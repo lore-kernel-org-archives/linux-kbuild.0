@@ -2,52 +2,52 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3FFEC10F1B
-	for <linux-kbuild@archiver.kernel.org>; Mon, 19 Dec 2022 05:55:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61A6BC4167B
+	for <linux-kbuild@archiver.kernel.org>; Mon, 19 Dec 2022 05:55:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231130AbiLSFzq (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 19 Dec 2022 00:55:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34150 "EHLO
+        id S231244AbiLSFzw (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 19 Dec 2022 00:55:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230484AbiLSFzo (ORCPT
+        with ESMTP id S231178AbiLSFzt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 19 Dec 2022 00:55:44 -0500
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 562B7B1;
-        Sun, 18 Dec 2022 21:55:42 -0800 (PST)
-Received: by mail-pg1-x530.google.com with SMTP id 7so432236pga.1;
-        Sun, 18 Dec 2022 21:55:42 -0800 (PST)
+        Mon, 19 Dec 2022 00:55:49 -0500
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5FD521B4;
+        Sun, 18 Dec 2022 21:55:47 -0800 (PST)
+Received: by mail-pf1-x429.google.com with SMTP id c7so5451410pfc.12;
+        Sun, 18 Dec 2022 21:55:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=xjYjpB0mdpoS0QPDN63hP2X3k7rFnBva/pL54tIDB7M=;
-        b=IGiLREpo03nd1mOJwn3H86s/4jpj9RFtgmO7pVCUcKaXvB/763+/fs+FDv5LiyNYak
-         JZUn0IfJRnGOO3u1Mh/Rl4H7DOpRRIngvl7TbbK/jORt/48Y0/LzE28Y/sY/pXV9yVrg
-         RuEMmRVMtu5hE5SvHVo4OU3jpK2BJyDxpSZpgaY9dR8DnnVgW9DhP22/ags9qGPET5u7
-         yke+vtf0BGqDCV8nKm8Vp5GKrj2a9bLQ4dqDglmloDj9EMPW0WxSYprcYLB7nkKaTE+8
-         Ku0/0AvOljFPlzOKagMgPb05EWpn3hSpGbD1ePTRFEpkI4oSsOjOYAz+pQIo6Zj6gScj
-         GVdg==
+        bh=AyBv2yXRlkeeO+f1+H4d1q5PY0y4eC9QhEdscvwNLko=;
+        b=a7MCRIQ0ffuurW4I/AzKORy24PQy6iEOw0R9D0PddFYnpa6/o47E2KpKw5c/xHCQci
+         ++poYRA9+sEAgcA2ZpfJq7S1U6a8Smrpj4h/KCSMssZmTTimLoJK30aCbVX7ILq0ZrQ6
+         srC7ngABRHLSxR2SmKPJJKsFhyRMkjt5BFkmDxZYlldEk38SZ4P4M437oqASMMNAMMUs
+         X4TzTzAUs6O0pCxKMR+BsiocI5xKqxCuvGE4v7I/2Sk0jBMTrRjTDEO/7cGQ9IN2OFM3
+         16VUlLXlW5HfVTbeSe/yQCM5BsccBQB71/w4s+MToHYF5OHKAw1n60eYid9D4hnpg6v+
+         ivgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=references:in-reply-to:message-id:date:subject:cc:to:from
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xjYjpB0mdpoS0QPDN63hP2X3k7rFnBva/pL54tIDB7M=;
-        b=cByIAM34ywGoyAmgZXVtYVzAqPr0VVVYsk3MopdsP6OSrl56Lc3Gnr5P0Kq5A7apx4
-         sP6GM8bWeoVqaM6WKse+TeZFK+tjcEc4Rzk/gL0KjEQgGpb3mjwhWZrcaiEEAqGa62yC
-         NOgxhcHYQ8xAabaFeGFaXci0E9itrB9qT7gDmajECeoymOv4521+7vkZgFd0d+3kJ0g5
-         8uB7k8K6yQPDFn0QKyhcGHOduGgAd6EehwWjxv7Ri4NCKDo/PyVT24WZmiTI0AXr6Y3n
-         9Pw68I4vinNSIl/VrExJg5Bng7XziGWBl1kpI9ujM9Wn6INEZZDhdUsDsaozIN8Q8ycf
-         S0Hw==
-X-Gm-Message-State: ANoB5pk6chhkllucygJB/VMPsoONiuXG9AHrRMDmzML97BaPsFBAM2Z5
-        WvQCFXAezL1P+bBTgNo+7yY=
-X-Google-Smtp-Source: AA0mqf5MfPpYJKDV/7PiN+/CxjwXpTaqxF5QDS6Kr3/6TLtwd6PIw4MV6JDcS8Ii2zotw1Cw5Kdzpg==
-X-Received: by 2002:a05:6a00:10d5:b0:572:6d6b:2297 with SMTP id d21-20020a056a0010d500b005726d6b2297mr49400591pfu.21.1671429341677;
-        Sun, 18 Dec 2022 21:55:41 -0800 (PST)
+        bh=AyBv2yXRlkeeO+f1+H4d1q5PY0y4eC9QhEdscvwNLko=;
+        b=bIErkx9lNq8DWKYwEIG8lU3kFoDoAA+0eFWo5TByU0+R7m+C+7tIwQEYLlVNvJFlKg
+         9c5s8gJiyYw6AuoqY+IrdvgmV9NXL5BeoJGieFcSzf+Qif2iApUZ47NUvf+Gb+k9+Apt
+         ZWzzKavCHTid4rRn4pKNyTy1IoRibXTGT99zYzMIBKSD7qqaebD6QilWmwqT+79Re+5A
+         OaDqEVKMC1kjmBlXUCPcRo/45tsjjm6L6M5ql/M0EbLJCNi79Py+fcIDKlzxoY/AIuia
+         JDxn+9WUY4Wquv+Fp3m5GfdSRBsLk6F8OIa/CVd4E/bjTaJUs166VnIM8EC1jT1OvLUr
+         QFtw==
+X-Gm-Message-State: AFqh2kpCRxbpHabEkZzgCWrUDiz9msrn7FDRI2R6XATY6LjyAeOm56Jd
+        fg7YssPYaPKcejDQn52DT+k=
+X-Google-Smtp-Source: AMrXdXslhaKo3Yl2VN4YoYZIe9fwnTM+MIhC3cQqnUth7HFJ2YAyOmmyVruTo0UdUNmPAFIQIcS/PQ==
+X-Received: by 2002:a62:1653:0:b0:578:f6f:efab with SMTP id 80-20020a621653000000b005780f6fefabmr7649033pfw.11.1671429347221;
+        Sun, 18 Dec 2022 21:55:47 -0800 (PST)
 Received: from localhost ([103.152.220.92])
-        by smtp.gmail.com with ESMTPSA id 193-20020a6217ca000000b00574cf11aaf3sm5525905pfx.208.2022.12.18.21.55.40
+        by smtp.gmail.com with ESMTPSA id i6-20020a056a00004600b00577adb71f92sm5571562pfk.219.2022.12.18.21.55.46
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Sun, 18 Dec 2022 21:55:41 -0800 (PST)
+        Sun, 18 Dec 2022 21:55:46 -0800 (PST)
 From:   Dan Li <ashimida.1990@gmail.com>
 To:     gcc-patches@gcc.gnu.org,
         Richard Sandiford <richard.sandiford@arm.com>,
@@ -85,9 +85,9 @@ To:     gcc-patches@gcc.gnu.org,
 Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, llvm@lists.linux.dev,
         linux-hardening@vger.kernel.org
-Subject: [RFC/RFT 1/3] [PR102768] flag-types.h (enum sanitize_code): Extend sanitize_code to 64 bits to support more features
-Date:   Sun, 18 Dec 2022 21:54:29 -0800
-Message-Id: <20221219055431.22596-2-ashimida.1990@gmail.com>
+Subject: [RFC/RFT 3/3] [PR102768] aarch64: Add support for Control Flow Integrity
+Date:   Sun, 18 Dec 2022 21:54:31 -0800
+Message-Id: <20221219055431.22596-4-ashimida.1990@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20221219055431.22596-1-ashimida.1990@gmail.com>
 References: <20221219055431.22596-1-ashimida.1990@gmail.com>
@@ -95,405 +95,310 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-32-bit sanitize_code can no longer accommodate new options,
-extending it to 64-bit.
+In the AArch64 platform, typeid can be directly inserted in front
+of the function header (offset is -4).
+
+For all functions that will not be called indirectly, insert the
+reserved RESERVED_CFI_TYPEID (0x0) as typeid in front of them. If
+not, the attacker may use the instruction/data before the function
+as typeid to bypass CFI.
+
+All typeids ignore some bits (& AARCH64_UNALLOCATED_INSN_MASK) to
+avoid conflicts with the AArch64 instruction set.
 
 Signed-off-by: Dan Li <ashimida.1990@gmail.com>
 
 gcc/ChangeLog:
 
 	PR c/102768
-	* asan.h (sanitize_flags_p): Promote to uint64_t.
-	* common.opt: Likewise.
-	* dwarf2asm.cc (dw2_output_indirect_constant_1): Likewise.
-	* flag-types.h (enum sanitize_code): Likewise.
-	* opt-suggestions.cc (option_proposer::build_option_suggestions):
-	Likewise.
-	* opts.cc (find_sanitizer_argument): Likewise.
-	(report_conflicting_sanitizer_options): Likewise.
-	(get_closest_sanitizer_option): Likewise.
-	(parse_sanitizer_options): Likewise.
-	(parse_no_sanitize_attribute): Likewise.
-	* opts.h (parse_sanitizer_options): Likewise.
-	(parse_no_sanitize_attribute): Likewise.
-	* tree-cfg.cc (print_no_sanitize_attr_value): Likewise.
+	* config/aarch64/aarch64.cc (RESERVED_CFI_TYPEID): Macro definition.
+	(DEFAULT_CFI_TYPEID): Likewise.
+	(AARCH64_UNALLOCATED_INSN_MASK): Likewise.
+	(aarch64_gimple_get_func_cfi_typeid): Platform-dependent
+	CFI function.
+	(aarch64_calc_func_cfi_typeid): Likewise.
+	(cgraph_indirectly_callable): Determine whether a funtion may
+	be called indirectly.
+	(aarch64_output_func_cfi_typeid): Platform-dependent CFI function.
+	(TARGET_HAVE_CFI): New hook.
+	(TARGET_CALC_FUNC_CFI_TYPEID): Likewise.
+	(TARGET_ASM_OUTPUT_FUNC_CFI_TYPEID): Likewise.
+	(TARGET_GIMPLE_GET_FUNC_CFI_TYPEID): Likewise.
+	* doc/invoke.texi: Document -fsanitize=cfi.
 
-gcc/c-family/ChangeLog:
+gcc/testsuite/ChangeLog:
 
-	* c-attribs.cc (add_no_sanitize_value): Likewise.
-	(handle_no_sanitize_attribute): Likewise.
-	* c-common.h (add_no_sanitize_value): Likewise.
-
-gcc/c/ChangeLog:
-
-	* c-parser.cc (c_parser_declaration_or_fndef): Likewise.
-
-gcc/cp/ChangeLog:
-
-	* typeck.cc (get_member_function_from_ptrfunc): Likewise.
+	* gcc.target/aarch64/control_flow_integrity_1.c: New test.
+	* gcc.target/aarch64/control_flow_integrity_2.c: New test.
+	* gcc.target/aarch64/control_flow_integrity_3.c: New test.
 ---
- gcc/asan.h                |  4 +--
- gcc/c-family/c-attribs.cc | 10 +++---
- gcc/c-family/c-common.h   |  2 +-
- gcc/c/c-parser.cc         |  4 +--
- gcc/common.opt            |  4 +--
- gcc/cp/typeck.cc          |  2 +-
- gcc/dwarf2asm.cc          |  2 +-
- gcc/flag-types.h          | 65 ++++++++++++++++++++-------------------
- gcc/opt-suggestions.cc    |  2 +-
- gcc/opts.cc               | 22 ++++++-------
- gcc/opts.h                |  8 ++---
- gcc/tree-cfg.cc           |  2 +-
- 12 files changed, 64 insertions(+), 63 deletions(-)
+ gcc/config/aarch64/aarch64.cc                 | 106 ++++++++++++++++++
+ gcc/doc/invoke.texi                           |  35 ++++++
+ .../aarch64/control_flow_integrity_1.c        |  14 +++
+ .../aarch64/control_flow_integrity_2.c        |  25 +++++
+ .../aarch64/control_flow_integrity_3.c        |  23 ++++
+ 5 files changed, 203 insertions(+)
+ create mode 100644 gcc/testsuite/gcc.target/aarch64/control_flow_integrity_1.c
+ create mode 100644 gcc/testsuite/gcc.target/aarch64/control_flow_integrity_2.c
+ create mode 100644 gcc/testsuite/gcc.target/aarch64/control_flow_integrity_3.c
 
-diff --git a/gcc/asan.h b/gcc/asan.h
-index d4ea49cb240..5b98172549b 100644
---- a/gcc/asan.h
-+++ b/gcc/asan.h
-@@ -233,9 +233,9 @@ asan_protect_stack_decl (tree decl)
-    remove all flags mentioned in "no_sanitize" of DECL_ATTRIBUTES.  */
+diff --git a/gcc/config/aarch64/aarch64.cc b/gcc/config/aarch64/aarch64.cc
+index 5c9e7791a12..2796df0cdf3 100644
+--- a/gcc/config/aarch64/aarch64.cc
++++ b/gcc/config/aarch64/aarch64.cc
+@@ -81,6 +81,7 @@
+ #include "rtlanal.h"
+ #include "tree-dfa.h"
+ #include "asan.h"
++#include "ssa.h"
  
- static inline bool
--sanitize_flags_p (unsigned int flag, const_tree fn = current_function_decl)
-+sanitize_flags_p (uint64_t flag, const_tree fn = current_function_decl)
- {
--  unsigned int result_flags = flag_sanitize & flag;
-+  uint64_t result_flags = flag_sanitize & flag;
-   if (result_flags == 0)
-     return false;
- 
-diff --git a/gcc/c-family/c-attribs.cc b/gcc/c-family/c-attribs.cc
-index 111a33f405a..a73e2364525 100644
---- a/gcc/c-family/c-attribs.cc
-+++ b/gcc/c-family/c-attribs.cc
-@@ -1118,23 +1118,23 @@ handle_cold_attribute (tree *node, tree name, tree ARG_UNUSED (args),
- /* Add FLAGS for a function NODE to no_sanitize_flags in DECL_ATTRIBUTES.  */
- 
- void
--add_no_sanitize_value (tree node, unsigned int flags)
-+add_no_sanitize_value (tree node, uint64_t flags)
- {
-   tree attr = lookup_attribute ("no_sanitize", DECL_ATTRIBUTES (node));
-   if (attr)
-     {
--      unsigned int old_value = tree_to_uhwi (TREE_VALUE (attr));
-+      uint64_t old_value = tree_to_uhwi (TREE_VALUE (attr));
-       flags |= old_value;
- 
-       if (flags == old_value)
- 	return;
- 
--      TREE_VALUE (attr) = build_int_cst (unsigned_type_node, flags);
-+      TREE_VALUE (attr) = build_int_cst (long_long_unsigned_type_node, flags);
-     }
-   else
-     DECL_ATTRIBUTES (node)
-       = tree_cons (get_identifier ("no_sanitize"),
--		   build_int_cst (unsigned_type_node, flags),
-+		   build_int_cst (long_long_unsigned_type_node, flags),
- 		   DECL_ATTRIBUTES (node));
+ /* This file should be included last.  */
+ #include "target-def.h"
+@@ -5450,6 +5451,99 @@ aarch64_output_sve_addvl_addpl (rtx offset)
+   return buffer;
  }
  
-@@ -1145,7 +1145,7 @@ static tree
- handle_no_sanitize_attribute (tree *node, tree name, tree args, int,
- 			      bool *no_add_attrs)
- {
--  unsigned int flags = 0;
-+  uint64_t flags = 0;
-   *no_add_attrs = true;
-   if (TREE_CODE (*node) != FUNCTION_DECL)
-     {
-diff --git a/gcc/c-family/c-common.h b/gcc/c-family/c-common.h
-index 52a85bfb783..eb91b9703db 100644
---- a/gcc/c-family/c-common.h
-+++ b/gcc/c-family/c-common.h
-@@ -1500,7 +1500,7 @@ extern enum flt_eval_method
- excess_precision_mode_join (enum flt_eval_method, enum flt_eval_method);
++/* Reserved for all functions that cannot be called indirectly.  */
++#define RESERVED_CFI_TYPEID 0x0U
++
++/* If the typeid of a function that can be called indirectly is equal to
++   RESERVED_CFI_TYPEID, change it to DEFAULT_CFI_TYPEID.  */
++#define DEFAULT_CFI_TYPEID 0x00000ADAU
++
++/* Mask of reserved and unallocated instructions in AArch64 platform.  */
++#define AARCH64_UNALLOCATED_INSN_MASK 0xE7FFFFFFU
++
++/* Generate gimple insns to return the callee's typeid to a tmp var,
++   for aarch64, like:
++	__cfi_tmp = *(fptr - 4);  */
++
++static tree
++aarch64_gimple_get_func_cfi_typeid (gimple_seq *stmts,
++				    location_t loc, tree fptr)
++{
++  gimple *stmt;
++  tree result, rhs;
++
++  result = create_tmp_var (integer_type_node, "__cfi_tmp");
++  result = make_ssa_name (result, NULL);
++
++  rhs = build_pointer_type (integer_type_node);
++  rhs = build_int_cst_type (rhs, -4);
++  rhs = build2 (MEM_REF, integer_type_node, fptr, rhs);
++
++  stmt = gimple_build_assign (result, rhs);
++  gimple_set_location (stmt, loc);
++
++  SSA_NAME_DEF_STMT (result) = stmt;
++
++  gimple_seq_add_stmt (stmts, stmt);
++
++  return result;
++}
++
++static unsigned int
++aarch64_calc_func_cfi_typeid (const_tree fntype)
++{
++  unsigned int hash;
++
++  /* The value of typeid has a probability of being the same as the encoding
++     of an instruction.  If the attacker can find the same encoding as the
++     typeid in the assembly code, then he has found a usable jump location.
++     So here, a platform-related mask is used when generating a typeid to
++     avoid such conflicts as much as possible.  */
++  hash = unified_type_hash (fntype) & AARCH64_UNALLOCATED_INSN_MASK;
++
++  /* RESERVED_CFI_TYPEID is reserved for functions that cannot
++     be called indirectly.  */
++  if (hash == RESERVED_CFI_TYPEID)
++    hash = DEFAULT_CFI_TYPEID;
++
++  return hash;
++}
++
++static bool
++cgraph_indirectly_callable (struct cgraph_node *node,
++			    void *data ATTRIBUTE_UNUSED)
++{
++  if (node->externally_visible || node->address_taken)
++    return true;
++
++  return false;
++}
++
++static void
++aarch64_output_func_cfi_typeid (FILE * stream, tree decl)
++{
++  struct cgraph_node *node;
++  unsigned int cur_func_typeid;
++
++  node = cgraph_node::get (decl);
++
++  if (!node->call_for_symbol_thunks_and_aliases (cgraph_indirectly_callable,
++					       NULL, true))
++    /* CFI's typeid check always considers that there is a typeid before the
++       target function, so it is also necessary to output typeid for functions
++       that cannot be called indirectly to prevent attackers from bypassing
++       CFI by using instructions/data before those functions.
++       The typeid inserted before such a function is RESERVED_CFI_TYPEID,
++       and the calculation of the typeid must ensure that this value is always
++       reserved.  */
++    cur_func_typeid = RESERVED_CFI_TYPEID;
++  else
++    cur_func_typeid = aarch64_calc_func_cfi_typeid (TREE_TYPE (decl));
++
++  fprintf (stream, "__cfi_%s:\n", get_name (decl));
++  fprintf (stream, "\t.4byte %#010x\n", cur_func_typeid);
++}
++
+ /* Return true if X is a valid immediate for an SVE vector INC or DEC
+    instruction.  If it is, store the number of elements in each vector
+    quadword in *NELTS_PER_VQ_OUT (if nonnull) and store the multiplication
+@@ -27823,6 +27917,18 @@ aarch64_libgcc_floating_mode_supported_p
+ #undef TARGET_HAVE_SHADOW_CALL_STACK
+ #define TARGET_HAVE_SHADOW_CALL_STACK true
  
- extern int c_flt_eval_method (bool ts18661_p);
--extern void add_no_sanitize_value (tree node, unsigned int flags);
-+extern void add_no_sanitize_value (tree node, uint64_t flags);
++#undef TARGET_HAVE_CFI
++#define TARGET_HAVE_CFI true
++
++#undef TARGET_CALC_FUNC_CFI_TYPEID
++#define TARGET_CALC_FUNC_CFI_TYPEID aarch64_calc_func_cfi_typeid
++
++#undef TARGET_ASM_OUTPUT_FUNC_CFI_TYPEID
++#define TARGET_ASM_OUTPUT_FUNC_CFI_TYPEID aarch64_output_func_cfi_typeid
++
++#undef TARGET_GIMPLE_GET_FUNC_CFI_TYPEID
++#define TARGET_GIMPLE_GET_FUNC_CFI_TYPEID aarch64_gimple_get_func_cfi_typeid
++
+ struct gcc_target targetm = TARGET_INITIALIZER;
  
- extern void maybe_add_include_fixit (rich_location *, const char *, bool);
- extern void maybe_suggest_missing_token_insertion (rich_location *richloc,
-diff --git a/gcc/c/c-parser.cc b/gcc/c/c-parser.cc
-index f679d53706a..9d55ea55fa6 100644
---- a/gcc/c/c-parser.cc
-+++ b/gcc/c/c-parser.cc
-@@ -2217,7 +2217,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
- 		  start_init (NULL_TREE, asm_name, global_bindings_p (), &richloc);
- 		  /* A parameter is initialized, which is invalid.  Don't
- 		     attempt to instrument the initializer.  */
--		  int flag_sanitize_save = flag_sanitize;
-+		  uint64_t flag_sanitize_save = flag_sanitize;
- 		  if (nested && !empty_ok)
- 		    flag_sanitize = 0;
- 		  init = c_parser_expr_no_commas (parser, NULL);
-@@ -2275,7 +2275,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
- 		  start_init (d, asm_name, global_bindings_p (), &richloc);
- 		  /* A parameter is initialized, which is invalid.  Don't
- 		     attempt to instrument the initializer.  */
--		  int flag_sanitize_save = flag_sanitize;
-+		  uint64_t flag_sanitize_save = flag_sanitize;
- 		  if (TREE_CODE (d) == PARM_DECL)
- 		    flag_sanitize = 0;
- 		  init = c_parser_initializer (parser);
-diff --git a/gcc/common.opt b/gcc/common.opt
-index 8a0dafc522d..9613c2f8ba0 100644
---- a/gcc/common.opt
-+++ b/gcc/common.opt
-@@ -217,11 +217,11 @@ bool flag_opts_finished
+ #include "gt-aarch64.h"
+diff --git a/gcc/doc/invoke.texi b/gcc/doc/invoke.texi
+index ff6c338bedb..302ae6fe370 100644
+--- a/gcc/doc/invoke.texi
++++ b/gcc/doc/invoke.texi
+@@ -15736,6 +15736,41 @@ to turn off exceptions.
+ See @uref{https://clang.llvm.org/docs/ShadowCallStack.html} for more
+ details.
  
- ; What the sanitizer should instrument
- Variable
--unsigned int flag_sanitize
-+uint64_t flag_sanitize
- 
- ; What sanitizers should recover from errors
- Variable
--unsigned int flag_sanitize_recover = (SANITIZE_UNDEFINED | SANITIZE_UNDEFINED_NONDEFAULT | SANITIZE_KERNEL_ADDRESS | SANITIZE_KERNEL_HWADDRESS) & ~(SANITIZE_UNREACHABLE | SANITIZE_RETURN)
-+uint64_t flag_sanitize_recover = (SANITIZE_UNDEFINED | SANITIZE_UNDEFINED_NONDEFAULT | SANITIZE_KERNEL_ADDRESS | SANITIZE_KERNEL_HWADDRESS) & ~(SANITIZE_UNREACHABLE | SANITIZE_RETURN)
- 
- ; Flag whether a prefix has been added to dump_base_name
- Variable
-diff --git a/gcc/cp/typeck.cc b/gcc/cp/typeck.cc
-index ceb80d9744f..0afaf58d87d 100644
---- a/gcc/cp/typeck.cc
-+++ b/gcc/cp/typeck.cc
-@@ -4023,7 +4023,7 @@ get_member_function_from_ptrfunc (tree *instance_ptrptr, tree function,
-       idx = build1 (NOP_EXPR, vtable_index_type, e3);
-       switch (TARGET_PTRMEMFUNC_VBIT_LOCATION)
- 	{
--	  int flag_sanitize_save;
-+	  uint64_t flag_sanitize_save;
- 	case ptrmemfunc_vbit_in_pfn:
- 	  e1 = cp_build_binary_op (input_location,
- 				   BIT_AND_EXPR, idx, integer_one_node,
-diff --git a/gcc/dwarf2asm.cc b/gcc/dwarf2asm.cc
-index 274f574f25e..b54d1935d57 100644
---- a/gcc/dwarf2asm.cc
-+++ b/gcc/dwarf2asm.cc
-@@ -1026,7 +1026,7 @@ dw2_output_indirect_constant_1 (const char *sym, tree id)
-   sym_ref = gen_rtx_SYMBOL_REF (Pmode, sym);
-   /* Disable ASan for decl because redzones cause ABI breakage between GCC and
-      libstdc++ for `.LDFCM*' variables.  See PR 78651 for details.  */
--  unsigned int save_flag_sanitize = flag_sanitize;
-+  uint64_t save_flag_sanitize = flag_sanitize;
-   flag_sanitize &= ~(SANITIZE_ADDRESS | SANITIZE_USER_ADDRESS
- 		     | SANITIZE_KERNEL_ADDRESS);
-   /* And also temporarily disable -fsection-anchors.  These indirect constants
-diff --git a/gcc/flag-types.h b/gcc/flag-types.h
-index 2c8498169e0..0aa51e282fb 100644
---- a/gcc/flag-types.h
-+++ b/gcc/flag-types.h
-@@ -287,42 +287,43 @@ enum auto_init_type {
- /* Different instrumentation modes.  */
- enum sanitize_code {
-   /* AddressSanitizer.  */
--  SANITIZE_ADDRESS = 1UL << 0,
--  SANITIZE_USER_ADDRESS = 1UL << 1,
--  SANITIZE_KERNEL_ADDRESS = 1UL << 2,
-+  SANITIZE_ADDRESS = 1ULL << 0,
-+  SANITIZE_USER_ADDRESS = 1ULL << 1,
-+  SANITIZE_KERNEL_ADDRESS = 1ULL << 2,
-   /* ThreadSanitizer.  */
--  SANITIZE_THREAD = 1UL << 3,
-+  SANITIZE_THREAD = 1ULL << 3,
-   /* LeakSanitizer.  */
--  SANITIZE_LEAK = 1UL << 4,
-+  SANITIZE_LEAK = 1ULL << 4,
-   /* UndefinedBehaviorSanitizer.  */
--  SANITIZE_SHIFT_BASE = 1UL << 5,
--  SANITIZE_SHIFT_EXPONENT = 1UL << 6,
--  SANITIZE_DIVIDE = 1UL << 7,
--  SANITIZE_UNREACHABLE = 1UL << 8,
--  SANITIZE_VLA = 1UL << 9,
--  SANITIZE_NULL = 1UL << 10,
--  SANITIZE_RETURN = 1UL << 11,
--  SANITIZE_SI_OVERFLOW = 1UL << 12,
--  SANITIZE_BOOL = 1UL << 13,
--  SANITIZE_ENUM = 1UL << 14,
--  SANITIZE_FLOAT_DIVIDE = 1UL << 15,
--  SANITIZE_FLOAT_CAST = 1UL << 16,
--  SANITIZE_BOUNDS = 1UL << 17,
--  SANITIZE_ALIGNMENT = 1UL << 18,
--  SANITIZE_NONNULL_ATTRIBUTE = 1UL << 19,
--  SANITIZE_RETURNS_NONNULL_ATTRIBUTE = 1UL << 20,
--  SANITIZE_OBJECT_SIZE = 1UL << 21,
--  SANITIZE_VPTR = 1UL << 22,
--  SANITIZE_BOUNDS_STRICT = 1UL << 23,
--  SANITIZE_POINTER_OVERFLOW = 1UL << 24,
--  SANITIZE_BUILTIN = 1UL << 25,
--  SANITIZE_POINTER_COMPARE = 1UL << 26,
--  SANITIZE_POINTER_SUBTRACT = 1UL << 27,
--  SANITIZE_HWADDRESS = 1UL << 28,
--  SANITIZE_USER_HWADDRESS = 1UL << 29,
--  SANITIZE_KERNEL_HWADDRESS = 1UL << 30,
-+  SANITIZE_SHIFT_BASE = 1ULL << 5,
-+  SANITIZE_SHIFT_EXPONENT = 1ULL << 6,
-+  SANITIZE_DIVIDE = 1ULL << 7,
-+  SANITIZE_UNREACHABLE = 1ULL << 8,
-+  SANITIZE_VLA = 1ULL << 9,
-+  SANITIZE_NULL = 1ULL << 10,
-+  SANITIZE_RETURN = 1ULL << 11,
-+  SANITIZE_SI_OVERFLOW = 1ULL << 12,
-+  SANITIZE_BOOL = 1ULL << 13,
-+  SANITIZE_ENUM = 1ULL << 14,
-+  SANITIZE_FLOAT_DIVIDE = 1ULL << 15,
-+  SANITIZE_FLOAT_CAST = 1ULL << 16,
-+  SANITIZE_BOUNDS = 1ULL << 17,
-+  SANITIZE_ALIGNMENT = 1ULL << 18,
-+  SANITIZE_NONNULL_ATTRIBUTE = 1ULL << 19,
-+  SANITIZE_RETURNS_NONNULL_ATTRIBUTE = 1ULL << 20,
-+  SANITIZE_OBJECT_SIZE = 1ULL << 21,
-+  SANITIZE_VPTR = 1ULL << 22,
-+  SANITIZE_BOUNDS_STRICT = 1ULL << 23,
-+  SANITIZE_POINTER_OVERFLOW = 1ULL << 24,
-+  SANITIZE_BUILTIN = 1ULL << 25,
-+  SANITIZE_POINTER_COMPARE = 1ULL << 26,
-+  SANITIZE_POINTER_SUBTRACT = 1ULL << 27,
-+  SANITIZE_HWADDRESS = 1ULL << 28,
-+  SANITIZE_USER_HWADDRESS = 1ULL << 29,
-+  SANITIZE_KERNEL_HWADDRESS = 1ULL << 30,
-   /* Shadow Call Stack.  */
--  SANITIZE_SHADOW_CALL_STACK = 1UL << 31,
-+  SANITIZE_SHADOW_CALL_STACK = 1ULL << 31,
-+  SANITIZE_MAX = 1ULL << 63,
-   SANITIZE_SHIFT = SANITIZE_SHIFT_BASE | SANITIZE_SHIFT_EXPONENT,
-   SANITIZE_UNDEFINED = SANITIZE_SHIFT | SANITIZE_DIVIDE | SANITIZE_UNREACHABLE
- 		       | SANITIZE_VLA | SANITIZE_NULL | SANITIZE_RETURN
-diff --git a/gcc/opt-suggestions.cc b/gcc/opt-suggestions.cc
-index 33f298560a1..c667e23e66f 100644
---- a/gcc/opt-suggestions.cc
-+++ b/gcc/opt-suggestions.cc
-@@ -173,7 +173,7 @@ option_proposer::build_option_suggestions (const char *prefix)
- 		/* -fsanitize=all is not valid, only -fno-sanitize=all.
- 		   So don't register the positive misspelling candidates
- 		   for it.  */
--		if (sanitizer_opts[j].flag == ~0U && i == OPT_fsanitize_)
-+		if (sanitizer_opts[j].flag == ~0ULL && i == OPT_fsanitize_)
- 		  {
- 		    optb = *option;
- 		    optb.opt_text = opt_text = "-fno-sanitize=";
-diff --git a/gcc/opts.cc b/gcc/opts.cc
-index 3a89da2dd03..11c5d70458f 100644
---- a/gcc/opts.cc
-+++ b/gcc/opts.cc
-@@ -966,7 +966,7 @@ vec<const char *> help_option_arguments;
- /* Return the string name describing a sanitizer argument which has been
-    provided on the command line and has set this particular flag.  */
- const char *
--find_sanitizer_argument (struct gcc_options *opts, unsigned int flags)
-+find_sanitizer_argument (struct gcc_options *opts, uint64_t flags)
- {
-   for (int i = 0; sanitizer_opts[i].name != NULL; ++i)
-     {
-@@ -1000,10 +1000,10 @@ find_sanitizer_argument (struct gcc_options *opts, unsigned int flags)
-    set these flags.  */
- static void
- report_conflicting_sanitizer_options (struct gcc_options *opts, location_t loc,
--				      unsigned int left, unsigned int right)
-+				      uint64_t left, uint64_t right)
- {
--  unsigned int left_seen = (opts->x_flag_sanitize & left);
--  unsigned int right_seen = (opts->x_flag_sanitize & right);
-+  uint64_t left_seen = (opts->x_flag_sanitize & left);
-+  uint64_t right_seen = (opts->x_flag_sanitize & right);
-   if (left_seen && right_seen)
-     {
-       const char* left_arg = find_sanitizer_argument (opts, left_seen);
-@@ -2059,7 +2059,7 @@ const struct sanitizer_opts_s sanitizer_opts[] =
-   SANITIZER_OPT (pointer-overflow, SANITIZE_POINTER_OVERFLOW, true),
-   SANITIZER_OPT (builtin, SANITIZE_BUILTIN, true),
-   SANITIZER_OPT (shadow-call-stack, SANITIZE_SHADOW_CALL_STACK, false),
--  SANITIZER_OPT (all, ~0U, true),
-+  SANITIZER_OPT (all, ~0ULL, true),
- #undef SANITIZER_OPT
-   { NULL, 0U, 0UL, false }
- };
-@@ -2128,7 +2128,7 @@ get_closest_sanitizer_option (const string_fragment &arg,
-     {
-       /* -fsanitize=all is not valid, so don't offer it.  */
-       if (code == OPT_fsanitize_
--	  && opts[i].flag == ~0U
-+	  && opts[i].flag == ~0ULL
- 	  && value)
- 	continue;
- 
-@@ -2148,9 +2148,9 @@ get_closest_sanitizer_option (const string_fragment &arg,
-    adjust previous FLAGS and return new ones.  If COMPLAIN is false,
-    don't issue diagnostics.  */
- 
--unsigned int
-+uint64_t
- parse_sanitizer_options (const char *p, location_t loc, int scode,
--			 unsigned int flags, int value, bool complain)
-+			 uint64_t flags, int value, bool complain)
- {
-   enum opt_code code = (enum opt_code) scode;
- 
-@@ -2176,7 +2176,7 @@ parse_sanitizer_options (const char *p, location_t loc, int scode,
- 	    && memcmp (p, sanitizer_opts[i].name, len) == 0)
- 	  {
- 	    /* Handle both -fsanitize and -fno-sanitize cases.  */
--	    if (value && sanitizer_opts[i].flag == ~0U)
-+	    if (value && sanitizer_opts[i].flag == ~0ULL)
- 	      {
- 		if (code == OPT_fsanitize_)
- 		  {
-@@ -2241,10 +2241,10 @@ parse_sanitizer_options (const char *p, location_t loc, int scode,
- /* Parse string values of no_sanitize attribute passed in VALUE.
-    Values are separated with comma.  */
- 
--unsigned int
-+uint64_t
- parse_no_sanitize_attribute (char *value)
- {
--  unsigned int flags = 0;
-+  uint64_t flags = 0;
-   unsigned int i;
-   char *q = strtok (value, ",");
- 
-diff --git a/gcc/opts.h b/gcc/opts.h
-index a43ce66cffe..17a02cc7c14 100644
---- a/gcc/opts.h
-+++ b/gcc/opts.h
-@@ -425,10 +425,10 @@ extern void control_warning_option (unsigned int opt_index, int kind,
- extern char *write_langs (unsigned int mask);
- extern void print_ignored_options (void);
- extern void handle_common_deferred_options (void);
--unsigned int parse_sanitizer_options (const char *, location_t, int,
--				      unsigned int, int, bool);
-+uint64_t parse_sanitizer_options (const char *, location_t, int,
-+				      uint64_t, int, bool);
- 
--unsigned int parse_no_sanitize_attribute (char *value);
-+uint64_t parse_no_sanitize_attribute (char *value);
- extern bool common_handle_option (struct gcc_options *opts,
- 				  struct gcc_options *opts_set,
- 				  const struct cl_decoded_option *decoded,
-@@ -470,7 +470,7 @@ extern bool opt_enum_arg_to_value (size_t opt_index, const char *arg,
- extern const struct sanitizer_opts_s
- {
-   const char *const name;
--  unsigned int flag;
-+  uint64_t flag;
-   size_t len;
-   bool can_recover;
- } sanitizer_opts[];
-diff --git a/gcc/tree-cfg.cc b/gcc/tree-cfg.cc
-index e321d929fd0..8cc31db9bea 100644
---- a/gcc/tree-cfg.cc
-+++ b/gcc/tree-cfg.cc
-@@ -8018,7 +8018,7 @@ dump_default_def (FILE *file, tree def, int spc, dump_flags_t flags)
- static void
- print_no_sanitize_attr_value (FILE *file, tree value)
- {
--  unsigned int flags = tree_to_uhwi (value);
-+  uint64_t flags = tree_to_uhwi (value);
-   bool first = true;
-   for (int i = 0; sanitizer_opts[i].name != NULL; ++i)
-     {
++@item -fsanitize=cfi
++@opindex fsanitize=cfi
++The CFI sanitizer, enabled with @option{-fsanitize=cfi}, implements a
++forward-edge control flow integrity scheme for indirect calls.  It
++attaches a type identifier (@code{typeid}) for each function and injects
++verification code before indirect calls.
++
++A @code{typeid} is a 32-bit constant, its value is mainly related to the
++return value type and all parameter types of the function, and is invariant
++for each compilation.  Since the value of @code{typeid} may conflict with
++the instruction set encoding of the current platform, some bits may be
++ignored on different platforms.
++
++At compile time, the compiler inserts checking code on all indirect calls,
++and at run time, before any indirect calls occur, the code checks that
++the @code{typeid} before the callee function matches the @code{typeid}
++requested by the caller.  If the match fails, the @code{cfi_check_failed}
++function will be called.  When enabling cfi, users need to implement this
++function by themselves.
++
++If a program contains indirect calls to assembly functions, they must be
++manually annotated with the expected type identifiers to prevent errors.
++To make this easier, CFI generates a weak SHN_ABS
++@code{__cfi_typeid_<function>} symbol for each address-taken function
++declaration, which can be used to annotate functions in assembly as long
++as at least one C translation unit linked into the program takes the
++function address.
++
++Currently this feature only supports the aarch64 platform, mainly for
++the linux kernel.  Users who want to use this feature in user space
++need to provide their own support for the runtime.
++
++See @uref{https://clang.llvm.org/docs/ControlFlowIntegrity.html} for
++more details.
++
+ @item -fsanitize=thread
+ @opindex fsanitize=thread
+ Enable ThreadSanitizer, a fast data race detector.
+diff --git a/gcc/testsuite/gcc.target/aarch64/control_flow_integrity_1.c b/gcc/testsuite/gcc.target/aarch64/control_flow_integrity_1.c
+new file mode 100644
+index 00000000000..0e53e294a96
+--- /dev/null
++++ b/gcc/testsuite/gcc.target/aarch64/control_flow_integrity_1.c
+@@ -0,0 +1,14 @@
++/* Verify:
++     * typeid is output for an external declaration if and only if
++       its address is token within the current compilation unit.  */
++
++/* { dg-do compile } */
++/* { dg-options "-fsanitize=cfi" } */
++
++extern int func1(void);
++extern int func2(void);
++
++int (*p)(void) = func1;
++
++/* { dg-final { scan-assembler-times {.weak __cfi_typeid_func} 1 } } */
++/* { dg-final { scan-assembler-times {.set __cfi_typeid_func} 1 } } */
+diff --git a/gcc/testsuite/gcc.target/aarch64/control_flow_integrity_2.c b/gcc/testsuite/gcc.target/aarch64/control_flow_integrity_2.c
+new file mode 100644
+index 00000000000..36396a904f0
+--- /dev/null
++++ b/gcc/testsuite/gcc.target/aarch64/control_flow_integrity_2.c
+@@ -0,0 +1,25 @@
++/* Verify:
++     * When CFI is enabled, the default typeid inserted before
++       functions that cannot be called indirectly is 0.
++     * The default typeid inserted before the function that can
++       be called indirectly is not 0.
++     * A __cfi_A symbol is always inserted before function A.  */
++
++/* { dg-do compile } */
++/* { dg-options "-fsanitize=cfi" } */
++
++static int func1(void)
++{
++  return 0;
++}
++
++static int func2(void)
++{
++  return 0;
++}
++
++int (*p)(void) = func1;
++
++/* { dg-final { scan-assembler-times {.4byte} 2 } } */
++/* { dg-final { scan-assembler-times {.4byte 0000000000} 1 } } */
++/* { dg-final { scan-assembler-times {__cfi_func} 2 } } */
+diff --git a/gcc/testsuite/gcc.target/aarch64/control_flow_integrity_3.c b/gcc/testsuite/gcc.target/aarch64/control_flow_integrity_3.c
+new file mode 100644
+index 00000000000..ad8880d526c
+--- /dev/null
++++ b/gcc/testsuite/gcc.target/aarch64/control_flow_integrity_3.c
+@@ -0,0 +1,23 @@
++/* Verify:
++     * A cfi check is always inserted before an indirect function call,
++       and the cfi_check_failed function is called if the check fails.
++     * For functions with cfi disabled, no checks are inserted.  */
++
++/* { dg-do compile } */
++/* { dg-options "-fsanitize=cfi" } */
++
++#define __no_cfi __attribute__((no_sanitize("cfi")))
++
++int (*p)(void);
++
++void __no_cfi func1(void)
++{
++  p();
++}
++
++void func2(void)
++{
++  p();
++}
++
++/* { dg-final { scan-assembler-times {bl\tcfi_check_failed} 1 } } */
 -- 
 2.17.1
 
