@@ -2,143 +2,74 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFFB9C3DA7D
-	for <linux-kbuild@archiver.kernel.org>; Thu, 29 Dec 2022 07:44:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE31BC4332F
+	for <linux-kbuild@archiver.kernel.org>; Thu, 29 Dec 2022 08:08:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230078AbiL2Hn7 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 29 Dec 2022 02:43:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56138 "EHLO
+        id S229685AbiL2II2 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 29 Dec 2022 03:08:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232996AbiL2Hnc (ORCPT
+        with ESMTP id S229483AbiL2II1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 29 Dec 2022 02:43:32 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73D89FD3;
-        Wed, 28 Dec 2022 23:43:31 -0800 (PST)
+        Thu, 29 Dec 2022 03:08:27 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7573C12;
+        Thu, 29 Dec 2022 00:08:25 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E65386170C;
-        Thu, 29 Dec 2022 07:43:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E3E0C433D2;
-        Thu, 29 Dec 2022 07:43:28 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 18D1CCE1626;
+        Thu, 29 Dec 2022 08:08:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C39BFC433EF;
+        Thu, 29 Dec 2022 08:08:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1672299810;
-        bh=/mTmrBpGVR4tHpil4FIqdwtv6srLo9Xnga3QkS7c6QQ=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=FlqslimJZoIeBn+FrqTdBOBuFMPmaZN6s2NfM7h++iksFK0Zp4luuvQTCKa6Zwosm
-         ShF07zAQsN11sK8jNuRVcc7h73IWcywsc3r0QfCpQmqoXyNQuz9ilOMyZGozbcPJkY
-         3XGLTedCy75KtsFWb1/GOLhjRLPR1OlmoHNy0FInREsa9z6RBDn9roy3lSCtl8NnZs
-         63M28ALmLFceylC+ruLSsaWEwAjZMLUnA14zDMIMjHrcthe4z+FvLOz/UKrSmhn29s
-         hUoiHRZHZSIudNBpW4zDT9eFyU0LPMvuRpRAjS8Aba92jtdlbDU0T+lomB0OrpxGcm
-         D2GkXunoyzudg==
+        s=k20201202; t=1672301302;
+        bh=sm+R17qklIAzzueLKed0KwWpx39W6KMlkozX2GsMfMk=;
+        h=From:To:Cc:Subject:Date:From;
+        b=XtsshrjfGOR37AUqV4A2y2OVbUyZ1Sn/469r5X+BAkzIl+VdBDwO+ItmV6f/Gf8rP
+         qyvneuivjIdjsJlbR3OJCBx/IwJwhlszhELBhop+cOk/E7hf4IfO152E8/BUzEVWIS
+         LgjQW+pJ75m1njtMESvdFWL6Uv+nvmTkOecGdsPrvWoBNLW5L2ozeFknn4+TQ8y7j1
+         Xx4ishTf7f/kk9tC3rIp6t5rgRldQ/MNzTJWCfYLnnp4qwHmeGwll3/tMsesyCfFUz
+         4bH4UDioiGbO9T7naRGvtoPKHWkpT0GJ+7Khrve7JWe9hfj6KAeQxffJHCI3Pd460i
+         YINIlOHD8m6Yg==
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
+Cc:     linux-kernel@vger.kernel.org, Miguel Ojeda <ojeda@kernel.org>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Nathan Chancellor <nathan@kernel.org>,
-        Nicolas Schier <nicolas@fjasle.eu>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH v3 2/2] kbuild: make W=1 warn files that are tracked but ignored by git
-Date:   Thu, 29 Dec 2022 16:43:10 +0900
-Message-Id: <20221229074310.906556-2-masahiroy@kernel.org>
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nicolas Schier <nicolas@fjasle.eu>
+Subject: [PATCH] kbuild: sort single-targets alphabetically again
+Date:   Thu, 29 Dec 2022 17:08:13 +0900
+Message-Id: <20221229080813.908450-1-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221229074310.906556-1-masahiroy@kernel.org>
-References: <20221229074310.906556-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The top .gitignore comments about how to detect files breaking
-.gitignore rules, but people rarely care about it.
-
-Add a new W=1 warning to detect files that are tracked but ignored by
-git. If git is not installed or the source tree is not tracked by git
-at all, this script does not print anything.
-
-Running it on v6.2-rc1 detected the following:
-
-  $ make W=1 misc-check
-  Documentation/devicetree/bindings/.yamllint: warning: ignored by one of the .gitignore files
-  drivers/clk/.kunitconfig: warning: ignored by one of the .gitignore files
-  drivers/gpu/drm/tests/.kunitconfig: warning: ignored by one of the .gitignore files
-  drivers/hid/.kunitconfig: warning: ignored by one of the .gitignore files
-  fs/ext4/.kunitconfig: warning: ignored by one of the .gitignore files
-  fs/fat/.kunitconfig: warning: ignored by one of the .gitignore files
-  kernel/kcsan/.kunitconfig: warning: ignored by one of the .gitignore files
-  lib/kunit/.kunitconfig: warning: ignored by one of the .gitignore files
-  mm/kfence/.kunitconfig: warning: ignored by one of the .gitignore files
-  tools/testing/selftests/arm64/tags/.gitignore: warning: ignored by one of the .gitignore files
-  tools/testing/selftests/arm64/tags/Makefile: warning: ignored by one of the .gitignore files
-  tools/testing/selftests/arm64/tags/run_tags_test.sh: warning: ignored by one of the .gitignore files
-  tools/testing/selftests/arm64/tags/tags_test.c: warning: ignored by one of the .gitignore files
-
-These are ignored by the '.*' or 'tags' in the top .gitignore, but
-there is no rule to negate it.
-
-You might be tempted to do 'git add -f' but I want to have the real
-issue fixed (by fixing a .gitignore, or by renaming files, etc.).
+This was previously alphabetically sorted. Sort it again.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Reviewed-by: Nathan Chancellor <nathan@kernel.org>
-Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
 ---
 
-Changes in v3:
-  - change working directory to srctree (Nicolas)
-
-Changes in v2:
-  - Add $(srctree)/ to make it work with O=
-
- Makefile           |  6 ++++++
- scripts/misc-check | 19 +++++++++++++++++++
- 2 files changed, 25 insertions(+)
- create mode 100755 scripts/misc-check
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Makefile b/Makefile
-index acce5ec514f6..c0d7c75d8f14 100644
+index c0d7c75d8f14..563ec1d8dd2f 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1848,6 +1848,12 @@ rust-analyzer:
- # Misc
- # ---------------------------------------------------------------------------
+@@ -289,7 +289,7 @@ no-compiler-targets := $(no-dot-config-targets) install dtbs_install \
+ 			headers_install modules_install kernelrelease image_name
+ no-sync-config-targets := $(no-dot-config-targets) %install kernelrelease \
+ 			  image_name
+-single-targets := %.a %.i %.rsi %.ko %.lds %.ll %.lst %.mod %.o %.s %.symtypes %/
++single-targets := %.a %.i %.ko %.lds %.ll %.lst %.mod %.rsi %.o %.s %.symtypes %/
  
-+PHONY += misc-check
-+misc-check:
-+	$(Q)$(srctree)/scripts/misc-check
-+
-+all: misc-check
-+
- PHONY += scripts_gdb
- scripts_gdb: prepare0
- 	$(Q)$(MAKE) $(build)=scripts/gdb
-diff --git a/scripts/misc-check b/scripts/misc-check
-new file mode 100755
-index 000000000000..d40d5484e0c5
---- /dev/null
-+++ b/scripts/misc-check
-@@ -0,0 +1,19 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0-only
-+
-+set -e
-+
-+# Detect files that are tracked but ignored by git. This is checked only when
-+# ${KBUILD_EXTRA_WARN} contains 1, git is installed, and the source tree is
-+# tracked by git.
-+check_tracked_ignored_files () {
-+	case "${KBUILD_EXTRA_WARN}" in
-+	*1*) ;;
-+	*) return;;
-+	esac
-+
-+	git -C ${srctree:-.} ls-files -i -c --exclude-per-directory=.gitignore 2>/dev/null |
-+		sed 's/$/: warning: ignored by one of the .gitignore files/' >&2
-+}
-+
-+check_tracked_ignored_files
+ config-build	:=
+ mixed-build	:=
 -- 
 2.34.1
 
