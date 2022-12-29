@@ -2,120 +2,165 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C614EC4332F
-	for <linux-kbuild@archiver.kernel.org>; Thu, 29 Dec 2022 08:08:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D85BC4332F
+	for <linux-kbuild@archiver.kernel.org>; Thu, 29 Dec 2022 09:15:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229611AbiL2II6 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 29 Dec 2022 03:08:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35720 "EHLO
+        id S232345AbiL2JPM (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 29 Dec 2022 04:15:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229483AbiL2II5 (ORCPT
+        with ESMTP id S231280AbiL2JPL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 29 Dec 2022 03:08:57 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E623DB92
-        for <linux-kbuild@vger.kernel.org>; Thu, 29 Dec 2022 00:08:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1672301293;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5c2KVd3iEyoCh8u6V32NAXnUsG2MphtjjNVwzV1t5TE=;
-        b=UrW3mnbmNyIERHU5vhIo53CKGSB5c8/swbkUc4xAh0pA97lKTCnbxn1Pq0uYD5104DBcTq
-        dwIp/odem1A3LHKcxWHgXh4jTabweliDW2d8wT15sdn7wek4Xa7V08pjXEFTzcbQu2A9j3
-        xc+fTMYDQs7+6qE/dvYZLWB4ZSV3uOA=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-279-JNoRE3FQNOm72c_pPwqvRQ-1; Thu, 29 Dec 2022 03:08:12 -0500
-X-MC-Unique: JNoRE3FQNOm72c_pPwqvRQ-1
-Received: by mail-qv1-f69.google.com with SMTP id i7-20020a056214020700b004ffce246a2bso9584406qvt.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 29 Dec 2022 00:08:12 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5c2KVd3iEyoCh8u6V32NAXnUsG2MphtjjNVwzV1t5TE=;
-        b=c7pJZiNScfYAgdh0d75X43mei4/yzvgfUkwcRkdKwewGjmVNFPKeVlqTN8CCqlGZco
-         14Ibz8ngNZFX9zDBskLkHitIYpYxc7ysBevILPoYR1TDkGSvCzAW3oYzE16mWezdPVLm
-         gjJ45NuK6gJhTzRMKXJZYbA614LOFXeZQehSUB6laiosmOPtaT/9jIpkFEvsaOS0R9vZ
-         W411VeEHs7myTlSViNjZ6Lxfm56KuvfyDXXoHF+tyny6YbVpHF04GRoVAzzqAVgQWMal
-         TS4j8zSuTSlQ+bfmMsNex4VxeywfMEZRvP/QSI0+x6936G/RAGkVQjIll6A3Xe+vsdHU
-         z3XA==
-X-Gm-Message-State: AFqh2koGRx0SE9+QNAkMs3c42DtpfyiM6nFk/bI5XODF162Xnt2NMBXD
-        eX/4bly0f7usCrV83IrLyo3tUH/bwaF4DC7/5jaV4POVE54tQVGdAd0FEOMM1IWzChFQoIZ3xSS
-        eBlFM93pwIEwG/Nle1TUN2o7r
-X-Received: by 2002:ac8:74d6:0:b0:3a5:2644:bcd2 with SMTP id j22-20020ac874d6000000b003a52644bcd2mr37756757qtr.8.1672301292035;
-        Thu, 29 Dec 2022 00:08:12 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXt5V/sAsCEHjQ2ZpxZpa01QLECRhCwCe4d8j9XtsajXrmmVGxtgl/uKFz4jADNN4B3Q9cIchg==
-X-Received: by 2002:ac8:74d6:0:b0:3a5:2644:bcd2 with SMTP id j22-20020ac874d6000000b003a52644bcd2mr37756749qtr.8.1672301291837;
-        Thu, 29 Dec 2022 00:08:11 -0800 (PST)
-Received: from [192.168.33.110] (c-73-19-232-221.hsd1.tn.comcast.net. [73.19.232.221])
-        by smtp.gmail.com with ESMTPSA id k20-20020ac84754000000b003a527d29a41sm11180993qtp.75.2022.12.29.00.08.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Dec 2022 00:08:11 -0800 (PST)
-Message-ID: <0357df64-54ad-06fd-031e-66350cb03d54@redhat.com>
-Date:   Thu, 29 Dec 2022 03:08:10 -0500
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH] kbuild: rpm-pkg: add libelf-devel as alternative for
- BuildRequires
-To:     Masahiro Yamada <masahiroy@kernel.org>,
-        linux-kbuild@vger.kernel.org
+        Thu, 29 Dec 2022 04:15:11 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAF2C638B;
+        Thu, 29 Dec 2022 01:15:09 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 558DB61739;
+        Thu, 29 Dec 2022 09:15:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E927C433F0;
+        Thu, 29 Dec 2022 09:15:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1672305308;
+        bh=wtSs6J9YLnzQPlTY0VzKME94in4y1oLZtAIe70huUqE=;
+        h=From:To:Cc:Subject:Date:From;
+        b=UcEFphREvL1CSWRfHNQSiBEvCbzdCYvSblsfY1GzZ55jhvhdsI8UsH3HDdlRpF/t1
+         2XdtBz6nmOMBxobkhx1IehWgBZO/SRgpd1EyGEdEVe2pAmXmaGlOr6j88E95Ewl5jK
+         ljZ7wtS9XwHgydVIhHN0foW/zfZGSU/8rvAGhfNJSVpAY86ZZebOTb21AJQDb9dmWu
+         QCSp3xt5DO+pEzAJGahamtTCdcKPMyCjsvQmXIU+2gyFMzj22jCmSCl5izvROR0YTg
+         LbeSmZsEIJOo2RrmkX8wYpS9iPsuWg5fWgzqOoQMXJ1QkgS7w1oppvJS9GmOjR7aLq
+         aukoscZ3qYCzw==
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Guoqing Jiang <guoqing.jiang@linux.dev>,
-        Ivan Vecera <ivecera@redhat.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        Nicolas Schier <nicolas@fjasle.eu>,
-        =?UTF-8?B?w43DsWlnbyBIdWd1ZXQ=?= <ihuguet@redhat.com>
-References: <20221228191014.659746-1-masahiroy@kernel.org>
-Content-Language: en-US
-From:   Jonathan Toppins <jtoppins@redhat.com>
-In-Reply-To: <20221228191014.659746-1-masahiroy@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Nicolas Schier <nicolas@fjasle.eu>, Tom Rix <trix@redhat.com>,
+        llvm@lists.linux.dev
+Subject: [PATCH 1/2] kbuild: rename cmd_$@ to savedcmd_$@ in *.cmd files
+Date:   Thu, 29 Dec 2022 18:15:00 +0900
+Message-Id: <20221229091501.916296-1-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.34.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On 12/28/22 14:10, Masahiro Yamada wrote:
-> Guoqing Jiang reports that openSUSE cannot compile the kernel rpm due
-> to "BuildRequires: elfutils-libelf-devel" added by commit 8818039f959b
-> ("kbuild: add ability to make source rpm buildable using koji").
-> The relevant package name in openSUSE is libelf-devel.
-> 
-> Add it an alternative package.
-> 
-> BTW, if it is impossible to solve the build requirement, the final
-> resort would be:
-> 
->      $ make RPMOPTS=--nodeps rpm-pkg
-> 
-> This passes --nodeps to the rpmbuild command so it will not verify
-> build dependencies. This is useful to test rpm builds on non-rpm
-> system. On Debian/Ubuntu, for example, you can install rpmbuild by
-> 'apt-get install rpm'.
-> 
-> NOTE1:
->    Likewise, it is possible to bypass the build dependency check for
->    debian package builds:
-> 
->      $ make DPKG_FLAGS=-d deb-pkg
-> 
-> NOTE2:
->    The 'or' operator is supported since RPM 4.13. So, old distros such
->    as CentOS 7 will break. I suggest installing newer rpmbuild in such
->    cases.
-> 
-> Link: https://lore.kernel.org/linux-kbuild/ee227d24-9c94-bfa3-166a-4ee6b5dfea09@linux.dev/T/#u
-> Fixes: 8818039f959b ("kbuild: add ability to make source rpm buildable using koji")
-> Reported-by: Guoqing Jiang <guoqing.jiang@linux.dev>
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+The cmd-check macro compares $(cmd_$@) and $(cmd_$1), but a pitfall is
+that you cannot use cmd_<target> as the variable name for the command.
 
-Acked-by: Jonathan Toppins <jtoppins@redhat.com>
+For example, the following code will not work in the top Makefile
+or ./Kbuild.
+
+    quiet_cmd_foo = GEN     $@
+          cmd_foo = touch $@
+
+    targets += foo
+    foo: FORCE
+            $(call if_changed,foo)
+
+In this case, both $@ and $1 are expanded to 'foo', so $(cmd_check)
+is always empty.
+
+We do not need to use the same prefix for cmd_$@ and cmd_$1.
+Rename the former to savedcmd_$@.
+
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
+
+ scripts/Kbuild.include                      | 8 ++++----
+ scripts/Makefile.modfinal                   | 2 +-
+ scripts/basic/fixdep.c                      | 4 ++--
+ scripts/clang-tools/gen_compile_commands.py | 2 +-
+ 4 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 10cf8d2d82ef..1a7514f49089 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -170,10 +170,10 @@ cmd = @$(if $(cmd_$(1)),set -e; $($(quiet)log_print) $(delete-on-interrupt) $(cm
+ ifneq ($(KBUILD_NOCMDDEP),1)
+ # Check if both commands are the same including their order. Result is empty
+ # string if equal. User may override this check using make KBUILD_NOCMDDEP=1
+-cmd-check = $(filter-out $(subst $(space),$(space_escape),$(strip $(cmd_$@))), \
++cmd-check = $(filter-out $(subst $(space),$(space_escape),$(strip $(savedcmd_$@))), \
+                          $(subst $(space),$(space_escape),$(strip $(cmd_$1))))
+ else
+-cmd-check = $(if $(strip $(cmd_$@)),,1)
++cmd-check = $(if $(strip $(savedcmd_$@)),,1)
+ endif
+ 
+ # Replace >$< with >$$< to preserve $ when reloading the .cmd file
+@@ -199,7 +199,7 @@ if_changed = $(if $(if-changed-cond),$(cmd_and_savecmd),@:)
+ 
+ cmd_and_savecmd =                                                            \
+ 	$(cmd);                                                              \
+-	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd
++	printf '%s\n' 'savedcmd_$@ := $(make-cmd)' > $(dot-target).cmd
+ 
+ # Execute the command and also postprocess generated .d dependencies file.
+ if_changed_dep = $(if $(if-changed-cond),$(cmd_and_fixdep),@:)
+@@ -239,7 +239,7 @@ _why =                                                                        \
+         $(if $(wildcard $@),                                                 \
+             $(if $(newer-prereqs),- due to: $(newer-prereqs),                \
+                 $(if $(cmd-check),                                           \
+-                    $(if $(cmd_$@),- due to command line change,             \
++                    $(if $(savedcmd_$@),- due to command line change,        \
+                         $(if $(filter $@, $(targets)),                       \
+                             - due to missing .cmd file,                      \
+                             - due to $(notdir $@) not in $$(targets)         \
+diff --git a/scripts/Makefile.modfinal b/scripts/Makefile.modfinal
+index a30d5b08eee9..4703f652c009 100644
+--- a/scripts/Makefile.modfinal
++++ b/scripts/Makefile.modfinal
+@@ -54,7 +54,7 @@ newer_prereqs_except = $(filter-out $(PHONY) $(1),$?)
+ # Same as if_changed, but allows to exclude specified extra dependencies
+ if_changed_except = $(if $(call newer_prereqs_except,$(2))$(cmd-check),      \
+ 	$(cmd);                                                              \
+-	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd, @:)
++	printf '%s\n' 'savedcmd_$@ := $(make-cmd)' > $(dot-target).cmd, @:)
+ 
+ # Re-generate module BTFs if either module's .ko or vmlinux changed
+ %.ko: %.o %.mod.o scripts/module.lds $(and $(CONFIG_DEBUG_INFO_BTF_MODULES),$(KBUILD_BUILTIN),vmlinux) FORCE
+diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
+index 2328f9a641da..7a408bb97478 100644
+--- a/scripts/basic/fixdep.c
++++ b/scripts/basic/fixdep.c
+@@ -70,7 +70,7 @@
+  *
+  * It first generates a line
+  *
+- *   cmd_<target> = <cmdline>
++ *   savedcmd_<target> = <cmdline>
+  *
+  * and then basically copies the .<target>.d file to stdout, in the
+  * process filtering out the dependency on autoconf.h and adding
+@@ -344,7 +344,7 @@ int main(int argc, char *argv[])
+ 	target = argv[2];
+ 	cmdline = argv[3];
+ 
+-	printf("cmd_%s := %s\n\n", target, cmdline);
++	printf("savedcmd_%s := %s\n\n", target, cmdline);
+ 
+ 	buf = read_file(depfile);
+ 	parse_dep_file(buf, target);
+diff --git a/scripts/clang-tools/gen_compile_commands.py b/scripts/clang-tools/gen_compile_commands.py
+index 0227522959a4..15ba56527acd 100755
+--- a/scripts/clang-tools/gen_compile_commands.py
++++ b/scripts/clang-tools/gen_compile_commands.py
+@@ -19,7 +19,7 @@ _DEFAULT_OUTPUT = 'compile_commands.json'
+ _DEFAULT_LOG_LEVEL = 'WARNING'
+ 
+ _FILENAME_PATTERN = r'^\..*\.cmd$'
+-_LINE_PATTERN = r'^cmd_[^ ]*\.o := (.* )([^ ]*\.c) *(;|$)'
++_LINE_PATTERN = r'^savedcmd_[^ ]*\.o := (.* )([^ ]*\.c) *(;|$)'
+ _VALID_LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
+ # The tools/ directory adopts a different build system, and produces .cmd
+ # files in a different format. Do not support it.
+-- 
+2.34.1
 
