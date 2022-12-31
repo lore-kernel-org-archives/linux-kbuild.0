@@ -2,36 +2,36 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D7A7C46467
-	for <linux-kbuild@archiver.kernel.org>; Sat, 31 Dec 2022 06:42:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E346C4332F
+	for <linux-kbuild@archiver.kernel.org>; Sat, 31 Dec 2022 06:42:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231494AbiLaGma (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 31 Dec 2022 01:42:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32802 "EHLO
+        id S231231AbiLaGmd (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 31 Dec 2022 01:42:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230149AbiLaGm1 (ORCPT
+        with ESMTP id S231508AbiLaGmb (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 31 Dec 2022 01:42:27 -0500
+        Sat, 31 Dec 2022 01:42:31 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F0EADF1E;
-        Fri, 30 Dec 2022 22:42:25 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88FE0DF1E;
+        Fri, 30 Dec 2022 22:42:30 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1F2176090C;
-        Sat, 31 Dec 2022 06:42:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9997C4339B;
-        Sat, 31 Dec 2022 06:42:21 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 18E8060907;
+        Sat, 31 Dec 2022 06:42:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05A2DC43398;
+        Sat, 31 Dec 2022 06:42:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1672468944;
-        bh=TYz0+owbHpGu+NR39J76tZxgsfupHoR+sq24KGH4hCc=;
+        s=k20201202; t=1672468949;
+        bh=pPtNFbrwZDEe7R9hGihgBI1Cy7TXHMHG4P1tYoFNjZ0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=jbLzN1vLnGdFxz6Adw0JsfkXLylFO2Yig/xSLeltOj76v04uIB0qr8w9U8fC9yxc0
-         zX/ExraGY59B6/wRZCqtE4FRXMznLSiawWCGDPxaK1Rqfe/O8bCyTBT8ijswIXPO8h
-         Rc4bsePiBpvGj05fLuy9yMDOiBFGme1U9hSfHW6FpdM7Jw+tvUtvb3Has1BC8lcN1t
-         9RKEWr4RwkS8I6bjKGZTMayzkuNN6D6EvonR+4c90Lc9bnoAezKjx9Z44hYHdrZszG
-         O9Whunggbozgl1J5x0pouDZoezTbClazpvb9qgmN1LFDf9W6dsP+pIWrWMagvK+DCt
-         gHyST7dx9MB3Q==
+        b=CjVgtKIEuSKQV5RCpmNW/O1yoF8JI3xd4McrQbIA1czpfqaWgRrk6xd17BGHx0PCm
+         DFolHEM19x+a1P2/nb6IRjgHxdQ8jIa4JXX7AlN3oWWhy7oYUZ6IDqVWRWnxdn3lT+
+         asNw5BnhqGchSuGcSLoup/1h6PO6BKWS0EVdJye5wpTpFPNymP3pn5cjdKHPre+bd9
+         i35/ppuKtMFTmAhI3VmsvfST7UgTpDXRHbURyPRtzHGmFoOYYzhDhHX3By9gt+HH3z
+         YhVjAzGUxc7HxAFwbKQKjw8jiN3dmx4LDphYdntmnQp1Q9PG2Z4nQZg5z9mLoJDfwK
+         8aJdtTZBiB4Jw==
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, Miguel Ojeda <ojeda@kernel.org>,
@@ -41,12 +41,12 @@ Cc:     linux-kernel@vger.kernel.org, Miguel Ojeda <ojeda@kernel.org>,
         Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        Nicolas Schier <nicolas@fjasle.eu>, Tom Rix <trix@redhat.com>,
+        Nicolas Schier <nicolas@fjasle.eu>,
         Wedson Almeida Filho <wedsonaf@gmail.com>,
-        llvm@lists.linux.dev, rust-for-linux@vger.kernel.org
-Subject: [PATCH 3/6] kbuild: remove sed commands after rustc rules
-Date:   Sat, 31 Dec 2022 15:42:00 +0900
-Message-Id: <20221231064203.1623793-4-masahiroy@kernel.org>
+        rust-for-linux@vger.kernel.org
+Subject: [PATCH 5/6] fixdep: avoid parsing the same file over again
+Date:   Sat, 31 Dec 2022 15:42:02 +0900
+Message-Id: <20221231064203.1623793-6-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221231064203.1623793-1-masahiroy@kernel.org>
 References: <20221231064203.1623793-1-masahiroy@kernel.org>
@@ -56,110 +56,76 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-rustc may put comments in dep-info, so sed is used to drop them before
-passing it to fixdep.
+The dep files (*.d files) emitted by C compilers usually contain the
+deduplicated list of included files.
 
-Now that fixdep can remove comments, Makefiles do not need to run sed.
+There is an exceptional case; if a header is included by the -include
+command line option, and also by #include directive, it appears twice
+in the *.d file.
+
+For example, the top Makefile specifies the command line option,
+-include $(srctree)/include/linux/kconfig.h. You do not need to
+add #include <linux/kconfig.h> in every source file.
+
+In fact, include/linux/kconfig.h is listed twice in many .*.cmd files
+due to include/linux/xarray.h including <linux/kconfig.h>.
+I did not fix that since it is a small redundancy.
+
+However, this is more annoying for rustc. rustc emits the dependency
+for each emission type.
+
+For example, cmd_rustc_library emits dep-info, obj, and metadata.
+So, the emitted *.d file contains the dependency for those 3 targets,
+which makes fixdep parse the same file 3 times.
+
+  $ grep rust/alloc/raw_vec.rs rust/.alloc.o.cmd
+    rust/alloc/raw_vec.rs \
+    rust/alloc/raw_vec.rs \
+    rust/alloc/raw_vec.rs \
+
+To skip the second parsing, this commit adds a hash table for parsed
+files, just like we did for CONFIG options.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- rust/Makefile          |  6 ++----
- scripts/Makefile.build | 18 ++++--------------
- scripts/Makefile.host  |  3 +--
- 3 files changed, 7 insertions(+), 20 deletions(-)
+ scripts/basic/fixdep.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/rust/Makefile b/rust/Makefile
-index 0e2a32f4b3e9..c8941fec6955 100644
---- a/rust/Makefile
-+++ b/rust/Makefile
-@@ -333,8 +333,7 @@ quiet_cmd_rustc_procmacro = $(RUSTC_OR_CLIPPY_QUIET) P $@
- 	$(RUSTC_OR_CLIPPY) $(rust_common_flags) \
- 		--emit=dep-info=$(depfile) --emit=link=$@ --extern proc_macro \
- 		--crate-type proc-macro \
--		--crate-name $(patsubst lib%.so,%,$(notdir $@)) $<; \
--	sed -i '/^\#/d' $(depfile)
-+		--crate-name $(patsubst lib%.so,%,$(notdir $@)) $<
+diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
+index b20777b888d7..cc8f6d34c2ca 100644
+--- a/scripts/basic/fixdep.c
++++ b/scripts/basic/fixdep.c
+@@ -113,7 +113,7 @@ struct item {
+ };
  
- # Procedural macros can only be used with the `rustc` that compiled it.
- # Therefore, to get `libmacros.so` automatically recompiled when the compiler
-@@ -349,8 +348,7 @@ quiet_cmd_rustc_library = $(if $(skip_clippy),RUSTC,$(RUSTC_OR_CLIPPY_QUIET)) L
- 		$(filter-out $(skip_flags),$(rust_flags) $(rustc_target_flags)) \
- 		--emit=dep-info=$(depfile) --emit=obj=$@ --emit=metadata=$(dir $@)$(patsubst %.o,lib%.rmeta,$(notdir $@)) \
- 		--crate-type rlib -L$(objtree)/$(obj) \
--		--crate-name $(patsubst %.o,%,$(notdir $@)) $<; \
--	sed -i '/^\#/d' $(depfile) \
-+		--crate-name $(patsubst %.o,%,$(notdir $@)) $< \
- 	$(if $(rustc_objcopy),;$(OBJCOPY) $(rustc_objcopy) $@)
+ #define HASHSZ 256
+-static struct item *config_hashtab[HASHSZ];
++static struct item *config_hashtab[HASHSZ], *file_hashtab[HASHSZ];
  
- rust-analyzer:
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 40de20246e50..76323201232a 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -289,9 +289,6 @@ rust_common_cmd = \
- 	--crate-name $(basename $(notdir $@)) \
- 	--emit=dep-info=$(depfile)
- 
--rust_handle_depfile = \
--	sed -i '/^\#/d' $(depfile)
--
- # `--emit=obj`, `--emit=asm` and `--emit=llvm-ir` imply a single codegen unit
- # will be used. We explicitly request `-Ccodegen-units=1` in any case, and
- # the compiler shows a warning if it is not 1. However, if we ever stop
-@@ -301,9 +298,7 @@ rust_handle_depfile = \
- # would not match each other.
- 
- quiet_cmd_rustc_o_rs = $(RUSTC_OR_CLIPPY_QUIET) $(quiet_modtag) $@
--      cmd_rustc_o_rs = \
--	$(rust_common_cmd) --emit=obj=$@ $<; \
--	$(rust_handle_depfile)
-+      cmd_rustc_o_rs = $(rust_common_cmd) --emit=obj=$@ $<
- 
- $(obj)/%.o: $(src)/%.rs FORCE
- 	$(call if_changed_dep,rustc_o_rs)
-@@ -311,24 +306,19 @@ $(obj)/%.o: $(src)/%.rs FORCE
- quiet_cmd_rustc_rsi_rs = $(RUSTC_OR_CLIPPY_QUIET) $(quiet_modtag) $@
-       cmd_rustc_rsi_rs = \
- 	$(rust_common_cmd) -Zunpretty=expanded $< >$@; \
--	command -v $(RUSTFMT) >/dev/null && $(RUSTFMT) $@; \
--	$(rust_handle_depfile)
-+	command -v $(RUSTFMT) >/dev/null && $(RUSTFMT) $@
- 
- $(obj)/%.rsi: $(src)/%.rs FORCE
- 	$(call if_changed_dep,rustc_rsi_rs)
- 
- quiet_cmd_rustc_s_rs = $(RUSTC_OR_CLIPPY_QUIET) $(quiet_modtag) $@
--      cmd_rustc_s_rs = \
--	$(rust_common_cmd) --emit=asm=$@ $<; \
--	$(rust_handle_depfile)
-+      cmd_rustc_s_rs = $(rust_common_cmd) --emit=asm=$@ $<
- 
- $(obj)/%.s: $(src)/%.rs FORCE
- 	$(call if_changed_dep,rustc_s_rs)
- 
- quiet_cmd_rustc_ll_rs = $(RUSTC_OR_CLIPPY_QUIET) $(quiet_modtag) $@
--      cmd_rustc_ll_rs = \
--	$(rust_common_cmd) --emit=llvm-ir=$@ $<; \
--	$(rust_handle_depfile)
-+      cmd_rustc_ll_rs = $(rust_common_cmd) --emit=llvm-ir=$@ $<
- 
- $(obj)/%.ll: $(src)/%.rs FORCE
- 	$(call if_changed_dep,rustc_ll_rs)
-diff --git a/scripts/Makefile.host b/scripts/Makefile.host
-index 4434cdbf7b8e..bc782655d09e 100644
---- a/scripts/Makefile.host
-+++ b/scripts/Makefile.host
-@@ -148,8 +148,7 @@ $(host-cxxobjs): $(obj)/%.o: $(src)/%.cc FORCE
- # host-rust -> Executable
- quiet_cmd_host-rust	= HOSTRUSTC $@
-       cmd_host-rust	= \
--	$(HOSTRUSTC) $(hostrust_flags) --emit=link=$@ $<; \
--	sed -i '/^\#/d' $(depfile)
-+	$(HOSTRUSTC) $(hostrust_flags) --emit=link=$@ $<
- $(host-rust): $(obj)/%: $(src)/%.rs FORCE
- 	$(call if_changed_dep,host-rust)
- 
+ static unsigned int strhash(const char *str, unsigned int sz)
+ {
+@@ -361,6 +361,10 @@ static void parse_dep_file(char *p, const char *target)
+ 			 * name, which will be the original one, and ignore any
+ 			 * other source names, which will be intermediate
+ 			 * temporary files.
++			 *
++			 * rustc emits the same dependency list for each
++			 * emission type. It is enough to list the source name
++			 * just once.
+ 			 */
+ 			if (!saw_any_target) {
+ 				saw_any_target = true;
+@@ -368,7 +372,8 @@ static void parse_dep_file(char *p, const char *target)
+ 				printf("deps_%s := \\\n", target);
+ 				need_parse = true;
+ 			}
+-		} else if (!is_ignored_file(p, q - p)) {
++		} else if (!is_ignored_file(p, q - p) &&
++			   !in_hashtable(p, q - p, file_hashtab)) {
+ 			printf("  %s \\\n", p);
+ 			need_parse = true;
+ 		}
 -- 
 2.34.1
 
