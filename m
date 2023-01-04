@@ -2,177 +2,103 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3760C63705
-	for <linux-kbuild@archiver.kernel.org>; Wed,  4 Jan 2023 19:55:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F19BC677F0
+	for <linux-kbuild@archiver.kernel.org>; Wed,  4 Jan 2023 19:55:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235156AbjADTzI (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 4 Jan 2023 14:55:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52466 "EHLO
+        id S240261AbjADTzN (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 4 Jan 2023 14:55:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240204AbjADTy6 (ORCPT
+        with ESMTP id S240276AbjADTzE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 4 Jan 2023 14:54:58 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C07AF1C923
-        for <linux-kbuild@vger.kernel.org>; Wed,  4 Jan 2023 11:54:57 -0800 (PST)
+        Wed, 4 Jan 2023 14:55:04 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C41811AA11;
+        Wed,  4 Jan 2023 11:55:03 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5CA3261742
-        for <linux-kbuild@vger.kernel.org>; Wed,  4 Jan 2023 19:54:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DF9EC43392;
-        Wed,  4 Jan 2023 19:54:56 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 66FC6B818B9;
+        Wed,  4 Jan 2023 19:55:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EF56C43396;
+        Wed,  4 Jan 2023 19:55:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1672862096;
-        bh=iDpwete7KRRtx7xm+tCbXm0Lyr2zptLdbj1MM4EGk8w=;
+        s=k20201202; t=1672862101;
+        bh=eOzKxLrRsBTq/MljE5/gHOkCQwsBUGjl8YrlO4iJnbE=;
         h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-        b=XSh3WiMpkuAAm+nhA52aK5YzKtG/6pHbHKysJHN/Fwb5kNBADC5pG5jArcZ707Zue
-         L60ej1YWTgRf5Dkkmkic1rVRnfwDQfMDwMNydTsig/htlfZAyQJRcmggkQ8YSQgwX1
-         WtYDgadLHy+WquLOn0OVc6MNsuDkjGHLk/U1IANYvJ8/TH4QD7xbSYE/DQLL04mOtF
-         AuLfz49pkcTJ0PPSqESG0y8HLydXQANKq3b9Bm+nXIP4YeRlH5jcsfFs4G07q9EglK
-         JXCrk1VjE6ckOun8yHZMNDC9t+jCmZ+NxQVExYT/pZ6lr7GhuKSAOKL6zDZMjezI2n
-         U1Q1VzfmF1haQ==
+        b=kvFJpgAbYewxpxa+bz2Udtm6ypeLdSpxaH/VUK6Ae27GBGBz1x2BXHUu+80G/aghj
+         49WtUUD+e0T9hoMuEoCcgIFMC2Y/h9K5PQAKmL3/LYB+Do8RjVacmx0m0HSUxetYkK
+         v57P0IcbDHxcShopAo6pIF1lpFrE8roM8/gyMPv19fc+K887/ngD5IVnxzBzGtXjKK
+         TXlFR1fQoQskj6A2bhg9Kj7YVrMQK8su4cqhcDE6ohVprx1elX99zdco/SfVrdGKp0
+         hv2uhrdHRSujCjL9dwj2sHDqvqpD4yOPWi8BBUFJPRyQI8IY4Sgcm2J8EU/aJr8agO
+         0pK3tD2m0hOTw==
 From:   Nathan Chancellor <nathan@kernel.org>
-Date:   Wed, 04 Jan 2023 12:54:21 -0700
-Subject: [PATCH 04/14] kbuild: Update assembler calls to use proper flags and
- language target
+Date:   Wed, 04 Jan 2023 12:54:26 -0700
+Subject: [PATCH 09/14] s390/vdso: Drop unused '-s' flag from KBUILD_AFLAGS_64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Message-Id: <20221228-drop-qunused-arguments-v1-4-658cbc8fc592@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20221228-drop-qunused-arguments-v1-9-658cbc8fc592@kernel.org>
 References: <20221228-drop-qunused-arguments-v1-0-658cbc8fc592@kernel.org>
 In-Reply-To: <20221228-drop-qunused-arguments-v1-0-658cbc8fc592@kernel.org>
 To:     masahiroy@kernel.org, ndesaulniers@google.com
 Cc:     nicolas@fjasle.eu, trix@redhat.com, linux-kbuild@vger.kernel.org,
         llvm@lists.linux.dev, Nathan Chancellor <nathan@kernel.org>,
-        kernel test robot <lkp@intel.com>
+        kernel test robot <lkp@intel.com>, hca@linux.ibm.com,
+        gor@linux.ibm.com, agordeev@linux.ibm.com,
+        borntraeger@linux.ibm.com, svens@linux.ibm.com,
+        linux-s390@vger.kernel.org
 X-Mailer: b4 0.11.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5349; i=nathan@kernel.org;
- h=from:subject:message-id; bh=ygBZ1B4cc2ZDEctLp77RGqvNTcRd7amEhdM91D44bsY=;
- b=owGbwMvMwCEmm602sfCA1DTG02pJDMlbb3YZP5I8WLrD4BPDbf0Zt+aeTGyX2b/Dqow/9tXiKG2F
- ScYbOkpZGMQ4GGTFFFmqH6seNzScc5bxxqlJMHNYmUCGMHBxCsBEnhcx/C94OOGfe7ePfeXt1+a7tD
- VYOCTafq18EF/eM9/VV9BoZiEjQ8ffOyatmsap6a56dhF6jsqX7yz5Kbz634TV5uIndTTq2AA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1516; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=eOzKxLrRsBTq/MljE5/gHOkCQwsBUGjl8YrlO4iJnbE=;
+ b=owGbwMvMwCEmm602sfCA1DTG02pJDMlbb3Y/2p92pWtCrfcjzsJJVhnNfAnBHq5/rq8sYufa5lUR
+ Enevo5SFQYyDQVZMkaX6sepxQ8M5ZxlvnJoEM4eVCWQIAxenAExE/B4jw+eK8L9yJiISoa62X1doum
+ 5y229/SH/HIV7eHjPJ0ua6Gwz/jPb8OprUttuTOfrCtG0f3V67BM34wv1t2amjhTcmvr5SywUA
 X-Developer-Key: i=nathan@kernel.org; a=openpgp;
  fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-From: Nick Desaulniers <ndesaulniers@google.com>
+When clang's -Qunused-arguments is dropped from KBUILD_CPPFLAGS, it
+warns that KBUILD_AFLAGS_64 contains '-s', which is a linking phase
+option, so it is unused.
 
-as-instr uses KBUILD_AFLAGS, but as-option uses KBUILD_CFLAGS. This can
-cause as-option to fail unexpectedly when CONFIG_WERROR is set, because
-clang will emit -Werror,-Wunused-command-line-argument for various -m
-and -f flags in KBUILD_CFLAGS for assembler sources.
+  clang-16: error: argument unused during compilation: '-s' [-Werror,-Wunused-command-line-argument]
 
-Callers of as-option and as-instr should be adding flags to
-KBUILD_AFLAGS / aflags-y, not KBUILD_CFLAGS / cflags-y. Use
-KBUILD_AFLAGS in all macros to clear up the initial problem.
+There appears to be no equivalent for '-s' in GNU as; 'as --help' on
+x86_64 notes that '-s' is ignored and 's390x-linux-gnu-as --help' makes
+no mention of it whatsoever.
 
-Unfortunately, -Wunused-command-line-argument can still be triggered
-with clang by the presence of warning flags or macro definitions because
-'-x assembler' is used, instead of '-x assembler-with-cpp', which will
-consume these flags. Switch to '-x assembler-with-cpp' in places where
-'-x assembler' is used, as the compiler is always used as the driver for
-out of line assembler sources in the kernel.
+Just drop '-s' altogether, as it has been there since the introduction
+of the vDSO, which means it is likely uneeded, given there would likely
+have been a report by this point.
 
-Finally, add -Werror to these macros so that they behave consistently
-whether or not CONFIG_WERROR is set.
-
-Link: https://github.com/ClangBuiltLinux/linux/issues/1699
-Suggested-by: Masahiro Yamada <masahiroy@kernel.org>
-Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
-[nathan: Reworded and expanded on problems in commit message
-         Use '-x assembler-with-cpp' in a couple more places]
 Signed-off-by: Nathan Chancellor <nathan@kernel.org>
 ---
-Benchmarking '-x assembler' vs. '-x assembler-with-cpp' does show that
-invoking the preprocessor incurs some overhead but my kernel builds do
-not show any noticeable slowdowns due to how infrequently these macros
-are used.
-
-$ hyperfine -L lang assembler,assembler-with-cpp -N -w 5 "/usr/bin/gcc -x {lang} -c -o /dev/null /dev/null"
-Benchmark 1: /usr/bin/gcc -x assembler -c -o /dev/null /dev/null
-  Time (mean ± σ):       5.5 ms ±   0.5 ms    [User: 4.1 ms, System: 1.3 ms]
-  Range (min … max):     4.3 ms …   6.3 ms    472 runs
-
-Benchmark 2: /usr/bin/gcc -x assembler-with-cpp -c -o /dev/null /dev/null
-  Time (mean ± σ):      12.7 ms ±   1.0 ms    [User: 9.1 ms, System: 3.6 ms]
-  Range (min … max):     9.6 ms …  14.2 ms    225 runs
-
-Summary
-  '/usr/bin/gcc -x assembler -c -o /dev/null /dev/null' ran
-    2.29 ± 0.28 times faster than '/usr/bin/gcc -x assembler-with-cpp -c -o /dev/null /dev/null'
-
-$ hyperfine -L lang assembler,assembler-with-cpp -N -w 5 "/usr/bin/clang -x {lang} -c -o /dev/null /dev/null"
-Benchmark 1: /usr/bin/clang -x assembler -c -o /dev/null /dev/null
-  Time (mean ± σ):      21.0 ms ±   1.1 ms    [User: 9.6 ms, System: 11.1 ms]
-  Range (min … max):    13.9 ms …  22.0 ms    138 runs
-
-Benchmark 2: /usr/bin/clang -x assembler-with-cpp -c -o /dev/null /dev/null
-  Time (mean ± σ):      56.9 ms ±   3.2 ms    [User: 27.2 ms, System: 29.5 ms]
-  Range (min … max):    53.9 ms …  62.1 ms    48 runs
-
-Summary
-  '/usr/bin/clang -x assembler -c -o /dev/null /dev/null' ran
-    2.71 ± 0.20 times faster than '/usr/bin/clang -x assembler-with-cpp -c -o /dev/null /dev/null'
+Cc: hca@linux.ibm.com
+Cc: gor@linux.ibm.com
+Cc: agordeev@linux.ibm.com
+Cc: borntraeger@linux.ibm.com
+Cc: svens@linux.ibm.com
+Cc: linux-s390@vger.kernel.org
 ---
- scripts/Kconfig.include   | 2 +-
- scripts/Makefile.compiler | 8 ++++----
- scripts/as-version.sh     | 2 +-
- 3 files changed, 6 insertions(+), 6 deletions(-)
+ arch/s390/kernel/vdso64/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/Kconfig.include b/scripts/Kconfig.include
-index 274125307ebd..5a84b6443875 100644
---- a/scripts/Kconfig.include
-+++ b/scripts/Kconfig.include
-@@ -33,7 +33,7 @@ ld-option = $(success,$(LD) -v $(1))
+diff --git a/arch/s390/kernel/vdso64/Makefile b/arch/s390/kernel/vdso64/Makefile
+index 9e2b95a222a9..a2fe9383d452 100644
+--- a/arch/s390/kernel/vdso64/Makefile
++++ b/arch/s390/kernel/vdso64/Makefile
+@@ -22,7 +22,7 @@ KBUILD_AFLAGS += -DBUILD_VDSO
+ KBUILD_CFLAGS += -DBUILD_VDSO -DDISABLE_BRANCH_PROFILING
  
- # $(as-instr,<instr>)
- # Return y if the assembler supports <instr>, n otherwise
--as-instr = $(success,printf "%b\n" "$(1)" | $(CC) $(CLANG_FLAGS) -c -x assembler -o /dev/null -)
-+as-instr = $(success,printf "%b\n" "$(1)" | $(CC) $(CLANG_FLAGS) -c -x assembler-with-cpp -o /dev/null -)
+ KBUILD_AFLAGS_64 := $(filter-out -m64,$(KBUILD_AFLAGS))
+-KBUILD_AFLAGS_64 += -m64 -s
++KBUILD_AFLAGS_64 += -m64
  
- # check if $(CC) and $(LD) exist
- $(error-if,$(failure,command -v $(CC)),C compiler '$(CC)' not found)
-diff --git a/scripts/Makefile.compiler b/scripts/Makefile.compiler
-index 3d8adfd34af1..7aa1fbc4aafe 100644
---- a/scripts/Makefile.compiler
-+++ b/scripts/Makefile.compiler
-@@ -29,16 +29,16 @@ try-run = $(shell set -e;		\
- 	fi)
- 
- # as-option
--# Usage: cflags-y += $(call as-option,-Wa$(comma)-isa=foo,)
-+# Usage: aflags-y += $(call as-option,-Wa$(comma)-isa=foo,)
- 
- as-option = $(call try-run,\
--	$(CC) $(KBUILD_CFLAGS) $(1) -c -x assembler /dev/null -o "$$TMP",$(1),$(2))
-+	$(CC) -Werror $(KBUILD_AFLAGS) $(1) -c -x assembler-with-cpp /dev/null -o "$$TMP",$(1),$(2))
- 
- # as-instr
--# Usage: cflags-y += $(call as-instr,instr,option1,option2)
-+# Usage: aflags-y += $(call as-instr,instr,option1,option2)
- 
- as-instr = $(call try-run,\
--	printf "%b\n" "$(1)" | $(CC) $(KBUILD_AFLAGS) -c -x assembler -o "$$TMP" -,$(2),$(3))
-+	printf "%b\n" "$(1)" | $(CC) -Werror $(KBUILD_AFLAGS) -c -x assembler-with-cpp -o "$$TMP" -,$(2),$(3))
- 
- # __cc-option
- # Usage: MY_CFLAGS += $(call __cc-option,$(CC),$(MY_CFLAGS),-march=winchip-c6,-march=i586)
-diff --git a/scripts/as-version.sh b/scripts/as-version.sh
-index 1a21495e9ff0..af717476152d 100755
---- a/scripts/as-version.sh
-+++ b/scripts/as-version.sh
-@@ -45,7 +45,7 @@ orig_args="$@"
- # Get the first line of the --version output.
- IFS='
- '
--set -- $(LC_ALL=C "$@" -Wa,--version -c -x assembler /dev/null -o /dev/null 2>/dev/null)
-+set -- $(LC_ALL=C "$@" -Wa,--version -c -x assembler-with-cpp /dev/null -o /dev/null 2>/dev/null)
- 
- # Split the line on spaces.
- IFS=' '
+ KBUILD_CFLAGS_64 := $(filter-out -m64,$(KBUILD_CFLAGS))
+ KBUILD_CFLAGS_64 += -m64 -fPIC -shared -fno-common -fno-builtin
 
 -- 
 2.39.0
