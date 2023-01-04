@@ -2,87 +2,101 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ABDBC46467
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB63EC53210
 	for <linux-kbuild@archiver.kernel.org>; Wed,  4 Jan 2023 19:56:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240268AbjADTzi (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 4 Jan 2023 14:55:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52570 "EHLO
+        id S229832AbjADTzj (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 4 Jan 2023 14:55:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240175AbjADTzG (ORCPT
+        with ESMTP id S240113AbjADTzG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Wed, 4 Jan 2023 14:55:06 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 226103FA25
-        for <linux-kbuild@vger.kernel.org>; Wed,  4 Jan 2023 11:55:06 -0800 (PST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A49743E0CA;
+        Wed,  4 Jan 2023 11:55:05 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id AD5B3617ED
-        for <linux-kbuild@vger.kernel.org>; Wed,  4 Jan 2023 19:55:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADF4CC43396;
+        by ams.source.kernel.org (Postfix) with ESMTPS id 39C80B818CA;
         Wed,  4 Jan 2023 19:55:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30D45C433D2;
+        Wed,  4 Jan 2023 19:55:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1672862105;
-        bh=tTrQfczjuETaSOGxfQJLqsLErfJo6Bv4ivE/dvWNz9s=;
+        s=k20201202; t=1672862102;
+        bh=Wq2xy5rFWf75vfk6CLmeCRvK7xMzUB8bK7uoSW9gNDQ=;
         h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-        b=BJNLJlodI+/96CSfUaWvmMuOZ0oPdmLT1hEzgscMSOCXiFOY/QHUf59fy29zzeJ2K
-         q51ZyIbB3bb/kGq66Un/MArKCxFtauq2xqmg67bwlGnc9GKER0SAZUq2ipjFHbVYmw
-         vKPabcb8kMfigC+jIWDX2LQ+X5HfuiaAieyxXhVQtGwdAH0vGU9Gi6LpJThR1KcLSV
-         AyXghJfsz77HlD3wLhOsU1hPERuvI0VUbjBbdxn6PujtwgdJWLTBZ11nqXHPz8heMo
-         phkyaeoozS3Earu9aj2D3hcoes/4Y/UnESp0UxK+GdkmTeKu50CIXw12nNm3FbCn03
-         vS6YV5NlN0oJA==
+        b=kowh49BE0vlyOeGqVIEX40KPeHVEcDwAr6nyxSIsrGz3fErLZJ/U57mzRd7bHUO2v
+         KJcxJQxr4Iu+UOaNjlbKkD3F1Mk/WeMZ3mQIgZlFKAJC9IvMeWcQE2qmw4VPku8DvO
+         gv4rBxjsuKEqwKjSXUr3O8F4s5ZVc8bFQ7zJyBl3zrIHfVV01fLuQP731+ZlVxf3iM
+         LEXQ0nboH+JrxYEEYqu9fYyeNc/i6D3cFwCMXwh52iXQAxsD/8RisCiZX8/Uqkt3Kv
+         kmQycMaZqy7oRpoqnhx2EvcxQCV7gmLC+EnHh0xdZ8sAlGJKKqTN5Wgc+K/eUf6u5V
+         uuKUMPFcbMeUg==
 From:   Nathan Chancellor <nathan@kernel.org>
-Date:   Wed, 04 Jan 2023 12:54:31 -0700
-Subject: [PATCH 14/14] kbuild: Stop using '-Qunused-arguments' with clang
+Date:   Wed, 04 Jan 2023 12:54:28 -0700
+Subject: [PATCH 11/14] s390/purgatory: Remove unused '-MD' and unnecessary '-c' flags
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20221228-drop-qunused-arguments-v1-14-658cbc8fc592@kernel.org>
+Message-Id: <20221228-drop-qunused-arguments-v1-11-658cbc8fc592@kernel.org>
 References: <20221228-drop-qunused-arguments-v1-0-658cbc8fc592@kernel.org>
 In-Reply-To: <20221228-drop-qunused-arguments-v1-0-658cbc8fc592@kernel.org>
 To:     masahiroy@kernel.org, ndesaulniers@google.com
 Cc:     nicolas@fjasle.eu, trix@redhat.com, linux-kbuild@vger.kernel.org,
         llvm@lists.linux.dev, Nathan Chancellor <nathan@kernel.org>,
-        kernel test robot <lkp@intel.com>
+        kernel test robot <lkp@intel.com>, hca@linux.ibm.com,
+        gor@linux.ibm.com, agordeev@linux.ibm.com,
+        borntraeger@linux.ibm.com, svens@linux.ibm.com,
+        linux-s390@vger.kernel.org
 X-Mailer: b4 0.11.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=958; i=nathan@kernel.org;
- h=from:subject:message-id; bh=tTrQfczjuETaSOGxfQJLqsLErfJo6Bv4ivE/dvWNz9s=;
- b=owGbwMvMwCEmm602sfCA1DTG02pJDMlbb3Zf+xR/N3ltT1dhPZfFafeOWZcXhbeyHZjuyhV51PNb
- sc/RjlIWBjEOBlkxRZbqx6rHDQ3nnGW8cWoSzBxWJpAhDFycAjCRFV4Mv5j3Ly5fzPpzQ+xyR1uf03
- leJ3x8YlnCzJe+7gybMkf7bRHDf2fbtIVn7n8p62EK9w83iBZm+LfFtjKucD9HJbdYk89GLgA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1532; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=Wq2xy5rFWf75vfk6CLmeCRvK7xMzUB8bK7uoSW9gNDQ=;
+ b=owGbwMvMwCEmm602sfCA1DTG02pJDMlbb3b7ZBf/rn1s+nZr5eJ2yd8LEiWKcwNmRk34Xbvz1Laf
+ FevaO0pZGMQ4GGTFFFmqH6seNzScc5bxxqlJMHNYmUCGMHBxCsBEbHwZGX5afPM8fnO9+KX1YeXbtD
+ PDo+M4rjWu1izN4BLf/Fsmponhf4lvgOKFPQ8Zy7gvTT+W8oTX+LLVkQY2mXbeCxtObJzOzQEA
 X-Developer-Key: i=nathan@kernel.org; a=openpgp;
  fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-This option masks all unused command line argument warnings, which can
-hide potential issues, such as an architecture Makefile adding an
-unsupported flag to KBUILD_AFLAGS or KBUILD_CFLAGS, which will cause all
-as-option and cc-options to silently fail due to -Werror with no
-indication as to why in the main kernel build.
+When clang's -Qunused-arguments is dropped from KBUILD_CPPFLAGS, it
+warns while building objects in the purgatory folder:
 
-Remove this flag so that warnings of this nature can be caught early and
-obviously in a build.
+  clang-16: error: argument unused during compilation: '-MD' [-Werror,-Wunused-command-line-argument]
+
+'-MMD' is always passed to the preprocessor via c_flags, even when
+KBUILD_CFLAGS is overridden in a folder, so clang complains the addition
+of '-MD' will be unused. Remove '-MD' to clear up this warning, as it is
+unnecessary with '-MMD'.
+
+Additionally, '-c' is also unnecessary, remove it while in the area.
 
 Signed-off-by: Nathan Chancellor <nathan@kernel.org>
 ---
- Makefile | 1 -
- 1 file changed, 1 deletion(-)
+Cc: hca@linux.ibm.com
+Cc: gor@linux.ibm.com
+Cc: agordeev@linux.ibm.com
+Cc: borntraeger@linux.ibm.com
+Cc: svens@linux.ibm.com
+Cc: linux-s390@vger.kernel.org
+---
+ arch/s390/purgatory/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Makefile b/Makefile
-index c05b4fb7121e..4bc79d2a42f2 100644
---- a/Makefile
-+++ b/Makefile
-@@ -878,7 +878,6 @@ KBUILD_RUSTFLAGS-$(CONFIG_WERROR) += -Dwarnings
- KBUILD_RUSTFLAGS += $(KBUILD_RUSTFLAGS-y)
- 
- ifdef CONFIG_CC_IS_CLANG
--KBUILD_CPPFLAGS += -Qunused-arguments
- # The kernel builds with '-std=gnu11' so use of GNU extensions is acceptable.
- KBUILD_CFLAGS += -Wno-gnu
- else
+diff --git a/arch/s390/purgatory/Makefile b/arch/s390/purgatory/Makefile
+index d237bc6841cb..32573b4f9bd2 100644
+--- a/arch/s390/purgatory/Makefile
++++ b/arch/s390/purgatory/Makefile
+@@ -24,7 +24,7 @@ KCSAN_SANITIZE := n
+ KBUILD_CFLAGS := -fno-strict-aliasing -Wall -Wstrict-prototypes
+ KBUILD_CFLAGS += -Wno-pointer-sign -Wno-sign-compare
+ KBUILD_CFLAGS += -fno-zero-initialized-in-bss -fno-builtin -ffreestanding
+-KBUILD_CFLAGS += -c -MD -Os -m64 -msoft-float -fno-common
++KBUILD_CFLAGS += -Os -m64 -msoft-float -fno-common
+ KBUILD_CFLAGS += -fno-stack-protector
+ KBUILD_CFLAGS += $(CLANG_FLAGS)
+ KBUILD_CFLAGS += $(call cc-option,-fno-PIE)
 
 -- 
 2.39.0
