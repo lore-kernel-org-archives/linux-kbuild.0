@@ -2,58 +2,58 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31E80C6379F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22CA5C64981
 	for <linux-kbuild@archiver.kernel.org>; Wed,  4 Jan 2023 19:55:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240251AbjADTzL (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        id S239830AbjADTzL (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
         Wed, 4 Jan 2023 14:55:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52480 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239830AbjADTzC (ORCPT
+        with ESMTP id S240263AbjADTzD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 4 Jan 2023 14:55:02 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27D0A17881
-        for <linux-kbuild@vger.kernel.org>; Wed,  4 Jan 2023 11:55:01 -0800 (PST)
+        Wed, 4 Jan 2023 14:55:03 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0986A1AD9D;
+        Wed,  4 Jan 2023 11:55:03 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id BC42A61742
-        for <linux-kbuild@vger.kernel.org>; Wed,  4 Jan 2023 19:55:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84A7FC433A0;
-        Wed,  4 Jan 2023 19:54:59 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 956DE61812;
+        Wed,  4 Jan 2023 19:55:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46AABC43398;
+        Wed,  4 Jan 2023 19:55:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1672862100;
-        bh=v6Pz2Y597IXrTiPrySIepPbVwiJR5GwFlJrsRuCIfjA=;
+        s=k20201202; t=1672862102;
+        bh=5O31/XAlnhwnQJPlhpwoSbHf+ZiDlbOC4a1CxUANeAk=;
         h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-        b=mkASiltETfh4En70AMu63xlODVbvUZ3CGiAg43pvev1i8Iwh06O1t8hl0yJwZ91Hh
-         PjN5gImQ3ULDaZZBPEJ5nR5dJSzIDF+ys0DU2O6vCIZaVEvUY+mzlgqJJWwi4oSTHI
-         pO/Y3qIi51iv7+1BLOWfJDnBD+nwbPGaEjjI8r8xDnYQ2+0Ss/gv+6wd4eBUpU/BiO
-         kzr/vQZeDDV0IPpLbyl7fnJRMM868O6aL2dnFg85f4ZvveKBBaGfmhEMJ4axoEyNZp
-         azM6gIQIwiBFZ68dyBiod7wdvIH+uIh8c1WGRIRXLFJRtG/362bwJVrbisYaVdNaIA
-         g+5jeRz2FSRzA==
+        b=gQmdMK/SRWnAee27fDhmXVD5oLyGSteYXSK2Yy/Ia5/p6Ow7SmjkDWqikzVDxG80x
+         Amc2M5O7c4RZX7n/NT4dNjGoRtl0EykkYA+vHnR73JWZ7XaRlicpwSedZF3kCsxG8c
+         tEPwFo6Cg8ivTUHIFhsPJzfhFA5SEyTfVe34z7dwAH7VF92EJeoaacOtIRzkkChuVv
+         zEqrnXUJ8Si/1GrsAk98ThmSeM2vcjtG22C3agPniOczkdJejPen9wxbG+WMTZQ/RZ
+         O+oRxhX4ixadzuu4na1OVUwLumWMdnHJpcW0/InccY7CcrscQhKJmKGZ8w94JrbSqI
+         1NxyFSAZcgYIQ==
 From:   Nathan Chancellor <nathan@kernel.org>
-Date:   Wed, 04 Jan 2023 12:54:25 -0700
-Subject: [PATCH 08/14] powerpc/vdso: Remove an unsupported flag from
- vgettimeofday-32.o with clang
+Date:   Wed, 04 Jan 2023 12:54:27 -0700
+Subject: [PATCH 10/14] s390/vdso: Drop '-shared' from KBUILD_CFLAGS_64
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20221228-drop-qunused-arguments-v1-8-658cbc8fc592@kernel.org>
+Message-Id: <20221228-drop-qunused-arguments-v1-10-658cbc8fc592@kernel.org>
 References: <20221228-drop-qunused-arguments-v1-0-658cbc8fc592@kernel.org>
 In-Reply-To: <20221228-drop-qunused-arguments-v1-0-658cbc8fc592@kernel.org>
 To:     masahiroy@kernel.org, ndesaulniers@google.com
 Cc:     nicolas@fjasle.eu, trix@redhat.com, linux-kbuild@vger.kernel.org,
         llvm@lists.linux.dev, Nathan Chancellor <nathan@kernel.org>,
-        kernel test robot <lkp@intel.com>, mpe@ellerman.id.au,
-        npiggin@gmail.com, christophe.leroy@csgroup.eu,
-        linuxppc-dev@lists.ozlabs.org
+        kernel test robot <lkp@intel.com>, hca@linux.ibm.com,
+        gor@linux.ibm.com, agordeev@linux.ibm.com,
+        borntraeger@linux.ibm.com, svens@linux.ibm.com,
+        linux-s390@vger.kernel.org
 X-Mailer: b4 0.11.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1615; i=nathan@kernel.org;
- h=from:subject:message-id; bh=v6Pz2Y597IXrTiPrySIepPbVwiJR5GwFlJrsRuCIfjA=;
- b=owGbwMvMwCEmm602sfCA1DTG02pJDMlbb3Z7Oq3kieNiveZyJXDJXasQq54txYoNPclTjr3u7Xo4
- ZeLpjlIWBjEOBlkxRZbqx6rHDQ3nnGW8cWoSzBxWJpAhDFycAjARsRiG/4kaRepfr4TF+i5fe2SxxC
- QL5QfqtVtfZX7951uV4MLPUcvI8NJTeEWyUZXhPo85ojZH1SS93f4Fbf/7uijotRdHqtgPDgA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1359; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=5O31/XAlnhwnQJPlhpwoSbHf+ZiDlbOC4a1CxUANeAk=;
+ b=owGbwMvMwCEmm602sfCA1DTG02pJDMlbb3Y7rfl6cl9SyN2pqtnZpq3hiZ9Yjl19ddDg3F6nGU1r
+ mkPudZSyMIhxMMiKKbJUP1Y9bmg45yzjjVOTYOawMoEMYeDiFICJtFxg+CulI+7Yx7K0qfvWb/e9XS
+ 4/D2dcd/RadsPHOPOk3qqMd4KMDEcnf29fV1fU9XuV7bTbi6TWO6Qv1uboP3lbvSnv1e037HwA
 X-Developer-Key: i=nathan@kernel.org; a=openpgp;
  fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 Precedence: bulk
@@ -61,40 +61,39 @@ List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
 When clang's -Qunused-arguments is dropped from KBUILD_CPPFLAGS, it
-warns:
+points out that there is a linking phase flag added to CFLAGS, which
+will only be used for compiling
 
-  clang-16: error: argument unused during compilation: '-fno-stack-clash-protection' [-Werror,-Wunused-command-line-argument]
+  clang-16: error: argument unused during compilation: '-shared' [-Werror,-Wunused-command-line-argument]
 
-This flag is supported for 64-bit powerpc but not 32-bit, hence the warning.
-Just remove the flag from vgettimeofday-32.o's CFLAGS when using clang, as has
-been done for other flags previously.
+'-shared' is already present in ldflags-y so it can just be dropped.
 
+Fixes: 2b2a25845d53 ("s390/vdso: Use $(LD) instead of $(CC) to link vDSO")
 Signed-off-by: Nathan Chancellor <nathan@kernel.org>
 ---
-Cc: mpe@ellerman.id.au
-Cc: npiggin@gmail.com
-Cc: christophe.leroy@csgroup.eu
-Cc: linuxppc-dev@lists.ozlabs.org
+Cc: hca@linux.ibm.com
+Cc: gor@linux.ibm.com
+Cc: agordeev@linux.ibm.com
+Cc: borntraeger@linux.ibm.com
+Cc: svens@linux.ibm.com
+Cc: linux-s390@vger.kernel.org
 ---
- arch/powerpc/kernel/vdso/Makefile | 5 +++++
- 1 file changed, 5 insertions(+)
+ arch/s390/kernel/vdso64/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/powerpc/kernel/vdso/Makefile b/arch/powerpc/kernel/vdso/Makefile
-index 769b62832b38..4ee7d36ce752 100644
---- a/arch/powerpc/kernel/vdso/Makefile
-+++ b/arch/powerpc/kernel/vdso/Makefile
-@@ -16,6 +16,11 @@ ifneq ($(c-gettimeofday-y),)
-   CFLAGS_vgettimeofday-32.o += -ffreestanding -fasynchronous-unwind-tables
-   CFLAGS_REMOVE_vgettimeofday-32.o = $(CC_FLAGS_FTRACE)
-   CFLAGS_REMOVE_vgettimeofday-32.o += -mcmodel=medium -mabi=elfv1 -mabi=elfv2 -mcall-aixdesc
-+  # This flag is supported by clang for 64-bit but not 32-bit so it will cause
-+  # an unused command line flag warning for this file.
-+  ifdef CONFIG_CC_IS_CLANG
-+  CFLAGS_REMOVE_vgettimeofday-32.o += -fno-stack-clash-protection
-+  endif
-   CFLAGS_vgettimeofday-64.o += -include $(c-gettimeofday-y)
-   CFLAGS_vgettimeofday-64.o += $(DISABLE_LATENT_ENTROPY_PLUGIN)
-   CFLAGS_vgettimeofday-64.o += $(call cc-option, -fno-stack-protector)
+diff --git a/arch/s390/kernel/vdso64/Makefile b/arch/s390/kernel/vdso64/Makefile
+index a2fe9383d452..34f9542636e9 100644
+--- a/arch/s390/kernel/vdso64/Makefile
++++ b/arch/s390/kernel/vdso64/Makefile
+@@ -25,7 +25,7 @@ KBUILD_AFLAGS_64 := $(filter-out -m64,$(KBUILD_AFLAGS))
+ KBUILD_AFLAGS_64 += -m64
+ 
+ KBUILD_CFLAGS_64 := $(filter-out -m64,$(KBUILD_CFLAGS))
+-KBUILD_CFLAGS_64 += -m64 -fPIC -shared -fno-common -fno-builtin
++KBUILD_CFLAGS_64 += -m64 -fPIC -fno-common -fno-builtin
+ ldflags-y := -fPIC -shared -soname=linux-vdso64.so.1 \
+ 	     --hash-style=both --build-id=sha1 -T
+ 
 
 -- 
 2.39.0
