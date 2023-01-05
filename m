@@ -2,116 +2,110 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0D2BC4708D
-	for <linux-kbuild@archiver.kernel.org>; Thu,  5 Jan 2023 03:34:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36874C3DA7A
+	for <linux-kbuild@archiver.kernel.org>; Thu,  5 Jan 2023 07:28:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229554AbjAEDeK (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 4 Jan 2023 22:34:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38614 "EHLO
+        id S230319AbjAEH2G (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 5 Jan 2023 02:28:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230059AbjAEDeJ (ORCPT
+        with ESMTP id S229781AbjAEH2F (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 4 Jan 2023 22:34:09 -0500
-Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9D4B485B6;
-        Wed,  4 Jan 2023 19:34:08 -0800 (PST)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailout.west.internal (Postfix) with ESMTP id CCB9B32009B8;
-        Wed,  4 Jan 2023 22:34:04 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute3.internal (MEProxy); Wed, 04 Jan 2023 22:34:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sholland.org; h=
-        cc:cc:content-transfer-encoding:content-type:date:date:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to; s=fm3; t=1672889644; x=
-        1672976044; bh=J5dtluVJN/sDCz5O/tnIQDUHTV9zIL4n+5iOhogQdAc=; b=f
-        q2f0L04VWkCVzGLPpVpe6pu2vwvu11ugBpr1YE5NsGVWfNamFZTtA6mb8RB7obcI
-        dKiKjqO/7zNxppLTWA1WRgGri6Lmz7dHUdF1Jroo1bDq7kogE4xfTvKubRGwmdwM
-        AhDHzlSTCS4aW5KGxdc7zgfNHR50lbaxDz+Ay1j/5JgkOZKC+5JqIz6GjZbqL6Nb
-        PCRFaa4IQorYDTcKT0IYchcNKTpN9IeDMfIiPWmS8/VzrgZZLeORErEcRXw0mbLS
-        8mCTnvSfjw/CiDEJn90jQittQ5FwGHk9/9RQiBIkbcHY5n3otPYXs0WhN4NjYqRS
-        vhW6b8N6B/nIsAnn9fPxQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-transfer-encoding
-        :content-type:date:date:feedback-id:feedback-id:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1672889644; x=
-        1672976044; bh=J5dtluVJN/sDCz5O/tnIQDUHTV9zIL4n+5iOhogQdAc=; b=Q
-        O+QQMzzT6VCvmRtb8h9gVIM9Y7MBT8BBuNHuVMAZTqP3jXCUcw3wGAFCw19LOYHz
-        BrFvURAIwm43NbnQ0F0D5XsN1zm8VKC6Xlf3YweUJxVoRwOo1foK3E5mtBg/304j
-        D1ZzFR3dcGl2IlYefSabtAj8R59DaQO7VvcgyDZR38vmzackopGpHUAjeF/1mmfK
-        QyMKzicWxlH/q8IXJ1mmR2HQ4VB2NQGV/2E49+53/LC3yCa5wqYc9xWO6N26K2AW
-        cg/mXu7+/t1OWrQlHGhIEKFPWtQrH0VaHQwrnMFG5KPGx3YbYUOkAq7ZbOIOFYxy
-        /jHoz5fvBEWwlBGBMf6Hg==
-X-ME-Sender: <xms:K0W2Y3DTkQj5xtaTFYAaqTM7_efDj7gwl97GHYQrDBMHyyFwcnzk5w>
-    <xme:K0W2Y9jCQ_2jqa5blvk76vQajAx9zWL_ohspG3b_vPxzow8IMBKWaZhsewD2YhR73
-    Stx-BcCfLSpynqSQQ>
-X-ME-Received: <xmr:K0W2YyleaJ2T-D3kpRaOLNBw3A7z74GbeWrGGdNeZfuLSnPHDiN4FtbH_3oxI87iJDWMpNBf33vD5jHLbbmdL425RFIlulLnZpY4YX0P1pnz3afGJXeddfgbJQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrjeejgdeiudcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefkffggfgfvvehfhffujggtgfesthejredttdefjeenucfhrhhomhepufgrmhhu
-    vghlucfjohhllhgrnhguuceoshgrmhhuvghlsehshhholhhlrghnugdrohhrgheqnecugg
-    ftrfgrthhtvghrnhepheettdefgeeuudelvdffleejheejueeludduiedvkeffgeetueev
-    vdelvdetfeejnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghruf
-    hiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsrghmuhgvlhesshhhohhllhgr
-    nhgurdhorhhg
-X-ME-Proxy: <xmx:K0W2Y5xZuGqFpBxlUXh3QbSx-fGevjcGeGfBkjJjfKw3ZrMtyTY5iA>
-    <xmx:K0W2Y8QTFDFwSKurhzAaFS5Cx11OUoaN3yWds8uh9FSsVz-Zt3_1Zw>
-    <xmx:K0W2Y8Ye5aABlp4CH9IAZv4K26nl1d8ZkjCu9fIzZ1fkUv1-hIW4jw>
-    <xmx:LEW2YxJYz-mzlMrdCqjuXT6YnzW4XjX1Ps6CA4nsfFBGUKNle_H7Nw>
-Feedback-ID: i0ad843c9:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 4 Jan 2023 22:34:02 -0500 (EST)
-Message-ID: <15cd1727-eedd-d476-e52c-2234cf66a5c9@sholland.org>
-Date:   Wed, 4 Jan 2023 21:34:02 -0600
+        Thu, 5 Jan 2023 02:28:05 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 938A44BD59;
+        Wed,  4 Jan 2023 23:28:03 -0800 (PST)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3057M9Cb016137;
+        Thu, 5 Jan 2023 07:27:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=pp1; bh=vPgl6uHLw/VLOqi4bB3zQ3ahi5Ls1wSXBqKR8b4bX5Q=;
+ b=D86CAd+LPbZbPNfC84kTzwGxdlLA6Z0VAhLGhC0cIoXNlie/dnPQFfrtboYBJ6W1xqQQ
+ De0S5j16cMpbQBjoAlhkoaIdo2MScYJd6my72uRw1exnRiBGaHQoVFXHxsexoRElZzFV
+ AYNTdwr9Lpdn0ukDtkZ8qC4Op8A2OGBGKtetkDOUavuMoMctmRQx2ggvAqtkDp2qLxjd
+ KKWkBpYELkZUi1cQkAyPj/yoXI9KBMkgWestklIjVMWRS7IgJ+37Z8UehRH/z4ckFl9n
+ bos2vSZD03xpNmUQq+miPSuWusUN+pr/YfYQLUqTaVONOlPg3gFNNwq2s3lRe/Ajg/oI zQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mwt3q02dw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 05 Jan 2023 07:27:51 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3057PJiE028622;
+        Thu, 5 Jan 2023 07:27:50 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mwt3q02da-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 05 Jan 2023 07:27:50 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30557dRk021827;
+        Thu, 5 Jan 2023 07:27:48 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3mtcq6ed0f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 05 Jan 2023 07:27:48 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3057RiEL23396698
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 5 Jan 2023 07:27:45 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D33DD20043;
+        Thu,  5 Jan 2023 07:27:44 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A567920040;
+        Thu,  5 Jan 2023 07:27:44 +0000 (GMT)
+Received: from tuxmaker.linux.ibm.com (unknown [9.152.85.9])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Thu,  5 Jan 2023 07:27:44 +0000 (GMT)
+From:   Sven Schnelle <svens@linux.ibm.com>
+To:     Nathan Chancellor <nathan@kernel.org>
+Cc:     masahiroy@kernel.org, ndesaulniers@google.com, nicolas@fjasle.eu,
+        trix@redhat.com, linux-kbuild@vger.kernel.org,
+        llvm@lists.linux.dev, kernel test robot <lkp@intel.com>,
+        hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+        borntraeger@linux.ibm.com, linux-s390@vger.kernel.org
+Subject: Re: [PATCH 09/14] s390/vdso: Drop unused '-s' flag from
+ KBUILD_AFLAGS_64
+References: <20221228-drop-qunused-arguments-v1-0-658cbc8fc592@kernel.org>
+        <20221228-drop-qunused-arguments-v1-9-658cbc8fc592@kernel.org>
+Date:   Thu, 05 Jan 2023 08:27:44 +0100
+In-Reply-To: <20221228-drop-qunused-arguments-v1-9-658cbc8fc592@kernel.org>
+        (Nathan Chancellor's message of "Wed, 04 Jan 2023 12:54:26 -0700")
+Message-ID: <yt9dbkndh24v.fsf@linux.ibm.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.0.50 (gnu/linux)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux ppc64le; rv:102.0) Gecko/20100101
- Thunderbird/102.3.3
-Content-Language: en-US
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-kernel@vger.kernel.org,
-        Christopher Schramm <debian@cschramm.eu>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nicolas Schier <nicolas@fjasle.eu>,
-        linux-kbuild@vger.kernel.org
-References: <20230104140459.1147626-1-masahiroy@kernel.org>
-From:   Samuel Holland <samuel@sholland.org>
-Subject: Re: [PATCH] kbuild: readd -w option when vmlinux.o or Module.symver
- is missing
-In-Reply-To: <20230104140459.1147626-1-masahiroy@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 9knDhEHCuyEBAbYP-HjbQiZByUEX-ADo
+X-Proofpoint-ORIG-GUID: ce9R7N1HDmawW1JV3dY9FhbyG-RkAlj-
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2023-01-05_02,2023-01-04_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
+ clxscore=1011 suspectscore=0 priorityscore=1501 bulkscore=0
+ impostorscore=0 spamscore=0 malwarescore=0 lowpriorityscore=0
+ mlxlogscore=843 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2212070000 definitions=main-2301050058
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On 1/4/23 08:04, Masahiro Yamada wrote:
-> Commit 63ffe00d8c93 ("kbuild: Fix running modpost with musl libc")
-> accidentally turned the unresolved symbol warnings into errors when
-> vmlinux.o (for in-tree builds) or Module.symver (for external module
-> builds) is missing.
-> 
-> In those cases, unresolved symbols are expected, but the -w option
-> is not set because 'missing-input' is referenced before set.
-> 
-> Move $(missing-input back to the original place. This should be fine
-> for musl libc because vmlinux.o and -w are not added at the same time.
-> 
-> With this change, -w may be passed twice, but it is not a big deal.
-> 
-> Link: https://lore.kernel.org/all/b56a03b8-2a2a-f833-a5d2-cdc50a7ca2bb@cschramm.eu/
-> Fixes: 63ffe00d8c93 ("kbuild: Fix running modpost with musl libc")
-> Reported-by: Christopher Schramm <debian@cschramm.eu>
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
-> 
->  scripts/Makefile.modpost | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
+Nathan Chancellor <nathan@kernel.org> writes:
 
-Sorry for the breakage. This works fine for me, with or without vmlinux.o.
+> When clang's -Qunused-arguments is dropped from KBUILD_CPPFLAGS, it
+> warns that KBUILD_AFLAGS_64 contains '-s', which is a linking phase
+> option, so it is unused.
+>
+>   clang-16: error: argument unused during compilation: '-s' [-Werror,-Wunused-command-line-argument]
+>
+> There appears to be no equivalent for '-s' in GNU as; 'as --help' on
+> x86_64 notes that '-s' is ignored and 's390x-linux-gnu-as --help' makes
+> no mention of it whatsoever.
+>
+> Just drop '-s' altogether, as it has been there since the introduction
+> of the vDSO, which means it is likely uneeded, given there would likely
+> have been a report by this point.
+>
+> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
 
-Tested-by: Samuel Holland <samuel@sholland.org>
-
+Reviewed-by: Sven Schnelle <svens@linux.ibm.com>
