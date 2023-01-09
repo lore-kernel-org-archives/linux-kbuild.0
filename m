@@ -2,87 +2,82 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D4ADC54EBD
-	for <linux-kbuild@archiver.kernel.org>; Mon,  9 Jan 2023 20:24:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 223C3C54EBD
+	for <linux-kbuild@archiver.kernel.org>; Mon,  9 Jan 2023 20:45:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230032AbjAIUY3 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 9 Jan 2023 15:24:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43964 "EHLO
+        id S234779AbjAIUpr (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 9 Jan 2023 15:45:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231220AbjAIUY2 (ORCPT
+        with ESMTP id S234229AbjAIUpq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 9 Jan 2023 15:24:28 -0500
-X-Greylist: delayed 306 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 09 Jan 2023 12:24:24 PST
-Received: from mout.web.de (mout.web.de [212.227.15.14])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92AE6E3A;
-        Mon,  9 Jan 2023 12:24:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
-        t=1673295862; bh=OQa6MVATnom40EiZAoiknanw3c0hK9XWFEEbAcwYCZ4=;
-        h=X-UI-Sender-Class:From:To:Cc:Subject:Date;
-        b=c6a3JbeL5mFoQSEMGZmxQii7p+K/dfXytNZJg0uSuvfOrjSBu+Oaj1SaVUNYot+5+
-         A89ZCYdBlADM7WzF2TBziP+7NAFFjbLVeWXelZD8L4eAfXkboMvM06J+TZU0VoGyRA
-         oxCpLrKraBnZFFLHAL0V2aG/R/djcTOT5Yua9ZjX6UeLLem1diadA3inUC3mywujOE
-         7Pnza0mNHvMy4OGz2mvkr0tySmvIqnwVFc8VAPaqGR+E95k6aAB2fwwt6Dyvc9ASSa
-         J3Id2udIvWYbPX4Z80/QAWTzmJmRw4y4/8IYQCeQ4vHvvtWffX9AD0NOLbtPPTwANL
-         kv76yGbrssr9Q==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from artix.fritz.box ([88.72.104.165]) by smtp.web.de (mrweb006
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1M3V6E-1pFWZh16Wo-000qjM; Mon, 09
- Jan 2023 21:19:11 +0100
-From:   Lizzy Fleckenstein <eliasfleckenstein@web.de>
-To:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        akpm@linux-foundation.org, ndesaulniers@google.com,
-        masahiroy@kernel.org
-Cc:     Lizzy Fleckenstein <eliasfleckenstein@web.de>
-Subject: [PATCH] kconfig: fix typo (usafe -> unsafe)
-Date:   Mon,  9 Jan 2023 21:18:37 +0100
-Message-Id: <20230109201837.23873-1-eliasfleckenstein@web.de>
-X-Mailer: git-send-email 2.39.0
+        Mon, 9 Jan 2023 15:45:46 -0500
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A32AA4ECB8
+        for <linux-kbuild@vger.kernel.org>; Mon,  9 Jan 2023 12:45:45 -0800 (PST)
+Received: by mail-pl1-x62f.google.com with SMTP id v23so5971344plo.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 09 Jan 2023 12:45:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UI3QmEyTzt2vGoW+rXIva7nnQIqT6mp5caaaDYa3q3s=;
+        b=RvqetUe8b71Si4JZbdpPsA6WybRwDAXCqS+u+STGEcqMTN2WxPw7SMKyu1yLfUpsto
+         j+R7Bo7Gv/PcJdVUX2CzA9U8uiKPo01ZFIxJmm5JQAcpUFqMgH8fmOk3ykh7+Ev9Yk6A
+         snGP9wbgpslEI516ykfReqyRU9GoM5jxLs4s6uZpWekQpT6lv1MVEICFfp0UU6opXBPh
+         hvBGPrIUyKd2nPJ973Wea6B7/6L05jjb28fzx0SZscqzyfBUWXUp87bs8czSr81v26QD
+         Nqse8zdAtpNzEhQBDSPoGHq1Sd2h2g8xLDKzg4fIgXJQF7qS0coDtaUzIKYxnKUw9+ET
+         Q/8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UI3QmEyTzt2vGoW+rXIva7nnQIqT6mp5caaaDYa3q3s=;
+        b=a+PT71C4oRpOz9WT6Cqvue06oZPQEEmuH9AaEdr2Iif3pxOYhjNGbJct+s5Qm9PkV+
+         uwj6oJa/MnLB4PcyW7gBqOzvExmjvHX29f8eGj137H1cVJyy20KIrCJiiLGT+wEPJlrO
+         h10zkpkR85OcYoaHfot+dW/WjmlDvSFzf+PLIW3C11pnFb86MjVHKBHKqdqMvMSoY9lO
+         h/6FmPmruwVyWYWLa1AQpio6/G4DxUatZWyI3NlS8nEfjiToaP4+0m4JmEZ5BiN/Mp8H
+         2/uN3s4viMo1HCCZ6G4SXvN6utZxvk88WE5etaCIsnQBBeFMRm6Z8ezNGjEdHmoNd4AL
+         fhXg==
+X-Gm-Message-State: AFqh2kqo9BCkDDqznFcXLdzoWe+6fQhrHAGHAW+XzvBax/aQ+GnRuzGg
+        YjkcDuHeKT2RSHp8gFlCtEDdRA==
+X-Google-Smtp-Source: AMrXdXusDW0vlZsH5jekwe1G7AR/6oHp5h2LYAZo26+MoZNoSEB2oH5REu2CSXVGXdhzYaYbWSoLcg==
+X-Received: by 2002:a17:902:f292:b0:191:1543:6b2f with SMTP id k18-20020a170902f29200b0019115436b2fmr650806plc.3.1673297144970;
+        Mon, 09 Jan 2023 12:45:44 -0800 (PST)
+Received: from google.com (13.65.82.34.bc.googleusercontent.com. [34.82.65.13])
+        by smtp.gmail.com with ESMTPSA id c1-20020a170903234100b0017f48a9e2d6sm6444589plh.292.2023.01.09.12.45.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Jan 2023 12:45:44 -0800 (PST)
+Date:   Mon, 9 Jan 2023 12:45:40 -0800
+From:   William McVicker <willmcvicker@google.com>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     linux-kbuild@vger.kernel.org, kernel-team@android.com
+Subject: modpost warning by default on missing Module.symvers
+Message-ID: <Y7x89C9nAVX98T4g@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:aF+26sjVlVUZ8XhiCRy+CXUFd65Itd5PmHE7l1v0s6WIAghh2vl
- H4vppew4ZPG1Bz3Pt3ZUGgCsfgcxvHcBR/kJEIO5J5Z1kjRsw9+CawSdG7qGTOdRGOhMOzr
- xKhQ0F0KahjQLotDGuyd9x1MmrrCdzAzuWqaNPQn53rRnVYhDi61OcFN1NXD7QANZkXiZsC
- uj9SsBW6Y4tppatc8kKmw==
-UI-OutboundReport: notjunk:1;M01:P0:RPCqNCnWrrU=;y58UeZdA7KxozXY1hSgDt4Lcu9w
- wAeZ7pZC2kUPsAGb6qljCgJlWrdPCW/Gn/Ic6djBwe8rOcL4o6zaHiDJrILmFQ8fYNogFGdFo
- V8F4lShdlobbkfY83hBkOvPrl4Ykg17oL4FVXh+teqE1jbi+serHW3MkBA+K5xCfuOtejzjRn
- qlj5BNRtnm+tLnVuULKc2oNOlz7WVA1fU5E0Q95HHnAh1U9KmTW0Z0K6waffQnlo7iOv/iJDU
- AStWb5Hc38R3Z3D9wrWIGJcmDVy0ZRAyZ77XkLWr67hu0EbH5HI0gYCr0AYixxrYPfxq7qh3t
- 4yBcabrXTvX+4FnrvzvSTHirZ/BPS0/xOGFNz4zFc4KJCyz2murFLS2liIhwz193uVyMqtRFt
- HwNkVCzrcubRACQFe+FMzUVskvdtgOYGXTKD7u5gq2WK6aCyXoV9seba+wHqy6RyXqCgF5lyt
- ZQnybW3nbmWbfGD2DWBGtReDVyIwDeF+2s/U/P/GwoKqBtKve4RSi2y8pY8Oxel6IC1ovJtr4
- uzwOXipcq9G6sbW8GhW5O3UrRVVCwkfDk87vuV9RVzTI2xP29HA2qPaM5jrnIe79pw0vgwuVj
- p46TIqSKV0nzAyBE5u7RJzASTA5eNulO66UNICBahoJ5kqgdv/jTJoRtK261LQdy2GwoL8aB3
- IzgQpG7qCb9OZQn+XTZ53C705uW4nW18fTeiZMb8yX2MAwhaHbbGNMJz6qF46XJXJ7fr7gW2v
- 2w+JNVZlpjmZLJxBYRYA+S3Qq0UxWTQe7xMB5wetCVCDdWgUjxGEse+zMIWPBwQGo0+g2kj08
- lBi7h409Gi3N+DYCV5Np+Cv3x6VX4amw+14TmNwE+i93yWk2JkdZtW0aqnRr7a3rmXCdzWVTa
- JYD7OLFJJ3J9hlsdWk1+ttQwf1VfuX7UBWc0vO3APyBbnnXuuEkqxgsbBRHkCU4Pfc+1EXzx+
- xwYhbgEHhqae5G+Uv8twMKv43NE=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Fix the help text for the PRINTK_SAFE_LOG_BUF_SHIFT setting.
+Hi Masahiro,
 
-Signed-off-by: Lizzy Fleckenstein <eliasfleckenstein@web.de>
-=2D--
- init/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I recently noticed that in commit 4475dff55c54 ("kbuild: fix false-positive
+modpost warning when all symbols are trimmed") [1] you modified the modpost
+behavior to always warn (by passing `-w`) when there are missing Module.symver
+files in order to allow module builds to continue building with warnings
+instead of errors. I'm curious why you decided to not continue to rely on
+KBUILD_MODPOST_WARN to enable/disable that functionality?
 
-diff --git a/init/Kconfig b/init/Kconfig
-index 7e5c3ddc341d..57c8d224ea4c 100644
-=2D-- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -776,7 +776,7 @@ config PRINTK_SAFE_LOG_BUF_SHIFT
- 	depends on PRINTK
- 	help
- 	  Select the size of an alternate printk per-CPU buffer where messages
--	  printed from usafe contexts are temporary stored. One example would
-+	  printed from unsafe contexts are temporary stored. One example would
- 	  be NMI messages, another one - printk recursion. The messages are
- 	  copied to the main log buffer in a safe context to avoid a deadlock.
- 	  The value defines the size as a power of 2.
-=2D-
-2.39.0
+I personally find it useful to keep these types of warnings as errors in order
+to catch missing dependencies at build time (ideally by the CI build) instead
+of at runtime when a module fails to load due to a missing symbol dependency.
 
+Let me know your thoughts on this and I'll try to come up with a solution to
+factor in any concerns you have.
+
+Thanks,
+Will
+
+[1] https://lore.kernel.org/all/20210325185412.2352951-3-masahiroy@kernel.org/
