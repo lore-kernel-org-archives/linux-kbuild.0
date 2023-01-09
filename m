@@ -2,82 +2,98 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 223C3C54EBD
-	for <linux-kbuild@archiver.kernel.org>; Mon,  9 Jan 2023 20:45:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B9FCC54EBD
+	for <linux-kbuild@archiver.kernel.org>; Mon,  9 Jan 2023 20:45:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234779AbjAIUpr (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 9 Jan 2023 15:45:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54904 "EHLO
+        id S237069AbjAIUpy (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 9 Jan 2023 15:45:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234229AbjAIUpq (ORCPT
+        with ESMTP id S231290AbjAIUpx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 9 Jan 2023 15:45:46 -0500
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A32AA4ECB8
-        for <linux-kbuild@vger.kernel.org>; Mon,  9 Jan 2023 12:45:45 -0800 (PST)
-Received: by mail-pl1-x62f.google.com with SMTP id v23so5971344plo.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 09 Jan 2023 12:45:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UI3QmEyTzt2vGoW+rXIva7nnQIqT6mp5caaaDYa3q3s=;
-        b=RvqetUe8b71Si4JZbdpPsA6WybRwDAXCqS+u+STGEcqMTN2WxPw7SMKyu1yLfUpsto
-         j+R7Bo7Gv/PcJdVUX2CzA9U8uiKPo01ZFIxJmm5JQAcpUFqMgH8fmOk3ykh7+Ev9Yk6A
-         snGP9wbgpslEI516ykfReqyRU9GoM5jxLs4s6uZpWekQpT6lv1MVEICFfp0UU6opXBPh
-         hvBGPrIUyKd2nPJ973Wea6B7/6L05jjb28fzx0SZscqzyfBUWXUp87bs8czSr81v26QD
-         Nqse8zdAtpNzEhQBDSPoGHq1Sd2h2g8xLDKzg4fIgXJQF7qS0coDtaUzIKYxnKUw9+ET
-         Q/8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UI3QmEyTzt2vGoW+rXIva7nnQIqT6mp5caaaDYa3q3s=;
-        b=a+PT71C4oRpOz9WT6Cqvue06oZPQEEmuH9AaEdr2Iif3pxOYhjNGbJct+s5Qm9PkV+
-         uwj6oJa/MnLB4PcyW7gBqOzvExmjvHX29f8eGj137H1cVJyy20KIrCJiiLGT+wEPJlrO
-         h10zkpkR85OcYoaHfot+dW/WjmlDvSFzf+PLIW3C11pnFb86MjVHKBHKqdqMvMSoY9lO
-         h/6FmPmruwVyWYWLa1AQpio6/G4DxUatZWyI3NlS8nEfjiToaP4+0m4JmEZ5BiN/Mp8H
-         2/uN3s4viMo1HCCZ6G4SXvN6utZxvk88WE5etaCIsnQBBeFMRm6Z8ezNGjEdHmoNd4AL
-         fhXg==
-X-Gm-Message-State: AFqh2kqo9BCkDDqznFcXLdzoWe+6fQhrHAGHAW+XzvBax/aQ+GnRuzGg
-        YjkcDuHeKT2RSHp8gFlCtEDdRA==
-X-Google-Smtp-Source: AMrXdXusDW0vlZsH5jekwe1G7AR/6oHp5h2LYAZo26+MoZNoSEB2oH5REu2CSXVGXdhzYaYbWSoLcg==
-X-Received: by 2002:a17:902:f292:b0:191:1543:6b2f with SMTP id k18-20020a170902f29200b0019115436b2fmr650806plc.3.1673297144970;
-        Mon, 09 Jan 2023 12:45:44 -0800 (PST)
-Received: from google.com (13.65.82.34.bc.googleusercontent.com. [34.82.65.13])
-        by smtp.gmail.com with ESMTPSA id c1-20020a170903234100b0017f48a9e2d6sm6444589plh.292.2023.01.09.12.45.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Jan 2023 12:45:44 -0800 (PST)
-Date:   Mon, 9 Jan 2023 12:45:40 -0800
-From:   William McVicker <willmcvicker@google.com>
+        Mon, 9 Jan 2023 15:45:53 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D988240;
+        Mon,  9 Jan 2023 12:45:50 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E633E613EA;
+        Mon,  9 Jan 2023 20:45:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9624C433EF;
+        Mon,  9 Jan 2023 20:45:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1673297149;
+        bh=7uir+fpWvzx/j9KVXbIqIv40RM5gM3COk4tThC15780=;
+        h=From:To:Cc:Subject:Date:From;
+        b=g6N3/ydSgf1ekjlEVVfHIsbM86g99kyRUChoRdZg9dF1V/YnyOisYY37+GmhiitC0
+         Jdi2fKYCxTR6yF2oF3U/V0kkuRBNpAVyrGOiqqVN4JpG6eGFBVbNFBPsOHQSc17+Vh
+         lNaZxi1Dt9tvPKNvDjwQJ/6lv0fPjQGtuA3lfiiPTgOB3RZLYuYpvrrMsjEILsl8qI
+         QuDZ0h1vJ7mq97UjXtbliAoUDQc6j8sjYcuAkg/KbYgpKCbjPb1lBS2UTe6sN8SZZ+
+         83WGp3wKWYw6yURHS1NMI9AG1KA78Jh38A6ktiB7Obi8hyEL74pZ22Jywp1NEdzJtS
+         zQWuLBcrUi58A==
+From:   Miguel Ojeda <ojeda@kernel.org>
 To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-kbuild@vger.kernel.org, kernel-team@android.com
-Subject: modpost warning by default on missing Module.symvers
-Message-ID: <Y7x89C9nAVX98T4g@google.com>
+Cc:     linux-kbuild@vger.kernel.org,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nicolas Schier <nicolas@fjasle.eu>,
+        rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org,
+        patches@lists.linux.dev, Miguel Ojeda <ojeda@kernel.org>,
+        Alex Gaynor <alex.gaynor@gmail.com>,
+        Wedson Almeida Filho <wedsonaf@gmail.com>,
+        Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
+        =?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
+        Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org
+Subject: [PATCH 1/6] docs: rust: add paragraph about finding a suitable `libclang`
+Date:   Mon,  9 Jan 2023 21:45:15 +0100
+Message-Id: <20230109204520.539080-1-ojeda@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hi Masahiro,
+Sometimes users need to tweak the finding process of `libclang`
+for `bindgen` via the `clang-sys`-provided environment variables.
 
-I recently noticed that in commit 4475dff55c54 ("kbuild: fix false-positive
-modpost warning when all symbols are trimmed") [1] you modified the modpost
-behavior to always warn (by passing `-w`) when there are missing Module.symver
-files in order to allow module builds to continue building with warnings
-instead of errors. I'm curious why you decided to not continue to rely on
-KBUILD_MODPOST_WARN to enable/disable that functionality?
+Thus add a paragraph to the setting up guide, including a reference
+to `clang-sys`'s relevant documentation.
 
-I personally find it useful to keep these types of warnings as errors in order
-to catch missing dependencies at build time (ideally by the CI build) instead
-of at runtime when a module fails to load due to a missing symbol dependency.
+Link: https://lore.kernel.org/rust-for-linux/CAKwvOdm5JT4wbdQQYuW+RT07rCi6whGBM2iUAyg8A1CmLXG6Nw@mail.gmail.com/
+Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
+---
+ Documentation/rust/quick-start.rst | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-Let me know your thoughts on this and I'll try to come up with a solution to
-factor in any concerns you have.
+diff --git a/Documentation/rust/quick-start.rst b/Documentation/rust/quick-start.rst
+index 13b7744b1e27..cae21ea7de41 100644
+--- a/Documentation/rust/quick-start.rst
++++ b/Documentation/rust/quick-start.rst
+@@ -100,6 +100,23 @@ Install it via (note that this will download and build the tool from source)::
+ 
+ 	cargo install --locked --version $(scripts/min-tool-version.sh bindgen) bindgen
+ 
++``bindgen`` needs to find a suitable ``libclang`` in order to work. If it is
++not found (or a different ``libclang`` than the one found should be used),
++the process can be tweaked using the environment variables understood by
++``clang-sys`` (the Rust bindings crate that ``bindgen`` uses to access
++``libclang``):
++
++* ``LLVM_CONFIG_PATH`` can be pointed to an ``llvm-config`` executable.
++
++* Or ``LIBCLANG_PATH`` can be pointed to a ``libclang`` shared library
++  or to the directoy containing it.
++
++* Or ``CLANG_PATH`` can be pointed to a ``clang`` executable.
++
++For details, please see ``clang-sys``'s documentation at:
++
++	https://github.com/KyleMayes/clang-sys#environment-variables
++
+ 
+ Requirements: Developing
+ ------------------------
+-- 
+2.39.0
 
-Thanks,
-Will
-
-[1] https://lore.kernel.org/all/20210325185412.2352951-3-masahiroy@kernel.org/
