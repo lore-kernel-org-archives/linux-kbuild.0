@@ -2,96 +2,126 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0F1AC54EBD
-	for <linux-kbuild@archiver.kernel.org>; Mon,  9 Jan 2023 20:46:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 728FBC5479D
+	for <linux-kbuild@archiver.kernel.org>; Mon,  9 Jan 2023 20:56:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237606AbjAIUqR (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 9 Jan 2023 15:46:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55460 "EHLO
+        id S237795AbjAIU4t (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 9 Jan 2023 15:56:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237666AbjAIUqL (ORCPT
+        with ESMTP id S237644AbjAIUz7 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 9 Jan 2023 15:46:11 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A06573E3A;
-        Mon,  9 Jan 2023 12:46:05 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 2979DB80FE1;
-        Mon,  9 Jan 2023 20:46:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F207FC433F0;
-        Mon,  9 Jan 2023 20:45:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1673297162;
-        bh=v6aIwGe42UpqRaNoSLoyuLZZtQ4F5eJRx+9gWWQ/eO8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=nU3KceGNxWBQHIw4s9cYt/+dB4mBbRCcVDxEWhD97wuWQx1pW1cuVmiFxvPG9ovqa
-         LxqUYYF5JfpArpnr/OW8MnFdtsjss8Ty3NY+79and96nOyJw7ZDi0QG1HW99e1fvst
-         Gywb+jPHB/nGT9VLU29DM6/QAjgWK7ILl8TDVMoxnPgBccHuG757H4SivxGK2bBnEa
-         2WjPHnV4T1u27okoMT6T2s++THucuyYlW1KeKmoel2+tv4sTATR1t1zRIGjjBDDDAh
-         Bzn8HdMYfZXbz6+btbSMvCHuYP3rH08v98r9FFecybgSZWb2IJU7KfqJ+0OynWfB7B
-         ObscqPXnQLETw==
-From:   Miguel Ojeda <ojeda@kernel.org>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-kbuild@vger.kernel.org,
+        Mon, 9 Jan 2023 15:55:59 -0500
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0209487F04
+        for <linux-kbuild@vger.kernel.org>; Mon,  9 Jan 2023 12:54:36 -0800 (PST)
+Received: by mail-pg1-x535.google.com with SMTP id b12so6753795pgj.6
+        for <linux-kbuild@vger.kernel.org>; Mon, 09 Jan 2023 12:54:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=bCpbMmW0eLev9FdtuyFUocFIcOdmXfyBWebTqFK5CIA=;
+        b=h4agD+4jNY3gjy2SULguao1y1SDRTBALR9O8Bjx0eLoYRsDA2ETD9q9AMY5zysnq+q
+         6GujFw61YQklfxifLoM25/Qx27WxO+muJS7gQ2/y584ocSmZlbkb+YerHNikmmopMt8Q
+         8rlV/PMlrHVvPBQwSUX45mQgkl/lnEsPItg7VmFwxpKVkQ0wxzMolPIiKpSrMm9vWf91
+         BdnidegVeoi+AAnpJEtgYYuR8Hj6cvvQ4gLOYJJiMwV7jAU647pgrMmjixSWC4tlr/XH
+         6G2iG/BNRvOLrlnG/a3jkymflXl2P3YV8Dio+cecoWhApoEiT0ZHCb/LmhkfF6l0Q1eF
+         Zn0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bCpbMmW0eLev9FdtuyFUocFIcOdmXfyBWebTqFK5CIA=;
+        b=7xRI41udZSg9nS6Aw4mCUcsNNZ7xIJ293lz2+A6OUOV6EsA+JEAuDxb03RAQFrMeqP
+         iFb/gL/OrvmyqkOkXTvLAtb3jNNnfwlsB07O6EJ1SwveKHXKl3JcpNYMN90+HoIofgRZ
+         QjImmz7NMVpibSs2Qbrk+HF4bxDKUW0tD6IxPBIhrKStStrFtBLrorHIvdjUYJzOXWoi
+         GKtDkVfQcJ18L4OJS0VoHoqaUmlvamk7TParXvHVnCUPBW1DLa675CTkgVnwMHwNCymY
+         lCBK8AxX5pN9UaPLSZL9GRCSKJNiBQoHmhQiUMKv916Mrue8A0rqwSb7SIE+Wn+/0Ja2
+         9fsA==
+X-Gm-Message-State: AFqh2kq2fa4McTMF8i+V77XoLGxIHi86Km0KvZ0wXwovaBoML5ChPjwe
+        1g/Pg/6lj3bYqhV9cl19hj7PmgiogZqCSprgIxBS3xPx8h155A==
+X-Google-Smtp-Source: AMrXdXtJwhfbhqPtlK+wteYA6wJbhqZXNYUZFPHzEbZJNaISXYOe+1yfLa+PUkvrtxjs8n0M+KBV1ndODf+qq8fq670=
+X-Received: by 2002:aa7:914e:0:b0:578:202d:a33a with SMTP id
+ 14-20020aa7914e000000b00578202da33amr3345635pfi.23.1673297676007; Mon, 09 Jan
+ 2023 12:54:36 -0800 (PST)
+MIME-Version: 1.0
+References: <20230109204520.539080-1-ojeda@kernel.org>
+In-Reply-To: <20230109204520.539080-1-ojeda@kernel.org>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Mon, 9 Jan 2023 12:54:24 -0800
+Message-ID: <CAKwvOdkr6mAdNOkZqGdkosAN6JABHRU3bHg=K8ujjbw2GxEsKQ@mail.gmail.com>
+Subject: Re: [PATCH 1/6] docs: rust: add paragraph about finding a suitable `libclang`
+To:     Miguel Ojeda <ojeda@kernel.org>
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        linux-kbuild@vger.kernel.org,
         Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
         Nicolas Schier <nicolas@fjasle.eu>,
         rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org,
-        patches@lists.linux.dev, Miguel Ojeda <ojeda@kernel.org>,
-        Alex Gaynor <alex.gaynor@gmail.com>,
+        patches@lists.linux.dev, Alex Gaynor <alex.gaynor@gmail.com>,
         Wedson Almeida Filho <wedsonaf@gmail.com>,
         Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-        =?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>
-Subject: [PATCH 5/6] kbuild: rust_is_available: fix confusion when a version appears in the path
-Date:   Mon,  9 Jan 2023 21:45:19 +0100
-Message-Id: <20230109204520.539080-5-ojeda@kernel.org>
-In-Reply-To: <20230109204520.539080-1-ojeda@kernel.org>
-References: <20230109204520.539080-1-ojeda@kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
+        Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-`bindgen`'s output for `libclang`'s version check contains paths, which
-in turn may contain strings that look like version numbers [1]:
+On Mon, Jan 9, 2023 at 12:45 PM Miguel Ojeda <ojeda@kernel.org> wrote:
+>
+> Sometimes users need to tweak the finding process of `libclang`
+> for `bindgen` via the `clang-sys`-provided environment variables.
+>
+> Thus add a paragraph to the setting up guide, including a reference
+> to `clang-sys`'s relevant documentation.
+>
+> Link: https://lore.kernel.org/rust-for-linux/CAKwvOdm5JT4wbdQQYuW+RT07rCi6whGBM2iUAyg8A1CmLXG6Nw@mail.gmail.com/
+> Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
 
-    .../6.1.0-dev/.../rust_is_available_bindgen_libclang.h:2:9: warning: clang version 11.1.0  [-W#pragma-messages], err: false
+This is super helpful for me, since I build clang from source and
+would like to use my libclang.so! Thanks for this documentation
+Miguel!
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 
-which the script will pick up as the version instead of the latter.
+> ---
+>  Documentation/rust/quick-start.rst | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
+>
+> diff --git a/Documentation/rust/quick-start.rst b/Documentation/rust/quick-start.rst
+> index 13b7744b1e27..cae21ea7de41 100644
+> --- a/Documentation/rust/quick-start.rst
+> +++ b/Documentation/rust/quick-start.rst
+> @@ -100,6 +100,23 @@ Install it via (note that this will download and build the tool from source)::
+>
+>         cargo install --locked --version $(scripts/min-tool-version.sh bindgen) bindgen
+>
+> +``bindgen`` needs to find a suitable ``libclang`` in order to work. If it is
+> +not found (or a different ``libclang`` than the one found should be used),
+> +the process can be tweaked using the environment variables understood by
+> +``clang-sys`` (the Rust bindings crate that ``bindgen`` uses to access
+> +``libclang``):
+> +
+> +* ``LLVM_CONFIG_PATH`` can be pointed to an ``llvm-config`` executable.
+> +
+> +* Or ``LIBCLANG_PATH`` can be pointed to a ``libclang`` shared library
+> +  or to the directoy containing it.
+> +
+> +* Or ``CLANG_PATH`` can be pointed to a ``clang`` executable.
+> +
+> +For details, please see ``clang-sys``'s documentation at:
+> +
+> +       https://github.com/KyleMayes/clang-sys#environment-variables
+> +
+>
+>  Requirements: Developing
+>  ------------------------
+> --
+> 2.39.0
+>
 
-It is also the case that versions may appear after the actual version
-(e.g. distribution's version text), which was the reason behind `head` [2]:
 
-    .../rust-is-available-bindgen-libclang.h:2:9: warning: clang version 13.0.0 (Fedora 13.0.0-3.fc35) [-W#pragma-messages], err: false
-
-Thus instead ask for a match after the `clang version` string.
-
-Reported-by: Jordan (@jordanisaacs)
-Link: https://github.com/Rust-for-Linux/linux/issues/942 [1]
-Link: https://github.com/Rust-for-Linux/linux/pull/789 [2]
-Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
----
- scripts/rust_is_available.sh | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
-
-diff --git a/scripts/rust_is_available.sh b/scripts/rust_is_available.sh
-index 0c082a248f15..a86659410e48 100755
---- a/scripts/rust_is_available.sh
-+++ b/scripts/rust_is_available.sh
-@@ -141,9 +141,7 @@ fi
- # of the `libclang` found by the Rust bindings generator is suitable.
- bindgen_libclang_version=$( \
- 	echo "$bindgen_libclang_output" \
--		| grep -F 'clang version ' \
--		| grep -oE '[0-9]+\.[0-9]+\.[0-9]+' \
--		| head -n 1 \
-+		| sed -nE 's:.*clang version ([0-9]+\.[0-9]+\.[0-9]+).*:\1:p'
- )
- bindgen_libclang_min_version=$($min_tool_version llvm)
- bindgen_libclang_cversion=$(get_canonical_version $bindgen_libclang_version)
 -- 
-2.39.0
-
+Thanks,
+~Nick Desaulniers
