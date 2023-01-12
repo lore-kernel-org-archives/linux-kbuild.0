@@ -2,58 +2,58 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F20F3C46467
-	for <linux-kbuild@archiver.kernel.org>; Thu, 12 Jan 2023 03:05:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96BDEC46467
+	for <linux-kbuild@archiver.kernel.org>; Thu, 12 Jan 2023 03:05:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235887AbjALDFr (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 11 Jan 2023 22:05:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55846 "EHLO
+        id S234552AbjALDFu (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 11 Jan 2023 22:05:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231690AbjALDFo (ORCPT
+        with ESMTP id S236019AbjALDFq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 11 Jan 2023 22:05:44 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CB8F48832
-        for <linux-kbuild@vger.kernel.org>; Wed, 11 Jan 2023 19:05:43 -0800 (PST)
+        Wed, 11 Jan 2023 22:05:46 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6567048817
+        for <linux-kbuild@vger.kernel.org>; Wed, 11 Jan 2023 19:05:46 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 15AAFB81DAA
-        for <linux-kbuild@vger.kernel.org>; Thu, 12 Jan 2023 03:05:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17974C433A4;
-        Thu, 12 Jan 2023 03:05:40 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 19555B81DB6
+        for <linux-kbuild@vger.kernel.org>; Thu, 12 Jan 2023 03:05:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C101C433AF;
+        Thu, 12 Jan 2023 03:05:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1673492740;
-        bh=ZYrEe+UlGxSb3XmlyRW+kxOUXOC4ka67ZA2eVmniGls=;
+        s=k20201202; t=1673492743;
+        bh=J83wF7k7E0HU61W5ENYtGO7bGrsUpcp8KJIdVMaGB7s=;
         h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-        b=RXfklGdaqsc4OBns3LZcCpfBAzzRfrmJY22decYhmK/DmMfUZPXq8HVbaEq62fqXF
-         spZsaa+1iNIPJwRIy6DXvwN7U/sxikAXM3tfBhjY+Us+Y2kzDiJwMfKVr57OWYpBe6
-         FR8RauQuRnHG5OnnUI5H7ZPa0ajNNIchD6jIcDJXW9dXbhSeIf9C5eOD639FQoqHnS
-         a8A7BRk/I9O4Ztil+KHW4UKsNaOEgQtkvvPt/wlTnCY3H6bAiVt2Zh18KGbaGFHYH4
-         DqdW2e86KkHAKk7fw23RyJF0XTpJYUtvlCETasjCL/g2ds8kvhgzEqByiln4CadxUd
-         BGadsL6QopuzQ==
+        b=Mb9PnUo8YVEMyxMGibvXcV9p1VYvPFlAE/83Y636eQxZC+SCt5tEuCTIW7OB/9Ony
+         477IRakir6QrRIe/6NPfw9tKzYDQ/J2Ps3CUGrOvXLfLTVVr1UDvbEfR9JkY37oEy4
+         BsWfUKoIa7s2hDIyt3jnQZhOA6Mo9ruwxMgh6asn/QjJBzfySz+6+nnwFS7s7oju2Y
+         XCRF0Uq1i2YB9Sk8e3LhJR3V4niPvP9mIlY1sV6croT7Aptn8eHeq8FAzwoDjejyb7
+         mXjUJsj/CRpGat52WYTHfGLUG80AlrluZhnnBMT5w4TvB9Im3ZuOYq1YPoTCn7oLG1
+         XErKtEh3qpAsw==
 From:   Nathan Chancellor <nathan@kernel.org>
-Date:   Wed, 11 Jan 2023 20:05:05 -0700
-Subject: [PATCH v2 08/14] powerpc/vdso: Remove an unsupported flag from
- vgettimeofday-32.o with clang
+Date:   Wed, 11 Jan 2023 20:05:09 -0700
+Subject: [PATCH v2 12/14] drm/amd/display: Do not add '-mhard-float' to
+ dml_ccflags for clang
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20221228-drop-qunused-arguments-v2-8-9adbddd20d86@kernel.org>
+Message-Id: <20221228-drop-qunused-arguments-v2-12-9adbddd20d86@kernel.org>
 References: <20221228-drop-qunused-arguments-v2-0-9adbddd20d86@kernel.org>
 In-Reply-To: <20221228-drop-qunused-arguments-v2-0-9adbddd20d86@kernel.org>
 To:     masahiroy@kernel.org
 Cc:     ndesaulniers@google.com, nicolas@fjasle.eu, trix@redhat.com,
         linux-kbuild@vger.kernel.org, llvm@lists.linux.dev,
-        Nathan Chancellor <nathan@kernel.org>, mpe@ellerman.id.au,
-        npiggin@gmail.com, christophe.leroy@csgroup.eu,
-        linuxppc-dev@lists.ozlabs.org
+        Nathan Chancellor <nathan@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org
 X-Mailer: b4 0.12-dev-78c63
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2124; i=nathan@kernel.org;
- h=from:subject:message-id; bh=ZYrEe+UlGxSb3XmlyRW+kxOUXOC4ka67ZA2eVmniGls=;
- b=owGbwMvMwCEmm602sfCA1DTG02pJDMn7K36fz/vbKrXpuv2eZb5z05tO+M9908m59Na+tW+XzPtW
- NIe1uaOUhUGMg0FWTJGl+rHqcUPDOWcZb5yaBDOHlQlkCAMXpwBMxLCF4X/Q683ffF+8EF/c/znfU8
- hUYsO5nrIl2nKtN0oeJD77ppfLyPD844cfDWfy3iYd+fqEZ+ZSg0e973q5Co6d97tx58OhCVe5AQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1279; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=J83wF7k7E0HU61W5ENYtGO7bGrsUpcp8KJIdVMaGB7s=;
+ b=owGbwMvMwCEmm602sfCA1DTG02pJDMn7K/78jF1rcKBxUaNA1oNO7i/ZDNc+di+83b5J6vDJ1qXm
+ B4UzO0pZGMQ4GGTFFFmqH6seNzScc5bxxqlJMHNYmUCGMHBxCsBEVrcyMpxnaur+LrQtxuOEF1/17C
+ khDDETv8iem5qx/dREsxsB0W2MDP8dFRkZVp8OWaoVob7Jfb3OrJtK+XPsxYIVubk7n01V4wUA
 X-Developer-Key: i=nathan@kernel.org; a=openpgp;
  fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 Precedence: bulk
@@ -63,47 +63,37 @@ X-Mailing-List: linux-kbuild@vger.kernel.org
 When clang's -Qunused-arguments is dropped from KBUILD_CPPFLAGS, it
 warns:
 
-  clang-16: error: argument unused during compilation: '-fno-stack-clash-protection' [-Werror,-Wunused-command-line-argument]
+  clang-16: error: argument unused during compilation: '-mhard-float' [-Werror,-Wunused-command-line-argument]
 
-This warning happens because vgettimeofday-32.c gets its base CFLAGS
-from the main kernel, which may contain flags that are only supported on
-a 64-bit target but not a 32-bit one, which is the case here.
--fstack-clash-protection and its negation are only suppported by the
-64-bit powerpc target but that flag is included in an invocation for a
-32-bit powerpc target, so clang points out that while the flag is one
-that it recognizes, it is not actually used by this compiler job.
-
-To eliminate the warning, remove -fno-stack-clash-protection from
-vgettimeofday-32.c's CFLAGS when using clang, as has been done for other
-flags previously.
+Similar to commit 84edc2eff827 ("selftest/fpu: avoid clang warning"),
+just add this flag to GCC builds. Commit 0f0727d971f6 ("drm/amd/display:
+readd -msse2 to prevent Clang from emitting libcalls to undefined SW FP
+routines") added '-msse2' to prevent clang from emitting software
+floating point routines.
 
 Signed-off-by: Nathan Chancellor <nathan@kernel.org>
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+Acked-by: Alex Deucher <alexander.deucher@amd.com>
 ---
-Cc: mpe@ellerman.id.au
-Cc: npiggin@gmail.com
-Cc: christophe.leroy@csgroup.eu
-Cc: linuxppc-dev@lists.ozlabs.org
+Cc: amd-gfx@lists.freedesktop.org
+Cc: dri-devel@lists.freedesktop.org
 ---
- arch/powerpc/kernel/vdso/Makefile | 5 +++++
- 1 file changed, 5 insertions(+)
+ drivers/gpu/drm/amd/display/dc/dml/Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/arch/powerpc/kernel/vdso/Makefile b/arch/powerpc/kernel/vdso/Makefile
-index 4337b3aa9171..e78a57e0a6c0 100644
---- a/arch/powerpc/kernel/vdso/Makefile
-+++ b/arch/powerpc/kernel/vdso/Makefile
-@@ -16,6 +16,11 @@ ifneq ($(c-gettimeofday-y),)
-   CFLAGS_vgettimeofday-32.o += -ffreestanding -fasynchronous-unwind-tables
-   CFLAGS_REMOVE_vgettimeofday-32.o = $(CC_FLAGS_FTRACE)
-   CFLAGS_REMOVE_vgettimeofday-32.o += -mcmodel=medium -mabi=elfv1 -mabi=elfv2 -mcall-aixdesc
-+  # This flag is supported by clang for 64-bit but not 32-bit so it will cause
-+  # an unused command line flag warning for this file.
-+  ifdef CONFIG_CC_IS_CLANG
-+  CFLAGS_REMOVE_vgettimeofday-32.o += -fno-stack-clash-protection
-+  endif
-   CFLAGS_vgettimeofday-64.o += -include $(c-gettimeofday-y)
-   CFLAGS_vgettimeofday-64.o += $(DISABLE_LATENT_ENTROPY_PLUGIN)
-   CFLAGS_vgettimeofday-64.o += $(call cc-option, -fno-stack-protector)
+diff --git a/drivers/gpu/drm/amd/display/dc/dml/Makefile b/drivers/gpu/drm/amd/display/dc/dml/Makefile
+index 0ecea87cf48f..9d0f79dff2e3 100644
+--- a/drivers/gpu/drm/amd/display/dc/dml/Makefile
++++ b/drivers/gpu/drm/amd/display/dc/dml/Makefile
+@@ -26,7 +26,8 @@
+ # subcomponents.
+ 
+ ifdef CONFIG_X86
+-dml_ccflags := -mhard-float -msse
++dml_ccflags-$(CONFIG_CC_IS_GCC) := -mhard-float
++dml_ccflags := $(dml_ccflags-y) -msse
+ endif
+ 
+ ifdef CONFIG_PPC64
 
 -- 
 2.39.0
