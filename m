@@ -2,107 +2,109 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CB84C678DA
-	for <linux-kbuild@archiver.kernel.org>; Thu, 12 Jan 2023 03:05:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 611A8C46467
+	for <linux-kbuild@archiver.kernel.org>; Thu, 12 Jan 2023 03:05:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235881AbjALDFn (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 11 Jan 2023 22:05:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55798 "EHLO
+        id S235863AbjALDFo (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 11 Jan 2023 22:05:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234552AbjALDFk (ORCPT
+        with ESMTP id S235842AbjALDFm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 11 Jan 2023 22:05:40 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 401FE4882A;
-        Wed, 11 Jan 2023 19:05:39 -0800 (PST)
+        Wed, 11 Jan 2023 22:05:42 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A18C048817
+        for <linux-kbuild@vger.kernel.org>; Wed, 11 Jan 2023 19:05:41 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id F3A4AB81DB7;
-        Thu, 12 Jan 2023 03:05:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17550C43396;
-        Thu, 12 Jan 2023 03:05:36 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 586BAB81C97
+        for <linux-kbuild@vger.kernel.org>; Thu, 12 Jan 2023 03:05:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55EC7C43396;
+        Thu, 12 Jan 2023 03:05:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1673492736;
-        bh=txYeyGRL/DUszIFU8B4pWQlNw6Izr2In0VO93aHbv50=;
+        s=k20201202; t=1673492739;
+        bh=uAHgiJSCHpIUV5vt/SRkX0KHkpA5UbELEGGq1ql5Qak=;
         h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-        b=ImL+LmFd0dlpeiyG1gRq30oZdW6wC3ArA18BiYxRvSms8DRsD6rb8jnDldcLQQwfu
-         LsOt6BDl/yPjPIx8v4EndJd4sTBkMsAAbKw/onUjgObwRykyngh1jSHRqe3UAIvmRl
-         rs1a5GPIEMRUbeNmOZWtxXPm8xfcxWNPVJ0/yAAhGQb81HgbFYz2cuUOAKZd1mWCbl
-         hy947COMZyZgE/CuywCG3Vn+tVtcHQuCTrJ2KVTA9INFqScm6aPedZ7GeMkTveffTu
-         ESylkPlUnpZPtfIKCkEjXbIyclOW+0xq2AcHwSPp/78OQ5flR4TZ/8jUCx/vjUvgtq
-         SYOqcRObpSk7Q==
+        b=rVLVuVeTlHKtoWOmjZ+358Jzlf1tfQeNy3bGkJhjSwHJwEzQaTmi6iPfn2zhd8yku
+         SiiOIO+WX200NtX3TyIeXFL/bdCbJzy/kMaON0d45nND6Eqp+Jiry2COytuXnikcEO
+         1YXC9A33GD+XdvMFxhw2H176oSqMa7Y4yO6mfVp9eo8b3gIFV2HufvV11EJSkWtEMp
+         POPdtD3fo5IsDGCgj6X6JYilQwEtNnKWRWLsWPs0OhFvA0nhwDVZMwNHdEt5Kxl/4L
+         kdN7a2veO8GsJo9UOm4Vpd9nBa2DGLbmW/6cxfxIH/ottwRHZUzZcCYMNQo7izHb+P
+         Ik7a2Ii3YN+6w==
 From:   Nathan Chancellor <nathan@kernel.org>
-Date:   Wed, 11 Jan 2023 20:05:00 -0700
-Subject: [PATCH v2 03/14] MIPS: Prefer cc-option for additions to cflags
+Date:   Wed, 11 Jan 2023 20:05:03 -0700
+Subject: [PATCH v2 06/14] powerpc/vdso: Remove unused '-s' flag from
+ ASFLAGS
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20221228-drop-qunused-arguments-v2-3-9adbddd20d86@kernel.org>
+Content-Transfer-Encoding: 7bit
+Message-Id: <20221228-drop-qunused-arguments-v2-6-9adbddd20d86@kernel.org>
 References: <20221228-drop-qunused-arguments-v2-0-9adbddd20d86@kernel.org>
 In-Reply-To: <20221228-drop-qunused-arguments-v2-0-9adbddd20d86@kernel.org>
 To:     masahiroy@kernel.org
 Cc:     ndesaulniers@google.com, nicolas@fjasle.eu, trix@redhat.com,
         linux-kbuild@vger.kernel.org, llvm@lists.linux.dev,
         Nathan Chancellor <nathan@kernel.org>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        linux-mips@vger.kernel.org
+        Segher Boessenkool <segher@kernel.crashing.org>,
+        mpe@ellerman.id.au, npiggin@gmail.com, christophe.leroy@csgroup.eu,
+        linuxppc-dev@lists.ozlabs.org
 X-Mailer: b4 0.12-dev-78c63
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1919; i=nathan@kernel.org;
- h=from:subject:message-id; bh=txYeyGRL/DUszIFU8B4pWQlNw6Izr2In0VO93aHbv50=;
- b=owGbwMvMwCEmm602sfCA1DTG02pJDMn7K35pvpfa//161ZvdhwWcAqtnti902blfldHEv2Rdxo5b
- bg9PdpSyMIhxMMiKKbJUP1Y9bmg45yzjjVOTYOawMoEMYeDiFICbfIHhf46LXNv7dbW+KnM7G9Rm7N
- yX2Cbjtu/eYV+W6NkPa+QsfzH8L59tc+jYp/lJq54+P6Z3ND/3UpfwHp/srSevtC/UP+BqzwgA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1751; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=uAHgiJSCHpIUV5vt/SRkX0KHkpA5UbELEGGq1ql5Qak=;
+ b=owGbwMvMwCEmm602sfCA1DTG02pJDMn7K37Luf5TSJn1zGJGs5WDEWtGnPySzwmOwleXi5y7GMc1
+ LUaxo5SFQYyDQVZMkaX6sepxQ8M5ZxlvnJoEM4eVCWQIAxenAEyEgYuRYdKPQG4+2+5fz2Y7PqucK2
+ V3YumbB5PKOXc9ursgvuacygxGhiPeFmF7Jdj7jnBc+ZpmGWXzfAWTQrbrjFs11zznMDEe4wYA
 X-Developer-Key: i=nathan@kernel.org; a=openpgp;
  fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-A future change will switch as-option to use KBUILD_AFLAGS instead of
-KBUILD_CFLAGS to allow clang to drop -Qunused-arguments, which may cause
-issues if the flag being tested requires a flag previously added to
-KBUILD_CFLAGS but not KBUILD_AFLAGS. Use cc-option for cflags additions
-so that the flags are tested properly.
+When clang's -Qunused-arguments is dropped from KBUILD_CPPFLAGS, it
+warns:
+
+  clang-16: error: argument unused during compilation: '-s' [-Werror,-Wunused-command-line-argument]
+
+The compiler's '-s' flag is a linking option (it is passed along to the
+linker directly), which means it does nothing when the linker is not
+invoked by the compiler. The kernel builds all .o files with '-c', which
+stops the compilation pipeline before linking, so '-s' can be safely
+dropped from ASFLAGS.
 
 Signed-off-by: Nathan Chancellor <nathan@kernel.org>
-Acked-by: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
 Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Reviewed-by: Segher Boessenkool <segher@kernel.crashing.org>
 ---
-Cc: linux-mips@vger.kernel.org
----
- arch/mips/Makefile             | 2 +-
- arch/mips/loongson2ef/Platform | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Cc: mpe@ellerman.id.au
+Cc: npiggin@gmail.com
+Cc: christophe.leroy@csgroup.eu
+Cc: linuxppc-dev@lists.ozlabs.org
 
-diff --git a/arch/mips/Makefile b/arch/mips/Makefile
-index a00a6d94e16f..04e46ec24319 100644
---- a/arch/mips/Makefile
-+++ b/arch/mips/Makefile
-@@ -143,7 +143,7 @@ cflags-y += -fno-stack-check
- #
- # Avoid this by explicitly disabling that assembler behaviour.
- #
--cflags-y += $(call as-option,-Wa$(comma)-mno-fix-loongson3-llsc,)
-+cflags-y += $(call cc-option,-Wa$(comma)-mno-fix-loongson3-llsc,)
+As I mentioned before, it is possible that we should add '-s' to
+ldflags-y in the following patch but I assume someone would have noticed
+by now if that was a problem.
+---
+ arch/powerpc/kernel/vdso/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/powerpc/kernel/vdso/Makefile b/arch/powerpc/kernel/vdso/Makefile
+index 6a977b0d8ffc..45c0cc5d34b6 100644
+--- a/arch/powerpc/kernel/vdso/Makefile
++++ b/arch/powerpc/kernel/vdso/Makefile
+@@ -51,10 +51,10 @@ ccflags-y := -shared -fno-common -fno-builtin -nostdlib -Wl,--hash-style=both
+ ccflags-$(CONFIG_LD_IS_LLD) += $(call cc-option,--ld-path=$(LD),-fuse-ld=lld)
  
- #
- # CPU-dependent compiler/assembler options for optimization.
-diff --git a/arch/mips/loongson2ef/Platform b/arch/mips/loongson2ef/Platform
-index eebabf9df6ac..c6f7a4b95997 100644
---- a/arch/mips/loongson2ef/Platform
-+++ b/arch/mips/loongson2ef/Platform
-@@ -25,7 +25,7 @@ cflags-$(CONFIG_CPU_LOONGSON2F) += -march=loongson2f
- # binutils does not merge support for the flag then we can revisit & remove
- # this later - for now it ensures vendor toolchains don't cause problems.
- #
--cflags-$(CONFIG_CPU_LOONGSON2EF)	+= $(call as-option,-Wa$(comma)-mno-fix-loongson3-llsc,)
-+cflags-$(CONFIG_CPU_LOONGSON2EF)	+= $(call cc-option,-Wa$(comma)-mno-fix-loongson3-llsc,)
+ CC32FLAGS := -Wl,-soname=linux-vdso32.so.1 -m32
+-AS32FLAGS := -D__VDSO32__ -s
++AS32FLAGS := -D__VDSO32__
  
- # Enable the workarounds for Loongson2f
- ifdef CONFIG_CPU_LOONGSON2F_WORKAROUNDS
+ CC64FLAGS := -Wl,-soname=linux-vdso64.so.1
+-AS64FLAGS := -D__VDSO64__ -s
++AS64FLAGS := -D__VDSO64__
+ 
+ targets += vdso32.lds
+ CPPFLAGS_vdso32.lds += -P -C -Upowerpc
 
 -- 
 2.39.0
