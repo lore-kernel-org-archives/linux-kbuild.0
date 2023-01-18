@@ -2,35 +2,35 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06AE6C54EBE
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Jan 2023 05:05:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00421C32793
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Jan 2023 05:06:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229568AbjARFFG (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 18 Jan 2023 00:05:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33060 "EHLO
+        id S229666AbjARFGP (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 18 Jan 2023 00:06:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229475AbjARFFE (ORCPT
+        with ESMTP id S229551AbjARFFs (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Jan 2023 00:05:04 -0500
-Received: from todd.t-8ch.de (todd.t-8ch.de [IPv6:2a01:4f8:c010:41de::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F9534FAE5;
-        Tue, 17 Jan 2023 21:05:03 -0800 (PST)
+        Wed, 18 Jan 2023 00:05:48 -0500
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11BB2577FD;
+        Tue, 17 Jan 2023 21:05:47 -0800 (PST)
 From:   Thomas =?utf-8?q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=weissschuh.net;
-        s=mail; t=1674018301;
+        s=mail; t=1674018345;
         bh=/0jOebbYX70I0nvSrPoQPRoP/uFq1ZW6GdE24q/IDq8=;
         h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-        b=bNLzlNx8uNm8Yd0FXwMngRVuWCvS/8meW+rE5seGgza4A13DKDdhDe8Zb+cpzKqSv
-         3YJ8avVAhmAllBIA8pgaayq/vzoofNPj7YPZI5Uoil37GJ9gJzhNMVWCHwjn7Iuu1U
-         3ZuaD7lwYuZZN46GBcMNFaxGisLFVUnmYbK4U598=
-Date:   Wed, 18 Jan 2023 05:04:52 +0000
+        b=kddahOoPrJno2N+e1J9xr+ojBUF2ea3a/gpcjfUHwa9NCRwY/sXhCGS/rU7xQg8rN
+         iJolY6cOTft6+1iOCunOfhL4GBbY5/L/9T1AKHsay42WxejIYYzc4ik5kYZYduMHJq
+         +7x4+7RMdVE4Z+oYhpSTqVIEbBq0pQ9Etn1M5X44=
+Date:   Wed, 18 Jan 2023 05:05:35 +0000
 Subject: [PATCH v3 2/2] kheaders: use standard naming for the temporary directory
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Message-Id: <20230117-kernel-kheaders-gitignore-v3-2-d67d649dd990@weissschuh.net>
-References: <20230117-kernel-kheaders-gitignore-v3-0-d67d649dd990@weissschuh.net>
-In-Reply-To: <20230117-kernel-kheaders-gitignore-v3-0-d67d649dd990@weissschuh.net>
+Message-Id: <20230117-kernel-kheaders-gitignore-v3-2-e686b93b0732@weissschuh.net>
+References: <20230117-kernel-kheaders-gitignore-v3-0-e686b93b0732@weissschuh.net>
+In-Reply-To: <20230117-kernel-kheaders-gitignore-v3-0-e686b93b0732@weissschuh.net>
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
@@ -39,11 +39,11 @@ Cc:     linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
         Nicolas Schier <n.schier@avm.de>,
         Thomas =?utf-8?q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
 X-Mailer: b4 0.11.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1674018294; l=867;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1674018337; l=867;
  i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
  bh=/0jOebbYX70I0nvSrPoQPRoP/uFq1ZW6GdE24q/IDq8=;
- b=hLTHnP/QFDYSiXJOKQmUdG0Mbjj/ra+G2+J20sAYm5olerC/qY8/exy6zeUsUQ4NsI+W2XbFNV+J
- qe+IRQZIBKfKKdrzeYoPkYT6i/GznA5yIorE3X9MrbiLrw3pnGY+
+ b=fyFTMXVPgKM/lMPfOB9cHpXWfMqiZN06jA4troAsamgUfy30G4vk7DualK2n5M/OIxgmuWg1HZ2P
+ Z6kuzlTjDwkgBvFviSdoJG4mapmJb5jftKhu0YBnx3o0a/K8vto7
 X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
  pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 Precedence: bulk
