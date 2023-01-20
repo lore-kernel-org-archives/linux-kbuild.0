@@ -2,63 +2,63 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DB6AC54E94
-	for <linux-kbuild@archiver.kernel.org>; Fri, 20 Jan 2023 13:35:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D4F4C38141
+	for <linux-kbuild@archiver.kernel.org>; Fri, 20 Jan 2023 13:35:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229907AbjATNfK (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 20 Jan 2023 08:35:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47046 "EHLO
+        id S229864AbjATNfL (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 20 Jan 2023 08:35:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229882AbjATNfJ (ORCPT
+        with ESMTP id S229729AbjATNfK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 20 Jan 2023 08:35:09 -0500
+        Fri, 20 Jan 2023 08:35:10 -0500
 Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D46FBB1EFC;
-        Fri, 20 Jan 2023 05:35:06 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E42BCC41EC;
+        Fri, 20 Jan 2023 05:35:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1674221707; x=1705757707;
+  t=1674221709; x=1705757709;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=5Kno1EhBcu3aUhfxZ0bJwRyPCr+L9KijABJ8+gAqgEk=;
-  b=aAzC/eYub6hSQULqNKERYluQo10VgKSgZ1OLcMQu7jONAlqUBSSCE7hP
-   dpFjtEdNFiVnCbSKqf2wqByPC7bRPEiWi3NCA7jj54JPTCd/Ptkk2MTX8
-   8p9EsrSVX7JgPyTrEuqosMZJ0gSvciH42WpflHipUDoKof8FKiCgq9Psl
-   1g/mehTLvrNfAUVXD1+m+DWlDDWYCyh4isj5C9VYKlVk1uPvOsGLm17pK
-   5YkEbA7/Ir/oIvE2ffiVaYuS5Hc5AlNWjNlsy4l6NF5a0AQaRzWijRSzA
-   NgukNNxZzOGQ3Uv0PygiNpU3nsEXVxEFLMmg5UEdjy2EZFylPtMWT9ugk
-   w==;
+  bh=6lUwIFtQeWgMcDuLcfHeHzcSNR9oLnzazQUJVZ0zNcU=;
+  b=D4IwoM2qI947cK4DGnjeJKiGKMw8HqdVjEKh2PWRzZYRnvKhT3fhiwCx
+   gMwg+qxB1OQXyfe3wVAapug0Gb9jQUIWqBwFDe7TCz9+MbTpojE27PxDj
+   IarWDjHiXMJmG0ZdP7qqPwwi69wUSgTRC4j1hOZGrd9uxSBcePUDkOFQm
+   c2HDH9JYrXY+73LoXGA+ePjUNNbQUvt0ePSwBWkCccwldJun8tPlYgzaE
+   P/m4MWa3NMSrZqI9pO+MioIydc8O7PZzBHb5Fit0UpjHmM1Ev2DUJkDpX
+   785MjD7Ie4BcJ0mcT7WeCzRG/B2sMuqFs0rVzBpd0ggrZvFo5ZpFx+Ziw
+   g==;
 X-IronPort-AV: E=Sophos;i="5.97,232,1669071600"; 
-   d="scan'208";a="28561574"
+   d="scan'208";a="28561582"
 Received: from unknown (HELO tq-pgp-pr1.tq-net.de) ([192.168.6.15])
-  by mx1-pgp.tq-group.com with ESMTP; 20 Jan 2023 14:35:03 +0100
+  by mx1-pgp.tq-group.com with ESMTP; 20 Jan 2023 14:35:05 +0100
 Received: from mx1.tq-group.com ([192.168.6.7])
   by tq-pgp-pr1.tq-net.de (PGP Universal service);
-  Fri, 20 Jan 2023 14:35:03 +0100
+  Fri, 20 Jan 2023 14:35:05 +0100
 X-PGP-Universal: processed;
-        by tq-pgp-pr1.tq-net.de on Fri, 20 Jan 2023 14:35:03 +0100
+        by tq-pgp-pr1.tq-net.de on Fri, 20 Jan 2023 14:35:05 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1674221703; x=1705757703;
+  t=1674221705; x=1705757705;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=5Kno1EhBcu3aUhfxZ0bJwRyPCr+L9KijABJ8+gAqgEk=;
-  b=pDmIW66yrQ9nvNSZFkDGstw0xDXnD2axOBk/4ap71KXCuN2/v43ki7L4
-   aT9VIqQIPwIdjbp8bEEVrwW+dReOPsTq9mvAYak/+z47gHuFiSEdsnzvO
-   MbihutEGTNhzS63tKh7LiMtd4iuSRpwQVECU50GUjqWLLWUcrefAHVNW0
-   cK6JPYpbX5wtPR2O6dVPYAYruWmxgYRbifXgwPgJyW3+5wnhcN2ZdQ50Z
-   FvhSa9GO4qgTpL9C+r8I8RbCUzZAg0ojZlvhW0LbmK0KPFRv3yaVg1Asb
-   4/kzDay/lVmjhJYaeg6QxPzfPC5r9AGTaxgQlbz5YkFwoJC7WNkKqp4FG
+  bh=6lUwIFtQeWgMcDuLcfHeHzcSNR9oLnzazQUJVZ0zNcU=;
+  b=XKrETyMHqxjFkEL8Ec0OcOzsTD7CpLhxD2mDSNEri70JZioVgNwAR2S7
+   epS0WklJwszSrLwIu9f6tSfP+JSE5O8lOZhHpxhYAyHv9yGGk3ELT24jR
+   whhUwp6jUmJX2C5N2w1sXldvRas2Q49Njjt2pCAyS2TKIAZH5IbrFvVvV
+   NXB70r3w1EnwGA6mg4JLhoHF6n8MBnk3meLRiiUUW/wehvvnBaG1xBJnc
+   /DO2TSRKDjsdw3x0Y75xc2ONPD1bXZB7D8F8BEMWEPpYICBizmyM+PVGd
+   DRPxgI84SNWBBYbWlr20KBkOxXKibnX22EP/StPgisUezBfqXjDwBNxfV
    Q==;
 X-IronPort-AV: E=Sophos;i="5.97,232,1669071600"; 
-   d="scan'208";a="28561573"
+   d="scan'208";a="28561581"
 Received: from vtuxmail01.tq-net.de ([10.115.0.20])
-  by mx1.tq-group.com with ESMTP; 20 Jan 2023 14:35:03 +0100
+  by mx1.tq-group.com with ESMTP; 20 Jan 2023 14:35:04 +0100
 Received: from steina-w.tq-net.de (unknown [10.123.53.21])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by vtuxmail01.tq-net.de (Postfix) with ESMTPSA id 2B1FD280056;
-        Fri, 20 Jan 2023 14:35:03 +0100 (CET)
+        by vtuxmail01.tq-net.de (Postfix) with ESMTPSA id 65FF1280078;
+        Fri, 20 Jan 2023 14:35:04 +0100 (CET)
 From:   Alexander Stein <alexander.stein@ew.tq-group.com>
 To:     Rob Herring <robh+dt@kernel.org>,
         Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
@@ -77,9 +77,9 @@ To:     Rob Herring <robh+dt@kernel.org>,
 Cc:     Alexander Stein <alexander.stein@ew.tq-group.com>, soc@kernel.org,
         devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org
-Subject: [PATCH v2 02/10] ARM: dts: ls1021a: add TQ-Systems MBLS102xA device tree
-Date:   Fri, 20 Jan 2023 14:34:47 +0100
-Message-Id: <20230120133455.3962413-3-alexander.stein@ew.tq-group.com>
+Subject: [PATCH v2 05/10] ARM: dts: ls1021a: add TQMLS1021A/MBLS102xA HDMI overlay
+Date:   Fri, 20 Jan 2023 14:34:50 +0100
+Message-Id: <20230120133455.3962413-6-alexander.stein@ew.tq-group.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230120133455.3962413-1-alexander.stein@ew.tq-group.com>
 References: <20230120133455.3962413-1-alexander.stein@ew.tq-group.com>
@@ -89,533 +89,73 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Add device tree for the MBLS102xA mainboard with TQMLS1021A SoM.
+Add device tree overlay for HDMI usage.
 
 Signed-off-by: Alexander Stein <alexander.stein@ew.tq-group.com>
 ---
 Changes in v2:
-* Remove unnecessary status = "okay"
-* Remove underscore from node names
-* Move reg direct below compatiblefor i2c devices
-* Remove i2c device nodes without software support
-  Add a comment about existance for the device though
+* None
 
- arch/arm/boot/dts/Makefile                    |   1 +
- .../boot/dts/ls1021a-tqmls1021a-mbls1021a.dts | 406 ++++++++++++++++++
- arch/arm/boot/dts/ls1021a-tqmls1021a.dtsi     |  81 ++++
- 3 files changed, 488 insertions(+)
- create mode 100644 arch/arm/boot/dts/ls1021a-tqmls1021a-mbls1021a.dts
- create mode 100644 arch/arm/boot/dts/ls1021a-tqmls1021a.dtsi
+ arch/arm/boot/dts/Makefile                    |  2 ++
+ .../ls1021a-tqmls1021a-mbls1021a-hdmi.dtso    | 36 +++++++++++++++++++
+ 2 files changed, 38 insertions(+)
+ create mode 100644 arch/arm/boot/dts/ls1021a-tqmls1021a-mbls1021a-hdmi.dtso
 
 diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
-index d0c07867aeabe..44b5ed44b13d6 100644
+index e6943dc73a3fd..d5105e8179431 100644
 --- a/arch/arm/boot/dts/Makefile
 +++ b/arch/arm/boot/dts/Makefile
-@@ -802,6 +802,7 @@ dtb-$(CONFIG_SOC_LS1021A) += \
- 	ls1021a-iot.dtb \
- 	ls1021a-moxa-uc-8410a.dtb \
- 	ls1021a-qds.dtb \
-+	ls1021a-tqmls1021a-mbls1021a.dtb \
+@@ -806,8 +806,10 @@ dtb-$(CONFIG_SOC_LS1021A) += \
  	ls1021a-tsn.dtb \
  	ls1021a-twr.dtb
+ 
++ls1021a-tqmls1021a-mbls1021a-hdmi-dtbs := ls1021a-tqmls1021a-mbls1021a.dtb ls1021a-tqmls1021a-mbls1021a-hdmi.dtbo
+ ls1021a-tqmls1021a-mbls1021a-lvds-tm070jvhg33-dtbs := ls1021a-tqmls1021a-mbls1021a.dtb ls1021a-tqmls1021a-mbls1021a-lvds-tm070jvhg33.dtbo
+ 
++dtb-$(CONFIG_SOC_LS1021A) += ls1021a-tqmls1021a-mbls1021a-hdmi.dtb
+ dtb-$(CONFIG_SOC_LS1021A) += ls1021a-tqmls1021a-mbls1021a-lvds-tm070jvhg33.dtb
+ 
  dtb-$(CONFIG_SOC_VF610) += \
-diff --git a/arch/arm/boot/dts/ls1021a-tqmls1021a-mbls1021a.dts b/arch/arm/boot/dts/ls1021a-tqmls1021a-mbls1021a.dts
+diff --git a/arch/arm/boot/dts/ls1021a-tqmls1021a-mbls1021a-hdmi.dtso b/arch/arm/boot/dts/ls1021a-tqmls1021a-mbls1021a-hdmi.dtso
 new file mode 100644
-index 0000000000000..aa8b605344655
+index 0000000000000..f5ca22643c08e
 --- /dev/null
-+++ b/arch/arm/boot/dts/ls1021a-tqmls1021a-mbls1021a.dts
-@@ -0,0 +1,406 @@
++++ b/arch/arm/boot/dts/ls1021a-tqmls1021a-mbls1021a-hdmi.dtso
+@@ -0,0 +1,36 @@
 +// SPDX-License-Identifier: (GPL-2.0-or-later OR X11)
 +/*
-+ * Copyright 2013-2014 Freescale Semiconductor, Inc.
 + * Copyright 2018-2023 TQ-Systems GmbH <linux@ew.tq-group.com>,
 + * D-82229 Seefeld, Germany.
 + * Author: Alexander Stein
++
 + */
 +
 +/dts-v1/;
++/plugin/;
 +
-+#include <dt-bindings/gpio/gpio.h>
-+#include <dt-bindings/input/linux-event-codes.h>
-+#include <dt-bindings/leds/common.h>
-+#include <dt-bindings/leds/leds-pca9532.h>
-+#include <dt-bindings/net/ti-dp83867.h>
-+#include "ls1021a-tqmls1021a.dtsi"
++&dcu {
++	status = "okay";
 +
-+/ {
-+	model = "TQMLS102xA SOM on MBLS102xA";
-+	compatible = "tq,ls1021a-tqmls1021a-mbls102xa", "tq,ls1021a-tqmls1021a", "fsl,ls1021a";
-+
-+	audio_mclk: audio-clock {
-+		compatible = "fixed-clock";
-+		#clock-cells = <0>;
-+		clock-frequency = <25000000>;
-+	};
-+
-+	backlight_dcu: backlight {
-+		compatible = "gpio-backlight";
-+		gpios = <&pca9530 0 GPIO_ACTIVE_LOW>;
-+		status = "disabled";
-+	};
-+
-+	gpio-keys {
-+		compatible = "gpio-keys";
-+		autorepeat;
-+
-+		switch-1 {
-+			label = "S6";
-+			linux,code = <BTN_0>;
-+			gpios = <&pca9554_0 0 GPIO_ACTIVE_LOW>;
-+		};
-+
-+		btn2: switch-2 {
-+			label = "S7";
-+			linux,code = <BTN_1>;
-+			gpios = <&pca9554_0 1 GPIO_ACTIVE_LOW>;
-+		};
-+
-+		switch-3 {
-+			label = "S8";
-+			linux,code = <BTN_2>;
-+			gpios = <&pca9554_0 2 GPIO_ACTIVE_LOW>;
++	port {
++		dcu_out: endpoint {
++			remote-endpoint = <&sii9022a_in>;
 +		};
 +	};
++};
 +
-+	gpio_leds: gpio-leds {
-+		compatible = "gpio-leds";
++&hdmi_out {
++	status = "okay";
++};
 +
-+		led-0 {
-+			color = <LED_COLOR_ID_GREEN>;
-+			function = LED_FUNCTION_STATUS;
-+			function-enumerator = <0>;
-+			gpios = <&pca9554_2 4 GPIO_ACTIVE_LOW>;
-+			linux,default-trigger = "default-on";
-+		};
++&sii9022a {
++	status = "okay";
 +
-+		led-1 {
-+			color = <LED_COLOR_ID_GREEN>;
-+			function = LED_FUNCTION_STATUS;
-+			function-enumerator = <1>;
-+			gpios = <&pca9554_2 5 GPIO_ACTIVE_LOW>;
-+			linux,default-trigger = "default-on";
-+		};
-+
-+		led-2 {
-+			color = <LED_COLOR_ID_GREEN>;
-+			function = LED_FUNCTION_STATUS;
-+			function-enumerator = <2>;
-+			gpios = <&pca9554_2 6 GPIO_ACTIVE_LOW>;
-+			linux,default-trigger = "default-on";
-+		};
-+
-+		led-3 {
-+			color = <LED_COLOR_ID_GREEN>;
-+			function = LED_FUNCTION_HEARTBEAT;
-+			function-enumerator = <0>;
-+			gpios = <&pca9554_2 7 GPIO_ACTIVE_LOW>;
-+			linux,default-trigger = "heartbeat";
-+		};
-+	};
-+
-+	lvds_encoder: lvds-encoder {
-+		compatible = "ti,sn75lvds83", "lvds-encoder";
-+		power-supply = <&reg_3p3v>;
-+		status = "disabled";
-+
-+		ports {
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+
-+			port@0 {
-+				reg = <0>;
-+
-+				lvds_encoder_in: endpoint {};
-+			};
-+
-+			port@1 {
-+				reg = <1>;
-+
-+				lvds_encoder_out: endpoint {};
++	ports {
++		port@0 {
++			sii9022a_in: endpoint {
++				remote-endpoint = <&dcu_out>;
 +			};
 +		};
-+	};
-+
-+	reg_1p2v: regulator-1p2v {
-+		compatible = "regulator-fixed";
-+		regulator-name = "1P2V";
-+		regulator-min-microvolt = <1200000>;
-+		regulator-max-microvolt = <1200000>;
-+		regulator-always-on;
-+		vin-supply = <&reg_3p3v>;
-+	};
-+
-+	reg_3p3v: regulator-3p3v {
-+		compatible = "regulator-fixed";
-+		regulator-name = "3P3V";
-+		regulator-min-microvolt = <3300000>;
-+		regulator-max-microvolt = <3300000>;
-+		regulator-always-on;
-+	};
-+
-+	hdmi_out: hdmi {
-+		compatible = "hdmi-connector";
-+		type = "a";
-+		ddc-i2c-bus = <&i2c0>;
-+		status = "disabled";
-+
-+		port {
-+			hdmi_in: endpoint {
-+				remote-endpoint = <&sii9022a_out>;
-+			};
-+		};
-+	};
-+
-+	display: panel {
-+		backlight = <&backlight_dcu>;
-+		enable-gpios = <&pca9554_1 3 GPIO_ACTIVE_HIGH>;
-+		status = "disabled";
-+
-+		port {
-+			panel_in: endpoint {};
-+		};
-+	};
-+
-+	sound {
-+		compatible = "fsl,imx-audio-tlv320aic32x4";
-+		model = "ls1021a-mbls1021a-tlv320aic32";
-+		ssi-controller = <&sai1>;
-+		audio-codec = <&tlv320aic32x4>;
-+	};
-+
-+};
-+
-+&can0 {
-+	status = "okay";
-+	xceiver-supply = <&reg_3p3v>;
-+};
-+
-+&can1 {
-+	status = "okay";
-+	xceiver-supply = <&reg_3p3v>;
-+};
-+
-+&dspi0 {
-+	bus-num = <0>;
-+	status = "okay";
-+};
-+
-+&enet0 {
-+	phy-handle = <&rgmii_phy0c>;
-+	phy-mode = "rgmii-id";
-+	mac-address = [ 00 00 00 00 00 00 ];
-+	status = "okay";
-+};
-+
-+&enet1 {
-+	tbi-handle = <&tbi1>;
-+	phy-handle = <&sgmii_phy03>;
-+	phy-mode = "sgmii";
-+	mac-address = [ 00 00 00 00 00 00 ];
-+	status = "okay";
-+};
-+
-+&enet2 {
-+	phy-handle = <&rgmii_phy04>;
-+	phy-mode = "rgmii-id";
-+	mac-address = [ 00 00 00 00 00 00 ];
-+	status = "okay";
-+};
-+
-+&i2c0 {
-+	status = "okay";
-+
-+	tlv320aic32x4: audio-codec@18 {
-+		compatible = "ti,tlv320aic32x4";
-+		reg = <0x18>;
-+		clocks = <&audio_mclk>;
-+		clock-names = "mclk";
-+		ldoin-supply = <&reg_3p3v>;
-+		iov-supply = <&reg_3p3v>;
-+	};
-+
-+	pca9554_0: gpio-expander@20 {
-+		compatible = "nxp,pca9554";
-+		reg = <0x20>;
-+		gpio-controller;
-+		#gpio-cells = <2>;
-+		interrupt-parent = <&gpio0>;
-+		interrupts = <24 IRQ_TYPE_EDGE_FALLING>;
-+		interrupt-controller;
-+		#interrupt-cells = <2>;
-+		vcc-supply = <&reg_3p3v>;
-+		gpio-line-names = "BUTTON0", "BUTTON1",
-+				  "BUTTON2", "EMMC_SEL",
-+				  "DIP2", "DIP3",
-+				  "EXT_TOUCH_INT", "GPIO_1";
-+	};
-+
-+	pca9554_1: gpio-expander@21 {
-+		compatible = "nxp,pca9554";
-+		reg = <0x21>;
-+		gpio-controller;
-+		#gpio-cells = <2>;
-+		interrupt-parent = <&gpio0>;
-+		interrupts = <25 IRQ_TYPE_EDGE_FALLING>;
-+		interrupt-controller;
-+		#interrupt-cells = <2>;
-+		vcc-supply = <&reg_3p3v>;
-+		gpio-line-names = "PCIE_PWR_EN", "MPCIE_DISABLE#",
-+				  "MPCIE_WAKE#", "LCD_BLT_EN",
-+				  "LCD_PWR_EN", "EC1_PHY_PWDN",
-+				  "EC3_PHY_PWDN", "SGMII_PHY_PWDN";
-+	};
-+
-+	pca9554_2: gpio-expander@22 {
-+		compatible = "nxp,pca9554";
-+		reg = <0x22>;
-+		gpio-controller;
-+		#gpio-cells = <2>;
-+		interrupt-parent = <&extirq>;
-+		interrupts = <2 IRQ_TYPE_EDGE_FALLING>;
-+		interrupt-controller;
-+		#interrupt-cells = <2>;
-+		vcc-supply = <&reg_3p3v>;
-+		gpio-line-names = "MUX_SEL0", "MUX_SEL1",
-+				  "MUX_SEL2", "MUX_SEL3",
-+				  "V95", "V96", "V97", "V98";
-+	};
-+
-+	sii9022a: hdmi-transmitter@3b {
-+		compatible = "sil,sii9022";
-+		reg = <0x3b>;
-+		iovcc-supply = <&reg_3p3v>;
-+		cvcc12-supply = <&reg_1p2v>;
-+		interrupts = <GIC_SPI 167 IRQ_TYPE_EDGE_RISING>;
-+		#sound-dai-cells = <0>;
-+		sil,i2s-data-lanes = <0>;
-+		status = "disabled";
-+
-+		ports {
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+
-+			port@0 {
-+				reg = <0>;
-+
-+				sii9022a_in: endpoint {};
-+			};
-+
-+			port@1 {
-+				reg = <1>;
-+
-+				sii9022a_out: endpoint {
-+					remote-endpoint = <&hdmi_in>;
-+				};
-+			};
-+		};
-+	};
-+
-+	stmpe811: touchscreen@41 {
-+		compatible = "st,stmpe811";
-+		reg = <0x41>;
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+		interrupt-parent = <&gpio0>;
-+		interrupts = <23 IRQ_TYPE_EDGE_FALLING>;
-+		vcc-supply = <&reg_3p3v>;
-+		vio-supply = <&reg_3p3v>;
-+
-+		gpio {
-+			compatible = "st,stmpe-gpio";
-+			gpio-controller;
-+			#gpio-cells = <2>;
-+			/* GPIO 5-7 used for touch */
-+			st,norequest-mask = <0xf0>;
-+			gpio-line-names = "GPIO_ADC_I2C1_1",
-+					  "GPIO_ADC_I2C1_2",
-+					  "GPIO_ADC_I2C1_3",
-+					  "GPIO_ADC_I2C1_4";
-+		};
-+
-+		touchscreen {
-+			compatible = "st,stmpe-ts";
-+			status = "disabled";
-+		};
-+	};
-+
-+	pca9530: leds@60 {
-+		compatible = "nxp,pca9530";
-+		reg = <0x60>;
-+		gpio-controller;
-+		#gpio-cells = <2>;
-+		gpio-line-names = "PWM_0", "PWM_1";
-+
-+		led-0 {
-+			type = <PCA9532_TYPE_GPIO>;
-+		};
-+
-+		led-1 {
-+			type = <PCA9532_TYPE_GPIO>;
-+		};
-+	};
-+
-+};
-+
-+&i2c1 {
-+	status = "okay";
-+};
-+
-+&lpuart0 {
-+	status = "okay";
-+	linux,rs485-enabled-at-boot-time;
-+};
-+
-+&mdio0 {
-+	sgmii_phy03: ethernet-phy@3 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <0x03>;
-+		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
-+		ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
-+		ti,dp83867-rxctrl-strap-quirk;
-+	};
-+
-+	rgmii_phy04: ethernet-phy@4 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <0x04>;
-+		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
-+		ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
-+		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
-+		ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
-+	};
-+
-+	rgmii_phy0c: ethernet-phy@c {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <0x0c>;
-+		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
-+		ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
-+		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
-+		ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
-+	};
-+};
-+
-+&pwm6 {
-+	status = "okay";
-+};
-+
-+&pwm7 {
-+	status = "okay";
-+};
-+
-+&sai1 {
-+	status = "okay";
-+};
-+
-+&sata {
-+	/delete-property/ dma-coherent;
-+	status = "okay";
-+};
-+
-+&uart0 {
-+	status = "okay";
-+};
-+
-+&uart1 {
-+	status = "okay";
-+};
-+
-+&usb3 {
-+	/*
-+	 * Although DR connector, VBUS is always driven, so
-+	 * restrict to host mode.
-+	 */
-+	dr_mode = "host";
-+	status = "okay";
-+};
-diff --git a/arch/arm/boot/dts/ls1021a-tqmls1021a.dtsi b/arch/arm/boot/dts/ls1021a-tqmls1021a.dtsi
-new file mode 100644
-index 0000000000000..24ad4a76fe597
---- /dev/null
-+++ b/arch/arm/boot/dts/ls1021a-tqmls1021a.dtsi
-@@ -0,0 +1,81 @@
-+// SPDX-License-Identifier: (GPL-2.0-or-later OR X11)
-+/*
-+ * Copyright 2013-2014 Freescale Semiconductor, Inc.
-+ * Copyright 2018-2023 TQ-Systems GmbH <linux@ew.tq-group.com>,
-+ * D-82229 Seefeld, Germany.
-+ * Author: Alexander Stein
-+ */
-+
-+#include "ls1021a.dtsi"
-+
-+/ {
-+	model = "TQMLS102xA SOM";
-+	compatible = "tq,ls1021a-tqmls1021a", "fsl,ls1021a";
-+
-+	reg_3p3v_som: regulator-3p3v-som {
-+		compatible = "regulator-fixed";
-+		regulator-name = "3P3V_SOM";
-+		regulator-min-microvolt = <3300000>;
-+		regulator-max-microvolt = <3300000>;
-+		regulator-always-on;
-+	};
-+};
-+
-+&esdhc {
-+	compatible = "fsl,esdhc", "fsl,ls1021a-esdhc";
-+	/* e-MMC over 8 data lines */
-+	bus-width = <8>;
-+	status = "okay";
-+};
-+
-+&i2c0 {
-+	status = "okay";
-+
-+	/* MC34VR500 DC/DC regulator at 0x8 */
-+	/* On-board PMC at 0x11 */
-+
-+	sa56004: temperature-sensor@4c {
-+		compatible = "nxp,sa56004";
-+		reg = <0x4c>;
-+		vcc-supply = <&reg_3p3v_som>;
-+	};
-+
-+	rtc0: rtc@51 {
-+		compatible = "nxp,pcf85063a";
-+		reg = <0x51>;
-+		quartz-load-femtofarads = <12500>;
-+	};
-+
-+	m24c64_54: eeprom@54 {
-+		compatible = "atmel,24c64";
-+		reg = <0x54>;
-+		pagesize = <32>;
-+		read-only;
-+		vcc-supply = <&reg_3p3v_som>;
-+	};
-+};
-+
-+&mdio0 {
-+	tbi1: tbi-phy@8 {
-+		reg = <0x8>;
-+		device_type = "tbi-phy";
-+	};
-+};
-+
-+&scfg {
-+	reg = <0x0 0x1570000 0x0 0x0e00>;
-+};
-+
-+&qspi {
-+	status = "okay";
-+
-+	qflash0: flash@0 {
-+		compatible = "jedec,spi-nor";
-+		#address-cells = <1>;
-+		#size-cells = <1>;
-+		spi-max-frequency = <20000000>;
-+		spi-rx-bus-width = <4>;
-+		spi-tx-bus-width = <4>;
-+		reg = <0>;
 +	};
 +};
 -- 
