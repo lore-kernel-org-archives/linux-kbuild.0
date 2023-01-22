@@ -2,44 +2,44 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E16CC54EAA
-	for <linux-kbuild@archiver.kernel.org>; Sun, 22 Jan 2023 14:14:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E204CC54EED
+	for <linux-kbuild@archiver.kernel.org>; Sun, 22 Jan 2023 14:14:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229763AbjAVOOl (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 22 Jan 2023 09:14:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39722 "EHLO
+        id S230119AbjAVOOm (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 22 Jan 2023 09:14:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230076AbjAVOOj (ORCPT
+        with ESMTP id S230096AbjAVOOj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 22 Jan 2023 09:14:39 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 735A6FF0A;
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 633911027D;
         Sun, 22 Jan 2023 06:14:38 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id DC2F6CE0EC5;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 09F5860C27;
+        Sun, 22 Jan 2023 14:14:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A678AC433EF;
         Sun, 22 Jan 2023 14:14:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CCC5C4339E;
-        Sun, 22 Jan 2023 14:14:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674396875;
-        bh=AmzoAcLy4rVEa77Srrddz7lY2JGQMKi8x97/XkEnqeI=;
+        s=k20201202; t=1674396877;
+        bh=y+Ug4suYHYeIMApo2ZM/VY4lgUs7HsilGboGF3UyoLU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=PLLlojZsj6x7FqINSenhdIbYC7OHbmRHXOcA6JV2STTfF+QnTgBZL8qNlP573q0yU
-         O+dSLE/V2X+z44PpM+BLmNKSOUEcShsLCbRgvq4mQ8qs/TOEv0gkOaLs8I1hsxdVt4
-         ezvO91yNvNgxD0iK5FhpnmCD+DNdLnRG4mNggGmZUJTn5QpSo51kSDdZbddndZxN+C
-         hlFc3pU8oMygG2hJWE2XDpDxg6pA84Gd+gC7yItazOmZR/NEUhJK2EcwnynLjGXvpn
-         4XUlHe5NCCwsNjQAlV6taU3h7Yv6oSykSi3v9cETu+g1dxiBzzR/sR8VVofDfltGWS
-         iym6csGpqZOWg==
+        b=S8M+/49bxCSUvlkbHHFeQYPCjAx0oTxw9MI29v3hNlenmYLHrCc8ueuI8kZW9C1b+
+         Y8YhtCIJ+TQcdYKrpbp4AafnL51606dLNskej/AJKFXEe3YLU7JsloNheDIdJjDzxJ
+         Rdzep00ey8GjRSuHWWskMiO1Jh1qi7H+ZESkNeHQIOX763R+cDXOBvwUCyI/CULCyi
+         nlExDe4M8WHRDHxqAdin1ui8ewn3jYUYY8fLyEmwFp1WhPrVfRt0diF33CvSBr2dxN
+         BhId8tgSSJPS3uX3RLtvdm+TKz/XJqS4L8PlWMEyenOc0HWCMjeAdQBHTOMFxg5F9N
+         Pp+tjPJ3K0pIA==
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
         Rasmus Villemoes <rasmus.villemoes@prevas.dk>,
         Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 2/7] setlocalversion: simplify the construction of the short version
-Date:   Sun, 22 Jan 2023 23:14:22 +0900
-Message-Id: <20230122141428.115372-2-masahiroy@kernel.org>
+Subject: [PATCH 4/7] setlocalversion: use only the correct release tag for git-describe
+Date:   Sun, 22 Jan 2023 23:14:24 +0900
+Message-Id: <20230122141428.115372-4-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230122141428.115372-1-masahiroy@kernel.org>
 References: <20230122141428.115372-1-masahiroy@kernel.org>
@@ -49,29 +49,92 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-With the --short option given, scm_version() prints "+".
-Just append it.
+Currently, setlocalversion uses any annotated tag for git-describe.
+If we are at a tagged commit, it will not append the commit hash.
+
+  $ git checkout v6.2-rc1^
+  $ make -s defconfig prepare
+  $ make kernelrelease
+  6.1.0-14595-g292a089d78d3
+  $ git tag -a foo -m foo
+  $ make kernelrelease
+  6.1.0
+
+If a local tag 'foo' exists, it pretends to be a released version
+'6.1.0', while there are many commits on top of it.
+
+The output should be consistent irrespective of such a local tag.
+Pass the correct release tag to --match option of git-describe.
+
+In the mainline kernel, the SUBLEVEL is always '0' but it is omitted
+from the tag.
+
+  version         tag
+  6.1.0      ->   v6.1        (mainline)
+  6.2.0-rc5  ->   v6.2-rc5    (mainline, release candidate)
+  6.1.7      ->   v6.1.7      (stable)
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/setlocalversion | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ scripts/setlocalversion | 23 +++++++++++++++++------
+ 1 file changed, 17 insertions(+), 6 deletions(-)
 
 diff --git a/scripts/setlocalversion b/scripts/setlocalversion
-index 3b31702b4a4a..5cdf409204aa 100755
+index b8e1018d611e..a4c9a61b0665 100755
 --- a/scripts/setlocalversion
 +++ b/scripts/setlocalversion
-@@ -121,8 +121,7 @@ elif [ "${LOCALVERSION+set}" != "set" ]; then
- 	#
- 	# If the variable LOCALVERSION is set (including being set
- 	# to an empty string), we don't want to append a plus sign.
--	scm=$(scm_version --short)
--	res="$res${scm:++}"
-+	res="$res$(scm_version --short)"
+@@ -27,6 +27,7 @@ fi
+ scm_version()
+ {
+ 	local short
++	local tag
+ 	short=false
+ 
+ 	cd "$srctree"
+@@ -42,9 +43,14 @@ scm_version()
+ 		return
+ 	fi
+ 
+-	# If we are at a tagged commit (like "v2.6.30-rc6"), we ignore it
+-	# because this version is defined in the top level Makefile.
+-	if [ -z "$(git describe --exact-match 2>/dev/null)" ]; then
++	# convert the version to a tag
++	#   mainline kernel:  6.2.0-rc5  ->  v6.2-rc5
++	#   stable kernel:    6.1.7      ->  v6.1.7
++	tag=v$(echo "${KERNELVERSION}" | sed 's/^\(.*\..*\)\.0\(.*\)$/\1\2/')
++
++	# If we are at a tagged commit and the tag matches the version defined
++	# in the top level Makefile, we ignore it.
++	if [ -z "$(git describe --exact-match --match=$tag 2>/dev/null)" ]; then
+ 
+ 		# If only the short version is requested, don't bother
+ 		# running further git commands
+@@ -52,9 +58,9 @@ scm_version()
+ 			echo "+"
+ 			return
+ 		fi
+-		# If we are past a tagged commit (like
+-		# "v2.6.30-rc5-302-g72357d5"), we pretty print it.
+-		if atag="$(git describe 2>/dev/null)"; then
++		# If we are past the release tag, we pretty print it.
++		# (like 6.1.0-14595-g292a089d78d3)
++		if atag="$(git describe --match=$tag 2>/dev/null)"; then
+ 			echo "$atag" | awk -F- '{printf("-%05d", $(NF-1))}'
+ 		fi
+ 
+@@ -102,6 +108,11 @@ if ! test -e include/config/auto.conf; then
+ 	exit 1
  fi
  
- echo "$res"
++if [ -z "${KERNELVERSION}" ]; then
++	echo "KERNELVERSION is not set" >&2
++	exit 1
++fi
++
+ # localversion* files in the build and source directory
+ res="$(collect_files localversion*)"
+ if test ! "$srctree" -ef .; then
 -- 
 2.34.1
 
