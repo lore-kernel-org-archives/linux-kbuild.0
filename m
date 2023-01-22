@@ -2,36 +2,36 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15BD5C27C76
-	for <linux-kbuild@archiver.kernel.org>; Sun, 22 Jan 2023 14:14:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38A23C25B4E
+	for <linux-kbuild@archiver.kernel.org>; Sun, 22 Jan 2023 14:14:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230125AbjAVOOn (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 22 Jan 2023 09:14:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39756 "EHLO
+        id S230096AbjAVOOx (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 22 Jan 2023 09:14:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230107AbjAVOOl (ORCPT
+        with ESMTP id S230137AbjAVOOq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 22 Jan 2023 09:14:41 -0500
+        Sun, 22 Jan 2023 09:14:46 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 795FD113C5;
-        Sun, 22 Jan 2023 06:14:40 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0466D1A960;
+        Sun, 22 Jan 2023 06:14:42 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9A36C60C35;
-        Sun, 22 Jan 2023 14:14:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D056DC4339C;
-        Sun, 22 Jan 2023 14:14:37 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 84D9160C33;
+        Sun, 22 Jan 2023 14:14:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE931C433EF;
+        Sun, 22 Jan 2023 14:14:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674396879;
-        bh=9IUwo+QWRIianpkKIsxTKg2IUwJbi7Os01Md0K+GfMA=;
+        s=k20201202; t=1674396881;
+        bh=54/WoMZ8YydDCjSCHnhXruffaj7Qo/EOB9FpfM9dfE4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=P2hHapDYpEu8VY7fMIr1T3wE/FRmZnEcrE6k/V1Vm6LVNCxC35dqXP4U8xcZ9SxMG
-         uyj18Z9o8yT07+6lbYWKsDCDpg84eR4NGdoUQ/OIk71JkIHyMsPCkv0XhCxW8FK8dk
-         nEIZNBTarPSWqZKHEu4E/jme0kw5oxKLOoT/ernhNbEuqGsyTqElF1fZhZci9hXXIp
-         svbUQ0brQzBphYXOyCtlMA6viyAN6K9Ms1XXdEqgdavZjtcKLaczPgZp/DFliBBlXA
-         wu3zrLlZqsSkXSRsrinOwo7IoL0LOy/WNFeGxih2cP9t1RPhleUAzLME10ntl1dddT
-         SJIMkdiF1vjsQ==
+        b=mKaHTJNU+lxxXBEbp3aV2wH/EkaNYfJE0weeBS2a9lRuj9k8T63GLvWo6LHMY2Tft
+         oTXgc7CPLEpt92WRC5w5S8c+73JSshZYcMdQHtoCVHHdcU5SWECLLW/mKJW8L+vanI
+         VtuiHWbP5iG6BBFnT0QLXB4fS648rna4lgLV8xGEiYtro0jyDtIpoeb7W+rj/n6kr9
+         itpHQkz+yqnSQsocunshqIBDu51acPdu6+dxuCXrBHNXGnMQXHypkt1kKWgWkpkLB+
+         2xh0HqQuPQcz/pC7LMwtCwm4+F+EfVFIosNv67uPBjVvRWRchbqkjRhaLGnoF2Xe7D
+         Sdos3Z3ba/ktw==
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
@@ -40,9 +40,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
         Nicolas Schier <nicolas@fjasle.eu>
-Subject: [PATCH 5/7] setlocalversion: absorb $(KERNELVERSION)
-Date:   Sun, 22 Jan 2023 23:14:25 +0900
-Message-Id: <20230122141428.115372-5-masahiroy@kernel.org>
+Subject: [PATCH 7/7] kbuild: do not re-run setlocalversion for kernelrelease
+Date:   Sun, 22 Jan 2023 23:14:27 +0900
+Message-Id: <20230122141428.115372-7-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230122141428.115372-1-masahiroy@kernel.org>
 References: <20230122141428.115372-1-masahiroy@kernel.org>
@@ -52,55 +52,63 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Print $(KERNELVERSION) in setlocalversion so that the callers get
-simpler.
+Revert:
+  - 7b8ea53d7f18 ("makefile: not need to regenerate kernel.release
+    file when make kernelrelease")
+
+  - 01ab17887f4c ("Makefile: "make kernelrelease" should show the
+    correct full kernel version")
+
+I think the original behavior was better - 'make kernelrelease' should
+print $(KERNELRELEASE) used in the last build, not the one that will
+be used in the next build. Therefore, it is an error if you run it in
+the pristine source tree.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- Makefile                | 5 ++---
- scripts/setlocalversion | 4 +++-
- 2 files changed, 5 insertions(+), 4 deletions(-)
+ Makefile | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index ed3294c7be97..d0a95277f08a 100644
+index d0a95277f08a..de402d415d5f 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1247,8 +1247,7 @@ vmlinux: vmlinux.o $(KBUILD_LDS) modpost
- # make sure no implicit rule kicks in
- $(sort $(KBUILD_LDS) $(KBUILD_VMLINUX_OBJS) $(KBUILD_VMLINUX_LIBS)): . ;
+@@ -281,13 +281,13 @@ clean-targets := %clean mrproper cleandocs
+ no-dot-config-targets := $(clean-targets) \
+ 			 cscope gtags TAGS tags help% %docs check% coccicheck \
+ 			 $(version_h) headers headers_% archheaders archscripts \
+-			 %asm-generic kernelversion %src-pkg dt_binding_check \
++			 %asm-generic kernelrelease kernelversion %src-pkg dt_binding_check \
+ 			 outputmakefile rustavailable rustfmt rustfmtcheck
+ # Installation targets should not require compiler. Unfortunately, vdso_install
+ # is an exception where build artifacts may be updated. This must be fixed.
+ no-compiler-targets := $(no-dot-config-targets) install dtbs_install \
+-			headers_install modules_install kernelrelease image_name
+-no-sync-config-targets := $(no-dot-config-targets) %install kernelrelease \
++			headers_install modules_install image_name
++no-sync-config-targets := $(no-dot-config-targets) %install \
+ 			  image_name
+ single-targets := %.a %.i %.ko %.lds %.ll %.lst %.mod %.o %.rsi %.s %.symtypes %/
  
--filechk_kernel.release = \
--	echo "$(KERNELVERSION)$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree))"
-+filechk_kernel.release = $(srctree)/scripts/setlocalversion $(srctree)
- 
- # Store (new) KERNELRELEASE string in include/config/kernel.release
- include/config/kernel.release: FORCE
-@@ -2112,7 +2111,7 @@ checkstack:
+@@ -1677,7 +1677,7 @@ help:
+ 	@echo  '  tags/TAGS	  - Generate tags file for editors'
+ 	@echo  '  cscope	  - Generate cscope index'
+ 	@echo  '  gtags           - Generate GNU GLOBAL index'
+-	@echo  '  kernelrelease	  - Output the release version string (use with make -s)'
++	@echo  '  kernelrelease	  - Output the release version string used in the last build (use with make -s)'
+ 	@echo  '  kernelversion	  - Output the version stored in Makefile (use with make -s)'
+ 	@echo  '  image_name	  - Output the image name (use with make -s)'
+ 	@echo  '  headers_install - Install sanitised kernel headers to INSTALL_HDR_PATH'; \
+@@ -2111,7 +2111,7 @@ checkstack:
  	$(PERL) $(srctree)/scripts/checkstack.pl $(CHECKSTACK_ARCH)
  
  kernelrelease:
--	@echo "$(KERNELVERSION)$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree))"
-+	@$(srctree)/scripts/setlocalversion $(srctree)
+-	@$(srctree)/scripts/setlocalversion $(srctree)
++	@echo $(or $(KERNELRELEASE),$(error kernelrelease not valid - run 'make prepare' to update it))
  
  kernelversion:
  	@echo $(KERNELVERSION)
-diff --git a/scripts/setlocalversion b/scripts/setlocalversion
-index a4c9a61b0665..7c7cbefa5aa4 100755
---- a/scripts/setlocalversion
-+++ b/scripts/setlocalversion
-@@ -113,8 +113,10 @@ if [ -z "${KERNELVERSION}" ]; then
- 	exit 1
- fi
- 
-+res="${KERNELVERSION}"
-+
- # localversion* files in the build and source directory
--res="$(collect_files localversion*)"
-+res="${res}$(collect_files localversion*)"
- if test ! "$srctree" -ef .; then
- 	res="$res$(collect_files "$srctree"/localversion*)"
- fi
 -- 
 2.34.1
 
