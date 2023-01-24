@@ -2,63 +2,63 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F825C61D97
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D0AAC61DA0
 	for <linux-kbuild@archiver.kernel.org>; Tue, 24 Jan 2023 11:03:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232854AbjAXLCt (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 24 Jan 2023 06:02:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33330 "EHLO
+        id S233659AbjAXLCu (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 24 Jan 2023 06:02:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233856AbjAXLC2 (ORCPT
+        with ESMTP id S233883AbjAXLCe (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 24 Jan 2023 06:02:28 -0500
+        Tue, 24 Jan 2023 06:02:34 -0500
 Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 699172E0D0;
-        Tue, 24 Jan 2023 03:02:23 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFC0942DD5;
+        Tue, 24 Jan 2023 03:02:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1674558144; x=1706094144;
+  t=1674558147; x=1706094147;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=/Lfr/oH4GT9ZPy5cQIRAJOqX6mMsqobCIWK3XrP/hkY=;
-  b=h/Q+Sf8cn1jtwsTjyw7fiwb9RzCmM25whGtlDim/0BTETGNToj9Zwf1U
-   k6+M0kG428yJS2oaCdDZgT/PI/836LkeL6LpwbBEVKygYvzrcfn0lE6PU
-   b4PGHvLxpiKHh6mHI/nrfPjYP6UVWcTIks5zFCYHDty6d91rQOSrPa7QA
-   P0n/SVXcoNGGXoNhzlKB7VjeZM/afOdEqQB1KSIaznfD9nsrboAyM6pGG
-   cpAQECyrN9fsnFKAV2zuiZdYXYH8JgMDJg46HpeTboklMiJbpGIGbp5Op
-   SF1eq+i9ll0lK44GI/anmnTGAKtyrnohaRkxHtRSj7JlZeBHoOhrNMRwV
-   A==;
+  bh=fztzhObr1+DPfV8Dj85hL/YthEfox+DFu5vzVTCvub4=;
+  b=YLj109uu8LDr6r90OH+01Qr2+nTY4/FldPH+4xLYo/11glliYXy4eM0V
+   /ZACBhgxfHfIx2wWuE8o1KaLfunIkPOBR6Eavfc0YpPQTFUBi+aZlL045
+   llVC2WDmZ6tPWbgHh7FRhPXczpYx8/RclhBMBghz29HHbpN4kPI6k0Xpc
+   oR1OuwmG0Mi6k7+Kjlok9TDcCBg/tDJmT8vcKrYSY4fHjA/adFeDrRnPh
+   n1/JYhNxBdLpCTNrj1e2wlO8fxiVBfQAG18IMa5HlSbqLuYtV4TNFsdXq
+   wciMythFOgIHWmK6XZX53Q3PfG/Nj4iYOIomxA4L4FgsMXJRCV4OZrwLp
+   Q==;
 X-IronPort-AV: E=Sophos;i="5.97,242,1669071600"; 
-   d="scan'208";a="28616623"
+   d="scan'208";a="28616630"
 Received: from unknown (HELO tq-pgp-pr1.tq-net.de) ([192.168.6.15])
-  by mx1-pgp.tq-group.com with ESMTP; 24 Jan 2023 12:02:18 +0100
+  by mx1-pgp.tq-group.com with ESMTP; 24 Jan 2023 12:02:19 +0100
 Received: from mx1.tq-group.com ([192.168.6.7])
   by tq-pgp-pr1.tq-net.de (PGP Universal service);
-  Tue, 24 Jan 2023 12:02:18 +0100
+  Tue, 24 Jan 2023 12:02:19 +0100
 X-PGP-Universal: processed;
-        by tq-pgp-pr1.tq-net.de on Tue, 24 Jan 2023 12:02:18 +0100
+        by tq-pgp-pr1.tq-net.de on Tue, 24 Jan 2023 12:02:19 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1674558138; x=1706094138;
+  t=1674558139; x=1706094139;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=/Lfr/oH4GT9ZPy5cQIRAJOqX6mMsqobCIWK3XrP/hkY=;
-  b=nfe1c8B3/QzQK+Xamdfxk+14F/HuUQfVPSSrsM/2p6Q/EhndbobWNbNG
-   BujGUeOLvVnWSI9oMN3f8LK18wvtC4hwUNJn6TyvVckoHhBJ26MHB2EjL
-   ogTstDzmp5z8Xju/1ublXDETiA0Xk8pOs51O9PnBMboigWChJkZcQGZxC
-   q1QGq5Vczer1+9eJCZ3Jq2Q0V9xJhrwi05Ng+jNJqVjfNGmROLvi6THWl
-   oTlHV9jRr16AoMXOX0j5B4ZhjUZ0+zZHJUdoc7OFaSXwXyHudJskTrwFb
-   ntW8Gdzrp8HOE6DejH6zjeHGsJXe6IPbOsQzMWpy/R7jYpEnIcT1GnKuB
-   A==;
+  bh=fztzhObr1+DPfV8Dj85hL/YthEfox+DFu5vzVTCvub4=;
+  b=lqKCjxHBSJc+jLpnAo3p60pWadHqTcLcQCugWNR4GR2itHV1eVBfbbeK
+   zCaqbjavPHwHJS4gKN6x2ZGhlfFjrTisaexGL+0R75qIuV64WPWVWiB//
+   oQcUBh9M7Hi8kSLTKZRw0BKUPmVpaHgOQxN3NJupgLJjbGOb2108FG+s8
+   hct4HZernT1Z94Yik5RuiqA1gitPRGfEmAMcaQh4byz49DtyGhOKdgomP
+   7+iyxz+EjxiJnhT9mw3CRps0tMUKnZyQBCDIki2QmNIma7LUV/wITEK+X
+   IwC50NLcb0YJB5dpFeNIF7lOlFWaDmwLnWOyfOL3FBAu38bcubO5bg7QD
+   g==;
 X-IronPort-AV: E=Sophos;i="5.97,242,1669071600"; 
-   d="scan'208";a="28616621"
+   d="scan'208";a="28616628"
 Received: from vtuxmail01.tq-net.de ([10.115.0.20])
-  by mx1.tq-group.com with ESMTP; 24 Jan 2023 12:02:18 +0100
+  by mx1.tq-group.com with ESMTP; 24 Jan 2023 12:02:19 +0100
 Received: from steina-w.tq-net.de (unknown [10.123.53.21])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by vtuxmail01.tq-net.de (Postfix) with ESMTPSA id D02A2280072;
-        Tue, 24 Jan 2023 12:02:17 +0100 (CET)
+        by vtuxmail01.tq-net.de (Postfix) with ESMTPSA id E272B280074;
+        Tue, 24 Jan 2023 12:02:18 +0100 (CET)
 From:   Alexander Stein <alexander.stein@ew.tq-group.com>
 To:     Rob Herring <robh+dt@kernel.org>,
         Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
@@ -77,9 +77,9 @@ To:     Rob Herring <robh+dt@kernel.org>,
 Cc:     Alexander Stein <alexander.stein@ew.tq-group.com>, soc@kernel.org,
         devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org
-Subject: [PATCH v3 05/10] ARM: dts: ls1021a: add TQMLS1021A/MBLS102xA HDMI overlay
-Date:   Tue, 24 Jan 2023 12:02:08 +0100
-Message-Id: <20230124110213.3221264-6-alexander.stein@ew.tq-group.com>
+Subject: [PATCH v3 08/10] ARM: multi_v7_defconfig: Add options to support TQMLS102xA series
+Date:   Tue, 24 Jan 2023 12:02:11 +0100
+Message-Id: <20230124110213.3221264-9-alexander.stein@ew.tq-group.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230124110213.3221264-1-alexander.stein@ew.tq-group.com>
 References: <20230124110213.3221264-1-alexander.stein@ew.tq-group.com>
@@ -89,7 +89,7 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Add device tree overlay for HDMI usage.
+Enable drivers used on TQMLS102xA + MBLS1021A.
 
 Signed-off-by: Alexander Stein <alexander.stein@ew.tq-group.com>
 ---
@@ -97,70 +97,105 @@ Changes in v3:
 * None
 
 Changes in v2:
-* None
+* Changed symbols to 'm' where possible
 
- arch/arm/boot/dts/Makefile                    |  2 ++
- .../ls1021a-tqmls1021a-mbls1021a-hdmi.dtso    | 36 +++++++++++++++++++
- 2 files changed, 38 insertions(+)
- create mode 100644 arch/arm/boot/dts/ls1021a-tqmls1021a-mbls1021a-hdmi.dtso
+ arch/arm/configs/multi_v7_defconfig | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
-index 626f7172c74e9..f9f75c5325808 100644
---- a/arch/arm/boot/dts/Makefile
-+++ b/arch/arm/boot/dts/Makefile
-@@ -806,8 +806,10 @@ dtb-$(CONFIG_SOC_LS1021A) += \
- 	ls1021a-tsn.dtb \
- 	ls1021a-twr.dtb
- 
-+ls1021a-tqmls1021a-mbls1021a-hdmi-dtbs := ls1021a-tqmls1021a-mbls1021a.dtb ls1021a-tqmls1021a-mbls1021a-hdmi.dtbo
- ls1021a-tqmls1021a-mbls1021a-lvds-tm070jvhg33-dtbs := ls1021a-tqmls1021a-mbls1021a.dtb ls1021a-tqmls1021a-mbls1021a-lvds-tm070jvhg33.dtbo
- 
-+dtb-$(CONFIG_SOC_LS1021A) += ls1021a-tqmls1021a-mbls1021a-hdmi.dtb
- dtb-$(CONFIG_SOC_LS1021A) += ls1021a-tqmls1021a-mbls1021a-lvds-tm070jvhg33.dtb
- 
- dtb-$(CONFIG_SOC_VF610) += \
-diff --git a/arch/arm/boot/dts/ls1021a-tqmls1021a-mbls1021a-hdmi.dtso b/arch/arm/boot/dts/ls1021a-tqmls1021a-mbls1021a-hdmi.dtso
-new file mode 100644
-index 0000000000000..f5ca22643c08e
---- /dev/null
-+++ b/arch/arm/boot/dts/ls1021a-tqmls1021a-mbls1021a-hdmi.dtso
-@@ -0,0 +1,36 @@
-+// SPDX-License-Identifier: (GPL-2.0-or-later OR X11)
-+/*
-+ * Copyright 2018-2023 TQ-Systems GmbH <linux@ew.tq-group.com>,
-+ * D-82229 Seefeld, Germany.
-+ * Author: Alexander Stein
-+
-+ */
-+
-+/dts-v1/;
-+/plugin/;
-+
-+&dcu {
-+	status = "okay";
-+
-+	port {
-+		dcu_out: endpoint {
-+			remote-endpoint = <&sii9022a_in>;
-+		};
-+	};
-+};
-+
-+&hdmi_out {
-+	status = "okay";
-+};
-+
-+&sii9022a {
-+	status = "okay";
-+
-+	ports {
-+		port@0 {
-+			sii9022a_in: endpoint {
-+				remote-endpoint = <&dcu_out>;
-+			};
-+		};
-+	};
-+};
+diff --git a/arch/arm/configs/multi_v7_defconfig b/arch/arm/configs/multi_v7_defconfig
+index ee184eb37adcf..92628a160cfb3 100644
+--- a/arch/arm/configs/multi_v7_defconfig
++++ b/arch/arm/configs/multi_v7_defconfig
+@@ -191,6 +191,7 @@ CONFIG_PCI_TEGRA=y
+ CONFIG_PCI_RCAR_GEN2=y
+ CONFIG_PCIE_RCAR_HOST=y
+ CONFIG_PCI_DRA7XX_EP=y
++CONFIG_PCI_LAYERSCAPE=y
+ CONFIG_PCI_ENDPOINT=y
+ CONFIG_PCI_ENDPOINT_CONFIGFS=y
+ CONFIG_PCI_EPF_TEST=m
+@@ -249,6 +250,7 @@ CONFIG_AHCI_ST=y
+ CONFIG_AHCI_IMX=y
+ CONFIG_AHCI_SUNXI=y
+ CONFIG_AHCI_TEGRA=y
++CONFIG_AHCI_QORIQ=y
+ CONFIG_SATA_HIGHBANK=y
+ CONFIG_SATA_MV=y
+ CONFIG_SATA_RCAR=y
+@@ -329,6 +331,7 @@ CONFIG_TOUCHSCREEN_ADC=m
+ CONFIG_TOUCHSCREEN_ATMEL_MXT=m
+ CONFIG_TOUCHSCREEN_ELAN=m
+ CONFIG_TOUCHSCREEN_MMS114=m
++CONFIG_TOUCHSCREEN_EDT_FT5X06=m
+ CONFIG_TOUCHSCREEN_WM97XX=m
+ CONFIG_TOUCHSCREEN_ST1232=m
+ CONFIG_TOUCHSCREEN_STMPE=y
+@@ -483,6 +486,7 @@ CONFIG_GPIO_ASPEED_SGPIO=y
+ CONFIG_GPIO_DAVINCI=y
+ CONFIG_GPIO_DWAPB=y
+ CONFIG_GPIO_EM=y
++CONFIG_GPIO_MPC8XXX=y
+ CONFIG_GPIO_MXC=y
+ CONFIG_GPIO_RCAR=y
+ CONFIG_GPIO_SYSCON=y
+@@ -493,6 +497,7 @@ CONFIG_GPIO_PCA953X=y
+ CONFIG_GPIO_PCA953X_IRQ=y
+ CONFIG_GPIO_PCF857X=y
+ CONFIG_GPIO_PALMAS=y
++CONFIG_GPIO_STMPE=y
+ CONFIG_GPIO_TPS6586X=y
+ CONFIG_GPIO_TPS65910=y
+ CONFIG_GPIO_TWL4030=y
+@@ -533,6 +538,7 @@ CONFIG_SENSORS_INA2XX=m
+ CONFIG_CPU_THERMAL=y
+ CONFIG_DEVFREQ_THERMAL=y
+ CONFIG_IMX_THERMAL=y
++CONFIG_QORIQ_THERMAL=m
+ CONFIG_ROCKCHIP_THERMAL=y
+ CONFIG_RCAR_THERMAL=y
+ CONFIG_ARMADA_THERMAL=y
+@@ -821,6 +827,8 @@ CONFIG_SND_SOC_MSM8916_WCD_ANALOG=m
+ CONFIG_SND_SOC_MSM8916_WCD_DIGITAL=m
+ CONFIG_SND_SOC_SGTL5000=m
+ CONFIG_SND_SOC_STI_SAS=m
++CONFIG_SND_SOC_TLV320AIC32X4=m
++CONFIG_SND_SOC_TLV320AIC32X4_I2C=m
+ CONFIG_SND_SOC_WM8978=m
+ CONFIG_SND_AUDIO_GRAPH_CARD=m
+ CONFIG_USB=y
+@@ -830,6 +838,7 @@ CONFIG_USB_XHCI_MVEBU=y
+ CONFIG_USB_XHCI_TEGRA=m
+ CONFIG_USB_BRCMSTB=m
+ CONFIG_USB_EHCI_HCD=y
++CONFIG_USB_EHCI_FSL=m
+ CONFIG_USB_EHCI_HCD_STI=y
+ CONFIG_USB_EHCI_EXYNOS=m
+ CONFIG_USB_EHCI_MV=m
+@@ -933,6 +942,8 @@ CONFIG_NEW_LEDS=y
+ CONFIG_LEDS_CLASS=y
+ CONFIG_LEDS_CLASS_FLASH=m
+ CONFIG_LEDS_CPCAP=m
++CONFIG_LEDS_PCA9532=m
++CONFIG_LEDS_PCA9532_GPIO=y
+ CONFIG_LEDS_GPIO=y
+ CONFIG_LEDS_PWM=y
+ CONFIG_LEDS_MAX8997=m
+@@ -949,6 +960,7 @@ CONFIG_LEDS_TRIGGER_DEFAULT_ON=y
+ CONFIG_LEDS_TRIGGER_TRANSIENT=y
+ CONFIG_LEDS_TRIGGER_CAMERA=y
+ CONFIG_EDAC=y
++CONFIG_EDAC_LAYERSCAPE=y
+ CONFIG_EDAC_HIGHBANK_MC=y
+ CONFIG_EDAC_HIGHBANK_L2=y
+ CONFIG_RTC_CLASS=y
+@@ -962,6 +974,7 @@ CONFIG_RTC_DRV_MAX8997=m
+ CONFIG_RTC_DRV_MAX77686=y
+ CONFIG_RTC_DRV_RK808=m
+ CONFIG_RTC_DRV_RS5C372=m
++CONFIG_RTC_DRV_PCF85063=m
+ CONFIG_RTC_DRV_PCF85363=m
+ CONFIG_RTC_DRV_BQ32K=m
+ CONFIG_RTC_DRV_TWL4030=y
 -- 
 2.34.1
 
