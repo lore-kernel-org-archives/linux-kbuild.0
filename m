@@ -2,63 +2,63 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61433C25B4E
-	for <linux-kbuild@archiver.kernel.org>; Tue, 24 Jan 2023 11:03:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F825C61D97
+	for <linux-kbuild@archiver.kernel.org>; Tue, 24 Jan 2023 11:03:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232166AbjAXLCs (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 24 Jan 2023 06:02:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33420 "EHLO
+        id S232854AbjAXLCt (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 24 Jan 2023 06:02:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233888AbjAXLCg (ORCPT
+        with ESMTP id S233856AbjAXLC2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 24 Jan 2023 06:02:36 -0500
+        Tue, 24 Jan 2023 06:02:28 -0500
 Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F36E126EA;
-        Tue, 24 Jan 2023 03:02:29 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 699172E0D0;
+        Tue, 24 Jan 2023 03:02:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1674558149; x=1706094149;
+  t=1674558144; x=1706094144;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=La1SqrmmnmfoRQVaCbL1NtRLcutiM97WpgFEBLZ3rgU=;
-  b=XHe8ND97S2JwM+UnbG9PeRNLqwuXJFtHg8iBcI2lxsWdkO4TNV1KMM8q
-   I2V1qfGfscTv65iJe/Qi5BXnW0S4vT347ZlN8pGnq0mY75iG4SJpZRk8h
-   lp1bVvrOV636rOeMp5Irv1gigBF0XOjasney6pP1N1VqgweYawwyKk/sg
-   5zDOLzlsuQAy9A8aHu80gvgewC5HeTiCR+KGuzKL9r43cm3okDS7SDe9M
-   4/70sLAdJZklSNyeh+aOpoVRzn/7jWDGc68tdqRHBneyPMGZcJsSEskMp
-   wD/J5xqYwlHsLsX8zXxHt8sihj3WeLGEvqeNE02AUQJkZe5Vb+O41MuCW
-   w==;
+  bh=/Lfr/oH4GT9ZPy5cQIRAJOqX6mMsqobCIWK3XrP/hkY=;
+  b=h/Q+Sf8cn1jtwsTjyw7fiwb9RzCmM25whGtlDim/0BTETGNToj9Zwf1U
+   k6+M0kG428yJS2oaCdDZgT/PI/836LkeL6LpwbBEVKygYvzrcfn0lE6PU
+   b4PGHvLxpiKHh6mHI/nrfPjYP6UVWcTIks5zFCYHDty6d91rQOSrPa7QA
+   P0n/SVXcoNGGXoNhzlKB7VjeZM/afOdEqQB1KSIaznfD9nsrboAyM6pGG
+   cpAQECyrN9fsnFKAV2zuiZdYXYH8JgMDJg46HpeTboklMiJbpGIGbp5Op
+   SF1eq+i9ll0lK44GI/anmnTGAKtyrnohaRkxHtRSj7JlZeBHoOhrNMRwV
+   A==;
 X-IronPort-AV: E=Sophos;i="5.97,242,1669071600"; 
-   d="scan'208";a="28616632"
+   d="scan'208";a="28616623"
 Received: from unknown (HELO tq-pgp-pr1.tq-net.de) ([192.168.6.15])
-  by mx1-pgp.tq-group.com with ESMTP; 24 Jan 2023 12:02:19 +0100
+  by mx1-pgp.tq-group.com with ESMTP; 24 Jan 2023 12:02:18 +0100
 Received: from mx1.tq-group.com ([192.168.6.7])
   by tq-pgp-pr1.tq-net.de (PGP Universal service);
-  Tue, 24 Jan 2023 12:02:19 +0100
+  Tue, 24 Jan 2023 12:02:18 +0100
 X-PGP-Universal: processed;
-        by tq-pgp-pr1.tq-net.de on Tue, 24 Jan 2023 12:02:19 +0100
+        by tq-pgp-pr1.tq-net.de on Tue, 24 Jan 2023 12:02:18 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1674558139; x=1706094139;
+  t=1674558138; x=1706094138;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=La1SqrmmnmfoRQVaCbL1NtRLcutiM97WpgFEBLZ3rgU=;
-  b=SrDH+i65ZKGEcoinX3OOn7YGLK5Cs4JyetgjdvFsRXgA7kblQDB1Firw
-   xV47NcY8tPbHWeA8MKTucXJ8H8ThAxKsZj5nKJzO0bibzTc6ilDJ7ipOg
-   JTGMzKOWp1f7lSGdOHCYDsm8Ad+GEt8mdATMAmjq9rWOyN+aRR7NGlMzW
-   xtNHG8KGyP7JRcK3vFhaTI98UXe6J465KS1S41rkJ0UQi05jD+Tge0aLS
-   wg7gRKMhSWm9nQAUqUQ/kn4LJEOe6yKp977N/6gEMDtA+HT+fYfe8K1Q6
-   iglW2DUeQkxB4/tHCTl4EpJUN1gQMa3B+fVniMXBSo0K4r44nmbF9gnsc
-   w==;
+  bh=/Lfr/oH4GT9ZPy5cQIRAJOqX6mMsqobCIWK3XrP/hkY=;
+  b=nfe1c8B3/QzQK+Xamdfxk+14F/HuUQfVPSSrsM/2p6Q/EhndbobWNbNG
+   BujGUeOLvVnWSI9oMN3f8LK18wvtC4hwUNJn6TyvVckoHhBJ26MHB2EjL
+   ogTstDzmp5z8Xju/1ublXDETiA0Xk8pOs51O9PnBMboigWChJkZcQGZxC
+   q1QGq5Vczer1+9eJCZ3Jq2Q0V9xJhrwi05Ng+jNJqVjfNGmROLvi6THWl
+   oTlHV9jRr16AoMXOX0j5B4ZhjUZ0+zZHJUdoc7OFaSXwXyHudJskTrwFb
+   ntW8Gdzrp8HOE6DejH6zjeHGsJXe6IPbOsQzMWpy/R7jYpEnIcT1GnKuB
+   A==;
 X-IronPort-AV: E=Sophos;i="5.97,242,1669071600"; 
-   d="scan'208";a="28616631"
+   d="scan'208";a="28616621"
 Received: from vtuxmail01.tq-net.de ([10.115.0.20])
-  by mx1.tq-group.com with ESMTP; 24 Jan 2023 12:02:19 +0100
+  by mx1.tq-group.com with ESMTP; 24 Jan 2023 12:02:18 +0100
 Received: from steina-w.tq-net.de (unknown [10.123.53.21])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by vtuxmail01.tq-net.de (Postfix) with ESMTPSA id 3AE88280075;
-        Tue, 24 Jan 2023 12:02:19 +0100 (CET)
+        by vtuxmail01.tq-net.de (Postfix) with ESMTPSA id D02A2280072;
+        Tue, 24 Jan 2023 12:02:17 +0100 (CET)
 From:   Alexander Stein <alexander.stein@ew.tq-group.com>
 To:     Rob Herring <robh+dt@kernel.org>,
         Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
@@ -74,13 +74,12 @@ To:     Rob Herring <robh+dt@kernel.org>,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
         Nicolas Schier <nicolas@fjasle.eu>
-Cc:     Nicolas Saenz Julienne <nsaenzjulienne@suse.de>, soc@kernel.org,
+Cc:     Alexander Stein <alexander.stein@ew.tq-group.com>, soc@kernel.org,
         devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org,
-        Alexander Stein <alexander.stein@ew.tq-group.com>
-Subject: [PATCH v3 09/10] kbuild: Add config fragment merge functionality
-Date:   Tue, 24 Jan 2023 12:02:12 +0100
-Message-Id: <20230124110213.3221264-10-alexander.stein@ew.tq-group.com>
+        linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org
+Subject: [PATCH v3 05/10] ARM: dts: ls1021a: add TQMLS1021A/MBLS102xA HDMI overlay
+Date:   Tue, 24 Jan 2023 12:02:08 +0100
+Message-Id: <20230124110213.3221264-6-alexander.stein@ew.tq-group.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230124110213.3221264-1-alexander.stein@ew.tq-group.com>
 References: <20230124110213.3221264-1-alexander.stein@ew.tq-group.com>
@@ -90,68 +89,78 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-From: Nicolas Saenz Julienne <nsaenzjulienne@suse.de>
+Add device tree overlay for HDMI usage.
 
-So far this function was only used locally in powerpc, some other
-architectures might benefit from it. Move it into
-scripts/Makefile.defconf.
-
-Signed-off-by: Nicolas Saenz Julienne <nsaenzjulienne@suse.de>
 Signed-off-by: Alexander Stein <alexander.stein@ew.tq-group.com>
-Acked-by: Arnd Bergmann <arnd@arndb.de>
 ---
 Changes in v3:
-* Added Arnd's A-b
+* None
 
- arch/powerpc/Makefile    | 12 +-----------
- scripts/Makefile.defconf | 15 +++++++++++++++
- 2 files changed, 16 insertions(+), 11 deletions(-)
- create mode 100644 scripts/Makefile.defconf
+Changes in v2:
+* None
 
-diff --git a/arch/powerpc/Makefile b/arch/powerpc/Makefile
-index 4fd630efe39d3..6ec5b9f7b7caa 100644
---- a/arch/powerpc/Makefile
-+++ b/arch/powerpc/Makefile
-@@ -253,17 +253,7 @@ PHONY += bootwrapper_install
- bootwrapper_install:
- 	$(Q)$(MAKE) $(build)=$(boot) $(patsubst %,$(boot)/%,$@)
+ arch/arm/boot/dts/Makefile                    |  2 ++
+ .../ls1021a-tqmls1021a-mbls1021a-hdmi.dtso    | 36 +++++++++++++++++++
+ 2 files changed, 38 insertions(+)
+ create mode 100644 arch/arm/boot/dts/ls1021a-tqmls1021a-mbls1021a-hdmi.dtso
+
+diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
+index 626f7172c74e9..f9f75c5325808 100644
+--- a/arch/arm/boot/dts/Makefile
++++ b/arch/arm/boot/dts/Makefile
+@@ -806,8 +806,10 @@ dtb-$(CONFIG_SOC_LS1021A) += \
+ 	ls1021a-tsn.dtb \
+ 	ls1021a-twr.dtb
  
--# Used to create 'merged defconfigs'
--# To use it $(call) it with the first argument as the base defconfig
--# and the second argument as a space separated list of .config files to merge,
--# without the .config suffix.
--define merge_into_defconfig
--	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/kconfig/merge_config.sh \
--		-m -O $(objtree) $(srctree)/arch/$(ARCH)/configs/$(1) \
--		$(foreach config,$(2),$(srctree)/arch/$(ARCH)/configs/$(config).config)
--	+$(Q)$(MAKE) -f $(srctree)/Makefile olddefconfig
--endef
--
-+include $(srctree)/scripts/Makefile.defconf
- PHONY += pseries_le_defconfig
- pseries_le_defconfig:
- 	$(call merge_into_defconfig,pseries_defconfig,le)
-diff --git a/scripts/Makefile.defconf b/scripts/Makefile.defconf
++ls1021a-tqmls1021a-mbls1021a-hdmi-dtbs := ls1021a-tqmls1021a-mbls1021a.dtb ls1021a-tqmls1021a-mbls1021a-hdmi.dtbo
+ ls1021a-tqmls1021a-mbls1021a-lvds-tm070jvhg33-dtbs := ls1021a-tqmls1021a-mbls1021a.dtb ls1021a-tqmls1021a-mbls1021a-lvds-tm070jvhg33.dtbo
+ 
++dtb-$(CONFIG_SOC_LS1021A) += ls1021a-tqmls1021a-mbls1021a-hdmi.dtb
+ dtb-$(CONFIG_SOC_LS1021A) += ls1021a-tqmls1021a-mbls1021a-lvds-tm070jvhg33.dtb
+ 
+ dtb-$(CONFIG_SOC_VF610) += \
+diff --git a/arch/arm/boot/dts/ls1021a-tqmls1021a-mbls1021a-hdmi.dtso b/arch/arm/boot/dts/ls1021a-tqmls1021a-mbls1021a-hdmi.dtso
 new file mode 100644
-index 0000000000000..ab332f7534f51
+index 0000000000000..f5ca22643c08e
 --- /dev/null
-+++ b/scripts/Makefile.defconf
-@@ -0,0 +1,15 @@
-+# SPDX-License-Identifier: GPL-2.0
-+# Configuration heplers
++++ b/arch/arm/boot/dts/ls1021a-tqmls1021a-mbls1021a-hdmi.dtso
+@@ -0,0 +1,36 @@
++// SPDX-License-Identifier: (GPL-2.0-or-later OR X11)
++/*
++ * Copyright 2018-2023 TQ-Systems GmbH <linux@ew.tq-group.com>,
++ * D-82229 Seefeld, Germany.
++ * Author: Alexander Stein
 +
-+# Creates 'merged defconfigs'
-+# ---------------------------------------------------------------------------
-+# Usage:
-+#   $(call merge_into_defconfig,base_config,config_fragment1 config_fragment2 ...)
-+#
-+# Input config fragments without '.config' suffix
-+define merge_into_defconfig
-+	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/kconfig/merge_config.sh \
-+		-m -O $(objtree) $(srctree)/arch/$(ARCH)/configs/$(1) \
-+		$(foreach config,$(2),$(srctree)/arch/$(ARCH)/configs/$(config).config)
-+	+$(Q)$(MAKE) -f $(srctree)/Makefile olddefconfig
-+endef
++ */
++
++/dts-v1/;
++/plugin/;
++
++&dcu {
++	status = "okay";
++
++	port {
++		dcu_out: endpoint {
++			remote-endpoint = <&sii9022a_in>;
++		};
++	};
++};
++
++&hdmi_out {
++	status = "okay";
++};
++
++&sii9022a {
++	status = "okay";
++
++	ports {
++		port@0 {
++			sii9022a_in: endpoint {
++				remote-endpoint = <&dcu_out>;
++			};
++		};
++	};
++};
 -- 
 2.34.1
 
