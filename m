@@ -2,127 +2,218 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0E4EC54E94
-	for <linux-kbuild@archiver.kernel.org>; Tue, 24 Jan 2023 16:20:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69364C25B4E
+	for <linux-kbuild@archiver.kernel.org>; Tue, 24 Jan 2023 16:31:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234076AbjAXQUr (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 24 Jan 2023 11:20:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52074 "EHLO
+        id S233653AbjAXQa7 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 24 Jan 2023 11:30:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233983AbjAXQUo (ORCPT
+        with ESMTP id S229546AbjAXQa6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 24 Jan 2023 11:20:44 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 879F947ED2;
-        Tue, 24 Jan 2023 08:20:39 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 98639CE1B8B;
-        Tue, 24 Jan 2023 16:20:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E07B1C4339C;
-        Tue, 24 Jan 2023 16:20:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674577235;
-        bh=aRLiN9Rsyo8xPFa8GOCkbKbw7dV6SfkqfYAeFSOYgxs=;
-        h=From:Date:Subject:To:Cc:From;
-        b=TkpOI/0NiTk9z0rTfC8nrx1Ojrb6PP4q7le9SEAX2GQ4NoY5apmkKcg4VHqkOwJgR
-         1OpwJOgNpEpizlVRD022aIEsKCtcQ0oeWTE7u3QkRM1HrKfKTPfkEOYZXd+kpWrffc
-         N11FIhuT26UeoZjxBjOJCeMIZB45upexUvxNNzUhmGK7uEeaCxyDSngYIiKevM0mdt
-         FM0hGzkbQZ9+cCaeegyCRb+ON4GPSaE42/4A1GAoNNKhBC1OnlWF/3Q/R57rYijeme
-         JKBfQXXbXmWb1SFBaWkQBJz6UWLqX7kKxq/SofWpnV4dVYfLvVgqq8tLRvfCLk1GB2
-         zaZZWtxhTgJew==
-From:   Nathan Chancellor <nathan@kernel.org>
-Date:   Tue, 24 Jan 2023 09:19:28 -0700
-Subject: [PATCH] powerpc/vdso: Filter clang's auto var init zero enabler
- when linking
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+        Tue, 24 Jan 2023 11:30:58 -0500
+Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2084.outbound.protection.outlook.com [40.107.8.84])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 779CE11EA1;
+        Tue, 24 Jan 2023 08:30:57 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dfIh6JNpiUm0Puxa1OFBkpxr49M/+uX5wd6fDzyjApSO06Y47ua9ci2g3csuT8tb8ks9H4jNT5c+doN8vvNgcR+gZQA1WoJguviMPbPajXLw0615MDuKAkp+fXyAd6FrdgPG8jpoNEFVWacXWES8G1dawqrdA4JtYVBs6LS46SXoHr/Ag4fdWsUEM08Ug3I+ma82rwiumiKso1Gx58YJCXfQRMZsG19UeanMKBuFRddzY32QLRpOkRawf7HY0B+VVWaJO8TInNp+aWlM3PuyR7Ww35JoFItqOqOFJZZH26YYzc8LkAZN72zIb2+0t/vjVmVGF2dE17xtYxaymyn+3g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9UgTGLBhEQVscQNBG4YCWvYiYDlgp001c0bxw//T5Y0=;
+ b=K3S/DqbqDCDZ5MUEOTqQd46T2NqUcvrNcO2Aiuj0jIJIY6eBu9Y4V8SgEyPRj52AX/Nmj1AlXMSQKWOfzU8UgSfxMggQ3jTF8AOXv5doSmrHgxx5Mr9aPerQ1f5l4bxXesqBt55+AYCe4AleqCPTSwkgWq7Hv1e/se3J/o9Zy2NbnXmsnzEEZPTpG4SCNWXv4XKlTpFsBEwP38iZJ1QqSsOBwlif+fDvQMXfGYVbgnmcdHyOhm4YX1jwOa335ZVQ12x1Zmu0dh8DdG2TTGUHLNCjM36NfaJts+RN5jFI2jlcgptgigsMX9IcZfq4TG/2XOHDpRccoYc39LjDErqOPA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=seco.com; dmarc=pass action=none header.from=seco.com;
+ dkim=pass header.d=seco.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=seco.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9UgTGLBhEQVscQNBG4YCWvYiYDlgp001c0bxw//T5Y0=;
+ b=iHsIiIZ3Os0ujjdYYltFsxpnBxGS2S+Bu3qE7XgI8BJmHbNb0eEA7i+f4ayy+7bNhihVRLLQXPW9BmzBIQ+T3p7LuHwyz4Vh3PCYu4IcgFSaOJjDi47XnQzpjlg6rIGFa8Uz2Cbxo+ghavZOd4vO0fyYR6J0Xy9sZSOtRxsBZjpFt+NfV2Mwv3+x+KsCxqKw6Uc3eSXJpGC107KyhUgBzwzjaiWgOH3zJxmi3dmK+FRu8fzHzWJ3Y6QJo0npMUiErSq0ujvv6c/XkD7iDmaabFpSLVLEb8i7T8bA/1AhZDTJKvyUSMbskkN46hEuuH3vBKLxOGhIf8XLvZeeyw68PA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=seco.com;
+Received: from DB9PR03MB8847.eurprd03.prod.outlook.com (2603:10a6:10:3dd::13)
+ by DU2PR03MB9999.eurprd03.prod.outlook.com (2603:10a6:10:490::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.33; Tue, 24 Jan
+ 2023 16:30:54 +0000
+Received: from DB9PR03MB8847.eurprd03.prod.outlook.com
+ ([fe80::6b03:ac16:24b5:9166]) by DB9PR03MB8847.eurprd03.prod.outlook.com
+ ([fe80::6b03:ac16:24b5:9166%2]) with mapi id 15.20.6002.033; Tue, 24 Jan 2023
+ 16:30:54 +0000
+Message-ID: <5cc63796-fd46-98d6-fd01-54a8281cf995@seco.com>
+Date:   Tue, 24 Jan 2023 11:30:49 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH 0/8] generic command line v5
+Content-Language: en-US
+To:     Daniel Walker <danielwa@cisco.com>, Will Deacon <will@kernel.org>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Rob Herring <robh@kernel.org>,
+        Daniel Gimpelevich <daniel@gimpelevich.san-francisco.ca.us>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+        linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kbuild@vger.kernel.org
+Cc:     xe-linux-external@cisco.com, linux-efi@vger.kernel.org
+References: <20220929023301.3344694-1-danielwa@cisco.com>
+From:   Sean Anderson <sean.anderson@seco.com>
+In-Reply-To: <20220929023301.3344694-1-danielwa@cisco.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230123-qunused-argument-auto-var-init-v1-1-ec06051f0d87@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAA8F0GMC/x2NywqDMBAAf0Vy7oImhT5+pfSwmo3uwbXdTUQQ/
- 72xx2FgZndGymTu2exOaWXjRSp0l8YNE8pIwLGy860PbecDfIsUowioY5lJMmDJC6yowMIZ7ki
- 3R4wphmtyNdKjEfSKMkxnZkbLpKf4KCXe/ufX+zh+zp4/vokAAAA=
-To:     masahiroy@kernel.org
-Cc:     ndesaulniers@google.com, nicolas@fjasle.eu, mpe@ellerman.id.au,
-        npiggin@gmail.com, christophe.leroy@csgroup.eu, trix@redhat.com,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, llvm@lists.linux.dev,
-        Nathan Chancellor <nathan@kernel.org>
-X-Mailer: b4 0.12.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2880; i=nathan@kernel.org;
- h=from:subject:message-id; bh=aRLiN9Rsyo8xPFa8GOCkbKbw7dV6SfkqfYAeFSOYgxs=;
- b=owGbwMvMwCEmm602sfCA1DTG02pJDMkXWINyeA+F8bKssp4xy9m+wDLkyhX3o7Ltp+8rvrjmfWO5
- zc2PHaUsDGIcDLJiiizVj1WPGxrOOct449QkmDmsTCBDGLg4BWAil/IY/pc/nP5YeJHor5Xfj5ZwLr
- h2f1fXFI7l3kpvWLb4ZWRyOtkw/E8/W/55xqu1mxcWv3vcfvTh5Ff3Z5x1suudJLjjZ2hKrTk3AA==
-X-Developer-Key: i=nathan@kernel.org; a=openpgp;
- fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
+X-ClientProxiedBy: MN2PR20CA0005.namprd20.prod.outlook.com
+ (2603:10b6:208:e8::18) To DB9PR03MB8847.eurprd03.prod.outlook.com
+ (2603:10a6:10:3dd::13)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB9PR03MB8847:EE_|DU2PR03MB9999:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9f9b0c36-b9fc-4457-fae2-08dafe285d09
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 1Hxp6HmeF/ueRYPWUFjY/p9TAhlgUzb5DzMUFrynG7B7LDdgyEGSYlv8T2QY99/2/CARY6nFFBZC7ga32Q3+JNSovFqYjpuy7G9gG7Gogkr4ymt9ujES94QJCU5lbKdbiZzwOhHfN6xuwpHGaBulXMEV8gpfPLViiVNRONK+pzEUtvPe7g4aW3tVzSLa0mUNMYS/Jb+K95/XOS/F7AtFshDKK/Ad44QeJhtnQghNqiMGEwLNmDVmBk8SZsSgDRyJGm6CWYCTzg+UhbhqTHzffc3XT3rL5i2L2f7VBFrvbn45LALbseKEROqrxohgtFrdgzH6sxeJPaaDJXAjVfJD6vGiDTCBSFxZwx3KgPQ6WRL3wonAlIJ1xGj+usm9t17Sy69Xq38TfbTM8ZVBFOA0MpTA30AX1aZFI5IG55Q7gIFyIRoaHTrX4oIptMzNWoLX8mMx/HiDrprtIN8oLEQFK3HeF/iYhg5eyFf8s6JQD2zkPwNasACTZzGcJLNjKJSjiE6uc2LLR0LTBjg9ytGVrX0mnSzHVa6EvXf7+MYrUM4jSZZzobFYkIVWMa29jtR5RXCIqdRwOA5KdQ0ECqXFQR3tkKDJPThyCzWFZ1OWYCNRtv76aTFTcRtlqeU4nxI8My3EZytrGOWMjFFXUFhciirKNA5g/4lBGM5B0cwVlFV07AXVwQ7nesUI8c/DmFPgUAXvF6KxsRoFg44NFHjxlUlMa8AfrRMB/36ICZojGlT91Y2sLMBBlaJhRoacClr/co5VsfqltAqrJN1k+GwxgJuddR3RurkZIOAPlg8/3S0=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR03MB8847.eurprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(366004)(39850400004)(136003)(396003)(376002)(346002)(451199015)(31686004)(31696002)(316002)(110136005)(478600001)(52116002)(36756003)(86362001)(2616005)(38100700002)(921005)(38350700002)(83380400001)(26005)(186003)(53546011)(6512007)(5660300002)(2906002)(6666004)(44832011)(6486002)(6506007)(41300700001)(7416002)(66476007)(8936002)(8676002)(66946007)(66556008)(4326008)(41533002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OGpTVEhNd1ZrK0xrdnJRWHdsMVM4M1A4MVhWYVk3VE9uVUNxNytMS2ZTSGJl?=
+ =?utf-8?B?NjRXWEVsLytYMnYzK3dZQUhqZnZPTUhoZm54bFlzeGhWUjVWa0tPQmoyMDZ5?=
+ =?utf-8?B?aG9xT004NnZkUjZFR1p6NzRmL1Q4UVFGTGZvSTZlN0NMUU9WR0t0ZXJ0amRG?=
+ =?utf-8?B?K3NWKzdISmRXaDFHYTlvai8xWUlFOHlxREFibTNSSWE5THIrUGdpOGVxYlpJ?=
+ =?utf-8?B?amtEY3RCaEhpNE5TdjFIelQ1YjBEaHBLTlJtTkJoZVI5aWJRelA4TkZtL2cz?=
+ =?utf-8?B?b1lGQmhYNTF6eitHc2ZFalQ0YU1NV3Fpejc0OExQUms1N2RucWplUHVLOWg3?=
+ =?utf-8?B?TnRnODYrN3hFMjQ0T1FlOU5OUkVhQjZFcDBlRG9ITXpTamZZT3BtY2Y0M0J3?=
+ =?utf-8?B?S2Z0VGFxSEJ5NHVCSFZFZllXNHJmVTEvc1ZCN0hMZzdoZ3BQcFF2N0NqT0tt?=
+ =?utf-8?B?N0VsOGFkclhGR3hLdDZCMjRJYzh5ZGpmaC9pRHpEajAzOEV0Q0RsRHhab2hB?=
+ =?utf-8?B?cjk2Zm9nOEc5a3dwQ1llaE9JbU05ZWwyOVV6anBWUTcrY3RESGpxWkhhNDJp?=
+ =?utf-8?B?NklWaVkzUldxbWxDVkFiZ3RoY3hpSThQUklnYzlYS00wUlB1WmVrbEpzcXg2?=
+ =?utf-8?B?Y2lIYjF2NFRlWW1xWVQ4b082QmRqeVJIMXR4K1NGWHF6aGM2RjlqR2xHWFU3?=
+ =?utf-8?B?WFpSL0x0WmtoZmQ4Q09xR1RGMzdzRDU3dTgxalRkVnFQZHNuaXhpdDc5RkpE?=
+ =?utf-8?B?ZHBscmFzOFNtaFJsWWdOMFh5cWZSVURKdXpVNFFKbGQzczNGUlA4UWhPb1VB?=
+ =?utf-8?B?RzRTNWVCTitpZzBOZktMa3l6a0wzTkNVejZVcUd2L0plTGZBdGNsNE9ubGxj?=
+ =?utf-8?B?WktIY1A5UENtYThKL3BvUDFuYU1SVjRsSFUvV0xrcUk0ZG94VHBVeThCZmJt?=
+ =?utf-8?B?aFNGK3lEWjc0NkhVc21FQUQ1UGk2Y3ltSnFyTzdDVmk0V3RCL1dLVTVWeVFE?=
+ =?utf-8?B?clVkTk82VHV1eDVrMDJ2SWRodXpEZ1ZyT0hRaEpPS0lvMHYwU1Mxem5iZlpW?=
+ =?utf-8?B?a0I2bGt1dG1lSkIwNFN2c1NPL2RJTC8zaUVTeFE0OGt2TVlBVmpodk9HSmxo?=
+ =?utf-8?B?VFV4NlU0aWdvMmFsMG9DV3dGN1l1VGx4Tnc4blMxa1Z2WGt4UUM0dVUySVJ1?=
+ =?utf-8?B?MjArNXFCbHJGejRPSE40N3FvOFk4T1poN25EcFdQbFB2bFVLdWFnWUVXazdO?=
+ =?utf-8?B?dGxRWVRDSDBXN3BZWUhHVFpldVRPd29SZFFsZ3ZZaXYzOEdJcmdwdjJFMnFm?=
+ =?utf-8?B?QVJzRVVVSG5TN2NwQkw3VG9YNTBkaFhBTWMwUi9HeTJMZFdHajkvc1pCdmd5?=
+ =?utf-8?B?a3k4OVlleHpObWs0cHNqaWRaN0JZT05UaGNoZkk1d004azFuZUVvMjlLdVo1?=
+ =?utf-8?B?akJCakRMc0E3TkMwVmNqcEFzUmorWDhMYWV4TEcvZjFheVlGdmRvaTEwNUxE?=
+ =?utf-8?B?eDNNL1JHemdoKzRWWTVnZ0dnaFE2enRzZW5PQklOcFZlblhJWVFyV2xVK3pC?=
+ =?utf-8?B?SW90WWZjVHRDQ0hwZXhLSENOUFNTNkxSY3JKVC93OXQyT09ubkVpWm9GYnpK?=
+ =?utf-8?B?Ny9uMEplV05RQlk3b3VRMGExZGlwVTZERjJydXZBUFNUSzBoQy90QURQQjM3?=
+ =?utf-8?B?NDhMUWlXd1R6KzZGcmIzREhiWW5YODZKTXNpeGQwWnBJTC9pTVRmY294MnQ3?=
+ =?utf-8?B?UWtFNjdWZTZRZ0p2UHZzSis5eHFWQm9oRDc2TFZYVkhMdm5HbnQ5YmtzdW5h?=
+ =?utf-8?B?TUpiQ1hOc091ZU45QnBOVkI3Si83OFZuU0pFem9CdFdRUVZ5cDM0M3p0QS9M?=
+ =?utf-8?B?YkwxQW4xcjFKWXRhQ2xYOWNOOVBJeFZ5L2t2c2kzblJtTmVXQ1NrMHFScnNM?=
+ =?utf-8?B?UUxaektWaTlGWHZsVk1zWW1LRDZ3NlJWSTdHT1RxbkRIMEtBZ1dmZkZ4Tmd4?=
+ =?utf-8?B?QmNDb2ozRll3MU5WQ3Qyd1lWbXJSMGZLMzllTHdRcXRnWnR3TzRPWnZVUjZK?=
+ =?utf-8?B?bU8rTXFacE5jNHQ1Z1hhM3JZZGM1SE1pNUhwWFdxa3dxVGQ5QUJUcDBzREk4?=
+ =?utf-8?B?US9FczVYYW40Uk1jTXY3ZFEvbEpyLzQ5aitSU0FueTZ6SnBXN1ZQOFJMUTBO?=
+ =?utf-8?B?VUE9PQ==?=
+X-OriginatorOrg: seco.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9f9b0c36-b9fc-4457-fae2-08dafe285d09
+X-MS-Exchange-CrossTenant-AuthSource: DB9PR03MB8847.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2023 16:30:54.1616
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: bebe97c3-6438-442e-ade3-ff17aa50e733
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: xND+A2DB21t/vPRp6zi3b+cLTiMXbvUbW+dRhVMH0Lf0BLAqcYhuNQ2o1+fKgZsDYZpbH7KcsGmRnx46tAuxvA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR03MB9999
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-After commit 7bbf02b875b5 ("kbuild: Stop using '-Qunused-arguments' with
-clang"), the PowerPC vDSO shows the following error with clang-13 and
-older when CONFIG_INIT_STACK_ALL_ZERO is enabled:
+On 9/28/22 22:32, Daniel Walker wrote:
+> v5 release changes. Generally a rebase from v4.
+> 
+> * Modified OF changes to move the ugly code into the cmdline.h
+> 
+> * Minor compliation update in arm64. Added ifndef __ASSEMBLY__ in
+>   a few places.
+> 
+> * Worked around arm64 kaslr_early.c.
+> 
+> 	This code needs some additional review and consideration. 
+> 	It appears this code is missing the opposite option to nokaslr
+> 	which is kaslr.disabled=1/0 which would allow kaslr to be turn
+> 	back on later in the command line. For example,
+> 
+> 	console=ttyS0 nokaslr root=/dev/ram0 nosmp kaslr.disabled=0 loglevel=7
+> 	
+> 	On arm64 in arch/arm64/kernel/idreg-override.c this is parsed correctly
+> 	to turn on kaslr, but the kaslr_early.c is missing this logic.
+> 	Doing this results in kaslr getting disabled with the following message,
+> 
+> 	KASLR disabled due to lack of seed
+> 
+> 	Even when there is a seed in the device tree.	
+> 
+> 	So change to the generic command line would leave built in command
+> 	lines with nokaslr with no option to re-enable kaslr in in the bootloader
+> 	arguments.
+> 
+> 
+> Daniel Walker (8):
+>   CMDLINE: add generic builtin command line
+>   scripts: insert-sys-cert: add command line insert capability
+>   scripts: insert-sys-cert: change name to insert-symbol
+>   CMDLINE: mips: convert to generic builtin command line
+>   drivers: firmware: efi: libstub: enable generic commandline
+>   CMDLINE: x86: convert to generic builtin command line
+>   of: replace command line handling
+>   CMDLINE: arm64: convert to generic builtin command line
+> 
+>  arch/arm64/Kconfig                            |  33 +--
+>  arch/arm64/include/asm/setup.h                |   4 +
+>  arch/arm64/include/uapi/asm/setup.h           |   2 +
+>  arch/arm64/kernel/idreg-override.c            |   9 +-
+>  arch/arm64/kernel/pi/kaslr_early.c            |  14 +-
+>  arch/mips/Kconfig                             |   4 +-
+>  arch/mips/Kconfig.debug                       |  44 ----
+>  arch/mips/configs/ar7_defconfig               |   9 +-
+>  arch/mips/configs/bcm47xx_defconfig           |   8 +-
+>  arch/mips/configs/bcm63xx_defconfig           |  15 +-
+>  arch/mips/configs/bmips_be_defconfig          |  11 +-
+>  arch/mips/configs/bmips_stb_defconfig         |   6 +-
+>  arch/mips/configs/ci20_defconfig              |   9 +-
+>  arch/mips/configs/cu1000-neo_defconfig        |  10 +-
+>  arch/mips/configs/cu1830-neo_defconfig        |  10 +-
+>  arch/mips/configs/generic_defconfig           |   6 +-
+>  arch/mips/configs/gpr_defconfig               |  18 +-
+>  arch/mips/configs/loongson3_defconfig         |  12 +-
+>  arch/mips/include/asm/setup.h                 |   2 +
+>  arch/mips/kernel/relocate.c                   |  17 +-
+>  arch/mips/kernel/setup.c                      |  36 +--
+>  arch/mips/pic32/pic32mzda/early_console.c     |   2 +-
+>  arch/mips/pic32/pic32mzda/init.c              |   3 +-
+>  arch/x86/Kconfig                              |  44 +---
+>  arch/x86/kernel/setup.c                       |  18 +-
+>  .../firmware/efi/libstub/efi-stub-helper.c    |  29 +++
+>  drivers/firmware/efi/libstub/efi-stub.c       |   9 +
+>  drivers/firmware/efi/libstub/efistub.h        |   1 +
+>  drivers/firmware/efi/libstub/x86-stub.c       |  13 +-
+>  drivers/of/fdt.c                              |  22 +-
+>  include/linux/cmdline.h                       | 137 ++++++++++
+>  init/Kconfig                                  |  78 ++++++
+>  lib/Kconfig                                   |   4 +
+>  lib/Makefile                                  |   3 +
+>  lib/generic_cmdline.S                         |  53 ++++
+>  lib/test_cmdline1.c                           | 139 ++++++++++
+>  scripts/Makefile                              |   2 +-
+>  .../{insert-sys-cert.c => insert-symbol.c}    | 243 ++++++++++++------
+>  38 files changed, 724 insertions(+), 355 deletions(-)
+>  create mode 100644 include/linux/cmdline.h
+>  create mode 100644 lib/generic_cmdline.S
+>  create mode 100644 lib/test_cmdline1.c
+>  rename scripts/{insert-sys-cert.c => insert-symbol.c} (72%)
+> 
 
-  clang: error: argument unused during compilation: '-enable-trivial-auto-var-init-zero-knowing-it-will-be-removed-from-clang' [-Werror,-Wunused-command-line-argument]
+For arm64:
 
-clang-14 added a change to make sure this flag never triggers
--Wunused-command-line-argument, so it is fixed with newer releases. For
-older releases that the kernel still supports building with, just filter
-out this flag, as has been done for other flags.
+Tested-by: Sean Anderson <sean.anderson@seco.com>
 
-Fixes: b174f4c26aa3 ("powerpc/vdso: Improve linker flags")
-Fixes: 7bbf02b875b5 ("kbuild: Stop using '-Qunused-arguments' with clang")
-Link: https://github.com/llvm/llvm-project/commit/ca6d5813d17598cd180995fb3bdfca00f364475f
-Signed-off-by: Nathan Chancellor <nathan@kernel.org>
----
-This should be the last flag that needs to be filtered (famous last
-words...) but if any more come up, we should really just explore
-switching the PowerPC vDSO to linking with $(LD) like every other part
-of the kernel; for now, I hope this is fine.
-
-Cheers,
-Nathan
----
- Makefile                          | 4 +++-
- arch/powerpc/kernel/vdso/Makefile | 2 +-
- 2 files changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index cf30a8b6463e..0406f37fd7a2 100644
---- a/Makefile
-+++ b/Makefile
-@@ -912,7 +912,9 @@ ifdef CONFIG_INIT_STACK_ALL_ZERO
- KBUILD_CFLAGS	+= -ftrivial-auto-var-init=zero
- ifdef CONFIG_CC_HAS_AUTO_VAR_INIT_ZERO_ENABLER
- # https://github.com/llvm/llvm-project/issues/44842
--KBUILD_CFLAGS	+= -enable-trivial-auto-var-init-zero-knowing-it-will-be-removed-from-clang
-+CC_AUTO_VAR_INIT_ZERO_ENABLER := -enable-trivial-auto-var-init-zero-knowing-it-will-be-removed-from-clang
-+export CC_AUTO_VAR_INIT_ZERO_ENABLER
-+KBUILD_CFLAGS	+= $(CC_AUTO_VAR_INIT_ZERO_ENABLER)
- endif
- endif
- 
-diff --git a/arch/powerpc/kernel/vdso/Makefile b/arch/powerpc/kernel/vdso/Makefile
-index 7e69e87fbf74..d2a1dc0956d5 100644
---- a/arch/powerpc/kernel/vdso/Makefile
-+++ b/arch/powerpc/kernel/vdso/Makefile
-@@ -56,7 +56,7 @@ ccflags-y := -fno-common -fno-builtin
- ldflags-y := -Wl,--hash-style=both -nostdlib -shared -z noexecstack
- ldflags-$(CONFIG_LD_IS_LLD) += $(call cc-option,--ld-path=$(LD),-fuse-ld=lld)
- # Filter flags that clang will warn are unused for linking
--ldflags-y += $(filter-out $(CC_FLAGS_FTRACE) -Wa$(comma)%, $(KBUILD_CFLAGS))
-+ldflags-y += $(filter-out $(CC_AUTO_VAR_INIT_ZERO_ENABLER) $(CC_FLAGS_FTRACE) -Wa$(comma)%, $(KBUILD_CFLAGS))
- 
- CC32FLAGS := -m32
- LD32FLAGS := -Wl,-soname=linux-vdso32.so.1
-
----
-base-commit: a778c9dd138b4f4410779705b444d58ce6f8fc44
-change-id: 20230123-qunused-argument-auto-var-init-8ae79ddfd34f
-
-Best regards,
--- 
-Nathan Chancellor <nathan@kernel.org>
-
+Thanks!
