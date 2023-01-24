@@ -2,74 +2,173 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CA69C25B4E
-	for <linux-kbuild@archiver.kernel.org>; Tue, 24 Jan 2023 16:39:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E543C25B4E
+	for <linux-kbuild@archiver.kernel.org>; Tue, 24 Jan 2023 17:39:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233988AbjAXQjr (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 24 Jan 2023 11:39:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44206 "EHLO
+        id S234098AbjAXRj3 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 24 Jan 2023 12:39:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234111AbjAXQjr (ORCPT
+        with ESMTP id S233927AbjAXRj2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 24 Jan 2023 11:39:47 -0500
-Received: from gate.crashing.org (gate.crashing.org [63.228.1.57])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0E56840C4
-        for <linux-kbuild@vger.kernel.org>; Tue, 24 Jan 2023 08:39:44 -0800 (PST)
-Received: from gate.crashing.org (localhost.localdomain [127.0.0.1])
-        by gate.crashing.org (8.14.1/8.14.1) with ESMTP id 30OGUo7N008108;
-        Tue, 24 Jan 2023 10:30:50 -0600
-Received: (from segher@localhost)
-        by gate.crashing.org (8.14.1/8.14.1/Submit) id 30OGUmel008107;
-        Tue, 24 Jan 2023 10:30:48 -0600
-X-Authentication-Warning: gate.crashing.org: segher set sender to segher@kernel.crashing.org using -f
-Date:   Tue, 24 Jan 2023 10:30:48 -0600
-From:   Segher Boessenkool <segher@kernel.crashing.org>
-To:     Nathan Chancellor <nathan@kernel.org>
-Cc:     masahiroy@kernel.org, nicolas@fjasle.eu,
-        linux-kbuild@vger.kernel.org, trix@redhat.com,
-        llvm@lists.linux.dev, ndesaulniers@google.com, npiggin@gmail.com,
-        linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH v2 07/14] powerpc/vdso: Improve linker flags
-Message-ID: <20230124163048.GL25951@gate.crashing.org>
-References: <20221228-drop-qunused-arguments-v2-0-9adbddd20d86@kernel.org> <20221228-drop-qunused-arguments-v2-7-9adbddd20d86@kernel.org> <20230123150716.GJ25951@gate.crashing.org> <Y9AD/Mejnv6jp7Np@dev-arch.thelio-3990X>
-Mime-Version: 1.0
+        Tue, 24 Jan 2023 12:39:28 -0500
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1FB316AD1
+        for <linux-kbuild@vger.kernel.org>; Tue, 24 Jan 2023 09:39:27 -0800 (PST)
+Received: by mail-pg1-x529.google.com with SMTP id d10so11744371pgm.13
+        for <linux-kbuild@vger.kernel.org>; Tue, 24 Jan 2023 09:39:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FR1+Eb2Nx7WArb8KnWYRHzcFH+KeXGNrwM5HzoF5rS8=;
+        b=QAzkuKBB06Ea9Mitu5Opcze99VQj39JvlMBoiWPYYnbyQ7TNJKCk2peKINkcxV/kKB
+         2WRn7eqwGzwZ7Ybc5rtJK7/JM79WrFDADzG7riBvI2pxfRgmdl+4m+UnPXp4HsHzDxIc
+         dvPAcoK95VVrgyVEbYABebucJnVu2vOCIHl5KXdw4+Bpe+TMbxpbcVaVZl9cQ+JJmWJo
+         kApb2roHyE60HvRdLVkFff3jKh82oRY5Ke1CxEs6p0uS6rlBY69S0RXJCANvpgGPbB4F
+         zlYUaAB0B4xlogdsPUGKcuk0rRGNK7vq4gSvemiWRTij1H9hsGwQQWvnre/cQyyhl7ey
+         yfLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FR1+Eb2Nx7WArb8KnWYRHzcFH+KeXGNrwM5HzoF5rS8=;
+        b=yipDD4jkXhiSXdmDK6vWTpSEjZz2boMxGw+Wm8EblW2TUPyKU6TU/OwRMuG+wRrzhc
+         whXy5UDHSqW8CGXVoe09FhiDvPaEGhsM/vIkJ6VD4/v309UG1j9az+FdEHa0NGypTAJL
+         Nk9IXwDkGzFRaXwM82dGcAxGpQzrsUC6RXlE8sZyRI02tt0YLPBRJVFA7DezztVJbVuY
+         EjJ4UdujNxW2m0lVXSeMyDgl8t1gtV4Cz+g8yDNOKv+chk7WkwQYAttUYkLVP8YmC9Dx
+         ub1LCxc00taVoV6X/2SLwdYY1qQkfmxRCNpsHoZ+HfPF4Kn8rvOS98ncbpKNpLqw0+kz
+         5tfQ==
+X-Gm-Message-State: AO0yUKUu9N22DAEOJj/vn/LAOXVZk4hGE8ue4JDbqqcbt9OU3fPyA4/w
+        4PDO8RFyj55c9qGUg5OcPqqFJw==
+X-Google-Smtp-Source: AK7set9sJdaB9831+HewZLmd9g/qnwqpTX5/RmlSRMT1+ZIk5G+2VR1xgH97SUfh3MaWzumN466zbQ==
+X-Received: by 2002:a05:6a00:23cb:b0:581:bfac:7a52 with SMTP id g11-20020a056a0023cb00b00581bfac7a52mr271810pfc.1.1674581966697;
+        Tue, 24 Jan 2023 09:39:26 -0800 (PST)
+Received: from google.com (13.65.82.34.bc.googleusercontent.com. [34.82.65.13])
+        by smtp.gmail.com with ESMTPSA id h11-20020a056a00170b00b0058d97f2ab31sm1858433pfc.184.2023.01.24.09.39.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Jan 2023 09:39:25 -0800 (PST)
+Date:   Tue, 24 Jan 2023 09:39:22 -0800
+From:   William McVicker <willmcvicker@google.com>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nicolas Schier <nicolas@fjasle.eu>
+Subject: Re: [PATCH] kbuild: do not automatically add -w option to modpost
+Message-ID: <Y9AXytjc61Le0PQZ@google.com>
+References: <20230123052653.711899-1-masahiroy@kernel.org>
+ <Y88NX11/LcnfloYk@google.com>
+ <CAK7LNASfY+2w-aN0LQs0_gB=ASRyJoXSobsqzGa0BNL2sqpJeA@mail.gmail.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y9AD/Mejnv6jp7Np@dev-arch.thelio-3990X>
-User-Agent: Mutt/1.4.2.3i
+In-Reply-To: <CAK7LNASfY+2w-aN0LQs0_gB=ASRyJoXSobsqzGa0BNL2sqpJeA@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, Jan 24, 2023 at 09:14:52AM -0700, Nathan Chancellor wrote:
-> On Mon, Jan 23, 2023 at 09:07:16AM -0600, Segher Boessenkool wrote:
-> > And here it is even more obviously fine.  If you need obfuscation like
-> > in your patch, it is better not to do this imo.
+On 01/24/2023, Masahiro Yamada wrote:
+> On Tue, Jan 24, 2023 at 7:42 AM William McVicker
+> <willmcvicker@google.com> wrote:
+> >
+> > On 01/23/2023, Masahiro Yamada wrote:
+> > > When there is a missing input file (vmlinux.o or Module.symvers), you
+> > > are likely to get a ton of unresolved symbols.
+> > >
+> > > Currently, Kbuild automatically adds the -w option to allow module builds
+> > > to continue with warnings instead of errors.
+> > >
+> > > This may not be what the user expects because it is generally more useful
+> > > to catch all possible issues at build time instead of at run time.
+> > >
+> > > Let's not do what the user did not ask.
+> > >
+> > > If you still want to build modules anyway, you can proceed by explicitly
+> > > setting KBUILD_MODPOST_WARN=1. Since you may miss a real issue, you need
+> > > to be aware of what you are doing.
+> > >
+> > > Suggested-by: William McVicker <willmcvicker@google.com>
+> > > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> > > ---
+> > >
+> > >  scripts/Makefile.modpost | 8 +++-----
+> > >  1 file changed, 3 insertions(+), 5 deletions(-)
+> > >
+> > > diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+> > > index 43343e13c542..9254ed811ddd 100644
+> > > --- a/scripts/Makefile.modpost
+> > > +++ b/scripts/Makefile.modpost
+> > > @@ -121,16 +121,14 @@ modpost-args += -e $(addprefix -i , $(KBUILD_EXTRA_SYMBOLS))
+> > >
+> > >  endif # ($(KBUILD_EXTMOD),)
+> > >
+> > > -ifneq ($(missing-input),)
+> > > -modpost-args += -w
+> > > -endif
+> > > -
+> > >  quiet_cmd_modpost = MODPOST $@
+> > >        cmd_modpost = \
+> > >       $(if $(missing-input), \
+> > >               echo >&2 "WARNING: $(missing-input) is missing."; \
+> > >               echo >&2 "         Modules may not have dependencies or modversions."; \
+> > > -             echo >&2 "         You may get many unresolved symbol warnings.";) \
+> > > +             echo >&2 "         You may get many unresolved symbol errors.";) \
+> >
+> > You need to move the closing parenthesis to come at the end of these
+> > echo messages. Otherwise you get this new message unconditionally.
 > 
-> I do not think this patch really obfuscates anything? The filtering is
-> pretty clear to me.
+> 
+> Ah, thanks for catching it.
+> 
+> 
+> > I also found during testing that the refactoring in commit f73edc8951b2
+> > ("kbuild: unify two modpost invocations") dropped the check for missing
+> > KBUILD_EXTRA_SYMBOLS. That means if an external module depends on
+> > another external module and sets:
+> >
+> >   KBUILD_EXTRA_SYMBOLS=/path/to/ext_module/Module.symvers
+> >
+> > ... then make will fail even with KBUILD_MODPOST_WARN=1 since we
+> > unconditionally add KBUILD_EXTRA_SYMBOLS to the modpost-args like this:
+> >
+> >   modpost-args += -e $(addprefix -i , $(KBUILD_EXTRA_SYMBOLS))
+> >
+> > To fix this, I suggest you also take the following patch so that
+> > KBUILD_MODPOST_WARN=1 will allow you to skip those unresolved symbols as
+> > well:
+> 
+> 
+> How is this useful?
+> 
+> KBUILD_EXTRA_SYMBOLS is explicitly specified by the user
+> via the command line or the environment variable.
+> 
+> If $(KBUILD_EXTRA_SYMBOLS) does not exist,
+> it is a user's fault, isn't it?
 
-And not having such filtering is more obvious and more clear.
+Sort of, yes. One could argue that it's the same situation as missing
+the in-tree Module.symvers or the vmlinuux.o/vmlinux.symvers. Basically,
+if you keep it as is, then KBUILD_MODPOST_WARN=1 would only work if the
+user edits the Makefile to remove the KBUILD_EXTRA_SYMBOLS line.  With
+my suggested patch, the user could build the module as is without any
+dependencies by setting KBUILD_MODPOST_WARN=1.
 
-It doesn't matter much for just this patch of course, but it will make
-the code significantly harder to read (and deal with in other ways) if
-this continues.
+I'm fine with whichever way you choose to support since I know this is
+an external modules edge-case. I personally like to build my modules
+with all the dependencies present to try an catch any issues at build
+time.
 
-> If this is a real objection to the patch, I suppose we could just
-> localize '-Qunused-arguments' to this Makefile and be done with it but I
-> do not think this change is a bad solution to the problem either.
+Thanks,
+Will
 
-It is a comment about the direction this patch is moving us in.  I don't
-think it is a good idea at all to try to avoid all warnings, and even
-more so it is a bad idea to make objectively worse source code just to
-appease a trigger-happy and questionable warning.
-
-As I said, you can often avoid warnings by writing better code, like
-part of the patch did.  That is a good reaction to warnings.  Making
-worse code to avoid warnings is not a good idea normally.
-
-Just don't use -Werror by default, and don't make other people suffer
-its yoke!
-
-
-Segher
+> 
+> 
+> 
+> 
+> 
+> 
+> -- 
+> Best Regards
+> Masahiro Yamada
