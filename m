@@ -2,105 +2,85 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88077C54EAA
-	for <linux-kbuild@archiver.kernel.org>; Fri, 27 Jan 2023 15:51:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1F67C61DA4
+	for <linux-kbuild@archiver.kernel.org>; Fri, 27 Jan 2023 16:20:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233617AbjA0Pve (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 27 Jan 2023 10:51:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47482 "EHLO
+        id S233885AbjA0QT7 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 27 Jan 2023 11:19:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233386AbjA0PvZ (ORCPT
+        with ESMTP id S234174AbjA0QT7 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 27 Jan 2023 10:51:25 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1B0B45BD1;
-        Fri, 27 Jan 2023 07:51:17 -0800 (PST)
+        Fri, 27 Jan 2023 11:19:59 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94209AD17;
+        Fri, 27 Jan 2023 08:19:58 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 54F55B80AF8;
-        Fri, 27 Jan 2023 15:51:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0700CC433D2;
-        Fri, 27 Jan 2023 15:51:15 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2F30261CC3;
+        Fri, 27 Jan 2023 16:19:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D360C433EF;
+        Fri, 27 Jan 2023 16:19:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674834675;
-        bh=gX12jOrRkb1rjBILNvcmKkE46vvlFJL/mDyptg9AClM=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=PzSeETgch6b0w8SXANYRpya00efWx57a5QUTalSSpO6I4mUiT0+4xNrv/NBdy90yf
-         tWgxmUeJW4sXea9lGrKZi1vrRHLj6kKoEVKytCunI3swR+hLJY/VYyRrE5M3+7Ho6V
-         jFsvqJCDQUvFJ4/rmFIpNXnWNW9XYj4aX0km19jpjv/ukAZvh2P4p5En+XRAy5BhZh
-         xCYHPKBeKt1MOWOSBDLd4yLUS6BmeI75prvc1ib3O4HzwnkjDXsTJ2+XpCVxsVGyel
-         fz66mNmxbBEeC2C6/w3WfM2E9iChb5EY3wJTe6ddJ/ujwVdyBnsgdU02HDeSvgcEtZ
-         cAwirCC1ZuGuA==
-Received: by mail-oi1-f173.google.com with SMTP id s66so4525598oib.7;
-        Fri, 27 Jan 2023 07:51:14 -0800 (PST)
-X-Gm-Message-State: AFqh2kqLO7MpjoeJZrQF7u8RZlQ0RAd7Z92epN/czqODU74MCmUOJRXo
-        CbGCQUgRG9csXo3kXXQuftbWCnp5g7oAO84jsu8=
-X-Google-Smtp-Source: AMrXdXsEVCDrcCrPO3WwFGoGMw8KY8bSw80OpIW9KEUB9vyFzXUsqCTvX2onikFDjUHFBlDlja8ypDHL8R33CGaBWKY=
-X-Received: by 2002:a05:6808:1786:b0:35e:7c55:b015 with SMTP id
- bg6-20020a056808178600b0035e7c55b015mr2475524oib.287.1674834674237; Fri, 27
- Jan 2023 07:51:14 -0800 (PST)
-MIME-Version: 1.0
-References: <20230122141428.115372-1-masahiroy@kernel.org> <Y9PozQphFcXZmEJz@orome>
-In-Reply-To: <Y9PozQphFcXZmEJz@orome>
+        s=k20201202; t=1674836397;
+        bh=dWkUXrk0g8ak0BjqJ52KwIBrpaKr1aFEKuCxJYYFurI=;
+        h=From:To:Cc:Subject:Date:From;
+        b=t7xEkFKOfRPsnN5oKe3OF1cn9OhAJNwfDcM7cj1tjE1WBrPQ775VJ33ZDoJNKcyAA
+         2V3sAhAq5z61UBLNFKR91E8oYX47DUOb8lukaG2yV+UmJtrLSOF7XQ3ajeiIZopY2n
+         DeuUmfr1Hcl2DD/zTAXwtoG/pzk6Rd4kyqp/cTa5BIWa8BJa3r9EFPkQqNQ0Mdeh3p
+         ueBP6QLSk4PZp8AO4ImuDE6DIJhGKYLd7ZWsXF/ynUeEY0IctBAQE6KlHWK/4xdcgH
+         if/0alOp1fDItKnLt5FsNPM4bmGDOodR0R59PJWkjuymV3ciGne4Z0NDKkQuYlYf6Z
+         BOrDUWCm74JQQ==
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Sat, 28 Jan 2023 00:50:37 +0900
-X-Gmail-Original-Message-ID: <CAK7LNATc_aPxiYXabzYbGXOMUW0Rcf0KQi6GBPvoy71uPuqKPg@mail.gmail.com>
-Message-ID: <CAK7LNATc_aPxiYXabzYbGXOMUW0Rcf0KQi6GBPvoy71uPuqKPg@mail.gmail.com>
-Subject: Re: [PATCH 1/7] kbuild: do not put .scmversion into the source tarball
-To:     Thierry Reding <thierry.reding@gmail.com>
-Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Rasmus Villemoes <rasmus.villemoes@prevas.dk>,
+To:     linux-kbuild@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Masahiro Yamada <masahiroy@kernel.org>,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
         Nicolas Schier <nicolas@fjasle.eu>
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH] kbuild: save overridden KERNELRELEASE in include/config/kernel.release
+Date:   Sat, 28 Jan 2023 01:19:42 +0900
+Message-Id: <20230127161942.543483-1-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.34.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sat, Jan 28, 2023 at 12:08 AM Thierry Reding
-<thierry.reding@gmail.com> wrote:
->
-> On Sun, Jan 22, 2023 at 11:14:21PM +0900, Masahiro Yamada wrote:
-> > .scmversion is used by (src)rpm-pkg and deb-pkg to carry KERNELRELEASE.
-> >
-> > In fact, deb-pkg does not rely on it any more because the generated
-> > debian/rules specifies KERNELRELEASE from the command line.
-> >
-> > Do likwise for (src)rpm-pkg, and remove this feature.
-> >
-> > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> > ---
-> >
-> >  scripts/Makefile.package |  6 ++----
-> >  scripts/package/mkspec   |  6 +++---
-> >  scripts/setlocalversion  | 19 +------------------
-> >  3 files changed, 6 insertions(+), 25 deletions(-)
->
-> Hi Masahiro,
->
-> I've been observing some strange behaviour when doing incremental builds
-> on recent linux-next versions. What happens is that the kernel version
-> doesn't get updated as I switch branches.
->
-> For instance I was rebuilding in a kernel tree which I hadn't touched in
-> a very long while and rebased on a recent linux-next. The kernel version
-> then stayed at the prior version rather than being updated to reflect
-> the actual state of the working tree.
->
-> Reverting all of the seven patches in this series fixes the issue, but I
-> don't really have a clue where exactly it fails. Do you have any ideas
-> how to fix this?
+${KERNELRELEASE} is used as a part of the installation path.
+(INSTALL_DTBS_PATH, MODLIB, etc.)
 
+When KERNELRELEASE is overridden from the command line, it should be
+saved in include/config/kernel.release, so that it will be consistently
+used for the installation steps.
 
-Thanks for the report.
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-"setlocalversion: print ${KERNELRELEASE} if set" is bad.
+This patch will replace the buggy
+ https://lore.kernel.org/linux-kbuild/20230122141428.115372-6-masahiroy@kernel.org/T/#u
 
-I will fix it.
+ Makefile | 4 ++++
+ 1 file changed, 4 insertions(+)
 
+diff --git a/Makefile b/Makefile
+index 203b86e95197..aeea900eff71 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1258,7 +1258,11 @@ vmlinux: vmlinux.o $(KBUILD_LDS) modpost
+ # make sure no implicit rule kicks in
+ $(sort $(KBUILD_LDS) $(KBUILD_VMLINUX_OBJS) $(KBUILD_VMLINUX_LIBS)): . ;
+ 
++ifeq ($(origin KERNELRELEASE),file)
+ filechk_kernel.release = $(srctree)/scripts/setlocalversion $(srctree)
++else
++filechk_kernel.release = echo $(KERNELRELEASE)
++endif
+ 
+ # Store (new) KERNELRELEASE string in include/config/kernel.release
+ include/config/kernel.release: FORCE
+-- 
+2.34.1
 
-
-Best Regards
-Masahiro Yamada
