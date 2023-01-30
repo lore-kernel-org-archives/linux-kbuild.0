@@ -2,114 +2,81 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD090C54EED
-	for <linux-kbuild@archiver.kernel.org>; Mon, 30 Jan 2023 12:00:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7923C636D6
+	for <linux-kbuild@archiver.kernel.org>; Mon, 30 Jan 2023 14:16:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235394AbjA3MAd (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 30 Jan 2023 07:00:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57906 "EHLO
+        id S237408AbjA3OQl (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 30 Jan 2023 09:16:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235917AbjA3MAa (ORCPT
+        with ESMTP id S237387AbjA3OQd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 30 Jan 2023 07:00:30 -0500
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 851F22701;
-        Mon, 30 Jan 2023 04:00:19 -0800 (PST)
-Received: by mail-yb1-xb2c.google.com with SMTP id d8so11720895ybe.9;
-        Mon, 30 Jan 2023 04:00:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=1HbguGHpB5FjqpATPjgOHDIrWn/kBKd6drXFRcfzVNs=;
-        b=B38If1QkuwWtrB4fFeIOZ0mF+gcyvYWCVzpQ+7uNh2WDW6E8cIParAuMk9w3aDI7dS
-         re0rwuXk38QKY7cLUiqX8uy2GzVRkA0mcOnE5nN6RGWXJ84p8jmIcN+8zJ1NvgRkTLgC
-         R4b0Cltat49eq4rl9aq1trm0dl99CqKk+fp8+die9j4ol5A9opeKkHxaLnfHIdwfJsbC
-         ukD0lyyLI3PVFkOUS+3XpqTrsMks5Aa6rOPWKVCgPPB3uW5qzdHhlaDX+38icxdW+5dM
-         k4GD7HkvDn0/bUHBJ3nc4jkqcwsoD2JCw3oJM93jnFw88N1nW1BPhu/jfjjBGUlS0fG2
-         +ZZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1HbguGHpB5FjqpATPjgOHDIrWn/kBKd6drXFRcfzVNs=;
-        b=2w7m86FJZcscKt4qsHjjnnRpm0nw7HYoh5PQnC5x0r+i9R5o8ZbzNHSfjPeiCDP3Wp
-         QTS4CMX6uu5S3TiSq2VcJE06vksjobPwzHIcXq/ph54GPMon2/VL/BsH+cPOZYg8s/TM
-         nZl8E8jKNl//SNtiSHS/6ot9j2jv5qkikpIruaaB67dWG72IbmsAhHK7ySjHVJ8+we9J
-         6uH0H6hWe0tXqjrKwWLJOJ1nyKL0AsIxN5P8MD7ziHTy1lnGBN4nxJpQN7rqa0cr9wTR
-         xRn0wt/OpK3X1jdwQVIjMmJ9CltAlSWlqFlGFNuRdV3PU+0XVfpH7DvVgcLEjLJl28jL
-         9S7g==
-X-Gm-Message-State: AFqh2kqBH4rTYW2COo0ftN6mF+fXDedKGjNpcLZ7EDDUs/w8RC73rzRC
-        DE3noBOLyOD/qckkAT+IBhi1xcX7UszJeIvGXKQ=
-X-Google-Smtp-Source: AMrXdXtZMmt5G/oSVrrJr7dHDHlsu+PaGz9sWWvSC9nqJy48wlwExCnPYy3D7LATlmfiivbrUYiAU+/+8iAdRc00MNc=
-X-Received: by 2002:a25:24c4:0:b0:803:197f:3f41 with SMTP id
- k187-20020a2524c4000000b00803197f3f41mr4140563ybk.489.1675080018737; Mon, 30
- Jan 2023 04:00:18 -0800 (PST)
-MIME-Version: 1.0
-References: <20230129184602.3974058-1-masahiroy@kernel.org>
- <20230129184602.3974058-4-masahiroy@kernel.org> <CANiq72=BRW9TunjKQmeMthm7Esc_YKM++NmWh-Dqc9Av13SNow@mail.gmail.com>
- <CAK7LNAQttb=qc5vsZNudYwTxmn=y3HZzVqZwAzMvLfUJXa4OFQ@mail.gmail.com>
-In-Reply-To: <CAK7LNAQttb=qc5vsZNudYwTxmn=y3HZzVqZwAzMvLfUJXa4OFQ@mail.gmail.com>
-From:   Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date:   Mon, 30 Jan 2023 13:00:07 +0100
-Message-ID: <CANiq72miWD_MtTrC0Ua7o4Tk5oDbQSFefwmYCsGx3Y=85ziJfQ@mail.gmail.com>
-Subject: Re: [PATCH v2 4/5] kbuild: srcrpm-pkg: create source package without cleaning
+        Mon, 30 Jan 2023 09:16:33 -0500
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A3683CE04
+        for <linux-kbuild@vger.kernel.org>; Mon, 30 Jan 2023 06:16:31 -0800 (PST)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <jlu@pengutronix.de>)
+        id 1pMUxI-0004FU-3D; Mon, 30 Jan 2023 15:16:20 +0100
+Received: from [2a0a:edc0:0:1101:1d::39] (helo=dude03.red.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
+        (envelope-from <jlu@pengutronix.de>)
+        id 1pMUxI-001UGx-DS; Mon, 30 Jan 2023 15:16:19 +0100
+Received: from jlu by dude03.red.stw.pengutronix.de with local (Exim 4.94.2)
+        (envelope-from <jlu@pengutronix.de>)
+        id 1pMUxG-00GG5L-TK; Mon, 30 Jan 2023 15:16:18 +0100
+From:   Jan Luebbe <jlu@pengutronix.de>
 To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nicolas Schier <nicolas@fjasle.eu>,
-        Alex Gaynor <alex.gaynor@gmail.com>,
-        =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
-        Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Wedson Almeida Filho <wedsonaf@gmail.com>,
-        rust-for-linux@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Cc:     Jan Luebbe <jlu@pengutronix.de>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        keyrings@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel@pengutronix.de
+Subject: [PATCH 1/2] certs: Fix build error when PKCS#11 URI contains semicolon
+Date:   Mon, 30 Jan 2023 15:15:52 +0100
+Message-Id: <20230130141553.3825449-2-jlu@pengutronix.de>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20230130141553.3825449-1-jlu@pengutronix.de>
+References: <20230130141553.3825449-1-jlu@pengutronix.de>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: jlu@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-kbuild@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Mon, Jan 30, 2023 at 2:29 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> I guess you are talking about kernel-devel-*.rpm
-> (and linux-headers-.deb).
->
-> They are not useful for building external modules
-> written in Rust since they do not contain *.rmeta etc.
-> I am not caring about that because Rust support is not
-> mature enough yet.
+When CONFIG_MODULE_SIG_KEY is PKCS#11 URI (pkcs11:*) and contains a
+semicolon, signing_key.x509 fails to build:
 
-Yeah, that is what I meant, i.e. since the Rust ML was Cc'd, I checked
-and wanted to say removing `rust` from there was OK (an `Acked-by`
-seemed too much for just that line :).
+  certs/extract-cert pkcs11:token=foo;object=bar;pin-value=1111 certs/signing_key.x509
+  Usage: extract-cert <source> <dest>
 
-> I stopped hard-coding the top-level directories.
-> The resulting source package still contains all check-in files
-> under rust/, so it is good from the source package perspective.
+Add quotes to the PKCS11_URI variable to avoid splitting by the shell.
 
-Sounds good to me.
+Fixes: 129ab0d2d9f3 ("kbuild: do not quote string values in include/config/auto.conf")
+Signed-off-by: Jan Luebbe <jlu@pengutronix.de>
+---
+ certs/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> 5/5 changed the behavior because rpm-pkg re-uses the
-> *.src.rpm generated by srcrpm-pkg.
+diff --git a/certs/Makefile b/certs/Makefile
+index 9486ed924731..cda21811ed88 100644
+--- a/certs/Makefile
++++ b/certs/Makefile
+@@ -67,7 +67,7 @@ $(obj)/system_certificates.o: $(obj)/signing_key.x509
+ 
+ PKCS11_URI := $(filter pkcs11:%, $(CONFIG_MODULE_SIG_KEY))
+ ifdef PKCS11_URI
+-$(obj)/signing_key.x509: extract-cert-in := $(PKCS11_URI)
++$(obj)/signing_key.x509: extract-cert-in := "$(PKCS11_URI)"
+ endif
+ 
+ $(obj)/signing_key.x509: $(filter-out $(PKCS11_URI),$(CONFIG_MODULE_SIG_KEY)) $(obj)/extract-cert FORCE
+-- 
+2.30.2
 
-(3/5?)
-
-> Having *.src.rpm in the kernel tree seems Redhat's preference.
-> Commit 8818039f959b2efc0d6f2cb101f8061332f0c77e
-> added --define='_srcrpmdir $(srctree)'.
-
-Thanks for the details! I just noticed it, so I thought I would let
-you know just in case.
-
-(Perhaps it could be useful to mention this change in the output in
-the commit message.)
-
-> In contrast, binary rpm files are generated under rpmbuild/RPMS/.
-> I want to fix this inconsistency, though.
-
-That would be nice.
-
-Cheers,
-Miguel
