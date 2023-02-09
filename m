@@ -2,109 +2,133 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86F90C636D3
-	for <linux-kbuild@archiver.kernel.org>; Thu,  9 Feb 2023 05:32:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 469DBC636D3
+	for <linux-kbuild@archiver.kernel.org>; Thu,  9 Feb 2023 22:43:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229733AbjBIFcU (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 9 Feb 2023 00:32:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37274 "EHLO
+        id S230351AbjBIWnl (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 9 Feb 2023 17:43:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbjBIFcT (ORCPT
+        with ESMTP id S230400AbjBIWnT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 9 Feb 2023 00:32:19 -0500
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E1C230282
-        for <linux-kbuild@vger.kernel.org>; Wed,  8 Feb 2023 21:32:18 -0800 (PST)
-Received: by mail-wr1-x432.google.com with SMTP id m14so588558wrg.13
-        for <linux-kbuild@vger.kernel.org>; Wed, 08 Feb 2023 21:32:18 -0800 (PST)
+        Thu, 9 Feb 2023 17:43:19 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AF71188;
+        Thu,  9 Feb 2023 14:43:17 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id s89-20020a17090a2f6200b0023125ebb4b1so3758010pjd.3;
+        Thu, 09 Feb 2023 14:43:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=w6z3lxwnln7Ypie34pRxdCgfXQDUlJU7iUw2s4xeNCQ=;
-        b=hbv+iUmy8sb7UTevXZXSzxz4aaIUDG/plNczLQrgAbId4wPVrQ+MkUcq3aY+CY5S+3
-         rjawt/atll9AOMzPTfCwmorE8mJ0IW4ExC+pOffnmttwon2NgCXsQXAHNH70+CqH4Yet
-         b6oLh+gnKxDrXWJ+sVkEhlEAuMsgo82g7kQbD0bRtom8ONxlwBf6CsHrI8kEQQPSr8cE
-         02FslNpxxsQJnKXlRV77g9pOv1nepBqVy0+lQY1q5jHCyV3MZ1/poYrNBSof/aw2ifvB
-         XBsmv3sQsOevFgU/eI4a8Lch+EluHrUqqffry2uORieqI42qXv+KNAZGRuXumHYaK8Mh
-         FeiA==
+        bh=zptQebfexw7ADz0p1vyYhnhBqZ69swmuxOP2gn0h68k=;
+        b=C2Raiuj9IFUwIbhnGgLmIloYo36QDBax9jsSAruPNUZBziAE/trNC3SorI7xMtAYWx
+         fdBcq+//eABAEhGM63hvCQq3YoHaY6Sh0LSGidPgx2qF91NL//LZ6uFKPLXI8oLArIST
+         Jh/r+NoGA3YmBujbBifKaTaLqhhCklFE8ZhDJl1lEvUilU8C6jLaux394w2RTQbGrRDk
+         iGnZ8l4gTIT3c0Cs+Ali1kPSlal/Kkex9fiqYeMia9YHRnGGS3UhF2fH/jIazDC3S0Cs
+         KoFBNBR3pbQKgS5Gcm+Zv2AT8KQIUXrlOqUXlax1u2MmUDOsyfsaeGJo/gTlNqhg82Nv
+         UcKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=w6z3lxwnln7Ypie34pRxdCgfXQDUlJU7iUw2s4xeNCQ=;
-        b=4COrjf1+pClveZ1CyyrqYI2mJY3ve9Z2/zJ48ro/pviHpkLjZOcK9X+6NEvXD/frtV
-         2HSao8d5PT/IFV2CYGTokkYFTq4fQRCSIlGLlkBsIOGaLgB+1QBIeQGFh/XrNH0TUaJt
-         pmbmFn8woLm97sz1gDLE3vkHCY+jRGn2Q6Vhr9RNnTMrj7nLQ7NjNL8UAIbn/IUxbjQ1
-         +6RLH8oiD9bj5Pi8IQp9efJutpFH0FsIIxPxYQPCI8tACYd3H5ncTOttRkgGfTpCg/3f
-         Fjuz/3vAc/e1JcwUj1GwPU8eZVYOMMiSQHfZuUFjW9yHv7ftTDybEg0ULEOZjXnTpe9s
-         D0bA==
-X-Gm-Message-State: AO0yUKWcOfKzIn35ApGv8CbOvWn4THNFCW0QMTyNfJe5lOaOHIUnVdJK
-        /KRAumIvznFt4xNRTvjeN/SZK+pO/YDzOi1j1umJ8g==
-X-Google-Smtp-Source: AK7set9YGa7NCNq2wHzwRqe7rRW1StB4rmp4kgxLGJELsL8k4ez/VaGVQujKbNDfKlqQkG5awGCGVr1ELO1GQ8rpFMA=
-X-Received: by 2002:a5d:4247:0:b0:2bf:b264:6bf7 with SMTP id
- s7-20020a5d4247000000b002bfb2646bf7mr251486wrr.427.1675920736829; Wed, 08 Feb
- 2023 21:32:16 -0800 (PST)
+        bh=zptQebfexw7ADz0p1vyYhnhBqZ69swmuxOP2gn0h68k=;
+        b=sr2I8WSzHDBcKUxwXRBG6ck7wFB5Oe10zRkL6gHP1jfIkyKf4uzpuTnk2QYaPY5dyc
+         6/yyYM+BlNP6dapMwZYz4yMEICAOwInRaxookpvi6qyOBU8Z40mO11p5VwQKmT79xvC4
+         GSiJCucNS9G6JfG8OGCcTE3K5XVUA5pwhBe1dy9S4RaWzpQ3t7e4uhlHEH/LpoxqOhO/
+         HWBGHgMi/Zyj8J9FUnkk53D+7QJDSvLAnc8RpA3Xak1vZYHsc27CvPPlkpCsDXwurrPC
+         ZxEJXfJ8t3Qm1rnM5w8W7NXjFJKrqijr4Eyy9eewqdI+3Tj5hAa4I0rrxp9nYXNh5ovl
+         kHVA==
+X-Gm-Message-State: AO0yUKW/lxSYbqA4YX5ly0i0wCOBZ42RzZ+YZzveTPBWyi15c7Dj3bqE
+        fqHZ5oqXjTTKCNR8Lr3NEN1dH9eRf3mM2cVfsN4tNDh45w0yXw==
+X-Google-Smtp-Source: AK7set/x2t0GTSkMGOB9YiHaJ8Im/tziGOqDwT6L+THb+YdhQwHBZeiuSv0HmKdSgKVaDHVvjjvOOp9JVF+17ec38zU=
+X-Received: by 2002:a17:90a:764d:b0:232:ccdc:2687 with SMTP id
+ s13-20020a17090a764d00b00232ccdc2687mr955780pjl.100.1675982597028; Thu, 09
+ Feb 2023 14:43:17 -0800 (PST)
 MIME-Version: 1.0
-References: <20221219055431.22596-1-ashimida.1990@gmail.com>
-In-Reply-To: <20221219055431.22596-1-ashimida.1990@gmail.com>
-From:   Peter Collingbourne <pcc@google.com>
-Date:   Wed, 8 Feb 2023 21:32:03 -0800
-Message-ID: <CAMn1gO6hwaSDCqigwoH981ffVbU8OvgJhrGh997kGseCSbpAJA@mail.gmail.com>
-Subject: Re: [RFC/RFT 0/3] Add compiler support for Control Flow Integrity
-To:     Dan Li <ashimida.1990@gmail.com>
-Cc:     gcc-patches@gcc.gnu.org,
-        Richard Sandiford <richard.sandiford@arm.com>,
+References: <20230208184203.2260394-1-elver@google.com>
+In-Reply-To: <20230208184203.2260394-1-elver@google.com>
+From:   Andrey Konovalov <andreyknvl@gmail.com>
+Date:   Thu, 9 Feb 2023 23:43:05 +0100
+Message-ID: <CA+fCnZeU=pRcyiBpj3nyri0ow+ZYp=ewU3dtSVm_6mh73y1NTA@mail.gmail.com>
+Subject: Re: [PATCH -tip] kasan: Emit different calls for instrumentable memintrinsics
+To:     Marco Elver <elver@google.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Kees Cook <keescook@chromium.org>,
         Nathan Chancellor <nathan@kernel.org>,
-        Tom Rix <trix@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        Marco Elver <elver@google.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Song Liu <song@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Uros Bizjak <ubizjak@gmail.com>,
-        Kumar Kartikeya Dwivedi <memxor@gmail.com>,
-        Juergen Gross <jgross@suse.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Borislav Petkov <bp@suse.de>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Aaron Tomlin <atomlin@redhat.com>,
-        Kalesh Singh <kaleshsingh@google.com>,
-        Yuntao Wang <ytcoode@gmail.com>,
-        Changbin Du <changbin.du@intel.com>,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, llvm@lists.linux.dev,
-        linux-hardening@vger.kernel.org
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nicolas Schier <nicolas@fjasle.eu>,
+        Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+        Alexander Potapenko <glider@google.com>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        linux-kbuild@vger.kernel.org, kasan-dev@googlegroups.com,
+        linux-kernel@vger.kernel.org, Ingo Molnar <mingo@kernel.org>,
+        Tony Lindgren <tony@atomide.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        linux-toolchains@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sun, Dec 18, 2022 at 10:06 PM Dan Li <ashimida.1990@gmail.com> wrote:
+On Wed, Feb 8, 2023 at 7:42 PM Marco Elver <elver@google.com> wrote:
 >
-> This series of patches is mainly used to support the control flow
-> integrity protection of the linux kernel [1], which is similar to
-> -fsanitize=kcfi in clang 16.0 [2,3].
+> Clang 15 will provide an option to prefix calls to memcpy/memset/memmove
+> with __asan_ in instrumented functions: https://reviews.llvm.org/D122724
+
+Hi Marco,
+
+Does this option affect all functions or only the ones that are marked
+with no_sanitize?
+
+Based on the LLVM patch description, should we also change the normal
+memcpy/memset/memmove to be noninstrumented?
+
+These __asan_mem* functions are not defined in the kernel AFAICS.
+Should we add them?
+
+Or maybe we should just use "__" as the prefix, as right now __mem*
+functions are the ones that are not instrumented?
+
+Thanks!
+
+> GCC does not yet have similar support.
 >
-> I hope that this feature will also support user-mode CFI in the
-> future (at least for developers who can recompile the runtime),
-> so I use -fsanitize=cfi as a compilation option here.
-
-Please don't. The various CFI-related build flags are confusing enough
-without also having this inconsistency between Clang and GCC.
-
-Peter
+> Use it to regain KASAN instrumentation of memcpy/memset/memmove on
+> architectures that require noinstr to be really free from instrumented
+> mem*() functions (all GENERIC_ENTRY architectures).
+>
+> Fixes: 69d4c0d32186 ("entry, kasan, x86: Disallow overriding mem*() functions")
+> Signed-off-by: Marco Elver <elver@google.com>
+> ---
+>
+> The Fixes tag is just there to show the dependency, and that people
+> shouldn't apply this patch without 69d4c0d32186.
+>
+> ---
+>  scripts/Makefile.kasan | 7 +++++++
+>  1 file changed, 7 insertions(+)
+>
+> diff --git a/scripts/Makefile.kasan b/scripts/Makefile.kasan
+> index b9e94c5e7097..78336b04c077 100644
+> --- a/scripts/Makefile.kasan
+> +++ b/scripts/Makefile.kasan
+> @@ -38,6 +38,13 @@ endif
+>
+>  CFLAGS_KASAN += $(call cc-param,asan-stack=$(stack_enable))
+>
+> +ifdef CONFIG_GENERIC_ENTRY
+> +# Instrument memcpy/memset/memmove calls by using instrumented __asan_mem*()
+> +# instead. With compilers that don't support this option, compiler-inserted
+> +# memintrinsics won't be checked by KASAN.
+> +CFLAGS_KASAN += $(call cc-param,asan-kernel-mem-intrinsic-prefix)
+> +endif
+> +
+>  endif # CONFIG_KASAN_GENERIC
+>
+>  ifdef CONFIG_KASAN_SW_TAGS
+> --
+> 2.39.1.519.gcb327c4b5f-goog
+>
