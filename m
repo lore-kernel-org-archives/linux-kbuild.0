@@ -2,201 +2,306 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC788C61DA4
-	for <linux-kbuild@archiver.kernel.org>; Wed, 15 Feb 2023 01:23:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C73D0C636D4
+	for <linux-kbuild@archiver.kernel.org>; Wed, 15 Feb 2023 12:52:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233643AbjBOBXP (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 14 Feb 2023 20:23:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45850 "EHLO
+        id S233791AbjBOMwV (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 15 Feb 2023 07:52:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233645AbjBOBXC (ORCPT
+        with ESMTP id S233733AbjBOMwN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 14 Feb 2023 20:23:02 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E81931E04;
-        Tue, 14 Feb 2023 17:22:15 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id D3769B81F88;
-        Wed, 15 Feb 2023 01:21:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E33BC4339E;
-        Wed, 15 Feb 2023 01:21:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1676424106;
-        bh=xoiM6mWes29Mf1DMrYU7f872NlsvnuFCR71OIJFjM4o=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=iKhDw9TF0XC+O2zLcgg8lApTf6z1ja4d0VaqGEyhzjIVCVWDLvgcZSHfpLlbfa919
-         F6fZ1fk75YaXiVm3kLtWz6lmhQ6fCgCbH6fCNRdpZBCSVc2TP2GwITBBF5BycMF31S
-         eUAKt1TI6iMR2UGSj/n9vEhoCdOGqfneO3bhzCSDhCPwvYsXJsKtvdAdcOnrMCvzTh
-         2r95oiedrUwQFamW/aBYqzAcMxY6qM7AHzkdh3nkecwaGACcYeEiOAp70iJNK77NxY
-         6/rzm/E/ed9j/6HWGjBckwcBB1ZV34Drkq4i2KoE1R7m4WkC5swJ/2ajHQsD9Ddkcs
-         pAcRuV+S0LtMQ==
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, Ben Hutchings <ben@decadent.org.uk>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nicolas Schier <nicolas@fjasle.eu>
-Subject: [PATCH v6 08/12] kbuild: make perf-tar*-src-pkg work without relying on git
-Date:   Wed, 15 Feb 2023 10:20:30 +0900
-Message-Id: <20230215012034.403356-8-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230215012034.403356-1-masahiroy@kernel.org>
-References: <20230215012034.403356-1-masahiroy@kernel.org>
+        Wed, 15 Feb 2023 07:52:13 -0500
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2062.outbound.protection.outlook.com [40.107.92.62])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BD3938032;
+        Wed, 15 Feb 2023 04:52:10 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lAVE8nqgQsSdcved5kWo8iyIA5hlYB/ZmQ/07h/4lujKykjZXIjnlIY/oiBtpbyHaYAuziSHnFcb+g5t1KlNUkFXU+0BoSiRVQ+YYqb0wHIP6uHs5FD5Pg25euv2hTdBvO9q0kPtp6IRAOz6HQXW+kMtZVzCztSBCymYtH/WeVT1HfdDM1x0rL0YQaLzB6uIy3qt7E47gNprlD1lCDjgfCrjgCiyHXvYIAvlNjHQZTje9ZHQtBSUe6M/o3wQhNmsVC2Z3NfVj1ZfNoINRoVqPDhnLv9lMRDt7IerIyR4ASlx1FLVpZMOLkg8V+8KMf+cZLNrpdv0Vp2PctKlItT28w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=40tMrOlwEBWREGyIhwLXGzGfwUYaOh610W5LfqIFbQs=;
+ b=U4KfV1bipSPAeohJeR5FrzN8TVJ8FctdNZlL4hkBZcWpqusGAHKG6tkAEwr/wdi6u9eiIQMfsz4w9d3U1mMrRJ/BrXnKf+p9ynD9JypDaAJ0YA3FN6uY6KtW/TS++HTQkSyQ/llRhBmNtEBKde5boZ6ns8Aklh/X8csAhR2Q41R9U9ITwMgcSK4HcMUWDHrl29VuBGs5rPrCm+dYNKpzQwwjHaTJuA+Wdv4tmuYmpigNe84ywa8GJOEYSSob94LZDVLF+IHjaoXmgb502ce4NxVAaxG8HUDi4bUmvoDFuq8cpbFtiPH17eIzH1G9wRJZ8im2iKTLOTZAFmado2aIfw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=40tMrOlwEBWREGyIhwLXGzGfwUYaOh610W5LfqIFbQs=;
+ b=EKjpuUm3JDbWo9yEXFrhvPHu+/+UnnO+p8V7eJ0WWHsloHoxvhicE9h8Ikxad8ygMetY5n2l0PnH40oly75C+Hgi4Makk8pOoDPucw5AcuMdw9Atxfkt1TnfqTZ012ShWUGebq2stbMA5elaja35RBY7CphVS2dKPUsDLfucaU8=
+Received: from BL1PR12MB5333.namprd12.prod.outlook.com (2603:10b6:208:31f::11)
+ by DM8PR12MB5477.namprd12.prod.outlook.com (2603:10b6:8:35::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.26; Wed, 15 Feb
+ 2023 12:52:07 +0000
+Received: from BL1PR12MB5333.namprd12.prod.outlook.com
+ ([fe80::882:91b4:9e16:6d84]) by BL1PR12MB5333.namprd12.prod.outlook.com
+ ([fe80::882:91b4:9e16:6d84%5]) with mapi id 15.20.6086.026; Wed, 15 Feb 2023
+ 12:52:06 +0000
+From:   "Agarwal, Nikhil" <nikhil.agarwal@amd.com>
+To:     "Gupta, Nipun" <Nipun.Gupta@amd.com>,
+        "robh+dt@kernel.org" <robh+dt@kernel.org>,
+        "krzysztof.kozlowski+dt@linaro.org" 
+        <krzysztof.kozlowski+dt@linaro.org>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "song.bao.hua@hisilicon.com" <song.bao.hua@hisilicon.com>,
+        "mchehab+huawei@kernel.org" <mchehab+huawei@kernel.org>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "f.fainelli@gmail.com" <f.fainelli@gmail.com>,
+        "jeffrey.l.hugo@gmail.com" <jeffrey.l.hugo@gmail.com>,
+        "saravanak@google.com" <saravanak@google.com>,
+        "Michael.Srba@seznam.cz" <Michael.Srba@seznam.cz>,
+        "mani@kernel.org" <mani@kernel.org>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        "jgg@ziepe.ca" <jgg@ziepe.ca>, "jgg@nvidia.com" <jgg@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "will@kernel.org" <will@kernel.org>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "masahiroy@kernel.org" <masahiroy@kernel.org>,
+        "ndesaulniers@google.com" <ndesaulniers@google.com>,
+        "rdunlap@infradead.org" <rdunlap@infradead.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>
+CC:     "okaya@kernel.org" <okaya@kernel.org>,
+        "Anand, Harpreet" <harpreet.anand@amd.com>,
+        "Simek, Michal" <michal.simek@amd.com>,
+        "git (AMD-Xilinx)" <git@amd.com>,
+        "Gupta, Nipun" <Nipun.Gupta@amd.com>
+Subject: RE: [PATCH v7 0/7] add support for CDX bus
+Thread-Topic: [PATCH v7 0/7] add support for CDX bus
+Thread-Index: AQHZNU/R42HTbcoQU0eH7h5/0tPKpa7QC+7g
+Date:   Wed, 15 Feb 2023 12:52:06 +0000
+Message-ID: <BL1PR12MB533354263F0C9A8D5234272E9DA39@BL1PR12MB5333.namprd12.prod.outlook.com>
+References: <20230131084049.23698-1-nipun.gupta@amd.com>
+In-Reply-To: <20230131084049.23698-1-nipun.gupta@amd.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Enabled=true;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SetDate=2023-02-15T12:52:04Z;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Method=Standard;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Name=General;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ActionId=b5e49cc6-4858-424e-b061-60ae14b01471;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ContentBits=1
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR12MB5333:EE_|DM8PR12MB5477:EE_
+x-ms-office365-filtering-correlation-id: 700edc50-aeea-480c-0024-08db0f5371b1
+x-ld-processed: 3dd8961f-e488-4e60-8e11-a82d994e183d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: OEbgMEI+jAv4o1DpKppvFjxctevaUlf0A3x9XNk0YEtZimFFJwq7B226Imq5GPQWTVcZrhCmwdDI5lPRbOcHWw5V5MAhzwar5JI/nVHWbK4fsEjyr54AI9LyzGgDe6sIkXKlt1MGfpZ+5633rUSnADZ1kLd+3AphKsV9QucG3Vz17t+LxLQPlUwAVp9SzFANFsOdxbvuocbWiDpmbXoxyfVCoPRVwVw5Saes6CQNtVlrkbpHEPpGHrPybgjRDfxyNEfkUtQH7gjYBxve3M/f2blAOLygZe4H2/VL7KnuquPwWf+LKZIkGpjDGwZXhn6YKf+sAzsubMVb3JKfu4tRHa4oo9SYvnszy5qNr8cDrJd2gxw0UQwv+N17MFpVNrplY5lrzN5QwVBAwQT2Enj1oCqj+NooPYX8JnhA6A8DiyIWrPnVC80RfYoqC2+1sMDcX+D7diqM9onbTueYbeZxjK1jaRTsCqGYfmgMMX8Zr1LvD2Gdk5cQ3LmnbF4uPFP2CdsnWd25Eae0kVsa7lTvyRa1C8O1/ua3PACqIJdxI3qLWhHhI0KZaxVYhDIm1ZbkNyqek7x2X1GfnNOJ9r2hW0LMjBUe8q8cLelQI243SkQISKOaapG5ud2uB0H/EvErWEZbhcpxd+9EAwAM8/KMjL26fccEBD1uW7UaMkkP4nLoZ21sz47ekTYaHDWysGK64xcwZ342KoIGBrn6Guj82x+K2BEyKxrqr60Oktv1iIRwEtNuQh8KSsX4iJwzx3tJ
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5333.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(396003)(39860400002)(376002)(346002)(366004)(136003)(451199018)(921005)(71200400001)(7696005)(316002)(7406005)(110136005)(66946007)(478600001)(54906003)(26005)(53546011)(9686003)(966005)(5660300002)(2906002)(52536014)(66556008)(4326008)(41300700001)(66446008)(66476007)(76116006)(8676002)(64756008)(8936002)(7416002)(186003)(86362001)(33656002)(55016003)(38100700002)(6506007)(38070700005)(83380400001)(122000001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?fCc+7JNONxU/Ycbi5fQEwTvLBLpq+X0qvdVqhLP+OH1IoVBzpY/bA0GBauXu?=
+ =?us-ascii?Q?+ZwrbBVfsOjRaURpXRoljp52ZXjkcCuuChXQPhXuUT4FOzLIHl+AxYef4sdW?=
+ =?us-ascii?Q?eLddujTLy1Lsam1eHTYe6vAs/jFSrvhraB59p1DzjQJ3ND4M82RdKEn/sfIP?=
+ =?us-ascii?Q?bjAA/qt2MM8R7tpCHEfSOiNV3QpOnT7HLJI01J/YQ11wrfe9taOae2cdylzv?=
+ =?us-ascii?Q?9xm4F3VVlcJc7vlWXK2cx+HvOz6TO2hHwgb+PNIjvcN32bvF/dWeA+lxjxaC?=
+ =?us-ascii?Q?hUk4+ogtySaLZI2GTVE9Hbl5tXtDdojvH0zk/uXLhWdgU0dBx0TCVSgW08Bd?=
+ =?us-ascii?Q?W1suZbYwvNRtzLOcSUdmUGc8YSbBRG2Uem5Ep483dEyd1fEM3H+xXI0opd3D?=
+ =?us-ascii?Q?ascpM6ivME9amfk6OTSgzLp+clAGGQFs/6xLa8xOJ9J4eZwk7MXNfLcduRm0?=
+ =?us-ascii?Q?jVWsPs3V6qDgGYm1sZDvfc/ndiXdiOIUZg2U/+vo2PD+4qqb5cJXGamIHuzf?=
+ =?us-ascii?Q?bxfju6d6CMC2vsnxn9K1uSzG5Qls24JzMLDd4VNXo4cUTGBS8yFE8dkNJXDk?=
+ =?us-ascii?Q?UY5LuqqBUeKXHbgQqrSOOsmpFDYSMXVSFflVzNp0huaEalNwNPfyh2gtgakt?=
+ =?us-ascii?Q?Q5Ja9MCHusU6MF75auXU25pGQseIB2YEh1f4PJOvJExkDuMqMW8nJhyyl0da?=
+ =?us-ascii?Q?N3zV4uw/b2UWcB0lgoifiBica+x++6H3ScfrhXqplZIlqdQ35jhxBlY473mI?=
+ =?us-ascii?Q?ASh/ez//2vrsTndnGaY1elujgY9ASG3vd0/dihzoCppUm/YCOEt2nZ55OGqu?=
+ =?us-ascii?Q?yhtLBJko8xj0yIYKc+X2wtf61462AxgAHNZNu9HU49pJHIRK/uBVh8p1Z4sM?=
+ =?us-ascii?Q?Y/bwMobWUzLXqE0aIK83cPT9+MAIOJKkx5Le4xWR2mkGqSkERzp60elcIcWU?=
+ =?us-ascii?Q?jEcUsBpi1pSf1lIncrMnVTIRaOxa1NVq5E/aqGfFmEOYaI+zvjvcEMoLtTHl?=
+ =?us-ascii?Q?7x2CHxq90MSIzrYKhmyDjvLoYIQnXcY6CRfZ2UhZNJyJkp4Hd2DAKvbONOte?=
+ =?us-ascii?Q?j983swDZsxP/rbEGwy1VrhJo4U3cgh9kxt6N45jim/BQ1oxQhLgQJlWDLLsm?=
+ =?us-ascii?Q?vGWQa86GUHs67ArKQKb/Dux0FY+qroivspkcGnPtDCUrkhfBNHV3E5gZtNrL?=
+ =?us-ascii?Q?tHP7ceH+NLaSpePE3p4ZtE3fX6ZALGR4PhrkXw8VkYCmBVAmdpS3rECsq/1d?=
+ =?us-ascii?Q?4TGVDIdzwPHF1x6LCMHjQVoSnOYjJW5BVZ8+1ksnTgIWUxCja35Yq9Ucwjzd?=
+ =?us-ascii?Q?K6Aw/brGxmnwWA1L6iOql2jf2VhdRbOlsn/fK8a2QST5u3mCh/M9O5EPQE86?=
+ =?us-ascii?Q?0uZTjjHNzyKPpGXRSd1PMvp+4xSwT/ARdzpD67vvbOJvZB5+WpO7B1BqFvs3?=
+ =?us-ascii?Q?NUgUQopZK34IHHjxYazS1kZ7dFkK6nZQxELi3WCH5zQW+D6eUzNFVjm4KiAC?=
+ =?us-ascii?Q?RRFFpL+Gyy6PLFDIsFXXMLRxPOrldfQ8oi8gd+oNNP5BP3HC5VxUj+wzYR03?=
+ =?us-ascii?Q?IxeI+bcgNnbwvqkk9OE=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5333.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 700edc50-aeea-480c-0024-08db0f5371b1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Feb 2023 12:52:06.7029
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 9iHFb2jjFi/p5o81Pk1S3aaYqsvtChgjMVM0Q5Dw5ZQPU4CwKeXz8SibEi0azf38
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR12MB5477
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Currently, perf-tar*-src-pkg only uses 'git archive', but it is better
-to make it work without relying on git.
+[AMD Official Use Only - General]
 
-The file, HEAD, which saves the commit hash, will be included in the
-tarball only when the source tree is managed by git. The git tree is
-more precisely checked; it has been copied from scripts/setlocalversion.
+CDX bus driver series:
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+Tested-by: Nikhil Agarwal <nikhil.agarwal@amd.com>
 
-(no changes since v5)
+On a vnc board for versal-net. Also, on QEMU simulation platform.
 
-Changes in v5:
-  - New patch
-
- scripts/Makefile.package | 97 ++++++++++++++++++++++++++--------------
- 1 file changed, 64 insertions(+), 33 deletions(-)
-
-diff --git a/scripts/Makefile.package b/scripts/Makefile.package
-index 5538deacb136..50b86b325d7a 100644
---- a/scripts/Makefile.package
-+++ b/scripts/Makefile.package
-@@ -50,10 +50,25 @@ quiet_cmd_tar = TAR     $@
- 
- tar-rootdir := $(srctree)
- 
-+%.tar:
-+	$(call cmd,tar)
-+
- %.tar.gz: private tar-compress-opt := -I $(KGZIP)
- %.tar.gz:
- 	$(call cmd,tar)
- 
-+%.tar.bz2: private tar-compress-opt := -I $(KBZIP2)
-+%.tar.bz2:
-+	$(call cmd,tar)
-+
-+%.tar.xz: private tar-compress-opt := -I $(XZ)
-+%.tar.xz:
-+	$(call cmd,tar)
-+
-+%.tar.zst: private tar-compress-opt := -I $(ZSTD)
-+%.tar.zst:
-+	$(call cmd,tar)
-+
- # Linux source tarball
- # ---------------------------------------------------------------------------
- 
-@@ -138,36 +153,52 @@ $(tar-pkgs):
- 	$(MAKE) -f $(srctree)/Makefile
- 	+$(CONFIG_SHELL) $(srctree)/scripts/package/buildtar $@
- 
--# perf-pkg - generate a source tarball with perf source
-+# perf-tar*-src-pkg - generate a source tarball with perf source
- # ---------------------------------------------------------------------------
- 
--perf-tar=perf-$(KERNELVERSION)
--
--quiet_cmd_perf_tar = TAR
--      cmd_perf_tar = \
--git --git-dir=$(srctree)/.git archive --prefix=$(perf-tar)/         \
--	HEAD^{tree} $$(cd $(srctree);                               \
--		       echo $$(cat tools/perf/MANIFEST)) \
--	-o $(perf-tar).tar;                                         \
--mkdir -p $(perf-tar);                                               \
--git --git-dir=$(srctree)/.git rev-parse HEAD > $(perf-tar)/HEAD;    \
--(cd $(srctree)/tools/perf;                                          \
--util/PERF-VERSION-GEN $(CURDIR)/$(perf-tar)/);              \
--tar rf $(perf-tar).tar $(perf-tar)/HEAD $(perf-tar)/PERF-VERSION-FILE; \
--rm -r $(perf-tar);                                                  \
--$(if $(findstring tar-src,$@),,                                     \
--$(if $(findstring bz2,$@),$(KBZIP2),                                 \
--$(if $(findstring gz,$@),$(KGZIP),                                  \
--$(if $(findstring xz,$@),$(XZ),                                     \
--$(if $(findstring zst,$@),$(ZSTD),                                  \
--$(error unknown target $@)))))                                      \
--	-f -9 $(perf-tar).tar)
--
--perf-tar-pkgs := perf-tar-src-pkg perf-targz-src-pkg perf-tarbz2-src-pkg \
--		 perf-tarxz-src-pkg perf-tarzst-src-pkg
--PHONY += $(perf-tar-pkgs)
--$(perf-tar-pkgs):
--	$(call cmd,perf_tar)
-+perf-tar-src-pkg-tarball = perf-$(KERNELVERSION).$(1)
-+perf-tar-src-pkg-phony   = perf-$(subst .,,$(1))-src-pkg
-+
-+quiet_cmd_stage_perf_src = STAGE   $@
-+      cmd_stage_perf_src = \
-+	rm -rf $@; \
-+	mkdir -p $@; \
-+	tar -c -f - --exclude-from=$<_exclude -C $(srctree) --files-from=$(srctree)/tools/perf/MANIFEST | \
-+	tar -x -f - -C $@
-+
-+.tmp_perf: .tmp_filelist
-+	$(call cmd,stage_perf_src)
-+
-+filechk_perf_head = \
-+	if test -z "$(git -C $(srctree) rev-parse --show-cdup 2>/dev/null)" && \
-+	       head=$$(git -C $(srctree) rev-parse --verify HEAD 2>/dev/null); then \
-+		echo $$head; \
-+	else \
-+		echo "not a git tree"; \
-+	fi
-+
-+.tmp_perf/HEAD: .tmp_perf FORCE
-+	$(call filechk,perf_head)
-+
-+quiet_cmd_perf_version_file = GEN     $@
-+      cmd_perf_version_file = cd $(srctree)/tools/perf; util/PERF-VERSION-GEN $(dir $(abspath $@))
-+
-+# PERF-VERSION-FILE and HEAD are independent, but this avoids updating the
-+# timestamp of PERF-VERSION-FILE.
-+# The best is to fix tools/perf/util/PERF-VERSION-GEN.
-+.tmp_perf/PERF-VERSION-FILE: .tmp_perf/HEAD $(srctree)/tools/perf/util/PERF-VERSION-GEN
-+	$(call cmd,perf_version_file)
-+
-+define perf-tar-src-pkg-rule
-+PHONY += $(perf-tar-src-pkg-phony)
-+$(perf-tar-src-pkg-phony): $(perf-tar-src-pkg-tarball)
-+	@:
-+
-+$(perf-tar-src-pkg-tarball): private tar-rootdir := .tmp_perf
-+$(perf-tar-src-pkg-tarball): .tmp_filelist .tmp_perf/HEAD .tmp_perf/PERF-VERSION-FILE
-+endef
-+
-+$(foreach x, tar tar.gz tar.bz2 tar.xz tar.zst, $(eval $(call perf-tar-src-pkg-rule,$(x))))
- 
- # Help text displayed when executing 'make help'
- # ---------------------------------------------------------------------------
-@@ -186,11 +217,11 @@ help:
- 	@echo '  tarbz2-pkg          - Build the kernel as a bzip2 compressed tarball'
- 	@echo '  tarxz-pkg           - Build the kernel as a xz compressed tarball'
- 	@echo '  tarzst-pkg          - Build the kernel as a zstd compressed tarball'
--	@echo '  perf-tar-src-pkg    - Build $(perf-tar).tar source tarball'
--	@echo '  perf-targz-src-pkg  - Build $(perf-tar).tar.gz source tarball'
--	@echo '  perf-tarbz2-src-pkg - Build $(perf-tar).tar.bz2 source tarball'
--	@echo '  perf-tarxz-src-pkg  - Build $(perf-tar).tar.xz source tarball'
--	@echo '  perf-tarzst-src-pkg - Build $(perf-tar).tar.zst source tarball'
-+	@echo '  perf-tar-src-pkg    - Build the perf source tarball with no compression'
-+	@echo '  perf-targz-src-pkg  - Build the perf source tarball with gzip compression'
-+	@echo '  perf-tarbz2-src-pkg - Build the perf source tarball with bz2 compression'
-+	@echo '  perf-tarxz-src-pkg  - Build the perf source tarball with xz compression'
-+	@echo '  perf-tarzst-src-pkg - Build the perf source tarball with zst compression'
- 
- PHONY += FORCE
- FORCE:
--- 
-2.34.1
-
+> -----Original Message-----
+> From: Nipun Gupta <nipun.gupta@amd.com>
+> Sent: Tuesday, January 31, 2023 2:11 PM
+> To: robh+dt@kernel.org; krzysztof.kozlowski+dt@linaro.org;
+> gregkh@linuxfoundation.org; rafael@kernel.org; eric.auger@redhat.com;
+> alex.williamson@redhat.com; cohuck@redhat.com;
+> song.bao.hua@hisilicon.com; mchehab+huawei@kernel.org; maz@kernel.org;
+> f.fainelli@gmail.com; jeffrey.l.hugo@gmail.com; saravanak@google.com;
+> Michael.Srba@seznam.cz; mani@kernel.org; yishaih@nvidia.com;
+> jgg@ziepe.ca; jgg@nvidia.com; robin.murphy@arm.com; will@kernel.org;
+> joro@8bytes.org; masahiroy@kernel.org; ndesaulniers@google.com;
+> rdunlap@infradead.org; linux-arm-kernel@lists.infradead.org; linux-
+> kbuild@vger.kernel.org; linux-kernel@vger.kernel.org;
+> devicetree@vger.kernel.org
+> Cc: okaya@kernel.org; Anand, Harpreet <harpreet.anand@amd.com>;
+> Agarwal, Nikhil <nikhil.agarwal@amd.com>; Simek, Michal
+> <michal.simek@amd.com>; git (AMD-Xilinx) <git@amd.com>; Gupta, Nipun
+> <Nipun.Gupta@amd.com>
+> Subject: [PATCH v7 0/7] add support for CDX bus
+>=20
+> Introduce AMD CDX bus, which provides a mechanism to discover/rescan CDX
+> devices. The CDX devices are memory mapped on system bus for embedded
+> CPUs.
+>=20
+> CDX controller interacts with the firmware to query different CDX devices
+> present in the Fabric and expose them to the Linux host on CDX bus.
+>=20
+> This patch series:
+> - Introduces the CDX bus and CDX devices.
+> - Device tree binding for CDX controller
+> - Support for CDX bus in arm-smmu-v3 driver
+> - Add MCDI (Management CPU Driver Interface) as a protocol
+>   for communication with RPU Firmware
+> - Support RPMSg channel for Firmware communication
+>=20
+> v6 patch series is at:
+> https://lore.kernel.org/lkml/20230117134139.1298-4-
+> nipun.gupta@amd.com/T/
+>=20
+> Changes v6 -> v7
+> - Fix compilation for x86 environment in case CDX bus is enabled
+> - Fixed crash in reset if device is not bound to any device driver
+> - Update sysfs with typo and other minor changes
+> - Removed header file issue reported by make versioncheck
+>=20
+> Changes v5 -> v6
+> - updated compatible name in the CDX dt-binding
+> - updated reset CDX device and removed redundant function
+> - moved from drivers/bus/cdx to drivers/cdx
+> - used xarray instead of controller list and ID
+> - updated sysfs documentation with more details
+>=20
+> Changes RFC v4 -> v5
+> - Fixed device tree documentation
+> - Add MCDI as a protocol and RPMsg as transport for communication
+>   with RPU Firmware instead of using MCDI stubs.
+> - MSI patches for CDX are not added in this series as it's
+>   support is being revisited as per patch series:
+>   https://lore.kernel.org/all/20221111133158.196269823@linutronix.de/
+>   It will be added as separate patches.
+>=20
+> Changes RFC v3 -> RFC v4:
+>  - Separate CDX bus and CDX controller driver (Greg K-H)
+>  - Added MSI interfacing to Firmware for writing MSI message
+>    to firmware so it can be provided to the device.
+>  - Fix MSI review comments - multiple cleanups (Mark Zynger)
+>  - Fix the device tree yaml compilation (Rob Herring, Krzysztof)
+>  - removed vfio-cdx from this series. It will be added after bus
+>    support is complete (Jason)
+>=20
+> Changes RFC v2 -> RFC v3:
+> - Move CDX bus as a new bus type in kernel rather than
+>   using the platform devices (Greg K-H, Marc Zynger)
+> - Correspondingly update ARM SMMU v3
+> - Add support for vfio-cdx driver
+> - Updated device tree yaml with correct binding information
+>   (Krzysztof Kozlowski)
+> - remove 'compatible' sysfs platform patch which was required
+>   for CDX devices exposed as platform devices
+>=20
+> Changes RFC v1 -> RFC v2:
+> - introduce CDX bus infrastructure
+> - fixed code for making compatible visible for devices
+>   having the 'compatible' property only (Greg K-H)
+> - moved CDX-MSI domain as part of CDX bus infrastructure.
+>   previously it was part of irqchip (Marc Zynger).
+> - fixed few prints (Greg K-H)
+> - support rescan and reset of CDX bus
+> - add VFIO reset module for CDX bus based devices
+>=20
+> Abhijit Gangurde (1):
+>   cdx: add rpmsg communication channel for CDX
+>=20
+> Nipun Gupta (6):
+>   cdx: add the cdx bus driver
+>   iommu/arm-smmu-v3: support ops registration for CDX bus
+>   dt-bindings: bus: add CDX bus controller for versal net
+>   cdx: add MCDI protocol interface for firmware interaction
+>   cdx: add cdx controller
+>   cdx: add device attributes
+>=20
+>  Documentation/ABI/testing/sysfs-bus-cdx       |  56 ++
+>  .../bindings/bus/xlnx,versal-net-cdx.yaml     |  68 ++
+>  MAINTAINERS                                   |   8 +
+>  drivers/Kconfig                               |   2 +
+>  drivers/Makefile                              |   1 +
+>  drivers/cdx/Kconfig                           |  19 +
+>  drivers/cdx/Makefile                          |   8 +
+>  drivers/cdx/cdx.c                             | 553 +++++++++++
+>  drivers/cdx/cdx.h                             |  62 ++
+>  drivers/cdx/controller/Kconfig                |  30 +
+>  drivers/cdx/controller/Makefile               |   9 +
+>  drivers/cdx/controller/bitfield.h             |  90 ++
+>  drivers/cdx/controller/cdx_controller.c       | 230 +++++
+>  drivers/cdx/controller/cdx_controller.h       |  30 +
+>  drivers/cdx/controller/cdx_rpmsg.c            | 202 ++++
+>  drivers/cdx/controller/mc_cdx_pcol.h          | 590 ++++++++++++
+>  drivers/cdx/controller/mcdi.c                 | 911 ++++++++++++++++++
+>  drivers/cdx/controller/mcdi.h                 | 247 +++++
+>  drivers/cdx/controller/mcdi_functions.c       | 139 +++
+>  drivers/cdx/controller/mcdi_functions.h       |  61 ++
+>  drivers/iommu/iommu.c                         |   4 +
+>  include/linux/cdx/cdx_bus.h                   | 174 ++++
+>  include/linux/mod_devicetable.h               |  15 +
+>  scripts/mod/devicetable-offsets.c             |   4 +
+>  scripts/mod/file2alias.c                      |  12 +
+>  25 files changed, 3525 insertions(+)
+>  create mode 100644 Documentation/ABI/testing/sysfs-bus-cdx
+>  create mode 100644 Documentation/devicetree/bindings/bus/xlnx,versal-
+> net-cdx.yaml
+>  create mode 100644 drivers/cdx/Kconfig
+>  create mode 100644 drivers/cdx/Makefile  create mode 100644
+> drivers/cdx/cdx.c  create mode 100644 drivers/cdx/cdx.h  create mode
+> 100644 drivers/cdx/controller/Kconfig  create mode 100644
+> drivers/cdx/controller/Makefile  create mode 100644
+> drivers/cdx/controller/bitfield.h  create mode 100644
+> drivers/cdx/controller/cdx_controller.c
+>  create mode 100644 drivers/cdx/controller/cdx_controller.h
+>  create mode 100644 drivers/cdx/controller/cdx_rpmsg.c
+>  create mode 100644 drivers/cdx/controller/mc_cdx_pcol.h
+>  create mode 100644 drivers/cdx/controller/mcdi.c  create mode 100644
+> drivers/cdx/controller/mcdi.h  create mode 100644
+> drivers/cdx/controller/mcdi_functions.c
+>  create mode 100644 drivers/cdx/controller/mcdi_functions.h
+>  create mode 100644 include/linux/cdx/cdx_bus.h
+>=20
+> --
+> 2.17.1
