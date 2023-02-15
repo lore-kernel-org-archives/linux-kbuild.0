@@ -2,36 +2,36 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 409B3C61DA4
-	for <linux-kbuild@archiver.kernel.org>; Wed, 15 Feb 2023 01:22:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06EA2C6379F
+	for <linux-kbuild@archiver.kernel.org>; Wed, 15 Feb 2023 01:22:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233486AbjBOBWV (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 14 Feb 2023 20:22:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44034 "EHLO
+        id S233472AbjBOBWg (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 14 Feb 2023 20:22:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233497AbjBOBWT (ORCPT
+        with ESMTP id S233491AbjBOBWU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 14 Feb 2023 20:22:19 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DB9334C08;
-        Tue, 14 Feb 2023 17:21:47 -0800 (PST)
+        Tue, 14 Feb 2023 20:22:20 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FBD432CD2;
+        Tue, 14 Feb 2023 17:21:49 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id EB762B81F8F;
-        Wed, 15 Feb 2023 01:21:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F6CCC433A0;
-        Wed, 15 Feb 2023 01:21:43 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id ED1076199C;
+        Wed, 15 Feb 2023 01:21:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0DBCC433D2;
+        Wed, 15 Feb 2023 01:21:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1676424104;
-        bh=1ifncx4mS+h9vwXHr2C/Xo2uXi8XsaHG4mWZBULRw1c=;
+        s=k20201202; t=1676424108;
+        bh=WszWYo1Dp3gtPmdsDTDcLO4U185HID5tYaADLVl+YJ8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=XtQoInXqwBBDqL5I5+ZdSX1wJAP66Af55RnkhqvPKRs2BxZyd4v56MJUN/onpbptt
-         mp1flP19iQ/ANlIUuocu9BC1yPnSTiw/c6VkJPcIFn8LFRl2Du6SfXb8PujfxMVQ9T
-         Sp6djTtBF39C9uHv1Gk2icPhAkugamAKnlZSDw8Afm4NqHwo76zgYq058yYuSiQNWr
-         Uca0cLwmw4V2n+Eo/QJl0GqEsFoOxDnMx6ZrBh/8qMoSwRZaaSQSnJl8/SRa8PUp/u
-         frMO7YWv4UabEq4FGtnIO6t57Rxut89k8WmdPDt7TdvvVglvs0ebH288PypFNVhVBy
-         GP7KnJWdhBEnw==
+        b=tuXS3J3lUbtayvg3n33el4JAI3hK8xT9eZMWTj6IPX1KusGuisadhyvWNeu5MGZh5
+         wFDikPC6YAbtPrvVF0ls/l2XO93KH2ogMTlvoRm8g3//MatM+WVGiEy1dqnsETc6bE
+         qiHXJrxo5cCvqh/lHPXO+fFmOot3/DrhSXEbUo0i6K2lqjBs15VYDMxobws3pweOuG
+         dqkl2/QnvzWD9h6wgefhNvPpg7Hf3M4hGpsnTfqyIhZIMRYEvsOTvT2FusR7JvHpUp
+         y7cV2B5Xh83kEp3LuFB4DWn9+9+QqdhJq7rLSOBwHcl+TBNzp+DPq2H8amFcQNprLJ
+         3hmB9vs4eI7PQ==
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, Ben Hutchings <ben@decadent.org.uk>,
@@ -39,9 +39,9 @@ Cc:     linux-kernel@vger.kernel.org, Ben Hutchings <ben@decadent.org.uk>,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
         Nicolas Schier <nicolas@fjasle.eu>
-Subject: [PATCH v6 07/12] kbuild: deb-pkg: switch over to source format 3.0 (quilt)
-Date:   Wed, 15 Feb 2023 10:20:29 +0900
-Message-Id: <20230215012034.403356-7-masahiroy@kernel.org>
+Subject: [PATCH v6 09/12] kbuild: tar-pkg: use tar rules in scripts/Makefile.package
+Date:   Wed, 15 Feb 2023 10:20:31 +0900
+Message-Id: <20230215012034.403356-9-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230215012034.403356-1-masahiroy@kernel.org>
 References: <20230215012034.403356-1-masahiroy@kernel.org>
@@ -51,98 +51,127 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Change the source format from "1.0" to "3.0 (quilt)" because it works
-more cleanly.
-
-All files except .config and debian/ go into the orig tarball.
-Add a single patch, debian/patches/config, and delete the ugly
-extend-diff-ignore patterns.
-
-The debian tarball will be compressed into *.debian.tar.xz by default.
-If you like to use a different compression mode, you can pass the
-command line option, DPKG_FLAGS=-Zgzip, for example.
-
-The orig tarball only supports gzip for now. The combination of
-gzip and xz is somewhat clumsy, but it is not a practical problem.
+Use %.tar, %.tar.gz, %.tar.bz2, %.tar.xz, %.tar.zst rules in
+scripts/Makefile.package.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
 Changes in v6:
-  - Fix error when KCONFIG_CONFIG is set
+ - New patch
 
-Changes in v4:
-  - New patch
-
- scripts/Makefile.package |  2 +-
- scripts/package/mkdebian | 41 ++++++++++++++++++----------------------
- 2 files changed, 19 insertions(+), 24 deletions(-)
+ scripts/Makefile.package | 29 +++++++++++++++++-----
+ scripts/package/buildtar | 52 +---------------------------------------
+ 2 files changed, 24 insertions(+), 57 deletions(-)
 
 diff --git a/scripts/Makefile.package b/scripts/Makefile.package
-index 80a96eb61426..5538deacb136 100644
+index 50b86b325d7a..b941e6341b36 100644
 --- a/scripts/Makefile.package
 +++ b/scripts/Makefile.package
-@@ -105,7 +105,7 @@ debian-orig: linux.tar.gz debian
- PHONY += deb-pkg
- deb-pkg: debian-orig
- 	+dpkg-buildpackage -r$(KBUILD_PKG_ROOTCMD) -a$$(cat debian/arch) $(DPKG_FLAGS) \
--		--build=source,binary --source-option=-sP -nc -us -uc
-+		--build=source,binary -nc -us -uc
+@@ -145,13 +145,30 @@ snap-pkg:
+ 	cd $(objtree)/snap && \
+ 	snapcraft --target-arch=$(UTS_MACHINE)
  
- PHONY += bindeb-pkg
- bindeb-pkg: debian
-diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
-index 534e9713761a..22fc73a5e4f2 100755
---- a/scripts/package/mkdebian
-+++ b/scripts/package/mkdebian
-@@ -135,29 +135,24 @@ else
- fi
- 
- mkdir -p debian/source/
--echo "1.0" > debian/source/format
--
--# Ugly: ignore anything except .config or debian/
--cat<<'EOF' > debian/source/local-options
--diff-ignore
--
--extend-diff-ignore = ^[^.d]
--
--extend-diff-ignore = ^\.[^c]
--extend-diff-ignore = ^\.c($|[^o])
--extend-diff-ignore = ^\.co($|[^n])
--extend-diff-ignore = ^\.con($|[^f])
--extend-diff-ignore = ^\.conf($|[^i])
--extend-diff-ignore = ^\.confi($|[^g])
--extend-diff-ignore = ^\.config.
--
--extend-diff-ignore = ^d($|[^e])
--extend-diff-ignore = ^de($|[^b])
--extend-diff-ignore = ^deb($|[^i])
--extend-diff-ignore = ^debi($|[^a])
--extend-diff-ignore = ^debia($|[^n])
--extend-diff-ignore = ^debian[^/]
--EOF
-+echo "3.0 (quilt)" > debian/source/format
+-# tarball targets
++# dir-pkg tar*-pkg - tarball targets
+ # ---------------------------------------------------------------------------
+-tar-pkgs := dir-pkg tar-pkg targz-pkg tarbz2-pkg tarxz-pkg tarzst-pkg
+-PHONY += $(tar-pkgs)
+-$(tar-pkgs):
+-	$(MAKE) -f $(srctree)/Makefile
+-	+$(CONFIG_SHELL) $(srctree)/scripts/package/buildtar $@
 +
-+{
-+	echo "diff-ignore"
-+	echo "extend-diff-ignore = .*"
-+} > debian/source/local-options
++tar-pkg-tarball = linux-$(KERNELRELEASE)-$(ARCH).$(1)
++tar-pkg-phony = $(subst .,,$(1))-pkg
 +
-+# Add .config as a patch
-+mkdir -p debian/patches
-+{
-+	echo "Subject: Add .config"
-+	echo "Author: ${maintainer}"
-+	echo
-+	echo "--- /dev/null"
-+	echo "+++ linux/.config"
-+	diff -u /dev/null "${KCONFIG_CONFIG}" | tail -n +3
-+} > debian/patches/config
-+echo config > debian/patches/series
++tar-install: FORCE
++	$(Q)$(MAKE) -f $(srctree)/Makefile
++	+$(Q)$(srctree)/scripts/package/buildtar $@
++
++PHONY += dir-pkg
++dir-pkg: tar-install
++	@echo "Kernel tree successfully created in $<"
++
++define tar-pkg-rule
++PHONY += $(tar-pkg-phony)
++$(tar-pkg-phony): $(tar-pkg-tarball)
++	@:
++
++$(tar-pkg-tarball): private tar-rootdir := tar-install
++$(tar-pkg-tarball): tar-install
++endef
++
++$(foreach x, tar tar.gz tar.bz2 tar.xz tar.zst, $(eval $(call tar-pkg-rule,$(x))))
  
- echo $debarch > debian/arch
- extra_build_depends=", $(if_enabled_echo CONFIG_UNWINDER_ORC libelf-dev:native)"
+ # perf-tar*-src-pkg - generate a source tarball with perf source
+ # ---------------------------------------------------------------------------
+diff --git a/scripts/package/buildtar b/scripts/package/buildtar
+index 4d6f0b128efd..65b4ea502962 100755
+--- a/scripts/package/buildtar
++++ b/scripts/package/buildtar
+@@ -16,39 +16,7 @@ set -e
+ #
+ # Some variables and settings used throughout the script
+ #
+-tmpdir="${objtree}/tar-install"
+-tarball="${objtree}/linux-${KERNELRELEASE}-${ARCH}.tar"
+-
+-
+-#
+-# Figure out how to compress, if requested at all
+-#
+-case "${1}" in
+-	dir-pkg|tar-pkg)
+-		opts=
+-		;;
+-	targz-pkg)
+-		opts="-I ${KGZIP}"
+-		tarball=${tarball}.gz
+-		;;
+-	tarbz2-pkg)
+-		opts="-I ${KBZIP2}"
+-		tarball=${tarball}.bz2
+-		;;
+-	tarxz-pkg)
+-		opts="-I ${XZ}"
+-		tarball=${tarball}.xz
+-		;;
+-	tarzst-pkg)
+-		opts="-I ${ZSTD}"
+-		tarball=${tarball}.zst
+-		;;
+-	*)
+-		echo "Unknown tarball target \"${1}\" requested, please add it to ${0}." >&2
+-		exit 1
+-		;;
+-esac
+-
++tmpdir=$1
+ 
+ #
+ # Clean-up and re-create the temporary directory
+@@ -148,21 +116,3 @@ case "${ARCH}" in
+ 		sleep 5
+ 		;;
+ esac
+-
+-if [ "${1}" = dir-pkg ]; then
+-	echo "Kernel tree successfully created in $tmpdir"
+-	exit 0
+-fi
+-
+-#
+-# Create the tarball
+-#
+-if tar --owner=root --group=root --help >/dev/null 2>&1; then
+-	opts="$opts --owner=root --group=root"
+-fi
+-
+-tar cf $tarball -C $tmpdir $opts $dirs
+-
+-echo "Tarball successfully created in $tarball"
+-
+-exit 0
 -- 
 2.34.1
 
