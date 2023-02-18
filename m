@@ -2,165 +2,123 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90984C636D7
-	for <linux-kbuild@archiver.kernel.org>; Fri, 17 Feb 2023 20:23:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71F23C61DA4
+	for <linux-kbuild@archiver.kernel.org>; Sat, 18 Feb 2023 08:17:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229482AbjBQUXP (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 17 Feb 2023 15:23:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50220 "EHLO
+        id S229636AbjBRIRT (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 18 Feb 2023 03:17:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229746AbjBQUXN (ORCPT
+        with ESMTP id S229460AbjBRIRS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 17 Feb 2023 15:23:13 -0500
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A5A860A50;
-        Fri, 17 Feb 2023 12:23:10 -0800 (PST)
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31HE1FHg009572;
-        Fri, 17 Feb 2023 20:22:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-type; s=qcppdkim1;
- bh=OwC1YUWD4RDPqj6ij1e+DtTL840oqoIG3+VP9IMFt2g=;
- b=bopzOf1sOHwKpGmFctnCshxn/e3t7HACszkx8XXJmZidnK75m5QfFlWdsc1irOH1jO94
- Rqgl99mQ1rkNYGtvlf3skcBhcG1dMhq9LsGLR/t0M8qRfiCGKvMlbj0ThTCyp83YRbUi
- o6VLEZZrtKl7b5t6ebvoy+yccyTCgKFahXR+HSNFQhwRqLcGB8Ouihb/PPf4B4fJ5Ttm
- XxqaIz4Xz/+6cQJJL8+GaLBWCb0aar0ihUlWah3EPZz5poqPlLp33HGfsTKlpJbkuK9/
- LCBieBD+YiTcYs6qjt+MxfNArLy/fE/GEFSbQIkUEz3sxXLwQkmYfK2ofWLLV2bZPJzf Zg== 
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ntayfs34c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Feb 2023 20:22:58 +0000
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-        by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 31HKMuxI015818
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Feb 2023 20:22:56 GMT
-Received: from hu-johmoo-lv.qualcomm.com (10.49.16.6) by
- nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.41; Fri, 17 Feb 2023 12:22:56 -0800
-From:   John Moon <quic_johmoo@quicinc.com>
-To:     Masahiro Yamada <masahiroy@kernel.org>,
+        Sat, 18 Feb 2023 03:17:18 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16DB62C649;
+        Sat, 18 Feb 2023 00:17:17 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id BD00CB82EB1;
+        Sat, 18 Feb 2023 08:17:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 036B4C433EF;
+        Sat, 18 Feb 2023 08:17:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1676708234;
+        bh=BNbl3BOcb+TlBY9OXcmytUp8bjBVyH+3E4aP7IoRNH0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=SWJYFb5xLWZn4MAB7/ao/J1LRMuU1xsaMmdRB79QEBVq4atB/HfbpRH6JVr3J0sjw
+         krdibM1Q7MV4zfR2QmsCk/RPIPeSGhNkSunqTYhWSxTvmahfgTwPK9NUgMfuFPIcXf
+         QYeOLp65+hSqgEP2QbMbHQfcRUHhOn3YpBtQSJc8=
+Date:   Sat, 18 Feb 2023 09:17:11 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     John Moon <quic_johmoo@quicinc.com>,
+        Randy Dunlap <rdunlap@infradead.org>
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        "Nicolas Schier" <nicolas@fjasle.eu>
-CC:     John Moon <quic_johmoo@quicinc.com>,
-        <linux-kbuild@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>,
+        Nicolas Schier <nicolas@fjasle.eu>,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
         Trilok Soni <quic_tsoni@quicinc.com>,
-        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
         Bjorn Andersson <andersson@kernel.org>,
         Todd Kjos <tkjos@google.com>,
         Matthias Maennich <maennich@google.com>,
         Giuliano Procida <gprocida@google.com>,
-        <kernel-team@android.com>, Jordan Crouse <jorcrous@amazon.com>
-Subject: [PATCH RESEND 0/1] Validating UAPI backwards compatibility
-Date:   Fri, 17 Feb 2023 12:22:33 -0800
-Message-ID: <20230217202234.32260-1-quic_johmoo@quicinc.com>
-X-Mailer: git-send-email 2.17.1
+        kernel-team@android.com, Jordan Crouse <jorcrous@amazon.com>
+Subject: Re: [PATCH RESEND 1/1] check-uapi: Introduce check-uapi.sh
+Message-ID: <Y/CJhzSJ5YKvD7my@kroah.com>
+References: <20230217202234.32260-1-quic_johmoo@quicinc.com>
+ <20230217202234.32260-2-quic_johmoo@quicinc.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.49.16.6]
-X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: gQ__dsIXddcnFwqLNS6LKYVPkVedklXQ
-X-Proofpoint-GUID: gQ__dsIXddcnFwqLNS6LKYVPkVedklXQ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
- definitions=2023-02-17_14,2023-02-17_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- spamscore=0 priorityscore=1501 impostorscore=0 lowpriorityscore=0
- mlxlogscore=999 clxscore=1015 mlxscore=0 adultscore=0 suspectscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302170178
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230217202234.32260-2-quic_johmoo@quicinc.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-+ linux-arm-kernel and Greg KH
+On Fri, Feb 17, 2023 at 12:22:34PM -0800, John Moon wrote:
+> While the kernel community has been good at maintaining backwards
+> compatibility with kernel UAPIs, it would be helpful to have a tool
+> to check if a patch introduces changes that break backwards
+> compatibility.
+> 
+> To that end, introduce check-uapi.sh: a simple shell script that
+> checks for changes to UAPI headers using libabigail.
+> 
+> libabigail is "a framework which aims at helping developers and
+> software distributors to spot some ABI-related issues like interface
+> incompatibility in ELF shared libraries by performing a static
+> analysis of the ELF binaries at hand."
+> 
+> The script uses one of libabigail's tools, "abidiff", to compile the
+> changed header before and after the patch to detect any changes.
+> 
+> abidiff "compares the ABI of two shared libraries in ELF format. It
+> emits a meaningful report describing the differences between the two
+> ABIs."
+> 
+> Signed-off-by: John Moon <quic_johmoo@quicinc.com>
+> ---
+>  scripts/check-uapi.sh | 245 ++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 245 insertions(+)
+>  create mode 100755 scripts/check-uapi.sh
 
-Hi all,
+Ok, this is very cool, thank you so much for doing this.
 
-The kernel community has rigorously enforced a policy of backwards
-compatibility in its UAPI headers for a long time. This has allowed user
-applications to enjoy stability across kernel upgrades without
-recompiling.
+I know Randy Dunlap was also looking into this previously, so I've cc:ed
+him and bounced him the original.
 
-In the vendor driver community (out-of-tree modules), there's been a
-lack of discipline when it comes to maintaining UAPI backwards
-compatibility. This has been a maintenance burden and limits our options
-for long-term support of older devices.
+I tried this out, and at first glance, this felt like it was just "too
+fast" in that nothing actually was being tested.  So I manually added a
+field to a structure I know would break the abi, and:
 
-Our goal is to add tooling for vendor driver developers because the
-upstream model of expert maintainer code review can be difficult to
-replicate in-house. Tools may help developers catch simple UAPI
-incompatibilities that could be easily overlooked by in-house review.
+	$ ./scripts/check-uapi.sh
+	!!! ABI differences detected in include/uapi/linux/usb/ch9.h (compared to file at HEAD^1) !!!
 
-We see in the kernel documentation:
-"Kernel headers are backwards compatible, but not forwards compatible.
-This means that a program built against a C library using older kernel
-headers should run on a newer kernel (although it may not have access
-to new features), but a program built against newer kernel headers may
-not work on an older kernel."[1]
+	    [C] 'struct usb_ctrlrequest' changed:
+	      type size changed from 64 to 72 (in bits)
+	      1 data member insertion:
+		'__u8 abi_break', at offset 16 (in bits) at ch9.h:216:1
+	      3 data member changes:
+		'__le16 wValue' offset changed from 16 to 24 (in bits) (by +8 bits)
+		'__le16 wIndex' offset changed from 32 to 40 (in bits) (by +8 bits)
+		'__le16 wLength' offset changed from 48 to 56 (in bits) (by +8 bits)
 
-How does the kernel enforce this guarantee? We would be interested to
-learn about any tools or methods used by kernel developers to make sure
-the above statement remains true.
+	0/1 UAPI header file changes are backwards compatible
+	UAPI header ABI check failed
 
-Could the documentation on UAPI maintenance (from a developer's point of
-view) be expanded? Internally, we have a set of guidelines for our kernel
-developers regarding UAPI compatibility techniques. If there's interest
-in supplying a document on this topic with the kernel, we'd be happy to
-submit a draft detailing what we have so far as a jumping off point.
+So it worked!
 
-Additionally, I've attached a shell script we've been using internally
-to validate changes to our UAPI headers are backwards compatible. The
-script uses libabigail's[2] tool abidiff[3] to compare a modified
-header's ABI before and after a patch is applied. If an existing UAPI is
-modified, the script exits non-zero. We use this script in our CI system
-to block changes that fail the check.
+There is a mismatch of different bash coding styles in the document, which
+isn't a big deal, and one warning produced by the `shellcheck` tool, but that
+can all be fixed up later.  I'll go queue this up now, as a starting point for
+people to play with, thanks!
 
-Currently, the script works with gcc. It generates output like this when
-a backwards-incompatible change is made to a UAPI header:
+Also, it would be nice to be able to check if the current tree with changes in
+it (not checked in, just modified) breaks the abi, without having to go and
+check the change in.  But again, future fixups for people to do!
 
- !!! ABI differences detected in include/uapi/linux/acct.h (compared to
- file at HEAD^1) !!!
+thanks,
 
-     [C] 'struct acct' changed:
-       type size changed from 512 to 544 (in bits)
-       1 data member insertion:
-         '__u32 new_val', at offset 512 (in bits) at acct.h:71:1
-
- 0/1 UAPI header file changes are backwards compatible
- UAPI header ABI check failed
-
-However, we have not had success with clang. It seems clang is more
-aggressive in optimizing dead code away (no matter which options we
-pass). Therefore, no ABI differences are found.
-
-We wanted to share with the community to receive feedback and any advice
-when it comes to tooling/policy surrounding this issue. Our hope is that
-the script will help all kernel UAPI authors (even those that haven't
-upstreamed yet) maintain good discipline and avoid breaking userspace.
-
-[1] Documentation/kbuild/headers_install.rst
-[2] https://sourceware.org/libabigail/manual/libabigail-overview.html
-[3] https://sourceware.org/libabigail/manual/abidiff.html
-
-P.S. While at Qualcomm, Jordan Crouse <jorcrous@amazon.com> authored the
-original version of the UAPI checker script. Thanks Jordan!
-
-John Moon (1):
-  check-uapi: Introduce check-uapi.sh
-
- scripts/check-uapi.sh | 245 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 245 insertions(+)
- create mode 100755 scripts/check-uapi.sh
-
-
-base-commit: 033c40a89f55525139fd5b6342281b09b97d05bf
---
-2.17.1
-
+greg k-h
