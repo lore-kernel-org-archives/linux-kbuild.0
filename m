@@ -2,174 +2,92 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 509A5C05027
-	for <linux-kbuild@archiver.kernel.org>; Sun, 19 Feb 2023 10:14:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DD17C05027
+	for <linux-kbuild@archiver.kernel.org>; Sun, 19 Feb 2023 14:16:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229900AbjBSKOy (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 19 Feb 2023 05:14:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60564 "EHLO
+        id S229613AbjBSOQ1 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 19 Feb 2023 09:16:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229506AbjBSKOy (ORCPT
+        with ESMTP id S229839AbjBSOQX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 19 Feb 2023 05:14:54 -0500
+        Sun, 19 Feb 2023 09:16:23 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAA7A10A95;
-        Sun, 19 Feb 2023 02:14:52 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6EC4E3BF;
+        Sun, 19 Feb 2023 06:16:21 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 82A8A60C11;
-        Sun, 19 Feb 2023 10:14:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4710C4339B;
-        Sun, 19 Feb 2023 10:14:51 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3D7EF60C1E;
+        Sun, 19 Feb 2023 14:16:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6175C4339B;
+        Sun, 19 Feb 2023 14:16:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1676801691;
-        bh=sNN8c94qA1yZlc1KlOz29fi1nBuqPs8632wXKj46328=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=FfJrHOHfOvghJdnBIVi7Gv5Kc3EfdZScmpsLIdZzWpMEyASmseEaBmseo+jBmi9jJ
-         YAtaOnumjPIGafXsq9KNDOttsyzvX1CgryuHjxsNH8eyLWECliB21Z3upGRol+QNm0
-         KiyFp+6pHY13mCMe8sRSmPsJFR4CTDn//elx9KuuuS6Nk2waKUMtTDLutbwIS+JlDI
-         oSUQ8M2pKUWG41CDlPsh7FY0iIgr49eA1W3Lr5zfbpVXBAVvLx246KucZxLdZJWmQf
-         yX5jeDQ4p6N9uwn6Oxs3FTHiIL4xCHhvfiJw/TPvc2jI/cuDRCLktjk13l4Ncq6MOO
-         c9lK23AX2iVjw==
-Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-171d57fcba3so634595fac.11;
-        Sun, 19 Feb 2023 02:14:51 -0800 (PST)
-X-Gm-Message-State: AO0yUKW78xCFfczao6dc5i5ehWVgq14kLnJxNrH8G+GKEIXMKtReqelm
-        ghoKeEsaSQHQ7cFKNI79rbS5TOmpr8ZZ6c/qSpY=
-X-Google-Smtp-Source: AK7set+zyV+dD80XZnkrT+/dXopUSPLMEroAOP2bmUZGlzQqg5q2AvNWCeKql6sz5q5oOygGHV4gggGRiFn7s2R1sIE=
-X-Received: by 2002:a05:6870:c1ce:b0:16e:9431:5c2e with SMTP id
- i14-20020a056870c1ce00b0016e94315c2emr443762oad.56.1676801690999; Sun, 19 Feb
- 2023 02:14:50 -0800 (PST)
-MIME-Version: 1.0
-References: <20230217065246.31641-1-rdunlap@infradead.org>
-In-Reply-To: <20230217065246.31641-1-rdunlap@infradead.org>
+        s=k20201202; t=1676816180;
+        bh=BqvNL4z/UoB9dOUirlrYrge5KkBaM56X6vW7byxa1NQ=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=Eh9g1i6ltIJaKeZXIFwrhYBOVzbBH+s9K5nOu/rEnBU6ihKJpvfiFj6jd0oqV/kGi
+         tdgKxBc2d2ui0a/g1q4xXzE8rv9wHdHHl5czwzztpttn+3DxDErdE3oCkW5c2UbIyz
+         89Fk+OZkAqGZZovU6ZGPe+bvLq0wD0ltzBfj8meuiiV1nm2LX+uNSB1kzEQaz2jPp6
+         aCapvZnrsli7QqfgivSeLm73M6gH3N7x46ctYe3rRceiAZWoIcTWqjpQ4ht42RlapX
+         /ERBCENd2fvXn/kD1Uyn9cfl9AKqLm1Tckwp0WZA3uzOo5oNVZ9Yg4DvxTsLCRXFnA
+         1oTtxU+hTTEWg==
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Sun, 19 Feb 2023 19:14:14 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAT4KW=SiWSYyC7fZYcpX5-6FFsPsHCVNbTvvgdKCXSctw@mail.gmail.com>
-Message-ID: <CAK7LNAT4KW=SiWSYyC7fZYcpX5-6FFsPsHCVNbTvvgdKCXSctw@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: save the KCONFIG_SEED value in the config file
-To:     Randy Dunlap <rdunlap@infradead.org>
-Cc:     linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-kbuild@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Rich Felker <dalias@libc.org>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        linux-sh@vger.kernel.org
+Subject: [PATCH 2/4] sh: move build rule of cchips/hd6446x/ to arch/sh/Kbuild
+Date:   Sun, 19 Feb 2023 23:15:53 +0900
+Message-Id: <20230219141555.2308306-2-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230219141555.2308306-1-masahiroy@kernel.org>
+References: <20230219141555.2308306-1-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Fri, Feb 17, 2023 at 3:52 PM Randy Dunlap <rdunlap@infradead.org> wrote:
->
-> Save (print) the randconfig seed value in the kernel .config file.
-> This enables someone to see easily that the .config file is a
-> randconfig file.
+This is the last user of core-y in ARCH=sh.
 
+Use the standard obj-y syntax.
 
-I still do not understand why this is useful.
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-Who cares if it was generated by randconfig or menuconfig?
-They are the same.
+ arch/sh/Kbuild   | 2 ++
+ arch/sh/Makefile | 3 ---
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
-
-
-
-If I run "make randconfig" followed by "make olddefconfig",
-I get the same .config file, except that "KCONFIG_SEED=..."
-has disappeared.
-
-So, you cannot carry this kind of information, anyway.
-
-
-
-$ make  randconfig
-KCONFIG_SEED=0x69256B40
-#
-# configuration written to .config
-#
-
-$ make olddefconfig
-#
-# configuration written to .config
-#
-
-$ diff -u .config.old .config
---- .config.old 2023-02-19 19:03:16.831931359 +0900
-+++ .config 2023-02-19 19:03:37.147477826 +0900
-@@ -1,7 +1,6 @@
+diff --git a/arch/sh/Kbuild b/arch/sh/Kbuild
+index be171880977e..056efec72c2a 100644
+--- a/arch/sh/Kbuild
++++ b/arch/sh/Kbuild
+@@ -3,5 +3,7 @@ obj-y				+= kernel/ mm/ boards/
+ obj-$(CONFIG_SH_FPU_EMU)	+= math-emu/
+ obj-$(CONFIG_USE_BUILTIN_DTB)	+= boot/dts/
+ 
++obj-$(CONFIG_HD6446X_SERIES)	+= cchips/hd6446x/
++
+ # for cleaning
+ subdir- += boot
+diff --git a/arch/sh/Makefile b/arch/sh/Makefile
+index a9cad5137f92..0625796cfe7f 100644
+--- a/arch/sh/Makefile
++++ b/arch/sh/Makefile
+@@ -126,9 +126,6 @@ machdir-$(CONFIG_SH_X3PROTO)			+= mach-x3proto
+ machdir-$(CONFIG_SH_LANDISK)			+= mach-landisk
+ machdir-y					+= mach-common
+ 
+-# Companion chips
+-core-$(CONFIG_HD6446X_SERIES)	+= arch/sh/cchips/hd6446x/
+-
  #
- # Automatically generated file; DO NOT EDIT.
- # Linux/x86 6.2.0-rc5 Kernel Configuration
--# KCONFIG_SEED=0x69256B40
+ # CPU header paths
  #
- CONFIG_CC_VERSION_TEXT="gcc (Ubuntu 11.3.0-1ubuntu1~22.04) 11.3.0"
- CONFIG_CC_IS_GCC=y
-
-
-
-
-
-
-
->
-> It also allows the randconfig file to be recreated by using the
-> KCONFIG_SEED environment variable, as long as KCONFIG_PROBABILITY
-> was not specified (the default probability values were used) and
-> as long as the file was not edited.
->
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Cc: Masahiro Yamada <masahiroy@kernel.org>
-> Cc: linux-kbuild@vger.kernel.org
-> ---
->  scripts/kconfig/conf.c     |    3 +++
->  scripts/kconfig/confdata.c |    2 ++
->  scripts/kconfig/lkc.h      |    2 ++
->  3 files changed, 7 insertions(+)
->
-> diff -- a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-> --- a/scripts/kconfig/conf.c
-> +++ b/scripts/kconfig/conf.c
-> @@ -83,6 +83,8 @@ static void xfgets(char *str, int size,
->                 printf("%s", str);
->  }
->
-> +unsigned int rand_seed;
-> +
->  static void set_randconfig_seed(void)
->  {
->         unsigned int seed;
-> @@ -109,6 +111,7 @@ static void set_randconfig_seed(void)
->                 seed = (now.tv_sec + 1) * (now.tv_usec + 1);
->         }
->
-> +       rand_seed = seed;
->         printf("KCONFIG_SEED=0x%X\n", seed);
->         srand(seed);
->  }
-> diff -- a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-> --- a/scripts/kconfig/confdata.c
-> +++ b/scripts/kconfig/confdata.c
-> @@ -621,6 +621,8 @@ static void conf_write_heading(FILE *fp,
->                 cs->decoration);
->
->         fprintf(fp, "%s %s\n", cs->decoration, rootmenu.prompt->text);
-> +       if (rand_seed)
-> +               fprintf(fp, "%s KCONFIG_SEED=0x%X\n", cs->decoration, rand_seed);
-
-
-If 'rand_seed' just happens to become zero,
-this does not print it, which is weird.
-
-
-The seed is generated by:
-
-     seed = (now.tv_sec + 1) * (now.tv_usec + 1);
-
-
-This is very rare, but it may become zero.
-
-
-
-
-
-
-
 -- 
-Best Regards
-Masahiro Yamada
+2.34.1
+
