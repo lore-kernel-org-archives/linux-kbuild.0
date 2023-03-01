@@ -2,42 +2,43 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 807E5C64EC7
-	for <linux-kbuild@archiver.kernel.org>; Wed,  1 Mar 2023 07:54:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CA4DC64ED6
+	for <linux-kbuild@archiver.kernel.org>; Wed,  1 Mar 2023 07:54:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229673AbjCAHy4 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 1 Mar 2023 02:54:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58874 "EHLO
+        id S229812AbjCAHy5 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 1 Mar 2023 02:54:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229813AbjCAHyz (ORCPT
+        with ESMTP id S229437AbjCAHy4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 1 Mar 2023 02:54:55 -0500
+        Wed, 1 Mar 2023 02:54:56 -0500
 Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83A079025;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABB022DE75;
         Tue, 28 Feb 2023 23:54:54 -0800 (PST)
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3216cNiu006140;
-        Wed, 1 Mar 2023 07:54:32 GMT
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3216dDS4026185;
+        Wed, 1 Mar 2023 07:54:33 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-type; s=qcppdkim1;
- bh=lOC2M2xsKQVJTnNjc3Y1KhO64GI6l7zA8Oakc8Xf4Ek=;
- b=PtMqgvNxGjTbgCEEWtjiaICcxpTiJ4BWhGfqUQWOXUmyUVtGnak5eFZIU58+uh/HPdv6
- xX3lsUCbpuoC0HLJ6+sNlGzAbY/JbuOgXyzjSdnL0RanZ8nIT+nrDcO7NMucWj/xQla0
- cNwuVKDsCeWR9lp9N0JtNc88OqXL6tM1k0rPvoNmv3VajVHybB5nmhhvfYXOEUpVf+uY
- jJM8FLwHGE+7KpdeviHvHioebQVkM6pLEc4ZJh1KxR1hy4D7IcxCDpRvPH0xqkY/yRyI
- YUvVGseOZwlnhBRePPis3qh1+2MwAPs5HzAkUohld7r9q0wpc+C5etjyyB9b4nxvHGbv yQ== 
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-type; s=qcppdkim1;
+ bh=5vBpNWqoIG9Sd56AWdWffRkP9kbDWEXkwlpB9BhHEBM=;
+ b=i7R4ff6w9rH0a2e50JCojHoGxsTMhNNycNhpF3z6uXcFRmAB+lZJcCZkB1jScGBQvF6W
+ W9qfL4Vid/xCSC+zEJ7qzFaZOm/DaVzJyead4H+MFmbhI9AYC4dHB1So2U4QOAHXoTWz
+ tUteb3Au5vV1uNdHqkkE9vP9vjy/ncqC+Y6bA4g1laiNf1Nc1FcDfneD5cZlXKShLGeo
+ +E+L2ZRjbCrH9OtS5qvHvT8l3LKGJvtXrJNp075YUqdLxhzjzQdGi0PmFpDScNZG1Nos
+ WluuOlp8EKyu6+bKmZM4e6NxAXi9fQzcjZ2v8lQZcuueoDnf97wTWcdywO/ELf4KgmJO kw== 
 Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3p1f7n3a30-1
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3p1mwxa28a-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Wed, 01 Mar 2023 07:54:32 +0000
 Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-        by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3217sVwt032682
+        by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3217sVbx032691
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 1 Mar 2023 07:54:31 GMT
+        Wed, 1 Mar 2023 07:54:32 GMT
 Received: from hu-johmoo-lv.qualcomm.com (10.49.16.6) by
  nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.41; Tue, 28 Feb 2023 23:54:30 -0800
+ 15.2.986.41; Tue, 28 Feb 2023 23:54:31 -0800
 From:   John Moon <quic_johmoo@quicinc.com>
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Nathan Chancellor <nathan@kernel.org>,
@@ -59,10 +60,12 @@ CC:     John Moon <quic_johmoo@quicinc.com>,
         Trilok Soni <quic_tsoni@quicinc.com>,
         Satya Durga Srinivasu Prabhala <quic_satyap@quicinc.com>,
         Elliot Berman <quic_eberman@quicinc.com>
-Subject: [PATCH v2 0/2] Validating UAPI backwards compatibility
-Date:   Tue, 28 Feb 2023 23:54:00 -0800
-Message-ID: <20230301075402.4578-1-quic_johmoo@quicinc.com>
+Subject: [PATCH v2 2/2] docs: dev-tools: Add UAPI checker documentation
+Date:   Tue, 28 Feb 2023 23:54:02 -0800
+Message-ID: <20230301075402.4578-3-quic_johmoo@quicinc.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20230301075402.4578-1-quic_johmoo@quicinc.com>
+References: <20230301075402.4578-1-quic_johmoo@quicinc.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.49.16.6]
@@ -70,120 +73,303 @@ X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
  nalasex01c.na.qualcomm.com (10.47.97.35)
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: dX5y6pYg_G9A_mshnoWy4sexWdqyV5G0
-X-Proofpoint-ORIG-GUID: dX5y6pYg_G9A_mshnoWy4sexWdqyV5G0
+X-Proofpoint-ORIG-GUID: 40KKAWs3331-R91PucECTRAARLT9wbO7
+X-Proofpoint-GUID: 40KKAWs3331-R91PucECTRAARLT9wbO7
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.219,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
  definitions=2023-03-01_04,2023-02-28_03,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- priorityscore=1501 impostorscore=0 bulkscore=0 phishscore=0
- lowpriorityscore=0 malwarescore=0 mlxlogscore=999 clxscore=1011 mlxscore=0
- adultscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2212070000 definitions=main-2303010063
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
+ bulkscore=0 impostorscore=0 mlxscore=0 clxscore=1015 lowpriorityscore=0
+ mlxlogscore=999 malwarescore=0 spamscore=0 priorityscore=1501
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2303010063
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hi all,
-
-The kernel community has rigorously enforced a policy of backwards
-compatibility in its UAPI headers for a long time. This has allowed user
-applications to enjoy stability across kernel upgrades without
-recompiling.
-
-In the vendor driver community (out-of-tree modules), there's been a
-lack of discipline when it comes to maintaining UAPI backwards
-compatibility. This has been a maintenance burden and limits our options
-for long-term support of older devices.
-
-Our goal is to add tooling for vendor driver developers because the
-upstream model of expert maintainer code review can be difficult to
-replicate in-house. Tools may help developers catch simple UAPI
-incompatibilities that could be easily overlooked by in-house review.
-
-We see in the kernel documentation:
-"Kernel headers are backwards compatible, but not forwards compatible.
-This means that a program built against a C library using older kernel
-headers should run on a newer kernel (although it may not have access
-to new features), but a program built against newer kernel headers may
-not work on an older kernel."[1]
-
-How does the kernel enforce this guarantee? We would be interested to
-learn about any tools or methods used by kernel developers to make sure
-the above statement remains true.
-
-Could the documentation on UAPI maintenance (from a developer's point of
-view) be expanded? Internally, we have a set of guidelines for our kernel
-developers regarding UAPI compatibility techniques. If there's interest
-in supplying a document on this topic with the kernel, we'd be happy to
-submit a draft detailing what we have so far as a jumping off point.
-
-Additionally, I've attached a shell script we've been using internally
-to validate changes to our UAPI headers are backwards compatible. The
-script uses libabigail's[2] tool abidiff[3] to compare a modified
-header's ABI before and after a patch is applied. If an existing UAPI is
-modified, the script exits non-zero. We use this script in our CI system
-to block changes that fail the check.
-
-Currently, the script works with gcc. It generates output like this when
-a backwards-incompatible change is made to a UAPI header:
-
- !!! ABI differences detected in include/uapi/linux/acct.h (compared to
- file at HEAD^1) !!!
-
-     [C] 'struct acct' changed:
-       type size changed from 512 to 544 (in bits)
-       1 data member insertion:
-         '__u32 new_val', at offset 512 (in bits) at acct.h:71:1
-
- 0/1 UAPI header file changes are backwards compatible
- UAPI header ABI check failed
-
-However, we have not had success with clang. It seems clang is more
-aggressive in optimizing dead code away (no matter which options we
-pass). Therefore, no ABI differences are found.
-
-We wanted to share with the community to receive feedback and any advice
-when it comes to tooling/policy surrounding this issue. Our hope is that
-the script will help all kernel UAPI authors (even those that haven't
-upstreamed yet) maintain good discipline and avoid breaking userspace.
-
-In v2, we've expanded the functionality quite a bit. We've added a
-document for the tool which includes some examples and explanations of
-possible false positives. We've also made it easier to examine changes
-across a large range of commits (e.g. v6.0 -> v6.1). This provided a
-great testbed of a wide variety of changes to examine.
-
-It would be very helpful for the expert maintainers to look over the
-tool's output and describe why or why not certain changes are being
-incorrectly flagged. This could lead the way towards another document
-that describes the kernel's UAPI policy more formally.
-
-As our tooling improves, we may be able to effectively filter out the
-false positives so the tool fits the kernel's UAPI policy neatly.
-
-Thanks for the help on v1 and thanks in advance for the help on v2!
-
-[1] Documentation/kbuild/headers_install.rst
-[2] https://sourceware.org/libabigail/manual/libabigail-overview.html
-[3] https://sourceware.org/libabigail/manual/abidiff.html
-
-P.S. While at Qualcomm, Jordan Crouse <jorcrous@amazon.com> authored the
-original version of the UAPI checker script. Thanks Jordan!
-
-John Moon (2):
-  check-uapi: Introduce check-uapi.sh
-  docs: dev-tools: Add UAPI checker documentation
-
- Documentation/dev-tools/checkuapi.rst | 258 +++++++++++++++
+Add detailed documentation for scripts/check-uapi.sh.
+---
+ Documentation/dev-tools/checkuapi.rst | 258 ++++++++++++++++++++++++++
  Documentation/dev-tools/index.rst     |   1 +
- scripts/check-uapi.sh                 | 452 ++++++++++++++++++++++++++
- 3 files changed, 711 insertions(+)
+ 2 files changed, 259 insertions(+)
  create mode 100644 Documentation/dev-tools/checkuapi.rst
- create mode 100755 scripts/check-uapi.sh
+
+diff --git a/Documentation/dev-tools/checkuapi.rst b/Documentation/dev-tools/checkuapi.rst
+new file mode 100644
+index 000000000000..2255066658e3
+--- /dev/null
++++ b/Documentation/dev-tools/checkuapi.rst
+@@ -0,0 +1,258 @@
++.. SPDX-License-Identifier: GPL-2.0-only
++
++============
++UAPI Checker
++============
++
++The UAPI checker (scripts/check-uapi.sh) is a shell script which checks UAPI
++header files for userspace backwards-compatibility across the git tree.
++
++The script can produce false positives in some cases, so developers are
++encouraged to use their best judgement when interpreting the results. Please
++refer to kernel documentation on the topic of IOCTL stability for more
++information (Documentation/process/botching-up-ioctls.rst).
++
++Options
++=======
++
++This section will describe the options check-uapi.sh can be run with.
++
++Usage::
++
++    ./scripts/check-uapi.sh [-b BASE_REF] [-r COMP_REF] [-a] [-j N] [-l ERROR_LOG]
++
++Available options::
++
++    -b BASE_REF    Base git reference to use for comparison. If unspecified or empty,
++                   will use any dirty changes in tree to UAPI files. If there are no
++                   dirty changes, HEAD will be used.
++    -r COMP_REF    Compare BASE_REF to COMP_REF (e.g. -r v6.1). If unspecified or empty,
++                   will use BASE_REF^1.
++    -a             Check all UAPI headers for backwards compatibility.
++    -j JOBS        Number of checks to run in parallel (default: number of CPU cores)
++    -l ERROR_LOG   Write error log to file (default: "$KERNEL_SOURCE/abi_error_log.txt")
++
++Environmental args::
++
++    ABIDIFF  Custom path to abidiff binary
++    CC       C compiler (default is "gcc")
++
++Examples
++========
++
++First, let's try making a change to a UAPI header file that obviously won't
++break userspace::
++
++    cat << 'EOF' | patch -l -p1
++    --- a/include/uapi/linux/acct.h
++    +++ b/include/uapi/linux/acct.h
++    @@ -21,7 +21,9 @@
++     #include <asm/param.h>
++     #include <asm/byteorder.h>
++
++    -/*
++    +#define FOO
++    +
++    +/*
++      *  comp_t is a 16-bit "floating" point number with a 3-bit base 8
++      *  exponent and a 13-bit fraction.
++      *  comp2_t is 24-bit with 5-bit base 2 exponent and 20 bit fraction
++    diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
++    EOF
++
++Now, let's use the script to validate::
++
++    % ./scripts/check-uapi.sh
++    Installing sanitized UAPI headers from dirty tree... OK
++    Saving current tree state... OK
++    Installing sanitized UAPI headers from HEAD... OK
++    Restoring current tree state... OK
++    Checking changes to UAPI headers starting from dirty tree
++    No ABI differences detected in include/uapi/linux/acct.h from HEAD -> dirty tree
++    All 1 UAPI headers modified between HEAD and dirty tree are backwards compatible!
++
++Let's add another change that *would* break userspace::
++
++    cat << 'EOF' | patch -l -p1
++    --- a/include/uapi/linux/bpf.h  2023-02-28 13:32:36.505591077 -0800
++    +++ b/include/uapi/linux/bpf.h  2023-02-28 13:32:57.033494020 -0800
++    @@ -73,7 +73,7 @@
++            __u8    dst_reg:4;      /* dest register */
++            __u8    src_reg:4;      /* source register */
++            __s16   off;            /* signed offset */
++    -       __s32   imm;            /* signed immediate constant */
++    +       __u32   imm;            /* unsigned immediate constant */
++     };
++
++     /* Key of an a BPF_MAP_TYPE_LPM_TRIE entry */
++    EOF
++
++The script should catch this incompatibility::
++
++    % ./scripts/check-uapi.sh
++    Installing sanitized UAPI headers from dirty tree... OK
++    Saving current tree state... OK
++    Installing sanitized UAPI headers from HEAD... OK
++    Restoring current tree state... OK
++    Checking changes to UAPI headers starting from dirty tree
++    No ABI differences detected in include/uapi/linux/acct.h from HEAD -> dirty tree
++    !!! ABI differences detected in include/uapi/linux/bpf.h from HEAD -> dirty tree !!!
++
++        [C] 'struct bpf_insn' changed:
++          type size hasn't changed
++          1 data member change:
++            type of '__s32 imm' changed:
++              typedef name changed from __s32 to __u32 at int-ll64.h:27:1
++              underlying type 'int' changed:
++                type name changed from 'int' to 'unsigned int'
++                type size hasn't changed
++
++    Header file diff (after headers_install):
++    --- HEAD/include/uapi/linux/bpf.h       2023-02-28 22:24:44.068898545 -0800
++    +++ dirty/include/uapi/linux/bpf.h      2023-02-28 22:24:42.132909241 -0800
++    @@ -73,7 +73,7 @@
++            __u8    dst_reg:4;      /* dest register */
++            __u8    src_reg:4;      /* source register */
++            __s16   off;            /* signed offset */
++    -       __s32   imm;            /* signed immediate constant */
++    +       __u32   imm;            /* unsigned immediate constant */
++     };
++
++     /* Key of an a BPF_MAP_TYPE_LPM_TRIE entry */
++
++    error - 1/2 UAPI headers modified between HEAD and dirty tree are not backwards compatible
++    error - UAPI header ABI check failed
++
++Note: the script is operating on UAPI header files which have changed in the
++dirty git tree. If there were no changes in the tree, it would look for UAPI
++changes introduced by the latest HEAD commit.
++
++Let's commit the breaking change, then commit the good change::
++
++    % git commit -m 'Breaking UAPI change' include/uapi/linux/bpf.h
++    [detached HEAD f758e574663a] Breaking UAPI change
++     1 file changed, 1 insertion(+), 1 deletion(-)
++    % git commit -m 'Innocuous UAPI change' include/uapi/linux/acct.h
++    [detached HEAD 2e87df769081] Innocuous UAPI change
++     1 file changed, 3 insertions(+), 1 deletion(-)
++
++Now, what happens if we run the script again with no arguments?::
++
++    % ./scripts/check-uapi.sh
++    Saving current tree state... OK
++    Installing sanitized UAPI headers from HEAD... OK
++    Installing sanitized UAPI headers from HEAD^1... OK
++    Restoring current tree state... OK
++    Checking changes to UAPI headers starting from HEAD
++    No ABI differences detected in include/uapi/linux/acct.h from HEAD^1 -> HEAD
++    All 1 UAPI headers modified between HEAD^1 and HEAD are backwards compatible!
++
++It doesn't catch any breaking change because by default, it only compares HEAD
++to HEAD^1. If we wanted the search scope to go back further, we'd have to use
++the "-r" option to pass other references to compare to. In this case, let's
++pass "-r HEAD~2" to the script so it checks UAPI changes between HEAD~2 and
++HEAD::
++
++    % ./scripts/check-uapi.sh -r "HEAD~2"
++    Saving current tree state... OK
++    Installing sanitized UAPI headers from HEAD... OK
++    Installing sanitized UAPI headers from HEAD~2... OK
++    Restoring current tree state... OK
++    Checking changes to UAPI headers starting from HEAD
++    No ABI differences detected in include/uapi/linux/acct.h from HEAD~2 -> HEAD
++    !!! ABI differences detected in include/uapi/linux/bpf.h from HEAD~2 -> HEAD !!!
++
++        [C] 'struct bpf_insn' changed:
++          type size hasn't changed
++          1 data member change:
++            type of '__s32 imm' changed:
++              typedef name changed from __s32 to __u32 at int-ll64.h:27:1
++              underlying type 'int' changed:
++                type name changed from 'int' to 'unsigned int'
++                type size hasn't changed
++
++    Header file diff (after headers_install):
++    --- HEAD~2/include/uapi/linux/bpf.h     2023-02-28 22:27:40.311925004 -0800
++    +++ HEAD/include/uapi/linux/bpf.h       2023-02-28 22:27:39.743928142 -0800
++    @@ -73,7 +73,7 @@
++            __u8    dst_reg:4;      /* dest register */
++            __u8    src_reg:4;      /* source register */
++            __s16   off;            /* signed offset */
++    -       __s32   imm;            /* signed immediate constant */
++    +       __u32   imm;            /* unsigned immediate constant */
++     };
++
++     /* Key of an a BPF_MAP_TYPE_LPM_TRIE entry */
++
++    error - 1/2 UAPI headers modified between HEAD~2 and HEAD are not backwards compatible
++    error - UAPI header ABI check failed
++
++If you want to check different chunks of the tree, you can also change your
++base commit with the "-b" option. For example, to check all changed UAPI header
++files between v6.0 and v6.1, you'd run::
++
++    % ./scripts/check-uapi.sh -b v6.1 -r v6.0
++    Saving current tree state... OK
++    Installing sanitized UAPI headers from v6.1... OK
++    Installing sanitized UAPI headers from v6.0... OK
++    Restoring current tree state... OK
++    Checking changes to UAPI headers starting from v6.1
++    -- snip --
++    error - 42/106 UAPI headers modified between v6.0 and v6.1 are not backwards compatible
++    error - UAPI header ABI check failed
++
++Aren't kernel UAPIs stable forever? Why is the script reporting errors?
++
++False Positives
++===============
++
++The UAPI checker is very aggressive in detecting ABI changes, so some false
++positives may appear. For example, if you check all UAPI headers between v6.0
++and v6.1, many breakages will be flagged. Run the following::
++
++    ./scripts/check-uapi.sh -b v6.1 -r v6.0
++
++The errors will be logged to "abi_error_log.txt". Here, we'll find examples of
++several types of false positives.
++
++Enum Expansion::
++
++    !!! ABI differences detected in include/uapi/linux/openvswitch.h from v6.0 -> v6.1 !!!
++
++        [C] 'enum ovs_datapath_attr' changed:
++          type size hasn't changed
++          1 enumerator insertion:
++            'ovs_datapath_attr::OVS_DP_ATTR_IFINDEX' value '9'
++          1 enumerator change:
++            'ovs_datapath_attr::__OVS_DP_ATTR_MAX' from value '9' to '10' at openvswitch.h.current:85:1
++
++In this case, an enum was expanded. Consequently, the "MAX" value was
++incremented. This is not considered a breaking change because it's assumed
++userspace programs are using the MAX value in a sane fashion.
++
++Expanding into reserved/padding fields::
++
++    !!! ABI differences detected in include/uapi/linux/perf_event.h from v6.0 -> v6.1 !!!
++
++        [C] 'struct perf_branch_entry' changed:
++          type size hasn't changed
++          3 data member insertions:
++            '__u64 spec', at offset 152 (in bits) at perf_event.h.current:1420:1
++            '__u64 new_type', at offset 154 (in bits) at perf_event.h.current:1421:1
++            '__u64 priv', at offset 158 (in bits) at perf_event.h.current:1422:1
++          1 data member change:
++            '__u64 reserved' offset changed from 152 to 161 (in bits) (by +9 bits)
++
++In this case, a reserved field was expanded into. Previously, the reserved
++field occupied 40 bits in the struct. After the change, three new members
++were added that took up 9 bits, so the size of the reserved field was
++reduced to 31.
++
++As the size of the struct did not change and none of the fields a userspace
++program could have been using were removed/changed/relocated, this change is
++not considered breaking.
++
++In the future, as tooling improves, we may be able to filter out more of these
++false positives. There may also be additional examples of false positives not
++listed here. Use your best judgement, and ideally a unit test in userspace, to
++test your UAPI changes!
+diff --git a/Documentation/dev-tools/index.rst b/Documentation/dev-tools/index.rst
+index 6b0663075dc0..0876f5a2cf55 100644
+--- a/Documentation/dev-tools/index.rst
++++ b/Documentation/dev-tools/index.rst
+@@ -34,6 +34,7 @@ Documentation/dev-tools/testing-overview.rst
+    kselftest
+    kunit/index
+    ktap
++   checkuapi
 
 
-base-commit: e492250d5252635b6c97d52eddf2792ec26f1ec1
+ .. only::  subproject and html
 --
 2.17.1
 
