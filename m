@@ -2,80 +2,80 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E186C678D4
-	for <linux-kbuild@archiver.kernel.org>; Thu,  2 Mar 2023 00:28:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E87A3C6FA8E
+	for <linux-kbuild@archiver.kernel.org>; Thu,  2 Mar 2023 13:17:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229703AbjCBA2W (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 1 Mar 2023 19:28:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50788 "EHLO
+        id S229836AbjCBNRd (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 2 Mar 2023 08:17:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbjCBA2V (ORCPT
+        with ESMTP id S229523AbjCBNRb (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 1 Mar 2023 19:28:21 -0500
-X-Greylist: delayed 1199 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 01 Mar 2023 16:28:06 PST
-Received: from gnu.wildebeest.org (gnu.wildebeest.org [45.83.234.184])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D11EE32E66;
-        Wed,  1 Mar 2023 16:28:05 -0800 (PST)
-Received: by gnu.wildebeest.org (Postfix, from userid 1000)
-        id 221EF30067B2; Thu,  2 Mar 2023 00:52:33 +0100 (CET)
-Date:   Thu, 2 Mar 2023 00:52:33 +0100
-From:   Mark Wielaard <mark@klomp.org>
-To:     John Moon <quic_johmoo@quicinc.com>
-Cc:     Nick Desaulniers <ndesaulniers@google.com>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nicolas Schier <nicolas@fjasle.eu>,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Todd Kjos <tkjos@google.com>,
-        Matthias Maennich <maennich@google.com>,
-        Giuliano Procida <gprocida@google.com>,
-        kernel-team@android.com, libabigail@sourceware.org,
-        Jordan Crouse <jorcrous@amazon.com>,
-        Trilok Soni <quic_tsoni@quicinc.com>,
-        Satya Durga Srinivasu Prabhala <quic_satyap@quicinc.com>,
-        Elliot Berman <quic_eberman@quicinc.com>
-Subject: Re: [PATCH v2 0/2] Validating UAPI backwards compatibility
-Message-ID: <20230301235233.GJ12496@gnu.wildebeest.org>
-References: <20230301075402.4578-1-quic_johmoo@quicinc.com>
- <CAKwvOdmqShYae=DrwP1JZBYXAYZyDB0SaOkVCvCzQC60MaJcpw@mail.gmail.com>
- <41d287fa-3a0a-cac6-4595-ad47ef873d79@quicinc.com>
- <0c92e7b8-e415-8ad5-14e7-d94f18c3fa25@quicinc.com>
- <b2055eab-4762-5fbf-8ea6-0956a0a2eb58@quicinc.com>
+        Thu, 2 Mar 2023 08:17:31 -0500
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DC5F3B0F5
+        for <linux-kbuild@vger.kernel.org>; Thu,  2 Mar 2023 05:17:23 -0800 (PST)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4PSBTq2Dr6z4x80;
+        Fri,  3 Mar 2023 00:17:19 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+        s=201909; t=1677763039;
+        bh=0JIQWJKznz7AtiZOyXNJNdwCGrnZhYEwd8v6MXpZZbk=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=mx3WB01f/BIglEyoyz+c+rctgDHNseoJp9meZk/si0LfJlCdGCBb32q1e/Ju7OZ9c
+         fXqmqO2TeyTW5dj1LmXzJsKsDNHVmNC80eQ5YlYFfXOxIBMVZZaSB1U+0Ql/J0swlZ
+         HpYWMXDdtuuH1WvKQcsjx4DRRY8cSrMlXnL7HX+al/ESHnErySHt/jcQTcTNmJlIeS
+         GVC9R/XgWOd22ZBBJ6fYGZDm5xjhWtTQzVWiAQLA8pHPu4p64HSRTd4gjDsoSY5Z9W
+         Mwiy64D7rMVg/u6kj/lzGJwTsM2wWvU7ouw7MSegeBNawSOrewwjZP4s4IqhHlR48X
+         frBVjzrU/EnoA==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     <linuxppc-dev@lists.ozlabs.org>
+Cc:     <nathan@kernel.org>, <linux-kbuild@vger.kernel.org>
+Subject: [PATCH 2/2] powerpc/64: Use -mtune=pwr10/9/8 for clang
+Date:   Fri,  3 Mar 2023 00:16:56 +1100
+Message-Id: <20230302131656.50626-2-mpe@ellerman.id.au>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230302131656.50626-1-mpe@ellerman.id.au>
+References: <20230302131656.50626-1-mpe@ellerman.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b2055eab-4762-5fbf-8ea6-0956a0a2eb58@quicinc.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hi John,
+For the -mtune option clang doesn't accept power10/9/8, instead it
+accepts pwr10/9/8. That will be fixed in future versions of clang, but
+the kernel must support the clang versions in the wild.
 
-On Wed, Mar 01, 2023 at 02:33:00PM -0800, John Moon via Libabigail wrote:
-> With some additional help from Nick offline, we determined that the
-> issue isn't with clang, but with libdw (from elfutils). You need at
-> least libdw version 0.171 for the abidiff tool to work correctly
-> with clang (in this particular case). Ubuntu 18.04 ships with
-> version 0.170.
+So add support for the "pwr" spelling if clang is in use.
 
-I don't remember any specific fixes for clang in libdw for elfutils
-0.171. But elfutils 0.171 was the first release that supported most of
-DWARF5 (including GNU DebugFission and split dwarf).
+Reported-by: Nathan Chancellor <nathan@kernel.org>
+BugLink: https://github.com/ClangBuiltLinux/linux/issues/1799
+Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+---
+ arch/powerpc/platforms/Kconfig.cputype | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-> If there's any interest, it'd be fairly easy to add a check for this
-> condition under the check_deps() function in the script.
+Need to confirm the clang <= 16 statement is correct.
 
-Please do add this check. elfutils 0.170 is almost 6 years old now,
-there have been many, many bug fixes since then (current release is
-0.188 from Nov 2022).
+diff --git a/arch/powerpc/platforms/Kconfig.cputype b/arch/powerpc/platforms/Kconfig.cputype
+index 7d7477b73951..e4e0e81be7de 100644
+--- a/arch/powerpc/platforms/Kconfig.cputype
++++ b/arch/powerpc/platforms/Kconfig.cputype
+@@ -278,6 +278,10 @@ config TUNE_CPU
+ 	default "-mtune=power10" if POWERPC64_CPU && CC_IS_GCC   && $(cc-option,-mtune=power10)
+ 	default "-mtune=power9"  if POWERPC64_CPU && CC_IS_GCC   && $(cc-option,-mtune=power9)
+ 	default "-mtune=power8"  if POWERPC64_CPU && CC_IS_GCC   && $(cc-option,-mtune=power8)
++	# clang <= 16 only supports the "pwr" names
++	default "-mtune=pwr10"   if POWERPC64_CPU && CC_IS_CLANG && $(cc-option,-mtune=pwr10)
++	default "-mtune=pwr9"    if POWERPC64_CPU && CC_IS_CLANG && $(cc-option,-mtune=pwr9)
++	default "-mtune=pwr8"    if POWERPC64_CPU && CC_IS_CLANG && $(cc-option,-mtune=pwr8)
+ 
+ config PPC_BOOK3S
+ 	def_bool y
+-- 
+2.39.2
 
-Thanks,
-
-Mark
