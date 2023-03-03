@@ -2,106 +2,115 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DB71C6FA8E
-	for <linux-kbuild@archiver.kernel.org>; Fri,  3 Mar 2023 01:38:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48798C64EC4
+	for <linux-kbuild@archiver.kernel.org>; Fri,  3 Mar 2023 15:14:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229909AbjCCBiA (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 2 Mar 2023 20:38:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45624 "EHLO
+        id S230516AbjCCPOI (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 3 Mar 2023 10:14:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229511AbjCCBh7 (ORCPT
+        with ESMTP id S231262AbjCCPOH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 2 Mar 2023 20:37:59 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51A36A5F0;
-        Thu,  2 Mar 2023 17:37:57 -0800 (PST)
+        Fri, 3 Mar 2023 10:14:07 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D6173A8B
+        for <linux-kbuild@vger.kernel.org>; Fri,  3 Mar 2023 07:14:05 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id E03A1B8161C;
-        Fri,  3 Mar 2023 01:37:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A8AEC433EF;
-        Fri,  3 Mar 2023 01:37:54 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 34540B818CA
+        for <linux-kbuild@vger.kernel.org>; Fri,  3 Mar 2023 15:14:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A00B9C433EF;
+        Fri,  3 Mar 2023 15:14:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677807474;
-        bh=20VXKyNfJN9zSFhzr0rYOP4ot/127qDIv810fbKi6ko=;
-        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-        b=fDamD9pnsAdrgaMFHDZ3NISCI+thvyvYKOjUanl9RYYazBT1nfAita+/5iTn09glh
-         WZH6HUy/g0F0+SBYuoKFs/thaXR/L0Gvi4uaT7DtgVQqhTTS4irRvSIg436gxjCLXD
-         867paPtEvE31Iy32v704vfuN6rJoZFs3hrZC0rmLmj1DFRGOH5Kmbo7o53jGrp4QYx
-         DZExRsgIyi0b3b6m7ZmM6WUKNSiTdlfTQC7b1uTdtXM2eM9CbNR9yWfAUvf+afETDk
-         iIjgSBkdtESUqfTCKV8FySngG29XfjAjzhSn/LCf+vJn4d13TMyO9CYfP8c5iau6Hc
-         zSG/XXrYOcaTA==
-Date:   Thu, 02 Mar 2023 17:37:51 -0800
-From:   Kees Cook <kees@kernel.org>
-To:     Nick Desaulniers <ndesaulniers@google.com>,
-        Kees Cook <keescook@chromium.org>
-CC:     Jakub Kicinski <kuba@kernel.org>,
-        Andy Shevchenko <andy@kernel.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nicolas Schier <nicolas@fjasle.eu>, Tom Rix <trix@redhat.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Miroslav Benes <mbenes@suse.cz>,
-        Marco Elver <elver@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Cezary Rojewski <cezary.rojewski@intel.com>,
-        Mark Brown <broonie@kernel.org>, Puyou Lu <puyou.lu@gmail.com>,
-        linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        llvm@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] fortify: Improve buffer overflow reporting
-User-Agent: K-9 Mail for Android
-In-Reply-To: <CAKwvOdkfCQJcpx3zh0pwHfnBP2v2ieqxqTUzOUyW14s3Xsaf-w@mail.gmail.com>
-References: <20230302225808.never.375-kees@kernel.org> <CAKwvOdkfCQJcpx3zh0pwHfnBP2v2ieqxqTUzOUyW14s3Xsaf-w@mail.gmail.com>
-Message-ID: <35F16A63-E946-4467-AD4D-D5E1331EA4D5@kernel.org>
+        s=k20201202; t=1677856443;
+        bh=SY8yapFxxlbxxr+YImm1QNyDrMxq689GISGUK9dvGzM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=XUBMaRMGAHRCenjd4RbPqV/bhxgnkH1olWU6j3dlWBghBnruGBN5UDe9zwKa/fyKb
+         QHI0/euHioxKSC5BSqzq3ASq1njWsB+n17cjtNA+19sLHnRqfwteqnCCSte8OjneH9
+         4RwJUm+5zpBUdUZRmVOA4308F9ALarlAACp/dqRo6eUbB19LqpD1tCQV68UsxOw0GO
+         9QnmFWsrQ7csVOffJ8OAYY5A2zSAVjVjT7rAwY/iJ150pJ7wmGIyxhPiGnAU763VtE
+         EaNqwxweAfIhs/Dv/1BWZTTmThYvrPact4rTfCX+ZCVxHZOAxAIK+XkE5evbh5RuIE
+         WcKK8GEuU7MKw==
+Date:   Fri, 3 Mar 2023 08:14:00 -0700
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     Michael Ellerman <mpe@ellerman.id.au>
+Cc:     linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org,
+        llvm@lists.linux.dev, Nick Desaulniers <ndesaulniers@google.com>
+Subject: Re: [PATCH 2/2] powerpc/64: Use -mtune=pwr10/9/8 for clang
+Message-ID: <20230303151400.GA2665@dev-arch.thelio-3990X>
+References: <20230302131656.50626-1-mpe@ellerman.id.au>
+ <20230302131656.50626-2-mpe@ellerman.id.au>
+ <20230302164324.GB3010526@dev-arch.thelio-3990X>
+ <878rgelnhd.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <878rgelnhd.fsf@mpe.ellerman.id.au>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On March 2, 2023 3:21:11 PM PST, Nick Desaulniers <ndesaulniers@google=2Eco=
-m> wrote:
->On Thu, Mar 2, 2023 at 2:58=E2=80=AFPM Kees Cook <keescook@chromium=2Eorg=
-> wrote:
->>
->> diff --git a/include/linux/fortify-string=2Eh b/include/linux/fortify-s=
-tring=2Eh
->> index c9de1f59ee80=2E=2E981e2838f99a 100644
->> --- a/include/linux/fortify-string=2Eh
->> +++ b/include/linux/fortify-string=2Eh
->> @@ -170,11 +170,13 @@ __FORTIFY_INLINE __diagnose_as(__builtin_strcat, =
-1, 2)
->>  char *strcat(char * const POS p, const char *q)
->>  {
->>         size_t p_size =3D __member_size(p);
->> +       size_t size;
->>
->>         if (p_size =3D=3D SIZE_MAX)
->>                 return __underlying_strcat(p, q);
->> -       if (strlcat(p, q, p_size) >=3D p_size)
->> -               fortify_panic(__func__);
->> +       size =3D strlcat(p, q, p_size);
->> +       if (p_size < size)
->
->What happens when they're equal? I think this patch changes
->behavior=2E=2E=2E? Intentional?
->
->Did flipping this conditional drop what should be `<=3D`?
->
->Was there an off by one, or is this version of this patch potentially
->introducing one? Or am I misremembering my boolean algebra?
+On Fri, Mar 03, 2023 at 10:53:02AM +1100, Michael Ellerman wrote:
+> Nathan Chancellor <nathan@kernel.org> writes:
+> > Hi Michael,
+> >
+> > Thanks for the workaround and sorry this has come to bite us :/
+> >
+> > On Fri, Mar 03, 2023 at 12:16:56AM +1100, Michael Ellerman wrote:
+> >> For the -mtune option clang doesn't accept power10/9/8, instead it
+> >> accepts pwr10/9/8. That will be fixed in future versions of clang, but
+> >> the kernel must support the clang versions in the wild.
+> >> 
+> >> So add support for the "pwr" spelling if clang is in use.
+> >> 
+> >> Reported-by: Nathan Chancellor <nathan@kernel.org>
+> >
+> > I think that should actually be
+> >
+> > Reported-by: Nick Desaulniers <ndesaulniers@google.com>
+> 
+> I guess yeah.
+> 
+> >> BugLink: https://github.com/ClangBuiltLinux/linux/issues/1799
+> >> Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+> >
+> > Reviewed-by: Nathan Chancellor <nathan@kernel.org>
+> 
+> Thanks.
+> 
+> >> ---
+> >>  arch/powerpc/platforms/Kconfig.cputype | 4 ++++
+> >>  1 file changed, 4 insertions(+)
+> >> 
+> >> Need to confirm the clang <= 16 statement is correct.
+> >
+> > Currently, this is indeed the case. It is possible that Nemanja's patch
+> > will get applied to release/16.x before 16.0.0 final but it might not.
+> >
+> > We can always update it later. I think we do want to push to get that
+> > patch applied because I forgot that it is only in 16.0.0 that '-mtune'
+> > starts to do something on PowerPC:
+> >
+> > https://github.com/llvm/llvm-project/commit/1dc26b80b872a94c581549a21943756a8c3448a3
+> >
+> > Prior to that change, '-mtune' was accepted but did nothing. It is only
+> > once it was hooked up to the backend that we got the spew of warnings. I
+> > think that warrants us trying to get Nemanja's patch into 16.0.0, which
+> > may allow us to drop this workaround altogether...
+> 
+> Aha OK, I missed that the warning was new in 16.
+> 
+> I'll sit on this for now then until we know if that change will make it
+> into clang 16.
 
-Whoops! Thanks for catching that=2E I was going too fast=2E And I'm bother=
-ed that my regression tests missed it=2E :|
+It was merged into release/16.x a few hours ago:
 
-I will send a v2=2E=2E=2E
+https://github.com/llvm/llvm-project/issues/61128
 
--Kees
+https://github.com/llvm/llvm-project/commit/9b2e09e9fb1aa3bbe3668d7cc585188a3014d1b9
 
+So I think this particular workaround is no longer needed :)
 
---=20
-Kees Cook
+Cheers,
+Nathan
