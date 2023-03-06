@@ -2,92 +2,103 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81A14C6FD19
-	for <linux-kbuild@archiver.kernel.org>; Mon,  6 Mar 2023 10:16:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03064C678D4
+	for <linux-kbuild@archiver.kernel.org>; Mon,  6 Mar 2023 13:39:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231133AbjCFKQD (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 6 Mar 2023 05:16:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39066 "EHLO
+        id S229771AbjCFNjD (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 6 Mar 2023 08:39:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230414AbjCFKPm (ORCPT
+        with ESMTP id S229494AbjCFNjD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 6 Mar 2023 05:15:42 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10FC922796;
-        Mon,  6 Mar 2023 02:15:04 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A9E26B80D79;
-        Mon,  6 Mar 2023 10:15:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F225C433EF;
-        Mon,  6 Mar 2023 10:14:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678097701;
-        bh=b8mXcWVvr64LaGiDwsadENDYgpIdOC4YHwo1Q1/sMko=;
-        h=From:To:Cc:Subject:Date:From;
-        b=Zu8k0Tkvwvb7q/J3jqm9DD2lkIqZIAlMvxqxd5XXdq73BDVe0QUNbtzGWGoFP02g3
-         koG9v303G5KWhlmKVFlT86hN3WYUu9HUFUMT7g/S6GRYbUpKX0StsddRz8GENQ5BuJ
-         qSzMuiFAPw9LJvUEZsq9pPZt0fc2PRqBhq/8JR44oJDIOw7J566ABaXhX4Izx95Z0W
-         Zhz6Q6MY9fXKeB6TgU176iwoTWo8d2T6hkvpBW3WuRUl5D+eWwf5Yme3M0NA8yeHYk
-         KIvTEXTn0UN2rnnPxTly3dYqqkdCbjmfDjgq1Zg6Dq5CvBAql1ac7OiYKuxmb/9nzO
-         oRGkeAvIk+VwA==
-From:   Arnd Bergmann <arnd@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        Mon, 6 Mar 2023 08:39:03 -0500
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 472B01DB81;
+        Mon,  6 Mar 2023 05:39:01 -0800 (PST)
+Received: from dggpemm500006.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4PVfkb1QnxzKq07;
+        Mon,  6 Mar 2023 21:36:55 +0800 (CST)
+Received: from [10.174.178.55] (10.174.178.55) by
+ dggpemm500006.china.huawei.com (7.185.36.236) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Mon, 6 Mar 2023 21:38:58 +0800
+Subject: Re: [PATCH 1/2] kallsyms: add kallsyms_seqs_of_names to list of
+ special symbols
+To:     Arnd Bergmann <arnd@kernel.org>, <linux-kbuild@vger.kernel.org>
+CC:     Masahiro Yamada <masahiroy@kernel.org>,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
         Nicolas Schier <nicolas@fjasle.eu>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Kees Cook <keescook@chromium.org>,
         Miguel Ojeda <ojeda@kernel.org>,
-        Zhen Lei <thunder.leizhen@huawei.com>,
         Boqun Feng <boqun.feng@gmail.com>,
         Luis Chamberlain <mcgrof@kernel.org>,
-        linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 1/2] kallsyms: add kallsyms_seqs_of_names to list of special symbols
-Date:   Mon,  6 Mar 2023 11:14:50 +0100
-Message-Id: <20230306101451.375844-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
+        <linux-kernel@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>
+References: <20230306101451.375844-1-arnd@kernel.org>
+From:   "Leizhen (ThunderTown)" <thunder.leizhen@huawei.com>
+Message-ID: <15ae14de-f73b-7dd0-b54d-b029e7fc7d16@huawei.com>
+Date:   Mon, 6 Mar 2023 21:38:57 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230306101451.375844-1-arnd@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.178.55]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemm500006.china.huawei.com (7.185.36.236)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-From: Arnd Bergmann <arnd@arndb.de>
 
-My randconfig build setup ran into another kallsyms warning:
 
-Inconsistent kallsyms data
-Try make KALLSYMS_EXTRA_PASS=1 as a workaround
+On 2023/3/6 18:14, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> My randconfig build setup ran into another kallsyms warning:
+> 
+> Inconsistent kallsyms data
+> Try make KALLSYMS_EXTRA_PASS=1 as a workaround
+> 
+> After adding some debugging code to kallsyms.c, I saw that the recently
+> added kallsyms_seqs_of_names symbol can sometimes cause the second stage
+> table to be slightly longer than the first stage, which makes the
+> build inconsistent.
+> 
+> Add it to the exception table that contains all other kallsyms-generated
+> symbols.
 
-After adding some debugging code to kallsyms.c, I saw that the recently
-added kallsyms_seqs_of_names symbol can sometimes cause the second stage
-table to be slightly longer than the first stage, which makes the
-build inconsistent.
+Reviewed-by: Zhen Lei <thunder.leizhen@huawei.com>
 
-Add it to the exception table that contains all other kallsyms-generated
-symbols.
+Maybe we can do a sanity check in output_label(). Or dynamically add the new
+symbol into ignored_symbols[], in this way, manual maintenance is not required.
 
-Fixes: 60443c88f3a8 ("kallsyms: Improve the performance of kallsyms_lookup_name()")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- scripts/kallsyms.c | 1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-index 8a68179a98a3..a239a87e7bec 100644
---- a/scripts/kallsyms.c
-+++ b/scripts/kallsyms.c
-@@ -119,6 +119,7 @@ static bool is_ignored_symbol(const char *name, char type)
- 		"kallsyms_markers",
- 		"kallsyms_token_table",
- 		"kallsyms_token_index",
-+		"kallsyms_seqs_of_names",
- 		/* Exclude linker generated symbols which vary between passes */
- 		"_SDA_BASE_",		/* ppc */
- 		"_SDA2_BASE_",		/* ppc */
+> 
+> Fixes: 60443c88f3a8 ("kallsyms: Improve the performance of kallsyms_lookup_name()")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  scripts/kallsyms.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+> index 8a68179a98a3..a239a87e7bec 100644
+> --- a/scripts/kallsyms.c
+> +++ b/scripts/kallsyms.c
+> @@ -119,6 +119,7 @@ static bool is_ignored_symbol(const char *name, char type)
+>  		"kallsyms_markers",
+>  		"kallsyms_token_table",
+>  		"kallsyms_token_index",
+> +		"kallsyms_seqs_of_names",
+>  		/* Exclude linker generated symbols which vary between passes */
+>  		"_SDA_BASE_",		/* ppc */
+>  		"_SDA2_BASE_",		/* ppc */
+> 
+
 -- 
-2.39.2
-
+Regards,
+  Zhen Lei
