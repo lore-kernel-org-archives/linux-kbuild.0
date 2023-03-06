@@ -2,88 +2,94 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35398C61DA4
-	for <linux-kbuild@archiver.kernel.org>; Sun,  5 Mar 2023 23:25:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3C50C6FD20
+	for <linux-kbuild@archiver.kernel.org>; Mon,  6 Mar 2023 10:16:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229600AbjCEXZw (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 5 Mar 2023 18:25:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52036 "EHLO
+        id S230295AbjCFKQA (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 6 Mar 2023 05:16:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229572AbjCEXZv (ORCPT
+        with ESMTP id S230413AbjCFKPm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 5 Mar 2023 18:25:51 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A32CE193E6;
-        Sun,  5 Mar 2023 15:25:50 -0800 (PST)
-From:   Bastian Germann <bage@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1678058747;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=V1oqD3RLQE54KREnjnPSNU36NDXrqx5n49sI1IXyxQQ=;
-        b=OX3+jXTYtDpuW7Y6HuXsrKM3fyr63rOlkxq722F4e7HW5MeMioSc5zunPt+90c6ilYhA8Q
-        ydfErU+k6sFzF4pDzVDjJlDrVbZ565dC79fmULqHnbuW0YqXdBrHyK9XvtZn2C+UqC9/n2
-        6U875vPXwtnSovDKO6IjKZuUdQ3gNE6q59myCyjHRDCFzQJKXCY3KGHdJgbqRXli2WsEFr
-        v/PYhd3gMKz9jGE1wpF8xyCvX8PhWiTmhpZYODndz2Xiul/5UteGRTiAkTtq/JurbKvh2j
-        ssIsVMqWjchsJ2/QhtYjTH/PV1oynO1+SNZE5GQ+EzfBm1Ej5RkJSKFVc6Sdkg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1678058747;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=V1oqD3RLQE54KREnjnPSNU36NDXrqx5n49sI1IXyxQQ=;
-        b=/YWYg87hXlmtkAgCJ2Vk4S8dmVu+0GGg8XgI3VgijIoVrIYrSs2XNhY+s74vleyA6tt00G
-        0ri1XNInXIFhwnCg==
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Bastian Germann <bage@linutronix.de>,
+        Mon, 6 Mar 2023 05:15:42 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96F467DAB;
+        Mon,  6 Mar 2023 02:15:05 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 32C2F60DBD;
+        Mon,  6 Mar 2023 10:15:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C162EC433AA;
+        Mon,  6 Mar 2023 10:15:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1678097704;
+        bh=gMn8LBo4YTVz4DCKbMOG8G2eyzp1G0ta2S/O8jCHVPo=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=i2TaLotztsUci/exTzbvk9XHqyKP3LCim+/r3AbtTx2DCWDp5H4PHEvbFsyO51sNp
+         p8rbs/qYmr5RYL9B+Ib7kqYO/h5Mqx9tFRPGudGqigweySeDAjAlPpZJWwCap4LYH4
+         I3U8G6hSaAiYdjG9AVDB6OqjG92pWLcdN/4KS8twDy76XcF5c/6mFfMWtaXuGDPsc2
+         nAtAdDqt+KeQWlJaqaOg8tdJRLjfl/Mgj+k/0EGB/FfAlitpg0wHx956pRFsg8YuGv
+         igujcesHHxhQad991EbKxKYbpS6I0kcZ1NLo1yhw4Kdrb/yA98gbH9lPjPA8YER5S7
+         5wJI7DPfOi3Rg==
+From:   Arnd Bergmann <arnd@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
         Nicolas Schier <nicolas@fjasle.eu>,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 1/1] kbuild: deb-pkg: default dpkg-buildpackage --build
-Date:   Mon,  6 Mar 2023 00:25:35 +0100
-Message-Id: <20230305232536.19528-2-bage@linutronix.de>
-In-Reply-To: <20230305232536.19528-1-bage@linutronix.de>
-References: <20230305232536.19528-1-bage@linutronix.de>
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Zhen Lei <thunder.leizhen@huawei.com>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH 2/2] kallsyms: expand symbol name into comment for debugging
+Date:   Mon,  6 Mar 2023 11:14:51 +0100
+Message-Id: <20230306101451.375844-2-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230306101451.375844-1-arnd@kernel.org>
+References: <20230306101451.375844-1-arnd@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-deb-pkg's dpkg-buildpackage invocation was added --build=source,binary
-recently. Before, it relied on the default, which is
---build=source,binary,all and makes no difference for the built packages
-as there is no "Arch: all" package.
+From: Arnd Bergmann <arnd@arndb.de>
 
-However, the explicit --build eliminates overriding it via DPKG_FLAGS,
-which used to fill the gap of generating only a source package without
-building it.
+The assembler output of kallsyms.c is not meant for people to understand,
+and is generally not helpful when debugging "Inconsistent kallsyms data"
+warnings. I have previously struggled with these, but found it helpful
+to list which symbols changed between the first and second pass in the
+.tmp_vmlinux.kallsyms*.S files.
 
-Recover the old, default behavior.
+As this file is preprocessed, it's possible to add a C-style multiline
+comment with the full type/name tuple.
 
-Fixes: 7bf4582d7aad ("kbuild: deb-pkg: create source package without cleaning")
-Signed-off-by: Bastian Germann <bage@linutronix.de>
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- scripts/Makefile.package | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+No idea if there is already a better way to debug this kind of problem,
+or if this causes a notable slowdown.
+---
+ scripts/kallsyms.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/Makefile.package b/scripts/Makefile.package
-index b941e6341b36..fe1721915a59 100644
---- a/scripts/Makefile.package
-+++ b/scripts/Makefile.package
-@@ -120,7 +120,7 @@ debian-orig: linux.tar.gz debian
- PHONY += deb-pkg
- deb-pkg: debian-orig
- 	+dpkg-buildpackage -r$(KBUILD_PKG_ROOTCMD) -a$$(cat debian/arch) $(DPKG_FLAGS) \
--		--build=source,binary -nc -us -uc
-+		-nc -us -uc
- 
- PHONY += bindeb-pkg
- bindeb-pkg: debian
+diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+index a239a87e7bec..ea1e3d3aaa6b 100644
+--- a/scripts/kallsyms.c
++++ b/scripts/kallsyms.c
+@@ -525,7 +525,8 @@ static void write_src(void)
+ 					table[i]->addr);
+ 				exit(EXIT_FAILURE);
+ 			}
+-			printf("\t.long\t%#x\n", (int)offset);
++			expand_symbol(table[i]->sym, table[i]->len, buf);
++			printf("\t.long\t%#x	/* %s */\n", (int)offset, buf);
+ 		} else if (!symbol_absolute(table[i])) {
+ 			output_address(table[i]->addr);
+ 		} else {
 -- 
 2.39.2
 
