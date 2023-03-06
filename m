@@ -2,91 +2,124 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DFB6C61DA4
-	for <linux-kbuild@archiver.kernel.org>; Mon,  6 Mar 2023 17:43:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DF72C64EC4
+	for <linux-kbuild@archiver.kernel.org>; Mon,  6 Mar 2023 18:23:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229932AbjCFRn2 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 6 Mar 2023 12:43:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56846 "EHLO
+        id S229806AbjCFSXY (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 6 Mar 2023 13:23:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229929AbjCFRnY (ORCPT
+        with ESMTP id S229718AbjCFSXX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 6 Mar 2023 12:43:24 -0500
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A51F36A405
-        for <linux-kbuild@vger.kernel.org>; Mon,  6 Mar 2023 09:42:44 -0800 (PST)
-Received: by mail-ed1-x52a.google.com with SMTP id j11so22499247edq.4
-        for <linux-kbuild@vger.kernel.org>; Mon, 06 Mar 2023 09:42:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678124526;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4FRX9KRq7RNgr4E++7wUJD5awkriR+XH1NGMmzEW3NQ=;
-        b=oYh6UgqOK+afo9Y+CdpfYv6wkmhWyYBkUeTHM6a86hfYCfCy8O53JEQlm8rSkulaQl
-         R1GvcA9vsQQqtbTFZsMfeaG80WuJIO1ixYqGS7VfAgAZjeEVRuxiSbbZlW2heFKutmq3
-         lzWRYk35EFZaGieBhMjff+uxnih1Tt7gOeIQAT19kM9rpEV5TvEhbiQamaE4W12CRG6k
-         rMg6iI24aibl5JCCRodomYzh7LiuGLBCTqutpqRE2uBTRfUz8ycTGeEGgIMYOfhV3PJh
-         /HXre7BuQdO2aDIG60wIQV91i7T7/8QEdjuQ1xuJXxM6VAK66/qWPb4G7hIfUuSyLW4N
-         kPag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678124526;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4FRX9KRq7RNgr4E++7wUJD5awkriR+XH1NGMmzEW3NQ=;
-        b=hzICMCN8o1mIeL7JzLZya2BQzN5doK6skseBz10IcIxws4Ch7IYZwB/Lw73AW98wqr
-         hdRODx6iaS//F5k7jQX/0o4VWW5xyDjUWNkmY72k69u8bCJ6GoYJyxxXzDyJhon2Ld65
-         5tHHIvkl5MXoK5kG3fsOhP1v7E31DMFenTYO/6Lcs2R+VjptlkF9x8sz29keZKnuC6wT
-         mdxMcTGopOvBhawNUh7ZPrEZj9zKYAfuUcAe/N+gkJvto2Ber7iirpjDeuG7aTLeeJi+
-         64L3uzwIK7VL7gK2ukBLn/7gGnpmETLH1gBjF5MLjg03zEa2bOJfZ68pwssYLA7QemiS
-         znuw==
-X-Gm-Message-State: AO0yUKVx8iTBAl/UTRs11mGoVw103pwsQ7Ez3itEuUZ8wMZ93JukwM8X
-        e8ZX44NlK7NqZdP40/nTEb/La/hv+r/U+bmf
-X-Google-Smtp-Source: AK7set/kNMaL7/tQ59jAPGARuyffPUPVtSP3YPEwJrghm3Ad9vu/Lw5JZbo3hn66KxikhIiEUO3eLg==
-X-Received: by 2002:a17:906:eecc:b0:90b:167e:3050 with SMTP id wu12-20020a170906eecc00b0090b167e3050mr15068751ejb.36.1678124526443;
-        Mon, 06 Mar 2023 09:42:06 -0800 (PST)
-Received: from localhost.localdomain ([2001:b07:5d37:537d:5e25:9ef5:7977:d60c])
-        by smtp.gmail.com with ESMTPSA id h10-20020a170906718a00b008c33ebac259sm4836148ejk.127.2023.03.06.09.42.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Mar 2023 09:42:06 -0800 (PST)
-From:   Vincenzo Palazzo <vincenzopalazzodev@gmail.com>
-To:     linux-kbuild@vger.kernel.org
-Cc:     masahiroy@kernel.org,
-        Vincenzo Palazzo <vincenzopalazzodev@gmail.com>,
-        Roland Kletzing <devzero@web.de>
-Subject: [PATCH v1 1/1] script: modpost: emit warning when description is missing
-Date:   Mon,  6 Mar 2023 18:41:59 +0100
-Message-Id: <20230306174159.145224-1-vincenzopalazzodev@gmail.com>
-X-Mailer: git-send-email 2.39.2
+        Mon, 6 Mar 2023 13:23:23 -0500
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FFF359C7;
+        Mon,  6 Mar 2023 10:22:55 -0800 (PST)
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 326DnQVb004336;
+        Mon, 6 Mar 2023 16:56:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : from : subject : to : cc : references : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=u+HeMWCnDL/51+TscHscVQEY/G74ehiDJ2aQmcF8ul8=;
+ b=E9umlb3amdCqPwuBfvXhDkM2TEQoA+Txr25Jo1FN1uk0NO8jnfb3VdXMGszPeeLwh9XT
+ TyD9jAb5UBBnrNCPzDwPXN+8MLzMNYfckEqhbQW4B2bSkFAHoquEIlmAwMi1kTjE321U
+ O4FFZb/lmNNfpWApFrj+lXCKz37quB7KcAEPgVADJtq2S6KVvFEmHBEtkgx/tAaeM5yi
+ vzdAREK9OnG2s5AhFnmELOL3zMiJZY6qd+uJ13fp4iGY98mORsedR75rxmj70wsJZNTh
+ d5RidTDe5HGtXA1elfBxZa7Jij3XbPUYKMyfJFIqYRc4x+KGeIRqr5Jna1fWO1q+ENvT gQ== 
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3p417jwep8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 06 Mar 2023 16:56:13 +0000
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+        by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 326GuCJB024582
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 6 Mar 2023 16:56:12 GMT
+Received: from [10.110.111.169] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 6 Mar 2023
+ 08:56:11 -0800
+Message-ID: <186dd23e-765f-584f-11e1-84b27f728abe@quicinc.com>
+Date:   Mon, 6 Mar 2023 08:56:10 -0800
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+From:   John Moon <quic_johmoo@quicinc.com>
+Subject: Re: [PATCH v2 2/2] docs: dev-tools: Add UAPI checker documentation
+To:     Masahiro Yamada <masahiroy@kernel.org>
+CC:     Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nicolas Schier <nicolas@fjasle.eu>,
+        <linux-kbuild@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-arm-msm@vger.kernel.org>,
+        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Todd Kjos <tkjos@google.com>,
+        Matthias Maennich <maennich@google.com>,
+        Giuliano Procida <gprocida@google.com>,
+        <kernel-team@android.com>, <libabigail@sourceware.org>,
+        Jordan Crouse <jorcrous@amazon.com>,
+        Trilok Soni <quic_tsoni@quicinc.com>,
+        "Satya Durga Srinivasu Prabhala" <quic_satyap@quicinc.com>,
+        Elliot Berman <quic_eberman@quicinc.com>
+References: <20230301075402.4578-1-quic_johmoo@quicinc.com>
+ <20230301075402.4578-3-quic_johmoo@quicinc.com>
+ <CAK7LNAQUgr0rrJv8ZvPKfyC8zZ1XX-Wv2Npw4iJXDGor=HSKyQ@mail.gmail.com>
+Content-Language: en-US
+In-Reply-To: <CAK7LNAQUgr0rrJv8ZvPKfyC8zZ1XX-Wv2Npw4iJXDGor=HSKyQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: A28HIHph3bEw3GIf7i0LrYogXJ86bcJ2
+X-Proofpoint-ORIG-GUID: A28HIHph3bEw3GIf7i0LrYogXJ86bcJ2
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-06_10,2023-03-06_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
+ clxscore=1015 adultscore=0 impostorscore=0 lowpriorityscore=0
+ malwarescore=0 phishscore=0 suspectscore=0 priorityscore=1501 spamscore=0
+ mlxlogscore=823 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2303060149
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Emit a warning when the mod description is missed.
+On 3/4/2023 10:20 PM, Masahiro Yamada wrote:
+> On Wed, Mar 1, 2023 at 4:54 PM John Moon <quic_johmoo@quicinc.com> wrote:
+>>
+>> Add detailed documentation for scripts/check-uapi.sh.
+>> ---
+>>   Documentation/dev-tools/checkuapi.rst | 258 ++++++++++++++++++++++++++
+>>   Documentation/dev-tools/index.rst     |   1 +
+>>   2 files changed, 259 insertions(+)
+>>   create mode 100644 Documentation/dev-tools/checkuapi.rst
+>>
+>> diff --git a/Documentation/dev-tools/checkuapi.rst b/Documentation/dev-tools/checkuapi.rst
+>> new file mode 100644
+>> index 000000000000..2255066658e3
+>> --- /dev/null
+>> +++ b/Documentation/dev-tools/checkuapi.rst
+>> @@ -0,0 +1,258 @@
+>> +.. SPDX-License-Identifier: GPL-2.0-only
+>> +
+>> +============
+>> +UAPI Checker
+>> +============
+>> +
+>> +The UAPI checker (scripts/check-uapi.sh) is a shell script which checks UAPI
+>> +header files for userspace backwards-compatibility across the git tree.
+>> +
+>> +The script can produce false positives in some cases, so developers are
+> 
+> 
+> and false negatives too.
+> 
 
-Reported-by: Roland Kletzing <devzero@web.de>
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=10770
-Signed-off-by: Vincenzo Palazzo <vincenzopalazzodev@gmail.com>
----
- scripts/mod/modpost.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index efff8078e395..c63156ba4e5e 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -1824,6 +1824,9 @@ static void read_symbols(const char *modname)
- 		}
- 	}
- 
-+	if (!get_modinfo(&info, "description"))
-+		warn("missing MODULE_DESCRIPTION() in %s\n", modname);
-+
- 	for (sym = info.symtab_start; sym < info.symtab_stop; sym++) {
- 		symname = remove_dot(info.strtab + sym->st_name);
- 
--- 
-2.39.2
-
+Yes, I'll expand the notes to include examples of false negatives in v3.
