@@ -2,53 +2,50 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56753C6FA99
-	for <linux-kbuild@archiver.kernel.org>; Mon,  6 Mar 2023 14:25:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D3CEC61DA4
+	for <linux-kbuild@archiver.kernel.org>; Mon,  6 Mar 2023 14:35:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229536AbjCFOZm (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 6 Mar 2023 09:25:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33134 "EHLO
+        id S230355AbjCFOfV (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 6 Mar 2023 09:35:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230222AbjCFOYq (ORCPT
+        with ESMTP id S230400AbjCFOfT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 6 Mar 2023 09:24:46 -0500
+        Mon, 6 Mar 2023 09:35:19 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77E51305D0
-        for <linux-kbuild@vger.kernel.org>; Mon,  6 Mar 2023 06:23:07 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8BC0298FD
+        for <linux-kbuild@vger.kernel.org>; Mon,  6 Mar 2023 06:33:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678112505;
+        s=mimecast20190719; t=1678113180;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jbzvdIcb//A8yoxuDFaYl2bDsTcFMMkz8dI1chMYqe4=;
-        b=MaBUZ/IE59jjxxf62jSudwED6mAtZprL1s6CGwiqhKCHR6kIO/96X2i0BJULQRrbZL/Ex0
-        GJkF44E3tAZu//9co0RqksrU2bhCKx6N5url8uMINuZqFAuI8iLaOCL8R6mwhdK0s0dXan
-        WJeKJIg/QrDQWUfudFbz0hsaPMuWdzE=
+         content-transfer-encoding:content-transfer-encoding;
+        bh=djmf7VYZwrWQPrKhg3rfMb09otmSQIVe2MqSC5L6dA0=;
+        b=aliELQISR9ZJvnNEbCj46iuVK76fo6AemWQR19PWVffgxEVyoNmzSXzgZ+0WVntZQWP/I4
+        1RtxnpnPUowbmJtfNXdEuYuS07tPp1WLgEHLRCtqcWRnPwJu4skijW/OPQTSK3OoUcops8
+        cPYSDDHuIYwT4sU7woVT05Rnq4v5H9U=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-456-KA-r4U7fPZibIZlx00eOqQ-1; Mon, 06 Mar 2023 09:08:30 -0500
-X-MC-Unique: KA-r4U7fPZibIZlx00eOqQ-1
+ us-mta-202-wr7Yf1G2Oz6JWpOJG11CBQ-1; Mon, 06 Mar 2023 09:08:27 -0500
+X-MC-Unique: wr7Yf1G2Oz6JWpOJG11CBQ-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 82DAB3C02555;
-        Mon,  6 Mar 2023 14:08:29 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A5D281C05AD7;
+        Mon,  6 Mar 2023 14:08:26 +0000 (UTC)
 Received: from jlaw-desktop.redhat.com (unknown [10.22.17.104])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3277D40C945A;
-        Mon,  6 Mar 2023 14:08:29 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5A67840C1106;
+        Mon,  6 Mar 2023 14:08:26 +0000 (UTC)
 From:   Joe Lawrence <joe.lawrence@redhat.com>
 To:     live-patching@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-kbuild@vger.kernel.org, Josh Poimboeuf <jpoimboe@kernel.org>,
         Miroslav Benes <mbenes@suse.cz>,
         Petr Mladek <pmladek@suse.com>,
         Marcos Paulo de Souza <mpdesouza@suse.com>
-Subject: [PATCH v7 07/10] livepatch/selftests: test multiple sections
-Date:   Mon,  6 Mar 2023 09:08:21 -0500
-Message-Id: <20230306140824.3858543-8-joe.lawrence@redhat.com>
-In-Reply-To: <20230306140824.3858543-1-joe.lawrence@redhat.com>
-References: <20230306140824.3858543-1-joe.lawrence@redhat.com>
+Subject: [PATCH v7 00/10] livepatch: klp-convert tool
+Date:   Mon,  6 Mar 2023 09:08:14 -0500
+Message-Id: <20230306140824.3858543-1-joe.lawrence@redhat.com>
 MIME-Version: 1.0
 Content-type: text/plain
 Content-Transfer-Encoding: 8bit
@@ -57,209 +54,171 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Add a test case in which klp-convert needs to convert a symbol that is
-shared across ELF sections.  Special sections like .altinstructions do
-this.  It is possible that symbols may be shared across various .text
-sections as well.
+Summary
+-------
 
-Signed-off-by: Joe Lawrence <joe.lawrence@redhat.com>
----
- lib/livepatch/Makefile                        |   1 +
- lib/livepatch/test_klp_convert_sections.c     | 120 ++++++++++++++++++
- .../selftests/livepatch/test-livepatch.sh     |  43 +++++++
- 3 files changed, 164 insertions(+)
+Livepatches may use symbols which are not contained in its own scope,
+and, because of that, may end up compiled with relocations that will
+only be resolved during module load. Yet, when the referenced symbols
+are not exported, solving this relocation requires information on the
+object that holds the symbol (either vmlinux or modules) and its
+position inside the object, as an object may contain multiple symbols
+with the same name.  Providing such information must be done accordingly
+to what is specified in Documentation/livepatch/module-elf-format.txt.
+
+Currently, there is no trivial way to embed the required information as
+requested in the final livepatch elf object. klp-convert solves this
+problem in two different forms: (i) by relying on a symbol map, which is
+built during kernel compilation, to automatically infer the relocation
+targeted symbol, and, when such inference is not possible (ii) by using
+annotations in the elf object to convert the relocation accordingly to
+the specification, enabling it to be handled by the livepatch loader.
+
+Given the above, add support for symbol mapping in the form of a
+symbols.klp file; add klp-convert tool; integrate klp-convert tool into
+kbuild; make livepatch modules discernible during kernel compilation
+pipeline; add data-structure and macros to enable users to annotate
+livepatch source code; make modpost stage compatible with livepatches;
+update livepatch-sample and update documentation.
+
+The patch was tested under three use-cases:
+
+use-case 1: There is a relocation in the lp that can be automatically
+resolved by klp-convert.  For example. see the saved_command_line
+variable in lib/livepatch/test_klp_convert2.c.
+
+use-case 2: There is a relocation in the lp that cannot be automatically
+resolved, as the name of the respective symbol appears in multiple
+objects. The livepatch contains an annotation to enable a correct
+relocation.  See the KLP_MODULE_RELOC / KLP_SYMPOS annotation sections
+in lib/livepatch/test_klp_convert{1,2}.c.
+
+use-case 3: There is a relocation in the lp that cannot be automatically
+resolved similarly as 2, but no annotation was provided in the
+livepatch, triggering an error during compilation.  Reproducible by
+removing the KLP_MODULE_RELOC / KLP_SYMPOS annotation sections in
+lib/livepatch/test_klp_convert{1,2}.c.
+
+Selftests have been added to exercise these klp-convert use-cases
+through several tests.
+
+
+Testing
+-------
+
+The patchset selftests build and execute on x86_64, s390x, and ppc64le
+for both default config (with added livepatch dependencies) and a larger
+RHEL-9-ish config.
+
+Using the Intel's Linux Kernel Performance tests's make.cross,
+klp-convert builds and processes livepatch .ko's for x86_64 ppc64le
+ppc32 s390 arm64 arches.
+
+
+Summary of changes in v7
+------------------------
+
+- rebase for v6.2
+- combine ("livepatch: Add klp-convert tool") with ("livepatch: Add
+  klp-convert annotation helpers")
+- combine ("kbuild: Support for symbols.klp creation") with ("modpost:
+  Integrate klp-convert") to simplify Kbuild magic [Petr, Nicolas]
+- klp-convert: add safe_snprintf() (-Wsign-compare)
+- klp-convert: fix -Wsign-compare warnings
+- klp-convert: use calloc() where appropriate
+- klp-convert: copy ELF e_flags
+- selftests: fix various build warnings
+- klp-convert: WARN msg simplification, failed sanity checks, and sympos
+  comment [Marcos]
+- klp-convert: fix elf_write_file() error paths [Petr]
+
+
+Previous versions
+-----------------
+
+RFC:
+  https://lore.kernel.org/lkml/cover.1477578530.git.jpoimboe@redhat.com/
+v2:
+  https://lore.kernel.org/lkml/f52d29f7-7d1b-ad3d-050b-a9fa8878faf2@redhat.com/
+v3:
+  https://lore.kernel.org/lkml/20190410155058.9437-1-joe.lawrence@redhat.com/
+v4:
+  https://lore.kernel.org/lkml/20190509143859.9050-1-joe.lawrence@redhat.com/
+v5:
+  (not posted)
+  https://github.com/joe-lawrence/klp-convert-tree/tree/klp-convert-v5-devel
+v6:
+  https://lore.kernel.org/live-patching/20220216163940.228309-1-joe.lawrence@redhat.com/
+
+
+Joe Lawrence (10):
+  livepatch: Create and include UAPI headers
+  livepatch: Add klp-convert tool
+  kbuild/modpost: create symbols.klp and integrate klp-convert
+  livepatch: Add sample livepatch module
+  documentation: Update on livepatch elf format
+  livepatch/selftests: add klp-convert
+  livepatch/selftests: test multiple sections
+  livepatch/selftests: add __asm__ symbol renaming examples
+  livepatch/selftests: add data relocations test
+  livepatch/selftests: add static keys test
+
+ .gitignore                                    |   2 +
+ Documentation/dontdiff                        |   1 +
+ Documentation/livepatch/livepatch.rst         |   3 +
+ Documentation/livepatch/module-elf-format.rst |  42 +-
+ MAINTAINERS                                   |   2 +
+ Makefile                                      |  16 +-
+ include/linux/livepatch.h                     |  13 +
+ include/uapi/linux/livepatch.h                |  25 +
+ kernel/livepatch/core.c                       |   4 +-
+ lib/livepatch/Makefile                        |  12 +
+ lib/livepatch/test_klp_convert.h              |  45 +
+ lib/livepatch/test_klp_convert1.c             | 121 +++
+ lib/livepatch/test_klp_convert2.c             | 110 +++
+ lib/livepatch/test_klp_convert_data.c         | 190 ++++
+ lib/livepatch/test_klp_convert_keys.c         |  91 ++
+ lib/livepatch/test_klp_convert_keys_mod.c     |  52 +
+ lib/livepatch/test_klp_convert_mod_a.c        |  31 +
+ lib/livepatch/test_klp_convert_mod_b.c        |  19 +
+ lib/livepatch/test_klp_convert_mod_c.c        |  36 +
+ lib/livepatch/test_klp_convert_sections.c     | 120 +++
+ samples/livepatch/Makefile                    |   1 +
+ .../livepatch/livepatch-annotated-sample.c    |  93 ++
+ scripts/Makefile                              |   1 +
+ scripts/Makefile.modfinal                     |  33 +
+ scripts/Makefile.modpost                      |   5 +
+ scripts/livepatch/.gitignore                  |   1 +
+ scripts/livepatch/Makefile                    |   5 +
+ scripts/livepatch/elf.c                       | 817 ++++++++++++++++
+ scripts/livepatch/elf.h                       |  74 ++
+ scripts/livepatch/klp-convert.c               | 893 ++++++++++++++++++
+ scripts/livepatch/klp-convert.h               |  47 +
+ scripts/livepatch/list.h                      | 391 ++++++++
+ scripts/mod/modpost.c                         |  28 +-
+ scripts/mod/modpost.h                         |   1 +
+ .../selftests/livepatch/test-livepatch.sh     | 403 ++++++++
+ 35 files changed, 3716 insertions(+), 12 deletions(-)
+ create mode 100644 include/uapi/linux/livepatch.h
+ create mode 100644 lib/livepatch/test_klp_convert.h
+ create mode 100644 lib/livepatch/test_klp_convert1.c
+ create mode 100644 lib/livepatch/test_klp_convert2.c
+ create mode 100644 lib/livepatch/test_klp_convert_data.c
+ create mode 100644 lib/livepatch/test_klp_convert_keys.c
+ create mode 100644 lib/livepatch/test_klp_convert_keys_mod.c
+ create mode 100644 lib/livepatch/test_klp_convert_mod_a.c
+ create mode 100644 lib/livepatch/test_klp_convert_mod_b.c
+ create mode 100644 lib/livepatch/test_klp_convert_mod_c.c
  create mode 100644 lib/livepatch/test_klp_convert_sections.c
+ create mode 100644 samples/livepatch/livepatch-annotated-sample.c
+ create mode 100644 scripts/livepatch/.gitignore
+ create mode 100644 scripts/livepatch/Makefile
+ create mode 100644 scripts/livepatch/elf.c
+ create mode 100644 scripts/livepatch/elf.h
+ create mode 100644 scripts/livepatch/klp-convert.c
+ create mode 100644 scripts/livepatch/klp-convert.h
+ create mode 100644 scripts/livepatch/list.h
 
-diff --git a/lib/livepatch/Makefile b/lib/livepatch/Makefile
-index ced00515ff84..77e21317d4da 100644
---- a/lib/livepatch/Makefile
-+++ b/lib/livepatch/Makefile
-@@ -9,6 +9,7 @@ obj-$(CONFIG_TEST_LIVEPATCH) += test_klp_atomic_replace.o \
- 				test_klp_callbacks_mod.o \
- 				test_klp_convert1.o \
- 				test_klp_convert2.o \
-+				test_klp_convert_sections.o \
- 				test_klp_convert_mod.o \
- 				test_klp_livepatch.o \
- 				test_klp_shadow_vars.o \
-diff --git a/lib/livepatch/test_klp_convert_sections.c b/lib/livepatch/test_klp_convert_sections.c
-new file mode 100644
-index 000000000000..fb6cdb9aaa90
---- /dev/null
-+++ b/lib/livepatch/test_klp_convert_sections.c
-@@ -0,0 +1,120 @@
-+// SPDX-License-Identifier: GPL-2.0
-+// Copyright (C) 2020 Joe Lawrence <joe.lawrence@redhat.com>
-+
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
-+#include <linux/module.h>
-+#include <linux/kernel.h>
-+#include <linux/livepatch.h>
-+#include "test_klp_convert.h"
-+
-+/* klp-convert symbols - vmlinux */
-+extern char *saved_command_line;
-+
-+/*
-+ * Scatter references to the same symbol (saved_command_line) across a
-+ * few different ELF sections.  At the same time, include multiple
-+ * references within the same function.
-+ */
-+__section(".text.print_saved_command_line")
-+static noinline void print_saved_command_line(void)
-+{
-+	pr_info("saved_command_line (1): %s\n", saved_command_line);
-+}
-+
-+__section(".text.print_saved_command_line2")
-+static noinline void print_saved_command_line2(void)
-+{
-+	pr_info("saved_command_line (1): %s\n", saved_command_line);
-+	pr_info("saved_command_line (2): %s\n", saved_command_line);
-+}
-+
-+__section(".text.print_saved_command_line3")
-+static noinline void print_saved_command_line3(void)
-+{
-+	pr_info("saved_command_line (1): %s\n", saved_command_line);
-+	pr_info("saved_command_line (2): %s\n", saved_command_line);
-+	pr_info("saved_command_line (3): %s\n", saved_command_line);
-+}
-+
-+/*
-+ * Create relocations in .rela.data that need conversion, sharing
-+ * symbols with ordinary .text relas.
-+ */
-+const char *(*p_test_klp_get_driver_name)(void) = test_klp_get_driver_name;
-+const char *(*p_get_homonym_string)(void) = get_homonym_string;
-+
-+static noinline void print_via_function_pointers(void)
-+{
-+	pr_info("test_klp_get_driver_name(): %s\n", test_klp_get_driver_name());
-+	pr_info("p_test_klp_get_driver_name(): %s\n", p_test_klp_get_driver_name());
-+	pr_info("get_homonym_string(): %s\n", get_homonym_string());
-+	pr_info("p_get_homonym_string(): %s\n", p_get_homonym_string());
-+}
-+
-+/* provide a sysfs handle to invoke debug functions */
-+static int print_debug;
-+static int print_debug_set(const char *val, const struct kernel_param *kp)
-+{
-+	print_saved_command_line();
-+	print_saved_command_line2();
-+	print_saved_command_line3();
-+	print_via_function_pointers();
-+
-+	return 0;
-+}
-+static const struct kernel_param_ops print_debug_ops = {
-+	.set = print_debug_set,
-+	.get = param_get_int,
-+};
-+
-+module_param_cb(print_debug, &print_debug_ops, &print_debug, 0200);
-+MODULE_PARM_DESC(print_debug, "print klp-convert debugging info");
-+
-+
-+KLP_MODULE_RELOC(test_klp_convert_mod) test_klp_convert_mod_relocs_a[] = {
-+	KLP_SYMPOS(get_homonym_string, 1),
-+};
-+
-+static struct klp_func funcs[] = {
-+	{
-+	}, { }
-+};
-+
-+static struct klp_object objs[] = {
-+	{
-+		/* name being NULL means vmlinux */
-+		.funcs = funcs,
-+	},
-+	{
-+		.name = "test_klp_convert_mod",
-+		.funcs = funcs,
-+	}, { }
-+};
-+
-+static struct klp_patch patch = {
-+	.mod = THIS_MODULE,
-+	.objs = objs,
-+};
-+
-+static int test_klp_convert_sections_init(void)
-+{
-+	int ret;
-+
-+	ret = klp_enable_patch(&patch);
-+	if (ret)
-+		return ret;
-+
-+	return 0;
-+}
-+
-+static void test_klp_convert_sections_exit(void)
-+{
-+}
-+
-+module_init(test_klp_convert_sections_init);
-+module_exit(test_klp_convert_sections_exit);
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Joe Lawrence <joe.lawrence@redhat.com>");
-+MODULE_DESCRIPTION("Livepatch test: klp-convert-sections");
-+MODULE_INFO(livepatch, "Y");
-diff --git a/tools/testing/selftests/livepatch/test-livepatch.sh b/tools/testing/selftests/livepatch/test-livepatch.sh
-index 25c21ddf30f0..bcb8b468b80a 100755
---- a/tools/testing/selftests/livepatch/test-livepatch.sh
-+++ b/tools/testing/selftests/livepatch/test-livepatch.sh
-@@ -293,4 +293,47 @@ livepatch: '$MOD_KLP_CONVERT2': unpatching complete
- % rmmod $MOD_KLP_CONVERT2
- % rmmod $MOD_KLP_CONVERT_MOD"
- 
-+
-+# TEST: klp-convert symbols across ELF sections
-+# - load a livepatch that references symbols that require klp-convert
-+#   and reference the same symbol from multiple ELF sections
-+# - verify correct behavior
-+# - unload the livepatch
-+
-+start_test "klp-convert symbols across ELF sections"
-+
-+saved_cmdline=$(cat /proc/cmdline)
-+
-+load_mod $MOD_KLP_CONVERT_MOD
-+load_lp $MOD_KLP_CONVERT_SECTIONS
-+echo 1 > /sys/module/$MOD_KLP_CONVERT_SECTIONS/parameters/print_debug
-+disable_lp $MOD_KLP_CONVERT_SECTIONS
-+unload_lp $MOD_KLP_CONVERT_SECTIONS
-+unload_mod $MOD_KLP_CONVERT_MOD
-+
-+check_result "% modprobe $MOD_KLP_CONVERT_MOD
-+% modprobe $MOD_KLP_CONVERT_SECTIONS
-+livepatch: enabling patch '$MOD_KLP_CONVERT_SECTIONS'
-+livepatch: '$MOD_KLP_CONVERT_SECTIONS': initializing patching transition
-+livepatch: '$MOD_KLP_CONVERT_SECTIONS': starting patching transition
-+livepatch: '$MOD_KLP_CONVERT_SECTIONS': completing patching transition
-+livepatch: '$MOD_KLP_CONVERT_SECTIONS': patching complete
-+$MOD_KLP_CONVERT_SECTIONS: saved_command_line (1): $saved_cmdline
-+$MOD_KLP_CONVERT_SECTIONS: saved_command_line (1): $saved_cmdline
-+$MOD_KLP_CONVERT_SECTIONS: saved_command_line (2): $saved_cmdline
-+$MOD_KLP_CONVERT_SECTIONS: saved_command_line (1): $saved_cmdline
-+$MOD_KLP_CONVERT_SECTIONS: saved_command_line (2): $saved_cmdline
-+$MOD_KLP_CONVERT_SECTIONS: saved_command_line (3): $saved_cmdline
-+$MOD_KLP_CONVERT_SECTIONS: test_klp_get_driver_name(): $MOD_KLP_CONVERT_MOD
-+$MOD_KLP_CONVERT_SECTIONS: p_test_klp_get_driver_name(): $MOD_KLP_CONVERT_MOD
-+$MOD_KLP_CONVERT_SECTIONS: get_homonym_string(): homonym string A
-+$MOD_KLP_CONVERT_SECTIONS: p_get_homonym_string(): homonym string A
-+% echo 0 > /sys/kernel/livepatch/$MOD_KLP_CONVERT_SECTIONS/enabled
-+livepatch: '$MOD_KLP_CONVERT_SECTIONS': initializing unpatching transition
-+livepatch: '$MOD_KLP_CONVERT_SECTIONS': starting unpatching transition
-+livepatch: '$MOD_KLP_CONVERT_SECTIONS': completing unpatching transition
-+livepatch: '$MOD_KLP_CONVERT_SECTIONS': unpatching complete
-+% rmmod $MOD_KLP_CONVERT_SECTIONS
-+% rmmod $MOD_KLP_CONVERT_MOD"
-+
- exit 0
 -- 
 2.39.2
 
