@@ -2,189 +2,127 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B171C678D4
-	for <linux-kbuild@archiver.kernel.org>; Mon,  6 Mar 2023 14:56:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA15AC61DA4
+	for <linux-kbuild@archiver.kernel.org>; Mon,  6 Mar 2023 17:06:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229805AbjCFO4M (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 6 Mar 2023 09:56:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35456 "EHLO
+        id S229962AbjCFRGX (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 6 Mar 2023 12:06:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229732AbjCFO4K (ORCPT
+        with ESMTP id S230211AbjCFRGK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 6 Mar 2023 09:56:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A41842FCD9
-        for <linux-kbuild@vger.kernel.org>; Mon,  6 Mar 2023 06:55:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678114512;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qrV6uJIm/Y4g08NszDYAhcJIJkYS8EE2yW4AwS7aHm8=;
-        b=grgpPr3sY06o/VdxMEkpl7C1HPT+ZJFA5bKzUfgnAnywtPQc3bMc4hDwAe0orFRxoN1Lei
-        6vtbF3+TcFFc/YZHjrv6Z8upRvaW50KS6VuIREelZhitkoaFJNiQxkbuv2Hg94S4JXQ4f4
-        D2W9sxlAUskZeZDlv0ttDi+dzckQZ0s=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-315-I2Hxq88LP7WCK-SdI9Epqg-1; Mon, 06 Mar 2023 09:08:28 -0500
-X-MC-Unique: I2Hxq88LP7WCK-SdI9Epqg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 54EF785CBE2;
-        Mon,  6 Mar 2023 14:08:28 +0000 (UTC)
-Received: from jlaw-desktop.redhat.com (unknown [10.22.17.104])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 039C040ED76C;
-        Mon,  6 Mar 2023 14:08:27 +0000 (UTC)
-From:   Joe Lawrence <joe.lawrence@redhat.com>
-To:     live-patching@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, Josh Poimboeuf <jpoimboe@kernel.org>,
-        Miroslav Benes <mbenes@suse.cz>,
-        Petr Mladek <pmladek@suse.com>,
-        Marcos Paulo de Souza <mpdesouza@suse.com>
-Subject: [PATCH v7 04/10] livepatch: Add sample livepatch module
-Date:   Mon,  6 Mar 2023 09:08:18 -0500
-Message-Id: <20230306140824.3858543-5-joe.lawrence@redhat.com>
-In-Reply-To: <20230306140824.3858543-1-joe.lawrence@redhat.com>
-References: <20230306140824.3858543-1-joe.lawrence@redhat.com>
+        Mon, 6 Mar 2023 12:06:10 -0500
+Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.73])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D73859E5A;
+        Mon,  6 Mar 2023 09:05:32 -0800 (PST)
+Received: from leknes.fjasle.eu ([46.142.97.228]) by mrelayeu.kundenserver.de
+ (mreue108 [212.227.15.183]) with ESMTPSA (Nemesis) id
+ 1N0o7f-1qTmjM1i8z-00wjTi; Mon, 06 Mar 2023 18:04:33 +0100
+Received: by leknes.fjasle.eu (Postfix, from userid 1000)
+        id 6C0133C1C5; Mon,  6 Mar 2023 18:04:31 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fjasle.eu; s=mail;
+        t=1678122271; bh=/QhdHt+oCasOCh3Dkbd+vJMlKi/bswqXbEm0k+oIQdM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=kchi/EqHGTOW7hPBvh/EQ0HKEVzsYFv2KtAvclEKxpqsWcp9vp2flB2+UKCuvaNM0
+         HCupKvwAHZzvg1ixzxxDtTscSeS4Z/5ULMKgviVQKXSiOziyyGGux8b4vDEFs+H2zu
+         +HhcVXBhled/FUMlhma37jkayLNm4gC0wtXCHuXs=
+Date:   Mon, 6 Mar 2023 18:04:31 +0100
+From:   Nicolas Schier <nicolas@fjasle.eu>
+To:     Bastian Germann <bage@linutronix.de>
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/1] kbuild: deb-pkg: default dpkg-buildpackage --build
+Message-ID: <ZAYdH6huDB9QtNdR@fjasle.eu>
+References: <20230305232536.19528-1-bage@linutronix.de>
+ <20230305232536.19528-2-bage@linutronix.de>
 MIME-Version: 1.0
-Content-type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="JerCWPahw1HPxYCf"
+Content-Disposition: inline
+In-Reply-To: <20230305232536.19528-2-bage@linutronix.de>
+X-Provags-ID: V03:K1:5oosnOkcAKuDEMOKTaPVFu/+T4F9WxzsYIhaq3L7QxE+m038W48
+ 8HSWibJEkraVGhaZ+rY8z06gErwphoYWpvsbWdiljHh7+lmjGhDpGussijrETKUql/tljxJ
+ XZIhz5+oidPh6gPv0+Y5bAU9nU0UMiibklRNeyV8MwU1K0hX2zEoeUTs3XyxBM1++O1lFmv
+ R5Mq0PWM8lwj7yKZe1LqQ==
+UI-OutboundReport: notjunk:1;M01:P0:CkMiTDBNPaY=;6HKX4a7VANrtBTHkSkBOk1SwpQG
+ 9qyV3zs1tGs8xHgApdYl000lseuzeyVRtEmx7q7+4Hvm7h4mAxyEzABIlPEQrESzAxmxKaZw5
+ SuUAzBEbbocPziElsooiAekCUqYzIkuf84jranGSApVHPvG2G1hyicpVxbviI1tJUK6v3wwzC
+ YuD9VjpZgFIlP6Pkldxesmcrt0pnWq3skbbcBjzL0VanDrSL4si4llasJOaJSppxFdxmPY+XB
+ m/PXXb40e9OFwYEQr66zRM4SxT0fOjypCmcKg73tXEmowOnjG2tfj2gv7N/xKbE4FHW/EzJ66
+ h6XhDZm1bl2k0zuz8diCzOGzuyWlmB2FnBjaZtDz/aA5kRMt/afQ4hYOw14Gb3nbTvWTHFE5H
+ rJHaUlrhauhEBaRIMX1Ys7SNOng3bJ12z0DKSuCgfW3fzQaNh8fCFiwYqxyJQuc3yUIK0a1JL
+ PZvR/XL3sSeUzVPoWsxEHzp3qMUWuI80MXRSqEZjVypYmk1ygLGmJLubSA0mmKEwcd0MUX0JG
+ 0KGplVi53T8bW+eMD8Wk2TlPkG5P6egWq8aZOyNqip8XuKmOppbpjhK7embH69B8/UMbul5Dx
+ Vu/wG7v2zJW+AsKp5mAmXrUy1pL4PRgPdSYdEFOJRnL6c4vb4OT8yAt2uENRlKSXa8pHm9AZq
+ ymoysNpZuslqxNPEqJoALQ7GEUluPqyuHt8XBfuD6A==
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Add a new livepatch sample in samples/livepatch/ to make use of symbols
-that must be post-processed to enable load-time relocation resolution.
-As the new sample is to be used as an example, it is annotated with
-KLP_MODULE_RELOC and with KLP_SYMPOS macros.
 
-The livepatch sample updates the function cmdline_proc_show to print the
-string referenced by the symbol saved_command_line appended by the
-string "livepatch=1".
+--JerCWPahw1HPxYCf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Update livepatch-sample.c to remove livepatch MODULE_INFO statement.
+On Mon, Mar 06, 2023 at 12:25:35AM +0100 Bastian Germann wrote:
+> deb-pkg's dpkg-buildpackage invocation was added --build=3Dsource,binary
+> recently. Before, it relied on the default, which is
+> --build=3Dsource,binary,all and makes no difference for the built packages
+> as there is no "Arch: all" package.
+>=20
+> However, the explicit --build eliminates overriding it via DPKG_FLAGS,
+> which used to fill the gap of generating only a source package without
+> building it.
+>=20
+> Recover the old, default behavior.
+>=20
+> Fixes: 7bf4582d7aad ("kbuild: deb-pkg: create source package without clea=
+ning")
+> Signed-off-by: Bastian Germann <bage@linutronix.de>
+> ---
+>  scripts/Makefile.package | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/scripts/Makefile.package b/scripts/Makefile.package
+> index b941e6341b36..fe1721915a59 100644
+> --- a/scripts/Makefile.package
+> +++ b/scripts/Makefile.package
+> @@ -120,7 +120,7 @@ debian-orig: linux.tar.gz debian
+>  PHONY +=3D deb-pkg
+>  deb-pkg: debian-orig
+>  	+dpkg-buildpackage -r$(KBUILD_PKG_ROOTCMD) -a$$(cat debian/arch) $(DPKG=
+_FLAGS) \
+> -		--build=3Dsource,binary -nc -us -uc
+> +		-nc -us -uc
+> =20
+>  PHONY +=3D bindeb-pkg
+>  bindeb-pkg: debian
+> --=20
+> 2.39.2
 
-Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
-Signed-off-by: Joao Moreira <jmoreira@suse.de>
-Signed-off-by: Joe Lawrence <joe.lawrence@redhat.com>
----
- samples/livepatch/Makefile                    |  1 +
- .../livepatch/livepatch-annotated-sample.c    | 93 +++++++++++++++++++
- 2 files changed, 94 insertions(+)
- create mode 100644 samples/livepatch/livepatch-annotated-sample.c
+Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
 
-diff --git a/samples/livepatch/Makefile b/samples/livepatch/Makefile
-index 9f853eeb6140..f2b41f4d6c16 100644
---- a/samples/livepatch/Makefile
-+++ b/samples/livepatch/Makefile
-@@ -6,3 +6,4 @@ obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-shadow-fix2.o
- obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-callbacks-demo.o
- obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-callbacks-mod.o
- obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-callbacks-busymod.o
-+obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-annotated-sample.o
-diff --git a/samples/livepatch/livepatch-annotated-sample.c b/samples/livepatch/livepatch-annotated-sample.c
-new file mode 100644
-index 000000000000..4fe0e16423c7
---- /dev/null
-+++ b/samples/livepatch/livepatch-annotated-sample.c
-@@ -0,0 +1,93 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * Copyright (C) 2014 Seth Jennings <sjenning@redhat.com>
-+ */
-+
-+/*
-+ * livepatch-annotated-sample.c - Kernel Live Patching Sample Module
-+ */
-+
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
-+#include <linux/module.h>
-+#include <linux/kernel.h>
-+#include <linux/livepatch.h>
-+
-+/*
-+ * This (dumb) live patch overrides the function that prints the
-+ * kernel boot cmdline when /proc/cmdline is read.
-+ *
-+ * This livepatch uses the symbol saved_command_line whose relocation
-+ * must be resolved during load time. To enable that, this module
-+ * must be post-processed by a tool called klp-convert, which embeds
-+ * information to be used by the loader to solve the relocation.
-+ *
-+ * The module is annotated with KLP_MODULE_RELOC/KLP_SYMPOS macros.
-+ * These annotations are used by klp-convert to infer that the symbol
-+ * saved_command_line is in the object vmlinux.
-+ *
-+ * As saved_command_line has no other homonimous symbol across
-+ * kernel objects, this annotation is not a requirement, and can be
-+ * suppressed with no harm to klp-convert. Yet, it is kept here as an
-+ * example on how to annotate livepatch modules that contain symbols
-+ * whose names are used in more than one kernel object.
-+ *
-+ * Example:
-+ *
-+ * $ cat /proc/cmdline
-+ * <your cmdline>
-+ *
-+ * $ insmod livepatch-sample.ko
-+ * $ cat /proc/cmdline
-+ * <your cmdline> livepatch=1
-+ *
-+ * $ echo 0 > /sys/kernel/livepatch/livepatch_sample/enabled
-+ * $ cat /proc/cmdline
-+ * <your cmdline>
-+ */
-+
-+extern char *saved_command_line;
-+
-+#include <linux/seq_file.h>
-+static int livepatch_cmdline_proc_show(struct seq_file *m, void *v)
-+{
-+	seq_printf(m, "%s livepatch=1\n", saved_command_line);
-+	return 0;
-+}
-+
-+KLP_MODULE_RELOC(vmlinux) vmlinux_relocs[] = {
-+	KLP_SYMPOS(saved_command_line, 0)
-+};
-+
-+static struct klp_func funcs[] = {
-+	{
-+		.old_name = "cmdline_proc_show",
-+		.new_func = livepatch_cmdline_proc_show,
-+	}, { }
-+};
-+
-+static struct klp_object objs[] = {
-+	{
-+		/* name being NULL means vmlinux */
-+		.funcs = funcs,
-+	}, { }
-+};
-+
-+static struct klp_patch patch = {
-+	.mod = THIS_MODULE,
-+	.objs = objs,
-+};
-+
-+static int livepatch_init(void)
-+{
-+	return klp_enable_patch(&patch);
-+}
-+
-+static void livepatch_exit(void)
-+{
-+}
-+
-+module_init(livepatch_init);
-+module_exit(livepatch_exit);
-+MODULE_LICENSE("GPL");
-+MODULE_INFO(livepatch, "Y");
--- 
-2.39.2
+--JerCWPahw1HPxYCf
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEh0E3p4c3JKeBvsLGB1IKcBYmEmkFAmQGHR4ACgkQB1IKcBYm
+EmlwyA/+JkqQ67j709PRCYeg61NYLHpE462WunWAub1qwetq9r823k0XuNHOWkGg
+8g0M7M8IApnx00o9N6sjiQvvek1nAxLeXGdAs0IFWZadjayqwrntNtp6jMBM4mQo
+zIu84SzA56+dT5Ujus5C+ny6D4nOqyPWhkAOjFE2mMzLyurt4E4spAYdfjije+9K
+AVo2vZf0vA+Ejmw83QYuxV1T/EV3Uo2nlvfnPPLepPHhaZ6c8hi4s7awE7D0dFDm
+vzrpNyipQKM8j1tdylOz1y4HO2M+tUG0alqcWXml0UYtKnK7LfI9UiJO3AfTgifX
+tNdqt62tWdyUlu6fjzmRu8Lrp7FTnId3KEQCMeRGIZjddYXvQ+uuOaRPz+/VWSrt
+C6Twk6/eC4xUWNDZU8LvVb13ZNy055saaG3V3qQKcAPtXybEVUgSX/Dt6R1BEdbr
+wAmBO0RVM4N6pEtNbyrj7EOgMkRBcv99yap0cOaAK/8Ig9mRlaiNdTUkfEjFJFRD
+NvuIrME98OQqi9qFwKV4qlsvKTpSeIgHF22LzVxpxs/qqgGq+lA9U3Xxr22toJgO
+/Z6IrNhSTgkgCMa6bER8ygxpj0zCgfqaEBz/2systx4+BuXdTQ7i1UYKJ12dWo0F
+Pkj7ioBuXfYabazu8C2WAZCPk2R24dU+uM3n+ACfOZwumVBxWVU=
+=EsWY
+-----END PGP SIGNATURE-----
+
+--JerCWPahw1HPxYCf--
