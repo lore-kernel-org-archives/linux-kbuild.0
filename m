@@ -2,71 +2,163 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8BF5C678D4
-	for <linux-kbuild@archiver.kernel.org>; Tue,  7 Mar 2023 11:20:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6537C678D5
+	for <linux-kbuild@archiver.kernel.org>; Tue,  7 Mar 2023 11:45:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229852AbjCGLUn (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 7 Mar 2023 06:20:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45498 "EHLO
+        id S231145AbjCGLph (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 7 Mar 2023 06:45:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229750AbjCGLUl (ORCPT
+        with ESMTP id S231567AbjCGLpP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 7 Mar 2023 06:20:41 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E22A7D8C;
-        Tue,  7 Mar 2023 03:20:39 -0800 (PST)
-From:   Bastian Germann <bage@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1678188036;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+        Tue, 7 Mar 2023 06:45:15 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 305F57D0B8;
+        Tue,  7 Mar 2023 03:42:51 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id CFE7721A20;
+        Tue,  7 Mar 2023 11:41:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1678189281; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=fjU0RRsv7TsEJsNWRtNsfcewJtMWB2CYOxvOiRR9HvM=;
-        b=17xEKT9OuHgdtQstFPiyp6fSl3ZlGibcexGgHDAKNwvTMMIGXDxkQ9gPpD2eSWbb0wT+nu
-        c2aqldLfL8zenD5JlhiZxx2Kjg07aLBhlSJKBFwtrynQIYMBDuYTMtB+P9t3XAOBs57E25
-        kzrugp9yxM4YHxLRhPNSzosKFZ+afzJpOPDQKwxUA/FA6dP0kDCB1FNEczarZ1UlJIdxoo
-        hlwZeH+oBvLI5v7ZMWRHlwA97IZQ4VULbcugtbg+TnUj//kZ9uZT8XKXstZNJefe37hwEi
-        b5+BFN/V7fIUlDZXBQws3wpA4HOK/57dWixL3hD5vwqeqTopBOX0D7fo3sH+nQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1678188036;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+        bh=+pemajQb8YP6fjdoGUmljNw7gqtlykEg8Ge5hYifXP4=;
+        b=2HzZLajkhO1VacYOeLd8PTuEQVTKSpWUM6VZuKovXS45ISnOFHN/9IXXZwn1IFJAznI7Ed
+        QgdVirHlYC+Lt2nv+vPwUU6nQsLSW6IB1qHtkweJJHsXC3eW4j0j31V6u7AEChDWUkzXDp
+        sike6KP0KmRZ0JaJs2tw8uzEgqObn1s=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1678189281;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=fjU0RRsv7TsEJsNWRtNsfcewJtMWB2CYOxvOiRR9HvM=;
-        b=QX83x/w/aZKnoVl14WLp4M0p7i6HBlzKuefpyHj4jajoRcQobfRLMWt45CSkG1uINhU2hz
-        6JRSg7kvH8shTnAA==
-To:     Masahiro Yamada <masahiroy@kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nicolas Schier <nicolas@fjasle.eu>
-Cc:     Bastian Germann <bage@linutronix.de>, linux-kbuild@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2 0/1] kbuild: deb-pkg: default dpkg-buildpackage --build
-Date:   Tue,  7 Mar 2023 12:20:27 +0100
-Message-Id: <20230307112028.14190-1-bage@linutronix.de>
-In-Reply-To: <CAK7LNASjiAB93mu0igQsiwgu=zrgu3gArMJZ+6CXHuJ+kG_ELg@mail.gmail.com>
-References: <CAK7LNASjiAB93mu0igQsiwgu=zrgu3gArMJZ+6CXHuJ+kG_ELg@mail.gmail.com>
+        bh=+pemajQb8YP6fjdoGUmljNw7gqtlykEg8Ge5hYifXP4=;
+        b=8jFRF4nMk3jcjEjaS3YZJIGciSp2TFitvO2sY4rakybV2XPaICJZUbzUTdQz/7Lhz8u0Fz
+        GZnPWR7kIYbAzjCg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3012313440;
+        Tue,  7 Mar 2023 11:41:20 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 7D9hN+AiB2R7EgAAMHmgww
+        (envelope-from <mpdesouza@suse.com>); Tue, 07 Mar 2023 11:41:20 +0000
+Date:   Tue, 7 Mar 2023 08:41:18 -0300
+From:   Marcos Paulo de Souza <mpdesouza@suse.de>
+To:     Joe Lawrence <joe.lawrence@redhat.com>
+Cc:     live-patching@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, Josh Poimboeuf <jpoimboe@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Petr Mladek <pmladek@suse.com>,
+        Marcos Paulo de Souza <mpdesouza@suse.com>
+Subject: Re: [PATCH v7 01/10] livepatch: Create and include UAPI headers
+Message-ID: <20230307114118.igckixgcc5gmgyyy@daedalus>
+References: <20230306140824.3858543-1-joe.lawrence@redhat.com>
+ <20230306140824.3858543-2-joe.lawrence@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230306140824.3858543-2-joe.lawrence@redhat.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-deb-pkg's dpkg-buildpackage invocation was changed in v6.2, unnecessarily
-adding the --build parameter explicitly. Revert the change.
+On Mon, Mar 06, 2023 at 09:08:15AM -0500, Joe Lawrence wrote:
+> Define klp prefixes in include/uapi/linux/livepatch.h, and use them for
+> replacing hard-coded values in kernel/livepatch/core.c.
+> 
+> Update MAINTAINERS.
+> 
+> Note: Add defines to uapi as these are also to be used by a newly
+> introduced klp-convert script.
+> 
+> Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
+> Signed-off-by: Joao Moreira <jmoreira@suse.de>
+> Signed-off-by: Joe Lawrence <joe.lawrence@redhat.com>
 
-Changelog:
-v2:
- * Rephrase the commit message not to misrepresent the build options
+LGTM:
 
-Bastian Germann (1):
-  kbuild: deb-pkg: default dpkg-buildpackage --build
+Reviewed-by: Marcos Paulo de Souza <mpdesouza@suse.com>
 
- scripts/Makefile.package | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
--- 
-2.39.2
-
+> ---
+>  MAINTAINERS                    |  1 +
+>  include/linux/livepatch.h      |  1 +
+>  include/uapi/linux/livepatch.h | 15 +++++++++++++++
+>  kernel/livepatch/core.c        |  4 ++--
+>  4 files changed, 19 insertions(+), 2 deletions(-)
+>  create mode 100644 include/uapi/linux/livepatch.h
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 135d93368d36..5bdf333fb1f3 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -12069,6 +12069,7 @@ F:	Documentation/ABI/testing/sysfs-kernel-livepatch
+>  F:	Documentation/livepatch/
+>  F:	arch/powerpc/include/asm/livepatch.h
+>  F:	include/linux/livepatch.h
+> +F:	include/uapi/linux/livepatch.h
+>  F:	kernel/livepatch/
+>  F:	kernel/module/livepatch.c
+>  F:	lib/livepatch/
+> diff --git a/include/linux/livepatch.h b/include/linux/livepatch.h
+> index 293e29960c6e..46da4c0df6c1 100644
+> --- a/include/linux/livepatch.h
+> +++ b/include/linux/livepatch.h
+> @@ -13,6 +13,7 @@
+>  #include <linux/ftrace.h>
+>  #include <linux/completion.h>
+>  #include <linux/list.h>
+> +#include <uapi/linux/livepatch.h>
+>  
+>  #if IS_ENABLED(CONFIG_LIVEPATCH)
+>  
+> diff --git a/include/uapi/linux/livepatch.h b/include/uapi/linux/livepatch.h
+> new file mode 100644
+> index 000000000000..e19430918a07
+> --- /dev/null
+> +++ b/include/uapi/linux/livepatch.h
+> @@ -0,0 +1,15 @@
+> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> +
+> +/*
+> + * livepatch.h - Kernel Live Patching Core
+> + *
+> + * Copyright (C) 2016 Josh Poimboeuf <jpoimboe@redhat.com>
+> + */
+> +
+> +#ifndef _UAPI_LIVEPATCH_H
+> +#define _UAPI_LIVEPATCH_H
+> +
+> +#define KLP_RELA_PREFIX		".klp.rela."
+> +#define KLP_SYM_PREFIX		".klp.sym."
+> +
+> +#endif /* _UAPI_LIVEPATCH_H */
+> diff --git a/kernel/livepatch/core.c b/kernel/livepatch/core.c
+> index 201f0c0482fb..c565d33db582 100644
+> --- a/kernel/livepatch/core.c
+> +++ b/kernel/livepatch/core.c
+> @@ -234,7 +234,7 @@ static int klp_resolve_symbols(Elf_Shdr *sechdrs, const char *strtab,
+>  
+>  		/* Format: .klp.sym.sym_objname.sym_name,sympos */
+>  		cnt = sscanf(strtab + sym->st_name,
+> -			     ".klp.sym.%55[^.].%511[^,],%lu",
+> +			     KLP_SYM_PREFIX "%55[^.].%511[^,],%lu",
+>  			     sym_objname, sym_name, &sympos);
+>  		if (cnt != 3) {
+>  			pr_err("symbol %s has an incorrectly formatted name\n",
+> @@ -305,7 +305,7 @@ int klp_apply_section_relocs(struct module *pmod, Elf_Shdr *sechdrs,
+>  	 * See comment in klp_resolve_symbols() for an explanation
+>  	 * of the selected field width value.
+>  	 */
+> -	cnt = sscanf(shstrtab + sec->sh_name, ".klp.rela.%55[^.]",
+> +	cnt = sscanf(shstrtab + sec->sh_name, KLP_RELA_PREFIX "%55[^.]",
+>  		     sec_objname);
+>  	if (cnt != 1) {
+>  		pr_err("section %s has an incorrectly formatted name\n",
+> -- 
+> 2.39.2
+> 
