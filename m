@@ -2,240 +2,98 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF31CC6FD1B
-	for <linux-kbuild@archiver.kernel.org>; Tue,  7 Mar 2023 15:59:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 667B2C742A7
+	for <linux-kbuild@archiver.kernel.org>; Tue,  7 Mar 2023 19:59:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231628AbjCGP7O (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 7 Mar 2023 10:59:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41552 "EHLO
+        id S230487AbjCGT7U (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 7 Mar 2023 14:59:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231633AbjCGP6Q (ORCPT
+        with ESMTP id S231526AbjCGT7C (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 7 Mar 2023 10:58:16 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E46E19477D;
-        Tue,  7 Mar 2023 07:57:04 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id h11-20020a17090a2ecb00b00237c740335cso12268393pjs.3;
-        Tue, 07 Mar 2023 07:57:04 -0800 (PST)
+        Tue, 7 Mar 2023 14:59:02 -0500
+Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D9B824493;
+        Tue,  7 Mar 2023 11:55:39 -0800 (PST)
+Received: by mail-yb1-xb36.google.com with SMTP id k23so12555885ybk.13;
+        Tue, 07 Mar 2023 11:55:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678204624;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20210112; t=1678218938;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0+WhmNvyuzqlExpYYh7Rlrgluvlj6y0oW+rTW+VkZB4=;
-        b=V3sin0IBOGbhGIEs2LKhORy9EQaehgDvid40b0dvoHNQIGRt3VoQbCI2S9S9rOaGlm
-         HxJPN7egTgZ/7NXm/vw2EhjYFCX2YJvgUFSrJsHXMebXyu6+c6LU1d+kOzs9t3M9G7hI
-         yr3t1Iieh0+wp0w3ijKHszJA3CMU06cha6l9doSi3v3CgqkksAGBJ1PnzjZ5vsM0UADQ
-         0iIi75xFhx4H0+sSfBLMON6QHUW8UDLayK3nxcMssCPVPLxHG1/SREpaAyfbr+CFBVIs
-         ghyBxTAZaVWUO2/WaxrPupGd+0wIA4h/582X+QDFHgSxSVA0MzjKrwB6WRBcd/NEGpL2
-         uAsA==
+        bh=W0IZLqmZy0tkE3D6dehIaOZJMQhJ6wIO1l7RgkyXBKU=;
+        b=P1sOOl+jOSGV2KvhWDTm43KAlEkQoK1UU4EX0jCulOuurJF0V1C7CQ02KMaGUqTw9X
+         QZKqqhQXAIeC9WFvTnpXfeJVdEDypFi1ohEtENR9FUFx1uQLLf6fmHpydoUTAfAY4ho+
+         Kri4JCyuykgvVY0sp3gqvrf1lKz/Vlp16qkwU2/n9IDp0gqun48Bsir6i6iW3xa+nRUo
+         EfpjSr7lZlWuyRRp1tvBgpfyoGfBFgYKhA1HCd4eDaZBUtR0H+U/DTkQpmSikp35L3i1
+         KTLziDNysQ6CLpKJHuAfc1hVcxXQIuUodvQ6BuDM3pxJ35VK0gIAUAbhWn+9OPqwmABW
+         TyMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678204624;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20210112; t=1678218938;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0+WhmNvyuzqlExpYYh7Rlrgluvlj6y0oW+rTW+VkZB4=;
-        b=zBGS6pdFc7nlE8J0L1tod8OxtcpX3pq62T2TEOeb/vj4eKQn9DB4DXl2aEdQZx+HEf
-         5lSKfYp4Z16Yc0kcsdrDAGT1IxtqHhfa5ARHF6f/BB44AOrKWv+Wh1s5ZmwawZQilQf6
-         c2z9eC60gZtJry/DHaNXjbQUC+8qFPSq5/fUGD4yXsCg3+NGGrQcX7NTzjJcbhJE47L9
-         3s9nXQYuqa+BOe1FWL3suOTFK97uy3kOJNrYrgWS8HCF2CFNv35lV8tTmvRRi3uIJXuO
-         +G/2Bh8e9qR4RptjWqOs0Ger0tGH/4sbkOLO3BH1K79sGwoE+RnW+iuAMq95FAAY1dzT
-         yaHA==
-X-Gm-Message-State: AO0yUKWdiCo40c6bhanjBj96cgNDTSvyEBUSqfLmU8iU05hGTl0UKNaT
-        4v53iETDvCMgHEXAzCClT+CQpK0gwDVMZQ==
-X-Google-Smtp-Source: AK7set+yZM9Dwc6FqtYsJowtfxw9gQp79YeaxR3WXOXCIzmggTmF27wy9SYGXc/IWDYEO869x99FJA==
-X-Received: by 2002:a17:90a:6485:b0:237:461c:b44d with SMTP id h5-20020a17090a648500b00237461cb44dmr15265856pjj.46.1678204624100;
-        Tue, 07 Mar 2023 07:57:04 -0800 (PST)
-Received: from nvrarch.lan ([218.186.180.226])
-        by smtp.gmail.com with ESMTPSA id v9-20020a17090ae98900b00233afe09177sm9405070pjy.8.2023.03.07.07.57.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Mar 2023 07:57:03 -0800 (PST)
-From:   Vinay Varma <varmavinaym@gmail.com>
-Cc:     masahiroy@kernel.org, alicef@alicef.me,
-        Vinay Varma <varmavinaym@gmail.com>,
-        Nathan Chancellor <nathan@kernel.org>,
+        bh=W0IZLqmZy0tkE3D6dehIaOZJMQhJ6wIO1l7RgkyXBKU=;
+        b=XbLh1k92vvcYqn2EEN71PPVfsySCpUmZ3v3HrAlHrJh/nE9ETktZ5HbpMIHZbAvZU8
+         lpD1vaTuDERUfyOSZZ0iDhOqjlcj05KED46de2V05Fn/zGvN+eLwYAFpmLtw1uixsYpO
+         zsX2kkZARV5LmpOT79zT06XRrcfuwlkdgo3eW6zgn5XEuJBRsWQSG4qcl3tpkobAkb+b
+         +IvSpbuE6IRb6/vQXkOat/Ao40zV+bEvm2qNupTYrqasauf8BxX7cfZPHIPqIuGmlGtA
+         +BHuW0MkoYLgaiykJRSW7Akp+QIU1JPocWDUu6T9oLdoEe951BKVeIJhwkZ6Kddnq4ot
+         C5Dw==
+X-Gm-Message-State: AO0yUKWgtP9Q5rEx5KPjw0Dhk9ce2udNiu7XMi4FFntui2ksF22m6mty
+        FkC9mi8PwWnaxposekb4ct8sVxMX47HNPZEutow=
+X-Google-Smtp-Source: AK7set9q7Fr5lAcQ+rUn/aXjIXW/u94G5SLO1K/+kqdRhPEJFxECPOa51JwvvrUobgAJvlH9+sSBCHaRLK4iCfY53Yg=
+X-Received: by 2002:a05:6902:4c2:b0:a36:3875:564a with SMTP id
+ v2-20020a05690204c200b00a363875564amr9258448ybs.2.1678218938404; Tue, 07 Mar
+ 2023 11:55:38 -0800 (PST)
+MIME-Version: 1.0
+References: <CANiq72k4cOEOykgUhgqaXPC7xhX2EoC8c4sr1oFEhKMfEdi=wA@mail.gmail.com>
+ <20230121052507.885734-1-varmavinaym@gmail.com> <CAK7LNAT1p=ykc1yruvzRiYthCAuXNcLq9461Mdgz95Z39_MYxQ@mail.gmail.com>
+ <ZAdYIMYAwsOwErIl@nvrarch>
+In-Reply-To: <ZAdYIMYAwsOwErIl@nvrarch>
+From:   Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date:   Tue, 7 Mar 2023 20:55:27 +0100
+Message-ID: <CANiq72=mg3LEdqaiy+4VDn67-C++Fyz21gefns_EvgUwGfPCTQ@mail.gmail.com>
+Subject: Re: [PATCH v2] scripts: `make rust-analyzer` for out-of-tree modules
+To:     Vinay Varma <varmavinaym@gmail.com>
+Cc:     Masahiro Yamada <masahiroy@kernel.org>, alicef@alicef.me,
+        Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        Nicolas Schier <nicolas@fjasle.eu>,
         Miguel Ojeda <ojeda@kernel.org>,
         Alex Gaynor <alex.gaynor@gmail.com>,
         Wedson Almeida Filho <wedsonaf@gmail.com>,
         Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-        =?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
+        =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
         linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
         rust-for-linux@vger.kernel.org
-Subject: [PATCH v4] scripts: `make rust-analyzer` for out-of-tree modules
-Date:   Tue,  7 Mar 2023 23:55:22 +0800
-Message-Id: <20230307155521.241104-1-varmavinaym@gmail.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230307144233.205819-1-varmavinaym@gmail.com>
-References: <20230307144233.205819-1-varmavinaym@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-To:     unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Adds support for out-of-tree rust modules to use the `rust-analyzer`
-make target to generate the rust-project.json file.
+On Tue, Mar 7, 2023 at 4:28=E2=80=AFPM Vinay Varma <varmavinaym@gmail.com> =
+wrote:
+>
+> Sorry, got caught up with another project and lost track of this thread.
+> I have updated the patch and replied to some of the threads inline.
 
-The change involves adding an optional parameter `external_src` to the
-`generate_rust_analyzer.py` which expects the path to the out-of-tree
-module's source directory. When this parameter is passed, I have chosen
-not to add the non-core modules (samples and drivers) into the result
-since these are not expected to be used in third party modules. Related
-changes are also made to the Makefile and rust/Makefile allowing the
-`rust-analyzer` target to be used for out-of-tree modules as well.
+No problem -- thanks!
 
-Link: https://github.com/Rust-for-Linux/linux/pull/914
-Link: https://github.com/Rust-for-Linux/rust-out-of-tree-module/pull/2
+Note that we may need a rebase after
+https://lore.kernel.org/rust-for-linux/20230307120736.75492-1-nmi@metaspace=
+.dk/
+(or equivalent) lands in `rust-fixes`. So perhaps wait for that, then
+rebase (especially if we go with the EAFP style), and then others may
+want to give it a spin for a re-test.
 
-Signed-off-by: Vinay Varma <varmavinaym@gmail.com>
----
- Makefile                          | 11 +++++-----
- rust/Makefile                     |  6 ++++--
- scripts/generate_rust_analyzer.py | 36 +++++++++++++++++++------------
- 3 files changed, 32 insertions(+), 21 deletions(-)
+When you rebase, please consider putting `f"{name}.o"` inside the
+function to avoid repetition, and perhaps consider inverting the
+condition to avoid indenting the file further (and reducing the diff).
+It makes the "Skip ..." comment more understandable (otherwise, you
+may want to change the comment to "Only process ..." or similar
+instead of using "Skip ...").
 
-diff --git a/Makefile b/Makefile
-index 3f6628780eb2..ee7b61dc6075 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1860,11 +1860,6 @@ rustfmt:
- rustfmtcheck: rustfmt_flags = --check
- rustfmtcheck: rustfmt
- 
--# IDE support targets
--PHONY += rust-analyzer
--rust-analyzer:
--	$(Q)$(MAKE) $(build)=rust $@
--
- # Misc
- # ---------------------------------------------------------------------------
- 
-@@ -1917,6 +1912,7 @@ help:
- 	@echo  '  modules         - default target, build the module(s)'
- 	@echo  '  modules_install - install the module'
- 	@echo  '  clean           - remove generated files in module directory only'
-+	@echo  '  rust-analyzer	  - generate rust-project.json rust-analyzer support file'
- 	@echo  ''
- 
- endif # KBUILD_EXTMOD
-@@ -2053,6 +2049,11 @@ quiet_cmd_tags = GEN     $@
- tags TAGS cscope gtags: FORCE
- 	$(call cmd,tags)
- 
-+# IDE support targets
-+PHONY += rust-analyzer
-+rust-analyzer:
-+	$(Q)$(MAKE) $(build)=rust $@
-+
- # Script to generate missing namespace dependencies
- # ---------------------------------------------------------------------------
- 
-diff --git a/rust/Makefile b/rust/Makefile
-index 8f598a904f38..41c1435cd8d4 100644
---- a/rust/Makefile
-+++ b/rust/Makefile
-@@ -389,8 +389,10 @@ quiet_cmd_rustc_library = $(if $(skip_clippy),RUSTC,$(RUSTC_OR_CLIPPY_QUIET)) L
- 	$(if $(rustc_objcopy),;$(OBJCOPY) $(rustc_objcopy) $@)
- 
- rust-analyzer:
--	$(Q)$(srctree)/scripts/generate_rust_analyzer.py $(srctree) $(objtree) \
--		$(RUST_LIB_SRC) > $(objtree)/rust-project.json
-+	$(Q)$(srctree)/scripts/generate_rust_analyzer.py \
-+		$(abs_srctree) $(abs_objtree) \
-+		$(RUST_LIB_SRC) $(KBUILD_EXTMOD) > \
-+		$(if $(KBUILD_EXTMOD),$(extmod_prefix),$(objtree))/rust-project.json
- 
- $(obj)/core.o: private skip_clippy = 1
- $(obj)/core.o: private skip_flags = -Dunreachable_pub
-diff --git a/scripts/generate_rust_analyzer.py b/scripts/generate_rust_analyzer.py
-index ecc7ea9a4dcf..7a1a958b1f8a 100755
---- a/scripts/generate_rust_analyzer.py
-+++ b/scripts/generate_rust_analyzer.py
-@@ -6,10 +6,11 @@
- import argparse
- import json
- import logging
-+import os
- import pathlib
- import sys
- 
--def generate_crates(srctree, objtree, sysroot_src):
-+def generate_crates(srctree, objtree, sysroot_src, external_src):
-     # Generate the configuration list.
-     cfg = []
-     with open(objtree / "include" / "generated" / "rustc_cfg") as fd:
-@@ -65,7 +66,7 @@ def generate_crates(srctree, objtree, sysroot_src):
-         [],
-         is_proc_macro=True,
-     )
--    crates[-1]["proc_macro_dylib_path"] = "rust/libmacros.so"
-+    crates[-1]["proc_macro_dylib_path"] = f"{objtree}/rust/libmacros.so"
- 
-     append_crate(
-         "build_error",
-@@ -95,25 +96,31 @@ def generate_crates(srctree, objtree, sysroot_src):
-         "exclude_dirs": [],
-     }
- 
-+    def is_root_crate(build_file, target):
-+        return os.path.exists(build_file) and target in open(build_file).read()
-+
-     # Then, the rest outside of `rust/`.
-     #
-     # We explicitly mention the top-level folders we want to cover.
--    for folder in ("samples", "drivers"):
--        for path in (srctree / folder).rglob("*.rs"):
-+    extra_dirs = map(lambda dir: srctree / dir, ("samples", "drivers"))
-+    if external_src is not None:
-+        extra_dirs = [external_src]
-+    for folder in extra_dirs:
-+        for path in folder.rglob("*.rs"):
-             logging.info("Checking %s", path)
-             name = path.name.replace(".rs", "")
- 
-             # Skip those that are not crate roots.
--            if f"{name}.o" not in open(path.parent / "Makefile").read():
--                continue
-+            if is_root_crate(path.parent / "Makefile", f"{name}.o") or \
-+               is_root_crate(path.parent / "Kbuild", f"{name}.o"):
- 
--            logging.info("Adding %s", name)
--            append_crate(
--                name,
--                path,
--                ["core", "alloc", "kernel"],
--                cfg=cfg,
--            )
-+                logging.info("Adding %s", name)
-+                append_crate(
-+                    name,
-+                    path,
-+                    ["core", "alloc", "kernel"],
-+                    cfg=cfg,
-+                )
- 
-     return crates
- 
-@@ -123,6 +130,7 @@ def main():
-     parser.add_argument("srctree", type=pathlib.Path)
-     parser.add_argument("objtree", type=pathlib.Path)
-     parser.add_argument("sysroot_src", type=pathlib.Path)
-+    parser.add_argument("exttree", type=pathlib.Path, nargs="?")
-     args = parser.parse_args()
- 
-     logging.basicConfig(
-@@ -131,7 +139,7 @@ def main():
-     )
- 
-     rust_project = {
--        "crates": generate_crates(args.srctree, args.objtree, args.sysroot_src),
-+        "crates": generate_crates(args.srctree, args.objtree, args.sysroot_src, args.exttree),
-         "sysroot_src": str(args.sysroot_src),
-     }
- 
--- 
-2.39.2
-
+Cheers,
+Miguel
