@@ -2,54 +2,34 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 457CEC64EC4
-	for <linux-kbuild@archiver.kernel.org>; Wed,  8 Mar 2023 17:04:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43153C678D5
+	for <linux-kbuild@archiver.kernel.org>; Wed,  8 Mar 2023 17:05:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229874AbjCHREB (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 8 Mar 2023 12:04:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40230 "EHLO
+        id S230088AbjCHRFq (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 8 Mar 2023 12:05:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230092AbjCHRDj (ORCPT
+        with ESMTP id S229800AbjCHRFf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 8 Mar 2023 12:03:39 -0500
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EB8B38B46;
-        Wed,  8 Mar 2023 09:02:38 -0800 (PST)
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-        by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 328H1vjx018910;
-        Wed, 8 Mar 2023 11:01:57 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1678294917;
-        bh=Rzhdyx4/bWaLNlhaP+DWfD17bwuJ+afLN2sYULYLQKI=;
-        h=Date:Subject:To:CC:References:From:In-Reply-To;
-        b=EKUUO1WFLbEyQYR3mburZt281MOy7feMi7MHdl66XW6FMv03Ymhh2JX0A8SumNzti
-         s+SANVBt5DyPm7IkJBqwAK1zbAgrNyF54Vl9l2VmO8x82efYBI9vn62C56b4DH5D51
-         db4aNHSpnpjTPDlwJegpEF6uFBIMlx7X695wGHhI=
-Received: from DFLE107.ent.ti.com (dfle107.ent.ti.com [10.64.6.28])
-        by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 328H1vXJ026069
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 8 Mar 2023 11:01:57 -0600
-Received: from DFLE112.ent.ti.com (10.64.6.33) by DFLE107.ent.ti.com
- (10.64.6.28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.16; Wed, 8
- Mar 2023 11:01:57 -0600
-Received: from lelv0326.itg.ti.com (10.180.67.84) by DFLE112.ent.ti.com
- (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.16 via
- Frontend Transport; Wed, 8 Mar 2023 11:01:57 -0600
-Received: from [10.247.19.40] (ileaxei01-snat2.itg.ti.com [10.180.69.6])
-        by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 328H1vQm002979;
-        Wed, 8 Mar 2023 11:01:57 -0600
-Message-ID: <b3820dd3-83dd-278e-e9ad-814be0bc8cfa@ti.com>
-Date:   Wed, 8 Mar 2023 11:01:56 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH] kbuild: Disallow DTB overlays to built from .dts named
- source files
-Content-Language: en-US
-To:     Nicolas Schier <nicolas@fjasle.eu>
-CC:     Sascha Hauer <s.hauer@pengutronix.de>,
+        Wed, 8 Mar 2023 12:05:35 -0500
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71E293B0C7;
+        Wed,  8 Mar 2023 09:05:21 -0800 (PST)
+Received: from leknes.fjasle.eu ([46.142.97.228]) by mrelayeu.kundenserver.de
+ (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis) id
+ 1M9nlN-1pfhr81LW9-005pvL; Wed, 08 Mar 2023 17:56:39 +0100
+Received: by leknes.fjasle.eu (Postfix, from userid 1000)
+        id 539723C0EE; Wed,  8 Mar 2023 17:56:34 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fjasle.eu; s=mail;
+        t=1678294594; bh=7VWMwfXXv0YD8F9Lq169jrl7Zw+rwUp8ZVw3UymO9/o=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=AYbiKWo6Y8ak5EvFzXrG1NuTCXhu/a60TJTxgZs9YrPaR1e8c5ZXw5DzK1GbT12Xw
+         YM9NbplWU5a7r74Uja4ihpCLdqYMEb8gRCwfH7ekhTfciiG127mIwo1f9G6xQdhePV
+         UCuqPErU6ACUenJK676pFd71wl2TaBzPhflyG+4s=
+Date:   Wed, 8 Mar 2023 17:56:34 +0100
+From:   Nicolas Schier <nicolas@fjasle.eu>
+To:     Andrew Davis <afd@ti.com>
+Cc:     Sascha Hauer <s.hauer@pengutronix.de>,
         Rob Herring <robh+dt@kernel.org>,
         Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
         Nishanth Menon <nm@ti.com>,
@@ -61,57 +41,72 @@ CC:     Sascha Hauer <s.hauer@pengutronix.de>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        <devicetree@vger.kernel.org>, <linux-kbuild@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20230306224752.8417-1-afd@ti.com> <ZAi+Qo1z2OkrqncP@fjasle.eu>
-From:   Andrew Davis <afd@ti.com>
-In-Reply-To: <ZAi+Qo1z2OkrqncP@fjasle.eu>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+        devicetree@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] kbuild: Disallow DTB overlays to built from .dts named
+ source files
+Message-ID: <ZAi+Qo1z2OkrqncP@fjasle.eu>
+References: <20230306224752.8417-1-afd@ti.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20230306224752.8417-1-afd@ti.com>
+X-Provags-ID: V03:K1:8JHUdQfsgXsc3MmQdY06IDbmasMyiee9XYceo3T8y+M0stCLqA8
+ aYBVjJbUetgHxd/i2J1+NXGK4EsAkTwKsTgjx7vBfYwEA19b6Y1qn1h5W7GsUszVJUoPdmU
+ Gg8yV4wXbP+MlLdvRllTCwmu/rtT9Ge11JenKM4XnWN5H9WfyT79UD6P+Pi5M5jbnWQ8Gro
+ 0XWYuYCrYoE+a/6Xjo64A==
+UI-OutboundReport: notjunk:1;M01:P0:dSGm0YPz3s8=;vb8e7fVSk4bNsFLEMS1MxlVrjtu
+ dKMrBQpnbmkYN96hy1WPrebQrmRRorEm/h6LX3Kyu/TBjf2d+rB0ybyJv9+76hcHQXQ4PZmjz
+ 5k3ZHhhlT+hmOYT56I7f2TNErog8GIhwArJR55EpmG13ER9EIDDjXIKAZYkEnJGhBPqC6Sn6n
+ JETssKxWt2xl4kxTcSSjHObHhMqzZOgDUMS9ixE4PkS7Ij99lpZ49EV24qPwP0IA+SyQfO4wW
+ Bmof21Gx2Qo4At6+k8WNZqwpq3WeZcsA1KYuhH67F4WwXzoGf41WZeXe1/smo8DYelUKPO92L
+ CtBxxe5m0pjHX7E0KmNa+Hg/h88DxzOU+TBD1dcRfd5zejGx4xUJwd7EVJzh8+m52MN6H6ZRU
+ sbh7SzP/kcMv8Bo87CMB2bsYZ1T7imdkJ+1HooRIVi+P4ueTvqf9ezBa0TjyijuAF05Vd3pIg
+ DKuDESFktiHK4AhsnqUM9obsqSthgRZsPMiSLCMrUuLdvhh8NquEJAECQlZnSeNkPOrMGT/Aj
+ b2TM12jrwYBVdvyEdK3GqCoUYgBstlO7HX4FEitgMqe/cSivj8Yg2BJ30b04J2jpJJlYWFk1M
+ Cb/y+fftPw9X8Ozwn9XuiNByn8GiLYcYHpGr3RxXUGvn7agZZxgt1ZUOspKS5cX0cM6ETPsld
+ hfNSMOWe6GXsaa/iu7OEg35Ag0O1Awp2n8PfBTW5TZXmRcljKKLJMSX2hlgx1DgmmnH4o/ONP
+ dkote5MuKaRe9sGm6+D5Yb3Kf2Bqezzvg==
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On 3/8/23 10:56 AM, Nicolas Schier wrote:
-> On Mon, Mar 06, 2023 at 04:47:52PM -0600 Andrew Davis wrote:
->> As a follow up to the series allowing DTB overlays to built from .dtso
->> files. Now that all overlays have been renamed, remove the ability to
->> build from overlays from .dts files to prevent any files with the old
->          ^^^^
-> 
-> The first "from" sounds superfluous to me.
-> 
+On Mon, Mar 06, 2023 at 04:47:52PM -0600 Andrew Davis wrote:
+> As a follow up to the series allowing DTB overlays to built from .dtso
+> files. Now that all overlays have been renamed, remove the ability to
+> build from overlays from .dts files to prevent any files with the old
+        ^^^^
 
-It is a typo, feel free to drop it locally whoever takes this patch.
+The first "from" sounds superfluous to me.
 
-Thanks,
-Andrew
+Kind regards,
+Nicolas
+> name from accidental being added.
+>=20
+> Signed-off-by: Andrew Davis <afd@ti.com>
+> ---
+>  scripts/Makefile.lib | 3 ---
+>  1 file changed, 3 deletions(-)
+>=20
+> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+> index 100a386fcd71..68d0134bdbf9 100644
+> --- a/scripts/Makefile.lib
+> +++ b/scripts/Makefile.lib
+> @@ -418,9 +418,6 @@ endif
+>  $(obj)/%.dtb: $(src)/%.dts $(DTC) $(DT_TMP_SCHEMA) FORCE
+>  	$(call if_changed_dep,dtb)
+> =20
+> -$(obj)/%.dtbo: $(src)/%.dts $(DTC) FORCE
+> -	$(call if_changed_dep,dtc)
+> -
+>  $(obj)/%.dtbo: $(src)/%.dtso $(DTC) FORCE
+>  	$(call if_changed_dep,dtc)
+> =20
+> --=20
+> 2.39.2
 
-> Kind regards,
-> Nicolas
->> name from accidental being added.
->>
->> Signed-off-by: Andrew Davis <afd@ti.com>
->> ---
->>   scripts/Makefile.lib | 3 ---
->>   1 file changed, 3 deletions(-)
->>
->> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
->> index 100a386fcd71..68d0134bdbf9 100644
->> --- a/scripts/Makefile.lib
->> +++ b/scripts/Makefile.lib
->> @@ -418,9 +418,6 @@ endif
->>   $(obj)/%.dtb: $(src)/%.dts $(DTC) $(DT_TMP_SCHEMA) FORCE
->>   	$(call if_changed_dep,dtb)
->>   
->> -$(obj)/%.dtbo: $(src)/%.dts $(DTC) FORCE
->> -	$(call if_changed_dep,dtc)
->> -
->>   $(obj)/%.dtbo: $(src)/%.dtso $(DTC) FORCE
->>   	$(call if_changed_dep,dtc)
->>   
->> -- 
->> 2.39.2
-> 
+--=20
+epost|xmpp: nicolas@fjasle.eu          irc://oftc.net/nsc
+=E2=86=B3 gpg: 18ed 52db e34f 860e e9fb  c82b 7d97 0932 55a0 ce7f
+     -- frykten for herren er opphav til kunnskap --
