@@ -2,80 +2,93 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EE3BC6FA99
-	for <linux-kbuild@archiver.kernel.org>; Tue,  7 Mar 2023 20:07:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7212EC678D5
+	for <linux-kbuild@archiver.kernel.org>; Wed,  8 Mar 2023 01:54:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231561AbjCGUHD (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 7 Mar 2023 15:07:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46134 "EHLO
+        id S229480AbjCHByS (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 7 Mar 2023 20:54:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230460AbjCGUGr (ORCPT
+        with ESMTP id S229477AbjCHByR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 7 Mar 2023 15:06:47 -0500
-X-Greylist: delayed 930 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 07 Mar 2023 12:06:37 PST
-Received: from mail.vukad.in (mail.vukad.in [134.209.187.160])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C19C899D65;
-        Tue,  7 Mar 2023 12:06:37 -0800 (PST)
-Received: from kreator.vukad.in (dh207-125-167.xnet.hr [88.207.125.167])
-        by mail.vukad.in (Postfix) with ESMTPSA id 5707B160081;
-        Tue,  7 Mar 2023 20:40:47 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=vukad.in; s=mail;
-        t=1678218047; bh=vo3sVDOx/JkAqhi7qGWauEgDUk5ce+94wjbTjZGEpM0=;
-        h=From:To:Cc:Subject:Date;
-        b=aMcWaM4Hvqel5L5QeIMqdNGjegztyXTkQCVn6v5YMT3+eWBzKgo0San2jKL3QC2Bt
-         7HsEq3ZvwpQbVOyRESs+KQMdgZCyuGubrM2Rg1/e59uIsljaHuaOVpuoyaoPqFMjup
-         Kaw7wyh9Li7FiFWr8QyBWU1KRVEgCrWiB8r8W9cIzamnm5wyBhE0ptFfXR6ThN2So6
-         1oTHev4uQJH9j58gezEb3CBK3COq4ZdaqsXRYMzy/nLfqe4Kz1dwjzuJ+ovFmUulXQ
-         0aEsUBxtZz3IGqPmwnCflbu+kJvOJerGomOGnwLLBvV47tcE8WycSL1zgtXSORl/NI
-         FIC/Wi3WAu40Q==
-From:   Jurica Vukadin <jura@vukad.in>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jurica Vukadin <jura@vukad.in>
-Subject: [PATCH] kconfig: Update config changed flag before calling callback
-Date:   Tue,  7 Mar 2023 20:40:39 +0100
-Message-Id: <20230307194039.8825-1-jura@vukad.in>
-X-Mailer: git-send-email 2.39.2
+        Tue, 7 Mar 2023 20:54:17 -0500
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2AD75F531;
+        Tue,  7 Mar 2023 17:54:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1678240456; x=1709776456;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=6/zv7m3IA6CkY+ozpRASdY5fBVx8Ky1TfJQ7tvgNfng=;
+  b=ieYTNiYa4jqePsO3JoXTACiErSX7pKPNZUMnIqlYlWBuoT+NWyyaFjVc
+   1myg5JdOaIWvVAdHB5QgvW8qZ3IeYyisAkqdVWH4++gu4iLPj3w64BBgN
+   a7i7PUaKzy7otQTgBGhd+ABOIFjlTXp48O3sD0xY2936oMK/xRkm6s4e+
+   g6t2WdOXXSCxh++C2RlbyJbuv6MTXOkEoHrxwfIWX2Ce91rgnb52EB+wG
+   LNvMZj4gXLlhOuzB3xLzu28Q7lDun+OCjlwsIEE9iwTl+nK0aQSjw/uYh
+   WABzGP2f5O+J+d8Qn0QTmiXkuHcyBI2sJ2XGU8Kz7bkPhcwxykQf27hb/
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10642"; a="333501355"
+X-IronPort-AV: E=Sophos;i="5.98,242,1673942400"; 
+   d="scan'208";a="333501355"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2023 17:54:16 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10642"; a="676794837"
+X-IronPort-AV: E=Sophos;i="5.98,242,1673942400"; 
+   d="scan'208";a="676794837"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.48]) ([10.239.159.48])
+  by orsmga002.jf.intel.com with ESMTP; 07 Mar 2023 17:54:07 -0800
+Message-ID: <63a49364-21c4-e82d-6449-18f163efff61@linux.intel.com>
+Date:   Wed, 8 Mar 2023 09:53:10 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Cc:     baolu.lu@linux.intel.com, okaya@kernel.org, harpreet.anand@amd.com,
+        nikhil.agarwal@amd.com, michal.simek@amd.com,
+        pieter.jansen-van-vuuren@amd.com, pablo.cascon@amd.com, git@amd.com
+Subject: Re: [PATCH v9 2/7] iommu: Support ops registration for CDX bus
+Content-Language: en-US
+To:     Nipun Gupta <nipun.gupta@amd.com>, robh+dt@kernel.org,
+        krzysztof.kozlowski+dt@linaro.org, gregkh@linuxfoundation.org,
+        rafael@kernel.org, eric.auger@redhat.com,
+        alex.williamson@redhat.com, cohuck@redhat.com,
+        song.bao.hua@hisilicon.com, mchehab+huawei@kernel.org,
+        maz@kernel.org, f.fainelli@gmail.com, jeffrey.l.hugo@gmail.com,
+        saravanak@google.com, Michael.Srba@seznam.cz, mani@kernel.org,
+        yishaih@nvidia.com, jgg@ziepe.ca, jgg@nvidia.com,
+        robin.murphy@arm.com, will@kernel.org, joro@8bytes.org,
+        masahiroy@kernel.org, ndesaulniers@google.com,
+        rdunlap@infradead.org, linux-arm-kernel@lists.infradead.org,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        devicetree@vger.kernel.org
+References: <20230307131917.30605-1-nipun.gupta@amd.com>
+ <20230307131917.30605-3-nipun.gupta@amd.com>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <20230307131917.30605-3-nipun.gupta@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Prior to commit 5ee546594025 ("kconfig: change sym_change_count to a
-boolean flag"), the conf_updated flag was set to the new value *before*
-calling the callback. xconfig's save action depends on this behaviour,
-because xconfig calls conf_get_changed() directly from the callback and
-now sees the old value, thus never enabling the save button or the
-shortcut.
+On 3/7/23 9:19 PM, Nipun Gupta wrote:
+> With new CDX bus supported for AMD FPGA devices on ARM
+> platform, the bus requires registration for the SMMU v3
+> driver.
+> 
+> Signed-off-by: Nipun Gupta<nipun.gupta@amd.com>
+> Reviewed-by: Pieter Jansen van Vuuren<pieter.jansen-van-vuuren@amd.com>
+> Tested-by: Nikhil Agarwal<nikhil.agarwal@amd.com>
 
-Restore the previous behaviour.
+Nit:
 
-Fixes: 5ee546594025 ("kconfig: change sym_change_count to a boolean flag")
-Signed-off-by: Jurica Vukadin <jura@vukad.in>
----
- scripts/kconfig/confdata.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+The bus iommu ops is about to retire. So probably the commit title could
+be "iommu: Add iommu probe for CDX bus"?
 
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index b7c9f1dd5e42..992575f1e976 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -1226,10 +1226,12 @@ static void (*conf_changed_callback)(void);
- 
- void conf_set_changed(bool val)
- {
--	if (conf_changed_callback && conf_changed != val)
--		conf_changed_callback();
-+	bool changed = conf_changed != val;
- 
- 	conf_changed = val;
-+
-+	if (conf_changed_callback && changed)
-+		conf_changed_callback();
- }
- 
- bool conf_get_changed(void)
--- 
-2.39.2
+Anyway,
 
+Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
+
+Best regards,
+baolu
