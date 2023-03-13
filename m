@@ -2,89 +2,63 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B074C6FD19
-	for <linux-kbuild@archiver.kernel.org>; Mon, 13 Mar 2023 09:41:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AA2FC61DA4
+	for <linux-kbuild@archiver.kernel.org>; Mon, 13 Mar 2023 10:27:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229743AbjCMJlT (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 13 Mar 2023 05:41:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38852 "EHLO
+        id S229810AbjCMK1g (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 13 Mar 2023 06:27:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229664AbjCMJlS (ORCPT
+        with ESMTP id S229534AbjCMK1f (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 13 Mar 2023 05:41:18 -0400
+        Mon, 13 Mar 2023 06:27:35 -0400
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DAF812E;
-        Mon, 13 Mar 2023 02:41:17 -0700 (PDT)
-From:   Bastian Germann <bage@linutronix.de>
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DC013D93E;
+        Mon, 13 Mar 2023 03:27:35 -0700 (PDT)
+Message-ID: <f9ffe524-21be-4d35-b700-30faaa5841fc@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1678700475;
+        s=2020; t=1678703253;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=Q9CKaZh4szJMAvMtK0X/GWpgV//q3NDYlXAW/WCtFpA=;
-        b=pKxI1RUqa1QN9RGcMBbah8OKkKyCxWoUm3Zrktkcrb0WGHf6MdriVW7BkPkuGCI+NNuMTV
-        9k/ZdZotwsmELCST3B1t/ZM0zpHOhYw2M7twAdUTAPEH2zcJXjJZXHefwPkqCkGmcFtKVE
-        zkqgXfvkZWwxxAjocm+hzxAVd95Hn2Lu0OjXJXqalAWyWJalUz9tosZJVwoZqq6XSiOYYu
-        N/pHfIj++phUodV24K6zjzldHvxPJZY6znB0fPEEApNiVyzfg/jvOGH46jW5hRiWXIeN4l
-        yj+9GoMT6ONrjM9y+29rfjqR4z2HqWBSVjkG56xrKlX20YaCUVXGIwEuql+yTQ==
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=rq0YSUEVkW/ymdvQmMGv1vXwwm1dfjT8X4OBlFPp6eY=;
+        b=wZGHGfL/uJXrzqnuHN7a/+SsZbUVVpg7WB0+8HefrYYNjNhNfmJvvFmK45mkfYoRB1rprC
+        F+EwWNq5CfOHTVyv4wcEo8VrXHhpTjmKQhXF3OLp5FGSeBuhkVNvUOjLvKfueGv7vMbDx5
+        /VhOMqPJyOiZjj8yVPLTSpyJvAgkrEknWkr7T6cVWXlbAABA0HeyOJv9JIzyOjxMHB1HKt
+        +J09dSqarT/Vc54H8Unm7krExAKbghRp/E3uB7dx8HsSL8GSyePHGVM+4AJVe9zDNtgxBT
+        rdA2624gCqnQKEKbAZ9aulbWyf0XAKwG4tXyurp8+YNPIxVdhHyPf6jGDdYwXQ==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1678700475;
+        s=2020e; t=1678703253;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=Q9CKaZh4szJMAvMtK0X/GWpgV//q3NDYlXAW/WCtFpA=;
-        b=VqYSWqZ0v6vNDhq63Y2OWgggwIs3/BSvo6iu8lVjALnmL+GQ7bspGenbsHxM/cGJm5ZCXc
-        rfyewpGk7kJrSVDg==
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=rq0YSUEVkW/ymdvQmMGv1vXwwm1dfjT8X4OBlFPp6eY=;
+        b=thnu0MALUlRXdm9w0r7zwelwIklfpWZvR1Qm0pjGNGI0DQFmiYxv/kCohI6NFQCwUlG8c8
+        alq+DcWkKuJ/VDCQ==
+Date:   Mon, 13 Mar 2023 11:27:33 +0100
+MIME-Version: 1.0
+Subject: Re: [PATCH v3 0/1] builddeb: introduce profile excluding the dbg pkg
+Content-Language: de-DE-frami
 To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Bastian Germann <bage@linutronix.de>,
-        Nathan Chancellor <nathan@kernel.org>,
+Cc:     Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
         linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v3 0/1] builddeb: introduce profile excluding the dbg pkg
-Date:   Mon, 13 Mar 2023 10:41:05 +0100
-Message-Id: <20230313094106.46770-1-bage@linutronix.de>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20230313094106.46770-1-bage@linutronix.de>
+From:   Bastian Germann <bage@linutronix.de>
+In-Reply-To: <20230313094106.46770-1-bage@linutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Introduce a Debian build profile to exclude the massive debug package
-during build. This was sent the first time as part of a patch series:
-<20210411101422.7092-6-bage@linutronix.de>
+Am 13.03.23 um 10:41 schrieb Bastian Germann:
+> Changelog:
+> v2:
+>   * Align the profile name with the one that ended up in Debian.
+> v3:
+>   * Prevent the creation of the dbg package when profile is set
 
-Most of the patch series is included in the current work on mkdebian
-but this is still missing.
-
-A basic test showing better timing.
-It is expected that the relative diff will be greater with more symbols:
-
-make tinyconfig
-# Enable CONFIG_DEBUG_INFO
-time make deb-pkg
-real    5m31,104s
-user    4m30,960s
-sys     0m46,296s
-
-make clean
-time make DPKG_FLAGS=--build-profiles=pkg.linux-upstream.nokerneldbg deb-pkg
-real    5m28,076s
-user    4m25,129s
-sys     0m45,489s
-
-Changelog:
-v2:
- * Align the profile name with the one that ended up in Debian.
-v3:
- * Prevent the creation of the dbg package when profile is set
-
-Bastian Germann (1):
-  builddeb: introduce profile excluding the dbg pkg
-
- scripts/package/builddeb | 4 +++-
- scripts/package/mkdebian | 1 +
- 2 files changed, 4 insertions(+), 1 deletion(-)
-
--- 
-2.39.2
-
+Please ignore v3. Sent the wrong patches.
