@@ -2,139 +2,122 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52E4EC6FD1D
-	for <linux-kbuild@archiver.kernel.org>; Mon, 20 Mar 2023 04:09:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D51D5C7618A
+	for <linux-kbuild@archiver.kernel.org>; Mon, 20 Mar 2023 05:06:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230014AbjCTEJI (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 20 Mar 2023 00:09:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39746 "EHLO
+        id S229529AbjCTFGY (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 20 Mar 2023 01:06:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229972AbjCTEJD (ORCPT
+        with ESMTP id S229458AbjCTFGW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 20 Mar 2023 00:09:03 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06631EF99;
-        Sun, 19 Mar 2023 21:09:00 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32K239vM007733;
-        Mon, 20 Mar 2023 04:09:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=+c0v0f+QowBSsrYxlfwLSKzDuPmAMcXRbidWbkS9Di0=;
- b=AqC2cZxbpptE9ygbWlD4eLnIMhV5eIjL8MMS4ZYRnwT2D6mQDlGGX/0eILzcvQtRT7a2
- 64n9IfIKKK0TNsVX2Emu2FcJwjCTbjzMBM15aLFyn5RQu0Iy84sOBBlstRvrnZNwFIan
- vK60k4TZNNZ/MN/VvJj2uqAeaNfjRFu1+932++ZfI23SnJla3eF/AiXiQNwwbm5ZXeJ3
- D/HC03lB0GB6PA72PUEIyxQ0Lry9JaF0c//bfaOzoNC+ekdvBaeh5+L8cR3S4iunRwRY
- RyzZHW5fP6n7kruR/xWocuQGSyjkYQXk/yNGfIOjTZRxzpI7sqyPbGWytYDa9fbxRS3l FA== 
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pdq5p54b6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 20 Mar 2023 04:08:59 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32JARoTU017094;
-        Mon, 20 Mar 2023 04:08:58 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3pd4x6an1k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 20 Mar 2023 04:08:57 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32K48tKo23396922
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 20 Mar 2023 04:08:55 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 580112004D;
-        Mon, 20 Mar 2023 04:08:55 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CBAD220040;
-        Mon, 20 Mar 2023 04:08:54 +0000 (GMT)
-Received: from ozlabs.au.ibm.com (unknown [9.192.253.14])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 20 Mar 2023 04:08:54 +0000 (GMT)
-Received: from bgray-lenovo-p15.ozlabs.ibm.com (haven.au.ibm.com [9.192.254.114])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ozlabs.au.ibm.com (Postfix) with ESMTPSA id E247E602FE;
-        Mon, 20 Mar 2023 15:08:49 +1100 (AEDT)
-From:   Benjamin Gray <bgray@linux.ibm.com>
-To:     linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
-Cc:     Benjamin Gray <bgray@linux.ibm.com>
-Subject: [PATCH 1/2] initramfs: Check negative timestamp to prevent broken cpio archive
-Date:   Mon, 20 Mar 2023 15:08:38 +1100
-Message-Id: <20230320040839.660475-1-bgray@linux.ibm.com>
-X-Mailer: git-send-email 2.39.2
+        Mon, 20 Mar 2023 01:06:22 -0400
+Received: from mail-ua1-x932.google.com (mail-ua1-x932.google.com [IPv6:2607:f8b0:4864:20::932])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BAC61E9EA;
+        Sun, 19 Mar 2023 22:06:20 -0700 (PDT)
+Received: by mail-ua1-x932.google.com with SMTP id n17so7041815uaj.10;
+        Sun, 19 Mar 2023 22:06:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1679288779;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=6Gib55IPNKPDHGsO/r/1AFOaqBwqBE1C5ui0pHqkTWU=;
+        b=A9+EFIHSfvLTQUD8yPRYxpH5w1+3fXQyS1sPhRmNfufxNEVjShl9soIBeHrtYn2OuQ
+         dywOCnoJMrCJaJ9WxWK9X0+hijatdYIpIUeCB8ERzlM/C2i4xgapDG5b3GR6/1wlCm9o
+         c10nA9Q685xpU3vFPTYeHcwaMcLdIPCGOQv/SLwMA8SqPvRVraWz4PbwweVGsCm5URqX
+         dVffFebYO35Pfu0vQSTMIZomWLr0pVNsrEbptIoKARj5Mum6o5oIQiyblm2P8y7cMtTy
+         zoK3rpjIVarn2N+Narmw/NGhJJA5SXYNP1iW0LxU5mY/J7xrWgRGsZxOkdapPP50yQXn
+         rj5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679288779;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6Gib55IPNKPDHGsO/r/1AFOaqBwqBE1C5ui0pHqkTWU=;
+        b=VR7hZwpYO+LjofRaHmvcXOewvd3K/r5lp+yi0hXjEGWK8cA67Ti5JDZqDaMnTev/Z3
+         s8JVmTBWsPDB7AHukkyNMyyp24t0w57oHTDKehHgOvKlZNPL05O+gMdHUc+TpzP31kSM
+         pG7DNCdGMbRB22TCfHVDzvWMHGQMShjZoOFPB31gdtp6jbyzbTMPJSDnIlnQLRRJyiHT
+         Bh51tBxb5n0Y2ErCou1A7zzXuYoiE1n7JZTJu6nw2OJheDp6AJA/VUVWlgakls67KNlh
+         QClf3neDNWOijUaGjfwAe+nU0bWcpsdRrObw21/lm03ULm3Zy/pR43cMHzLWA77c6SnG
+         /eYA==
+X-Gm-Message-State: AO0yUKXIE8Hcfsuo7Qw19ESHQDRB+U1A161fzdZXM+eOih6Y72TgJ/k/
+        qyEky7SeDYZhIGKglfsPiIflKVVKhfP/+qk9uO3gwsh2OnA=
+X-Google-Smtp-Source: AK7set/LauD6kxENWDuW87+2f6ufLPaM+vYj3cnq/yHfLtx8zE5U70z5GgzowSr+YcHZNHxPsClh8Ev6r9X40hLmTDk=
+X-Received: by 2002:a1f:264e:0:b0:401:4daf:d581 with SMTP id
+ m75-20020a1f264e000000b004014dafd581mr3197662vkm.0.1679288778914; Sun, 19 Mar
+ 2023 22:06:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: EMHSJnVCmMQhS9ullXJc7ze42ztu3ZUs
-X-Proofpoint-GUID: EMHSJnVCmMQhS9ullXJc7ze42ztu3ZUs
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-20_01,2023-03-16_02,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 bulkscore=0
- suspectscore=0 malwarescore=0 phishscore=0 adultscore=0 spamscore=0
- mlxlogscore=999 priorityscore=1501 mlxscore=0 lowpriorityscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303150002 definitions=main-2303200029
+From:   jim.cromie@gmail.com
+Date:   Sun, 19 Mar 2023 23:05:52 -0600
+Message-ID: <CAJfuBxyeKz3bsc=WfjJZDKgAHScC80_irQvmsecxPukjM-J8gw@mail.gmail.com>
+Subject: RFC - KBUILD_MODNAME is misleading in builtins, as seen in /proc/dynamic_debug/control
+To:     LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+Cc:     Greg KH <gregkh@linuxfoundation.org>,
+        Jason Baron <jbaron@akamai.com>,
+        Luis Chamberlain <mcgrof@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Similar to commit 4c9d410f32b3 ("initramfs: Check timestamp to prevent
-broken cpio archive"), except asserts that the timestamp is
-non-negative. This can happen when the KBUILD_BUILD_TIMESTAMP is a value
-before UNIX epoch, which may be set when making reproducible builds that
-don't want to look like they use a valid date.
+dynamic-debug METADATA uses KBUILD_MODNAME as:
 
-While support for dates before 1970 might not be supported, this is more
-about preventing undetected CPIO corruption. The printf's use a minimum
-length format specifier, and will happily make the field longer than 8
-characters if they need to.
+#define DEFINE_DYNAMIC_DEBUG_METADATA_CLS(name, cls, fmt)       \
+        static struct _ddebug  __aligned(8)                     \
+        __section("__dyndbg") name = {                          \
+                .modname = KBUILD_MODNAME,                      \
 
-Signed-off-by: Benjamin Gray <bgray@linux.ibm.com>
+This is going amiss for some builtins, ie those enabled here, by:
 
----
+    echo module main +pmf > /proc/dynamic_debug_control
+    grep =pmf /proc/dynamic_debug/control
 
-Ran into this when setting KBUILD_BUILD_TIMESTAMP=0000-01-01. The kernel
-builds and boots to an initramfs just fine, but inexplicably failed to
-load any root disks. It was a pain to debug, because the first sign of
-an issue was so deep into the boot sequence.
----
- usr/gen_init_cpio.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+init/main.c:1187 [main]initcall_blacklist =pmf "blacklisting initcall %s\n"
+init/main.c:1226 [main]initcall_blacklisted =pmf "initcall %s blacklisted\n"
+init/main.c:1432 [main]run_init_process =pmf "  with arguments:\n"
+init/main.c:1434 [main]run_init_process =pmf "    %s\n"
+init/main.c:1435 [main]run_init_process =pmf "  with environment:\n"
+init/main.c:1437 [main]run_init_process =pmf "    %s\n"
+kernel/module/main.c:336 [main]find_symbol =pmf "Failed to find symbol %s\n"
+kernel/module/main.c:567 [main]already_uses =pmf "%s uses %s!\n"
+kernel/module/main.c:571 [main]already_uses =pmf "%s does not use %s!\n"
+kernel/module/main.c:586 [main]add_module_usage =pmf "Allocating new
+usage for %s.\n"
+kernel/module/main.c:627 [main]module_unload_free =pmf "%s unusing %s\n"
+kernel/module/main.c:733 [main]__do_sys_delete_module =pmf "%s already dying\n"
+kernel/module/main.c:1345 [main]simplify_symbols =pmf "Common symbol: %s\n"
+kernel/module/main.c:1353 [main]simplify_symbols =pmf "Absolute
+symbol: 0x%08lx\n"
+kernel/module/main.c:1508 [main]__layout_sections =pmf "\t%s\n"
+kernel/module/main.c:1526 [main]layout_sections =pmf "Core section
+allocation order:\n"
+kernel/module/main.c:1529 [main]layout_sections =pmf "Init section
+allocation order:\n"
+kernel/module/main.c:2168 [main]move_module =pmf "final section addresses:\n"
+kernel/module/main.c:2183 [main]move_module =pmf "\t0x%lx %s\n"
+kernel/module/main.c:2921 [main]__do_sys_init_module =pmf
+"init_module: umod=%p, len=%lu, uargs=%p\n"
+kernel/module/main.c:2942 [main]__do_sys_finit_module =pmf
+"finit_module: fd=%d, uargs=%p, flags=%i\n"
+drivers/base/power/main.c:135 [main]device_pm_add =pmf "Adding info for %s:%s\n"
+drivers/base/power/main.c:156 [main]device_pm_remove =pmf "Removing
+info for %s:%s\n"
+drivers/base/power/main.c:175 [main]device_pm_move_before =pmf "Moving
+%s:%s before %s:%s\n"
+drivers/base/power/main.c:189 [main]device_pm_move_after =pmf "Moving
+%s:%s after %s:%s\n"
+drivers/base/power/main.c:202 [main]device_pm_move_last =pmf "Moving
+%s:%s to end of list\n"
+drivers/base/power/main.c:441 [main]pm_dev_dbg =pmf "PM: %s%s%s driver
+flags: %x\n"
+drivers/base/power/main.c:467 [main]dpm_show_time =pmf "%s%s%s of
+devices %s after %ld.%03ld msecs\n"
+bash-5.2#
 
-diff --git a/usr/gen_init_cpio.c b/usr/gen_init_cpio.c
-index ee01e40e8bc6..61230532fef1 100644
---- a/usr/gen_init_cpio.c
-+++ b/usr/gen_init_cpio.c
-@@ -353,6 +353,12 @@ static int cpio_mkfile(const char *name, const char *location,
- 		buf.st_mtime = 0xffffffff;
- 	}
- 
-+	if (buf.st_mtime < 0) {
-+		fprintf(stderr, "%s: Timestamp negative, clipping.\n",
-+			location);
-+		buf.st_mtime = 0;
-+	}
-+
- 	if (buf.st_size > 0xffffffff) {
- 		fprintf(stderr, "%s: Size exceeds maximum cpio file size\n",
- 			location);
-@@ -602,10 +608,10 @@ int main (int argc, char *argv[])
- 	/*
- 	 * Timestamps after 2106-02-07 06:28:15 UTC have an ascii hex time_t
- 	 * representation that exceeds 8 chars and breaks the cpio header
--	 * specification.
-+	 * specification. Negative timestamps similarly exceed 8 chars.
- 	 */
--	if (default_mtime > 0xffffffff) {
--		fprintf(stderr, "ERROR: Timestamp too large for cpio format\n");
-+	if (default_mtime > 0xffffffff || default_mtime < 0) {
-+		fprintf(stderr, "ERROR: Timestamp out of range for cpio format\n");
- 		exit(1);
- 	}
- 
+Basically, KBUILD_MODNAME appears to get basename,
+not something specific, set in some config (such as pm, or module)
+or cleverly picked out of the path (power is possible)
 
-base-commit: 065ffaee73892e8a3629b4cfbe635697807a3c6f
--- 
-2.39.2
+this compromises the clarity of  dyndbg's module keyword
 
+is some heuristic possible to improve this,
+with a manual setting to fix when heuristic fails ?
