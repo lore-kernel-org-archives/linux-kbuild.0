@@ -2,103 +2,177 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37EBDC7618A
-	for <linux-kbuild@archiver.kernel.org>; Sun, 19 Mar 2023 08:10:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21DD3C6FD1D
+	for <linux-kbuild@archiver.kernel.org>; Mon, 20 Mar 2023 04:09:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230057AbjCSIKT (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 19 Mar 2023 04:10:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43492 "EHLO
+        id S230005AbjCTEJG (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 20 Mar 2023 00:09:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229694AbjCSIKS (ORCPT
+        with ESMTP id S230000AbjCTEJD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 19 Mar 2023 04:10:18 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8856017CFB;
-        Sun, 19 Mar 2023 01:10:16 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        Mon, 20 Mar 2023 00:09:03 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B2F4F77C;
+        Sun, 19 Mar 2023 21:09:02 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32K26hNV016868;
+        Mon, 20 Mar 2023 04:09:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=s29gtJQTaAQNRvDYuRNvJzZ7BnhQ4Zgr013/VoKrO9c=;
+ b=WYr4tF0xT13DLWABqJJXAXm4FvhIA9kZKik9b+eq6nXvYhvHFtwBCkVT8MUANBdOlTn4
+ lVe8MyKdfauuUhF1Z8ie+aua3So6SxBnYleATtiwxFLayyJdgeV5nffNTrIuupAr7+Fp
+ 2oNN9s/SYgEOwGhWyIHpIlQCv0PD2YagQ1xXYWdHAdLJ1bThHHncCVIjwoH+D2tAyiWq
+ aXpyLUZluxYRsoFNCvb6yldC55G74vWPw7tbLqWid0+BsqZecxhqz3tCiNpZD4SDEPy3
+ aMw0IPuRlhNvjKjNIq52llskSJ4N14nKGWuFI1RaPebd0z6fd+MHEmzx6ALG5lDHLKFk VQ== 
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pdq3td5b4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 20 Mar 2023 04:09:01 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32JAgiZp015057;
+        Mon, 20 Mar 2023 04:08:59 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3pd4jfanak-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 20 Mar 2023 04:08:59 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32K48tfx58655028
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 20 Mar 2023 04:08:57 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CDC442004B;
+        Mon, 20 Mar 2023 04:08:55 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CD32E20043;
+        Mon, 20 Mar 2023 04:08:54 +0000 (GMT)
+Received: from ozlabs.au.ibm.com (unknown [9.192.253.14])
+        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Mon, 20 Mar 2023 04:08:54 +0000 (GMT)
+Received: from bgray-lenovo-p15.ozlabs.ibm.com (haven.au.ibm.com [9.192.254.114])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 2B8FCB80ABA;
-        Sun, 19 Mar 2023 08:10:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9AABC433D2;
-        Sun, 19 Mar 2023 08:10:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1679213413;
-        bh=a5va3tEE4tXt4RbnY9wq9cGeJVVqrZTJXQVaAqJNs7I=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=t7Iw70ya9uQVCK20e6iFJax7/rZjaTW+nRxkgQeVhV7DVrNROAGSKMSZGybf9JXGG
-         7z0VvNYUz5Xc6s96Usezq439boIWBXvInF1+XCUfzv3chvyA0nqbHB/DNF8/wErE6s
-         L5FSY+qYRQqjkXou2o6DiUv7knILXdlxRCZD7tyclnXwpbN7rqr9hTikjVaqjmrMl/
-         cl/YjMnDNGrZGHNyh3sCMKVd872VIoZpB6/7HvEqt88TQk4phDu4M0Q6ROXywQftr6
-         HLqMfMNN6nSmyfI4NsWQZ7S54O56duC2+ztzXHMd0i4BNK/cM3BOuYZWl8rFeWPXkg
-         WfI5Q9MBKVBcg==
-Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-17997ccf711so10210678fac.0;
-        Sun, 19 Mar 2023 01:10:13 -0700 (PDT)
-X-Gm-Message-State: AO0yUKXjIdj6JODZrhWXWHx07tBdJvyYjDRLTHl8E7R3Po4nCdOYeeb6
-        vzzPkyePJbK3u2MSrtTxmfYjrK/U4LfYHx/dXM8=
-X-Google-Smtp-Source: AK7set9E2ZsG/UD8QjqMoQ5NEHggJTNBfQWoUR0XzMx0OFjaipPPxI8WOQASYdT2zBZ4z08XLIWoinwIvyWaOajnHOw=
-X-Received: by 2002:a05:6871:e85:b0:179:c3d1:42d0 with SMTP id
- vl5-20020a0568710e8500b00179c3d142d0mr1239161oab.11.1679213413097; Sun, 19
- Mar 2023 01:10:13 -0700 (PDT)
+        by ozlabs.au.ibm.com (Postfix) with ESMTPSA id E43F260463;
+        Mon, 20 Mar 2023 15:08:49 +1100 (AEDT)
+From:   Benjamin Gray <bgray@linux.ibm.com>
+To:     linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc:     Benjamin Gray <bgray@linux.ibm.com>
+Subject: [PATCH 2/2] initramfs: Encode dependency on KBUILD_BUILD_TIMESTAMP
+Date:   Mon, 20 Mar 2023 15:08:39 +1100
+Message-Id: <20230320040839.660475-2-bgray@linux.ibm.com>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230320040839.660475-1-bgray@linux.ibm.com>
+References: <20230320040839.660475-1-bgray@linux.ibm.com>
 MIME-Version: 1.0
-References: <20230314004022.403937-1-bage@linutronix.de> <20230314004022.403937-2-bage@linutronix.de>
-In-Reply-To: <20230314004022.403937-2-bage@linutronix.de>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Sun, 19 Mar 2023 17:09:37 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAQJtiRkuQNpG7fhmwzOszi09W3PuDqojkCizNP5rxepig@mail.gmail.com>
-Message-ID: <CAK7LNAQJtiRkuQNpG7fhmwzOszi09W3PuDqojkCizNP5rxepig@mail.gmail.com>
-Subject: Re: [PATCH 1/1] builddeb: Eliminate debian/arch use
-To:     Bastian Germann <bage@linutronix.de>
-Cc:     Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: vCU-69eZaEcK3fy6V2LK7fPGhV3gncPE
+X-Proofpoint-GUID: vCU-69eZaEcK3fy6V2LK7fPGhV3gncPE
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-20_02,2023-03-16_02,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ lowpriorityscore=0 mlxscore=0 malwarescore=0 spamscore=0
+ priorityscore=1501 bulkscore=0 impostorscore=0 phishscore=0 suspectscore=0
+ mlxlogscore=999 clxscore=1015 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2303150002 definitions=main-2303200034
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, Mar 14, 2023 at 9:43=E2=80=AFAM Bastian Germann <bage@linutronix.de=
-> wrote:
->
-> In the builddeb context, the DEB_HOST_ARCH environment variable is set to
-> the same value as debian/arch's content, so use the variable with
-> dpkg-architecture.
->
-> This is the last use of the debian/arch file during dpkg-buildpackage tim=
-e.
->
-> Signed-off-by: Bastian Germann <bage@linutronix.de>
-> ---
+gen_initramfs.sh has an internal dependency on KBUILD_BUILD_TIMESTAMP
+for generating file mtimes that is not exposed to make, so changing
+KBUILD_BUILD_TIMESTAMP will not trigger a rebuild of the archive.
 
+Declare the mtime date as a new parameter to gen_initramfs.sh to encode
+KBUILD_BUILD_TIMESTAMP in the shell command, thereby making make aware
+of the dependency.
 
-Applied to linux-kbuild.
-Thanks.
+It will rebuild if KBUILD_BUILD_TIMESTAMP changes or is newly set/unset.
+It will _not_ rebuild if KBUILD_BUILD_TIMESTAMP is unset before and
+after. This should be fine for anyone who doesn't care about setting
+specific build times in the first place.
 
->  scripts/package/builddeb | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-> index ff5e7d8e380b..ef43e8937f25 100755
-> --- a/scripts/package/builddeb
-> +++ b/scripts/package/builddeb
-> @@ -99,7 +99,7 @@ deploy_libc_headers () {
->
->         # move asm headers to /usr/include/<libc-machine>/asm to match th=
-e structure
->         # used by Debian-based distros (to support multi-arch)
-> -       host_arch=3D$(dpkg-architecture -a$(cat debian/arch) -qDEB_HOST_M=
-ULTIARCH)
-> +       host_arch=3D$(dpkg-architecture -a$DEB_HOST_ARCH -qDEB_HOST_MULTI=
-ARCH)
->         mkdir $pdir/usr/include/$host_arch
->         mv $pdir/usr/include/asm $pdir/usr/include/$host_arch/
->  }
-> --
-> 2.39.2
->
+Signed-off-by: Benjamin Gray <bgray@linux.ibm.com>
 
+---
 
---=20
-Best Regards
-Masahiro Yamada
+Ran into this while debugging the issue in the first patch. Made for a
+very perplexing debug session before we worked out the state wasn't
+being rebuilt.
+---
+ usr/Makefile         |  2 ++
+ usr/gen_initramfs.sh | 16 +++++++++-------
+ 2 files changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/usr/Makefile b/usr/Makefile
+index 59d9e8b07a01..2aa386cf48d6 100644
+--- a/usr/Makefile
++++ b/usr/Makefile
+@@ -64,6 +64,7 @@ quiet_cmd_initfs = GEN     $@
+ 	$(CONFIG_SHELL) $< -o $@ -l $(obj)/.initramfs_data.cpio.d \
+ 	$(if $(CONFIG_INITRAMFS_ROOT_UID), -u $(CONFIG_INITRAMFS_ROOT_UID)) \
+ 	$(if $(CONFIG_INITRAMFS_ROOT_GID), -g $(CONFIG_INITRAMFS_ROOT_GID)) \
++	$(if $(KBUILD_BUILD_TIMESTAMP), -d $(KBUILD_BUILD_TIMESTAMP)) \
+ 	$(ramfs-input)
+ 
+ # We rebuild initramfs_data.cpio if:
+@@ -71,6 +72,7 @@ quiet_cmd_initfs = GEN     $@
+ # 2) There are changes in which files are included (added or deleted)
+ # 3) If gen_init_cpio are newer than initramfs_data.cpio
+ # 4) Arguments to gen_initramfs.sh changes
++# 5) KBUILD_BUILD_TIMESTAMP is changed
+ $(obj)/initramfs_data.cpio: $(src)/gen_initramfs.sh $(obj)/gen_init_cpio $(deps_initramfs) FORCE
+ 	$(call if_changed,initfs)
+ 
+diff --git a/usr/gen_initramfs.sh b/usr/gen_initramfs.sh
+index 63476bb70b41..14b5782f961a 100755
+--- a/usr/gen_initramfs.sh
++++ b/usr/gen_initramfs.sh
+@@ -23,6 +23,7 @@ $0 [-o <file>] [-l <dep_list>] [-u <uid>] [-g <gid>] {-d | <cpio_source>} ...
+ 	-g <gid>       Group ID to map to group ID 0 (root).
+ 		       <gid> is only meaningful if <cpio_source> is a
+ 		       directory.  "squash" forces all files to gid 0.
++	-d <date>      Use date for all file mtime values
+ 	<cpio_source>  File list or directory for cpio archive.
+ 		       If <cpio_source> is a .cpio file it will be used
+ 		       as direct input to initramfs.
+@@ -190,6 +191,7 @@ prog=$0
+ root_uid=0
+ root_gid=0
+ dep_list=
++timestamp=
+ cpio_list=$(mktemp ${TMPDIR:-/tmp}/cpiolist.XXXXXX)
+ output="/dev/stdout"
+ 
+@@ -218,6 +220,13 @@ while [ $# -gt 0 ]; do
+ 			[ "$root_gid" = "-1" ] && root_gid=$(id -g || echo 0)
+ 			shift
+ 			;;
++		"-d")	# date for file mtimes
++			timestamp="$(date -d"$1" +%s || :)"
++			if test -n "$timestamp"; then
++				timestamp="-t $timestamp"
++			fi
++			shift
++			;;
+ 		"-h")
+ 			usage
+ 			exit 0
+@@ -237,11 +246,4 @@ done
+ 
+ # If output_file is set we will generate cpio archive
+ # we are careful to delete tmp files
+-timestamp=
+-if test -n "$KBUILD_BUILD_TIMESTAMP"; then
+-	timestamp="$(date -d"$KBUILD_BUILD_TIMESTAMP" +%s || :)"
+-	if test -n "$timestamp"; then
+-		timestamp="-t $timestamp"
+-	fi
+-fi
+ usr/gen_init_cpio $timestamp $cpio_list > $output
+-- 
+2.39.2
+
