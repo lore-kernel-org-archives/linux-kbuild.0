@@ -2,138 +2,194 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE31BC77B61
-	for <linux-kbuild@archiver.kernel.org>; Mon, 10 Apr 2023 09:39:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35F60C77B6F
+	for <linux-kbuild@archiver.kernel.org>; Mon, 10 Apr 2023 10:03:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229773AbjDJJjN (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 10 Apr 2023 05:39:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57752 "EHLO
+        id S229806AbjDJKDq (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 10 Apr 2023 06:03:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229730AbjDJJjM (ORCPT
+        with ESMTP id S229828AbjDJKDq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 10 Apr 2023 05:39:12 -0400
+        Mon, 10 Apr 2023 06:03:46 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5A00422C;
-        Mon, 10 Apr 2023 02:39:10 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9344D3580;
+        Mon, 10 Apr 2023 03:03:43 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 692D461A30;
-        Mon, 10 Apr 2023 09:39:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9A6DC4339B;
-        Mon, 10 Apr 2023 09:39:09 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2E94C61198;
+        Mon, 10 Apr 2023 10:03:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DE77C4339B;
+        Mon, 10 Apr 2023 10:03:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681119549;
-        bh=u9uOtOyMOaKSTTiyOnYDDaylCJ0ioZPZbm0SYxS7UPc=;
+        s=k20201202; t=1681121022;
+        bh=X6mFdrcKBloByjl+W+HqhTL0wxXMHJsugPyYCIhiCuQ=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=dD8HE0g1szC9f7iofiJyYBkj0bMvruspqYhonJXuoIgtwwkrZftdg2tEHcVu/g4om
-         Ft0bxlVqkHWciHmONyajwEsVXpiWqjCMhKLhKy/2OADE/43l/mt/fHxWpX1ojoTHXK
-         irBDFUa28gOfXe7h+s581a0yiDlLhJfTHLXNP/CnoGdpMyT5VG4Rmk99hx3x21Rr0j
-         D02xkfZnL0PZkr03HIgOGAYv9NINbhSN+47sv52TL0tsui8tqw6Dfa+dlLMkwRj2W4
-         Q8s7u7piz15gDRgm7dUzoMwHCuHnoTLlHOYtDuIRv51sK1ndp44GPnDU7kxC2aeNqF
-         0KtyO5t3CEBsA==
-Received: by mail-oi1-f178.google.com with SMTP id f14so21207454oiw.10;
-        Mon, 10 Apr 2023 02:39:09 -0700 (PDT)
-X-Gm-Message-State: AAQBX9fEqCZhEXit4OAZv5eIoLSF+gTq/bCsE87kphD137Uz6Jf4hS+H
-        WbHpJGgUvT8nNTo4gdxtnGbm17/4UYsJ/aQIA/M=
-X-Google-Smtp-Source: AKy350YgrJCbSJJRWtzwT6ZuCreBjjz08GvvgA1HSJ271s2b76q2yVFDpXlcyspbjZXdEyS4o6J0uAc7hGpD0wvJuSw=
-X-Received: by 2002:a05:6808:5ca:b0:386:bb7a:5c85 with SMTP id
- d10-20020a05680805ca00b00386bb7a5c85mr2640586oij.11.1681119549130; Mon, 10
- Apr 2023 02:39:09 -0700 (PDT)
+        b=BXKaFHIauq0W0rEqTd0dU4B313rWlL/ab5aUxj23oPqxYYDxfeD8UdorVlEHCgN52
+         kY+L6h0Of+F/fSfFeCPKA5o23nc0M0RScNtORjnXoU4hw2Q3pmujZzviQI1yhWdEdJ
+         UvYxTe9oZTIwQiQGFIeDiYl05ptRMeHeEo158Y/aHy62emMgLNxD/hd1cgB2dDKLCn
+         HtHLZM019uiDOliPMHCrzctOyC69cc+Z3yMqCUhpbgY1W83YkY/0vopNeoPVt7urqO
+         D4qW+N5iXcExVXt48enOYupVy8QYw7FRkIEM1rMl4ng2UIVANDqska3oAPKISMLp2h
+         6QiWs+HApLPag==
+Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-1842e8a8825so5317354fac.13;
+        Mon, 10 Apr 2023 03:03:42 -0700 (PDT)
+X-Gm-Message-State: AAQBX9dk+LdZK4izVP217e8q+qo2HYfpxyLYLYRoGDu3ow2BDbGFtWA7
+        vqw14hqGW/0w5EAXESQyDYefIQweaSAcg8Ncotw=
+X-Google-Smtp-Source: AKy350ZSMPsXHOZRqPbQgGcdegDIS4ZvZkviKutYNlqfA6bckwfU2TPWc8FRAmTHiCTn7pfKyZgtA7inGf0zF4Q/NSs=
+X-Received: by 2002:a05:6870:5594:b0:17f:f1f4:b006 with SMTP id
+ n20-20020a056870559400b0017ff1f4b006mr4967756oao.11.1681121021823; Mon, 10
+ Apr 2023 03:03:41 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230308115243.82592-1-masahiroy@kernel.org> <20230308115243.82592-4-masahiroy@kernel.org>
- <CAKwvOd=MLHjGPSyVtmtW=1P=n2OLCXEFG+L=wLPVr4Orwuu2Xg@mail.gmail.com>
-In-Reply-To: <CAKwvOd=MLHjGPSyVtmtW=1P=n2OLCXEFG+L=wLPVr4Orwuu2Xg@mail.gmail.com>
+References: <20230407203456.27141-1-quic_johmoo@quicinc.com> <20230407203456.27141-2-quic_johmoo@quicinc.com>
+In-Reply-To: <20230407203456.27141-2-quic_johmoo@quicinc.com>
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Mon, 10 Apr 2023 18:38:32 +0900
-X-Gmail-Original-Message-ID: <CAK7LNASODwma1Ntezkk9gUK=r29XuCe_D9qniKLXL9qmO=V0rQ@mail.gmail.com>
-Message-ID: <CAK7LNASODwma1Ntezkk9gUK=r29XuCe_D9qniKLXL9qmO=V0rQ@mail.gmail.com>
-Subject: Re: [PATCH 4/8] scripts/kallsyms: exclude symbols generated by itself dynamically
-To:     Nick Desaulniers <ndesaulniers@google.com>
-Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Zhen Lei <thunder.leizhen@huawei.com>,
+Date:   Mon, 10 Apr 2023 19:03:05 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAQQmoyUx+0Jk3c7iqY20KokrHEOPwHNb2doZOOA8RWBDA@mail.gmail.com>
+Message-ID: <CAK7LNAQQmoyUx+0Jk3c7iqY20KokrHEOPwHNb2doZOOA8RWBDA@mail.gmail.com>
+Subject: Re: [PATCH v5 1/2] check-uapi: Introduce check-uapi.sh
+To:     John Moon <quic_johmoo@quicinc.com>
+Cc:     Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nicolas Schier <nicolas@fjasle.eu>,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-arm-msm@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
         Arnd Bergmann <arnd@arndb.de>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nicolas Schier <nicolas@fjasle.eu>
+        Bjorn Andersson <andersson@kernel.org>,
+        Todd Kjos <tkjos@google.com>,
+        Matthias Maennich <maennich@google.com>,
+        Giuliano Procida <gprocida@google.com>,
+        kernel-team@android.com, libabigail@sourceware.org,
+        Jordan Crouse <jorcrous@amazon.com>,
+        Trilok Soni <quic_tsoni@quicinc.com>,
+        Satya Durga Srinivasu Prabhala <quic_satyap@quicinc.com>,
+        Elliot Berman <quic_eberman@quicinc.com>,
+        Guru Das Srinagesh <quic_gurus@quicinc.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sat, Apr 8, 2023 at 5:13=E2=80=AFAM Nick Desaulniers <ndesaulniers@googl=
-e.com> wrote:
+On Sat, Apr 8, 2023 at 5:35=E2=80=AFAM John Moon <quic_johmoo@quicinc.com> =
+wrote:
 >
-> On Wed, Mar 8, 2023 at 3:53=E2=80=AFAM Masahiro Yamada <masahiroy@kernel.=
-org> wrote:
-> >
-> > Drop the symbols generated by scripts/kallsyms itself automatically
-> > instead of maintaining the symbol list manually.
-> >
-> > Pass the kallsyms object from the previous kallsyms step (if it exists)
-> > as the third parameter of scripts/mksysmap, which will weed out the
-> > generated symbols from the input to the next kallsyms step.
-> >
-> > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> > ---
-> >
-> >  scripts/kallsyms.c      | 17 -----------------
-> >  scripts/link-vmlinux.sh |  6 +++---
-> >  scripts/mksysmap        | 11 ++++++++++-
-> >  3 files changed, 13 insertions(+), 21 deletions(-)
-> >
-> > diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-> > index 8148e880f78e..e572fda6fe42 100644
-> > --- a/scripts/kallsyms.c
-> > +++ b/scripts/kallsyms.c
-> > @@ -104,23 +104,6 @@ static bool is_ignored_symbol(const char *name, ch=
-ar type)
-> >  {
-> >         /* Symbol names that exactly match to the following are ignored=
-.*/
-> >         static const char * const ignored_symbols[] =3D {
-> > -               /*
-> > -                * Symbols which vary between passes. Passes 1 and 2 mu=
-st have
-> > -                * identical symbol lists. The kallsyms_* symbols below=
- are
-> > -                * only added after pass 1, they would be included in p=
-ass 2
-> > -                * when --all-symbols is specified so exclude them to g=
-et a
-> > -                * stable symbol list.
-> > -                */
-> > -               "kallsyms_addresses",
-> > -               "kallsyms_offsets",
-> > -               "kallsyms_relative_base",
-> > -               "kallsyms_num_syms",
-> > -               "kallsyms_names",
-> > -               "kallsyms_markers",
-> > -               "kallsyms_token_table",
-> > -               "kallsyms_token_index",
-> > -               "kallsyms_seqs_of_names",
-> > -               /* Exclude linker generated symbols which vary between =
-passes */
+> While the kernel community has been good at maintaining backwards
+> compatibility with kernel UAPIs, it would be helpful to have a tool
+> to check if a commit introduces changes that break backwards
+> compatibility.
 >
-> ^ Do we want to retain this comment for the below two symbols?
-
-
-
-Correct.
-
-I will keep the comment, but it will be removed
-in the next commit, 5/8 because all the ignored patterns
-will go away anyway.
-
-Thanks.
-
-
-
-
+> To that end, introduce check-uapi.sh: a simple shell script that
+> checks for changes to UAPI headers using libabigail.
 >
-> >                 "_SDA_BASE_",           /* ppc */
-> >                 "_SDA2_BASE_",          /* ppc */
-> >                 NULL
+> libabigail is "a framework which aims at helping developers and
+> software distributors to spot some ABI-related issues like interface
+> incompatibility in ELF shared libraries by performing a static
+> analysis of the ELF binaries at hand."
+>
+> The script uses one of libabigail's tools, "abidiff", to compile the
+> changed header before and after the commit to detect any changes.
+>
+> abidiff "compares the ABI of two shared libraries in ELF format. It
+> emits a meaningful report describing the differences between the two
+> ABIs."
+>
+> The script also includes the ability to check the compatibility of
+> all UAPI headers across commits. This allows developers to inspect
+> the stability of the UAPIs over time.
+>
+> Signed-off-by: John Moon <quic_johmoo@quicinc.com>
+
+
+
+BTW, is there anybody (except the submitters) who loves this tool?
+(or anybody who has ever evaluated this?)
+
+I am the only person who pointed out something.
+
+
+
+I put some more comments from users' point of view.
+
+
+
+
+
+[1] The number of lines of the error log.
+
+
+According to this tool, it looks like we broke a lot of UAPI
+headers in the previous MW (between v6.2 and v6.3-rc1).
+
+Not only in the previous MW, we always broke so many UAPI
+headers, this script says.
+
+
+The following command outputs 2380 lines.
+
+
+$ ./scripts/check-uapi.sh -q -b v6.3-rc1 -p v6.2 2>&1  | wc
+   2380    9438  104953
+
+
+I do not know how many are real breakages, and
+how many are false positives.
+
+Anyway, I will not check the 2380 lines of the error log.
+
+
+And, please note that the help message explains '-q' is the *quiet* mode.
+It is the opposite. This is super noisy.
+
+
+
+
+[2] Be careful!
+
+
+While testing the patch submissions of this,
+I messed up my repository multiple times.
+
+The script takes some time because it builds many objects
+internally.
+
+However, once this script starts running, you must not hit Ctrl-C.
+If you do it, your repository will be sprinkled with a ton
+of untracked files.
+
+Apply this patch, and run "./scripts/check-uapi.sh -p v6.0"
+and hit Ctrl-C.
+
+Repeat it a couple of times, and "git status" will show you
+something horrible.
+
+
+You will never know when git is checking out a commit
+because this script hides it by 'git checkout --quiet'.
+
+
+So, this tool should show a caveat at least.
+
+
+'git checkout' should not be hidden, or
+maybe a caveat message should be shown.
+
+
+CAVEAT
+This tool runs 'git checkout' a couple of times internally.
+If you interrupt it, your worktree might be messed up.
+
+
+
+
+
+
+
+
+
 
 
 
