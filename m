@@ -2,205 +2,182 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD872C77B76
-	for <linux-kbuild@archiver.kernel.org>; Tue, 11 Apr 2023 10:07:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13680C76196
+	for <linux-kbuild@archiver.kernel.org>; Tue, 11 Apr 2023 18:37:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229546AbjDKKHL (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 11 Apr 2023 06:07:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57206 "EHLO
+        id S229581AbjDKShd (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 11 Apr 2023 14:37:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229789AbjDKKGv (ORCPT
+        with ESMTP id S229452AbjDKShc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 11 Apr 2023 06:06:51 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AB4E30EB;
-        Tue, 11 Apr 2023 03:06:46 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id B40D721A0D;
-        Tue, 11 Apr 2023 10:06:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1681207604; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8n7ywmQ+awe973K1RiYMXZS6nrgeQ28SDo2b1f0miws=;
-        b=iQjAp5Plo1DxL4G3EAf2Uv9qUVPzx3RAeN44LQkAv7smbByu3MTFhOjI4+gHxLKJImd/eW
-        S+q3SjnKpG86/TkXPkfJJQON2FHhUmUzluJK5BeO6G8JIaB/UNyO9XZWIVe6hS3biBYtqJ
-        A15ah9wSpiteBOBddDbZl9Eqa0cncWI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1681207604;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8n7ywmQ+awe973K1RiYMXZS6nrgeQ28SDo2b1f0miws=;
-        b=ZbKtL1u5soy8hRk0Kk3VLkq9oiIES7TTj0sDzvYEh/IS+4YlcKjBfPtemhYJw7VUkaPzg+
-        gsCuIFjGO5iLO5Ag==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6C57D13638;
-        Tue, 11 Apr 2023 10:06:44 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id fSZ3GDQxNWR0PwAAMHmgww
-        (envelope-from <nstange@suse.de>); Tue, 11 Apr 2023 10:06:44 +0000
-From:   Nicolai Stange <nstange@suse.de>
-To:     Josh Poimboeuf <jpoimboe@kernel.org>
-Cc:     Joe Lawrence <joe.lawrence@redhat.com>,
-        Marcos Paulo de Souza <mpdesouza@suse.de>,
-        live-patching@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, Miroslav Benes <mbenes@suse.cz>,
-        Petr Mladek <pmladek@suse.com>,
-        Marcos Paulo de Souza <mpdesouza@suse.com>,
-        Lukas Hruska <lhruska@suse.cz>
-Subject: Re: [PATCH v7 00/10] livepatch: klp-convert tool
-References: <20230306140824.3858543-1-joe.lawrence@redhat.com>
-        <20230314202356.kal22jracaw5442y@daedalus>
-        <ZBTNvEPrCcRj3F1C@redhat.com> <20230317232010.7uq6tt4ty35eo5hm@treble>
-Date:   Tue, 11 Apr 2023 12:06:43 +0200
-In-Reply-To: <20230317232010.7uq6tt4ty35eo5hm@treble> (Josh Poimboeuf's
-        message of "Fri, 17 Mar 2023 16:20:10 -0700")
-Message-ID: <873556ag24.fsf@suse.de>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+        Tue, 11 Apr 2023 14:37:32 -0400
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FD4E3A98;
+        Tue, 11 Apr 2023 11:37:30 -0700 (PDT)
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33BHCUb6008150;
+        Tue, 11 Apr 2023 18:36:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=oJe2Li55wC5pjAdZ7BIhyOmj3PqDZqQ1WfnBAszZ1TA=;
+ b=WfbIawjvAGvsMU8ukUfgdIcRsYI5KYc9IqrG/IJBRAtb8oPCOqrklV1RNgHUrM0m8k7t
+ 6PCQoviGzAMhWwUAV5euL3SP7v47++spd5oYNJg0abDTKAhzcQRbfgMrD04pAuVBZ3N/
+ eLyz0zxqsKUN+4gBXqwuCcv749inak6sjjFGd9vfNVZlMnEYYJDBLXzq/tyLxFzPe9BU
+ D0FhAhCa4eKz6pOCZzqLTh02jK/05zth47iejBHzNDzsgszthTvhKJgkUhXCepV6Ji3e
+ jJX/h6cWof84po37zOFTrr+16q7ejbHx8SUwjx+3yNu7xPC2z3qcjrgI40XuwNIJgEE1 /g== 
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3pw0jpsrnr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 11 Apr 2023 18:36:52 +0000
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+        by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 33BIaogG020184
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 11 Apr 2023 18:36:50 GMT
+Received: from [10.110.49.239] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.42; Tue, 11 Apr
+ 2023 11:36:49 -0700
+Message-ID: <bcdcee9b-f213-bc3c-d300-92a1e0138187@quicinc.com>
+Date:   Tue, 11 Apr 2023 11:36:48 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH v5 1/2] check-uapi: Introduce check-uapi.sh
+Content-Language: en-US
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+CC:     Masahiro Yamada <masahiroy@kernel.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        "Nicolas Schier" <nicolas@fjasle.eu>,
+        <linux-kbuild@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-arm-msm@vger.kernel.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        "Arnd Bergmann" <arnd@arndb.de>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Todd Kjos <tkjos@google.com>,
+        Matthias Maennich <maennich@google.com>,
+        Giuliano Procida <gprocida@google.com>,
+        <kernel-team@android.com>, <libabigail@sourceware.org>,
+        Jordan Crouse <jorcrous@amazon.com>,
+        Trilok Soni <quic_tsoni@quicinc.com>,
+        Satya Durga Srinivasu Prabhala <quic_satyap@quicinc.com>,
+        Elliot Berman <quic_eberman@quicinc.com>,
+        "Guru Das Srinagesh" <quic_gurus@quicinc.com>
+References: <20230407203456.27141-1-quic_johmoo@quicinc.com>
+ <20230407203456.27141-2-quic_johmoo@quicinc.com>
+ <CAK7LNAQQmoyUx+0Jk3c7iqY20KokrHEOPwHNb2doZOOA8RWBDA@mail.gmail.com>
+ <2023041015-lunar-dandelion-1b4e@gregkh>
+ <ae44540f-8947-8efb-fb8d-45a84bd3fef3@quicinc.com>
+ <2023041136-donator-faceplate-5f91@gregkh>
+From:   John Moon <quic_johmoo@quicinc.com>
+In-Reply-To: <2023041136-donator-faceplate-5f91@gregkh>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: hlN2L9npwgxOYiye6LLp0KUxZ8pjtuci
+X-Proofpoint-ORIG-GUID: hlN2L9npwgxOYiye6LLp0KUxZ8pjtuci
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-11_11,2023-04-11_02,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
+ impostorscore=0 bulkscore=0 phishscore=0 malwarescore=0 suspectscore=0
+ adultscore=0 spamscore=0 priorityscore=1501 clxscore=1015 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2303200000
+ definitions=main-2304110169
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Josh Poimboeuf <jpoimboe@kernel.org> writes:
-
-> On Fri, Mar 17, 2023 at 04:29:48PM -0400, Joe Lawrence wrote:
->> Have you tried retrofitting klp-convert into any real-world livepatch?
->> I'm curious as to your observations on the overall experience, or
->> thoughts on the sympos annotation style noted above.
+On 4/10/2023 11:34 PM, Greg Kroah-Hartman wrote:
+> On Mon, Apr 10, 2023 at 04:32:49PM -0700, John Moon wrote:
+>>>> According to this tool, it looks like we broke a lot of UAPI
+>>>> headers in the previous MW (between v6.2 and v6.3-rc1).
+>>>
+>>> That's not ok, and needs to be fixed, otherwise this is useless as no
+>>> one can rely on it at all.
+>>>
+>>
+>> Right, there are several classes of false positives that we've documented
+>> and when examining thousands of commits at time, it'll flag many things.
+>>
+>> For some comparison, if you run checkpatch on the same changeset
+>> (v6.2..v6.3-rc1), you get 995 errors and 7,313 warnings. Still, checkpatch
+>> is helpful for spot-checks.
+> 
+> checkpatch.pl does not matter, it is a "hint", and many patches
+> explicitly ignore it (think about patches in the staging tree, you could
+> fix up one checkpatch issue for a line, but ignore another one as you
+> are not supposed to mix them up.)
+> 
+> Also for some subsystems, checkpatch does not matter because their
+> codebase is old and follows different rules.  And in some places,
+> checkpatch is just wrong, because it's a perl script and can not really
+> parse code.
+> 
+> So NEVER use that as a comparison to the user/kernel abi please.  It's a
+> false comparison.
 >
-> On a related note, the patch creation process (of which klp-convert
-> would be part of) needs to be documented.
+
+Fair enough. I was just trying to frame this tool as a "hint" as well. :)
+
+>>
+>> Others do not seem to be intentional:
+>>
+>>   Addition/use of flex arrays:
+>>     - include/uapi/linux/rseq.h (f7b01bb0b57f)
+>>     - include/uapi/scsi/scsi_bsg_mpi3mr.h (c6f2e6b6eaaf)
+> 
+> That is not a breakage, that's a tool problem.
+> 
+>>   Type change:
+>>     - include/uapi/scsi/scsi_bsg_ufs.h (3f5145a615238)
+> 
+> Again, not a real breakage, size is still the same.
 >
-> If I remember correctly, the proper safe usage of klp-convert requires a
-> kernel built with -flive-patching, plus some scripting and/or manual
-> processes.
 
-Not always, I think: -flive-patching or IPA optimizations in general
-aren't a concern in the context of data symbols. From a quick glance, it
-seems like the selftests introduced as part of this patchset are
-all restricted to this usecase.
+Would you find the tool more useful if it simply filtered out all 
+instances where the size of the type did not change? This would filter 
+out the following which the tool currently flags:
 
+- enum expansions
+- reserved field expansions
+- expansions of a struct with a flex array at the end
+- type changes
+- re-ordering of existing members
+- ...others?
 
-> If nobody knows how to safely use it then there wouldn't be much value
-> in merging it.
+These changes aren't _always_ safe, but if you assume the kernel 
+developer is doing something reasonable, then maybe it's okay. Maybe we 
+could hide these checks behind something like a "--pedantic" flag?
 
-I tend to agree, but would put it a bit differently: the current
-implementation of klp-convert features quite some convenience logic,
-which, until the question of a documented livepatch preparation process
-has been settled, is not known yet to ever be of any use.
+This logic is actually trivial to add. Filtering out issues where the 
+type size stays the same brings us down to 14 failures in that same MW 
+changeset. 8 of them are file removals and the 6 remaining flags are 
+additions to existing structs or intentional removals of APIs.
 
-For example, from [3/10]:
+LMK what you think and I can work this into a v6 patch.
 
-  "For automatic resolution of livepatch relocations, a file called
-   symbols.klp is used. This file maps symbols within every compiled kernel
-   object allowing the identification of symbols whose name is unique, thus
-   relocation can be automatically inferred, or providing information that
-   helps developers when code annotation is required for solving the
-   matter."
+>>   Additions into existing struct:
+>>     - include/uapi/drm/amdgpu_drm.h (b299221faf9b)
+>>     - include/uapi/linux/perf_event.h (09519ec3b19e)
+>>     - include/uapi/linux/virtio_blk.h (95bfec41bd3d)
+> 
+> Adding data to the end of a structure is a well-known way to extend the
+> api, in SOME instances if it is used properly.
+> 
+> So again, not a break.
+>
 
-For the source based approach to livepatch preparation we're using
-internally, this is not really needed: the entity generating the source
--- be it klp-ccp or the author doing it manually -- needs to examine the
-target objects long before link resp. klp-convert time for which symbols
-can be referenced from the livepatch and how (i.e. determine a potential
-sympos). I would expect it works similar for kpatch-build conceptually,
-albeit kpatch-build probably doesn't rely on any external utility like
-klp-convert for the .klp.* relas generation at all.
-
-So with that, I agree that merging the klp-convert patchset in its
-current form with those potentially unused convenience features,
-presumably born out of certain assumptions about a manual livepatch
-preparation process, indeed can be argued about, probably.
-
-
-However, OTOH, there's currently no means whatsoever to create those
-.klp.* relas (*) (**) and I would like to propose resorting to a more
-minimal utility doing only that single thing: to stubbornly create
-.klp.* relas out of certain "regular" ones using a very simple
-transformation rule and nothing else beyond that. The "stripped"
-klp-convert would have no knowledge of the symbols available in the
-livepatched target objects at all, i.e. there would be no symbols.klp
-file or alike anymore. Instead, it would simply walk through all of a
-livepatch object's SHN_UNDEF symbols of format
-".klp.sym.<loading-obj-name>.<foo-providing-mod>.some_foo,0" somewhen at
-modpost time and
-- rename the symbol to ".klp.sym.<foo-providing-mod>.some_foo,0" --
-  shortening the name should always be feasible as far as strtab is
-  concerned.
-- turn the symbol's SHN_UNDEF into SHN_LIVEPATCH
-- move any relocation (initially created by the compiler with source
-  based lp preparation approaches) against this symbol into a separate,
-  newly created rela section with flag SHF_RELA_LIVEPATCH set and whose
-  name is of format
-  .klp.rela.<loading-obj-name>.<livepatch-obj-dst-section-name>.
-  Furthermore, the new .klp.rela section's ->sh_info needs to be made to
-  refer to the destination section.
-
-So, the only thing which would depend on the yet unspecified details of
-the livepatch preparation process would be the creation of those
-intermediate
-".klp.sym.<loading-obj-name>.<foo-providing-mod>.some_foo,0" SHN_UNDEF
-symbols to be processed by klp-convert. For source based livepatch
-preparation approaches, counting in the selftests, this can be easily
-controlled by means of asm("...") alias specifications at the respective
-declarations like in e.g.  extern int foo
-asm("\".klp.sym.<loading-obj-name>.<foo-providing-mod>.some_foo,0\"");
-
-
-I imagine the first ones to benefit from having such a "stripped"
-klp-convert available in the kernel tree would be new upstream selftests
-for .klp.* rela coverage (like introduced with this here patchset
-already) and for those some means of creating .klp.* relas would be
-needed anyway. We (SUSE), and perhaps others as well, could integrate
-this "stripped" klp-convert into our source based, production livepatch
-preparation workflows right away, of course, and so we're obviously keen
-on having it. Such a tool providing only the bare minimum would be
-pretty much self-contained -- it would only need to hook into the
-modpost Kbuild stage one way or the other -- and we could certainly
-maintain it downstream out-of-tree, but that would potentially only
-contribute to the current fragmentation around the livepatch creation
-processes even more and there still wouldn't have a solution for the
-upstream selftests.
-
-What do you think, does it make sense to eventually have such a bare
-minimum klp-convert merged in-tree, independently of the ongoing
-discussion around the livepatch preparation processes, respectively (the
-lack of) documentation around it? If yes, Lukas, now on CC, is
-interested in this topic and would be willing to help out in any form
-desired: either by contributing to Joe's work here or, if deemed more
-feasible, to start out completely new from scratch -- dependent on your
-opinion on the proposed, more minimal approach as well as on Joe's plans
-around klp-convert.
-
-Looking forward to hearing your feedback!
+I don't know of a way the tool could be smart enough to decide if the 
+additions are done properly in the proper instances. Seems appropriate 
+that the tool would flag these changes for closer human review.
 
 Thanks,
-
-Nicolai
-
-(*) We've been experimenting with building the relocation records
-    manually by various means, e.g. with GNU as' .reloc directive as an
-    example, but this all turned out impractical for various
-    reasons. Most noteworthy, because the records' offsets wouldn't get
-    adjusted properly when linking AFAIR.
-
-(**) by some other means than directly with kpatch-build
-
---=20
-SUSE Software Solutions Germany GmbH, Frankenstra=C3=9Fe 146, 90461 N=C3=BC=
-rnberg, Germany
-GF: Ivo Totev, Andrew Myers, Andrew McDonald, Boudien Moerman
-(HRB 36809, AG N=C3=BCrnberg)
+John
