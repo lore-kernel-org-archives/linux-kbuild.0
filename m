@@ -2,166 +2,158 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C2E3C77B72
-	for <linux-kbuild@archiver.kernel.org>; Tue, 18 Apr 2023 01:18:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9569C77B75
+	for <linux-kbuild@archiver.kernel.org>; Tue, 18 Apr 2023 12:09:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230037AbjDRBS2 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 17 Apr 2023 21:18:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42484 "EHLO
+        id S230389AbjDRMJD (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 18 Apr 2023 08:09:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229521AbjDRBS1 (ORCPT
+        with ESMTP id S231195AbjDRMIj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 17 Apr 2023 21:18:27 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1E444EF5;
-        Mon, 17 Apr 2023 18:18:20 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 88E1D62651;
-        Tue, 18 Apr 2023 01:18:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E970DC4339B;
-        Tue, 18 Apr 2023 01:18:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681780699;
-        bh=yxqXE0xqSqAG3ZtCTAIanNNrObebqPlfP+3p3fGfGnE=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=un3oyaP3y9vegmHuygUsbH1JC7Po6YstpBYUVdjiF5HnIkOzkYzN8K+JsvLlgz9Zm
-         KCYsw7PgcZrHTHNm7FSiadlvUx4rzwZA4cJ8c3DBnHeoatMRF69dSXUD8PmnBVjs5z
-         DSus/9KP8/WTH3XtEoQOQvnS2Zk0F8lB35+v8xKQ8WN8oLmc/0gY/4Z6S1bNnsspBP
-         8e9n58+r3T1THM+X3FKM8h+IUGtAAQ54YpinkjFLMcxqloCwdMuBEI6AKgEksGgW2l
-         m8cai/ddbxY2YlN/BJwAX6/Q/SuiXbdldp/uUi07m7Kik3VwOt/cLCguB5qFFS9UCL
-         46lhdE+Sx7ubA==
-Received: by mail-oo1-f49.google.com with SMTP id bg38-20020a056820082600b005421db6ed5bso2222793oob.12;
-        Mon, 17 Apr 2023 18:18:19 -0700 (PDT)
-X-Gm-Message-State: AAQBX9fhBlGbdf0grucht0rI9CeNJskj1Vv2Bfz3OM47njGuLXLSezvU
-        nYmLg7VIUIGRi9/zqRxr9vSyBPlHJCJdl7c3nh4=
-X-Google-Smtp-Source: AKy350ZACWFaxxKz9OQtqzz782v2Gaou4+ityrNLzAB1WuooTCi9ec4TcrzXQFpk8aBwVheHjN09N/tFJLbbtQJMPZ8=
-X-Received: by 2002:a4a:e9b2:0:b0:541:fdc8:7a3d with SMTP id
- t18-20020a4ae9b2000000b00541fdc87a3dmr5013245ood.1.1681780699209; Mon, 17 Apr
- 2023 18:18:19 -0700 (PDT)
+        Tue, 18 Apr 2023 08:08:39 -0400
+Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A376C40F3
+        for <linux-kbuild@vger.kernel.org>; Tue, 18 Apr 2023 05:07:34 -0700 (PDT)
+Received: by mail-io1-xd29.google.com with SMTP id ca18e2360f4ac-760a5e0f752so53181939f.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 18 Apr 2023 05:07:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1681819654; x=1684411654;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=P5YkRvYf1yCuUPW+Kk1SNC+gRw+VoF5jM1xlyDbolaQ=;
+        b=WOcobd9VuTYeoeolWhApTMmZDhAKpw9GEyyhfF7cQCdUNfz1RIY4dav6bNZoVjLKr2
+         zXkYI/AJ1jTCUk6vYMxWQvX8Tf/SG21R477oZST/o/wvRfqCY7CIXcliCnuipdTIu450
+         l+0tHwoWK4Jf2lDR+Z/7ChjGpd2IK8YBDHY/eLmESpzZnbRDLjFptVf74TleeNy9uBZG
+         jj/naKWhxNSfSdD0lvumrAKdCUHPrnXhxC/a21XFO0c8isWr1AIV/yB31nFwAV3l35BK
+         2PyDek6BcGpz1pz18+/wfo+aGzGWBJOeEmZNE6dTErfd4C70Uke6tMGEK7pWqTpPMBj+
+         W/Mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681819654; x=1684411654;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=P5YkRvYf1yCuUPW+Kk1SNC+gRw+VoF5jM1xlyDbolaQ=;
+        b=LRFeB8pqg5m67vC6aMRTM0fInj0YxbMQkCi79DT0WcRMULgdTCGYns9O2Lrlfv3Qgt
+         HFZEEoqd8jfgwSnH5XkDBhwH1B3BblU4htDpFpeZ6J7sDgRsl9DBBLWtB+TKuszfp+DI
+         bmk1XCtxk+24eogHXyW+R4xyxSWZcbVH3uwWxVFQ6qlZVWyAH8wBGE1hTd87iGhISLCQ
+         gSpgUHZpMcbo9YVZwvavAOQTFtkNNMwZrK7jIsrnOMggtoaPVvBe6TPocf8KVYTbEYCQ
+         ZT6maZ7QkB4MJfgYNO8WoI/XC9qJj8FvgtRKdjc682wE193pfZcc9GwBI0RKVdV1nsQf
+         nB8Q==
+X-Gm-Message-State: AAQBX9cM8cMbD6HiTsUHfeC/ru7aYBejA2x7XgzpblWnKNZtgANisksY
+        wJvguh4RdhckKfFbPVVwk/YIahC+V8sAJ2pB4p/Aww==
+X-Google-Smtp-Source: AKy350aa0eGR3rVWgp5X55p+lwLOnj2E8Vot0GFoupjvl9G3FkOikipr6kPUR5xD0sUsnZ0CUJk+9WJe0KIsaNnh1hQ=
+X-Received: by 2002:a6b:e216:0:b0:74c:8cec:548e with SMTP id
+ z22-20020a6be216000000b0074c8cec548emr1574390ioc.4.1681819653797; Tue, 18 Apr
+ 2023 05:07:33 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230417142548.249610-1-masahiroy@kernel.org> <3a857172b78f1bbd6427600bdd5afa81dd21c73f.camel@decadent.org.uk>
-In-Reply-To: <3a857172b78f1bbd6427600bdd5afa81dd21c73f.camel@decadent.org.uk>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Tue, 18 Apr 2023 10:17:42 +0900
-X-Gmail-Original-Message-ID: <CAK7LNARnd=Jryg80NeRddYvHqHGTrzES0T5YNSAKShz3D_JGdw@mail.gmail.com>
-Message-ID: <CAK7LNARnd=Jryg80NeRddYvHqHGTrzES0T5YNSAKShz3D_JGdw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] kbuild: add srcdeb-pkg target
-To:     Ben Hutchings <ben@decadent.org.uk>
-Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Bastian Germann <bage@linutronix.de>,
+References: <20230414082943.1341757-1-arnd@kernel.org> <20230414162605.GA2161385@dev-arch.thelio-3990X>
+In-Reply-To: <20230414162605.GA2161385@dev-arch.thelio-3990X>
+From:   Marco Elver <elver@google.com>
+Date:   Tue, 18 Apr 2023 14:06:57 +0200
+Message-ID: <CANpmjNMwYosrvqh4ogDO8rgn+SeDHM2b-shD21wTypm_6MMe=g@mail.gmail.com>
+Subject: Re: [PATCH] kasan: remove hwasan-kernel-mem-intrinsic-prefix=1 for clang-14
+To:     Nathan Chancellor <nathan@kernel.org>
+Cc:     Arnd Bergmann <arnd@kernel.org>,
+        Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Arnd Bergmann <arnd@arndb.de>,
         Nicolas Schier <nicolas@fjasle.eu>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>
+        Alexander Potapenko <glider@google.com>,
+        Andrey Konovalov <andreyknvl@gmail.com>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Tom Rix <trix@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        linux-kbuild@vger.kernel.org, kasan-dev@googlegroups.com,
+        linux-kernel@vger.kernel.org, llvm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Mon, Apr 17, 2023 at 11:52=E2=80=AFPM Ben Hutchings <ben@decadent.org.uk=
-> wrote:
+On Fri, 14 Apr 2023 at 18:26, Nathan Chancellor <nathan@kernel.org> wrote:
 >
-> On Mon, 2023-04-17 at 23:25 +0900, Masahiro Yamada wrote:
-> > This new target builds only the debian source package.
+> On Fri, Apr 14, 2023 at 10:29:27AM +0200, Arnd Bergmann wrote:
+> > From: Arnd Bergmann <arnd@arndb.de>
 > >
-> > Unify the build rules of deb-pkg, srcdeb-pkg, bindeb-pkg to avoid
-> > code duplication.
+> > Unknown -mllvm options don't cause an error to be returned by clang, so
+> > the cc-option helper adds the unknown hwasan-kernel-mem-intrinsic-prefix=1
+> > flag to CFLAGS with compilers that are new enough for hwasan but too
+>
+> Hmmm, how did a change like commit 0e1aa5b62160 ("kcsan: Restrict
+> supported compilers") work if cc-option does not work with unknown
+> '-mllvm' flags (or did it)? That definitely seems like a problem, as I
+> see a few different places where '-mllvm' options are used with
+> cc-option. I guess I will leave that up to the sanitizer folks to
+> comment on that further, one small comment below.
+
+Urgh, this one turns out to be rather ridiculous. It's only a problem
+with hwasan...
+
+If you try it for yourself, e.g. with something "normal" like:
+
+> clang -Werror -mllvm -asan-does-not-exist -c -x c /dev/null -o /dev/null
+
+It errors as expected. But with:
+
+> clang -Werror -mllvm -hwasan-does-not-exist -c -x c /dev/null -o /dev/null
+
+It ends up printing _help_ text, because anything "-h..." (if it
+doesn't recognize it as a long-form argument), will make it produce
+the help text.
+
+> > old for this option. This causes a rather unreadable build failure:
 > >
-> > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> > Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
+> > fixdep: error opening file: scripts/mod/.empty.o.d: No such file or directory
+> > make[4]: *** [/home/arnd/arm-soc/scripts/Makefile.build:252: scripts/mod/empty.o] Error 2
+> > fixdep: error opening file: scripts/mod/.devicetable-offsets.s.d: No such file or directory
+> > make[4]: *** [/home/arnd/arm-soc/scripts/Makefile.build:114: scripts/mod/devicetable-offsets.s] Error 2
+> >
+> > Add a version check to only allow this option with clang-15, gcc-13
+> > or later versions.
+> >
+> > Fixes: 51287dcb00cc ("kasan: emit different calls for instrumentable memintrinsics")
+> > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 > > ---
-> [...]
-> >  bindeb-pkg: debian
-> > -     +dpkg-buildpackage -r$(KBUILD_PKG_ROOTCMD) -a$$(cat debian/arch) =
-$(DPKG_FLAGS) -b -nc -uc
-> > +deb-pkg srcdeb-pkg bindeb-pkg:
-> > +     +$(strip dpkg-buildpackage \
-> > +     --build=3D$(build-type) --no-pre-clean --unsigned-changes \
-> > +     $(if $(findstring source, $(build-type)), \
-> > +             --unsigned-source) \
-> > +     $(if $(findstring binary, $(build-type)), \
-> > +             -r$(KBUILD_PKG_ROOTCMD) -a$$(cat debian/arch), \
-> > +             --no-check-builddeps) \
-> [...]
+> > There is probably a better way to do this than to add version checks,
+> > but I could not figure it out.
+> > ---
+> >  scripts/Makefile.kasan | 5 +++++
+> >  1 file changed, 5 insertions(+)
+> >
+> > diff --git a/scripts/Makefile.kasan b/scripts/Makefile.kasan
+> > index c186110ffa20..2cea0592e343 100644
+> > --- a/scripts/Makefile.kasan
+> > +++ b/scripts/Makefile.kasan
+> > @@ -69,7 +69,12 @@ CFLAGS_KASAN := -fsanitize=kernel-hwaddress \
+> >               $(instrumentation_flags)
+> >
+> >  # Instrument memcpy/memset/memmove calls by using instrumented __hwasan_mem*().
+> > +ifeq ($(call clang-min-version, 150000),y)
+> >  CFLAGS_KASAN += $(call cc-param,hwasan-kernel-mem-intrinsic-prefix=1)
+> > +endif
+> > +ifeq ($(call gcc-min-version, 130000),y)
+> > +CFLAGS_KASAN += $(call cc-param,hwasan-kernel-mem-intrinsic-prefix=1)
+> > +endif
 >
-> There is no need to make the use of --unsigned-source (-us) or -r
-> conditional on the build type.  They will be ignored if not applicable.
-
-
-
-True, but you can also say there is no need
-to pass options that we know are unnecessary.
-
-
-My motivation is to make unneeded options
-really don't-care.
-
-
-
-2/2 will add KDEB_SOURCE_COMPRESS.
-
-If I do not make it optional,
-"KDEB_SOURCE_COMPRESS=3Dfoo make bindeb-pkg"
-would fail.
-
-
-
-
-dpkg-buildpackage --build=3Dbinary --no-pre-clean --unsigned-changes
---unsigned-source --compression=3Dfoo -r'fakeroot -u' -a$(cat
-debian/arch)
-dpkg-buildpackage: info: source package linux-upstream
-dpkg-buildpackage: info: source version 6.3.0-rc7-00003-geb58366b57fe-33
-dpkg-buildpackage: info: source distribution kinetic
-dpkg-buildpackage: info: source changed by Masahiro Yamada
-<masahiro.yamada@canonical.com>
-dpkg-buildpackage: info: host architecture amd64
- dpkg-source --compression=3Dfoo --before-build .
-dpkg-source: error: foo is not a supported compression
-
-Use --help for program usage information.
-
-
-
-
-
-"dpkg-buildpackage --build=3Dbinary" does not
-generate a source package, but still checks
-if --compression=3Dfoo is correct.
-
-
-
-> This is also adding --no-check-builddeps (-d), which is not explained
-> in the commit message.  It might be valid to add this for srcdeb-pkg,
-> but the build dependency check is valuable for bindeb-pkg and deb-pkg.
-
-
-Yes.
-So, I added --no-check-builddeps to the else arm.
-
-
-
-I will add the following commit description:
-
-
---no-check-builddeps is added to srcbin-pkg
-so that build dependencies will not be checked.
-
-
-
-
-
+> I do not think you need to duplicate this block, I think
 >
-> Ben.
->
-> --
-> Ben Hutchings
-> Sturgeon's Law: Ninety percent of everything is crap.
+>   ifeq ($(call clang-min-version, 150000)$(call gcc-min-version, 130000),y)
+>   CFLAGS_KASAN += $(call cc-param,hwasan-kernel-mem-intrinsic-prefix=1)
+>   endif
 
+We just need the clang version check. If the compiler is gcc, it'll do
+the "right thing" (i.e. not print help text). So at a minimum, we need
+if "clang version >= 15 or gcc". Checking if gcc is 13 or later
+doesn't hurt though, so I don't mind either way.
 
+So on a whole this patch is the right thing to do because fixing old
+clang versions to not interpret unrecognized options that start with
+"-h.." as help isn't something we can realistically do.
 
---=20
-Best Regards
-Masahiro Yamada
+Thanks,
+-- Marco
