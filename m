@@ -2,108 +2,155 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA62DC77B78
-	for <linux-kbuild@archiver.kernel.org>; Wed, 19 Apr 2023 06:25:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75B6FC77B7E
+	for <linux-kbuild@archiver.kernel.org>; Wed, 19 Apr 2023 15:45:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231520AbjDSGZJ (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 19 Apr 2023 02:25:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40770 "EHLO
+        id S233644AbjDSPp0 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 19 Apr 2023 11:45:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232140AbjDSGZH (ORCPT
+        with ESMTP id S233661AbjDSPpN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 19 Apr 2023 02:25:07 -0400
-Received: from m126.mail.126.com (m126.mail.126.com [220.181.12.35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C0AB72D45;
-        Tue, 18 Apr 2023 23:24:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-        s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=Ev0iO
-        zag+i9qMKa+8ZXpBQVtIc2vDR7hLqzGU0Ksojk=; b=EAiSYUQibU/LVu7jXJeMr
-        B0MFVq4/8RJ1NevqPt8eNVq+umeqxcdajlCKSgpISE8LM++bD+BnPoRrYB09E0cJ
-        dV2vm+tyIxsDJSRVcn1FTQdQJTR6IIXtrR65jsreJBuJ05wkpzuHcFHirNiMQf18
-        9QWCpWLpug4bJQViyGcdKI=
-Received: from jiwei-VirtualBox.lenovo.com (unknown [111.205.43.230])
-        by zwqz-smtp-mta-g2-0 (Coremail) with SMTP id _____wC3Hv9JiD9k7lSgBQ--.999S2;
-        Wed, 19 Apr 2023 14:20:57 +0800 (CST)
-From:   jiweisun126@126.com
-To:     masahiroy@kernel.org, nathan@kernel.org, ndesaulniers@google.com,
-        nicolas@fjasle.eu, linux-kbuild@vger.kernel.org,
-        linux-kernel@vger.kernel.org, sunjw10@lenovo.com
-Cc:     jiwei.sun.bj@qq.com
-Subject: [PATCH] kbuild: rpm-pkg: fix rpm-pkg build error
-Date:   Wed, 19 Apr 2023 14:20:56 +0800
-Message-Id: <20230419062056.7964-1-jiweisun126@126.com>
-X-Mailer: git-send-email 2.25.1
+        Wed, 19 Apr 2023 11:45:13 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C6CBA5D5;
+        Wed, 19 Apr 2023 08:45:08 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 20BB963CB5;
+        Wed, 19 Apr 2023 15:45:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81BA0C433A0;
+        Wed, 19 Apr 2023 15:45:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1681919107;
+        bh=90/tbLhV1ayXAjshEn/Ria2dF5WRQsSyCH03+eREOJc=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=s8uo2ZzagsbAOEk23kn6eQh/sW+2gj9qRvXTVv7AyUQMn7PH9TO3+WnO09ss9M1yq
+         7PRwnTdQnwonVvkv2Wu30dwc42VxhDcCvlxDLC4n+c402I+KV0pkkC4QRwcXKldqEq
+         AiUU9UFgx7Jxx7INXCmH/PZ1La+SDfbLXNQ17I8Jrg4XQUDypid/gdbW5lBnU8xk43
+         UUlTQV85ThCyImKOPGWrHDBim9HgyjnZzppFdZYOkeVpzs+5OQVcARqOBxRBYkfNKT
+         As2gJoXlPx8NxE9IjrHKvS8wuUloziFo4NiNwi9rEGvsJxOSWjT2T1W0nyb24Otjlx
+         w55wiXN+Ure8w==
+Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-6a5e7482961so895663a34.3;
+        Wed, 19 Apr 2023 08:45:07 -0700 (PDT)
+X-Gm-Message-State: AAQBX9fU/S7GZNPkyBh2FQQK/gkPE50K6lE/ipRGOlAOEGBbqKnUdgNX
+        bdOShRySdxlYbiLd2tMRzpofGpqFa0uXXZ/k/OM=
+X-Google-Smtp-Source: AKy350awxs0egxRonUq1BNIltf2oXCLUHFnYsxjk327cz2GTGYOHoUZge6aRtUP8EgIkT9l3f5KVzRj6W1Rs7wIFT3Q=
+X-Received: by 2002:a05:6870:1687:b0:184:af3:910d with SMTP id
+ j7-20020a056870168700b001840af3910dmr80817oae.32.1681919106743; Wed, 19 Apr
+ 2023 08:45:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _____wC3Hv9JiD9k7lSgBQ--.999S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7WF15uFW5WryxJF1kKF1DGFg_yoW5JrW3pw
-        s3urZxGa1UKF95A3WUCw4rW3y7XryDKF4UWa48Xw18tryqyFyIvanrKFWrJr9Iqa48t34Y
-        gr1DuF18KrW7CrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07j5CztUUUUU=
-X-Originating-IP: [111.205.43.230]
-X-CM-SenderInfo: 5mlzvxpvxqijaw6rjloofrz/1tbiXw9WjWIxn4SuHgAAsz
+References: <tencent_76F930F42F060E84C8BFA5440D0A35A17209@qq.com>
+In-Reply-To: <tencent_76F930F42F060E84C8BFA5440D0A35A17209@qq.com>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Thu, 20 Apr 2023 00:44:30 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAQys34ptXW+-OPnR22pDVvHZf0JEKy5-=ufFdOu0jBU-Q@mail.gmail.com>
+Message-ID: <CAK7LNAQys34ptXW+-OPnR22pDVvHZf0JEKy5-=ufFdOu0jBU-Q@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: rpm-pkg: fix rpm-pkg build error
+To:     29581992@qq.com
+Cc:     nathan@kernel.org, ndesaulniers@google.com, nicolas@fjasle.eu,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        sunjw10@lenovo.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-From: Jiwei Sun <sunjw10@lenovo.com>
+On Wed, Apr 19, 2023 at 12:18=E2=80=AFPM <29581992@qq.com> wrote:
+>
+> From: Jiwei Sun <sunjw10@lenovo.com>
+>
+> The following error will trigger when building rpm-pkg
+> $ make rpm-pkg
+>   SYNC    include/config/auto.conf.cmd
+>   HOSTLD  scripts/kconfig/conf
+>   UPD     include/config/kernel.release
+>   UPD     .tmp_HEAD
+>   ARCHIVE linux.tar.gz
+> sh ./scripts/package/mkspec >./kernel.spec
+> rpmbuild  --target x86_64-linux -bs kernel.spec \
+> --define=3D'_smp_mflags %{nil}' --define=3D'_sourcedir rpmbuild/SOURCES' =
+--define=3D'_srcrpmdir .'
+> Building target platforms: x86_64-linux
+> Building for target x86_64-linux
+> Wrote: ./kernel-6.3.0_rc7-47.src.rpm
+> rpmbuild  --target x86_64-linux -rb kernel-6.3.0_rc7-47.src.rpm \
+> --define=3D'_smp_mflags %{nil}'
+> Installing kernel-6.3.0_rc7-47.src.rpm
+> Building target platforms: x86_64-linux
+> Building for target x86_64-linux
+> Executing(%prep): /bin/sh -e /var/tmp/rpm-tmp.QtGSXP
+> + umask 022
+> + cd /mnt/datapart/rpmbuild/BUILD
+> + cd /mnt/datapart/rpmbuild/BUILD
+> + rm -rf linux
+> + /usr/bin/gzip -dc /mnt/datapart/rpmbuild/SOURCES/linux.tar.gz
+> + /usr/bin/tar -xof -
+> + STATUS=3D0
+> + '[' 0 -ne 0 ']'
+> + cd linux
+> /var/tmp/rpm-tmp.QtGSXP: line 40: cd: linux: No such file or directory
+> error: Bad exit status from /var/tmp/rpm-tmp.QtGSXP (%prep)
+>
+> There is linux.tar, not linux, and the linux.tar.gz is create by the foll=
+owing
+>  quiet_cmd_archive =3D ARCHIVE $@
+>        cmd_archive =3D git -C $(srctree) $(git-config-tar$(suffix $@)) ar=
+chive \
+>                      --output=3D$$(realpath $@) --prefix=3D$(basename $@)=
+/ $(archive-args)
+> Here the $@ is linux.tar.gz, and $(basename $@) will be linux.tar,
+> The above fact is the cause, so use $(basename $(basename $@)) to get the=
+ right directory name.
+>
+> Signed-off-by: Jiwei Sun <sunjw10@lenovo.com>
+> ---
+>  scripts/Makefile.package | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/scripts/Makefile.package b/scripts/Makefile.package
+> index 4d90691505b1..3718ecdf9edf 100644
+> --- a/scripts/Makefile.package
+> +++ b/scripts/Makefile.package
+> @@ -49,7 +49,7 @@ git-config-tar.zst =3D -c tar.tar.zst.command=3D"$(ZSTD=
+)"
+>
+>  quiet_cmd_archive =3D ARCHIVE $@
+>        cmd_archive =3D git -C $(srctree) $(git-config-tar$(suffix $@)) ar=
+chive \
+> -                    --output=3D$$(realpath $@) --prefix=3D$(basename $@)=
+/ $(archive-args)
+> +                    --output=3D$$(realpath $@) --prefix=3D$(basename $(b=
+asename $@))/ $(archive-args)
 
-The following error will trigger when building rpm-pkg
-$ make rpm-pkg
-  SYNC    include/config/auto.conf.cmd
-  HOSTLD  scripts/kconfig/conf
-  UPD     include/config/kernel.release
-  UPD     .tmp_HEAD
-  ARCHIVE linux.tar.gz
-sh ./scripts/package/mkspec >./kernel.spec
-rpmbuild  --target x86_64-linux -bs kernel.spec \
---define='_smp_mflags %{nil}' --define='_sourcedir rpmbuild/SOURCES' --define='_srcrpmdir .'
-Building target platforms: x86_64-linux
-Building for target x86_64-linux
-Wrote: ./kernel-6.3.0_rc7-47.src.rpm
-rpmbuild  --target x86_64-linux -rb kernel-6.3.0_rc7-47.src.rpm \
---define='_smp_mflags %{nil}'
-Installing kernel-6.3.0_rc7-47.src.rpm
-Building target platforms: x86_64-linux
-Building for target x86_64-linux
-Executing(%prep): /bin/sh -e /var/tmp/rpm-tmp.QtGSXP
-+ umask 022
-+ cd /mnt/datapart/rpmbuild/BUILD
-+ cd /mnt/datapart/rpmbuild/BUILD
-+ rm -rf linux
-+ /usr/bin/gzip -dc /mnt/datapart/rpmbuild/SOURCES/linux.tar.gz
-+ /usr/bin/tar -xof -
-+ STATUS=0
-+ '[' 0 -ne 0 ']'
-+ cd linux
-/var/tmp/rpm-tmp.QtGSXP: line 40: cd: linux: No such file or directory
-error: Bad exit status from /var/tmp/rpm-tmp.QtGSXP (%prep)
 
-There is linux.tar, not linux, and the linux.tar.gz is create by the following
- quiet_cmd_archive = ARCHIVE $@
-       cmd_archive = git -C $(srctree) $(git-config-tar$(suffix $@)) archive \
-                     --output=$$(realpath $@) --prefix=$(basename $@)/ $(archive-args)
-Here the $@ is linux.tar.gz, and $(basename $@) will be linux.tar,
-The above fact is the cause, so use $(basename $(basename $@)) to get the right directory name.
+Thanks for the report and patch, but
+this would introduce another regression for
+'make perf-tar-src-pkg'.
 
-Signed-off-by: Jiwei Sun <sunjw10@lenovo.com>
----
- scripts/Makefile.package | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+If you run it on the mainline
+the file name will be "perf-6.3.0-rc7.tar"
 
-diff --git a/scripts/Makefile.package b/scripts/Makefile.package
-index 4d90691505b1..3718ecdf9edf 100644
---- a/scripts/Makefile.package
-+++ b/scripts/Makefile.package
-@@ -49,7 +49,7 @@ git-config-tar.zst = -c tar.tar.zst.command="$(ZSTD)"
- 
- quiet_cmd_archive = ARCHIVE $@
-       cmd_archive = git -C $(srctree) $(git-config-tar$(suffix $@)) archive \
--                    --output=$$(realpath $@) --prefix=$(basename $@)/ $(archive-args)
-+                    --output=$$(realpath $@) --prefix=$(basename $(basename $@))/ $(archive-args)
- 
- # Linux source tarball
- # ---------------------------------------------------------------------------
--- 
-2.27.0
+The inner $(basename ...) will strip ".tar",
+then the outer $(basename ...) will strip ".0-rc7".
 
+The resulting prefix will become "perf-6.3/"
+while the expected prefix is "pref-6.3.0-rc7/".
+
+
+
+
+>
+>  # Linux source tarball
+>  # ----------------------------------------------------------------------=
+-----
+> --
+> 2.27.0
+>
+
+
+--=20
+Best Regards
+Masahiro Yamada
