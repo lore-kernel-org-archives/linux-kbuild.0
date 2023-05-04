@@ -2,103 +2,94 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4F3BC77B71
-	for <linux-kbuild@archiver.kernel.org>; Fri, 21 Apr 2023 14:36:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17DF8C77B78
+	for <linux-kbuild@archiver.kernel.org>; Thu,  4 May 2023 20:31:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231936AbjDUOgb (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 21 Apr 2023 10:36:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43720 "EHLO
+        id S230377AbjEDUb2 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 4 May 2023 16:31:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231728AbjDUOga (ORCPT
+        with ESMTP id S230084AbjEDUbO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 21 Apr 2023 10:36:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C74FE9030
-        for <linux-kbuild@vger.kernel.org>; Fri, 21 Apr 2023 07:35:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1682087745;
+        Thu, 4 May 2023 16:31:14 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D70D518DCA;
+        Thu,  4 May 2023 13:20:03 -0700 (PDT)
+From:   "Ahmed S. Darwish" <darwi@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1683231558;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=UCQL2D9su8wjwOrs6IuTNGHSeQSL9lst6CDlj1GlHvQ=;
-        b=buTt6oDgOGd4WYtoL6XYovqfXZCxJk7TLFqwltZ5hVm6VpnPO24JuGq8xbNJnfH8T9bw9n
-        ximX/Ce50ICbF/wQxBPWAO+k4F35EJhlr8Frk/VnvUwV+9blpnQwwIwvkdeMlF5D1diH+Q
-        8fnvv8okgCabeEyF+Cv5vz8spBCRVbg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-380-HjtImQA4Nzy9mg_o0W6siw-1; Fri, 21 Apr 2023 10:35:41 -0400
-X-MC-Unique: HjtImQA4Nzy9mg_o0W6siw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 084BC101A54F;
-        Fri, 21 Apr 2023 14:35:41 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.158])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0ACFC1121318;
-        Fri, 21 Apr 2023 14:35:39 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-To:     torvalds@linux-foundation.org
-cc:     dhowells@redhat.com, Ekaterina Orlova <vorobushek.ok@gmail.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: 
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=XQ86TMvno5qeng6U0rCVgoMQaGJVwnTJIy9oD2h9Q1A=;
+        b=BEE9oUQ/E2WZ1iOrhE5rFNn7EV5qH7DX8gPHCT11aJrUiXf3PxrF/5hqFdCeg9DOvCYFlm
+        BKBTKhA9ABi4/TqM6rNfDfSRx2JGaBERFCwFZXC5kGnnvCap+TLx3LcNgMgq8Y/ymRxfUd
+        vt7bOcG1QerPAeaEpEGYWq/74wVc0vaicLN8zg600580VpDNhhXjduFGMTxf1G9SYfq1jA
+        Hpy//bDtkaLjtEuzlrhRaar6+4it0UgzSVtU+dp5u/PMBq5cYdcpNeVLK6yKGh3AzjHhrg
+        6cuwfvo95TTjBjcUYQJqJ8TeIMe3+JhImTMO8FEFu0acu/GaiEdgNFW9rgvrEg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1683231558;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=XQ86TMvno5qeng6U0rCVgoMQaGJVwnTJIy9oD2h9Q1A=;
+        b=M4w+POcjZb2xIsQOBUzBJeslZ2v85/wkjHh+e8SvBtE9m4SbvpmFev6+6JmT61ROUnd4AX
+        10NbKaqPaMOxfuBQ==
+To:     Masahiro Yamada <masahiroy@kernel.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nicolas Schier <nicolas@fjasle.eu>
+Cc:     Thomas Gleixner <tglx@linutronix.de>, linux-kbuild@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        "Ahmed S. Darwish" <darwi@linutronix.de>
+Subject: [PATCH v1 1/1] scripts/tags.sh: Fix gtags generation for O= kernel builds
+Date:   Thu,  4 May 2023 22:18:33 +0200
+Message-Id: <20230504201833.202494-2-darwi@linutronix.de>
+In-Reply-To: <20230504201833.202494-1-darwi@linutronix.de>
+References: <20230504201833.202494-1-darwi@linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <158286.1682087739.1@warthog.procyon.org.uk>
-Date:   Fri, 21 Apr 2023 15:35:39 +0100
-Message-ID: <158287.1682087739@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hi Linus,
+gtags considers any file outside of its current working directory
+"outside the source tree" and refuses to index it.
 
-Can you apply this, please?  It can probably wait for the merge window if you
-don't want to apply it now as it only affects building the kernel.
+For O= kernel builds, scripts/tags.sh invokes gtags with the current
+working directory set to ${O}. This leads to gtags ignoring the entire
+kernel source and generating an empty index.
 
-Thanks,
-David
+For O= builds, set gtags' working directory to the kernel source tree
+and explicitly set its output path through parameters instead.
+
+Signed-off-by: Ahmed S. Darwish <darwi@linutronix.de>
 ---
-From: Ekaterina Orlova <vorobushek.ok@gmail.com>
+ scripts/tags.sh | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-ASN.1: Fix check for strdup() success
-
-It seems there is a misprint in the check of strdup() return code
-that can lead to NULL pointer dereference.
-
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
-
-Fixes: 4520c6a49af8 ("X.509: Add simple ASN.1 grammar compiler")
-Signed-off-by: Ekaterina Orlova <vorobushek.ok@gmail.com>
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: David Woodhouse <dwmw2@infradead.org>
-cc: James Bottomley <jejb@linux.ibm.com>
-cc: Jarkko Sakkinen <jarkko@kernel.org>
-cc: keyrings@vger.kernel.org
-cc: linux-kbuild@vger.kernel.org
-Link: https://lore.kernel.org/r/20230315172130.140-1-vorobushek.ok@gmail.com/
----
- scripts/asn1_compiler.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/scripts/asn1_compiler.c b/scripts/asn1_compiler.c
-index 7b6756a8c15d..4c3f645065a4 100644
---- a/scripts/asn1_compiler.c
-+++ b/scripts/asn1_compiler.c
-@@ -625,7 +625,7 @@ int main(int argc, char **argv)
- 	p = strrchr(argv[1], '/');
- 	p = p ? p + 1 : argv[1];
- 	grammar_name = strdup(p);
--	if (!p) {
-+	if (!grammar_name) {
- 		perror(NULL);
- 		exit(1);
- 	}
+diff --git a/scripts/tags.sh b/scripts/tags.sh
+index ea31640b2671..1a6db535503b 100755
+--- a/scripts/tags.sh
++++ b/scripts/tags.sh
+@@ -131,7 +131,14 @@ docscope()
+ 
+ dogtags()
+ {
+-	all_target_sources | gtags -i -f -
++	# gtags refuses to index any file outside of the current working
++	# directory. For O= builds, set the current working directory to
++	# the kernel source tree and the output tags dir to ${O}.
++	suffixparams=
++	if [ -v O ]; then
++		suffixparams="-C $tree $O"
++	fi
++	all_target_sources | gtags -i -f - $suffixparams
+ }
+ 
+ # Basic regular expressions with an optional /kind-spec/ for ctags and
+-- 
+2.30.2
 
