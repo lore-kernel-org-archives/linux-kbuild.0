@@ -2,36 +2,36 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6347EC77B7F
-	for <linux-kbuild@archiver.kernel.org>; Sat, 13 May 2023 20:47:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC8AAC77B7D
+	for <linux-kbuild@archiver.kernel.org>; Sat, 13 May 2023 20:47:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236997AbjEMUrs (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 13 May 2023 16:47:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35894 "EHLO
+        id S237169AbjEMUru (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 13 May 2023 16:47:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237090AbjEMUre (ORCPT
+        with ESMTP id S233675AbjEMUrg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 13 May 2023 16:47:34 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E32C4EFE;
-        Sat, 13 May 2023 13:46:32 -0700 (PDT)
+        Sat, 13 May 2023 16:47:36 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E8F75596;
+        Sat, 13 May 2023 13:46:37 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 574C761563;
-        Sat, 13 May 2023 20:45:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D5B2C4339B;
-        Sat, 13 May 2023 20:45:54 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C59086157F;
+        Sat, 13 May 2023 20:45:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8913FC4339E;
+        Sat, 13 May 2023 20:45:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684010755;
-        bh=mhnT2D0NfaJmk9MDozT9zgdIHJhWnfK8bL6q5ynqcI4=;
+        s=k20201202; t=1684010749;
+        bh=Kep8Iw8VgQxgpYvfyniHHN0kmqkyl1ojVYpvdIK/Gqw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=DDwffNGrXRub1C5F003mQan7Q0mjETfM/pSD0U+lMxD5OWrT+0SP6DJ6EZfbBI1rU
-         KuhSbLz83OQxDG8W3WMsUDYv1YmXobUe0FFYGLwnQ7PQwNcKiZL9QACQa/QOj1LgFX
-         srgNDF0JXprUV1zbJT0HbNqTvyp+C60fbfhr7oqxIF+B76qAvH0Dmh0SzVWj3jiPKo
-         n3+Vn4NV99Lg/RRJYqvlzfh697VBuW8mBJDCej6llcerNhlRuYpsOn95KJt08hLmjt
-         +VcFoKMlCYaTe/XMAQgoRq9lw1oMumsEI6Sc9psDabfXOVGl9+r5eofFykdqrhtaDB
-         eCp0vAt1bIs6w==
+        b=Mgj+J+S5Vo7VZDr9w9TT9ssCBZGrIdvb/9cnhjAEov8VK+4pYvzYSAnWpzrSSqE1O
+         lsuAGKhaDPviVvAKUyatb8+BiRx73v+PAiFZagLt8+pMQNC0tHOENazTYxaWNwQlNz
+         niJSpsyVEobga39680r33Tr9J246elH8NZjMfPcSTColkThYuSxm8mx9x5F70NmpnO
+         TnE1pr/VxBtOugS2d3groPtjETyyw/0ig8UeIAp37Wrc6P+g+pUGwOROHzb9r1Zm/E
+         7CMM2DdNVRBmbSLMldvbzfoN4WCvPiAey0FF8Z0W0JST6s0hvartJAc4Tt76XBFHrw
+         PnG1fPkkRK5Ag==
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
@@ -40,9 +40,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Nicolas Pitre <npitre@baylibre.com>,
         Nicolas Schier <nicolas@fjasle.eu>,
         Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v4 20/21] modpost: use null string instead of NULL pointer for default namespace
-Date:   Sun, 14 May 2023 05:45:01 +0900
-Message-Id: <20230513204502.1593923-21-masahiroy@kernel.org>
+Subject: [PATCH v4 17/21] ia64,export.h: replace EXPORT_DATA_SYMBOL* with EXPORT_SYMBOL*
+Date:   Sun, 14 May 2023 05:44:58 +0900
+Message-Id: <20230513204502.1593923-18-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230513204502.1593923-1-masahiroy@kernel.org>
 References: <20230513204502.1593923-1-masahiroy@kernel.org>
@@ -52,87 +52,56 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The default namespace is the null string, "".
+With the previous refactoring, you can always use EXPORT_SYMBOL*.
 
-When set, the null string "" is converted to NULL:
-
-  s->namespace = namespace[0] ? NOFAIL(strdup(namespace)) : NULL;
-
-When printed, the NULL pointer is get back to the null string:
-
-  sym->namespace ?: ""
-
-This saves 1 byte memory allocated for "", but loses the readability.
-
-In kernel-space, we strive to save memory, but modpost is a userspace
-tool used to build the kernel. On modern systems, such small piece of
-memory is not a big deal.
-
-Handle the namespace string as is.
+Replace two instances in ia64, then remove EXPORT_DATA_SYMBOL*.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 ---
 
- scripts/mod/modpost.c | 17 +++++++++++------
- 1 file changed, 11 insertions(+), 6 deletions(-)
+ arch/ia64/kernel/head.S      | 2 +-
+ arch/ia64/kernel/ivt.S       | 2 +-
+ include/asm-generic/export.h | 3 ---
+ 3 files changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 7de6548103d9..bb9510f9645f 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -298,6 +298,13 @@ static bool contains_namespace(struct list_head *head, const char *namespace)
- {
- 	struct namespace_list *list;
+diff --git a/arch/ia64/kernel/head.S b/arch/ia64/kernel/head.S
+index f22469f1c1fc..c096500590e9 100644
+--- a/arch/ia64/kernel/head.S
++++ b/arch/ia64/kernel/head.S
+@@ -170,7 +170,7 @@ RestRR:											\
+ 	__PAGE_ALIGNED_DATA
  
-+	/*
-+	 * The default namespace is null string "", which is always implicitly
-+	 * contained.
-+	 */
-+	if (!namespace[0])
-+		return true;
-+
- 	list_for_each_entry(list, head, list) {
- 		if (!strcmp(list->namespace, namespace))
- 			return true;
-@@ -367,7 +374,7 @@ static struct symbol *sym_add_exported(const char *name, struct module *mod,
- 	s = alloc_symbol(name);
- 	s->module = mod;
- 	s->is_gpl_only = gpl_only;
--	s->namespace = namespace[0] ? NOFAIL(strdup(namespace)) : NULL;
-+	s->namespace = NOFAIL(strdup(namespace));
- 	list_add_tail(&s->list, &mod->exported_symbols);
- 	hash_add_symbol(s);
+ 	.global empty_zero_page
+-EXPORT_DATA_SYMBOL_GPL(empty_zero_page)
++EXPORT_SYMBOL_GPL(empty_zero_page)
+ empty_zero_page:
+ 	.skip PAGE_SIZE
  
-@@ -1761,8 +1768,7 @@ static void check_exports(struct module *mod)
- 		else
- 			basename = mod->name;
+diff --git a/arch/ia64/kernel/ivt.S b/arch/ia64/kernel/ivt.S
+index d6d4229b28db..7a418e324d30 100644
+--- a/arch/ia64/kernel/ivt.S
++++ b/arch/ia64/kernel/ivt.S
+@@ -87,7 +87,7 @@
  
--		if (exp->namespace &&
--		    !contains_namespace(&mod->imported_namespaces, exp->namespace)) {
-+		if (!contains_namespace(&mod->imported_namespaces, exp->namespace)) {
- 			modpost_log(allow_missing_ns_imports ? LOG_WARN : LOG_ERROR,
- 				    "module %s uses symbol %s from namespace %s, but does not import it.\n",
- 				    basename, exp->name, exp->namespace);
-@@ -1848,8 +1854,7 @@ static void add_exported_symbols(struct buffer *buf, struct module *mod)
- 	list_for_each_entry(sym, &mod->exported_symbols, list)
- 		buf_printf(buf, "KSYMTAB_%s(%s, \"%s\", \"%s\");\n",
- 			   sym->is_func ? "FUNC" : "DATA", sym->name,
--			   sym->is_gpl_only ? "_gpl" : "",
--			   sym->namespace ?: "");
-+			   sym->is_gpl_only ? "_gpl" : "", sym->namespace);
+ 	.align 32768	// align on 32KB boundary
+ 	.global ia64_ivt
+-	EXPORT_DATA_SYMBOL(ia64_ivt)
++	EXPORT_SYMBOL(ia64_ivt)
+ ia64_ivt:
+ /////////////////////////////////////////////////////////////////////////////////////////
+ // 0x0000 Entry 0 (size 64 bundles) VHPT Translation (8,20,47)
+diff --git a/include/asm-generic/export.h b/include/asm-generic/export.h
+index 0ae9f38a904c..570cd4da7210 100644
+--- a/include/asm-generic/export.h
++++ b/include/asm-generic/export.h
+@@ -8,7 +8,4 @@
+  */
+ #include <linux/export.h>
  
- 	if (!modversions)
- 		return;
-@@ -2117,7 +2122,7 @@ static void write_dump(const char *fname)
- 			buf_printf(&buf, "0x%08x\t%s\t%s\tEXPORT_SYMBOL%s\t%s\n",
- 				   sym->crc, sym->name, mod->name,
- 				   sym->is_gpl_only ? "_GPL" : "",
--				   sym->namespace ?: "");
-+				   sym->namespace);
- 		}
- 	}
- 	write_buf(&buf, fname);
+-#define EXPORT_DATA_SYMBOL(name)	EXPORT_SYMBOL(name)
+-#define EXPORT_DATA_SYMBOL_GPL(name)	EXPORT_SYMBOL_GPL(name)
+-
+ #endif
 -- 
 2.39.2
 
