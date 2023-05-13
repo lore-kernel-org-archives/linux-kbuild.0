@@ -2,36 +2,36 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53BD4C77B7F
-	for <linux-kbuild@archiver.kernel.org>; Sat, 13 May 2023 20:46:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9450C7EE24
+	for <linux-kbuild@archiver.kernel.org>; Sat, 13 May 2023 20:46:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237324AbjEMUqw (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 13 May 2023 16:46:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35284 "EHLO
+        id S237370AbjEMUqz (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 13 May 2023 16:46:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236812AbjEMUqY (ORCPT
+        with ESMTP id S229633AbjEMUq2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 13 May 2023 16:46:24 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49C654204;
-        Sat, 13 May 2023 13:45:55 -0700 (PDT)
+        Sat, 13 May 2023 16:46:28 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A53B24C1B;
+        Sat, 13 May 2023 13:45:58 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D12E660BA8;
-        Sat, 13 May 2023 20:45:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E07FFC433D2;
-        Sat, 13 May 2023 20:45:38 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 23DFD6152F;
+        Sat, 13 May 2023 20:45:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB616C433D2;
+        Sat, 13 May 2023 20:45:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684010740;
-        bh=2nRP9FGN/P2zQhGGRzQIrB1YS6CQfI+BdiCcThJT2L0=;
+        s=k20201202; t=1684010751;
+        bh=uOppWNJ6OKrWtEcyb/WZOLcPRQzIKaj9fIb8LyZK590=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=LUppWEoYkVNpUb+b225//D+UUXi64ZlA0hbQmPsfn6ap2+dSHUv8GjpDCmuFBCqdq
-         GqYGG/+kv4ZcmIqs6lu87HyUiH+vPS6IQ5uQl0kVU/GK5053eQnIfPtB8iyArfuq56
-         KI7xn8D1SBirJUsOoM5QSTg9L6/rLC0fae6sICwF9lAQxsRDt5tCctzsoSha/KTgJi
-         UY4DrQwXxQJgWKUx2j7Axa39eQQhfvMO/ssenscBuKX4+KBfsxRjEtxH6BNlKtIP2J
-         1zR3D7BckngDSaaAz4C4KMGQmLHVIxfH2WUGnfddCtHcaM5tvH5IOnXArs2eyUqNn8
-         bqKERrK2ybhJA==
+        b=PueLfi5n/cCFGP5fZw8m4Hwvgq6A50mXArJA0Ol6T6Ug9zp7Q0XJ6HQ/h32Vsj8T6
+         w8w6vlDUox3lJClRI2UApc+LYcmJuc0fp361g4U1DWFgWOp5ILIztOWu/xYxhv8WwO
+         LJBdOsGW15Kv4JR5bSBpyw9/J0V1vwoJ9eVUBiDRrJM19NXyaANpPktTZc/6LIYwpk
+         F9TU/jTddPF2JGAEKVdeHco5fybw7gqnlPkQQDHcdvvk6V+H0fpufTd57AvcJ7bYHY
+         8NrJi0vMmWiDWJWSGQFgYwbB1hHS4x+olXlb+6ocZXmVg1Gu5R2rcO9Z2w4gyqspp6
+         KZ+wwPqg7nhfQ==
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
@@ -40,9 +40,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Nicolas Pitre <npitre@baylibre.com>,
         Nicolas Schier <nicolas@fjasle.eu>,
         Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v4 13/21] modpost: replace r->r_offset, r->r_addend with faddr, taddr
-Date:   Sun, 14 May 2023 05:44:54 +0900
-Message-Id: <20230513204502.1593923-14-masahiroy@kernel.org>
+Subject: [PATCH v4 18/21] modpost: check static EXPORT_SYMBOL* by modpost again
+Date:   Sun, 14 May 2023 05:44:59 +0900
+Message-Id: <20230513204502.1593923-19-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230513204502.1593923-1-masahiroy@kernel.org>
 References: <20230513204502.1593923-1-masahiroy@kernel.org>
@@ -52,118 +52,167 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-r_offset/r_addend holds the offset address from/to which a symbol is
-referenced. It is unclear unless you are familiar with ELF.
+Commit 31cb50b5590f ("kbuild: check static EXPORT_SYMBOL* by script
+instead of modpost") moved the static EXPORT_SYMBOL* check from the
+mostpost to a shell script because I thought it must be checked per
+compilation unit to avoid false negatives.
 
-Rename them to faddr, taddr, respectively. The prefix 'f' means 'from',
-'t' means 'to'.
+I came up with an idea to do this in modpost, against combined ELF
+files. The relocation entries in ELF will find the correct exported
+symbol even if there exist symbols with the same name in different
+compilation units.
+
+Again, the same sample code.
+
+  Makefile:
+
+    obj-y += foo1.o foo2.o
+
+  foo1.c:
+
+    #include <linux/export.h>
+    static void foo(void) {}
+    EXPORT_SYMBOL(foo);
+
+  foo2.c:
+
+    void foo(void) {}
+
+Then, modpost can catch it correctly.
+
+    MODPOST Module.symvers
+  ERROR: modpost: vmlinux: local symbol 'foo' was exported
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/modpost.c | 34 +++++++++++++++++++---------------
- 1 file changed, 19 insertions(+), 15 deletions(-)
+ scripts/Makefile.build     |  4 ---
+ scripts/check-local-export | 70 --------------------------------------
+ scripts/mod/modpost.c      |  6 ++++
+ 3 files changed, 6 insertions(+), 74 deletions(-)
+ delete mode 100755 scripts/check-local-export
 
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index c26c04aea652..94b3323dcea7 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -220,8 +220,6 @@ cmd_gen_ksymdeps = \
+ 	$(CONFIG_SHELL) $(srctree)/scripts/gen_ksymdeps.sh $@ >> $(dot-target).cmd
+ endif
+ 
+-cmd_check_local_export = $(srctree)/scripts/check-local-export $@
+-
+ ifneq ($(findstring 1, $(KBUILD_EXTRA_WARN)),)
+ cmd_warn_shared_object = $(if $(word 2, $(modname-multi)),$(warning $(kbuild-file): $*.o is added to multiple modules: $(modname-multi)))
+ endif
+@@ -229,7 +227,6 @@ endif
+ define rule_cc_o_c
+ 	$(call cmd_and_fixdep,cc_o_c)
+ 	$(call cmd,gen_ksymdeps)
+-	$(call cmd,check_local_export)
+ 	$(call cmd,checksrc)
+ 	$(call cmd,checkdoc)
+ 	$(call cmd,gen_objtooldep)
+@@ -241,7 +238,6 @@ endef
+ define rule_as_o_S
+ 	$(call cmd_and_fixdep,as_o_S)
+ 	$(call cmd,gen_ksymdeps)
+-	$(call cmd,check_local_export)
+ 	$(call cmd,gen_objtooldep)
+ 	$(call cmd,gen_symversions_S)
+ 	$(call cmd,warn_shared_object)
+diff --git a/scripts/check-local-export b/scripts/check-local-export
+deleted file mode 100755
+index e54a1642c970..000000000000
+--- a/scripts/check-local-export
++++ /dev/null
+@@ -1,70 +0,0 @@
+-#!/bin/sh
+-# SPDX-License-Identifier: GPL-2.0-only
+-#
+-# Copyright (C) 2022 Masahiro Yamada <masahiroy@kernel.org>
+-# Copyright (C) 2022 Owen Rafferty <owen@owenrafferty.com>
+-#
+-# Exit with error if a local exported symbol is found.
+-# EXPORT_SYMBOL should be used for global symbols.
+-
+-set -e
+-pid=$$
+-
+-# If there is no symbol in the object, ${NM} (both GNU nm and llvm-nm) shows
+-# 'no symbols' diagnostic (but exits with 0). It is harmless and hidden by
+-# '2>/dev/null'. However, it suppresses real error messages as well. Add a
+-# hand-crafted error message here.
+-#
+-# TODO:
+-# Use --quiet instead of 2>/dev/null when we upgrade the minimum version of
+-# binutils to 2.37, llvm to 13.0.0.
+-# Then, the following line will be simpler:
+-#   { ${NM} --quiet ${1} || kill 0; } |
+-
+-{ ${NM} ${1} 2>/dev/null || { echo "${0}: ${NM} failed" >&2; kill $pid; } } |
+-${AWK} -v "file=${1}" '
+-BEGIN {
+-	i = 0
+-}
+-
+-# Skip the line if the number of fields is less than 3.
+-#
+-# case 1)
+-#   For undefined symbols, the first field (value) is empty.
+-#   The outout looks like this:
+-#     "                 U _printk"
+-#   It is unneeded to record undefined symbols.
+-#
+-# case 2)
+-#   For Clang LTO, llvm-nm outputs a line with type t but empty name:
+-#     "---------------- t"
+-!length($3) {
+-	next
+-}
+-
+-# save (name, type) in the associative array
+-{ symbol_types[$3]=$2 }
+-
+-# append the exported symbol to the array
+-($3 ~ /^__export_symbol.*\..*/) {
+-	export_symbols[i] = $3
+-	sub(/^__export_symbol.*\./, "", export_symbols[i])
+-	i++
+-}
+-
+-END {
+-	exit_code = 0
+-	for (j = 0; j < i; ++j) {
+-		name = export_symbols[j]
+-		# nm(3) says "If lowercase, the symbol is usually local"
+-		if (symbol_types[name] ~ /[a-z]/) {
+-			printf "%s: error: local symbol %s was exported\n",
+-				file, name | "cat 1>&2"
+-			exit_code = 1
+-		}
+-	}
+-
+-	exit exit_code
+-}'
+-
+-exit $?
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 9e81cd6803a7..43ce35377f6a 100644
+index 8cf6bc0ac050..3e956013a6c8 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -1160,18 +1160,18 @@ static bool is_executable_section(struct elf_info *elf, unsigned int secndx)
- 
- static void default_mismatch_handler(const char *modname, struct elf_info *elf,
- 				     const struct sectioncheck* const mismatch,
--				     Elf_Rela *r, Elf_Sym *tsym,
--				     unsigned int fsecndx, const char *fromsec,
--				     const char *tosec)
-+				     Elf_Sym *tsym,
-+				     unsigned int fsecndx, const char *fromsec, Elf_Addr faddr,
-+				     const char *tosec, Elf_Addr taddr)
- {
- 	Elf_Sym *from;
- 	const char *tosym;
- 	const char *fromsym;
- 
--	from = find_nearest_symbol(elf, r->r_offset, fsecndx);
-+	from = find_nearest_symbol(elf, faddr, fsecndx);
- 	fromsym = sym_name(elf, from);
- 
--	tsym = find_better_symbol(elf, r->r_addend, tsym);
-+	tsym = find_better_symbol(elf, taddr, tsym);
- 	tosym = sym_name(elf, tsym);
- 
- 	/* check whitelist - we may ignore it */
-@@ -1198,7 +1198,7 @@ static void default_mismatch_handler(const char *modname, struct elf_info *elf,
- 		break;
- 	case EXTABLE_TO_NON_TEXT:
- 		warn("%s(%s+0x%lx): Section mismatch in reference to the %s:%s\n",
--		     modname, fromsec, (long)r->r_offset, tosec, tosym);
-+		     modname, fromsec, (long)faddr, tosec, tosym);
- 
- 		if (match(tosec, mismatch->bad_tosec))
- 			fatal("The relocation at %s+0x%lx references\n"
-@@ -1206,7 +1206,7 @@ static void default_mismatch_handler(const char *modname, struct elf_info *elf,
- 			      "Something is seriously wrong and should be fixed.\n"
- 			      "You might get more information about where this is\n"
- 			      "coming from by using scripts/check_extable.sh %s\n",
--			      fromsec, (long)r->r_offset, tosec, modname);
-+			      fromsec, (long)faddr, tosec, modname);
- 		else if (is_executable_section(elf, get_secindex(elf, tsym)))
- 			warn("The relocation at %s+0x%lx references\n"
- 			     "section \"%s\" which is not in the list of\n"
-@@ -1215,17 +1215,18 @@ static void default_mismatch_handler(const char *modname, struct elf_info *elf,
- 			     "list of authorized sections to jump to on fault.\n"
- 			     "This can be achieved by adding \"%s\" to\n"
- 			     "OTHER_TEXT_SECTIONS in scripts/mod/modpost.c.\n",
--			     fromsec, (long)r->r_offset, tosec, tosec, tosec);
-+			     fromsec, (long)faddr, tosec, tosec, tosec);
- 		else
- 			error("%s+0x%lx references non-executable section '%s'\n",
--			      fromsec, (long)r->r_offset, tosec);
-+			      fromsec, (long)faddr, tosec);
- 		break;
- 	}
- }
- 
- static void check_section_mismatch(const char *modname, struct elf_info *elf,
--				   Elf_Rela *r, Elf_Sym *sym,
--				   unsigned int fsecndx, const char *fromsec)
-+				   Elf_Sym *sym,
-+				   unsigned int fsecndx, const char *fromsec,
-+				   Elf_Addr faddr, Elf_Addr taddr)
- {
- 	const char *tosec = sec_name(elf, get_secindex(elf, sym));
- 	const struct sectioncheck *mismatch = section_mismatch(fromsec, tosec);
-@@ -1233,8 +1234,9 @@ static void check_section_mismatch(const char *modname, struct elf_info *elf,
- 	if (!mismatch)
+@@ -1236,6 +1236,12 @@ static void check_export_symbol(struct module *mod, struct elf_info *elf,
  		return;
- 
--	default_mismatch_handler(modname, elf, mismatch, r, sym, fsecndx, fromsec,
--				 tosec);
-+	default_mismatch_handler(modname, elf, mismatch, sym,
-+				 fsecndx, fromsec, faddr,
-+				 tosec, taddr);
- }
- 
- static unsigned int *reloc_location(struct elf_info *elf,
-@@ -1392,7 +1394,8 @@ static void section_rela(const char *modname, struct elf_info *elf,
- 		/* Skip special sections */
- 		if (is_shndx_special(sym->st_shndx))
- 			continue;
--		check_section_mismatch(modname, elf, &r, sym, fsecndx, fromsec);
-+		check_section_mismatch(modname, elf, sym,
-+				       fsecndx, fromsec, r.r_offset, r.r_addend);
  	}
- }
  
-@@ -1450,7 +1453,8 @@ static void section_rel(const char *modname, struct elf_info *elf,
- 		/* Skip special sections */
- 		if (is_shndx_special(sym->st_shndx))
- 			continue;
--		check_section_mismatch(modname, elf, &r, sym, fsecndx, fromsec);
-+		check_section_mismatch(modname, elf, sym,
-+				       fsecndx, fromsec, r.r_offset, r.r_addend);
- 	}
- }
++	if (ELF_ST_BIND(sym->st_info) != STB_GLOBAL &&
++	    ELF_ST_BIND(sym->st_info) != STB_WEAK) {
++		error("%s: local symbol '%s' was exported\n", mod->name, name);
++		return;
++	}
++
+ 	s = sym_add_exported(name, mod, is_gpl);
+ 	sym_update_namespace(name, sym_get_data(elf, label));
  
 -- 
 2.39.2
