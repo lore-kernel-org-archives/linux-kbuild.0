@@ -2,36 +2,36 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9450C7EE24
-	for <linux-kbuild@archiver.kernel.org>; Sat, 13 May 2023 20:46:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62CEDC77B7D
+	for <linux-kbuild@archiver.kernel.org>; Sat, 13 May 2023 20:46:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237370AbjEMUqz (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 13 May 2023 16:46:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35436 "EHLO
+        id S237472AbjEMUq5 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 13 May 2023 16:46:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229633AbjEMUq2 (ORCPT
+        with ESMTP id S234152AbjEMUq3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 13 May 2023 16:46:28 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A53B24C1B;
-        Sat, 13 May 2023 13:45:58 -0700 (PDT)
+        Sat, 13 May 2023 16:46:29 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EA2A40F9;
+        Sat, 13 May 2023 13:46:02 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 23DFD6152F;
-        Sat, 13 May 2023 20:45:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB616C433D2;
-        Sat, 13 May 2023 20:45:49 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id CC4556158A;
+        Sat, 13 May 2023 20:45:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBF6CC433EF;
+        Sat, 13 May 2023 20:45:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684010751;
-        bh=uOppWNJ6OKrWtEcyb/WZOLcPRQzIKaj9fIb8LyZK590=;
+        s=k20201202; t=1684010742;
+        bh=SoXIycWj4KQdPY8pR5wZYEZwmM9FVSj+5ZmHcrpIoTI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=PueLfi5n/cCFGP5fZw8m4Hwvgq6A50mXArJA0Ol6T6Ug9zp7Q0XJ6HQ/h32Vsj8T6
-         w8w6vlDUox3lJClRI2UApc+LYcmJuc0fp361g4U1DWFgWOp5ILIztOWu/xYxhv8WwO
-         LJBdOsGW15Kv4JR5bSBpyw9/J0V1vwoJ9eVUBiDRrJM19NXyaANpPktTZc/6LIYwpk
-         F9TU/jTddPF2JGAEKVdeHco5fybw7gqnlPkQQDHcdvvk6V+H0fpufTd57AvcJ7bYHY
-         8NrJi0vMmWiDWJWSGQFgYwbB1hHS4x+olXlb+6ocZXmVg1Gu5R2rcO9Z2w4gyqspp6
-         KZ+wwPqg7nhfQ==
+        b=R++onr6agMmopZVmIWlYVYpkdqUBJqQ/SU72DJ0796Ipf7udrN2p2L+1DeMW0B1sI
+         0NMjV0+YiyTrpDnZ0mF+FNKBz+NQm7zP/wd431jZBTJAgx97zwXoIArljD9QInVu7e
+         GsekDjO+szMgvF68kJawfv7Oh4dOSuBkYQcpqc77XY13EBsd02Kmc80MBli4WcoRWo
+         v4URHtc0GiVgoDd9uECD/fO/i9IL8dKC3Bo7KyM4Kg/O00f0xq0r5QTpJeQBYBAN/N
+         zlzeTNV8YnYGuScz7S7O2cFXX9pG49U+bQzdPXXZMdlUk/09yDu5hzC4n48pxqDro+
+         lfsW8mu71BTfA==
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
@@ -40,9 +40,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Nicolas Pitre <npitre@baylibre.com>,
         Nicolas Schier <nicolas@fjasle.eu>,
         Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v4 18/21] modpost: check static EXPORT_SYMBOL* by modpost again
-Date:   Sun, 14 May 2023 05:44:59 +0900
-Message-Id: <20230513204502.1593923-19-masahiroy@kernel.org>
+Subject: [PATCH v4 14/21] modpost: remove is_shndx_special() check from section_rel(a)
+Date:   Sun, 14 May 2023 05:44:55 +0900
+Message-Id: <20230513204502.1593923-15-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230513204502.1593923-1-masahiroy@kernel.org>
 References: <20230513204502.1593923-1-masahiroy@kernel.org>
@@ -52,168 +52,66 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Commit 31cb50b5590f ("kbuild: check static EXPORT_SYMBOL* by script
-instead of modpost") moved the static EXPORT_SYMBOL* check from the
-mostpost to a shell script because I thought it must be checked per
-compilation unit to avoid false negatives.
+This check is unneeded. Without it, sec_name() will returns the null
+string "", then section_mismatch() will return immediately.
 
-I came up with an idea to do this in modpost, against combined ELF
-files. The relocation entries in ELF will find the correct exported
-symbol even if there exist symbols with the same name in different
-compilation units.
-
-Again, the same sample code.
-
-  Makefile:
-
-    obj-y += foo1.o foo2.o
-
-  foo1.c:
-
-    #include <linux/export.h>
-    static void foo(void) {}
-    EXPORT_SYMBOL(foo);
-
-  foo2.c:
-
-    void foo(void) {}
-
-Then, modpost can catch it correctly.
-
-    MODPOST Module.symvers
-  ERROR: modpost: vmlinux: local symbol 'foo' was exported
+Anyway, special section indices do not appear quite often in these
+loops.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/Makefile.build     |  4 ---
- scripts/check-local-export | 70 --------------------------------------
- scripts/mod/modpost.c      |  6 ++++
- 3 files changed, 6 insertions(+), 74 deletions(-)
- delete mode 100755 scripts/check-local-export
+ scripts/mod/modpost.c | 16 ++++------------
+ 1 file changed, 4 insertions(+), 12 deletions(-)
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index c26c04aea652..94b3323dcea7 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -220,8 +220,6 @@ cmd_gen_ksymdeps = \
- 	$(CONFIG_SHELL) $(srctree)/scripts/gen_ksymdeps.sh $@ >> $(dot-target).cmd
- endif
- 
--cmd_check_local_export = $(srctree)/scripts/check-local-export $@
--
- ifneq ($(findstring 1, $(KBUILD_EXTRA_WARN)),)
- cmd_warn_shared_object = $(if $(word 2, $(modname-multi)),$(warning $(kbuild-file): $*.o is added to multiple modules: $(modname-multi)))
- endif
-@@ -229,7 +227,6 @@ endif
- define rule_cc_o_c
- 	$(call cmd_and_fixdep,cc_o_c)
- 	$(call cmd,gen_ksymdeps)
--	$(call cmd,check_local_export)
- 	$(call cmd,checksrc)
- 	$(call cmd,checkdoc)
- 	$(call cmd,gen_objtooldep)
-@@ -241,7 +238,6 @@ endef
- define rule_as_o_S
- 	$(call cmd_and_fixdep,as_o_S)
- 	$(call cmd,gen_ksymdeps)
--	$(call cmd,check_local_export)
- 	$(call cmd,gen_objtooldep)
- 	$(call cmd,gen_symversions_S)
- 	$(call cmd,warn_shared_object)
-diff --git a/scripts/check-local-export b/scripts/check-local-export
-deleted file mode 100755
-index e54a1642c970..000000000000
---- a/scripts/check-local-export
-+++ /dev/null
-@@ -1,70 +0,0 @@
--#!/bin/sh
--# SPDX-License-Identifier: GPL-2.0-only
--#
--# Copyright (C) 2022 Masahiro Yamada <masahiroy@kernel.org>
--# Copyright (C) 2022 Owen Rafferty <owen@owenrafferty.com>
--#
--# Exit with error if a local exported symbol is found.
--# EXPORT_SYMBOL should be used for global symbols.
--
--set -e
--pid=$$
--
--# If there is no symbol in the object, ${NM} (both GNU nm and llvm-nm) shows
--# 'no symbols' diagnostic (but exits with 0). It is harmless and hidden by
--# '2>/dev/null'. However, it suppresses real error messages as well. Add a
--# hand-crafted error message here.
--#
--# TODO:
--# Use --quiet instead of 2>/dev/null when we upgrade the minimum version of
--# binutils to 2.37, llvm to 13.0.0.
--# Then, the following line will be simpler:
--#   { ${NM} --quiet ${1} || kill 0; } |
--
--{ ${NM} ${1} 2>/dev/null || { echo "${0}: ${NM} failed" >&2; kill $pid; } } |
--${AWK} -v "file=${1}" '
--BEGIN {
--	i = 0
--}
--
--# Skip the line if the number of fields is less than 3.
--#
--# case 1)
--#   For undefined symbols, the first field (value) is empty.
--#   The outout looks like this:
--#     "                 U _printk"
--#   It is unneeded to record undefined symbols.
--#
--# case 2)
--#   For Clang LTO, llvm-nm outputs a line with type t but empty name:
--#     "---------------- t"
--!length($3) {
--	next
--}
--
--# save (name, type) in the associative array
--{ symbol_types[$3]=$2 }
--
--# append the exported symbol to the array
--($3 ~ /^__export_symbol.*\..*/) {
--	export_symbols[i] = $3
--	sub(/^__export_symbol.*\./, "", export_symbols[i])
--	i++
--}
--
--END {
--	exit_code = 0
--	for (j = 0; j < i; ++j) {
--		name = export_symbols[j]
--		# nm(3) says "If lowercase, the symbol is usually local"
--		if (symbol_types[name] ~ /[a-z]/) {
--			printf "%s: error: local symbol %s was exported\n",
--				file, name | "cat 1>&2"
--			exit_code = 1
--		}
--	}
--
--	exit exit_code
--}'
--
--exit $?
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 8cf6bc0ac050..3e956013a6c8 100644
+index 43ce35377f6a..1c5dd81c0987 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -1236,6 +1236,12 @@ static void check_export_symbol(struct module *mod, struct elf_info *elf,
- 		return;
- 	}
- 
-+	if (ELF_ST_BIND(sym->st_info) != STB_GLOBAL &&
-+	    ELF_ST_BIND(sym->st_info) != STB_WEAK) {
-+		error("%s: local symbol '%s' was exported\n", mod->name, name);
-+		return;
-+	}
+@@ -1347,7 +1347,6 @@ static int addend_mips_rel(struct elf_info *elf, Elf_Shdr *sechdr, Elf_Rela *r)
+ static void section_rela(const char *modname, struct elf_info *elf,
+ 			 Elf_Shdr *sechdr)
+ {
+-	Elf_Sym  *sym;
+ 	Elf_Rela *rela;
+ 	Elf_Rela r;
+ 	unsigned int r_sym;
+@@ -1390,11 +1389,8 @@ static void section_rela(const char *modname, struct elf_info *elf,
+ 				continue;
+ 			break;
+ 		}
+-		sym = elf->symtab_start + r_sym;
+-		/* Skip special sections */
+-		if (is_shndx_special(sym->st_shndx))
+-			continue;
+-		check_section_mismatch(modname, elf, sym,
 +
- 	s = sym_add_exported(name, mod, is_gpl);
- 	sym_update_namespace(name, sym_get_data(elf, label));
- 
++		check_section_mismatch(modname, elf, elf->symtab_start + r_sym,
+ 				       fsecndx, fromsec, r.r_offset, r.r_addend);
+ 	}
+ }
+@@ -1402,7 +1398,6 @@ static void section_rela(const char *modname, struct elf_info *elf,
+ static void section_rel(const char *modname, struct elf_info *elf,
+ 			Elf_Shdr *sechdr)
+ {
+-	Elf_Sym *sym;
+ 	Elf_Rel *rel;
+ 	Elf_Rela r;
+ 	unsigned int r_sym;
+@@ -1449,11 +1444,8 @@ static void section_rel(const char *modname, struct elf_info *elf,
+ 		default:
+ 			fatal("Please add code to calculate addend for this architecture\n");
+ 		}
+-		sym = elf->symtab_start + r_sym;
+-		/* Skip special sections */
+-		if (is_shndx_special(sym->st_shndx))
+-			continue;
+-		check_section_mismatch(modname, elf, sym,
++
++		check_section_mismatch(modname, elf, elf->symtab_start + r_sym,
+ 				       fsecndx, fromsec, r.r_offset, r.r_addend);
+ 	}
+ }
 -- 
 2.39.2
 
