@@ -2,106 +2,173 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC8AAC77B7D
-	for <linux-kbuild@archiver.kernel.org>; Sat, 13 May 2023 20:47:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8A19C77B7D
+	for <linux-kbuild@archiver.kernel.org>; Sat, 13 May 2023 23:28:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237169AbjEMUru (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 13 May 2023 16:47:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35272 "EHLO
+        id S231278AbjEMX21 convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 13 May 2023 19:28:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233675AbjEMUrg (ORCPT
+        with ESMTP id S229447AbjEMX20 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 13 May 2023 16:47:36 -0400
+        Sat, 13 May 2023 19:28:26 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E8F75596;
-        Sat, 13 May 2023 13:46:37 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32C9D1FDE;
+        Sat, 13 May 2023 16:28:25 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C59086157F;
-        Sat, 13 May 2023 20:45:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8913FC4339E;
-        Sat, 13 May 2023 20:45:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684010749;
-        bh=Kep8Iw8VgQxgpYvfyniHHN0kmqkyl1ojVYpvdIK/Gqw=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Mgj+J+S5Vo7VZDr9w9TT9ssCBZGrIdvb/9cnhjAEov8VK+4pYvzYSAnWpzrSSqE1O
-         lsuAGKhaDPviVvAKUyatb8+BiRx73v+PAiFZagLt8+pMQNC0tHOENazTYxaWNwQlNz
-         niJSpsyVEobga39680r33Tr9J246elH8NZjMfPcSTColkThYuSxm8mx9x5F70NmpnO
-         TnE1pr/VxBtOugS2d3groPtjETyyw/0ig8UeIAp37Wrc6P+g+pUGwOROHzb9r1Zm/E
-         7CMM2DdNVRBmbSLMldvbzfoN4WCvPiAey0FF8Z0W0JST6s0hvartJAc4Tt76XBFHrw
-         PnG1fPkkRK5Ag==
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nicolas Pitre <npitre@baylibre.com>,
-        Nicolas Schier <nicolas@fjasle.eu>,
-        Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v4 17/21] ia64,export.h: replace EXPORT_DATA_SYMBOL* with EXPORT_SYMBOL*
-Date:   Sun, 14 May 2023 05:44:58 +0900
-Message-Id: <20230513204502.1593923-18-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230513204502.1593923-1-masahiroy@kernel.org>
-References: <20230513204502.1593923-1-masahiroy@kernel.org>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C1B6F60C2B;
+        Sat, 13 May 2023 23:28:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AF2AC433D2;
+        Sat, 13 May 2023 23:28:23 +0000 (UTC)
+Date:   Sat, 13 May 2023 19:28:21 -0400
+From:   Steven Rostedt <rostedt@goodmis.org>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Jiri Slaby <jirislaby@kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        andreas.noever@gmail.com, michael.jamet@intel.com,
+        Mika Westerberg <mika.westerberg@linux.intel.com>,
+        YehezkelShB@gmail.com, USB list <linux-usb@vger.kernel.org>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>
+Subject: Re: make localmodconfig doesn't work for thunderbolt
+Message-ID: <20230513192821.34ca93fd@rorschach.local.home>
+In-Reply-To: <CAK7LNATQeT8MaQr450x0SpHJV=QU7nrfWfDO1ZRKimppVZG4KA@mail.gmail.com>
+References: <4cb758c7-f4f5-820c-c7e7-5b900ccc2534@kernel.org>
+        <CAK7LNATQeT8MaQr450x0SpHJV=QU7nrfWfDO1ZRKimppVZG4KA@mail.gmail.com>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-With the previous refactoring, you can always use EXPORT_SYMBOL*.
+On Fri, 12 May 2023 01:15:49 +0900
+Masahiro Yamada <masahiroy@kernel.org> wrote:
 
-Replace two instances in ia64, then remove EXPORT_DATA_SYMBOL*.
+> +CC Steven Rostedt, author of streamline_config.pl
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+Thanks!
 
- arch/ia64/kernel/head.S      | 2 +-
- arch/ia64/kernel/ivt.S       | 2 +-
- include/asm-generic/export.h | 3 ---
- 3 files changed, 2 insertions(+), 5 deletions(-)
+> 
+> 
+> 
+> On Wed, May 10, 2023 at 8:01 PM Jiri Slaby <jirislaby@kernel.org> wrote:
+> >
+> > Hi,
+> >
+> > if I use localmodconfig for example like this:
+> > mkdir /tmp/tb/
+> > echo thunderbolt >/tmp/tb/lsmod
+> > make O=/tmp/tb LSMOD=/tmp/tb/lsmod localmodconfig
+> >
+> > I get:
+> > using config: '.config'
+> > thunderbolt config not found!!
+> >
+> > $ grep 'USB4\>' /tmp/tb/.config
+> > # CONFIG_USB4 is not set
+> >
+> > I believe it's due to:
+> >    obj-${CONFIG_USB4} := thunderbolt.o
+> > in drivers/thunderbolt/Makefile. I.e. ${} used instead of more common $().
+> >
+> > But even if I change the parser:
+> >
+> > --- a/scripts/kconfig/streamline_config.pl
+> > +++ b/scripts/kconfig/streamline_config.pl
+> > @@ -317,7 +317,7 @@ foreach my $makefile (@makefiles) {
+> >          $_ = convert_vars($_, %make_vars);
+> >
+> >          # collect objects after obj-$(CONFIG_FOO_BAR)
+> > -       if (/obj-\$\((CONFIG_[^\)]*)\)\s*[+:]?=\s*(.*)/) {
+> > +       if (/obj-\$[({](CONFIG_[^})]*)[)}]\s*[+:]?=\s*(.*)/) {
+> >              $var = $1;
+> >              $objs = $2;
+> >
+> >
+> > I see:
+> > module thunderbolt did not have configs CONFIG_USB4
+> >
+> > and:
+> > $ grep 'USB4\>' /tmp/tb/.config
+> > # CONFIG_USB4 is not set
+> >
+> > So two questions:
+> > 1) is ${} supported and should be the above change sent as a patch? Or
+> > should be drivers/thunderbolt/Makefile fixed to use $(). (And maybe
+> > other Makefiles too.)  
+> 
+> 
+> I believe streamline_config.pl should be fixed.
 
-diff --git a/arch/ia64/kernel/head.S b/arch/ia64/kernel/head.S
-index f22469f1c1fc..c096500590e9 100644
---- a/arch/ia64/kernel/head.S
-+++ b/arch/ia64/kernel/head.S
-@@ -170,7 +170,7 @@ RestRR:											\
- 	__PAGE_ALIGNED_DATA
- 
- 	.global empty_zero_page
--EXPORT_DATA_SYMBOL_GPL(empty_zero_page)
-+EXPORT_SYMBOL_GPL(empty_zero_page)
- empty_zero_page:
- 	.skip PAGE_SIZE
- 
-diff --git a/arch/ia64/kernel/ivt.S b/arch/ia64/kernel/ivt.S
-index d6d4229b28db..7a418e324d30 100644
---- a/arch/ia64/kernel/ivt.S
-+++ b/arch/ia64/kernel/ivt.S
-@@ -87,7 +87,7 @@
- 
- 	.align 32768	// align on 32KB boundary
- 	.global ia64_ivt
--	EXPORT_DATA_SYMBOL(ia64_ivt)
-+	EXPORT_SYMBOL(ia64_ivt)
- ia64_ivt:
- /////////////////////////////////////////////////////////////////////////////////////////
- // 0x0000 Entry 0 (size 64 bundles) VHPT Translation (8,20,47)
-diff --git a/include/asm-generic/export.h b/include/asm-generic/export.h
-index 0ae9f38a904c..570cd4da7210 100644
---- a/include/asm-generic/export.h
-+++ b/include/asm-generic/export.h
-@@ -8,7 +8,4 @@
-  */
- #include <linux/export.h>
- 
--#define EXPORT_DATA_SYMBOL(name)	EXPORT_SYMBOL(name)
--#define EXPORT_DATA_SYMBOL_GPL(name)	EXPORT_SYMBOL_GPL(name)
--
- #endif
--- 
-2.39.2
+So do I.
 
+> 
+> There is no good reason to support only $(), but not ${}.
+
+Agreed.
+
+> 
+> 
+> In fact, the comment line around line 395 of this script
+> uses the curly brace style.
+> 
+>   # a loaded module. This is a direct obj-${CONFIG_FOO} += bar.o
+> 
+> 
+> 
+> 
+> 
+> 
+> > 2) how to fix that 'thunderbolt did not have configs'?  
+> 
+> That warning is CONFIG_USB4 was unset in the resulting .config.
+> 
+> Was CONFIG_USB4 enabled before running localmodconfig?
+> 
+> In my understanding, the purpose of localmodconfig
+> is to slim down the .config file.
+
+Correct.
+
+> 
+> It disables unneeded CONFIG options, but
+> it does not enable needed CONFIG options.
+
+Also correct.
+
+> 
+> 
+> 
+> 
+> If I start from allnoconfig (i.e. CONFIG_USB4 is unset), I see the warning.
+> 
+> $ echo thunderbolt >/tmp/tb/lsmod
+> $ make -s O=/tmp/tb allnoconfig
+> $ make O=/tmp/tb LSMOD=/tmp/tb/lsmod  localmodconfig
+>   GEN     Makefile
+> using config: '.config'
+> module thunderbolt did not have configs CONFIG_USB4
+> 
+> 
+> 
+> If I start from allmodconfig (i.e. CONFIG_USB4 is m), I do not see the warning.
+> 
+> $ echo thunderbolt >/tmp/tb/lsmod
+> $ make -s O=/tmp/tb allmodconfig
+> $ make O=/tmp/tb LSMOD=/tmp/tb/lsmod  localmodconfig
+>   GEN     Makefile
+> using config: '.config'
+> 
+
+I hate the inconsistency in the Makefile, but localmodconfig should be
+able to adapt to it.
+
+Acked-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+
+Thanks Jiri and Masamhiro!
+
+-- Steve
