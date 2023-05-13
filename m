@@ -2,36 +2,36 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F5E7C77B7F
-	for <linux-kbuild@archiver.kernel.org>; Sat, 13 May 2023 20:46:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5149C77B7F
+	for <linux-kbuild@archiver.kernel.org>; Sat, 13 May 2023 20:46:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236419AbjEMUq3 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 13 May 2023 16:46:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35448 "EHLO
+        id S231809AbjEMUqe (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 13 May 2023 16:46:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234163AbjEMUqO (ORCPT
+        with ESMTP id S230422AbjEMUqS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 13 May 2023 16:46:14 -0400
+        Sat, 13 May 2023 16:46:18 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A50049E2;
-        Sat, 13 May 2023 13:45:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E73C59E6;
+        Sat, 13 May 2023 13:45:48 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B609F61575;
-        Sat, 13 May 2023 20:45:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBB5DC433D2;
-        Sat, 13 May 2023 20:45:36 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E691361573;
+        Sat, 13 May 2023 20:45:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0E18C433EF;
+        Sat, 13 May 2023 20:45:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684010738;
-        bh=MK50kQzYPm9nr14jP1vittYESWZFYCDkDk5qdO0JFYU=;
+        s=k20201202; t=1684010744;
+        bh=M/byfPkmRAEN53bHhhXgMLLxGO+hRrGOrMzEpdrjXfM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=kjosXOAe8a+7yCECWXziTSeLRdI5oux1AnfMVV12bnTMdNWN0rS/cFOC//2AwKtIA
-         HFBpCHQzb1Q7kJQdaGomnX5bckQQDAzsXs+zJ3Gli+NdsY2hdC1IeFBgWBsvWBnKCS
-         U1W7D7zC7khJqgf//ru7vig5vtQiAs43d2Ucpqhet8E1jhSHbUCTJ93Xvwjf/w2Ehy
-         3R2K7DfnWhLuISTaYm4ml9eawopQvf9LQ6WX+HCX9sRi3TMksGIxE1gTd1eE4bf+aa
-         M0qmQ3wXHF7zJP9fHRj5fgNlzl/TqvYB9e82NQ3s9duw23DiArgGMiAaX2Qazi13Yf
-         yFlKh8KSLxfDw==
+        b=YH7aIWT7nzIWBw9+vdEpka6kVSlxVzTRbng97XHynmyEMJZaJKOzJvnIuyqEsdemP
+         fU5Ux44lDyaXM9KeTr9J+PJ2+HE+D/uWnCYCrH8eyefayvDl07yZlHtbPw4tatZjQf
+         dR1Yby/HlQ3S3jcEdr5tMzH2VALXSnI0C5PDuwsZcyWI40kGA5C3/uXC/5RUjLLN7m
+         utKpnyW3V7QcDFKZE/dKa1nnn9zGDnYBH2nSCcnSvK2VDbmHy3P2Y6FO6LJ1bcRFDE
+         mtdyu8vp7WLAZGn6Cdpun+eTVXOMF6JeeE003dfXYJlH7rfU3SbEnNZfQ1FymMphbs
+         pnZya00PeD/uQ==
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
@@ -40,9 +40,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Nicolas Pitre <npitre@baylibre.com>,
         Nicolas Schier <nicolas@fjasle.eu>,
         Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v4 12/21] modpost: unify 'sym' and 'to' in default_mismatch_handler()
-Date:   Sun, 14 May 2023 05:44:53 +0900
-Message-Id: <20230513204502.1593923-13-masahiroy@kernel.org>
+Subject: [PATCH v4 15/21] modpost: pass struct module pointer to check_section_mismatch()
+Date:   Sun, 14 May 2023 05:44:56 +0900
+Message-Id: <20230513204502.1593923-16-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230513204502.1593923-1-masahiroy@kernel.org>
 References: <20230513204502.1593923-1-masahiroy@kernel.org>
@@ -52,55 +52,87 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-find_better_symbol() takes 'sym' and stores the return value to
-another variable 'to'.
-
-We can use the same variable because we want to replace the original
-one if possible.
+The next commit will use it.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/modpost.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ scripts/mod/modpost.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index d2a9c655f6ea..9e81cd6803a7 100644
+index 1c5dd81c0987..e82299c90836 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -1160,11 +1160,10 @@ static bool is_executable_section(struct elf_info *elf, unsigned int secndx)
+@@ -1223,7 +1223,7 @@ static void default_mismatch_handler(const char *modname, struct elf_info *elf,
+ 	}
+ }
  
- static void default_mismatch_handler(const char *modname, struct elf_info *elf,
- 				     const struct sectioncheck* const mismatch,
--				     Elf_Rela *r, Elf_Sym *sym,
-+				     Elf_Rela *r, Elf_Sym *tsym,
- 				     unsigned int fsecndx, const char *fromsec,
- 				     const char *tosec)
+-static void check_section_mismatch(const char *modname, struct elf_info *elf,
++static void check_section_mismatch(struct module *mod, struct elf_info *elf,
+ 				   Elf_Sym *sym,
+ 				   unsigned int fsecndx, const char *fromsec,
+ 				   Elf_Addr faddr, Elf_Addr taddr)
+@@ -1234,7 +1234,7 @@ static void check_section_mismatch(const char *modname, struct elf_info *elf,
+ 	if (!mismatch)
+ 		return;
+ 
+-	default_mismatch_handler(modname, elf, mismatch, sym,
++	default_mismatch_handler(mod->name, elf, mismatch, sym,
+ 				 fsecndx, fromsec, faddr,
+ 				 tosec, taddr);
+ }
+@@ -1344,7 +1344,7 @@ static int addend_mips_rel(struct elf_info *elf, Elf_Shdr *sechdr, Elf_Rela *r)
+ #define R_LARCH_SUB32		55
+ #endif
+ 
+-static void section_rela(const char *modname, struct elf_info *elf,
++static void section_rela(struct module *mod, struct elf_info *elf,
+ 			 Elf_Shdr *sechdr)
  {
--	Elf_Sym *to;
- 	Elf_Sym *from;
- 	const char *tosym;
- 	const char *fromsym;
-@@ -1172,8 +1171,8 @@ static void default_mismatch_handler(const char *modname, struct elf_info *elf,
- 	from = find_nearest_symbol(elf, r->r_offset, fsecndx);
- 	fromsym = sym_name(elf, from);
+ 	Elf_Rela *rela;
+@@ -1395,7 +1395,7 @@ static void section_rela(const char *modname, struct elf_info *elf,
+ 	}
+ }
  
--	to = find_better_symbol(elf, r->r_addend, sym);
--	tosym = sym_name(elf, to);
-+	tsym = find_better_symbol(elf, r->r_addend, tsym);
-+	tosym = sym_name(elf, tsym);
+-static void section_rel(const char *modname, struct elf_info *elf,
++static void section_rel(struct module *mod, struct elf_info *elf,
+ 			Elf_Shdr *sechdr)
+ {
+ 	Elf_Rel *rel;
+@@ -1462,19 +1462,19 @@ static void section_rel(const char *modname, struct elf_info *elf,
+  * to find all references to a section that reference a section that will
+  * be discarded and warns about it.
+  **/
+-static void check_sec_ref(const char *modname, struct elf_info *elf)
++static void check_sec_ref(struct module *mod, struct elf_info *elf)
+ {
+ 	int i;
+ 	Elf_Shdr *sechdrs = elf->sechdrs;
  
- 	/* check whitelist - we may ignore it */
- 	if (!secref_whitelist(mismatch, fromsec, fromsym, tosec, tosym))
-@@ -1208,7 +1207,7 @@ static void default_mismatch_handler(const char *modname, struct elf_info *elf,
- 			      "You might get more information about where this is\n"
- 			      "coming from by using scripts/check_extable.sh %s\n",
- 			      fromsec, (long)r->r_offset, tosec, modname);
--		else if (is_executable_section(elf, get_secindex(elf, sym)))
-+		else if (is_executable_section(elf, get_secindex(elf, tsym)))
- 			warn("The relocation at %s+0x%lx references\n"
- 			     "section \"%s\" which is not in the list of\n"
- 			     "authorized sections.  If you're adding a new section\n"
+ 	/* Walk through all sections */
+ 	for (i = 0; i < elf->num_sections; i++) {
+-		check_section(modname, elf, &elf->sechdrs[i]);
++		check_section(mod->name, elf, &elf->sechdrs[i]);
+ 		/* We want to process only relocation sections and not .init */
+ 		if (sechdrs[i].sh_type == SHT_RELA)
+-			section_rela(modname, elf, &elf->sechdrs[i]);
++			section_rela(mod, elf, &elf->sechdrs[i]);
+ 		else if (sechdrs[i].sh_type == SHT_REL)
+-			section_rel(modname, elf, &elf->sechdrs[i]);
++			section_rel(mod, elf, &elf->sechdrs[i]);
+ 	}
+ }
+ 
+@@ -1645,7 +1645,7 @@ static void read_symbols(const char *modname)
+ 					     sym_get_data(&info, sym));
+ 	}
+ 
+-	check_sec_ref(modname, &info);
++	check_sec_ref(mod, &info);
+ 
+ 	if (!mod->is_vmlinux) {
+ 		version = get_modinfo(&info, "version");
 -- 
 2.39.2
 
