@@ -2,36 +2,36 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A820C7EE24
-	for <linux-kbuild@archiver.kernel.org>; Sun, 14 May 2023 15:29:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0AC1C77B7F
+	for <linux-kbuild@archiver.kernel.org>; Sun, 14 May 2023 15:30:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238201AbjENP33 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 14 May 2023 11:29:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47480 "EHLO
+        id S238025AbjENPaS (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 14 May 2023 11:30:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235808AbjENP24 (ORCPT
+        with ESMTP id S238026AbjENP35 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 14 May 2023 11:28:56 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 936684EEA;
-        Sun, 14 May 2023 08:28:37 -0700 (PDT)
+        Sun, 14 May 2023 11:29:57 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F2584C11;
+        Sun, 14 May 2023 08:29:06 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 228C361138;
-        Sun, 14 May 2023 15:28:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4755C433D2;
-        Sun, 14 May 2023 15:28:28 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5D5E561825;
+        Sun, 14 May 2023 15:28:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 011BEC4339C;
+        Sun, 14 May 2023 15:28:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684078110;
-        bh=bRIrCHjbdkZMIq4/mCKkZCOfrF0gDAT9QeEo9NeR8YE=;
+        s=k20201202; t=1684078090;
+        bh=fhR5EjRHQOWqBwC6o7KBtApN+RZJKOZ2Jxm08oS087U=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=TlMRQMZD/zkU3pocW4viuecVfsF1DnEGbO1puEEtfxuzd7aZFsNmbtOVLD2ygt2rC
-         atMtQqm5CBSaVzF3i4jhf1PX57ZwlvpNV3Maxn1/hOGHEEyo4+PYM6b2PDzaiJLX1/
-         hUYWXNDp/qofUeGXS4kOKstlSKN4g9hYL+uxkcnZDnXUbVcnnuVZLJmFLoynKZfIvC
-         Am7+qnkvbSd7NAwZABnSb/HcNb++EZJ6uary++6YjGaXLr1LXPqHdaNz0HoXqZmr8Z
-         ckHvivtA72OtvVw+ZdJTCUR9CJe2RSoXz5j5Vb9fJPA3moAQuPH+m5VPNRh7ZlAIQa
-         TcfQz1fGxbvMg==
+        b=DnAzqVXAO0KjJ3yE5NdfUYgtXrg54if+wRTlfaAnAdSRK8UpgwCjvxTuberat6wxR
+         XPcc/EoLJtvMv+2AMylE52Xrm0HhrRuCI+3cVsVdCXuJoq0NTLIlLzoa7GJ/sQ5zNP
+         6cURnuBto0DGlQ3puFXY8Px5nY1H0/1TCyR/78EVKlNPrI5+dclb3T7DDtgKztzsbz
+         mOcJL/McHz/31DP8Y2a7J/0iru077y3f/fxZ+653QyZkZ7wXB3qRFKejROhnXQQBln
+         ViMFiG9uVm/kJfUlTj7eL3KPaTtgu/B1fMssumX5SllrwL9oiugW6sQ1Fr0asZvKuo
+         iriiLh82D3T/A==
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
@@ -40,9 +40,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Nicolas Pitre <npitre@baylibre.com>,
         Nicolas Schier <nicolas@fjasle.eu>,
         Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v5 20/21] modpost: use null string instead of NULL pointer for default namespace
-Date:   Mon, 15 May 2023 00:27:38 +0900
-Message-Id: <20230514152739.962109-21-masahiroy@kernel.org>
+Subject: [PATCH v5 11/21] modpost: modpost: refactor find_fromsym() and find_tosym()
+Date:   Mon, 15 May 2023 00:27:29 +0900
+Message-Id: <20230514152739.962109-12-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230514152739.962109-1-masahiroy@kernel.org>
 References: <20230514152739.962109-1-masahiroy@kernel.org>
@@ -52,87 +52,142 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The default namespace is the null string, "".
+find_fromsym() and find_tosym() are similar - both of them iterate
+in the .symtab section and return the near symbol.
 
-When set, the null string "" is converted to NULL:
-
-  s->namespace = namespace[0] ? NOFAIL(strdup(namespace)) : NULL;
-
-When printed, the NULL pointer is get back to the null string:
-
-  sym->namespace ?: ""
-
-This saves 1 byte memory allocated for "", but loses the readability.
-
-In kernel-space, we strive to save memory, but modpost is a userspace
-tool used to build the kernel. On modern systems, such small piece of
-memory is not a big deal.
-
-Handle the namespace string as is.
+Factor out the common part into find_nearest_sym().
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 ---
 
- scripts/mod/modpost.c | 17 +++++++++++------
- 1 file changed, 11 insertions(+), 6 deletions(-)
+Changes in v5:
+  - Fix broken symbol name in x86_64
+
+ scripts/mod/modpost.c | 95 ++++++++++++++++++-------------------------
+ 1 file changed, 40 insertions(+), 55 deletions(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 7edb9a843ead..010c4f88d77b 100644
+index 0d2c2aff2c03..d147e8f63e52 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -298,6 +298,13 @@ static bool contains_namespace(struct list_head *head, const char *namespace)
+@@ -1117,77 +1117,62 @@ static inline int is_valid_name(struct elf_info *elf, Elf_Sym *sym)
+ 	return !is_mapping_symbol(name);
+ }
+ 
+-/**
+- * Find symbol based on relocation record info.
+- * In some cases the symbol supplied is a valid symbol so
+- * return refsym. If st_name != 0 we assume this is a valid symbol.
+- * In other cases the symbol needs to be looked up in the symbol table
+- * based on section and address.
+- *  **/
+-static Elf_Sym *find_tosym(struct elf_info *elf, Elf64_Sword addr,
+-			   Elf_Sym *relsym)
++/* Look up the nearest symbol based on the section and the address */
++static Elf_Sym *find_nearest_sym(struct elf_info *elf, Elf_Addr addr,
++				 unsigned int secndx, bool allow_negative)
  {
- 	struct namespace_list *list;
+ 	Elf_Sym *sym;
+ 	Elf_Sym *near = NULL;
+-	Elf64_Sword distance = 20;
+-	Elf64_Sword d;
+-	unsigned int relsym_secindex;
+-
+-	if (relsym->st_name != 0)
+-		return relsym;
+-
+-	relsym_secindex = get_secindex(elf, relsym);
+-	for (sym = elf->symtab_start; sym < elf->symtab_stop; sym++) {
+-		if (get_secindex(elf, sym) != relsym_secindex)
+-			continue;
+-		if (ELF_ST_TYPE(sym->st_info) == STT_SECTION)
+-			continue;
+-		if (!is_valid_name(elf, sym))
+-			continue;
+-		if (sym->st_value == addr)
+-			return sym;
+-		/* Find a symbol nearby - addr are maybe negative */
+-		d = sym->st_value - addr;
+-		if (d < 0)
+-			d = addr - sym->st_value;
+-		if (d < distance) {
+-			distance = d;
+-			near = sym;
+-		}
+-	}
+-	/* We need a close match */
+-	if (distance < 20)
+-		return near;
+-	else
+-		return NULL;
+-}
+-
+-/*
+- * Find symbols before or equal addr and after addr - in the section sec.
+- * If we find two symbols with equal offset prefer one with a valid name.
+- * The ELF format may have a better way to detect what type of symbol
+- * it is, but this works for now.
+- **/
+-static Elf_Sym *find_fromsym(struct elf_info *elf, Elf_Addr addr,
+-			     unsigned int secndx)
+-{
+-	Elf_Sym *sym;
+-	Elf_Sym *near = NULL;
+-	Elf_Addr distance = ~0;
++	Elf_Addr min_distance = ~0;
++	Elf_Addr distance;
  
-+	/*
-+	 * The default namespace is null string "", which is always implicitly
-+	 * contained.
-+	 */
-+	if (!namespace[0])
-+		return true;
+ 	for (sym = elf->symtab_start; sym < elf->symtab_stop; sym++) {
+ 		if (get_secindex(elf, sym) != secndx)
+ 			continue;
+ 		if (!is_valid_name(elf, sym))
+ 			continue;
+-		if (sym->st_value <= addr && addr - sym->st_value <= distance) {
 +
- 	list_for_each_entry(list, head, list) {
- 		if (!strcmp(list->namespace, namespace))
- 			return true;
-@@ -367,7 +374,7 @@ static struct symbol *sym_add_exported(const char *name, struct module *mod,
- 	s = alloc_symbol(name);
- 	s->module = mod;
- 	s->is_gpl_only = gpl_only;
--	s->namespace = namespace[0] ? NOFAIL(strdup(namespace)) : NULL;
-+	s->namespace = NOFAIL(strdup(namespace));
- 	list_add_tail(&s->list, &mod->exported_symbols);
- 	hash_add_symbol(s);
- 
-@@ -1784,8 +1791,7 @@ static void check_exports(struct module *mod)
- 		else
- 			basename = mod->name;
- 
--		if (exp->namespace &&
--		    !contains_namespace(&mod->imported_namespaces, exp->namespace)) {
-+		if (!contains_namespace(&mod->imported_namespaces, exp->namespace)) {
- 			modpost_log(allow_missing_ns_imports ? LOG_WARN : LOG_ERROR,
- 				    "module %s uses symbol %s from namespace %s, but does not import it.\n",
- 				    basename, exp->name, exp->namespace);
-@@ -1871,8 +1877,7 @@ static void add_exported_symbols(struct buffer *buf, struct module *mod)
- 	list_for_each_entry(sym, &mod->exported_symbols, list)
- 		buf_printf(buf, "KSYMTAB_%s(%s, \"%s\", \"%s\");\n",
- 			   sym->is_func ? "FUNC" : "DATA", sym->name,
--			   sym->is_gpl_only ? "_gpl" : "",
--			   sym->namespace ?: "");
-+			   sym->is_gpl_only ? "_gpl" : "", sym->namespace);
- 
- 	if (!modversions)
- 		return;
-@@ -2140,7 +2145,7 @@ static void write_dump(const char *fname)
- 			buf_printf(&buf, "0x%08x\t%s\t%s\tEXPORT_SYMBOL%s\t%s\n",
- 				   sym->crc, sym->name, mod->name,
- 				   sym->is_gpl_only ? "_GPL" : "",
--				   sym->namespace ?: "");
-+				   sym->namespace);
++		if (addr >= sym->st_value)
+ 			distance = addr - sym->st_value;
++		else if (allow_negative)
++			distance = sym->st_value - addr;
++		else
++			continue;
++
++		if (distance <= min_distance) {
++			min_distance = distance;
+ 			near = sym;
  		}
++
++		if (min_distance == 0)
++			break;
  	}
- 	write_buf(&buf, fname);
++
+ 	return near;
+ }
+ 
++static Elf_Sym *find_fromsym(struct elf_info *elf, Elf_Addr addr,
++			     unsigned int secndx)
++{
++	return find_nearest_sym(elf, addr, secndx, false);
++}
++
++static Elf_Sym *find_tosym(struct elf_info *elf, Elf_Addr addr, Elf_Sym *sym)
++{
++	/* If the supplied symbol has a name, return it */
++	if (sym->st_name != 0)
++		return sym;
++
++	/*
++	 * Otherwise, look up the symbol.
++	 * For example, if the referenced symbol is static, sym->st_name is
++	 * zero. So, we need the look-up to know the symbol name.
++	 * The 'addr' might be smaller than the st_value of the symbol we are
++	 * looking for. Hence, allow_negative=true.
++	 */
++	return find_nearest_sym(elf, addr, get_secindex(elf, sym), true);
++}
++
+ static bool is_executable_section(struct elf_info *elf, unsigned int secndx)
+ {
+ 	if (secndx > elf->num_sections)
 -- 
 2.39.2
 
