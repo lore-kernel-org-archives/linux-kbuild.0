@@ -2,36 +2,36 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E2B0C77B7F
-	for <linux-kbuild@archiver.kernel.org>; Sun, 14 May 2023 15:29:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB958C77B7F
+	for <linux-kbuild@archiver.kernel.org>; Sun, 14 May 2023 15:29:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238010AbjENP3J (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 14 May 2023 11:29:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47334 "EHLO
+        id S238157AbjENP3Z (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 14 May 2023 11:29:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237624AbjENP2s (ORCPT
+        with ESMTP id S237545AbjENP2u (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 14 May 2023 11:28:48 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B20940E9;
-        Sun, 14 May 2023 08:28:25 -0700 (PDT)
+        Sun, 14 May 2023 11:28:50 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6CEA46AC;
+        Sun, 14 May 2023 08:28:30 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 938B26182A;
-        Sun, 14 May 2023 15:28:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D410C433D2;
-        Sun, 14 May 2023 15:28:22 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0162A61807;
+        Sun, 14 May 2023 15:28:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96EA5C433EF;
+        Sun, 14 May 2023 15:28:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684078104;
-        bh=Kep8Iw8VgQxgpYvfyniHHN0kmqkyl1ojVYpvdIK/Gqw=;
+        s=k20201202; t=1684078108;
+        bh=aGJ3xn0BmrJvcxnKs1H9H5MNeC4hGTO1aqiwfmy3iA8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=aytVWZJhhqsNa846mzQohDPesweiTk5CSCuuxIDisq+YIpoftblU9X8qvb2vTRy9A
-         RpExpbchUgqbAMNKggDj4PTwAzhFF/K4c98ZmOh1GrOaRK7D7qFa1brDEur/5Gmdsr
-         KqSNZjmdUkvSsbY0UilrPpdLg0LKNuFNgPjo96CBo77S9u/DIbcvGCgZH9EieZRLHm
-         Zie6PqawRM0Vqp8ebO8D72mskN0vJjrfz/EaJcEK4448JOlD7tni9BHd91jriXv1wp
-         PMfGZAhb57NoAoEE7kBc+9Y+Osz0yeQCkG8/YeAQCd7XSilsFXKyw6XzP/35eIBlQF
-         PaZcYwEgeeL8A==
+        b=BC3/eot32EV0/C480CQ+NBpcKoO+WDRGw8vl7T71vF7GUSR75yHfG9o08ee/PPn3I
+         xTyLVeSMk0NFMNYkjB2sXGYpWbSY62ZX3s07gQ/M2o20QCVShoaTBhLkr6bEWdE1rr
+         4hhM9K/paAcogY2JIh+0e6CyNvHOHRajiPk3UdCv8JjvI1rqYXNgtCxkr7NHCWlLaR
+         nwxNGka4y3VM0t7oKD7QWZaxb2n5WeXpnF5yru736tDFKTELLlCMtvUMYI5nAM9HAR
+         TMgQkvuyAxIonRaU+4cEwpCiCm373xQA9I50GAp2Oj/SBGktKo4zK8SI6RYOYTHhzQ
+         vIamycxhVj01Q==
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
@@ -40,9 +40,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Nicolas Pitre <npitre@baylibre.com>,
         Nicolas Schier <nicolas@fjasle.eu>,
         Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v5 17/21] ia64,export.h: replace EXPORT_DATA_SYMBOL* with EXPORT_SYMBOL*
-Date:   Mon, 15 May 2023 00:27:35 +0900
-Message-Id: <20230514152739.962109-18-masahiroy@kernel.org>
+Subject: [PATCH v5 19/21] modpost: squash sym_update_namespace() into sym_add_exported()
+Date:   Mon, 15 May 2023 00:27:37 +0900
+Message-Id: <20230514152739.962109-20-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230514152739.962109-1-masahiroy@kernel.org>
 References: <20230514152739.962109-1-masahiroy@kernel.org>
@@ -52,56 +52,78 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-With the previous refactoring, you can always use EXPORT_SYMBOL*.
+Pass a set of the name, license, and namespace to sym_add_exported().
 
-Replace two instances in ia64, then remove EXPORT_DATA_SYMBOL*.
+sym_update_namespace() is unneeded.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 ---
 
- arch/ia64/kernel/head.S      | 2 +-
- arch/ia64/kernel/ivt.S       | 2 +-
- include/asm-generic/export.h | 3 ---
- 3 files changed, 2 insertions(+), 5 deletions(-)
+ scripts/mod/modpost.c | 27 ++++-----------------------
+ 1 file changed, 4 insertions(+), 23 deletions(-)
 
-diff --git a/arch/ia64/kernel/head.S b/arch/ia64/kernel/head.S
-index f22469f1c1fc..c096500590e9 100644
---- a/arch/ia64/kernel/head.S
-+++ b/arch/ia64/kernel/head.S
-@@ -170,7 +170,7 @@ RestRR:											\
- 	__PAGE_ALIGNED_DATA
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 5db6a6f76971..7edb9a843ead 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -353,26 +353,8 @@ static const char *sec_name(const struct elf_info *info, unsigned int secindex)
  
- 	.global empty_zero_page
--EXPORT_DATA_SYMBOL_GPL(empty_zero_page)
-+EXPORT_SYMBOL_GPL(empty_zero_page)
- empty_zero_page:
- 	.skip PAGE_SIZE
+ #define strstarts(str, prefix) (strncmp(str, prefix, strlen(prefix)) == 0)
  
-diff --git a/arch/ia64/kernel/ivt.S b/arch/ia64/kernel/ivt.S
-index d6d4229b28db..7a418e324d30 100644
---- a/arch/ia64/kernel/ivt.S
-+++ b/arch/ia64/kernel/ivt.S
-@@ -87,7 +87,7 @@
- 
- 	.align 32768	// align on 32KB boundary
- 	.global ia64_ivt
--	EXPORT_DATA_SYMBOL(ia64_ivt)
-+	EXPORT_SYMBOL(ia64_ivt)
- ia64_ivt:
- /////////////////////////////////////////////////////////////////////////////////////////
- // 0x0000 Entry 0 (size 64 bundles) VHPT Translation (8,20,47)
-diff --git a/include/asm-generic/export.h b/include/asm-generic/export.h
-index 0ae9f38a904c..570cd4da7210 100644
---- a/include/asm-generic/export.h
-+++ b/include/asm-generic/export.h
-@@ -8,7 +8,4 @@
-  */
- #include <linux/export.h>
- 
--#define EXPORT_DATA_SYMBOL(name)	EXPORT_SYMBOL(name)
--#define EXPORT_DATA_SYMBOL_GPL(name)	EXPORT_SYMBOL_GPL(name)
+-static void sym_update_namespace(const char *symname, const char *namespace)
+-{
+-	struct symbol *s = find_symbol(symname);
 -
- #endif
+-	/*
+-	 * That symbol should have been created earlier and thus this is
+-	 * actually an assertion.
+-	 */
+-	if (!s) {
+-		error("Could not update namespace(%s) for symbol %s\n",
+-		      namespace, symname);
+-		return;
+-	}
+-
+-	free(s->namespace);
+-	s->namespace = namespace[0] ? NOFAIL(strdup(namespace)) : NULL;
+-}
+-
+ static struct symbol *sym_add_exported(const char *name, struct module *mod,
+-				       bool gpl_only)
++				       bool gpl_only, const char *namespace)
+ {
+ 	struct symbol *s = find_symbol(name);
+ 
+@@ -385,6 +367,7 @@ static struct symbol *sym_add_exported(const char *name, struct module *mod,
+ 	s = alloc_symbol(name);
+ 	s->module = mod;
+ 	s->is_gpl_only = gpl_only;
++	s->namespace = namespace[0] ? NOFAIL(strdup(namespace)) : NULL;
+ 	list_add_tail(&s->list, &mod->exported_symbols);
+ 	hash_add_symbol(s);
+ 
+@@ -1265,8 +1248,7 @@ static void check_export_symbol(struct module *mod, struct elf_info *elf,
+ 		return;
+ 	}
+ 
+-	s = sym_add_exported(name, mod, is_gpl);
+-	sym_update_namespace(name, sym_get_data(elf, label));
++	s = sym_add_exported(name, mod, is_gpl, sym_get_data(elf, label));
+ 
+ 	/*
+ 	 * We need to be aware whether we are exporting a function or
+@@ -2135,9 +2117,8 @@ static void read_dump(const char *fname)
+ 			mod = new_module(modname, strlen(modname));
+ 			mod->from_dump = true;
+ 		}
+-		s = sym_add_exported(symname, mod, gpl_only);
++		s = sym_add_exported(symname, mod, gpl_only, namespace);
+ 		sym_set_crc(s, crc);
+-		sym_update_namespace(symname, namespace);
+ 	}
+ 	free(buf);
+ 	return;
 -- 
 2.39.2
 
