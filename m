@@ -2,36 +2,36 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82611C77B7F
-	for <linux-kbuild@archiver.kernel.org>; Sun, 14 May 2023 15:28:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E2CCC7EE24
+	for <linux-kbuild@archiver.kernel.org>; Sun, 14 May 2023 15:29:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237712AbjENP2i (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 14 May 2023 11:28:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46686 "EHLO
+        id S237865AbjENP3A (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 14 May 2023 11:29:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237280AbjENP2U (ORCPT
+        with ESMTP id S237928AbjENP2p (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 14 May 2023 11:28:20 -0400
+        Sun, 14 May 2023 11:28:45 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE67F35B5;
-        Sun, 14 May 2023 08:28:07 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F34530E1;
+        Sun, 14 May 2023 08:28:20 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id EFE3A6181B;
-        Sun, 14 May 2023 15:28:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC12BC4339C;
-        Sun, 14 May 2023 15:28:04 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 892D66177B;
+        Sun, 14 May 2023 15:28:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EE91C433A1;
+        Sun, 14 May 2023 15:28:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684078086;
-        bh=5jnQxwz3UmV9tj1v34IDrOsiFFXLCh6HDE2/jdtbZ2w=;
+        s=k20201202; t=1684078092;
+        bh=QEbX8slSLfdvKL7Judwq4MdAmwErOXYMizfNrkW0R2o=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=i6OpcTZMHBI7kvbFOKpYHyYkwvBCurxFpzr5JYjrG05tYQlAXOg7NpDE8XZDIXgtg
-         /B4A5/OaFfLsHWlzNtWXi3zzDj0/CnDn9UeXE33HRUiFwbPfYXvrb3l/S/E4+EhiFC
-         rj9M4PKVuEWZv/oJyiAbWh3Xt1dRUcyErmRu403+c2lG5zA1czcOmuEDCoyE0IoAc9
-         WUqT4RAk6DzTvRk9mv1yCoyLkAMXZMd/TE7yw/2X+i05UmXk3+MFefFSm1SECg7hVZ
-         Kj1VfyCVYy3JokxXvhdCDP01EsxKuVs+ZPt1B9qhHNGhT4Slgj7EgSBFEW0vO4B82j
-         iuAbjRgWxAPVQ==
+        b=SvaA802YG5i64zcCH5bkd2MiFB9dxW07sbZ9brxB4sYAO3DuPmIMTsgWpsNmR2Bcx
+         GdyYb81TnBG7+jMoUTqVnEg8FEmIYNwuGaL4Ry3U96M7EeHGD3aZmw4PUbbzs8hNAf
+         IHrgVjocKb0TuqmdP+TSDSstluVD5NzPB8Dk2BAFTMeB2CVL+LPlHqBux6DVAUCDPb
+         rFLq8t+JLkRJoehTyaIqnMwlTjuBxcuQC1T6JwQa8mIns461CxzfVVn4bi9CmPY7cn
+         D88tIDJk7M4trYqiDlLxGNfz+zpGPpq9N+ACNpAf9P6wr54fvmQILMIWx9xxmeNpDu
+         fx0fTqi7yLlhA==
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
@@ -40,9 +40,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Nicolas Pitre <npitre@baylibre.com>,
         Nicolas Schier <nicolas@fjasle.eu>,
         Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v5 09/21] modpost: pass section index to find_elf_symbol2()
-Date:   Mon, 15 May 2023 00:27:27 +0900
-Message-Id: <20230514152739.962109-10-masahiroy@kernel.org>
+Subject: [PATCH v5 12/21] modpost: unify 'sym' and 'to' in default_mismatch_handler()
+Date:   Mon, 15 May 2023 00:27:30 +0900
+Message-Id: <20230514152739.962109-13-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230514152739.962109-1-masahiroy@kernel.org>
 References: <20230514152739.962109-1-masahiroy@kernel.org>
@@ -52,130 +52,53 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-find_elf_symbol2() converts the section index to the section name,
-then compares the two section names in each iteration. This is slow.
-
-It is faster to compare the section indices (i.e. integers) directly.
+find_tosym() takes 'sym' and stores the return value to another
+variable 'to'. You can use the same variable because we want to
+replace the original one when appropriate.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/modpost.c | 34 +++++++++++++++-------------------
- 1 file changed, 15 insertions(+), 19 deletions(-)
+ scripts/mod/modpost.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 2cc9c2a4aadc..3b7b78e69137 100644
+index d147e8f63e52..7601f2ca28ed 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -1169,19 +1169,14 @@ static Elf_Sym *find_elf_symbol(struct elf_info *elf, Elf64_Sword addr,
-  * it is, but this works for now.
-  **/
- static Elf_Sym *find_elf_symbol2(struct elf_info *elf, Elf_Addr addr,
--				 const char *sec)
-+				 unsigned int secndx)
- {
- 	Elf_Sym *sym;
- 	Elf_Sym *near = NULL;
- 	Elf_Addr distance = ~0;
- 
- 	for (sym = elf->symtab_start; sym < elf->symtab_stop; sym++) {
--		const char *symsec;
--
--		if (is_shndx_special(sym->st_shndx))
--			continue;
--		symsec = sec_name(elf, get_secindex(elf, sym));
--		if (strcmp(symsec, sec) != 0)
-+		if (get_secindex(elf, sym) != secndx)
- 			continue;
- 		if (!is_valid_name(elf, sym))
- 			continue;
-@@ -1203,7 +1198,8 @@ static bool is_executable_section(struct elf_info *elf, unsigned int secndx)
+@@ -1183,11 +1183,10 @@ static bool is_executable_section(struct elf_info *elf, unsigned int secndx)
  
  static void default_mismatch_handler(const char *modname, struct elf_info *elf,
  				     const struct sectioncheck* const mismatch,
--				     Elf_Rela *r, Elf_Sym *sym, const char *fromsec,
-+				     Elf_Rela *r, Elf_Sym *sym,
-+				     unsigned int fsecndx, const char *fromsec,
+-				     Elf_Rela *r, Elf_Sym *sym,
++				     Elf_Rela *r, Elf_Sym *tsym,
+ 				     unsigned int fsecndx, const char *fromsec,
  				     const char *tosec)
  {
- 	Elf_Sym *to;
-@@ -1211,7 +1207,7 @@ static void default_mismatch_handler(const char *modname, struct elf_info *elf,
+-	Elf_Sym *to;
+ 	Elf_Sym *from;
  	const char *tosym;
  	const char *fromsym;
- 
--	from = find_elf_symbol2(elf, r->r_offset, fromsec);
-+	from = find_elf_symbol2(elf, r->r_offset, fsecndx);
+@@ -1195,8 +1194,8 @@ static void default_mismatch_handler(const char *modname, struct elf_info *elf,
+ 	from = find_fromsym(elf, r->r_offset, fsecndx);
  	fromsym = sym_name(elf, from);
  
- 	to = find_elf_symbol(elf, r->r_addend, sym);
-@@ -1267,7 +1263,8 @@ static void default_mismatch_handler(const char *modname, struct elf_info *elf,
- }
+-	to = find_tosym(elf, r->r_addend, sym);
+-	tosym = sym_name(elf, to);
++	tsym = find_tosym(elf, r->r_addend, tsym);
++	tosym = sym_name(elf, tsym);
  
- static void check_section_mismatch(const char *modname, struct elf_info *elf,
--				   Elf_Rela *r, Elf_Sym *sym, const char *fromsec)
-+				   Elf_Rela *r, Elf_Sym *sym,
-+				   unsigned int fsecndx, const char *fromsec)
- {
- 	const char *tosec = sec_name(elf, get_secindex(elf, sym));
- 	const struct sectioncheck *mismatch = section_mismatch(fromsec, tosec);
-@@ -1275,7 +1272,8 @@ static void check_section_mismatch(const char *modname, struct elf_info *elf,
- 	if (!mismatch)
- 		return;
- 
--	default_mismatch_handler(modname, elf, mismatch, r, sym, fromsec, tosec);
-+	default_mismatch_handler(modname, elf, mismatch, r, sym, fsecndx, fromsec,
-+				 tosec);
- }
- 
- static unsigned int *reloc_location(struct elf_info *elf,
-@@ -1390,12 +1388,11 @@ static void section_rela(const char *modname, struct elf_info *elf,
- 	Elf_Rela *rela;
- 	Elf_Rela r;
- 	unsigned int r_sym;
--	const char *fromsec;
--
-+	unsigned int fsecndx = sechdr->sh_info;
-+	const char *fromsec = sec_name(elf, fsecndx);
- 	Elf_Rela *start = (void *)elf->hdr + sechdr->sh_offset;
- 	Elf_Rela *stop  = (void *)start + sechdr->sh_size;
- 
--	fromsec = sec_name(elf, sechdr->sh_info);
- 	/* if from section (name) is know good then skip it */
- 	if (match(fromsec, section_white_list))
- 		return;
-@@ -1434,7 +1431,7 @@ static void section_rela(const char *modname, struct elf_info *elf,
- 		/* Skip special sections */
- 		if (is_shndx_special(sym->st_shndx))
- 			continue;
--		check_section_mismatch(modname, elf, &r, sym, fromsec);
-+		check_section_mismatch(modname, elf, &r, sym, fsecndx, fromsec);
- 	}
- }
- 
-@@ -1445,12 +1442,11 @@ static void section_rel(const char *modname, struct elf_info *elf,
- 	Elf_Rel *rel;
- 	Elf_Rela r;
- 	unsigned int r_sym;
--	const char *fromsec;
--
-+	unsigned int fsecndx = sechdr->sh_info;
-+	const char *fromsec = sec_name(elf, fsecndx);
- 	Elf_Rel *start = (void *)elf->hdr + sechdr->sh_offset;
- 	Elf_Rel *stop  = (void *)start + sechdr->sh_size;
- 
--	fromsec = sec_name(elf, sechdr->sh_info);
- 	/* if from section (name) is know good then skip it */
- 	if (match(fromsec, section_white_list))
- 		return;
-@@ -1493,7 +1489,7 @@ static void section_rel(const char *modname, struct elf_info *elf,
- 		/* Skip special sections */
- 		if (is_shndx_special(sym->st_shndx))
- 			continue;
--		check_section_mismatch(modname, elf, &r, sym, fromsec);
-+		check_section_mismatch(modname, elf, &r, sym, fsecndx, fromsec);
- 	}
- }
- 
+ 	/* check whitelist - we may ignore it */
+ 	if (!secref_whitelist(mismatch, fromsec, fromsym, tosec, tosym))
+@@ -1231,7 +1230,7 @@ static void default_mismatch_handler(const char *modname, struct elf_info *elf,
+ 			      "You might get more information about where this is\n"
+ 			      "coming from by using scripts/check_extable.sh %s\n",
+ 			      fromsec, (long)r->r_offset, tosec, modname);
+-		else if (is_executable_section(elf, get_secindex(elf, sym)))
++		else if (is_executable_section(elf, get_secindex(elf, tsym)))
+ 			warn("The relocation at %s+0x%lx references\n"
+ 			     "section \"%s\" which is not in the list of\n"
+ 			     "authorized sections.  If you're adding a new section\n"
 -- 
 2.39.2
 
