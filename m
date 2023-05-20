@@ -2,166 +2,115 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1941C7EE22
-	for <linux-kbuild@archiver.kernel.org>; Thu, 18 May 2023 08:27:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18FE6C77B7D
+	for <linux-kbuild@archiver.kernel.org>; Sat, 20 May 2023 05:21:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230150AbjERI1J (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 18 May 2023 04:27:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56588 "EHLO
+        id S229526AbjETFVq (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 20 May 2023 01:21:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230088AbjERI1I (ORCPT
+        with ESMTP id S229512AbjETFVp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 18 May 2023 04:27:08 -0400
+        Sat, 20 May 2023 01:21:45 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8700A198E
-        for <linux-kbuild@vger.kernel.org>; Thu, 18 May 2023 01:27:06 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83D201B0
+        for <linux-kbuild@vger.kernel.org>; Fri, 19 May 2023 22:21:44 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1847C61AA8
-        for <linux-kbuild@vger.kernel.org>; Thu, 18 May 2023 08:27:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 819AFC433D2
-        for <linux-kbuild@vger.kernel.org>; Thu, 18 May 2023 08:27:05 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 153A5617A4
+        for <linux-kbuild@vger.kernel.org>; Sat, 20 May 2023 05:21:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F9B8C433EF
+        for <linux-kbuild@vger.kernel.org>; Sat, 20 May 2023 05:21:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684398425;
-        bh=OuUb0GFcpm3oT9D//g949iHPeGSWTDQbYa68G/ZlGSY=;
+        s=k20201202; t=1684560103;
+        bh=SvZXwAxSu5nwvgbSmYacv0D576gGEw6J/t5wsal5Xko=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=sTxoxjIiQY5mNgDiBwqqUClAbPM//wsKBKu9DLj4OBCMbyjEcrT+vzUOzQ5ET7ykc
-         /YYxZsO7me/VQFCJD8GERgzg/bmzfAX8XKufN7FTKNFqAQ73qB9roq+y8KgP6mt2Im
-         byhQ5961Rxb1EtG3rp1Gd7lRurM9rM6WaI8HZnRjoV4F9QoqF6QAkpqstRzwB1Ouyj
-         yzTji4Gm4CJ0Ov96Q8KcBqT4CxJK4W2bGRzX3WabqVlAHgS7GBstGQUBhwfZn8nHDK
-         VQJEG6KNKTGsQ9jgZCxaZU+6SDrn9y65hmKkwB4hrD9OQACSCRZrkMAYyejfmZRk+t
-         kiI3b8JMFFIAQ==
-Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-392116ae103so1116328b6e.0
-        for <linux-kbuild@vger.kernel.org>; Thu, 18 May 2023 01:27:05 -0700 (PDT)
-X-Gm-Message-State: AC+VfDwpFdTqwhdM2g/2Pt/9ENzOzLOVpdmJkEjovdTy+5KeHrdDb1xO
-        kJsBWasDiWE+kSP9CNAGjf1W3QW021QdFLLg64k=
-X-Google-Smtp-Source: ACHHUZ79hT0E78gusGfJRrHVa6vdtoFGbOJGzEofZqP2yTO3ntemixkzb20oUAA6y9RB3GMtrcI4LHReYB3fjLiAEEQ=
-X-Received: by 2002:a05:6808:14c9:b0:394:4aaa:eab2 with SMTP id
- f9-20020a05680814c900b003944aaaeab2mr912886oiw.36.1684398424784; Thu, 18 May
- 2023 01:27:04 -0700 (PDT)
+        b=YC8TgiIIpeRweuUBo1Wd2a0gJunUqjb+MiRJKhLVxFrPPyKMP/ThqMsXGgEAnoYp1
+         QM6mM1yGOlLduRwm/bwU1eMErsj1E7hNRAMw1mpH2STBCLSIGbHGnkbeilJXamuINa
+         Zhw6NPEt4IWHPOubg6VWZgvki+VNCqLER04K+IvPF/2LR/YUO4YaaXl31VMMLzxVaG
+         8eIZUcIGOvy7AM28MfflttJG8vA9d3mopMJ9pszJjevaORCICOpo3Npdn6B9SBpbfw
+         QvA4PuoSv46p+HSGCouB7DI51y0d2mgsJFS6VxvgLXxT78TbaDYliED5KOOVlxHHr/
+         Y6xnVJC3EnVMA==
+Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-3943fdc59f9so2257557b6e.0
+        for <linux-kbuild@vger.kernel.org>; Fri, 19 May 2023 22:21:43 -0700 (PDT)
+X-Gm-Message-State: AC+VfDwssEU2exBH84Pof1bypwZAi6CF5Cn+89emJKHnQ/Y76RFgkLI8
+        57lX4VEO2VezWHT/T68ASxRoGwf0+rqULP6/3BY=
+X-Google-Smtp-Source: ACHHUZ7le24rziBquheHTI6tCUMDmbdvBcEAtyM2vFSg/ICuzyVVJCrNoY8hjdTz6uy+0QNTvv2pb5Xu/M0TTgeyUHo=
+X-Received: by 2002:a54:400c:0:b0:395:f7d3:d4b8 with SMTP id
+ x12-20020a54400c000000b00395f7d3d4b8mr2262827oie.36.1684560102666; Fri, 19
+ May 2023 22:21:42 -0700 (PDT)
 MIME-Version: 1.0
-References: <ZGVi9HbI43R5trN8@bhelgaas>
-In-Reply-To: <ZGVi9HbI43R5trN8@bhelgaas>
+References: <729c71ad.51ce3.1882daddff7.Coremail.sunying@nj.iscas.ac.cn>
+In-Reply-To: <729c71ad.51ce3.1882daddff7.Coremail.sunying@nj.iscas.ac.cn>
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Thu, 18 May 2023 17:26:28 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAQPXapu3Ydh9XaB2ggGqgfYX5mo0pHPNHDcnm=w3ubYag@mail.gmail.com>
-Message-ID: <CAK7LNAQPXapu3Ydh9XaB2ggGqgfYX5mo0pHPNHDcnm=w3ubYag@mail.gmail.com>
-Subject: Re: possible dependency error?
-To:     Bjorn Helgaas <helgaas@kernel.org>
-Cc:     linux-kbuild@vger.kernel.org, Josh Poimboeuf <jpoimboe@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>
+Date:   Sat, 20 May 2023 14:21:06 +0900
+X-Gmail-Original-Message-ID: <CAK7LNARtpBkT-SL5kGqnrSQQT+SRsU8xfqrC5iqZCwoQs=QnzQ@mail.gmail.com>
+Message-ID: <CAK7LNARtpBkT-SL5kGqnrSQQT+SRsU8xfqrC5iqZCwoQs=QnzQ@mail.gmail.com>
+Subject: Re: Suggestion: Improve the dependency information during Kconfig compilation
+To:     sunying@nj.iscas.ac.cn
+Cc:     linux-kbuild@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-(+CC: Josh Poimboeuf,Peter Zijlstra, objtool maintainer)
-
-
-
-On Thu, May 18, 2023 at 8:27=E2=80=AFAM Bjorn Helgaas <helgaas@kernel.org> =
-wrote:
+On Thu, May 18, 2023 at 4:13=E2=80=AFPM <sunying@nj.iscas.ac.cn> wrote:
 >
-> This is on v6.4-rc1.  I fat-fingered the make target (I intended
-> "pciehp.o", not "pciehp.c"), then interrupted the build when I noticed
-> my mistake:
+> Hi,
 >
->   06:04:15 ~/linux (hotplug)$ make drivers/pci/hotplug/pciehp.c
->     SYNC    include/config/auto.conf.cmd
->   ^Cmake: *** [include/config/auto.conf.cmd] Deleting file 'include/gener=
-ated/rustc_cfg'
->   make: *** [include/config/auto.conf.cmd] Deleting file 'include/generat=
-ed/autoconf.h'
->   make[2]: *** [scripts/kconfig/Makefile:77: syncconfig] Interrupt
->   make[1]: *** [Makefile:692: syncconfig] Interrupt
->   make: *** [Makefile:793: include/config/auto.conf.cmd] Interrupt
 >
-> Subsequent builds now fail ("pciehp.o" is *also* an incorrect target,
-> but doesn't seem related to the error):
+> We found that the Kconfig build system silently changes invalid values in=
+ the. config file,
+> which may prevent users from getting their desired kernel, and also make =
+it hard to know
+> which configuration option caused the forced change based on the compilat=
+ion information.
 >
->   06:04:22 ~/linux (hotplug)$ make drivers/pci/hotplug/pciehp.o
->     SYNC    include/config/auto.conf.cmd
->     UPD     include/config/kernel.release
->     UPD     include/generated/utsrelease.h
->     UPD     include/generated/compile.h
->     CC      scripts/mod/empty.o
->     MKELF   scripts/mod/elfconfig.h
->     HOSTCC  scripts/mod/modpost.o
->     CC      scripts/mod/devicetable-offsets.s
->     HOSTCC  scripts/mod/file2alias.o
->     HOSTCC  scripts/mod/sumversion.o
->     HOSTLD  scripts/mod/modpost
->     CC      kernel/bounds.s
->     CC      arch/x86/kernel/asm-offsets.s
->     CALL    scripts/checksyscalls.sh
->     DESCEND objtool
->     HOSTCC  /home/bjorn/linux/tools/objtool/fixdep.o
->     HOSTLD  /home/bjorn/linux/tools/objtool/fixdep-in.o
->     LINK    /home/bjorn/linux/tools/objtool/fixdep
->   make[4]: *** No rule to make target '/usr/include/x86_64-linux-gnu/bits=
-/sys_errlist.h', needed by '/home/bjorn/linux/tools/objtool/libsubcmd/exec-=
-cmd.o'.  Stop.
->   make[3]: *** [Makefile:80: /home/bjorn/linux/tools/objtool/libsubcmd/li=
-bsubcmd-in.o] Error 2
->   make[2]: *** [Makefile:78: /home/bjorn/linux/tools/objtool/libsubcmd/li=
-bsubcmd.a] Error 2
->   make[1]: *** [Makefile:73: objtool] Error 2
->   make: *** [Makefile:1440: tools/objtool] Error 2
+> There are similar questions on stack overflow, where people find it diffi=
+cult to get
+> the complete dependency chain and other information=EF=BC=9A
 >
-> I finally got the right target, but the build still fails:
+>   ex1. How can I disable CONFIG_PM when building Linux kernel for x86_64 =
+- Stack Overflow
+>   https://stackoverflow.com/questions/64499221/how-can-i-disable-config-p=
+m-when-building-linux-kernel-for-x86-64/64501647#64501647
 >
->   06:04:39 ~/linux (hotplug)$ make drivers/pci/hotplug/
->     CALL    scripts/checksyscalls.sh
->     DESCEND objtool
->   make[4]: *** No rule to make target '/usr/include/x86_64-linux-gnu/bits=
-/sys_errlist.h', needed by '/home/bjorn/linux/tools/objtool/libsubcmd/exec-=
-cmd.o'.  Stop.
->   make[3]: *** [Makefile:80: /home/bjorn/linux/tools/objtool/libsubcmd/li=
-bsubcmd-in.o] Error 2
->   make[2]: *** [Makefile:78: /home/bjorn/linux/tools/objtool/libsubcmd/li=
-bsubcmd.a] Error 2
->   make[1]: *** [Makefile:73: objtool] Error 2
->   make: *** [Makefile:1440: tools/objtool] Error 2
+>   ex2. c - kernel symbol enabled but doesn't shows up in .config - Stack =
+Overflow
+>   https://stackoverflow.com/questions/24074116/kernel-symbol-enabled-but-=
+doesnt-shows-up-in-config)
 >
-> After "make distclean", everything works as expected, so maybe this is
-> just the expected behavior after my initial user error?  I dunno; it
-> seemed surprising.  Just FYI.
+>   ex3. makefile - update menuconfig entries without recompiling all the k=
+ernel - Stack Overflow
+>   https://stackoverflow.com/questions/71075113/update-menuconfig-entries-=
+without-recompiling-all-the-kernel
 >
-> Bjorn
+>   ex4. linux - disabling CONFIG_NET_DMA - Stack Overflow
+>   https://stackoverflow.com/questions/30794576/disabling-config-net-dma/3=
+0796820#30796820
+>
+> We plan to optimize the conf_read() function in /scripts/kconfig/confdata=
+.c,
+> and add information for the mismatched configuration options to help user=
+s get the desired Linux kernel.
+> Do you think it's necessary? Any suggestions?
+>
 
 
-I do not know what is happening on your build machine,
-but judging from the error log, something went wrong
-while building objtool.
-
-objtool Makefile is not a part of Kbuild.
-The maintainers of objtool may have some insight.
+It may be helpful.
+I do not know if such warnings should be turned on by default,
+or under some verbose mode, though.
 
 
 
 
-
-BTW, I could not reproduce the issue.
-I could not find anything weird from the Kbuild perspective so far.
-The errors in the single target builds are expected.
-
-This is what I did.
-
-$ git clean -fdx
-$ make defconfig
-$ make drivers/pci/hotplug/pciehp.c
-    -> Fail. This is expected behavior
-$ make drivers/pci/hotplug/pciehp.o
-    -> Fail. This is also expected behavior
-       because CONFIG_HOTPLUG_PCI_PCIE is unset
-$ make drivers/pci/hotplug/
-    -> success for me
-
-
-Is this the same command sequence as you did?
-
+> Best regards,
+> Siyuan Guo
+> Ying Sun
+>
+>
 
 
 --=20
