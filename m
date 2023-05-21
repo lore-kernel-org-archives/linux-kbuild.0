@@ -2,43 +2,46 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63367C77B73
-	for <linux-kbuild@archiver.kernel.org>; Sun, 21 May 2023 13:36:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3116EC77B7C
+	for <linux-kbuild@archiver.kernel.org>; Sun, 21 May 2023 16:05:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231146AbjEUNgk (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 21 May 2023 09:36:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36528 "EHLO
+        id S229528AbjEUQFQ (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 21 May 2023 12:05:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230309AbjEUN2I (ORCPT
+        with ESMTP id S229495AbjEUQFQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 21 May 2023 09:28:08 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C9EAFA;
-        Sun, 21 May 2023 06:24:43 -0700 (PDT)
+        Sun, 21 May 2023 12:05:16 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60B1AC7;
+        Sun, 21 May 2023 09:05:15 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 10B9360ACA;
-        Sun, 21 May 2023 13:24:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C047C433D2;
-        Sun, 21 May 2023 13:24:41 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E863760DE9;
+        Sun, 21 May 2023 16:05:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC57DC433D2;
+        Sun, 21 May 2023 16:05:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684675482;
-        bh=DGOor88cskTgt1c8gVoMlnt1QfpaP6hGJz8ZYo5w6lc=;
+        s=k20201202; t=1684685114;
+        bh=G3drc7In4D1VhMoTc5Lfa7NiaqWtPZnS/8G0QWUohGM=;
         h=From:To:Cc:Subject:Date:From;
-        b=Tt7KZI5hZJV70VL4MLA/HN2UAQ7vEkWzOdPD2YxbpfObGzvWit2+MLsAeYDKqbLd1
-         +WjaXjWoeKADF4PlC+R6tv9HwfzxAJAipac0HSmMtPO975XjRUfilLQdzhiW7iaPq0
-         NK1wMT9rTvTpJ2NQjSNaEOlC18y6Zw3tZyUdUGz97nBoL6t+bOK0RunFNTSNaHoDud
-         YiKr1CwOE37dsX8W0lf1ZbKzSWZ+ke1hqkLC82MlT/LYnLTDBJDBzTBXUrwDbwluvs
-         akyX/913rsd53IW28t3/+IFPrTZBe4aRJhLC61SbNNiY/IMWoJqQHIL1tUkNTykeYF
-         sj3giFPmlIo+g==
+        b=p1ijQ+zARm7LoKfY65ZFtMu7Q8ga38E80NWgFuV7jj7qRULguwqCPqtEuW0HXHq1N
+         AmkwuOgCJlx9eN8P4/yhxpZ0OphqpxZuTLdUQgXG46v6fOj76m5qb7pdRcfAQ041EX
+         Ege574MPrvQZ7VTyUL4wRF9KrU9dOZjegaoUrBxiH3j3bl6FZV9iluSD6dU95zo0nz
+         xQQbbRDaV+kaqPnKc1gdtZDH1Yme/6NcJMizqs7000mXeDgnu9K122BcjLywI8/KGL
+         YT/wJ9xpAOu6WEi8PbnSldOZYPHDJSkbEUr7DMIDMqZE+LhElp1HR/nAvmyzLvhMSN
+         wV2/B9AgIvp8A==
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nicolas Schier <nicolas@fjasle.eu>,
         Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 1/2] Revert "kheaders: substituting --sort in archive creation"
-Date:   Sun, 21 May 2023 22:23:35 +0900
-Message-Id: <20230521132336.1279523-1-masahiroy@kernel.org>
+Subject: [PATCH v6 00/20] Unify <linux/export.h> and <asm/export.h>, remove EXPORT_DATA_SYMBOL(), faster TRIM_UNUSED_KSYMS
+Date:   Mon, 22 May 2023 01:04:05 +0900
+Message-Id: <20230521160426.1881124-1-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -46,40 +49,84 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-This reverts commit 700dea5a0bea9f64eba89fae7cb2540326fdfdc1.
 
-The reason for that commit was --sort=ORDER introduced in
-tar 1.28 (2014). More than 3 years have passed since then.
+This patch set refactors modpost first to make it easier to
+add new code.
 
-Requiring GNU tar 1.28 should be fine now because we require
-GCC 5.1 (2015).
+My goals:
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+ - Refactors EXPORT_SYMBOL, <linux/export.h> and <asm/export.h>.
+   You can still put EXPORT_SYMBOL() in *.S file, very close to the definition,
+   but you do not need to care about whether it is a function or a data.
+   This removes EXPORT_DATA_SYMBOL().
 
- kernel/gen_kheaders.sh | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ - Re-implement TRIM_UNUSED_KSYMS in one-pass.
+   This makes the building faster.
 
-diff --git a/kernel/gen_kheaders.sh b/kernel/gen_kheaders.sh
-index 1ef9a87511f5..6d443ea22bb7 100755
---- a/kernel/gen_kheaders.sh
-+++ b/kernel/gen_kheaders.sh
-@@ -83,12 +83,9 @@ find $cpio_dir -type f -print0 |
- 	xargs -0 -P8 -n1 perl -pi -e 'BEGIN {undef $/;}; s/\/\*((?!SPDX).)*?\*\///smg;'
- 
- # Create archive and try to normalize metadata for reproducibility.
--# For compatibility with older versions of tar, files are fed to tar
--# pre-sorted, as --sort=name might not be available.
--find $cpio_dir -printf "./%P\n" | LC_ALL=C sort | \
--    tar "${KBUILD_BUILD_TIMESTAMP:+--mtime=$KBUILD_BUILD_TIMESTAMP}" \
--    --owner=0 --group=0 --numeric-owner --no-recursion \
--    -I $XZ -cf $tarfile -C $cpio_dir/ -T - > /dev/null
-+tar "${KBUILD_BUILD_TIMESTAMP:+--mtime=$KBUILD_BUILD_TIMESTAMP}" \
-+    --owner=0 --group=0 --sort=name --numeric-owner \
-+    -I $XZ -cf $tarfile -C $cpio_dir/ . > /dev/null
- 
- echo $headers_md5 > kernel/kheaders.md5
- echo "$this_file_md5" >> kernel/kheaders.md5
+ - Move the static EXPORT_SYMBOL check to modpost.
+   This also makes the building faster.
+
+This patch set is applicable to
+git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kbuild
+
+Previous version
+v5: https://lore.kernel.org/linux-kbuild/CAK7LNARBiOywrMLbR=9N35sk19U0QM3xcPy7d1WqV-eyb4W23w@mail.gmail.com/T/#t
+v4: https://lore.kernel.org/linux-kbuild/CAK7LNASDzy9RERN6+q6WgR4ROYZQue=SBqgbcoYuVePByHtk6Q@mail.gmail.com/T/#t
+v3: https://lore.kernel.org/all/20220928063947.299333-1-masahiroy@kernel.org/
+
+
+Masahiro Yamada (20):
+  Revert "modpost: skip ELF local symbols during section mismatch check"
+  modpost: fix section mismatch message for R_ARM_ABS32
+  modpost: detect section mismatch for R_ARM_MOVW_ABS_NC and
+    R_ARM_MOVT_ABS
+  modpost: remove unused argument from secref_whitelist()
+  modpost: refactor find_fromsym() and find_tosym()
+  modpost: unify 'sym' and 'to' in default_mismatch_handler()
+  modpost: replace r->r_offset, r->r_addend with faddr, taddr
+  modpost: remove is_shndx_special() check from section_rel(a)
+  modpost: pass struct module pointer to check_section_mismatch()
+  kbuild: generate KSYMTAB entries by modpost
+  ia64,export.h: replace EXPORT_DATA_SYMBOL* with EXPORT_SYMBOL*
+  modpost: check static EXPORT_SYMBOL* by modpost again
+  modpost: squash sym_update_namespace() into sym_add_exported()
+  modpost: use null string instead of NULL pointer for default namespace
+  kbuild: implement CONFIG_TRIM_UNUSED_KSYMS without recursion
+  modpost: merge fromsec=DATA_SECTIONS entries in sectioncheck table
+  modpost: merge bad_tosec=ALL_EXIT_SECTIONS entries in sectioncheck
+    table
+  modpost: remove *_sections[] arrays
+  modpost: merge two similar section mismatch warnings
+  modpost: show offset from symbol for section mismatch warnings
+
+ .gitignore                        |   1 -
+ Makefile                          |  19 +-
+ arch/ia64/include/asm/Kbuild      |   1 +
+ arch/ia64/include/asm/export.h    |   3 -
+ arch/ia64/kernel/head.S           |   2 +-
+ arch/ia64/kernel/ivt.S            |   2 +-
+ arch/um/os-Linux/user_syms.c      |   9 +-
+ include/asm-generic/export.h      |  83 +-----
+ include/asm-generic/vmlinux.lds.h |   1 +
+ include/linux/export-internal.h   |  49 ++++
+ include/linux/export.h            | 119 ++------
+ include/linux/pm.h                |   8 +-
+ kernel/module/internal.h          |  12 +
+ scripts/Makefile.build            |  19 +-
+ scripts/Makefile.modpost          |   7 +
+ scripts/adjust_autoksyms.sh       |  73 -----
+ scripts/basic/fixdep.c            |   3 +-
+ scripts/check-local-export        |  70 -----
+ scripts/gen_ksymdeps.sh           |  30 --
+ scripts/mod/modpost.c             | 454 +++++++++++++++---------------
+ scripts/mod/modpost.h             |   6 +-
+ scripts/remove-stale-files        |   2 +
+ 22 files changed, 345 insertions(+), 628 deletions(-)
+ delete mode 100644 arch/ia64/include/asm/export.h
+ delete mode 100755 scripts/adjust_autoksyms.sh
+ delete mode 100755 scripts/check-local-export
+ delete mode 100755 scripts/gen_ksymdeps.sh
+
 -- 
 2.39.2
 
