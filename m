@@ -2,36 +2,36 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71CB1C77B73
-	for <linux-kbuild@archiver.kernel.org>; Sun, 21 May 2023 16:06:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64A00C7EE2A
+	for <linux-kbuild@archiver.kernel.org>; Sun, 21 May 2023 16:06:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231216AbjEUQGa (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 21 May 2023 12:06:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55622 "EHLO
+        id S231166AbjEUQGi (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 21 May 2023 12:06:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231151AbjEUQGI (ORCPT
+        with ESMTP id S231174AbjEUQGS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 21 May 2023 12:06:08 -0400
+        Sun, 21 May 2023 12:06:18 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20248118;
-        Sun, 21 May 2023 09:05:45 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DAB0E78;
+        Sun, 21 May 2023 09:05:49 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C0F7E60FAC;
-        Sun, 21 May 2023 16:05:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1D51C433EF;
-        Sun, 21 May 2023 16:05:36 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E23BC6179A;
+        Sun, 21 May 2023 16:05:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1114CC4339E;
+        Sun, 21 May 2023 16:05:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684685138;
-        bh=Irn8s+5UgFMeFebwkxke8zqHLikSaF4AyAgWT+2aYBE=;
+        s=k20201202; t=1684685148;
+        bh=OsDQm9j1PsDhPRuAGeNz8Ube9RFsdeDF2EBPrRh3R00=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ICceVZTSu3z1ir8GvjVJApiD7PzYwHGmFkdrP3xw09UR2BaYM/a7LEpWIbLe77eJu
-         CWePIZBTSUFLEftBlphUFf0dM+h4pVQwgxQB8fKjva4Z01zyFcJmfVzbVv9Hni2LrN
-         JSBRR6cAgbEawSyRab65dt05G4F/Y1L/uPldOeo6PIeJQ7BhsSldm1U/JPmdg06J6k
-         xUImyjm7tmBjAAydWlh/gwCtW0Y7l/9R1/JMjjFC+jda/UVdaOoNwAybEslC3+y8O9
-         rahLv5afZUy2nIJ8DoYolXGrJBvskFiPdBCTUcvgZZFEwRyVSZlNJy68PByKwPpCJ2
-         7et/6ExVxDJmg==
+        b=pSSCKgO/pgmJMYhG5PbEkacPkJY9fJzSjVvsy7mQ6g5XQ01mmRjzRWa0l5QGox1zj
+         Ehse+zJR2r2fCka79ORaDKzj6yVqM5mxK7nXB4Kv/aOXj3iuPLmiBVlzi3wQnkvh/K
+         gl7fj2T9p82yk3Ae/afrvt+jPkYL4dORCwGu1sQa6VhK6y2wsrh5ynhBLLselJ3+Hg
+         jjvrrEfABBLm2CwQ3RWulT3jXzttTWAZ0621MtACF9jyf36m5f6j1yw+WT6t0JU0hl
+         kFHtBhfwGzWb6VLUk9dRfAQCYUN+ISXdzTa2HcU74FcvIx0wsCB04D+sGcjAF+lh0S
+         n+VHiBIAn+Y0w==
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
@@ -39,9 +39,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Nick Desaulniers <ndesaulniers@google.com>,
         Nicolas Schier <nicolas@fjasle.eu>,
         Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v6 13/20] modpost: squash sym_update_namespace() into sym_add_exported()
-Date:   Mon, 22 May 2023 01:04:18 +0900
-Message-Id: <20230521160426.1881124-14-masahiroy@kernel.org>
+Subject: [PATCH v6 19/20] modpost: merge two similar section mismatch warnings
+Date:   Mon, 22 May 2023 01:04:24 +0900
+Message-Id: <20230521160426.1881124-20-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230521160426.1881124-1-masahiroy@kernel.org>
 References: <20230521160426.1881124-1-masahiroy@kernel.org>
@@ -51,78 +51,61 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Pass a set of the name, license, and namespace to sym_add_exported().
+In case of section mismatch, modpost shows slightly different messages.
 
-sym_update_namespace() is unneeded.
+For extable section mismatch:
 
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+ "%s(%s+0x%lx): Section mismatch in reference to the %s:%s\n"
+
+For the other cases:
+
+ "%s: section mismatch in reference: %s (section: %s) -> %s (section: %s)\n"
+
+They are similar. Merge them.
+
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/modpost.c | 27 ++++-----------------------
- 1 file changed, 4 insertions(+), 23 deletions(-)
+ scripts/mod/modpost.c | 18 +++---------------
+ 1 file changed, 3 insertions(+), 15 deletions(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index dd1d066f1214..8fe2aa7bf71b 100644
+index 852cc164c77e..e7561fa57478 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -353,26 +353,8 @@ static const char *sec_name(const struct elf_info *info, unsigned int secindex)
+@@ -1135,21 +1135,10 @@ static void default_mismatch_handler(const char *modname, struct elf_info *elf,
  
- #define strstarts(str, prefix) (strncmp(str, prefix, strlen(prefix)) == 0)
+ 	sec_mismatch_count++;
  
--static void sym_update_namespace(const char *symname, const char *namespace)
--{
--	struct symbol *s = find_symbol(symname);
--
--	/*
--	 * That symbol should have been created earlier and thus this is
--	 * actually an assertion.
--	 */
--	if (!s) {
--		error("Could not update namespace(%s) for symbol %s\n",
--		      namespace, symname);
--		return;
--	}
--
--	free(s->namespace);
--	s->namespace = namespace[0] ? NOFAIL(strdup(namespace)) : NULL;
--}
--
- static struct symbol *sym_add_exported(const char *name, struct module *mod,
--				       bool gpl_only)
-+				       bool gpl_only, const char *namespace)
- {
- 	struct symbol *s = find_symbol(name);
+-	switch (mismatch->mismatch) {
+-	case TEXT_TO_ANY_INIT:
+-	case DATA_TO_ANY_INIT:
+-	case TEXTDATA_TO_ANY_EXIT:
+-	case XXXINIT_TO_SOME_INIT:
+-	case XXXEXIT_TO_SOME_EXIT:
+-	case ANY_INIT_TO_ANY_EXIT:
+-	case ANY_EXIT_TO_ANY_INIT:
+-		warn("%s: section mismatch in reference: %s (section: %s) -> %s (section: %s)\n",
+-		     modname, fromsym, fromsec, tosym, tosec);
+-		break;
+-	case EXTABLE_TO_NON_TEXT:
+-		warn("%s(%s+0x%lx): Section mismatch in reference to the %s:%s\n",
+-		     modname, fromsec, (long)faddr, tosec, tosym);
++	warn("%s: section mismatch in reference: %s (section: %s) -> %s (section: %s)\n",
++	     modname, fromsym, fromsec, tosym, tosec);
  
-@@ -385,6 +367,7 @@ static struct symbol *sym_add_exported(const char *name, struct module *mod,
- 	s = alloc_symbol(name);
- 	s->module = mod;
- 	s->is_gpl_only = gpl_only;
-+	s->namespace = namespace[0] ? NOFAIL(strdup(namespace)) : NULL;
- 	list_add_tail(&s->list, &mod->exported_symbols);
- 	hash_add_symbol(s);
- 
-@@ -1248,8 +1231,7 @@ static void check_export_symbol(struct module *mod, struct elf_info *elf,
- 		return;
++	if (mismatch->mismatch == EXTABLE_TO_NON_TEXT) {
+ 		if (match(tosec, mismatch->bad_tosec))
+ 			fatal("The relocation at %s+0x%lx references\n"
+ 			      "section \"%s\" which is black-listed.\n"
+@@ -1169,7 +1158,6 @@ static void default_mismatch_handler(const char *modname, struct elf_info *elf,
+ 		else
+ 			error("%s+0x%lx references non-executable section '%s'\n",
+ 			      fromsec, (long)faddr, tosec);
+-		break;
  	}
+ }
  
--	s = sym_add_exported(name, mod, is_gpl);
--	sym_update_namespace(name, sym_get_data(elf, label));
-+	s = sym_add_exported(name, mod, is_gpl, sym_get_data(elf, label));
- 
- 	/*
- 	 * We need to be aware whether we are exporting a function or
-@@ -2126,9 +2108,8 @@ static void read_dump(const char *fname)
- 			mod = new_module(modname, strlen(modname));
- 			mod->from_dump = true;
- 		}
--		s = sym_add_exported(symname, mod, gpl_only);
-+		s = sym_add_exported(symname, mod, gpl_only, namespace);
- 		sym_set_crc(s, crc);
--		sym_update_namespace(symname, namespace);
- 	}
- 	free(buf);
- 	return;
 -- 
 2.39.2
 
