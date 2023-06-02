@@ -2,161 +2,64 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8982C7EE29
-	for <linux-kbuild@archiver.kernel.org>; Fri,  2 Jun 2023 21:00:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF273C7EE2C
+	for <linux-kbuild@archiver.kernel.org>; Sat,  3 Jun 2023 10:41:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236383AbjFBVAa (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 2 Jun 2023 17:00:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34316 "EHLO
+        id S235628AbjFCKk6 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 3 Jun 2023 06:40:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236010AbjFBVA3 (ORCPT
+        with ESMTP id S235879AbjFCKkz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 2 Jun 2023 17:00:29 -0400
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:191:4433::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B85C819B;
-        Fri,  2 Jun 2023 14:00:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-        Message-Id:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
-        Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
-        Resent-Message-ID:In-Reply-To:References;
-        bh=qRgq5U/n9Ip9t5IBpxq+Q3tveoCjRKpwVurL75b8pPY=; t=1685739626; x=1686949226; 
-        b=vTqJotCK7xpxTZoS9CJTIV358rzDwcnvSD6igpgFCaMBzRGk39c9Nravr0ETyW6xgw35CrsoBbS
-        icIHGA0rNrUb+g1oISrYMCn3vKy+KWoonsg9jLOpTu8GT7r6BSHwwNRwvIlRZOPzwsgUsNVt14GIz
-        eTG6uddN9cbWyGpS/gA0g4FtaEiPO9deac+a0xJ5NSqiKWpotQGKJfiQRS9sb/+rCzxFMMnZyx4OK
-        gGZiUxYBwFYkm2Ip4cadhb5eKEyG03gLvTjEzH7H2zcf+ykLDPrvMQFjFsT6AhenZHV8vGvwr//Wq
-        gd11Fq9D4KbqNx99EIRIXiBj+bnRRCe9HKnw==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-        (Exim 4.96)
-        (envelope-from <johannes@sipsolutions.net>)
-        id 1q5Bsk-00BgEs-1p;
-        Fri, 02 Jun 2023 23:00:22 +0200
-From:   Johannes Berg <johannes@sipsolutions.net>
-To:     linux-kernel@vger.kernel.org
-Cc:     linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org,
-        Johannes Berg <johannes.berg@intel.com>
-Subject: [PATCH 1/2] kernel-doc: don't let V=1 change outcome
-Date:   Fri,  2 Jun 2023 23:00:13 +0200
-Message-Id: <20230602230014.a435aab03cee.I21ab3b54eeebd638676bead3b2f87417944e44f3@changeid>
-X-Mailer: git-send-email 2.40.1
+        Sat, 3 Jun 2023 06:40:55 -0400
+X-Greylist: delayed 4233 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 03 Jun 2023 03:40:26 PDT
+Received: from mail.webtopbits.pl (mail.webtopbits.pl [195.231.64.176])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8442210DB
+        for <linux-kbuild@vger.kernel.org>; Sat,  3 Jun 2023 03:40:26 -0700 (PDT)
+Received: by mail.webtopbits.pl (Postfix, from userid 1001)
+        id 9C3E2A38EE; Fri,  2 Jun 2023 09:50:58 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=webtopbits.pl;
+        s=mail; t=1685695859;
+        bh=Eh8ECMiYd4baGAwPAzhz8mhJACXX7NSRkYjh+plaY18=;
+        h=Date:From:To:Subject:From;
+        b=fk9B/hzPpuZwYh74esD8XKNaey2h5BHn927tedug0kUSYcYXHKHxmtkNUZ5G5Djl2
+         hqdU6A+Xc3kGhZWTODL+SUKpyWbkE2KLCR4J8ezvQSVboYMcRzvjHAYgyUThoFktX/
+         +B4TuA0lW/z9wWefUmWYLj08G2jQTPe7MbyTCSl32LbwAU+ymgzzRyuQUXnkbagi61
+         yt82GGmREPZvMi5MYP+wsjhX4tVu0TJkQ049Xtha8mMj8azvNWd18kp8rCswDoz83I
+         VAJKsletLHndRmRFQP5bWvaIEybvJVhPCvuUtEtd9k11Z3yVZtLz5SD/MKHXoYhBSP
+         Z7uJ2XxVzSqHg==
+Received: by mail.webtopbits.pl for <linux-kbuild@vger.kernel.org>; Fri,  2 Jun 2023 08:50:56 GMT
+Message-ID: <20230602085530-0.1.8w.5kpp.0.yliq34cf93@webtopbits.pl>
+Date:   Fri,  2 Jun 2023 08:50:56 GMT
+From:   "Kamil Durjasz" <kamil.durjasz@webtopbits.pl>
+To:     <linux-kbuild@vger.kernel.org>
+Subject: =?UTF-8?Q?Wy=C5=BCsza_konwersja_w_e-sklepie_?=
+X-Mailer: mail.webtopbits.pl
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-From: Johannes Berg <johannes.berg@intel.com>
+Dzie=C5=84 dobry,
 
-The kernel-doc script currently reports a number of issues
-only in "verbose" mode, but that's initialized from V=1
-(via KBUILD_VERBOSE), so if you use KDOC_WERROR=1 then
-adding V=1 might actually break the build. This is rather
-unexpected.
+w jaki spos=C3=B3b docieraj=C4=85 Pa=C5=84stwo do odbiorc=C3=B3w?
 
-Change kernel-doc to not change its behaviour wrt. errors
-(or warnings) when verbose mode is enabled, but rather add
-separate warning flags (and -Wall) for it.
+Tworzymy pot=C4=99=C5=BCne narz=C4=99dzia sprzeda=C5=BCy, kt=C3=B3re pozw=
+alaj=C4=85 kompleksowo rozwi=C4=85za=C4=87 problemy potencjalnych klient=C3=
+=B3w i skutecznie wp=C5=82yn=C4=85=C4=87 na ich decyzje zakupowe.=20
 
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
----
- scripts/kernel-doc | 41 ++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 36 insertions(+), 5 deletions(-)
+Skupiamy si=C4=99 na Pa=C5=84stwa potrzebach zwi=C4=85zanych z obs=C5=82u=
+g=C4=85 sklepu, oczekiwaniach i planach sprzeda=C5=BCowych. Szczeg=C3=B3=C5=
+=82owo dopasowujemy grafik=C4=99, funkcjonalno=C5=9Bci, struktur=C4=99 i =
+mikrointerakcje do Pa=C5=84stwa grupy docelowej, co przek=C5=82ada si=C4=99=
+ na oczekiwane rezultaty.
 
-diff --git a/scripts/kernel-doc b/scripts/kernel-doc
-index 2486689ffc7b..1eb1819fbe13 100755
---- a/scripts/kernel-doc
-+++ b/scripts/kernel-doc
-@@ -23,7 +23,7 @@ kernel-doc - Print formatted kernel documentation to stdout
- 
- =head1 SYNOPSIS
- 
-- kernel-doc [-h] [-v] [-Werror]
-+ kernel-doc [-h] [-v] [-Werror] [-Wreturn] [-Wshort-description] [-Wcontents-before-sections] [-Wall]
-    [ -man |
-      -rst [-sphinx-version VERSION] [-enable-lineno] |
-      -none
-@@ -133,6 +133,9 @@ my $dohighlight = "";
- 
- my $verbose = 0;
- my $Werror = 0;
-+my $Wreturn = 0;
-+my $Wshort_desc = 0;
-+my $Wcontents_before_sections = 0;
- my $output_mode = "rst";
- my $output_preformatted = 0;
- my $no_doc_sections = 0;
-@@ -191,6 +194,24 @@ if (defined($ENV{'KDOC_WERROR'})) {
- 	$Werror = "$ENV{'KDOC_WERROR'}";
- }
- 
-+if (defined($ENV{'KDOC_WRETURN'})) {
-+	$Wreturn = "$ENV{'KDOC_WRETURN'}";
-+}
-+
-+if (defined($ENV{'KDOC_WSHORT_DESC'})) {
-+	$Wshort_desc = "$ENV{'KDOC_WSHORT_DESC'}";
-+}
-+
-+if (defined($ENV{'KDOC_WCONTENTS_BEFORE_SECTION'})) {
-+	$Wcontents_before_sections = "$ENV{'KDOC_WCONTENTS_BEFORE_SECTION'}";
-+}
-+
-+if (defined($ENV{'KDOC_WALL'})) {
-+	$Wreturn = "$ENV{'KDOC_WALL'}";
-+	$Wshort_desc = "$ENV{'KDOC_WALL'}";
-+	$Wcontents_before_sections = "$ENV{'KDOC_WALL'}";
-+}
-+
- # Generated docbook code is inserted in a template at a point where
- # docbook v3.1 requires a non-zero sequence of RefEntry's; see:
- # https://www.oasis-open.org/docbook/documentation/reference/html/refentry.html
-@@ -318,6 +339,16 @@ while ($ARGV[0] =~ m/^--?(.*)/) {
- 	$verbose = 1;
-     } elsif ($cmd eq "Werror") {
- 	$Werror = 1;
-+    } elsif ($cmd eq "Wreturn") {
-+	$Wreturn = 1;
-+    } elsif ($cmd eq "Wshort-desc") {
-+	$Wshort_desc = 1;
-+    } elsif ($cmd eq "Wcontents-before-sections") {
-+	$Wcontents_before_sections = 1;
-+    } elsif ($cmd eq "Wall") {
-+        $Wreturn = 1;
-+        $Wshort_desc = 1;
-+	$Wcontents_before_sections = 1;
-     } elsif (($cmd eq "h") || ($cmd eq "help")) {
- 		pod2usage(-exitval => 0, -verbose => 2);
-     } elsif ($cmd eq 'no-doc-sections') {
-@@ -1748,9 +1779,9 @@ sub dump_function($$) {
-     # This check emits a lot of warnings at the moment, because many
-     # functions don't have a 'Return' doc section. So until the number
-     # of warnings goes sufficiently down, the check is only performed in
--    # verbose mode.
-+    # -Wreturn mode.
-     # TODO: always perform the check.
--    if ($verbose && !$noret) {
-+    if ($Wreturn && !$noret) {
- 	    check_return_section($file, $declaration_name, $return_type);
-     }
- 
-@@ -2054,7 +2085,7 @@ sub process_name($$) {
- 	    $state = STATE_NORMAL;
- 	}
- 
--	if (($declaration_purpose eq "") && $verbose) {
-+	if (($declaration_purpose eq "") && $Wshort_desc) {
- 	    emit_warning("${file}:$.", "missing initial short description on line:\n$_");
- 	}
- 
-@@ -2103,7 +2134,7 @@ sub process_body($$) {
- 	}
- 
- 	if (($contents ne "") && ($contents ne "\n")) {
--	    if (!$in_doc_sect && $verbose) {
-+	    if (!$in_doc_sect && $Wcontents_before_sections) {
- 		emit_warning("${file}:$.", "contents before sections\n");
- 	    }
- 	    dump_section($file, $section, $contents);
--- 
-2.40.1
+Ch=C4=99tnie przedstawi=C4=99 dotychczasowe realizacje, aby mogli Pa=C5=84=
+stwo przekona=C4=87 si=C4=99 o naszych mo=C5=BCliwo=C5=9Bciach. Mog=C4=99=
+ si=C4=99 skontaktowa=C4=87?
 
+
+Pozdrawiam
+Kamil Durjasz
