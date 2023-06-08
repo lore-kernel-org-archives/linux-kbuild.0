@@ -2,36 +2,36 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46C23C7EE23
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E90A8C7EE45
 	for <linux-kbuild@archiver.kernel.org>; Thu,  8 Jun 2023 14:25:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237137AbjFHOZU (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 8 Jun 2023 10:25:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56004 "EHLO
+        id S237151AbjFHOZV (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 8 Jun 2023 10:25:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237059AbjFHOZI (ORCPT
+        with ESMTP id S237097AbjFHOZI (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Thu, 8 Jun 2023 10:25:08 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 901472D71;
-        Thu,  8 Jun 2023 07:24:51 -0700 (PDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E6202D6A;
+        Thu,  8 Jun 2023 07:24:53 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C6DA164E17;
-        Thu,  8 Jun 2023 14:24:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EED04C4339E;
-        Thu,  8 Jun 2023 14:24:43 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2C75264E2B;
+        Thu,  8 Jun 2023 14:24:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52D36C4339E;
+        Thu,  8 Jun 2023 14:24:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686234285;
-        bh=wDZYNwqiVuH0V8gWt3bQO0dgJiIU1kJv/naJ4wK8eyk=;
+        s=k20201202; t=1686234288;
+        bh=Ap3GuMqINZf2WdIT1xsNL1OzEvsLgkbr6RhrjaSFN2U=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=f5eyupytjMru7y+zKUf+neYzJmNN/qDO1yks3ibrmWIyBDDfHdmEMPqrYbXFoFRml
-         v4TPOg+NVeepAQ1LJ6RVR7SLOICOQX/jjZJcdkdTiQmC8iNB+OpHFL0zLOWYqZul1/
-         Q0Ly5ObC4xq67L546vHmIP0i6cxu7vfIMochFxeJPeT3C2XSvLfO9KGd6DY29ox1mb
-         YvYgTXPTmh8OaTNxbFNY+/5HBoNxoOlwFPT6JPlv2dx5kfTPf/WU+inMIqbgbzOfp5
-         MrSn9fanDBshrjHHZnrj08MUM2hZr+ZGS37CBpsF2ci09sxbD85hP87bqjm4q2RU1B
-         pOiNv7OmW3usg==
+        b=E/ppkNpUa1T5/FB+OZN82dq2UDzQIyU5Cbo8U3TTO4UUNzBPXl51gEj6FYXPHd0C0
+         B8fBUUD/WnNo6CND5zxE7A91YlNR8D75vEQqCmvaXDREUZMvckx6QEyeAr2D8LRUg6
+         mTEF3tCzZrWR/Bz+RWDK09Bl8RxWyDtiAseu46h6FEXk+pM2XpyEbH01OEkUhVaYt3
+         N6AWER4bq6Z6hZwWxZc4TOIfkzhSS9PaCantt/xrBbkDTIhgc/96+WPERBmKn2RSCz
+         ItV8rK4Zh871ZfPPMNhWASgocY09hJn0uporPngp75NKd2+x//eEWrcaAry+aGCdFy
+         ehyl0GtZu4Lag==
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
@@ -40,9 +40,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Nicolas Schier <nicolas@fjasle.eu>,
         linux-um@lists.infradead.org,
         Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v7 05/11] modpost: check static EXPORT_SYMBOL* by modpost again
-Date:   Thu,  8 Jun 2023 23:24:22 +0900
-Message-Id: <20230608142428.256985-6-masahiroy@kernel.org>
+Subject: [PATCH v7 07/11] modpost: use null string instead of NULL pointer for default namespace
+Date:   Thu,  8 Jun 2023 23:24:24 +0900
+Message-Id: <20230608142428.256985-8-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230608142428.256985-1-masahiroy@kernel.org>
 References: <20230608142428.256985-1-masahiroy@kernel.org>
@@ -52,175 +52,87 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Commit 31cb50b5590f ("kbuild: check static EXPORT_SYMBOL* by script
-instead of modpost") moved the static EXPORT_SYMBOL* check from the
-mostpost to a shell script because I thought it must be checked per
-compilation unit to avoid false negatives.
+The default namespace is the null string, "".
 
-I came up with an idea to do this in modpost, against combined ELF
-files. The relocation entries in ELF will find the correct exported
-symbol even if there exist symbols with the same name in different
-compilation units.
+When set, the null string "" is converted to NULL:
 
-Again, the same sample code.
+  s->namespace = namespace[0] ? NOFAIL(strdup(namespace)) : NULL;
 
-  Makefile:
+When printed, the NULL pointer is get back to the null string:
 
-    obj-y += foo1.o foo2.o
+  sym->namespace ?: ""
 
-  foo1.c:
+This saves 1 byte memory allocated for "", but loses the readability.
 
-    #include <linux/export.h>
-    static void foo(void) {}
-    EXPORT_SYMBOL(foo);
+In kernel-space, we strive to save memory, but modpost is a userspace
+tool used to build the kernel. On modern systems, such small piece of
+memory is not a big deal.
 
-  foo2.c:
-
-    void foo(void) {}
-
-Then, modpost can catch it correctly.
-
-    MODPOST Module.symvers
-  ERROR: modpost: vmlinux: local symbol 'foo' was exported
+Handle the namespace string as is.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 ---
 
-(no changes since v6)
+ scripts/mod/modpost.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
 
-Changes in v6:
-  - Make the symbol name in the warning more precise
-
- scripts/Makefile.build     |  4 ---
- scripts/check-local-export | 70 --------------------------------------
- scripts/mod/modpost.c      |  7 ++++
- 3 files changed, 7 insertions(+), 74 deletions(-)
- delete mode 100755 scripts/check-local-export
-
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 6bf026a304e4..bd4123795299 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -220,8 +220,6 @@ cmd_gen_ksymdeps = \
- 	$(CONFIG_SHELL) $(srctree)/scripts/gen_ksymdeps.sh $@ >> $(dot-target).cmd
- endif
- 
--cmd_check_local_export = $(srctree)/scripts/check-local-export $@
--
- ifneq ($(findstring 1, $(KBUILD_EXTRA_WARN)),)
- cmd_warn_shared_object = $(if $(word 2, $(modname-multi)),$(warning $(kbuild-file): $*.o is added to multiple modules: $(modname-multi)))
- endif
-@@ -229,7 +227,6 @@ endif
- define rule_cc_o_c
- 	$(call cmd_and_fixdep,cc_o_c)
- 	$(call cmd,gen_ksymdeps)
--	$(call cmd,check_local_export)
- 	$(call cmd,checksrc)
- 	$(call cmd,checkdoc)
- 	$(call cmd,gen_objtooldep)
-@@ -241,7 +238,6 @@ endef
- define rule_as_o_S
- 	$(call cmd_and_fixdep,as_o_S)
- 	$(call cmd,gen_ksymdeps)
--	$(call cmd,check_local_export)
- 	$(call cmd,gen_objtooldep)
- 	$(call cmd,gen_symversions_S)
- 	$(call cmd,warn_shared_object)
-diff --git a/scripts/check-local-export b/scripts/check-local-export
-deleted file mode 100755
-index 969a313b9299..000000000000
---- a/scripts/check-local-export
-+++ /dev/null
-@@ -1,70 +0,0 @@
--#!/bin/sh
--# SPDX-License-Identifier: GPL-2.0-only
--#
--# Copyright (C) 2022 Masahiro Yamada <masahiroy@kernel.org>
--# Copyright (C) 2022 Owen Rafferty <owen@owenrafferty.com>
--#
--# Exit with error if a local exported symbol is found.
--# EXPORT_SYMBOL should be used for global symbols.
--
--set -e
--pid=$$
--
--# If there is no symbol in the object, ${NM} (both GNU nm and llvm-nm) shows
--# 'no symbols' diagnostic (but exits with 0). It is harmless and hidden by
--# '2>/dev/null'. However, it suppresses real error messages as well. Add a
--# hand-crafted error message here.
--#
--# TODO:
--# Use --quiet instead of 2>/dev/null when we upgrade the minimum version of
--# binutils to 2.37, llvm to 13.0.0.
--# Then, the following line will be simpler:
--#   { ${NM} --quiet ${1} || kill 0; } |
--
--{ ${NM} ${1} 2>/dev/null || { echo "${0}: ${NM} failed" >&2; kill $pid; } } |
--${AWK} -v "file=${1}" '
--BEGIN {
--	i = 0
--}
--
--# Skip the line if the number of fields is less than 3.
--#
--# case 1)
--#   For undefined symbols, the first field (value) is empty.
--#   The outout looks like this:
--#     "                 U _printk"
--#   It is unneeded to record undefined symbols.
--#
--# case 2)
--#   For Clang LTO, llvm-nm outputs a line with type t but empty name:
--#     "---------------- t"
--!length($3) {
--	next
--}
--
--# save (name, type) in the associative array
--{ symbol_types[$3]=$2 }
--
--# append the exported symbol to the array
--($3 ~ /^__export_symbol_(gpl)?_.*/) {
--	export_symbols[i] = $3
--	sub(/^__export_symbol_(gpl)?_/, "", export_symbols[i])
--	i++
--}
--
--END {
--	exit_code = 0
--	for (j = 0; j < i; ++j) {
--		name = export_symbols[j]
--		# nm(3) says "If lowercase, the symbol is usually local"
--		if (symbol_types[name] ~ /[a-z]/) {
--			printf "%s: error: local symbol %s was exported\n",
--				file, name | "cat 1>&2"
--			exit_code = 1
--		}
--	}
--
--	exit exit_code
--}'
--
--exit $?
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 0ae6c9c5bdf6..a3185ee6ec1a 100644
+index 4b0a009de0fb..7044b257424a 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -1217,6 +1217,13 @@ static void check_export_symbol(struct module *mod, struct elf_info *elf,
- 		return;
- 	}
+@@ -300,6 +300,13 @@ static bool contains_namespace(struct list_head *head, const char *namespace)
+ {
+ 	struct namespace_list *list;
  
-+	if (ELF_ST_BIND(sym->st_info) != STB_GLOBAL &&
-+	    ELF_ST_BIND(sym->st_info) != STB_WEAK) {
-+		error("%s: local symbol '%s' was exported\n", mod->name,
-+		      label_name + strlen(prefix));
-+		return;
-+	}
++	/*
++	 * The default namespace is null string "", which is always implicitly
++	 * contained.
++	 */
++	if (!namespace[0])
++		return true;
 +
- 	if (strcmp(label_name + strlen(prefix), name)) {
- 		error("%s: .export_symbol section references '%s', but it does not seem to be an export symbol\n",
- 		      mod->name, name);
+ 	list_for_each_entry(list, head, list) {
+ 		if (!strcmp(list->namespace, namespace))
+ 			return true;
+@@ -369,7 +376,7 @@ static struct symbol *sym_add_exported(const char *name, struct module *mod,
+ 	s = alloc_symbol(name);
+ 	s->module = mod;
+ 	s->is_gpl_only = gpl_only;
+-	s->namespace = namespace[0] ? NOFAIL(strdup(namespace)) : NULL;
++	s->namespace = NOFAIL(strdup(namespace));
+ 	list_add_tail(&s->list, &mod->exported_symbols);
+ 	hash_add_symbol(s);
+ 
+@@ -1823,8 +1830,7 @@ static void check_exports(struct module *mod)
+ 		else
+ 			basename = mod->name;
+ 
+-		if (exp->namespace &&
+-		    !contains_namespace(&mod->imported_namespaces, exp->namespace)) {
++		if (!contains_namespace(&mod->imported_namespaces, exp->namespace)) {
+ 			modpost_log(allow_missing_ns_imports ? LOG_WARN : LOG_ERROR,
+ 				    "module %s uses symbol %s from namespace %s, but does not import it.\n",
+ 				    basename, exp->name, exp->namespace);
+@@ -1910,8 +1916,7 @@ static void add_exported_symbols(struct buffer *buf, struct module *mod)
+ 	list_for_each_entry(sym, &mod->exported_symbols, list)
+ 		buf_printf(buf, "KSYMTAB_%s(%s, \"%s\", \"%s\");\n",
+ 			   sym->is_func ? "FUNC" : "DATA", sym->name,
+-			   sym->is_gpl_only ? "_gpl" : "",
+-			   sym->namespace ?: "");
++			   sym->is_gpl_only ? "_gpl" : "", sym->namespace);
+ 
+ 	if (!modversions)
+ 		return;
+@@ -2179,7 +2184,7 @@ static void write_dump(const char *fname)
+ 			buf_printf(&buf, "0x%08x\t%s\t%s\tEXPORT_SYMBOL%s\t%s\n",
+ 				   sym->crc, sym->name, mod->name,
+ 				   sym->is_gpl_only ? "_GPL" : "",
+-				   sym->namespace ?: "");
++				   sym->namespace);
+ 		}
+ 	}
+ 	write_buf(&buf, fname);
 -- 
 2.39.2
 
