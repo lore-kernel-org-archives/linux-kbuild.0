@@ -2,85 +2,75 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77E12C7EE2E
-	for <linux-kbuild@archiver.kernel.org>; Fri,  9 Jun 2023 08:43:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABFDAC7EE37
+	for <linux-kbuild@archiver.kernel.org>; Fri,  9 Jun 2023 08:46:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239457AbjFIInH (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 9 Jun 2023 04:43:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47340 "EHLO
+        id S230379AbjFIIqy (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 9 Jun 2023 04:46:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241052AbjFIImr (ORCPT
+        with ESMTP id S238515AbjFIIqx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 9 Jun 2023 04:42:47 -0400
+        Fri, 9 Jun 2023 04:46:53 -0400
 Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:191:4433::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E540B1BD3;
-        Fri,  9 Jun 2023 01:42:45 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D32F0E47;
+        Fri,  9 Jun 2023 01:46:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-        Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+        d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Content-Type:Sender
         :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-        Resent-Cc:Resent-Message-ID; bh=XD9OkuqOMsNTdtH8ubJ6y9hV2Du3mkBOHolDgReSNN4=;
-        t=1686300166; x=1687509766; b=nVIuZiOlZucVrHZ+tc3TICiIHKUAUy2Esi9vKnD9Y11kBVx
-        qysRcVw5XfsNGSOdsIf3oLqAOCzVxdvyiBpyb6m0tiJOmZrGH2mWpOEH0TQnjhRZh/jl1wb5jaSO2
-        LSYH4FS7W8koTyzqpSA4uNp10GX/N/NUBHNfgE0gVAcy+43aTxnP5HIbh9TSFObf0ruS25Lunemhk
-        0WzJNLkqV+D73GgPRoVjJII3YmnckXsVYcSb2k2y0hpX9d9sIANkM7KqHwW4XT/iDyuwTyduRl8a+
-        MebfGJ6dWshuk+rO87w2/baudp0uiFyUPGy1HRCwOaUSepqDa3V3KtNXPNbEVtnQ==;
+        Resent-Cc:Resent-Message-ID; bh=8c8LFaF/+nfjR8FUn1SGTVmbBSqzu+xt6KI9vgP+uZQ=;
+        t=1686300408; x=1687510008; b=CvKa8vYe+22wXjpUl/Gyv7C2id9YYbYIlQlfkpEqQzSnL7B
+        hnH9kKeKkj7zp68MoHo7D+2IHyZne2BECJy7/BCSGUdiKIQBKRS4yM0wnbd/rA3bVU3mmKilRvmEX
+        0lziAhzVb2cP+pGyAOqSAF06WuuIBOWg7RJPxLKegSK+v/l7AIU1zzdA4DQTXu4MkKhys3wNmAs9T
+        JhN/QXnP5QFlbnOHLK1ummdEP3xOkbU5ox8jazQuG9DHjaQwVeKUc9McIUPRYw8yHGOyxMRUrPPSd
+        DzpQQQQtrD5EfxmR8zUNWQ15oMGIJg7nzrMZIVchY0pfivMrgUavXAi/34BlEiPw==;
 Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
         (Exim 4.96)
         (envelope-from <johannes@sipsolutions.net>)
-        id 1q7Xhk-000sTj-0B;
-        Fri, 09 Jun 2023 10:42:44 +0200
-Message-ID: <4d93871f8b87c9d1e384f52619fe14433c5bc6a0.camel@sipsolutions.net>
-Subject: Re: [PATCH v2 1/2] kernel-doc: don't let V=1 change outcome
+        id 1q7Xle-000seH-03;
+        Fri, 09 Jun 2023 10:46:46 +0200
 From:   Johannes Berg <johannes@sipsolutions.net>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>
-Date:   Fri, 09 Jun 2023 10:42:42 +0200
-In-Reply-To: <CAK7LNAROju1ob-5VKEsu_UOfCNoMRE-QU27JE3Ndh-M7pBraSw@mail.gmail.com>
-References: <20230606105706.60807b85ff79.I21ab3b54eeebd638676bead3b2f87417944e44f3@changeid>
-         <CAK7LNASe+HWuufyANGJJ0dajzSC4LFy=x2N6erGis0+ZQkAAXA@mail.gmail.com>
-         <2017a6dba12cc7cd05aec33e8066cb7038a89a31.camel@sipsolutions.net>
-         <CAK7LNAROju1ob-5VKEsu_UOfCNoMRE-QU27JE3Ndh-M7pBraSw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.3 (3.48.3-1.fc38) 
+To:     linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        linux-doc@vger.kernel.org
+Cc:     Johannes Berg <johannes.berg@intel.com>
+Subject: [PATCH v3 2/2] kbuild: enable kernel-doc -Wall for W=2
+Date:   Fri,  9 Jun 2023 10:46:42 +0200
+Message-Id: <20230609104642.170be0ce1cf2.Ibd08cad396b630b68d93b2469905ad55b375af65@changeid>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20230609104642.0a5f030f59a5.I21ab3b54eeebd638676bead3b2f87417944e44f3@changeid>
+References: <20230609104642.0a5f030f59a5.I21ab3b54eeebd638676bead3b2f87417944e44f3@changeid>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Thu, 2023-06-08 at 08:51 +0900, Masahiro Yamada wrote:
-> >=20
-> > > cmd_checkdoc =3D $(srctree)/scripts/kernel-doc -none \
-> > >               $(KDOCFLAGS)
-> > >=20
-> > >=20
-> > > Then, users can do
-> > >=20
-> > >   $ make KDOCFLAGS=3D-Wall
-> > >   $ make KDOCFLAGS=3D-Wreturn
-> >=20
-> > I'd rather call it KDOC_FLAGS if you don't mind to align with
-> > KDOC_WERROR which we have already, but sure, can do.
->=20
->=20
-> I just tried to be consistent with
-> CPPFLAGS, CFLAGS, AFLAGS, CHECKFLAGS etc.
-> (CHECKFLAGS is for sparse) because
-> you apparently mimick compiler flags in kernel-doc.
+From: Johannes Berg <johannes.berg@intel.com>
 
+For W=2, we can enable more kernel-doc warnings,
+such as missing return value descriptions etc.
 
-OK, sure, works for me. I made it mimic compiler flags because it was
-already doing it for -Werror :)
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+---
+ scripts/Makefile.build | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-> BTW, kernel-doc is invoked from Documentation/Makefile too.
->=20
-> Do we need to pass the same flags to both of them?
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index a0b4fb58201c..ddd644bd032d 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -101,7 +101,9 @@ else ifeq ($(KBUILD_CHECKSRC),2)
+ endif
+ 
+ ifneq ($(KBUILD_EXTRA_WARN),)
+-  cmd_checkdoc = $(srctree)/scripts/kernel-doc -none $(KDOCFLAGS) $<
++  cmd_checkdoc = $(srctree)/scripts/kernel-doc -none $(KDOCFLAGS) \
++        $(if $(findstring 2, $(KBUILD_EXTRA_WARN)), -Wall) \
++        $<
+ endif
+ 
+ # Compile C sources (.c)
+-- 
+2.40.1
 
-It doesn't look like we _can_ in that case, at least not from the build
-system, it'd have to be in kerneldoc.py or something. I also didn't
-think it was that important, so I left it.
-
-johannes
