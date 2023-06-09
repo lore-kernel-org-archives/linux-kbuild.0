@@ -2,191 +2,90 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19B2EC7EE2E
-	for <linux-kbuild@archiver.kernel.org>; Fri,  9 Jun 2023 08:46:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91C39C7EE25
+	for <linux-kbuild@archiver.kernel.org>; Fri,  9 Jun 2023 09:59:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239559AbjFIIq4 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 9 Jun 2023 04:46:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49872 "EHLO
+        id S241300AbjFIJ7C (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 9 Jun 2023 05:59:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239153AbjFIIqy (ORCPT
+        with ESMTP id S241413AbjFIJ6I (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 9 Jun 2023 04:46:54 -0400
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:191:4433::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 962471730;
-        Fri,  9 Jun 2023 01:46:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-        Message-Id:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
-        Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
-        Resent-Message-ID:In-Reply-To:References;
-        bh=rYsZ7NUM9QnsnZDvOA2XVbvmpJGN8lxYjvG/P+i1FWY=; t=1686300408; x=1687510008; 
-        b=HqA2KMqsn9ICFDaWj4YroeLzOFnG0XLVJeQiIglFG9YZAwT7CreIyStCebg+ylxuZcCE5/zCLpr
-        gy4rdI+WZc01zd5d8rN+6JiN33VruWNL4oiIEo1paR9WxOFUouKKl8pIfpF1Gx5sJ32qCB1/hGj5Q
-        WxuvUC9ls050/93+6jGhhsIRhvgD04qhOdtsVfM+KwTnia2x5PlY/RkUDgNGyGPusk5p6eovVsmzY
-        LIKRsXi7icdf+fCJ0BhMkii0www8oJsmNBKRGwKNGIveZIOTRO/piu/VxhIX92EpENLhAZLPLbGod
-        gSn9PAMs8cR91ErEj7Ld7QERZWyDF2YpB3nQ==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-        (Exim 4.96)
-        (envelope-from <johannes@sipsolutions.net>)
-        id 1q7Xld-000seH-1T;
-        Fri, 09 Jun 2023 10:46:45 +0200
-From:   Johannes Berg <johannes@sipsolutions.net>
-To:     linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        linux-doc@vger.kernel.org
-Cc:     Johannes Berg <johannes.berg@intel.com>
-Subject: [PATCH v3 1/2] kernel-doc: don't let V=1 change outcome
-Date:   Fri,  9 Jun 2023 10:46:41 +0200
-Message-Id: <20230609104642.0a5f030f59a5.I21ab3b54eeebd638676bead3b2f87417944e44f3@changeid>
-X-Mailer: git-send-email 2.40.1
+        Fri, 9 Jun 2023 05:58:08 -0400
+Received: from sonic303-20.consmr.mail.sg3.yahoo.com (sonic303-20.consmr.mail.sg3.yahoo.com [106.10.242.37])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E3B44EEB
+        for <linux-kbuild@vger.kernel.org>; Fri,  9 Jun 2023 02:50:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1686304237; bh=9nzxW6B/MvFhAP50ZbSiMFWUt0MzxUGDbu3YVmfcIxw=; h=Date:From:Reply-To:To:In-Reply-To:References:Subject:From:Subject:Reply-To; b=l732Kgw3EbFpq/Pu06+k9m4EjVoW1v+s1/LgDmMOmoSml1ZmF5lxgSWhIWdyZBP3kqcDhoBS/UrGLtXPosx4RcDXZ3HSP37/zHjDIpTFV6ak8HQXDXTNJJQ6KD/UDZF9mc4SUreYwDF6Ue9PkxSxeBVrtTRy2BGyjkCLDze/uG/wM+NOz6Gd2E7swkyfugcPrVhI9VA0vjM7UjR4SjVv/djLnNg61jECO7YKReEXAlNagf16Ed1ZlesHK47+OMsS5xpQnY9D7CodaoY0PvcyhkTesWNXsurNwDUF7fY3arM6ypHNzhCIUJfzBinELamE0NTJhroEvOhLHXcdNMcWWQ==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1686304237; bh=P+YJ3QyJrAA9FG4mDiD1DyTl8WeLkk3nLQEd3itbQqh=; h=X-Sonic-MF:Date:From:To:Subject:From:Subject; b=TzNHa0siP+RXMYf8LSWOBdMLnipfT5Tqo4CTJJwWwwX5JlPvATBUMOMv8SjZ29T8h0QwuL3xoVDdehnbzHGrU4BQBvNGL9wqvVNmHTz77p7kBxZhUpmUu0/VpiW3tvXJMQXcgNRq1tjSEUtVMHCDLZyh7G193X0Ag9O1cT6PccDssiZW4PPI1xZikq8YtfLXGn1fFH1C/dOpFMT5wCSRy9UC95KLhlhh8Kb7ZHrELKCsFAZ/r/8okKj1WQJv75p7oJ4WPz/PTG3PHV2dpukZw2qWa+DyC1pfhYspvwUPVBfxYUP4pQ5w/k+5bi+9OlqKblUwIXVZlXuy+UGnzV4HCQ==
+X-YMail-OSG: o4As8.MVM1lPG9QjPmcqlU0.W1jiNZZIZUoOlkhWYEmzAAOSEWyDHzTbBU42rKA
+ T2r8l_TXJJzbiYkbs4iwxajn02J3B83ua93B3VNvbnT7_gNcVEBdrOuyHkdjSmN2Af_kSgFtqowR
+ 7F_5kh0IWdSVnqe0JCkaoIJ7ZqM4C14JUROcEXYH3ZcpD1tlgqXe7x.0H3m5gCNYIecNkTCVSs_z
+ a2zT0x8SAQZAxOU5p0GY2avADdO8fDwe1bUuCRoYrdFyHp743V1NtxNIBSR7Rd7N2pzkMl89UIQ9
+ MRHycds3UzsHp6xLI._ar3wkIuUe7M84fQqIZKNxCSrs8f3vO9ZxV0m8ZV7fn8KsuvkJzOWIvNc4
+ JgwAHJTftFaF90KQo5L0dt.OgGOSn2bdaNUPR0cX1.7Z6meBLNAUGCmFQNEmJrPEK4CMjQeHboyu
+ tPkOQkEMDZWnzRYOU6xhISMo6VZcbD5O1gmPt.GDWX0RgPI6i33qvzfeCkNWZzDqcv02z1rXCtuB
+ Spd7rKav1lfqNVcKozFkO.EqkI74hiF1jn0LPy3TMzuqpXtXbp6BliyiXctAA.mDcjh_H05Dgc9m
+ lcRCC4mOt7KM256P1fhcOGwCWmMbuXnE.RKhSyUOwls8HYNauJeOj89gvle3p7S2qNankPwRjU0d
+ PFzWHtZKllU0wIIcfzBE7wffIay06.83V7KE2BT3x.MHx9fMkdWvm1Ppdu5zAZIs70b6q9VhJevp
+ JMiB2hyX4Uz9XEeZkeCVtalh2QsIQEoi5M9OZTDPcKA5YM7OJ2ez1GgCoUW1dHkWzwU_Qq4ia99G
+ sqkxCytvP4Li6HWeldxIA2KDdRfmj8zF6m1NZA8SaeJwjv8Mseg27A8uVrGoyxC6PMp_tD9MN3WV
+ ixPxE8Y0NqQDIWPj8exGMFcSU0PxaaJwyrwI6EXPeguuVWI_1DBRQ.03tKEbMaA1wwQBnqVOEGZ.
+ 309KDKkkgiaqMojbT_z7YNGvj4u58pSr8A3giyzVnb9kKRA9kHSWzMZoRz9Sdba4m_lZkz4P.AM_
+ CxrJPt91J1bA5szWZXHfLtBPfHFXRyZG__tAu64zZ.SaH6hoNbgxnZ7kz3uMJGDJ0_z4mTmLd8T8
+ lfhsv5avpZRmM6OeRp1PgRNu13xZvpf0p.MiPPHePWGGY9OMpz1mDFL2bQ5IZELCCtKDgFmAD2MA
+ 26een6J0uGkNHDJL4kCjT5kkveQ78sOOmi_RVgNajPWVNLQA0B0YPJiqAjv6SkEicguN6fF.3Fxp
+ H3MC.MvUCx.fZfloF_4S1sA_YP1eVF_.A4xKOjgR1YGCM0oqOfWfx67bWqaYgXAKAC22QUN_LCvo
+ 779qmZ57Ygt0JlGflLJCHC_r_WIHQyrFMFn2dHgRe58h2jotnGw7B7mN3Ea9DFBk0Feyk2oZjcXU
+ D6V8SKgC0dC_9uefC3ATlwFHnFPAfTO8c9aF8jXaas1E6sEUZnI5YCjrzweRkq_JElGcIM1Lk67s
+ EN4w_lfD7ujYMs9vK7ZxFz0Jdz748GaN.NU8rHYezsAW9UDko0EHGPNbcUYBtYgETWAyfehTQFcI
+ uPbviJbkG8TBEh4Rfzb0Sh0SmSmGRbDbTl7o58cB_ui4wqvwzKY1W1FG.fkK5KuflASaVKd1NvvZ
+ hvvW_fF7WUCNTLv2sjZeAlfZ5OqR78AYhNkekRLGZrshOapGVfqg6ePeM82s_hyPUQ._drI2V1iY
+ pWouoaE5n7_.jxJyopURezLjqFAI5yx4tqMgimy9LGi_yo36FObfX9xJQpeGzl_uSSlvNedkdzxr
+ oRwuuzeq6iQDFb8MSaDA2KlHOisIohm9OoyifyDOmeKvlkOr2yRqMp5knQXrdrJntzR_bgGq6PVD
+ OJCZ1DT.7p6cy30vN06pWIMXNUVofuz6H9wAsI07XLvh7XFaFFKP2MD6jlradvCvly9zVL6dyBHs
+ uqbl.Ukh6VUG7Rc3RDwBMiEEN2TLuy4XlUQS4XiUZKrKQPZYJJDXd_X6iY2ivWg6AIGJKvaLrY98
+ 8u20_Tv6DAqrkSRXR7hFfl.Gd8GUis3ABL6YMqZfAXug9xOdsBVpPFUPU0W4jweEcaKrw8LJVUHS
+ zUPKWyr.uT2_F7msZs.GAgog6UUM7Ul6rXbJ0HMMOkWeS9scban1pdX5h8wJv9rICIMCwnU.VXxC
+ 6GC73ayarDtrrSSgLKudknEDGo2bfOwQ4k4ticqcgcOHg3Oh_jThRNfx2eMh33uRSMLL41PnuPRm
+ geqieTP5dywlA.9WFj37_sg8EEchLLwfYd7ShYg0ZpByTqJxY9R9Xb8YCBPY0j3zraRuZblqZe3v
+ 3.juUHE5rfOHcNPOvPs2_KA--
+X-Sonic-MF: <pjp@fedoraproject.org>
+X-Sonic-ID: 7999d4f3-0f2b-4434-addf-82a91b47a7b1
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic303.consmr.mail.sg3.yahoo.com with HTTP; Fri, 9 Jun 2023 09:50:37 +0000
+Date:   Fri, 9 Jun 2023 09:50:32 +0000 (UTC)
+From:   P J P <pjp@fedoraproject.org>
+Reply-To: P J P <pj.pandit@yahoo.co.in>
+To:     Masahiro Yamada <masahiroy@kernel.org>,
+        "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
+Message-ID: <1289987364.1419400.1686304232810@mail.yahoo.com>
+In-Reply-To: <1912422946.266461.1686045667325@mail.yahoo.com>
+References: <1912422946.266461.1686045667325.ref@mail.yahoo.com> <1912422946.266461.1686045667325@mail.yahoo.com>
+Subject: Re: About Kconfig tree
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: WebService/1.1.21516 YMailNorrin
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-From: Johannes Berg <johannes.berg@intel.com>
+Hello Masahiro,
 
-The kernel-doc script currently reports a number of issues
-only in "verbose" mode, but that's initialized from V=1
-(via KBUILD_VERBOSE), so if you use KDOC_WERROR=1 then
-adding V=1 might actually break the build. This is rather
-unexpected.
 
-Change kernel-doc to not change its behaviour wrt. errors
-(or warnings) when verbose mode is enabled, but rather add
-separate warning flags (and -Wall) for it. Allow enabling
-those flags via environment/make variables in the kernel's
-build system for easier user use, but to not have to parse
-them in the script itself.
+* I've been reading linux/scripts/kconfig sources and trying to understand =
+how it works. I'm wondering if we can read Kconfig sources and build a tree=
+/graph structure in memory, which can then be traversed by a user.
 
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+
+* Is there any code/library under scripts/kconfig/ directory which creates =
+such tree/graph data-structure from kconfig source files? Which can be reus=
+ed? OR we'll have to write such a code from scratch?
+
+
+* I'd appreciate your inputs/comments to confirm the same? And any guidance=
+ if we have to write code to create such data-structure.
+
+
+Thank you.
 ---
-v2: - parse environment variables in build system rather than
-      the script itself, as suggested by Masahiro Yamada
-    - fix indentation
-v3: - use a single KDOCFLAGS variable
----
- Documentation/kbuild/kbuild.rst |  6 ++++++
- scripts/Makefile.build          |  2 +-
- scripts/kernel-doc              | 28 +++++++++++++++++++++++-----
- 3 files changed, 30 insertions(+), 6 deletions(-)
-
-diff --git a/Documentation/kbuild/kbuild.rst b/Documentation/kbuild/kbuild.rst
-index 2a22ddb1b848..bd906407e307 100644
---- a/Documentation/kbuild/kbuild.rst
-+++ b/Documentation/kbuild/kbuild.rst
-@@ -150,6 +150,12 @@ the UTS_MACHINE variable, and on some architectures also the kernel config.
- The value of KBUILD_DEBARCH is assumed (not checked) to be a valid Debian
- architecture.
- 
-+KDOCFLAGS
-+---------
-+Specify extra (warning/error) flags for kernel-doc checks during the build,
-+see scripts/kernel-doc for which flags are supported. Note that this doesn't
-+(currently) apply to documentation builds.
-+
- ARCH
- ----
- Set ARCH to the architecture to be built.
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 9f94fc83f086..a0b4fb58201c 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -101,7 +101,7 @@ else ifeq ($(KBUILD_CHECKSRC),2)
- endif
- 
- ifneq ($(KBUILD_EXTRA_WARN),)
--  cmd_checkdoc = $(srctree)/scripts/kernel-doc -none $<
-+  cmd_checkdoc = $(srctree)/scripts/kernel-doc -none $(KDOCFLAGS) $<
- endif
- 
- # Compile C sources (.c)
-diff --git a/scripts/kernel-doc b/scripts/kernel-doc
-index 2486689ffc7b..8f8440870a0f 100755
---- a/scripts/kernel-doc
-+++ b/scripts/kernel-doc
-@@ -23,7 +23,7 @@ kernel-doc - Print formatted kernel documentation to stdout
- 
- =head1 SYNOPSIS
- 
-- kernel-doc [-h] [-v] [-Werror]
-+ kernel-doc [-h] [-v] [-Werror] [-Wall] [-Wreturn] [-Wshort-description] [-Wcontents-before-sections]
-    [ -man |
-      -rst [-sphinx-version VERSION] [-enable-lineno] |
-      -none
-@@ -133,6 +133,9 @@ my $dohighlight = "";
- 
- my $verbose = 0;
- my $Werror = 0;
-+my $Wreturn = 0;
-+my $Wshort_desc = 0;
-+my $Wcontents_before_sections = 0;
- my $output_mode = "rst";
- my $output_preformatted = 0;
- my $no_doc_sections = 0;
-@@ -187,9 +190,14 @@ if (defined($ENV{'KCFLAGS'})) {
- 	}
- }
- 
-+# reading this variable is for backwards compat just in case
-+# someone was calling it with the variable from outside the
-+# kernel's build system
- if (defined($ENV{'KDOC_WERROR'})) {
- 	$Werror = "$ENV{'KDOC_WERROR'}";
- }
-+# other environment variables are converted to command-line
-+# arguments in cmd_checkdoc in the build system
- 
- # Generated docbook code is inserted in a template at a point where
- # docbook v3.1 requires a non-zero sequence of RefEntry's; see:
-@@ -318,6 +326,16 @@ while ($ARGV[0] =~ m/^--?(.*)/) {
- 	$verbose = 1;
-     } elsif ($cmd eq "Werror") {
- 	$Werror = 1;
-+    } elsif ($cmd eq "Wreturn") {
-+	$Wreturn = 1;
-+    } elsif ($cmd eq "Wshort-desc") {
-+	$Wshort_desc = 1;
-+    } elsif ($cmd eq "Wcontents-before-sections") {
-+	$Wcontents_before_sections = 1;
-+    } elsif ($cmd eq "Wall") {
-+        $Wreturn = 1;
-+        $Wshort_desc = 1;
-+        $Wcontents_before_sections = 1;
-     } elsif (($cmd eq "h") || ($cmd eq "help")) {
- 		pod2usage(-exitval => 0, -verbose => 2);
-     } elsif ($cmd eq 'no-doc-sections') {
-@@ -1748,9 +1766,9 @@ sub dump_function($$) {
-     # This check emits a lot of warnings at the moment, because many
-     # functions don't have a 'Return' doc section. So until the number
-     # of warnings goes sufficiently down, the check is only performed in
--    # verbose mode.
-+    # -Wreturn mode.
-     # TODO: always perform the check.
--    if ($verbose && !$noret) {
-+    if ($Wreturn && !$noret) {
- 	    check_return_section($file, $declaration_name, $return_type);
-     }
- 
-@@ -2054,7 +2072,7 @@ sub process_name($$) {
- 	    $state = STATE_NORMAL;
- 	}
- 
--	if (($declaration_purpose eq "") && $verbose) {
-+	if (($declaration_purpose eq "") && $Wshort_desc) {
- 	    emit_warning("${file}:$.", "missing initial short description on line:\n$_");
- 	}
- 
-@@ -2103,7 +2121,7 @@ sub process_body($$) {
- 	}
- 
- 	if (($contents ne "") && ($contents ne "\n")) {
--	    if (!$in_doc_sect && $verbose) {
-+	    if (!$in_doc_sect && $Wcontents_before_sections) {
- 		emit_warning("${file}:$.", "contents before sections\n");
- 	    }
- 	    dump_section($file, $section, $contents);
--- 
-2.40.1
-
+=C2=A0 -Prasad
