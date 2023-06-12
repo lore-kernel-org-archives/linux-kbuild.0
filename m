@@ -2,44 +2,43 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33726C83005
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80EA2C87FE1
 	for <linux-kbuild@archiver.kernel.org>; Mon, 12 Jun 2023 09:56:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235689AbjFLJ4I (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 12 Jun 2023 05:56:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33450 "EHLO
+        id S235704AbjFLJ4J (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 12 Jun 2023 05:56:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229692AbjFLJyR (ORCPT
+        with ESMTP id S231684AbjFLJy2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Jun 2023 05:54:17 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6347649F6;
-        Mon, 12 Jun 2023 02:38:54 -0700 (PDT)
+        Mon, 12 Jun 2023 05:54:28 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2E735FFA;
+        Mon, 12 Jun 2023 02:39:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Content-Type:MIME-Version:References:
+        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:References:
         Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
         Content-ID:Content-Description:In-Reply-To;
-        bh=VyS6fqYhD/n91U5f9GQ+a8R8fakG8EouUVHj8V9PE00=; b=QruMXFdvJIpT6C4xhfbtXQc4F6
-        4BWAt2iZpXnuR4PZL/DqfGiytuUGSiJSOq/8VdBO2EL0m6XzvNtDiKZ1oLWkBo4Fjyp1SCW0HtowW
-        khBwKdFSkOaLE0NRU0h6wppJ/BJQbx6t+fi0YMOq8E+vtMHdfs8eGLnlXdcKkdtjJW1TZjuaLEaOi
-        xRrHYrmW0sm1wBcbePBmYSzXufFebgerY8jxwNA5ArsNL9JCWj7MuCccd5YfoqES1HrUtarXWvNv9
-        rTToGRe669jagMzznnXleX7c296r5JI6WREQfZY9f/DB2/IM2B7t9lrQeaDhqxwYfXOZ/h3jaM8KO
-        MM3mvBbQ==;
+        bh=RF7AlZRmRPruwiE6WSJ8fgsVWKVvpbmYdppCd/KBEkQ=; b=gufB5guI2wjztq+YIlaWdjMhyv
+        3LYfsbSy4unkOyd2ugwudXuVbPkgYZFtkZVII3Xqay+tH7nkG1yTdrFKTcjUHvpAa8Cf37YLpt3E8
+        pDLxbYYLfAa1grWsAGwn5LQLL4FRD+9IBx4VEM4Gmq/oyW3fFf8dLVvIRA7oBGmGxTO7R049FIU1t
+        r4XaxNuX7StfRoeJQ7EQPUjJFlffCIlkZhBv+EjHy6R48CogNzg2OSLrwlw3rCqTLDkgHr+w7wF/Q
+        ZOTFC2+xYVUW9aU01AvEkNjTt06XQEZg/5knH9qw46D4tqiWNFnLETrbsKjwwTivhd6RHKFM2hAvf
+        JA52UjPw==;
 Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1q8e0f-008kOm-0u;
-        Mon, 12 Jun 2023 09:38:49 +0000
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1q8e0l-002NBd-VJ; Mon, 12 Jun 2023 09:38:56 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 29BC6300E86;
-        Mon, 12 Jun 2023 11:38:48 +0200 (CEST)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 27CCF3031BE;
+        Mon, 12 Jun 2023 11:38:53 +0200 (CEST)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
-        id ED20B240FDF93; Mon, 12 Jun 2023 11:38:47 +0200 (CEST)
-Message-ID: <20230612093537.467120754@infradead.org>
+        id A1B8930A77B67; Mon, 12 Jun 2023 11:38:48 +0200 (CEST)
+Message-ID: <20230612093539.682563843@infradead.org>
 User-Agent: quilt/0.66
-Date:   Mon, 12 Jun 2023 11:07:14 +0200
+Date:   Mon, 12 Jun 2023 11:07:43 +0200
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     torvalds@linux-foundation.org, keescook@chromium.org,
         gregkh@linuxfoundation.org, pbonzini@redhat.com
@@ -67,7 +66,7 @@ Cc:     masahiroy@kernel.org, nathan@kernel.org, ndesaulniers@google.com,
         rcu@vger.kernel.org, linux-security-module@vger.kernel.org,
         tglx@linutronix.de, ravi.bangoria@amd.com, error27@gmail.com,
         luc.vanoostenryck@gmail.com
-Subject: [PATCH v3 01/57] dmaengine: ioat: Free up __cleanup() name
+Subject: [PATCH v3 30/57] perf: Simplify: *perf_event_{dis,en}able*()
 References: <20230612090713.652690195@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -75,65 +74,98 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-In order to use __cleanup for __attribute__((__cleanup__(func))) the
-name must not be used for anything else. Avoid the conflict.
 
 Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
- drivers/dma/ioat/dma.c |   12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ kernel/events/core.c |   51 ++++++++++++++++++++++-----------------------------
+ 1 file changed, 22 insertions(+), 29 deletions(-)
 
---- a/drivers/dma/ioat/dma.c
-+++ b/drivers/dma/ioat/dma.c
-@@ -584,11 +584,11 @@ desc_get_errstat(struct ioatdma_chan *io
- }
- 
- /**
-- * __cleanup - reclaim used descriptors
-+ * __ioat_cleanup - reclaim used descriptors
-  * @ioat_chan: channel (ring) to clean
-  * @phys_complete: zeroed (or not) completion address (from status)
-  */
--static void __cleanup(struct ioatdma_chan *ioat_chan, dma_addr_t phys_complete)
-+static void __ioat_cleanup(struct ioatdma_chan *ioat_chan, dma_addr_t phys_complete)
- {
- 	struct ioatdma_device *ioat_dma = ioat_chan->ioat_dma;
- 	struct ioat_ring_ent *desc;
-@@ -675,7 +675,7 @@ static void ioat_cleanup(struct ioatdma_
- 	spin_lock_bh(&ioat_chan->cleanup_lock);
- 
- 	if (ioat_cleanup_preamble(ioat_chan, &phys_complete))
--		__cleanup(ioat_chan, phys_complete);
-+		__ioat_cleanup(ioat_chan, phys_complete);
- 
- 	if (is_ioat_halted(*ioat_chan->completion)) {
- 		u32 chanerr = readl(ioat_chan->reg_base + IOAT_CHANERR_OFFSET);
-@@ -712,7 +712,7 @@ static void ioat_restart_channel(struct
- 
- 	ioat_quiesce(ioat_chan, 0);
- 	if (ioat_cleanup_preamble(ioat_chan, &phys_complete))
--		__cleanup(ioat_chan, phys_complete);
-+		__ioat_cleanup(ioat_chan, phys_complete);
- 
- 	__ioat_restart_chan(ioat_chan);
- }
-@@ -786,7 +786,7 @@ static void ioat_eh(struct ioatdma_chan
- 
- 	/* cleanup so tail points to descriptor that caused the error */
- 	if (ioat_cleanup_preamble(ioat_chan, &phys_complete))
--		__cleanup(ioat_chan, phys_complete);
-+		__ioat_cleanup(ioat_chan, phys_complete);
- 
- 	chanerr = readl(ioat_chan->reg_base + IOAT_CHANERR_OFFSET);
- 	pci_read_config_dword(pdev, IOAT_PCI_CHANERR_INT_OFFSET, &chanerr_int);
-@@ -943,7 +943,7 @@ void ioat_timer_event(struct timer_list
- 		/* timer restarted in ioat_cleanup_preamble
- 		 * and IOAT_COMPLETION_ACK cleared
- 		 */
--		__cleanup(ioat_chan, phys_complete);
-+		__ioat_cleanup(ioat_chan, phys_complete);
- 		goto unlock_out;
+--- a/kernel/events/core.c
++++ b/kernel/events/core.c
+@@ -2415,7 +2415,7 @@ static void __perf_event_disable(struct
+ 		update_cgrp_time_from_event(event);
  	}
  
+-	perf_pmu_disable(event->pmu_ctx->pmu);
++	guard(perf_pmu_disable)(event->pmu_ctx->pmu);
+ 
+ 	if (event == event->group_leader)
+ 		group_sched_out(event, ctx);
+@@ -2424,8 +2424,6 @@ static void __perf_event_disable(struct
+ 
+ 	perf_event_set_state(event, PERF_EVENT_STATE_OFF);
+ 	perf_cgroup_event_disable(event, ctx);
+-
+-	perf_pmu_enable(event->pmu_ctx->pmu);
+ }
+ 
+ /*
+@@ -2446,12 +2444,10 @@ static void _perf_event_disable(struct p
+ {
+ 	struct perf_event_context *ctx = event->ctx;
+ 
+-	raw_spin_lock_irq(&ctx->lock);
+-	if (event->state <= PERF_EVENT_STATE_OFF) {
+-		raw_spin_unlock_irq(&ctx->lock);
+-		return;
++	scoped_guard (raw_spinlock_irq, &ctx->lock) {
++		if (event->state <= PERF_EVENT_STATE_OFF)
++			return;
+ 	}
+-	raw_spin_unlock_irq(&ctx->lock);
+ 
+ 	event_function_call(event, __perf_event_disable, NULL);
+ }
+@@ -2955,32 +2951,29 @@ static void _perf_event_enable(struct pe
+ {
+ 	struct perf_event_context *ctx = event->ctx;
+ 
+-	raw_spin_lock_irq(&ctx->lock);
+-	if (event->state >= PERF_EVENT_STATE_INACTIVE ||
+-	    event->state <  PERF_EVENT_STATE_ERROR) {
+-out:
+-		raw_spin_unlock_irq(&ctx->lock);
+-		return;
+-	}
++	scoped_guard (raw_spinlock_irq, &ctx->lock) {
++		if (event->state >= PERF_EVENT_STATE_INACTIVE ||
++		    event->state <  PERF_EVENT_STATE_ERROR)
++			return;
+ 
+-	/*
+-	 * If the event is in error state, clear that first.
+-	 *
+-	 * That way, if we see the event in error state below, we know that it
+-	 * has gone back into error state, as distinct from the task having
+-	 * been scheduled away before the cross-call arrived.
+-	 */
+-	if (event->state == PERF_EVENT_STATE_ERROR) {
+ 		/*
+-		 * Detached SIBLING events cannot leave ERROR state.
++		 * If the event is in error state, clear that first.
++		 *
++		 * That way, if we see the event in error state below, we know that it
++		 * has gone back into error state, as distinct from the task having
++		 * been scheduled away before the cross-call arrived.
+ 		 */
+-		if (event->event_caps & PERF_EV_CAP_SIBLING &&
+-		    event->group_leader == event)
+-			goto out;
++		if (event->state == PERF_EVENT_STATE_ERROR) {
++			/*
++			 * Detached SIBLING events cannot leave ERROR state.
++			 */
++			if (event->event_caps & PERF_EV_CAP_SIBLING &&
++			    event->group_leader == event)
++				return;
+ 
+-		event->state = PERF_EVENT_STATE_OFF;
++			event->state = PERF_EVENT_STATE_OFF;
++		}
+ 	}
+-	raw_spin_unlock_irq(&ctx->lock);
+ 
+ 	event_function_call(event, __perf_event_enable, NULL);
+ }
 
 
