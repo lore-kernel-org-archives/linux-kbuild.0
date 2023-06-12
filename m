@@ -2,43 +2,44 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5751C7EE25
-	for <linux-kbuild@archiver.kernel.org>; Mon, 12 Jun 2023 09:55:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D38BFC87FDC
+	for <linux-kbuild@archiver.kernel.org>; Mon, 12 Jun 2023 09:55:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235488AbjFLJzw (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 12 Jun 2023 05:55:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33962 "EHLO
+        id S235511AbjFLJzx (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 12 Jun 2023 05:55:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230408AbjFLJyY (ORCPT
+        with ESMTP id S231855AbjFLJyZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Jun 2023 05:54:24 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7806B5FF2;
-        Mon, 12 Jun 2023 02:38:58 -0700 (PDT)
+        Mon, 12 Jun 2023 05:54:25 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A25155FF3;
+        Mon, 12 Jun 2023 02:38:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:References:
+        d=infradead.org; s=desiato.20200630; h=Content-Type:MIME-Version:References:
         Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
         Content-ID:Content-Description:In-Reply-To;
-        bh=tN5fF7Wyh35qBJFCdjEuKMaMwIiqau8XmW0j2x/SMjk=; b=pTQEAHGpF5fz0pLIBta9z8QWvF
-        V3VTKbdm5MrZ6Uq6sIyVOPIlJRamTVCnfvzmEg5CiuDQWZwIOhMu3l9PZQuNwkMb8MTxXwLb05k1F
-        pXKfEwe9Z0i663rYdw9pUPCOE+2AHi/lm0RzSNXMm4U2w1iNa1ZIxBs9afcsQW/V20UMXzYer3WCT
-        zF9DC46u7wLZd3iCRc+AmRVnu9fCua5kGt94sVVOX6RESLLLndvS1OIwmKToKe+pfW/q3/OlKUMUJ
-        NzNjcl62XQoQkQaJg1jmU538/Cwb5EJWwMJr4XxONBZWuSlObMm3Fh7GXzLLBUAOiqFAhv2ZaNNZD
-        zVv+iV3g==;
+        bh=9sqy4wj1SuZG+E1ZOkNDiw8zR5F8T4bHRpYkByM8S6o=; b=HNjtc1kou6jUKrPa93YlSTKipB
+        VhOpXUPSBCgjriMwtuZYiFbSO92NjXbfCsFmRFtzO7yfFSXIVuY/yN+Yj7pGBcnBI5S0hv8fNdtcN
+        //wmbKzY575t4i5oKfCiWpecYl0rAG6BFfdMSjKIXuCRhpuWcyhO2gVcrMTipwAY6sjO79StTEAIQ
+        VC8/ybwDlXuWf1vL/cHd1fVTSgl2eqKrBrD54rFBuftQGd/gu653fosXknQhYF8Op6cNrlThojVpp
+        8VS39gvDd4GbsgBVynRhv46UkSxPgULiSAQIabpdcmA7w8/j+yhjfaJwXT+KXZjarghiosRq198gW
+        o3zyz1kQ==;
 Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1q8e0g-002N98-AY; Mon, 12 Jun 2023 09:38:50 +0000
+        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1q8e0g-008kPB-1k;
+        Mon, 12 Jun 2023 09:38:51 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id D8E9630318E;
-        Mon, 12 Jun 2023 11:38:48 +0200 (CEST)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 0BFFE3031BE;
+        Mon, 12 Jun 2023 11:38:49 +0200 (CEST)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
-        id 416A530A70ADF; Mon, 12 Jun 2023 11:38:48 +0200 (CEST)
-Message-ID: <20230612093538.393498853@infradead.org>
+        id 5832930A77B57; Mon, 12 Jun 2023 11:38:48 +0200 (CEST)
+Message-ID: <20230612093538.712217968@infradead.org>
 User-Agent: quilt/0.66
-Date:   Mon, 12 Jun 2023 11:07:26 +0200
+Date:   Mon, 12 Jun 2023 11:07:30 +0200
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     torvalds@linux-foundation.org, keescook@chromium.org,
         gregkh@linuxfoundation.org, pbonzini@redhat.com
@@ -66,7 +67,7 @@ Cc:     masahiroy@kernel.org, nathan@kernel.org, ndesaulniers@google.com,
         rcu@vger.kernel.org, linux-security-module@vger.kernel.org,
         tglx@linutronix.de, ravi.bangoria@amd.com, error27@gmail.com,
         luc.vanoostenryck@gmail.com
-Subject: [PATCH v3 13/57] sched: Simplify sched_core_cpu_{starting,deactivate}()
+Subject: [PATCH v3 17/57] sched: Simplify yield_to()
 References: <20230612090713.652690195@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -78,99 +79,98 @@ Use guards to reduce gotos and simplify control flow.
 
 Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
- kernel/sched/core.c |   27 ++++++++++++---------------
- 1 file changed, 12 insertions(+), 15 deletions(-)
+ kernel/sched/core.c |   73 ++++++++++++++++++++++------------------------------
+ 1 file changed, 32 insertions(+), 41 deletions(-)
 
 --- a/kernel/sched/core.c
 +++ b/kernel/sched/core.c
-@@ -6331,20 +6331,24 @@ static void queue_core_balance(struct rq
- 	queue_balance_callback(rq, &per_cpu(core_balance_head, rq->cpu), sched_core_balance);
- }
+@@ -8799,55 +8799,46 @@ int __sched yield_to(struct task_struct
+ {
+ 	struct task_struct *curr = current;
+ 	struct rq *rq, *p_rq;
+-	unsigned long flags;
+ 	int yielded = 0;
  
-+DEFINE_LOCK_GUARD_1(core_lock, int,
-+		    sched_core_lock(*_T->lock, &_T->flags),
-+		    sched_core_unlock(*_T->lock, &_T->flags),
-+		    unsigned long flags)
+-	local_irq_save(flags);
+-	rq = this_rq();
++	scoped_guard (irqsave) {
++		rq = this_rq();
+ 
+ again:
+-	p_rq = task_rq(p);
+-	/*
+-	 * If we're the only runnable task on the rq and target rq also
+-	 * has only one task, there's absolutely no point in yielding.
+-	 */
+-	if (rq->nr_running == 1 && p_rq->nr_running == 1) {
+-		yielded = -ESRCH;
+-		goto out_irq;
+-	}
+-
+-	double_rq_lock(rq, p_rq);
+-	if (task_rq(p) != p_rq) {
+-		double_rq_unlock(rq, p_rq);
+-		goto again;
+-	}
+-
+-	if (!curr->sched_class->yield_to_task)
+-		goto out_unlock;
+-
+-	if (curr->sched_class != p->sched_class)
+-		goto out_unlock;
+-
+-	if (task_on_cpu(p_rq, p) || !task_is_running(p))
+-		goto out_unlock;
+-
+-	yielded = curr->sched_class->yield_to_task(rq, p);
+-	if (yielded) {
+-		schedstat_inc(rq->yld_count);
++		p_rq = task_rq(p);
+ 		/*
+-		 * Make p's CPU reschedule; pick_next_entity takes care of
+-		 * fairness.
++		 * If we're the only runnable task on the rq and target rq also
++		 * has only one task, there's absolutely no point in yielding.
+ 		 */
+-		if (preempt && rq != p_rq)
+-			resched_curr(p_rq);
+-	}
++		if (rq->nr_running == 1 && p_rq->nr_running == 1)
++			return -ESRCH;
+ 
+-out_unlock:
+-	double_rq_unlock(rq, p_rq);
+-out_irq:
+-	local_irq_restore(flags);
++		guard(double_rq_lock)(rq, p_rq);
++		if (task_rq(p) != p_rq)
++			goto again;
 +
- static void sched_core_cpu_starting(unsigned int cpu)
- {
- 	const struct cpumask *smt_mask = cpu_smt_mask(cpu);
- 	struct rq *rq = cpu_rq(cpu), *core_rq = NULL;
--	unsigned long flags;
- 	int t;
++		if (!curr->sched_class->yield_to_task)
++			return 0;
++
++		if (curr->sched_class != p->sched_class)
++			return 0;
++
++		if (task_on_cpu(p_rq, p) || !task_is_running(p))
++			return 0;
++
++		yielded = curr->sched_class->yield_to_task(rq, p);
++		if (yielded) {
++			schedstat_inc(rq->yld_count);
++			/*
++			 * Make p's CPU reschedule; pick_next_entity
++			 * takes care of fairness.
++			 */
++			if (preempt && rq != p_rq)
++				resched_curr(p_rq);
++		}
++	}
  
--	sched_core_lock(cpu, &flags);
-+	guard(core_lock)(&cpu);
+-	if (yielded > 0)
++	if (yielded)
+ 		schedule();
  
- 	WARN_ON_ONCE(rq->core != rq);
- 
- 	/* if we're the first, we'll be our own leader */
- 	if (cpumask_weight(smt_mask) == 1)
--		goto unlock;
-+		return;
- 
- 	/* find the leader */
- 	for_each_cpu(t, smt_mask) {
-@@ -6358,7 +6362,7 @@ static void sched_core_cpu_starting(unsi
- 	}
- 
- 	if (WARN_ON_ONCE(!core_rq)) /* whoopsie */
--		goto unlock;
-+		return;
- 
- 	/* install and validate core_rq */
- 	for_each_cpu(t, smt_mask) {
-@@ -6369,29 +6373,25 @@ static void sched_core_cpu_starting(unsi
- 
- 		WARN_ON_ONCE(rq->core != core_rq);
- 	}
--
--unlock:
--	sched_core_unlock(cpu, &flags);
- }
- 
- static void sched_core_cpu_deactivate(unsigned int cpu)
- {
- 	const struct cpumask *smt_mask = cpu_smt_mask(cpu);
- 	struct rq *rq = cpu_rq(cpu), *core_rq = NULL;
--	unsigned long flags;
- 	int t;
- 
--	sched_core_lock(cpu, &flags);
-+	guard(core_lock)(&cpu);
- 
- 	/* if we're the last man standing, nothing to do */
- 	if (cpumask_weight(smt_mask) == 1) {
- 		WARN_ON_ONCE(rq->core != rq);
--		goto unlock;
-+		return;
- 	}
- 
- 	/* if we're not the leader, nothing to do */
- 	if (rq->core != rq)
--		goto unlock;
-+		return;
- 
- 	/* find a new leader */
- 	for_each_cpu(t, smt_mask) {
-@@ -6402,7 +6402,7 @@ static void sched_core_cpu_deactivate(un
- 	}
- 
- 	if (WARN_ON_ONCE(!core_rq)) /* impossible */
--		goto unlock;
-+		return;
- 
- 	/* copy the shared state to the new leader */
- 	core_rq->core_task_seq             = rq->core_task_seq;
-@@ -6424,9 +6424,6 @@ static void sched_core_cpu_deactivate(un
- 		rq = cpu_rq(t);
- 		rq->core = core_rq;
- 	}
--
--unlock:
--	sched_core_unlock(cpu, &flags);
- }
- 
- static inline void sched_core_cpu_dying(unsigned int cpu)
+ 	return yielded;
 
 
