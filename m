@@ -2,43 +2,43 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6B70C88C98
-	for <linux-kbuild@archiver.kernel.org>; Mon, 12 Jun 2023 09:55:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BC7CC7EE25
+	for <linux-kbuild@archiver.kernel.org>; Mon, 12 Jun 2023 09:56:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235593AbjFLJz6 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        id S235612AbjFLJz6 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
         Mon, 12 Jun 2023 05:55:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32892 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233658AbjFLJyq (ORCPT
+        with ESMTP id S229454AbjFLJyb (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Jun 2023 05:54:46 -0400
+        Mon, 12 Jun 2023 05:54:31 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A2624C1C;
-        Mon, 12 Jun 2023 02:39:10 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55F1F6185;
+        Mon, 12 Jun 2023 02:39:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:References:
         Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
         Content-ID:Content-Description:In-Reply-To;
-        bh=EsmTLBQmhx/5yfk2nLo68eqoCP+8wKcpRacytoeqYb0=; b=X3ADuQS8goezGkMNMjigZlzpSL
-        9BE3pznji3+z534OS7SCF+8WM3OVawaER0mluA6toWtSKmGr9OkNt6TrHh1RJ/0f4dm+lr2Mf5B/S
-        /3JsSlVexJtTenPgLTxgl7OtS2wBCdLUZZslGHs0LnouhMoVSNg5EB+NeLeCso9sW7q97yznHM7ah
-        o4Ct9DyDQgiFbgtYKRjAt8b7QprbRIVvzOfFbTpljdDShy2RouyJIW7GmwwP8+M+oOh6V9e+Bi9JD
-        deaMDXMxMZHh+4v1+iWZUWGpEjVtujoC9MJiz7W5KwZalJEMDtXxCCbcKkQ7BU8mDLjYEo1AjNISv
-        G6mcfmnA==;
+        bh=IwZQFShSV/PIl8fTfPc9l4QCHQp32ssy80H3iz5Si2g=; b=n2QBRERGYOTGa4H4UfPiQMxml4
+        DlIa7Bh+E0wy752HUyfCxpdFro63TOC2IKp9jPE5GAfa1mJYpUhJg7mXGYIHTeDn9BySpGXGbyVd3
+        IwJesqbM7Wb3W3h6YpQgJKi2jBSkPrZDWblalKMV6HQ84Jsy2sFXbKyI8rcW+nAOW3dJ/b920m92P
+        rah0RrnGqtwQsyYb1dXy9/e8D1odgIYC+fkV2EbyFFqvSqo9mCNLgutnfVUAg637Ma+mnkR77qzmE
+        PZQFREWg0jB+r3RJ1GGStrlIluYtwark33oMb5t5WyJikLV3GNXnRWJf6oZ44tLapABjEhnCdDKM9
+        42/wgNSw==;
 Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1q8e0u-002NHq-89; Mon, 12 Jun 2023 09:39:04 +0000
+        id 1q8e0l-002NBI-II; Mon, 12 Jun 2023 09:38:55 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 5D259305ECF;
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 23BBA303196;
         Mon, 12 Jun 2023 11:38:53 +0200 (CEST)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
-        id 03E4530A77B79; Mon, 12 Jun 2023 11:38:49 +0200 (CEST)
-Message-ID: <20230612093540.779825032@infradead.org>
+        id 8C04B30A77B63; Mon, 12 Jun 2023 11:38:48 +0200 (CEST)
+Message-ID: <20230612093539.371360635@infradead.org>
 User-Agent: quilt/0.66
-Date:   Mon, 12 Jun 2023 11:07:58 +0200
+Date:   Mon, 12 Jun 2023 11:07:39 +0200
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     torvalds@linux-foundation.org, keescook@chromium.org,
         gregkh@linuxfoundation.org, pbonzini@redhat.com
@@ -66,7 +66,7 @@ Cc:     masahiroy@kernel.org, nathan@kernel.org, ndesaulniers@google.com,
         rcu@vger.kernel.org, linux-security-module@vger.kernel.org,
         tglx@linutronix.de, ravi.bangoria@amd.com, error27@gmail.com,
         luc.vanoostenryck@gmail.com
-Subject: [PATCH v3 45/57] perf: Simplify perf_event_parse_addr_filter()
+Subject: [PATCH v3 26/57] perf: Simplify event_function*()
 References: <20230612090713.652690195@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -74,180 +74,105 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-XXX this code needs a cleanup
+Use guards to reduce gotos and simplify control flow.
 
 Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
- kernel/events/core.c |   56 ++++++++++++++++++++-------------------------------
- 1 file changed, 22 insertions(+), 34 deletions(-)
+ kernel/events/core.c |   39 ++++++++++++++++++++++++++-------------
+ 1 file changed, 26 insertions(+), 13 deletions(-)
 
 --- a/kernel/events/core.c
 +++ b/kernel/events/core.c
-@@ -10495,6 +10495,8 @@ static void free_filters_list(struct lis
- 	}
- }
+@@ -214,6 +214,25 @@ struct event_function_struct {
+ 	void *data;
+ };
  
-+DEFINE_FREE(filter_list, struct list_head *, if (_T) free_filters_list(_T))
++typedef struct {
++	struct perf_cpu_context *cpuctx;
++	struct perf_event_context *ctx;
++} class_perf_ctx_lock_t;
 +
- /*
-  * Free existing address filters and optionally install new ones
-  */
-@@ -10658,13 +10660,15 @@ perf_event_parse_addr_filter(struct perf
- 			     struct list_head *filters)
++static inline void class_perf_ctx_lock_destructor(class_perf_ctx_lock_t *_T)
++{
++	if (_T->cpuctx)
++		perf_ctx_unlock(_T->cpuctx, _T->ctx);
++}
++
++static inline class_perf_ctx_lock_t
++class_perf_ctx_lock_constructor(struct perf_cpu_context *cpuctx,
++				struct perf_event_context *ctx)
++{
++	perf_ctx_lock(cpuctx, ctx);
++	return (class_perf_ctx_lock_t){ cpuctx, ctx };
++}
++
+ static int event_function(void *info)
  {
- 	struct perf_addr_filter *filter = NULL;
--	char *start, *orig, *filename = NULL;
- 	substring_t args[MAX_OPT_ARGS];
- 	int state = IF_STATE_ACTION, token;
- 	unsigned int kernel = 0;
--	int ret = -EINVAL;
-+	char *start;
-+	int ret;
+ 	struct event_function_struct *efs = info;
+@@ -224,17 +243,15 @@ static int event_function(void *info)
+ 	int ret = 0;
  
--	orig = fstr = kstrdup(fstr, GFP_KERNEL);
-+	struct list_head *fguard __free(filter_list) = filters;
-+	char *filename __free(kfree) = NULL;
-+	char *orig __free(kfree) = fstr = kstrdup(fstr, GFP_KERNEL);
- 	if (!fstr)
- 		return -ENOMEM;
+ 	lockdep_assert_irqs_disabled();
++	guard(perf_ctx_lock)(cpuctx, task_ctx);
  
-@@ -10674,7 +10678,6 @@ perf_event_parse_addr_filter(struct perf
- 			[IF_ACT_START]	= PERF_ADDR_FILTER_ACTION_START,
- 			[IF_ACT_STOP]	= PERF_ADDR_FILTER_ACTION_STOP,
- 		};
--		ret = -EINVAL;
- 
- 		if (!*start)
- 			continue;
-@@ -10683,7 +10686,7 @@ perf_event_parse_addr_filter(struct perf
- 		if (state == IF_STATE_ACTION) {
- 			filter = perf_addr_filter_new(event, filters);
- 			if (!filter)
--				goto fail;
-+				return -EINVAL;
- 		}
- 
- 		token = match_token(start, if_tokens, args);
-@@ -10692,7 +10695,7 @@ perf_event_parse_addr_filter(struct perf
- 		case IF_ACT_START:
- 		case IF_ACT_STOP:
- 			if (state != IF_STATE_ACTION)
--				goto fail;
-+				return -EINVAL;
- 
- 			filter->action = actions[token];
- 			state = IF_STATE_SOURCE;
-@@ -10706,18 +10709,18 @@ perf_event_parse_addr_filter(struct perf
- 		case IF_SRC_FILEADDR:
- 		case IF_SRC_FILE:
- 			if (state != IF_STATE_SOURCE)
--				goto fail;
-+				return -EINVAL;
- 
- 			*args[0].to = 0;
- 			ret = kstrtoul(args[0].from, 0, &filter->offset);
- 			if (ret)
--				goto fail;
-+				return ret;
- 
- 			if (token == IF_SRC_KERNEL || token == IF_SRC_FILE) {
- 				*args[1].to = 0;
- 				ret = kstrtoul(args[1].from, 0, &filter->size);
- 				if (ret)
--					goto fail;
-+					return ret;
- 			}
- 
- 			if (token == IF_SRC_FILE || token == IF_SRC_FILEADDR) {
-@@ -10725,17 +10728,15 @@ perf_event_parse_addr_filter(struct perf
- 
- 				kfree(filename);
- 				filename = match_strdup(&args[fpos]);
--				if (!filename) {
--					ret = -ENOMEM;
--					goto fail;
--				}
-+				if (!filename)
-+					return -ENOMEM;
- 			}
- 
- 			state = IF_STATE_END;
- 			break;
- 
- 		default:
--			goto fail;
-+			return -EINVAL;
- 		}
+-	perf_ctx_lock(cpuctx, task_ctx);
+ 	/*
+ 	 * Since we do the IPI call without holding ctx->lock things can have
+ 	 * changed, double check we hit the task we set out to hit.
+ 	 */
+ 	if (ctx->task) {
+-		if (ctx->task != current) {
+-			ret = -ESRCH;
+-			goto unlock;
+-		}
++		if (ctx->task != current)
++			return -ESRCH;
  
  		/*
-@@ -10744,19 +10745,17 @@ perf_event_parse_addr_filter(struct perf
- 		 * attribute.
- 		 */
- 		if (state == IF_STATE_END) {
--			ret = -EINVAL;
--
- 			/*
- 			 * ACTION "filter" must have a non-zero length region
- 			 * specified.
- 			 */
- 			if (filter->action == PERF_ADDR_FILTER_ACTION_FILTER &&
- 			    !filter->size)
--				goto fail;
-+				return -EINVAL;
- 
- 			if (!kernel) {
- 				if (!filename)
--					goto fail;
-+					return -EINVAL;
- 
- 				/*
- 				 * For now, we only support file-based filters
-@@ -10766,21 +10765,19 @@ perf_event_parse_addr_filter(struct perf
- 				 * mapped at different virtual addresses in
- 				 * different processes.
- 				 */
--				ret = -EOPNOTSUPP;
- 				if (!event->ctx->task)
--					goto fail;
-+					return -EOPNOTSUPP;
- 
- 				/* look up the path and grab its inode */
- 				ret = kern_path(filename, LOOKUP_FOLLOW,
- 						&filter->path);
- 				if (ret)
--					goto fail;
-+					return ret;
- 
--				ret = -EINVAL;
- 				if (!filter->path.dentry ||
- 				    !S_ISREG(d_inode(filter->path.dentry)
- 					     ->i_mode))
--					goto fail;
-+					return -EINVAL;
- 
- 				event->addr_filters.nr_file_filters++;
- 			}
-@@ -10795,19 +10792,10 @@ perf_event_parse_addr_filter(struct perf
+ 		 * We only use event_function_call() on established contexts,
+@@ -254,8 +271,6 @@ static int event_function(void *info)
  	}
  
- 	if (state != IF_STATE_ACTION)
--		goto fail;
--
--	kfree(filename);
--	kfree(orig);
-+		return -EINVAL;
+ 	efs->func(event, cpuctx, ctx, efs->data);
+-unlock:
+-	perf_ctx_unlock(cpuctx, task_ctx);
  
-+	no_free_ptr(fguard); // allow filters to escape to the caller
- 	return 0;
--
--fail:
--	kfree(filename);
--	free_filters_list(filters);
--	kfree(orig);
--
--	return ret;
+ 	return ret;
+ }
+@@ -329,11 +344,11 @@ static void event_function_local(struct
+ 		task_ctx = ctx;
+ 	}
+ 
+-	perf_ctx_lock(cpuctx, task_ctx);
++	guard(perf_ctx_lock)(cpuctx, task_ctx);
+ 
+ 	task = ctx->task;
+ 	if (task == TASK_TOMBSTONE)
+-		goto unlock;
++		return;
+ 
+ 	if (task) {
+ 		/*
+@@ -343,18 +358,16 @@ static void event_function_local(struct
+ 		 */
+ 		if (ctx->is_active) {
+ 			if (WARN_ON_ONCE(task != current))
+-				goto unlock;
++				return;
+ 
+ 			if (WARN_ON_ONCE(cpuctx->task_ctx != ctx))
+-				goto unlock;
++				return;
+ 		}
+ 	} else {
+ 		WARN_ON_ONCE(&cpuctx->ctx != ctx);
+ 	}
+ 
+ 	func(event, cpuctx, ctx, data);
+-unlock:
+-	perf_ctx_unlock(cpuctx, task_ctx);
  }
  
- static int
+ #define PERF_FLAG_ALL (PERF_FLAG_FD_NO_GROUP |\
 
 
