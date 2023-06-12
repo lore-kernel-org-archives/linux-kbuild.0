@@ -2,44 +2,44 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C581AC87FDD
-	for <linux-kbuild@archiver.kernel.org>; Mon, 12 Jun 2023 09:55:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEF0EC88C83
+	for <linux-kbuild@archiver.kernel.org>; Mon, 12 Jun 2023 09:55:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235372AbjFLJzn (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 12 Jun 2023 05:55:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33472 "EHLO
+        id S235386AbjFLJzo (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 12 Jun 2023 05:55:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230383AbjFLJyT (ORCPT
+        with ESMTP id S233586AbjFLJyp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Jun 2023 05:54:19 -0400
+        Mon, 12 Jun 2023 05:54:45 -0400
 Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C7C24C00;
-        Mon, 12 Jun 2023 02:38:56 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA9D56190;
+        Mon, 12 Jun 2023 02:39:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=desiato.20200630; h=Content-Type:MIME-Version:References:
         Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
         Content-ID:Content-Description:In-Reply-To;
-        bh=q92jsVFPZSP8G7FOeDp8TiMSNcZFRY9w1smIqAIutpc=; b=ZjjVcZol4/9Mg/CL1z/yvfA0AG
-        OAFbqGJmR4WaLGPuac3DsxuC/cSLfbEfZYKTwqp9zVOHAsflVFZRmumwh6cw0dmuh8tYBucZ3u0Bv
-        rYCwv7X1JMsEe/Bto2w5Ft+VMSeXNZoL9d7mW5B4ILoyaUUzjXUpOLsiTzmFWQE55vsKoxPa9Ol60
-        eK29omO/sJmvbBhucM9rXlm3uLaAGBN0Ne0S14xbL5cU904oFMiq6FXiZdX6eIaV+eBG+pu5krCbP
-        WhCEIB+k7OA7yII2HdbfhSoriI3sHSADL+6mMPmTzKFHg7w0eK75g37vf6kFTHN40d5lPG/ZFftsp
-        MVAqneTQ==;
+        bh=5KSqPesmPX08w8dWPEEw5Ll2e7FMQinOnTr3XW9NIYo=; b=otUSsXrkwDi6rVuLl90MM+76vL
+        cE6gp9EEa8Zpqqg9MG4CPJ7+wgAaw1DsHIj5puea/XbvsOxRyOFpyECLs24dRzQ6Sjol89f/EXqvQ
+        LChObBEVQXRBsTW4GZSlyTIrge2V5AXUII3ByKeNmerebPgKH0p6l5UMuFfc+5XpT1yAnuRwxbHT8
+        2TJtKzkAkK7oEDchq+KMZKfYnIVzQSIQ18PSNfOGRXZs26r2yqrAQzcGI/y/cuIBGiWJXVqpmFdO/
+        vnWMq8UVC4ZBmx1AVgqzGkpD1hMSd/tM7MGG2el0Wb3T3Cib/eS7vjoZ84B8P3FcOaWoCXC0PdTIv
+        Ssmk1qgw==;
 Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
         by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1q8e0g-008kOz-11;
-        Mon, 12 Jun 2023 09:38:51 +0000
+        id 1q8e0o-008kRF-02;
+        Mon, 12 Jun 2023 09:39:04 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id C5F08303164;
-        Mon, 12 Jun 2023 11:38:48 +0200 (CEST)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 52D533033FC;
+        Mon, 12 Jun 2023 11:38:53 +0200 (CEST)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
-        id 3619930A70ADD; Mon, 12 Jun 2023 11:38:48 +0200 (CEST)
-Message-ID: <20230612093538.225353309@infradead.org>
+        id EBB5330A77B75; Mon, 12 Jun 2023 11:38:48 +0200 (CEST)
+Message-ID: <20230612093540.638818161@infradead.org>
 User-Agent: quilt/0.66
-Date:   Mon, 12 Jun 2023 11:07:24 +0200
+Date:   Mon, 12 Jun 2023 11:07:56 +0200
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     torvalds@linux-foundation.org, keescook@chromium.org,
         gregkh@linuxfoundation.org, pbonzini@redhat.com
@@ -67,7 +67,7 @@ Cc:     masahiroy@kernel.org, nathan@kernel.org, ndesaulniers@google.com,
         rcu@vger.kernel.org, linux-security-module@vger.kernel.org,
         tglx@linutronix.de, ravi.bangoria@amd.com, error27@gmail.com,
         luc.vanoostenryck@gmail.com
-Subject: [PATCH v3 11/57] sched: Simplify sched_tick_remote()
+Subject: [PATCH v3 43/57] perf: Simplify perf_sw_event()
 References: <20230612090713.652690195@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -75,73 +75,99 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Use guards to reduce gotos and simplify control flow.
 
 Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
- kernel/sched/core.c |   43 ++++++++++++++++++-------------------------
- 1 file changed, 18 insertions(+), 25 deletions(-)
+ kernel/events/core.c |   37 ++++++++++++-------------------------
+ 1 file changed, 12 insertions(+), 25 deletions(-)
 
---- a/kernel/sched/core.c
-+++ b/kernel/sched/core.c
-@@ -5651,9 +5651,6 @@ static void sched_tick_remote(struct wor
- 	struct tick_work *twork = container_of(dwork, struct tick_work, work);
- 	int cpu = twork->cpu;
- 	struct rq *rq = cpu_rq(cpu);
--	struct task_struct *curr;
--	struct rq_flags rf;
--	u64 delta;
- 	int os;
+--- a/kernel/events/core.c
++++ b/kernel/events/core.c
+@@ -9701,17 +9701,15 @@ static void do_perf_sw_event(enum perf_t
+ 	struct perf_event *event;
+ 	struct hlist_head *head;
  
- 	/*
-@@ -5663,30 +5660,26 @@ static void sched_tick_remote(struct wor
- 	 * statistics and checks timeslices in a time-independent way, regardless
- 	 * of when exactly it is running.
- 	 */
--	if (!tick_nohz_tick_stopped_cpu(cpu))
--		goto out_requeue;
-+	if (tick_nohz_tick_stopped_cpu(cpu)) {
-+		guard(rq_lock_irq)(rq);
-+		struct task_struct *curr = rq->curr;
-+
-+		if (cpu_online(cpu)) {
-+			update_rq_clock(rq);
-+
-+			if (!is_idle_task(curr)) {
-+				/*
-+				 * Make sure the next tick runs within a
-+				 * reasonable amount of time.
-+				 */
-+				u64 delta = rq_clock_task(rq) - curr->se.exec_start;
-+				WARN_ON_ONCE(delta > (u64)NSEC_PER_SEC * 3);
-+			}
-+			curr->sched_class->task_tick(rq, curr, 0);
+-	rcu_read_lock();
++	guard(rcu)();
+ 	head = find_swevent_head_rcu(swhash, type, event_id);
+ 	if (!head)
+-		goto end;
++		return;
  
--	rq_lock_irq(rq, &rf);
--	curr = rq->curr;
--	if (cpu_is_offline(cpu))
--		goto out_unlock;
+ 	hlist_for_each_entry_rcu(event, head, hlist_entry) {
+ 		if (perf_swevent_match(event, type, event_id, data, regs))
+ 			perf_swevent_event(event, nr, data, regs);
+ 	}
+-end:
+-	rcu_read_unlock();
+ }
+ 
+ DEFINE_PER_CPU(struct pt_regs, __perf_regs[4]);
+@@ -9746,16 +9744,13 @@ void __perf_sw_event(u32 event_id, u64 n
+ {
+ 	int rctx;
+ 
+-	preempt_disable_notrace();
++	guard(preempt_notrace)();
+ 	rctx = perf_swevent_get_recursion_context();
+ 	if (unlikely(rctx < 0))
+-		goto fail;
++		return;
+ 
+ 	___perf_sw_event(event_id, nr, regs, addr);
 -
--	update_rq_clock(rq);
+ 	perf_swevent_put_recursion_context(rctx);
+-fail:
+-	preempt_enable_notrace();
+ }
+ 
+ static void perf_swevent_read(struct perf_event *event)
+@@ -9844,21 +9839,17 @@ static int swevent_hlist_get_cpu(int cpu
+ 	struct swevent_htable *swhash = &per_cpu(swevent_htable, cpu);
+ 	int err = 0;
+ 
+-	mutex_lock(&swhash->hlist_mutex);
++	guard(mutex)(&swhash->hlist_mutex);
+ 	if (!swevent_hlist_deref(swhash) &&
+ 	    cpumask_test_cpu(cpu, perf_online_mask)) {
+ 		struct swevent_hlist *hlist;
+ 
+ 		hlist = kzalloc(sizeof(*hlist), GFP_KERNEL);
+-		if (!hlist) {
+-			err = -ENOMEM;
+-			goto exit;
+-		}
++		if (!hlist)
++			return -ENOMEM;
+ 		rcu_assign_pointer(swhash->swevent_hlist, hlist);
+ 	}
+ 	swhash->hlist_refcount++;
+-exit:
+-	mutex_unlock(&swhash->hlist_mutex);
+ 
+ 	return err;
+ }
+@@ -10115,16 +10106,12 @@ void perf_tp_event(u16 event_type, u64 c
+ 	if (task && task != current) {
+ 		struct perf_event_context *ctx;
+ 
+-		rcu_read_lock();
++		guard(rcu)();
+ 		ctx = rcu_dereference(task->perf_event_ctxp);
+-		if (!ctx)
+-			goto unlock;
 -
--	if (!is_idle_task(curr)) {
--		/*
--		 * Make sure the next tick runs within a reasonable
--		 * amount of time.
--		 */
--		delta = rq_clock_task(rq) - curr->se.exec_start;
--		WARN_ON_ONCE(delta > (u64)NSEC_PER_SEC * 3);
-+			calc_load_nohz_remote(rq);
+-		raw_spin_lock(&ctx->lock);
+-		perf_tp_event_target_task(count, record, regs, &data, ctx);
+-		raw_spin_unlock(&ctx->lock);
+-unlock:
+-		rcu_read_unlock();
++		if (ctx) {
++			guard(raw_spinlock)(&ctx->lock);
++			perf_tp_event_target_task(count, record, regs, &data, ctx);
 +		}
  	}
--	curr->sched_class->task_tick(rq, curr, 0);
--
--	calc_load_nohz_remote(rq);
--out_unlock:
--	rq_unlock_irq(rq, &rf);
--out_requeue:
  
- 	/*
- 	 * Run the remote tick once per second (1Hz). This arbitrary
+ 	perf_swevent_put_recursion_context(rctx);
 
 
