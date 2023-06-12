@@ -2,44 +2,44 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7D1EC83005
-	for <linux-kbuild@archiver.kernel.org>; Mon, 12 Jun 2023 09:56:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CD9CC7EE25
+	for <linux-kbuild@archiver.kernel.org>; Mon, 12 Jun 2023 09:57:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234902AbjFLJ4g (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 12 Jun 2023 05:56:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33802 "EHLO
+        id S233967AbjFLJ5D (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 12 Jun 2023 05:57:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234600AbjFLJy5 (ORCPT
+        with ESMTP id S234688AbjFLJy6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Jun 2023 05:54:57 -0400
+        Mon, 12 Jun 2023 05:54:58 -0400
 Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E20E619A;
-        Mon, 12 Jun 2023 02:39:35 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94603619E;
+        Mon, 12 Jun 2023 02:39:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=desiato.20200630; h=Content-Type:MIME-Version:References:
         Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
         Content-ID:Content-Description:In-Reply-To;
-        bh=TIflEc6HK/22xB9+LAc8fdYfMJHSxjY/dB735CDFq7w=; b=OzxWN5L/KzC4VUo/iTYaWameCX
-        hrbwrk3ixeRH23F57jlIRFGWnlTcHuMcV7kLy7osS01tgjphDYs7mWn2JZfDkZ1+rR6EcEvrBxrNq
-        zuW6xChuJcvp8qwBU8di5iOmYh8pWWaTGqRRp0lXV86E7IzjUkmvM0B0kyib/7YaiFdsFaLUU6kzN
-        jRUGUTzf6TM4YMKKaPBC+AkGNgv4QE6GBnrVTUB+3uvTZYeky0QKBbK68+lbLkHSUur0WJ5xngoPZ
-        gJIK2g+KtjpXKF0kOxEZS0dUHbQ0CQVAE0El1MhQ7ke9TlaJD5eefsKkFJQO3sIV0cBEXmZEPvZrb
-        0kCDB3Ig==;
+        bh=Hyp83c4zEQiDnre/2FuPX5V+t4FAU+QqZYq6E3vAduE=; b=Gtb5Ev6740h/Uu//z0ccX1hScc
+        Ck98D6/rxacYaUVGPfXtg073SExo3RFg4HAVAwuEx1OEQLLt9RbdVLZs4jgS8VYz19wXPm8F7X/I+
+        7WeQiyTsi1jlEeyPs1F0ihul+YLu1RJS1s+FeAP9xTHYjDaUYE3upOVxx5r6t3B62YsJAqx9lyVbj
+        UC381d09c/rXGi/P9xexX5myrbqbF5MzgVQvqLhDW1yv4cmbx/NmkwAE761i6+nygyHErTIh+dwz4
+        BeyuYoQfUEGmVnwjGaWuO5jR6RO3Wq+ZoiGVXZUL1/3FmffvSgadr0ZATXm7zlY8LN0s087WDHlEu
+        u2+sLK9g==;
 Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
         by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1q8e0l-008kQb-39;
-        Mon, 12 Jun 2023 09:39:30 +0000
+        id 1q8e0m-008kQo-13;
+        Mon, 12 Jun 2023 09:39:33 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 2813A30325F;
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 2E4A03032AF;
         Mon, 12 Jun 2023 11:38:53 +0200 (CEST)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
-        id 9735A30A77B62; Mon, 12 Jun 2023 11:38:48 +0200 (CEST)
-Message-ID: <20230612093539.537454913@infradead.org>
+        id AE93C30A77B6A; Mon, 12 Jun 2023 11:38:48 +0200 (CEST)
+Message-ID: <20230612093539.823493926@infradead.org>
 User-Agent: quilt/0.66
-Date:   Mon, 12 Jun 2023 11:07:41 +0200
+Date:   Mon, 12 Jun 2023 11:07:45 +0200
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     torvalds@linux-foundation.org, keescook@chromium.org,
         gregkh@linuxfoundation.org, pbonzini@redhat.com
@@ -67,7 +67,7 @@ Cc:     masahiroy@kernel.org, nathan@kernel.org, ndesaulniers@google.com,
         rcu@vger.kernel.org, linux-security-module@vger.kernel.org,
         tglx@linutronix.de, ravi.bangoria@amd.com, error27@gmail.com,
         luc.vanoostenryck@gmail.com
-Subject: [PATCH v3 28/57] perf; Simplify event_sched_in()
+Subject: [PATCH v3 32/57] perf: Simplify perf_event_context_sched_in()
 References: <20230612090713.652690195@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -75,61 +75,81 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Use guards to reduce gotos and simplify control flow.
 
 Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
- kernel/events/core.c |   13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
+ kernel/events/core.c |   38 +++++++++++++++-----------------------
+ 1 file changed, 15 insertions(+), 23 deletions(-)
 
 --- a/kernel/events/core.c
 +++ b/kernel/events/core.c
-@@ -1153,6 +1153,8 @@ void perf_pmu_enable(struct pmu *pmu)
- 		pmu->pmu_enable(pmu);
+@@ -713,6 +713,9 @@ static void perf_ctx_enable(struct perf_
+ 		perf_pmu_enable(pmu_ctx->pmu);
  }
  
-+DEFINE_GUARD(perf_pmu_disable, struct pmu *, perf_pmu_disable(_T), perf_pmu_enable(_T))
++DEFINE_GUARD(perf_ctx_disable, struct perf_event_context *,
++	     perf_ctx_disable(_T), perf_ctx_enable(_T))
 +
- static void perf_assert_pmu_disabled(struct pmu *pmu)
- {
- 	WARN_ON_ONCE(*this_cpu_ptr(pmu->pmu_disable_count) == 0);
-@@ -2489,7 +2491,6 @@ event_sched_in(struct perf_event *event,
- {
- 	struct perf_event_pmu_context *epc = event->pmu_ctx;
- 	struct perf_cpu_pmu_context *cpc = this_cpu_ptr(epc->pmu->cpu_pmu_context);
--	int ret = 0;
+ static void ctx_sched_out(struct perf_event_context *ctx, enum event_type_t event_type);
+ static void ctx_sched_in(struct perf_event_context *ctx, enum event_type_t event_type);
  
- 	WARN_ON_ONCE(event->ctx != ctx);
+@@ -3906,31 +3909,27 @@ static void perf_event_context_sched_in(
+ 	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
+ 	struct perf_event_context *ctx;
  
-@@ -2517,15 +2518,14 @@ event_sched_in(struct perf_event *event,
- 		event->hw.interrupts = 0;
- 	}
- 
--	perf_pmu_disable(event->pmu);
-+	guard(perf_pmu_disable)(event->pmu);
- 
- 	perf_log_itrace_start(event);
- 
- 	if (event->pmu->add(event, PERF_EF_START)) {
- 		perf_event_set_state(event, PERF_EVENT_STATE_INACTIVE);
- 		event->oncpu = -1;
--		ret = -EAGAIN;
--		goto out;
-+		return -EAGAIN;
- 	}
- 
- 	if (!is_software_event(event))
-@@ -2536,10 +2536,7 @@ event_sched_in(struct perf_event *event,
- 	if (event->attr.exclusive)
- 		cpc->exclusive = 1;
- 
--out:
--	perf_pmu_enable(event->pmu);
+-	rcu_read_lock();
++	guard(rcu)();
++
+ 	ctx = rcu_dereference(task->perf_event_ctxp);
+ 	if (!ctx)
+-		goto rcu_unlock;
 -
--	return ret;
-+	return 0;
+-	if (cpuctx->task_ctx == ctx) {
+-		perf_ctx_lock(cpuctx, ctx);
+-		perf_ctx_disable(ctx);
+-
+-		perf_ctx_sched_task_cb(ctx, true);
+-
+-		perf_ctx_enable(ctx);
+-		perf_ctx_unlock(cpuctx, ctx);
+-		goto rcu_unlock;
+-	}
++		return;
+ 
+-	perf_ctx_lock(cpuctx, ctx);
++	guard(perf_ctx_lock)(cpuctx, ctx);
+ 	/*
+ 	 * We must check ctx->nr_events while holding ctx->lock, such
+ 	 * that we serialize against perf_install_in_context().
+ 	 */
+ 	if (!ctx->nr_events)
+-		goto unlock;
++		return;
++
++	guard(perf_ctx_disable)(ctx);
++
++	if (cpuctx->task_ctx == ctx) {
++		perf_ctx_sched_task_cb(ctx, true);
++		return;
++	}
+ 
+-	perf_ctx_disable(ctx);
+ 	/*
+ 	 * We want to keep the following priority order:
+ 	 * cpu pinned (that don't need to move), task pinned,
+@@ -3950,13 +3949,6 @@ static void perf_event_context_sched_in(
+ 
+ 	if (!RB_EMPTY_ROOT(&ctx->pinned_groups.tree))
+ 		perf_ctx_enable(&cpuctx->ctx);
+-
+-	perf_ctx_enable(ctx);
+-
+-unlock:
+-	perf_ctx_unlock(cpuctx, ctx);
+-rcu_unlock:
+-	rcu_read_unlock();
  }
  
- static int
+ /*
 
 
