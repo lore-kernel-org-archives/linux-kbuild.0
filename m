@@ -2,43 +2,44 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28E91C7EE45
-	for <linux-kbuild@archiver.kernel.org>; Mon, 12 Jun 2023 09:55:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3116AC7EE25
+	for <linux-kbuild@archiver.kernel.org>; Mon, 12 Jun 2023 09:55:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230293AbjFLJzd (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 12 Jun 2023 05:55:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34030 "EHLO
+        id S232075AbjFLJzg (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 12 Jun 2023 05:55:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231547AbjFLJy1 (ORCPT
+        with ESMTP id S233785AbjFLJys (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Jun 2023 05:54:27 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F13BD5FF7;
-        Mon, 12 Jun 2023 02:39:00 -0700 (PDT)
+        Mon, 12 Jun 2023 05:54:48 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B1B96193;
+        Mon, 12 Jun 2023 02:39:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:References:
+        d=infradead.org; s=desiato.20200630; h=Content-Type:MIME-Version:References:
         Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
         Content-ID:Content-Description:In-Reply-To;
-        bh=y0wgwpukS8T7O340+NKvU9chnTVlAmLcht1jdurq5Ss=; b=XJLeq7I1drWQYbixkl89Se55Lm
-        ueDLMCBUmrK1ud0Ym2MEKFBBcNCFsHuofYli/d22KQa8rLnB7TqYweSgfEswFS0Rngj94PaRCGISU
-        BjJqQVzROtr4nm6YuEhME1yjkhuAy4siEWBxnmmKn84Ma8GXkQN0TO78ajWRKONL+bjwVXBj1OHlc
-        wd5XSXX9DMA+GZC8viUDd1En+ijoZsCoNPdUmeqGf2hUg2zXdMg7bMFdw2n7RijPcP1yaXBwIJspG
-        zSqEDja4Bsa9uiVuz1JOYDJaWqEk5fEBX3CCfz04e9HuFekeyep/OIowD9BCc1AFfcfJdAMXRdKLx
-        jIf4FRgA==;
+        bh=u1PqToTv4tGu/wNo5qNbJmeSKvydQLpyPDESq1sFIz4=; b=mHcg7bsEVSqy84in9mzk14TWOQ
+        pUvBhruN8Ps4QU7UuXumepKGGKVTz/FqQ93C9z0RN9W8/VKYjDbgUgbBY3/hYg1MVwS8NQtUh+Xww
+        CynHYhgrEVuJvTSlRsgcVCBrRmckY/PSGTJojKVJLzgMoiN08hB1rnPRAI2jI27rXNxb+MIytDB8L
+        DnKzYQDZWDNXEVW7juyczQTLAGwCYM4mK+1HoLnrpThSbhUJZex38ZlRC9grt10V6FjhXAKdXPMZm
+        veFavMchJctFhw66K958zPJTPkM0N+TjTu3S9OTJzMVp9r9RRaE5dQ/R2ohI3MV52F1JIkwJGTg5z
+        XosuHW2w==;
 Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1q8e0l-002NB4-5z; Mon, 12 Jun 2023 09:38:55 +0000
+        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1q8e0p-008kRQ-2g;
+        Mon, 12 Jun 2023 09:39:06 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 03D383002A9;
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 51E713033FA;
         Mon, 12 Jun 2023 11:38:53 +0200 (CEST)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
-        id 6353930A77B5A; Mon, 12 Jun 2023 11:38:48 +0200 (CEST)
-Message-ID: <20230612093538.871533689@infradead.org>
+        id E65E130A77B74; Mon, 12 Jun 2023 11:38:48 +0200 (CEST)
+Message-ID: <20230612093540.564584285@infradead.org>
 User-Agent: quilt/0.66
-Date:   Mon, 12 Jun 2023 11:07:32 +0200
+Date:   Mon, 12 Jun 2023 11:07:55 +0200
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     torvalds@linux-foundation.org, keescook@chromium.org,
         gregkh@linuxfoundation.org, pbonzini@redhat.com
@@ -66,7 +67,7 @@ Cc:     masahiroy@kernel.org, nathan@kernel.org, ndesaulniers@google.com,
         rcu@vger.kernel.org, linux-security-module@vger.kernel.org,
         tglx@linutronix.de, ravi.bangoria@amd.com, error27@gmail.com,
         luc.vanoostenryck@gmail.com
-Subject: [PATCH v3 19/57] sched: Simplify sched_move_task()
+Subject: [PATCH v3 42/57] perf: Simplify perf_iterate_sb()
 References: <20230612090713.652690195@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -74,46 +75,43 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Use guards to reduce gotos and simplify control flow.
 
 Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
- kernel/sched/core.c |   10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ kernel/events/core.c |    9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
---- a/kernel/sched/core.c
-+++ b/kernel/sched/core.c
-@@ -10361,17 +10361,18 @@ void sched_move_task(struct task_struct
- 	int queued, running, queue_flags =
- 		DEQUEUE_SAVE | DEQUEUE_MOVE | DEQUEUE_NOCLOCK;
- 	struct task_group *group;
--	struct rq_flags rf;
- 	struct rq *rq;
+--- a/kernel/events/core.c
++++ b/kernel/events/core.c
+@@ -7871,8 +7871,8 @@ perf_iterate_sb(perf_iterate_f output, v
+ {
+ 	struct perf_event_context *ctx;
  
--	rq = task_rq_lock(tsk, &rf);
-+	CLASS(task_rq_lock, rq_guard)(tsk);
-+	rq = rq_guard.rq;
-+
+-	rcu_read_lock();
+-	preempt_disable();
++	guard(rcu)();
++	guard(preempt)();
+ 
  	/*
- 	 * Esp. with SCHED_AUTOGROUP enabled it is possible to get superfluous
- 	 * group changes.
+ 	 * If we have task_ctx != NULL we only notify the task context itself.
+@@ -7881,7 +7881,7 @@ perf_iterate_sb(perf_iterate_f output, v
  	 */
- 	group = sched_get_task_group(tsk);
- 	if (group == tsk->sched_task_group)
--		goto unlock;
+ 	if (task_ctx) {
+ 		perf_iterate_ctx(task_ctx, output, data, false);
+-		goto done;
 +		return;
- 
- 	update_rq_clock(rq);
- 
-@@ -10396,9 +10397,6 @@ void sched_move_task(struct task_struct
- 		 */
- 		resched_curr(rq);
  	}
--
--unlock:
--	task_rq_unlock(rq, tsk, &rf);
+ 
+ 	perf_iterate_sb_cpu(output, data);
+@@ -7889,9 +7889,6 @@ perf_iterate_sb(perf_iterate_f output, v
+ 	ctx = rcu_dereference(current->perf_event_ctxp);
+ 	if (ctx)
+ 		perf_iterate_ctx(ctx, output, data, false);
+-done:
+-	preempt_enable();
+-	rcu_read_unlock();
  }
  
- static inline struct task_group *css_tg(struct cgroup_subsys_state *css)
+ /*
 
 
