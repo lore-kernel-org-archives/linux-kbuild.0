@@ -2,44 +2,43 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29AEEC88C83
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84D08C88C84
 	for <linux-kbuild@archiver.kernel.org>; Mon, 12 Jun 2023 09:55:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231716AbjFLJzu (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 12 Jun 2023 05:55:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33460 "EHLO
+        id S235464AbjFLJzv (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 12 Jun 2023 05:55:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230186AbjFLJyT (ORCPT
+        with ESMTP id S231173AbjFLJyX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Jun 2023 05:54:19 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C79749FA;
-        Mon, 12 Jun 2023 02:38:54 -0700 (PDT)
+        Mon, 12 Jun 2023 05:54:23 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F3E55FF0;
+        Mon, 12 Jun 2023 02:38:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Content-Type:MIME-Version:References:
+        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:References:
         Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
         Content-ID:Content-Description:In-Reply-To;
-        bh=iuKjwptMM283OkeCg3rHRYfDPMncNnTiTfZUlZvzjjw=; b=eQ6OsD4kYVKLafcm5zMaXykUrJ
-        t3Yx8a+byrZdB944/0aNdLOqAmoLeWSa1sowLg19pvZhRfEGH12EfjQizZN73l+Q2lmgWVTy/jEN2
-        66w/tSoR035EtMK1QJrtp16Z85OKpvfSl1I8OLy7JSDS0vEBXw8vGKRffU4u96Gz85h50NrSym32v
-        8aadmJp7+8xctTmftjzi5KRquTBd3yr6fYIYX7v7Rb7TZGAQFPvFwW5JY6GaXXShnDrDMfhQWRx/H
-        Hx6pFtrNHcKkz/xQw6bxea1nVgSbzWPnczzWWwxrD46aGrv+zXbaZt8xVprl8zZZmhqQuJnaVP8+3
-        u9+4lFQg==;
+        bh=mq5JO2tPl8C7SILOfz/KwJIcnobnm9UFdJaARgXH410=; b=AMcWXrFAvQk7IooWq5vsQKOUpX
+        c+43fYmu8uTkx0XjpUhBb5rLhhZTpeo7fFtrFQ6gX1Ie/h4dDKHWEhenT13VsLCQtYF4J8qBvnqTN
+        Rb7fXamtrAdhJIYp7XX1thb9d5mecYu5DsgQSqMp7US340Et8Gvt1QM3WZU+8S6FEN+rhyMOUXAIr
+        zrgte1I7kA8l7tRuTCoT+JXSeh785ZZ203dX7QWjb/gjzrBXnKJDRygq4P+8awKyHb5qZx9laV/87
+        GV7BCj0gIl7rPXAFdcBqCQXcR9zo9IGdzN5vsPxOEsYOaEA/IqiNceS6vjnqf815nn9bTlK1cd3oY
+        AFlkOulA==;
 Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1q8e0f-008kOo-0K;
-        Mon, 12 Jun 2023 09:38:49 +0000
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1q8e0f-002N8u-IH; Mon, 12 Jun 2023 09:38:49 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 7FC1C302E28;
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 6C280302680;
         Mon, 12 Jun 2023 11:38:48 +0200 (CEST)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
-        id 0C29230A58077; Mon, 12 Jun 2023 11:38:48 +0200 (CEST)
-Message-ID: <20230612093537.693926033@infradead.org>
+        id F111730A210B0; Mon, 12 Jun 2023 11:38:47 +0200 (CEST)
+Message-ID: <20230612093537.536441207@infradead.org>
 User-Agent: quilt/0.66
-Date:   Mon, 12 Jun 2023 11:07:17 +0200
+Date:   Mon, 12 Jun 2023 11:07:15 +0200
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     torvalds@linux-foundation.org, keescook@chromium.org,
         gregkh@linuxfoundation.org, pbonzini@redhat.com
@@ -67,7 +66,7 @@ Cc:     masahiroy@kernel.org, nathan@kernel.org, ndesaulniers@google.com,
         rcu@vger.kernel.org, linux-security-module@vger.kernel.org,
         tglx@linutronix.de, ravi.bangoria@amd.com, error27@gmail.com,
         luc.vanoostenryck@gmail.com
-Subject: [PATCH v3 04/57] kbuild: Drop -Wdeclaration-after-statement
+Subject: [PATCH v3 02/57] apparmor: Free up __cleanup() name
 References: <20230612090713.652690195@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -75,54 +74,42 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-With the advent on scope-based resource management it comes really
-tedious to abide by the contraints of -Wdeclaration-after-statement.
+In order to use __cleanup for __attribute__((__cleanup__(func))) the
+name must not be used for anything else. Avoid the conflict.
 
-It will still be recommeneded to place declarations at the start of a
-scope where possible, but it will no longer be enforced.
-
-Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
 Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
- Makefile                          |    6 +-----
- arch/arm64/kernel/vdso32/Makefile |    2 --
- 2 files changed, 1 insertion(+), 7 deletions(-)
+ security/apparmor/include/lib.h |    6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
---- a/Makefile
-+++ b/Makefile
-@@ -447,8 +447,7 @@ HOSTRUSTC = rustc
- HOSTPKG_CONFIG	= pkg-config
- 
- KBUILD_USERHOSTCFLAGS := -Wall -Wmissing-prototypes -Wstrict-prototypes \
--			 -O2 -fomit-frame-pointer -std=gnu11 \
--			 -Wdeclaration-after-statement
-+			 -O2 -fomit-frame-pointer -std=gnu11
- KBUILD_USERCFLAGS  := $(KBUILD_USERHOSTCFLAGS) $(USERCFLAGS)
- KBUILD_USERLDFLAGS := $(USERLDFLAGS)
- 
-@@ -1012,9 +1011,6 @@ endif
- # arch Makefile may override CC so keep this after arch Makefile is included
- NOSTDINC_FLAGS += -nostdinc
- 
--# warn about C99 declaration after statement
--KBUILD_CFLAGS += -Wdeclaration-after-statement
--
- # Variable Length Arrays (VLAs) should not be used anywhere in the kernel
- KBUILD_CFLAGS += -Wvla
- 
---- a/arch/arm64/kernel/vdso32/Makefile
-+++ b/arch/arm64/kernel/vdso32/Makefile
-@@ -65,11 +65,9 @@ VDSO_CFLAGS += -Wall -Wundef -Wstrict-pr
-                -fno-strict-aliasing -fno-common \
-                -Werror-implicit-function-declaration \
-                -Wno-format-security \
--               -Wdeclaration-after-statement \
-                -std=gnu11
- VDSO_CFLAGS  += -O2
- # Some useful compiler-dependent flags from top-level Makefile
--VDSO_CFLAGS += $(call cc32-option,-Wdeclaration-after-statement,)
- VDSO_CFLAGS += $(call cc32-option,-Wno-pointer-sign)
- VDSO_CFLAGS += -fno-strict-overflow
- VDSO_CFLAGS += $(call cc32-option,-Werror=strict-prototypes)
+--- a/security/apparmor/include/lib.h
++++ b/security/apparmor/include/lib.h
+@@ -232,7 +232,7 @@ void aa_policy_destroy(struct aa_policy
+  */
+ #define fn_label_build(L, P, GFP, FN)					\
+ ({									\
+-	__label__ __cleanup, __done;					\
++	__label__ __do_cleanup, __done;					\
+ 	struct aa_label *__new_;					\
+ 									\
+ 	if ((L)->size > 1) {						\
+@@ -250,7 +250,7 @@ void aa_policy_destroy(struct aa_policy
+ 			__new_ = (FN);					\
+ 			AA_BUG(!__new_);				\
+ 			if (IS_ERR(__new_))				\
+-				goto __cleanup;				\
++				goto __do_cleanup;			\
+ 			__lvec[__j++] = __new_;				\
+ 		}							\
+ 		for (__j = __count = 0; __j < (L)->size; __j++)		\
+@@ -272,7 +272,7 @@ void aa_policy_destroy(struct aa_policy
+ 			vec_cleanup(profile, __pvec, __count);		\
+ 		} else							\
+ 			__new_ = NULL;					\
+-__cleanup:								\
++__do_cleanup:								\
+ 		vec_cleanup(label, __lvec, (L)->size);			\
+ 	} else {							\
+ 		(P) = labels_profile(L);				\
 
 
