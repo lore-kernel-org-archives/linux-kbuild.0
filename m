@@ -2,128 +2,102 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 659CEEB64DA
-	for <linux-kbuild@archiver.kernel.org>; Fri, 16 Jun 2023 14:58:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 396F5EB64D7
+	for <linux-kbuild@archiver.kernel.org>; Fri, 16 Jun 2023 15:00:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345760AbjFPO6B (ORCPT
-        <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 16 Jun 2023 10:58:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55888 "EHLO
+        id S232199AbjFPPAy (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 16 Jun 2023 11:00:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345756AbjFPO6A (ORCPT
+        with ESMTP id S1345172AbjFPPAx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 16 Jun 2023 10:58:00 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8BE930DD;
-        Fri, 16 Jun 2023 07:57:59 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 78B4B62FBB;
-        Fri, 16 Jun 2023 14:57:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61B3EC433CB;
-        Fri, 16 Jun 2023 14:57:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686927478;
-        bh=VEgG/e8fspM0F601IZYMqwpkaszvh+z+6C3I9ZOUdPU=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=HO3j+fdwDlPrXg3XbH0O26oU15mWSLLDR2qPmFPbvajv34VOWB/sQQld0y23xbCj4
-         L4wRcf90mHcgw8kYasEMrNj/YsZs3OY5IVbQIJ4amINKsobefTlLIzAhnn0kW25Xnj
-         N9sNVT+BPpCmT45KGzy5arrBBufxwCI/KUi6+jR56gSeITKiaTRutVEaEhL0pqGFxO
-         ymS2vKOVQ68AUMUmOPTxjJAQJfZ2u/IiSjByXYdA8qm0BcDxdh3qQtiv4QCwaV1Alr
-         ji9EEm5AJaM3+RlaE1Yg7cG1qgKaRcQuE78JtWdZR6kSP4R2F8XDoICDL20szGiji5
-         J52n7UFrx7XJQ==
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Nathan Chancellor <nathan@kernel.org>,
+        Fri, 16 Jun 2023 11:00:53 -0400
+Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E61330F4;
+        Fri, 16 Jun 2023 08:00:52 -0700 (PDT)
+Received: by mail-ot1-x32c.google.com with SMTP id 46e09a7af769-6b2e1023f30so757627a34.1;
+        Fri, 16 Jun 2023 08:00:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1686927651; x=1689519651;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gbcAX6a1eicu6d3jk33i1zAfmDcjTd2pa8lrf0SUGvQ=;
+        b=oAot7/Zp5mILgXcqyrtRgc6bTBbIhbsoKJj73kFHgJuD4WrzbiBkBme2A6CQZsaNtT
+         rVcwh87oTEq+kXIpqLgMQ2MbuWIEAY3DcSuYM28gcKaIj7JX5K3c1Km9HZvHCY/qw4dW
+         jk3Xl4iYIhAm/typevshEm9jvZOBddkT3JYk1qAqxhUjfiWLSCJLoeytOl74B8Po3Zpt
+         1xSt+NXAJPiE2qHtHWwwibfvK26ffcFPpOi5b+YU3SzJV+FD8oM3zd0738qFeO8U/OEf
+         rNB8kTD73ZQQR5EI3ubXI9cbisd8Ukl+xoiwOX3V4r8rfMx4Mlqtw7U9mxC2DSMBCSQj
+         ItUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686927651; x=1689519651;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gbcAX6a1eicu6d3jk33i1zAfmDcjTd2pa8lrf0SUGvQ=;
+        b=QP1AFWvV26UKpJfDdkK0utyLyXac+22MoHBYpdcn4cCTabGe+rcAJ257PABRy3xZGU
+         21fyFYwY26liD6gvwwb1cYXNtnlmoi1kE7jc1S/f8dLWy0q3esMiHZlfj5LpcUckd06t
+         48R/RIIZRBxmETVevl7sEzSuVFYtF0702f8ERxfxnx0s1l4q3zda18z/CfnNB5WhnXUr
+         gLkaV6zpmjRvHWhM2O/EslqcuFl4ZPt0lq/qSCjvsyQrGjIjsO/VQbJUKFr7zdL+Oc2H
+         S7ge90mrVt9gDP/jlCJ8SvNNCqAqAxlw52UoIAr2v/kXhHqNLwds6kdq/Uzn6cJtQmgX
+         BcyQ==
+X-Gm-Message-State: AC+VfDwTZ4rSgiw5uSSZrdAvHr4TWD2olwOTr9o1siuWaBvbvHNZpQmS
+        7anbTI6kZVRARIMXLMk6278=
+X-Google-Smtp-Source: ACHHUZ466j1P5f7zSgTKQ27WFq3EVgQ+S7RfZBJhvqWaa4/+rm+bKYxB4YpejS+9SlXqCVx5d0hrtQ==
+X-Received: by 2002:a05:6870:5b28:b0:1a6:4eb9:d10b with SMTP id ds40-20020a0568705b2800b001a64eb9d10bmr2147868oab.16.1686927651338;
+        Fri, 16 Jun 2023 08:00:51 -0700 (PDT)
+Received: from [192.168.54.90] (static.220.238.itcsa.net. [190.15.220.238])
+        by smtp.gmail.com with ESMTPSA id ve17-20020a0568710c1100b001a6a3f99691sm6211975oab.27.2023.06.16.08.00.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Jun 2023 08:00:50 -0700 (PDT)
+Message-ID: <022fc9e1-692f-754c-061a-0e4e7c380731@gmail.com>
+Date:   Fri, 16 Jun 2023 10:56:21 -0300
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v2 01/11] kbuild: rust_is_available: remove -v option
+Content-Language: en-US
+To:     Miguel Ojeda <ojeda@kernel.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Wedson Almeida Filho <wedsonaf@gmail.com>,
+        Alex Gaynor <alex.gaynor@gmail.com>
+Cc:     Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
         Nicolas Schier <nicolas@fjasle.eu>,
-        Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v2 2/2] kbuild: respect GNU Make -w flag
-Date:   Fri, 16 Jun 2023 23:57:51 +0900
-Message-Id: <20230616145751.945864-2-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230616145751.945864-1-masahiroy@kernel.org>
-References: <20230616145751.945864-1-masahiroy@kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
+        =?UTF-8?Q?Bj=c3=b6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
+        Benno Lossin <benno.lossin@proton.me>,
+        Alice Ryhl <aliceryhl@google.com>,
+        Andreas Hindborg <nmi@metaspace.dk>,
+        linux-kbuild@vger.kernel.org, rust-for-linux@vger.kernel.org,
+        linux-kernel@vger.kernel.org, patches@lists.linux.dev
+References: <20230616001631.463536-1-ojeda@kernel.org>
+ <20230616001631.463536-2-ojeda@kernel.org>
+From:   Martin Rodriguez Reboredo <yakoyoku@gmail.com>
+In-Reply-To: <20230616001631.463536-2-ojeda@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Currently, -w (--print-directory) option is ignored, but it is better
-to respect the user's choice.
+On 6/15/23 21:16, Miguel Ojeda wrote:
+> From: Masahiro Yamada <masahiroy@kernel.org>
+> 
+> The -v option is passed when this script is invoked from Makefile,
+> but not when invoked from Kconfig.
+> 
+> As you can see in scripts/Kconfig.include, the 'success' macro suppresses
+> stdout and stderr anyway, so this script does not need to be quiet.
+> 
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> Reviewed-by: Miguel Ojeda <ojeda@kernel.org>
+> Tested-by: Miguel Ojeda <ojeda@kernel.org>
+> Reviewed-by: Nathan Chancellor <nathan@kernel.org>
+> Link: https://lore.kernel.org/r/20230109061436.3146442-1-masahiroy@kernel.org
+> [ Reworded prefix to match the others in the patch series. ]
+> Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
+> ---
+> 
 
-This commit changes the behavior of "Entering directory ..." logging.
-
-If -w (or --print-directory) is given via the command line or the
-MAKEFLAGS environment variable, print "Entering directory ..." for every
-sub make.
-
-If --no-print-directory is given via the command line or the MAKEFLAGS
-environment variable, suppress "Entering directory ..." completely.
-
-If none of them is given, print "Entering directory ..." only when Kbuild
-changes the working directory. (default)
-
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
-
-Changes in v2:
-  - new patch
-
- Makefile | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 916c1a7984b0..3867cdc3de5d 100644
---- a/Makefile
-+++ b/Makefile
-@@ -38,6 +38,12 @@ __all:
- # descending is started. They are now explicitly listed as the
- # prepare rule.
- 
-+ifeq ($(filter 3.%,$(MAKE_VERSION)),)
-+short-opts := $(firstword -$(MAKEFLAGS))
-+else
-+short-opts := $(filter-out --%,$(MAKEFLAGS))
-+endif
-+
- ifneq ($(sub_make_done),1)
- 
- # Do not use make's built-in rules and variables
-@@ -91,12 +97,6 @@ endif
- # commands
- # make-4.0 (and later) keep single letter options in the 1st word of MAKEFLAGS.
- 
--ifeq ($(filter 3.%,$(MAKE_VERSION)),)
--short-opts := $(firstword -$(MAKEFLAGS))
--else
--short-opts := $(filter-out --%,$(MAKEFLAGS))
--endif
--
- ifneq ($(findstring s,$(short-opts)),)
- quiet=silent_
- override KBUILD_VERBOSE :=
-@@ -217,12 +217,16 @@ else
- need-sub-make := 1
- endif
- 
-+ifeq ($(findstring w, $(short-opts)),)
- ifeq ($(filter --no-print-directory, $(MAKEFLAGS)),)
- # If --no-print-directory is unset, recurse once again to set it.
- # You may end up with recursing into __sub-make twice. This is due to the
- # behavior change for GNU Make 4.4.1.
- need-sub-make := 1
- endif
-+else
-+no-print-directory :=
-+endif
- 
- ifeq ($(need-sub-make),1)
- 
--- 
-2.39.2
-
+Reviewed-by: Martin Rodriguez Reboredo <yakoyoku@gmail.com>
