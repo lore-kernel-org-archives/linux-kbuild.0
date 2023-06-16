@@ -2,196 +2,186 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AC4DEB64D7
-	for <linux-kbuild@archiver.kernel.org>; Fri, 16 Jun 2023 07:45:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D8DAEB64D7
+	for <linux-kbuild@archiver.kernel.org>; Fri, 16 Jun 2023 14:58:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242521AbjFPHpc (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 16 Jun 2023 03:45:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40180 "EHLO
+        id S1345746AbjFPO6A (ORCPT
+        <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 16 Jun 2023 10:58:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244284AbjFPHpb (ORCPT
+        with ESMTP id S229706AbjFPO57 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 16 Jun 2023 03:45:31 -0400
-Received: from mail-4316.protonmail.ch (mail-4316.protonmail.ch [185.70.43.16])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC8212719;
-        Fri, 16 Jun 2023 00:45:29 -0700 (PDT)
-Date:   Fri, 16 Jun 2023 07:45:14 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-        s=protonmail3; t=1686901527; x=1687160727;
-        bh=hja84EESOQ9EaSxRMOYXkxBe5bRgfXkY/dr6HfkUDdw=;
-        h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-         Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-         Message-ID:BIMI-Selector;
-        b=UnCtG/TNYW/c2hj1iuYW9BVFSfc3MamSO/1GgW7QqhNODpOPMihdMKcBs8DQWb1bU
-         WCTXOl33qmyXRQCwlks+omoyqIERsvq8bx0GHcrX2XXRekrygTToo9b7nQOLl93wvi
-         s0g1RVSfM0r1etX2g+I2G51pE3aAfp6i57KuU3EYnYoOq6IMG+TGLGteFMmYo8SqQn
-         /hAn32YyLE79hytYP7ZMkmizIMDMNuewLYqK8mSu6a93diwnjuNMWwyx7Wnu0NcAVp
-         mY9ZKfcaVGUdomoUm1RdipPoBDbfIUp3NVY2K/GfSaXr8LHl7j7jhwvGStJsGvhzYt
-         I1En8JyAiEX8A==
-To:     Miguel Ojeda <ojeda@kernel.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Wedson Almeida Filho <wedsonaf@gmail.com>,
-        Alex Gaynor <alex.gaynor@gmail.com>
-From:   Heghedus Razvan <heghedus.razvan@protonmail.com>
-Cc:     Nathan Chancellor <nathan@kernel.org>,
+        Fri, 16 Jun 2023 10:57:59 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CEB830C5;
+        Fri, 16 Jun 2023 07:57:58 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AE4376336C;
+        Fri, 16 Jun 2023 14:57:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 356D7C433C0;
+        Fri, 16 Jun 2023 14:57:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1686927476;
+        bh=MPjQQ3JtAC+4df4LxJ4VAYqSVq149IdkIDQqJgcx6ms=;
+        h=From:To:Cc:Subject:Date:From;
+        b=cin4XiA8F5ZrvkEgAT9yCstY6jWTY4WQgdfjRhVHvNTEV8fdJk09mFVVX3xCL7f5R
+         hcioGNhqMxMv0U/BP+D0OP9hCZ/NNav+wpI+5qAdE2rvRS2TYLv5jBtMvazOGR/hMZ
+         IRGQqv408IoiGCY/os9eA/HvFsgLxiIE63aBgAVsJKhhZJ1W4vosbQgoDlTW5Wh+jO
+         oU5wHGj/AC3K4C4jhGQG6YsUqpygPqP5B1oRoErskfYHjRxdGE7Icrxomhp3++l3Pu
+         ZLzB7bqS8oRvhYGzb/2iHO6s3DbJQpl/b+YOA1LqqNvHPgUM9DFzekfmFK4RWPsSWJ
+         KHFbM24MgslJg==
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
         Nicolas Schier <nicolas@fjasle.eu>,
-        Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-        =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
-        Benno Lossin <benno.lossin@proton.me>,
-        Alice Ryhl <aliceryhl@google.com>,
-        Andreas Hindborg <nmi@metaspace.dk>,
-        linux-kbuild@vger.kernel.org, rust-for-linux@vger.kernel.org,
-        linux-kernel@vger.kernel.org, patches@lists.linux.dev
-Subject: Re: [PATCH v2 00/11] `scripts/rust_is_available.sh` improvements
-Message-ID: <CTDWNRIZBWCN.CJEV9K20D9OI@pc-server>
-In-Reply-To: <20230616001631.463536-1-ojeda@kernel.org>
-References: <20230616001631.463536-1-ojeda@kernel.org>
-Feedback-ID: 1233518:user:proton
+        Masahiro Yamada <masahiroy@kernel.org>,
+        David Howells <dhowells@redhat.com>
+Subject: [PATCH v2 1/2] kbuild: revive "Entering directory" for Make >= 4.4.1
+Date:   Fri, 16 Jun 2023 23:57:50 +0900
+Message-Id: <20230616145751.945864-1-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Fri Jun 16, 2023 at 3:16 AM EEST, Miguel Ojeda wrote:
-> This is the patch series to improve `scripts/rust_is_available.sh`.
->
-> The major addition in v2 is the test suite in the last commit. I added
-> it because I wanted to have a proper way to test any further changes to
-> it (such as the suggested `set --` idea to avoid forking by Masahiro),
-> and so that adding new checks was easier to justify too (i.e. vs. the
-> added complexity).
->
-> In addition, there are also a few new checks in the script, to cover for
-> even some more cases, which hopefully make problematic setups easier to
-> identify and solve by users building the kernel. For instance, running
-> the script externally gives:
->
->     $ scripts/rust_is_available.sh
->     ***
->     *** Environment variable 'RUSTC' is not set.
->     ***
->     *** This script is intended to be called from Kbuild.
->     *** Please use the 'rustavailable' target to call it instead.
->     *** Otherwise, the results may not be meaningful.
->     ***
->     *** Please see Documentation/rust/quick-start.rst for details
->     *** on how to set up the Rust support.
->     ***
->
-> I also changed it to avoid setting `-e` as Masahiro suggested.
-> Similarly, I now check for `$RUSTC`, `$BINDGEN` and `$CC`, instead of
-> `$MAKEFLAGS`, as he also suggested (but I gave it their own error
-> message rather than use the `${CC?: is not set}` approach. This goes in
-> line with the reasons outlined above, i.e. trying to give users a clear
-> error of what step exactly failed).
->
-> In the test suite I included previously problematic compiler version
-> strings we got reports for. The test suite covers all current branches
-> in the script, and we should keep it that way in the future.
->
-> The patch series also include Masahiro's patch to remove the `-v`
-> option, as well as Russell's patch for supporting multiple arguments
-> in `$CC`.
->
-> All in all, this should solve all the issues we got so far (unless I
-> have missed something) and improve things further with the new checks
-> plus the test suite to hopefully have an easier time in the future.
->
-> Testers for this one are appreciated, especially if you have uncommon or
-> custom setups for building the kernel.
+With commit 9da0763bdd82 ("kbuild: Use relative path when building in
+a subdir of the source tree"), compiler messages in out-of-tree builds
+include relative paths, which are relative to the build directory, not
+the directory where make was started.
 
-I gave this patch series a spin and is a nice improvement when trying to
-use a broken setup.
+To help IDEs/editors find the source files, Kbuild lets GNU Make print
+"Entering directory ..." when it changes the working directory. It has
+been working fine for a long time, but David reported it is broken with
+the latest GNU Make.
 
-When previously I had:
-./scripts/rust_is_available.sh: line 21: 100000 *  + 100 *  + : syntax erro=
-r: operand expected (error token is "+ ")
-make: *** [Makefile:1883: rustavailable] Error 1
+The behavior was changed by GNU Make commit 8f9e7722ff0f ("[SV 63537]
+Fix setting -w in makefiles"). Previously, setting --no-print-directory
+to MAKEFLAGS only affected child makes, but it is now interpreted in
+the current make as soon as it is set.
 
-Now I have:
+[test code]
 
-***
-*** Running 'bindgen' to check the libclang version (used by the Rust
-*** bindings generator) failed with code 101. This may be caused by
-*** a failure to locate libclang. See output and docs below for details:
-***
-thread 'main' panicked at 'Unable to find libclang: "the `libclang` shared =
-library at /opt/sdk/sysroots/x86_64-pokysdk-linux/usr/lib/libclang.so.14.0.=
-3 could not be opened: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.34=
-' not found (required by /opt/idc23/sysroots/x86_64-pokysdk-linux/usr/lib/l=
-ibclang.so.14.0.3)"', /home/heghedusrazvan/.cargo/registry/src/github.com-1=
-ecc6299db9ec823/bindgen-0.56.0/src/lib.rs:1922:31
-note: run with `RUST_BACKTRACE=3D1` environment variable to display a backt=
-race
-***
-***
-*** Please see Documentation/rust/quick-start.rst for details
-*** on how to set up the Rust support.
-***
-make: *** [Makefile:1883: rustavailable] Error 1
+  $ cat /tmp/Makefile
+  ifneq ($(SUBMAKE),1)
+  MAKEFLAGS += --no-print-directory
+  all: ; $(MAKE) SUBMAKE=1
+  else
+  all: ; :
+  endif
 
-or:
+[before 8f9e7722ff0f]
 
-***
-*** Rust compiler 'rustc' is too new. This may or may not work.
-***   Your version:     1.70.0
-***   Expected version: 1.68.2
-***
-***
-*** Running 'bindgen' to check the libclang version (used by the Rust
-*** bindings generator) failed with code 101. This may be caused by
-*** a failure to locate libclang. See output and docs below for details:
-***
-thread 'main' panicked at 'Unable to find libclang: "the `libclang` shared =
-library at /opt/sdk/sysroots/x86_64-pokysdk-linux/usr/lib/libclang.so.14.0.=
-3 could not be opened: libncurses.so.5: cannot open shared object file: No =
-such file or directory"', /root/.cargo/registry/src/index.crates.io-6f17d22=
-bba15001f/bindgen-0.56.0/src/lib.rs:1922:31
-note: run with `RUST_BACKTRACE=3D1` environment variable to display a backt=
-race
-***
-***
-*** Please see Documentation/rust/quick-start.rst for details
-*** on how to set up the Rust support.
-***
-make: *** [Makefile:1883: rustavailable] Error 1
+  $ make -C /tmp
+  make: Entering directory '/tmp'
+  make SUBMAKE=1
+  :
+  make: Leaving directory '/tmp'
 
--- Razvan
->
-> This could go through either the Kbuild or the Rust tree.
->
-> Masahiro Yamada (1):
->   kbuild: rust_is_available: remove -v option
->
-> Miguel Ojeda (9):
->   docs: rust: add paragraph about finding a suitable `libclang`
->   kbuild: rust_is_available: print docs reference
->   kbuild: rust_is_available: add check for `bindgen` invocation
->   kbuild: rust_is_available: check that environment variables are set
->   kbuild: rust_is_available: fix confusion when a version appears in the
->     path
->   kbuild: rust_is_available: normalize version matching
->   kbuild: rust_is_available: handle failures calling `$RUSTC`/`$BINDGEN`
->   kbuild: rust_is_available: check that output looks as expected
->   kbuild: rust_is_available: add test suite
->
-> Russell Currey (1):
->   kbuild: rust_is_available: fix version check when CC has multiple
->     arguments
->
->  Documentation/rust/quick-start.rst |  17 ++
->  Makefile                           |   4 +-
->  scripts/rust_is_available.sh       | 233 +++++++++++++------
->  scripts/rust_is_available_test.py  | 346 +++++++++++++++++++++++++++++
->  4 files changed, 532 insertions(+), 68 deletions(-)
->  create mode 100755 scripts/rust_is_available_test.py
->
->
-> base-commit: 858fd168a95c5b9669aac8db6c14a9aeab446375
-> --
-> 2.41.0
+[after 8f9e7722ff0f]
 
+  $ make -C /tmp
+  make SUBMAKE=1
+  :
+
+Previously, the effect of --no-print-directory was delayed until Kbuild
+started the directory descending, but it is no longer true with GNU Make
+4.4.1.
+
+This commit adds one more recursion to cater to GNU Make >= 4.4.1.
+
+When Kbuild needs to change the working directory, __submake will be
+executed twice.
+
+  __submake without --no-print-directory  --> show "Entering directory ..."
+  __submake with    --no-print-directory  --> parse the rest of Makefile
+
+We end up with one more recursion than needed for GNU Make < 4.4.1, but
+I do not want to complicate the version check.
+
+Reported-by: David Howells <dhowells@redhat.com>
+Closes: https://lore.kernel.org/all/2427604.1686237298@warthog.procyon.org.uk/
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
+
+Changes in v2:
+  - Fix the code. V1 did not work.
+  - Remove the version check to simplify the code
+
+ Makefile | 36 ++++++++++++++++++++----------------
+ 1 file changed, 20 insertions(+), 16 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index cc3fe09c4dec..916c1a7984b0 100644
+--- a/Makefile
++++ b/Makefile
+@@ -189,13 +189,6 @@ else
+ abs_objtree := $(CURDIR)
+ endif # ifneq ($(KBUILD_OUTPUT),)
+ 
+-ifeq ($(abs_objtree),$(CURDIR))
+-# Suppress "Entering directory ..." unless we are changing the work directory.
+-MAKEFLAGS += --no-print-directory
+-else
+-need-sub-make := 1
+-endif
+-
+ this-makefile := $(lastword $(MAKEFILE_LIST))
+ abs_srctree := $(realpath $(dir $(this-makefile)))
+ 
+@@ -214,6 +207,23 @@ endif
+ export abs_srctree abs_objtree
+ export sub_make_done := 1
+ 
++endif # sub_make_done
++
++ifeq ($(abs_objtree),$(CURDIR))
++# Suppress "Entering directory ..." if we are at the final work directory.
++no-print-directory := --no-print-directory
++else
++# Recursion to show "Entering directory ..."
++need-sub-make := 1
++endif
++
++ifeq ($(filter --no-print-directory, $(MAKEFLAGS)),)
++# If --no-print-directory is unset, recurse once again to set it.
++# You may end up with recursing into __sub-make twice. This is due to the
++# behavior change for GNU Make 4.4.1.
++need-sub-make := 1
++endif
++
+ ifeq ($(need-sub-make),1)
+ 
+ PHONY += $(MAKECMDGOALS) __sub-make
+@@ -223,18 +233,12 @@ $(filter-out $(this-makefile), $(MAKECMDGOALS)) __all: __sub-make
+ 
+ # Invoke a second make in the output directory, passing relevant variables
+ __sub-make:
+-	$(Q)$(MAKE) -C $(abs_objtree) -f $(abs_srctree)/Makefile $(MAKECMDGOALS)
++	$(Q)$(MAKE) $(no-print-directory) -C $(abs_objtree) \
++	-f $(abs_srctree)/Makefile $(MAKECMDGOALS)
+ 
+-endif # need-sub-make
+-endif # sub_make_done
++else # need-sub-make
+ 
+ # We process the rest of the Makefile if this is the final invocation of make
+-ifeq ($(need-sub-make),)
+-
+-# Do not print "Entering directory ...",
+-# but we want to display it when entering to the output directory
+-# so that IDEs/editors are able to understand relative filenames.
+-MAKEFLAGS += --no-print-directory
+ 
+ ifeq ($(abs_srctree),$(abs_objtree))
+         # building in the source tree
+-- 
+2.39.2
 
