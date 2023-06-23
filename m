@@ -2,40 +2,40 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26E2EEB64DD
-	for <linux-kbuild@archiver.kernel.org>; Fri, 23 Jun 2023 13:44:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D56FBEB64DD
+	for <linux-kbuild@archiver.kernel.org>; Fri, 23 Jun 2023 13:44:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231855AbjFWNo0 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 23 Jun 2023 09:44:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58562 "EHLO
+        id S231896AbjFWNoe (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 23 Jun 2023 09:44:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231758AbjFWNoT (ORCPT
+        with ESMTP id S231767AbjFWNoT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Fri, 23 Jun 2023 09:44:19 -0400
 Received: from mailbox.box.xen0n.name (mail.xen0n.name [115.28.160.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADC882697;
-        Fri, 23 Jun 2023 06:44:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEBAB26A0;
+        Fri, 23 Jun 2023 06:44:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xen0n.name; s=mail;
-        t=1687527855; bh=IRnQjd+50zNSbl5gfok3N2S0Jg+9Z4fkKrrLulCYgAU=;
+        t=1687527856; bh=R+wSgT+F3wMRO69fjSeRvENEk0FsnlxB4dse3vdqbGM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=jBYwNFvAZtvh5weJO87WvoPnD0vpgGxNBYxenSAK4gnQ9KmrG3BnzhhnkWqMKoKgb
-         vb0Yqr0llRUyT+De4OoHeaQTyWD4tdaWBYRB+S3XVp7H/rgy17Rt2BnBhce+lGAiJv
-         ksfdcKBmIXr/whec8cjaLK0fSsArdAEyhi0wdRzw=
+        b=rVJ1+TEL1Mzfomk4I8r6tvyT6fAVTvtqs+kZGN0mHc6VIoSy32rUJ4EEHFG0Id0SP
+         lwsCEmzJzrEs8ZKSuOW2PzmGtVzSc6m0sAjP+8b0eM9Q68OcKb+3izIKkQo+4OMMJk
+         lqg0CXemv+itFmqQdYx+iEQWaD1c3Cnnv6oMtSNg=
 Received: from ld50.lan (unknown [101.88.25.181])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by mailbox.box.xen0n.name (Postfix) with ESMTPSA id BEC90605EB;
-        Fri, 23 Jun 2023 21:44:14 +0800 (CST)
+        by mailbox.box.xen0n.name (Postfix) with ESMTPSA id 922ED605F6;
+        Fri, 23 Jun 2023 21:44:16 +0800 (CST)
 From:   WANG Xuerui <kernel@xen0n.name>
 To:     Huacai Chen <chenhuacai@kernel.org>
 Cc:     WANG Rui <wangrui@loongson.cn>, Xi Ruoyao <xry111@xry111.site>,
         loongarch@lists.linux.dev, linux-kbuild@vger.kernel.org,
         llvm@lists.linux.dev, linux-kernel@vger.kernel.org,
         WANG Xuerui <git@xen0n.name>
-Subject: [PATCH 6/9] LoongArch: Simplify the invtlb wrappers
-Date:   Fri, 23 Jun 2023 21:43:48 +0800
-Message-Id: <20230623134351.1898379-7-kernel@xen0n.name>
+Subject: [PATCH 8/9] Makefile: Add loongarch target flag for Clang compilation
+Date:   Fri, 23 Jun 2023 21:43:50 +0800
+Message-Id: <20230623134351.1898379-9-kernel@xen0n.name>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20230623134351.1898379-1-kernel@xen0n.name>
 References: <20230623134351.1898379-1-kernel@xen0n.name>
@@ -47,138 +47,27 @@ X-Mailing-List: linux-kbuild@vger.kernel.org
 
 From: WANG Xuerui <git@xen0n.name>
 
-Of the 3 existing invtlb wrappers, invtlb_info is not used at all,
-so it is removed; invtlb_all and invtlb_addr have their unused
-argument(s) removed from their signatures.
-
-Also, the invtlb instruction has been supported by upstream LoongArch
-toolchains from day one, so ditch the raw opcode trickery and just use
-plain inline asm for it.
+The LoongArch kernel is 64-bit and built with the soft-float ABI,
+hence the loongarch64-linux-gnusf target. (The "libc" part doesn't
+matter.)
 
 Signed-off-by: WANG Xuerui <git@xen0n.name>
 ---
- arch/loongarch/include/asm/tlb.h | 45 ++++++++++++--------------------
- arch/loongarch/mm/tlb.c          | 10 +++----
- 2 files changed, 21 insertions(+), 34 deletions(-)
+ scripts/Makefile.clang | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/loongarch/include/asm/tlb.h b/arch/loongarch/include/asm/tlb.h
-index 0dc9ee2b05d2..5e6ee9a15f0f 100644
---- a/arch/loongarch/include/asm/tlb.h
-+++ b/arch/loongarch/include/asm/tlb.h
-@@ -88,52 +88,39 @@ enum invtlb_ops {
- 	INVTLB_GID_ADDR = 0x16,
- };
- 
--/*
-- * invtlb op info addr
-- * (0x1 << 26) | (0x24 << 20) | (0x13 << 15) |
-- * (addr << 10) | (info << 5) | op
-- */
- static inline void invtlb(u32 op, u32 info, u64 addr)
- {
- 	__asm__ __volatile__(
--		"parse_r addr,%0\n\t"
--		"parse_r info,%1\n\t"
--		".word ((0x6498000) | (addr << 10) | (info << 5) | %2)\n\t"
--		:
--		: "r"(addr), "r"(info), "i"(op)
--		:
--		);
--}
--
--static inline void invtlb_addr(u32 op, u32 info, u64 addr)
--{
--	__asm__ __volatile__(
--		"parse_r addr,%0\n\t"
--		".word ((0x6498000) | (addr << 10) | (0 << 5) | %1)\n\t"
--		:
--		: "r"(addr), "i"(op)
-+		"invtlb %0, %1, %2\n\t"
- 		:
-+		: "i"(op), "r"(info), "r"(addr)
-+		: "memory"
- 		);
- }
- 
--static inline void invtlb_info(u32 op, u32 info, u64 addr)
-+static inline void invtlb_addr(u32 op, u64 addr)
- {
-+	/*
-+	 * The ISA manual says $zero shall be used in case a particular op
-+	 * does not take the respective argument, hence the invtlb helper is
-+	 * not re-used to make sure this is the case.
-+	 */
- 	__asm__ __volatile__(
--		"parse_r info,%0\n\t"
--		".word ((0x6498000) | (0 << 10) | (info << 5) | %1)\n\t"
--		:
--		: "r"(info), "i"(op)
-+		"invtlb %0, $zero, %1\n\t"
- 		:
-+		: "i"(op), "r"(addr)
-+		: "memory"
- 		);
- }
- 
--static inline void invtlb_all(u32 op, u32 info, u64 addr)
-+static inline void invtlb_all(u32 op)
- {
-+	/* Similar to invtlb_addr, ensure the operands are actually $zero. */
- 	__asm__ __volatile__(
--		".word ((0x6498000) | (0 << 10) | (0 << 5) | %0)\n\t"
-+		"invtlb %0, $zero, $zero\n\t"
- 		:
- 		: "i"(op)
--		:
-+		: "memory"
- 		);
- }
- 
-diff --git a/arch/loongarch/mm/tlb.c b/arch/loongarch/mm/tlb.c
-index 00bb563e3c89..de04d2624ef4 100644
---- a/arch/loongarch/mm/tlb.c
-+++ b/arch/loongarch/mm/tlb.c
-@@ -17,19 +17,19 @@
- 
- void local_flush_tlb_all(void)
- {
--	invtlb_all(INVTLB_CURRENT_ALL, 0, 0);
-+	invtlb_all(INVTLB_CURRENT_ALL);
- }
- EXPORT_SYMBOL(local_flush_tlb_all);
- 
- void local_flush_tlb_user(void)
- {
--	invtlb_all(INVTLB_CURRENT_GFALSE, 0, 0);
-+	invtlb_all(INVTLB_CURRENT_GFALSE);
- }
- EXPORT_SYMBOL(local_flush_tlb_user);
- 
- void local_flush_tlb_kernel(void)
- {
--	invtlb_all(INVTLB_CURRENT_GTRUE, 0, 0);
-+	invtlb_all(INVTLB_CURRENT_GTRUE);
- }
- EXPORT_SYMBOL(local_flush_tlb_kernel);
- 
-@@ -100,7 +100,7 @@ void local_flush_tlb_kernel_range(unsigned long start, unsigned long end)
- 		end &= (PAGE_MASK << 1);
- 
- 		while (start < end) {
--			invtlb_addr(INVTLB_ADDR_GTRUE_OR_ASID, 0, start);
-+			invtlb_addr(INVTLB_ADDR_GTRUE_OR_ASID, start);
- 			start += (PAGE_SIZE << 1);
- 		}
- 	} else {
-@@ -131,7 +131,7 @@ void local_flush_tlb_page(struct vm_area_struct *vma, unsigned long page)
- void local_flush_tlb_one(unsigned long page)
- {
- 	page &= (PAGE_MASK << 1);
--	invtlb_addr(INVTLB_ADDR_GTRUE_OR_ASID, 0, page);
-+	invtlb_addr(INVTLB_ADDR_GTRUE_OR_ASID, page);
- }
- 
- static void __update_hugetlb(struct vm_area_struct *vma, unsigned long address, pte_t *ptep)
+diff --git a/scripts/Makefile.clang b/scripts/Makefile.clang
+index 058a4c0f864e..6c23c6af797f 100644
+--- a/scripts/Makefile.clang
++++ b/scripts/Makefile.clang
+@@ -4,6 +4,7 @@
+ CLANG_TARGET_FLAGS_arm		:= arm-linux-gnueabi
+ CLANG_TARGET_FLAGS_arm64	:= aarch64-linux-gnu
+ CLANG_TARGET_FLAGS_hexagon	:= hexagon-linux-musl
++CLANG_TARGET_FLAGS_loongarch	:= loongarch64-linux-gnusf
+ CLANG_TARGET_FLAGS_m68k		:= m68k-linux-gnu
+ CLANG_TARGET_FLAGS_mips		:= mipsel-linux-gnu
+ CLANG_TARGET_FLAGS_powerpc	:= powerpc64le-linux-gnu
 -- 
 2.40.0
 
