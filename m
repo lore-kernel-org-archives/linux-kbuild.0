@@ -2,113 +2,131 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09143EB64D7
-	for <linux-kbuild@archiver.kernel.org>; Mon, 26 Jun 2023 23:30:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C2B0EB64D7
+	for <linux-kbuild@archiver.kernel.org>; Mon, 26 Jun 2023 23:32:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229861AbjFZXa1 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 26 Jun 2023 19:30:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60092 "EHLO
+        id S229566AbjFZXcD (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 26 Jun 2023 19:32:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229495AbjFZXaW (ORCPT
+        with ESMTP id S229841AbjFZXa1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 26 Jun 2023 19:30:22 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 764E9FB;
-        Mon, 26 Jun 2023 16:30:21 -0700 (PDT)
+        Mon, 26 Jun 2023 19:30:27 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDC3C19A2;
+        Mon, 26 Jun 2023 16:30:24 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0208460F9D;
-        Mon, 26 Jun 2023 23:30:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3914CC433C8;
-        Mon, 26 Jun 2023 23:30:19 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5AB0760FA2;
+        Mon, 26 Jun 2023 23:30:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88FEDC433CC;
+        Mon, 26 Jun 2023 23:30:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1687822220;
-        bh=cjJsx6TjubpGMxRoEjJsSsu/4pIX4weGQrf/DhGnRwM=;
-        h=From:To:Cc:Subject:Date:From;
-        b=TxIfBg0wkRWHpL0I3cKAWbAYQvCwixUZRiHMJ5JvVbrGo3yea6cFyXZiT3cDkorn6
-         6Wv/Fbyh3aiTqyAqDJCuJEwUybPSX9E4ryQdrKPyzzcOQCqWT8qr+EgQ7MaNVA9txD
-         vOuS+ZxRar2p91fvXePl+2VVURM+oYIqPIeUhNh5Gu0PsR2x6fqXTzITteMcyH5lmA
-         0D1W7ZD4PX9MwIk1ojtPGgWd7DnlYPgTkjKeAP3MWrlHuKu0jdHqlRhGzEAUmtW6vm
-         hUA8JcZRhcq1w4evon/LoZN/Nco4NkRqXCo5KnbYBI5IbPkxoXl7C94xaZe4tGtTrZ
-         couq/E4em9y+w==
+        s=k20201202; t=1687822223;
+        bh=AkTW18VRFm3aTIK6VmGPviMroWucajIDz7AXevpDt4g=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=fI2hZvtsgQcib8dtlCMxbdZzfe6K44XYN+DUS+FsUW64uLhr/otCBQXo7Y15Ofz2d
+         UnEiosmv4Ws7w1c5jPTtoz8/7wlF3jPZfb4S1tUgrw+sm8dCLKmLE/czZbrPR/JuKY
+         7xike14a+dtWTgrCDTSZyrbnAuJFZG78IaZRZdbn8Udi4rOjYQij2ROC7JSNGy/xdw
+         ccPdhzZH2KB23DGWnYjY2N8kkMcCz/2ZsaD/DsD8Xc7ZlvCvehxYjoE5AAeT9yZCXU
+         LijpBR437U82jckTyleFkWTVn4ZwKpIH/aMBlh10PiaNrq0ZSwRm3DCSeN3m6VM45P
+         8ytF5BjzEV8/Q==
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
+        Nicolas Schier <n.schier@avm.de>,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
         Nicolas Schier <nicolas@fjasle.eu>
-Subject: [PATCH v4 1/3] kbuild: set correct abs_srctree and abs_objtree for package builds
-Date:   Tue, 27 Jun 2023 08:30:12 +0900
-Message-Id: <20230626233014.66549-1-masahiroy@kernel.org>
+Subject: [PATCH v4 3/3] kbuild: respect GNU Make -w flag
+Date:   Tue, 27 Jun 2023 08:30:14 +0900
+Message-Id: <20230626233014.66549-3-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230626233014.66549-1-masahiroy@kernel.org>
+References: <20230626233014.66549-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-When you run 'make rpm-pkg', the rpmbuild tool builds the kernel in
-rpmbuild/BUILD, but $(abs_srctree) and $(abs_objtree) point to the
-directory path where make was started, not the kernel is actually
-being built. The same applies to 'make snap-pkg'. Fix it.
+Currently, -w (--print-directory) option is ignored, but it is better
+to respect the user's choice.
+
+This commit changes the behavior of "Entering directory ..." logging.
+
+If -w (or --print-directory) is given via the command line or the
+MAKEFLAGS environment variable, print "Entering directory ..." for every
+sub make.
+
+If --no-print-directory is given via the command line or the MAKEFLAGS
+environment variable, suppress "Entering directory ..." completely.
+
+If none of them is given, print "Entering directory ..." when Kbuild
+changes the working directory at the start of building. (default)
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Tested-by: Nicolas Schier <n.schier@avm.de>
 ---
 
-Changes in v4:
- - Export abs_{src,obj}tree again
+(no changes since v2)
 
-Changes in v3:
- - New patch
+Changes in v2:
+  - new patch
 
- Makefile | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ Makefile | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index f18d59c81241..70b314059d8b 100644
+index 7edb00603b7e..c9864f83a3d2 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -38,6 +38,10 @@ __all:
+@@ -38,6 +38,12 @@ __all:
  # descending is started. They are now explicitly listed as the
  # prepare rule.
  
-+this-makefile := $(lastword $(MAKEFILE_LIST))
-+export abs_srctree := $(realpath $(dir $(this-makefile)))
-+export abs_objtree := $(CURDIR)
++ifeq ($(filter 3.%,$(MAKE_VERSION)),)
++short-opts := $(firstword -$(MAKEFLAGS))
++else
++short-opts := $(filter-out --%,$(MAKEFLAGS))
++endif
 +
- ifneq ($(sub_make_done),1)
+ this-makefile := $(lastword $(MAKEFILE_LIST))
+ export abs_srctree := $(realpath $(dir $(this-makefile)))
+ export abs_objtree := $(CURDIR)
+@@ -95,12 +101,6 @@ endif
+ # commands
+ # make-4.0 (and later) keep single letter options in the 1st word of MAKEFLAGS.
  
- # Do not use make's built-in rules and variables
-@@ -185,8 +189,6 @@ $(if $(abs_objtree),, \
- 
- # $(realpath ...) resolves symlinks
- abs_objtree := $(realpath $(abs_objtree))
+-ifeq ($(filter 3.%,$(MAKE_VERSION)),)
+-short-opts := $(firstword -$(MAKEFLAGS))
 -else
--abs_objtree := $(CURDIR)
- endif # ifneq ($(KBUILD_OUTPUT),)
- 
- ifeq ($(abs_objtree),$(CURDIR))
-@@ -196,9 +198,6 @@ else
+-short-opts := $(filter-out --%,$(MAKEFLAGS))
+-endif
+-
+ ifneq ($(findstring s,$(short-opts)),)
+ quiet=silent_
+ override KBUILD_VERBOSE :=
+@@ -215,12 +215,16 @@ else
  need-sub-make := 1
  endif
  
--this-makefile := $(lastword $(MAKEFILE_LIST))
--abs_srctree := $(realpath $(dir $(this-makefile)))
--
- ifneq ($(words $(subst :, ,$(abs_srctree))), 1)
- $(error source directory cannot contain spaces or colons)
++ifeq ($(findstring w, $(short-opts)),)
+ ifeq ($(filter --no-print-directory, $(MAKEFLAGS)),)
+ # If --no-print-directory is unset, recurse once again to set it.
+ # You may end up recursing into __sub-make twice. This is needed due to the
+ # behavior change in GNU Make 4.4.1.
+ need-sub-make := 1
  endif
-@@ -211,7 +210,6 @@ need-sub-make := 1
- $(this-makefile): ;
- endif
- 
--export abs_srctree abs_objtree
- export sub_make_done := 1
++else
++no-print-directory :=
++endif
  
  ifeq ($(need-sub-make),1)
+ 
 -- 
 2.39.2
 
