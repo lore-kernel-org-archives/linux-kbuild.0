@@ -2,197 +2,133 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A701EB64D9
-	for <linux-kbuild@archiver.kernel.org>; Thu, 29 Jun 2023 15:51:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53469C001B0
+	for <linux-kbuild@archiver.kernel.org>; Thu, 29 Jun 2023 16:04:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230036AbjF2PvE (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 29 Jun 2023 11:51:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58770 "EHLO
+        id S231821AbjF2QEC (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 29 Jun 2023 12:04:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229991AbjF2PvD (ORCPT
+        with ESMTP id S231633AbjF2QEB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 29 Jun 2023 11:51:03 -0400
+        Thu, 29 Jun 2023 12:04:01 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2A9130D1
-        for <linux-kbuild@vger.kernel.org>; Thu, 29 Jun 2023 08:51:02 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FE6C10D5;
+        Thu, 29 Jun 2023 09:04:00 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 33A796150E
-        for <linux-kbuild@vger.kernel.org>; Thu, 29 Jun 2023 15:51:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 968CAC433C8
-        for <linux-kbuild@vger.kernel.org>; Thu, 29 Jun 2023 15:51:01 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A9FE96156D;
+        Thu, 29 Jun 2023 16:03:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46D0BC433C9;
+        Thu, 29 Jun 2023 16:03:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688053861;
-        bh=Jtgw3odh+GLq+lUTPEqZS0iPo1sMbAGB2ih16Wmske4=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=MJQyqQ/oZDquI08zzso7L4/ROTAq94jmB2YNQlsdDQfDfN+9W6h/EIDRoooDvnFsd
-         vZhPSCcm3Qh491zlpc7RuFkIb9GFmMErODkRdv11Q/vJPxcJNqfM1k0b2noJS45ZP4
-         MNppBtQooqkfD/eOGs66zIIamD8ZuPfo2Bl0JOLadCCo4UdOQ+81e5H1gCephIRzqI
-         roVrcS3wBeL5bRKa2KhL3D/yT9zM4v6PkJ0tRrlCgOcE8O33NstSItd+AFsIn/0wr0
-         VRf2ST/wvIx3cugA8A4FT/pusFFGkqZ3bwUmRj3BUI9KPdamt/dQ0xLXwa+ok0H/sd
-         GdAqwaKVbL8cg==
-Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-1b0156a1c4bso591841fac.1
-        for <linux-kbuild@vger.kernel.org>; Thu, 29 Jun 2023 08:51:01 -0700 (PDT)
-X-Gm-Message-State: AC+VfDywKdmr+U+Af2zjmUKJVQvvgAWe8ByVCDa+rPWqI/AlOpptSfn1
-        xTgtHR0B0FH8fw4ZFZTQByZlq9th/5e+BL3C3cI=
-X-Google-Smtp-Source: APBJJlE2X8KYP9eByL1Vjfcsd91PxRRoduq+LkQjHMdFZYyj6vXAwB6Jv24GYfr5zPcUFLv/wASIxq+p7zaOxRRg8+Y=
-X-Received: by 2002:a05:6870:c8a8:b0:1ad:4a74:9d63 with SMTP id
- er40-20020a056870c8a800b001ad4a749d63mr216064oab.53.1688053860900; Thu, 29
- Jun 2023 08:51:00 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230618001646.1228521-1-Mr.Bossman075@gmail.com>
- <CAK7LNAT=jKNFcQmrrZsF5Lis_fmex+1KZe0U-VpsxeekH7aZYw@mail.gmail.com>
- <CAJFTR8QexS3wyWTv+9_9=Z3OMnwyJtysBucwqLizDsczLW8Vjg@mail.gmail.com>
- <CAK7LNARG+m8RPJWKyOXHB=deF+yRN-2soXWO-ohBEc3nLDYF5A@mail.gmail.com> <CAJFTR8STYYmcqJNr2sLCfsWAHBkzLuDUnLLr5Ke-JfbUoKefBA@mail.gmail.com>
-In-Reply-To: <CAJFTR8STYYmcqJNr2sLCfsWAHBkzLuDUnLLr5Ke-JfbUoKefBA@mail.gmail.com>
+        s=k20201202; t=1688054639;
+        bh=kecJ7j1mmrkVEupftE0qUI4crvKvKvDb/jves3wo4F8=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=LNvpacQZCKhYQq0u34fEhS/M05Vbgc2zSsPVWnBSBjsYihTTq4GETbJAt5V0CmitM
+         yhHawHUZOqsGxIG3amSA/Ik0QwKPrBUnsJCSKOSZXF5n4Y5YXLU4A4rwkiyDRUNoR7
+         AAs27VNslKEYpDQk8yqWmodKY3+zfTInYoBXnKI1GleH7IZgtEEPL/KycXaHZeRSWp
+         L1tNtqfK4d5ntfL4FzjEt4D0G5yBitStGgMT0bNYvyI9wNz/Io0we7sRLWLB4h3IrL
+         g656gucy5TjjdzFJw9tVKIAhjVsYmrh0sMQLrspo9JZ1S1QPSmGxlloAURpNAa/Okp
+         akf/g91y3VYdg==
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Fri, 30 Jun 2023 00:50:23 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAR2jO8cdHLVx1+qW9N+PQuiofu8Kf0Z1AN2caDUSOSJcQ@mail.gmail.com>
-Message-ID: <CAK7LNAR2jO8cdHLVx1+qW9N+PQuiofu8Kf0Z1AN2caDUSOSJcQ@mail.gmail.com>
-Subject: Re: [PATCH v1] scripts: kconfig: nconf: Add search jump feature
-To:     Jesse T <mr.bossman075@gmail.com>
-Cc:     linux-kbuild@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>,
-        Stephen Boyd <sboyd@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     linux-kbuild@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Jesse Taube <Mr.Bossman075@gmail.com>,
+        Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH 2/2] kconfig: menuconfig: remove jump_key::index
+Date:   Fri, 30 Jun 2023 01:03:51 +0900
+Message-Id: <20230629160351.2996541-2-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230629160351.2996541-1-masahiroy@kernel.org>
+References: <20230629160351.2996541-1-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, Jun 27, 2023 at 12:08=E2=80=AFPM Jesse T <mr.bossman075@gmail.com> =
-wrote:
->
-> On Mon, Jun 26, 2023 at 8:38=E2=80=AFPM Masahiro Yamada <masahiroy@kernel=
-.org> wrote:
-> >
-> > On Sun, Jun 25, 2023 at 5:36=E2=80=AFAM Jesse T <mr.bossman075@gmail.co=
-m> wrote:
-> > >
-> > > On Sat, Jun 24, 2023 at 4:11=E2=80=AFAM Masahiro Yamada <masahiroy@ke=
-rnel.org> wrote:
-> > > >
-> > > > On Sun, Jun 18, 2023 at 9:16=E2=80=AFAM Jesse Taube <mr.bossman075@=
-gmail.com> wrote:
-> > > > >
-> > > > > Menuconfig has a feature where you can "press the key in the (#) =
-prefix
-> > > > > to jump directly to that location. You will be returned to the cu=
-rrent
-> > > > > search results after exiting this new menu."
-> > > > >
-> > > > > This commit adds this feature to nconfig, with almost identical c=
-ode.
-> > > > >
-> > > > > Signed-off-by: Jesse Taube <Mr.Bossman075@gmail.com>
-> > > >
-> > > >
-> > > > Setting the code duplication aside,
-> > >
-> > >
-> > > If it does function as expected will you accept the patch?
-> >
-> >
-> > Probably.
-> >
-> > The menuconfig code you copied is really ugly.
->
-> Yes, I saw and was surprised it was allowed, grandfathered in I guess.
+You do not need to remember the index of each jump key because you can
+count it up after a key is pressed.
 
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-Yes, you are grandfathered in.
+ scripts/kconfig/expr.h  | 1 -
+ scripts/kconfig/mconf.c | 7 ++++---
+ scripts/kconfig/menu.c  | 8 --------
+ 3 files changed, 4 insertions(+), 12 deletions(-)
 
-Code refactoring is one of maintainer's jobs.
+diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
+index 9c9caca5bd5f..4a9a23b1b7e1 100644
+--- a/scripts/kconfig/expr.h
++++ b/scripts/kconfig/expr.h
+@@ -275,7 +275,6 @@ struct jump_key {
+ 	struct list_head entries;
+ 	size_t offset;
+ 	struct menu *target;
+-	int index;
+ };
+ 
+ extern struct file *file_list;
+diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+index 7adfd6537279..fcb91d69c774 100644
+--- a/scripts/kconfig/mconf.c
++++ b/scripts/kconfig/mconf.c
+@@ -22,8 +22,6 @@
+ #include "lkc.h"
+ #include "lxdialog/dialog.h"
+ 
+-#define JUMP_NB			9
+-
+ static const char mconf_readme[] =
+ "Overview\n"
+ "--------\n"
+@@ -399,6 +397,7 @@ static int handle_search_keys(int key, int start, int end, void *_data)
+ {
+ 	struct search_data *data = _data;
+ 	struct jump_key *pos;
++	int index = '1';
+ 
+ 	if (key < '1' || key > '9')
+ 		return 0;
+@@ -408,11 +407,13 @@ static int handle_search_keys(int key, int start, int end, void *_data)
+ 			if (pos->offset >= end)
+ 				break;
+ 
+-			if (key == '1' + (pos->index % JUMP_NB)) {
++			if (key == index) {
+ 				data->target = pos->target;
+ 				return 1;
+ 			}
+ 		}
++
++		index = next_key(index);
+ 	}
+ 
+ 	return 0;
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index 5578b8bc8a23..198eb1367e7a 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -735,15 +735,7 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
+ 	}
+ 	if (head && location) {
+ 		jump = xmalloc(sizeof(struct jump_key));
+-
+ 		jump->target = location;
+-
+-		if (list_empty(head))
+-			jump->index = 0;
+-		else
+-			jump->index = list_entry(head->prev, struct jump_key,
+-						 entries)->index + 1;
+-
+ 		list_add_tail(&jump->entries, head);
+ 	}
+ 
+-- 
+2.39.2
 
-
-
-
->
-> > Actually, I was refactoring the search jump code a few
-> > months ago, but I did not get around to completing it.
->
-> This isn't on git.kernel.org, would you mind sharing it?
-> If you have any ideas on the best way to implement this,
-> I would love suggestions.
-
-
-Digging into my local repository, it looks like
-I had written up functional code already.
-
-I just filled in the commit description.
-
-I will post it.
-
-
-
-
-
-
-> Thanks,
-> Jesse T
->
-> >
-> >
-> >
-> >
-> >
-> >
-> >
-> >
-> > > Should I mark the copied codes'  original location?
-> > >
-> > > > does this patch work correctly?
-> > > >
-> > > >
-> > > >
-> > > >
-> > > > $ make defconfig
-> > > > $ make nconfig
-> > > >
-> > > > Press F8
-> > > >
-> > > > Input "MODULES" in the search box.
-> > > >
-> > > > You will see:
-> > > >
-> > > > (1) -> Enable loadable module support
-> > > >
-> > > > Press the "1" key.
-> > > >
-> > > >
-> > > > It will navigate to "General setup"
-> > > > instead of "Enable loadable module support".
-> > >
-> > >
-> > > Hmm, this is a confusing issue.
-> > > It will take you to the parent menu of the option, it should move you
-> > > to the parent option and
-> > > move the cursor to the option location. I will see if I can resolve
-> > > this oversight.
-> > >
-> > > Thanks,
-> > > Jesse Taube
-> > >
-> > > >
-> > > >
-> > > >
-> > > >
-> > > >
-> > > >
-> > > >
-> > > > --
-> > > > Best Regards
-> > > > Masahiro Yamada
-> >
-> >
-> >
-> > --
-> > Best Regards
-> > Masahiro Yamada
-
-
-
---=20
-Best Regards
-Masahiro Yamada
