@@ -2,473 +2,97 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D5D6EB64D9
-	for <linux-kbuild@archiver.kernel.org>; Thu, 29 Jun 2023 16:04:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2B10EB64D9
+	for <linux-kbuild@archiver.kernel.org>; Thu, 29 Jun 2023 18:58:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231650AbjF2QEB (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 29 Jun 2023 12:04:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35090 "EHLO
+        id S232301AbjF2S6r (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 29 Jun 2023 14:58:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231537AbjF2QEA (ORCPT
+        with ESMTP id S231393AbjF2S6q (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 29 Jun 2023 12:04:00 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDF2C9E;
-        Thu, 29 Jun 2023 09:03:58 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6E08C6156B;
-        Thu, 29 Jun 2023 16:03:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE70BC433C0;
-        Thu, 29 Jun 2023 16:03:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688054637;
-        bh=qjOh8PcGvb2JP9QrZz6XnfZ+0K4P/pZ94BB3qlnKJPQ=;
-        h=From:To:Cc:Subject:Date:From;
-        b=EvYW5aYtfb8B+9Sn9it2ad+6bmQv8vbY0KJygXI0LRQY18hVTxm+7JTQNWR2roe2k
-         oDsZPEH8+nVL7kaDzfwprow6aAZvGvKq2thOglmYvDBjI8uow7HyZ6fNiQK/2PvSHi
-         AZRsilpZshWq5sN2jD5nang8sxgcJYYQRyv90MJ+fqnvm8+sjh0IL71jVqK0hLY6qX
-         fWnTjUopL6EzAYtZq+OytO8wA5bNVAu4r2gwzo5BZ1ecLqzneoRzLkK6Zpdh0+py61
-         I7P+r5ZK2EIAQsKD87UfHd8ixyyLXF0Z/QBaQbVC6TyPGeuq8AqCxZDlPFoQypes7x
-         ckvmkGsERYXBA==
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Jesse Taube <Mr.Bossman075@gmail.com>,
-        Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 1/2] kconfig: menuconfig: simplify global jump key assignment
-Date:   Fri, 30 Jun 2023 01:03:50 +0900
-Message-Id: <20230629160351.2996541-1-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.39.2
+        Thu, 29 Jun 2023 14:58:46 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88241CA
+        for <linux-kbuild@vger.kernel.org>; Thu, 29 Jun 2023 11:58:45 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1b7fdc66e30so6576545ad.2
+        for <linux-kbuild@vger.kernel.org>; Thu, 29 Jun 2023 11:58:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1688065125; x=1690657125;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=CtoO7wxtO66WKs7HcsIYHnyEK9qS2ptNje4197iQ+WQ=;
+        b=FqDckJGHOAILns8g8SssjEEqPgFGcqCyYEpxv0IIM+kBYWw18HQ3wDZvDveym6Iexv
+         MuHvgZIebcIjQg0yrloXjPPrh9JqXGUM7vT/pkXe7VZ3HOOu4XClZnKHCXl4HzTZj6XZ
+         brONgjMBygrSxQDYjk6T4XM5k4ImQ0xpweSjI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688065125; x=1690657125;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CtoO7wxtO66WKs7HcsIYHnyEK9qS2ptNje4197iQ+WQ=;
+        b=avy8CfPZejq1otNCSvw0Ia2apZMpUUAyW21AtKZqIbZ98SgfWkJ0nL2hevodEOqmhR
+         KJlpXZ21TCOoViwac1cp9JqKk5lJajDGqhkc5YRqmST37EQM4yYeXLMkeYsIxkpShAEA
+         mnD/WGOXQPq/gblCea/z4toJBFuCOb5+CJiiRfTDyB/luikvNLv8uwHcHZBHEBJqv3cO
+         U4AyTIk9wP/qjXIkjsn+vJkz4RtDZOiqyfTpSeLAmrN0Te0seAwEJWVO8p3F5BLIT3gN
+         RBp11XdmhBshQn5nNqzaW1Hm6KpM6KKjh9PZzzb1kW0aBXly+jWoI2AU0aEqMtCR/SDc
+         JfyA==
+X-Gm-Message-State: ABy/qLYYDj9CfvnFrqM5UTwg6p1Rn3O0TTqozPLDI+p/rTwK0PCSqb1Q
+        V7n9tw/SMJJ6wt07fTRmpu8u0fZqzw+VbqEx15M=
+X-Google-Smtp-Source: APBJJlE2bSL3RaiK4vRaauIvsS0try4vm6SYiy+L//V/kX9bwLc2aK/E9ffrCixlwmqbMMkIt+XsuQ==
+X-Received: by 2002:a17:902:f544:b0:1b5:2b12:6f50 with SMTP id h4-20020a170902f54400b001b52b126f50mr121980plf.12.1688065125035;
+        Thu, 29 Jun 2023 11:58:45 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id x3-20020a1709027c0300b001ae5d21f760sm9382247pll.146.2023.06.29.11.58.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jun 2023 11:58:44 -0700 (PDT)
+Date:   Thu, 29 Jun 2023 11:58:43 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     llvm@lists.linux.dev, linux-kbuild@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+        Borislav Petkov <bp@alien8.de>, linux-usb@vger.kernel.org
+Subject: Re: UBSAN spat in valid xhci code in Linus's current tree (6.4+)
+Message-ID: <202306291147.4CE126CE5@keescook>
+References: <2023062945-fencing-pebble-0411@gregkh>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2023062945-fencing-pebble-0411@gregkh>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Commit 95ac9b3b585d ("menuconfig: Assign jump keys per-page instead
-of globally") injects a lot of hacks to the bottom of the textbox
-infrastructure.
+On Thu, Jun 29, 2023 at 05:36:51PM +0200, Greg KH wrote:
+> Boris just reported to me a UBSAN splat in the USB xhci driver in
+> Linus's tree that wasn't present in 6.4-final, and given that no USB
+> changes are merged yet there, I was confused.
+> 
+> Turns out, I think you all missed a "variable length" structure in the
+> xhci driver, which UBSAN is calling out a being an overrun, when really
+> it isn't (it's just written that way...)
+> 
+> The splat is:
+> 
+> UBSAN: array-index-out-of-bounds in drivers/usb/host/xhci-hub.c:231:31
+> index 1 is out of range for type '__le32 [1]'
+> CPU: 0 PID: 1556 Comm: kworker/0:2 Not tainted 6.4.0+ #7
 
-I reverted many of them without changing the behavior. (almost)
-Now, the key markers are inserted when constructing the search result
-instead of updating the text buffer on-the-fly.
+This is fixed here, a couple weeks ago, but maybe it missed your tree:
+https://lore.kernel.org/lkml/20230614181307.gonna.256-kees@kernel.org/
 
-The buffer passed to the textbox got back to a constant string.
-The ugly casts from (const char *) to (char *) went away.
+Would you prefer I carry it?
 
-A disadvantage is that the same key numbers might be diplayed multiple
-times in the dialog if you use a huge window (but I believe it is
-unlikely to happen).
+> So perhaps 2d47c6956ab3 ("ubsan: Tighten UBSAN_BOUNDS on GCC") should be
+> reverted for now?  Or this field fixed up to properly be marked as a
+> variable length array of at least one entry?
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+We've been turning these things on further and further so we can catch
+stuff like this (and we did while it lived in -next). FWIW, it shouldn't
+cause any problems beyond the splat (i.e. everything should continue
+working normally).
 
- scripts/kconfig/lkc.h              |  1 +
- scripts/kconfig/lxdialog/dialog.h  | 10 ++--
- scripts/kconfig/lxdialog/textbox.c | 68 +++++++++--------------
- scripts/kconfig/mconf.c            | 86 +++++++++++++++++-------------
- scripts/kconfig/menu.c             | 22 ++++++--
- 5 files changed, 97 insertions(+), 90 deletions(-)
+-Kees
 
-diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
-index e7118d62a45f..d5c27180ce91 100644
---- a/scripts/kconfig/lkc.h
-+++ b/scripts/kconfig/lkc.h
-@@ -101,6 +101,7 @@ const char *menu_get_prompt(struct menu *menu);
- struct menu *menu_get_parent_menu(struct menu *menu);
- bool menu_has_help(struct menu *menu);
- const char *menu_get_help(struct menu *menu);
-+int get_jump_key(void);
- struct gstr get_relations_str(struct symbol **sym_arr, struct list_head *head);
- void menu_get_ext_help(struct menu *menu, struct gstr *help);
- 
-diff --git a/scripts/kconfig/lxdialog/dialog.h b/scripts/kconfig/lxdialog/dialog.h
-index 347daf25fdc8..cd1b59c24b21 100644
---- a/scripts/kconfig/lxdialog/dialog.h
-+++ b/scripts/kconfig/lxdialog/dialog.h
-@@ -196,13 +196,9 @@ int first_alpha(const char *string, const char *exempt);
- int dialog_yesno(const char *title, const char *prompt, int height, int width);
- int dialog_msgbox(const char *title, const char *prompt, int height,
- 		  int width, int pause);
--
--
--typedef void (*update_text_fn)(char *buf, size_t start, size_t end, void
--			       *_data);
--int dialog_textbox(const char *title, char *tbuf, int initial_height,
--		   int initial_width, int *keys, int *_vscroll, int *_hscroll,
--		   update_text_fn update_text, void *data);
-+int dialog_textbox(const char *title, const char *tbuf, int initial_height,
-+		   int initial_width, int *_vscroll, int *_hscroll,
-+		   int (*extra_key_cb)(int, int, int, void *), void *data);
- int dialog_menu(const char *title, const char *prompt,
- 		const void *selected, int *s_scroll);
- int dialog_checklist(const char *title, const char *prompt, int height,
-diff --git a/scripts/kconfig/lxdialog/textbox.c b/scripts/kconfig/lxdialog/textbox.c
-index bc4d4fb1dc75..e6cd7bb83746 100644
---- a/scripts/kconfig/lxdialog/textbox.c
-+++ b/scripts/kconfig/lxdialog/textbox.c
-@@ -10,8 +10,8 @@
- 
- static int hscroll;
- static int begin_reached, end_reached, page_length;
--static char *buf;
--static char *page;
-+static const char *buf, *page;
-+static int start, end;
- 
- /*
-  * Go back 'n' lines in text. Called by dialog_textbox().
-@@ -98,21 +98,10 @@ static void print_line(WINDOW *win, int row, int width)
- /*
-  * Print a new page of text.
-  */
--static void print_page(WINDOW *win, int height, int width, update_text_fn
--		       update_text, void *data)
-+static void print_page(WINDOW *win, int height, int width)
- {
- 	int i, passed_end = 0;
- 
--	if (update_text) {
--		char *end;
--
--		for (i = 0; i < height; i++)
--			get_line();
--		end = page;
--		back_lines(height);
--		update_text(buf, page - buf, end - buf, data);
--	}
--
- 	page_length = 0;
- 	for (i = 0; i < height; i++) {
- 		print_line(win, i, width);
-@@ -142,24 +131,26 @@ static void print_position(WINDOW *win)
-  * refresh window content
-  */
- static void refresh_text_box(WINDOW *dialog, WINDOW *box, int boxh, int boxw,
--			     int cur_y, int cur_x, update_text_fn update_text,
--			     void *data)
-+			     int cur_y, int cur_x)
- {
--	print_page(box, boxh, boxw, update_text, data);
-+	start = page - buf;
-+
-+	print_page(box, boxh, boxw);
- 	print_position(dialog);
- 	wmove(dialog, cur_y, cur_x);	/* Restore cursor position */
- 	wrefresh(dialog);
-+
-+	end = page - buf;
- }
- 
- /*
-  * Display text from a file in a dialog box.
-  *
-  * keys is a null-terminated array
-- * update_text() may not add or remove any '\n' or '\0' in tbuf
-  */
--int dialog_textbox(const char *title, char *tbuf, int initial_height,
--		   int initial_width, int *keys, int *_vscroll, int *_hscroll,
--		   update_text_fn update_text, void *data)
-+int dialog_textbox(const char *title, const char *tbuf, int initial_height,
-+		   int initial_width, int *_vscroll, int *_hscroll,
-+		   int (*extra_key_cb)(int, int, int, void *), void *data)
- {
- 	int i, x, y, cur_x, cur_y, key = 0;
- 	int height, width, boxh, boxw;
-@@ -239,8 +230,7 @@ int dialog_textbox(const char *title, char *tbuf, int initial_height,
- 
- 	/* Print first page of text */
- 	attr_clear(box, boxh, boxw, dlg.dialog.atr);
--	refresh_text_box(dialog, box, boxh, boxw, cur_y, cur_x, update_text,
--			 data);
-+	refresh_text_box(dialog, box, boxh, boxw, cur_y, cur_x);
- 
- 	while (!done) {
- 		key = wgetch(dialog);
-@@ -259,8 +249,7 @@ int dialog_textbox(const char *title, char *tbuf, int initial_height,
- 				begin_reached = 1;
- 				page = buf;
- 				refresh_text_box(dialog, box, boxh, boxw,
--						 cur_y, cur_x, update_text,
--						 data);
-+						 cur_y, cur_x);
- 			}
- 			break;
- 		case 'G':	/* Last page */
-@@ -270,8 +259,7 @@ int dialog_textbox(const char *title, char *tbuf, int initial_height,
- 			/* point to last char in buf */
- 			page = buf + strlen(buf);
- 			back_lines(boxh);
--			refresh_text_box(dialog, box, boxh, boxw, cur_y,
--					 cur_x, update_text, data);
-+			refresh_text_box(dialog, box, boxh, boxw, cur_y, cur_x);
- 			break;
- 		case 'K':	/* Previous line */
- 		case 'k':
-@@ -280,8 +268,7 @@ int dialog_textbox(const char *title, char *tbuf, int initial_height,
- 				break;
- 
- 			back_lines(page_length + 1);
--			refresh_text_box(dialog, box, boxh, boxw, cur_y,
--					 cur_x, update_text, data);
-+			refresh_text_box(dialog, box, boxh, boxw, cur_y, cur_x);
- 			break;
- 		case 'B':	/* Previous page */
- 		case 'b':
-@@ -290,8 +277,7 @@ int dialog_textbox(const char *title, char *tbuf, int initial_height,
- 			if (begin_reached)
- 				break;
- 			back_lines(page_length + boxh);
--			refresh_text_box(dialog, box, boxh, boxw, cur_y,
--					 cur_x, update_text, data);
-+			refresh_text_box(dialog, box, boxh, boxw, cur_y, cur_x);
- 			break;
- 		case 'J':	/* Next line */
- 		case 'j':
-@@ -300,8 +286,7 @@ int dialog_textbox(const char *title, char *tbuf, int initial_height,
- 				break;
- 
- 			back_lines(page_length - 1);
--			refresh_text_box(dialog, box, boxh, boxw, cur_y,
--					 cur_x, update_text, data);
-+			refresh_text_box(dialog, box, boxh, boxw, cur_y, cur_x);
- 			break;
- 		case KEY_NPAGE:	/* Next page */
- 		case ' ':
-@@ -310,8 +295,7 @@ int dialog_textbox(const char *title, char *tbuf, int initial_height,
- 				break;
- 
- 			begin_reached = 0;
--			refresh_text_box(dialog, box, boxh, boxw, cur_y,
--					 cur_x, update_text, data);
-+			refresh_text_box(dialog, box, boxh, boxw, cur_y, cur_x);
- 			break;
- 		case '0':	/* Beginning of line */
- 		case 'H':	/* Scroll left */
-@@ -326,8 +310,7 @@ int dialog_textbox(const char *title, char *tbuf, int initial_height,
- 				hscroll--;
- 			/* Reprint current page to scroll horizontally */
- 			back_lines(page_length);
--			refresh_text_box(dialog, box, boxh, boxw, cur_y,
--					 cur_x, update_text, data);
-+			refresh_text_box(dialog, box, boxh, boxw, cur_y, cur_x);
- 			break;
- 		case 'L':	/* Scroll right */
- 		case 'l':
-@@ -337,8 +320,7 @@ int dialog_textbox(const char *title, char *tbuf, int initial_height,
- 			hscroll++;
- 			/* Reprint current page to scroll horizontally */
- 			back_lines(page_length);
--			refresh_text_box(dialog, box, boxh, boxw, cur_y,
--					 cur_x, update_text, data);
-+			refresh_text_box(dialog, box, boxh, boxw, cur_y, cur_x);
- 			break;
- 		case KEY_ESC:
- 			if (on_key_esc(dialog) == KEY_ESC)
-@@ -351,11 +333,9 @@ int dialog_textbox(const char *title, char *tbuf, int initial_height,
- 			on_key_resize();
- 			goto do_resize;
- 		default:
--			for (i = 0; keys[i]; i++) {
--				if (key == keys[i]) {
--					done = true;
--					break;
--				}
-+			if (extra_key_cb(key, start, end, data)) {
-+				done = true;
-+				break;
- 			}
- 		}
- 	}
-diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-index 53d8834d12fe..7adfd6537279 100644
---- a/scripts/kconfig/mconf.c
-+++ b/scripts/kconfig/mconf.c
-@@ -288,6 +288,7 @@ static int single_menu_mode;
- static int show_all_options;
- static int save_and_exit;
- static int silent;
-+static int jump_key;
- 
- static void conf(struct menu *menu, struct menu *active_menu);
- 
-@@ -348,19 +349,19 @@ static void reset_subtitle(void)
- 	set_dialog_subtitles(subtitles);
- }
- 
--static int show_textbox_ext(const char *title, char *text, int r, int c, int
--			    *keys, int *vscroll, int *hscroll, update_text_fn
--			    update_text, void *data)
-+static int show_textbox_ext(const char *title, const char *text, int r, int c,
-+			    int *vscroll, int *hscroll,
-+			    int (*extra_key_cb)(int, int, int, void *),
-+			    void *data)
- {
- 	dialog_clear();
--	return dialog_textbox(title, text, r, c, keys, vscroll, hscroll,
--			      update_text, data);
-+	return dialog_textbox(title, text, r, c, vscroll, hscroll,
-+			      extra_key_cb, data);
- }
- 
- static void show_textbox(const char *title, const char *text, int r, int c)
- {
--	show_textbox_ext(title, (char *) text, r, c, (int []) {0}, NULL, NULL,
--			 NULL, NULL);
-+	show_textbox_ext(title, text, r, c, NULL, NULL, NULL, NULL);
- }
- 
- static void show_helptext(const char *title, const char *text)
-@@ -381,35 +382,51 @@ static void show_help(struct menu *menu)
- 
- struct search_data {
- 	struct list_head *head;
--	struct menu **targets;
--	int *keys;
-+	struct menu *target;
- };
- 
--static void update_text(char *buf, size_t start, size_t end, void *_data)
-+static int next_key(int key)
-+{
-+	key++;
-+
-+	if (key > '9')
-+		key = '1';
-+
-+	return key;
-+}
-+
-+static int handle_search_keys(int key, int start, int end, void *_data)
- {
- 	struct search_data *data = _data;
- 	struct jump_key *pos;
--	int k = 0;
-+
-+	if (key < '1' || key > '9')
-+		return 0;
- 
- 	list_for_each_entry(pos, data->head, entries) {
--		if (pos->offset >= start && pos->offset < end) {
--			char header[4];
-+		if (pos->offset >= start) {
-+			if (pos->offset >= end)
-+				break;
- 
--			if (k < JUMP_NB) {
--				int key = '0' + (pos->index % JUMP_NB) + 1;
--
--				sprintf(header, "(%c)", key);
--				data->keys[k] = key;
--				data->targets[k] = pos->target;
--				k++;
--			} else {
--				sprintf(header, "   ");
-+			if (key == '1' + (pos->index % JUMP_NB)) {
-+				data->target = pos->target;
-+				return 1;
- 			}
--
--			memcpy(buf + pos->offset, header, sizeof(header) - 1);
- 		}
- 	}
--	data->keys[k] = 0;
-+
-+	return 0;
-+}
-+
-+int get_jump_key(void)
-+{
-+	int cur_key;
-+
-+	cur_key = jump_key;
-+
-+	jump_key = next_key(cur_key);
-+
-+	return cur_key;
- }
- 
- static void search_conf(void)
-@@ -456,26 +473,23 @@ static void search_conf(void)
- 	sym_arr = sym_re_search(dialog_input);
- 	do {
- 		LIST_HEAD(head);
--		struct menu *targets[JUMP_NB];
--		int keys[JUMP_NB + 1], i;
- 		struct search_data data = {
- 			.head = &head,
--			.targets = targets,
--			.keys = keys,
- 		};
- 		struct jump_key *pos, *tmp;
- 
-+		jump_key = '1';
- 		res = get_relations_str(sym_arr, &head);
- 		set_subtitle();
- 		dres = show_textbox_ext("Search Results", str_get(&res), 0, 0,
--					keys, &vscroll, &hscroll, &update_text,
--					&data);
-+					&vscroll, &hscroll,
-+					handle_search_keys, &data);
- 		again = false;
--		for (i = 0; i < JUMP_NB && keys[i]; i++)
--			if (dres == keys[i]) {
--				conf(targets[i]->parent, targets[i]);
--				again = true;
--			}
-+		if (dres >= '1' && dres <= '9') {
-+			assert(data.target != NULL);
-+			conf(data.target->parent, data.target);
-+			again = true;
-+		}
- 		str_free(&res);
- 		list_for_each_entry_safe(pos, tmp, &head, entries)
- 			free(pos);
-diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-index b90fff833588..5578b8bc8a23 100644
---- a/scripts/kconfig/menu.c
-+++ b/scripts/kconfig/menu.c
-@@ -701,6 +701,11 @@ static void get_dep_str(struct gstr *r, struct expr *expr, const char *prefix)
- 	}
- }
- 
-+int __attribute__((weak)) get_jump_key(void)
-+{
-+	return -1;
-+}
-+
- static void get_prompt_str(struct gstr *r, struct property *prop,
- 			   struct list_head *head)
- {
-@@ -743,11 +748,22 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
- 	}
- 
- 	str_printf(r, "  Location:\n");
--	for (j = 4; --i >= 0; j += 2) {
-+	for (j = 0; --i >= 0; j++) {
-+		int jk = -1;
-+		int indent = 2 * j + 4;
-+
- 		menu = submenu[i];
--		if (jump && menu == location)
-+		if (jump && menu == location) {
- 			jump->offset = strlen(r->s);
--		str_printf(r, "%*c-> %s", j, ' ', menu_get_prompt(menu));
-+			jk = get_jump_key();
-+		}
-+
-+		if (jk >= 0) {
-+			str_printf(r, "(%c)", jk);
-+			indent -= 3;
-+		}
-+
-+		str_printf(r, "%*c-> %s", indent, ' ', menu_get_prompt(menu));
- 		if (menu->sym) {
- 			str_printf(r, " (%s [=%s])", menu->sym->name ?
- 				menu->sym->name : "<choice>",
 -- 
-2.39.2
-
+Kees Cook
