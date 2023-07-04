@@ -2,24 +2,23 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 676BDEB64D9
-	for <linux-kbuild@archiver.kernel.org>; Tue,  4 Jul 2023 21:21:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22F43EB64D9
+	for <linux-kbuild@archiver.kernel.org>; Tue,  4 Jul 2023 21:34:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230490AbjGDVVK (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 4 Jul 2023 17:21:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60788 "EHLO
+        id S231204AbjGDVeZ (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 4 Jul 2023 17:34:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230507AbjGDVVK (ORCPT
+        with ESMTP id S229903AbjGDVeY (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 4 Jul 2023 17:21:10 -0400
-X-Greylist: delayed 341 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 04 Jul 2023 14:21:07 PDT
+        Tue, 4 Jul 2023 17:34:24 -0400
 Received: from 1wt.eu (ded1.1wt.eu [163.172.96.212])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D196512A
-        for <linux-kbuild@vger.kernel.org>; Tue,  4 Jul 2023 14:21:07 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1215FE4F;
+        Tue,  4 Jul 2023 14:34:22 -0700 (PDT)
 Received: (from willy@localhost)
-        by pcw.home.local (8.15.2/8.15.2/Submit) id 364LF9aC021868;
-        Tue, 4 Jul 2023 23:15:09 +0200
-Date:   Tue, 4 Jul 2023 23:15:09 +0200
+        by pcw.home.local (8.15.2/8.15.2/Submit) id 364LYFqi022233;
+        Tue, 4 Jul 2023 23:34:15 +0200
+Date:   Tue, 4 Jul 2023 23:34:15 +0200
 From:   Willy Tarreau <w@1wt.eu>
 To:     Linus Torvalds <torvalds@linux-foundation.org>
 Cc:     Masahiro Yamada <masahiroy@kernel.org>,
@@ -28,58 +27,97 @@ Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 Subject: Re: Overly aggressive .gitignore file?
-Message-ID: <20230704211509.GA21834@1wt.eu>
+Message-ID: <20230704213415.GA21872@1wt.eu>
 References: <CAHk-=wiJHMje8cpiTajqrLrM23wZK0SWetuK1Bd67c0OGM_BzQ@mail.gmail.com>
+ <20230704211509.GA21834@1wt.eu>
+ <CAHk-=wjH4O6v_EwVB=t_6Haky2jOiejHbCkCTvgNQWo1ghy8-w@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAHk-=wiJHMje8cpiTajqrLrM23wZK0SWetuK1Bd67c0OGM_BzQ@mail.gmail.com>
+In-Reply-To: <CAHk-=wjH4O6v_EwVB=t_6Haky2jOiejHbCkCTvgNQWo1ghy8-w@mail.gmail.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, Jul 04, 2023 at 12:49:01PM -0700, Linus Torvalds wrote:
-> So this keeps happening to me - I go to apply a patch I just
-> downloaded with 'b4', and I do my regular
+On Tue, Jul 04, 2023 at 02:20:36PM -0700, Linus Torvalds wrote:
+> On Tue, 4 Jul 2023 at 14:15, Willy Tarreau <w@1wt.eu> wrote:
+> >
+> > I don't understand why your completion on "git am" should rely on
+> > *tracked* files.
 > 
->      git am -s --whitespace 2023<tab>
+> It doesn't.
 > 
-> and the dang thing doesn't autocomplete.,
+> Read that email again.
 > 
-> The reason it doesn't auto-complete ends up being that my kernel tree
-> contains some other random stale mbx file from the _previous_ time I
-> did that, because they effectively get hidden from "git status" etc by
-> our .gitignore file.
+> It fails on *untracked* files that are hidden from "git status" and
+> friends by our .gitignore pattern:
 > 
-> So then those stale files end up staying around much too long and not
-> showing up on my radar even though they are just old garbage by the
-> time I have actually applied them.
+>    *.mbx
 > 
-> And I always use auto-complete, because those filenames that 'b4'
-> generate are ridiculously long (for good reason).
+> added by commit 534066a983df (".gitignore: ignore *.cover and *.mbx")
 > 
-> And the auto-complete always fails, because b4 just uses a common
-> prefix pattern too (again, for a perfectly good reason - I'm not
-> complaining about b4 here).
+> So when I have those old stale mbx files around, I don't see them,
+> because "git status" will happily say
 > 
-> This has been a slight annoyance for a while, but the last time it
-> happened just a moment ago when I applied David Howells' afs patch
-> (commit 03275585cabd: "afs: Fix accidental truncation when storing
-> data" - not that the particular commit matters, I'm just pointing out
-> how it just happened _again_).
+>     nothing to commit, working tree clean
 > 
-> So I'm really inclined to just revert the commit that added this
-> pattern: 534066a983df (".gitignore: ignore *.cover and *.mbx"). It's
-> actively detrimental to my workflow.
+> with no mention of those old turds.
 
-I don't understand why your completion on "git am" should rely on
-*tracked* files. From a workflow perspective that makes no sense,
-as by definition, git am will consume only *untracked* files. Are
-you sure there isn't something wrong elsewhere in your completion
-rules, that would make your "git am" complete only with tracked
-files ? Most likely it should use a rule very similar to what
-"git add" uses.
+But the git am completion rules should actually *not* rely on
+git status output. At least in my opinion.
 
-Just my two cents,
+> Really. Try it.
+
+I did and for me on this machine I don't have the problem:
+
+  willy@pcw:~/linux$ git status
+  On branch 20230702-nolibc-series1+2_2
+  Your branch is up to date with 'origin/20230702-nolibc-series1+2_2'.
+  
+  nothing to commit, working tree clean
+  willy@pcw:~/linux$ echo blah > 2023-new-patch.mbx 
+  willy@pcw:~/linux$ git status
+  On branch 20230702-nolibc-series1+2_2
+  Your branch is up to date with 'origin/20230702-nolibc-series1+2_2'.
+  
+=> .mbx is indeed ignored
+
+  nothing to commit, working tree clean
+  willy@pcw:~/linux$ git am -s --whitespace 2023-new-patch.mbx
+  ^C
+
+Here I pressed [Tab] after "2023" and it automatically completed.
+By git completion is certainly quite old, as I really don't change
+it often once I have a satisfying one. My git-completion.bash script
+has this in case that helps:
+
+  _git_am ()
+  {
+          __git_find_repo_path
+          if [ -d "$__git_repo_path"/rebase-apply ]; then
+                  __gitcomp "$__git_am_inprogress_options"
+                  return
+          fi
+          case "$cur" in
+          --whitespace=*)
+                  __gitcomp "$__git_whitespacelist" "" "${cur##--whitespace=}"
+                  return
+                  ;;
+          --*)
+                  __gitcomp_builtin am "--no-utf8" \
+                          "$__git_am_inprogress_options"
+                  return
+          esac
+  }
+
+> > From a workflow perspective that makes no sense,
+> > as by definition, git am will consume only *untracked* files.
+> 
+> I don't think you actually read my email.
+
+Yes I did and I neither experience your problem nor figure why it
+should happen, because I don't see the relation between gitignore
+and anything that git am should be allowed to consume :-/
+
 Willy
