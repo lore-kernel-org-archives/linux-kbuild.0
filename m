@@ -2,63 +2,68 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1C6EEB64D9
-	for <linux-kbuild@archiver.kernel.org>; Tue,  4 Jul 2023 19:49:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C7C5EB64D9
+	for <linux-kbuild@archiver.kernel.org>; Tue,  4 Jul 2023 21:20:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231643AbjGDTtX (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 4 Jul 2023 15:49:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42808 "EHLO
+        id S230129AbjGDVU6 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 4 Jul 2023 17:20:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231624AbjGDTtX (ORCPT
+        with ESMTP id S229647AbjGDVU5 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 4 Jul 2023 15:49:23 -0400
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB7DE10D9
-        for <linux-kbuild@vger.kernel.org>; Tue,  4 Jul 2023 12:49:21 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2b6f943383eso16290031fa.2
-        for <linux-kbuild@vger.kernel.org>; Tue, 04 Jul 2023 12:49:21 -0700 (PDT)
+        Tue, 4 Jul 2023 17:20:57 -0400
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61EC312A
+        for <linux-kbuild@vger.kernel.org>; Tue,  4 Jul 2023 14:20:56 -0700 (PDT)
+Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-9939fbb7191so10418366b.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 04 Jul 2023 14:20:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1688500160; x=1691092160;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=h4y4pe8nKPNc3vbmtQQZLZUBLO/NbEWrS8puocb/Up0=;
-        b=H36zhe0MwmlWlO2lW0dYKtdnedoDkVIl2291itwlJI8sIg2XeNIr94M7/xGlBhV8H2
-         yjkF2b5dOSdGBQatMXvp+K10wU9IyGPI5Wi43Zc5b0jedNf/fNo9UkT25qbwgdgESQmV
-         0vOLHJTSY/plvO+6TQFOZZOdcCh6hIwibOYlU=
+        d=linux-foundation.org; s=google; t=1688505654; x=1691097654;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=n75Dh2puDmWxs7IMDzFSoZlMiY6RQZaHybFGnsL1ZMY=;
+        b=QOODvko3WFZFhybeNOP3lbChfYO1Uc3IsA5HH7WSwBUgpgyh1EyfYWsHcn3/OiI0s5
+         EZEjJG6l6ecCFsAopwbb9PHUYFUDDCWOF/SvmiZrJLJHszYY7zanT9wcNB7r6h7J5bZs
+         Tv9sfBOAsIbeONQX2EOkPHY5M2SHe9I/Rslnw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688500160; x=1691092160;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=h4y4pe8nKPNc3vbmtQQZLZUBLO/NbEWrS8puocb/Up0=;
-        b=hzcmaqnCeQbt+67K1kN6LqWT1QmqgOnqToOX4XItv4uXva3CC0QmNIZ6X0ySwaT+G4
-         LL3m1Q87i68XhPi5rqgqwnikALPoI+M4IMsaUBpqgRWGnalRBuDGtsNKKKbEc/xW8t76
-         +LIx/S72JNY1qSB7cixEEM3BWPOr+y0DhpXOhRGsZ7voXzS4VXbDvweVyK5BINfX7BeX
-         +Rhc9E3v1CsXUWvnBr6OnzxkdpXnkrYSDt8uulb3v+sas61q0dAldryv51VIQfaVtBj7
-         atvVJu2F+Hgtno8ZsrsemTAmMum1fcRu7qnGk3TggsES22HilX8l8M60/56QGTD/cxxE
-         qMkA==
-X-Gm-Message-State: ABy/qLbABfnBjAA+b08Uc1xNaYqbFZ3i0/ugGfhw2QHCy+52tR6+bSYL
-        pY1mIgFXlno0zDjUi0xFZfyzYh5DSvo7RL0UcNHgqyjo
-X-Google-Smtp-Source: APBJJlFOetmHEpJIi6+8+1znPh3y8bm7/XDQblpNjaWhTVvb2R6NjeIwbiDRs7fWfkK5HjltCoEBQA==
-X-Received: by 2002:a05:6512:3d09:b0:4f8:6d54:72fb with SMTP id d9-20020a0565123d0900b004f86d5472fbmr12011775lfv.62.1688500159789;
-        Tue, 04 Jul 2023 12:49:19 -0700 (PDT)
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com. [209.85.208.45])
-        by smtp.gmail.com with ESMTPSA id d10-20020a056402078a00b0051de38eb925sm6777886edy.93.2023.07.04.12.49.18
+        d=1e100.net; s=20221208; t=1688505654; x=1691097654;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=n75Dh2puDmWxs7IMDzFSoZlMiY6RQZaHybFGnsL1ZMY=;
+        b=ZChcbLzQoEfb8FQZRByvbVZuyCkDtoyNgnR92mFxjQmp9z1Q2qtl53ro8IC6WKxXAE
+         IGfL4g38G30Hqo9+C/NuZD9ssLDdPYhb91umf8Zexrkn5G6jZryqvUPdxUlizZmyPNjS
+         fY2qjgyi8ShVNpuBdpvbGXumF4e/PVwC7oFKv/YGK4ZRA3QnZWRow+VLCGzh0tgJf41A
+         w8Mt9lOvlu9AwekzRdSfjzE8DM/HOYiWjdaSU9mCNnibrnoXzJd508WiTIy3RrJhvk+T
+         xqqV+z6cx5GUpkxv5gKEoHvXQYQC5gzMr//39Nc31ONfri6UxJZb2SMItDB+ZjnAi84i
+         rD+A==
+X-Gm-Message-State: ABy/qLYNSOsIzwh3STDSoJ2VgVL+rN+OBelmjfu4WyfodnmTP8ZMQQs0
+        F/E+c8W4x7FqdCtVoHo5qP/7kVVtfLMBDvj3WWs0ow==
+X-Google-Smtp-Source: APBJJlGrZdb+1lbGtmyhJzxoTd9NUjdBec3APKgwua/t0SczHRPu9Bc7Qq2oSE+D4N6Tug1q0gwW9w==
+X-Received: by 2002:a17:906:245:b0:992:1653:3402 with SMTP id 5-20020a170906024500b0099216533402mr404805ejl.25.1688505654779;
+        Tue, 04 Jul 2023 14:20:54 -0700 (PDT)
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com. [209.85.218.43])
+        by smtp.gmail.com with ESMTPSA id gw26-20020a170906f15a00b009929d998abcsm8079334ejb.209.2023.07.04.14.20.53
         for <linux-kbuild@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Jul 2023 12:49:18 -0700 (PDT)
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-51dec0b6fecso5677990a12.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 04 Jul 2023 12:49:18 -0700 (PDT)
-X-Received: by 2002:a50:fa96:0:b0:50b:c693:70af with SMTP id
- w22-20020a50fa96000000b0050bc69370afmr8998604edr.2.1688500158487; Tue, 04 Jul
- 2023 12:49:18 -0700 (PDT)
+        Tue, 04 Jul 2023 14:20:54 -0700 (PDT)
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-98e39784a85so12097366b.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 04 Jul 2023 14:20:53 -0700 (PDT)
+X-Received: by 2002:a17:907:7f26:b0:966:1bf2:2af5 with SMTP id
+ qf38-20020a1709077f2600b009661bf22af5mr379213ejc.22.1688505653634; Tue, 04
+ Jul 2023 14:20:53 -0700 (PDT)
 MIME-Version: 1.0
+References: <CAHk-=wiJHMje8cpiTajqrLrM23wZK0SWetuK1Bd67c0OGM_BzQ@mail.gmail.com>
+ <20230704211509.GA21834@1wt.eu>
+In-Reply-To: <20230704211509.GA21834@1wt.eu>
 From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Tue, 4 Jul 2023 12:49:01 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wiJHMje8cpiTajqrLrM23wZK0SWetuK1Bd67c0OGM_BzQ@mail.gmail.com>
-Message-ID: <CAHk-=wiJHMje8cpiTajqrLrM23wZK0SWetuK1Bd67c0OGM_BzQ@mail.gmail.com>
-Subject: Overly aggressive .gitignore file?
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Nicolas Schier <nicolas@fjasle.eu>,
+Date:   Tue, 4 Jul 2023 14:20:36 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wjH4O6v_EwVB=t_6Haky2jOiejHbCkCTvgNQWo1ghy8-w@mail.gmail.com>
+Message-ID: <CAHk-=wjH4O6v_EwVB=t_6Haky2jOiejHbCkCTvgNQWo1ghy8-w@mail.gmail.com>
+Subject: Re: Overly aggressive .gitignore file?
+To:     Willy Tarreau <w@1wt.eu>
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        Nicolas Schier <nicolas@fjasle.eu>,
         Nick Desaulniers <ndesaulniers@google.com>,
         Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
@@ -67,58 +72,34 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-So this keeps happening to me - I go to apply a patch I just
-downloaded with 'b4', and I do my regular
+On Tue, 4 Jul 2023 at 14:15, Willy Tarreau <w@1wt.eu> wrote:
+>
+> I don't understand why your completion on "git am" should rely on
+> *tracked* files.
 
-     git am -s --whitespace 2023<tab>
+It doesn't.
 
-and the dang thing doesn't autocomplete.,
+Read that email again.
 
-The reason it doesn't auto-complete ends up being that my kernel tree
-contains some other random stale mbx file from the _previous_ time I
-did that, because they effectively get hidden from "git status" etc by
-our .gitignore file.
+It fails on *untracked* files that are hidden from "git status" and
+friends by our .gitignore pattern:
 
-So then those stale files end up staying around much too long and not
-showing up on my radar even though they are just old garbage by the
-time I have actually applied them.
+   *.mbx
 
-And I always use auto-complete, because those filenames that 'b4'
-generate are ridiculously long (for good reason).
+added by commit 534066a983df (".gitignore: ignore *.cover and *.mbx")
 
-And the auto-complete always fails, because b4 just uses a common
-prefix pattern too (again, for a perfectly good reason - I'm not
-complaining about b4 here).
+So when I have those old stale mbx files around, I don't see them,
+because "git status" will happily say
 
-This has been a slight annoyance for a while, but the last time it
-happened just a moment ago when I applied David Howells' afs patch
-(commit 03275585cabd: "afs: Fix accidental truncation when storing
-data" - not that the particular commit matters, I'm just pointing out
-how it just happened _again_).
+    nothing to commit, working tree clean
 
-So I'm really inclined to just revert the commit that added this
-pattern: 534066a983df (".gitignore: ignore *.cover and *.mbx"). It's
-actively detrimental to my workflow.
+with no mention of those old turds.
 
-I'm not sure why that pattern was added, though. These are not
-auto-generated files from our build.  So before I go off and revert
-it, let's ask the people mentioned in that commit.
+Really. Try it.
 
-I *suspect* the thing that triggered this wasn't that people actually
-wanted to ignore these files, but that it was related to the misguided
-"let's use .gitignore to build source packages" project.
+> From a workflow perspective that makes no sense,
+> as by definition, git am will consume only *untracked* files.
 
-But at least for me, it's a real problem when .gitignore contains
-other files than the ones we actually generate.
+I don't think you actually read my email.
 
-The only one that actually commonly affects me is the *.mbx file,
-although I could certainly see the same being true of the *.cover
-thing.
-
-And there might certainly be other patterns like this that I just
-don't react to, because they don't have the same detrimental effects
-on how I work.
-
-Comments?
-
-               Linus
+            Linus
