@@ -2,89 +2,97 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A23F9EB64D9
-	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Jul 2023 19:12:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2EA2EB64DC
+	for <linux-kbuild@archiver.kernel.org>; Tue, 11 Jul 2023 03:43:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232676AbjGGTMP (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 7 Jul 2023 15:12:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55358 "EHLO
+        id S230120AbjGKDnP (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 10 Jul 2023 23:43:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229611AbjGGTMO (ORCPT
+        with ESMTP id S229468AbjGKDnO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 7 Jul 2023 15:12:14 -0400
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD6AA118
-        for <linux-kbuild@vger.kernel.org>; Fri,  7 Jul 2023 12:12:13 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2b6a084a34cso34631161fa.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 07 Jul 2023 12:12:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1688757132; x=1691349132;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=8RgAiRj/Ah9GpFVKQ42X3iF0te9OVig0xR7Tnv48JkA=;
-        b=KBtj8DBLIvc+ld9MJdHlsAZraivfLO55rL7GtiKuwX5rEqWqeUQfPshtY+2tuA3T4k
-         +78INjV8z14lc74qCfseqhhgLcSN1kS7tRrXN2C5846XV4rA0B/rnjt+kwZU8BwjKUD1
-         H9qBdMYMxG+CA0wxxkI3NqA2KkFqXs5LPYKVE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688757132; x=1691349132;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8RgAiRj/Ah9GpFVKQ42X3iF0te9OVig0xR7Tnv48JkA=;
-        b=lJh1S4uv30qOI0MnhakoKSGwbZ5+SryWzM13CMdCGVYAR2KPHvwyd6UK7f8lwznbVp
-         +QiLGBWXOuSq/sgMRHoEWVGZvr7MRh9txjz7eCYZdV5nWWqXKR8XdATp1Qi7cBK4XdHe
-         4R0rCvkD3zdd1Ko8aMDJiuVd/KSLGM4LauNsH1ICkfqo2Q7FyaVX3zm0k/R/PEx7FMP8
-         U6ruiD4RccuC1xk+8Z2xctqxU5YS3WAWCUlyBuZucQIY94yA18Gv/A06Pe079Mux9Ly8
-         T2BDZsbwBTnhzsj3FAhApS4DuK/6Z24mwW+ltlu1gcuN5F7X0PloYJAF5Ys/uUPat+59
-         Sbgg==
-X-Gm-Message-State: ABy/qLayRt9f6YF1W8hY+CTolWL9Se9VwNuZUWqw8zQfHU0AN4KYCq0K
-        OtmoLL2XRAGj0mwN+JCSXzi4+lbyCmwqrmGKp5tiZjqG
-X-Google-Smtp-Source: APBJJlG6RJ+2cK9/O+9taKWzxgwRrFKShypMhO4PZ1zAm0a89s0xblVVVGObR+ZpKw6iCe++0dds0w==
-X-Received: by 2002:a2e:9c87:0:b0:2b6:c4fd:753a with SMTP id x7-20020a2e9c87000000b002b6c4fd753amr4683097lji.34.1688757131796;
-        Fri, 07 Jul 2023 12:12:11 -0700 (PDT)
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com. [209.85.167.52])
-        by smtp.gmail.com with ESMTPSA id q19-20020a2e8753000000b002b6d647c7e6sm894172ljj.133.2023.07.07.12.12.11
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Jul 2023 12:12:11 -0700 (PDT)
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-4fb73ba3b5dso3706706e87.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 07 Jul 2023 12:12:11 -0700 (PDT)
-X-Received: by 2002:a05:6512:3104:b0:4fb:7626:31a8 with SMTP id
- n4-20020a056512310400b004fb762631a8mr4290389lfb.27.1688757130684; Fri, 07 Jul
- 2023 12:12:10 -0700 (PDT)
+        Mon, 10 Jul 2023 23:43:14 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37415E5
+        for <linux-kbuild@vger.kernel.org>; Mon, 10 Jul 2023 20:43:14 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id CA768612EC
+        for <linux-kbuild@vger.kernel.org>; Tue, 11 Jul 2023 03:43:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34014C433C7
+        for <linux-kbuild@vger.kernel.org>; Tue, 11 Jul 2023 03:43:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1689046993;
+        bh=8W8t1Nr2oSw4znJ/A3c/Fnmkkn3GKHnELnuueXoZcdc=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=J+0OmktsKJd9VIWhpInH623Q/CQVBaKCNWGYP/izBaHw0tmCwSFHz244H3p2ujsNi
+         QmIbYv3ty02L5zmKwOESe4RNED6Q8u0IT0siJ43SfUmTZa5vsTN+LPN26nhue1O1fh
+         wrQ0uocQJjXJi5Z1XqehRXD2h87VccSoWEk3K6PInASXa7FpawB1eqm/y0nU9DhMUL
+         l1MBMhG0gxUj0GGNM2PqX+hRtTsDdJry9Jk1kUaX+UTytEHcIHLpX+4fYXNbm952xp
+         IbK1I881bBznRhkvu0dy4JnGoe/rjkvEG0KQDmUzdf9NUyDYsolpUrA4iJfcoKUB3J
+         WbY7HNgeEJ7MQ==
+Received: by mail-oo1-f54.google.com with SMTP id 006d021491bc7-565a8d74daeso3253089eaf.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 10 Jul 2023 20:43:13 -0700 (PDT)
+X-Gm-Message-State: ABy/qLb68a71CgrvmF/URZ99313bJsIJQxYJGQzCZsLMdif0igsIYND9
+        GKq3oTMDvVz/f4M/d0k0Rnq0KQTvn2ICvdaKeOo=
+X-Google-Smtp-Source: APBJJlFaPtxhyUYUMkVPgI/RNspa61slHwXMJgfQGv1pk+jOi8yxv6Ol1rIxar4ruQ3ax+/aljcDUe08lNnZwj8UI9E=
+X-Received: by 2002:a05:6820:1501:b0:560:c558:b6f9 with SMTP id
+ ay1-20020a056820150100b00560c558b6f9mr10739878oob.2.1689046992417; Mon, 10
+ Jul 2023 20:43:12 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAHk-=wiJHMje8cpiTajqrLrM23wZK0SWetuK1Bd67c0OGM_BzQ@mail.gmail.com>
- <20230704211509.GA21834@1wt.eu> <CAHk-=wjH4O6v_EwVB=t_6Haky2jOiejHbCkCTvgNQWo1ghy8-w@mail.gmail.com>
- <20230704213415.GA21872@1wt.eu> <CAHk-=wjPEjrB7eCukREhWu-0qfjbFD-K8sk1TYYRgeHzYr1tuQ@mail.gmail.com>
- <20230704215600.GA22271@1wt.eu> <CAHk-=whMytacPBHfKKi8GYdgfadNy5LA-1TDHrTtz22eJr2B1Q@mail.gmail.com>
- <20230704222758.GB22271@1wt.eu> <20230705004129.GI1178919@mit.edu> <CAKwvOd=ktNGZ=uBVxF7Wicooy7VMz1UNe5MRDkEDZPcg1_DJ2A@mail.gmail.com>
-In-Reply-To: <CAKwvOd=ktNGZ=uBVxF7Wicooy7VMz1UNe5MRDkEDZPcg1_DJ2A@mail.gmail.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Fri, 7 Jul 2023 12:11:53 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wiJQS72y15+33DTZiR0pyBwFZSyd=LcN0weso_AWfCenA@mail.gmail.com>
-Message-ID: <CAHk-=wiJQS72y15+33DTZiR0pyBwFZSyd=LcN0weso_AWfCenA@mail.gmail.com>
-Subject: Re: Overly aggressive .gitignore file?
-To:     Nick Desaulniers <ndesaulniers@google.com>
-Cc:     "Theodore Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Nicolas Schier <nicolas@fjasle.eu>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+References: <c7b1cb3d-801b-b78f-d203-edd840c9e98a@infradead.org>
+In-Reply-To: <c7b1cb3d-801b-b78f-d203-edd840c9e98a@infradead.org>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Tue, 11 Jul 2023 12:42:36 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAS53G=c+nsVGT66GXZsTOJqwzLyWtNbXY_FaBcXcG2Vtg@mail.gmail.com>
+Message-ID: <CAK7LNAS53G=c+nsVGT66GXZsTOJqwzLyWtNbXY_FaBcXcG2Vtg@mail.gmail.com>
+Subject: Re: gconfig help text quesion
+To:     Randy Dunlap <rdunlap@infradead.org>
+Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Fri, 7 Jul 2023 at 11:51, Nick Desaulniers <ndesaulniers@google.com> wrote:
+On Tue, Jul 4, 2023 at 9:04=E2=80=AFAM Randy Dunlap <rdunlap@infradead.org>=
+ wrote:
 >
+> Hi,
 >
-> I don't really understand why *.patch is ok to have in .gitignore but
-> *.mbox is not?  Wouldn't autocomplete fail due to `git status` for the
-> exact same reason?
+> The gconfig help text says:
+>
+> Toggling Show Debug Info under the Options menu will show
+> the dependencies, which you can then match by examining other options.
+>
+> This is at the end of the intro_text string.
+>
+> I don't see any way to toggle the Show Debug Info flag,
+> or even any such flag.
 
-I'm sure it does. It just isn't in *my* workflow, so I don't hit it.
 
-But if other people find the *.patch pattern annoying, I certainly
-agree that that should be removed too.
+I guess this comment is left-over after
+7b5d87215b38 ("gconfig: remove show_debug option")
 
-               Linus
+
+
+
+> Is it hidden somewhere or should this text be removed?
+
+I think it should be removed.
+
+
+
+
+>
+> thanks.
+> --
+> ~Randy
+
+
+
+--=20
+Best Regards
+Masahiro Yamada
