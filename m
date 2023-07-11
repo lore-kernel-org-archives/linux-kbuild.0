@@ -2,85 +2,71 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FD53EB64DC
-	for <linux-kbuild@archiver.kernel.org>; Tue, 11 Jul 2023 03:59:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D781EB64DC
+	for <linux-kbuild@archiver.kernel.org>; Tue, 11 Jul 2023 04:29:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230325AbjGKD7y (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 10 Jul 2023 23:59:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35886 "EHLO
+        id S229868AbjGKE3C (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 11 Jul 2023 00:29:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230203AbjGKD7v (ORCPT
+        with ESMTP id S229479AbjGKE3B (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 10 Jul 2023 23:59:51 -0400
+        Tue, 11 Jul 2023 00:29:01 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31B5C12F
-        for <linux-kbuild@vger.kernel.org>; Mon, 10 Jul 2023 20:59:50 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E65DFE42;
+        Mon, 10 Jul 2023 21:29:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-        Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-        bh=p3N0rKMAtLe/rTQe1FW+qwjwr6uFhtA/ztrC5/uT9e0=; b=ltep12dcDfvCXyJ40Cmk4mvJlM
-        yFDZ1omigi/0ox+ei/CYBEsjjWLkRI2BgQ808lNTkzwNehIix/iF0mvBKiqaK/UPTqNg9UWUhLeJe
-        RAUMCZoX1o4HYOp4cfMBJX7T+jzHBDgm5hLQ/U5MFQKfOgvzt0HLwHFyqx7VEyYDF4FKaf0oz3iwJ
-        drXxEBPBPCp2yT07TbuV4QTftNGu/Xdzso9mabkQZBDi0S6SIEhne5fk6wKvQ4Ngd1X6lPnyMF6Fm
-        Rmvpz/YobG1Wtm7B+sJcdJtP9M/KV6BvKpjLYPfvLEP9MhE+i3jCbJ91wCgs53engqyPnJZ6rCvR2
-        Ok7wFfqQ==;
-Received: from [2601:1c2:980:9ec0::2764]
+        MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=mW7N0YhrzylXcrfqMfjApU7mfEYrVUHUJlt95bsUitU=; b=OqWi+UGYC5HZPpjSBD0gZksSuD
+        OVDBGJaNUt1iGKG4+Qrt1VgqVODze1JQVzjASXXJFEi7pm0cc4NFKBJIkcF601fIX5fvuSn3qFq0L
+        5avSMRwfHqEr8EOZMGBCHqQUe3dxR0NcTzAzhTPToEppwOJcAe/CRK9Dw51mem4GFLmYOy73BDU6+
+        o0R9ZuhnVttdNEipNE27gS2/yBVw8Vi3lUwi53XmiHb8QDbwmrza1SlkWOqycDLC/re+iKSS26klo
+        tFAtdpAgJSBo4t+DJ4svmd0Jymz+EpGyjSLq/xW3TObzdL3j78HGFP8LKg404LuFBOtVqUWJODbvS
+        YJymTB0A==;
+Received: from [2601:1c2:980:9ec0::2764] (helo=bombadil.infradead.org)
         by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1qJ4XT-00DYXz-29;
-        Tue, 11 Jul 2023 03:59:50 +0000
-Message-ID: <1e05d248-b619-1d74-acd7-275f2c9db61d@infradead.org>
-Date:   Mon, 10 Jul 2023 20:59:46 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: gconfig help text quesion
-Content-Language: en-US
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-References: <c7b1cb3d-801b-b78f-d203-edd840c9e98a@infradead.org>
- <CAK7LNAS53G=c+nsVGT66GXZsTOJqwzLyWtNbXY_FaBcXcG2Vtg@mail.gmail.com>
+        id 1qJ4zk-00DclO-2O;
+        Tue, 11 Jul 2023 04:29:00 +0000
 From:   Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <CAK7LNAS53G=c+nsVGT66GXZsTOJqwzLyWtNbXY_FaBcXcG2Vtg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+To:     linux-kernel@vger.kernel.org
+Cc:     Randy Dunlap <rdunlap@infradead.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        linux-kbuild@vger.kernel.org
+Subject: [PATCH 1/2] kconfig: gconfig: drop the Show Debug Info help text
+Date:   Mon, 10 Jul 2023 21:28:59 -0700
+Message-ID: <20230711042859.17927-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.41.0
+MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
+The Show Debug Info option was removed eons ago. Now finish the job
+by removing the help text for it also.
 
+Fixes: 7b5d87215b38 ("gconfig: remove show_debug option")
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Masahiro Yamada <masahiroy@kernel.org>
+Cc: linux-kbuild@vger.kernel.org
+---
+ scripts/kconfig/gconf.c |    5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-On 7/10/23 20:42, Masahiro Yamada wrote:
-> On Tue, Jul 4, 2023 at 9:04 AM Randy Dunlap <rdunlap@infradead.org> wrote:
->>
->> Hi,
->>
->> The gconfig help text says:
->>
->> Toggling Show Debug Info under the Options menu will show
->> the dependencies, which you can then match by examining other options.
->>
->> This is at the end of the intro_text string.
->>
->> I don't see any way to toggle the Show Debug Info flag,
->> or even any such flag.
-> 
-> 
-> I guess this comment is left-over after
-> 7b5d87215b38 ("gconfig: remove show_debug option")
-> 
-
-Ugh, I need to improve my search skills. Sorry about that.
-
-> 
-> 
-> 
->> Is it hidden somewhere or should this text be removed?
-> 
-> I think it should be removed.
-
-OK, I'll send a patch.
-
-thanks.
--- 
-~Randy
+diff -- a/scripts/kconfig/gconf.c b/scripts/kconfig/gconf.c
+--- a/scripts/kconfig/gconf.c
++++ b/scripts/kconfig/gconf.c
+@@ -647,10 +647,7 @@ void on_introduction1_activate(GtkMenuIt
+ 	    "Although there is no cross reference yet to help you figure out\n"
+ 	    "what other options must be enabled to support the option you\n"
+ 	    "are interested in, you can still view the help of a grayed-out\n"
+-	    "option.\n"
+-	    "\n"
+-	    "Toggling Show Debug Info under the Options menu will show \n"
+-	    "the dependencies, which you can then match by examining other options.";
++	    "option.";
+ 
+ 	dialog = gtk_message_dialog_new(GTK_WINDOW(main_wnd),
+ 					GTK_DIALOG_DESTROY_WITH_PARENT,
