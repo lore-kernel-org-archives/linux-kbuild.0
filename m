@@ -2,93 +2,199 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E12BEB64DA
-	for <linux-kbuild@archiver.kernel.org>; Fri, 14 Jul 2023 06:34:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F4207EB64DA
+	for <linux-kbuild@archiver.kernel.org>; Fri, 14 Jul 2023 09:31:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235172AbjGNGel (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 14 Jul 2023 02:34:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56752 "EHLO
+        id S229828AbjGNJbl (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 14 Jul 2023 05:31:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235194AbjGNGeS (ORCPT
+        with ESMTP id S234417AbjGNJbk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 14 Jul 2023 02:34:18 -0400
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE47C30E9
-        for <linux-kbuild@vger.kernel.org>; Thu, 13 Jul 2023 23:33:49 -0700 (PDT)
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-52162b2f18cso197251a12.2
-        for <linux-kbuild@vger.kernel.org>; Thu, 13 Jul 2023 23:33:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689316428; x=1691908428;
-        h=content-transfer-encoding:subject:from:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=YmFcJkiBwPQ/COWzvSWc7QMWXtETyPlJ3qMCELjrLyc=;
-        b=k/lac4CZR5bszLyRpKWeP7ZyhSwJKRzADQ08CIiN4COajNSIp1jVJY/96svrW5H7YB
-         WPa9rbvpXoo2oa7eyHnN+3Ve29OedELwEE2nRL9WZ6HEXd3PbM97HY95sH2rfnaOVQE8
-         +oiuPlLGgYrOqdO3Ogb5j6uf+lcZgiHlS2d+H9uihMdV7+J+HOJGim5QpurvGqt79UzR
-         fndzUI4ji2UFwat9zXNTn69oRKEoHHh6eheieyoPXRJAhO5OfqAeoLIAqz8a1NnFABt3
-         IeFbOGUngXkxb/63DmowiX/1pr5hz7bub7Z9zaZG8feLFkAtAsCJpwy+8qRMsoa4/C/8
-         PGnQ==
-X-Gm-Message-State: ABy/qLZWdZhOJVyLVL2m5ZBQWBwLY3S1/K7VoPyG2ZwmpITfyf+Wpona
-        rNvMLWmyYDbDz1q7XhYrn+JvDMZKIlw=
-X-Google-Smtp-Source: APBJJlH+nzs96G7o3Kjz9zbDkXhGVy50K2oMaGzSto/uZdIVeRhq75PwxChc4V2KICK1ysJIp1DHGg==
-X-Received: by 2002:aa7:d7c7:0:b0:51e:1932:db07 with SMTP id e7-20020aa7d7c7000000b0051e1932db07mr3872657eds.34.1689316427954;
-        Thu, 13 Jul 2023 23:33:47 -0700 (PDT)
-Received: from ?IPV6:2a0b:e7c0:0:107::aaaa:59? ([2a0b:e7c0:0:107::aaaa:59])
-        by smtp.gmail.com with ESMTPSA id e3-20020a50ec83000000b0051e0ea53eaasm5290894edr.97.2023.07.13.23.33.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Jul 2023 23:33:47 -0700 (PDT)
-Message-ID: <7b663b86-4df0-c3df-18a7-e4f47f900be4@kernel.org>
-Date:   Fri, 14 Jul 2023 08:33:46 +0200
+        Fri, 14 Jul 2023 05:31:40 -0400
+Received: from mail.marcansoft.com (marcansoft.com [212.63.210.85])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ACC53594;
+        Fri, 14 Jul 2023 02:31:14 -0700 (PDT)
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: linasend@asahilina.net)
+        by mail.marcansoft.com (Postfix) with ESMTPSA id 94E585BC46;
+        Fri, 14 Jul 2023 09:14:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=asahilina.net;
+        s=default; t=1689326077;
+        bh=gnMMY1x9qq2PPTNUzBdxhYi7ww499CWLccQC4OWzTx0=;
+        h=From:Date:Subject:References:In-Reply-To:To:Cc;
+        b=mOUxHiDwZefAGEFyddpSP0C3sc+AGebB1164Sp4/WwaCwg0cMeyRLTWVxHoyF0dMy
+         6+N56AQcfNwJoKzhJCuzDLTiVI1RMbCJsdEvhr8iV6JKWgYsI+boZ8p+fKDP0PuGJh
+         tsYRCK3HQwJ12DomTTeRBaj0nYgsJiqMzWaiMR0dHldiGmR/Rr2/qTq47LgkBuG3EH
+         Swzgk/2goIh/JslYbAOJeaZQnIIZQuXaYcw1wZ+mTM0pPv76jTMnK26cnAbJUFfQ5L
+         mZjStDi/cxIswFfO9cWkjCnGUFXm9X0adKBYPRYOyMaZKOCl8t/i/qnWDN3Gz/4woW
+         BvLg/oOhqISKA==
+From:   Asahi Lina <lina@asahilina.net>
+Date:   Fri, 14 Jul 2023 18:13:57 +0900
+Subject: [PATCH RFC 05/11] rust: sync: Add dummy LockClassKey
+ implementation for !CONFIG_LOCKDEP
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Content-Language: en-US
-To:     Masahiro Yamada <masahiroy@kernel.org>,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20230714-classless_lockdep-v1-5-229b9671ce31@asahilina.net>
+References: <20230714-classless_lockdep-v1-0-229b9671ce31@asahilina.net>
+In-Reply-To: <20230714-classless_lockdep-v1-0-229b9671ce31@asahilina.net>
+To:     Miguel Ojeda <ojeda@kernel.org>,
+        Alex Gaynor <alex.gaynor@gmail.com>,
+        Wedson Almeida Filho <wedsonaf@gmail.com>,
+        Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
+        =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
+        Benno Lossin <benno.lossin@proton.me>,
+        Masahiro Yamada <masahiroy@kernel.org>,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        Nicolas Schier <nicolas@fjasle.eu>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-From:   Jiri Slaby <jirislaby@kernel.org>
-Subject: con3270.o is built twice, leading to errors
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Nicolas Schier <nicolas@fjasle.eu>, Tom Rix <trix@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>
+Cc:     Hector Martin <marcan@marcan.st>, Sven Peter <sven@svenpeter.dev>,
+        Alyssa Rosenzweig <alyssa@rosenzweig.io>,
+        asahi@lists.linux.dev, rust-for-linux@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        llvm@lists.linux.dev, Asahi Lina <lina@asahilina.net>
+X-Mailer: b4 0.12.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1689326040; l=3940;
+ i=lina@asahilina.net; s=20230221; h=from:subject:message-id;
+ bh=gnMMY1x9qq2PPTNUzBdxhYi7ww499CWLccQC4OWzTx0=;
+ b=bUWCrMNd7kHfIgvXiwbCtuSH/byuJpb+njsl0PfbHBCQxpRL9xMxqT8cQPBr35CdPxPspIQkK
+ dII2uF6hA+OBRhfkDQOkW33pZImPKdLb45I4COXTwZnB1UFS/mveMtP
+X-Developer-Key: i=lina@asahilina.net; a=ed25519;
+ pk=Qn8jZuOtR1m5GaiDfTrAoQ4NE1XoYVZ/wmt5YtXWFC4=
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hi,
+Lock classes aren't used without lockdep. The C side declares the key
+as an empty struct in that case, but let's make it an explicit ZST in
+Rust, implemented in a separate module. This allows us to more easily
+guarantee that the lockdep code will be trivially optimized out without
+CONFIG_LOCKDEP, including LockClassKey arguments that are passed around.
 
-if I create an s390 defconfig:
-mkdir /tmp/s390/
-make O=/tmp/s390/ ARCH=s390 CROSS_COMPILE=s390x-suse-linux- defconfig
+Depending on whether CONFIG_LOCKDEP is enabled or not, we then import
+the real lockdep implementation or the dummy one.
 
-And then if I try for a couple times:
-make O=/tmp/s390/ -j17 ARCH=s390 CROSS_COMPILE=s390x-suse-linux- 
-drivers/s390/char/con3270.o
+Signed-off-by: Asahi Lina <lina@asahilina.net>
+---
+ rust/kernel/sync.rs            | 29 ++++++++---------------------
+ rust/kernel/sync/lockdep.rs    | 27 +++++++++++++++++++++++++++
+ rust/kernel/sync/no_lockdep.rs | 19 +++++++++++++++++++
+ 3 files changed, 54 insertions(+), 21 deletions(-)
 
-Most of the time, I get:
-make[1]: Entering directory '/tmp/s390'
-   GEN     Makefile
-   CALL    /home/latest/linux/scripts/checksyscalls.sh
-   CC      drivers/s390/char/con3270.o
-   CC      drivers/s390/char/con3270.o
+diff --git a/rust/kernel/sync.rs b/rust/kernel/sync.rs
+index d219ee518eff..352472c6b77a 100644
+--- a/rust/kernel/sync.rs
++++ b/rust/kernel/sync.rs
+@@ -5,37 +5,24 @@
+ //! This module contains the kernel APIs related to synchronisation that have been ported or
+ //! wrapped for usage by Rust code in the kernel.
+ 
+-use crate::types::Opaque;
+-
+ mod arc;
+ mod condvar;
+ pub mod lock;
+ mod locked_by;
+ 
++#[cfg(CONFIG_LOCKDEP)]
++mod lockdep;
++#[cfg(not(CONFIG_LOCKDEP))]
++mod no_lockdep;
++#[cfg(not(CONFIG_LOCKDEP))]
++use no_lockdep as lockdep;
++
+ pub use arc::{Arc, ArcBorrow, UniqueArc};
+ pub use condvar::CondVar;
+ pub use lock::{mutex::Mutex, spinlock::SpinLock};
++pub use lockdep::LockClassKey;
+ pub use locked_by::LockedBy;
+ 
+-/// Represents a lockdep class. It's a wrapper around C's `lock_class_key`.
+-#[repr(transparent)]
+-pub struct LockClassKey(Opaque<bindings::lock_class_key>);
+-
+-// SAFETY: `bindings::lock_class_key` is designed to be used concurrently from multiple threads and
+-// provides its own synchronization.
+-unsafe impl Sync for LockClassKey {}
+-
+-impl LockClassKey {
+-    /// Creates a new lock class key.
+-    pub const fn new() -> Self {
+-        Self(Opaque::uninit())
+-    }
+-
+-    pub(crate) fn as_ptr(&self) -> *mut bindings::lock_class_key {
+-        self.0.get()
+-    }
+-}
+-
+ /// Defines a new static lock class and returns a pointer to it.
+ #[doc(hidden)]
+ #[macro_export]
+diff --git a/rust/kernel/sync/lockdep.rs b/rust/kernel/sync/lockdep.rs
+new file mode 100644
+index 000000000000..cb68b18dc0ad
+--- /dev/null
++++ b/rust/kernel/sync/lockdep.rs
+@@ -0,0 +1,27 @@
++// SPDX-License-Identifier: GPL-2.0
++
++//! Lockdep utilities.
++//!
++//! This module abstracts the parts of the kernel lockdep API relevant to Rust
++//! modules, including lock classes.
++
++use crate::types::Opaque;
++
++/// Represents a lockdep class. It's a wrapper around C's `lock_class_key`.
++#[repr(transparent)]
++pub struct LockClassKey(Opaque<bindings::lock_class_key>);
++
++impl LockClassKey {
++    /// Creates a new lock class key.
++    pub const fn new() -> Self {
++        Self(Opaque::uninit())
++    }
++
++    pub(crate) fn as_ptr(&self) -> *mut bindings::lock_class_key {
++        self.0.get()
++    }
++}
++
++// SAFETY: `bindings::lock_class_key` is designed to be used concurrently from multiple threads and
++// provides its own synchronization.
++unsafe impl Sync for LockClassKey {}
+diff --git a/rust/kernel/sync/no_lockdep.rs b/rust/kernel/sync/no_lockdep.rs
+new file mode 100644
+index 000000000000..69d42e8d9801
+--- /dev/null
++++ b/rust/kernel/sync/no_lockdep.rs
+@@ -0,0 +1,19 @@
++// SPDX-License-Identifier: GPL-2.0
++
++//! Dummy lockdep utilities.
++//!
++//! Takes the place of the `lockdep` module when lockdep is disabled.
++
++/// A dummy, zero-sized lock class.
++pub struct LockClassKey();
++
++impl LockClassKey {
++    /// Creates a new dummy lock class key.
++    pub const fn new() -> Self {
++        Self()
++    }
++
++    pub(crate) fn as_ptr(&self) -> *mut bindings::lock_class_key {
++        core::ptr::null_mut()
++    }
++}
 
-I.e. it is built twice.
-
-Sometimes, I also get an error:
-fixdep: error opening file: drivers/s390/char/.con3270.o.d: No such file 
-or directory
-make[4]: *** [/home/latest/linux/scripts/Makefile.build:243: 
-drivers/s390/char/con3270.o] Error 2
-make[4]: *** Deleting file 'drivers/s390/char/con3270.o'
-make[3]: *** [/home/latest/linux/scripts/Makefile.build:477: drivers]
-
-Obviously due to some race.
-
-Any ideas what is going on?
-
-thanks,
 -- 
-js
-suse labs
+2.40.1
+
