@@ -2,249 +2,122 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B976C04FE0
-	for <linux-kbuild@archiver.kernel.org>; Fri, 14 Jul 2023 09:32:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65BE9EB64DA
+	for <linux-kbuild@archiver.kernel.org>; Fri, 14 Jul 2023 10:13:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235920AbjGNJc0 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 14 Jul 2023 05:32:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55986 "EHLO
+        id S236056AbjGNKNm (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 14 Jul 2023 06:13:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235926AbjGNJcH (ORCPT
+        with ESMTP id S235938AbjGNKNl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 14 Jul 2023 05:32:07 -0400
-Received: from mail.marcansoft.com (marcansoft.com [212.63.210.85])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBF163599;
-        Fri, 14 Jul 2023 02:31:44 -0700 (PDT)
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: linasend@asahilina.net)
-        by mail.marcansoft.com (Postfix) with ESMTPSA id A6D035BC4B;
-        Fri, 14 Jul 2023 09:14:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=asahilina.net;
-        s=default; t=1689326083;
-        bh=YQMECCDF0tMPqG41YW5GqgPmtn/MWGEIPI5Q1NaQYSY=;
-        h=From:Date:Subject:References:In-Reply-To:To:Cc;
-        b=Phm4cOQp7dNly6KdM+1WaFltuLRCCccAdmrNa2mW1HaP5xISZ8QVF9w5oH4EHsF29
-         nBxlu8nN92foqpEy/Cqv9V+Z0UGM5pwEJjyWj1AD56aOJGcMUuhaPldP1A2JDaALE7
-         dux48++7nyiMgJ45pEG9vtiIG7qKSCHawDzfhorMgjmbMApa6ydxNSWmBV/ldFv5T8
-         d8tQdycNmmNXKi/iBFjfT2Or5qtatxPOK2ZTOz+Q3o5CN0Z8Z3rUOqFHKepPBgcyVZ
-         bG27LPWiYfpBp4XRcdTNwbPU85BHVPyqxXrRlYa9QOTsyn2R5VJHIShiaQIVkFfp40
-         0l8klm95ruhRQ==
-From:   Asahi Lina <lina@asahilina.net>
-Date:   Fri, 14 Jul 2023 18:13:58 +0900
-Subject: [PATCH RFC 06/11] rust: sync: Replace static LockClassKey refs
- with a pointer wrapper
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20230714-classless_lockdep-v1-6-229b9671ce31@asahilina.net>
-References: <20230714-classless_lockdep-v1-0-229b9671ce31@asahilina.net>
+        Fri, 14 Jul 2023 06:13:41 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5740C1989
+        for <linux-kbuild@vger.kernel.org>; Fri, 14 Jul 2023 03:13:40 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-c5a479bc2d4so1454663276.1
+        for <linux-kbuild@vger.kernel.org>; Fri, 14 Jul 2023 03:13:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689329619; x=1691921619;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wxNp02bNCTAVyLPRZ82mLPkwbAN62CIGC9HHKgWokDk=;
+        b=2F4xNUdVveqN+R5EKr8RvDc7bTWM+gLKOemIBdfkq0xCOm+Cr4UcTnXi7Ex+Z93qzm
+         0Jr5cpq2w11H+0Cg6FN9ZTSvdb5obWOs5j0cgJ0bcrvXiE2RRrlmIoxST4HoWSBwgOK2
+         8JD3CugG730wX57wEfvKkXfRliM7CBRRje7zXW9Eh8XpC3vlQcb8g9lC3f7RU2/c+xih
+         zeerj13DLEEgAOKU8aDV2UeFmV+9cbL73eRaQL//xH4DpiXrl7+msaF7IidwNkSYAvxL
+         rZh7VEifal0tY7Lt6YJ1DvF9fWQNWkiFiAlRb1vLaDscgIZXzMzIrbT3QjcbJLDqu6o/
+         RHvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689329619; x=1691921619;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wxNp02bNCTAVyLPRZ82mLPkwbAN62CIGC9HHKgWokDk=;
+        b=eUgHv6ojNDZW2Neae+V0ZEEEahaeHDOP69ksga6IEOdjy5BadCj19ruUDR0IzV+ifb
+         Bv+syCbfqinatsMeRTFEO2Xi6w5SumdYjwws+AvmPrgHE0vS3xaMs03bBudTC6JbppPY
+         qiY0HQ3IMaiSsm5gSFyNWZt2zg503k7GOoPe32WvYcBes5Yee0mGJlqYkF3FUlq1rbjU
+         p36ZiWXBtfCpWaLm8PmQYog6ZtlD+QE6pkfIpBekJLwP1JL7c0xVCfLXA6QIM2NzYYn9
+         gpNrtA0mbwAvlraCgADmtCatibKKmShawvdT51PJ/0L8bTFMglcVKQf8psmrC/nOMlHI
+         /q5Q==
+X-Gm-Message-State: ABy/qLZpHlpIbp2SqRPFtbKwk/CH8Kx6n436wLBWG2n5H4oA/D+wY9Xi
+        FE9KpdZhasFEj8eSoeAwNF/z2F1EXA2hK0Q=
+X-Google-Smtp-Source: APBJJlFQrE4sbqNmMgiT0tYYLjApKeHUUY+9Z7jWQry23roqS1du7n+Bvn1DHckLfj2QgRK2ut1rlpfSA3O9848=
+X-Received: from aliceryhl.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:6c8])
+ (user=aliceryhl job=sendgmr) by 2002:a25:9cc8:0:b0:bac:5d2c:844b with SMTP id
+ z8-20020a259cc8000000b00bac5d2c844bmr22156ybo.8.1689329619648; Fri, 14 Jul
+ 2023 03:13:39 -0700 (PDT)
+Date:   Fri, 14 Jul 2023 10:13:37 +0000
 In-Reply-To: <20230714-classless_lockdep-v1-0-229b9671ce31@asahilina.net>
-To:     Miguel Ojeda <ojeda@kernel.org>,
-        Alex Gaynor <alex.gaynor@gmail.com>,
-        Wedson Almeida Filho <wedsonaf@gmail.com>,
-        Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-        =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
-        Benno Lossin <benno.lossin@proton.me>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nicolas Schier <nicolas@fjasle.eu>, Tom Rix <trix@redhat.com>,
-        Daniel Vetter <daniel@ffwll.ch>
-Cc:     Hector Martin <marcan@marcan.st>, Sven Peter <sven@svenpeter.dev>,
-        Alyssa Rosenzweig <alyssa@rosenzweig.io>,
-        asahi@lists.linux.dev, rust-for-linux@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        llvm@lists.linux.dev, Asahi Lina <lina@asahilina.net>
-X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1689326040; l=6618;
- i=lina@asahilina.net; s=20230221; h=from:subject:message-id;
- bh=YQMECCDF0tMPqG41YW5GqgPmtn/MWGEIPI5Q1NaQYSY=;
- b=DHnofK17mNqOsVKbC7EuDKWPrgQt8WOHKWeRP7sUdWZGE9Ed0qlD+ubbbZ1HJJjrCebrQ8Ru5
- qfpFd+NvfkgBrKIeVDgO1ojTXJ3jFyt0CJxGcsLXh5mTChXqp5XtkUM
-X-Developer-Key: i=lina@asahilina.net; a=ed25519;
- pk=Qn8jZuOtR1m5GaiDfTrAoQ4NE1XoYVZ/wmt5YtXWFC4=
+Mime-Version: 1.0
+References: <20230714-classless_lockdep-v1-0-229b9671ce31@asahilina.net>
+X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
+Message-ID: <20230714101337.2193665-1-aliceryhl@google.com>
+Subject: Re: [PATCH RFC 00/11] rust: Implicit lock class creation & Arc
+ Lockdep integration
+From:   Alice Ryhl <aliceryhl@google.com>
+To:     lina@asahilina.net
+Cc:     alex.gaynor@gmail.com, alyssa@rosenzweig.io, asahi@lists.linux.dev,
+        benno.lossin@proton.me, bjorn3_gh@protonmail.com,
+        boqun.feng@gmail.com, daniel@ffwll.ch, gary@garyguo.net,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        llvm@lists.linux.dev, marcan@marcan.st, masahiroy@kernel.org,
+        nathan@kernel.org, ndesaulniers@google.com, nicolas@fjasle.eu,
+        ojeda@kernel.org, rust-for-linux@vger.kernel.org,
+        sven@svenpeter.dev, trix@redhat.com, wedsonaf@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-We want to be able to handle dynamic lock class creation and using
-pointers to things that aren't a real lock_class_key as lock classes.
-Doing this by casting around Rust references is difficult without
-accidentally invoking UB.
+Asahi Lina <lina@asahilina.net> writes:
+> Begone, lock classes!
+> 
+> As discussed in meetings/etc, we would really like to support implicit
+> lock class creation for Rust code. Right now, lock classes are created
+> using macros and passed around (similar to C). Unfortunately, Rust
+> macros don't look like Rust functions, which means adding lockdep to a
+> type is a breaking API change. This makes Rust mutex creation rather
+> ugly, with the new_mutex!() macro and friends.
+> 
+> Implicit lock classes have to be unique per instantiation code site.
+> Notably, with Rust generics and monomorphization, this is not the same
+> as unique per generated code instance. If this weren't the case, we
+> could use inline functions and asm!() magic to try to create lock
+> classes that have the right uniqueness semantics. But that doesn't work,
+> since it would create too many lock classes for the same actual lock
+> creation in the source code.
+> 
+> But Rust does have one trick we can use: it can track the caller
+> location (as file:line:column), across multiple functions. This works
+> using an implicit argument that gets passed around, which is exactly the
+> thing we do for lock classes. The tricky bit is that, while the value of
+> these Location objects has the semantics we want (unique value per
+> source code location), there is no guarantee that they are deduplicated
+> in memory.
+> 
+> So we use a hash table, and map Location values to lock classes. Et
+> voila, implicit lock class support!
+>
+> This lets us clean up the Mutex & co APIs and make them look a lot more
+> Rust-like, but it also means we can now throw Lockdep into more APIs
+> without breaking the API. And so we can pull a neat trick: adding
+> Lockdep support into Arc<T>. This catches cases where the Arc Drop
+> implementation could create a locking correctness violation only when
+> the reference count drops to 0 at that particular drop site, which is
+> otherwise not detectable unless that condition actually happens at
+> runtime. Since Drop is "magic" in Rust and Drop codepaths very difficult
+> to audit, this helps a lot.
+> 
+> For the initial RFC, this implements the new API only for Mutex. If this
+> looks good, I can extend it to CondVar & friends in the next version.
+> This series also folds in a few related minor dependencies / changes
+> (like the pin_init mutex stuff).
 
-Instead, switch LockClassKey to being a raw pointer wrapper around a
-lock_class_key, which means there is no UB possible on the Rust side
-just by creating and consuming these objects. The C code also should
-never actually dereference lock classes, only use their address
-(possibly with an offset).
+I'm not convinced that this is the right compromise. Moving lockdep
+class creation to runtime sounds unfortunate, especially since this
+makes them fallible due to memory allocations (I think?).
 
-We still provide a dummy ZST version of this wrapper, to be used when
-lockdep is disabled.
+I would be inclined to keep using macros for this.
 
-Signed-off-by: Asahi Lina <lina@asahilina.net>
----
- rust/kernel/sync.rs            |  6 +++---
- rust/kernel/sync/condvar.rs    |  2 +-
- rust/kernel/sync/lock.rs       |  4 ++--
- rust/kernel/sync/lockdep.rs    | 27 ++++++++++++++++++++++-----
- rust/kernel/sync/no_lockdep.rs | 15 +++++++++++++--
- rust/kernel/types.rs           |  2 +-
- 6 files changed, 42 insertions(+), 14 deletions(-)
-
-diff --git a/rust/kernel/sync.rs b/rust/kernel/sync.rs
-index 352472c6b77a..49286c3e0ff3 100644
---- a/rust/kernel/sync.rs
-+++ b/rust/kernel/sync.rs
-@@ -20,7 +20,7 @@
- pub use arc::{Arc, ArcBorrow, UniqueArc};
- pub use condvar::CondVar;
- pub use lock::{mutex::Mutex, spinlock::SpinLock};
--pub use lockdep::LockClassKey;
-+pub use lockdep::{LockClassKey, StaticLockClassKey};
- pub use locked_by::LockedBy;
- 
- /// Defines a new static lock class and returns a pointer to it.
-@@ -28,8 +28,8 @@
- #[macro_export]
- macro_rules! static_lock_class {
-     () => {{
--        static CLASS: $crate::sync::LockClassKey = $crate::sync::LockClassKey::new();
--        &CLASS
-+        static CLASS: $crate::sync::StaticLockClassKey = $crate::sync::StaticLockClassKey::new();
-+        CLASS.key()
-     }};
- }
- 
-diff --git a/rust/kernel/sync/condvar.rs b/rust/kernel/sync/condvar.rs
-index ed353399c4e5..3bccb2c6ef84 100644
---- a/rust/kernel/sync/condvar.rs
-+++ b/rust/kernel/sync/condvar.rs
-@@ -92,7 +92,7 @@ unsafe impl Sync for CondVar {}
- impl CondVar {
-     /// Constructs a new condvar initialiser.
-     #[allow(clippy::new_ret_no_self)]
--    pub fn new(name: &'static CStr, key: &'static LockClassKey) -> impl PinInit<Self> {
-+    pub fn new(name: &'static CStr, key: LockClassKey) -> impl PinInit<Self> {
-         pin_init!(Self {
-             _pin: PhantomPinned,
-             // SAFETY: `slot` is valid while the closure is called and both `name` and `key` have
-diff --git a/rust/kernel/sync/lock.rs b/rust/kernel/sync/lock.rs
-index d493c5d19104..8e71e7aa2cc1 100644
---- a/rust/kernel/sync/lock.rs
-+++ b/rust/kernel/sync/lock.rs
-@@ -103,7 +103,7 @@ unsafe impl<T: ?Sized + Send, B: Backend> Sync for Lock<T, B> {}
- impl<T, B: Backend> Lock<T, B> {
-     /// Constructs a new lock initialiser.
-     #[allow(clippy::new_ret_no_self)]
--    pub fn new(t: T, name: &'static CStr, key: &'static LockClassKey) -> impl PinInit<Self> {
-+    pub fn new(t: T, name: &'static CStr, key: LockClassKey) -> impl PinInit<Self> {
-         pin_init!(Self {
-             data: UnsafeCell::new(t),
-             _pin: PhantomPinned,
-@@ -119,7 +119,7 @@ pub fn new(t: T, name: &'static CStr, key: &'static LockClassKey) -> impl PinIni
-     pub fn pin_init<E>(
-         t: impl PinInit<T, E>,
-         name: &'static CStr,
--        key: &'static LockClassKey,
-+        key: LockClassKey,
-     ) -> impl PinInit<Self, E>
-     where
-         E: core::convert::From<core::convert::Infallible>,
-diff --git a/rust/kernel/sync/lockdep.rs b/rust/kernel/sync/lockdep.rs
-index cb68b18dc0ad..d8328f4275fb 100644
---- a/rust/kernel/sync/lockdep.rs
-+++ b/rust/kernel/sync/lockdep.rs
-@@ -9,19 +9,36 @@
- 
- /// Represents a lockdep class. It's a wrapper around C's `lock_class_key`.
- #[repr(transparent)]
--pub struct LockClassKey(Opaque<bindings::lock_class_key>);
-+pub struct StaticLockClassKey(Opaque<bindings::lock_class_key>);
- 
--impl LockClassKey {
-+impl StaticLockClassKey {
-     /// Creates a new lock class key.
-     pub const fn new() -> Self {
-         Self(Opaque::uninit())
-     }
- 
-+    /// Returns the lock class key reference for this static lock class.
-+    pub const fn key(&self) -> LockClassKey {
-+        LockClassKey(self.0.get())
-+    }
-+}
-+
-+// SAFETY: `bindings::lock_class_key` just represents an opaque memory location, and is never
-+// actually dereferenced.
-+unsafe impl Sync for StaticLockClassKey {}
-+
-+/// A reference to a lock class key. This is a raw pointer to a lock_class_key,
-+/// which is required to have a static lifetime.
-+#[derive(Copy, Clone)]
-+pub struct LockClassKey(*mut bindings::lock_class_key);
-+
-+impl LockClassKey {
-     pub(crate) fn as_ptr(&self) -> *mut bindings::lock_class_key {
--        self.0.get()
-+        self.0
-     }
- }
- 
--// SAFETY: `bindings::lock_class_key` is designed to be used concurrently from multiple threads and
--// provides its own synchronization.
-+// SAFETY: `bindings::lock_class_key` just represents an opaque memory location, and is never
-+// actually dereferenced.
-+unsafe impl Send for LockClassKey {}
- unsafe impl Sync for LockClassKey {}
-diff --git a/rust/kernel/sync/no_lockdep.rs b/rust/kernel/sync/no_lockdep.rs
-index 69d42e8d9801..518ec0bf9a7d 100644
---- a/rust/kernel/sync/no_lockdep.rs
-+++ b/rust/kernel/sync/no_lockdep.rs
-@@ -5,14 +5,25 @@
- //! Takes the place of the `lockdep` module when lockdep is disabled.
- 
- /// A dummy, zero-sized lock class.
--pub struct LockClassKey();
-+pub struct StaticLockClassKey();
- 
--impl LockClassKey {
-+impl StaticLockClassKey {
-     /// Creates a new dummy lock class key.
-     pub const fn new() -> Self {
-         Self()
-     }
- 
-+    /// Returns the lock class key reference for this static lock class.
-+    pub const fn key(&self) -> LockClassKey {
-+        LockClassKey()
-+    }
-+}
-+
-+/// A dummy reference to a lock class key.
-+#[derive(Copy, Clone)]
-+pub struct LockClassKey();
-+
-+impl LockClassKey {
-     pub(crate) fn as_ptr(&self) -> *mut bindings::lock_class_key {
-         core::ptr::null_mut()
-     }
-diff --git a/rust/kernel/types.rs b/rust/kernel/types.rs
-index 185d3493857e..91739bf71cc3 100644
---- a/rust/kernel/types.rs
-+++ b/rust/kernel/types.rs
-@@ -262,7 +262,7 @@ pub fn ffi_init(init_func: impl FnOnce(*mut T)) -> impl PinInit<Self> {
-     }
- 
-     /// Returns a raw pointer to the opaque data.
--    pub fn get(&self) -> *mut T {
-+    pub const fn get(&self) -> *mut T {
-         UnsafeCell::raw_get(self.0.as_ptr())
-     }
- 
-
--- 
-2.40.1
+Alice
 
