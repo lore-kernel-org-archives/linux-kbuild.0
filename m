@@ -2,44 +2,43 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08AE5EB64DA
-	for <linux-kbuild@archiver.kernel.org>; Fri, 14 Jul 2023 09:32:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6A76EB64DC
+	for <linux-kbuild@archiver.kernel.org>; Fri, 14 Jul 2023 09:32:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235895AbjGNJcC (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 14 Jul 2023 05:32:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55886 "EHLO
+        id S235951AbjGNJcU (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 14 Jul 2023 05:32:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56422 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235853AbjGNJbp (ORCPT
+        with ESMTP id S235873AbjGNJcG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 14 Jul 2023 05:31:45 -0400
+        Fri, 14 Jul 2023 05:32:06 -0400
 Received: from mail.marcansoft.com (marcansoft.com [212.63.210.85])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A779435A2;
-        Fri, 14 Jul 2023 02:31:14 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77E413594;
+        Fri, 14 Jul 2023 02:31:42 -0700 (PDT)
 Received: from [127.0.0.1] (localhost [127.0.0.1])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
         (Authenticated sender: linasend@asahilina.net)
-        by mail.marcansoft.com (Postfix) with ESMTPSA id DDFCB5BC90;
-        Fri, 14 Jul 2023 09:14:55 +0000 (UTC)
+        by mail.marcansoft.com (Postfix) with ESMTPSA id 5C0EA5BC40;
+        Fri, 14 Jul 2023 09:14:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=asahilina.net;
-        s=default; t=1689326101;
-        bh=pmERp6GwnOCWkgphnzptIlYb6DLdsFhpRouByq625cQ=;
+        s=default; t=1689326058;
+        bh=y9j+fmO9oWE2TupvVpaaD80X7pDQKCp9sdvtdWdP4zM=;
         h=From:Date:Subject:References:In-Reply-To:To:Cc;
-        b=kdLKIFgKGIwIntnz0AYgYdJvrgRLnnaI9MlYtqgh04f6DRCdyEJsf1wCQz/bICx4h
-         Qu4xtfwtlzbagPh3ny4EsL9dxxSnfv+odIkxV5lscrKYPAe64NHpifx3W+U6dxLi/G
-         Y6Nf0R3QOG2AJzHVEDQrrYB2I44moYV9sGHdVr9SPiJmfeJHwO7nJfPZvQGwEU/GRw
-         xFmwpIZbCmFnjfQP8D2EA1pMZVkNmfCfJJK7WILd4XjK51yJSynQKWMOqPwseqwtDg
-         G7pIumuQWNqHZQm0ZE5G2V98/nyldQKujWMnfE011Uau369ialqAGfMq8vU9oS9Kwf
-         pGlz20dcsxNmw==
+        b=y84e2wXTjy0hzmtrX37Fvo6re+l/TXA0Bs5Kqc1RccJ2w8WblDu9BBWxmI8KYN6LL
+         7Hyq6eJjmnUvRTpLA4aXoIYlc1haDLCjd2dxkJpGyDwe8b4QRiMjNJdJUZseGW49Rb
+         iA8HP0D7u811zX8VDaFJgS11NguIUSnEnDszRH4HCZoVRAZIHhmysFsYsNM4Yt5C86
+         8PO0TP7/92gQybYXNgpEMxLGZX6LF97opbpfzb08ps5Y6KZhoYHucRMXk5jlMy61Ht
+         xe84AHM+oAuc5F3FnZBmfUUdgCaM3DOuixY90ZzdIyLh20o9uyeERVzb+7u2eVmwTn
+         WiIE1mlb/BQGg==
 From:   Asahi Lina <lina@asahilina.net>
-Date:   Fri, 14 Jul 2023 18:14:01 +0900
-Subject: [PATCH RFC 09/11] rust: init: Update documentation for new mutex
- init style
+Date:   Fri, 14 Jul 2023 18:13:54 +0900
+Subject: [PATCH RFC 02/11] rust: lock: Add Lock::pin_init()
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230714-classless_lockdep-v1-9-229b9671ce31@asahilina.net>
+Message-Id: <20230714-classless_lockdep-v1-2-229b9671ce31@asahilina.net>
 References: <20230714-classless_lockdep-v1-0-229b9671ce31@asahilina.net>
 In-Reply-To: <20230714-classless_lockdep-v1-0-229b9671ce31@asahilina.net>
 To:     Miguel Ojeda <ojeda@kernel.org>,
@@ -59,101 +58,105 @@ Cc:     Hector Martin <marcan@marcan.st>, Sven Peter <sven@svenpeter.dev>,
         linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
         llvm@lists.linux.dev, Asahi Lina <lina@asahilina.net>
 X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1689326040; l=2511;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1689326040; l=3329;
  i=lina@asahilina.net; s=20230221; h=from:subject:message-id;
- bh=pmERp6GwnOCWkgphnzptIlYb6DLdsFhpRouByq625cQ=;
- b=SSD6fmaYAIs7/HNgGcRACQ89lpuCPIOoeaRkkZ2UkBP8Q1hptBMoz/GGwxRAszksq/cVul+Uq
- V3ShxAHSYKjA01dNJeNpjtApErQmrziR42b2PVrJ58GJ9xhMTUqfHrU
+ bh=y9j+fmO9oWE2TupvVpaaD80X7pDQKCp9sdvtdWdP4zM=;
+ b=HldwayEzarn12NZLBONXhBl2dK70OLqVEoWxGybMgF5VMQyfeDLVYNVFYC4aOjRpascoC/fA3
+ nN73G79SFLMD34bCpycjN0Re4OpiEh4nng1Q4gG2YqIe/f7m9yKlLsZ
 X-Developer-Key: i=lina@asahilina.net; a=ed25519;
  pk=Qn8jZuOtR1m5GaiDfTrAoQ4NE1XoYVZ/wmt5YtXWFC4=
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Now that we have classless Mutex creation, update the docs to reflect
-the new API.
+Allow initializing a lock using pin_init!(), instead of requiring
+the inner data to be passed through the stack.
 
 Signed-off-by: Asahi Lina <lina@asahilina.net>
 ---
- rust/kernel/init.rs | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ rust/kernel/sync/lock.rs       | 30 +++++++++++++++++++++++++++++-
+ rust/kernel/sync/lock/mutex.rs | 13 +++++++++++++
+ 2 files changed, 42 insertions(+), 1 deletion(-)
 
-diff --git a/rust/kernel/init.rs b/rust/kernel/init.rs
-index b4332a4ec1f4..f190bbd0bab1 100644
---- a/rust/kernel/init.rs
-+++ b/rust/kernel/init.rs
-@@ -36,7 +36,7 @@
- //!
- //! ```rust
- //! # #![allow(clippy::disallowed_names, clippy::new_ret_no_self)]
--//! use kernel::{prelude::*, sync::Mutex, new_mutex};
-+//! use kernel::{prelude::*, sync::Mutex};
- //! # use core::pin::Pin;
- //! #[pin_data]
- //! struct Foo {
-@@ -46,7 +46,7 @@
- //! }
- //!
- //! let foo = pin_init!(Foo {
--//!     a <- new_mutex!(42, "Foo::a"),
-+//!     a <- Mutex::new_named(42, "Foo::a"),
- //!     b: 24,
- //! });
- //! ```
-@@ -56,7 +56,7 @@
- //!
- //! ```rust
- //! # #![allow(clippy::disallowed_names, clippy::new_ret_no_self)]
--//! # use kernel::{prelude::*, sync::Mutex, new_mutex};
-+//! # use kernel::{prelude::*, sync::Mutex};
- //! # use core::pin::Pin;
- //! # #[pin_data]
- //! # struct Foo {
-@@ -65,7 +65,7 @@
- //! #     b: u32,
- //! # }
- //! # let foo = pin_init!(Foo {
--//! #     a <- new_mutex!(42, "Foo::a"),
-+//! #     a <- Mutex::new_named(42, "Foo::a"),
- //! #     b: 24,
- //! # });
- //! let foo: Result<Pin<Box<Foo>>> = Box::pin_init(foo);
-@@ -98,7 +98,7 @@
- //! impl DriverData {
- //!     fn new() -> impl PinInit<Self, Error> {
- //!         try_pin_init!(Self {
--//!             status <- new_mutex!(0, "DriverData::status"),
-+//!             status <- Mutex::new_named(0, "DriverData::status"),
- //!             buffer: Box::init(kernel::init::zeroed())?,
- //!         })
- //!     }
-@@ -242,7 +242,7 @@
- /// }
+diff --git a/rust/kernel/sync/lock.rs b/rust/kernel/sync/lock.rs
+index a2216325632d..d493c5d19104 100644
+--- a/rust/kernel/sync/lock.rs
++++ b/rust/kernel/sync/lock.rs
+@@ -6,7 +6,9 @@
+ //! spinlocks, raw spinlocks) to be provided with minimal effort.
+ 
+ use super::LockClassKey;
+-use crate::{bindings, init::PinInit, pin_init, str::CStr, types::Opaque, types::ScopeGuard};
++use crate::{
++    bindings, init::PinInit, pin_init, str::CStr, try_pin_init, types::Opaque, types::ScopeGuard,
++};
+ use core::{cell::UnsafeCell, marker::PhantomData, marker::PhantomPinned};
+ use macros::pin_data;
+ 
+@@ -87,6 +89,7 @@ pub struct Lock<T: ?Sized, B: Backend> {
+     _pin: PhantomPinned,
+ 
+     /// The data protected by the lock.
++    #[pin]
+     pub(crate) data: UnsafeCell<T>,
+ }
+ 
+@@ -111,6 +114,31 @@ pub fn new(t: T, name: &'static CStr, key: &'static LockClassKey) -> impl PinIni
+             }),
+         })
+     }
++
++    /// Constructs a new lock initialiser taking an initialiser.
++    pub fn pin_init<E>(
++        t: impl PinInit<T, E>,
++        name: &'static CStr,
++        key: &'static LockClassKey,
++    ) -> impl PinInit<Self, E>
++    where
++        E: core::convert::From<core::convert::Infallible>,
++    {
++        try_pin_init!(Self {
++            // SAFETY: We are just forwarding the initialization across a
++            // cast away from UnsafeCell, so the pin_init_from_closure and
++            // __pinned_init() requirements are in sync.
++            data <- unsafe { crate::init::pin_init_from_closure(move |slot: *mut UnsafeCell<T>| {
++                t.__pinned_init(slot as *mut T)
++            })},
++            _pin: PhantomPinned,
++            // SAFETY: `slot` is valid while the closure is called and both `name` and `key` have
++            // static lifetimes so they live indefinitely.
++            state <- Opaque::ffi_init(|slot| unsafe {
++                B::init(slot, name.as_char_ptr(), key.as_ptr())
++            }),
++        }? E)
++    }
+ }
+ 
+ impl<T: ?Sized, B: Backend> Lock<T, B> {
+diff --git a/rust/kernel/sync/lock/mutex.rs b/rust/kernel/sync/lock/mutex.rs
+index 923472f04af4..06fe685501b4 100644
+--- a/rust/kernel/sync/lock/mutex.rs
++++ b/rust/kernel/sync/lock/mutex.rs
+@@ -18,6 +18,19 @@ macro_rules! new_mutex {
+     };
+ }
+ 
++/// Creates a [`Mutex`] initialiser with the given name and a newly-created lock class,
++/// given an initialiser for the inner type.
++///
++/// It uses the name if one is given, otherwise it generates one based on the file name and line
++/// number.
++#[macro_export]
++macro_rules! new_mutex_pinned {
++    ($inner:expr $(, $name:literal)? $(,)?) => {
++        $crate::sync::Mutex::pin_init(
++            $inner, $crate::optional_name!($($name)?), $crate::static_lock_class!())
++    };
++}
++
+ /// A mutual exclusion primitive.
  ///
- /// stack_pin_init!(let foo = pin_init!(Foo {
--///     a <- new_mutex!(42),
-+///     a <- Mutex::new(42),
- ///     b: Bar {
- ///         x: 64,
- ///     },
-@@ -294,7 +294,7 @@ macro_rules! stack_pin_init {
- /// }
- ///
- /// stack_try_pin_init!(let foo: Result<Pin<&mut Foo>, AllocError> = pin_init!(Foo {
--///     a <- new_mutex!(42),
-+///     a <- Mutex::new(42),
- ///     b: Box::try_new(Bar {
- ///         x: 64,
- ///     })?,
-@@ -320,7 +320,7 @@ macro_rules! stack_pin_init {
- /// }
- ///
- /// stack_try_pin_init!(let foo: Pin<&mut Foo> =? pin_init!(Foo {
--///     a <- new_mutex!(42),
-+///     a <- Mutex::new(42),
- ///     b: Box::try_new(Bar {
- ///         x: 64,
- ///     })?,
+ /// Exposes the kernel's [`struct mutex`]. When multiple threads attempt to lock the same mutex,
 
 -- 
 2.40.1
