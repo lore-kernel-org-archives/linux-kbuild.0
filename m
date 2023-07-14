@@ -2,47 +2,46 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03F8DC00528
-	for <linux-kbuild@archiver.kernel.org>; Fri, 14 Jul 2023 09:31:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08AE5EB64DA
+	for <linux-kbuild@archiver.kernel.org>; Fri, 14 Jul 2023 09:32:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235858AbjGNJbp (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 14 Jul 2023 05:31:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55864 "EHLO
+        id S235895AbjGNJcC (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 14 Jul 2023 05:32:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234417AbjGNJbn (ORCPT
+        with ESMTP id S235853AbjGNJbp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 14 Jul 2023 05:31:43 -0400
+        Fri, 14 Jul 2023 05:31:45 -0400
 Received: from mail.marcansoft.com (marcansoft.com [212.63.210.85])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5A793599;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A779435A2;
         Fri, 14 Jul 2023 02:31:14 -0700 (PDT)
 Received: from [127.0.0.1] (localhost [127.0.0.1])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
         (Authenticated sender: linasend@asahilina.net)
-        by mail.marcansoft.com (Postfix) with ESMTPSA id 2DD105BC3A;
-        Fri, 14 Jul 2023 09:14:00 +0000 (UTC)
+        by mail.marcansoft.com (Postfix) with ESMTPSA id DDFCB5BC90;
+        Fri, 14 Jul 2023 09:14:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=asahilina.net;
-        s=default; t=1689326046;
-        bh=NNlQg01GoROuwHT7V4Ok4QbA2Wacecl8a9cR39wPQX4=;
-        h=From:Subject:Date:To:Cc;
-        b=DWOuvqjnL+WVRlQCchmZp/1Q5QSmwk1TXPN8elD+Lr+TEOyfN68h44fdUmUcdHUN2
-         7A4F4XNCMes02IwEzHvDFlsJpVL0C1B4V1z1Ue0okL8UxvAiq4YGiBco3taDmSFjt/
-         jS1+M7N5xtG4lbjc5aUXgomR7zvuNjImD/mfiMO2d2SBUVIwbYtnjKb3nbQzJMX+ol
-         vHAaNDJRwALfpj1vg6IIcWkXw5ZDFpjpkKMYGKkPHoYaEQR6LoFiC9FK29dna86ls9
-         2qOlhTZmdmXLAN5YMfQKDpOaFiZjQ2tR+HS58wyprIbaP33CVyONvqagYL1nunBGyZ
-         /QtxTuAPRiOWQ==
+        s=default; t=1689326101;
+        bh=pmERp6GwnOCWkgphnzptIlYb6DLdsFhpRouByq625cQ=;
+        h=From:Date:Subject:References:In-Reply-To:To:Cc;
+        b=kdLKIFgKGIwIntnz0AYgYdJvrgRLnnaI9MlYtqgh04f6DRCdyEJsf1wCQz/bICx4h
+         Qu4xtfwtlzbagPh3ny4EsL9dxxSnfv+odIkxV5lscrKYPAe64NHpifx3W+U6dxLi/G
+         Y6Nf0R3QOG2AJzHVEDQrrYB2I44moYV9sGHdVr9SPiJmfeJHwO7nJfPZvQGwEU/GRw
+         xFmwpIZbCmFnjfQP8D2EA1pMZVkNmfCfJJK7WILd4XjK51yJSynQKWMOqPwseqwtDg
+         G7pIumuQWNqHZQm0ZE5G2V98/nyldQKujWMnfE011Uau369ialqAGfMq8vU9oS9Kwf
+         pGlz20dcsxNmw==
 From:   Asahi Lina <lina@asahilina.net>
-Subject: [PATCH RFC 00/11] rust: Implicit lock class creation & Arc Lockdep
- integration
-Date:   Fri, 14 Jul 2023 18:13:52 +0900
-Message-Id: <20230714-classless_lockdep-v1-0-229b9671ce31@asahilina.net>
+Date:   Fri, 14 Jul 2023 18:14:01 +0900
+Subject: [PATCH RFC 09/11] rust: init: Update documentation for new mutex
+ init style
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIANARsWQC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDI2MDc0MT3eScxOLinNTi4vic/OTslNQC3TTDFFNLc6O0JJOkRCWgvoKi1LT
- MCrCZ0UpBbs5KsbW1AJoiJw1oAAAA
+Message-Id: <20230714-classless_lockdep-v1-9-229b9671ce31@asahilina.net>
+References: <20230714-classless_lockdep-v1-0-229b9671ce31@asahilina.net>
+In-Reply-To: <20230714-classless_lockdep-v1-0-229b9671ce31@asahilina.net>
 To:     Miguel Ojeda <ojeda@kernel.org>,
         Alex Gaynor <alex.gaynor@gmail.com>,
         Wedson Almeida Filho <wedsonaf@gmail.com>,
@@ -60,96 +59,102 @@ Cc:     Hector Martin <marcan@marcan.st>, Sven Peter <sven@svenpeter.dev>,
         linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
         llvm@lists.linux.dev, Asahi Lina <lina@asahilina.net>
 X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1689326040; l=3990;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1689326040; l=2511;
  i=lina@asahilina.net; s=20230221; h=from:subject:message-id;
- bh=NNlQg01GoROuwHT7V4Ok4QbA2Wacecl8a9cR39wPQX4=;
- b=/iyr7ancBEF0XHvo1tC+PR5V7K/FO06oJ0Cy/w4WDvBHh+I0Op8T6d5uYejSOZ+TUqNdVn/Ns
- klBa8CShSlIAxB40VpRMh8VI93PqdHiAsoOvp8NK/p+ZA/7SUcFENqu
+ bh=pmERp6GwnOCWkgphnzptIlYb6DLdsFhpRouByq625cQ=;
+ b=SSD6fmaYAIs7/HNgGcRACQ89lpuCPIOoeaRkkZ2UkBP8Q1hptBMoz/GGwxRAszksq/cVul+Uq
+ V3ShxAHSYKjA01dNJeNpjtApErQmrziR42b2PVrJ58GJ9xhMTUqfHrU
 X-Developer-Key: i=lina@asahilina.net; a=ed25519;
  pk=Qn8jZuOtR1m5GaiDfTrAoQ4NE1XoYVZ/wmt5YtXWFC4=
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Begone, lock classes!
-
-As discussed in meetings/etc, we would really like to support implicit
-lock class creation for Rust code. Right now, lock classes are created
-using macros and passed around (similar to C). Unfortunately, Rust
-macros don't look like Rust functions, which means adding lockdep to a
-type is a breaking API change. This makes Rust mutex creation rather
-ugly, with the new_mutex!() macro and friends.
-
-Implicit lock classes have to be unique per instantiation code site.
-Notably, with Rust generics and monomorphization, this is not the same
-as unique per generated code instance. If this weren't the case, we
-could use inline functions and asm!() magic to try to create lock
-classes that have the right uniqueness semantics. But that doesn't work,
-since it would create too many lock classes for the same actual lock
-creation in the source code.
-
-But Rust does have one trick we can use: it can track the caller
-location (as file:line:column), across multiple functions. This works
-using an implicit argument that gets passed around, which is exactly the
-thing we do for lock classes. The tricky bit is that, while the value of
-these Location objects has the semantics we want (unique value per
-source code location), there is no guarantee that they are deduplicated
-in memory.
-
-So we use a hash table, and map Location values to lock classes. Et
-voila, implicit lock class support!
-
-This lets us clean up the Mutex & co APIs and make them look a lot more
-Rust-like, but it also means we can now throw Lockdep into more APIs
-without breaking the API. And so we can pull a neat trick: adding
-Lockdep support into Arc<T>. This catches cases where the Arc Drop
-implementation could create a locking correctness violation only when
-the reference count drops to 0 at that particular drop site, which is
-otherwise not detectable unless that condition actually happens at
-runtime. Since Drop is "magic" in Rust and Drop codepaths very difficult
-to audit, this helps a lot.
-
-For the initial RFC, this implements the new API only for Mutex. If this
-looks good, I can extend it to CondVar & friends in the next version.
-This series also folds in a few related minor dependencies / changes
-(like the pin_init mutex stuff).
+Now that we have classless Mutex creation, update the docs to reflect
+the new API.
 
 Signed-off-by: Asahi Lina <lina@asahilina.net>
 ---
-Asahi Lina (11):
-      rust: types: Add Opaque::zeroed()
-      rust: lock: Add Lock::pin_init()
-      rust: Use absolute paths to build Rust objects
-      rust: siphash: Add a simple siphash abstraction
-      rust: sync: Add dummy LockClassKey implementation for !CONFIG_LOCKDEP
-      rust: sync: Replace static LockClassKey refs with a pointer wrapper
-      rust: sync: Implement dynamic lockdep class creation
-      rust: sync: Classless Lock::new() and pin_init()
-      rust: init: Update documentation for new mutex init style
-      rust: sync: Add LockdepMap abstraction
-      rust: sync: arc: Add lockdep integration
- lib/Kconfig.debug                 |   8 ++
- rust/Makefile                     |   2 +-
- rust/bindings/bindings_helper.h   |   2 +
- rust/helpers.c                    |  24 ++++
- rust/kernel/init.rs               |  22 ++--
- rust/kernel/lib.rs                |   1 +
- rust/kernel/siphash.rs            |  39 +++++++
- rust/kernel/sync.rs               |  33 ++----
- rust/kernel/sync/arc.rs           |  71 +++++++++++-
- rust/kernel/sync/condvar.rs       |   2 +-
- rust/kernel/sync/lock.rs          |  68 ++++++++++-
- rust/kernel/sync/lock/mutex.rs    |  15 ++-
- rust/kernel/sync/lock/spinlock.rs |   2 +-
- rust/kernel/sync/lockdep.rs       | 229 ++++++++++++++++++++++++++++++++++++++
- rust/kernel/sync/no_lockdep.rs    |  38 +++++++
- rust/kernel/types.rs              |   7 +-
- scripts/Makefile.build            |   8 +-
- 17 files changed, 525 insertions(+), 46 deletions(-)
----
-base-commit: 7eb28ae62e16abc207c90064ad2b824c19566fe2
-change-id: 20230714-classless_lockdep-f1d5972fb4ba
+ rust/kernel/init.rs | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-Thank you,
-~~ Lina
+diff --git a/rust/kernel/init.rs b/rust/kernel/init.rs
+index b4332a4ec1f4..f190bbd0bab1 100644
+--- a/rust/kernel/init.rs
++++ b/rust/kernel/init.rs
+@@ -36,7 +36,7 @@
+ //!
+ //! ```rust
+ //! # #![allow(clippy::disallowed_names, clippy::new_ret_no_self)]
+-//! use kernel::{prelude::*, sync::Mutex, new_mutex};
++//! use kernel::{prelude::*, sync::Mutex};
+ //! # use core::pin::Pin;
+ //! #[pin_data]
+ //! struct Foo {
+@@ -46,7 +46,7 @@
+ //! }
+ //!
+ //! let foo = pin_init!(Foo {
+-//!     a <- new_mutex!(42, "Foo::a"),
++//!     a <- Mutex::new_named(42, "Foo::a"),
+ //!     b: 24,
+ //! });
+ //! ```
+@@ -56,7 +56,7 @@
+ //!
+ //! ```rust
+ //! # #![allow(clippy::disallowed_names, clippy::new_ret_no_self)]
+-//! # use kernel::{prelude::*, sync::Mutex, new_mutex};
++//! # use kernel::{prelude::*, sync::Mutex};
+ //! # use core::pin::Pin;
+ //! # #[pin_data]
+ //! # struct Foo {
+@@ -65,7 +65,7 @@
+ //! #     b: u32,
+ //! # }
+ //! # let foo = pin_init!(Foo {
+-//! #     a <- new_mutex!(42, "Foo::a"),
++//! #     a <- Mutex::new_named(42, "Foo::a"),
+ //! #     b: 24,
+ //! # });
+ //! let foo: Result<Pin<Box<Foo>>> = Box::pin_init(foo);
+@@ -98,7 +98,7 @@
+ //! impl DriverData {
+ //!     fn new() -> impl PinInit<Self, Error> {
+ //!         try_pin_init!(Self {
+-//!             status <- new_mutex!(0, "DriverData::status"),
++//!             status <- Mutex::new_named(0, "DriverData::status"),
+ //!             buffer: Box::init(kernel::init::zeroed())?,
+ //!         })
+ //!     }
+@@ -242,7 +242,7 @@
+ /// }
+ ///
+ /// stack_pin_init!(let foo = pin_init!(Foo {
+-///     a <- new_mutex!(42),
++///     a <- Mutex::new(42),
+ ///     b: Bar {
+ ///         x: 64,
+ ///     },
+@@ -294,7 +294,7 @@ macro_rules! stack_pin_init {
+ /// }
+ ///
+ /// stack_try_pin_init!(let foo: Result<Pin<&mut Foo>, AllocError> = pin_init!(Foo {
+-///     a <- new_mutex!(42),
++///     a <- Mutex::new(42),
+ ///     b: Box::try_new(Bar {
+ ///         x: 64,
+ ///     })?,
+@@ -320,7 +320,7 @@ macro_rules! stack_pin_init {
+ /// }
+ ///
+ /// stack_try_pin_init!(let foo: Pin<&mut Foo> =? pin_init!(Foo {
+-///     a <- new_mutex!(42),
++///     a <- Mutex::new(42),
+ ///     b: Box::try_new(Bar {
+ ///         x: 64,
+ ///     })?,
+
+-- 
+2.40.1
 
