@@ -2,44 +2,43 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F4207EB64DA
-	for <linux-kbuild@archiver.kernel.org>; Fri, 14 Jul 2023 09:31:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1372C0015E
+	for <linux-kbuild@archiver.kernel.org>; Fri, 14 Jul 2023 09:31:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229828AbjGNJbl (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 14 Jul 2023 05:31:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55814 "EHLO
+        id S235633AbjGNJbm (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 14 Jul 2023 05:31:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55826 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234417AbjGNJbk (ORCPT
+        with ESMTP id S235307AbjGNJbl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 14 Jul 2023 05:31:40 -0400
+        Fri, 14 Jul 2023 05:31:41 -0400
 Received: from mail.marcansoft.com (marcansoft.com [212.63.210.85])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ACC53594;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EA7435A3;
         Fri, 14 Jul 2023 02:31:14 -0700 (PDT)
 Received: from [127.0.0.1] (localhost [127.0.0.1])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
         (Authenticated sender: linasend@asahilina.net)
-        by mail.marcansoft.com (Postfix) with ESMTPSA id 94E585BC46;
-        Fri, 14 Jul 2023 09:14:31 +0000 (UTC)
+        by mail.marcansoft.com (Postfix) with ESMTPSA id F34395BC96;
+        Fri, 14 Jul 2023 09:15:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=asahilina.net;
-        s=default; t=1689326077;
-        bh=gnMMY1x9qq2PPTNUzBdxhYi7ww499CWLccQC4OWzTx0=;
+        s=default; t=1689326107;
+        bh=iunu/MEktIfyC9aBXASL3Y+DNDi/HoqbZYswDE31qjY=;
         h=From:Date:Subject:References:In-Reply-To:To:Cc;
-        b=mOUxHiDwZefAGEFyddpSP0C3sc+AGebB1164Sp4/WwaCwg0cMeyRLTWVxHoyF0dMy
-         6+N56AQcfNwJoKzhJCuzDLTiVI1RMbCJsdEvhr8iV6JKWgYsI+boZ8p+fKDP0PuGJh
-         tsYRCK3HQwJ12DomTTeRBaj0nYgsJiqMzWaiMR0dHldiGmR/Rr2/qTq47LgkBuG3EH
-         Swzgk/2goIh/JslYbAOJeaZQnIIZQuXaYcw1wZ+mTM0pPv76jTMnK26cnAbJUFfQ5L
-         mZjStDi/cxIswFfO9cWkjCnGUFXm9X0adKBYPRYOyMaZKOCl8t/i/qnWDN3Gz/4woW
-         BvLg/oOhqISKA==
+        b=fGwsQoHqMFsrJDlFFDPR0k3MaE5WXRU8RB0KWzOUSDcHpsn22IQyGC3HN2lCwncyK
+         wAuqBSwsU1wpop8HxHZZxntrScSS3ywoUW/fICNk8UmtKb6muutZNMoWZ+UcszLYHQ
+         M+MSrjQttyZZqxSDaex5VDxabG/Ko11qdgQZOCoFPbKhO+Vjs9pYmCrlIlGj7ggUsr
+         BvO2xfMlOB9+4V01CgzNjQgUzvvmG7Sld8Qn/tdtTxtZuPu/XThvbbVBE0MUoxrHM/
+         bX5ZWLPWUJJi1j1mSbgEirahVhQ5ap9KDWfGVt536mxdO/c9hzyPFZPJ2SUBaK+FOX
+         g+Pc+qui1Bz3w==
 From:   Asahi Lina <lina@asahilina.net>
-Date:   Fri, 14 Jul 2023 18:13:57 +0900
-Subject: [PATCH RFC 05/11] rust: sync: Add dummy LockClassKey
- implementation for !CONFIG_LOCKDEP
+Date:   Fri, 14 Jul 2023 18:14:02 +0900
+Subject: [PATCH RFC 10/11] rust: sync: Add LockdepMap abstraction
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230714-classless_lockdep-v1-5-229b9671ce31@asahilina.net>
+Message-Id: <20230714-classless_lockdep-v1-10-229b9671ce31@asahilina.net>
 References: <20230714-classless_lockdep-v1-0-229b9671ce31@asahilina.net>
 In-Reply-To: <20230714-classless_lockdep-v1-0-229b9671ce31@asahilina.net>
 To:     Miguel Ojeda <ojeda@kernel.org>,
@@ -59,139 +58,125 @@ Cc:     Hector Martin <marcan@marcan.st>, Sven Peter <sven@svenpeter.dev>,
         linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
         llvm@lists.linux.dev, Asahi Lina <lina@asahilina.net>
 X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1689326040; l=3940;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1689326040; l=3708;
  i=lina@asahilina.net; s=20230221; h=from:subject:message-id;
- bh=gnMMY1x9qq2PPTNUzBdxhYi7ww499CWLccQC4OWzTx0=;
- b=bUWCrMNd7kHfIgvXiwbCtuSH/byuJpb+njsl0PfbHBCQxpRL9xMxqT8cQPBr35CdPxPspIQkK
- dII2uF6hA+OBRhfkDQOkW33pZImPKdLb45I4COXTwZnB1UFS/mveMtP
+ bh=iunu/MEktIfyC9aBXASL3Y+DNDi/HoqbZYswDE31qjY=;
+ b=04lyCEBPyQa9PMDV9CRJ+d48EyVHc5I664n8RdVhvo5ioHbmWbeIlQUoXCgobM9ilIo2P40ht
+ W2v4aU2ydo8CA+EolWeYDtyrdSPo3/F+5Rv8SBH/RL8TWwoGEWLzZtg
 X-Developer-Key: i=lina@asahilina.net; a=ed25519;
  pk=Qn8jZuOtR1m5GaiDfTrAoQ4NE1XoYVZ/wmt5YtXWFC4=
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Lock classes aren't used without lockdep. The C side declares the key
-as an empty struct in that case, but let's make it an explicit ZST in
-Rust, implemented in a separate module. This allows us to more easily
-guarantee that the lockdep code will be trivially optimized out without
-CONFIG_LOCKDEP, including LockClassKey arguments that are passed around.
+Add a simple abstraction for creating new lockdep maps. This allows
+Rust code to explicitly integrate types with lockdep.
 
-Depending on whether CONFIG_LOCKDEP is enabled or not, we then import
-the real lockdep implementation or the dummy one.
+There's some voodoo compiler intrinsic magic to get the caller return
+address on the C side. I have no idea how to plumb that through in Rust
+if that's even possible, so let's just wrap it in a C helper for now.
+That gives us the callsite from the Rust abstraction instead of its
+user, but that's probably okay for now.
 
 Signed-off-by: Asahi Lina <lina@asahilina.net>
 ---
- rust/kernel/sync.rs            | 29 ++++++++---------------------
- rust/kernel/sync/lockdep.rs    | 27 +++++++++++++++++++++++++++
- rust/kernel/sync/no_lockdep.rs | 19 +++++++++++++++++++
- 3 files changed, 54 insertions(+), 21 deletions(-)
+ rust/bindings/bindings_helper.h |  1 +
+ rust/helpers.c                  | 16 ++++++++++++++++
+ rust/kernel/sync/lockdep.rs     | 40 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 57 insertions(+)
 
-diff --git a/rust/kernel/sync.rs b/rust/kernel/sync.rs
-index d219ee518eff..352472c6b77a 100644
---- a/rust/kernel/sync.rs
-+++ b/rust/kernel/sync.rs
-@@ -5,37 +5,24 @@
- //! This module contains the kernel APIs related to synchronisation that have been ported or
- //! wrapped for usage by Rust code in the kernel.
+diff --git a/rust/bindings/bindings_helper.h b/rust/bindings/bindings_helper.h
+index 52f32e423b04..5c28de44e528 100644
+--- a/rust/bindings/bindings_helper.h
++++ b/rust/bindings/bindings_helper.h
+@@ -8,6 +8,7 @@
  
--use crate::types::Opaque;
--
- mod arc;
- mod condvar;
- pub mod lock;
- mod locked_by;
+ #include <linux/errname.h>
+ #include <linux/slab.h>
++#include <linux/lockdep.h>
+ #include <linux/refcount.h>
+ #include <linux/wait.h>
+ #include <linux/siphash.h>
+diff --git a/rust/helpers.c b/rust/helpers.c
+index 1ed71315d1eb..392f5359677a 100644
+--- a/rust/helpers.c
++++ b/rust/helpers.c
+@@ -22,6 +22,8 @@
+ #include <linux/build_bug.h>
+ #include <linux/err.h>
+ #include <linux/errname.h>
++#include <linux/instruction_pointer.h>
++#include <linux/lockdep.h>
+ #include <linux/refcount.h>
+ #include <linux/mutex.h>
+ #include <linux/siphash.h>
+@@ -143,6 +145,20 @@ u64 rust_helper_siphash(const void *data, size_t len,
+ }
+ EXPORT_SYMBOL_GPL(rust_helper_siphash);
  
-+#[cfg(CONFIG_LOCKDEP)]
-+mod lockdep;
-+#[cfg(not(CONFIG_LOCKDEP))]
-+mod no_lockdep;
-+#[cfg(not(CONFIG_LOCKDEP))]
-+use no_lockdep as lockdep;
++void rust_helper_lock_acquire_ret(struct lockdep_map *lock, unsigned int subclass,
++				  int trylock, int read, int check,
++				  struct lockdep_map *nest_lock)
++{
++	lock_acquire(lock, subclass, trylock, read, check, nest_lock, _RET_IP_);
++}
++EXPORT_SYMBOL_GPL(rust_helper_lock_acquire_ret);
 +
- pub use arc::{Arc, ArcBorrow, UniqueArc};
- pub use condvar::CondVar;
- pub use lock::{mutex::Mutex, spinlock::SpinLock};
-+pub use lockdep::LockClassKey;
- pub use locked_by::LockedBy;
- 
--/// Represents a lockdep class. It's a wrapper around C's `lock_class_key`.
--#[repr(transparent)]
--pub struct LockClassKey(Opaque<bindings::lock_class_key>);
--
--// SAFETY: `bindings::lock_class_key` is designed to be used concurrently from multiple threads and
--// provides its own synchronization.
--unsafe impl Sync for LockClassKey {}
--
--impl LockClassKey {
--    /// Creates a new lock class key.
--    pub const fn new() -> Self {
--        Self(Opaque::uninit())
--    }
--
--    pub(crate) fn as_ptr(&self) -> *mut bindings::lock_class_key {
--        self.0.get()
--    }
--}
--
- /// Defines a new static lock class and returns a pointer to it.
- #[doc(hidden)]
- #[macro_export]
++void rust_helper_lock_release_ret(struct lockdep_map *lock)
++{
++	lock_release(lock, _RET_IP_);
++}
++EXPORT_SYMBOL_GPL(rust_helper_lock_release_ret);
++
+ /*
+  * We use `bindgen`'s `--size_t-is-usize` option to bind the C `size_t` type
+  * as the Rust `usize` type, so we can use it in contexts where Rust
 diff --git a/rust/kernel/sync/lockdep.rs b/rust/kernel/sync/lockdep.rs
-new file mode 100644
-index 000000000000..cb68b18dc0ad
---- /dev/null
+index fbf9f6ed403d..ca32aa833e10 100644
+--- a/rust/kernel/sync/lockdep.rs
 +++ b/rust/kernel/sync/lockdep.rs
-@@ -0,0 +1,27 @@
-+// SPDX-License-Identifier: GPL-2.0
+@@ -187,3 +187,43 @@ pub(crate) fn caller_lock_class() -> (LockClassKey, &'static CStr) {
+         }
+     }
+ }
 +
-+//! Lockdep utilities.
-+//!
-+//! This module abstracts the parts of the kernel lockdep API relevant to Rust
-+//! modules, including lock classes.
++pub(crate) struct LockdepMap(Opaque<bindings::lockdep_map>);
++pub(crate) struct LockdepGuard<'a>(&'a LockdepMap);
 +
-+use crate::types::Opaque;
++#[allow(dead_code)]
++impl LockdepMap {
++    #[track_caller]
++    pub(crate) fn new() -> Self {
++        let map = Opaque::uninit();
++        let (key, name) = caller_lock_class();
 +
-+/// Represents a lockdep class. It's a wrapper around C's `lock_class_key`.
-+#[repr(transparent)]
-+pub struct LockClassKey(Opaque<bindings::lock_class_key>);
++        unsafe {
++            bindings::lockdep_init_map_type(
++                map.get(),
++                name.as_char_ptr(),
++                key.as_ptr(),
++                0,
++                bindings::lockdep_wait_type_LD_WAIT_INV as _,
++                bindings::lockdep_wait_type_LD_WAIT_INV as _,
++                bindings::lockdep_lock_type_LD_LOCK_NORMAL as _,
++            )
++        };
 +
-+impl LockClassKey {
-+    /// Creates a new lock class key.
-+    pub const fn new() -> Self {
-+        Self(Opaque::uninit())
++        LockdepMap(map)
 +    }
 +
-+    pub(crate) fn as_ptr(&self) -> *mut bindings::lock_class_key {
-+        self.0.get()
++    #[inline(always)]
++    pub(crate) fn lock(&self) -> LockdepGuard<'_> {
++        unsafe { bindings::lock_acquire_ret(self.0.get(), 0, 0, 1, 1, core::ptr::null_mut()) };
++
++        LockdepGuard(self)
 +    }
 +}
 +
-+// SAFETY: `bindings::lock_class_key` is designed to be used concurrently from multiple threads and
-+// provides its own synchronization.
-+unsafe impl Sync for LockClassKey {}
-diff --git a/rust/kernel/sync/no_lockdep.rs b/rust/kernel/sync/no_lockdep.rs
-new file mode 100644
-index 000000000000..69d42e8d9801
---- /dev/null
-+++ b/rust/kernel/sync/no_lockdep.rs
-@@ -0,0 +1,19 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+//! Dummy lockdep utilities.
-+//!
-+//! Takes the place of the `lockdep` module when lockdep is disabled.
-+
-+/// A dummy, zero-sized lock class.
-+pub struct LockClassKey();
-+
-+impl LockClassKey {
-+    /// Creates a new dummy lock class key.
-+    pub const fn new() -> Self {
-+        Self()
-+    }
-+
-+    pub(crate) fn as_ptr(&self) -> *mut bindings::lock_class_key {
-+        core::ptr::null_mut()
++impl<'a> Drop for LockdepGuard<'a> {
++    #[inline(always)]
++    fn drop(&mut self) {
++        unsafe { bindings::lock_release_ret(self.0 .0.get()) };
 +    }
 +}
 
