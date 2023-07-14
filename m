@@ -2,43 +2,43 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2D04C001DD
-	for <linux-kbuild@archiver.kernel.org>; Fri, 14 Jul 2023 09:32:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80781C04A94
+	for <linux-kbuild@archiver.kernel.org>; Fri, 14 Jul 2023 09:32:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235962AbjGNJcW (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 14 Jul 2023 05:32:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56448 "EHLO
+        id S235965AbjGNJcX (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 14 Jul 2023 05:32:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235922AbjGNJcH (ORCPT
+        with ESMTP id S235886AbjGNJcH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Fri, 14 Jul 2023 05:32:07 -0400
 Received: from mail.marcansoft.com (marcansoft.com [212.63.210.85])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3719235A7;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3704435A6;
         Fri, 14 Jul 2023 02:31:42 -0700 (PDT)
 Received: from [127.0.0.1] (localhost [127.0.0.1])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
         (Authenticated sender: linasend@asahilina.net)
-        by mail.marcansoft.com (Postfix) with ESMTPSA id 6CA745BC42;
-        Fri, 14 Jul 2023 09:14:19 +0000 (UTC)
+        by mail.marcansoft.com (Postfix) with ESMTPSA id CB8C15BC8E;
+        Fri, 14 Jul 2023 09:14:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=asahilina.net;
-        s=default; t=1689326065;
-        bh=VAWao2XqqfaUrUG4eX38dF7EKCEUq2ZmTgp3mGFnUog=;
+        s=default; t=1689326095;
+        bh=qTjhfjiBkJU6f/AjrudTz4vasN/1yBaW+jjwT+W1pRI=;
         h=From:Date:Subject:References:In-Reply-To:To:Cc;
-        b=Rv070+McVf53L+fSrNOclnynR56VOM4amtL7xuLQwcaK+e19Wsy1rNkvqbg6WcsiY
-         0MnUjP+vlKz8e6ztLv/VZ9thIOOFcPh0OWjANftlA2mnzK0dim3oF0fgNYG43698xB
-         2hdwNHSrKhAT/ten+6mJY64iGCuS7pi9/uEKjn1hjFJZSnfhXRZNDVOMVr91DxgTgi
-         J0zWbSZ5CC8aYPK4M53RQmC7CirFTX2n9Tg6KW0Wujo0/4J7KIjn4pOV7Qtb/yJMH6
-         jcssZJ/U1sfZiokColgbsAoU+/s9Jf/eYAtM85nCAY7a0ZBn2JjFj9InCXH9KY+eOV
-         83Kma93HKnxpA==
+        b=ghyYl6hi59GB1zxU9EMKMTlNPTziYGtruW4r5bUMuWNTtpjDGLU/XI/AT6a15Asla
+         JtX/YknnFQoDmNi28BM1eFj1SnlUPdlO1/EsHBHVS/hklm1TzRjgATLpv4+BUenGuQ
+         ssNCYPINuX8DnbxyGr5S7f7LyTLi+7c9cQ6XTUKxku4AB19CU3af1qfljwckOHhl+H
+         kt1fiDElfFWCNNsDtnMfHkp8bCiRR3RgXUehiQfzdw94AfncR5aRC8EvNRtJov+ti5
+         LdyWP/RD3w1XBlPUGjrWF7WgiWcJaiFIW9r6nbtkd64Id2m1WuFVjQhI/MoZkIid4e
+         prYMHZDA4vqcQ==
 From:   Asahi Lina <lina@asahilina.net>
-Date:   Fri, 14 Jul 2023 18:13:55 +0900
-Subject: [PATCH RFC 03/11] rust: Use absolute paths to build Rust objects
+Date:   Fri, 14 Jul 2023 18:14:00 +0900
+Subject: [PATCH RFC 08/11] rust: sync: Classless Lock::new() and pin_init()
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230714-classless_lockdep-v1-3-229b9671ce31@asahilina.net>
+Message-Id: <20230714-classless_lockdep-v1-8-229b9671ce31@asahilina.net>
 References: <20230714-classless_lockdep-v1-0-229b9671ce31@asahilina.net>
 In-Reply-To: <20230714-classless_lockdep-v1-0-229b9671ce31@asahilina.net>
 To:     Miguel Ojeda <ojeda@kernel.org>,
@@ -58,82 +58,137 @@ Cc:     Hector Martin <marcan@marcan.st>, Sven Peter <sven@svenpeter.dev>,
         linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
         llvm@lists.linux.dev, Asahi Lina <lina@asahilina.net>
 X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1689326040; l=2695;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1689326040; l=4989;
  i=lina@asahilina.net; s=20230221; h=from:subject:message-id;
- bh=VAWao2XqqfaUrUG4eX38dF7EKCEUq2ZmTgp3mGFnUog=;
- b=Mei8TIbhg8193HQ30Z4+6AvQI9I9bSJA87f41daFHByxLcwEs3OLPMiDdbvZqxkvrxSyz2Yw4
- CfwDvXCA5JUDiUEQ/kiBq9bICTiHOt+It/8iffq7+3VXjaJJiug42AT
+ bh=qTjhfjiBkJU6f/AjrudTz4vasN/1yBaW+jjwT+W1pRI=;
+ b=VSgLrpW0d/2c9lqEZuqEzHhPFcBQpRyst3tQBod3DJegwz60yvk/KCW+S7R7BF0NS1ztjhNlJ
+ wbNq5gOaViABiSAPh+PUQmPAelov6UL1FovyDB/E6yGZEHhOXUUvmNx
 X-Developer-Key: i=lina@asahilina.net; a=ed25519;
  pk=Qn8jZuOtR1m5GaiDfTrAoQ4NE1XoYVZ/wmt5YtXWFC4=
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-We want to use caller_location to uniquely identify callsites, to
-automatically create lockdep classes without macros. The location
-filename in local code uses the relative path passed to the compiler,
-but if that code is generic and instantiated from another crate, the
-path becomes absolute.
+Use the new automagic lock class code to remove the lock class and name
+parameters from Lock::new() and Lock::pin_init(). The old functions
+are renamed to new_with_class() and pin_init_with_class() respectively.
 
-To make this work and keep the paths consistent, always pass an absolute
-path to the compiler. Then the Location path is always identical
-regardless of how the code is being compiled.
+The new approach uses the caller tracking machinery in Rust, which means
+it can be trivially wrapped by adding #[track_caller] to any functions
+that should bubble up lock class creation to their caller. This, for
+example, allows a type using multiple Mutexes to create separate lock
+classes for every user of the type, simply by adding that attribute to
+the mutex creation code paths.
 
 Signed-off-by: Asahi Lina <lina@asahilina.net>
 ---
- rust/Makefile          | 2 +-
- scripts/Makefile.build | 8 ++++----
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ rust/kernel/sync/lock.rs          | 42 +++++++++++++++++++++++++++++++++++----
+ rust/kernel/sync/lock/mutex.rs    |  4 ++--
+ rust/kernel/sync/lock/spinlock.rs |  2 +-
+ 3 files changed, 41 insertions(+), 7 deletions(-)
 
-diff --git a/rust/Makefile b/rust/Makefile
-index 7c9d9f11aec5..552f023099c8 100644
---- a/rust/Makefile
-+++ b/rust/Makefile
-@@ -369,7 +369,7 @@ quiet_cmd_rustc_library = $(if $(skip_clippy),RUSTC,$(RUSTC_OR_CLIPPY_QUIET)) L
- 		--emit=dep-info=$(depfile) --emit=obj=$@ \
- 		--emit=metadata=$(dir $@)$(patsubst %.o,lib%.rmeta,$(notdir $@)) \
- 		--crate-type rlib -L$(objtree)/$(obj) \
--		--crate-name $(patsubst %.o,%,$(notdir $@)) $< \
-+		--crate-name $(patsubst %.o,%,$(notdir $@)) $(abspath $<) \
- 	$(if $(rustc_objcopy),;$(OBJCOPY) $(rustc_objcopy) $@)
+diff --git a/rust/kernel/sync/lock.rs b/rust/kernel/sync/lock.rs
+index 8e71e7aa2cc1..8849741c1d9a 100644
+--- a/rust/kernel/sync/lock.rs
++++ b/rust/kernel/sync/lock.rs
+@@ -5,7 +5,7 @@
+ //! It contains a generic Rust lock and guard that allow for different backends (e.g., mutexes,
+ //! spinlocks, raw spinlocks) to be provided with minimal effort.
  
- rust-analyzer:
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 6413342a03f4..c925b90ebd80 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -283,27 +283,27 @@ rust_common_cmd = \
- # would not match each other.
+-use super::LockClassKey;
++use super::{lockdep::caller_lock_class, LockClassKey};
+ use crate::{
+     bindings, init::PinInit, pin_init, str::CStr, try_pin_init, types::Opaque, types::ScopeGuard,
+ };
+@@ -103,7 +103,40 @@ unsafe impl<T: ?Sized + Send, B: Backend> Sync for Lock<T, B> {}
+ impl<T, B: Backend> Lock<T, B> {
+     /// Constructs a new lock initialiser.
+     #[allow(clippy::new_ret_no_self)]
+-    pub fn new(t: T, name: &'static CStr, key: LockClassKey) -> impl PinInit<Self> {
++    #[track_caller]
++    pub fn new(t: T) -> impl PinInit<Self> {
++        let (key, name) = caller_lock_class();
++        Self::new_with_key(t, name, key)
++    }
++
++    /// Constructs a new lock initialiser taking an initialiser/
++    pub fn pin_init<E>(t: impl PinInit<T, E>) -> impl PinInit<Self, E>
++    where
++        E: core::convert::From<core::convert::Infallible>,
++    {
++        let (key, name) = caller_lock_class();
++        Self::pin_init_with_key(t, name, key)
++    }
++
++    /// Constructs a new lock initialiser.
++    #[allow(clippy::new_ret_no_self)]
++    #[track_caller]
++    pub fn new_named(t: T, name: &'static CStr) -> impl PinInit<Self> {
++        let (key, _) = caller_lock_class();
++        Self::new_with_key(t, name, key)
++    }
++
++    /// Constructs a new lock initialiser taking an initialiser/
++    pub fn pin_init_named<E>(t: impl PinInit<T, E>, name: &'static CStr) -> impl PinInit<Self, E>
++    where
++        E: core::convert::From<core::convert::Infallible>,
++    {
++        let (key, _) = caller_lock_class();
++        Self::pin_init_with_key(t, name, key)
++    }
++
++    /// Constructs a new lock initialiser given a particular name and lock class key.
++    pub fn new_with_key(t: T, name: &'static CStr, key: LockClassKey) -> impl PinInit<Self> {
+         pin_init!(Self {
+             data: UnsafeCell::new(t),
+             _pin: PhantomPinned,
+@@ -115,8 +148,9 @@ pub fn new(t: T, name: &'static CStr, key: LockClassKey) -> impl PinInit<Self> {
+         })
+     }
  
- quiet_cmd_rustc_o_rs = $(RUSTC_OR_CLIPPY_QUIET) $(quiet_modtag) $@
--      cmd_rustc_o_rs = $(rust_common_cmd) --emit=obj=$@ $<
-+      cmd_rustc_o_rs = $(rust_common_cmd) --emit=obj=$@ $(abspath $<)
- 
- $(obj)/%.o: $(src)/%.rs FORCE
- 	$(call if_changed_dep,rustc_o_rs)
- 
- quiet_cmd_rustc_rsi_rs = $(RUSTC_OR_CLIPPY_QUIET) $(quiet_modtag) $@
-       cmd_rustc_rsi_rs = \
--	$(rust_common_cmd) -Zunpretty=expanded $< >$@; \
-+	$(rust_common_cmd) -Zunpretty=expanded $(abspath $<) >$@; \
- 	command -v $(RUSTFMT) >/dev/null && $(RUSTFMT) $@
- 
- $(obj)/%.rsi: $(src)/%.rs FORCE
- 	$(call if_changed_dep,rustc_rsi_rs)
- 
- quiet_cmd_rustc_s_rs = $(RUSTC_OR_CLIPPY_QUIET) $(quiet_modtag) $@
--      cmd_rustc_s_rs = $(rust_common_cmd) --emit=asm=$@ $<
-+      cmd_rustc_s_rs = $(rust_common_cmd) --emit=asm=$@ $(abspath $<)
- 
- $(obj)/%.s: $(src)/%.rs FORCE
- 	$(call if_changed_dep,rustc_s_rs)
- 
- quiet_cmd_rustc_ll_rs = $(RUSTC_OR_CLIPPY_QUIET) $(quiet_modtag) $@
--      cmd_rustc_ll_rs = $(rust_common_cmd) --emit=llvm-ir=$@ $<
-+      cmd_rustc_ll_rs = $(rust_common_cmd) --emit=llvm-ir=$@ $(abspath $<)
- 
- $(obj)/%.ll: $(src)/%.rs FORCE
- 	$(call if_changed_dep,rustc_ll_rs)
+-    /// Constructs a new lock initialiser taking an initialiser.
+-    pub fn pin_init<E>(
++    /// Constructs a new lock initialiser taking an initialiser given a particular
++    /// name and lock class key.
++    pub fn pin_init_with_key<E>(
+         t: impl PinInit<T, E>,
+         name: &'static CStr,
+         key: LockClassKey,
+diff --git a/rust/kernel/sync/lock/mutex.rs b/rust/kernel/sync/lock/mutex.rs
+index 06fe685501b4..15ea70fa3933 100644
+--- a/rust/kernel/sync/lock/mutex.rs
++++ b/rust/kernel/sync/lock/mutex.rs
+@@ -13,7 +13,7 @@
+ #[macro_export]
+ macro_rules! new_mutex {
+     ($inner:expr $(, $name:literal)? $(,)?) => {
+-        $crate::sync::Mutex::new(
++        $crate::sync::Mutex::new_with_key(
+             $inner, $crate::optional_name!($($name)?), $crate::static_lock_class!())
+     };
+ }
+@@ -26,7 +26,7 @@ macro_rules! new_mutex {
+ #[macro_export]
+ macro_rules! new_mutex_pinned {
+     ($inner:expr $(, $name:literal)? $(,)?) => {
+-        $crate::sync::Mutex::pin_init(
++        $crate::sync::Mutex::pin_init_with_key(
+             $inner, $crate::optional_name!($($name)?), $crate::static_lock_class!())
+     };
+ }
+diff --git a/rust/kernel/sync/lock/spinlock.rs b/rust/kernel/sync/lock/spinlock.rs
+index 979b56464a4e..9f6137f047ee 100644
+--- a/rust/kernel/sync/lock/spinlock.rs
++++ b/rust/kernel/sync/lock/spinlock.rs
+@@ -13,7 +13,7 @@
+ #[macro_export]
+ macro_rules! new_spinlock {
+     ($inner:expr $(, $name:literal)? $(,)?) => {
+-        $crate::sync::SpinLock::new(
++        $crate::sync::SpinLock::new_with_class(
+             $inner, $crate::optional_name!($($name)?), $crate::static_lock_class!())
+     };
+ }
 
 -- 
 2.40.1
