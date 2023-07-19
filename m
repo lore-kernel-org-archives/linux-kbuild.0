@@ -2,105 +2,168 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8CDDC001E0
-	for <linux-kbuild@archiver.kernel.org>; Wed, 19 Jul 2023 18:35:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ED2DC0015E
+	for <linux-kbuild@archiver.kernel.org>; Wed, 19 Jul 2023 19:09:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229553AbjGSSfa (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 19 Jul 2023 14:35:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55958 "EHLO
+        id S229812AbjGSTJM (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 19 Jul 2023 15:09:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229961AbjGSSf2 (ORCPT
+        with ESMTP id S229535AbjGSTJL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 19 Jul 2023 14:35:28 -0400
-Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1B171FFB;
-        Wed, 19 Jul 2023 11:35:18 -0700 (PDT)
-Received: by mail-oi1-x235.google.com with SMTP id 5614622812f47-3a3b7fafd61so5290983b6e.2;
-        Wed, 19 Jul 2023 11:35:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689791717; x=1690396517;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=WPhThja73rMrwtCLzLlEodMjDA/ciBfmdIGUhDH+5vQ=;
-        b=X+Z+q0Ps8A7gvg57y6lo4X3jlA2aRilCfFsCwdxkuxGPIk3h0dhuB0CfJYcvPVaLHT
-         tQYWNvqAMkdWsYjU/X+IzJMmLjQ+ZOsaZ3iB9O5IzCj/U+OYN1eZP0xT0wgqpP1ipMA7
-         OCktBzVSn6oy0dgLtG9dvQsWApnxlWn83JZANN2J3pjWHxQJ63i/vm+zbongHy0TJMUI
-         JxRQ4IgT2HaSnqsBCRrKBBE+9gaa6hGPmqjHKwb/LHmQBPM/CABIdr0rBJ/8fj1HISR8
-         9ChmX8tSa9KeoSWfSd9eqzLAKW97WbX8wt4zHLhbPI1XNSbZAMyTYyNtl91nbdrjVPFR
-         Nu4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689791717; x=1690396517;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WPhThja73rMrwtCLzLlEodMjDA/ciBfmdIGUhDH+5vQ=;
-        b=TkW/KEM0Xmyxk9DTWSOkrTdEhxDDvwr0JqyEC1jz5CD9sYas4jLhJFVTGVteZNz3QY
-         ddNkE1tt8PtRIA35npkCxzR82oLRn+tvxWuFtZWhgYuM5HEuhxD1UF4ShMfCAqnIKdes
-         tCzHoX+XBxSxJ/jNGHg1OaiIFY5tXt0jOPq/BshT51cwRZmlcNJ/Ub8xYDcVVEwxVQiN
-         /JnbxXpSQeDCMJiEHINEdg52MqxQtY9YhvVQhe0ayu2ECDcbwP9y8LkBTEca4oq8Gz/V
-         oOLb5B5DVx2ZF+ht8K54JU28s1E2jhmRi4WVXz/+ZSM9ZbmoqKzvydSCn3f1hpcixyyv
-         YZaw==
-X-Gm-Message-State: ABy/qLbKSjogfbUOxmYD3RSgbLH3L9RHpOrB8fRH12tB84XVJKxjxuVK
-        +cUR6vTwqB4YL0GAx0ucsuk=
-X-Google-Smtp-Source: APBJJlHVEHlTyIvqzFTB4W0vefUBSAK+mOmKyVCwFbKOOhaY3peS5u1nNan1QlfcMHTg8RLq496Rcw==
-X-Received: by 2002:a05:6808:157:b0:3a3:79ef:e2d3 with SMTP id h23-20020a056808015700b003a379efe2d3mr6395705oie.29.1689791717505;
-        Wed, 19 Jul 2023 11:35:17 -0700 (PDT)
-Received: from [192.168.54.90] (static.220.238.itcsa.net. [190.15.220.238])
-        by smtp.gmail.com with ESMTPSA id y7-20020a056808130700b003a3860b375esm2042016oiv.34.2023.07.19.11.35.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Jul 2023 11:35:17 -0700 (PDT)
-Message-ID: <c3385c4a-1864-e602-379d-fc0184053ea6@gmail.com>
-Date:   Wed, 19 Jul 2023 14:44:12 -0300
+        Wed, 19 Jul 2023 15:09:11 -0400
+Received: from hi1smtp01.de.adit-jv.com (smtp1.de.adit-jv.com [93.241.18.167])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CDB1199A;
+        Wed, 19 Jul 2023 12:09:09 -0700 (PDT)
+Received: from hi2exch02.adit-jv.com (hi2exch02.adit-jv.com [10.72.92.28])
+        by hi1smtp01.de.adit-jv.com (Postfix) with ESMTP id 93BEF520165;
+        Wed, 19 Jul 2023 21:09:07 +0200 (CEST)
+Received: from lxhi-064.domain (10.72.94.1) by hi2exch02.adit-jv.com
+ (10.72.92.28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.27; Wed, 19 Jul
+ 2023 21:09:07 +0200
+Date:   Wed, 19 Jul 2023 21:09:02 +0200
+From:   Eugeniu Rosca <erosca@de.adit-jv.com>
+To:     Masahiro Yamada <masahiroy@kernel.org>,
+        Nicolas Schier <n.schier@avm.de>,
+        SzuWei Lin <szuweilin@google.com>
+CC:     <linux-kbuild@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arch@vger.kernel.org>, <Matthias.Thomae@de.bosch.com>,
+        <yyankovskyi@de.adit-jv.com>, <Dirk.Behme@de.bosch.com>,
+        Eugeniu Rosca <erosca@de.adit-jv.com>,
+        Eugeniu Rosca <roscaeugeniu@gmail.com>
+Subject: Re: [PATCH 3/5] kbuild: rename cmd_{bzip2,lzma,lzo,lz4,xzkern,zstd22}
+Message-ID: <20230719190902.GA11207@lxhi-064.domain>
+References: <20220109181529.351420-1-masahiroy@kernel.org>
+ <20220109181529.351420-3-masahiroy@kernel.org>
+ <YdwZe9DHJZUaa6aO@buildd.core.avm.de>
+ <20230623144544.GA24871@lxhi-065>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From:   Martin Rodriguez Reboredo <yakoyoku@gmail.com>
-Subject: Re: [PATCH] kbuild: rust: avoid creating temporary files
-To:     Miguel Ojeda <ojeda@kernel.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Wedson Almeida Filho <wedsonaf@gmail.com>,
-        Alex Gaynor <alex.gaynor@gmail.com>
-Cc:     Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nicolas Schier <nicolas@fjasle.eu>,
-        Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-        =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
-        Benno Lossin <benno.lossin@proton.me>,
-        Alice Ryhl <aliceryhl@google.com>,
-        Andreas Hindborg <a.hindborg@samsung.com>,
-        linux-kbuild@vger.kernel.org, rust-for-linux@vger.kernel.org,
-        linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-        Raphael Nestler <raphael.nestler@gmail.com>,
-        Andrea Righi <andrea.righi@canonical.com>,
-        stable@vger.kernel.org
-References: <20230718055235.1050223-1-ojeda@kernel.org>
-Content-Language: en-US
-In-Reply-To: <20230718055235.1050223-1-ojeda@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20230623144544.GA24871@lxhi-065>
+X-Originating-IP: [10.72.94.1]
+X-ClientProxiedBy: hi2exch02.adit-jv.com (10.72.92.28) To
+ hi2exch02.adit-jv.com (10.72.92.28)
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On 7/18/23 02:52, Miguel Ojeda wrote:
-> `rustc` outputs by default the temporary files (i.e. the ones saved
-> by `-Csave-temps`, such as `*.rcgu*` files) in the current working
-> directory when `-o` and `--out-dir` are not given (even if
-> `--emit=x=path` is given, i.e. it does not use those for temporaries).
+Hello Yamada-san,
+
+On Fri, Jun 23, 2023 at 04:45:44PM +0200, Eugeniu Rosca wrote:
+> Hello Yamada-san,
+> Hello Nicolas,
+> Cc: SzuWei Lin (committer of the patch in AOSP [1])
+> Cc: Kbuild
 > 
-> Since out-of-tree modules are compiled from the `linux` tree,
-> `rustc` then tries to create them there, which may not be accessible.
+> On Mon, Jan 10, 2022 at 12:33:15PM +0100, Nicolas Schier wrote:
+> > On Mon, Jan 10, 2022 at 03:15:27AM +0900, Masahiro Yamada wrote:
+> > > GZIP-compressed files end with 4 byte data that represents the size
+> > > of the original input. The decompressors (the self-extracting kernel)
+> > > exploit it to know the vmlinux size beforehand. To mimic the GZIP's
+> > > trailer, Kbuild provides cmd_{bzip2,lzma,lzo,lz4,xzkern,zstd22}.
+> > > Unfortunately these macros are used everywhere despite the appended
+> > > size data is only useful for the decompressors.
+> > > 
+> > > There is no guarantee that such hand-crafted trailers are safely ignored.
+> > > In fact, the kernel refuses compressed initramdisks with the garbage
+> > > data. That is why usr/Makefile overrides size_append to make it no-op.
+> > > 
+> > > To limit the use of such broken compressed files, this commit renames
+> > > the existing macros as follows:
+> > > 
+> > >   cmd_bzip2   --> cmd_bzip2_with_size
+> > >   cmd_lzma    --> cmd_lzma_with_size
+> > >   cmd_lzo     --> cmd_lzo_with_size
+> > >   cmd_lz4     --> cmd_lz4_with_size
+> > >   cmd_xzkern  --> cmd_xzkern_with_size
+> > >   cmd_zstd22  --> cmd_zstd22_with_size
+> > > 
+> > > To keep the decompressors working, I updated the following Makefiles
+> > > accordingly:
+> > > 
+> > >   arch/arm/boot/compressed/Makefile
+> > >   arch/h8300/boot/compressed/Makefile
+> > >   arch/mips/boot/compressed/Makefile
+> > >   arch/parisc/boot/compressed/Makefile
+> > >   arch/s390/boot/compressed/Makefile
+> > >   arch/sh/boot/compressed/Makefile
+> > >   arch/x86/boot/compressed/Makefile
+> > > 
+> > > I reused the current macro names for the normal usecases; they produce
+> > > the compressed data in the proper format.
+> > > 
+> > > I did not touch the following:
+> > > 
+> > >   arch/arc/boot/Makefile
+> > >   arch/arm64/boot/Makefile
+> > >   arch/csky/boot/Makefile
+> > >   arch/mips/boot/Makefile
+> > >   arch/riscv/boot/Makefile
+> > >   arch/sh/boot/Makefile
+> > >   kernel/Makefile
+> > > 
+> > > This means those Makefiles will stop appending the size data.
+> > > 
+> > > I dropped the 'override size_append' hack from usr/Makefile.
+> > > 
+> > > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> > > ---
+> > 
+> > Reviewed-by: Nicolas Schier <n.schier@avm.de>
 > 
-> Thus pass `--out-dir` explicitly, even if it is just for the temporary
-> files.
+> If you don't mind, I would like to report another instance of
+> "/bin/sh: Argument list too long" while building some out-of-tree *ko
+> in a number of downstream v5.15.78+ kernels containing [1].
 > 
-> Reported-by: Raphael Nestler <raphael.nestler@gmail.com>
-> Closes: https://github.com/Rust-for-Linux/linux/issues/1015
-> Reported-by: Andrea Righi <andrea.righi@canonical.com>
-> Tested-by: Raphael Nestler <raphael.nestler@gmail.com>
-> Tested-by: Andrea Righi <andrea.righi@canonical.com>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
-> ---
-> [...]
-Reviewed-by: Martin Rodriguez Reboredo <yakoyoku@gmail.com>
+> For some time now, we've been living with ugly hacks to overcome it.
+> 
+> Fortunately, recent git bisecting efforts apparently reveal that
+> current v5.17-rc1 commit (and its backports in downstream) look to
+> act as the culprit (confirmed on several host machines). So, I
+> started to have some hopes of a long-term solution and hence
+> sharing the findings as a first step.
+> 
+> I am not entirely clear how to properly trace this behavior, since no
+> amount of "make V=1/V=2" uncovers more details. Purely by accident, I
+> looked into the top/htop output (while running the repro) and
+> noticed several processes doing:
+> 
+> /bin/sh -c dec_size=0; for F in <humongous list of filenames>; do \
+>   fsize=$(sh /abs/path/to/scripts/file-size.sh $F); \
+>   dec_size=$(expr $dec_size + $fsize); done; printf "%08x\n" $dec_size \
+>   | sed 's/\(..\)/\1 /g' | { read ch0 ch1 ch2 ch3; for ch in \
+>   $ch3 $ch2 $ch1 $ch0; do printf '%s%03o' '\\' $((0x$ch)); done; }
+> 
+> As it was the case in the recent report [2], the above command seems
+> to require/assume generous amount of space for the shell arguments.
+> 
+> I still haven't compared the exact traces before and after this commit,
+> to quantify by how much the shell argument list is increased (TODO).
+> 
+> Another aspect is that current commit seems to introduce the
+> regression in a multi-threaded make only. The issue is apparently
+> masked by 'make -j1' (TBC), which adds another level of complexity.
+> 
+> Unfortunately, the build use-case is highly tailored to downstream
+> and is not repeatable against vanilla out of the box.
+> 
+> I will continue to increase my understanding behind what's happening.
+> In case there are already any suggestions, would appreciate those.
+
+JFYI, we've got confirmation from Qualcomm Customer Support interface
+that reverting [1] heals the issue on QC end as well. However, it looks
+like none of us has clear understanding how to properly
+troubleshoot/trace/compare the behavior before and after the commit.
+
+I would happily follow any suggestions.
+
+> [1] https://android.googlesource.com/kernel/common/+/bc6d3d83539512
+>     ("UPSTREAM: kbuild: rename cmd_{bzip2,lzma,lzo,lz4,xzkern,zstd22}")
+> 
+> [2] https://lore.kernel.org/linux-kbuild/20230616194505.GA27753@lxhi-065/
+
+-- 
+Best regards,
+Eugeniu Rosca
