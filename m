@@ -2,37 +2,37 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51B48C001DC
-	for <linux-kbuild@archiver.kernel.org>; Sat, 22 Jul 2023 04:50:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CA7BEB64DA
+	for <linux-kbuild@archiver.kernel.org>; Sat, 22 Jul 2023 04:50:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231336AbjGVEu2 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 22 Jul 2023 00:50:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49684 "EHLO
+        id S231132AbjGVEur (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 22 Jul 2023 00:50:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231338AbjGVEtr (ORCPT
+        with ESMTP id S229557AbjGVEuC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 22 Jul 2023 00:49:47 -0400
+        Sat, 22 Jul 2023 00:50:02 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 519914687;
-        Fri, 21 Jul 2023 21:48:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F82F46AC;
+        Fri, 21 Jul 2023 21:48:48 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 09E9D60B07;
-        Sat, 22 Jul 2023 04:48:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 518E5C43391;
-        Sat, 22 Jul 2023 04:48:37 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id F0DFD60A64;
+        Sat, 22 Jul 2023 04:48:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52774C433CB;
+        Sat, 22 Jul 2023 04:48:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690001318;
-        bh=VPUaxVtXdPuq4HOqNcJIyglxoF0IOoqdg44mkFjj0xo=;
+        s=k20201202; t=1690001321;
+        bh=48TYLXDk2TZk+T1Fx9XPl8wRZKrGD3cF6zfP4SYoA0M=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=T/gQUaCOpGdMRfrDiYuPDjF9izqAaP27voG5UdnyPecGtsnuRCiyG37Kb9Dd6GO5t
-         0UYVo0WEkGpNWGcXJL6i9JzTvhLjvoZk16PipBBZxDfSNMbzlJVH7I4Dx91D/TIPz9
-         FCRKTt1yCqsf0pc8OzR/YK3irXNF4Wjva5gY4aAtuL2bbMkge4qdHSfMtplKSYmdIF
-         quV6ZSRrtxRzk9U0kF4xUIOload+bM/ie6Y/dvrdesW5NOL4cv4DyvoOPQss7uxIsS
-         67p0fNvIwB5V1GV8VHXVyP+T9luA+vnG61bMn6vR1yza7vHcHnDmNlImpZWa+VRpdn
-         HqQwuYrsqkoNQ==
+        b=YoU0nAY1eP4T61+9clSYpSNgSfwWWh5UlvXHQA//yjU3npmsHTTOKSvm94lha13Oz
+         VlQR+ktlhlf2gImIIzl4WuCm3bwrzllNjw1HT93s9YXAW/b3nJdMoKSdZSJ85c3Quz
+         I/m6oaHdjG3haE1snv63ELmDYLmC3bxtdl1YhBLbX434PIqwU7SoAQA1rrb3Ykfek6
+         PCl4jK408qph6rby2DCGuCbOYY9onlVrywe+VW+ZoMyhUB621OEviungDsh/gJtF6G
+         AmDAwQ6gafSHqU2SVT7k4BsYvnTrDTFUSjhiBTlMSu27sDFLjSNomBlchLc5PQHWul
+         30V1JW4Jha8Qg==
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
@@ -40,9 +40,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
         Nicolas Schier <nicolas@fjasle.eu>
-Subject: [PATCH 16/19] kbuild: rpm-pkg: rename binkernel.spec to kernel.spec
-Date:   Sat, 22 Jul 2023 13:48:03 +0900
-Message-Id: <20230722044806.3867434-16-masahiroy@kernel.org>
+Subject: [PATCH 18/19] kbuild: rpm-pkg: refactor *rpm-pkg targets
+Date:   Sat, 22 Jul 2023 13:48:05 +0900
+Message-Id: <20230722044806.3867434-18-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230722044806.3867434-1-masahiroy@kernel.org>
 References: <20230722044806.3867434-1-masahiroy@kernel.org>
@@ -52,71 +52,115 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Now kernel.spec and binkernel.spec have the exactly same contents.
+Merge the similar build targets.
 
-Use kernel.spec for binrpm-pkg as well.
+Also, make the output location consistent.
+
+Previously, source packages were created in the build directory,
+while binary packages under ~/rpmbuild/RPMS/.
+
+Now, Kbuild creates the rpmbuild/ directory in the build directory,
+and saves all packages under it.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- .gitignore                 | 2 +-
- Makefile                   | 2 +-
- scripts/Makefile.package   | 4 ++--
- scripts/remove-stale-files | 2 ++
- 4 files changed, 6 insertions(+), 4 deletions(-)
+ scripts/Makefile.package | 52 +++++++++++++++++++++-------------------
+ scripts/package/mkspec   |  8 -------
+ 2 files changed, 28 insertions(+), 32 deletions(-)
 
-diff --git a/.gitignore b/.gitignore
-index 9fd4c9533b3d..0bbae167bf93 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -74,7 +74,7 @@ modules.order
- #
- # RPM spec file (make rpm-pkg)
- #
--/*.spec
-+/kernel.spec
- /rpmbuild/
- 
- #
-diff --git a/Makefile b/Makefile
-index f258ef13fa5d..5a263e5f6559 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1595,7 +1595,7 @@ MRPROPER_FILES += include/config include/generated          \
- 		  certs/signing_key.pem \
- 		  certs/x509.genkey \
- 		  vmlinux-gdb.py \
--		  *.spec rpmbuild \
-+		  kernel.spec rpmbuild \
- 		  rust/libmacros.so
- 
- # clean - Delete most, but leave enough to build external modules
 diff --git a/scripts/Makefile.package b/scripts/Makefile.package
-index c36ae03d6002..be9602fa98da 100644
+index bf2da97f29d0..0ace3973a0d1 100644
 --- a/scripts/Makefile.package
 +++ b/scripts/Makefile.package
-@@ -86,9 +86,9 @@ srcrpm-pkg: linux.tar.gz
+@@ -11,7 +11,6 @@ TAR_CONTENT := Documentation LICENSES arch block certs crypto drivers fs \
+                samples scripts security sound tools usr virt \
+                .config Makefile \
+                Kbuild Kconfig COPYING $(wildcard localversion*)
+-MKSPEC     := $(srctree)/scripts/package/mkspec
+ 
+ quiet_cmd_src_tar = TAR     $(2).tar.gz
+       cmd_src_tar = \
+@@ -66,32 +65,37 @@ $(linux-tarballs): archive-args = --prefix=linux/ $$(cat $<)
+ $(linux-tarballs): .tmp_HEAD FORCE
+ 	$(call if_changed,archive)
+ 
+-# rpm-pkg
++# rpm-pkg srcrpm-pkg binrpm-pkg
  # ---------------------------------------------------------------------------
- PHONY += binrpm-pkg
- binrpm-pkg:
--	$(CONFIG_SHELL) $(MKSPEC) prebuilt > $(objtree)/binkernel.spec
-+	$(CONFIG_SHELL) $(MKSPEC) prebuilt > $(objtree)/kernel.spec
- 	+rpmbuild $(RPMOPTS) --define "_builddir $(objtree)" --target \
--		$(UTS_MACHINE)-linux -bb $(objtree)/binkernel.spec \
-+		$(UTS_MACHINE)-linux -bb $(objtree)/kernel.spec \
- 		--build-in-place --noprep --define='_smp_mflags %{nil}' --without devel \
- 		--define='make $(MAKE)'
+-PHONY += rpm-pkg
+-rpm-pkg: srpm = $(shell rpmspec --srpm --query --queryformat='%{name}-%{VERSION}-%{RELEASE}.src.rpm' kernel.spec)
+-rpm-pkg: srcrpm-pkg
+-	+rpmbuild $(RPMOPTS) --target $(UTS_MACHINE)-linux -rb $(srpm) \
+-	--build-in-place --noprep \
+-	--define='_smp_mflags %{nil}' --define='make $(MAKE)'
  
-diff --git a/scripts/remove-stale-files b/scripts/remove-stale-files
-index f3659ea0335b..8b1a636f8543 100755
---- a/scripts/remove-stale-files
-+++ b/scripts/remove-stale-files
-@@ -37,3 +37,5 @@ rm -f .scmversion
- rm -rf include/ksym
+-# srcrpm-pkg
+-# ---------------------------------------------------------------------------
+-PHONY += srcrpm-pkg
+-srcrpm-pkg: linux.tar.gz
+-	$(CONFIG_SHELL) $(MKSPEC) >$(objtree)/kernel.spec
+-	+rpmbuild $(RPMOPTS) --target $(UTS_MACHINE)-linux -bs kernel.spec \
+-	--define='_smp_mflags %{nil}' --define='_sourcedir rpmbuild/SOURCES' --define='_srcrpmdir .'
++quiet_cmd_mkspec = GEN     $@
++      cmd_mkspec = $(srctree)/scripts/package/mkspec > $@
  
- find . -name '*.usyms' | xargs rm -f
+-# binrpm-pkg
+-# ---------------------------------------------------------------------------
+-PHONY += binrpm-pkg
+-binrpm-pkg:
+-	$(CONFIG_SHELL) $(MKSPEC) prebuilt > $(objtree)/kernel.spec
+-	+rpmbuild $(RPMOPTS) --define "_builddir $(objtree)" --target \
+-		$(UTS_MACHINE)-linux -bb $(objtree)/kernel.spec \
+-		--build-in-place --noprep --define='_smp_mflags %{nil}' --without devel \
+-		--define='make $(MAKE)'
++kernel.spec: FORCE
++	$(call cmd,mkspec)
 +
-+rm -f binkernel.spec
++PHONY += rpm-sources
++rpm-sources: linux.tar.gz
++	$(Q)mkdir -p rpmbuild/SOURCES
++	$(Q)ln -f linux.tar.gz rpmbuild/SOURCES/linux.tar.gz
++	$(Q)cp $(KCONFIG_CONFIG) rpmbuild/SOURCES/config
++	$(Q)$(srctree)/scripts/package/gen-diff-patch rpmbuild/SOURCES/diff.patch
++
++PHONY += rpm-pkg srcrpm-pkg binrpm-pkg
++
++rpm-pkg:    private build-type := a
++srcrpm-pkg: private build-type := s
++binrpm-pkg: private build-type := b
++
++rpm-pkg srcrpm-pkg: rpm-sources
++rpm-pkg srcrpm-pkg binrpm-pkg: kernel.spec
++	+$(strip rpmbuild -b$(build-type) kernel.spec \
++	--define='_topdir $(abspath rpmbuild)' \
++	$(if $(filter a b, $(build-type)), \
++		--target $(UTS_MACHINE)-linux --build-in-place --noprep --define='_smp_mflags %{nil}') \
++	$(if $(filter b, $(build-type)), \
++		--without devel) \
++	$(RPMOPTS))
+ 
+ # deb-pkg srcdeb-pkg bindeb-pkg
+ # ---------------------------------------------------------------------------
+diff --git a/scripts/package/mkspec b/scripts/package/mkspec
+index c08567ae7fb1..d41608efb747 100755
+--- a/scripts/package/mkspec
++++ b/scripts/package/mkspec
+@@ -9,14 +9,6 @@
+ #	Patched for non-x86 by Opencon (L) 2002 <opencon@rio.skydome.net>
+ #
+ 
+-# how we were called determines which rpms we build and how we build them
+-if [ -z "$1" ]; then
+-	mkdir -p rpmbuild/SOURCES
+-	cp linux.tar.gz rpmbuild/SOURCES
+-	cp "${KCONFIG_CONFIG}" rpmbuild/SOURCES/config
+-	"${srctree}/scripts/package/gen-diff-patch" rpmbuild/SOURCES/diff.patch
+-fi
+-
+ if grep -q CONFIG_MODULES=y include/config/auto.conf; then
+ echo '%define with_devel %{?_without_devel: 0} %{?!_without_devel: 1}'
+ else
 -- 
 2.39.2
 
