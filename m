@@ -2,128 +2,96 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5429CC001DC
-	for <linux-kbuild@archiver.kernel.org>; Wed, 26 Jul 2023 07:14:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F4EBEB64DD
+	for <linux-kbuild@archiver.kernel.org>; Tue, 25 Jul 2023 21:48:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231784AbjGZHOI (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 26 Jul 2023 03:14:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48674 "EHLO
+        id S229448AbjGYVsa (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 25 Jul 2023 17:48:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231841AbjGZHNi (ORCPT
+        with ESMTP id S229445AbjGYVs3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 26 Jul 2023 03:13:38 -0400
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B06CC559E;
-        Wed, 26 Jul 2023 00:09:49 -0700 (PDT)
-X-UUID: 48d18b7fbb5e4399a646d23469c1a346-20230726
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.28,REQID:308e6581-c474-4014-b1a3-53283994d9aa,IP:15,
-        URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-        ON:release,TS:0
-X-CID-INFO: VERSION:1.1.28,REQID:308e6581-c474-4014-b1a3-53283994d9aa,IP:15,UR
-        L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-        :release,TS:0
-X-CID-META: VersionHash:176cd25,CLOUDID:2dd756d2-cd77-4e67-bbfd-aa4eaace762f,B
-        ulkID:230726150927DGBQ9DXH,BulkQuantity:0,Recheck:0,SF:38|24|17|19|44|102,
-        TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,COL:0
-        ,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_FSI,TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD
-X-UUID: 48d18b7fbb5e4399a646d23469c1a346-20230726
-X-User: guodongtai@kylinos.cn
-Received: from localhost.localdomain [(39.156.73.12)] by mailgw
-        (envelope-from <guodongtai@kylinos.cn>)
-        (Generic MTA)
-        with ESMTP id 586468305; Wed, 26 Jul 2023 15:09:24 +0800
-From:   George Guo <guodongtai@kylinos.cn>
-To:     masahiroy@kernel.org, ndesaulniers@google.com, nathan@kernel.org,
-        nicolas@fjasle.eu
-Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        bpf@vger.kernel.org
-Subject: [PATCH] samples/bpf: Update sockex2: get the expected output results
-Date:   Wed, 26 Jul 2023 15:09:55 +0800
-Message-Id: <20230726070955.178288-1-guodongtai@kylinos.cn>
-X-Mailer: git-send-email 2.34.1
+        Tue, 25 Jul 2023 17:48:29 -0400
+X-Greylist: delayed 488 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 25 Jul 2023 14:48:28 PDT
+Received: from out-35.mta0.migadu.com (out-35.mta0.migadu.com [IPv6:2001:41d0:1004:224b::23])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F11210D1
+        for <linux-kbuild@vger.kernel.org>; Tue, 25 Jul 2023 14:48:28 -0700 (PDT)
+Message-ID: <f71b9d6e-e608-0c8d-1efd-201e8002db42@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1690321219;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vOEjSRPghqZUXU6a9KIFU0/2bAuZPx1SXHj+MlsTBQk=;
+        b=EbhqHnGncvrmlFFcR8t7lSlhxV5gWQn3lgR+yruJb6yVwSor0UZkbfyCFQntKjS0z9iIoP
+        M+IXsJgb29Gy3Uwug0g4baC0PBz24poaWOIPHDPxsEMOcK4tv95xaTsmY7XuIhLzIK7wVI
+        8S1uKewp3Ru+5tqCMxxkHy508WhV9ns=
+Date:   Tue, 25 Jul 2023 14:40:16 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] btf: Remove unnecessary header file inclusions
+Content-Language: en-US
+To:     George Guo <guodongtai@kylinos.cn>
+References: <20230721075007.4100863-1-guodongtai@kylinos.cn>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20230721075007.4100863-1-guodongtai@kylinos.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Running "ping -4 -c5 localhost" only shows 4 times prints not 5:
+On 7/21/23 12:50 AM, George Guo wrote:
+> Remove unnecessary header file inclusions in btf.c
+> 
+> Signed-off-by: George Guo <guodongtai@kylinos.cn>
+> ---
+>   kernel/bpf/btf.c | 16 ----------------
+>   1 file changed, 16 deletions(-)
+> 
+> diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
+> index 817204d53372..e5ea729ba6b8 100644
+> --- a/kernel/bpf/btf.c
+> +++ b/kernel/bpf/btf.c
+> @@ -1,20 +1,7 @@
+>   // SPDX-License-Identifier: GPL-2.0
+>   /* Copyright (c) 2018 Facebook */
+>   
+> -#include <uapi/linux/btf.h>
+> -#include <uapi/linux/bpf.h>
+> -#include <uapi/linux/bpf_perf_event.h>
+> -#include <uapi/linux/types.h>
+> -#include <linux/seq_file.h>
+> -#include <linux/compiler.h>
+> -#include <linux/ctype.h>
+> -#include <linux/errno.h>
+> -#include <linux/slab.h>
+>   #include <linux/anon_inodes.h>
+> -#include <linux/file.h>
+> -#include <linux/uaccess.h>
+> -#include <linux/kernel.h>
+> -#include <linux/idr.h>
+>   #include <linux/sort.h>
+>   #include <linux/bpf_verifier.h>
+>   #include <linux/btf.h>
+> @@ -22,9 +9,6 @@
+>   #include <linux/bpf_lsm.h>
+>   #include <linux/skmsg.h>
+>   #include <linux/perf_event.h>
+> -#include <linux/bsearch.h>
+> -#include <linux/kobject.h>
+> -#include <linux/sysfs.h>
 
-$ sudo ./samples/bpf/sockex2
-ip 127.0.0.1 bytes 392 packets 4
-ip 127.0.0.1 bytes 784 packets 8
-ip 127.0.0.1 bytes 1176 packets 12
-ip 127.0.0.1 bytes 1568 packets 16
+What is the reason that needs this change and only to this file? There are other 
+files that can do this kind of removal. Are you planning to make all the changes 
+also?
 
-debug it with num prints:
-$ sudo ./samples/bpf/sockex2
-num = 1: ip 127.0.0.1 bytes 392 packets 4
-num = 2: ip 127.0.0.1 bytes 784 packets 8
-num = 3: ip 127.0.0.1 bytes 1176 packets 12
-num = 4: ip 127.0.0.1 bytes 1568 packets 16
+afaict, they are here because this file is using something defined in them. Now 
+it is depending on other header files implicitly including the removed headers.
 
-The reason is that we check it faster, just put sleep(1) before check
-while(bpf_map_get_next_key(map_fd, &key, &next_key) == 0).
-Now we get the expected results:
-
-$ sudo ./samples/bpf/sockex2
-num = 0: ip 127.0.0.1 bytes 392 packets 4
-num = 1: ip 127.0.0.1 bytes 784 packets 8
-num = 2: ip 127.0.0.1 bytes 1176 packets 12
-num = 3: ip 127.0.0.1 bytes 1568 packets 16
-num = 4: ip 127.0.0.1 bytes 1960 packets 20
-
-Signed-off-by: George Guo <guodongtai@kylinos.cn>
----
- samples/bpf/sockex2_user.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
-
-diff --git a/samples/bpf/sockex2_user.c b/samples/bpf/sockex2_user.c
-index 2c18471336f0..84bf1ab77649 100644
---- a/samples/bpf/sockex2_user.c
-+++ b/samples/bpf/sockex2_user.c
-@@ -18,8 +18,8 @@ int main(int ac, char **argv)
- 	struct bpf_program *prog;
- 	struct bpf_object *obj;
- 	int map_fd, prog_fd;
--	char filename[256];
--	int i, sock, err;
-+	char filename[256], command[64];
-+	int i, sock, err, num = 5;
- 	FILE *f;
- 
- 	snprintf(filename, sizeof(filename), "%s_kern.o", argv[0]);
-@@ -42,21 +42,22 @@ int main(int ac, char **argv)
- 	assert(setsockopt(sock, SOL_SOCKET, SO_ATTACH_BPF, &prog_fd,
- 			  sizeof(prog_fd)) == 0);
- 
--	f = popen("ping -4 -c5 localhost", "r");
-+	snprintf(command, sizeof(command), "ping -4 -c%d localhost", num);
-+	f = popen(command, "r");
- 	(void) f;
- 
--	for (i = 0; i < 5; i++) {
-+	for (i = 0; i < num; i++) {
- 		int key = 0, next_key;
- 		struct pair value;
- 
-+		sleep(1);
- 		while (bpf_map_get_next_key(map_fd, &key, &next_key) == 0) {
- 			bpf_map_lookup_elem(map_fd, &next_key, &value);
--			printf("ip %s bytes %lld packets %lld\n",
-+			printf("num = %d: ip %s bytes %lld packets %lld\n", i,
- 			       inet_ntoa((struct in_addr){htonl(next_key)}),
- 			       value.bytes, value.packets);
- 			key = next_key;
- 		}
--		sleep(1);
- 	}
- 	return 0;
- }
--- 
-2.34.1
+>   
+>   #include <net/netfilter/nf_bpf_link.h>
+>   
 
