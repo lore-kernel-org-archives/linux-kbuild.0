@@ -2,96 +2,179 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F4EBEB64DD
-	for <linux-kbuild@archiver.kernel.org>; Tue, 25 Jul 2023 21:48:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE24DC001DC
+	for <linux-kbuild@archiver.kernel.org>; Wed, 26 Jul 2023 21:23:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229448AbjGYVsa (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 25 Jul 2023 17:48:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40316 "EHLO
+        id S229595AbjGZVX6 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 26 Jul 2023 17:23:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbjGYVs3 (ORCPT
+        with ESMTP id S229479AbjGZVX6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 25 Jul 2023 17:48:29 -0400
-X-Greylist: delayed 488 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 25 Jul 2023 14:48:28 PDT
-Received: from out-35.mta0.migadu.com (out-35.mta0.migadu.com [IPv6:2001:41d0:1004:224b::23])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F11210D1
-        for <linux-kbuild@vger.kernel.org>; Tue, 25 Jul 2023 14:48:28 -0700 (PDT)
-Message-ID: <f71b9d6e-e608-0c8d-1efd-201e8002db42@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1690321219;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vOEjSRPghqZUXU6a9KIFU0/2bAuZPx1SXHj+MlsTBQk=;
-        b=EbhqHnGncvrmlFFcR8t7lSlhxV5gWQn3lgR+yruJb6yVwSor0UZkbfyCFQntKjS0z9iIoP
-        M+IXsJgb29Gy3Uwug0g4baC0PBz24poaWOIPHDPxsEMOcK4tv95xaTsmY7XuIhLzIK7wVI
-        8S1uKewp3Ru+5tqCMxxkHy508WhV9ns=
-Date:   Tue, 25 Jul 2023 14:40:16 -0700
-MIME-Version: 1.0
-Subject: Re: [PATCH] btf: Remove unnecessary header file inclusions
-Content-Language: en-US
+        Wed, 26 Jul 2023 17:23:58 -0400
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FF4B269E;
+        Wed, 26 Jul 2023 14:23:43 -0700 (PDT)
+Received: from leknes.fjasle.eu ([46.142.99.148]) by mrelayeu.kundenserver.de
+ (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis) id
+ 1Mi2BV-1pta0v23hh-00e1RL; Wed, 26 Jul 2023 23:22:56 +0200
+Received: by leknes.fjasle.eu (Postfix, from userid 1000)
+        id 0EA553E9FD; Wed, 26 Jul 2023 23:22:50 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fjasle.eu; s=mail;
+        t=1690406570; bh=guMxT3zoTwr2vilWiRE+24bgG9Cap5wpXyAUs/XneQE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=s6A0R4fi6QWjrigkfNpm/aqCP2zZqd9hR0eEZAvriHpSMxikVAfQHWcUVK7qVZJII
+         5H9TNx0gEVFDcCbkxuMzCCQW2SgPEF/oc/bJdhhI5/9hC3MCHIfZiurQ4uIlnF+eXH
+         RVVIxbEm90+nqFj9q15CIsxYN0KlpXLilMqJenjU=
+Date:   Wed, 26 Jul 2023 23:22:49 +0200
+From:   Nicolas Schier <nicolas@fjasle.eu>
 To:     George Guo <guodongtai@kylinos.cn>
-References: <20230721075007.4100863-1-guodongtai@kylinos.cn>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20230721075007.4100863-1-guodongtai@kylinos.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Cc:     masahiroy@kernel.org, ndesaulniers@google.com, nathan@kernel.org,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        bpf@vger.kernel.org
+Subject: Re: [PATCH] samples/bpf: Update sockex2: get the expected output
+ results
+Message-ID: <ZMGOqYG8oCAQmMtq@fjasle.eu>
+References: <20230726070955.178288-1-guodongtai@kylinos.cn>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="lNnXaHDZlVni+dB7"
+Content-Disposition: inline
+In-Reply-To: <20230726070955.178288-1-guodongtai@kylinos.cn>
+X-Provags-ID: V03:K1:PEE9o+FfrnXX+8QFTuay5HcHbTBK8BtYX5C0kcSftKusoLpvWxw
+ Y+yRx/pyYDxkC2FzKlPsUe1Zae5lLcVAJ2TM+EpR3C9yjNGMW156C1zqb330QIq7nLWw9xK
+ G7bpU3i5/j/KfhuebM+47vwdoD/B8Z0uyrLMpnagZ+RDmLyqXhGjbsW2Pgsyi8455unU202
+ wSHf+elj+ZRM5WRSlEzJg==
+UI-OutboundReport: notjunk:1;M01:P0:DbSP5bcjtjs=;7ah/Ba7fJBiL9s91hdBn2iE11MB
+ THObXZkcooO4XVCmm49FFvGAlIqijqVrecu/5/QfXhyTQGh+qi1HNmHohAbk/WX4nPjCW3ZB0
+ SrGAnvCZznKA6y8uBurmuNc84SigXjZRGNGRXItYmu/AKSRNo63+Wnz/LFhO2im3qzinpEC7p
+ utBbhTDNoxHT7FjSc1K8sppgQzPb+n07xTr0+6bhTAIh8QtHpAbRCDPDzrMmHUvghpTCKEFcu
+ D5fsyMjUM/RwQ6w7uCtkZtiRMhZW4lz3J0JGUZQNHzk97m/olyqLqoHIz+7S/5bLr8F+02AV8
+ uSCAsZ6rnlBIefUGJA0bo0h6139g36gP7faxCTcs+DRYSPMwB3vCQtxZbz47EBPEy72zrPo4A
+ K1Q/fSBdSCsS+bB/4n//Id1/GLXgF1q4V9HSjhulSBdfw1cHuH4ZW0cc2a7d2qnPlYn+DfMSy
+ KZpIQkb0aNW/kUyqM1uFHMtfIcavqCzh/KNfuahitUiFWSc10DALjTCXIPiR0CjKYOESlTcbi
+ eqRYISUgtiBIDby4zi2flkv96cseUi5VOdVa0S+pjHPI8Tt2Gsz6/YPnNtuxfwIzV8LcQvqoX
+ eFJsArijjxg6cGKWJwLQOEF3cr8LecOD6FZo75mO5VdVg9d31cWSlzVIBRm+gYtk9w15rcEdv
+ +mdA9Kys/zUoC9HRluTbBxPuxHH0ZJYQMwfcO+VNjw==
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On 7/21/23 12:50 AM, George Guo wrote:
-> Remove unnecessary header file inclusions in btf.c
-> 
+
+--lNnXaHDZlVni+dB7
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Jul 26, 2023 at 03:09:55PM +0800 George Guo wrote:
+> Running "ping -4 -c5 localhost" only shows 4 times prints not 5:
+>=20
+> $ sudo ./samples/bpf/sockex2
+> ip 127.0.0.1 bytes 392 packets 4
+> ip 127.0.0.1 bytes 784 packets 8
+> ip 127.0.0.1 bytes 1176 packets 12
+> ip 127.0.0.1 bytes 1568 packets 16
+>=20
+> debug it with num prints:
+> $ sudo ./samples/bpf/sockex2
+> num =3D 1: ip 127.0.0.1 bytes 392 packets 4
+> num =3D 2: ip 127.0.0.1 bytes 784 packets 8
+> num =3D 3: ip 127.0.0.1 bytes 1176 packets 12
+> num =3D 4: ip 127.0.0.1 bytes 1568 packets 16
+>=20
+> The reason is that we check it faster, just put sleep(1) before check
+> while(bpf_map_get_next_key(map_fd, &key, &next_key) =3D=3D 0).
+> Now we get the expected results:
+>=20
+> $ sudo ./samples/bpf/sockex2
+> num =3D 0: ip 127.0.0.1 bytes 392 packets 4
+> num =3D 1: ip 127.0.0.1 bytes 784 packets 8
+> num =3D 2: ip 127.0.0.1 bytes 1176 packets 12
+> num =3D 3: ip 127.0.0.1 bytes 1568 packets 16
+> num =3D 4: ip 127.0.0.1 bytes 1960 packets 20
+>=20
 > Signed-off-by: George Guo <guodongtai@kylinos.cn>
 > ---
->   kernel/bpf/btf.c | 16 ----------------
->   1 file changed, 16 deletions(-)
-> 
-> diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
-> index 817204d53372..e5ea729ba6b8 100644
-> --- a/kernel/bpf/btf.c
-> +++ b/kernel/bpf/btf.c
-> @@ -1,20 +1,7 @@
->   // SPDX-License-Identifier: GPL-2.0
->   /* Copyright (c) 2018 Facebook */
->   
-> -#include <uapi/linux/btf.h>
-> -#include <uapi/linux/bpf.h>
-> -#include <uapi/linux/bpf_perf_event.h>
-> -#include <uapi/linux/types.h>
-> -#include <linux/seq_file.h>
-> -#include <linux/compiler.h>
-> -#include <linux/ctype.h>
-> -#include <linux/errno.h>
-> -#include <linux/slab.h>
->   #include <linux/anon_inodes.h>
-> -#include <linux/file.h>
-> -#include <linux/uaccess.h>
-> -#include <linux/kernel.h>
-> -#include <linux/idr.h>
->   #include <linux/sort.h>
->   #include <linux/bpf_verifier.h>
->   #include <linux/btf.h>
-> @@ -22,9 +9,6 @@
->   #include <linux/bpf_lsm.h>
->   #include <linux/skmsg.h>
->   #include <linux/perf_event.h>
-> -#include <linux/bsearch.h>
-> -#include <linux/kobject.h>
-> -#include <linux/sysfs.h>
 
-What is the reason that needs this change and only to this file? There are other 
-files that can do this kind of removal. Are you planning to make all the changes 
-also?
+Thanks, sounds reasonable to me (but I haven't checked it).  Might you want=
+ to
+minimize the diff to only contain the move of the sleep call?
 
-afaict, they are here because this file is using something defined in them. Now 
-it is depending on other header files implicitly including the removed headers.
+Kind regards,
+Nicolas
 
->   
->   #include <net/netfilter/nf_bpf_link.h>
->   
 
+>  samples/bpf/sockex2_user.c | 13 +++++++------
+>  1 file changed, 7 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/samples/bpf/sockex2_user.c b/samples/bpf/sockex2_user.c
+> index 2c18471336f0..84bf1ab77649 100644
+> --- a/samples/bpf/sockex2_user.c
+> +++ b/samples/bpf/sockex2_user.c
+> @@ -18,8 +18,8 @@ int main(int ac, char **argv)
+>  	struct bpf_program *prog;
+>  	struct bpf_object *obj;
+>  	int map_fd, prog_fd;
+> -	char filename[256];
+> -	int i, sock, err;
+> +	char filename[256], command[64];
+> +	int i, sock, err, num =3D 5;
+>  	FILE *f;
+> =20
+>  	snprintf(filename, sizeof(filename), "%s_kern.o", argv[0]);
+> @@ -42,21 +42,22 @@ int main(int ac, char **argv)
+>  	assert(setsockopt(sock, SOL_SOCKET, SO_ATTACH_BPF, &prog_fd,
+>  			  sizeof(prog_fd)) =3D=3D 0);
+> =20
+> -	f =3D popen("ping -4 -c5 localhost", "r");
+> +	snprintf(command, sizeof(command), "ping -4 -c%d localhost", num);
+> +	f =3D popen(command, "r");
+>  	(void) f;
+> =20
+> -	for (i =3D 0; i < 5; i++) {
+> +	for (i =3D 0; i < num; i++) {
+>  		int key =3D 0, next_key;
+>  		struct pair value;
+> =20
+> +		sleep(1);
+>  		while (bpf_map_get_next_key(map_fd, &key, &next_key) =3D=3D 0) {
+>  			bpf_map_lookup_elem(map_fd, &next_key, &value);
+> -			printf("ip %s bytes %lld packets %lld\n",
+> +			printf("num =3D %d: ip %s bytes %lld packets %lld\n", i,
+>  			       inet_ntoa((struct in_addr){htonl(next_key)}),
+>  			       value.bytes, value.packets);
+>  			key =3D next_key;
+>  		}
+> -		sleep(1);
+>  	}
+>  	return 0;
+>  }
+> --=20
+> 2.34.1
+
+--=20
+epost|xmpp: nicolas@fjasle.eu          irc://oftc.net/nsc
+=E2=86=B3 gpg: 18ed 52db e34f 860e e9fb  c82b 7d97 0932 55a0 ce7f
+     -- frykten for herren er opphav til kunnskap --
+
+--lNnXaHDZlVni+dB7
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEh0E3p4c3JKeBvsLGB1IKcBYmEmkFAmTBjqkACgkQB1IKcBYm
+EmnN7g/9HHXKhI3q4rW1w1RUQKsozSPEmGnWmd7f+9Yrt/oW76GQX+XxE9rhOksq
+XiKWtS+C/l0vNASQdWCrc77GPy5lKDSySoDzLy461PF9fEVQ1QbjCtoosHuM2eKm
+pmI8HUsAcEZbJ5RPr5U4gjKhXuCvNP66ZxmsXAAcbrdWMNVk5L3zMEo8iJGCnYr4
+/ry8UyJtP/qgNCJcX4wcUrNOfn9QsmIexLGh/zzG0pcH9PtQCdTBrSb6hFOSgv8J
+2yAx5a2PdD2RCKgcntYizbW1bhFIogC+1VcqfPB7Tv6bwZZiYBYsxV8OQr6Dpe5b
+sQUvem8wWTZQyjPuihsbAAiAnma2oCQMCgmSlOgDAouxbfrX8QFgDKY32mlpSZHC
+Kq21skAOOUR7s/kz3uHLuBdvNv/ayxTFXgupCXPR1xPIHaFIYanVds/pBLyc3FfA
+cX8mKCFLJhddSFmCXKdT2c6KmHcFDYQbnPPYh00l80qMfKKqNL/E32XMGNyAgAlO
+Agg2+WDAk0efJjb5zl5YSV6BSLRzNV+hUvFODhQUxjYWcWjrrs4eyHQQt6bQjkgk
+w69Mho1Wby+Q8LBXtD5DpraG+ZMrzi1dNtomQZtulB0c3o/j6BzN3VhGS7F5KKnk
+NYyfYbH4wH4k+XL9sboJxm8wbnn976sjemlM3oVq5l+3CqLvvHI=
+=qhta
+-----END PGP SIGNATURE-----
+
+--lNnXaHDZlVni+dB7--
