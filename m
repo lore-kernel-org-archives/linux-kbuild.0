@@ -2,115 +2,185 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3D28C0015E
-	for <linux-kbuild@archiver.kernel.org>; Tue,  1 Aug 2023 17:18:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFE6FC001DF
+	for <linux-kbuild@archiver.kernel.org>; Tue,  1 Aug 2023 17:50:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231336AbjHARSS (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 1 Aug 2023 13:18:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58274 "EHLO
+        id S231478AbjHARu0 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 1 Aug 2023 13:50:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232155AbjHARSR (ORCPT
+        with ESMTP id S231389AbjHARuZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 1 Aug 2023 13:18:17 -0400
-Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 903FC211E
-        for <linux-kbuild@vger.kernel.org>; Tue,  1 Aug 2023 10:18:16 -0700 (PDT)
-Received: by mail-ot1-x334.google.com with SMTP id 46e09a7af769-6bca7d82d54so1666085a34.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 01 Aug 2023 10:18:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690910296; x=1691515096;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+lVeKq7FzrA8zpaWVb8WBRY41fSXAU8sM5RKZuACP/E=;
-        b=oZV13r92MVDAp5Le6pcqZhs+Cx194TWvATG0jqNsJiWAlOebdfvMW8qY7WqsSVUKhr
-         bA5iwvXzaO3M0RJIoREZKCqGpaebvOWUoqXgGtNmOFLRfXv4TYpdt6IEdO+ooAZgHa8R
-         +Rh+R5OLgya8ckaTfj3i5Y+SzJybZJ/XCa6CR+s2h/j9VzgSmyLdrFlFc59pjjXIRrbB
-         LtE6gt3NgxzXXP9KYKML+RjAoJ383eDOO/K6bb1m9V0oP01UduJjkdnxIlzm/8hQr5jG
-         ok1TFOOrzIbCqXwi8/XPZFg1d5LbDGWh+ZhWeHN/HINI5Xsm4lq+WX8POytOFQ9/3Obp
-         P5gg==
+        Tue, 1 Aug 2023 13:50:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 330C41FD6
+        for <linux-kbuild@vger.kernel.org>; Tue,  1 Aug 2023 10:49:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1690912179;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=GYUWXb5VBW1ndzfLEcQ3Dy13isLM6VUOP91Qx2qKRhg=;
+        b=KTpjpZR+i/NGJdjx3AOW/D2UJSdcbka5+uG6x6z6w84iasxDUp3cWVakMRLwXVSSJ70Ulp
+        3IoBmOUbTWCTt1EdZSoKACqHCSjP/lphF8giGQdcgqsgwR3DTUNZ5Sho3oLPt6x5wRaHnr
+        0Z+5YRYjEfEKUFSePJWxUgIIlkq1qII=
+Received: from mail-yw1-f199.google.com (mail-yw1-f199.google.com
+ [209.85.128.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-339-A79MoLrIPOCsaZxHmjxjCA-1; Tue, 01 Aug 2023 13:49:38 -0400
+X-MC-Unique: A79MoLrIPOCsaZxHmjxjCA-1
+Received: by mail-yw1-f199.google.com with SMTP id 00721157ae682-5847479b559so68633207b3.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 01 Aug 2023 10:49:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690910296; x=1691515096;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1690912177; x=1691516977;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+lVeKq7FzrA8zpaWVb8WBRY41fSXAU8sM5RKZuACP/E=;
-        b=BU3Rl8FEqI+pcrRdYDE1Gfw0xEeRHBojARv7wmQja7thuRgUrft8xCXLGh7XRoW7av
-         M/1p4Z3fHMOGRRc5xqYxaLKICGL7pPNTRWAfxO+UzJKVBoZVPVCeFqPs/eQjOoW6O7Ak
-         zSGI4QbNnkff2JnTADYhCSw2UrmFTd/mWKgYxsKVkEv25QtBQQdttB0DW1ahvATEMche
-         BSiyizJbHbTR9/UQ9ShsG6cZgawXve/alND+CmSbCW8XpUI0t5grDtC6ntmq0oJZjVoh
-         W5d5Fsz+DiSvU/4VcPFom2h5GuGAkClxgQfIa+DYFgU0I/OCQc883XAiRCLeV3PRABSE
-         4Zhg==
-X-Gm-Message-State: ABy/qLZc0JybwSadBQzU03Oi2ZO6psPt3Uq6beUI/NGMlfDcvoFc6N1z
-        u2I8alfEQtmb+INmePHvzYbcrTK9G3h8oUWpRNu7lQ==
-X-Google-Smtp-Source: APBJJlH28E/XfL7JZrm7ZeIynJrP1Sh3tHyJVBOaUxj3H5FfAq1biNm4w1Wy+tLu2K6GHIXmKjv3/UZtWZDl1raA7Yg=
-X-Received: by 2002:a05:6358:60c7:b0:139:d5d5:7a8f with SMTP id
- i7-20020a05635860c700b00139d5d57a8fmr3371801rwi.30.1690910295394; Tue, 01 Aug
- 2023 10:18:15 -0700 (PDT)
+        bh=GYUWXb5VBW1ndzfLEcQ3Dy13isLM6VUOP91Qx2qKRhg=;
+        b=UdMeBlwrz+qZaVq1dTxTBFgEOIx7HQKzNPpSgixcHzGANWkwLo7JoKNRHsp58VoR2Z
+         zwgrInxid+BY3Vk3N8aeTYNu3uE9N/JR5F9Xe6Q0ugduBhf6GebbNWvh06A+WIPJmr8k
+         JfxOnV4CfA4y/RuCVmYaXZQLnW/VdU+AHcosO+poXzWvjXBwYhxug96q8QHsDWxv8STd
+         jDT2ugHo7GQ6YB4Ok25Wb4jAOTPzM0WLMUBUwzBxaVHYkunjg53usob/0pTDeEt6XAHP
+         bq/FOl68fPEGan+OEJPvuSLTS44EMSSYbfUdujXZoLcA8o4NULgNYutYRnUZBqVIwsjT
+         p0Xw==
+X-Gm-Message-State: ABy/qLauXpKJqZnSNUJZWQHQ6wA+LdoRQMGXtj/dCpw90n9llV0PQj+o
+        fy4Yunz5hAwQe3wdYdsF8nqJko6vYBQIWhOr+xClI4zDkHXuIGjvkgkonXNT0Lj0+YeZCdBHdax
+        XSjjn2Sq6/04D656jnO0PYqRl
+X-Received: by 2002:a81:83cf:0:b0:570:6fbd:2daf with SMTP id t198-20020a8183cf000000b005706fbd2dafmr16026116ywf.37.1690912177471;
+        Tue, 01 Aug 2023 10:49:37 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlEx/rTzRu8VRjCf/p3Bv17M0mRYJt5gkfqTtA7hsbvwsSFovUUUg5LKF0PGAKJJ27eO3PqixA==
+X-Received: by 2002:a81:83cf:0:b0:570:6fbd:2daf with SMTP id t198-20020a8183cf000000b005706fbd2dafmr16026104ywf.37.1690912177215;
+        Tue, 01 Aug 2023 10:49:37 -0700 (PDT)
+Received: from brian-x1.. ([2600:381:222b:e67:295d:9324:c84:3382])
+        by smtp.gmail.com with ESMTPSA id k187-20020a0dc8c4000000b005773afca47bsm3881728ywd.27.2023.08.01.10.49.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Aug 2023 10:49:36 -0700 (PDT)
+From:   Brian Masney <bmasney@redhat.com>
+To:     masahiroy@kernel.org
+Cc:     linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Subject: [PATCH 1/2] scripts: add mod-to-kconfig.sh
+Date:   Tue,  1 Aug 2023 13:49:21 -0400
+Message-ID: <20230801174922.333700-2-bmasney@redhat.com>
+X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230801174922.333700-1-bmasney@redhat.com>
+References: <20230801174922.333700-1-bmasney@redhat.com>
 MIME-Version: 1.0
-References: <20230728113415.21067-1-will@kernel.org> <20230728113415.21067-4-will@kernel.org>
- <CAKwvOdnPWL7ts0PC_NxqxZZRgaT=WLZGQQ-3cVii-jG5GCNjfw@mail.gmail.com>
-In-Reply-To: <CAKwvOdnPWL7ts0PC_NxqxZZRgaT=WLZGQQ-3cVii-jG5GCNjfw@mail.gmail.com>
-From:   Sami Tolvanen <samitolvanen@google.com>
-Date:   Tue, 1 Aug 2023 10:17:38 -0700
-Message-ID: <CABCJKueCWThVG9sBhWppHTUiuxinXf0MO6-MsMnmMTG6tv_j0Q@mail.gmail.com>
-Subject: Re: [PATCH v3 3/4] scripts/faddr2line: Constrain readelf output to
- symbols from System.map
-To:     Nick Desaulniers <ndesaulniers@google.com>
-Cc:     linux-kernel@vger.kernel.org, kernel-team@android.com,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nicolas Schier <nicolas@fjasle.eu>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        John Stultz <jstultz@google.com>, linux-kbuild@vger.kernel.org,
-        Will Deacon <will@kernel.org>,
-        Fangrui Song <maskray@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, Aug 1, 2023 at 9:42=E2=80=AFAM Nick Desaulniers <ndesaulniers@googl=
-e.com> wrote:
->
-> On Fri, Jul 28, 2023 at 4:34=E2=80=AFAM Will Deacon <will@kernel.org> wro=
-te:
-> >
-> > Some symbols emitted in the readelf output but filtered from System.map
-> > can confuse the 'faddr2line' symbol size calculation, resulting in the
-> > erroneous rejection of valid offsets. This is especially prevalent when
-> > building an arm64 kernel with CONFIG_CFI_CLANG=3Dy, where most function=
-s
-> > are prefixed with a 32-bit data value in a '$d.n' section. For example:
-> >
-> > 447538: ffff800080014b80   548 FUNC    GLOBAL DEFAULT    2 do_one_initc=
-all
-> >    104: ffff800080014c74     0 NOTYPE  LOCAL  DEFAULT    2 $x.73
-> >    106: ffff800080014d30     0 NOTYPE  LOCAL  DEFAULT    2 $x.75
-> >    111: ffff800080014da4     0 NOTYPE  LOCAL  DEFAULT    2 $d.78
-> >    112: ffff800080014da8     0 NOTYPE  LOCAL  DEFAULT    2 $x.79
-> >     36: ffff800080014de0   200 FUNC    LOCAL  DEFAULT    2 run_init_pro=
-cess
->
-> Sami,
-> Should we change the llvm-ir linkage type for these symbols from
-> `internal` to `private`?
-> https://llvm.org/docs/LangRef.html#linkage-types
->
-> Then they would not appear in the symbol table.
->
-> At first, I thought other modules might need to directly reference
-> this data, but with the local binding, I don't think they can.
+Add a useful script that can be used to convert a kernel module path
+to the relevant Kconfig symbol name. Examples showing how to use this
+is in the help at the top of the script.
 
-For arm64, we don't explicitly emit symbols for type prefixes (see
-AsmPrinter::emitKCFITypeId). These mapping symbols are emitted by
-AArch64ELFStreamer to mark data and code regions. According to the
-AArch64 ELF specification, "All mapping symbols have type STT_NOTYPE
-and binding STB_LOCAL," so I assume changing the linkage type isn't an
-option:
+Signed-off-by: Brian Masney <bmasney@redhat.com>
+---
+ scripts/kconfig/mod-to-kconfig.sh | 93 +++++++++++++++++++++++++++++++
+ 1 file changed, 93 insertions(+)
+ create mode 100755 scripts/kconfig/mod-to-kconfig.sh
 
-https://github.com/ARM-software/abi-aa/blob/main/aaelf64/aaelf64.rst#mappin=
-g-symbols
+diff --git a/scripts/kconfig/mod-to-kconfig.sh b/scripts/kconfig/mod-to-kconfig.sh
+new file mode 100755
+index 000000000000..1b69b638ebf5
+--- /dev/null
++++ b/scripts/kconfig/mod-to-kconfig.sh
+@@ -0,0 +1,93 @@
++#!/usr/bin/env bash
++# SPDX-License-Identifier: GPL-2.0-only
++#
++# Copyright (C) 2023 Red Hat, Inc. All Rights Reserved.
++# Written by Brian Masney <bmasney@redhat.com>
++#
++# This script takes as input one or more kernel module names, and outputs
++# the relevant Kconfig symbol name. This script was originally intended to help
++# identify which Kconfig options are enabled inside an initramfs.
++#
++#   x1:~/src/linux$ find /usr/lib/modules/`uname -r` -name *.ko.xz | \
++#                       ./scripts/kconfig/mod-to-kconfig.sh
++#   CONFIG_CRYPTO_USER
++#   CONFIG_CRYPTO_ESSIV
++#   CONFIG_CRYPTO_CHACHA20
++#   CONFIG_CRYPTO_TWOFISH
++#   ...
++#
++# You can also use this to walk the modules.builtin file:
++#
++#     x1:~/src/linux$ ./scripts/kconfig/mod-to-kconfig.sh < \
++#            /usr/lib/modules/`uname -r`/modules.builtin
++#
++# Pipe the output of this script into scripts/kconfig/lookup.sh if you want to
++# view the full Kconfig entries.
++#
++# Note that there is a fair bit of variability in the Makefiles across the
++# kernel and this script won't match everything. It's only been written to
++# cover the 95% use case.
++
++process_module()
++{
++	# We may have a full path, like /usr/lib/modules/`uname -r`/kernel/...`,
++	# or a relative path, like kernel/... that's found in modules.builtin.
++	local DIR
++	DIR=$(dirname "$1")
++	if [[ "${DIR}" =~ ^/ ]] ; then
++		DIR=${DIR##*/kernel/}
++	else
++		DIR=${DIR##kernel/}
++	fi
++
++	# Handle compressed module names
++	local MOD_NAME
++	MOD_NAME=$(basename "$1")
++	MOD_NAME="${MOD_NAME/.xz/}" # CONFIG_FW_LOADER_COMPRESS_XZ
++	MOD_NAME="${MOD_NAME/.zst/}" # CONFIG_FW_LOADER_COMPRESS_ZSTD
++	MOD_NAME="${MOD_NAME/.ko/}"
++	MOD_NAME="${MOD_NAME/.c/}"
++
++	local MAKEFILE
++	MAKEFILE="${DIR}/Makefile"
++	if [ ! -f "${MAKEFILE}" ] ; then
++		echo "Skipping $1 since ${MAKEFILE} is not found" >&2
++		return 1
++	fi
++
++	# There's probably a more elegant way you could do this with sed or awk,
++	# however personally I find this approach more readable in this
++	# particular case.
++	local CONFIG
++	CONFIG=$(grep --before-context=200 -w -E "${MOD_NAME}(\.o|/)" \
++		 "${DIR}/Makefile" | grep CONFIG_ | tail -n 1 | \
++		 awk -F\( '{print $2}' | awk -F\) '{print $1}')
++	if [ "${CONFIG}" = "" ] ; then
++		echo "Skipping $1 since CONFIG cannot be determined" >&2
++		return 1
++	fi
++	echo "${CONFIG}"
++}
++
++# Run this script from the toplevel kernel source directory.
++SCRIPT_PATH=$(readlink -f "$0")
++cd "$(dirname "${SCRIPT_PATH}")/../.." || exit 1
++
++RET=0
++if [[ $# == 0 ]] ; then
++	# Read module paths from stdin
++	while read -r MODULE_PATH ; do
++		if ! process_module "${MODULE_PATH}" ; then
++			RET=1
++		fi
++	done
++else
++	# Read module paths from the command line arguments
++	for NUM in $(seq 1 "$#") ; do
++		if ! process_module "${!NUM}" ; then
++			RET=1
++		fi
++	done
++fi
++
++exit "${RET}"
+-- 
+2.41.0
 
-Sami
