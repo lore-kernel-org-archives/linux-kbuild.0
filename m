@@ -2,72 +2,45 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3EBCEB64DD
-	for <linux-kbuild@archiver.kernel.org>; Mon,  7 Aug 2023 04:13:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A277FEB64DD
+	for <linux-kbuild@archiver.kernel.org>; Mon,  7 Aug 2023 04:17:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229520AbjHGENR (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 7 Aug 2023 00:13:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34262 "EHLO
+        id S229504AbjHGERN convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 7 Aug 2023 00:17:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229469AbjHGENP (ORCPT
+        with ESMTP id S229469AbjHGERM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 7 Aug 2023 00:13:15 -0400
-Received: from mail-0301.mail-europe.com (mail-0301.mail-europe.com [188.165.51.139])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 946B2FA;
-        Sun,  6 Aug 2023 21:13:14 -0700 (PDT)
-Date:   Mon, 07 Aug 2023 04:13:05 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-        s=protonmail3; t=1691381589; x=1691640789;
-        bh=7uqzfhuRxSmBbn5ctX5ihwDULfyOnq19+Nj7KIe2Xmo=;
-        h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-         Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-         Message-ID:BIMI-Selector;
-        b=h0S7t26u7xcb2g4C8yLrd4uq3MNXlS8pD/6KLwjw1XKZF0QwLkAKTWUyfR8eqPbT1
-         SEkgLppMLCaEjrlJNt/H9x7mMdOtUdoSP8DpALvT3gferx3Z4PMiDjRyRrQmz4eS6T
-         jEgAdz0pNxr1zcRgwSVoEvW+jMhyxYQx+tLQqxfbzWe3kI9aTFgiMproOx411jjvCy
-         d7/bdYRwB6Arz//rRZ52Gqs+j3TCij9iXgFk3GSCLZZxRU8q3vdM6MbeVUv+JPF/0y
-         KRSIp0uYScwe5HHA/FYYCMfhk/kpc+xtPYvwElHhfhd2auYS7fBok4qAQvEg7rULmt
-         689aCSUodfmkQ==
-To:     Masahiro Yamada <masahiroy@kernel.org>
-From:   Rahul Rameshbabu <sergeantsagara@protonmail.com>
-Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] scripts: merge_config: Add flag to prevent unsetting config option
-Message-ID: <875y5rsd6c.fsf@protonmail.com>
-In-Reply-To: <CAK7LNAR_Egr+G9_HmGfrmFAEQ0Tznmbff0w9cJ=1biV5P4PmNQ@mail.gmail.com>
-References: <20230729214138.79902-1-sergeantsagara@protonmail.com> <CAK7LNAR_Egr+G9_HmGfrmFAEQ0Tznmbff0w9cJ=1biV5P4PmNQ@mail.gmail.com>
-Feedback-ID: 26003777:user:proton
+        Mon, 7 Aug 2023 00:17:12 -0400
+X-Greylist: delayed 1641 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 06 Aug 2023 21:17:11 PDT
+Received: from mail.ensignlab.com.au (mail.ensignlab.com.au [118.127.113.2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB6A8FA
+        for <linux-kbuild@vger.kernel.org>; Sun,  6 Aug 2023 21:17:11 -0700 (PDT)
+Received: from ensignlab.com.au (Not Verified[192.168.10.252]) by mail.ensignlab.com.au with Trustwave MailMarshal (v10,0,6,3739)
+        id <B64ce5c0b0008>; Sun, 06 Aug 2023 00:26:19 +1000
+Reply-To: sgtjohndailey101@gmail.com
+From:   SGM John Dailey <info@ensignlab.com.au>
+To:     linux-kbuild@vger.kernel.org
+Subject: Can I trust you ?
+Date:   05 Aug 2023 14:26:18 -0700
+Message-ID: <20230805142617.04B23F557D58EB99@ensignlab.com.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+        charset="utf-8"
+Content-Transfer-Encoding: 8BIT
+X-SEG-SpamProfiler-Analysis: v=2.4 cv=RYyDtnhv c=1 sm=1 tr=0 ts=64ce5c0c a=hXnKPWgDLWM34vL1GVP9Vg==:117 a=KB2MJBMgghoA:10 a=IkcTkHD0fZMA:10 a=UttIx32zK-AA:10 a=yZKQ-k1sMqEA:10 a=x7bEGLp0ZPQA:10 a=huMgF0JS7QKPILLfrxAA:9 a=QEXdDO2ut3YA:10 a=synKTHnKqs2Mh5PB1P5k:22
+X-SEG-SpamProfiler-Score: 0
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
+My name is Sgt Major John Dailey. I am here in Syria, I have a 
+profiling amount of $20million United States Dollars. I need an 
+honest person that can help me receive these funds for investment 
+purposes. I'm willing to compensate you with 30% of the total 
+amount for your help. If interested kindly get back to me for 
+more details.
 
-On Sun, 06 Aug, 2023 23:19:55 +0900 "Masahiro Yamada" <masahiroy@kernel.org=
-> wrote:
-> On Sun, Jul 30, 2023 at 6:42=E2=80=AFAM Rahul Rameshbabu
-> <sergeantsagara@protonmail.com> wrote:
->>
->> Overriding a previously defined entry for a config option with 'is not s=
-et'
->> may be undesirable in some fragment configuration setups.
->
-> Then, you should remove the 'is not set' entry from the fragment.
-
-I had a feeling that was the expectation. Just for reference, my flow
-for generating fragments looks like the following.
-
-  1. make allnoconfig
-  2. make menuconfig   # select the options that I desire for the fragment
-
-We can drop this patch if this is the expected developer flow. I
-realized that overriding with 'is not set' entries in a fragment is
-likely desirable, so I made this behavior change as part of a flag that
-can be set by the user.
-
---
-Thanks,
-
-Rahul Rameshbabu
-
+Regards,
+SGM John Dailey
