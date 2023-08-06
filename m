@@ -2,172 +2,98 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03DE5EB64DD
-	for <linux-kbuild@archiver.kernel.org>; Sun,  6 Aug 2023 03:20:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D783C001DE
+	for <linux-kbuild@archiver.kernel.org>; Sun,  6 Aug 2023 06:45:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229544AbjHFDUj (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 5 Aug 2023 23:20:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58062 "EHLO
+        id S229521AbjHFGpM (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 6 Aug 2023 02:45:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229468AbjHFDUi (ORCPT
+        with ESMTP id S229436AbjHFGpL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 5 Aug 2023 23:20:38 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2025B1FE1
-        for <linux-kbuild@vger.kernel.org>; Sat,  5 Aug 2023 20:20:36 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id 41be03b00d2f7-563e21a6011so2475069a12.0
-        for <linux-kbuild@vger.kernel.org>; Sat, 05 Aug 2023 20:20:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691292035; x=1691896835;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1l5PpttEWgTbTiDqutcx7xzkKoPKzCAMtPG7TkBUcIk=;
-        b=U0JA7ov3qbXjfk9Jm+wN+CLBpEtJwLTRyV4VeoZFM5Zn+wJ6qW+JIoCvwaVUuW1laI
-         gosNoq6YJB0Ev+W1mBtn+0cPL74MR2lp6MQubyu5exhiwGVmMu/SQWpvMq4a6Vy0nqdT
-         qw6SPO+jLxoZZZ6jZ5VhlOx4EgE9ZRJV4520u8aAWFDCNGaMcIrABNAFlxkitzKCedEU
-         KXU+ns+BOpCeUee7MNEnFCowpjNuv14ntku970ACBe7njqDsPkR1FsFrxsJw2zG0TCop
-         YThaIAV1b9eDKcdJ+9tBNb1YvDWzPylSeZ7gULJnvtsm03V5cxN1ZCt5x6+8mGa//XK+
-         v+og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691292035; x=1691896835;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1l5PpttEWgTbTiDqutcx7xzkKoPKzCAMtPG7TkBUcIk=;
-        b=P0D7SgmuAfZIVO/6ajtK7XzSUnsfcpzFJ9E50hcTl1M/YUIvUnmzquAUaYl8/wCKq3
-         kCaxx02dgrnTuS84ufOispktPAH4IpOKbxA8gLr0evAbtY9PKAsXSd6zxCofpUCGirkL
-         sQ7mAlFpf1r7GPb1LU2tzTu1ojWcXpBainhsVUD+dk+Msn8pg9RzWQ4PyY3XAfcHpFlN
-         93pnJLclNzJ2FkSm3n/FTDX5OdsZxn0oJqiryC7FrltzIxGno+SeN5rP6KUQMYp2bEnD
-         pPx9KLG091gGDi7JU4lVh6mXd9SSgST1dFdGMqMrjNWaVw8ltGPwxF5OAI3RiDuOSA39
-         iNIg==
-X-Gm-Message-State: AOJu0YwGGUl4KviM4sq7lvf5/AhCsbCsgUlePXG7BmAFrsebIrxWUxiS
-        yIR2ICaCaUJq5qIj6lKNch5jqG9jnrI8gsDs/GAgtLbi31s=
-X-Google-Smtp-Source: AGHT+IFyT1lN5P+5BkNgdGRs9V1XZpCDulXTBDc5Q96DgOrVCnM2ZtHP72ebR8PD+1RtecHjZrDS2HaX8JtYXRjycJ0=
-X-Received: by 2002:a17:90a:ea0a:b0:263:2335:594e with SMTP id
- w10-20020a17090aea0a00b002632335594emr5826465pjy.38.1691292035213; Sat, 05
- Aug 2023 20:20:35 -0700 (PDT)
+        Sun, 6 Aug 2023 02:45:11 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9BCF1FD4;
+        Sat,  5 Aug 2023 23:45:09 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 54B9360F87;
+        Sun,  6 Aug 2023 06:45:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AC09C433C8;
+        Sun,  6 Aug 2023 06:45:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1691304308;
+        bh=uNG7eW59DkHR03SvfUijrRfJtqldDdsoJpdtu0H745E=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=nD15+Jappd81Lbgw48rpkDz0SZ71w7vol38DHWguz7ueABSgNuRtGfhWXafG8aSF3
+         lTrOEfpO25dyE7S2O6ktVGA5jtT5V/ipKdFCQAGD4UNDqKRtBrj70XVRUkt/k0N7gw
+         rEhP9o7O8xmA4GX026uVgp6jFzJRjz86jJwKH89U=
+Date:   Sun, 6 Aug 2023 08:45:04 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Shreenidhi Shedi <yesshedi@gmail.com>
+Cc:     dhowells@redhat.com, dwmw2@infradead.org, masahiroy@kernel.org,
+        nathan@kernel.org, ndesaulniers@google.com, nicolas@fjasle.eu,
+        linux-kernel@vger.kernel.org, sshedi@vmware.com,
+        linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH v7 8/8] kbuild: modinst: do modules_install step by step
+Message-ID: <2023080630-entomb-ogle-3da8@gregkh>
+References: <20230623145358.568971-1-yesshedi@gmail.com>
+ <20230623145358.568971-9-yesshedi@gmail.com>
+ <2023080434-verbose-value-1200@gregkh>
+ <9ff945e6-c963-41d2-9df2-542d83ada519@gmail.com>
 MIME-Version: 1.0
-References: <20230806031658.1656667-1-Mr.Bossman075@gmail.com>
-In-Reply-To: <20230806031658.1656667-1-Mr.Bossman075@gmail.com>
-From:   Jesse T <mr.bossman075@gmail.com>
-Date:   Sat, 5 Aug 2023 23:20:24 -0400
-Message-ID: <CAJFTR8QZDxhmyDewqsuOmVUHDvspw-W_wbNAFAQ+MUpr3pwhBQ@mail.gmail.com>
-Subject: Re: [PATCH v1] kconfig: nconf: Keep position after jump search
-To:     linux-kbuild@vger.kernel.org
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Stephen Boyd <sboyd@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9ff945e6-c963-41d2-9df2-542d83ada519@gmail.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Please ignore this email refer to v2
+On Sun, Aug 06, 2023 at 12:30:22AM +0530, Shreenidhi Shedi wrote:
+> On 04/08/23 19:36, Greg KH wrote:
+> > On Fri, Jun 23, 2023 at 08:23:58PM +0530, Shreenidhi Shedi wrote:
+> > > Currently Makefile.modinst does three tasks on each module built:
+> > > - Install modules
+> > > - Sign modules
+> > > - Compress modules
+> > > 
+> > > All the above tasks happen from a single place.
+> > > 
+> > > This patch divides this task further and uses a different makefile for
+> > > each task.
+> > > Signing module logic is completely refactored and everything happens
+> > > from a shell script now.
+> > > 
+> > > Signed-off-by: Shreenidhi Shedi <yesshedi@gmail.com>
+> > > ---
+> > >   scripts/Makefile.compress |  53 ++++++++++++++++++
+> > >   scripts/Makefile.install  |  66 +++++++++++++++++++++++
+> > >   scripts/Makefile.modinst  | 111 +++-----------------------------------
+> > >   scripts/Makefile.sign     |  37 +++++++++++++
+> > >   scripts/signfile.sh       |  24 +++++++++
+> > >   5 files changed, 186 insertions(+), 105 deletions(-)
+> > >   create mode 100644 scripts/Makefile.compress
+> > >   create mode 100644 scripts/Makefile.install
+> > >   create mode 100644 scripts/Makefile.sign
+> > >   create mode 100755 scripts/signfile.sh
+> > 
+> > As you are touching the build process, you should always cc: the proper
+> > mailing list, and the KBUILD maintainer.  Please do so for this series,
+> > as that is the proper tree for this to go through.
+> > 
+> > thanks,
+> > 
+> > greg k-h
+> 
+> Thanks for the inputs Greg.
+> 
+> CC-ing linux-kbuild@vger.kernel.org as suggested.
 
-On Sat, Aug 5, 2023 at 11:16=E2=80=AFPM Jesse Taube <mr.bossman075@gmail.co=
-m> wrote:
->
-> In this Menuconfig, pressing the key in the (#) prefix will jump
-> directly to that location. You will be returned to the current search
-> results after exiting this new menu.
->
-> In nconfig, exiting always returns to the top of the search output, not
-> to where the (#) was displayed on the search output screen.
->
-> This patch fixes that by saving the current position in the search.
->
-> Reported-by: Randy Dunlap <rdunlap@infradead.org>
-> Link: https://lore.kernel.org/r/20230805034445.2508362-1-Mr.Bossman075@gm=
-ail.com/
-> Signed-off-by: Jesse Taube <Mr.Bossman075@gmail.com>
-> ---
->  scripts/kconfig/nconf.c     |  3 ++-
->  scripts/kconfig/nconf.gui.c | 12 +++++++++++-
->  scripts/kconfig/nconf.h     |  1 +
->  3 files changed, 14 insertions(+), 2 deletions(-)
->
-> diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-> index 172dc8fdd3ef..536332286c2f 100644
-> --- a/scripts/kconfig/nconf.c
-> +++ b/scripts/kconfig/nconf.c
-> @@ -749,7 +749,7 @@ static void search_conf(void)
->         struct gstr res;
->         struct gstr title;
->         char *dialog_input;
-> -       int dres;
-> +       int dres, vscroll =3D 0, hscroll =3D 0;
->         bool again;
->
->         title =3D str_new();
-> @@ -790,6 +790,7 @@ static void search_conf(void)
->                 res =3D get_relations_str(sym_arr, &head);
->                 dres =3D show_scroll_win_ext(main_window,
->                                 "Search Results", str_get(&res),
-> +                               &vscroll, &hscroll,
->                                 handle_search_keys, &data);
->                 again =3D false;
->                 if (dres >=3D '1' && dres <=3D '9') {
-> diff --git a/scripts/kconfig/nconf.gui.c b/scripts/kconfig/nconf.gui.c
-> index bf015895053c..a3f7c921d6c2 100644
-> --- a/scripts/kconfig/nconf.gui.c
-> +++ b/scripts/kconfig/nconf.gui.c
-> @@ -501,11 +501,12 @@ void show_scroll_win(WINDOW *main_window,
->                 const char *title,
->                 const char *text)
->  {
-> -       (void)show_scroll_win_ext(main_window, title, (char *)text, NULL,=
- NULL);
-> +       (void)show_scroll_win_ext(main_window, title, NULL, NULL, (char *=
-)text, NULL, NULL);
->  }
->
->  /* layman's scrollable window... */
->  int show_scroll_win_ext(WINDOW *main_window, const char *title, char *te=
-xt,
-> +                       int *vscroll, int *hscroll,
->                         extra_key_cb_fn extra_key_cb, void *data)
->  {
->         int res;
-> @@ -522,6 +523,11 @@ int show_scroll_win_ext(WINDOW *main_window, const c=
-har *title, char *text,
->         PANEL *panel;
->         bool done =3D false;
->
-> +       if (hscroll)
-> +               start_x =3D *hscroll;
-> +       if (vscroll)
-> +               start_y =3D *vscroll;
-> +
->         getmaxyx(stdscr, lines, columns);
->
->         /* find the widest line of msg: */
-> @@ -624,6 +630,10 @@ int show_scroll_win_ext(WINDOW *main_window, const c=
-har *title, char *text,
->                         start_x =3D total_cols-text_cols;
->         }
->
-> +       if (hscroll)
-> +               *hscroll =3D start_x;
-> +       if (vscroll)
-> +               *vscroll =3D start_y;
->         del_panel(panel);
->         delwin(win);
->         refresh_all_windows(main_window);
-> diff --git a/scripts/kconfig/nconf.h b/scripts/kconfig/nconf.h
-> index 912f668c5772..ab836d582664 100644
-> --- a/scripts/kconfig/nconf.h
-> +++ b/scripts/kconfig/nconf.h
-> @@ -81,6 +81,7 @@ int dialog_inputbox(WINDOW *main_window,
->                 const char *init, char **resultp, int *result_len);
->  void refresh_all_windows(WINDOW *main_window);
->  int show_scroll_win_ext(WINDOW *main_window, const char *title, char *te=
-xt,
-> +                       int *vscroll, int *hscroll,
->                         extra_key_cb_fn extra_key_cb, void *data);
->  void show_scroll_win(WINDOW *main_window,
->                 const char *title,
-> --
-> 2.40.0
->
+This doesn't actually do anything, sorry.  Please resend the whole
+patchset again and add the proper people and list.
+
+thanks,
+
+greg k-h
