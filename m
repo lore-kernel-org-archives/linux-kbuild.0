@@ -2,53 +2,53 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81BB1EB64DD
-	for <linux-kbuild@archiver.kernel.org>; Sun,  6 Aug 2023 03:17:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DADFDEB64DD
+	for <linux-kbuild@archiver.kernel.org>; Sun,  6 Aug 2023 03:20:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229483AbjHFDRC (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 5 Aug 2023 23:17:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57262 "EHLO
+        id S229506AbjHFDUe (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 5 Aug 2023 23:20:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229468AbjHFDRB (ORCPT
+        with ESMTP id S229468AbjHFDUd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 5 Aug 2023 23:17:01 -0400
-Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCF6E1FE1
-        for <linux-kbuild@vger.kernel.org>; Sat,  5 Aug 2023 20:17:00 -0700 (PDT)
-Received: by mail-qk1-x72c.google.com with SMTP id af79cd13be357-76ad8892d49so306423885a.1
-        for <linux-kbuild@vger.kernel.org>; Sat, 05 Aug 2023 20:17:00 -0700 (PDT)
+        Sat, 5 Aug 2023 23:20:33 -0400
+Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EB9A1FE1
+        for <linux-kbuild@vger.kernel.org>; Sat,  5 Aug 2023 20:20:28 -0700 (PDT)
+Received: by mail-qk1-x72d.google.com with SMTP id af79cd13be357-76571dae5feso270448285a.1
+        for <linux-kbuild@vger.kernel.org>; Sat, 05 Aug 2023 20:20:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691291819; x=1691896619;
+        d=gmail.com; s=20221208; t=1691292027; x=1691896827;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=yBdlmY+mC6rev9Riug08va+NbgbHoVlZKCz5N33Aqv8=;
-        b=IVO7TLuBl9wQ1/SKTOw4HQfsavx+ZkdOTFG5C3IPv1APexIz+cH7CBVoc4npSZK++a
-         iXwGcRwkrx3XQMHCHpQT5/IqnT6AM+yE4xWN5YZKDB2kPMcVSsqb4zhiMwzuvArzglH+
-         7oethBAWMF3rGu4IgZEe2adfL3sbXUuW3dyM5nTWEsLrADeI49Yv1Pr/XaK3iisZTF2y
-         0nhnRHWCDyEZgK69Y+0PwOI4qh4fKqHI3oS1UzejWraZw8KmtvgF+RG3CxnVSQdCUhkB
-         WMJDPMcLcWd5Ee3KEJDvqHkOfo3kLNm97bVPbHGfzmVvSHaQ9v5OE5IL5O9RcNlDdRTQ
-         rNwg==
+        bh=X9O2OZItrfOAVoQO2D+wLHnWcW9nN78WFWRXGqjAKZs=;
+        b=gRyiXpGRuctUXKHPE7cygxYn8jrxpyWFz/SIuSFiVlwWlXAS7IL8W+CZCG3LfGY/XB
+         MF/uKfgLf3wJPqJr7HbJrqdda0poST33+B3Qa5mgqoVP7W7rXC/bXjEabqf9kzkuWH/G
+         VYTXprTXfp3VD1Sft8b4gXarX9kH24uCJCUVkTqpQnpzvNkXaSoN4iQbYMRPLP1/t/+S
+         PhpZ9qOM2qScjLBIkRUZLFxKOHF5XzvDHRc2zpw8johRHL/k76MNbVauuaBi3K1BLnT4
+         XQDVnhvXxLABpqOsGIlAU4HUh5mMD7hFGv6kfODduJu7JNXrE2l1nTSEIIgIFXo5fdZC
+         1mJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691291819; x=1691896619;
+        d=1e100.net; s=20221208; t=1691292027; x=1691896827;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=yBdlmY+mC6rev9Riug08va+NbgbHoVlZKCz5N33Aqv8=;
-        b=kIrl9r6Jshx2/jseTAjM6TnYEwo64v76UlZIK4SrhML8CQmYIPAddhGdqn2X4frWKf
-         qYJrdhyMU+1J+hW5Ii2ckCrkzSsdqOPqPjz1tpBml4yhXSc3cbqMevc6y1OImZ0ihc6y
-         o27y2KeVI0+woixx4go0FSaz+7wEGAS1xsgU2RjDP1fE6HqCpCgn7gOeGSrR9GLRIK4Y
-         0p9W0WeuW97vLaLGXX9JZldHAQBdVCjPyqn2AA2eNowW40cl9vhxnwqjCJrsiHiyQvho
-         Hh4hGsOymFpy6sTX9xdtbsebcxPuWcGvGNIklHXMb2cdHPIYnTSIyMqBK66OjZPxk5Tw
-         TpXA==
-X-Gm-Message-State: AOJu0Yya2Nuu1aJUErfeJErSwpJjGoz89EDUT0tR08EtByZ5TXpV5jzW
-        KlAXeFeY29yeg11BQa/feDfqjv4DknWU0w==
-X-Google-Smtp-Source: AGHT+IHc/3oHN7U/LbkzTBcGl33i4slLzEVqz7ifaSVl0M2KN1G+tkQmHGlaVteIzcw52xJTgLs/5Q==
-X-Received: by 2002:a05:620a:1aa5:b0:76c:b2d5:5bbe with SMTP id bl37-20020a05620a1aa500b0076cb2d55bbemr7389410qkb.14.1691291819600;
-        Sat, 05 Aug 2023 20:16:59 -0700 (PDT)
+        bh=X9O2OZItrfOAVoQO2D+wLHnWcW9nN78WFWRXGqjAKZs=;
+        b=d9XIbdmqckd+vejKg2UWF/pRpgdh/dKc7+QV3MZ4ipOhmQp9S/Dw+RELmVEwMkPBYm
+         KvRHD9NyCSuiGa903iQqVpeeLUq2Ql8E7LWQ8CfnUSc9KK6mk5kwAdT2z8qApwFCZGsO
+         Jt4DL3MJmJj58OBU47OaWS4EeUtSVxjwUz+RXX2TuZW/671W1tGdqx36NZbPvuffqEBI
+         nvT2fBJf/6iYQsMrbLwdb+vflUpE+qQItB1xWdj0+13vrwd7EztyNadQxIZ+V+2yuP6v
+         BzysyHPuQKtQCxW18X8eUyGQnw7fi9H5IK3is9r7f/dtUAj/Xi+t0sopvldnSb8pzrEx
+         V+bQ==
+X-Gm-Message-State: AOJu0Ywy8hP+663UwPEEviL5I75wE7iM6owf3lvGll3Bsp91mcjdR+9W
+        kfwyzQBa4Pw7NZ9N9DPkZ12xB5gYrulchg==
+X-Google-Smtp-Source: AGHT+IGxKO1tUIKCNZ0X9QIFYbfci6rcB3u7DdHNlsFoNw8uULYR/QXRiXVJWLu6AAaKgpIsQE8gig==
+X-Received: by 2002:a05:620a:4456:b0:76c:b476:f712 with SMTP id w22-20020a05620a445600b0076cb476f712mr8610051qkp.51.1691292027076;
+        Sat, 05 Aug 2023 20:20:27 -0700 (PDT)
 Received: from jesse-desktop.jtp-bos.lab ([2600:4040:57a3:100:4d2:1712:5755:2865])
-        by smtp.gmail.com with ESMTPSA id j5-20020a05620a000500b0076cbcf8ad3bsm1696491qki.55.2023.08.05.20.16.58
+        by smtp.gmail.com with ESMTPSA id k8-20020a0cf588000000b00631eaf8b9e5sm1876787qvm.138.2023.08.05.20.20.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Aug 2023 20:16:59 -0700 (PDT)
+        Sat, 05 Aug 2023 20:20:26 -0700 (PDT)
 From:   Jesse Taube <mr.bossman075@gmail.com>
 X-Google-Original-From: Jesse Taube <Mr.Bossman075@gmail.com>
 To:     linux-kbuild@vger.kernel.org
@@ -57,8 +57,8 @@ Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         Randy Dunlap <rdunlap@infradead.org>,
         Stephen Boyd <sboyd@kernel.org>
 Subject: [PATCH v1] kconfig: nconf: Keep position after jump search
-Date:   Sat,  5 Aug 2023 23:16:58 -0400
-Message-Id: <20230806031658.1656667-1-Mr.Bossman075@gmail.com>
+Date:   Sat,  5 Aug 2023 23:20:26 -0400
+Message-Id: <20230806032026.1718752-1-Mr.Bossman075@gmail.com>
 X-Mailer: git-send-email 2.40.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -106,7 +106,7 @@ index 172dc8fdd3ef..536332286c2f 100644
  		again = false;
  		if (dres >= '1' && dres <= '9') {
 diff --git a/scripts/kconfig/nconf.gui.c b/scripts/kconfig/nconf.gui.c
-index bf015895053c..a3f7c921d6c2 100644
+index bf015895053c..5c54d6fec460 100644
 --- a/scripts/kconfig/nconf.gui.c
 +++ b/scripts/kconfig/nconf.gui.c
 @@ -501,11 +501,12 @@ void show_scroll_win(WINDOW *main_window,
@@ -114,7 +114,7 @@ index bf015895053c..a3f7c921d6c2 100644
  		const char *text)
  {
 -	(void)show_scroll_win_ext(main_window, title, (char *)text, NULL, NULL);
-+	(void)show_scroll_win_ext(main_window, title, NULL, NULL, (char *)text, NULL, NULL);
++	(void)show_scroll_win_ext(main_window, title, (char *)text, NULL, NULL, NULL, NULL);
  }
  
  /* layman's scrollable window... */
