@@ -2,63 +2,63 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56A5FEB64DD
-	for <linux-kbuild@archiver.kernel.org>; Mon,  7 Aug 2023 11:16:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D89BC41513
+	for <linux-kbuild@archiver.kernel.org>; Mon,  7 Aug 2023 11:16:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231493AbjHGLP7 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 7 Aug 2023 07:15:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49710 "EHLO
+        id S232142AbjHGLQD (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 7 Aug 2023 07:16:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232142AbjHGLPj (ORCPT
+        with ESMTP id S232152AbjHGLPj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Mon, 7 Aug 2023 07:15:39 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BD192684;
-        Mon,  7 Aug 2023 04:14:30 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-68783004143so2969639b3a.2;
-        Mon, 07 Aug 2023 04:14:30 -0700 (PDT)
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4236C1998;
+        Mon,  7 Aug 2023 04:14:33 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-686efb9ee0cso4186225b3a.3;
+        Mon, 07 Aug 2023 04:14:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691406813; x=1692011613;
+        d=gmail.com; s=20221208; t=1691406808; x=1692011608;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=IbHv3wvRcvM75BkSn4zM3JPIA0eKalklIcdZaiMIV1Y=;
-        b=UWiLYD69U/Ptu1IqP/NqT9pb/7DkkiWX1cUe2kV04iEBjPOM2p/QSjE2mc70FuQsPA
-         I6Xto/Zk8ZHdmeKqABoppPi5SAWcnpfTOdOTjiI9oSaTImVPdubQHPDpw0Pkx7IKtKc0
-         lAMcMbO5S+RYePUcw0D41vIS5cEU2PVMRyGTR25m4d1gOpfW54ffpnStaQeLJfY4t5SU
-         S6WYE89u97HmU/rUNdIVim4amJxUnOZoKU4nlLz8DbFS2GShyWQWb6PAhwUztt7UFMZx
-         L/wJ2u0XRJrOmJSetW2f+jcRT/xhog5fLx4XxKJiMAt8UKX3KMV1gcJvnNowy2UQwvEr
-         3NGg==
+        bh=Ig5W7IVmZukpubm43ufz7bJD8pT18xKkNxAjQ1Pkr0Y=;
+        b=Nxsxc2gtfadujSZDWH7cc/dc7W+ZNp114hMajuoIKwCi17Mfc4/P0yHFCE7sUTvcix
+         qqPMTqdG3QyGE2SBMPcnmpIonHmZdbaYqFou1wsKUs/O2aB5YJaJCiytoKlHcKNwkj3d
+         qvUbuRekv2TrTamHt7fgnRYlS8Qc+AuRRigcqvZSNvdJQFeQvBXJ1fbwm7ZuQ1x9P7H7
+         UAbkL8lh/zxBNrb1z6yzDX9cl9evUuvoETb7Cw/E92QvHTDStspHeQq48Gk+1F/mj7BO
+         dxnhO/QPLP/etVNAiBvrW5HjcpQasZ6cG3CNophVUU86v7fAmxlmjetfpZDthR/PQdRP
+         yawA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691406813; x=1692011613;
+        d=1e100.net; s=20221208; t=1691406808; x=1692011608;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=IbHv3wvRcvM75BkSn4zM3JPIA0eKalklIcdZaiMIV1Y=;
-        b=jHb9uE+z1UAVbJONQ6oMPDMo0L6gKj6+agR3E6xGAokqLhRUwpwVuwXw0CPGbcXREV
-         tunbhm+E+GR5ISDzzXYgy0sL0HD196VmeyhxEu1LhFqdw1Wv1tlJe8mFYR/skmoWVR82
-         k1mgj0Q5XWxVUKBcdfA5IOEYZCMpdxt463CvqxKIMcmjxDd2ZHhgnye0jHIJmPqnEMUK
-         Vpp6y9M43402sDE8ZtHKhoctE1PoEur5IfVxM7xq51WH/yOF+vUTZcwHi5ghYPjKsdv7
-         qwGUbbXlujQOM7r8qDoEH+WSVwn1LypHkNn5NnFMfWB9WfFCyQ1xAaH8CwyQ1lW93O1F
-         hv6A==
-X-Gm-Message-State: AOJu0Yzz7KJnXidB2wiyMnr042vd/E6YUwUBb08iccZSGRbLDhIRjAe1
-        q1iqSkQO1fei4CCoHalTW/g=
-X-Google-Smtp-Source: AGHT+IEskgGrBWYJ6PO6WkImYpM8S+918p7wYiwq3v4Owtm78MeN/hL58EHQJMCVSDyWZbuEfZDtyg==
-X-Received: by 2002:a05:6a21:8187:b0:137:bc72:9c08 with SMTP id pd7-20020a056a21818700b00137bc729c08mr7722973pzb.16.1691406812946;
-        Mon, 07 Aug 2023 04:13:32 -0700 (PDT)
+        bh=Ig5W7IVmZukpubm43ufz7bJD8pT18xKkNxAjQ1Pkr0Y=;
+        b=Hl3sDcpAMV8y8nzlFXR0jrcx3cc0BT0XZ6iwPjAa+1/H7aFibmvEaR4JPMM0fPwBph
+         H/etwi8v6LoC9DyE3SjZh5eHSgiGyHGA6tGB0FY37z34BLtlnqNi1GACXK7PbA/uN2CA
+         SMUaC3POqFOBXWWtqatpdJUzXurRtuyWOguD4MdNsohes2OqWL7kuGRUOY7Ab9c477dL
+         7vEVuUbdVLHyMBJM9BHqaYoR/ozmltxhIOuQr4YpnL7FeNUMwH9jRZWWduoPTV8+/kFt
+         EVBvujiuSAqVBPH5XZYqgGAcNT/8BRD1nzFY+HOmnuECnXhKXFm/Wy0xsf7FmnLUFldD
+         52wA==
+X-Gm-Message-State: AOJu0YxsfYEdtWh/YKAplf4lDiHU/nUNszBih4uuohmRIVYDEwKm1ztL
+        KZrzAS19BmRuzqOt2LHsMnc=
+X-Google-Smtp-Source: AGHT+IFRe/K/CpxkThSa7MFgXDiNocYf6+yZh2HUY05rxMAr7ugegSi2NlisoesFfCHknUQ62NZqNg==
+X-Received: by 2002:a05:6a20:728e:b0:138:48d7:4a31 with SMTP id o14-20020a056a20728e00b0013848d74a31mr11880590pzk.62.1691406808410;
+        Mon, 07 Aug 2023 04:13:28 -0700 (PDT)
 Received: from f38.eng.vmware.com ([66.170.99.1])
-        by smtp.googlemail.com with ESMTPSA id 4-20020aa79144000000b00660d80087a8sm5939173pfi.187.2023.08.07.04.13.31
+        by smtp.googlemail.com with ESMTPSA id 4-20020aa79144000000b00660d80087a8sm5939173pfi.187.2023.08.07.04.13.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Aug 2023 04:13:32 -0700 (PDT)
+        Mon, 07 Aug 2023 04:13:28 -0700 (PDT)
 From:   Shreenidhi Shedi <yesshedi@gmail.com>
 To:     dhowells@redhat.com, dwmw2@infradead.org,
         gregkh@linuxfoundation.org, masahiroy@kernel.org,
         nathan@kernel.org, ndesaulniers@google.com, nicolas@fjasle.eu
 Cc:     yesshedi@gmail.com, linux-kernel@vger.kernel.org,
         sshedi@vmware.com, linux-kbuild@vger.kernel.org
-Subject: [PATCH v8 8/8] kbuild: modinst: do modules_install step by step
-Date:   Mon,  7 Aug 2023 16:43:16 +0530
-Message-ID: <20230807111316.315836-9-yesshedi@gmail.com>
+Subject: [PATCH v8 5/8] sign-file: improve help message
+Date:   Mon,  7 Aug 2023 16:43:13 +0530
+Message-ID: <20230807111316.315836-6-yesshedi@gmail.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230807111316.315836-1-yesshedi@gmail.com>
 References: <20230807111316.315836-1-yesshedi@gmail.com>
@@ -68,367 +68,94 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Currently Makefile.modinst does three tasks on each module built:
-- Install modules
-- Sign modules
-- Compress modules
-
-All the above tasks happen from a single place.
-
-This patch divides this task further and uses a different makefile for
-each task.
-Signing module logic is completely refactored and everything happens
-from a shell script now.
+Add a proper help message with examples on how to use this tool.
 
 Signed-off-by: Shreenidhi Shedi <yesshedi@gmail.com>
 ---
- scripts/Makefile.compress |  53 +++++++++++++++++++
- scripts/Makefile.install  |  66 +++++++++++++++++++++++
- scripts/Makefile.modinst  | 108 +++-----------------------------------
- scripts/Makefile.sign     |  37 +++++++++++++
- scripts/signfile.sh       |  24 +++++++++
- 5 files changed, 188 insertions(+), 100 deletions(-)
- create mode 100644 scripts/Makefile.compress
- create mode 100644 scripts/Makefile.install
- create mode 100644 scripts/Makefile.sign
- create mode 100755 scripts/signfile.sh
+ scripts/sign-file.c | 48 ++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 41 insertions(+), 7 deletions(-)
 
-diff --git a/scripts/Makefile.compress b/scripts/Makefile.compress
-new file mode 100644
-index 000000000000..35d337ac9b6c
---- /dev/null
-+++ b/scripts/Makefile.compress
-@@ -0,0 +1,53 @@
-+# SPDX-License-Identifier: GPL-2.0
-+# ==========================================================================
-+# Compressing modules
-+# ==========================================================================
-+
-+PHONY := __modcompress
-+__modcompress:
-+
-+include include/config/auto.conf
-+include $(srctree)/scripts/Kbuild.include
-+
-+modules := $(call read-file, $(MODORDER))
-+
-+ifeq ($(KBUILD_EXTMOD),)
-+dst := $(MODLIB)/kernel
-+else
-+INSTALL_MOD_DIR ?= updates
-+dst := $(MODLIB)/$(INSTALL_MOD_DIR)
-+endif
-+
-+suffix-y				:=
-+suffix-$(CONFIG_MODULE_COMPRESS_GZIP)	:= .gz
-+suffix-$(CONFIG_MODULE_COMPRESS_XZ)	:= .xz
-+suffix-$(CONFIG_MODULE_COMPRESS_ZSTD)	:= .zst
-+
-+modules := $(patsubst $(extmod_prefix)%.o, $(dst)/%.ko$(suffix-y), $(modules))
-+
-+__modcompress: $(modules)
-+	@:
-+
-+#
-+# Compression
-+#
-+quiet_cmd_gzip = GZIP    $@
-+      cmd_gzip = $(KGZIP) -n -f $<
-+quiet_cmd_xz = XZ      $@
-+      cmd_xz = $(XZ) --lzma2=dict=2MiB -f $<
-+quiet_cmd_zstd = ZSTD    $@
-+      cmd_zstd = $(ZSTD) -T0 --rm -f -q $<
-+
-+$(dst)/%.ko.gz: $(dst)/%.ko FORCE
-+	$(call cmd,gzip)
-+
-+$(dst)/%.ko.xz: $(dst)/%.ko FORCE
-+	$(call cmd,xz)
-+
-+$(dst)/%.ko.zst: $(dst)/%.ko FORCE
-+	$(call cmd,zstd)
-+
-+PHONY += FORCE
-+FORCE:
-+
-+.PHONY: $(PHONY)
-diff --git a/scripts/Makefile.install b/scripts/Makefile.install
-new file mode 100644
-index 000000000000..40c496cb99dc
---- /dev/null
-+++ b/scripts/Makefile.install
-@@ -0,0 +1,66 @@
-+# SPDX-License-Identifier: GPL-2.0
-+# ==========================================================================
-+# Installing modules
-+# ==========================================================================
-+
-+PHONY := __modinstall
-+__modinstall:
-+
-+include include/config/auto.conf
-+include $(srctree)/scripts/Kbuild.include
-+
-+modules := $(call read-file, $(MODORDER))
-+
-+ifeq ($(KBUILD_EXTMOD),)
-+dst := $(MODLIB)/kernel
-+else
-+INSTALL_MOD_DIR ?= updates
-+dst := $(MODLIB)/$(INSTALL_MOD_DIR)
-+endif
-+
-+$(foreach x, % :, $(if $(findstring $x, $(dst)), \
-+	$(error module installation path cannot contain '$x')))
-+
-+modules := $(patsubst $(extmod_prefix)%.o, $(dst)/%.ko$(suffix-y), $(modules))
-+
-+__modinstall: $(modules)
-+	@:
-+
-+#
-+# Installation
-+#
-+quiet_cmd_install = INSTALL $@
-+      cmd_install = mkdir -p $(dir $@); cp $< $@
-+
-+# Strip
-+#
-+# INSTALL_MOD_STRIP, if defined, will cause modules to be stripped after they
-+# are installed. If INSTALL_MOD_STRIP is '1', then the default option
-+# --strip-debug will be used. Otherwise, INSTALL_MOD_STRIP value will be used
-+# as the options to the strip command.
-+ifdef INSTALL_MOD_STRIP
-+
-+ifeq ($(INSTALL_MOD_STRIP),1)
-+strip-option := --strip-debug
-+else
-+strip-option := $(INSTALL_MOD_STRIP)
-+endif
-+
-+quiet_cmd_strip = STRIP   $@
-+      cmd_strip = $(STRIP) $(strip-option) $@
-+
-+else
-+
-+quiet_cmd_strip =
-+      cmd_strip = :
-+
-+endif
-+
-+$(dst)/%.ko: $(extmod_prefix)%.ko FORCE
-+	$(call cmd,install)
-+	$(call cmd,strip)
-+
-+PHONY += FORCE
-+FORCE:
-+
-+.PHONY: $(PHONY)
-diff --git a/scripts/Makefile.modinst b/scripts/Makefile.modinst
-index e94ac9afe17a..fc9cd7638ea5 100644
---- a/scripts/Makefile.modinst
-+++ b/scripts/Makefile.modinst
-@@ -1,119 +1,27 @@
- # SPDX-License-Identifier: GPL-2.0
- # ==========================================================================
--# Installing modules
-+# Install, Sign & Compress modules
- # ==========================================================================
+diff --git a/scripts/sign-file.c b/scripts/sign-file.c
+index 0a275256ca16..d3abc5721a7e 100644
+--- a/scripts/sign-file.c
++++ b/scripts/sign-file.c
+@@ -74,12 +74,43 @@ struct module_signature {
+ static char magic_number[] = "~Module signature appended~\n";
  
--PHONY := __modinst
--__modinst:
--
- include include/config/auto.conf
- include $(srctree)/scripts/Kbuild.include
+ static __attribute__((noreturn))
+-void format(void)
++void print_usage(void)
+ {
+-	fprintf(stderr,
+-		"Usage: scripts/sign-file [-dp] <hash algo> <key> <x509> <module> [<dest>]\n");
+-	fprintf(stderr,
+-		"       scripts/sign-file -s <raw sig> <hash algo> <x509> <module> [<dest>]\n");
++	fprintf(stderr, "Usage: scripts/sign-file [OPTIONS]... [MODULE]...\n");
++	fprintf(stderr, "Available options:\n");
++	fprintf(stderr, "-h, --help             Print this help message and exit\n");
++
++	fprintf(stderr, "\nOptional args:\n");
++	fprintf(stderr, "-s, --rawsig <sig>     Raw signature\n");
++	fprintf(stderr, "-p, --savesig          Save signature\n");
++	fprintf(stderr, "-d, --signonly         Sign only\n");
++#ifndef USE_PKCS7
++	fprintf(stderr, "-k, --usekeyid         Use key ID\n");
++#endif
++	fprintf(stderr, "-b, --bulksign         Sign modules in bulk\n");
++	fprintf(stderr, "-r, --replaceorig      Replace original\n");
++	fprintf(stderr, "-t, --dest <dest>      Destination path ");
++	fprintf(stderr, "(Exclusive with bulk option)\n");
++
++	fprintf(stderr, "\nMandatory args:\n");
++	fprintf(stderr, "-i, --privkey <key>    Private key\n");
++	fprintf(stderr, "-a, --hashalgo <alg>   Hash algorithm\n");
++	fprintf(stderr, "-x, --x509 <x509>      X509\n");
++
++	fprintf(stderr, "\nExamples:\n");
++
++	fprintf(stderr, "\n    Regular signing:\n");
++	fprintf(stderr, "     scripts/sign-file -a sha512 -i certs/signing_key.pem ");
++	fprintf(stderr, "-x certs/signing_key.x509 <module>\n");
++
++	fprintf(stderr, "\n    Signing with destination path:\n");
++	fprintf(stderr, "     scripts/sign-file -a sha512 -i certs/signing_key.pem ");
++	fprintf(stderr, "-x certs/signing_key.x509 <module> -t <path>\n");
++
++	fprintf(stderr, "\n    Signing modules in bulk:\n");
++	fprintf(stderr, "     scripts/sign-file -a sha512 -i certs/signing_key.pem ");
++	fprintf(stderr, "-x certs/signing_key.x509 -b <module1> <module2> ...\n");
++
+ 	exit(2);
+ }
  
--modules := $(call read-file, $(MODORDER))
--
--ifeq ($(KBUILD_EXTMOD),)
--dst := $(MODLIB)/kernel
--else
--INSTALL_MOD_DIR ?= updates
--dst := $(MODLIB)/$(INSTALL_MOD_DIR)
--endif
--
--$(foreach x, % :, $(if $(findstring $x, $(dst)), \
--	$(error module installation path cannot contain '$x')))
--
--suffix-y				:=
--suffix-$(CONFIG_MODULE_COMPRESS_GZIP)	:= .gz
--suffix-$(CONFIG_MODULE_COMPRESS_XZ)	:= .xz
--suffix-$(CONFIG_MODULE_COMPRESS_ZSTD)	:= .zst
--
--modules := $(patsubst $(extmod_prefix)%.o, $(dst)/%.ko$(suffix-y), $(modules))
--
--__modinst: $(modules)
--	@:
--
--#
--# Installation
--#
--quiet_cmd_install = INSTALL $@
--      cmd_install = mkdir -p $(dir $@); cp $< $@
--
--# Strip
--#
--# INSTALL_MOD_STRIP, if defined, will cause modules to be stripped after they
--# are installed. If INSTALL_MOD_STRIP is '1', then the default option
--# --strip-debug will be used. Otherwise, INSTALL_MOD_STRIP value will be used
--# as the options to the strip command.
--ifdef INSTALL_MOD_STRIP
--
--ifeq ($(INSTALL_MOD_STRIP),1)
--strip-option := --strip-debug
--else
--strip-option := $(INSTALL_MOD_STRIP)
--endif
--
--quiet_cmd_strip = STRIP   $@
--      cmd_strip = $(STRIP) $(strip-option) $@
--
--else
--
--quiet_cmd_strip =
--      cmd_strip = :
--
--endif
--
--#
--# Signing
--# Don't stop modules_install even if we can't sign external modules.
--#
--ifeq ($(CONFIG_MODULE_SIG_ALL),y)
--ifeq ($(filter pkcs11:%, $(CONFIG_MODULE_SIG_KEY)),)
--sig-key := $(if $(wildcard $(CONFIG_MODULE_SIG_KEY)),,$(srctree)/)$(CONFIG_MODULE_SIG_KEY)
--else
--sig-key := $(CONFIG_MODULE_SIG_KEY)
--endif
--quiet_cmd_sign = SIGN    $@
--      cmd_sign = scripts/sign-file -a "$(CONFIG_MODULE_SIG_HASH)" \
--				   -i "$(sig-key)" \
--				   -x certs/signing_key.x509 $@ \
--                 $(if $(KBUILD_EXTMOD),|| true)
--else
--quiet_cmd_sign :=
--      cmd_sign := :
--endif
-+PHONY := __modinst
+@@ -281,7 +312,7 @@ static void parse_args(int argc, char **argv, struct cmd_opts *opts)
+ #endif
  
- ifeq ($(modules_sign_only),)
+ 		case 'h':
+-			format();
++			print_usage();
+ 			break;
  
--$(dst)/%.ko: $(extmod_prefix)%.ko FORCE
--	$(call cmd,install)
--	$(call cmd,strip)
--	$(call cmd,sign)
-+__modinst: FORCE
-+	$(MAKE) -f scripts/Makefile.install
-+	$(MAKE) -f scripts/Makefile.sign
-+	$(MAKE) -f scripts/Makefile.compress
+ 		case 'i':
+@@ -312,7 +343,7 @@ static void parse_args(int argc, char **argv, struct cmd_opts *opts)
+ 			break;
  
- else
+ 		default:
+-			format();
++			print_usage();
+ 			break;
+ 		}
+ 	} while (opt != -1);
+@@ -472,6 +503,9 @@ int main(int argc, char **argv)
+ 	argc -= optind;
+ 	argv += optind;
  
--$(dst)/%.ko: FORCE
--	$(call cmd,sign)
-+__modinst: FORCE
-+	$(MAKE) -f scripts/Makefile.sign
- 
- endif
- 
--#
--# Compression
--#
--quiet_cmd_gzip = GZIP    $@
--      cmd_gzip = $(KGZIP) -n -f $<
--quiet_cmd_xz = XZ      $@
--      cmd_xz = $(XZ) --lzma2=dict=2MiB -f $<
--quiet_cmd_zstd = ZSTD    $@
--      cmd_zstd = $(ZSTD) -T0 --rm -f -q $<
--
--$(dst)/%.ko.gz: $(dst)/%.ko FORCE
--	$(call cmd,gzip)
--
--$(dst)/%.ko.xz: $(dst)/%.ko FORCE
--	$(call cmd,xz)
--
--$(dst)/%.ko.zst: $(dst)/%.ko FORCE
--	$(call cmd,zstd)
--
- PHONY += FORCE
- FORCE:
- 
-diff --git a/scripts/Makefile.sign b/scripts/Makefile.sign
-new file mode 100644
-index 000000000000..d6b242b16657
---- /dev/null
-+++ b/scripts/Makefile.sign
-@@ -0,0 +1,37 @@
-+# SPDX-License-Identifier: GPL-2.0
-+# ==========================================================================
-+# Signing modules
-+# ==========================================================================
++	if ((opts.bulk_sign && opts.dest_name) || (!opts.bulk_sign && argc != 1))
++		print_usage();
 +
-+PHONY := __modsign
-+__modsign:
-+
-+include include/config/auto.conf
-+include $(srctree)/scripts/Kbuild.include
-+
-+#
-+# Signing
-+# Don't stop modules_install even if we can't sign external modules.
-+#
-+ifeq ($(CONFIG_MODULE_SIG_ALL),y)
-+ifeq ($(filter pkcs11:%, $(CONFIG_MODULE_SIG_KEY)),)
-+sig-key := $(if $(wildcard $(CONFIG_MODULE_SIG_KEY)),,$(srctree)/)$(CONFIG_MODULE_SIG_KEY)
-+else
-+sig-key := $(CONFIG_MODULE_SIG_KEY)
-+endif
-+quiet_cmd_sign = SIGNING ALL MODULES ...
-+      cmd_sign = $(CONFIG_SHELL) $(srctree)/scripts/signfile.sh \
-+					 "$(CONFIG_MODULE_SIG_HASH)" \
-+					 "$(sig-key)"
-+else
-+quiet_cmd_sign :=
-+      cmd_sign := :
-+endif
-+
-+__modsign: FORCE
-+	$(call cmd,sign)
-+
-+PHONY += FORCE
-+FORCE:
-+
-+.PHONY: $(PHONY)
-diff --git a/scripts/signfile.sh b/scripts/signfile.sh
-new file mode 100755
-index 000000000000..b2b58bfbd5ba
---- /dev/null
-+++ b/scripts/signfile.sh
-@@ -0,0 +1,24 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# A sign-file wrapper used by scripts/Makefile.sign
-+
-+#set -x
-+
-+if test $# -ne 2; then
-+	echo "Usage: $0 <hash-algo> <sign-key>" >&2
-+	exit 1
-+fi
-+
-+SIG_HASH="$1"
-+SIG_KEY="$2"
-+
-+MODULES_PATH="${INSTALL_MOD_PATH}/lib/modules/${KERNELRELEASE}"
-+
-+find "${MODULES_PATH}" -name *.ko -type f -print0 | \
-+	xargs -r -0 -P$(nproc) -x -n32 sh -c "\
-+${srctree}/scripts/sign-file \
-+-a \"${SIG_HASH}\" \
-+-i \"${SIG_KEY}\" \
-+-x ${srctree}/certs/signing_key.x509 \
-+-b \$@ \$0"
+ 	OpenSSL_add_all_algorithms();
+ 	ERR_load_crypto_strings();
+ 	ERR_clear_error();
 -- 
 2.41.0
 
