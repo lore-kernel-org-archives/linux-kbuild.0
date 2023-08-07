@@ -2,45 +2,62 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A277FEB64DD
-	for <linux-kbuild@archiver.kernel.org>; Mon,  7 Aug 2023 04:17:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03F7DEB64DD
+	for <linux-kbuild@archiver.kernel.org>; Mon,  7 Aug 2023 08:26:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229504AbjHGERN convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 7 Aug 2023 00:17:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34722 "EHLO
+        id S229459AbjHGI0Q (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 7 Aug 2023 04:26:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229469AbjHGERM (ORCPT
+        with ESMTP id S229520AbjHGI0P (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 7 Aug 2023 00:17:12 -0400
-X-Greylist: delayed 1641 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 06 Aug 2023 21:17:11 PDT
-Received: from mail.ensignlab.com.au (mail.ensignlab.com.au [118.127.113.2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB6A8FA
-        for <linux-kbuild@vger.kernel.org>; Sun,  6 Aug 2023 21:17:11 -0700 (PDT)
-Received: from ensignlab.com.au (Not Verified[192.168.10.252]) by mail.ensignlab.com.au with Trustwave MailMarshal (v10,0,6,3739)
-        id <B64ce5c0b0008>; Sun, 06 Aug 2023 00:26:19 +1000
-Reply-To: sgtjohndailey101@gmail.com
-From:   SGM John Dailey <info@ensignlab.com.au>
-To:     linux-kbuild@vger.kernel.org
-Subject: Can I trust you ?
-Date:   05 Aug 2023 14:26:18 -0700
-Message-ID: <20230805142617.04B23F557D58EB99@ensignlab.com.au>
+        Mon, 7 Aug 2023 04:26:15 -0400
+X-Greylist: delayed 629 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 07 Aug 2023 01:25:43 PDT
+Received: from mail.wownow24.com (mail.wownow24.com [94.177.230.243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9C0B1BF0
+        for <linux-kbuild@vger.kernel.org>; Mon,  7 Aug 2023 01:25:43 -0700 (PDT)
+Received: by mail.wownow24.com (Postfix, from userid 1001)
+        id 4C07F8308B; Mon,  7 Aug 2023 09:15:43 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=wownow24.com; s=mail;
+        t=1691396149; bh=x9T7/X5dPfTlbNyLzlCZN4jD7cG5+UEf0V0g2YAP0IM=;
+        h=Date:From:To:Subject:From;
+        b=m2mTnElbcg3ovIk1X7HHh8/rSuhFHCz0Yl2UKoePMB4oc9Lqa/652U/oitdqXw7sw
+         hZuldMgqY7SNVm6bB4kLAhb2ENbwOtwpAIKdfuKgaaGqXHQ6BT0jgxfWAgH94+VRwv
+         drTuuZLds+rPBivqwU38V06xKAEuM8K62YJb36bCN7G4DRrfovOJdKST6SkwDeHV1H
+         jpWLRALAe3bI/jbEb+6+P6hM24Gby84zE6JUqvjIZGk9l7aODeP+yvKlcfC1/MnLhe
+         sfAet81sNH8NOpnIV6Jd6By60/f7a0Yu+PUq/vXjsI+K1XNXEQW+gnIZOQDrue8dIz
+         ukMuySJBe5RfQ==
+Received: by mail.wownow24.com for <linux-kbuild@vger.kernel.org>; Mon,  7 Aug 2023 08:15:34 GMT
+Message-ID: <20230807074500-0.1.56.emyf.0.0qqgjaaf3i@wownow24.com>
+Date:   Mon,  7 Aug 2023 08:15:34 GMT
+From:   "Kurt Birky" <kurt.birky@wownow24.com>
+To:     <linux-kbuild@vger.kernel.org>
+Subject: Free 60-Day Trial: Enhance Your Production Processes
+X-Mailer: mail.wownow24.com
 MIME-Version: 1.0
-Content-Type: text/plain;
-        charset="utf-8"
-Content-Transfer-Encoding: 8BIT
-X-SEG-SpamProfiler-Analysis: v=2.4 cv=RYyDtnhv c=1 sm=1 tr=0 ts=64ce5c0c a=hXnKPWgDLWM34vL1GVP9Vg==:117 a=KB2MJBMgghoA:10 a=IkcTkHD0fZMA:10 a=UttIx32zK-AA:10 a=yZKQ-k1sMqEA:10 a=x7bEGLp0ZPQA:10 a=huMgF0JS7QKPILLfrxAA:9 a=QEXdDO2ut3YA:10 a=synKTHnKqs2Mh5PB1P5k:22
-X-SEG-SpamProfiler-Score: 0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-My name is Sgt Major John Dailey. I am here in Syria, I have a 
-profiling amount of $20million United States Dollars. I need an 
-honest person that can help me receive these funds for investment 
-purposes. I'm willing to compensate you with 30% of the total 
-amount for your help. If interested kindly get back to me for 
-more details.
+Hi!
 
-Regards,
-SGM John Dailey
+We have created a tool for automatic data collection from production stat=
+ions that can improve your work and increase the efficiency of processes.
+
+Quick to install and easy to use, the solution will provide you with valu=
+able data on performance indicators for the entire factory and individual=
+ machines. The tool clearly indicates when the machine/line slows down, w=
+hat downtimes it has, and so you know when to react.
+
+You receive valuable knowledge about the production status and the reason=
+s for possible delays. Thanks to the ability to react immediately to emer=
+ging problems and symptoms, you increase your work efficiency by several =
+dozen percent.
+
+Do you want to test such a solution for free in your company?
+
+
+Best regards
+Kurt Birky
