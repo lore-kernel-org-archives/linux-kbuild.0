@@ -2,119 +2,72 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB5F7C0015E
-	for <linux-kbuild@archiver.kernel.org>; Mon,  7 Aug 2023 02:38:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3EBCEB64DD
+	for <linux-kbuild@archiver.kernel.org>; Mon,  7 Aug 2023 04:13:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229820AbjHGCi0 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 6 Aug 2023 22:38:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43688 "EHLO
+        id S229520AbjHGENR (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 7 Aug 2023 00:13:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229481AbjHGCiZ (ORCPT
+        with ESMTP id S229469AbjHGENP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 6 Aug 2023 22:38:25 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0C51E6A
-        for <linux-kbuild@vger.kernel.org>; Sun,  6 Aug 2023 19:38:24 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4DA7161302
-        for <linux-kbuild@vger.kernel.org>; Mon,  7 Aug 2023 02:38:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6AD7C433C9
-        for <linux-kbuild@vger.kernel.org>; Mon,  7 Aug 2023 02:38:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691375903;
-        bh=qXM1eDBQja7Qyd7W7cUKYUC0UUVvRKhsi2LmrP3oRQo=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=AC3VqK6aZRkJm5yGL84bR9+cJzi5AJRQBeYBuD7m4g32gtc+Z59oL8xfiha88+Z0V
-         1ivhs8EIv2ReJ+Cr+CFYYy9vPceaSRg2DObYmBbMzpQhnNt4V0RAumOXW0bi07YSRf
-         5/pIt9wot9kglGyI8Z6NxqkxMQmz+IqmnqPSN5QpKzPpQ5r+40lQiyLO/WTBmblYmt
-         7A8JgeKM2Gj5gY/0roNfl9wOm0P2wGlPGnkvY6fsddxrJV+eh3KhEkupDVHSOz/06J
-         txcTY3vPHsRjAGH/zcIzleGtCFD/UickXHolTeKlwUOn9TrONDvE9Hdbfgkfk6YkVc
-         IA0FqYTsiT1UA==
-Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-56c96982829so2858611eaf.0
-        for <linux-kbuild@vger.kernel.org>; Sun, 06 Aug 2023 19:38:23 -0700 (PDT)
-X-Gm-Message-State: AOJu0YxTgys3vQ9VA2aZCiAsfO5tPWTkapUiSuD/WPSivqIpncKUcIrq
-        HNLJ1nZGkGr0rciZ9kfDOY3WFdnHh0Qus1H+krA=
-X-Google-Smtp-Source: AGHT+IEGBlJMkIwrht93lp66sYjlk2FKMUcmDQUGPc/AlP8VHGDPEMqyoHSzI5dDPR3KU2L9HX6+NyqdsCJNUC3qlt4=
-X-Received: by 2002:a4a:3914:0:b0:55a:f44b:43cd with SMTP id
- m20-20020a4a3914000000b0055af44b43cdmr8035555ooa.7.1691375903002; Sun, 06 Aug
- 2023 19:38:23 -0700 (PDT)
+        Mon, 7 Aug 2023 00:13:15 -0400
+Received: from mail-0301.mail-europe.com (mail-0301.mail-europe.com [188.165.51.139])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 946B2FA;
+        Sun,  6 Aug 2023 21:13:14 -0700 (PDT)
+Date:   Mon, 07 Aug 2023 04:13:05 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+        s=protonmail3; t=1691381589; x=1691640789;
+        bh=7uqzfhuRxSmBbn5ctX5ihwDULfyOnq19+Nj7KIe2Xmo=;
+        h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+         Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+         Message-ID:BIMI-Selector;
+        b=h0S7t26u7xcb2g4C8yLrd4uq3MNXlS8pD/6KLwjw1XKZF0QwLkAKTWUyfR8eqPbT1
+         SEkgLppMLCaEjrlJNt/H9x7mMdOtUdoSP8DpALvT3gferx3Z4PMiDjRyRrQmz4eS6T
+         jEgAdz0pNxr1zcRgwSVoEvW+jMhyxYQx+tLQqxfbzWe3kI9aTFgiMproOx411jjvCy
+         d7/bdYRwB6Arz//rRZ52Gqs+j3TCij9iXgFk3GSCLZZxRU8q3vdM6MbeVUv+JPF/0y
+         KRSIp0uYScwe5HHA/FYYCMfhk/kpc+xtPYvwElHhfhd2auYS7fBok4qAQvEg7rULmt
+         689aCSUodfmkQ==
+To:     Masahiro Yamada <masahiroy@kernel.org>
+From:   Rahul Rameshbabu <sergeantsagara@protonmail.com>
+Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] scripts: merge_config: Add flag to prevent unsetting config option
+Message-ID: <875y5rsd6c.fsf@protonmail.com>
+In-Reply-To: <CAK7LNAR_Egr+G9_HmGfrmFAEQ0Tznmbff0w9cJ=1biV5P4PmNQ@mail.gmail.com>
+References: <20230729214138.79902-1-sergeantsagara@protonmail.com> <CAK7LNAR_Egr+G9_HmGfrmFAEQ0Tznmbff0w9cJ=1biV5P4PmNQ@mail.gmail.com>
+Feedback-ID: 26003777:user:proton
 MIME-Version: 1.0
-References: <20230806032026.1718752-1-Mr.Bossman075@gmail.com>
- <9c86c832-9a2c-0500-292f-5449e21be7e3@infradead.org> <CAJFTR8QzSpopeooARoz8S2Dy7jr8p8gSQcgz_6ro2MM+D3Gjhg@mail.gmail.com>
-In-Reply-To: <CAJFTR8QzSpopeooARoz8S2Dy7jr8p8gSQcgz_6ro2MM+D3Gjhg@mail.gmail.com>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Mon, 7 Aug 2023 11:37:46 +0900
-X-Gmail-Original-Message-ID: <CAK7LNASj+_CGFnXHTnfrQv2h4QzwX8PCkRMDbteEd2mwVWitZw@mail.gmail.com>
-Message-ID: <CAK7LNASj+_CGFnXHTnfrQv2h4QzwX8PCkRMDbteEd2mwVWitZw@mail.gmail.com>
-Subject: Re: [PATCH v1] kconfig: nconf: Keep position after jump search
-To:     Jesse T <mr.bossman075@gmail.com>
-Cc:     Randy Dunlap <rdunlap@infradead.org>, linux-kbuild@vger.kernel.org,
-        Stephen Boyd <sboyd@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Mon, Aug 7, 2023 at 7:17=E2=80=AFAM Jesse T <mr.bossman075@gmail.com> wr=
-ote:
+
+On Sun, 06 Aug, 2023 23:19:55 +0900 "Masahiro Yamada" <masahiroy@kernel.org=
+> wrote:
+> On Sun, Jul 30, 2023 at 6:42=E2=80=AFAM Rahul Rameshbabu
+> <sergeantsagara@protonmail.com> wrote:
+>>
+>> Overriding a previously defined entry for a config option with 'is not s=
+et'
+>> may be undesirable in some fragment configuration setups.
 >
-> On Sun, Aug 6, 2023 at 11:30=E2=80=AFAM Randy Dunlap <rdunlap@infradead.o=
-rg> wrote:
-> >
-> > Hi Jesse,
-> >
-> > On 8/5/23 20:20, Jesse Taube wrote:
-> > > In this Menuconfig, pressing the key in the (#) prefix will jump
-> > > directly to that location. You will be returned to the current search
-> > > results after exiting this new menu.
-> > >
-> > > In nconfig, exiting always returns to the top of the search output, n=
-ot
-> > > to where the (#) was displayed on the search output screen.
-> > >
-> > > This patch fixes that by saving the current position in the search.
-> > >
-> >
-> > This patch fixes the reported problem. Thanks, Jesse.
-> >
-> > > Reported-by: Randy Dunlap <rdunlap@infradead.org>
-> > > Link: https://lore.kernel.org/r/20230805034445.2508362-1-Mr.Bossman07=
-5@gmail.com/
-> > > Signed-off-by: Jesse Taube <Mr.Bossman075@gmail.com>
-> >
-> > Tested-by: Randy Dunlap <rdunlap@infradead.org>
-> >
-> > Now I have another issue. :(
-> >
-> > Here is my test case: x86_64 defconfig.
-> >
-> > SymSearch (F8) for MSR.
-> > Page Down to #3. Select 3.
-> > X86_MSR is about 7 lines below the highlighted line in the menu,
-> > which is confusing and sometimes it's not obvious what the correct
-> > line for the symbol is.
-> >
-> > In menuconfig, the highlighted line is precisely on X86_MSR.
->
-> Oh jeez, how did I miss this?
-> I will fix this asap as this seems to be a big issue as it can easily
-> cause confusion.
-> Weirdly all the test cases I used were fine, but I found a few more like =
-this.
+> Then, you should remove the 'is not set' entry from the fragment.
 
+I had a feeling that was the expectation. Just for reference, my flow
+for generating fragments looks like the following.
 
-As it turns out, your initial nconf search is not mature enough.
+  1. make allnoconfig
+  2. make menuconfig   # select the options that I desire for the fragment
 
-I will drop it from my tree.
+We can drop this patch if this is the expected developer flow. I
+realized that overriding with 'is not set' entries in a fragment is
+likely desirable, so I made this behavior change as part of a flag that
+can be set by the user.
 
+--
+Thanks,
 
+Rahul Rameshbabu
 
-
-
---=20
-Best Regards
-Masahiro Yamada
