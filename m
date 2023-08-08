@@ -2,120 +2,127 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D191C04A6A
-	for <linux-kbuild@archiver.kernel.org>; Tue,  8 Aug 2023 20:03:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F26EC001B0
+	for <linux-kbuild@archiver.kernel.org>; Tue,  8 Aug 2023 20:04:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234339AbjHHUDa (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 8 Aug 2023 16:03:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43948 "EHLO
+        id S232905AbjHHUE4 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 8 Aug 2023 16:04:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232905AbjHHUDD (ORCPT
+        with ESMTP id S232997AbjHHUEo (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 8 Aug 2023 16:03:03 -0400
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 470D38DC4A
-        for <linux-kbuild@vger.kernel.org>; Tue,  8 Aug 2023 11:21:53 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id 41be03b00d2f7-56401f1da3dso3429174a12.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 08 Aug 2023 11:21:53 -0700 (PDT)
+        Tue, 8 Aug 2023 16:04:44 -0400
+Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4557C7EEF
+        for <linux-kbuild@vger.kernel.org>; Tue,  8 Aug 2023 11:24:02 -0700 (PDT)
+Received: by mail-qv1-xf2e.google.com with SMTP id 6a1803df08f44-63d23473ed5so34480476d6.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 08 Aug 2023 11:24:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691518913; x=1692123713;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JmyLEGU8GSveXQW4ZwKDzQ9yMdM7AfBAEdQ4m4LJOnQ=;
-        b=abrxRrd0sYsjaDd1GRFKwJ9nlXO94DqGiXr7ZuKo+O01p4pxbRXCrBUFBLE1aDmbQ3
-         wsY30SOQzfkNzCj/bCy9Xt9DI51lUoBHtGGM3JQsYlVsay/aEPrVmh+N2zbcFjhoL01U
-         QkRjaFpVb1xh95xm8xeq9ILUL05tHSizKuNgaoQ1IKIOSYY1gCVmaHqUawsleyjGbQp5
-         1NMyoBj+bpqFpT0oflORFjNhiXRIZJ22UIbUa4WvKepS/SuimNUV5cWrxAXCP9qNiTc1
-         70F0VrWks96BEVtPx3J5dYiY5oE/LzDGQ6l/JHo8VUMC+YYQcRpfrDgRFiqhPMMPwVeO
-         35ZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691518913; x=1692123713;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20221208; t=1691519041; x=1692123841;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JmyLEGU8GSveXQW4ZwKDzQ9yMdM7AfBAEdQ4m4LJOnQ=;
-        b=BBfUU6cdgzLz2OVbEzW/V1W48wPXKTHVI+I53sYQ2bbYkxHSt/3sNvpTBrr5tMB6V/
-         b08fhFcsk2igZ9+eBj8gOUAAlHOByEgxfJrFox6eIU0v57W5iZpuiJ0E3wEY1B5WuDFs
-         FGqStGJTkxz42iCD91imIFlD6kYhYDTUbPKmKt3d/gs8fcdWXeW+W1vsHANoL1kYGtl9
-         gSNwuAJIUJNDKxjViQeygi7SBULs53lCfvvNr7i3cKEqjnzj4fXGFY1OdAOAqviuRVIf
-         ZjIg1wAqGiGEZNxddzjSwRwdlEXtO9M1CLFrfz/xRP5vRMtiU/QBhPe/UcQWng0ar4qD
-         jy2g==
-X-Gm-Message-State: AOJu0YyyeTGhvn4XnNLH9GXq1OAWG/FbvVjtHgtKZHA7b1Buv8a/bmPy
-        o5gMEKAc5B2/asSlpqXKMk7yPg==
-X-Google-Smtp-Source: AGHT+IG/n51ocBB6FRywFFitnfbQeW9iCANzsfD18QE1l0UvN+OO0XnZsX2w3M7ClY3FnmZNCDy5EA==
-X-Received: by 2002:a05:6a00:14d6:b0:686:7621:5494 with SMTP id w22-20020a056a0014d600b0068676215494mr242443pfu.27.1691518912493;
-        Tue, 08 Aug 2023 11:21:52 -0700 (PDT)
-Received: from google.com ([2620:15c:2d1:203:cc03:38d0:9718:e90b])
-        by smtp.gmail.com with ESMTPSA id j5-20020aa78d05000000b0065e154bac6dsm8365280pfe.133.2023.08.08.11.21.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Aug 2023 11:21:52 -0700 (PDT)
-Date:   Tue, 8 Aug 2023 11:21:47 -0700
+        bh=SuHu2aaGBtXDGm6ZbqKeYvS7JNps7v7hBHb8nXUWyCA=;
+        b=Szm+Vlx1Tmywbd71ISdGfvHzo0S11pvxk8Zu8eH5AWgDVpVmjOfx9T2c/S7v9DhvRs
+         SVXeLVpS4LFejNPELELQsdXNFG3tqCy5u/IcY9VGm7ltFF/7Vgp3uc2y+dHfwx/XqGQ2
+         nyFbRp7LsFY2cYdWXCCJcG3UzplEGvdj86LimvE/TFAArOnUMZuFlGfKs9voq3fxRew/
+         Cdvbw0HwOsexbyJuW8dj4gf1S6ae8FY/Hqq3t7A18oz8ltfyxp32MHDoFE1gaHt7upqZ
+         cy2N5fqsx68LfVRUZCJX9Gf/hivW5Y17MUJ9aRcSEnxmHGAmt6kXHSftBagzVSxwEP4t
+         O8gg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691519041; x=1692123841;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SuHu2aaGBtXDGm6ZbqKeYvS7JNps7v7hBHb8nXUWyCA=;
+        b=KkxOonpw0pztZZZ/Ab7dSudeG1NibbmJfDzRRw+RdM2P2zngjE43mXcTmMQt0NuvE4
+         IWgHET5xKL6CSqixyadR8YRd+PBjVT84hBy1DPkKNRmVaW4SwSe/1TKwLR6cnnCTrvmY
+         RV5IMLhmRajbYA5FLeTGfp3i0CB8M6EJeqdkE19ZDi8E7KPw57nmKwjuO/82mNCdFfg5
+         nehMRbR23okgTRj3zGUDW9MOrtBxhGqW6cSUop7NwgXDQyAAQ7l8HEv8qcX5yjRcPWVS
+         D6FLAt0I/wi7m1F9KZ8yv31f6jPhslGQlOHsiANANVS3UGSVouCHFhfrIInhrDvu+wmH
+         olaA==
+X-Gm-Message-State: AOJu0YwqnLlCV/EEISKzUb0reig0mGx4ktLUY3V8U4w4CrHLVIYn7Wth
+        Jo7Xowh/frJ0fK6+k8ucl7BVhO4lBxQZ7CGzezQwNg==
+X-Google-Smtp-Source: AGHT+IEuGYfM7Ti1gjPOBrG90iQRTcKJFDV2Zy0ZEcRXgZXpwwv/qmU8lNj+mqkZvmlZCUr5ZljsFeJuq0iBxNf/iao=
+X-Received: by 2002:a0c:aa94:0:b0:636:14d4:445b with SMTP id
+ f20-20020a0caa94000000b0063614d4445bmr215145qvb.9.1691519041270; Tue, 08 Aug
+ 2023 11:24:01 -0700 (PDT)
+MIME-Version: 1.0
+References: <CAKwvOd=KCT-aqcWctRPVhEoOjkjP+y5TpNK1hV9mq6PuZDvApQ@mail.gmail.com>
+ <CAK7LNASVZLYh1PZ_0QqVEfopGHUKq8fCVDmpKDZfODzgspPXEQ@mail.gmail.com>
+In-Reply-To: <CAK7LNASVZLYh1PZ_0QqVEfopGHUKq8fCVDmpKDZfODzgspPXEQ@mail.gmail.com>
 From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Tue, 8 Aug 2023 11:23:50 -0700
+Message-ID: <CAKwvOdno6=XZsAfDpUMgoBtE2kOM+fiO_KOEbkfYMPi1hg+2HA@mail.gmail.com>
+Subject: Re: missing separator. Stop. after rebuild
 To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Richard Weinberger <richard@nod.at>,
+Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Nicolas Schier <nicolas@fjasle.eu>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Richard Weinberger <richard@nod.at>,
         Anton Ivanov <anton.ivanov@cambridgegreys.com>,
         Johannes Berg <johannes@sipsolutions.net>,
-        linux-um@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, Jiri Slaby <jirislaby@kernel.org>
-Subject: Re: [PATCH v2 2/2] UML: use obj-y to descend into arch/um/*/
-Message-ID: <ZNKHu4+MlO3L6wUl@google.com>
-References: <20230721171857.3612639-1-masahiroy@kernel.org>
- <20230721171857.3612639-2-masahiroy@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230721171857.3612639-2-masahiroy@kernel.org>
+        linux-um@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sat, Jul 22, 2023 at 02:18:57AM +0900, Masahiro Yamada wrote:
-> The single build rule does not work with the core-y syntax. [1]
-> 
-> Use the standard obj-y syntax.
-> 
-> [1]: https://lore.kernel.org/linux-kbuild/d57ba55f-20a3-b836-783d-b49c8a161b6e@kernel.org/T/#m7bc402e1e038f00ebcf2e92ed7fcb8a52fc1ea44
-> 
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+On Tue, Aug 8, 2023 at 11:02=E2=80=AFAM Masahiro Yamada <masahiroy@kernel.o=
+rg> wrote:
+>
+> On Wed, Aug 9, 2023 at 2:31=E2=80=AFAM Nick Desaulniers <ndesaulniers@goo=
+gle.com> wrote:
+> >
+> > $ wget https://download.01.org/0day-ci/archive/20230808/202308081050.sZ=
+Ew4cQ5-lkp@intel.com/config
+> > -O .config
+> > $ make LLVM=3D1 ARCH=3Dum -j128 arch/um/drivers/port_kern.o
+> > $ make LLVM=3D1 ARCH=3Dum -j128 arch/um/drivers/port_kern.o
+> > arch/um/drivers/.hostaudio_kern.o.cmd:843: *** missing separator.  Stop=
+.
+> > $ sed -n -e 842p -e 843p arch/um/drivers/.hostaudio_kern.o.cmd
+> > $(deps_arch/um/drivers/hostaudio_kern.o):
+> > o)
+> >
+> > Any idea if this is some form of malformed Makefile rule, or actually
+> > a compiler bug generating these .cmd files?
+>
+>
+> Presumably, this is the same symptom as Jiri Slaby reported
+> some time ago.
+>
+> If you run a single build for arch/um/drivers/*, bad things may happen.
+>
+> He reported.
+>   This leads often to corrupted arch/um/arch/um/drivers/.ssl.o.cmd.
+>
+> https://lore.kernel.org/linux-kbuild/92f4dfe9-eb87-766b-271a-e57ada3a7dbd=
+@kernel.org/
+>
+>
+> A patch exists in ML.
+>
+> https://lore.kernel.org/all/20230721171857.3612639-2-masahiroy@kernel.org=
+/
 
-This resolves an issue I reported (but doesn't seem to be on lore
-for linux-kbuild...)
+Thanks. That resolves the issue for me. Can you pick it up if the UML
+folks don't?  It's been nearly 3 weeks.
 
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-Tested-by: Nick Desaulniers <ndesaulniers@google.com>
+>
+>
+>
+> I really want to stop using core-y or drivers-y in arch/*/Makefile.
+>
+>
+>
+> --
+> Best Regards
+> Masahiro Yamada
 
-> ---
-> 
-> Changes in v2:
->   - Rephase the commit log
-> 
->  arch/um/Kbuild   | 2 ++
->  arch/um/Makefile | 4 ----
->  2 files changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/um/Kbuild b/arch/um/Kbuild
-> index a4e40e534e6a..6cf0c1e5927b 100644
-> --- a/arch/um/Kbuild
-> +++ b/arch/um/Kbuild
-> @@ -1 +1,3 @@
->  # SPDX-License-Identifier: GPL-2.0-only
-> +
-> +obj-y += kernel/ drivers/ os-Linux/
-> diff --git a/arch/um/Makefile b/arch/um/Makefile
-> index 1735a562453d..82f05f250634 100644
-> --- a/arch/um/Makefile
-> +++ b/arch/um/Makefile
-> @@ -22,10 +22,6 @@ ARCH_DIR := arch/um
->  # features.
->  SHELL := /bin/bash
->  
-> -core-y			+= $(ARCH_DIR)/kernel/		\
-> -			   $(ARCH_DIR)/drivers/		\
-> -			   $(ARCH_DIR)/os-Linux/
-> -
->  MODE_INCLUDE	+= -I$(srctree)/$(ARCH_DIR)/include/shared/skas
->  
->  HEADER_ARCH 	:= $(SUBARCH)
-> -- 
-> 2.39.2
-> 
+
+
+--=20
+Thanks,
+~Nick Desaulniers
