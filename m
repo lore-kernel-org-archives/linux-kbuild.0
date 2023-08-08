@@ -2,176 +2,75 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 760C0C001B0
-	for <linux-kbuild@archiver.kernel.org>; Tue,  8 Aug 2023 20:08:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 787FDC001B0
+	for <linux-kbuild@archiver.kernel.org>; Tue,  8 Aug 2023 20:30:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232997AbjHHUIc (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 8 Aug 2023 16:08:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47046 "EHLO
+        id S232759AbjHHUaI (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 8 Aug 2023 16:30:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233195AbjHHUIO (ORCPT
+        with ESMTP id S231162AbjHHU36 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 8 Aug 2023 16:08:14 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9B1265B7;
-        Tue,  8 Aug 2023 11:42:32 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 405B362A29;
-        Tue,  8 Aug 2023 18:42:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3427C433CC;
-        Tue,  8 Aug 2023 18:42:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691520151;
-        bh=V6GroEZc1Lu3vGnXokTIyovbvq0wBDOW55yP+hahU6A=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=q4m2RHbU6fAbgWmSdoAWbgQEoaDcaUQGChAFTP4SADAbV47uhHRot6kzc1dz/e0LN
-         mCwEAgUUlUdLTwP87Q2rLRcc9OnD+nnDUN8NGN6sFwKEJdw4ZVEbIOv4vYGYl/u4vG
-         rzNxTEPoPspUDXBitPV3uv5C0xRx2aeNcNnYd07ulDsx9+12PlToIQJXo0gZqnmOrT
-         0H5ai6W+um/YAMCaY6IuPa2H+IFJQOTvOZkLaYH6gjYssDXr2mroiLlgrNhKQLyFyi
-         +7BhobP6j6FJ716VBNHWtSdO4zjAVVuYH4A4parGctxuEa4ywID2iYEM5Gy5mbKnhM
-         MaugWFmdqVoWg==
-Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-6bd0c953fd9so376887a34.3;
-        Tue, 08 Aug 2023 11:42:31 -0700 (PDT)
-X-Gm-Message-State: AOJu0YxkjRQau+gz96eVR9LD/hmiHCFn7cGnt7sKy81dsrWbVBFzVbpZ
-        4faApCIViaPgj65WD6SsOXGaDPzWnj4rU1If57Q=
-X-Google-Smtp-Source: AGHT+IE1kMeMgxlH7/iv9E5yoRpEJ5vphNEnh/q42PUxCdJKK/TnVq6TRswiiGhcSR90D+t3Qb4t+irdcQz0aPNdZ74=
-X-Received: by 2002:a05:6870:9a19:b0:1ad:4a74:9d63 with SMTP id
- fo25-20020a0568709a1900b001ad4a749d63mr553799oab.53.1691520150864; Tue, 08
- Aug 2023 11:42:30 -0700 (PDT)
+        Tue, 8 Aug 2023 16:29:58 -0400
+Received: from mail-qv1-xf31.google.com (mail-qv1-xf31.google.com [IPv6:2607:f8b0:4864:20::f31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5650B8E97D
+        for <linux-kbuild@vger.kernel.org>; Tue,  8 Aug 2023 10:31:14 -0700 (PDT)
+Received: by mail-qv1-xf31.google.com with SMTP id 6a1803df08f44-63cf7cce5fbso40771916d6.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 08 Aug 2023 10:31:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691515873; x=1692120673;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=dcYuNvQ6LRTr9Kqku3e5x987a4JKtIpBF7s0doGAzwo=;
+        b=vGW2IHcvfu9EV1axxq+MdPcnl/KytPvI8hqjO8oUbeKaaLkY73kn0g0b31ckK6W4xH
+         PTh8xW6tbPWYUqtT4nRHOz1fkjU/Hx9qtcA1kqKzmoGnU2Vu0WRpGxKDYA8RBPIBDnH/
+         gdGfQ2E8KB70maO0vJeK8nkPxhjWFA2ctKQkU58EnNBVZBKkjznyJsfSJjDIxOT+WXhm
+         0I0HfStOtI7DCAZb1cvFJWjIHD39rHVNCgRteG5WsiY/LThcfV9yrEgY+SjDKVF1Cd2/
+         D31ecBVe7rOx5/L88WeH6kU7umudLlqya/8PvDA0NGcRwIEj+ZnDaUbmxyU5X355dIi6
+         8Orw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691515873; x=1692120673;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dcYuNvQ6LRTr9Kqku3e5x987a4JKtIpBF7s0doGAzwo=;
+        b=im6GTwcevz5R881WGX7U59ssucNSeLtazY3Bk75zdbFEWAYsijNcIXn2Cv+nK0qhby
+         FAh1xxhBa91eGMDX6fXqX1hiZAdNPVtAk3HI+DkEfMpPjXGesw37SRPIv3LWXGR8iMUF
+         j1CkhR1+lAl354cjjIPtfjvXzb2bOjN04QeGITySowrTKr9qOusbnT/+EQD5s7EMhhZL
+         XY83FPsj0mMxiHUTzdOPczqQ/7Ah/AGfbJRMMEAusYq04m2U9O1Ne6suURZabrfGTkb6
+         5Sohk9c9tCk6UkZoq6fzCtHWXg/0O02Eau7tXlkkunV4cs8LFe58eOE6kmUA+VphWtLR
+         JHvQ==
+X-Gm-Message-State: AOJu0YyacCeEl5i3yfesheTOdQ5I3WCHLkItcOZZGvbtHYPqLpoNgeRe
+        GeZiI+v0D/XOUJe8UWuDS1r2DUaPfZYT1IkYkMAptTAlCFZzYQx3wPXEUw==
+X-Google-Smtp-Source: AGHT+IGL+m3AXxT0UjxI4bfbYWJD+7UTXrk+ZWN8Jj/k4gy1INz1dZtoQF1N/LGotEPcBGSZheZbiZNFTHfNpKONXl4=
+X-Received: by 2002:a0c:dc08:0:b0:62d:ee5a:514b with SMTP id
+ s8-20020a0cdc08000000b0062dee5a514bmr113802qvk.11.1691515872827; Tue, 08 Aug
+ 2023 10:31:12 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230807-missing_proto-v2-1-3ae2e188bb0c@google.com>
- <202308081508.EI3CRzQo-lkp@intel.com> <CAKwvOdnDEaZt-mD2PvMDmCY1WyaqtrH+oM3M5JgZaiOOWA_0YQ@mail.gmail.com>
- <20230808161707.GA2171444@dev-arch.thelio-3990X>
-In-Reply-To: <20230808161707.GA2171444@dev-arch.thelio-3990X>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Wed, 9 Aug 2023 03:41:54 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAS8NqjZTWz_Yhp=pzv2rRLjiwk1eYFc_BB+ptYKO7pc+A@mail.gmail.com>
-Message-ID: <CAK7LNAS8NqjZTWz_Yhp=pzv2rRLjiwk1eYFc_BB+ptYKO7pc+A@mail.gmail.com>
-Subject: Re: [PATCH v2] Makefile.extrawarn: enable -Wmissing-variable-declarations
- for W=1
-To:     Nathan Chancellor <nathan@kernel.org>
-Cc:     Nick Desaulniers <ndesaulniers@google.com>,
-        kernel test robot <lkp@intel.com>,
-        Nicolas Schier <nicolas@fjasle.eu>, Tom Rix <trix@redhat.com>,
-        llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Arnd Bergmann <arnd@kernel.org>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Tue, 8 Aug 2023 10:31:02 -0700
+Message-ID: <CAKwvOd=KCT-aqcWctRPVhEoOjkjP+y5TpNK1hV9mq6PuZDvApQ@mail.gmail.com>
+Subject: missing separator. Stop. after rebuild
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Nicolas Schier <nicolas@fjasle.eu>,
+        Nathan Chancellor <nathan@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Wed, Aug 9, 2023 at 1:17=E2=80=AFAM Nathan Chancellor <nathan@kernel.org=
-> wrote:
->
-> On Tue, Aug 08, 2023 at 09:01:38AM -0700, Nick Desaulniers wrote:
-> > On Tue, Aug 8, 2023 at 1:03=E2=80=AFAM kernel test robot <lkp@intel.com=
-> wrote:
-> > >
-> > > Hi Nick,
-> > >
-> > > kernel test robot noticed the following build errors:
-> > >
-> > > [auto build test ERROR on 52a93d39b17dc7eb98b6aa3edb93943248e03b2f]
-> > >
-> > > url:    https://github.com/intel-lab-lkp/linux/commits/Nick-Desaulnie=
-rs/Makefile-extrawarn-enable-Wmissing-variable-declarations-for-W-1/2023080=
-8-005859
-> > > base:   52a93d39b17dc7eb98b6aa3edb93943248e03b2f
-> > > patch link:    https://lore.kernel.org/r/20230807-missing_proto-v2-1-=
-3ae2e188bb0c%40google.com
-> > > patch subject: [PATCH v2] Makefile.extrawarn: enable -Wmissing-variab=
-le-declarations for W=3D1
-> > > config: arm64-randconfig-r013-20230807 (https://download.01.org/0day-=
-ci/archive/20230808/202308081508.EI3CRzQo-lkp@intel.com/config)
-> > > compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.=
-git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
-> > > reproduce: (https://download.01.org/0day-ci/archive/20230808/20230808=
-1508.EI3CRzQo-lkp@intel.com/reproduce)
-> > >
-> > > If you fix the issue in a separate patch/commit (i.e. not just a new =
-version of
-> > > the same patch/commit), kindly add following tags
-> > > | Reported-by: kernel test robot <lkp@intel.com>
-> > > | Closes: https://lore.kernel.org/oe-kbuild-all/202308081508.EI3CRzQo=
--lkp@intel.com/
-> > >
-> > > All errors (new ones prefixed by >>):
-> > >
-> > >    In file included from lib/test_bitops.c:9:
-> > >    In file included from include/linux/module.h:13:
-> > >    In file included from include/linux/stat.h:19:
-> > >    In file included from include/linux/time.h:60:
-> > >    In file included from include/linux/time32.h:13:
-> > >    In file included from include/linux/timex.h:67:
-> > >    In file included from arch/arm64/include/asm/timex.h:8:
-> > >    In file included from arch/arm64/include/asm/arch_timer.h:18:
-> > >    In file included from include/linux/smp.h:110:
-> > >    In file included from include/linux/preempt.h:79:
-> > >    In file included from arch/arm64/include/asm/preempt.h:6:
-> > >    In file included from include/linux/thread_info.h:60:
-> > >    In file included from arch/arm64/include/asm/thread_info.h:18:
-> > > >> arch/arm64/include/asm/stack_pointer.h:8:24: error: no previous ex=
-tern declaration for non-static variable 'current_stack_pointer' [-Werror,-=
-Wmissing-variable-declarations]
-> > >        8 | register unsigned long current_stack_pointer asm ("sp");
-> > >          |                        ^
-> > >    arch/arm64/include/asm/stack_pointer.h:8:10: note: declare 'static=
-' if the variable is not intended to be used outside of this translation un=
-it
-> > >        8 | register unsigned long current_stack_pointer asm ("sp");
-> > >          |          ^
-> >
-> > I actually don't think that either compiler should warn for variables
-> > with register storage.  I spoke briefly with some GCC folks on IRC and
-> > the initial assesment was agreed.  I've filed
-> > - https://github.com/llvm/llvm-project/issues/64509
-> > - https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D110947
-> >
-> > Also, I've received 3 emails from zero day; this is expected as the
-> > tree is not W=3D1 clean (actually, I think Arnd has been a lot of
-> > cleanup around these groups of warnings, so I take that back).  What's
-> > more curious to me is that none are GCC builds. I wonder if 0day bot
-> > team is only testing W=3D1 with clang and not GCC?  That would seem lik=
-e
-> > perhaps the bar is higher for LLVM?
->
-> As far as I am aware, the 0day bot tests both compilers with W=3D1. I
-> think the more likely explanation is that the robot is not testing with
-> prerelease versions of GCC, which is currently 14.x, which is the only
-> version of GCC that has this warning implemented.
->
-> > Masahiro, Nathan,
-> > What are your thoughts on how to proceed here? Do we need the tree to
-> > be free of warnings before it can be added to W=3D1? Hopefully not; I
->
-> No, otherwise we wouldn't be adding it to W=3D1 ;)
->
-> > would think that's the criteria for promoting a warning from being
-> > hidden behind W=3D1 to being on by default in the top level Makefile.
-> > What are your thoughts?
->
-> I think the register storage issue should be resolved in at least clang
-> before this patch is accepted, as that seems to be where the majority of
-> warnings are coming from so far. Like we talked about, I'll take a shot
-> at fixing that. Once that is fixed, I'll build mainline with
-> -Wmissing-variable-declarations to see how many instances there are and
-> if there are any other interesting edge cases that should be fixed in
-> the compiler. After that, I think this should be good to go in. Does
-> that sound reasonable?
+$ wget https://download.01.org/0day-ci/archive/20230808/202308081050.sZEw4cQ5-lkp@intel.com/config
+-O .config
+$ make LLVM=1 ARCH=um -j128 arch/um/drivers/port_kern.o
+$ make LLVM=1 ARCH=um -j128 arch/um/drivers/port_kern.o
+arch/um/drivers/.hostaudio_kern.o.cmd:843: *** missing separator.  Stop.
+$ sed -n -e 842p -e 843p arch/um/drivers/.hostaudio_kern.o.cmd
+$(deps_arch/um/drivers/hostaudio_kern.o):
+o)
 
+Any idea if this is some form of malformed Makefile rule, or actually
+a compiler bug generating these .cmd files?
 
-Sounds reasonable!
-Thank you.
-
-
-
-
-
---=20
-Best Regards
-Masahiro Yamada
+-- 
+Thanks,
+~Nick Desaulniers
