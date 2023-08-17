@@ -2,127 +2,108 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9966AC2FC18
-	for <linux-kbuild@archiver.kernel.org>; Thu, 17 Aug 2023 03:16:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A32BC41513
+	for <linux-kbuild@archiver.kernel.org>; Thu, 17 Aug 2023 03:46:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347806AbjHQDPj (ORCPT
+        id S1347916AbjHQDpb (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 16 Aug 2023 23:15:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37334 "EHLO
+        Wed, 16 Aug 2023 23:45:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347825AbjHQDPc (ORCPT
+        with ESMTP id S1347900AbjHQDp0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 16 Aug 2023 23:15:32 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20BBB1724;
-        Wed, 16 Aug 2023 20:15:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-        :Reply-To:Content-ID:Content-Description;
-        bh=P/kFyzCr/eSDaJkbY0OlCILEe1j9xWTLXn/yJLAYIu4=; b=A9+ZOyBLxgvkefgcCG3G+GbFOc
-        t3Q4LPTtkkpyh0LBpbAFdc+3lhG3pcvB3Tuy2cTe9/M//iW+Sx1QS7+tpwHS9HCucIDpD/RDGCGIr
-        FphyIapebkE7eEjeEnFtOi+9dwumQAvsQRYGjE0GEiZ5WBo53AxtXkFjlluHJQQSFYe1ZQ0mwCfpK
-        6X/okD9sKE4Z8iWegd56l1SCJXl6wUSJ5Uk04klLzVcTy3SNTh8mgr2aL00kPfkoj1Td2N2/Azxck
-        21ORjXTS2+GmCUfbeyQtLCC4mizooGziW6L1eBdD4Ta+hfKURTJGkPtTMCT5Ht16ny8Gi1C8JbRXm
-        mdreectQ==;
-Received: from [2601:1c2:980:9ec0::1a0b]
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qWTTi-000tOI-Mm; Thu, 17 Aug 2023 03:15:18 +0000
-Message-ID: <86e329b1-c8d7-47bf-8be8-3326daf74eb5@infradead.org>
-Date:   Wed, 16 Aug 2023 20:15:09 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH] treewide: drop CONFIG_EMBEDDED
-To:     20230816055010.31534-1-rdunlap@infradead.org
-Cc:     linux-kernel@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
-        linux-arm-kernel@lists.infradead.org,
-        Arnd Bergmann <arnd@arndb.de>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>, wireguard@lists.zx2c4.com,
-        linux-arch@vger.kernel.org, linux-snps-arc@lists.infradead.org,
-        Vineet Gupta <vgupta@kernel.org>,
-        Brian Cain <bcain@quicinc.com>, linux-hexagon@vger.kernel.org,
-        Greg Ungerer <gerg@linux-m68k.org>,
-        linux-m68k@lists.linux-m68k.org, Michal Simek <monstr@monstr.eu>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Dinh Nguyen <dinguyen@kernel.org>,
-        Jonas Bonn <jonas@southpole.se>,
-        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
-        Stafford Horne <shorne@gmail.com>,
-        linux-openrisc@vger.kernel.org, linux-mips@vger.kernel.org,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Rich Felker <dalias@libc.org>,
-        John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
-        linux-sh@vger.kernel.org, Max Filippov <jcmvbkbc@gmail.com>,
-        Josh Triplett <josh@joshtriplett.org>,
+        Wed, 16 Aug 2023 23:45:26 -0400
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1CF726AB
+        for <linux-kbuild@vger.kernel.org>; Wed, 16 Aug 2023 20:45:14 -0700 (PDT)
+Received: by mail-pg1-x536.google.com with SMTP id 41be03b00d2f7-565334377d0so5404310a12.2
+        for <linux-kbuild@vger.kernel.org>; Wed, 16 Aug 2023 20:45:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1692243914; x=1692848714;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=l1BgjUd4XeLDjePWLEkR6YV2AiwpHk7vLupAQf6XJLQ=;
+        b=TvgxcjKypMfJeopGsUNlMXTiUHcfuLHQ/y2jvog9XzAJ3arUvziwgeymTbDVDXJFON
+         0zVyTwy7OJQhGWjYkMs5oK6URxYhyfHYxv+HkNPWZiNeTZm59BxVAP0jhM/FrkTRO/gh
+         g0uGDl27dEWbKesbWcwe80Fu9ixMwAbcyLO7Q=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692243914; x=1692848714;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=l1BgjUd4XeLDjePWLEkR6YV2AiwpHk7vLupAQf6XJLQ=;
+        b=Dj4KM8YwwftfA41TXrthumApaQqmihGY8Kurh6Pz32CuKpYRCi9vprPQW7sjazAeaq
+         NELiyIdpUTETZKhtVTK/7nldYh7dVn6IxDXqrUEQI2+uvCtvigWihysn0PD+oFqqE9Sx
+         33pB2+34Gi0fzXFHtUS/4t552ANkKnDrIOEHDeFWSnefZ/DrFQb2xr2DC4U+TP3jPOXm
+         zcFVkJ19MzB/fmkjd4wkJqq7Gti18zwlp6hVNSSaKfy6rGaGeA2kmLn6J31xs5yk8sqW
+         R4k6HdDbBXRL2DY+HX4dRM6al9DXKQGzyDpSTRdn6DQBH0OofPoIuKdrVm5X0ct26101
+         SLpA==
+X-Gm-Message-State: AOJu0YyGzEAfrw3TvCSxPbpy2QoxIbPb8wcF2dBlZKKZjzUXHbKnbtxk
+        9yd1o0q712wxRPxNsWlGSunD3A==
+X-Google-Smtp-Source: AGHT+IH8lolk4W+WcKJ1Kxtt09L5YGzywK1Nuph+YXsBY0VuP/2D2X85rls5K/9b24WwiohRWWW+PQ==
+X-Received: by 2002:a05:6a20:748b:b0:133:6219:15e2 with SMTP id p11-20020a056a20748b00b00133621915e2mr5072261pzd.21.1692243914250;
+        Wed, 16 Aug 2023 20:45:14 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id s22-20020aa78d56000000b006765cb32558sm4292519pfe.139.2023.08.16.20.45.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Aug 2023 20:45:13 -0700 (PDT)
+Date:   Wed, 16 Aug 2023 20:45:12 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc:     Andrea Righi <andrea.righi@canonical.com>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Alex Gaynor <alex.gaynor@gmail.com>,
+        Wedson Almeida Filho <wedsonaf@gmail.com>,
+        Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
+        =?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+        Benno Lossin <benno.lossin@proton.me>,
+        "Gustavo A . R . Silva" <gustavoars@kernel.org>,
         Masahiro Yamada <masahiroy@kernel.org>,
-        linux-kbuild@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>
-References: <38e1a01b-1e8b-7c66-bafc-fc5861f08da9@gmail.com>
-Content-Language: en-US
-From:   Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <38e1a01b-1e8b-7c66-bafc-fc5861f08da9@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+        rust-for-linux@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nathan Chancellor <nathan@kernel.org>
+Subject: Re: [PATCH] rust: fix bindgen build error with fstrict-flex-arrays
+Message-ID: <202308162043.3D267E19D2@keescook>
+References: <20230815065346.131387-1-andrea.righi@canonical.com>
+ <CANiq72kv4DwGLSGTwXYh3-b9h08Erd2RH7wXvVAUAEx2x+q_BA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANiq72kv4DwGLSGTwXYh3-b9h08Erd2RH7wXvVAUAEx2x+q_BA@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hi Jesse,
-
-On 8/16/23 15:45, Jesse Taube wrote:
-> Hi, Randy
+On Tue, Aug 15, 2023 at 02:06:36PM +0200, Miguel Ojeda wrote:
+> On Tue, Aug 15, 2023 at 8:54 AM Andrea Righi <andrea.righi@canonical.com> wrote:
+> >
+> > Commit df8fc4e934c1 ("kbuild: Enable -fstrict-flex-arrays=3") enabled
+> > '-fstrict-flex-arrays=3' globally, but bindgen does not recognized this
 > 
->> diff -- a/init/Kconfig b/init/Kconfig
->> --- a/init/Kconfig
->> +++ b/init/Kconfig
->> @@ -1790,14 +1790,6 @@ config DEBUG_RSEQ
->>
->>        If unsure, say N.
->>
->> -config EMBEDDED
->> -    bool "Embedded system"
->> -    select EXPERT
->> -    help
->> -      This option should be enabled if compiling the kernel for
->> -      an embedded system so certain expert options are available
->> -      for configuration.
+> It may be more accurate to say libclang here (bindgen forwards the options).
 > 
-> Wouldn't removing this break many out of tree configs?
+> Also, df8fc4e934c1 did it so only conditionally (if the C compiler
+> supports it). This explains what you are seeing: if I am right, you
+> are compiling with a modern enough GCC, which enables the option, but
+> with an old enough Clang.
+> 
+> > compiler option, triggering the following build error:
+> >
+> >  error: unknown argument: '-fstrict-flex-arrays=3', err: true
+> 
+> This should only be true with libclang < 16, since Clang 16
+> implemented the option, right?
+> 
+> In fact, Clang 15 seems to work too -- it seems the compiler does not
+> error if the option is not within [0,3] (unlike GCC).
+> 
+> Kees: this should only affect `__builtin_object_size` and not `sizeof`, right?
 
-I'm not familiar with out-of-tree configs.
-Do you have some examples of some that use CONFIG_EMBEDDED?
-(not distros)
+That's correct. It would affect __builtin_object_size,
+__builtin_dynamic_object_size, and -fsantize=bounds instrumentation.
 
-> Should there be a warning here to update change it instead of removal?
-
-kconfig doesn't have a warning mechanism AFAIK.
-Do you have an idea of how this would work?
-
-We could make a smaller change to init/Kconfig, like so:
-
- config EMBEDDED
--	bool "Embedded system"
-+	bool "Embedded system (DEPRECATED)"
- 	select EXPERT
- 	help
--	  This option should be enabled if compiling the kernel for
--	  an embedded system so certain expert options are available
--	  for configuration.
-+	  This option is being removed after Linux 6.6.
-+	  Use EXPERT instead of EMBEDDED.
-
-but there is no way to produce a warning message. I.e., even with this
-change, the message will probably be overlooked.
-
----
-~Randy
-
+-- 
+Kees Cook
