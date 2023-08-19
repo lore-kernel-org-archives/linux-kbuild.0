@@ -2,96 +2,76 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F06DAEE49A3
-	for <linux-kbuild@archiver.kernel.org>; Sun, 20 Aug 2023 00:31:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C235AEE49A3
+	for <linux-kbuild@archiver.kernel.org>; Sun, 20 Aug 2023 00:34:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229683AbjHTAau (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 19 Aug 2023 20:30:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43102 "EHLO
+        id S229637AbjHTAd3 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 19 Aug 2023 20:33:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229879AbjHTAaN (ORCPT
+        with ESMTP id S229743AbjHTAdF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 19 Aug 2023 20:30:13 -0400
+        Sat, 19 Aug 2023 20:33:05 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 465504C1CB;
-        Sat, 19 Aug 2023 16:04:32 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F72188CF4;
+        Sat, 19 Aug 2023 16:34:04 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D1BAC60DCA;
-        Sat, 19 Aug 2023 23:04:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F76EC433C8;
-        Sat, 19 Aug 2023 23:04:31 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5F26261A60;
+        Sat, 19 Aug 2023 23:34:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84FE2C433C8;
+        Sat, 19 Aug 2023 23:34:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692486271;
-        bh=+j9WRqednGH1+NxFhVTgnVGn/8Qvkzl/efsDkEK8uhM=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=HO4PfW0Vmh2ehaeIt++wBNm79ATKd11hq0U5+B92cMoT0BOBJwmRzCK/BxSCcHvi5
-         CC6Ti8JOyjOx4hdHkMq1AcyrjnkKmLLWs0LkOgrWYuRFynrTqoPe73eVLPTarYzKaJ
-         XF6cD0Hl+395lViiWPxkvk2mqav6W2V9mkJPoKd/j1PLX5puLu5mQZKLVhgZtyeKXi
-         k5/PpZJn8kZb+QTLeWm3CDsZujElEKEOz/6gYmjppYRGKY0XQ5to2ochUpNCZpiqs6
-         2KehJ9QZzz5+N6No8so/oKVYySVa3goKhpXcG72PLtmrRR16oAShvhdc3vS8ftLNeu
-         mZsaSqlY2tGXw==
-Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-56c711a889dso1413272eaf.0;
-        Sat, 19 Aug 2023 16:04:31 -0700 (PDT)
-X-Gm-Message-State: AOJu0YwZw/nfjuSX7/3yW08PYfSa/BteDT1V/VNAKBGnUeurrStdiFBk
-        U3I9hJR4xVfpEAGxRBvA7FxtSFhc/A+PvgGPnc4=
-X-Google-Smtp-Source: AGHT+IGyF9vfyHiext9WLpiou5vaMm6T5IbSdf7XdCrPvrTrtIwD+GibBH5g6g7fKzc0ObxkJ0SuXemN3HeHkHD2wuM=
-X-Received: by 2002:aca:2216:0:b0:3a7:83f6:9d19 with SMTP id
- b22-20020aca2216000000b003a783f69d19mr3868919oic.51.1692486270519; Sat, 19
- Aug 2023 16:04:30 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230721171857.3612639-1-masahiroy@kernel.org> <707999896.6490583.1692479291135.JavaMail.zimbra@nod.at>
-In-Reply-To: <707999896.6490583.1692479291135.JavaMail.zimbra@nod.at>
+        s=k20201202; t=1692488042;
+        bh=nIfDO5AJtyTcclk+tlfLVxSChbajrljmwnUClALdUiU=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=iwhxDMVrzGufl+ixJQKMhyTnX23HBwjB6h5t1xAGlTU8wwL2WiNTgGnCcROe+OykL
+         tF8d2Cr/akJbQv1jYHqQchg7Y99XZXP56OI5D0OCx9XzHmOTCoBcdHzIWJnfsTwNDA
+         raw+RvcJMyha9xPI/46eXKXdIvTVop59G+EEW0BUYcCkqSdMqQYBA5/lptUafTNta5
+         baHBu0m6pe/5uz3i5g8I6BtObpQsjwJW11Sd8iSG0fnwLfHORnrzD2XUGFeVO15zQm
+         RZRHGtISyt1Tfc1UCZJ00scvKc1Mi8BsYTg2KrfEymLzMH5V8ZC6u+7/zwpFtsMism
+         sU0fZl4rAV/ZQ==
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Sun, 20 Aug 2023 08:03:54 +0900
-X-Gmail-Original-Message-ID: <CAK7LNATX4uekv=W9Rsvwxc-3fuNJvUZsAO49qV_TCzsWZu76XA@mail.gmail.com>
-Message-ID: <CAK7LNATX4uekv=W9Rsvwxc-3fuNJvUZsAO49qV_TCzsWZu76XA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] UML: hard-code the result of 'uname -s'
-To:     Richard Weinberger <richard@nod.at>
-Cc:     anton ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        linux-um <linux-um@lists.infradead.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        linux-kbuild <linux-kbuild@vger.kernel.org>,
-        Jiri Slaby <jirislaby@kernel.org>, bp <bp@alien8.de>,
-        dave hansen <dave.hansen@linux.intel.com>, hpa <hpa@zytor.com>,
-        mingo <mingo@redhat.com>, tglx <tglx@linutronix.de>,
-        x86 <x86@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     linux-kbuild@vger.kernel.org
+Cc:     linux-arch@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>,
+        linux-ia64@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 4/6] ia64: remove <asm/export.h>
+Date:   Sun, 20 Aug 2023 08:33:51 +0900
+Message-Id: <20230819233353.3683813-4-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230819233353.3683813-1-masahiroy@kernel.org>
+References: <20230819233353.3683813-1-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sun, Aug 20, 2023 at 6:15=E2=80=AFAM Richard Weinberger <richard@nod.at>=
- wrote:
->
-> ----- Urspr=C3=BCngliche Mail -----
-> > Von: "masahiroy" <masahiroy@kernel.org>
-> > We rely on 'uname -s' returning 'Linux' because there are os-Linux/
-> > directories, but no other os-*/.
-> >
-> > Supporting a non-Linux host is unlikely to happen.
-> >
-> > Let's hard-code 'Linux'.
->
-> While I agree that a non-Linux version is unlikely I'd like to
-> know why we can't keep the uname -s check?
-> I guess to avoid unnecessary command execution?
+All *.S files under arch/ia64/ have been converted to include
+<linux/export.h> instead of <asm/export.h>.
 
+Remove <asm/export.h>.
 
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-Just because 'uname -s' is meaningless.
+ arch/ia64/include/asm/Kbuild | 1 -
+ 1 file changed, 1 deletion(-)
 
-Just build 'Linux' ones irrespective of the host platform.
-If it works, it works.
-If not, it does not work.
+diff --git a/arch/ia64/include/asm/Kbuild b/arch/ia64/include/asm/Kbuild
+index 33733245f42b..aefae2efde9f 100644
+--- a/arch/ia64/include/asm/Kbuild
++++ b/arch/ia64/include/asm/Kbuild
+@@ -1,7 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0
+ generated-y += syscall_table.h
+ generic-y += agp.h
+-generic-y += export.h
+ generic-y += kvm_para.h
+ generic-y += mcs_spinlock.h
+ generic-y += vtime.h
+-- 
+2.39.2
 
-
-
-
---=20
-Best Regards
-Masahiro Yamada
