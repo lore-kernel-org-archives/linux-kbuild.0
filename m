@@ -2,96 +2,115 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 041FCEE49AC
-	for <linux-kbuild@archiver.kernel.org>; Sun, 20 Aug 2023 02:36:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 056AFEE49A3
+	for <linux-kbuild@archiver.kernel.org>; Sun, 20 Aug 2023 02:37:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229913AbjHTCgB (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 19 Aug 2023 22:36:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55820 "EHLO
+        id S229556AbjHTChi (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 19 Aug 2023 22:37:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229869AbjHTCfs (ORCPT
+        with ESMTP id S229482AbjHTChi (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 19 Aug 2023 22:35:48 -0400
+        Sat, 19 Aug 2023 22:37:38 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A96DC6CB35;
-        Sat, 19 Aug 2023 16:20:35 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15DB0847C0;
+        Sat, 19 Aug 2023 18:45:44 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3F50761882;
-        Sat, 19 Aug 2023 23:20:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D9B0C433CB;
-        Sat, 19 Aug 2023 23:20:34 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 94F1561959;
+        Sun, 20 Aug 2023 01:45:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F34C3C433CB;
+        Sun, 20 Aug 2023 01:45:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692487234;
-        bh=DIVwax5Y3AFVt2W6HkTTPIpqSiJRvcBZtl6jpYXaXlU=;
+        s=k20201202; t=1692495943;
+        bh=6fcQLBduqpJE52egBZQkcMs9RprzwAUDcASkLZuT6Zw=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=LC38TrMnFINW6OjR+twcKA37K3TMDEiEQNxY4Rx5vZCI5YGancu0e5BgkxXcp1l8C
-         Ig4ldcWwp/L9BnkZudSTWB9zSxPTbkOwHpFTZkggOaEfI/Yfj56ca4zSiYZF3vjT5l
-         gg4rYAB7q66vzvixkl4PxoMXoeQA53P8rz8a2mLiEjDCKYOD0Kj3jYkz3cTzlEcAB+
-         iE9ICRmdKJF378HkKrWmOgBWhidea4WToYYu/u8JyudRRVT+/F2trquEh3YkTokZvl
-         FKsrEuCHx2e4No1VCScgpV/WU38zTSL1YywwMO94aIlUA9f4iMibnXXAVQ+NRVPnN/
-         IHx8LK/RErqlg==
-Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-56e0d6651fbso1714419eaf.1;
-        Sat, 19 Aug 2023 16:20:34 -0700 (PDT)
-X-Gm-Message-State: AOJu0Yz5SD1TivzVbkV0/dqCy/P2BrEgfLxnPlt61baabNa7v75yYI5T
-        4yGDNtlBbbgP3aKcwIonP4LaOc5rTzmr8mfvvDY=
-X-Google-Smtp-Source: AGHT+IFXuIQCKgq40Jh+CUksunkc4g/HDrnQiJZxj1NwMk0N8zIlTUbmfGTPV89p9ZOEo/oIbsfpCG8Z9qm6KBIXmfM=
-X-Received: by 2002:aca:1b08:0:b0:3a4:8ecb:185c with SMTP id
- b8-20020aca1b08000000b003a48ecb185cmr2035399oib.22.1692487233928; Sat, 19 Aug
- 2023 16:20:33 -0700 (PDT)
+        b=H1z1ywUGeI0d7gh0O6Remzq5PxzL6iYeVC524AR+yPTJTSajxGOPIJgtFzqwT/Ugl
+         llVLRrML0HM2+mDEMJyZMuHUc9B610+jN7Ekkic0muYSR9gldoro5OuH1YyLkyLFHz
+         BB4aLogbPv4Px74pW6kR37A8cWLtkre4lG4NHNKDzysvNhZbxEzS/6TH3k4BZB1XZO
+         YSiTICSRMnz+0DJr6mSkTU0sVCUg/wC6XUnoWTGUJ8qqfRpN/g+LC9ORYn7GS4SDLe
+         5Yk/4YyoRKYFbYCJxXSAjdHUJdIGJQ+Hok/u3mo33JGcP/9mTR9USLS3adwnbSwv+Y
+         NanEoV3C4c7Dw==
+Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-1bfca0ec8b9so1372812fac.2;
+        Sat, 19 Aug 2023 18:45:42 -0700 (PDT)
+X-Gm-Message-State: AOJu0YxldTex8kRrkJ2RMai0uzZ0eTd37rGuCSWSRDIrnAbhcYGCGlyJ
+        Z3wE8fXuRv/7N7vOn1ZpqgHRESz27P+vrB36P0Y=
+X-Google-Smtp-Source: AGHT+IGsZifTiodwRSU4On/Zy2oCp44tbAWfjza+kklugHVAOlgDj+S+yAHIkLlrHrRTHc/lOwJSkYaPEuEhxKIO+xE=
+X-Received: by 2002:a05:6870:73c6:b0:1bf:61e3:df1 with SMTP id
+ a6-20020a05687073c600b001bf61e30df1mr4559515oan.50.1692495942212; Sat, 19 Aug
+ 2023 18:45:42 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230817012007.131868-1-senozhatsky@chromium.org>
-In-Reply-To: <20230817012007.131868-1-senozhatsky@chromium.org>
+References: <20230811140327.3754597-1-arnd@kernel.org> <20230811140327.3754597-7-arnd@kernel.org>
+In-Reply-To: <20230811140327.3754597-7-arnd@kernel.org>
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Sun, 20 Aug 2023 08:19:57 +0900
-X-Gmail-Original-Message-ID: <CAK7LNASJWKSsdzn5ccgWaC35-XvHGU7pnE6C=eZFDbqrrghtdQ@mail.gmail.com>
-Message-ID: <CAK7LNASJWKSsdzn5ccgWaC35-XvHGU7pnE6C=eZFDbqrrghtdQ@mail.gmail.com>
-Subject: Re: [RFC][PATCH] kconfig: introduce listunknownconfig
-To:     Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc:     Nathan Chancellor <nathan@kernel.org>,
+Date:   Sun, 20 Aug 2023 10:45:05 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAToUuWO2-Z=2A+Ubc8iwxRg8VVWFoEpDtHrtDXcSVzg1Q@mail.gmail.com>
+Message-ID: <CAK7LNAToUuWO2-Z=2A+Ubc8iwxRg8VVWFoEpDtHrtDXcSVzg1Q@mail.gmail.com>
+Subject: Re: [PATCH 6/9] extrawarn: move -Wrestrict into W=1 warnings
+To:     Arnd Bergmann <arnd@kernel.org>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
         Nicolas Schier <nicolas@fjasle.eu>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Tomasz Figa <tfiga@chromium.org>, linux-kbuild@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+        Guenter Roeck <linux@roeck-us.net>, Lee Jones <lee@kernel.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Thu, Aug 17, 2023 at 5:30=E2=80=AFPM Sergey Senozhatsky
-<senozhatsky@chromium.org> wrote:
+On Sat, Aug 12, 2023 at 4:40=E2=80=AFPM Arnd Bergmann <arnd@kernel.org> wro=
+te:
 >
-> Example:
-> Suppose old .config has the following two options which
-> were removed from the recent kernel:
+> From: Arnd Bergmann <arnd@arndb.de>
 >
-> $ cat .config
-> CONFIG_DISABLE_BUGS=3Dy
+> There are few of these, so enable them whenever W=3D1 is enabled.
 >
-> Running `make listunknownconfig` produces the following
-> list of unrecognized symbols:
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  scripts/Makefile.extrawarn | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
 >
-> .config:6:warning: unknown symbol: DISABLE_BUGS
-> .config:7:warning: unknown unset symbol: ENABLE_WINAPI
+> diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
+> index ec528972371fa..8abe90270b335 100644
+> --- a/scripts/Makefile.extrawarn
+> +++ b/scripts/Makefile.extrawarn
+> @@ -54,9 +54,6 @@ KBUILD_CFLAGS +=3D -Wno-pointer-sign
+>  # globally built with -Wcast-function-type.
+>  KBUILD_CFLAGS +=3D $(call cc-option, -Wcast-function-type)
 >
-> Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+> -# Another good warning that we'll want to enable eventually
+> -KBUILD_CFLAGS +=3D $(call cc-disable-warning, restrict)
+> -
+>  # The allocators already balk at large sizes, so silence the compiler
+>  # warnings for bounds checks involving those possible values. While
+>  # -Wno-alloc-size-larger-than would normally be used here, earlier versi=
+ons
+> @@ -99,6 +96,7 @@ ifneq ($(findstring 1, $(KBUILD_EXTRA_WARN)),)
+>
+>  KBUILD_CFLAGS +=3D -Wextra -Wunused -Wno-unused-parameter
+>  KBUILD_CFLAGS +=3D -Wmissing-declarations
+> +KBUILD_CFLAGS +=3D $(call cc-option, -Wrestrict)
+>  KBUILD_CFLAGS +=3D -Wmissing-format-attribute
+>  KBUILD_CFLAGS +=3D -Wmissing-prototypes
+>  KBUILD_CFLAGS +=3D -Wold-style-definition
+> @@ -120,6 +118,7 @@ else
+>  # Suppress them by using -Wno... except for W=3D1.
+>  KBUILD_CFLAGS +=3D $(call cc-disable-warning, unused-but-set-variable)
+>  KBUILD_CFLAGS +=3D $(call cc-disable-warning, unused-const-variable)
+> +KBUILD_CFLAGS +=3D $(call cc-disable-warning, restrict)
+>  KBUILD_CFLAGS +=3D $(call cc-disable-warning, packed-not-aligned)
+>  KBUILD_CFLAGS +=3D $(call cc-disable-warning, format-overflow)
+>  KBUILD_CFLAGS +=3D $(call cc-disable-warning, format-truncation)
+> --
+> 2.39.2
+>
 
-
-A new target is not what I like to see.
-
-
-We decided to add KCONFIG_VERBOSE, which will be used to
-warn options accidentally disabled or downgraded.
-
-https://lore.kernel.org/linux-kbuild/20230809002436.18079-1-sunying@nj.isca=
-s.ac.cn/T/#u
-
-
---
+Applied  to linux-kbuild. Thanks.
+--=20
 Best Regards
-
 Masahiro Yamada
