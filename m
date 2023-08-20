@@ -2,82 +2,147 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AF34EE49A3
-	for <linux-kbuild@archiver.kernel.org>; Sun, 20 Aug 2023 02:48:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C87ABEE49A3
+	for <linux-kbuild@archiver.kernel.org>; Sun, 20 Aug 2023 02:52:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229781AbjHTCsN (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 19 Aug 2023 22:48:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40174 "EHLO
+        id S229482AbjHTCwG (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 19 Aug 2023 22:52:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230001AbjHTCr7 (ORCPT
+        with ESMTP id S229922AbjHTCvy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 19 Aug 2023 22:47:59 -0400
-Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 208E5A5DE7
-        for <linux-kbuild@vger.kernel.org>; Sat, 19 Aug 2023 19:31:03 -0700 (PDT)
-Received: by mail-ot1-x329.google.com with SMTP id 46e09a7af769-6bcd4b5ebbaso1780978a34.1
-        for <linux-kbuild@vger.kernel.org>; Sat, 19 Aug 2023 19:31:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1692498662; x=1693103462;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Aq02rNNrFFRXd2WHrHFiWmxFWaZMSaBzFscYMGYTbjA=;
-        b=E+RvrWXJ+/mmbIkNM98G9zdglrursJ9xu6mgnfSaHJm4sNNBwUsyQrLF1hXSDmLvov
-         Mc3IUjMLg91svgyaycEXz+ciTWTEwNVDdyHmxJ8i1flmjMgYC5sJeKswmMKUrXRsgElh
-         E0oEb5wsCOuDvlbiQJBYFc2SlqG0zG08hGj00=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692498662; x=1693103462;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Aq02rNNrFFRXd2WHrHFiWmxFWaZMSaBzFscYMGYTbjA=;
-        b=UCr/wKxUIPGk8gFfA0uP1Yf/J2tDY8GAqlBZAlnnfNmdMfleLbXPfuKKjeSK5ZpNay
-         iqYsP7IIoj/s1rZLZG7/HSOSs3hkhOt3MrLNYMk2vW2mmLnhYkfCt9gOQdcBnm6F0p2H
-         YtyPvqyq6D5eSy6SsdOjdXTNpgi9UINKTpkODfvA3+PY6ffFI3QJ7HmLvnZTFcN7l5bT
-         AQQl/b14vq8pYxPQmaXWcSkwwCXKrCPzrW+wq7Chuah49YXdiWuWZGYGgMk7YaMhYy8i
-         Qneh6hjxC7cAyqEjwyjMqd0c5PVrzhibY780WSL9QTl2JdJIcrsfAH67wTimYUTmWIFH
-         11Rw==
-X-Gm-Message-State: AOJu0Yxbr6u0Xc19Wcow6XzVLySzk1whPbOxnTRcyTPtkqQ3MevDZ3mG
-        R4vZHcf9G0xiyzlLhbFT68Pneg==
-X-Google-Smtp-Source: AGHT+IHwXOJMPBiAOiWzmPiEXAnRJDxCfdaHaSImiaxxvy0xUo3fdhVz+3lvjJNZExZMz7ma9epV3w==
-X-Received: by 2002:a05:6870:6387:b0:1b3:cb1f:cd1f with SMTP id t7-20020a056870638700b001b3cb1fcd1fmr5370836oap.0.1692498662465;
-        Sat, 19 Aug 2023 19:31:02 -0700 (PDT)
-Received: from google.com (KD124209188001.ppp-bb.dion.ne.jp. [124.209.188.1])
-        by smtp.gmail.com with ESMTPSA id y4-20020aa78544000000b006862b2a6b0dsm3845988pfn.15.2023.08.19.19.30.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 19 Aug 2023 19:31:01 -0700 (PDT)
-Date:   Sun, 20 Aug 2023 11:30:57 +0900
-From:   Sergey Senozhatsky <senozhatsky@chromium.org>
-To:     Jesse T <mr.bossman075@gmail.com>
-Cc:     Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Tomasz Figa <tfiga@chromium.org>, linux-kbuild@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: kconfig: list unknown symbols in the old .config
-Message-ID: <20230820023057.GJ907732@google.com>
-References: <20230816124221.GH907732@google.com>
- <CAJFTR8SW=csT9o6iFdaVn7L8P38xYwcf2oU0Qd762=kOtrcs7w@mail.gmail.com>
+        Sat, 19 Aug 2023 22:51:54 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 730EC81831;
+        Sat, 19 Aug 2023 18:41:23 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 076D961939;
+        Sun, 20 Aug 2023 01:41:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59FC2C433CA;
+        Sun, 20 Aug 2023 01:41:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1692495682;
+        bh=8vJrg6bScgP7KMUHXJiLEWTyerH8jmKxylz1ghIm6LQ=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=kA5YXM7kDOEphlJJ2ct6EUdud5KXpeKlqM5WCAFJMN1O4xUaPnp5cWMq8Z03mqT4H
+         iVlI9VSEbYBCTy0S49s1P+Rw6I0C9zdtE+mBjLLwWS5DmuejAeU8gC685JBmNxWDIx
+         yxpgfbeFSWmiyg8aiIR5/kemOx8zLpQRA+n8xhwXY59XmoCDd2nVhMbKneTcsqlNWp
+         fcfBNg0xGOUqnA3sbb3fYZqyRSoBhu1QnlGYLEBpu+GWz7GLelFYNJsmKKk0kp1+8+
+         slaZpsptNj1WqYtdKjtpa/hC/tn/snJw44inV608iiG+RBDE1wlW73lhwFAbGeVVJx
+         pmMEXgAvZ9A1Q==
+Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-1c8be41e5efso1356962fac.3;
+        Sat, 19 Aug 2023 18:41:22 -0700 (PDT)
+X-Gm-Message-State: AOJu0YwJopPoui7qeug0MH3YCMkYDk2zs6l0jAiAlsmhbJHan6o+Vbye
+        yesb2ucl/5sG7c4+nNcyX73i/BVSBSScB75T+IA=
+X-Google-Smtp-Source: AGHT+IG29AmKpf1Sid9m6LYfYuiXk8qrFeMM2FmYfu5NkRteGi4dD2h6nnzgPp0MYVohCvtPXI3kP4IllyUrurld9Dg=
+X-Received: by 2002:a05:6870:8308:b0:1ba:3a7f:50eb with SMTP id
+ p8-20020a056870830800b001ba3a7f50ebmr4107984oae.22.1692495681563; Sat, 19 Aug
+ 2023 18:41:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJFTR8SW=csT9o6iFdaVn7L8P38xYwcf2oU0Qd762=kOtrcs7w@mail.gmail.com>
+References: <20230811140327.3754597-1-arnd@kernel.org> <20230811140327.3754597-6-arnd@kernel.org>
+ <CAK7LNASuTOwHA0zz8MqxPdt5snMstpSY7==0o6kmU-RML3nioQ@mail.gmail.com>
+In-Reply-To: <CAK7LNASuTOwHA0zz8MqxPdt5snMstpSY7==0o6kmU-RML3nioQ@mail.gmail.com>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Sun, 20 Aug 2023 10:40:45 +0900
+X-Gmail-Original-Message-ID: <CAK7LNASWu5otunZrgfgS+BLdUu9R853fBaiW-aVOhKER0F_57w@mail.gmail.com>
+Message-ID: <CAK7LNASWu5otunZrgfgS+BLdUu9R853fBaiW-aVOhKER0F_57w@mail.gmail.com>
+Subject: Re: [PATCH 5/9] extrawarn: enable format and stringop overflow
+ warnings in W=1
+To:     Arnd Bergmann <arnd@kernel.org>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nicolas Schier <nicolas@fjasle.eu>,
+        Guenter Roeck <linux@roeck-us.net>, Lee Jones <lee@kernel.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On (23/08/19 15:54), Jesse T wrote:
-> > We recently were hit (unnecessarily hard) when after kernel uprev we
-> > figured that something wasn't working. The root cause was a rename of
-> > the CONFIG_FOO option between kernel releases, which make oldconfig
-> > doesn't warn/notify about.
+On Sat, Aug 12, 2023 at 10:10=E2=80=AFPM Masahiro Yamada <masahiroy@kernel.=
+org> wrote:
+>
+> On Sat, Aug 12, 2023 at 10:50=E2=80=AFAM Arnd Bergmann <arnd@kernel.org> =
+wrote:
 > >
-> > Would it be possible to add either a new --listunknown mode to conf or
-> > to somehow make it conf_warning("unknown symbol: %s\n", line) when it
-> > reads a line from oldconf that it cannot sym_find()?
-> 
-> This makes sense and I brought up this scenario a couple of days ago
-> on a recent patch.
-> I can make a patch for this if needed.
+> > From: Arnd Bergmann <arnd@arndb.de>
+> >
+> > The stringop and format warnings got disabled globally when they were
+> > newly introduced in commit bd664f6b3e376 ("disable new gcc-7.1.1 warnin=
+gs
+> > for now"), 217c3e0196758 ("disable stringop truncation warnings for now=
+")
+> > and 5a76021c2eff7 ("gcc-10: disable 'stringop-overflow' warning for now=
+").
+> >
+> > In all cases, the sentiment at the time was that the warnings are
+> > useful, and we actually addressed a number of real bugs based on
+> > them, but we never managed to eliminate them all because even the
+> > build bots using W=3D1 builds only see the -Wstringop-truncation
+> > warnings that are enabled at that level.
+> >
+> > Move these into the W=3D1 section to give them a larger build coverage
+> > and actually eliminate them over time.
+> >
+> > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> > ---
+> >  scripts/Makefile.extrawarn | 11 ++++++-----
+> >  1 file changed, 6 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
+> > index 87bfe153198f1..ec528972371fa 100644
+> > --- a/scripts/Makefile.extrawarn
+> > +++ b/scripts/Makefile.extrawarn
+> > @@ -16,8 +16,6 @@ KBUILD_CFLAGS +=3D -Werror=3Dstrict-prototypes
+> >  KBUILD_CFLAGS +=3D -Wno-format-security
+> >  KBUILD_CFLAGS +=3D -Wno-trigraphs
+> >  KBUILD_CFLAGS +=3D $(call cc-disable-warning,frame-address,)
+> > -KBUILD_CFLAGS +=3D $(call cc-disable-warning, format-truncation)
+> > -KBUILD_CFLAGS +=3D $(call cc-disable-warning, format-overflow)
+> >  KBUILD_CFLAGS +=3D $(call cc-disable-warning, address-of-packed-member=
+)
+> >
+> >  ifneq ($(CONFIG_FRAME_WARN),0)
+> > @@ -56,9 +54,6 @@ KBUILD_CFLAGS +=3D -Wno-pointer-sign
+> >  # globally built with -Wcast-function-type.
+> >  KBUILD_CFLAGS +=3D $(call cc-option, -Wcast-function-type)
+> >
+> > -# We'll want to enable this eventually, but it's not going away for 5.=
+7 at least
+> > -KBUILD_CFLAGS +=3D $(call cc-disable-warning, stringop-overflow)
+> > -
+> >  # Another good warning that we'll want to enable eventually
+> >  KBUILD_CFLAGS +=3D $(call cc-disable-warning, restrict)
+> >
+> > @@ -111,6 +106,9 @@ KBUILD_CFLAGS +=3D -Wmissing-include-dirs
+> >  KBUILD_CFLAGS +=3D $(call cc-option, -Wunused-but-set-variable)
+> >  KBUILD_CFLAGS +=3D $(call cc-option, -Wunused-const-variable)
+> >  KBUILD_CFLAGS +=3D $(call cc-option, -Wpacked-not-aligned)
+> > +KBUILD_CFLAGS +=3D $(call cc-option, -Wformat-overflow)
+> > +KBUILD_CFLAGS +=3D $(call cc-option, -Wformat-truncation)
+>
+>
+> These are redundant because -Wall implies
+> -Wformat-overflow and -Wformat-truncation
+> according to the GCC manual.
+>
+>
+>
+>
+> --
+> Best Regards
+> Masahiro Yamada
 
-I posted an RFC patch a couple of days ago
-https://lore.kernel.org/all/20230817012007.131868-1-senozhatsky@chromium.org/T/#u
+
+Applied  to linux-kbuild. Thanks.
+
+
+--=20
+Best Regards
+Masahiro Yamada
