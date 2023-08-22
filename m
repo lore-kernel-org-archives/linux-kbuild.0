@@ -2,104 +2,93 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0099EE4993
-	for <linux-kbuild@archiver.kernel.org>; Mon, 21 Aug 2023 19:09:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65643EE49A8
+	for <linux-kbuild@archiver.kernel.org>; Tue, 22 Aug 2023 06:12:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229783AbjHUTJt (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 21 Aug 2023 15:09:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52424 "EHLO
+        id S231494AbjHVGML (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 22 Aug 2023 02:12:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229782AbjHUTJs (ORCPT
+        with ESMTP id S232934AbjHVGMK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 21 Aug 2023 15:09:48 -0400
-Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 693A5A1
-        for <linux-kbuild@vger.kernel.org>; Mon, 21 Aug 2023 12:09:47 -0700 (PDT)
-Received: by mail-qt1-x82d.google.com with SMTP id d75a77b69052e-4108ec645a1so13795361cf.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 21 Aug 2023 12:09:47 -0700 (PDT)
+        Tue, 22 Aug 2023 02:12:10 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A42F187
+        for <linux-kbuild@vger.kernel.org>; Mon, 21 Aug 2023 23:12:09 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1bf092a16c9so32266185ad.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 21 Aug 2023 23:12:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692644986; x=1693249786;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=q6WN3DCNO0zBtBrLem2uFNaX453NTVZRXkQjbDwp+UE=;
-        b=J35flMR91EaUP3bKz/19Qtuoc1tHsb/6LRGo8zoFHwl1gEZuJAbHTNwf87CHLKOkbh
-         GMNRo6lVZWRqLHwuzPx5MwcgSAuA+2asre3VH9KMKMsbi6PgH/1ItTFDTpxE4Pl9nXRu
-         MhMLjqYcZLoq6NZdNWs/laO3Fzja3pcBXnIHUOLl/tE8TPZMaeMPsjiHbVrc2HzPeRzy
-         1kaGADO1cHK5RGznQojM3boQuiRe1vWOG2y7DwTkFL3we8JItm9Yqt3UFTUdLgw15wns
-         IP2aoMTNitVV6lmuuRMMRYbxr9ssFkpUva2ZnVF06k3F0ncf7C9fU5560vKc/ZLgVR2l
-         ddXg==
+        d=chromium.org; s=google; t=1692684728; x=1693289528;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=w45Oqv9V+9GduMYZDVvpjOPvC6nIzmlSs0r5WVQ2Q5k=;
+        b=NRA3ibdjsNuRArDJbB+9n5vZjZxQGhFDqh2Cr9v17/iiJCG9qQo6bRiXx8hMPByy6O
+         wdAEn0XZi7zJASuTW9oGUjKm4QD2GkH6W5APo6rjGD5NDgjqrbxHF87+B3gitaeqCuCq
+         DwIu796zGkwCSTW+efq9ZxNNQczi0pIYy+/gg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692644986; x=1693249786;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=q6WN3DCNO0zBtBrLem2uFNaX453NTVZRXkQjbDwp+UE=;
-        b=c2BfUGhRzOXHzkSmceeRoXqOq/Nf3uVeiMuPHra4DdtkY5re3AzT86pOjG/1hCgwWq
-         O9HXMYfQM8C9YloYWc4UKMXo7woKKVx5TLioVdSjp5hER5g+tJbejTLVOcFj4v3Qr54O
-         64+wDug0aZCWa7C6kfdbZM3DMTsFMf5JMbY/cksIgz8yGbqoSni7FIUq5dmApxlf4XAI
-         qfZGKHqWsBzbcL48hriQ2V8Wl0Ir5oF7cyiNRLP5EjYbaSvvRacyYUd9LnCSAnB+YZsQ
-         G88k0SSqixAeHPgj9chTcmBzTVeeFlsLrpjGs8bGt1OqxU1J25TyrMuhUUKrDkkLfVxd
-         cRGA==
-X-Gm-Message-State: AOJu0YxWXbmb/ghfxslueOUlSuR9yIuivUHBGvvGd8p8ShMnZVloQCIO
-        8nhRFVifsgE7mjFG8stda3AH17xhAOBsDDEqD6O8e1Hoiirzreguqns=
-X-Google-Smtp-Source: AGHT+IGJYSZf1l0UJ0KSgxHAtOtmYq2E8CygBXeo6QYQKiG+p9L5bzR88fmYhCm7vChNHQ9vokZaZVqsyBeX/0JBpw8=
-X-Received: by 2002:a05:6870:d113:b0:1bf:df47:7b5d with SMTP id
- e19-20020a056870d11300b001bfdf477b5dmr7201694oac.24.1692643242106; Mon, 21
- Aug 2023 11:40:42 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230819114301.3505878-1-masahiroy@kernel.org>
-In-Reply-To: <20230819114301.3505878-1-masahiroy@kernel.org>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Mon, 21 Aug 2023 11:40:31 -0700
-Message-ID: <CAKwvOd=bRs-YGfOcgzJ8WUPdP6hRr5ENX0seg0SSmdCktxAKJw@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: remove include/ksym from CLEAN_FILES
+        d=1e100.net; s=20221208; t=1692684728; x=1693289528;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=w45Oqv9V+9GduMYZDVvpjOPvC6nIzmlSs0r5WVQ2Q5k=;
+        b=WbE/UzWVadcCjc2RKmDAXvafPxl9nEA7YQzpVtsBMoDYr92liYwcdUMTxTW6CfaO7Y
+         tEwuyrX+zJn2v6QKpzYKok+bVgm+hi7GaB7vDwFzDkezMREjuvewsspJ/isnpo3GkhxJ
+         a081uiFaDd0w+aCxGmjABtAQDYtGAbzJ/d2fbDhcNMnX9mm1egdnPeWgVJHN4gI1hTqi
+         9sEJ20BZNwpwpicsRinxCYb9Q/s+Lkl2CbuSAkwrcLhBgrdb+UXgi3KOvryGmRz/JpPJ
+         7qg71LWjUIK5nDD6CyE6VuP/7A62fugWdXluMPyAsl4LZ2Daxa8ghthWaw6Bymf5Mrfe
+         uq1g==
+X-Gm-Message-State: AOJu0YwG5MaH5E4p1xFBL+8rkR7/hsaUnA47pziak6ntk7tWdvc9tFtR
+        G0V9KC7q/2BCATMlhJ9CQpo7oA2WrUUnK6DXPd8=
+X-Google-Smtp-Source: AGHT+IHiuSHIk401989XjYLzZuT/i2ncQJKajBtdSdauDZOiU31hXa77jn81segf0rCj+wwJsWu52Q==
+X-Received: by 2002:a17:902:d4c9:b0:1b8:a88c:4dc6 with SMTP id o9-20020a170902d4c900b001b8a88c4dc6mr11451735plg.45.1692684728409;
+        Mon, 21 Aug 2023 23:12:08 -0700 (PDT)
+Received: from google.com ([2401:fa00:8f:203:f833:4d35:e744:4f9e])
+        by smtp.gmail.com with ESMTPSA id d2-20020a170903230200b001b9ecee459csm8122816plh.34.2023.08.21.23.12.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Aug 2023 23:12:07 -0700 (PDT)
+Date:   Tue, 22 Aug 2023 15:12:03 +0900
+From:   Sergey Senozhatsky <senozhatsky@chromium.org>
 To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+Cc:     Ying Sun <sunying@nj.iscas.ac.cn>,
+        Jesse T <mr.bossman075@gmail.com>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
         Nathan Chancellor <nathan@kernel.org>,
-        Nicolas Schier <nicolas@fjasle.eu>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nicolas Schier <nicolas@fjasle.eu>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Tomasz Figa <tfiga@chromium.org>, linux-kbuild@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC][PATCH] kconfig: introduce listunknownconfig
+Message-ID: <20230822061203.GA610023@google.com>
+References: <20230817012007.131868-1-senozhatsky@chromium.org>
+ <CAK7LNASJWKSsdzn5ccgWaC35-XvHGU7pnE6C=eZFDbqrrghtdQ@mail.gmail.com>
+ <20230820024519.GK907732@google.com>
+ <CAK7LNAS9KC1GjPgadMEivSpy4TMYU8mQ+BrtfJpNs2kvhK18yA@mail.gmail.com>
+ <20230820072119.GM907732@google.com>
+ <20230820073332.GN907732@google.com>
+ <CAK7LNARTZXvWD8PrA3bC+Ok7LK85qO=pkMs4kOPGn90OBooL6w@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK7LNARTZXvWD8PrA3bC+Ok7LK85qO=pkMs4kOPGn90OBooL6w@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sat, Aug 19, 2023 at 4:43=E2=80=AFAM Masahiro Yamada <masahiroy@kernel.o=
-rg> wrote:
->
-> This is a remnant of commit 5e9e95cc9148 ("kbuild: implement
-> CONFIG_TRIM_UNUSED_KSYMS without recursion").
->
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+On (23/08/21 21:27), Masahiro Yamada wrote:
+> 
+> My (original) hope was to add a single switch, KCONFIG_VERBOSE, to address both:
+> 
+>   - A CONFIG option is hidden by unmet dependency (Ying Sun's case)
+>   - A CONFIG option no longer exists  (your case)
+>   - Anything else we need to be careful
 
-Thanks for the patch! I didn't see any more references to include/ksym
-after this commit.
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+A quick question: is it too late to suggest an alternative name?
+Could KCONFIG_SANITY_CHECKS be a little cleaner? Because we basically
+run sanity checks on the config.
 
-> ---
->
->  Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/Makefile b/Makefile
-> index 4425d87dd2fa..f451241d0feb 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1596,7 +1596,7 @@ endif
->  # make distclean Remove editor backup files, patch leftover files and th=
-e like
->
->  # Directories & files removed with 'make clean'
-> -CLEAN_FILES +=3D include/ksym vmlinux.symvers modules-only.symvers \
-> +CLEAN_FILES +=3D vmlinux.symvers modules-only.symvers \
->                modules.builtin modules.builtin.modinfo modules.nsdeps \
->                compile_commands.json .thinlto-cache rust/test rust/doc \
->                rust-project.json .vmlinux.objs .vmlinux.export.c
-> --
-> 2.39.2
->
-
-
---=20
-Thanks,
-~Nick Desaulniers
+And one more question: those sanity checks seem very reasonable.
+Is there any reason we would not want to keep them ON by default?
+And those brave souls, that do not wish for the tool to very that
+the .config is sane and nothing will get downgraded/disabled, can
+always set KCONFIG_SANITY_CHECKS to 0.
