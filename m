@@ -2,137 +2,136 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F19EEC7113B
-	for <linux-kbuild@archiver.kernel.org>; Wed, 23 Aug 2023 20:00:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE678C27C40
+	for <linux-kbuild@archiver.kernel.org>; Wed, 23 Aug 2023 20:18:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238440AbjHWT7j (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 23 Aug 2023 15:59:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33622 "EHLO
+        id S232702AbjHWUST (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 23 Aug 2023 16:18:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238443AbjHWT7Z (ORCPT
+        with ESMTP id S235963AbjHWURt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 23 Aug 2023 15:59:25 -0400
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5641F10C2;
-        Wed, 23 Aug 2023 12:59:18 -0700 (PDT)
+        Wed, 23 Aug 2023 16:17:49 -0400
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.10])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 729DB10D2;
+        Wed, 23 Aug 2023 13:17:40 -0700 (PDT)
 Received: from leknes.fjasle.eu ([46.142.48.46]) by mrelayeu.kundenserver.de
- (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis) id
- 1Ma1HG-1qBikl3Sfk-00Vwhe; Wed, 23 Aug 2023 21:53:35 +0200
-Received: from localhost.fjasle.eu (kirkenes.fjasle.eu [10.10.0.5])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by leknes.fjasle.eu (Postfix) with ESMTPS id 536953F8C0;
-        Wed, 23 Aug 2023 21:53:30 +0200 (CEST)
+ (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis) id
+ 1M9npT-1qcVC81pQ5-005mNr; Wed, 23 Aug 2023 22:17:13 +0200
+Received: by leknes.fjasle.eu (Postfix, from userid 1000)
+        id 1BFF23F8EE; Wed, 23 Aug 2023 22:17:08 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fjasle.eu; s=mail;
-        t=1692820410; bh=GKOk5MTY/v4XTWXhlEfjiFJxiiEgn5QhRpYC38mJgtI=;
+        t=1692821829; bh=9Y6GJu22Mm4w6kt+Z0QIvpKJSKBxuDbHBUcn5zJ/y9o=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=JC8lNW8idZX8RJR8ds+8m4QB/2Z2fHdxLzUk5rTVpk2S7BySMjPjaUTP+fgggipGZ
-         c853knJzqhR30b2YHe1b7Ry1XgT1FrXI0wes8IPk1dhr2bUIXbhB5UBkZvTJBgOwlr
-         +BjIqXXL6bIZbEC8Q0MMwvlLVZMTRmapkGJfbk0o=
-Received: by localhost.fjasle.eu (Postfix, from userid 1000)
-        id A1D435F39; Wed, 23 Aug 2023 21:52:56 +0200 (CEST)
-Date:   Wed, 23 Aug 2023 21:52:56 +0200
+        b=yj02GCgiR3PvhGLJmxabMp6B6qVfAQEcuXyxrGiBE4kqg4Wjum3ZcfMekOr1Xsl1Z
+         77Wmanpqa6sgQpFSklstNBGTwDrNEuQSdKVmTEKtGwm/4zOFQpn/3RXAnUV0dr+rbe
+         4PtsIa6ICBXu9lS1fLbILiNAAvcBRPT8/KO3r4l0=
+Date:   Wed, 23 Aug 2023 22:17:08 +0200
 From:   Nicolas Schier <nicolas@fjasle.eu>
 To:     Masahiro Yamada <masahiroy@kernel.org>
 Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>
-Subject: Re: [PATCH 1/8] kbuild: do not run depmod for 'make modules_sign'
-Message-ID: <ZOZjmLPxwWik/YOz@bergen.fjasle.eu>
+Subject: Re: [PATCH 4/8] kbuild: remove $(MODLIB)/source symlink
+Message-ID: <ZOZpRMu6a47kkzrZ@fjasle.eu>
 References: <20230823115048.823011-1-masahiroy@kernel.org>
+ <20230823115048.823011-4-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="+/FtnWWBCMuQiUfl"
+        protocol="application/pgp-signature"; boundary="DcjO63GeeJJAWHOK"
 Content-Disposition: inline
-In-Reply-To: <20230823115048.823011-1-masahiroy@kernel.org>
-X-Operating-System: Debian GNU/Linux trixie/sid
-Jabber-ID: nicolas@jabber.no
-X-Provags-ID: V03:K1:M1PkP04ts/rPPHOsL3u6h1ACqUU563GekuG/27AsnPA+Q5oSbXp
- /3liXI9u3+25q364Wv/5e6wiyuSVqmvI+4lgNSejhEPeCEWojXVfpbA63+7Zq1NMOgrXxRL
- QS7Jr0/gQOLeD9l24NfQ4FinIPlFIIPAOxdM2LM62Vsu5wJ1+lawFbJVfh0w/vsA7saAXw8
- xHO6Zubdt4xhuccV7kyRw==
-UI-OutboundReport: notjunk:1;M01:P0:E7zuzkOgrdI=;RbGDFRy9GbX6WfvWJ49C6LNLhkg
- 5+CGWrZPZx/mNRrhjLrMR5czS4Z+2oZpd9CFDDkPID5JwdrD00dQlXz6TVcrtXnjEusOQ5nDG
- 5FH/3v78oRqkJ/qcvhOscWmnOgusGevMhcwthaVv88cfwyCG04beLdMsySwKegfR9/5DWWwQu
- pn08+hwgy2Vf35FvRbk4qA31jGfG3wwk1yUFQolfjBepMrGohxvy2q/TO2py1Nj6LO9vxKclf
- SvE+ODTdFIfG5fRyKaIWhbgDdqAEpuvQA1nUuTi34lF66n23u0dRwuXIe8FuhEjMx5OXhsGrA
- v+4JzpUhdweKztiUJal5uTT2TB0Xs8V/MUf29fScPXjxRX+BFxhK2RoTQIYVowVE3nkjt5Bk9
- GHI9UcU6uVS29H81+Ofnmn+NTrTwJdQlblStXPwDOoH0+IyQegUD/7ko5fstsjEG7uKtvNT4m
- +kUXT49ydQISG+jowvBNhv+0oroxdhClyLH5z4IeWGe9faHmBj2gdbfWKq1fTVatgRyT0GErQ
- NC3lC2/iiYNshRzfZMKYtXurW2+3iV3unLM2huFMvk3XhR/0tRW2ah15SEWVDSGDo8SD4PhZ9
- RPws8UwJrZ3SckaTmNxsonW+V8sDc6NjVapZJMYrNd40T+BJal5bzS2ERqvaF/1/hmVFQQTJy
- FmPRnXIA0RowHaGbPAlXftUwvb4FNW9BMnHe9ZeKxNp3i2md4O+Z7WsoCmim3NLKZ99SXP03m
- 1N4tpVxoGy/I4aojNO917giZB5jmn+x8xp77CNo+Q4k04ayU6OZPO4kEBFzMy8EdR+UIKrOje
- YtHrXwMnzTN65UXyFq5vRgH4FpqkJy7qldiF2kxb4OK3sz1OjvQF+k8sVLfaZW1YKhl0S/o45
- pWlzqrZD2cnIxfQ==
+In-Reply-To: <20230823115048.823011-4-masahiroy@kernel.org>
+X-Provags-ID: V03:K1:ll3xFyBhpy4a0AlZdxB9cPcqKQBqov2zQCy4UJiib3Y4zzjC7Ie
+ cnSJ3HXSJ1U8sX8k+vsiJodRc/SgN706zg55Omixf1Q6CUP6srvGFx/nFzUgPh3VUHeIadt
+ 3W2StLvjpCf5mhmvp/mOOj23fCUeHGAnnb6vP+efxQuxBXwBvpHzWOrOVF1jdRBH5b/uJpc
+ pi94LtCscvW0/bTTX5w8w==
+UI-OutboundReport: notjunk:1;M01:P0:OOrOpK7oFSQ=;OZr6uQt6rOTcYU3cYDKM0PoO+N7
+ OGCCRuPEF5RbTE+YyFmR/xlIO+92GpStmtfNswVsBs7OeJR9fjzgsloEQ7aLEktcqfvCP9BZJ
+ UqL8RHiXVle8Sq6iRxb+/1LhAUa3PxLtUmwhFk0SClq50fXKYhghAOU8xCKw9KzaW6QHz6+ul
+ M8FAT15LPM72nKtmCmj61u0YhenBwJTkkdjaWrEVoS9NBDBEJJllrkwUFB4vMrxbABvGGUbkk
+ 6x6BHpGrr1Uou4RtL8wCr1bVAJFonvcW5aFfZKtOYZ9ablzgwBYJR1RRW3VZn/CNu6DyWb84/
+ 1yfYgwgxLhdaeFKFO4P42kifjL4XROH68vQNecGyejuJOTi/SHQSsO7/pDsDOpFpO3vfzOC/+
+ t93KOTCRfa9A4XMzTkDGJb/SZre3c47f3mV5BwCZcBbU/T+eJhw/O3Mom+j1E7gpn54IAfA4Q
+ ifmhdk4KszED6lSl+py8ylT8+dEFN5I7siNv3Mg0RXgpq1lhQ1+YTRXkSiZqr0W6l+PlrVkkY
+ RUG0pjBfizc3JeqCQEKruAEPFsQjkhPXBqBbFzvHfn1T3Lf7kjx7WGyYUBFRrG/hkUhgqAVT9
+ iKG8J+WSSKnyh2KVK8vnOuZ2u3Yuz/MhO0d58nCNH2Qeo+9emmyirNG65ryL237DL21cP0yhc
+ WPKNv7c39pzsjK47OIcLWzQaEXfkKeUZhylnHiAkmNnhkbzadfhtY/EwdznHqLM33a8qpj8Ep
+ EIsmgTG4ALw6TF6zATkBeNeXVmljKyK2MUK94ofyUtr1ZYcQA4HQK0JCWKy/7DO5T3PtegECq
+ ZGkJtEmelix++AClxXYlGIly2zYyBYciHUuBaWnhDzaFkWkdnao0PgwD3OzPo8rZq3uIAkEm/
+ jIUyFbeNmpt49pw==
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
 
---+/FtnWWBCMuQiUfl
-Content-Type: text/plain; charset=iso-8859-1
+--DcjO63GeeJJAWHOK
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed 23 Aug 2023 20:50:41 GMT, Masahiro Yamada wrote:
-> Commit 961ab4a3cd66 ("kbuild: merge scripts/Makefile.modsign to
-> scripts/Makefile.modinst") started to run depmod at the end of
-> 'make modules_sign'.
+On Wed, Aug 23, 2023 at 08:50:44PM +0900 Masahiro Yamada wrote:
+> This reverts the old commit "kbuild: Introduce source symlink in
+> /lib/modules/.../". [1]
 >=20
-> Move the depmod rule to scripts/Makefile.modinst and run it only when
-> $(modules_sign_only) is empty.
-
-Moving the depmod rule is in patch 3/8, first half of the sentence=20
-seems to be left over?
-
-Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
-
+> The current Kbuild does not require $(MODLIB)/source. If the kernel was
+> built in a separate output directory, $(MODLIB)/build/Makefile wraps
+> the Makefile in the source tree. It is enough for building external
+> modules.
 >=20
-> Fixes: 961ab4a3cd66 ("kbuild: merge scripts/Makefile.modsign to scripts/M=
-akefile.modinst")
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/history/history.git/c=
+ommit/?id=3De09e58867154b8aae0a3ac26a9b1c05962f5a355
+>=20
 > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 > ---
 >=20
->  Makefile | 2 ++
->  1 file changed, 2 insertions(+)
+>  Makefile | 8 ++------
+>  1 file changed, 2 insertions(+), 6 deletions(-)
 >=20
 > diff --git a/Makefile b/Makefile
-> index e0d52539a0f1..7d54a0700c6e 100644
+> index c9c8019e4720..7d9cab3d2186 100644
 > --- a/Makefile
 > +++ b/Makefile
-> @@ -1877,7 +1877,9 @@ quiet_cmd_depmod =3D DEPMOD  $(MODLIB)
-> =20
->  modules_install:
->  	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modinst
-> +ifndef modules_sign_only
->  	$(call cmd,depmod)
-> +endif
-> =20
->  else # CONFIG_MODULES
-> =20
+> @@ -1486,14 +1486,10 @@ modules_install: $(modinst_pre)
+>  PHONY +=3D __modinst_pre
+>  __modinst_pre:
+>  	@rm -rf $(MODLIB)/kernel
+> -	@rm -f $(MODLIB)/source
+> +	@rm -f $(MODLIB)/build
+>  	@mkdir -p $(MODLIB)
+>  ifdef CONFIG_MODULES
+> -	@ln -s $(abspath $(srctree)) $(MODLIB)/source
+> -	@if [ ! $(objtree) -ef  $(MODLIB)/build ]; then \
+> -		rm -f $(MODLIB)/build ; \
+> -		ln -s $(CURDIR) $(MODLIB)/build ; \
+> -	fi
+> +	@ln -s $(CURDIR) $(MODLIB)/build
+>  	@sed 's:^\(.*\)\.o$$:kernel/\1.ko:' modules.order > $(MODLIB)/modules.o=
+rder
+>  endif
+>  	@cp -f modules.builtin $(MODLIB)/
 > --=20
 > 2.39.2
 
---+/FtnWWBCMuQiUfl
+Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
+
+--DcjO63GeeJJAWHOK
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCAAdFiEEh0E3p4c3JKeBvsLGB1IKcBYmEmkFAmTmY5IACgkQB1IKcBYm
-Emm/3RAA5KswfhNDW9x3xANz1SbvNruE7AMIyEdTVtNjbvraf6o64m+I2oMtr+c8
-ismL0KlcV0AtE9iPusb1ZSNn8X5HMrL6u9L+PgNNXFXewObu2D2405sCkhFKMgJ2
-rW70YN6Y6QJwNsosTUdod47e5SYsJHBQN1+s6PxBz7kvqNrLqsZwpt9OKpEv+6oW
-prVBs5FCv/9Pf+LIMZ4x83zM+eZA57NMRjrkTP63UdSCyYyDvjmmBZfBhuyEDuj1
-bNDlPLm5zzI7etM95gUD1Ex7CoG6U2ozCKQRan71QKUI5hHV4Q1rksTkFbLOh0Wu
-LR2jBqyD8/FcZAEI3e5Z779XZoLOgJ6HkyQMs3WHiEiG7Etd1smjyjwWrGKsukdX
-88qXUqKF3tHoGSbEpdSv3EcVOMi+TMoxrChb2rWnWWQZsvvJ+F8D32l3nit5zH80
-GslgfokDgFKLExFs3anpz4f1iqms9JroBkosa6h/Iakh69yjrHejXfyL4PNG1u/A
-rFAWczHZDlPcCLENum4T3m+4AgRpqLT2MnVxsahVKxINomRy0l1Bevt2WXLTqxzS
-5+yzV6I4cpryTzx1W4XjtMvMkJ2acryb+Pyzu8l9afKWGo/TXVlmJz7WSYqZcpSB
-ko61lb1KMGZ/DYjYoZhATXUNscp6Nd7aTL1zszC8tyfN5jCHZnw=
-=m3Ns
+iQIzBAABCAAdFiEEh0E3p4c3JKeBvsLGB1IKcBYmEmkFAmTmaUMACgkQB1IKcBYm
+Emmesw//TfQqTYlQpo5Q6nIDiISOZuUlcP3EsHZ7GcIngKh4TQA/FkQGMS8Nn6pc
+a/3zc8JM4AyTZvLJbWnrStttY84DxN9Ugt4D/a1gwQZVx3XbFijRN/rD/hThSliW
+mt57E+/2bdixYNsNjJB9Jy4PIH65Q/SZTrSPNlV5iCoStlYc3QrAAEQT4OWUahNB
+9O+m42T1UIe06rd/GreUr1vBI4q1e4U22q01UjJep598dieNCeQMXUrae5woDM+P
+0ZFE9dTaYH3ZxrEN5M2Z72LTRND5sMR6LSvEHfsDwZ3gMARG4oQ8aZNbtkOcf9+4
+zRiD1E3p1ICcbMzMCCUKhp3bdxExNQaSur2naXFzOyeze87x4Mb6tCJc4Wp5D7kn
+SIgJfJstTRdLWE+L39cY9q9heh7BF66BH9RATvx9C3q9miKQhKQ1uWQyXfftMsYi
+CNynIny5PUoqJovdy0OcvVvT3R6zWDYCv8kseEhhy9DLeroIIotzl1YXGlT/JVY+
+0COQ2C6vOaCaOZYh4CY7yDtMEPP54+ia6yjUVx1s+VzBEIhipe3M0DdyugzcWxoL
+POURAifOp1eL/G/dgERBmFiVe980ekw0ImUTRwrqHtHdk0pcBMttESQYiCn6w92R
+aNLnq7x6gb/+ESP9ee1gHHWsgaab8lRmtfQOXqsLHeWJDbjSMVk=
+=AzOZ
 -----END PGP SIGNATURE-----
 
---+/FtnWWBCMuQiUfl--
+--DcjO63GeeJJAWHOK--
