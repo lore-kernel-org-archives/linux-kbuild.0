@@ -2,67 +2,117 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76CAFC83F1D
-	for <linux-kbuild@archiver.kernel.org>; Wed, 30 Aug 2023 18:37:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7637DC83F21
+	for <linux-kbuild@archiver.kernel.org>; Wed, 30 Aug 2023 18:37:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232169AbjH3ShE (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 30 Aug 2023 14:37:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38050 "EHLO
+        id S233166AbjH3ShI (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 30 Aug 2023 14:37:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244343AbjH3NAQ (ORCPT
+        with ESMTP id S243708AbjH3Leg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 30 Aug 2023 09:00:16 -0400
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69086185
-        for <linux-kbuild@vger.kernel.org>; Wed, 30 Aug 2023 06:00:13 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-72-ghgLKwR4MNqb2ZVtsa0Jyw-1; Wed, 30 Aug 2023 14:00:08 +0100
-X-MC-Unique: ghgLKwR4MNqb2ZVtsa0Jyw-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 30 Aug
- 2023 14:00:06 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Wed, 30 Aug 2023 14:00:06 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Masahiro Yamada' <masahiroy@kernel.org>,
-        Nicolas Schier <nicolas@fjasle.eu>
-CC:     "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
-        "Nick Desaulniers" <ndesaulniers@google.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        "Nathan Chancellor" <nathan@kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
-Subject: RE: [PATCH] kbuild: single-quote the format string of printf
-Thread-Topic: [PATCH] kbuild: single-quote the format string of printf
-Thread-Index: AQHZ2zYMiPMplwqfeUe66jkcyc3HB7ACzGyA
-Date:   Wed, 30 Aug 2023 13:00:06 +0000
-Message-ID: <231e031b803041e0ba248d1efbc98dfd@AcuMS.aculab.com>
-References: <20230829113531.4004730-1-masahiroy@kernel.org>
- <ZO3d7DrfKfsDXqa5@bergen.fjasle.eu>
- <CAK7LNATvUo7gKFG9NjtJarTBM508ntf2v6yo5tXsmDoMcUrJVA@mail.gmail.com>
-In-Reply-To: <CAK7LNATvUo7gKFG9NjtJarTBM508ntf2v6yo5tXsmDoMcUrJVA@mail.gmail.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Wed, 30 Aug 2023 07:34:36 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BDB7132;
+        Wed, 30 Aug 2023 04:34:34 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A6A9362947;
+        Wed, 30 Aug 2023 11:34:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B934C433CD;
+        Wed, 30 Aug 2023 11:34:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1693395273;
+        bh=8PWPyT185nAtNOY9ZfIuQmYypEHvEnAKXob/fzJFzmU=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=UFbSR3+TrzjNWYwzynS+zz3AR+ROQkYYb8Jc1Y3bhCI9RN14hL/dH0F7/VtbK/2sd
+         nHJ9bzuvjxVaFEPH82m7v9FlnhBCfRob3tlO07d2X5eK1wQqxLxTmbenus8BSKxe5v
+         lXi8V++xXhIAW0v381yj8wDgiMu2o9AuQE/wMwXFmMLIo4N0Shf2xyriNS3mquojQ4
+         hivIeh4RBAP7sSL1+gU4F6vURm+zhixSZcW22i3G9LgKv6XQ4asQvHmVgX8v6BLL+z
+         hGTeSQXJGbLUViQ2bW6BbibUcjPyz/jd+ylMS/csxK6gsPw0x9Aos8OP4tosjJFP7x
+         OZAFbwz2RLmtg==
+Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-3a9f87adfe1so133853b6e.1;
+        Wed, 30 Aug 2023 04:34:32 -0700 (PDT)
+X-Gm-Message-State: AOJu0Yy5xBhoPz0onTjIEIyUNCbOILHqjOkaztGvOu83Fjlw4sliMfu1
+        BMYt7f+EwDc8CY7mkl2oLzE8k4FwRmeBUqpZARY=
+X-Google-Smtp-Source: AGHT+IGGq5Rqco8PApfnoN6MY05uD7oJkUFoXYsw6ftS35VEXOIjGOHW2RlK6KWUSGFFkiYpsLeyv5+GV14iOu/km8A=
+X-Received: by 2002:a05:6808:a09:b0:3a8:1012:89d6 with SMTP id
+ n9-20020a0568080a0900b003a8101289d6mr1682501oij.34.1693395272281; Wed, 30 Aug
+ 2023 04:34:32 -0700 (PDT)
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+References: <20230829113531.4004730-1-masahiroy@kernel.org> <ZO3d7DrfKfsDXqa5@bergen.fjasle.eu>
+In-Reply-To: <ZO3d7DrfKfsDXqa5@bergen.fjasle.eu>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Wed, 30 Aug 2023 20:33:56 +0900
+X-Gmail-Original-Message-ID: <CAK7LNATvUo7gKFG9NjtJarTBM508ntf2v6yo5tXsmDoMcUrJVA@mail.gmail.com>
+Message-ID: <CAK7LNATvUo7gKFG9NjtJarTBM508ntf2v6yo5tXsmDoMcUrJVA@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: single-quote the format string of printf
+To:     Nicolas Schier <nicolas@fjasle.eu>
+Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        linuxppc-dev@lists.ozlabs.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Li4uDQo+IEFsbCBvZiAiXFxuIiwgIlxuIiwgJ1xuJyBhcmUgdGhlIHNhbWUuDQoNCmFuZCBcXG4g
-KHdpdGhvdXQgYW55IHF1b3RlIGNoYXJhY3RlcnMgYXQgYWxsKS4NCg0KUGVyc29uYWxseSBJJ2Qg
-dXNlICdmb3JtYXQnIGZvciBwcmludGYuDQpUbyBtYWtlIGl0IG9idmlvdXMgdGhhdCBub3RoaW5n
-IGlzIHRvIGJlIGV4cGFuZGVkLg0KQnV0IGl0IGlzbid0IHJlYWxseSB3b3J0aCBjaGFuZ2luZyBl
-eGlzdGluZyAnc3R1ZmYnLg0KDQoJRGF2aWQNCg0KLQ0KUmVnaXN0ZXJlZCBBZGRyZXNzIExha2Vz
-aWRlLCBCcmFtbGV5IFJvYWQsIE1vdW50IEZhcm0sIE1pbHRvbiBLZXluZXMsIE1LMSAxUFQsIFVL
-DQpSZWdpc3RyYXRpb24gTm86IDEzOTczODYgKFdhbGVzKQ0K
+On Wed, Aug 30, 2023 at 10:00=E2=80=AFAM Nicolas Schier <nicolas@fjasle.eu>=
+ wrote:
+>
+> On Tue 29 Aug 2023 20:35:31 GMT, Masahiro Yamada wrote:
+> > Use single-quotes to avoid escape sequences (\\n).
+> >
+> > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> > ---
+>
+> Is this really necessary?  Testing w/ GNU Make 4.3, bash 5.2.15 or
+> dash 0.5.12-6 and a stupid Makefile snippet I cannot see any difference
+> between these three:
+>
+> print:
+>         @printf "hello med single-backslash and double quotes\n"
+>         @printf 'hello med single-backslash and single quotes\n'
+>         @printf "hello med double-backslash and double quotes\\n"
+>
+> Only double-backslash+n in single-quotes does not work, for obvious
+> reasons.
 
+
+You are right.
+
+I was misunderstanding the backslash-escaping in double-quotes.
+
+I always used single-quotes when I wanted to avoid
+escape sequences.
+
+The following POSIX spec applies here:
+
+
+  2.2.3 Double-Quotes
+
+  The <backslash> shall retain its special meaning as an escape character
+  (see Escape Character (Backslash)) only when followed by one of the
+  following characters when considered special:
+
+  $   `   "   \   <newline>
+
+
+
+
+https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html
+
+
+All of "\\n", "\n", '\n' are the same.
+
+
+
+--=20
+Best Regards
+Masahiro Yamada
