@@ -2,284 +2,308 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62710C83F2C
-	for <linux-kbuild@archiver.kernel.org>; Mon,  4 Sep 2023 13:09:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6367DCA0FF3
+	for <linux-kbuild@archiver.kernel.org>; Tue,  5 Sep 2023 16:33:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234255AbjIDNJX (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 4 Sep 2023 09:09:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40448 "EHLO
+        id S1352536AbjIEQ1p (ORCPT
+        <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 5 Sep 2023 12:27:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230468AbjIDNJW (ORCPT
+        with ESMTP id S1354122AbjIEJn3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 4 Sep 2023 09:09:22 -0400
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E9D501AD;
-        Mon,  4 Sep 2023 06:09:18 -0700 (PDT)
-Received: from pwmachine.localnet (85-170-34-233.rev.numericable.fr [85.170.34.233])
-        by linux.microsoft.com (Postfix) with ESMTPSA id EF88E212B16B;
-        Mon,  4 Sep 2023 06:09:14 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com EF88E212B16B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1693832958;
-        bh=LtAw+jVuIucYv5hspY/X06k4jJZyLR+Pai5EJWTJy8o=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Dy1rkeKHWA6nJgdJ6sf04+PJ9ExqJ5t3hL1YuoKT960ZsBq4jlkw4nhX380lmimqW
-         C9Ruzvcc/UXrYKL6lCh51w7mQsxHiEMTEpeQDiNWFZfhbftnC2EPoJpX5bJeVQtA36
-         73B7EfcJoD2YGG4/jdJo2eDhUOcc5HBpfPt0oByU=
-From:   Francis Laniel <flaniel@linux.microsoft.com>
-To:     Masahiro Yamada <masahiroy@kernel.org>,
-        Alessandro Carminati <alessandro.carminati@gmail.com>
-Cc:     Masami Hiramatsu <mhiramat@kernel.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Daniel Bristot de Oliveira <bristot@kernel.org>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nicolas Schier <nicolas@fjasle.eu>,
-        Alexander Lobakin <aleksander.lobakin@intel.com>,
-        Nick Alcock <nick.alcock@oracle.com>,
-        Kris Van Hees <kris.van.hees@oracle.com>,
-        Eugene Loh <eugene.loh@oracle.com>,
-        Viktor Malik <vmalik@redhat.com>, linux-kbuild@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-        live-patching@vger.kernel.org
-Subject: Re: [PATCH v3] scripts/link-vmlinux.sh: Add alias to duplicate symbols for kallsyms
-Date:   Mon, 04 Sep 2023 15:09:12 +0200
-Message-ID: <12278120.O9o76ZdvQC@pwmachine>
-In-Reply-To: <CAPp5cGTngA6_zhPpgMGsvp8T49LZEohzyRtedGSo8hkEJFRkiA@mail.gmail.com>
-References: <20230828080423.3539686-1-alessandro.carminati@gmail.com> <CAK7LNATf5zQH=qOX3HCcAoaccK1KTjoGNuXc-d2-FM-japABoQ@mail.gmail.com> <CAPp5cGTngA6_zhPpgMGsvp8T49LZEohzyRtedGSo8hkEJFRkiA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 5 Sep 2023 05:43:29 -0400
+Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 940671AD;
+        Tue,  5 Sep 2023 02:43:22 -0700 (PDT)
+Received: from localhost.localdomain (unknown [124.16.141.245])
+        by APP-05 (Coremail) with SMTP id zQCowACnrWE1+PZkgCnQCg--.20711S2;
+        Tue, 05 Sep 2023 17:43:17 +0800 (CST)
+From:   sunying@nj.iscas.ac.cn
+To:     masahiroy@kernel.org
+Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        senozhatsky@chromium.org, mr.bossman075@gmail.com,
+        Ying Sun <sunying@nj.iscas.ac.cn>,
+        Siyuan Guo <zy21df106@buaa.edu.cn>
+Subject: [PATCHv2 -next] kconfig: add dependency warning print about invalid values in verbose mode
+Date:   Tue,  5 Sep 2023 17:43:13 +0800
+Message-Id: <20230905094313.11609-1-sunying@nj.iscas.ac.cn>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20230809002436.18079-1-sunying@nj.iscas.ac.cn>
+References: <20230809002436.18079-1-sunying@nj.iscas.ac.cn>
+X-CM-TRANSID: zQCowACnrWE1+PZkgCnQCg--.20711S2
+X-Coremail-Antispam: 1UD129KBjvJXoW3XFWxXw4UCFy8WF4kGr18AFb_yoW3XrW5pa
+        18uayUKrsrAFySvw17KF18Cw1rJ3yvgr4xCwsxCw17ZFy3ta92vw47Gr1Yqa15Cr48ArWj
+        ka4F9FWFkF4xJaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUva14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+        6F4UM28EF7xvwVC2z280aVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVCY1x0267AKxVW8Jr
+        0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
+        6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AKxVWxJVW8Jr1lOx8S6xCaFVCjc4AY6r
+        1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwAKzVCY07xG64k0
+        F24lc2xSY4AK67AK6r4fMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI
+        8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AK
+        xVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI
+        8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280
+        aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyT
+        uYvjfUOrWrDUUUU
+X-Originating-IP: [124.16.141.245]
+X-CM-SenderInfo: 5vxq5xdqj60y4olvutnvoduhdfq/
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hi.
+From: Ying Sun <sunying@nj.iscas.ac.cn>
 
-Le samedi 2 septembre 2023, 09:40:46 CEST Alessandro Carminati a =C3=A9crit=
- :
-> Il giorno sab 2 set 2023 alle ore 08:36 Masahiro Yamada
->=20
-> <masahiroy@kernel.org> ha scritto:
-> > On Mon, Aug 28, 2023 at 8:45=E2=80=AFPM Alessandro Carminati (Red Hat)
-> >=20
-> > <alessandro.carminati@gmail.com> wrote:
-> > > From: Alessandro Carminati <alessandro.carminati@gmail.com>
-> > >=20
-> > > It is not uncommon for drivers or modules related to similar peripher=
-als
-> > > to have symbols with the exact same name.
-> > > While this is not a problem for the kernel's binary itself, it becomes
-> > > an
-> > > issue when attempting to trace or probe specific functions using
-> > > infrastructure like ftrace or kprobe.
-> > >=20
-> > > The tracing subsystem relies on the `nm -n vmlinux` output, which
-> > > provides
-> > > symbol information from the kernel's ELF binary. However, when multip=
-le
-> > > symbols share the same name, the standard nm output does not
-> > > differentiate
-> > > between them. This can lead to confusion and difficulty when trying to
-> > > probe the intended symbol.
-> > >=20
-> > >  ~ # cat /proc/kallsyms | grep " name_show"
-> > >  ffffffff8c4f76d0 t name_show
-> > >  ffffffff8c9cccb0 t name_show
-> > >  ffffffff8cb0ac20 t name_show
-> > >  ffffffff8cc728c0 t name_show
-> > >  ffffffff8ce0efd0 t name_show
-> > >  ffffffff8ce126c0 t name_show
-> > >  ffffffff8ce1dd20 t name_show
-> > >  ffffffff8ce24e70 t name_show
-> > >  ffffffff8d1104c0 t name_show
-> > >  ffffffff8d1fe480 t name_show
-> > >=20
-> > > **kas_alias** addresses this challenge by extending the symbol names
-> > > with
-> > > unique suffixes during the kernel build process.
-> > > The newly created aliases for these duplicated symbols are unique nam=
-es
-> > > that can be fed to the ftracefs interface. By doing so, it enables
-> > > previously unreachable symbols to be probed.
-> > >=20
-> > >  ~ # cat /proc/kallsyms | grep " name_show"
-> > >  ffffffff974f76d0 t name_show
-> > >  ffffffff974f76d0 t name_show__alias__6340
-> > >  ffffffff979cccb0 t name_show
-> > >  ffffffff979cccb0 t name_show__alias__6341
-> > >  ffffffff97b0ac20 t name_show
-> > >  ffffffff97b0ac20 t name_show__alias__6342
-> > >  ffffffff97c728c0 t name_show
-> > >  ffffffff97c728c0 t name_show__alias__6343
-> > >  ffffffff97e0efd0 t name_show
-> > >  ffffffff97e0efd0 t name_show__alias__6344
-> > >  ffffffff97e126c0 t name_show
-> > >  ffffffff97e126c0 t name_show__alias__6345
-> > >  ffffffff97e1dd20 t name_show
-> > >  ffffffff97e1dd20 t name_show__alias__6346
-> > >  ffffffff97e24e70 t name_show
-> > >  ffffffff97e24e70 t name_show__alias__6347
-> > >  ffffffff981104c0 t name_show
-> > >  ffffffff981104c0 t name_show__alias__6348
-> > >  ffffffff981fe480 t name_show
-> > >  ffffffff981fe480 t name_show__alias__6349
-> > >  ~ # echo "p:kprobes/evnt1 name_show__alias__6349" \
-> > > =20
-> > >  > >/sys/kernel/tracing/kprobe_events
-> > > =20
-> > >  ~ # cat /sys/kernel/tracing/kprobe_events
-> > >  p:kprobes/evnt1 name_show__alias__6349
-> > >=20
-> > > Changes from v1:
-> > > - Integrated changes requested by Masami to exclude symbols with
-> > > prefixes
-> > >=20
-> > >   "_cfi" and "_pfx".
-> > >=20
-> > > - Introduced a small framework to handle patterns that need to be
-> > > excluded
-> > >=20
-> > >   from the alias production.
-> > >=20
-> > > - Excluded other symbols using the framework.
-> > > - Introduced the ability to discriminate between text and data symbol=
-s.
-> > > - Added two new config symbols in this version:
-> > > CONFIG_KALLSYMS_ALIAS_DATA,
-> > >=20
-> > >   which allows data for data, and CONFIG_KALLSYMS_ALIAS_DATA_ALL, whi=
-ch
-> > >   excludes all filters and provides an alias for each duplicated symb=
-ol.
-> > >=20
-> > > https://lore.kernel.org/all/20230711151925.1092080-1-alessandro.carmi=
-nat
-> > > i@gmail.com/
-> > >=20
-> > > Changes from v2:
-> > > - Alias tags are created by querying DWARF information from the vmlin=
-ux.
-> > > - The filename + line number is normalized and appended to the origin=
-al
-> > > name. - The tag begins with '@' to indicate the symbol source.
-> > > - Not a change, but worth mentioning, since the alias is added to the
-> > > existing> >=20
-> > >   list, the old duplicated name is preserved, and the livepatch way of
-> > >   dealing with duplicates is maintained.
-> > >=20
-> > > - Acknowledging the existence of scenarios where inlined functions
-> > > declared in> >=20
-> > >   header files may result in multiple copies due to compiler behavior,
-> > >   though
-> > >  =20
-> > >    it is not actionable as it does not pose an operational issue.
-> > >=20
-> > > - Highlighting a single exception where the same name refers to
-> > > different
-> > >=20
-> > >   functions: the case of "compat_binfmt_elf.c," which directly includ=
-es
-> > >   "binfmt_elf.c" producing identical function copies in two separate
-> > >   modules.
-> > >=20
-> > > sample from new v3
-> > >=20
-> > >  ~ # cat /proc/kallsyms | grep gic_mask_irq
-> > >  ffffd0b03c04dae4 t gic_mask_irq
-> > >  ffffd0b03c04dae4 t gic_mask_irq@_drivers_irqchip_irq-gic_c_167
-> > >  ffffd0b03c050960 t gic_mask_irq
-> > >  ffffd0b03c050960 t gic_mask_irq@_drivers_irqchip_irq-gic-v3_c_404
-> > >  ~ #
-> > >=20
-> > > https://lore.kernel.org/all/20230714150326.1152359-1-alessandro.carmi=
-nat
-> > > i@gmail.com/
-> > >=20
-> > > Signed-off-by: Alessandro Carminati (Red Hat)
-> > > <alessandro.carminati@gmail.com> ---
-> > >=20
-> > >  init/Kconfig                        |  36 ++++
-> > >  scripts/Makefile                    |   4 +
-> > >  scripts/kas_alias/Makefile          |   4 +
-> > >  scripts/kas_alias/a2l.c             | 268 ++++++++++++++++++++++++++=
-++
-> > >  scripts/kas_alias/a2l.h             |  32 ++++
-> > >  scripts/kas_alias/duplicates_list.c |  70 ++++++++
-> > >  scripts/kas_alias/duplicates_list.h |  15 ++
-> > >  scripts/kas_alias/item_list.c       | 230 ++++++++++++++++++++++++
-> > >  scripts/kas_alias/item_list.h       |  26 +++
-> > >  scripts/kas_alias/kas_alias.c       | 217 ++++++++++++++++++++++
-> > >  scripts/link-vmlinux.sh             |  11 +-
-> > >  11 files changed, 910 insertions(+), 3 deletions(-)
-> >=20
-> > I added some review comments in another thread, but
-> > one of the biggest concerns might be "910 insertions".
->=20
-> Based on the feedback I received in the reviews, I need to overhaul the
-> code, potentially reducing its size. What would be a reasonable number
-> of lines for this feature?
->=20
-> > What this program does is quite simple,
-> > "find duplicated names, and call addr2line".
-> >=20
-> > You wrote a lot of code to self-implement these:
-> >  - sort function
-> >  - parse PATH env variable to find addr2line
-> >  - fork addr2line to establish pipe communications
->=20
-> Some of these functions might become obsolete in the upcoming v4, which
-> will certainly reduce the line count.
->=20
-> > Have you considered writing the code in Python (or Perl)?
-> > Is it too slow?
-> >
-> >From my perspective, there is a concern that using Python or Perl might
->=20
-> result in slower performance. My proficiency in Python and Perl is
-> limited, so I did not initially consider them as viable options for
-> implementing this solution.
->=20
-> > Most of the functions you implemented are already
-> > available in script languages.
-> >=20
-> >=20
-> >=20
-> > I am not sure if "@<file-path>" is a good solution,
-> > but the amount of the added code looks too much to me.
->=20
-> I had reservations about using the '@' symbol to decorate the alias becau=
-se
-> it's not a character commonly found in the kallsyms output. However, after
-> careful consideration, I arrived at the conclusion that it was suitable f=
-or
-> the task because it would make the alias stand-out and be easily
-> identifiable.
-> I'm open to any suggestions or alternative approaches you may have on this
-> matter.
+Add warning about the configuration option's invalid value in verbose mode,
+ including error causes, mismatch dependency, old and new values,
+ to help users correct them.
 
-I am maybe over-engineering the thing, but maybe we can have a=20
-CONFIG_KALLSYMS_ALIAS_FORMAT which users would set to indicate how to=20
-differentiate between two symbols?
-=46or example, CONFIG_KALLSYMS_ALIAS_FORMAT=3D@file-lineno would lead to wh=
-at we=20
-have currently.
-If you switch to using a higher level language, you can maybe focus more on=
-=20
-this.
-Anyway, I personally like what this contribution offers currently as it per=
-mits=20
-to distinguish between same symbols.
-I will take a look at v4! Thank you again for working on this.
+Detailed error messages are printed only when the environment variable
+ is set like "KCONFIG_VERBOSE=1".
+By default, the current behavior is not changed.
 
-> > --
-> > Best Regards
-> > Masahiro Yamada
->=20
-> Thank you
+Signed-off-by: Siyuan Guo <zy21df106@buaa.edu.cn>
+Signed-off-by: Ying Sun <sunying@nj.iscas.ac.cn>
+---
+v1 -> v2:
+* Reduced the number of code lines by refactoring and simplifying the logic.
+* Changed the print "ERROR" to "WARNING".
+* Focused on handling dependency errors: dir_dep and rev_dep, and range error.
+  - A downgrade from 'y' to 'm' has be warned.
+  - A new CONFIG option should not be warned.
+  - Overwriting caused by default value is not an error and is no longer printed.
+* Fixed style issues.
+---
+ scripts/kconfig/confdata.c | 100 +++++++++++++++++++++++++++++++++++--
+ scripts/kconfig/lkc.h      |   7 +++
+ scripts/kconfig/symbol.c   |  24 +++++++--
+ 3 files changed, 121 insertions(+), 10 deletions(-)
 
-Best regards.
-
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index 4a6811d77d18..86794ab39d7d 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -154,6 +154,56 @@ static void conf_message(const char *fmt, ...)
+ 
+ static const char *conf_filename;
+ static int conf_lineno, conf_warnings;
++const char *verbose;
++
++void conf_error_log(enum error_type type, struct symbol *sym, char *log, ...)
++{
++	static char *const tristate2str[3] = {"n", "m", "y"};
++	struct gstr gs = str_new();
++	char s[100];
++	char *oldval = NULL;
++	va_list args;
++
++	va_start(args, log);
++	vsnprintf(s, sizeof(s), log, args);
++	va_end(args);
++
++	switch (sym->type) {
++	case S_BOOLEAN:
++	case S_TRISTATE:
++		oldval = tristate2str[sym->def[S_DEF_USER].tri];
++		break;
++	case S_INT:
++	case S_HEX:
++	case S_STRING:
++		oldval = sym->def[S_DEF_USER].val;
++	default:
++		break;
++	}
++
++	str_printf(&gs,
++		"\nWARNING : %s [%s] value is invalid\n",
++		sym->name, oldval);
++	str_printf(&gs, s);
++	switch (type) {
++	case DIR_DEP:
++		str_printf(&gs,
++			"  Depends on [%c]: ",
++			sym->dir_dep.tri == mod ? 'm' : 'n');
++		expr_gstr_print(sym->dir_dep.expr, &gs);
++		str_printf(&gs, "\n");
++		break;
++	case REV_DEP:
++		expr_gstr_print_revdep(sym->rev_dep.expr, &gs, yes,
++					"  Selected by [y]:\n");
++		expr_gstr_print_revdep(sym->rev_dep.expr, &gs, mod,
++					"  Selected by [m]:\n");
++		break;
++	default:
++		break;
++	}
++	fputs(str_get(&gs), stderr);
++}
+ 
+ static void conf_warning(const char *fmt, ...)
+ {
+@@ -226,11 +276,14 @@ static const char *conf_get_rustccfg_name(void)
+ static int conf_set_sym_val(struct symbol *sym, int def, int def_flags, char *p)
+ {
+ 	char *p2;
++	static const char * const type[] = {"unknown", "bool", "tristate", "int", "hex", "string"};
+ 
+ 	switch (sym->type) {
+ 	case S_TRISTATE:
+ 		if (p[0] == 'm') {
+ 			sym->def[def].tri = mod;
++
++
+ 			sym->flags |= def_flags;
+ 			break;
+ 		}
+@@ -246,9 +299,14 @@ static int conf_set_sym_val(struct symbol *sym, int def, int def_flags, char *p)
+ 			sym->flags |= def_flags;
+ 			break;
+ 		}
+-		if (def != S_DEF_AUTO)
+-			conf_warning("symbol value '%s' invalid for %s",
++		if (def != S_DEF_AUTO) {
++			if (verbose)
++				conf_warning("symbol value '%s' invalid for %s\n due to its type is %s",
++				     p, sym->name, type[sym->type]);
++			else
++				conf_warning("symbol value '%s' invalid for %s",
+ 				     p, sym->name);
++		}
+ 		return 1;
+ 	case S_STRING:
+ 		/* No escaping for S_DEF_AUTO (include/config/auto.conf) */
+@@ -274,9 +332,14 @@ static int conf_set_sym_val(struct symbol *sym, int def, int def_flags, char *p)
+ 			sym->def[def].val = xstrdup(p);
+ 			sym->flags |= def_flags;
+ 		} else {
+-			if (def != S_DEF_AUTO)
+-				conf_warning("symbol value '%s' invalid for %s",
+-					     p, sym->name);
++			if (def != S_DEF_AUTO) {
++				if (verbose)
++					conf_warning("symbol value '%s' invalid for %s\n due to its type is %s",
++						p, sym->name, type[sym->type]);
++				else
++					conf_warning("symbol value '%s' invalid for %s",
++						p, sym->name);
++			}
+ 			return 1;
+ 		}
+ 		break;
+@@ -545,6 +608,7 @@ int conf_read(const char *name)
+ 	int conf_unsaved = 0;
+ 	int i;
+ 
++	verbose = getenv("KCONFIG_VERBOSE");
+ 	conf_set_changed(false);
+ 
+ 	if (conf_read_simple(name, S_DEF_USER)) {
+@@ -576,6 +640,32 @@ int conf_read(const char *name)
+ 			continue;
+ 		conf_unsaved++;
+ 		/* maybe print value in verbose mode... */
++		if (verbose) {
++			switch (sym->type) {
++			case S_BOOLEAN:
++			case S_TRISTATE:
++				if (sym->def[S_DEF_USER].tri != sym->curr.tri) {
++					if (sym->dir_dep.tri < sym->def[S_DEF_USER].tri)
++						conf_error_log(DIR_DEP, sym,
++							"  due to unmet direct dependencies\n",
++							NULL);
++					if (sym->rev_dep.tri > sym->def[S_DEF_USER].tri)
++						conf_error_log(REV_DEP, sym,
++							"  due to it is selected\n", NULL);
++				}
++				break;
++			case S_INT:
++			case S_HEX:
++			case S_STRING:
++				if (sym->dir_dep.tri == no &&
++					strcmp((char *)(sym->def[S_DEF_USER].val), "") != 0)
++					conf_error_log(DIR_DEP, sym,
++						"  due to unmet direct dependencies\n", NULL);
++				break;
++			default:
++				break;
++			}
++		}
+ 	}
+ 
+ 	for_all_symbols(i, sym) {
+diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
+index 471a59acecec..242b24650f47 100644
+--- a/scripts/kconfig/lkc.h
++++ b/scripts/kconfig/lkc.h
+@@ -38,10 +38,17 @@ void zconf_initscan(const char *name);
+ void zconf_nextfile(const char *name);
+ int zconf_lineno(void);
+ const char *zconf_curname(void);
++extern const char *verbose;
++enum error_type {
++	DIR_DEP,
++	REV_DEP,
++	RANGE
++};
+ 
+ /* confdata.c */
+ const char *conf_get_configname(void);
+ void set_all_choice_values(struct symbol *csym);
++void conf_error_log(enum error_type type, struct symbol *sym, char *log, ...);
+ 
+ /* confdata.c and expr.c */
+ static inline void xfwrite(const void *str, size_t len, size_t count, FILE *out)
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index 0572330bf8a7..a78f7eb64f40 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -600,7 +600,7 @@ bool sym_string_valid(struct symbol *sym, const char *str)
+ bool sym_string_within_range(struct symbol *sym, const char *str)
+ {
+ 	struct property *prop;
+-	long long val;
++	long long val, left, right;
+ 
+ 	switch (sym->type) {
+ 	case S_STRING:
+@@ -612,8 +612,15 @@ bool sym_string_within_range(struct symbol *sym, const char *str)
+ 		if (!prop)
+ 			return true;
+ 		val = strtoll(str, NULL, 10);
+-		return val >= sym_get_range_val(prop->expr->left.sym, 10) &&
+-		       val <= sym_get_range_val(prop->expr->right.sym, 10);
++		left = sym_get_range_val(prop->expr->left.sym, 10);
++		right = sym_get_range_val(prop->expr->right.sym, 10);
++		if (val >= left && val <= right)
++			return true;
++		if (verbose)
++			conf_error_log(RANGE, sym,
++				"  symbol value is %lld, the range is (%lld %lld)\n",
++				val, left, right);
++		return false;
+ 	case S_HEX:
+ 		if (!sym_string_valid(sym, str))
+ 			return false;
+@@ -621,8 +628,15 @@ bool sym_string_within_range(struct symbol *sym, const char *str)
+ 		if (!prop)
+ 			return true;
+ 		val = strtoll(str, NULL, 16);
+-		return val >= sym_get_range_val(prop->expr->left.sym, 16) &&
+-		       val <= sym_get_range_val(prop->expr->right.sym, 16);
++		left = sym_get_range_val(prop->expr->left.sym, 16);
++		right = sym_get_range_val(prop->expr->right.sym, 16);
++		if (val >= left && val <= right)
++			return true;
++		if (verbose)
++			conf_error_log(RANGE, sym,
++				"  symbol value is 0x%llx, the range is (0x%llx 0x%llx)\n",
++				val, left, right);
++		return false;
+ 	case S_BOOLEAN:
+ 	case S_TRISTATE:
+ 		switch (str[0]) {
+-- 
+2.17.1
 
