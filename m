@@ -2,65 +2,88 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14EAACA0FF8
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A37B9C83F2C
 	for <linux-kbuild@archiver.kernel.org>; Tue,  5 Sep 2023 16:33:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352503AbjIEQ1o (ORCPT
+        id S1352584AbjIEQ1q (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 5 Sep 2023 12:27:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42598 "EHLO
+        Tue, 5 Sep 2023 12:27:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354088AbjIEJf3 (ORCPT
+        with ESMTP id S1354162AbjIEJ71 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Sep 2023 05:35:29 -0400
-X-Greylist: delayed 4327 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 05 Sep 2023 02:35:26 PDT
-Received: from mail.equinoxrise.pl (mail.equinoxrise.pl [217.61.112.157])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FB2D1A7
-        for <linux-kbuild@vger.kernel.org>; Tue,  5 Sep 2023 02:35:26 -0700 (PDT)
-Received: by mail.equinoxrise.pl (Postfix, from userid 1002)
-        id A92E583543; Mon,  4 Sep 2023 09:41:36 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=equinoxrise.pl;
-        s=mail; t=1693813369;
-        bh=v6OgBfK5dN7P5dQ0wCu59rOfZaiqziJeLNblJ8dOcGI=;
-        h=Date:From:To:Subject:From;
-        b=vESK5QRsWao/iffWKaLJsDVwXGKRNIEghSgxMH8Iy3FDrk8Wfg8oFoBUICVfbcKlq
-         bKVcPY7RC/1UUUcSiOTekKLrHdNn2U1znmEF8vsddTaplfW8AF8+RY7olp+3/WU7Z9
-         GM9+O1FUeVT3oX8CQRjpgqv3qsATHBGAQGbp5PZOgk/i1E4c5nWAkfvy9H2DD6sKW7
-         6XJdfMeGcpp4VsgzlU9RVyLUTK/q+4cuo+goNXwgC9FAkMVF4/dg9SVq+gMhsPyA7Z
-         c3yDYPogmsbX+aZWeimgxnKFgU9aRZH28lKs5bsMpTx/KJ3uGOK+u+8EHZ4a3pXaVF
-         tjZVNeaQCTzqA==
-Received: by mail.equinoxrise.pl for <linux-kbuild@vger.kernel.org>; Mon,  4 Sep 2023 07:40:34 GMT
-Message-ID: <20230904084500-0.1.7.rnh.0.dza5pzzqur@equinoxrise.pl>
-Date:   Mon,  4 Sep 2023 07:40:34 GMT
-From:   "Mateusz Talaga" <mateusz.talaga@equinoxrise.pl>
-To:     <linux-kbuild@vger.kernel.org>
-Subject: Prezentacja
-X-Mailer: mail.equinoxrise.pl
+        Tue, 5 Sep 2023 05:59:27 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBC8118C;
+        Tue,  5 Sep 2023 02:59:23 -0700 (PDT)
+Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.226])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Rg1CY4m95z6D8dW;
+        Tue,  5 Sep 2023 17:58:01 +0800 (CST)
+Received: from mscphis00759.huawei.com (10.123.66.134) by
+ lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Tue, 5 Sep 2023 10:59:20 +0100
+From:   Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+To:     <masahiroy@kernel.org>
+CC:     <linux-kbuild@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yusongping@huawei.com>, <artem.kuzin@huawei.com>
+Subject: [PATCH] kconfig: fix possible buffer overflow
+Date:   Tue, 5 Sep 2023 17:59:14 +0800
+Message-ID: <20230905095914.1699335-1-konstantin.meskhidze@huawei.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.123.66.134]
+X-ClientProxiedBy: mscpeml100002.china.huawei.com (7.188.26.75) To
+ lhrpeml500004.china.huawei.com (7.191.163.9)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Dzie=C5=84 dobry!
+Buffer 'new_argv' is accessed without bound check after accessing with
+bound check via 'new_argc' index.
 
-Czy m=C3=B3g=C5=82bym przedstawi=C4=87 rozwi=C4=85zanie, kt=C3=B3re umo=C5=
-=BCliwia monitoring ka=C5=BCdego auta w czasie rzeczywistym w tym jego po=
-zycj=C4=99, zu=C5=BCycie paliwa i przebieg?
+Fixes: e298f3b49def ("kconfig: add built-in function support")
+Co-developed-by: Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>
+Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+---
+ scripts/kconfig/preprocess.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Dodatkowo nasze narz=C4=99dzie minimalizuje koszty utrzymania samochod=C3=
-=B3w, skraca czas przejazd=C3=B3w, a tak=C5=BCe tworzenie planu tras czy =
-dostaw.
+diff --git a/scripts/kconfig/preprocess.c b/scripts/kconfig/preprocess.c
+index 748da578b418..d1f5bcff4b62 100644
+--- a/scripts/kconfig/preprocess.c
++++ b/scripts/kconfig/preprocess.c
+@@ -387,24 +387,27 @@ static char *eval_clause(const char *str, size_t len, int argc, char *argv[])
+ 			if (new_argc >= FUNCTION_MAX_ARGS)
+ 				pperror("too many function arguments");
+ 			new_argv[new_argc++] = prev;
+ 			prev = p + 1;
+ 		} else if (*p == '(') {
+ 			nest++;
+ 		} else if (*p == ')') {
+ 			nest--;
+ 		}
+ 
+ 		p++;
+ 	}
++
++	if (new_argc >= FUNCTION_MAX_ARGS)
++		pperror("too many function arguments");
+ 	new_argv[new_argc++] = prev;
+ 
+ 	/*
+ 	 * Shift arguments
+ 	 * new_argv[0] represents a function name or a variable name.  Put it
+ 	 * into 'name', then shift the rest of the arguments.  This simplifies
+ 	 * 'const' handling.
+ 	 */
+ 	name = expand_string_with_args(new_argv[0], argc, argv);
+ 	new_argc--;
+ 	for (i = 0; i < new_argc; i++)
+ 		new_argv[i] = expand_string_with_args(new_argv[i + 1],
+-- 
+2.34.1
 
-Z naszej wiedzy i do=C5=9Bwiadczenia korzysta ju=C5=BC ponad 49 tys. Klie=
-nt=C3=B3w. Monitorujemy 809 000 pojazd=C3=B3w na ca=C5=82ym =C5=9Bwiecie,=
- co jest nasz=C4=85 najlepsz=C4=85 wizyt=C3=B3wk=C4=85.
-
-Bardzo prosz=C4=99 o e-maila zwrotnego, je=C5=9Bli mogliby=C5=9Bmy wsp=C3=
-=B3lnie om=C3=B3wi=C4=87 potencja=C5=82 wykorzystania takiego rozwi=C4=85=
-zania w Pa=C5=84stwa firmie.
-
-
-Pozdrawiam
-Mateusz Talaga
