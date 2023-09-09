@@ -2,94 +2,103 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F115EEC875F
-	for <linux-kbuild@archiver.kernel.org>; Thu,  7 Sep 2023 22:02:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DB92EEB57F
+	for <linux-kbuild@archiver.kernel.org>; Sat,  9 Sep 2023 05:28:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239057AbjIGWCU (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 7 Sep 2023 18:02:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39688 "EHLO
+        id S239515AbjIIF2b (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 9 Sep 2023 01:28:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239005AbjIGWCT (ORCPT
+        with ESMTP id S229925AbjIIF2a (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 7 Sep 2023 18:02:19 -0400
-Received: from cmx-torrgo001.bell.net (mta-tor-003.bell.net [209.71.212.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DE6E1BC9;
-        Thu,  7 Sep 2023 15:02:15 -0700 (PDT)
-X-RG-CM-BuS: 0
-X-RG-CM-SC: 0
-X-RG-CM: Clean
-X-Originating-IP: [142.198.135.111]
-X-RG-Env-Sender: dave.anglin@bell.net
-X-RG-Rigid: 64E88507015705AD
-X-CM-Envelope: MS4xfMguLgi8rgOYYRlMsto9Ayq2NmgVNKUBCk79F5EH/AZzO9PbzVP60RGbo6lhY50wZggkSlued0wG6DvohA9+cVvfARViIVUuVLeie9x+Xaf2mDG22QRw
- OtW06eMfh4QsRO6opGDu1t6o3s8gGeNcxWlsZ0DjOhmxbgL51jpqwjsmQVxrN8B0q9h/FCRmPz3CuG5A6gjT53x/gffyZfl2ss+jup9tYYjOjZLUSQjXoaa+
- sYHh1OHSyhR57ikVoyPflIo3+CuiiH/XOvuTxDES2/araKc5rxiMIR7iNwLpkCReGpVso0dhaR+c7kJOQde8+XFeEysNyh8a3tt5eiCAtqDSdDHZ2R0thMeJ
- gzalX9fVnO7FRTwrPs00vHxHNfzvBs5ffIZUej6SiMpvYQgIO2wnZczH32oJUnC9eSgMZ1ezlwTJJsdk+DbrWt4G9QvrkQ==
-X-CM-Analysis: v=2.4 cv=UM++oATy c=1 sm=1 tr=0 ts=64fa485d
- a=m0hBPjpnfWKpZW+YOe+Hqw==:117 a=m0hBPjpnfWKpZW+YOe+Hqw==:17
- a=IkcTkHD0fZMA:10 a=FBHGMhGWAAAA:8 a=0AOgk2NmGiZ_o05NmboA:9 a=QEXdDO2ut3YA:10
- a=9gvnlMMaQFpL9xblJ6ne:22
-Received: from [192.168.2.49] (142.198.135.111) by cmx-torrgo001.bell.net (5.8.814) (authenticated as dave.anglin@bell.net)
-        id 64E88507015705AD; Thu, 7 Sep 2023 18:02:05 -0400
-Message-ID: <97859bf1-c8c3-7294-8322-b0c9c408ba5e@bell.net>
-Date:   Thu, 7 Sep 2023 18:02:06 -0400
+        Sat, 9 Sep 2023 01:28:30 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C14B11BD3;
+        Fri,  8 Sep 2023 22:28:26 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-68a529e1974so2328132b3a.3;
+        Fri, 08 Sep 2023 22:28:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694237306; x=1694842106; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AhGcYIVxPZwLXUPMQ7arLtBywPpQ4z3xctSy6TWk6XU=;
+        b=qzkiSbkk044CfPpNTsN4hI8HDDas2kRjLqqMQzopziv/4dbduQAGTjcbzAvMbt6Iqu
+         /dGSBOwG6FBBBaz/xz2cDsH4kvT/AyYmyhglWwXhQ52opY0ZOJk9XPpMQSMMjaUQrr37
+         qMQlIiZvnBm1y93+P4rFRWL2CRmqdBmiRqa7QJW1fJQUKntVpWlR145arqdRYuHqkF5/
+         leACPU0cf5WS2+kORfjx1J8Ne1tHPoxTjgT2NNME8WU+luGfDrwlysJCYj+3pSePLtxn
+         n0T3qnrPnVMbkleIw3hvwcVtw750eRz/ZhK7i3suk6PFIIXeynP9h0ZHAC8Qc8H3KgBS
+         /1DA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694237306; x=1694842106;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AhGcYIVxPZwLXUPMQ7arLtBywPpQ4z3xctSy6TWk6XU=;
+        b=j8Hk0jHMnImoTIBWrNq08mycoXelz/3GpB02NFd/wkwcM01b7UJ63lBeAV4xgAP991
+         5zLQoURigmg2lK5u0nnvQUsV+rOAqir4bu2qiLvx7TiJ3DGakbkuGfzddh1c/AxwsMqd
+         Q8E5bxUzbyclnET6wEtIiOb68cXu0CFgL8zB9PvUAuzIGhzmtAA3bWYoeoFlIYKwdT5q
+         zq0Yt0cNDu/6mibpC7wv61TFRVGqtEGZ6vTGgmaBhhrr2M3QNSjpIAeEbbm0sPMUO3e4
+         Yd+7Jy8fpODvU3QKMUcfaC3V1P5Kehg7FNDJI/Z3fpK/za02veQTCpshQ/xXWL6Dlqd9
+         /FzQ==
+X-Gm-Message-State: AOJu0YzMBTYCBrnSoEqq8Tn6iZKJg7sDA3upgKIzQyvM/SvjO7qbSXej
+        +48tzxAh5muosGHmRtDZAms=
+X-Google-Smtp-Source: AGHT+IGw0ulupui94qNdMz252mwrFm6dOVwPF7ntkmtDhRPf3eauIShtH1mkNSqQIgh2r194qOvtMA==
+X-Received: by 2002:a05:6a00:15ca:b0:68a:4dfa:ea63 with SMTP id o10-20020a056a0015ca00b0068a4dfaea63mr4581797pfu.19.1694237306156;
+        Fri, 08 Sep 2023 22:28:26 -0700 (PDT)
+Received: from debian.me ([103.124.138.83])
+        by smtp.gmail.com with ESMTPSA id n26-20020aa78a5a000000b006828e49c04csm2088013pfa.75.2023.09.08.22.28.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Sep 2023 22:28:25 -0700 (PDT)
+Received: by debian.me (Postfix, from userid 1000)
+        id 89ED6803A58F; Sat,  9 Sep 2023 12:28:21 +0700 (WIB)
+Date:   Sat, 9 Sep 2023 12:28:21 +0700
+From:   Bagas Sanjaya <bagasdotme@gmail.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        TatriX <tatrics@gmail.com>,
+        Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Regressions <regressions@lists.linux.dev>,
+        Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
+        Linux Kernel Build System <linux-kbuild@vger.kernel.org>
+Subject: Re: Fwd: Bluetooth LE scan doesn't show device name
+Message-ID: <ZPwCdd6lnOTbcDS0@debian.me>
+References: <97224321-c839-c0a7-52dd-3fb6e52fc15e@gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Subject: Re: [PATCH] linux/export: fix reference to exported functions for
- parisc64
-From:   John David Anglin <dave.anglin@bell.net>
-To:     Masahiro Yamada <masahiroy@kernel.org>,
-        linux-parisc@vger.kernel.org, Helge Deller <deller@gmx.de>
-Cc:     linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        Nick Desaulniers <ndesaulniers@google.com>
-References: <20230905190828.790400-1-masahiroy@kernel.org>
- <c8a92dc8-de78-7484-bcc8-d4a91bec77de@bell.net>
- <c6568683-86b4-c48d-ed37-f1f87677eb44@bell.net>
-Content-Language: en-US
-In-Reply-To: <c6568683-86b4-c48d-ed37-f1f87677eb44@bell.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="yHJYS4swNGsW/wbV"
+Content-Disposition: inline
+In-Reply-To: <97224321-c839-c0a7-52dd-3fb6e52fc15e@gmail.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On 2023-09-05 7:59 p.m., John David Anglin wrote:
-> On 2023-09-05 5:57 p.m., John David Anglin wrote:
->> I'll check ddb5cdbafaaa.
-> Similar fault with ddb5cdbafaaa:
-The alignment of the __kstrtab_ symbols in vmlinux seems wrong.  I'm fairly certain that function
-references prefixed with P% on hppa64 need 8 byte alignment.
 
-81662: 0000000040ea4358     0 NOTYPE  LOCAL  DEFAULT   16 __kstrtab_system[...]
-  81663: 0000000040ea4748     0 NOTYPE  LOCAL  DEFAULT   16 __kstrtabns_syst[...]
-  81664: 0000000040e8e830     0 NOTYPE  LOCAL  DEFAULT   14 __ksymtab_system[...]
-  81665: 0000000040ea4365     0 NOTYPE  LOCAL  DEFAULT   16 __kstrtab_static[...]
-  81666: 0000000040ea4748     0 NOTYPE  LOCAL  DEFAULT   16 __kstrtabns_stat[...]
-  81667: 0000000040ea1640     0 NOTYPE  LOCAL  DEFAULT   15 __ksymtab_static[...]
-  81668: 0000000040ea437c     0 NOTYPE  LOCAL  DEFAULT   16 __kstrtab_reset_[...]
-  81669: 0000000040ea4748     0 NOTYPE  LOCAL  DEFAULT   16 __kstrtabns_rese[...]
-  81670: 0000000040e8bbc0     0 NOTYPE  LOCAL  DEFAULT   14 __ksymtab_reset_[...]
-  81671: 0000000040ea438a     0 NOTYPE  LOCAL  DEFAULT   16 __kstrtab_loops_[...]
-  81672: 0000000040ea4748     0 NOTYPE  LOCAL  DEFAULT   16 __kstrtabns_loop[...]
-  81673: 0000000040e86610     0 NOTYPE  LOCAL  DEFAULT   14 __ksymtab_loops_[...]
-  81674: 0000000040ea439a     0 NOTYPE  LOCAL  DEFAULT   16 __kstrtab_init_uts_ns
-  81675: 0000000040ea4748     0 NOTYPE  LOCAL  DEFAULT   16 __kstrtabns_init[...]
-  81676: 0000000040e99180     0 NOTYPE  LOCAL  DEFAULT   15 __ksymtab_init_uts_ns
-  81677: 0000000040ea43a6     0 NOTYPE  LOCAL  DEFAULT   16 __kstrtab_name_t[...]
-  81678: 0000000040ea4748     0 NOTYPE  LOCAL  DEFAULT   16 __kstrtabns_name[...]
-  81679: 0000000040e9b340     0 NOTYPE  LOCAL  DEFAULT   15 __ksymtab_name_t[...]
-  81680: 0000000040ea43b4     0 NOTYPE  LOCAL  DEFAULT   16 __kstrtab_wait_f[...]
-  81681: 0000000040ea4748     0 NOTYPE  LOCAL  DEFAULT   16 __kstrtabns_wait[...]
-  81682: 0000000040ea3638     0 NOTYPE  LOCAL  DEFAULT   15 __ksymtab_wait_f[...]
-  81683: 0000000040ea43c7     0 NOTYPE  LOCAL  DEFAULT   16 __kstrtab_init_task
-[...]
+--yHJYS4swNGsW/wbV
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I'm not sure how we get symbols that aren't 8 byte aligned.  The ".balign 4" directive
-in __KSYMTAB doesn't seem correct but it's not the whole problem.
+On Tue, Aug 08, 2023 at 08:44:36PM +0700, Bagas Sanjaya wrote:
+> #regzbot introduced: v5.9..v6.4 https://bugzilla.kernel.org/show_bug.cgi?=
+id=3D217773
+>=20
 
-Dave
+#regzbot fix: 52bf4fd43f759a
 
--- 
-John David Anglin  dave.anglin@bell.net
+--=20
+An old man doll... just what I always wanted! - Clara
 
+--yHJYS4swNGsW/wbV
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZPwCbwAKCRD2uYlJVVFO
+o3YPAQCu8g+OeR/FT4e0bLiH5epWupufFcZnNZzU0y5VYqsNqQD/Zy1WqYyTeb3n
+nOxfRLCWsV9IJ3KNPiTfR0i2jHbzKwU=
+=TM2y
+-----END PGP SIGNATURE-----
+
+--yHJYS4swNGsW/wbV--
