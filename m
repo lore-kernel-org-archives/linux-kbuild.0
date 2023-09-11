@@ -2,147 +2,116 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF498CA0EC7
-	for <linux-kbuild@archiver.kernel.org>; Mon, 11 Sep 2023 21:49:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C983CA0EC8
+	for <linux-kbuild@archiver.kernel.org>; Tue, 12 Sep 2023 02:20:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243676AbjIKVtf (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 11 Sep 2023 17:49:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42464 "EHLO
+        id S236855AbjILCUa (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 11 Sep 2023 22:20:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244275AbjIKTu5 (ORCPT
+        with ESMTP id S237363AbjILCUQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 11 Sep 2023 15:50:57 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A9A71A5;
-        Mon, 11 Sep 2023 12:50:52 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id DCB0E1F88C;
-        Mon, 11 Sep 2023 19:50:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1694461850; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9x8HAEIwtXLqml/7oNF1Uow6kl0Fypm9g4pU0Qbt6A0=;
-        b=LdsQIu6zmCI7TDQ6QofFPK2xiRxUbXOSjnePiglgpn0kDlJ/c+3YVnx52rOXOE63yaC9T+
-        DiWiAA0uqBjZfryxMLu9AbbcH+kevsdihj4n965KfTifOWw+GEO4wQph2TVFkfHeKtWS5b
-        R7V3VlIm8zv2EngyVws3GoVwxQ4gUgc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1694461850;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9x8HAEIwtXLqml/7oNF1Uow6kl0Fypm9g4pU0Qbt6A0=;
-        b=C4OffT5Eet3xv0n0rdQHo9TxEusmpxWcZGiKixobHAxVA6YT7HeI+iwCzgRMhvOw506fKl
-        sG19g3QXZRSYi2Bw==
-Received: from kitsune.suse.cz (kitsune.suse.cz [10.100.12.127])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id F18812C142;
-        Mon, 11 Sep 2023 19:50:49 +0000 (UTC)
-Date:   Mon, 11 Sep 2023 21:50:48 +0200
-From:   Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-modules@vger.kernel.org, Takashi Iwai <tiwai@suse.com>,
-        Lucas De Marchi <lucas.de.marchi@gmail.com>,
-        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-        Jiri Slaby <jslaby@suse.com>, Jan Engelhardt <jengelh@inai.de>,
+        Mon, 11 Sep 2023 22:20:16 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 244B7141938;
+        Mon, 11 Sep 2023 18:43:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+        Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+        bh=o91i0BrRYW6i4ggXpHFxM6+k8TqRwA2kmbfi7bWB11I=; b=jtOtBkVi85VfoTYtK70HkFQRhV
+        7n1exiuutzIDGv0/lTYyDrXxLtRiyFs8vVVQiPwvxfGaHKcUS5fwsX/80Lm6JEH8l4+uWkSQYHUsS
+        f/TLIAunPWJqd2nMjW2U4mbs3tL7bIi1bCXAnBtel9fmVehJDx0/8xZF8xtdzqvOXt7XDKQoXdVUT
+        NNWBdJHbG1Rc+uGGzV17Xp15A1LuIAjVfvT2hiW8XHgn/lvlEjQyqF/NLy1OHl5SUmX8QH1KsBZ/e
+        YQpQBAYQGc1C3qON0ke0vT+ov5P/V2dHPc73RvV+WTvSiVzv9wMXgCPdFJADLBU4ZDfrYvsJteYfx
+        I0O2cwjg==;
+Received: from [2601:1c2:980:9ec0::9fed]
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1qfp2e-001SmM-1a;
+        Mon, 11 Sep 2023 22:06:00 +0000
+Message-ID: <85563fd1-b9c1-60a9-24bc-4e5f7ee3bea4@infradead.org>
+Date:   Mon, 11 Sep 2023 15:05:56 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [RFC PATCH 1/1] scripts: Introduce a default git.orderFile
+Content-Language: en-US
+To:     Leonardo Bras <leobras@redhat.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
         Nicolas Schier <nicolas@fjasle.eu>,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH kmod v5 0/5] kmod /usr support
-Message-ID: <20230911195048.GK8826@kitsune.suse.cz>
-References: <cover.1689589902.git.msuchanek@suse.de>
- <cover.1689681454.git.msuchanek@suse.de>
- <20230817163744.GD8826@kitsune.suse.cz>
- <CAK7LNAQy79ZHS0d000XQzC-trRPhOUBFnWsGm03yG0cQAs-rXA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAK7LNAQy79ZHS0d000XQzC-trRPhOUBFnWsGm03yG0cQAs-rXA@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        Mauro Carvalho Chehab <mchehab@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+References: <20230911193752.27642-2-leobras@redhat.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20230911193752.27642-2-leobras@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sat, Aug 19, 2023 at 08:25:52PM +0900, Masahiro Yamada wrote:
-> On Fri, Aug 18, 2023 at 12:15 PM Michal Suchánek <msuchanek@suse.de> wrote:
-> >
-> > Hello,
-> >
-> > On Tue, Jul 18, 2023 at 02:01:51PM +0200, Michal Suchanek wrote:
-> > > Hello,
-> > >
-> > > with these patches it is possible to install kernel modules in an arbitrary
-> > > directory - eg. moving the /lib/modules to /usr/lib/modules or /opt/linux.
-> > >
-> > > While the modprobe.d and depmod.d search which already includes multiple
-> > > paths is expanded to also include $(prefix) the module directory still
-> > > supports only one location, only a different one under $(module_directory).
-> > >
-> > > Having kmod search multiple module locations while only one is supported now
-> > > might break some assumption about relative module path corresponding to a
-> > > specific file, would require more invasive changes to implement, and is not
-> > > supportive of the goal of moving the modules away from /lib.
-> > >
-> > > Both kmod and the kernel need to be patched to make use of this feature.
-> > > Patched kernel is backwards compatible with older kmod.  Patched kmod
-> > > with $(module_directory) set to /lib/modules is equivalent to unpatched kmod.
-> >
-> > The patch to kernel to support autodetection of module directory is
-> > rejected. However, a workaround like
-> >
-> > make MODLIB='$(INSTALL_MOD_PATH)/usr/lib/modules/$(KERNELRELEASE)'
-> >
-> > is suggested.
-> >
-> > Can you consider inluding the kmod changes?
-> 
-> 
-> Hi.
-> 
-> I have a question about your original patch
-> for the Kbuild change.
-> 
-> In your patch, Kbuild runs 'kmod config' or
-> 'pkg-config --variable=module_directory kmod',
-> then sets the returned string to MODLIB.
-> 
-> 
-> If kmod is configured to use /usr/lib/modules,
-> /opt/modules, or whatever,
-> should we change the installation path of the debug
-> vdso accordingly?
-> 
-> Currently, the debug vdso is always installed
-> to /lib/modules/$(KERNELRELEASE)/vdso/.
-> 
-> However, modules and vdso are unrelated to each other.
-> kmod does not care about vdso.
-> 
-> 
-> The following commits started to install debug vdso.
-> 
-> Commit 8150caad0226 ("[POWERPC] powerpc vDSO: install unstripped
-> copies on disk")
-> Commit f79eb83b3af4 ("x86: Install unstripped copy of 64bit vdso to disk")
-> 
-> 
-> I do not know why they chose $(MODLIB)/vdso as the install destination.
-> 
-> 
-> I am thinking of split the variable into two:
-> MODLIB -  installation path for modules
-> VDSOLIB - installation path for debug vdso (not affected by kmod config)
-> 
-> I think that is the way to do this correctly.
 
-The source and build symlinks that point at the kernel tree are not
-modules either yet they are in the module directory as well.
 
-Thanks
+On 9/11/23 12:37, Leonardo Bras wrote:
+> When reviewing patches, it looks much nicer to have some changes shown
+> before others, which allow better understanding of the patch before the
+> the .c files reviewing.
+> 
+> Introduce a default git.orderFile, in order to help developers getting the
+> best ordering easier.
+> 
+> Signed-off-by: Leonardo Bras <leobras@redhat.com>
+> ---
+> 
+> Please provide feedback on what else to add / remove / reorder here!
+> 
+>  scripts/git.orderFile | 31 +++++++++++++++++++++++++++++++
+>  1 file changed, 31 insertions(+)
+>  create mode 100644 scripts/git.orderFile
+> 
+> diff --git a/scripts/git.orderFile b/scripts/git.orderFile
+> new file mode 100644
+> index 000000000000..3434028be2f2
+> --- /dev/null
+> +++ b/scripts/git.orderFile
+> @@ -0,0 +1,31 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +
+> +# order file for git, to produce patches which are easier to review
+> +# by diffing the important stuff like header changes first.
+> +#
+> +# one-off usage:
+> +#   git diff -O scripts/git.orderfile ...
+> +#
+> +# add to git config:
+> +#   git config diff.orderFile scripts/git.orderfile
+> +#
+> +
+> +MAINTAINERS
+> +
+> +# Documentation
+> +Documentation/*
+> +*.rst
+> +
+> +# build system
+> +Kbuild
+> +Makefile*
+> +*.mak
 
-Michal
+Can we have Kconfig* here also?
+thanks.
+
+> +
+> +# semantic patches
+> +*.cocci
+> +
+> +# headers
+> +*.h
+> +
+> +# code
+> +*.c
+
+-- 
+~Randy
