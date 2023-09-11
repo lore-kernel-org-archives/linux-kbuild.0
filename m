@@ -2,116 +2,127 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C983CA0EC8
-	for <linux-kbuild@archiver.kernel.org>; Tue, 12 Sep 2023 02:20:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F076CCA0EC3
+	for <linux-kbuild@archiver.kernel.org>; Tue, 12 Sep 2023 02:32:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236855AbjILCUa (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 11 Sep 2023 22:20:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43138 "EHLO
+        id S238040AbjILCc6 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 11 Sep 2023 22:32:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237363AbjILCUQ (ORCPT
+        with ESMTP id S238449AbjILCcj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 11 Sep 2023 22:20:16 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 244B7141938;
-        Mon, 11 Sep 2023 18:43:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-        Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-        bh=o91i0BrRYW6i4ggXpHFxM6+k8TqRwA2kmbfi7bWB11I=; b=jtOtBkVi85VfoTYtK70HkFQRhV
-        7n1exiuutzIDGv0/lTYyDrXxLtRiyFs8vVVQiPwvxfGaHKcUS5fwsX/80Lm6JEH8l4+uWkSQYHUsS
-        f/TLIAunPWJqd2nMjW2U4mbs3tL7bIi1bCXAnBtel9fmVehJDx0/8xZF8xtdzqvOXt7XDKQoXdVUT
-        NNWBdJHbG1Rc+uGGzV17Xp15A1LuIAjVfvT2hiW8XHgn/lvlEjQyqF/NLy1OHl5SUmX8QH1KsBZ/e
-        YQpQBAYQGc1C3qON0ke0vT+ov5P/V2dHPc73RvV+WTvSiVzv9wMXgCPdFJADLBU4ZDfrYvsJteYfx
-        I0O2cwjg==;
-Received: from [2601:1c2:980:9ec0::9fed]
-        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1qfp2e-001SmM-1a;
-        Mon, 11 Sep 2023 22:06:00 +0000
-Message-ID: <85563fd1-b9c1-60a9-24bc-4e5f7ee3bea4@infradead.org>
-Date:   Mon, 11 Sep 2023 15:05:56 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [RFC PATCH 1/1] scripts: Introduce a default git.orderFile
-Content-Language: en-US
-To:     Leonardo Bras <leobras@redhat.com>,
-        Masahiro Yamada <masahiroy@kernel.org>,
+        Mon, 11 Sep 2023 22:32:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2CA4E16DD6F
+        for <linux-kbuild@vger.kernel.org>; Mon, 11 Sep 2023 17:14:11 -0700 (PDT)
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-121-Phy95IUDN2WVqDQ6Do8P6w-1; Mon, 11 Sep 2023 19:45:39 -0400
+X-MC-Unique: Phy95IUDN2WVqDQ6Do8P6w-1
+Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-6c0f2a1da4fso1020628a34.2
+        for <linux-kbuild@vger.kernel.org>; Mon, 11 Sep 2023 16:45:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694475938; x=1695080738;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pVho9DFdy9WX2sV5QCNmMLyT6ZAwYjpgqtFPu/9HvYo=;
+        b=sVYdT4GZq1nkFjeU6tmxDui6NOPsvLyO450Zi5eChkDKmk4KZrm5JEkeBPZ1uwYI9D
+         54siSDwdIF4q5hju0Go9FXZT15skJH77FTfuV52/2hBsjolqSVhb1FsYE/i29UjVBmCl
+         vsV6X5/rKM3xSM4bzsZPXqycVtE/5DIBCADHymaQI4JEPzCuwXTIMoEYwf1o/Xw6HhzH
+         /7lJ0KuK4PRI8Bpimm4gpocdywAHwf56DhZgm2FmD6LnF12F/YAIaMHNB5w3zMz861WB
+         5z7wkxVbi1Qnc4+6VdoIND4v5jUtssA9q+iW/BNjr8qlxnPcvZVegYR7ApVniUdaVVXh
+         47tg==
+X-Gm-Message-State: AOJu0Yz2IXIRHriK2NdvGecAe06TOnBO995UJUu8rMjrb3/g7e7oXuXG
+        xKL/MWAPF9u2vLrXNy/LFrcidycXaUEcBOkAgH7IbRzqmbpZbTnH/y6UkDsCQw5PZuQe13IBv88
+        Tdrfw4DRjOnDAwYuWsFHiRMgQiqRwLjOd
+X-Received: by 2002:a9d:6d19:0:b0:6bc:c542:6f75 with SMTP id o25-20020a9d6d19000000b006bcc5426f75mr12808184otp.0.1694475938733;
+        Mon, 11 Sep 2023 16:45:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHPpJM2jDI9Nw3z0LJidGHjDMA/sa6wLPPzWY/rhO4GYN6s/67nHlerNd4ErB5Sr6FlG6KNOQ==
+X-Received: by 2002:a9d:6d19:0:b0:6bc:c542:6f75 with SMTP id o25-20020a9d6d19000000b006bcc5426f75mr12808172otp.0.1694475938540;
+        Mon, 11 Sep 2023 16:45:38 -0700 (PDT)
+Received: from localhost.localdomain ([2804:1b3:a803:c91:da45:7fbc:86c3:920a])
+        by smtp.gmail.com with ESMTPSA id a2-20020a9d6e82000000b006b89596bc61sm3547839otr.61.2023.09.11.16.45.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Sep 2023 16:45:37 -0700 (PDT)
+From:   Leonardo Bras <leobras@redhat.com>
+To:     Masahiro Yamada <masahiroy@kernel.org>,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
         Nicolas Schier <nicolas@fjasle.eu>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
-References: <20230911193752.27642-2-leobras@redhat.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20230911193752.27642-2-leobras@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Randy Dunlap <rdunlap@infradead.org>
+Cc:     Leonardo Bras <leobras@redhat.com>, linux-kernel@vger.kernel.org,
+        linux-kbuild@vger.kernel.org
+Subject: [RFC PATCH v2 1/1] scripts: Introduce a default git.orderFile
+Date:   Mon, 11 Sep 2023 20:44:17 -0300
+Message-ID: <20230911234418.38154-2-leobras@redhat.com>
+X-Mailer: git-send-email 2.42.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
+When reviewing patches, it looks much nicer to have some changes shown
+before others, which allow better understanding of the patch before the
+the .c files reviewing.
 
+Introduce a default git.orderFile, in order to help developers getting the
+best ordering easier.
 
-On 9/11/23 12:37, Leonardo Bras wrote:
-> When reviewing patches, it looks much nicer to have some changes shown
-> before others, which allow better understanding of the patch before the
-> the .c files reviewing.
-> 
-> Introduce a default git.orderFile, in order to help developers getting the
-> best ordering easier.
-> 
-> Signed-off-by: Leonardo Bras <leobras@redhat.com>
-> ---
-> 
-> Please provide feedback on what else to add / remove / reorder here!
-> 
->  scripts/git.orderFile | 31 +++++++++++++++++++++++++++++++
->  1 file changed, 31 insertions(+)
->  create mode 100644 scripts/git.orderFile
-> 
-> diff --git a/scripts/git.orderFile b/scripts/git.orderFile
-> new file mode 100644
-> index 000000000000..3434028be2f2
-> --- /dev/null
-> +++ b/scripts/git.orderFile
-> @@ -0,0 +1,31 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +
-> +# order file for git, to produce patches which are easier to review
-> +# by diffing the important stuff like header changes first.
-> +#
-> +# one-off usage:
-> +#   git diff -O scripts/git.orderfile ...
-> +#
-> +# add to git config:
-> +#   git config diff.orderFile scripts/git.orderfile
-> +#
-> +
-> +MAINTAINERS
-> +
-> +# Documentation
-> +Documentation/*
-> +*.rst
-> +
-> +# build system
-> +Kbuild
-> +Makefile*
-> +*.mak
+Signed-off-by: Leonardo Bras <leobras@redhat.com>
+---
 
-Can we have Kconfig* here also?
-thanks.
+Please provide feedback on what else to add / remove / reorder here!
 
-> +
-> +# semantic patches
-> +*.cocci
-> +
-> +# headers
-> +*.h
-> +
-> +# code
-> +*.c
+Changes since RFCv1:
+- Added Kconfig* (thanks Randy Dunlap!)
+- Changed Kbuild to Kbuild* (improve matching)
 
+ scripts/git.orderFile | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+ create mode 100644 scripts/git.orderFile
+
+diff --git a/scripts/git.orderFile b/scripts/git.orderFile
+new file mode 100644
+index 000000000000..819f0a957fe3
+--- /dev/null
++++ b/scripts/git.orderFile
+@@ -0,0 +1,32 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++
++# order file for git, to produce patches which are easier to review
++# by diffing the important stuff like header changes first.
++#
++# one-off usage:
++#   git diff -O scripts/git.orderfile ...
++#
++# add to git config:
++#   git config diff.orderFile scripts/git.orderfile
++#
++
++MAINTAINERS
++
++# Documentation
++Documentation/*
++*.rst
++
++# build system
++Kbuild*
++Kconfig*
++Makefile*
++*.mak
++
++# semantic patches
++*.cocci
++
++# headers
++*.h
++
++# code
++*.c
 -- 
-~Randy
+2.42.0
+
