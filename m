@@ -2,78 +2,86 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EC51EE57DF
-	for <linux-kbuild@archiver.kernel.org>; Mon, 11 Sep 2023 08:01:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12D95CA0EC7
+	for <linux-kbuild@archiver.kernel.org>; Mon, 11 Sep 2023 21:49:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232716AbjIKIBj (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 11 Sep 2023 04:01:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53970 "EHLO
+        id S244215AbjIKVtK (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 11 Sep 2023 17:49:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234074AbjIKIBi (ORCPT
+        with ESMTP id S235784AbjIKJhq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 11 Sep 2023 04:01:38 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC159BB;
-        Mon, 11 Sep 2023 01:01:30 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 749D11F38D;
-        Mon, 11 Sep 2023 08:01:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1694419289; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc;
-        bh=6itrlTfHSmO99MfE7NAbLdU9YS0CJgPDLtuNCYJ8Yps=;
-        b=hSy/0bU2Gy29rUOLalrzqxje69Bm1z5bVULbGKS7lqVlECloMcxd0zHeD0c7qQ3R/87668
-        chYbCHyKZiafZbyE2msUbuvLIe31xL0wAiH/9nBN/FRi23atmG4xXDPSU6rfabtWayLSOY
-        +bHSGm2hwG/ydbCViO3M+AveQo+W8rk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1694419289;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc;
-        bh=6itrlTfHSmO99MfE7NAbLdU9YS0CJgPDLtuNCYJ8Yps=;
-        b=wU1myPCNw6AJyFLjQTur+2NvESVhBCBdoG9uUVLTs1uBLEO8CMNUsgdTokpt6TN7mKloWn
-        vSpP61/km5gix4BA==
-Received: from lion.mk-sys.cz (mkubecek.udp.ovpn2.prg.suse.de [10.100.200.14])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 608272C142;
-        Mon, 11 Sep 2023 08:01:29 +0000 (UTC)
-Received: by lion.mk-sys.cz (Postfix, from userid 1000)
-        id 38BA12016B; Mon, 11 Sep 2023 10:01:29 +0200 (CEST)
-From:   Michal Kubecek <mkubecek@suse.cz>
-Subject: [PATCH] kbuild: avoid long argument lists in make modules_install
-To:     Masahiro Yamada <masahiroy@kernel.org>,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-Id: <20230911080129.38BA12016B@lion.mk-sys.cz>
-Date:   Mon, 11 Sep 2023 10:01:29 +0200 (CEST)
+        Mon, 11 Sep 2023 05:37:46 -0400
+Received: from mail.avm.de (mail.avm.de [IPv6:2001:bf0:244:244::120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34CDBEE
+        for <linux-kbuild@vger.kernel.org>; Mon, 11 Sep 2023 02:37:38 -0700 (PDT)
+Received: from mail-auth.avm.de (unknown [IPv6:2001:bf0:244:244::71])
+        by mail.avm.de (Postfix) with ESMTPS;
+        Mon, 11 Sep 2023 11:37:34 +0200 (CEST)
+Received: from buildd.core.avm.de (buildd-sv-01.avm.de [172.16.0.225])
+        by mail-auth.avm.de (Postfix) with ESMTPA id 2F96B800AA;
+        Mon, 11 Sep 2023 11:37:35 +0200 (CEST)
+Received: by buildd.core.avm.de (Postfix, from userid 1000)
+        id 1E614180D2E; Mon, 11 Sep 2023 11:37:35 +0200 (CEST)
+Date:   Mon, 11 Sep 2023 11:37:35 +0200
+From:   Nicolas Schier <nicolas@fjasle.eu>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Karolis M <k4rolis@protonmail.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>
+Subject: Re: [PATCH] kbuild: fix kernel-devel RPM package and linux-headers
+ Deb package
+Message-ID: <ZP7f35Lmt6Lo3Y0X@buildd.core.avm.de>
+References: <20230910124413.1479521-1-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230910124413.1479521-1-masahiroy@kernel.org>
+X-purgate-ID: 149429::1694425054-84FD9D8B-89BDB70F/0/0
+X-purgate-type: clean
+X-purgate-size: 1583
+X-purgate-Ad: Categorized by eleven eXpurgate (R) http://www.eleven.de
+X-purgate: This mail is considered clean (visit http://www.eleven.de for further information)
+X-purgate: clean
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Running "make modules_install" may fail with
+On Sun, Sep 10, 2023 at 09:44:13PM +0900, Masahiro Yamada wrote:
+> Since commit fe66b5d2ae72 ("kbuild: refactor kernel-devel RPM package
+> and linux-headers Deb package"), the kernel-devel RPM package and
+> linux-headers Deb package are broken.
+> 
+> I double-quoted the $(find ... -type d), which resulted in newlines
+> being included in the argument to the outer find comment.
+> 
+>   find: 'arch/arm64/include\narch/arm64/kvm/hyp/include': No such file or directory
+> 
+> The outer find command is unneeded.
+> 
+> Fixes: fe66b5d2ae72 ("kbuild: refactor kernel-devel RPM package and linux-headers Deb package")
+> Reported-by: Karolis M <k4rolis@protonmail.com>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
+> 
+>  scripts/package/install-extmod-build | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/scripts/package/install-extmod-build b/scripts/package/install-extmod-build
+> index af7fe9f5b1e4..8a7051fad087 100755
+> --- a/scripts/package/install-extmod-build
+> +++ b/scripts/package/install-extmod-build
+> @@ -20,7 +20,7 @@ mkdir -p "${destdir}"
+>  	find "arch/${SRCARCH}" -maxdepth 1 -name 'Makefile*'
+>  	find include scripts -type f -o -type l
+>  	find "arch/${SRCARCH}" -name Kbuild.platforms -o -name Platform
+> -	find "$(find "arch/${SRCARCH}" -name include -o -name scripts -type d)" -type f
+> +	find "arch/${SRCARCH}" -name include -o -name scripts -type d
+>  ) | tar -c -f - -C "${srctree}" -T - | tar -xf - -C "${destdir}"
+>  
+>  {
+> -- 
+> 2.39.2
 
-  make[2]: execvp: /bin/sh: Argument list too long
-
-if many modules are built and INSTALL_MOD_PATH is long. This is because
-scripts/Makefile.modinst creates all directories with one mkdir command.
-Use $(foreach ...) instead to prevent an excessive argument list.
-
-Fixes: 2dfec887c0fd ("kbuild: reduce the number of mkdir calls during modules_install")
-Signed-off-by: Michal Kubecek <mkubecek@suse.cz>
----
- scripts/Makefile.modinst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/scripts/Makefile.modinst b/scripts/Makefile.modinst
-index c59cc57286ba..346f5ec50682 100644
---- a/scripts/Makefile.modinst
-+++ b/scripts/Makefile.modinst
-@@ -113,7 +113,7 @@ quiet_cmd_sign :=
- endif
- 
- # Create necessary directories
--$(shell mkdir -p $(sort $(dir $(install-y))))
-+$(foreach dir, $(sort $(dir $(install-y))), $(shell mkdir -p $(dir)))
- 
- $(dst)/%.ko: $(extmod_prefix)%.ko FORCE
- 	$(call cmd,install)
--- 
-2.42.0
-
+Reviewed-by: Nicolas Schier <n.schier@avm.de>
