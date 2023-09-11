@@ -2,139 +2,205 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 457ABCA0ECB
-	for <linux-kbuild@archiver.kernel.org>; Mon, 11 Sep 2023 21:49:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34264CA0EC6
+	for <linux-kbuild@archiver.kernel.org>; Mon, 11 Sep 2023 21:49:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240414AbjIKVtQ (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 11 Sep 2023 17:49:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44170 "EHLO
+        id S239364AbjIKVtR (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 11 Sep 2023 17:49:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244293AbjIKT4p (ORCPT
+        with ESMTP id S242251AbjIKPZ4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 11 Sep 2023 15:56:45 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE9D41A7;
-        Mon, 11 Sep 2023 12:56:40 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 693161F88C;
-        Mon, 11 Sep 2023 19:56:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1694462199; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=f/nZkdclC8N0AmmXEFCRJO8MtC0Z8ZAPugiL8rL00Ks=;
-        b=mvHWRKfFiFdjA+RAqKXUbxbczOMFEUGNmKIv4pgCPbjU+NQjcayZrqHnwQ24ez9LMAkZ5n
-        60VC/RsscTdhpHKoAJIEiGU0Yij2Slr0UbNidGNubILeJYqrxhEczPdptLSPVgDmOgczZ2
-        FrOHhRFt2ooaYPq/ydzs0UGcEY4Iij0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1694462199;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=f/nZkdclC8N0AmmXEFCRJO8MtC0Z8ZAPugiL8rL00Ks=;
-        b=jlb2xG4flSJUd9PhiC8ngVWDKpjClKpX+MUcZZ+sInXANl2y52lciL898ZK0jKOBXOcSNw
-        GdL0P8f7cirE6NDQ==
-Received: from kitsune.suse.cz (kitsune.suse.cz [10.100.12.127])
-        by relay2.suse.de (Postfix) with ESMTP id 0F1872C143;
-        Mon, 11 Sep 2023 19:56:39 +0000 (UTC)
-From:   Michal Suchanek <msuchanek@suse.de>
-To:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Michal Suchanek <msuchanek@suse.de>,
-        Nicolas Schier <nicolas@fjasle.eu>,
-        linux-modules@vger.kernel.org, Takashi Iwai <tiwai@suse.com>,
-        Lucas De Marchi <lucas.de.marchi@gmail.com>,
-        =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
-        Jiri Slaby <jslaby@suse.com>, Jan Engelhardt <jengelh@inai.de>,
+        Mon, 11 Sep 2023 11:25:56 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCD99D8;
+        Mon, 11 Sep 2023 08:25:51 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECF2CC433C8;
+        Mon, 11 Sep 2023 15:25:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1694445951;
+        bh=8/6+KG0FZJN+OPTG6EeDl2K5ZOjK3JRC0tgCXBuvO+Q=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=VkBdJh42eC9h8RmLKS2c6TnRAgYNSEOhP9000lCHnKhz+YdxZpmYYySN0WjHGc/w3
+         /UJEupLvL+kU/vViOMNNTxF+yf/Wjjfph6vXsMffq5kdbzzrEJD6XcoT8JVl63DPQD
+         fR7lyROg5+jCuMUdyfGWL93rF5FaBTsGjiuW655s=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     stable@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        patches@lists.linux.dev, Randy Dunlap <rdunlap@infradead.org>,
+        kernel test robot <lkp@intel.com>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        linux-um@lists.infradead.org, Tejun Heo <tj@kernel.org>,
+        Takashi Iwai <tiwai@suse.de>, Jaroslav Kysela <perex@perex.cz>,
+        Masahiro Yamada <masahiroy@kernel.org>,
         Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH] kbuild: rpm-pkg: Fix build with non-default MODLIB
-Date:   Mon, 11 Sep 2023 21:56:18 +0200
-Message-ID: <20230911195621.15198-1-msuchanek@suse.de>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <CAK7LNAT6mQ0EpwmKUCBhv9Acaf_qyGq4hu=XvSWRuZ-pNAFWVw@mail.gmail.com>
-References: <CAK7LNAT6mQ0EpwmKUCBhv9Acaf_qyGq4hu=XvSWRuZ-pNAFWVw@mail.gmail.com>
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nicolas Schier <nicolas@fjasle.eu>,
+        linux-kbuild@vger.kernel.org, alsa-devel@alsa-project.org,
+        Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.1 512/600] um: Fix hostaudio build errors
+Date:   Mon, 11 Sep 2023 15:49:05 +0200
+Message-ID: <20230911134648.730492117@linuxfoundation.org>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20230911134633.619970489@linuxfoundation.org>
+References: <20230911134633.619970489@linuxfoundation.org>
+User-Agent: quilt/0.67
+X-stable: review
+X-Patchwork-Hint: ignore
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The default MODLIB value is composed of two variables and the hardcoded
-string '/lib/modules/'.
+6.1-stable review patch.  If anyone has any objections, please let me know.
 
-MODLIB = $(INSTALL_MOD_PATH)/lib/modules/$(KERNELRELEASE)
+------------------
 
-Defining this middle part as a variable was rejected on the basis that
-users can pass the whole MODLIB to make, such as
+From: Randy Dunlap <rdunlap@infradead.org>
 
-make 'MODLIB=$(INSTALL_MOD_PATH)/usr/lib/modules/$(KERNELRELEASE)'
+[ Upstream commit db4bfcba7bb8d10f00bba2a3da6b9a9c2a1d7b71 ]
 
-However, this middle part of MODLIB is independently hardcoded by
-rpm-pkg, and when the user alters MODLIB this is not reflected when
-building the package.
+Use "select" to ensure that the required kconfig symbols are set
+as expected.
+Drop HOSTAUDIO since it is now equivalent to UML_SOUND.
 
-Given that $(INSTALL_MOD_PATH) is overridden during the rpm package build
-it is likely going to be empty. Then MODLIB can be passed to the rpm
-package, and used in place of the whole
-/usr/lib/modules/$(KERNELRELEASE) part.
+Set CONFIG_SOUND=m in ARCH=um defconfig files to maintain the
+status quo of the default configs.
 
-Signed-off-by: Michal Suchanek <msuchanek@suse.de>
+Allow SOUND with UML regardless of HAS_IOMEM. Otherwise there is a
+kconfig warning for unmet dependencies. (This was not an issue when
+SOUND was defined in arch/um/drivers/Kconfig. I have done 50 randconfig
+builds and didn't find any issues.)
+
+This fixes build errors when CONFIG_SOUND is not set:
+
+ld: arch/um/drivers/hostaudio_kern.o: in function `hostaudio_cleanup_module':
+hostaudio_kern.c:(.exit.text+0xa): undefined reference to `unregister_sound_mixer'
+ld: hostaudio_kern.c:(.exit.text+0x15): undefined reference to `unregister_sound_dsp'
+ld: arch/um/drivers/hostaudio_kern.o: in function `hostaudio_init_module':
+hostaudio_kern.c:(.init.text+0x19): undefined reference to `register_sound_dsp'
+ld: hostaudio_kern.c:(.init.text+0x31): undefined reference to `register_sound_mixer'
+ld: hostaudio_kern.c:(.init.text+0x49): undefined reference to `unregister_sound_dsp'
+
+and this kconfig warning:
+WARNING: unmet direct dependencies detected for SOUND
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Fixes: d886e87cb82b ("sound: make OSS sound core optional")
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: lore.kernel.org/r/202307141416.vxuRVpFv-lkp@intel.com
+Cc: Richard Weinberger <richard@nod.at>
+Cc: Anton Ivanov <anton.ivanov@cambridgegreys.com>
+Cc: Johannes Berg <johannes@sipsolutions.net>
+Cc: linux-um@lists.infradead.org
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Takashi Iwai <tiwai@suse.de>
+Cc: Jaroslav Kysela <perex@perex.cz>
+Cc: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Nathan Chancellor <nathan@kernel.org>
+Cc: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Nicolas Schier <nicolas@fjasle.eu>
+Cc: linux-kbuild@vger.kernel.org
+Cc: alsa-devel@alsa-project.org
+Reviewed-by: Masahiro Yamada <masahiroy@kernel.org>
+Signed-off-by: Richard Weinberger <richard@nod.at>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- scripts/package/kernel.spec | 14 +++++++-------
- scripts/package/mkspec      |  1 +
- 2 files changed, 8 insertions(+), 7 deletions(-)
+ arch/um/configs/i386_defconfig   |  1 +
+ arch/um/configs/x86_64_defconfig |  1 +
+ arch/um/drivers/Kconfig          | 16 +++-------------
+ arch/um/drivers/Makefile         |  2 +-
+ sound/Kconfig                    |  2 +-
+ 5 files changed, 7 insertions(+), 15 deletions(-)
 
-diff --git a/scripts/package/kernel.spec b/scripts/package/kernel.spec
-index ac3f2ee6d7a0..1a727f636f67 100644
---- a/scripts/package/kernel.spec
-+++ b/scripts/package/kernel.spec
-@@ -67,8 +67,8 @@ cp $(%{make} %{makeflags} -s image_name) %{buildroot}/boot/vmlinuz-%{KERNELRELEA
- %{make} %{makeflags} INSTALL_HDR_PATH=%{buildroot}/usr headers_install
- cp System.map %{buildroot}/boot/System.map-%{KERNELRELEASE}
- cp .config %{buildroot}/boot/config-%{KERNELRELEASE}
--ln -fns /usr/src/kernels/%{KERNELRELEASE} %{buildroot}/lib/modules/%{KERNELRELEASE}/build
--ln -fns /usr/src/kernels/%{KERNELRELEASE} %{buildroot}/lib/modules/%{KERNELRELEASE}/source
-+ln -fns /usr/src/kernels/%{KERNELRELEASE} %{buildroot}%{MODLIB}/build
-+ln -fns /usr/src/kernels/%{KERNELRELEASE} %{buildroot}%{MODLIB}/source
- %if %{with_devel}
- %{make} %{makeflags} run-command KBUILD_RUN_COMMAND='${srctree}/scripts/package/install-extmod-build %{buildroot}/usr/src/kernels/%{KERNELRELEASE}'
- %endif
-@@ -99,9 +99,9 @@ fi
+diff --git a/arch/um/configs/i386_defconfig b/arch/um/configs/i386_defconfig
+index c0162286d68b7..c33a6880a437a 100644
+--- a/arch/um/configs/i386_defconfig
++++ b/arch/um/configs/i386_defconfig
+@@ -35,6 +35,7 @@ CONFIG_TTY_CHAN=y
+ CONFIG_XTERM_CHAN=y
+ CONFIG_CON_CHAN="pts"
+ CONFIG_SSL_CHAN="pts"
++CONFIG_SOUND=m
+ CONFIG_UML_SOUND=m
+ CONFIG_DEVTMPFS=y
+ CONFIG_DEVTMPFS_MOUNT=y
+diff --git a/arch/um/configs/x86_64_defconfig b/arch/um/configs/x86_64_defconfig
+index bec6e5d956873..df29f282b6ac2 100644
+--- a/arch/um/configs/x86_64_defconfig
++++ b/arch/um/configs/x86_64_defconfig
+@@ -33,6 +33,7 @@ CONFIG_TTY_CHAN=y
+ CONFIG_XTERM_CHAN=y
+ CONFIG_CON_CHAN="pts"
+ CONFIG_SSL_CHAN="pts"
++CONFIG_SOUND=m
+ CONFIG_UML_SOUND=m
+ CONFIG_DEVTMPFS=y
+ CONFIG_DEVTMPFS_MOUNT=y
+diff --git a/arch/um/drivers/Kconfig b/arch/um/drivers/Kconfig
+index 5903e2b598aae..fe0210eaf9bb6 100644
+--- a/arch/um/drivers/Kconfig
++++ b/arch/um/drivers/Kconfig
+@@ -111,24 +111,14 @@ config SSL_CHAN
  
- %files
- %defattr (-, root, root)
--/lib/modules/%{KERNELRELEASE}
--%exclude /lib/modules/%{KERNELRELEASE}/build
--%exclude /lib/modules/%{KERNELRELEASE}/source
-+%{MODLIB}
-+%exclude %{MODLIB}/build
-+%exclude %{MODLIB}/source
- /boot/*
+ config UML_SOUND
+ 	tristate "Sound support"
++	depends on SOUND
++	select SOUND_OSS_CORE
+ 	help
+ 	  This option enables UML sound support.  If enabled, it will pull in
+-	  soundcore and the UML hostaudio relay, which acts as a intermediary
++	  the UML hostaudio relay, which acts as a intermediary
+ 	  between the host's dsp and mixer devices and the UML sound system.
+ 	  It is safe to say 'Y' here.
  
- %files headers
-@@ -112,6 +112,6 @@ fi
- %files devel
- %defattr (-, root, root)
- /usr/src/kernels/%{KERNELRELEASE}
--/lib/modules/%{KERNELRELEASE}/build
--/lib/modules/%{KERNELRELEASE}/source
-+%{MODLIB}/build
-+%{MODLIB}/source
- %endif
-diff --git a/scripts/package/mkspec b/scripts/package/mkspec
-index d41608efb747..d41b2e5304ac 100755
---- a/scripts/package/mkspec
-+++ b/scripts/package/mkspec
-@@ -18,6 +18,7 @@ fi
- cat<<EOF
- %define ARCH ${ARCH}
- %define KERNELRELEASE ${KERNELRELEASE}
-+%define MODLIB ${MODLIB}
- %define pkg_release $("${srctree}/init/build-version")
- EOF
+-config SOUND
+-	tristate
+-	default UML_SOUND
+-
+-config SOUND_OSS_CORE
+-	bool
+-	default UML_SOUND
+-
+-config HOSTAUDIO
+-	tristate
+-	default UML_SOUND
+-
+ endmenu
  
+ menu "UML Network Devices"
+diff --git a/arch/um/drivers/Makefile b/arch/um/drivers/Makefile
+index 65b449c992d2c..079556ec044b8 100644
+--- a/arch/um/drivers/Makefile
++++ b/arch/um/drivers/Makefile
+@@ -54,7 +54,7 @@ obj-$(CONFIG_UML_NET) += net.o
+ obj-$(CONFIG_MCONSOLE) += mconsole.o
+ obj-$(CONFIG_MMAPPER) += mmapper_kern.o 
+ obj-$(CONFIG_BLK_DEV_UBD) += ubd.o 
+-obj-$(CONFIG_HOSTAUDIO) += hostaudio.o
++obj-$(CONFIG_UML_SOUND) += hostaudio.o
+ obj-$(CONFIG_NULL_CHAN) += null.o 
+ obj-$(CONFIG_PORT_CHAN) += port.o
+ obj-$(CONFIG_PTY_CHAN) += pty.o
+diff --git a/sound/Kconfig b/sound/Kconfig
+index e56d96d2b11ca..1903c35d799e1 100644
+--- a/sound/Kconfig
++++ b/sound/Kconfig
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ menuconfig SOUND
+ 	tristate "Sound card support"
+-	depends on HAS_IOMEM
++	depends on HAS_IOMEM || UML
+ 	help
+ 	  If you have a sound card in your computer, i.e. if it can say more
+ 	  than an occasional beep, say Y.
 -- 
-2.41.0
+2.40.1
+
+
 
