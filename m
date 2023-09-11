@@ -2,86 +2,139 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12D95CA0EC7
-	for <linux-kbuild@archiver.kernel.org>; Mon, 11 Sep 2023 21:49:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 457ABCA0ECB
+	for <linux-kbuild@archiver.kernel.org>; Mon, 11 Sep 2023 21:49:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244215AbjIKVtK (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 11 Sep 2023 17:49:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51838 "EHLO
+        id S240414AbjIKVtQ (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 11 Sep 2023 17:49:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235784AbjIKJhq (ORCPT
+        with ESMTP id S244293AbjIKT4p (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 11 Sep 2023 05:37:46 -0400
-Received: from mail.avm.de (mail.avm.de [IPv6:2001:bf0:244:244::120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34CDBEE
-        for <linux-kbuild@vger.kernel.org>; Mon, 11 Sep 2023 02:37:38 -0700 (PDT)
-Received: from mail-auth.avm.de (unknown [IPv6:2001:bf0:244:244::71])
-        by mail.avm.de (Postfix) with ESMTPS;
-        Mon, 11 Sep 2023 11:37:34 +0200 (CEST)
-Received: from buildd.core.avm.de (buildd-sv-01.avm.de [172.16.0.225])
-        by mail-auth.avm.de (Postfix) with ESMTPA id 2F96B800AA;
-        Mon, 11 Sep 2023 11:37:35 +0200 (CEST)
-Received: by buildd.core.avm.de (Postfix, from userid 1000)
-        id 1E614180D2E; Mon, 11 Sep 2023 11:37:35 +0200 (CEST)
-Date:   Mon, 11 Sep 2023 11:37:35 +0200
-From:   Nicolas Schier <nicolas@fjasle.eu>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Karolis M <k4rolis@protonmail.com>,
+        Mon, 11 Sep 2023 15:56:45 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE9D41A7;
+        Mon, 11 Sep 2023 12:56:40 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 693161F88C;
+        Mon, 11 Sep 2023 19:56:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1694462199; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=f/nZkdclC8N0AmmXEFCRJO8MtC0Z8ZAPugiL8rL00Ks=;
+        b=mvHWRKfFiFdjA+RAqKXUbxbczOMFEUGNmKIv4pgCPbjU+NQjcayZrqHnwQ24ez9LMAkZ5n
+        60VC/RsscTdhpHKoAJIEiGU0Yij2Slr0UbNidGNubILeJYqrxhEczPdptLSPVgDmOgczZ2
+        FrOHhRFt2ooaYPq/ydzs0UGcEY4Iij0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1694462199;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=f/nZkdclC8N0AmmXEFCRJO8MtC0Z8ZAPugiL8rL00Ks=;
+        b=jlb2xG4flSJUd9PhiC8ngVWDKpjClKpX+MUcZZ+sInXANl2y52lciL898ZK0jKOBXOcSNw
+        GdL0P8f7cirE6NDQ==
+Received: from kitsune.suse.cz (kitsune.suse.cz [10.100.12.127])
+        by relay2.suse.de (Postfix) with ESMTP id 0F1872C143;
+        Mon, 11 Sep 2023 19:56:39 +0000 (UTC)
+From:   Michal Suchanek <msuchanek@suse.de>
+To:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Michal Suchanek <msuchanek@suse.de>,
+        Nicolas Schier <nicolas@fjasle.eu>,
+        linux-modules@vger.kernel.org, Takashi Iwai <tiwai@suse.com>,
+        Lucas De Marchi <lucas.de.marchi@gmail.com>,
+        =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
+        Jiri Slaby <jslaby@suse.com>, Jan Engelhardt <jengelh@inai.de>,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>
-Subject: Re: [PATCH] kbuild: fix kernel-devel RPM package and linux-headers
- Deb package
-Message-ID: <ZP7f35Lmt6Lo3Y0X@buildd.core.avm.de>
-References: <20230910124413.1479521-1-masahiroy@kernel.org>
+Subject: [PATCH] kbuild: rpm-pkg: Fix build with non-default MODLIB
+Date:   Mon, 11 Sep 2023 21:56:18 +0200
+Message-ID: <20230911195621.15198-1-msuchanek@suse.de>
+X-Mailer: git-send-email 2.41.0
+In-Reply-To: <CAK7LNAT6mQ0EpwmKUCBhv9Acaf_qyGq4hu=XvSWRuZ-pNAFWVw@mail.gmail.com>
+References: <CAK7LNAT6mQ0EpwmKUCBhv9Acaf_qyGq4hu=XvSWRuZ-pNAFWVw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230910124413.1479521-1-masahiroy@kernel.org>
-X-purgate-ID: 149429::1694425054-84FD9D8B-89BDB70F/0/0
-X-purgate-type: clean
-X-purgate-size: 1583
-X-purgate-Ad: Categorized by eleven eXpurgate (R) http://www.eleven.de
-X-purgate: This mail is considered clean (visit http://www.eleven.de for further information)
-X-purgate: clean
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sun, Sep 10, 2023 at 09:44:13PM +0900, Masahiro Yamada wrote:
-> Since commit fe66b5d2ae72 ("kbuild: refactor kernel-devel RPM package
-> and linux-headers Deb package"), the kernel-devel RPM package and
-> linux-headers Deb package are broken.
-> 
-> I double-quoted the $(find ... -type d), which resulted in newlines
-> being included in the argument to the outer find comment.
-> 
->   find: 'arch/arm64/include\narch/arm64/kvm/hyp/include': No such file or directory
-> 
-> The outer find command is unneeded.
-> 
-> Fixes: fe66b5d2ae72 ("kbuild: refactor kernel-devel RPM package and linux-headers Deb package")
-> Reported-by: Karolis M <k4rolis@protonmail.com>
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
-> 
->  scripts/package/install-extmod-build | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/scripts/package/install-extmod-build b/scripts/package/install-extmod-build
-> index af7fe9f5b1e4..8a7051fad087 100755
-> --- a/scripts/package/install-extmod-build
-> +++ b/scripts/package/install-extmod-build
-> @@ -20,7 +20,7 @@ mkdir -p "${destdir}"
->  	find "arch/${SRCARCH}" -maxdepth 1 -name 'Makefile*'
->  	find include scripts -type f -o -type l
->  	find "arch/${SRCARCH}" -name Kbuild.platforms -o -name Platform
-> -	find "$(find "arch/${SRCARCH}" -name include -o -name scripts -type d)" -type f
-> +	find "arch/${SRCARCH}" -name include -o -name scripts -type d
->  ) | tar -c -f - -C "${srctree}" -T - | tar -xf - -C "${destdir}"
->  
->  {
-> -- 
-> 2.39.2
+The default MODLIB value is composed of two variables and the hardcoded
+string '/lib/modules/'.
 
-Reviewed-by: Nicolas Schier <n.schier@avm.de>
+MODLIB = $(INSTALL_MOD_PATH)/lib/modules/$(KERNELRELEASE)
+
+Defining this middle part as a variable was rejected on the basis that
+users can pass the whole MODLIB to make, such as
+
+make 'MODLIB=$(INSTALL_MOD_PATH)/usr/lib/modules/$(KERNELRELEASE)'
+
+However, this middle part of MODLIB is independently hardcoded by
+rpm-pkg, and when the user alters MODLIB this is not reflected when
+building the package.
+
+Given that $(INSTALL_MOD_PATH) is overridden during the rpm package build
+it is likely going to be empty. Then MODLIB can be passed to the rpm
+package, and used in place of the whole
+/usr/lib/modules/$(KERNELRELEASE) part.
+
+Signed-off-by: Michal Suchanek <msuchanek@suse.de>
+---
+ scripts/package/kernel.spec | 14 +++++++-------
+ scripts/package/mkspec      |  1 +
+ 2 files changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/scripts/package/kernel.spec b/scripts/package/kernel.spec
+index ac3f2ee6d7a0..1a727f636f67 100644
+--- a/scripts/package/kernel.spec
++++ b/scripts/package/kernel.spec
+@@ -67,8 +67,8 @@ cp $(%{make} %{makeflags} -s image_name) %{buildroot}/boot/vmlinuz-%{KERNELRELEA
+ %{make} %{makeflags} INSTALL_HDR_PATH=%{buildroot}/usr headers_install
+ cp System.map %{buildroot}/boot/System.map-%{KERNELRELEASE}
+ cp .config %{buildroot}/boot/config-%{KERNELRELEASE}
+-ln -fns /usr/src/kernels/%{KERNELRELEASE} %{buildroot}/lib/modules/%{KERNELRELEASE}/build
+-ln -fns /usr/src/kernels/%{KERNELRELEASE} %{buildroot}/lib/modules/%{KERNELRELEASE}/source
++ln -fns /usr/src/kernels/%{KERNELRELEASE} %{buildroot}%{MODLIB}/build
++ln -fns /usr/src/kernels/%{KERNELRELEASE} %{buildroot}%{MODLIB}/source
+ %if %{with_devel}
+ %{make} %{makeflags} run-command KBUILD_RUN_COMMAND='${srctree}/scripts/package/install-extmod-build %{buildroot}/usr/src/kernels/%{KERNELRELEASE}'
+ %endif
+@@ -99,9 +99,9 @@ fi
+ 
+ %files
+ %defattr (-, root, root)
+-/lib/modules/%{KERNELRELEASE}
+-%exclude /lib/modules/%{KERNELRELEASE}/build
+-%exclude /lib/modules/%{KERNELRELEASE}/source
++%{MODLIB}
++%exclude %{MODLIB}/build
++%exclude %{MODLIB}/source
+ /boot/*
+ 
+ %files headers
+@@ -112,6 +112,6 @@ fi
+ %files devel
+ %defattr (-, root, root)
+ /usr/src/kernels/%{KERNELRELEASE}
+-/lib/modules/%{KERNELRELEASE}/build
+-/lib/modules/%{KERNELRELEASE}/source
++%{MODLIB}/build
++%{MODLIB}/source
+ %endif
+diff --git a/scripts/package/mkspec b/scripts/package/mkspec
+index d41608efb747..d41b2e5304ac 100755
+--- a/scripts/package/mkspec
++++ b/scripts/package/mkspec
+@@ -18,6 +18,7 @@ fi
+ cat<<EOF
+ %define ARCH ${ARCH}
+ %define KERNELRELEASE ${KERNELRELEASE}
++%define MODLIB ${MODLIB}
+ %define pkg_release $("${srctree}/init/build-version")
+ EOF
+ 
+-- 
+2.41.0
+
