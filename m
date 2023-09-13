@@ -2,150 +2,307 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8EBDEE0204
-	for <linux-kbuild@archiver.kernel.org>; Wed, 13 Sep 2023 21:17:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7B2FEE0204
+	for <linux-kbuild@archiver.kernel.org>; Wed, 13 Sep 2023 21:22:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232624AbjIMVRT (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 13 Sep 2023 17:17:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44196 "EHLO
+        id S229671AbjIMVW7 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 13 Sep 2023 17:22:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232821AbjIMVRR (ORCPT
+        with ESMTP id S229572AbjIMVW6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 13 Sep 2023 17:17:17 -0400
-Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67BD419A0;
-        Wed, 13 Sep 2023 14:17:12 -0700 (PDT)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-        by mailout.nyi.internal (Postfix) with ESMTP id 1DBB15C00CE;
-        Wed, 13 Sep 2023 17:17:10 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute6.internal (MEProxy); Wed, 13 Sep 2023 17:17:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-        :cc:content-type:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm1; t=1694639830; x=1694726230; bh=2D
-        CLnmcqbeJcLbHMyYWTOk/2hFdchUOr/bffN5DYUjA=; b=hFSZISYnmgONLjrajz
-        IARN20iioHx4e0z07CKF2J9XCzubhCvQIhC9q/QP6JeC49HsoW97NWA9/sNMiyuz
-        ZlJxIWPRBJJ8vyUYaQgt7uQWUHS4nO/qRgm/jzVkzhQxW+iHj008LAtm28OeOVLM
-        1puNNss2kerVDrDZM5k/7dlHiAcJ08e7r4eAaRXBjZ7ZCof0yntGR/EZCsq0K9jg
-        yqoZfoXvbB8lopqrIKP+vEsxnHe/48P7rpkjOEX1rXyB8PuAzaTdUJIKZ+xJ69ZX
-        ooWmjJqi2REjFQ1d5A3tw3RNI3Cg/0Yl0dBv+fHaXFVOubObS7ibjMLLSdDQMHyr
-        xT6Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:content-type:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm2; t=1694639830; x=1694726230; bh=2DCLnmcqbeJcL
-        bHMyYWTOk/2hFdchUOr/bffN5DYUjA=; b=W2wz8OaAcdAPUtH2KSq/xOFW1/O6M
-        919yPmbpK0xaB78Dq6YZzFTNCmLa5APlVvBbJTBQJ26KVkae3Ykv0iDgHnGuR8I/
-        6iSBMyKcWkApEY0ZCy5OTzP14tOJgvOGmcuHwpaho2gkO75aMq/aC/LOQG2TXeuD
-        RInlrAexmOtO0s2ZJ7iDT7NqmTtOI6PUXR44t553heP182OqnFGsa8Bw4WUfKz5z
-        39UT38FGKGY0VeyNwyWfKGHWAXaG1imbaQPJv9jw+I5MLQjPZR27KFFgHn9O735B
-        zBhgYvCkYj8iFL/nHHqCIeh44zfl6qtH0BOWr/rSvkaw3kRFSZlu7KAzg==
-X-ME-Sender: <xms:1CYCZRsNw0g27c-ZCydeQXSsaHxnIfeQqGGXfKI8HSoBJe_kC_nwlg>
-    <xme:1CYCZafyrP-Ut2grj8IM0S-rEP9Ka7jjkHgXD2-UVMdqxWh7SSQxSC3JCDdxcuzko
-    BhnQLwkgQniuI9gl1U>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrudeikedgudehlecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdet
-    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
-    htthgvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedt
-    keetffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    grrhhnugesrghrnhgusgdruggv
-X-ME-Proxy: <xmx:1CYCZUyz-blYP1SIwFwaqd4YBkgr_1EVOzpaXfF1x079PjsmTKmHkw>
-    <xmx:1CYCZYMLW_1EdJUsE9KTGrAORDvM-LBRwouaB3rmaKoxPDHX84DQzQ>
-    <xmx:1CYCZR9dIx8cINAMoQcNm8uQEGHwRsA3rC49pw7GinQOUUQO_YTdCA>
-    <xmx:1iYCZdQG7CHKJQxsYSaNsPJ8ssjOuZFeHddfp4r1ex7dlO_sbu7KAQ>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 5B67BB60089; Wed, 13 Sep 2023 17:17:08 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-745-g95dd7bea33-fm-20230905.001-g95dd7bea
-Mime-Version: 1.0
-Message-Id: <c7c6de7b-4adf-4625-8f09-8f419869161d@app.fastmail.com>
-In-Reply-To: <ZQIcuVgaDmA+VdV0@fjasle.eu>
-References: <20230913113801.1901152-1-arnd@kernel.org>
- <ZQISGujwlH00B8KJ@fjasle.eu>
- <b234530c-88fe-4a2a-993c-f1733fe4d0c1@app.fastmail.com>
- <ZQIcuVgaDmA+VdV0@fjasle.eu>
-Date:   Wed, 13 Sep 2023 23:16:47 +0200
-From:   "Arnd Bergmann" <arnd@arndb.de>
-To:     "Nicolas Schier" <nicolas@fjasle.eu>
-Cc:     "Arnd Bergmann" <arnd@kernel.org>,
-        "Masahiro Yamada" <masahiroy@kernel.org>,
-        "Jonathan Corbet" <corbet@lwn.net>,
-        "Sakari Ailus" <sakari.ailus@iki.fi>,
-        "Javier Martinez Canillas" <javierm@redhat.com>,
-        "Nathan Chancellor" <nathan@kernel.org>,
-        "Nick Desaulniers" <ndesaulniers@google.com>,
-        linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Documentation: kbuild: explain handling optional dependencies
-Content-Type: text/plain
+        Wed, 13 Sep 2023 17:22:58 -0400
+Received: from cmx-mtlrgo002.bell.net (mta-mtl-003.bell.net [209.71.208.13])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A01071739;
+        Wed, 13 Sep 2023 14:22:54 -0700 (PDT)
+X-RG-CM-BuS: 0
+X-RG-CM-SC: 0
+X-RG-CM: Clean
+X-Originating-IP: [142.126.114.79]
+X-RG-Env-Sender: dave.anglin@bell.net
+X-RG-Rigid: 64FAC33300A7A951
+X-CM-Envelope: MS4xfA/Q8dyyuQE9fjb8HHotURuJCDZ2yvdiVpvX4yZnZZW/2aBzhMiGPmTpMLZDCG4JGoMaaIk09AgXwQkd7y1ZaxQmUmxIEtMhX8Fc8lph7ln1+qA2mF9q
+ EzQCWrIy4tJTr+lYEdICutWyZfd2OcUgQuPlbETaaUMFm1QcheYiVM8ZP7Hr1SUPisGzO755MQejAjcpMvpr2nvtld6qzWTZH2e2LjUetHqrc60KA5XVtiMX
+ VpMJnyIeYA7ubTdtUpdNZkfp8j8xTZrDgFWgBU1oAtHWhhD9EM4OUnXyjBeYYmc4JTgtRx7nIMu+/pttiKhms9l7IQjS8S5RHx1vGBqN+p5qHLmK2oM8i6mO
+ S0F0hkrCslUMXdv6rfu5S+jTyRes2e/XoWikI/d5ud5wjhkj1olH5eSvuygrBau51vW2HpeMwaaUJzwPYZv8wvAJWBw5NNkE7Zir6qCaP/8tWuG3+Nv52aAv
+ Ri57aehAcoj2s5aK
+X-CM-Analysis: v=2.4 cv=QbcFAuXv c=1 sm=1 tr=0 ts=6502281a
+ a=qwLmA0wx3TwW38sY+xTbUA==:117 a=qwLmA0wx3TwW38sY+xTbUA==:17
+ a=IkcTkHD0fZMA:10 a=Z4Rwk6OoAAAA:8 a=VwQbUJbxAAAA:8 a=JF9118EUAAAA:8
+ a=58xqZnKBAAAA:8 a=yPCof4ZbAAAA:8 a=FBHGMhGWAAAA:8 a=5HXnJtIU4lPC16g7ETMA:9
+ a=QEXdDO2ut3YA:10 a=HkZW87K1Qel5hWWM3VKY:22 a=AjGcO6oz07-iQ99wixmX:22
+ a=xVlTc564ipvMDusKsbsT:22 a=ys0uu9INkvWFKRHAnSH-:22
+ a=9gvnlMMaQFpL9xblJ6ne:22
+Received: from [192.168.2.49] (142.126.114.79) by cmx-mtlrgo002.bell.net (5.8.814) (authenticated as dave.anglin@bell.net)
+        id 64FAC33300A7A951; Wed, 13 Sep 2023 17:22:33 -0400
+Message-ID: <b9ceba24-345e-20dc-783b-3759a9819359@bell.net>
+Date:   Wed, 13 Sep 2023 17:22:33 -0400
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH] linux/export: fix reference to exported functions for
+ parisc64
+From:   John David Anglin <dave.anglin@bell.net>
+To:     Helge Deller <deller@gmx.de>,
+        James Bottomley <James.Bottomley@HansenPartnership.com>,
+        Damien Le Moal <dlemoal@kernel.org>
+Cc:     linux-parisc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kbuild@vger.kernel.org,
+        Nick Desaulniers <ndesaulniers@google.com>
+References: <20230905190828.790400-1-masahiroy@kernel.org>
+ <c8a92dc8-de78-7484-bcc8-d4a91bec77de@bell.net>
+ <c6568683-86b4-c48d-ed37-f1f87677eb44@bell.net>
+ <97859bf1-c8c3-7294-8322-b0c9c408ba5e@bell.net>
+ <CAK7LNAR_4rVgAQToSoYmbgYnWoSpowcrKi2ciiH9HyhJUGdmWg@mail.gmail.com>
+ <CAK7LNAQQ1Vp4YtvU8Bq9aE+NWxnnOTX2dcZ5Gc9fC+vjRmCe4w@mail.gmail.com>
+ <CAK7LNATktSBFe=7cE8kHEGx2R90iVV6AJsCfgg5ZD2+ssMmzow@mail.gmail.com>
+ <040a0941-936b-87ab-aedd-5a933383b500@bell.net>
+ <b919c7fd-babb-5557-dd8d-c2b8bb428d54@bell.net>
+ <4fee8886-daa3-fb03-f9e7-89358fb5fc38@bell.net>
+Content-Language: en-US
+In-Reply-To: <4fee8886-daa3-fb03-f9e7-89358fb5fc38@bell.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Wed, Sep 13, 2023, at 22:34, Nicolas Schier wrote:
-> On Wed, Sep 13, 2023 at 09:55:36PM +0200 Arnd Bergmann wrote:
+On 2023-09-13 1:58 p.m., John David Anglin wrote:
+> On 2023-09-12 5:53 p.m., John David Anglin wrote:
+>> On 2023-09-10 5:30 p.m., John David Anglin wrote:
+>>> Hi Masahiro,
+>>>
+>>> The attached change fixed boot at ddb5cdbafaaa 😁
+>>>
+>>> However, v6.5.x boot is still broken:
+>>>
+>>> Run /init as init process
+>>> process '/usr/bin/sh' started with executable stack
+>>> Loading, please wait...
+>>> Starting systemd-udevd version 254.1-3
+>>> e1000 alternatives: applied 0 out of 569 patches
+>>> e1000: Intel(R) PRO/1000 Network Driver
+>>> e1000: Copyright (c) 1999-2006 Intel Corporation.
+>>> scsi_mod alternatives: applied 0 out of 7 patches
+>>> SCSI subsystem initialized
+>>> usbcore alternatives: applied 0 out of 18 patches
+>>> usbcore: registered new interface driver usbfs
+>>> libata alternatives: applied 0 out of 3 patches
+>>> usbcore: registered new interface driver hub
+>>> usbcore: registered new device driver usb
+>>> mptbase alternatives: applied 0 out of 73 patches
+>>> ehci_hcd alternatives: applied 0 out of 114 patches
+>>> sata_sil24 alternatives: applied 0 out of 56 patches
+>>> Fusion MPT base driver 3.04.20
+>>> Copyright (c) 1999-2008 LSI Corporation
+>>> sata_sil24 0000:00:01.0: Applying completion IRQ loss on PCI-X errata fix
+>>> scsi host0: sata_sil24
+>>> scsi host1: sata_sil24
+>>> pata_sil680 0000:60:02.0: sil680: 133MHz clock.
+>>> scsi host2: sata_sil24
+>>> ehci_pci alternatives: applied 0 out of 2 patches
+>>> ohci_hcd alternatives: applied 0 out of 144 patches
+>>> ehci-pci 0000:60:01.2: EHCI Host Controller
+>>> scsi host3: pata_sil680
+>>> ehci-pci 0000:60:01.2: new USB bus registered, assigned bus number 1
+>>> scsi host4: sata_sil24
+>>> ata1: SATA max UDMA/100 host m128@0xffffffff80088000 port 0xffffffff80080000 ir6
+>>> ata2: SATA max UDMA/100 host m128@0xffffffff80088000 port 0xffffffff80082000 ir6
+>>> ata3: SATA max UDMA/100 host m128@0xffffffff80088000 port 0xffffffff80084000 ir6
+>>> ata4: SATA max UDMA/100 host m128@0xffffffff80088000 port 0xffffffff80086000 ir6
+>>> e1000 0000:60:03.0 eth0: (PCI:33MHz:32-bit) 00:11:0a:31:8a:77
+>>> ehci-pci 0000:60:01.2: irq 71, io mem 0xffffffffb00a1000
+>>> scsi host5: pata_sil680
+>>> ata5: PATA max UDMA/133 cmd 0x26058 ctl 0x26064 bmdma 0x26040 irq 72
+>>> ata6: PATA max UDMA/133 cmd 0x26050 ctl 0x26060 bmdma 0x26048 irq 72
+>>> e1000 0000:60:03.0 eth0: Intel(R) PRO/1000 Network Connection
+>>> ehci-pci 0000:60:01.2: USB 2.0 started, EHCI 0.95
+>>> usb usb1: New USB device found, idVendor=1d6b, idProduct=0002, bcdDevice= 6.05
+>>> usb usb1: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+>>> usb usb1: Product: EHCI Host Controller
+>>> usb usb1: Manufacturer: Linux 6.5.2-dirty ehci_hcd
+>>> usb usb1: SerialNumber: 0000:60:01.2
+>>> hub 1-0:1.0: USB hub found
+>>> hub 1-0:1.0: 5 ports detected
+>>> ata1: SATA link down (SStatus 0 SControl 0)
+>>> ata2: SATA link down (SStatus 0 SControl 0)
+>>> ata3: SATA link down (SStatus 0 SControl 0)
+>>> ata4: SATA link up 3.0 Gbps (SStatus 123 SControl 0)
+>>> ata4.00: ATA-10: ST4000VN008-2DR166, SC60, max UDMA/133
+>>> ata4.00: 7814037168 sectors, multi 0: LBA48 NCQ (depth 31/32)
+>>> ata4.00: configured for UDMA/100
+>>> scsi 4:0:0:0: Direct-Access     ATA      ST4000VN008-2DR1 SC60 PQ: 0 ANSI: 5
+>>> ata6.00: ATAPI: HL-DT-STDVD+-RW GSA-H21L, 1.04, max UDMA/44
+>>> scsi 5:0:0:0: CD-ROM            HL-DT-ST DVD+-RW GSA-H21L 1.04 PQ: 0 ANSI: 5
+>>> random: crng init done
+>>> Timed out for waiting the udev queue being empty.
+>>> Begin: Loading essential drivers ... done.
+>>> Begin: Running /scripts/init-premount ... done.
+>>> Begin: Mounting root file system ... Begin: Running /scripts/local-top ... done.
+>>> Begin: Running /scripts/local-premount ... done.
+>>> Timed out for waiting the udev queue being empty.
+>>> Begin: Waiting for root file system ... Begin: Running /scripts/local-block ....
+>>> Begin: Running /scripts/local-block ... done.
+>>> Begin: Running /scripts/local-block ... done.
+>>> Begin: Running /scripts/local-block ... done.
+>>> Begin: Running /scripts/local-block ... done.
+>>> Begin: Running /scripts/local-block ... done.
+>>> Begin: Running /scripts/local-block ... done.
+>>> Begin: Running /scripts/local-block ... done.
+>>> Begin: Running /scripts/local-block ... done.
+>>> Begin: Running /scripts/local-block ... done.
+>>> Begin: Running /scripts/local-block ... done.
+>>> Begin: Running /scripts/local-block ... done.
+>>> Begin: Running /scripts/local-block ... done.
+>>> Begin: Running /scripts/local-block ... done.
+>>> Begin: Running /scripts/local-block ... done.
+>>> Begin: Running /scripts/local-block ... done.
+>>> Begin: Running /scripts/local-block ... done.
+>>> Begin: Running /scripts/local-block ... done.
+>>> Begin: Running /scripts/local-block ... done.
+>>> done.
+>>> Gave up waiting for root file system device.  Common problems:
+>>>  - Boot args (cat /proc/cmdline)
+>>>    - Check rootdelay= (did the system wait long enough?)
+>>>  - Missing modules (cat /proc/modules; ls /dev)
+>>> ALERT!  LABEL=ROOT does not exist.  Dropping to a shell!
+>>> Rebooting automatically due to panic= boot argument
+>>>
+>>> I'll see if I can find the commit that breaks 6.5.
+>> I've traced this to the following merge commit:
+>>
+>> dave@atlas:~/linux/linux$ git bisect good
+>> ca7ce08d6a063e0ccb91dc57f9bc213120d0d1a7 is the first bad commit
+>> commit ca7ce08d6a063e0ccb91dc57f9bc213120d0d1a7
+>> Merge: 1546cd4bfda4 af92c02fb209
+>> Author: Linus Torvalds <torvalds@linux-foundation.org>
+>> Date:   Fri Jun 30 11:57:07 2023 -0700
+>>
+>>     Merge tag 'scsi-misc' of git://git.kernel.org/pub/scm/linux/kernel/git/jejb/scsi
+>>
+>>     Pull SCSI updates from James Bottomley:
+>>      "Updates to the usual drivers (ufs, pm80xx, libata-scsi, smartpqi,
+>>       lpfc, qla2xxx).
+>>
+>>       We have a couple of major core changes impacting other systems:
+>>
+>>        - Command Duration Limits, which spills into block and ATA
+>>
+>>        - block level Persistent Reservation Operations, which touches block,
+>>          nvme, target and dm
+>>
+>>       Both of these are added with merge commits containing a cover letter
+>>       explaining what's going on"
+>>
+>>     * tag 'scsi-misc' of git://git.kernel.org/pub/scm/linux/kernel/git/jejb/scsi: (187 commits)
+>>       scsi: core: Improve warning message in scsi_device_block()
+>>       scsi: core: Replace scsi_target_block() with scsi_block_targets()
+>>       scsi: core: Don't wait for quiesce in scsi_device_block()
+>>       scsi: core: Don't wait for quiesce in scsi_stop_queue()
+>>       scsi: core: Merge scsi_internal_device_block() and device_block()
+>>       scsi: sg: Increase number of devices
+>>       scsi: bsg: Increase number of devices
+>>       scsi: qla2xxx: Remove unused nvme_ls_waitq wait queue
+>>       scsi: ufs: ufs-pci: Add support for Intel Arrow Lake
+>>       scsi: sd: sd_zbc: Use PAGE_SECTORS_SHIFT
+>>       scsi: ufs: wb: Add explicit flush_threshold sysfs attribute
+>>       scsi: ufs: ufs-qcom: Switch to the new ICE API
+>>       scsi: ufs: dt-bindings: qcom: Add ICE phandle
+>>       scsi: ufs: ufs-mediatek: Set UFSHCD_QUIRK_MCQ_BROKEN_RTC quirk
+>>       scsi: ufs: ufs-mediatek: Set UFSHCD_QUIRK_MCQ_BROKEN_INTR quirk
+>>       scsi: ufs: core: Add host quirk UFSHCD_QUIRK_MCQ_BROKEN_RTC
+>>       scsi: ufs: core: Add host quirk UFSHCD_QUIRK_MCQ_BROKEN_INTR
+>>       scsi: ufs: core: Remove dedicated hwq for dev command
+>>       scsi: ufs: core: mcq: Fix the incorrect OCS value for the device command
+>>       scsi: ufs: dt-bindings: samsung,exynos: Drop unneeded quotes
+>>       ...
+>>
+>> dave@atlas:~/linux/linux$ lspci
+>> 00:01.0 RAID bus controller: Silicon Image, Inc. SiI 3124 PCI-X Serial ATA Controller (rev 02)
+>> 40:01.0 SCSI storage controller: Broadcom / LSI 53c1030 PCI-X Fusion-MPT Dual Ultra320 SCSI (rev 07)
+>> 40:01.1 SCSI storage controller: Broadcom / LSI 53c1030 PCI-X Fusion-MPT Dual Ultra320 SCSI (rev 07)
+>> 60:01.0 USB controller: NEC Corporation OHCI USB Controller (rev 41)
+>> 60:01.1 USB controller: NEC Corporation OHCI USB Controller (rev 41)
+>> 60:01.2 USB controller: NEC Corporation uPD72010x USB 2.0 Controller (rev 02)
+>> 60:02.0 IDE interface: Silicon Image, Inc. PCI0680 Ultra ATA-133 Host Controller (rev 02)
+>> 60:03.0 Ethernet controller: Intel Corporation 82540EM Gigabit Ethernet Controller (rev 02)
+> This was introduced by the following commit:
+>
+> dave@atlas:~/linux/linux$ git bisect good
+> 624885209f31eb9985bf51abe204ecbffe2fdeea is the first bad commit
+> commit 624885209f31eb9985bf51abe204ecbffe2fdeea
+> Author: Damien Le Moal <dlemoal@kernel.org>
+> Date:   Thu May 11 03:13:41 2023 +0200
+>
+>     scsi: core: Detect support for command duration limits
+>
+>     Introduce the function scsi_cdl_check() to detect if a device supports
+>     command duration limits (CDL). Support for the READ 16, WRITE 16, READ 32
+>     and WRITE 32 commands are checked using the function scsi_report_opcode()
+>     to probe the rwcdlp and cdlp bits as they indicate the mode page defining
+>     the command duration limits descriptors that apply to the command being
+>     tested.
+>
+>     If any of these commands support CDL, the field cdl_supported of struct
+>     scsi_device is set to 1 to indicate that the device supports CDL.
+>
+>     Support for CDL for a device is advertizes through sysfs using the new
+>     cdl_supported device attribute. This attribute value is 1 for a device
+>     supporting CDL and 0 otherwise.
+>
+>     Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+>     Reviewed-by: Hannes Reinecke <hare@suse.de>
+>     Co-developed-by: Niklas Cassel <niklas.cassel@wdc.com>
+>     Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
+>     Link: https://lore.kernel.org/r/20230511011356.227789-9-nks@flawful.org
+>     Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+>
+>  Documentation/ABI/testing/sysfs-block-device |  9 ++++
+>  drivers/scsi/scsi.c                          | 81 ++++++++++++++++++++++++++++
+>  drivers/scsi/scsi_scan.c                     |  3 ++
+>  drivers/scsi/scsi_sysfs.c                    |  2 +
+>  include/scsi/scsi_device.h                   |  3 ++
+>  5 files changed, 98 insertions(+)
+>
+> Sometimes I see when booting a bad commit:
+> [...]
+> Begin: Running /scripts/local-block ... done.
+> Begin: Running /scripts/local-block ... done.
+> Begin: Running /scripts/local-block ... done.
+> done.
+> Gave up waiting for root file system device.  Common problems:
+>  - Boot args (cat /proc/cmdline)
+>    - Check rootdelay= (did the system wait long enough?)
+>  - Missing modules (cat /proc/modules; ls /dev)
+> ALERT!  LABEL=ROOT does not exist.  Dropping to a shell!
+> Rebooting automatically due to panic= boot argument
+> ata4: SATA link down (SStatus 0 SControl 0)
+> ata5: SATA link down (SStatus 0 SControl 0)
+> ata6: SATA link up 3.0 Gbps (SStatus 123 SControl 0)
+> ata6.00: ATA-10: ST4000VN008-2DR166, SC60, max UDMA/133
+> ata6.00: 7814037168 sectors, multi 0: LBA48 NCQ (depth 31/32)
+> ata6.00: configured for UDMA/100
+> scsi 5:0:0:0: Direct-Access     ATA      ST4000VN008-2DR1 SC60 PQ: 0 ANSI: 5
 
->>    config FOO
->> -       bool "Support for foo hardware"
->> +       tristate "Support for foo hardware"
->>         depends on BAR || !BAR
->
-> ah, thanks, tristate kconfig symbols are really more interesting.  But I am
-> still not sure, whether this works as proposed:
->
-> With the 'config FOO' above and
->
->   config BAR
->   	tristate "Support for bar feature"
->
-> kconfig allows me to choose between these:
->
-> BAR=y  => FOO={N/m/y}
-> BAR=m  => FOO={N/m}
-> BAR=n  => FOO={N/m/y}
->
-> But with
->
->   config FOO
->   	tristate "Support for foo hardware"
->   	depends on !BAR=m
->
-> I can choose between:
->
-> BAR=y  => FOO={N/m/y}
-> BAR=m  => FOO is not selectable
-> BAR=n  => FOO={N/m/y}
+System boots master at e56b2b605799 if I disable CDL:
 
-That is indeed the point: if BAR=m, we want to be able to pick FOO=m
-here, otherwise it is impossible to enabled everything as modules.
+dave@atlas:~/linux/linux$ git diff drivers/scsi/scsi.c
+diff --git a/drivers/scsi/scsi.c b/drivers/scsi/scsi.c
+index d0911bc28663..dc3a283ebd75 100644
+--- a/drivers/scsi/scsi.c
++++ b/drivers/scsi/scsi.c
+@@ -578,6 +578,8 @@ static bool scsi_cdl_check_cmd(struct scsi_device *sdev, u8 opcode, u16 sa,
+         int ret;
+         u8 cdlp;
 
-Another correct way to express the same thing as the first would
-be 
++       return false;
++
+         /* Check operation code */
+         ret = scsi_report_opcode(sdev, buf, SCSI_CDL_CHECK_BUF_LEN, opcode, sa);
+         if (ret <= 0)
 
-config FOO
-      tristate "Support for foo hardware"
-      depends on !BAR=m || m
+Dave
 
-which I find even more confusing than the 'BAR || !BAR'
-convention, though we have that in a couple of places.
+-- 
+John David Anglin  dave.anglin@bell.net
 
-I just found another variant that I had not seen before:
-
-> (Re-checked with BAR=IPV6 and FOO=WIREGUARD; CONFIG_WIREGUARD as 'depends on
-> IPV6 || !IPV6' in its kconfig definition, and both are tristate kconfig
-> symbols.)
->
-> Thus, it seems to me, that the intuitive way is the way forward (and several
-> Kconfigs are out-of-date with regard to 'depends on !X=m'.  Or do I still miss
-> your point?
-
-I'm not sure what you mean here, but it appears that one of us
-is missing the point ;-)
-
-      Arnd
