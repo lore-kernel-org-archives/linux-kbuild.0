@@ -2,176 +2,108 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D62ECD13D1
-	for <linux-kbuild@archiver.kernel.org>; Sun, 17 Sep 2023 15:22:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81F21CD13D2
+	for <linux-kbuild@archiver.kernel.org>; Sun, 17 Sep 2023 19:20:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230117AbjIQPWG (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 17 Sep 2023 11:22:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36342 "EHLO
+        id S231166AbjIQTUa (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 17 Sep 2023 15:20:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233512AbjIQPVr (ORCPT
+        with ESMTP id S231801AbjIQTUW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 17 Sep 2023 11:21:47 -0400
-Received: from todd.t-8ch.de (todd.t-8ch.de [IPv6:2a01:4f8:c010:41de::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0468B5;
-        Sun, 17 Sep 2023 08:21:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-        s=mail; t=1694964099;
-        bh=IIibg1/4WvIjXQyZJl+4IBf/DvAGCXDdcSGNSt2pWjA=;
-        h=From:Date:Subject:To:Cc:From;
-        b=LlqUgOyEsBqAZqjJivPFcSsQLVsFgWx5g0J7ezOBTL/g0AJZYqIhsArLRKAkEKYwa
-         2DCtFNjYNDQQTkXxJ6gKzi+WDjtKJx4OXgMHeNOWpvuI7lx441MwIrivlZjiVXYxMH
-         gkxxH3KX0nTexxX7Po80lIjCgsDBLSB98egltGts=
-From:   =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Date:   Sun, 17 Sep 2023 17:21:38 +0200
-Subject: [PATCH RFC v2] selftests/nolibc: don't embed initramfs into kernel
- image
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20230917-nolibc-initramfs-v2-1-f0f293a8b198@weissschuh.net>
-X-B4-Tracking: v=1; b=H4sIAIEZB2UC/3WNwQrCMBBEf6Xs2UiSxoCehIIf4FV6iMnWLGgq2
- ViV0n839O7xzTBvZmDMhAyHZoaMEzGNqYLeNOCjSzcUFCqDlrqVe2VFGu909YISleweAwszBCn
- R+VbvLNTZM+NAn1V5gfOpg76GkbiM+bveTGqt/hsnJaQwRln0GLyz4fhGYmYfX3GbsEC/LMsPb
- 8YCkLoAAAA=
+        Sun, 17 Sep 2023 15:20:22 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 201A8115;
+        Sun, 17 Sep 2023 12:20:17 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66821C433C9;
+        Sun, 17 Sep 2023 19:20:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1694978416;
+        bh=zlezv61pkEtIb39QJV+KksqxpQMU0fbcIUj51bSEwrY=;
+        h=From:To:Cc:Subject:Date:From;
+        b=oIzJcm+yqSjU0N+/nDHU6W2dBiG4y1dTlpVyxYVZl0TvEkebI5Rsm40kS+rbblFIW
+         J9xYHqsfQSEGE/hrzWSnkCdsJc14eqkd2Z6cYnhuD2DqR3KVwaVBv1ceygvjxD7mp0
+         uSsZ9ztBuXxelRCElu1PTfkmN1VXpCVK1alE09zCaD6Ea3nwiJToHlkkSga0AmfxZF
+         kJgY8RZB3FIxnaemnt6Qai0L4mOWctRk2BrqAUoNF6zQgCQJGZ894J/ExJ4LauKIxE
+         23CBrwm9tnAbGXXh1B2eSPvGstmkbum93JCxt3rbGQriU32RhBdOPt18egKTEpabXP
+         kIIlN/4gJDHQQ==
+From:   Arnd Bergmann <arnd@kernel.org>
 To:     Masahiro Yamada <masahiroy@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Javier Martinez Canillas <javierm@redhat.com>,
+        Sakari Ailus <sakari.ailus@linux.intel.com>,
+        Nicolas Schier <nicolas@fjasle.eu>,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        Nicolas Schier <nicolas@fjasle.eu>, Willy Tarreau <w@1wt.eu>,
-        Shuah Khan <shuah@kernel.org>
-Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1694964099; l=5921;
- i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
- bh=IIibg1/4WvIjXQyZJl+4IBf/DvAGCXDdcSGNSt2pWjA=;
- b=TMywZlcbRfqxkouH8taMqHBh3L3qIqomdcFFYO6Sgvb1gIcjNkUTBZBzTsZX2PgpnQIyVEeek
- RpFYtG0ll4MB5N+H1KBQwsBkanZ7UaY2LH6RT6Wp84CFmzlJLUWQu9r
-X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
- pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
+        linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] [v2] Documentation: kbuild: explain handling optional dependencies
+Date:   Sun, 17 Sep 2023 21:19:59 +0200
+Message-Id: <20230917192009.254979-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-When the initramfs is embedded into the kernel each rebuild of it will
-trigger a full kernel relink and all the expensive postprocessing steps.
+From: Arnd Bergmann <arnd@arndb.de>
 
-Currently nolibc-test and therefore the initramfs are always rebuild,
-even without source changes, leading to lots of slow kernel relinks.
+This problem frequently comes up in randconfig testing, with
+drivers failing to link because of a dependency on an optional
+feature.
 
-Instead of linking the initramfs into the kernel assemble it manually
-and pass it explicitly to qemu.
-This avoids all of the kernel relinks.
+The Kconfig language for this is very confusing, so try to
+document it in "Kconfig hints" section.
 
-Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
+Reviewed-by: Javier Martinez Canillas <javierm@redhat.com>
+Reviewed-by: Sakari Ailus <sakari.ailus@linux.intel.com>
+Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
-Currently the nolibc testsuite embeds the test executable into a kernel
-image with CONFIG_INITRAMFS_SOURCE.
-This forces a full kernel relink everytime the test executable is
-updated.
-
-This relinking step dominates the test cycle.
-It is slower than building and running the test in qemu together.
-
-With a bit of Makefile-shuffling the relinking can be avoided.
+v2: fix typos pointed out by Nicolas Schier
 ---
-Changes in v2:
-- avoid need to modify top-level Makefile
-- drop patch removing "rerun" target
-- add kernel-standalone target
-- Link to v1: https://lore.kernel.org/r/20230916-nolibc-initramfs-v1-0-4416ecedca6d@weissschuh.net
----
- tools/testing/selftests/nolibc/Makefile | 42 ++++++++++++++++++++-------------
- 1 file changed, 26 insertions(+), 16 deletions(-)
+ Documentation/kbuild/kconfig-language.rst | 26 +++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-diff --git a/tools/testing/selftests/nolibc/Makefile b/tools/testing/selftests/nolibc/Makefile
-index 689658f81a19..ee6a9ad28cfd 100644
---- a/tools/testing/selftests/nolibc/Makefile
-+++ b/tools/testing/selftests/nolibc/Makefile
-@@ -131,18 +131,20 @@ REPORT  ?= awk '/\[OK\][\r]*$$/{p++} /\[FAIL\][\r]*$$/{if (!f) printf("\n"); f++
+diff --git a/Documentation/kbuild/kconfig-language.rst b/Documentation/kbuild/kconfig-language.rst
+index 858ed5d80defe..0135905c0aa35 100644
+--- a/Documentation/kbuild/kconfig-language.rst
++++ b/Documentation/kbuild/kconfig-language.rst
+@@ -573,6 +573,32 @@ above, leading to:
+ 	bool "Support for foo hardware"
+ 	depends on ARCH_FOO_VENDOR || COMPILE_TEST
  
- help:
- 	@echo "Supported targets under selftests/nolibc:"
--	@echo "  all          call the \"run\" target below"
--	@echo "  help         this help"
--	@echo "  sysroot      create the nolibc sysroot here (uses \$$ARCH)"
--	@echo "  nolibc-test  build the executable (uses \$$CC and \$$CROSS_COMPILE)"
--	@echo "  libc-test    build an executable using the compiler's default libc instead"
--	@echo "  run-user     runs the executable under QEMU (uses \$$XARCH, \$$TEST)"
--	@echo "  initramfs    prepare the initramfs with nolibc-test"
--	@echo "  defconfig    create a fresh new default config (uses \$$XARCH)"
--	@echo "  kernel       (re)build the kernel with the initramfs (uses \$$XARCH)"
--	@echo "  run          runs the kernel in QEMU after building it (uses \$$XARCH, \$$TEST)"
--	@echo "  rerun        runs a previously prebuilt kernel in QEMU (uses \$$XARCH, \$$TEST)"
--	@echo "  clean        clean the sysroot, initramfs, build and output files"
-+	@echo "  all               call the \"run\" target below"
-+	@echo "  help              this help"
-+	@echo "  sysroot           create the nolibc sysroot here (uses \$$ARCH)"
-+	@echo "  nolibc-test       build the executable (uses \$$CC and \$$CROSS_COMPILE)"
-+	@echo "  libc-test         build an executable using the compiler's default libc instead"
-+	@echo "  run-user          runs the executable under QEMU (uses \$$XARCH, \$$TEST)"
-+	@echo "  initramfs.cpio    prepare the initramfs archive with nolibc-test"
-+	@echo "  initramfs         prepare the initramfs tree with nolibc-test"
-+	@echo "  defconfig         create a fresh new default config (uses \$$XARCH)"
-+	@echo "  kernel            (re)build the kernel (uses \$$XARCH)"
-+	@echo "  kernel-standalone (re)build the kernel with the initramfs (uses \$$XARCH)"
-+	@echo "  run               runs the kernel in QEMU after building it (uses \$$XARCH, \$$TEST)"
-+	@echo "  rerun             runs a previously prebuilt kernel in QEMU (uses \$$XARCH, \$$TEST)"
-+	@echo "  clean             clean the sysroot, initramfs, build and output files"
- 	@echo ""
- 	@echo "The output file is \"run.out\". Test ranges may be passed using \$$TEST."
- 	@echo ""
-@@ -195,6 +197,9 @@ run-user: nolibc-test
- 	$(Q)qemu-$(QEMU_ARCH) ./nolibc-test > "$(CURDIR)/run.out" || :
- 	$(Q)$(REPORT) $(CURDIR)/run.out
- 
-+initramfs.cpio: kernel nolibc-test
-+	$(QUIET_GEN)echo 'file /init nolibc-test 755 0 0' | $(srctree)/usr/gen_init_cpio - > initramfs.cpio
++Optional dependencies
++~~~~~~~~~~~~~~~~~~~~~
 +
- initramfs: nolibc-test
- 	$(QUIET_MKDIR)mkdir -p initramfs
- 	$(call QUIET_INSTALL, initramfs/init)
-@@ -203,17 +208,20 @@ initramfs: nolibc-test
- defconfig:
- 	$(Q)$(MAKE) -C $(srctree) ARCH=$(ARCH) CC=$(CC) CROSS_COMPILE=$(CROSS_COMPILE) mrproper $(DEFCONFIG) prepare
- 
--kernel: initramfs
-+kernel:
-+	$(Q)$(MAKE) -C $(srctree) ARCH=$(ARCH) CC=$(CC) CROSS_COMPILE=$(CROSS_COMPILE) $(IMAGE_NAME)
++Some drivers are able to optionally use a feature from another module
++or build cleanly with that module disabled, but cause a link failure
++when trying to use that loadable module from a built-in driver.
 +
-+kernel-standalone: initramfs
- 	$(Q)$(MAKE) -C $(srctree) ARCH=$(ARCH) CC=$(CC) CROSS_COMPILE=$(CROSS_COMPILE) $(IMAGE_NAME) CONFIG_INITRAMFS_SOURCE=$(CURDIR)/initramfs
++The most common way to express this optional dependency in Kconfig logic
++uses the slightly counterintuitive::
++
++  config FOO
++	tristate "Support for foo hardware"
++	depends on BAR || !BAR
++
++This means that there is either a dependency on BAR that disallows
++the combination of FOO=y with BAR=m, or BAR is completely disabled.
++For a more formalized approach if there are multiple drivers that have
++the same dependency, a helper symbol can be used, like::
++
++  config FOO
++	tristate "Support for foo hardware"
++	depends on BAR_OPTIONAL
++
++  config BAR_OPTIONAL
++	def_tristate BAR || !BAR
++
+ Kconfig recursive dependency limitations
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  
- # run the tests after building the kernel
--run: kernel
--	$(Q)qemu-system-$(QEMU_ARCH) -display none -no-reboot -kernel "$(srctree)/$(IMAGE)" -serial stdio $(QEMU_ARGS) > "$(CURDIR)/run.out"
-+run: kernel initramfs.cpio
-+	$(Q)qemu-system-$(QEMU_ARCH) -display none -no-reboot -kernel "$(srctree)/$(IMAGE)" -initrd initramfs.cpio -serial stdio $(QEMU_ARGS) > "$(CURDIR)/run.out"
- 	$(Q)$(REPORT) $(CURDIR)/run.out
- 
- # re-run the tests from an existing kernel
- rerun:
--	$(Q)qemu-system-$(QEMU_ARCH) -display none -no-reboot -kernel "$(srctree)/$(IMAGE)" -serial stdio $(QEMU_ARGS) > "$(CURDIR)/run.out"
-+	$(Q)qemu-system-$(QEMU_ARCH) -display none -no-reboot -kernel "$(srctree)/$(IMAGE)" -initrd initramfs.cpio -serial stdio $(QEMU_ARGS) > "$(CURDIR)/run.out"
- 	$(Q)$(REPORT) $(CURDIR)/run.out
- 
- # report with existing test log
-@@ -227,6 +235,8 @@ clean:
- 	$(Q)rm -f nolibc-test
- 	$(call QUIET_CLEAN, libc-test)
- 	$(Q)rm -f libc-test
-+	$(call QUIET_CLEAN, initramfs.cpio)
-+	$(Q)rm -rf initramfs.cpio
- 	$(call QUIET_CLEAN, initramfs)
- 	$(Q)rm -rf initramfs
- 	$(call QUIET_CLEAN, run.out)
-
----
-base-commit: 3f79a57865b33f49fdae6655510bd27c8e6610e0
-change-id: 20230916-nolibc-initramfs-4fd00eac3256
-
-Best regards,
 -- 
-Thomas Weißschuh <linux@weissschuh.net>
+2.39.2
 
