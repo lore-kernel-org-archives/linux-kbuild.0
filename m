@@ -2,28 +2,28 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A7B1CD13D2
-	for <linux-kbuild@archiver.kernel.org>; Sun, 17 Sep 2023 19:35:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71686CD13D3
+	for <linux-kbuild@archiver.kernel.org>; Sun, 17 Sep 2023 20:33:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238649AbjIQTey (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 17 Sep 2023 15:34:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53770 "EHLO
+        id S241015AbjIQUdF (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 17 Sep 2023 16:33:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239745AbjIQTeg (ORCPT
+        with ESMTP id S241110AbjIQUcm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 17 Sep 2023 15:34:36 -0400
+        Sun, 17 Sep 2023 16:32:42 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5DB2119;
-        Sun, 17 Sep 2023 12:34:30 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA400C433C8;
-        Sun, 17 Sep 2023 19:34:29 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EDD5115;
+        Sun, 17 Sep 2023 13:32:22 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A3C8C433CA;
+        Sun, 17 Sep 2023 20:32:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1694979270;
-        bh=qkyFRXgpmq4LAg1OeWTNwSNZo29c8o0GmrXlxn7ZiFE=;
+        s=korg; t=1694982741;
+        bh=LA5dzD2L3YHuhGexc8xd6TfJQbIj4PlVNa2HI4ZpbfM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=osRrqH+Z551BZdw2Fkeo7ljOwHChWm+rV6bwEjTvudPhdFQnNap0UqC3lVIiaKIeP
-         yxs3VbnfM/PbJ4OXvTj+OPnFOJqvMUszT/PWDYAVtBFxSf/S3F2CDhSQseNEksW7ad
-         fCCbhHQ6tjlmH6nLT919EP3XT3fZ0vDV/5esg9pE=
+        b=AaNISD6+AwGGns6CQeZkqfo67OyVA6LDknpk3BWJjFCtWatuFDt8NxrukRj7e1ohc
+         3rSrvR9jNwdEKJIvmAw1l9WHN36Y5EKsNDced6wGDOslYRga/MUaQBjrpyvTOnpJBy
+         7ARWj+E288t5bRPxF3vBFXpsEBegMS3Tn5Qnx6qM=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     stable@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -40,12 +40,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Nicolas Schier <nicolas@fjasle.eu>,
         linux-kbuild@vger.kernel.org, alsa-devel@alsa-project.org,
         Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.10 264/406] um: Fix hostaudio build errors
-Date:   Sun, 17 Sep 2023 21:11:58 +0200
-Message-ID: <20230917191108.188086382@linuxfoundation.org>
+Subject: [PATCH 5.15 312/511] um: Fix hostaudio build errors
+Date:   Sun, 17 Sep 2023 21:12:19 +0200
+Message-ID: <20230917191121.358402280@linuxfoundation.org>
 X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20230917191101.035638219@linuxfoundation.org>
-References: <20230917191101.035638219@linuxfoundation.org>
+In-Reply-To: <20230917191113.831992765@linuxfoundation.org>
+References: <20230917191113.831992765@linuxfoundation.org>
 User-Agent: quilt/0.67
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -55,7 +55,7 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-5.10-stable review patch.  If anyone has any objections, please let me know.
+5.15-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -142,7 +142,7 @@ index 477b873174243..4bdd83008f623 100644
  CONFIG_DEVTMPFS=y
  CONFIG_DEVTMPFS_MOUNT=y
 diff --git a/arch/um/drivers/Kconfig b/arch/um/drivers/Kconfig
-index 2e7b8e0e7194b..01dfbd57e29d7 100644
+index f145842c40b94..3dd74d369f995 100644
 --- a/arch/um/drivers/Kconfig
 +++ b/arch/um/drivers/Kconfig
 @@ -104,24 +104,14 @@ config SSL_CHAN
@@ -174,10 +174,10 @@ index 2e7b8e0e7194b..01dfbd57e29d7 100644
  
  menu "UML Network Devices"
 diff --git a/arch/um/drivers/Makefile b/arch/um/drivers/Makefile
-index 2a249f6194671..207d62ab519df 100644
+index cd1a58bb3e9cd..dc0e6fe77de10 100644
 --- a/arch/um/drivers/Makefile
 +++ b/arch/um/drivers/Makefile
-@@ -52,7 +52,7 @@ obj-$(CONFIG_UML_NET) += net.o
+@@ -54,7 +54,7 @@ obj-$(CONFIG_UML_NET) += net.o
  obj-$(CONFIG_MCONSOLE) += mconsole.o
  obj-$(CONFIG_MMAPPER) += mmapper_kern.o 
  obj-$(CONFIG_BLK_DEV_UBD) += ubd.o 
@@ -187,7 +187,7 @@ index 2a249f6194671..207d62ab519df 100644
  obj-$(CONFIG_PORT_CHAN) += port.o
  obj-$(CONFIG_PTY_CHAN) += pty.o
 diff --git a/sound/Kconfig b/sound/Kconfig
-index 36785410fbe15..aaf2022ffc57d 100644
+index e56d96d2b11ca..1903c35d799e1 100644
 --- a/sound/Kconfig
 +++ b/sound/Kconfig
 @@ -1,7 +1,7 @@
