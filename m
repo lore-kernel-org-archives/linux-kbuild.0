@@ -2,137 +2,110 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9018E784B0
-	for <linux-kbuild@archiver.kernel.org>; Mon,  2 Oct 2023 17:02:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6895FE7491B
+	for <linux-kbuild@archiver.kernel.org>; Mon,  2 Oct 2023 19:52:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238552AbjJBRCd (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 2 Oct 2023 13:02:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39358 "EHLO
+        id S229631AbjJBTwi (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 2 Oct 2023 15:52:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238397AbjJBRCc (ORCPT
+        with ESMTP id S229497AbjJBTwh (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 2 Oct 2023 13:02:32 -0400
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BFABB4
-        for <linux-kbuild@vger.kernel.org>; Mon,  2 Oct 2023 10:02:29 -0700 (PDT)
-Received: by mail-wr1-x436.google.com with SMTP id ffacd0b85a97d-3231dff4343so2043566f8f.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 02 Oct 2023 10:02:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696266147; x=1696870947; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6fBgZzG8H8L+RMO629wwCt+NqtJpm6mxiNYmYMNrioQ=;
-        b=wRcHmiNtZkoDucBVwQH7YeY2ld2BHTYYbcx0DukRKcgCeWkZ+G3d4daBtvISZUVOfl
-         FI7SK0p/lL7ipw8MtWYoWO7rJ/GFmvY5PyC2/sDLvT3sLmjNbEbi5cmzLrF3un/bo8Bp
-         3th1WTBVCI4fVYvAbBuhkjqDWdTJmVyQTXVuEHvJ8SETWgPG6JKxVpfP7O9hXsbWii4d
-         aasBE/o3ssBS0G4YiPgcVGo1xl6aB1IiRkDIR/mmwTv9oOCqhI+cVxSc6rpa5Gfva5ky
-         JBEpwtpW72i0OVLzGdaF1WoL6uKIJxfyQAZb6tn142L0kCMgKxeIaHncczcVq3rZFnR2
-         gktw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696266147; x=1696870947;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6fBgZzG8H8L+RMO629wwCt+NqtJpm6mxiNYmYMNrioQ=;
-        b=W4OgBL/WcpgSks4mtfC2yZ+fK+YlV8LkUJnfllbA93HvJw28ZAYJs7rTHZXIrUTFuM
-         VXJsvIK447CUYxv87+4meaVE54W0XHwPB+hH3mtmTmZzLLzJ81yfGOxI77w3wIlRQCzf
-         qRZGqhyHz5BDBxu6dhoPIkHZRtqEPgpa5YDGCc2ev8qFp5JGF02k3smdT+0A/2P8GwHA
-         QBZ6VUpWx1w0lFY/4mx/LspCw2sgA+CHZnjPWib/E2ZmyA1Do3RukKBec4froSfvOpkW
-         4pQ4mH4oKk3vWxnu6ZigGCNEjqE79ElaArKLUAnC/+7D8AZFRSLBfjwTtEPFA6TJiyGI
-         PTTQ==
-X-Gm-Message-State: AOJu0YyFYpBOsmLEcJJ0Xj5u98DktrVrPOzosQoCaG5dfXOOMzVzVWjQ
-        VohAsKLgAuA3iEIMfgKQMLIqsynGOdFXYvGnH6snbQ==
-X-Google-Smtp-Source: AGHT+IHAgIMir4wwCM6XdRGvOWBdNLdGzUBf9zrpeeFrzoDCpgeqJzSybRFIgRtYZEdM3xBYZynrqbZu/R1kiLzJi7Y=
-X-Received: by 2002:a05:6000:1050:b0:323:1e69:7b4 with SMTP id
- c16-20020a056000105000b003231e6907b4mr132794wrx.31.1696266147248; Mon, 02 Oct
- 2023 10:02:27 -0700 (PDT)
+        Mon, 2 Oct 2023 15:52:37 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1542FAD
+        for <linux-kbuild@vger.kernel.org>; Mon,  2 Oct 2023 12:52:35 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44F9EC433C8;
+        Mon,  2 Oct 2023 19:52:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1696276354;
+        bh=+548pRRoJGnyq+La0+LmV2WoZSprlMO8hwf3zOhMwFk=;
+        h=From:Date:Subject:To:Cc:From;
+        b=EqWiZsTStPaTnLlG9Ln2clf5JhEUOwWSlMzPCtk4SJrcNKfaOPuRDpDojq0zQwdan
+         nfi4nA+wX8mlV0tc6uwgc4BZB+Xv0terRZxA+2HJF/TUrRkE9tqoWTG2Y71U1x8nNc
+         QRXdav27RnFhVkZVxyuT3LEutXi6JCYLnV3uo7l03ExaEyihCppDzoD12aDSBbPeTL
+         wRtGScA8HkXP6Ie9r0rgntcaf5Swu2pgQzzwkaZ7DbQkkjYjPh+Cq9vmEaLZO/b5yN
+         bo1xyjfX3FkR+SupPk6GkP/51ns2GbgSNebtR/FHYCmIpR7vyEVZ07TZThNxu26BDc
+         Wo2nHLe24lAfA==
+From:   Nathan Chancellor <nathan@kernel.org>
+Date:   Mon, 02 Oct 2023 12:52:28 -0700
+Subject: [PATCH] kbuild: Disable clang's
+ -Wformat-{overflow,truncation}-non-kprintf
 MIME-Version: 1.0
-References: <20231002165750.1661-1-will@kernel.org> <20231002165750.1661-4-will@kernel.org>
-In-Reply-To: <20231002165750.1661-4-will@kernel.org>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Mon, 2 Oct 2023 10:02:16 -0700
-Message-ID: <CAKwvOdmZrU90+jA4ugbqiT=VxvsEdTqwmvo7hk-HEocd8xJbmQ@mail.gmail.com>
-Subject: Re: [PATCH v5 3/3] scripts/faddr2line: Skip over mapping symbols in
- output from readelf
-To:     Will Deacon <will@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, kernel-team@android.com,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nicolas Schier <nicolas@fjasle.eu>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        John Stultz <jstultz@google.com>, linux-kbuild@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20231002-disable-wformat-truncation-overflow-non-kprintf-v1-1-35179205c8d9@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAHsfG2UC/x3NMQ6DMAyF4asgz7UUEoaoV6k6BOJQqzRBToBKi
+ LvX6vgN/3snVBKmCvfuBKGdK5es6G8dTK+QZ0KOarDGut4Yi5FrGBfCIxX5hIZNtjyFphmWnSQ
+ t5cCseK/CuSU0zpGPfhwiedDVVSjx9//4eF7XD8W1K/mBAAAA
+To:     masahiroy@kernel.org, ndesaulniers@google.com
+Cc:     nicolas@fjasle.eu, trix@redhat.com, linux-kbuild@vger.kernel.org,
+        llvm@lists.linux.dev, patches@lists.linux.dev,
+        Nathan Chancellor <nathan@kernel.org>
+X-Mailer: b4 0.13-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2683; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=+548pRRoJGnyq+La0+LmV2WoZSprlMO8hwf3zOhMwFk=;
+ b=owGbwMvMwCEmm602sfCA1DTG02pJDKnS8k3mUdGPhA8usu6/ktx2yOy/1VRpSy/H73UvrP4Fs
+ PrOyPraUcrCIMbBICumyFL9WPW4oeGcs4w3Tk2CmcPKBDKEgYtTACbCy8/IsGnJ821tzOET4noy
+ 45wCVkjkODCXvV/M+C6GY/nyJl8DQYb/rteaSzWrOVLs1MrPsgc4cbTvdll3fIXm7Ed7pFdyK+h
+ xAwA=
+X-Developer-Key: i=nathan@kernel.org; a=openpgp;
+ fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Mon, Oct 2, 2023 at 9:58=E2=80=AFAM Will Deacon <will@kernel.org> wrote:
->
-> Mapping symbols emitted in the readelf output can confuse the
-> 'faddr2line' symbol size calculation, resulting in the erroneous
-> rejection of valid offsets. This is especially prevalent when building
-> an arm64 kernel with CONFIG_CFI_CLANG=3Dy, where most functions are
-> prefixed with a 32-bit data value in a '$d.n' section. For example:
->
-> 447538: ffff800080014b80   548 FUNC    GLOBAL DEFAULT    2 do_one_initcal=
-l
->    104: ffff800080014c74     0 NOTYPE  LOCAL  DEFAULT    2 $x.73
->    106: ffff800080014d30     0 NOTYPE  LOCAL  DEFAULT    2 $x.75
->    111: ffff800080014da4     0 NOTYPE  LOCAL  DEFAULT    2 $d.78
->    112: ffff800080014da8     0 NOTYPE  LOCAL  DEFAULT    2 $x.79
->     36: ffff800080014de0   200 FUNC    LOCAL  DEFAULT    2 run_init_proce=
-ss
->
-> Adding a warning to do_one_initcall() results in:
->
->   | WARNING: CPU: 0 PID: 1 at init/main.c:1236 do_one_initcall+0xf4/0x260
->
-> Which 'faddr2line' refuses to accept:
->
-> $ ./scripts/faddr2line vmlinux do_one_initcall+0xf4/0x260
-> skipping do_one_initcall address at 0xffff800080014c74 due to size mismat=
-ch (0x260 !=3D 0x224)
-> no match for do_one_initcall+0xf4/0x260
->
-> Filter out these entries from readelf using a shell reimplementation of
-> is_mapping_symbol(), so that the size of a symbol is calculated as a
-> delta to the next symbol present in ksymtab.
->
-> Cc: Josh Poimboeuf <jpoimboe@kernel.org>
-> Cc: John Stultz <jstultz@google.com>
-> Suggested-by: Masahiro Yamada <masahiroy@kernel.org>
-> Signed-off-by: Will Deacon <will@kernel.org>
+Recently, clang added support for -Wformat-overflow and
+-Wformat-truncation. When building the kernel, it was discovered that
+clang's implementation of these warnings handles the '%p' specifier,
+which differs from GCC's implementation. This results in false positive
+warnings due to the kernel's various '%p' extensions. Fortunately, the
+clang developers placed this warning difference into a separate flag,
+allowing the kernel to turn off the warning for '%p' unconditionally.
 
-Thanks for the patch!
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+This is not currently an issue for a normal build, as -Wformat-overflow
+and -Wformat-truncation are unconditionally disabled, which includes
+this sub-warning. However, ever since commit 6d4ab2e97dcf ("extrawarn:
+enable format and stringop overflow warnings in W=1"), these warnings
+are in W=1 and the goal is to enable them in the normal build once they
+are all eliminated. Disable the warnings for W=1 to avoid false
+positives. This block should move with -Wformat-overflow and
+-Wformat-truncation when they are enabled for a normal build.
 
-> ---
->  scripts/faddr2line | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/scripts/faddr2line b/scripts/faddr2line
-> index 6b8206802157..587415a52b6f 100755
-> --- a/scripts/faddr2line
-> +++ b/scripts/faddr2line
-> @@ -179,6 +179,11 @@ __faddr2line() {
->                         local cur_sym_elf_size=3D${fields[2]}
->                         local cur_sym_name=3D${fields[7]:-}
->
-> +                       # is_mapping_symbol(cur_sym_name)
-> +                       if [[ ${cur_sym_name} =3D~ ^(\.L|L0|\$) ]]; then
-> +                               continue
-> +                       fi
-> +
->                         if [[ $cur_sym_addr =3D $sym_addr ]] &&
->                            [[ $cur_sym_elf_size =3D $sym_elf_size ]] &&
->                            [[ $cur_sym_name =3D $sym_name ]]; then
-> --
-> 2.42.0.582.g8ccd20d70d-goog
->
+Link: https://github.com/ClangBuiltLinux/linux/issues/1923
+Link: https://github.com/llvm/llvm-project/issues/64871
+Link: https://github.com/llvm/llvm-project/pull/65969
+Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=111219
+Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=78512
+Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+---
+ scripts/Makefile.extrawarn | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
+diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
+index 2fe6f2828d37..bad1baa2cfb4 100644
+--- a/scripts/Makefile.extrawarn
++++ b/scripts/Makefile.extrawarn
+@@ -106,6 +106,13 @@ KBUILD_CFLAGS += $(call cc-option, -Wunused-const-variable)
+ KBUILD_CFLAGS += $(call cc-option, -Wpacked-not-aligned)
+ KBUILD_CFLAGS += $(call cc-option, -Wformat-overflow)
+ KBUILD_CFLAGS += $(call cc-option, -Wformat-truncation)
++# Clang checks for overflow/truncation with '%p', while GCC does not:
++# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=111219
++# The kernel has many extensions to '%p' that clang does not understand, so
++# always disable these warnings when '-Wformat-truncation' and
++# '-Wformat-overflow' are enabled.
++KBUILD_CFLAGS += $(call cc-disable-warning, format-overflow-non-kprintf)
++KBUILD_CFLAGS += $(call cc-disable-warning, format-truncation-non-kprintf)
+ KBUILD_CFLAGS += $(call cc-option, -Wstringop-overflow)
+ KBUILD_CFLAGS += $(call cc-option, -Wstringop-truncation)
+ 
 
---=20
-Thanks,
-~Nick Desaulniers
+---
+base-commit: 8a749fd1a8720d4619c91c8b6e7528c0a355c0aa
+change-id: 20231002-disable-wformat-truncation-overflow-non-kprintf-033e8d8b4de8
+
+Best regards,
+-- 
+Nathan Chancellor <nathan@kernel.org>
+
