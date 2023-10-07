@@ -2,42 +2,42 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BBB0E95A61
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB32EE95A65
 	for <linux-kbuild@archiver.kernel.org>; Sat,  7 Oct 2023 17:05:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344118AbjJGRFE (ORCPT
+        id S1344113AbjJGRFG (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 7 Oct 2023 13:05:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56746 "EHLO
+        Sat, 7 Oct 2023 13:05:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344098AbjJGRFB (ORCPT
+        with ESMTP id S1344120AbjJGRFE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 7 Oct 2023 13:05:01 -0400
+        Sat, 7 Oct 2023 13:05:04 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE623B9;
-        Sat,  7 Oct 2023 10:04:59 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23CA5C433C8;
-        Sat,  7 Oct 2023 17:04:57 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EF2FB9;
+        Sat,  7 Oct 2023 10:05:03 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9964FC433C8;
+        Sat,  7 Oct 2023 17:05:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1696698299;
-        bh=7PA8scmHfu5nyFOhItoPibMephbX/u9X82eA3NzQP1c=;
+        s=k20201202; t=1696698303;
+        bh=VFhwLN6cPSTo8azgI6QvVm2lvfds7OQ34SuiYHF6MzU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=LWnn0sOt6WygtD1hvtwiVIqmKHBDxYUleCmm8Su8hd/lnUJvGVbe6sHfuJl7ZjjA8
-         pZ96QAL2xYi7Egbrrdjvt0EvwffMJKtblV8mUCndaQJ2RZJAoTQibExZrVfXJykOnj
-         aWSpG0WDrEdYgYLSX33jj/riVgkH8hz3+x/rwrSdyQsPVmBDpQ12ADSFv3EiQADHaY
-         J8cCrKBe64utnoCGPbxGVmreLogcNc4NqaPkbm5XwX4Abes0XcwIAeQBco/YFqve0Q
-         0kNqxSJHhRmkr4BW2uaIYynAZfKuDg+aL1DvDsjChq5pL746vpys8wjaVLH/1nrUI5
-         f9e2VYHEtY3FA==
+        b=sBynyLUd1/uJaABdRrkJDXMqCBr6rKnMibc1ZccirbcOVP0DwA/e6rFwgRutM+vYO
+         C4kcvfL+Ojlxuec+WLBCy7aRXhcVG9AopB9Q6UBjRY593Srgrp7kt6kAUNcJsUzyzx
+         tJX4/8N4Vlg2L0zkVrmGv2n83/MVoStZQbTb8ETiJeaKFuR7gNiG45L5z3WhNzAnT6
+         0RPHK8V1m/jU2/2iIyjugJDYW1Ct2Yw/Uhii6rDcnnA2A1pNTMvF6f8hiFCouxgYbl
+         sBayNGlrDVh/ixc8rMSgyy69ofVu+BLzBwH2Bvae06izplRquNEs7i2VGiBvvqje+L
+         UzfP+q5pGXKkg==
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
+        Nathan Chancellor <nathan@kernel.org>,
         Nicolas Schier <nicolas@fjasle.eu>
-Subject: [PATCH 3/5] modpost: define TO_NATIVE() using bswap_* functions
-Date:   Sun,  8 Oct 2023 02:04:46 +0900
-Message-Id: <20231007170448.505487-3-masahiroy@kernel.org>
+Subject: [PATCH 5/5] modpost: factor out the common boilerplate of section_rel(a)
+Date:   Sun,  8 Oct 2023 02:04:48 +0900
+Message-Id: <20231007170448.505487-5-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231007170448.505487-1-masahiroy@kernel.org>
 References: <20231007170448.505487-1-masahiroy@kernel.org>
@@ -47,94 +47,97 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The current TO_NATIVE() has some limitations:
+The first few lines of section_rel() and section_rela() are the same.
+They both retrieve the index of the section to which the relocaton
+applies, and skip known-good sections. This common code should be moved
+to check_sec_ref().
 
- 1) You cannot cast the argument.
-
- 2) You cannot pass a variable marked as 'const'.
-
- 3) Passing an array is a bug, but it is not detected.
-
-Impelement TO_NATIVE() using bswap_*() functions. These are GNU
-extensions. If we face portability issues, we can port the code from
-include/uapi/linux/swab.h.
-
-With this change, get_rel_type_and_sym() can be simplified by casting
-the arguments directly.
+Avoid ugly casts when computing 'start' and 'stop', and also make the
+Elf_Rel and Elf_Rela pointers const.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 ---
 
- scripts/mod/modpost.c | 13 ++++---------
- scripts/mod/modpost.h | 25 ++++++++++++-------------
- 2 files changed, 16 insertions(+), 22 deletions(-)
+ scripts/mod/modpost.c | 50 ++++++++++++++++++++++---------------------
+ 1 file changed, 26 insertions(+), 24 deletions(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 2f3b0fe6f68d..99476a9695c5 100644
+index 441d57ee3275..f1f658122ad8 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -1410,15 +1410,10 @@ static void get_rel_type_and_sym(struct elf_info *elf, uint64_t r_info,
- 		return;
- 	}
+@@ -1420,17 +1420,10 @@ static void get_rel_type_and_sym(struct elf_info *elf, uint64_t r_info,
+ }
  
--	if (is_64bit) {
--		Elf64_Xword r_info64 = r_info;
+ static void section_rela(struct module *mod, struct elf_info *elf,
+-			 Elf_Shdr *sechdr)
++			 unsigned int fsecndx, const char *fromsec,
++			 const Elf_Rela *start, const Elf_Rela *stop)
+ {
+-	Elf_Rela *rela;
+-	unsigned int fsecndx = sechdr->sh_info;
+-	const char *fromsec = sec_name(elf, fsecndx);
+-	Elf_Rela *start = (void *)elf->hdr + sechdr->sh_offset;
+-	Elf_Rela *stop  = (void *)start + sechdr->sh_size;
 -
--		r_info = TO_NATIVE(r_info64);
--	} else {
--		Elf32_Word r_info32 = r_info;
+-	/* if from section (name) is know good then skip it */
+-	if (match(fromsec, section_white_list))
+-		return;
++	const Elf_Rela *rela;
+ 
+ 	for (rela = start; rela < stop; rela++) {
+ 		Elf_Addr taddr, r_offset;
+@@ -1460,17 +1453,10 @@ static void section_rela(struct module *mod, struct elf_info *elf,
+ }
+ 
+ static void section_rel(struct module *mod, struct elf_info *elf,
+-			Elf_Shdr *sechdr)
++			unsigned int fsecndx, const char *fromsec,
++			const Elf_Rel *start, const Elf_Rel *stop)
+ {
+-	Elf_Rel *rel;
+-	unsigned int fsecndx = sechdr->sh_info;
+-	const char *fromsec = sec_name(elf, fsecndx);
+-	Elf_Rel *start = (void *)elf->hdr + sechdr->sh_offset;
+-	Elf_Rel *stop  = (void *)start + sechdr->sh_size;
 -
--		r_info = TO_NATIVE(r_info32);
--	}
-+	if (is_64bit)
-+		r_info = TO_NATIVE((Elf64_Xword)r_info);
-+	else
-+		r_info = TO_NATIVE((Elf32_Word)r_info);
+-	/* if from section (name) is know good then skip it */
+-	if (match(fromsec, section_white_list))
+-		return;
++	const Elf_Rel *rel;
  
- 	*r_type = ELF_R_TYPE(r_info);
- 	*r_sym = ELF_R_SYM(r_info);
-diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
-index 6413f26fcb6b..1392afec118c 100644
---- a/scripts/mod/modpost.h
-+++ b/scripts/mod/modpost.h
-@@ -1,4 +1,5 @@
- /* SPDX-License-Identifier: GPL-2.0 */
-+#include <byteswap.h>
- #include <stdbool.h>
- #include <stdio.h>
- #include <stdlib.h>
-@@ -51,21 +52,19 @@
- #define ELF_R_TYPE  ELF64_R_TYPE
- #endif
+ 	for (rel = start; rel < stop; rel++) {
+ 		Elf_Sym *tsym;
+@@ -1525,10 +1511,26 @@ static void check_sec_ref(struct module *mod, struct elf_info *elf)
  
-+#define bswap(x) \
-+({ \
-+	_Static_assert(sizeof(x) == 1 || sizeof(x) == 2 || \
-+		       sizeof(x) == 4 || sizeof(x) == 8, "bug"); \
-+	(typeof(x))(sizeof(x) == 2 ? bswap_16(x) : \
-+		    sizeof(x) == 4 ? bswap_32(x) : \
-+		    sizeof(x) == 8 ? bswap_64(x) : \
-+		    x); \
-+})
+ 		check_section(mod->name, elf, sechdr);
+ 		/* We want to process only relocation sections and not .init */
+-		if (sechdr->sh_type == SHT_RELA)
+-			section_rela(mod, elf, sechdr);
+-		else if (sechdr->sh_type == SHT_REL)
+-			section_rel(mod, elf, sechdr);
++		if (sechdr->sh_type == SHT_REL || sechdr->sh_type == SHT_RELA) {
++			/* section to which the relocation applies */
++			unsigned int secndx = sechdr->sh_info;
++			const char *secname = sec_name(elf, secndx);
++			const void *start, *stop;
 +
- #if KERNEL_ELFDATA != HOST_ELFDATA
- 
--static inline void __endian(const void *src, void *dest, unsigned int size)
--{
--	unsigned int i;
--	for (i = 0; i < size; i++)
--		((unsigned char*)dest)[i] = ((unsigned char*)src)[size - i-1];
--}
--
--#define TO_NATIVE(x)						\
--({								\
--	typeof(x) __x;						\
--	__endian(&(x), &(__x), sizeof(__x));			\
--	__x;							\
--})
-+#define TO_NATIVE(x) (bswap(x))
- 
- #else /* endianness matches */
++			/* If the section is known good, skip it */
++			if (match(secname, section_white_list))
++				continue;
++
++			start = sym_get_data_by_offset(elf, i, 0);
++			stop = start + sechdr->sh_size;
++
++			if (sechdr->sh_type == SHT_RELA)
++				section_rela(mod, elf, secndx, secname,
++					     start, stop);
++			else
++				section_rel(mod, elf, secndx, secname,
++					    start, stop);
++		}
+ 	}
+ }
  
 -- 
 2.39.2
