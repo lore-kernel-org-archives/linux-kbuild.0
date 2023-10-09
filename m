@@ -2,32 +2,32 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3391AE95A96
-	for <linux-kbuild@archiver.kernel.org>; Mon,  9 Oct 2023 12:42:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86DC6E95A9B
+	for <linux-kbuild@archiver.kernel.org>; Mon,  9 Oct 2023 12:42:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376563AbjJIMm3 (ORCPT
+        id S1376517AbjJIMmh (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 9 Oct 2023 08:42:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60420 "EHLO
+        Mon, 9 Oct 2023 08:42:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1376527AbjJIMmZ (ORCPT
+        with ESMTP id S1376574AbjJIMmg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 9 Oct 2023 08:42:25 -0400
+        Mon, 9 Oct 2023 08:42:36 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF3CFAB;
-        Mon,  9 Oct 2023 05:42:23 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 160ADC433C7;
-        Mon,  9 Oct 2023 12:42:20 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10110C6;
+        Mon,  9 Oct 2023 05:42:32 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AD3BC433C8;
+        Mon,  9 Oct 2023 12:42:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1696855343;
-        bh=2pDAXsYdr6lnZaEYy+XyoiLH0SPTSNq4AwXsBcAaKjg=;
+        s=k20201202; t=1696855351;
+        bh=ohuZp0WsPxcwHw6R6rlObohasBZPv2zNfsGPMOVNB0w=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=OHYkpZWPOomWrfTFYsYVR0dUXhsAstX8BQkaIe3nW9TdyVFGMja92VWRyCVFwtvLu
-         CbD7EBBZEDbE6fCV4YR61vYddvnMXW67ZL85pe26/hUqPjUmqu0OAa8XY0PvvwbenC
-         /oGofIlRr4w/Og4GChSzkelChds0+PIHOQPVgEybQ6zx+9uKj1+hy9HriCG/xUVpot
-         U3xkmlZXMutL2G9oSGHhPB7gSKKDzof5imbxXPmpSZKgOHnUaD+6xRQHglYQzxwJjW
-         yT5ERsvwknSJqNYTvtNznli7Pq9cxsMmX8BJaFSR2Egmg1Nb1Tb44If/mAVcG+esbL
-         kM3C1xQExPh2Q==
+        b=BKSDQENlvCmvcUrtGTpvgpXpECfR89ZihieZKhN8yFEcgvnaQah5u+fu1s9cT4cyh
+         t0XXIrXBr5Wh2tHs5U1wgNNLvlJriRBgYeecMegYSMNkZLiT37eCLJlFIUbu7rxsbG
+         5sr0In6kOsFUzhVpOudgXO5aL4REohZCiaJPgybNzfR2soQZC2ttQ0uYemp5lQ6Wtx
+         vi8oA26zKj5teKiNkX8lGRKZNfEXHLCGSxdgSIRTbQ/cGXWeU3YnKa2qbLlIVXNKLs
+         UbTjRun9wVsuKTpkgtho/Jv5qMGp9UmJAFMvr18c5+F3RNdavwcms6ANinS9j1avAn
+         oEcB4ugnaUyQg==
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
@@ -36,11 +36,12 @@ Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-um@lists.infradead.org, loongarch@lists.linux.dev,
         sparclinux@vger.kernel.org, x86@kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Helge Deller <deller@gmx.de>,
-        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
-Subject: [PATCH 3/5] parisc: remove broken vdso_install
-Date:   Mon,  9 Oct 2023 21:42:08 +0900
-Message-Id: <20231009124210.1064021-3-masahiroy@kernel.org>
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nicolas Schier <nicolas@fjasle.eu>
+Subject: [PATCH 5/5] kbuild: unify no-compiler-targets and no-sync-config-targets
+Date:   Mon,  9 Oct 2023 21:42:10 +0900
+Message-Id: <20231009124210.1064021-5-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231009124210.1064021-1-masahiroy@kernel.org>
 References: <20231009124210.1064021-1-masahiroy@kernel.org>
@@ -50,45 +51,61 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-'make ARCH=parisc vdso_install' has never worked. It attempts to
-descend into arch/parisc/kernel/vdso/, which does not exist.
-
-The command just fails:
-
-  scripts/Makefile.build:41: arch/parisc/kernel/vdso/Makefile: No such file or directory
-
-The second line is also meaningless because parisc does not define
-CONFIG_COMPAT_VDSO.
-
-It appears that this code was copied from another architecture without
-proper adaptation.
-
-Remove the broken code.
+Now that vdso_install does not depend on any in-tree build artifact,
+it no longer invokes a compiler, making no-compiler-targets the same
+as no-sync-config-targets.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- arch/parisc/Makefile | 7 -------
- 1 file changed, 7 deletions(-)
+ Makefile | 13 +------------
+ 1 file changed, 1 insertion(+), 12 deletions(-)
 
-diff --git a/arch/parisc/Makefile b/arch/parisc/Makefile
-index 968ebe17494c..4222fa73c34a 100644
---- a/arch/parisc/Makefile
-+++ b/arch/parisc/Makefile
-@@ -177,13 +177,6 @@ vdso_prepare: prepare0
- 	$(Q)$(MAKE) $(build)=arch/parisc/kernel/vdso32 include/generated/vdso32-offsets.h
+diff --git a/Makefile b/Makefile
+index 2170d56630e8..982b1ad33287 100644
+--- a/Makefile
++++ b/Makefile
+@@ -277,10 +277,6 @@ no-dot-config-targets := $(clean-targets) \
+ 			 $(version_h) headers headers_% archheaders archscripts \
+ 			 %asm-generic kernelversion %src-pkg dt_binding_check \
+ 			 outputmakefile rustavailable rustfmt rustfmtcheck
+-# Installation targets should not require compiler. Unfortunately, vdso_install
+-# is an exception where build artifacts may be updated. This must be fixed.
+-no-compiler-targets := $(no-dot-config-targets) install dtbs_install \
+-			headers_install modules_install modules_sign kernelrelease image_name
+ no-sync-config-targets := $(no-dot-config-targets) %install modules_sign kernelrelease \
+ 			  image_name
+ single-targets := %.a %.i %.ko %.lds %.ll %.lst %.mod %.o %.rsi %.s %.symtypes %/
+@@ -288,7 +284,6 @@ single-targets := %.a %.i %.ko %.lds %.ll %.lst %.mod %.o %.rsi %.s %.symtypes %
+ config-build	:=
+ mixed-build	:=
+ need-config	:= 1
+-need-compiler	:= 1
+ may-sync-config	:= 1
+ single-build	:=
+ 
+@@ -298,12 +293,6 @@ ifneq ($(filter $(no-dot-config-targets), $(MAKECMDGOALS)),)
+ 	endif
  endif
  
--PHONY += vdso_install
+-ifneq ($(filter $(no-compiler-targets), $(MAKECMDGOALS)),)
+-	ifeq ($(filter-out $(no-compiler-targets), $(MAKECMDGOALS)),)
+-		need-compiler :=
+-	endif
+-endif
 -
--vdso_install:
--	$(Q)$(MAKE) $(build)=arch/parisc/kernel/vdso $@
--	$(if $(CONFIG_COMPAT_VDSO), \
--		$(Q)$(MAKE) $(build)=arch/parisc/kernel/vdso32 $@)
--
- install: KBUILD_IMAGE := vmlinux
- zinstall: KBUILD_IMAGE := vmlinuz
- install zinstall:
+ ifneq ($(filter $(no-sync-config-targets), $(MAKECMDGOALS)),)
+ 	ifeq ($(filter-out $(no-sync-config-targets), $(MAKECMDGOALS)),)
+ 		may-sync-config :=
+@@ -675,7 +664,7 @@ endif
+ 
+ # Include this also for config targets because some architectures need
+ # cc-cross-prefix to determine CROSS_COMPILE.
+-ifdef need-compiler
++ifdef may-sync-config
+ include $(srctree)/scripts/Makefile.compiler
+ endif
+ 
 -- 
 2.39.2
 
