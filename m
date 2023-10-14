@@ -2,119 +2,146 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2AF1CDB47E
-	for <linux-kbuild@archiver.kernel.org>; Thu, 12 Oct 2023 10:56:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19667CDB474
+	for <linux-kbuild@archiver.kernel.org>; Sat, 14 Oct 2023 08:36:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377922AbjJLK4R (ORCPT
-        <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 12 Oct 2023 06:56:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59732 "EHLO
+        id S232912AbjJNIgg (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 14 Oct 2023 04:36:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377894AbjJLK4Q (ORCPT
+        with ESMTP id S232960AbjJNIgf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 12 Oct 2023 06:56:16 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D20B90;
-        Thu, 12 Oct 2023 03:56:15 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1c9e072472bso3711545ad.2;
-        Thu, 12 Oct 2023 03:56:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697108175; x=1697712975;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:dkim-signature:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W9Da9MBT9rB+lZA9zm7WjEfc17v4yeizFPCpeNj0xZ0=;
-        b=Ei07dD2m+RTvKQhFedviaU1CsU5TBQ/erBoTMJOHBNfnnycKPjdIy1+kaJ+4DWAfMJ
-         kBe5yBQuv7K4vIqZhY2mryVqSd+ASML7t2cXci4Qjrv0NY/YOwgMGowdIXzdEGSv8+fd
-         Pdn+qdl3Mxuz1s5wFIertknrqDOt970bnc/GBWa2GNSQs+LMZpG/MRumMXXg3Ne1jMA/
-         pNTw+eeeR3oqUZWNedlC94yT416cqbpqwIrCQhN6wxLhBH4lVjDQdcM1ZE+cH7gB/MnN
-         D50pm+hKYJk6EK1TinKUyzHGWj8QuaW/q0dDO+qzSYYbF4JN7HLBf/JtEVahNjyOTrCs
-         cMRA==
-X-Gm-Message-State: AOJu0YxQDamhMNb0DqygyM8iM0bsALWBmPRHUTJnuSFF/Smh+hmU4jGt
-        50OAzBhbYBGMx+iw2M9BUz8=
-X-Google-Smtp-Source: AGHT+IHrukWTPzhOjCyRsKwTW9N1rf4iR43yr7LemfnQgYdFKwX3fykZ3xDPkLmVgn5cqdkN8M/iSQ==
-X-Received: by 2002:a17:902:fa8f:b0:1c9:d948:33d5 with SMTP id lc15-20020a170902fa8f00b001c9d94833d5mr2349432plb.64.1697108174615;
-        Thu, 12 Oct 2023 03:56:14 -0700 (PDT)
-Received: from mail.marliere.net ([24.199.118.162])
-        by smtp.gmail.com with ESMTPSA id a7-20020a170902ecc700b001c3267ae31bsm1642297plh.301.2023.10.12.03.56.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Oct 2023 03:56:13 -0700 (PDT)
-From:   "Ricardo B. Marliere" <ricardo@marliere.net>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marliere.net;
-        s=2023; t=1697108172;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=W9Da9MBT9rB+lZA9zm7WjEfc17v4yeizFPCpeNj0xZ0=;
-        b=p6mRBJRv15x2a8mugD54EELIKpHhGxE1HudINzkmlCUswZguuXtnlCIm/uEwKwVFGZVLJK
-        nYWY3ofQoWfYLeWEKmB7VlsdpqXtvMSIsU6UcKac9GL54ENIO1eIdN7DJjkuzehSfniMDg
-        qORCa7JwERprwg49vaR4XZH3DGZYcOA0iaWdlZhua/wejFBTrv0X29zVCWKoPHxCiZUyj+
-        6m2N1mhjzLGzrd+M41gY1i3BLQ8YfOEO7gI4LQKNrAbrF/BAbWNzNcAJZ6yUKmJvj2rjU8
-        m0xLBNvh1cZcYPP/CDUQ5IFVxGBe/Ql7NmfsVGUjkM9DsgHzdToaow1h361Ndg==
-Authentication-Results: ORIGINATING;
-        auth=pass smtp.auth=ricardo@marliere.net smtp.mailfrom=ricardo@marliere.net
-To:     Masahiro Yamada <masahiroy@kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nicolas Schier <nicolas@fjasle.eu>,
-        Jonathan Corbet <corbet@lwn.net>
-Cc:     linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        "Ricardo B. Marliere" <ricardo@marliere.net>
-Subject: [PATCH] docs: kbuild: add INSTALL_DTBS_PATH
-Date:   Thu, 12 Oct 2023 07:54:21 -0300
-Message-ID: <20231012105420.16779-2-ricardo@marliere.net>
+        Sat, 14 Oct 2023 04:36:35 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55BF9DC
+        for <linux-kbuild@vger.kernel.org>; Sat, 14 Oct 2023 01:36:32 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F37FC433C7
+        for <linux-kbuild@vger.kernel.org>; Sat, 14 Oct 2023 08:36:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1697272591;
+        bh=aHL/WqlFErNGXGiwapJdKxSDSd48GX2HEHqlCazr7rQ=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=CpYZoOjnRXP1yrBXijNsvKirhfFG2mvI03A2PxTBMpbuNPWGQEWnBD0bq/1bHL8I+
+         coQfTiqgb5VBL+J8vLuCu5wzQsnJiQK5CmNR95+iXwzdpLXWo4oFIa7n4zoLNyh8Qe
+         s/tj61qE8WMp9tqLmU9JzMOI89Dt6KUfDBnC/nIwEltsL15Yxb/eq6q9Xe6Eg6jhZd
+         6F//ZYz3Ifjw04Na+CCHrGmm1PWKJ+vNXvpwaqiQmG/NZ3fGX7dCPeQBD2ADNjn9V2
+         gY8g9Woj76RjADqV2ADYgfOPO56VGkuB6D1YQ9PFCJCWkH5JzIHJuc3MVtsqC6WK71
+         9HrxWVnqgie7w==
+Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-6c64c2c0f97so1766147a34.3
+        for <linux-kbuild@vger.kernel.org>; Sat, 14 Oct 2023 01:36:31 -0700 (PDT)
+X-Gm-Message-State: AOJu0Yz5ntxj7aYbH0NV86qx7atfve5lhq5WzrU+1R5JkWvLbU8qYuhV
+        QN63p+6m+55wHq8ZiIc4ZeToCWh3vzBQ9Y+ANyc=
+X-Google-Smtp-Source: AGHT+IGbj1ld9sr8d4lmDlrEwBi8vGTv25EDR8SaK89TmW48PEgSXIc43jnAshj7uUlBvrx5LPN0efOnhREzZwNkGBs=
+X-Received: by 2002:a05:6870:ce48:b0:1e9:858e:ff23 with SMTP id
+ xd8-20020a056870ce4800b001e9858eff23mr10123367oab.55.1697272590864; Sat, 14
+ Oct 2023 01:36:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <lp2gjgzwxvhluh7fpmmo2drhii7bxcrlvxacclfgsl4ycubjhc@jjq2jfvow4y2>
+In-Reply-To: <lp2gjgzwxvhluh7fpmmo2drhii7bxcrlvxacclfgsl4ycubjhc@jjq2jfvow4y2>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Sat, 14 Oct 2023 17:35:55 +0900
+X-Gmail-Original-Message-ID: <CAK7LNATLv2KSWo0BnFGXi73GVdnvc1EX23TvTkKT1U-krgBnNQ@mail.gmail.com>
+Message-ID: <CAK7LNATLv2KSWo0BnFGXi73GVdnvc1EX23TvTkKT1U-krgBnNQ@mail.gmail.com>
+Subject: Re: # Toplevel Makefile doesn't process module build correctly on
+ recursive make calls
+To:     Marcos Paulo de Souza <mpdesouza@suse.de>
+Cc:     linux-kbuild@vger.kernel.org, mbenes@suse.cz
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The documentation for kbuild and makefiles is missing an explanation of
-a variable important for some architectures.
+On Tue, Oct 10, 2023 at 5:43=E2=80=AFAM Marcos Paulo de Souza <mpdesouza@su=
+se.de> wrote:
+>
+> Hi all,
+>
+> I found an issue while moving the livepatch kselftest modules to be built=
+ on the
+> fly, instead of building them on kernel building.
+>
+> If, for some reason, there is a recursive make invocation that starts fro=
+m the
+> top level Makefile and in the leaf Makefile it tries to build a module (u=
+sing M=3D
+> in the make invocation), it doesn't produce the module. This happens beca=
+use the
+> toplevel Makefile checks for M=3D only once. This is controlled by the
+> sub_make_done variable, which is exported after checking the command line
+> options are passed to the top level Makefile. Once this variable is set i=
+t's
+> the M=3D setting is never checked again on the recursive call.
+>
+> This can be observed when cleaning the bpf kselftest dir. When calling
+>
+>         $ make TARGETS=3D"bpf" SKIP_TARGETS=3D"" kselftest-clean
+>
+> What happens:
+>
+>         1. It checks for some command line settings (like M=3D) was passe=
+d (it wasn't),
+>         set some definitions and exports sub_make_done.
+>
+>         2. Jump into tools/testing/selftests/bpf, and calls the clean tar=
+get.
+>
+>         3. The clean target is overwritten to remove some files and then =
+jump to
+>         bpf_testmod dir and call clean there
+>
+>         4. On bpf_testmod/Makefile, the clean target will execute
+>                 $(Q)make -C $(KDIR) M=3D$(BPF_TESTMOD_DIR) clean
+>
+>         5. The KDIR is to toplevel dir. The top Makefile will check that =
+sub_make_done was
+>         already set, ignoring the M=3D setting.
+>
+>         6. As M=3D wasn't checked, KBUILD_EXTMOD isn't set, and the clean=
+ target applies
+>         to the kernel as a whole, making it clean all generated code/obje=
+cts and
+>         everything.
+>
+> One way to avoid it is to call "unexport sub_make_done" on
+> tools/testing/selftests/bpf/bpf_testmod/Makefile before processing the al=
+l
+> target, forcing the toplevel Makefile to process the M=3D, producing the =
+module
+> file correctly.
+>
+> If the M=3Ddir points to /lib/modules/.../build, then it fails with "m2c:=
+ No such
+> file", which I already reported here[1]. At the time this problem was tre=
+ated
+> like a problem with kselftest infrastructure.
+>
+> Important: The process works fine if the initial make invocation is targe=
+ted to a
+> different directory (using -C), since it doesn't goes through the topleve=
+l
+> Makefile, and sub_make_done variable is not set.
+>
+> I attached a minimal reproducer, that can be used to better understand th=
+e
+> problem. The "make testmod" and "make testmod-clean" have the same effect=
+ that
+> can be seem with the bpf kselftests. There is a unexport call commented o=
+n
+> test-mods/Makefile, and once that is called the process works as expected=
+.
+>
+> Is there a better way to fix this? Is this really a problem, or am I miss=
+ing
+> something?
 
-Signed-off-by: Ricardo B. Marliere <ricardo@marliere.net>
----
- Documentation/kbuild/kbuild.rst    | 6 ++++++
- Documentation/kbuild/makefiles.rst | 7 +++++++
- 2 files changed, 13 insertions(+)
 
-diff --git a/Documentation/kbuild/kbuild.rst b/Documentation/kbuild/kbuild.rst
-index bd906407e307..9c8d1d046ea5 100644
---- a/Documentation/kbuild/kbuild.rst
-+++ b/Documentation/kbuild/kbuild.rst
-@@ -243,6 +243,12 @@ The output directory is often set using "O=..." on the commandline.
- 
- The value can be overridden in which case the default value is ignored.
- 
-+INSTALL_DTBS_PATH
-+-----------------
-+INSTALL_DTBS_PATH specifies where to install device tree blobs for
-+relocations required by build roots.  This is not defined in the
-+makefile but the argument can be passed to make if needed.
-+
- KBUILD_ABS_SRCTREE
- --------------------------------------------------
- Kbuild uses a relative path to point to the tree when possible. For instance,
-diff --git a/Documentation/kbuild/makefiles.rst b/Documentation/kbuild/makefiles.rst
-index e67eb261c9b0..d88d4f0f4f89 100644
---- a/Documentation/kbuild/makefiles.rst
-+++ b/Documentation/kbuild/makefiles.rst
-@@ -1623,6 +1623,13 @@ INSTALL_MOD_STRIP
-   INSTALL_MOD_STRIP value will be used as the option(s) to the strip
-   command.
- 
-+INSTALL_DTBS_PATH
-+  This variable specifies a prefix for relocations required by build
-+  roots. It defines a place for installing the device tree blobs. Like
-+  INSTALL_MOD_PATH, it isn't defined in the Makefile, but can be passed
-+  by the user if desired. Otherwise it defaults to the kernel install
-+  path.
-+
- Makefile language
- =================
- 
--- 
-2.42.0
+Or, using KBUILD_EXTMOD will work too.
 
+
+
+
+
+--
+Best Regards
+Masahiro Yamada
