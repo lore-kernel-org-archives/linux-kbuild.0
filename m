@@ -2,50 +2,57 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44159CDB474
-	for <linux-kbuild@archiver.kernel.org>; Tue, 17 Oct 2023 20:47:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D8FDCDB483
+	for <linux-kbuild@archiver.kernel.org>; Tue, 17 Oct 2023 20:47:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234787AbjJQUrZ (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 17 Oct 2023 16:47:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52212 "EHLO
+        id S234819AbjJQUrg (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 17 Oct 2023 16:47:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234920AbjJQUrS (ORCPT
+        with ESMTP id S229883AbjJQUrf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 17 Oct 2023 16:47:18 -0400
+        Tue, 17 Oct 2023 16:47:35 -0400
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38E7792
-        for <linux-kbuild@vger.kernel.org>; Tue, 17 Oct 2023 13:47:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06E57C6
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Oct 2023 13:47:34 -0700 (PDT)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
         by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <ukl@pengutronix.de>)
-        id 1qsqy1-0001nz-Cc; Tue, 17 Oct 2023 22:47:05 +0200
+        id 1qsqy2-0001nf-7N; Tue, 17 Oct 2023 22:47:06 +0200
 Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
         by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <ukl@pengutronix.de>)
-        id 1qsqy0-002OlE-5j; Tue, 17 Oct 2023 22:47:04 +0200
+        id 1qsqxy-002Oky-V0; Tue, 17 Oct 2023 22:47:02 +0200
 Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
         (envelope-from <ukl@pengutronix.de>)
-        id 1qsqxz-000U0j-Si; Tue, 17 Oct 2023 22:47:03 +0200
+        id 1qsqxy-000U0Q-LC; Tue, 17 Oct 2023 22:47:02 +0200
 From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
         <u.kleine-koenig@pengutronix.de>
 To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+Cc:     Nicolas Ferre <nicolas.ferre@microchip.com>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+        Michael Grzeschik <m.grzeschik@pengutronix.de>,
+        linux-usb@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kernel@pengutronix.de, Li Yang <leoyang.li@nxp.com>,
+        linuxppc-dev@lists.ozlabs.org,
+        Aaro Koskinen <aaro.koskinen@iki.fi>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        Gaosheng Cui <cuigaosheng1@huawei.com>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
         Pavel Machek <pavel@ucw.cz>, Paolo Abeni <pabeni@redhat.com>,
         "Steven Rostedt (Google)" <rostedt@goodmis.org>,
-        Aaro Koskinen <aaro.koskinen@iki.fi>,
-        linux-usb@vger.kernel.org, kernel@pengutronix.de,
         Arnd Bergmann <arnd@arndb.de>, linux-kbuild@vger.kernel.org
-Subject: [PATCH 5/6] usb: gadget: m66592-udc: Convert to use module_platform_driver()
-Date:   Tue, 17 Oct 2023 22:44:48 +0200
-Message-ID: <20231017204442.1625925-13-u.kleine-koenig@pengutronix.de>
+Subject: [PATCH 0/6] usb: gadget: Convert to use module_platform_driver()
+Date:   Tue, 17 Oct 2023 22:44:43 +0200
+Message-ID: <20231017204442.1625925-8-u.kleine-koenig@pengutronix.de>
 X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231017204442.1625925-8-u.kleine-koenig@pengutronix.de>
-References: <20231017204442.1625925-8-u.kleine-koenig@pengutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1272; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=7iG+7YHkjXyb8dJ/SKwln8ra7wbimjCSB/o9LaESEkQ=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlLvJERJ72oT7SW8wEwuuhuHcE3wi8xb8q9D/ee QOxBJIyzvCJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZS7yRAAKCRCPgPtYfRL+ TtNsB/9+pKqFO/XZfoq5tUTRiQ1TFiQZ/sqwT5ehdbyhQ/MhejSVDwtIbUm7sb7qPYwc9b5yUMW KAdfFml7DB93X8KSdafB9mEwOz6mrD4dz/hcjrg4Ay7zv801n9fCk/ixDfnbDQSC67UUOfsLL7D bVKvznCDgysFI1PCS59syr+9ENlevrs3bV0D2e2efcQutaZeZr0IL4fnf9KTG4M2R3Jh36N4IT9 FjoTQuV7v35VW9V7JGgyyozCIayu3vuPFyIvsyp5ZnMqYldmpjZDliVtFop5J+eJ4nZb7YCyHmj yo7dl3n2N0Hp+zS+mJII9WsjY6HNB8yhfgn/o4t/Tj0ir+94
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1786; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=Z/Vn1N315f7fZHcxDG81QUWg0Chp5jm5OkmHHEOJRVE=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlLvI7mPi3t5lSt18AODt6voX5wl6HZGEZUuiLE DhImsw17AuJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZS7yOwAKCRCPgPtYfRL+ ThJEB/9+jgGO1Osx1rWXHL+Yx4I4Ef0vXz+VHQMVy9A2tCCjNre5tivU2+SxAlVa6kI4TZjRtCQ FyAOQnHfLBiNaj8mx5ozuYig8xHBmH//k/z4GzYYiU2HYzP6izmdCC848LHCRcHuqeMwOzLhcyy M28c1WL43/YowvzK/7lpDT9hgjF1n5Ar0s2fyB2dLLvzH8+VPo/933uyq0y+C3IKNKe+tvU8Oth OiDqUV82qBcsLJ+aFXsrweNqjNxZDBZeyL1zdUDYu1dB4YpYjf3ftUbNHhaedzernUoazFkw9m+ +DpbUhtUY7ntNY0dfx4SKZ3KdK3yIE63VeCBUdEqLJHgUjCa
 X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
@@ -56,36 +63,47 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-module_platform_driver_probe() has the advantage that the .probe() and
-.remove() calls can live in .init.text and .exit.text respectively and
-so some memory is saved. The downside is that dynamic bind and unbind
-are impossible. As the driver doesn't benefit from the advantages (both
-.probe and .remove are defined in plain .text), stop suffering from the
-downsides and use module_platform_driver() instead of
-module_platform_driver_probe().
+Hello,
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
----
- drivers/usb/gadget/udc/m66592-udc.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+module_platform_driver_probe() is an alternative to
+module_platform_driver(). Comparing the two the former has the advantage
+that the probe and remove callbacks can live in .init.text and
+.exit.text respectively. The latter has the advantage that it's a bit
+easier to use correctly and you can bind/unbind via sysfs and/or
+hotplug.
 
-diff --git a/drivers/usb/gadget/udc/m66592-udc.c b/drivers/usb/gadget/udc/m66592-udc.c
-index e05f45a4b56b..bfaa5291e6c8 100644
---- a/drivers/usb/gadget/udc/m66592-udc.c
-+++ b/drivers/usb/gadget/udc/m66592-udc.c
-@@ -1687,10 +1687,11 @@ static int m66592_probe(struct platform_device *pdev)
- 
- /*-------------------------------------------------------------------------*/
- static struct platform_driver m66592_driver = {
-+	.probe =	m66592_probe,
- 	.remove_new =	m66592_remove,
- 	.driver		= {
- 		.name =	udc_name,
- 	},
- };
- 
--module_platform_driver_probe(m66592_driver, m66592_probe);
-+module_platform_driver(m66592_driver);
+There are considerations about deprecating
+module_platform_driver_probe()[1] as very few drivers use it, still less
+make actually use of the advantages and saving a few bytes isn't as
+important any more as it was (say) 10 years ago.
+
+Given that the drivers below drivers/usb/gadget making use of
+module_platform_driver_probe() doesn't benefit from the advantages
+at all (probe and remove are all defined in .text), convert these
+drivers to module_platform_driver().
+
+Best regards
+Uwe
+
+[1] https://lore.kernel.org/linux-kbuild/20231017132045.afswdgcv4axjf6jj@pengutronix.de
+
+Uwe Kleine-König (6):
+  usb: gadget: at91-udc: Convert to use module_platform_driver()
+  usb: gadget: fsl-udc: Convert to use module_platform_driver()
+  usb: gadget: fusb300-udc: Convert to use module_platform_driver()
+  usb: gadget: lpc32xx-udc: Convert to use module_platform_driver()
+  usb: gadget: m66592-udc: Convert to use module_platform_driver()
+  usb: gadget: r8a66597-udc: Convert to use module_platform_driver()
+
+ drivers/usb/gadget/udc/at91_udc.c     | 3 ++-
+ drivers/usb/gadget/udc/fsl_udc_core.c | 3 ++-
+ drivers/usb/gadget/udc/fusb300_udc.c  | 7 ++++---
+ drivers/usb/gadget/udc/lpc32xx_udc.c  | 3 ++-
+ drivers/usb/gadget/udc/m66592-udc.c   | 3 ++-
+ drivers/usb/gadget/udc/r8a66597-udc.c | 3 ++-
+ 6 files changed, 14 insertions(+), 8 deletions(-)
+
+base-commit: 4d5ab2376ec576af173e5eac3887ed0b51bd8566
 -- 
 2.42.0
 
