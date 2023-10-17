@@ -2,50 +2,81 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24CB8CDB474
-	for <linux-kbuild@archiver.kernel.org>; Tue, 17 Oct 2023 12:37:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB880C41513
+	for <linux-kbuild@archiver.kernel.org>; Tue, 17 Oct 2023 12:41:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235018AbjJQMhR (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 17 Oct 2023 08:37:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37432 "EHLO
+        id S235096AbjJQMNw (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 17 Oct 2023 08:13:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232228AbjJQMhO (ORCPT
+        with ESMTP id S1343579AbjJQMNi (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 17 Oct 2023 08:37:14 -0400
-X-Greylist: delayed 1522 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 17 Oct 2023 05:37:10 PDT
-Received: from mail.avm.de (mail.avm.de [212.42.244.94])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1201CB0;
-        Tue, 17 Oct 2023 05:37:09 -0700 (PDT)
-Received: from mail-auth.avm.de (unknown [IPv6:2001:bf0:244:244::71])
+        Tue, 17 Oct 2023 08:13:38 -0400
+X-Greylist: delayed 188 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 17 Oct 2023 05:12:45 PDT
+Received: from mail.avm.de (mail.avm.de [IPv6:2001:bf0:244:244::119])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCDF8D0B6;
+        Tue, 17 Oct 2023 05:12:44 -0700 (PDT)
+Received: from mail-auth.avm.de (dovecot-mx-01.avm.de [212.42.244.71])
         by mail.avm.de (Postfix) with ESMTPS;
-        Tue, 17 Oct 2023 14:37:06 +0200 (CEST)
+        Tue, 17 Oct 2023 14:09:31 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=avm.de; s=mail;
+        t=1697544572; bh=KD3DEtP5d6DCBHOitoR8vzNgmhwKZ20ThM66mmXaQDA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=H3xiTCRTfXo07q+mWSyekXKERZRHw8/lwaQcPG8H37jzuclELv0P1eZcewRqi9xfm
+         4FjwkD5E/CAI7Jsf1jt27JdGi4xolHrKm534XM7mLulgUbh3foeFQbVeHZrkGEgsx3
+         6NcIgfurfJnD3rsiwm/mEe1Iw8nhHG8j82oJD9DM=
 Received: from buildd.core.avm.de (buildd-sv-01.avm.de [172.16.0.225])
-        by mail-auth.avm.de (Postfix) with ESMTPA id 74F3F801EF;
-        Tue, 17 Oct 2023 14:37:06 +0200 (CEST)
+        by mail-auth.avm.de (Postfix) with ESMTPA id CFCFB81EAD;
+        Tue, 17 Oct 2023 14:09:31 +0200 (CEST)
 Received: by buildd.core.avm.de (Postfix, from userid 1000)
-        id 6830B180DB8; Tue, 17 Oct 2023 14:37:06 +0200 (CEST)
-Date:   Tue, 17 Oct 2023 14:37:06 +0200
-From:   Nicolas Schier <nicolas@fjasle.eu>
+        id B9EFA1819D1; Tue, 17 Oct 2023 14:09:31 +0200 (CEST)
+Date:   Tue, 17 Oct 2023 14:09:31 +0200
+From:   Nicolas Schier <n.schier@avm.de>
 To:     Masahiro Yamada <masahiroy@kernel.org>
 Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Borislav Petkov <bp@alien8.de>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
         Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Subject: Re: [PATCH 3/4] kbuild: skip module BTF with one-time check for
- vmlinux
-Message-ID: <ZS5/8hTK/cfaIz4m@buildd.core.avm.de>
+        Nicholas Piggin <npiggin@gmail.com>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nicolas Schier <nicolas@fjasle.eu>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-mips@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linuxppc-dev@lists.ozlabs.org, x86@kernel.org
+Subject: Re: [PATCH 1/4] kbuild: remove ARCH_POSTLINK from module builds
+Message-ID: <ZS55e3ZyzoNDchD+@buildd.core.avm.de>
 Mail-Followup-To: Masahiro Yamada <masahiroy@kernel.org>,
         linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Albert Ou <aou@eecs.berkeley.edu>, Borislav Petkov <bp@alien8.de>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
         Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>
+        Nicholas Piggin <npiggin@gmail.com>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Thomas Gleixner <tglx@linutronix.de>, linux-mips@vger.kernel.org,
+        linux-riscv@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+        x86@kernel.org
 References: <20231017103742.130927-1-masahiroy@kernel.org>
- <20231017103742.130927-3-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20231017103742.130927-3-masahiroy@kernel.org>
-X-purgate-ID: 149429::1697546226-6CE0F42D-AD18EF1E/0/0
+In-Reply-To: <20231017103742.130927-1-masahiroy@kernel.org>
+Organization: AVM GmbH
+X-purgate-ID: 149429::1697544571-C3E340EE-41584499/0/0
 X-purgate-type: clean
-X-purgate-size: 406
+X-purgate-size: 585
 X-purgate-Ad: Categorized by eleven eXpurgate (R) http://www.eleven.de
 X-purgate: This mail is considered clean (visit http://www.eleven.de for further information)
 X-purgate: clean
@@ -53,14 +84,20 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, Oct 17, 2023 at 07:37:41PM +0900, Masahiro Yamada wrote:
-> When CONFIG_DEBUG_INFO_BTF_MODULES is enabled, vmlinux presence is
-> checked in every module build, resulting in repetitive warning
-> messages if vmlinux is missing.
+On Tue, Oct 17, 2023 at 07:37:39PM +0900, Masahiro Yamada wrote:
+> The '%.ko' rule in arch/*/Makefile.postlink does nothing but call the
+> 'true' command.
 > 
-> Check vmlinux and print a warning just once.
+> Remove the meaningless code.
 > 
 > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 > ---
+> 
+>  arch/mips/Makefile.postlink    | 3 ---
+>  arch/powerpc/Makefile.postlink | 3 ---
+>  arch/riscv/Makefile.postlink   | 3 ---
+>  arch/x86/Makefile.postlink     | 3 ---
+>  scripts/Makefile.modfinal      | 5 +----
+>  5 files changed, 1 insertion(+), 16 deletions(-)
 
 Reviewed-by: Nicolas Schier <n.schier@avm.de>
