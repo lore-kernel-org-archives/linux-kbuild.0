@@ -2,62 +2,42 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 734B3C41513
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EACC3CDB483
 	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Oct 2023 15:20:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235253AbjJRPUP (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 18 Oct 2023 11:20:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59790 "EHLO
+        id S1344713AbjJRPUQ (ORCPT
+        <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 18 Oct 2023 11:20:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232011AbjJRPUM (ORCPT
+        with ESMTP id S231960AbjJRPUO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Oct 2023 11:20:12 -0400
+        Wed, 18 Oct 2023 11:20:14 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FD18FA;
-        Wed, 18 Oct 2023 08:20:09 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 805DDC433CC;
-        Wed, 18 Oct 2023 15:20:04 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAFF8114;
+        Wed, 18 Oct 2023 08:20:12 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED347C433CA;
+        Wed, 18 Oct 2023 15:20:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697642408;
-        bh=lrwp96Hw7hR0NmIZyK9E+Yck2vromf2V4V2XM+YwBrM=;
+        s=k20201202; t=1697642412;
+        bh=64NbOJwL+HDqWyuM6JoXFyBcAlHXP3zz+QUuLv6Cm7Q=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=bbbQz7uOjLBbcJOU77RCqez7qqCnwfeNfFfIy1x/tmueoX47XKwqdFDKFGTvYpH1t
-         cn0NbHXwsx2nyphvX8w8Q3ImvYRiYty2VZVXAJ1d+XVLtaTlCYYpv4oULvYtcm5Rny
-         /wU0RJWp/c2MLEjUj1y1/Ooz9i8vFL+l4kkNQFpOv0nGdbXt3eVxUAAdpBt/6mBml8
-         6jjxz3ST6I+tLONlMYb55FbSGWFD8JB+8lpMK2Q4WHdO/HQDj0x3qkKKYqh8Nay62X
-         godcax2rXU8iUZewPbVup/dPB3svnE1h6SKIhYXu/80y5yhoXCsEzb6DGO2feHwxVc
-         B0WAv4z/9WT6A==
+        b=fTIyxfwrpTY5bgbva8rPbkcGlgqoZai0aO3PkJiKLsjwlaQN26q9Yhf7zRd2wjkRW
+         WZduFe/lFbU/q+9u4epT/mVv1LqRuauO0bz5OWF23Kd8JMxngIYbgEwwc+f4kmivhh
+         VJTyepbpLsgfF5FtZVGl8dMHPuvoQ8QD6No7cMYjk689j0+PdrMxAx2gcLvk6LY2TW
+         Ety129FzUIr6FfwD15PVqI3wl9DSL9mvUBfMHnmNmKqGI6SnKNxfdm/eFbapyE1BFX
+         gpiFW89j2Z6bS6GGInAnAKbVxMu33QTPYYdJA91bLmvH3+wqGmgTWgilv6JfdU0Nwc
+         KdvBwAIq+VCYg==
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Alan Maguire <alan.maguire@oracle.com>,
-        Nicolas Schier <n.schier@avm.de>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Alex Gaynor <alex.gaynor@gmail.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Alice Ryhl <aliceryhl@google.com>,
-        Andreas Hindborg <a.hindborg@samsung.com>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Benno Lossin <benno.lossin@proton.me>,
-        =?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Gary Guo <gary@garyguo.net>, Hao Luo <haoluo@google.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        KP Singh <kpsingh@kernel.org>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        Nicolas Schier <nicolas@fjasle.eu>, Song Liu <song@kernel.org>,
-        Stanislav Fomichev <sdf@google.com>,
-        Wedson Almeida Filho <wedsonaf@gmail.com>,
-        Yonghong Song <yonghong.song@linux.dev>, bpf@vger.kernel.org,
-        rust-for-linux@vger.kernel.org
-Subject: [bpf-next PATCH v2 2/4] kbuild: avoid too many execution of scripts/pahole-flags.sh
-Date:   Thu, 19 Oct 2023 00:19:48 +0900
-Message-Id: <20231018151950.205265-2-masahiroy@kernel.org>
+        Nicolas Schier <nicolas@fjasle.eu>, bpf@vger.kernel.org
+Subject: [bpf-next PATCH v2 4/4] kbuild: refactor module BTF rule
+Date:   Thu, 19 Oct 2023 00:19:50 +0900
+Message-Id: <20231018151950.205265-4-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20231018151950.205265-1-masahiroy@kernel.org>
 References: <20231018151950.205265-1-masahiroy@kernel.org>
@@ -67,164 +47,65 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-scripts/pahole-flags.sh is executed so many times.
+newer_prereqs_except and if_changed_except are ugly hacks of the
+newer-prereqs and if_changed in scripts/Kbuild.include.
 
-You can check how many times it is invoked during the build, as follows:
-
-  $ cat <<EOF >> scripts/pahole-flags.sh
-  > echo "scripts/pahole-flags.sh was executed" >&2
-  > EOF
-
-  $ make -s
-  scripts/pahole-flags.sh was executed
-  scripts/pahole-flags.sh was executed
-  scripts/pahole-flags.sh was executed
-  scripts/pahole-flags.sh was executed
-  scripts/pahole-flags.sh was executed
-    [ lots of repeated lines suppressed... ]
-
-This scripts is executed more than 20 times during the kernel build
-because PAHOLE_FLAGS is a recursively expanded variable and exported
-to sub-processes.
-
-With the GNU Make >= 4.4, it is executed more than 60 times because
-exported variables are also passed to other $(shell ) invocations.
-Without careful coding, it is known to cause an exponential fork
-explosion. [1]
-
-The use of $(shell ) in an exported recursive variable is likely wrong
-because $(shell ) is always evaluated due to the 'export' keyword, and
-the evaluation can occur multiple times by the nature of recursive
-variables.
-
-Convert the shell script to a Makefile, which is included only when
-CONFIG_DEBUG_INFO_BTF=y.
-
-[1]: https://savannah.gnu.org/bugs/index.php?64746
+Remove.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Reviewed-by: Alan Maguire <alan.maguire@oracle.com>
-Tested-by: Alan Maguire <alan.maguire@oracle.com>
-Reviewed-by: Nicolas Schier <n.schier@avm.de>
-Tested-by: Miguel Ojeda <ojeda@kernel.org>
-Acked-by: Miguel Ojeda <ojeda@kernel.org>
 ---
 
 Changes in v2:
- - Fix a typo in commit description
- - Update MAINTAINERS
+  - Fix if_changed_except to if_changed
 
- MAINTAINERS             |  2 +-
- Makefile                |  4 +---
- scripts/Makefile.btf    | 19 +++++++++++++++++++
- scripts/pahole-flags.sh | 30 ------------------------------
- 4 files changed, 21 insertions(+), 34 deletions(-)
- create mode 100644 scripts/Makefile.btf
- delete mode 100755 scripts/pahole-flags.sh
+ scripts/Makefile.modfinal | 25 ++++++-------------------
+ 1 file changed, 6 insertions(+), 19 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 35977b269d5e..a08d558b1aaa 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3742,7 +3742,7 @@ F:	net/sched/act_bpf.c
- F:	net/sched/cls_bpf.c
- F:	samples/bpf/
- F:	scripts/bpf_doc.py
--F:	scripts/pahole-flags.sh
-+F:	scripts/Makefile.btf
- F:	scripts/pahole-version.sh
- F:	tools/bpf/
- F:	tools/lib/bpf/
-diff --git a/Makefile b/Makefile
-index fed9a6cc3665..eaddec67e5e1 100644
---- a/Makefile
-+++ b/Makefile
-@@ -513,8 +513,6 @@ LZ4		= lz4c
- XZ		= xz
- ZSTD		= zstd
+diff --git a/scripts/Makefile.modfinal b/scripts/Makefile.modfinal
+index 9fd7a26e4fe9..fc07854bb7b9 100644
+--- a/scripts/Makefile.modfinal
++++ b/scripts/Makefile.modfinal
+@@ -19,6 +19,9 @@ vmlinux :=
+ ifdef CONFIG_DEBUG_INFO_BTF_MODULES
+ ifneq ($(wildcard vmlinux),)
+ vmlinux := vmlinux
++cmd_btf = ; \
++	LLVM_OBJCOPY="$(OBJCOPY)" $(PAHOLE) -J $(PAHOLE_FLAGS) --btf_base vmlinux $@; \
++	$(RESOLVE_BTFIDS) -b vmlinux $@
+ else
+ $(warning Skipping BTF generation due to unavailability of vmlinux)
+ endif
+@@ -41,27 +44,11 @@ quiet_cmd_ld_ko_o = LD [M]  $@
+       cmd_ld_ko_o +=							\
+ 	$(LD) -r $(KBUILD_LDFLAGS)					\
+ 		$(KBUILD_LDFLAGS_MODULE) $(LDFLAGS_MODULE)		\
+-		-T scripts/module.lds -o $@ $(filter %.o, $^)
++		-T scripts/module.lds -o $@ $(filter %.o, $^)		\
++	$(cmd_btf)
  
--PAHOLE_FLAGS	= $(shell PAHOLE=$(PAHOLE) $(srctree)/scripts/pahole-flags.sh)
+-quiet_cmd_btf_ko = BTF [M] $@
+-      cmd_btf_ko = 							\
+-		LLVM_OBJCOPY="$(OBJCOPY)" $(PAHOLE) -J $(PAHOLE_FLAGS) --btf_base vmlinux $@; \
+-		$(RESOLVE_BTFIDS) -b vmlinux $@
 -
- CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
- 		  -Wbitwise -Wno-return-void -Wno-unknown-attribute $(CF)
- NOSTDINC_FLAGS :=
-@@ -605,7 +603,6 @@ export KBUILD_RUSTFLAGS RUSTFLAGS_KERNEL RUSTFLAGS_MODULE
- export KBUILD_AFLAGS AFLAGS_KERNEL AFLAGS_MODULE
- export KBUILD_AFLAGS_MODULE KBUILD_CFLAGS_MODULE KBUILD_RUSTFLAGS_MODULE KBUILD_LDFLAGS_MODULE
- export KBUILD_AFLAGS_KERNEL KBUILD_CFLAGS_KERNEL KBUILD_RUSTFLAGS_KERNEL
--export PAHOLE_FLAGS
+-# Same as newer-prereqs, but allows to exclude specified extra dependencies
+-newer_prereqs_except = $(filter-out $(PHONY) $(1),$?)
+-
+-# Same as if_changed, but allows to exclude specified extra dependencies
+-if_changed_except = $(if $(call newer_prereqs_except,$(2))$(cmd-check),      \
+-	$(cmd);                                                              \
+-	printf '%s\n' 'savedcmd_$@ := $(make-cmd)' > $(dot-target).cmd, @:)
+-
+-# Re-generate module BTFs if either module's .ko or vmlinux changed
+ %.ko: %.o %.mod.o scripts/module.lds $(vmlinux) FORCE
+-	+$(call if_changed_except,ld_ko_o,vmlinux)
+-ifdef vmlinux
+-	+$(if $(newer-prereqs),$(call cmd,btf_ko))
+-endif
++	+$(call if_changed,ld_ko_o)
  
- # Files to ignore in find ... statements
+ targets += $(modules:%.o=%.ko) $(modules:%.o=%.mod.o)
  
-@@ -1002,6 +999,7 @@ KBUILD_CPPFLAGS += $(call cc-option,-fmacro-prefix-map=$(srctree)/=)
- # include additional Makefiles when needed
- include-y			:= scripts/Makefile.extrawarn
- include-$(CONFIG_DEBUG_INFO)	+= scripts/Makefile.debug
-+include-$(CONFIG_DEBUG_INFO_BTF)+= scripts/Makefile.btf
- include-$(CONFIG_KASAN)		+= scripts/Makefile.kasan
- include-$(CONFIG_KCSAN)		+= scripts/Makefile.kcsan
- include-$(CONFIG_KMSAN)		+= scripts/Makefile.kmsan
-diff --git a/scripts/Makefile.btf b/scripts/Makefile.btf
-new file mode 100644
-index 000000000000..82377e470aed
---- /dev/null
-+++ b/scripts/Makefile.btf
-@@ -0,0 +1,19 @@
-+# SPDX-License-Identifier: GPL-2.0
-+
-+pahole-ver := $(CONFIG_PAHOLE_VERSION)
-+pahole-flags-y :=
-+
-+# pahole 1.18 through 1.21 can't handle zero-sized per-CPU vars
-+ifeq ($(call test-le, $(pahole-ver), 121),y)
-+pahole-flags-$(call test-ge, $(pahole-ver), 118)	+= --skip_encoding_btf_vars
-+endif
-+
-+pahole-flags-$(call test-ge, $(pahole-ver), 121)	+= --btf_gen_floats
-+
-+pahole-flags-$(call test-ge, $(pahole-ver), 122)	+= -j
-+
-+pahole-flags-$(CONFIG_PAHOLE_HAS_LANG_EXCLUDE)		+= --lang_exclude=rust
-+
-+pahole-flags-$(call test-ge, $(pahole-ver), 125)	+= --skip_encoding_btf_inconsistent_proto --btf_gen_optimized
-+
-+export PAHOLE_FLAGS := $(pahole-flags-y)
-diff --git a/scripts/pahole-flags.sh b/scripts/pahole-flags.sh
-deleted file mode 100755
-index 728d55190d97..000000000000
---- a/scripts/pahole-flags.sh
-+++ /dev/null
-@@ -1,30 +0,0 @@
--#!/bin/sh
--# SPDX-License-Identifier: GPL-2.0
--
--extra_paholeopt=
--
--if ! [ -x "$(command -v ${PAHOLE})" ]; then
--	exit 0
--fi
--
--pahole_ver=$($(dirname $0)/pahole-version.sh ${PAHOLE})
--
--if [ "${pahole_ver}" -ge "118" ] && [ "${pahole_ver}" -le "121" ]; then
--	# pahole 1.18 through 1.21 can't handle zero-sized per-CPU vars
--	extra_paholeopt="${extra_paholeopt} --skip_encoding_btf_vars"
--fi
--if [ "${pahole_ver}" -ge "121" ]; then
--	extra_paholeopt="${extra_paholeopt} --btf_gen_floats"
--fi
--if [ "${pahole_ver}" -ge "122" ]; then
--	extra_paholeopt="${extra_paholeopt} -j"
--fi
--if [ "${pahole_ver}" -ge "124" ]; then
--	# see PAHOLE_HAS_LANG_EXCLUDE
--	extra_paholeopt="${extra_paholeopt} --lang_exclude=rust"
--fi
--if [ "${pahole_ver}" -ge "125" ]; then
--	extra_paholeopt="${extra_paholeopt} --skip_encoding_btf_inconsistent_proto --btf_gen_optimized"
--fi
--
--echo ${extra_paholeopt}
 -- 
 2.40.1
 
