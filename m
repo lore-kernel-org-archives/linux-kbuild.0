@@ -2,66 +2,56 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D792CDB47E
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Oct 2023 15:20:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3792ECDB47E
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Oct 2023 15:20:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231344AbjJRPUI (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 18 Oct 2023 11:20:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59760 "EHLO
+        id S232072AbjJRPUO (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 18 Oct 2023 11:20:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230391AbjJRPUH (ORCPT
+        with ESMTP id S232311AbjJRPUN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Oct 2023 11:20:07 -0400
+        Wed, 18 Oct 2023 11:20:13 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76481EA;
-        Wed, 18 Oct 2023 08:20:04 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9464AC433C8;
-        Wed, 18 Oct 2023 15:20:00 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F035E10F;
+        Wed, 18 Oct 2023 08:20:10 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C79BC433C9;
+        Wed, 18 Oct 2023 15:20:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697642404;
-        bh=d9q2EGQopnbrrZB9hrsBcWEpKabaAuR6MB/YUqLsU4w=;
-        h=From:To:Cc:Subject:Date:From;
-        b=qWpvifiKtTK5o66piHOruftpghs50wXvOldPydTwAZWMgN9cLJfVLlvGl9Nucou7Q
-         ecBxT7h/Yv5+/t4yVhUiWVSYN2rBDIXXboM51HEDPFpgYttQUCpZdh7en0zSaTHw8E
-         6DyNmXSbBBt1qk2hmpZbB1eXVL2JdOlz+mbtMSfqgaQEaV4axi18xctWfmwJcwc+zu
-         xJI0epn7jgszwmZbLlESdaczmIe7PxrQUmRdpP3sY68RaoSAWPA7WB9shIl++7+0iY
-         ryu+JsPEw+Qu6jMHzajqLcdDgOltoj4CC1agv/doRuOoxHFL9MjV/+ieuT1TzsS8uO
-         IMS1ILXONw1VA==
+        s=k20201202; t=1697642410;
+        bh=Zr2L12JqejcIlTbLLIerbGhqiW1yZZSSNZv8I1yqdSc=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=FL059UW4d7zF4SqEOQDHlI9qWMvJTNfpJxRNMVNqZIf3KIUSQ34igV3GhrJx5clcG
+         EP49FyFunMCWDuWbJ2Rgtu8IUQLVkRt8/ZT+zRDwiQhZsHOwvyY5v0Lp489rPOkKmY
+         GF8TBHcovVrhZr42YPDCjfhdyW5LJ2IRqzQUCD1BZxigG2fCZD8NDLVj1ElMvcTUVH
+         UB/pd4w/YRgbME2VUuZNZzzm+zhGK+1gmmY0vh8SuI7roe4HZSuvY/yiJHldr8pFEo
+         x3u0Ezxb0numpcnNjRr4dIHd1m0q7Ofxvc7PgHSUlKpJgCT4fupNNTGBArHzlcrWja
+         XcJUo4C3bgUgw==
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
         Nicolas Schier <n.schier@avm.de>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Borislav Petkov <bp@alien8.de>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
         Nathan Chancellor <nathan@kernel.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        Nicolas Schier <nicolas@fjasle.eu>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Thomas Gleixner <tglx@linutronix.de>, bpf@vger.kernel.org,
-        linux-mips@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linuxppc-dev@lists.ozlabs.org, x86@kernel.org
-Subject: [bpf-next PATCH v2 1/4] kbuild: remove ARCH_POSTLINK from module builds
-Date:   Thu, 19 Oct 2023 00:19:47 +0900
-Message-Id: <20231018151950.205265-1-masahiroy@kernel.org>
+        Nicolas Schier <nicolas@fjasle.eu>, bpf@vger.kernel.org
+Subject: [bpf-next PATCH v2 3/4] kbuild: skip module BTF with one-time check for vmlinux
+Date:   Thu, 19 Oct 2023 00:19:49 +0900
+Message-Id: <20231018151950.205265-3-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20231018151950.205265-1-masahiroy@kernel.org>
+References: <20231018151950.205265-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The '%.ko' rule in arch/*/Makefile.postlink does nothing but call the
-'true' command.
+When CONFIG_DEBUG_INFO_BTF_MODULES is enabled, vmlinux presence is
+checked in every module build, resulting in repetitive warning
+messages if vmlinux is missing.
 
-Remove the meaningless code.
+Check vmlinux and print a warning just once.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 Reviewed-by: Nicolas Schier <n.schier@avm.de>
@@ -69,89 +59,55 @@ Reviewed-by: Nicolas Schier <n.schier@avm.de>
 
 (no changes since v1)
 
- arch/mips/Makefile.postlink    | 3 ---
- arch/powerpc/Makefile.postlink | 3 ---
- arch/riscv/Makefile.postlink   | 3 ---
- arch/x86/Makefile.postlink     | 3 ---
- scripts/Makefile.modfinal      | 5 +----
- 5 files changed, 1 insertion(+), 16 deletions(-)
+ scripts/Makefile.modfinal | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
-diff --git a/arch/mips/Makefile.postlink b/arch/mips/Makefile.postlink
-index 34e3bd71f3b0..6cfdc149d3bc 100644
---- a/arch/mips/Makefile.postlink
-+++ b/arch/mips/Makefile.postlink
-@@ -31,9 +31,6 @@ ifeq ($(CONFIG_RELOCATABLE),y)
- 	$(call if_changed,relocs)
- endif
- 
--%.ko: FORCE
--	@true
--
- clean:
- 	@true
- 
-diff --git a/arch/powerpc/Makefile.postlink b/arch/powerpc/Makefile.postlink
-index 1f860b3c9bec..ae5a4256b03d 100644
---- a/arch/powerpc/Makefile.postlink
-+++ b/arch/powerpc/Makefile.postlink
-@@ -35,9 +35,6 @@ ifdef CONFIG_RELOCATABLE
- 	$(call if_changed,relocs_check)
- endif
- 
--%.ko: FORCE
--	@true
--
- clean:
- 	rm -f .tmp_symbols.txt
- 
-diff --git a/arch/riscv/Makefile.postlink b/arch/riscv/Makefile.postlink
-index a46fc578b30b..829b9abc91f6 100644
---- a/arch/riscv/Makefile.postlink
-+++ b/arch/riscv/Makefile.postlink
-@@ -36,9 +36,6 @@ ifdef CONFIG_RELOCATABLE
- 	$(call if_changed,relocs_strip)
- endif
- 
--%.ko: FORCE
--	@true
--
- clean:
- 	@true
- 
-diff --git a/arch/x86/Makefile.postlink b/arch/x86/Makefile.postlink
-index 936093d29160..fef2e977cc7d 100644
---- a/arch/x86/Makefile.postlink
-+++ b/arch/x86/Makefile.postlink
-@@ -34,9 +34,6 @@ ifeq ($(CONFIG_X86_NEED_RELOCS),y)
- 	$(call cmd,strip_relocs)
- endif
- 
--%.ko: FORCE
--	@true
--
- clean:
- 	@rm -f $(OUT_RELOCS)/vmlinux.relocs
- 
 diff --git a/scripts/Makefile.modfinal b/scripts/Makefile.modfinal
-index b3a6aa8fbe8c..8568d256d6fb 100644
+index 8568d256d6fb..9fd7a26e4fe9 100644
 --- a/scripts/Makefile.modfinal
 +++ b/scripts/Makefile.modfinal
-@@ -28,14 +28,11 @@ quiet_cmd_cc_o_c = CC [M]  $@
- %.mod.o: %.mod.c FORCE
- 	$(call if_changed_dep,cc_o_c)
+@@ -14,6 +14,15 @@ include $(srctree)/scripts/Makefile.lib
  
--ARCH_POSTLINK := $(wildcard $(srctree)/arch/$(SRCARCH)/Makefile.postlink)
--
- quiet_cmd_ld_ko_o = LD [M]  $@
-       cmd_ld_ko_o +=							\
- 	$(LD) -r $(KBUILD_LDFLAGS)					\
- 		$(KBUILD_LDFLAGS_MODULE) $(LDFLAGS_MODULE)		\
--		-T scripts/module.lds -o $@ $(filter %.o, $^);		\
--	$(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
-+		-T scripts/module.lds -o $@ $(filter %.o, $^)
+ # find all modules listed in modules.order
+ modules := $(call read-file, $(MODORDER))
++vmlinux :=
++
++ifdef CONFIG_DEBUG_INFO_BTF_MODULES
++ifneq ($(wildcard vmlinux),)
++vmlinux := vmlinux
++else
++$(warning Skipping BTF generation due to unavailability of vmlinux)
++endif
++endif
+ 
+ __modfinal: $(modules:%.o=%.ko)
+ 	@:
+@@ -36,12 +45,8 @@ quiet_cmd_ld_ko_o = LD [M]  $@
  
  quiet_cmd_btf_ko = BTF [M] $@
        cmd_btf_ko = 							\
+-	if [ ! -f vmlinux ]; then					\
+-		printf "Skipping BTF generation for %s due to unavailability of vmlinux\n" $@ 1>&2; \
+-	else								\
+ 		LLVM_OBJCOPY="$(OBJCOPY)" $(PAHOLE) -J $(PAHOLE_FLAGS) --btf_base vmlinux $@; \
+-		$(RESOLVE_BTFIDS) -b vmlinux $@; 			\
+-	fi;
++		$(RESOLVE_BTFIDS) -b vmlinux $@
+ 
+ # Same as newer-prereqs, but allows to exclude specified extra dependencies
+ newer_prereqs_except = $(filter-out $(PHONY) $(1),$?)
+@@ -52,9 +57,9 @@ if_changed_except = $(if $(call newer_prereqs_except,$(2))$(cmd-check),      \
+ 	printf '%s\n' 'savedcmd_$@ := $(make-cmd)' > $(dot-target).cmd, @:)
+ 
+ # Re-generate module BTFs if either module's .ko or vmlinux changed
+-%.ko: %.o %.mod.o scripts/module.lds $(and $(CONFIG_DEBUG_INFO_BTF_MODULES),$(KBUILD_BUILTIN),vmlinux) FORCE
++%.ko: %.o %.mod.o scripts/module.lds $(vmlinux) FORCE
+ 	+$(call if_changed_except,ld_ko_o,vmlinux)
+-ifdef CONFIG_DEBUG_INFO_BTF_MODULES
++ifdef vmlinux
+ 	+$(if $(newer-prereqs),$(call cmd,btf_ko))
+ endif
+ 
 -- 
 2.40.1
 
