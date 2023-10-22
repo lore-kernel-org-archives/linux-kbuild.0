@@ -2,31 +2,31 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 846BAC25B43
-	for <linux-kbuild@archiver.kernel.org>; Sun, 22 Oct 2023 17:06:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A42DC001DF
+	for <linux-kbuild@archiver.kernel.org>; Sun, 22 Oct 2023 17:06:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232440AbjJVRGX (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 22 Oct 2023 13:06:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33422 "EHLO
+        id S232511AbjJVRG2 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 22 Oct 2023 13:06:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232225AbjJVRGW (ORCPT
+        with ESMTP id S232473AbjJVRGZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 22 Oct 2023 13:06:22 -0400
+        Sun, 22 Oct 2023 13:06:25 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E465EE;
-        Sun, 22 Oct 2023 10:06:21 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B20DEC433C7;
-        Sun, 22 Oct 2023 17:06:19 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 185F9124;
+        Sun, 22 Oct 2023 10:06:24 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D55CC433C7;
+        Sun, 22 Oct 2023 17:06:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697994380;
-        bh=aTiLuP4Ust/jrgVbBMYTU3kLN1U+pxnaKRT4WTs91Ww=;
+        s=k20201202; t=1697994383;
+        bh=mnjPdsDS3enDm6WXK4/X4WMDdmcRPpl/JrVaMfXuHA4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=jg1DbiRh1IPvX12jNdpnak/QyZ5ZFyN8mhTCC/tRkLBZJ7Zl6krum94admfzOjbF2
-         03KncXSoHzbgA10LiuocV6c9uwjMhSDExdWQsjEfoLbjxpoyY124uLqdHvGA9dPRYi
-         asL6tVM7itdGLLRG8DYxhibwXqk6VZ3bPaZyEnClc8ZGCoQn6PEm7I+6SMJxiZGL+f
-         GKR0NpucI7AguDOxFi5AJeTc3MvY8FNKZvBbP3kZtw9nUO5K4+yMZejfCKsGMf4hsT
-         LfdWazAAiQJ2YSdQh3a283unvXZ/W3xKEXfddBEFnm7E7XAsRfRXbTbXRdLxf85Olo
-         vY7j18pTmyHyQ==
+        b=E+votQPOQvger1N5hYN7MOnDeOx47VZpkOSweEfnd691hHxUNuOevb15IZhg0jsIO
+         s4XfHcHt8+f+SIhUZ4nA08sTKbS/QaQ4S3SjMQsSYsZ3v8ACdJ5Yb/iZYf9w1ULBzj
+         Q2c2PorpNQ1c2GOMo0hyAwi6ySlPBdUbkzM8JVnwNVtsxewBt+AVbJ4lgTw9q0QBFR
+         gmMdOqVhZ40SSzwMQDziRAlDyP6qdtejWvWhWyIFMVhMrtmPIzUiN8r66zpRWtjfHE
+         j98xRRzdrNfqEQ9Afsc3/O6VQIgiuoR3EQDSnJLCEXgUP9K6zN0pZFaD6FwSu0OGpG
+         QM6ZLG3jZhqhA==
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
@@ -34,9 +34,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
         Nicolas Schier <nicolas@fjasle.eu>
-Subject: [PATCH 03/10] modpost: disallow *driver to reference .meminit* sections
-Date:   Mon, 23 Oct 2023 02:06:06 +0900
-Message-Id: <20231022170613.2072838-3-masahiroy@kernel.org>
+Subject: [PATCH 05/10] modpost: remove MEM_INIT_SECTIONS macro
+Date:   Mon, 23 Oct 2023 02:06:08 +0900
+Message-Id: <20231022170613.2072838-5-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20231022170613.2072838-1-masahiroy@kernel.org>
 References: <20231022170613.2072838-1-masahiroy@kernel.org>
@@ -46,43 +46,36 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Drivers must not reference .meminit* sections, which are discarded
-when CONFIG_MEMORY_HOTPLUG=n.
-
-The reason for whitelisting "*driver" in the section mismatch check
-was to allow drivers to reference symbols annotated as __devinit or
-__devexit that existed in the past.
-
-Those annotations were removed by the following commits:
-
- - 54b956b90360 ("Remove __dev* markings from init.h")
- - 92e9e6d1f984 ("modpost.c: Stop checking __dev* section mismatches")
-
-Remove the wrong whitelist.
+ALL_XXXINIT_SECTIONS and MEM_INIT_SECTIONS are the same.
+Remove the latter.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/modpost.c | 6 ------
- 1 file changed, 6 deletions(-)
+ scripts/mod/modpost.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index bcc334b28a2c..792ba9da0f27 100644
+index 19b138664f75..626ab599eea2 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -1006,12 +1006,6 @@ static int secref_whitelist(const char *fromsec, const char *fromsym,
- 				    "*_console")))
- 		return 0;
+@@ -805,7 +805,7 @@ static void check_section(const char *modname, struct elf_info *elf,
+ 	".pci_fixup_enable", ".pci_fixup_resume", \
+ 	".pci_fixup_resume_early", ".pci_fixup_suspend"
  
--	/* symbols in data sections that may refer to meminit sections */
--	if (match(fromsec, PATTERNS(DATA_SECTIONS)) &&
--	    match(tosec, PATTERNS(ALL_XXXINIT_SECTIONS)) &&
--	    match(fromsym, PATTERNS("*driver")))
--		return 0;
--
- 	/*
- 	 * symbols in data sections must not refer to .exit.*, but there are
- 	 * quite a few offenders, so hide these unless for W=1 builds until
+-#define ALL_XXXINIT_SECTIONS MEM_INIT_SECTIONS
++#define ALL_XXXINIT_SECTIONS ".meminit.*"
+ 
+ #define ALL_INIT_SECTIONS INIT_SECTIONS, ALL_XXXINIT_SECTIONS
+ #define ALL_EXIT_SECTIONS EXIT_SECTIONS
+@@ -818,7 +818,6 @@ static void check_section(const char *modname, struct elf_info *elf,
+ 		".coldtext", ".softirqentry.text"
+ 
+ #define INIT_SECTIONS      ".init.*"
+-#define MEM_INIT_SECTIONS  ".meminit.*"
+ 
+ #define EXIT_SECTIONS      ".exit.*"
+ 
 -- 
 2.40.1
 
