@@ -2,125 +2,55 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BA4EC00A8F
-	for <linux-kbuild@archiver.kernel.org>; Tue, 24 Oct 2023 00:17:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB511C25B47
+	for <linux-kbuild@archiver.kernel.org>; Tue, 24 Oct 2023 08:15:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230284AbjJXARx (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 23 Oct 2023 20:17:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36694 "EHLO
+        id S233160AbjJXIPl (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 24 Oct 2023 04:15:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230421AbjJXARw (ORCPT
+        with ESMTP id S232799AbjJXIPk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 23 Oct 2023 20:17:52 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A72DCD6E;
-        Mon, 23 Oct 2023 17:17:50 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D1E0C433C7;
-        Tue, 24 Oct 2023 00:17:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1698106670;
-        bh=3q2j031K9WR3kHW/1FF7tj1iuRrzBeX5gnG1AT3nR1Y=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=rpODxa8UECTDfdDLBH0YAEOpbwm+/Peb8lnyLaiZvd3DVnS/59wGWZBxB5ELOsQD9
-         JHmrPXxQgRqd61scOyaTnP70FnRo1z1sZumm4TF9pKpNk9teazVI+eJ4YPHFt2vZdS
-         d9ObW3lAzZmnwD6Lat1AznDB9VxLd3/E7oVAPj+X2As9JP0naxyxaCiR8bhU67EaZ0
-         GQDxV5gWqUfdkR49U6vrRomDmEap2TKVG6IG7mNhG2EHs1TBpw1kx9D/Urtw4dsbG1
-         h4DGceIPYrBNbMLcjfg9Ny1udZOcgqFRGZKJq/wS9NUkDZg0jlS01Ay3jB+0sUoDmh
-         6O6QpZhuoXaFw==
-Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-5832ea25c7eso1498193eaf.3;
-        Mon, 23 Oct 2023 17:17:50 -0700 (PDT)
-X-Gm-Message-State: AOJu0Yxq3He2kctaS3f5PMHJKRYoLJLyhaf7yclYWKJild14IRfcMseM
-        /olWjfdR/kZeYpog9TXsjPzMi/CaRItQH49m890=
-X-Google-Smtp-Source: AGHT+IGgx+goDYUrN1p4jOx1XaLm71LBGdqMfgjX0cebhoBhJ3O1Fh6oWaEViaqPJey9ObCB46wjaySdsyltD1CqpXo=
-X-Received: by 2002:a05:6870:568a:b0:1d0:f5bd:6e9 with SMTP id
- p10-20020a056870568a00b001d0f5bd06e9mr10166484oao.22.1698106669621; Mon, 23
- Oct 2023 17:17:49 -0700 (PDT)
+        Tue, 24 Oct 2023 04:15:40 -0400
+Received: from mail.citycodes.pl (mail.citycodes.pl [158.255.215.195])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9683C8F
+        for <linux-kbuild@vger.kernel.org>; Tue, 24 Oct 2023 01:15:38 -0700 (PDT)
+Received: by mail.citycodes.pl (Postfix, from userid 1001)
+        id 5B4C62177C; Tue, 24 Oct 2023 10:15:32 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=citycodes.pl; s=mail;
+        t=1698135337; bh=fClkhHu/p6gIm8tbpvFwCqGX3kXIMdqjiuDdSiYGEkk=;
+        h=Date:From:To:Subject:From;
+        b=J4xv2WsSgeYlSikg4BvhIzCbC2ymDoqJtDZ30O56OEWjFR+PgtegmY3FdDqCoKXsL
+         BoCU0fHjV2tvqBh8Bu0VyymS9qGQfbQMiFpS1P/aTudv8iMzoPERLOVe21T3TzgxVn
+         NXXL3AKk0YZW8AhEV2ytKToT3xwWHfNDQZrMBgbe5EqcH+HJAIMHQ57Ey7TTCc/KPE
+         j4wRWri62NF4q8ZnFWfqshKlwI5p9B6nwAYNY5rcBzomvb+huVzp7ypoGyh3hUIl+h
+         0ivKx/hgO1cRWHZTGRxx7HbmK9737DgEDPz00dp/JFehhyz/jdsEO+7xoZtm42D3PL
+         5P7XjMaB8N8Xg==
+Received: by mail.citycodes.pl for <linux-kbuild@vger.kernel.org>; Tue, 24 Oct 2023 08:15:29 GMT
+Message-ID: <20231024084500-0.1.8a.l8k3.0.r1j48ca2q1@citycodes.pl>
+Date:   Tue, 24 Oct 2023 08:15:29 GMT
+From:   "Kamil Lasek" <kamil.lasek@citycodes.pl>
+To:     <linux-kbuild@vger.kernel.org>
+Subject: Wycena paneli fotowoltaicznych
+X-Mailer: mail.citycodes.pl
 MIME-Version: 1.0
-References: <20231002165750.1661-1-will@kernel.org> <20231002165750.1661-4-will@kernel.org>
-In-Reply-To: <20231002165750.1661-4-will@kernel.org>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Tue, 24 Oct 2023 09:17:13 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAR-8NA9dG-G6gU3XZnTgo41-5c2v74LsCo18HkGJ-7CbQ@mail.gmail.com>
-Message-ID: <CAK7LNAR-8NA9dG-G6gU3XZnTgo41-5c2v74LsCo18HkGJ-7CbQ@mail.gmail.com>
-Subject: Re: [PATCH v5 3/3] scripts/faddr2line: Skip over mapping symbols in
- output from readelf
-To:     Will Deacon <will@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, kernel-team@android.com,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nicolas Schier <nicolas@fjasle.eu>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        John Stultz <jstultz@google.com>, linux-kbuild@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, Oct 3, 2023 at 1:58=E2=80=AFAM Will Deacon <will@kernel.org> wrote:
->
-> Mapping symbols emitted in the readelf output can confuse the
-> 'faddr2line' symbol size calculation, resulting in the erroneous
-> rejection of valid offsets. This is especially prevalent when building
-> an arm64 kernel with CONFIG_CFI_CLANG=3Dy, where most functions are
-> prefixed with a 32-bit data value in a '$d.n' section. For example:
->
-> 447538: ffff800080014b80   548 FUNC    GLOBAL DEFAULT    2 do_one_initcal=
-l
->    104: ffff800080014c74     0 NOTYPE  LOCAL  DEFAULT    2 $x.73
->    106: ffff800080014d30     0 NOTYPE  LOCAL  DEFAULT    2 $x.75
->    111: ffff800080014da4     0 NOTYPE  LOCAL  DEFAULT    2 $d.78
->    112: ffff800080014da8     0 NOTYPE  LOCAL  DEFAULT    2 $x.79
->     36: ffff800080014de0   200 FUNC    LOCAL  DEFAULT    2 run_init_proce=
-ss
->
-> Adding a warning to do_one_initcall() results in:
->
->   | WARNING: CPU: 0 PID: 1 at init/main.c:1236 do_one_initcall+0xf4/0x260
->
-> Which 'faddr2line' refuses to accept:
->
-> $ ./scripts/faddr2line vmlinux do_one_initcall+0xf4/0x260
-> skipping do_one_initcall address at 0xffff800080014c74 due to size mismat=
-ch (0x260 !=3D 0x224)
-> no match for do_one_initcall+0xf4/0x260
->
-> Filter out these entries from readelf using a shell reimplementation of
-> is_mapping_symbol(), so that the size of a symbol is calculated as a
-> delta to the next symbol present in ksymtab.
->
-> Cc: Josh Poimboeuf <jpoimboe@kernel.org>
-> Cc: John Stultz <jstultz@google.com>
-> Suggested-by: Masahiro Yamada <masahiroy@kernel.org>
-> Signed-off-by: Will Deacon <will@kernel.org>
-> ---
->  scripts/faddr2line | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/scripts/faddr2line b/scripts/faddr2line
-> index 6b8206802157..587415a52b6f 100755
-> --- a/scripts/faddr2line
-> +++ b/scripts/faddr2line
-> @@ -179,6 +179,11 @@ __faddr2line() {
->                         local cur_sym_elf_size=3D${fields[2]}
->                         local cur_sym_name=3D${fields[7]:-}
->
-> +                       # is_mapping_symbol(cur_sym_name)
-> +                       if [[ ${cur_sym_name} =3D~ ^(\.L|L0|\$) ]]; then
-> +                               continue
-> +                       fi
-> +
->                         if [[ $cur_sym_addr =3D $sym_addr ]] &&
->                            [[ $cur_sym_elf_size =3D $sym_elf_size ]] &&
->                            [[ $cur_sym_name =3D $sym_name ]]; then
-> --
-> 2.42.0.582.g8ccd20d70d-goog
->
+Dzie=C5=84 dobry,
+
+dostrzegam mo=C5=BCliwo=C5=9B=C4=87 wsp=C3=B3=C5=82pracy z Pa=C5=84stwa f=
+irm=C4=85.
+
+=C5=9Awiadczymy kompleksow=C4=85 obs=C5=82ug=C4=99 inwestycji w fotowolta=
+ik=C4=99, kt=C3=B3ra obni=C5=BCa koszty energii elektrycznej.
+
+Czy s=C4=85 Pa=C5=84stwo zainteresowani weryfikacj=C4=85 wst=C4=99pnych p=
+ropozycji?
 
 
-Reviewed-by: Masahiro Yamada <masahiroy@kernel.org>
-
-
---=20
-Best Regards
-Masahiro Yamada
+Pozdrawiam,
+Kamil Lasek
