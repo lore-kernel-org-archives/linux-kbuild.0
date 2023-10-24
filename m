@@ -2,92 +2,125 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0573C25B67
-	for <linux-kbuild@archiver.kernel.org>; Mon, 23 Oct 2023 23:28:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BA4EC00A8F
+	for <linux-kbuild@archiver.kernel.org>; Tue, 24 Oct 2023 00:17:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229568AbjJWX2T (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 23 Oct 2023 19:28:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43680 "EHLO
+        id S230284AbjJXARx (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 23 Oct 2023 20:17:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229482AbjJWX2S (ORCPT
+        with ESMTP id S230421AbjJXARw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 23 Oct 2023 19:28:18 -0400
+        Mon, 23 Oct 2023 20:17:52 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6085EDE;
-        Mon, 23 Oct 2023 16:28:17 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5F8AC433C7;
-        Mon, 23 Oct 2023 23:28:16 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A72DCD6E;
+        Mon, 23 Oct 2023 17:17:50 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D1E0C433C7;
+        Tue, 24 Oct 2023 00:17:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1698103697;
-        bh=6P4ReWHS+myUk2YY4Rx+y5auSUtYo8uMw77/ieje5bU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=GQsh875nTbQaGdexfP8f74K5+5NSqOXtFMfRypG7GfzyOYu3bn8+DJr7lRfVKjhYn
-         VecaNSFENoWHQVEuXz7TMRBPUZBHtkY6HHI+8JHen60tfuU7/XMDMNihzrANDlk1pV
-         hUztLgpSLwWoMI4RP2cZv1iD/sfemiEgIUl35K8dDj05tR5wtmVRjoChkkTnWs41LF
-         2ZOfiSNZg6Z3sMNJw0mOp+STEWvKmm34fRoOLu5M73UYhy8YbPjjifiLSY0NpLc7Yz
-         R9rZaX7mYZNAX69lwdWTZ+3RGCPbjdePSJJ1QPyJ6lciAXkaHcY2JI8tU3kk6DWfVu
-         ETU/bK9Ded25g==
-Date:   Mon, 23 Oct 2023 16:28:14 -0700
-From:   Nathan Chancellor <nathan@kernel.org>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nicolas Schier <nicolas@fjasle.eu>
-Subject: Re: [PATCH 04/10] modpost: remove more symbol patterns from the
- section check whitelist
-Message-ID: <20231023232814.GA3514685@dev-arch.thelio-3990X>
-References: <20231022170613.2072838-1-masahiroy@kernel.org>
- <20231022170613.2072838-4-masahiroy@kernel.org>
+        s=k20201202; t=1698106670;
+        bh=3q2j031K9WR3kHW/1FF7tj1iuRrzBeX5gnG1AT3nR1Y=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=rpODxa8UECTDfdDLBH0YAEOpbwm+/Peb8lnyLaiZvd3DVnS/59wGWZBxB5ELOsQD9
+         JHmrPXxQgRqd61scOyaTnP70FnRo1z1sZumm4TF9pKpNk9teazVI+eJ4YPHFt2vZdS
+         d9ObW3lAzZmnwD6Lat1AznDB9VxLd3/E7oVAPj+X2As9JP0naxyxaCiR8bhU67EaZ0
+         GQDxV5gWqUfdkR49U6vrRomDmEap2TKVG6IG7mNhG2EHs1TBpw1kx9D/Urtw4dsbG1
+         h4DGceIPYrBNbMLcjfg9Ny1udZOcgqFRGZKJq/wS9NUkDZg0jlS01Ay3jB+0sUoDmh
+         6O6QpZhuoXaFw==
+Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-5832ea25c7eso1498193eaf.3;
+        Mon, 23 Oct 2023 17:17:50 -0700 (PDT)
+X-Gm-Message-State: AOJu0Yxq3He2kctaS3f5PMHJKRYoLJLyhaf7yclYWKJild14IRfcMseM
+        /olWjfdR/kZeYpog9TXsjPzMi/CaRItQH49m890=
+X-Google-Smtp-Source: AGHT+IGgx+goDYUrN1p4jOx1XaLm71LBGdqMfgjX0cebhoBhJ3O1Fh6oWaEViaqPJey9ObCB46wjaySdsyltD1CqpXo=
+X-Received: by 2002:a05:6870:568a:b0:1d0:f5bd:6e9 with SMTP id
+ p10-20020a056870568a00b001d0f5bd06e9mr10166484oao.22.1698106669621; Mon, 23
+ Oct 2023 17:17:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231022170613.2072838-4-masahiroy@kernel.org>
+References: <20231002165750.1661-1-will@kernel.org> <20231002165750.1661-4-will@kernel.org>
+In-Reply-To: <20231002165750.1661-4-will@kernel.org>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Tue, 24 Oct 2023 09:17:13 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAR-8NA9dG-G6gU3XZnTgo41-5c2v74LsCo18HkGJ-7CbQ@mail.gmail.com>
+Message-ID: <CAK7LNAR-8NA9dG-G6gU3XZnTgo41-5c2v74LsCo18HkGJ-7CbQ@mail.gmail.com>
+Subject: Re: [PATCH v5 3/3] scripts/faddr2line: Skip over mapping symbols in
+ output from readelf
+To:     Will Deacon <will@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, kernel-team@android.com,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nicolas Schier <nicolas@fjasle.eu>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        John Stultz <jstultz@google.com>, linux-kbuild@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Mon, Oct 23, 2023 at 02:06:07AM +0900, Masahiro Yamada wrote:
-> These symbol patterns were whitelisted to allow them to reference to
-> functions with the old __devinit and __devexit annotations.
-> 
-> We stopped doing this a long time ago, for example, commit 6f039790510f
-> ("Drivers: scsi: remove __dev* attributes.") remove those annotations
-> from the scsi drivers.
-> 
-> Keep *_ops and *_console, otherwise they will really cause section
-> mismatch warnings.
-> 
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+On Tue, Oct 3, 2023 at 1:58=E2=80=AFAM Will Deacon <will@kernel.org> wrote:
+>
+> Mapping symbols emitted in the readelf output can confuse the
+> 'faddr2line' symbol size calculation, resulting in the erroneous
+> rejection of valid offsets. This is especially prevalent when building
+> an arm64 kernel with CONFIG_CFI_CLANG=3Dy, where most functions are
+> prefixed with a 32-bit data value in a '$d.n' section. For example:
+>
+> 447538: ffff800080014b80   548 FUNC    GLOBAL DEFAULT    2 do_one_initcal=
+l
+>    104: ffff800080014c74     0 NOTYPE  LOCAL  DEFAULT    2 $x.73
+>    106: ffff800080014d30     0 NOTYPE  LOCAL  DEFAULT    2 $x.75
+>    111: ffff800080014da4     0 NOTYPE  LOCAL  DEFAULT    2 $d.78
+>    112: ffff800080014da8     0 NOTYPE  LOCAL  DEFAULT    2 $x.79
+>     36: ffff800080014de0   200 FUNC    LOCAL  DEFAULT    2 run_init_proce=
+ss
+>
+> Adding a warning to do_one_initcall() results in:
+>
+>   | WARNING: CPU: 0 PID: 1 at init/main.c:1236 do_one_initcall+0xf4/0x260
+>
+> Which 'faddr2line' refuses to accept:
+>
+> $ ./scripts/faddr2line vmlinux do_one_initcall+0xf4/0x260
+> skipping do_one_initcall address at 0xffff800080014c74 due to size mismat=
+ch (0x260 !=3D 0x224)
+> no match for do_one_initcall+0xf4/0x260
+>
+> Filter out these entries from readelf using a shell reimplementation of
+> is_mapping_symbol(), so that the size of a symbol is calculated as a
+> delta to the next symbol present in ksymtab.
+>
+> Cc: Josh Poimboeuf <jpoimboe@kernel.org>
+> Cc: John Stultz <jstultz@google.com>
+> Suggested-by: Masahiro Yamada <masahiroy@kernel.org>
+> Signed-off-by: Will Deacon <will@kernel.org>
 > ---
-> 
->  scripts/mod/modpost.c | 8 +-------
->  1 file changed, 1 insertion(+), 7 deletions(-)
-> 
-> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-> index 792ba9da0f27..19b138664f75 100644
-> --- a/scripts/mod/modpost.c
-> +++ b/scripts/mod/modpost.c
-> @@ -997,13 +997,7 @@ static int secref_whitelist(const char *fromsec, const char *fromsym,
->  	/* symbols in data sections that may refer to any init/exit sections */
->  	if (match(fromsec, PATTERNS(DATA_SECTIONS)) &&
->  	    match(tosec, PATTERNS(ALL_INIT_SECTIONS, ALL_EXIT_SECTIONS)) &&
-> -	    match(fromsym, PATTERNS("*_template", // scsi uses *_template a lot
-> -				    "*_timer", // arm uses ops structures named _timer a lot
-> -				    "*_sht", // scsi also used *_sht to some extent
-> -				    "*_ops",
-> -				    "*_probe",
+>  scripts/faddr2line | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/scripts/faddr2line b/scripts/faddr2line
+> index 6b8206802157..587415a52b6f 100755
+> --- a/scripts/faddr2line
+> +++ b/scripts/faddr2line
+> @@ -179,6 +179,11 @@ __faddr2line() {
+>                         local cur_sym_elf_size=3D${fields[2]}
+>                         local cur_sym_name=3D${fields[7]:-}
+>
+> +                       # is_mapping_symbol(cur_sym_name)
+> +                       if [[ ${cur_sym_name} =3D~ ^(\.L|L0|\$) ]]; then
+> +                               continue
+> +                       fi
+> +
+>                         if [[ $cur_sym_addr =3D $sym_addr ]] &&
+>                            [[ $cur_sym_elf_size =3D $sym_elf_size ]] &&
+>                            [[ $cur_sym_name =3D $sym_name ]]; then
+> --
+> 2.42.0.582.g8ccd20d70d-goog
+>
 
-It seems like this one might still be needed. I see this when building
-certain arm64 configurations with clang.
 
-  WARNING: modpost: vmlinux: section mismatch in reference: qcom_irq_combiner_probe+0x0 (section: .data) -> combiner_probe (section: .init.text)
+Reviewed-by: Masahiro Yamada <masahiroy@kernel.org>
 
-> -				    "*_probe_one",
-> -				    "*_console")))
-> +	    match(fromsym, PATTERNS("*_ops", "*_console")))
->  		return 0;
->  
->  	/*
-> -- 
-> 2.40.1
-> 
+
+--=20
+Best Regards
+Masahiro Yamada
