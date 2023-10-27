@@ -2,44 +2,43 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5D09C25B6F
-	for <linux-kbuild@archiver.kernel.org>; Fri, 27 Oct 2023 19:31:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CBFBC25B48
+	for <linux-kbuild@archiver.kernel.org>; Fri, 27 Oct 2023 19:31:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346253AbjJ0Tb1 (ORCPT
-        <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 27 Oct 2023 15:31:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48278 "EHLO
+        id S235236AbjJ0Tbs (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 27 Oct 2023 15:31:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346382AbjJ0TbY (ORCPT
+        with ESMTP id S235154AbjJ0Tbh (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 27 Oct 2023 15:31:24 -0400
+        Fri, 27 Oct 2023 15:31:37 -0400
 Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DAB81BE;
-        Fri, 27 Oct 2023 12:31:17 -0700 (PDT)
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39RJ4Yn3002274;
-        Fri, 27 Oct 2023 19:30:41 GMT
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F0781BC;
+        Fri, 27 Oct 2023 12:31:33 -0700 (PDT)
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39RJ4Rli003642;
+        Fri, 27 Oct 2023 19:31:03 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-type; s=qcppdkim1;
- bh=sSPXzUdA6bcWUCh6IjEImH0rAVGnWus4lPvKyOZNTYE=;
- b=eZBb+5OsE8VDz6ExNCA3c6Y91iPgMmGTbMKxC6qupHVnueEr3Wmovf94n6fDDJLoyin2
- vBxQN8ubB0Ta4aoGlbtMDXfmPZW4K2EvI5nfselK0lGEjBqH+oQ7zYWxU11T8tccOfOm
- weR0OSxO6YYtVV4Ks/0snmz+MYA+LOzqXzWDlHqmvkdLFwcW06qfQgbisyLxenIhB8xM
- pqD/Z3ivQgGAYUK+3VWy56VrWaQaMmYBnAM4rUXJkuPzbJJthb14P1DFZvnNEUEEoP/9
- 3TKGSPFEvBnD+dRDr3Bf6eiqmI/lcfQYVHzjVufw1lKmLGDEnwXtWnI7sWSFHc053Fy5 ig== 
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3tyws9b361-1
+ bh=bV5AdOX1b6yj4uR97m5Igmj5fgcPy3yKPKwqN8wNUHA=;
+ b=DK3S6ez61lBeAytVbhzJsYRGJZXwM7oMS5Ad5tOuYPmNe9dAhK04sQrrtOsVjsRRRMAv
+ cRqm3q9ks+Z/pt4nuPCGCWW9wQk+oYYZmZMcEJvwP97Zy4gK3bb6N9AqwY6JugpCJGXR
+ zE56YFK7iZMwJBiZX4gI8iy4kN5XXrT+NPm+rvfyTf1X8LE6cT57Spp56RFGzSYRVGSS
+ CQ7Ny5upcfSQM4FsYjYGxLZDjMFOxabg5HlIthVrZxclNlVOOPpF1ZcdYQGuF1C3MkW5
+ L0TGMsYtoWJrVD3vJSqdcBbzx2HS+VmZBX9of73zkNEJ/h6VlJ1Iz58C+lzEwQHf6gp2 cA== 
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3tyxfgawwc-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Oct 2023 19:30:41 +0000
+        Fri, 27 Oct 2023 19:31:03 +0000
 Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-        by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 39RJUd7P013511
+        by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 39RJUgWF019845
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Oct 2023 19:30:39 GMT
+        Fri, 27 Oct 2023 19:30:42 GMT
 Received: from hu-johmoo-lv.qualcomm.com (10.49.16.6) by
  nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Fri, 27 Oct 2023 12:30:36 -0700
+ 15.2.1118.39; Fri, 27 Oct 2023 12:30:39 -0700
 From:   John Moon <quic_johmoo@quicinc.com>
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Nathan Chancellor <nathan@kernel.org>,
@@ -62,9 +61,9 @@ CC:     John Moon <quic_johmoo@quicinc.com>,
         Trilok Soni <quic_tsoni@quicinc.com>,
         Satya Durga Srinivasu Prabhala <quic_satyap@quicinc.com>,
         Jordan Crouse <jorcrous@amazon.com>
-Subject: [PATCH v6 1/3] check-uapi: Introduce check-uapi.sh
-Date:   Fri, 27 Oct 2023 12:30:14 -0700
-Message-ID: <20231027193016.27516-2-quic_johmoo@quicinc.com>
+Subject: [PATCH v6 3/3] check-module-params: Introduce check-module-params.sh
+Date:   Fri, 27 Oct 2023 12:30:16 -0700
+Message-ID: <20231027193016.27516-4-quic_johmoo@quicinc.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20231027193016.27516-1-quic_johmoo@quicinc.com>
 References: <20231027193016.27516-1-quic_johmoo@quicinc.com>
@@ -75,70 +74,53 @@ X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
  nalasex01c.na.qualcomm.com (10.47.97.35)
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: iwHWs7FUUnoswuRkQmkr3DqaqKPbEfyS
-X-Proofpoint-GUID: iwHWs7FUUnoswuRkQmkr3DqaqKPbEfyS
+X-Proofpoint-GUID: 5ZOiOtwdrCJekduPWOFAJ74XuEjt5e8j
+X-Proofpoint-ORIG-GUID: 5ZOiOtwdrCJekduPWOFAJ74XuEjt5e8j
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2023-10-27_18,2023-10-27_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
- mlxlogscore=999 spamscore=0 impostorscore=0 mlxscore=0 bulkscore=0
- clxscore=1015 lowpriorityscore=0 phishscore=0 priorityscore=1501
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2310240000 definitions=main-2310270168
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ impostorscore=0 phishscore=0 suspectscore=0 priorityscore=1501
+ malwarescore=0 lowpriorityscore=0 adultscore=0 spamscore=0 mlxscore=0
+ clxscore=1015 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2310240000 definitions=main-2310270169
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-While the kernel community has been good at maintaining backwards
-compatibility with kernel UAPIs, it would be helpful to have a tool
-to check if a commit introduces changes that break backwards
-compatibility.
+One part of maintaining backwards compatibility with older
+userspace programs is avoiding changes to module parameters.
 
-To that end, introduce check-uapi.sh: a simple shell script that
-checks for changes to UAPI headers using libabigail.
+To that end, add a script (check-module-params.sh) which
+performs a simple check of module parameter changes across
+git references.
 
-libabigail is "a framework which aims at helping developers and
-software distributors to spot some ABI-related issues like interface
-incompatibility in ELF shared libraries by performing a static
-analysis of the ELF binaries at hand."
+For example, if this module parameter:
 
-The script uses one of libabigail's tools, "abidiff", to compile the
-changed header before and after the commit to detect any changes.
+module_param(max_nullfunc_tries, int, 0644);
 
-abidiff "compares the ABI of two shared libraries in ELF format. It
-emits a meaningful report describing the differences between the two
-ABIs."
+...restricted its mode parameter:
 
-The script also includes the ability to check the compatibility of
-all UAPI headers across commits. This allows developers to inspect
-the stability of the UAPIs over time.
+module_param(max_nullfunc_tries, int, 0600);
+
+The script would flag the change:
+
+Module parameter "max_nullfunc_tries" in net/mac80211/mlme.c changed!
+  Original args: int,0644
+       New args: int,0600
 
 Signed-off-by: John Moon <quic_johmoo@quicinc.com>
 ---
-    - Add abidiff suppressions to filter out common things like enum
-      variants named .*_MAX being changed and expansion into padding
-      fields.
-    - Bump minimum abidiff version to 2.4 to accomodate new
-      suppressions.
-    - Add option (-i) to suppress ambiguous breaking changes.
-    - Remove printing of full file diffs when ABI breakage is found
-      as this was too noisy.
-    - Wait for all files to be checked before printing results as
-      printing from parallel threads was garbling output.
-    - Suppress all output when -q is passed.
-    - Avoid messing up user's git tree by using "git archive" instead
-      of checking out references.
+ scripts/check-module-params.sh | 295 +++++++++++++++++++++++++++++++++
+ 1 file changed, 295 insertions(+)
+ create mode 100755 scripts/check-module-params.sh
 
- scripts/check-uapi.sh | 585 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 585 insertions(+)
- create mode 100755 scripts/check-uapi.sh
-
-diff --git a/scripts/check-uapi.sh b/scripts/check-uapi.sh
+diff --git a/scripts/check-module-params.sh b/scripts/check-module-params.sh
 new file mode 100755
-index 000000000000..bcb03c8dae60
+index 000000000000..4d2b2cd483e8
 --- /dev/null
-+++ b/scripts/check-uapi.sh
-@@ -0,0 +1,585 @@
++++ b/scripts/check-module-params.sh
+@@ -0,0 +1,295 @@
 +#!/bin/bash
 +# SPDX-License-Identifier: GPL-2.0-only
 +# Script to check commits for UAPI backwards compatibility
@@ -149,16 +131,13 @@ index 000000000000..bcb03c8dae60
 +print_usage() {
 +	name=$(basename "$0")
 +	cat << EOF
-+$name - check for UAPI header stability across Git commits
++$name - check for module parameters stability across git commits.
 +
 +By default, the script will check to make sure the latest commit (or current
-+dirty changes) did not introduce ABI changes when compared to HEAD^1. You can
++dirty changes) did not introduce changes when compared to HEAD^1. You can
 +check against additional commit ranges with the -b and -p options.
 +
-+The script will not check UAPI headers for architectures other than the one
-+defined in ARCH.
-+
-+Usage: $name [-b BASE_REF] [-p PAST_REF] [-j N] [-l ERROR_LOG] [-i] [-q] [-v]
++Usage: $name [-b BASE_REF] [-p PAST_REF] [-j N] [-l ERROR_LOG] [-q] [-v]
 +
 +Options:
 +    -b BASE_REF    Base git reference to use for comparison. If unspecified or empty,
@@ -169,25 +148,17 @@ index 000000000000..bcb03c8dae60
 +                   that exist on PAST_REF will be checked for compatibility.
 +    -j JOBS        Number of checks to run in parallel (default: number of CPU cores).
 +    -l ERROR_LOG   Write error log to file (default: no error log is generated).
-+    -i             Ignore ambiguous changes that may or may not break UAPI compatibility.
-+    -q             Quiet operation.
++    -q             Quiet operation (suppress stdout, still print stderr).
 +    -v             Verbose operation (print more information about each header being checked).
-+
-+Environmental args:
-+    ABIDIFF  Custom path to abidiff binary
-+    CC       C compiler (default is "gcc")
-+    ARCH     Target architecture of C compiler (default is host arch)
 +
 +Exit codes:
 +    $SUCCESS) Success
-+    $FAIL_ABI) ABI difference detected
-+    $FAIL_PREREQ) Prerequisite not met
++    $FAILURE) Module param differences detected
 +EOF
 +}
 +
 +readonly SUCCESS=0
-+readonly FAIL_ABI=1
-+readonly FAIL_PREREQ=2
++readonly FAILURE=1
 +
 +# Print to stderr
 +eprintf() {
@@ -195,217 +166,141 @@ index 000000000000..bcb03c8dae60
 +	printf "$@" >&2
 +}
 +
-+# Expand an array with a specific character (similar to Python string.join())
-+join() {
-+	local IFS="$1"
-+	shift
-+	printf "%s" "$*"
-+}
-+
-+# Create abidiff suppressions
-+gen_suppressions() {
-+	# Common enum variant names which we don't want to worry about
-+	# being shifted when new variants are added.
-+	local -a enum_regex=(
-+		".*_AFTER_LAST$"
-+		".*_CNT$"
-+		".*_COUNT$"
-+		".*_END$"
-+		".*_LAST$"
-+		".*_MASK$"
-+		".*_MAX$"
-+		".*_MAX_BIT$"
-+		".*_MAX_BPF_ATTACH_TYPE$"
-+		".*_MAX_ID$"
-+		".*_MAX_SHIFT$"
-+		".*_NBITS$"
-+		".*_NETDEV_NUMHOOKS$"
-+		".*_NFT_META_IIFTYPE$"
-+		".*_NL80211_ATTR$"
-+		".*_NLDEV_NUM_OPS$"
-+		".*_NUM$"
-+		".*_NUM_ELEMS$"
-+		".*_NUM_IRQS$"
-+		".*_SIZE$"
-+		".*_TLSMAX$"
-+		"^MAX_.*"
-+		"^NUM_.*"
-+	)
-+
-+	# Common padding field names which can be expanded into
-+	# without worrying about users.
-+	local -a padding_regex=(
-+		".*end$"
-+		".*pad$"
-+		".*pad[0-9]?$"
-+		".*pad_[0-9]?$"
-+		".*padding$"
-+		".*padding[0-9]?$"
-+		".*padding_[0-9]?$"
-+		".*res$"
-+		".*resv$"
-+		".*resv[0-9]?$"
-+		".*resv_[0-9]?$"
-+		".*reserved$"
-+		".*reserved[0-9]?$"
-+		".*reserved_[0-9]?$"
-+		".*rsvd[0-9]?$"
-+		".*unused$"
-+	)
-+
-+	cat << EOF
-+[suppress_type]
-+  type_kind = enum
-+  changed_enumerators_regexp = $(join , "${enum_regex[@]}")
-+EOF
-+
-+	for p in "${padding_regex[@]}"; do
-+		cat << EOF
-+[suppress_type]
-+  type_kind = struct
-+  has_data_member_inserted_at = offset_of_first_data_member_regexp(${p})
-+EOF
-+	done
-+
-+if [ "$IGNORE_AMBIGUOUS_CHANGES" = "true" ]; then
-+	cat << EOF
-+[suppress_type]
-+  type_kind = struct
-+  has_data_member_inserted_at = end
-+  has_size_change = yes
-+EOF
-+fi
-+}
-+
 +# Check if git tree is dirty
 +tree_is_dirty() {
 +	! git diff --quiet
 +}
 +
-+# Get list of files installed in $ref
-+get_file_list() {
-+	local -r ref="$1"
-+	local -r tree="$(get_header_tree "$ref")"
++file_module_params_unmodified() {
++	local file="$1"
++	local base_ref="$2"
++	local past_ref="$3"
++	local base_params_file="${TMP_DIR}/${file}.base"
++	local past_params_file="${TMP_DIR}/${file}.past"
++	local error_log="${TMP_DIR}/${file}.error"
 +
-+	# Print all installed headers, filtering out ones that can't be compiled
-+	find "$tree" -type f -name '*.h' -printf '%P\n' | grep -v -f "$INCOMPAT_LIST"
-+}
++	local -r awk_cmd='/^ *module_param.*\(/,/.*\);/'
 +
-+# Add to the list of incompatible headers
-+add_to_incompat_list() {
-+	local -r ref="$1"
++	mkdir -p "$(dirname "$error_log")"
++	git show "${past_ref}:${file}" 2> /dev/null \
++		| awk "$awk_cmd" > "$past_params_file" || true
 +
-+	# Start with the usr/include/Makefile to get a list of the headers
-+	# that don't compile using this method.
-+	if [ ! -f usr/include/Makefile ]; then
-+		eprintf "error - no usr/include/Makefile present at %s\n" "$ref"
-+		eprintf "Note: usr/include/Makefile was added in the v5.3 kernel release\n"
-+		exit "$FAIL_PREREQ"
++	# Ignore files that don't exist at the past ref or don't have module params
++	if [ ! -s "$past_params_file" ]; then
++		return 255 # Special return code for "no-op"
 +	fi
-+	{
-+		# shellcheck disable=SC2016
-+		printf 'all: ; @echo $(no-header-test)\n'
-+		cat usr/include/Makefile
-+	} | SRCARCH="$ARCH" make --always-make -f - | tr " " "\n" \
-+	  | grep -v "asm-generic" >> "$INCOMPAT_LIST"
 +
-+	# The makefile also skips all asm-generic files, but prints "asm-generic/%"
-+	# which won't work for our grep match. Instead, print something grep will match.
-+	printf "asm-generic/.*\.h\n" >> "$INCOMPAT_LIST"
++	if [ -z "$base_ref" ]; then
++		awk "$awk_cmd" "${KERNEL_SRC}/${file}" \
++			> "$base_params_file" 2> /dev/null || true
++	else
++		git show "${base_ref}:${file}" 2> /dev/null \
++			| awk "$awk_cmd" > "$base_params_file" || true
++	fi
 +
-+	sort -u -o "$INCOMPAT_LIST" "$INCOMPAT_LIST"
-+	sed -i -e '/^$/d' "$INCOMPAT_LIST"
-+}
++	# Process the param data to come up with an associative array of param names to param data
++	# For example:
++	#   module_param_call(foo, set_result, get_result, NULL, 0600);
++	#
++	# is processed into:
++	#   pre_change_params[foo]="set_result,get_result,NULL,0600"
++	local -A pre_change_params
++	local param_name
++	local param_params
++	while read -r mod_param_args; do
++		param_name="$(echo "$mod_param_args" | cut -d ',' -f 1)"
++		param_params="$(echo "$mod_param_args" | cut -d ',' -f 2-)"
 +
-+# Compile the simple test app
-+do_compile() {
-+	local -r inc_dir="$1"
-+	local -r header="$2"
-+	local -r out="$3"
-+	printf "int main(void) { return 0; }\n" | \
-+		"$CC" -c \
-+		  -o "$out" \
-+		  -x c \
-+		  -O0 \
-+		  -std=c90 \
-+		  -fno-eliminate-unused-debug-types \
-+		  -g \
-+		  "-I${inc_dir}" \
-+		  -include "$header" \
-+		  -
-+}
++		pre_change_params[$param_name]=$param_params
++	done < <(tr -d '\t\n ' < "$past_params_file" | tr ';' '\n' | grep -o '(.*)' | tr -d '()')
 +
-+# Run make headers_install
-+run_make_headers_install() {
-+	local -r install_dir="$1"
-+	make -j "$MAX_THREADS" ARCH="$ARCH" INSTALL_HDR_PATH="$install_dir" \
-+		headers_install > /dev/null
-+}
++	local -A post_change_params
++	while read -r mod_param_args; do
++		param_name="$(echo "$mod_param_args" | cut -d ',' -f 1)"
++		param_params="$(echo "$mod_param_args" | cut -d ',' -f 2-)"
 +
-+# Install headers for both git refs
-+install_headers() {
-+	local -r base_ref="$1"
-+	local -r past_ref="$2"
++		post_change_params[$param_name]=$param_params
++	done < <(tr -d '\t\n ' < "$base_params_file" | tr ';' '\n' | grep -o '(.*)' | tr -d '()')
 +
-+	for ref in "$base_ref" "$past_ref"; do
-+		printf "Installing user-facing UAPI headers from %s... " "${ref:-dirty tree}"
-+		if [ -n "$ref" ]; then
-+			git archive --format=tar --prefix="${ref}-archive/" "$ref" \
-+				| (cd "$TMP_DIR" && tar xf -)
-+			(
-+				cd "${TMP_DIR}/${ref}-archive"
-+				run_make_headers_install "${TMP_DIR}/${ref}/usr"
-+				add_to_incompat_list "$ref" "$INCOMPAT_LIST"
-+			)
-+		else
-+			run_make_headers_install "${TMP_DIR}/${ref}/usr"
-+			add_to_incompat_list "$ref" "$INCOMPAT_LIST"
++	# Flag any module param changes that:
++	#  - Remove/rename a parameter
++	#  - Change the arguments of the parameter
++	local incompat_param_changes=0
++	local pre
++	local post
++	for param_name in "${!pre_change_params[@]}"; do
++		pre="${pre_change_params[$param_name]}"
++		if [ ! "${post_change_params[$param_name]+set}" ]; then
++			{
++				printf "Module parameter \"%s\" in %s removed!\n" "$param_name" "$file"
++				printf "  Original args: %s\n" "$pre"
++			} > "$error_log"
++			incompat_param_changes=$((incompat_param_changes + 1))
++			continue
 +		fi
-+		printf "OK\n"
++
++		post="${post_change_params[$param_name]}"
++		if [ "$pre" != "$post" ]; then
++			{
++				printf "Module parameter \"%s\" in %s changed!\n" "$param_name" "$file"
++				printf "  Original args: %s\n" "$pre"
++				printf "       New args: %s\n" "$post"
++			} > "$error_log"
++			incompat_param_changes=$((incompat_param_changes + 1))
++			continue
++		fi
 +	done
++
++	if [ "$incompat_param_changes" -gt 0 ]; then
++		return 1
++	fi
 +}
 +
-+# Print the path to the headers_install tree for a given ref
-+get_header_tree() {
-+	local -r ref="$1"
-+	printf "%s" "${TMP_DIR}/${ref}/usr"
-+}
++run() {
++	local base_ref="$1"
++	local past_ref="$2"
++	local abi_error_log="$3"
 +
-+# Check file list for UAPI compatibility
-+check_uapi_files() {
-+	local -r base_ref="$1"
-+	local -r past_ref="$2"
-+	local -r abi_error_log="$3"
++	diff_args=("$past_ref")
++	if [ -n "$base_ref" ]; then
++		diff_args+=("$base_ref")
++	fi
 +
-+	local passed=0;
-+	local failed=0;
 +	local -a threads=()
-+	set -o errexit
-+
-+	printf "Checking changes to UAPI headers between %s and %s...\n" "$past_ref" "${base_ref:-dirty tree}"
-+	# Loop over all UAPI headers that were installed by $past_ref (if they only exist on $base_ref,
-+	# there's no way they're broken and no way to compare anyway)
-+	while read -r file; do
++	local passed=0
++	local failed=0
++	printf "Checking files between %s and %s for module parameter compatibility...\n" \
++		"$past_ref" "$base_ref"
++	while read -r modified_file; do
 +		if [ "${#threads[@]}" -ge "$MAX_THREADS" ]; then
-+			if wait "${threads[0]}"; then
++			wait "${threads[0]}" && ret="$?" || ret="$?"
++			if [ "$ret" -eq 0 ]; then
 +				passed=$((passed + 1))
-+			else
++			elif [ "$ret" -eq 1 ]; then
 +				failed=$((failed + 1))
 +			fi
 +			threads=("${threads[@]:1}")
 +		fi
 +
-+		check_individual_file "$base_ref" "$past_ref" "$file" &
++		file_module_params_unmodified "$modified_file" "$base_ref" "$past_ref" &
 +		threads+=("$!")
-+	done < <(get_file_list "$past_ref")
++	done < <(git diff --diff-filter=MCD --name-only "${diff_args[@]}" -- '*.c' '*.h')
 +
 +	for t in "${threads[@]}"; do
-+		if wait "$t"; then
++		wait "$t" && ret="$?" || ret="$?"
++		if [ "$ret" -eq 0 ]; then
 +			passed=$((passed + 1))
-+		else
++		elif [ "$ret" -eq 1 ]; then
 +			failed=$((failed + 1))
 +		fi
 +	done
++
++	total=$((passed + failed))
++	if [ "$total" -eq 0 ]; then
++		printf "No files with module parameters modified between %s and %s\n" \
++			"$past_ref" "${base_ref:-dirty tree}"
++		exit 0
++	fi
 +
 +	if [ -n "$abi_error_log" ]; then
 +		printf 'Generated by "%s %s" from git ref %s\n\n' \
@@ -419,189 +314,22 @@ index 000000000000..bcb03c8dae60
 +		} | tee -a "${abi_error_log:-/dev/null}" >&2
 +	done < <(find "$TMP_DIR" -type f -name '*.error')
 +
-+	total="$((passed + failed))"
 +	if [ "$failed" -gt 0 ]; then
-+		eprintf "error - %d/%d UAPI headers compatible with %s appear _not_ to be backwards compatible\n" \
-+			"$failed" "$total" "$ARCH"
++		eprintf "error - %d/%d files with modules parameters appear _not_ to be backwards compatible\n" \
++			"$failed" "$total"
 +		if [ -n "$abi_error_log" ]; then
 +			eprintf "Failure summary saved to %s\n" "$abi_error_log"
 +		fi
 +	else
-+		printf "All %d UAPI headers compatible with %s appear to be backwards compatible\n" \
++		printf "All %d files with module_parameters checked appear to be backwards compatible\n" \
 +			"$total" "$ARCH"
 +	fi
 +
-+	return "$failed"
++	exit "$failed"
 +}
 +
-+# Check an individual file for UAPI compatibility
-+check_individual_file() {
-+	local -r base_ref="$1"
-+	local -r past_ref="$2"
-+	local -r file="$3"
-+
-+	local -r base_header="$(get_header_tree "$base_ref")/${file}"
-+	local -r past_header="$(get_header_tree "$past_ref")/${file}"
-+
-+	local base_ref_short="${base_ref:-dirty tree}"
-+	if [ "${#base_ref_short}" -ge 40 ]; then
-+		base_ref_short="$(git rev-parse --short "$base_ref_short")"
-+	fi
-+
-+	local past_ref_short="$past_ref"
-+	if [ "${#past_ref_short}" -ge 40 ]; then
-+		past_ref_short="$(git rev-parse --short "$past_ref_short")"
-+	fi
-+
-+	if [ ! -f "$base_header" ]; then
-+		mkdir -p "$(dirname "$base_header")"
-+		printf "==== UAPI header %s was removed between %s and %s ====" \
-+			"$file" "$past_ref_short" "$base_ref_short" \
-+				> "${base_header}.error"
-+		return 1
-+	fi
-+
-+	compare_abi "$file" "$base_header" "$past_header" "$base_ref" "$past_ref" \
-+		"$base_ref_short" "$past_ref_short"
-+}
-+
-+# Perform the A/B compilation and compare output ABI
-+compare_abi() {
-+	local -r file="$1"
-+	local -r base_header="$2"
-+	local -r past_header="$3"
-+	local -r base_ref="$4"
-+	local -r past_ref="$5"
-+	local -r base_ref_short="$6"
-+	local -r past_ref_short="$7"
-+	local -r log="${TMP_DIR}/log/${file}.log"
-+
-+	mkdir -p "$(dirname "$log")"
-+
-+	if ! do_compile "$(get_header_tree "$base_ref")/include" "$base_header" "${base_header}.bin" 2> "$log"; then
-+		{
-+			warn_str=$(printf "==== Could not compile version of UAPI header %s at %s ====\n" \
-+				"$file" "$base_ref_short")
-+			printf "%s\n" "$warn_str"
-+			cat "$log"
-+			printf -- "=%.0s" $(seq 0 ${#warn_str})
-+		} > "${base_header}.error"
-+		return 1
-+	fi
-+
-+	if ! do_compile "$(get_header_tree "$past_ref")/include" "$past_header" "${past_header}.bin" 2> "$log"; then
-+		{
-+			warn_str=$(printf "==== Could not compile version of UAPI header %s at %s ====\n" \
-+				"$file" "$past_ref_short")
-+			printf "%s\n" "$warn_str"
-+			cat "$log"
-+			printf -- "=%.0s" $(seq 0 ${#warn_str})
-+		} > "${base_header}.error"
-+		return 1
-+	fi
-+
-+	local ret=0
-+	"$ABIDIFF" --non-reachable-types \
-+		--suppressions "$SUPPRESSIONS" \
-+		"${past_header}.bin" "${base_header}.bin" > "$log" || ret="$?"
-+	if [ "$ret" -eq 0 ]; then
-+		if [ "$VERBOSE" = "true" ]; then
-+			printf "No ABI differences detected in %s from %s -> %s\n" \
-+				"$file" "$past_ref_short" "$base_ref_short"
-+		fi
-+	else
-+		# Bits in abidiff's return code can be used to determine the type of error
-+		if [ $((ret & 0x2)) -gt 0 ]; then
-+			eprintf "error - abidiff did not run properly\n"
-+			exit 1
-+		fi
-+
-+		if [ "$IGNORE_AMBIGUOUS_CHANGES" = "true" ] && [ "$ret" -eq 4 ]; then
-+			return 0
-+		fi
-+
-+		# If the only changes were additions (not modifications to existing APIs), then
-+		# there's no problem. Ignore these diffs.
-+		if grep "Unreachable types summary" "$log" | grep -q "0 removed" &&
-+		   grep "Unreachable types summary" "$log" | grep -q "0 changed"; then
-+			return 0
-+		fi
-+
-+		{
-+			warn_str=$(printf "==== ABI differences detected in %s from %s -> %s ====" \
-+				"$file" "$past_ref_short" "$base_ref_short")
-+			printf "%s\n" "$warn_str"
-+			sed  -e '/summary:/d' -e '/changed type/d' -e '/^$/d' -e 's/^/  /g' "$log"
-+			printf -- "=%.0s" $(seq 0 ${#warn_str})
-+			if cmp "$past_header" "$base_header" > /dev/null 2>&1; then
-+				printf "\n%s did not change between %s and %s...\n" "$file" "$past_ref" "${base_ref:-dirty tree}"
-+				printf "It's possible a change to one of the headers it includes caused this error:\n"
-+				grep '^#include' "$base_header"
-+				printf "\n"
-+			fi
-+		} > "${base_header}.error"
-+
-+		return 1
-+	fi
-+}
-+
-+# Check that a minimum software version number is satisfied
-+min_version_is_satisfied() {
-+	local -r min_version="$1"
-+	local -r version_installed="$2"
-+
-+	printf "%s\n%s\n" "$min_version" "$version_installed" \
-+		| sort -Vc > /dev/null 2>&1
-+}
-+
-+# Make sure we have the tools we need and the arguments make sense
-+check_deps() {
-+	ABIDIFF="${ABIDIFF:-abidiff}"
-+	CC="${CC:-gcc}"
-+	ARCH="${ARCH:-$(uname -m)}"
-+	if [ "$ARCH" = "x86_64" ]; then
-+		ARCH="x86"
-+	fi
-+
-+	local -r abidiff_min_version="2.4"
-+	local -r libdw_min_version_if_clang="0.171"
-+
-+	if ! command -v "$ABIDIFF" > /dev/null 2>&1; then
-+		eprintf "error - abidiff not found!\n"
-+		eprintf "Please install abigail-tools version %s or greater\n" "$abidiff_min_version"
-+		eprintf "See: https://sourceware.org/libabigail/manual/libabigail-overview.html\n"
-+		return 1
-+	fi
-+
-+	local -r abidiff_version="$("$ABIDIFF" --version | cut -d ' ' -f 2)"
-+	if ! min_version_is_satisfied "$abidiff_min_version" "$abidiff_version"; then
-+		eprintf "error - abidiff version too old: %s\n" "$abidiff_version"
-+		eprintf "Please install abigail-tools version %s or greater\n" "$abidiff_min_version"
-+		eprintf "See: https://sourceware.org/libabigail/manual/libabigail-overview.html\n"
-+		return 1
-+	fi
-+
-+	if ! command -v "$CC" > /dev/null 2>&1; then
-+		eprintf 'error - %s not found\n' "$CC"
-+		return 1
-+	fi
-+
-+	if "$CC" --version | grep -q clang; then
-+		local -r libdw_version="$(ldconfig -v 2>/dev/null | grep -v SKIPPED | grep -m 1 -o 'libdw-[0-9]\+.[0-9]\+' | cut -c 7-)"
-+		if ! min_version_is_satisfied "$libdw_min_version_if_clang" "$libdw_version"; then
-+			eprintf "error - libdw version too old for use with clang: %s\n" "$libdw_version"
-+			eprintf "Please install libdw from elfutils version %s or greater\n" "$libdw_min_version_if_clang"
-+			eprintf "See: https://sourceware.org/elfutils/\n"
-+			return 1
-+		fi
-+	fi
-+
-+	if [ ! -d "arch/${ARCH}" ]; then
-+		eprintf 'error - ARCH "%s" is not a subdirectory under arch/\n' "$ARCH"
-+		eprintf "Please set ARCH to one of:\n%s\n" "$(find arch -maxdepth 1 -mindepth 1 -type d -printf '%f ' | fmt)"
-+		return 1
-+	fi
-+
++# Make sure the git refs we have make sense
++check_refs() {
 +	if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
 +		eprintf "error - this script requires the kernel tree to be initialized with Git\n"
 +		return 1
@@ -624,11 +352,39 @@ index 000000000000..bcb03c8dae60
 +	fi
 +}
 +
-+run() {
-+	local base_ref="$1"
-+	local past_ref="$2"
-+	local abi_error_log="$3"
-+	shift 3
++main() {
++	MAX_THREADS=$(nproc)
++	quiet="false"
++	local base_ref=""
++	while getopts "hb:p:j:l:q" opt; do
++		case $opt in
++		h)
++			print_usage
++			exit "$SUCCESS"
++			;;
++		b)
++			base_ref="$OPTARG"
++			;;
++		p)
++			past_ref="$OPTARG"
++			;;
++		j)
++			MAX_THREADS="$OPTARG"
++			;;
++		l)
++			abi_error_log="$OPTARG"
++			;;
++		q)
++			quiet="true"
++			;;
++		*)
++			exit "$FAIL_PREREQ"
++		esac
++	done
++
++	if [ "$quiet" = "true" ]; then
++		exec > /dev/null 2>&1
++	fi
 +
 +	if [ -z "$KERNEL_SRC" ]; then
 +		KERNEL_SRC="$(realpath "$(dirname "$0")"/..)"
@@ -648,7 +404,7 @@ index 000000000000..bcb03c8dae60
 +		fi
 +	fi
 +
-+	if ! check_deps; then
++	if ! check_refs; then
 +		exit "$FAIL_PREREQ"
 +	fi
 +
@@ -656,71 +412,7 @@ index 000000000000..bcb03c8dae60
 +	readonly TMP_DIR
 +	trap 'rm -rf "$TMP_DIR"' EXIT
 +
-+	readonly INCOMPAT_LIST="${TMP_DIR}/incompat_list.txt"
-+	touch "$INCOMPAT_LIST"
-+
-+	readonly SUPPRESSIONS="${TMP_DIR}/suppressions.txt"
-+	gen_suppressions > "$SUPPRESSIONS"
-+
-+	# Run make install_headers for both refs
-+	install_headers "$base_ref" "$past_ref"
-+
-+	# Check for any differences in the installed header trees
-+	if diff -r -q "$(get_header_tree "$base_ref")" "$(get_header_tree "$past_ref")" > /dev/null 2>&1; then
-+		printf "No changes to UAPI headers were applied between %s and %s\n" "$past_ref" "${base_ref:-dirty tree}"
-+		exit "$SUCCESS"
-+	fi
-+
-+	if ! check_uapi_files "$base_ref" "$past_ref" "$abi_error_log"; then
-+		exit "$FAIL_ABI"
-+	fi
-+}
-+
-+main() {
-+	MAX_THREADS=$(nproc)
-+	VERBOSE="false"
-+	IGNORE_AMBIGUOUS_CHANGES="false"
-+	quiet="false"
-+	local base_ref=""
-+	while getopts "hb:p:j:l:iqv" opt; do
-+		case $opt in
-+		h)
-+			print_usage
-+			exit "$SUCCESS"
-+			;;
-+		b)
-+			base_ref="$OPTARG"
-+			;;
-+		p)
-+			past_ref="$OPTARG"
-+			;;
-+		j)
-+			MAX_THREADS="$OPTARG"
-+			;;
-+		l)
-+			abi_error_log="$OPTARG"
-+			;;
-+		i)
-+			IGNORE_AMBIGUOUS_CHANGES="true"
-+			;;
-+		q)
-+			quiet="true"
-+			VERBOSE="false"
-+			;;
-+		v)
-+			VERBOSE="true"
-+			quiet="false"
-+			;;
-+		*)
-+			exit "$FAIL_PREREQ"
-+		esac
-+	done
-+
-+	if [ "$quiet" = "true" ]; then
-+		exec > /dev/null 2>&1
-+	fi
-+
-+	run "$base_ref" "$past_ref" "$abi_error_log" "$@"
++	run "$base_ref" "$past_ref" "$abi_error_log"
 +}
 +
 +main "$@"
