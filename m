@@ -2,31 +2,31 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC80BC4167B
-	for <linux-kbuild@archiver.kernel.org>; Wed,  1 Nov 2023 15:05:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C3A0C4167B
+	for <linux-kbuild@archiver.kernel.org>; Wed,  1 Nov 2023 15:05:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232783AbjKAPFH (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 1 Nov 2023 11:05:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39994 "EHLO
+        id S233064AbjKAPFP (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 1 Nov 2023 11:05:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232591AbjKAPFE (ORCPT
+        with ESMTP id S233002AbjKAPFM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 1 Nov 2023 11:05:04 -0400
+        Wed, 1 Nov 2023 11:05:12 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EE3010C;
-        Wed,  1 Nov 2023 08:04:59 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA0BCC43215;
-        Wed,  1 Nov 2023 15:04:57 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2885E12B;
+        Wed,  1 Nov 2023 08:05:03 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B8EEC433C7;
+        Wed,  1 Nov 2023 15:05:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1698851099;
-        bh=JtLodipaGPF999feXSGnDvTxAtoqNAWxEAUjQUNvakM=;
+        s=k20201202; t=1698851102;
+        bh=J9TDTTp5Th8l4Sk4Cvv9hQrUXmMuJKZ9hBfQCH+y39o=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=kHNj6pS4OyGwkRF8mHZhF+YVeLtrDGwcNAKX1Zwq7SVqBaUinKfojmeq61mmW93ue
-         aVZXMQkUH5pLMuQ5Kaelo4ooNejJ4jksN2d+Eg+0ZScv15cLJtcyrPWqxeTVetNlMF
-         8UEea089U8sUyU2HgFFoW0N2fkE8oPSB/2a39oBZB+PAJbkaKQ/zAfsGkMOCWaGnBQ
-         qAtFnwgPLInYKcwp/41z8I3GoQIioOh9eMbz337H/zRIWgMInDlVQ94hyP+irQNR3c
-         L69698PAr+M/CkRp15c3q7x50/j2wAwzNnrWPFXHqiqFu1ZymFoUrrj/IQJwbeBQCn
-         zId1tz02kA3sw==
+        b=mForM/ElSg9nfUfHoSsS9u0waPf4ExfykoG7pn8Q3XaEFgsuytu/ouZBmYcqQY8rw
+         mBCLgYXYsf/9nsFDRochpXiVbM1DwA2OtewmFI4or+JDh0c8/cnOXG1n9KvZPrO34R
+         XR3XxeLrPAqnnn3W3aaXyYsWXUdRH2RsWT8+z5XWQAtZ2dFQdViSHXC//r9Aa7d9n/
+         r/L053pdsVpMNa65QHfpWWceGMtD27/WRDnLzz9u1jsm+cnaMmvTfc9ENNegOoaUfY
+         e2eSn8UCofIHVcgoEC8GrhEsPMr5SHW7ge7vA1krBOKkEgAaV+Xi+9vmk0tvA4Kv5C
+         pHhg1GVhlpXWw==
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, Greg Ungerer <gerg@kernel.org>,
@@ -35,9 +35,9 @@ Cc:     linux-kernel@vger.kernel.org, Greg Ungerer <gerg@kernel.org>,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
         Nicolas Schier <nicolas@fjasle.eu>
-Subject: [PATCH 4/7] modpost: introduce a filtering feature to symsearch
-Date:   Thu,  2 Nov 2023 00:04:01 +0900
-Message-Id: <20231101150404.754108-5-masahiroy@kernel.org>
+Subject: [PATCH 6/7] modpost: add symsearch_find_with_name() helper function
+Date:   Thu,  2 Nov 2023 00:04:03 +0900
+Message-Id: <20231101150404.754108-7-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20231101150404.754108-1-masahiroy@kernel.org>
 References: <20231101150404.754108-1-masahiroy@kernel.org>
@@ -47,149 +47,61 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-If adjacent table entries have the same section index and address,
-symsearch_fixup() modifies the entries so the symbol lookup returns
-the first symbol entry in the original .symtab section, but it may
-not be the optimal result.
+This helper function searches for a symbol with the provided name.
+The symbol must be located in the specified section and within the
+given distance from the target address.
 
-Add the filter() callback for more flexible symbol selection.
-
-After the binary search is finished, a linear search begins to determine
-the best symbol. Typically, the one found in the first iteration is the
-closest, but the linear search continues as long as it sees another
-symbol on the same distance. In each iteration, filter() is called to
-determine if the current symbol should be taken.
-
-Here are some useful scenarios:
-
- - When multiple entries share the same section index and address,
-   filter() can be used to break a tie.
-
- - When there is an unwanted symbol depending on the search context,
-   filter() can return false to skip it.
-
-Currently, there is one hard-coded policy: if the target address falls
-perfectly in the middle of the two neighbors, the lower address is
-preferred. Let's move this preference to the filter function because it
-is not directly related to the binary search algorithm.
-
-This commit does not introduce any functional change, but more useful
-filtering policies will be added in subsequent commits.
+In the expected use case, the min_distance is very small, so the
+linear search will finish within a few iterations.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/symsearch.c | 102 ++++++++++++++++++++++++++++++----------
- 1 file changed, 77 insertions(+), 25 deletions(-)
+ scripts/mod/modpost.h   |  3 +++
+ scripts/mod/symsearch.c | 44 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 47 insertions(+)
 
+diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
+index 9834ac44846d..43148b1a762b 100644
+--- a/scripts/mod/modpost.h
++++ b/scripts/mod/modpost.h
+@@ -186,6 +186,9 @@ void symsearch_finish(struct elf_info *elf);
+ Elf_Sym *symsearch_find_nearest(struct elf_info *elf, Elf_Addr addr,
+ 				unsigned int secndx, bool allow_negative,
+ 				Elf_Addr min_distance);
++Elf_Sym *symsearch_find_with_name(struct elf_info *elf, Elf_Addr addr,
++				  unsigned int secndx, bool allow_negative,
++				  Elf_Addr min_distance, const char *name);
+ 
+ /* file2alias.c */
+ void handle_moddevtable(struct module *mod, struct elf_info *info,
 diff --git a/scripts/mod/symsearch.c b/scripts/mod/symsearch.c
-index 97566aee0979..4549c5b0bb81 100644
+index 13464e4f4d72..9101bb9584a4 100644
 --- a/scripts/mod/symsearch.c
 +++ b/scripts/mod/symsearch.c
-@@ -5,6 +5,8 @@
-  * to a given address.
-  */
- 
-+#include <stdbool.h>
-+
- #include "modpost.h"
- 
- struct syminfo {
-@@ -142,17 +144,11 @@ void symsearch_finish(struct elf_info *elf)
- 	elf->symsearch = NULL;
+@@ -240,3 +240,47 @@ Elf_Sym *symsearch_find_nearest(struct elf_info *elf, Elf_Addr addr,
+ 	return symsearch_find(elf, addr, secndx, allow_negative, min_distance,
+ 			      symsearch_nearest_filter, elf);
  }
- 
--/*
-- * Find the syminfo which is in secndx and "nearest" to addr.
-- * allow_negative: allow returning a symbol whose address is > addr.
-- * min_distance: ignore symbols which are further away than this.
-- *
-- * Returns a pointer into the symbol table for success.
-- * Returns NULL if no legal symbol is found within the requested range.
-- */
--Elf_Sym *symsearch_find_nearest(struct elf_info *elf, Elf_Addr addr,
--				unsigned int secndx, bool allow_negative,
--				Elf_Addr min_distance)
-+static Elf_Sym *symsearch_find(struct elf_info *elf, Elf_Addr addr,
-+			       unsigned int secndx, bool allow_negative,
-+			       Elf_Addr min_distance,
-+			       bool (*filter)(const Elf_Sym *, const Elf_Sym *, void *),
-+			       void *filter_data)
- {
- 	const struct syminfo *table = elf->symsearch->table;
- 	unsigned int table_size = elf->symsearch->table_size;
-@@ -178,22 +174,78 @@ Elf_Sym *symsearch_find_nearest(struct elf_info *elf, Elf_Addr addr,
- 	 * entry in the array which comes before target, including the
- 	 * case where it perfectly matches the section and the address.
- 	 *
--	 * Note -- if the address we're looking up falls perfectly
--	 * in the middle of two symbols, this is written to always
--	 * prefer the symbol with the lower address.
-+	 * If there are multiple candidates, the filter() callback can be used
-+	 * to break a tie. filter() is provided with the current symbol and the
-+	 * best one so far. If it returns true, the current one is selected.
-+	 * Only a few iterations are expected, hence the linear search is fine.
- 	 */
--	Elf_Sym *result = NULL;
-+	Elf_Addr distance;
-+	Elf_Sym *best = NULL;
-+	Elf_Sym *sym;
-+	int i;
- 
--	if (allow_negative && hi < table_size &&
--	    table[hi].section_index == secndx &&
--	    table[hi].addr - addr <= min_distance) {
--		min_distance = table[hi].addr - addr;
--		result = &elf->symtab_start[table[hi].symbol_index];
-+	/* Search to the left. */
-+	for (i = hi - 1; i >= 0; i--) {
-+		if (table[i].section_index != secndx)
-+			break;
 +
-+		distance = addr - table[i].addr;
-+		if (distance > min_distance)
-+			break;
++struct name_filter_data {
++	struct elf_info *elf;
++	const char *name;
++};
 +
-+		sym = &elf->symtab_start[table[i].symbol_index];
-+		if (filter(sym, best, filter_data)) {
-+			min_distance = distance;
-+			best = sym;
-+		}
- 	}
--	if (hi > 0 &&
--	    table[hi - 1].section_index == secndx &&
--	    addr - table[hi - 1].addr <= min_distance) {
--		result = &elf->symtab_start[table[hi - 1].symbol_index];
-+
-+	if (!allow_negative)
-+		return best;
-+
-+	/* Search to the right if allow_negative is true. */
-+	for (i = hi; i < table_size; i++) {
-+		if (table[i].section_index != secndx)
-+			break;
-+
-+		distance = table[i].addr - addr;
-+		if (distance > min_distance)
-+			break;
-+
-+		sym = &elf->symtab_start[table[i].symbol_index];
-+		if (filter(sym, best, filter_data)) {
-+			min_distance = distance;
-+			best = sym;
-+		}
- 	}
--	return result;
-+
-+	return best;
-+}
-+
-+/* Return true if sym1 is preferred over sym2. */
-+static bool symsearch_nearest_filter(const Elf_Sym *sym1, const Elf_Sym *sym2,
-+				     void *data)
++static bool symsearch_name_filter(const Elf_Sym *sym1, const Elf_Sym *sym2,
++				  void *_data)
 +{
++	struct name_filter_data *data = _data;
++	const char *name;
++
++	/* Check the symbol name. */
++	name = sym_name(data->elf, sym1);
++	if (strcmp(name, data->name))
++		return false;
++
 +	/* If sym2 is NULL, this is the first occurrence, always take it. */
-+	if (sym2 == NULL)
++	if (!sym2)
 +		return true;
 +
 +	/* Prefer lower address. */
@@ -197,20 +109,24 @@ index 97566aee0979..4549c5b0bb81 100644
 +}
 +
 +/*
-+ * Find the syminfo which is in secndx and "nearest" to addr.
++ * Find the symbol which is in secndx and has the given name, and is located
++ * close enough to the given address.
 + * allow_negative: allow returning a symbol whose address is > addr.
 + * min_distance: ignore symbols which are further away than this.
++ * name: the name of the symbol to search for.
 + *
 + * Returns a pointer into the symbol table for success.
 + * Returns NULL if no legal symbol is found within the requested range.
 + */
-+Elf_Sym *symsearch_find_nearest(struct elf_info *elf, Elf_Addr addr,
-+				unsigned int secndx, bool allow_negative,
-+				Elf_Addr min_distance)
++Elf_Sym *symsearch_find_with_name(struct elf_info *elf, Elf_Addr addr,
++				  unsigned int secndx, bool allow_negative,
++				  Elf_Addr min_distance, const char *name)
 +{
++	struct name_filter_data data = { .elf = elf, .name = name };
++
 +	return symsearch_find(elf, addr, secndx, allow_negative, min_distance,
-+			      symsearch_nearest_filter, NULL);
- }
++			      symsearch_name_filter, &data);
++}
 -- 
 2.40.1
 
