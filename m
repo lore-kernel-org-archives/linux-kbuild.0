@@ -2,116 +2,129 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72FA9C4332F
-	for <linux-kbuild@archiver.kernel.org>; Sat,  4 Nov 2023 21:16:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27733C4332F
+	for <linux-kbuild@archiver.kernel.org>; Sat,  4 Nov 2023 22:27:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230212AbjKDVQC (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 4 Nov 2023 17:16:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52408 "EHLO
+        id S229749AbjKDW1k (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 4 Nov 2023 18:27:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230174AbjKDVQA (ORCPT
+        with ESMTP id S229577AbjKDW1j (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 4 Nov 2023 17:16:00 -0400
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5EA3EB
-        for <linux-kbuild@vger.kernel.org>; Sat,  4 Nov 2023 14:15:57 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1qzNza-0007wl-IE; Sat, 04 Nov 2023 22:15:42 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1qzNzX-006e14-Sw; Sat, 04 Nov 2023 22:15:39 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1qzNzX-00D1an-Jv; Sat, 04 Nov 2023 22:15:39 +0100
-From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-To:     Sebastian Reichel <sre@kernel.org>
-Cc:     Nicolas Ferre <nicolas.ferre@microchip.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-        linux-pm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kernel@pengutronix.de, linux-kbuild@vger.kernel.org
-Subject: [PATCH 01/14] power: reset: at91-poweroff: Stop using module_platform_driver_probe()
-Date:   Sat,  4 Nov 2023 22:15:03 +0100
-Message-ID: <20231104211501.3676352-17-u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231104211501.3676352-16-u.kleine-koenig@pengutronix.de>
-References: <20231104211501.3676352-16-u.kleine-koenig@pengutronix.de>
+        Sat, 4 Nov 2023 18:27:39 -0400
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E93BD6A
+        for <linux-kbuild@vger.kernel.org>; Sat,  4 Nov 2023 15:27:36 -0700 (PDT)
+Received: by mail-wr1-x42b.google.com with SMTP id ffacd0b85a97d-32fb95dfe99so1064273f8f.2
+        for <linux-kbuild@vger.kernel.org>; Sat, 04 Nov 2023 15:27:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=smile-fr.20230601.gappssmtp.com; s=20230601; t=1699136854; x=1699741654; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=I8s2yoRUeKgroJRQQN5i4eD7t3aini7S28e/D8lZRFg=;
+        b=kNTWNr0Pl+bOZwgBsxm+9ho9fF8l+scaSrbtFziosIhLgnsNJsNyKIbCX6Ws4WXjRm
+         EjZNGcEsYbrwPeB7CmDjoxPAfKC9LOU3dEohA51SMjXNTJlkV4V9sin2GIY2z+ku3pER
+         NqfcujjVH+UI2+vG45hBDL4pVZuWDVhmojKlRGXF+jmcanLC4T4loyM6QRd/7g1oJ+tn
+         unYHP3QfX4oo9mVvqqSuaR1M+U9q2zwAFd7hLou72Qwc6VWmQGYZZ2yao/gyMh7G3L9R
+         w4NZkAvACE5o74YnOKyL7j0Yv44DkuVPrniW0vlZD+faX9dzJIF5uoOmsVcmhph5PhL8
+         rt+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699136854; x=1699741654;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=I8s2yoRUeKgroJRQQN5i4eD7t3aini7S28e/D8lZRFg=;
+        b=kbXZOA41eaKS+ICLyITw+Bb9sPLOtBe5vyysdcKXbo68xANTgNXskKr53/CG0s5sfm
+         7lsbO7ncdPNmT2GYUorqWErwjvdSxuuS84vi1ncoTiodAQPdwvRzotQ3zw1BoYZN5tsN
+         zZzQQIW8kTgGd87J/j908ucdCoNZiP/3GYAkttvyqwQHKXBnAC5URU+aQWIux2bTWY9a
+         ANSGIpTG5ks0JSKCkokHbNhyIL6CcfeX5XtDLOviqspYKJq/lWQlAMlNEMB8z1VQ6IvX
+         ELH0s4/KWyIx0R+CJGW8rm2X+XJC43M/inWT1R7s8E6Sc3Fh5RzbuRKNpa7dsWPpz/AV
+         fhTA==
+X-Gm-Message-State: AOJu0YzW1pt7eyjiAMozixz/YkAvWljtslG6dDqFLwvVdNO7hyKcNC1F
+        5YBMcWyZtUvcHY94OJRmpHf6Fw==
+X-Google-Smtp-Source: AGHT+IGs9hk9yWFiEyPpATtAnF8XYLh+dsKh5fiy0L0GIoiXsPwCpxqwvdwXknjJLgaAoPSnYBo2Mw==
+X-Received: by 2002:a05:6000:2c2:b0:32f:8581:4f8a with SMTP id o2-20020a05600002c200b0032f85814f8amr16908549wry.11.1699136854379;
+        Sat, 04 Nov 2023 15:27:34 -0700 (PDT)
+Received: from P-ASN-ECS-830T8C3.numericable.fr ([89.159.1.53])
+        by smtp.gmail.com with ESMTPSA id f4-20020a5d6644000000b0032da49e18fasm5384724wrw.23.2023.11.04.15.27.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 04 Nov 2023 15:27:34 -0700 (PDT)
+From:   Yoann Congal <yoann.congal@smile.fr>
+To:     Masahiro Yamada <masahiroy@kernel.org>,
+        linux-kbuild@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>,
+        Yoann Congal <yoann.congal@smile.fr>,
+        Brandon Maier <brandon.maier@collins.com>
+Subject: [PATCH v5] kconfig: avoid an infinite loop in oldconfig/syncconfig
+Date:   Sat,  4 Nov 2023 23:27:15 +0100
+Message-Id: <20231104222715.3967791-1-yoann.congal@smile.fr>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2430; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=A3GAxdaP9FxnJQ7rdo3LThGc0DGMFeHVPc7hJP55U5Q=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlRrRX2ekh/1qZTC0n2BRRtCK1zpqrxzqdE79Ty O7zSdte1x6JATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZUa0VwAKCRCPgPtYfRL+ TgohB/4ptjt30U5tviUVA9ykdAEiJCC/n+XKyhbI7DvZEqsdM1jiamjhnDbT5HChOF8pkXwThU/ LEFqkDWFI8QcI+dHXz2h8r5s9zHgibuCOappD3TfOTPh6XxTy1rDnqj8kAfy2T0uGRhU89kx0P6 LQL326NRBs3JDvMH9Xl1+jxKexLfzxhj1pAQrDWp7Gy+cNY+kYDma8l5l9Cv1hSmpMH3lQCD0hY pQWiNZylQGRlflUVP2QQoe9qll1RHeIdW9ueCP+3DzQ6B84rPz9GCGbhtu1ncrKJ1CFZb53XPn9 nUxYMBEtDZ9gq9qcdgq3yulGma+tSRJQS6GPi1tjEFTlMO3B
-X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-kbuild@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On today's platforms the benefit of platform_driver_probe() isn't that
-relevant any more. It allows to drop some code after booting (or module
-loading) for .probe() and discard the .remove() function completely if
-the driver is built-in. This typically saves a few 100k.
+Exit on error when asking for value and reading stdin returns an error
+(mainly if it has reached EOF or is closed).
 
-The downside of platform_driver_probe() is that the driver cannot be
-bound and unbound at runtime which is ancient and so slightly
-complicates testing. There are also thoughts to deprecate
-platform_driver_probe() because it adds some complexity in the driver
-core for little gain. Also many drivers don't use it correctly. This
-driver for example misses to mark the driver struct with __ref which is
-needed to suppress a (W=1) modpost warning.
+This infinite loop happens in particular for hex/int configs without an
+explicit default value.
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+Previously, this case would loop:
+* oldconfig prompts for the value but stdin has reached EOF
+* It gets the global default value : an empty string
+* This is not a valid hex/int value so it prompts again, hence the
+  infinite loop.
+
+This case happens with a configuration like this (a hex config without a
+valid default value):
+  config TEST_KCONFIG
+       hex "Test KConfig"
+       # default 0x0
+
+And using:
+  make oldconfig < /dev/null
+
+This was discovered when working on Yocto bug[0] on a downstream
+kconfig user (U-boot)
+
+[0]: https://bugzilla.yoctoproject.org/show_bug.cgi?id=14136
+
+CC: Brandon Maier <brandon.maier@collins.com>
+Signed-off-by: Yoann Congal <yoann.congal@smile.fr>
 ---
- drivers/power/reset/at91-poweroff.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+v4->v5:
+ * Switched to Masahiro Yamada's suggested code.
+v3->v4:
+ * Added Brandon Maier's "Tested-by". Thanks!
+v2->v3:
+ * Simplify the patch by fusing comments of :
+   * Masahiro Yamada : Exit as soon as reading stdin hits an error
+   * Randy Dunlap : Display the name of the currently read symbol
+v1->v2:
+ * Improve coding style
+ * Put more info in the commit message
+---
+ scripts/kconfig/conf.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/power/reset/at91-poweroff.c b/drivers/power/reset/at91-poweroff.c
-index dd5399785b69..83567428ab43 100644
---- a/drivers/power/reset/at91-poweroff.c
-+++ b/drivers/power/reset/at91-poweroff.c
-@@ -149,7 +149,7 @@ static void at91_poweroff_dt_set_wakeup_mode(struct platform_device *pdev)
- 	writel(wakeup_mode | mode, at91_shdwc.shdwc_base + AT91_SHDW_MR);
- }
- 
--static int __init at91_poweroff_probe(struct platform_device *pdev)
-+static int at91_poweroff_probe(struct platform_device *pdev)
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index 33d19e419908..62de1fbaff97 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -76,8 +76,10 @@ static void strip(char *str)
+ /* Helper function to facilitate fgets() by Jean Sacren. */
+ static void xfgets(char *str, int size, FILE *in)
  {
- 	struct device_node *np;
- 	u32 ddr_type;
-@@ -202,7 +202,7 @@ static int __init at91_poweroff_probe(struct platform_device *pdev)
- 	return ret;
- }
+-	if (!fgets(str, size, in))
++	if (!fgets(str, size, in)) {
+ 		fprintf(stderr, "\nError in reading or end of file.\n");
++		exit(1);
++	}
  
--static int __exit at91_poweroff_remove(struct platform_device *pdev)
-+static int at91_poweroff_remove(struct platform_device *pdev)
- {
- 	if (pm_power_off == at91_poweroff)
- 		pm_power_off = NULL;
-@@ -224,13 +224,14 @@ static const struct of_device_id at91_poweroff_of_match[] = {
- MODULE_DEVICE_TABLE(of, at91_poweroff_of_match);
- 
- static struct platform_driver at91_poweroff_driver = {
--	.remove = __exit_p(at91_poweroff_remove),
-+	.probe = at91_poweroff_probe,
-+	.remove = at91_poweroff_remove,
- 	.driver = {
- 		.name = "at91-poweroff",
- 		.of_match_table = at91_poweroff_of_match,
- 	},
- };
--module_platform_driver_probe(at91_poweroff_driver, at91_poweroff_probe);
-+module_platform_driver(at91_poweroff_driver);
- 
- MODULE_AUTHOR("Atmel Corporation");
- MODULE_DESCRIPTION("Shutdown driver for Atmel SoCs");
+ 	if (!tty_stdio)
+ 		printf("%s", str);
 -- 
-2.42.0
+2.30.2
 
