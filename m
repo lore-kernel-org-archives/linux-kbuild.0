@@ -2,55 +2,49 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 105E9C4167D
-	for <linux-kbuild@archiver.kernel.org>; Sat,  4 Nov 2023 21:15:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BA14C001B0
+	for <linux-kbuild@archiver.kernel.org>; Sat,  4 Nov 2023 21:16:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229578AbjKDVPv (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 4 Nov 2023 17:15:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40004 "EHLO
+        id S230299AbjKDVQB (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 4 Nov 2023 17:16:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230085AbjKDVPu (ORCPT
+        with ESMTP id S230273AbjKDVQA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 4 Nov 2023 17:15:50 -0400
+        Sat, 4 Nov 2023 17:16:00 -0400
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 390E6B0
-        for <linux-kbuild@vger.kernel.org>; Sat,  4 Nov 2023 14:15:48 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BED8D6F
+        for <linux-kbuild@vger.kernel.org>; Sat,  4 Nov 2023 14:15:56 -0700 (PDT)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
         by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <ukl@pengutronix.de>)
-        id 1qzNza-0007wk-IH; Sat, 04 Nov 2023 22:15:42 +0100
+        id 1qzNza-0007wn-IF; Sat, 04 Nov 2023 22:15:42 +0100
 Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
         by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <ukl@pengutronix.de>)
-        id 1qzNzX-006e11-N8; Sat, 04 Nov 2023 22:15:39 +0100
+        id 1qzNzY-006e1A-BU; Sat, 04 Nov 2023 22:15:40 +0100
 Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
         (envelope-from <ukl@pengutronix.de>)
-        id 1qzNzX-00D1ak-Dc; Sat, 04 Nov 2023 22:15:39 +0100
+        id 1qzNzY-00D1av-2F; Sat, 04 Nov 2023 22:15:40 +0100
 From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
         <u.kleine-koenig@pengutronix.de>
 To:     Sebastian Reichel <sre@kernel.org>
-Cc:     Nicolas Ferre <nicolas.ferre@microchip.com>,
+Cc:     Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
         Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Claudiu Beznea <claudiu.beznea@tuxon.dev>,
         linux-pm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kernel@pengutronix.de, linux-kbuild@vger.kernel.org,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Cristian Ciocaltea <cristian.ciocaltea@gmail.com>,
-        linux-actions@lists.infradead.org,
-        Sean Wang <sean.wang@mediatek.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        AngeloGioacchino Del Regno 
-        <angelogioacchino.delregno@collabora.com>,
-        linux-mediatek@lists.infradead.org
-Subject: [PATCH 00/14] power: reset: Drop platform_driver_probe() and convert to platform remove callback returning void
-Date:   Sat,  4 Nov 2023 22:15:02 +0100
-Message-ID: <20231104211501.3676352-16-u.kleine-koenig@pengutronix.de>
+        kernel@pengutronix.de, linux-kbuild@vger.kernel.org
+Subject: [PATCH 03/14] power: reset: at91-sama5d2_shdwc: Stop using module_platform_driver_probe()
+Date:   Sat,  4 Nov 2023 22:15:05 +0100
+Message-ID: <20231104211501.3676352-19-u.kleine-koenig@pengutronix.de>
 X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20231104211501.3676352-16-u.kleine-koenig@pengutronix.de>
+References: <20231104211501.3676352-16-u.kleine-koenig@pengutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3239; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=ASJpJ0PbRdt9ZtFZlOFmy3zBFQUV+f7OBE5g1UcY3qM=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlRrRW2nlD3Bq26a3P3sYG5qAEG5GwUfm6B9YOc 7QqQI7xub+JATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZUa0VgAKCRCPgPtYfRL+ Ts6VB/9MYH4OE9JZxwtQ11ZFXv37CHQWuj2H7yDF2BNpbvz84sSUIBsB2cZ/P7qmXPmDGGnN9YH R/at02fE+3cIvpTPFySkqRu+sErOGGxzGIlcb+TY3IMtSpAfGsw19fH6vdOUiwweAAvFp6haRF6 ftt1EHSNdOTPHV3DMCX7XsfCW9JAuhaaDbXEoJwMB6JjqA4o/DJrEI+JANq5W/hKFvSY1C0Z0AT Q/XMroNdUYtHirVUJ7JqurjHCeYLVWXlHLSuEtyLMq6g+zpQOWbPuUdBP/iRLJx8dDd4b/IRuEa 5YUGw7TsAGg7bR/dIxQ3GGTak4rbbahwjrJV9xcC40W0gL7Q
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2338; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=CzfLFzFhdKZJS53HV7olnleoDV2ECmztZSZ0hXx6qvU=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlRrRZvSUmVm+Ux2DDRAvxRKgCWmH6x9Tx/AWBs S3Mcf5rWu6JATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZUa0WQAKCRCPgPtYfRL+ Tld8CACz7r9Zk4EtBHkBDdUVbuoeGgQPmN5+wiA8GgVpHuG7h7S5CNtvi59p2VYTke10Ooq0I3C mf4ZDqQ5I7hm4Htbb7EMc8AtBPljMUsPG/JTKAaxtqkPvt0pIzRpyPGzluwNStGHG4UOzv4puLq o1AzzH6ryb4UyP4qXcbKmdFGrZgnIulWB6F3ZK6vvUdMJjIiCK6Iaf7cw1SEtJLthS0Sqke39+/ SJAZZuMnLz/w+/93LjfPVhYUv+sXK9Vu6XqaPCR5nN3UDJTTjxGy9D9WXqC7rk6olJry5SjGzo6 FLXYgDeBqndSVhrWg7wEVZPcWyj7x2kdAn4glugVboSEkxXk
 X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
@@ -61,75 +55,63 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hello,
+On today's platforms the benefit of platform_driver_probe() isn't that
+relevant any more. It allows to drop some code after booting (or module
+loading) for .probe() and discard the .remove() function completely if
+the driver is built-in. This typically saves a few 100k.
 
-there are two different types of patches here that would justify to
-different series. But as the patches are not independant I chose to put
-them in a single series.
+The downside of platform_driver_probe() is that the driver cannot be
+bound and unbound at runtime which is ancient and so slightly
+complicates testing. There are also thoughts to deprecate
+platform_driver_probe() because it adds some complexity in the driver
+core for little gain. Also many drivers don't use it correctly. This
+driver for example misses to mark the driver struct with __ref which is
+needed to suppress a (W=1) modpost warning.
 
-The first three patches drop usage of platform_driver_probe(). This is a
-concept that isn't so relevant any more today. I didn't check, but it
-saves typically only a few 100k and there are thoughts to deprecate it
-to simplify the core. Getting the usage right is not trivial though the
-at91 drivers got it nearly right. The alternative to these patches is to
-add __ref to the driver struct ideally with a comment describing the
-need like is e.g. done in commit 5b44abbc39ca ("platform/x86: hp-wmi::
-Mark driver struct with __refdata to prevent section mismatch warning").
+Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+---
+ drivers/power/reset/at91-sama5d2_shdwc.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-The remaining patches convert the platform drivers to .remove_new(), see
-commit 5c5a7680e67b ("platform: Provide a remove callback that returns
-no value") for an extended explanation and the eventual goal. All
-conversions but one are trivial as the remove functions return zero
-unconditionally. The only exception is the tps65086-restart driver.
-
-Best regards
-Uwe
-
-Uwe Kleine-König (14):
-  power: reset: at91-poweroff: Stop using module_platform_driver_probe()
-  power: reset: at91-reset:: Stop using module_platform_driver_probe()
-  power: reset: at91-sama5d2_shdwc: Stop using
-    module_platform_driver_probe()
-  power: reset: as3722-poweroff: Convert to platform remove callback
-    returning void
-  power: reset: at91-poweroff: Convert to platform remove callback
-    returning void
-  power: reset: atc260x-poweroff: Convert to platform remove callback
-    returning void
-  power: reset: ltc2952-poweroff: Convert to platform remove callback
-    returning void
-  power: reset: mt6323-poweroff: Convert to platform remove callback
-    returning void
-  power: reset: qnap-poweroff: Convert to platform remove callback
-    returning void
-  power: reset: regulator-poweroff: Convert to platform remove callback
-    returning void
-  power: reset: restart-poweroff: Convert to platform remove callback
-    returning void
-  power: reset: rmobile-reset: Convert to platform remove callback
-    returning void
-  power: reset: syscon-poweroff: Convert to platform remove callback
-    returning void
-  power: reset: tps65086-restart: Convert to platform remove callback
-    returning void
-
- drivers/power/reset/as3722-poweroff.c    |  6 ++----
- drivers/power/reset/at91-poweroff.c      | 11 +++++------
- drivers/power/reset/at91-reset.c         |  9 +++++----
- drivers/power/reset/at91-sama5d2_shdwc.c |  9 +++++----
- drivers/power/reset/atc260x-poweroff.c   |  6 ++----
- drivers/power/reset/ltc2952-poweroff.c   |  5 ++---
- drivers/power/reset/mt6323-poweroff.c    |  6 ++----
- drivers/power/reset/qnap-poweroff.c      |  5 ++---
- drivers/power/reset/regulator-poweroff.c |  6 ++----
- drivers/power/reset/restart-poweroff.c   |  6 ++----
- drivers/power/reset/rmobile-reset.c      |  5 ++---
- drivers/power/reset/syscon-poweroff.c    |  6 ++----
- drivers/power/reset/tps65086-restart.c   | 12 +++++++-----
- 13 files changed, 40 insertions(+), 52 deletions(-)
-
-
-base-commit: e27090b1413ff236ca1aec26d6b022149115de2c
+diff --git a/drivers/power/reset/at91-sama5d2_shdwc.c b/drivers/power/reset/at91-sama5d2_shdwc.c
+index e76b102b57b1..ef8add623363 100644
+--- a/drivers/power/reset/at91-sama5d2_shdwc.c
++++ b/drivers/power/reset/at91-sama5d2_shdwc.c
+@@ -329,7 +329,7 @@ static const struct of_device_id at91_pmc_ids[] = {
+ 	{ /* Sentinel. */ }
+ };
+ 
+-static int __init at91_shdwc_probe(struct platform_device *pdev)
++static int at91_shdwc_probe(struct platform_device *pdev)
+ {
+ 	const struct of_device_id *match;
+ 	struct device_node *np;
+@@ -421,7 +421,7 @@ static int __init at91_shdwc_probe(struct platform_device *pdev)
+ 	return ret;
+ }
+ 
+-static int __exit at91_shdwc_remove(struct platform_device *pdev)
++static int at91_shdwc_remove(struct platform_device *pdev)
+ {
+ 	struct shdwc *shdw = platform_get_drvdata(pdev);
+ 
+@@ -442,13 +442,14 @@ static int __exit at91_shdwc_remove(struct platform_device *pdev)
+ }
+ 
+ static struct platform_driver at91_shdwc_driver = {
+-	.remove = __exit_p(at91_shdwc_remove),
++	.probe = at91_shdwc_probe,
++	.remove = at91_shdwc_remove,
+ 	.driver = {
+ 		.name = "at91-shdwc",
+ 		.of_match_table = at91_shdwc_of_match,
+ 	},
+ };
+-module_platform_driver_probe(at91_shdwc_driver, at91_shdwc_probe);
++module_platform_driver(at91_shdwc_driver);
+ 
+ MODULE_AUTHOR("Nicolas Ferre <nicolas.ferre@atmel.com>");
+ MODULE_DESCRIPTION("Atmel shutdown controller driver");
 -- 
 2.42.0
 
