@@ -2,100 +2,85 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2257AC4332F
-	for <linux-kbuild@archiver.kernel.org>; Sun,  5 Nov 2023 18:11:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F35FBC4332F
+	for <linux-kbuild@archiver.kernel.org>; Sun,  5 Nov 2023 21:55:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229475AbjKESLB (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 5 Nov 2023 13:11:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55642 "EHLO
+        id S229451AbjKEVz1 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 5 Nov 2023 16:55:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229489AbjKESLA (ORCPT
+        with ESMTP id S229447AbjKEVz0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 5 Nov 2023 13:11:00 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEA28DD;
-        Sun,  5 Nov 2023 10:10:57 -0800 (PST)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E944DC433C7;
-        Sun,  5 Nov 2023 18:10:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1699207857;
-        bh=mpoFT+sF50Go2QZkoZaiy6iHqvzaLfmudnHNvkJjZ0M=;
-        h=From:To:Cc:Subject:Date:From;
-        b=FF199295T+QngVfe3dCykm2QL3pOi50DD0yTbipcqRTQQMIzaCQERTqwE4jQ3C+cz
-         vgVvm+MNjjXl4RgT2BTIXmECuI28soPzolp4Gj0GyV5njaVRNJvgH76ayat6spDTFe
-         vZMqZEglfRJmpQv7PMZX6HAWAJK70OLWjrPWjt29hPkRzsjnOsfbcxlPXoY6cPgEdN
-         eyZO+V9/rDXq8f2BpfNA0pIdDub7uNrd0UKReIpIf0UPb7zcrt6Y2YNYNTdeaZCIj6
-         zimS/UksCQiryMrjBQrpuJMZGq7DWVTxUxk3/J31LTpoG9fekkiA6aL+zD7bxhJlDr
-         UzP0PfNHsTp5Q==
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH] kconfig: do not clear SYMBOL_DEF_USER when the value is out of range
-Date:   Mon,  6 Nov 2023 03:10:47 +0900
-Message-Id: <20231105181047.159441-1-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.40.1
+        Sun, 5 Nov 2023 16:55:26 -0500
+Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BC5EBF;
+        Sun,  5 Nov 2023 13:55:24 -0800 (PST)
+Received: by mail-ot1-x334.google.com with SMTP id 46e09a7af769-6d3505e1426so38811a34.1;
+        Sun, 05 Nov 2023 13:55:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699221323; x=1699826123; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+PnCQo2jJdNP1v8hfPEAzBImF3kZOSlGPf3wKLl8H+0=;
+        b=HuUWWkJFBxiPnBqGw1xwfMOxgx4PG2io8jzawZOEo9DKiRSWBePVu658LBhiSGvJeG
+         uonwwSt0cQEpBZP/opbZI78xt1JPtzNLwCfGuZyK7Lt6FAKsFU4QaB8wNdVlxjN/ldFL
+         QCdB524JJIuw3vLM0LPQaUJj4fJaE+tjM7AcM3JZkC31w3aobBr3WJy/otIEEYMfWWG8
+         ChwtB/T1JaciNSdvd1uXvV2XlwMmVWmTCEssjlg+/h49hCXcGJCHez3fOHhKi2O6U+rA
+         8egSFoxWF2wP6qwP6gJ++nV3flelIVk7zh1vA/RYayQUpMHXGz2zcOT7S1yAhgaRnMVp
+         15iw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699221323; x=1699826123;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+PnCQo2jJdNP1v8hfPEAzBImF3kZOSlGPf3wKLl8H+0=;
+        b=ipjPh8lmnejACNZGObbZaLjG47a41ErTRDcCrrJVokxPREnq0Cc6HwcFiNmeMQGntv
+         YFi1xCRA+5AxmqesGUzR9cOuwABqEFqTB11IPU68/b7De5kY9d7iXHyjAhl+oyQj8Nc/
+         iZFGl4GlA3SeBlQ7+4Rc6k+WrFevEjysFCe7VD3dcICNh9hlQDb9FI2ZsOifSRqEQC79
+         zsMnBRUwDqUUsVPScrzvavgaCy/pxf/VK/HmMdQo7QexuvU++PiE36kariCqsoJfuiPx
+         Fp1B+wmcG6+ef0AhAbpMq+UfA1tVw3ShV0WnfH0U6ggSXWyOOS5wJkjk9RE9KwEJRtcR
+         /2MA==
+X-Gm-Message-State: AOJu0Yw79Q+ZD1+mlyrIzMqTCxg67Xcv1TU/xphykPUCtEy3375yCRJ6
+        NEbTucIGKRcg44YrcdoaAbLKxbP7//BNQWJ4p/0=
+X-Google-Smtp-Source: AGHT+IELii7XHSOhU2UCOzpOqaZbLhEI7ngf5iK2a8rNGdkzJrcVq2e/xKePZlsDxNHZXk9QOSVPQGn7Nvvso0t5Qss=
+X-Received: by 2002:a05:6830:390a:b0:6c0:c1ba:8f78 with SMTP id
+ br10-20020a056830390a00b006c0c1ba8f78mr31652540otb.0.1699221323646; Sun, 05
+ Nov 2023 13:55:23 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20231103234247.4505-1-dmitrii.bundin.a@gmail.com> <CAK7LNAQE=ankopXh_6q=Rw+JA+MVus5jjyuS3YBoJVz4YPDB1A@mail.gmail.com>
+In-Reply-To: <CAK7LNAQE=ankopXh_6q=Rw+JA+MVus5jjyuS3YBoJVz4YPDB1A@mail.gmail.com>
+From:   Dmitrii Bundin <dmitrii.bundin.a@gmail.com>
+Date:   Mon, 6 Nov 2023 00:55:12 +0300
+Message-ID: <CANXV_XxGCCrqeN-Yu0H4AiJwV=Ve0dF7VnJz8CWoDywU31qPCA@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: deb-pkg: apply short --rules-file option
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     linux-kbuild@vger.kernel.org, nathan@kernel.org,
+        ndesaulniers@google.com, nicolas@fjasle.eu,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-When a user-supplied value is out of range, (NEW) and an incorrect default
-value are shown.
+On Sun, Nov 5, 2023 at 11:08=E2=80=AFAM Masahiro Yamada <masahiroy@kernel.o=
+rg> wrote:
+>
+>
+> I do not think it is a big deal because the version 1.18.8
+> was released in 2016.
+>
+> Best Regards
+> Masahiro Yamada
 
-[Test Kconfig]
-
-  config FOO
-          int "foo"
-          range 10 20
-
-[Test .config]
-
-  CONFIG_FOO=30
-
-[Result without this fix]
-
-  $ make config
-  *
-  * Main menu
-  *
-  foo (FOO) [10] (NEW)
-
-[Result with this fix]
-
-  $ make config
-  *
-  * Main menu
-  *
-  foo (FOO) [20]
-
-Currently, the SYMBOL_DEF_USER is cleared if the user input does not
-reside within the range. Kconfig forgets the initial value 30, and
-prints (NEW) and an incorrect default [10].
-
-Kconfig should remember the user's input. The default should be [20]
-because the user's input, 30, is closer to the upper limit of the range.
-
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
-
- scripts/kconfig/confdata.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index 4a6811d77d18..7fca9cc3ae74 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -594,7 +594,7 @@ int conf_read(const char *name)
- 				/* Reset a string value if it's out of range */
- 				if (sym_string_within_range(sym, sym->def[S_DEF_USER].val))
- 					break;
--				sym->flags &= ~(SYMBOL_VALID|SYMBOL_DEF_USER);
-+				sym->flags &= ~SYMBOL_VALID;
- 				conf_unsaved++;
- 				break;
- 			default:
--- 
-2.40.1
-
+Even in spite of being documented that way the long option
+--rules-file was fixed to behave the way it currently does in the
+commit 5cd52673aabdf5eaa58181972119a41041fc85f2 of dpkg dated dated
+23.07.18 and become available starting 1.19.1. That might cause build
+failures for some versions newer than 1.18.8. I faced
+dpkg-buildpackage: error: unknown option or argument --rules-file when
+building the Kernel using Debian dpkg-buildpackage version 1.19.0.5
+having no errors for --jobs. To avoid such inconsistencies I think it
+might be useful to apply short options that are guaranteed to be
+available starting 1.14.7.
