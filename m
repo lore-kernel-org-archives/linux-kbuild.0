@@ -2,44 +2,46 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDA69C4167B
-	for <linux-kbuild@archiver.kernel.org>; Sun,  5 Nov 2023 15:01:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1BF3C4708E
+	for <linux-kbuild@archiver.kernel.org>; Sun,  5 Nov 2023 15:01:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230419AbjKEPBO (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 5 Nov 2023 10:01:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38598 "EHLO
+        id S230338AbjKEPBP (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 5 Nov 2023 10:01:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230325AbjKEPBD (ORCPT
+        with ESMTP id S230289AbjKEPBE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 5 Nov 2023 10:01:03 -0500
+        Sun, 5 Nov 2023 10:01:04 -0500
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F6DAE0
-        for <linux-kbuild@vger.kernel.org>; Sun,  5 Nov 2023 07:01:01 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 846CECC
+        for <linux-kbuild@vger.kernel.org>; Sun,  5 Nov 2023 07:01:02 -0800 (PST)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
         by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <ukl@pengutronix.de>)
-        id 1qzecR-0002zF-7V; Sun, 05 Nov 2023 16:00:55 +0100
+        id 1qzecR-0002zQ-9D; Sun, 05 Nov 2023 16:00:55 +0100
 Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
         by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <ukl@pengutronix.de>)
-        id 1qzecQ-006oU3-Am; Sun, 05 Nov 2023 16:00:54 +0100
+        id 1qzecQ-006oU9-Si; Sun, 05 Nov 2023 16:00:54 +0100
 Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
         (envelope-from <ukl@pengutronix.de>)
-        id 1qzecQ-00DBt0-1a; Sun, 05 Nov 2023 16:00:54 +0100
+        id 1qzecQ-00DBt7-HJ; Sun, 05 Nov 2023 16:00:54 +0100
 From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
         <u.kleine-koenig@pengutronix.de>
 To:     Damien Le Moal <dlemoal@kernel.org>
 Cc:     Sergey Shtylyov <s.shtylyov@omp.ru>, linux-ide@vger.kernel.org,
         kernel@pengutronix.de, linux-kbuild@vger.kernel.org
-Subject: [PATCH 0/4] ata: Drop platform_driver_probe() and convert to platform remove callback returning void (part II)
-Date:   Sun,  5 Nov 2023 16:00:35 +0100
-Message-ID: <20231105150037.3724669-6-u.kleine-koenig@pengutronix.de>
+Subject: [PATCH 2/4] ata: pata_gayle: Stop using module_platform_driver_probe()
+Date:   Sun,  5 Nov 2023 16:00:37 +0100
+Message-ID: <20231105150037.3724669-8-u.kleine-koenig@pengutronix.de>
 X-Mailer: git-send-email 2.42.0.482.g2e8e77cbac8a.dirty
+In-Reply-To: <20231105150037.3724669-6-u.kleine-koenig@pengutronix.de>
+References: <20231105150037.3724669-6-u.kleine-koenig@pengutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1896; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=zQwS8Il+WgtfBqkO69r1zQOhOBlGGdfD3HH7HJrmADc=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlR64VeSiUDnZzDgKQRHabjxLzSqL9HyGnyr2AB NpP/+Jqwp6JATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZUeuFQAKCRCPgPtYfRL+ TlA2B/4/9VMQvRNJN/yOZODybuHUfIiaVLoQu44ePCFv9bfdwm5S23DLJw9klopgEJHb3vOK0Mr a7sN9ABzdEnegf7HloWEVkMhJbhmmWKRchXXUGNYVLyoOj8UrQWpyiYYkYd236Rz9f7poRN7c74 c6DvrjX/y8i/kO9CgkZbEBPObQZxwkBZ/gy4PM9aLle3jzzaAH2VkhCyDJnIgSwBsqeQjmSWIVH yb3mAMqp3kF08Nw6O4MKnR1dI8et4ATut7OfgXmtxsQRcb1CVk3LbCBDNeT8VLwQyuWO8AAL2NY vXAkOlsImQyyVjEakHCkuTRUdp6AOoizuPjh2GRdVPMsOQK3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2275; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=LbK9Tg1XnSWlrNwILoe3+9o72vLYA7IUvjJ2HdrJ/cs=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlR64XEu0h8i3Tbes67W9npNlv/lwt06zlgG/K5 /ZRHdbeqEWJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZUeuFwAKCRCPgPtYfRL+ ThTSB/9g0RCxSIo6WdKyLlV9ylF4jzAFCJGslrSm8ZPYQtbR1H+WQjvAeM9YaNK3r5y3H3Oczzn z+OV9jdWRlhPZkR+wUCnEvyT1xvuGjb8FWxB2U0lvq+dsJ7xFcG0qJimU16CM+xewvO2V8s3kwh +WPMUQ5W/k5wbXT5LoRYrHqhHB03VHJpUkvOA4vl7qmsWtYvzTZi/exJ12yweSPQeFeDnTHnJ5+ UB8zUuQVH/5WIhFuolME7epMZ5vjkQrEr6cxy7lrGnTwevvyX35Exhlyym5DshlKIxr7da9xv/Q k5ph2+m6zA4gkAFmxA2I6yqDWzH/nN0tyECJE9q9FIAcH4x5
 X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
@@ -50,47 +52,63 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hello,
+On today's platforms the benefit of platform_driver_probe() isn't that
+relevant any more. It allows to drop some code after booting (or module
+loading) for .probe() and discard the .remove() function completely if
+the driver is built-in. This typically saves a few 100k.
 
-there are two different types of patches here that would justify to
-different series. But as the patches are not independent I chose to put
-them in a single series.
+The downside of platform_driver_probe() is that the driver cannot be
+bound and unbound at runtime which is ancient and so slightly
+complicates testing. There are also thoughts to deprecate
+platform_driver_probe() because it adds some complexity in the driver
+core for little gain. Also many drivers don't use it correctly. This
+driver for example misses to mark the driver struct with __ref which is
+needed to suppress a (W=1) modpost warning.
 
-The first two patches drop usage of platform_driver_probe(). This is a
-concept that isn't so relevant any more today. I didn't check, but it
-saves typically only a few 100k and there are thoughts to deprecate it
-to simplify the core. Getting the usage right is not trivial though the
-drivers here got it nearly right. The alternative to these patches is to
-add __refdata to the driver struct ideally with a comment describing the
-need like is e.g. done in commit 5b44abbc39ca ("platform/x86: hp-wmi::
-Mark driver struct with __refdata to prevent section mismatch warning").
-Note that the warning only happens starting with commit f177cd0c15fc
-("modpost: Don't let "driver"s reference .exit.*") that is expected to
-be part of v6.7-rc1.
+Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+---
+ drivers/ata/pata_gayle.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-The remaining two patches convert the platform drivers to .remove_new(),
-see commit 5c5a7680e67b ("platform: Provide a remove callback that
-returns no value") for an extended explanation and the eventual goal.
-All conversions are trivial as the remove functions return zero
-unconditionally. The other ata drivers were already converted earlier,
-my coccinelle script just missed these two drivers (because of the
-__exit_p macro).
-
-Best regards
-Uwe
-
-Uwe Kleine-König (4):
-  ata: pata_falcon: Stop using module_platform_driver_probe()
-  ata: pata_gayle: Stop using module_platform_driver_probe()
-  ata: pata_falcon: Convert to platform remove callback returning void
-  ata: pata_gayle: Convert to platform remove callback returning void
-
- drivers/ata/pata_falcon.c | 11 +++++------
- drivers/ata/pata_gayle.c  | 11 +++++------
- 2 files changed, 10 insertions(+), 12 deletions(-)
-
-
-base-commit: e27090b1413ff236ca1aec26d6b022149115de2c
+diff --git a/drivers/ata/pata_gayle.c b/drivers/ata/pata_gayle.c
+index 3bdbe2b65a2b..e10411b02047 100644
+--- a/drivers/ata/pata_gayle.c
++++ b/drivers/ata/pata_gayle.c
+@@ -124,7 +124,7 @@ static struct ata_port_operations pata_gayle_a4000_ops = {
+ 	.set_mode	= pata_gayle_set_mode,
+ };
+ 
+-static int __init pata_gayle_init_one(struct platform_device *pdev)
++static int pata_gayle_init_one(struct platform_device *pdev)
+ {
+ 	struct resource *res;
+ 	struct gayle_ide_platform_data *pdata;
+@@ -193,7 +193,7 @@ static int __init pata_gayle_init_one(struct platform_device *pdev)
+ 	return 0;
+ }
+ 
+-static int __exit pata_gayle_remove_one(struct platform_device *pdev)
++static int pata_gayle_remove_one(struct platform_device *pdev)
+ {
+ 	struct ata_host *host = platform_get_drvdata(pdev);
+ 
+@@ -203,13 +203,14 @@ static int __exit pata_gayle_remove_one(struct platform_device *pdev)
+ }
+ 
+ static struct platform_driver pata_gayle_driver = {
+-	.remove = __exit_p(pata_gayle_remove_one),
++	.probe = pata_gayle_init_one,
++	.remove = pata_gayle_remove_one,
+ 	.driver   = {
+ 		.name	= "amiga-gayle-ide",
+ 	},
+ };
+ 
+-module_platform_driver_probe(pata_gayle_driver, pata_gayle_init_one);
++module_platform_driver(pata_gayle_driver);
+ 
+ MODULE_AUTHOR("Bartlomiej Zolnierkiewicz");
+ MODULE_DESCRIPTION("low-level driver for Amiga Gayle PATA");
 -- 
 2.42.0
 
