@@ -2,105 +2,96 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1991CC4332F
-	for <linux-kbuild@archiver.kernel.org>; Mon,  6 Nov 2023 15:49:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1753C4167B
+	for <linux-kbuild@archiver.kernel.org>; Mon,  6 Nov 2023 16:01:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232213AbjKFPtV (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 6 Nov 2023 10:49:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35830 "EHLO
+        id S232128AbjKFQBs (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 6 Nov 2023 11:01:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230146AbjKFPtU (ORCPT
+        with ESMTP id S231881AbjKFQBs (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 6 Nov 2023 10:49:20 -0500
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCD9A10A
-        for <linux-kbuild@vger.kernel.org>; Mon,  6 Nov 2023 07:49:17 -0800 (PST)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1r01qD-0007h7-4a; Mon, 06 Nov 2023 16:48:41 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1r01qA-0074pI-CD; Mon, 06 Nov 2023 16:48:38 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1r01qA-00Dn7l-2k; Mon, 06 Nov 2023 16:48:38 +0100
-From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
+        Mon, 6 Nov 2023 11:01:48 -0500
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 897A0184;
+        Mon,  6 Nov 2023 08:01:45 -0800 (PST)
+Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-6b7f0170d7bso4667257b3a.2;
+        Mon, 06 Nov 2023 08:01:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699286505; x=1699891305; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9g9CJdOT5exx1UmkTNwpwNtQ67IAsvOnnzfWKi9SLsM=;
+        b=fnargay0UVx+PmHEqXtYmyLCrC5LUpeVIkDKu73RUTL7HX1tsI1WH4ZI9T8xiExAVT
+         NFighhvSChk+FGbHQ2pLPlldZBT/c/ck2VXxVe4eVYdU6uS02e5mfK4yjdcxJBpaskDM
+         ykVV6W2HexI5ywXczsCOVGEOgqiVHFyxZqBHKUaQ8oTCxZQDiSrM77y0yO/0z0xhWn66
+         0Axqi9ZWZ8hm9+vHie5LAgBqXGpqq/LGItNd6Y5d7FAqtmPMaP1ryptO4+2nOPiYzn3F
+         g7Ow7gnBT+6tV9ik5woO3BchNJE4LROkagyrccjytH7ZxCeMqGjS9Et19Bz+LUuWXDlt
+         kFuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699286505; x=1699891305;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9g9CJdOT5exx1UmkTNwpwNtQ67IAsvOnnzfWKi9SLsM=;
+        b=BTy3nA80uzfez7IDCmMVgnGpoM1V8b8fgdvKXS7KADutz3kgFH2ceIaq+MJbt89nkR
+         Mbl9OaTl8a+eOGwnpQQHEoOaWruLjibSMJUgE204pA29DJMOLEA+d0hEQUAWdgZlpHPM
+         p4qbW5Ej5xh7l7k19zymQH+3SkVNUBqGOP08sg7Goq0fP54ZVoTS28t079NlVW2hVomU
+         xtvCH6u99jyrIpXgw8+KDt4sraPIWlbqiDesNZef7/qdrkuY8vNrXc7mxKEYzj5UaFfK
+         nmNtAtMXbJ70AGLIvFmGhiz2n1NbyBgjLCBeH0WMMU3hdNPDQR19D0K7RtkVBbeiRao2
+         1kWw==
+X-Gm-Message-State: AOJu0Yx7MRFdyjkJs5UW0ADX+hbT/ldlPGlzcfboDXUq5trsY2oeLp52
+        ycpetOH7+hWc6y86jYV2jvAXI4CbYTw=
+X-Google-Smtp-Source: AGHT+IHa1Seod2+YJfMi2H1+psXXcDvr+RlCpvjPS58nxXuVmEokNTtqsAWghRmYRsMayR+a4ax40Q==
+X-Received: by 2002:a05:6a21:3d84:b0:184:1c37:c3d2 with SMTP id bj4-20020a056a213d8400b001841c37c3d2mr4552071pzc.21.1699286504876;
+        Mon, 06 Nov 2023 08:01:44 -0800 (PST)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id du8-20020a056a002b4800b0069346777241sm5951461pfb.97.2023.11.06.08.01.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Nov 2023 08:01:44 -0800 (PST)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date:   Mon, 6 Nov 2023 08:01:43 -0800
+From:   Guenter Roeck <linux@roeck-us.net>
+To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
         <u.kleine-koenig@pengutronix.de>
-To:     Wim Van Sebroeck <wim@linux-watchdog.org>,
-        Guenter Roeck <linux@roeck-us.net>
-Cc:     Nicolas Ferre <nicolas.ferre@microchip.com>,
+Cc:     Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
         Alexandre Belloni <alexandre.belloni@bootlin.com>,
         Claudiu Beznea <claudiu.beznea@tuxon.dev>,
         linux-watchdog@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, kernel@pengutronix.de,
-        Xingyu Wu <xingyu.wu@starfivetech.com>,
-        Samin Guo <samin.guo@starfivetech.com>,
         linux-kbuild@vger.kernel.org
-Subject: [PATCH 0/5] watchdog: Drop platform_driver_probe() and convert to platform remove callback returning void (part II)
-Date:   Mon,  6 Nov 2023 16:48:08 +0100
-Message-ID: <20231106154807.3866712-1-u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.42.0.586.gbc5204569f7d.dirty
+Subject: Re: [PATCH 1/5] watchdog: at91sam9: Stop using
+ module_platform_driver_probe()
+Message-ID: <b03b55f0-deba-41c5-acef-38338afa34bb@roeck-us.net>
+References: <20231106154807.3866712-1-u.kleine-koenig@pengutronix.de>
+ <20231106154807.3866712-2-u.kleine-koenig@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2092; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=CsAAXZNfJagYUNn9G20OK8DcPy3GbXjNMDl1T3VSBYQ=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlSQq3aUszaj3irVk4cMap4zE+bCpxad780bIG4 3QZVmi9wpyJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZUkKtwAKCRCPgPtYfRL+ TgRfB/oDmIgi03zoEKPaCUBxzxR+pVxsVJEghmbFYqG6Gksf8sRf0Ya7nwonZJP5VL3BEUbubr7 f8gZ0LP9tOFtCI95/WCJqvFNRpj/gGUsL8XgFgTcHi1d25NBzaJ9BP6J+uDavCMt4jSFg+FINyt rbVtjF2uG/1sG0Gkoja/wCpGH1NTxb/x0tFFJ2bgl+pZGfzL+FXMFcRWr+1lNVCzI1j90qR7+zl CKjm70zCOlPcDLu9RPTCey2LgMJqSQZApTijn4Q8tN5+nVELVn71AYD1OiY3n6ov28jnUPIzck8 qMd9TKQQLgYnR5YQs3cIcskmI4kIfM2AFZYM082YxXQRS2bY
-X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-kbuild@vger.kernel.org
+In-Reply-To: <20231106154807.3866712-2-u.kleine-koenig@pengutronix.de>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hello,
+On Mon, Nov 06, 2023 at 04:48:09PM +0100, Uwe Kleine-König wrote:
+> On today's platforms the benefit of platform_driver_probe() isn't that
+> relevant any more. It allows to drop some code after booting (or module
+> loading) for .probe() and discard the .remove() function completely if
+> the driver is built-in. This typically saves a few 100k.
+> 
+> The downside of platform_driver_probe() is that the driver cannot be
+> bound and unbound at runtime which is ancient and also slightly
+> complicates testing. There are also thoughts to deprecate
+> platform_driver_probe() because it adds some complexity in the driver
+> core for little gain. Also many drivers don't use it correctly. This
+> driver for example misses to mark the driver struct with __refdata which
+> is needed to suppress a (W=1) modpost warning:
+> 
+> 	WARNING: modpost: drivers/watchdog/at91sam9_wdt: section mismatch in reference: at91wdt_driver+0x4 (section: .data) -> at91wdt_remove (section: .exit.text)
+> 
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 
-there are two different types of patches here that would justify to
-different series. But as the patches are not independent I chose to put
-them in a single series.
-
-The first two patches drop usage of platform_driver_probe(). This is a
-concept that isn't so relevant any more today. I didn't check, but it
-saves typically only a few 100k and there are thoughts to deprecate it
-to simplify the core. Getting the usage right is not trivial though the
-drivers here got it nearly right. The alternative to these patches is to
-add __refdata to the driver struct ideally with a comment describing the
-need like is e.g. done in commit 5b44abbc39ca ("platform/x86: hp-wmi::
-Mark driver struct with __refdata to prevent section mismatch warning").
-Note that the warning only happens starting with commit f177cd0c15fc
-("modpost: Don't let "driver"s reference .exit.*") that is expected to
-be part of v6.7-rc1.
-
-The remaining three patches convert the platform drivers to
-.remove_new(), see commit 5c5a7680e67b ("platform: Provide a remove
-callback that returns no value") for an extended explanation and the
-eventual goal. Some time ago I already did this to watchdog drivers, but
-I missed the at91sam9_wdt and txx9wdt driver, because my coccinelle
-patch failed to detect these as patch opportunities (because of the
-__exit_p annotation). the starfive-wdt driver is new since then.
-
-Best regards
-Uwe
-
-Uwe Kleine-KÃ¶nig (5):
-  watchdog: at91sam9: Stop using module_platform_driver_probe()
-  watchdog: txx9: Stop using module_platform_driver_probe()
-  watchdog: at91sam9_wdt: Convert to platform remove callback returning
-    void
-  watchdog: starfive-wdt: Convert to platform remove callback returning
-    void
-  watchdog: txx9wdt: Convert to platform remove callback returning void
-
- drivers/watchdog/at91sam9_wdt.c | 12 +++++-------
- drivers/watchdog/starfive-wdt.c |  6 ++----
- drivers/watchdog/txx9wdt.c      | 11 +++++------
- 3 files changed, 12 insertions(+), 17 deletions(-)
-
-base-commit: 3ff7a5781ceee3befb9224d29cef6e6a4766c5fe
--- 
-2.42.0
-
+Reviewed-by: Guenter Roeck <linux@roeck-us.net>
