@@ -2,47 +2,71 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ABEBC4332F
-	for <linux-kbuild@archiver.kernel.org>; Wed,  8 Nov 2023 06:00:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87D2EC4167B
+	for <linux-kbuild@archiver.kernel.org>; Wed,  8 Nov 2023 06:54:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229574AbjKHGAu (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 8 Nov 2023 01:00:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43846 "EHLO
+        id S232154AbjKHGyy (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 8 Nov 2023 01:54:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbjKHGAt (ORCPT
+        with ESMTP id S231674AbjKHGyw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 8 Nov 2023 01:00:49 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D58AD41
-        for <linux-kbuild@vger.kernel.org>; Tue,  7 Nov 2023 22:00:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-        Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-        bh=QBid7HVCoGvEDVq1twLH9v7Uua/NFPJbcJ/bw5jpTFU=; b=sPLq70b/uLcR3Uv0J6xzSzXPi9
-        uN8REg2gN5PZ9AW6ajXuYUnOcGp2KVdH+mtqf18b9xHrqqQLHH9Bv43z5SqFsVHUyX4SU3gIfZLDc
-        f2WlnN97Scu4hOxmwnQNCUiW+vKK3/eYrVOAjsaUhNLCk7LLVAqrM1ArxGgyPwmSNoAXauWX1cKv1
-        8w6gGW97wcskjw24x12zXUTgKkrLFJR4pdJs17D/ol8Ofu91Y2Sox5kIYsE4ERA9XXvZiZ2hFf4RY
-        pGyRC2iXQ9trm6MEMJDggJhbD2mBZA+4oZyemgdkj6zfazxUwPHKWUstbASXn2AKq1mAElPMitEKs
-        4y/v6X+g==;
-Received: from [50.53.46.231] (helo=[192.168.254.15])
-        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1r0bcL-0031lb-2h;
-        Wed, 08 Nov 2023 06:00:45 +0000
-Message-ID: <1aab6cfd-1b87-42a8-9beb-02073bdf9add@infradead.org>
-Date:   Tue, 7 Nov 2023 22:00:44 -0800
+        Wed, 8 Nov 2023 01:54:52 -0500
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6A281B5
+        for <linux-kbuild@vger.kernel.org>; Tue,  7 Nov 2023 22:54:50 -0800 (PST)
+Received: by mail-wr1-x436.google.com with SMTP id ffacd0b85a97d-32dc9ff4a8fso3675912f8f.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 07 Nov 2023 22:54:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tuxon.dev; s=google; t=1699426489; x=1700031289; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WADg7Gm6M1d4joBFiIBPtNImR2VpL9viJ4iA0bfHJbQ=;
+        b=Zod5rmWVlv7iROxODKBc/gI6+Ik2PlFoRBQrsjh38bF7XztD5HpBkNZeUw1sV4Yavz
+         Kl3fj+iZOQO0902fUMQqOf1V6TZZP3pXt5F/JX1slkukHyCUVO3Gz+sRVJ/nQGFwAJfV
+         gabdPqi9Rp9YVIVNmkcPD26R9mT5cRTfDS34KodNzxuEYuTp+QJNAGfCBiqFXo9Xry4W
+         UzVLxqPucpLasGOHCOth8nt6J6Jeq5bBZKZHYRF/kK1anNNNXi3rLkIaHlyhPIYrZIep
+         fUD54TMu7uWDDvJLZjkpP1mf1YJEAsxS0B5goq5U01/v3NZQDmH3ktGhVkhNQoTqYetT
+         rN4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699426489; x=1700031289;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WADg7Gm6M1d4joBFiIBPtNImR2VpL9viJ4iA0bfHJbQ=;
+        b=EyC5xQcIQISq7xdw6HsFwJCRTE3wKCYV7HsaAP1I56GR4YoRfrEklh9u//QpDTDeM0
+         386AX20AcezeqKq2TcG1ryoWAW0cJ85KzYTIvz/ltCTjMM1WmFPL8HSIuQsiU28MAAdZ
+         WGXW+MEkjkfhdJ+91uMHpZcDCoTyg9qB6M+VMUpulkH4T/8j7hsyQF5XrqiRUpdhYUYQ
+         x6ZgoevhEPqShYXL0NgCz0S6wS9nngUIVxE0x0D44vxZmSESQxAO3QQm85Lus8q6QSMn
+         ExqWvFd56F9mWoNleg0pOCPc4F7phP3vChWY+zP4QCcwl2tWMKt67VIx+avSb4eZ11sY
+         dqHg==
+X-Gm-Message-State: AOJu0Yz15GPzxZjjEYnGMSW5QplWkYfzlhWqpqnfWBKDAU2v65mYHsIj
+        oe9hIW777L016bC2rIiqDFvm9A==
+X-Google-Smtp-Source: AGHT+IH9sF8Iat/MJCRKetrR0QjQlXe0ah3cJGmtywkEt+nWdfSRUNj+tMAo8P/GO37d7ozNguEasQ==
+X-Received: by 2002:a05:6000:b81:b0:323:36f1:c256 with SMTP id dl1-20020a0560000b8100b0032336f1c256mr673503wrb.11.1699426489081;
+        Tue, 07 Nov 2023 22:54:49 -0800 (PST)
+Received: from [192.168.50.4] ([82.78.167.144])
+        by smtp.gmail.com with ESMTPSA id d5-20020adff2c5000000b0032d2f09d991sm4110012wrp.33.2023.11.07.22.54.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Nov 2023 22:54:48 -0800 (PST)
+Message-ID: <202b36b3-2f77-46c1-ad2f-5ec686ca05c8@tuxon.dev>
+Date:   Wed, 8 Nov 2023 08:54:47 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: SymSearch can cause make nconfig to segfault
+Subject: Re: [PATCH 02/14] power: reset: at91-reset:: Stop using
+ module_platform_driver_probe()
 Content-Language: en-US
-To:     Jesse T <mr.bossman075@gmail.com>,
-        Vivien Gallinaro <vivien.gallinaro@free.fr>
-Cc:     linux-kbuild@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>
-References: <5ec262711df2f3d3ccd84930ed4e9778@free.fr>
- <CAJFTR8Sfea5gCpYA+Xb5vAz=0nemrQNxSf5BFeD0jM+YfagpmA@mail.gmail.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <CAJFTR8Sfea5gCpYA+Xb5vAz=0nemrQNxSf5BFeD0jM+YfagpmA@mail.gmail.com>
+To:     =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+        Sebastian Reichel <sre@kernel.org>
+Cc:     Nicolas Ferre <nicolas.ferre@microchip.com>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        linux-pm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kernel@pengutronix.de, linux-kbuild@vger.kernel.org
+References: <20231104211501.3676352-16-u.kleine-koenig@pengutronix.de>
+ <20231104211501.3676352-18-u.kleine-koenig@pengutronix.de>
+From:   claudiu beznea <claudiu.beznea@tuxon.dev>
+In-Reply-To: <20231104211501.3676352-18-u.kleine-koenig@pengutronix.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -51,60 +75,66 @@ X-Mailing-List: linux-kbuild@vger.kernel.org
 
 
 
-On 11/7/23 19:06, Jesse T wrote:
-> On Tue, Nov 7, 2023 at 9:30 PM Vivien Gallinaro
-> <vivien.gallinaro@free.fr> wrote:
->>
->> Hi all,
->>
->> In make nconfig, when I perform a SymSearch (F8) for "x86", I get a
->> segfault. It doesn't happen in make menuconfig (/ search).
->>
->> It doesn't seem to be a simple matter of "too many results" as a
->> SymSearch for "fs" does ok.
->>
->>
->> For a fresh 6.6 kernel :
->>
->> $ cd linux-6.6
->> $ make mrproper
->> $ make nconfig 2>../blarb
->> (<F8> x86 <enter>)
->> $ reset
+On 04.11.2023 23:15, Uwe Kleine-König wrote:
+> On today's platforms the benefit of platform_driver_probe() isn't that
+> relevant any more. It allows to drop some code after booting (or module
+> loading) for .probe() and discard the .remove() function completely if
+> the driver is built-in. This typically saves a few 100k.
 > 
-> I'm assuming "reset" here means you got put back into your shell and are
-> resetting the terminal state.
+> The downside of platform_driver_probe() is that the driver cannot be
+> bound and unbound at runtime which is ancient and so slightly
+> complicates testing. There are also thoughts to deprecate
+> platform_driver_probe() because it adds some complexity in the driver
+> core for little gain. Also many drivers don't use it correctly. This
+> driver for example misses to mark the driver struct with __ref which is
+> needed to suppress a (W=1) modpost warning.
 > 
->> $ cat ../blarb
->>
->> gives :
->>
->> make[2]: *** [scripts/kconfig/Makefile:48: nconfig] Segmentation fault
->> make[1]: *** [/home/username/linux-6.6/Makefile:697: nconfig] Error 2
->> make: *** [Makefile:234: __sub-make] Error 2
-> 
-> I can not recreate this error on my machine unfortunately are you
-> using the tar release?
-> What distro are you using?
-> 
-> Thanks,
-> Jesse Taube
->>
->>
->> That's not very helpful, I know… looking up "x86" was not particularly
->> useful either! (I was following a wiki referring to x86_sysfb. Before I
->> realized it probably doesn't exist any more, I tried to widen the
->> search, since I had just come across the deprecation of efi_vars in
->> favor of efivar_fs, so to speak.) I hope some one can help the search
->> fail gracefully.
->>
->> Have a nice day,
->> VG
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 
-I also cannot recreate this issue.
-FWIW.
+Other than "::" in title:
 
-More info needed.
+Reviewed-by: Claudiu Beznea <claudiu.beznea@tuxon.dev>
 
--- 
-~Randy
+> ---
+>  drivers/power/reset/at91-reset.c | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/power/reset/at91-reset.c b/drivers/power/reset/at91-reset.c
+> index aa9b012d3d00..af85f2f929ba 100644
+> --- a/drivers/power/reset/at91-reset.c
+> +++ b/drivers/power/reset/at91-reset.c
+> @@ -337,7 +337,7 @@ static int at91_rcdev_init(struct at91_reset *reset,
+>  	return devm_reset_controller_register(&pdev->dev, &reset->rcdev);
+>  }
+>  
+> -static int __init at91_reset_probe(struct platform_device *pdev)
+> +static int at91_reset_probe(struct platform_device *pdev)
+>  {
+>  	const struct of_device_id *match;
+>  	struct at91_reset *reset;
+> @@ -417,7 +417,7 @@ static int __init at91_reset_probe(struct platform_device *pdev)
+>  	return ret;
+>  }
+>  
+> -static int __exit at91_reset_remove(struct platform_device *pdev)
+> +static int at91_reset_remove(struct platform_device *pdev)
+>  {
+>  	struct at91_reset *reset = platform_get_drvdata(pdev);
+>  
+> @@ -428,13 +428,14 @@ static int __exit at91_reset_remove(struct platform_device *pdev)
+>  }
+>  
+>  static struct platform_driver at91_reset_driver = {
+> -	.remove = __exit_p(at91_reset_remove),
+> +	.probe = at91_reset_probe,
+> +	.remove = at91_reset_remove,
+>  	.driver = {
+>  		.name = "at91-reset",
+>  		.of_match_table = at91_reset_of_match,
+>  	},
+>  };
+> -module_platform_driver_probe(at91_reset_driver, at91_reset_probe);
+> +module_platform_driver(at91_reset_driver);
+>  
+>  MODULE_AUTHOR("Atmel Corporation");
+>  MODULE_DESCRIPTION("Reset driver for Atmel SoCs");
