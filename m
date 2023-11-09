@@ -2,88 +2,147 @@ Return-Path: <linux-kbuild-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFD9EC4332F
-	for <linux-kbuild@archiver.kernel.org>; Thu,  9 Nov 2023 07:52:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4271C4332F
+	for <linux-kbuild@archiver.kernel.org>; Thu,  9 Nov 2023 09:25:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232778AbjKIHxB (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 9 Nov 2023 02:53:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52096 "EHLO
+        id S232598AbjKIJZx (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 9 Nov 2023 04:25:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232613AbjKIHxA (ORCPT
+        with ESMTP id S232483AbjKIJZv (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 9 Nov 2023 02:53:00 -0500
-X-Greylist: delayed 550 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 08 Nov 2023 23:52:58 PST
-Received: from codesynthesis.com (codesynthesis.com [188.40.148.39])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4E571716;
-        Wed,  8 Nov 2023 23:52:58 -0800 (PST)
-Received: from brak.codesynthesis.com (unknown [105.186.92.249])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by codesynthesis.com (Postfix) with ESMTPSA id 55E5160D9F;
-        Thu,  9 Nov 2023 07:43:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codesynthesis.com;
-        s=mail1; t=1699515826;
-        bh=fJ48MnwSMLL/XzmjxNLHtBoWhFyXgj04jwsCFx/3Hfs=;
-        h=Date:From:To:Subject:Message-ID:MIME-Version:From;
-        b=RmY00MK5Rg1p2bfkJRAejhbFOLJapXmR89HNVZ3EBm/VjgibjKGCFeSK65GEm8Qp7
-         7f9j1Jtr+eZAWyildkdVI5FnoKpLEsSBiJNckuM1L++5FiDEp+8rt9YCYWbIgMRdMb
-         Al9k9Cj8OS7NQDRJOB2rhzeJeoJzRGMuS+3W9CmV5AryyGeE5UKAAZzMU29UM7zbiY
-         x3wl9ICeAVqEmQZ1e99N5pzif5p18N2hGqk3Jl0HgiK1XdfCetqii0PTPMRIOpqlwL
-         utdtn5Fd16cdAlWb9XZbkyCF9VkdxC5FIx/HpCvzr3tTDJ7dpJDm1ijUjadcTb7BzS
-         uboZ2QLZ4arkQ==
-Received: by brak.codesynthesis.com (Postfix, from userid 1000)
-        id 2AE8B145E0D; Thu,  9 Nov 2023 09:43:44 +0200 (SAST)
-Date:   Thu, 9 Nov 2023 09:43:44 +0200
-From:   Boris Kolpackov <boris@codesynthesis.com>
-To:     Matthew Maurer <mmaurer@google.com>
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Alex Gaynor <alex.gaynor@gmail.com>,
-        Wedson Almeida Filho <wedsonaf@gmail.com>,
-        linux-kbuild@vger.kernel.org, Boqun Feng <boqun.feng@gmail.com>,
-        Gary Guo <gary@garyguo.net>,
-        =?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-        Benno Lossin <benno.lossin@proton.me>,
-        Andreas Hindborg <a.hindborg@samsung.com>,
-        Alice Ryhl <aliceryhl@google.com>,
-        linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org
-Subject: Re: [PATCH 2/3] kconfig: Add special rust_modules config option
-Message-ID: <boris.20231109093619@codesynthesis.com>
-References: <20231108022651.645950-2-mmaurer@google.com>
- <20231108022651.645950-5-mmaurer@google.com>
+        Thu, 9 Nov 2023 04:25:51 -0500
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71F6A270C;
+        Thu,  9 Nov 2023 01:25:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1699521949; x=1731057949;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=AyxJP29kR02iiNbcHt7dehQtU/CjLqUJJGn9LSD530U=;
+  b=HlAQ9WAYZZcdevi18vuASlC3HnxW4AnTI9acS6AdA0pQNZyRYR/IE4td
+   yXyaxyte2JbSiEI3Hqg8lQXVtFqseRznMdNXwGtXBGhJJrqhleLuEXLKU
+   lA4StVc4aiiPwdeO25EbLfaX5rUP3rriStFq2xtQrmwkNs68IveXN49s3
+   45zD5BMl9wtcWMYlDmKcdGq4VVRSV1zhsXEOdjCzwdogWlSUuu7qu1a4a
+   AjDMcfSrjE9xqf/KAUcTXuDWw968C0GfsDX7DqAb0WrirHXqV7moTrLu2
+   eRtPbEn87fPPpfCsegnw7p357FMoOBoA5ZX8yLqS4Me4SvsYCWxo443uQ
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="393860530"
+X-IronPort-AV: E=Sophos;i="6.03,289,1694761200"; 
+   d="scan'208";a="393860530"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2023 01:25:48 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="829250358"
+X-IronPort-AV: E=Sophos;i="6.03,289,1694761200"; 
+   d="scan'208";a="829250358"
+Received: from lkp-server01.sh.intel.com (HELO 17d9e85e5079) ([10.239.97.150])
+  by fmsmga008.fm.intel.com with ESMTP; 09 Nov 2023 01:25:41 -0800
+Received: from kbuild by 17d9e85e5079 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1r11IB-0008cK-0b;
+        Thu, 09 Nov 2023 09:25:39 +0000
+Date:   Thu, 9 Nov 2023 17:25:13 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Arnd Bergmann <arnd@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        linux-kbuild@vger.kernel.org
+Cc:     oe-kbuild-all@lists.linux.dev,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Matt Turner <mattst88@gmail.com>,
+        Vineet Gupta <vgupta@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Guo Ren <guoren@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Greg Ungerer <gerg@linux-m68k.org>,
+        Michal Simek <monstr@monstr.eu>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Dinh Nguyen <dinguyen@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Geoff Levand <geoff@infradead.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+        Andy Lutomirski <luto@kernel.org>
+Subject: Re: [PATCH 15/22] arch: vdso: consolidate gettime prototypes
+Message-ID: <202311091754.K9wZD9Nv-lkp@intel.com>
+References: <20231108125843.3806765-16-arnd@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231108022651.645950-5-mmaurer@google.com>
-Organization: Code Synthesis
+In-Reply-To: <20231108125843.3806765-16-arnd@kernel.org>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Matthew Maurer <mmaurer@google.com> writes:
+Hi Arnd,
 
-> Adds support for the rust_modules kconfig type, which works similarly to
-> modules, but for restricting or allowing the use of modules which
-> directly depend on Rust.
->
-> [...]
->
-> +struct symbol *modules_rust_sym;
-> +static tristate modules_rust_val;
-> +
-> +bool sym_depends_rust(struct symbol *sym)
-> +{
-> +	static struct symbol *rust_sym;
-> +
-> +	if (!rust_sym)
-> +		rust_sym = sym_find("RUST");
-> +	return expr_depends_symbol(sym->dir_dep.expr, rust_sym, true);
-> +}
-> +
+kernel test robot noticed the following build errors:
 
-Hm, this feels like a quick and dirty hack to me: will we be hardcoding
-a symbol for each language?
+[auto build test ERROR on linus/master]
+[cannot apply to v6.6 next-20231109]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-I know there is little sympathy for other projects that use Kconfig,
-and whatever Linux needs, goes, but still, this feels like a step too
-far.
+url:    https://github.com/intel-lab-lkp/linux/commits/Arnd-Bergmann/ida-make-ida_dump-static/20231109-005742
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20231108125843.3806765-16-arnd%40kernel.org
+patch subject: [PATCH 15/22] arch: vdso: consolidate gettime prototypes
+config: um-defconfig (https://download.01.org/0day-ci/archive/20231109/202311091754.K9wZD9Nv-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231109/202311091754.K9wZD9Nv-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202311091754.K9wZD9Nv-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> arch/x86/um/vdso/um_vdso.c:17:5: error: conflicting types for '__vdso_clock_gettime'; have 'int(clockid_t,  struct __kernel_old_timespec *)' {aka 'int(int,  struct __kernel_old_timespec *)'}
+      17 | int __vdso_clock_gettime(clockid_t clock, struct __kernel_old_timespec *ts)
+         |     ^~~~~~~~~~~~~~~~~~~~
+   In file included from arch/x86/um/vdso/um_vdso.c:15:
+   include/vdso/gettime.h:16:5: note: previous declaration of '__vdso_clock_gettime' with type 'int(clockid_t,  struct __kernel_timespec *)' {aka 'int(int,  struct __kernel_timespec *)'}
+      16 | int __vdso_clock_gettime(clockid_t clock, struct __kernel_timespec *ts);
+         |     ^~~~~~~~~~~~~~~~~~~~
+   arch/x86/um/vdso/um_vdso.c:58:1: warning: no previous prototype for '__vdso_getcpu' [-Wmissing-prototypes]
+      58 | __vdso_getcpu(unsigned *cpu, unsigned *node, struct getcpu_cache *unused)
+         | ^~~~~~~~~~~~~
+
+
+vim +17 arch/x86/um/vdso/um_vdso.c
+
+f1c2bb8b9964ed arch/um/sys-x86_64/vdso/um_vdso.c Richard Weinberger 2011-07-25  16  
+82210fc778982d arch/x86/um/vdso/um_vdso.c        Arnd Bergmann      2019-10-27 @17  int __vdso_clock_gettime(clockid_t clock, struct __kernel_old_timespec *ts)
+f1c2bb8b9964ed arch/um/sys-x86_64/vdso/um_vdso.c Richard Weinberger 2011-07-25  18  {
+f1c2bb8b9964ed arch/um/sys-x86_64/vdso/um_vdso.c Richard Weinberger 2011-07-25  19  	long ret;
+f1c2bb8b9964ed arch/um/sys-x86_64/vdso/um_vdso.c Richard Weinberger 2011-07-25  20  
+5541992e512de8 arch/x86/um/vdso/um_vdso.c        Ammar Faizi        2022-12-24  21  	asm("syscall"
+5541992e512de8 arch/x86/um/vdso/um_vdso.c        Ammar Faizi        2022-12-24  22  		: "=a" (ret)
+5541992e512de8 arch/x86/um/vdso/um_vdso.c        Ammar Faizi        2022-12-24  23  		: "0" (__NR_clock_gettime), "D" (clock), "S" (ts)
+5541992e512de8 arch/x86/um/vdso/um_vdso.c        Ammar Faizi        2022-12-24  24  		: "rcx", "r11", "memory");
+f1c2bb8b9964ed arch/um/sys-x86_64/vdso/um_vdso.c Richard Weinberger 2011-07-25  25  
+f1c2bb8b9964ed arch/um/sys-x86_64/vdso/um_vdso.c Richard Weinberger 2011-07-25  26  	return ret;
+f1c2bb8b9964ed arch/um/sys-x86_64/vdso/um_vdso.c Richard Weinberger 2011-07-25  27  }
+82210fc778982d arch/x86/um/vdso/um_vdso.c        Arnd Bergmann      2019-10-27  28  int clock_gettime(clockid_t, struct __kernel_old_timespec *)
+f1c2bb8b9964ed arch/um/sys-x86_64/vdso/um_vdso.c Richard Weinberger 2011-07-25  29  	__attribute__((weak, alias("__vdso_clock_gettime")));
+f1c2bb8b9964ed arch/um/sys-x86_64/vdso/um_vdso.c Richard Weinberger 2011-07-25  30  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
