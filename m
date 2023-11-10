@@ -1,131 +1,108 @@
-Return-Path: <linux-kbuild+bounces-5-linux-kbuild=archiver.kernel.org@vger.kernel.org>
+Return-Path: <linux-kbuild+bounces-6-linux-kbuild=archiver.kernel.org@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.lore.kernel.org (Postfix) with ESMTPS id C29AFC4332F
-	for <linux-kbuild@archiver.kernel.org>; Fri, 10 Nov 2023 17:49:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTPS id D07E5C05021
+	for <linux-kbuild@archiver.kernel.org>; Fri, 10 Nov 2023 17:49:57 +0000 (UTC)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4481DB2209F
-	for <linux-kbuild@archiver.kernel.org>; Fri, 10 Nov 2023 17:49:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 573F8B22428
+	for <linux-kbuild@archiver.kernel.org>; Fri, 10 Nov 2023 17:49:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAC053C09D;
-	Fri, 10 Nov 2023 17:47:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 627893D979;
+	Fri, 10 Nov 2023 17:47:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="AY+Eyy9+";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="FL4aOef4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GJNOg6Jd"
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 030D63C69F
-	for <linux-kbuild@vger.kernel.org>; Fri, 10 Nov 2023 17:46:56 +0000 (UTC)
-Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5AD772AA;
-	Thu,  9 Nov 2023 22:30:46 -0800 (PST)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.west.internal (Postfix) with ESMTP id 3B8D83200AE3;
-	Fri, 10 Nov 2023 01:30:43 -0500 (EST)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Fri, 10 Nov 2023 01:30:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:sender
-	:subject:subject:to:to; s=fm3; t=1699597842; x=1699684242; bh=hX
-	qqY4BWR14neNf2OWhT/hoES7tg7nkHkI39Wk4fnR4=; b=AY+Eyy9+TUI2gFefVm
-	OQ2F+8oM4FfGiO6xnl65YXS3uHvP9rtPE8qRzIHpPJbPl8CF7V9cR7SnjJDuGx0W
-	I0BfJQKvddhepAG9h6Lpg99YGKa7/DaTH11t4n/nDaryAY08+jc71UiNKbgxl3EJ
-	JoSpwiluGAgxn9TuseqhcaMdHR3tMMx8OqZ96zVHGM+zQ1nuAtGE/fEU6DaQf5SL
-	sfie5yeHfkWU6ozEjZL/0haGXFXv6FG9mzo2Pkhafqj88hr1XQLGaBRmmgqk1fbM
-	n75g+U6f4zMEBhIV930lAbRqYUv2BD+AfgdqXscMvnQnE+JhGHJxdnQ7/vmh6mN+
-	e23Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm3; t=1699597842; x=1699684242; bh=hXqqY4BWR14ne
-	Nf2OWhT/hoES7tg7nkHkI39Wk4fnR4=; b=FL4aOef4wrn+mcyjJq2E/ZO3fCQVo
-	M/MT7NCE29j0g7qW2Q8h1puyq1dWOLY1JM2CmmpEJ0tKBw8cOYi4zRmGB9T6JneP
-	CLG62qgARHN4F2r5y+wBgiZCHuOwhyQ3pm6kKNoDN7o3SeCFncHv10C2bphgFVqy
-	KgthlZWeFLYsGw5JM/DctoVueEumEgRcleNfu0KBGrq0nyG5h10gAHwvAS8I7XPi
-	QEEgNzaocUjV0EicCwV0Vxywfu+QY6khpk0mUVUZz1pOcCdWf5q+jTXQfHVsFFdC
-	MFHSWbukx561a0ms34MO7juCuoNGzZ5D5UDbhf5msu/yHki82fsLSkUpA==
-X-ME-Sender: <xms:EM5NZd0ZO5Keau_3lae8xWi_VQl_vF0AtX3RJT3glfwO6bSWgp94RA>
-    <xme:EM5NZUGtGCJoujiCpk1rmVeeK9S3-E7Vd_uootXFoAbYL9340BuifPLl_GbRpYdMp
-    hXLrAGzHqgPROMraxE>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedruddvvddgleefucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
-    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
-    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
-    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
-    hrnhgusegrrhhnuggsrdguvg
-X-ME-Proxy: <xmx:Ec5NZd6Cdr1B5-_seQjypiAD77jU0p_usS1DQ9sE_NVRr_anxaKgcA>
-    <xmx:Ec5NZa2YlJLASmHePpYoiFhGCJgcvHB9qT9WXegouv0MidmFx2vG2Q>
-    <xmx:Ec5NZQE0MOxHxwSJwsqIUEkDZEyqoeh3hoGlJ7LlWxJoL8foGy_bXA>
-    <xmx:Es5NZeMOC-xWrCco4yoZufFoPvP4nkYgbIxaKBSTkxqIdWzy6E_bqg>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id DA3AEB60089; Fri, 10 Nov 2023 01:30:40 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-1108-g3a29173c6d-fm-20231031.005-g3a29173c
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB9BD3986B
+	for <linux-kbuild@vger.kernel.org>; Fri, 10 Nov 2023 17:47:01 +0000 (UTC)
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3DBD3289E;
+	Fri, 10 Nov 2023 04:07:26 -0800 (PST)
+Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-507975d34e8so2758778e87.1;
+        Fri, 10 Nov 2023 04:07:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699618045; x=1700222845; darn=vger.kernel.org;
+        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ziu6y5kMWv25GqkZtPQxmr/4uKotFiq7lYQMCanhehw=;
+        b=GJNOg6JdwHbJLE1SvQTaHaYcFu5uJ7ftggt4YpQ/yOIDpvbhxgnJCJWKc6ft+ce5MY
+         DWAoW13R3nuwXJH9AE6TjqOzM97Ikfppn+lmE0z2d/kqnanka4VYAy3JKAjqFSPfU1Yd
+         MjnWkO0ieaE2NbvPOqHGjvglpvz4mvtO7v3f15VZsVYyf9w+IA7AZByhFlYyn19V1LnJ
+         0RTzPfOa3SjBlWNWneaoo81JStfyaq7p7xU7BtlJf8dn7qhAAqC7DchwJYz/Mm+Nousg
+         i+JSkeOpw/VfidXoAVzmEip/Ix0aHOuEZkb4LSHhu41yy8wRmtg/JJCTlpOWzD8h8yzq
+         ccPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699618045; x=1700222845;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ziu6y5kMWv25GqkZtPQxmr/4uKotFiq7lYQMCanhehw=;
+        b=t9OvTR5gzJGEb1D8P8votE01/PTUcri5Opb1Ct8KbpIaTrYZEqkTKrfVXYa4ADWtz4
+         6weILu+iIYYKEfn81j7ML5EMk9qG8hkKHIHUhxtizdAS3Ucr1tus5wFaGGN9MCJRgT60
+         Lu0dYUAAc+5SKbOD22jfKrwNJwMUtAnNIuitp9xxs6BqvAtx39TUHqK8sHiOVt1/RrUH
+         v4UTnavxRpixp9l6BOxjJ00K5/x0VgcxR9drNkn7r/TSQEMCIGM2GK6k1XOhV1khOhqn
+         he+6awc4mn181JQXGA3G0JA9NenDImu65K/jodiSI0Kp2oystmsanKETz1/0VGRED7L9
+         VMYA==
+X-Gm-Message-State: AOJu0YyvWAvacoHgSgb3ZC0Ms7vQjGuJEVJaxmd2ZQaUxR5nu8hhebtl
+	8AfC/Vy6TMIHQMeIf7Wma+E=
+X-Google-Smtp-Source: AGHT+IG2ZkUZun9f/LdlHUkgkvZ6BN2lAKn/tL2UtyLIvTGStr7CM9zKixfGdPF9esMQlWXQdtiZ1A==
+X-Received: by 2002:a05:6512:3087:b0:509:7915:a1d6 with SMTP id z7-20020a056512308700b005097915a1d6mr4844174lfd.58.1699618044689;
+        Fri, 10 Nov 2023 04:07:24 -0800 (PST)
+Received: from felia.fritz.box ([2a02:810d:7e40:14b0:cd7:bb15:91b6:862d])
+        by smtp.gmail.com with ESMTPSA id j7-20020a5d6187000000b00318147fd2d3sm1801841wru.41.2023.11.10.04.07.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Nov 2023 04:07:24 -0800 (PST)
+From: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+To: Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Nicolas Schier <nicolas@fjasle.eu>,
+	Helge Deller <deller@gmx.de>,
+	linux-kbuild@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Subject: [PATCH] linux/export: clean up the IA-64 KSYM_FUNC macro
+Date: Fri, 10 Nov 2023 13:07:22 +0100
+Message-Id: <20231110120722.15907-1-lukas.bulwahn@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Message-Id: <5e0966cd-7fa6-4217-a92e-d4a73b6b8bd6@app.fastmail.com>
-In-Reply-To: <87h6lu8ed8.fsf@mail.lhotse>
-References: <20231108125843.3806765-18-arnd@kernel.org>
- <202311090843.b8ISrsV1-lkp@intel.com> <87h6lu8ed8.fsf@mail.lhotse>
-Date: Fri, 10 Nov 2023 07:30:20 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Michael Ellerman" <mpe@ellerman.id.au>,
- "kernel test robot" <lkp@intel.com>, "Arnd Bergmann" <arnd@kernel.org>,
- "Andrew Morton" <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org,
- "Masahiro Yamada" <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev,
- "Linux Memory Management List" <linux-mm@kvack.org>,
- "Matt Turner" <mattst88@gmail.com>, "Vineet Gupta" <vgupta@kernel.org>,
- "Russell King" <linux@armlinux.org.uk>,
- "Catalin Marinas" <catalin.marinas@arm.com>,
- "Will Deacon" <will@kernel.org>, "Steven Rostedt" <rostedt@goodmis.org>,
- "Masami Hiramatsu" <mhiramat@kernel.org>,
- "Mark Rutland" <mark.rutland@arm.com>, guoren <guoren@kernel.org>,
- "Peter Zijlstra" <peterz@infradead.org>,
- "Ard Biesheuvel" <ardb@kernel.org>,
- "Huacai Chen" <chenhuacai@kernel.org>,
- "Greg Ungerer" <gerg@linux-m68k.org>, "Michal Simek" <monstr@monstr.eu>,
- "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>,
- "Dinh Nguyen" <dinguyen@kernel.org>,
- "Nicholas Piggin" <npiggin@gmail.com>,
- "Christophe Leroy" <christophe.leroy@csgroup.eu>,
- "Geoff Levand" <geoff@infradead.org>,
- "Palmer Dabbelt" <palmer@dabbelt.com>,
- "Heiko Carstens" <hca@linux.ibm.com>,
- "John Paul Adrian Glaubitz" <glaubitz@physik.fu-berlin.de>,
- "Andy Lutomirski" <luto@kernel.org>
-Subject: Re: [PATCH 17/22] powerpc: ps3: move udbg_shutdown_ps3gelic prototype
-Content-Type: text/plain
 
-On Fri, Nov 10, 2023, at 04:40, Michael Ellerman wrote:
+With commit cf8e8658100d ("arch: Remove Itanium (IA-64) architecture"),
+there is no need to keep the IA-64 definition of the KSYM_FUNC macro.
 
-> As pointed out by Arnd this is due to there being two symbols that
-> control the gelic_udbg.c code.
->
-> I don't see the need for PS3GELIC_UDBG, without PPC_EARLY_DEBUG_PS3GELIC
-> it just causes gelic_udbg.c to be built, but never called.
->
-> The diff below fixes the error AFAICS.
->
-> I can just fold it in if you're happy with that Arnd.
+Clean up the IA-64 definition of the KSYM_FUNC macro.
 
-Yes, looks good to me, please do.
+Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+---
+ include/linux/export-internal.h | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-    Arnd
+diff --git a/include/linux/export-internal.h b/include/linux/export-internal.h
+index 45fca09b2319..69501e0ec239 100644
+--- a/include/linux/export-internal.h
++++ b/include/linux/export-internal.h
+@@ -50,9 +50,7 @@
+ 	    "	.previous"						"\n"	\
+ 	)
+ 
+-#ifdef CONFIG_IA64
+-#define KSYM_FUNC(name)		@fptr(name)
+-#elif defined(CONFIG_PARISC) && defined(CONFIG_64BIT)
++#if defined(CONFIG_PARISC) && defined(CONFIG_64BIT)
+ #define KSYM_FUNC(name)		P%name
+ #else
+ #define KSYM_FUNC(name)		name
+-- 
+2.17.1
+
 
