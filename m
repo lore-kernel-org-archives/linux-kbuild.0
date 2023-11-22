@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7035B4CE11
-	for <linux-kbuild@vger.kernel.org>; Wed, 22 Nov 2023 15:35:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BAEC4E1C7
+	for <linux-kbuild@vger.kernel.org>; Wed, 22 Nov 2023 15:36:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h+/H//P9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39DFBC433BA;
-	Wed, 22 Nov 2023 15:35:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pQRB8xFf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C00FC433AD;
+	Wed, 22 Nov 2023 15:36:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700667330;
-	bh=dVqBzGcCjDV2Q/et/moBqR85/eGP57EpdKJAS9tf8pk=;
+	s=k20201202; t=1700667360;
+	bh=Lq00onOaGhMQrQm6KMEWgcF+DMXr0QemXLunGniudF4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=h+/H//P9t+2/Yhzt68cMRHXKciQYYVYO7FGtprHM4SFbnaGY97CVJ7/nU0D/5oHmB
-	 MWqBZ+nUIrdos23eQOMTF31KkOQKBtXAj+g+J9JnRxYY0tea3L5adHjPmMvNfMoJH6
-	 LzW3f7+wF0M+c4ZVIXZuihl80DPDaviizj//bA5pcBDpQiCR27MdxXyOnMeMO+csMF
-	 ps1biCgCsmBEosP4jYe7Yp4F+xTOgwvAMJAQUQyhKw6EeMj+QrLvduMi36R4jtj4gf
-	 LATnR53iUd056sOZXw4G/mRgwsyPPB/iumb38RZQpvxAe5lT5f3L6HygwGRIBCb8li
-	 VeNwHmT1UhbBg==
+	b=pQRB8xFfRd/9S+tpfoBdeXtJpgUz1ftEFNxtRdr3PWJ+/nnFE7oPFg4ttOvMEI1lF
+	 mVHYzSsgQcnuKPpZ59w3gn/qD2/p8TE9wKtHtp6hgjZuyFj/H/XRJUYnF7PhRuO5MU
+	 i+lrLC/USM7BnUxvj28FuxTZgrUvSg2iVDbSdjbhso4c8nQg6p8pEer7T90puUB8Ic
+	 QO6koqJP1JakK8eBNRJRzHx9ZLTJh+Kf2P0md4hLBCFvQza6gZgRAOVObN7yxYbEQT
+	 FW4ixiUfhx08AHfRPHN0Xod8qtcc+pdqpV91miujuOBa2I3bPqEzcR3pf2J6q5Kcw3
+	 f57FunZeTluQQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
 Cc: Masahiro Yamada <masahiroy@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	linux-kbuild@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 6/7] kconfig: fix memory leak from range properties
-Date: Wed, 22 Nov 2023 10:35:06 -0500
-Message-ID: <20231122153512.853015-6-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 6/7] kconfig: fix memory leak from range properties
+Date: Wed, 22 Nov 2023 10:35:34 -0500
+Message-ID: <20231122153541.853179-6-sashal@kernel.org>
 X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231122153512.853015-1-sashal@kernel.org>
-References: <20231122153512.853015-1-sashal@kernel.org>
+In-Reply-To: <20231122153541.853179-1-sashal@kernel.org>
+References: <20231122153541.853179-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.15.139
+X-stable-base: Linux 5.10.201
 Content-Transfer-Encoding: 8bit
 
 From: Masahiro Yamada <masahiroy@kernel.org>
@@ -87,10 +87,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 6 insertions(+), 8 deletions(-)
 
 diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index 5844d636d38f4..7f8013dcef002 100644
+index ffa3ec65cc907..a2056fa80de2b 100644
 --- a/scripts/kconfig/symbol.c
 +++ b/scripts/kconfig/symbol.c
-@@ -122,9 +122,9 @@ static long long sym_get_range_val(struct symbol *sym, int base)
+@@ -123,9 +123,9 @@ static long long sym_get_range_val(struct symbol *sym, int base)
  static void sym_validate_range(struct symbol *sym)
  {
  	struct property *prop;
@@ -101,7 +101,7 @@ index 5844d636d38f4..7f8013dcef002 100644
  
  	switch (sym->type) {
  	case S_INT:
-@@ -140,17 +140,15 @@ static void sym_validate_range(struct symbol *sym)
+@@ -141,17 +141,15 @@ static void sym_validate_range(struct symbol *sym)
  	if (!prop)
  		return;
  	val = strtoll(sym->curr.val, NULL, base);
