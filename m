@@ -1,89 +1,63 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Zj/s9vWM"
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85F321A7
-	for <linux-kbuild@vger.kernel.org>; Mon, 27 Nov 2023 16:34:18 -0800 (PST)
-Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-6cb9dd2ab56so4224098b3a.3
-        for <linux-kbuild@vger.kernel.org>; Mon, 27 Nov 2023 16:34:18 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Hndy02yt"
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84D6D1B8
+	for <linux-kbuild@vger.kernel.org>; Mon, 27 Nov 2023 21:34:49 -0800 (PST)
+Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1ce28faa92dso38864515ad.2
+        for <linux-kbuild@vger.kernel.org>; Mon, 27 Nov 2023 21:34:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1701131658; x=1701736458; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xYiTIXqRTDarNbi0aa1f81qxroNRuY69MIWNnPKjAyY=;
-        b=Zj/s9vWMze0CQMyIflVTK3B3dxSeRg1P9NPpAdamgEcVQzPB+/KC5Bg0UH6DBrYjz+
-         Cw9uwhTWfRln18EmUt4Rro0DET7kc4CoKcieM+nxU5Ge9irWUlRC8c10o2ffkuyspse5
-         6qMsjsR0wydgD20oX3OOAvpvvrDhBusbtvndQ=
+        d=chromium.org; s=google; t=1701149689; x=1701754489; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rLD4U1IQ3GBXZUYRBdNM3XjIajDHuVM3KMdSWM11Qn4=;
+        b=Hndy02yttaR7uPciKF4mqyxHp/ZzphH50Pn8hswI1nmCCmMRiACwdOOxOCtKxpzAEm
+         rvFD7mswAZUI9zITOhIQyqdG2ChpV+lnvWbnkm1jLevUdOntKSO8G629xXhHayTJ1jfK
+         3Uei5bjNJ4tTfNr6zirGydojqZaAb7dnWkjpw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701131658; x=1701736458;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xYiTIXqRTDarNbi0aa1f81qxroNRuY69MIWNnPKjAyY=;
-        b=tbAViBLc4eefYFsPYNplIwRwGefVmc/B5/bJtpzIDZFx8iCDA0cfXtQneQZBuiF9iU
-         VBeiqn9Ezue3B8/qan7llM2noi7y760pnC6WtaYVe0pju5SrRmE7rvvrvaaPOGMN1qo2
-         aF4FASS4KkoP7LhzBZvh7hGQvhQmtU5ADvrGXFOUcnJH4nSs01iV42E4yCb1sTEMACte
-         QLzbMKYjU1ZFPuc+qxfiibXNxGdhmD6UF/8GfqYg5FYlyxPPukY+8qZl9I0ncjz6tpIN
-         x0371dHuysIZaUDJhmRGRzAOdPwrfymGCu23yNyZ5E/lekRxC+9SuNzgBgnEJlhAYCSB
-         NdQQ==
-X-Gm-Message-State: AOJu0Yz+J8k2OIo3AZnwyWnRivVnK301bT++eBGe2oaujDo9LJqP+bkZ
-	myabRINIxWOKdt5ocwMCqKwCEg==
-X-Google-Smtp-Source: AGHT+IE1qopXbd9oTJotAIwAhuzGIfmugcli9ua2BkHYosf3Vb/rPrjdoH2dQ3EIE9Fwv7Aw8jhVSA==
-X-Received: by 2002:a05:6a20:144b:b0:18c:382e:48fe with SMTP id a11-20020a056a20144b00b0018c382e48femr11176362pzi.15.1701131658027;
-        Mon, 27 Nov 2023 16:34:18 -0800 (PST)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id 102-20020a17090a09ef00b002800e0b4852sm9214040pjo.22.2023.11.27.16.34.17
+        d=1e100.net; s=20230601; t=1701149689; x=1701754489;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rLD4U1IQ3GBXZUYRBdNM3XjIajDHuVM3KMdSWM11Qn4=;
+        b=Gyy8ijIIKAJdNeHbkLiKHq4KduwTqIXwr4zxsj9AUEHncsXQBPc0Gqwpj53qD8WQMc
+         9nplTmosu7EZyx0xoYibXL/VCBF8PozFJGe92rqbRAYtqsWCNHsAiEStT0DcDduRx8e9
+         uLaMt3ouEbiyqtOe4qyP/0U4c0CTCA4dYB/zu0WomOTeXycnFJwx+2zwsQYZN7c6/DwJ
+         0DyiLhP0ThWBgmwfeqFCZ5wjaM+2iJe4xM639NaW2OWYI0yR+tMCl2bXb1WHsmVl3KNM
+         fhZjo5W4lShrkUbQF49Z1F4QCfQjpwsuQCmMLCXsSRnEpvmSzL6kd7AJ8zDe5WZPEsuk
+         XS9A==
+X-Gm-Message-State: AOJu0YwsL31JXBOTcxYgaCWD6tpyEez4Pe/i7t5eudSuk2i8GfsBYPdN
+	Qn0ttXNOlhw3vvUM3bnL7bTLzg==
+X-Google-Smtp-Source: AGHT+IG9oo9og7X0ZOa7sH8woREQOsxuAEQf7/f2lcKOZ5d71WwjwmAbp9twRvlp1eqdZVSNGAhVTQ==
+X-Received: by 2002:a17:902:9a96:b0:1cf:b4ca:4e79 with SMTP id w22-20020a1709029a9600b001cfb4ca4e79mr6869880plp.17.1701149688975;
+        Mon, 27 Nov 2023 21:34:48 -0800 (PST)
+Received: from google.com (KD124209171220.ppp-bb.dion.ne.jp. [124.209.171.220])
+        by smtp.gmail.com with ESMTPSA id l13-20020a170902d34d00b001cc29b5a2aesm9280184plk.254.2023.11.27.21.34.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Nov 2023 16:34:17 -0800 (PST)
-From: Kees Cook <keescook@chromium.org>
-To: ndesaulniers@google.com
-Cc: Kees Cook <keescook@chromium.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Tom Rix <trix@redhat.com>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Nicolas Schier <nicolas@fjasle.eu>,
-	llvm@lists.linux.dev,
-	linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] MAINTAINERS: refresh LLVM support
-Date: Mon, 27 Nov 2023 16:34:11 -0800
-Message-Id: <170113164796.1670732.18133777682518787773.b4-ty@chromium.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231117-maintainers-v1-1-85f2a7422ed9@google.com>
-References: <20231117-maintainers-v1-1-85f2a7422ed9@google.com>
+        Mon, 27 Nov 2023 21:34:48 -0800 (PST)
+Date: Tue, 28 Nov 2023 14:34:43 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Patrick Georgi <pgeorgi@google.com>, linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Stefan Reinauer <reinauer@google.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: Re: [PATCH] kconfig: WERROR unmet symbol dependency
+Message-ID: <20231128053443.GA6525@google.com>
+References: <20231122034753.1446513-1-senozhatsky@chromium.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231122034753.1446513-1-senozhatsky@chromium.org>
 
-On Fri, 17 Nov 2023 11:24:02 -0800, ndesaulniers@google.com wrote:
-> As discussed at the ClangBuiltLinux '23 meetup (co-located with Linux Plumbers
-> Conf '23), I'll be taking a step back from kernel work to focus on my growing
-> family and helping Google figure out its libc story. So I think it's time to
-> formally hand over the reigns to my co-maintainer Nathan.
+On (23/11/22 12:47), Sergey Senozhatsky wrote:
+> When KCONFIG_WERROR env variable is set treat unmet direct
+> symbol dependency as a terminal condition (error).
 > 
-> As such, remove myself from reviewer for:
-> - CLANG CONTROL FLOW INTEGRITY SUPPORT
-> - COMPILER ATTRIBUTES
-> - KERNEL BUILD
-> 
-> [...]
+> Suggested-by: Stefan Reinauer <reinauer@google.com>
+> Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 
-Applied to for-linus/hardening, thanks!
-
-[1/1] MAINTAINERS: refresh LLVM support
-      https://git.kernel.org/kees/c/9099184dec26
-
-Take care,
-
--- 
-Kees Cook
-
+Gentle ping.
