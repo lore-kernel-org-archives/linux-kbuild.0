@@ -1,191 +1,160 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C00D4A99C;
-	Mon,  5 Feb 2024 23:11:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FF642595
+	for <linux-kbuild@vger.kernel.org>; Tue,  6 Feb 2024 00:13:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707174671; cv=none; b=Vxog5655FjKEqJP6+rFkD85Jk0mo8ygCWjfo861Q7lTR0QU4/bHA/4Os8siilGCjkk6DWAihqEbwW4xJbX2HmAWIdaL3lyKtzYc6El1rZURsdiu9wSNGC1Da3a2sUjhBeL75RkwBLQTeyjjiO5rMU0cKuv+PKBNNnacECPWToAI=
+	t=1707178435; cv=none; b=n3D+qm93K8webr14mdXYEvaKvy41tIVwat4+o4hGZZEl7cw7ZBoyJTRrX3+tSwZFG5a2xx+4Qc2qfH2IEpGOS+x1pZr/S9/Nb1QmYksW5Q8yOznnRZdQ7ap6uddZGHv2RqPcr8dDFEX9D48Uic62kJvWDmQn4STqoStxuU0WTu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707174671; c=relaxed/simple;
-	bh=kKKhcMaqwLfUrQpjENPUNxtz3qXKdR24f6zeijBX9CE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hfX4qUK1cvmFMe7F7H/ACuRkEo0AfAuOxHOUcE9ankoIM7aQIuYd+xV7vF62C6c7bOg1lpDbHcdzSFkzS2Cmf/OLEifQp+o5CwpOF+SKZ6gcbIcr45AMEb8yeda9PnWm0fHv2WkoeLs8kFZBTYEEQ4L6qSDZlbN3dkl7yuMMVDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HB187Jmc; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1707178435; c=relaxed/simple;
+	bh=PZg3QWq+/GKgfZZA2qyqx39P/kRDLKfoOfmCw8uE3uc=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=KUkDIHci8eX1u8LNOp732UlvLCovbMSe93uPHa29eEhCx7hNYXNBX7LA4FESXyAu5qakZJKZPg9qDVVvaKcju/H491Qeb/Vq9jjrQpnUQqIOBp4SGu3Y660MPRJ/Nm0iDIbWvTEnX3mmLNaeCTuMQf3uR76zC/fG0KWqwA2ymXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=smile.fr; spf=pass smtp.mailfrom=smile.fr; dkim=pass (2048-bit key) header.d=smile-fr.20230601.gappssmtp.com header.i=@smile-fr.20230601.gappssmtp.com header.b=PElaE5FL; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=smile.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=smile.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HB187Jmc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4E64C43609;
-	Mon,  5 Feb 2024 23:11:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707174670;
-	bh=kKKhcMaqwLfUrQpjENPUNxtz3qXKdR24f6zeijBX9CE=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=HB187Jmc7N7uKVocaYk9dPVnB0bc0p+8iqaeqwMCeBQC0ZqhLdrW5YjLlU9tsfcx4
-	 pgwHPeYFLw0+aHppjkw35gZgsTrwzZEum4uVFCDDyjS6KpxNO0pjSNezg5C0DYSwB9
-	 9on4UE/EAlIFzTxnR1Z1Qd6PE6NFULCjGkN0uV93j0OpObNr3VLvi33C0ossP0j3ke
-	 /CTmygQGpqJmghvmv0/gBordhtTRSZiiRiECkmV8ubfpRSB9Hi+q7sVj7ZthVVjv1b
-	 yAonpdQ6wKRdWVgcXMuCK2PPO2vOr3+7Rg3QWuzSpCK/HHcEKU8/yU4kuS7wKlTIrK
-	 OyfXsaEhsR2sg==
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2cf4fafa386so63531461fa.1;
-        Mon, 05 Feb 2024 15:11:10 -0800 (PST)
-X-Gm-Message-State: AOJu0YziolENu1FszCFANQIQq4YZ6GRgAeGFAdzha71Q+QJxNm3JdB8k
-	ip14I5hhqIo4E7CZFVj42r16AKpZCr4ak2IrBHdN/+hHJIjogtqBXv4aKzNgURL4nd2XUdXZ4ZO
-	0vgccMY/f010pA23QMpz5NpKCr7s=
-X-Google-Smtp-Source: AGHT+IH/zQJiT8/Oo7PpxCUmoye89gZAefcTyo51dU8Du8JULRbKsx7NuW1HiTmxHkDZc8e1guuf9kncHcYJ5t3C078=
-X-Received: by 2002:a2e:9098:0:b0:2d0:996e:b014 with SMTP id
- l24-20020a2e9098000000b002d0996eb014mr347168ljg.32.1707174669110; Mon, 05 Feb
- 2024 15:11:09 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=smile-fr.20230601.gappssmtp.com header.i=@smile-fr.20230601.gappssmtp.com header.b="PElaE5FL"
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-33b29b5eab5so1730447f8f.2
+        for <linux-kbuild@vger.kernel.org>; Mon, 05 Feb 2024 16:13:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=smile-fr.20230601.gappssmtp.com; s=20230601; t=1707178431; x=1707783231; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JGAprqtgwfmvAPo8XwmHq4MOLLyHp0qoLOC+fnp28mc=;
+        b=PElaE5FLEeILIlVeSxLGe4wVM5aEf37u5b3k2Qcauh07I6v6rK2PfXkoxmdkooKxcN
+         AZFOqSANlvjAbO5Wl4FMgfKUHAqErEbdLs0CY2M20hvIZmc/+n97TGqQ/LYvw2Pay62Z
+         5AHjAM64kvfbJ5x/96v0FNbqoBPtpQv+VYijhob1gEWUYFiBg4A4qMHckPET7u2ADGXO
+         uZdIyj9Q+ZClFGOvg3KBuqej2KVXvk5zd3B822rEBOhz00mcHT7tCOzKDI1zTqcT9fJa
+         aR1GgriaiZOxe5iifa9EKAx5k3lfnoxAVqegvVB7EUZtnJoaVfj4Jfv/be6eRjD+h4cO
+         9JiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707178431; x=1707783231;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JGAprqtgwfmvAPo8XwmHq4MOLLyHp0qoLOC+fnp28mc=;
+        b=iQqaU+Q03GTTEl5OXCqYT9xhZTNwMPvIrGjlyj1Vhdtv569mG9YxaU+gU9AE3GTlui
+         TuICFihNDAoS4/LUtmjnz5ltJXnDstSWr+TKzLEP8LC13knhGgtSuXklBsTw1LC/fK5R
+         6r7gp0UJE4rEcie0NecwlzNNwSWKHw1GiwZEFJ3ZF4gRWJto5V/4XKEhHeED/DCxqouB
+         w8JdDLgv3po6zbfHeDdjaW7Ib1C98H+WwxJRFYxcAQ7A8RjDgM0S3R7zhpgJX1KpiNcN
+         AsDsbuXXk6nv9eGLnez75JOiazNwsMowL6JvRl9yUgXm+MCmd2ra3FzUveG/9lmrvQTv
+         tBuw==
+X-Gm-Message-State: AOJu0YxaM2LmxceBPJp6OXh0aIRdDjt2dItQR3h2RmiofSVhIFNFY2zQ
+	/9rLiHUB6fdY/2eZJG+HvWZBn4DFYfvr1YKcqqZRR/crCEE7ZYCifjrKS3I9LRQ=
+X-Google-Smtp-Source: AGHT+IFVdveHEmqxwMT4/lrRvnliU1C6woy6CYFET1Y1uqw/pAcuN254xpaVv8itNDA24IGtf/7z3g==
+X-Received: by 2002:adf:f342:0:b0:33a:ec79:f923 with SMTP id e2-20020adff342000000b0033aec79f923mr42991wrp.54.1707178431092;
+        Mon, 05 Feb 2024 16:13:51 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCXSkm+KM6a//GM/zt8jAHlWsL+R+s9l4YXJWg1ms9wE3bjkViT7qTUvsy7b5e5PiupkD2cg693R32UTsr918zPuNWNygjG+uFSovIBuPxd5Xm7lK2IijJ2BZaSurM3ygYbTl+DotuZr2x6cWpTPXZNLyJb8/OI1MHQRo2Ghheug212Tbf6xxTZBkpMoAylnuIwCCECEsubpc09Jntn/OM89NdVfKWA3+p/ywO1gWdanNHX05R3kPNp9tFvc0P7HnuwEixWBjJX+iR3KSUD7XUrbFN6oMuhAC3uzEUTnkocCLQNsopJ3RiUcgeCAjC+Kqf8r5ORhxmxKs6nvX94tkKsvoJZBvL/rRS2V/9fmv+rg9u0A+xpyGFNPxEGRXvm1k2Y/xAcXZMlP44j9FZESuS0up5toeSJNMu1cZJ6/ggWx7n3p/ucG/mFjYeXCAM8AJDCsccm1phCeQTjjcPlgKo4jfk6EVJN0pZK2KKJpZmK0e5EvIYQ7FjcStkmYMqz00z8dmX5YR1pth/yFfrHAIch64lGYkAIMifoFVLcviHFaJ9KHw6E8/7fATdGDugocyjUvuykyXJF8ENryYOBMe7c6lkiKGYUMDp3miQX8Mgbwqp5oTYXKV9uNa6z/ANe1VjvGnwT0u1LV02nZzE11Hl84MmT5Aqgijx05nV0MLtnPuQgUHIqcXWUnqB7AwLeIIQAhAiyDEHlmhXZRxWTsboWbiDgBZksbBHmBtpJ6eEfzTHBP6/GFSaD/6Vfh1kdSf7gQdL48+HB8FBzM2VqRr0Jj6rNqZhvXiRPeQx8rcq5C/lg/qgOf9ldIZP6Tk3z8tQ==
+Received: from P-ASN-ECS-830T8C3.local ([89.159.1.53])
+        by smtp.gmail.com with ESMTPSA id b17-20020a5d40d1000000b0033ae7d768b2sm686959wrq.117.2024.02.05.16.13.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Feb 2024 16:13:50 -0800 (PST)
+From: Yoann Congal <yoann.congal@smile.fr>
+To: linux-fsdevel@vger.kernel.org,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-serial@vger.kernel.org,
+	x86@kernel.org
+Cc: =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@igalia.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Darren Hart <dvhart@infradead.org>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Davidlohr Bueso <dave@stgolabs.net>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	John Ogness <john.ogness@linutronix.de>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Petr Mladek <pmladek@suse.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Yoann Congal <yoann.congal@smile.fr>,
+	Vegard Nossum <vegard.nossum@oracle.com>
+Subject: [PATCH v4 1/3] printk: Fix LOG_CPU_MAX_BUF_SHIFT when BASE_SMALL is enabled
+Date: Tue,  6 Feb 2024 01:13:31 +0100
+Message-Id: <20240206001333.1710070-2-yoann.congal@smile.fr>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240206001333.1710070-1-yoann.congal@smile.fr>
+References: <20240206001333.1710070-1-yoann.congal@smile.fr>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240131104851.2311358-1-john.g.garry@oracle.com>
- <CAK7LNATDMjzmgpBHZFTOJCkTCqpLPq8jEjdrwzEZ3uu7WMG7jg@mail.gmail.com> <23c67ffc-64a5-4e19-8fbd-ecb9bfe9d3ff@oracle.com>
-In-Reply-To: <23c67ffc-64a5-4e19-8fbd-ecb9bfe9d3ff@oracle.com>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Tue, 6 Feb 2024 08:10:32 +0900
-X-Gmail-Original-Message-ID: <CAK7LNASfTW+OMk1cJJWb4E6P+=k0FEsm_=6FDfDF_mTrxJCSMQ@mail.gmail.com>
-Message-ID: <CAK7LNASfTW+OMk1cJJWb4E6P+=k0FEsm_=6FDfDF_mTrxJCSMQ@mail.gmail.com>
-Subject: Re: [PATCH RFC 0/4] Introduce uts_release
-To: John Garry <john.g.garry@oracle.com>
-Cc: mcgrof@kernel.org, russ.weight@linux.dev, gregkh@linuxfoundation.org, 
-	rafael@kernel.org, rostedt@goodmis.org, mhiramat@kernel.org, 
-	mathieu.desnoyers@efficios.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, keescook@chromium.org, nathan@kernel.org, 
-	nicolas@fjasle.eu, linux-kernel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Feb 5, 2024 at 5:25=E2=80=AFPM John Garry <john.g.garry@oracle.com>=
- wrote:
->
-> On 02/02/2024 15:01, Masahiro Yamada wrote:
-> >> --
-> >> 2.35.3
-> >
-> > As you see, several drivers store UTS_RELEASE in their driver data,
-> > and even print it in debug print.
-> >
-> >
-> > I do not see why it is useful.
->
-> I would tend to agree, and mentioned that earlier.
->
-> > As you discussed in 3/4, if UTS_RELEASE is unneeded,
-> > it is better to get rid of it.
->
-> Jakub replied about this.
->
-> >
-> >
-> > If such version information is useful for drivers, the intention is
-> > whether the version of the module, or the version of vmlinux.
-> > That is a question.
-> > They differ when CONFIG_MODVERSION.
-> >
->
-> I think often this information in UTS_RELEASE is shared as informative
-> only, so the user can conveniently know the specific kernel git version.
->
-> >
-> > When module developers intend to printk the git version
-> > from which the module was compiled from,
-> > presumably they want to use UTS_RELEASE, which
-> > was expanded at the compile time of the module.
-> >
-> > If you replace it with uts_release, it is the git version
-> > of vmlinux.
-> >
-> >
-> > Of course, the replacement is safe for always-builtin code.
-> >
-> >
-> >
-> > Lastly, we can avoid using UTS_RELEASE without relying
-> > on your patch.
-> >
-> >
-> >
-> > For example, commit 3a3a11e6e5a2bc0595c7e36ae33c861c9e8c75b1
-> > replaced  UTS_RELEASE with init_uts_ns.name.release
-> >
-> >
-> > So, is your uts_release a shorthand of init_uts_ns.name.release?
->
-> Yes - well that both are strings containing UTS_RELEASE. Using a struct
-> sub-member is bit ungainly, but I suppose that we should not be making
-> life easy for people using this.
->
-> However we already have init_utsname in:
->
-> static inline struct new_utsname *init_utsname(void)
-> {
->         return &init_uts_ns.name;
-> }
->
-> So could use init_utsname()->release, which is a bit nicer.
->
-> >
-> >
-> >
-> > I think what you can contribute are:
-> >
-> >   - Explore the UTS_RELEASE users, and check if you can get rid of it.
->
-> Unfortunately I expect resistance for this. I also expect places like FW
-> loader it is necessary. And when this is used in sysfs, people will say
-> that it is part of the ABI now.
->
-> How about I send the patch to update to use init_uts_ns and mention also
-> that it would be better to not use at all, if possible? I can cc you.
+LOG_CPU_MAX_BUF_SHIFT default value depends on BASE_SMALL:
+  config LOG_CPU_MAX_BUF_SHIFT
+  	default 12 if !BASE_SMALL
+  	default 0 if BASE_SMALL
+But, BASE_SMALL is a config of type int and "!BASE_SMALL" is always
+evaluated to true whatever is the value of BASE_SMALL.
 
+This patch fixes this by using the correct conditional operator for int
+type : BASE_SMALL != 0.
 
-OK.
+Note: This changes CONFIG_LOG_CPU_MAX_BUF_SHIFT=12 to
+CONFIG_LOG_CPU_MAX_BUF_SHIFT=0 for BASE_SMALL defconfigs, but that will
+not be a big impact due to this code in kernel/printk/printk.c:
+  /* by default this will only continue through for large > 64 CPUs */
+  if (cpu_extra <= __LOG_BUF_LEN / 2)
+          return;
+Systems using CONFIG_BASE_SMALL and having 64+ CPUs should be quite
+rare.
 
+John Ogness <john.ogness@linutronix.de> (printk reviewer) wrote:
+> For printk this will mean that BASE_SMALL systems were probably
+> previously allocating/using the dynamic ringbuffer and now they will
+> just continue to use the static ringbuffer. Which is fine and saves
+> memory (as it should).
 
-As I mentioned in the previous reply, the replacement is safe
-for builtin code.
+Petr Mladek <pmladek@suse.com> (printk maintainer) wrote:
+> More precisely, it allocated the buffer dynamically when the sum
+> of per-CPU-extra space exceeded half of the default static ring
+> buffer. This happened for systems with more than 64 CPUs with
+> the default config values.
 
-When you touch modular code, please pay a little more care,
-because UTS_RELEASE and init_utsname()->release
-may differ when CONFIG_MODVERSIONS=3Dy.
+Signed-off-by: Yoann Congal <yoann.congal@smile.fr>
+Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Closes: https://lore.kernel.org/all/CAMuHMdWm6u1wX7efZQf=2XUAHascps76YQac6rdnQGhc8nop_Q@mail.gmail.com/
+Reported-by: Vegard Nossum <vegard.nossum@oracle.com>
+Closes: https://lore.kernel.org/all/f6856be8-54b7-0fa0-1d17-39632bf29ada@oracle.com/
+Fixes: 4e244c10eab3 ("kconfig: remove unneeded symbol_empty variable")
 
+---
+v3->v4:
+* Fix BASE_SMALL usage instead of switching to BASE_FULL because
+  BASE_FULL will be removed in the next patches of this series.
+---
+ init/Kconfig | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/init/Kconfig b/init/Kconfig
+index deda3d14135bb..d50ebd2a2ce42 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -734,8 +734,8 @@ config LOG_CPU_MAX_BUF_SHIFT
+ 	int "CPU kernel log buffer size contribution (13 => 8 KB, 17 => 128KB)"
+ 	depends on SMP
+ 	range 0 21
+-	default 12 if !BASE_SMALL
+-	default 0 if BASE_SMALL
++	default 0 if BASE_SMALL != 0
++	default 12
+ 	depends on PRINTK
+ 	help
+ 	  This option allows to increase the default ring buffer size
+-- 
+2.39.2
 
-
-
-
-
->
-> >
-> >   - Where UTS_RELEASE is useful, consider if it is possible
-> >     to replace it with init_uts_ns.name.release
->
-> ok, but, as above, could use init_utsname()->release also
-
-
-I am fine with it.
-
-
-init_utsname()->release is more commonly used
-(but less common than UTS_RELEASE)
-
-
-
-$ git grep   'init_utsname()->release' | wc
-     28      92    2065
-$ git grep   'init_uts_ns.name.release' | wc
-      7      34     587
-$ git grep   'UTS_RELEASE' | wc
-     57     304    4741
-
-
-
-
---=20
-Best Regards
-Masahiro Yamada
