@@ -1,107 +1,97 @@
-Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0F8711197;
-	Wed, 14 Feb 2024 01:25:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DE9A13AD8;
+	Wed, 14 Feb 2024 09:43:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707873933; cv=none; b=dRKoWr/UcaMqkvvKGuabW+HbHhT9qlflSZ7N9YBSbtPRHSAzjADlxMEWc0KInjC3j3fQCUNW6FloWi4Pnu3AfkUdTPze6u2pktZ1FEM6iBOiX1EVaAyZFZ5fbw4+TLzDyOUyUzgfL6Flj3ZxGVaiGgy9KdWXizVciE7krxCHhlk=
+	t=1707903792; cv=none; b=aCf/+rjO8d+iIzR2qAIFZ5PSBIInjBGBP1LZtAb5QTiM4WUpKCYrO2384UAV70JGMIQeO17vpYVMR6jq3tXfOrcCX6qrGnDw3mRZMl9LPpBEwa39wtHM4Fd1WBC2ITRQTXiP3rXglyJ1PX2NpLKiUGZ33dkB5y9IX6kXaw9U4UA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707873933; c=relaxed/simple;
-	bh=yOEMQLS0HBWD1xpp/GEUAOHOe6zYSrs6EjP/pYr8yKk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VFs01rmXl4/KldDFj63HcIe/C5A/SGTsFuPLDUPWGixReogELNWn6N9u35ToWaI1zon+WhaWjRgjW0rUQvOFrjw4hEhe4bRpXUOo6DMHxBdQMcM2oxaYxIb8ldHaMfJmnLMI/yFy1uTRySN9FOmE58J9kJtzGUcXcUdux0thqAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RJX4wR1B; arc=none smtp.client-ip=209.85.160.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1707903792; c=relaxed/simple;
+	bh=/5hVSHktuXKBdFSneU+sqS55ktsDEcZtWY02THLUTWE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=p9ZodUoNGWc5S0Ef9fmPvCqDDMDZfVYNNAF1VWfH+65vi35K2tbIu2v9FAVU0WPfipxmgbGVbycE8/E0fU9fORbIPvjAX2cvzE+Q6lycqUSjtHvnp45webS09atIDfsHjhR98k71md91CMkc2HyXHvoqCfSDhDzoCbSoJUmHh4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=yfTWt3rT; arc=none smtp.client-ip=46.235.227.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RJX4wR1B"
-Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-2185739b64cso3175408fac.0;
-        Tue, 13 Feb 2024 17:25:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707873931; x=1708478731; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8zqcKGjJIq8z28bcz9jGNmiRh2zlXlrXCYNsKpGAsbk=;
-        b=RJX4wR1B6KPkvvvpTmwmtkAhG7jv8V7Ys/5f76WCqrGv7ZYIFaaGvlm2jppkEyyvEJ
-         83qKm6IeKGx5E1qiwZwLhqrBxpoQZnuG9QDhtl8Fw/xoXTVqY8BK0X0MSVBknKt7fPk1
-         E7CzczaN3pLwJvVLNqTFbBWj3nrjXauB5YaYA4M829wv/gFcXtwgcUgMyHeo26opb8M3
-         tfG1LfPwXB+NQVN2KZFmkeUi8xqZL5G9uar5NQzxFOtLVHh+hmQyUq2zbKrsEmOWjpZm
-         QF6tX3U5tggVRkcZ7f0L4nKgSFIVflbeJo88M7MTCX4f7LIHGhwCHW3GPhdIV5JRIEW1
-         nvuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707873931; x=1708478731;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8zqcKGjJIq8z28bcz9jGNmiRh2zlXlrXCYNsKpGAsbk=;
-        b=LrH0PT3Bl/HPJNECWQt59WPo/2RGDebFpcD1t54P9cgS9WI28roPyWShMAC2vrTjKn
-         VofFSMlds7exk0sdQ6ukKz+sHZ2t+P8lsYKSbOZcQUPCZcNM02qOjZOpUI01SaN98jii
-         bgGF6SihcJBii2vk9XgEBIHkbdwpeo8/y7Wf0nQw7w9Hnw1gHt8H8OvPiUwyejlrtzUZ
-         tEP6I/DbdeV8PKh4JdczUcbLj1SJERC5RxdNjXamp1TJRpdWzYwHDN3uixILaYQwsCcV
-         NtcriVEPsvS5fqqvxy+R5j9qwX4nfgSC37qO2PKdtXTdGvNow0Fuk8gXStPvbr5UWUSq
-         a/JA==
-X-Forwarded-Encrypted: i=1; AJvYcCVRP9kbSlyQ7XJbxl97olVI0L8P6iC6RENSeWiRfZVRVfNSskyha01Krb71y6P1b8cnUwa3xYztC1cMmP8j5OS7x9xljI/l1opideN1egzrOOopT7ANG1bsLycsYonlCnokJacVmmsG0kAm
-X-Gm-Message-State: AOJu0YylKgH6/KROsuQniwgZK6thEf9eWOgKSYSnnjmd+MnkABZvkgVk
-	hb0Unfg5neBnGL+DoDGcRWXOFoB8dwQ8FVpTIDALOXDSp74/VLtz
-X-Google-Smtp-Source: AGHT+IGkPWH3yWst8zIhaEqoltQddmcw8FOkSPKhRemNOFMvUlGw/MFK4UEg1BMeMV6v3qIWULcviA==
-X-Received: by 2002:a05:6870:84c2:b0:21a:216d:3a6a with SMTP id l2-20020a05687084c200b0021a216d3a6amr1195402oak.52.1707873930990;
-        Tue, 13 Feb 2024 17:25:30 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVv1/HqwbbPQn8gnhT+3LrX1gtJKlF9y4+dDoI8DuptB9zKlMmYPlEA9NbSXc7Wg1qo5pU1tT2nPwL9R7K/x0hS8W2NQ6FKvh7TFU7du9IwKDTWJTsYCzl/xgDX+pM/hBynoFTzCmtPyjqMTRnatvME3uCT2Yqmi5r+5/X0m9XOEvFf71xLF6HJ+Ch6gyxc3oAatPw9jPfzVxMrjPDUyVy52T5Bw1MDX5whs0UBXXDKWBKTXiat5eSwOir99hrhzR55jp4MkLwW9bUTSdGhqpz3tDxveYLBih+jg96V47GtOSIU7CQgGSijeXr8yIqDqpHgHVxhT6CRRwcHPXkVM1VAnhcr4WDy1//qmSNJLrIip2eevvh4bpwaApC0+d3Thzy0pToic/MDQa9oeFNNLrBhhR8=
-Received: from my-computer.uh.edu ([129.7.0.170])
-        by smtp.googlemail.com with ESMTPSA id pc7-20020a0568701ec700b0021a89fff00esm572928oab.19.2024.02.13.17.25.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Feb 2024 17:25:30 -0800 (PST)
-From: Andrew Ballance <andrewjballance@gmail.com>
-To: justinstitt@google.com
-Cc: andrewjballance@gmail.com,
-	linux-kbuild@vger.kernel.org,
-	linux-kernel-mentees@lists.linuxfoundation.org,
-	linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev,
-	masahiroy@kernel.org,
-	morbo@google.com,
-	nathan@kernel.org,
-	ndesaulniers@google.com,
-	nicolas@fjasle.eu,
-	skhan@linuxfoundation.org
-Subject: [PATCH v3 1/1] gen_compile_commands: fix invalid escape sequence warning
-Date: Tue, 13 Feb 2024 19:23:05 -0600
-Message-ID: <20240214012439.879134-2-andrewjballance@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240214012439.879134-1-andrewjballance@gmail.com>
-References: <CAFhGd8pvhzehMGh1XEHBct7CGEQuF0CZeneMH3D6cKSRj5UdHQ@mail.gmail.com>
- <20240214012439.879134-1-andrewjballance@gmail.com>
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="yfTWt3rT"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1707903788;
+	bh=/5hVSHktuXKBdFSneU+sqS55ktsDEcZtWY02THLUTWE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=yfTWt3rThwEwUs2ZhQXKOg/ftYHcebsEIvFiVe9kcFlJsq3PvOoV5aTO1Ut0cTEb+
+	 4LpagApuIW8w6OMGDwh/OFgCdSgzZ+Pl6Rvh9l+9Svfv5yZBcmUThzaqS12BLBP986
+	 5Kn3zsAPkhY/4Asr5Azpq/DFjitOUdoLq88z5P00ESykYqhZXXvvCD1D/dCizNpyqr
+	 CGwG6rXsUKk4C4NvWCi5V7GXqB19sVHXfFTK8P+hlqeIWYS2YU6u7a4G/04Kro5fbX
+	 ta9AZTeZatefM84NA0SvCaSfIhCejpWRssvwGIGJRcslQ2YRVm2jbD3uUSjeCVhrf4
+	 tXmJ9S86cqstA==
+Received: from [100.113.186.2] (cola.collaboradmins.com [195.201.22.229])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: kholk11)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 81E293781FEF;
+	Wed, 14 Feb 2024 09:43:05 +0000 (UTC)
+Message-ID: <50342623-9955-4471-869c-1343abe4a2c0@collabora.com>
+Date: Wed, 14 Feb 2024 10:43:03 +0100
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/6] arm64: dts: Fix dtc interrupt_provider warnings
+Content-Language: en-US
+To: Rob Herring <robh@kernel.org>, soc@kernel.org,
+ Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>, NXP Linux Team <linux-imx@nxp.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Tsahee Zidenberg <tsahee@annapurnalabs.com>,
+ Antoine Tenart <atenart@kernel.org>, Joel Stanley <joel@jms.id.au>,
+ Andrew Jeffery <andrew@codeconstruct.com.au>, Ray Jui <rjui@broadcom.com>,
+ Scott Branden <sbranden@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
+ Gregory Clement <gregory.clement@bootlin.com>,
+ Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+ =?UTF-8?Q?Jonathan_Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
+ Thierry Reding <thierry.reding@gmail.com>,
+ Jonathan Hunter <jonathanh@nvidia.com>, Stefan Agner <stefan@agner.ch>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ =?UTF-8?Q?Beno=C3=AEt_Cousson?= <bcousson@baylibre.com>,
+ Tony Lindgren <tony@atomide.com>, Chanho Min <chanho.min@lge.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Magnus Damm <magnus.damm@gmail.com>, Linus Walleij <linusw@kernel.org>,
+ Imre Kaloz <kaloz@openwrt.org>, Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konrad.dybcio@linaro.org>,
+ Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor
+ <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>
+Cc: linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-aspeed@lists.ozlabs.org,
+ openbmc@lists.ozlabs.org, linux-tegra@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com, linux-omap@vger.kernel.org,
+ linux-mediatek@lists.infradead.org, linux-renesas-soc@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, linux-kbuild@vger.kernel.org
+References: <20240213-arm-dt-cleanups-v1-0-f2dee1292525@kernel.org>
+ <20240213-arm-dt-cleanups-v1-3-f2dee1292525@kernel.org>
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+In-Reply-To: <20240213-arm-dt-cleanups-v1-3-f2dee1292525@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-with python 3.12.1 '\#' results in this warning
-    SyntaxWarning: invalid escape sequence '\#'
+Il 13/02/24 20:34, Rob Herring ha scritto:
+> The dtc interrupt_provider warning is off by default. Fix all the warnings
+> so it can be enabled.
+> 
+> Signed-off-by: Rob Herring <robh@kernel.org>
 
-Signed-off-by: Andrew Ballance <andrewjballance@gmail.com>
----
- scripts/clang-tools/gen_compile_commands.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/scripts/clang-tools/gen_compile_commands.py b/scripts/clang-tools/gen_compile_commands.py
-index 5dea4479240b..e4fb686dfaa9 100755
---- a/scripts/clang-tools/gen_compile_commands.py
-+++ b/scripts/clang-tools/gen_compile_commands.py
-@@ -170,7 +170,7 @@ def process_line(root_directory, command_prefix, file_path):
-     # escape the pound sign '#', either as '\#' or '$(pound)' (depending on the
-     # kernel version). The compile_commands.json file is not interepreted
-     # by Make, so this code replaces the escaped version with '#'.
--    prefix = command_prefix.replace('\#', '#').replace('$(pound)', '#')
-+    prefix = command_prefix.replace(r'\#', '#').replace('$(pound)', '#')
- 
-     # Return the canonical path, eliminating any symbolic links encountered in the path.
-     abs_path = os.path.realpath(os.path.join(root_directory, file_path))
--- 
-2.43.0
+Reviewed-By: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com> # 
+MediaTek
 
