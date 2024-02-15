@@ -1,87 +1,124 @@
-Received: from lgeamrelo11.lge.com (lgeamrelo13.lge.com [156.147.23.53])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5981182DF
-	for <linux-kbuild@vger.kernel.org>; Thu, 15 Feb 2024 09:25:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.147.23.53
+Received: from smtp.domeneshop.no (smtp.domeneshop.no [194.63.252.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8066B12C53F;
+	Thu, 15 Feb 2024 12:39:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.63.252.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707989151; cv=none; b=UUW7HlkaGVxnCFuIDlxRWdgBYdnq00yuMd4muR5d1zg6NPGvwvYHQSmVNmQsbY6uXaF1zloeWpC/l/VyXxg8awfgY074j8jhEAJv7mCps1DMQ32E3IJBbyn9qv34uLzTvykZW40U0nlUk3xB6NYP/EEBn58886qFWpV0kPvRI3w=
+	t=1708000762; cv=none; b=BppmrqlGhZw6WK+GRrJiH3gqP2gsrrdbd8WUoYQpY5nsKEz76FUDzcw5G1G2XBdCZWF16Sa8uT6yqxEH0uMzWKoALDH8LQZF0B+s1nn0y6N05cVqtcmGr9c1LsoieqNuFsm/uzbnIRHODTne8JhfvgrodrFLrrBtwSN9iO3Ay+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707989151; c=relaxed/simple;
-	bh=WW+WFmDnH2V+1GQsgAFG07eSRILRm8Qu3HVR57TR4a4=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=oXhFU8yK179f365s2rHT5J1Zf2g/t+45QEA1aIvgyzTeNnssvu8DVnlizyTOsxqxWPSnNQKnx91xFxsiNv2RbWB/Bhj2SlqGIaY7pmNvaZuRAsuDmkGitISXvQAoxyVm/s9eaYOHmtyAalqST2Nxy1Vm/hpDP2APdhe75MaTEME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lge.com; spf=pass smtp.mailfrom=lge.com; arc=none smtp.client-ip=156.147.23.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lge.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lge.com
-Received: from unknown (HELO lgemrelse6q.lge.com) (156.147.1.121)
-	by 156.147.23.53 with ESMTP; 15 Feb 2024 17:55:46 +0900
-X-Original-SENDERIP: 156.147.1.121
-X-Original-MAILFROM: chanho.min@lge.com
-Received: from unknown (HELO ?10.178.36.63?) (10.178.36.63)
-	by 156.147.1.121 with ESMTP; 15 Feb 2024 17:55:46 +0900
-X-Original-SENDERIP: 10.178.36.63
-X-Original-MAILFROM: chanho.min@lge.com
-Subject: Re: [PATCH 3/6] arm64: dts: Fix dtc interrupt_provider warnings
-To: Rob Herring <robh@kernel.org>, soc@kernel.org,
- Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, NXP Linux Team <linux-imx@nxp.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Tsahee Zidenberg <tsahee@annapurnalabs.com>,
- Antoine Tenart <atenart@kernel.org>, Joel Stanley <joel@jms.id.au>,
- Andrew Jeffery <andrew@codeconstruct.com.au>, Ray Jui <rjui@broadcom.com>,
- Scott Branden <sbranden@broadcom.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
- Gregory Clement <gregory.clement@bootlin.com>,
- Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
- =?UTF-8?Q?Jonathan_Neusch=c3=a4fer?= <j.neuschaefer@gmx.net>,
- Thierry Reding <thierry.reding@gmail.com>,
- Jonathan Hunter <jonathanh@nvidia.com>, Stefan Agner <stefan@agner.ch>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- =?UTF-8?Q?Beno=c3=aet_Cousson?= <bcousson@baylibre.com>,
- Tony Lindgren <tony@atomide.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Magnus Damm <magnus.damm@gmail.com>, Linus Walleij <linusw@kernel.org>,
- Imre Kaloz <kaloz@openwrt.org>, Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konrad.dybcio@linaro.org>,
- Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor
- <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>
-Cc: linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-aspeed@lists.ozlabs.org,
- openbmc@lists.ozlabs.org, linux-tegra@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com, linux-omap@vger.kernel.org,
- linux-mediatek@lists.infradead.org, linux-renesas-soc@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-kbuild@vger.kernel.org,
- Lee Gunho <gunho.lee@lge.com>
-References: <20240213-arm-dt-cleanups-v1-0-f2dee1292525@kernel.org>
- <20240213-arm-dt-cleanups-v1-3-f2dee1292525@kernel.org>
-From: Chanho Min <chanho.min@lge.com>
-Message-ID: <f5aeffed-9365-b1db-4c32-4ed6da208ea0@lge.com>
-Date: Thu, 15 Feb 2024 17:55:46 +0900
-User-Agent: Mozilla/5.0 (X11; Linux i686; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+	s=arc-20240116; t=1708000762; c=relaxed/simple;
+	bh=0CrNpBu4yIiHyPyXquDCtohQJsa75tOaNepCV6CAu00=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TbVPLP51TEAaZ03ExhoOuPNPi4yIa10xtrCtDNfgB9HzjmgR1mRF2Q1n9/Tj/5s8QE9WEaCbn6MljQtlpWqjDX9ZaO2ltxcXZNOPRIL/lJdvcxWrxwGyZw3M/lEUNAPn2/TUYtp1gw6Z6qCprMKl8nFfuj8e16VjuXXFxmi/ELg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fjasle.eu; spf=pass smtp.mailfrom=fjasle.eu; dkim=pass (2048-bit key) header.d=fjasle.eu header.i=@fjasle.eu header.b=sd11SsMk; arc=none smtp.client-ip=194.63.252.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fjasle.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fjasle.eu
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=fjasle.eu header.i=@fjasle.eu header.b="sd11SsMk"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=fjasle.eu;
+	s=ds202307; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=0CrNpBu4yIiHyPyXquDCtohQJsa75tOaNepCV6CAu00=; b=sd11SsMkQ7iHgV+GJrN30/KviA
+	Ulaemp9KMtn0zGIpbsKHlRcgGL+MuRyMF/fNH766IcBjNz+clfzEX/3xfZMmWBCipji5Ja7sld+V6
+	Cwm853qVchFUeMqUQF3kEHFE6XLuz1dWZ/rNDIWV4HBWTRLDySwMmfcNOTEtuS6ZPrEibBiJiEsyJ
+	wR6qal0PCvWcXs2bzBLUjW69kESa9SKVAvFUni36VuEFT7ZxlFhPvJRWoLRFCEazY0Hb9rCF+Xadu
+	SFKO8+qAVrz2uZ3iRQaRDbx2BvTN0AwfzcuoQZIPs1cpo2DDGQmn7SD+kRlkvUCR/73Cr3rgABHb8
+	6GS4VQZw==;
+Received: from [2001:9e8:9e8:801:6f0:21ff:fe91:394] (port=48468 helo=bergen.fjasle.eu)
+	by smtp.domeneshop.no with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <nicolas@fjasle.eu>)
+	id 1rab10-00BKdV-Oh;
+	Thu, 15 Feb 2024 13:38:58 +0100
+Date: Thu, 15 Feb 2024 13:38:52 +0100
+From: Nicolas Schier <nicolas@fjasle.eu>
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Arnd Bergmann <arnd@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Javier Martinez Canillas <javierm@redhat.com>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] [v2] Documentation: kbuild: explain handling optional
+ dependencies
+Message-ID: <Zc4F3JttXSsBsw-P@bergen.fjasle.eu>
+References: <20230917192009.254979-1-arnd@kernel.org>
+ <CAK7LNASua5xkkg84s4o4GZ00hFRc10V9BmqyxfWfPi=JVFYC8g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240213-arm-dt-cleanups-v1-3-f2dee1292525@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="SLx/gfFA9UUD09BZ"
+Content-Disposition: inline
+In-Reply-To: <CAK7LNASua5xkkg84s4o4GZ00hFRc10V9BmqyxfWfPi=JVFYC8g@mail.gmail.com>
+X-Operating-System: Debian GNU/Linux trixie/sid
+Jabber-ID: nicolas@jabber.no
 
-On 24. 2. 14. 4:34 Rob Herring wrote:
-> The dtc interrupt_provider warning is off by default. Fix all the warnings
-> so it can be enabled.
-> 
-> Signed-off-by: Rob Herring <robh@kernel.org>
 
->   arch/arm64/boot/dts/lg/lg1312.dtsi                  | 1 -
->   arch/arm64/boot/dts/lg/lg1313.dtsi                  | 1 -
-Acked-by: Chanho Min <chanho.min@lge.com>
+--SLx/gfFA9UUD09BZ
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Mon 25 Sep 2023 16:06:41 GMT, Masahiro Yamada wrote:
+> On Mon, Sep 18, 2023 at 4:20=E2=80=AFAM Arnd Bergmann <arnd@kernel.org>=
+=20
+> wrote:
+> >
+> > From: Arnd Bergmann <arnd@arndb.de>
+> >
+> > This problem frequently comes up in randconfig testing, with
+> > drivers failing to link because of a dependency on an optional
+> > feature.
+> >
+> > The Kconfig language for this is very confusing, so try to
+> > document it in "Kconfig hints" section.
+> >
+> > Reviewed-by: Javier Martinez Canillas <javierm@redhat.com>
+> > Reviewed-by: Sakari Ailus <sakari.ailus@linux.intel.com>
+> > Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
+> > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> > ---
+> > v2: fix typos pointed out by Nicolas Schier
+>=20
+>=20
+> Applied to linux-kbuild. Thanks.
+
+Hi Masahiro,
+
+this patch seems to got lost, or did you intentionally removed it=20
+again?
+
+Kind regards,
+Nicolas
+
+--SLx/gfFA9UUD09BZ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEh0E3p4c3JKeBvsLGB1IKcBYmEmkFAmXOBdcACgkQB1IKcBYm
+EmmJNxAAkHRogwZILhoqFWK3tgngdLB7MkwI0nI7N136dpjW/zatqutnBvWxpBrz
+boH70WhEOieibR17yLtVsvtC7AH4TOwhtSvsfENy/IsCOvZZTdox30+eFMfBORrA
+SfcsROlP6AuXSjw42UdXvPneGL3rjX3VOQvMDtGgdI72GQm9xkUDmtCxVZC/bSU8
+NEx785JyhiTOmsHHO6AWOoZoh3lRe844TSEtekxF+apXEWJF+pr6br0CR1TyNnNY
+RG4Rsq4gJ7BLlb0ts8Cnld6mdyW6CikKlYkd2ru7aBEvyhLxSdF+oA7/I7agIQju
+Rgg0DSsYgSCeA+WWEneK+BE8dBRG6yfZ7M+Tu2GOSNSGOykDZyUeYmBai0lLNU++
+LoI/awE66lLgmAAfXtlXkOIO0anaEiE4t3i6vLRDKaPDXsFbeY25dM0sqwyzdAHS
+6pESnrbxdwxUl63THX+9jrYkiu2ji0axErUTn3XwmMLGw88CNm+ZkeI2db48WgVf
+sJNjhbfVpKOaJTaPQBcO+flFXWOlc2wFE1e8Q96wjJI5tOnlKthGdQ5xJTMTGF0x
+G2TANEw4Neo7hRwOImrcXolFrdoI4/BcRe3qotDQeHLn61jpvBSN1BTog/iREcZh
+i/gQQS4m1kmZOk0/quveFrKCBNtW57pP2jTP2tf3hhnjDZuQuQY=
+=KLro
+-----END PGP SIGNATURE-----
+
+--SLx/gfFA9UUD09BZ--
