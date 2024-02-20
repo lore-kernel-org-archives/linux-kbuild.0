@@ -1,107 +1,145 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C9B4657D7
-	for <linux-kbuild@vger.kernel.org>; Tue, 20 Feb 2024 11:31:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA1AE6A352;
+	Tue, 20 Feb 2024 13:40:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708428703; cv=none; b=dJM0C+6+KDT+EH13tfnv/ue8c46l1nAWgb6Eoe00rknwEk+s76YClK0RWy4bsaBZx+Kd+ZVD+WnW7iBhzKJz3rHtNXijCfNa2vzYvMEDOi2cMrghh2WfDUNl9EGNJJ2pyU72GAGsCNQyXAXXyhRxoSrJ2g5IvY9NPonqguZh9ok=
+	t=1708436416; cv=none; b=d++mkchmLJ4puqaGtgy1fOfOdpxYDG8utNPN4EoPvrX5rOHrZ2zA/IoqFGO91r/CFrh9SzJkuNNo0eDSvObd4UmY3krWc4afNb3vD9kY4q44JoaMmkoYSfz2yrIloQPOH7VV2we3f6kN6m6hH5M/ZYiGUZHbCurdIu2S+k7wbes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708428703; c=relaxed/simple;
-	bh=x8l3YanFxYZru5A4b40SoXypi1/XbyL4t/qe0rTQZ0E=;
+	s=arc-20240116; t=1708436416; c=relaxed/simple;
+	bh=JDJQNjVw0veG1VaCbbXgYBFSju4HC6XVDS/PqNxBn1k=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Vfq5cCc6nwgFPv3aNSog/9PmW1zNCrMH9/4FPtS8cpch37WPQKUxkkm9vX2KTVz6dYgFUtp0XWajhyVi1ClmCIt0e1Z7GolUl03ZPnA9DjV4e+RjszY8GGPTHZhDZtVIGyxRgQg2Zd5xygLgCWIILf3au/MZtGJLrm8O247tg8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GyoxAyW6; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=amprxO7RUNPQv7fzMDmyx5qQKMVRTfj04sIbqeGIUh/+j1MMy+TXAnU+t7rSRx0k7KYpEk7J3eEz1IPHwTIVePMN34ldxVjm5AOkHe3Oute/DjXPPHwMK29Zt4bJhpNligYT98Na3lroFJoZt4+w6Ul3+vSyNZo+QsRNHl1nTe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rLArZT+q; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GyoxAyW6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A976C43390
-	for <linux-kbuild@vger.kernel.org>; Tue, 20 Feb 2024 11:31:43 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rLArZT+q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64DB3C433F1;
+	Tue, 20 Feb 2024 13:40:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708428703;
-	bh=x8l3YanFxYZru5A4b40SoXypi1/XbyL4t/qe0rTQZ0E=;
+	s=k20201202; t=1708436415;
+	bh=JDJQNjVw0veG1VaCbbXgYBFSju4HC6XVDS/PqNxBn1k=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=GyoxAyW6nhcFwEl+WwjWhMLNRed7K/SJjK5rUhHU9Vj/w7H/fw5MOCXvrrD0oStve
-	 Jm7Pe4OhnpTB1gkKCxEtAEYpX5N2sAEJhqoCJpdnGLsHSICbLja2ZFb8te+S2SHg3l
-	 FJNuXXQFWmg3OjG8z7cLTVZQVdGQJmk3mPg1h/2g6KImluXrtBZEj8dPJ6ewefrqyu
-	 DmifZGljkwFpDA00HF//1mDjzdx3tkG9SqqjuLrIPi6//ONkmhXiegQYLKVOk2yTG+
-	 diUjpWodTHGRHHviAkv8GPjYNJropspFs0fDfHeGeMC/pk6yY2E0lccWdZ5oSGPRYQ
-	 Z/2sl4kSSc02w==
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2d22b8c6e0dso37098221fa.2
-        for <linux-kbuild@vger.kernel.org>; Tue, 20 Feb 2024 03:31:43 -0800 (PST)
-X-Gm-Message-State: AOJu0Yzwh3XT+wpIgOuMPkK+xRGBFtzX/nDJypuXVPM0FksMye94k9C/
-	GTGRiSQn88xO2jd++SQgM/DeywbdksvmjLQOmJKuqSS23TgLoBSM4JZ9MP8w6c+dT+Hg/eV2cbA
-	vareO8ZKimNJWTQGPyHVlI6s8gbc=
-X-Google-Smtp-Source: AGHT+IGOyaI6C3oilGNBfw9LxuZaqzLFSI0t6hjfa55k4Kz9DFhEK/9EUigpefVc1fIJLdQEhK8VzMj+2bLqnGSZdlQ=
-X-Received: by 2002:a2e:98c7:0:b0:2d2:2ada:9267 with SMTP id
- s7-20020a2e98c7000000b002d22ada9267mr6368766ljj.6.1708428701656; Tue, 20 Feb
- 2024 03:31:41 -0800 (PST)
+	b=rLArZT+qc+TFAcJdTODc0UbjE8Ongzr4+cb0ZJxf2TN1Ka+D5pZJFuHPrzb0pc9dO
+	 6UyOwJABmhW7fuWo0gNNceBhgT/q5UuWm4M3mZQGdHAPtNy9z6Vlm1IUSJ1Drn+mm0
+	 S9NfiPcK4NMifLJTfTTLms7lik6lkhByCWG41uXYRVK5H5SKfxE84OwSzstJQZp0BZ
+	 fA+m303Ekn9A+Pr4cWI6n6HFPlx05lwCzceXLp4LuUpBDN8cxSVn2l6vDbFCw8HbnZ
+	 DDynf9AOAm2wy3CHk7t/y6w/BwXeuTSZ2k5RTD2tnAKC9u2npE55UerLmvb3LoGQbJ
+	 95UXpH1wXk2ZA==
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-512be87a0f3so1780276e87.3;
+        Tue, 20 Feb 2024 05:40:15 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCW5dCYik3k6C9COKWfHSSBgcq8zGeuTPtDShDi5yCeJ9HodRiqp8nN46RtRAUIOHa9vcAYciFS4GS5myQ4XJ3d+QNZnMq207+8OZlz6TDPMT+bx3tw5Zk8BvTyFmQubQFgp0+da/jmAExL0
+X-Gm-Message-State: AOJu0YxYN+z/9TnmYC34zBi8srGC0jJ9+4q6DrLSBrNLk/dn0jz1n5eQ
+	nA67RHb1K83b3K0YQh2gTrNFK4LiySBaknHXkg7STasR8tEAKYkz1iY3i7X9Q0kVx/19fmpakwG
+	b/uz6nawKjZpUxRX3dw2xRwHLkAo=
+X-Google-Smtp-Source: AGHT+IGEDbJeXcckbzMiYZMx6O2WQYB/vnGFoZGu8Zv15CobuFxWqNDt17JsTSLOmf2HHpo6+Xodu81aQL1nhwKl4TM=
+X-Received: by 2002:ac2:505c:0:b0:512:a59d:27b3 with SMTP id
+ a28-20020ac2505c000000b00512a59d27b3mr5068137lfm.14.1708436413895; Tue, 20
+ Feb 2024 05:40:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240216141016.11425-1-dev.mbstr@gmail.com>
-In-Reply-To: <20240216141016.11425-1-dev.mbstr@gmail.com>
+References: <20240215151642.8970-1-petr.pavlu@suse.com>
+In-Reply-To: <20240215151642.8970-1-petr.pavlu@suse.com>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Tue, 20 Feb 2024 20:31:05 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAR-gic2AJQFNO7s+-ovxTvCftBkeje7T-XQRganFvV3+w@mail.gmail.com>
-Message-ID: <CAK7LNAR-gic2AJQFNO7s+-ovxTvCftBkeje7T-XQRganFvV3+w@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: lxdialog: fixed cursor render in checklist
-To: Matthew Bystrin <dev.mbstr@gmail.com>
-Cc: linux-kbuild@vger.kernel.org
+Date: Tue, 20 Feb 2024 22:39:37 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAS=knGxd9ZRo37CaKTvjcc28bqNasx+XuqbV3S+XV=HtQ@mail.gmail.com>
+Message-ID: <CAK7LNAS=knGxd9ZRo37CaKTvjcc28bqNasx+XuqbV3S+XV=HtQ@mail.gmail.com>
+Subject: Re: [PATCH v2] kbuild: Use -fmin-function-alignment when available
+To: Petr Pavlu <petr.pavlu@suse.com>
+Cc: nathan@kernel.org, nicolas@fjasle.eu, mark.rutland@arm.com, 
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 16, 2024 at 11:10=E2=80=AFPM Matthew Bystrin <dev.mbstr@gmail.c=
-om> wrote:
+On Fri, Feb 16, 2024 at 12:16=E2=80=AFAM Petr Pavlu <petr.pavlu@suse.com> w=
+rote:
 >
-> When a checklist is opened, the cursor is rendered in a wrong position
-> (after the last list element on the screen). You can observe it by
-> opening any checklist in menuconfig.
+> GCC recently added option -fmin-function-alignment, which should appear
+> in GCC 14. Unlike -falign-functions, this option causes all functions to
+> be aligned at the specified value, including the cold ones.
 >
-> Added wmove() to set the cursor in the proper position, just like in
-> menubox.c. Removed wnoutrefresh(dialog) because dialog window has
-> already been updated in print_buttons(). Replaced wnoutrefresh(list) and
-> doupdate() calls with one wrefresh(list) call.
+> Detect availability of -fmin-function-alignment and use it instead of
+> -falign-functions when present. Introduce CC_HAS_SANE_FUNCTION_ALIGNMENT
+> and make the workarounds for the broken function alignment conditional
+> on this setting.
 >
-> Signed-off-by: Matthew Bystrin <dev.mbstr@gmail.com>
-
-
-Applied to linux-kbuild.
-
-Thanks.
-
-
-
-
+> Signed-off-by: Petr Pavlu <petr.pavlu@suse.com>
 > ---
->  scripts/kconfig/lxdialog/checklist.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
->
-> diff --git a/scripts/kconfig/lxdialog/checklist.c b/scripts/kconfig/lxdia=
-log/checklist.c
-> index fd161cfff121..31d0a89fbeb7 100644
-> --- a/scripts/kconfig/lxdialog/checklist.c
-> +++ b/scripts/kconfig/lxdialog/checklist.c
-> @@ -188,9 +188,8 @@ int dialog_checklist(const char *title, const char *p=
-rompt, int height,
->
->         print_buttons(dialog, height, width, 0);
->
-> -       wnoutrefresh(dialog);
-> -       wnoutrefresh(list);
-> -       doupdate();
-> +       wmove(list, choice, check_x + 1);
-> +       wrefresh(list);
->
->         while (key !=3D KEY_ESC) {
->                 key =3D wgetch(dialog);
-> --
-> 2.43.0
->
+
+[snip]
+
+> index dfb963d2f862..5a6fed4ad3df 100644
+> --- a/kernel/exit.c
+> +++ b/kernel/exit.c
+> @@ -1920,7 +1920,10 @@ EXPORT_SYMBOL(thread_group_exited);
+>   *
+>   * See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D88345#c11
+>   */
+> -__weak __function_aligned void abort(void)
+> +#ifndef CONFIG_CC_HAS_SANE_FUNCTION_ALIGNMENT
+> +__function_aligned
+> +#endif
+> +__weak void abort(void)
+>  {
+>         BUG();
 
 
---=20
+
+
+
+__function_aligned is conditionally defined in
+include/linux/compiler_types.h, and then it is
+conditionally used in kernel/exit.c
+
+This is unreadable.
+
+
+
+
+You may want to move CONFIG_CC_HAS_SANE_FUNCTION_ALIGNMENT
+to include/linux/compiler_types.h, as this is more
+aligned with what you did for __cold.
+
+
+
+if !defined(CONFIG_CC_HAS_SANE_FUNCTION_ALIGNMENT) && \
+               CONFIG_FUNCTION_ALIGNMENT > 0
+#define __function_aligned       __aligned(CONFIG_FUNCTION_ALIGNMENT)
+#else
+#define __function_aligned
+#endif
+
+
+
+
+
+However, an even more elegant approach is to unify
+the two #ifdef blocks because __cold and __function_aligned
+are related to each other.
+
+
+
+#if defined(CONFIG_CC_HAS_SANE_FUNCTION_ALIGNMENT) || \
+                 (CONFIG_FUNCTION_ALIGNMENT =3D=3D 0)
+#define __cold                 __attribute__((__cold__))
+#define __function_aligned
+#else
+#define __cold
+#define __function_aligned     __aligned(CONFIG_FUNCTION_ALIGNMENT)
+#endif
+
+
+
+
+
+
+
+
+
+--
 Best Regards
 Masahiro Yamada
