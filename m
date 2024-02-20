@@ -1,70 +1,107 @@
-Received: from elvis.franken.de (elvis.franken.de [193.175.24.41])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 912C569DFF;
-	Tue, 20 Feb 2024 13:48:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.175.24.41
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A35F74E0A
+	for <linux-kbuild@vger.kernel.org>; Tue, 20 Feb 2024 15:28:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708436934; cv=none; b=d9mD8hBPtQagykPxKbJnl48t9HvOzL8fcNy5x+KCQzjynYwrjMmmHWIrUDRGhd8KJ5cxC75hq4kJD2xIKKaNRza49CyNPQP6DAqsKEg0M0kzZ1cuGBcw+g7AT3dgvMBh4TfPmRqderxXqr1TAdRZxAC2BksbhukZidVt6RzGboE=
+	t=1708442908; cv=none; b=hfg4wGqtUgkcGyQ8HvXUl9GVgcZFKop1WHt3+2c4vPNtWvYOl99mIRKo9sfCprQdSDqk/p2hbbLfkp6X+AFwTvO93seI0ARoivEiVTQ4IWKa4gRWzFRuthv6Uu+xyn4zwjiTVLpJSyP/R67Q6Z57bhSEeykdv4nOD52siwT7iOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708436934; c=relaxed/simple;
-	bh=FXC6OCaMo6PBra09rv0mQ7fmtDHn40tyIY5riwAomwY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LrujmuqsVy2d3VSWVnaKDHC+6/Z1QpTfMQpo/eq67d2a2/riCvtYD7XhqB9Wb+/CRunukMLljWUXA9eev+jEIYMf372prRGGDoOMe7SA6mTu3FD5mceAvGma/ucX0xrybsLzbvwuap8yuukiTgWKzxfQt2FrikJjbBHwrfLW9OY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alpha.franken.de; spf=pass smtp.mailfrom=alpha.franken.de; arc=none smtp.client-ip=193.175.24.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alpha.franken.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alpha.franken.de
-Received: from uucp by elvis.franken.de with local-rmail (Exim 3.36 #1)
-	id 1rcQUF-0007OQ-00; Tue, 20 Feb 2024 14:48:43 +0100
-Received: by alpha.franken.de (Postfix, from userid 1000)
-	id 99382C0694; Tue, 20 Feb 2024 14:38:24 +0100 (CET)
-Date: Tue, 20 Feb 2024 14:38:24 +0100
-From: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: linux-mips@vger.kernel.org, linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/1] MIPS: move unselectable entries out of the "CPU
- type" choice
-Message-ID: <ZdSrUKlV+Q37S3B7@alpha.franken.de>
-References: <20240127162309.1026549-1-masahiroy@kernel.org>
- <20240127162309.1026549-2-masahiroy@kernel.org>
+	s=arc-20240116; t=1708442908; c=relaxed/simple;
+	bh=UVLriIpfrdpJPFajm71aoVJ8QkLWvRefgJDCt8opwww=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Bv/U1AcNwhrHmcwenHxhNMYyG3/7b2q+OYIydD6zr9VgnzEqpUUQf4+Giw6RzZL4eiFOW9Y4BuRMydDkqJGVm+GAyfla7Jo4LAvOD94dQvZ8FtfDlixqxcR/LPh/+cN4zzRsYQgWxTPvlPI2equOe2vw5l+YQYLjni0ciOxdu54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=RnagBOFq; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="RnagBOFq"
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a3e7f7b3d95so299325866b.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 20 Feb 2024 07:28:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1708442904; x=1709047704; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XcksBfOCrTeFsWG5z2uYrSU/RcRjea2qnZfecVJx4nk=;
+        b=RnagBOFqkyJbs08aZtEcKjHCk4hLC8aIfc+iM718gYJnENB8CKEF7hY7piGKHOg1Dg
+         uGWnpjK2RlqKeWYFr8Ezd2+2dVpfCjTnJDiap2hgL6momYBU2MwzSnKMuNSIdyLDczuh
+         XUXBr/ycbvo60Zr+Vfm0tZbGtqoVKlt49HzifPTgaGutY8LqygOVkZTJyNvzZrVq1MZP
+         0Pm4GDrJjpe0F1mZQVTuYBoh6+2WyONw5LiFQqa9dmMEVGtaBL1IHmid+lvvTAdqX4aR
+         TJhxTGvQriO13dooYozrrXRCBIa68HoGVx3FEAP+usPt0Jb9DDMZhGyYrl7Xpz/F99kh
+         xydQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708442904; x=1709047704;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XcksBfOCrTeFsWG5z2uYrSU/RcRjea2qnZfecVJx4nk=;
+        b=Wz5V09ovWhYzujxJadW8vYZwFLWb+9MlEGF1xsY+u7PheAYHC/kW29frZVYcEjhH32
+         Lmlc5w4B/adopzK4xZGts3OuF4lOZr2OFre2zCYTfLc/Jhzu2rr+7gQx7YnUV0G72Rvz
+         X1rS90zPnc6ZlxvW5quI1rWN0AnjTm1EeOZiQRbw9GLTc7yumiO8uc5XH7ynLzGiyDYe
+         h7C9zCjLFSwpSRt/c8+QAORGhrbxf/361SkJp1uCmykknjrJM2pGGd3NkuVhsId6m5H2
+         pWV7YSHgX1lDyClE4KGYY13SH/tKwVuC4Up9Cyzr86Me82zjZvw5IOeEWVd3FGbmtPbB
+         Y1hw==
+X-Forwarded-Encrypted: i=1; AJvYcCURIxdxS5SWr/Xc8S+qSbCOoGsGIPbxEnOqpr6XBB6kwGfxBaqQAiVM/w0dlEAMRvyJx4JR4N3+2ThEE7A+q/TMEs2/hL2p8uEWQcVk
+X-Gm-Message-State: AOJu0YzRUKYzyKbGRjNTi6m07XL6QoQPDLb+ADW2AoLIy8jXlpzB6I9e
+	1tL8Csghp36oXbr+D8czf6kQHmW0Enai3Ckf7UtbaTlXyUF8di0j0tk69z5LzwY=
+X-Google-Smtp-Source: AGHT+IGhdJLTwm3ykzZLu9BaukJMGGo/4XttbvnV7nwt//z0Rmmt73MQF1z4dOhk61XgIiIrH0LNIQ==
+X-Received: by 2002:a17:906:60f:b0:a3e:b8ac:288f with SMTP id s15-20020a170906060f00b00a3eb8ac288fmr3168446ejb.4.1708442904601;
+        Tue, 20 Feb 2024 07:28:24 -0800 (PST)
+Received: from [10.100.51.161] (nat2.prg.suse.com. [195.250.132.146])
+        by smtp.gmail.com with ESMTPSA id s13-20020a170906bc4d00b00a3e8b5df769sm2322738ejv.35.2024.02.20.07.28.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Feb 2024 07:28:24 -0800 (PST)
+Message-ID: <1c6bb7d4-59bf-4887-8a0a-03373d3d9c11@suse.com>
+Date: Tue, 20 Feb 2024 16:28:23 +0100
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240127162309.1026549-2-masahiroy@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] kbuild: Use -fmin-function-alignment when available
+Content-Language: en-US
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: masahiroy@kernel.org, nathan@kernel.org, nicolas@fjasle.eu,
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240215151642.8970-1-petr.pavlu@suse.com>
+ <ZdON5rbsYFsoulxm@FVFF77S0Q05N>
+From: Petr Pavlu <petr.pavlu@suse.com>
+In-Reply-To: <ZdON5rbsYFsoulxm@FVFF77S0Q05N>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Jan 28, 2024 at 01:23:09AM +0900, Masahiro Yamada wrote:
-> Move the following entries out of the "CPU type" choice:
+On 2/19/24 18:20, Mark Rutland wrote:
+> On Thu, Feb 15, 2024 at 04:16:42PM +0100, Petr Pavlu wrote:
+>> GCC recently added option -fmin-function-alignment, which should appear
+>> in GCC 14. Unlike -falign-functions, this option causes all functions to
+>> be aligned at the specified value, including the cold ones.
+>>
+>> Detect availability of -fmin-function-alignment and use it instead of
+>> -falign-functions when present. Introduce CC_HAS_SANE_FUNCTION_ALIGNMENT
+>> and make the workarounds for the broken function alignment conditional
+>> on this setting.
+>>
+>> Signed-off-by: Petr Pavlu <petr.pavlu@suse.com>
 > 
->  - LOONGSON3_ENHANCEMENT
->  - CPU_LOONGSON3_WORKAROUNDS
->  - CPU_LOONGSON3_CPUCFG_EMULATION
+> I don't have a GCC 14 build to play with, but this looks sound to me.
 > 
-> These entries cannot be selected from the choice because they depend on
-> CPU_LOONGSON64, which is also located in the same choice.
-> 
-> In fact, Kconfig does not consider them as choice values because they
-> become children of CPU_LOOONGSON64 due to the automatic submenu creation
-> in menu_finalize().
-> 
-> However, it is hard to understand this behavior unless you are familiar
-> with the Kconfig internals.
-> 
-> "choice" should contain only selectable entries.
-> 
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
-> 
->  arch/mips/Kconfig | 76 +++++++++++++++++++++++------------------------
->  1 file changed, 38 insertions(+), 38 deletions(-)
+> Petr, are you able to test an arm64 kernel with this and DYNAMIC_FTRACE
+> enabled? i.e. build that, and check that function symbols are all aligned to 8
+> bytes using objdump or similar? That way we could be pretty sure there's no
+> other latent issue in this area.
 
-applied to mips-next.
-
-Thomas.
+I tested an arm64 kernel with DYNAMIC_FTRACE, in particular with
+DYNAMIC_FTRACE_WITH_CALL_OPS=y. That is actually the primary motivation
+for this patch. We ran in our environment into some incorrectly aligned
+functions with this option despite the kernel workarounds. They were
+reported as "Misaligned patch-site" warnings from ftrace_call_adjust().
+I don't observe them anymore with -fmin-function-alignment in my tests.
+Sorry, I should have mentioned this motivation in the commit message.
 
 -- 
-Crap can work. Given enough thrust pigs will fly, but it's not necessarily a
-good idea.                                                [ RFC1925, 2.3 ]
+Thanks,
+Petr
+
