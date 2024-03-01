@@ -1,33 +1,34 @@
 Received: from mailhost.m5p.com (mailhost.m5p.com [74.104.188.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D3F11362
-	for <linux-kbuild@vger.kernel.org>; Mon,  4 Mar 2024 02:11:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45E03EDF
+	for <linux-kbuild@vger.kernel.org>; Mon,  4 Mar 2024 02:18:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.104.188.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709518265; cv=none; b=O5h3NkkenTy6fKB6iGZHfXEP3I4LYqHcT6Hxp1nNbWCxC3DwcGvN1+hLA5hvQxQG81taAPm4E8YxH4yj13PO44z2vC5kDpH0s6i8t213EjXiClskpnRwL04iDxewLtlPxADPGChHxpSFRQRwJSnFgdrhHQIMhcFwQEqe7dx8xSQ=
+	t=1709518688; cv=none; b=YzJQ7V2h4lNWa2mTKxDRd7hKH3D/tHZOCw+/kdETeQ+56zRLxL8XuuQTtRD6RQiZHFRZlMNOtC5CaRUACjNySGGupd9D3IYTt45PWT9sZt6pvkknQjvuUHAVC9V59WJzaaVvseBLRYz9FembGVfTP2HDvR+foLlOk0wwVqUnFKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709518265; c=relaxed/simple;
-	bh=h4/hvtZxNmGc4xWK0xDrhpXuUKYEUSPg1jU4l/Le7s4=;
-	h=Message-Id:In-Reply-To:References:From:Date:Subject:To:Cc; b=lwC8lsneB6cw8ZE/SFZi6RufKpyw7MapvDv0dULUl3BqyLH3qPHeRs+td9fX0TIaReo7Hi4CrAZxFbOemNUn0Y0BKp1D+x1WueXnD9aWzQUjcrX/sl466G+UIW8ui4Ej64cCBy3aZa1uI1NQP1hitL80LYxSnom9oTTzxhOhqhU=
+	s=arc-20240116; t=1709518688; c=relaxed/simple;
+	bh=9r/GCE5TabIjWxrtUzKUpf7OCFGMfMN1KuvaGkFLZ6Y=;
+	h=Message-Id:In-Reply-To:References:From:Date:Subject:To:Cc; b=CMZ6qmZB8gjcLyoa09idvOlx7CbD/AakNiRYhe5zSpbzJA51fZwXorLBxKsfwwqLQf/R7vJvYGHNHcUv9x/YgW2biq+DAkbiE3lpJ2pdZBQ1RzJr/Gt9QiR2/mrZ8QiWUe1aP+C/FmMs8eslE7T0B94KIZEEODNbWB4/IM6btwo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=m5p.com; spf=pass smtp.mailfrom=m5p.com; arc=none smtp.client-ip=74.104.188.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=m5p.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=m5p.com
 Received: from m5p.com (mailhost.m5p.com [IPv6:2001:470:1f07:15ff:0:0:0:f7])
-	by mailhost.m5p.com (8.17.1/8.15.2) with ESMTPS id 4242Aj3J021818
+	by mailhost.m5p.com (8.17.1/8.15.2) with ESMTPS id 4242FfS6021852
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Sun, 3 Mar 2024 21:10:51 -0500 (EST)
+	Sun, 3 Mar 2024 21:15:47 -0500 (EST)
 	(envelope-from ehem@m5p.com)
 Received: (from ehem@localhost)
-	by m5p.com (8.17.1/8.15.2/Submit) id 4242AiaP021817;
-	Sun, 3 Mar 2024 18:10:44 -0800 (PST)
+	by m5p.com (8.17.1/8.15.2/Submit) id 4242FebC021851;
+	Sun, 3 Mar 2024 18:15:40 -0800 (PST)
 	(envelope-from ehem)
-Message-Id: <f0595a783d60c80c78a861ff70e7cf52f3a0729a.1709508290.git.ehem+linux@m5p.com>
+Message-Id: <ca98f586d81973fcc01826a8f2b1d5754f9c10e0.1709508290.git.ehem+linux@m5p.com>
 In-Reply-To: <cover.1709508290.git.ehem+linux@m5p.com>
 References: <cover.1709508290.git.ehem+linux@m5p.com>
 From: Elliott Mitchell <ehem+linux@m5p.com>
-Date: Sun, 3 Mar 2024 15:24:50 -0800
-Subject: [WIP PATCH 04/30] build: add trailing slash to $(*tree)
+Date: Fri, 1 Mar 2024 11:48:49 -0800
+Subject: [WIP PATCH 07/30] build: modify uses of $(srctree) to assume trailing
+ slash
 To: masahiroy@kernel.org, nathan@kernel.org, nicolas@fjasle.eu
 Cc: linux-kbuild@vger.kernel.org
 Precedence: bulk
@@ -36,63 +37,37 @@ List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 
-Date: Tue, 20 Feb 2024 09:13:37 -0800
+This isn't much more than `find | sed` to adjust all uses of $(srctree).
+This is split into a separate commit to highlight the actual changes to
+the build machinery.
 
-This better handles the case of $({src|obj}tree) being the current
-directory and $({src|obj}) being an absolute path.  Instead of being
-".", $({src|obj}tree) ends up empty, and $({src|obj}) can be directly
-appended.
+Include the instance of $(objtree) in include/uapi/Makefile while at it.
 
 Signed-off-by: Elliott Mitchell <ehem+linux@m5p.com>
 ---
-I suspect the Makefile sections in tools/ are attempting to solve the
-*exact* *same* issue.  Problem is that workaround requires changes in
-every Makefile, whereas this looks closer to the root cause.
+`grep` was also used to locate things which needed other actions
+(notably the non-toplevel Makefile adjustments), but this is roughly:
 
-I'm less than 100% sure I've avoided all spacing changes.  I forget
-where, but I seem to recall running into a space which was instead a tab.
+find . -name Kbuild\* -print0 | xargs -0 sed -i -e's,$(srctree)$,$(srctree:%/=%),' -e's,$(srctree)\([^,/]\),$(srctree:%/=%)\1,g' -es',$(srctree)/,$(srctree),g'
 
-`find . -name Makefile* -print0 | xargs -0 grep -e^\[\[:space:\]\]\*srctree.\*=`
-is a handy way to locate these.
+There could be goofs in here or missed bits.  I hope not, but...
 ---
- Makefile | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ include/uapi/Kbuild | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Makefile b/Makefile
-index a7696f13bece..6d7758a76429 100644
---- a/Makefile
-+++ b/Makefile
-@@ -246,24 +246,24 @@ else # need-sub-make
- 
- ifeq ($(abs_srctree),$(abs_objtree))
-         # building in the source tree
--        srctree := .
-+        srctree := ./
- 	building_out_of_srctree :=
- else
-         ifeq ($(abs_srctree)/,$(dir $(abs_objtree)))
-                 # building in a subdirectory of the source tree
--                srctree := ..
-+                srctree := ../
-         else
--                srctree := $(abs_srctree)
-+                srctree := $(abs_srctree)/
-         endif
- 	building_out_of_srctree := 1
+diff --git a/include/uapi/Kbuild b/include/uapi/Kbuild
+index 4b8401173ef5..4d685badb829 100644
+--- a/include/uapi/Kbuild
++++ b/include/uapi/Kbuild
+@@ -8,7 +8,7 @@ no-export-headers += linux/kvm.h
  endif
  
- ifneq ($(KBUILD_ABS_SRCTREE),)
--srctree := $(abs_srctree)
-+srctree := $(abs_srctree)/
+ ifeq ($(wildcard $(srctree)arch/$(SRCARCH)/include/uapi/asm/kvm_para.h),)
+-ifeq ($(wildcard $(objtree)/arch/$(SRCARCH)/include/generated/uapi/asm/kvm_para.h),)
++ifeq ($(wildcard $(objtree)arch/$(SRCARCH)/include/generated/uapi/asm/kvm_para.h),)
+ no-export-headers += linux/kvm_para.h
  endif
- 
--objtree		:= .
--VPATH		:= $(srctree)
-+objtree		:= ./
-+VPATH		:= $(srctree).
- 
- export building_out_of_srctree srctree objtree VPATH
- 
+ endif
 -- 
 2.39.2
 
