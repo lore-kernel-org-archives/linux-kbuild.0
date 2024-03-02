@@ -1,34 +1,34 @@
 Received: from mailhost.m5p.com (mailhost.m5p.com [74.104.188.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5544C1854
-	for <linux-kbuild@vger.kernel.org>; Mon,  4 Mar 2024 02:37:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B92E38D
+	for <linux-kbuild@vger.kernel.org>; Mon,  4 Mar 2024 02:37:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.104.188.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709519831; cv=none; b=ckVBp6MIKz0Gqs878lHmHuGxu9euVlIGjIEuPaB2KIqq1BHRqKzWqbb06CsvPWYPaXrzv46nOeGIPpcFvghwY/wiPSAkuCZMAzVaq1PP7+1WOl2w9GmxufY2CMPM7e0yM24BqW9t2e43lDem/vRAwhY7KaTEIvo54yRKqaUchAk=
+	t=1709519832; cv=none; b=Iz6UAGx/Dj0G9jVsXvmju+xfElcVUniDu5IEHkFdwNG+VCW0wihdKuXOuBLYTQqp/ukyeF3iErxOOjWNJ/VwR/cDrs7Qqb5AYa1lbA0B/oP4DqD2Xbo8QjwNrQq5ZTAeufEivu7PLVEWqL1uMOLyQX/Hn99uYyKN6Hm8VS58Fek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709519831; c=relaxed/simple;
-	bh=k7gtVEbelQhD9LQpywuIKFtyW3863gG7ECWuoCdIAoI=;
-	h=Message-Id:In-Reply-To:References:From:Date:Subject:To:Cc; b=qchibWqhyDbz2XWqw1hBEw8rUvvjUDeWZQ/N3y0A6E7aXfvicW8jRsFMMJEHm/mXyLWVfwBWVW3mAHwCWax623rW3ZToObhruScgZvJZ1ZL5JFOLEjLBgK/jW8tKGJSDsmIJBwR6n/xoWojgcFCJRZ5bXpbtW7qhUhh44kZQDlc=
+	s=arc-20240116; t=1709519832; c=relaxed/simple;
+	bh=WRyOSFy0go59gBwZ37D0NyxxWYEmX4Jwk3P79nRz4Qc=;
+	h=Message-Id:In-Reply-To:References:From:Date:Subject:To:Cc; b=pFX+SXxiibVthgs2PPXqCugtBHj+O3/tLpuPkNag2XZ5yk5XTqVUgNB3jjKLlEXOn+ZoKEU9M7a+bk8GVnszxIOLhAsty3padPC52k46cmglvGpKQEusLmkQVSAgr+tb5UQjyq0JJ2bp46OsOw0M8SGcjobTA/ywzXuU+DN3p64=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=m5p.com; spf=pass smtp.mailfrom=m5p.com; arc=none smtp.client-ip=74.104.188.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=m5p.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=m5p.com
 Received: from m5p.com (mailhost.m5p.com [IPv6:2001:470:1f07:15ff:0:0:0:f7])
-	by mailhost.m5p.com (8.17.1/8.15.2) with ESMTPS id 4242ZK9h022009
+	by mailhost.m5p.com (8.17.1/8.15.2) with ESMTPS id 4242W5Wh021982
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Sun, 3 Mar 2024 21:35:26 -0500 (EST)
+	Sun, 3 Mar 2024 21:32:10 -0500 (EST)
 	(envelope-from ehem@m5p.com)
 Received: (from ehem@localhost)
-	by m5p.com (8.17.1/8.15.2/Submit) id 4242ZJwV022008;
-	Sun, 3 Mar 2024 18:35:19 -0800 (PST)
+	by m5p.com (8.17.1/8.15.2/Submit) id 4242W45G021981;
+	Sun, 3 Mar 2024 18:32:04 -0800 (PST)
 	(envelope-from ehem)
-Message-Id: <92c7be4e2854885ac1304a13f085c276cd2e0d49.1709508291.git.ehem+linux@m5p.com>
+Message-Id: <90c316089a2e1c92800973aee3415dde4afce27c.1709508291.git.ehem+linux@m5p.com>
 In-Reply-To: <cover.1709508290.git.ehem+linux@m5p.com>
 References: <cover.1709508290.git.ehem+linux@m5p.com>
 From: Elliott Mitchell <ehem+linux@m5p.com>
-Date: Fri, 1 Mar 2024 17:43:44 -0800
-Subject: [WIP PATCH 19/30] scripts/package: mkdebian: modify use of ${srctree}
- to assume trailing slash
+Date: Fri, 1 Mar 2024 16:32:06 -0800
+Subject: [WIP PATCH 17/30] build/scripts: generate_initcall_order.pl: modify
+ use of ${srctree} for trailing slash
 To: masahiroy@kernel.org, nathan@kernel.org, nicolas@fjasle.eu
 Cc: linux-kbuild@vger.kernel.org
 Precedence: bulk
@@ -42,102 +42,31 @@ Once converted this script needs to match what the Makefiles have.
 Signed-off-by: Elliott Mitchell <ehem+linux@m5p.com>
 ---
 ---
- scripts/package/builddeb     | 12 ++++++------
- scripts/package/debian/rules |  2 +-
- scripts/package/mkdebian     |  8 ++++----
- 3 files changed, 11 insertions(+), 11 deletions(-)
+ scripts/generate_initcall_order.pl | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index bf96a3c24608..fe0e3cb9bdeb 100755
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -43,11 +43,11 @@ install_linux_image () {
- 	rm -rf ${pdir}
+diff --git a/scripts/generate_initcall_order.pl b/scripts/generate_initcall_order.pl
+index 1a88d3f1b913..d925580ee567 100755
+--- a/scripts/generate_initcall_order.pl
++++ b/scripts/generate_initcall_order.pl
+@@ -12,7 +12,7 @@ use IO::Select;
+ use POSIX ":sys_wait_h";
  
- 	# Only some architectures with OF support have this target
--	if is_enabled CONFIG_OF_EARLY_FLATTREE && [ -d "${srctree}/arch/${SRCARCH}/boot/dts" ]; then
--		${MAKE} -f ${srctree}/Makefile INSTALL_DTBS_PATH="${pdir}/usr/lib/linux-image-${KERNELRELEASE}" dtbs_install
-+	if is_enabled CONFIG_OF_EARLY_FLATTREE && [ -d "${srctree}arch/${SRCARCH}/boot/dts" ]; then
-+		${MAKE} -f ${srctree}Makefile INSTALL_DTBS_PATH="${pdir}/usr/lib/linux-image-${KERNELRELEASE}" dtbs_install
- 	fi
+ my $nm = $ENV{'NM'} || die "$0: ERROR: NM not set?";
+-my $objtree = $ENV{'objtree'} || '.';
++my $objtree = $ENV{'objtree'} || '';
  
--	${MAKE} -f ${srctree}/Makefile INSTALL_MOD_PATH="${pdir}" INSTALL_MOD_STRIP=1 modules_install
-+	${MAKE} -f ${srctree}Makefile INSTALL_MOD_PATH="${pdir}" INSTALL_MOD_STRIP=1 modules_install
- 	rm -f "${pdir}/lib/modules/${KERNELRELEASE}/build"
+ ## currently active child processes
+ my $jobs = {};		# child process pid -> file handle
+@@ -203,7 +203,7 @@ sub process_files {
+ 		} else {
+ 			# in the child process
+ 			STDOUT->autoflush(1);
+-			find_initcalls($index, "$objtree/$file");
++			find_initcalls($index, "$objtree$file");
+ 			exit;
+ 		}
  
- 	# Install the kernel
-@@ -75,7 +75,7 @@ install_linux_image () {
- 	*)
- 		installed_image_path="boot/vmlinuz-${KERNELRELEASE}";;
- 	esac
--	cp "$(${MAKE} -s -f ${srctree}/Makefile image_name)" "${pdir}/${installed_image_path}"
-+	cp "$(${MAKE} -s -f ${srctree}Makefile image_name)" "${pdir}/${installed_image_path}"
- 
- 	# Install the maintainer scripts
- 	# Note: hook scripts under /etc/kernel are also executed by official Debian
-@@ -142,7 +142,7 @@ install_kernel_headers () {
- 
- 	rm -rf $pdir
- 
--	"${srctree}/scripts/package/install-extmod-build" "${pdir}/usr/src/linux-headers-${version}"
-+	"${srctree}scripts/package/install-extmod-build" "${pdir}/usr/src/linux-headers-${version}"
- 
- 	mkdir -p $pdir/lib/modules/$version/
- 	ln -s /usr/src/linux-headers-$version $pdir/lib/modules/$version/build
-@@ -153,7 +153,7 @@ install_libc_headers () {
- 
- 	rm -rf $pdir
- 
--	$MAKE -f $srctree/Makefile headers_install INSTALL_HDR_PATH=$pdir/usr
-+	$MAKE -f ${srctree}Makefile headers_install INSTALL_HDR_PATH=$pdir/usr
- 
- 	# move asm headers to /usr/include/<libc-machine>/asm to match the structure
- 	# used by Debian-based distros (to support multi-arch)
-diff --git a/scripts/package/debian/rules b/scripts/package/debian/rules
-index 098307780062..fd4b86c6f25f 100755
---- a/scripts/package/debian/rules
-+++ b/scripts/package/debian/rules
-@@ -20,7 +20,7 @@ binary: binary-arch binary-indep
- binary-indep: build-indep
- binary-arch: build-arch
- 	$(MAKE) $(make-opts) \
--	run-command KBUILD_RUN_COMMAND='+$$(srctree)/scripts/package/builddeb'
-+	run-command KBUILD_RUN_COMMAND='+$$(srctree)scripts/package/builddeb'
- 
- .PHONY: build build-indep build-arch
- build: build-arch build-indep
-diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
-index 070149c985fe..dcd5765999e0 100755
---- a/scripts/package/mkdebian
-+++ b/scripts/package/mkdebian
-@@ -108,7 +108,7 @@ gen_source ()
- 	} > debian/patches/config.patch
- 	echo config.patch > debian/patches/series
- 
--	"${srctree}/scripts/package/gen-diff-patch" debian/patches/diff.patch
-+	"${srctree}scripts/package/gen-diff-patch" debian/patches/diff.patch
- 	if [ -s debian/patches/diff.patch ]; then
- 		sed -i "
- 			1iSubject: Add local diff
-@@ -150,7 +150,7 @@ version=$KERNELRELEASE
- if [ -n "$KDEB_PKGVERSION" ]; then
- 	packageversion=$KDEB_PKGVERSION
- else
--	packageversion=$(${srctree}/scripts/setlocalversion --no-local ${srctree})-$($srctree/init/build-version)
-+	packageversion=$(${srctree}scripts/setlocalversion --no-local ${srctree})-$($srctree/init/build-version)
- fi
- sourcename=${KDEB_SOURCENAME:-linux-upstream}
- 
-@@ -247,7 +247,7 @@ ARCH := ${ARCH}
- KERNELRELEASE := ${KERNELRELEASE}
- EOF
- 
--cp "${srctree}/scripts/package/debian/copyright" debian/
--cp "${srctree}/scripts/package/debian/rules" debian/
-+cp "${srctree}scripts/package/debian/copyright" debian/
-+cp "${srctree}scripts/package/debian/rules" debian/
- 
- exit 0
 -- 
 2.39.2
 
