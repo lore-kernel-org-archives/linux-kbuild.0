@@ -1,34 +1,34 @@
 Received: from mailhost.m5p.com (mailhost.m5p.com [74.104.188.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CFC238D
-	for <linux-kbuild@vger.kernel.org>; Mon,  4 Mar 2024 02:33:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0471D818
+	for <linux-kbuild@vger.kernel.org>; Mon,  4 Mar 2024 02:34:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.104.188.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709519621; cv=none; b=FXtvSPDwXNV9O5qdVNf9gOTU9EhEIQItKPUa4lXJnagylaextsZ8sAbxqYj4EEGWnITtXXdz6TwqISLYq/b1Xjyrzpycp3P7BCXAfmJF3dMliTxZKt2ogiZxtshF2HJ6xWWmbf1sfPkJoS7jiobQ2ac2Z8Mpsja9rfiF1bm73Rk=
+	t=1709519648; cv=none; b=tyWiK3urUxsH23LyADPZpPk6fKstj3+ti7yeTFbk7gAeDXwAo8tTzojLHYZJxC1fuX5ekVkM1j0NQzCBjTMBrcZayc8NHgWPU24k22Kq/kiGc5KXSyicDSHsvU4iD6jG+GjtQFBXaNdzICLnG8CdpOgSfCfvF5/+7mng2XC4534=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709519621; c=relaxed/simple;
-	bh=/IaRIBYn/hDGttuI2a/bEHqRFr2qzrbn2h8z/4nt+9o=;
-	h=Message-Id:In-Reply-To:References:From:Date:Subject:To:Cc; b=HHG8y1OaGTULrq+/cBv0gP9ir4+K6eorGm6XFPJT9k+p4oOY5Y24bGyszC2Vf80mJsvS1iSAkusi/x4Z/qNibP/kNTq21hwXDau+v9XI6DD+N9DNlt5+D7EsdfgUgv69gBR8aCsGneeMgiteRIM5d9lYkcGPgyooacIiHesI04k=
+	s=arc-20240116; t=1709519648; c=relaxed/simple;
+	bh=2sn9EZi53zMlKPUXPXYI1DWkDLPRC9UWGEh0y2Gx7zs=;
+	h=Message-Id:In-Reply-To:References:From:Date:Subject:To:Cc; b=W3Lj2PPnV38lMwsTHJC/fTvx4V2WAAgK/gSnFZ3Y07/8gjcfruKWqRLRhzj6C2zrwGjUbFM+XkKGzqXlclwGTCXO4nhrZRexQmRUp7aphBZtampW1UERpRaJAS8vWTZmv8/j+iH19hA7w7jhL7+xK7viDce2rGFOpB4bgDNJA/U=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=m5p.com; spf=pass smtp.mailfrom=m5p.com; arc=none smtp.client-ip=74.104.188.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=m5p.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=m5p.com
 Received: from m5p.com (mailhost.m5p.com [IPv6:2001:470:1f07:15ff:0:0:0:f7])
-	by mailhost.m5p.com (8.17.1/8.15.2) with ESMTPS id 4242RAG1021936
+	by mailhost.m5p.com (8.17.1/8.15.2) with ESMTPS id 4242SmHm021962
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Sun, 3 Mar 2024 21:27:16 -0500 (EST)
+	Sun, 3 Mar 2024 21:28:54 -0500 (EST)
 	(envelope-from ehem@m5p.com)
 Received: (from ehem@localhost)
-	by m5p.com (8.17.1/8.15.2/Submit) id 4242RAT2021935;
-	Sun, 3 Mar 2024 18:27:10 -0800 (PST)
+	by m5p.com (8.17.1/8.15.2/Submit) id 4242Smx1021961;
+	Sun, 3 Mar 2024 18:28:48 -0800 (PST)
 	(envelope-from ehem)
-Message-Id: <fb1251528787d6bfa297f58a25c2ae7626335649.1709508291.git.ehem+linux@m5p.com>
+Message-Id: <d9dcd7eed4ae12719a3ae0924617fe37e7f8a726.1709508291.git.ehem+linux@m5p.com>
 In-Reply-To: <cover.1709508290.git.ehem+linux@m5p.com>
 References: <cover.1709508290.git.ehem+linux@m5p.com>
 From: Elliott Mitchell <ehem+linux@m5p.com>
-Date: Fri, 1 Mar 2024 17:08:28 -0800
-Subject: [WIP PATCH 14/30] build/scripts: link-vmlinux.sh: modify use of
- ${objtree} for trailing slash
+Date: Fri, 1 Mar 2024 16:29:44 -0800
+Subject: [WIP PATCH 15/30] build/scripts: install.sh: modify use of ${srctree}
+ for trailing slash
 To: masahiroy@kernel.org, nathan@kernel.org, nicolas@fjasle.eu
 Cc: linux-kbuild@vger.kernel.org
 Precedence: bulk
@@ -41,59 +41,25 @@ Once converted this script needs to match what the Makefiles have.
 
 Signed-off-by: Elliott Mitchell <ehem+linux@m5p.com>
 ---
-With this, the new approach is pretty well functioning.
 ---
- scripts/link-vmlinux.sh | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ scripts/install.sh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-index 7862a8101747..d98a1494655a 100755
---- a/scripts/link-vmlinux.sh
-+++ b/scripts/link-vmlinux.sh
-@@ -87,7 +87,7 @@ vmlinux_link()
- 		ldlibs=
- 	fi
- 
--	ldflags="${ldflags} ${wl}--script=${objtree}/${KBUILD_LDS}"
-+	ldflags="${ldflags} ${wl}--script=${objtree}${KBUILD_LDS}"
- 
- 	# The kallsyms linking does not need debug symbols included.
- 	if [ "$output" != "${output#.tmp_vmlinux.kallsyms}" ] ; then
-@@ -193,12 +193,12 @@ kallsyms_step()
- mksysmap()
- {
- 	info NM ${2}
--	${CONFIG_SHELL} "${srctree}/scripts/mksysmap" ${1} ${2} ${3}
-+	${CONFIG_SHELL} "${srctree}scripts/mksysmap" ${1} ${2} ${3}
- }
- 
- sorttable()
- {
--	${objtree}/scripts/sorttable ${1}
-+	${objtree}scripts/sorttable ${1}
- }
- 
- # Delete output files in case of error
-@@ -222,7 +222,7 @@ if [ "$1" = "clean" ]; then
- 	exit 0
- fi
- 
--${MAKE} -f "${srctree}/scripts/Makefile.build" obj=init init/version-timestamp.o
-+${MAKE} -f "${srctree}scripts/Makefile.build" obj=init init/version-timestamp.o
- 
- btf_vmlinux_bin_o=""
- if is_enabled CONFIG_DEBUG_INFO_BTF; then
-@@ -266,8 +266,8 @@ if is_enabled CONFIG_KALLSYMS; then
- 	kallsyms_step 2
- 
- 	# step 3
--	size1=$(${CONFIG_SHELL} "${srctree}/scripts/file-size.sh" ${kallsymso_prev})
--	size2=$(${CONFIG_SHELL} "${srctree}/scripts/file-size.sh" ${kallsymso})
-+	size1=$(${CONFIG_SHELL} "${srctree}scripts/file-size.sh" ${kallsymso_prev})
-+	size2=$(${CONFIG_SHELL} "${srctree}scripts/file-size.sh" ${kallsymso})
- 
- 	if [ $size1 -ne $size2 ] || [ -n "${KALLSYMS_EXTRA_PASS}" ]; then
- 		kallsyms_step 3
+diff --git a/scripts/install.sh b/scripts/install.sh
+index 9bb0fb44f04a..beda9b808cb9 100755
+--- a/scripts/install.sh
++++ b/scripts/install.sh
+@@ -23,8 +23,8 @@ done
+ # User/arch may have a custom install script
+ for file in "${HOME}/bin/${INSTALLKERNEL}"		\
+ 	    "/sbin/${INSTALLKERNEL}"			\
+-	    "${srctree}/arch/${SRCARCH}/install.sh"	\
+-	    "${srctree}/arch/${SRCARCH}/boot/install.sh"
++	    "${srctree}arch/${SRCARCH}/install.sh"	\
++	    "${srctree}arch/${SRCARCH}/boot/install.sh"
+ do
+ 	if [ ! -x "${file}" ]; then
+ 		continue
 -- 
 2.39.2
 
