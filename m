@@ -1,34 +1,34 @@
 Received: from mailhost.m5p.com (mailhost.m5p.com [74.104.188.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 993A738D
-	for <linux-kbuild@vger.kernel.org>; Mon,  4 Mar 2024 02:31:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CFC238D
+	for <linux-kbuild@vger.kernel.org>; Mon,  4 Mar 2024 02:33:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.104.188.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709519521; cv=none; b=M+PFWUfLdppdxWdDYIjzoI4C3laK7HMblf/KLYH+I/YVf6gWvVRMoU2wZe4qYOjB2KkB3DdbJelRG91geFWN+4uo7Sl7dpnfAIXNBqiPMnI63XLq+Zxy3lXpDXv0IIqSHws6k4nmTN/VnyVWjQNRBsoAbbvHxq1RmTg5eQbUcy0=
+	t=1709519621; cv=none; b=FXtvSPDwXNV9O5qdVNf9gOTU9EhEIQItKPUa4lXJnagylaextsZ8sAbxqYj4EEGWnITtXXdz6TwqISLYq/b1Xjyrzpycp3P7BCXAfmJF3dMliTxZKt2ogiZxtshF2HJ6xWWmbf1sfPkJoS7jiobQ2ac2Z8Mpsja9rfiF1bm73Rk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709519521; c=relaxed/simple;
-	bh=I19raxbmS6mydc5YLxv5TIYlPQHjE2R1vu2PSJCi/G4=;
-	h=Message-Id:In-Reply-To:References:From:Date:Subject:To:Cc; b=JMwh6I28cdquUUC3IGBgIn4PtyrrjGjjjuMONNsExG6gEOyFI3u2c7rWBZVxWRUDNjFMRrBc+UmrGTJRLa8o74WmWz3mQYcSNhkY3LQZkvy4h8MgYWX0dUEmnz3M0gGXIeU+cZuedd0NIcQ4z3p3yWxQd6TjT7vCjsrD9oZ0iqA=
+	s=arc-20240116; t=1709519621; c=relaxed/simple;
+	bh=/IaRIBYn/hDGttuI2a/bEHqRFr2qzrbn2h8z/4nt+9o=;
+	h=Message-Id:In-Reply-To:References:From:Date:Subject:To:Cc; b=HHG8y1OaGTULrq+/cBv0gP9ir4+K6eorGm6XFPJT9k+p4oOY5Y24bGyszC2Vf80mJsvS1iSAkusi/x4Z/qNibP/kNTq21hwXDau+v9XI6DD+N9DNlt5+D7EsdfgUgv69gBR8aCsGneeMgiteRIM5d9lYkcGPgyooacIiHesI04k=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=m5p.com; spf=pass smtp.mailfrom=m5p.com; arc=none smtp.client-ip=74.104.188.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=m5p.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=m5p.com
 Received: from m5p.com (mailhost.m5p.com [IPv6:2001:470:1f07:15ff:0:0:0:f7])
-	by mailhost.m5p.com (8.17.1/8.15.2) with ESMTPS id 4242UROT021975
+	by mailhost.m5p.com (8.17.1/8.15.2) with ESMTPS id 4242RAG1021936
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Sun, 3 Mar 2024 21:30:33 -0500 (EST)
+	Sun, 3 Mar 2024 21:27:16 -0500 (EST)
 	(envelope-from ehem@m5p.com)
 Received: (from ehem@localhost)
-	by m5p.com (8.17.1/8.15.2/Submit) id 4242UPnm021974;
-	Sun, 3 Mar 2024 18:30:25 -0800 (PST)
+	by m5p.com (8.17.1/8.15.2/Submit) id 4242RAT2021935;
+	Sun, 3 Mar 2024 18:27:10 -0800 (PST)
 	(envelope-from ehem)
-Message-Id: <e01aea1a01b9a269bb973384ead21a0d2f6b8065.1709508291.git.ehem+linux@m5p.com>
+Message-Id: <fb1251528787d6bfa297f58a25c2ae7626335649.1709508291.git.ehem+linux@m5p.com>
 In-Reply-To: <cover.1709508290.git.ehem+linux@m5p.com>
 References: <cover.1709508290.git.ehem+linux@m5p.com>
 From: Elliott Mitchell <ehem+linux@m5p.com>
-Date: Fri, 1 Mar 2024 15:26:47 -0800
-Subject: [WIP PATCH 16/30] scripts/dtc: dtx_diff: include trailing slash in
- ${srctree} variable
+Date: Fri, 1 Mar 2024 17:08:28 -0800
+Subject: [WIP PATCH 14/30] build/scripts: link-vmlinux.sh: modify use of
+ ${objtree} for trailing slash
 To: masahiroy@kernel.org, nathan@kernel.org, nicolas@fjasle.eu
 Cc: linux-kbuild@vger.kernel.org
 Precedence: bulk
@@ -37,70 +37,63 @@ List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 
-If run under debugging this looks slightly nicer.  The net effect is
-basically null though.
+Once converted this script needs to match what the Makefiles have.
 
 Signed-off-by: Elliott Mitchell <ehem+linux@m5p.com>
 ---
-I'm unsure whether this is ever used directly on the command-line.
-There might be a need to compensate for direct invocation, but I'm
-unsure of the approach to choose for that.
+With this, the new approach is pretty well functioning.
 ---
- scripts/dtc/dtx_diff | 14 +++++---------
- 1 file changed, 5 insertions(+), 9 deletions(-)
+ scripts/link-vmlinux.sh | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/scripts/dtc/dtx_diff b/scripts/dtc/dtx_diff
-index f2bbde4bba86..e06778527751 100755
---- a/scripts/dtc/dtx_diff
-+++ b/scripts/dtc/dtx_diff
-@@ -139,10 +139,10 @@ compile_to_dts() {
- 			echo "  >>\$ARCH<< is: >>${ARCH}<<"                  >&2
- 		fi
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index 7862a8101747..d98a1494655a 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -87,7 +87,7 @@ vmlinux_link()
+ 		ldlibs=
+ 	fi
  
--		if [ ! -d ${srctree}/arch/${ARCH} ] ; then
-+		if [ ! -d ${srctree}arch/${ARCH} ] ; then
- 			hint_given=1
- 			echo ""                                              >&2
--			echo "  ${srctree}/arch/${ARCH}/ does not exist"     >&2
-+			echo "  ${srctree}arch/${ARCH}/ does not exist"      >&2
- 			echo "  Is \$ARCH='${ARCH}' correct?"                >&2
- 			echo "  Possible fix: use '-s' option"               >&2
+-	ldflags="${ldflags} ${wl}--script=${objtree}/${KBUILD_LDS}"
++	ldflags="${ldflags} ${wl}--script=${objtree}${KBUILD_LDS}"
  
-@@ -247,10 +247,6 @@ while [ $# -gt 0 ] ; do
+ 	# The kallsyms linking does not need debug symbols included.
+ 	if [ "$output" != "${output#.tmp_vmlinux.kallsyms}" ] ; then
+@@ -193,12 +193,12 @@ kallsyms_step()
+ mksysmap()
+ {
+ 	info NM ${2}
+-	${CONFIG_SHELL} "${srctree}/scripts/mksysmap" ${1} ${2} ${3}
++	${CONFIG_SHELL} "${srctree}scripts/mksysmap" ${1} ${2} ${3}
+ }
  
- done
+ sorttable()
+ {
+-	${objtree}/scripts/sorttable ${1}
++	${objtree}scripts/sorttable ${1}
+ }
  
--if [ "${srctree}" = "" ] ; then
--	srctree="."
--fi
--
- if [ "${dtx_file_2}" != "" ]; then
- 	cmd_diff=1
+ # Delete output files in case of error
+@@ -222,7 +222,7 @@ if [ "$1" = "clean" ]; then
+ 	exit 0
  fi
-@@ -272,7 +268,7 @@ fi
- # -----  prefer dtc from linux kernel, allow fallback to dtc in $PATH
  
- if [ "${KBUILD_OUTPUT:0:2}" = ".." ] ; then
--	__KBUILD_OUTPUT="${srctree}/${KBUILD_OUTPUT}"
-+	__KBUILD_OUTPUT="${srctree}${KBUILD_OUTPUT}"
- elif [ "${KBUILD_OUTPUT}" = "" ] ; then
- 	__KBUILD_OUTPUT="."
- else
-@@ -337,12 +333,12 @@ fi
+-${MAKE} -f "${srctree}/scripts/Makefile.build" obj=init init/version-timestamp.o
++${MAKE} -f "${srctree}scripts/Makefile.build" obj=init init/version-timestamp.o
  
- cpp_flags="\
- 	-nostdinc                                  \
--	-I${srctree}/scripts/dtc/include-prefixes  \
-+	-I${srctree}scripts/dtc/include-prefixes  \
- 	-undef -D__DTS__"
+ btf_vmlinux_bin_o=""
+ if is_enabled CONFIG_DEBUG_INFO_BTF; then
+@@ -266,8 +266,8 @@ if is_enabled CONFIG_KALLSYMS; then
+ 	kallsyms_step 2
  
- DTC="\
- 	${DTC}                                     \
--	-i ${srctree}/scripts/dtc/include-prefixes \
-+	-i ${srctree}scripts/dtc/include-prefixes \
- 	-O dts -qq -f ${dtc_sort} ${annotate} -o -"
+ 	# step 3
+-	size1=$(${CONFIG_SHELL} "${srctree}/scripts/file-size.sh" ${kallsymso_prev})
+-	size2=$(${CONFIG_SHELL} "${srctree}/scripts/file-size.sh" ${kallsymso})
++	size1=$(${CONFIG_SHELL} "${srctree}scripts/file-size.sh" ${kallsymso_prev})
++	size2=$(${CONFIG_SHELL} "${srctree}scripts/file-size.sh" ${kallsymso})
  
- 
+ 	if [ $size1 -ne $size2 ] || [ -n "${KALLSYMS_EXTRA_PASS}" ]; then
+ 		kallsyms_step 3
 -- 
 2.39.2
 
