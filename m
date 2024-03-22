@@ -1,129 +1,132 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986131C6AB;
-	Fri, 22 Mar 2024 17:27:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D054D82890
+	for <linux-kbuild@vger.kernel.org>; Fri, 22 Mar 2024 22:57:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711128449; cv=none; b=ZmUWqMtQ3Lw3iSXgsXGPs9ZZxHaU6/Zo9XjJX1nj4tnhZxblC/j/x3xP9lyNf+SySfkd/tDs79G1FfM+f21ywLqIa2rbN6Bn2tVGG7p2NMzPOJ0rLNg7CVLTExr8v2ikrfmQ1yDyEi0iumhleY0aDIhpvl40SiV4bYuZFLM5D84=
+	t=1711148222; cv=none; b=TusrpQyZk0lbHQjuDC9B/qPCM9XO1vIGBoqGw5jlmBi5n5wt4cGw3Z1in+WF4aptESk21up5zTbyGQPlyUf65IKEdMYKFfV77cYfffPWwESHUnMwH3M3Y1Lc3hUNywoanz90yLlp7wHCEXow31NdWXRcMd4moxfC2jzZksHozFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711128449; c=relaxed/simple;
-	bh=8jU4Y94EgTZ2cjnSSp7l1TCrtVwVdXwRUYY1Hz25hzk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wc9h6FJYU0m25x2uzEWF4UiACoevHMluYaqFJ+Zr3V54bEOe8PK1ySuNeGudKxhVmf+jws0ujgaLVs1seyekUqEwc1EBAMb89j4ruUyDPt3eJJcqHDs6BE7MMTdFJn0fd04sL/JMFEG7I6HWn2TeSgaXEpjQzFtB7KKCS9poJQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R53Y9fMA; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711148222; c=relaxed/simple;
+	bh=Qgjc0zwou9fhsXbbN2p4ZWlMuaNpRr7RxW3B4yymOWk=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=AI+KNkjky2I1TbEE+/K3hKjwxHEV3QfPQZVjzNeWlarGo5KFk51J3GzBxvTwHVzppx0R4DsoyH0ZAb4EDgMYuAESJaYeHcZwDYqrRwQjXXDopy9g0ghMeZ8broLZJJ78q87yGkxsQmRO7G4j3l4GqbLPemOKT+7OLDmyFGExLFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=EIz7ygwI; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R53Y9fMA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91BCCC433F1;
-	Fri, 22 Mar 2024 17:27:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711128449;
-	bh=8jU4Y94EgTZ2cjnSSp7l1TCrtVwVdXwRUYY1Hz25hzk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=R53Y9fMA3e14/1ff1d4IvrBB//jd7qQ4DJBGT7ibVt+eMuvh38Rvn6sZrEF+/FYtE
-	 VZ+nNoz9Rt+JFCmCu36RheRF34nBzeRhg+RHFM5hQ8q3ArZq8pbantXKE7oDHHVZxz
-	 /V0M7fO/sZz8xqjkKf3P6SgxNNnplgeYLT+uXtb0F45wzDfaSzV/IQIwNlGbXvgdxg
-	 Sa1BH5llQw6qrJHN1WxqDARsTXm8t1g2QkA9sgV3IxZXiLCoejc9lUeoOVKoJbZNPd
-	 zSk5faKwi1g3MOpndx9FuXlZVO/ieMWSGF5oVLud//r8LlX0dOPO2KnE3qlMfNlofO
-	 TbV5ExZWDEnuw==
-Date: Fri, 22 Mar 2024 14:27:26 -0300
-From: Arnaldo Carvalho de Melo <acme@kernel.org>
-To: Alan Maguire <alan.maguire@oracle.com>
-Cc: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nicolas@fjasle.eu>, bpf@vger.kernel.org,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] kbuild: disable pahole multithreading for reproducible
- builds
-Message-ID: <Zf2_fgs0cqW82zEu@x1>
-References: <20240322-pahole-reprodicible-v1-1-3eaafb1842da@weissschuh.net>
- <49fa2bd1-bd6e-4404-a1c7-2170d37f0194@oracle.com>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EIz7ygwI"
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-513cf9bacf1so3598048e87.0
+        for <linux-kbuild@vger.kernel.org>; Fri, 22 Mar 2024 15:57:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1711148219; x=1711753019; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=J8Y0RnqdkkNJT2IOUAgIJwE7VvEMel7kUBPozDnljrU=;
+        b=EIz7ygwIsXytZsFUFcojYJvZiPFale4/wWZ2VDkwjlBrGt/q2Vur/YiVWiL+mfZgwb
+         lzsOXlR5NUElC1+4A08lE7xNIR2B6i2IC+b7f7lSq1IqfZBW7Te0AnmZtuYpF2X6khtj
+         /XnyWnwe+uBN52bXFWlZvInAOQZXDrCO0q2KtMDI6IHze8AoSUwGxXCORozFK2ypwktB
+         +Fb47RL2CqRUIqFSCM78HQRpbpxBIpRHL1yeOoueAJJiJlbeUKIxYZdcS0UaJhnfh4VK
+         NEZTMpdtod+U1i8cgzDDXmIRJThPcpdvCB1hWaeGA07k8pbHWOJAM6k9BIB4ax9gRVBg
+         PCrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711148219; x=1711753019;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=J8Y0RnqdkkNJT2IOUAgIJwE7VvEMel7kUBPozDnljrU=;
+        b=lMkH84k79Y48whbLgQxozbE2u1A7zysU5oIIOepaOW3mrv6TAes/M/NsuHRyBx+PBX
+         /xhfpgbexyXdMq4Ex/E1aFBWi2YeNBMXKiuN12iO2ZOvPjmCJM0wu+U/qwEl1gJO0w4x
+         gH58IMGDKmsSGd7LpL1aCeOsXuFz5SOR9UAssJ7xzwlja/5i+M/ldWbyr45TPB62B3WO
+         5zAeV09Wo0nokAINeSZBi0bhOmC1K3zEruFj5eWw0oe7cfS4o1a8F5njgf5goOkbZ0Zk
+         5R/R/sTU9XtNiPoBAhv21R5XKrZgHSBkrdiKIoCbRpL0Yd3Vf7ISPmGDhmeeff5gkGJr
+         W1Ag==
+X-Gm-Message-State: AOJu0YyKPaO5N6KcChDpyDtyE5MLNFa//OU8XhNTORi+vbLJLlDwbgtw
+	D2XtS1Harn4jbfyUnO1x/pBeDUgm1h6/HK0bZMHyUoUbLVlvC2EdLm+7Eb+91PA=
+X-Google-Smtp-Source: AGHT+IGdp+o4CDbwmcSah48K76ZnFm8Lpri3RosPHxDjMy+zNnVHyIo5UxLjLdqY6Hh1qIxp+YMhZQ==
+X-Received: by 2002:ac2:5611:0:b0:515:852c:c77b with SMTP id v17-20020ac25611000000b00515852cc77bmr463629lfd.39.1711148219036;
+        Fri, 22 Mar 2024 15:56:59 -0700 (PDT)
+Received: from umbar.lan ([192.130.178.91])
+        by smtp.gmail.com with ESMTPSA id e7-20020a196907000000b005158982f42csm78530lfc.16.2024.03.22.15.56.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Mar 2024 15:56:58 -0700 (PDT)
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Sat, 23 Mar 2024 00:56:53 +0200
+Subject: [PATCH v4 01/16] drm/msm/mdp5: add writeback block bases
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <49fa2bd1-bd6e-4404-a1c7-2170d37f0194@oracle.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240323-fd-xml-shipped-v4-1-cca5e8457b9e@linaro.org>
+References: <20240323-fd-xml-shipped-v4-0-cca5e8457b9e@linaro.org>
+In-Reply-To: <20240323-fd-xml-shipped-v4-0-cca5e8457b9e@linaro.org>
+To: Masahiro Yamada <masahiroy@kernel.org>, 
+ Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, 
+ Rob Clark <robdclark@gmail.com>, Abhinav Kumar <quic_abhinavk@quicinc.com>, 
+ Sean Paul <sean@poorly.run>, Marijn Suijten <marijn.suijten@somainline.org>, 
+ David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>
+Cc: linux-kbuild@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+ dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org, 
+ Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1223;
+ i=dmitry.baryshkov@linaro.org; h=from:subject:message-id;
+ bh=Qgjc0zwou9fhsXbbN2p4ZWlMuaNpRr7RxW3B4yymOWk=;
+ b=owGbwMvMwMXYbdNlx6SpcZXxtFoSQ+o/nm0v9VxfyjaFzlD26OA0ztf8G7XYN2DKnPv8nz8cv
+ /6rdFNhJ6MxCwMjF4OsmCKLT0HL1JhNyWEfdkythxnEygQyhYGLUwAmMlGWg2GCr5C8843Zf6Lz
+ GObIBh5dunfTo+2mXFyH6tyKmz4091r4vOZvONnbekz6mbhQm3ko54up7hYCLzoflwvzBVta1Vt
+ tiAxjl9DNTpyT9o+v4qrW1ens25pP2LAeO8aza9l76WjepmdHbjIUVm/8bcWpr9AdLPrw6deVMg
+ VHu5fU9UTOq9mz2zprtqUa24d7M7Uup9uVW215s6zTLKkptdfRpTtMdj378fSiFbNW2h1481Tu7
+ M+9U5bf8VNQTrU6vpm1mdGkdQrDA9OiwpoDuyJfGkVWHAisbX7wR2ytJlP7+00e9zkMjE+4pkmJ
+ Jz4PDPTM/3Fm9sepmud/XJO9+y3g8zV2SVWZaKeOOKW1AA==
+X-Developer-Key: i=dmitry.baryshkov@linaro.org; a=openpgp;
+ fpr=8F88381DD5C873E4AE487DA5199BF1243632046A
 
-On Fri, Mar 22, 2024 at 10:07:00AM +0000, Alan Maguire wrote:
-> On 22/03/2024 08:31, Thomas Weiﬂschuh wrote:
-> > A BTF type_id is a numeric identifier allocated by pahole through
-> > libbpfd. Ids are incremented for each allocation.
-> > Running pahole multithreaded makes the sequence of allocations
-> > non-deterministic which also makes the type_id itself non-deterministic.
-> > As the type_id end up in the binary this breaks reproducibility.
-> > 
-> > Therefore, if the kernel is built reproducibly as indicated by
-> > KBUILD_BUILD_TIMESTAMP, disable threading in pahole.
-> > 
-> > Fixes: b4f72786429c ("scripts/pahole-flags.sh: Parse DWARF and generate BTF with multithreading.")
-> > Fixes: 72d091846de9 ("kbuild: avoid too many execution of scripts/pahole-flags.sh")
-> > Signed-off-by: Thomas Weiﬂschuh <linux@weissschuh.net>
-> 
-> Yep, we've talked about sorting final BTF in various ways but until that
-> is implemented, non-parallel execution of pahole is the best way to get
-> reliabily-reproducing BTF ids. We should probably update the pahole
+In order to stop patching the mdp5 headers, import definitions for the
+writeback blocks. This part is extracted from the old Rob's patch.
 
-So, the problem is about parallel BTF encoding, not so much about
-parallel DWARF loading, which speeds up the whole process and could
-continue if we make sure that we feed the BTF encoder in the same order
-as when not doing anything in parallel.
+Co-developed-by: Rob Clark <robdclark@gmail.com>
+Signed-off-by: Rob Clark <robdclark@gmail.com>
+Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+---
+ drivers/gpu/drm/msm/disp/mdp5/mdp5_cfg.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-I.e. a serial BTF encoding done at the same time as a parallel DWARF
-loading would produce a reproducible build faster than doing
-_everything_ serially.
+diff --git a/drivers/gpu/drm/msm/disp/mdp5/mdp5_cfg.h b/drivers/gpu/drm/msm/disp/mdp5/mdp5_cfg.h
+index 26c5d8b4ab46..4b988e69fbfc 100644
+--- a/drivers/gpu/drm/msm/disp/mdp5/mdp5_cfg.h
++++ b/drivers/gpu/drm/msm/disp/mdp5/mdp5_cfg.h
+@@ -69,6 +69,16 @@ struct mdp5_mdp_block {
+ 	uint32_t caps;			/* MDP capabilities: MDP_CAP_xxx bits */
+ };
+ 
++struct mdp5_wb_instance {
++	int id;
++	int lm;
++};
++
++struct mdp5_wb_block {
++	MDP5_SUB_BLOCK_DEFINITION;
++	struct mdp5_wb_instance instances[MAX_BASES];
++};
++
+ #define MDP5_INTF_NUM_MAX	5
+ 
+ struct mdp5_intf_block {
+@@ -98,6 +108,7 @@ struct mdp5_cfg_hw {
+ 	struct mdp5_sub_block pp;
+ 	struct mdp5_sub_block dsc;
+ 	struct mdp5_sub_block cdm;
++	struct mdp5_wb_block wb;
+ 	struct mdp5_intf_block intf;
+ 	struct mdp5_perf_block perf;
+ 
 
-The important point would be to feed the btf encoder the DWARF CUs in
-the same order as when doing it serially.
+-- 
+2.39.2
 
-No need to order anything, just create a linked list/array of CUs and
-then start loading them and leave the BTF encoder go on taking CUs from
-that linked list/array in the order they are in vmlinux.
-
-- Arnaldo
-
-> manpage to warn about parallel non-deterministic id allocation in the
-> meantime.
-> 
-> Reviewed-by: Alan Maguire <alan.maguire@oracle.com>
-> 
-> > ---
-> >  scripts/Makefile.btf | 3 +++
-> >  1 file changed, 3 insertions(+)
-> > 
-> > diff --git a/scripts/Makefile.btf b/scripts/Makefile.btf
-> > index 82377e470aed..2356929e62e4 100644
-> > --- a/scripts/Makefile.btf
-> > +++ b/scripts/Makefile.btf
-> > @@ -10,7 +10,10 @@ endif
-> >  
-> >  pahole-flags-$(call test-ge, $(pahole-ver), 121)	+= --btf_gen_floats
-> >  
-> > +# threaded execution randomizes BTF type_id allocation, breaking reproducibility
-> > +ifeq ($(KBUILD_BUILD_TIMESTAMP),)
-> >  pahole-flags-$(call test-ge, $(pahole-ver), 122)	+= -j
-> > +endif
-> >  
-> >  pahole-flags-$(CONFIG_PAHOLE_HAS_LANG_EXCLUDE)		+= --lang_exclude=rust
-> >  
-> > 
-> > ---
-> > base-commit: 8e938e39866920ddc266898e6ae1fffc5c8f51aa
-> > change-id: 20240322-pahole-reprodicible-02e904e45686
-> > 
-> > Best regards,
-> 
