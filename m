@@ -1,58 +1,59 @@
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9874E82881
-	for <linux-kbuild@vger.kernel.org>; Fri, 22 Mar 2024 22:57:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27FAA8289C
+	for <linux-kbuild@vger.kernel.org>; Fri, 22 Mar 2024 22:57:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711148222; cv=none; b=Tk7qc0dFgkancs14/1/1Q3sz7y/ZRZV4remTxEv7DrDj2o3g7YmTHBNe4DDTBu24Byj5uIUAdQdDxcX64q+0wruBWc3lOjPoYJQHk9mRXVxA6CmHUvACxT7o7skKLZpdqwW0/FRFXlozh2RefIjN3WT4ozsKXgfbrhgWlETfeuo=
+	t=1711148225; cv=none; b=pG28gEPI7Bgm2jJHHIGNuKNI3aymhQ8H+5D5tcCzsFLLuzy+pEHFtC5fmrA3iQlftpOEuq0T/iMpTR9V+2Y+w8ihkvjr45Tum9oBcLmk5OJf9kKTvT0umfGEJBLA0aJxyTbFUGu6g1Gvd9e5wNZ1l1YCdu+msmb/AP5oBPp2bqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711148222; c=relaxed/simple;
-	bh=SUasj9x+5boQXrGjbbvWEUUrFe45KHm8dnD84tTBZlM=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=SszBcT4cSXZ9Bz9Px6tugqoAbAYmtVizgtnX24UNSC3hG6gePEWoJZhjZwau7i0n8ekqJjxB22wXSBc9RLUeVApO/DB0Z6yqn/uokyMteZptfyVYf6/40ANkLouYcNEc+/E4q/cvXWcsgoKxYksGZipXdneCjQCStsfBcX1CXl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=z8rEuZXP; arc=none smtp.client-ip=209.85.167.41
+	s=arc-20240116; t=1711148225; c=relaxed/simple;
+	bh=gqKp1S6/zn30s6BNuSQoNE5FrMLSKTVvFXbaJQz/Q24=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=kXSOvJa2HNgY01hm6XfDSGL9HPQN8ITfeEMhmVq82pYxoZgS/P3KHZgA+UlZ1aOoXOwOkvBirK5DO96qdWvtiR5dJ/OJXu/ld5sGFNtgZ6NvgPU2Cyy5um2R6TXTnHxd+SNpq9hpQI4gE4I08np3E8cSo8XD2A4Qm+WIQRKJXeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=iKT4/gM3; arc=none smtp.client-ip=209.85.167.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="z8rEuZXP"
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-513d23be0b6so3139992e87.0
-        for <linux-kbuild@vger.kernel.org>; Fri, 22 Mar 2024 15:57:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iKT4/gM3"
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-513d717269fso3267812e87.0
+        for <linux-kbuild@vger.kernel.org>; Fri, 22 Mar 2024 15:57:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1711148219; x=1711753019; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kfjVwt6d+IRd8DOInllyNHPrf4pjD9asCpY8CF5unc4=;
-        b=z8rEuZXP4gz+GYdPqUTdVLZXBIYdewM9HGW7mQ7vApMw+bp88JIqOtRSsD+B5RycoS
-         J3eJ4UhR6VoXyyE3Wb81w4fzlL+dvIKPT2SkogtEWJ1i1LS/b6mkUR/LGlQ4mcCYW3YT
-         a4L4hXR2ijwjXOJ1t8EfekrmWYLemb4Iu/YJzXZyAcivTk9VHJIVHSgNChv48v7mGIUl
-         7/XKJ87CMOF/RwAmzPVVn721bfmeKrSIOuMHZb7WQJk9nFmYkcXQGmzsEukQN9F0QukH
-         Bn4UeB/lOR7fvs65Wab79Wo8KLZXFnOyJ+lHMXwyuYKpk67RGpgeicE3loQtfxQ0UU1O
-         6M5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711148219; x=1711753019;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=linaro.org; s=google; t=1711148221; x=1711753021; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=kfjVwt6d+IRd8DOInllyNHPrf4pjD9asCpY8CF5unc4=;
-        b=oHFMch1aYMpnXxruFzVwj5hgyrr2a8eMZNQasrvSLA4YtC5pzgQSC2WOZahRAcuBU5
-         /M3iCUMOApxm29UKAKn8+WQskC+SfO5IsHAJKz7njDW6gooKOzPP5zjR3AAyH6WsZVuY
-         oRbl2AC3wFHQyQLhiss2mZiZoawScL2wftIPvSXVCSGKJVdWzOLAEkz/vanm9QbowgP+
-         c0XgreOu5HEWb09a4cBpqSVbAXYDhLSTlQri98Vptob0aR3LKX//fPr7SlV+81R/cYCU
-         brMnkvh3hnpeDUeX3bugL46BcCyLDUBbT8yYTLz79sKdIe0iJOnRN//mHowqpQM6ChTN
-         BNvQ==
-X-Gm-Message-State: AOJu0YyWaQ4FeRL17FgB840LYQnwzVGyDj4TYn8lZuvWV/RrhIkwchdX
-	cB1AmylkNxXE2fb6sn8cU3yu6RVwLNy9qkkcKZLWmQzYbqcS9BobAHCUkYYK9bU=
-X-Google-Smtp-Source: AGHT+IFHVlDi96VVX9QQGQSp36xeTVVK2YAOFfU9flowpUO64lBi5C0OuNMJrS/SE1YaXbH3CXQNLg==
-X-Received: by 2002:a05:6512:32a3:b0:512:f657:122d with SMTP id q3-20020a05651232a300b00512f657122dmr586259lfe.12.1711148218316;
-        Fri, 22 Mar 2024 15:56:58 -0700 (PDT)
+        bh=kbFUU4iMew5gCyNhy6Z/kEtYbNuf40upf3sZEP5LUHU=;
+        b=iKT4/gM3v1JIWIw3b6dk24jz4l9U5p7NKrnAQHNCB+1hFgWI210cCASEvWN9YZJ/Q+
+         XzZlHakeVAdLOcRRKPnYY35pmc9kAzl+yYi1KEzEEDAjTSmdQsPu49g4/0VzRlOn2nnz
+         n/wH7gRSWX66NUn4uth2q3O6gwBtCRqlMk57i4tyEIePu7tgFpWTMpsG04R6LXTIbVWD
+         ZISglt0VbsPIUWJhpDGOHlv7gMmnNRcV+u25kNVbjKNLlsCIVCqVbrStnNGlr7wtktic
+         OvlSwCwlcuF6QOvqghE4ynyf2qP/IsWArCCQP9cXHr7n29XQ4FOJ+Vs8xJqDcI8JEOmZ
+         YQ4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711148221; x=1711753021;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kbFUU4iMew5gCyNhy6Z/kEtYbNuf40upf3sZEP5LUHU=;
+        b=LmQTf8UidPujZ+NdzEqKgEjKrYgvau2+BO4vUbWOZOgQikBEzfE7FpTNYlq/VeFuhc
+         nlZvnE/snrFpndHw/jsNl1jLx+TlWdpjPNbMUSS3KOzOCXZvKTSvLeU98IU80XktnhYx
+         fPyRQCleXlK99Ad/UCxpO2aV6PpMgS5bkb7Ck1G/6SrGUSPuAB12VhYaxzKCcxfkJ4/i
+         99FSGj+RIx2znDWdmL104kJXKOdme30zrINBuqnBM5S4OoywNQcXc9yZuX8gjwyq9Vo4
+         GqwNT33jBFZts+UJFLcngKjSqhHZafqmNRVyiHtZHm7+6bH0fHKMEU9wE8zoUiywWSO5
+         RNaA==
+X-Gm-Message-State: AOJu0YwMHry1FcQ/+meorJ1yBkY9u4JnDLSC4o9mZY97JyahwzQqRX7i
+	XUz4w39ACnqNGW1zBdJlgn1STgJFOCGA2OzJfrm9gcBZ3KehBLfucCzIOVQtMzU=
+X-Google-Smtp-Source: AGHT+IFV3Dk3L9+5fI6dai9KtVtUDBcirSVfNV8cDlZQLNLc8vM1FFyfP/fXq3yyga1XutJahgGGMg==
+X-Received: by 2002:a19:5f51:0:b0:513:b8c0:faa8 with SMTP id a17-20020a195f51000000b00513b8c0faa8mr473145lfj.65.1711148221019;
+        Fri, 22 Mar 2024 15:57:01 -0700 (PDT)
 Received: from umbar.lan ([192.130.178.91])
-        by smtp.gmail.com with ESMTPSA id e7-20020a196907000000b005158982f42csm78530lfc.16.2024.03.22.15.56.57
+        by smtp.gmail.com with ESMTPSA id e7-20020a196907000000b005158982f42csm78530lfc.16.2024.03.22.15.57.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Mar 2024 15:56:57 -0700 (PDT)
+        Fri, 22 Mar 2024 15:57:00 -0700 (PDT)
 From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Subject: [PATCH v4 00/16] drm/msm: generate register header files
-Date: Sat, 23 Mar 2024 00:56:52 +0200
-Message-Id: <20240323-fd-xml-shipped-v4-0-cca5e8457b9e@linaro.org>
+Date: Sat, 23 Mar 2024 00:56:55 +0200
+Subject: [PATCH v4 03/16] drm/msm/dsi: drop mmss_cc.xml.h
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -61,10 +62,9 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIALQM/mUC/33O0QqCMBTG8VeJXbfYztFlXfUe0YVuRx2Yky2GI
- b57U4goocvvwO/PmVggbymw825inqIN1vVpZPsd023ZN8StSZuBgEwA5Lw2fLx3PLR2GMjwqjy
- VCFIbMjVLaPBU23ENXm9ptzY8nH+u/SiX6zulflNRcsELVVVKI2bKwKWzfendwfmGLa0IH49y8
- 0qE5I/aqIK0zhDExuN/j8mLWksAQqVz/PLzPL8A0skSuS0BAAA=
+Message-Id: <20240323-fd-xml-shipped-v4-3-cca5e8457b9e@linaro.org>
+References: <20240323-fd-xml-shipped-v4-0-cca5e8457b9e@linaro.org>
+In-Reply-To: <20240323-fd-xml-shipped-v4-0-cca5e8457b9e@linaro.org>
 To: Masahiro Yamada <masahiroy@kernel.org>, 
  Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, 
  Rob Clark <robdclark@gmail.com>, Abhinav Kumar <quic_abhinavk@quicinc.com>, 
@@ -74,138 +74,166 @@ Cc: linux-kbuild@vger.kernel.org, linux-arm-msm@vger.kernel.org,
  dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org, 
  Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=6362;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=7249;
  i=dmitry.baryshkov@linaro.org; h=from:subject:message-id;
- bh=SUasj9x+5boQXrGjbbvWEUUrFe45KHm8dnD84tTBZlM=;
- b=owEBbQGS/pANAwAKAYs8ij4CKSjVAcsmYgBl/gy1GAeGsSVMy2dItc8Eim/HYejhaCYx4nzxi
- 6x2n0RnrtGJATMEAAEKAB0WIQRMcISVXLJjVvC4lX+LPIo+Aiko1QUCZf4MtQAKCRCLPIo+Aiko
- 1RouB/0RA0EXl8cWAvvhz4VFY1azOhyepALjUsAfJ+HobFciLte50m06U+7me+dFHP9WN6ry1zx
- mn9I4DasJ0PZ58Q/Td8thBaDEY2/cyQWTZ57tk+zNEHTieUQMstkzZWvKl1X48h7uJ5waNI3cmn
- Lziqtd2tgGqENF8TirzbiznPDeATIliXcuT6minaEbnwh3FvWSQdYE61Tyc7Q8TgI9h4oUcoaxN
- F4HmPtkmAbQiWhCoSaAE7zi7wrYXlnpGai9caKSr7CiU/rZerbdjNkc6tFIyEtxWpZIjS7lWGAn
- Tc84BNWJwSn8frUVT0U9n+F5x6CSpng7jUd5iLNgnJQ3oF6i
+ bh=gqKp1S6/zn30s6BNuSQoNE5FrMLSKTVvFXbaJQz/Q24=;
+ b=owEBbQGS/pANAwAKAYs8ij4CKSjVAcsmYgBl/gy27kwyMn34fqUVWe6InJLCq+UVNjRK/Cl9T
+ En984yYgPSJATMEAAEKAB0WIQRMcISVXLJjVvC4lX+LPIo+Aiko1QUCZf4MtgAKCRCLPIo+Aiko
+ 1aRXB/wItueHG5ocCfJ6dpoN2iPfZBTFWuPyDwSaaDPBOedYZ/oEDpljwzB4SRBDsXCbk3WWOva
+ cEo5juekEb3x2XlcIM/pr11DllLCOpibdPlJeTw8Q0v+TSeN+PMd3HD/4WOAnlupdjhwZ1RSK7Z
+ Xbsmy0+B8yWCo5KFJvebkdEf6XIMgu2xj4GVn+AorsCVJijTPbB+mgTMafDxFM4BZkpEdh3EWP8
+ CIjTRahqmgVUgX9ld/1/8S8p+WinjCnb6rhvQM0ZHuxf9sHMMLHC7nk6Sbhfk9I0jQI9EFYZSmv
+ YPNkfkyiIs3J4SS/QPCm59OV++GV5bb3YfXM18n9kYVL9M9G
 X-Developer-Key: i=dmitry.baryshkov@linaro.org; a=openpgp;
  fpr=8F88381DD5C873E4AE487DA5199BF1243632046A
 
-Currently display-related register headers are generated from XML files
-shipped withing Mesa source tree. This is not fully optimal: it requires
-multi-stage process of the changes first being landed to Mesa and only
-then synced to the kernel tree.
-
-Move original XML files to the kernel tree and generate header files
-when required. Display-related XMLs are going to be dropped from the
-Mesa, with the kernel becoming the primary source. Adreno-related XMLs
-are still going to handled by Mesa and should be synced from Mesa to the
-kernel when required.
-
-Unless there are any objections, I'd like to consider this a final
-revision with the target of it being merged for 6.10. Please review.
+The mmss_cc.xml.h file describes bits of the MMSS clock controller on
+APQ8064 / MSM8960 platforms. They are not used by the driver and do not
+belong to the DRM MSM driver. Drop the file.
 
 Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
 ---
-Changes in v4:
-- Updated headers, schema and script to the latest version merged to
-  Mesa
-- Further split of Adreno XML / Adreno headers patches in order to pass
-  through more ML filters.
-- Dropped the RFC tag
-- Link to v3: https://lore.kernel.org/r/20240315-fd-xml-shipped-v3-0-0fc122e36c53@linaro.org
+ drivers/gpu/drm/msm/dsi/mmss_cc.xml.h | 131 ----------------------------------
+ 1 file changed, 131 deletions(-)
 
-Changes in v3:
-- Split XML and git rm patches in hope to pass ML limitations
-- Link to v2: https://lore.kernel.org/r/20240315-fd-xml-shipped-v2-0-7cd68ecc4320@linaro.org
+diff --git a/drivers/gpu/drm/msm/dsi/mmss_cc.xml.h b/drivers/gpu/drm/msm/dsi/mmss_cc.xml.h
+deleted file mode 100644
+index 7062f7164216..000000000000
+--- a/drivers/gpu/drm/msm/dsi/mmss_cc.xml.h
++++ /dev/null
+@@ -1,131 +0,0 @@
+-#ifndef MMSS_CC_XML
+-#define MMSS_CC_XML
+-
+-/* Autogenerated file, DO NOT EDIT manually!
+-
+-This file was generated by the rules-ng-ng headergen tool in this git repository:
+-http://github.com/freedreno/envytools/
+-git clone https://github.com/freedreno/envytools.git
+-
+-The rules-ng-ng source files this header was generated from are:
+-- /home/robclark/src/mesa/mesa/src/freedreno/registers/msm.xml                   (    944 bytes, from 2022-07-23 20:21:46)
+-- /home/robclark/src/mesa/mesa/src/freedreno/registers/freedreno_copyright.xml   (   1572 bytes, from 2022-07-23 20:21:46)
+-- /home/robclark/src/mesa/mesa/src/freedreno/registers/mdp/mdp4.xml              (  20912 bytes, from 2022-03-08 17:40:42)
+-- /home/robclark/src/mesa/mesa/src/freedreno/registers/mdp/mdp_common.xml        (   2849 bytes, from 2022-03-08 17:40:42)
+-- /home/robclark/src/mesa/mesa/src/freedreno/registers/mdp/mdp5.xml              (  37461 bytes, from 2022-03-08 17:40:42)
+-- /home/robclark/src/mesa/mesa/src/freedreno/registers/dsi/dsi.xml               (  18746 bytes, from 2022-04-28 17:29:36)
+-- /home/robclark/src/mesa/mesa/src/freedreno/registers/dsi/dsi_phy_v2.xml        (   3236 bytes, from 2022-03-08 17:40:42)
+-- /home/robclark/src/mesa/mesa/src/freedreno/registers/dsi/dsi_phy_28nm_8960.xml (   4935 bytes, from 2022-03-08 17:40:42)
+-- /home/robclark/src/mesa/mesa/src/freedreno/registers/dsi/dsi_phy_28nm.xml      (   7004 bytes, from 2022-03-08 17:40:42)
+-- /home/robclark/src/mesa/mesa/src/freedreno/registers/dsi/dsi_phy_20nm.xml      (   3712 bytes, from 2022-03-08 17:40:42)
+-- /home/robclark/src/mesa/mesa/src/freedreno/registers/dsi/dsi_phy_14nm.xml      (   5381 bytes, from 2022-03-08 17:40:42)
+-- /home/robclark/src/mesa/mesa/src/freedreno/registers/dsi/dsi_phy_10nm.xml      (   4499 bytes, from 2022-03-08 17:40:42)
+-- /home/robclark/src/mesa/mesa/src/freedreno/registers/dsi/dsi_phy_7nm.xml       (  11007 bytes, from 2022-03-08 17:40:42)
+-- /home/robclark/src/mesa/mesa/src/freedreno/registers/dsi/sfpb.xml              (    602 bytes, from 2022-03-08 17:40:42)
+-- /home/robclark/src/mesa/mesa/src/freedreno/registers/dsi/mmss_cc.xml           (   1686 bytes, from 2022-03-08 17:40:42)
+-- /home/robclark/src/mesa/mesa/src/freedreno/registers/hdmi/qfprom.xml           (    600 bytes, from 2022-03-08 17:40:42)
+-- /home/robclark/src/mesa/mesa/src/freedreno/registers/hdmi/hdmi.xml             (  42350 bytes, from 2022-09-20 17:45:56)
+-- /home/robclark/src/mesa/mesa/src/freedreno/registers/edp/edp.xml               (  10416 bytes, from 2022-03-08 17:40:42)
+-
+-Copyright (C) 2013-2022 by the following authors:
+-- Rob Clark <robdclark@gmail.com> (robclark)
+-- Ilia Mirkin <imirkin@alum.mit.edu> (imirkin)
+-
+-Permission is hereby granted, free of charge, to any person obtaining
+-a copy of this software and associated documentation files (the
+-"Software"), to deal in the Software without restriction, including
+-without limitation the rights to use, copy, modify, merge, publish,
+-distribute, sublicense, and/or sell copies of the Software, and to
+-permit persons to whom the Software is furnished to do so, subject to
+-the following conditions:
+-
+-The above copyright notice and this permission notice (including the
+-next paragraph) shall be included in all copies or substantial
+-portions of the Software.
+-
+-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+-IN NO EVENT SHALL THE COPYRIGHT OWNER(S) AND/OR ITS SUPPLIERS BE
+-LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+-OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+-*/
+-
+-
+-enum mmss_cc_clk {
+-	CLK = 0,
+-	PCLK = 1,
+-};
+-
+-#define REG_MMSS_CC_AHB						0x00000008
+-
+-static inline uint32_t __offset_CLK(enum mmss_cc_clk idx)
+-{
+-	switch (idx) {
+-		case CLK: return 0x0000004c;
+-		case PCLK: return 0x00000130;
+-		default: return INVALID_IDX(idx);
+-	}
+-}
+-static inline uint32_t REG_MMSS_CC_CLK(enum mmss_cc_clk i0) { return 0x00000000 + __offset_CLK(i0); }
+-
+-static inline uint32_t REG_MMSS_CC_CLK_CC(enum mmss_cc_clk i0) { return 0x00000000 + __offset_CLK(i0); }
+-#define MMSS_CC_CLK_CC_CLK_EN					0x00000001
+-#define MMSS_CC_CLK_CC_ROOT_EN					0x00000004
+-#define MMSS_CC_CLK_CC_MND_EN					0x00000020
+-#define MMSS_CC_CLK_CC_MND_MODE__MASK				0x000000c0
+-#define MMSS_CC_CLK_CC_MND_MODE__SHIFT				6
+-static inline uint32_t MMSS_CC_CLK_CC_MND_MODE(uint32_t val)
+-{
+-	return ((val) << MMSS_CC_CLK_CC_MND_MODE__SHIFT) & MMSS_CC_CLK_CC_MND_MODE__MASK;
+-}
+-#define MMSS_CC_CLK_CC_PMXO_SEL__MASK				0x00000300
+-#define MMSS_CC_CLK_CC_PMXO_SEL__SHIFT				8
+-static inline uint32_t MMSS_CC_CLK_CC_PMXO_SEL(uint32_t val)
+-{
+-	return ((val) << MMSS_CC_CLK_CC_PMXO_SEL__SHIFT) & MMSS_CC_CLK_CC_PMXO_SEL__MASK;
+-}
+-
+-static inline uint32_t REG_MMSS_CC_CLK_MD(enum mmss_cc_clk i0) { return 0x00000004 + __offset_CLK(i0); }
+-#define MMSS_CC_CLK_MD_D__MASK					0x000000ff
+-#define MMSS_CC_CLK_MD_D__SHIFT					0
+-static inline uint32_t MMSS_CC_CLK_MD_D(uint32_t val)
+-{
+-	return ((val) << MMSS_CC_CLK_MD_D__SHIFT) & MMSS_CC_CLK_MD_D__MASK;
+-}
+-#define MMSS_CC_CLK_MD_M__MASK					0x0000ff00
+-#define MMSS_CC_CLK_MD_M__SHIFT					8
+-static inline uint32_t MMSS_CC_CLK_MD_M(uint32_t val)
+-{
+-	return ((val) << MMSS_CC_CLK_MD_M__SHIFT) & MMSS_CC_CLK_MD_M__MASK;
+-}
+-
+-static inline uint32_t REG_MMSS_CC_CLK_NS(enum mmss_cc_clk i0) { return 0x00000008 + __offset_CLK(i0); }
+-#define MMSS_CC_CLK_NS_SRC__MASK				0x0000000f
+-#define MMSS_CC_CLK_NS_SRC__SHIFT				0
+-static inline uint32_t MMSS_CC_CLK_NS_SRC(uint32_t val)
+-{
+-	return ((val) << MMSS_CC_CLK_NS_SRC__SHIFT) & MMSS_CC_CLK_NS_SRC__MASK;
+-}
+-#define MMSS_CC_CLK_NS_PRE_DIV_FUNC__MASK			0x00fff000
+-#define MMSS_CC_CLK_NS_PRE_DIV_FUNC__SHIFT			12
+-static inline uint32_t MMSS_CC_CLK_NS_PRE_DIV_FUNC(uint32_t val)
+-{
+-	return ((val) << MMSS_CC_CLK_NS_PRE_DIV_FUNC__SHIFT) & MMSS_CC_CLK_NS_PRE_DIV_FUNC__MASK;
+-}
+-#define MMSS_CC_CLK_NS_VAL__MASK				0xff000000
+-#define MMSS_CC_CLK_NS_VAL__SHIFT				24
+-static inline uint32_t MMSS_CC_CLK_NS_VAL(uint32_t val)
+-{
+-	return ((val) << MMSS_CC_CLK_NS_VAL__SHIFT) & MMSS_CC_CLK_NS_VAL__MASK;
+-}
+-
+-#define REG_MMSS_CC_DSI2_PIXEL_CC				0x00000094
+-
+-#define REG_MMSS_CC_DSI2_PIXEL_NS				0x000000e4
+-
+-#define REG_MMSS_CC_DSI2_PIXEL_CC2				0x00000264
+-
+-
+-#endif /* MMSS_CC_XML */
 
-Changes in v2:
-- Removed the _shipped files, always generating the headers (Masahiro
-  Yamada)
-- Replaced headergen2 with gen_headers.py
-- Simplify Makefile rules, making all Adreno objects depend on Adreno
-  headers and all displau objects depend on all display headers
-- Also handle Adreno registers
-- Link to v1: https://lore.kernel.org/r/20240226-fd-xml-shipped-v1-0-86bb6c3346d2@linaro.org
-
----
-Dmitry Baryshkov (16):
-      drm/msm/mdp5: add writeback block bases
-      drm/msm/hdmi: drop qfprom.xml.h
-      drm/msm/dsi: drop mmss_cc.xml.h
-      drm/msm: move msm_gpummu.c to adreno/a2xx_gpummu.c
-      drm/msm: import XML display registers database
-      drm/msm: import A2xx-A4xx XML display registers database
-      drm/msm: import A5xx XML display registers database
-      drm/msm: import A6xx XML display registers database
-      drm/msm: import gen_header.py script from Mesa
-      drm/msm: generate headers on the fly
-      drm/msm: drop display-related headers
-      drm/msm: drop A2xx and common headers
-      drm/msm: drop A3xx and A4xx headers
-      drm/msm: drop A5xx header
-      drm/msm: drop A6xx GMU header
-      drm/msm: drop A6xx headers
-
- drivers/gpu/drm/msm/.gitignore                     |     1 +
- drivers/gpu/drm/msm/Makefile                       |    99 +-
- drivers/gpu/drm/msm/adreno/a2xx.xml.h              |  3251 -----
- drivers/gpu/drm/msm/adreno/a2xx_gpu.c              |     4 +-
- drivers/gpu/drm/msm/adreno/a2xx_gpu.h              |     4 +
- .../drm/msm/{msm_gpummu.c => adreno/a2xx_gpummu.c} |    45 +-
- drivers/gpu/drm/msm/adreno/a3xx.xml.h              |  3268 -----
- drivers/gpu/drm/msm/adreno/a4xx.xml.h              |  4379 -------
- drivers/gpu/drm/msm/adreno/a5xx.xml.h              |  5572 ---------
- drivers/gpu/drm/msm/adreno/a6xx.xml.h              | 11858 -------------------
- drivers/gpu/drm/msm/adreno/a6xx_gmu.xml.h          |   422 -
- drivers/gpu/drm/msm/adreno/adreno_common.xml.h     |   539 -
- drivers/gpu/drm/msm/adreno/adreno_pm4.xml.h        |  2803 -----
- drivers/gpu/drm/msm/disp/mdp4/mdp4.xml.h           |  1181 --
- drivers/gpu/drm/msm/disp/mdp5/mdp5.xml.h           |  1979 ----
- drivers/gpu/drm/msm/disp/mdp5/mdp5_cfg.h           |    11 +
- drivers/gpu/drm/msm/disp/mdp_common.xml.h          |   111 -
- drivers/gpu/drm/msm/dsi/dsi.xml.h                  |   790 --
- drivers/gpu/drm/msm/dsi/dsi_phy_10nm.xml.h         |   227 -
- drivers/gpu/drm/msm/dsi/dsi_phy_14nm.xml.h         |   309 -
- drivers/gpu/drm/msm/dsi/dsi_phy_20nm.xml.h         |   237 -
- drivers/gpu/drm/msm/dsi/dsi_phy_28nm.xml.h         |   384 -
- drivers/gpu/drm/msm/dsi/dsi_phy_28nm_8960.xml.h    |   286 -
- drivers/gpu/drm/msm/dsi/dsi_phy_7nm.xml.h          |   483 -
- drivers/gpu/drm/msm/dsi/mmss_cc.xml.h              |   131 -
- drivers/gpu/drm/msm/dsi/sfpb.xml.h                 |    70 -
- drivers/gpu/drm/msm/hdmi/hdmi.xml.h                |  1399 ---
- drivers/gpu/drm/msm/hdmi/qfprom.xml.h              |    61 -
- drivers/gpu/drm/msm/msm_drv.c                      |     3 +-
- drivers/gpu/drm/msm/msm_gpu.c                      |     2 +-
- drivers/gpu/drm/msm/msm_mmu.h                      |     5 -
- drivers/gpu/drm/msm/registers/.gitignore           |     4 +
- drivers/gpu/drm/msm/registers/adreno/a2xx.xml      |  1865 +++
- drivers/gpu/drm/msm/registers/adreno/a3xx.xml      |  1751 +++
- drivers/gpu/drm/msm/registers/adreno/a4xx.xml      |  2409 ++++
- drivers/gpu/drm/msm/registers/adreno/a5xx.xml      |  3039 +++++
- drivers/gpu/drm/msm/registers/adreno/a6xx.xml      |  4970 ++++++++
- drivers/gpu/drm/msm/registers/adreno/a6xx_gmu.xml  |   228 +
- .../gpu/drm/msm/registers/adreno/adreno_common.xml |   400 +
- .../gpu/drm/msm/registers/adreno/adreno_pm4.xml    |  2268 ++++
- drivers/gpu/drm/msm/registers/display/dsi.xml      |   390 +
- .../gpu/drm/msm/registers/display/dsi_phy_10nm.xml |   102 +
- .../gpu/drm/msm/registers/display/dsi_phy_14nm.xml |   135 +
- .../gpu/drm/msm/registers/display/dsi_phy_20nm.xml |   100 +
- .../gpu/drm/msm/registers/display/dsi_phy_28nm.xml |   180 +
- .../msm/registers/display/dsi_phy_28nm_8960.xml    |   134 +
- .../gpu/drm/msm/registers/display/dsi_phy_7nm.xml  |   230 +
- drivers/gpu/drm/msm/registers/display/edp.xml      |   239 +
- drivers/gpu/drm/msm/registers/display/hdmi.xml     |  1015 ++
- drivers/gpu/drm/msm/registers/display/mdp4.xml     |   504 +
- drivers/gpu/drm/msm/registers/display/mdp5.xml     |   806 ++
- .../gpu/drm/msm/registers/display/mdp_common.xml   |    90 +
- drivers/gpu/drm/msm/registers/display/msm.xml      |    32 +
- drivers/gpu/drm/msm/registers/display/sfpb.xml     |    17 +
- .../gpu/drm/msm/registers/freedreno_copyright.xml  |    40 +
- drivers/gpu/drm/msm/registers/gen_header.py        |   957 ++
- drivers/gpu/drm/msm/registers/rules-fd.xsd         |   404 +
- 57 files changed, 22431 insertions(+), 39792 deletions(-)
----
-base-commit: 226d3c72fcde130a99d760895ebdd20e78e02cb5
-change-id: 20240225-fd-xml-shipped-ba9a321cdedf
-
-Best regards,
 -- 
-Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+2.39.2
 
