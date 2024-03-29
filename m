@@ -1,93 +1,92 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1920A131E59;
-	Fri, 29 Mar 2024 20:00:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8885E13DB9C
+	for <linux-kbuild@vger.kernel.org>; Fri, 29 Mar 2024 21:54:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711742437; cv=none; b=U+/SbMjZXFFV5DmCRmBAAN7gMYg3DReVOIIFVGEM1/cPwThxnzy9A03wNDMZOl2vR/DoXWfFAdUBgB23VhlT62a39SDnxtql4Y26Z8m+28xFqzSUgkFDLruM3/R0yMGgzHhPoE2hvwd96fiOjGyCXt+1v9kNkndBXOn8oEd2nZ4=
+	t=1711749295; cv=none; b=pfgAQ7VMly0yT5j10YFvorod0JMsJscK8yu4bZr189B/xWR2bWdST5q8g4v9TzkmSvzg6S68zWSiwse/Tja/u1NP3AOBi9Js5R0pl5fqSQzH4nW0zhb90j8wMp53AyZ6hpF2EAwIVnzskzf9CH3HqrCKrltUEw3agdaFNbf9wvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711742437; c=relaxed/simple;
-	bh=O10HO98LXxHRjwwegetD1LC2QarBz8wOkuidkGTxkic=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PnBmFAmNiNutZAk0OAiRfOfj4Z2HD6NoW97nrh2+lO5n6JMkXzTn3Ihn7SnnGPbDb9SMGZsG4adEqxuLnV30VfuxMDc4fgkYIMiyQCOsPWJT8o7iIwlxXVMZY4IqORrEwr2MotYud95+XXa7IkqNz6Nheiojtzqm8ru8lXqtTjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ibdChtO/; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ibdChtO/"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 88958C43399;
-	Fri, 29 Mar 2024 20:00:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711742436;
-	bh=O10HO98LXxHRjwwegetD1LC2QarBz8wOkuidkGTxkic=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ibdChtO/bXootBctSxklNeA7bYCBts1UgwUFhft4x2sjMGXGiyQ6xGf96V2e0eOA1
-	 ODq9Ia/6579epCaP4lnUDfDLkut5fsOWeaFbJF7me6TstZSBLf3BMrkYDf55Adi731
-	 zHrMkkINKMdPiMUb6gLSoTWBG++DiMupsV5KEmKMPytdOQEZ4kBSph0dMZLkdeLFkK
-	 EbluA1me7aURKnJpRkImBfuddbCDZ41vUC7YUj2cCjTbvsHIIgprJTvRvr6boPp1Ff
-	 UJoxCMbUZIsBcLic6mF8suqylfUb00h7TTGot8oyp8sxfTR9PMGMw0bRiDFpkQ8O6Y
-	 waG7vYyhosOoA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7B142D84BAF;
-	Fri, 29 Mar 2024 20:00:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1711749295; c=relaxed/simple;
+	bh=FFP5qSLt2gi6OXPIlQSb+oCOhup6SxDCMfl5WUh43iA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nd+A2/FpEfx2hrOL7Y/yatCUB5f/KzVfTG/zBMr7yMTriUoA60YQTmh2zG8PpWDHFB0RvIj2vd2Z5jqSPXyANvtTkhoUtC86W4ChGLRd3ZQumZ71IDugV3EH98b/2MhOyAF8L1z066QmPCPbjyRvU9k2p9ixd+YDkYeDLbyEeBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1rqKBX-0004gJ-DJ; Fri, 29 Mar 2024 22:54:51 +0100
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1rqKBX-009GM9-0n; Fri, 29 Mar 2024 22:54:51 +0100
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1rqKBW-00DTju-32;
+	Fri, 29 Mar 2024 22:54:50 +0100
+From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To: Sudip Mukherjee <sudipm.mukherjee@gmail.com>
+Cc: linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH] parport: amiga: Mark driver struct with __refdata to prevent section mismatch
+Date: Fri, 29 Mar 2024 22:54:39 +0100
+Message-ID:  <49ab91032bf9b57cd5fb6d306c38884d059dce2f.1711748999.git.u.kleine-koenig@pengutronix.de>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To:  <2e3783106bf6bd9a7bdeb12b706378fb16316471.1711748999.git.u.kleine-koenig@pengutronix.de>
+References:  <2e3783106bf6bd9a7bdeb12b706378fb16316471.1711748999.git.u.kleine-koenig@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1501; i=u.kleine-koenig@pengutronix.de; h=from:subject:message-id; bh=FFP5qSLt2gi6OXPIlQSb+oCOhup6SxDCMfl5WUh43iA=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBmBziinZBZuqhic9jwgdlI0skMFr+/xqo+9bVkF +wj9XnM69uJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZgc4ogAKCRCPgPtYfRL+ ThbOB/4mIS6/DERN5/ySMmxe23YeE2PvWHuIDtKHC3gP4q78njdUTPWp9lr5D8KRrmbXfIf0l9E XadY6k2bIpZ2WiROWj8rjVVuAiA8RGKWuXfbbWD0xlzT5w3yPSkLl3VHT45uuoCY/OWOOiRbKz5 2rduIoLKfp9JKQsgH7Ph3kolEbvkKlUIwENCx1LaOjOYTVu3zKkjk2Zfvy6PCi7/sYHhD7K9AeO x4598/StdH+df5qAOEEFE1QEIO8YNTZe1J6SVsuUZ1enXGbAZKH10DrDmJyQzDZw3a6wNVVZvSR HCLCUSLYRNidLhdlkuw14kZKeY3rd4+rAFIMkgb1QdS86IZv
+X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 0/9] address remaining
- -Wtautological-constant-out-of-range-compare
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171174243650.4906.1760676317968487901.git-patchwork-notify@kernel.org>
-Date: Fri, 29 Mar 2024 20:00:36 +0000
-References: <20240328143051.1069575-1-arnd@kernel.org>
-In-Reply-To: <20240328143051.1069575-1-arnd@kernel.org>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: linux-kernel@vger.kernel.org, arnd@arndb.de, idryomov@gmail.com,
- dongsheng.yang@easystack.cn, axboe@kernel.dk, jgg@ziepe.ca, leon@kernel.org,
- agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com,
- dm-devel@lists.linux.dev, saeedm@nvidia.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, xiubli@redhat.com,
- jlayton@kernel.org, konishi.ryusuke@gmail.com, dvyukov@google.com,
- andreyknvl@gmail.com, dsahern@kernel.org, masahiroy@kernel.org,
- nathan@kernel.org, nicolas@fjasle.eu, ndesaulniers@google.com,
- morbo@google.com, justinstitt@google.com, keescook@chromium.org,
- gustavoars@kernel.org, tariqt@nvidia.com, ceph-devel@vger.kernel.org,
- linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org, linux-nilfs@vger.kernel.org,
- kasan-dev@googlegroups.com, linux-kbuild@vger.kernel.org,
- llvm@lists.linux.dev
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-kbuild@vger.kernel.org
 
-Hello:
+As described in the added code comment, a reference to .exit.text is ok
+for drivers registered via module_platform_driver_probe(). Make this
+explicit to prevent the following section mismatch warning
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+	WARNING: modpost: drivers/parport/parport_amiga: section mismatch in reference: amiga_parallel_driver+0x8 (section: .data) -> amiga_parallel_remove (section: .exit.text)
 
-On Thu, 28 Mar 2024 15:30:38 +0100 you wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> The warning option was introduced a few years ago but left disabled
-> by default. All of the actual bugs that this has found have been
-> fixed in the meantime, and this series should address the remaining
-> false-positives, as tested on arm/arm64/x86 randconfigs as well as
-> allmodconfig builds for all architectures supported by clang.
-> 
-> [...]
+that triggers on an allmodconfig W=1 build.
 
-Here is the summary with links:
-  - [2/9] libceph: avoid clang out-of-range warning
-    (no matching commit)
-  - [5/9] ipv4: tcp_output: avoid warning about NET_ADD_STATS
-    (no matching commit)
-  - [8/9] mlx5: stop warning for 64KB pages
-    https://git.kernel.org/netdev/net-next/c/a5535e533694
+Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+---
+ drivers/parport/parport_amiga.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-You are awesome, thank you!
+diff --git a/drivers/parport/parport_amiga.c b/drivers/parport/parport_amiga.c
+index e6dc857aac3f..e06c7b2aac5c 100644
+--- a/drivers/parport/parport_amiga.c
++++ b/drivers/parport/parport_amiga.c
+@@ -229,7 +229,13 @@ static void __exit amiga_parallel_remove(struct platform_device *pdev)
+ 	parport_put_port(port);
+ }
+ 
+-static struct platform_driver amiga_parallel_driver = {
++/*
++ * amiga_parallel_remove() lives in .exit.text. For drivers registered via
++ * module_platform_driver_probe() this is ok because they cannot get unbound at
++ * runtime. So mark the driver struct with __refdata to prevent modpost
++ * triggering a section mismatch warning.
++ */
++static struct platform_driver amiga_parallel_driver __refdata = {
+ 	.remove_new = __exit_p(amiga_parallel_remove),
+ 	.driver   = {
+ 		.name	= "amiga-parallel",
+base-commit: a6bd6c9333397f5a0e2667d4d82fef8c970108f2
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
