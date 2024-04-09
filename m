@@ -1,111 +1,189 @@
-Received: from fhigh7-smtp.messagingengine.com (fhigh7-smtp.messagingengine.com [103.168.172.158])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E460B13BACD;
-	Tue,  9 Apr 2024 15:05:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 264FF12FF93;
+	Tue,  9 Apr 2024 15:24:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712675131; cv=none; b=mBwIIohLRX4+Svs98vqcqmbMOgmoj34YDa5LXpcs//D8B3gUu0Tq2HP0nK9sofPoP3w2PLX8BXQ/4ZoR2pMFMUcD34WZIJI1O5uFl7am/tXiCfrS6s2hFuh3WccGXuqAh+3wR5m6BtDU5ir5NkAPIJKalJ74RrmchnR6S+7L7Xc=
+	t=1712676279; cv=none; b=WJpBMfFKb+Zvm0Lx6liFmiXCi2LDAFXA+OlzYiDNXiJTVLRuWSVM6otyRoPO/oVdAK4Zrm8/Ldro4M+I/aLMkjQa5x2l6JRo/bVdvoSq7zGnim+TJItDo7tmUV3pTcTda6W4/nuoSiQ9GEQZFbB7UPeMhQigHqafvz2fL4VKJTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712675131; c=relaxed/simple;
-	bh=BRuB4UKpiBNByIq5UG25bS2+dgxfikOk79EzTalBWB0=;
-	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
-	 Subject:Content-Type; b=c7GsqqKvU/yBnQnlMPdnLu2rtIXBLg08oh7Rlp0CNKitSUmhJIJW1aiEJnPTRNCEn98fMoISWT8JzS/2FIkbt2aRauRFNZv3851g++9FeNlsE1mvx+XKCsCYSA6Bbj/OeXJLO8AqCBPtydT/kBg7diSNIqqjhOCGytxuEQLKNXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=SfFQjHod; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Ef0PFokv; arc=none smtp.client-ip=103.168.172.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="SfFQjHod";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Ef0PFokv"
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-	by mailfhigh.nyi.internal (Postfix) with ESMTP id 06B801140193;
-	Tue,  9 Apr 2024 11:05:29 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute2.internal (MEProxy); Tue, 09 Apr 2024 11:05:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm2; t=1712675129; x=1712761529; bh=BRuB4UKpiB
-	NByIq5UG25bS2+dgxfikOk79EzTalBWB0=; b=SfFQjHodMy4wHc/7Hwneo7e6ym
-	E8E50/C3wm/DXFR2krf3ZaIFAuJp8dq3KeP/bmTag5bqJ2qgznRgzUmHdZpvPzYF
-	HiNN6uqsTLlUcHVbhGaCE61tQTR1G7PATqfFLZyT6Z/SqfFS9QoQkMFUJ/aaa1vL
-	Bff0NW6osSw1a3SOCQ0hpZSuLMMYyfbj/ZEad8PgsiuiA0dk9p65Vqkyuw1VngmP
-	RKhqrp0bV03yTWp7CntUJtBFGm0hV/hVyunkEjHrF4DS4Ze/v12vJGC9Jh7y9KEy
-	aQ6fvM3zqsMvWehZUUchBdx9GFtoszvedaoz6k+Kqo4YJJ8/QAQ2RAQdFxtQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm2; t=1712675129; x=1712761529; bh=BRuB4UKpiBNByIq5UG25bS2+dgxf
-	ikOk79EzTalBWB0=; b=Ef0PFokvTD6zcZNbpgYWGwiG5tb0z3tH4RKUwV1BcnOA
-	LU55sK6DHPcIixL7d+ocbFjLyuKgyjk6t8WSkbHyAmB6Fk/Yhdq1iBcbG5ktwK1W
-	Vdp2tkSlqPIGaPpjs+hf8Y47V1agAFjUezogUnWV7MC/8tt3xE4MVXUldis12au+
-	5wO5e8APojGNViA7hoHehOQB/RGvPY3MPsU1ezN0Uay5fos05hCdbkmL8gJKuHvq
-	j1jRgVIOj94mFUuaYi8QgnRtdO4KE7XfYpmZ06MXTPlnxqOhDVGlAauKNzWg/LjQ
-	YmOOcfFW8fUeGF05V0O/XHG8Jp5iLt73t0/uiFIrUQ==
-X-ME-Sender: <xms:OFkVZu0Rsk9E-4wgeolKdkfyRkZkktAQ_nwi90wpywPJECrcnp-xRQ>
-    <xme:OFkVZtZ8E7n0QrrrKCWDTBwFI11uOolA1CyI3MTRjtaaXbZmB_3MSqCt6Am9uCAv5
-    RPFkWA46jtfV2z5aW8>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudehvddgudeiucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
-    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
-    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
-    teffnecuvehluhhsthgvrhfuihiivgepudenucfrrghrrghmpehmrghilhhfrhhomheprg
-    hrnhgusegrrhhnuggsrdguvg
-X-ME-Proxy: <xmx:OFkVZpp0uweMVBe4mmv9NW5UTNyoys7sI81g1sZ10cCG-ZxWmhaSQQ>
-    <xmx:OFkVZhqhHpgYAZzObLm-mMSA97VqEN7nUWTJHqv2EnUtO8uMV8Nm0g>
-    <xmx:OFkVZj3qCI5_0Z9qhwv8FivbGBSHkYtJLI47daNJFbOu9tZ3r_WR-A>
-    <xmx:OFkVZgDTVHrnffOvSW3qUIcqx_TBrTFj8dIpvFFmofUrTguf6f5txA>
-    <xmx:OFkVZlw730G3knSjl4M9c5cTKK3CRiFbZBBn-zYvW7qImYlwh_S02HmI>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 67E1AB6008D; Tue,  9 Apr 2024 11:05:28 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.11.0-alpha0-379-gabd37849b7-fm-20240408.001-gabd37849
+	s=arc-20240116; t=1712676279; c=relaxed/simple;
+	bh=85Dtdhs4cI7wMp4CVhZJsWIixGlTrtyaSva9NaNU/i4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=A1DRd2z8ogO/dipE6dGm4sxOZv8MVHxF6Q2TsgKge/iagCXGNZ952+pkZ4vCXaWr9T2uTLCjkkWzX4m59RPBCJn5xG8DvIyNNttZFw74rJGmoWHv3KSw7kg3ojZ+c5feE/JVwWc3SdWzRs6oawGVwrsYi5v+R85VCHt8lqgEsjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-615019cd427so49122097b3.3;
+        Tue, 09 Apr 2024 08:24:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712676276; x=1713281076;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lu5hD9VvS+qp+vhw7UeQVESAr0EzPRLUzVlLL7V9CRE=;
+        b=vF5ySepFHb/RzAmOoTMn/+cuolBejnJuuf3JQk5ITQOaCkhguDfY0SliaDQkmVW0WA
+         edEVF9BNhKfklfckElbxMoAOUMf0OqT63va6l8RqdbHwAOGZ2OSrGSAPL1+jJP7+Gk3l
+         z60gKRxKIV30klC+I5Pp0HeKAqi2+9ItEvoAzzardD/9RW3WJDGnMhH9R8Y9k386UEGb
+         NMaJ8aH9/+SSOG38QM1EQp7/f5oXYiquYs9FaHWkKf+ETtcgK7TO/rwIjT2o/Svtb7Cp
+         vEYUxu/qkJTmhcPkLaiH6+JRSdMgK8ZZ8/BkhOxNL8jghfTi5gWLeUaX0PteEWH/BjA0
+         Pwyg==
+X-Forwarded-Encrypted: i=1; AJvYcCVtrR+VDEycDG0UsGRrruzKZAP7I/A0zg7gjlPwBqO0hqEa9E/Zm6R2E5ZpxHrjPmJ4E6C95bGP0LHku8Jb8AhQ/AfZSCT+RhKbdHDRFC6XJrLiX2sS3psZhveJB4gGBdQV1atphqMLE2Ct3jU3+NQ=
+X-Gm-Message-State: AOJu0YyUZPnvXWtpxBn/HbfJpNEPYmJuzPBJT2uJSY4/pCVxAK5tfCIU
+	3Bg9URjZHGJ4ht1jr1SM5rRd0cEPFKCvRIgxLrjgh4PTCbiL4pRFtVP+JAo9sLo=
+X-Google-Smtp-Source: AGHT+IG1cnrLl7tfsBBOIdsLlFA6/UdLeOLXuSll683s/hJa/CT5uqV2+sJU1/zA62dnxg6yc1hRsQ==
+X-Received: by 2002:a0d:df82:0:b0:614:42c2:278d with SMTP id i124-20020a0ddf82000000b0061442c2278dmr20175ywe.0.1712676275174;
+        Tue, 09 Apr 2024 08:24:35 -0700 (PDT)
+Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com. [209.85.219.180])
+        by smtp.gmail.com with ESMTPSA id ho3-20020a05690c630300b0060a07fdf93bsm2208208ywb.134.2024.04.09.08.24.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Apr 2024 08:24:34 -0700 (PDT)
+Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-dcc80d6004bso5803357276.0;
+        Tue, 09 Apr 2024 08:24:34 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCW5KIXEl24dup6xUcnLf8LDIIfKGOxTFpttmBvRLfvdfrk6EkPZWzoBYakBSTpJNgZo7Btl93Z5ESE0viF8SL17C/FKbUEgBya3Vj/+Eg3PTsmkMoskimk1zZBTeOmGpXcXJqWzErECD+O/9/S0AGo=
+X-Received: by 2002:a25:b10a:0:b0:dcc:f3fe:19c with SMTP id
+ g10-20020a25b10a000000b00dccf3fe019cmr53487ybj.59.1712676273820; Tue, 09 Apr
+ 2024 08:24:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <fe75de1c-f500-42f3-bef0-8830d9f45ea1@app.fastmail.com>
-In-Reply-To: <20240409150132.4097042-8-ardb+git@google.com>
-References: <20240409150132.4097042-5-ardb+git@google.com>
- <20240409150132.4097042-8-ardb+git@google.com>
-Date: Tue, 09 Apr 2024 17:05:08 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Ard Biesheuvel" <ardb+git@google.com>, linux-kernel@vger.kernel.org
-Cc: "Ard Biesheuvel" <ardb@kernel.org>,
- "Masahiro Yamada" <masahiroy@kernel.org>,
- "Martin KaFai Lau" <martin.lau@linux.dev>,
- Linux-Arch <linux-arch@vger.kernel.org>, linux-kbuild@vger.kernel.org,
- bpf@vger.kernel.org, "Andrii Nakryiko" <andrii@kernel.org>
-Subject: Re: [PATCH v2 3/3] btf: Avoid weak external references
-Content-Type: text/plain
+References: <20240327-kms-kconfig-helpers-v3-0-eafee11b84b3@kernel.org>
+ <a816fea-9974-d17f-bed6-69728e223@linux-m68k.org> <87sezu97id.fsf@intel.com>
+ <CAMuHMdVMhXFm-kZ50Un1ZFmEcjJ7SnpyEyw65-wucBGpVRUFww@mail.gmail.com> <87edbe94ck.fsf@intel.com>
+In-Reply-To: <87edbe94ck.fsf@intel.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 9 Apr 2024 17:24:21 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdUYqEpKTxHgkdm5B-Q9nM4PyzNDxmqDW=GHG7adcp83+Q@mail.gmail.com>
+Message-ID: <CAMuHMdUYqEpKTxHgkdm5B-Q9nM4PyzNDxmqDW=GHG7adcp83+Q@mail.gmail.com>
+Subject: Re: [PATCH v3 00/13] drm/display: Convert helpers Kconfig symbols to
+ depends on
+To: Jani Nikula <jani.nikula@linux.intel.com>
+Cc: Maxime Ripard <mripard@kernel.org>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Thomas Zimmermann <tzimmermann@suse.de>, 
+	David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>, dri-devel@lists.freedesktop.org, 
+	Lucas De Marchi <lucas.demarchi@intel.com>, kernel test robot <lkp@intel.com>, 
+	linux-renesas-soc@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kbuild <linux-kbuild@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 9, 2024, at 17:01, Ard Biesheuvel wrote:
-> From: Ard Biesheuvel <ardb@kernel.org>
->
-> If the BTF code is enabled in the build configuration, the start/stop
-> BTF markers are guaranteed to exist in the final link but not during the
-> first linker pass.
->
-> Avoid GOT based relocations to these markers in the final executable by
-> providing preliminary definitions that will be used by the first linker
-> pass, and superseded by the actual definitions in the subsequent ones.
->
-> Make the preliminary definitions dependent on CONFIG_DEBUG_INFO_BTF so
-> that inadvertent references to this section will trigger a link failure
-> if they occur in code that does not honour CONFIG_DEBUG_INFO_BTF.
->
-> Note that Clang will notice that taking the address of__start_BTF cannot
-> yield NULL any longer, so testing for that condition is no longer
-> needed.
->
-> Acked-by: Andrii Nakryiko <andrii@kernel.org>
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+Hi Jani,
 
-Acked-by: Arnd Bergmann <arnd@arndb.de>
+On Tue, Apr 9, 2024 at 1:13=E2=80=AFPM Jani Nikula <jani.nikula@linux.intel=
+.com> wrote:
+> On Tue, 09 Apr 2024, Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+> > On Tue, Apr 9, 2024 at 12:04=E2=80=AFPM Jani Nikula <jani.nikula@linux.=
+intel.com> wrote:
+> >> On Tue, 09 Apr 2024, Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+> >> > The user should not need to know which helpers are needed for the dr=
+iver
+> >> > he is interested in.  When a symbol selects another symbol, it shoul=
+d
+> >> > just make sure the dependencies of the target symbol are met.
+> >>
+> >> It's really not "just make sure". This leads to perpetual illegal
+> >> configurations, and duct tape fixes. Select should not be used for
+> >> visible symbols or symbols with dependencies [1].
+> >
+> > In other words: none of these helpers should be visible...
+>
+> ...and should have no dependencies? :p
+
+Unless they do have dependencies.
+
+> >> What we'd need for usability is not more abuse of select, but rather 1=
+)
+> >> warnings for selecting symbols with dependencies, and 2) a way to enab=
+le
+> >
+> > Kconfig already warns if dependencies of selected symbols are not met.
+>
+> But it does lead to cases where a builtin tries to use a symbol from a
+> module, failing at link time, not config time. Then I regularly see
+> patches trying to fix this with IS_REACHABLE(), making it a silent
+> runtime failure instead, when it should've been a config issue.
+
+If a symbol for a builtin selects a symbol for a module, the latter
+becomes builtin, too, so that does not cause such issues?
+You can get such issues when a boolean symbol depends on a tristate
+symbol...
+
+> >> a kconfig option with all its dependencies, recursively. This is what =
+we
+> >> lack.
+> >
+> > You cannot force-enable all dependencies of the target symbol, as some
+> > of these dependencies may be impossible to meet on the system you are
+> > configuring a kernel for.
+>
+> Surely kconfig should be able to figure out if they're possible or not.
+>
+> > The current proper way is to add these dependencies to the source
+> > symbol, which is what we have been doing everywhere else.  Another
+> > solution may be to teach Kconfig to ignore any symbols that select a
+> > symbol with unmet dependencies.
+>
+> ...
+>
+> It seems like your main argument in favour of using select is that it's
+> more convenient for people who configure the kernel. Because the user
+> should be able to just enable a driver, and that would select everything
+> that's needed. But where do we draw the line? Then what qualifies for
+> "depends on"?
+
+Hard (platform and subsystem) dependencies.
+
+> Look at config DRM_I915 and where select abuse has lead us. Like, why
+> don't we just select DRM, PCI and X86 as well instead of depend. :p
+
+X86 and PCI are hard platform dependencies.
+DRM is a subsystem dependency.
+
+> A lot of things we have to select because it appears to generally be the
+> case that if some places select and some places depends on a symbol,
+> it'll lead to circular dependencies.
+
+True.  So all library code (incl. helpers) should be selected, and
+not be used as a dependency.
+The user shouldn't be aware that the driver uses library code (or not).
+
+> Sure there may be a usability issue with using depends on. But the
+> proper fix isn't hacking in kconfig files, it's to fix the usability in
+> kconfig the tool UI. But nobody steps up, because at least I find the
+> kconfig source to be inpenetrable. I've tried many times, and given up.
+
+As long as Kconfig does not handle dependencies of selected symbols
+automatically, adding explicit dependencies to the origin symbols is
+the only workable solution.
+
+> I mean, if you want to enable a driver D, it could, at a minimum, show
+> you a tree of (possibly alternative) things you also need to enable. But
+
+And this series is actually making that harder, by turning all these
+selects of helpers into dependencies...
+
+> if the dependencies aren't there, you won't even see the config for
+> D. That's not something that should be "fixed" by abusing select in
+> kconfig files.
+
+I consider not seeing symbols when a hard dependency is not met as
+a good thing.  If everything was visible all the time, you would
+have a very hard (well, harder than the current already-hard ;-)
+time configuring your kernel.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
