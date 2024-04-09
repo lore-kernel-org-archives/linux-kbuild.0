@@ -1,102 +1,121 @@
-Received: from fhigh7-smtp.messagingengine.com (fhigh7-smtp.messagingengine.com [103.168.172.158])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B396131E4B;
-	Tue,  9 Apr 2024 15:05:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EADB131E3C;
+	Tue,  9 Apr 2024 15:05:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712675114; cv=none; b=hW+djoaqEUSphvtegYC9pCIX4WsfwXT0OjW0RXO8pAbYvA3q8QmmCc/A4CBzvWOgF8s9nuqAdJ7MGZIpjno6+CE1fL06yr6XNg4nxmhAcVOZoTq+n9EbN5e4IhJRYbwFud3Cq3l4Tb+FFNV2gD7VuannB3dgtkRSZj5lRFhgmnA=
+	t=1712675128; cv=none; b=E+5Z0oF7LDb5rnd6FRQ6Fa/NdB/6RPfPiKGvuj398IMcizrSWDAf+6MdO6y5h5fOS/lGf1rs/ZPZdafc0KcczOkP+J1uWN076xmuccB6oIvSy6qEWIvs0bADf+BffreY2M3OPkwztH6wg06ceOaa3KRV0zy0y5SVAuNAE9XES+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712675114; c=relaxed/simple;
-	bh=V6madtNyWdhTt9y9c6a6ZrnVncckkEUPl1Vv6/BK8EA=;
-	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
-	 Subject:Content-Type; b=a3Qmwb81mqelUxr+Te++urWgAt2WIgz6PbgRYHifjyCjuxeJQYdgvv0TzHEuK2+Ua6BGu3JuS2d541Me22ye59nwr1za+77fmZeNkZ1wyFYN2BomIDzrjX5OIXUPI2D9ugdIlc/GiQu4mtAyQAuVJrZS9MX7ZVyTveaex3PCvgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=kbyIdd4w; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=fB+VxKTC; arc=none smtp.client-ip=103.168.172.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1712675128; c=relaxed/simple;
+	bh=mJt7v6CLSOYzx1gtAyi5VoQyh9G4Ztq0Q2FlAeZxZmo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=e1aqm2m+l4Gkkh2D2ipZD/X4Jfdl/+VZEj9G80D11DeK4yuzNGIrpVtkiWF09QWSgLCOEYb2eExLYQFXXfs6BMufTK72TaO3o8FhtGdeX6GtJ2gP2sZH1bdbu0kOC3qWAGohvbTkvBFG1RKSuozlS+rKuYJvO/BPk18QYaKoaQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fCn2zHwP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="kbyIdd4w";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="fB+VxKTC"
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-	by mailfhigh.nyi.internal (Postfix) with ESMTP id ACD9C114019F;
-	Tue,  9 Apr 2024 11:05:11 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute2.internal (MEProxy); Tue, 09 Apr 2024 11:05:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm2; t=1712675111; x=1712761511; bh=V6madtNyWd
-	hTt9y9c6a6ZrnVncckkEUPl1Vv6/BK8EA=; b=kbyIdd4wjpKM/gTCylL1w1ytKN
-	ugmaHUHp9TFSUTKagB9R8Elv67DZAn3PneCEsqWNFH0YxrYTsWsHyI4dEe2AXfdm
-	jROAlz5r0xErkOuobwoSinRujrfhxjZLMvj0rye43IootA3QkswUsGbELcjq6J5P
-	n7q52Bz1R3ypEWz3sPykXycY4ip6kelo44Kj4tMYaVSeXQHFnA5CJc16CyMM4moX
-	dA9IL4B8cgJB/DJORNBRDKpcOrgHJ/42iLF0AdUidh/NMWFyHVM0fJ7vEIQvkj55
-	QN2gudXQceSsY9EwUsmGKrGnz3GWVBBJbj4xON7efCGNTpsgC7J66if7TPrA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm2; t=1712675111; x=1712761511; bh=V6madtNyWdhTt9y9c6a6ZrnVncck
-	kEUPl1Vv6/BK8EA=; b=fB+VxKTCqbxmFLOdr5crCTZ3J5nLE4ks0UrcGXqlc9V0
-	uS3ADHT8rS0aRmJlWxpYnXefFf9tZosXG0tCzHSHyV76cpcVTb9RfcPL5lfwMqAZ
-	IbUMb1eBLY0Y6vE/92cj/nnCcoyyLMXa+cXCbmdWGK1Rasf8WFQ3NsgGl+2HhahE
-	3lAkqS/PXz4ZQRuw9iDXYoByupQ4g2x1hjTbf4kuMRNQjazrjDD1T4+7K22nH9Vu
-	CY9mqlSd5ceoFVkBz6lo4YwG18RtLtMdhnSMlTF7ZdxEQL+fAGL+nOnHB0SrDgEs
-	qkbYQJNhvDpFwUV9TQs7Qt2JgI9XSUcaPzVN83cjwg==
-X-ME-Sender: <xms:J1kVZkGJ_rcgZOh4SmzUXxDCulhR54CuplgFi-RCAg7slankBwfsiA>
-    <xme:J1kVZprDR67Xp5IhpoXDKP0SVqR-lrcxghB1esS7_UpdvfDZjFzItyKF489Mwcsv5
-    GqV91yWI-wzDh9kzBw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudehvddgudeiucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
-    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
-    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
-    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
-    hrnhgusegrrhhnuggsrdguvg
-X-ME-Proxy: <xmx:J1kVZg6uQZuzxxjChOWFntNgaF1glK_RoaBaxU6b3PzitRmQx7igHA>
-    <xmx:J1kVZn5P045DmgD9Zg-vuljp1A0oiQlSDOe_XnvmgjSxX3qHH5HeRw>
-    <xmx:J1kVZtEC1Wmpgi4u3Q32E6hiNgZgfjpS1qQot2FYczZ_qZiRoujUjQ>
-    <xmx:J1kVZgRCwG5ZfeMHa0hg1WRzQf4u5LFRwbOPPzuHtz_dco7iSRNggQ>
-    <xmx:J1kVZtC59ksjutW5_9lJrNkJ6dKmLbgyfyX_WiQ-WsMJbnsEav7Y6VLT>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 0D78EB6008D; Tue,  9 Apr 2024 11:05:10 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.11.0-alpha0-379-gabd37849b7-fm-20240408.001-gabd37849
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fCn2zHwP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D441C43394;
+	Tue,  9 Apr 2024 15:05:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712675128;
+	bh=mJt7v6CLSOYzx1gtAyi5VoQyh9G4Ztq0Q2FlAeZxZmo=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=fCn2zHwPhopHz3aJMqQuvT0XcsT7uQACdH7RpIfWCKsUDLkk3gf5FGDw4zWpYrgvD
+	 uHsoSSt5qLptwNNbfqus0tnv+lz8+j1GLA7xNJuWdgoxedmWIxOy1qpgIkLedk9xDZ
+	 Tk/2gjwceeSc1HSDRiACiU5Lt1elWa15BD6BnZoSUoi2ONmiPBp5pZJ4PFLwkkq164
+	 yQAbCmUhBIsj30JKInNCV4w8feoC9IBwwj2hTtDSdwUhcdDk808VmE/4jVrvoWs8eH
+	 2mdyLkcgR2mZGl6rkNdcwmbWQYw5RmNuI3DaQ9sgQ+yZZNlJVIt3ARO7x5S0Mba2We
+	 Bx23czV4vYapQ==
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-22ec8db3803so401636fac.1;
+        Tue, 09 Apr 2024 08:05:28 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCV1ZpLlplzyjSp+xywErsTXtkV+AFugDo9gIIux1ycBbSUIjzE3xViy7vCqYCjcreUuhgkXrog87BDsc7Yo0TtOfiKeV1iKm8X0hVJg/NiV6Lq2bvqtz2+l07rS18EfVl2cMmQjokreUAxXEr28sehtG+V4wb+MlOSp/TFENIYxDVyjoAemHNj5twUWhrNdDmdllpklEqFtzJnRKLQ/cFY47+qbc8eXY1Iv
+X-Gm-Message-State: AOJu0YxrwQXJcPZA9b4blDwM01TCYyX+6S7pznTfEdQ9VBFDQU7+qe7U
+	ew8hrKnpC98nOiJb9vYwchZMbANWwJhLD4tboQ79vwkrGMZCyw49grLn0IdKM4nbIen6xJPJDO8
+	q3jPzUFH+pMZ9PPDCdPDOSY+pVho=
+X-Google-Smtp-Source: AGHT+IGDUO0rZ4GKVyVieaHSmKzYKqNHjEuMKn4kB8H+BP9iyv6DlSuHKVlwMC/rIyJebF0i0bhH71zkmEuwl5+N0cA=
+X-Received: by 2002:a05:6870:f727:b0:222:81cc:ac9c with SMTP id
+ ej39-20020a056870f72700b0022281ccac9cmr12216666oab.5.1712675127270; Tue, 09
+ Apr 2024 08:05:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <328afce9-345e-4d25-a8c0-f6630112f674@app.fastmail.com>
-In-Reply-To: <20240409150132.4097042-7-ardb+git@google.com>
-References: <20240409150132.4097042-5-ardb+git@google.com>
- <20240409150132.4097042-7-ardb+git@google.com>
-Date: Tue, 09 Apr 2024 17:04:50 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Ard Biesheuvel" <ardb+git@google.com>, linux-kernel@vger.kernel.org
-Cc: "Ard Biesheuvel" <ardb@kernel.org>,
- "Masahiro Yamada" <masahiroy@kernel.org>,
- "Martin KaFai Lau" <martin.lau@linux.dev>,
- Linux-Arch <linux-arch@vger.kernel.org>, linux-kbuild@vger.kernel.org,
- bpf@vger.kernel.org, "Andrii Nakryiko" <andrii@kernel.org>
-Subject: Re: [PATCH v2 2/3] vmlinux: Avoid weak reference to notes section
-Content-Type: text/plain
+References: <20240409140059.3806717-1-arnd@kernel.org> <20240409140059.3806717-3-arnd@kernel.org>
+In-Reply-To: <20240409140059.3806717-3-arnd@kernel.org>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Tue, 9 Apr 2024 17:05:15 +0200
+X-Gmail-Original-Message-ID: <CAJZ5v0h7XEV__S4pvQJt54Ab832z6PZFTNTRspfLF507MNo9Og@mail.gmail.com>
+Message-ID: <CAJZ5v0h7XEV__S4pvQJt54Ab832z6PZFTNTRspfLF507MNo9Og@mail.gmail.com>
+Subject: Re: [PATCH 2/5] [v2] acpi: disable -Wstringop-truncation
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: linux-kbuild@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, 
+	Richard Russon <ldm@flatcap.org>, Jens Axboe <axboe@kernel.dk>, Robert Moore <robert.moore@intel.com>, 
+	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>, Len Brown <lenb@kernel.org>, 
+	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nicolas Schier <nicolas@fjasle.eu>, Lin Ming <ming.m.lin@intel.com>, 
+	Alexey Starikovskiy <astarikovskiy@suse.de>, linux-ntfs-dev@lists.sourceforge.net, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-acpi@vger.kernel.org, acpica-devel@lists.linux.dev, 
+	linux-trace-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 9, 2024, at 17:01, Ard Biesheuvel wrote:
-> From: Ard Biesheuvel <ardb@kernel.org>
+On Tue, Apr 9, 2024 at 4:01=E2=80=AFPM Arnd Bergmann <arnd@kernel.org> wrot=
+e:
 >
-> Weak references are references that are permitted to remain unsatisfied
-> in the final link. This means they cannot be implemented using place
-> relative relocations, resulting in GOT entries when using position
-> independent code generation.
+> From: Arnd Bergmann <arnd@arndb.de>
 >
-> The notes section should always exist, so the weak annotations can be
-> omitted.
+> gcc -Wstringop-truncation warns about copying a string that results in a
+> missing nul termination:
 >
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> drivers/acpi/acpica/tbfind.c: In function 'acpi_tb_find_table':
+> drivers/acpi/acpica/tbfind.c:60:9: error: 'strncpy' specified bound 6 equ=
+als destination size [-Werror=3Dstringop-truncation]
+>    60 |         strncpy(header.oem_id, oem_id, ACPI_OEM_ID_SIZE);
+>       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> drivers/acpi/acpica/tbfind.c:61:9: error: 'strncpy' specified bound 8 equ=
+als destination size [-Werror=3Dstringop-truncation]
+>    61 |         strncpy(header.oem_table_id, oem_table_id, ACPI_OEM_TABLE=
+_ID_SIZE);
+>       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
+~~~~~~~~~
+>
+> The code works as intended, and the warning could be addressed by using
+> a memcpy(), but turning the warning off for this file works equally well
+> and may be easir to merge.
 
-Acked-by: Arnd Bergmann <arnd@arndb.de>
+"easier" (fixed up).
+
+Tricky that, but OK.let's get the warning off the table.
+
+Applied as 6.10 material, thanks!
+
+> Fixes: 47c08729bf1c ("ACPICA: Fix for LoadTable operator, input strings")
+> Link: https://lore.kernel.org/lkml/CAJZ5v0hoUfv54KW7y4223Mn9E7D4xvR7whRFN=
+LTBqCZMUxT50Q@mail.gmail.com/#t
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  drivers/acpi/acpica/Makefile | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/drivers/acpi/acpica/Makefile b/drivers/acpi/acpica/Makefile
+> index 30f3fc13c29d..8d18af396de9 100644
+> --- a/drivers/acpi/acpica/Makefile
+> +++ b/drivers/acpi/acpica/Makefile
+> @@ -5,6 +5,7 @@
+>
+>  ccflags-y                      :=3D -D_LINUX -DBUILDING_ACPICA
+>  ccflags-$(CONFIG_ACPI_DEBUG)   +=3D -DACPI_DEBUG_OUTPUT
+> +CFLAGS_tbfind.o                +=3D $(call cc-disable-warning, stringop-=
+truncation)
+>
+>  # use acpi.o to put all files here into acpi.o modparam namespace
+>  obj-y  +=3D acpi.o
+> --
+> 2.39.2
+>
+>
