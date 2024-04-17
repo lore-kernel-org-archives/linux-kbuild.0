@@ -1,37 +1,41 @@
 Received: from mail-4022.proton.ch (mail-4022.proton.ch [185.70.40.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC3828475;
-	Wed, 17 Apr 2024 04:37:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7AA2249FF;
+	Wed, 17 Apr 2024 04:37:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713328668; cv=none; b=rIqEpuLiP0+9jh5lz5iuFv+OeevokK5z5gdQHl14b6XS3ne2mKO2n2eW5jm1kXY6vGJhyNgzQTunNamdXcCFfvjszSmOEMBwItIHxAYQ3zl+cQNhGQ6GTLTTqZdi6chazZBV46Fob/gRPqs4t6UkgZb9kJ1tmiKmF4U/Nr3WJQg=
+	t=1713328681; cv=none; b=DXuILphBTfCbwGkMbYi5WoOx8RURokxhykKVcLpyjQ5JlDRAd5WrLiLOlGIV5wwvm1n8URcqbpD0IYe7bax3zgkypwAzarXObCFihGL8U2AMxa16WDFCzD1D0Xg2glus+I8AOaURekfxiQgKYtvAkmlEOZUDCiew8Cnq8V6LmMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713328668; c=relaxed/simple;
-	bh=qbDz0DlgjrZENhlsJHJ+gy7SCfIWG/XwWh12SVY1HZk=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=FREJ1O13aFRR1J9VlZjBeZuJKhJVgnslpSsK0SugFg6rw+2deyco0n+NHdoxkfz/5dQVtniCOWIKFxxMf8bFPWx1sFnoAdxWMEE3KAxI2v9/+irVEvMfM8sIutOpMoN8WbaVDoFtYTySEVzxQ/Fl6wv/wU3A2IpMlwHWfEOceEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=thefossguy.com; spf=pass smtp.mailfrom=thefossguy.com; dkim=pass (2048-bit key) header.d=thefossguy.com header.i=@thefossguy.com header.b=b1yIZsvZ; arc=none smtp.client-ip=185.70.40.22
+	s=arc-20240116; t=1713328681; c=relaxed/simple;
+	bh=KX5dGt60kRXkSBH8M6UZCTSOzlReUUj2VrWu2VzGTP8=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=flDM29dy3Kye4oowssiB/SG9JB2NDdWj+qPVjBw7s+FTawcPVAgTIM7V7dABC5gLUYOWz9ubr54Cy+ONmjgOzuljqQCNVVNlKubH24jBeSfnY2gRsJ9EZMLcCyb78f57ykntL9N7E2w5ZOQ1PgLHrbZAv/LJdttMjE3gIoe/wsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=thefossguy.com; spf=pass smtp.mailfrom=thefossguy.com; dkim=pass (2048-bit key) header.d=thefossguy.com header.i=@thefossguy.com header.b=Hn0Cnc4P; arc=none smtp.client-ip=185.70.40.22
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=thefossguy.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=thefossguy.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=thefossguy.com header.i=@thefossguy.com header.b="b1yIZsvZ"
+	dkim=pass (2048-bit key) header.d=thefossguy.com header.i=@thefossguy.com header.b="Hn0Cnc4P"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=thefossguy.com;
-	s=protonmail; t=1713328657; x=1713587857;
-	bh=IbZR0E8/N9KY9oYmAUshTasIKbqaTz9GcGXb+f2i2D4=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=b1yIZsvZtUtDn2depEJGgUVQLugYpxmY7Pm7bJV2lVoh/lpKxIseLcWaWN5ByL8cz
-	 FwmHpX6pBXbVTjHAXMyXnWsY+kUN1WXBQoiYcYjCY5HCaQOyXJbVDp2pzpIRHSWRsa
-	 XwpU+gNRKFH4wiEK4kWmMEHc1SAzkNhHSzXNmCUOPkklFEgxbulN8mag3LimhgGP68
-	 vbbbaA906d5DlpA+FmK7mNBUgdaM8gEQcv7lo/BHHOsDsPcD7EaatXhfNgBw9074ue
-	 q3O5pVN55WZ+4Pajwkomg+AVxsvPqhu4dQ/dlaPW7dQJhVYLJ32g/wQdQ3DqAqONLE
-	 MstFI19XH0MoA==
-Date: Wed, 17 Apr 2024 04:37:32 +0000
+	s=protonmail; t=1713328677; x=1713587877;
+	bh=KX5dGt60kRXkSBH8M6UZCTSOzlReUUj2VrWu2VzGTP8=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=Hn0Cnc4Pkbu6KMaU1AGxgDMbM5vaIPjmlxIdYfg3zIHx+5PBIIOSEyNZ6CGF7Uifi
+	 pLQe/89ehnOmoWS9KG2VKKEausXHxGZkMuigygbEVsSaU4sK49wsGt5DhDVRFs7CRa
+	 4UlUrf9iCRvqZsmP0ORdXPJAZbp6cGw8SJ9AJhTXdFOi712Ugca8/JmvzLC+KW+OjW
+	 27FjH64l324YsHH4fYlLrbpw1TjDymKmw3jpHiSBHdnjG7Kftxz3PK73Ohpd3cF1FB
+	 5pp0FQ2VPRJcR3hI9e4QZkmOUzVriCnuKVlJ7saaiTTNuK+OHI0rWL72LivZlycMc8
+	 uw4ZAelDRwVqg==
+Date: Wed, 17 Apr 2024 04:37:54 +0000
 To: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Jonathan Corbet <corbet@lwn.net>
 From: Pratham Patel <prathampatel@thefossguy.com>
 Cc: linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Pratham Patel <prathampatel@thefossguy.com>, thefirst1322@gmail.com
-Subject: [PATCH 0/2] Enable building of the devel RPM package from Kbuild
-Message-ID: <20240417043654.60662-1-prathampatel@thefossguy.com>
+Subject: [PATCH 2/2] docs: kbuild: document KBUILD_RPM_WITH_DEVEL
+Message-ID: <20240417043654.60662-3-prathampatel@thefossguy.com>
+In-Reply-To: <20240417043654.60662-1-prathampatel@thefossguy.com>
+References: <20240417043654.60662-1-prathampatel@thefossguy.com>
 Feedback-ID: 104309535:user:proton
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
@@ -42,18 +46,36 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-This addresses a minor nit where I want a `-devel` RPM package to be
-built when I build a binary RPM package with either `binrpm-pkg`
-or `rpm-pkg` target(s).
+KBUILD_RPM_WITH_DEVEL was added to toggle the `with_devel` RPM macro.
+Add brief documentation on its usage.
 
-Pratham Patel (2):
-  kbuild: allow toggling the `with_devel` RPM macro
-  docs: kbuild: document KBUILD_RPM_WITH_DEVEL
-
+Signed-off-by: Pratham Patel <prathampatel@thefossguy.com>
+---
  Documentation/kbuild/kbuild.rst | 6 ++++++
- scripts/Makefile.package        | 5 ++++-
- 2 files changed, 10 insertions(+), 1 deletion(-)
+ 1 file changed, 6 insertions(+)
 
---
+diff --git a/Documentation/kbuild/kbuild.rst b/Documentation/kbuild/kbuild.=
+rst
+index 9c8d1d046ea5..0b7ae268ac67 100644
+--- a/Documentation/kbuild/kbuild.rst
++++ b/Documentation/kbuild/kbuild.rst
+@@ -310,6 +310,12 @@ These two variables allow to override the user@host st=
+ring displayed during
+ boot and in /proc/version. The default value is the output of the commands
+ whoami and host, respectively.
+=20
++KBUILD_RPM_WITH_DEVEL
++---------------------
++This variable dictates weather creating an RPM package also builds a `-dev=
+el`
++package or not. Set to 1 if you want a `-devel` package. The default value
++is 0.
++
+ LLVM
+ ----
+ If this variable is set to 1, Kbuild will use Clang and LLVM utilities ins=
+tead
+--=20
 2.42.0
+
 
