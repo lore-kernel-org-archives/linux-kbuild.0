@@ -1,54 +1,54 @@
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B495F57C9B
-	for <linux-kbuild@vger.kernel.org>; Thu,  2 May 2024 22:33:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61BD94436B
+	for <linux-kbuild@vger.kernel.org>; Thu,  2 May 2024 22:33:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714689228; cv=none; b=WuONLEcWSXPkF5NjB5jyp/AXvOh/8hCx0RG+M6YWxaG/Gr3GncLQ1+bZWAK9V8/ilkXcqnq9CUr2dEGFXV/H56V8dJBAIQPqJ6YpJoJjqZffosJKLjHUEBMPIGzgu7u8qoYdVEZWlIZVsbQ+fUldtJSrw8Mevp7WB2hYs4i6XuU=
+	t=1714689231; cv=none; b=SEk+gSX1CtqkqrTkVLp+fLL4N+jkO2SR8wFzAcW5KkZZdXrtD91dagL6u+DFRePxr4FVNX0C49jgCu2idmnkUo5g65jk5o7eEzipO1eLL3qJU/Nkr9iCHt77ptePplHiANtICuDofyfjQHTfFU9A3hrZwOJNnmR58bpFsF0aeBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714689228; c=relaxed/simple;
-	bh=WtgCtyIMNT2LXHS8P/KpT13C94RxNhKJ7RovKI+clEE=;
+	s=arc-20240116; t=1714689231; c=relaxed/simple;
+	bh=aku0Ov6TP/MVYBgFlGuMSUdhnxeal+hPQHrvCM+9JCg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=i5YBgSHt5Xio4qroCEy/XHktvsO3AFXBwiT6e8A9gbwh02LHnsw1f33vMPkgLjA7Hic36sdoe3mTJzpu2fLnDZ1dIzmQ4S4e46uTtI/pzNU3+SKE3wP1SnXWfa0c6KTnSSbcbJ4mmAEIo7CiPuiMQoq36VmzO3N5Hu/gATYb6lk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=h0EfiOOh; arc=none smtp.client-ip=209.85.215.169
+	 MIME-Version; b=SfAw5E71VeFLSfa2Bp8va495MrC0RndU/yOuHGzFwbtms7PM7gTMDpGUiuh+kYdxy2w6wbhXaZ0LMW8T6X3cg9R/xAVjHVBoiWa4RQZWtAqHSAhmwLEpo5ycbViQ3e/zbjBBq4SudV1l6NL/QmYnLOLy7770LusnTtYRoEs31S4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=MHfM2F0L; arc=none smtp.client-ip=209.85.215.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="h0EfiOOh"
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-5c6bd3100fcso5797015a12.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 02 May 2024 15:33:46 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="MHfM2F0L"
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-618a51c8c29so972819a12.1
+        for <linux-kbuild@vger.kernel.org>; Thu, 02 May 2024 15:33:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1714689226; x=1715294026; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1714689229; x=1715294029; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FS85aS0uSYWPmkJmR+HxkNl8OY9pDJKR/ix6jc3gM1o=;
-        b=h0EfiOOhmq8PjQZgn8+PA/uRz1CCoSzsd5+0RMCsycrlsl8RuGIlxlQ675/ukdYLNr
-         kueqkcinV0iWaagkejkVrPFgPDVgq0BKWAb5/YmMJUbWPES5NS2MftK8kywHq+VdNSq1
-         EGz0UoCxdBCbt4etTLesRg3eAKRXxfKLgSoAM=
+        bh=Nhj8hJv8Nz4SLO0kIrZY8268X0YP9luJWZdcMXgW554=;
+        b=MHfM2F0LjCk+8EUjh9rcul74jhMusbATkG+JI+0vONTQiZ9qLpGT0TMRAX7ifHH5V9
+         F590du9Unm3NlLg7xzMFZLEuDWxbu1FkPvyhG+P0CKXhTTs6ApN15IDTx8D6oZJQptJC
+         XQw8U79NpNamGRkGsbTnsAkDiH+c+c9unS1ks=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714689226; x=1715294026;
+        d=1e100.net; s=20230601; t=1714689229; x=1715294029;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FS85aS0uSYWPmkJmR+HxkNl8OY9pDJKR/ix6jc3gM1o=;
-        b=eExwK8UFYtVGvP4AvQo0YXUgaGrM0bum0Og2ryYjpELndhWFMryTc4sdAtQ38ZWWd1
-         KZgFWbNrnQ97uS4JY7uaAejIwr0DBZtwF/vc2EZsPYi8uIldEMefHXbxg/8RKqFK91cW
-         gmlyumnY9Uubsv+eQUPzl1u9vgAyIM3Q/6NsTJc6NfF/4CENDiH7JOfOtKoSm9xOYwqM
-         Q8SEiQCiivCCgSbR51RLMi2wbfwJ8JnmoLqLGTzDIarRlXf29WZYg6fTFb+g1uBurBA3
-         IVfVjR0IWrbu5L/ARGMCdSDSqNoapRdDhQ2HK2I181c2FxJb0s9mhIHvbtW2gA5L5Og+
-         yf0w==
-X-Forwarded-Encrypted: i=1; AJvYcCUij5VpQigg7JHkX4GjpplGopZjpcOABxgkLetYVfXKU++Vj8YAy6EtlL7I2kNSrcWOz8E3GyK5h2Wpz/GWODyTr1TL2hh+W1ddYUHA
-X-Gm-Message-State: AOJu0YxfxIjj84w38kIk2m2apGJgH9JfmCmO5I3dNzfhbuEPpvUjeQQu
-	8nX7hwKyrI5Ly8Srw/r9m4iLqwMPo96mrKVbyL20+epZSbQ/bqaCuvqdY6ddjw==
-X-Google-Smtp-Source: AGHT+IHPqWSEIWAkmTHA3m+ip5N1siYc+jc02yV1sSYNCUk2VbsJlQut2h0V+Wbt+chL+SgMhgBGWw==
-X-Received: by 2002:a05:6a21:1f27:b0:1ac:6762:e62e with SMTP id ry39-20020a056a211f2700b001ac6762e62emr1201922pzb.30.1714689225930;
-        Thu, 02 May 2024 15:33:45 -0700 (PDT)
+        bh=Nhj8hJv8Nz4SLO0kIrZY8268X0YP9luJWZdcMXgW554=;
+        b=V1J2C2A/rKT87mq+YULJTBGtd9b28IuykGd3GPQ12Bm9+C5KJN5VHyAUtmnET2kn3F
+         3Xz8nc105bTfrjJeILcFnTIo3j4WQ2J2+DjsRNqrd2wWi2dCCAJusp4lHZ2OEs033KcY
+         aGtvIyatAHkW40pzUVWJRrv/mTgcJQJJ4Qas2E+bYA38n7F4FuSiZCiS6kH5xiqImQp7
+         5wW1ZKVP/Y5nUU76Vwv9VgA2zgafcmmRhACAsioUqKp9I9/n2vYbyzPNVcwAlBdGKzNq
+         /ASvCckZopzuSI4a+Pn70qwvQONVOS5qJT2Q6Fc/B0Zdp/wtE+RtOU/pt+m0/E2tYJ6G
+         uIUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU4PgsSphXtNrTZGNxK/dJe4ksaGob0bvNyRebv+PI7cdEP2vlqu8165MwubnRrNOC1HL2WF0XirHLQhOxB40f8NGDA/KlVvHvgz7I0
+X-Gm-Message-State: AOJu0Yy9TDHpwiFijqz6zYF5IwU/PgA5ocODhwrUGBvRP4/DSz+5v0E2
+	FBOHayjJrm4VxwcDaksOhU5Ci+lArxYu5tKdFNm4Da/4YzFULEuYSfBVtI2ROA==
+X-Google-Smtp-Source: AGHT+IFc7AO8befqehZXahPHokNXwIeinKWSHFTDAZBc8gTAVzLseerL0chlFu6kgm2QDfWE7mdbeg==
+X-Received: by 2002:a17:90a:ac18:b0:2b2:9783:d0ca with SMTP id o24-20020a17090aac1800b002b29783d0camr1477782pjq.12.1714689228740;
+        Thu, 02 May 2024 15:33:48 -0700 (PDT)
 Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id eu6-20020a17090af94600b002b3631c9270sm2784217pjb.25.2024.05.02.15.33.41
+        by smtp.gmail.com with ESMTPSA id fw14-20020a17090b128e00b002a2d4bf345bsm3698747pjb.55.2024.05.02.15.33.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 May 2024 15:33:42 -0700 (PDT)
+        Thu, 02 May 2024 15:33:47 -0700 (PDT)
 From: Kees Cook <keescook@chromium.org>
 To: Christian Brauner <brauner@kernel.org>
 Cc: Kees Cook <keescook@chromium.org>,
@@ -86,9 +86,9 @@ Cc: Kees Cook <keescook@chromium.org>,
 	intel-gfx@lists.freedesktop.org,
 	linux-kbuild@vger.kernel.org,
 	linux-hardening@vger.kernel.org
-Subject: [PATCH 1/5] fs: Do not allow get_file() to resurrect 0 f_count
-Date: Thu,  2 May 2024 15:33:36 -0700
-Message-Id: <20240502223341.1835070-1-keescook@chromium.org>
+Subject: [PATCH 5/5] fs: Convert struct file::f_count to refcount_long_t
+Date: Thu,  2 May 2024 15:33:40 -0700
+Message-Id: <20240502223341.1835070-5-keescook@chromium.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240502222252.work.690-kees@kernel.org>
 References: <20240502222252.work.690-kees@kernel.org>
@@ -98,14 +98,26 @@ List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=923; i=keescook@chromium.org; h=from:subject; bh=WtgCtyIMNT2LXHS8P/KpT13C94RxNhKJ7RovKI+clEE=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBmNBTDS8z47/RFROL1IOhhstMS1R8chpsln1UTA /ua0FxEWaCJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZjQUwwAKCRCJcvTf3G3A JmiTD/9h3vxAjfd+x38LUO8iBg0XaVYG0fE+uUAgPtl4+tThkzIHVPwRZvUaAttpv0rxblAgfyt blgim7dvZLmsZwvtY+fG0B7Ex0KmlH4jF9o/0oOrFCCJcHFKogjX9q8vOq7nXb0AutdLQxXbALT Gi07OKXY6BfixXgXojnjmDsDX37JKM+9aMT/Js5FWDOhIaFSpn/b4bEgh4VvE5aUCW2AMcqbZUa 5fIMXU+GdA6q1EHkPu/V/oANVb9vi6kkL3MQRMd2Q6yY/QjA5EVHCA2u8w+Wu2DgUCffgY3zli5 QvqPOdlTd2unyBGzT+05ygn2f+4E7JW9FczuGQ9wfArVgUiCUZ5OrOhU7YpgHTgtmZhuA/XKvrb 2uemrbNiU2fmNpil1TqgxnryEz0MfaYDb8BjLOmchF87oBK0wKbVOHNJjVVSoKmqPh3qEk1jC2s uHic4zSh8WIZc/ycwpUNqcghKK0fL0v0apyhBiLHa7PYDDRWE89n4xXFDk8p3es23xa8pvtFZ3p xrXlj4DW1sDT08plpkk0UXHYq6K8qAaSw1Ts1IwjwkVHo95wmegwPwc3/U1ZfqsuTr9BG7ugDI5 LiSdxoiZF/Q9dl04c99LliAAzAHYWqj9BQJwJkkOe2KTTQ5L/Hi4L4GT4RdcdaHuJAF0JTaTtR2 hEa2Zvq5tUpbQpQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3356; i=keescook@chromium.org;
+ h=from:subject; bh=aku0Ov6TP/MVYBgFlGuMSUdhnxeal+hPQHrvCM+9JCg=;
+ b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBmNBTDsTosM5PigT8MgtAILfCBKJBIs1YpjR+n9
+ i4hU3z7b2GJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZjQUwwAKCRCJcvTf3G3A
+ JpwAD/47yb9BpbWzPuD0heUR6EIq/XA2DmBYJDN5EAEcjQh8e95gPvrbNsBQnT+lojr4owqsbV7
+ yzKXeVQsU4C13GRWVgHZOs4DuQkYYtC0AJVHQ9LrjXn9Rgkfb928ujjbYMNhZpvfGxJ///oDZEx
+ SLgxaj8AKWkuPDgKyktn25SCmT7MnZbHQ5h+s3Eu+U0PO1IeAY8qwit7+cWw0KtH0SmVPGyzLSg
+ OD7OAFb7j5XoajUhOQcltZOHvQI8FEQQsMvOJxUtioIyuro1Ah2yAhiJ+Gb4IiuzreOOS5mpQY9
+ rAeyVw1zgu2gR6iJ7gpPfq40oFIp3yulcggvyRh6GeikDzJhwpr9MIdIEnYpgeyTm/PgomJjyNR
+ KVeoluWeWITtKvPSs1kXp33TxqrsjXk2F06HFgRPXqyLP4d/qcZhl7q6Vs8GmNlEbtLMqxJscV2
+ o/JWSiqQ4VeQfHwCAZNY9enOk5CCC6Z+YwOof8OUIKsivBxLc7dLGjX+X01ttLx5GWsmPr7/RHY
+ jAKBvlDq1GORFiHN/58xNQNqu1fGiicNh5Wyuk7D22DfoO0k+gWAoz/7JKx6Q+N1zM4URIMfePa
+ ZwcN0ap5AIn9iwCooiNslmX4gAjKTcV7LO1fvZy8mgzRK2khRr0rpHK6qi52Vq3AMNylI0Nw9qZ qJGKfgmX6LueF0A==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 
-If f_count reaches 0, calling get_file() should be a failure. Adjust to
-use atomic_long_inc_not_zero() and return NULL on failure. In the future
-get_file() can be annotated with __must_check, though that is not
-currently possible.
+Underflow of f_count needs to be more carefully detected than it
+currently is. The results of get_file() should be checked, but the
+first step is detection. Redefine f_count from atomic_long_t to
+refcount_long_t.
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
@@ -114,22 +126,94 @@ Cc: Alexander Viro <viro@zeniv.linux.org.uk>
 Cc: Jan Kara <jack@suse.cz>
 Cc: linux-fsdevel@vger.kernel.org
 ---
- include/linux/fs.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ fs/file.c          | 4 ++--
+ fs/file_table.c    | 6 +++---
+ include/linux/fs.h | 6 +++---
+ 3 files changed, 8 insertions(+), 8 deletions(-)
 
+diff --git a/fs/file.c b/fs/file.c
+index 3b683b9101d8..570424dd634b 100644
+--- a/fs/file.c
++++ b/fs/file.c
+@@ -865,7 +865,7 @@ static struct file *__get_file_rcu(struct file __rcu **f)
+ 	if (!file)
+ 		return NULL;
+ 
+-	if (unlikely(!atomic_long_inc_not_zero(&file->f_count)))
++	if (unlikely(!refcount_long_inc_not_zero(&file->f_count)))
+ 		return ERR_PTR(-EAGAIN);
+ 
+ 	file_reloaded = rcu_dereference_raw(*f);
+@@ -987,7 +987,7 @@ static inline struct file *__fget_files_rcu(struct files_struct *files,
+ 		 * barrier. We only really need an 'acquire' one to
+ 		 * protect the loads below, but we don't have that.
+ 		 */
+-		if (unlikely(!atomic_long_inc_not_zero(&file->f_count)))
++		if (unlikely(!refcount_long_inc_not_zero(&file->f_count)))
+ 			continue;
+ 
+ 		/*
+diff --git a/fs/file_table.c b/fs/file_table.c
+index 4f03beed4737..f29e7b94bca1 100644
+--- a/fs/file_table.c
++++ b/fs/file_table.c
+@@ -167,7 +167,7 @@ static int init_file(struct file *f, int flags, const struct cred *cred)
+ 	 * fget-rcu pattern users need to be able to handle spurious
+ 	 * refcount bumps we should reinitialize the reused file first.
+ 	 */
+-	atomic_long_set(&f->f_count, 1);
++	refcount_long_set(&f->f_count, 1);
+ 	return 0;
+ }
+ 
+@@ -470,7 +470,7 @@ static DECLARE_DELAYED_WORK(delayed_fput_work, delayed_fput);
+ 
+ void fput(struct file *file)
+ {
+-	if (atomic_long_dec_and_test(&file->f_count)) {
++	if (refcount_long_dec_and_test(&file->f_count)) {
+ 		struct task_struct *task = current;
+ 
+ 		if (unlikely(!(file->f_mode & (FMODE_BACKING | FMODE_OPENED)))) {
+@@ -503,7 +503,7 @@ void fput(struct file *file)
+  */
+ void __fput_sync(struct file *file)
+ {
+-	if (atomic_long_dec_and_test(&file->f_count))
++	if (refcount_long_dec_and_test(&file->f_count))
+ 		__fput(file);
+ }
+ 
 diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 00fc429b0af0..210bbbfe9b83 100644
+index 210bbbfe9b83..b8f6cce7c39d 100644
 --- a/include/linux/fs.h
 +++ b/include/linux/fs.h
-@@ -1038,7 +1038,8 @@ struct file_handle {
+@@ -1001,7 +1001,7 @@ struct file {
+ 	 */
+ 	spinlock_t		f_lock;
+ 	fmode_t			f_mode;
+-	atomic_long_t		f_count;
++	refcount_long_t		f_count;
+ 	struct mutex		f_pos_lock;
+ 	loff_t			f_pos;
+ 	unsigned int		f_flags;
+@@ -1038,7 +1038,7 @@ struct file_handle {
  
  static inline struct file *get_file(struct file *f)
  {
--	atomic_long_inc(&f->f_count);
-+	if (unlikely(!atomic_long_inc_not_zero(&f->f_count)))
-+		return NULL;
+-	if (unlikely(!atomic_long_inc_not_zero(&f->f_count)))
++	if (unlikely(!refcount_long_inc_not_zero(&f->f_count)))
+ 		return NULL;
  	return f;
  }
+@@ -1046,7 +1046,7 @@ static inline struct file *get_file(struct file *f)
+ struct file *get_file_rcu(struct file __rcu **f);
+ struct file *get_file_active(struct file **f);
+ 
+-#define file_count(x)	atomic_long_read(&(x)->f_count)
++#define file_count(x)	refcount_long_read(&(x)->f_count)
+ 
+ #define	MAX_NON_LFS	((1UL<<31) - 1)
  
 -- 
 2.34.1
