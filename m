@@ -1,65 +1,48 @@
-Received: from mail-pg1-f194.google.com (mail-pg1-f194.google.com [209.85.215.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88E9C14039E
-	for <linux-kbuild@vger.kernel.org>; Thu, 13 Jun 2024 09:34:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35CE5143C5F;
+	Thu, 13 Jun 2024 13:36:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718271291; cv=none; b=A2XtaG/raXFSQTd8g9X9bpCSRr+PNaErg4hEN/Uu3h4De/kPQfE0HbahV+A2KkQ3xAULohq1I8Tmre5eQ39bnP1+p8r5/y8alNfiZgar6/Zn6Ml9pCh6Do+HCJH6Ob4OryVchds1p/xPfYe6XbCn74+TA3oELQZKf7weCMp3tLY=
+	t=1718285805; cv=none; b=LFg19xWbXQBGLjngUmjk6sJMr++whhDOnqjjooPR0t9FosgOGLkiW9GA0KKxw/eMnkvCW2122Uw7+xI9aiVkATdfzZKVABFyQrZBARJ8hQ1uNS/E8yuSTh2HckFRnDIv8CBMvwpzPurpMUH6j+mS8XSujMX9yBiCL/kdmrcSjjU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718271291; c=relaxed/simple;
-	bh=Wk19CPlfuV7oR9ir/74te7+uM1iysqvQXTOBDktBM1Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Yzi6L9fts2JFIfVnu8KffDziavfKNHjFlEg3qNZrg1KwZcxeBJ3GqyV+hgKAs5KpyCR+IGHVCQjGiv4zmduXNNs0d4f+/lrmdXLQ65hjwPjWOIcKOl0c3BEN1crvu4s/aAQds/qkO6QA+qUiytqokVkkJgD/u153nMqhKkEWcXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=R82YjmPv; arc=none smtp.client-ip=209.85.215.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="R82YjmPv"
-Received: by mail-pg1-f194.google.com with SMTP id 41be03b00d2f7-6e40ee57f45so638267a12.0
-        for <linux-kbuild@vger.kernel.org>; Thu, 13 Jun 2024 02:34:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1718271288; x=1718876088; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=VwsSHgS8s2wQj0WzRoqwu97IEcpIHsOcGhEZ3yrM0mk=;
-        b=R82YjmPvw8NojL4wTS9+d6oT9nlbTKTLuepWU7/bpi++o7sB7JkuCP5sKdFJM/a/88
-         xcyf6OijmM8A3NJy43DWHnWGcZXlerwpR/Ao/OmtIIe1/2e3CKd3lGclzOcXthHu4QKU
-         xHq9rBGCEvw5hxxwUs+mhzuaNXKxl9WO4KIuc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718271288; x=1718876088;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VwsSHgS8s2wQj0WzRoqwu97IEcpIHsOcGhEZ3yrM0mk=;
-        b=YrCYU5OKn+WEHH7bBuLuuMWZB9ApZDps6J0u1b6zJ46bNzgfCdknkJJCcz04/roAj+
-         HrKSuJvOhzBhqvBa+D9sK864w/VYZETJb2tH9ZHdATcwaAsuvT1O6GslW2PCGqLj3B/P
-         Xa1BHkKZGOb/vH/HSoXLm2uLxQv8vVTRE3y9L8fN+CgoPAEGQhY/olMdFg5PBKfC+3fp
-         BxdGg/VpFixcmFH6jRpJEpIX8QRrywa/UobeQt8B9PYLqTnm0CZJgzuU8r+uuUfMEpLW
-         H6SbtZqbpDH3lS54FBqf1euoLotKXUj0i6DoXC0/vD/Or5pJOjcELC5rNf2OaahgSMaH
-         oMkw==
-X-Forwarded-Encrypted: i=1; AJvYcCVEUoL3Tv9gf8thN9LgPSWzlePA/tRXriMRo3DVBlvqwqM353TPSxRnG2GaGpodoZxCeNPDktcAIf5zRE4ELAuQs8FuhVRp6p8UpZPi
-X-Gm-Message-State: AOJu0YxnS17TZVfOYnZoc1ibZb5CE3nutai698Dh0+c5cwtO58hn2ddZ
-	6CbYcNvovyqx7jm7ONlk2CAIN+UsBUWmG3VmIS52pYvSgthdXOouGCs8QZVXPg==
-X-Google-Smtp-Source: AGHT+IEnIOh7DiAESrTJ1kbxGQvP2E7KfH7dzH3UNBD/7cHFjOlB1I94q07CgHTKdnlATWkACJWcVA==
-X-Received: by 2002:a05:6a20:6a1d:b0:1b5:a58b:1acd with SMTP id adf61e73a8af0-1b8a9b76456mr5940574637.1.1718271287662;
-        Thu, 13 Jun 2024 02:34:47 -0700 (PDT)
-Received: from wenstp920.tpe.corp.google.com ([2401:fa00:1:10:324e:368c:b7ef:8bd2])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f855e6e42csm9287625ad.73.2024.06.13.02.34.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jun 2024 02:34:47 -0700 (PDT)
-From: Chen-Yu Tsai <wenst@chromium.org>
-To: Simon Glass <sjg@chromium.org>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nicolas@fjasle.eu>
-Cc: Chen-Yu Tsai <wenst@chromium.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-kbuild@vger.kernel.org
-Subject: [PATCH v2] scripts/make_fit: Support decomposing DTBs
-Date: Thu, 13 Jun 2024 17:34:32 +0800
-Message-ID: <20240613093433.131699-1-wenst@chromium.org>
-X-Mailer: git-send-email 2.45.2.627.g7a2c4fd464-goog
+	s=arc-20240116; t=1718285805; c=relaxed/simple;
+	bh=L3kKolLqYCdCsguERH50zIApmY/jXnpJBn/Cw8AtSBc=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dbirFXteDmHz7qFj1gpijxFlNHjPwuRPkQIjnFxVhiyFs1xu/2A9qB1CAcqd0idGO8WD9U8qV/aWt1nhE+sRwtOUvv6++Qvcm+k2KQ4l67DHfXA8ZQ61hC5TVwxaMPY/ftxrzaJthuFyCSHV49qHAJaLL4Y3/kbU60zDjL3E+gw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4W0Ncx4JDtzwTlf;
+	Thu, 13 Jun 2024 21:32:33 +0800 (CST)
+Received: from dggpeml500012.china.huawei.com (unknown [7.185.36.15])
+	by mail.maildlp.com (Postfix) with ESMTPS id E049B140154;
+	Thu, 13 Jun 2024 21:36:40 +0800 (CST)
+Received: from localhost.localdomain (10.67.175.61) by
+ dggpeml500012.china.huawei.com (7.185.36.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 13 Jun 2024 21:36:40 +0800
+From: Zheng Yejian <zhengyejian1@huawei.com>
+To: <rostedt@goodmis.org>, <mhiramat@kernel.org>, <mark.rutland@arm.com>,
+	<mpe@ellerman.id.au>, <npiggin@gmail.com>, <christophe.leroy@csgroup.eu>,
+	<naveen.n.rao@linux.ibm.com>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<bp@alien8.de>, <dave.hansen@linux.intel.com>, <x86@kernel.org>,
+	<hpa@zytor.com>, <mcgrof@kernel.org>, <mathieu.desnoyers@efficios.com>,
+	<masahiroy@kernel.org>, <nathan@kernel.org>, <nicolas@fjasle.eu>,
+	<kees@kernel.org>, <james.clark@arm.com>, <kent.overstreet@linux.dev>,
+	<yhs@fb.com>, <jpoimboe@kernel.org>, <peterz@infradead.org>
+CC: <zhengyejian1@huawei.com>, <linux-kernel@vger.kernel.org>,
+	<linux-trace-kernel@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
+	<linux-modules@vger.kernel.org>, <linux-kbuild@vger.kernel.org>,
+	<bpf@vger.kernel.org>
+Subject: [PATCH 3/6] module: kallsyms: Determine exact function size
+Date: Thu, 13 Jun 2024 21:37:08 +0800
+Message-ID: <20240613133711.2867745-4-zhengyejian1@huawei.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20240613133711.2867745-1-zhengyejian1@huawei.com>
+References: <20240613133711.2867745-1-zhengyejian1@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -67,224 +50,95 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpeml500012.china.huawei.com (7.185.36.15)
 
-The kernel tree builds some "composite" DTBs, where the final DTB is the
-result of applying one or more DTB overlays on top of a base DTB with
-fdtoverlay.
+When a weak type function is overridden, its symbol will be removed
+from the symbol table, but its code will not been removed. It will
+cause find_kallsyms_symbol() to compute a larger function size than
+it actually is, just because symbol of its following weak function is
+removed.
 
-The FIT image specification already supports configurations having one
-base DTB and overlays applied on top. It is then up to the bootloader to
-apply said overlays and either use or pass on the final result. This
-allows the FIT image builder to reuse the same FDT images for multiple
-configurations, if such cases exist.
+To fix this issue, check that an given address is within the size of
+the function found.
 
-The decomposition function depends on the kernel build system, reading
-back the .cmd files for the to-be-packaged DTB files to check for the
-fdtoverlay command being called. This will not work outside the kernel
-tree. The function is off by default to keep compatibility with possible
-existing users.
-
-To facilitate the decomposition and keep the code clean, the model and
-compatitble string extraction have been moved out of the output_dtb
-function. The FDT image description is replaced with the base file name
-of the included image.
-
-Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
+Signed-off-by: Zheng Yejian <zhengyejian1@huawei.com>
 ---
-Changes since v1:
-- Replace OrderedDict with standard {} dict
-- Change short form command line argument to -D
-- Drop [] around "'fdt-{x}\x00' for x in files"
-- Add spaces around '+' in slice argument
-- Split out DTB parsing into separate function
+ include/linux/module.h   |  7 +++++++
+ kernel/module/kallsyms.c | 19 +++++++++++++++++--
+ 2 files changed, 24 insertions(+), 2 deletions(-)
 
-Simon's reviewed-by was dropped.
-
-This is a feature I alluded to in my replies to Simon's original
-submission of the make_fit.py script [1].
-
-This is again made a runtime argument as not all firmware out there
-that boot FIT images support applying overlays. Like my previous
-submission for disabling compression for included FDT images, the
-bootloader found in RK3399 and MT8173 Chromebooks do not support
-applying overlays. Another case of this is U-boot shipped by development
-board vendors in binary form (without upstream) in an image or in
-SPI flash on the board that were built with OF_LIBFDT_OVERLAY=n.
-These would fail to boot FIT images with DT overlays. One such
-example is my Hummingboard Pulse. In these cases the firmware is
-either not upgradable or very hard to upgrade.
-
-I believe there is value in supporting these cases. A common script
-shipped with the kernel source that can be shared by distros means
-the distro people don't have to reimplement this in their downstream
-repos or meta-packages. For ChromeOS this means reducing the amount
-of package code we have in shell script.
-
-[1] https://lore.kernel.org/linux-kbuild/20231207142723.GA3187877@google.com/
-
- scripts/Makefile.lib |  1 +
- scripts/make_fit.py  | 86 ++++++++++++++++++++++++++++++++------------
- 2 files changed, 65 insertions(+), 22 deletions(-)
-
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 9f06f6aaf7fc..d78b5d38beaa 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -522,6 +522,7 @@ quiet_cmd_fit = FIT     $@
-       cmd_fit = $(MAKE_FIT) -o $@ --arch $(UIMAGE_ARCH) --os linux \
- 		--name '$(UIMAGE_NAME)' \
- 		$(if $(findstring 1,$(KBUILD_VERBOSE)),-v) \
-+		$(if $(FIT_DECOMPOSE_DTBS),--decompose-dtbs) \
- 		--compress $(FIT_COMPRESSION) -k $< @$(word 2,$^)
+diff --git a/include/linux/module.h b/include/linux/module.h
+index ffa1c603163c..13518f464d3f 100644
+--- a/include/linux/module.h
++++ b/include/linux/module.h
+@@ -597,6 +597,13 @@ static inline unsigned long kallsyms_symbol_value(const Elf_Sym *sym)
+ }
+ #endif
  
- # XZ
-diff --git a/scripts/make_fit.py b/scripts/make_fit.py
-index 263147df80a4..4a1bb2f55861 100755
---- a/scripts/make_fit.py
-+++ b/scripts/make_fit.py
-@@ -22,6 +22,11 @@ the entire FIT.
- Use -c to compress the data, using bzip2, gzip, lz4, lzma, lzo and
- zstd algorithms.
- 
-+Use -D to decompose "composite" DTBs into their base components and
-+deduplicate the resulting base DTBs and DTB overlays. This requires the
-+DTBs to be sourced from the kernel build directory, as the implementation
-+looks at the .cmd files produced by the kernel build.
++#ifndef HAVE_ARCH_KALLSYMS_SYMBOL_TYPE
++static inline unsigned int kallsyms_symbol_type(const Elf_Sym *sym)
++{
++	return ELF_ST_TYPE(sym->st_info);
++}
++#endif
 +
- The resulting FIT can be booted by bootloaders which support FIT, such
- as U-Boot, Linuxboot, Tianocore, etc.
+ /* FIXME: It'd be nice to isolate modules during init, too, so they
+    aren't used before they (may) fail.  But presently too much code
+    (IDE & SCSI) require entry into the module during init.*/
+diff --git a/kernel/module/kallsyms.c b/kernel/module/kallsyms.c
+index 62fb57bb9f16..092ae6f43dad 100644
+--- a/kernel/module/kallsyms.c
++++ b/kernel/module/kallsyms.c
+@@ -262,6 +262,7 @@ static const char *find_kallsyms_symbol(struct module *mod,
+ 	unsigned long nextval, bestval;
+ 	struct mod_kallsyms *kallsyms = rcu_dereference_sched(mod->kallsyms);
+ 	struct module_memory *mod_mem;
++	const Elf_Sym *sym;
  
-@@ -64,6 +69,8 @@ def parse_args():
-           help='Specifies the architecture')
-     parser.add_argument('-c', '--compress', type=str, default='none',
-           help='Specifies the compression')
-+    parser.add_argument('-D', '--decompose-dtbs', action='store_true',
-+          help='Decompose composite DTBs into base DTB and overlays')
-     parser.add_argument('-E', '--external', action='store_true',
-           help='Convert the FIT to use external data')
-     parser.add_argument('-n', '--name', type=str, required=True,
-@@ -140,12 +147,12 @@ def finish_fit(fsw, entries):
-     fsw.end_node()
-     seq = 0
-     with fsw.add_node('configurations'):
--        for model, compat in entries:
-+        for model, compat, files in entries:
-             seq += 1
-             with fsw.add_node(f'conf-{seq}'):
-                 fsw.property('compatible', bytes(compat))
-                 fsw.property_string('description', model)
--                fsw.property_string('fdt', f'fdt-{seq}')
-+                fsw.property('fdt', bytes(''.join(f'fdt-{x}\x00' for x in files), "ascii"))
-                 fsw.property_string('kernel', 'kernel')
-     fsw.end_node()
+ 	/* At worse, next value is at end of module */
+ 	if (within_module_init(addr, mod))
+@@ -278,9 +279,10 @@ static const char *find_kallsyms_symbol(struct module *mod,
+ 	 * starts real symbols at 1).
+ 	 */
+ 	for (i = 1; i < kallsyms->num_symtab; i++) {
+-		const Elf_Sym *sym = &kallsyms->symtab[i];
+-		unsigned long thisval = kallsyms_symbol_value(sym);
++		unsigned long thisval;
  
-@@ -193,21 +200,9 @@ def output_dtb(fsw, seq, fname, arch, compress):
-         fname (str): Filename containing the DTB
-         arch: FIT architecture, e.g. 'arm64'
-         compress (str): Compressed algorithm, e.g. 'gzip'
--
--    Returns:
--        tuple:
--            str: Model name
--            bytes: Compatible stringlist
-     """
-     with fsw.add_node(f'fdt-{seq}'):
--        # Get the compatible / model information
--        with open(fname, 'rb') as inf:
--            data = inf.read()
--        fdt = libfdt.FdtRo(data)
--        model = fdt.getprop(0, 'model').as_str()
--        compat = fdt.getprop(0, 'compatible')
--
--        fsw.property_string('description', model)
-+        fsw.property_string('description', os.path.basename(fname))
-         fsw.property_string('type', 'flat_dt')
-         fsw.property_string('arch', arch)
-         fsw.property_string('compression', compress)
-@@ -215,9 +210,45 @@ def output_dtb(fsw, seq, fname, arch, compress):
-         with open(fname, 'rb') as inf:
-             compressed = compress_data(inf, compress)
-         fsw.property('data', compressed)
--    return model, compat
++		sym = &kallsyms->symtab[i];
++		thisval = kallsyms_symbol_value(sym);
+ 		if (sym->st_shndx == SHN_UNDEF)
+ 			continue;
  
+@@ -292,6 +294,13 @@ static const char *find_kallsyms_symbol(struct module *mod,
+ 		    is_mapping_symbol(kallsyms_symbol_name(kallsyms, i)))
+ 			continue;
  
-+def process_dtb(fname, args):
-+    """Process an input DTB, decomposing it if requested and is possible
-+
-+    Args:
-+        fname (str): Filename containing the DTB
-+        args (Namespace): Program arguments
-+    Returns:
-+        tuple:
-+            str: Model name string
-+            str: Root compatible string
-+            files: list of filenames corresponding to the DTB
-+    """
-+    # Get the compatible / model information
-+    with open(fname, 'rb') as inf:
-+        data = inf.read()
-+    fdt = libfdt.FdtRo(data)
-+    model = fdt.getprop(0, 'model').as_str()
-+    compat = fdt.getprop(0, 'compatible')
-+
-+    if args.decompose_dtbs:
-+        # Check if the DTB needs to be decomposed
-+        path, basename = os.path.split(fname)
-+        cmd_fname = os.path.join(path, f'.{basename}.cmd')
-+        with open(cmd_fname, 'r', encoding='ascii') as inf:
-+            cmd = inf.read()
-+
-+        if 'scripts/dtc/fdtoverlay' in cmd:
-+            # This depends on the structure of the composite DTB command
-+            files = cmd.split()
-+            files = files[files.index('-i') + 1:]
-+        else:
-+            files = [fname]
-+    else:
-+        files = [fname]
-+
-+    return (model, compat, files)
-+
- def build_fit(args):
-     """Build the FIT from the provided files and arguments
++		if (kallsyms_symbol_type(sym) == STT_FUNC &&
++		    addr >= thisval && addr < thisval + sym->st_size) {
++			best = i;
++			bestval = thisval;
++			nextval = thisval + sym->st_size;
++			goto find;
++		}
+ 		if (thisval <= addr && thisval > bestval) {
+ 			best = i;
+ 			bestval = thisval;
+@@ -303,6 +312,12 @@ static const char *find_kallsyms_symbol(struct module *mod,
+ 	if (!best)
+ 		return NULL;
  
-@@ -235,6 +266,7 @@ def build_fit(args):
-     fsw = libfdt.FdtSw()
-     setup_fit(fsw, args.name)
-     entries = []
-+    fdts = {}
- 
-     # Handle the kernel
-     with open(args.kernel, 'rb') as inf:
-@@ -243,12 +275,22 @@ def build_fit(args):
-     write_kernel(fsw, comp_data, args)
- 
-     for fname in args.dtbs:
--        # Ignore overlay (.dtbo) files
--        if os.path.splitext(fname)[1] == '.dtb':
--            seq += 1
--            size += os.path.getsize(fname)
--            model, compat = output_dtb(fsw, seq, fname, args.arch, args.compress)
--            entries.append([model, compat])
-+        # Ignore non-DTB (*.dtb) files
-+        if os.path.splitext(fname)[1] != '.dtb':
-+            continue
++	sym = &kallsyms->symtab[best];
++	if (kallsyms_symbol_type(sym) == STT_FUNC && sym->st_size &&
++	    addr >= kallsyms_symbol_value(sym) + sym->st_size)
++		return NULL;
 +
-+        (model, compat, files) = process_dtb(fname, args)
-+
-+        for fn in files:
-+            if fn not in fdts:
-+                seq += 1
-+                size += os.path.getsize(fn)
-+                output_dtb(fsw, seq, fn, args.arch, args.compress)
-+                fdts[fn] = seq
-+
-+        files_seq = [fdts[fn] for fn in files]
-+
-+        entries.append([model, compat, files_seq])
- 
-     finish_fit(fsw, entries)
- 
++find:
+ 	if (size)
+ 		*size = nextval - bestval;
+ 	if (offset)
 -- 
-2.45.2.627.g7a2c4fd464-goog
+2.25.1
 
