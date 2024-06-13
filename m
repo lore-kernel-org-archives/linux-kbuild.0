@@ -1,123 +1,127 @@
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B884314430C;
-	Thu, 13 Jun 2024 13:36:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E721144312
+	for <linux-kbuild@vger.kernel.org>; Thu, 13 Jun 2024 15:22:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718285806; cv=none; b=PNuZZdpw2XSX/1bN8cPS206sm5yfe+MPfO/Yn0PvNSu73wFcM2sQrgQt1wL0qAea0qVaxeTKQAe0nFaFgDqvaTzO7O/GvgNIIUi0KZCZBX2EEfz/o6MTSsLvsvMthWxAfOasIGHmGGNKKTdxGeQaPqdxx+UazIM7e1d7Uqc6TK8=
+	t=1718292158; cv=none; b=LBZNc/j4kadpdSimuOPCXtlFTIOZ03xdOVctWvSbDMPOyEInHAwqNzhQ4FfpjP1Q4u6xaJx+X5Yyknb6el7HBrc2kxkvvwyDM0uhKN+6Z7DY1rKHixEBf+NKlYAdeYNOclkMSXzIsC5Uy5rDJCKwG5lzY/TtbY+lbLD018r5apQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718285806; c=relaxed/simple;
-	bh=e65AO8YkGqI6QNmDImUltk/oT8Th8lPKfyfsMwtaoc8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sgchlM9P2uJ9RhjZ/ewIcxoswEKhj6XCZB88RGMpbCTm0BRTGyJRaipOYC+5pUvkrJKinMfBC+qpdH5VeHac4Dpw9C5TKS7FbdyU7/zA3fKcw/BSizo1WW8h/LepIY28THZ28nmsA+F5GuihS59sXzLuE3EtmneK41GvWH6O438=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4W0NcC6mT1zmb2t;
-	Thu, 13 Jun 2024 21:31:55 +0800 (CST)
-Received: from dggpeml500012.china.huawei.com (unknown [7.185.36.15])
-	by mail.maildlp.com (Postfix) with ESMTPS id 761B1140258;
-	Thu, 13 Jun 2024 21:36:41 +0800 (CST)
-Received: from localhost.localdomain (10.67.175.61) by
- dggpeml500012.china.huawei.com (7.185.36.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 13 Jun 2024 21:36:41 +0800
-From: Zheng Yejian <zhengyejian1@huawei.com>
-To: <rostedt@goodmis.org>, <mhiramat@kernel.org>, <mark.rutland@arm.com>,
-	<mpe@ellerman.id.au>, <npiggin@gmail.com>, <christophe.leroy@csgroup.eu>,
-	<naveen.n.rao@linux.ibm.com>, <tglx@linutronix.de>, <mingo@redhat.com>,
-	<bp@alien8.de>, <dave.hansen@linux.intel.com>, <x86@kernel.org>,
-	<hpa@zytor.com>, <mcgrof@kernel.org>, <mathieu.desnoyers@efficios.com>,
-	<masahiroy@kernel.org>, <nathan@kernel.org>, <nicolas@fjasle.eu>,
-	<kees@kernel.org>, <james.clark@arm.com>, <kent.overstreet@linux.dev>,
-	<yhs@fb.com>, <jpoimboe@kernel.org>, <peterz@infradead.org>
-CC: <zhengyejian1@huawei.com>, <linux-kernel@vger.kernel.org>,
-	<linux-trace-kernel@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
-	<linux-modules@vger.kernel.org>, <linux-kbuild@vger.kernel.org>,
-	<bpf@vger.kernel.org>
-Subject: [PATCH 5/6] ftrace: Fix possible out-of-bound issue in ftrace_process_locs()
-Date: Thu, 13 Jun 2024 21:37:10 +0800
-Message-ID: <20240613133711.2867745-6-zhengyejian1@huawei.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240613133711.2867745-1-zhengyejian1@huawei.com>
-References: <20240613133711.2867745-1-zhengyejian1@huawei.com>
+	s=arc-20240116; t=1718292158; c=relaxed/simple;
+	bh=n4hXsXgUNly0dvZL2DEJYivRYjI1ORhlqA7s2/ruvis=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oZhFiB4iXE2q4HSKovMMYAc0hH8uIjwrClMJqcCrLmDq9UEb813J9Yg22HgMd9O/fvho/Oq9GxGkLCVK9eU6RoImzGPOEBiQA0mt18qiugSDC4DeApEoYgl0b6/MVT1wae3HhxUrhDlnFnevfcbwaAL9uOwS59sGDsxTRM5AqM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=d5sbq6c+; arc=none smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="d5sbq6c+"
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6ad8243dba8so5629066d6.3
+        for <linux-kbuild@vger.kernel.org>; Thu, 13 Jun 2024 08:22:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1718292154; x=1718896954; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=c1FwXGbPrFXal5e1NPPyrNFtuM5Jb5Wk1WnrPz9CJ3g=;
+        b=d5sbq6c+Ln9ohEJetSbmbITgkXLfYXo3TH2XJiZv7uqd7Y48X+qrPgc5XVgeP4McGI
+         wOi+I40pbwUij3Dx3JCuIKXF9LeDVhh+Qm0UN3wDucL343aTN8JNdn+58n2HgSgDEEVL
+         d/hg1oppE/hIizHKJbA5+j8RBY+XHuhjF/gTc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718292154; x=1718896954;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=c1FwXGbPrFXal5e1NPPyrNFtuM5Jb5Wk1WnrPz9CJ3g=;
+        b=M3a6TDFIH4gsliiA8KH+VGejFvDYWIkh/h8v9piTbMTXQ7lbET99qxWQwYWUE26HUx
+         wpM8L0Hr9v7bBFcbrbe8yuVrar1FcaysOLMOvkHXMv8qBj4TQKhmWQCpGEwZVywQPO77
+         g7GUxEBCOSkyKWGOoSvjxccTfTWaVnhhS3B0EjXxibKXi+mYtJMtZ7v0HC/hEcBpTO7Z
+         Rq6Y69d91syuOOplahKggM1qsbcSklqukTqKn1E7iCJsTi/GG8XzpGdMHni25vh3+AwK
+         ZNBVW6XxQK7cpdJuiPRWa0gGx+bKxvVacOd0/DSKyMCtU5T8rZuzqXTS9J1NTKX3wUy/
+         GjaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW0JDno+SRIfO9NIAKZS1powoUsodkXSfVauMNhF86SxoMBi51eCuANmvhHJif6cXFMXKF9jbUg1Z6p55EX6pX2lcXZBABfWEU4a+5a
+X-Gm-Message-State: AOJu0Yx6dBHqHvomyrTTIEDIm1C6cb0fZBtPL0iT08384/aPH6okw1VW
+	p7rz/4P/e14fT0wydvrGZTH8ZC5PTlgHtgMIkqPXUXKLUJo4ELwYrFdQ3ljF/crXPv3CqRjggaw
+	Zop5tGw579a8hbNKk/OED8wlm5WHeM7N2goWFR41XlYelpJ4=
+X-Google-Smtp-Source: AGHT+IEa7ob5SUFmAeY7t+jsiZ0g0b24xhK3WVy8G0Zs4wQMtVzABwezXEypz7uuOagcfWUSmCPfVFLB/TFN5YhaLvI=
+X-Received: by 2002:a05:6214:3a82:b0:6b0:74cf:676c with SMTP id
+ 6a1803df08f44-6b1a77f12e4mr68951216d6.63.1718292154251; Thu, 13 Jun 2024
+ 08:22:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpeml500012.china.huawei.com (7.185.36.15)
+References: <20240613093433.131699-1-wenst@chromium.org>
+In-Reply-To: <20240613093433.131699-1-wenst@chromium.org>
+From: Simon Glass <sjg@chromium.org>
+Date: Thu, 13 Jun 2024 09:22:23 -0600
+Message-ID: <CAFLszThZ0SKMVhK_DPxq7n+DavBbWLxit0P3R=o7HN7UcTrPvg@mail.gmail.com>
+Subject: Re: [PATCH v2] scripts/make_fit: Support decomposing DTBs
+To: Chen-Yu Tsai <wenst@chromium.org>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nicolas Schier <nicolas@fjasle.eu>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-In ftrace_process_locs(), a series pages are prepared and linked in
-start_pg, then fentry records are skipped or added, then unused pages
-are freed.
+On Thu, 13 Jun 2024 at 03:34, Chen-Yu Tsai <wenst@chromium.org> wrote:
+>
+> The kernel tree builds some "composite" DTBs, where the final DTB is the
+> result of applying one or more DTB overlays on top of a base DTB with
+> fdtoverlay.
+>
+> The FIT image specification already supports configurations having one
+> base DTB and overlays applied on top. It is then up to the bootloader to
+> apply said overlays and either use or pass on the final result. This
+> allows the FIT image builder to reuse the same FDT images for multiple
+> configurations, if such cases exist.
+>
+> The decomposition function depends on the kernel build system, reading
+> back the .cmd files for the to-be-packaged DTB files to check for the
+> fdtoverlay command being called. This will not work outside the kernel
+> tree. The function is off by default to keep compatibility with possible
+> existing users.
+>
+> To facilitate the decomposition and keep the code clean, the model and
+> compatitble string extraction have been moved out of the output_dtb
+> function. The FDT image description is replaced with the base file name
+> of the included image.
+>
+> Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
+> ---
+> Changes since v1:
+> - Replace OrderedDict with standard {} dict
+> - Change short form command line argument to -D
+> - Drop [] around "'fdt-{x}\x00' for x in files"
+> - Add spaces around '+' in slice argument
+> - Split out DTB parsing into separate function
+>
+> Simon's reviewed-by was dropped.
+>
+> This is a feature I alluded to in my replies to Simon's original
+> submission of the make_fit.py script [1].
+>
+> This is again made a runtime argument as not all firmware out there
+> that boot FIT images support applying overlays. Like my previous
+> submission for disabling compression for included FDT images, the
+> bootloader found in RK3399 and MT8173 Chromebooks do not support
+> applying overlays. Another case of this is U-boot shipped by development
+> board vendors in binary form (without upstream) in an image or in
+> SPI flash on the board that were built with OF_LIBFDT_OVERLAY=n.
+> These would fail to boot FIT images with DT overlays. One such
+> example is my Hummingboard Pulse. In these cases the firmware is
+> either not upgradable or very hard to upgrade.
+>
+> I believe there is value in supporting these cases. A common script
+> shipped with the kernel source that can be shared by distros means
+> the distro people don't have to reimplement this in their downstream
+> repos or meta-packages. For ChromeOS this means reducing the amount
+> of package code we have in shell script.
+>
+> [1] https://lore.kernel.org/linux-kbuild/20231207142723.GA3187877@google.com/
+>
+>  scripts/Makefile.lib |  1 +
+>  scripts/make_fit.py  | 86 ++++++++++++++++++++++++++++++++------------
+>  2 files changed, 65 insertions(+), 22 deletions(-)
 
-However, assume that all records are skipped, currently the start_pg
-will still be in list of ftrace_pages_start but without any record.
-Then in ftrace_free_mem() index record by (pg->index - 1) will be out
-of bound.
-
-To fix this issue, properly handle with unused start_pg and add
-WARN_ON_ONCE() where the records need to be indexed.
-
-Fixes: 26efd79c4624 ("ftrace: Fix possible warning on checking all pages used in ftrace_process_locs()")
-Signed-off-by: Zheng Yejian <zhengyejian1@huawei.com>
----
- kernel/trace/ftrace.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
-
-diff --git a/kernel/trace/ftrace.c b/kernel/trace/ftrace.c
-index 0e8628e4d296..c46c35ac9b42 100644
---- a/kernel/trace/ftrace.c
-+++ b/kernel/trace/ftrace.c
-@@ -6575,10 +6575,22 @@ static int ftrace_process_locs(struct module *mod,
- 		rec->ip = addr;
- 	}
- 
--	if (pg->next) {
-+	if (pg->index == 0) {
-+		/* No record is added on the current page, so it's unused */
-+		pg_unuse = pg;
-+	} else if (pg->next) {
-+		/* Current page has records, so it's next page is unused */
- 		pg_unuse = pg->next;
- 		pg->next = NULL;
- 	}
-+	/*
-+	 * Even the start_pg hasn't been used, that means, no record has
-+	 * been added, so restore state of ftrace_pages and just go out.
-+	 */
-+	if (pg_unuse == start_pg) {
-+		ftrace_pages->next = NULL;
-+		goto out;
-+	}
- 
- 	/* Assign the last page to ftrace_pages */
- 	ftrace_pages = pg;
-@@ -6794,6 +6806,8 @@ void ftrace_release_mod(struct module *mod)
- 	 */
- 	last_pg = &ftrace_pages_start;
- 	for (pg = ftrace_pages_start; pg; pg = *last_pg) {
-+		/* The page should have at lease one record */
-+		WARN_ON_ONCE(!pg->index);
- 		rec = &pg->records[0];
- 		if (within_module(rec->ip, mod)) {
- 			/*
-@@ -7176,6 +7190,8 @@ void ftrace_free_mem(struct module *mod, void *start_ptr, void *end_ptr)
- 		mod_map = allocate_ftrace_mod_map(mod, start, end);
- 
- 	for (pg = ftrace_pages_start; pg; last_pg = &pg->next, pg = *last_pg) {
-+		/* The page should have at lease one record */
-+		WARN_ON_ONCE(!pg->index);
- 		if (end < pg->records[0].ip ||
- 		    start >= (pg->records[pg->index - 1].ip + MCOUNT_INSN_SIZE))
- 			continue;
--- 
-2.25.1
-
+Reviewed-by: Simon Glass <sjg@chromium.org>
