@@ -1,199 +1,227 @@
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2042.outbound.protection.outlook.com [40.107.220.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9FDC770F2;
-	Thu, 20 Jun 2024 20:55:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718916943; cv=fail; b=gtBDmNmlOoXH4nKCV6V82J2ufvgvaZgHW8gCZU7l9wPU+U0hYZfiqtazn1ukMaYQbd01tPumLR96ZgSL3lvNZ6vdYEfY4b6Yh/Vskg6guBM5TgqBZbssA2DAjZgz0+aofJ3uXpjesVPA/m7E3NdkwC3UlXbymOqODk3f6gD37HI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718916943; c=relaxed/simple;
-	bh=pFxOGg5A85dKn8goVOWnl72bABIhO69aSe8dM8KzbAU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=rLkSaeOvMq9gjo0KmhIyGtoOWja5ubxX8Cw295pvnIw3R7sURZwY1KUrwtNvLmW1Uxt4msszVTFMyOuIVY9k6kluI/QnDZLFm3mDXUBLy0Ar/fsr3/CQVcW1FjmK9cRBm1FxJTez+a/r6C4FcyVzMIIyu/lm9sUjXhW7u6zoEPU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Dli1C3t6; arc=fail smtp.client-ip=40.107.220.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B96153A1CD
+	for <linux-kbuild@vger.kernel.org>; Thu, 20 Jun 2024 21:11:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718917908; cv=none; b=cjd7woCp3XB7vr/QErdufXXubn+X8UXB0AchAHZ2JMbdjXPEoh1RefO59sKjfvQraf/6crZZz19OsIKtU2uGgU9OuLCfXl5bJOzzdYNQQTlMigGlCZazH4thFL6GqG4r2i5IaHSUqGTPe2r/0SshwBQfRmxfOeiL5du7GOegp2E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718917908; c=relaxed/simple;
+	bh=GA91huQdLUbSlkWk8Tpei6PdXlKNw2ETyVPB0qR2BUU=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ij7Gut3DNbwEoF3mQVhMg1SQaEKmDCqDI1dQaEqWtnIhmg4Bi7Y8yVMsJg541BL4Ql4oV0KjMtXFjZxu4XTlpffE73HPo4zcLKXpIweSuycX5k9bdaacMz1xJ5bQ9hixT1kD2UeHixQb+mt7XhvbwtassSkv19wNllu2haPOHzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--elsk.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZGr2uNtv; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--elsk.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Dli1C3t6"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mwrwOSKQKvUYB4BXeoou2abdfc+i98tHn9S3jUU4b1TyRT9eSCpxBS3wFsQSng+GsEQGQZByZ11Kd5N+pjrsHs4OpZ3bWtC1SXrB3aYVRUX3i26IYYS493qgzomUJGSbomrQyCpqHWJgFKHqyvfKF8rLbZJDfIUC0mZoBiB+YUHyPOLQdYVFvIodQWTCTt5PtY6UPIlK3K4AzO9Vex1lcXW0sSCwMGOaYP2wsA9v8cHNXhljFc1wfinkZ/epaUXP4oQRuS8bXqTG8AAe30pCrfA7ejpo7Rvd4P7GEdbePnRiW6XIsnX6j+SEQbysJ05Rt0PkJJ8UlpdJLGotlFUVZg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HZ4OM/68Kuff8FC7FNyb8W7fjsLpy4V4xLhB+u4/Wzk=;
- b=fN9OK0NhytPsZv/D33mqxLyWB1yByCHfRXQ4NjuooI/Xhj58YS9CuykCGx8MZe3yHZU9hkB3z0WEs+EVfapfPuNhukb5Asu5Luf+6Q2NEwH9YIOV065i1zbVo7L7DRGPt50FHOYRA9DgOlMVUzS3LXxihZR/U0QIuzXydo7eVzwyvRJKpoB0hUnZdtxjdPWdZUUZ6LW39U9U8T/XgRPUR31tstuc9d+pDMwYyTz7Hd+3YRUFAB4CtE9q7DhoETYgNZJpc1mrj1oNAmlB4mLCSevcWlqLVM4jQEGYW9k5NMq6fKF8HH528EGYGXdO7bH1Lj3Z1GzodgMcJFNHbnRWmQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HZ4OM/68Kuff8FC7FNyb8W7fjsLpy4V4xLhB+u4/Wzk=;
- b=Dli1C3t68bN0HQoFjb3MVj2jAymT3CYziCLUuURdYXUcPVdA/jmnGEZss4Smfmhz4mNQQjgdDkelTc/l8aHYPhFsvvqDM82h459bCDBshSnBnBO5Xqi9BRRk4sAHEj6J9YLgEbCyecrmFN/D+iDARNNpS0et25lAZ6aAEwVP36dVAdFrgEzWPfEClRIFqPvRq3Inn1fYlCXFShatgiEceYpHyBYMLIvw7qSE56ZaKLQtsk8ArWrctG3T/Rv4UoJYC/59b/jPrphJldqo2e2LTdoB5fxLPejDcEtBZ06+z8pv9r/RzQCegP3Ye3BtKH0y9s5eS4Kvcky15addZdkjnw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BY5PR12MB4130.namprd12.prod.outlook.com (2603:10b6:a03:20b::16)
- by SA1PR12MB6725.namprd12.prod.outlook.com (2603:10b6:806:254::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.19; Thu, 20 Jun
- 2024 20:55:33 +0000
-Received: from BY5PR12MB4130.namprd12.prod.outlook.com
- ([fe80::2cf4:5198:354a:cd07]) by BY5PR12MB4130.namprd12.prod.outlook.com
- ([fe80::2cf4:5198:354a:cd07%4]) with mapi id 15.20.7698.020; Thu, 20 Jun 2024
- 20:55:33 +0000
-From: John Hubbard <jhubbard@nvidia.com>
-To: Miguel Ojeda <ojeda@kernel.org>
-Cc: Greg KH <greg@kroah.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nicolas@fjasle.eu>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Wedson Almeida Filho <wedsonaf@gmail.com>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Gary Guo <gary@garyguo.net>,
-	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
-	Benno Lossin <benno.lossin@proton.me>,
-	Andreas Hindborg <a.hindborg@samsung.com>,
-	Alice Ryhl <aliceryhl@google.com>,
-	linux-kbuild@vger.kernel.org,
-	rust-for-linux@vger.kernel.org,
-	LKML <linux-kernel@vger.kernel.org>,
-	John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH v2 1/2] Makefile: rust-analyzer target: better error handling
-Date: Thu, 20 Jun 2024 13:54:52 -0700
-Message-ID: <20240620205453.81799-2-jhubbard@nvidia.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240620205453.81799-1-jhubbard@nvidia.com>
-References: <20240620205453.81799-1-jhubbard@nvidia.com>
-X-NVConfidentiality: public
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR03CA0071.namprd03.prod.outlook.com
- (2603:10b6:a03:331::16) To BY5PR12MB4130.namprd12.prod.outlook.com
- (2603:10b6:a03:20b::16)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZGr2uNtv"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dfdfe3d9fc8so2247755276.3
+        for <linux-kbuild@vger.kernel.org>; Thu, 20 Jun 2024 14:11:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1718917906; x=1719522706; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=IQuwu/NTPlbRKO6mQ54PUmCU1PjMj/T5kuRqII4usxg=;
+        b=ZGr2uNtvmYfe9AOJI84J1ia/Sh+kP6Hh6luEJWg+vBpmguPCvJL4kWDpRxBkocYcuP
+         lTlsRJCmusmePhyLpTv7LDdbhDw2p2m+mKQ++bLNXVXvm1kc4nBTqpB1K7w32AbnGucz
+         O5mFUj08IuBbakJVXYCN+abHDvqhiEbDlnt5qqec2RpAyc6oi+c/Sx9kXMfo0a9DUOkJ
+         XK/kj4W7GKNf0ijOaSsQ13zDfvUnGUREfWl+06RJSQXVxpRnrFnA/JJz1LNtKRDcI7ud
+         NhAgAhk3bYswooGR1XdSudvkY0Efr7kRMVj2veThg2NyQgU6cv6PXlZ1dupsB2vXNBVa
+         VmxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718917906; x=1719522706;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IQuwu/NTPlbRKO6mQ54PUmCU1PjMj/T5kuRqII4usxg=;
+        b=XiQYyLst5kCw3rXiivyNzmOKUsuhQ4zO58rY6InKkzphMIxgWoCZNZs621gwFwBiUr
+         cDY/jHMAYI4JVbR/1kpBXSRlQcwzDZ65khTqvYaaJNuJQ5cXSx81B5qV7HPpTv8GNzkX
+         SCzaiiYLFkepPpBrnVF2w+YmA5Spyw5lpWbHfSyGzh9K/f4UrXBCVxGv7+d7Pa1KoMqB
+         djjn+H90ehuHFB5yMJggUL9waeimntVHQa+I4gbgqN6MMV2uEdlGljVZWmHolExl4kxX
+         NfWO/mTrN/xhEH4xNMQCqZxjtt7XM4/UlBj146hLJwcm7a47bP+1ovNIkm28Qx6d62pP
+         TKGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWlJ4BXr15rRGPMbx5Qrg1U32dB4ycKAQ1evHfOCsbj8wltSOdVYau1O7XkzTd0n909VTZu8rtRt1kO7a4zWEzizBomtyzTpRGgGhJc
+X-Gm-Message-State: AOJu0YwsmgKfCIEv7nJe1PfJuD+em3mrN0eJESLJ9GHbX4LrGf9bHCpu
+	R+e3mJvABNsJzxZ68z3+IPaqlga0NJOvzPRotZQ7hAj9gi+LfAJ67tJ2PED7V8iirfjVpQ==
+X-Google-Smtp-Source: AGHT+IHc/3f9XoezpLQgMIYpssJemzPAUQJu+86hEHhv1C0NFnpvXJwK87sdofroR3vo7JN/LbpZqICj
+X-Received: from elsk.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:dbd])
+ (user=elsk job=sendgmr) by 2002:a05:6902:1006:b0:dfe:1633:89e9 with SMTP id
+ 3f1490d57ef6-e02be16c56dmr1760259276.1.1718917905788; Thu, 20 Jun 2024
+ 14:11:45 -0700 (PDT)
+Date: Thu, 20 Jun 2024 21:11:12 +0000
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BY5PR12MB4130:EE_|SA1PR12MB6725:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8577187b-988b-472d-3a0d-08dc916b53ac
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230037|376011|7416011|366013|1800799021;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?/jgwkcbyfiRf3tlVq8aAiapn/vjVqUrahAE75xJCyXaGRaIjUFmYmyWTOEMy?=
- =?us-ascii?Q?y9WtUMdUWXnrK7+7F+/VSJTVvLSQ1g9gVJsmg6IDRAzU/24oiuDvI/LS6/dc?=
- =?us-ascii?Q?AuVUl0FI7WoKDFGArugdPH4BDtAdwpNfpKMWaRHur+7Zd6tWmoHhBiNKMKam?=
- =?us-ascii?Q?2Snf7XMHkeRq4Uc5OlP+RJBknSJ9HwezgRLcHi745cCbxj+qRxN4EXeCz7Wj?=
- =?us-ascii?Q?1WE3dDWOZpl0EqtLUdWFjIPD9r6MI8qeC49gy3xoaK1IG80HeC1r1JSyEy2b?=
- =?us-ascii?Q?CXP+FQkLJ9/Yvn0c/zfzWEgEawVm6U+YBl6McMxXafmisWyg2oDskmCwpsAv?=
- =?us-ascii?Q?NHaApo810EBEUQUyY+9JVVBw85irentI0FSft0brrMFUvFcvD+82jLFaL6yO?=
- =?us-ascii?Q?sHd4MUht3EdbxpnUErMXoOKaUIwqdis66M+0/FmK7Y5Z5sLLkVYzGBirAVdu?=
- =?us-ascii?Q?JmUA48iVcYf4JJcpItT/iL0Yk8uQVHddEJXk3yGE2CqhT+PRQhcnnLA4F8Hj?=
- =?us-ascii?Q?6zo4RT+4C/N51pNIucsocw+TTNGu9V/Qig2GaJx7iOfKEW7psXgcVX1TXfs8?=
- =?us-ascii?Q?3DBCsm/FBTYJsQqmcaKnZvZOgOjVD5RblJjAFYNCJdk1tl/kTg277AIu9YuE?=
- =?us-ascii?Q?oOOHfa0rIQv5SxknkGMTH3exLOkTOZB682X3+u6R6yq6uHeCU+9/+AbTfu5D?=
- =?us-ascii?Q?k6h3eleesbphseFl8TOdW3CxbmZKQtl9fKg5YhiWRxzK9Fu+tJTJN62LwL6J?=
- =?us-ascii?Q?C/AGjVTK+BUOT8swyieM06hPuLvm/daMnHSHPy2+ZA0gHJqnIll8Sl8nEm6d?=
- =?us-ascii?Q?okJWuV33ASYhqdpU5qfaFVKvkkgtF1dtlCqNdwfox4HKZeW4imAyA7SEa0PS?=
- =?us-ascii?Q?8rIjLHl94fVYT6JIsZMP/xC62MpYZs/J+tv7GugesMcs0s1+7RItVc1IfHAb?=
- =?us-ascii?Q?wCodgFzfP/cyunTpsSC2jdPYLYwHMatCBU+F1geDkpDItkngyUH4gKogr3Gd?=
- =?us-ascii?Q?HkmS0ly96MsUTykEhvhBAoPJIt9IJkODnJBWMbczn4yeYprCgeAA1EFiEB7O?=
- =?us-ascii?Q?Cn1+6isp40KVMZioVKVN3M/npqteycsaM1MixYu8n8nfooMgckD+yV+D57aa?=
- =?us-ascii?Q?2YykMVQuujCUec80Db/e8TVJ8amE+N/Y7EU80jXuN7NnRqvrQScopra1r5hZ?=
- =?us-ascii?Q?jEY5zXqTVWjFNI7gXOtfseyKY3HUGV9+cZMndaiLe0CpMe9ksq9p7hcs0rUb?=
- =?us-ascii?Q?sKUmDAoFjVzJBFjjMajwEx7wQLlLx20WeRD2MULegr++5ghBuTRSWtXqCKsn?=
- =?us-ascii?Q?M9ZPlhN16yHajYOB/yMLFX8e?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR12MB4130.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(376011)(7416011)(366013)(1800799021);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?aL7ddM4ZpH9DIVv0qi5bv9Frok0SQvE7OG74aLSjxbJbQeUufcmhyDKczZsT?=
- =?us-ascii?Q?cybE83lRinjiOvccUr1yA5DASvfjhJD9d5v0vm3OUves92ZqZ3rwJuhfZXdS?=
- =?us-ascii?Q?dzSHor7JmMIQRGYBoCvgu6dPQvq1pcthcLM9Igo/bU/SJaMZee84kgt7oGCd?=
- =?us-ascii?Q?L+DlbsEaH0CgsERSThr8SgTJaBAtdJY9FGDYnOHkOnQAaci2fmLen5a+yxSa?=
- =?us-ascii?Q?1DzTOymZ/9enz4MuqUEva9IzZAyQkyqQjIfXdAVm+LZ0jxrMUVVdrsEQCPa2?=
- =?us-ascii?Q?ekftWMImO1InXQlJfWHqWSUEy530i+xF446wjHUOk18q1GmdJfVQrvGWS+pM?=
- =?us-ascii?Q?qOC4Lj+dIw3k1UUGXn3eUhpn0PYTObD4y498uXTPcp4qXrX3dtRDxQ9oir4V?=
- =?us-ascii?Q?CfUWnGIcknljP6D3y+pxTeN0wO3j1vG63IwlhtfB5/FGqbgxB5CjuqZ/gy0r?=
- =?us-ascii?Q?MCEKjnspoN/x0BhwsYIzjO8PutlkRj4ydPcifkOkWsBB9SxwZOr4sD6/72Kl?=
- =?us-ascii?Q?xTXjGWwmgLAy6ctwKR6DG+h1sQnTof0j0yyZiL1ACwhY0Yf/nQ45Dex4/AyN?=
- =?us-ascii?Q?0s6WTAxmBf0NuSz7bcnau0DTmA8zgpHjRbaeYDSyRp0e3osCDIdEWOblwfbz?=
- =?us-ascii?Q?eLM2RSqVYolkAQBf57NdyaljRPd3nP3zA7GiX05cRZ8zoQ/T7sZ+13DHLh05?=
- =?us-ascii?Q?OSeZZVDbfCO6B4tTBftzN+pNp3eRcTiZgCzYKMgkWMw78TeeqzKYnO2sO79S?=
- =?us-ascii?Q?nH8ID1CQLgEKUP+wF+llUh6LIdAmxLpTd5n3Ngibi3ormiWKqd7BPblULSk1?=
- =?us-ascii?Q?SPSPURdR4JNIKHFzgdCmzuJ7k5VWG9TjsTKLBpjr1HfHOdwk6ZLMhz10NFuF?=
- =?us-ascii?Q?Y2eZS8ahvVY3D9oFRZrhBnpzq0NYYmaEPobGrLDKzQVKE8zqfMpxp8jvOc9L?=
- =?us-ascii?Q?yth51VVDcSFmhYj/cV1g7/4qskNsL+AHppbv8EHveHUtl5FFt53x/2x/0Kc1?=
- =?us-ascii?Q?tAS51yFMPHzxRHBuHV6wA0YetkcEh4tL2CuVDcTVaZ85EiSoUM/3zWR1Y9fp?=
- =?us-ascii?Q?bPJKjww0fdtP0n90a/70T/Hf6JlrO9k7xDeWHhsSVpyCL5LB/HwcO3esavCk?=
- =?us-ascii?Q?W4Qdr8B1JSJPjMKjEzPwUaa/pXa9ZrqnGh1B5KbWzhS6QBjlkcMOQLksvZeL?=
- =?us-ascii?Q?YuD5u7dIB4YJzS8UUHqdHajXnlCjIIz2eB7ihJL0WAW+MfWiz9EOmCIvtWTK?=
- =?us-ascii?Q?Lv6Sy39iNaRVl2xMulhSQvVZRqhMXUSYStxlx7NTrEo5zguCstBt64m6AOOK?=
- =?us-ascii?Q?Nxliy1PbtJypw7IUTcYXq3HoFr7ugbGLwj68KrEq2L2WDCcqEQ8qGEIpYjKi?=
- =?us-ascii?Q?oblz00zAw6XFXVaUuIbvoz0+U6oIP5wpzn0FqYG5rX+27cJqREDlGx5/k4Ni?=
- =?us-ascii?Q?8I9PeR6Pfd9T/TuSYphNkeH9hnT8lGgY0Dp0aGac+IgUIjeJtlbQm+YOgSLf?=
- =?us-ascii?Q?J2hYMqaapewK36Zh/Myk+Urkv25PsGbSrIomnhsdinHXaqRpxl5Eno0GJX0+?=
- =?us-ascii?Q?YWehSkZe6dzW3HmGL+zVmXgWuWtDZjkVzPq+KOpbiMJEisB7S4wDrpXMIAxL?=
- =?us-ascii?Q?KA=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8577187b-988b-472d-3a0d-08dc916b53ac
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR12MB4130.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2024 20:55:33.1794
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: n9JdNZ+Mj3f2KcKdeVceblthRgHDJkmRQnUfQLPQH2bh8/GPiGlm6yHqoGe52TN2/ghkombGlH35hXOvXGJW6g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6725
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.2.741.gdbec12cfda-goog
+Message-ID: <20240620211112.500465-1-elsk@google.com>
+Subject: [PATCH v2] kconfig: recursive checks drop file/lineno
+From: HONG Yifan <elsk@google.com>
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: HONG Yifan <elsk@google.com>, kernel-team@android.com, linux-kbuild@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-1) Provide a better error message for the "Rust not available" case.
-Without this patch, one gets various misleading messages, such as:
+This prevents segfault when getting filename
+and lineno in recursive checks.
 
-    "No rule to make target 'rust-analyzer'"
+If the following snippet is found in Kconfig:
 
-Instead, run scripts/rust_is_available.sh directly, as a prerequisite,
-and let that script report the cause of any problems, as well as
-providing a link to the documentation. Thanks to Miguel Ojeda for the
-idea of just letting rust_is_available.sh report its results directly.
+[Test code 1]
 
-The new output in the failure case looks like this:
+config FOO
+       tristate
+       depends on BAR
+       select BAR
+       help
+         foo
 
-$ make rust-analyzer
-***
-*** Rust compiler 'rustc' could not be found.
-***
-***
-*** Please see Documentation/rust/quick-start.rst for details
-*** on how to set up the Rust support.
-***
-make[1]: *** [/kernel_work/linux-github/Makefile:1975: rust-analyzer] Error 1
-make: *** [Makefile:240: __sub-make] Error 2
+... without BAR defined; then if one runs
+`make tinyconfig`, there is a segfault.
 
-Cc: Alice Ryhl <aliceryhl@google.com>
-Acked-by: Miguel Ojeda <ojeda@kernel.org>
-Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+  Kconfig:34:error: recursive dependency detected!
+  Kconfig:34:	symbol FOO depends on BAR
+  make[4]: *** [scripts/kconfig/Makefile:85: allnoconfig] Segmentation fault
+
+This is because of the following. BAR is
+a fake entry created by sym_lookup() with prop
+being NULL. In the recursive check, there is a
+NULL check for prop to fall back to
+stack->sym->prop if stack->prop is NULL. However,
+in this case, stack->sym points to the fake BAR
+entry created by sym_lookup(), so prop is still
+NULL. prop was then referenced without additional
+NULL checks, causing segfault.
+
+As the previous email thread suggests, the file
+and lineno for select is also wrong:
+
+[Test code 2]
+
+config FOO
+       bool
+
+config BAR
+       bool
+
+config FOO
+       bool "FOO"
+       depends on BAR
+       select BAR
+
+$ make defconfig
+*** Default configuration is based on 'x86_64_defconfig'
+Kconfig:1:error: recursive dependency detected!
+Kconfig:1: symbol FOO depends on BAR
+Kconfig:4: symbol BAR is selected by FOO
+[...]
+
+Kconfig:4 should be Kconfig:10.
+
+This patch deletes the wrong and segfault-prone
+filename/lineno inference completely. With this
+patch, Test code 1 yields:
+
+error: recursive dependency detected!
+	symbol FOO depends on BAR
+	symbol BAR is selected by FOO
+
+Link: https://lore.kernel.org/linux-kbuild/20240618185609.4096399-1-elsk@google.com/
+Signed-off-by: HONG Yifan <elsk@google.com>
+
+--
+v2: Delete all filenames/lineno completely as
+suggested by masahiroy@kernel.org
 ---
- Makefile | 1 +
- 1 file changed, 1 insertion(+)
+ scripts/kconfig/symbol.c | 43 +++++++++++++++-------------------------
+ 1 file changed, 16 insertions(+), 27 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 14427547dc1e..07308277a6f5 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1970,6 +1970,7 @@ tags TAGS cscope gtags: FORCE
- # IDE support targets
- PHONY += rust-analyzer
- rust-analyzer:
-+	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/rust_is_available.sh
- 	$(Q)$(MAKE) $(build)=rust $@
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index 8df0a75f40b9..3974e46a8533 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -1042,9 +1042,9 @@ static void sym_check_print_recursive(struct symbol *last_sym)
+ {
+ 	struct dep_stack *stack;
+ 	struct symbol *sym, *next_sym;
+-	struct menu *menu = NULL;
+ 	struct property *prop;
+ 	struct dep_stack cv_stack;
++	enum prop_type type;
  
- # Script to generate missing namespace dependencies
+ 	if (sym_is_choice_value(last_sym)) {
+ 		dep_stack_insert(&cv_stack, last_sym);
+@@ -1066,54 +1066,43 @@ static void sym_check_print_recursive(struct symbol *last_sym)
+ 		if (prop == NULL)
+ 			prop = stack->sym->prop;
+ 
+-		/* for choice values find the menu entry (used below) */
+-		if (sym_is_choice(sym) || sym_is_choice_value(sym)) {
+-			for (prop = sym->prop; prop; prop = prop->next) {
+-				menu = prop->menu;
+-				if (prop->menu)
+-					break;
+-			}
+-		}
++		if (prop == NULL)
++			type = P_UNKNOWN;
++		else
++			type = prop->type;
++
+ 		if (stack->sym == last_sym)
+-			fprintf(stderr, "%s:%d:error: recursive dependency detected!\n",
+-				prop->filename, prop->lineno);
++			fprintf(stderr, "error: recursive dependency detected!\n");
+ 
+ 		if (sym_is_choice(sym)) {
+-			fprintf(stderr, "%s:%d:\tchoice %s contains symbol %s\n",
+-				menu->filename, menu->lineno,
++			fprintf(stderr, "\tchoice %s contains symbol %s\n",
+ 				sym->name ? sym->name : "<choice>",
+ 				next_sym->name ? next_sym->name : "<choice>");
+ 		} else if (sym_is_choice_value(sym)) {
+-			fprintf(stderr, "%s:%d:\tsymbol %s is part of choice %s\n",
+-				menu->filename, menu->lineno,
++			fprintf(stderr, "\tsymbol %s is part of choice %s\n",
+ 				sym->name ? sym->name : "<choice>",
+ 				next_sym->name ? next_sym->name : "<choice>");
+ 		} else if (stack->expr == &sym->dir_dep.expr) {
+-			fprintf(stderr, "%s:%d:\tsymbol %s depends on %s\n",
+-				prop->filename, prop->lineno,
++			fprintf(stderr, "\tsymbol %s depends on %s\n",
+ 				sym->name ? sym->name : "<choice>",
+ 				next_sym->name ? next_sym->name : "<choice>");
+ 		} else if (stack->expr == &sym->rev_dep.expr) {
+-			fprintf(stderr, "%s:%d:\tsymbol %s is selected by %s\n",
+-				prop->filename, prop->lineno,
++			fprintf(stderr, "\tsymbol %s is selected by %s\n",
+ 				sym->name ? sym->name : "<choice>",
+ 				next_sym->name ? next_sym->name : "<choice>");
+ 		} else if (stack->expr == &sym->implied.expr) {
+-			fprintf(stderr, "%s:%d:\tsymbol %s is implied by %s\n",
+-				prop->filename, prop->lineno,
++			fprintf(stderr, "\tsymbol %s is implied by %s\n",
+ 				sym->name ? sym->name : "<choice>",
+ 				next_sym->name ? next_sym->name : "<choice>");
+ 		} else if (stack->expr) {
+-			fprintf(stderr, "%s:%d:\tsymbol %s %s value contains %s\n",
+-				prop->filename, prop->lineno,
++			fprintf(stderr, "\tsymbol %s %s value contains %s\n",
+ 				sym->name ? sym->name : "<choice>",
+-				prop_get_type_name(prop->type),
++				prop_get_type_name(type),
+ 				next_sym->name ? next_sym->name : "<choice>");
+ 		} else {
+-			fprintf(stderr, "%s:%d:\tsymbol %s %s is visible depending on %s\n",
+-				prop->filename, prop->lineno,
++			fprintf(stderr, "\tsymbol %s %s is visible depending on %s\n",
+ 				sym->name ? sym->name : "<choice>",
+-				prop_get_type_name(prop->type),
++				prop_get_type_name(type),
+ 				next_sym->name ? next_sym->name : "<choice>");
+ 		}
+ 	}
 -- 
-2.45.2
+2.45.2.741.gdbec12cfda-goog
 
