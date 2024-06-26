@@ -1,59 +1,82 @@
-Received: from gimli.kloenk.de (gimli.kloenk.de [49.12.72.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19CA317A932;
-	Tue, 25 Jun 2024 19:07:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.12.72.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 528272869A
+	for <linux-kbuild@vger.kernel.org>; Wed, 26 Jun 2024 08:00:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719342426; cv=none; b=Ndog4Ddc/dBCN2uMAatnNkgePP7qzyAZCxilQ0LaoguJVyRDI19awVkp1WqeTjQVXLIySKz3SLOAsX1qx4e+LYJvLzsQZza6Vw9E444BdwdxUeFVyYBwDEw7E0DlS5sI+W2TGckEOVc3hHvheGkeRSwznRQYy41UCHzJeIb5g3E=
+	t=1719388829; cv=none; b=ssR0EXdzctghSGP+xVsi4OaNrHoh1v/qZ+IyfHhL5lxtGnqh0Ow+l4+Vms5TYsm+e3Yfe6HZ7pHs5aIFbwlZnpY38QADpzHZQvJRHdsGWnuTb5swGHps/jBB8JrgCLbVGndebeAAjSKW6v0y9FRh4JI44gt9d/kRlLHQOuDwxqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719342426; c=relaxed/simple;
-	bh=Asjm/C5+CmQ+TnjuNygMYUQqEXInZseKiWCxfOweU7k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LuyQIl/cbevcvPt5ZxCrx1090UdJztR+gQUZ5/PXGP6e9HWIHvnf2QNwzWwp6naeHOLVhad5J69zfVlqIfWBP8JxJibCjdFTXW5MmzhzWoWQw9gfscNd0T+u21vnChh+wue6ER2K3qpRvbED6tOCZ8Nhw1rk/lV52TmKppauz8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kloenk.dev; spf=pass smtp.mailfrom=kloenk.dev; dkim=pass (1024-bit key) header.d=kloenk.dev header.i=@kloenk.dev header.b=Osh/WSZb; arc=none smtp.client-ip=49.12.72.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kloenk.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kloenk.dev
+	s=arc-20240116; t=1719388829; c=relaxed/simple;
+	bh=laZdbTy8eS9uMajVxpeJfWljM4iIqizSdOix/w7vFms=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OK6+R6La8FKK/yYU0rK8RABEU+5Sf9fOFKPlQZ3V0YAzllWbgeDKDA6qNogmBj0YPecPJSJjAMT87VlddtFm7+kkyHfYbZzwfMtZ2TE6ooGKDYewPuUUEpg4C4d2ESVRvJ2vOFzeogzCaYHS5OxUc8ylZsk3WCVzHdc6oMrcJzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=o0CVrRrh; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=kloenk.dev header.i=@kloenk.dev header.b="Osh/WSZb"
-From: Finn Behrens <me@kloenk.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kloenk.dev; s=mail;
-	t=1719341978; bh=DfZVYn4i4/VpKnmIgEflQ+7+YiZX3LFU35HAKDKVHMI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Osh/WSZbq02S3onY9bnOiJQkl8+OjTXDw9ow2ZrTTXTJPUoDI6E7tqHiivLvwXeyi
-	 UZ/P1xRuyUMXL61qJRnNpip8U6HXidiKeMg4AjUt01D7B0RL3/m78g9WRs51KMNQqz
-	 EacaLvpI2RJ7g4adb0YEgyJkMYgzCG+VhzeKKH7M=
-To: John Hubbard <jhubbard@nvidia.com>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Greg KH <greg@kroah.com>,
- Masahiro Yamada <masahiroy@kernel.org>,
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>,
- Alex Gaynor <alex.gaynor@gmail.com>,
- Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun Feng <boqun.feng@gmail.com>,
- Gary Guo <gary@garyguo.net>,
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
- Benno Lossin <benno.lossin@proton.me>,
- Andreas Hindborg <a.hindborg@samsung.com>, Alice Ryhl <aliceryhl@google.com>,
- linux-kbuild@vger.kernel.org, rust-for-linux@vger.kernel.org,
- LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 1/2] Makefile: rust-analyzer target: better error
- handling
-Date: Tue, 25 Jun 2024 20:59:36 +0200
-Message-ID: <3E731AD5-428C-427C-AFBD-7E65504169FA@kloenk.dev>
-In-Reply-To: <20240620205453.81799-2-jhubbard@nvidia.com>
-References: <20240620205453.81799-1-jhubbard@nvidia.com>
- <20240620205453.81799-2-jhubbard@nvidia.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="o0CVrRrh"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-424a3ccd0c0so11989615e9.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 26 Jun 2024 01:00:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1719388827; x=1719993627; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c7Q3IkL803SLgV6z8ys88NDBo/QBGmu2fV4E89499Ts=;
+        b=o0CVrRrhb5ZLM9bzN1sTl9O+bY9xcyUtHVc8sWX809V6g1W2Emoj9IPwHWybcPzOxf
+         4W/SF2elxL/BDVTVrFE13ZLQsjPtBgxL3W2knCwzEuSFbgEDKJpH/a9bh565MMu+Z6d7
+         fjETgLd6BvRcpLiwik9sBhtFEr0Pg0mCWYRQNMnBVV9BHM48vm4r7BSLuzBkCXn34qXy
+         1+XMA81TZZaXiU/4j+/re5uOuHWu/K7pLS09dQl5fl6oag/yXtH8UQL1Lgb6DC8r1UOH
+         mwSVDCeljHcWYDHoTUTR3FT6UCArEx1Nf2c/l95HamIEkJBP+cuwZZ6VGyPyNil+jki9
+         eTqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719388827; x=1719993627;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=c7Q3IkL803SLgV6z8ys88NDBo/QBGmu2fV4E89499Ts=;
+        b=mz0S6WTkZozW8WpwvkX7DxrdHxk+zZvFLOWBjqqE4DZ6j7lSuqTnc65t+GAa71LkGT
+         k+mQVHXE6g3qsWgfofa6ku/qW7XaSRrloimHJx449WDQda9vmoEXShHCeGZgr2aKnmVs
+         nbGCUFk9lE/d745VKQP8w7qXIfqsSECK9i094FmTkj3j20865roJvVUEQHtACghf5AyD
+         wPeY1hxr2vRiKwPxZwbge7aibVxgnaCjKMNvjBcYz3RTyO2hwz+7rd2Mo4UtjJzf8AGz
+         KivAmeBEOwmEOo0XdF6GMiK3vej3ERVWhWbZONpBnsIDqFR4TBNLze4c2a0e6Q34qbkK
+         IObA==
+X-Forwarded-Encrypted: i=1; AJvYcCUf0hY0bS/SOfA58T8zhEth7CyXLSQXUZWx1NODSZJ9V3gGukCxgHgnCFmaaB4LmOAtuJeNde4xdtyid3hMjfdUvW0MF1A/qQFzeg5D
+X-Gm-Message-State: AOJu0YzwaEPR9E1iMI2ICKOAbi53/8kV4pBRNCZM+DyuTNMkw4ENEDPB
+	Ucd4vBGs9TJ8+EqZqXzPoDM77f8FkRWsJs8mSxgjercGpX2FkF6ZNCmfahOe27lv4vkxnWL1WPz
+	8ZpU83zD2I/OohkbG3QAIiGGQ/w+SOgDfYqts
+X-Google-Smtp-Source: AGHT+IFItsjk1ACcla1EuGTcJ4heCic6G2ZGhg4p2ESBoP/ZiP/at9PWI6/wNvCL2Qe05EHwd3WiOnSuoZHosj4Yh7E=
+X-Received: by 2002:a05:6000:4020:b0:366:e991:b9ac with SMTP id
+ ffacd0b85a97d-366e991ba88mr7267698f8f.14.1719388826333; Wed, 26 Jun 2024
+ 01:00:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20240620205453.81799-1-jhubbard@nvidia.com> <20240620205453.81799-2-jhubbard@nvidia.com>
+In-Reply-To: <20240620205453.81799-2-jhubbard@nvidia.com>
+From: Alice Ryhl <aliceryhl@google.com>
+Date: Wed, 26 Jun 2024 10:00:13 +0200
+Message-ID: <CAH5fLggqb0nDLAD_fWgVR2vV7cvZXiR3VskxMSUAJPdLh1PNZg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] Makefile: rust-analyzer target: better error handling
+To: John Hubbard <jhubbard@nvidia.com>
+Cc: Miguel Ojeda <ojeda@kernel.org>, Greg KH <greg@kroah.com>, 
+	Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nicolas Schier <nicolas@fjasle.eu>, Alex Gaynor <alex.gaynor@gmail.com>, 
+	Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@samsung.com>, 
+	linux-kbuild@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-
-On 20 Jun 2024, at 22:54, John Hubbard wrote:
-
+On Thu, Jun 20, 2024 at 10:55=E2=80=AFPM John Hubbard <jhubbard@nvidia.com>=
+ wrote:
+>
 > 1) Provide a better error message for the "Rust not available" case.
 > Without this patch, one gets various misleading messages, such as:
 >
@@ -74,29 +97,13 @@ On 20 Jun 2024, at 22:54, John Hubbard wrote:
 > *** Please see Documentation/rust/quick-start.rst for details
 > *** on how to set up the Rust support.
 > ***
-> make[1]: *** [/kernel_work/linux-github/Makefile:1975: rust-analyzer] Error 1
+> make[1]: *** [/kernel_work/linux-github/Makefile:1975: rust-analyzer] Err=
+or 1
 > make: *** [Makefile:240: __sub-make] Error 2
 >
 > Cc: Alice Ryhl <aliceryhl@google.com>
 > Acked-by: Miguel Ojeda <ojeda@kernel.org>
 > Signed-off-by: John Hubbard <jhubbard@nvidia.com>
-> ---
->  Makefile | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/Makefile b/Makefile
-> index 14427547dc1e..07308277a6f5 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1970,6 +1970,7 @@ tags TAGS cscope gtags: FORCE
->  # IDE support targets
->  PHONY += rust-analyzer
->  rust-analyzer:
-> +	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/rust_is_available.sh
->  	$(Q)$(MAKE) $(build)=rust $@
->
->  # Script to generate missing namespace dependencies
-> -- 
-> 2.45.2
 
-Reviewed-by: Finn Behrens <me@kloenk.dev>
+Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+Tested-by: Alice Ryhl <aliceryhl@google.com>
