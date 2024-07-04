@@ -1,301 +1,209 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from gimli.kloenk.de (gimli.kloenk.de [49.12.72.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5CB31B013E;
-	Thu,  4 Jul 2024 14:38:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 650771AEFF5;
+	Thu,  4 Jul 2024 15:06:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.12.72.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720103929; cv=none; b=j0gpaXUehvKt49/QqrIlZLpLJc0xPKL3eWXXRGtzMP/7ofcKZDPtEucVU0mz/H1Aq/EgSONeqTFxWuEwmTZi+AJfQNCHpSrBqZrA+UBoMjff/xEYi2GuT0c6Xb/FUzSvEbpq0NrbSNum+KTJaAgK68ikOkEnYf7UVlcVQ5zLDhE=
+	t=1720105566; cv=none; b=WImbED8gL+uzfgTMslA+4IOXMlfZvK8io+IPxLStQ7m9sVi//9Sie5NkgYTto/SJNiDYUiMQmxBg4NwRX/urNqLsEGsxWkvrED0ecFIsRtIJo8RGI22k8H9pD+CnZubt2WyB/DyWuAv858vYmXmJUNar/wBr8KzFnDd+pCKUNCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720103929; c=relaxed/simple;
-	bh=6VGcvb+hjNG3OZrSZmKQqWbbNaSc922Mlx+mVwuKLTI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=J3G7vYwIu4oY0SoW63n7tJRDZJosoI59U9ElhDDrZJRIdnU2r+EiCAksXaftM7VNSdbanrsjDIJA+iQhxnpYuu9wxmwggeGLXIUTKTK8Sj9sP7rgfeUymyFEinphWDM5mJSrYWPDZ8rnAmsxjmDlJUDbc0m+nFJ/rYXSrveYOgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rBziHuEX; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1720105566; c=relaxed/simple;
+	bh=O/rIHm2vHUSZsxeUoiEX/0t9NEzq9RzAEAqRqaKvRhU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=A3basVCJ6J0kP43mo72NskFTidl3mIGUOnTPFFxE4IadFHgODrMrIdlmwIL9HjOwZn5G4wdv1ZG4c8gEWSd/URJ0dlp77HcqeTpkYDXi9nsfso+Qe7iq2aVKEpJw+VuHJ4dDgeA7MmiovOB+hPA0+Zv+vQxjxtCi4xBI1U2iQac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kloenk.dev; spf=pass smtp.mailfrom=kloenk.dev; dkim=pass (1024-bit key) header.d=kloenk.dev header.i=@kloenk.dev header.b=oL/xeAqo; arc=none smtp.client-ip=49.12.72.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kloenk.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kloenk.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rBziHuEX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAB7EC32781;
-	Thu,  4 Jul 2024 14:38:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720103928;
-	bh=6VGcvb+hjNG3OZrSZmKQqWbbNaSc922Mlx+mVwuKLTI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rBziHuEXIXC8B4bVdX4ubT5QGzvcwhzcBNCEQSHkqRYVfo8HXKbNhxoVk2ZCTRVc4
-	 I+BYhyhrFlBUlxjREkLG6DFqHfguVlYCB468eioxgwLrw/u8uo8WiUgkPvNmVRRZc6
-	 sVvGStxrImJRElhxow0rbSsp/FrpRY3DQSux78mE/k5Gn+VO59+6vtrqrhc3h9B4Wp
-	 trZmyYYbDmFp6+c3SPo57hb8Mz/TFOekcjtQMfbFvrBvhwEesi0h1xkQj6NuYsQquf
-	 qBe0ou+Y9rdBo3nAJb3CXBQ7/u0MSnQBUWowBSewq2xtP4yJkdziyq/c6z1dGw15HV
-	 anNr9FoyBBZxg==
-From: Arnd Bergmann <arnd@kernel.org>
-To: linux-arch@vger.kernel.org
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nicolas@fjasle.eu>,
-	Vineet Gupta <vgupta@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Guo Ren <guoren@kernel.org>,
-	Brian Cain <bcain@quicinc.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Dinh Nguyen <dinguyen@kernel.org>,
-	Jonas Bonn <jonas@southpole.se>,
-	Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
-	Stafford Horne <shorne@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Rich Felker <dalias@libc.org>,
-	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andreas Larsson <andreas@gaisler.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-snps-arc@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-csky@vger.kernel.org,
-	linux-hexagon@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	linux-openrisc@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: [PATCH 17/17] riscv: convert to generic syscall table
-Date: Thu,  4 Jul 2024 16:36:11 +0200
-Message-Id: <20240704143611.2979589-18-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240704143611.2979589-1-arnd@kernel.org>
-References: <20240704143611.2979589-1-arnd@kernel.org>
+	dkim=pass (1024-bit key) header.d=kloenk.dev header.i=@kloenk.dev header.b="oL/xeAqo"
+From: Finn Behrens <me@kloenk.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kloenk.dev; s=mail;
+	t=1720105558; bh=BfMLSZ0AT/mlle+53mZ6wwVCSyTdxQNs4XoaGRKGrCo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=oL/xeAqo14mbEBOpub69gGN+CpzUImD6m2uaiva1K4yk815JJV04Ygsr3TV/FwYzH
+	 6M4ZOzXJzjQyuodgNP9TVEBvaQ9TWy88txYGLKkWJwpD1xG5BoT+fLR6Nkd/FxNof8
+	 sfu4i3dJKsPM4y2ZAJk3fwhJB92z/b93HtFMPkLQ=
+To: Miguel Ojeda <ojeda@kernel.org>
+Cc: Wedson Almeida Filho <wedsonaf@gmail.com>,
+ Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>,
+ Gary Guo <gary@garyguo.net>,
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
+ Benno Lossin <benno.lossin@proton.me>,
+ Andreas Hindborg <a.hindborg@samsung.com>, Alice Ryhl <aliceryhl@google.com>,
+ rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org,
+ patches@lists.linux.dev, Masahiro Yamada <masahiroy@kernel.org>,
+ Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>,
+ linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH 11/13] kbuild: rust: add `rustc-version` support
+Date: Thu, 04 Jul 2024 17:05:56 +0200
+Message-ID: <69FCD7F0-9B70-45B5-B58D-E952A2FA99A1@kloenk.dev>
+In-Reply-To: <20240701183625.665574-12-ojeda@kernel.org>
+References: <20240701183625.665574-1-ojeda@kernel.org>
+ <20240701183625.665574-12-ojeda@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-From: Arnd Bergmann <arnd@arndb.de>
 
-The uapi/asm/unistd_{32,64}.h and asm/syscall_table_{32,64}.h headers can
-now be generated from scripts/syscall.tbl, which makes this consistent
-with the other architectures that have their own syscall.tbl.
 
-riscv has two extra system call that gets added to scripts/syscall.tbl.
+On 1 Jul 2024, at 20:36, Miguel Ojeda wrote:
 
-The newstat and rlimit entries in the syscall_abis_64 line are for system
-calls that were part of the generic ABI when riscv64 got added but are
-no longer enabled by default for new architectures. Both riscv32 and
-riscv64 also implement memfd_secret, which is optional for all
-architectures.
+> Now that we are starting to support several Rust versions, introduce
+> `rustc-version` support, mimicking the C side:
+>
+>   - `scripts/rustc-version.sh`, that mimics the other version scripts
+>      (with one more digit, e.g. Rust 1.79.0 is 107900).
+>
+>   - `rustc-{info,name,version}` Kbuild macros.
+>
+>   - `CONFIG_RUSTC_VERSION` Kconfig symbol that calls `rustc-version`.
+>
+>   - `rustc-min-version` Kbuild macro that uses `CONFIG_RUSTC_VERSION`.
+>
+> With these, we can easily support flags conditionally depending on
+> `rustc`'s version -- a user comes in the next patch.
+>
+> Another user will be the `-Ctarget-feature=3D+reserve-x18`/`-Zfixed-x18=
+`
+> arm64 flags [1].
+>
+> Link: https://lore.kernel.org/rust-for-linux/20240305-shadow-call-stack=
+-v2-1-c7b4a3f4d616@google.com/ [1]
+> Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
 
-Unlike all the other 32-bit architectures, the time32 and stat64
-sets of syscalls are not enabled on riscv32.
+Reviewed-by: Finn Behrens <me@kloenk.dev>
 
-Both the user visible side of asm/unistd.h and the internal syscall
-table in the kernel should have the same effective contents after this.
+> ---
+>  init/Kconfig              |  6 +++++
+>  scripts/Kconfig.include   |  6 +++++
+>  scripts/Makefile.compiler |  4 +++
+>  scripts/rustc-version.sh  | 52 +++++++++++++++++++++++++++++++++++++++=
 
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- arch/riscv/include/asm/Kbuild            |  3 ++
- arch/riscv/include/asm/syscall_table.h   |  7 +++++
- arch/riscv/include/asm/unistd.h          | 13 +++++---
- arch/riscv/include/uapi/asm/Kbuild       |  2 ++
- arch/riscv/include/uapi/asm/unistd.h     | 40 +++---------------------
- arch/riscv/kernel/Makefile.syscalls      |  4 +++
- arch/riscv/kernel/compat_syscall_table.c |  6 ++--
- arch/riscv/kernel/syscall_table.c        |  6 ++--
- scripts/syscall.tbl                      |  3 ++
- 9 files changed, 40 insertions(+), 44 deletions(-)
- create mode 100644 arch/riscv/include/asm/syscall_table.h
- create mode 100644 arch/riscv/kernel/Makefile.syscalls
+>  4 files changed, 68 insertions(+)
+>  create mode 100755 scripts/rustc-version.sh
+>
+> diff --git a/init/Kconfig b/init/Kconfig
+> index 94e20d3b99d4..7d344f248785 100644
+> --- a/init/Kconfig
+> +++ b/init/Kconfig
+> @@ -1920,6 +1920,12 @@ config RUST
+>
+>  	  If unsure, say N.
+>
+> +config RUSTC_VERSION
+> +	int
+> +	depends on RUST
+> +	default $(rustc-version)
+> +	default 0
+> +
+>  config RUSTC_VERSION_TEXT
+>  	string
+>  	depends on RUST
+> diff --git a/scripts/Kconfig.include b/scripts/Kconfig.include
+> index 3ee8ecfb8c04..82ab889725db 100644
+> --- a/scripts/Kconfig.include
+> +++ b/scripts/Kconfig.include
+> @@ -45,6 +45,12 @@ $(error-if,$(success,test -z "$(cc-info)"),Sorry$(co=
+mma) this C compiler is not
+>  cc-name :=3D $(shell,set -- $(cc-info) && echo $1)
+>  cc-version :=3D $(shell,set -- $(cc-info) && echo $2)
+>
+> +# Get the Rust compiler name, version, and error out if it is not supp=
+orted.
+> +rustc-info :=3D $(shell,$(srctree)/scripts/rustc-version.sh $(RUSTC))
+> +$(error-if,$(success,test -z "$(rustc-info)"),Sorry$(comma) this Rust =
+compiler is not supported.)
+> +rustc-name :=3D $(shell,set -- $(rustc-info) && echo $1)
+> +rustc-version :=3D $(shell,set -- $(rustc-info) && echo $2)
+> +
+>  # Get the assembler name, version, and error out if it is not supporte=
+d.
+>  as-info :=3D $(shell,$(srctree)/scripts/as-version.sh $(CC) $(CLANG_FL=
+AGS))
+>  $(error-if,$(success,test -z "$(as-info)"),Sorry$(comma) this assemble=
+r is not supported.)
+> diff --git a/scripts/Makefile.compiler b/scripts/Makefile.compiler
+> index 92be0c9a13ee..17eaa085b59c 100644
+> --- a/scripts/Makefile.compiler
+> +++ b/scripts/Makefile.compiler
+> @@ -69,6 +69,10 @@ gcc-min-version =3D $(call test-ge, $(CONFIG_GCC_VER=
+SION), $1)
+>  # Usage: cflags-$(call clang-min-version, 110000) +=3D -foo
+>  clang-min-version =3D $(call test-ge, $(CONFIG_CLANG_VERSION), $1)
+>
+> +# rustc-min-version
+> +# Usage: rustflags-$(call rustc-min-version, 107900) +=3D -foo
+> +rustc-min-version =3D $(call test-ge, $(CONFIG_RUSTC_VERSION), $1)
+> +
+>  # ld-option
+>  # Usage: KBUILD_LDFLAGS +=3D $(call ld-option, -X, -Y)
+>  ld-option =3D $(call try-run, $(LD) $(KBUILD_LDFLAGS) $(1) -v,$(1),$(2=
+),$(3))
+> diff --git a/scripts/rustc-version.sh b/scripts/rustc-version.sh
+> new file mode 100755
+> index 000000000000..4e658fd55ae6
+> --- /dev/null
+> +++ b/scripts/rustc-version.sh
+> @@ -0,0 +1,52 @@
+> +#!/bin/sh
+> +# SPDX-License-Identifier: GPL-2.0
+> +#
+> +# Print the Rust compiler name and its version in a 5 or 6-digit form.=
 
-diff --git a/arch/riscv/include/asm/Kbuild b/arch/riscv/include/asm/Kbuild
-index 504f8b7e72d4..5c589770f2a8 100644
---- a/arch/riscv/include/asm/Kbuild
-+++ b/arch/riscv/include/asm/Kbuild
-@@ -1,4 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0
-+syscall-y += syscall_table_32.h
-+syscall-y += syscall_table_64.h
-+
- generic-y += early_ioremap.h
- generic-y += flat.h
- generic-y += kvm_para.h
-diff --git a/arch/riscv/include/asm/syscall_table.h b/arch/riscv/include/asm/syscall_table.h
-new file mode 100644
-index 000000000000..0c2d61782813
---- /dev/null
-+++ b/arch/riscv/include/asm/syscall_table.h
-@@ -0,0 +1,7 @@
-+#include <asm/bitsperlong.h>
-+
-+#if __BITS_PER_LONG == 64
-+#include <asm/syscall_table_64.h>
-+#else
-+#include <asm/syscall_table_32.h>
-+#endif
-diff --git a/arch/riscv/include/asm/unistd.h b/arch/riscv/include/asm/unistd.h
-index 221630bdbd07..e6d904fa67c5 100644
---- a/arch/riscv/include/asm/unistd.h
-+++ b/arch/riscv/include/asm/unistd.h
-@@ -3,11 +3,6 @@
-  * Copyright (C) 2012 Regents of the University of California
-  */
- 
--/*
-- * There is explicitly no include guard here because this file is expected to
-- * be included multiple times.
-- */
--
- #define __ARCH_WANT_SYS_CLONE
- 
- #ifdef CONFIG_COMPAT
-@@ -21,6 +16,14 @@
- #define __ARCH_WANT_COMPAT_FADVISE64_64
- #endif
- 
-+#if defined(__LP64__) && !defined(__SYSCALL_COMPAT)
-+#define __ARCH_WANT_NEW_STAT
-+#define __ARCH_WANT_SET_GET_RLIMIT
-+#endif /* __LP64__ */
-+
-+#define __ARCH_WANT_MEMFD_SECRET
-+
-+
- #include <uapi/asm/unistd.h>
- 
- #define NR_syscalls (__NR_syscalls)
-diff --git a/arch/riscv/include/uapi/asm/Kbuild b/arch/riscv/include/uapi/asm/Kbuild
-index f66554cd5c45..89ac01faa5ae 100644
---- a/arch/riscv/include/uapi/asm/Kbuild
-+++ b/arch/riscv/include/uapi/asm/Kbuild
-@@ -1 +1,3 @@
- # SPDX-License-Identifier: GPL-2.0
-+syscall-y += unistd_32.h
-+syscall-y += unistd_64.h
-diff --git a/arch/riscv/include/uapi/asm/unistd.h b/arch/riscv/include/uapi/asm/unistd.h
-index 328520defc13..81896bbbf727 100644
---- a/arch/riscv/include/uapi/asm/unistd.h
-+++ b/arch/riscv/include/uapi/asm/unistd.h
-@@ -14,40 +14,10 @@
-  * You should have received a copy of the GNU General Public License
-  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-  */
-+#include <asm/bitsperlong.h>
- 
--#if defined(__LP64__) && !defined(__SYSCALL_COMPAT)
--#define __ARCH_WANT_NEW_STAT
--#define __ARCH_WANT_SET_GET_RLIMIT
--#endif /* __LP64__ */
--
--#define __ARCH_WANT_MEMFD_SECRET
--
--#include <asm-generic/unistd.h>
--
--/*
-- * Allows the instruction cache to be flushed from userspace.  Despite RISC-V
-- * having a direct 'fence.i' instruction available to userspace (which we
-- * can't trap!), that's not actually viable when running on Linux because the
-- * kernel might schedule a process on another hart.  There is no way for
-- * userspace to handle this without invoking the kernel (as it doesn't know the
-- * thread->hart mappings), so we've defined a RISC-V specific system call to
-- * flush the instruction cache.
-- *
-- * __NR_riscv_flush_icache is defined to flush the instruction cache over an
-- * address range, with the flush applying to either all threads or just the
-- * caller.  We don't currently do anything with the address range, that's just
-- * in there for forwards compatibility.
-- */
--#ifndef __NR_riscv_flush_icache
--#define __NR_riscv_flush_icache (__NR_arch_specific_syscall + 15)
--#endif
--__SYSCALL(__NR_riscv_flush_icache, sys_riscv_flush_icache)
--
--/*
-- * Allows userspace to query the kernel for CPU architecture and
-- * microarchitecture details across a given set of CPUs.
-- */
--#ifndef __NR_riscv_hwprobe
--#define __NR_riscv_hwprobe (__NR_arch_specific_syscall + 14)
-+#if __BITS_PER_LONG == 64
-+#include <asm/unistd_64.h>
-+#else
-+#include <asm/unistd_32.h>
- #endif
--__SYSCALL(__NR_riscv_hwprobe, sys_riscv_hwprobe)
-diff --git a/arch/riscv/kernel/Makefile.syscalls b/arch/riscv/kernel/Makefile.syscalls
-new file mode 100644
-index 000000000000..52087a023b3d
---- /dev/null
-+++ b/arch/riscv/kernel/Makefile.syscalls
-@@ -0,0 +1,4 @@
-+# SPDX-License-Identifier: GPL-2.0
-+
-+syscall_abis_32 += riscv memfd_secret
-+syscall_abis_64 += riscv newstat rlimit memfd_secret
-diff --git a/arch/riscv/kernel/compat_syscall_table.c b/arch/riscv/kernel/compat_syscall_table.c
-index ad7f2d712f5f..e884c069e88f 100644
---- a/arch/riscv/kernel/compat_syscall_table.c
-+++ b/arch/riscv/kernel/compat_syscall_table.c
-@@ -8,9 +8,11 @@
- #include <asm-generic/syscalls.h>
- #include <asm/syscall.h>
- 
-+#define __SYSCALL_WITH_COMPAT(nr, native, compat) __SYSCALL(nr, compat)
-+
- #undef __SYSCALL
- #define __SYSCALL(nr, call)	asmlinkage long __riscv_##call(const struct pt_regs *);
--#include <asm/unistd.h>
-+#include <asm/syscall_table_32.h>
- 
- #undef __SYSCALL
- #define __SYSCALL(nr, call)      [nr] = __riscv_##call,
-@@ -19,5 +21,5 @@ asmlinkage long compat_sys_rt_sigreturn(void);
- 
- void * const compat_sys_call_table[__NR_syscalls] = {
- 	[0 ... __NR_syscalls - 1] = __riscv_sys_ni_syscall,
--#include <asm/unistd.h>
-+#include <asm/syscall_table_32.h>
- };
-diff --git a/arch/riscv/kernel/syscall_table.c b/arch/riscv/kernel/syscall_table.c
-index dda913764903..6f1a36cb0f3f 100644
---- a/arch/riscv/kernel/syscall_table.c
-+++ b/arch/riscv/kernel/syscall_table.c
-@@ -9,14 +9,16 @@
- #include <asm-generic/syscalls.h>
- #include <asm/syscall.h>
- 
-+#define __SYSCALL_WITH_COMPAT(nr, native, compat) __SYSCALL(nr, native)
-+
- #undef __SYSCALL
- #define __SYSCALL(nr, call)	asmlinkage long __riscv_##call(const struct pt_regs *);
--#include <asm/unistd.h>
-+#include <asm/syscall_table.h>
- 
- #undef __SYSCALL
- #define __SYSCALL(nr, call)	[nr] = __riscv_##call,
- 
- void * const sys_call_table[__NR_syscalls] = {
- 	[0 ... __NR_syscalls - 1] = __riscv_sys_ni_syscall,
--#include <asm/unistd.h>
-+#include <asm/syscall_table.h>
- };
-diff --git a/scripts/syscall.tbl b/scripts/syscall.tbl
-index 28329c00bf68..797e20ea99a2 100644
---- a/scripts/syscall.tbl
-+++ b/scripts/syscall.tbl
-@@ -301,6 +301,9 @@
- 
- 244	or1k	or1k_atomic			sys_or1k_atomic
- 
-+258	riscv	riscv_hwprobe			sys_riscv_hwprobe
-+259	riscv	riscv_flush_icache		sys_riscv_flush_icache
-+
- 260	time32	wait4				sys_wait4			compat_sys_wait4
- 260	64	wait4				sys_wait4
- 261	common	prlimit64			sys_prlimit64
--- 
-2.39.2
+> +# Also, perform the minimum version check.
+> +
+> +set -e
+> +
+> +# Convert the version string x.y.z to a canonical up-to-7-digits form.=
 
+> +#
+> +# Note that this function uses one more digit (compared to other
+> +# instances in other version scripts) to give a bit more space to
+> +# `rustc` since it will reach 1.100.0 in late 2026.
+> +get_canonical_version()
+> +{
+> +	IFS=3D.
+> +	set -- $1
+> +	echo $((100000 * $1 + 100 * $2 + $3))
+> +}
+> +
+> +orig_args=3D"$@"
+> +
+> +set -- $("$@" --version)
+> +
+> +name=3D$1
+> +
+> +min_tool_version=3D$(dirname $0)/min-tool-version.sh
+> +
+> +case "$name" in
+> +rustc)
+> +	version=3D$2
+> +	min_version=3D$($min_tool_version rustc)
+> +	;;
+> +*)
+> +	echo "$orig_args: unknown Rust compiler" >&2
+> +	exit 1
+> +	;;
+> +esac
+> +
+> +rustcversion=3D$(get_canonical_version $version)
+> +min_rustcversion=3D$(get_canonical_version $min_version)
+> +
+> +if [ "$rustcversion" -lt "$min_rustcversion" ]; then
+> +	echo >&2 "***"
+> +	echo >&2 "*** Rust compiler is too old."
+> +	echo >&2 "***   Your $name version:    $version"
+> +	echo >&2 "***   Minimum $name version: $min_version"
+> +	echo >&2 "***"
+> +	exit 1
+> +fi
+> +
+> +echo $name $rustcversion
+> -- =
+
+> 2.45.2
