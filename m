@@ -1,37 +1,78 @@
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAD5C1BB6BD;
-	Tue, 27 Aug 2024 12:31:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA0891BC9E9;
+	Tue, 27 Aug 2024 12:31:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724761867; cv=none; b=Tbs4e/5rmOlooMBJvv7PvB6kiYcFQWAcKyHeb63RFvbvQwEvv85I005iyABmIZPxccL1olgLNc0exH2htQWq/tPqY1x1HpMUpH6xpY6Rh0z9NeZTs7iVhRuDla28TBftd3yMfur0iv73gOzySJCAGKgrYcVREUdW8ZpkfQqxgKw=
+	t=1724761870; cv=none; b=qUAn02emdi7HnA9TCEOKlInhJlzTUOQXlWJzYJvoPbI6sNZ/yOMW6c26yBy2fmLtwXIQ2CsurMxEpa9NLWviOkf1ZnNG2wR3IeJ9v6MZcgGxIQKFwC37vwSVckZZlxLWpKLKE5ehbYl+DCEr5NICvAdOUSiVznUxhIj+u3FRlzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724761867; c=relaxed/simple;
-	bh=aRdmym/AY2Rh1oDH9QAjsr3DwL+0OSdCczjrdKZB6Ao=;
+	s=arc-20240116; t=1724761870; c=relaxed/simple;
+	bh=CiDc3AlGeKOrysrp/CgBganzjOryXmBiKhxPXuepiqk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qonV3lPGGqEtwyhilzD8YcCXXfliFPWvUHSHmLDz0jseYpiklFveAy08yUhs7jK765lxZFumhnvne6E8EDgmnu5bvTpsHqP9pF1fyeqjhudEpDH7bdZyxZIuhFgc+Bh3hfAHQByhNFNKlZfm4jvkdqFOzQeb6bvzFd2lBOXKPeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; arc=none smtp.client-ip=195.135.223.131
+	 MIME-Version; b=o6SJEFF9I2UGqj4+dJljMBYhbVVFZ3WgvE5fxSbp4J+d7QH+LLj1hWyGKI9O+9dSZsdHXr5mNGrDGzCJYhINpl3/udr18MwA8/DOpHiFXuFFaxA1WCHMCTaa1lfjBO55sy/YtVzcKsHW9fodLm1BT1Kf1pdZjNcTs3pbPfZQjtk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=I0g1aGK0; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=HVFdO4IA; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=I0g1aGK0; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=HVFdO4IA; arc=none smtp.client-ip=195.135.223.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="I0g1aGK0";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="HVFdO4IA";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="I0g1aGK0";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="HVFdO4IA"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 1CF1B1FB6A;
-	Tue, 27 Aug 2024 12:31:03 +0000 (UTC)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 0AD6D1FB73;
+	Tue, 27 Aug 2024 12:31:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1724761867; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=r5AnqN2FneO8Qgbj2+/+ZJF0wdzB6eYns1Tk7nxauVE=;
+	b=I0g1aGK0F190P2PsNBcVgPLAOoSD0aonJE2vDUq6kDkQ5ShZV9x3BWKUgIqkzEw5lUjOhM
+	zlCFhWAldpuAVNK0KaMvuFoSbpyk56As3lduT87dbBKOXIWUETtXLb0tYghAYyTLH6YpYH
+	Vns5NY0+LOjZ0vSqu1v8lp/p4K5wF0c=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1724761867;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=r5AnqN2FneO8Qgbj2+/+ZJF0wdzB6eYns1Tk7nxauVE=;
+	b=HVFdO4IA2nAQtO2qw/J8XbPnt1j3Sw+0YM3bkC1xQozeosMb6VpFVXkzVo0AHdpoEHzG08
+	keivXZrxKa5xuVCQ==
 Authentication-Results: smtp-out2.suse.de;
 	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1724761867; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=r5AnqN2FneO8Qgbj2+/+ZJF0wdzB6eYns1Tk7nxauVE=;
+	b=I0g1aGK0F190P2PsNBcVgPLAOoSD0aonJE2vDUq6kDkQ5ShZV9x3BWKUgIqkzEw5lUjOhM
+	zlCFhWAldpuAVNK0KaMvuFoSbpyk56As3lduT87dbBKOXIWUETtXLb0tYghAYyTLH6YpYH
+	Vns5NY0+LOjZ0vSqu1v8lp/p4K5wF0c=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1724761867;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=r5AnqN2FneO8Qgbj2+/+ZJF0wdzB6eYns1Tk7nxauVE=;
+	b=HVFdO4IA2nAQtO2qw/J8XbPnt1j3Sw+0YM3bkC1xQozeosMb6VpFVXkzVo0AHdpoEHzG08
+	keivXZrxKa5xuVCQ==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1562613724;
-	Tue, 27 Aug 2024 12:31:03 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0466313724;
+	Tue, 27 Aug 2024 12:31:07 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id xm45BQfHzWbBYwAAD6G6ig
-	(envelope-from <lhruska@suse.cz>); Tue, 27 Aug 2024 12:31:03 +0000
+	id 1/EQAQvHzWbLYwAAD6G6ig
+	(envelope-from <lhruska@suse.cz>); Tue, 27 Aug 2024 12:31:07 +0000
 From: Lukas Hruska <lhruska@suse.cz>
 To: pmladek@suse.com,
 	mbenes@suse.cz,
@@ -41,11 +82,10 @@ Cc: joe.lawrence@redhat.com,
 	linux-kernel@vger.kernel.org,
 	linux-kbuild@vger.kernel.org,
 	mpdesouza@suse.com,
-	lhruska@suse.cz,
-	Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: [PATCH v3 4/6] livepatch: Add sample livepatch module
-Date: Tue, 27 Aug 2024 14:30:49 +0200
-Message-ID: <20240827123052.9002-5-lhruska@suse.cz>
+	lhruska@suse.cz
+Subject: [PATCH v3 7/6 DONT_MERGE] selftests: livepatch: Test failing IBT checks crashing the module
+Date: Tue, 27 Aug 2024 14:30:52 +0200
+Message-ID: <20240827123052.9002-8-lhruska@suse.cz>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240827123052.9002-1-lhruska@suse.cz>
 References: <20240827123052.9002-1-lhruska@suse.cz>
@@ -56,118 +96,204 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
 X-Spam-Level: 
-X-Spamd-Result: default: False [-4.00 / 50.00];
-	REPLY(-4.00)[]
-X-Spam-Score: -4.00
+X-Spamd-Result: default: False [-6.80 / 50.00];
+	REPLY(-4.00)[];
+	BAYES_HAM(-3.00)[100.00%];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	TO_DN_NONE(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:email,suse.cz:mid,imap1.dmz-prg2.suse.org:helo];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	R_RATELIMIT(0.00)[to_ip_from(RLwfjdgm737utdgph7keiopinp)];
+	RCVD_TLS_ALL(0.00)[]
+X-Spam-Score: -6.80
 X-Spam-Flag: NO
-X-Rspamd-Queue-Id: 1CF1B1FB6A
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
 
-From: Josh Poimboeuf <jpoimboe@redhat.com>
+This patch is only an example of how to generate #GP by IBT.
+It serves only as an example for those wondering how the Linux behaves
+in this case.
+Don't merge this patch, because it causes a refcount underflow of the test
+module, so it's not possible to unload it.
 
-Add a new livepatch sample in samples/livepatch/ to make use of symbols
-that must be post-processed to enable load-time relocation resolution.
-As the new sample is to be used as an example, it is annotated with
-KLP_RELOC_SYMBOL macro.
-
-The livepatch sample updates the function cmdline_proc_show to print the
-string referenced by the symbol saved_command_line appended by the
-string "livepatch=1".
-
-Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
 Signed-off-by: Lukas Hruska <lhruska@suse.cz>
-Reviewed-by: Petr Mladek <pmladek@suse.com>
 ---
- samples/livepatch/Makefile                  |  1 +
- samples/livepatch/livepatch-extern-symbol.c | 84 +++++++++++++++++++++
- 2 files changed, 85 insertions(+)
- create mode 100644 samples/livepatch/livepatch-extern-symbol.c
+ tools/testing/selftests/livepatch/Makefile    |  4 ++
+ tools/testing/selftests/livepatch/test-ibt.sh | 57 +++++++++++++++++++
+ .../selftests/livepatch/test_modules/Makefile |  2 +
+ .../test_modules/test_klp_extern_hello.c      | 20 +++++++
+ .../livepatch/test_modules/test_klp_ibt.c     | 51 +++++++++++++++++
+ 5 files changed, 134 insertions(+)
+ create mode 100644 tools/testing/selftests/livepatch/test-ibt.sh
+ create mode 100644 tools/testing/selftests/livepatch/test_modules/test_klp_ibt.c
 
-diff --git a/samples/livepatch/Makefile b/samples/livepatch/Makefile
-index 9f853eeb6140..5cc81d5db17c 100644
---- a/samples/livepatch/Makefile
-+++ b/samples/livepatch/Makefile
-@@ -6,3 +6,4 @@ obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-shadow-fix2.o
- obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-callbacks-demo.o
- obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-callbacks-mod.o
- obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-callbacks-busymod.o
-+obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-extern-symbol.o
-diff --git a/samples/livepatch/livepatch-extern-symbol.c b/samples/livepatch/livepatch-extern-symbol.c
+diff --git a/tools/testing/selftests/livepatch/Makefile b/tools/testing/selftests/livepatch/Makefile
+index 611ee16bef56..3ef2040e4c50 100644
+--- a/tools/testing/selftests/livepatch/Makefile
++++ b/tools/testing/selftests/livepatch/Makefile
+@@ -13,6 +13,10 @@ TEST_PROGS := \
+ 	test-syscall.sh \
+ 	test-extern.sh
+ 
++ifdef CONFIG_X86_KERNEL_IBT
++	TEST_PROGS += test-ibt.sh
++endif
++
+ TEST_FILES := settings
+ 
+ include ../lib.mk
+diff --git a/tools/testing/selftests/livepatch/test-ibt.sh b/tools/testing/selftests/livepatch/test-ibt.sh
 new file mode 100644
-index 000000000000..276a43d157b4
+index 000000000000..c5f49fb7af4d
 --- /dev/null
-+++ b/samples/livepatch/livepatch-extern-symbol.c
-@@ -0,0 +1,84 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * Copyright (C) 2014 Seth Jennings <sjenning@redhat.com>
-+ */
++++ b/tools/testing/selftests/livepatch/test-ibt.sh
+@@ -0,0 +1,57 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (C) 2024 Lukas Hruska <lhruska@suse.cz>
 +
-+/*
-+ * livepatch-extern-symbol.c - Kernel Live Patching Sample Module
-+ */
++. $(dirname $0)/functions.sh
 +
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++MOD_LIVEPATCH=test_klp_ibt
++MOD_HELLO=test_klp_extern_hello
++PARAM_HELLO=hello
++
++setup_config
++
++# - load a module to be livepatched
++# - load a livepatch that calls the unused function which does not have endbr64
++#   as its first instruction
++# - unload the livepatch and make sure the patch was removed
++# - unload the module that was livepatched
++
++start_test "livepatch with external symbol"
++
++load_mod $MOD_HELLO
++
++read_module_param $MOD_HELLO $PARAM_HELLO
++
++load_lp $MOD_LIVEPATCH
++
++read_module_param $MOD_HELLO $PARAM_HELLO
++
++disable_lp $MOD_LIVEPATCH
++unload_lp $MOD_LIVEPATCH
++
++read_module_param $MOD_HELLO $PARAM_HELLO
++
++unload_mod $MOD_HELLO
++
++check_result "% insmod test_modules/$MOD_HELLO.ko
++% echo \"$MOD_HELLO/parameters/$PARAM_HELLO: \$(cat /sys/module/$MOD_HELLO/parameters/$PARAM_HELLO)\"
++$MOD_HELLO/parameters/$PARAM_HELLO: Hello from kernel module.
++% insmod test_modules/$MOD_LIVEPATCH.ko
++livepatch: enabling patch '$MOD_LIVEPATCH'
++livepatch: '$MOD_LIVEPATCH': initializing patching transition
++livepatch: '$MOD_LIVEPATCH': starting patching transition
++livepatch: '$MOD_LIVEPATCH': completing patching transition
++livepatch: '$MOD_LIVEPATCH': patching complete
++% echo \"$MOD_HELLO/parameters/$PARAM_HELLO: \$(cat /sys/module/$MOD_HELLO/parameters/$PARAM_HELLO)\"
++$MOD_HELLO/parameters/$PARAM_HELLO: Hello from livepatched module.
++% echo 0 > /sys/kernel/livepatch/$MOD_LIVEPATCH/enabled
++livepatch: '$MOD_LIVEPATCH': initializing unpatching transition
++livepatch: '$MOD_LIVEPATCH': starting unpatching transition
++livepatch: '$MOD_LIVEPATCH': completing unpatching transition
++livepatch: '$MOD_LIVEPATCH': unpatching complete
++% rmmod $MOD_LIVEPATCH
++% echo \"$MOD_HELLO/parameters/$PARAM_HELLO: \$(cat /sys/module/$MOD_HELLO/parameters/$PARAM_HELLO)\"
++$MOD_HELLO/parameters/$PARAM_HELLO: Hello from kernel module.
++% rmmod $MOD_HELLO"
++
++exit 0
+diff --git a/tools/testing/selftests/livepatch/test_modules/Makefile b/tools/testing/selftests/livepatch/test_modules/Makefile
+index 0d6df14787da..49a22ea90f3a 100644
+--- a/tools/testing/selftests/livepatch/test_modules/Makefile
++++ b/tools/testing/selftests/livepatch/test_modules/Makefile
+@@ -15,6 +15,8 @@ obj-m += test_klp_atomic_replace.o \
+ 	test_klp_shadow_vars.o \
+ 	test_klp_syscall.o
+ 
++obj-$(CONFIG_X86_KERNEL_IBT) += test_klp_ibt.o
++
+ # Ensure that KDIR exists, otherwise skip the compilation
+ modules:
+ ifneq ("$(wildcard $(KDIR))", "")
+diff --git a/tools/testing/selftests/livepatch/test_modules/test_klp_extern_hello.c b/tools/testing/selftests/livepatch/test_modules/test_klp_extern_hello.c
+index 431c55b5849a..37e1cd2cecdb 100644
+--- a/tools/testing/selftests/livepatch/test_modules/test_klp_extern_hello.c
++++ b/tools/testing/selftests/livepatch/test_modules/test_klp_extern_hello.c
+@@ -13,6 +13,26 @@ static int hello_get(char *buffer, const struct kernel_param *kp)
+ 	return sysfs_emit(buffer, "%s kernel module.\n", hello_msg);
+ }
+ 
++#ifdef CONFIG_X86_KERNEL_IBT
++static __attribute__((nocf_check)) int hello_get_alt(char *buffer, const struct kernel_param *kp)
++{
++	return sysfs_emit(buffer, "%s unused function.\n", hello_msg);
++}
++
++static int fail_get(char *buffer, const struct kernel_param *kp)
++{
++	int __attribute__((nocf_check)) (* volatile klpe_hello_get_alt)(char *, const struct kernel_param *) = hello_get_alt;
++	return (*klpe_hello_get_alt)(buffer, kp);
++}
++
++static const struct kernel_param_ops fail_ops = {
++	.get	= fail_get,
++};
++
++module_param_cb(fail, &fail_ops, NULL, 0400);
++MODULE_PARM_DESC(fail, "Read only parameter failing the reader.");
++#endif
++
+ static const struct kernel_param_ops hello_ops = {
+ 	.get	= hello_get,
+ };
+diff --git a/tools/testing/selftests/livepatch/test_modules/test_klp_ibt.c b/tools/testing/selftests/livepatch/test_modules/test_klp_ibt.c
+new file mode 100644
+index 000000000000..3b76d175d398
+--- /dev/null
++++ b/tools/testing/selftests/livepatch/test_modules/test_klp_ibt.c
+@@ -0,0 +1,51 @@
++// SPDX-License-Identifier: GPL-2.0
++// Copyright (C) 2024 Lukas Hruska <lhruska@suse.cz>
++
++#define pr_fmt(fmt) "test_klp_extern_hello: " fmt
 +
 +#include <linux/module.h>
 +#include <linux/kernel.h>
 +#include <linux/livepatch.h>
 +
-+/*
-+ * This (dumb) live patch overrides the function that prints the
-+ * kernel boot cmdline when /proc/cmdline is read.
-+ *
-+ * This livepatch uses the symbol saved_command_line whose relocation
-+ * must be resolved during load time. To enable that, this module
-+ * must be post-processed by a tool called klp-convert, which embeds
-+ * information to be used by the loader to solve the relocation.
-+ *
-+ * The module is annotated with KLP_RELOC_SYMBOL macros.
-+ * These annotations are used by klp-convert to infer that the symbol
-+ * saved_command_line is in the object vmlinux.
-+ *
-+ * Example:
-+ *
-+ * $ cat /proc/cmdline
-+ * <your cmdline>
-+ *
-+ * $ insmod livepatch-sample.ko
-+ * $ cat /proc/cmdline
-+ * <your cmdline> livepatch=1
-+ *
-+ * $ echo 0 > /sys/kernel/livepatch/livepatch_sample/enabled
-+ * $ cat /proc/cmdline
-+ * <your cmdline>
-+ */
++extern int hello_get_alt(char *buffer, const struct kernel_param *kp)
++			KLP_RELOC_SYMBOL(test_klp_extern_hello, test_klp_extern_hello, hello_get_alt);
 +
-+extern char *saved_command_line \
-+	       KLP_RELOC_SYMBOL(vmlinux, vmlinux, saved_command_line);
-+
-+#include <linux/seq_file.h>
-+static int livepatch_cmdline_proc_show(struct seq_file *m, void *v)
++static int hello_get(char *buffer, const struct kernel_param *kp)
 +{
-+	seq_printf(m, "%s livepatch=1\n", saved_command_line);
-+	return 0;
++	return hello_get_alt(buffer, kp);
 +}
 +
 +static struct klp_func funcs[] = {
 +	{
-+		.old_name = "cmdline_proc_show",
-+		.new_func = livepatch_cmdline_proc_show,
++		.old_name = "hello_get",
++		.new_func = hello_get,
 +	}, { }
 +};
 +
 +static struct klp_object objs[] = {
 +	{
-+		/* name being NULL means vmlinux */
++		.name = "test_klp_extern_hello",
 +		.funcs = funcs,
 +	}, { }
 +};
@@ -177,19 +303,21 @@ index 000000000000..276a43d157b4
 +	.objs = objs,
 +};
 +
-+static int livepatch_init(void)
++static int test_klp_extern_init(void)
 +{
 +	return klp_enable_patch(&patch);
 +}
 +
-+static void livepatch_exit(void)
++static void test_klp_extern_exit(void)
 +{
 +}
 +
-+module_init(livepatch_init);
-+module_exit(livepatch_exit);
++module_init(test_klp_extern_init);
++module_exit(test_klp_extern_exit);
 +MODULE_LICENSE("GPL");
 +MODULE_INFO(livepatch, "Y");
++MODULE_AUTHOR("Lukas Hruska <lhruska@suse.cz>");
++MODULE_DESCRIPTION("Livepatch test: external function call with IBT enabled");
 -- 
 2.46.0
 
