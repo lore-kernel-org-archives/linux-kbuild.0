@@ -1,97 +1,158 @@
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1CFB38DC7;
-	Sun, 15 Sep 2024 19:15:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3543545023;
+	Sun, 15 Sep 2024 20:57:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726427759; cv=none; b=gPBoH19t8PCq/d6WCt47hEEpLP/VAPiKwK/CNgtm/4StFzuBEUP8aBdcsTuUAL7O0Qyeo2GX9IatNA0rx6GFFywZh1CuGkIOwU4rsUcMpGwBUVm1rHAukoyleDpCjLkKIcoIAUbKg7/XFvngIwRa8Ivp3QmNWjewak5wqo89niQ=
+	t=1726433852; cv=none; b=kG4ImfIGD8/T1zpzJn/aY08HAVxphTb4/vQiEDfbltsN82vU5YZTj/83O6OOpooST0FlWsmk8cIkL/f0eeW0EufskVQeoxwS3LEPw4GiMATqTpLlFoeVd++NfcNTeLmim/bwK5yylr0iXNxTfebBKzlrylFKMk1DPOqp/KzekmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726427759; c=relaxed/simple;
-	bh=lNRBqTKCLNDFBOpyROD/tyxwIsQ0nHuHbMhbWiuk2+A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KRHh+BNw7+RXsICuW3xYtQiYF4nb4wg5SZsFNgpmlJ5E7+Qv+GPEVosn8FmPexnt2U9jfuygW5z/zy4de74DULhGfyNO86Oy4TsJKuAkaE1CAytyumO3fBzpmTafRIQRMGrX1axIS78keBC958x1PAMXyb65khNYU0Y6FA92Hoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LCPbIiO3; arc=none smtp.client-ip=209.85.215.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1726433852; c=relaxed/simple;
+	bh=zA/QsWa6q7LJTtE5ublcb3HICHudBVDInko7cvOFggU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=YEb0WhrZMzVXdWhQYninvrl8G/wrzQRlnTJzDo8rNaRN7KUFwy1+jQQw91FubOOxUXlmxc3XMHLyC1iuPE+FPpSjbSVQedZfEzRXyAe8CYKiTuwj+tNADZA+/SFgy2aCAxqyQLylhZ/SDESG7+7fbNyHHbEbFQjX6K8iyeZ+RKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=bmVAqrCu; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LCPbIiO3"
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-7d50ac2e3f8so578586a12.2;
-        Sun, 15 Sep 2024 12:15:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726427757; x=1727032557; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lNRBqTKCLNDFBOpyROD/tyxwIsQ0nHuHbMhbWiuk2+A=;
-        b=LCPbIiO3bk0OgaosmQqKm+7kItOkXIjKZsVSBxYicPDPOOLAXeI8XAJT1LLEn4HfAB
-         C5ApBhu7g+xqoMm10vtgRZkyb7QVzYMGad+ew4WT4zKrieyc7t4nSSA+pl5+2UQbjKcL
-         woJWfl8tteJKCGI5J6G17BJO5Pib23rJS1LsA/G3ydMP2MP9Ns39LLgjijvIJSqQvRSI
-         JP4rQTAJ0lyWrudq7DYEUP8yY+iY6C0DSRSOTY1x7ueuDhQRPaENu2d6+N18cyRPxWrg
-         ravk50bqLVaeSul9JqL3OgLVVrwZugt8O1Ch4F3goINULIeKBnPfXLwLy/73eDP6za/j
-         mAVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726427757; x=1727032557;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lNRBqTKCLNDFBOpyROD/tyxwIsQ0nHuHbMhbWiuk2+A=;
-        b=fY5JSLlAiCeUHoWC+UDINp32X0P7BoCs09WGOE8IJLm8O6I6EdI/lYlQ1r9zD4Y6aC
-         YilfvKgFddTEkkz1yzRZEhMn4NVoMCgRSI3eZTYrhBkOdoZAnVKUyp4TpI3IXZa+cKZ4
-         +O966+iElO+PagImro6shMzw3thtJsRfdE0epOhxjDzX+cdNn0GxUQ5CYB37EfghSrns
-         y23UpQe3mIRuXpgbhVlKU1h39gjtL62sVoYXIb2NF6TTPG1AjIap2Go6JoCsJWbH24vP
-         UvTxAIXt4u+6ks+ubErxTqvbFD3b2fO/vyVTCW/t1RPFLRP1pwgrAMrbhMuAwPTpEztZ
-         86JA==
-X-Forwarded-Encrypted: i=1; AJvYcCWWn+J4ocIFlMJ4hFk2rY9LVswjPCjluKv1iN8h1hRNgnbPTAcZrveJ6/99JNASU5Fm9PfwBb/HEBD45TdDri4=@vger.kernel.org, AJvYcCX0reMrMG7ajvWJDiwBO3/S4aUmPo0w7LYH3LvMsd2wvn2h0B8eJNPl1UH8OW/1Rv25cALMo0aOABDf39vm@vger.kernel.org, AJvYcCXgi8iQu4EmnsNBrO/NwKecPAf1j5z0mvb0BHOIMtcKIxdrrDe+s4IpQ+LM7ZecquoC2wa2j3w6ydPg4LE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDUJay6aW3E1h6Q/BWIr4T1c4aQtc7fht8I+VtxpTNG4wSLdFJ
-	k0XmC7oVYiRXqc+XlToUK8fiRxs93rUJGGYsQ9ps1bWq/loTLD27+E21ESnulLqEqDDejRCWCbE
-	61G6do2xenLHktF7Gchj76VE1YsQ=
-X-Google-Smtp-Source: AGHT+IEZEaOGvWfSQ1PMkaaBAWgoGIZZWM1FWt0ex2FWLRyvw9E6qDkHeoNUZf9rNRieQOensoOlHkvZ8E1ihKB6Umk=
-X-Received: by 2002:a17:902:ecc1:b0:206:a027:8aa3 with SMTP id
- d9443c01a7336-2076d6141a0mr84892845ad.0.1726427756913; Sun, 15 Sep 2024
- 12:15:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bmVAqrCu"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48FKmRuF026980;
+	Sun, 15 Sep 2024 20:57:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
+	:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding; s=pp1; bh=zQA7iLTfCFqW2
+	Uv7PmpE+IQDhTe/2DO2+wb/qAwSldk=; b=bmVAqrCungPA2O+pwXvERYAqffgdS
+	7uz1oR3/7y7a0aIxyUJAOHvuQ4AlNmei3FEhdFlPLOv2QmHmTGa2qngYDHPn5ga3
+	vIGje88C9N+Cxm6V+TarHdXC1jDKAIn54pbdUt69DuC0QUBqmWbYl2zzfFevw9+f
+	i0Uj4AFYFaEcCu6V8MJ8ZEfmAy/0CCxOccISrzAhtwls3hTlAx29XgByg1d925AK
+	vdkq8lYgt2eq4+79seEYf/cIy2DBU1e9PSviB5YTEXtcs9fY9e/eGMwYQDNNzq2D
+	1L4OQ18nzbX/uS9gy3gByDc01N50uYEQaFNuJgWBD4AMJ0n1cCYxQiRFg==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41n41a682u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 15 Sep 2024 20:57:06 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 48FKv616010815;
+	Sun, 15 Sep 2024 20:57:06 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41n41a682r-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 15 Sep 2024 20:57:06 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48FI3QWW001960;
+	Sun, 15 Sep 2024 20:57:05 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 41nmtubyc5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 15 Sep 2024 20:57:05 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48FKv1BN54657404
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 15 Sep 2024 20:57:02 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D660020049;
+	Sun, 15 Sep 2024 20:57:01 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id F061520040;
+	Sun, 15 Sep 2024 20:56:57 +0000 (GMT)
+Received: from li-bd3f974c-2712-11b2-a85c-df1cec4d728e.ibm.com.com (unknown [9.43.68.55])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Sun, 15 Sep 2024 20:56:57 +0000 (GMT)
+From: Hari Bathini <hbathini@linux.ibm.com>
+To: linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, bpf@vger.kernel.org,
+        linux-trace-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc: "Naveen N. Rao" <naveen@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Vishal Chourasia <vishalc@linux.ibm.com>,
+        Mahesh J Salgaonkar <mahesh@linux.ibm.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>
+Subject: [PATCH v5 02/17] powerpc/kprobes: Use ftrace to determine if a probe is at function entry
+Date: Mon, 16 Sep 2024 02:26:33 +0530
+Message-ID: <20240915205648.830121-3-hbathini@linux.ibm.com>
+X-Mailer: git-send-email 2.46.0
+In-Reply-To: <20240915205648.830121-1-hbathini@linux.ibm.com>
+References: <20240915205648.830121-1-hbathini@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240829-shadow-call-stack-v7-1-2f62a4432abf@google.com>
- <CANiq72kNmvFOXhhAcQJQdMC872908=CWW15_bzyyt9ht2q=twQ@mail.gmail.com>
- <20240913-shack-estate-b376a65921b1@spud> <20240914173037.422902b9.gary@garyguo.net>
- <20240914-jitters-barber-a0e51e7b83a8@spud> <20240914-romp-clothing-965a16cb4dd4@spud>
-In-Reply-To: <20240914-romp-clothing-965a16cb4dd4@spud>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Sun, 15 Sep 2024 21:15:44 +0200
-Message-ID: <CANiq72mb7UVbeH9R3t3s7U3tuJHT86FFdsEB=v_x1KKJV9uvgQ@mail.gmail.com>
-Subject: Re: [PATCH v7] rust: support for shadow call stack sanitizer
-To: Conor Dooley <conor@kernel.org>
-Cc: Gary Guo <gary@garyguo.net>, rust-for-linux@vger.kernel.org, 
-	Alice Ryhl <aliceryhl@google.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Ard Biesheuvel <ardb@kernel.org>, Jamie Cunliffe <Jamie.Cunliffe@arm.com>, 
-	Sami Tolvanen <samitolvanen@google.com>, Nathan Chancellor <nathan@kernel.org>, Kees Cook <kees@kernel.org>, 
-	Masahiro Yamada <masahiroy@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Marc Zyngier <maz@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Mark Brown <broonie@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, 
-	Boqun Feng <boqun.feng@gmail.com>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@samsung.com>, 
-	Valentin Obst <kernel@valentinobst.de>, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-riscv <linux-riscv@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: eyE_Tdvn-PAycfH2ToAXay_fjHRPGcBM
+X-Proofpoint-ORIG-GUID: EnC10AeeZviH-DJ3W2DqeDRShj48SZLI
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-15_12,2024-09-13_02,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ lowpriorityscore=0 suspectscore=0 mlxscore=0 mlxlogscore=999 bulkscore=0
+ impostorscore=0 phishscore=0 priorityscore=1501 spamscore=0 clxscore=1015
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2408220000 definitions=main-2409150159
 
-On Sun, Sep 15, 2024 at 12:15=E2=80=AFAM Conor Dooley <conor@kernel.org> wr=
-ote:
->
-> Turned it off, only to find out my board farm is non-functional! Looks
-> fine in QEMU however :)
+From: Naveen N Rao <naveen@kernel.org>
 
-Thanks for checking that -- I have kept the patch in `rust-next`
-applied since it is unrelated.
+Rather than hard-coding the offset into a function to be used to
+determine if a kprobe is at function entry, use ftrace_location() to
+determine the ftrace location within the function and categorize all
+instructions till that offset to be function entry.
 
-Cheers,
-Miguel
+For functions that cannot be traced, we fall back to using a fixed
+offset of 8 (two instructions) to categorize a probe as being at
+function entry for 64-bit elfv2, unless we are using pcrel.
+
+Acked-by: Masami Hiramatsu (Google) <mhiramat@kernel.org>
+Signed-off-by: Naveen N Rao <naveen@kernel.org>
+---
+ arch/powerpc/kernel/kprobes.c | 18 ++++++++----------
+ 1 file changed, 8 insertions(+), 10 deletions(-)
+
+diff --git a/arch/powerpc/kernel/kprobes.c b/arch/powerpc/kernel/kprobes.c
+index f8aa91bc3b17..bf382c459e1f 100644
+--- a/arch/powerpc/kernel/kprobes.c
++++ b/arch/powerpc/kernel/kprobes.c
+@@ -105,24 +105,22 @@ kprobe_opcode_t *kprobe_lookup_name(const char *name, unsigned int offset)
+ 	return addr;
+ }
+ 
+-static bool arch_kprobe_on_func_entry(unsigned long offset)
++static bool arch_kprobe_on_func_entry(unsigned long addr, unsigned long offset)
+ {
+-#ifdef CONFIG_PPC64_ELF_ABI_V2
+-#ifdef CONFIG_KPROBES_ON_FTRACE
+-	return offset <= 16;
+-#else
+-	return offset <= 8;
+-#endif
+-#else
++	unsigned long ip = ftrace_location(addr);
++
++	if (ip)
++		return offset <= (ip - addr);
++	if (IS_ENABLED(CONFIG_PPC64_ELF_ABI_V2) && !IS_ENABLED(CONFIG_PPC_KERNEL_PCREL))
++		return offset <= 8;
+ 	return !offset;
+-#endif
+ }
+ 
+ /* XXX try and fold the magic of kprobe_lookup_name() in this */
+ kprobe_opcode_t *arch_adjust_kprobe_addr(unsigned long addr, unsigned long offset,
+ 					 bool *on_func_entry)
+ {
+-	*on_func_entry = arch_kprobe_on_func_entry(offset);
++	*on_func_entry = arch_kprobe_on_func_entry(addr, offset);
+ 	return (kprobe_opcode_t *)(addr + offset);
+ }
+ 
+-- 
+2.46.0
+
