@@ -1,53 +1,59 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.avm.de (mail.avm.de [212.42.244.94])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E3415C147;
-	Tue, 17 Sep 2024 22:45:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA4D313667E;
+	Wed, 18 Sep 2024 15:36:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.94
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726613127; cv=none; b=SNxcC5Aa3cV0yFvZj3dJBD0A3u2+TE+jDy9ZEOfXGS4kG7O8LZ/Nao0NuG+8ogUQ9/ZclL80SkQ0/ZBpkv3mgPaWn+7JAaGTF+zI9T/b0zqm4BiGpbytDSytrs01dV9fx2khRdvLLcP/biQfa7d2wXiMVMJVi8kKU9CAd3/G3rQ=
+	t=1726673828; cv=none; b=uXDDV/ieTjh1l74rdKIswlg6J0R5JT3+63LSuZPY1R8H7HThr26EcuduGaiFbV55bkd51a1SZSGOrUezNB1+UB3UDwsijYg/sJWYlkYfSeRck5bN1yU4JJuJjU5LslZ5X69SOL9MJiYvoOg//CwJytijKkWyw0cd38TJGTkK+oM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726613127; c=relaxed/simple;
-	bh=Hw9iyrJ0e58e+rXTCDQUpQH3J+dNdJH/7seORIpje5k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=scHVXeSyoZl6ibbZ+y5CuMZoIP4So25X9bL8kQ/mehJdpnaCXh/qjUJrc7MJewTPUFp6m4eV8eKO5T1Rj5Tr/Q8GqZXEHwWFqjlsljdlsL3y5bU9IshtT0O8NjaXi0FDwDiuF9V4tlxMb/ytm6PJr2/vG459GuGXyRtEwftpi1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5ECBC4CEC5;
-	Tue, 17 Sep 2024 22:45:24 +0000 (UTC)
-Date: Tue, 17 Sep 2024 18:45:20 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
+	s=arc-20240116; t=1726673828; c=relaxed/simple;
+	bh=F5pPLbFwSN/7LkXTc9oqQPIaqBamJ2hOis0OVx3G4qo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TMitvzjVqmHOMJQwzt248I/7JyTEqPlsivcMb6FE611fH42yawwEYMA5mp1mUdPqrWDPCQayiAgPyq/5CkT3N3WRoG10cCjEHJo2Pg0I2PjnlbfNFpzfP093EvzMvlCcL1QQ/hwPA/kevBreHNZR6Pfz8hn2bMd6q94ecAedP9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=fjasle.eu; spf=fail smtp.mailfrom=fjasle.eu; arc=none smtp.client-ip=212.42.244.94
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=fjasle.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=fjasle.eu
+Received: from mail-auth.avm.de (dovecot-mx-01.avm.de [IPv6:2001:bf0:244:244::71])
+	by mail.avm.de (Postfix) with ESMTPS;
+	Wed, 18 Sep 2024 17:36:00 +0200 (CEST)
+Received: from l-nschier-nb (unknown [83.68.141.146])
+	by mail-auth.avm.de (Postfix) with ESMTPSA id 6093280174;
+	Wed, 18 Sep 2024 17:36:00 +0200 (CEST)
+Date: Wed, 18 Sep 2024 17:35:59 +0200
+From: Nicolas Schier <nicolas@fjasle.eu>
 To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: David Hunter <david.hunter.linux@gmail.com>,
- linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
- shuah@kernel.org, javier.carrasco.cruz@gmail.com
-Subject: Re: [PATCH v2 0/7] linux-kbuild: fix: process configs set to "y"
-Message-ID: <20240917184520.6acdf00b@rorschach.local.home>
-In-Reply-To: <CAK7LNATbgLrU07dZe+30jzUuP-A1KRfPY8=E2hP9W-Rvzsfg8Q@mail.gmail.com>
-References: <20240916142939.754911-1-david.hunter.linux@gmail.com>
-	<CAK7LNATbgLrU07dZe+30jzUuP-A1KRfPY8=E2hP9W-Rvzsfg8Q@mail.gmail.com>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+Cc: linux-kbuild@vger.kernel.org, Miguel Ojeda <ojeda@kernel.org>,
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Nathan Chancellor <nathan@kernel.org>
+Subject: Re: [PATCH 02/23] kbuild: doc: remove description about grepping
+ CONFIG options
+Message-ID: <ZurzXxdFb4RYGeZG@l-nschier-nb>
+References: <20240917141725.466514-1-masahiroy@kernel.org>
+ <20240917141725.466514-3-masahiroy@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240917141725.466514-3-masahiroy@kernel.org>
+X-purgate-ID: 149429::1726673760-0B63ADC4-5E4E5A06/0/0
+X-purgate-type: clean
+X-purgate-size: 443
+X-purgate-Ad: Categorized by eleven eXpurgate (R) http://www.eleven.de
+X-purgate: This mail is considered clean (visit http://www.eleven.de for further information)
+X-purgate: clean
 
-On Tue, 17 Sep 2024 23:45:36 +0900
-Masahiro Yamada <masahiroy@kernel.org> wrote:
-
-> (+CC: Steven Rostedt, the author of this script)
+On Tue, Sep 17, 2024 at 11:16:30PM +0900, Masahiro Yamada wrote:
+> This description was added 20 years ago [1]. It does not convey any
+> useful information except for a feeling of nostalgia.
 > 
+> [1]: https://git.kernel.org/pub/scm/linux/kernel/git/history/history.git/commit/?id=65e433436b5794ae056d22ddba60fe9194bba007
+> 
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
 
-Since my Out of Office message only goes to people who email me, and
-this was basically just adding me to someone else's email, I'll reply
-here to say I'm currently helping to running Linux Plumbers, and next
-week I'll be at Kernel Recipes. My inbox will be very full when I get
-back home and will likely not see this email again for a month or two.
-
-If you want me to take a look, please ping me again sometime after
-September 30th.
-
--- Steve
+Reviewed-by: Nicolas Schier <n.schier@avm.de>
