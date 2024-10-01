@@ -1,179 +1,138 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 921323307B;
-	Tue,  1 Oct 2024 07:19:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57C521BCA1E;
+	Tue,  1 Oct 2024 07:39:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727767180; cv=none; b=Cz6i5mqJlV4dIb1nouU7Maf6dM6VbruBA27XclqZ4lY6T4VZTbGSPMVv9TV0t1IDoHnl+2RpbSKGABxbOUS2udU5ZggKArgdVFlNcfVM1cJhKVR27601E5D7QFSQKxB/q7KM4bwL/O+H4LVD1KJJnLBqcs1YA/TIqECXARBMdU8=
+	t=1727768399; cv=none; b=FHlkAm/AgEWHMQiUW0g6KjUHD3HMVjZVKPnv0z+0mv8/1wElV0xDqYs/NU46utlIhUewOJ6Sh+cKntx0HfEaDxkNteiBFcs2wKFfa5I6k2mlYNawb/G091wpiZztc18RZZ8wYcBi0eZMl+3SiRhg6v2rybJUxn7z5AnDDJSLwno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727767180; c=relaxed/simple;
-	bh=n01BNZbF9ejiB2KdEN2OeP8SsSt6kV6tDAX9IasD2yo=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=fB61RRR9GnXvwlI9sE5PIHfDssw1m/xE3ZVWRXxW+CCgnZMIrwEfsZ2alj1EiGSpq7SrTwlq0J4ZYV3zEKr9rsbBAlDiO0XI57Vqk4GlrjZFi6z9Tnh4o3XqLzWgI7qj2oW9/MMdVQ+ojFaKiNXYLtxXQvpEY/TCz2kDRoAxZQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=UhhulmnP; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1727768399; c=relaxed/simple;
+	bh=za16NxIQDUGjjHP2c29sw6PI8ZU3lXszSx4jSWmr5Jk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Gs1Vlb39N+XmFyhOeSWV4HH9lzSLiE41NhmnxX/eJOYaPkrQukle5QKp6eexE760VeACnvemTTg6q4R2woDbDQ4SYtmLCljnKwuIRo26inm4taTB+AwKKdD8HDrvig05ViTX9WH7/7r/ALZGLDecw2+p7SyXoYJu8vH9a16f76I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aDEbkzH3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="UhhulmnP"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4916L9ex011324;
-	Tue, 1 Oct 2024 07:18:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:subject:to:cc:references:from:in-reply-to
-	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
-	nVeO7YF2qI6ks2gsAqC/25H4gdCxGkd3m/X2UTY0ILY=; b=UhhulmnPyVi7zDDc
-	MiYTsb4EjCA9S5khRljvKZZFH+E7fNMDN/hsqh3bppnsfIWUAQWeIQoheidbuzTC
-	C9587f7+VgsgnppBNvYrGnbRho16NiNMkAKA0n6LyMqRB4vc0khuf3l5NxfaZfXg
-	WuUMnEPcuRphLF0t7r/yv+NXtuXgsGJkF9AQYHAgmlJxBNJ+zbjRp+UBpaVakpBQ
-	phraW1hlwDGw57HpLVSjA1zTEeYKNHpJn/WsiAQbqakshqgizGwfNKnMCdR/g5Gz
-	lBgL1rYbPDmJGd50Mw+lqiJXd8WkqOqPSNBlnbW6uQIWdMLcV/HqDCoxQAGB2VLP
-	I7sPig==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 420bqs08jd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 01 Oct 2024 07:18:42 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4917IgPY005898;
-	Tue, 1 Oct 2024 07:18:42 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 420bqs08jb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 01 Oct 2024 07:18:42 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4915MFix007994;
-	Tue, 1 Oct 2024 07:18:41 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 41xvgxu0xv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 01 Oct 2024 07:18:41 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4917IbaV50332034
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 1 Oct 2024 07:18:37 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 88C8820040;
-	Tue,  1 Oct 2024 07:18:37 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6E6E320043;
-	Tue,  1 Oct 2024 07:18:33 +0000 (GMT)
-Received: from [9.203.115.143] (unknown [9.203.115.143])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  1 Oct 2024 07:18:33 +0000 (GMT)
-Message-ID: <7afc9cc7-95cd-45c7-b748-28040206d9a0@linux.ibm.com>
-Date: Tue, 1 Oct 2024 12:48:32 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 17/17] powerpc64/bpf: Add support for bpf trampolines
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, bpf <bpf@vger.kernel.org>,
-        linux-trace-kernel <linux-trace-kernel@vger.kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "Naveen N. Rao" <naveen@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Vishal Chourasia <vishalc@linux.ibm.com>,
-        Mahesh J Salgaonkar <mahesh@linux.ibm.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>
-References: <20240915205648.830121-1-hbathini@linux.ibm.com>
- <20240915205648.830121-18-hbathini@linux.ibm.com>
- <CAADnVQL60XXW95tgwKn3kVgSQAN7gr1STy=APuO1xQD7mz-aXA@mail.gmail.com>
- <32249e74-633d-4757-8931-742b682a63d3@linux.ibm.com>
- <CAADnVQKfSH_zkP0-TwOB_BLxCBH9efot9mk03uRuooCTMmWnWA@mail.gmail.com>
-Content-Language: en-US
-From: Hari Bathini <hbathini@linux.ibm.com>
-In-Reply-To: <CAADnVQKfSH_zkP0-TwOB_BLxCBH9efot9mk03uRuooCTMmWnWA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: SM-pZFexbR8K0U23khEKm2Gk2BFix6Vn
-X-Proofpoint-ORIG-GUID: o8_9c23Vj1cySEYDs0mB8nQmYzb-zRAw
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aDEbkzH3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09567C4CECE;
+	Tue,  1 Oct 2024 07:39:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727768399;
+	bh=za16NxIQDUGjjHP2c29sw6PI8ZU3lXszSx4jSWmr5Jk=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=aDEbkzH31TMYxyPZ0U4IqFDz2ggAiyQ93AuGH6DFWD852wq66X3Juctv++qrVnY1E
+	 6ZxaDC6+h3KE0C3l6NuZeDDiDBRF3EQr23e6H7GtHVX072wWjX7iI/+gFopMi4XBCn
+	 BQre8YouOhT4yPxzR2ekUT/nh48OGc3LLs9GaU55B4BLhQp30yz1hZOr+kIXvYG3ih
+	 OZ3IX+Rt7jhZPHye/HmzQ++7Vy95pRJ5j3zgDMATlOYnW26kd2Y9d5yDOCNbt7sReu
+	 G4umcThdYU5KCIUGRK/jsPgHtwnY8ozG6RFsniIyYbjsaaJ8GQzJdc9VLHuOINxJqx
+	 dhb3f3MUsJE9A==
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5398d171fa2so2783454e87.0;
+        Tue, 01 Oct 2024 00:39:58 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCU/4nIGRrbGh3fKfqUG5lBSWj4sLs7BomAA5/iJNOngPTrRwE2j9edU1IW53QqIB/XvPxm2/p5+bYtMMTjBXD+imw==@vger.kernel.org, AJvYcCVHBvlJPF69wQJrLI29PPI5avcaApjG9AlqhTLFEPzHipbItjFqkgeMwOKf52H3ExcZXO4rwwadaEs8@vger.kernel.org, AJvYcCVgQgKOxio5O6CEGiiFsPbIMX8HHp0rwpUPgHFECYWRHZJlsrunalwFkzpr/RqUkG8k6enjVaAneQqxu6rZ@vger.kernel.org, AJvYcCVpj2nxLH2Ocx3TJVYA3WxBMLn6Zyjn5nVORL82cXS2VqcsSjOcK17rv+W3EpQOtE/DUIQH73pjJxGo@vger.kernel.org, AJvYcCW7r+HxAZ94V7SnxSOZuF25B5VS/qgMYUYYZkw3l+h9hAcYspPtmbKdf5QIM5ZTjU+K6PYKIWxLNbGO1WC8@vger.kernel.org, AJvYcCWnj89cLq4UDpSVTsnQc0CeSQU6avwkubSZ6Fq02ILdogiS85IaE0+b8Y+31C7euDIXsSE=@vger.kernel.org, AJvYcCWnx1dX2weYGF3LZ2hgZ4LfD0EmZlGluFwMZm43Fnywg32fiqqiVMns604gn0hfr40HXhYtAPtTp5QJIw==@vger.kernel.org, AJvYcCWupMnXRcWfp77XHQviOgHVVj6sZCHyGs8GzsyFreayGMY1d2SqNzeQnBkCJF1hbzYvl25h6qWfFJw=@vger.kernel.org, AJvYcCXVR91nchlBpGtG38m1ufl3kVJoZSiCAKwTPPQpH09dl/hLTMbs78rJ5e/ovgq24kqkpqOn69j1SV7OlnAb2Y0=@vger.kernel.org, AJvYcCXnYcweb4CyvmNYsZQgBSFWtATkU1HvWQoID6SRBDGbgxp7topIHiOONqv5sQnhu87iBTnMG3HYWzOyAPRh@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxzc8oZ1zlQFg/X12ociZ3RcFG7M3WM4l/p9iaTi8/3BitDc1Ut
+	mjGrNFR4ZS5vRzDNfBYiDBFts4PfyJJH85g5A554V5lRplMTDLTbeFFnOHG50guQmOFoOAsz/bd
+	Pg6KoOwt/dD4RwOq4UBP8VJSdMOQ=
+X-Google-Smtp-Source: AGHT+IGSGW+uzmUjxyeIFaLft3PnZ2kaCaMuKqb2T+GLgytq3+U5XTQLxKYTu05fD4+Ir4Uuwo1LuIK4EgJ7mk97UG4=
+X-Received: by 2002:a05:6512:b9e:b0:539:8e20:105 with SMTP id
+ 2adb3069b0e04-5398e200266mr5005657e87.28.1727768396993; Tue, 01 Oct 2024
+ 00:39:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-01_04,2024-09-30_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
- clxscore=1015 lowpriorityscore=0 suspectscore=0 mlxlogscore=950
- bulkscore=0 phishscore=0 spamscore=0 adultscore=0 impostorscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2408220000 definitions=main-2410010048
+References: <20240925150059.3955569-30-ardb+git@google.com>
+ <20240925150059.3955569-54-ardb+git@google.com> <20241001071841.yrc7cxdp2unnzju7@treble>
+In-Reply-To: <20241001071841.yrc7cxdp2unnzju7@treble>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Tue, 1 Oct 2024 09:39:45 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXGA785Z2_AWuTTXPkvH9Mis=28rn_paOZe=gdaXjpu-=A@mail.gmail.com>
+Message-ID: <CAMj1kXGA785Z2_AWuTTXPkvH9Mis=28rn_paOZe=gdaXjpu-=A@mail.gmail.com>
+Subject: Re: [RFC PATCH 24/28] tools/objtool: Treat indirect ftrace calls as
+ direct calls
+To: Josh Poimboeuf <jpoimboe@kernel.org>
+Cc: Ard Biesheuvel <ardb+git@google.com>, linux-kernel@vger.kernel.org, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
+	Uros Bizjak <ubizjak@gmail.com>, Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, 
+	Christoph Lameter <cl@linux.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Juergen Gross <jgross@suse.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Masahiro Yamada <masahiroy@kernel.org>, Kees Cook <kees@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Keith Packard <keithp@keithp.com>, 
+	Justin Stitt <justinstitt@google.com>, Arnaldo Carvalho de Melo <acme@kernel.org>, 
+	Namhyung Kim <namhyung@kernel.org>, Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>, 
+	Adrian Hunter <adrian.hunter@intel.com>, Kan Liang <kan.liang@linux.intel.com>, 
+	linux-doc@vger.kernel.org, linux-pm@vger.kernel.org, kvm@vger.kernel.org, 
+	xen-devel@lists.xenproject.org, linux-efi@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-sparse@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+
+On Tue, 1 Oct 2024 at 09:18, Josh Poimboeuf <jpoimboe@kernel.org> wrote:
+>
+> On Wed, Sep 25, 2024 at 05:01:24PM +0200, Ard Biesheuvel wrote:
+> > +             if (insn->type == INSN_CALL_DYNAMIC) {
+> > +                     if (!reloc)
+> > +                             continue;
+> > +
+> > +                     /*
+> > +                      * GCC 13 and older on x86 will always emit the call to
+> > +                      * __fentry__ using a relaxable GOT-based symbol
+> > +                      * reference when operating in PIC mode, i.e.,
+> > +                      *
+> > +                      *   call   *0x0(%rip)
+> > +                      *             R_X86_64_GOTPCRELX  __fentry__-0x4
+> > +                      *
+> > +                      * where it is left up to the linker to relax this into
+> > +                      *
+> > +                      *   call   __fentry__
+> > +                      *   nop
+> > +                      *
+> > +                      * if __fentry__ turns out to be DSO local, which is
+> > +                      * always the case for vmlinux. Given that this
+> > +                      * relaxation is mandatory per the x86_64 psABI, these
+> > +                      * calls can simply be treated as direct calls.
+> > +                      */
+> > +                     if (arch_ftrace_match(reloc->sym->name)) {
+> > +                             insn->type = INSN_CALL;
+> > +                             add_call_dest(file, insn, reloc->sym, false);
+> > +                     }
+>
+> Can the compiler also do this for non-fentry direct calls?
+
+No, it is essentially an oversight in GCC that this happens at all,
+and I fixed it [0] for GCC 14, i.e., to honour -mdirect-extern-access
+when emitting these calls.
+
+But even without that, it is peculiar at the very least that the
+compiler would emit GOT based indirect calls at all.
+
+Instead of
+
+  call *__fentry__@GOTPCREL(%rip)
+
+it should simply emit
+
+  call __fentry__@PLT
+
+and leave it up to the linker to resolve this directly or
+lazily/eagerly via a PLT jump (assuming -fno-plt is not being used)
+
+> If so would
+> it make sense to generalize this by converting all
+> INSN_CALL_DYNAMIC+reloc to INSN_CALL?
+>
+> And maybe something similar for add_jump_destinations().
+>
+
+I suppose that the pattern INSN_CALL_DYNAMIC+reloc is unambiguous, and
+can therefore always be treated as INSN_CALL. But I don't anticipate
+any other occurrences here, and if they do exist, they indicate some
+other weirdness in the compiler, so perhaps it is better not to add
+general support for these.
 
 
-
-On 30/09/24 6:25 pm, Alexei Starovoitov wrote:
-> On Sun, Sep 29, 2024 at 10:33 PM Hari Bathini <hbathini@linux.ibm.com> wrote:
->>
->>
->>
->> On 17/09/24 1:20 pm, Alexei Starovoitov wrote:
->>> On Sun, Sep 15, 2024 at 10:58 PM Hari Bathini <hbathini@linux.ibm.com> wrote:
->>>>
->>>> +
->>>> +       /*
->>>> +        * Generated stack layout:
->>>> +        *
->>>> +        * func prev back chain         [ back chain        ]
->>>> +        *                              [                   ]
->>>> +        * bpf prog redzone/tailcallcnt [ ...               ] 64 bytes (64-bit powerpc)
->>>> +        *                              [                   ] --
->>> ...
->>>> +
->>>> +       /* Dummy frame size for proper unwind - includes 64-bytes red zone for 64-bit powerpc */
->>>> +       bpf_dummy_frame_size = STACK_FRAME_MIN_SIZE + 64;
->>>
->>> What is the goal of such a large "red zone" ?
->>> The kernel stack is a limited resource.
->>> Why reserve 64 bytes ?
->>> tail call cnt can probably be optional as well.
->>
->> Hi Alexei, thanks for reviewing.
->> FWIW, the redzone on ppc64 is 288 bytes. BPF JIT for ppc64 was using
->> a redzone of 80 bytes since tailcall support was introduced [1].
->> It came down to 64 bytes thanks to [2]. The red zone is being used
->> to save NVRs and tail call count when a stack is not setup. I do
->> agree that we should look at optimizing it further. Do you think
->> the optimization should go as part of PPC64 trampoline enablement
->> being done here or should that be taken up as a separate item, maybe?
-> 
-> The follow up is fine.
-> It just odd to me that we currently have:
-> 
-> [   unused red zone ] 208 bytes protected
-> 
-> I simply don't understand why we need to waste this much stack space.
-> Why can't it be zero today ?
-> 
-
-The ABI for ppc64 has a redzone of 288 bytes below the current
-stack pointer that can be used as a scratch area until a new
-stack frame is created. So, no wastage of stack space as such.
-It is just red zone that can be used before a new stack frame
-is created. The comment there is only to show how redzone is
-being used in ppc64 BPF JIT. I think the confusion is with the
-mention of "208 bytes" as protected. As not all of that scratch
-area is used, it mentions the remaining as unused. Essentially
-288 bytes below current stack pointer is protected from debuggers
-and interrupt code (red zone). Note that it should be 224 bytes
-of unused red zone instead of 208 bytes as red zone usage in
-ppc64 BPF JIT come down from 80 bytes to 64 bytes since [2].
-Hope that clears the misunderstanding..
-
->> [1]
->> https://lore.kernel.org/all/40b65ab2bb3a48837ab047a70887de3ccd70c56b.1474661927.git.naveen.n.rao@linux.vnet.ibm.com/
->> [2] https://lore.kernel.org/all/20180503230824.3462-11-daniel@iogearbox.net/
->>
-
-Thanks
-Hari
+[0] https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=bde21de1205c0456f6df68c950fb7ee631fcfa93
