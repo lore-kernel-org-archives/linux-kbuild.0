@@ -1,21 +1,21 @@
 Received: from smtp.domeneshop.no (smtp.domeneshop.no [194.63.252.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6EEA1B4F21;
-	Fri,  4 Oct 2024 18:51:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58D3B1F891E;
+	Fri,  4 Oct 2024 19:02:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.63.252.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728067915; cv=none; b=K4oLUY3w3qMISwBdgHzggAzdF7UAiROzxI8oWwcNz1ohwwKOrPLdv3WDnTWnWhOfx/PGwDIX66dX8LfhK48+smvI9TiBl+G+Bn87H8jxtOeO+h0AZF+g2mOBowocOcatdIfRxCoZYiqU5+cNXRc4NIudK5ETryQoxxEUnKJpgbc=
+	t=1728068560; cv=none; b=ZJMGEHMrwcfbKpf1g+zrThvLm+aqsiX+9Tw1tCh0DNBXsonWupW7jUHOXQVWgetd8mDu3BKPi9otB8Og/35ahfi2HfZh5/RtqfXepLGEXKSUo6qratfqpJaQ84tHhf+T6zTmwe2jxQCwd4g9TBp9+UxksiYwsaKqnTrh1iAfc5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728067915; c=relaxed/simple;
-	bh=pWuFZrwN4wtkilryw/UMy9cLsTNLyiM1dKKnNINkga0=;
+	s=arc-20240116; t=1728068560; c=relaxed/simple;
+	bh=8cPfv1CMzvFTyW1STkPhWYztPeK4NqLJWODU2BD8IEw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hCYFq1w/HFHnfylmkj1EjN0yFItoHYMmtz0Sqzswwy64B5Hx25qkgcfDBbuZuhYOjnBqnhQgR6pYfSDlgqtFg6Q3fubwdnUEFQeBaG8RxlVmq5h5Egma8Jk/h6bZEU6RziDMQAP9Kr3SXlJg8GHl+GY2j40uldBfye++Nb7Glr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fjasle.eu; spf=pass smtp.mailfrom=fjasle.eu; dkim=pass (2048-bit key) header.d=fjasle.eu header.i=@fjasle.eu header.b=pHPqcg5S; arc=none smtp.client-ip=194.63.252.55
+	 Content-Type:Content-Disposition:In-Reply-To; b=amBe0M7nVxYTBimmkga0tLcEUNLWJ3pm1skU0+OcHpcN8K9FsutJS3j2Rx57TTstmfb9gNZ1u37H92iKufvfBb+mTf+aB6qYMPYxAv9XXLoK3j8DFoYl8UH4+KayIFGDZVc20p6GahS52vO4cXmg6IJmgEXWemZWZXiF2OlAkQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fjasle.eu; spf=pass smtp.mailfrom=fjasle.eu; dkim=pass (2048-bit key) header.d=fjasle.eu header.i=@fjasle.eu header.b=BLPC8FrP; arc=none smtp.client-ip=194.63.252.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fjasle.eu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fjasle.eu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fjasle.eu header.i=@fjasle.eu header.b="pHPqcg5S"
+	dkim=pass (2048-bit key) header.d=fjasle.eu header.i=@fjasle.eu header.b="BLPC8FrP"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=fjasle.eu;
 	s=ds202307; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:
@@ -23,29 +23,29 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=fjasle.eu;
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
 	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=+QJWjJSXtNottcZdqX67V05rKODxR7ykGq3H14xUESc=; b=pHPqcg5S/RCjSaVyJgnDXzKNVQ
-	w3IlDkCcuHjavGSu/y90BWIaUwZI80S0uS39BULxJkGJZuSyJphiEv1UcnjYA9cSR0amvX4t5Oz5l
-	niNYzpees2PCyJFOo3jjp/9vbm1aga5Xo7CTuA8AzEGVhLb9twrLYgvgHR31RTp+koSiDdH/VL8LV
-	EQdyW0P3cEmk/sfj+sxxa+Inbyjra6lb8M6bZ9CTXQ1hX1z/1Q9j1Tp762M1lXS/UeUnOFIGdXLej
-	WA96GF8PF30nkL74XVyY+u/pWi+9u6MVEqCpe7NIPuKgU96KbFUkg8CfzaO5PbpP/pyTCBCzm6SOw
-	wFhlExdw==;
-Received: from [2001:9e8:9c9:1501:3235:adff:fed0:37e6] (port=55002 helo=lindesnes.fjasle.eu)
+	bh=ivQY6V/u0jBvC6PqC9zx+ri2q1Em0IGwsgDgYmQ9PlQ=; b=BLPC8FrPnzm5nF+tH3QUqt1EHj
+	h5x5/F7MhWDL+JcW0KwnaTBfpnMymP2ZiPEffJ+LgkP32NkeQnxqo9voz5pIC1bBWcQqU8LGRdnNY
+	STeAhM5sgBXgJtRiIEdx8rS0nSxlw8TrrNY7LWdOkUqntHkNbIFxFN2ESMXKmICFckNJpgy5OJa2i
+	nbf0FinfPQGdJ32OtR5wj6WBgyruUshAznxTyAUZmtLTVMj8Zsc8ZSUOyfu/5qCx3SaEkCyeUcixn
+	TmnHJ2N649IAjScSxIabYc3eEw31Q7VSp+2J4Ht05+dYp3f2lf9qy9LdA0k3gIILspmjNMJoRmPtD
+	lRMsG8hw==;
+Received: from [2001:9e8:9c9:1501:3235:adff:fed0:37e6] (port=57150 helo=lindesnes.fjasle.eu)
 	by smtp.domeneshop.no with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <nicolas@fjasle.eu>)
-	id 1swnOw-00Cmid-Dj;
-	Fri, 04 Oct 2024 20:51:42 +0200
-Date: Fri, 4 Oct 2024 20:51:38 +0200
+	id 1swnZK-00Cp6k-Rm;
+	Fri, 04 Oct 2024 21:02:26 +0200
+Date: Fri, 4 Oct 2024 21:02:21 +0200
 From: Nicolas Schier <nicolas@fjasle.eu>
 To: Masahiro Yamada <masahiroy@kernel.org>
 Cc: linux-kbuild@vger.kernel.org, Miguel Ojeda <ojeda@kernel.org>,
 	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Nathan Chancellor <nathan@kernel.org>
-Subject: Re: [PATCH 20/23] kbuild: support -fmacro-prefix-map for external
- modules
-Message-ID: <20241004-xanthic-shrew-of-trust-0f9e1d@lindesnes>
+Subject: Re: [PATCH 21/23] kbuild: use absolute path in the generated wrapper
+ Makefile
+Message-ID: <20241004-impressive-chowchow-of-charisma-9c5e6b@lindesnes>
 References: <20240917141725.466514-1-masahiroy@kernel.org>
- <20240917141725.466514-21-masahiroy@kernel.org>
+ <20240917141725.466514-22-masahiroy@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -54,21 +54,16 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240917141725.466514-21-masahiroy@kernel.org>
+In-Reply-To: <20240917141725.466514-22-masahiroy@kernel.org>
 
-On Tue, Sep 17, 2024 at 11:16:48PM +0900, Masahiro Yamada wrote:
-> This commit makes -fmacro-prefix-map work for external modules built in
-> a separate output directory. It improves the reproducibility of external
-> modules and provides the benefits described in commit a73619a845d5
-> ("kbuild: use -fmacro-prefix-map to make __FILE__ a relative path").
-> 
-> When VPATH is not defined (e.g., when the kernel or external module is
-> built in the source directory), this option is unnecessary.
+On Tue, Sep 17, 2024 at 11:16:49PM +0900, Masahiro Yamada wrote:
+> Keep the consistent behavior when this Makefile is invoked from another
+> directory.
 > 
 > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 > ---
 > 
->  Makefile | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
+>  Makefile | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 
 Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
