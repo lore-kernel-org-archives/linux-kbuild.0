@@ -1,156 +1,115 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2FC61F81B7;
-	Tue, 15 Oct 2024 23:19:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F3A1FC7D1
+	for <linux-kbuild@vger.kernel.org>; Tue, 15 Oct 2024 23:19:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729034398; cv=none; b=mVybWAvK1YqOP5iWoJ03E3FouD+RXxH0DWSEYEms1nXVEflhNIxdghLkP45nqwhlt3VOFyYZtXwY9tZ1YstrqQUtFrbiZQ+Mo/3zjEn+GUe8TEOrYk8LJ/1E49iU4GOtPsPHNuUGiwm0jpaBBuBDCVmWD2oxz71enDLpcFN5Tmk=
+	t=1729034398; cv=none; b=a2k7he0jgv2j2vOOG7wN4jWaiQXQbIEd7ydKuaTDCMwav/tnKsT1Aghk85fxTMDkZjZuMV8QmIHAjCg3kvQq6i3NJDxcEug5/EGXhmTh8NaXgRB9ypmFT0K/KlyMSFn0uOh2HAh/tdKDfB2sJ2C2vTDX3cLdYWTCeVPfpUw+tek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1729034398; c=relaxed/simple;
-	bh=iTwuUkf7APiW5yFPUkq/Cuo9QkvbM0O8tE08zTPSqu8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MB2jmTjUlL1SPkyodwU3NWhktWOzIUXMIr5d8qk57zmcuY4ZonmYPP58KLmxhE+HpQJA07r49h596B0fMCGeisimP3jPt1lGUELe8km2rBTp9uGJXK9NE5+QAD1MADLRkAsI9xp05ui2KStX4YuzrcJ+Zq/sPY++lBMpZ6yRBVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BE5BC4CECF;
-	Tue, 15 Oct 2024 23:19:57 +0000 (UTC)
-Date: Tue, 15 Oct 2024 19:20:17 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: David Hunter <david.hunter.linux@gmail.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org,
- linux-kernel@vger.kernel.org, shuah@kernel.org,
- javier.carrasco.cruz@gmail.com
-Subject: Re: [PATCH v2 6/7] streamline_config.pl: process config options set
- to "y"
-Message-ID: <20241015192017.173d316e@gandalf.local.home>
-In-Reply-To: <20241014141345.5680-7-david.hunter.linux@gmail.com>
-References: <20241014141345.5680-1-david.hunter.linux@gmail.com>
-	<20241014141345.5680-7-david.hunter.linux@gmail.com>
-X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	bh=b/Bd5hNVwONQMAMAKZObOat4jqHFnL5FtBWQng4HuQc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=uOUTGSFkANOVu0VXocsQftHdHU8Ikk6vzhI87zeLaPTe/MfjEVRmGeTe5665q2ObcN3/7NfGuP8Ttoq75yLHihuYcRKTB3TyOFRxYNyT2+EMlezJ6ejhMolnGgpTJLIyumE8gs72MTViB6+4Dq4BGs6hjporzffSQAI2dT7YBfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--mmaurer.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=N1dO/cYJ; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--mmaurer.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="N1dO/cYJ"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e2904d0cad0so9007135276.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 15 Oct 2024 16:19:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1729034396; x=1729639196; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GMeFuBGaCaHx7HaM28eyKlSyRMkG/ZUOc3U36euZD88=;
+        b=N1dO/cYJgyXeHSEkWZ8PHaXrwa/kRuKQYlwroncJFvpb+qGuZlcqMJw7yzLeY03SXD
+         Tf3MIpwjEaL7rtuiH2HoEPdISP63RqtNsmBauP0fjZ2ytZWbuvDpD+XpeuwdZb7Vel4m
+         rwDhDnugNGydsQ1jb9+y0lEiDpgyAVIil/SrHktcGNRXQXh9H2ygeeMx7bECNdUZQcIj
+         Z7/PWE5YWKimlu0XXydjHhLEDV8BRzdbczjknmDR/oFRbo29BvVQpWyMRCP1FD/p+JoX
+         38hchTAzzXjhve1pzxwljmTVZxAabLdBO5rZo8/VNAbjcLY+ffYEL/sMO1vvBnP7+C1y
+         Krjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729034396; x=1729639196;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GMeFuBGaCaHx7HaM28eyKlSyRMkG/ZUOc3U36euZD88=;
+        b=EUxOx+tdi2MtrI57sw6xblc+e9dO8ECieVbfuUJMVXfIWpv4MKcdaAqxReD9aaNX1N
+         mgazImI4Cfz5pUiD5R+FK/qZ4Xal5bPg5vp/JG/Gfr7fPkUR5KthnfD/Ghli1gQptoA1
+         NEzghCD5O1MdjO4BvaBaNUI4sByqaIg6Ik04Qu0jQxZ0o5Y/2z894rewMGGzXONWNG1M
+         DyU9QpRFX1FcSN+KswFskuOpFAJRPuN2BpLF2mSxMUWyqeQ2XzZ8PctDCTkDswDQLbKW
+         dzilTnIPOEoJdlg8e4x552PHNL7+jA4HezVjmiRfiwvi25CLDBrHGgHvq6Odsi7p6q71
+         qm+w==
+X-Forwarded-Encrypted: i=1; AJvYcCV0E0FCIb0G7PdWGvXt6e3GwuDrdw+a+a+gjw8l7DivPlfb+sfAR5aV4meC6t1lHKSe4fzsUvux8I0s8Cw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkG6JodibC4oKEUrs81Qg4FOiclyOV6BAqmrp/o8hqwfF/d3Nx
+	PjVWsEykCb3XyKUGLjg0SmlIpX0/wKcgEvQPHorvhIl29Vk/Br9Je1ISQTCZGbbelDqodM6QIr9
+	CGjF+Kw==
+X-Google-Smtp-Source: AGHT+IHJ/PD4IZdXpfLT+phmwcv6QqIW8I80B2uJZiw7eFoWOINWL5PmPprPbPx3sBWJLPoXxBjkxCvK2VhZ
+X-Received: from anyblade.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1791])
+ (user=mmaurer job=sendgmr) by 2002:a5b:341:0:b0:e29:68a9:8612 with SMTP id
+ 3f1490d57ef6-e29782f4017mr1762276.4.1729034396326; Tue, 15 Oct 2024 16:19:56
+ -0700 (PDT)
+Date: Tue, 15 Oct 2024 23:18:58 +0000
+In-Reply-To: <20241015231925.3854230-1-mmaurer@google.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20241015231925.3854230-1-mmaurer@google.com>
+X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
+Message-ID: <20241015231925.3854230-4-mmaurer@google.com>
+Subject: [PATCH v6 3/5] export_report: Tolerate additional `.mod.c` content
+From: Matthew Maurer <mmaurer@google.com>
+To: masahiroy@kernel.org, ndesaulniers@google.com, ojeda@kernel.org, 
+	gary@garyguo.net, mcgrof@kernel.org, Alex Gaynor <alex.gaynor@gmail.com>
+Cc: rust-for-linux@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, neal@gompa.dev, marcan@marcan.st, j@jannau.net, 
+	asahi@lists.linux.dev, linux-modules@vger.kernel.org, samitolvanen@google.com, 
+	Matthew Maurer <mmaurer@google.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	"=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?=" <bjorn3_gh@protonmail.com>, Benno Lossin <benno.lossin@proton.me>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	Trevor Gross <tmgross@umich.edu>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 14 Oct 2024 10:13:36 -0400
-David Hunter <david.hunter.linux@gmail.com> wrote:
+Currently, `export_report.pl` will error out if it sees a hex number not
+in the context of the original `__versions` array. This adds a
+"finished" state so that it does not attempt to parse content past the
+end of the array, and requires the array to be terminated.
 
-> An assumption made in this script is that the config options do not need
-> to be processed because they will simply be in the new config file. This
-> assumption is incorrect.
-> 
-> Process the config entries set to "y" because those config entries might
-> have dependencies set to "m". If a config entry is set to "m" and is not
-> loaded directly into the machine, the script will currently turn off
-> that config entry; however, if that turned off config entry is a
-> dependency for a "y" option. that means the config entry set to "y"
-> will also be turned off later when the conf executive file is called.
-> 
-> Here is a model of the problem (arrows show dependency):
-> 
-> Original config file
-> Config_1 (m) <-- Config_2 (y)
-> 
-> Config_1 is not loaded in this example, so it is turned off.
-> After scripts/kconfig/streamline_config.pl, but before scripts/kconfig/conf
-> Config_1 (n) <-- Config_2 (y)
-> 
-> After  scripts/kconfig/conf
-> Config_1 (n) <-- Config_2 (n)
+This is prepwork for the subsequent extended modversions information,
+which would not be parseable otherwise.
 
-Hmm, can you show the example of this. My worry here is that there are a
-lot of cases that have:
+Signed-off-by: Matthew Maurer <mmaurer@google.com>
+---
+ scripts/export_report.pl | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
- Config_1 (m) <-- Config_2 (y)
-
-Where Config_2 is just some binary option to modify the module set by
-Config_1. If we keep Config_1 because there's some 'y' that selects it, we
-are going to keep a lot of unused modules around.
-
-> 
-> It should also be noted that any module in the dependency chain will
-> also be turned off, even if that module is loaded directly onto the
-> computer. Here is an example:
-> 
-> Original config file
-> Config_1 (m) <-- Config_2 (y) <-- Config_3 (m)
-
-If Config_3 is used, then it should add Config_2 as a dependency. I guess
-that's what this patch does.
-
-> 
-> Config_3 will be loaded in this example.
-> After scripts/kconfig/streamline_config.pl, but before scripts/kconfig/conf
-> Config_1 (n) <-- Config_2 (y) <-- Config_3 (m)
-> 
-> After scripts/kconfig/conf
-> Config_1 (n) <-- Config_2 (n) <-- Config_3 (n)
-> 
-> Signed-off-by: David Hunter <david.hunter.linux@gmail.com>
-> ---
-> V1 https://lore.kernel.org/all/20240913171205.22126-8-david.hunter.linux@gmail.com/
-> 
-> V2
->         - change subject
->         - changed part of the code that only processed config options 
->           set to "m" so that config options set to "y" are processed. I
->           forgot to put this in v1 when making the series patch.
->         - removed an unneccessary condition that would have skipped a
->           dependency loop.
-> ---
->  scripts/kconfig/streamline_config.pl | 15 +++++++--------
->  1 file changed, 7 insertions(+), 8 deletions(-)
-> 
-> diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-> index 4149c4b344db..c3b434220c9f 100755
-> --- a/scripts/kconfig/streamline_config.pl
-> +++ b/scripts/kconfig/streamline_config.pl
-> @@ -473,6 +473,11 @@ foreach my $line (@config_file) {
->  
->      if (/(CONFIG_[$valid]*)=(m|y)/) {
->  	$orig_configs{$1} = $2;
-> +	# all configs options set to 'y' need to be processed
-> +	if ($2 eq "y") {
-> +            $configs{$1}= $2;
-> +        }
-> +
->      }
->  }
->  
-> @@ -499,8 +504,8 @@ sub parse_config_depends
->  
->  	    $p =~ s/^[^$valid]*[$valid]+//;
->  
-> -	    # We only need to process if the depend config is a module
-> -	    if (!defined($orig_configs{$conf}) || $orig_configs{$conf} eq "y") {
-> +	    # Make sure that this config exists in the current .config file
-> +	    if (!defined($orig_configs{$conf})) {
->  		next;
->  	    }
->  
-> @@ -600,12 +605,6 @@ sub loop_depend {
->  
->        forloop:
->  	foreach my $config (keys %configs) {
-> -
-> -	    # If this config is not a module, we do not need to process it
-> -	    if (defined($orig_configs{$config}) && $orig_configs{$config} ne "m") {
-> -		next forloop;
-> -	    }
-> -
-
-OK, and I guess you tests show this doesn't have any other issues. I'll check it out.
-
-Thanks,
-
--- Steve
-
-
->  	    $config =~ s/^CONFIG_//;
->  	    $depconfig = $config;
->  
+diff --git a/scripts/export_report.pl b/scripts/export_report.pl
+index 30b5f7819086..dcef915405f3 100755
+--- a/scripts/export_report.pl
++++ b/scripts/export_report.pl
+@@ -125,6 +125,10 @@ foreach my $thismod (@allcfiles) {
+ 			next;
+ 		}
+ 		if ($state == 2) {
++			if ( $_ =~ /};/ ) {
++				$state = 3;
++				next;
++			}
+ 			if ( $_ !~ /0x[0-9a-f]+,/ ) {
+ 				next;
+ 			}
+@@ -134,7 +138,7 @@ foreach my $thismod (@allcfiles) {
+ 			push(@{$MODULE{$thismod}} , $sym);
+ 		}
+ 	}
+-	if ($state != 2) {
++	if ($state != 3) {
+ 		warn "WARNING:$thismod is not built with CONFIG_MODVERSIONS enabled\n";
+ 		$modversion_warnings++;
+ 	}
+-- 
+2.47.0.rc1.288.g06298d1525-goog
 
