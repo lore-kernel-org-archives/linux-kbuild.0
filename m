@@ -1,199 +1,130 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8178A145B2C;
-	Tue, 29 Oct 2024 06:45:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DBE12AE7F;
+	Tue, 29 Oct 2024 14:49:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730184340; cv=none; b=JqLA0zh/do9Clnp8VJ51hqgdIoZdqxNluARnxtIVNbkQFT8BI7yHTyR1DJ1Vayuvxc6SjwENkZ2agc+Q9KtwnYllKU5yd6DV7Sa0saZ/4CMwEo/O2iJtgwj5H/wQsvkSFzZodkU7Z3NuG6Aja0FnTh9z67D5LHik1tFNHyVpJtQ=
+	t=1730213395; cv=none; b=rqfdKU6nvZh34qI4hzUWa6zcQJDFIgNPPiwuJGL/ans2B8MWhgd4XA5jGvmFVH611lVnWCdkMKjRMao1tXjTIa6k/JzGRD/0CsMNk24ez97Xy8Pa7L4nv7rBbLkWJR/b08Y9E7HaHKJuUcGxqCLhQbhbkeITRwmL9UGfR9vsJ6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730184340; c=relaxed/simple;
-	bh=1DrL+8jrbRz5TXvELVZ3R7u/AfvuuYFORhxgcZBZzpM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lejOKsxJN8IxTusLLsB9HRBf42Ys3hQveS/vQtsfU9uwupGAGXY8fxVa83V++8j/t92Jd5H6zHoDH0Lu88LO4oObwa4Eg2gCCEDX1t5rxHH04Z4qxB5M1CKS16zv99K+s+tDlJkpcPl1To/tq6TREOOq4SskzQpId8xpz1uFSdY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=iJAGDJX0; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1730213395; c=relaxed/simple;
+	bh=DNai7oJ0zOfmdmuloM/IxFLitC4QWuuzG9CMmFEr1rI=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=V/+DUqoDpD9GpIqzaUz0Gn3G0DhFrjYNA2OT0XWtUMn22hPLATysN+CS3w/IUcceB4mTJeUQaB7vAQhs7twPF1fr5CT7sNH2lUJkn1Vp93nNUWzMhF3FYwCFdyDYQ+Y+0fTn2JVbF7RRzy5rhro51ufqPspcWiLuUS8u/880XXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UzaD8BdS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="iJAGDJX0"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49T25Ta3007263;
-	Tue, 29 Oct 2024 06:44:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=wpMMtU
-	T/7iLSb1CPes2U6yH2Knc2kYorBmqmySojMfw=; b=iJAGDJX0zp7I8wnDmOxnwR
-	nsM832ucdpVHkqQlx2nmn3aDhYFrvERJXw+QFNKGd0H1UhMEw6AIZDhCEjEexTAI
-	guKsHOoqJguJX/7T0/zQZAK+VWxiqz9f3CchJR+AXAmbWu3MJQC581JSC2+woml5
-	wu4gC23D4KkJH74McGOquG3CMMc2mmS+7vem9H1FJ2TbLKQmXSvskdWJa/iu90p4
-	0kpLJ8LHaYEpm2681wNPdpOFRtuVAAYCFr/xX16m5/yk5yQhxw+p8EF+TdfG3nR3
-	9ObEqtjhVEPKZWfz9X5implw3U26UFo9ZQNNGrlLtysJVwIYYNIg8BUynlDR1Gng
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42jb65bm7n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 29 Oct 2024 06:44:40 +0000 (GMT)
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49T6idbf015515;
-	Tue, 29 Oct 2024 06:44:39 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42jb65bm7h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 29 Oct 2024 06:44:39 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49T55BI6017313;
-	Tue, 29 Oct 2024 06:44:38 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 42harsa1gc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 29 Oct 2024 06:44:38 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49T6iZ7M40370472
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 29 Oct 2024 06:44:35 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4555820043;
-	Tue, 29 Oct 2024 06:44:35 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BBCF820040;
-	Tue, 29 Oct 2024 06:44:31 +0000 (GMT)
-Received: from [9.203.115.143] (unknown [9.203.115.143])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 29 Oct 2024 06:44:31 +0000 (GMT)
-Message-ID: <841804f7-d634-4d8c-8585-04a2e4ea40f0@linux.ibm.com>
-Date: Tue, 29 Oct 2024 12:14:30 +0530
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UzaD8BdS"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 444C1C4CECD;
+	Tue, 29 Oct 2024 14:49:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730213395;
+	bh=DNai7oJ0zOfmdmuloM/IxFLitC4QWuuzG9CMmFEr1rI=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=UzaD8BdSY2kirnhryrwYlV/+AIMOBQs5wzu7xVHb8n8ft/2jzbQ5g8w4h8jrXSSUD
+	 vVtZRwVpCD1xQ2t3dMtfKi2J5N0cPQtr8C14a5U7T3FiyIWXQTVQIY74yqH8KQb4LH
+	 UnH5MGmfJGWCwFYSebC+iAN5JPEJNgR1HEij+vNCaAxFol+PEd+/fKR6IRTXj/j8KN
+	 PGmQvDcS45J+zsEfZI2pVrMJdrXpTK7l4b9BBQ6wnSYfIvO8wNAQp2wuMKS5zuZVvX
+	 jTSHP//MLDxT90jHA2TfWCpeOHBM5q5KK7qrg3m+U0Bcn5GWQN71O/oXeVhGSDZIXo
+	 LNilrz8CBZJtw==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DE22D3A662;
+	Tue, 29 Oct 2024 14:49:55 +0000 (UTC)
+From: Koakuma via B4 Relay <devnull+koachan.protonmail.com@kernel.org>
+Date: Tue, 29 Oct 2024 21:49:07 +0700
+Subject: [PATCH v3 1/2] sparc/build: Put usage of -fcall-used* flags behind
+ cc-option
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 17/17] powerpc64/bpf: Add support for bpf trampolines
-To: Michael Ellerman <mpe@ellerman.id.au>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, bpf@vger.kernel.org,
-        linux-trace-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc: "Naveen N. Rao" <naveen@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Vishal Chourasia <vishalc@linux.ibm.com>,
-        Mahesh J Salgaonkar <mahesh@linux.ibm.com>
-References: <20241018173632.277333-1-hbathini@linux.ibm.com>
- <20241018173632.277333-18-hbathini@linux.ibm.com>
- <87wmhtrmni.fsf@mpe.ellerman.id.au>
-Content-Language: en-US
-From: Hari Bathini <hbathini@linux.ibm.com>
-In-Reply-To: <87wmhtrmni.fsf@mpe.ellerman.id.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: -iB9zBHmU6GGaR0CrGda44FqrDjFKDqK
-X-Proofpoint-GUID: 57WHYjnIt4dw8lVBHWWBue558w_N7zEI
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- clxscore=1015 adultscore=0 phishscore=0 bulkscore=0 mlxlogscore=999
- impostorscore=0 spamscore=0 suspectscore=0 mlxscore=0 malwarescore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410290052
+Message-Id: <20241029-sparc-cflags-v3-1-b28745a6bd71@protonmail.com>
+References: <20241029-sparc-cflags-v3-0-b28745a6bd71@protonmail.com>
+In-Reply-To: <20241029-sparc-cflags-v3-0-b28745a6bd71@protonmail.com>
+To: "David S. Miller" <davem@davemloft.net>, 
+ Andreas Larsson <andreas@gaisler.com>, 
+ Nathan Chancellor <nathan@kernel.org>, 
+ Nick Desaulniers <ndesaulniers@google.com>, 
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+ glaubitz@physik.fu-berlin.de, Masahiro Yamada <masahiroy@kernel.org>, 
+ Nicolas Schier <nicolas@fjasle.eu>, Jonathan Corbet <corbet@lwn.net>
+Cc: sparclinux@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ llvm@lists.linux.dev, linux-kbuild@vger.kernel.org, 
+ linux-doc@vger.kernel.org, Koakuma <koachan@protonmail.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1730213393; l=2721;
+ i=koachan@protonmail.com; s=20240620; h=from:subject:message-id;
+ bh=j/K37+Baat6IoHsWFp39+kRW4co5mJJ6tRxT2CAjvfU=;
+ b=+hjWwxlr7VTHDpLFtlamCVvHi/a0OH/j3VFREyh7jZVAPzEJmwLiEHi3HSeUjllvhM20Uemvd
+ cTmir13kw+QD1TCZxCUMeECwfkCF9MB/AMaGO9DaYbHRCEeue6Hqnjs
+X-Developer-Key: i=koachan@protonmail.com; a=ed25519;
+ pk=UA59FS3yiAA1cnAAUZ1rehTmr6skh95PgkNRBLcoKCg=
+X-Endpoint-Received: by B4 Relay for koachan@protonmail.com/20240620 with
+ auth_id=174
+X-Original-From: Koakuma <koachan@protonmail.com>
+Reply-To: koachan@protonmail.com
 
+From: Koakuma <koachan@protonmail.com>
 
+Place -fcall-used* flags behind cc-option so that clang (which doesn't
+support them) can still compile the kernel.
 
-On 28/10/24 7:53 am, Michael Ellerman wrote:
-> Hari Bathini <hbathini@linux.ibm.com> writes:
->> From: Naveen N Rao <naveen@kernel.org>
->>
->> Add support for bpf_arch_text_poke() and arch_prepare_bpf_trampoline()
->> for 64-bit powerpc. While the code is generic, BPF trampolines are only
->> enabled on 64-bit powerpc. 32-bit powerpc will need testing and some
->> updates.
-> 
-> Hi Hari,
-> 
-> This is breaking the PCREL build for me:
-> 
->    ERROR: 11:49:18: Failed building ppc64le_defconfig+pcrel@fedora
->    INFO: 11:49:18: (skipped 41 lines) ...
->    INFO: 11:49:18: /linux/arch/powerpc/net/bpf_jit.h:90:9: note: in expansion of macro 'EMIT'
->       90 |         EMIT(PPC_RAW_LD(_R2, _R13, offsetof(struct paca_struct, kernel_toc)))
->          |         ^~~~
->    /linux/arch/powerpc/include/asm/ppc-opcode.h:473:88: note: in expansion of macro 'IMM_DS'
->      473 | #define PPC_RAW_LD(r, base, i)          (0xe8000000 | ___PPC_RT(r) | ___PPC_RA(base) | IMM_DS(i))
->          |                                                                                        ^~~~~~
->    /linux/arch/powerpc/net/bpf_jit.h:90:14: note: in expansion of macro 'PPC_RAW_LD'
->       90 |         EMIT(PPC_RAW_LD(_R2, _R13, offsetof(struct paca_struct, kernel_toc)))
->          |              ^~~~~~~~~~
->    /linux/arch/powerpc/net/bpf_jit.h:90:36: note: in expansion of macro 'offsetof'
->       90 |         EMIT(PPC_RAW_LD(_R2, _R13, offsetof(struct paca_struct, kernel_toc)))
->          |                                    ^~~~~~~~
->    /linux/arch/powerpc/net/bpf_jit_comp.c:791:17: note: in expansion of macro 'PPC64_LOAD_PACA'
->      791 |                 PPC64_LOAD_PACA();
->          |                 ^~~~~~~~~~~~~~~
->    /linux/arch/powerpc/net/bpf_jit.h:90:65: error: 'struct paca_struct' has no member named 'kernel_toc'; did you mean 'kernel_msr'?
->       90 |         EMIT(PPC_RAW_LD(_R2, _R13, offsetof(struct paca_struct, kernel_toc)))
->          |                                                                 ^~~~~~~~~~
->    /linux/arch/powerpc/net/bpf_jit.h:29:34: note: in definition of macro 'PLANT_INSTR'
->       29 |         do { if (d) { (d)[idx] = instr; } idx++; } while (0)
->          |                                  ^~~~~
->    /linux/arch/powerpc/net/bpf_jit.h:90:9: note: in expansion of macro 'EMIT'
->       90 |         EMIT(PPC_RAW_LD(_R2, _R13, offsetof(struct paca_struct, kernel_toc)))
->          |         ^~~~
->    /linux/arch/powerpc/include/asm/ppc-opcode.h:473:88: note: in expansion of macro 'IMM_DS'
->      473 | #define PPC_RAW_LD(r, base, i)          (0xe8000000 | ___PPC_RT(r) | ___PPC_RA(base) | IMM_DS(i))
->          |                                                                                        ^~~~~~
->    /linux/arch/powerpc/net/bpf_jit.h:90:14: note: in expansion of macro 'PPC_RAW_LD'
->       90 |         EMIT(PPC_RAW_LD(_R2, _R13, offsetof(struct paca_struct, kernel_toc)))
->          |              ^~~~~~~~~~
->    /linux/arch/powerpc/net/bpf_jit.h:90:36: note: in expansion of macro 'offsetof'
->       90 |         EMIT(PPC_RAW_LD(_R2, _R13, offsetof(struct paca_struct, kernel_toc)))
->          |                                    ^~~~~~~~
->    /linux/arch/powerpc/net/bpf_jit_comp.c:882:25: note: in expansion of macro 'PPC64_LOAD_PACA'
->      882 |                         PPC64_LOAD_PACA();
->          |                         ^~~~~~~~~~~~~~~
->    make[5]: *** [/linux/scripts/Makefile.build:229: arch/powerpc/net/bpf_jit_comp.o] Error 1
-> 
-> 
-> To test it you need to enable CONFIG_POWER10_CPU, eg:
-> 
->    CONFIG_POWERPC64_CPU=n
->    CONFIG_POWER10_CPU=y
->    CONFIG_PPC_KERNEL_PCREL=y
-> 
-> This diff gets it building, but I haven't tested it actually works:
+This is a safe change, the reasoning is as follows:
 
-Thanks, Michael. Yeah, the below snippet will be sufficient as
-PPC64_LOAD_PACA() is used with !IS_ENABLED(CONFIG_PPC_KERNEL_PCREL)
+In the (normal) 32-bit ABI, %g5 and %g7 is normally reserved, and in
+the 64-bit ABI, %g7 is the reserved one.
+Linux turns them into volatile registers by the way of -fcall-used-*,
+but on the other hand, omitting the flags shouldn't be harmful;
+compilers will now simply refuse to touch them, and any assembly
+code that happens to touch them would still work like usual (because
+Linux' conventions already treats them as volatile anyway).
 
-- Hari
+Signed-off-by: Koakuma <koachan@protonmail.com>
+---
+ arch/sparc/Makefile      | 4 ++--
+ arch/sparc/vdso/Makefile | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-> diff --git a/arch/powerpc/net/bpf_jit.h b/arch/powerpc/net/bpf_jit.h
-> index 2d04ce5a23da..af6ff3eb621a 100644
-> --- a/arch/powerpc/net/bpf_jit.h
-> +++ b/arch/powerpc/net/bpf_jit.h
-> @@ -86,9 +86,14 @@
->                                                          0xffff));             \
->                  } } while (0)
->   #define PPC_LI_ADDR    PPC_LI64
-> +
-> +#ifndef CONFIG_PPC_KERNEL_PCREL
->   #define PPC64_LOAD_PACA()                                                    \
->          EMIT(PPC_RAW_LD(_R2, _R13, offsetof(struct paca_struct, kernel_toc)))
->   #else
-> +#define PPC64_LOAD_PACA() do {} while (0)
-> +#endif
-> +#else
->   #define PPC_LI64(d, i) BUILD_BUG()
->   #define PPC_LI_ADDR    PPC_LI32
->   #define PPC64_LOAD_PACA() BUILD_BUG()
-> 
-> cheers
-> 
+diff --git a/arch/sparc/Makefile b/arch/sparc/Makefile
+index 757451c3ea1df63b948e68a45988c78f5974f9ea..0400078076e588be93a702d1c64eb9fd34466075 100644
+--- a/arch/sparc/Makefile
++++ b/arch/sparc/Makefile
+@@ -29,7 +29,7 @@ UTS_MACHINE    := sparc
+ # versions of gcc.  Some gcc versions won't pass -Av8 to binutils when you
+ # give -mcpu=v8.  This silently worked with older bintutils versions but
+ # does not any more.
+-KBUILD_CFLAGS  += -m32 -mcpu=v8 -pipe -mno-fpu -fcall-used-g5 -fcall-used-g7
++KBUILD_CFLAGS  += -m32 -mcpu=v8 -pipe -mno-fpu $(call cc-option,-fcall-used-g5) $(call cc-option,-fcall-used-g7)
+ KBUILD_CFLAGS  += -Wa,-Av8
+ 
+ KBUILD_AFLAGS  += -m32 -Wa,-Av8
+@@ -45,7 +45,7 @@ export BITS   := 64
+ UTS_MACHINE   := sparc64
+ 
+ KBUILD_CFLAGS += -m64 -pipe -mno-fpu -mcpu=ultrasparc -mcmodel=medlow
+-KBUILD_CFLAGS += -ffixed-g4 -ffixed-g5 -fcall-used-g7 -Wno-sign-compare
++KBUILD_CFLAGS += -ffixed-g4 -ffixed-g5 $(call cc-option,-fcall-used-g7) -Wno-sign-compare
+ KBUILD_CFLAGS += -Wa,--undeclared-regs
+ KBUILD_CFLAGS += $(call cc-option,-mtune=ultrasparc3)
+ KBUILD_AFLAGS += -m64 -mcpu=ultrasparc -Wa,--undeclared-regs
+diff --git a/arch/sparc/vdso/Makefile b/arch/sparc/vdso/Makefile
+index 243dbfc4609d804fc221c3591eebe891107ffdab..50ec2978cda5397841daad6ffdc9682811b9b38e 100644
+--- a/arch/sparc/vdso/Makefile
++++ b/arch/sparc/vdso/Makefile
+@@ -46,7 +46,7 @@ CFL := $(PROFILING) -mcmodel=medlow -fPIC -O2 -fasynchronous-unwind-tables -m64
+        -fno-omit-frame-pointer -foptimize-sibling-calls \
+        -DDISABLE_BRANCH_PROFILING -DBUILD_VDSO
+ 
+-SPARC_REG_CFLAGS = -ffixed-g4 -ffixed-g5 -fcall-used-g5 -fcall-used-g7
++SPARC_REG_CFLAGS = -ffixed-g4 -ffixed-g5 $(call cc-option,-fcall-used-g5) $(call cc-option,-fcall-used-g7)
+ 
+ $(vobjs): KBUILD_CFLAGS := $(filter-out $(RANDSTRUCT_CFLAGS) $(GCC_PLUGINS_CFLAGS) $(SPARC_REG_CFLAGS),$(KBUILD_CFLAGS)) $(CFL)
+ 
+
+-- 
+2.47.0
+
 
