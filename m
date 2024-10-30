@@ -1,111 +1,147 @@
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FB4E1CF289;
-	Wed, 30 Oct 2024 05:35:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B2F1E0DFE;
+	Wed, 30 Oct 2024 07:09:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730266531; cv=none; b=Jrncrvt+8TZkbplwjFLjO/0w6eSdKWd9thdz+23t8ut/olbSiwVQ0rfT+IRA5TbkJJ1tM5dmT2pGfDCFnf0AlkzgkK/FFSuNG+73lBJEC4QFK6mFZqOTFeSAfBXqIk7eHbUkXZqdpfcWzEKxnlZ9EdZZUrDx9Z05WxLWvucNm2E=
+	t=1730272185; cv=none; b=mf/ZAqAU4qJRWJOt5Xni4/5Jm5ep3mAUaBoscSq0ymYnHTbRp1Fi57deCJLgXHrblJ09Fd+kdTrdlW2WHgYZpz+sb+zXHkgTsa4WFByUMHeXGNH38yQXSaQyJHB6tnVqcPQTerYpvd4eSw7zonfoeF7W0IqgxTSppkI/LW0tV2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730266531; c=relaxed/simple;
-	bh=iNv76ZzAMBPTV4l1YgFD0Bej4qjTGYw2zGCKkGf5dtk=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=HxsusLOWFjyLqJSbft2BCLnSQSdxO0Ovj3v/fk5wUzyM5rZiaX3qW16+7yzOOV7c7Pbns1ge3xsK4i8yO+EE8TGOYaIYxIVgO8Li7a1COu6v2hhm4kMe8cIF2lsC+bRZFyr5dpHsTRAjLkyYDm93l/iPZFI1dl7yoyHCZiL2m5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=iBvnjoKY; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
+	s=arc-20240116; t=1730272185; c=relaxed/simple;
+	bh=PqKZkX5MfNlqlkxog8KNBTjCxPmS3rMjKgXtSBWMvGg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=LplDkhQgYMilxdAY17aMEFhUG771CsobTQzv8Im2CS0XIjIhRLC8GTAANrjeM9vEtoDXq/pm9ds4InzGcW1FaOy5AcHavOgnZwixnqlqODfA5510hnTu64IVcnFqk7VMuouwiU73ZchbwB6fg4A467TodeI5DRMAfEWkXRLeB5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=DMe3xRrI; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="iBvnjoKY"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-	s=201909; t=1730266522;
-	bh=fTiOGMiECd5augAVpcP0FAu96xmTgJEVxQ1j0YsCjtE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=iBvnjoKYWd263kXfDZH/Sh3Gw+wTz+mRV6lTEiTnUbqNaziGATw0mFF/3EToCY/PD
-	 udF0Al/to8Vm7A/g41rEuux1jQmB83t1Kr6C9ZcQq4Xq/UaQGqAjDuqJV9oYMQ82jV
-	 DVKSCXTurLYVR3+ooGcH3Sq/8S1VGrbDhpePRLxQaDxfhTLlnj2C0cZONLKusDrrK8
-	 Up/XjvkE6J4cyUVYfviZrBdnHI4CfI/7Nodpb4xfjVNDjDyDZi2/hCfSA9SdvnllD2
-	 wZb6ggjadgnszxDjHOe9PnHOTusOlD1OemAGIwvANBqjeV8PiDciNgQEVMkU1dnQnL
-	 n0M/8hQTWodXw==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4XdbS75X7wz4x8f;
-	Wed, 30 Oct 2024 16:35:19 +1100 (AEDT)
-From: Michael Ellerman <mpe@ellerman.id.au>
-To: Matthew Maurer <mmaurer@google.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Naveen N Rao <naveen@kernel.org>, Madhavan
- Srinivasan <maddy@linux.ibm.com>, Luis Chamberlain <mcgrof@kernel.org>,
- Petr Pavlu <petr.pavlu@suse.com>, Sami Tolvanen <samitolvanen@google.com>,
- Daniel Gomez <da.gomez@samsung.com>, Masahiro Yamada
- <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas
- Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor
- <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo
- <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn?= Roy Baron
- <bjorn3_gh@protonmail.com>, Benno
- Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@kernel.org>,
- Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
- linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
- linux-modules@vger.kernel.org, linux-kbuild@vger.kernel.org,
- rust-for-linux@vger.kernel.org
-Subject: Re: [PATCH v7 1/3] modules: Support extended MODVERSIONS info
-In-Reply-To: <CAGSQo03L--HDUBeo3xEUANbBcSf4GK5GUNGmHSBzL+ixpRGuqA@mail.gmail.com>
-References: <20241023-extended-modversions-v7-0-339787b43373@google.com>
- <20241023-extended-modversions-v7-1-339787b43373@google.com>
- <874j50juyp.fsf@mail.lhotse>
- <CAGSQo03L--HDUBeo3xEUANbBcSf4GK5GUNGmHSBzL+ixpRGuqA@mail.gmail.com>
-Date: Wed, 30 Oct 2024 16:35:10 +1100
-Message-ID: <878qu6dugh.fsf@mpe.ellerman.id.au>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="DMe3xRrI"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49U2d3BE024043;
+	Wed, 30 Oct 2024 07:09:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=pp1; bh=NBCz3KcpjPp2NZk6Q
+	kJH2AEFQre7Vj8TAQLOxgPmAFI=; b=DMe3xRrIog+pq4x9QG+06M2qVOt+FN+Ie
+	1zVd1VKqCKgPt0LHxueJ5aX7n8mgYvZheI2MZJA7Ky0pGLLHV0IqjP326/yXUzHc
+	+za+dD6CtcfXiyHgiOapI+UJl51EbyNs9V6+wP7TkJ7w1w49S1hsg7TdnPyMM8iJ
+	RRuBXpZ5ymX5JYq45Zy2xzY0lJWT0rwoNqpiDJzJFG6Z2u/7GY/q9+upx6iPaAkC
+	LemG6hWKwBLnLrhQIAtWldHxwLf2mDp4bGnx/SwPnAa8mDKpMtYWTr79nxpDBDd4
+	lzazZvf56+jF8Wjx0IEM7L+Jjo3AJxZS329uJdC7daRBU1JlkhXsQ==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42jyhbmb76-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 30 Oct 2024 07:09:12 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49U79CBV004738;
+	Wed, 30 Oct 2024 07:09:12 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42jyhbmb73-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 30 Oct 2024 07:09:12 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49U3A8oB013670;
+	Wed, 30 Oct 2024 07:09:11 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 42hbrmxw55-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 30 Oct 2024 07:09:11 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49U797PR28902076
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 30 Oct 2024 07:09:07 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7A2F22004D;
+	Wed, 30 Oct 2024 07:09:07 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C08F920043;
+	Wed, 30 Oct 2024 07:09:03 +0000 (GMT)
+Received: from li-bd3f974c-2712-11b2-a85c-df1cec4d728e.in.ibm.com (unknown [9.203.115.143])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 30 Oct 2024 07:09:03 +0000 (GMT)
+From: Hari Bathini <hbathini@linux.ibm.com>
+To: linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, bpf@vger.kernel.org,
+        linux-trace-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc: Michael Ellerman <mpe@ellerman.id.au>, "Naveen N. Rao" <naveen@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Vishal Chourasia <vishalc@linux.ibm.com>,
+        Mahesh J Salgaonkar <mahesh@linux.ibm.com>
+Subject: [PATCH v7 03/17] powerpc64/ftrace: Nop out additional 'std' instruction emitted by gcc v5.x
+Date: Wed, 30 Oct 2024 12:38:36 +0530
+Message-ID: <20241030070850.1361304-4-hbathini@linux.ibm.com>
+X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20241030070850.1361304-1-hbathini@linux.ibm.com>
+References: <20241030070850.1361304-1-hbathini@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: qgy0KvjTxbxMRpmk5MFbntDDAWjfDqT_
+X-Proofpoint-ORIG-GUID: 9AYLyruOn_3zT9wtyLDntWCorkdG9MXp
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
+ malwarescore=0 bulkscore=0 priorityscore=1501 lowpriorityscore=0
+ suspectscore=0 phishscore=0 impostorscore=0 mlxlogscore=941 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410300051
 
-Matthew Maurer <mmaurer@google.com> writes:
->> Sorry I realise it's version 7, but although the above looks correct it's
->> kind of dense.
->>
->> I think the below would also work and is (I think) easier to follow, and
->> is more obviously similar to the existing code. I'm sure your version is
->> faster, but I don't think it's that performance critical.
->>
->> static void dedotify_ext_version_names(char *str_seq, unsigned long size)
->> {
->>         char *end = str_seq + size;
->>         char *p = str_seq;
->>
->>         while (p < end) {
->>                 if (*p == '.')
->>                         memmove(p, p + 1, end - p - 1);
->>
->>                 p += strlen(p) + 1;
->>         }
->> }
->>
->> The tail of str_seq will be filled with nulls as long as the last string
->> was null terminated.
->
-> As you alluded to, what you're providing is potentially O(n^2) in the
-> number of symbols a module depends on - the existing code is O(n).
-> If leading dots on names are rare, this is probably fine. If they're
-> common, this will potentially make loading modules with a large number
-> of imported symbols actually take a measurable amount of additional
-> time.
+From: Naveen N Rao <naveen@kernel.org>
 
-It should only be a single symbol these days, .TOC., for both big and
-little endian builds.
+Gcc v5.x emits a 3-instruction sequence for -mprofile-kernel:
+	mflr	r0
+	std	r0, 16(r1)
+	bl	_mcount
 
-But maybe someone out there is still building their kernel ELFv1, in
-which case every function will begin with '.'.
+Gcc v6.x moved to a simpler 2-instruction sequence by removing the 'std'
+instruction. The store saved the return address in the LR save area in
+the caller stack frame for stack unwinding. However, with dynamic
+ftrace, we no longer have a call to _mcount on kernel boot when ftrace
+is not enabled. When ftrace is enabled, that store is performed within
+ftrace_caller(). As such, the additional 'std' instruction is redundant.
+Nop it out on kernel boot.
 
-I still don't think it will be measurable, but n^2 is asking for
-trouble.
+With this change, we now use the same 2-instruction profiling sequence
+with both -mprofile-kernel, as well as -fpatchable-function-entry on
+64-bit powerpc.
 
-So forget it, just use your version, you've already written it anyway.
-Sorry for the noise.
+Signed-off-by: Naveen N Rao <naveen@kernel.org>
+---
+ arch/powerpc/kernel/trace/ftrace.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-cheers
+diff --git a/arch/powerpc/kernel/trace/ftrace.c b/arch/powerpc/kernel/trace/ftrace.c
+index d8d6b4fd9a14..2ef504700e8d 100644
+--- a/arch/powerpc/kernel/trace/ftrace.c
++++ b/arch/powerpc/kernel/trace/ftrace.c
+@@ -246,8 +246,12 @@ int ftrace_init_nop(struct module *mod, struct dyn_ftrace *rec)
+ 		/* Expected sequence: 'mflr r0', ['std r0,16(r1)'], 'bl _mcount' */
+ 		ret = ftrace_read_inst(ip - 4, &old);
+ 		if (!ret && !ppc_inst_equal(old, ppc_inst(PPC_RAW_MFLR(_R0)))) {
++			/* Gcc v5.x emit the additional 'std' instruction, gcc v6.x don't */
+ 			ret = ftrace_validate_inst(ip - 8, ppc_inst(PPC_RAW_MFLR(_R0)));
+-			ret |= ftrace_validate_inst(ip - 4, ppc_inst(PPC_RAW_STD(_R0, _R1, 16)));
++			if (ret)
++				return ret;
++			ret = ftrace_modify_code(ip - 4, ppc_inst(PPC_RAW_STD(_R0, _R1, 16)),
++						 ppc_inst(PPC_RAW_NOP()));
+ 		}
+ 	} else {
+ 		return -EINVAL;
+-- 
+2.47.0
+
