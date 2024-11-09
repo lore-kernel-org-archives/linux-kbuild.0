@@ -1,52 +1,51 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63C1D33DF;
-	Sat,  9 Nov 2024 01:30:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A5401CA94;
+	Sat,  9 Nov 2024 01:30:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731115837; cv=none; b=NntVp8PTGEJsPdzRgA9eb5tc/LGgZ2mMcDp9KUE7C0eE3N4mPZmVnJe0soHk5JB4YWN2nb66R4s++ftshV+HmRoWIPC3z6QCYcGuWHT8adSB8/XOxpUPuBLx0z+uWHLO0BIJ1LFSuuS63BBZuJN+bLcfWMHfvjXGHFMutyivMUU=
+	t=1731115839; cv=none; b=BF68Af+CquZLVa8VEeAl8W6xAeoHVPr6XRjhSMvyTh1p2jLcqPSYpAyHVa22TY+TFLG32WQsRXFBcDBJpPqs7sHMr6vFvceGvcSLwytxuEAImRM+1kO01QognN9dGCkRgL6gdiUzYIcAWdF+ZQH6cOC0HGY3eimF1dEkVQ50odY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731115837; c=relaxed/simple;
-	bh=iWHmSogp7Hh/8BB7fwpzDGIbK/3lc+iOb+TAfBgpxA8=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=RsMH/ssFh8GMxs2DiB+oxAC9eYt4N9Ew/N++skOLeF54UR+1dO4jDFOTr+gSSkULQ1Oq7/xvWRf4ULR8pozTYEyFQUqdYOMLrGQw99uJmN7IXFO/TsmtmMBD4c8HUxMxmIKskbaVHdmHqMXz6D48c97SXTmy2moQtHsRyakTGYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T2LNu9TO; arc=none smtp.client-ip=192.198.163.16
+	s=arc-20240116; t=1731115839; c=relaxed/simple;
+	bh=LdoeboTt1iJZ8l27Xbcv/vUqueDpoEQkChBB6rU81hQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=SXprBGZ8L7/Q27Bh9bVkG8BjdrtYbFdoendmDDBpmpnLpvjj4yjrs0QWU0BJBH4Bzy2Qqqm2ZZ6lOvFYeiZC8HOo4XuB68A6axdERWgLKoCGPjV8FTvT3PepDOsuL/c2Hb66ESFLokz3tqG0cPsFDa+fFfUKfhYf6DLav4VgHkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=V6gt9zfx; arc=none smtp.client-ip=192.198.163.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T2LNu9TO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="V6gt9zfx"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731115835; x=1762651835;
-  h=from:subject:date:message-id:mime-version:
-   content-transfer-encoding:to:cc;
-  bh=iWHmSogp7Hh/8BB7fwpzDGIbK/3lc+iOb+TAfBgpxA8=;
-  b=T2LNu9TObS6Ufv8t5VXnkCvkrtZIFBAQK18Yc8hamkoO/7FydszkQAkR
-   Qdtwv4S1q5maUSDnDop0Gicw0wo5OUoz11W1Hq8hKoIpTmSZPBt7lfQGI
-   ZtTtHn3z5ajaIIrxuxy1UheSUqvXWlh62KCmZ0ZEWnfwCjPMeRdLy5MWq
-   8V9Xq4UICIV6bz0tcdPK/tlpDAHmKqhVd+6MU9dbmCt2DBsGrzzeL6gMs
-   VWhzQ4ETh9rxChb3Xv5kP0NimERqdW6jQ4w64evpEIOuimm5Lc+/3M/L7
-   tg+IBzuUlyuAqd5mB6YnWmm4h7c0WtapU4ETEWn2r1IxseFzOqjCFEn8G
-   g==;
-X-CSE-ConnectionGUID: LRGRGyaMRm6sqlCLjtND7w==
-X-CSE-MsgGUID: QdknwcATRgiuYKtPhm5ZiQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11250"; a="18637294"
+  t=1731115837; x=1762651837;
+  h=from:date:subject:mime-version:content-transfer-encoding:
+   message-id:references:in-reply-to:to:cc;
+  bh=LdoeboTt1iJZ8l27Xbcv/vUqueDpoEQkChBB6rU81hQ=;
+  b=V6gt9zfx66AGwW0Xdf5+F7rdyx4g7jgGk04M3BrjUA9fw1FOKAKuwtNs
+   9jQcWztKwHd8tk9XnSZpRy2wM/EU/Qzt5XAAAmtVwDuWX9ZnUTDCYZIrG
+   OQZyF8rQkUKCEfbETDuOO+7yvtMuuT69uk/pzXfGoRljNaAb/A0J6EMmV
+   O7deT//NPoLWPDiMJJJX0+9XRJmgpzw7MRLcYzrb/J8enUBPXVTntzt7I
+   KG0PXa7Ax1xw3C78uEJ7PgCRpOwkhzM7cAraz1sqnU4YIPmvEPfTa553E
+   KFuy5V6fGMOO76WdlYfqhkiVFnHAfqklDNXyJD08i6WoUEAhz6R/sFxHu
+   w==;
+X-CSE-ConnectionGUID: zI19LgOJT3idKQuqx0/xlA==
+X-CSE-MsgGUID: j9BuSuVXRyGts+26Ez7uFQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11250"; a="18637327"
 X-IronPort-AV: E=Sophos;i="6.12,139,1728975600"; 
-   d="scan'208";a="18637294"
+   d="scan'208";a="18637327"
 Received: from orviesa003.jf.intel.com ([10.64.159.143])
   by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2024 17:30:33 -0800
-X-CSE-ConnectionGUID: h7rTRzzpTRekubJbn/0O6A==
-X-CSE-MsgGUID: knCcPmymQZ6wgEQT0LjGRQ==
+X-CSE-ConnectionGUID: kirmoctdSX2FepERQQDF+w==
+X-CSE-MsgGUID: j2bmX+eFQv6rhRrOjBE6LA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="90646164"
+   d="scan'208";a="90646189"
 Received: from jekeller-desk.jf.intel.com ([10.166.241.20])
   by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2024 17:30:33 -0800
 From: Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH net-next v4 0/9] lib: packing: introduce and use
- (un)pack_fields
-Date: Fri, 08 Nov 2024 17:30:13 -0800
-Message-Id: <20241108-packing-pack-fields-and-ice-implementation-v4-0-81a9f42c30e5@intel.com>
+Date: Fri, 08 Nov 2024 17:30:20 -0800
+Subject: [PATCH net-next v4 7/9] ice: reduce size of queue context fields
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -55,218 +54,137 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIACW7LmcC/5XOz2qEMBAG8FeRnDcl/3S0p75H6SE7jrtDNYoJs
- mXx3RtSSoWePA0fM/y+eYpIK1MUr9VTrLRx5Dnk4C6VwLsPN5Lc5yyMMk4r5eTi8ZPDrUw5MI1
- 9lD70kjGfTstIE4XkU2bkVQMCUksWrMjgstLAj1L2LgIlGeiRxEfe3Dmmef0qX2y67H8KtT5Tu
- GmpZN9d9QC1UuDUG4dE4wvOU6nZzIE29SnaZBqsA2iwbek/bf9orZpTtM001s5b7AbddXCgL9U
- vCadJA1g3jUfjbHP8dt/3bzsj6+L3AQAA
+Message-Id: <20241108-packing-pack-fields-and-ice-implementation-v4-7-81a9f42c30e5@intel.com>
+References: <20241108-packing-pack-fields-and-ice-implementation-v4-0-81a9f42c30e5@intel.com>
+In-Reply-To: <20241108-packing-pack-fields-and-ice-implementation-v4-0-81a9f42c30e5@intel.com>
 To: Vladimir Oltean <olteanv@gmail.com>, 
  Andrew Morton <akpm@linux-foundation.org>, 
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
  Paolo Abeni <pabeni@redhat.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
  Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
  Masahiro Yamada <masahiroy@kernel.org>, netdev <netdev@vger.kernel.org>
-Cc: linux-kbuild@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>, 
- Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: linux-kbuild@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>
 X-Mailer: b4 0.14.1
 
-This series improves the packing library with a new API for packing or
-unpacking a large number of fields at once with minimal code footprint. The
-API is then used to replace bespoke packing logic in the ice driver,
-preparing it to handle unpacking in the future. Finally, the ice driver has
-a few other cleanups related to the packing logic.
+The ice_rlan_ctx and ice_tlan_ctx structures have some fields which are
+intentionally sized larger necessary relative to the packed sizes the data
+must fit into. This was done because the original ice_set_ctx() function
+and its helpers did not correctly handle packing when the packed bits
+straddled a byte. This is no longer the case with the use of the
+<linux/packing.h> implementation.
 
-The pack_fields and unpack_fields functions have the following improvements
-over the existing pack() and unpack() API:
+Save some bytes in these structures by sizing the variables to the number
+of bytes the actual bitpacked fields fit into.
 
- 1. Packing or unpacking a large number of fields takes significantly less
-    code. This significantly reduces the .text size for an increase in the
-    .data size which is much smaller.
+There are a couple of gaps left in the structure, which is a result of the
+fields being in the order they appear in the packed bit layout, but where
+alignment forces some extra gaps. We could fix this, saving ~8 bytes from
+each structure. However, these structures are not used heavily, and the
+resulting savings is minimal:
 
- 2. The unpacked data can be stored in sizes smaller than u64 variables.
-    This reduces the storage requirement both for runtime data structures,
-    and for the rodata defining the fields. This scales with the number of
-    fields used.
+$ bloat-o-meter ice-before-reorder.ko ice-after-reorder.ko
+add/remove: 0/0 grow/shrink: 1/1 up/down: 26/-70 (-44)
+Function                                     old     new   delta
+ice_vsi_cfg_txq                             1873    1899     +26
+ice_setup_rx_ctx.constprop                  1529    1459     -70
+Total: Before=1459555, After=1459511, chg -0.00%
 
- 3. Most of the error checking is done at compile time, rather than
-    runtime, via additional checks added to modpost. This saves wasted
-    computation time *and* catches errors in the field definitions early,
-    rather than only after the offending code is executed.
-
-The actual packing and unpacking code still uses the u64 size
-variables. However, these are converted to the appropriate field sizes when
-storing or reading the data from the buffer.
-
-The majority of the "compile time" checks are placed into modpost. This is
-done to enable checking ordering and overlap of the fields. An attempt was
-made to implement these checks via macro in version 2 of this series.
-However, the C pre-processor cannot use loops to execute compile time
-checks. Without the loops, drivers were responsible for using the specific
-CHECK_PACKED_FIELDS_<N> macro. We generated these macros at compile time,
-but this resulted in thousands of lines of macro in the
-<generated/packing-checks.h> header. To limit the size, we tried config
-options to only generate the macros that are used. This resulted in even
-more complexity in the drivers and the build system.
-
-By using modpost, all of this complexity is kept in one place, minimizing
-the complexity on driver authors.
-
-Modpost can easily check the field overlap and ordering restrictions, but
-it cannot easily check that the fields fit within the buffers. To do that,
-modpost would need to obtain the size of the target buffer. This was
-attempted in v3, but the result was a mess, as modpost had to obtain a
-special symbol with the target size.
-
-Instead, modpost now only checks the things that are simple for it to
-check. The buffer size check is now handled directly by the pack_fields and
-unpack_fields macros. To obtain the size, we enforce that users wrap their
-buffer with an appropriate type (such as via a packed structure with a
-fixed size buffer). This reduces the number of arguments, and enables easy
-size checking. To allow both ascending and descending order, the first and
-last elements are checked to be within the size of the buffer. Modpost
-ensures that we do not allow other orderings, so we only need to check 2
-places.
-
-This version has much simpler modpost checks, as we no longer need to keep
-a hash of all the symbols: each symbol is independently checked. This
-reduces the amount of code even further, and avoids some other
-modifications that were originally required.
-
-This implementation is even simpler than before, and I do think modpost is
-better overall. The macro checks require additional work from drivers and
-might need to be extended if a user ever needs more than 50 fields.
-
-If the enforcement of a structured type is frowned upon, I believe we could
-keep the original API with a pbuflen argument and use
-__builtin_choose_expr() and __is_constexpr() to determine whether to have
-the checks run at compile time or run time.
-
-I'm in favor of this modpost implementation over the previous macro based
-solution. The fact that the mess of checking the fields is fairly self
-contained and avoids the mess of the CHECK_* and config options is a big
-win, and I think the modpost option is significantly better for this.
-
-Pros:
-
- * Significantly less code to implement the checks, even if we ignore the
-   generated portions in <generated/packing-checks.h>
-
- * The modpost checks are able to work in arbitrarily sized arrays, without
-   needing to add any modification in the future. The macro implementation
-   could require adding additional macros if a driver ever needed >50
-   fields.
-
- * Keeping the size checks within pack_fields() and unpack_fields() greatly
-   simplifies the modpost implementation as we no longer need to determine
-   the sizes. This makes the checks extremely self contained.
-
- * This solution avoids needing to edit the top level Kbuild.
-
- * We don't need to leave 20K+ lines of code in a generated header.
-
- * We don't need to add extra config options.
-
- * Field order is enforced, which I think is useful even outside
-   simplifying the overlap checks to O(N).
-
- * Drivers simply DECLARE_PACKED_FIELDS_(S|M) and get modpost warnings,
-   without requiring a manual call to CHECK_PACKED_FIELDS*. This should
-   make it easier to review, and less likely that checks are skipped.
-
-Cons:
-
- * modpost doesn't have source code line information, so we can't report
-   that back to the user.
-
- * modpost errors are reported slightly later in the compile process.
-
- * We have to place the packed field arrays in special sections to enable
-   modpost. This is handled by DECLARE macros, so we have to ensure all
-   users use these macros. I did not attempt to add a check for that in
-   this series, but it could be done in principle with cocinelle or
-   checkpatch.
-
- * These type of checks do feel somewhat ancillary to the original purpose
-   of modpost.
+Thus, the fields are left in the same order as the packed bit layout,
+despite the gaps this causes.
 
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 ---
-Changes in v4:
-- Move the buffer size checks to (un)pack_fields() macros.
-- Enforce use of a sized type of the packed buffer, removing the now
-  unnecessary pbuflen argument of (un)pack_fields().
-- Drop exporting the buffer size to modpost.
-- Simplify modpost implementation to directly check each symbol in the
-  handle_packed_field_symbol() function. This removes the need for a hash,
-  and is ultimately much simpler now that modpost doesn't need the size of
-  the target buffer.
-- Fix the width check to correctly calculate the width and compare it
-  properly.
-- Refactor modpost messages to consistently report the module name first,
-  the symbol name second, and the field number 3rd.
-- Correctly implement overlap checks in the modpost, rather than only
-  checking field ordering.
-- Link to v3: https://lore.kernel.org/r/20241107-packing-pack-fields-and-ice-implementation-v3-0-27c566ac2436@intel.com
+ drivers/net/ethernet/intel/ice/ice_lan_tx_rx.h | 32 ++++++++------------------
+ 1 file changed, 10 insertions(+), 22 deletions(-)
 
-Changes in v3:
-- Replace macro-based C pre-processor checks with checks implemented in
-  modpost.
-- Move structure definitions into  <linux/packing_types.h> to enable reuse
-  within modpost.
-- Add DECLARE_PACKED_FIELDS_S and DECLARE_PACKED_FIELDS_M to enable
-  automatically generating the buffer size constants and the section
-  attributes.
-- Add additional unit tests for the pack_fields and unpack_fields APIs.
-- Update documentation with an explanation of the new API as well as some
-  example code.
-- Link to v2: https://lore.kernel.org/r/20241025-packing-pack-fields-and-ice-implementation-v2-0-734776c88e40@intel.com
+diff --git a/drivers/net/ethernet/intel/ice/ice_lan_tx_rx.h b/drivers/net/ethernet/intel/ice/ice_lan_tx_rx.h
+index 31d4a445d640..1479b45738af 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lan_tx_rx.h
++++ b/drivers/net/ethernet/intel/ice/ice_lan_tx_rx.h
+@@ -375,23 +375,17 @@ enum ice_rx_flex_desc_status_error_1_bits {
+ #define ICE_TX_DRBELL_Q_CTX_SIZE_DWORDS	5
+ #define GLTCLAN_CQ_CNTX(i, CQ)		(GLTCLAN_CQ_CNTX0(CQ) + ((i) * 0x0800))
+ 
+-/* RLAN Rx queue context data
+- *
+- * The sizes of the variables may be larger than needed due to crossing byte
+- * boundaries. If we do not have the width of the variable set to the correct
+- * size then we could end up shifting bits off the top of the variable when the
+- * variable is at the top of a byte and crosses over into the next byte.
+- */
++/* RLAN Rx queue context data */
+ struct ice_rlan_ctx {
+ 	u16 head;
+-	u16 cpuid; /* bigger than needed, see above for reason */
++	u8 cpuid;
+ #define ICE_RLAN_BASE_S 7
+ 	u64 base;
+ 	u16 qlen;
+ #define ICE_RLAN_CTX_DBUF_S 7
+-	u16 dbuf; /* bigger than needed, see above for reason */
++	u8 dbuf;
+ #define ICE_RLAN_CTX_HBUF_S 6
+-	u16 hbuf; /* bigger than needed, see above for reason */
++	u8 hbuf;
+ 	u8 dtype;
+ 	u8 dsize;
+ 	u8 crcstrip;
+@@ -399,12 +393,12 @@ struct ice_rlan_ctx {
+ 	u8 hsplit_0;
+ 	u8 hsplit_1;
+ 	u8 showiv;
+-	u32 rxmax; /* bigger than needed, see above for reason */
++	u16 rxmax;
+ 	u8 tphrdesc_ena;
+ 	u8 tphwdesc_ena;
+ 	u8 tphdata_ena;
+ 	u8 tphhead_ena;
+-	u16 lrxqthresh; /* bigger than needed, see above for reason */
++	u8 lrxqthresh;
+ 	u8 prefena;	/* NOTE: normally must be set to 1 at init */
+ };
+ 
+@@ -535,18 +529,12 @@ enum ice_tx_ctx_desc_eipt_offload {
+ #define ICE_LAN_TXQ_MAX_QGRPS	127
+ #define ICE_LAN_TXQ_MAX_QDIS	1023
+ 
+-/* Tx queue context data
+- *
+- * The sizes of the variables may be larger than needed due to crossing byte
+- * boundaries. If we do not have the width of the variable set to the correct
+- * size then we could end up shifting bits off the top of the variable when the
+- * variable is at the top of a byte and crosses over into the next byte.
+- */
++/* Tx queue context data */
+ struct ice_tlan_ctx {
+ #define ICE_TLAN_CTX_BASE_S	7
+ 	u64 base;		/* base is defined in 128-byte units */
+ 	u8 port_num;
+-	u16 cgd_num;		/* bigger than needed, see above for reason */
++	u8 cgd_num;
+ 	u8 pf_num;
+ 	u16 vmvf_num;
+ 	u8 vmvf_type;
+@@ -557,7 +545,7 @@ struct ice_tlan_ctx {
+ 	u8 tsyn_ena;
+ 	u8 internal_usage_flag;
+ 	u8 alt_vlan;
+-	u16 cpuid;		/* bigger than needed, see above for reason */
++	u8 cpuid;
+ 	u8 wb_mode;
+ 	u8 tphrd_desc;
+ 	u8 tphrd;
+@@ -566,7 +554,7 @@ struct ice_tlan_ctx {
+ 	u16 qnum_in_func;
+ 	u8 itr_notification_mode;
+ 	u8 adjust_prof_id;
+-	u32 qlen;		/* bigger than needed, see above for reason */
++	u16 qlen;
+ 	u8 quanta_prof_idx;
+ 	u8 tso_ena;
+ 	u16 tso_qnum;
 
-Changes in v2:
-- Add my missing sign-off to the first patch
-- Update the descriptions for a few patches
-- Only generate CHECK_PACKED_FIELDS_N when another module selects it
-- Add a new patch introducing wrapper structures for the packed Tx and Rx
-  queue context, suggested by Vladimir.
-- Drop the now unnecessary macros in ice, thanks to the new types
-- Link to v1: https://lore.kernel.org/r/20241011-packing-pack-fields-and-ice-implementation-v1-0-d9b1f7500740@intel.com
-
----
-Jacob Keller (6):
-      ice: remove int_q_state from ice_tlan_ctx
-      ice: use structures to keep track of queue context size
-      ice: use <linux/packing.h> for Tx and Rx queue context data
-      ice: reduce size of queue context fields
-      ice: move prefetch enable to ice_setup_rx_ctx
-      ice: cleanup Rx queue context programming functions
-
-Vladimir Oltean (3):
-      lib: packing: create __pack() and __unpack() variants without error checking
-      lib: packing: demote truncation error in pack() to a warning in __pack()
-      lib: packing: add pack_fields() and unpack_fields()
-
- drivers/net/ethernet/intel/ice/ice_adminq_cmd.h |  11 +-
- drivers/net/ethernet/intel/ice/ice_common.h     |   5 +-
- drivers/net/ethernet/intel/ice/ice_lan_tx_rx.h  |  49 +---
- include/linux/packing.h                         |  43 ++++
- include/linux/packing_types.h                   |  48 ++++
- scripts/mod/modpost.h                           |   5 +
- drivers/net/dsa/sja1105/sja1105_static_config.c |   8 +-
- drivers/net/ethernet/intel/ice/ice_base.c       |   6 +-
- drivers/net/ethernet/intel/ice/ice_common.c     | 293 +++++-------------------
- lib/packing.c                                   | 285 +++++++++++++++++------
- lib/packing_test.c                              |  61 +++++
- scripts/mod/modpost.c                           |   3 +-
- scripts/mod/packed_fields.c                     | 199 ++++++++++++++++
- Documentation/core-api/packing.rst              |  59 +++++
- MAINTAINERS                                     |   2 +
- drivers/net/ethernet/intel/Kconfig              |   1 +
- scripts/mod/Makefile                            |   4 +-
- 17 files changed, 725 insertions(+), 357 deletions(-)
----
-base-commit: a84e8c05f58305dfa808bc5465c5175c29d7c9b6
-change-id: 20241004-packing-pack-fields-and-ice-implementation-b17c7ce8e373
-
-Best regards,
 -- 
-Jacob Keller <jacob.e.keller@intel.com>
+2.47.0.265.g4ca455297942
 
