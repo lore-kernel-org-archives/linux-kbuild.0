@@ -1,106 +1,88 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB13E14F121;
-	Sun, 10 Nov 2024 01:37:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D75C3153573;
+	Sun, 10 Nov 2024 01:37:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731202630; cv=none; b=dlFMa0P5JdXXjyZnHH74PJJo9VHHOrtCtZDij690ncTmM6lLdUSC0rhjjt6Z1GAwy8VXtyDX/LUTynhlzayX4INP2DWr9aygC10rRvuNof0mIMe41+PAH/QtNq+4Z0vbCnu5keTktZiEIsGVEYLd5RepzKaavsP+0PtWC9nQ1hQ=
+	t=1731202631; cv=none; b=IQ2pv1VOil6u+Gp+1YYXasrokP5lvOXGFB/8S434yDEWPvPpaUtIHmv6+xU2RqyixmGSYDDbBRG2n9W0V6Gdz/edSvfEAuQ5hbndW8iHF7UgQZRotZJjE8nm7lY07E9bCr0472lM0v6NhYy9lqtNWlRV29uakgJW2aUqF7q52yE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731202630; c=relaxed/simple;
-	bh=Hq/3MBZSIE9wAa3fShhSryh3ayVPZALjJGUIQoeZ8QQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XLDeOl74iKXo3fgQHHLoFzY/XPd8DfmuqRaX75yDyIla+9PYeDBilCMyQVlNSGzEp4HR4IhGQ45bN3mTu/RcX3jD5q1Yp778U6Zz+Cr6k3lIuqPWmWf9/Gd3agTnPwqNpS7jUKZqvfXjwPlQMlVazohlCkJV9fhgC/TjULKeK24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bFlBxZSd; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1731202631; c=relaxed/simple;
+	bh=us5XMqVwdbsYqray5sAUkCpHJq/PzlTni1SE6suosWA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=qdCxgChqVYUem7cpkQYCKLAhe0oYXLQrDp+/fJK24+FU8bsfzrXNrMdE4ylfpQl91yXPucdLQVSmOqKJ1UUYAWWD5hm0lSq6dYgfHumZt2i8eNQZbUjK2wnIFrzt4AW+jqlTajFoyIa1aJKF7A0bDvmJaYjGZSEdMmFviMjJ5ik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FYpHijwk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bFlBxZSd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EF9DC4CECE;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FYpHijwk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70568C4CED2;
 	Sun, 10 Nov 2024 01:37:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731202630;
-	bh=Hq/3MBZSIE9wAa3fShhSryh3ayVPZALjJGUIQoeZ8QQ=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=bFlBxZSdeNx1LohdwS2UCDO1xM/oTZyFkdmap9qHqvutGAUdmt6eH9CpDjmN7yDTY
-	 9PlBL1Mo7jBeVEXmt+BiffQZPmnyK817648m7fSDmsReUDiOU2gvzpdUnjjXCOoGY5
-	 L4/Wpqgeic2YLryNAN1dYHTK4z8OJUgwBnQSdmPMuibL2a4B7GvMB8gcoNSYsCy19r
-	 IXwUC7vt22CZajWNtkCzeA+EnQ16GcbUxrfWe7ZHu07dyj9k2x0/Y01T3SUNH+EYxl
-	 UmJPIjzkFqE7dHr72pMqpk5dj2qGinj1oGbhVaQiA/A0b/u32W3YZIpf6bVZS4/jxE
-	 XT0Bm6Prhv4Og==
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-539f4d8ef66so5240456e87.1;
-        Sat, 09 Nov 2024 17:37:10 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWMqcjosr/sP3ifGKukf7aywZ8Y+OE4lGK6zlVxnYg/avH64EWiw8BtNi2DcqNsbP/EhVxBIfAR/47j0M0=@vger.kernel.org, AJvYcCWdg4/AwhC7iy2iyPEipuaUu3aZyGwPyhegHvpScIGbaDWCQZw5/2kHVtWrmRTVrmgEwdVpGC8nlSXtYFE1+bA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3GOgCXpqYJVWRqsTNVN4MdP/GEIVzZFtptGxuDL6WxtPX4byM
-	qVrslwgBhhkIytHgOzkRw1OibYf551O5yx8YxYHqtKCPTi4rkiSHvjjpHMV35L367ZqmabR4Aib
-	zwQPsrLyXDhQdU9rOkwuQhITNuu4=
-X-Google-Smtp-Source: AGHT+IHUhU0ROX8OdVi52tjJJSq+LdO5tFyeyINTRxSOzJvM7W2GUDGG+EPxO5JkvWLd6hAWFIGl4NvIi3YCIU35k3o=
-X-Received: by 2002:a05:651c:247:b0:2fb:65c8:b4ca with SMTP id
- 38308e7fff4ca-2ff23daf148mr27750441fa.40.1731202629022; Sat, 09 Nov 2024
- 17:37:09 -0800 (PST)
+	s=k20201202; t=1731202631;
+	bh=us5XMqVwdbsYqray5sAUkCpHJq/PzlTni1SE6suosWA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=FYpHijwk9mcoVCtK/bAUiFUeeUIfQf92dIktH/Ui4EM0+1FbLTrjZKR8ZDDZWsG8R
+	 3tdxMA9KnbGlYbhUQoCkE3K/POCpboPw+Tsj8vHCI3RcxuB5dR0DL155C80qzwUqFa
+	 LflcVEYQv/FONuhc6bx14auG8qGNtGBwrxL5Z73IrBNDp4teVkkwgILQpFk1uqSihY
+	 hYnx4j3hz4//F5pxW0welWeNGSBQBr78iNnllRAmzWQQE7qyLqutK/JYjOeXc0u1QJ
+	 6860ZflHe8fte6sr/phGtKskgwCDD3qWGZ4rRIzRALRMWDg9ZDbtMmBIVHbZCVUAL+
+	 k0lEGg/1Euv5g==
+From: Masahiro Yamada <masahiroy@kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	rust-for-linux@vger.kernel.org,
+	cocci@inria.fr,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Nicolas Schier <nicolas@fjasle.eu>
+Subject: [PATCH v2 08/11] kbuild: support -fmacro-prefix-map for external modules
+Date: Sun, 10 Nov 2024 10:34:36 +0900
+Message-ID: <20241110013649.34903-9-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20241110013649.34903-1-masahiroy@kernel.org>
+References: <20241110013649.34903-1-masahiroy@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240917141725.466514-1-masahiroy@kernel.org> <20240917141725.466514-20-masahiroy@kernel.org>
- <20241003-mustard-marmot-of-storm-af36a2@lindesnes> <20241004-precious-nightingale-of-pluck-b78ac3@lindesnes>
-In-Reply-To: <20241004-precious-nightingale-of-pluck-b78ac3@lindesnes>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Sun, 10 Nov 2024 10:36:32 +0900
-X-Gmail-Original-Message-ID: <CAK7LNATpKk28mx5Au6pge-uAJCwqkQHdUXKNTDs-QQj6bOoeFQ@mail.gmail.com>
-Message-ID: <CAK7LNATpKk28mx5Au6pge-uAJCwqkQHdUXKNTDs-QQj6bOoeFQ@mail.gmail.com>
-Subject: Re: [PATCH 19/23] kbuild: support building external modules in a
- separate build directory
-To: Nicolas Schier <nicolas@fjasle.eu>
-Cc: linux-kbuild@vger.kernel.org, Miguel Ojeda <ojeda@kernel.org>, 
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Nathan Chancellor <nathan@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sat, Oct 5, 2024 at 4:45=E2=80=AFAM Nicolas Schier <nicolas@fjasle.eu> w=
-rote:
+This commit makes -fmacro-prefix-map work for external modules built in
+a separate output directory. It improves the reproducibility of external
+modules and provides the benefits described in commit a73619a845d5
+("kbuild: use -fmacro-prefix-map to make __FILE__ a relative path").
 
-> > > @@ -640,6 +648,7 @@ quiet_cmd_makefile =3D GEN     Makefile
-> > >     } > Makefile
-> > >
-> > >  outputmakefile:
-> > > +ifeq ($(KBUILD_EXTMOD),)
-> > >     @if [ -f $(srctree)/.config -o \
-> > >              -d $(srctree)/include/config -o \
-> > >              -d $(srctree)/arch/$(SRCARCH)/include/generated ]; then =
-\
-> > > @@ -649,7 +658,16 @@ outputmakefile:
-> > >             echo >&2 "***"; \
-> > >             false; \
-> > >     fi
-> > > -   $(Q)ln -fsn $(srctree) source
-> > > +else
-> > > +   @if [ -f $(KBUILD_EXTMOD)/modules.order ]; then \
->
-> If I do
->
->     make O=3Dbuild
->     touch fs/btrfs/modules.order
->     make O=3Dbuild M=3Dfs/btrfs/ MO=3D/tmp/btrfs CONFIG_BTRFS_FS=3Dm
->
-> the 'modules.order' check does not work correctly.  But a consequtive
->
->     make -C /tmp/btrfs CONFIG_BTRFS_FS=3Dm
->
-> shows the 'The external module source tree is not clean.' message as
-> expected.
->
-> If I replace $(KBUILD_EXTMOD) by $(abs_extmodtree), it works for me also
-> in the first case.
+When building_out_of_srctree is not defined (e.g., when the kernel or
+external module is built in the source directory), this option is
+unnecessary.
 
-Right, this check does not work correctly
-when KBUILD_EXTMOD is a relative path.
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
+---
 
-In v2, I changed this part.
+Changes in v2:
+  - Check building_out_of_srctree instead of VPATH
 
+ Makefile | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
+diff --git a/Makefile b/Makefile
+index 38ce19747728..5488aa96b46b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1041,8 +1041,10 @@ ifdef CONFIG_CC_IS_GCC
+ KBUILD_CFLAGS   += -fconserve-stack
+ endif
+ 
+-# change __FILE__ to the relative path from the srctree
+-KBUILD_CPPFLAGS += $(call cc-option,-fmacro-prefix-map=$(srctree)/=)
++# change __FILE__ to the relative path to the source directory
++ifdef building_out_of_srctree
++KBUILD_CPPFLAGS += $(call cc-option,-fmacro-prefix-map=$(srcroot)/=)
++endif
+ 
+ # include additional Makefiles when needed
+ include-y			:= scripts/Makefile.extrawarn
+-- 
+2.43.0
 
---
-Best Regards
-Masahiro Yamada
