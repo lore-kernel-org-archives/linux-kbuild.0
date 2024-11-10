@@ -1,182 +1,111 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBC991531E1;
-	Sun, 10 Nov 2024 01:37:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 381F5156F3B;
+	Sun, 10 Nov 2024 01:37:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731202636; cv=none; b=eMyxE4hjlyrFuLQN0IJ9ARxr6WbnI3WWQ8BSlFQnmqyDcgENMChjvcccRtzh3zTgX6ZCDQPG2luax3m0o9icgBBxAPDoO3lADuAEctY5eJ7nUxRgmcAwW1YxLOLi51VpBlozqaU2lXoN0fl6qRMGE/JqVYjecsJMUk2I4wooDmo=
+	t=1731202640; cv=none; b=bBZSY0qPi5PBdVWIwV/Kz3GwfLlDE76N5D6U0KUvROVvHwhHb30tz5pn0TDk0psynHV1CvFjn+8ymWvFM2O1+1rFlM2dOY+rUkXMv4hUn4D0DG3pm08jw/YDxtfVyMpMEZZKdGRqzM0payKMYYYX3QmZ41AXaYPu78WQgMfFfPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731202636; c=relaxed/simple;
-	bh=JnWxdVvEakJui+gj8y0AxBpvkUHKa2A9Zi/L+iOkT1Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ElVZnibyjkgk1bmpLtvkkU/Iv8FYdp0lwQVrgG463APoXO3oAa2W8jhFsY2BA3rYA03Bs+Gem4a4JSDFRh6xrG3dD+vbuUlDmleIvVVClpnWh4JmvP1OjXkL8dLITiOInUfAXjO91a49qbX8R4Y86cAyRnAGeV9Q8mzjPlYINQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bwaaGq2H; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1731202640; c=relaxed/simple;
+	bh=LnNEpa/HZX7mcyixSAXxOl1pf8RoJrB5+xssS5UsWYg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=opvAoEeDwIiqx8y6xq4/wAS7F+Y294vSzkEpGnLH38cq+KKcaxFykRwrO4bAg3XHUgIm3Ypb6jQMWQblsxkx9hesvstCWqMUsGUtlPMyYaORduuGBUTh6KFUyV0mkPiZMJtdQpLNlf+2OAayNQ9njUbHxhlU7NfpoGa7icVP3HU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SiD6Kljb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bwaaGq2H"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D4A0C4CED4;
-	Sun, 10 Nov 2024 01:37:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SiD6Kljb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 192C0C4CECE;
+	Sun, 10 Nov 2024 01:37:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731202636;
-	bh=JnWxdVvEakJui+gj8y0AxBpvkUHKa2A9Zi/L+iOkT1Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bwaaGq2HqiVB2ahWcOSdWO3oIJXB7Eg6GV61J+xbFylFN/twskGjDMCQccPPIldvI
-	 zS0AxzPzUaaV/bw1hlYH+M74PtywkLUgBmISlhKQyFACz962upk1J4iuF6uhL8QKnL
-	 xy3mlAamzLiMZRvFiAqQItnFPAeTmxb9wzxzQrz/M5ul1BqXMQ+1T53dc9O7mp75oP
-	 m+zaJzb2Sje2GMiWQ/5XADl2KZK75KQhtD9hjFRlOL7DABkghTsk+SUjUxgHlIKtm9
-	 j/tqReUhKCoTZ2r41ztMH5Kyhf4ksju/aRIIHqCqkRNs4F1fL/VRW+FBOEhWPfSVkC
-	 ODb2gw/ITRmKg==
-From: Masahiro Yamada <masahiroy@kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	rust-for-linux@vger.kernel.org,
-	cocci@inria.fr,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Nicolas Schier <nicolas@fjasle.eu>
-Subject: [PATCH v2 11/11] kbuild: allow to start building external modules in any directory
-Date: Sun, 10 Nov 2024 10:34:39 +0900
-Message-ID: <20241110013649.34903-12-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241110013649.34903-1-masahiroy@kernel.org>
-References: <20241110013649.34903-1-masahiroy@kernel.org>
+	s=k20201202; t=1731202640;
+	bh=LnNEpa/HZX7mcyixSAXxOl1pf8RoJrB5+xssS5UsWYg=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=SiD6KljbSfGpD/jdFVZF8hyNgZl0Kknrd8QbgBnjrovNyibD1hoXz2eHTX8XK6oAM
+	 Yl8r8x+J7HBKSsiobDFa3DUvfPOslMRxn0WHFrLLnBHT3SRv6YXfM7nvzeQq/8IrV9
+	 kLXilUE9AfRIvys+Hnht+CBPr5yltx2j/x0kRlk8sAuIBUVVCD9PtGOrA+DWlVPS6U
+	 XjKuFjo0SVJhwno89JX95R5TrQAxC5fWNVPJnHHP3Yg6nZ6fZ4Sz+GTOs7GTmqe3wy
+	 B5bXWB5i5EE07nBBIUAPRGLFk1ZVG/EKA2TECozP70l/4Gl88O2fsl48Zs2SPAOWmK
+	 LDcQnPgnZWVeQ==
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2fb470a8b27so39346991fa.1;
+        Sat, 09 Nov 2024 17:37:20 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWwlxMhwnGgzoS9W7Pi9WNAZwDilrMi+tJKUxyRj4h4z4env1gWhjPIZ3H0j7hX0qop/obdV358v8g5MxCpHGM=@vger.kernel.org, AJvYcCXIpPWyrPBehrbdWtsSUZXFHFBzhS3lD6Yga/j6YfDGNl13bYQOOU8ouBIndK2OSAUV9FE+Jxht8+OUYiU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZl+mB1zGhDibdPlIybeEKstqjduOWutj5VQkdNzUnwprkDDqu
+	4mg2DXDmqVWR5sweCeVzZqVLiblq3hao3Lzw2OKZjI7x34+gQLkzp+Ma5btkcCiX1MSd5IRb4su
+	+cV+R+hbwJGfHEw0egOycBSg49EU=
+X-Google-Smtp-Source: AGHT+IFGcfOP77GehGduhNUJLZd7rfR0VkcHzXTghglCpOx8L+pLMx/+vclH+5ddzS35blU1ZXVC62RlVwA0L8iBWbM=
+X-Received: by 2002:a2e:bc8b:0:b0:2fa:faed:e86b with SMTP id
+ 38308e7fff4ca-2ff20981669mr27884461fa.13.1731202638733; Sat, 09 Nov 2024
+ 17:37:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240917141725.466514-1-masahiroy@kernel.org> <20240917141725.466514-19-masahiroy@kernel.org>
+ <20241003-petite-mamba-of-champagne-d9e0ac@lindesnes>
+In-Reply-To: <20241003-petite-mamba-of-champagne-d9e0ac@lindesnes>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Sun, 10 Nov 2024 10:36:42 +0900
+X-Gmail-Original-Message-ID: <CAK7LNARYW6FtkbFm4V7hW49FoxoFa7rkCv0Hk4hnBwRxvLtYmA@mail.gmail.com>
+Message-ID: <CAK7LNARYW6FtkbFm4V7hW49FoxoFa7rkCv0Hk4hnBwRxvLtYmA@mail.gmail.com>
+Subject: Re: [PATCH 18/23] kbuild: remove extmod_prefix, MODORDER,
+ MODULES_NSDEPS variables
+To: Nicolas Schier <nicolas@fjasle.eu>
+Cc: linux-kbuild@vger.kernel.org, Miguel Ojeda <ojeda@kernel.org>, 
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Nathan Chancellor <nathan@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Unless an explicit O= option is provided, external module builds must
-start from the kernel directory.
+On Fri, Oct 4, 2024 at 3:47=E2=80=AFAM Nicolas Schier <nicolas@fjasle.eu> w=
+rote:
+>
+> On Tue, Sep 17, 2024 at 11:16:46PM +0900, Masahiro Yamada wrote:
+> > With the previous changes, $(extmod_prefix), $(MODORDER), and
+> > $(MODULES_NSDEPS) are constant. (empty, modules.order, and
+> > modules.nsdeps, respectively).
+> >
+> > Remove these variables and hard-code their values.
+> >
+> > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> > ---
+> >
+> >  Makefile                  | 22 +++++++++-------------
+> >  scripts/Makefile.modfinal |  2 +-
+> >  scripts/Makefile.modinst  |  2 +-
+> >  scripts/Makefile.modpost  |  6 +++---
+> >  scripts/nsdeps            |  2 +-
+> >  5 files changed, 15 insertions(+), 19 deletions(-)
+>
+> Do you want to remove these also?  I can't think of a reason to keep thes=
+e
+> around:
+>
+> $ git grep -Hrnwe extmod_prefix -e MODORDER -e MODULES_NSDEP
+> Makefile:1912:  $(Q){ $(foreach m, $(single-ko), echo $(extmod_prefix)$(m=
+:%.ko=3D%.o);) } > modules.order
+> scripts/Makefile.modfinal:33:$(extmod_prefix).module-common.o: $(srctree)=
+/scripts/module-common.c FORCE
+> scripts/Makefile.modfinal:60:%.ko: %.o %.mod.o $(extmod_prefix).module-co=
+mmon.o $(objtree)/scripts/module.lds $(and $(CONFIG_DEBUG_INFO_BTF_MODULES)=
+,$(KBUILD_BUILTIN),$(objtree)/vmlinux) FORCE
+> scripts/Makefile.modfinal:66:targets +=3D $(modules:%.o=3D%.ko) $(modules=
+:%.o=3D%.mod.o) $(extmod_prefix).module-common.o
+> scripts/Makefile.modinst:60:modules :=3D $(patsubst $(extmod_prefix)%.o, =
+$(dst)/%.ko$(suffix-y), $(modules))
+> scripts/Makefile.modinst:120:$(dst)/%.ko: $(extmod_prefix)%.ko FORCE
 
-This can be achieved by using the -C option:
+Right, I will clean up these.
 
-  $ make -C /path/to/kernel M=/path/to/external/module
 
-This commit allows starting external module builds from any directory,
-so you can also do the following:
 
-  $ make -f /path/to/kernel/Makefile M=/path/to/external/module
+> W/ or w/o:
+>
+> Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
 
-The key difference is that the -C option changes the working directory
-and parses the Makefile located there, while the -f option only
-specifies the Makefile to use.
 
-As shown in the examples in Documentation/kbuild/modules.rst, external
-modules usually have a wrapper Makefile that allows you to build them
-without specifying any make arguments. The Makefile typically contains
-a rule as follows:
 
-    KDIR ?= /path/to/kernel
-    default:
-            $(MAKE) -C $(KDIR) M=$(CURDIR) $(MAKECMDGOALS)
-
-The log will appear as follows:
-
-    $ make
-    make -C /path/to/kernel M=/path/to/external/module
-    make[1]: Entering directory '/path/to/kernel'
-    make[2]: Entering directory '/path/to/external/module'
-      CC [M]  helloworld.o
-      MODPOST Module.symvers
-      CC [M]  helloworld.mod.o
-      CC [M]  .module-common.o
-      LD [M]  helloworld.ko
-    make[2]: Leaving directory '/path/to/external/module'
-    make[1]: Leaving directory '/path/to/kernel'
-
-This changes the working directory twice because the -C option first
-switches to the kernel directory, and then Kbuild internally recurses
-back to the external module directory.
-
-With this commit, the wrapper Makefile can directly include the kernel
-Makefile:
-
-    KDIR ?= /path/to/kernel
-    export KBUILD_EXTMOD := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
-    include $(KDIR)/Makefile
-
-This avoids unnecessary sub-make invocations:
-
-    $ make
-      CC [M]  helloworld.o
-      MODPOST Module.symvers
-      CC [M]  helloworld.mod.o
-      CC [M]  .module-common.o
-      LD [M]  helloworld.ko
-
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
----
-
-Changes in v2:
-  - Fix typos in the commit description (s/exernal/external/)
-  - Fix `uname -r` to $(shell uname -r) in Example 3
-
- Documentation/kbuild/modules.rst | 21 +++++++++++++++++++++
- Makefile                         |  8 ++++++--
- 2 files changed, 27 insertions(+), 2 deletions(-)
-
-diff --git a/Documentation/kbuild/modules.rst b/Documentation/kbuild/modules.rst
-index a01f3754c7fc..101de236cd0c 100644
---- a/Documentation/kbuild/modules.rst
-+++ b/Documentation/kbuild/modules.rst
-@@ -59,6 +59,12 @@ Command Syntax
- 
- 		$ make -C /lib/modules/`uname -r`/build M=$PWD modules_install
- 
-+	Starting from Linux 6.13, you can use the -f option instead of -C. This
-+	will avoid unnecessary change of the working directory. The external
-+	module will be output to the directory where you invoke make.
-+
-+		$ make -f /lib/modules/`uname -r`/build/Makefile M=$PWD
-+
- Options
- -------
- 
-@@ -221,6 +227,21 @@ Separate Kbuild File and Makefile
- 	consisting of several hundred lines, and here it really pays
- 	off to separate the kbuild part from the rest.
- 
-+	Linux 6.13 and later support another way. The external module Makefile
-+	can include the kernel Makefile directly, rather than invoking sub Make.
-+
-+	Example 3::
-+
-+		--> filename: Kbuild
-+		obj-m  := 8123.o
-+		8123-y := 8123_if.o 8123_pci.o
-+
-+		--> filename: Makefile
-+		KDIR ?= /lib/modules/$(shell uname -r)/build
-+		export KBUILD_EXTMOD := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
-+		include $(KDIR)/Makefile
-+
-+
- Building Multiple Modules
- -------------------------
- 
-diff --git a/Makefile b/Makefile
-index df002595341a..0825a9a58ca9 100644
---- a/Makefile
-+++ b/Makefile
-@@ -189,9 +189,13 @@ ifdef KBUILD_EXTMOD
-         objtree := $(realpath $(KBUILD_OUTPUT))
-         $(if $(objtree),,$(error specified kernel directory "$(KBUILD_OUTPUT)" does not exist))
-     else
--        objtree := $(CURDIR)
-+        objtree := $(abs_srctree)
-     endif
--    output := $(or $(KBUILD_EXTMOD_OUTPUT),$(KBUILD_EXTMOD))
-+    # If Make is invoked from the kernel directory (either kernel
-+    # source directory or kernel build directory), external modules
-+    # are built in $(KBUILD_EXTMOD) for backward compatibility,
-+    # otherwise, built in the current directory.
-+    output := $(or $(KBUILD_EXTMOD_OUTPUT),$(if $(filter $(CURDIR),$(objtree) $(abs_srctree)),$(KBUILD_EXTMOD)))
-     # KBUILD_EXTMOD might be a relative path. Remember its absolute path before
-     # Make changes the working directory.
-     srcroot := $(realpath $(KBUILD_EXTMOD))
--- 
-2.43.0
-
+--
+Best Regards
+Masahiro Yamada
