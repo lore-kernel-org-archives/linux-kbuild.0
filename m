@@ -1,156 +1,135 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0648E42069;
-	Sat,  9 Nov 2024 22:53:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E02A62914;
+	Sun, 10 Nov 2024 01:36:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731192814; cv=none; b=U8o9ivDiJ7RkhcBb3dOv/7qAC/b3EPDERL8oypelIvl9p3dohjOWBzREkWBZ8P15YJhdjdKR0UFc6AlFpzNGeGVGfrsCgIxkjqh7Yjli7/6x8eM92uqiPNVPSEEe/IiuEtX9NaR62QdFI/grYwPZTW67x8a3Eio3T2EL2fiVCk4=
+	t=1731202608; cv=none; b=aoIIFKXUvx5jdk0RyQtQYkjmTbaNbMcVTH0ZX+wxY/Cn43x1M5gQrdJVGVfQtful1PayDewRxVM5bF1VlJcluCIuX7Ee2/t24+ZG2pQTtrpBLYD80fpPVSEkGxg3VnxLpiRpAFnki3GyYGZjzk5PXMlLROUxAJoSBSukeBjmsUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731192814; c=relaxed/simple;
-	bh=xtcrRBtDp1sQT0+olLfHpFoUN9DRG4asrIehpwN2shU=;
+	s=arc-20240116; t=1731202608; c=relaxed/simple;
+	bh=E3SoG8k/aV1i85tzOsAGTSFTx7UX87P+OkkgxMcscmY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mRx7SyuIbEFMjD47e7PCQJdZTESxwPQCW7TkMVWG5S0FbWDKpGUwXFL3QcI2LdvOYcO+BAUSagxvZXhyZ3fKlA3rwo61wkbmkbAePtxpEaoIlfpG+K7nI80em/5cSidDu2Lms1cVnS4PYS4plL6Tax12Ot0u94F4nLkqZ5+PCTo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iPX4xBFJ; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=b/ThZPjC7w0bsVBMCq7yYhXbVlD9bqbn1bXhZJPoMoq0+87dgonOSIQgBva83h2daDFHTDaD8OjdyKftqS/6r2CI2xBke5lx8Nvh402DA8yO1FhqjnaL0NUtkD1LGEc+PUtsk/xKWPeZV46qfXQdKe57nJC2SpRhe5SZBq5fsbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PjfD7tT5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iPX4xBFJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B82DC4CECE;
-	Sat,  9 Nov 2024 22:53:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PjfD7tT5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81A9EC4AF0B;
+	Sun, 10 Nov 2024 01:36:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731192813;
-	bh=xtcrRBtDp1sQT0+olLfHpFoUN9DRG4asrIehpwN2shU=;
+	s=k20201202; t=1731202607;
+	bh=E3SoG8k/aV1i85tzOsAGTSFTx7UX87P+OkkgxMcscmY=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=iPX4xBFJO+DLDLWfGnZwDzJz+350Jl+p/Wjd1mXWjXvvLePBnvbRqSUpkA3vmag/I
-	 a+5gbmDwYC/F2i9T9WCbDawKptanoPpoLskgED7+2h/AVZX9ETah6xO8kUY3se2B/g
-	 WBZuE7d0Lg6FCwluIR9dOvfjh43ScCO8FXbWOcC/6YliZLoH1nNB2+H2RjUAsqmluv
-	 r1zWqcEwE3EfpS2DF8XnLaF3pd9cglAd/WdQFa8Z5ULeufpn8HKSsKq65uubxU+dgt
-	 OVg1NtFgDtBUJ9bHhuCd19thrhPYL7Dql6tAAdNMmTrjffLWr7pmFDEbnYMvuAkJ7K
-	 cwwT+NpBfjD5Q==
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2fb3ce15172so39208801fa.0;
-        Sat, 09 Nov 2024 14:53:33 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUwFiuloN1/GDZuo6Kdbs7KS3NvDjcA374ztyk8W7oDCFOFS0/SLfqZZafEqvMqf23ye9S0jvi7n7mx5HJJ@vger.kernel.org, AJvYcCVL5kp4uQEATtQYTe0+KxpeDar4O3o/KxiILzxQR6gGu85iLPIB/KuGhvrvFz2PUD456SYm5NZ/inNyaSk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJCLEjyJSqds2uXFHgzK2zSQ/YEcFjgL/bvaDMcP2TsKSlIhFu
-	d3b0q7Q7Hk8BU1YENFCh+ynpacXE/q2QmS7iz1j0Wg4SzJkW3E8lvazbcPcDxXLrmlwnWHbhk3G
-	AAi9YaM4OsJC9ZQg3ixHXTaYzFk4=
-X-Google-Smtp-Source: AGHT+IHjvn36AnbQLmAWrdPLIf0XSNJ4Dxd6AnhuLakBkJhSf8xKtWBp8YWLdr4o6gqYTIovPRGtUTSjRuk/Ho4NbdY=
-X-Received: by 2002:a05:651c:221e:b0:2fa:ce0d:ec34 with SMTP id
- 38308e7fff4ca-2ff209437a4mr22012941fa.2.1731192812236; Sat, 09 Nov 2024
- 14:53:32 -0800 (PST)
+	b=PjfD7tT5H4nrPo7Zv7gyTmqf7L4ZKnHecPouvsNCD1sF7j/vVlEUxy/6/LeEdwqXX
+	 vNyAxsOitUkSDGMuYfjB5y4r1YtvVX9d0EDuFJpJ92deaF/iq3d0YZiz0+jwfufjQB
+	 qsFmrzcCxo9XRjrnutJTd9YB5thCddd52fLb861YsDpMbDXdO93125byez+n6r4Jyb
+	 NwtPFNQ2MDuijBnmwcs5CVJr7ol6vqLtRO+xMy4r5QtTHB7tI7wySrPqslmlQIyeD9
+	 24CSAbYMMlBbCZJMqB2JSlLNah/3C9FLjQ8YC6PXeV/ClFWBzu/wgO+51MzqzSg5WM
+	 +hsbZJsSsHdXg==
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-539ee1acb86so3941946e87.0;
+        Sat, 09 Nov 2024 17:36:47 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUpxhFcB432pP50MRCoLfUiVABeu5Ho+Q4HY2ISZsJn/3ZYp6P6N0OYIRQ2/SqgJH9RCpiNH4+tfI+16PI=@vger.kernel.org, AJvYcCWW1aNonlH5GZ2lNxfGd4tsuv5ffz8X8IsWx66MYbo+EPzucNYcVX28YsZqMc7EqiCzHfnxmeT0iAbZh6KVr9g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzrt49TC1i6RiSm/0pErOfCjkD8Y9btRwex7AG7SR3FtDG9DuBi
+	uXVR7a2QXkhD9+04VvMe2V65T2IBg5jMpi6hT9x0vi6Kb32KXvO/9bg3+UHtdbnk26rmnHAGAgI
+	FM98Z1mqb2MnlyhK+osrJkTZEiPM=
+X-Google-Smtp-Source: AGHT+IHJZnaOjQ6LluQjKywtfMJhzNZE5VsThKb5nWROn77YWDMoMcmvgmQ+tFzkKY38JxdtzJFqABCv4/6tzZr14W0=
+X-Received: by 2002:a2e:a541:0:b0:2f7:64b9:ff90 with SMTP id
+ 38308e7fff4ca-2ff20144c4amr34386481fa.9.1731202606189; Sat, 09 Nov 2024
+ 17:36:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241031132630.24667-1-t.boehler@kunbus.com> <20241031132630.24667-4-t.boehler@kunbus.com>
-In-Reply-To: <20241031132630.24667-4-t.boehler@kunbus.com>
+References: <20240917141725.466514-1-masahiroy@kernel.org> <20240917141725.466514-20-masahiroy@kernel.org>
+ <20241003-mustard-marmot-of-storm-af36a2@lindesnes>
+In-Reply-To: <20241003-mustard-marmot-of-storm-af36a2@lindesnes>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Sun, 10 Nov 2024 07:52:56 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAQSJJy27=jc3qQVsLd0kYmUJBOa7c=b6pHeonx81TwKFQ@mail.gmail.com>
-Message-ID: <CAK7LNAQSJJy27=jc3qQVsLd0kYmUJBOa7c=b6pHeonx81TwKFQ@mail.gmail.com>
-Subject: Re: [PATCH 3/3] package: debian: don't include .gitignore under scripts/
-To: =?UTF-8?Q?Thomas_B=C3=B6hler?= <t.boehler@kunbus.com>
-Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Philipp Rosenberger <p.rosenberger@kunbus.com>, 
-	Lino Sanfilippo <l.sanfilippo@kunbus.com>
+Date: Sun, 10 Nov 2024 10:36:09 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAQ5Ay2iTyNwJ957S77ipdP1uLR3vehK+SEh17f3v0B_nw@mail.gmail.com>
+Message-ID: <CAK7LNAQ5Ay2iTyNwJ957S77ipdP1uLR3vehK+SEh17f3v0B_nw@mail.gmail.com>
+Subject: Re: [PATCH 19/23] kbuild: support building external modules in a
+ separate build directory
+To: Nicolas Schier <nicolas@fjasle.eu>
+Cc: linux-kbuild@vger.kernel.org, Miguel Ojeda <ojeda@kernel.org>, 
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Nathan Chancellor <nathan@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Please use "kbuild: deb-pkg:" as the commit subject.
+On Fri, Oct 4, 2024 at 4:47=E2=80=AFAM Nicolas Schier <nicolas@fjasle.eu> w=
+rote:
 
-
-
-On Thu, Oct 31, 2024 at 10:26=E2=80=AFPM Thomas B=C3=B6hler <t.boehler@kunb=
-us.com> wrote:
+> > @@ -109,6 +109,9 @@ executed to make module versioning work.
+> >               directory where the external module (kbuild file) is
+> >               located.
+> >
+> > +     MO=3D$BUILD_DIR
+> > +             Speficies a separate output directory for the external mo=
+dule.
 >
-> Files to copy into the header package from the scripts/ directory are
-> listed by a call to find which also includes .gitignore files. These
-> don't belong in the package, and lintian also complains with a
-> "package-contains-vcs-control-file":
+> s/Speficies/Specifies/
+
+Thanks, I will fix.
+
 >
->     W: linux-headers-6.12.0-rc4-g7e04fcfc6195: package-contains-vcs-contr=
-ol-file [usr/src/linux-headers-6.12.0-rc4-g7e04fcfc6195/scripts/.gitignore]
->     W: linux-headers-6.12.0-rc4-g7e04fcfc6195: package-contains-vcs-contr=
-ol-file [usr/src/linux-headers-6.12.0-rc4-g7e04fcfc6195/scripts/basic/.giti=
-gnore]
->     W: linux-headers-6.12.0-rc4-g7e04fcfc6195: package-contains-vcs-contr=
-ol-file [usr/src/linux-headers-6.12.0-rc4-g7e04fcfc6195/scripts/gcc-plugins=
-/.gitignore]
->     W: linux-headers-6.12.0-rc4-g7e04fcfc6195: package-contains-vcs-contr=
-ol-file [usr/src/linux-headers-6.12.0-rc4-g7e04fcfc6195/scripts/gdb/linux/.=
-gitignore]
->     W: linux-headers-6.12.0-rc4-g7e04fcfc6195: package-contains-vcs-contr=
-ol-file [usr/src/linux-headers-6.12.0-rc4-g7e04fcfc6195/scripts/genksyms/.g=
-itignore]
->     W: linux-headers-6.12.0-rc4-g7e04fcfc6195: package-contains-vcs-contr=
-ol-file [usr/src/linux-headers-6.12.0-rc4-g7e04fcfc6195/scripts/ipe/polgen/=
-.gitignore]
->     W: linux-headers-6.12.0-rc4-g7e04fcfc6195: package-contains-vcs-contr=
-ol-file [usr/src/linux-headers-6.12.0-rc4-g7e04fcfc6195/scripts/mod/.gitign=
-ore]
->     W: linux-headers-6.12.0-rc4-g7e04fcfc6195: package-contains-vcs-contr=
-ol-file [usr/src/linux-headers-6.12.0-rc4-g7e04fcfc6195/scripts/selinux/gen=
-headers/.gitignore]
->     W: linux-headers-6.12.0-rc4-g7e04fcfc6195: package-contains-vcs-contr=
-ol-file [usr/src/linux-headers-6.12.0-rc4-g7e04fcfc6195/scripts/selinux/mdp=
-/.gitignore]
-
-
-Could you add log messages based on linux-headers-6.12.0-rc6 instead?
-Then, the line length will become shorter.
-
-
-
-> Filter the .gitignore files so they're not copied into the resulting
-> package.
+> > +
+> >  2.3 Targets
+> >  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >
+> > diff --git a/Makefile b/Makefile
+> > index 9fbf7ef6e394..b654baa0763a 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -134,6 +134,10 @@ ifeq ("$(origin M)", "command line")
+> >    KBUILD_EXTMOD :=3D $(M)
+> >  endif
+> >
+> > +ifeq ("$(origin MO)", "command line")
+> > +  KBUILD_EXTMOD_OUTPUT :=3D $(MO)
+> > +endif
+> > +
+> >  $(if $(word 2, $(KBUILD_EXTMOD)), \
+> >       $(error building multiple external modules is not supported))
 >
-> Signed-off-by: Thomas B=C3=B6hler <t.boehler@kunbus.com>
-> ---
->  scripts/package/install-extmod-build | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
+> Should we also check against multiple output directories?
+
+
+I do not think so.
+
+When a directory path contains a space,
+it should be treated as-is, in general.
+
+However, GNU Make is not good at handling spaces in files paths.
+
+So, this will fail eventually (with a little more obscure way).
+
+$ make O=3Dbuild  M=3Dfs/btrfs MO=3D'/tmp/AA BB/btffs'
+Makefile:214: *** failed to create output directory "/tmp/AA BB/btffs".  St=
+op.
+
+
+
+
+
+
+> > -export building_out_of_srctree srctree VPATH
+> > +ifeq ($(realpath $(_vpath)),$(CURDIR))
 >
-> diff --git a/scripts/package/install-extmod-build b/scripts/package/insta=
-ll-extmod-build
-> index d2c9cacecc0c..5c735e176b53 100755
-> --- a/scripts/package/install-extmod-build
-> +++ b/scripts/package/install-extmod-build
-> @@ -12,7 +12,8 @@ is_enabled() {
->  find_in_scripts() {
->         find scripts \
->                 \( -name atomic -o -name dtc -o -name kconfig -o -name pa=
-ckage \) -prune -o \
-> -               ! -name unifdef -a ! -name mk_elfconfig -a \( -type f -o =
--type l \) -print
-> +               ! -name unifdef -a ! -name mk_elfconfig -a \( -type f -o =
--type l \) \
-> +               ! -name .gitignore -print
+> Just a style consistency question: 'ifeq (,)' with a space after ',' (as =
+a few
+> lines above) or without as used here?
 
-For consistency, please move the new pattern before -a \( -type f -o -type =
-l \)
+Maybe, we should keep consistency.
+
+But, this line will be removed in v2.
 
 
 
->  }
->
->  mkdir -p "${destdir}"
-> @@ -23,7 +24,8 @@ mkdir -p "${destdir}"
->         find "arch/${SRCARCH}" -maxdepth 1 -name 'Makefile*'
->         find "arch/${SRCARCH}" -name generated -prune -o -name include -t=
-ype d -print
->         find "arch/${SRCARCH}" -name Kbuild.platforms -o -name Platform
-> -       find include \( -name config -o -name generated \) -prune -o \( -=
-type f -o -type l \) -print
-> +       find include \( -name config -o -name generated \) -prune -o \( -=
-type f -o -type l \) \
-> +               ! -name .gitignore -print
->         find_in_scripts
->  ) | tar -c -f - -C "${srctree}" -T - | tar -xf - -C "${destdir}"
->
-> --
-> 2.39.2
->
 
 
---=20
+
+--
 Best Regards
 Masahiro Yamada
