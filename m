@@ -1,51 +1,52 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B0C615A85E;
-	Mon, 11 Nov 2024 08:08:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D6BE15AAC1;
+	Mon, 11 Nov 2024 08:08:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731312537; cv=none; b=Br/S9wvxQn/rs3+3zqGiSTVhXXSL4XczB5quzn4YfN+RnA8qxefxtLTTZ/aVgqd0Lha1iz1N3rMekHwCD29ITsnuz9LT8VAKp5amGyjytB6+qWsqQIkR6srsGOqW4lHGnbPBzCa1TNOrTxN1qOdOkuveFJvLiS3P3UU7PWNZfEw=
+	t=1731312537; cv=none; b=t+wFMy6tMZnF8zBwmbnyxcwEaA9IRu7umfa2KgVtJshTkAsq1lK5sx8wnBe2QMOYNTzzLQWOe5P/5ecjYnvEkei1oC0Q4uHdEAdIJP4z4eoxBIpefIGB4O/yXBgFjx+RET2ac6klIcC/JKrspi/Aelo+TX87gXkD7avb17VInTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1731312537; c=relaxed/simple;
-	bh=smdCnKK5JCnXzm+UfTq+T7poKVvmdHV4Efr4cxIXJpQ=;
+	bh=MlXbHuvt3wGllLux/V5NooK/PasQZbsIt3aVkig4UAk=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=BBVeG3wD9hZqk3Iq8Ch+eK5TiQPOpJ5lepeKFRe4oFPCfDELviT1KZViVp+mzBl+g0lEE59HPhnaxCUqZ7m52gZjHCm7EpIDVWDhjoCPSn5vK1IZmYugxgpnX+nRJvyz9ixba7IG8I5PgQCe8/oUESmdCDTDXrlFTTD6zxHnwy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MZCRVM4S; arc=none smtp.client-ip=192.198.163.9
+	 In-Reply-To:To:Cc; b=GK+m2rezUEV+9N3Rb+y2Q9wnOLF10gUZFREnHUISpBh/4vpyPLMzMuBNRspCDG5L1qS9SMKW0dYTQDTVmXN7whHjxOloVLvIqm27G5jO1vXP1kNhVtelUJ8M+Km6/z2V3kOAeiDbQBkhtShm+NRsp+FOpCs49LqSbu101i9Dsfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KeaIU0GH; arc=none smtp.client-ip=192.198.163.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MZCRVM4S"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KeaIU0GH"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1731312536; x=1762848536;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=smdCnKK5JCnXzm+UfTq+T7poKVvmdHV4Efr4cxIXJpQ=;
-  b=MZCRVM4SEK9RVYv4p3Lyu1jN1DfoQ5td7Vs737gry08Q/9xMRBOghwMX
-   DLSn7nCNuEqyc2U4ZU1CvPpZLaycMHeLmvRzLbNg2hcBi6gWlyfNhxrWN
-   855ALUovhCp/Vm0rVDFqohWHL5UBIL4fkkGfmqSWx+idkHbKW5mEpky9J
-   c3jSvRkP0PBIADiImZIrZZ0NaSmxy5iGJt4L1+YAotZoqC64Z4ec9ITDi
-   XY9fUxZT536e7bXrzna1YkTODsSjmTWMFTf5uHvlgfSh/4K1t4H5EExdQ
-   zM7oVJUP63nWYTLq7d48ZaxUcHjq0RiCsmp/EjK3ZOA/7midbEPoiA8Rt
+  bh=MlXbHuvt3wGllLux/V5NooK/PasQZbsIt3aVkig4UAk=;
+  b=KeaIU0GHSPdwK3LUgc/jG9KeunVn7g+yd6GWhbmtXWPQBOt0KlGHKa59
+   /sFEuS7vPQMs+P+AfpdZ0ijSWq9pXQNRPka5151yfFUQ1oa1cQ/mZZnsW
+   TeFTngwp3XeVsMgNCIrRXHY9/NCRL5ZsZGyVcFk6HkvQ9jl5JodwCrowE
+   SV1olK03HMf/quTdTanGPdqf3TgVgOg8GN3Yw8Lp4q+trW+gYYTNNNrJe
+   jgvW3D2pVac0NO6rEOYETM6kXFw2P20+prC83xTN4K5yojrrNIZT4QdO8
+   dMWpdMM+aGC8LJpWdh7Mfl45Vibc7NJpIQWK54OQZ4BGQD1rh444IflWF
    g==;
-X-CSE-ConnectionGUID: zqWeihNhQwO2Jt+sp05zig==
-X-CSE-MsgGUID: f6tQAyA3Tl+Hl8ntGOSSKQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11252"; a="41723231"
+X-CSE-ConnectionGUID: M7iRoW1mTuKXlrGFfpsGug==
+X-CSE-MsgGUID: qUiXvB0QRxeIb+l1A+MjUA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11252"; a="41723213"
 X-IronPort-AV: E=Sophos;i="6.12,144,1728975600"; 
-   d="scan'208";a="41723231"
+   d="scan'208";a="41723213"
 Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2024 00:08:54 -0800
-X-CSE-ConnectionGUID: 8sE7QjK3TMeQP2m0/+C2OA==
-X-CSE-MsgGUID: MPp1Ll9TSkCLxdleYrfQjQ==
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2024 00:08:53 -0800
+X-CSE-ConnectionGUID: pmj1l1XLT2yUK3UG+mS9MA==
+X-CSE-MsgGUID: +x/rkvrsTsmI5sPF+DZ/yA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,144,1728975600"; 
-   d="scan'208";a="91323655"
+   d="scan'208";a="91323645"
 Received: from jekeller-desk.jf.intel.com ([10.166.241.20])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2024 00:08:54 -0800
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2024 00:08:53 -0800
 From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Mon, 11 Nov 2024 00:08:45 -0800
-Subject: [PATCH net-next v5 4/9] ice: remove int_q_state from ice_tlan_ctx
+Date: Mon, 11 Nov 2024 00:08:43 -0800
+Subject: [PATCH net-next v5 2/9] lib: packing: demote truncation error in
+ pack() to a warning in __pack()
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -54,7 +55,7 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241111-packing-pack-fields-and-ice-implementation-v5-4-80c07349e6b7@intel.com>
+Message-Id: <20241111-packing-pack-fields-and-ice-implementation-v5-2-80c07349e6b7@intel.com>
 References: <20241111-packing-pack-fields-and-ice-implementation-v5-0-80c07349e6b7@intel.com>
 In-Reply-To: <20241111-packing-pack-fields-and-ice-implementation-v5-0-80c07349e6b7@intel.com>
 To: Vladimir Oltean <olteanv@gmail.com>, 
@@ -63,46 +64,109 @@ To: Vladimir Oltean <olteanv@gmail.com>,
  Paolo Abeni <pabeni@redhat.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
  Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
  Masahiro Yamada <masahiroy@kernel.org>, netdev <netdev@vger.kernel.org>
-Cc: linux-kbuild@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>
+Cc: linux-kbuild@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>, 
+ Vladimir Oltean <vladimir.oltean@nxp.com>
 X-Mailer: b4 0.14.1
 
-The int_q_state field of the ice_tlan_ctx structure represents the internal
-queue state. However, we never actually need to assign this or read this
-during normal operation. In fact, trying to unpack it would not be possible
-as it is larger than a u64. Remove this field from the ice_tlan_ctx
-structure, and remove its packing field from the ice_tlan_ctx_info array.
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Most of the sanity checks in pack() and unpack() can be covered at
+compile time. There is only one exception, and that is truncation of the
+uval during a pack() operation.
+
+We'd like the error-less __pack() to catch that condition as well. But
+at the same time, it is currently the responsibility of consumer drivers
+(currently just sja1105) to print anything at all when this error
+occurs, and then discard the return code.
+
+We can just print a loud warning in the library code and continue with
+the truncated __pack() operation. In practice, having the warning is
+very important, see commit 24deec6b9e4a ("net: dsa: sja1105: disallow
+C45 transactions on the BASE-TX MDIO bus") where the bug was caught
+exactly by noticing this print.
+
+Add the first print to the packing library, and at the same time remove
+the print for the same condition from the sja1105 driver, to avoid
+double printing.
+
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 ---
- drivers/net/ethernet/intel/ice/ice_lan_tx_rx.h | 1 -
- drivers/net/ethernet/intel/ice/ice_common.c    | 1 -
- 2 files changed, 2 deletions(-)
+ drivers/net/dsa/sja1105/sja1105_static_config.c |  8 ++------
+ lib/packing.c                                   | 26 ++++++++++---------------
+ 2 files changed, 12 insertions(+), 22 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_lan_tx_rx.h b/drivers/net/ethernet/intel/ice/ice_lan_tx_rx.h
-index 611577ebc29d..0e8ed8c226e6 100644
---- a/drivers/net/ethernet/intel/ice/ice_lan_tx_rx.h
-+++ b/drivers/net/ethernet/intel/ice/ice_lan_tx_rx.h
-@@ -590,7 +590,6 @@ struct ice_tlan_ctx {
- 	u8 drop_ena;
- 	u8 cache_prof_idx;
- 	u8 pkt_shaper_prof_idx;
--	u8 int_q_state;	/* width not needed - internal - DO NOT WRITE!!! */
- };
+diff --git a/drivers/net/dsa/sja1105/sja1105_static_config.c b/drivers/net/dsa/sja1105/sja1105_static_config.c
+index baba204ad62f..3d790f8c6f4d 100644
+--- a/drivers/net/dsa/sja1105/sja1105_static_config.c
++++ b/drivers/net/dsa/sja1105/sja1105_static_config.c
+@@ -26,12 +26,8 @@ void sja1105_pack(void *buf, const u64 *val, int start, int end, size_t len)
+ 		pr_err("Start bit (%d) expected to be larger than end (%d)\n",
+ 		       start, end);
+ 	} else if (rc == -ERANGE) {
+-		if ((start - end + 1) > 64)
+-			pr_err("Field %d-%d too large for 64 bits!\n",
+-			       start, end);
+-		else
+-			pr_err("Cannot store %llx inside bits %d-%d (would truncate)\n",
+-			       *val, start, end);
++		pr_err("Field %d-%d too large for 64 bits!\n",
++		       start, end);
+ 	}
+ 	dump_stack();
+ }
+diff --git a/lib/packing.c b/lib/packing.c
+index f237b8af99f5..09a2d195b943 100644
+--- a/lib/packing.c
++++ b/lib/packing.c
+@@ -59,8 +59,17 @@ static void __pack(void *pbuf, u64 uval, size_t startbit, size_t endbit,
+ 	 */
+ 	int plogical_first_u8 = startbit / BITS_PER_BYTE;
+ 	int plogical_last_u8 = endbit / BITS_PER_BYTE;
++	int value_width = startbit - endbit + 1;
+ 	int box;
  
- #endif /* _ICE_LAN_TX_RX_H_ */
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index b22e71dc59d4..0f5a80269a7b 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -1467,7 +1467,6 @@ const struct ice_ctx_ele ice_tlan_ctx_info[] = {
- 	ICE_CTX_STORE(ice_tlan_ctx, drop_ena,			1,	165),
- 	ICE_CTX_STORE(ice_tlan_ctx, cache_prof_idx,		2,	166),
- 	ICE_CTX_STORE(ice_tlan_ctx, pkt_shaper_prof_idx,	3,	168),
--	ICE_CTX_STORE(ice_tlan_ctx, int_q_state,		122,	171),
- 	{ 0 }
- };
++	/* Check if "uval" fits in "value_width" bits.
++	 * The test only works for value_width < 64, but in the latter case,
++	 * any 64-bit uval will surely fit.
++	 */
++	WARN(value_width < 64 && uval >= (1ull << value_width),
++	     "Cannot store 0x%llx inside bits %zu-%zu - will truncate\n",
++	     uval, startbit, endbit);
++
+ 	/* Iterate through an idealistic view of the pbuf as an u64 with
+ 	 * no quirks, u8 by u8 (aligned at u8 boundaries), from high to low
+ 	 * logical bit significance. "box" denotes the current logical u8.
+@@ -143,9 +152,6 @@ static void __pack(void *pbuf, u64 uval, size_t startbit, size_t endbit,
+ int pack(void *pbuf, u64 uval, size_t startbit, size_t endbit, size_t pbuflen,
+ 	 u8 quirks)
+ {
+-	/* width of the field to access in the pbuf */
+-	u64 value_width;
+-
+ 	/* startbit is expected to be larger than endbit, and both are
+ 	 * expected to be within the logically addressable range of the buffer.
+ 	 */
+@@ -153,19 +159,7 @@ int pack(void *pbuf, u64 uval, size_t startbit, size_t endbit, size_t pbuflen,
+ 		/* Invalid function call */
+ 		return -EINVAL;
  
+-	value_width = startbit - endbit + 1;
+-	if (unlikely(value_width > 64))
+-		return -ERANGE;
+-
+-	/* Check if "uval" fits in "value_width" bits.
+-	 * If value_width is 64, the check will fail, but any
+-	 * 64-bit uval will surely fit.
+-	 */
+-	if (value_width < 64 && uval >= (1ull << value_width))
+-		/* Cannot store "uval" inside "value_width" bits.
+-		 * Truncating "uval" is most certainly not desirable,
+-		 * so simply erroring out is appropriate.
+-		 */
++	if (unlikely(startbit - endbit >= 64))
+ 		return -ERANGE;
+ 
+ 	__pack(pbuf, uval, startbit, endbit, pbuflen, quirks);
 
 -- 
 2.47.0.265.g4ca455297942
