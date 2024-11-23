@@ -1,89 +1,109 @@
 Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1284566A;
-	Sat, 23 Nov 2024 13:33:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E20FA134AC;
+	Sat, 23 Nov 2024 14:57:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732368827; cv=none; b=oXWNsbSmTUAiE1EvKsmbS0fKJvYzimlDNUOK7u18nGW1OhM2sD7ySsCskpFsWTzZ9iOrAsLgZ0e2fBcbUMLDk0AusaSvP+fRbnqWn7g8KslPk5QFiRA/ghX9rynpFA7BlXBnU+GS90Y6Ih6efV5JdQYhiLU5YDabSheIfNT7vik=
+	t=1732373846; cv=none; b=bNwuml3sMBc3UI6+LF/1/X44xr4Oe+cAujNpCUqP60BEyfo2xxzVTwkpD0FH64cOYaGVZW63MsaeBpEuJS2BDvbuDEsICRE9MQZMQeZPfrYznrwPEMMt4ba+TVC49qG6gjiyYSikLgpntfIm/KYerh3tv1aRmQYLyoo2lVc6hK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732368827; c=relaxed/simple;
-	bh=c6CdDGMpfwLEdjJ2eCMkd1FUqsRSkbiB2A1jKRSH2R0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=YJCkZZyJAjzTfxEsuOuYKn+cu2yOVJ2+Cg1N3slkaU7fWak3O6I9lsaR54mQgUs1KQM6aKlDETuQneG6evu6dMbYBKDFxYTdFl62k1yYg7tEOGmSL455FKYeFtWgt6ETArOriCzdjPp74KumC0178N+lFB2KJgDJHSzNJKtCQtI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=G+1EnYnP; arc=none smtp.client-ip=159.69.126.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
+	s=arc-20240116; t=1732373846; c=relaxed/simple;
+	bh=y+p2vfpAsDbdRXjWSxrNGSKpYiCle7orKliitpCbmcs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SeL6XYECcHE116l3zpaec7o9Gxf+b4FGmxrrVHYux+m5PSTvxtmIvjT5x/bC2SQQ9O+SXWTrPfHHINS2a5v3ZoXade6567PzZY+1nwCkxUQY9wS3+bo0O0G0sQEUJ5wbnv3/ot2U0Sn579m34oFtxWpRfgK5ZGw6OAGH5sEv1eM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=t-8ch.de; spf=pass smtp.mailfrom=t-8ch.de; dkim=pass (1024-bit key) header.d=t-8ch.de header.i=@t-8ch.de header.b=BMlztdYO; arc=none smtp.client-ip=159.69.126.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=t-8ch.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=t-8ch.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="G+1EnYnP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-	s=mail; t=1732368822;
-	bh=c6CdDGMpfwLEdjJ2eCMkd1FUqsRSkbiB2A1jKRSH2R0=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=G+1EnYnP3Wvn/a4GhQ/bIL6JW6Sje4DBg+z/58yTceYS3vIUcNc1c/4ZRDXni9W+B
-	 jNfzv4xmfcsNJcrPmElsrdQuUNXwLn0hATH+gyzDyv4FWWL22xdzc3T+fZS1EptR9t
-	 +8NcbdlzGmJ6lHnAqqkcnnjCEpzC79PJldePy6d0=
-From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Date: Sat, 23 Nov 2024 14:33:37 +0100
-Subject: [PATCH 1/3] kbuild: add dependency from vmlinux to resolve_btfids
+	dkim=pass (1024-bit key) header.d=t-8ch.de header.i=@t-8ch.de header.b="BMlztdYO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=t-8ch.de; s=mail;
+	t=1732373841; bh=y+p2vfpAsDbdRXjWSxrNGSKpYiCle7orKliitpCbmcs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BMlztdYO+WXtEIdUpDEt/ZO2l1mjjP1BLZS6b2pFtt6WM3SGoLT1t1D1F41jbAWvT
+	 C2f1+Z1w3txxsgUbw7/498uf69PDlinQSw8arJN6SHcVnyacDA1WP3z5L1rb72sm0c
+	 5st0GwKDLojuFmqMYlYUAFr/NZl2RW+0hln/sW4k=
+Date: Sat, 23 Nov 2024 15:57:20 +0100
+From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas@t-8ch.de>
+To: Mirsad Todorovac <mtodorovac69@gmail.com>
+Cc: Linux Kernel Build System <linux-kbuild@vger.kernel.org>, 
+	Masahiro Yamada <masahiroy@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+	Bagas Sanjaya <bagasdotme@gmail.com>
+Subject: Re: [PROBLEM] make bindeb-pkg: When just one source line in a single
+ driver is changed, all driver are rebuilt?
+Message-ID: <b21160de-8f12-4796-8df1-2188b5fc93e0@t-8ch.de>
+References: <f96d57c9-efda-4781-a395-a7c5fec7f2ad@gmail.com>
+ <9748bda4-0db8-4c70-a321-c7189d575cbc@t-8ch.de>
+ <f50cd6ae-0d99-4836-b268-c9c86da448d8@alu.unizg.hr>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Message-Id: <20241123-resolve_btfids-v1-1-927700b641d1@weissschuh.net>
-References: <20241123-resolve_btfids-v1-0-927700b641d1@weissschuh.net>
-In-Reply-To: <20241123-resolve_btfids-v1-0-927700b641d1@weissschuh.net>
-To: Masahiro Yamada <masahiroy@kernel.org>, 
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, 
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, 
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
- bpf@vger.kernel.org, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1732368820; l=909;
- i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
- bh=c6CdDGMpfwLEdjJ2eCMkd1FUqsRSkbiB2A1jKRSH2R0=;
- b=CrIzTkeL7ZmqLczaKpIoJ60WdaDLhaFzDtFg5Lu3jJ7df/Ynj6jOHRyWKqMwNBE00uKC/Ray7
- tJ9W426ko4xCnkfQkPmpcjG69itJainyqwfO7PhORkaALNUwsEX8WpH
-X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
- pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
+In-Reply-To: <f50cd6ae-0d99-4836-b268-c9c86da448d8@alu.unizg.hr>
 
-resolve_btfids is used by link-vmlinux.sh.
-In contrast to other configuration options and targets no transitive
-dependency between resolve_btfids and vmlinux.
-Add an explicit one.
+Hi Mirsad,
 
-Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
----
- scripts/Makefile.vmlinux | 3 +++
- 1 file changed, 3 insertions(+)
+On 2024-11-23 02:53:09+0100, Mirsad Todorovac wrote:
+> Hi, Mr. Weißschuh,
 
-diff --git a/scripts/Makefile.vmlinux b/scripts/Makefile.vmlinux
-index 1284f05555b97f726c6d167a09f6b92f20e120a2..599b486adb31cfb653e54707b7d77052d372b7c1 100644
---- a/scripts/Makefile.vmlinux
-+++ b/scripts/Makefile.vmlinux
-@@ -32,6 +32,9 @@ cmd_link_vmlinux =							\
- targets += vmlinux
- vmlinux: scripts/link-vmlinux.sh vmlinux.o $(KBUILD_LDS) FORCE
- 	+$(call if_changed_dep,link_vmlinux)
-+ifdef CONFIG_DEBUG_INFO_BTF
-+vmlinux: $(RESOLVE_BTFIDS)
-+endif
- 
- # module.builtin.ranges
- # ---------------------------------------------------------------------------
+Call me Thomas, please :-)
 
--- 
-2.47.0
+> On 11/21/24 22:43, Thomas Weißschuh wrote:
+> 
+> > On 2024-11-21 22:18:58+0100, Mirsad Todorovac wrote:
+> >> I am perplexed now at 6.12 stable vanilla tree, and I've noticed that after changing just one
+> >> line in ./drivers/gpu/drm/xe/tests/xe_migrate.c:226:5-11, all unrelated drivers are being BTF'd, SIGNED,
+> >> and INSTALL-ed:
+> >>
+> >>   SIGN    debian/linux-image-6.12.0-dirty/lib/modules/6.12.0-dirty/kernel/drivers/hwmon/aht10.ko
+> >>   INSTALL debian/linux-image-6.12.0-dirty/lib/modules/6.12.0-dirty/kernel/drivers/hwmon/coretemp.ko
+> >>   STRIP   debian/linux-image-6.12.0-dirty/lib/modules/6.12.0-dirty/kernel/drivers/hwmon/atxp1.ko
+> >>   INSTALL debian/linux-image-6.12.0-dirty/lib/modules/6.12.0-dirty/kernel/drivers/hwmon/corsair-cpro.ko
+> >>   SIGN    debian/linux-image-6.12.0-dirty/lib/modules/6.12.0-dirty/kernel/drivers/hwmon/adt7475.ko
+> >>   STRIP   debian/linux-image-6.12.0-dirty/lib/modules/6.12.0-dirty/kernel/drivers/hwmon/axi-fan-control.ko
+> >>   SIGN    debian/linux-image-6.12.0-dirty/lib/modules/6.12.0-dirty/kernel/drivers/hwmon/as370-hwmon.ko
+> >>   STRIP   debian/linux-image-6.12.0-dirty/lib/modules/6.12.0-dirty/kernel/drivers/hwmon/chipcap2.ko
+> >>   SIGN    debian/linux-image-6.12.0-dirty/lib/modules/6.12.0-dirty/kernel/drivers/hwmon/aquacomputer_d5next.ko
+> >>   STRIP   debian/linux-image-6.12.0-dirty/lib/modules/6.12.0-dirty/kernel/drivers/hwmon/coretemp.ko
+> >>   SIGN    debian/linux-image-6.12.0-dirty/lib/modules/6.12.0-dirty/kernel/drivers/hwmon/applesmc.ko
+> >>   INSTALL debian/linux-image-6.12.0-dirty/lib/modules/6.12.0-dirty/kernel/drivers/hwmon/corsair-psu.ko
+> >>   STRIP   debian/linux-image-6.12.0-dirty/lib/modules/6.12.0-dirty/kernel/drivers/hwmon/corsair-cpro.ko
+> >>   SIGN    debian/linux-image-6.12.0-dirty/lib/modules/6.12.0-dirty/kernel/drivers/hwmon/asus_rog_ryujin.ko
+> >>   INSTALL debian/linux-image-6.12.0-dirty/lib/modules/6.12.0-dirty/kernel/drivers/hwmon/cros_ec_hwmon.ko
+> >>   SIGN    debian/linux-image-6.12.0-dirty/lib/modules/6.12.0-dirty/kernel/drivers/hwmon/asc7621.ko
+> >>   INSTALL debian/linux-image-6.12.0-dirty/lib/modules/6.12.0-dirty/kernel/drivers/hwmon/da9052-hwmon.ko
+> >>   SIGN    debian/linux-image-6.12.0-dirty/lib/modules/6.12.0-dirty/kernel/drivers/hwmon/atxp1.ko
+> >>   SIGN    debian/linux-image-6.12.0-dirty/lib/modules/6.12.0-dirty/kernel/drivers/hwmon/axi-fan-control.ko
+> >>   STRIP   debian/linux-image-6.12.0-dirty/lib/modules/6.12.0-dirty/kernel/drivers/hwmon/corsair-psu.ko
+> >>   INSTALL debian/linux-image-6.12.0-dirty/lib/modules/6.12.0-dirty/kernel/drivers/hwmon/da9055-hwmon.ko
+> >>   SIGN    debian/linux-image-6.12.0-dirty/lib/modules/6.12.0-dirty/kernel/drivers/hwmon/chipcap2.ko
+> >>   STRIP   debian/linux-image-6.12.0-dirty/lib/modules/6.12.0-dirty/kernel/drivers/hwmon/cros_ec_hwmon.ko
+> >>   STRIP   debian/linux-image-6.12.0-dirty/lib/modules/6.12.0-dirty/kernel/drivers/hwmon/da9052-hwmon.ko
+> >>   SIGN    debian/linux-image-6.12.0-dirty/lib/modules/6.12.0-dirty/kernel/drivers/hwmon/coretemp.ko
+> >>   SIGN    debian/linux-image-6.12.0-dirty/lib/modules/6.12.0-dirty/kernel/drivers/hwmon/corsair-cpro.ko
+> >>   INSTALL debian/linux-image-6.12.0-dirty/lib/modules/6.12.0-dirty/kernel/drivers/hwmon/dell-smm-hwmon.ko
+> > This happens when the vermagic is changed. The vermagic is linked into
+> > each module. And after relinking all the other steps also need to be
+> > done.
+> > Building the Debian package increases the build number which ends up in
+> > the vermagic and therefore all modules.
+> > Also there is CONFIG_LOCALVERSION_AUTO which may be involved.
+> 
+> Yes, I use CONFIG_LOCALVERSION_AUTO because it saves a lot of trouble in bisecting.
+> 
+> This vermagic manipulation is beyond my grasp. I understand that
+> modules must match kernel version, for internal ABI often changes. But
+> not between builds of the same source? Am I thinking right?
 
+The ABI doesn't change between builds of the same source tree which is
+why there are no actual rebuilds ("CC") of all modules.
+
+But your usage of bindeb-pkg bumps the version string
+(also without CONFIG_LOCALVERSION_AUTO) and this needs to end up in each
+module file which explains the LD/BTF/SIGN/INSTALL steps.
+
+[..]
