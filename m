@@ -1,71 +1,91 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E165AD26D;
-	Tue, 26 Nov 2024 18:30:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E99511DE2B3;
+	Tue, 26 Nov 2024 21:17:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732645810; cv=none; b=WhGw3jJGsosXRM5vYVDDba6XuDApy5Tjw4P3pMzDVZf52aUMEDK+ylLi8zLmIUI244II4Zu3+ULRm3f3+XK8i/qNcdV++fkIISZho4xkTMC7Xy7JWHm//sIB2GSh5lldIAWqaRcIDFBPZ3zpNeF1KpnzewO3pkPAOR3AmH2K7ao=
+	t=1732655848; cv=none; b=GbGdjRMpYLGqDOHQyCUenIUsZ8M0OUV4//TZMUg9E4eFLdTRsf9zP1J9K0QQBG+RcIoLCwr6alzzycsRKJceKfuciu9XSIBUoPKyRBdC8YBlHVWKv7EFFjnMoYHJY1C0s/bI1gNNkZmMY4PU6TZuYtG24qImRbuR+E/wamzm4Dk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732645810; c=relaxed/simple;
-	bh=xJxnjepxK0AEdfOi6g9/KK12La2nbdJnN04DFsBA1UU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c8JVCcI0qZVU1o5udfJ9CnEU7TC2j6n+7/AkfZ67Z31MD4v3qu/wTDOvEigfh8xx5NmtgKEJtTslkaeNaGOeezeYfEBQdRww1V9rsic6mcEND+MKMF2WywS08pyEcagZ3GscRaCWvGJgv3R/zfPtW1FIYDQi9+6tv2ndDbv7XaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QMdrxGfx; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1732655848; c=relaxed/simple;
+	bh=qUel6NrnvGwtQ1zz0ZBdXrr8Q3TIOXkey8rp6qUc4OQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=IyLLVNSCR4EM9d3HtqE2GBxHWJdDD+8/w8Wm/wLNac4pRDknFO9rXLO+R4plhcXBO5iNuhWvXiFGIvWyLGh9a7JS4PPyan12Skmql9npa6tVtA08ptUD/PdAMyKPElj2x32Y4Ip/t1skiHnwAT9/NCzj5JOICIvdYKFp3U30pDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=QHZIu4z6; arc=none smtp.client-ip=159.69.126.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QMdrxGfx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF45CC4CED0;
-	Tue, 26 Nov 2024 18:30:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732645809;
-	bh=xJxnjepxK0AEdfOi6g9/KK12La2nbdJnN04DFsBA1UU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QMdrxGfxApaLT6JB8X+787BYq9pDSG9WhjeCG55VdqH+w/RUWwLHLhVS0W9U2s902
-	 TkBJC8WDKfGLDKQBmymw7OOJjWOE9wGowLBeZ+gmybqPXtuKajzpg8xcveo7BCwOgl
-	 yMlaDb717UxCNP7AHYZvpbYqOArsNXZ+ooBmMaqDkcQBESl5M2fH+fXpBYjsYdfsuJ
-	 3HBqORXD3W67Jr/IzZjhLbk90+uMUKI1KgTRKtCATSg16L7z0fVjmBQgchOqJqfyXd
-	 XiyHiBzLSXi4CeBE8O4sTA7xvd23Z27/mItW3ib5I9pjmKEXwQ6SV2Xf7s5IaCOV6K
-	 8e0wmuXHhiYzw==
-Date: Tue, 26 Nov 2024 10:30:07 -0800
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: Sami Tolvanen <samitolvanen@google.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Miguel Ojeda <ojeda@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Matthew Maurer <mmaurer@google.com>,
-	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>,
-	Petr Pavlu <petr.pavlu@suse.com>,
-	Daniel Gomez <da.gomez@samsung.com>, Neal Gompa <neal@gompa.dev>,
-	Hector Martin <marcan@marcan.st>, Janne Grunau <j@jannau.net>,
-	Miroslav Benes <mbenes@suse.cz>,
-	Asahi Linux <asahi@lists.linux.dev>,
-	Sedat Dilek <sedat.dilek@gmail.com>, linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-modules@vger.kernel.org,
-	rust-for-linux@vger.kernel.org
-Subject: Re: [PATCH v6 00/18] Implement DWARF modversions
-Message-ID: <Z0YTrwR67-5T86E6@bombadil.infradead.org>
-References: <20241121204220.2378181-20-samitolvanen@google.com>
+	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="QHZIu4z6"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+	s=mail; t=1732655836;
+	bh=qUel6NrnvGwtQ1zz0ZBdXrr8Q3TIOXkey8rp6qUc4OQ=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=QHZIu4z619/ko/QCySe/Cx8g6kNrefkJOlxIQ2tYOF5PMW4sMOmMppLOxVcLgTX0b
+	 kQO8cSS6zprdxGuXDcIT/L/FGEDDZ7MmI8zcUkwW0fu4fasPL7hbLqLy3y/aV21gWy
+	 Pv2G3SodHMH1c6BEWWN6Ok3kLk8Jf1xY6q0ZK6A0=
+From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+Date: Tue, 26 Nov 2024 22:17:10 +0100
+Subject: [PATCH v2 2/2] kbuild: propagate CONFIG_WERROR to resolve_btfids
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241121204220.2378181-20-samitolvanen@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20241126-resolve_btfids-v2-2-288c37cb89ee@weissschuh.net>
+References: <20241126-resolve_btfids-v2-0-288c37cb89ee@weissschuh.net>
+In-Reply-To: <20241126-resolve_btfids-v2-0-288c37cb89ee@weissschuh.net>
+To: Masahiro Yamada <masahiroy@kernel.org>, 
+ Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, 
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, 
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ bpf@vger.kernel.org, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1732655835; l=928;
+ i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
+ bh=qUel6NrnvGwtQ1zz0ZBdXrr8Q3TIOXkey8rp6qUc4OQ=;
+ b=iZdeC9osjgnTQJeB05GcRBFuABstvQYxT1en54Otzg5IdShYnTxMrytV6i8py/pEsc7i7Yv3E
+ gNCSMRTpGLzBTAfGjeW3ol7NpqQ+VnIstIBGtrf3ToH/rqFthLpV+7F
+X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
+ pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 
-On Thu, Nov 21, 2024 at 08:42:21PM +0000, Sami Tolvanen wrote:
-> If you also want to test the series with actual Rust modules, this
-> branch adds Matt's latest modversion_info series:
+Use CONFIG_WERROR to also fail on warnings emitted by resolve_btfids.
+Allow the CI bots to prevent the introduction of new warnings.
 
-The merge window for v6.13 is now open so this is too late for that, so
-this is all work to be queued up after, so in about 2 weeks or so. Given
-that, considering this and the extended modversions patches what I don't
-see is actual selftests to easily test this and extended modversions.
-Could you guys add tests for this? Since we have automated tests for
-modules and we now extended it with another new test for kallsyms under
-the modules directly it should be fairly easy I think to add tests for
-this. Think about how we can easily grow these tests to ensure we don't
-break things with future kernel regressions.
+Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
+Acked-by: Jiri Olsa <jolsa@kernel.org>
+---
+ scripts/link-vmlinux.sh | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-  Luis
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index a3c634b2f348f9c976cff9693caf290db7f31666..7288fe501b57e29003d922441c8d5e2f48dee6ad 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -279,7 +279,11 @@ vmlinux_link vmlinux
+ # fill in BTF IDs
+ if is_enabled CONFIG_DEBUG_INFO_BTF; then
+ 	info BTFIDS vmlinux
+-	${RESOLVE_BTFIDS} vmlinux
++	RESOLVE_BTFIDS_ARGS=""
++	if is_enabled CONFIG_WERROR; then
++		RESOLVE_BTFIDS_ARGS=" --fatal-warnings "
++	fi
++	${RESOLVE_BTFIDS} ${RESOLVE_BTFIDS_ARGS} vmlinux
+ fi
+ 
+ mksysmap vmlinux System.map
+
+-- 
+2.47.1
+
