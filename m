@@ -1,159 +1,80 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31AF01EB9EB;
-	Tue,  3 Dec 2024 13:55:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B49871E32CB;
+	Tue,  3 Dec 2024 13:59:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733234129; cv=none; b=nmET6JFl9Bs5hH7f7OPbJX7fZ4bJySxL+9SCnuYLRPCIgMAE/URPZo231NtvqXQg0Z4+5c6rBXkdZWqjwWcW2rQ8shf9mXU795gk6wb04a858uQPU8Rz783jxiCP8wbOpWLGGQTwwLMnmhx93jJOxh+yTAry+kaz4jj8oDFP0yY=
+	t=1733234386; cv=none; b=tbgrLP5J0XV1RhTI6r0mYdoS7FQDcrq3GZXhS9Dqsn2I2bZ0rfdp0g45xdcDnIen9BNNbY7tFHwv0lnxeLzAfqPflacw2sItN4eZqOmzcGdtyIx3KGJ/X26CEcde24y0XVqTkY/ljTIOs1xEFNrhM1D43UKO7gRD7gPOwelYS6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733234129; c=relaxed/simple;
-	bh=YxuqQgJLfpd4HodsZVa0O6Pu7LR7Mzot6gA3INEGXXY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DG61PVrDfvTV1uV5nq3+21yN/GSZCTnThyrRSlHDyYZqJhpQhbbC/PCfxdrIr3fycLqkio6ATHgmjYSCviRQ+A15KuGmBpNqrDa4ZrSXj8BbddYahqkUYFct5fD7DH6xt4x1AYFxgvsrHTMJjut1NK/4om+F9eFsc7Lydhfza3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lj8CkesZ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1733234386; c=relaxed/simple;
+	bh=LjPcE93nS8srOepOdWDgsIrsPff/dVPGSA7vrvWl9Q8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wy3ciy603JSopCN0p1RTlU0COqZHrm4mb/M8in3/qKpIgc5rxtVdPdOe/6ne3oyQ0WzmHMZ1E8snHMklkWY8m9sEOqZFFZmb1eBHYEm/rsLUE1/Dtf60yGBVYmrfe0uHV5CWvchDa30WgNahZr79WIU+uQsQp8wvx+d4poQVsbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=emF1J0GU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lj8CkesZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC636C4CECF;
-	Tue,  3 Dec 2024 13:55:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="emF1J0GU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8342DC4CECF;
+	Tue,  3 Dec 2024 13:59:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733234125;
-	bh=YxuqQgJLfpd4HodsZVa0O6Pu7LR7Mzot6gA3INEGXXY=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Lj8CkesZEoJrvohwJHVD6zwGxEU/gmlipcnA4uTpjQPItZnXBAjzKOFmvxeMRMXcB
-	 rklPH52WxDGArT/fMrNBY73Fx4ujm4/VNjKH0ltl9R10w9agExTdXWZIQ/m+dut2Bp
-	 9AGusao2TJk3qwDtgd531COPGuiiNJoA+CqD0OadYnZrk8xVftFeFE3RHxb6YZKA9y
-	 1bmXjbTQLw302K7BxETQmRva9ADSDTpI9Ycyrc4ZQ/KfxRc8d7l0+n/+8vj5N5UKXm
-	 ZjZi37d5YesNPJSrC7s7dnnVxa6uVhn+v0ZzAUFM2JwpP39pWmhIjKlKq1bj5LvdTT
-	 KAjIfwmLL+cog==
+	s=k20201202; t=1733234386;
+	bh=LjPcE93nS8srOepOdWDgsIrsPff/dVPGSA7vrvWl9Q8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=emF1J0GUUTMvYbvn1TcEoRcqh1xSD6oX+9ZkCoOuzraz0njX5h9Syg5DtTzyulbKk
+	 DIX9974JfCV/V0VufxON3dIrBSnv4Imgc5hHZY6gmlm8NbFu4NBOUnx3T2uRomiyDe
+	 Mdn/aHA42fo9Gb4lGg8cV543u56daWql0d7exPLgHuo4qkDOFkUHFLR24sx6hBGbhH
+	 Hl85yDOWrNE6ZgCNGvK3WGoBmc8PF1LH2jXPDBE/MVELmtt9XRpWXK9kyXz7yj6icc
+	 IxbHJiwi44RSUzDhMdtj6TR+kT8lXwpvZ1mmv2ZOla0WQWFC6p2JE4A4cyF7uWtyzd
+	 8WqTCZVjAv0AQ==
+Date: Tue, 3 Dec 2024 15:59:41 +0200
 From: Leon Romanovsky <leon@kernel.org>
 To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Leon Romanovsky <leonro@nvidia.com>,
-	linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH rdma-next] kbuild: Respect request to silent output when merging configs
-Date: Tue,  3 Dec 2024 15:55:18 +0200
-Message-ID: <e534ce33b0e1060eb85ece8429810f087b034c88.1733234008.git.leonro@nvidia.com>
-X-Mailer: git-send-email 2.47.0
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH rdma-next] kbuild: Respect request to silent output when
+ merging configs
+Message-ID: <20241203135941.GJ1245331@unreal>
+References: <e534ce33b0e1060eb85ece8429810f087b034c88.1733234008.git.leonro@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <e534ce33b0e1060eb85ece8429810f087b034c88.1733234008.git.leonro@nvidia.com>
 
-From: Leon Romanovsky <leonro@nvidia.com>
+On Tue, Dec 03, 2024 at 03:55:18PM +0200, Leon Romanovsky wrote:
+> From: Leon Romanovsky <leonro@nvidia.com>
+> 
+> Builds with -s option (silent) are supposed to silence all output
+> which is not an error. It is the case for target builds but not
+> for configs. These builds generate prints like this:
+> 
+> ➜  kernel git:(rdma-next) make -s defconfig debug.config
+>  Using .config as base
+>  Merging ./kernel/configs/debug.config
+>  #
+>  # merged configuration written to .config (needs make)
+>  #
+>  ...
+>  Value of CONFIG_FUNCTION_TRACER is redefined by fragment ./kernel/configs/debug.config:
+>  Previous value: # CONFIG_FUNCTION_TRACER is not set
+>  New value: CONFIG_FUNCTION_TRACER=y
+>  ----
+> 
+> Let's honor -s option and hide all non-error output.
+> 
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> ---
+>  scripts/kconfig/Makefile        |  3 ++-
+>  scripts/kconfig/merge_config.sh | 18 +++++++++++++-----
+>  2 files changed, 15 insertions(+), 6 deletions(-)
 
-Builds with -s option (silent) are supposed to silence all output
-which is not an error. It is the case for target builds but not
-for configs. These builds generate prints like this:
+Masahiro,
 
-➜  kernel git:(rdma-next) make -s defconfig debug.config
- Using .config as base
- Merging ./kernel/configs/debug.config
- #
- # merged configuration written to .config (needs make)
- #
- ...
- Value of CONFIG_FUNCTION_TRACER is redefined by fragment ./kernel/configs/debug.config:
- Previous value: # CONFIG_FUNCTION_TRACER is not set
- New value: CONFIG_FUNCTION_TRACER=y
- ----
+I hope that you don't mind that I put "rdma-next" as a target. It wasn't
+intentionally, and bug in my submission scripts.
 
-Let's honor -s option and hide all non-error output.
-
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- scripts/kconfig/Makefile        |  3 ++-
- scripts/kconfig/merge_config.sh | 18 +++++++++++++-----
- 2 files changed, 15 insertions(+), 6 deletions(-)
-
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index a0a0be38cbdc..130c3c74b828 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -15,6 +15,7 @@ endif
- 
- ifeq ($(quiet),silent_)
- silent := -s
-+silent_merge := -q
- endif
- 
- export KCONFIG_DEFCONFIG_LIST :=
-@@ -107,7 +108,7 @@ config-fragments = $(call configfiles,$@)
- 
- %.config: $(obj)/conf
- 	$(if $(config-fragments),, $(error $@ fragment does not exists on this architecture))
--	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/kconfig/merge_config.sh -m $(KCONFIG_CONFIG) $(config-fragments)
-+	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/kconfig/merge_config.sh $(silent_merge) -m $(KCONFIG_CONFIG) $(config-fragments)
- 	$(Q)$(MAKE) -f $(srctree)/Makefile olddefconfig
- 
- PHONY += tinyconfig
-diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
-index 0b7952471c18..29060fba84b6 100755
---- a/scripts/kconfig/merge_config.sh
-+++ b/scripts/kconfig/merge_config.sh
-@@ -30,6 +30,7 @@ usage() {
- 	echo "  -O    dir to put generated output files.  Consider setting \$KCONFIG_CONFIG instead."
- 	echo "  -s    strict mode. Fail if the fragment redefines any value."
- 	echo "  -Q    disable warning messages for overridden options."
-+	echo "  -q    be quiet."
- 	echo
- 	echo "Used prefix: '$CONFIG_PREFIX'. You can redefine it with \$CONFIG_ environment variable."
- }
-@@ -42,6 +43,7 @@ OUTPUT=.
- STRICT=false
- CONFIG_PREFIX=${CONFIG_-CONFIG_}
- WARNOVERRIDE=echo
-+QUIET=echo
- 
- while true; do
- 	case $1 in
-@@ -89,6 +91,12 @@ while true; do
- 		shift
- 		continue
- 		;;
-+	"-q")
-+		WARNOVERRIDE=true
-+		QUIET=true
-+		shift
-+		continue
-+		;;
- 	*)
- 		break
- 		;;
-@@ -123,7 +131,7 @@ SED_CONFIG_EXP2="s/^# \(${CONFIG_PREFIX}[a-zA-Z0-9_]*\) is not set$/\1/p"
- TMP_FILE=$(mktemp ./.tmp.config.XXXXXXXXXX)
- MERGE_FILE=$(mktemp ./.merge_tmp.config.XXXXXXXXXX)
- 
--echo "Using $INITFILE as base"
-+${QUIET} "Using $INITFILE as base"
- 
- trap clean_up EXIT
- 
-@@ -131,7 +139,7 @@ cat $INITFILE > $TMP_FILE
- 
- # Merge files, printing warnings on overridden values
- for ORIG_MERGE_FILE in $MERGE_LIST ; do
--	echo "Merging $ORIG_MERGE_FILE"
-+	${QUIET} "Merging $ORIG_MERGE_FILE"
- 	if [ ! -r "$ORIG_MERGE_FILE" ]; then
- 		echo "The merge file '$ORIG_MERGE_FILE' does not exist.  Exit." >&2
- 		exit 1
-@@ -179,9 +187,9 @@ fi
- 
- if [ "$RUNMAKE" = "false" ]; then
- 	cp -T -- "$TMP_FILE" "$KCONFIG_CONFIG"
--	echo "#"
--	echo "# merged configuration written to $KCONFIG_CONFIG (needs make)"
--	echo "#"
-+	${QUIET} "#"
-+	${QUIET} "# merged configuration written to $KCONFIG_CONFIG (needs make)"
-+	${QUIET} "#"
- 	exit
- fi
- 
--- 
-2.47.0
-
+Thanks
