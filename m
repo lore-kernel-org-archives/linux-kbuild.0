@@ -1,122 +1,116 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BFB01DF723
-	for <linux-kbuild@vger.kernel.org>; Fri, 13 Dec 2024 11:31:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46683175AB;
+	Fri, 13 Dec 2024 11:33:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734089512; cv=none; b=ZzBFPyBKFWl7egWLRULrzug4jISToOLiY+fpee2p5dm57kIKGgNAlBWZ4ldxbTKY2IOujOZJNt247c8yNboTLr8o5jyM+h71ZqWEwe2LS7neJEVR47ubnWY8vP7AG4y83AN+xgJfqRxAFnclxaFGuGtm3vLOLM/ftIOj1LKDYrw=
+	t=1734089620; cv=none; b=XzPH426bSeW+skDLftDxMNJysbLkTVXGEAximO/y/lISh4/8NfUNwqdF1NwjqecBunn8bK6149TOfCSZ+FfHtgGTRM7DAMgW7fFtrtn3rr2kTKJwEI29VrCWYw4qY7VgWVlHauF0BAHCUqIMHzZbR6+KNjA+orc4xNWoOEmt1Xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734089512; c=relaxed/simple;
-	bh=8Z+fkcLpCW50dgG3XgGbc9Y+J6ZITUqaOeKIYboitQ8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=FI4emZ+Rt9gWg6BSjNCM3kESZYK4eJhKlnCd4ppJtwLcauLUVARQHhbs0gEWbPfHYM2s9sGsXr9q8YiXtj5O6Ef0k7G9iAWjl02r0v3fPehVJs0kvQkOTaAU9BQ8sC8W3Jil2vhv09eDbauHpOjCUPeNYGpZuN+i8LlN8Y9lD60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e8V4rozR; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com
+	s=arc-20240116; t=1734089620; c=relaxed/simple;
+	bh=W1dON2DXJk8wtFufY6Ee10/Ghnqv3HpHBRkp7n4UJys=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=m8PtHgMhf2ybcLsniQ+GaqonyBrCJam4uZuM0/mEDwZ75tk4D5BHKzMHP1DM3UVfwQtRaxe6vS61f15HhiawzbtvgFE5TedMkf4j4zUAXUnyF/qPdmO2stLO7fJbfu/6xo8KUkiMlkqzec6bP/8Vtv00EAVLt5S9IWUe5ZTXbsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gYgRU3jZ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e8V4rozR"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-43627bb20b5so10416395e9.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 13 Dec 2024 03:31:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734089509; x=1734694309; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=12jc0w/fivkkryMIJsg9WOh7az7NrRYvkDaKh8q38vk=;
-        b=e8V4rozRZDQGgq2bdNP9Nlyfwa9Xh7OHavGBO4y1dBS7KWB5hmAmheJzIpiE8Va8Hy
-         tThS8pUJk+855bCGr1xkxdKgL+hKir2WTVNg7Sc2SyCYixDonXpuRd6r5FlibvVngQcN
-         mwy3BUdGVR30Y4FuGy/8eHAkKHR/oaiv3Zu4Zn3S5cU6OVkiFAUwpKXHM4rEfSaXRXTU
-         86GA5bMq24zb1IKPkw36n/JZVcyaac3/a4mjNGebq//WyJDnr91JCxT2IheOBCBy4hkW
-         ZhukrohU3vzuLVu+yHxu1pRPoUeggUG3fdP0eCFvVhA4oL/RSlYrjmhnfQpw/WhsAKda
-         Ofvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734089509; x=1734694309;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=12jc0w/fivkkryMIJsg9WOh7az7NrRYvkDaKh8q38vk=;
-        b=XHAsoVSDzR4i4TrtA0WBt5Yb//zZv1Se8rI9nfc2RYjLukmU/s+6CjP9HVkOekrEgN
-         itGxJ6dm8zYX9kyzNRZtik39BYUN8kRhYlgvsCOkCe32NWo/pEKwl7UE91ZFxq/OP1DM
-         GCPrLyUcdMAvnO6gsHf2S6IRiRcXjCT90Qg48X+x40H8x1YtwstKGUwMm06CNz99iLcS
-         SkCB0BrhvVpSTl+mv1GKN1hVXTSTnJa4EcDWrM1/c6IGaujbfA/sKY0xT2QTiOWhfCqg
-         2RmuGt4s0oCUBRG7iDtVQPXv+pfnjJe8KH001sOHIowyUvA+KeDNdrT0lA0dcz6haqwm
-         nPQg==
-X-Forwarded-Encrypted: i=1; AJvYcCXCpKOx2DmO1XD6PRDUh02cI3ieqY1yujFdeAtO3S1ADvLMwOeHNG3Q014h/9CCb2vAbvWMudY31DToZds=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyiA9Qf3teA2cd6WpHS/dhnaoeYI7o09BOCtIGwARA6whyfnmMf
-	XJNYEBJ6e+hMyZNXAnwUrzfFzN00v4QoQ2zS4lOZUFoLJ2qrgiDUhlPqtA7F8rbiJb19mKopdEf
-	KVhm15USXRA==
-X-Google-Smtp-Source: AGHT+IEZ4eA8bhHHA8R9uWIaOs6w9kxA+a6SSCc9PyYcjPq9AgHQF76/B6v8e4W1chnsdD7KewFoDA8hfeL33Q==
-X-Received: from wmbdx22.prod.google.com ([2002:a05:600c:63d6:b0:436:3ea:c491])
- (user=jackmanb job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:a14:b0:435:32e:8270 with SMTP id 5b1f17b1804b1-4362aa3bcdcmr19895245e9.14.1734089508870;
- Fri, 13 Dec 2024 03:31:48 -0800 (PST)
-Date: Fri, 13 Dec 2024 11:31:31 +0000
-In-Reply-To: <20241213-objtool-strict-v1-0-fd388f9d971f@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gYgRU3jZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F720C4CED0;
+	Fri, 13 Dec 2024 11:33:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734089620;
+	bh=W1dON2DXJk8wtFufY6Ee10/Ghnqv3HpHBRkp7n4UJys=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=gYgRU3jZJ7TWQ48ScFxUDqYu44sr4/grgzSwhgqCch4qL61kKeFAyQXpixr7Nrgn4
+	 SC/p3YQkCPGUx/rIsWG7FvcRWMoVPuYOnHJFlxtOIztU/W+ZJlnAYeP/9Y66xgK+ZQ
+	 5i1udD+TBhOsZbThgSn+aPkz8B2fTpHtnnDCUrDJu285v3xWm3UuEiebf8MMXc3kWJ
+	 X4LVz2NKeIwzixSzMcZ3p+jQzHp/1uvgjp3oP3BSnvRzOC5vX8LPjAmzvXbOQPGufG
+	 0w5Q/9TR591XpMLlKMoadu8ufn3ynjBvYIMBBCFYwYOgMZgYwEO30CZL2w3L6YZOp0
+	 lp+l6yRYKNGqA==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+Date: Fri, 13 Dec 2024 12:30:47 +0100
+Subject: [PATCH v3 2/4] rust: str: implement `strip_prefix` for `BStr`
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241213-objtool-strict-v1-0-fd388f9d971f@google.com>
-X-Mailer: b4 0.15-dev
-Message-ID: <20241213-objtool-strict-v1-2-fd388f9d971f@google.com>
-Subject: [PATCH 2/2] kbuild: Add option to fail build on vmlinux objtool issues
-From: Brendan Jackman <jackmanb@google.com>
-To: Josh Poimboeuf <jpoimboe@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Masahiro Yamada <masahiroy@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	Brendan Jackman <jackmanb@google.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20241213-module-params-v3-v3-2-485a015ac2cf@kernel.org>
+References: <20241213-module-params-v3-v3-0-485a015ac2cf@kernel.org>
+In-Reply-To: <20241213-module-params-v3-v3-0-485a015ac2cf@kernel.org>
+To: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+ Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>, 
+ Masahiro Yamada <masahiroy@kernel.org>, 
+ Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>
+Cc: Trevor Gross <tmgross@umich.edu>, 
+ Adam Bratschi-Kaye <ark.email@gmail.com>, rust-for-linux@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+ Andreas Hindborg <a.hindborg@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1549; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=W1dON2DXJk8wtFufY6Ee10/Ghnqv3HpHBRkp7n4UJys=;
+ b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBnXBr3TBAVUizS1xdUCu+XmO2/txTPKNdgAyR9X
+ z1A8hN9gbSJAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCZ1wa9wAKCRDhuBo+eShj
+ d4DFD/9QrT+VmKDUDncGxWzfaL0kcWBVEtqigswAs1ctsX2CZE1no8K6jiFd/BrjL7vj55NRHz9
+ fDQ7CQyYwNllhIMgvzTLVa1JoQjK2vgc1dEkqRdokr7tMz8AyDb7W0h5i2oeiOTUuq52IMdlcpq
+ CNKBlpJRd3JlOPXrp/j73G55rqcF+WJYAZrSPW6vjenX2cDgCPPr1ItFAgejIB9Gx9AjQKUF51S
+ ugsTcKHniOvT7kt8zYBiZuYokK7eUSM1zvqgUsWmsLTtzr71tzp2ZlIQsmaMoKUArqH1fcLIbzK
+ C1AGlnfVrA/v6rNuovHe98xBY79Hl+qYXkQ+/mq053DGxMfKBGAtZS829XS2mbSnVZi6kIz10as
+ NFXirS+gjM8eGf06toqQIQZMhOpQVdEeccg/5QgUDARAYD3046Nwv0/A20rJ/AYACw/J6+o8kFA
+ 6xfdC2koARakfGvGLv3Eo0ARqtQpCDmi/nvBGpVw4caRq9PP1AgqINgUqpF2uVpCInHjrcPRjis
+ yS9hqxg7RZoa5o5DE28yVcxMhtOd/zwZ9jqYUv52+SstFQgbuiuf28/me3ylRkjQFcdq1FAk6NP
+ JBn8LPQgDv1iFk2jOJCysmSPeNcNteGBH0Tlti1mV3g67Xi46tYkoRRb63LkLxSY8cXrVHCnuNG
+ l1/btl9t+IeBO9g==
+X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
+ fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-NOINSTR_VALIDATION is pretty helpful for detecting bugs, I would like
-my build to fail when those bugs arise.
+Implement `strip_prefix` for `BStr` by deferring to `slice::strip_prefix`
+on the underlying `&[u8]`.
 
-If we wanted to we could enable this for individual warnings, it seems
-unlikely there's a use-case for that though. So for now I've just added
-a global setting for vmlinux.
+Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 
-Signed-off-by: Brendan Jackman <jackmanb@google.com>
 ---
- lib/Kconfig.debug          | 11 +++++++++++
- scripts/Makefile.vmlinux_o |  1 +
- 2 files changed, 12 insertions(+)
 
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index f3d72370587936fa373129cc9b246f15dac907be..b1f0f8c83b050d4112428e0d8dece059ebf8dcd2 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -563,6 +563,17 @@ config NOINSTR_VALIDATION
- 	select OBJTOOL
- 	default y
- 
-+config VMLINUX_OBJTOOL_STRICT
-+	bool "Strict objtool on vmlinux"
-+	default n
-+	# Conditions when we run objtool on vmlinux
-+	depends on NOINSTR_VALIDATION || LTO_CLANG || X86_KERNEL_IBT
-+	help
-+	  Fail the build when objtool produces warnings on vmlinux.
+It is also possible to get this method by implementing
+`core::slice::SlicePattern` for `BStr`. `SlicePattern` is unstable, so this
+seems more reasonable.
+---
+ rust/kernel/str.rs | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
+index c441acf76ebd1f14919b6d233edffbbbbf944619..9c446ff1ad7adba7ca09a5ae9df00fd369a32899 100644
+--- a/rust/kernel/str.rs
++++ b/rust/kernel/str.rs
+@@ -31,6 +31,22 @@ pub const fn from_bytes(bytes: &[u8]) -> &Self {
+         // SAFETY: `BStr` is transparent to `[u8]`.
+         unsafe { &*(bytes as *const [u8] as *const BStr) }
+     }
 +
-+	  By default, objtool just prints warnings to the terminal without
-+	  causing a build failure. This config changes that for vmlinux.
-+
- config VMLINUX_MAP
- 	bool "Generate vmlinux.map file when linking"
- 	depends on EXPERT
-diff --git a/scripts/Makefile.vmlinux_o b/scripts/Makefile.vmlinux_o
-index 0b6e2ebf60dc1bb69d9651d5b7858ccd296e92dd..97b6b262d482e0bac1a4d74f9a2e7b1867b6ee00 100644
---- a/scripts/Makefile.vmlinux_o
-+++ b/scripts/Makefile.vmlinux_o
-@@ -39,6 +39,7 @@ vmlinux-objtool-args-$(delay-objtool)			+= $(objtool-args-y)
- vmlinux-objtool-args-$(CONFIG_GCOV_KERNEL)		+= --no-unreachable
- vmlinux-objtool-args-$(CONFIG_NOINSTR_VALIDATION)	+= --noinstr \
- 							   $(if $(or $(CONFIG_MITIGATION_UNRET_ENTRY),$(CONFIG_MITIGATION_SRSO)), --unret)
-+vmlinux-objtool-args-$(CONFIG_VMLINUX_OBJTOOL_STRICT)	+= --fail-on-warn
++    /// Strip a prefix from `self`. Delegates to [`slice::strip_prefix`].
++    ///
++    /// # Example
++    /// ```
++    /// use kernel::b_str;
++    /// assert_eq!(Some(b_str!("bar")), b_str!("foobar").strip_prefix(b_str!("foo")));
++    /// assert_eq!(None, b_str!("foobar").strip_prefix(b_str!("bar")));
++    /// assert_eq!(Some(b_str!("foobar")), b_str!("foobar").strip_prefix(b_str!("")));
++    /// assert_eq!(Some(b_str!("")), b_str!("foobar").strip_prefix(b_str!("foobar")));
++    /// ```
++    pub fn strip_prefix(&self, pattern: &Self) -> Option<&BStr> {
++        self.deref()
++            .strip_prefix(pattern.deref())
++            .map(Self::from_bytes)
++    }
+ }
  
- objtool-args = $(vmlinux-objtool-args-y) --link
- 
+ impl fmt::Display for BStr {
 
 -- 
-2.47.1.613.gc27f4b7a9f-goog
+2.47.0
+
 
