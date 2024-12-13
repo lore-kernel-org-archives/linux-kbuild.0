@@ -1,34 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46683175AB;
-	Fri, 13 Dec 2024 11:33:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C01F41DF736;
+	Fri, 13 Dec 2024 11:33:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734089620; cv=none; b=XzPH426bSeW+skDLftDxMNJysbLkTVXGEAximO/y/lISh4/8NfUNwqdF1NwjqecBunn8bK6149TOfCSZ+FfHtgGTRM7DAMgW7fFtrtn3rr2kTKJwEI29VrCWYw4qY7VgWVlHauF0BAHCUqIMHzZbR6+KNjA+orc4xNWoOEmt1Xg=
+	t=1734089624; cv=none; b=bhDEShlEwllpsfufGGE2XZmb+mg550FDQmlSqw1RMF2R7xO3fdUmCtHRxDvf1yEENQXRnXMoy9msG9fInQPo8yY5UA00aKw9Zvaacz+kITNdyZMvhdUNP0ylHKWM0bgmoAzfBzfd9KockhHdxXPj38PxkXFVHjOizZ/PobBr5e0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734089620; c=relaxed/simple;
-	bh=W1dON2DXJk8wtFufY6Ee10/Ghnqv3HpHBRkp7n4UJys=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=m8PtHgMhf2ybcLsniQ+GaqonyBrCJam4uZuM0/mEDwZ75tk4D5BHKzMHP1DM3UVfwQtRaxe6vS61f15HhiawzbtvgFE5TedMkf4j4zUAXUnyF/qPdmO2stLO7fJbfu/6xo8KUkiMlkqzec6bP/8Vtv00EAVLt5S9IWUe5ZTXbsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gYgRU3jZ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734089624; c=relaxed/simple;
+	bh=jn1+kwErRSsB5tbg2oGFUgowoj8MlSLJ2/SRH/JeQmM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=PswrXkR9ptbSMq563+V2jYOvqGr3rNhsFi1sOPD+rGv9nyjE8jb/KtiLwtizXtS7gy5pdpPRgroZCVYbwMZbXVtG2npHBXczkrRqx7Z4jMndp4m392e0MSCd854ukvqtCyIT7YZwjNRVYmE7A2dluguDW5YoXlmsy7PzvPv8UCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sDQ5dIgX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gYgRU3jZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F720C4CED0;
-	Fri, 13 Dec 2024 11:33:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sDQ5dIgX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B44FBC4CEDD;
+	Fri, 13 Dec 2024 11:33:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734089620;
-	bh=W1dON2DXJk8wtFufY6Ee10/Ghnqv3HpHBRkp7n4UJys=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=gYgRU3jZJ7TWQ48ScFxUDqYu44sr4/grgzSwhgqCch4qL61kKeFAyQXpixr7Nrgn4
-	 SC/p3YQkCPGUx/rIsWG7FvcRWMoVPuYOnHJFlxtOIztU/W+ZJlnAYeP/9Y66xgK+ZQ
-	 5i1udD+TBhOsZbThgSn+aPkz8B2fTpHtnnDCUrDJu285v3xWm3UuEiebf8MMXc3kWJ
-	 X4LVz2NKeIwzixSzMcZ3p+jQzHp/1uvgjp3oP3BSnvRzOC5vX8LPjAmzvXbOQPGufG
-	 0w5Q/9TR591XpMLlKMoadu8ufn3ynjBvYIMBBCFYwYOgMZgYwEO30CZL2w3L6YZOp0
-	 lp+l6yRYKNGqA==
+	s=k20201202; t=1734089624;
+	bh=jn1+kwErRSsB5tbg2oGFUgowoj8MlSLJ2/SRH/JeQmM=;
+	h=From:Subject:Date:To:Cc:From;
+	b=sDQ5dIgXsch9/E4ObBb7dYLt1CMJDE+1uaYpIrltl0BLYFCUh8gzlMfBCZv8rtf9l
+	 x7riOOYVxIAuLGRKfAZcGS1doiTgzeJILDQibOzWclMxtdPLnO1LAqxB1E8xp8Nt2F
+	 cFobAm6wfzdhzSxYzjSf8v1oHNQhq21fGwnEuItf5KexQNXtPASq0g0wr0mXogAxpk
+	 g7Ich5qQz3aNf7H3DOe3pyOKzNO/g32X3Twz9IeZIWrJ3V7S8yALv3H4wMShj+K3W/
+	 CT4A5YuVFYGDhNSY5CjsK4OotTCTCaVXRA7jXckLfC1YGrYYAoY2HxeJxXZSzq+Ld8
+	 ACRKxCIy1BmqQ==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Fri, 13 Dec 2024 12:30:47 +0100
-Subject: [PATCH v3 2/4] rust: str: implement `strip_prefix` for `BStr`
+Subject: [PATCH v3 0/4] rust: extend `module!` macro with integer parameter
+ support
+Date: Fri, 13 Dec 2024 12:30:45 +0100
+Message-Id: <20241213-module-params-v3-v3-0-485a015ac2cf@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -37,9 +38,10 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241213-module-params-v3-v3-2-485a015ac2cf@kernel.org>
-References: <20241213-module-params-v3-v3-0-485a015ac2cf@kernel.org>
-In-Reply-To: <20241213-module-params-v3-v3-0-485a015ac2cf@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAOUaXGcC/x3MQQqAIBBA0avErBtILYquEi2mnGqgNJQkiO6et
+ HyL/x+IHIQj9MUDgZNE8S7DlAXMG7mVUWw26ErXSiuFh7fXznhSoCNiMkjccjN3tpsagpydgRe
+ 5/+Uwvu8HpqE7MWIAAAA=
+X-Change-ID: 20241211-module-params-v3-ae7e5c8d8b5a
 To: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
  Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
  =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
@@ -51,66 +53,102 @@ Cc: Trevor Gross <tmgross@umich.edu>,
  linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
  Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1549; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=W1dON2DXJk8wtFufY6Ee10/Ghnqv3HpHBRkp7n4UJys=;
- b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBnXBr3TBAVUizS1xdUCu+XmO2/txTPKNdgAyR9X
- z1A8hN9gbSJAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCZ1wa9wAKCRDhuBo+eShj
- d4DFD/9QrT+VmKDUDncGxWzfaL0kcWBVEtqigswAs1ctsX2CZE1no8K6jiFd/BrjL7vj55NRHz9
- fDQ7CQyYwNllhIMgvzTLVa1JoQjK2vgc1dEkqRdokr7tMz8AyDb7W0h5i2oeiOTUuq52IMdlcpq
- CNKBlpJRd3JlOPXrp/j73G55rqcF+WJYAZrSPW6vjenX2cDgCPPr1ItFAgejIB9Gx9AjQKUF51S
- ugsTcKHniOvT7kt8zYBiZuYokK7eUSM1zvqgUsWmsLTtzr71tzp2ZlIQsmaMoKUArqH1fcLIbzK
- C1AGlnfVrA/v6rNuovHe98xBY79Hl+qYXkQ+/mq053DGxMfKBGAtZS829XS2mbSnVZi6kIz10as
- NFXirS+gjM8eGf06toqQIQZMhOpQVdEeccg/5QgUDARAYD3046Nwv0/A20rJ/AYACw/J6+o8kFA
- 6xfdC2koARakfGvGLv3Eo0ARqtQpCDmi/nvBGpVw4caRq9PP1AgqINgUqpF2uVpCInHjrcPRjis
- yS9hqxg7RZoa5o5DE28yVcxMhtOd/zwZ9jqYUv52+SstFQgbuiuf28/me3ylRkjQFcdq1FAk6NP
- JBn8LPQgDv1iFk2jOJCysmSPeNcNteGBH0Tlti1mV3g67Xi46tYkoRRb63LkLxSY8cXrVHCnuNG
- l1/btl9t+IeBO9g==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3680; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=jn1+kwErRSsB5tbg2oGFUgowoj8MlSLJ2/SRH/JeQmM=;
+ b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBnXBrr0zsNb2QcluQ3v0wkkSyjDhb02usZ3esuJ
+ diQngHvJgSJAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCZ1wa6wAKCRDhuBo+eShj
+ d83wD/4+9Pj/7slOT/674RxtE6Eo/6z2lNzvbDAzozudCdLD7JiUToKxx+mNoPttOYhJ+x0+3Vk
+ BzLi2eusFMNErvnfAIL7rHTC4zkWn0bM4rmjlJxBR6e/1haYsfY1nO5Lv7p3sQ5GTuz6SfIudsa
+ lO5Br+TITIAo8urxOS5hvHPYaRxpxAShxpSbkbu1UrNEJHKziI7zHv/mH3LEq08zL+ijvAbVB9Y
+ J4BzyZRKyzGqxC1XQLGnVxSDYtmQdYf9cYGI0V2vhTLmhsJ4NAM/1kr6BQau9gXLkrKVAlL6IZJ
+ WHJKLp0wsxw+b2WnNk3xjr1luop8WVNZOiP2uZE5fLUi6R+1xSnhCfHLLByiUi9UfX7iZDeUhgG
+ 6HEUC6D72vbqCl2zBl1KQj/iijrMYcT+diEQGMzJmne7jqCN+zrfSL71kLmE5bfB9INPHScRNpG
+ KwAXZE+pe9O7KaIqygKM7TfAf2YEuDZvkGtJ8rZ8jKyZi2AJUKhfss1MzpTljU3awSE/BJPB/Xc
+ K5nuLvZMfj66BHEHeavqhbhn6CT41xHPG45oMCya64i6R1N+zIF+1d+TvjY/+DlBrexlmgbZv//
+ /rwKS4WR5p8v+1nZiEfJaejv6HVNwAFclnM6XaXZby2qw1zCayJ4GFvp23sQUJzoW+oE4oxzt2X
+ 1sOzPPGdeomR3pA==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Implement `strip_prefix` for `BStr` by deferring to `slice::strip_prefix`
-on the underlying `&[u8]`.
+This series extends the `module!` macro with support module parameters. It
+also adds some string to integer parsing functions and updates `BStr` with
+a method to strip a string prefix.
 
+This series stated out as code by Adam Bratschi-Kaye lifted from the original
+`rust` branch [1].
+
+Link: https://github.com/Rust-for-Linux/linux/tree/bc22545f38d74473cfef3e9fd65432733435b79f [1]
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+---
+Changes since v2 [1]:
+- use `SyncUnsafeCell` rather than `static mut` and simplify parameter access
+- remove `Display` bound from `ModuleParam`
+- automatically generate documentation for `PARAM_OPS_.*`
+- remove `as *const _ as *mut_` phrasing
+- inline parameter name in struct instantiation in  `emit_params`
+- move `RacyKernelParam` out of macro template
+- use C string literals rather than byte string literals with explicit null
+- template out `__{name}_{param_name}` in `emit_param`
+- indent template in `emit_params`
+- use let-else expression in `emit_params` to get rid of an indentation level
+- document `expect_string_field`
+- move invication of `impl_int_module_param` to be closer to macro def
+- move attributes after docs in `make_param_ops`
+- rename `impl_module_param` to impl_int_module_param`
+- use `ty` instead of `ident` in `impl_parse_int`
+- use `BStr` instead of `&str` for string manipulation
+- move string parsing functions to seperate patch and add examples, fix bugs
+- degrade comment about future support from doc comment to regular comment
+- remove std lib path from `Sized` marker
+- update documentation for `trait ModuleParam`
+
+Changes since v1 [2]:
+- Remove support for params without values (`NOARG_ALLOWED`).
+- Improve documentation for `try_from_param_arg`.
+- Use prelude import.
+- Refactor `try_from_param_arg` to return `Result`.
+- Refactor `ParseInt::from_str` to return `Result`.
+- Move C callable functions out of `ModuleParam` trait.
+- Rename literal string field parser to `expect_string_field`.
+- Move parameter parsing from generation to parsing stage.
+- Use absolute type paths in macro code.
+- Inline `kparam`and `read_func` values.
+- Resolve TODO regarding alignment attributes.
+- Remove unnecessary unsafe blocks in macro code.
+- Improve error message for unrecognized parameter types.
+- Do not use `self` receiver when reading parameter value.
+- Add parameter documentation to `module!` macro.
+- Use empty `enum` for parameter type.
+- Use `addr_of_mut` to get address of parameter value variable.
+- Enabled building of docs for for `module_param` module.
+
+Link: https://lore.kernel.org/rust-for-linux/20240705111455.142790-1-nmi@metaspace.dk/ [2]
+Link: https://lore.kernel.org/all/20240819133345.3438739-1-nmi@metaspace.dk/ [1]
 
 ---
 
-It is also possible to get this method by implementing
-`core::slice::SlicePattern` for `BStr`. `SlicePattern` is unstable, so this
-seems more reasonable.
 ---
- rust/kernel/str.rs | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+Andreas Hindborg (4):
+      rust: str: implement `PartialEq` for `BStr`
+      rust: str: implement `strip_prefix` for `BStr`
+      rust: str: add radix prefixed integer parsing functions
+      rust: add parameter support to the `module!` macro
 
-diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
-index c441acf76ebd1f14919b6d233edffbbbbf944619..9c446ff1ad7adba7ca09a5ae9df00fd369a32899 100644
---- a/rust/kernel/str.rs
-+++ b/rust/kernel/str.rs
-@@ -31,6 +31,22 @@ pub const fn from_bytes(bytes: &[u8]) -> &Self {
-         // SAFETY: `BStr` is transparent to `[u8]`.
-         unsafe { &*(bytes as *const [u8] as *const BStr) }
-     }
-+
-+    /// Strip a prefix from `self`. Delegates to [`slice::strip_prefix`].
-+    ///
-+    /// # Example
-+    /// ```
-+    /// use kernel::b_str;
-+    /// assert_eq!(Some(b_str!("bar")), b_str!("foobar").strip_prefix(b_str!("foo")));
-+    /// assert_eq!(None, b_str!("foobar").strip_prefix(b_str!("bar")));
-+    /// assert_eq!(Some(b_str!("foobar")), b_str!("foobar").strip_prefix(b_str!("")));
-+    /// assert_eq!(Some(b_str!("")), b_str!("foobar").strip_prefix(b_str!("foobar")));
-+    /// ```
-+    pub fn strip_prefix(&self, pattern: &Self) -> Option<&BStr> {
-+        self.deref()
-+            .strip_prefix(pattern.deref())
-+            .map(Self::from_bytes)
-+    }
- }
- 
- impl fmt::Display for BStr {
+ rust/kernel/lib.rs           |   2 +
+ rust/kernel/module_param.rs  | 238 +++++++++++++++++++++++++++++++++++++++++++
+ rust/kernel/str.rs           | 138 +++++++++++++++++++++++++
+ rust/macros/helpers.rs       |  10 ++
+ rust/macros/lib.rs           |  31 ++++++
+ rust/macros/module.rs        | 188 ++++++++++++++++++++++++++++++----
+ samples/rust/rust_minimal.rs |  10 ++
+ scripts/Makefile.build       |   2 +-
+ 8 files changed, 600 insertions(+), 19 deletions(-)
+---
+base-commit: fac04efc5c793dccbd07e2d59af9f90b7fc0dca4
+change-id: 20241211-module-params-v3-ae7e5c8d8b5a
 
+Best regards,
 -- 
-2.47.0
+Andreas Hindborg <a.hindborg@kernel.org>
 
 
