@@ -1,95 +1,81 @@
-Received: from mx1.emlix.com (mx1.emlix.com [178.63.209.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A8A521771E;
-	Thu, 19 Dec 2024 07:23:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.63.209.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E281222591
+	for <linux-kbuild@vger.kernel.org>; Thu, 19 Dec 2024 10:19:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734593033; cv=none; b=Y7pg2Hhr3Pf/6t+opzsj0EeWYeJYCNOUnJwFcacl4GJUVKwDJhgFTCJOHYX0ZKWbnszg5kVVb57WkcNl9S1MWYHjMNxrbCP8qX8LjJM3FoVm326xNW0e6z0iCP/0Kr2h8nKKQ/7tOSVhXTIk0ijEKLk1K7nay9rlGiLRvXJ6uKY=
+	t=1734603546; cv=none; b=SgEdttj4atlAl5RfAB59+FUr06r/1V9Z3JgGt9fR+oMwfo9LchebySmE80yzI25YnIzGgcSh8B5X5RHENBywAHd4uxi1z3eneLqcYouMxAeao/qNK/QvaQ14Yhs0bMAkzWJXAjOg0yyHas88KKm7TRzgEB2L658s8LRCcCknw9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734593033; c=relaxed/simple;
-	bh=P49GO8TGjYuVKT9hnmNxjhhzt3nwNBmXFHX0asn6OII=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Gid+xJyEAlOmpsfspYSZNThdrKrRBcOAeyxm1/abuUUohkrh03ZQZsogLBqnNuDMOg7NQsLEaQmZWMcgJ1JS7X0lc30XalYtflWls8XJa3SQ1fYAgNfnZworaVQtb9tnlQTyfM/+hCbFAPtCL1quRMGuwAQhDBgk5ovKdDoE+Og=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=emlix.com; spf=pass smtp.mailfrom=emlix.com; arc=none smtp.client-ip=178.63.209.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=emlix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=emlix.com
-Received: from mailer.emlix.com (p5098be52.dip0.t-ipconnect.de [80.152.190.82])
-	(using TLSv1.2 with cipher ADH-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.emlix.com (Postfix) with ESMTPS id 298D85FEEB;
-	Thu, 19 Dec 2024 08:23:12 +0100 (CET)
-From: Rolf Eike Beer <eb@emlix.com>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 0/4] improve qconfig C++ code, take 2
-Date: Thu, 19 Dec 2024 08:19:21 +0100
-Message-ID: <5843611.DvuYhMxLoT@devpool47.emlix.com>
-Organization: emlix GmbH
+	s=arc-20240116; t=1734603546; c=relaxed/simple;
+	bh=5s46Lx8wPW6FQmIAJTy79x4iTnyqYAlN02MalO8e+LM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IbxmuqEm5UN+ixX7UBI/H99CL0Hnc3uv55xdXWbuxSqiTowzIjImOZBspTTpGAIi7hjcAgtsI5WY7UIQvzkcIz0rbuCMu1GQ+udp9lLIWfOvNKvYB9GwhjaFkIMBscAsNOsLx2NQJo7zMQ8BOyBw/UbIKOfScxDbLLUFI8qqfXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hihoqEgr; arc=none smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hihoqEgr"
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4679b5c66d0so170311cf.1
+        for <linux-kbuild@vger.kernel.org>; Thu, 19 Dec 2024 02:19:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1734603543; x=1735208343; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=5s46Lx8wPW6FQmIAJTy79x4iTnyqYAlN02MalO8e+LM=;
+        b=hihoqEgrUSx7U1jbWpXk6UD2y1x8kvqWocr6eROcHrz6KT+bzVYc5jNc9OT+WKz5M/
+         kRA/tQ+RjmaFmcWxiCJzcdiZkiZ8CwWeRMDAa+vV8OoV9OsKBBRNI939LCAqv59s4+fv
+         UGOuL1ya21i2w8kiJvfEMBUHI8tQzKf/r8X1MA0KJ7s5+eM7e606YbTHpkC7x2grOAt+
+         iS3V09X/0FTU26f3tD2Lu0+2vAZjTIP6nuiLD2NtbUvDAZmLcvLXyLxPdnthgK28LT/1
+         1pJkHTUZqcGY9zgxcEJxC5q/i6VoOkyzgZshuY6tpUv0hGq6U3httMp2Fb4D3aOvzXzG
+         zqfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734603543; x=1735208343;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5s46Lx8wPW6FQmIAJTy79x4iTnyqYAlN02MalO8e+LM=;
+        b=O2oGmRPjjNofiVWleYuEghZbaekq/Mfp/tFKckpFrfM6LXNvViufH7vuCBhseepJSo
+         pPxmYFJji/awEKrNjptb/xVp/O2ULpRYu+7SgHC8IuJFsH5fH6wAx/ufFCcXIp9D24Yw
+         IGshf6bZb7syRLpFKoiL1qG2hFb7L8w/Kbdmuc4RyloQp8Kh8/feY+x35JbBKbktaxAn
+         +Y4OKNNRXKqatN1h4BG1hJjhyugUhDwEYNf4ddkCkxNRF3Qg0BPZCiEFvP8jTyaw8uDH
+         PnJtkUlhBNHcV6dvcOa6TojMrxCsLhaXndA/ykW49uzML9d34iDLC1LUgqWhTSQLIJfj
+         //rQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXOuPt+R0637Q2AggU+Tk3dUZXGg+bLheW+LLUzQr+TtryA53Zssbk67IsA1eWZQ6AP13mvMpanOUaAofU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx5JxYIbhpTXUFbonA9OzlwOrl11rlyRrbNVlE3/myXARKxEDRu
+	A9VMPyACjEtOS1H+SuE5QZnsK4cShBeGX/FtajogF3Fs+VrunW5sbFxzlzS9eo3YP9Vb2ibITGL
+	GZqF3Chx1+JcS6uiiiOWwaFo18ZhednngBzMw
+X-Gm-Gg: ASbGnctKY3S2y5fRbwRM23RPuWXDWmqa5GBtQbpu1C/6H3X1XH5Z+tLybWJpz7a4M/d
+	G8626P/jDtE44jHValmHkt57kyE47JeOWTtY=
+X-Google-Smtp-Source: AGHT+IFBSKmqI7VdKTF7Shu01LIAOnSYZ4niZTfoNrU7z66Tl6ZodA8N35DTP9RCqTA5kzhdyBHlk50oFp5OT1KJQtA=
+X-Received: by 2002:a05:622a:189b:b0:463:6fc7:e7cb with SMTP id
+ d75a77b69052e-46a3d9880a0mr2176241cf.11.1734603543175; Thu, 19 Dec 2024
+ 02:19:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart6110953.lOV4Wx5bFT";
- micalg="pgp-sha256"; protocol="application/pgp-signature"
+References: <20241218-objtool-strict-v2-0-a5297c961434@google.com>
+ <20241218-objtool-strict-v2-2-a5297c961434@google.com> <20241218190406.gbemqsbf3rxtione@jpoimboe>
+In-Reply-To: <20241218190406.gbemqsbf3rxtione@jpoimboe>
+From: Brendan Jackman <jackmanb@google.com>
+Date: Thu, 19 Dec 2024 11:18:51 +0100
+X-Gm-Features: AbW1kvbmAyvP9XO2mgM5Vrykn6IpcsUixZ0Hch4wGc7cR210rdkFQKXut0NFlbc
+Message-ID: <CA+i-1C2Gfm_VQUeHrV-FVZY-DPhy0_VyBdMKMuYj1T+0ODQSTA@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] kbuild: Add option to fail build on vmlinux
+ objtool issues
+To: Josh Poimboeuf <jpoimboe@kernel.org>
+Cc: Peter Zijlstra <peterz@infradead.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nicolas Schier <nicolas@fjasle.eu>, linux-kernel@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
---nextPart6110953.lOV4Wx5bFT
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
-From: Rolf Eike Beer <eb@emlix.com>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 0/4] improve qconfig C++ code, take 2
-Date: Thu, 19 Dec 2024 08:19:21 +0100
-Message-ID: <5843611.DvuYhMxLoT@devpool47.emlix.com>
-Organization: emlix GmbH
-MIME-Version: 1.0
+On Wed, 18 Dec 2024 at 20:04, Josh Poimboeuf <jpoimboe@kernel.org> wrote:
+> The patch looks good to me, though the subject and commit log still need
+> to be updated.
 
-This is a followup to my earlier series, which has been partially applied=20
-already. Other patches that became obsolete by unrelated refactoring have b=
-een=20
-dropped.
-
-The review comments have been addressed. The nullptr patch should now be=20
-complete and catch every "0" in qconf.cc and qconf.h. One additional patch =
-has=20
-been added that removes a constructor overload that would have needed this=
-=20
-treatment otherwise as well.
-
-Regards,
-
-Eike
-=2D-=20
-Rolf Eike Beer
-
-emlix GmbH
-Headquarters: Berliner Str. 12, 37073 G=C3=B6ttingen, Germany
-Phone +49 (0)551 30664-0, e-mail info@emlix.com
-District Court of G=C3=B6ttingen, Registry Number HR B 3160
-Managing Directors: Heike Jordan, Dr. Uwe Kracke
-VAT ID No. DE 205 198 055
-Office Berlin: Panoramastr. 1, 10178 Berlin, Germany
-Office Bonn: Bachstr. 6, 53115 Bonn, Germany
-http://www.emlix.com
-
-emlix - your embedded Linux partner
---nextPart6110953.lOV4Wx5bFT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
-
------BEGIN PGP SIGNATURE-----
-
-iLMEAAEIAB0WIQQ/Uctzh31xzAxFCLur5FH7Xu2t/AUCZ2PI+gAKCRCr5FH7Xu2t
-/EJjBACwvkml9fqFt7Fm5ygH2JxXuYEgjoMr0jvRe/kvmb0l0jljaVM3wG26Njgc
-M09maqljUVtb5SJahG/IVE71WoW3IE3fgNBDcq6tMe/cZ567/jSWl9buWuRl6rl1
-EjW8F7yDmdURNMuJi9BDpBIGkWZwgRsgFkHGxcGcrzMBZdp8sA==
-=78pK
------END PGP SIGNATURE-----
-
---nextPart6110953.lOV4Wx5bFT--
-
-
-
+Agh, sorry. I'll wait a couple of days before posting the update to
+avoid spamming in case anyone wants to weigh in on the discussion.
