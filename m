@@ -1,75 +1,130 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA0320E309;
-	Fri, 10 Jan 2025 13:33:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F9C03B1A4
+	for <linux-kbuild@vger.kernel.org>; Fri, 10 Jan 2025 13:36:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736516009; cv=none; b=aVMSXJHkQwdWDmIG2K0HOa41T91GMOfmzs2IoCndPEzZAYDLBFO2MmeLuqcZkqtIdPH0W52//yAVBnXCOa1bf6wngOSTjoYB7CKZsrKFrDBhcHcFkpcko453fL+oKvFrenBWC2Whuvwr0ocHAsZirymWm7+cfIE5fNOWY2gtYFs=
+	t=1736516195; cv=none; b=U27koKB3g8NC0OxvSoattCUxwQse15rRM3Wp9dnndLy3X4Hd7SOnIiNN1R1kfrkvNmZ46kRHMM9yc8g4Vn90/GTxqVy4v/AW6BR8HJagteQx+aK21IU537gdQip8g67nIpCVWJXETVGmZwFYYfBQJqwnbO8y3++hTV1wkcCAIg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736516009; c=relaxed/simple;
-	bh=Rf9AInWA78YV1eY89zKesjFq1NrGShI+hyMES9T6hHc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=mXPkpnQmvEiTjxnpvzzdlXeHOL5zROjd4jmJZyKfYmfk2d1NP/uQni1Fj+UDhQLWGzkCLCO1v8e4VHVLnVrJ495Lz3lSHnMfo9K+DDv4r5MNQ4BQU2b1RxTcP5wGem9+V9kGp9/V7TE2zU+9AYCStlM+ODFqDnK6/0tfoYbLxMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hhNB51C7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736516195; c=relaxed/simple;
+	bh=jw/b+/vL53dnu7PBBWqcm3242olQotsUaChNLj/3oEA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=asjLtLl/A6nSSYYI/h8Xpf0W+59tJp9xw317MKQmpHQ01wIAzUS99S6QEzh+w9H+4csl0url2UaM1reotj4eWTujnFLvtSnpKu08O2XSQ0hjWHYRXXBbCtulFSWIeAxridU8JabMPKM6vpY+2ZDTA2mcvedUKb4hgnfIL29zDsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nwiK3hyx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hhNB51C7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 232C7C4CED6;
-	Fri, 10 Jan 2025 13:33:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nwiK3hyx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28B6DC4CED6
+	for <linux-kbuild@vger.kernel.org>; Fri, 10 Jan 2025 13:36:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736516008;
-	bh=Rf9AInWA78YV1eY89zKesjFq1NrGShI+hyMES9T6hHc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=hhNB51C7DjddLT+E4r9UusYrr6/NphwiQRGZmY+XcfH75PJE9QK7I0ixQNP2km75I
-	 FQTACek9PXRct5DQYmgLhPr6rRC7KW3A/dYHMN++6pDWPDH48k6JooYWBzQKlSp9fE
-	 6vwulG55pyTvE0OAMyL660Ia0i8xQOw1zj1u9LaUFTKar0aN7SwJIe9O+cdA3d0EvC
-	 n375WPtJamGeXXCKNRp8ArVdnzIRA2FZVRfPO7DnikjoqoCvkmCOSZRTksjwdvuMbM
-	 7VjRW9aO/nRpIL74pZW9tAOxLw6iYBEjgyjBX9pMMhW/x3KKSVLCg9rX7AL7Ic6mEU
-	 EEDmrc5Fv6jvw==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-To: Miguel Ojeda <ojeda@kernel.org>
-Cc: Masahiro Yamada <masahiroy@kernel.org>,  Wedson Almeida Filho
- <wedsonaf@gmail.com>,  Alex Gaynor <alex.gaynor@gmail.com>,  Nathan
- Chancellor <nathan@kernel.org>,  Nicolas Schier <nicolas@fjasle.eu>,
-  Boqun Feng <boqun.feng@gmail.com>,  Gary Guo <gary@garyguo.net>,
-  =?utf-8?Q?Bj=C3=B6rn?=
- Roy Baron <bjorn3_gh@protonmail.com>,  Benno Lossin
- <benno.lossin@proton.me>,  Andreas Hindborg <a.hindborg@samsung.com>,
-  Alice Ryhl <aliceryhl@google.com>,  linux-kbuild@vger.kernel.org,
-  rust-for-linux@vger.kernel.org,  linux-kernel@vger.kernel.org,
-  patches@lists.linux.dev
-Subject: Re: [PATCH 1/3] kbuild: rust: move `-Dwarnings` handling to
- `Makefile.extrawarn`
-In-Reply-To: <20240519211235.589325-1-ojeda@kernel.org> (Miguel Ojeda's
-	message of "Sun, 19 May 2024 23:12:33 +0200")
-References: <20240519211235.589325-1-ojeda@kernel.org>
-User-Agent: mu4e 1.12.7; emacs 29.4
-Date: Fri, 10 Jan 2025 14:12:12 +0100
-Message-ID: <87sepqg6dv.fsf@kernel.org>
+	s=k20201202; t=1736516195;
+	bh=jw/b+/vL53dnu7PBBWqcm3242olQotsUaChNLj/3oEA=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=nwiK3hyxa20omp55ekryQzUZLBHH4Z/YfzXNXyCPDqYBnOlE8s2KOmjJKR22UypGt
+	 sa2Rcc08pDXJTvyKJBUcIaKufp7OeEcyNTLATjuCnMcr/AEMUXHSdmfepCFDe+pahx
+	 1Seazixg4Pmn8T9xEYPc0/xK/mxNSa05mVdcHCzuvY8p7MXeH5NR4ufmd0lF0VIeQg
+	 9H92036ZTevtKNw/RSEsjtTMksOq+ujXW8E04YjzlC0fABJ1Z6UHF0iEOSz7paH12t
+	 8wNsQdYfWVVmm/h/iyPM96d+YG5yBxI1Jzqvy4Hc46pWvP44GWUKcARgrCz8nETQni
+	 Ld5KMQd+rS09A==
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-303548a9361so13810721fa.0
+        for <linux-kbuild@vger.kernel.org>; Fri, 10 Jan 2025 05:36:35 -0800 (PST)
+X-Gm-Message-State: AOJu0YybDAuvCwhjocilknUQfRsUPuyRkKMXcjyGlbL7d384cUgDCBK5
+	yShhOxNfUU+XVkI5iLJ83veaYLJ98+0vN/hfEYqVKoFXP+4W12nLO/4y5oZ+OSVGAjDQo5d+YkP
+	0W+/7R0MiKqqZJRFa8l0Gp3k8aPo=
+X-Google-Smtp-Source: AGHT+IFL8EOTKz91+q7KgQgp7O0ASG1Zg8aE7hU6ITYBt0yPFZf6PD4wJIDGizkDxcvXzLsJXS9iOftztaTQCUh2o3A=
+X-Received: by 2002:a05:6512:3e22:b0:540:2da2:f282 with SMTP id
+ 2adb3069b0e04-54284810c88mr2944148e87.42.1736516193541; Fri, 10 Jan 2025
+ 05:36:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <302dedfd-af8b-43cc-99cf-3a3f7b34b714@secunet.com> <4915d245-4419-43cf-abbe-b28cd27c869a@secunet.com>
+In-Reply-To: <4915d245-4419-43cf-abbe-b28cd27c869a@secunet.com>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Fri, 10 Jan 2025 22:35:57 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAQi0ZbVF9BLMCkHKufim43qH7MULW5iksoLK_sxYhRjkg@mail.gmail.com>
+X-Gm-Features: AbW1kvavlnWzfHMYG4lhZhO5i-vD6M-QecprjjESgLe3H4ZZbBuwGf5op5I_-BY
+Message-ID: <CAK7LNAQi0ZbVF9BLMCkHKufim43qH7MULW5iksoLK_sxYhRjkg@mail.gmail.com>
+Subject: Re: v6.13-rc1: Module signing stopped working for external modules
+To: Torsten Hilbrich <torsten.hilbrich@secunet.com>
+Cc: linux-kbuild@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Miguel Ojeda <ojeda@kernel.org> writes:
-
-> Following commit e88ca24319e4 ("kbuild: consolidate warning flags
-> in scripts/Makefile.extrawarn"), move `-Dwarnings` handling into
-> `Makefile.extrawarn` like C's `-Werror`.
+On Fri, Jan 10, 2025 at 3:44=E2=80=AFPM Torsten Hilbrich
+<torsten.hilbrich@secunet.com> wrote:
 >
-> No functional change intended.
+> On 09.01.25 07:35, Torsten Hilbrich wrote:
+> > Hello,
+> >
+> > after testing v6.13-rc1 after successfully using v6.12 I noticed that
+> > our external modules are no longer building correctly.
+> >
+> > - Module source: /build/client/devel/addmodules/vtx/work/vtx
+> > - Kernel source: /build/client/devel/kernel/work/linux-2.6
+> >    Symlinked by build-source
+> >
+> > We run the module_install step:
+> >
+> > ----------------
+> > make -C build-source M=3D/build/client/devel/addmodules/vtx/work/vtx
+> > modules_install INSTALL_MOD_PATH=3D/build/client/devel/addmodules/vtx/_
+> > INSTALL_MOD_DIR=3Dextra
+> > make[5]: Entering directory '/build/client/devel/kernel/work/linux-2.6'
+> > make[6]: Entering directory '/build/client/devel/addmodules/vtx/work/vt=
+x'
+> >    INSTALL
+> > /build/client/devel/addmodules/vtx/_/lib/modules/6.13.0-devel+/extra/vt=
+x.ko
+> >    SIGN
+> > /build/client/devel/addmodules/vtx/_/lib/modules/6.13.0-devel+/extra/vt=
+x.ko
+> > /bin/sh: 1: scripts/sign-file: not found
+> >    DEPMOD  /build/client/devel/addmodules/vtx/_/lib/modules/6.13.0-deve=
+l+
+> > make[6]: Leaving directory '/build/client/devel/addmodules/vtx/work/vtx=
+'
+> > make[5]: Leaving directory '/build/client/devel/kernel/work/linux-2.6'
+> > ---------------->
+> > The problem here is that before calling cmd_sign (scripts/sign-file) th=
+e
+> > build system now changes to the module source.
 >
-> Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
+> As workaround I used the following modification:
+>
+> diff --git a/scripts/Makefile.modinst b/scripts/Makefile.modinst
+> index 6fa9af4a25b4..67f081a68364 100644
+> --- a/scripts/Makefile.modinst
+> +++ b/scripts/Makefile.modinst
+> @@ -105,7 +105,7 @@ else
+>   sig-key :=3D $(CONFIG_MODULE_SIG_KEY)
+>   endif
+>   quiet_cmd_sign =3D SIGN    $@
+> -      cmd_sign =3D scripts/sign-file $(CONFIG_MODULE_SIG_HASH) "$(sig-ke=
+y)" certs/signing_key.x509 $@ \
+> +      cmd_sign =3D $(srctree)/scripts/sign-file $(CONFIG_MODULE_SIG_HASH=
+) "$(sig-key)" $(srctree)/certs/signing_key.x509 $@ \
+>                    $(if $(KBUILD_EXTMOD),|| true)
+>
+
+Please add $(objtree)/ instead of $(srctree)/
+in case the kernel was O=3D option.
 
 
-Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
+
+Please submit a patch with this tag.
+
+Fixes: 13b25489b6f8 ("kbuild: change working directory to external
+module directory with M=3D")
 
 
-Best regards,
-Andreas Hindborg
+Then, I will pick it up.
+Thanks.
 
 
-
+--=20
+Best Regards
+Masahiro Yamada
