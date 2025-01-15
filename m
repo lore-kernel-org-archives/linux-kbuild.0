@@ -1,90 +1,101 @@
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 569E4246A35;
-	Wed, 15 Jan 2025 09:10:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A8122475E2;
+	Wed, 15 Jan 2025 12:26:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736932248; cv=none; b=uOWOJQK3W9UoLUYayq/wTTJ64FvGNF9sgD4RwmKRzJuqEexfZ1Y3Oj7dscZMj0RjdIabJ8n84g4wLwiOfWeo1U3tGijCN7PEsQzhJBmiZriCEmRJkHmlPsH1PVgkK3MOa3SR21IIDdXZGrU2+SgfJMssRjWlOLooOAkE82Pz1pc=
+	t=1736943980; cv=none; b=ih5FwPrKnpYa7k9DTks2J2eKL2xQrB5UoI1paUgzyJr568SIM4fp/Nf1cRfz5WQRVZqllpMtpfBvfPctqDFpPofhE0mpbftBvqsOnSeK+si6LIWvkT2PjdrycXQzR3mrZPMsds5YS2X+CUmdzspVR/p/xTTcUjCAs/DRb1SJ+kg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736932248; c=relaxed/simple;
-	bh=s4gowUCkR8ThPcXmpLKlGclM8lC6TIMzjSkqs9savQ8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hqAs5hb+BpqifvBarFHovWDjCFkXe7MxNWQni1Ssy82r12bWsIsgPA9XKI+fYuWtpf8KT/M0LVKsY7dujmmMZbN8VJFYcZFbTMuZ+NxK8zesWANH5C50jrCvkARTX9bKibFodo9ne34VdOgO+DOwQmlly1RaD43SDgQzUjzwn80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PH89h/Yu; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1736943980; c=relaxed/simple;
+	bh=SEi3OXYW72ryJgMV9rqn8zuBcUU/wVY3ji2gwWJ3c8c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Xv6ltzAqyR1KoB4nP+4B0KCMcbysGC6lPAGVA8nvVX4TqtTijfO9e4GjhipjPy1LGDOryZOjFJHfcp80YIhnjmgZhyrXqEh9F/g4x2/v0Vc6JGvWb/llRweS4o4QXF0dn6ZOZ+J4/3C/MRxorqtgOElxkAtze9ilEUarLfN96+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=uj0qkWiH; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=v0BoDTQn; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PH89h/Yu"
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2ef05d0ef18so1345839a91.0;
-        Wed, 15 Jan 2025 01:10:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736932246; x=1737537046; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s4gowUCkR8ThPcXmpLKlGclM8lC6TIMzjSkqs9savQ8=;
-        b=PH89h/YuSRAissrvXDNSVWYeb4oOxps/RbuOu/+snzNfis1qxCHbxQYMO8b9YufGhM
-         ZFpcpIbCDHz6O6yon+Q+5D/90QviirEY3zTWvXyyMDegCZlorXQTuv1uQrUM7wUrK+jS
-         5jNdXPy/Y3eXG8qNWUl69SYbl3jZlr9vv678M0HFwdVLVYYewwv1LkYWLFfErjaXUjwd
-         CNZDk03yKUUS2WGVzH6p3PopBAo7bpEUV5mwpkqxJChTVRdpLyqGWkBXAMa8DRlxrleI
-         NZGirZtU05/lBIdHelPGGwOnM/lVa1fAckzKPWvpArcq/QaAvK3sMNXIcNCPozb9ryw+
-         Juiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736932246; x=1737537046;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=s4gowUCkR8ThPcXmpLKlGclM8lC6TIMzjSkqs9savQ8=;
-        b=sIWMv5U/HoKpfy0sJmrnLbhx3U073y4U6TNvDfq6fKbXygO8DQuSr/IRuvEZ/D3FGj
-         zOyLXu67t/PMnXYWozdP93G0noXavHc0UwCHkTwYSoSdG99l8gKdGEAzYAyOAJ7bIi9g
-         aR9TGV/Uo92wjJsfcoV5dYaDdFU/n6yIyoc7hvOpivivgRwJmyjt3WHA6e3pfuorqi7f
-         xkWLv8IvdKA6q0KLBRvOs1brKEHF3OjRy9sm8FQrridOxEqdXzdzgJEKnItKtXLmdEGI
-         Rr7/xG6GXEdjt8ZeMiBPPrCeN5jd2pY7eSTUIkW2BOtn5T+MJvRXO6Gb6p1QxOTUpoj0
-         9YYw==
-X-Forwarded-Encrypted: i=1; AJvYcCWdnCwndlNuTlD82kuCgGijBCIYVG1MKnwP+aEgYTmMcveorrho7vfTfhgbhqzoLuDwvbFOZvyeXM0V4GXCko8=@vger.kernel.org, AJvYcCX0GOMqbYQYrYFyC5UrCZhCMQgw0A89PHdB7BAo2v8+DTIZr9fSKKugozVsCMD4cbsN6BAhxraIHO0OFAxy@vger.kernel.org, AJvYcCXWc66fug2wCr6FHiqZDiBGp8UpRFz8H9MZhAeaOJFK/XEvmbBY5V/NsjHH/Ae0tW4FS4AxblAEgBm84ML6@vger.kernel.org, AJvYcCXdWyEg1K6e/yY4AaLcSDB5JMD527XKR7qz1o9GCjnFTYBw20Q9onFuEeNersCLyQMiCekaDQqaQzA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTaafdp0ek5RKT1DNDDfQ1Yhc/JKRjHlTO5PdwZ1TZd8d4pk0K
-	nS/ydJMDUhVyO1zaG+zVnsY0DCwQr5SFwpMqf9gmIaAP5ZFkjMpZJtOLpOPusgyNkfY2lRmS6jo
-	k3/JVCKUnwviYK9rwReueT5sq2s4=
-X-Gm-Gg: ASbGnctkjI52v6a773LMXB6B1zNT/7oG8y4LTu42tlL5sn3oiJi+kiVen+2Yrn84e7c
-	HiQYwLiOJ3JsIxwzmheTOVjBU/SXk9sRLB8rpFA==
-X-Google-Smtp-Source: AGHT+IF5o5Fngx9F8mAKdkHS+kf8BLRmpwBINYjoHVCcfYVIb4s1YvcCTtZ+OZrv6w6UeWm6DL+Xl1deyoXsqkgUcPY=
-X-Received: by 2002:a17:90b:37c3:b0:2f2:f6e5:d28e with SMTP id
- 98e67ed59e1d1-2f548f1c677mr15527940a91.3.1736932246563; Wed, 15 Jan 2025
- 01:10:46 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="uj0qkWiH";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="v0BoDTQn"
+Date: Wed, 15 Jan 2025 13:26:13 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1736943975;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=n6d6SgkhUSyqRwmZawfrB96eHNM5untwrAFDhIFtLNE=;
+	b=uj0qkWiHDiAKrR1Kpo4bFN0m7iisRJ48OoXUVAPiEYll7JEcV2xXUcpCP5Kie3V9ZdDXsB
+	Yl2MyNZdKZy3/1e8cVx56fJXL+sfFScUL5aluxMQfHpVBEkZ22haGn4dFJPgE92SDXPggh
+	rel+CR0kgYAiFNxt/NW9oaxA3fC9OgLLgQmRaPF7b4kN616S09vj5ARm0OyMTNaXtYysmE
+	pW2IDqTzZ2K9khm31OOTr+YwDxVzo1E9ZOF67rsedKH7miyMqd5cNMz6Vt0PlkdtfRdrrS
+	h4FJIVxw+cB8NtKZ6GjGDIg3ERyH+lUravJSV5qNO8sL7yM5a8xIIxUhcZRumA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1736943975;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=n6d6SgkhUSyqRwmZawfrB96eHNM5untwrAFDhIFtLNE=;
+	b=v0BoDTQn+hpyAc1zsCsUzhX0IO/MpFuXyXEXog5WYZHlHAqODrN+Sf3cXewFVznD7iC5kA
+	3SbgQE9IzBgvMDAg==
+From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+To: Nicolas Schier <nicolas@fjasle.eu>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, linux-kernel@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH 1/2] MAINTAINERS: Add kconfig utility scripts
+Message-ID: <20250115132235-f8c9c9ac-714f-4836-baaa-07250c92e349@linutronix.de>
+References: <20250108-diffconfig-validate-v1-0-4b3d8ee489da@linutronix.de>
+ <20250108-diffconfig-validate-v1-1-4b3d8ee489da@linutronix.de>
+ <Z4el2qEV1xZIMBfk@bergen>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241112184455.855133-1-ojeda@kernel.org> <CANiq72m+k07miKu=vHfp1-A+nu092R+khau5b95Ugq8M8sksFQ@mail.gmail.com>
- <CAK7LNASXLdya8d2Cjo9H2j5J2d8ukj27aDNStqWEVbDQFgsP2w@mail.gmail.com>
-In-Reply-To: <CAK7LNASXLdya8d2Cjo9H2j5J2d8ukj27aDNStqWEVbDQFgsP2w@mail.gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Wed, 15 Jan 2025 10:10:33 +0100
-X-Gm-Features: AbW1kvablhI2XqwtFDUl4ZnT060edaVgVSWH6gDoFIWIPktYypdDmv7lacp_u_Q
-Message-ID: <CANiq72kpCMcDgpRuUA-5oJq5dYgtLW2bVkk+H7fU6CTtKAw4SA@mail.gmail.com>
-Subject: Re: [PATCH v3] kbuild: rust: add PROCMACROLDFLAGS
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Miguel Ojeda <ojeda@kernel.org>, HONG Yifan <elsk@google.com>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, linux-kbuild@vger.kernel.org, 
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, rust-for-linux@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	patches@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Z4el2qEV1xZIMBfk@bergen>
 
-On Wed, Jan 15, 2025 at 3:56=E2=80=AFAM Masahiro Yamada <masahiroy@kernel.o=
-rg> wrote:
->
-> Acked-by: Masahiro Yamada <masahiroy@kernel.org>
+On Wed, Jan 15, 2025 at 01:11:06PM +0100, Nicolas Schier wrote:
+> On Wed 08 Jan 2025 13:34:28 GMT, Thomas Weiﬂschuh wrote:
+> > There are various utilities in scripts/ which work with kconfig 
+> > files.
+> > These have currently no maintainer.
+> > As most patches for them are applied through kconfig/kbuild anyways,
+> > add an explicit maintainership entry.
+> > 
+> > Signed-off-by: Thomas Weiﬂschuh <thomas.weissschuh@linutronix.de>
+> > ---
+> >  MAINTAINERS | 3 +++
+> >  1 file changed, 3 insertions(+)
+> > 
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index 30cbc3d44cd53e6b1a81d56161004d7ab825d7a9..2bd414fb3e6d6515b57a57a5f3d4d735137edcce 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -12385,6 +12385,9 @@ Q:	https://patchwork.kernel.org/project/linux-kbuild/list/
+> >  T:	git git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kbuild
+> >  F:	Documentation/kbuild/kconfig*
+> >  F:	scripts/Kconfig.include
+> > +F:	scripts/checkkconfigsymbols.py
+> > +F:	scripts/config
+> > +F:	scripts/diffconfig
+> 
+> Thanks!
+> 
+> Does it make sense to add scripts/extract-ikconfig also?  It does not 
+> handle kconfig language at all, but linux-kbuild would probably still a 
+> good place for review.
 
-Added, thanks a lot!
+scripts/extract-ikconfig should be maintained together with
+kernel/configs.c. Today both are formally unmaintained.
+linux-kbuild picking up both looks reasonable to me.
 
-Cheers,
-Miguel
+> Nevertheless,
+> 
+> Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
+
+Thanks!
