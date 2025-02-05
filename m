@@ -1,119 +1,166 @@
-Received: from mx0b-00206402.pphosted.com (mx0b-00206402.pphosted.com [148.163.152.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B5A31DAC95;
-	Wed,  5 Feb 2025 16:36:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.152.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E09AC18A6BA;
+	Wed,  5 Feb 2025 16:40:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738773388; cv=none; b=Vv9lO7D7hmk+yrk5qnJQnKNH0zwi3ZZSrQqX0Ce8XNagW1Sx9UzWD7stdNQgB4vDrpO/rqOyg4Xv0wDLjzPcY13H+DiVFPhwbknt3NTFdYIWwrXYPNEQmHOdtS+Q7XAJSb6PQ+mXzS2QHP8yl4r//KblKT9yoVW2XFGDRD7tm44=
+	t=1738773604; cv=none; b=sE/9Bv2l+/DYoABFQ4e5UEhNE7MK1eGRc+HWlo2ao+CSGzLLBAETtJn3lN0/sJxofGy2DARSZrrrpc7+KN1MLGI0c8hoSrBfvE2YX17BCxMILPSbWyO3s7oxdOFtu1w0+ktsVtY9Yab5O1XNwVYTQgFNlbgPJtVGtwe8Hly0QpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738773388; c=relaxed/simple;
-	bh=KQAjdNXPn0DfadHsCm5XjQMXRiXHNgA7KxiZn4px+3o=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=XRN1k6SwbqPu8djkomJyb0EyCRP6d5ISSuhqfMktTtYuxgrUOgUcbiReyXFvhHMY19WiEIyb9dd4UMMEk97If2qQeQa0N8jIZhBkPQR9SGffDwqODFW5E0/kqyQPgYXfT3+arvCVUuehY/t3xPRc/h9zqieLThb3fkB+akjL4tw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=crowdstrike.com; spf=pass smtp.mailfrom=crowdstrike.com; dkim=pass (2048-bit key) header.d=crowdstrike.com header.i=@crowdstrike.com header.b=YHeV919j; arc=none smtp.client-ip=148.163.152.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=crowdstrike.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=crowdstrike.com
+	s=arc-20240116; t=1738773604; c=relaxed/simple;
+	bh=MW6+C14jG5Esc0YVeTcbxaytpn8rmcNZfT7WdMxypH0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FWV3hSludjnqUw+SG3fw04G1uB0UsUqTVYX+21gTOTskq3YUdu35BDLaVBVHXEkxsXZHiO1Jm3/MZOC0mQT0yC+mF4S8ukZsXKsgLSrpY1JrCpMhwNn5AS7WnVQr4ECM4iW6/OkO7eXp62TvZNfIvUjNdM/CRCSNaCb5K/TsDF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PbvcBD9P; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=crowdstrike.com header.i=@crowdstrike.com header.b="YHeV919j"
-Received: from pps.filterd (m0354655.ppops.net [127.0.0.1])
-	by mx0b-00206402.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 515FQCIx024083;
-	Wed, 5 Feb 2025 16:00:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=crowdstrike.com;
-	 h=cc:content-id:content-transfer-encoding:content-type:date
-	:from:in-reply-to:message-id:mime-version:references:subject:to;
-	 s=default; bh=KQAjdNXPn0DfadHsCm5XjQMXRiXHNgA7KxiZn4px+3o=; b=Y
-	HeV919jwJAKBcZ9DZYoJZ746xXdNm2KJ++Nw6WaGqiiyhKDtNfUghTJeY3x/Qdm1
-	lPWXA1t9+oHuXjf8cHgfQFjGwqxzeOhJpV7fzoOSniIPt31uwiTe9145bBzlynWl
-	B1pDyp8D9OLUl38VgOHHHQ6QiUTE1GZrTm2iPvXQWn2qZgzIj2tDY+wM8LyHho4a
-	R945pTtGxTRlhDd7gTWdJiB7wjhwB1X8KYVltOhU6bPZ38VBLAVH1J2HUE5ZgN2x
-	8zqbBuD1EX58SrGkQJNzczp6kffEQ1lN8YnFH2Yzu5PuqFNAnOAaorTzcWLBaXnE
-	q545s4quSSUrqQNnRl2VA==
-Received: from mail.crowdstrike.com (dragosx.crowdstrike.com [208.42.231.60] (may be forged))
-	by mx0b-00206402.pphosted.com (PPS) with ESMTPS id 44mammg3t0-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 05 Feb 2025 16:00:04 +0000 (GMT)
-Received: from 04WPEXCH006.crowdstrike.sys (10.100.11.70) by
- 04WPEXCH005.crowdstrike.sys (10.100.11.69) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Wed, 5 Feb 2025 16:00:00 +0000
-Received: from 04WPEXCH006.crowdstrike.sys ([fe80::a97d:6ad:c239:d138]) by
- 04WPEXCH006.crowdstrike.sys ([fe80::a97d:6ad:c239:d138%11]) with mapi id
- 15.02.1544.009; Wed, 5 Feb 2025 16:00:00 +0000
-From: Martin Kelly <martin.kelly@crowdstrike.com>
-To: "rostedt@goodmis.org" <rostedt@goodmis.org>
-CC: "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-        "masahiroy@kernel.org"
-	<masahiroy@kernel.org>,
-        "zhengyejian1@huawei.com" <zhengyejian1@huawei.com>,
-        "torvalds@linux-foundation.org" <torvalds@linux-foundation.org>,
-        "mhiramat@kernel.org" <mhiramat@kernel.org>,
-        "mathieu.desnoyers@efficios.com"
-	<mathieu.desnoyers@efficios.com>,
-        "akpm@linux-foundation.org"
-	<akpm@linux-foundation.org>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "nathan@kernel.org" <nathan@kernel.org>,
-        "nicolas@fjasle.eu" <nicolas@fjasle.eu>,
-        "christophe.leroy@csgroup.eu"
-	<christophe.leroy@csgroup.eu>,
-        "mark.rutland@arm.com" <mark.rutland@arm.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "linux-trace-kernel@vger.kernel.org" <linux-trace-kernel@vger.kernel.org>,
-        "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
-        "jpoimboe@redhat.com" <jpoimboe@redhat.com>
-Subject: Re: Re: [PATCH v2 16/16] scripts/sorttable: ftrace: Do not add weak
- functions to available_filter_functions
-Thread-Topic: Re: [PATCH v2 16/16] scripts/sorttable: ftrace: Do not add weak
- functions to available_filter_functions
-Thread-Index: AQHbd+cCrpRl49KJ0EiNa9urqmBbFA==
-Date: Wed, 5 Feb 2025 16:00:00 +0000
-Message-ID: <c4c7f0931742c8636a82f2ae3b3c492c93266c93.camel@crowdstrike.com>
-References: <20250102232609.529842248@goodmis.org>
-	 <20250102232651.347490863@goodmis.org>
-	 <aba52935dc06a1fe69f05309f5d9828a297ad787.camel@crowdstrike.com>
-	 <20250204193559.1f87b4ea@gandalf.local.home>
-In-Reply-To: <20250204193559.1f87b4ea@gandalf.local.home>
-Accept-Language: en-US, en-GB
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-disclaimer: USA
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E0BB0A2C680BEB4980905CE6486592F2@crowdstrike.sys>
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PbvcBD9P"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8713C4CED1;
+	Wed,  5 Feb 2025 16:39:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738773603;
+	bh=MW6+C14jG5Esc0YVeTcbxaytpn8rmcNZfT7WdMxypH0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=PbvcBD9Pf48kjdmaunVfRm5HfKlG94YQkySYFmcKEhQpOV8dCfiq95QnAkj9au0Fn
+	 qCfVZYKf/+eMX18ZVyLZO76EaNqPNah3h528mNHT2F+rdGXDJZS8Af5hkSC4C7GKVY
+	 sB+0eIWiot4fXMhgWYAhlHq5rrh3tHqowXBvBislvgq99/FtqstgQtfATnrZ4HCs+o
+	 nZd9/vC1IP/LdePUmr25n/DfoURISrwDg4u7AZzvS5ryahUDsrDZFjskBhPz3d0Z8f
+	 n5znAHDlLKTZiA/q5Xj0JMaToeCmvdgTR620uvPOqs5rzUO3SFIQSWghvvbAJN3IXQ
+	 DdgVNuKto18Lw==
+From: Masahiro Yamada <masahiroy@kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Andy Whitcroft <apw@canonical.com>,
+	Dwaipayan Ray <dwaipayanray1@gmail.com>,
+	Joe Perches <joe@perches.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nicolas@fjasle.eu>,
+	linux-doc@vger.kernel.org,
+	workflows@vger.kernel.org
+Subject: [PATCH] kbuild: remove EXTRA_*FLAGS support
+Date: Thu,  6 Feb 2025 01:39:38 +0900
+Message-ID: <20250205163939.3464137-1-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-ORIG-GUID: 6e_pcGkFVcXTbb8vvYC3lg2INop8zK62
-X-Authority-Analysis: v=2.4 cv=NvQrc9dJ c=1 sm=1 tr=0 ts=67a38b04 cx=c_pps a=1d8vc5iZWYKGYgMGCdbIRA==:117 a=1d8vc5iZWYKGYgMGCdbIRA==:17 a=xqWC_Br6kY4A:10 a=EjBHVkixTFsA:10 a=IkcTkHD0fZMA:10 a=T2h4t0Lz3GQA:10 a=pl6vuDidAAAA:8 a=lqAKrMhzrGgqgS63txUA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: 6e_pcGkFVcXTbb8vvYC3lg2INop8zK62
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-05_06,2025-02-05_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
- bulkscore=0 priorityscore=1501 mlxscore=0 clxscore=1015 impostorscore=0
- malwarescore=0 lowpriorityscore=0 adultscore=0 spamscore=0 mlxlogscore=949
- classifier=spam authscore=0 authtc=n/a authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2501170000
- definitions=main-2502050124
+Content-Transfer-Encoding: 8bit
 
-T24gVHVlLCAyMDI1LTAyLTA0IGF0IDE5OjM1IC0wNTAwLCBTdGV2ZW4gUm9zdGVkdCB3cm90ZToN
-Cj4gT24gV2VkLCA1IEZlYiAyMDI1IDAwOjEzOjI2ICswMDAwDQo+IE1hcnRpbiBLZWxseSA8bWFy
-dGluLmtlbGx5QGNyb3dkc3RyaWtlLmNvbT4gd3JvdGU6DQo+IA0KPiA+IEknbSBub3QgbmVjZXNz
-YXJpbHkgYSBxdWFsaWZpZWQgcmV2aWV3ZXIgZm9yIHRoaXMgcGF0Y2gsIGJ1dCBJJ20NCj4gPiB2
-ZXJ5DQo+ID4gaW50ZXJlc3RlZCBpbiBzZWVpbmcgaXQgb3IgYSBzaW1pbGFyIHNvbHV0aW9uIGdl
-dCBtZXJnZWQsIGFzIHRoZQ0KPiA+IGltcGFjdA0KPiA+IHdoZW4gaXQgaGl0cyBpcyBzaWduaWZp
-Y2FudCAoc2lsZW50IGZhaWx1cmUpIGFuZCBub3QgZWFzeSB0byBkZXRlY3QNCj4gPiBvcg0KPiA+
-IHdvcmsgYXJvdW5kLiBJcyB0aGVyZSBhbnkgb2JzdGFjbGUgbGVmdCBpbiBnZXR0aW5nIHRoaXMg
-b25lIG1lcmdlZA0KPiA+IG90aGVyIHRoYW4gZnVydGhlciByZXZpZXdzPw0KPiANCj4gQSB2ZXJz
-aW9uIG9mIHRoZSBwYXRjaGVzIDEtMTQgd2FzIG1lcmdlZCB0aGlzIG1lcmdlIHdpbmRvdywgd2l0
-aCBzb21lDQo+IHR3ZWFrcy4gSSBwbGFuIG9uIHJlYmFzaW5nIHBhdGNoZXMgMTUgYW5kIDE2IG9u
-IHRvcCBvZiB0aGF0IGFuZA0KPiByZXN1Ym1pdHRpbmcuIEkganVzdCBoYXZlIHNvbWUgb3RoZXIg
-dGhpbmdzIEknbSBmaW5pc2hpbmcgdXAuDQo+IA0KPiBUaGFua3MsDQo+IA0KPiAtLSBTdGV2ZQ0K
-DQpBd2Vzb21lLCB0aGFua3MhDQo=
+Commit f77bf01425b1 ("kbuild: introduce ccflags-y, asflags-y and
+ldflags-y") deprecated these in 2007. The migration should have been
+completed by now.
+
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
+
+ Documentation/dev-tools/checkpatch.rst | 18 ------------------
+ Documentation/kbuild/makefiles.rst     |  3 ---
+ scripts/Makefile.build                 |  4 ----
+ scripts/Makefile.lib                   |  5 -----
+ scripts/checkpatch.pl                  | 14 --------------
+ 5 files changed, 44 deletions(-)
+
+diff --git a/Documentation/dev-tools/checkpatch.rst b/Documentation/dev-tools/checkpatch.rst
+index abb3ff682076..76bd0ddb0041 100644
+--- a/Documentation/dev-tools/checkpatch.rst
++++ b/Documentation/dev-tools/checkpatch.rst
+@@ -342,24 +342,6 @@ API usage
+ 
+     See: https://www.kernel.org/doc/html/latest/RCU/whatisRCU.html#full-list-of-rcu-apis
+ 
+-  **DEPRECATED_VARIABLE**
+-    EXTRA_{A,C,CPP,LD}FLAGS are deprecated and should be replaced by the new
+-    flags added via commit f77bf01425b1 ("kbuild: introduce ccflags-y,
+-    asflags-y and ldflags-y").
+-
+-    The following conversion scheme maybe used::
+-
+-      EXTRA_AFLAGS    ->  asflags-y
+-      EXTRA_CFLAGS    ->  ccflags-y
+-      EXTRA_CPPFLAGS  ->  cppflags-y
+-      EXTRA_LDFLAGS   ->  ldflags-y
+-
+-    See:
+-
+-      1. https://lore.kernel.org/lkml/20070930191054.GA15876@uranus.ravnborg.org/
+-      2. https://lore.kernel.org/lkml/1313384834-24433-12-git-send-email-lacombar@gmail.com/
+-      3. https://www.kernel.org/doc/html/latest/kbuild/makefiles.html#compilation-flags
+-
+   **DEVICE_ATTR_FUNCTIONS**
+     The function names used in DEVICE_ATTR is unusual.
+     Typically, the store and show functions are used with <attr>_store and
+diff --git a/Documentation/kbuild/makefiles.rst b/Documentation/kbuild/makefiles.rst
+index d36519f194dc..25e04e47faff 100644
+--- a/Documentation/kbuild/makefiles.rst
++++ b/Documentation/kbuild/makefiles.rst
+@@ -318,9 +318,6 @@ ccflags-y, asflags-y and ldflags-y
+   These three flags apply only to the kbuild makefile in which they
+   are assigned. They are used for all the normal cc, as and ld
+   invocations happening during a recursive build.
+-  Note: Flags with the same behaviour were previously named:
+-  EXTRA_CFLAGS, EXTRA_AFLAGS and EXTRA_LDFLAGS.
+-  They are still supported but their usage is deprecated.
+ 
+   ccflags-y specifies options for compiling with $(CC).
+ 
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 993708d11874..a59650ba140b 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -20,10 +20,6 @@ always-m :=
+ targets :=
+ subdir-y :=
+ subdir-m :=
+-EXTRA_AFLAGS   :=
+-EXTRA_CFLAGS   :=
+-EXTRA_CPPFLAGS :=
+-EXTRA_LDFLAGS  :=
+ asflags-y  :=
+ ccflags-y  :=
+ rustflags-y :=
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index ad55ef201aac..20d77bfd0d72 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -1,9 +1,4 @@
+ # SPDX-License-Identifier: GPL-2.0
+-# Backward compatibility
+-asflags-y  += $(EXTRA_AFLAGS)
+-ccflags-y  += $(EXTRA_CFLAGS)
+-cppflags-y += $(EXTRA_CPPFLAGS)
+-ldflags-y  += $(EXTRA_LDFLAGS)
+ 
+ # flags that take effect in current and sub directories
+ KBUILD_AFLAGS += $(subdir-asflags-y)
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index 7b28ad331742..8f70bedc18be 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -3689,20 +3689,6 @@ sub process {
+ 			}
+ 		}
+ 
+-		if (($realfile =~ /Makefile.*/ || $realfile =~ /Kbuild.*/) &&
+-		    ($line =~ /\+(EXTRA_[A-Z]+FLAGS).*/)) {
+-			my $flag = $1;
+-			my $replacement = {
+-				'EXTRA_AFLAGS' =>   'asflags-y',
+-				'EXTRA_CFLAGS' =>   'ccflags-y',
+-				'EXTRA_CPPFLAGS' => 'cppflags-y',
+-				'EXTRA_LDFLAGS' =>  'ldflags-y',
+-			};
+-
+-			WARN("DEPRECATED_VARIABLE",
+-			     "Use of $flag is deprecated, please use \`$replacement->{$flag} instead.\n" . $herecurr) if ($replacement->{$flag});
+-		}
+-
+ # check for DT compatible documentation
+ 		if (defined $root &&
+ 			(($realfile =~ /\.dtsi?$/ && $line =~ /^\+\s*compatible\s*=\s*\"/) ||
+-- 
+2.43.0
+
