@@ -1,84 +1,116 @@
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E8980BFF
-	for <linux-kbuild@vger.kernel.org>; Fri,  7 Feb 2025 10:16:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2A02238D4F;
+	Fri,  7 Feb 2025 15:45:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738923378; cv=none; b=rqRaQHSni4y1HZtR9IULwKOopr4gTzVu9PMYCHs5UPfjUC2pH/3it78OlmN6Uu74GL6sik6NjXxRdH7UloGhbcEkubwZzx45M/kn65s5uQE3gQPGX4W/vxmPELklMoQViG2p0zWYkIRPZzkmFY/AnH5sYkw23WqBqiqmJJ8sqyk=
+	t=1738943160; cv=none; b=J1G/8NuTUCRYrZFoIRW8nukE/j/b68vpQM6kpsgCuuDDmRnk8+1MvNY3FmVFeyLzmqeb1JSL/5Gb+Mt7ngABEC3AKay5Opi1BuA+bMlfZxNEpX6kaMe3zhPEO+iVTrRGe73AUHFQurG8ohqaMD8Lgw7p8KO1n8Th3FcvmpNJ5t4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738923378; c=relaxed/simple;
-	bh=mdTv+QVDXPvlalZfbkGNrgsBW9vvfsm7zTp0oVSmMP4=;
+	s=arc-20240116; t=1738943160; c=relaxed/simple;
+	bh=7pn7F/toAYXULdsZ+KZ9V1Ye15ECgQfIOBRNB0uvGFM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XjtWc68wcKCIb3c3eXW3uEVBpeJr3Ydl6rVOuw5mX+3HeAzLLn/0k2yHf5s66buDsgcNQqMXsQK7m4U5XJtqZIsQKxA9IvGX/yyG8OFO3IscuBFs1zygZOylRBIJN6d+jGPW0k+gZRt4DlzhS3agey02+HJ2fADCw28HBw1Hakw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oQPa2Dl/; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 To:Cc:Content-Type; b=Fu8pFnz8+y7KpgJbckJHY0igWb4B80rztrYMaE3WbL7tXgmiSsbh92ce8fBdjR2mBVJP431xdNqgWpBTHG9DJJySfE8JHTMPFTKdHPfFlPD3tJVWWTIQfGmY6PEOJtTWW6u2lx41RwWuBd0SKUWwG3J+bL17v/JaIb1G2MWpzoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lXyKOf/r; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oQPa2Dl/"
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4678c9310afso191201cf.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 07 Feb 2025 02:16:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738923376; x=1739528176; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=kCUV7x43bWbCI/hcabQDWCnrCITBo3VvJAZs4rie/Wo=;
-        b=oQPa2Dl//chZZlFgaQLXcSl7NGGC5z7c5+FFfC/Gl0sZNbPunGcPm5ezCaNiR+nLN+
-         EGvZSlR+xulUBAZXU4CXXgVUEcRiAXfxcIyLkSqvQIHs/4Qff8XbUMsmeSfJbIfBq0oy
-         vZ5oqZ4xW7zHm5qKOO6e9YXBuxj6nNvJHhuKBXvU/1ycwvMscKRFmzL+AxRa+OxtkBel
-         A7iFpBUBVuz5S5NqDVWZayjeqNQJQRd8yZFJX86ncAW4K7plhkBJNpLZvq4QA5S7eOUU
-         vQr+lYx9npNYP7Q9l40ZieGUv4+47KBz2knQJn/9vpN1mrPrzT7NVAT2TYjGFXlk6IH9
-         QwBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738923376; x=1739528176;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kCUV7x43bWbCI/hcabQDWCnrCITBo3VvJAZs4rie/Wo=;
-        b=gpPr7NLHWsXFXWo+QLDxaGmlMTwoax7+DNddvY71wELagZBIHBAEUss1GAdshdICkn
-         AL1GRA6jCSHom2D7qGdGux4HVoyXo5DJntT2WudFcGRmW4VZe6tQMkQI8qYNobOB5Ip9
-         5RDANn0ydCsGPVGzJLMv+mFoxgJm4IkYFcyPwEvQQdEG0ObqXlDIumeK4ED7U8D6jCLZ
-         WmLjJsqJkAJ+UJ1ALfDG0XLwnF/4n87mE/vRV4hnnhFHHdztFjDChSZcXY5HyG8eBPIE
-         /uhpz4eTilZKy2KpSab+QXK3q9a8IKCT0mH+dnD1cpOisNthI628zJLBdDjmkeAY8P9s
-         VDvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWWYPAN0Z1EdBEIZRcV/GZzWgaqJxSL/+C/qyq3Hh0MzJwRV6P3jxZC7ZWnSV+ZtWtQGYF3s7jDAiRBt/A=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8d8HBMmW2ZVb12mWspxf1qm4tl+PRpglCWut+4G+q+eix5osv
-	qD6Mfanp4TTM6c6CJgLZC78Y9wSwkzWDqw7WfpJjBOV0UidyfGQ58iTayLtR+YEv1hKqSq53M0i
-	Bry3/IW8pUIn34t7uKaaxayn18oy2USltS2QM
-X-Gm-Gg: ASbGncsjFlURs+BtR1d6ayexTX9wO1gXvB9elJcdkSi2AzgG+6M7WFlbTp+hxaeRXqb
-	IUb+vgKMHqS7xTql8XvOTlGb9D/rTzLMzeX2WyuF2Zmugt6yrRHpd4ZjgYM2T1XdCtL7rwsIwjF
-	BGofB8SYAQt4b7r/rGOG52UHountU=
-X-Google-Smtp-Source: AGHT+IGNBzvSf6Dx7xTDH8RzZIZRJ/MfxFXjZEpoZFDY8zOeAEieK82t+My9tday6P9m+xr4EBUG0yBPC8BUzCY0xo0=
-X-Received: by 2002:a05:622a:13c8:b0:461:358e:d635 with SMTP id
- d75a77b69052e-471685b8925mr2831741cf.18.1738923375596; Fri, 07 Feb 2025
- 02:16:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lXyKOf/r"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 256B2C4CEE7;
+	Fri,  7 Feb 2025 15:45:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738943159;
+	bh=7pn7F/toAYXULdsZ+KZ9V1Ye15ECgQfIOBRNB0uvGFM=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=lXyKOf/rv7LLec8IcTkiVpleC798uCqVHXtkpUc7asRSxQsLbGigUbTCC5Jh82ksa
+	 TSanE922RbqnEIvvz++fbEo10kcZsWT4jBfcQdz6gmNoRsPTSEzuYT+VfM02FNh4Ro
+	 MURGDGSH3Q5brf97Sq3PUjWcrkRpC5rPUhUjqvL7UuW7pzXVmuqM4tgdhmM7gwUaxO
+	 xVGbUuP4R9u6HOx1bTNiC2/u94kxRqj5YN2i1pX7FZuyLTu/4R7N/d2izN2foXW9Ib
+	 3TBnJ0wh0dmQqQsogRa/jxSLfUZZejLvP6qCT5/AGtTGDU9Is0wihq4VElLdZ520PS
+	 VWLysm6fHeShQ==
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-544fee2f3d5so421646e87.2;
+        Fri, 07 Feb 2025 07:45:59 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCX0E9gamvB4puJYSADHybhOtL1r0oDfVKFjQTf15CtlGJzXtWa5vdraRfYU1+lskWkM00y8bY60cz/R8EY=@vger.kernel.org, AJvYcCXGzjCMTB0nXYAKvex+64no65vIc9sqG+Mv6eQ7iBdhHctlGAnqA/ZeMDOzEG04NzhFsDUJr9d+OsaqMgOaTg==@vger.kernel.org, AJvYcCXi+rpNEaGN7Ja8JgvNrAcQKl4XY2eX0qKUCK9WyRokD0JW/rn92+6Wmx3h4ErXVM44MtSSVyQ54isiEOpG@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0rGsa7LnnX6CTcyvNbJpbGY8EtkGAwacYQEIGP+I9Hdf9CTGn
+	gDkXWWs+5vQmSszQv4B0ZyZ6J3CiETNrkhnVaaEjU2c163N1cwHbRxDgNVg7OAt0ltnla5hiKwQ
+	gDiGHyoNFCam5L/qWrpYNDAR5WK0=
+X-Google-Smtp-Source: AGHT+IGEtf1RrX05zYVQaG2m3sIrqIutrJIuGXBHRy3HNJnqkIZ1wcnCBkSVsTzMdfzxJDroRzufS0WtJ3GoW4++3/0=
+X-Received: by 2002:a05:6512:788:b0:540:353a:5b1f with SMTP id
+ 2adb3069b0e04-54414a61a62mr1006324e87.0.1738943157758; Fri, 07 Feb 2025
+ 07:45:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250113-objtool-strict-v3-0-8b51f94957fb@google.com>
- <20250114001440.cagqlvjfvw6ghsj7@jpoimboe> <CA+i-1C0MFQCLOah56wWQhPhtk4p0ynhxh48eTmQ0-0x+pB6fvw@mail.gmail.com>
- <20250130183042.GB3394637@ax162> <CA+i-1C2rw6uNOpeY8fakco8T75udRhLJLxJ4CHgJNKBhbxGa_A@mail.gmail.com>
- <20250131204920.GA1974131@ax162> <CA+i-1C1A_0nkY6G+W3n=dYqEJHZGuEwNXK=xrWNwDh7561x_9A@mail.gmail.com>
- <20250206171036.GF180182@ax162> <20250207025127.2sy74bhcu6wtbo6a@jpoimboe>
-In-Reply-To: <20250207025127.2sy74bhcu6wtbo6a@jpoimboe>
-From: Brendan Jackman <jackmanb@google.com>
-Date: Fri, 7 Feb 2025 11:16:04 +0100
-X-Gm-Features: AWEUYZlqVEPOKmDPwURyXi8JcqEovqZ4UT5KSclG2S9lxGoccrNZI3F2eMG33uc
-Message-ID: <CA+i-1C0eNAMvRtZTZ8yNT2TwC1tgLqP=9T=t38eWdaznFoS+xQ@mail.gmail.com>
-Subject: Re: [PATCH v3 0/2] objtool: Add option to fail build on vmlinux warnings
-To: Josh Poimboeuf <jpoimboe@kernel.org>
-Cc: Nathan Chancellor <nathan@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Masahiro Yamada <masahiroy@kernel.org>, 
-	Nicolas Schier <nicolas@fjasle.eu>, linux-kernel@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org
+References: <20241202145946.108093528@infradead.org> <20241202150810.496784892@infradead.org>
+In-Reply-To: <20241202150810.496784892@infradead.org>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Sat, 8 Feb 2025 00:45:21 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAT9yyCFApF=HgmvTjHiAyAagzvRfu+cx0_D+7FBxpzk9Q@mail.gmail.com>
+X-Gm-Features: AWEUYZlYu6UXW0LQCOjms6nXmViQaDQ6fta0mbAiM8E_FlpDz6G_2CYugwctx14
+Message-ID: <CAK7LNAT9yyCFApF=HgmvTjHiAyAagzvRfu+cx0_D+7FBxpzk9Q@mail.gmail.com>
+Subject: Re: [PATCH -v2 5/7] module: Extend the MODULE_ namespace parsing
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: mcgrof@kernel.org, x86@kernel.org, hpa@zytor.com, petr.pavlu@suse.com, 
+	samitolvanen@google.com, da.gomez@samsung.com, nathan@kernel.org, 
+	nicolas@fjasle.eu, linux-kernel@vger.kernel.org, 
+	linux-modules@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	hch@infradead.org, gregkh@linuxfoundation.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 7 Feb 2025 at 03:51, Josh Poimboeuf <jpoimboe@kernel.org> wrote:
-> I didn't quite follow the OBJTOOL_FLAGS idea.  We already have
-> OBJTOOL_ARGS which allows adding arguments (though not removing them),
-> was it mean to be something like that?
+On Tue, Dec 3, 2024 at 12:11=E2=80=AFAM Peter Zijlstra <peterz@infradead.or=
+g> wrote:
+>
+> Instead of only accepting "MODULE_${name}", extend it with a comma
+> separated list of module names and add tail glob support.
+>
+> That is, something like: "MODULE_foo-*,bar" is now possible.
+>
+> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+> ---
+>  kernel/module/main.c  |   39 ++++++++++++++++++++++++++++++++++-----
+>  scripts/mod/modpost.c |   40 ++++++++++++++++++++++++++++++++++------
+>  2 files changed, 68 insertions(+), 11 deletions(-)
+>
 
-Oh. Yeah, exactly that. Nothing to do on this point then.
+>  static void check_exports(struct module *mod)
+>  {
+>         struct symbol *s, *exp;
+> @@ -1714,7 +1741,8 @@ static void check_exports(struct module
+>
+>                 basename =3D mod_basename(mod->name);
+>
+> -               if (!contains_namespace(&mod->imported_namespaces, exp->n=
+amespace)) {
+> +               if (!module_namespace(exp->namespace, basename) &&
+> +                   !contains_namespace(&mod->imported_namespaces, exp->n=
+amespace)) {
+>                         modpost_log(!allow_missing_ns_imports,
+>                                     "module %s uses symbol %s from namesp=
+ace %s, but does not import it.\n",
+>                                     basename, exp->name, exp->namespace);
+>
+
+When module_namespace() fails, the following error message is shown:
+
+  ERROR: modpost: module bar uses symbol foo from namespace
+MODULE_kvm, but does not import it.
+
+
+We get a hint from this error message, but the solution
+is not MODULE_IMPORT_NS();
+
+'make nsdeps' will try to solve this by adding
+
+  MODULE_IMPORT_NS("MODULE_kvm");
+
+Apparently, this does not work.
+
+Not sure if you want to solve the issue.
+
+
+
+--=20
+Best Regards
+Masahiro Yamada
