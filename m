@@ -1,113 +1,200 @@
-Received: from out1.mail.ruhr-uni-bochum.de (out1.mail.ruhr-uni-bochum.de [134.147.53.149])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E6623C8A6;
-	Fri,  7 Feb 2025 15:53:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.147.53.149
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F027A18DB33;
+	Fri,  7 Feb 2025 16:22:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738943594; cv=none; b=tq0Ek98u9zJeBf2rGTOfs6+VBLfJBP7MP0FMDa2ya02Z/48b1hphYmbrp8HCYntPft+GzdGtqGrLlqWjsCg3S7NTqqjDGwqDzLrzA84+8yHDX8LjyAjyYGP3kxCEj4bNTc5yMk1wpwkT3rfcWOEVO9CFidh6zFSpIhW0QVrGQOk=
+	t=1738945375; cv=none; b=S8Dse3H+JEhkG0d3WOPuuYrxMw+wEXsA7jehfbJpo+ajaaCVcicZJ4qC7eq4fKL8bvgIKB0GFpANFeDjuTfwYgES4ekvP/EbLUEjPlI/ExBtQ25V0YAPd8muehUL81FcJchz5WOD2ceQYP4HEf5JEJ89aGyq3PuPvhphpYU1WLY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738943594; c=relaxed/simple;
-	bh=FaroOrq9VEaU3/0VRYA4vw35+utAAbLCIqzzlAS/eKw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JTgqGhVIoD1SYoL996w7OUmp5oUByL9+v3eJC5cqNhb89UTR5OmlGQLLNpdQ+i34GjeWCftr8TYb+oSuCd/LGerEbCdDAqQVpVLABS5LnBHNaf6/FnIhjtRRgL6P2b1j7ox8vsC230/2T9mnEGd13dBNgNNjsUPN3loi8ux8FpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rub.de; spf=pass smtp.mailfrom=rub.de; dkim=pass (2048-bit key) header.d=rub.de header.i=@rub.de header.b=L6vWV9NB; arc=none smtp.client-ip=134.147.53.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rub.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rub.de
+	s=arc-20240116; t=1738945375; c=relaxed/simple;
+	bh=cmqtt2HmWbRFcUX563+yFj+rTEctJSsCOhe/8byNEE0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CJP9aMpEc39pKCMRJR+gRi2s7NthCNCVKoES78ZtjgIS9iWuLMTVCLpm6YJ+Cb2sUKP3SkEBO9Myd4gQ3KCWwkjeGY1yYzxpmXO/i6FJbC/rHSiNFNFcFQjxKt45EYV2JfkXpO0kENdMgoS12LoFhUob2pq3VKrrbLNho1BSJUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tWG3AaIH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rub.de header.i=@rub.de header.b="L6vWV9NB"
-Received: from mx1.mail.ruhr-uni-bochum.de (localhost [127.0.0.1])
-	by out1.mail.ruhr-uni-bochum.de (Postfix mo-ext) with ESMTP id 4YqJCT3Sr6z8Sdk;
-	Fri, 07 Feb 2025 16:43:17 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=rub.de; s=mail-2024;
-	t=1738942997; bh=FaroOrq9VEaU3/0VRYA4vw35+utAAbLCIqzzlAS/eKw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=L6vWV9NB/HkTIGDlUP2UTpRrPgw4J5f3DF0NGHNJWPaChCMapAdpdPyTLyF/kBJPS
-	 ocXEvMdDLe3K5SSgLw5Jh4DRTwfyfVgMmY6NwPwIDIzPPKx4TwMUdzRMMBo308F8UX
-	 bupSg8vn0J/9rdijxJ4WBNTpFVUIWeqxuSfk3b4iDjWkkCHViK8xF8bUPse9SYHgHg
-	 Odf/XBKvFXDmSVNQFSkJXUcMqSL1qZtWIqeqqTeR6gtyj+cZvQ18qKyNRo/WpDXqaw
-	 lu3OqvqHvR9eKpcvO73VDm+7X+1QpOV8moLzSsrtAFx/7NLdfuHxi8D5+NEyu/xbwF
-	 zgN9YTnudRZHA==
-Received: from out1.mail.ruhr-uni-bochum.de (localhost [127.0.0.1])
-	by mx1.mail.ruhr-uni-bochum.de (Postfix idis) with ESMTP id 4YqJCT24lXz8Sf0;
-	Fri, 07 Feb 2025 16:43:17 +0100 (CET)
-X-Envelope-Sender: <thorsten.berger@rub.de>
-X-RUB-Notes: Internal origin=134.147.42.236
-Received: from mail2.mail.ruhr-uni-bochum.de (mail2.mail.ruhr-uni-bochum.de [134.147.42.236])
-	by out1.mail.ruhr-uni-bochum.de (Postfix mi-int) with ESMTPS id 4YqJCS3PZvz8SdM;
-	Fri, 07 Feb 2025 16:43:16 +0100 (CET)
-X-Virus-Status: Clean
-X-Virus-Scanned: clamav-milter 1.0.7 at mx1.mail.ruhr-uni-bochum.de
-Received: from [IPV6:2a05:3e00:a:500f::a96:4204] (dyn-402469a000000000f005a000.ig09.ipv6.ruhr-uni-bochum.de [IPv6:2a05:3e00:a:500f::a96:4204])
-	by mail2.mail.ruhr-uni-bochum.de (Postfix) with ESMTPSA id 4YqJCR6683zDgyX;
-	Fri, 07 Feb 2025 16:43:15 +0100 (CET)
-X-Virus-Status: Clean
-X-Virus-Scanned: clamav-milter 1.4.1 at mail2.mail.ruhr-uni-bochum.de
-Message-ID: <bd4d6c71-c7b7-4986-a215-fcffa1534953@rub.de>
-Date: Fri, 7 Feb 2025 16:43:15 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tWG3AaIH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58277C4CED1;
+	Fri,  7 Feb 2025 16:22:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738945374;
+	bh=cmqtt2HmWbRFcUX563+yFj+rTEctJSsCOhe/8byNEE0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=tWG3AaIHOBtcKyUQlhqoIw7tcZ3IINlim04reoKO66wCyJtO9/qdtjMG74/AKkJDO
+	 H70mza84LSpflO9SfW9Ib13d5RzrGmwZELc4sCsODPMSS74Vs7TphFEaRs/HAVAczo
+	 zi3i2yhtjHARRVNFirHNbUpEddwNTqrSq6I4gNAvu2+nsVDLi9VkzJMyxdOub4D80Z
+	 L7/t0rvEtTT7GSKy3qC7o5mBsPnz5i6MAPxnmwysX3aIlx/X7ue5MLupF87dkfmKm8
+	 VyJI6kwHVF7aEtAOPpg3I4SU74+be+oJCf0xq/YjANtX8z3xVoiln3KUerIx+4m2IG
+	 9vQUrCquK3sAQ==
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-30797730cbdso22005371fa.3;
+        Fri, 07 Feb 2025 08:22:54 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUlmH2kaxQsg6yVkb8+0vcKAyHKRWLcfymNYS5DnRtMTthObB2g4xM/TiQNUvGESr3Xa+a7heS1EDafyCvn@vger.kernel.org, AJvYcCVlRAMo5Jp6IoW9ncBZVH0Hnb90P/+RFOCKeaPkfWv2D4Sz20BjhO23N2tORcWnz4z1iqt71JkyRPJBV+h/6w==@vger.kernel.org, AJvYcCXLFLu2s/rm2O8P+FsiDGnLEXtwardKpqGUHgxNgC+mHxfBJ6/W52OwU3AKXaNyvPIYTxMcEw5h690reXw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0VWLj+iO0IsB4xWc35PTOgbIsRcNGB5bq9n1ZPH+xuKOTscKX
+	GFlm13LX4u+LQHcur/1wi0oCkTJO+OJPgOhVIWhpZPjq2gZ3dSTsSmZIFMEL0bF10a2PavkwJI0
+	qDoxUfGhWqh6VQ8zCQDfLgWgn2DY=
+X-Google-Smtp-Source: AGHT+IFJcy3Yuv5VaABaDY//hTvQflodlFGP+ZZj7CaKUT7Bh9xOZE38/nQoyKYMjsWb5WDDuG9eek5bXyiovp+jcBY=
+X-Received: by 2002:a05:651c:1507:b0:302:3c78:4ea4 with SMTP id
+ 38308e7fff4ca-307e586a99amr10502581fa.30.1738945373005; Fri, 07 Feb 2025
+ 08:22:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 01/11] kconfig: Add PicoSAT interface
-Content-Language: en-US
-To: Brendan Jackman <jackmanb@google.com>,
- Luis Chamberlain <mcgrof@kernel.org>
-Cc: ole0811sch@gmail.com, deltaone@debian.org, jan.sollmann@rub.de,
- jude.gyimah@rub.de, linux-kbuild@vger.kernel.org,
- linux-kernel@vger.kernel.org, masahiroy@kernel.org, nathan@kernel.org,
- nicolas@fjasle.eu
-References: <20241028034949.95322-1-ole0811sch@gmail.com>
- <20250109132817.1426138-1-jackmanb@google.com>
- <Z4FxyuF-Lnqa4Wl_@bombadil.infradead.org>
- <CA+i-1C0HUE2+TmMMthRv1MCSQg4SX-+oZao9-4M3rKg71oA-5A@mail.gmail.com>
-From: Thorsten Berger <thorsten.berger@rub.de>
-In-Reply-To: <CA+i-1C0HUE2+TmMMthRv1MCSQg4SX-+oZao9-4M3rKg71oA-5A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20241202145946.108093528@infradead.org> <20241202150810.382545529@infradead.org>
+In-Reply-To: <20241202150810.382545529@infradead.org>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Sat, 8 Feb 2025 01:22:15 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAR=ggfxVoQ=06PE4wkpyRCTvhpkkOSiRKx9eR2UezZK4Q@mail.gmail.com>
+X-Gm-Features: AWEUYZmfD0d8kNyQgovnYG27v4vPW6XUfG6sLEAqd2r8Oq4UtqGrS8TIYA_JJmA
+Message-ID: <CAK7LNAR=ggfxVoQ=06PE4wkpyRCTvhpkkOSiRKx9eR2UezZK4Q@mail.gmail.com>
+Subject: Re: [PATCH -v2 4/7] module: Add module specific symbol namespace support
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: mcgrof@kernel.org, x86@kernel.org, hpa@zytor.com, petr.pavlu@suse.com, 
+	samitolvanen@google.com, da.gomez@samsung.com, nathan@kernel.org, 
+	nicolas@fjasle.eu, linux-kernel@vger.kernel.org, 
+	linux-modules@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	hch@infradead.org, gregkh@linuxfoundation.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Brendan,
-
-Yes, that's a great idea. It reminds me about the eCos configurator 
-configtool developed by the Cygnus Solutions developers, which had such 
-a capability. One could manually create a partial specification and ask 
-it to complete the configuration. We should be able to create such a 
-support soon.
-
-We've just created the final set of patches, with the requested changes 
-(also some small naming change in the fix generation to avoid 
-confusion). Ole is sending them in.
-
-Best, Thorsten
-
-
-
-On 13/01/2025 17:29, Brendan Jackman wrote:
-> On Fri, 10 Jan 2025 at 20:15, Luis Chamberlain <mcgrof@kernel.org> wrote:
->> On Thu, Jan 09, 2025 at 01:28:17PM +0000, Brendan Jackman wrote:
->>> Would it be easy enough to provide this support as a standalone binary that can
->>> be called from scripts/config too?
->> I suspect this begs more the question of how could this be useful
->> outside of xconfig.
-> I was thinking of something like like this:
+On Tue, Dec 3, 2024 at 12:11=E2=80=AFAM Peter Zijlstra <peterz@infradead.or=
+g> wrote:
 >
-> $ scripts/sat_config --interactive --enable KVM_AMD
+> Designate the "MODULE_${modname}" symbol namespace to mean: 'only
+> export to the named module'.
 >
-> This would then prompt the user with a range of solutions for getting
-> KVM_AMD enabled.
+> Notably, explicit imports of anything in the "MODULE_" space is
+> forbidden. Modules implicitly get the "MODULE_${modname}" namespace
+> added.
 >
-> Then there might be an "I'm feeling lucky" variant like:
+> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+> ---
+>  kernel/module/main.c  |   28 ++++++++++++++++++++++++++--
+>  scripts/mod/modpost.c |    5 +++++
+>  2 files changed, 31 insertions(+), 2 deletions(-)
 >
-> $ scripts/sat_config --first-solution --enable KVM_AMD
+> --- a/kernel/module/main.c
+> +++ b/kernel/module/main.c
+> @@ -1070,6 +1070,13 @@ static int verify_namespace_is_imported(
 >
-> Where instead of prompting the user it just picks some arbitrary or
-> "minimal" set of changes that leads to KVM_AMD being enabled.
->
->> But one step at a time, this can be done *after*
->> this initial patch set gets merged,
-> Totally, please consider this a "yes, and" not a "but".
+>         namespace =3D kernel_symbol_namespace(sym);
+>         if (namespace && namespace[0]) {
+> +               /*
+> +                * Implicitly import MODULE_${mod->name} namespace.
+> +                */
+> +               if (strncmp(namespace, "MODULE_", 7) =3D=3D 0 &&
+
+strncmp() -> strstarts()
+
+> +                   strcmp(namespace+7, mod->name) =3D=3D 0)
+> +                       return 0;
+> +
 
 
+You can add verify_module_namespace() in this commit
+with a simple implementation.
+
+static bool verify_module_namespace(const char *namespace, const char *modn=
+ame)
+{
+        const char *prefix =3D "module:";
+
+        return strstarts(namespace, prefix) &&
+                  !strcmp(namespace + strlen(prefix), modname);
+}
+
+
+Then, you can extend it in the next commit,
+to support the glob pattern in verify_module_namespace()
+
+
+
+
+
+
+> --- a/scripts/mod/modpost.c
+> +++ b/scripts/mod/modpost.c
+> @@ -1565,6 +1565,7 @@ static const char *mod_basename(const ch
+>
+>  static void read_symbols(const char *modname)
+>  {
+> +       char module_namespace[MODULE_NAME_LEN + 8];
+>         const char *symname;
+>         char *version;
+>         char *license;
+> @@ -1600,6 +1601,10 @@ static void read_symbols(const char *mod
+>                      namespace =3D get_next_modinfo(&info, "import_ns", n=
+amespace))
+>                         add_namespace(&mod->imported_namespaces, namespac=
+e);
+>
+> +               snprintf(module_namespace, sizeof(module_namespace), "MOD=
+ULE_%s",
+> +                        mod_basename(mod->name));
+> +               add_namespace(&mod->imported_namespaces, module_namespace=
+);
+> +
+>                 if (extra_warn && !get_modinfo(&info, "description"))
+>                         warn("missing MODULE_DESCRIPTION() in %s\n", modn=
+ame);
+>         }
+
+
+This is a noise change, as you immediately remove this code in the next com=
+mit.
+
+So, I recommend adding verify_module_namespace() in this commit.
+Then, you can extend it in the next commit for glob pattern support.
+
+
+
+
+
+
+
+index d4abcd8ee2ed..58fbcb6bb718 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -1674,6 +1674,14 @@ void buf_write(struct buffer *buf, const char
+*s, int len)
+        buf->pos +=3D len;
+ }
+
++static bool verify_module_namespace(const char *namespace, const char *mod=
+name)
++{
++       const char *prefix =3D "module:";
++
++       return strstarts(namespace, prefix) &&
++               !strcmp(namespace + strlen(prefix), modname);
++}
++
+ static void check_exports(struct module *mod)
+ {
+        struct symbol *s, *exp;
+@@ -1701,7 +1709,8 @@ static void check_exports(struct module *mod)
+
+                basename =3D mod_basename(mod->name);
+
+-               if (!contains_namespace(&mod->imported_namespaces,
+exp->namespace)) {
++               if (!verify_module_namespace(exp->namespace, mod->name) &&
++                   !contains_namespace(&mod->imported_namespaces,
+exp->namespace)) {
+                        modpost_log(!allow_missing_ns_imports,
+                                    "module %s uses symbol %s from
+namespace %s, but does not import it.\n",
+                                    basename, exp->name, exp->namespace);
+
+
+
+
+
+
+
+
+--
+Best Regards
+Masahiro Yamada
