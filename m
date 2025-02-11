@@ -1,44 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B4FB28F5;
-	Tue, 11 Feb 2025 00:29:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D2DD524F;
+	Tue, 11 Feb 2025 00:39:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739233786; cv=none; b=mZEsY0pIpZELOL+PLmbcPYNU7G0zQ464+8vTO6CTEQw/IRqzGfvxD0IQeuqQtLt8hkKUCGR9QlPuP5Gng/xlw1W0OzqnabNQ5dRFKff4D3K0YuUiEHQ3QauNrRlfAk8LI4fIq4dKs/VAcBvFPLPx04J7gBS56MbTZC1sFmKOjRs=
+	t=1739234361; cv=none; b=twjRde47JFh05Cv5PlT2/WjCB4zxhg+Xb7GnOBX2NY9plyth71DOgXureUvVpfQyYN9FU2iX9goaj0P2AH3nJS0G7WxUSyMiLoPSLOPX3dNNEkw0KT1KA2OYo1OkAM5pI+xAYuZ6rRGxldjfY5idTBMKBmobjJGtXqRV1wSzkCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739233786; c=relaxed/simple;
+	s=arc-20240116; t=1739234361; c=relaxed/simple;
 	bh=TMgXkr3cTJRM3MaW/W4X97Rj0sxwJzv7gAxKX00QO1Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HDIdP9XWjoo78VVPsbIFOp4htaQS4rIop0RipvhCcFVByK3Th+j8knk5lpV3bYE20Txq2vOQhlIIoIF8TeLCeAonUKDy8u/UykILaTGqjOfo6LvFQ9LUC1AvXmvkQTAT+f9xfMfUlTug6UPyhEI+JtlshfpQw25bkr/Qy+HCtwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AXimKAQK; arc=none smtp.client-ip=10.30.226.201
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UgmBh+G9KekBgvf2p/dkw5zxwakG3KQHtTDBfwD0HGOPwDAG8IXh6pQQNk5GRczLFUvk+/MQ9B2xVx5TCm/TOs3zQf3bqeI1DwPo+CfKV0N8EWqqlP6Ih9kplJdbVPMUyzC/WJ61p6i2QsvjidXioCsogNYzBCNVn1sPU/ixhTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sxfIxgxv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AXimKAQK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08730C4CED1;
-	Tue, 11 Feb 2025 00:29:43 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sxfIxgxv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73B1FC4CED1;
+	Tue, 11 Feb 2025 00:39:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739233785;
+	s=k20201202; t=1739234361;
 	bh=TMgXkr3cTJRM3MaW/W4X97Rj0sxwJzv7gAxKX00QO1Y=;
 	h=From:To:Cc:Subject:Date:From;
-	b=AXimKAQK8gtKAqF7lap7m+Ntcb4qLWi68dQxwb0HERhJcKUxpSG2D5D7e2JKqrRbL
-	 OydQbSj9RgWKPQxirB4rLTsB4mH7IYirz2Dmg1OAf6yfRP895vtTSq/drXwSP4W3xA
-	 Z3T51AMKiOjD2UrpaaROYee4snilkqPvtzos/YW/u/fjlrpTWyRPY5c25mgApK/+UR
-	 vmAcESqUeOn5VaX6uRnNFXh0D0RDt2dLCo3L1B8cr4aQ4ciG2R/Bujqimt5gHKU6QF
-	 3CgihS2mwyoFgYEPrSCuzSZ2lvstbbZwAKac3ZMm0W8AeSUQA1DZkaWPXevsH0tHPT
-	 g59OqFsgfFHgQ==
+	b=sxfIxgxvhA8w8i81tp/pr+hr3QM2+JGG1brPpQ3oP5nMA2sqjuo8hQ4wpvw2GX3tq
+	 p98c5dLO6f6cU0SCIsTWPckGZP3IiMbgrK90cpaL7gBYbfdmfTR0paX+uYBUAJote3
+	 HOhzFZVfMaVhUYtAukx7TCojSWQcrq87DyrYIUMQvT3wSDYtYdPVI//j1pdIkTlgOs
+	 gSnYGyFegbt5T3nI2Tp37BsPCtN1BrIk734CSdNzOKKO+cxp6FpceAMfVeiNx8ZrUe
+	 JAPdw/5qf29tzhSP1e7eXdM/exH/G/yu7x9D5iIAkal3V89MONweyyD7dG5eZFj3Nq
+	 CY0ls6jhoNw7w==
 From: Masahiro Yamada <masahiroy@kernel.org>
-To: Frank Binns <frank.binns@imgtec.com>,
-	Matt Coster <matt.coster@imgtec.com>
+To: linux-kbuild@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
 	Masahiro Yamada <masahiroy@kernel.org>,
 	Arnaldo Carvalho de Melo <acme@redhat.com>,
 	Borislav Petkov <bp@suse.de>,
 	Nathan Chancellor <nathan@kernel.org>,
 	Nicolas Schier <nicolas@fjasle.eu>,
-	bpf@vger.kernel.org,
-	linux-kbuild@vger.kernel.org
+	bpf@vger.kernel.org
 Subject: [PATCH] tools: fix annoying "mkdir -p ..." logs when building tools in parallel
-Date: Tue, 11 Feb 2025 09:29:06 +0900
-Message-ID: <20250211002930.1865689-1-masahiroy@kernel.org>
+Date: Tue, 11 Feb 2025 09:39:12 +0900
+Message-ID: <20250211003914.1866689-1-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
