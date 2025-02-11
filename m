@@ -1,153 +1,139 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F3E524F;
-	Tue, 11 Feb 2025 00:39:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9CE6175D53;
+	Tue, 11 Feb 2025 00:43:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739234372; cv=none; b=a+K/pouvy+GRnInJhB3JLCkW/gE9FsQZ+2ZbXz1gab68UnH0U43iIaXjFhhcH7a1I+BwV1zvtb8dQf3+oY8WpS2w2IIAloavaF7hgdjJVGF5eCn7Zwg40R+IU8qeD0r+x1cRYAFvnBR9QMkvWZLMz4aISrRJInN58uDo2sPtBl0=
+	t=1739234623; cv=none; b=fE5x9fJYcIbqgeFcuwoRRk+3jO8EpCj25oEfsJrsmI+uCmPDQjJV+dfrppcx0V3B8QYuYu42cpkDgAjCtAzKcsvLDOB6DeEwQwIq4jtdyfkBdc8mRYTzqstZKyvOT6FE35nB5VPfRlg6L1TmycjU5kM7ZMY/BHE6s1H0OKF1cOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739234372; c=relaxed/simple;
-	bh=iu6RlgM5lqhqZIMQe9OWBltF2U0noubs1DdGYd+sp0U=;
+	s=arc-20240116; t=1739234623; c=relaxed/simple;
+	bh=KCSViv0OWASYK3hvtHdH5e/jXmrnMM4Yi/yKHh5fLC4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T2Qml94nW81MLeyPT7Hb3yFuaLS5H6d8QzdZsqxjlnAqwhYX8vJ3KPIWn+glgEwQ8E04IPhBkLG7OUZ4vQha9XX1c3BPV3w+H+DTdu+YbvwG83sOOzYkpmaSkEVUgq/fc4CbriykLkewX6fu/lhUZCwNESwzulJgMYy9T4qiyi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tmXkFbo8; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=V4qhoEMioBwB3CzslICW2Jhm0UKfD6G3hSgPXuyzaG4YqbZro3lJi2UuFN6Va3tlPzQe4Peb7PMotM6Zm7LyKArV0Nrb/5j1638eI4NN6Kw283FfuDFOpvjjlDhKQZepBYr5EzC8RMYDec+pN1H1GKILUxha1jO3P7a2bcAF0kI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i4H/VYac; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tmXkFbo8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DABE5C4CEDF;
-	Tue, 11 Feb 2025 00:39:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i4H/VYac"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39A8CC4CED1;
+	Tue, 11 Feb 2025 00:43:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739234371;
-	bh=iu6RlgM5lqhqZIMQe9OWBltF2U0noubs1DdGYd+sp0U=;
+	s=k20201202; t=1739234623;
+	bh=KCSViv0OWASYK3hvtHdH5e/jXmrnMM4Yi/yKHh5fLC4=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=tmXkFbo8ivsVMLGghuJmLI63Urq2H8iujO9rpOl2B7YYeYWeSPnIKtNHnkmLlmgzm
-	 hRY8xgtki3kiAk8lPg2oFkFpE42wbayhp4xvvkL/3eY6cgzT45oZA2cVriTLhlhNr5
-	 WmP99sG6acN836yFGGDh7+XbSysI9iYNdHeMtR43L7cYN4RU7mEWrEhyKYyMhG8i6S
-	 s49g12yp4QanPRy7Tripcz9tgHA+ozupup5a/srVrY+NaKjFvmTtyxlE+ZBHg3EBK7
-	 UAS57M8dEiwb0GPhMM4Y0Iz/KD7nX0uz+xlmHJU4/zZINnObh5FEqBM9m9+423Pxkn
-	 mZGaSsNC4Qhmg==
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-307c13298eeso52092511fa.0;
-        Mon, 10 Feb 2025 16:39:31 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWv9kFE8btIzLYtWKu/kraxyZzR79fb7m2u98VFYDRYYBAsgLpqOvMq3U2NA+Z2XlIMn20EZlPDrOM2l8Br@vger.kernel.org, AJvYcCX9+F2rjJTccaykhw/JEqadkNGXN6Kr7B1U5TYxKcBmzxuov5FldItexnMypBGjxhEf27A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKGA0LrTzDcP0lN9PK9DwodGPKcvuUqaLYuVcG3dn0hQSCB8xf
-	c88r55YxqFzL40PV2+iB4brPNIFgfqHVsEiGW7Kqqvb+H9uzmtCj/O9rpFLcKdWyAcLRdjFyjNo
-	VOGBY7s7/vGShKzorT/mZcyyGV5o=
-X-Google-Smtp-Source: AGHT+IGphwN2ayAD3ridXVRX//ia6KN3prU9kVDRP0j4JAiblT+GJSMQSvWJQxCVidX2P4kCQgx18UX850HgHGi2Uuk=
-X-Received: by 2002:a05:651c:a0b:b0:302:3356:35d7 with SMTP id
- 38308e7fff4ca-308f9169ee6mr4062921fa.18.1739234370551; Mon, 10 Feb 2025
- 16:39:30 -0800 (PST)
+	b=i4H/VYac8zLfn7i+NuAGfWMvfRgsHZKuA/IshQnvvVPUdGpI9K+7n/wgck4hJIJko
+	 5AqHMihBnmmCu6c1vzEcWM5c8H9LKqm3ZVEUNOmLz6ugLWv4RPaLSu4XHkdPc+sTbN
+	 Tc4+S0rQXU03cGkxoEhCfVKRD99oxHO7fYEekXw4j/hnMpxUa48Z554SFi664lUehl
+	 OuuVrYiqL24hbhKBN+xGFgnOapQT5tOQ2U6WYM/2rNo0Ewz23mqDAzqJ5k/OFZFsJx
+	 KbC/vnrxF5Yekb0p92+iKGIdPD6LcBgq6pML0xxImsICb2xDelWRbiNpbhIM+gg8TQ
+	 cnYkFLHpyJGxg==
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-30613802a59so51124321fa.0;
+        Mon, 10 Feb 2025 16:43:43 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWLB4uWzLW16PAosynudgOn1aucVLErcF1oDSsyy8xMFu+zoJI/O2pTPn2m3ldRdvYoMd+Eyn9VYRO9nZY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDI1nllLj3v7D24ZWGjmlnTkZ3BYTg6u/biS79X8KesxJAaNiO
+	3hRXEEj+KILSOJlGZGHLMO9MDvNg0UxwOXPrvLl1tDBglr4gUqwk3o6xhmMMpoSc/XjelMW9Rrt
+	NzG0RIxNDDtS2+oWbhFbXoxfINQA=
+X-Google-Smtp-Source: AGHT+IFvZm9mStugcDaqkymRtqbkTbT9YgU/LWYFh0JCnpWFPqzIgoYsv87gNn0UQZrN1uip6zaigJT3CFuJoAvD8Ik=
+X-Received: by 2002:a2e:a58d:0:b0:300:33b1:f0cc with SMTP id
+ 38308e7fff4ca-307e5a85f92mr60294321fa.34.1739234621920; Mon, 10 Feb 2025
+ 16:43:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250211002930.1865689-1-masahiroy@kernel.org>
-In-Reply-To: <20250211002930.1865689-1-masahiroy@kernel.org>
+References: <20250207175104.412158-1-masahiroy@kernel.org> <Z6cmGqMMLHrWddU6@bergen>
+In-Reply-To: <Z6cmGqMMLHrWddU6@bergen>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Tue, 11 Feb 2025 09:38:54 +0900
-X-Gmail-Original-Message-ID: <CAK7LNATOzTsrZ5O7-MxW=cr2SYXWKJ3ZG9zMHkv5jqYudVyuLg@mail.gmail.com>
-X-Gm-Features: AWEUYZkesWLw1Wz8TTR3ith50vtk6878AXh0KeiOQUon5SddnMleTzkOMekyajg
-Message-ID: <CAK7LNATOzTsrZ5O7-MxW=cr2SYXWKJ3ZG9zMHkv5jqYudVyuLg@mail.gmail.com>
-Subject: Re: [PATCH] tools: fix annoying "mkdir -p ..." logs when building
- tools in parallel
-To: Frank Binns <frank.binns@imgtec.com>, Matt Coster <matt.coster@imgtec.com>
-Cc: linux-kernel@vger.kernel.org, Arnaldo Carvalho de Melo <acme@redhat.com>, 
-	Borislav Petkov <bp@suse.de>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, 
-	bpf@vger.kernel.org, linux-kbuild@vger.kernel.org
+Date: Tue, 11 Feb 2025 09:43:05 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAR9f=u3tFQE_xczxOHv5FzJRdAxi81-TJ95BNxEsO9Lbw@mail.gmail.com>
+X-Gm-Features: AWEUYZmupTElOmYrHrexq_tqn4O9uIWLVOFNNLjbwf0BWcb5y7Ro9MVpaOwrpNQ
+Message-ID: <CAK7LNAR9f=u3tFQE_xczxOHv5FzJRdAxi81-TJ95BNxEsO9Lbw@mail.gmail.com>
+Subject: Re: [PATCH] modpost: use strstarts() to clean up parse_source_files()
+To: Nicolas Schier <nicolas@fjasle.eu>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Nathan Chancellor <nathan@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Frank and Matt,
-Please ignore this.
-This is intended for kbuild ML.
+On Sat, Feb 8, 2025 at 6:38=E2=80=AFPM Nicolas Schier <nicolas@fjasle.eu> w=
+rote:
+>
+> On Sat 08 Feb 2025 02:50:55 GMT, Masahiro Yamada wrote:
+> > No functional changes are intended.
+> >
+> > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> > ---
+> >
+> >  scripts/mod/sumversion.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/scripts/mod/sumversion.c b/scripts/mod/sumversion.c
+> > index e79fc40d852f..3dd28b4d0099 100644
+> > --- a/scripts/mod/sumversion.c
+> > +++ b/scripts/mod/sumversion.c
+> > @@ -330,7 +330,7 @@ static int parse_source_files(const char *objfile, =
+struct md4_ctx *md)
+> >                       line++;
+> >               p =3D line;
+> >
+> > -             if (strncmp(line, "source_", sizeof("source_")-1) =3D=3D =
+0) {
+> > +             if (strstarts(line, "source_")) {
+> >                       p =3D strrchr(line, ' ');
+> >                       if (!p) {
+> >                               warn("malformed line: %s\n", line);
+> > @@ -344,7 +344,7 @@ static int parse_source_files(const char *objfile, =
+struct md4_ctx *md)
+> >                       }
+> >                       continue;
+> >               }
+> > -             if (strncmp(line, "deps_", sizeof("deps_")-1) =3D=3D 0) {
+> > +             if (strstarts(line, "deps_")) {
+> >                       check_files =3D 1;
+> >                       continue;
+> >               }
+> > --
+> > 2.43.0
+> >
+>
+> Thanks, looks good to me.
+>
+> Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
+>
+> Do you also want to replace the last strncmp() in
+> scripts/mod/modpost.c?
+>
+> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+> index e18ae7dc8140..31468923cdf6 100644
+> --- a/scripts/mod/modpost.c
+> +++ b/scripts/mod/modpost.c
+> @@ -670,7 +670,7 @@ static char *get_next_modinfo(struct elf_info *info, =
+const char *tag,
+>         }
+>
+>         for (p =3D modinfo; p; p =3D next_string(p, &size)) {
+> -               if (strncmp(p, tag, taglen) =3D=3D 0 && p[taglen] =3D=3D =
+'=3D')
+> +               if (strstarts(p, tag) =3D=3D 0 && p[taglen] =3D=3D '=3D')
+>                         return p + taglen + 1;
+>         }
+>         return NULL;
+
+
+I believe you meant:
+
+  if (strstarts(p, tag) && p[taglen] =3D=3D '=3D')
 
 
 
-On Tue, Feb 11, 2025 at 9:29=E2=80=AFAM Masahiro Yamada <masahiroy@kernel.o=
-rg> wrote:
->
-> When CONFIG_OBJTOOL=3Dy or CONFIG_DEBUG_INFO_BTF=3Dy, parallel builds
-> show awkward "mkdir -p ..." logs.
->
->   $ make -j16
->     [ snip ]
->   mkdir -p /home/masahiro/ref/linux/tools/objtool && make O=3D/home/masah=
-iro/ref/linux subdir=3Dtools/objtool --no-print-directory -C objtool
->   mkdir -p /home/masahiro/ref/linux/tools/bpf/resolve_btfids && make O=3D=
-/home/masahiro/ref/linux subdir=3Dtools/bpf/resolve_btfids --no-print-direc=
-tory -C bpf/resolve_btfids
->
-> Defining MAKEFLAGS=3D<value> on the command line wipes out command line
-> switches from the resultant MAKEFLAGS definition, even though the command
-> line switches are active. [1]
->
-> The first word of $(MAKEFLAGS) is a possibly empty group of characters
-> representing single-letter options that take no argument. However, this
-> breaks if MAKEFLAGS=3D<value> is given on the command line.
->
-> The tools/ and tools/% targets set MAKEFLAGS=3D<value> on the command
-> line, which breaks the following code in tools/scripts/Makefile.include:
->
->     short-opts :=3D $(firstword -$(MAKEFLAGS))
->
-> If MAKEFLAGS really needs modification, it should be done through the
-> environment variable, as follows:
->
->     MAKEFLAGS=3D<value> $(MAKE) ...
->
-> That said, I question whether modifying MAKEFLAGS is necessary here.
-> The only flag we might want to exclude is --no-print-directory, as the
-> tools build system changes the working directory. However, people might
-> find the "Entering/Leaving directory" logs annoying.
->
-> I simply removed the offending MAKEFLAGS=3D.
->
-> [1]: https://savannah.gnu.org/bugs/?62469
->
-> Fixes: a50e43332756 ("perf tools: Honor parallel jobs")
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
->
->  Makefile | 9 ++-------
->  1 file changed, 2 insertions(+), 7 deletions(-)
->
-> diff --git a/Makefile b/Makefile
-> index 89628e354ca7..52207bcb1a9d 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1421,18 +1421,13 @@ ifneq ($(wildcard $(resolve_btfids_O)),)
->         $(Q)$(MAKE) -sC $(srctree)/tools/bpf/resolve_btfids O=3D$(resolve=
-_btfids_O) clean
->  endif
->
-> -# Clear a bunch of variables before executing the submake
-> -ifeq ($(quiet),silent_)
-> -tools_silent=3Ds
-> -endif
-> -
->  tools/: FORCE
->         $(Q)mkdir -p $(objtree)/tools
-> -       $(Q)$(MAKE) LDFLAGS=3D MAKEFLAGS=3D"$(tools_silent) $(filter --j%=
- -j,$(MAKEFLAGS))" O=3D$(abspath $(objtree)) subdir=3Dtools -C $(srctree)/t=
-ools/
-> +       $(Q)$(MAKE) LDFLAGS=3D O=3D$(abspath $(objtree)) subdir=3Dtools -=
-C $(srctree)/tools/
->
->  tools/%: FORCE
->         $(Q)mkdir -p $(objtree)/tools
-> -       $(Q)$(MAKE) LDFLAGS=3D MAKEFLAGS=3D"$(tools_silent) $(filter --j%=
- -j,$(MAKEFLAGS))" O=3D$(abspath $(objtree)) subdir=3Dtools -C $(srctree)/t=
-ools/ $*
-> +       $(Q)$(MAKE) LDFLAGS=3D O=3D$(abspath $(objtree)) subdir=3Dtools -=
-C $(srctree)/tools/ $*
->
->  # ----------------------------------------------------------------------=
------
->  # Kernel selftest
-> --
-> 2.43.0
->
+I do not think there is a strong reason to do so
+because taglen is already calculated a few lines above,
+but the compiler may be clever enough to avoid
+calling strlen() twice. I did not check the compiler output.
+
+
+
 
 
 --=20
