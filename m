@@ -1,101 +1,63 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64750190482;
-	Fri,  7 Mar 2025 04:19:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23C4C226D0C;
+	Fri,  7 Mar 2025 16:14:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741321158; cv=none; b=DsYvKDP+qOA8AaTk4VS4o77IKkQchB93R44sSx9pgZ6ERBAkZ/lpUaeBc1dGMNdeIQxLNW5uh+oqh7qgXhWGzUKTgrIep57q5zyJ5GwrNVB4XpZ5TOuf7jDUJv68yruIEIXAe3UEgV1KZ9+Aj25kEVCcUHp00Uf/SQbJwNhL0wg=
+	t=1741364050; cv=none; b=NHKftQLq1MAYFseurN+HXmXFO7LexTuKSSSMh6AvjQs7IvPzJ8Ve2X6PILXnIwwV29bO5YfeqVdHGvC5egk6f4pz2d4rMhi+H3uAfZc+qCUb1OqEv7CRRw+g2ZxY2NS4mK2j97CyrwJnSAtaiR0fqEYa1aLedOImN51BPkvA7Ng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741321158; c=relaxed/simple;
-	bh=HdpOnS7Eic+UbYPCcALNkxTU2FKSqjORHtZap9XlbFA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=I8ybzPFbnC58JTcrefAFUpivCKqQI0uSby2/xPa/x1rNvUKwgX4cUkiKTgAbwo2gpXu2Hlft8nAVH4JbniJOWLOlwZ7u1kSff7I7AVDBIfrZO2KTgxCnEPG9qRLhKCCZ1+gjZTiOPjTuXQNSxY+zE6vKGUUs10swhl0u+VHfets=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rpGqn/ZZ; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rpGqn/ZZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA624C4CEE2;
-	Fri,  7 Mar 2025 04:19:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741321157;
-	bh=HdpOnS7Eic+UbYPCcALNkxTU2FKSqjORHtZap9XlbFA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=rpGqn/ZZuVMd8802YF2u3CrReKTKLsliU+NXkgcbV+AGrn8xiN7OEu6SPojhjCHDT
-	 NNmk1S7H8fASwn4j1JJTfp7Ui5a9QnrmQ5b8q8kMRu4iH3QGPcG029YFGHUNi7XfUa
-	 tAO0jX8MF0Loo7tJGsIe+3p8jqwxjs2w+dQ/TFAAJ7ZGWDykFQ/22OBwyDHsEVlw6C
-	 BHjMCZZ44yPux6+9C4h8Q2PkhFxBa38udR+Zxg55a+eQ+b12uUpU0REpzu/SvKDaNw
-	 ufjU9+pXAFLjKMhCo1cH37EFESnTkXvg5YRAD2qClUtuLbaK1I0tFwD2slIidlEW28
-	 OPpMFoctyEMQQ==
-From: Kees Cook <kees@kernel.org>
-To: Justin Stitt <justinstitt@google.com>
-Cc: Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marco Elver <elver@google.com>,
-	Andrey Konovalov <andreyknvl@gmail.com>,
-	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nicolas@fjasle.eu>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Hao Luo <haoluo@google.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Bill Wendling <morbo@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Tony Ambardar <tony.ambardar@gmail.com>,
-	Alexander Potapenko <glider@google.com>,
-	Jan Hendrik Farr <kernel@jfarr.cc>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	kasan-dev@googlegroups.com,
-	linux-kbuild@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: [PATCH 0/3] ubsan/overflow: Enable pattern exclusions
-Date: Thu,  6 Mar 2025 20:19:08 -0800
-Message-Id: <20250307040948.work.791-kees@kernel.org>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1741364050; c=relaxed/simple;
+	bh=92cx1cBCDTShMfwReN9yU9enqFO6kybEdjhN1J7Q8K4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BQrpfDkmNb79w7gCDKfqEQeacwwpEOHhLTTfLiJAKr+Z45jD6Bbh63+JP3O71Snfl8e5tzyAuq3kt4m8iEsTBTVlgj2jVAKn0UwWWWVHVqjK6slr8jOUjKc3xmFPe4ji7s7aNpiLubcFu2lufGGPIMm9rsiQD3Ej8gxWVhQNtIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8C2AC4CED1;
+	Fri,  7 Mar 2025 16:14:07 +0000 (UTC)
+Date: Fri, 7 Mar 2025 11:14:07 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Kris Van Hees <kris.van.hees@oracle.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kbuild@vger.kernel.org, linux-modules@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, Nick Alcock <nick.alcock@oracle.com>,
+ Alan Maguire <alan.maguire@oracle.com>, Sam James <sam@gentoo.org>, Luis
+ Chamberlain <mcgrof@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>,
+ Nick Desaulniers <ndesaulniers@google.com>, Jiri Olsa <olsajiri@gmail.com>,
+ Elena Zannoni <elena.zannoni@oracle.com>, Daniel Gomez
+ <da.gomez@samsung.com>, Jack Vogel <jack.vogel@oracle.com>
+Subject: Re: [PATCH] kbuild: exclude .rodata.(cst|str)* when building ranges
+Message-ID: <20250307111407.0073ff75@gandalf.local.home>
+In-Reply-To: <20250305192808.2826336-1-kris.van.hees@oracle.com>
+References: <20250305192808.2826336-1-kris.van.hees@oracle.com>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1304; i=kees@kernel.org; h=from:subject:message-id; bh=HdpOnS7Eic+UbYPCcALNkxTU2FKSqjORHtZap9XlbFA=; b=owGbwMvMwCVmps19z/KJym7G02pJDOmnivc9WDdJnPdalex1RaudYX/mSYtfr5ZaxpWtqjyt9 5P6wfmiHaUsDGJcDLJiiixBdu5xLh5v28Pd5yrCzGFlAhnCwMUpABNRTWJk2Ls3+nLnp+qNm3pd i7/l+q32Xp9lKsT2w+HqrwYGvp+pKxkZznY7Kx+w8zbRv2vpHFciXPDncomFpWdCpd20INdqyTU cAA==
-X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi,
+On Wed,  5 Mar 2025 14:27:58 -0500
+Kris Van Hees <kris.van.hees@oracle.com> wrote:
 
-This brings Linux's integer overflow mitigation integration up to the
-current set of features available in Clang for handling things sanely
-(i.e. pattern exclusions). While this isn't over yet, it puts all the
-infrastructure in place to continue keeping up to date with current
-Clang development. The next step is to add support for the coming
-canonical wrapping and non-wrapping types[1].
+> The .rodata.(cst|str)* sections are often resized during the final
+> linking and since these sections do not cover actual symbols there is
+> no need to include them in the modules.builtin.ranges data.
+> 
+> When these sections were included in processing and resizing occurred,
+> modules were reported with ranges that extended beyond their true end,
+> causing subsequent symbols (in address order) to be associated with
+> the wrong module.
 
--Kees
+If that's the case, shouldn't this be considered a fix, and include a fixes
+tag as well as Cc stable?
 
-[1] https://discourse.llvm.org/t/rfc-clang-canonical-wrapping-and-non-wrapping-types/84356
+-- Steve
 
-Kees Cook (3):
-  ubsan/overflow: Rework integer overflow sanitizer option to turn on
-    everything
-  ubsan/overflow: Enable pattern exclusions
-  ubsan/overflow: Enable ignorelist parsing and add type filter
 
- include/linux/compiler_types.h  |  2 +-
- kernel/configs/hardening.config |  2 +-
- lib/Kconfig.ubsan               | 25 +++++++++++++------------
- lib/test_ubsan.c                | 18 ++++++++++++++----
- lib/ubsan.c                     | 28 ++++++++++++++++++++++++++--
- lib/ubsan.h                     |  8 ++++++++
- scripts/Makefile.lib            |  4 ++--
- scripts/Makefile.ubsan          | 10 ++++++++--
- scripts/integer-wrap-ignore.scl |  3 +++
- 9 files changed, 76 insertions(+), 24 deletions(-)
- create mode 100644 scripts/integer-wrap-ignore.scl
-
--- 
-2.34.1
-
+> 
+> Signed-off-by: Kris Van Hees <kris.van.hees@oracle.com>
+> Reviewed-by: Jack Vogel <jack.vogel@oracle.com>
+> ---
