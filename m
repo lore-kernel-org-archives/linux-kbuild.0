@@ -1,116 +1,192 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 917522620D1;
-	Tue, 11 Mar 2025 17:28:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 522CA2620C3;
+	Tue, 11 Mar 2025 18:05:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741714124; cv=none; b=aKixyMGuRFlydO8Iyd0uON9tsfJv20pEN1Wbk0qU5ixUGV6ff+TaoSaVks52lEzXdltDi+OSjHkHdZoQevcWCXLlYE5R20HGnyXmDZShrW2DxfLezl3a8uCgKsRVAE9RMa8s/hGKB9Y7YsSA9QqylCz7O1P00+ih+RqSZP0Y7MI=
+	t=1741716357; cv=none; b=lWQuvLeQaN1sFDuI/Ul/xBxvwL7SUPSOjtEp1g6GHoQCnNpBc/nbf4fdsQUfkCjie7cS5LLRZbqHfS4LpwmkmsB9J+wILteSUH3DaCa3NSiK/otefuD92/j0Kdp0bQpcHT0fySVzRV/rFWIS5Q6kdzJXViSaWMGGEcceXNfiWCI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741714124; c=relaxed/simple;
-	bh=d8BD4WOnmIjNqhK1wComNzTCrFFiicudBQP2VVmq7Z8=;
+	s=arc-20240116; t=1741716357; c=relaxed/simple;
+	bh=11Irf0tEDIGV3dK6QbQ3UhX4UB4z39GWrpYACLCFReI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LzpDZhqqnmdxxn5IgMrNbKSNEgFOQH1whq128XKhYaZD3l+FGHJa2Rm1wbhj8maWPoT+dfUNllITQsDiPj5/yZabtPXz5Pbti4t/+3s7hLh6T4/irnukSNiM/2lTB12XiR9bx9T2INmjUGTzqxtu0F8ohCFxO5hgnojRkJf4PXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SwLeDAsr; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=AYKSf8IJOChQkqzMFzli2m9uXRlJnovU+/naUdln0aORtCKxqRKBTdmUdy24B2iFI9ZnByEgDEaSrNeWfnY3QtIOcELaUJmdoaCKEbycFsD71CXwzRTwJ/vHLuhEqYkzLSnsNhcfbdP7ZO/eyPWzfKmdOhL3yzE7/o/zDmbqk4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ft4oGmHe; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SwLeDAsr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1465BC4AF0B;
-	Tue, 11 Mar 2025 17:28:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ft4oGmHe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C35A7C4CEEA;
+	Tue, 11 Mar 2025 18:05:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741714124;
-	bh=d8BD4WOnmIjNqhK1wComNzTCrFFiicudBQP2VVmq7Z8=;
+	s=k20201202; t=1741716356;
+	bh=11Irf0tEDIGV3dK6QbQ3UhX4UB4z39GWrpYACLCFReI=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=SwLeDAsrdikx6ereOClwlIDaeHpYUaVCYIdWA/gqU4jEb9otOGjjdZGvIpu9QgrFU
-	 BasH3tSjPtBd6wmXUUXmgtGXJE1c2mXPzeOs5dY12INMsI/tPwBJUSi4YJKLmECtes
-	 TM5UDohghrM4x2jKsArUS5J2Jh/ME+ZxorEGi8wdg/Qhbk5gvSSWtSAyI/PAUsy4Le
-	 zPfJmpwJpspt5Y9mXygKFmynxFUwMwdwlu93nj0LoEg/bOD7NQ94mwt8hicFAJE+JB
-	 WROxkOJm/Xr98WkIyDZQrpXSAOENYiYSOTFinIa11QBYrcNDfZOo/1nUA1Ez3Bu0mX
-	 56ptjUZ6gzRiw==
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5499614d3d2so5034557e87.3;
-        Tue, 11 Mar 2025 10:28:44 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUyYL5vswrvcs1L4DDawe1qUtvfUpA9efcU/hxYKMaxHaiEufKMygCbnGmgJx6QqX8jlKanJeSW@vger.kernel.org, AJvYcCW/VK+oEQbhrtiUpuMPFCeJYcoOLAdo7oZSFlDm+D/e1AMONu69jGYLo2QSVEFnYIqMKtVM0UhRc4Mf9hM=@vger.kernel.org, AJvYcCWI8v/xSmB6sjFYUTcVsxwzb9I5AYP9k/HRoa3l0fM3cMNrOVyUUOkio+t2vUytrGVAke/t2zDtV3EylSudtdnwZQaL@vger.kernel.org, AJvYcCWo4p6E7PDjcdg3k5QZRiMU8xB+YyTVlvo+PWcMzMh66u2SOJiRW71clnyUaptehnkQSvZYSrEZx5COplvRsA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwEuDIkczTfCM4S5/BsZXWkPj5N8xDNRXQaj5KDrdoEdKdy5bm
-	sSUXgNoOAP1UrrKzQZIreLdxhH3SB/SMDMMFKDzyi8Da90ffLKd/iYyOCqi9Acq3lBZhiJbMwBe
-	hg46MN5X+nxqhFmuL6S5Pf4ydCfk=
-X-Google-Smtp-Source: AGHT+IFsHDduF+cR7BKl2mu6ZO3HqQftxmEu5BM2vjBQCDt55EMsQyof7sw3rtliSMsgS7q7uQEOkP4A3gh75uedz9s=
-X-Received: by 2002:a05:6512:6cd:b0:545:f9c:a80f with SMTP id
- 2adb3069b0e04-54990e2bf27mr5120145e87.1.1741714122784; Tue, 11 Mar 2025
- 10:28:42 -0700 (PDT)
+	b=ft4oGmHeMCF/4B+JBUtZYLqh+mH7iNMfPsnD8+PVP4LH2/yJxsKXVJRsFX8MoRAnd
+	 W5BBYZt+U7DVFNdazggqUYWTo+DU2Cd3WzG5+2/EzhG3Ao4kkyP4udHAns9oLorFvR
+	 o66jFrU0igSRo6DDKTVvwPmeNfOIeH3znuEOOGkYywUwIjhTTRCiyHRKbq5Rnst39K
+	 jy4YRgwG1nB+SC3+UM0YcGgozV9Upb0F0AvYXQI7xn8gRIA5NOeuuv7/f4zAED6/Hk
+	 dFz+hZB5DBq9lY0t66R7ZZHViJdFmIoPdz+ZsLufQc6Sg4hijTqOxTS7L3IJhaipJi
+	 A5EnzzFvUyNSg==
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5495c1e1b63so5964877e87.0;
+        Tue, 11 Mar 2025 11:05:56 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVBQz5m+FHk1vk5hSafFSlu90CZ4SdYTQ7r6AQuuVHdXO3T5vTZ8ULxIVQlR/3Rdw8eEv4iCk3p@vger.kernel.org, AJvYcCVgywyawW+HfaMEv2YScYYzZknImp465tNgCx0AcVa9+7FHAy1Yb/twEdBAJUQsgalLE2liJJQsHxuPHqdM@vger.kernel.org, AJvYcCXraUh5HCRg+c6fGqc8WzizFlZ2fcLXrIJTUGALhk4PbI9qpQoav5BvsgkphhD/FIJnzrwbJ/PO41AzfYA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywydc1Mzombz4p6xc+26yLiBRuvYzPs8a0hkcSmR68kBDTc2+/v
+	0aqKUupDHiYoWFNMDwrjck+zsVn3m8mp4o/EdC0Ipxh7jF87SQ6SuBFvxhMg9VVmWyTz3IluqJR
+	O7usERv7MTP349fU+rImBt+Pdweg=
+X-Google-Smtp-Source: AGHT+IE1DhdzUxYfeRm9Qc57aIFuhnE1fxuQD7rqwy5wQRfpLpQIss0yR5vEY9Km1clMnMeURrvlVLa2n0ApHcBINmw=
+X-Received: by 2002:a05:6512:114f:b0:549:8963:eaf0 with SMTP id
+ 2adb3069b0e04-549abae96f7mr1803311e87.39.1741716355424; Tue, 11 Mar 2025
+ 11:05:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250307165335.3110476-1-kris.van.hees@oracle.com>
-In-Reply-To: <20250307165335.3110476-1-kris.van.hees@oracle.com>
+References: <20250305192536.1673099-1-alexandru.gagniuc@hp.com>
+In-Reply-To: <20250305192536.1673099-1-alexandru.gagniuc@hp.com>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Wed, 12 Mar 2025 02:28:06 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAQe5ZEd17v=zdP9xNMXFXa=Zjh=YUww2+_4Qerh=CdQOQ@mail.gmail.com>
-X-Gm-Features: AQ5f1Jqd8Dw99Dgh75IrGcKerpY-dzmShj5KMqxECut3Sko0l64ED8VLDnizrPM
-Message-ID: <CAK7LNAQe5ZEd17v=zdP9xNMXFXa=Zjh=YUww2+_4Qerh=CdQOQ@mail.gmail.com>
-Subject: Re: [PATCH v2] kbuild: exclude .rodata.(cst|str)* when building ranges
-To: Kris Van Hees <kris.van.hees@oracle.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	linux-modules@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	Nick Alcock <nick.alcock@oracle.com>, Alan Maguire <alan.maguire@oracle.com>, 
-	Steven Rostedt <rostedt@goodmis.org>, Sam James <sam@gentoo.org>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Jiri Olsa <olsajiri@gmail.com>, 
-	Elena Zannoni <elena.zannoni@oracle.com>, Daniel Gomez <da.gomez@samsung.com>, stable@vger.kernel.org, 
-	Jack Vogel <jack.vogel@oracle.com>
+Date: Wed, 12 Mar 2025 03:05:18 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAQzheUCQN031sJekqDR8AVVjqi_A0nW8cSZmnG1ZAENNQ@mail.gmail.com>
+X-Gm-Features: AQ5f1JpI_YJkfwIj1l5KI9YrTRH_tJ6-D90WQK3RndmobfKn6geow3CzLRLYN50
+Message-ID: <CAK7LNAQzheUCQN031sJekqDR8AVVjqi_A0nW8cSZmnG1ZAENNQ@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: deb-pkg: don't set KBUILD_BUILD_VERSION indiscriminately
+To: Alexandru Gagniuc <alexandru.gagniuc@hp.com>
+Cc: nathan@kernel.org, linux-kbuild@vger.kernel.org, nicolas@fjasle.eu, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Mar 8, 2025 at 1:54=E2=80=AFAM Kris Van Hees <kris.van.hees@oracle.=
-com> wrote:
+On Thu, Mar 6, 2025 at 4:27=E2=80=AFAM Alexandru Gagniuc
+<alexandru.gagniuc@hp.com> wrote:
 >
-> The .rodata.(cst|str)* sections are often resized during the final
-> linking and since these sections do not cover actual symbols there is
-> no need to include them in the modules.builtin.ranges data.
+> In ThinPro, we use the convention <upstream_ver>+hp<patchlevel> for
+> the kernel package. This does not have a dash in the name or version.
+
+So, the kernel is a native package in ThinPro, in contrast to
+Debian and Ubuntu, where the kernel is a non-native package.
+
+I think it is a little odd, but if you want to use a version number
+without a hyphen, we can support this only for bindeb-pkg.
+
+Please keep in mind that you still cannot do
+"make deb-pkg" or "make srcdeb-pkg" in your way.
+
+
+In Debian Policy [1], the version format is:
+
+    [epoch:]upstream_version[-debian_revision]
+
+[1]: https://www.debian.org/doc/debian-policy/ch-controlfields.html#version
+
+
+Here, the absence of the debian_revision indicates that the package is
+a native package.
+
+Because Kbuild uses the debian format 3.0 (quilt),
+the debian_revision portion must be appended with a hyphen
+when you generate a source package.
+
+
+
+> This is built by editing ".version" before a build, and setting
+> EXTRAVERSION=3D"+hp" and KDEB_PKGVERSION make variables:
 >
-> When these sections were included in processing and resizing occurred,
-> modules were reported with ranges that extended beyond their true end,
-> causing subsequent symbols (in address order) to be associated with
-> the wrong module.
+>     echo 68 > .version
+>     make -j<n> EXTRAVERSION=3D"+hp" bindeb-pkg KDEB_PKGVERSION=3D6.6.6+hp=
+69
+
+So, you are doing math.
+
+You write a smaller number into .version by one
+("68" into the .version file and set "+hp69" to the variable)
+as the number in the .version file is incremented
+during the kernel build.
+
+Tricky, but seems to work.
+
+
+
+
+
+
+>     .deb name: linux-image-6.6.6+hp_6.6.6+hp69_amd64.deb
 >
-> Fixes: 5f5e7344322f ("kbuild: generate offset range data for builtin modu=
-les")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Kris Van Hees <kris.van.hees@oracle.com>
-> Reviewed-by: Jack Vogel <jack.vogel@oracle.com>
+> Since commit 7d4f07d5cb71 ("kbuild: deb-pkg: squash
+> scripts/package/deb-build-option to debian/rules"), this no longer
+> works. The deb build logic changed, even though, the commit message
+> implies that the logic should be unmodified.
+>
+> Before, KBUILD_BUILD_VERSION was not set if the KDEB_PKGVERSION did
+> not contain a dash. After the change KBUILD_BUILD_VERSION is always
+> set to KDEB_PKGVERSION. Since this determines UTS_VERSION,the uname
+> output to look off:
+>
+>     (now)      uname -a: version 6.6.6+hp ... #6.6.6+hp69
+>     (expected) uname -a: version 6.6.6+hp ... #69
+>
+> Update the debian/rules logic to restore the original behavior.
+>
+> Cc: <stable@vger.kernel.org> # v6.12+
+> Fixes: 7d4f07d5cb71 ("kbuild: deb-pkg: squash scripts/package/deb-build-o=
+ption to debian/rules")
+> Signed-off-by: Alexandru Gagniuc <alexandru.gagniuc@hp.com>
 > ---
-
-Applied to linux-kbuild. Thanks.
-
->  scripts/generate_builtin_ranges.awk | 5 +++++
->  1 file changed, 5 insertions(+)
+>  scripts/package/debian/rules | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
 >
-> diff --git a/scripts/generate_builtin_ranges.awk b/scripts/generate_built=
-in_ranges.awk
-> index b9ec761b3bef..d4bd5c2b998c 100755
-> --- a/scripts/generate_builtin_ranges.awk
-> +++ b/scripts/generate_builtin_ranges.awk
-> @@ -282,6 +282,11 @@ ARGIND =3D=3D 2 && !anchor && NF =3D=3D 2 && $1 ~ /^=
-0x/ && $2 !~ /^0x/ {
->  # section.
->  #
->  ARGIND =3D=3D 2 && sect && NF =3D=3D 4 && /^ [^ \*]/ && !($1 in sect_add=
-end) {
-> +       # There are a few sections with constant data (without symbols) t=
-hat
-> +       # can get resized during linking, so it is best to ignore them.
-> +       if ($1 ~ /^\.rodata\.(cst|str)[0-9]/)
-> +               next;
-> +
->         if (!($1 in sect_base)) {
->                 sect_base[$1] =3D base;
+> diff --git a/scripts/package/debian/rules b/scripts/package/debian/rules
+> index ca07243bd5cd..bbc214f2e6bd 100755
+> --- a/scripts/package/debian/rules
+> +++ b/scripts/package/debian/rules
+> @@ -21,9 +21,13 @@ ifeq ($(origin KBUILD_VERBOSE),undefined)
+>      endif
+>  endif
+>
+> -revision =3D $(lastword $(subst -, ,$(shell dpkg-parsechangelog -S Versi=
+on)))
+> +debian_revision =3D $(shell dpkg-parsechangelog -S Version)
+> +revision =3D $(lastword $(subst -, ,$(debian_revision)))
+>  CROSS_COMPILE ?=3D $(filter-out $(DEB_BUILD_GNU_TYPE)-, $(DEB_HOST_GNU_T=
+YPE)-)
+> -make-opts =3D ARCH=3D$(ARCH) KERNELRELEASE=3D$(KERNELRELEASE) KBUILD_BUI=
+LD_VERSION=3D$(revision) $(addprefix CROSS_COMPILE=3D,$(CROSS_COMPILE))
+> +make-opts =3D ARCH=3D$(ARCH) KERNELRELEASE=3D$(KERNELRELEASE) $(addprefi=
+x CROSS_COMPILE=3D,$(CROSS_COMPILE))
+> +ifneq ($(revision), $(debian_revision))
+
+dpkg-parsechangelog is invoked multiple times,
+even for 'debian/rules clean'.
+
+
+I would write the code like this:
+
+revision =3D $(shell dpkg-parsechangelog -S Version | sed -n 's/.*-//p')
+CROSS_COMPILE ?=3D $(filter-out $(DEB_BUILD_GNU_TYPE)-, $(DEB_HOST_GNU_TYPE=
+)-)
+make-opts =3D ARCH=3D$(ARCH) KERNELRELEASE=3D$(KERNELRELEASE) $(addprefix
+KBUILD_BUILD_VERSION=3D,$(revision)) $(addprefix
+CROSS_COMPILE=3D,$(CROSS_COMPILE))
+
+
+
+WIth this, dpkg-parsechangelog is invoked just one time
+only when building the package.
+
+
+
+
+> +    make-opts+=3DKBUILD_BUILD_VERSION=3D$(revision)
+> +endif
+>
+>  binary-targets :=3D $(addprefix binary-, image image-dbg headers libc-de=
+v)
 >
 > --
-> 2.45.2
+> 2.48.1
 >
 
 
---=20
+--
 Best Regards
+
 Masahiro Yamada
