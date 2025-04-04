@@ -1,50 +1,50 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5660920E70F;
-	Fri,  4 Apr 2025 16:56:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58CB420ADC9;
+	Fri,  4 Apr 2025 16:59:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743785798; cv=none; b=r8IdnY0OLS20DTaRpagR8um4a65s2K/ssk/6sqWeDWnZens4N4bufTxUlH2H45LFjjkMw0JfFyxkTVb0v4lxahv4/f6TwIUU2BnJGbgS8pGYxUzFXeCcyomZy6D48SYqJlLtC+cV4IwA1N35z4ywPoxGeUEDmyfqnhCjznJOFts=
+	t=1743785997; cv=none; b=KdR7MNxbZWRb1h9j/vI5tgE8rKPPN3P/LurWBK0TR+w2qZ6DWhSKW5E3sK6jU6mkJ/ettNe7m+NHbkO+JSLkLCwD5og6M1+fLY+d7ooeINzc10NV+OAjKtb8uVEVGyK/qFcDEhsc0owvR28LNjxjk4Uec19UMSSVk0kwnkRwHkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743785798; c=relaxed/simple;
-	bh=uSI/mNDOWuv8z6wXM4ATudMQnMeI2qrBbdXzg2XE6UM=;
+	s=arc-20240116; t=1743785997; c=relaxed/simple;
+	bh=16EO5gHAYM3HfAoKbUWH4VAGtB0baKyya/lFzoHjEKQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=C9Hg+Mo2JyUMsKJzk4nYmD3j7mKqgChmzex4BUOqVctca87bKxWrELdzGGE7wFfjL9D+rBPVf70/zaDeMfrT7NpSsBt4sTnDiLxq6gduLXV2wouXJppQvM1CrULSVGp4WQP4GeR75hRL3JAK8hxj9ip4odfEI+7i2R5Q3eNHLJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KYgTyC9y; arc=none smtp.client-ip=192.198.163.13
+	 In-Reply-To:Content-Type; b=qNiXkcJ9pKSWgYweiZncH4cKu5a94Hidf6w/IoCi6AHW9880bKePFa6u6+V9J1sb4aK72gP0rzlLteqZCUi2F2SAdfpcNY0EEmA2wqwmTBCcWAepa32UUu+OfG+d308OAbYM8n7qICATf+gfqcuupP0d4AeioPCnwoLNrmP2j5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kfPOXemb; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KYgTyC9y"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kfPOXemb"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1743785798; x=1775321798;
+  t=1743785996; x=1775321996;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=uSI/mNDOWuv8z6wXM4ATudMQnMeI2qrBbdXzg2XE6UM=;
-  b=KYgTyC9yLwEzfNVDW0NT/L6DMb+ynxK1z1J6ZkxnjgNcJLUkRMDfVGFR
-   xyTGqv08NXIgsO8x681lTQJCajogsHT7Wf061XxfZLIAZkdx3mT3+50uS
-   5kSZehNDKi5qFajz1LnQRhV5jr0/ruilTH9q3wKKbnl1LvbYvwnNnxzQK
-   QCgsYxNYwaRTbXfn9HDsCJ8RAoLWAdk4geViFkUYbdi2W3NfeQ+3BTIwS
-   Le/BceXlRePKs+PaiInZEDcf/1PeL7vA20riYnMexEnr4A/+fOGp0VOUX
-   71FbpQq3HoAKO0UwzmifKpKATULosyx4hbNmFvEtHLLmiS0RBK4apK/jI
+  bh=16EO5gHAYM3HfAoKbUWH4VAGtB0baKyya/lFzoHjEKQ=;
+  b=kfPOXembZyt0uV9SfmV6g32/J/GKnd3E73DLGXcz0hG5utrYY97QO+bv
+   zIkf6fzMyWGgo2P0rXKzW57dEFxRYhxs5waJwezdBuN7N7WNlMpN3p2jf
+   G5nmz27+09ZbAxdePP9iOYVXwZf7mHxp2/BqC0ipIVizmBbs25+9DBViJ
+   WczpqiVK/j9UWRqpz2njhl9wN+rxMyTe7Vn3eb8djA+Y1ewNxqghb+F7x
+   yAY09Jbg8b3PyzQKc1J41zGLJ07K7FpfN1br4BlQ1rioe46vd3jsTUzOb
+   5vRanaVPt3VZmMtYbwuseymMogypLXxIrLCdblwcCjjtJhzJR1Z02cvHn
    A==;
-X-CSE-ConnectionGUID: ZfCUF+d1Q+WLJ+xEVN1bqg==
-X-CSE-MsgGUID: evlkveYDQ/i8mmSGDEoGvg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11394"; a="47944691"
+X-CSE-ConnectionGUID: s32WWF3TRsGiYmR6Ow+ssQ==
+X-CSE-MsgGUID: vtAE/3MKRHKNNMz7qam3HA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11394"; a="45323575"
 X-IronPort-AV: E=Sophos;i="6.15,188,1739865600"; 
-   d="scan'208";a="47944691"
+   d="scan'208";a="45323575"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2025 09:56:36 -0700
-X-CSE-ConnectionGUID: Y7QpnuiMSQu9Veya9py4Qg==
-X-CSE-MsgGUID: 5LEvsRX7R6CbR5uFxiPhsQ==
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2025 09:59:55 -0700
+X-CSE-ConnectionGUID: nVEgby4lRBOEOo0i/NiK6Q==
+X-CSE-MsgGUID: CnVOypTjRUKrXxLXzYnmog==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,188,1739865600"; 
-   d="scan'208";a="127875138"
+   d="scan'208";a="127875646"
 Received: from daliomra-mobl3.amr.corp.intel.com (HELO [10.124.223.29]) ([10.124.223.29])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2025 09:56:33 -0700
-Message-ID: <c4971a5e-1c17-4daf-8af4-804d07902fe4@intel.com>
-Date: Fri, 4 Apr 2025 09:56:31 -0700
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2025 09:59:51 -0700
+Message-ID: <ceade208-c585-48e7-aafe-4599b1a06b81@intel.com>
+Date: Fri, 4 Apr 2025 09:59:49 -0700
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -52,8 +52,7 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 06/14] x86: Physical address comparisons in
- fill_p*d/pte
+Subject: Re: [PATCH v3 09/14] x86: Minimal SLAB alignment
 To: Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, hpa@zytor.com,
  hch@infradead.org, nick.desaulniers+lkml@gmail.com,
  kuan-ying.lee@canonical.com, masahiroy@kernel.org,
@@ -80,7 +79,7 @@ Cc: llvm@lists.linux.dev, linux-mm@kvack.org, linux-doc@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org,
  linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, x86@kernel.org
 References: <cover.1743772053.git.maciej.wieczor-retman@intel.com>
- <926742095b7e55099cc48d70848ca3c1eff4b5eb.1743772053.git.maciej.wieczor-retman@intel.com>
+ <173d99afea37321e76e9380b49bd5966be8db849.1743772053.git.maciej.wieczor-retman@intel.com>
 From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -126,16 +125,16 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <926742095b7e55099cc48d70848ca3c1eff4b5eb.1743772053.git.maciej.wieczor-retman@intel.com>
+In-Reply-To: <173d99afea37321e76e9380b49bd5966be8db849.1743772053.git.maciej.wieczor-retman@intel.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 4/4/25 06:14, Maciej Wieczor-Retman wrote:
-> +		if (__pa(p4d) != (pgtable_l5_enabled() ?
-> +				  (unsigned long)pgd_val(*pgd) & PTE_PFN_MASK :
-> +				  __pa(pgd)))
->  			printk(KERN_ERR "PAGETABLE BUG #00! %p <-> %p\n",
+> Adjust x86 minimal SLAB alignment to match KASAN granularity size. In
+> tag-based mode the size changes to 16 bytes so the value needs to be 16.
 
-This one is pretty fugly. But I guess it's just one place and it
-probably isn't worth refactoring this and the other helpers just for a
-debug message.
+I feel like we need a _bit_ of a discussion of the impact here. We are,
+after all, trying to get this feature into shape so that it can be used
+more widely outside of just debugging environments.
+
+What's the impact of this in a production environment?
