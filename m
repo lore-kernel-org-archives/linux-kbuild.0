@@ -1,104 +1,155 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2EB113D52F;
-	Wed, 16 Apr 2025 09:41:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21EB9236421;
+	Wed, 16 Apr 2025 09:45:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744796499; cv=none; b=jw8RKTFuVMdhI8+8SSPBDxfRD34G1F250ism0P6eoolmhLIFf8z9PurVV/dohTWBH1gg+znAQwJxEfu46LdbOfJ/qnIqb9KPmCP98D1Q3qpNYbSztB8G5PL44eStkd7HFnPwR4gfzfqTgzW731Mg+XPDk+tGPAWmRxsAo++k9m4=
+	t=1744796701; cv=none; b=MMXUDDfAbzMNGebvyDPFy60k4NUIZvq5F43Bu6Sl0hNG+J504Soc16EoKYbmrc8FO2PzZH6rcVbPP6MDj37jGoibGHrpt5WWYCxOEMpPM1XiYnkz56C6mMPwXbL8Z1/znqvAMOA2Ku+X+hswD/0gxQv5vF+jcoELx9Vpsmo13zY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744796499; c=relaxed/simple;
-	bh=AoNhNoPjPMwVxdK0S/wXtvG9FCv+5FT+NuSD7HNXUqM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KmUCPoH5UP97aSDxYRGoKoNVPBSHykTikJ5N7+QLMW73KpUCATGVQuDwfMnMtNZPrYNp8h95OT9vKXlOlrIYpjhElG8rSzHyexT07kmUwccFWqCb0Mr53aj+ZIcCFnhZztg9kIIqSmG8T60LrVTbmmVpQck011h44risXwQiFA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=m9Xr+Qzd; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1744796701; c=relaxed/simple;
+	bh=Yv+kifpgtaJLLbyR4rAn27RlbXnINX7O4xl+RP8J8Ps=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=VgRVEp2sZGCjELve5cK7CflNS8wzSwNIOwmcaJNskzC7fjULShYnIIrefT8YaiG1HUcKjvyNNZRKXB00/8LX/OIgUEOUYkHvwYoEQV5hnYZh57BsLmiSyB6dL+3ierpoKovyWd+eTbENv6WIcRpf4ZVRpnVfZKQ5W13TjGNg7Cc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lach4qKY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="m9Xr+Qzd"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744796497; x=1776332497;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=AoNhNoPjPMwVxdK0S/wXtvG9FCv+5FT+NuSD7HNXUqM=;
-  b=m9Xr+Qzdo6WFCyFKG/CrYJGHhaVNikoFWbmY6BBckBkKjbI8Dylt2ApB
-   nY43pDds4fxrZLtHTfvaUb+Ly1AjDgiaohJQHZ7Qlu1qMsXXeyC3pQ+FK
-   UtbRQLHQRgfGsOUyJsErUMPnLeHjwLUY1fniSln59fTGBWObVwTbd9ELI
-   D5nJfneFkt2aWvgmWDUKw1otwwk9bwfC+vTMJvhT0g22oQ5wwGOODNANE
-   yrJUenizkAiBJHebSCm0oxGidEnOK/gtsquY8IbvS8FrKCyOpSRr4vp0V
-   wBnq/LWBTdDf599BqphrXJ+cicL1kDCP/RcHPLU1+ozLMeO92D9UdLqx7
-   A==;
-X-CSE-ConnectionGUID: 1HVo2y6kTXGHMEQKzvtGIg==
-X-CSE-MsgGUID: jAo3QTl3RXGSXNvP+nFWIg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11404"; a="46469861"
-X-IronPort-AV: E=Sophos;i="6.15,215,1739865600"; 
-   d="scan'208";a="46469861"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2025 02:41:37 -0700
-X-CSE-ConnectionGUID: lPbXkUJqTEGp/PB5o3PQ1Q==
-X-CSE-MsgGUID: 0SlJYQCHRKiaWMv6fQqysA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,215,1739865600"; 
-   d="scan'208";a="134494528"
-Received: from smile.fi.intel.com ([10.237.72.58])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2025 02:41:32 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98.2)
-	(envelope-from <andriy.shevchenko@intel.com>)
-	id 1u4zGr-0000000CoME-2iHK;
-	Wed, 16 Apr 2025 12:41:29 +0300
-Date: Wed, 16 Apr 2025 12:41:29 +0300
-From: Andy Shevchenko <andriy.shevchenko@intel.com>
-To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc: Jani Nikula <jani.nikula@linux.intel.com>,
-	Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>, David Airlie <airlied@gmail.com>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Maxime Ripard <mripard@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nicolas.schier@linux.dev>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Simona Vetter <simona@ffwll.ch>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Tvrtko Ursulin <tursulin@ursulin.net>,
-	dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 1/2] scripts/kernel-doc.py: don't create *.pyc files
-Message-ID: <Z_97SbBwVp29MNzL@smile.fi.intel.com>
-References: <cover.1744789777.git.mchehab+huawei@kernel.org>
- <4ad5eb8d4b819997c1615d2401581c22a32bb2c1.1744789777.git.mchehab+huawei@kernel.org>
- <87tt6opks7.fsf@intel.com>
- <20250416171917.0985c0eb@sal.lan>
- <20250416172901.60104103@sal.lan>
- <20250416173811.71c3c345@sal.lan>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lach4qKY"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 94480C4CEEF;
+	Wed, 16 Apr 2025 09:45:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744796700;
+	bh=Yv+kifpgtaJLLbyR4rAn27RlbXnINX7O4xl+RP8J8Ps=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=Lach4qKYDtR1r2uJIArcYnjlMTOKDb0ehkvd5UN0MlTPQ66miK+ydvERbEHHi1kFA
+	 tBpf9tUwVubeot9VKKHdObFIhyHr/l51RlJxsTRZ8oj+g4/BdRuPjSBNuldgQBVM+9
+	 UvX2qv3N66+SaIbevmpj0dgd+m8BxLNLtkxxA8hz1nsdQQLysQx6/OlU0DrTjpN/i1
+	 pfOB/R/QsgyA7x4qHvwXeyAh6EW9/Zr4yPpm4MGoXjLe/CsH00SkVm2vlbMhQ71VT6
+	 zbEXJXdUkgPzB0m6KeyasjYLeU/Lt3gTqLYOSq30P+a2Ew9wGYWT/leA7ITiHM3RxA
+	 LyZSn/JD5X2vw==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79C67C369BD;
+	Wed, 16 Apr 2025 09:45:00 +0000 (UTC)
+From: Chen Linxuan via B4 Relay <devnull+chenlinxuan.uniontech.com@kernel.org>
+Date: Wed, 16 Apr 2025 17:44:47 +0800
+Subject: [PATCH RFC v2 1/5] nvme: add __always_inline for
+ nvme_pci_npages_prp
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250416173811.71c3c345@sal.lan>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250416-noautoinline-v2-1-e69a2717530f@uniontech.com>
+References: <20250416-noautoinline-v2-0-e69a2717530f@uniontech.com>
+In-Reply-To: <20250416-noautoinline-v2-0-e69a2717530f@uniontech.com>
+To: Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+ Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
+ Andrew Morton <akpm@linux-foundation.org>, 
+ Yishai Hadas <yishaih@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
+ Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, 
+ Kevin Tian <kevin.tian@intel.com>, 
+ Alex Williamson <alex.williamson@redhat.com>, 
+ Peter Huewe <peterhuewe@gmx.de>, Jarkko Sakkinen <jarkko@kernel.org>, 
+ Masahiro Yamada <masahiroy@kernel.org>, 
+ Nathan Chancellor <nathan@kernel.org>, 
+ Nicolas Schier <nicolas.schier@linux.dev>, 
+ Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>
+Cc: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ linux-mm@kvack.org, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+ linux-integrity@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+ llvm@lists.linux.dev, Winston Wen <wentao@uniontech.com>, 
+ Chen Linxuan <chenlinxuan@uniontech.com>, 
+ Changbin Du <changbin.du@intel.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2975;
+ i=chenlinxuan@uniontech.com; h=from:subject:message-id;
+ bh=sGDh7M1GW9E/6Y/0K/CCKXvss9WxUze9tBDMdqLrW6k=;
+ b=owEBbQKS/ZANAwAKAXYe5hQ5ma6LAcsmYgBn/3wVG003JQmokzL+qRyfJcdxP60RFA0LrONcP
+ OK5orjrbTuJAjMEAAEKAB0WIQTO1VElAk6xdvy0ZVp2HuYUOZmuiwUCZ/98FQAKCRB2HuYUOZmu
+ i8TED/0fmsPVnspcWh0W6L0ZSZOLbCvbFNwkSR8ln0sclXUOPtKwmyiPlZa4zJmx7OcofjIaLD/
+ r/WJyI8YJpl735QY3QIBTbrps+iGTDVaqLw8NMv1GsgSn5r61K4TxGHIfCjlSFoamR3OMWdNCrS
+ WgKkuDC2E6ay6dA0WfzSP78maBTAvxztzt0mrFpxZQijD5Ky6gSFVQAeztouTp6ootKC9gvMeO5
+ +gtRmuu9R5kMvmwGyagr3VY9mc0otVIg2xlYhJiaVOu4CfRoc0oOpQcaFGlds7Ffe9vB6Apy562
+ 0ADyZ/DVMUzU4vli0sb0ABqeWUWJvQn0/PvNjTUSDE7ohfpIGMasSJ4U4pGTk2h2Uup4lO1Qk5Y
+ itpYWcQQWcxZirZzGnfIAEsscrdlIW1hfEPHbAAmbwUCKwM4mYIvIvT4jVx7V8WAsDJybp72ugL
+ sSHbcb/PohzAsREiVXj+ctQfKvFssyCqeC4QmvrsOAIySwTmvnVd/kmriXFtFBV32jCCFt1yrzy
+ DHcdVAGXK0AEbs+63WGWuWrlpIqyutFQpNNkxOFaL3DlLSgZdNLg8Z6TeBEpltgoSrnRHWSN6KK
+ 2We5DBjR8F7GIDWR3F/H9QRYE/Z0BaE7a9oEZKSwd3QL13ItpXVkjs4ZYIJ497+OIimgPtSzbF9
+ Tn7aHUXUKD2PLjg==
+X-Developer-Key: i=chenlinxuan@uniontech.com; a=openpgp;
+ fpr=D818ACDD385CAE92D4BAC01A6269794D24791D21
+X-Endpoint-Received: by B4 Relay for chenlinxuan@uniontech.com/default with
+ auth_id=380
+X-Original-From: Chen Linxuan <chenlinxuan@uniontech.com>
+Reply-To: chenlinxuan@uniontech.com
 
-On Wed, Apr 16, 2025 at 05:38:11PM +0800, Mauro Carvalho Chehab wrote:
-> Em Wed, 16 Apr 2025 17:29:01 +0800
-> Mauro Carvalho Chehab <mchehab+huawei@kernel.org> escreveu:
+From: Winston Wen <wentao@uniontech.com>
 
-...
+On x86_64 with gcc version 13.3.0, I build drivers/nvme/host/pci.c
+with:
 
-> Heh, trying to quickly write a patch before calling it a day is
-> usually not a good idea ;-)
-> 
-> I'll send a fix tomorrow.
+  make defconfig
+  ./scripts/kconfig/merge_config.sh .config <(
+    echo CONFIG_BLK_DEV_NVME=m
+  )
+  make KCFLAGS="-fno-inline-small-functions -fno-inline-functions-called-once" \
+    drivers/nvme/host/pci.o
 
-Take your time, we still have a couple or so weeks to address this.
+Then I get a compile error:
+
+    CALL    scripts/checksyscalls.sh
+    DESCEND objtool
+    INSTALL libsubcmd_headers
+    CC      drivers/nvme/host/pci.o
+  In file included from <command-line>:
+  drivers/nvme/host/pci.c: In function 'nvme_init':
+  ././include/linux/compiler_types.h:557:45: error: call to '__compiletime_assert_878' declared with attribute error: BUILD_BUG_ON failed: nvme_pci_npages_prp() > NVME_MAX_NR_ALLOCATIONS
+    557 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+        |                                             ^
+  ././include/linux/compiler_types.h:538:25: note: in definition of macro '__compiletime_assert'
+    538 |                         prefix ## suffix();                             \
+        |                         ^~~~~~
+  ././include/linux/compiler_types.h:557:9: note: in expansion of macro '_compiletime_assert'
+    557 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+        |         ^~~~~~~~~~~~~~~~~~~
+  ./include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_assert'
+     39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+        |                                     ^~~~~~~~~~~~~~~~~~
+  ./include/linux/build_bug.h:50:9: note: in expansion of macro 'BUILD_BUG_ON_MSG'
+     50 |         BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)
+        |         ^~~~~~~~~~~~~~~~
+  drivers/nvme/host/pci.c:3804:9: note: in expansion of macro 'BUILD_BUG_ON'
+   3804 |         BUILD_BUG_ON(nvme_pci_npages_prp() > NVME_MAX_NR_ALLOCATIONS);
+        |         ^~~~~~~~~~~~
+
+Mark nvme_pci_npages_prp() with __always_inline make it can be computed
+at compile time.
+
+Co-developed-by: Chen Linxuan <chenlinxuan@uniontech.com>
+Signed-off-by: Chen Linxuan <chenlinxuan@uniontech.com>
+Signed-off-by: Winston Wen <wentao@uniontech.com>
+---
+ drivers/nvme/host/pci.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index b178d52eac1b7f7286e217226b9b3686d07b7b6c..9ab070a9f0372bc6595c29a884ee9f2ffe5ae8e9 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -390,7 +390,7 @@ static bool nvme_dbbuf_update_and_check_event(u16 value, __le32 *dbbuf_db,
+  * as it only leads to a small amount of wasted memory for the lifetime of
+  * the I/O.
+  */
+-static int nvme_pci_npages_prp(void)
++static __always_inline int nvme_pci_npages_prp(void)
+ {
+ 	unsigned max_bytes = (NVME_MAX_KB_SZ * 1024) + NVME_CTRL_PAGE_SIZE;
+ 	unsigned nprps = DIV_ROUND_UP(max_bytes, NVME_CTRL_PAGE_SIZE);
 
 -- 
-With Best Regards,
-Andy Shevchenko
+2.48.1
 
 
