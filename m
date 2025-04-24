@@ -1,118 +1,99 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5493279792;
-	Wed, 23 Apr 2025 16:31:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD0B912E5B;
+	Thu, 24 Apr 2025 00:17:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745425908; cv=none; b=NrfWmEKf26H1okRsGcSH4bIxV6axXM4wOaj4ELFGfSI3MfUfkUI/K6KFZ4zSenVq/uRMKl1q7G4opgUFVusujiORCda5EKWYM28HIvhAHdGPDXrlSaCstfCN0p9oF9kdvtGSJVqQ2+fiH7x+FRB8z+3od4O6QuL4z0onsYIS/3A=
+	t=1745453837; cv=none; b=CgJaIjr0RLb3/zAygWBMomM1hWiHW/11rN9QQwmNUBjmpFqQx980JIRwc5ZE0rJPhJkCWI28ul5kkg7MHLcmF/lzf8alqv81ao1eTREuvfvuHTYjJT38bhXqvhyDeKp+jTf5AePdTfYcIZwTlytsn4aEA0T0Gm5mKILX3bklWvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745425908; c=relaxed/simple;
-	bh=rHHe/8RhyPpADAv2wMNhicCGW725SUetgJ9BCqcDqjo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fn86VGb6Lsn22yaUrR4XQrPCDVxfnUDlTfVkwWWyX2VmI/kL5wf9yl74LZQ1AhERJ0ZvDnCVpLs7TCpYouyMhxZW1QBBtYC6VgYm3amsGwh0V+JCMf/uz4fdrtJXTUKV0XbQAUPb6dDPJc0niFsFcHOHoeW2+8e95QPNXHcHrbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dKlNJc0I; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1745453837; c=relaxed/simple;
+	bh=qYC37Vo5nYVYlQVxiTco1BS1/PDOhMyuijYB9VWIZus=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=s3YJz6bNFRBkU+2+7mGu9Yv5tny/96LWiaPUfxZz5TmZPe3I5UeTIso9DXm5o6RsF28EA9kmktF3F7YEwMyBYNSDsyAwWSwV+Iq7HFqFs15egH/zsFchYD8nGbrgJr8iQ8pXfH2S6ByQbQOIA7Ld3rcRsdFgwWbHemkOzletxeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WyEdyM49; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dKlNJc0I"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745425907; x=1776961907;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=rHHe/8RhyPpADAv2wMNhicCGW725SUetgJ9BCqcDqjo=;
-  b=dKlNJc0IvbmmAyofZ7iTd30HJ5sHFdVdNzx4gw3xxUpopM1s5CKNUDl7
-   MTHIsjg8v7jcRg/I+vhTB7lI/85xMkIELks0IuTaezBKOSTarnpMftkkC
-   p09LfxsYplpctRMfR+iuiVYuGVLWyCcAoODJzntdkLE0TypqmW8k6ypZm
-   wR/YLYYbNf/8JbbAX0HtqdT4aYjBvXvi5VU2fV2CkLp3B9ctHZZEsR/45
-   wwb3IH+B4XgBCaAhJB1Qv09iIjjKX96vNZlcTHiEDq0rZbbtgH0fbaw9w
-   LJ1P8luN87/uZGms9Dd4zNfyojD0IhRc6cl/HnAopfUfdJfM7UO15Ltfq
-   Q==;
-X-CSE-ConnectionGUID: YGQPh+OuQA2Ke3+5AZg3YQ==
-X-CSE-MsgGUID: Sf6uv61fS7aUY6N5nWX66A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11412"; a="50830447"
-X-IronPort-AV: E=Sophos;i="6.15,233,1739865600"; 
-   d="scan'208";a="50830447"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 09:31:46 -0700
-X-CSE-ConnectionGUID: uLr7sJu1QAGKYY4H1GMrRw==
-X-CSE-MsgGUID: Rzl/IukPSwmtIFv8RfavZw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,233,1739865600"; 
-   d="scan'208";a="137220613"
-Received: from smile.fi.intel.com ([10.237.72.58])
-  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 09:31:41 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98.2)
-	(envelope-from <andriy.shevchenko@intel.com>)
-	id 1u7d0a-0000000F7Fm-3nZd;
-	Wed, 23 Apr 2025 19:31:36 +0300
-Date: Wed, 23 Apr 2025 19:31:36 +0300
-From: Andy Shevchenko <andriy.shevchenko@intel.com>
-To: Akira Yokosawa <akiyks@gmail.com>
-Cc: airlied@gmail.com, corbet@lwn.net, dmitry.baryshkov@oss.qualcomm.com,
-	dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-	jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
-	linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org, maarten.lankhorst@linux.intel.com,
-	masahiroy@kernel.org, mchehab+huawei@kernel.org, mripard@kernel.org,
-	nathan@kernel.org, nicolas.schier@linux.dev, rodrigo.vivi@intel.com,
-	simona@ffwll.ch, tursulin@ursulin.net, tzimmermann@suse.de
-Subject: Re: [PATCH v3 0/2] Don't create Python bytecode when building the
- kernel
-Message-ID: <aAkV6Kl3BX1TmMxl@smile.fi.intel.com>
-References: <aAdL7aEcbulV9lsA@smile.fi.intel.com>
- <5cc4d9dd-496e-4512-a683-272b1b84d98b@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WyEdyM49"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B6C6C4CEE3;
+	Thu, 24 Apr 2025 00:17:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745453836;
+	bh=qYC37Vo5nYVYlQVxiTco1BS1/PDOhMyuijYB9VWIZus=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=WyEdyM49aB5dfkLZLH8wkbGEsh+xxNygyaEHVRWs5TtmTAedewZiRuJ8PTPaNigI9
+	 ohmu9IeeP8wAmXOYIf210bUKbmNe1IvIlLP+HA/ceg7DrSYfkL7WHS0hTspsVt4HLQ
+	 5qlpMIYmKOJR/spmaHlvKszzPf6N1yBi/n3MXwEVGS/6MTn7QFq6Ar17crSVH5Hy4C
+	 z65BTHUj2Kbm8/Wy1ppmmrXcjthuykWt1LREIQs6xchI1rh+6ezjHTV8K2OFclZtGt
+	 Cd1O+/oWUanhBzRcIDjFMRmhmmukCRWFosj6Bw6KbPd5Kx8KWrEROea3SGMZw7M7j5
+	 8eaV7HJBxKkUQ==
+Received: from mchehab by mail.kernel.org with local (Exim 4.98.2)
+	(envelope-from <mchehab@kernel.org>)
+	id 1u7kH5-0000000049W-248p;
+	Thu, 24 Apr 2025 08:17:07 +0800
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To: Jonathan Corbet <corbet@lwn.net>,
+	Linux Doc Mailing List <linux-doc@vger.kernel.org>
+Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v4 2/4] Makefile: move KERNELDOC macro to the main Makefile
+Date: Thu, 24 Apr 2025 08:16:22 +0800
+Message-ID: <bb3ea3b49e76aee51dae7762db10c4d38cd67afe.1745453655.git.mchehab+huawei@kernel.org>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <cover.1745453655.git.mchehab+huawei@kernel.org>
+References: <cover.1745453655.git.mchehab+huawei@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5cc4d9dd-496e-4512-a683-272b1b84d98b@gmail.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Content-Transfer-Encoding: 8bit
+Sender: Mauro Carvalho Chehab <mchehab@kernel.org>
 
-On Wed, Apr 23, 2025 at 06:30:48PM +0900, Akira Yokosawa wrote:
-> On Tue, 22 Apr 2025 10:57:33 +0300, Andy Shevchenko wrote:
-> > On Mon, Apr 21, 2025 at 10:35:29AM -0600, Jonathan Corbet wrote:
-> >> Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com> writes:
+As kernel-doc script is used not only on Documentation, but
+also on scripts and drivers/drm Makefiles, move it to the
+main makefile, as otherwise sub-makefiles may not have it.
 
-[...]
+Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Tested-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ Documentation/Makefile | 1 -
+ Makefile               | 5 +++++
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
-> >> > Would it be possible to properly support O= and create pyc / pycache
-> >> > inside the object/output dir?
-> >> 
-> >> I have to confess, I've been wondering if we should be treating the .pyc
-> >> files like we treat .o files or other intermediate products.  Rather
-> >> than trying to avoid their creation entirely, perhaps we should just be
-> >> sure they end up in the right place and are properly cleaned up...?
-> >> 
-> >> To answer Dmitry's question, it seems that setting PYTHONPYCACHEPREFIX
-> >> should do the trick?
-> > 
-> > It's not so easy. The Python is written in a way that it thinks it will never
-> > runs object files separately from the source. Hence that variable sets only
-> > the folder per script as _home_ for the cache. It's completely unusable. They
-> > took it wrong. It still can be _painfully_ used, but it will make Makefiles
-> > uglier.
-> 
-> But, PYTHONPYCACHEPREFIX can be set as an environment variable.
-> 
-> For example, try:
-> 
->     export PYTHONPYCACHEPREFIX="$HOME/.cache/__pycache__"
-> 
-> Wouldn't it be good enough for you?
-
-Of course not. We have _many_ scripts in python in kernel and having a cache
-there for _all_ of them is simply WRONG. You never know what clashes can be
-there with two complicated enough scripts which may have same module names,
-etc.
-
+diff --git a/Documentation/Makefile b/Documentation/Makefile
+index a006c7681412..8c1f6a3dfc44 100644
+--- a/Documentation/Makefile
++++ b/Documentation/Makefile
+@@ -60,7 +60,6 @@ endif #HAVE_LATEXMK
+ # Internal variables.
+ PAPEROPT_a4     = -D latex_paper_size=a4
+ PAPEROPT_letter = -D latex_paper_size=letter
+-KERNELDOC       = $(srctree)/scripts/kernel-doc.py
+ ALLSPHINXOPTS   = -D kerneldoc_srctree=$(srctree) -D kerneldoc_bin=$(KERNELDOC)
+ ALLSPHINXOPTS   += $(PAPEROPT_$(PAPER)) $(SPHINXOPTS)
+ ifneq ($(wildcard $(srctree)/.config),)
+diff --git a/Makefile b/Makefile
+index 38689a0c3605..2a05988740a9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -458,6 +458,11 @@ endif
+ HOSTRUSTC = rustc
+ HOSTPKG_CONFIG	= pkg-config
+ 
++# the KERNELDOC macro needs to be exported, as scripts/Makefile.build
++# has a logic to call it
++KERNELDOC       = $(srctree)/scripts/kernel-doc.py
++export KERNELDOC
++
+ KBUILD_USERHOSTCFLAGS := -Wall -Wmissing-prototypes -Wstrict-prototypes \
+ 			 -O2 -fomit-frame-pointer -std=gnu11
+ KBUILD_USERCFLAGS  := $(KBUILD_USERHOSTCFLAGS) $(USERCFLAGS)
 -- 
-With Best Regards,
-Andy Shevchenko
-
+2.49.0
 
