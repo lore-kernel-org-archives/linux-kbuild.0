@@ -1,124 +1,105 @@
-Received: from mail.avm.de (mail.avm.de [212.42.244.94])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C7862D1922
-	for <linux-kbuild@vger.kernel.org>; Tue, 29 Apr 2025 12:54:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.94
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84BCD21325C;
+	Tue, 29 Apr 2025 13:04:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745931287; cv=none; b=LfwCCyboVS46dlxojoDkrqLmVv7nJZzjDWYKNBfodc/BbPKIJN8xZ00//wb2NaF4JDi1Hs2DKQWPclLaCyAxIUXlijt0chyNbPgzqxyHVdtV5DAGpkq01broB7z5bBxu5PK9gT49FcDz1CQHtPXzLV4kYJw2IULLytbXdbJQUPA=
+	t=1745931887; cv=none; b=p9Tfecl2YqHoPajQO1glOYhV/hPNDkLIjkcWQIIX2iw5yFb6TdUIjTfov6VkzjbyvzN6i2VNYxPbvJRNqkYk3y5ADvfskvV4+cV/wJHWt2nLQedUaHz5FVmrqtqg4XxTHMqO5E5/PyIC0+aeGK0lCAGKhYromLvMgpQYQvgvg58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745931287; c=relaxed/simple;
-	bh=U6IXl+OeXnl8K/0Nb0K0YO/fYuOrSQntUmXRnW6XOPQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=U6VmlolvvDtHD2lLLuzwBSiOqByfjXAOKtTyS34zNuQxFkfAj9fIXn5hSozC9mXhN3AMfOpz/hZZG6rG7SMeW2vzfwVsuzwKGOiKrssunlNPtEYrqvzO/J7ZpIgbp5SMndxkVcOYeQWSxhhga84WAAvPXRKfDQ16TOYGIIjIwLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=avm.de; spf=pass smtp.mailfrom=avm.de; arc=none smtp.client-ip=212.42.244.94
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=avm.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=avm.de
-Received: from [172.16.0.1] (helo=mail.avm.de)
-	by mail.avm.de with ESMTP (eXpurgate 4.52.1)
-	(envelope-from <n.schier@avm.de>)
-	id 6810cad8-603b-7f0000032729-7f000001a310-1
-	for <multiple-recipients>; Tue, 29 Apr 2025 14:49:28 +0200
-Received: from mail-notes.avm.de (mail-notes.avm.de [172.16.0.1])
-	by mail.avm.de (Postfix) with ESMTP;
-	Tue, 29 Apr 2025 14:49:28 +0200 (CEST)
-Received: from l-nschier-aarch64.ads.avm.de ([172.17.89.123])
-          by mail-notes.avm.de (HCL Domino Release 14.0FP4)
-          with ESMTP id 2025042914492842-14743 ;
-          Tue, 29 Apr 2025 14:49:28 +0200 
-Date: Tue, 29 Apr 2025 14:49:27 +0200
-From: Nicolas Schier <n.schier@avm.de>
-To: Kees Cook <kees@kernel.org>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org
-Subject: Re: how to create early build deps?
-Message-ID: <20250429-emerald-macaw-of-correction-efa87b@l-nschier-aarch64>
-References: <202504161928.17A90D9B@keescook>
- <20250425-bouncy-logical-ringtail-4d879a@lindesnes>
+	s=arc-20240116; t=1745931887; c=relaxed/simple;
+	bh=d/NdlzD2KV2pF2aazqdTVXD1jSSYLt8dgjzDd7PvoPo=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=P0UnnbS11tEtaitF4W3lQk1ZGOuXwQ2Nj2c9F4RX4j8CEAZ0thTICwsSeB/yTeL4dNIyGxor97O2lS4e1CVnITO+GmKMt1djm0OasOo6VKJ07hI29l27Dyt6oa5xNpjs6AaVgF/BGC3zaJtjmIDoFjFcouxA8aPqvvshcHkQhTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=ndr5eUgV; arc=none smtp.client-ip=159.69.126.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="ndr5eUgV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+	s=mail; t=1745931874;
+	bh=d/NdlzD2KV2pF2aazqdTVXD1jSSYLt8dgjzDd7PvoPo=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=ndr5eUgVSV+gAn8uBtqf5gkqDazOK0n25l02cugLtcQTuqMr/LNpa6t6wzbfuMAjH
+	 12Qulrdyx2c2aBEE5Yq6GwMxJfjD8udHNeMcCf4DwcNNIpMaOWa5/Pa3TCszUfVEud
+	 TJ/gfqJ/aj7cVBefjCJblpJsOrMKeMlWCvvIu+FQ=
+From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+Date: Tue, 29 Apr 2025 15:04:28 +0200
+Subject: [PATCH v3 1/9] powerpc/ima: Drop unnecessary check for
+ CONFIG_MODULE_SIG
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250425-bouncy-logical-ringtail-4d879a@lindesnes>
-Organization: AVM GmbH
-X-MIMETrack: Itemize by SMTP Server on ANIS1/AVM(Release 14.0FP4|March 10, 2025) at
- 29.04.2025 14:49:28,
-	Serialize by Router on ANIS1/AVM(Release 14.0FP4|March 10, 2025) at
- 29.04.2025 14:49:28,
-	Serialize complete at 29.04.2025 14:49:28
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Sh/LPi75mZ82OTrT"
-Content-Disposition: inline
-X-purgate-ID: 149429::1745930968-44C02263-5F137704/0/0
-X-purgate-type: clean
-X-purgate-size: 2630
-X-purgate-Ad: Categorized by eleven eXpurgate (R) https://www.eleven.de
-X-purgate: This mail is considered clean (visit https://www.eleven.de for further information)
-X-purgate: clean
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20250429-module-hashes-v3-1-00e9258def9e@weissschuh.net>
+References: <20250429-module-hashes-v3-0-00e9258def9e@weissschuh.net>
+In-Reply-To: <20250429-module-hashes-v3-0-00e9258def9e@weissschuh.net>
+To: Masahiro Yamada <masahiroy@kernel.org>, 
+ Nathan Chancellor <nathan@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
+ Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>, 
+ Sami Tolvanen <samitolvanen@google.com>, 
+ Daniel Gomez <da.gomez@samsung.com>, Paul Moore <paul@paul-moore.com>, 
+ James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, 
+ Jonathan Corbet <corbet@lwn.net>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
+ Christophe Leroy <christophe.leroy@csgroup.eu>, 
+ Naveen N Rao <naveen@kernel.org>, Mimi Zohar <zohar@linux.ibm.com>, 
+ Roberto Sassu <roberto.sassu@huawei.com>, 
+ Dmitry Kasatkin <dmitry.kasatkin@gmail.com>, 
+ Eric Snowberg <eric.snowberg@oracle.com>, 
+ Nicolas Schier <nicolas.schier@linux.dev>, 
+ Nicolas Schier <nicolas.schier@linux.dev>
+Cc: =?utf-8?q?Fabian_Gr=C3=BCnbichler?= <f.gruenbichler@proxmox.com>, 
+ Arnout Engelen <arnout@bzzt.net>, Mattia Rizzolo <mattia@mapreri.org>, 
+ kpcyrd <kpcyrd@archlinux.org>, Christian Heusel <christian@heusel.eu>, 
+ =?utf-8?q?C=C3=A2ju_Mihai-Drosi?= <mcaju95@gmail.com>, 
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-arch@vger.kernel.org, linux-modules@vger.kernel.org, 
+ linux-security-module@vger.kernel.org, linux-doc@vger.kernel.org, 
+ linuxppc-dev@lists.ozlabs.org, linux-integrity@vger.kernel.org, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1745931873; l=1136;
+ i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
+ bh=d/NdlzD2KV2pF2aazqdTVXD1jSSYLt8dgjzDd7PvoPo=;
+ b=xAYAenyFdE04MOoAyCY51VYJoTBGGcK4Soq/RQ+egxA1KIPa8xT21DSMBRyeZrix2b6b8RUK5
+ 4oPcru3LJfZABty4/kT+0dOo2ZPe8NuL+rpxUHGjPov6s65d3wYcJWl
+X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
+ pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 
+When CONFIG_MODULE_SIG is disabled set_module_sig_enforced() is defined
+as an empty stub, so the check is unnecessary.
+The specific configuration option for set_module_sig_enforced() is
+about to change and removing the check avoids some later churn.
 
---Sh/LPi75mZ82OTrT
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
 
-On Fri, 25 Apr 2025, Nicolas Schier wrote:
-[...]
-> > By what mechanism can I convince kbuild to rebuild everything if
-> > randstruct.seed (or the gcc-plugins) are changed?
->=20
-> I think the easiest way to achieve a full rebuild due to changes in
-> scripts/basic/randstruct.seed would be to let it show up in
-> .$(target).cmd.  Limited testing with a very hacky thing like
->=20
-> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-> index 8c311b997e24..1aceedfe0791 100644
-> --- a/scripts/Kbuild.include
-> +++ b/scripts/Kbuild.include
-> @@ -206,4 +206,5 @@ if_changed_dep =3D $(if $(if-changed-cond),$(cmd_and_=
-fixdep),@:)
->  cmd_and_fixdep =3D                                                      =
-       \
->         $(cmd);                                                          =
-    \
->         $(objtree)/scripts/basic/fixdep $(depfile) $@ '$(make-cmd)' > $(d=
-ot-target).cmd;\
-> +       sed -i -re 's,../include/linux/compiler.h,& $(objtree)/scripts/ba=
-sic/randstruct.seed,' $(dot-target).cmd ;\
->         rm -f $(depfile)
->=20
-> looks promising to me.  But as far as I can see, fixdep does not have
-> similar hard-coded dependencies included, yet.  Thus I am unsure if
-> fixdep is really the this we want to touch for randstruct.seed.
+---
+This patch is not strictly necessary right now, but makes looking for
+usages of CONFIG_MODULE_SIG easier.
+---
+ arch/powerpc/kernel/ima_arch.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-well, touching fixdep would really not be a nice option.  I'll send a=20
-patch that forces the rebuild by adding=20
-include/generated/randstruct_hash.h to include/linux/compiler-version.h.
+diff --git a/arch/powerpc/kernel/ima_arch.c b/arch/powerpc/kernel/ima_arch.c
+index b7029beed847dc0acf15b3edbdd7fe9e60626f24..690263bf4265c78331b5f306097543ce12ac7dbd 100644
+--- a/arch/powerpc/kernel/ima_arch.c
++++ b/arch/powerpc/kernel/ima_arch.c
+@@ -63,8 +63,7 @@ static const char *const secure_and_trusted_rules[] = {
+ const char *const *arch_get_ima_policy(void)
+ {
+ 	if (is_ppc_secureboot_enabled()) {
+-		if (IS_ENABLED(CONFIG_MODULE_SIG))
+-			set_module_sig_enforced();
++		set_module_sig_enforced();
+ 
+ 		if (is_ppc_trustedboot_enabled())
+ 			return secure_and_trusted_rules;
 
-Thanks for the report!
+-- 
+2.49.0
 
-Kind regards,
-Nicolas
-
---Sh/LPi75mZ82OTrT
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEDv+Fiet06YHnC6RpiMa8nIiabbgFAmgQytMACgkQiMa8nIia
-bbjEGw/5AY7kKlDWJCSUyiDBeiUcQNh52im+uhS/zEuYSeRyk6SK1bNSyUmxHp2G
-YuxC5OuG7mycjRMKk1vNH3nvySeHJdc5axnfUer8CziMVas5lu51B9r6/b46RMxt
-98nj2iuepb0nDWSsv5gS/c0evZYcj+BF4EmgEb0niXAabyObsrkR8GTVHnFWKpz7
-yA/KgiGs2P8WoCuzRq8DP3xstUiaXaVlXJSMuG102nUT0T6GtYEWNKADJv59T2LG
-Wd+xB5+5Z/fXyYUR70j9BUFYjRFNk1AKlDYyB05E6MMuvCO6EA9u42iYqphfevdI
-njdCULdyd5oxjebi0Nq9TJk3ud7ivmDXgcWLwnJUg2ZW32L0KxVkVISsYCCsv1K5
-28TwL9tbvNc0eqq4Inku3fz8IdNEOu3HwG+oY0QnN2vsjKI135CXk2eXHn8A7fBk
-QEqTC31VmFGf62M01ybJNXbx1mJ7BU8PReQHlVpyFOoEBZOhtdWZP2ism4W3gHzV
-BNllhBjrbFy7g0u7GzMsZWX4mtxhH77fAQcVmipHB3gfVuGmiQJboUq62hibgGUM
-kQdv/40pwtMQShOscdrCUO+dtR6BuzR+OjANBiMy+yX73wJw2N4M1UmMckSe/S0A
-uPMaFRDC0y++9lgeTxA0mlftdWLyupLEf5p2q/saPAYyV9qaMAk=
-=pu0D
------END PGP SIGNATURE-----
-
---Sh/LPi75mZ82OTrT--
