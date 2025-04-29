@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5C01270ED0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D86122741C2;
 	Tue, 29 Apr 2025 04:06:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745899577; cv=none; b=pfrHwvliT7+J39elDBuEkcQuuQ31fY9Dcy5SL9A2aRtfOCkl0ymWGJw06SGd8XCE7vm9Tm/pg+uz/HBHkjEtW43cVKFV7FGbTfjc6YmaT9/X/GqjCr78ZxNzAHgSeZMbSkhgt25w/8WgoyuWs49xPXaJZy9yECXLr8jBoRDUecc=
+	t=1745899578; cv=none; b=AD+WZrqWIz73bswLr1jw5ILxq1fqdXD4PSDDlTQ+cdNNNO2KEtv2Xu+Q8y+HNOfRLRt+VnXipYaVCPMjAfgzCUzqXY1IM/9QSnNkw2FfX1JFHcX44rdo+prluvbiG5C8cXyNJav1eeMAnJf9+6OCf/0pJjtEqBE0F1od613QzYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745899577; c=relaxed/simple;
-	bh=xaBPg6MMzZtyI5BynxGLu2CWzfYAh0y0igpwIukNl4w=;
+	s=arc-20240116; t=1745899578; c=relaxed/simple;
+	bh=I3qZ450wr0Q9CAPbI9DMJdfFZ5c1+02YMYdsGYpKCO4=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=RvMsLXax76/pjn56J0aRi+zcCeUSfNOoBzjkWQBjX9zxIPNpSYICxdJ0hDWhlxdqe8e0wTrOZLNrSxRSWntGa5iEe9jsQSlUx+tFkfJ6yBSc8i5uLF218phTcuh+KwlPhTPJSxbLasmBXplmxAqa0VOFRKsVRPldM9xFXjhmwIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rRQ75lu0; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=Ue+oEsvHSxwCu+IKP/oQYK+5mqilH1/XxEaP84h++etsYrUvISPnq2RI9gTbvHqbc0ezLejkkeqvCLzp7IIhTzVfGZOYyNanSef6hUSCxkY3OL2RyXQQbJ+e0XETXy/HoZ0tPpJbMZtd/qu+2vzHCiQNRMOMgvyYRrIbm7s+jNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JE0vEjoK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rRQ75lu0"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1D9C1C4CEF4;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JE0vEjoK"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 58FE1C4CEFF;
 	Tue, 29 Apr 2025 04:06:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1745899577;
-	bh=xaBPg6MMzZtyI5BynxGLu2CWzfYAh0y0igpwIukNl4w=;
+	bh=I3qZ450wr0Q9CAPbI9DMJdfFZ5c1+02YMYdsGYpKCO4=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=rRQ75lu00znvBITjVyrAMVKtCn2AtPLSrSuYcoZf125A63zHSdMhkAi/HFUGNCNeK
-	 J7X1yl7r0rN29gdmq5SsHcGn/T7CmDF/ID2Uvi7mvr0PFwvdGJmCpdOIysf5LfRnjC
-	 1w21Gx6IhBsNzjDnYjd6ko75qTravedUuRFoDbjzIS1z9I6hCFuD3mi0z2GXS1i4t6
-	 27AUHJ9cCIxoiAkllQIMQpLiz/s3c9V6KCvxFG9I9FzO5D6fpDGPZSi6DGeJKkmgmX
-	 LtIjdVeuyd+wIT4KgskYvFdzQ7diMBplESrWTHBJv/Ah47o30uQF/CA+9DkHa7pT6h
-	 70djD7BzAwDPA==
+	b=JE0vEjoKdI3aoLXySgz46sIqLxGHS10+ctvdryhzIzUS4HhXuF3Tl298hubpjKFM/
+	 w6TK/WAFgLyiSvmTT0C7btzFR8/sJwuEVJ7dvhLp/FopZjfp4F38JZxjFbjWToxx+2
+	 ZOs3hbeOeMzuD9W/l6w5BjAZ2TP8rnJk5mpj6qfsfebVTmp5WeguGbLar2dJg+54Ta
+	 BQeBNnkwOGxnWBYdRi+L77qoR8Ib+Sgt4uGR4FMtkCWkIFE7JcS9361sDdnaf8uzpI
+	 5PpYZSpLvvidhBYF+z1LHu2vN47VszMgmkxuY95ZwPxZ0LohS1hnrc8xtucx7pzmvs
+	 64lF44iLXmi+w==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13BE0C3ABA8;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C8CFC3ABA8;
 	Tue, 29 Apr 2025 04:06:17 +0000 (UTC)
 From: Chen Linxuan via B4 Relay <devnull+chenlinxuan.uniontech.com@kernel.org>
-Date: Tue, 29 Apr 2025 12:06:09 +0800
-Subject: [PATCH RFC v3 5/8] rseq: add __always_inline for
- rseq_kernel_fields
+Date: Tue, 29 Apr 2025 12:06:12 +0800
+Subject: [PATCH RFC v3 8/8] lib/Kconfig.debug: introduce
+ CONFIG_NO_AUTO_INLINE
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -41,7 +41,7 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250429-noautoinline-v3-5-4c49f28ea5b5@uniontech.com>
+Message-Id: <20250429-noautoinline-v3-8-4c49f28ea5b5@uniontech.com>
 References: <20250429-noautoinline-v3-0-4c49f28ea5b5@uniontech.com>
 In-Reply-To: <20250429-noautoinline-v3-0-4c49f28ea5b5@uniontech.com>
 To: Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
@@ -77,21 +77,21 @@ Cc: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
  Chen Linxuan <chenlinxuan@uniontech.com>, 
  Changbin Du <changbin.du@intel.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1064;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4279;
  i=chenlinxuan@uniontech.com; h=from:subject:message-id;
- bh=yuauFI3DVy8k9g1XQ1OrB7eESWm7f+B3/2pt9syGKzM=;
- b=owEBbQKS/ZANAwAKAXYe5hQ5ma6LAcsmYgBoEFAyanc3Cwc7HAg/63YHY6NNSEBN2RhZfPBtP
- dtxoPOqXNeJAjMEAAEKAB0WIQTO1VElAk6xdvy0ZVp2HuYUOZmuiwUCaBBQMgAKCRB2HuYUOZmu
- i7aID/44sv/mzy4WT2GTGw2LDhzFHfM+7rL13wS9xt+G7CMG4l6A0rduPv9Kj1+aTi8eOVMJft5
- 5TiNxVdcrGKSr3zwVOY/PNRlc66oIZlthPkrupbFv0SD5r0m5xlYv9Q9WAMMOLU1a+CKw7KXlIK
- zUkQ0dGZaFEhfFS3giTzwyMqJS6nvmjb5iRc4Zz/XOtdtIIBsD6qlLRwQDdV4KuiKgfabOvMbeX
- C/d2ZrlzN8bw8uBY9bJS4LF4cptR+kay58eEnIn86mc9en18eq/l2Y01BEqmDWaad6N+FJDodwI
- pMr/+GVr6bsXlGZJ+sULeKleGffl4G1zIhAoz7H8I0oNmr/nSGd3Wn6BKIxuLhtVppnLY1KsvGa
- yf2RsSmPzJHLCXkfpLhDD/oicoxFl43gpHqaND1YU47v6537LXhTaUC1wslQX7j/d1+ujI4YwtF
- vOr8GQoQM+gOCkSVJLMdhN73NjDBDQByqvsYdot/uoc2GscYToCLN6G8w6S/yE1iwgbv9J0upsK
- hCjXyMYy0yLyfeIMCV/s3OTjYIs2fkUTwhR/5ByE/gU+4GGrFSrBbZP1FArrKKo834SUQ98QfUi
- V+gTyYTxvmL/HMhC3LP7oMkp9BWNsUvbCEi3F0KTEm/YPo52etQ+1LPa6z6VqhkHXnGwZSJcPtW
- crGc2BctRQzKvsw==
+ bh=Bd93x7WuEFeV0iOsS3dMjqDGQS+n9awf6aimsKD9UOk=;
+ b=owEBbQKS/ZANAwAKAXYe5hQ5ma6LAcsmYgBoEFA1dN0rUHGv15CSgUAacYmKqLp9Xxxon6yon
+ c7TiGmprM+JAjMEAAEKAB0WIQTO1VElAk6xdvy0ZVp2HuYUOZmuiwUCaBBQNQAKCRB2HuYUOZmu
+ i55nD/9Z3vTJGmV0EjUhmeI4qXKmcdAMAq1X/bMvCKKqJb8nDqxr3XzOsrgtlGbWtGbSRpAcMRC
+ kIBZwz/EFrXdSky2mgTEfswE2JzuHKo+Mt434POfvbTmTZzfhinHk2rveNLn14K6QQxOZNTHzoq
+ DY3XtiBsr5/6XiSk58sFs0UB2do+v1RDxbRgPVRbwakBRf2EpGtYK+ZkSVPourJzkqG7PrIvHKY
+ FyKSLRcxh2ehQ+zdjfMyhxbXKMW3rLF6KyReLohSbuPnAZH9vBG07d85cT+hlqayZ2VFrTJWayX
+ ogvHBmQbs0jd6kEOOcqxulI9+HLWeFHpLWXkscXCbtKYFnN3of88CFc5dM1NBfTsa2bE/5c69eS
+ TXaS9CEvSaJLZP2bguKxeYXuKMcX7aCIEmkb5ywt+zXQ2sBHHXVo62B2vH+ZEPTvJ0JBvREoDHA
+ Z07bh3e0yi+U/gCk96uDLgnOmSkQUjen6r/WDp03CqP8r46lIU2aWAN8mPN0/bL6Leb+yx3Y5Gf
+ MfHerWdPEqYeBh6stf8GRI22HdoAjnaigM4iGlYaLrvgjiuVjR2tHFFGtnPEviP7O+74W7AnPTn
+ n9vHmKNe5H9AurNLXL/K7j5eRYSPpaBVROMuUUngVLHw7qljfnSQMwRNYonB6pGCO3WTd5AnIHj
+ tq2/DJ+5MgngDcg==
 X-Developer-Key: i=chenlinxuan@uniontech.com; a=openpgp;
  fpr=D818ACDD385CAE92D4BAC01A6269794D24791D21
 X-Endpoint-Received: by B4 Relay for chenlinxuan@uniontech.com/default with
@@ -101,34 +101,108 @@ Reply-To: chenlinxuan@uniontech.com
 
 From: Chen Linxuan <chenlinxuan@uniontech.com>
 
-Presume that kernel is compiled for x86_64 with gcc version 13.3.0:
+Add a new kernel hacking option CONFIG_NO_AUTO_INLINE that prevents the
+compiler from auto-inlining functions not explicitly marked with the
+'inline' keyword.
 
-  make allmodconfig
-  make KCFLAGS="-fno-inline-small-functions -fno-inline-functions-called-once"
+This enhancement improves function tracer capabilities as it can only
+trace functions that haven't been inlined by the compiler.
 
-This results some objtool warnings:
+Previous discussions:
 
-  vmlinux.o: warning: objtool: rseq_update_cpu_node_id+0x14c: call to rseq_kernel_fields() with UACCESS enabled
-  vmlinux.o: warning: objtool: rseq_reset_rseq_cpu_node_id+0xef: call to rseq_kernel_fields() with UACCESS enabled
+Link: https://lore.kernel.org/all/20181028130945.23581-3-changbin.du@gmail.com/
 
+This patch is modified from commit 917fad29febd ("kernel hacking: add a
+config option to disable compiler auto-inlining") which can be founded
+in linux-next-history:
+
+Link: https://web.git.kernel.org/pub/scm/linux/kernel/git/next/linux-next-history.git/commit/?id=917fad29febd
+
+Cc: Changbin Du <changbin.du@gmail.com>
+Co-developed-by: Winston Wen <wentao@uniontech.com>
+Signed-off-by: Winston Wen <wentao@uniontech.com>
 Signed-off-by: Chen Linxuan <chenlinxuan@uniontech.com>
 ---
- kernel/rseq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ Makefile          | 16 ++++++++++++++++
+ lib/Kconfig.debug | 21 +++++++++++++++++++++
+ lib/Makefile      |  3 +++
+ 3 files changed, 40 insertions(+)
 
-diff --git a/kernel/rseq.c b/kernel/rseq.c
-index b7a1ec327e8117b47e353cab92d62111dd261520..7a4b6c211359714087a753047581bc8ff0c6c76b 100644
---- a/kernel/rseq.c
-+++ b/kernel/rseq.c
-@@ -27,7 +27,7 @@
- 				  RSEQ_CS_FLAG_NO_RESTART_ON_MIGRATE)
+diff --git a/Makefile b/Makefile
+index 5aa9ee52a765b7aed27f44028cdcc34a90979acb..60dec6c123543150a3332a9a819fa6933e94db4f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1073,6 +1073,22 @@ endif
+ # Ensure compilers do not transform certain loops into calls to wcslen()
+ KBUILD_CFLAGS += -fno-builtin-wcslen
  
- #ifdef CONFIG_DEBUG_RSEQ
--static struct rseq *rseq_kernel_fields(struct task_struct *t)
-+static __always_inline struct rseq *rseq_kernel_fields(struct task_struct *t)
- {
- 	return (struct rseq *) t->rseq_fields;
- }
++ifdef CONFIG_NO_AUTO_INLINE
++# -fno-inline-functions behaves differently between gcc and clang.
++# With gcc, it prevents auto-inlining of functions but still considers functions
++# explicitly marked with "inline" for inlining. However, with clang, the flag
++# prevents inlining of all functions, including those explicitly marked with
++# inline. Clang provides the "-finline-hint-functions" option, which
++# specifically allows inlining of functions marked with "inline".
++#
++# In summary, to achieve equivalent behavior across compilers:
++# -fno-inline-functions (gcc) = -fno-inline-functions + -finline-hint-functions (clang)
++KBUILD_CFLAGS   += -fno-inline-functions \
++		   $(call cc-option, -finline-hint-functions) \
++		   $(call cc-option, -fno-inline-small-functions) \
++		   $(call cc-option, -fno-inline-functions-called-once)
++endif
++
+ # change __FILE__ to the relative path to the source directory
+ ifdef building_out_of_srctree
+ KBUILD_CPPFLAGS += $(call cc-option,-ffile-prefix-map=$(srcroot)/=)
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index f9051ab610d54358b21d61c141b737bb345b4cee..56530f0145c885e9846dae1d2f8c6125c610d25b 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -436,8 +436,29 @@ config GDB_SCRIPTS
+ 	  instance. See Documentation/process/debugging/gdb-kernel-debugging.rst
+ 	  for further details.
+ 
++
+ endif # DEBUG_INFO
+ 
++config NO_AUTO_INLINE
++	bool "Disable compiler auto-inline optimizations (EXPERIMENTAL)"
++	default n
++	help
++	  This will prevent the compiler from optimizing the kernel by
++	  auto-inlining functions not marked with the inline keyword.
++	  With this option, only functions explicitly marked with
++	  "inline" will be inlined. This will allow the function tracer
++	  to trace more functions because it only traces functions that
++	  the compiler has not inlined.
++
++	  Note that Clang with -O2 optimization does not fully support
++	  disabling all inline-related optimizations,
++	  as Clang does not support options like
++	  -fno-inline-small-functions and -fno-inline-functions-called-once
++	  that gcc does.
++	  Some functions without the inline keyword may still be inlined.
++
++	  If unsure, select N.
++
+ config FRAME_WARN
+ 	int "Warn for stack frames larger than"
+ 	range 0 8192
+diff --git a/lib/Makefile b/lib/Makefile
+index f07b24ce1b3f8db28796e461db1324d97133fdd5..2ac97f0856a12f66e6c3825af6aabafa61869262 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -87,6 +87,9 @@ obj-$(CONFIG_TEST_BITMAP) += test_bitmap.o
+ ifeq ($(CONFIG_CC_IS_CLANG)$(CONFIG_KASAN),yy)
+ # FIXME: Clang breaks test_bitmap_const_eval when KASAN and GCOV are enabled
+ GCOV_PROFILE_test_bitmap.o := n
++# FIXME:
++# Clang breaks test_bitmap_const_eval when NO_AUTO_INLINE and KASAN are enabled
++CFLAGS_test_bitmap.o += -finline-functions
+ endif
+ 
+ obj-$(CONFIG_TEST_UUID) += test_uuid.o
 
 -- 
 2.43.0
