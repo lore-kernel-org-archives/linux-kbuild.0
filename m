@@ -1,32 +1,48 @@
-Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.avm.de (mail.avm.de [212.42.244.120])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8970B2D29C7;
-	Tue, 29 Apr 2025 13:04:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC653B2A0;
+	Tue, 29 Apr 2025 13:05:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745931892; cv=none; b=F6mzS2a8/rxVzNosuGE2rRiaWjt9jznYf8y9Y+jFX4SF0+7iba5h78M313bXvM3Q7Yftn+4UEqjguWUZJ4uqynxUeQVtA6EO96kPcvw9cN1ks/mUTqDR7wjK5UhXcAOd2PFwi1XODqpvtMr0inCRh6hukyD0+EFzJydRpTp/i5A=
+	t=1745931905; cv=none; b=hLP1eYHjJnvv6ibE0hml8qUXzwZTNJ2bx5nLUiTltJkhT8ajFFPn2GNOgevO6qEFvO576afzmjnENvnUIW5rF4uvV5RLyTnHbJykVKltHLY+LaSY2QY+jeochFHKZkFdka8bndrqXF5D+4VlVY4FagvprfDjTwnKyLHkS/MeIsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745931892; c=relaxed/simple;
-	bh=kmQUIW+5wYPfShUIrOsErGdMJNnQUWIZ+BIWQSkTJR8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=pfKHsZaSZwZpmPPv9xyzAsXAakQT1fK6cJOXBqozSPGeUoQMW/K1GEKDcWGqLmhGflzyR+GxpJFTBU673qCw5Uk2a1z5mmJwBjNXYP5hcF8X6qD/dc/sKCxhXISvz9b4tc0voWvl3JLemexvxrxx9uytLojfn4b1wsC1z4CNMes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=WtCigX7B; arc=none smtp.client-ip=159.69.126.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
+	s=arc-20240116; t=1745931905; c=relaxed/simple;
+	bh=2oCW7m9ifAETTD8BGa4ZwZTAQDr4NgniCQNg5GmjRAw=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=DTO7atwnFl63Nrno0xHjx7mVTAuecGrXrvipfBrg36ycMN4Q6ME7uEDBgN+uW6MIgACeojoyHA2/xXCgmM/b+mYOwY+XuMjk0WxOJrUniEKo+KG5gt9X+FSDioe/nXE4iogqnI6WHa2jl4zT82sRpHyipifkXcxWQLi1umbpMuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=avm.de; spf=pass smtp.mailfrom=avm.de; dkim=pass (1024-bit key) header.d=avm.de header.i=@avm.de header.b=YjFoloqp; arc=none smtp.client-ip=212.42.244.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=avm.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=avm.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="WtCigX7B"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-	s=mail; t=1745931874;
-	bh=kmQUIW+5wYPfShUIrOsErGdMJNnQUWIZ+BIWQSkTJR8=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=WtCigX7BHHuvjnDxDfwmcSBeyBTCRfjxFnCfp2BR4OAm8h26gm2cA1/Y41MLSAFgt
-	 1Lui6JugA7ZpyRc/IZB1OjD42wB3i+36XOrIwAmkctFHApWN8n8eNQWTRbRgCPvph3
-	 brq4Vp0mkbXBZ/i62ncTuTb5J/ZgYF05LkJovw2Q=
-From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Date: Tue, 29 Apr 2025 15:04:34 +0200
-Subject: [PATCH v3 7/9] module: Move lockdown check into generic module
- loader
+	dkim=pass (1024-bit key) header.d=avm.de header.i=@avm.de header.b="YjFoloqp"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=avm.de; s=mail;
+	t=1745931564; bh=2oCW7m9ifAETTD8BGa4ZwZTAQDr4NgniCQNg5GmjRAw=;
+	h=From:Date:Subject:To:Cc:From;
+	b=YjFoloqpivBQWbE2WbnVfmpW9INRZv5pF97PSlPvPpjYmE5QnLma127gievqZpwLn
+	 awLAmpdVAlI9GiNBwWETkl2DXJgX4SvT7RRiDrXZk+iHRj6wOaYXbcG3GDYhj3xn/F
+	 hxDj6DBJ+so86j1avhozwnD2lEFWKcIDlSvnawCE=
+Received: from [212.42.244.71] (helo=mail.avm.de)
+	by mail.avm.de with ESMTP (eXpurgate 4.52.1)
+	(envelope-from <n.schier@avm.de>)
+	id 6810cd2c-0395-7f0000032729-7f000001d2ce-1
+	for <multiple-recipients>; Tue, 29 Apr 2025 14:59:24 +0200
+Received: from mail-auth.avm.de (dovecot-mx-01.avm.de [212.42.244.71])
+	by mail.avm.de (Postfix) with ESMTPS;
+	Tue, 29 Apr 2025 14:59:24 +0200 (CEST)
+Received: from buildd.core.avm.de (buildd-sv-01.avm.de [172.16.0.225])
+	by mail-auth.avm.de (Postfix) with ESMTPA id 3397880838;
+	Tue, 29 Apr 2025 14:59:25 +0200 (CEST)
+Received: from l-nschier-z2.ads.avm.de (unknown [IPv6:fde4:4c1b:acd5:7792::1])
+	by buildd.core.avm.de (Postfix) with ESMTP id 1038F181BA4;
+	Tue, 29 Apr 2025 14:59:24 +0200 (CEST)
+Received: from localhost ([::1] helo=l-nschier-z2.ads.avm.de)
+	by l-nschier-z2.ads.avm.de with esmtp (Exim 4.98.2)
+	(envelope-from <n.schier@avm.de>)
+	id 1u9kYh-000000089kf-3Z1r;
+	Tue, 29 Apr 2025 14:59:23 +0200
+From: Nicolas Schier <n.schier@avm.de>
+Date: Tue, 29 Apr 2025 14:59:13 +0200
+Subject: [PATCH] randstruct: Rebuild completely if randstruct.seed changes
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -34,90 +50,98 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20250429-module-hashes-v3-7-00e9258def9e@weissschuh.net>
-References: <20250429-module-hashes-v3-0-00e9258def9e@weissschuh.net>
-In-Reply-To: <20250429-module-hashes-v3-0-00e9258def9e@weissschuh.net>
-To: Masahiro Yamada <masahiroy@kernel.org>, 
- Nathan Chancellor <nathan@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
- Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>, 
- Sami Tolvanen <samitolvanen@google.com>, 
- Daniel Gomez <da.gomez@samsung.com>, Paul Moore <paul@paul-moore.com>, 
- James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, 
- Jonathan Corbet <corbet@lwn.net>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
- Christophe Leroy <christophe.leroy@csgroup.eu>, 
- Naveen N Rao <naveen@kernel.org>, Mimi Zohar <zohar@linux.ibm.com>, 
- Roberto Sassu <roberto.sassu@huawei.com>, 
- Dmitry Kasatkin <dmitry.kasatkin@gmail.com>, 
- Eric Snowberg <eric.snowberg@oracle.com>, 
- Nicolas Schier <nicolas.schier@linux.dev>, 
- Nicolas Schier <nicolas.schier@linux.dev>
-Cc: =?utf-8?q?Fabian_Gr=C3=BCnbichler?= <f.gruenbichler@proxmox.com>, 
- Arnout Engelen <arnout@bzzt.net>, Mattia Rizzolo <mattia@mapreri.org>, 
- kpcyrd <kpcyrd@archlinux.org>, Christian Heusel <christian@heusel.eu>, 
- =?utf-8?q?C=C3=A2ju_Mihai-Drosi?= <mcaju95@gmail.com>, 
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250429-rebuild-on-randstruct-seed-changes-v1-1-16a74fe65538@avm.de>
+X-B4-Tracking: v=1; b=H4sIACHNEGgC/yWNwQqDQAwFf0VybkBXrdhfKT247rMGZC2JFkH8d
+ xc9zmFmdjKowOiV7aT4i8kcExSPjPqxi1+whMTkclfnlWtZ4VeZAs+RtYvBFl37hQ0IfAvGT1/
+ VKF0z+LKgFPopBtmuyftzHCfjBAZUdAAAAA==
+X-Change-ID: 20250429-rebuild-on-randstruct-seed-changes-6b45e327fb31
+To: Kees Cook <kees@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, 
+ Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
+ Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <benno.lossin@proton.me>, 
+ Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+ Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, 
+ Nicolas Schier <nicolas.schier@linux.dev>, linux-hardening@vger.kernel.org, 
  linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-arch@vger.kernel.org, linux-modules@vger.kernel.org, 
- linux-security-module@vger.kernel.org, linux-doc@vger.kernel.org, 
- linuxppc-dev@lists.ozlabs.org, linux-integrity@vger.kernel.org, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+ rust-for-linux@vger.kernel.org, Nicolas Schier <nicolas.schier@linux.dev>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1745931873; l=1576;
- i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
- bh=kmQUIW+5wYPfShUIrOsErGdMJNnQUWIZ+BIWQSkTJR8=;
- b=UeBVXcH7NmJEkR+38OyjzyfoU04GJpL9A/GpeD8/tUNbtYa0RNhFf/oUemhiWfy3i/HNqh5wb
- 6448IhPkVJ2DZ12vw7Fz0/2aJ9GNQhLh065QNg6B4NkyTQK1vbDsDIR
-X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
- pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2055; i=n.schier@avm.de;
+ h=from:subject:message-id; bh=2oCW7m9ifAETTD8BGa4ZwZTAQDr4NgniCQNg5GmjRAw=;
+ b=owEBbQKS/ZANAwAIAYjGvJyImm24AcsmYgBoEM0r7k1GoafcbnAfvnDJSYJVnnD7bEOXWjP81
+ 0bR68QzE3aJAjMEAAEIAB0WIQQO/4WJ63TpgecLpGmIxryciJptuAUCaBDNKwAKCRCIxryciJpt
+ uIRGEACOJz1v3io+I/0Iq/QaOAt9e5NEWGXdxwDGtLA7Y2x68gbBJ/vP8LbsdBaWWsxB/UFbrQY
+ vvKHTmvRJAS3/giVw19jr/D/Owa5/B6r3AtW4mFjot52X021vK4TjKgQGpeW6c3qiSJGaMx8K4J
+ X8eeq1HaBiXV8TEBW/eTOL4fX/OtkdP0T9wNRkccBc+u9eVFX0PUSGt/6i/CrvbV76FGBDE76rI
+ SsIB/gWyB13ao6UrnTjnubpLsff+3B5kOV57e6kpDNmv0tqDsWa8X25IaDJrB8s3rGHo0AFhXWF
+ trhjeBANONIXzGZlzbpR6KYx3a2nJwB3INiQOxp1iLrPUohT4bky0u8OOArvzfBvTzmMlOvAsXh
+ nViGbseZ6QVGYU6UIlf/o/zMXQyrZJ1htk9lbHXWGCryqLxK0XxxYxMRQcey+QFzzmU9wEhoua6
+ klLOyP9K5U0Wh0cpUOxt6dZxA3H2b+IMtdPhstfopAk1j0/dIe4gpKW5b91VlXTBThesRZXMfTQ
+ 1pfz+D3NnkU84IWXW2XzSU4wTNkjtnd/1ljrM0vkc8i8ulMtbAGJMScE4CoAxf6mxwMeJiGSfTf
+ CY+XVxQcmGdVtMfUtCj7E/TGWWmdVFjcFz//pCo1cGQrcMnRQNWXTaGBywMoHr2lfAMmkWXUlKw
+ om2l5UNdKfJ8Ekg==
+X-Developer-Key: i=n.schier@avm.de; a=openpgp;
+ fpr=7CF67EF8868721AFE53D73FDBDE3A6CC4E333CC8
+X-purgate-ID: 149429::1745931564-2D629E09-1E870DB7/0/0
+X-purgate-type: clean
+X-purgate-size: 2057
+X-purgate-Ad: Categorized by eleven eXpurgate (R) https://www.eleven.de
+X-purgate: This mail is considered clean (visit https://www.eleven.de for further information)
+X-purgate: clean
 
-The lockdown check buried in module_sig_check() will not compose well
-with the introduction of hash-based module validation.
-Move it into module_integrity_check() which will work better.
+Include generated/randstruct_hash.h in linux/compiler-version.h to force
+a complete rebuild if CONFIG_RANDSTRUCT is enabled and randstruct.seed
+changes.
 
-Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
+Removal or change of scripts/basic/randstruct.seed leads to a remake of
+generated/randstruct_hash.h.  As linux/compiler-version.h is a
+hard-coded include for every kbuild induced compilation, conditionally
+adding generated/randstruct_hash.h there adds it as build-dependency to
+each object file.
+
+Reported-by: Kees Cook <kees@kernel.org>
+Closes: https://lore.kernel.org/linux-kbuild/202504161928.17A90D9B@keescook/
+Signed-off-by: Nicolas Schier <n.schier@avm.de>
 ---
- kernel/module/main.c    | 6 +++++-
- kernel/module/signing.c | 3 +--
- 2 files changed, 6 insertions(+), 3 deletions(-)
+As I have no rust experience at all, yet: Do we have to consider
+something for rust?
+---
+ include/linux/compiler-version.h | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/kernel/module/main.c b/kernel/module/main.c
-index 0c88d443a3bc894b18a7aa230cadf396e585c415..1c353ece05fd1d2d709204e4d5fa44ecb8832bfa 100644
---- a/kernel/module/main.c
-+++ b/kernel/module/main.c
-@@ -3254,7 +3254,11 @@ static int module_integrity_check(struct load_info *info, int flags)
- 	if (IS_ENABLED(CONFIG_MODULE_SIG))
- 		err = module_sig_check(info, flags);
- 
--	return err;
-+	if (err)
-+		return err;
-+	if (info->sig_ok)
-+		return 0;
-+	return security_locked_down(LOCKDOWN_MODULE_SIGNATURE);
- }
+diff --git a/include/linux/compiler-version.h b/include/linux/compiler-version.h
+index 573fa85b6c0cd314dfeec66e8c77342798aa7e62..523eacf80c1a6149c513dccfd0dd9fd388e909a4 100644
+--- a/include/linux/compiler-version.h
++++ b/include/linux/compiler-version.h
+@@ -6,9 +6,19 @@
+ #define __LINUX_COMPILER_VERSION_H
  
  /*
-diff --git a/kernel/module/signing.c b/kernel/module/signing.c
-index e51920605da14771601327ea596dad2e12400518..029e1ef6f0e369fd48e8c81154b6c697ad7a6249 100644
---- a/kernel/module/signing.c
-+++ b/kernel/module/signing.c
-@@ -11,7 +11,6 @@
- #include <linux/module_signature.h>
- #include <linux/string.h>
- #include <linux/verification.h>
--#include <linux/security.h>
- #include <crypto/public_key.h>
- #include <uapi/linux/module.h>
- #include "internal.h"
-@@ -100,5 +99,5 @@ int module_sig_check(struct load_info *info, int flags)
- 		return -EKEYREJECTED;
- 	}
- 
--	return security_locked_down(LOCKDOWN_MODULE_SIGNATURE);
-+	return 0;
- }
+- * This header exists to force full rebuild when the compiler is upgraded.
++ * This header exists to force full rebuild when the compiler is upgraded or
++ * the randstruct is changed.
+  *
+  * When fixdep scans this, it will find this string "CONFIG_CC_VERSION_TEXT"
+  * and add dependency on include/config/CC_VERSION_TEXT, which is touched
+  * by Kconfig when the version string from the compiler changes.
+  */
++#ifdef CONFIG_RANDSTRUCT
++/*
++ * If CONFIG_RANDSTRUCT is enabled and scripts/basic/randstruct.seed changes,
++ * randstruct_hash.h is updated.  Including it here, makes it a build
++ * dependency for all build objects.
++ */
++#include <generated/randstruct_hash.h>
++#undef RANDSTRUCT_HASHED_SEED
++#endif
 
+---
+base-commit: 9c32cda43eb78f78c73aee4aa344b777714e259b
+change-id: 20250429-rebuild-on-randstruct-seed-changes-6b45e327fb31
+
+Best regards,
 -- 
-2.49.0
+Nicolas Schier
 
