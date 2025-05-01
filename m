@@ -1,31 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B222201034;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B55A231827;
 	Thu,  1 May 2025 19:48:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746128909; cv=none; b=jQqqvc30TqyuYStnOko1cynmxdpp1YCg84m4dlx4wLzAYIznsWTG2RM05nqkam7Vy6+SqlVQEHW8is9fsK76mdF7CRap6tV6ziSKyjD+O9t+suJ+GAAX8x7DDk7lvjqqPY1DgM4BZp4xe66rf9MOgsvYT0Gm+TkX4g+hAoaBZFI=
+	t=1746128909; cv=none; b=Cu4D+U6iujYmvS41JlCvM/duU8eBzQYLtrpBSSIbOaQButOMcc47xm4ygEKgwXyBEoVtvJJhFMSrmGYVoytTNzPzPRCLt7YTxwqlAf7J3a+rWKDRdfEA3sMqdSNmpE4gbGHDyHPsXhK7ZEqej1G54tbtKw0ms5bIUIUE2JJg0Lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1746128909; c=relaxed/simple;
-	bh=8LFYhUOk2+Lg4KhiXXk+lmCuulr10jRLqqlaJXRzOrE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=aQtpivkxpd/Ia8SeBQqaFQ6EeFl6ISPNhzz5vhsIPndOHRj6aGi3ND1Sy8grntzG4/ZQYjyFEMWr/K74bnK97E9JEa8t/ozmJ+UUHay42p3TGrdlPQcPTknWH3N+oPYD5k/FiZG3opm8sc7narylkkOlK9MZw6N3KycsONUHp5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OoaU0ply; arc=none smtp.client-ip=10.30.226.201
+	bh=nDhsL2XJXp4sGdblMuXDz6J+s9arRNEgRYmTCyaexrQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GVgNfLo6k+qP90pXbP0axSWdIG3gRZLS2sGq/4NWqbzKcU34y68Knk740D7/7ovbS1z1zrozMlPiY6bOeQdYb5FI3o73NhIYhmoDqLWOZiZx5BxNTVwmoEEK1jFHWCIYzYC9iKr23W53yP5Q3wI9BlXeDmMzLsCr0GWteltCI9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YzGLO6k6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OoaU0ply"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1646DC4CEE3;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YzGLO6k6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18920C4CEE4;
 	Thu,  1 May 2025 19:48:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1746128909;
-	bh=8LFYhUOk2+Lg4KhiXXk+lmCuulr10jRLqqlaJXRzOrE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OoaU0ply0zZoLW19x2S5w/vOr9gMBxBZvZWYEy+zdy9ynwqc1RJ6slmlbpJHvXmUX
-	 UjDWsOVqy2jCTr0Gk5vsO4BshJuz7Xsd1gIjx5OzY55M5IVbvUOnQEj3XOvZl/6Ecj
-	 U2WdBTd4AewUdvU9M4k82Ia56Q8qokJ+IGBGK5DYrSBNuJyrP2N1PUZPfAZiEpcgZC
-	 MrL9OlrhBdR15+apQWo8S/nkoUOOHRtYAh9LVnK6Pp2hKkrIQqLtqDFAmcenq6MrZC
-	 LwRpTv7DYJYFtmXxgN1Z5Y7rd7Y+PP03GzBDUverxD73IZIv1bnMqzEs04HZz9pqzk
-	 ZT/6OI+kFC5CQ==
+	bh=nDhsL2XJXp4sGdblMuXDz6J+s9arRNEgRYmTCyaexrQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=YzGLO6k68UgR7+Nm00Bh3qiCYfJLGugqXN0nydwslcnTbRQL7jRNxuzYJwO2DL7nK
+	 tHUMwOWxVi1ZKRa2ONDBvRpY102ZaOxwW9yk5t/bA8XU+tunCUjcDlk8Ppu8wFPrjl
+	 Dgg8S9wTYSoCLPhnubONMUhq9GsPhbW9rywFw9abiBJSL2odSdcNE1vHRv2v7J3WYv
+	 2L/b7w6RDqK74h2pUhfLslnjBiTmu20VeiBLr7gvF/QWCRGBemHxRtXP9ezSWhuHtA
+	 H9K8FiJZyqPPWhr1XJufYGW/3/v3JjLJsKLseg6/XHAxH8v3giC3W5Kazz0jQ7/7Ac
+	 k0RbRd9Ap4Ykg==
 From: Kees Cook <kees@kernel.org>
 To: Masahiro Yamada <masahiroy@kernel.org>
 Cc: Kees Cook <kees@kernel.org>,
@@ -33,94 +32,72 @@ Cc: Kees Cook <kees@kernel.org>,
 	Nicolas Schier <nicolas.schier@linux.dev>,
 	Petr Pavlu <petr.pavlu@suse.com>,
 	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	linux-kbuild@vger.kernel.org,
 	Justin Stitt <justinstitt@google.com>,
 	Marco Elver <elver@google.com>,
 	Andrey Konovalov <andreyknvl@gmail.com>,
 	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
 	linux-kernel@vger.kernel.org,
 	linux-hardening@vger.kernel.org,
+	linux-kbuild@vger.kernel.org,
 	kasan-dev@googlegroups.com
-Subject: [PATCH 2/3] randstruct: Force full rebuild when seed changes
-Date: Thu,  1 May 2025 12:48:17 -0700
-Message-Id: <20250501194826.2947101-2-kees@kernel.org>
+Subject: [PATCH 0/3] Detect changed compiler dependencies for full rebuild
+Date: Thu,  1 May 2025 12:48:15 -0700
+Message-Id: <20250501193839.work.525-kees@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250501193839.work.525-kees@kernel.org>
-References: <20250501193839.work.525-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2614; i=kees@kernel.org; h=from:subject; bh=8LFYhUOk2+Lg4KhiXXk+lmCuulr10jRLqqlaJXRzOrE=; b=owGbwMvMwCVmps19z/KJym7G02pJDBnCFxilL1bpJjfMsursvPHsZVvOgY2/T2osYPuZcVu/O /PSkVNKHaUsDGJcDLJiiixBdu5xLh5v28Pd5yrCzGFlAhnCwMUpABN5cI/hf8CtpJVxv4zKS3pC 1uSt7nzgcupuV5KsK3NNik/hmpKEOYwMk75s22Rhal9opsopI2+uzPizQo7lAu8EFdad2Z2Pq83 YAQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1927; i=kees@kernel.org; h=from:subject:message-id; bh=nDhsL2XJXp4sGdblMuXDz6J+s9arRNEgRYmTCyaexrQ=; b=owGbwMvMwCVmps19z/KJym7G02pJDBnCFxh2/PXlvaehL1H6dc75Bx/zNktbhx09/FdmltqcI 0HqoR7HO0pZGMS4GGTFFFmC7NzjXDzetoe7z1WEmcPKBDKEgYtTACYy4wAjw2mV5XtjyvZEd0dd O3P41KcpP2eIZ6esbruk8vGX2Bsf0ekMf4WEFA8eXy5n9yd9Q8DhFWJR9nNPKmfrP4owctS5oT/ 5IgMA
 X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 
-While the randstruct GCC plugin was being rebuilt if the randstruct
-seed changed, Clangs build did not notice the change. Include the hash
-header directly so that it becomes a universal build dependency and full
-rebuilds will happen if it changes.
+Hi,
 
-Signed-off-by: Kees Cook <kees@kernel.org>
----
-Cc: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Nathan Chancellor <nathan@kernel.org>
-Cc: Nicolas Schier <nicolas.schier@linux.dev>
-Cc: Petr Pavlu <petr.pavlu@suse.com>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: <linux-kbuild@vger.kernel.org>
----
- include/linux/vermagic.h    |  1 -
- scripts/Makefile.randstruct |  3 ++-
- scripts/basic/Makefile      | 11 ++++++-----
- 3 files changed, 8 insertions(+), 7 deletions(-)
+This is my attempt to introduce dependencies that track the various
+compiler behaviors that may globally change the build that aren't
+represented by either compiler flags nor the compiler version
+(CC_VERSION_TEXT). Namely, this is to detect when the contents of a
+file the compiler uses changes. We have 3 such situations currently in
+the tree:
 
-diff --git a/include/linux/vermagic.h b/include/linux/vermagic.h
-index 939ceabcaf06..335c360d4f9b 100644
---- a/include/linux/vermagic.h
-+++ b/include/linux/vermagic.h
-@@ -33,7 +33,6 @@
- #define MODULE_VERMAGIC_MODVERSIONS ""
- #endif
- #ifdef RANDSTRUCT
--#include <generated/randstruct_hash.h>
- #define MODULE_RANDSTRUCT "RANDSTRUCT_" RANDSTRUCT_HASHED_SEED
- #else
- #define MODULE_RANDSTRUCT
-diff --git a/scripts/Makefile.randstruct b/scripts/Makefile.randstruct
-index 24e283e89893..ab87219c6149 100644
---- a/scripts/Makefile.randstruct
-+++ b/scripts/Makefile.randstruct
-@@ -12,6 +12,7 @@ randstruct-cflags-y	\
- 	+= -frandomize-layout-seed-file=$(objtree)/scripts/basic/randstruct.seed
- endif
- 
--export RANDSTRUCT_CFLAGS := $(randstruct-cflags-y)
-+export RANDSTRUCT_CFLAGS := $(randstruct-cflags-y) \
-+			    -include $(objtree)/scripts/basic/randstruct_hash.h
- 
- KBUILD_CFLAGS	+= $(RANDSTRUCT_CFLAGS)
-diff --git a/scripts/basic/Makefile b/scripts/basic/Makefile
-index dd289a6725ac..31637ce4dc5c 100644
---- a/scripts/basic/Makefile
-+++ b/scripts/basic/Makefile
-@@ -8,9 +8,10 @@ hostprogs-always-y	+= fixdep
- # before running a Clang kernel build.
- gen-randstruct-seed	:= $(srctree)/scripts/gen-randstruct-seed.sh
- quiet_cmd_create_randstruct_seed = GENSEED $@
--cmd_create_randstruct_seed = \
--	$(CONFIG_SHELL) $(gen-randstruct-seed) \
--		$@ $(objtree)/include/generated/randstruct_hash.h
--$(obj)/randstruct.seed: $(gen-randstruct-seed) FORCE
-+      cmd_create_randstruct_seed = $(CONFIG_SHELL) $(gen-randstruct-seed) \
-+		$(obj)/randstruct.seed $(obj)/randstruct_hash.h
-+
-+$(obj)/randstruct_hash.h $(obj)/randstruct.seed: $(gen-randstruct-seed) FORCE
- 	$(call if_changed,create_randstruct_seed)
--always-$(CONFIG_RANDSTRUCT) += randstruct.seed
-+
-+always-$(CONFIG_RANDSTRUCT) += randstruct.seed randstruct_hash.h
+- If any of the GCC plugins change, we need to rebuild everything that
+  was built with them, as they may have changed their behavior and those
+  behaviors may need to be synchronized across all translation units.
+  (The most obvious of these is the randstruct GCC plugin, but is true
+  for most of them.)
+
+- If the randstruct seed itself changes (whether for GCC plugins or
+  Clang), the entire tree needs to be rebuilt since the randomization of
+  structures may change between compilation units if not.
+
+- If the integer-wrap-ignore.scl file for Clang's integer wrapping
+  sanitizer changes, a full rebuild is needed as the coverage for wrapping
+  types may have changed, once again cause behavior differences between
+  compilation units.
+
+The best way I found to deal with this is to use a -include argument
+for each of the above cases, which causes fixdep to pick up the file and
+naturally depend on it causing the build to notice any date stamp changes.
+Each case updates its .h file when its internal dependencies change.
+
+-Kees
+
+Kees Cook (3):
+  gcc-plugins: Force full rebuild when plugins change
+  randstruct: Force full rebuild when seed changes
+  integer-wrap: Force full rebuild when .scl file changes
+
+ include/linux/vermagic.h     |  1 -
+ scripts/Makefile.gcc-plugins |  2 +-
+ scripts/Makefile.randstruct  |  3 ++-
+ scripts/Makefile.ubsan       |  1 +
+ scripts/basic/Makefile       | 20 +++++++++++++++-----
+ scripts/gcc-plugins/Makefile |  8 ++++++++
+ 6 files changed, 27 insertions(+), 8 deletions(-)
+
 -- 
 2.34.1
 
