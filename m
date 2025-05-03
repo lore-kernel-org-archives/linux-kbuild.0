@@ -1,110 +1,165 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC5E6849C;
-	Sat,  3 May 2025 17:37:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E54E1624E9;
+	Sat,  3 May 2025 18:46:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746293835; cv=none; b=ll1lMdGm6Fv0q0U5wEGX2Gf8ViCtGo6slgPg8f0DNV3ULJTJs2ef77/0grJnIPuCeclpzwI8Tv1yDjbNP8mjtn+B/DWJRLR655aWBBMci1JuzhSDETZ6Jn5jEMm5d1uz56ClipFNPr1ZAzISpbGxEeiQns+pPA+rnmZmQ7eA8nE=
+	t=1746297987; cv=none; b=LUjjTFRMGXGF7k9tKC5r6eluXz2Cv0/8uVOKD1MLw2nzSEfR0k9iYUmgFot3fDAooqa9wGQylgxlEXb5BQqi5VqrId8IdHyD5LIN3lsHjzqzuDLoJbBfVUxLfVTJvbHPtdb09qNpwkzO9Sx77Q04MMe6BSQYtsGmoQIPxC3cTzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746293835; c=relaxed/simple;
-	bh=y7WfEK3a16DmPLp50jYGnCuAQ573Pt+N9OZeOpG6A8s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MOVHVQG1wIcBqlJFy/KKDuXBBJju/SuDrOoqB2upx3WLRyegCsN009QxeRZQIjntLYa71J8Rnh/BT4q3VbGHdAXbtrDbulXaVTB4009yRRib/VTi+g6wbD5mZiNxJ2d2GtptHKkm2tiz3JusdI4ggrhpong/xfcgLzQsUlorGII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=roGI5vk0; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1746297987; c=relaxed/simple;
+	bh=vcmcNB9M/mnVV0u1TxfACvPzuwlKwH4U0CbHSsTxvvI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=LTV9uPovcfUVpx0R0fNBn8a6AZnVPuNXlr4YIg0hS/I0w6ORPbyxAbFMS2pAL95YpjjFEqLtOSNtfnMeBMWPeHQZ2/ee+EbiZcRiAcdF0QKyqQLYRXvjs4acVJfrDdSHkIS0zDc6FjeXokPKVeQ95Q1wuF+YSXES2Blq3+whyiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E/5UvviY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="roGI5vk0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F681C4CEE3;
-	Sat,  3 May 2025 17:37:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E/5UvviY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80319C4AF0B;
+	Sat,  3 May 2025 18:46:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746293834;
-	bh=y7WfEK3a16DmPLp50jYGnCuAQ573Pt+N9OZeOpG6A8s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=roGI5vk0DiDOfwmApphUuD1Ln8gVL17ZzOLJgmneAflP1O6DXKh1gHZRbQm1/kQrY
-	 IVSgRhSrPGEKdpI+v6gSZuWlDOIP7DRFepBw8Ddr2aTTrk3sezWp/fMpeGYqQtU0D4
-	 vq9TynoZ7BF7Ij0YesGKG5Q2sUHjwhnjmzLbcVuRYMrgJg9y16ZuEwKX7dBl/e9aRE
-	 SwqRyVwYjCfrR2JmeFvO0vw49V2HyWGnc3sxp6tBYeQ08YJE0PqWgF9ji1MUFF9tgA
-	 l3vMzVN2pNCLUhLLraTFCEjiOf3tDhNYDIbLfrWv+KoApkd+mPw9b3PfLUWNYza6DC
-	 FMmzHGLdILrhg==
-Date: Sat, 3 May 2025 10:37:11 -0700
+	s=k20201202; t=1746297986;
+	bh=vcmcNB9M/mnVV0u1TxfACvPzuwlKwH4U0CbHSsTxvvI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=E/5UvviYXd4M/OBy3fCYKWszd1r5TVBDxzzXa7gIW6vO6mFVvSMi54bi4L3Uwhs1g
+	 PLzjB05PAVxHMjRVuzOHqmdYVq4m5w7qJrugDaGHCthgNxITLShvMcjsSNJrNG5tIn
+	 Tsvbg55gZqviiFr4CixWjxeEH65ktOuo79s19KniMgtvIG6c8rA5JDn6aFdQ4RACmX
+	 3hxFSp7SDdxrhq28NWPPIatdxubInTKge/hEATyNT0ghtVG173sO6TSKjDKuq+6SSa
+	 rfiX9QESpHzV8mIM/SdJ4UoN2CFpw5tA4fIHuzXcdey1KFJlUcwgkMHGYwmpzQ0fF7
+	 a21e4Ah5ghrUA==
 From: Kees Cook <kees@kernel.org>
 To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Nathan Chancellor <nathan@kernel.org>,
+Cc: Kees Cook <kees@kernel.org>,
 	Nicolas Schier <nicolas.schier@linux.dev>,
+	Nathan Chancellor <nathan@kernel.org>,
+	linux-hardening@vger.kernel.org,
+	linux-kbuild@vger.kernel.org,
 	Petr Pavlu <petr.pavlu@suse.com>,
 	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
 	Justin Stitt <justinstitt@google.com>,
 	Marco Elver <elver@google.com>,
 	Andrey Konovalov <andreyknvl@gmail.com>,
 	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
-	linux-kbuild@vger.kernel.org, kasan-dev@googlegroups.com,
-	linux-um@lists.infradead.org
-Subject: Re: [PATCH v2 0/3] Detect changed compiler dependencies for full
- rebuild
-Message-ID: <202505031028.7022F10061@keescook>
-References: <20250502224512.it.706-kees@kernel.org>
- <CAK7LNAQCZMmAGfPTr1kgp5cNSdnLWMU5kC_duU0WzWnwZrqt2A@mail.gmail.com>
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	linux-kernel@vger.kernel.org,
+	kasan-dev@googlegroups.com,
+	llvm@lists.linux.dev
+Subject: [PATCH v3 1/3] gcc-plugins: Force full rebuild when plugins change
+Date: Sat,  3 May 2025 11:46:18 -0700
+Message-Id: <20250503184623.2572355-1-kees@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250503184001.make.594-kees@kernel.org>
+References: <20250503184001.make.594-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4099; i=kees@kernel.org; h=from:subject; bh=vcmcNB9M/mnVV0u1TxfACvPzuwlKwH4U0CbHSsTxvvI=; b=owGbwMvMwCVmps19z/KJym7G02pJDBliyftYMz0PPeCzUN3AeedYZIn/ro+vFtTaZi1jryxji P75JD6uo5SFQYyLQVZMkSXIzj3OxeNte7j7XEWYOaxMIEMYuDgFYCI9nQx/eAXnbl5/btvnlRlX neQ7dc5/2MPWInTRLi1CKTM3dB1fOyPDsRulL/9NuPHAXNpf6bDhB6OrK7VcI7jMZ5xn+2H9ye0 kLwA=
+X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAK7LNAQCZMmAGfPTr1kgp5cNSdnLWMU5kC_duU0WzWnwZrqt2A@mail.gmail.com>
 
-On Sat, May 03, 2025 at 06:39:28PM +0900, Masahiro Yamada wrote:
-> On Sat, May 3, 2025 at 7:54 AM Kees Cook <kees@kernel.org> wrote:
-> >
-> >  v2:
-> >   - switch from -include to -I with a -D gated include compiler-version.h
-> >  v1: https://lore.kernel.org/lkml/20250501193839.work.525-kees@kernel.org/
-> 
-> 
-> What do you think of my patch as a prerequisite?
-> https://lore.kernel.org/linux-kbuild/20250503084145.1994176-1-masahiroy@kernel.org/T/#u
-> Perhaps, can you implement this series more simply?
-> 
-> My idea is to touch a single include/generated/global-rebuild.h
-> rather than multiple files such as gcc-plugins-deps.h, integer-wrap.h, etc.
-> 
-> When the file is touched, the entire kernel source tree will be rebuilt.
-> This may rebuild more than needed (e.g. vdso) but I do not think
-> it is a big deal.
+There was no dependency between the plugins changing and the rest of the
+kernel being built. This could cause strange behaviors as instrumentation
+could vary between targets depending on when they were built.
 
-This is roughly where I started when trying to implement this, but I
-didn't like the ergonomics of needing to scatter "touch" calls all over,
-which was especially difficult for targets that shared a build rule but
-may not all need to trigger a global rebuild. But what ultimately pushed
-me away from it was when I needed to notice if a non-built source file
-changed (the Clang .scl file), and I saw that I need to be dependency
-driven rather than target driven. (Though perhaps there is a way to
-address this with your global-rebuild.h?)
+Generate a new header file, gcc-plugins.h, any time the GCC plugins
+change. Include the header file in compiler-version.h when its associated
+feature name, GCC_PLUGINS, is defined. This will be picked up by fixdep
+and force rebuilds where needed.
 
-As far as doing a full rebuild, if it had been available last week, I
-probably would have used it, but now given the work that Nicolas, you,
-and I have put into this, we have a viable way (I think) to make this
-more specific. It does end up being a waste of time/resources to rebuild
-stuff that doesn't need to be (efi-stub, vdso, boot code, etc), and that
-does add up when I'm iterating on something that keeps triggering a full
-rebuild. We already have to do the argument filtering for targets that
-don't want randstruct, etc, so why not capitalize on that and make the
-rebuild avoid those files too?
+Add a generic "touch" kbuild command, which will be used again in
+a following patch. Add a "normalize_path" string helper to make the
+"TOUCH" output less ugly.
 
-So, I think the global-rebuild.h idea is a good one (though I think it
-should maybe be included in compiler-version.h just to avoid yet more
-compiler command line arguments), I'd really like to try to have the
-specific dependency-based way to get it done.
+Signed-off-by: Kees Cook <kees@kernel.org>
+---
+Cc: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Nicolas Schier <nicolas.schier@linux.dev>
+Cc: Nathan Chancellor <nathan@kernel.org>
+Cc: <linux-hardening@vger.kernel.org>
+Cc: <linux-kbuild@vger.kernel.org>
+---
+ include/linux/compiler-version.h |  4 ++++
+ scripts/Makefile.gcc-plugins     |  2 +-
+ scripts/Makefile.lib             | 18 ++++++++++++++++++
+ scripts/gcc-plugins/Makefile     |  4 ++++
+ 4 files changed, 27 insertions(+), 1 deletion(-)
 
-I'll send a v3, and see what you think?
-
--Kees
-
+diff --git a/include/linux/compiler-version.h b/include/linux/compiler-version.h
+index 573fa85b6c0c..74ea11563ce3 100644
+--- a/include/linux/compiler-version.h
++++ b/include/linux/compiler-version.h
+@@ -12,3 +12,7 @@
+  * and add dependency on include/config/CC_VERSION_TEXT, which is touched
+  * by Kconfig when the version string from the compiler changes.
+  */
++
++#ifdef GCC_PLUGINS
++#include <generated/gcc-plugins.h>
++#endif
+diff --git a/scripts/Makefile.gcc-plugins b/scripts/Makefile.gcc-plugins
+index 5b8a8378ca8a..e50dc931be49 100644
+--- a/scripts/Makefile.gcc-plugins
++++ b/scripts/Makefile.gcc-plugins
+@@ -38,7 +38,7 @@ export DISABLE_STACKLEAK_PLUGIN
+ 
+ # All the plugin CFLAGS are collected here in case a build target needs to
+ # filter them out of the KBUILD_CFLAGS.
+-GCC_PLUGINS_CFLAGS := $(strip $(addprefix -fplugin=$(objtree)/scripts/gcc-plugins/, $(gcc-plugin-y)) $(gcc-plugin-cflags-y))
++GCC_PLUGINS_CFLAGS := $(strip $(addprefix -fplugin=$(objtree)/scripts/gcc-plugins/, $(gcc-plugin-y)) $(gcc-plugin-cflags-y)) -DGCC_PLUGINS
+ export GCC_PLUGINS_CFLAGS
+ 
+ # Add the flags to the build!
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 2fe73cda0bdd..6fc2a82ee3bb 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -296,6 +296,19 @@ $(foreach m, $1, \
+ 	$(addprefix $(obj)/, $(call suffix-search, $(patsubst $(obj)/%,%,$m), $2, $3))))
+ endef
+ 
++# Remove ".." and "." from a path, without using "realpath"
++# Usage:
++#   $(call normalize_path,path/to/../file)
++define normalize_path
++$(strip $(eval elements :=) \
++$(foreach elem,$(subst /, ,$1), \
++	$(if $(filter-out .,$(elem)), \
++	     $(if $(filter ..,$(elem)), \
++		  $(eval elements := $(wordlist 2,$(words $(elements)),x $(elements))), \
++		  $(eval elements := $(elements) $(elem))))) \
++$(subst $(space),/,$(elements)))
++endef
++
+ # Build commands
+ # ===========================================================================
+ # These are shared by some Makefile.* files.
+@@ -343,6 +356,11 @@ quiet_cmd_copy = COPY    $@
+ $(obj)/%: $(src)/%_shipped
+ 	$(call cmd,copy)
+ 
++# Touch a file
++# ===========================================================================
++quiet_cmd_touch = TOUCH   $(call normalize_path,$@)
++      cmd_touch = touch $@
++
+ # Commands useful for building a boot image
+ # ===========================================================================
+ #
+diff --git a/scripts/gcc-plugins/Makefile b/scripts/gcc-plugins/Makefile
+index 320afd3cf8e8..05b14aba41ef 100644
+--- a/scripts/gcc-plugins/Makefile
++++ b/scripts/gcc-plugins/Makefile
+@@ -66,3 +66,7 @@ quiet_cmd_plugin_cxx_o_c = HOSTCXX $@
+ 
+ $(plugin-objs): $(obj)/%.o: $(src)/%.c FORCE
+ 	$(call if_changed_dep,plugin_cxx_o_c)
++
++$(obj)/../../include/generated/gcc-plugins.h: $(plugin-single) $(plugin-multi) FORCE
++	$(call if_changed,touch)
++always-y += ../../include/generated/gcc-plugins.h
 -- 
-Kees Cook
+2.34.1
+
