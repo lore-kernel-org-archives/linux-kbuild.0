@@ -1,92 +1,90 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC6CE2797B2;
-	Thu,  8 May 2025 16:31:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E3CF281526;
+	Thu,  8 May 2025 16:44:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746721903; cv=none; b=Qw13BUmuJII1HVSG0r8GOGSATUzK9TgNJt1OkQ8PYBiKheFVDESCGWoQuNvjkqpRfpved+Qg/1mBtjn4CDK145l7rD8imW8sVrHyrLCnxh+1SJWY8DC7dSBuP+eSd0jEZVG8WsE2GncQZPs+9v/xu5Zn8rCXIukwHBBAhD5Hwbw=
+	t=1746722670; cv=none; b=pgBVfsqSmREK1KPeYrXOf8kXieEY+38L0UvOT+L4255ndG1KH7Y1Tvac7u61VAMgSArumHArVP/R8WIQ7BxBO4ZB86Vk03dLnPcbrZ6vcslUcf3+iBHuSgW0dFrPrYSXJ/zrNPxVlL8sSWdUJ3YoG5zjUQrAdNQUN4x7eFMWEz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746721903; c=relaxed/simple;
-	bh=bFjZ5vtNT50m7HAL+XeHBlNBRjs7OdpfXvvzw+mNsfI=;
+	s=arc-20240116; t=1746722670; c=relaxed/simple;
+	bh=Yj5rWdXL1B0PS35xQgfhOTmqhutON1mnNoRGG+yajEM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UNAJacexWesRxshmU81tpwYZarw3o6K5vvlR1dFcoZGeOvtPoYxHNDO1vCt9bSfbwYZ3Xal0vRnCvJl0mKFs+WJZAmuF4+yyd32V6Ap11M/FNmekKvpLL0AibH0kZBKR3sIxc/MXYKcHh+JP4jbZnoJYKUEUzS1ckkVUutegnQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xwlh2Js0; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=OS1qnZBuQwMfAsLWHjrhpeTxA98SQnJdhikbVTJCF8cUvl8g4vYYBm0h/rlFEXrBfvEhqDhw21jW8TZY9L0yKQFvbO7ZRa6SIX1qHACqLBw/yuhbOuARK8AO8P4k+mn+pfYozP0WT9xmK27Y19GXlbTWW644dl1cLSiQt5Xs1es=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CAYzuZT/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xwlh2Js0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E370C4CEEB;
-	Thu,  8 May 2025 16:31:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CAYzuZT/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3728C4CEE7;
+	Thu,  8 May 2025 16:44:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746721903;
-	bh=bFjZ5vtNT50m7HAL+XeHBlNBRjs7OdpfXvvzw+mNsfI=;
+	s=k20201202; t=1746722669;
+	bh=Yj5rWdXL1B0PS35xQgfhOTmqhutON1mnNoRGG+yajEM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Xwlh2Js0zVWr0hxhx1Hy9J6IkZh5TR1CcsCMRtHjlUXJCsFBP0sA0vSvaLYdh8EMq
-	 yiHzEURcD+SwSk4/5o2T6pfl3KjUOGn1s6zeusAjOpvaRgt6/4QqkWJa2JJY6/9orZ
-	 UAZeQiVT5Jd+e3oDVS95XexvAklYgH+j4iY0/mdYxCJVZ4vBzk2APokycX800XqHTR
-	 WaKTue6cD47yVL6f4hoP0nMmY9a/9/Rp80TlARy4/Z91zVPrlfNdIN0wpE4qXhDsi7
-	 qhIk3XH9FkqJ85Hcg8FNFRmOp/RFGhVClIqjyb/53Sw//XHpX6d13u06ViIiaibqW0
-	 DF4atJ5Kn6FBw==
-Date: Thu, 8 May 2025 17:31:38 +0100
+	b=CAYzuZT/sMyR1TSxvGZS7X+IVCqH9v/k7ODamg/4LbWc4rX16tadh5AD+m1zqyVBq
+	 8NisPidG7OO9qhaYRxeBAB4MbYh0btpH8MMMjpZr4X2MTzG/tGqS5kVyL1vzbCgwYN
+	 Ta2gnEc35a4H6R90H/aBxsCaD3Pa4pxOcOaQgdakPXOoTvZ+xcXnmKPwx18gdM9lBR
+	 IaEeSUyKV9ziI6cZOXhQfWuMP10VQAD5PTA8Ay7fitXX2TPDQcW55pAt6Kb7zxxNmc
+	 a/sLHrbXqe+YTr6nUwpxJTjpcccLu1yBVLQcXGxMegNWlqQ0DEs2eSxRSo4RNkHNVb
+	 2t8lwOtHo9xCQ==
+Date: Thu, 8 May 2025 17:44:25 +0100
 From: Nathan Chancellor <nathan@kernel.org>
-To: WangYuli <wangyuli@uniontech.com>
-Cc: masahiroy@kernel.org, nicolas.schier@linux.dev,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	zhanjun@uniontech.com, niecheng1@uniontech.com,
-	guanwentao@uniontech.com
-Subject: Re: [PATCH] extrawarn: Use cc-disable-warning for
- shift-negative-value
-Message-ID: <20250508163138.GA834338@ax162>
-References: <70AA6123A55FEA70+20250507054705.1196184-1-wangyuli@uniontech.com>
+To: Lukas Bulwahn <lbulwahn@redhat.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Andrey Konovalov <andreyknvl@gmail.com>,
+	Arnd Bergmann <arnd@arndb.de>, linux-kbuild@vger.kernel.org,
+	kasan-dev@googlegroups.com, kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Lukas Bulwahn <lukas.bulwahn@redhat.com>
+Subject: Re: [PATCH] Makefile.kcov: apply needed compiler option
+ unconditionally in CFLAGS_KCOV
+Message-ID: <20250508164425.GD834338@ax162>
+References: <20250507133043.61905-1-lukas.bulwahn@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <70AA6123A55FEA70+20250507054705.1196184-1-wangyuli@uniontech.com>
+In-Reply-To: <20250507133043.61905-1-lukas.bulwahn@redhat.com>
 
-On Wed, May 07, 2025 at 01:47:05PM +0800, WangYuli wrote:
-> The -Wno-shift-negative-value option is not supported by GCC 5.4.0.
-
-The patch is fine (albeit slightly incomplete because other places add
-this unconditionally) but this is not going to matter soon because the
-minimum version of GCC is being bumped to 8.1:
-
-https://git.kernel.org/next/linux-next/c/118c40b7b50340bf7ff7e0adee8e3bab6e552c82
-
-Even though we claim to support GCC 5, I suspect that basically nobody
-uses it in practice since this flag was added by 1344794a59db2.
-
-> This could potentially result in extra warnings under certain
-> circumstances.
+On Wed, May 07, 2025 at 03:30:43PM +0200, Lukas Bulwahn wrote:
+> From: Lukas Bulwahn <lukas.bulwahn@redhat.com>
 > 
-> Utilize cc-disable-warning to prevent the following from occurring:
->   mm/vmscan.c: At top level:
->   cc1: error: unrecognized command line option ‘-Wno-shift-negative-value’ [-Werror]
->   cc1: all warnings being treated as errors
+> Commit 852faf805539 ("gcc-plugins: remove SANCOV gcc plugin") removes the
+> config CC_HAS_SANCOV_TRACE_PC, as all supported compilers include the
+> compiler option '-fsanitize-coverage=trace-pc' by now.
 > 
-> Link: https://lore.kernel.org/all/62726950F697595A+20250507040827.1147510-1-wangyuli@uniontech.com/
-> Signed-off-by: WangYuli <wangyuli@uniontech.com>
+> The commit however misses the important use of this config option in
+> Makefile.kcov to add '-fsanitize-coverage=trace-pc' to CFLAGS_KCOV.
+> Include the compiler option '-fsanitize-coverage=trace-pc' unconditionally
+> to CFLAGS_KCOV, as all compilers provide that option now.
+> 
+> Fixes: 852faf805539 ("gcc-plugins: remove SANCOV gcc plugin")
+> Signed-off-by: Lukas Bulwahn <lukas.bulwahn@redhat.com>
+
+Good catch.
+
+Reviewed-by: Nathan Chancellor <nathan@kernel.org>
+
 > ---
->  scripts/Makefile.extrawarn | 2 +-
+>  scripts/Makefile.kcov | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
-> index d88acdf40855..375475e7b3bd 100644
-> --- a/scripts/Makefile.extrawarn
-> +++ b/scripts/Makefile.extrawarn
-> @@ -158,7 +158,7 @@ else
->  # The following turn off the warnings enabled by -Wextra
->  KBUILD_CFLAGS += -Wno-missing-field-initializers
->  KBUILD_CFLAGS += -Wno-type-limits
-> -KBUILD_CFLAGS += -Wno-shift-negative-value
-> +KBUILD_CFLAGS += $(call cc-disable-warning, shift-negative-value)
+> diff --git a/scripts/Makefile.kcov b/scripts/Makefile.kcov
+> index 67de7942b3e7..01616472f43e 100644
+> --- a/scripts/Makefile.kcov
+> +++ b/scripts/Makefile.kcov
+> @@ -1,5 +1,5 @@
+>  # SPDX-License-Identifier: GPL-2.0-only
+> -kcov-flags-$(CONFIG_CC_HAS_SANCOV_TRACE_PC)	+= -fsanitize-coverage=trace-pc
+> +kcov-flags-y					+= -fsanitize-coverage=trace-pc
+>  kcov-flags-$(CONFIG_KCOV_ENABLE_COMPARISONS)	+= -fsanitize-coverage=trace-cmp
 >  
->  ifdef CONFIG_CC_IS_CLANG
->  KBUILD_CFLAGS += -Wno-enum-enum-conversion
+>  export CFLAGS_KCOV := $(kcov-flags-y)
 > -- 
 > 2.49.0
 > 
