@@ -1,52 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E95A22DA16;
-	Tue, 20 May 2025 13:33:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70A06242D63;
+	Tue, 20 May 2025 13:33:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747748003; cv=none; b=ZYVIuxUt2v09u5EUI9g3teJUtXvGpp12/XCOj552IixNGPzbWKJnTT44jOlGwj4Ul1t4+uVKCWwFj5gyfa3rTiZ4KO5Dwey5bXUD3HmqUgAPL+z1XTrkA13xzL/jvjv556dIP9wtC8MsQuyz/45PHOWGBx6Ow+JLk0SKR0CpiF8=
+	t=1747748003; cv=none; b=dZZgCSgBRj4USU90hBEKvmDn4KIw+sxdMNTJTbI2S1xWuS2J+M2kbT4CISOWgWjrCeK8pP5OJf7gB8Tq0oia8X1ti4m1tpr9Y2b8xqLZXe1ubgrFyEyFR3XaTt4ZXB7TCcjPYGQGl7TgNP+yT56vPkxmMX3HzaEZeb3KlHWVaY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1747748003; c=relaxed/simple;
-	bh=fEgVgn8ddmuG94XtJzRW64JNMVcuU+HToQCr20S4KM0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tt5DvPSUwM4FC/UgIwwC0Z2vsGBRSdgOdCrPajMvjP6SSo+KRFzynAHM9z1CMyj3SkdTcCwvzLYptF1UxV2FgB3kgubMGjcWUtHR+w73bXKg9eI3HlxeTpr/tIxCNcIPXiHJkzH7xfpjbLy88cCb7EmGRTLVEI6UFp0xSG0oAFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kKWJAaAo; arc=none smtp.client-ip=10.30.226.201
+	bh=rwZGlHunc9416As6oU5f4UP+1bKxmdgbimljbSoNk7Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=akOx0EeOpMsCtQRhWM6oDzKiETPrmfm5TZucNFfv5yg3nyBDsWpUKyn3cMHWT7GvLjivje1e94imM3hv6ocKON88pGuzKUgIOxok9nDTTeH4h0wCHfQwcoe3JLabrQ+3LI1xuvWLHQAfXZIRaWeDQ/zZ+y4+zxOI7nExdc3jrAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QpDW12As; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kKWJAaAo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7F2CC4CEE9;
-	Tue, 20 May 2025 13:33:22 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QpDW12As"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04225C4CEF5;
+	Tue, 20 May 2025 13:33:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747748002;
-	bh=fEgVgn8ddmuG94XtJzRW64JNMVcuU+HToQCr20S4KM0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kKWJAaAob7o5E4J6lRb1qIeP3I9g6Sq+eN3TEt43Kl8XAFUWF5BHA7P/3/7ooKv6V
-	 7uIv2FbP3lta2DxTC0Nn9w8MU4fPUTmuCQKITHBGp8QyNCYxsrIMMY84q3AHPjKAPq
-	 0wJxHffs/5Q6PWAqpFWNJhiPbWzhc6JDlwKQFd4+1nWiKsmKEmHG3qvlyJ1TQSvHsw
-	 J/SVzrFqf92+Yz6UYgU/7Clk7YsLTOV2e7XvSgD7kKa9QDIKVhpQZM6qZCSBmTxdLJ
-	 XreisQrHCDZpSeebobtLnYrEb1oJjGgHI+luXNc2w42DYxezlwt2vdlo11AxAr+6d5
-	 EOAFFdIIeK7Fg==
+	s=k20201202; t=1747748003;
+	bh=rwZGlHunc9416As6oU5f4UP+1bKxmdgbimljbSoNk7Q=;
+	h=From:To:Cc:Subject:Date:From;
+	b=QpDW12AslYoMpMkQg2P2S4svRuVTYYxh/BShLbYDUVCwJ5SjLapzO7XFsTQ8cLO3K
+	 MQUD0/tIj+MJNFVvJ4oUwJbUyxR0s3ts3BYXe7EWn/iRIOeyiE25Zkabv9hDGUQNfJ
+	 Xg/ceSUPYebUf9kSn+zS0l4Ldkzuo6ZwMwZtV3SWI2Batm0lLCxCXNi/vJRXSODNCk
+	 SdAHIHVsdXAes0jkMDtzD/ItIirEHbepTNfOL984zWxqKvUGTU2m9jyy8zCgVoqBwa
+	 DjH2azDf2eAOH9AcS3guaUIJBuHg547hNkl+NXtfthwQ28PRilOzjp15RZiKnN17mk
+	 Q217d+l1ZRTmQ==
 Received: from mchehab by mail.kernel.org with local (Exim 4.98.2)
 	(envelope-from <mchehab@kernel.org>)
-	id 1uHN5r-00000006n8U-1bhS;
+	id 1uHN5r-00000006n8I-1FOM;
 	Tue, 20 May 2025 15:33:19 +0200
 From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To: "Jonathan Corbet" <corbet@lwn.net>
 Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-	"Akira Yokosawa" <akiyks@gmail.com>,
-	"Andy Shevchenko" <andriy.shevchenko@linux.intel.com>,
-	"Nicolas Schier" <nicolas.schier@linux.dev>,
-	"Randy Dunlap" <rdunlap@infradead.org>,
-	"Stephen Rothwell" <sfr@canb.auug.org.au>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Akira Yokosawa <akiyks@gmail.com>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
 	linux-doc@vger.kernel.org,
 	linux-kbuild@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 4/4] MAINTAINERS: update linux-doc entry to cover new Python scripts
-Date: Tue, 20 May 2025 15:33:09 +0200
-Message-ID: <8eb4f06214e1eadc8aff43d7264814bf0264c80d.1747747695.git.mchehab+huawei@kernel.org>
+Subject: [PATCH 0/4] Some kernel-doc fixes
+Date: Tue, 20 May 2025 15:33:05 +0200
+Message-ID: <cover.1747747695.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.49.0
-In-Reply-To: <cover.1747747695.git.mchehab+huawei@kernel.org>
-References: <cover.1747747695.git.mchehab+huawei@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -56,30 +53,36 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: Mauro Carvalho Chehab <mchehab@kernel.org>
 
-Changes to ABI and kernel-doc need to be c/c linux-doc. Update
-the maintainer's entry to cover those files.
+Hi Jon,
 
-Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
----
- MAINTAINERS | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Let me consolidate some patches on a single PR to make life simpler
+for you. Those should address Stephen and Akira's concerns with
+regards to KernelDoc class usage via sphinx kerneldoc.py extension.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 20e07e61a148..a668808769b6 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -7173,7 +7173,10 @@ T:	git git://git.lwn.net/linux.git docs-next
- F:	Documentation/
- F:	scripts/check-variable-fonts.sh
- F:	scripts/documentation-file-ref-check
--F:	scripts/kernel-doc
-+F:	scripts/get_abi.py
-+F:	scripts/kernel-doc*
-+F	scripts/lib/abi/*
-+F	scripts/lib/kdoc/*
- F:	scripts/sphinx-pre-install
- X:	Documentation/ABI/
- X:	Documentation/admin-guide/media/
+Patch 1:	don't let Sphinx suppress errors/warnings;
+Patch 2:	fix a KeyError when trying to acess data from non-existing files;
+Patch 3:	add try/except blocks to avoid crashes when handling bad
+	kernel-doc markups;
+Patch 4:	makes Lore and kernel-doc ML receive patches related
+	to kernel-doc.py and get_abi.py.
+
+Patches 1 to 3 were already submitted on separate series. Patch 4 is new.
+
+Regards,
+Mauro
+
+Mauro Carvalho Chehab (4):
+  docs: kerneldoc.py: don't use Sphinx logger
+  scripts: kernel-doc: prevent a KeyError when checking output
+  docs: kerneldoc.py: add try/except blocks for kernel-doc class errors
+  MAINTAINERS: update linux-doc entry to cover new Python scripts
+
+ Documentation/sphinx/kerneldoc.py | 27 ++++++++++++++++++++++-----
+ MAINTAINERS                       |  5 ++++-
+ scripts/lib/kdoc/kdoc_files.py    |  4 ++++
+ 3 files changed, 30 insertions(+), 6 deletions(-)
+
 -- 
 2.49.0
+
 
