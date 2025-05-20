@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B60E22D794;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E95A22DA16;
 	Tue, 20 May 2025 13:33:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747748003; cv=none; b=NC1S/evKTTqkAW8wBxsHa6dnLCBzrKAcUg/d5qsJv9STFj7YmnqwdkOq8FEOvLb0eddgiDnX1rgb8GUfCJBLwuHFFHY8UmHzFuT3/sTId9CK0HPrViPuNXCX+afa8peFGvJdWZbtm7jNNpVpKFYnTvXFgNdcQ7ceiRKjOOsci00=
+	t=1747748003; cv=none; b=ZYVIuxUt2v09u5EUI9g3teJUtXvGpp12/XCOj552IixNGPzbWKJnTT44jOlGwj4Ul1t4+uVKCWwFj5gyfa3rTiZ4KO5Dwey5bXUD3HmqUgAPL+z1XTrkA13xzL/jvjv556dIP9wtC8MsQuyz/45PHOWGBx6Ow+JLk0SKR0CpiF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1747748003; c=relaxed/simple;
-	bh=4nApEr5ie+wHKfoUKfSRSdRlkw1Tcp1VpPHE1i2VbGw=;
+	bh=fEgVgn8ddmuG94XtJzRW64JNMVcuU+HToQCr20S4KM0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VxilFaRNJ4vbipLrLJUsXfPPpmKs15rXzE0u3hVqf3vv/Gk9fjdx4ld4w/paF4/66r6xZ261iTkmOI5+TNBjTB4v/0kSG29mpOJQhIWAuKK0JIm/0ohCxdfHJRVCu4XIfizjD4QR3n9OFC0kJ4FYlyfOd2Rtct84rBYBUZCL9F0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f2uKt0Tc; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=tt5DvPSUwM4FC/UgIwwC0Z2vsGBRSdgOdCrPajMvjP6SSo+KRFzynAHM9z1CMyj3SkdTcCwvzLYptF1UxV2FgB3kgubMGjcWUtHR+w73bXKg9eI3HlxeTpr/tIxCNcIPXiHJkzH7xfpjbLy88cCb7EmGRTLVEI6UFp0xSG0oAFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kKWJAaAo; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f2uKt0Tc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAF80C4AF09;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kKWJAaAo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7F2CC4CEE9;
 	Tue, 20 May 2025 13:33:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1747748002;
-	bh=4nApEr5ie+wHKfoUKfSRSdRlkw1Tcp1VpPHE1i2VbGw=;
+	bh=fEgVgn8ddmuG94XtJzRW64JNMVcuU+HToQCr20S4KM0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=f2uKt0Tc7HkAwBGRFz00KE+i3IjbxvdvWOPIMXUP1hRRDAndpRBQH2tDtPbpHEKpt
-	 9GbcInaMUzyWAp5LjqeslxYJe+cH40kt5GSmU1JyYXMD4Qu4q1Lkj3nTc84taNnGUk
-	 mvcOzTZEHniQgdEVB+a9IWKuR6kIQ5FHQGc0EETQ06VmmTetdxwNSfvzU6jPlJg4zH
-	 kGNxlC96yQ59nfw0BVqEf1WyJo1e8GMfFCFDtYoBR2gJGRWSy0/WN+7TyrzdYpcTmw
-	 I3QwJLQjeQtNqvMpo9mbnWAF01yVsgGc9SmWiDhT+oMIwRJvvmFcVAQtxroRvWM+P6
-	 1ymeH34K0dK4g==
+	b=kKWJAaAob7o5E4J6lRb1qIeP3I9g6Sq+eN3TEt43Kl8XAFUWF5BHA7P/3/7ooKv6V
+	 7uIv2FbP3lta2DxTC0Nn9w8MU4fPUTmuCQKITHBGp8QyNCYxsrIMMY84q3AHPjKAPq
+	 0wJxHffs/5Q6PWAqpFWNJhiPbWzhc6JDlwKQFd4+1nWiKsmKEmHG3qvlyJ1TQSvHsw
+	 J/SVzrFqf92+Yz6UYgU/7Clk7YsLTOV2e7XvSgD7kKa9QDIKVhpQZM6qZCSBmTxdLJ
+	 XreisQrHCDZpSeebobtLnYrEb1oJjGgHI+luXNc2w42DYxezlwt2vdlo11AxAr+6d5
+	 EOAFFdIIeK7Fg==
 Received: from mchehab by mail.kernel.org with local (Exim 4.98.2)
 	(envelope-from <mchehab@kernel.org>)
-	id 1uHN5r-00000006n8L-1LgH;
+	id 1uHN5r-00000006n8U-1bhS;
 	Tue, 20 May 2025 15:33:19 +0200
 From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To: "Jonathan Corbet" <corbet@lwn.net>
@@ -38,13 +38,12 @@ Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
 	"Nicolas Schier" <nicolas.schier@linux.dev>,
 	"Randy Dunlap" <rdunlap@infradead.org>,
 	"Stephen Rothwell" <sfr@canb.auug.org.au>,
-	Kees Cook <kees@kernel.org>,
 	linux-doc@vger.kernel.org,
 	linux-kbuild@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/4] docs: kerneldoc.py: don't use Sphinx logger
-Date: Tue, 20 May 2025 15:33:06 +0200
-Message-ID: <b5c5fa41278bc0317461a5074d5229883c5753ef.1747747695.git.mchehab+huawei@kernel.org>
+Subject: [PATCH 4/4] MAINTAINERS: update linux-doc entry to cover new Python scripts
+Date: Tue, 20 May 2025 15:33:09 +0200
+Message-ID: <8eb4f06214e1eadc8aff43d7264814bf0264c80d.1747747695.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <cover.1747747695.git.mchehab+huawei@kernel.org>
 References: <cover.1747747695.git.mchehab+huawei@kernel.org>
@@ -57,31 +56,30 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: Mauro Carvalho Chehab <mchehab@kernel.org>
 
-Unfortunately, currently Sphinx logger is suppressing too much, not
-allowing warnings to be displayed. Disable it.
+Changes to ABI and kernel-doc need to be c/c linux-doc. Update
+the maintainer's entry to cover those files.
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 ---
- Documentation/sphinx/kerneldoc.py | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ MAINTAINERS | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/sphinx/kerneldoc.py b/Documentation/sphinx/kerneldoc.py
-index b713a2c4a615..314479718a01 100644
---- a/Documentation/sphinx/kerneldoc.py
-+++ b/Documentation/sphinx/kerneldoc.py
-@@ -311,7 +311,11 @@ def setup_kfiles(app):
-     if kerneldoc_bin and kerneldoc_bin.endswith("kernel-doc.py"):
-         print("Using Python kernel-doc")
-         out_style = RestFormat()
--        kfiles = KernelFiles(out_style=out_style, logger=logger)
-+
-+        # Ideally, we should be using Sphinx logger here, but its filtering
-+        # rules ending filtering out warnings and errors. So, let's use
-+        # Python default logger instead.
-+        kfiles = KernelFiles(out_style=out_style)
-     else:
-         print(f"Using {kerneldoc_bin}")
- 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 20e07e61a148..a668808769b6 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -7173,7 +7173,10 @@ T:	git git://git.lwn.net/linux.git docs-next
+ F:	Documentation/
+ F:	scripts/check-variable-fonts.sh
+ F:	scripts/documentation-file-ref-check
+-F:	scripts/kernel-doc
++F:	scripts/get_abi.py
++F:	scripts/kernel-doc*
++F	scripts/lib/abi/*
++F	scripts/lib/kdoc/*
+ F:	scripts/sphinx-pre-install
+ X:	Documentation/ABI/
+ X:	Documentation/admin-guide/media/
 -- 
 2.49.0
 
