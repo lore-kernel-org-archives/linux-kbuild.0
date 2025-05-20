@@ -1,88 +1,96 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70A06242D63;
-	Tue, 20 May 2025 13:33:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B29922D787;
+	Tue, 20 May 2025 14:18:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747748003; cv=none; b=dZZgCSgBRj4USU90hBEKvmDn4KIw+sxdMNTJTbI2S1xWuS2J+M2kbT4CISOWgWjrCeK8pP5OJf7gB8Tq0oia8X1ti4m1tpr9Y2b8xqLZXe1ubgrFyEyFR3XaTt4ZXB7TCcjPYGQGl7TgNP+yT56vPkxmMX3HzaEZeb3KlHWVaY0=
+	t=1747750684; cv=none; b=JlV/cuHTYcJB85q5e6a0hMyLb9sJeGuAE4XwZXa9LKeDuxt6T/KLOe8/vGXgpAVLjwxM4cTOAichL/D9s+eWaV1xFzMLqEyhYWj1hOZZLzbxqOPUxQTk5kOgVfvdDryrLM2Qgxd0uwaBvtZZ6N5+EEOPRfQm2PvlsCssBzu3bcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747748003; c=relaxed/simple;
-	bh=rwZGlHunc9416As6oU5f4UP+1bKxmdgbimljbSoNk7Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=akOx0EeOpMsCtQRhWM6oDzKiETPrmfm5TZucNFfv5yg3nyBDsWpUKyn3cMHWT7GvLjivje1e94imM3hv6ocKON88pGuzKUgIOxok9nDTTeH4h0wCHfQwcoe3JLabrQ+3LI1xuvWLHQAfXZIRaWeDQ/zZ+y4+zxOI7nExdc3jrAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QpDW12As; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1747750684; c=relaxed/simple;
+	bh=eC9fXZcLgrkduXdrhf8gr0JxS85xyQcb+dyW51Km4ew=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uEXyMNaSjood0S+KWRenHgkjP8zEBjJO+X+GtB15kR2IjJ31DrXQQcQ2cZ+lpE6m/s76dkjhJrNJLFSIY+d2NFi06MVsX5eUypAKIjjMYvNdZNcKtgEFUKjPPGOPBKT8NIklFAjF7cofWdK41tDJ6ncguauK12q9IBjvQLfHNYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f5QbyuDy; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QpDW12As"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04225C4CEF5;
-	Tue, 20 May 2025 13:33:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747748003;
-	bh=rwZGlHunc9416As6oU5f4UP+1bKxmdgbimljbSoNk7Q=;
-	h=From:To:Cc:Subject:Date:From;
-	b=QpDW12AslYoMpMkQg2P2S4svRuVTYYxh/BShLbYDUVCwJ5SjLapzO7XFsTQ8cLO3K
-	 MQUD0/tIj+MJNFVvJ4oUwJbUyxR0s3ts3BYXe7EWn/iRIOeyiE25Zkabv9hDGUQNfJ
-	 Xg/ceSUPYebUf9kSn+zS0l4Ldkzuo6ZwMwZtV3SWI2Batm0lLCxCXNi/vJRXSODNCk
-	 SdAHIHVsdXAes0jkMDtzD/ItIirEHbepTNfOL984zWxqKvUGTU2m9jyy8zCgVoqBwa
-	 DjH2azDf2eAOH9AcS3guaUIJBuHg547hNkl+NXtfthwQ28PRilOzjp15RZiKnN17mk
-	 Q217d+l1ZRTmQ==
-Received: from mchehab by mail.kernel.org with local (Exim 4.98.2)
-	(envelope-from <mchehab@kernel.org>)
-	id 1uHN5r-00000006n8I-1FOM;
-	Tue, 20 May 2025 15:33:19 +0200
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: "Jonathan Corbet" <corbet@lwn.net>
-Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f5QbyuDy"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747750682; x=1779286682;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=eC9fXZcLgrkduXdrhf8gr0JxS85xyQcb+dyW51Km4ew=;
+  b=f5QbyuDyYOahC1fhG85f5GDegwaONo87Jz/0SRJ/s29uO8CNIJQuZbEC
+   hR23OQdA+ra7WbZ+lQHSzLvgqO7PGJT6vcayHIbcPJvbpovedIq6WtXNx
+   oUhm9t9iFu5AuHfAp6g+/garPQrjD2h8h/n9vWJrtMcoSQOwhUOQavfP5
+   1oshpaK1FiPx+EKzSdTOLZpcPjec6lKB81GWVcYCi9zYHLoZujD8aTzH3
+   VZwMp5phDpNd/tdULlLz9klHaID55ArVCS9sm2NQ7AT4SXcoXKGhd18G+
+   P1L9FppJJVLBlyQ2ZVVO4GSdq9VyuHIoHhzLArRDhzjjnlC1apJC4qg9Q
+   w==;
+X-CSE-ConnectionGUID: dVKkDzRyQvy7xu/jb8YyKA==
+X-CSE-MsgGUID: xYDeDGlsQcmOx2FmJ9Ox4w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11439"; a="49788758"
+X-IronPort-AV: E=Sophos;i="6.15,302,1739865600"; 
+   d="scan'208";a="49788758"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2025 07:18:01 -0700
+X-CSE-ConnectionGUID: ncukOrUSR32wBqUaLPb9+Q==
+X-CSE-MsgGUID: PdX/Vsv5RG2QWonmixk12Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,302,1739865600"; 
+   d="scan'208";a="140124486"
+Received: from smile.fi.intel.com ([10.237.72.52])
+  by fmviesa008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2025 07:17:59 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.98.2)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1uHNn2-00000003LPE-1FWt;
+	Tue, 20 May 2025 17:17:56 +0300
+Date: Tue, 20 May 2025 17:17:56 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc: Jonathan Corbet <corbet@lwn.net>,
 	Stephen Rothwell <sfr@canb.auug.org.au>,
 	Nicolas Schier <nicolas.schier@linux.dev>,
 	Akira Yokosawa <akiyks@gmail.com>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	linux-doc@vger.kernel.org,
-	linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 0/4] Some kernel-doc fixes
-Date: Tue, 20 May 2025 15:33:05 +0200
-Message-ID: <cover.1747747695.git.mchehab+huawei@kernel.org>
-X-Mailer: git-send-email 2.49.0
+	Randy Dunlap <rdunlap@infradead.org>, linux-doc@vger.kernel.org,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/4] Some kernel-doc fixes
+Message-ID: <aCyPFAKhSQIFR_lJ@smile.fi.intel.com>
+References: <cover.1747747695.git.mchehab+huawei@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: Mauro Carvalho Chehab <mchehab@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1747747695.git.mchehab+huawei@kernel.org>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-Hi Jon,
+On Tue, May 20, 2025 at 03:33:05PM +0200, Mauro Carvalho Chehab wrote:
+> Hi Jon,
+> 
+> Let me consolidate some patches on a single PR to make life simpler
+> for you. Those should address Stephen and Akira's concerns with
+> regards to KernelDoc class usage via sphinx kerneldoc.py extension.
+> 
+> Patch 1:	don't let Sphinx suppress errors/warnings;
+> Patch 2:	fix a KeyError when trying to acess data from non-existing files;
+> Patch 3:	add try/except blocks to avoid crashes when handling bad
+> 	kernel-doc markups;
+> Patch 4:	makes Lore and kernel-doc ML receive patches related
+> 	to kernel-doc.py and get_abi.py.
+> 
+> Patches 1 to 3 were already submitted on separate series. Patch 4 is new.
 
-Let me consolidate some patches on a single PR to make life simpler
-for you. Those should address Stephen and Akira's concerns with
-regards to KernelDoc class usage via sphinx kerneldoc.py extension.
-
-Patch 1:	don't let Sphinx suppress errors/warnings;
-Patch 2:	fix a KeyError when trying to acess data from non-existing files;
-Patch 3:	add try/except blocks to avoid crashes when handling bad
-	kernel-doc markups;
-Patch 4:	makes Lore and kernel-doc ML receive patches related
-	to kernel-doc.py and get_abi.py.
-
-Patches 1 to 3 were already submitted on separate series. Patch 4 is new.
-
-Regards,
-Mauro
-
-Mauro Carvalho Chehab (4):
-  docs: kerneldoc.py: don't use Sphinx logger
-  scripts: kernel-doc: prevent a KeyError when checking output
-  docs: kerneldoc.py: add try/except blocks for kernel-doc class errors
-  MAINTAINERS: update linux-doc entry to cover new Python scripts
-
- Documentation/sphinx/kerneldoc.py | 27 ++++++++++++++++++++++-----
- MAINTAINERS                       |  5 ++++-
- scripts/lib/kdoc/kdoc_files.py    |  4 ++++
- 3 files changed, 30 insertions(+), 6 deletions(-)
+Can we actually utilise CONFIG_WERROR to fail the build. If yes, the build will
+be failed. This is in align with the warnings in the C code.
 
 -- 
-2.49.0
+With Best Regards,
+Andy Shevchenko
 
 
