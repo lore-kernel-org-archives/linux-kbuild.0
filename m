@@ -1,451 +1,158 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C28312798E1;
-	Wed,  2 Jul 2025 13:19:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C1532D3A72;
+	Wed,  2 Jul 2025 13:24:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751462392; cv=none; b=fkJKdyTKhtCPQPKLyD6xrtEOLKoX8aGjzE/4IQSM748mjjyn+CVGKcYWjr5vediqD3cmnBifHpleTQF2yOBtOzPLHxzIhw78q4MX37ve7Ykp17sMLDgqRZ6E/JzEx7fe+dksQGrFNiy9aUker8GVE9ab52zDo5bGamsbZTyamtI=
+	t=1751462642; cv=none; b=Ap38AswWC4twPBdmIL6z+L/OOMQKUZl7AxC1RkOibAs2sro3P1pJ4ypi6b5fchi+hyzjSec4NZuaGN2qDppc6w6fDiL+rW+3bdpTAXqa6KN337kzzt0pv7n5SxIslL9hY6ZwC+ZjNLZUhUotVNyCQHXsVDFMQGOcaz1zk5cSVcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751462392; c=relaxed/simple;
-	bh=S/JJdI/wj8kpTOdAlnf1mLcjQ66qFgptedQaa2V5SzM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=SXQBRbzWEHifpFrBdKZ6i4Ra190W7nSlr/7H4+ZK3i2P5bqe3HTBYswVThhTBITygdMBOh4gCC1GwY+xpImVo0uuW613rghPVDL9JGLmdImmthTp5NBxjs6ZDSHvhVHMTBr5x+f909SuOIAjVDVuUeWxPZbtDot8f0MaZQ5E2gU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IZgzWGGi; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751462642; c=relaxed/simple;
+	bh=uBfXUdrW1hpLXfIR0aGIbcnqYvtXDq4jqr7rWsFf3uU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iRWYfly+G3anljJw5RmdljPpIQE2NnmrKIXq6uaAUrLAHhdmEmClClPIDA4h3bYV4Erbh3SezLEsJY+3MHXpfbL0r89npI5E/haHZJKT4lllyksLouc0bG/8t2tty1wN6WgS1PviNUDiR/f3UHZy+yxbzz7+/Kaq432VKfAnMdA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P/hgumhc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IZgzWGGi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F5A1C4CEED;
-	Wed,  2 Jul 2025 13:19:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P/hgumhc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91718C4CEEF;
+	Wed,  2 Jul 2025 13:24:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751462392;
-	bh=S/JJdI/wj8kpTOdAlnf1mLcjQ66qFgptedQaa2V5SzM=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=IZgzWGGi2dxQSMqZJhmpmwZsmnpLY/k1RRKrY7Yw+mn9F2OFC73B9T7s8x3Y4Lrj0
-	 FfA5ImoQMFkUaP9LyqjX8YS3N/zvjipCZRjroL65Riju+EmAbKIKii/lpRqhaiNTzO
-	 YQVAxNXvJ3dxT2JbQIkVbT0lZNceSUHd8wvi5GEVLbZj5ZCtO+UPpjfLPyfQVrEets
-	 Y67AA9+RBTEneU4j57aIJAZau3I0cCiTyLFIqlMrjGTHLu/1MXhrqtWfypz2BNGaZ4
-	 lQBLuoo53RYdidm9j9VdYjZ5mUDaF3pwj1kRv2FDZGzzc75QRgdPFTpOVWkFKjVJWO
-	 RQyzRAww9ubRA==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Wed, 02 Jul 2025 15:18:37 +0200
-Subject: [PATCH v14 5/7] rust: module: update the module macro with module
- parameter support
+	s=k20201202; t=1751462641;
+	bh=uBfXUdrW1hpLXfIR0aGIbcnqYvtXDq4jqr7rWsFf3uU=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=P/hgumhczY8JSRsinu/UpSDiGLSetO4Dh1X7AjAFnDrh3bMPOdmG1XhUKF/klP2BV
+	 XLDIB2giBjsWtWftprXQv3W+6y48t/5SpXAE/v8o9/9Vn3/tNE4TeV6aolSXkMXUVr
+	 /e5C9qpFGxRq8+JIAG9t0m1b0lF8meEOeqwH3Rsy+M8j6gPgm0rx3tPAzDv+2xlBp/
+	 n0Hwj8lZupl2HlVdt6yQ9sEnVjjqlfSJkO6M8fJD1p0noV4tMzmRqih8ZIrbrfq00D
+	 sDBg0TpXpsiz0ZJrOQM8b291iVzVwG7a1yjztWkPiD5avlqUAaDUj386R2SgMzsD2S
+	 +4ZBLQfLqK9wg==
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-553b165c80cso6965070e87.2;
+        Wed, 02 Jul 2025 06:24:01 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCU0i5mkKzyR3kCTNzmV3Fa+ir07xOy/CrElKPPcdw+V/bm8o6oKeCwBotlHsYl5OpF8QjErK0zgotBcO+0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkiBwp6xWSBt5K49ajEP1w8Oly4Mbpas7urlnQPhlo1AgoC6/V
+	lMNoGTKU5OTbSPgRdBGnIzsvxGGQv72Ld6Mr1S/c3n3i6o94mZSO2blDxk0eVxwM/DXEiVpSwX4
+	6CKlfbhFO7AWXl4BUtuiVJZhXAGZI5xs=
+X-Google-Smtp-Source: AGHT+IFIX0rmQ5HWhDN0BrvcL+9eGDrmWk2w0n/Dk9eX8N0TAUG2zzcj1oGi74PmAdl+FneDvoXFX/9Zcp3PGzPoQHY=
+X-Received: by 2002:a05:6512:3ba7:b0:553:5135:69fb with SMTP id
+ 2adb3069b0e04-5562829dd0dmr1116168e87.10.1751462640111; Wed, 02 Jul 2025
+ 06:24:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250702-module-params-v3-v14-5-5b1cc32311af@kernel.org>
-References: <20250702-module-params-v3-v14-0-5b1cc32311af@kernel.org>
-In-Reply-To: <20250702-module-params-v3-v14-0-5b1cc32311af@kernel.org>
-To: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
- Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
- Alice Ryhl <aliceryhl@google.com>, Masahiro Yamada <masahiroy@kernel.org>, 
- Nathan Chancellor <nathan@kernel.org>, Luis Chamberlain <mcgrof@kernel.org>, 
- Danilo Krummrich <dakr@kernel.org>, Benno Lossin <lossin@kernel.org>, 
- Benno Lossin <lossin@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>
-Cc: Trevor Gross <tmgross@umich.edu>, 
- Adam Bratschi-Kaye <ark.email@gmail.com>, rust-for-linux@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
- Petr Pavlu <petr.pavlu@suse.com>, Sami Tolvanen <samitolvanen@google.com>, 
- Daniel Gomez <da.gomez@samsung.com>, Simona Vetter <simona.vetter@ffwll.ch>, 
- Greg KH <gregkh@linuxfoundation.org>, Fiona Behrens <me@kloenk.dev>, 
- Daniel Almeida <daniel.almeida@collabora.com>, 
- linux-modules@vger.kernel.org, Andreas Hindborg <a.hindborg@kernel.org>
-X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=13415;
- i=a.hindborg@kernel.org; h=from:subject:message-id;
- bh=S/JJdI/wj8kpTOdAlnf1mLcjQ66qFgptedQaa2V5SzM=;
- b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBoZTG2SGk38fuu6/kZ1wrzPLTn9Hzk+W+EqeBcX
- IUcOyXuX8WJAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaGUxtgAKCRDhuBo+eShj
- d+ObD/9DBhxQ+JDEcSTSfS2koQXQgStBAvO4Nib2Qt4CtkBatLKs4NnDXlx2ng6FRLEcvuIyZLq
- aDKBrGN5rs/UmytDYqXazVcaTOJl5YYrAV4HdEarTHuSFAkpHlZPXhfmvh0e4niNItj6Xc4DZcu
- i/NdtzU+nKyzI7xXHB5k1lKJhhYKrN5hbghNBVgAX1JyZke/nPWESL4wzwCL1dgqNgPAmipIIZu
- yCaXDls7fA/xGXpolwDnsmBXTSNRh7SJcOXFnBKcqrjwmzQcyy3n5PUfuorxPMFXA9Ex3/zWZpB
- n5P83BLXcPXa1+zKwtVLbV1fr2E50H63hvATSSoJa0vY+6w1i23+var5cTdFqR+qcfovbzbOW2r
- rLx0SqYniOI/zCmXWg5qPpxJ+B8Qq0mf2BL6rITmLkxi5R3tS6d0zs7IRjDaKGFeavOojrBeATt
- /tqpjyPOwJ8r75JrFxl9tkVgNr7g3Vopp4YXpRQA8SXdSHtnO/Fn2Tkz7HbQgh7OJaclfiG4+34
- w8wAeYvXesofyW9VFD5DFvw9L7uoxFNmb0ucDlVJp9duXcGACyPLtvsdTmhEW/XVb9fIopm47vA
- T09HoWQ/60bVvqdcKrxWV3K7ohQb07uEsgZMHRgO1/Whzjf2q49v/00/FFEVRo9YLMZWbxVnSNs
- ffV82UudqCgyxjw==
-X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
- fpr=3108C10F46872E248D1FB221376EB100563EF7A7
+References: <20250624150645.1107002-1-masahiroy@kernel.org>
+ <20250624150645.1107002-2-masahiroy@kernel.org> <85d530f3-0c27-48e0-b09b-470c16e08004@infradead.org>
+In-Reply-To: <85d530f3-0c27-48e0-b09b-470c16e08004@infradead.org>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Wed, 2 Jul 2025 22:23:22 +0900
+X-Gmail-Original-Message-ID: <CAK7LNASsM-1Gsw85=G3KU7x6hBAmBSn4vSHcMdoEVaaFymVeyw@mail.gmail.com>
+X-Gm-Features: Ac12FXzrKh4zkjLBrJ0X7vhr05oe2kWgBXv3rKEbcuBp8YR-b8kGZJwbrI3_qVw
+Message-ID: <CAK7LNASsM-1Gsw85=G3KU7x6hBAmBSn4vSHcMdoEVaaFymVeyw@mail.gmail.com>
+Subject: Re: [PATCH 01/66] kconfig: set MENU_CHANGED to choice when the
+ selected member is changed
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Allow module parameters to be declared in the rust `module!` macro.
+On Mon, Jun 30, 2025 at 3:34=E2=80=AFPM Randy Dunlap <rdunlap@infradead.org=
+> wrote:
+>
+>
+>
+> On 6/24/25 8:04 AM, Masahiro Yamada wrote:
+> > In gconf, choice entries display the selected symbol in the 'Value'
+> > column, but it is not updated when the selected symbol is changed.
+> >
+> > Set the MENU_CHANGED flag, so it is updated.
+> >
+> > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+>
+> Probably not related to this change (AFAICT), but I was trying to
+> reproduce this problem and I cannot do it.
 
-Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
----
- rust/macros/helpers.rs |  25 +++++++
- rust/macros/lib.rs     |  31 +++++++++
- rust/macros/module.rs  | 177 ++++++++++++++++++++++++++++++++++++++++++++++---
- 3 files changed, 223 insertions(+), 10 deletions(-)
+You can try this simple test code.
 
-diff --git a/rust/macros/helpers.rs b/rust/macros/helpers.rs
-index e2602be402c1..365d7eb499c0 100644
---- a/rust/macros/helpers.rs
-+++ b/rust/macros/helpers.rs
-@@ -10,6 +10,17 @@ pub(crate) fn try_ident(it: &mut token_stream::IntoIter) -> Option<String> {
-     }
- }
- 
-+pub(crate) fn try_sign(it: &mut token_stream::IntoIter) -> Option<char> {
-+    let peek = it.clone().next();
-+    match peek {
-+        Some(TokenTree::Punct(punct)) if punct.as_char() == '-' => {
-+            let _ = it.next();
-+            Some(punct.as_char())
-+        }
-+        _ => None,
-+    }
-+}
-+
- pub(crate) fn try_literal(it: &mut token_stream::IntoIter) -> Option<String> {
-     if let Some(TokenTree::Literal(literal)) = it.next() {
-         Some(literal.to_string())
-@@ -103,3 +114,17 @@ pub(crate) fn file() -> String {
-         proc_macro::Span::call_site().file()
-     }
- }
-+
-+/// Parse a token stream of the form `expected_name: "value",` and return the
-+/// string in the position of "value".
-+///
-+/// # Panics
-+///
-+/// - On parse error.
-+pub(crate) fn expect_string_field(it: &mut token_stream::IntoIter, expected_name: &str) -> String {
-+    assert_eq!(expect_ident(it), expected_name);
-+    assert_eq!(expect_punct(it), ':');
-+    let string = expect_string(it);
-+    assert_eq!(expect_punct(it), ',');
-+    string
-+}
-diff --git a/rust/macros/lib.rs b/rust/macros/lib.rs
-index fa847cf3a9b5..2fb520dc930a 100644
---- a/rust/macros/lib.rs
-+++ b/rust/macros/lib.rs
-@@ -28,6 +28,30 @@
- /// The `type` argument should be a type which implements the [`Module`]
- /// trait. Also accepts various forms of kernel metadata.
- ///
-+/// The `params` field describe module parameters. Each entry has the form
-+///
-+/// ```ignore
-+/// parameter_name: type {
-+///     default: default_value,
-+///     description: "Description",
-+/// }
-+/// ```
-+///
-+/// `type` may be one of
-+///
-+/// - [`i8`]
-+/// - [`u8`]
-+/// - [`i8`]
-+/// - [`u8`]
-+/// - [`i16`]
-+/// - [`u16`]
-+/// - [`i32`]
-+/// - [`u32`]
-+/// - [`i64`]
-+/// - [`u64`]
-+/// - [`isize`]
-+/// - [`usize`]
-+///
- /// C header: [`include/linux/moduleparam.h`](srctree/include/linux/moduleparam.h)
- ///
- /// [`Module`]: ../kernel/trait.Module.html
-@@ -44,6 +68,12 @@
- ///     description: "My very own kernel module!",
- ///     license: "GPL",
- ///     alias: ["alternate_module_name"],
-+///     params: {
-+///         my_parameter: i64 {
-+///             default: 1,
-+///             description: "This parameter has a default of 1",
-+///         },
-+///     },
- /// }
- ///
- /// struct MyModule(i32);
-@@ -52,6 +82,7 @@
- ///     fn init(_module: &'static ThisModule) -> Result<Self> {
- ///         let foo: i32 = 42;
- ///         pr_info!("I contain:  {}\n", foo);
-+///         pr_info!("i32 param is:  {}\n", module_parameters::my_parameter.read());
- ///         Ok(Self(foo))
- ///     }
- /// }
-diff --git a/rust/macros/module.rs b/rust/macros/module.rs
-index 1a867a1e787e..2b8123fe9fb0 100644
---- a/rust/macros/module.rs
-+++ b/rust/macros/module.rs
-@@ -26,6 +26,7 @@ struct ModInfoBuilder<'a> {
-     module: &'a str,
-     counter: usize,
-     buffer: String,
-+    param_buffer: String,
- }
- 
- impl<'a> ModInfoBuilder<'a> {
-@@ -34,10 +35,11 @@ fn new(module: &'a str) -> Self {
-             module,
-             counter: 0,
-             buffer: String::new(),
-+            param_buffer: String::new(),
-         }
-     }
- 
--    fn emit_base(&mut self, field: &str, content: &str, builtin: bool) {
-+    fn emit_base(&mut self, field: &str, content: &str, builtin: bool, param: bool) {
-         let string = if builtin {
-             // Built-in modules prefix their modinfo strings by `module.`.
-             format!(
-@@ -51,8 +53,14 @@ fn emit_base(&mut self, field: &str, content: &str, builtin: bool) {
-             format!("{field}={content}\0")
-         };
- 
-+        let buffer = if param {
-+            &mut self.param_buffer
-+        } else {
-+            &mut self.buffer
-+        };
-+
-         write!(
--            &mut self.buffer,
-+            buffer,
-             "
-                 {cfg}
-                 #[doc(hidden)]
-@@ -75,20 +83,118 @@ fn emit_base(&mut self, field: &str, content: &str, builtin: bool) {
-         self.counter += 1;
-     }
- 
--    fn emit_only_builtin(&mut self, field: &str, content: &str) {
--        self.emit_base(field, content, true)
-+    fn emit_only_builtin(&mut self, field: &str, content: &str, param: bool) {
-+        self.emit_base(field, content, true, param)
-     }
- 
--    fn emit_only_loadable(&mut self, field: &str, content: &str) {
--        self.emit_base(field, content, false)
-+    fn emit_only_loadable(&mut self, field: &str, content: &str, param: bool) {
-+        self.emit_base(field, content, false, param)
-     }
- 
-     fn emit(&mut self, field: &str, content: &str) {
--        self.emit_only_builtin(field, content);
--        self.emit_only_loadable(field, content);
-+        self.emit_internal(field, content, false);
-+    }
-+
-+    fn emit_internal(&mut self, field: &str, content: &str, param: bool) {
-+        self.emit_only_builtin(field, content, param);
-+        self.emit_only_loadable(field, content, param);
-+    }
-+
-+    fn emit_param(&mut self, field: &str, param: &str, content: &str) {
-+        let content = format!("{param}:{content}", param = param, content = content);
-+        self.emit_internal(field, &content, true);
-+    }
-+
-+    fn emit_params(&mut self, info: &ModuleInfo) {
-+        let Some(params) = &info.params else {
-+            return;
-+        };
-+
-+        for param in params {
-+            let ops = param_ops_path(&param.ptype);
-+
-+            // Note: The spelling of these fields is dictated by the user space
-+            // tool `modinfo`.
-+            self.emit_param("parmtype", &param.name, &param.ptype);
-+            self.emit_param("parm", &param.name, &param.description);
-+
-+            write!(
-+                self.param_buffer,
-+                "
-+                    pub(crate) static {param_name}:
-+                        ::kernel::module_param::ModuleParamAccess<{param_type}> =
-+                            ::kernel::module_param::ModuleParamAccess::new({param_default});
-+
-+                    #[link_section = \"__param\"]
-+                    #[used]
-+                    static __{module_name}_{param_name}_struct:
-+                        ::kernel::module_param::RacyKernelParam =
-+                        ::kernel::module_param::RacyKernelParam::new(
-+                          ::kernel::bindings::kernel_param {{
-+                            name: if cfg!(MODULE) {{
-+                                ::kernel::c_str!(\"{param_name}\").as_bytes_with_nul()
-+                            }} else {{
-+                                ::kernel::c_str!(\"{module_name}.{param_name}\").as_bytes_with_nul()
-+                            }}.as_ptr(),
-+                            // SAFETY: `__this_module` is constructed by the kernel at load time
-+                            // and will not be freed until the module is unloaded.
-+                            #[cfg(MODULE)]
-+                            mod_: unsafe {{
-+                                (&::kernel::bindings::__this_module
-+                                    as *const ::kernel::bindings::module)
-+                                    .cast_mut()
-+                            }},
-+                            #[cfg(not(MODULE))]
-+                            mod_: ::core::ptr::null_mut(),
-+                            ops: &{ops} as *const ::kernel::bindings::kernel_param_ops,
-+                            perm: 0, // Will not appear in sysfs
-+                            level: -1,
-+                            flags: 0,
-+                            __bindgen_anon_1:
-+                                ::kernel::bindings::kernel_param__bindgen_ty_1 {{
-+                                    arg: {param_name}.as_void_ptr()
-+                                }},
-+                          }}
-+                        );
-+                ",
-+                module_name = info.name,
-+                param_type = param.ptype,
-+                param_default = param.default,
-+                param_name = param.name,
-+                ops = ops,
-+            )
-+            .unwrap();
-+        }
-+    }
-+}
-+
-+fn param_ops_path(param_type: &str) -> &'static str {
-+    match param_type {
-+        "i8" => "::kernel::module_param::PARAM_OPS_I8",
-+        "u8" => "::kernel::module_param::PARAM_OPS_U8",
-+        "i16" => "::kernel::module_param::PARAM_OPS_I16",
-+        "u16" => "::kernel::module_param::PARAM_OPS_U16",
-+        "i32" => "::kernel::module_param::PARAM_OPS_I32",
-+        "u32" => "::kernel::module_param::PARAM_OPS_U32",
-+        "i64" => "::kernel::module_param::PARAM_OPS_I64",
-+        "u64" => "::kernel::module_param::PARAM_OPS_U64",
-+        "isize" => "::kernel::module_param::PARAM_OPS_ISIZE",
-+        "usize" => "::kernel::module_param::PARAM_OPS_USIZE",
-+        t => panic!("Unsupported parameter type {}", t),
-     }
- }
- 
-+fn expect_param_default(param_it: &mut token_stream::IntoIter) -> String {
-+    assert_eq!(expect_ident(param_it), "default");
-+    assert_eq!(expect_punct(param_it), ':');
-+    let sign = try_sign(param_it);
-+    let default = try_literal(param_it).expect("Expected default param value");
-+    assert_eq!(expect_punct(param_it), ',');
-+    let mut value = sign.map(String::from).unwrap_or_default();
-+    value.push_str(&default);
-+    value
-+}
-+
- #[derive(Debug, Default)]
- struct ModuleInfo {
-     type_: String,
-@@ -99,6 +205,50 @@ struct ModuleInfo {
-     description: Option<String>,
-     alias: Option<Vec<String>>,
-     firmware: Option<Vec<String>>,
-+    params: Option<Vec<Parameter>>,
-+}
-+
-+#[derive(Debug)]
-+struct Parameter {
-+    name: String,
-+    ptype: String,
-+    default: String,
-+    description: String,
-+}
-+
-+fn expect_params(it: &mut token_stream::IntoIter) -> Vec<Parameter> {
-+    let params = expect_group(it);
-+    assert_eq!(params.delimiter(), Delimiter::Brace);
-+    let mut it = params.stream().into_iter();
-+    let mut parsed = Vec::new();
-+
-+    loop {
-+        let param_name = match it.next() {
-+            Some(TokenTree::Ident(ident)) => ident.to_string(),
-+            Some(_) => panic!("Expected Ident or end"),
-+            None => break,
-+        };
-+
-+        assert_eq!(expect_punct(&mut it), ':');
-+        let param_type = expect_ident(&mut it);
-+        let group = expect_group(&mut it);
-+        assert_eq!(group.delimiter(), Delimiter::Brace);
-+        assert_eq!(expect_punct(&mut it), ',');
-+
-+        let mut param_it = group.stream().into_iter();
-+        let param_default = expect_param_default(&mut param_it);
-+        let param_description = expect_string_field(&mut param_it, "description");
-+        expect_end(&mut param_it);
-+
-+        parsed.push(Parameter {
-+            name: param_name,
-+            ptype: param_type,
-+            default: param_default,
-+            description: param_description,
-+        })
-+    }
-+
-+    parsed
- }
- 
- impl ModuleInfo {
-@@ -114,6 +264,7 @@ fn parse(it: &mut token_stream::IntoIter) -> Self {
-             "license",
-             "alias",
-             "firmware",
-+            "params",
-         ];
-         const REQUIRED_KEYS: &[&str] = &["type", "name", "license"];
-         let mut seen_keys = Vec::new();
-@@ -140,6 +291,7 @@ fn parse(it: &mut token_stream::IntoIter) -> Self {
-                 "license" => info.license = expect_string_ascii(it),
-                 "alias" => info.alias = Some(expect_string_array(it)),
-                 "firmware" => info.firmware = Some(expect_string_array(it)),
-+                "params" => info.params = Some(expect_params(it)),
-                 _ => panic!("Unknown key \"{key}\". Valid keys are: {EXPECTED_KEYS:?}."),
-             }
- 
-@@ -205,7 +357,9 @@ pub(crate) fn module(ts: TokenStream) -> TokenStream {
-     // Built-in modules also export the `file` modinfo string.
-     let file =
-         std::env::var("RUST_MODFILE").expect("Unable to fetch RUST_MODFILE environmental variable");
--    modinfo.emit_only_builtin("file", &file);
-+    modinfo.emit_only_builtin("file", &file, false);
-+
-+    modinfo.emit_params(&info);
- 
-     format!(
-         "
-@@ -369,15 +523,18 @@ unsafe fn __exit() {{
-                             __MOD.assume_init_drop();
-                         }}
-                     }}
--
-                     {modinfo}
-                 }}
-             }}
-+            mod module_parameters {{
-+                {params}
-+            }}
-         ",
-         type_ = info.type_,
-         name = info.name,
-         ident = ident,
-         modinfo = modinfo.buffer,
-+        params = modinfo.param_buffer,
-         initcall_section = ".initcall6.init"
-     )
-     .parse()
+choice
+        prompt "choose"
 
--- 
-2.47.2
+config A
+        bool "A"
+
+config B
+        bool "B"
+
+endchoice
+
+In Full mode, open the tree and double-clock the two
+radio buttons alternatively. (select A or B back-and-forth)
+In the main line code, the Value column of "choose" remains "B".
+
+After this commit, it starts to react to the change, but the fix is not per=
+fect.
+
+In the gconfig-v3 branch, this should work perfectly.
 
 
+
+
+> To enable an option (any options, choice or not), I have to double-click
+> on it or (sometimes, not for choice) I can use Y / N / M on the keyboard.
+> When I do either of those, the value (including a choice value) is change=
+d.
+>
+> I mention double-click only because the Help text (Information) says that
+> clicking will cycle thru Y/M/N.
+
+Presumably, this should be double-click in gconfig.
+(So, the help message should be fixed.)
+
+A single click in the "option" column is used for other functionality.
+(open/close the tree item in Split and Full views).
+
+
+
+>
+> The Information also says that "dot indicates that it is to be compiled a=
+s a module".
+> I see more of a Dash or Hyphen or just a horizontal bar.
+
+Right. The help message should be fixed.
+
+
+
+>
+> Thanks for reading...
+>
+> > ---
+> >
+> >  scripts/kconfig/symbol.c | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> >
+> > diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+> > index d57f8cbba291..26ab10c0fd76 100644
+> > --- a/scripts/kconfig/symbol.c
+> > +++ b/scripts/kconfig/symbol.c
+> > @@ -195,6 +195,10 @@ static void sym_set_changed(struct symbol *sym)
+> >
+> >       list_for_each_entry(menu, &sym->menus, link)
+> >               menu->flags |=3D MENU_CHANGED;
+> > +
+> > +     menu =3D sym_get_choice_menu(sym);
+> > +     if (menu)
+> > +             menu->flags |=3D MENU_CHANGED;
+> >  }
+> >
+> >  static void sym_set_all_changed(void)
+>
+> --
+> ~Randy
+>
+
+
+--
+Best Regards
+
+Masahiro Yamada
