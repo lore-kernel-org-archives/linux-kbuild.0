@@ -1,44 +1,52 @@
 Received: from mail.avm.de (mail.avm.de [212.42.244.120])
 	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3D502E7172;
-	Thu,  3 Jul 2025 13:45:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B50B2E9753;
+	Thu,  3 Jul 2025 14:00:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751550306; cv=none; b=oPG0/UCAZ52PJBjbO8OLnfnLwQUvZYLo8YG1L8aqkpuPa/7gqCcQG6Dc/J8wXidjVKUIORJKZ2kJy+nRBE6CqrcVxmrWK/C9+0gtIZ3+lJaQT33x7bo44jL6NuuwzQEmydn1lFAfi24JKyO1rs5XKJsMBQ8jJI8VsGZjk7u4dcw=
+	t=1751551218; cv=none; b=YpI0PSV4ddNZMer0U86wDL4NwJ1oepbckReyVK5XuJjY2vrE1LmPARE0lLmuOWqIC9oaA9yw685y4y9zldRoodgSnq+yIimRItHjRPqYkMd3lP6oCdTZHqh6DoNZhpI1dOoeeOhiuzRzGLeNtgQljFEuubmA1O+Vp3WuCtmpQaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751550306; c=relaxed/simple;
-	bh=jgRBUcYjsxcR6/WPVCigDDX1NPx00cIMSX/HK0xE4Q0=;
+	s=arc-20240116; t=1751551218; c=relaxed/simple;
+	bh=Q1zAbtzoHfc8f3iagLIrwIgcpj6jSRFJdUvSbwxZwpU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KeGWWIHwTdRdHZbfSddLFrw/ZFGJsOcjwz+CMAk3DgW5wHvTJgaANLOPmEMd3glgSatlKJdi7Sh9IbLugHrsVo+m/ScCyNC4ZrHyQ0Ctf6RT4JMzhqR7pPzAkKD00dtbBMigW3SS8KIl6bLnv3W89oJq4ZtMgvIAHH8+GpoImEc=
+	 Content-Type:Content-Disposition:In-Reply-To; b=QQi7Lmu6nNLSHnwa06D9s/6d9kb+o5YL1iw8Oot0cy5D1CWBBrWsHMO1ih+gELDRyzs/KAwdLCzW8CFkAvdK3NukzIShvvbJLpZjXNzwRLd64+z/EaCxRH4nvtqLC9wNJtobWQhSvhUebfU/NAVe+GhxJG+bBBRl9XYyEVCI7oo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=avm.de; arc=none smtp.client-ip=212.42.244.120
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=avm.de
-Received: from [212.42.244.71] (helo=mail.avm.de)
+Received: from [2001:bf0:244:244::71] (helo=mail.avm.de)
 	by mail.avm.de with ESMTP (eXpurgate 4.53.4)
 	(envelope-from <n.schier@avm.de>)
-	id 686687ab-037b-7f0000032729-7f0000018290-1
-	for <multiple-recipients>; Thu, 03 Jul 2025 15:37:47 +0200
-Received: from mail-auth.avm.de (dovecot-mx-01.avm.de [212.42.244.71])
+	id 68668ced-037b-7f0000032729-7f000001be6a-1
+	for <multiple-recipients>; Thu, 03 Jul 2025 16:00:13 +0200
+Received: from mail-auth.avm.de (dovecot-mx-01.avm.de [IPv6:2001:bf0:244:244::71])
 	by mail.avm.de (Postfix) with ESMTPS;
-	Thu,  3 Jul 2025 15:37:47 +0200 (CEST)
+	Thu,  3 Jul 2025 16:00:13 +0200 (CEST)
 Received: from buildd.core.avm.de (buildd-sv-01.avm.de [172.16.0.225])
-	by mail-auth.avm.de (Postfix) with ESMTPA id 0B39D80725;
-	Thu,  3 Jul 2025 15:37:48 +0200 (CEST)
+	by mail-auth.avm.de (Postfix) with ESMTPA id 66FD880759;
+	Thu,  3 Jul 2025 16:00:13 +0200 (CEST)
 Received: from l-nschier-aarch64.ads.avm.de (unknown [IPv6:fde4:4c1b:acd5:6472::1])
-	by buildd.core.avm.de (Postfix) with ESMTPS id 943FC189EB3;
-	Thu,  3 Jul 2025 15:37:47 +0200 (CEST)
-Date: Thu, 3 Jul 2025 15:37:38 +0200
+	by buildd.core.avm.de (Postfix) with ESMTPS id 1F287180C1B;
+	Thu,  3 Jul 2025 16:00:13 +0200 (CEST)
+Date: Thu, 3 Jul 2025 16:00:12 +0200
 From: Nicolas Schier <nicolas.schier@linux.dev>
-To: Bhaskar Chowdhury <unixbhaskar@gmail.com>
-Cc: masahiroy@kernel.org, nathan@kernel.org, linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: Building Debian from source spit out some warnings...please shed
- some light
-Message-ID: <20250703-quick-celadon-horse-afb4de@l-nschier-aarch64>
-References: <aF8f_3xbnXy4Vibi@debian>
- <20250703-offbeat-hound-of-tenacity-ceb047@l-nschier-aarch64>
- <aGZ3QH3hbpQVjUup@debian>
+To: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+Cc: Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>, Willy Tarreau <w@1wt.eu>,
+	Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+	Brendan Higgins <brendan.higgins@linux.dev>,
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
+	Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com,
+	linux-doc@vger.kernel.org, workflows@vger.kernel.org
+Subject: Re: [PATCH v4 02/15] kbuild: userprogs: also inherit byte order and
+ ABI from kernel
+Message-ID: <20250703-angelfish-of-premium-abracadabra-5bd2cb@l-nschier-aarch64>
+References: <20250626-kunit-kselftests-v4-0-48760534fef5@linutronix.de>
+ <20250626-kunit-kselftests-v4-2-48760534fef5@linutronix.de>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -46,82 +54,54 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="5UCpY6LUHqxL5aTa"
+	protocol="application/pgp-signature"; boundary="7/fbDo5/u/ed+dJg"
 Content-Disposition: inline
-In-Reply-To: <aGZ3QH3hbpQVjUup@debian>
+In-Reply-To: <20250626-kunit-kselftests-v4-2-48760534fef5@linutronix.de>
 Organization: AVM GmbH
-X-purgate-ID: 149429::1751549867-88FA7EE7-E28F7686/0/0
+X-purgate-ID: 149429::1751551213-AF7F4EE7-FA58F633/0/0
 X-purgate-type: clean
-X-purgate-size: 2538
+X-purgate-size: 1624
 X-purgate-Ad: Categorized by eleven eXpurgate (R) https://www.eleven.de
 X-purgate: This mail is considered clean (visit https://www.eleven.de for further information)
 X-purgate: clean
 
 
---5UCpY6LUHqxL5aTa
+--7/fbDo5/u/ed+dJg
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 03, 2025 at 05:57:44PM +0530, Bhaskar Chowdhury wrote:
-> On 12:53 Thu 03 Jul 2025, Nicolas Schier wrote:
-> > On Sat, Jun 28, 2025 at 04:19:35AM +0530, Bhaskar Chowdhury wrote:
-> > >=20
-> > > Alright, I was doing customary kernel building via upstream source an=
-d come
-> > > across these warnings .....
-> > >=20
-> > > dpkg-genbuildinfo --build=3Dfull -O../linux-upstream_6.15.4-00002-g48=
-44502d6635-1_amd64.buildinfo
-> > >  dpkg-genchanges --build=3Dfull -O../linux-upstream_6.15.4-00002-g484=
-4502d6635-1_amd64.changes
-> > > using Dpkg::Control::Fields::field_transfer_single() with an an impli=
-cit field argument is deprecated at /usr/bin/dpkg-genchanges line 245.
-> > > using Dpkg::Control::Fields::field_transfer_single() with an an impli=
-cit field argument is deprecated at /usr/bin/dpkg-genchanges line 245.
-> > [...]
-[...]
-
-> > Which version of dpkg-dev do you have installed on your system?
+On Thu, Jun 26, 2025 at 08:10:10AM +0200, Thomas Wei=C3=9Fschuh wrote:
+> Make sure the byte order and ABI of the userprogs matches the one of the
+> kernel, similar to how the bit size is handled.
+> Otherwise the userprogs may not be executable.
+> This happens for example on powerpc little endian, or riscv32.
 >=20
-> FYI
->=20
-> bhaskar_17:55:19_Thu Jul 03: :~>dpkg-query --status dpkg-dev
-> Package: dpkg-dev
-> Status: install ok installed
-> Priority: optional
-> Section: utils
-> Installed-Size: 1728
-> Maintainer: Dpkg Developers <debian-dpkg@lists.debian.org>
-> Architecture: all
-> Multi-Arch: foreign
-> Source: dpkg
-> Version: 1.21.22
+> Signed-off-by: Thomas Wei=C3=9Fschuh <thomas.weissschuh@linutronix.de>
+> ---
+>  Makefile | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-hm.  My bookworm chroot has dpkg-dev=3D1.22.5~bpo12+1, but even if I=20
-downgrade to 1.21.22 I cannot see the messages you reported.
+Reviewed-by: Nicolas Schier <n.schier@avm.de>
 
-Kind regards,
-Nicolas
-
---5UCpY6LUHqxL5aTa
+--7/fbDo5/u/ed+dJg
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCAAdFiEEDv+Fiet06YHnC6RpiMa8nIiabbgFAmhmh5sACgkQiMa8nIia
-bbhvaQ/9E00GM/KWqG5fYBWYQF2AhOzebuLH8qJok8ORFmk8RjEZGsUuk+0FLSdP
-O6AstdZaUw05WCGStxOjPAuOuiYSf2qAGMeMK+vDFTMMh7KjH+GWbXJvDoCV3QV1
-DwnE4U/ZfPEaycT8AH5HltHTEcwMt/Ac8qluXQ4XpqysPhtCEEuds+xSgbNlqbg3
-MCB9dnJF/IFZDaKLnx62pE/3nmWqP/R1w+ydW7BVVYOrULdKGWB66RCQZ++8qYMR
-5fxkWU3nACyQOJDqX2pDPHnG+T4v/owUpBpvchFUHs+J/10XmtHH4vtT50iDn2Ps
-MKvUvUx9zGJGTpaPZh2nVjrTr9bAID4XHM+xTo6MiPBqUG9vd9oV2+921StWTOz2
-8zFZx1yTbSb0DiLQn5tp/mHdm6x3ywBmJnffJlYsrgxHRHAYx12sW156wV8HMSEn
-gxIsVeZFovsNZmqKByGqbByx7dJfMxu/JoT7oQDK6Wdid5dxqB2xHiwe8nUAkdSz
-aK4prYEMsK03AMCtMfhuklG5ma4X4QIogN44mGXy0UVkVKlve49Sm9QpK0HUa1Wh
-IIuVlEgvYGov44mzHdb7eRFPaYwTU8mAnVEG03h9Ef83IDkD9hzQn6IYsa6xguEG
-hOFZgCOc6vm+x6rVsrDp4min8KMhYRSQn2VhN0LypAmWqtj94i4=
-=OqTi
+iQIzBAABCAAdFiEEDv+Fiet06YHnC6RpiMa8nIiabbgFAmhmjOcACgkQiMa8nIia
+bbhOtg//ZKD56fFFKhS3VkvSEf+ykGldJAeK+xcr5bLTKq5aSlD6FcdGYNtMEYxu
+MJOteT2bcQD9qDCyphMCeUTa8rbPleW6KwkI738j8/BdXG2O9Qou4XiDnHOrSVPw
+FpszvUuGIUCNYmoLuGHfUX9IDchTNAxG83YtSBGlyoY82XIIZsO05vA1HhTzXL3a
+wjSYhcRUbx+NquhjZieIHQ2wgOrJXv7zPt5zfj1g5fpzr764ss1JNT+m+5NF6zkk
+uhjo6ecThXKPixtRGua72FKYvLHRAuyakMae4FYj8RFr7GpJo+Mo7uBy8BEuyGSB
+otP9gNlEOncTCNFuttljE4u0CGtnhqB0oovYM/Ws7/68+c2mlMuF3PlCm/ss9CFU
+jl5rqiaGI3SCjoCU7dxJl6RlPBdpvCV3GnzbRru6DDb/1nUKQZq9t2WVsMDQ3BfO
+OzkWY75PbMwtXWV4LYa5COyPnHIG17+6dS2sFQWo547ZioHM/bZ8SotLwggltxaS
+IFrkEOPQoiAY/p3RGDA+0IlPFBXYlyXMjeyxpr1BcvxqHXe4tLSBoi+2mNR7h2Vp
+B3i3Cbq6I3XFhn2lE4mbG0eD9GuOqIlEsrvtP4rkoWt/SKKPs0iOhQ8O51HsY+r4
+exBcSsGAsJOyQjrKfoAXR8XZTRMEQFJ4EqYzw9o/bm2Qn03rxeM=
+=lAU5
 -----END PGP SIGNATURE-----
 
---5UCpY6LUHqxL5aTa--
+--7/fbDo5/u/ed+dJg--
