@@ -1,151 +1,453 @@
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E0DF21D3C6
-	for <linux-kbuild@vger.kernel.org>; Thu, 10 Jul 2025 19:30:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F2AF1E1A3F;
+	Fri, 11 Jul 2025 06:36:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752175821; cv=none; b=cDcc0YLWYGI5MJ5GiKIA5tXU/GWzpiS2C+Jf0qA4a14BjOa91loAVkVQWA9TLYPHcuVpFDZd2jewyaiLL3tNWQJzZPlTC3IWkmlJU1ZrrTPswjTxgOSruOzb9EMSapSvIV6QI81Bgm9kXSl44JF3ugePgGYj9WDlgxd+cdfNG2k=
+	t=1752215792; cv=none; b=T1TWwDpx8VJHkiM8teUNHxVolk7z4rQl0B8KfT5QwkpahtiWaHssYGfoDhflB6u+TRfSM+aGL9JmNdly4oEbx0xlCTcz5Tl+XI6ytmlJVRN5tzEwva3Mg6JiBQtRObK021A/uYp/M0/V8A3TYY1Sk4Ss3yjf3OTcWIxoI2ZL12w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752175821; c=relaxed/simple;
-	bh=EJ6s4tjHUT6RtbgUP+qOWodtQci0cx0J74QsTYz4VVo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pluqdFhTgezk5EbX+cbTaFHhyBQvnV61uNF2gtebemwYCK45hVT9FBV/iWuXUTacZNoHX+SnKonG121bfONAs7QpfyR/7ECqQhX/ww1ZyydwSuIkHhJw00ly0pryNgunRTBddAlpe3dRGIgwLdXDet8v/CmaOasus3nExscU3JY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D99Dt27d; arc=none smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1752215792; c=relaxed/simple;
+	bh=LxaN+hjdvCM/xzwPbqcEZTawPEEcX1egLOWAX0aeGs0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=JmkiXmdn0vOSq0KgynVv7SX7tPzb/U4OfP6LCiBBNHZJyqyJm2MmxexPFZOrl8/BNcyvNgPnuPesYbCynV4a5Cj1UKsCEw59Uhj/43VRAdEIIhn1NF0xU2a3JLcpN6UX9PoNYUwKigWqMDEQ/MtLpjdJjTJ6fYc70YjQ9MGxM/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F4BHw6ju; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D99Dt27d"
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6face367320so12795866d6.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 10 Jul 2025 12:30:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752175817; x=1752780617; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=USEIpL4apCBHIBMoQ7JPvYpW1LrAcOYziqZdXP5+KWM=;
-        b=D99Dt27d141/r5XQ/AIfIN8sEKybEgVy7KPWWfLB2K8kxh9YeXPGm4liw6icOra0Az
-         RIrzbkR6FkuMImrnm5UBZj3oYgGJ5pDuTkqnjW85R6LZUEeIrG6lTLLCHkbmakuFi/nt
-         5St2wwFFjszvFIhC6rB5PcvHyjNm/+Cta8yC9FYvUus+k8SeQGVSzjmOVyc+8rZtyR19
-         0r+ztu1MFTnXkSE0DKGmZ6QO9K4RusOtR2F1lUDdceRC9W3fpkopsgMkFLPl1lBw80cY
-         L4WmSlDwQf9WrLvhmx6w13iLs2Qc9KMuFcdTVCr5xEfsNwYrXm5d6SMgRN1EhMo0T06C
-         Yp/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752175817; x=1752780617;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=USEIpL4apCBHIBMoQ7JPvYpW1LrAcOYziqZdXP5+KWM=;
-        b=EMQX8gSniIviD7WYXdpfYYB7ptPBtHqMNkJnJl32MEA944aLJ3Het0DZ2dHlCK2Lsy
-         blwKaRnaN4KTArZzw4ne7aFjTrv7nG2BNecbyHEfYQtEPXRgdMo6AxUH+4pPtmhi8RnJ
-         6XEb5FH3gnO+sdTEVbhlAxT3Jpgu2m9wtjsZK1zsMPHk2GRiXGYj9YC66jsmBtk2+kg8
-         yXxbE2JXmXFhHbHFnqNGWJybIWQpHW55wpSEcn2EuBEtm+kM5AEck+As9m5M9xwEmzny
-         4k4vwgkRvWJU0q1RJ2jzl8LGEjGLKa7fFD8pCrY7GKLW4Zy020XzziEJjL/upq4evEx8
-         hx1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUexqrlW/lu1ebdmU/fXvoooQVkw9iLMNIQM4pPjwhdQfv2IaTdNTuO5nd7++UIEHOJ0XrgM/mtTHUCGlw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIh+D1W/RuesHcfHHzbV5tACSa4H+DANMB91RajHl/xzlU3vEc
-	1gKkIDmjp2R41RG54XLo7as/sEaimAkRGwimCdOTQKK2hfU3w1zbK0Wm6McmIZFFh2Fe2w0y6p0
-	weIlBUqxlbEAw4gCNbHrwNOex0KZn8lpVhIP+zdGz
-X-Gm-Gg: ASbGnctuXZcWM7Niyo7EGYyf3wvyjOfuocdRsYZLmq60xlGfxb4kMlIZZ+DA28xAXyx
-	QBy4SOpihVipyJFC3Z8p9jOEQrbpJD8KZXy3ymCVWXKXDhOLLKDlp9R83l6V48fgV4PGuS9i49x
-	bCYzrjsPot0sX9W6KpFVyykkl4zMYOsYu1LsZvbOPYD1x5f4c3NcYu7v9upU/3x5wtWPfXRyv7
-X-Google-Smtp-Source: AGHT+IGZ42wCwYI6/mUsKs5W1wwGLVBaIdQX9pYAG5+GOjYCAt5QsHm7XxQOSQrB76f5N4QqzG2xfswRS2/KVu8ypPA=
-X-Received: by 2002:a05:6214:1d2b:b0:704:778c:3b9d with SMTP id
- 6a1803df08f44-704a3976eb8mr7470116d6.30.1752175816350; Thu, 10 Jul 2025
- 12:30:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F4BHw6ju"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9409FC4CEED;
+	Fri, 11 Jul 2025 06:36:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752215791;
+	bh=LxaN+hjdvCM/xzwPbqcEZTawPEEcX1egLOWAX0aeGs0=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=F4BHw6ju3xjy1dv13yR/vpiy9autuYFzGDkOGRA/WRRwsOAM/dgCi9YD2s80sn4N8
+	 jww1QIhQ0JVtotto5cmzKe1h8/i8YFG3LonljnLojB98HT99PSFmkgNC8OFaceo9TE
+	 IgvumT24RlALSfqFrCLoyKFmfwmXYUTdeu7eyth0S8m/XewezDS1GewwljV60w556f
+	 Vj5v6suLlG5lbY9ADjFHhc7evSXxSUkU4GaBQGEhzTKaJLjpSE/vx93DQL5prT4ugd
+	 UeAwSA/iv3Z1xSKHCj21hYvUloaff4cFmVArPIUATDEBPhtsl2IHwZd5i9q6ySFfzc
+	 eX08kQz2G0zpA==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+Date: Fri, 11 Jul 2025 08:35:47 +0200
+Subject: [PATCH v17 5/7] rust: module: update the module macro with module
+ parameter support
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250706201855.232451-1-sergio.collado@gmail.com>
-In-Reply-To: <20250706201855.232451-1-sergio.collado@gmail.com>
-From: Rae Moar <rmoar@google.com>
-Date: Thu, 10 Jul 2025 15:30:05 -0400
-X-Gm-Features: Ac12FXx5GXs_yCw2SDS55fJaE3Sbr8VfcBVMKoEwWHmO2efRO1bMOT4Nye6j_po
-Message-ID: <CA+GJov5eXsoKG2eYch8h5HgLCwnE8+9RA0v-+9DW9TpP5SordA@mail.gmail.com>
-Subject: Re: [PATCH v3 RESEND] kunit: fix longest symbol length test
-To: =?UTF-8?Q?Sergio_Gonz=C3=A1lez_Collado?= <sergio.collado@gmail.com>
-Cc: David Gow <davidgow@google.com>, linux-kselftest@vger.kernel.org, 
-	kunit-dev@googlegroups.com, Miguel Ojeda <ojeda@kernel.org>, 
-	Boqun Feng <boqun.feng@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Randy Dunlap <rdunlap@infradead.org>, rust-for-linux@vger.kernel.org, 
-	Josh Poimboeuf <jpoimboe@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Peter Zijlstra <peterz@infradead.org>, Nathan Chancellor <nathan@kernel.org>, 
-	David Laight <david.laight.linux@gmail.com>, Shuah Khan <skhan@linuxfoundation.org>, 
-	Martin Rodriguez Reboredo <yakoyoku@gmail.com>, x86@kernel.org, linux-kbuild@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250711-module-params-v3-v17-5-cf9b10d4923d@kernel.org>
+References: <20250711-module-params-v3-v17-0-cf9b10d4923d@kernel.org>
+In-Reply-To: <20250711-module-params-v3-v17-0-cf9b10d4923d@kernel.org>
+To: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+ Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Alice Ryhl <aliceryhl@google.com>, Masahiro Yamada <masahiroy@kernel.org>, 
+ Nathan Chancellor <nathan@kernel.org>, Luis Chamberlain <mcgrof@kernel.org>, 
+ Danilo Krummrich <dakr@kernel.org>, Benno Lossin <lossin@kernel.org>, 
+ Benno Lossin <lossin@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>
+Cc: Trevor Gross <tmgross@umich.edu>, 
+ Adam Bratschi-Kaye <ark.email@gmail.com>, rust-for-linux@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+ Petr Pavlu <petr.pavlu@suse.com>, Sami Tolvanen <samitolvanen@google.com>, 
+ Daniel Gomez <da.gomez@samsung.com>, Simona Vetter <simona.vetter@ffwll.ch>, 
+ Greg KH <gregkh@linuxfoundation.org>, Fiona Behrens <me@kloenk.dev>, 
+ Daniel Almeida <daniel.almeida@collabora.com>, 
+ linux-modules@vger.kernel.org, Andreas Hindborg <a.hindborg@kernel.org>
+X-Mailer: b4 0.15-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=13514;
+ i=a.hindborg@kernel.org; h=from:subject:message-id;
+ bh=LxaN+hjdvCM/xzwPbqcEZTawPEEcX1egLOWAX0aeGs0=;
+ b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBocLDYhVQ3MkyBrsz3W9KbuMwTDRaPOC4AZNH+m
+ W/FGPcscYmJAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaHCw2AAKCRDhuBo+eShj
+ d0ufD/sERHkV1JuhsXbOqezjeT/vYMmfHvOeyfXxVLmg0sQfC4fCqXRIXDzSqS31HG6+udumQnv
+ sdm1hCqUPTCkMd1bNTUQs+306P30lWYcdKdWf0pdKBdUmADp6pXyTYIOXQzszyWJOSktsja3WHJ
+ rplL8nTorEuo/45L/tdRQRydeNi0mL6/+2C5Q3KBX1jokTMZ8LNeCYKkGSSIS6klPwcgIHRvV7L
+ sGI1O84zcouj53r825a/15tmnE86CUAO6sE9tlY03hvOPgszHK2QOQ1VXtDwTrfwNpt7dEARb+b
+ Jit4sSbxC1dzBWjWup9PIhhasrzPl3/U9ibcUH/JpC2qv4InwuwrOuL75xyqhYBhUERMWqvrs1j
+ 1FgZtPeMhD5vkDqpX4oEcQb1476m8a6BjCnCVS1mlpFqobNsVQj+vck1uy5rSGNydrnqT9Wh2yM
+ QjfeGQqgESn0bipKq+x/6ekA0LXFjUD2asxr6+Qzk/B1/buyWhG8PqtQOeuYIhzcnPkm1urUtIm
+ bUgw/RY+g0azWW9gDGFxiLfxrIn/zNewhUGEgLCAZ6Q89AVhJDh6Lo5WPQNC8wmapimYSj0MILx
+ 6ze2gHidbqxP/8xwCcEzGPLnBqxp4QoWW8sl03p8REJe+Ti96wYEe3k6KnDzpRXYm1BiOd+TYhh
+ mt19hBjCKTaC9cg==
+X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
+ fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-On Sun, Jul 6, 2025 at 4:19=E2=80=AFPM Sergio Gonz=C3=A1lez Collado
-<sergio.collado@gmail.com> wrote:
->
-> The kunit test that checks the longests symbol length [1], has triggered
-> warnings in some pilelines when symbol prefixes are used [2][3]. The test
-> will to depend on !PREFIX_SYMBOLS and !CFI_CLANG as sujested in [4] and
-> on !GCOV_KERNEL.
->
-> [1] https://lore.kernel.org/rust-for-linux/CABVgOSm=3D5Q0fM6neBhxSbOUHBgN=
-zmwf2V22vsYC10YRBT=3DkN1g@mail.gmail.com/T/#t
-> [2] https://lore.kernel.org/all/20250328112156.2614513-1-arnd@kernel.org/=
-T/#u
-> [3] https://lore.kernel.org/rust-for-linux/bbd03b37-c4d9-4a92-9be2-75aaf8=
-c19815@infradead.org/T/#t
-> [4] https://lore.kernel.org/linux-kselftest/20250427200916.GA1661412@ax16=
-2/T/#t
->
-> Reviewed-by: Rae Moar <rmoar@google.com>
-> Signed-off-by: Sergio Gonz=C3=A1lez Collado <sergio.collado@gmail.com>
-> Acked-by: Randy Dunlap <rdunlap@infradead.org>
-> Tested-by: Randy Dunlap <rdunlap@infradead.org>
+Allow module parameters to be declared in the rust `module!` macro.
 
-Hello!
+Reviewed-by: Benno Lossin <lossin@kernel.org>
+Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+---
+ rust/macros/helpers.rs |  25 +++++++
+ rust/macros/lib.rs     |  31 +++++++++
+ rust/macros/module.rs  | 178 ++++++++++++++++++++++++++++++++++++++++++++++---
+ 3 files changed, 224 insertions(+), 10 deletions(-)
 
-Thanks for resending! I don't believe this has been accepted yet.  So
-I've added it to the list of patches to get accepted for the
-kselftest/kunit branch.
+diff --git a/rust/macros/helpers.rs b/rust/macros/helpers.rs
+index e2602be402c1..365d7eb499c0 100644
+--- a/rust/macros/helpers.rs
++++ b/rust/macros/helpers.rs
+@@ -10,6 +10,17 @@ pub(crate) fn try_ident(it: &mut token_stream::IntoIter) -> Option<String> {
+     }
+ }
+ 
++pub(crate) fn try_sign(it: &mut token_stream::IntoIter) -> Option<char> {
++    let peek = it.clone().next();
++    match peek {
++        Some(TokenTree::Punct(punct)) if punct.as_char() == '-' => {
++            let _ = it.next();
++            Some(punct.as_char())
++        }
++        _ => None,
++    }
++}
++
+ pub(crate) fn try_literal(it: &mut token_stream::IntoIter) -> Option<String> {
+     if let Some(TokenTree::Literal(literal)) = it.next() {
+         Some(literal.to_string())
+@@ -103,3 +114,17 @@ pub(crate) fn file() -> String {
+         proc_macro::Span::call_site().file()
+     }
+ }
++
++/// Parse a token stream of the form `expected_name: "value",` and return the
++/// string in the position of "value".
++///
++/// # Panics
++///
++/// - On parse error.
++pub(crate) fn expect_string_field(it: &mut token_stream::IntoIter, expected_name: &str) -> String {
++    assert_eq!(expect_ident(it), expected_name);
++    assert_eq!(expect_punct(it), ':');
++    let string = expect_string(it);
++    assert_eq!(expect_punct(it), ',');
++    string
++}
+diff --git a/rust/macros/lib.rs b/rust/macros/lib.rs
+index fa847cf3a9b5..2fb520dc930a 100644
+--- a/rust/macros/lib.rs
++++ b/rust/macros/lib.rs
+@@ -28,6 +28,30 @@
+ /// The `type` argument should be a type which implements the [`Module`]
+ /// trait. Also accepts various forms of kernel metadata.
+ ///
++/// The `params` field describe module parameters. Each entry has the form
++///
++/// ```ignore
++/// parameter_name: type {
++///     default: default_value,
++///     description: "Description",
++/// }
++/// ```
++///
++/// `type` may be one of
++///
++/// - [`i8`]
++/// - [`u8`]
++/// - [`i8`]
++/// - [`u8`]
++/// - [`i16`]
++/// - [`u16`]
++/// - [`i32`]
++/// - [`u32`]
++/// - [`i64`]
++/// - [`u64`]
++/// - [`isize`]
++/// - [`usize`]
++///
+ /// C header: [`include/linux/moduleparam.h`](srctree/include/linux/moduleparam.h)
+ ///
+ /// [`Module`]: ../kernel/trait.Module.html
+@@ -44,6 +68,12 @@
+ ///     description: "My very own kernel module!",
+ ///     license: "GPL",
+ ///     alias: ["alternate_module_name"],
++///     params: {
++///         my_parameter: i64 {
++///             default: 1,
++///             description: "This parameter has a default of 1",
++///         },
++///     },
+ /// }
+ ///
+ /// struct MyModule(i32);
+@@ -52,6 +82,7 @@
+ ///     fn init(_module: &'static ThisModule) -> Result<Self> {
+ ///         let foo: i32 = 42;
+ ///         pr_info!("I contain:  {}\n", foo);
++///         pr_info!("i32 param is:  {}\n", module_parameters::my_parameter.read());
+ ///         Ok(Self(foo))
+ ///     }
+ /// }
+diff --git a/rust/macros/module.rs b/rust/macros/module.rs
+index 1a867a1e787e..c1400597774a 100644
+--- a/rust/macros/module.rs
++++ b/rust/macros/module.rs
+@@ -26,6 +26,7 @@ struct ModInfoBuilder<'a> {
+     module: &'a str,
+     counter: usize,
+     buffer: String,
++    param_buffer: String,
+ }
+ 
+ impl<'a> ModInfoBuilder<'a> {
+@@ -34,10 +35,11 @@ fn new(module: &'a str) -> Self {
+             module,
+             counter: 0,
+             buffer: String::new(),
++            param_buffer: String::new(),
+         }
+     }
+ 
+-    fn emit_base(&mut self, field: &str, content: &str, builtin: bool) {
++    fn emit_base(&mut self, field: &str, content: &str, builtin: bool, param: bool) {
+         let string = if builtin {
+             // Built-in modules prefix their modinfo strings by `module.`.
+             format!(
+@@ -51,8 +53,14 @@ fn emit_base(&mut self, field: &str, content: &str, builtin: bool) {
+             format!("{field}={content}\0")
+         };
+ 
++        let buffer = if param {
++            &mut self.param_buffer
++        } else {
++            &mut self.buffer
++        };
++
+         write!(
+-            &mut self.buffer,
++            buffer,
+             "
+                 {cfg}
+                 #[doc(hidden)]
+@@ -75,20 +83,119 @@ fn emit_base(&mut self, field: &str, content: &str, builtin: bool) {
+         self.counter += 1;
+     }
+ 
+-    fn emit_only_builtin(&mut self, field: &str, content: &str) {
+-        self.emit_base(field, content, true)
++    fn emit_only_builtin(&mut self, field: &str, content: &str, param: bool) {
++        self.emit_base(field, content, true, param)
+     }
+ 
+-    fn emit_only_loadable(&mut self, field: &str, content: &str) {
+-        self.emit_base(field, content, false)
++    fn emit_only_loadable(&mut self, field: &str, content: &str, param: bool) {
++        self.emit_base(field, content, false, param)
+     }
+ 
+     fn emit(&mut self, field: &str, content: &str) {
+-        self.emit_only_builtin(field, content);
+-        self.emit_only_loadable(field, content);
++        self.emit_internal(field, content, false);
++    }
++
++    fn emit_internal(&mut self, field: &str, content: &str, param: bool) {
++        self.emit_only_builtin(field, content, param);
++        self.emit_only_loadable(field, content, param);
++    }
++
++    fn emit_param(&mut self, field: &str, param: &str, content: &str) {
++        let content = format!("{param}:{content}", param = param, content = content);
++        self.emit_internal(field, &content, true);
++    }
++
++    fn emit_params(&mut self, info: &ModuleInfo) {
++        let Some(params) = &info.params else {
++            return;
++        };
++
++        for param in params {
++            let ops = param_ops_path(&param.ptype);
++
++            // Note: The spelling of these fields is dictated by the user space
++            // tool `modinfo`.
++            self.emit_param("parmtype", &param.name, &param.ptype);
++            self.emit_param("parm", &param.name, &param.description);
++
++            write!(
++                self.param_buffer,
++                "
++                pub(crate) static {param_name}:
++                    ::kernel::module_param::ModuleParamAccess<{param_type}> =
++                        ::kernel::module_param::ModuleParamAccess::new({param_default});
++
++                const _: () = {{
++                    #[link_section = \"__param\"]
++                    #[used]
++                    static __{module_name}_{param_name}_struct:
++                        ::kernel::module_param::KernelParam =
++                        ::kernel::module_param::KernelParam::new(
++                            ::kernel::bindings::kernel_param {{
++                                name: if ::core::cfg!(MODULE) {{
++                                    ::kernel::c_str!(\"{param_name}\").as_bytes_with_nul()
++                                }} else {{
++                                    ::kernel::c_str!(\"{module_name}.{param_name}\")
++                                        .as_bytes_with_nul()
++                                }}.as_ptr(),
++                                // SAFETY: `__this_module` is constructed by the kernel at load
++                                // time and will not be freed until the module is unloaded.
++                                #[cfg(MODULE)]
++                                mod_: unsafe {{
++                                    core::ptr::from_ref(&::kernel::bindings::__this_module)
++                                        .cast_mut()
++                                }},
++                                #[cfg(not(MODULE))]
++                                mod_: ::core::ptr::null_mut(),
++                                ops: core::ptr::from_ref(&{ops}),
++                                perm: 0, // Will not appear in sysfs
++                                level: -1,
++                                flags: 0,
++                                __bindgen_anon_1: ::kernel::bindings::kernel_param__bindgen_ty_1 {{
++                                    arg: {param_name}.as_void_ptr()
++                                }},
++                            }}
++                        );
++                }};
++                ",
++                module_name = info.name,
++                param_type = param.ptype,
++                param_default = param.default,
++                param_name = param.name,
++                ops = ops,
++            )
++            .unwrap();
++        }
++    }
++}
++
++fn param_ops_path(param_type: &str) -> &'static str {
++    match param_type {
++        "i8" => "::kernel::module_param::PARAM_OPS_I8",
++        "u8" => "::kernel::module_param::PARAM_OPS_U8",
++        "i16" => "::kernel::module_param::PARAM_OPS_I16",
++        "u16" => "::kernel::module_param::PARAM_OPS_U16",
++        "i32" => "::kernel::module_param::PARAM_OPS_I32",
++        "u32" => "::kernel::module_param::PARAM_OPS_U32",
++        "i64" => "::kernel::module_param::PARAM_OPS_I64",
++        "u64" => "::kernel::module_param::PARAM_OPS_U64",
++        "isize" => "::kernel::module_param::PARAM_OPS_ISIZE",
++        "usize" => "::kernel::module_param::PARAM_OPS_USIZE",
++        t => panic!("Unsupported parameter type {}", t),
+     }
+ }
+ 
++fn expect_param_default(param_it: &mut token_stream::IntoIter) -> String {
++    assert_eq!(expect_ident(param_it), "default");
++    assert_eq!(expect_punct(param_it), ':');
++    let sign = try_sign(param_it);
++    let default = try_literal(param_it).expect("Expected default param value");
++    assert_eq!(expect_punct(param_it), ',');
++    let mut value = sign.map(String::from).unwrap_or_default();
++    value.push_str(&default);
++    value
++}
++
+ #[derive(Debug, Default)]
+ struct ModuleInfo {
+     type_: String,
+@@ -99,6 +206,50 @@ struct ModuleInfo {
+     description: Option<String>,
+     alias: Option<Vec<String>>,
+     firmware: Option<Vec<String>>,
++    params: Option<Vec<Parameter>>,
++}
++
++#[derive(Debug)]
++struct Parameter {
++    name: String,
++    ptype: String,
++    default: String,
++    description: String,
++}
++
++fn expect_params(it: &mut token_stream::IntoIter) -> Vec<Parameter> {
++    let params = expect_group(it);
++    assert_eq!(params.delimiter(), Delimiter::Brace);
++    let mut it = params.stream().into_iter();
++    let mut parsed = Vec::new();
++
++    loop {
++        let param_name = match it.next() {
++            Some(TokenTree::Ident(ident)) => ident.to_string(),
++            Some(_) => panic!("Expected Ident or end"),
++            None => break,
++        };
++
++        assert_eq!(expect_punct(&mut it), ':');
++        let param_type = expect_ident(&mut it);
++        let group = expect_group(&mut it);
++        assert_eq!(group.delimiter(), Delimiter::Brace);
++        assert_eq!(expect_punct(&mut it), ',');
++
++        let mut param_it = group.stream().into_iter();
++        let param_default = expect_param_default(&mut param_it);
++        let param_description = expect_string_field(&mut param_it, "description");
++        expect_end(&mut param_it);
++
++        parsed.push(Parameter {
++            name: param_name,
++            ptype: param_type,
++            default: param_default,
++            description: param_description,
++        })
++    }
++
++    parsed
+ }
+ 
+ impl ModuleInfo {
+@@ -114,6 +265,7 @@ fn parse(it: &mut token_stream::IntoIter) -> Self {
+             "license",
+             "alias",
+             "firmware",
++            "params",
+         ];
+         const REQUIRED_KEYS: &[&str] = &["type", "name", "license"];
+         let mut seen_keys = Vec::new();
+@@ -140,6 +292,7 @@ fn parse(it: &mut token_stream::IntoIter) -> Self {
+                 "license" => info.license = expect_string_ascii(it),
+                 "alias" => info.alias = Some(expect_string_array(it)),
+                 "firmware" => info.firmware = Some(expect_string_array(it)),
++                "params" => info.params = Some(expect_params(it)),
+                 _ => panic!("Unknown key \"{key}\". Valid keys are: {EXPECTED_KEYS:?}."),
+             }
+ 
+@@ -205,7 +358,9 @@ pub(crate) fn module(ts: TokenStream) -> TokenStream {
+     // Built-in modules also export the `file` modinfo string.
+     let file =
+         std::env::var("RUST_MODFILE").expect("Unable to fetch RUST_MODFILE environmental variable");
+-    modinfo.emit_only_builtin("file", &file);
++    modinfo.emit_only_builtin("file", &file, false);
++
++    modinfo.emit_params(&info);
+ 
+     format!(
+         "
+@@ -369,15 +524,18 @@ unsafe fn __exit() {{
+                             __MOD.assume_init_drop();
+                         }}
+                     }}
+-
+                     {modinfo}
+                 }}
+             }}
++            mod module_parameters {{
++                {params}
++            }}
+         ",
+         type_ = info.type_,
+         name = info.name,
+         ident = ident,
+         modinfo = modinfo.buffer,
++        params = modinfo.param_buffer,
+         initcall_section = ".initcall6.init"
+     )
+     .parse()
 
-Thanks!
--Rae
+-- 
+2.47.2
 
-> ---
->  lib/Kconfig.debug                | 1 +
->  lib/tests/longest_symbol_kunit.c | 3 +--
->  2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-> index ebe33181b6e6..4a75a52803b6 100644
-> --- a/lib/Kconfig.debug
-> +++ b/lib/Kconfig.debug
-> @@ -2885,6 +2885,7 @@ config FORTIFY_KUNIT_TEST
->  config LONGEST_SYM_KUNIT_TEST
->         tristate "Test the longest symbol possible" if !KUNIT_ALL_TESTS
->         depends on KUNIT && KPROBES
-> +       depends on !PREFIX_SYMBOLS && !CFI_CLANG && !GCOV_KERNEL
->         default KUNIT_ALL_TESTS
->         help
->           Tests the longest symbol possible
-> diff --git a/lib/tests/longest_symbol_kunit.c b/lib/tests/longest_symbol_=
-kunit.c
-> index e3c28ff1807f..9b4de3050ba7 100644
-> --- a/lib/tests/longest_symbol_kunit.c
-> +++ b/lib/tests/longest_symbol_kunit.c
-> @@ -3,8 +3,7 @@
->   * Test the longest symbol length. Execute with:
->   *  ./tools/testing/kunit/kunit.py run longest-symbol
->   *  --arch=3Dx86_64 --kconfig_add CONFIG_KPROBES=3Dy --kconfig_add CONFI=
-G_MODULES=3Dy
-> - *  --kconfig_add CONFIG_RETPOLINE=3Dn --kconfig_add CONFIG_CFI_CLANG=3D=
-n
-> - *  --kconfig_add CONFIG_MITIGATION_RETPOLINE=3Dn
-> + *  --kconfig_add CONFIG_CPU_MITIGATIONS=3Dn --kconfig_add CONFIG_GCOV_K=
-ERNEL=3Dn
->   */
->
->  #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
->
-> base-commit: 772b78c2abd85586bb90b23adff89f7303c704c7
-> --
-> 2.39.2
->
+
