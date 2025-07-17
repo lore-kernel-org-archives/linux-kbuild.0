@@ -1,111 +1,131 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BADE2F2C73;
-	Wed, 16 Jul 2025 23:25:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BDFF1D7984;
+	Thu, 17 Jul 2025 08:49:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752708353; cv=none; b=TNzMzBMjSfB5WPYTjaANgDplnLq9JLJUWxzIyivEl+B1VV9SMNd1ADTw+CR7Ie/sVwIOfUtokbdOhtdpgEqZVQE99kIPpWf9GPn+2FyxaU+g/CHSqOTBUExIdAcmHlLtaCo9s4ud6hNBecoQm6suFymXovcj4t6bQKFNY+I9kiY=
+	t=1752742145; cv=none; b=n6GYna89k3t9YzElwNva/No5YgrR1ytr4FwwY70DNPfzgDaO5/5/JR1WdbuyEW10GBTpVtlFZb80JiLduKNkp3b3qRpfF/uDwmK1iT+zo1hYONBAi2EI6bSNyWtprYQv90FogZ9YU1aQKLuzAlkYDH7qbHTDplgYa5M+82JWls8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752708353; c=relaxed/simple;
-	bh=tI5mvT66Rm/lpoF3NhwuTmLXhid+pDYJjtfSR7IyuG8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aLvr737dkmVnHEDGDtTaU7SRED0fwZvWsBK07D+hjuuk0eJDg9vJk7VUngJWKsUmXEajfc956LWxS3WYFTTm8GCsRqvL8pY/M1Erzc6vI03gMowFShojyitJjbSrT4oS8g3+LsEgbB0iImjrbg56FM98A73IjN2rVbeCRuhHNm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XNwZc6JC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752742145; c=relaxed/simple;
+	bh=yVjZBovVFYRelPKtg1fQMKDDpGxbxaYJbTiXbrwq7Ao=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=iFyZCUnASBft5A/EY8p8FBn+qVik9Fi/NIdg5D4nFXoywC63IEZjY9XIG5YkGJ0cDB8V/TtsZD5Lfla8IAnyZbVQhaXgucUxlK2apAUxS5A8JiPWfXQaAQVCST39TCLT7YgK9Pyfz5KsCYS+sp06+49Q4PM5vHf4CkJ4++d5L6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=c4InLabs; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ddBrI2MT; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XNwZc6JC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 793E8C4CEEB;
-	Wed, 16 Jul 2025 23:25:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752708353;
-	bh=tI5mvT66Rm/lpoF3NhwuTmLXhid+pDYJjtfSR7IyuG8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XNwZc6JCuzw2WNstXgyx/8YBuEGUz56WHQqyba30DKYh+CnWwgVFRNLuHvdvol7TF
-	 9yIhhQ2GZK+R2MN9adnpXHHkgX5SYaV0KXvGZfVey57eOn+wCeqjT7OgrenoyOY2jl
-	 XtdWPWzhQi32NQ+6DtkqGZ00OxaysYVajo+0yxEw7C3I89JaFLacrnnhebJgD6buNb
-	 aaaKTdcU6mcTKB+8FO0mUQQ+Wss7sccaoh8QPKZdYqxuxrIfiY8A2jC+i3WIdiJrix
-	 47TzeD4iUkp8KAkFyQm+/3bjRAcCYmChbt1I8y2NflJYFgfFWjgOByT1LmsHgDyG3m
-	 /WwEKNvzWQ4Ig==
-From: Masahiro Yamada <masahiroy@kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <masahiroy@kernel.org>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 6/6] kconfig: gconf: refactor text_insert_help()
-Date: Thu, 17 Jul 2025 08:24:13 +0900
-Message-ID: <20250716232542.873747-6-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250716232542.873747-1-masahiroy@kernel.org>
-References: <20250716232542.873747-1-masahiroy@kernel.org>
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="c4InLabs";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ddBrI2MT"
+From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1752742136;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=28EngJ2RMDboH1kPF4R/YHxhFvguWtCe6+9usWrMNYU=;
+	b=c4InLabsGxInUfJEVc4VHN+M7m9gY7FaVq4Fh87mEtQeVsGS7aGcVw2ftFFcKW7J26QtV5
+	hDXIK95Ot9w5B2rQxkIOiYwLuMgRNlFbB4EmiB+LBeU4Px9dNLsNmXXxEKsYkn3Ny/7g/7
+	Dq5fIk6EIxiHUkTcWTN7al+Dd7zZeNkqSxAFFXXrtwPCwbH6DoqGphJebGJXOcsqo2a2Ze
+	K7EYYttIQnUMPv2q6CVmYxbYS/96TPEHXbBY9p03Ngq2W/06oIlYrRD3dq6/twUF99qo3v
+	2c0ZTBOYO1th581QFz2mXoHZ55KTwlqTb7n/W+/uCSk/rNH4rkWr2ldCz3zJnw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1752742136;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=28EngJ2RMDboH1kPF4R/YHxhFvguWtCe6+9usWrMNYU=;
+	b=ddBrI2MT61kbAKq9OFyxCJ9PR3IsugoRkN2Y0EuYU4DRHe3S4fOgCdN+H2GdaeBRbmaACo
+	onKl+M/WN/9jDmAg==
+Date: Thu, 17 Jul 2025 10:48:09 +0200
+Subject: [PATCH v5 07/15] kunit: tool: Add test for nested test result
+ reporting
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+Message-Id: <20250717-kunit-kselftests-v5-7-442b711cde2e@linutronix.de>
+References: <20250717-kunit-kselftests-v5-0-442b711cde2e@linutronix.de>
+In-Reply-To: <20250717-kunit-kselftests-v5-0-442b711cde2e@linutronix.de>
+To: Masahiro Yamada <masahiroy@kernel.org>, 
+ Nathan Chancellor <nathan@kernel.org>, 
+ Andrew Morton <akpm@linux-foundation.org>, Willy Tarreau <w@1wt.eu>, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>, 
+ Brendan Higgins <brendan.higgins@linux.dev>, 
+ David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
+ Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+ Nicolas Schier <nicolas.schier@linux.dev>, Kees Cook <kees@kernel.org>, 
+ Alexander Viro <viro@zeniv.linux.org.uk>, 
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+ Christoph Hellwig <hch@lst.de>, Luis Chamberlain <mcgrof@kernel.org>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>, 
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
+ linux-doc@vger.kernel.org, workflows@vger.kernel.org, linux-mm@kvack.org, 
+ linux-fsdevel@vger.kernel.org, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, 
+ Nicolas Schier <nicolas.schier@linux.dev>
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1752742130; l=2264;
+ i=thomas.weissschuh@linutronix.de; s=20240209; h=from:subject:message-id;
+ bh=yVjZBovVFYRelPKtg1fQMKDDpGxbxaYJbTiXbrwq7Ao=;
+ b=4Rrhad+4zQdJ2WFKLGxo3krskqwms12O3XlbFK00zw7rCvDGjBSyqv5SNZW3aB1Xu4ynOqiRl
+ xpmXlFDkWVhAaEiQgCJwSMO3zlaMRuGoxR6q/z+TdQfJMmqfa8aXr4J
+X-Developer-Key: i=thomas.weissschuh@linutronix.de; a=ed25519;
+ pk=pfvxvpFUDJV2h2nY0FidLUml22uGLSjByFbM6aqQQws=
 
-text_insert_help() and text_insert_msg() share similar code.
-Refactor text_insert_help() to eliminate the code duplication.
+Currently there is a lack of tests validating the result reporting from
+nested tests. Add one, it will also be used to validate upcoming changes
+to the nested test parsing.
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Signed-off-by: Thomas Weißschuh <thomas.weissschuh@linutronix.de>
+Reviewed-by: David Gow <davidgow@google.com>
+Reviewed-by: Rae Moar <rmoar@google.com>
 ---
+ tools/testing/kunit/kunit_tool_test.py                         | 10 ++++++++++
+ .../kunit/test_data/test_is_test_passed-failure-nested.log     |  7 +++++++
+ 2 files changed, 17 insertions(+)
 
- scripts/kconfig/gconf.c | 35 +++++++++--------------------------
- 1 file changed, 9 insertions(+), 26 deletions(-)
+diff --git a/tools/testing/kunit/kunit_tool_test.py b/tools/testing/kunit/kunit_tool_test.py
+index bbba921e0eacb18663abfcabb2bccf330d8666f5..b74dc05fc2fe5b3ff629172fc7aafeb5c3d29fb3 100755
+--- a/tools/testing/kunit/kunit_tool_test.py
++++ b/tools/testing/kunit/kunit_tool_test.py
+@@ -165,6 +165,16 @@ class KUnitParserTest(unittest.TestCase):
+ 		self.assertEqual(kunit_parser.TestStatus.FAILURE, result.status)
+ 		self.assertEqual(result.counts.errors, 0)
+ 
++	def test_parse_failed_nested_tests_log(self):
++		nested_log = test_data_path('test_is_test_passed-failure-nested.log')
++		with open(nested_log) as file:
++			result = kunit_parser.parse_run_tests(file.readlines(), stdout)
++		self.assertEqual(kunit_parser.TestStatus.FAILURE, result.status)
++		self.assertEqual(result.counts.failed, 2)
++		self.assertEqual(kunit_parser.TestStatus.FAILURE, result.subtests[0].status)
++		self.assertEqual(kunit_parser.TestStatus.FAILURE, result.subtests[1].status)
++		self.assertEqual(kunit_parser.TestStatus.FAILURE, result.subtests[1].subtests[0].status)
++
+ 	def test_no_header(self):
+ 		empty_log = test_data_path('test_is_test_passed-no_tests_run_no_header.log')
+ 		with open(empty_log) as file:
+diff --git a/tools/testing/kunit/test_data/test_is_test_passed-failure-nested.log b/tools/testing/kunit/test_data/test_is_test_passed-failure-nested.log
+new file mode 100644
+index 0000000000000000000000000000000000000000..2e528da39ab5b2be0fca6cf9160c10929fba3c9e
+--- /dev/null
++++ b/tools/testing/kunit/test_data/test_is_test_passed-failure-nested.log
+@@ -0,0 +1,7 @@
++KTAP version 1
++1..2
++not ok 1 subtest 1
++    KTAP version 1
++    1..1
++        not ok 1 subsubtest 1
++not ok 2 subtest 2
 
-diff --git a/scripts/kconfig/gconf.c b/scripts/kconfig/gconf.c
-index 651140af7d13..8b164ccfa008 100644
---- a/scripts/kconfig/gconf.c
-+++ b/scripts/kconfig/gconf.c
-@@ -64,32 +64,6 @@ static void conf_changed(bool dirty)
- 
- /* Utility Functions */
- 
--
--static void text_insert_help(struct menu *menu)
--{
--	GtkTextBuffer *buffer;
--	GtkTextIter start, end;
--	const char *prompt = menu_get_prompt(menu);
--	struct gstr help = str_new();
--
--	menu_get_ext_help(menu, &help);
--
--	buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text_w));
--	gtk_text_buffer_get_bounds(buffer, &start, &end);
--	gtk_text_buffer_delete(buffer, &start, &end);
--	gtk_text_view_set_left_margin(GTK_TEXT_VIEW(text_w), 15);
--
--	gtk_text_buffer_get_end_iter(buffer, &end);
--	gtk_text_buffer_insert_with_tags(buffer, &end, prompt, -1, tag1,
--					 NULL);
--	gtk_text_buffer_insert_at_cursor(buffer, "\n\n", 2);
--	gtk_text_buffer_get_end_iter(buffer, &end);
--	gtk_text_buffer_insert_with_tags(buffer, &end, str_get(&help), -1, tag2,
--					 NULL);
--	str_free(&help);
--}
--
--
- static void text_insert_msg(const char *title, const char *msg)
- {
- 	GtkTextBuffer *buffer;
-@@ -109,6 +83,15 @@ static void text_insert_msg(const char *title, const char *msg)
- 					 NULL);
- }
- 
-+static void text_insert_help(struct menu *menu)
-+{
-+	struct gstr help = str_new();
-+
-+	menu_get_ext_help(menu, &help);
-+	text_insert_msg(menu_get_prompt(menu), str_get(&help));
-+	str_free(&help);
-+}
-+
- static void _select_menu(GtkTreeView *view, GtkTreeModel *model,
- 			 GtkTreeIter *parent, struct menu *match)
- {
 -- 
-2.43.0
+2.50.0
 
