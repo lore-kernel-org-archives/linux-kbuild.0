@@ -1,92 +1,183 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F4427380C;
-	Mon, 28 Jul 2025 15:18:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 627A1218ABD
+	for <linux-kbuild@vger.kernel.org>; Mon, 28 Jul 2025 16:37:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753715890; cv=none; b=MbMSDWdQzvKsBuddC0YJgcN0Oxt/lqAytfniasTUlRgwTDx0AS8UDdBlJBqd4raFnUM48b/mNL3fkMVuGcEk+1dR/8Dw3Ha9RuzyeWGT7OIxikSaGxgVA+oWAJHIElJo3RmuaHJJG3YlH0FWJwiTOSDJAl5wIMRM810/pnilxko=
+	t=1753720661; cv=none; b=lwt5exddoMXWCNi4ukgXKm8Z4bl2Y7djwdFPU6PoGITSxOfYIS2BAo5XZq9py+LLMipkZCdpo7SJsdLb5adJmfvenN1lyUnCTKALxiM9oqs+SkxjeQ+0A+yC6F7AomC9yiN2eLqCLZBZVnYqdtwRtEvraTwaVJy6AVKccyLnKHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753715890; c=relaxed/simple;
-	bh=bG4zIdy+dA3Y/597WfQz5S9Yzld1+fhveqk83VwKwGo=;
+	s=arc-20240116; t=1753720661; c=relaxed/simple;
+	bh=2SCBpxMSnr0Udt96N/nYsntgpWGEdtVpMjRq+5bF/Io=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kEHTmKnlW9ahQ1Qk3TyXBAMUt5ZonxomOIwE+lilqv195mZiZ0NgyyimRodmYhEJlBMdiqUAsC79vUGCIvdgAdKvMT6edW7X14PMD8GXDny3db/SrixUTv2Ke8CQfzA05z8wh2l5Ndhai//KLH+v3VuLRHhCvG0c94G320FZ8PY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ABCZHSXj; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=hcFFUtgm5tO1JgoekyZavvP3oQdglvSVQEMdJTO4V22GUmm5xIsSNeD8F/v9d+uhQ+ktUzbEsA40n5khnA/tcQgY8Wya+gRPx4h6086VY0jmOPO5XPHZ9hG2b9LhQtyY+GPiSHCjyngKQ1iEDXCAth0dI28OiHe3gQg2z+yriQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=vVFi66ti; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ABCZHSXj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8689C4CEE7;
-	Mon, 28 Jul 2025 15:18:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753715889;
-	bh=bG4zIdy+dA3Y/597WfQz5S9Yzld1+fhveqk83VwKwGo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ABCZHSXjOos49tL59Dk8cHCSKeO/de1eGKwhkkjOA9b/Ozn/9BnHzniY9uP64taSY
-	 m9ipeATvUo2PWSb6yXWgll6sRPVATUU7sA9AO4cnC/QDFNaOTldN+Fw2FPVSMzwuTZ
-	 TJ6J3ZVIB7b19KsYe0H4Am5Tuqx4IJLYl6U4faFUtgGNLhy2AQf6rGd8EDxqdPiDer
-	 L5MQFjICo5WQzyGXdBhXprJUCwFujIMeRNsvwXbefV4JMF+spHFyySgBGkENVzl+4w
-	 I6IwDOoaDltotLINExzJbRySrGQW5KC+SEbwMA/uFST5xL/zmFBgmeQcxQ2jWr4ypp
-	 EWyAkZpwcBXGQ==
-Date: Mon, 28 Jul 2025 17:18:03 +0200
-From: Alexey Gladkov <legion@kernel.org>
-To: Heiko Carstens <hca@linux.ibm.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>,
-	Petr Pavlu <petr.pavlu@suse.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Daniel Gomez <da.gomez@samsung.com>,
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="vVFi66ti"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2403df11a2aso8049855ad.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 28 Jul 2025 09:37:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1753720658; x=1754325458; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5q5M+CpT+5kwmRPJ46tyAoXGVagM73LO6ZWHv96bYmU=;
+        b=vVFi66tiWkkBaX51T0jP0+PE1SzQWHC6EG7d1SVIMWrkF2yBdpIlKC3y3RISdPsAXx
+         flcnb8zEyYmHB4neYpKWddQK7ecUX2I94Ug+w6kTsJq0ghJsZYgBozyi/vHTVvx1Q2y8
+         KA0NBn3KpFhFBm9hMWKM47COZ/YgXeE2Uftzc/WwMVYiPjQu5ASRUGzCzwwesTr+3Pne
+         vZoMIyMF0epLbh2hyNVUhhiwyayfrbp+L348YyW4gOEKEKw9s8M8pkZmNFQnPoqO5CW5
+         NkY7BdvWrxnU9lsmY5jAI3cFu/MX5mKL1XYaw7JCOMF+nT7Sr6Yh/NBCv4sli2t495oG
+         YRgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753720658; x=1754325458;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5q5M+CpT+5kwmRPJ46tyAoXGVagM73LO6ZWHv96bYmU=;
+        b=A9pl9z3ZSW/5OXPwVMpdwb/6kyEjMKIRv/6X+CVrUB86f/SuL/6Oo35i6jWP0dH60J
+         fOmUIMnk/x4Pt+LUAdoZt14P0FY25Ea9qKYF9Dl5cVmMFeLpWbn8xHHMMjJtp7Fmh9Ps
+         BWWwiwj3u8U8SQMgtZ3HzS+ynTbi/1OvGjRpNXxSvZ4D+FKcEc0CBqBQ4bzfQzT6f5SK
+         yOayEszC+KrXDRygbZFefEDGKZnqo3Dca8pLIwjPAlHTxarxCa5pGda5eDJeg/o/xyTJ
+         OAbTb1kG0v45C8Kvx2961xlgWzxZqaatyrGpw5wGE4znNOLPi9McFRadKezF5YegvUbJ
+         qiXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWS89O4HIT9PD67bzNvQFGRBWedobjOce2IM3j4/Et1qX3Q5viNJBKgNXYZ6RhPVU6pNrJ05z5uYVnjBi0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOTVa04llUPPVP+6RidPzApJgk0HfBfsSITS5OBqRy0eX/qMON
+	jg2wFwB7rJ6h1raj55vlqDrPmXk1H1DQ56SUiEvyyartEumUvUibYGUcXMIwmmoOgGk=
+X-Gm-Gg: ASbGncsZLrAgfwywbvAlK5rAmPq0ualjxZ+dyw4Y4OkB8crpKPSgoZdUmDcRLDXdClD
+	+P0mHPed5ZzZxuh8pMDMkj5fj9phnusQVhOcmXGilDMf9RqKwCqfeyzFRyBOHYKsjWqZOeYMVH5
+	YkeT7fQwUCK5QAHVAYB9sSfI5wp57b84NQmuqBCf9gbwWUXmA2t8sMljdY4JMrxuSEjg/7lHzzb
+	92aotMIhl/JDQBq0+Y1c0V4zb4zPD087U93qYTj0FZ/VoXwRia1NYlz4oFdXJwGLUjMRIi8hSbl
+	2zUq1+0OqB0w+QikJGOAop3LcReW4Psaqfbc6pFCwe4pbARgMMU636wxTWeDYYvICwspiwvLG6j
+	gjRmVhtObgmJzffT5pw5Xk+3m+SNkECXX
+X-Google-Smtp-Source: AGHT+IG8PkXREALt2B41+CkCZk4vD0+tX/pzcMfIzczJ6dwSMXqtKdHnRzA6w8eQHSP6Yq5Aix/U2Q==
+X-Received: by 2002:a17:903:1111:b0:23d:dd04:28e2 with SMTP id d9443c01a7336-23fb30cd1f9mr182480625ad.35.1753720658505;
+        Mon, 28 Jul 2025 09:37:38 -0700 (PDT)
+Received: from debug.ba.rivosinc.com ([64.71.180.162])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23ff3ea7547sm40412335ad.149.2025.07.28.09.37.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Jul 2025 09:37:37 -0700 (PDT)
+Date: Mon, 28 Jul 2025 09:37:34 -0700
+From: Deepak Gupta <debug@rivosinc.com>
+To: Will Deacon <will@kernel.org>
+Cc: Sami Tolvanen <samitolvanen@google.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Masahiro Yamada <masahiroy@kernel.org>,
 	Nathan Chancellor <nathan@kernel.org>,
 	Nicolas Schier <nicolas.schier@linux.dev>,
-	linux-kernel@vger.kernel.org, linux-modules@vger.kernel.org,
-	linux-kbuild@vger.kernel.org, Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	linux-s390@vger.kernel.org, kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH v5 10/10] s390: vmlinux.lds.S: Reorder sections
-Message-ID: <aIeUq0qYXoNIePwd@example.org>
-References: <cover.1753354215.git.legion@kernel.org>
- <2860d5a5e7c6279b3836537e20b0fa0c40d2ba0f.1753354215.git.legion@kernel.org>
- <CAK7LNARV+8vZPUtX8iG_hEAt8tCchRPFobK85tv9dbJwVqYgsw@mail.gmail.com>
- <20250728140109.7289Ae1-hca@linux.ibm.com>
+	Andrew Morton <akpm@linux-foundation.org>,
+	David Hildenbrand <david@redhat.com>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Monk Chiang <monk.chiang@sifive.com>,
+	Kito Cheng <kito.cheng@sifive.com>,
+	Justin Stitt <justinstitt@google.com>,
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-kbuild@vger.kernel.org, linux-mm@kvack.org,
+	llvm@lists.linux.dev, rick.p.edgecombe@intel.com,
+	broonie@kernel.org, cleger@rivosinc.com, apatel@ventanamicro.com,
+	ajones@ventanamicro.com, conor.dooley@microchip.com,
+	charlie@rivosinc.com, samuel.holland@sifive.com, bjorn@rivosinc.com,
+	fweimer@redhat.com, jeffreyalaw@gmail.com,
+	heinrich.schuchardt@canonical.com, andrew@sifive.com,
+	ved@rivosinc.com
+Subject: Re: [PATCH 10/11] scs: generic scs code updated to leverage hw
+ assisted shadow stack
+Message-ID: <aIenTs_D4l414isp@debug.ba.rivosinc.com>
+References: <20250724-riscv_kcfi-v1-0-04b8fa44c98c@rivosinc.com>
+ <20250724-riscv_kcfi-v1-10-04b8fa44c98c@rivosinc.com>
+ <20250725161327.GC1724026@google.com>
+ <aIdxUpSc-Co8wLYE@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250728140109.7289Ae1-hca@linux.ibm.com>
+In-Reply-To: <aIdxUpSc-Co8wLYE@willie-the-truck>
 
-On Mon, Jul 28, 2025 at 04:01:09PM +0200, Heiko Carstens wrote:
-> On Sat, Jul 26, 2025 at 07:59:16PM +0900, Masahiro Yamada wrote:
-> > On Thu, Jul 24, 2025 at 10:50 PM Alexey Gladkov <legion@kernel.org> wrote:
-> > >
-> > > Reorder the sections to be placed in the default segment. The
-> > > .vmlinux.info use :NONE to override the default segment and tell the
-> > > linker to not put the section in any segment at all.
-> > >
-> > > >> s390x-linux-ld: .tmp_vmlinux1: warning: allocated section `.modinfo' not in segment
-> > > >> s390x-linux-ld: .tmp_vmlinux2: warning: allocated section `.modinfo' not in segment
-> > > >> s390x-linux-ld: vmlinux.unstripped: warning: allocated section `.modinfo' not in segment
-> > 
-> > Thank you for root-causing!
-> > 
-> > > Cc: Heiko Carstens <hca@linux.ibm.com>
-> > > Cc: Vasily Gorbik <gor@linux.ibm.com>
-> > > Cc: Alexander Gordeev <agordeev@linux.ibm.com>
-> > > Cc: linux-s390@vger.kernel.org
-> > 
-> > Hi s390 maintainers,
-> > I need this patch for kbuild tree.
-> > Ack is appreciated.
-> 
-> Acked-by: Heiko Carstens <hca@linux.ibm.com>
-> 
-> But can you reorder the series so this patch comes before any of the
-> patches which introduces the above warnings, please?
+On Mon, Jul 28, 2025 at 01:47:14PM +0100, Will Deacon wrote:
+>On Fri, Jul 25, 2025 at 04:13:27PM +0000, Sami Tolvanen wrote:
+>> On Thu, Jul 24, 2025 at 04:37:03PM -0700, Deepak Gupta wrote:
+>> > diff --git a/include/linux/scs.h b/include/linux/scs.h
+>> > index 4ab5bdc898cf..6ceee07c2d1a 100644
+>> > --- a/include/linux/scs.h
+>> > +++ b/include/linux/scs.h
+>> > @@ -12,6 +12,7 @@
+>> >  #include <linux/poison.h>
+>> >  #include <linux/sched.h>
+>> >  #include <linux/sizes.h>
+>> > +#include <asm/scs.h>
+>> >
+>> >  #ifdef CONFIG_SHADOW_CALL_STACK
+>> >
+>> > @@ -37,22 +38,45 @@ static inline void scs_task_reset(struct task_struct *tsk)
+>> >  	 * Reset the shadow stack to the base address in case the task
+>> >  	 * is reused.
+>> >  	 */
+>> > +#ifdef CONFIG_ARCH_HAS_KERNEL_SHADOW_STACK
+>> > +	task_scs_sp(tsk) = task_scs(tsk) + SCS_SIZE;
+>> > +#else
+>> >  	task_scs_sp(tsk) = task_scs(tsk);
+>> > +#endif
+>> >  }
+>> >
+>> >  static inline unsigned long *__scs_magic(void *s)
+>> >  {
+>> > +#ifdef CONFIG_ARCH_HAS_KERNEL_SHADOW_STACK
+>> > +	return (unsigned long *)(s);
+>> > +#else
+>> >  	return (unsigned long *)(s + SCS_SIZE) - 1;
+>> > +#endif
+>> >  }
+>> >
+>> >  static inline bool task_scs_end_corrupted(struct task_struct *tsk)
+>> >  {
+>> >  	unsigned long *magic = __scs_magic(task_scs(tsk));
+>> > -	unsigned long sz = task_scs_sp(tsk) - task_scs(tsk);
+>> > +	unsigned long sz;
+>> > +
+>> > +#ifdef CONFIG_ARCH_HAS_KERNEL_SHADOW_STACK
+>> > +	sz = (task_scs(tsk) + SCS_SIZE) - task_scs_sp(tsk);
+>> > +#else
+>> > +	sz = task_scs_sp(tsk) - task_scs(tsk);
+>> > +#endif
+>> >
+>> >  	return sz >= SCS_SIZE - 1 || READ_ONCE_NOCHECK(*magic) != SCS_END_MAGIC;
+>> >  }
+>> >
+>> > +static inline void __scs_store_magic(unsigned long *s, unsigned long magic_val)
+>> > +{
+>> > +#ifdef CONFIG_ARCH_HAS_KERNEL_SHADOW_STACK
+>> > +	arch_scs_store(s, magic_val);
+>> > +#else
+>> > +	*__scs_magic(s) = magic_val;
+>> > +#endif
+>> > +}
+>> > +
+>>
+>> I'm not a huge fan of all the ifdefs. We could clean this up by
+>> allowing architectures to simply override some these functions, or at
+>> least use if (IS_ENABLED(CONFIG...)) instead. Will, any thoughts about
+>> this?
+>
+>Yeah, I agree that allowing architectures to provide overrides makes
+>sense, however I also suspect that some of this needs to be a runtime
+>decision because not all CPUs will support the hardware-accelerated
+>feature and will presumably want to fall back on the software
+>implementation.
 
-Sure. I will put it first to avoid warnings.
+Hmm runtime fallback is an important point. Thanks. I'll munch on it a
+bit.
 
--- 
-Rgrds, legion
-
+>
+>Will
