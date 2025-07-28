@@ -1,107 +1,111 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from out203-205-221-202.mail.qq.com (out203-205-221-202.mail.qq.com [203.205.221.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B05214A6A
-	for <linux-kbuild@vger.kernel.org>; Thu,  7 Aug 2025 05:54:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0BA524728E;
+	Thu,  7 Aug 2025 07:57:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754546049; cv=none; b=NwBb7C6oMOh47AOX9T5p+R4yOk+Ze+Cz7LgoQxrgQq1+6rtztX52JIKfIJeMymu5ztmapXu5jhktS01cGpE8h/1dSvdp1RuBQJfStZSMmt0Ey3KLHcHuuKvBselxhVoUSR//iEQyaaXcthOe+D/mqZ9PITD5u0gea15Is8YduME=
+	t=1754553467; cv=none; b=D3rSekwLnqSFCNQdrIGqWGXx/VzC+hImZCEk0mrepwOAqnyaFi+769/cGL6Mkkw6nRPiSTAw37e5dqoaOGOf4WNdCkHWVrSKuQQJLCN0aNYI9WLhTUwd+Vu/FCaPUC4d5GqK2MKMW14GP5So5+zpBNGaZUnZGZUfvghh1zpPb+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754546049; c=relaxed/simple;
-	bh=aQs2zbmWB5MUeJPv8qdQEJeH+BA9lh3OyPsZZ3eKE/M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=ac5KXbD85YBinKiFRk/B0Hg0omjz8MJp161o58EmZZcbFA2VJjBqjhMgJnlZlex5DR3IXjd+cpIUw9QYeKkMZSFzNgKqCQKwsfACr0yehTQg9qH+XNXwhGqPBjaJorwM4pKRVeFNUCwBwtMMckKgrsnDxneOOX+pvzNUKc/suLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=O0/KP3xX; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1754553467; c=relaxed/simple;
+	bh=hSSHrpk6OlaUFAzYkoIXhJXy/1FzAkvk94awYHEFuy0=;
+	h=Message-ID:Date:From:To:Cc:Subject:MIME-Version:Content-Type:
+	 Content-Disposition; b=ScE5/OmZRFdRhp1x4XZEICkmBk2L3DLytk4H9FMcCCb+mGRJKoIMMwLAsAyUN3qHNItCAUQfTHLTr1Zh251pErpAo7URq1SBjlnAi6OZznKjJct++wlq8wuEcMR2YML4UU5fNNqZmwfV240zsnwZGHrHBBKJm6oF4QqZt93EGlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=PJbnv4sm; arc=none smtp.client-ip=203.205.221.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="O0/KP3xX"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Cc:Content-ID:Content-Description;
-	bh=rpZyKtbo3DFRupdqKlktbUcTrHk4QsGIQrj4xC5nPXQ=; b=O0/KP3xXKUQOJgIQoyIyNbxuL4
-	ANjjYhvZyukW+YpMhhEdk2SUaZUCIHhPUK4PYmUjhYDmpn37DVpg3AynLOSc+gMg16qkejkAhWWA3
-	HGVRp2EIWQdi1xfhKE+sJYpkvN/2Uy9gFt8CJEf27CCh9EwUN58jYiPhk0FSYjxRMafE8gi8AGqPh
-	iz3wWJTSfFFCNrbt+2Og903PqTgevi6Zc58CUeoDwzSuUAmJYVb2mf0zaUfT8jpJ8Bxc3VWsh0LM0
-	UbjVwUFByaUL1gNRkSFqhEkThK1E4N8hn611rJCKqzXVdNJDxjvc5sFwOIU3phuvLtuucTE7Z4Xob
-	QV55rXcg==;
-Received: from [50.53.25.54] (helo=[192.168.254.17])
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1ujtZl-0000000HKgr-38Yd;
-	Thu, 07 Aug 2025 05:54:05 +0000
-Message-ID: <bf26afd4-7c4d-47ce-b294-093c15e31ec0@infradead.org>
-Date: Wed, 6 Aug 2025 22:54:05 -0700
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="PJbnv4sm"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1754553153; bh=0D6buf/C7rlkREImPG3vkrDyYeGbb3A1RxVj/fZ5R80=;
+	h=Date:From:To:Cc:Subject;
+	b=PJbnv4smMpjFW81BLpWA7hdkkVe9G4MoRxzetSJ+wN4eOIU2HS5FwdrDSiMGSBXOj
+	 WUoF/CSXhHKlsdimuqO9v3/CW7Uh7cIZdE9DvivEbELM+qO2vBEIWADWpqk7zEEV3P
+	 ekRgCJ91GRglIJJC3lXYsxDrRbTsk4EBPxtxk+IU=
+Received: from localhost.localdomain ([120.197.14.100])
+	by newxmesmtplogicsvrszc13-1.qq.com (NewEsmtp) with SMTP
+	id B8C2B4A2; Thu, 07 Aug 2025 15:46:12 +0800
+X-QQ-mid: xmsmtpt1754552772twppzovpz
+Message-ID: <tencent_6FE857803A1AAB21B71853A2E89626ABA407@qq.com>
+X-QQ-XMAILINFO: MZ7OTbK+3aE5Y5nw5+P7moRJeD9fdBDZEJXXeCBc2GAQeLEvxyCilYozMWLa4E
+	 k2wR+sMawdwNyNa0Rtn1Jz1u1p8MQoHW0MEUo2/u62KMotoIr5tYZ27m91Giyt1+j0X9sLWpcAU7
+	 kCTQtPx4NDQXusU4gNNOTJRBViAr2DjnwZ8V7xxrUj+BJg4NWSFkQ+oFM554dDGc+YaxjWuFfOaO
+	 lckQ5M2AV/PHa/5oHZeb2s7nEGbnZsrhBjLBA3XVn9Qq47xAH1jdTlhehQASx5TLSB/K5diVqN+a
+	 QsATAWLPLbbRHyRMjG4zFu8oCTfRG3t3sdozZ3L3huC3dBCowiiMnwM+tgBPpQXB8pXP6ZujCaeX
+	 gZvPuKiHC1E63AA6Z4SI2lj5TRnMFSmbC0Okh7cLbZPvJkHAD3InjFLoYkor2cNBaTO0MFAj2D+K
+	 msmo5bA0hld965hV6Y5rAPhLyDMZBtKulLQYDlGl9bLj9WY921MLkYQAQkfwjEpkkCLOYRQ/De5n
+	 x9VtITZlPTd6iBk/VuonIYMPp7VIZCw4HULK2h6WmLNX34Rf54dHs/HrKlSMIfwG2j7bbCQBQZa6
+	 sn1lJwRrxPI3hfOInSeD9ZdQM3Zg6IMFolSXgIqzzbSFI5esc2PSJwFRRPuIoCGvWUMuCCRj8c2K
+	 F74yZ5YH6PGVe3zz1IU0eZo4TSSXLg5H2h8OK0w66qxy64f+EEf5iGajYUHZ7+qDldkzccWakrFW
+	 V+7YZkyutetNViXrT+mevMUIsXjQZMyDzE6S3eqK1/Ql0TMQWbP98J1K4G3S718FW50QB5a5dSZC
+	 F2ZAf2TfwyFNG3Ywq/3wqBa2iGy+GOhXblLhb3ac4vUIdT9Ss1McDJOyJKDo9unT0ygRw/fCjV99
+	 7Pw02hElUWoK86IXhJMbH5Ks9dv1zSxSzB0UPh17Y92zY9A7aVDYgBGYG+tuTqE9cKxdh4GM98fk
+	 V7rUdQ3CN2qqDyz2eIZT3f1oMdMvcw7Wh1Ky/rbEzQ3bQAG2YMVvCtWzNqsHGWQrkSBHj7hn2QXZ
+	 tL9Kky+w==
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+Date: Tue, 29 Jul 2025 00:19:46 +0800
+From: Haoran lee <470658536@qq.com>
+To: masahiroy@kernel.org
+Cc: nathan@kernel.org, nicolas.schier@linux.dev,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] scripts/mod/modpost: For CentOS 7/old binutils compatibility
+X-OQ-MSGID: <aIejIpoTV5xUFEOr@localhost.localdomain>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Unable to build custom amd64 module.
-To: "David F." <df7729@gmail.com>,
- Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-References: <CAGRSmLvRaFfLG-ksN=WHe3FrH4DOrcJud5BZynGhsrYc8c28ww@mail.gmail.com>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <CAGRSmLvRaFfLG-ksN=WHe3FrH4DOrcJud5BZynGhsrYc8c28ww@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Hi,
+From fcf92a8a85884b383872fb435fef008fc794c3bb Mon Sep 17 00:00:00 2001
+From: houranled <leegit@163.com>
+Date: Mon, 28 Jul 2025 23:54:57 +0800
+Subject: [PATCH] CentOS 7 / old binutils compatibility
 
-On 8/6/25 9:37 PM, David F. wrote:
-> Hello,
-> 
-> The last modules I built was from 6.6.x.  I'm trying to build for
-> 6.15.x but it's failing for the amd64 version.    I'm building both a
-> 686 and amd64 version of the module (driver) using the scripts I've
-> used a long time.   The system is Devuan Chimaera 686 version.   The
-> 686 module builds fine, but the amd64 get to the point shown below and
-> fails.   Does it have to do with that warning?  What would cause that
-> in the amd64 version but not the 686 version (everything is compiled
-> from the same source).
-> 
-> Any ideas how to work around this or find the problem.   The error
-> code doesn't give me a clue of what it is:
+Signed-off-by: Haoran Lee <470658536@qq.com>
+---
+ scripts/mod/modpost.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-It does a little bit. Also read tools/objtool/Documentation/objtool.txt
-in the kernel source tree: search for "unannotated".
-
-> 
->   LD [M]  mydriver.o
-> mydriver.o: warning: objtool: .text+0x23f4: unannotated intra-function call
-
-(1) prevent "Deleting file 'mydriver.o'" below (I don't know what is doing that.)
-
-(2) run
-    $ objdump -CDlSxp -m i386:x86-64 mydriver.o >mydriver.od
-(I have never used "-m i386:x86-64"; that's just what I found on the web.)
-
-(3) Edit/search mydriver.od:
-    find the code that is at .text+0x23f4. That should give you a big clue.
-
-I can't tell any more without knowing the command line & Makefile that you
-are using to build the driver.
-
-
-> make[5]: *** [/usr/src/linux-headers-6.15.6-amd64-mine/scripts/Makefile.build:408:
-> mydriver.o] Error 255
-> make[5]: *** Deleting file 'mydriver.o'
-> make[4]: *** [/usr/src/linux-headers-6.15.6-amd64-mine/Makefile:2003: .] Error 2
-> make[3]: *** [/usr/src/linux-headers-6.15.6-amd64-mine/Makefile:248:
-> __sub-make] Error 2
-> make[3]: Leaving directory
-> '/media/sf_Source/mydriver/linux/driver/6.15.6-amd64-mine'
-> make[2]: *** [Makefile:248: __sub-make] Error 2
-> make[2]: Leaving directory '/usr/src/linux-headers-6.15.6-amd64-mine'
-> make[1]: *** [Makefile:53: domake] Error 2
-> make[1]: Leaving directory '/media/sf_Source/mydriver/linux/driver'
-> make: *** [Makefile:44: all] Error 2
-> error: Build failed.
-> 
-
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 5ca7c268294e..216647e2f301 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -30,6 +30,32 @@
+ 
+ #define MODULE_NS_PREFIX "module:"
+ 
++/* CentOS 7 / old binutils compatibility */
++#ifndef R_ARM_MOVW_ABS_NC
++#define R_ARM_MOVW_ABS_NC       43
++#endif
++#ifndef R_ARM_MOVT_ABS
++#define R_ARM_MOVT_ABS          44
++#endif
++#ifndef R_ARM_THM_MOVW_ABS_NC
++#define R_ARM_THM_MOVW_ABS_NC   47
++#endif
++#ifndef R_ARM_THM_MOVT_ABS
++#define R_ARM_THM_MOVT_ABS      48
++#endif
++#ifndef R_ARM_CALL
++#define R_ARM_CALL              28
++#endif
++#ifndef R_ARM_JUMP24
++#define R_ARM_JUMP24            29
++#endif
++#ifndef R_ARM_THM_JUMP19
++#define R_ARM_THM_JUMP19        51
++#endif
++#ifndef R_ARM_THM_JUMP24
++#define R_ARM_THM_JUMP24        30
++#endif
++
+ static bool module_enabled;
+ /* Are we using CONFIG_MODVERSIONS? */
+ static bool modversions;
 -- 
-~Randy
+2.43.0
 
