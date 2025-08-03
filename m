@@ -1,181 +1,426 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 105271B7F4;
-	Sun,  3 Aug 2025 17:32:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83CF22CCC0
+	for <linux-kbuild@vger.kernel.org>; Sun,  3 Aug 2025 21:25:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754242361; cv=none; b=kshW18yx6wBLtbGWDnIfC9B/Lyx4yZ5z5cPyzYe7xnYqueh8WhkFhM8ScqkkDYcoGhnb8tkAtZDryV6b+5UwF5XRkHtPfn+oRnvImm8YUqCINhIKeCGZyXGWfe86hVKIGLwjRu/yr/4wVwkSSiK//UYbKDQZdhhrFl4OUEoMuyw=
+	t=1754256323; cv=none; b=QB6dC/TyRg6L1XpaYZs+OeRmiu5Xvd74lRlpFZemVyUqQyhp9OI2gyHjzxCzbeJN15gcRFkThd3GMs+pYzJ2/lOAet3FKfKCDb5BADBQDXPUpKGmfBS50gQfEYbbKUbEjz42mhvfk5KM/z+CKnNdbfem4M1lbyHPBpk/m2i2nG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754242361; c=relaxed/simple;
-	bh=a/PRtos9q7kngXplGI6XaTjlncjPBJcYproElg3uWPQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZvlVcXGvmuFUAEU5C08pcanUnSF15PHqsJoKhpPzNy/gN7BDMqQepJT7x1wx1j1N3P2Vy4GGeJQQNv3TKH5GHfJt4CghnnZHeGMnGWK5kE4N5TJqToiD0RvrFBltEh4YRvIEjIJtHhqeSea1TYgggW4pXMdWjEkR+jX7EnA6Wvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F9gWBdyC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754256323; c=relaxed/simple;
+	bh=73ghhIO8IN6/4qn1xOaPA4AmJCZ9JK4SM8IuQyTAEB8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=K9YhX+E8c9CvfnoHf588O8okYHpj6vsDs1o/myfB4fLzvZbFgCtn6UytEubjaQTlFfpXXp/Sui2wugaR0e523SX6EkSn5BmjPMs8h7nrQEnMd1xv++rtjJzReWkKWAEzLwDjEf6FTQ+8febnJJhuDElVN11gZarZH+VkX/OJMGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=e8o3bx0Y; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ACmQptgu; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=e8o3bx0Y; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ACmQptgu; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F9gWBdyC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AA36C4CEF7;
-	Sun,  3 Aug 2025 17:32:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754242360;
-	bh=a/PRtos9q7kngXplGI6XaTjlncjPBJcYproElg3uWPQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=F9gWBdyCGCHDk6wEjM3mMAo3HZOlf9fhUkOClREcZi8kEcA0ebGMLEF/t6WAkkqgf
-	 i4tQT25yV2YBfWBt9NRWh7JeAGG8/75mRHevXDkoJk5uCopQvemAXb4rkPM0OaNVWW
-	 hfgQBnwoeAV6DUpKKiSnZ8pz7LOZA6M/I7S3JmYU39Y+52Ps/gJuRH49QMa8d4qen4
-	 rFrfjReNvsnp4vUjMIXklRlRygi+u2BcFbxAopwyLk5w+DZccSkVgd/3zZo13vOQ6R
-	 UJ9CMpyOB2IGOVXJQ1UzXeH76Tf5EeK/gyIDi+m1SbccYRzvS/rbNpkeNkWffkZr1I
-	 HXMaazhutZebg==
-Date: Sun, 3 Aug 2025 10:32:35 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Kees Cook <kees@kernel.org>
-Cc: Masahiro Yamada <masahiroy@kernel.org>,
-	Nicolas Schier <nicolas.schier@linux.dev>,
-	linux-kbuild@vger.kernel.org,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v2] kbuild: Re-enable -Wunterminated-string-initialization
-Message-ID: <20250803173235.GA716998@ax162>
-References: <20250802184328.it.438-kees@kernel.org>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="e8o3bx0Y";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ACmQptgu";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="e8o3bx0Y";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ACmQptgu"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 276B321BF0;
+	Sun,  3 Aug 2025 21:25:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1754256313; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gr5aZv9DLzEmG30v3xEwDzcmj1CgrYahDGAo9ULHUf8=;
+	b=e8o3bx0YQ6rlOIYThpwNw+XTvUKJmIWywp4skFj4QfZRWg2ANgBepbB1QLSziAmisk267t
+	pyPUORDR+XIQTeKwIFvlzuo5/Id/VbPYLCHKuMINOMApAzMQnQc94rhD34mUxTBQHtYn5o
+	4sLwvLddVdjJe5zBO53pU7hMkh52Rdc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1754256313;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gr5aZv9DLzEmG30v3xEwDzcmj1CgrYahDGAo9ULHUf8=;
+	b=ACmQptguCeXFufRh2FN9jWLBgB92hnupmZzSJdZOvSk4hPiJ5srxPRpu+c9mtJ70DoXbHu
+	NgNvWyarBrOygkBA==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=e8o3bx0Y;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=ACmQptgu
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1754256313; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gr5aZv9DLzEmG30v3xEwDzcmj1CgrYahDGAo9ULHUf8=;
+	b=e8o3bx0YQ6rlOIYThpwNw+XTvUKJmIWywp4skFj4QfZRWg2ANgBepbB1QLSziAmisk267t
+	pyPUORDR+XIQTeKwIFvlzuo5/Id/VbPYLCHKuMINOMApAzMQnQc94rhD34mUxTBQHtYn5o
+	4sLwvLddVdjJe5zBO53pU7hMkh52Rdc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1754256313;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gr5aZv9DLzEmG30v3xEwDzcmj1CgrYahDGAo9ULHUf8=;
+	b=ACmQptguCeXFufRh2FN9jWLBgB92hnupmZzSJdZOvSk4hPiJ5srxPRpu+c9mtJ70DoXbHu
+	NgNvWyarBrOygkBA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 08BFA133D1;
+	Sun,  3 Aug 2025 21:25:13 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id iPDqALnTj2iEQAAAD6G6ig
+	(envelope-from <ddiss@suse.de>); Sun, 03 Aug 2025 21:25:13 +0000
+From: David Disseldorp <ddiss@suse.de>
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: linux-kbuild@vger.kernel.org,
+	David Disseldorp <ddiss@suse.de>
+Subject: [RFC PATCH 1/5] gen_init_cpio: write to fd instead of stdout stream
+Date: Mon,  4 Aug 2025 07:11:15 +1000
+Message-ID: <20250803212457.2286-2-ddiss@suse.de>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20250803212457.2286-1-ddiss@suse.de>
+References: <20250803212457.2286-1-ddiss@suse.de>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250802184328.it.438-kees@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:dkim,suse.de:email]
+X-Spam-Flag: NO
+X-Spam-Level: 
+X-Rspamd-Queue-Id: 276B321BF0
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Score: -3.01
 
-On Sat, Aug 02, 2025 at 11:43:32AM -0700, Kees Cook wrote:
-> With the few remaining fixes now landed, we can re-enable the option
-> -Wunterminated-string-initialization (via -Wextra). Both GCC and Clang
-> have the required multi-dimensional nonstring attribute support.
-> 
-> Build tested allmodconfig with:
-> 	gcc (Ubuntu 14.2.0-19ubuntu2) 14.2.0
-> 	gcc (GCC) 15.1.1 20250521 (Red Hat 15.1.1-2)
-> 	clang version 20.1.8 (Fedora 20.1.8-1.fc42)
-> 	ClangBuiltLinux clang version 21.1.0-rc2
-> 	clang version 22.0.0git
-> 
-> Signed-off-by: Kees Cook <kees@kernel.org>
-> ---
->  v2: Clang is fixed too! :) (Nathan)
->  v1: https://lore.kernel.org/lkml/20250802002733.work.941-kees@kernel.org/
-> Cc: Masahiro Yamada <masahiroy@kernel.org>
-> Cc: Nathan Chancellor <nathan@kernel.org>
-> Cc: Nicolas Schier <nicolas.schier@linux.dev>
-> Cc: <linux-kbuild@vger.kernel.org>
-> ---
->  scripts/Makefile.extrawarn | 3 ---
->  1 file changed, 3 deletions(-)
-> 
-> diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
-> index dca175fffcab..a1001377dcb2 100644
-> --- a/scripts/Makefile.extrawarn
-> +++ b/scripts/Makefile.extrawarn
-> @@ -78,9 +78,6 @@ KBUILD_CFLAGS += $(call cc-option, -Wcast-function-type)
->  KBUILD_CFLAGS-$(CONFIG_CC_NO_STRINGOP_OVERFLOW) += $(call cc-option, -Wno-stringop-overflow)
->  KBUILD_CFLAGS-$(CONFIG_CC_STRINGOP_OVERFLOW) += $(call cc-option, -Wstringop-overflow)
->  
-> -# Currently, disable -Wunterminated-string-initialization as broken
-> -KBUILD_CFLAGS += $(call cc-option, -Wno-unterminated-string-initialization)
-> -
->  # The allocators already balk at large sizes, so silence the compiler
->  # warnings for bounds checks involving those possible values. While
->  # -Wno-alloc-size-larger-than would normally be used here, earlier versions
-> -- 
-> 2.34.1
-> 
+In preparation for more efficient archiving using copy_file_range(),
+switch from writing archive data to stdout to using STDOUT_FILENO and
+I/O via write(), dprintf(), etc.
+Basic I/O error handling is added to cover cases such as ENOSPC. Partial
+writes are treated as errors.
 
-I threw this into my local -next tree and my matrix finds the following
-remaining instances of this warning, mostly in driver code that may be
-used on specific architectures (I am guessing it is only x86_64
-allmodconfig that is clean?). I verified GCC 15 seems a couple of them
-then I stopped double checking for time sake.
+Signed-off-by: David Disseldorp <ddiss@suse.de>
+---
+ usr/gen_init_cpio.c | 139 ++++++++++++++++++++++++++------------------
+ 1 file changed, 81 insertions(+), 58 deletions(-)
 
-ARCH=arm multi_v5_defconfig:
-
-  drivers/cpufreq/kirkwood-cpufreq.c:98:10: warning: initializer-string for character array is too long, array size is 16 but initializer has size 17 (including the null terminating character); did you mean to use the 'nonstring' attribute? [-Wunterminated-string-initialization]
-     98 |         .name   = "kirkwood-cpufreq",
-        |                   ^~~~~~~~~~~~~~~~~~
-
-ARCH=arm allmodconfig:
-
-  drivers/soc/ti/pm33xx.c:77:22: warning: initializer-string for character array is too long, array size is 10 but initializer has size 11 (including the null terminating character); did you mean to use the 'nonstring' attribute? [-Wunterminated-string-initialization]
-     77 |         .irq_nr = 0, .src = "Ext wakeup",
-        |                             ^~~~~~~~~~~~
-
-  drivers/cpuidle/cpuidle-mvebu-v7.c:69:13: warning: initializer-string for character array is too long, array size is 16 but initializer has size 17 (including the null terminating character); did you mean to use the 'nonstring' attribute? [-Wunterminated-string-initialization]
-     69 |                 .name                   = "MV CPU DEEP IDLE",
-        |                                           ^~~~~~~~~~~~~~~~~~
-
-  drivers/firmware/efi/libstub/vsprintf.c:121:33: warning: initializer-string for character array is too long, array size is 16 but initializer has size 17 (including the null terminating character); did you mean to use the 'nonstring' attribute? [-Wunterminated-string-initialization]
-    121 |         static const char digits[16] = "0123456789ABCDEF"; /* "GHIJKLMNOPQRSTUVWXYZ"; */
-        |                                        ^~~~~~~~~~~~~~~~~~
-
-  drivers/net/ethernet/ti/netcp_ethss.c:1049:2: warning: initializer-string for character array is too long, array size is 32 but initializer has size 33 (including the null terminating character); did you mean to use the 'nonstring' attribute? [-Wunterminated-string-initialization]
-   1049 |         GBENU_STATS_HOST(ale_unknown_ucast_bytes),
-        |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  drivers/net/ethernet/ti/netcp_ethss.c:956:2: note: expanded from macro 'GBENU_STATS_HOST'
-    956 |         "GBE_HOST:"#field, GBENU_STATS0_MODULE,                 \
-        |         ^~~~~~~~~~~~~~~~~
-  drivers/net/ethernet/ti/netcp_ethss.c:1051:2: warning: initializer-string for character array is too long, array size is 32 but initializer has size 33 (including the null terminating character); did you mean to use the 'nonstring' attribute? [-Wunterminated-string-initialization]
-   1051 |         GBENU_STATS_HOST(ale_unknown_mcast_bytes),
-        |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  drivers/net/ethernet/ti/netcp_ethss.c:956:2: note: expanded from macro 'GBENU_STATS_HOST'
-    956 |         "GBE_HOST:"#field, GBENU_STATS0_MODULE,                 \
-        |         ^~~~~~~~~~~~~~~~~
-  drivers/net/ethernet/ti/netcp_ethss.c:1053:2: warning: initializer-string for character array is too long, array size is 32 but initializer has size 33 (including the null terminating character); did you mean to use the 'nonstring' attribute? [-Wunterminated-string-initialization]
-   1053 |         GBENU_STATS_HOST(ale_unknown_bcast_bytes),
-        |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  drivers/net/ethernet/ti/netcp_ethss.c:956:2: note: expanded from macro 'GBENU_STATS_HOST'
-    956 |         "GBE_HOST:"#field, GBENU_STATS0_MODULE,                 \
-        |         ^~~~~~~~~~~~~~~~~
-
-ARCH=riscv allmodconfig:
-
-  In file included from arch/riscv/kernel/kgdb.c:13:
-  arch/riscv/include/asm/gdb_xml.h:9:46: warning: initializer-string for character array is too long, array size is 31 but initializer has size 32 (including the null terminating character); did you mean to use the 'nonstring' attribute? [-Wunterminated-string-initialization]
-      9 | static const char gdb_xfer_read_target[31] = "qXfer:features:read:target.xml:";
-        |                                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  arch/riscv/include/asm/gdb_xml.h:13:4: warning: initializer-string for character array is too long, array size is 39 but initializer has size 40 (including the null terminating character); did you mean to use the 'nonstring' attribute? [-Wunterminated-string-initialization]
-     13 |                         "qXfer:features:read:riscv-64bit-cpu.xml";
-        |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-These seem like obvious fixes from my brief investigations but I am not
-sure about the other ones. The RISC-V instances seem problematic because
-kgdb_arch_handle_qxfer_pkt() uses strcpy() to copy those strings?
-
-Cheers,
-Nathan
-
-diff --git a/drivers/firmware/efi/libstub/vsprintf.c b/drivers/firmware/efi/libstub/vsprintf.c
-index 71c71c222346..7f7bbdb2a507 100644
---- a/drivers/firmware/efi/libstub/vsprintf.c
-+++ b/drivers/firmware/efi/libstub/vsprintf.c
-@@ -118,7 +118,7 @@ char *number(char *end, unsigned long long num, int base, char locase)
- 	 */
+diff --git a/usr/gen_init_cpio.c b/usr/gen_init_cpio.c
+index edcdb8abfa31c..013f5668f33a8 100644
+--- a/usr/gen_init_cpio.c
++++ b/usr/gen_init_cpio.c
+@@ -23,64 +23,71 @@
+ #define xstr(s) #s
+ #define str(s) xstr(s)
+ #define MIN(a, b) ((a) < (b) ? (a) : (b))
++#define CPIO_HDR_LEN 110
++#define padlen(_off, _align) (((_align) - ((_off) & ((_align) - 1))) % (_align))
  
- 	/* we are called with base 8, 10 or 16, only, thus don't need "G..."  */
--	static const char digits[16] = "0123456789ABCDEF"; /* "GHIJKLMNOPQRSTUVWXYZ"; */
-+	static const char digits[16] __nonstring = "0123456789ABCDEF"; /* "GHIJKLMNOPQRSTUVWXYZ"; */
++static char padding[512];
+ static unsigned int offset;
+ static unsigned int ino = 721;
+ static time_t default_mtime;
+ static bool do_file_mtime;
+ static bool do_csum = false;
++static int outfd = STDOUT_FILENO;
  
- 	switch (base) {
- 	case 10:
-diff --git a/drivers/net/ethernet/ti/netcp_ethss.c b/drivers/net/ethernet/ti/netcp_ethss.c
-index 55a1a96cd834..05d4323c6a13 100644
---- a/drivers/net/ethernet/ti/netcp_ethss.c
-+++ b/drivers/net/ethernet/ti/netcp_ethss.c
-@@ -771,7 +771,7 @@ static struct netcp_module xgbe_module;
+ struct file_handler {
+ 	const char *type;
+ 	int (*handler)(const char *line);
+ };
  
- /* Statistic management */
- struct netcp_ethtool_stat {
--	char desc[ETH_GSTRING_LEN];
-+	char desc[ETH_GSTRING_LEN] __nonstring;
- 	int type;
- 	u32 size;
- 	int offset;
+-static void push_string(const char *name)
++static int push_string(const char *name)
+ {
+ 	unsigned int name_len = strlen(name) + 1;
++	ssize_t l;
++
++	l = write(outfd, name, name_len);
++	if (l != name_len)
++		return -1;
+ 
+-	fputs(name, stdout);
+-	putchar(0);
+ 	offset += name_len;
++	return 0;
+ }
+ 
+-static void push_pad (void)
++static int push_pad(size_t padlen)
+ {
+-	while (offset & 3) {
+-		putchar(0);
+-		offset++;
+-	}
++	ssize_t l = 0;
++
++	if (!padlen)
++		return 0;
++
++	if (padlen < sizeof(padding))
++		l = write(outfd, padding, padlen);
++	if (l != padlen)
++		return -1;
++
++	offset += padlen;
++	return 0;
+ }
+ 
+-static void push_rest(const char *name)
++static int push_rest(const char *name)
+ {
+ 	unsigned int name_len = strlen(name) + 1;
+-	unsigned int tmp_ofs;
++	ssize_t l;
+ 
+-	fputs(name, stdout);
+-	putchar(0);
+-	offset += name_len;
++	l = write(outfd, name, name_len);
++	if (l != name_len)
++		return -1;
+ 
+-	tmp_ofs = name_len + 110;
+-	while (tmp_ofs & 3) {
+-		putchar(0);
+-		offset++;
+-		tmp_ofs++;
+-	}
+-}
++	offset += name_len;
+ 
+-static void push_hdr(const char *s)
+-{
+-	fputs(s, stdout);
+-	offset += 110;
++	return push_pad(padlen(name_len + CPIO_HDR_LEN, 4));
+ }
+ 
+-static void cpio_trailer(void)
++static int cpio_trailer(void)
+ {
+-	char s[256];
+ 	const char name[] = "TRAILER!!!";
++	int l;
+ 
+-	sprintf(s, "%s%08X%08X%08lX%08lX%08X%08lX"
++	l = dprintf(outfd, "%s%08X%08X%08lX%08lX%08X%08lX"
+ 	       "%08X%08X%08X%08X%08X%08X%08X",
+ 		do_csum ? "070702" : "070701", /* magic */
+ 		0,			/* ino */
+@@ -96,23 +103,24 @@ static void cpio_trailer(void)
+ 		0,			/* rminor */
+ 		(unsigned)strlen(name)+1, /* namesize */
+ 		0);			/* chksum */
+-	push_hdr(s);
+-	push_rest(name);
++	offset += l;
+ 
+-	while (offset % 512) {
+-		putchar(0);
+-		offset++;
+-	}
++	if (l != CPIO_HDR_LEN
++	 || push_rest(name) < 0
++	 || push_pad(padlen(offset, 512)) < 0)
++		return -1;
++
++	return 0;
+ }
+ 
+ static int cpio_mkslink(const char *name, const char *target,
+ 			 unsigned int mode, uid_t uid, gid_t gid)
+ {
+-	char s[256];
++	int l;
+ 
+ 	if (name[0] == '/')
+ 		name++;
+-	sprintf(s,"%s%08X%08X%08lX%08lX%08X%08lX"
++	l = dprintf(outfd, "%s%08X%08X%08lX%08lX%08X%08lX"
+ 	       "%08X%08X%08X%08X%08X%08X%08X",
+ 		do_csum ? "070702" : "070701", /* magic */
+ 		ino++,			/* ino */
+@@ -128,12 +136,17 @@ static int cpio_mkslink(const char *name, const char *target,
+ 		0,			/* rminor */
+ 		(unsigned)strlen(name) + 1,/* namesize */
+ 		0);			/* chksum */
+-	push_hdr(s);
+-	push_string(name);
+-	push_pad();
+-	push_string(target);
+-	push_pad();
++	offset += l;
++
++	if (l != CPIO_HDR_LEN
++	 || push_string(name) < 0
++	 || push_pad(padlen(offset, 4)) < 0
++	 || push_string(target) < 0
++	 || push_pad(padlen(offset, 4)) < 0)
++		return -1;
++
+ 	return 0;
++
+ }
+ 
+ static int cpio_mkslink_line(const char *line)
+@@ -157,11 +170,11 @@ static int cpio_mkslink_line(const char *line)
+ static int cpio_mkgeneric(const char *name, unsigned int mode,
+ 		       uid_t uid, gid_t gid)
+ {
+-	char s[256];
++	int l;
+ 
+ 	if (name[0] == '/')
+ 		name++;
+-	sprintf(s,"%s%08X%08X%08lX%08lX%08X%08lX"
++	l = dprintf(outfd, "%s%08X%08X%08lX%08lX%08X%08lX"
+ 	       "%08X%08X%08X%08X%08X%08X%08X",
+ 		do_csum ? "070702" : "070701", /* magic */
+ 		ino++,			/* ino */
+@@ -177,8 +190,12 @@ static int cpio_mkgeneric(const char *name, unsigned int mode,
+ 		0,			/* rminor */
+ 		(unsigned)strlen(name) + 1,/* namesize */
+ 		0);			/* chksum */
+-	push_hdr(s);
+-	push_rest(name);
++	offset += l;
++
++	if (l != CPIO_HDR_LEN
++	 || push_rest(name) < 0)
++		return -1;
++
+ 	return 0;
+ }
+ 
+@@ -246,7 +263,7 @@ static int cpio_mknod(const char *name, unsigned int mode,
+ 		       uid_t uid, gid_t gid, char dev_type,
+ 		       unsigned int maj, unsigned int min)
+ {
+-	char s[256];
++	int l;
+ 
+ 	if (dev_type == 'b')
+ 		mode |= S_IFBLK;
+@@ -255,7 +272,7 @@ static int cpio_mknod(const char *name, unsigned int mode,
+ 
+ 	if (name[0] == '/')
+ 		name++;
+-	sprintf(s,"%s%08X%08X%08lX%08lX%08X%08lX"
++	l = dprintf(outfd, "%s%08X%08X%08lX%08lX%08X%08lX"
+ 	       "%08X%08X%08X%08X%08X%08X%08X",
+ 		do_csum ? "070702" : "070701", /* magic */
+ 		ino++,			/* ino */
+@@ -271,8 +288,12 @@ static int cpio_mknod(const char *name, unsigned int mode,
+ 		min,			/* rminor */
+ 		(unsigned)strlen(name) + 1,/* namesize */
+ 		0);			/* chksum */
+-	push_hdr(s);
+-	push_rest(name);
++	offset += l;
++
++	if (l != CPIO_HDR_LEN
++	 || push_rest(name) < 0)
++		return -1;
++
+ 	return 0;
+ }
+ 
+@@ -324,11 +345,9 @@ static int cpio_mkfile(const char *name, const char *location,
+ 			unsigned int mode, uid_t uid, gid_t gid,
+ 			unsigned int nlinks)
+ {
+-	char s[256];
+ 	struct stat buf;
+ 	unsigned long size;
+-	int file;
+-	int retval;
++	int file, retval, l;
+ 	int rc = -1;
+ 	time_t mtime;
+ 	int namesize;
+@@ -386,7 +405,7 @@ static int cpio_mkfile(const char *name, const char *location,
+ 		if (name[0] == '/')
+ 			name++;
+ 		namesize = strlen(name) + 1;
+-		sprintf(s,"%s%08X%08X%08lX%08lX%08X%08lX"
++		l = dprintf(outfd, "%s%08X%08X%08lX%08lX%08X%08lX"
+ 		       "%08lX%08X%08X%08X%08X%08X%08X",
+ 			do_csum ? "070702" : "070701", /* magic */
+ 			ino,			/* ino */
+@@ -402,9 +421,12 @@ static int cpio_mkfile(const char *name, const char *location,
+ 			0,			/* rminor */
+ 			namesize,		/* namesize */
+ 			size ? csum : 0);	/* chksum */
+-		push_hdr(s);
+-		push_string(name);
+-		push_pad();
++		offset += l;
++
++		if (l != CPIO_HDR_LEN
++		 || push_string(name) < 0
++		 || push_pad(padlen(offset, 4)) < 0)
++			goto error;
+ 
+ 		while (size) {
+ 			unsigned char filebuf[65536];
+@@ -417,14 +439,15 @@ static int cpio_mkfile(const char *name, const char *location,
+ 				goto error;
+ 			}
+ 
+-			if (fwrite(filebuf, this_read, 1, stdout) != 1) {
++			if (write(outfd, filebuf, this_read) != this_read) {
+ 				fprintf(stderr, "writing filebuf failed\n");
+ 				goto error;
+ 			}
+ 			offset += this_read;
+ 			size -= this_read;
+ 		}
+-		push_pad();
++		if (push_pad(padlen(offset, 4)) < 0)
++			goto error;
+ 
+ 		name += namesize;
+ 	}
+@@ -691,7 +714,7 @@ int main (int argc, char *argv[])
+ 		}
+ 	}
+ 	if (ec == 0)
+-		cpio_trailer();
++		ec = cpio_trailer();
+ 
+ 	exit(ec);
+ }
+-- 
+2.43.0
+
