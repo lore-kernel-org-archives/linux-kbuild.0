@@ -1,79 +1,147 @@
-Received: from mailrelay-egress4.pub.mailoutpod2-cph3.one.com (mailrelay-egress4.pub.mailoutpod2-cph3.one.com [46.30.211.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 765C380B
-	for <linux-kbuild@vger.kernel.org>; Mon,  4 Aug 2025 18:03:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.30.211.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4382328B417
+	for <linux-kbuild@vger.kernel.org>; Mon,  4 Aug 2025 19:18:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754330602; cv=none; b=QUjKI8eZUu7/WsVMPC3An71nxxFJvUTqyw60PvWJ0Cq9/dnUfiVBedMJGGQmswusUfhHet82MoyuWDOpax1DXCPJqBebo6EpO6+i7J91FA+IdidCEFTujYiKY89LIOHwuMt1xAXNf3TtdqhSIHCZsSZ4m3ZRat9otuj20ERJioQ=
+	t=1754335110; cv=none; b=tPZT93nXv6808a+o4nIUo/C4aJVlxhM+H6iNceDwWAcjRAbvwO867pg2wK3+vHo/7fDuJbhTqjDaY90tlinyAkTOh9dcttol5nH52zWfEV/oeOYJwQCusdU1bXKVU1NmZY8zQ0jis8E/gc7UucVryf338ERxyRR1OUth/jcqAQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754330602; c=relaxed/simple;
-	bh=+rtdkAkeAsEvT3rbhK68CZ+79amRgl2+bzbp24jzet8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c/MJxeo6BvMVWXTEvZvL6or+Wh77SPXd+6064kdM5tmOekGzbYlseb1iHPMtaiMhcJC1dleg1NI2qhQkZqsJRtlyi7DqZRFoUOiWFv2UvEGMmZck3+eB1JWq6WDeBgIE8UJ+nGjfHVNda/mWxWUkdrYL+8qIhrUXHFh0b2+mI6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ravnborg.org; spf=none smtp.mailfrom=ravnborg.org; dkim=pass (2048-bit key) header.d=ravnborg.org header.i=@ravnborg.org header.b=dlbMZ9QV; dkim=permerror (0-bit key) header.d=ravnborg.org header.i=@ravnborg.org header.b=JRcJC1O8; arc=none smtp.client-ip=46.30.211.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ravnborg.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ravnborg.org
+	s=arc-20240116; t=1754335110; c=relaxed/simple;
+	bh=OF7LyNhIL1EOuOn5pfi758khliHdObXKjDRY6+iPVTk=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=nJSo6kjetxMH1kfqf9UoM+zf2UQtVJRgxfsqNaSDwLg4j7GHOXSb1NJI3u48eJSsJ9iTBpZybOW9jC3A8LAtysws6kxQ1TfTX76wfJ1+a9A8frTAvZ+ejumI4QqGJ40uDSQ17POcZUyiD4rhIhhkOiAawHHUBNsvrbWXh+11Q4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YzD5lKCp; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ravnborg.org header.i=@ravnborg.org header.b="dlbMZ9QV";
-	dkim=permerror (0-bit key) header.d=ravnborg.org header.i=@ravnborg.org header.b="JRcJC1O8"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1754330529; x=1754935329;
-	d=ravnborg.org; s=rsa1;
-	h=in-reply-to:content-type:mime-version:references:message-id:subject:cc:to:
-	 from:date:from;
-	bh=1lpDC4cH3BTs6BuyJ75CqHsc1dvi+9ejQ/xPgMRN/xk=;
-	b=dlbMZ9QVshk1aGtgb+7m0s0SmprfLyZm08t6oYKH7CV4RmNj57ztxKx/M/NWn+FuMFkO2IBzQ/t3i
-	 Js+GDk7ktP5vDHAZ28SrU3FFDiyHj12l+Y33zQoQaBkQkyNgVpn5xr8yUiamNxRU1XWe6PnmnJvn9m
-	 Tr6ZxxdqvoGdXLgc93ZNiJ5V0ohgMddfjD0VlGhrROXJwiffHEB7cSCpfARcu51XF99ujN7JWvhcrZ
-	 2dX3Tb0zhJ4xE0jvMIpbiJmMYcjH2nChfGfiML+3wy5xYx+8Jggydmqab1zRY1Z0qtnLmNZsL3F3jv
-	 uNN8wL+kdMMkTQ9GSWEbMcJ1DvAoqIQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1754330529; x=1754935329;
-	d=ravnborg.org; s=ed1;
-	h=in-reply-to:content-type:mime-version:references:message-id:subject:cc:to:
-	 from:date:from;
-	bh=1lpDC4cH3BTs6BuyJ75CqHsc1dvi+9ejQ/xPgMRN/xk=;
-	b=JRcJC1O8ZYPNLm0p15mm4nP4044OtQqdynzKEeslzubpcNCSnViBr5DrACmE13Qk9UCQ22jzso757
-	 osb67BrAQ==
-X-HalOne-ID: 22958868-715d-11f0-8750-f78b1f841584
-Received: from ravnborg.org (2-105-16-150-cable.dk.customer.tdc.net [2.105.16.150])
-	by mailrelay1.pub.mailoutpod2-cph3.one.com (Halon) with ESMTPSA
-	id 22958868-715d-11f0-8750-f78b1f841584;
-	Mon, 04 Aug 2025 18:02:08 +0000 (UTC)
-Date: Mon, 4 Aug 2025 20:02:07 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nicolas@fjasle.eu>
-Subject: Re: [PATCH] MAINTAINERS: hand over Kbuild maintenance
-Message-ID: <20250804180207.GA191455@ravnborg.org>
-References: <20250804142007.776418-1-masahiroy@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YzD5lKCp"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-458bf57a4e7so125e9.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 04 Aug 2025 12:18:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1754335106; x=1754939906; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UiTfAb9cnMOM27iD69XKZ3u4igfynQ6rP5nLGl75Z/s=;
+        b=YzD5lKCp3Nc7LL+onR3iz9pARhaMIVkDuAPRgZwo+ncQd8SXrQa4jpe7z/nklub7EL
+         8PJGaNPy9+4pkUSP9Msey/7o5bMmAiLz7Cxz+lx8kMt7/Mn2W+tazAx9sFfpgOO5tMSJ
+         SbPbNbFlhLW8y2sLPzc+SNVUeNkjdND8RRrWbTG+RBZ4grqhaWIOrESc9ekAz+kMznri
+         O2jv7fZpCr+jXh4t2BA7mbaGEeMpOq/Q51hThe4ue6BGC+eKME00qZm4zOIyC1+VvJFb
+         a+lekUx8S4DAp75MXoxScbIWzSoG2meZh7qRq0QMT/nPfYPcAajDriqWcgTvGSjVzWmm
+         lKgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754335106; x=1754939906;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UiTfAb9cnMOM27iD69XKZ3u4igfynQ6rP5nLGl75Z/s=;
+        b=H3sc7ztekUewkfvhNyzTrKmyn5ILP61VGNYzRopva2kOHKI9XZwjpxye5/C50cIpxA
+         uL5HWfP3qranIquvJ54Gl1bHB3hszaFcEkfAOjVdwfZnBPnF2PRR4WS0jbLsU6flb5zm
+         I+r/mfXoYmqE5XlBhfp9OC0jPQIzVJJrUSdcwE40LhZaT4c7vPUN6ejp/D797p18VHY6
+         Jv0yh+V5Eu14U4Cyv2trt7OatAUMTMfetAU4oaMzn9rgtj483XTUX5Y/cdE0JTvbCg8F
+         s/BhaLq+1u6KuD2FFfoM/F5IxMg1hz6EzhV9i5fee4R8YgJug0fwzsD/rpv7WGh+iLXS
+         WTpw==
+X-Gm-Message-State: AOJu0Yxhc2kp9uquZyia/JwphuQL/cv6v4+DwYZ8NFwOC2gi+KVmh6sF
+	sW/MJpjcsLAt4Ly3zcR0sO0HNBWIIfExrG2VefZNT++3qHo1iqialXrp/OiLEwY4OA==
+X-Gm-Gg: ASbGnctHo5lak1uZrw82242tJdJrkzrKqZg2Z9suWr13A0pQFjQLV2EmWqPG/PVOx+f
+	Vfp7kDVuWG/dmv2d6RcunLU5AXBWSzNLM6dNCdletzLkFKOQP83zbOAtCFepUptv/RSlj3oVfTO
+	QSrIS9c63IqaOungrFJlAu0Tm1Eg5jnPNZLVO1xXtlwieyDZjD9t1S8j0RKCUESa9raMQxvoNuy
+	WG2JK0k19Bn3iaId56jjwTmM89n2JjkjT8UtGyK9+WylyriOMgcLVhQm+WYAC2hbPdeh/AH4nJC
+	p7WSGJnchTv4PGBOxjdNGBTJRfP2V8ji/Ru3L3Sw4jD6mG7Kkqa2e9KPDJBwtU7ICZYGPRJrpcm
+	PCBg9Nva/qg==
+X-Google-Smtp-Source: AGHT+IGv48sGeD5VUgCauZAiE/92kma0rYRuzmY0NHuib68VVw0+Cdvc44IEf/hoe+8yq75/M+2y6A==
+X-Received: by 2002:a05:600c:444e:b0:442:feea:622d with SMTP id 5b1f17b1804b1-459e14ef635mr140015e9.1.1754335106255;
+        Mon, 04 Aug 2025 12:18:26 -0700 (PDT)
+Received: from localhost ([2a00:79e0:9d:4:2069:2f99:1a0c:3fdd])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-3b79c3b9386sm16502103f8f.18.2025.08.04.12.18.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Aug 2025 12:18:25 -0700 (PDT)
+From: Jann Horn <jannh@google.com>
+Date: Mon, 04 Aug 2025 21:17:05 +0200
+Subject: [PATCH early RFC 1/4] kbuild: kasan,kcsan: refactor out enablement
+ check
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250804142007.776418-1-masahiroy@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250804-kasan-via-kcsan-v1-1-823a6d5b5f84@google.com>
+References: <20250804-kasan-via-kcsan-v1-0-823a6d5b5f84@google.com>
+In-Reply-To: <20250804-kasan-via-kcsan-v1-0-823a6d5b5f84@google.com>
+To: Masahiro Yamada <masahiroy@kernel.org>, 
+ Nathan Chancellor <nathan@kernel.org>, 
+ Nicolas Schier <nicolas.schier@linux.dev>, 
+ Andrey Ryabinin <ryabinin.a.a@gmail.com>, 
+ Alexander Potapenko <glider@google.com>, 
+ Andrey Konovalov <andreyknvl@gmail.com>, Dmitry Vyukov <dvyukov@google.com>, 
+ Vincenzo Frascino <vincenzo.frascino@arm.com>, 
+ Andrew Morton <akpm@linux-foundation.org>, Marco Elver <elver@google.com>, 
+ Christoph Lameter <cl@gentwo.org>, David Rientjes <rientjes@google.com>, 
+ Vlastimil Babka <vbabka@suse.cz>, Roman Gushchin <roman.gushchin@linux.dev>, 
+ Harry Yoo <harry.yoo@oracle.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ kasan-dev@googlegroups.com, linux-mm@kvack.org, 
+ Jann Horn <jannh@google.com>
+X-Mailer: b4 0.15-dev
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1754335100; l=2094;
+ i=jannh@google.com; s=20240730; h=from:subject:message-id;
+ bh=OF7LyNhIL1EOuOn5pfi758khliHdObXKjDRY6+iPVTk=;
+ b=Nj7lWb06h7SXCifoXeKMs0DUlOqOdP4H8VnS8Otq1aKjtHh/Kl7wkBiRiTwimSc9Mb/vQL3wz
+ G/GTNIUIiYQAgciu1KMGaY+kSTClICVFU5L25WqzmjcvA+7+WE4fbAH
+X-Developer-Key: i=jannh@google.com; a=ed25519;
+ pk=AljNtGOzXeF6khBXDJVVvwSEkVDGnnZZYqfWhP1V+C8=
 
-Hi Masahiro,
+In preparation for making the logic for enabling KASAN/KCSAN compiler
+instrumentation more complicated, refactor the existing logic to be more
+readable and (for KASAN) less repetitive.
 
-On Mon, Aug 04, 2025 at 11:20:07PM +0900, Masahiro Yamada wrote:
-> I'm stepping down as the maintainer of Kbuild/Kconfig.
-> It was enjoyable to refactor and improve the kernel build system,
-> but due to personal reasons, I believe it's difficult for me to
-> continue in this role any further.
+Signed-off-by: Jann Horn <jannh@google.com>
+---
+ scripts/Makefile.lib | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
 
-You have done a fantastic job and you can be proud of the improvements
-and the differences you have done.
-But technical stuff aside, it has also been a pleasure to see how you
-have dealt with the leadership side of your role, mentoring and assisting
-countless people on your way. Impressive and an example for others!
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 1d581ba5df66..017c9801b6bb 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -52,14 +52,12 @@ endif
+ # Enable address sanitizer flags for kernel except some files or directories
+ # we don't want to check (depends on variables KASAN_SANITIZE_obj.o, KASAN_SANITIZE)
+ #
++is-kasan-compatible = $(patsubst n%,, \
++	$(KASAN_SANITIZE_$(target-stem).o)$(KASAN_SANITIZE)$(is-kernel-object))
+ ifeq ($(CONFIG_KASAN),y)
+ ifneq ($(CONFIG_KASAN_HW_TAGS),y)
+-_c_flags += $(if $(patsubst n%,, \
+-		$(KASAN_SANITIZE_$(target-stem).o)$(KASAN_SANITIZE)$(is-kernel-object)), \
+-		$(CFLAGS_KASAN), $(CFLAGS_KASAN_NOSANITIZE))
+-_rust_flags += $(if $(patsubst n%,, \
+-		$(KASAN_SANITIZE_$(target-stem).o)$(KASAN_SANITIZE)$(is-kernel-object)), \
+-		$(RUSTFLAGS_KASAN))
++_c_flags += $(if $(is-kasan-compatible), $(CFLAGS_KASAN), $(CFLAGS_KASAN_NOSANITIZE))
++_rust_flags += $(if $(is-kasan-compatible), $(RUSTFLAGS_KASAN))
+ endif
+ endif
+ 
+@@ -94,10 +92,10 @@ endif
+ # Enable KCSAN flags except some files or directories we don't want to check
+ # (depends on variables KCSAN_SANITIZE_obj.o, KCSAN_SANITIZE)
+ #
++is-kcsan-compatible = $(patsubst n%,, \
++	$(KCSAN_SANITIZE_$(target-stem).o)$(KCSAN_SANITIZE)$(is-kernel-object))
+ ifeq ($(CONFIG_KCSAN),y)
+-_c_flags += $(if $(patsubst n%,, \
+-	$(KCSAN_SANITIZE_$(target-stem).o)$(KCSAN_SANITIZE)$(is-kernel-object)), \
+-	$(CFLAGS_KCSAN))
++_c_flags += $(if $(is-kcsan-compatible), $(CFLAGS_KCSAN))
+ # Some uninstrumented files provide implied barriers required to avoid false
+ # positives: set KCSAN_INSTRUMENT_BARRIERS for barrier instrumentation only.
+ _c_flags += $(if $(patsubst n%,, \
 
-When you took over from me 8 years ago the kernel ecosystem was very
-lucky, they could not have wished for anyone better to do the job!
+-- 
+2.50.1.565.gc32cd1483b-goog
 
-I wish you all the luck in whatever the future brings you!
-
-	Sam
