@@ -1,55 +1,42 @@
-Received: from out203-205-221-202.mail.qq.com (out203-205-221-202.mail.qq.com [203.205.221.202])
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0BA524728E;
-	Thu,  7 Aug 2025 07:57:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F84824B29
+	for <linux-kbuild@vger.kernel.org>; Thu,  7 Aug 2025 09:17:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754553467; cv=none; b=D3rSekwLnqSFCNQdrIGqWGXx/VzC+hImZCEk0mrepwOAqnyaFi+769/cGL6Mkkw6nRPiSTAw37e5dqoaOGOf4WNdCkHWVrSKuQQJLCN0aNYI9WLhTUwd+Vu/FCaPUC4d5GqK2MKMW14GP5So5+zpBNGaZUnZGZUfvghh1zpPb+Y=
+	t=1754558265; cv=none; b=IM4/Cuqn985r30v1HWHqA2zxU4ADqanUtwVWspVP0fZle6bQcnMlrJ1EeQIqFvfR1uhS3Nin6GgtAd/s+V4uZKP+CBJosVGUu6oLjALykQRnhXD4KAjDgsKr5f8UuaBJCWrp3MtRb2PTH1sMKJzlWNX6pzyvczOItWXziK2UreI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754553467; c=relaxed/simple;
-	bh=hSSHrpk6OlaUFAzYkoIXhJXy/1FzAkvk94awYHEFuy0=;
-	h=Message-ID:Date:From:To:Cc:Subject:MIME-Version:Content-Type:
-	 Content-Disposition; b=ScE5/OmZRFdRhp1x4XZEICkmBk2L3DLytk4H9FMcCCb+mGRJKoIMMwLAsAyUN3qHNItCAUQfTHLTr1Zh251pErpAo7URq1SBjlnAi6OZznKjJct++wlq8wuEcMR2YML4UU5fNNqZmwfV240zsnwZGHrHBBKJm6oF4QqZt93EGlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=PJbnv4sm; arc=none smtp.client-ip=203.205.221.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+	s=arc-20240116; t=1754558265; c=relaxed/simple;
+	bh=0zUxW8m/mOPoNNP6vroWtbgSbFrqqnjFkA4aVh0zoO4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kuH8JSeaPx/8E6xR1cPiMbuQFNXYIdxolI6gMUQz8yPIGcmQySNAC20qFhNtii4B61MIzq7sMVWEmRAKeauMGKVb6gX2QBq6dOxoURmorOHOyO9goLLFl4GX9gM7PMs/3DM+ccBgX/xQUxlWKK339NrgNnhf46tdNVHpNLX4iL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nrC4afab; arc=none smtp.client-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="PJbnv4sm"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1754553153; bh=0D6buf/C7rlkREImPG3vkrDyYeGbb3A1RxVj/fZ5R80=;
-	h=Date:From:To:Cc:Subject;
-	b=PJbnv4smMpjFW81BLpWA7hdkkVe9G4MoRxzetSJ+wN4eOIU2HS5FwdrDSiMGSBXOj
-	 WUoF/CSXhHKlsdimuqO9v3/CW7Uh7cIZdE9DvivEbELM+qO2vBEIWADWpqk7zEEV3P
-	 ekRgCJ91GRglIJJC3lXYsxDrRbTsk4EBPxtxk+IU=
-Received: from localhost.localdomain ([120.197.14.100])
-	by newxmesmtplogicsvrszc13-1.qq.com (NewEsmtp) with SMTP
-	id B8C2B4A2; Thu, 07 Aug 2025 15:46:12 +0800
-X-QQ-mid: xmsmtpt1754552772twppzovpz
-Message-ID: <tencent_6FE857803A1AAB21B71853A2E89626ABA407@qq.com>
-X-QQ-XMAILINFO: MZ7OTbK+3aE5Y5nw5+P7moRJeD9fdBDZEJXXeCBc2GAQeLEvxyCilYozMWLa4E
-	 k2wR+sMawdwNyNa0Rtn1Jz1u1p8MQoHW0MEUo2/u62KMotoIr5tYZ27m91Giyt1+j0X9sLWpcAU7
-	 kCTQtPx4NDQXusU4gNNOTJRBViAr2DjnwZ8V7xxrUj+BJg4NWSFkQ+oFM554dDGc+YaxjWuFfOaO
-	 lckQ5M2AV/PHa/5oHZeb2s7nEGbnZsrhBjLBA3XVn9Qq47xAH1jdTlhehQASx5TLSB/K5diVqN+a
-	 QsATAWLPLbbRHyRMjG4zFu8oCTfRG3t3sdozZ3L3huC3dBCowiiMnwM+tgBPpQXB8pXP6ZujCaeX
-	 gZvPuKiHC1E63AA6Z4SI2lj5TRnMFSmbC0Okh7cLbZPvJkHAD3InjFLoYkor2cNBaTO0MFAj2D+K
-	 msmo5bA0hld965hV6Y5rAPhLyDMZBtKulLQYDlGl9bLj9WY921MLkYQAQkfwjEpkkCLOYRQ/De5n
-	 x9VtITZlPTd6iBk/VuonIYMPp7VIZCw4HULK2h6WmLNX34Rf54dHs/HrKlSMIfwG2j7bbCQBQZa6
-	 sn1lJwRrxPI3hfOInSeD9ZdQM3Zg6IMFolSXgIqzzbSFI5esc2PSJwFRRPuIoCGvWUMuCCRj8c2K
-	 F74yZ5YH6PGVe3zz1IU0eZo4TSSXLg5H2h8OK0w66qxy64f+EEf5iGajYUHZ7+qDldkzccWakrFW
-	 V+7YZkyutetNViXrT+mevMUIsXjQZMyDzE6S3eqK1/Ql0TMQWbP98J1K4G3S718FW50QB5a5dSZC
-	 F2ZAf2TfwyFNG3Ywq/3wqBa2iGy+GOhXblLhb3ac4vUIdT9Ss1McDJOyJKDo9unT0ygRw/fCjV99
-	 7Pw02hElUWoK86IXhJMbH5Ks9dv1zSxSzB0UPh17Y92zY9A7aVDYgBGYG+tuTqE9cKxdh4GM98fk
-	 V7rUdQ3CN2qqDyz2eIZT3f1oMdMvcw7Wh1Ky/rbEzQ3bQAG2YMVvCtWzNqsHGWQrkSBHj7hn2QXZ
-	 tL9Kky+w==
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-Date: Tue, 29 Jul 2025 00:19:46 +0800
-From: Haoran lee <470658536@qq.com>
-To: masahiroy@kernel.org
-Cc: nathan@kernel.org, nicolas.schier@linux.dev,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] scripts/mod/modpost: For CentOS 7/old binutils compatibility
-X-OQ-MSGID: <aIejIpoTV5xUFEOr@localhost.localdomain>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nrC4afab"
+Date: Thu, 7 Aug 2025 11:17:35 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1754558260;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mwbW4f0KXuVWV5s+001Rqv82hgjpPTxoUsBswshTMUc=;
+	b=nrC4afabMCyaCN0ckW3AG837KGnwOf0PhsefEhDpxVDQfx0ReJbaQrbpA1vcpfvnOumPir
+	MLEekOTFSMX3q/vfilRKmOY78HX5bevh3SB0sPIssp+xXDubP9GRB41sD8caVWByHavWiE
+	rD8bFK/iVFwtYaQSjmg6/BB/tZ7EGt4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Nicolas Schier <nicolas.schier@linux.dev>
+To: "David F." <df7729@gmail.com>
+Cc: linux-kbuild@vger.kernel.org
+Subject: Re: 6.12 and 6.15 building fixdep / modpost for amd64 instead of 686.
+Message-ID: <aJRvL2UwDBVJ967k@fjasle.eu>
+References: <CAGRSmLtTCUoV66PAJ2VCBz70VNVKxhJHGbBFt9GXQdOP6z5KLg@mail.gmail.com>
+ <aItVnueRx5QW2Zds@fjasle.eu>
+ <CAGRSmLuAKjg=0P=67_M2d1bfDNwWpyHQAuZZCmY=ZNNC62BW5Q@mail.gmail.com>
+ <20250731-attractive-lionfish-of-love-a01cd7@lindesnes>
+ <CAGRSmLs6O+yvxQusQVRWCRiavZu_5qhTTLNqLkFHV6SEjKx_6g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -58,54 +45,44 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <CAGRSmLs6O+yvxQusQVRWCRiavZu_5qhTTLNqLkFHV6SEjKx_6g@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-From fcf92a8a85884b383872fb435fef008fc794c3bb Mon Sep 17 00:00:00 2001
-From: houranled <leegit@163.com>
-Date: Mon, 28 Jul 2025 23:54:57 +0800
-Subject: [PATCH] CentOS 7 / old binutils compatibility
+(please reply below relevant quotations, cp. "Use trimmed interleaved replies
+in email discussions" at Documentation/process/submitting-patches.rst)
 
-Signed-off-by: Haoran Lee <470658536@qq.com>
----
- scripts/mod/modpost.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+On Wed, Aug 06, 2025 at 08:46:24PM -0700 David F. wrote:
+> Sorry for the delay, had to work on some other stuff..
+> 
+> The output is below, it build it as ELF32 as it should.   I do note
+> that your build command was like:
+> x86_64_defconfig CROSS_COMPILE=x86_64-linux-gnu- bindeb-pkg
+> 
+> I don't have that, is it something new that is required, I just have:
+> 
+> extraversion="EXTRAVERSION=-amd64"
+> make -j$(nproc) ${extraversion} bindeb-pkg
+> 
+> Here's that output that worked:
+> 
+> 
+> # make V=1 scripts/basic/fixdep
+> make --no-print-directory -C /usr/src/mydisk/kernel/linux-6.15.6-64 \
+> -f /usr/src/mydisk/kernel/linux-6.15.6-64/Makefile scripts/basic/fixdep
+> : "  SYNC    include/config/auto.conf.cmd"
+> make -f ./Makefile syncconfig
+> make -f ./scripts/Makefile.build obj=scripts/basic
+> # HOSTCC  scripts/basic/fixdep
+>   gcc -Wp,-MMD,scripts/basic/.fixdep.d -Wall -Wmissing-prototypes
+> -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu11
+> -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  -I ./scripts/include
+> -o scripts/basic/fixdep scripts/basic/fixdep.c
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 5ca7c268294e..216647e2f301 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -30,6 +30,32 @@
- 
- #define MODULE_NS_PREFIX "module:"
- 
-+/* CentOS 7 / old binutils compatibility */
-+#ifndef R_ARM_MOVW_ABS_NC
-+#define R_ARM_MOVW_ABS_NC       43
-+#endif
-+#ifndef R_ARM_MOVT_ABS
-+#define R_ARM_MOVT_ABS          44
-+#endif
-+#ifndef R_ARM_THM_MOVW_ABS_NC
-+#define R_ARM_THM_MOVW_ABS_NC   47
-+#endif
-+#ifndef R_ARM_THM_MOVT_ABS
-+#define R_ARM_THM_MOVT_ABS      48
-+#endif
-+#ifndef R_ARM_CALL
-+#define R_ARM_CALL              28
-+#endif
-+#ifndef R_ARM_JUMP24
-+#define R_ARM_JUMP24            29
-+#endif
-+#ifndef R_ARM_THM_JUMP19
-+#define R_ARM_THM_JUMP19        51
-+#endif
-+#ifndef R_ARM_THM_JUMP24
-+#define R_ARM_THM_JUMP24        30
-+#endif
-+
- static bool module_enabled;
- /* Are we using CONFIG_MODVERSIONS? */
- static bool modversions;
--- 
-2.43.0
+I am afraid, I lost track of what your actual problem is.
 
+It looks like fixdep is built the way it should, so the next step would be
+running bindeb-pkg with V=1 and finding its gcc call for building fixdep and to
+verify both calls.  They should be (at least almost) the same.
+
+Kind regards,
+Nicolas
