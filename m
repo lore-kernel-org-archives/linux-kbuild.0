@@ -1,68 +1,141 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5083520C478
-	for <linux-kbuild@vger.kernel.org>; Tue, 12 Aug 2025 02:24:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD96E18FC91;
+	Tue, 12 Aug 2025 05:31:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754965490; cv=none; b=nIE/8GJDwqYePz4wXVz4LJxvLzybuB24rvhH8gT3odDknpKuRfvk7rHJU360fShuDpU0QUsd0Cf90rssNi7rfDOshCKY+i0Y0iKCrx8h2b0WGhhkZMt82tfga6oXE+cVC6otzfTgL5dCWMtSZheDYLGaTA6qp8v7hTU2ccBKeAQ=
+	t=1754976715; cv=none; b=orrJ3WKGreVh0n+RcfHNHFz4OykHZxd0dKZ6rRl3i+6eomJbl4x2A3/j7sbVb8Velrm8vzQxSAZ+VFMWVH9G93i3FXFcvKWJzPBhxTDE20HlU9lRK8Kr4k10URgIMXK/EjnTasuoa48lpCnLXiAxYcNxglt/ZxSgcssjFkNMx/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754965490; c=relaxed/simple;
-	bh=LohMC8L02xEkula2AUYpNoVunc7EP4wwSnkuLUppFqo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NCqWRbr6dblZ4cqAY8jTk8LC2tPuRGpy4xKyfkBHVRhB4TqOCjgJ/KG6sEb8tfLfzZJf21p7haOSwQnh3oTnkAPgpTsvG2SHVb3esuyVl5hmWuZdbnQdEARbBzS66D326mTh9gIYz9ftRZeqS1YNJl0WsPwH5z+o7ys8vbwl4Ow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=PwUJQl5W; arc=none smtp.client-ip=220.197.31.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1754976715; c=relaxed/simple;
+	bh=+pKek1uPajXdjvkKkRPqpP96Ei8Q3LMoOwHeMHpLB4g=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=XPsFsyzInoDiMnWcBIPs+yz6Fd1Ic83ne8CJFyvO76UmSELH3QyiC5Q5WxLd4M6QMG5KrJ47wsUetyUdwCkoJDdWHFlZ5X1lasnWhTjoTEUIDoFaDh8zFwXi3SeiJ9ikijyJnYotzmRU8pHWtPpT9HhqLeXPx/kIi+FhADZtxUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=1M35vqZN; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=whXEW0nK; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="PwUJQl5W"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=Sg
-	nVgy+6ldbq15M/rjJipP5qX3IUixcwlIcbykJW6yY=; b=PwUJQl5WkHmjlmNvgb
-	WHTxks+3Wbx/toGAOvXbM9V44xrodRKUUj2rtddPpBpfVhkiyYVTlA97VNSDkwhm
-	SJwPfh6U/PQ1/rgIVxmYGaSnPUk1G3i6LwjzKu9XEMm0XgbLPYugsLPhx/8f4A9i
-	7kZmqEM86E/TGVRCvxq9L0WEQ=
-Received: from localhost.localdomain (unknown [])
-	by gzsmtp1 (Coremail) with SMTP id PCgvCgC3D37gpZpo8NBmAA--.4775S2;
-	Tue, 12 Aug 2025 10:24:33 +0800 (CST)
-From: "longguang.yue" <bigclouds@163.com>
-To: linux-kbuild@vger.kernel.org
-Cc: nathan@kernel.org,
-	nicolas.schier@linux.dev,
-	masahiroy@kernel.org,
-	"longguang.yue" <bigclouds@163.com>
-Subject: [PATCH] Makefile: mrproper deletes signing_key.x509
-Date: Tue, 12 Aug 2025 10:24:29 +0800
-Message-Id: <20250812022429.52674-1-bigclouds@163.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="1M35vqZN";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="whXEW0nK"
+From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1754976712;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KMXUeqLVprRM83sPpoFBOYX8oSP1XBvAZsT4HmA8uJU=;
+	b=1M35vqZNJ4dU71xhNc8RuydoIBxCBcT1CORAdWaorLsUaOnxpw+2N7GEMvKlincIs62loy
+	T74zlTblfMUJb17Wd+NJ+RF1LKgZFFbuVZjfc0qyBzIDQ8mk8LoIIX6uq5yws/CiVfDBZU
+	fvlyXvn7CxRFtxI6HWuqYJq0A6aFN6PSzQeAMefS+yCewn/no5fSjYsX9+n9sQbs1GjQZT
+	5zZq5z2ZnRGBe6YivYOz+LPV3wNn2hIWS+cG4ZL94Gy28R3btOWLr6XMKSxgt81bL3Xejt
+	Ja2CMVV2VaAhqJ8wYWFBo9bcXh/ChPbbVUrj6tVYN1FzqKdnYxUQq934i6SgCw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1754976712;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KMXUeqLVprRM83sPpoFBOYX8oSP1XBvAZsT4HmA8uJU=;
+	b=whXEW0nKe2faCcoKL5alTItWuG8euaqSpS3PvsIwFTS8IdKST+PnkPwTAoky1Qo0m6gzgW
+	3ju/jAmgu9oVILDA==
+Date: Tue, 12 Aug 2025 07:31:39 +0200
+Subject: [PATCH 1/2] kbuild: move existing CONFIG_WERROR flags into
+ dedicated Makefile
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PCgvCgC3D37gpZpo8NBmAA--.4775S2
-X-Coremail-Antispam: 1Uf129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-	VFW2AGmfu7bjvjm3AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvjTRuoGmUUUUU
-X-CM-SenderInfo: peljuzprxg2qqrwthudrp/1tbiNg+mQ2iaULJhMQAJsV
+Message-Id: <20250812-kbuild-werror-v1-1-36c9ff653700@linutronix.de>
+References: <20250812-kbuild-werror-v1-0-36c9ff653700@linutronix.de>
+In-Reply-To: <20250812-kbuild-werror-v1-0-36c9ff653700@linutronix.de>
+To: Nathan Chancellor <nathan@kernel.org>, 
+ Nicolas Schier <nicolas.schier@linux.dev>, Miguel Ojeda <ojeda@kernel.org>, 
+ Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
+ Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+ Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+ Danilo Krummrich <dakr@kernel.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ rust-for-linux@vger.kernel.org, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1754976708; l=2547;
+ i=thomas.weissschuh@linutronix.de; s=20240209; h=from:subject:message-id;
+ bh=+pKek1uPajXdjvkKkRPqpP96Ei8Q3LMoOwHeMHpLB4g=;
+ b=nX9JWW4lGC9XaPA7cdKp7851DDASxuzGyvsz0YDZLG7i0Sgz+TL/tIIqgpH/os0l73ct5uDg4
+ sk6ZMlp50tvDRoMsiFTS4dtd4PS9u0iVQB9yLCeOxvyQLpC5XAyBHmp
+X-Developer-Key: i=thomas.weissschuh@linutronix.de; a=ed25519;
+ pk=pfvxvpFUDJV2h2nY0FidLUml22uGLSjByFbM6aqQQws=
 
-delete temporary signing_key.x509
+CONFIG_WERROR is about to be enabled for more build steps.
+To avoid spreading similar flags into multiple locations, create a
+dedicated, shared file for them.
 
-Signed-off-by: longguang.yue <bigclouds@163.com>
+Signed-off-by: Thomas Weißschuh <thomas.weissschuh@linutronix.de>
 ---
- Makefile | 1 +
- 1 file changed, 1 insertion(+)
+ Makefile                   |  4 +---
+ scripts/Makefile.extrawarn |  2 --
+ scripts/Makefile.werror    | 11 +++++++++++
+ 3 files changed, 12 insertions(+), 5 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 6bfe776bf3c5..7c45fa8e44ef 100644
+index 6bfe776bf3c5ff0cf187dc6719dd5817cd4af2ca..4ffa40e98b1517e1f2a7a155641fa9a3c784f625 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1589,6 +1589,7 @@ MRPROPER_FILES += include/config include/generated          \
- 		  .config .config.old .version \
- 		  Module.symvers \
- 		  certs/signing_key.pem \
-+		  certs/signing_key.x509 \
- 		  certs/x509.genkey \
- 		  vmlinux-gdb.py \
- 		  rpmbuild \
+@@ -901,9 +901,6 @@ stackp-flags-$(CONFIG_STACKPROTECTOR_STRONG)      := -fstack-protector-strong
+ 
+ KBUILD_CFLAGS += $(stackp-flags-y)
+ 
+-KBUILD_RUSTFLAGS-$(CONFIG_WERROR) += -Dwarnings
+-KBUILD_RUSTFLAGS += $(KBUILD_RUSTFLAGS-y)
+-
+ ifdef CONFIG_FRAME_POINTER
+ KBUILD_CFLAGS	+= -fno-omit-frame-pointer -fno-optimize-sibling-calls
+ KBUILD_RUSTFLAGS += -Cforce-frame-pointers=y
+@@ -1085,6 +1082,7 @@ endif
+ 
+ # include additional Makefiles when needed
+ include-y			:= scripts/Makefile.extrawarn
++include-$(CONFIG_WERROR)	+= scripts/Makefile.werror
+ include-$(CONFIG_DEBUG_INFO)	+= scripts/Makefile.debug
+ include-$(CONFIG_DEBUG_INFO_BTF)+= scripts/Makefile.btf
+ include-$(CONFIG_KASAN)		+= scripts/Makefile.kasan
+diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
+index dca175fffcabeb2d942814f0a096a7efbf8bc819..2d8201395002dace78b875a6d25d1fd33b1691fd 100644
+--- a/scripts/Makefile.extrawarn
++++ b/scripts/Makefile.extrawarn
+@@ -25,8 +25,6 @@ ifneq ($(CONFIG_FRAME_WARN),0)
+ KBUILD_CFLAGS += -Wframe-larger-than=$(CONFIG_FRAME_WARN)
+ endif
+ 
+-KBUILD_CPPFLAGS-$(CONFIG_WERROR) += -Werror
+-KBUILD_CPPFLAGS += $(KBUILD_CPPFLAGS-y)
+ KBUILD_CFLAGS-$(CONFIG_CC_NO_ARRAY_BOUNDS) += -Wno-array-bounds
+ 
+ ifdef CONFIG_CC_IS_CLANG
+diff --git a/scripts/Makefile.werror b/scripts/Makefile.werror
+new file mode 100644
+index 0000000000000000000000000000000000000000..db14b5490ba83444be39a18109f103cabc5b95e9
+--- /dev/null
++++ b/scripts/Makefile.werror
+@@ -0,0 +1,11 @@
++# SPDX-License-Identifier: GPL-2.0
++# ==========================================================================
++# Warning flags enabled by CONFIG_WERROR
++#
++# Different parts of the build require different flags to transform warnings
++# into errors. These are handled by the entries below.
++# ==========================================================================
++
++KBUILD_CPPFLAGS		+= -Werror
++
++KBUILD_RUSTFLAGS	+= -Dwarnings
+
 -- 
-2.34.1
+2.50.1
 
