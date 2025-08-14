@@ -1,45 +1,86 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CC21231839
-	for <linux-kbuild@vger.kernel.org>; Thu, 14 Aug 2025 05:49:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F0322333B
+	for <linux-kbuild@vger.kernel.org>; Thu, 14 Aug 2025 05:49:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755150546; cv=none; b=AyNIxnqOIbZJ8yuxeSkLFHEsmA12VgPQVlFXopZtBcx64H84Z6HYMWMUbGXr5P2gyMce+1gMv4wDkri4TTAFszmWEQATr/IvKC7GD3aDk9NV6gZQRSN+A24gQMbKmrKSCUjEVFsyXpqV8i1y48wUYTzYHuO0mbUuHV+FH30khNQ=
+	t=1755150550; cv=none; b=iz9n6+WANS3xJsIj5JzSTyXyk/JpBfTTOK1mi9vVNt6h9fHQ9kOZMc3l8MKNrZvXCACHKDNKKL3z4sLGIm0exFvmsMsUhOT7D+++g+Gs42gcFH836ELbf8lfEV12CzviV7cPDewHiBXZwSQWzkdQT1zRuBj54nt3OrMbsXYd3MQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755150546; c=relaxed/simple;
-	bh=5c4tsAbrUCPzNd0BA/l/beypy1l+JGENmNIxWBabzkw=;
+	s=arc-20240116; t=1755150550; c=relaxed/simple;
+	bh=pZ/gOI0k4sDj/lLAzb/QoiEwC4zgMq88cnBUTJoxozQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=f5M2xLgE4EfFyYqMpOJF1eZkaxmYTs8xdZzVvmvDlh7fsc9+P6Kckd5dsTRjK7QUppC/ev0mzSWfspMrXhqAkoD/VOaSZ9cKGBciAbjrOquro4Mn95OziRSs2JerwAgvGERCD/wIa7DoqDVVTLFIwbnI8E5PChE2MzogOI+rY5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; arc=none smtp.client-ip=195.135.223.130
+	 MIME-Version; b=Ns7QT8TLeC9/KYjKZtJ5RtzE1KeQ9wpsGN6A+ZnB4Z2kZwjwUXRcAYc5+q/yWMug2o0zYVxpQfPwxzeXtaL8kgTt6NSqYBR/Ej9Aq7gzo/h/dbFqHW34YxmHPLF4RyOVads5wkwKKrKiOI+IZ/GYsx0cQpu/CgXoC3p0UGedz4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=eqn3nTfJ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=hM6/zLqM; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=eqn3nTfJ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=hM6/zLqM; arc=none smtp.client-ip=195.135.223.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="eqn3nTfJ";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="hM6/zLqM";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="eqn3nTfJ";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="hM6/zLqM"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 8793621B2B;
-	Thu, 14 Aug 2025 05:48:55 +0000 (UTC)
-Authentication-Results: smtp-out1.suse.de;
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 0597E1F7D1;
+	Thu, 14 Aug 2025 05:48:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1755150531; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lnh4KOoFyfui8L9tod3Xuqssl1j5kS74I0ySiKi//IU=;
+	b=eqn3nTfJtIY5OSOrkYm3Yxi2JUXwvS8SjiwKxPUhNumfJQDnaeu+F15zeNpM3v37vy5Apn
+	duNYTSHZeM/OQJpBIir8GZzaeBenUCe0FSCxtaZz5/wEY0QyR+IbAVvQKFmUT6ib88g+p8
+	+0NYVofrLI1P0lOVTXiwjzDzznUQFG8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1755150531;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lnh4KOoFyfui8L9tod3Xuqssl1j5kS74I0ySiKi//IU=;
+	b=hM6/zLqMQSikb1oDd88BfOctuxaa5YzMNr8G4k0XZ7/Gu5vTZEqza9ucruIxQM8VMns9mE
+	mjVWUG0OPrUq+YCQ==
+Authentication-Results: smtp-out2.suse.de;
 	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1755150531; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lnh4KOoFyfui8L9tod3Xuqssl1j5kS74I0ySiKi//IU=;
+	b=eqn3nTfJtIY5OSOrkYm3Yxi2JUXwvS8SjiwKxPUhNumfJQDnaeu+F15zeNpM3v37vy5Apn
+	duNYTSHZeM/OQJpBIir8GZzaeBenUCe0FSCxtaZz5/wEY0QyR+IbAVvQKFmUT6ib88g+p8
+	+0NYVofrLI1P0lOVTXiwjzDzznUQFG8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1755150531;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lnh4KOoFyfui8L9tod3Xuqssl1j5kS74I0ySiKi//IU=;
+	b=hM6/zLqMQSikb1oDd88BfOctuxaa5YzMNr8G4k0XZ7/Gu5vTZEqza9ucruIxQM8VMns9mE
+	mjVWUG0OPrUq+YCQ==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CB07F13479;
-	Thu, 14 Aug 2025 05:48:53 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4C94913479;
+	Thu, 14 Aug 2025 05:48:49 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id mP7AIMV4nWiEYQAAD6G6ig
-	(envelope-from <ddiss@suse.de>); Thu, 14 Aug 2025 05:48:53 +0000
+	id cB7eAcF4nWiEYQAAD6G6ig
+	(envelope-from <ddiss@suse.de>); Thu, 14 Aug 2025 05:48:49 +0000
 From: David Disseldorp <ddiss@suse.de>
 To: linux-kbuild@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org
 Cc: linux-next@vger.kernel.org,
 	David Disseldorp <ddiss@suse.de>
-Subject: [PATCH v2 7/7] gen_init_cpio: add -a <data_align> as reflink optimization
-Date: Thu, 14 Aug 2025 15:18:05 +1000
-Message-ID: <20250814054818.7266-8-ddiss@suse.de>
+Subject: [PATCH v2 5/7] gen_initramfs.sh: use gen_init_cpio -o parameter
+Date: Thu, 14 Aug 2025 15:18:03 +1000
+Message-ID: <20250814054818.7266-6-ddiss@suse.de>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250814054818.7266-1-ddiss@suse.de>
 References: <20250814054818.7266-1-ddiss@suse.de>
@@ -50,243 +91,67 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
-X-Spam-Level: 
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-4.00 / 50.00];
-	REPLY(-4.00)[]
-X-Rspamd-Queue-Id: 8793621B2B
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
-X-Rspamd-Action: no action
+X-Spamd-Result: default: False [-6.80 / 50.00];
+	REPLY(-4.00)[];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-0.999];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_HAS_DN(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	RCPT_COUNT_THREE(0.00)[4];
+	RCVD_TLS_ALL(0.00)[]
 X-Spam-Flag: NO
-X-Spam-Score: -4.00
+X-Spam-Level: 
+X-Spam-Score: -6.80
 
-As described in buffer-format.rst, the existing initramfs.c extraction
-logic works fine if the cpio filename field is padded out with trailing
-zeros, with a caveat that the padded namesize can't exceed PATH_MAX.
-
-Add filename zero-padding logic to gen_init_cpio, which can be triggered
-via the new -a <data_align> parameter. Performance and storage
-utilization is improved for Btrfs and XFS workloads, as copy_file_range
-can reflink the entire source file into a filesystem block-size aligned
-destination offset within the cpio archive.
-
-Btrfs benchmarks run on 6.15.8-1-default (Tumbleweed) x86_64 host:
-  > truncate --size=2G /tmp/backing.img
-  > /sbin/mkfs.btrfs /tmp/backing.img
-  ...
-  Sector size:        4096        (CPU page size: 4096)
-  ...
-  > sudo mount /tmp/backing.img mnt
-  > sudo chown $USER mnt
-  > cd mnt
-  mnt> dd if=/dev/urandom of=foo bs=1M count=20 && cat foo >/dev/null
-  ...
-  mnt> echo "file /foo foo 0755 0 0" > list
-  mnt> perf stat -r 10 gen_init_cpio -o unaligned_btrfs list
-  ...
-            0.023496 +- 0.000472 seconds time elapsed  ( +-  2.01% )
-
-  mnt> perf stat -r 10 gen_init_cpio -o aligned_btrfs -a 4096 list
-  ...
-           0.0010010 +- 0.0000565 seconds time elapsed  ( +-  5.65% )
-
-  mnt> /sbin/xfs_io -c "fiemap -v" unaligned_btrfs
-  unaligned_btrfs:
-   EXT: FILE-OFFSET      BLOCK-RANGE      TOTAL FLAGS
-     0: [0..40967]:      695040..736007   40968   0x1
-  mnt> /sbin/xfs_io -c "fiemap -v" aligned_btrfs
-  aligned_btrfs:
-   EXT: FILE-OFFSET      BLOCK-RANGE      TOTAL FLAGS
-     0: [0..7]:          26768..26775         8   0x0
-     1: [8..40967]:      269056..310015   40960 0x2000
-     2: [40968..40975]:  26776..26783         8   0x1
-  mnt> /sbin/btrfs fi du unaligned_btrfs aligned_btrfs
-       Total   Exclusive  Set shared  Filename
-    20.00MiB    20.00MiB       0.00B  unaligned_btrfs
-    20.01MiB     8.00KiB    20.00MiB  aligned_btrfs
-
-XFS benchmarks run on same host:
-  > sudo umount mnt && rm /tmp/backing.img
-  > truncate --size=2G /tmp/backing.img
-  > /sbin/mkfs.xfs /tmp/backing.img
-  ...
-           =                       reflink=1    ...
-  data     =                       bsize=4096   blocks=524288, imaxpct=25
-  ...
-  > sudo mount /tmp/backing.img mnt
-  > sudo chown $USER mnt
-  > cd mnt
-  mnt> dd if=/dev/urandom of=foo bs=1M count=20 && cat foo >/dev/null
-  ...
-  mnt> echo "file /foo foo 0755 0 0" > list
-  mnt> perf stat -r 10 gen_init_cpio -o unaligned_xfs list
-  ...
-            0.011069 +- 0.000469 seconds time elapsed  ( +-  4.24% )
-
-  mnt> perf stat -r 10 gen_init_cpio -o aligned_xfs -a 4096 list
-  ...
-            0.001273 +- 0.000288 seconds time elapsed  ( +- 22.60% )
-
-  mnt> /sbin/xfs_io -c "fiemap -v" unaligned_xfs
-   unaligned_xfs:
-   EXT: FILE-OFFSET      BLOCK-RANGE      TOTAL FLAGS
-     0: [0..40967]:      106176..147143   40968   0x0
-     1: [40968..65023]:  147144..171199   24056 0x801
-  mnt> /sbin/xfs_io -c "fiemap -v" aligned_xfs
-   aligned_xfs:
-   EXT: FILE-OFFSET      BLOCK-RANGE      TOTAL FLAGS
-     0: [0..7]:          120..127             8   0x0
-     1: [8..40967]:      192..41151       40960 0x2000
-     2: [40968..40975]:  236728..236735       8   0x0
-     3: [40976..106495]: 236736..302255   65520 0x801
-
-The alignment is best-effort; a stderr message is printed if alignment
-can't be achieved due to PATH_MAX overrun, with fallback to non-padded
-filename. This allows it to still be useful for opportunistic alignment,
-e.g. on aarch64 Btrfs with 64K block-size. Alignment failure messages
-provide an indicator that reordering of the cpio-manifest may be
-beneficial.
-
-Archive read performance for reflinked initramfs images may suffer due
-to the effects of fragmentation, particularly on spinning disks. To
-mitigate excessive fragmentation, files with lengths less than
-data_align aren't padded.
+gen_init_cpio can now write to a file directly, so use it when
+gen_initramfs.sh is called with -o (e.g. usr/Makefile invocation).
 
 Signed-off-by: David Disseldorp <ddiss@suse.de>
 ---
- usr/gen_init_cpio.c | 50 ++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 38 insertions(+), 12 deletions(-)
+ usr/gen_initramfs.sh | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/usr/gen_init_cpio.c b/usr/gen_init_cpio.c
-index 40f4cbd95844e..75bf95d327171 100644
---- a/usr/gen_init_cpio.c
-+++ b/usr/gen_init_cpio.c
-@@ -28,13 +28,15 @@
- #define CPIO_TRAILER "TRAILER!!!"
- #define padlen(_off, _align) (((_align) - ((_off) & ((_align) - 1))) % (_align))
+diff --git a/usr/gen_initramfs.sh b/usr/gen_initramfs.sh
+index 14b5782f961a8..7eba2fddf0ef2 100755
+--- a/usr/gen_initramfs.sh
++++ b/usr/gen_initramfs.sh
+@@ -193,7 +193,8 @@ root_gid=0
+ dep_list=
+ timestamp=
+ cpio_list=$(mktemp ${TMPDIR:-/tmp}/cpiolist.XXXXXX)
+-output="/dev/stdout"
++# gen_init_cpio writes to stdout by default
++output=""
  
--static char padding[512];
-+/* zero-padding the filename field for data alignment is limited by PATH_MAX */
-+static char padding[PATH_MAX];
- static unsigned int offset;
- static unsigned int ino = 721;
- static time_t default_mtime;
- static bool do_file_mtime;
- static bool do_csum = false;
- static int outfd = STDOUT_FILENO;
-+static unsigned int dalign;
+ trap "rm -f $cpio_list" EXIT
  
- struct file_handler {
- 	const char *type;
-@@ -359,7 +361,7 @@ static int cpio_mkfile(const char *name, const char *location,
- 	int file, retval, len;
- 	int rc = -1;
- 	time_t mtime;
--	int namesize;
-+	int namesize, namepadlen;
- 	unsigned int i;
- 	uint32_t csum = 0;
- 	ssize_t this_read;
-@@ -407,14 +409,27 @@ static int cpio_mkfile(const char *name, const char *location,
- 	}
+@@ -207,7 +208,7 @@ while [ $# -gt 0 ]; do
+ 			shift
+ 			;;
+ 		"-o")	# generate cpio image named $1
+-			output="$1"
++			output="-o $1"
+ 			shift
+ 			;;
+ 		"-u")	# map $1 to uid=0 (root)
+@@ -246,4 +247,4 @@ done
  
- 	size = 0;
-+	namepadlen = 0;
- 	for (i = 1; i <= nlinks; i++) {
--		/* data goes on last link */
--		if (i == nlinks)
--			size = buf.st_size;
--
- 		if (name[0] == '/')
- 			name++;
- 		namesize = strlen(name) + 1;
-+
-+		/* data goes on last link, after any alignment padding */
-+		if (i == nlinks)
-+			size = buf.st_size;
-+
-+		if (dalign && size > dalign) {
-+			namepadlen = padlen(offset + CPIO_HDR_LEN + namesize,
-+					    dalign);
-+			if (namesize + namepadlen > PATH_MAX) {
-+				fprintf(stderr,
-+					"%s: best-effort alignment %u missed\n",
-+					name, dalign);
-+				namepadlen = 0;
-+			}
-+		}
-+
- 		len = dprintf(outfd, "%s%08X%08X%08lX%08lX%08X%08lX"
- 		       "%08lX%08X%08X%08X%08X%08X%08X",
- 			do_csum ? "070702" : "070701", /* magic */
-@@ -429,13 +444,13 @@ static int cpio_mkfile(const char *name, const char *location,
- 			1,			/* minor */
- 			0,			/* rmajor */
- 			0,			/* rminor */
--			namesize,		/* namesize */
-+			namesize + namepadlen,	/* namesize */
- 			size ? csum : 0);	/* chksum */
- 		offset += len;
- 
- 		if (len != CPIO_HDR_LEN
- 		 || push_buf(name, namesize) < 0
--		 || push_pad(padlen(offset, 4)) < 0)
-+		 || push_pad(namepadlen ? namepadlen : padlen(offset, 4)) < 0)
- 			goto error;
- 
- 		if (size) {
-@@ -552,8 +567,7 @@ static int cpio_mkfile_line(const char *line)
- static void usage(const char *prog)
- {
- 	fprintf(stderr, "Usage:\n"
--		"\t%s [-t <timestamp>] [-c] [-o <output_path>] <cpio_list>\n"
--		"\n"
-+		"\t%s [-t <timestamp>] [-c] [-o <output_path>] [-a <data_align>] <cpio_list>\n\n"
- 		"<cpio_list> is a file containing newline separated entries that\n"
- 		"describe the files to be included in the initramfs archive:\n"
- 		"\n"
-@@ -590,7 +604,10 @@ static void usage(const char *prog)
- 		"The default is to use the current time for all files, but\n"
- 		"preserve modification time for regular files.\n"
- 		"-c: calculate and store 32-bit checksums for file data.\n"
--		"<output_path>: write cpio to this file instead of stdout\n",
-+		"<output_path>: write cpio to this file instead of stdout\n"
-+		"<data_align>: attempt to align file data by zero-padding the\n"
-+		"filename field up to data_align. Must be a multiple of 4.\n"
-+		"Alignment is best-effort; PATH_MAX limits filename padding.\n",
- 		prog);
- }
- 
-@@ -632,7 +649,7 @@ int main (int argc, char *argv[])
- 
- 	default_mtime = time(NULL);
- 	while (1) {
--		int opt = getopt(argc, argv, "t:cho:");
-+		int opt = getopt(argc, argv, "t:cho:a:");
- 		char *invalid;
- 
- 		if (opt == -1)
-@@ -661,6 +678,15 @@ int main (int argc, char *argv[])
- 				exit(1);
- 			}
- 			break;
-+		case 'a':
-+			dalign = strtoul(optarg, &invalid, 10);
-+			if (!*optarg || *invalid || (dalign & 3)) {
-+				fprintf(stderr, "Invalid data_align: %s\n",
-+						optarg);
-+				usage(argv[0]);
-+				exit(1);
-+			}
-+			break;
- 		case 'h':
- 		case '?':
- 			usage(argv[0]);
+ # If output_file is set we will generate cpio archive
+ # we are careful to delete tmp files
+-usr/gen_init_cpio $timestamp $cpio_list > $output
++usr/gen_init_cpio $output $timestamp $cpio_list
 -- 
 2.43.0
 
