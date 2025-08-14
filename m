@@ -1,157 +1,180 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F0322333B
-	for <linux-kbuild@vger.kernel.org>; Thu, 14 Aug 2025 05:49:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9382C24468A;
+	Thu, 14 Aug 2025 07:15:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755150550; cv=none; b=iz9n6+WANS3xJsIj5JzSTyXyk/JpBfTTOK1mi9vVNt6h9fHQ9kOZMc3l8MKNrZvXCACHKDNKKL3z4sLGIm0exFvmsMsUhOT7D+++g+Gs42gcFH836ELbf8lfEV12CzviV7cPDewHiBXZwSQWzkdQT1zRuBj54nt3OrMbsXYd3MQ=
+	t=1755155740; cv=none; b=avRkJlLsM/1S3HCTomVXqEfA9nREKFWdPJGqtsY82rN5BTAoWG0v/W5SwNw9iVnySc65QEx3khJbq4dGGIgWoLhK5X5+T3i0mv72l5HseXtu0nlbmLDQakIlGnT7acR7tay0K2ojuvgxDhJscKAbXQ2q6A5iS4yQIYOjFJ0UFo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755150550; c=relaxed/simple;
-	bh=pZ/gOI0k4sDj/lLAzb/QoiEwC4zgMq88cnBUTJoxozQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ns7QT8TLeC9/KYjKZtJ5RtzE1KeQ9wpsGN6A+ZnB4Z2kZwjwUXRcAYc5+q/yWMug2o0zYVxpQfPwxzeXtaL8kgTt6NSqYBR/Ej9Aq7gzo/h/dbFqHW34YxmHPLF4RyOVads5wkwKKrKiOI+IZ/GYsx0cQpu/CgXoC3p0UGedz4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=eqn3nTfJ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=hM6/zLqM; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=eqn3nTfJ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=hM6/zLqM; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1755155740; c=relaxed/simple;
+	bh=SaB56iFHq9R1lIIJgY1jOBN/SbTeOE8emRCvNnsEoq0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E3RQy2Pmj9Fl8lc55CB5FJPsWZJj1lygVl9wXLl0XaGug4U3ii0ZnFgCMQhgsRb3/ufadoafhX/U9I8HrNiXeZJ9OLCifUwialYdnyT4r481mjIDvAuTn+kYhb65vRvbSLMAR21+Z/+oPsol+Uc4+EMjc/TJLMPeSdOD6JNibcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i1IKT2zw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="eqn3nTfJ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="hM6/zLqM";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="eqn3nTfJ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="hM6/zLqM"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 0597E1F7D1;
-	Thu, 14 Aug 2025 05:48:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1755150531; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lnh4KOoFyfui8L9tod3Xuqssl1j5kS74I0ySiKi//IU=;
-	b=eqn3nTfJtIY5OSOrkYm3Yxi2JUXwvS8SjiwKxPUhNumfJQDnaeu+F15zeNpM3v37vy5Apn
-	duNYTSHZeM/OQJpBIir8GZzaeBenUCe0FSCxtaZz5/wEY0QyR+IbAVvQKFmUT6ib88g+p8
-	+0NYVofrLI1P0lOVTXiwjzDzznUQFG8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1755150531;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lnh4KOoFyfui8L9tod3Xuqssl1j5kS74I0ySiKi//IU=;
-	b=hM6/zLqMQSikb1oDd88BfOctuxaa5YzMNr8G4k0XZ7/Gu5vTZEqza9ucruIxQM8VMns9mE
-	mjVWUG0OPrUq+YCQ==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1755150531; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lnh4KOoFyfui8L9tod3Xuqssl1j5kS74I0ySiKi//IU=;
-	b=eqn3nTfJtIY5OSOrkYm3Yxi2JUXwvS8SjiwKxPUhNumfJQDnaeu+F15zeNpM3v37vy5Apn
-	duNYTSHZeM/OQJpBIir8GZzaeBenUCe0FSCxtaZz5/wEY0QyR+IbAVvQKFmUT6ib88g+p8
-	+0NYVofrLI1P0lOVTXiwjzDzznUQFG8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1755150531;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lnh4KOoFyfui8L9tod3Xuqssl1j5kS74I0ySiKi//IU=;
-	b=hM6/zLqMQSikb1oDd88BfOctuxaa5YzMNr8G4k0XZ7/Gu5vTZEqza9ucruIxQM8VMns9mE
-	mjVWUG0OPrUq+YCQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4C94913479;
-	Thu, 14 Aug 2025 05:48:49 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id cB7eAcF4nWiEYQAAD6G6ig
-	(envelope-from <ddiss@suse.de>); Thu, 14 Aug 2025 05:48:49 +0000
-From: David Disseldorp <ddiss@suse.de>
-To: linux-kbuild@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org
-Cc: linux-next@vger.kernel.org,
-	David Disseldorp <ddiss@suse.de>
-Subject: [PATCH v2 5/7] gen_initramfs.sh: use gen_init_cpio -o parameter
-Date: Thu, 14 Aug 2025 15:18:03 +1000
-Message-ID: <20250814054818.7266-6-ddiss@suse.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250814054818.7266-1-ddiss@suse.de>
-References: <20250814054818.7266-1-ddiss@suse.de>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i1IKT2zw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0A94C4CEEF;
+	Thu, 14 Aug 2025 07:15:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755155740;
+	bh=SaB56iFHq9R1lIIJgY1jOBN/SbTeOE8emRCvNnsEoq0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=i1IKT2zwhssHQnjqKIWtvjwXerI6qQ1PNJ4VSL+eAdBxYbqVIjTYRDr4HQdDI2lyQ
+	 u6nsFBnRLyaqgFWWbzOeyOQEECfpnB7HFRoM6E3hO6sGlgss41eOmCgTCj8UDbGGiV
+	 kcOFxGN3h7q6PRJ0LFnpAK1twBP/I25c5bcY/wvp+piLO9bOEem5o1u/IyOlnGVqs5
+	 L90FI8Llj1gEjlrSGyhD/ENLft+kX+3j3yL1mUP3JUHnDXG1H78KF3wqJLtE+umkB6
+	 9qj4v3Wff5u7Gq6G5C3vOrkknrJVOKySTv9AXEbB2AQ2VTkv5un2lOKqSHyQjbbKCj
+	 5qil2ya53k7Hw==
+Date: Thu, 14 Aug 2025 10:15:09 +0300
+From: Mike Rapoport <rppt@kernel.org>
+To: Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>
+Cc: nathan@kernel.org, arnd@arndb.de, broonie@kernel.org,
+	Liam.Howlett@oracle.com, urezki@gmail.com, will@kernel.org,
+	kaleshsingh@google.com, leitao@debian.org, coxu@redhat.com,
+	surenb@google.com, akpm@linux-foundation.org, luto@kernel.org,
+	jpoimboe@kernel.org, changyuanl@google.com, hpa@zytor.com,
+	dvyukov@google.com, kas@kernel.org, corbet@lwn.net,
+	vincenzo.frascino@arm.com, smostafa@google.com,
+	nick.desaulniers+lkml@gmail.com, morbo@google.com,
+	andreyknvl@gmail.com, alexander.shishkin@linux.intel.com,
+	thiago.bauermann@linaro.org, catalin.marinas@arm.com,
+	ryabinin.a.a@gmail.com, jan.kiszka@siemens.com, jbohac@suse.cz,
+	dan.j.williams@intel.com, joel.granados@kernel.org,
+	baohua@kernel.org, kevin.brodsky@arm.com, nicolas.schier@linux.dev,
+	pcc@google.com, andriy.shevchenko@linux.intel.com,
+	wei.liu@kernel.org, bp@alien8.de, ada.coupriediaz@arm.com,
+	xin@zytor.com, pankaj.gupta@amd.com, vbabka@suse.cz,
+	glider@google.com, jgross@suse.com, kees@kernel.org,
+	jhubbard@nvidia.com, joey.gouly@arm.com, ardb@kernel.org,
+	thuth@redhat.com, pasha.tatashin@soleen.com,
+	kristina.martsenko@arm.com, bigeasy@linutronix.de,
+	lorenzo.stoakes@oracle.com, jason.andryuk@amd.com, david@redhat.com,
+	graf@amazon.com, wangkefeng.wang@huawei.com, ziy@nvidia.com,
+	mark.rutland@arm.com, dave.hansen@linux.intel.com,
+	samuel.holland@sifive.com, kbingham@kernel.org,
+	trintaeoitogc@gmail.com, scott@os.amperecomputing.com,
+	justinstitt@google.com, kuan-ying.lee@canonical.com, maz@kernel.org,
+	tglx@linutronix.de, samitolvanen@google.com, mhocko@suse.com,
+	nunodasneves@linux.microsoft.com, brgerst@gmail.com,
+	willy@infradead.org, ubizjak@gmail.com, peterz@infradead.org,
+	mingo@redhat.com, sohil.mehta@intel.com, linux-mm@kvack.org,
+	linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	x86@kernel.org, llvm@lists.linux.dev, kasan-dev@googlegroups.com,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 06/18] x86: Reset tag for virtual to physical address
+ conversions
+Message-ID: <aJ2M_eKPvBluyLKJ@kernel.org>
+References: <cover.1755004923.git.maciej.wieczor-retman@intel.com>
+ <01e62233dcc39aeb8d640eb3ee794f5da533f2a3.1755004923.git.maciej.wieczor-retman@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-6.80 / 50.00];
-	REPLY(-4.00)[];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_HAS_DN(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	RCPT_COUNT_THREE(0.00)[4];
-	RCVD_TLS_ALL(0.00)[]
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Spam-Score: -6.80
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <01e62233dcc39aeb8d640eb3ee794f5da533f2a3.1755004923.git.maciej.wieczor-retman@intel.com>
 
-gen_init_cpio can now write to a file directly, so use it when
-gen_initramfs.sh is called with -o (e.g. usr/Makefile invocation).
+On Tue, Aug 12, 2025 at 03:23:42PM +0200, Maciej Wieczor-Retman wrote:
+> Any place where pointer arithmetic is used to convert a virtual address
+> into a physical one can raise errors if the virtual address is tagged.
+> 
+> Reset the pointer's tag by sign extending the tag bits in macros that do
+> pointer arithmetic in address conversions. There will be no change in
+> compiled code with KASAN disabled since the compiler will optimize the
+> __tag_reset() out.
+> 
+> Signed-off-by: Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>
+> ---
+> Changelog v4:
+> - Simplify page_to_virt() by removing pointless casts.
+> - Remove change in __is_canonical_address() because it's taken care of
+>   in a later patch due to a LAM compatible definition of canonical.
+> 
+>  arch/x86/include/asm/page.h    | 14 +++++++++++---
+>  arch/x86/include/asm/page_64.h |  2 +-
+>  arch/x86/mm/physaddr.c         |  1 +
+>  3 files changed, 13 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/page.h b/arch/x86/include/asm/page.h
+> index 9265f2fca99a..15c95e96fd15 100644
+> --- a/arch/x86/include/asm/page.h
+> +++ b/arch/x86/include/asm/page.h
+> @@ -7,6 +7,7 @@
+>  #ifdef __KERNEL__
+>  
+>  #include <asm/page_types.h>
+> +#include <asm/kasan.h>
+>  
+>  #ifdef CONFIG_X86_64
+>  #include <asm/page_64.h>
+> @@ -41,7 +42,7 @@ static inline void copy_user_page(void *to, void *from, unsigned long vaddr,
+>  #define __pa(x)		__phys_addr((unsigned long)(x))
+>  #endif
+>  
+> -#define __pa_nodebug(x)	__phys_addr_nodebug((unsigned long)(x))
+> +#define __pa_nodebug(x)	__phys_addr_nodebug((unsigned long)(__tag_reset(x)))
 
-Signed-off-by: David Disseldorp <ddiss@suse.de>
----
- usr/gen_initramfs.sh | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+Why not reset the tag inside __phys_addr_nodebug() and __phys_addr()?
 
-diff --git a/usr/gen_initramfs.sh b/usr/gen_initramfs.sh
-index 14b5782f961a8..7eba2fddf0ef2 100755
---- a/usr/gen_initramfs.sh
-+++ b/usr/gen_initramfs.sh
-@@ -193,7 +193,8 @@ root_gid=0
- dep_list=
- timestamp=
- cpio_list=$(mktemp ${TMPDIR:-/tmp}/cpiolist.XXXXXX)
--output="/dev/stdout"
-+# gen_init_cpio writes to stdout by default
-+output=""
- 
- trap "rm -f $cpio_list" EXIT
- 
-@@ -207,7 +208,7 @@ while [ $# -gt 0 ]; do
- 			shift
- 			;;
- 		"-o")	# generate cpio image named $1
--			output="$1"
-+			output="-o $1"
- 			shift
- 			;;
- 		"-u")	# map $1 to uid=0 (root)
-@@ -246,4 +247,4 @@ done
- 
- # If output_file is set we will generate cpio archive
- # we are careful to delete tmp files
--usr/gen_init_cpio $timestamp $cpio_list > $output
-+usr/gen_init_cpio $output $timestamp $cpio_list
+>  /* __pa_symbol should be used for C visible symbols.
+>     This seems to be the official gcc blessed way to do such arithmetic. */
+>  /*
+> @@ -65,9 +66,16 @@ static inline void copy_user_page(void *to, void *from, unsigned long vaddr,
+>   * virt_to_page(kaddr) returns a valid pointer if and only if
+>   * virt_addr_valid(kaddr) returns true.
+>   */
+> -#define virt_to_page(kaddr)	pfn_to_page(__pa(kaddr) >> PAGE_SHIFT)
+> +
+> +#ifdef CONFIG_KASAN_SW_TAGS
+> +#define page_to_virt(x) ({							\
+> +	void *__addr = __va(page_to_pfn((struct page *)x) << PAGE_SHIFT);	\
+> +	__tag_set(__addr, page_kasan_tag(x));					\
+> +})
+> +#endif
+> +#define virt_to_page(kaddr)	pfn_to_page(__pa((void *)__tag_reset(kaddr)) >> PAGE_SHIFT)
+
+then virt_to_page() will remain the same, no?
+
+>  extern bool __virt_addr_valid(unsigned long kaddr);
+> -#define virt_addr_valid(kaddr)	__virt_addr_valid((unsigned long) (kaddr))
+> +#define virt_addr_valid(kaddr)	__virt_addr_valid((unsigned long)(__tag_reset(kaddr)))
+
+The same here, I think tag_reset() should be inside __virt_addr_valid()
+  
+>  static __always_inline void *pfn_to_kaddr(unsigned long pfn)
+>  {
+> diff --git a/arch/x86/include/asm/page_64.h b/arch/x86/include/asm/page_64.h
+> index 015d23f3e01f..de68ac40dba2 100644
+> --- a/arch/x86/include/asm/page_64.h
+> +++ b/arch/x86/include/asm/page_64.h
+> @@ -33,7 +33,7 @@ static __always_inline unsigned long __phys_addr_nodebug(unsigned long x)
+>  extern unsigned long __phys_addr(unsigned long);
+>  extern unsigned long __phys_addr_symbol(unsigned long);
+>  #else
+> -#define __phys_addr(x)		__phys_addr_nodebug(x)
+> +#define __phys_addr(x)		__phys_addr_nodebug(__tag_reset(x))
+>  #define __phys_addr_symbol(x) \
+>  	((unsigned long)(x) - __START_KERNEL_map + phys_base)
+>  #endif
+> diff --git a/arch/x86/mm/physaddr.c b/arch/x86/mm/physaddr.c
+> index fc3f3d3e2ef2..7f2b11308245 100644
+> --- a/arch/x86/mm/physaddr.c
+> +++ b/arch/x86/mm/physaddr.c
+> @@ -14,6 +14,7 @@
+>  #ifdef CONFIG_DEBUG_VIRTUAL
+>  unsigned long __phys_addr(unsigned long x)
+>  {
+> +	x = __tag_reset(x);
+>  	unsigned long y = x - __START_KERNEL_map;
+>  
+>  	/* use the carry flag to determine if x was < __START_KERNEL_map */
+> -- 
+> 2.50.1
+> 
+
 -- 
-2.43.0
-
+Sincerely yours,
+Mike.
