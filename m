@@ -1,123 +1,169 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AF65273D8C;
-	Mon, 18 Aug 2025 18:57:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28CA31D5146
+	for <linux-kbuild@vger.kernel.org>; Mon, 18 Aug 2025 23:46:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755543469; cv=none; b=dUUUCxSh47FNmNl4PsF+3dHSP8NMooyYgSUOpSH0bZZxFK49zP0tMO4N7NQlFW1v5W4kQovsNKZduuT3U5JuJBD1stgaqXXa2nziw+mvbd30OAu4b7S8omYHAgQCmTUTW8CKFMHtBvqiN6P8MqKx75CBH7GDpB3HONSMYiFwRz0=
+	t=1755560821; cv=none; b=YNBCnVT1bLVvFwNb0Kr0By/Ch6oFMvDUShFjZl0S4928BT334Hm9pBlfLZbtvo9XNal/tvg+SEyBK8f8HCy5r4yc9R9tTq2q/zKRwmYxuxYkSHPkijNx08ElTQEEicAO1Lx+oY1hYg6KzXFhUal6yKZWVgZWB8XYk3TczYPlkRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755543469; c=relaxed/simple;
-	bh=IDG166K1atPKY7m9tz5d771kcEokrOl3YOwP4VHZB2Y=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=NGg/jwgJ9QsU8S0etfYwUFv7hlDOC4xZ5nQiJQ8gltuFltNYgAh1TyeAoHWgprh5TXfXNkd8uoClX1pwBHYs4zdCFcb+48d/ZHGOX0885+UnUgBG2wJ27hTw2SlSQqGrSUGRuKNuPNnJuxU+3RJj0EyynKvlmXXfZtYO59wQJcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L4aYaJy9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755560821; c=relaxed/simple;
+	bh=EUIaYawZIEI778Q0jpb2ysU3mSttgdtYb2SKSDL2mic=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=b9xGTDG1JUe6yVfkVWKXHKC5wWNczpThN/cqnWVfa7pxLYDH16aibuZMO0weFJ1n+yzkMDmgXMeRix35ou+gbKgFIp6mfDe976QVgFbMyTFa+cBATp714wXhCllvg5uhSLJj1j+HWHchqXQsS+JepIhcrcwdiw4r4yHoMChQmfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ool6jtOu; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=t82DzWUO; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ool6jtOu; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=t82DzWUO; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L4aYaJy9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C9E7C116D0;
-	Mon, 18 Aug 2025 18:57:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755543468;
-	bh=IDG166K1atPKY7m9tz5d771kcEokrOl3YOwP4VHZB2Y=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=L4aYaJy9cDV+/UnJTWcR0iNDVk6FjVvwluccsEI6E/0AJYmgjDFwRfgMc+VbRcpvm
-	 WOvciQIoqrceYsxzy9CmszhbH5UHp6owiaQcwu2Yuy3mkeDrqEWFMmPNHnSL4E9PHl
-	 zt1b2U7Wl8g5XDdwsMRXfW+jIFwUQPPcFPbk8AacQCgtZMOrraZKddy2ZfO4wPKfh5
-	 M7WHTMdW+8z3IsN4Iab7PMjPdSo745auY8G1j0icvM5R9JsjnsWN7ZEzHqIb4sTwuZ
-	 sECxWz8frYn829tcn8zD2B/MJk3S00OYO/qyMN/lpYjSDtQF/R1vOiNXa9g4KmFDf3
-	 sVN3ftsVlcAEw==
-From: Nathan Chancellor <nathan@kernel.org>
-Date: Mon, 18 Aug 2025 11:57:17 -0700
-Subject: [PATCH 01/10] kbuild: Bump minimum version of LLVM for building
- the kernel to 15.0.0
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ool6jtOu";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="t82DzWUO";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ool6jtOu";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="t82DzWUO"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 18E0021200;
+	Mon, 18 Aug 2025 23:46:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1755560817; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kKPdfAGF6R26ubinwcGOkXEjKG7rKKI1AkRQ36bglwk=;
+	b=ool6jtOuF303p0ePZTwpsLaYfYRSVY1qgmJDdOGIfAT3+gFK55u2PfkfnCqH/5/IgKZ1lv
+	1m7O5bCgcLbRaZ47Tf0+lU7nFDw8G4+RE4KnutoABLZd0U0qlu1LzMjr9HJClwrnLesdi8
+	XVnAD2eG4xXXpBUroFzbEVJ45wzfGjQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1755560817;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kKPdfAGF6R26ubinwcGOkXEjKG7rKKI1AkRQ36bglwk=;
+	b=t82DzWUOX0JXT3objeIK1E7fC+Po0ICEomOqeCajU7flwO4rXxTtb6bvxGJxY5ocI4WxOS
+	2klxP5zGZSyNvqCA==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=ool6jtOu;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=t82DzWUO
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1755560817; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kKPdfAGF6R26ubinwcGOkXEjKG7rKKI1AkRQ36bglwk=;
+	b=ool6jtOuF303p0ePZTwpsLaYfYRSVY1qgmJDdOGIfAT3+gFK55u2PfkfnCqH/5/IgKZ1lv
+	1m7O5bCgcLbRaZ47Tf0+lU7nFDw8G4+RE4KnutoABLZd0U0qlu1LzMjr9HJClwrnLesdi8
+	XVnAD2eG4xXXpBUroFzbEVJ45wzfGjQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1755560817;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kKPdfAGF6R26ubinwcGOkXEjKG7rKKI1AkRQ36bglwk=;
+	b=t82DzWUOX0JXT3objeIK1E7fC+Po0ICEomOqeCajU7flwO4rXxTtb6bvxGJxY5ocI4WxOS
+	2klxP5zGZSyNvqCA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3DCA413686;
+	Mon, 18 Aug 2025 23:46:54 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 9bNGOG67o2isMQAAD6G6ig
+	(envelope-from <ddiss@suse.de>); Mon, 18 Aug 2025 23:46:54 +0000
+Date: Tue, 19 Aug 2025 09:46:48 +1000
+From: David Disseldorp <ddiss@suse.de>
+To: Nicolas Schier <nsc@kernel.org>
+Cc: linux-kbuild@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-next@vger.kernel.org
+Subject: Re: [PATCH v2 0/7] gen_init_cpio: add copy_file_range / reflink
+ support
+Message-ID: <20250819094648.186b037c.ddiss@suse.de>
+In-Reply-To: <aKNzl1Oo2zzPYGQP@levanger>
+References: <20250814054818.7266-1-ddiss@suse.de>
+	<aKNzl1Oo2zzPYGQP@levanger>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250818-bump-min-llvm-ver-15-v1-1-c8b1d0f955e0@kernel.org>
-References: <20250818-bump-min-llvm-ver-15-v1-0-c8b1d0f955e0@kernel.org>
-In-Reply-To: <20250818-bump-min-llvm-ver-15-v1-0-c8b1d0f955e0@kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, Kees Cook <kees@kernel.org>, 
- Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
- linux-kernel@vger.kernel.org, llvm@lists.linux.dev, patches@lists.linux.dev, 
- Nathan Chancellor <nathan@kernel.org>, linux-kbuild@vger.kernel.org
-X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2339; i=nathan@kernel.org;
- h=from:subject:message-id; bh=IDG166K1atPKY7m9tz5d771kcEokrOl3YOwP4VHZB2Y=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDBmLyxcWvmb41ZlXxD75o5cc03Rmb/uzvLxTL3InZB3s2
- bLQIJK7o5SFQYyLQVZMkaX6sepxQ8M5ZxlvnJoEM4eVCWQIAxenAExk0hyG/6XBnWXhyc2NuaZP
- fhRXJGUuPLR1xUyL6PMajTsdZ6dPdmZkuCZmz+GdFS8xw8HAyUnp36vil8HRVyrqK0QucOtvsOv
- kAQA=
-X-Developer-Key: i=nathan@kernel.org; a=openpgp;
- fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: 18E0021200
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-3.51 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_CONTAINS_FROM(1.00)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from,2a07:de40:b281:106:10:150:64:167:received];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
+	URIBL_BLOCKED(0.00)[suse.de:dkim,suse.de:mid,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Spam-Score: -3.51
 
-s390 and x86 have required LLVM 15 since
+On Mon, 18 Aug 2025 20:40:23 +0200, Nicolas Schier wrote:
 
-  30d17fac6aae ("scripts/min-tool-version.sh: raise minimum clang version to 15.0.0 for s390")
-  7861640aac52 ("x86/build: Raise the minimum LLVM version to 15.0.0")
+> On Thu, Aug 14, 2025 at 03:17:58PM +1000, David Disseldorp wrote:
+> > This patchset adds copy_file_range() support to gen_init_cpio. When
+> > combined with data segment alignment, large-file archiving performance
+> > is improved on Btrfs and XFS due to reflinks (see 7/7 benchmarks).
+> > 
+> > cpio data segment alignment is provided by "bending" the newc spec
+> > to zero-pad the filename field. GNU cpio and Linux initramfs extractors
+> > handle this fine as long as PATH_MAX isn't exceeded.
+> > 
+> > Changes since v1 RFC
+> > - add alignment patches 6-7
+> > - slightly rework commit and error messages
+> > - rename l->len to avoid 1/i confusion
+> > 
+> > David Disseldorp (7):
+> >       gen_init_cpio: write to fd instead of stdout stream
+> >       gen_init_cpio: support -o <output_path> parameter
+> >       gen_init_cpio: attempt copy_file_range for file data
+> >       gen_init_cpio: avoid duplicate strlen calls
+> >       gen_initramfs.sh: use gen_init_cpio -o parameter
+> >       docs: initramfs: file data alignment via name padding
+> >       gen_init_cpio: add -a <data_align> as reflink optimization
+> > 
+> >  .../driver-api/early-userspace/buffer-format.rst   |   5 +
+> >  usr/gen_init_cpio.c                                | 234 ++++++++++++++-------
+> >  usr/gen_initramfs.sh                               |   7 +-
+> >  3 files changed, 166 insertions(+), 80 deletions(-)
+> > 
+> >   
+> 
+> Thanks for the series!  I have found only a minor nick pick and some few
+> bike-shedding things.
+> 
+> Reviewed-by: Nicolas Schier <nsc@kernel.org>
 
-respectively but most other architectures allow LLVM 13.0.1 or newer. In
-accordance with the recent minimum supported version of GCC bump that
-happened in
+Thanks a lot for the review, Nicolas!
+I'll post a v3 with your suggestions addressed, as I have one further
+initramfs_test.c patch to padded filename test coverage.
 
-  118c40b7b503 ("kbuild: require gcc-8 and binutils-2.30")
-
-do the same for LLVM to 15.0.0.
-
-Of the supported releases of Arch Linux, Debian, Fedora, and OpenSUSE
-surveyed in evaluating this bump, this only leaves behind Debian
-Bookworm (14.0.6) and Ubuntu Jammy (14.0.0). Debian Trixie has 19.1.7
-and Ubuntu Noble has 18.1.3 (so there are viable upgrade paths) or users
-can use apt.llvm.org, which provides even newer packages for those
-distributions.
-
-Signed-off-by: Nathan Chancellor <nathan@kernel.org>
----
-Cc: linux-kbuild@vger.kernel.org
----
- Documentation/process/changes.rst | 2 +-
- scripts/min-tool-version.sh       | 6 ++----
- 2 files changed, 3 insertions(+), 5 deletions(-)
-
-diff --git a/Documentation/process/changes.rst b/Documentation/process/changes.rst
-index bccfa19b45df..b38622b0d525 100644
---- a/Documentation/process/changes.rst
-+++ b/Documentation/process/changes.rst
-@@ -30,7 +30,7 @@ you probably needn't concern yourself with pcmciautils.
-         Program        Minimal version       Command to check the version
- ====================== ===============  ========================================
- GNU C                  8.1              gcc --version
--Clang/LLVM (optional)  13.0.1           clang --version
-+Clang/LLVM (optional)  15.0.0           clang --version
- Rust (optional)        1.78.0           rustc --version
- bindgen (optional)     0.65.1           bindgen --version
- GNU make               4.0              make --version
-diff --git a/scripts/min-tool-version.sh b/scripts/min-tool-version.sh
-index 0d223b4a9445..99b5575c1ef7 100755
---- a/scripts/min-tool-version.sh
-+++ b/scripts/min-tool-version.sh
-@@ -24,12 +24,10 @@ gcc)
- 	fi
- 	;;
- llvm)
--	if [ "$SRCARCH" = s390 -o "$SRCARCH" = x86 ]; then
--		echo 15.0.0
--	elif [ "$SRCARCH" = loongarch ]; then
-+	if [ "$SRCARCH" = loongarch ]; then
- 		echo 18.0.0
- 	else
--		echo 13.0.1
-+		echo 15.0.0
- 	fi
- 	;;
- rustc)
-
--- 
-2.50.1
-
+Cheers, David
