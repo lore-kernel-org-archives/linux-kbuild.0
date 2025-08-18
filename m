@@ -1,99 +1,158 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71E69274666;
-	Tue, 19 Aug 2025 09:44:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14A2021FF48;
+	Tue, 19 Aug 2025 15:17:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755596697; cv=none; b=f1VhxVYgb8GJ5tRkzPcZJTxoI7gIe6q3m6vnAVeXMIRhoeDpdbfJkqYygeHyjBG8NMOIMZD4UciHKsB2PT+vt6YVYVTQTpxb9/bCOWhG+tRPylX3Pw8FX0AEOJFhxepSiqEzKsEPDOir6+GrjrtsbEoXXoLQFTPLlHoMb1sgwwM=
+	t=1755616666; cv=none; b=GOikiTw25HMIaWcxIhl9HgAJen0wEpHEMq0GAz4xzKwJgD0UPyrNYLb5xS7lsv6S9PTf4Bo3ZFPQmyMVa0ql6aYmlsgtauObkqDHg8YXFTx4optN8j7ZWfD+bmr0A0jAOgh13S1rezzx4mXg8c2UCqmCWVugWwqDjnaIwZd0mRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755596697; c=relaxed/simple;
-	bh=qkoSavUo25iuaFyv6MbaWJ1hYMagYZR2yJl9AnwGilk=;
+	s=arc-20240116; t=1755616666; c=relaxed/simple;
+	bh=YC3YqkY+ubMJ+BckfgV8x/v8nTzqCv3hnNV1WNYIJqA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BxDkymUe4eJmOU67++/b1t+Z+efaNpqmwDp55ZFMMrJeQNtFHmK/zbPvjv2S1ivmc1dwC2Q9aCYZxXxlRH1TYj85h7vw3s4T++CeDLILdn85Ma8LHplcuY/Tk6mFpFDM+goycoAAZjwjal2cXuDUkTCUHOpkKwl4CoR2aKqOdo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n0tVvonW; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=C9OticoUjFR81/LZ1mxWK71qyoI2JzSVXhtV1xC9CqUaSw6R2JeWygbtwADJb9lrJAijWXNrhMHNa3lqxWltRp4r9ANxiYY697EV4e5tNBmxB9qgD4vjh1k7Bg/RpRyNFs9hJW/1V4jJLvlKZZLkD+IW2mP+PxPrWrIyFjGW/p0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bD6Nm8hx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n0tVvonW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A37EC4CEF1;
-	Tue, 19 Aug 2025 09:44:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bD6Nm8hx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A38DC4CEF1;
+	Tue, 19 Aug 2025 15:17:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755596697;
-	bh=qkoSavUo25iuaFyv6MbaWJ1hYMagYZR2yJl9AnwGilk=;
+	s=k20201202; t=1755616665;
+	bh=YC3YqkY+ubMJ+BckfgV8x/v8nTzqCv3hnNV1WNYIJqA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=n0tVvonWE1oEyrGMBnKN7BtdvUYyXYUQ+yYnW91g4LS7S3b+Wic8ckZOkm2c0LQgR
-	 W3HpDgxJO3Izhz3SyUlED62hj5dA4ADph7+TZn1CfpcnL1QG2Bfj11Tt4C1oyxNtNS
-	 /H+5TlR76OOTKY6AI8bjUTwfmcr4T6EEcBiPOOAKLNWGu5eKrY4LT2T29dcoyt7OJN
-	 +CXdYIgO/f1SDXr1D5sF+9nefcAflvmgiFFWSy9N73q7Rqk5Y/nVk/HdKlZpnYmlqU
-	 Z+nm9okydm70LTdECMr3tBB+Vn2TrfHNwSC8FvOfv3kbPl/POtg1n8TBtQ9q2QJ2rD
-	 XQ2BbTozJRPLA==
-Date: Tue, 19 Aug 2025 11:44:48 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Daniel Gomez <da.gomez@kernel.org>
-Cc: Vlastimil Babka <vbabka@suse.cz>, 
-	Christoph Hellwig <hch@infradead.org>, Peter Zijlstra <peterz@infradead.org>, 
-	David Hildenbrand <david@redhat.com>, Shivank Garg <shivankg@amd.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Jiri Slaby (SUSE)" <jirislaby@kernel.org>, 
-	Stephen Rothwell <sfr@canb.auug.org.au>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-modules@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	Nicolas Schier <nicolas.schier@linux.dev>, Daniel Gomez <da.gomez@samsung.com>, 
-	Linus Torvalds <torvalds@linux-foundation.org>, Matthias Maennich <maennich@google.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain <mcgrof@kernel.org>, 
-	Petr Pavlu <petr.pavlu@suse.com>, Sami Tolvanen <samitolvanen@google.com>, 
-	Nathan Chancellor <nathan@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Jan Kara <jack@suse.cz>
-Subject: Re: [PATCH v4] module: Rename EXPORT_SYMBOL_GPL_FOR_MODULES to
- EXPORT_SYMBOL_FOR_MODULES
-Message-ID: <20250819-vorgibt-bewalden-d16b7673cc72@brauner>
-References: <20250808-export_modules-v4-1-426945bcc5e1@suse.cz>
- <20250811-wachen-formel-29492e81ee59@brauner>
- <2472a139-064c-4381-bc6e-a69245be01df@kernel.org>
- <20250815-darstellen-pappen-90a9edb193e5@brauner>
- <6cce2564-04f2-44ab-96d3-2f47fc221591@kernel.org>
+	b=bD6Nm8hxsVqxV6iX0p8kZ95x/tUAVmv+VI7eQPr5Jd0OewxBu+WwuPok1kZiL9MfK
+	 zXcheZ5nVB3l7NQCxUqXAvrveLMeeXaFRE6VwBqtNbdmzldBlAJgPSGuCszNZwYd4A
+	 jDDH/hPB2yyjRFvoggiNU2TAv4GygI/iwznAIaQR/V10I+sqrwmZshlvnzMvH+vQDk
+	 4x0O/cN3oq4keY0xgornwcUx/U1F2hjRgoTA4hvqyhk1hRsDwPpoCUF/qB0bvv4NRp
+	 hiu+rL5hRGT91qdCmifo37zUFRDQNFPKhAz5dftSbKacOVTm/Oc7r5yDeJJ2oLdk1N
+	 mZ/xLrIak4efA==
+Date: Mon, 18 Aug 2025 21:23:36 +0200
+From: Nicolas Schier <nsc@kernel.org>
+To: David Disseldorp <ddiss@suse.de>
+Cc: linux-kbuild@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-next@vger.kernel.org
+Subject: Re: [PATCH v2 7/7] gen_init_cpio: add -a <data_align> as reflink
+ optimization
+Message-ID: <aKN9uMf0HeD1Fgqk@levanger>
+References: <20250814054818.7266-1-ddiss@suse.de>
+ <20250814054818.7266-8-ddiss@suse.de>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6cce2564-04f2-44ab-96d3-2f47fc221591@kernel.org>
+In-Reply-To: <20250814054818.7266-8-ddiss@suse.de>
 
-On Fri, Aug 15, 2025 at 05:39:54PM +0200, Daniel Gomez wrote:
+On Thu, Aug 14, 2025 at 03:18:05PM +1000, David Disseldorp wrote:
+> As described in buffer-format.rst, the existing initramfs.c extraction
+> logic works fine if the cpio filename field is padded out with trailing
+> zeros, with a caveat that the padded namesize can't exceed PATH_MAX.
 > 
+> Add filename zero-padding logic to gen_init_cpio, which can be triggered
+> via the new -a <data_align> parameter. Performance and storage
+> utilization is improved for Btrfs and XFS workloads, as copy_file_range
+> can reflink the entire source file into a filesystem block-size aligned
+> destination offset within the cpio archive.
 > 
-> On 15/08/2025 07.25, Christian Brauner wrote:
-> > On Tue, Aug 12, 2025 at 09:54:43AM +0200, Daniel Gomez wrote:
-> >> On 11/08/2025 07.18, Christian Brauner wrote:j
-> >>> On Fri, 08 Aug 2025 15:28:47 +0200, Vlastimil Babka wrote:
-> >>>> Christoph suggested that the explicit _GPL_ can be dropped from the
-> >>>> module namespace export macro, as it's intended for in-tree modules
-> >>>> only. It would be possible to restrict it technically, but it was
-> >>>> pointed out [2] that some cases of using an out-of-tree build of an
-> >>>> in-tree module with the same name are legitimate. But in that case those
-> >>>> also have to be GPL anyway so it's unnecessary to spell it out in the
-> >>>> macro name.
-> >>>>
-> >>>> [...]
-> >>>
-> >>> Ok, so last I remember we said that this is going upstream rather sooner
-> >>> than later before we keep piling on users. If that's still the case I'll
-> >>> take it via vfs.fixes unless I hear objections.
-> >>
-> >> This used to go through Masahiro's kbuild tree. However, since he is not
-> >> available anymore [1] I think it makes sense that this goes through the modules
-> >> tree. The only reason we waited until rc1 was released was because of Greg's
-> >> advise [2]. Let me know if that makes sense to you and if so, I'll merge this
-> >> ASAP.
-> > 
-> > At this point it would mean messing up all of vfs.fixes to drop it from
-> > there. So I'd just leave it in there and send it to Linus.
+> Btrfs benchmarks run on 6.15.8-1-default (Tumbleweed) x86_64 host:
+>   > truncate --size=2G /tmp/backing.img
+>   > /sbin/mkfs.btrfs /tmp/backing.img
+>   ...
+>   Sector size:        4096        (CPU page size: 4096)
+>   ...
+>   > sudo mount /tmp/backing.img mnt
+>   > sudo chown $USER mnt
+>   > cd mnt
+>   mnt> dd if=/dev/urandom of=foo bs=1M count=20 && cat foo >/dev/null
+>   ...
+>   mnt> echo "file /foo foo 0755 0 0" > list
+>   mnt> perf stat -r 10 gen_init_cpio -o unaligned_btrfs list
+>   ...
+>             0.023496 +- 0.000472 seconds time elapsed  ( +-  2.01% )
 > 
-> Got it. I was waiting for confirmation before taking it into the modules tree,
-> and I agree that at this point it makes sense to keep it in vfs.fixes.
+>   mnt> perf stat -r 10 gen_init_cpio -o aligned_btrfs -a 4096 list
+>   ...
+>            0.0010010 +- 0.0000565 seconds time elapsed  ( +-  5.65% )
 > 
-> > Next time I know where it'll end up.
+>   mnt> /sbin/xfs_io -c "fiemap -v" unaligned_btrfs
+>   unaligned_btrfs:
+>    EXT: FILE-OFFSET      BLOCK-RANGE      TOTAL FLAGS
+>      0: [0..40967]:      695040..736007   40968   0x1
+>   mnt> /sbin/xfs_io -c "fiemap -v" aligned_btrfs
+>   aligned_btrfs:
+>    EXT: FILE-OFFSET      BLOCK-RANGE      TOTAL FLAGS
+>      0: [0..7]:          26768..26775         8   0x0
+>      1: [8..40967]:      269056..310015   40960 0x2000
+>      2: [40968..40975]:  26776..26783         8   0x1
+>   mnt> /sbin/btrfs fi du unaligned_btrfs aligned_btrfs
+>        Total   Exclusive  Set shared  Filename
+>     20.00MiB    20.00MiB       0.00B  unaligned_btrfs
+>     20.01MiB     8.00KiB    20.00MiB  aligned_btrfs
 > 
-> Can you clarify what you mean by this?
+> XFS benchmarks run on same host:
+>   > sudo umount mnt && rm /tmp/backing.img
+>   > truncate --size=2G /tmp/backing.img
+>   > /sbin/mkfs.xfs /tmp/backing.img
+>   ...
+>            =                       reflink=1    ...
+>   data     =                       bsize=4096   blocks=524288, imaxpct=25
+>   ...
+>   > sudo mount /tmp/backing.img mnt
+>   > sudo chown $USER mnt
+>   > cd mnt
+>   mnt> dd if=/dev/urandom of=foo bs=1M count=20 && cat foo >/dev/null
+>   ...
+>   mnt> echo "file /foo foo 0755 0 0" > list
+>   mnt> perf stat -r 10 gen_init_cpio -o unaligned_xfs list
+>   ...
+>             0.011069 +- 0.000469 seconds time elapsed  ( +-  4.24% )
+> 
+>   mnt> perf stat -r 10 gen_init_cpio -o aligned_xfs -a 4096 list
+>   ...
+>             0.001273 +- 0.000288 seconds time elapsed  ( +- 22.60% )
+> 
+>   mnt> /sbin/xfs_io -c "fiemap -v" unaligned_xfs
+>    unaligned_xfs:
+>    EXT: FILE-OFFSET      BLOCK-RANGE      TOTAL FLAGS
+>      0: [0..40967]:      106176..147143   40968   0x0
+>      1: [40968..65023]:  147144..171199   24056 0x801
+>   mnt> /sbin/xfs_io -c "fiemap -v" aligned_xfs
+>    aligned_xfs:
+>    EXT: FILE-OFFSET      BLOCK-RANGE      TOTAL FLAGS
+>      0: [0..7]:          120..127             8   0x0
+>      1: [8..40967]:      192..41151       40960 0x2000
+>      2: [40968..40975]:  236728..236735       8   0x0
+>      3: [40976..106495]: 236736..302255   65520 0x801
+> 
+> The alignment is best-effort; a stderr message is printed if alignment
+> can't be achieved due to PATH_MAX overrun, with fallback to non-padded
+> filename. This allows it to still be useful for opportunistic alignment,
+> e.g. on aarch64 Btrfs with 64K block-size. Alignment failure messages
+> provide an indicator that reordering of the cpio-manifest may be
+> beneficial.
+> 
+> Archive read performance for reflinked initramfs images may suffer due
+> to the effects of fragmentation, particularly on spinning disks. To
+> mitigate excessive fragmentation, files with lengths less than
+> data_align aren't padded.
+> 
+> Signed-off-by: David Disseldorp <ddiss@suse.de>
+> ---
+>  usr/gen_init_cpio.c | 50 ++++++++++++++++++++++++++++++++++-----------
+>  1 file changed, 38 insertions(+), 12 deletions(-)
 
-Next time I know that you are responsible for taking such patches. :)
+Thanks!  Testing with a massively oversized initramfs (600MB) was fun:
+from 2:44 down to 38s.
+
+
+Questions that pop up in my mind:
+Now, how can we make other benefit from this?  Might it make sense to
+introduce a kconfig variable for initramfs alignment -- even though this
+is just a build-time optimisation of few seconds?
+
+
+Kind regards,
+Nicolas
