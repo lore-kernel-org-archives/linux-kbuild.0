@@ -1,158 +1,159 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14A2021FF48;
-	Tue, 19 Aug 2025 15:17:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70C1E26D4DA;
+	Tue, 19 Aug 2025 19:11:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755616666; cv=none; b=GOikiTw25HMIaWcxIhl9HgAJen0wEpHEMq0GAz4xzKwJgD0UPyrNYLb5xS7lsv6S9PTf4Bo3ZFPQmyMVa0ql6aYmlsgtauObkqDHg8YXFTx4optN8j7ZWfD+bmr0A0jAOgh13S1rezzx4mXg8c2UCqmCWVugWwqDjnaIwZd0mRA=
+	t=1755630697; cv=none; b=AE2KjfphPkK/dAphPl2R27aD92j67VCXhLd8RpspZKoa5PYEOQLndElV8UohBcnMnSh/n8ypuO01kQa4ZUt3+Dcolv68hIRSw7CDy8VVTyZupdSWTRocxLbdlua5mTEd+gVx5B0PlHCljk2I3fvUSV3659jF7vxbkR/7tmWOyoc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755616666; c=relaxed/simple;
-	bh=YC3YqkY+ubMJ+BckfgV8x/v8nTzqCv3hnNV1WNYIJqA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C9OticoUjFR81/LZ1mxWK71qyoI2JzSVXhtV1xC9CqUaSw6R2JeWygbtwADJb9lrJAijWXNrhMHNa3lqxWltRp4r9ANxiYY697EV4e5tNBmxB9qgD4vjh1k7Bg/RpRyNFs9hJW/1V4jJLvlKZZLkD+IW2mP+PxPrWrIyFjGW/p0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bD6Nm8hx; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755630697; c=relaxed/simple;
+	bh=hHgmX2IlKh+H/jKJLuAW+0yjJbJ/Z7ekhE2zkEc2FNY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=lmK8dLWvL3zw7eKa5TdWRAVnowi7TH8KyhR6sNYVopXDpnzplCpWuTddobfdNjUkY/CLl5jRsO08YFbrMnFUz/UlqNKKK8r3/+TNBKRF/fjCoEs1SKals/AuMSpgM6c3DWsDH1ovdpbTqbp7FDgP5M/UTn9fCWlmIvUIs6vHe5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ft1WgwdJ; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bD6Nm8hx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A38DC4CEF1;
-	Tue, 19 Aug 2025 15:17:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755616665;
-	bh=YC3YqkY+ubMJ+BckfgV8x/v8nTzqCv3hnNV1WNYIJqA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bD6Nm8hxsVqxV6iX0p8kZ95x/tUAVmv+VI7eQPr5Jd0OewxBu+WwuPok1kZiL9MfK
-	 zXcheZ5nVB3l7NQCxUqXAvrveLMeeXaFRE6VwBqtNbdmzldBlAJgPSGuCszNZwYd4A
-	 jDDH/hPB2yyjRFvoggiNU2TAv4GygI/iwznAIaQR/V10I+sqrwmZshlvnzMvH+vQDk
-	 4x0O/cN3oq4keY0xgornwcUx/U1F2hjRgoTA4hvqyhk1hRsDwPpoCUF/qB0bvv4NRp
-	 hiu+rL5hRGT91qdCmifo37zUFRDQNFPKhAz5dftSbKacOVTm/Oc7r5yDeJJ2oLdk1N
-	 mZ/xLrIak4efA==
-Date: Mon, 18 Aug 2025 21:23:36 +0200
-From: Nicolas Schier <nsc@kernel.org>
-To: David Disseldorp <ddiss@suse.de>
-Cc: linux-kbuild@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-next@vger.kernel.org
-Subject: Re: [PATCH v2 7/7] gen_init_cpio: add -a <data_align> as reflink
- optimization
-Message-ID: <aKN9uMf0HeD1Fgqk@levanger>
-References: <20250814054818.7266-1-ddiss@suse.de>
- <20250814054818.7266-8-ddiss@suse.de>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ft1WgwdJ"
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-76e2ea79219so6520338b3a.2;
+        Tue, 19 Aug 2025 12:11:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755630695; x=1756235495; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0EiOHPkXHOWRCoxSY55xxvCqttDk+IXhPL7KL7WKckI=;
+        b=Ft1WgwdJ0WhSf3689bJ4lDM+HZzNGhhV4ZLeYkK+6hQsVe8tgAuEXLDNtqjbiy0ZFi
+         QuPQ+Xk76HH67ozdG9sA4EL2f52jrimFdVzqSeJ+u9MfIvij8pKEdzl0ARgQGtEZeEuB
+         /lHXpbU0g9ibZbOOhs+nzTLn7UAc9y5MxXSHZT81eBTpR8frgyBfYHprDntihUCk1cPu
+         byinM+yQYMe6IFiBy407AGsGjr6KjuQL2W0vyGzuX333onHWgqLM7lvu3+YoSfJjwvq3
+         ia274Dwo74TXXKywOtaQzn0IwhfKTJ2trWwgLHCZaclYeGxLLNBmaPxAi5f3Vb5OracT
+         Iqjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755630695; x=1756235495;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0EiOHPkXHOWRCoxSY55xxvCqttDk+IXhPL7KL7WKckI=;
+        b=ivEZ4MeOENiQAf+e/9N9pVEm1hoVb50E8IdpZE2EhK88zPWvN3+OkjQapj79AP/MwU
+         /nFep3gwx65/LI2xx8DrvAKYeMcmtRIMByhp2Fo5v7im9fVZ//oazZxJpRKww/vt4scI
+         I3Q3BhbtAr0B6TJExDP7kno3bGWPmJ2e6HAydLowd9wpijpcpR5WDQ9w6NnBb0afkd3q
+         q1JIhl4W6d9y3Pl9WRM/qYYMQgW6t8gahcBX8b5sQECiPdLl5pcVdu/M9bY3PMRsAS+f
+         yqZ2XWQq33zBI930Lx24n7kBzP75OsN8tdFLfUx1WphuVqi450jTriBTcWav8bbyZVHW
+         32bw==
+X-Forwarded-Encrypted: i=1; AJvYcCUYegeozO8/vSJONjbsbg1JgXsLuWZyVAemPCaZFe2YtC2gDLuFB/6fVKII69APYKwHLXl5mMsIT/sH8UNrkAA=@vger.kernel.org, AJvYcCWu21LYadUyjH4sz0IXGfc9JUzhd45+yBH0Vk7ka4mxtGZ8gth9p5Kav/DcIs6tgmZWWsoyiLNPEsNqMpxt@vger.kernel.org, AJvYcCXU6QQcFKKkaxIiKmSq5nJHVnP3rNYy1EUuO5v7wJlnJSnlkDpeZTwYdb9Wh4EYZLgmFWZeCxQjckUwR9c=@vger.kernel.org, AJvYcCXh7VqfI890i0YNCBc8rHqPk3I5zAqUWOPPJ0IcRMFh2MbwaUa0x3MJD61Fe3NIonTYaGE9GsajwVWmhjXGIA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwGJivMXwEzj2H0JiFfaNeoZ7PDdStrgDTX4/3G9+BoW4K4ehef
+	C+5AH0aU0sB9NQtUVEWGLxNIPeSsB1cZKgjF1NWzFh0Pjq6Bt+oagVEu
+X-Gm-Gg: ASbGncvVsdAkFd9p3ZZAZbCEWPO2CiUe7FUwIYNmcm/glRimA6/BfBXbbt8QyAky4JL
+	bmrDcevwaiO6ETB5+RqnnoHZbDb6tVoeLPD1uHHtKr+fsprQlzVzqQXN5lunTgmF/GZRqW98Wz7
+	s0QgJSbyWiOC4ptVzU5Ti/qresNooHXwtI+P083vT+NkW2/zTSygX532RBTjjSlbztVEa49gpAm
+	Tq7VGLCk+wl4DHFJYAnaVVc+Ol+tPfdrmjATTvZ1h0c7+l8Dab2ZU+wqnSokws+9o7xHhTnFQ2H
+	jt82UggiAsZbQYwjQmSgLOrQgW59z6p5xc6INU7flakB5QxIK0rA7Q2WifyLxUXrIQkkoUVIJua
+	m4UHjD0jOF1hXE1QsscBSkcwUPE0jd1LRNA1UKfLFsaECUZe5nN9Z6PJWv6n4OQ==
+X-Google-Smtp-Source: AGHT+IHE6gXoA6t88wZi7ZU7eCEJVWZQezy7yRl0UNN5MWMdprmoF2meOuqADXbXDYLksEeDxMWHeg==
+X-Received: by 2002:a05:6a21:32a0:b0:1f5:72eb:8b62 with SMTP id adf61e73a8af0-2431b7bb318mr630218637.20.1755630694387;
+        Tue, 19 Aug 2025 12:11:34 -0700 (PDT)
+Received: from localhost (75-174-53-95.boid.qwest.net. [75.174.53.95])
+        by smtp.gmail.com with UTF8SMTPSA id 41be03b00d2f7-b47640b6554sm359877a12.48.2025.08.19.12.11.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Aug 2025 12:11:33 -0700 (PDT)
+From: Darin Morrison <darinmorrison@gmail.com>
+To: a.hindborg@kernel.org
+Cc: Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Gary Guo <gary@garyguo.net>,
+	=?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Benno Lossin <lossin@kernel.org>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Trevor Gross <tmgross@umich.edu>,
+	Adam Bratschi-Kaye <ark.email@gmail.com>,
+	rust-for-linux@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kbuild@vger.kernel.org,
+	Petr Pavlu <petr.pavlu@suse.com>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Daniel Gomez <da.gomez@samsung.com>,
+	Simona Vetter <simona.vetter@ffwll.ch>,
+	Greg KH <gregkh@linuxfoundation.org>,
+	Fiona Behrens <me@kloenk.dev>,
+	Daniel Almeida <daniel.almeida@collabora.com>,
+	linux-modules@vger.kernel.org
+Subject: Re: [v17,6/7] rust: samples: add a module parameter to the rust_minimal sample
+Date: Tue, 19 Aug 2025 13:11:33 -0600
+Message-ID: <20250819191133.39413-1-darinmorrison@gmail.com>
+X-Mailer: git-send-email 2.50.1
+In-Reply-To: <20250711-module-params-v3-v17-6-cf9b10d4923d@kernel.org>
+References: 
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250814054818.7266-8-ddiss@suse.de>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Aug 14, 2025 at 03:18:05PM +1000, David Disseldorp wrote:
-> As described in buffer-format.rst, the existing initramfs.c extraction
-> logic works fine if the cpio filename field is padded out with trailing
-> zeros, with a caveat that the padded namesize can't exceed PATH_MAX.
+> Showcase the rust module parameter support by adding a module parameter to
+> the `rust_minimal` sample.
 > 
-> Add filename zero-padding logic to gen_init_cpio, which can be triggered
-> via the new -a <data_align> parameter. Performance and storage
-> utilization is improved for Btrfs and XFS workloads, as copy_file_range
-> can reflink the entire source file into a filesystem block-size aligned
-> destination offset within the cpio archive.
-> 
-> Btrfs benchmarks run on 6.15.8-1-default (Tumbleweed) x86_64 host:
->   > truncate --size=2G /tmp/backing.img
->   > /sbin/mkfs.btrfs /tmp/backing.img
->   ...
->   Sector size:        4096        (CPU page size: 4096)
->   ...
->   > sudo mount /tmp/backing.img mnt
->   > sudo chown $USER mnt
->   > cd mnt
->   mnt> dd if=/dev/urandom of=foo bs=1M count=20 && cat foo >/dev/null
->   ...
->   mnt> echo "file /foo foo 0755 0 0" > list
->   mnt> perf stat -r 10 gen_init_cpio -o unaligned_btrfs list
->   ...
->             0.023496 +- 0.000472 seconds time elapsed  ( +-  2.01% )
-> 
->   mnt> perf stat -r 10 gen_init_cpio -o aligned_btrfs -a 4096 list
->   ...
->            0.0010010 +- 0.0000565 seconds time elapsed  ( +-  5.65% )
-> 
->   mnt> /sbin/xfs_io -c "fiemap -v" unaligned_btrfs
->   unaligned_btrfs:
->    EXT: FILE-OFFSET      BLOCK-RANGE      TOTAL FLAGS
->      0: [0..40967]:      695040..736007   40968   0x1
->   mnt> /sbin/xfs_io -c "fiemap -v" aligned_btrfs
->   aligned_btrfs:
->    EXT: FILE-OFFSET      BLOCK-RANGE      TOTAL FLAGS
->      0: [0..7]:          26768..26775         8   0x0
->      1: [8..40967]:      269056..310015   40960 0x2000
->      2: [40968..40975]:  26776..26783         8   0x1
->   mnt> /sbin/btrfs fi du unaligned_btrfs aligned_btrfs
->        Total   Exclusive  Set shared  Filename
->     20.00MiB    20.00MiB       0.00B  unaligned_btrfs
->     20.01MiB     8.00KiB    20.00MiB  aligned_btrfs
-> 
-> XFS benchmarks run on same host:
->   > sudo umount mnt && rm /tmp/backing.img
->   > truncate --size=2G /tmp/backing.img
->   > /sbin/mkfs.xfs /tmp/backing.img
->   ...
->            =                       reflink=1    ...
->   data     =                       bsize=4096   blocks=524288, imaxpct=25
->   ...
->   > sudo mount /tmp/backing.img mnt
->   > sudo chown $USER mnt
->   > cd mnt
->   mnt> dd if=/dev/urandom of=foo bs=1M count=20 && cat foo >/dev/null
->   ...
->   mnt> echo "file /foo foo 0755 0 0" > list
->   mnt> perf stat -r 10 gen_init_cpio -o unaligned_xfs list
->   ...
->             0.011069 +- 0.000469 seconds time elapsed  ( +-  4.24% )
-> 
->   mnt> perf stat -r 10 gen_init_cpio -o aligned_xfs -a 4096 list
->   ...
->             0.001273 +- 0.000288 seconds time elapsed  ( +- 22.60% )
-> 
->   mnt> /sbin/xfs_io -c "fiemap -v" unaligned_xfs
->    unaligned_xfs:
->    EXT: FILE-OFFSET      BLOCK-RANGE      TOTAL FLAGS
->      0: [0..40967]:      106176..147143   40968   0x0
->      1: [40968..65023]:  147144..171199   24056 0x801
->   mnt> /sbin/xfs_io -c "fiemap -v" aligned_xfs
->    aligned_xfs:
->    EXT: FILE-OFFSET      BLOCK-RANGE      TOTAL FLAGS
->      0: [0..7]:          120..127             8   0x0
->      1: [8..40967]:      192..41151       40960 0x2000
->      2: [40968..40975]:  236728..236735       8   0x0
->      3: [40976..106495]: 236736..302255   65520 0x801
-> 
-> The alignment is best-effort; a stderr message is printed if alignment
-> can't be achieved due to PATH_MAX overrun, with fallback to non-padded
-> filename. This allows it to still be useful for opportunistic alignment,
-> e.g. on aarch64 Btrfs with 64K block-size. Alignment failure messages
-> provide an indicator that reordering of the cpio-manifest may be
-> beneficial.
-> 
-> Archive read performance for reflinked initramfs images may suffer due
-> to the effects of fragmentation, particularly on spinning disks. To
-> mitigate excessive fragmentation, files with lengths less than
-> data_align aren't padded.
-> 
-> Signed-off-by: David Disseldorp <ddiss@suse.de>
+> Reviewed-by: Benno Lossin <lossin@kernel.org>
+> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 > ---
->  usr/gen_init_cpio.c | 50 ++++++++++++++++++++++++++++++++++-----------
->  1 file changed, 38 insertions(+), 12 deletions(-)
+>  samples/rust/rust_minimal.rs | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+> diff --git a/samples/rust/rust_minimal.rs b/samples/rust/rust_minimal.rs
+> index 1fc7a1be6b6d..8eb9583571d7 100644
+> --- a/samples/rust/rust_minimal.rs
+> +++ b/samples/rust/rust_minimal.rs
+> @@ -10,6 +10,12 @@
+>      authors: ["Rust for Linux Contributors"],
+>      description: "Rust minimal sample",
+>      license: "GPL",
+> +    params: {
+> +        test_parameter: i64 {
+> +            default: 1,
+> +            description: "This parameter has a default of 1",
+> +        },
+> +    },
 
-Thanks!  Testing with a massively oversized initramfs (600MB) was fun:
-from 2:44 down to 38s.
+Thanks for the patches.
 
+I've been using these in a new PCI device driver module and noticed
+that the inclusion of `params:` in the rustdoc test here causes the
+`rusttest` target to fail with a linker error (below) complaining about
+undefined references for `rust_helper_atomic_try_cmpxchg_relaxed` and
+`rust_helper_atomic_set_release`.
 
-Questions that pop up in my mind:
-Now, how can we make other benefit from this?  Might it make sense to
-introduce a kconfig variable for initramfs alignment -- even though this
-is just a build-time optimisation of few seconds?
+Building a real module and using the `params:` field seems to work
+fine though so it must be something specific to the test configuration.
 
+Any ideas how to fix this?
 
-Kind regards,
-Nicolas
+---
+
+  RUSTDOC T rust/macros/lib.rs
+
+running 10 tests
+ii....... 9/10
+rust/macros/lib.rs - module (line 61) --- FAILED
+
+failures:
+
+---- rust/macros/lib.rs - module (line 61) stdout ----
+error: linking with `cc` failed: exit status: 1
+  |
+  = note:  "cc" "-m64" "/tmp/rustcVbJoqH/symbols.o" "<2 object files omitted>" "-Wl,--as-needed" "-Wl,-Bstatic" "./rust/test/{libkernel.rlib,libuapi.rlib,libbindings.rlib,libbuild_error.rlib,libpin_init.rlib,libffi.rlib}.rlib" "<sysroot>/lib/rustlib/x86_64-unknown-linux-gnu/lib/{libstd-*,libpanic_unwind-*,libobject-*,libmemchr-*,libaddr2line-*,libgimli-*,librustc_demangle-*,libstd_detect-*,libhashbrown-*,librustc_std_workspace_alloc-*,libminiz_oxide-*,libadler2-*,libunwind-*,libcfg_if-*,liblibc-*,librustc_std_workspace_core-*,liballoc-*,libcore-*,libcompiler_builtins-*}.rlib" "-Wl,-Bdynamic" "-lgcc_s" "-lutil" "-lrt" "-lpthread" "-lm" "-ldl" "-lc" "-L" "/tmp/rustcVbJoqH/raw-dylibs" "-Wl,--eh-frame-hdr" "-Wl,-z,noexecstack" "-L" "./rust/test" "-L" "<sysroot>/lib/rustlib/x86_64-unknown-linux-gnu/lib" "-o" "/tmp/rustdoctestTFYhZ1/rust_out" "-Wl,--gc-sections" "-pie" "-Wl,-z,relro,-z,now" "-nodefaultlibs"
+  = note: some arguments are omitted. use `--verbose` to show all linker arguments
+  = note: /usr/bin/ld: ./rust/test/libkernel.rlib(kernel.kernel.a8a3768e1a8b2c2e-cgu.3.rcgu.o): in function `kernel::sync::set_once::SetOnce<T>::populate':
+          kernel.a8a3768e1a8b2c2e-cgu.3:(.text._ZN6kernel4sync8set_once16SetOnce$LT$T$GT$8populate17hab8d57b99b7ebbcbE+0xd3): undefined reference to `rust_helper_atomic_try_cmpxchg_relaxed'
+          /usr/bin/ld: kernel.a8a3768e1a8b2c2e-cgu.3:(.text._ZN6kernel4sync8set_once16SetOnce$LT$T$GT$8populate17hab8d57b99b7ebbcbE+0x2a8): undefined reference to `rust_helper_atomic_set_release'
+          collect2: error: ld returned 1 exit status
+          
+  = note: some `extern` functions couldn't be found; some native libraries may need to be installed or have their path specified
+  = note: use the `-l` flag to specify native libraries to link
