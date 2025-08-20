@@ -1,71 +1,104 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A384431CA72;
-	Wed, 20 Aug 2025 16:11:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C5D936CE0C;
+	Wed, 20 Aug 2025 17:48:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755706308; cv=none; b=NSz3kdSg6r01O12QaJqjLGcp0ejYuFjHmZccQpLzyidafC85AksXUQbRPLp9gT1FWadSr43Kbf9hzkZCnFf3DlKIuc6ptg9Ksj5J2gV8bunplky+Ub3i9jq7/DnWlWLtjBdMgY3VZNhWc+WLp5SFwgkGI15r5MW0n5sXT0gdfVI=
+	t=1755712105; cv=none; b=rLXIEFWC6tA/T62tL+FCeYmf6AyOcrpNsWniSShH9cEUZ5tpYik5bu4b3Aj9nsP9jA5kaKaSvDNigkARA4bMMweLBEMCGZBvuzK8+qU5fTzTBEmC6WrpdJSJazoYu6tMVCEumLrkNdTbZYa/wY/ugnUHsfFLcFziZGCcY0aUVTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755706308; c=relaxed/simple;
-	bh=Jgv0+727RcBmLZ75xL/ndSMhEId+rvBQAtXXGW422Jk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JklYFF/YOVTOpcPMocXxCdi2RNRsgo37gUSBCV9H4noe1TT6kM+8gzhj2jfenN5vjwZFsEaJJ78QY2pJPorePmQrHjXK1ivgKy0A7JBgjAZULEr5BbPbQ0XOo18VcsYP8JB42Gmn326Baha7q5q5LRFiKg5k/zaOM5ClM0BoTfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XkPzI7Ur; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755712105; c=relaxed/simple;
+	bh=6peswoOhdw7dXI0cwkW9pPp7bgdjqqT10/tl3qs06UY=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type; b=UliK3kcEBNsugm+3fI0OsUK5WhWCDfplceVu3Q9qXpyZofwtL3yqcmUyuJRGlgLYFbRoe914oGvHKal1/u3M9jb+CRNpPvK/BjlM/qYd/yA79GKEYqfq427STt+Nu8Z+zg+7NqBpFyPUPFrglE4pq3JT/NPcxLo36ODfwouWQms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k7kIQcYr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XkPzI7Ur"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE7A2C4CEE7;
-	Wed, 20 Aug 2025 16:11:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k7kIQcYr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 763EEC4AF09;
+	Wed, 20 Aug 2025 17:48:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755706308;
-	bh=Jgv0+727RcBmLZ75xL/ndSMhEId+rvBQAtXXGW422Jk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XkPzI7UrGLkoanGse67TAfXMZbPIZVQHG0NmTSvP+CH/DUTeaR+/FBhe7ah3ixtFE
-	 xumFhk/eSiBnsbr6H+eASRUcv/dUC7HPdYJoyvsFs6qVj74NLVJ1soNfty0dtnDBr9
-	 U4V96O82sE2YXPLOzibyObUiTE9ZPPD+igZ7/R3/9yLH9jHndSmUPIejeCF3F8BQko
-	 Hw1MKZ/tcOqXp2oeWms4gDy+DcD9egUyzUaMq6NXD0QNng/H3gmPgSsqo/JHFs2O8W
-	 6h4FYmBhwawOIKG2HjfmDgeZQ0frbBYrwgRCsmEUDUPRlhzSZmADZ5MHtBEAz3opZQ
-	 B5JgnZkNI7hvw==
-Date: Wed, 20 Aug 2025 09:11:42 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Alexey Gladkov <legion@kernel.org>,
-	Nicolas Schier <nicolas.schier@linux.dev>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Petr Pavlu <petr.pavlu@suse.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Daniel Gomez <da.gomez@samsung.com>, linux-kernel@vger.kernel.org,
-	linux-modules@vger.kernel.org, linux-kbuild@vger.kernel.org,
-	Khalid Aziz <khalid@gonehiking.org>, linux-scsi@vger.kernel.org,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Arnd Bergmann <arnd@arndb.de>, Damien Le Moal <dlemoal@kernel.org>
-Subject: Re: [PATCH v6 4/9] scsi: Always define blogic_pci_tbl structure
-Message-ID: <20250820161142.GB3805667@ax162>
-References: <cover.1755170493.git.legion@kernel.org>
- <93ca6c988e2d8a294ae0941747a6e654e6e8e8b8.1755170493.git.legion@kernel.org>
- <yq1v7mkxe2h.fsf@ca-mkp.ca.oracle.com>
- <20250819071817.GA1540193@ax162>
- <yq18qjeyd4a.fsf@ca-mkp.ca.oracle.com>
+	s=k20201202; t=1755712105;
+	bh=6peswoOhdw7dXI0cwkW9pPp7bgdjqqT10/tl3qs06UY=;
+	h=Date:From:To:Cc:Subject:References:From;
+	b=k7kIQcYr4dAU3vHgI0Kg9RAqL96t50M5aDutZqH9CH2p5gvjhZAh4coACmWKLH1yl
+	 uQSzDmXp2kGfZcKzEzIffLXqu/3DEaYyG81rjz6cVu9F71xelvfee1H02j2Z4NBewf
+	 PhXlJUpDa2PHyqHbEbX1++TFHoEaHLnEsm0KBP7KV0LULFESg97+3frn944ajx8/jP
+	 gMu9B1RlpujqH9l8G8x/c8sM+9AvYl5LRkj9wkvhibM7xXTFNqUmBZ2T3JTH4wyOe4
+	 W0+V8gQb75sd8AVMtaefqb2kYiqT2fQMt+xnn8Y100kVA013OA/yAFXJ/Cn0jEW08O
+	 bgHuJc9rwREpQ==
+Received: from rostedt by gandalf with local (Exim 4.98.2)
+	(envelope-from <rostedt@kernel.org>)
+	id 1uomvE-00000000rUD-1g1S;
+	Wed, 20 Aug 2025 13:48:28 -0400
+Message-ID: <20250820174828.252631905@kernel.org>
+User-Agent: quilt/0.68
+Date: Wed, 20 Aug 2025 13:47:55 -0400
+From: Steven Rostedt <rostedt@kernel.org>
+To: linux-kernel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org,
+ linux-kbuild@vger.kernel.org
+Cc: Masami Hiramatsu <mhiramat@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Arnd Bergmann <arnd@arndb.de>,
+ Masahiro Yamada <masahiroy@kernel.org>,
+ Nathan Chancellor <nathan@kernel.org>,
+ Nicolas Schier <nicolas.schier@linux.dev>,
+ Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>
+Subject: [PATCH v6 3/3] tracepoint: Do not warn for unused event that is exported
+References: <20250820174752.684086778@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <yq18qjeyd4a.fsf@ca-mkp.ca.oracle.com>
+Content-Type: text/plain; charset=UTF-8
 
-On Tue, Aug 19, 2025 at 09:52:10PM -0400, Martin K. Petersen wrote:
-> >> Applied to 6.18/scsi-staging, thanks!
-> >
-> > I think I will need this change to apply patch 7 [1] to kbuild-next
-> > without any issues [2]. If there is little risk of conflict, could I
-> > take it with your Ack?
-> 
-> Sure, no problem. Dropped the patch from my tree.
-> 
-> Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
+From: Steven Rostedt <rostedt@goodmis.org>
 
-Thanks a lot!
+There are a few generic events that may only be used by modules. They are
+defined and then set with EXPORT_TRACEPOINT*(). Mark events that are
+exported as being used, even though they still waste memory in the kernel
+proper.
+
+Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+---
+ include/linux/tracepoint.h | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/include/linux/tracepoint.h b/include/linux/tracepoint.h
+index 71d2e085c49e..ec6827d00d79 100644
+--- a/include/linux/tracepoint.h
++++ b/include/linux/tracepoint.h
+@@ -223,8 +223,8 @@ static inline struct tracepoint *tracepoint_ptr_deref(tracepoint_ptr_t *p)
+ 
+ #ifdef CONFIG_TRACEPOINT_WARN_ON_UNUSED
+ # define TRACEPOINT_CHECK(name)						\
+-	static const char __used __section("__tracepoint_check") __trace_check[] = \
+-		#name;
++	static const char __used __section("__tracepoint_check")	\
++	__trace_check_##name[] = #name;
+ #else
+ # define TRACEPOINT_CHECK(tname)
+ #endif
+@@ -381,10 +381,12 @@ static inline struct tracepoint *tracepoint_ptr_deref(tracepoint_ptr_t *p)
+ 	__DEFINE_TRACE_EXT(_name, NULL, PARAMS(_proto), PARAMS(_args));
+ 
+ #define EXPORT_TRACEPOINT_SYMBOL_GPL(name)				\
++	TRACEPOINT_CHECK(name)						\
+ 	EXPORT_SYMBOL_GPL(__tracepoint_##name);				\
+ 	EXPORT_SYMBOL_GPL(__traceiter_##name);				\
+ 	EXPORT_STATIC_CALL_GPL(tp_func_##name)
+ #define EXPORT_TRACEPOINT_SYMBOL(name)					\
++	TRACEPOINT_CHECK(name)						\
+ 	EXPORT_SYMBOL(__tracepoint_##name);				\
+ 	EXPORT_SYMBOL(__traceiter_##name);				\
+ 	EXPORT_STATIC_CALL(tp_func_##name)
+-- 
+2.50.1
+
+
