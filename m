@@ -1,43 +1,55 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADE822FD1B1;
-	Mon, 25 Aug 2025 15:39:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A06B62FE58F;
+	Mon, 25 Aug 2025 15:59:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756136366; cv=none; b=JGJDDPkNYvTFXHUJ9kBzJKKu2hoC8BWt+A36RJY38rqR5VOhJElI7IiuClUJTMN5HG4zJCObFr/ZO+14h2LEhzBMP02RnP2emLYR+ParaBxMcwZlyggY6kSipvwdU6fUFKzVPQxutcKBNFTnT5wjxRVa3RUiRIR35FnvTIMgr44=
+	t=1756137573; cv=none; b=sTV56EnzfAQP8zeCASQyIrOJTa1U/1JBE67COjlluFo5ta6fUCYH7anflzdaEqrx/HDYbXifBgrlhwp6PhM0u0EsP9NOobSFpprvI0lAlf6kU5McDW4AplC1+NQEX2g9HF9zxevl6DOZ32G6kW9fmAJVEwDdg9EGo38TZ/lB7FI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756136366; c=relaxed/simple;
-	bh=wDX72lFXC9Zc3267BybmSNThL9SXJrH+3OnweEOr3JY=;
+	s=arc-20240116; t=1756137573; c=relaxed/simple;
+	bh=bQU5x1auMmGx0XG0xYYeyF+2z8gTrjrL5OF2jGIWL1k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mZ3zsku4ETn4W8hz/fY1n2R8p6jsWg8aCv7fU1JN+Xn+pAgFj8lWlgyZV79mvTitWJZYhevSn+Ih4YwHxBp12Sl4fwukiDFoJA1ZCbB+Ld/QZ6yqG21a69ZdIDg010Ks1I0iEIEdQUdFqKbTIyH89Cu83waWT9Not7mfzN7IZUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TykLHZcA; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=mzaoIAPdoTWFTeqzP40AzfEna7uFt69p6SwLtHROZA5I1wb7VKGY91dXajnDpTiBrtOPsjYN2zVdxd8XnkCdu3JtCthMAqYLB29o8HPHjb/8W3J3057a+Gy5NV9P5Ca5tKmiTToAVZsE3FytZhXapjsQ1Vb3Y6ll+9nRIMeqW8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=k3cgl2Ye; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TykLHZcA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2363C4CEED;
-	Mon, 25 Aug 2025 15:39:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756136366;
-	bh=wDX72lFXC9Zc3267BybmSNThL9SXJrH+3OnweEOr3JY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TykLHZcAmyav7iJuotWPm5t8m+TvFyNAhkljwLCNm9je3JAujyK/AClrcJmncLE/F
-	 C0pBqAfAYY0Vm1UyecmOSzy79zpgMczYcRCQr0rLaEvAbo8TlcQk3Bn/mC8OfeqGaj
-	 Z9ciVHGUox5vNj2NaAXS1dudRTDqfgUL2ckSNg3svdyE/ALeb00eNWLVaZyKejFejD
-	 Go53C6scUEJn1hQGAGMXQSrkevCtvCWn/Gks88XJKONj9CDzdrmtQEVqsFSwcPWixf
-	 WISE4wDACTqXkxm645PjLlkyUGhsxTLdjJrfPgZwQZvschB1FeoPg9tOYXZtT2d6Pi
-	 puaYoQAQG9TLw==
-Date: Mon, 25 Aug 2025 17:33:12 +0200
-From: Nicolas Schier <nsc@kernel.org>
-To: Vlastimil Babka <vbabka@suse.cz>
-Cc: Nathan Chancellor <nathan@kernel.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Daniel Gomez <da.gomez@kernel.org>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
-Subject: Re: [PATCH] scripts/misc-check: update export checks for
- EXPORT_SYMBOL_FOR_MODULES()
-Message-ID: <aKyCOIZir4PrC1EA@levanger>
-References: <20250825-export_modules_fix-v1-1-5c331e949538@suse.cz>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="k3cgl2Ye"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=LfZRCUjbcZcYfJqQ1pyJA0w5HiW+vn44jB/PfWRNK2k=; b=k3cgl2Ye2NFhvxXwnrIKo2obgZ
+	YlshUQn8PUtAXokUJ2ZeTDTPX1OZB1rL8KKakzcvLH/Ivt8xBTjkrejp7H1KnJf+B0BdzWkHCWeJ/
+	hAIHn4fFab6r96A1ITuIHkWRZtJ47iJjqWR+r86xDKFbD1LiJgNG8nTQQvjR/FarVfJjT4KtZrF0U
+	/Uqh2pskwapUBZlgpMf4qdNwywYbfAUeSlxFOxy6TM0ZvGOpXaT616hl1VLiSmVZfEitIrqD7j7EE
+	L82v3vzVcfZ5sV36P6TVRm/pPrZstYaD0ccOhUx7s8HWnu58N9+b9UASsFh0KGcot30oKrYVptwJu
+	QoVk4hkw==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uqZbP-000000004sA-3EoW;
+	Mon, 25 Aug 2025 15:59:24 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 535D23002ED; Mon, 25 Aug 2025 17:59:23 +0200 (CEST)
+Date: Mon, 25 Aug 2025 17:59:23 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Kees Cook <kees@kernel.org>
+Cc: Kees Cook <kees@outflux.net>, Sami Tolvanen <samitolvanen@google.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Puranjay Mohan <puranjay@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Nathan Chancellor <nathan@kernel.org>, x86@kernel.org,
+	linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org, llvm@lists.linux.dev,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH 3/5] x86/cfi: Add option for cfi=debug bootparam
+Message-ID: <20250825155923.GY3245006@noisy.programming.kicks-ass.net>
+References: <20250825141316.work.967-kees@kernel.org>
+ <20250825142603.1907143-3-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -46,22 +58,24 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250825-export_modules_fix-v1-1-5c331e949538@suse.cz>
+In-Reply-To: <20250825142603.1907143-3-kees@kernel.org>
 
-On Mon, Aug 25, 2025 at 05:00:37PM +0200, Vlastimil Babka wrote:
-> The module export checks are looking for EXPORT_SYMBOL_GPL_FOR_MODULES()
-> which was renamed to EXPORT_SYMBOL_FOR_MODULES(). Update the checks.
-> 
-> Fixes: 6d3c3ca4c77e ("module: Rename EXPORT_SYMBOL_GPL_FOR_MODULES to EXPORT_SYMBOL_FOR_MODULES")
-> Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
-> ---
-> I've missed these new checks when renaming the export macro due to my
-> git grep being too narrow. My commit went through Christian's vfs tree
-> but seems the script is part of kbuild (which is currently Odd fixes).
-> ---
->  scripts/misc-check | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+On Mon, Aug 25, 2025 at 07:25:50AM -0700, Kees Cook wrote:
 
-Good catch, thanks a lot!  We will gladly take the patch to kbuild-next.
 
-Reviewed-by: Nicolas Schier <nsc@kernel.org>
+> +	if (builtin && cfi_debug)
+> +		if (builtin && cfi_debug)
+> +		if (builtin && cfi_debug)
+> +		if (builtin && cfi_debug)
+> +		if (builtin && cfi_debug)
+> +		if (builtin && cfi_debug)
+> +		if (builtin && cfi_debug)
+> +		if (builtin && cfi_debug)
+> +		if (builtin && cfi_debug)
+
+You could just make that cfi_debug and add:
+
+	if (builtin)
+		cfi_debug = false;
+
+at the very end of __apply_fineibt().
