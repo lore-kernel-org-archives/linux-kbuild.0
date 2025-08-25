@@ -1,35 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA2742FB982;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA30B2FB990;
 	Mon, 25 Aug 2025 14:26:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756131964; cv=none; b=iBpb4ldwyasbnlokDemQhbxNeTQZEb0JktnMODdRb968OTt4CbPG0vdn15FWYwfGx5cXd4ubHGE02jB6Mio3hBBLaPVpA7gtfxhXEQw1k5ffH/2lc5CogtJzBMhiFd99fhCmGxidTW1kAuEIXTXbtrJT8cbZv25gtu1dxp/WzS8=
+	t=1756131964; cv=none; b=MpTYX87xZOnhAiZuE5i9OsAiOR/h3/L/ERJZ857MhVKqVAVCBctNj0MOZRY1Yc02kPrjbhrd52fyvYp0Iyg7uIVzXkjT/S7cac6f9LVsglwttWlevFDzxwmkqLD7Omb4p74k103k7I3za4nGoPqSj0ae97J7eTLIiOBCoog/Dn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1756131964; c=relaxed/simple;
-	bh=Sla/GNQ9pAAGrUEI5zQMMAiO+21DTDPiIwuUTYkcitE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=lHGhIChAYt7rLttTdUcFKKoN5pYmmVFw6GUtxcvohkIi5pKXYSEI96FWhSpGbWFJ9r4cqiAdn+NjjCdXeTPDI1sNoKEampOJF4nVEBsudGk55Yb9f+d3kliL106IZ0nogRNdUDjGen2BQNnc2W0LUcXPDz10AbH23I0QjkczWuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pLBCL5Lm; arc=none smtp.client-ip=10.30.226.201
+	bh=wgWu+8XypexFEPIMyZ5cUv+a841NNieT1SYM+X0Qx/k=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FwmhD+WTxy3Z3UqRPI1WrR+XP7pOrWx+r1qkmTUe24697MnLeRrk4EzJrQ8+PpgoNf075smFQoy5Se4haUfnqv29ZUJYCI4Vy6JBukGiVn45nMVfv4V7zKRsX3GoGaIfbgRVoZfksqH/B24InsVPcyNA9qQZW+A5Q1p6X8p1IM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qhtif550; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pLBCL5Lm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AEA2C4CEF4;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qhtif550"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78AA6C4CEED;
 	Mon, 25 Aug 2025 14:26:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1756131963;
-	bh=Sla/GNQ9pAAGrUEI5zQMMAiO+21DTDPiIwuUTYkcitE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pLBCL5LmhQPyqoqY1f6E3wEghXn6T6CCiDmYS6qt+GNFEkabqrkJTMUNAVeo62M+e
-	 85A97g70Fe6SZFcPD8c/KkMc7d5WGpKstwfKegv24ribLMZJKCJWyZJbRqV7/X/LQj
-	 KTNlzVf7wIpwFVGCMf8g/uXdk3s6VznZCcJeRWGF7ygEu31oLPRDNeYw8pczbtj66Z
-	 SMxQpT57KBuUtsMrD2wiVcUkC22UmxkxpQuB0UUL/zHZNRIzrXcHxtwB50E/YpgdLq
-	 pIxJCOS/+hH2fFWr1AVbW+3dYUxMClez490yXToCWxKYJ+cpqtNgCJdYLE0rsvIK/2
-	 KfpqFSeJEw9ww==
+	bh=wgWu+8XypexFEPIMyZ5cUv+a841NNieT1SYM+X0Qx/k=;
+	h=From:To:Cc:Subject:Date:From;
+	b=qhtif550k7UP88ylX7mXFhF3o1Ewy/94q+uBREqP5wwVj4p5tKWo4YIYxqabfCm7o
+	 RXbpoE5lUS9A4eX6olO0JQHJX7II7zucifIUT4t5oGSDjVm5tEUvNG7nDTaTagf8MC
+	 jr7RemyFaL1wlR9Kr70Sg2zVepCA8TRpRF4n178+y1/WeWFAYnDer2xVGz5oBJ0Lzm
+	 0uYOJ+IQmCdVYQdGABtrzKO32BebHlOxGDRRKOqu8JezSkNdHqIcMoMGgLe2oVQ2xq
+	 QdjlzNO81fwO8SDSNET5/Yoj4vn7Gds6gMmBMfvGySNCf4krhzhfmv4KmE2sfHEjQA
+	 zncS7Q1vVyi0w==
 From: Kees Cook <kees@kernel.org>
 To: Peter Zijlstra <peterz@infradead.org>
 Cc: Kees Cook <kees@kernel.org>,
-	Kees Cook <kees@outflux.net>,
 	Sami Tolvanen <samitolvanen@google.com>,
 	David Woodhouse <dwmw2@infradead.org>,
 	Linus Walleij <linus.walleij@linaro.org>,
@@ -44,12 +42,10 @@ Cc: Kees Cook <kees@kernel.org>,
 	linux-riscv@lists.infradead.org,
 	llvm@lists.linux.dev,
 	linux-hardening@vger.kernel.org
-Subject: [PATCH 3/5] x86/cfi: Add option for cfi=debug bootparam
-Date: Mon, 25 Aug 2025 07:25:50 -0700
-Message-Id: <20250825142603.1907143-3-kees@kernel.org>
+Subject: [PATCH 0/5] kcfi: Prepare for GCC support
+Date: Mon, 25 Aug 2025 07:25:47 -0700
+Message-Id: <20250825141316.work.967-kees@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250825141316.work.967-kees@kernel.org>
-References: <20250825141316.work.967-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -58,183 +54,92 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Kees Cook <kees@outflux.net>
+Hi,
 
-Add "debug" option for "cfi=" bootparam to get details on early CFI
-initialization steps. Standardize CFI pr_info() lines to use "CFI:"
-prefix. Standardize "CFI: Using ..." to always report which CFI mode is
-being used, regardless of CONFIG_FINEIBT. Document all the "cfi=" options.
+With KCFI support in GCC coming[1], we need to make some (relatively
+small) changes in the kernel to deal with it:
 
-Signed-off-by: Kees Cook <kees@outflux.net>
----
- .../admin-guide/kernel-parameters.txt         | 18 +++++++++
- arch/x86/kernel/alternative.c                 | 39 +++++++++++++++----
- 2 files changed, 50 insertions(+), 7 deletions(-)
+- move __nocfi out of compilers-clang.h (so GCC can see it too)
+- add cfi=debug so future Kees can find breakage easier
+- remove problematic __noinitretpoline usage
+- rename CONFIG_CFI_CLANG to CONFIG_CFI (otherwise is it quite confusing)
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 747a55abf494..7b4bddb5a030 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -608,6 +608,24 @@
- 	ccw_timeout_log	[S390]
- 			See Documentation/arch/s390/common_io.rst for details.
- 
-+	cfi=		[X86-64] Set Control Flow Integrity checking features
-+			when CONFIG_FINEIBT is enabled.
-+			Format: feature[,feature...]
-+			Default: auto
-+
-+			auto:	  Use FineIBT if IBT available, otherwise kCFI.
-+				  Under FineIBT, enable "paranoid" mode when
-+				  FRED is not available.
-+			off:	  Turn off CFI checking.
-+			kcfi:	  Use kCFI (disable FineIBT).
-+			fineibt:  Use FineIBT (even if IBT not available).
-+			norand:   Do not re-randomize CFI hashes.
-+			paranoid: Add caller hash checking under FineIBT.
-+			bhi:	  Enable register poisoning to stop speculation
-+				  across FineIBT. (Disabled by default.)
-+			warn:	  Do not enforce CFI checking: warn only.
-+			debug:	  Report CFI initialization details.
-+
- 	cgroup_disable=	[KNL] Disable a particular controller or optional feature
- 			Format: {name of the controller(s) or feature(s) to disable}
- 			The effects of cgroup_disable=foo are:
-diff --git a/arch/x86/kernel/alternative.c b/arch/x86/kernel/alternative.c
-index 7bde68247b5f..5d80ae77c042 100644
---- a/arch/x86/kernel/alternative.c
-+++ b/arch/x86/kernel/alternative.c
-@@ -1225,6 +1225,7 @@ int cfi_get_func_arity(void *func)
- 
- static bool cfi_rand __ro_after_init = true;
- static u32  cfi_seed __ro_after_init;
-+static bool cfi_debug __ro_after_init;
- 
- /*
-  * Re-hash the CFI hash with a boot-time seed while making sure the result is
-@@ -1259,6 +1260,8 @@ static __init int cfi_parse_cmdline(char *str)
- 		} else if (!strcmp(str, "off")) {
- 			cfi_mode = CFI_OFF;
- 			cfi_rand = false;
-+		} else if (!strcmp(str, "debug")) {
-+			cfi_debug = true;
- 		} else if (!strcmp(str, "kcfi")) {
- 			cfi_mode = CFI_KCFI;
- 		} else if (!strcmp(str, "fineibt")) {
-@@ -1266,26 +1269,26 @@ static __init int cfi_parse_cmdline(char *str)
- 		} else if (!strcmp(str, "norand")) {
- 			cfi_rand = false;
- 		} else if (!strcmp(str, "warn")) {
--			pr_alert("CFI mismatch non-fatal!\n");
-+			pr_alert("CFI: mismatch non-fatal!\n");
- 			cfi_warn = true;
- 		} else if (!strcmp(str, "paranoid")) {
- 			if (cfi_mode == CFI_FINEIBT) {
- 				cfi_paranoid = true;
- 			} else {
--				pr_err("Ignoring paranoid; depends on fineibt.\n");
-+				pr_err("CFI: ignoring paranoid; depends on fineibt.\n");
- 			}
- 		} else if (!strcmp(str, "bhi")) {
- #ifdef CONFIG_FINEIBT_BHI
- 			if (cfi_mode == CFI_FINEIBT) {
- 				cfi_bhi = true;
- 			} else {
--				pr_err("Ignoring bhi; depends on fineibt.\n");
-+				pr_err("CFI: ignoring bhi; depends on fineibt.\n");
- 			}
- #else
--			pr_err("Ignoring bhi; depends on FINEIBT_BHI=y.\n");
-+			pr_err("CFI: ignoring bhi; depends on FINEIBT_BHI=y.\n");
- #endif
- 		} else {
--			pr_err("Ignoring unknown cfi option (%s).", str);
-+			pr_err("CFI: Ignoring unknown option (%s).", str);
- 		}
- 
- 		str = next;
-@@ -1734,6 +1737,8 @@ static void __apply_fineibt(s32 *start_retpoline, s32 *end_retpoline,
- 	 * rewrite them. This disables all CFI. If this succeeds but any of the
- 	 * later stages fails, we're without CFI.
- 	 */
-+	if (builtin && cfi_debug)
-+		pr_info("CFI: disabling all indirect call checking\n");
- 	ret = cfi_disable_callers(start_retpoline, end_retpoline);
- 	if (ret)
- 		goto err;
-@@ -1744,43 +1749,61 @@ static void __apply_fineibt(s32 *start_retpoline, s32 *end_retpoline,
- 			cfi_bpf_hash = cfi_rehash(cfi_bpf_hash);
- 			cfi_bpf_subprog_hash = cfi_rehash(cfi_bpf_subprog_hash);
- 		}
-+		if (builtin && cfi_debug)
-+			pr_info("CFI: cfi_seed: 0x%08x\n", cfi_seed);
- 
-+		if (builtin && cfi_debug)
-+			pr_info("CFI: rehashing all preambles\n");
- 		ret = cfi_rand_preamble(start_cfi, end_cfi);
- 		if (ret)
- 			goto err;
- 
-+		if (builtin && cfi_debug)
-+			pr_info("CFI: rehashing all indirect calls\n");
- 		ret = cfi_rand_callers(start_retpoline, end_retpoline);
- 		if (ret)
- 			goto err;
-+	} else {
-+		if (builtin && cfi_debug)
-+			pr_info("CFI: rehashing disabled\n");
- 	}
- 
- 	switch (cfi_mode) {
- 	case CFI_OFF:
- 		if (builtin)
--			pr_info("Disabling CFI\n");
-+			pr_info("CFI: disabled\n");
- 		return;
- 
- 	case CFI_KCFI:
-+		if (builtin && cfi_debug)
-+			pr_info("CFI: enabling all indirect call checking\n");
- 		ret = cfi_enable_callers(start_retpoline, end_retpoline);
- 		if (ret)
- 			goto err;
- 
- 		if (builtin)
--			pr_info("Using kCFI\n");
-+			pr_info("CFI: Using %s kCFI\n",
-+				cfi_rand ? "rehashed" : "retpoline");
- 		return;
- 
- 	case CFI_FINEIBT:
-+		if (builtin && cfi_debug)
-+			pr_info("CFI: adding FineIBT to all preambles\n");
- 		/* place the FineIBT preamble at func()-16 */
- 		ret = cfi_rewrite_preamble(start_cfi, end_cfi);
- 		if (ret)
- 			goto err;
- 
- 		/* rewrite the callers to target func()-16 */
-+		if (builtin && cfi_debug)
-+			pr_info("CFI: rewriting indirect call sites to use FineIBT\n");
- 		ret = cfi_rewrite_callers(start_retpoline, end_retpoline);
- 		if (ret)
- 			goto err;
- 
- 		/* now that nobody targets func()+0, remove ENDBR there */
-+		if (builtin && cfi_debug)
-+			pr_info("CFI: removing old endbr insns\n");
- 		cfi_rewrite_endbr(start_cfi, end_cfi);
- 
- 		if (builtin) {
-@@ -2005,6 +2028,8 @@ bool decode_fineibt_insn(struct pt_regs *regs, unsigned long *target, u32 *type)
- static void __apply_fineibt(s32 *start_retpoline, s32 *end_retpoline,
- 			    s32 *start_cfi, s32 *end_cfi, bool builtin)
- {
-+	if (builtin)
-+		pr_info("CFI: Using standard kCFI\n");
- }
- 
- #ifdef CONFIG_X86_KERNEL_IBT
+Thanks!
+
+-Kees
+
+[1] https://lore.kernel.org/linux-hardening/20250821064202.work.893-kees@kernel.org/
+
+Kees Cook (5):
+  compiler_types.h: Move __nocfi out of compiler-specific header
+  x86/traps: Clarify KCFI instruction layout
+  x86/cfi: Add option for cfi=debug bootparam
+  x86/cfi: Remove __noinitretpoline and __noretpoline
+  kcfi: Rename CONFIG_CFI_CLANG to CONFIG_CFI
+
+ arch/Kconfig                                  | 22 +++++-----
+ arch/arm/Kconfig                              |  2 +-
+ arch/arm64/Kconfig                            |  4 +-
+ arch/riscv/Kconfig                            |  6 +--
+ arch/x86/Kconfig                              | 12 +++---
+ init/Kconfig                                  |  4 +-
+ kernel/module/Kconfig                         |  2 +-
+ lib/Kconfig.debug                             |  2 +-
+ Makefile                                      |  2 +-
+ arch/arm/mm/Makefile                          |  2 +-
+ arch/riscv/kernel/Makefile                    |  2 +-
+ arch/riscv/purgatory/Makefile                 |  2 +-
+ arch/x86/kernel/Makefile                      |  2 +-
+ arch/x86/purgatory/Makefile                   |  2 +-
+ kernel/Makefile                               |  2 +-
+ .../admin-guide/kernel-parameters.txt         | 18 ++++++++
+ arch/riscv/include/asm/cfi.h                  |  4 +-
+ arch/x86/include/asm/cfi.h                    |  4 +-
+ include/asm-generic/vmlinux.lds.h             |  2 +-
+ include/linux/cfi.h                           |  6 +--
+ include/linux/cfi_types.h                     |  8 ++--
+ include/linux/compiler-clang.h                |  5 ---
+ include/linux/compiler-gcc.h                  |  4 --
+ include/linux/compiler.h                      |  2 +-
+ include/linux/compiler_types.h                |  4 +-
+ include/linux/init.h                          |  8 ----
+ tools/include/linux/cfi_types.h               |  6 +--
+ tools/perf/util/include/linux/linkage.h       |  2 +-
+ arch/arm/mm/cache-fa.S                        |  2 +-
+ arch/arm/mm/cache-v4.S                        |  2 +-
+ arch/arm/mm/cache-v4wb.S                      |  4 +-
+ arch/arm/mm/cache-v4wt.S                      |  2 +-
+ arch/arm/mm/cache-v6.S                        |  2 +-
+ arch/arm/mm/cache-v7.S                        |  2 +-
+ arch/arm/mm/cache-v7m.S                       |  2 +-
+ arch/arm/mm/proc-arm1020.S                    |  2 +-
+ arch/arm/mm/proc-arm1020e.S                   |  2 +-
+ arch/arm/mm/proc-arm1022.S                    |  2 +-
+ arch/arm/mm/proc-arm1026.S                    |  2 +-
+ arch/arm/mm/proc-arm920.S                     |  2 +-
+ arch/arm/mm/proc-arm922.S                     |  2 +-
+ arch/arm/mm/proc-arm925.S                     |  2 +-
+ arch/arm/mm/proc-arm926.S                     |  2 +-
+ arch/arm/mm/proc-arm940.S                     |  2 +-
+ arch/arm/mm/proc-arm946.S                     |  2 +-
+ arch/arm/mm/proc-feroceon.S                   |  2 +-
+ arch/arm/mm/proc-mohawk.S                     |  2 +-
+ arch/arm/mm/proc-xsc3.S                       |  2 +-
+ arch/arm/mm/tlb-v4.S                          |  2 +-
+ arch/arm/kernel/hw_breakpoint.c               |  2 +-
+ arch/arm64/kernel/debug-monitors.c            |  2 +-
+ arch/arm64/kernel/traps.c                     |  4 +-
+ arch/arm64/kvm/handle_exit.c                  |  2 +-
+ arch/arm64/net/bpf_jit_comp.c                 |  2 +-
+ arch/riscv/net/bpf_jit_comp64.c               |  4 +-
+ arch/x86/kernel/alternative.c                 | 43 +++++++++++++++----
+ arch/x86/kernel/cfi.c                         |  2 +-
+ arch/x86/kernel/kprobes/core.c                |  2 +-
+ drivers/misc/lkdtm/cfi.c                      |  2 +-
+ kernel/module/tree_lookup.c                   |  2 +-
+ kernel/configs/hardening.config               |  2 +-
+ 61 files changed, 141 insertions(+), 113 deletions(-)
+
 -- 
 2.34.1
 
