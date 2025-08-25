@@ -1,79 +1,85 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D85A52D948D;
-	Mon, 25 Aug 2025 10:10:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA03E38FB9;
+	Mon, 25 Aug 2025 14:26:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756116604; cv=none; b=ajTdACqzCyzTFhTrMnaD2uZkkmn0ggEwXbTncQ/7BdiQDmzeYHVWqOgqfYQ1tQMBOGM1Utq3l3qnWjBJuXnOn0d0IyrEfCfJzowffObhw3cNKzatilhNcOdi5AhgnGktM3yMV+h8D1ZAiLivcR7afZ57Pg7yB79m+3SlJ6tX4No=
+	t=1756131964; cv=none; b=oswmYukC9XnZmjoo24LM1uZG9kOM2jVqyifPlz86iDPs5KeeOix31fiq+4+PLCCYDnRaSPAa67yU/KaWRr1/sc9GQnnNUBWjTKYQf2EchU89aMxq4/MqHzBuWmxcdxyNkDEvUsptPqzFU0wJQ/K/M/39m/WyxPuV45m7dVb4/No=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756116604; c=relaxed/simple;
-	bh=y2WZ+B7tgeuKJW7dG7eCxLPf07QClN6hhHPYNmFlzh4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C0YkRs5MxCAbYQthp74RVsV4GlvUIvD3HYWiaZn8xgHavxCe7hTG6qGQottGYKETmn1Zbo+SgvA+AdJucLPGAmCl4A1yGgsYKRL0CXgkXqCr4FC8kWFbnG4GYMw1i6E2F+2MWeqCo9b6O/9EpwZmH3WtjFHyY4NmSgUgZEVdzd0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R84dDUek; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1756131964; c=relaxed/simple;
+	bh=qKnJwvVOQdbIM7AwmZDu1aieujqnr4MVL8xJV+3xcWU=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TEjIRi1LXKuBLD5jUTAohhszLUME9ODlaUxswkhzMvaE1nUsCmECAhCX/G/L2Lhxv9xRQ11w2hl4so/ZwxuUj0ixsS4d1otDpLwZ/5ocE7K6/rk/9y8teH+GtNB4u99nPSvEjBO3tp2ruN+GHO6rQm1kf0X7OvKkuQjrlBJLs/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bPWPBLMJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R84dDUek"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16A3AC4CEED;
-	Mon, 25 Aug 2025 10:09:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bPWPBLMJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81222C116C6;
+	Mon, 25 Aug 2025 14:26:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756116603;
-	bh=y2WZ+B7tgeuKJW7dG7eCxLPf07QClN6hhHPYNmFlzh4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=R84dDUekJqdaEOIacf9j3xK+NqOW8OLGOyByxdYxUOLU94CfwLOaxaQt66m5ESk2W
-	 ZmO01EPHsoPzbIWZ0Nl5bX9m9Owsmnpj2QymCNGi9Dp/IcvvIkYmbbSVDIT5GKD2Xo
-	 1cOO4RYUWnw4AZ+/GlW972LthSDcFwGoFbrgLCSvdsO74uYWdeU7zcj4/evUOIBYjq
-	 k30TJo9qjysxgdQdXIk1hxsLJZH4RBbgwBx70LhiEP942EaiiUc+HeprdGNN3n9a8M
-	 +LeH8TgScRyMavWvfVwpTsYx4dLx7BLFfAAjkNz0ZI6rkGC/3P8WZBAl8lfvSC6FMN
-	 R9R9F/lFjhqxg==
-Date: Mon, 25 Aug 2025 12:09:48 +0200
-From: Alexey Gladkov <legion@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-	Nicolas Schier <nicolas.schier@linux.dev>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Petr Pavlu <petr.pavlu@suse.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
+	s=k20201202; t=1756131963;
+	bh=qKnJwvVOQdbIM7AwmZDu1aieujqnr4MVL8xJV+3xcWU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=bPWPBLMJbqPu4Ihz/jn1p85BL57qjQm0GeXE5FNWeLlN++/7RKlMCJ8dHmh3NN98j
+	 a2MJOEJMImQWuqo4ojpxl7wQxUW+kMSttdKngdXjPS2kCUyc+BZ+1e8oOgQ0Ti2/6m
+	 reEgKi6EjffV33DLzQyIgr8V9g2nlmSVYUG7EaM/MyY7M2lKY2Zv/dN2S7hOdASMCl
+	 /HccRg3BXD9cdYB8R3XGPA4vYe8uLuojG1CaSJ1AIvlscFmLwGNseHrwr/ONQGONLO
+	 cnGyoQE6fc06n1ued9gtzzjBPgY/6MjOfjPP43UQ+V4sPfnprtr50fs3xdqa5Qy6Yd
+	 aMsiVDBIbNsJA==
+From: Kees Cook <kees@kernel.org>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Kees Cook <kees@kernel.org>,
 	Sami Tolvanen <samitolvanen@google.com>,
-	Daniel Gomez <da.gomez@samsung.com>, linux-kernel@vger.kernel.org,
-	linux-modules@vger.kernel.org, linux-kbuild@vger.kernel.org,
-	Khalid Aziz <khalid@gonehiking.org>, linux-scsi@vger.kernel.org,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Arnd Bergmann <arnd@arndb.de>, Damien Le Moal <dlemoal@kernel.org>
-Subject: Re: [PATCH v6 4/9] scsi: Always define blogic_pci_tbl structure
-Message-ID: <aKw2bKTjmHBGjxt_@example.org>
-References: <cover.1755170493.git.legion@kernel.org>
- <93ca6c988e2d8a294ae0941747a6e654e6e8e8b8.1755170493.git.legion@kernel.org>
- <yq1v7mkxe2h.fsf@ca-mkp.ca.oracle.com>
- <20250819071817.GA1540193@ax162>
- <yq18qjeyd4a.fsf@ca-mkp.ca.oracle.com>
- <20250820161142.GB3805667@ax162>
+	David Woodhouse <dwmw2@infradead.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Puranjay Mohan <puranjay@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Nathan Chancellor <nathan@kernel.org>,
+	x86@kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kbuild@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	llvm@lists.linux.dev,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH 2/5] x86/traps: Clarify KCFI instruction layout
+Date: Mon, 25 Aug 2025 07:25:49 -0700
+Message-Id: <20250825142603.1907143-2-kees@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250825141316.work.967-kees@kernel.org>
+References: <20250825141316.work.967-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250820161142.GB3805667@ax162>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Aug 20, 2025 at 09:11:42AM -0700, Nathan Chancellor wrote:
-> On Tue, Aug 19, 2025 at 09:52:10PM -0400, Martin K. Petersen wrote:
-> > >> Applied to 6.18/scsi-staging, thanks!
-> > >
-> > > I think I will need this change to apply patch 7 [1] to kbuild-next
-> > > without any issues [2]. If there is little risk of conflict, could I
-> > > take it with your Ack?
-> > 
-> > Sure, no problem. Dropped the patch from my tree.
-> > 
-> > Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
-> 
-> Thanks a lot!
+Just a nit-picky change to the KCFI indirect call check instruction
+documentation. The addl offset isn't always -4 (it depends on patchable
+function entry configuration).
 
-Has these patches been added somewhere, I can't find it in kbuild?
+Signed-off-by: Kees Cook <kees@kernel.org>
+---
+ arch/x86/kernel/cfi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/arch/x86/kernel/cfi.c b/arch/x86/kernel/cfi.c
+index 77086cf565ec..638eb5c933e0 100644
+--- a/arch/x86/kernel/cfi.c
++++ b/arch/x86/kernel/cfi.c
+@@ -27,7 +27,7 @@ static bool decode_cfi_insn(struct pt_regs *regs, unsigned long *target,
+ 	 * for indirect call checks:
+ 	 *
+ 	 *   movl    -<id>, %r10d       ; 6 bytes
+-	 *   addl    -4(%reg), %r10d    ; 4 bytes
++	 *   addl    -<pos>(%reg), %r10d; 4 bytes
+ 	 *   je      .Ltmp1             ; 2 bytes
+ 	 *   ud2                        ; <- regs->ip
+ 	 *   .Ltmp1:
 -- 
-Rgrds, legion
+2.34.1
 
