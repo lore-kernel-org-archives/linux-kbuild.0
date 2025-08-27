@@ -1,256 +1,128 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53679273810;
-	Wed, 27 Aug 2025 19:57:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918DF30CD9C;
+	Wed, 27 Aug 2025 22:49:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756324679; cv=none; b=tfpMRq3521wAjzyFqL73PiOw1+5i02woo5TZBE0lX3/MUwOfijTierMmTA9ew+g+NRLtZAIe4IKoyGOr6ZvbBbDlKXKg/JXXDUaanSwSGqqCT/aa4ucTZ2PyIvheQ1XRwVkz2CnuXsKJ/ZIC1Bd2azenNFAvmlE2Re6BrQ6lRBI=
+	t=1756334979; cv=none; b=VtXyUUvosC1oIZeKGVgjx+ON+SiimDPdpC0d6F2Eru/BibTJ7BQxpY/Ydg2caqnSMamo6n+MXKRguQmuzA0Gzw7O0rIAXnOqowln7AT2WD087Ihon1dovwIq0q8yAgzFkNXE3chWX4bvoKy5HBVd3/U6NI3u/YnOrGAhNExaLLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756324679; c=relaxed/simple;
-	bh=vy4jaU+tF4nJ+2/n+HhT0G0kW3maniYcW78uwrPgAQc=;
+	s=arc-20240116; t=1756334979; c=relaxed/simple;
+	bh=ybnfv5G/UHvJ1FV2+oMrm4MyyGYbL0FpiszOiePMzGI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LNOtfC2xcUmS/ZajugmH/cxBDHuHgaaE2ViE7GTi0bhy+GEOyjKQBEgB5FCAnUY0S4qUtGIxa+PQQTVYHkfbkc7Nny900dgSIvAs1SIciiHuMjodx7iqIjYMAN8bZUSVDFIpGIANKA5wP1nM3FhMxwvs5pNi/DTsW3NKz305SKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ii6ET0wv; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=FyC2NPgyFUbwJseEzec7SN1x1guGVSdeFGHgq75LHBJUMVB2rx1658g3sCVvsJbTQCJX9Um1LKkC5ru4aD0o0HhhWAYrH/WjsldtO2rKGUqX8D0wiZaA/pofbX1NV5H0Noj3RcV+/IrnsImh2DpDA12HzxFezDFUuAiLklQ+Qf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ocX7D9UB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ii6ET0wv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9B1EC4CEEB;
-	Wed, 27 Aug 2025 19:57:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ocX7D9UB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCC68C4CEEB;
+	Wed, 27 Aug 2025 22:49:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756324678;
-	bh=vy4jaU+tF4nJ+2/n+HhT0G0kW3maniYcW78uwrPgAQc=;
+	s=k20201202; t=1756334979;
+	bh=ybnfv5G/UHvJ1FV2+oMrm4MyyGYbL0FpiszOiePMzGI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ii6ET0wvArOsxX/ssBzb/+H7x9KbZftfTVjf/SXXq4vInYHTqx+iHWGk9SusLNXM8
-	 9M8JLRgUhM+h+7PWPxGKRNDg81FH5AjGacpl9nbf63lJHmieGEU/EV9dVFOHiztk9r
-	 yLffNs4q5n8uhwnSc+/so3sr3s/b3LlpZIKq5YPwx1tjjMKnzMKIUSkqRrpqR9g0oP
-	 E82PXUm9owcegxXN+Hjw40BjDxX21cZaTVKYwY2gJl7jAcWQ08NWeBl2ctSqA9p56T
-	 znFZ/U+3N5oO88nF2YnkSs1sk45Sx+XbR6QU1ECiSSJMalVUM5n/7+89hWJng7Jta4
-	 ydYMGwfNEvSrA==
-Date: Wed, 27 Aug 2025 12:57:53 -0700
+	b=ocX7D9UBVYze+yjlww4QFREVgkeu1y0cTcIewEiMl481Vq1waDGRmAToN0KNJi37C
+	 g3H3fK/lloeGSxSlw6ON+Tou4PvOzGt32XX5obxB7pwxAQpz9sEwMlT1mZ4RYo38bj
+	 KrYlDESV+p9lh5WmRZlkPgEj8Ik5mmG00nodJ8VqOlas4dbSzDlz9xPo84Pgjx/XLV
+	 QSQB8+i9Zdatsi21s7iEAdJiNo1oSEpR9Y9xwqTlG6q24lBSkS9ikSdoTnxv9PK9jf
+	 NDXx1oc5iEIIL+hilfI0ooGhHoFsdC9qHxOSrlkZG/+Mt8NjBTU8Z7tjm19L3WrjQi
+	 DZKqiDWDS73zQ==
+Date: Wed, 27 Aug 2025 15:49:35 -0700
 From: Nathan Chancellor <nathan@kernel.org>
-To: Kees Cook <kees@kernel.org>
-Cc: Peter Zijlstra <peterz@infradead.org>, Kees Cook <kees@outflux.net>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Puranjay Mohan <puranjay@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>, x86@kernel.org,
-	linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-riscv@lists.infradead.org, llvm@lists.linux.dev,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH 3/5] x86/cfi: Add option for cfi=debug bootparam
-Message-ID: <20250827195753.GB3572128@ax162>
-References: <20250825141316.work.967-kees@kernel.org>
- <20250825142603.1907143-3-kees@kernel.org>
+To: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>
+Cc: Nicolas Schier <nicolas.schier@linux.dev>, linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Masahiro Yamada <masahiroy@kernel.org>
+Subject: Re: [PATCH 2/2] kbuild: userprogs: also inherit byte order and ABI
+ from kernel
+Message-ID: <20250827224935.GB414199@ax162>
+References: <20250813-kbuild-userprogs-bits-v1-0-2d9f7f411083@linutronix.de>
+ <20250813-kbuild-userprogs-bits-v1-2-2d9f7f411083@linutronix.de>
+ <20250827075334-3332c08d-66f3-427d-b0b2-4460e779f261@linutronix.de>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20250825142603.1907143-3-kees@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250827075334-3332c08d-66f3-427d-b0b2-4460e779f261@linutronix.de>
 
-On Mon, Aug 25, 2025 at 07:25:50AM -0700, Kees Cook wrote:
-> From: Kees Cook <kees@outflux.net>
+Hi Thomas,
+
+On Wed, Aug 27, 2025 at 08:31:00AM +0200, Thomas Weißschuh wrote:
+> On Wed, Aug 13, 2025 at 07:43:41AM +0200, Thomas Weißschuh wrote:
+...
+> > diff --git a/Makefile b/Makefile
+> > index d0f5262a9c0f3b4aa79a91c20cc149d034ffa0b7..7d40f84d5efde18ed3a2f4d8cf7a9b1ec3610ed4 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -1137,8 +1137,8 @@ ifneq ($(CONFIG_ARCH_VMLINUX_NEEDS_RELOCS),)
+> >  LDFLAGS_vmlinux	+= --emit-relocs --discard-none
+> >  endif
+> >  
+> > -# Align the bit size of userspace programs with the kernel
+> > -USERFLAGS_FROM_KERNEL := -m32 -m64 --target=%
+> > +# Align the bit size, byte order and architecture of userspace programs with the kernel
+> > +USERFLAGS_FROM_KERNEL := -m32 -m64 -mlittle-endian -mbig-endian -EL -EB --target=% -march=% -mabi=%
+> >  KBUILD_USERCFLAGS  += $(filter $(USERFLAGS_FROM_KERNEL), $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS))
+> >  KBUILD_USERLDFLAGS += $(filter $(USERFLAGS_FROM_KERNEL), $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS))
 > 
-> Add "debug" option for "cfi=" bootparam to get details on early CFI
-> initialization steps. Standardize CFI pr_info() lines to use "CFI:"
-> prefix. Standardize "CFI: Using ..." to always report which CFI mode is
-> being used, regardless of CONFIG_FINEIBT. Document all the "cfi=" options.
+> I looked some more at the breakage reported from -next [0].
+
+Thanks for looking into this.
+
+> For architectures with multiple possible byte orders or ABIs the toolchain
+> might be able to build the kernel for all combinations but might not have a
+> matching libc for them. Currently userprogs uses the default byteorder and
+> ABI from the compiler, which will match the included libcs if there is any.
+> However the resulting binary might not run on the built kernel.
+> CC_CAN_LINK can be extended to generically handle different byte orders, as
+> for those we have standard kconfig symbols. But handling ABIs would need to
+> be architecture specific and a bit more complex.
 > 
-> Signed-off-by: Kees Cook <kees@outflux.net>
+> We can't use KBUILD_*FLAGS for CC_CAN_LINK, as they are not yet set during
+> the configuration stage.
 
-I am not sure if the x86 maintainers are "patch count adverse" but it
-feels like this would be a little easier to review as four separate
-patches. Every sentence in the commit message is basically its own
-change.
+Right, this was the biggest thing that I noticed, which would really
+help us out...
 
-1. The initial documentation for cfi= and its current values.
-2. Standardization of pr_info() calls to use "CFI:"
-3. Adding "CFI: Using" to __apply_fineibt()
-4. Adding cfi=debug
-
-Patch four would become much simpler to understand, especially with
-Peter's suggested change.
-
-> ---
->  .../admin-guide/kernel-parameters.txt         | 18 +++++++++
->  arch/x86/kernel/alternative.c                 | 39 +++++++++++++++----
->  2 files changed, 50 insertions(+), 7 deletions(-)
+> I see the following options:
 > 
-> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-> index 747a55abf494..7b4bddb5a030 100644
-> --- a/Documentation/admin-guide/kernel-parameters.txt
-> +++ b/Documentation/admin-guide/kernel-parameters.txt
-> @@ -608,6 +608,24 @@
->  	ccw_timeout_log	[S390]
->  			See Documentation/arch/s390/common_io.rst for details.
->  
-> +	cfi=		[X86-64] Set Control Flow Integrity checking features
-> +			when CONFIG_FINEIBT is enabled.
-> +			Format: feature[,feature...]
-> +			Default: auto
-> +
-> +			auto:	  Use FineIBT if IBT available, otherwise kCFI.
-> +				  Under FineIBT, enable "paranoid" mode when
-> +				  FRED is not available.
-> +			off:	  Turn off CFI checking.
-> +			kcfi:	  Use kCFI (disable FineIBT).
-> +			fineibt:  Use FineIBT (even if IBT not available).
-> +			norand:   Do not re-randomize CFI hashes.
-> +			paranoid: Add caller hash checking under FineIBT.
-> +			bhi:	  Enable register poisoning to stop speculation
-> +				  across FineIBT. (Disabled by default.)
-> +			warn:	  Do not enforce CFI checking: warn only.
-> +			debug:	  Report CFI initialization details.
-> +
->  	cgroup_disable=	[KNL] Disable a particular controller or optional feature
->  			Format: {name of the controller(s) or feature(s) to disable}
->  			The effects of cgroup_disable=foo are:
-> diff --git a/arch/x86/kernel/alternative.c b/arch/x86/kernel/alternative.c
-> index 7bde68247b5f..5d80ae77c042 100644
-> --- a/arch/x86/kernel/alternative.c
-> +++ b/arch/x86/kernel/alternative.c
-> @@ -1225,6 +1225,7 @@ int cfi_get_func_arity(void *func)
->  
->  static bool cfi_rand __ro_after_init = true;
->  static u32  cfi_seed __ro_after_init;
-> +static bool cfi_debug __ro_after_init;
->  
->  /*
->   * Re-hash the CFI hash with a boot-time seed while making sure the result is
-> @@ -1259,6 +1260,8 @@ static __init int cfi_parse_cmdline(char *str)
->  		} else if (!strcmp(str, "off")) {
->  			cfi_mode = CFI_OFF;
->  			cfi_rand = false;
-> +		} else if (!strcmp(str, "debug")) {
-> +			cfi_debug = true;
->  		} else if (!strcmp(str, "kcfi")) {
->  			cfi_mode = CFI_KCFI;
->  		} else if (!strcmp(str, "fineibt")) {
-> @@ -1266,26 +1269,26 @@ static __init int cfi_parse_cmdline(char *str)
->  		} else if (!strcmp(str, "norand")) {
->  			cfi_rand = false;
->  		} else if (!strcmp(str, "warn")) {
-> -			pr_alert("CFI mismatch non-fatal!\n");
-> +			pr_alert("CFI: mismatch non-fatal!\n");
->  			cfi_warn = true;
->  		} else if (!strcmp(str, "paranoid")) {
->  			if (cfi_mode == CFI_FINEIBT) {
->  				cfi_paranoid = true;
->  			} else {
-> -				pr_err("Ignoring paranoid; depends on fineibt.\n");
-> +				pr_err("CFI: ignoring paranoid; depends on fineibt.\n");
->  			}
->  		} else if (!strcmp(str, "bhi")) {
->  #ifdef CONFIG_FINEIBT_BHI
->  			if (cfi_mode == CFI_FINEIBT) {
->  				cfi_bhi = true;
->  			} else {
-> -				pr_err("Ignoring bhi; depends on fineibt.\n");
-> +				pr_err("CFI: ignoring bhi; depends on fineibt.\n");
->  			}
->  #else
-> -			pr_err("Ignoring bhi; depends on FINEIBT_BHI=y.\n");
-> +			pr_err("CFI: ignoring bhi; depends on FINEIBT_BHI=y.\n");
->  #endif
->  		} else {
-> -			pr_err("Ignoring unknown cfi option (%s).", str);
-> +			pr_err("CFI: Ignoring unknown option (%s).", str);
+> * Add byte order and architecture-specific ABI handling to CC_CAN_LINK
 
-You lowercase "Ignoring" earlier but not here, intentional? There are a
-couple of other messages that have a capital first letter but not
-others.
+How do you envision this? Different default lines for each combination?
+Feels like that could get complicated quickly but this would probably be
+the objectively most robust and "hands off" option.
 
->  		}
->  
->  		str = next;
-> @@ -1734,6 +1737,8 @@ static void __apply_fineibt(s32 *start_retpoline, s32 *end_retpoline,
->  	 * rewrite them. This disables all CFI. If this succeeds but any of the
->  	 * later stages fails, we're without CFI.
->  	 */
-> +	if (builtin && cfi_debug)
-> +		pr_info("CFI: disabling all indirect call checking\n");
->  	ret = cfi_disable_callers(start_retpoline, end_retpoline);
->  	if (ret)
->  		goto err;
-> @@ -1744,43 +1749,61 @@ static void __apply_fineibt(s32 *start_retpoline, s32 *end_retpoline,
->  			cfi_bpf_hash = cfi_rehash(cfi_bpf_hash);
->  			cfi_bpf_subprog_hash = cfi_rehash(cfi_bpf_subprog_hash);
->  		}
-> +		if (builtin && cfi_debug)
-> +			pr_info("CFI: cfi_seed: 0x%08x\n", cfi_seed);
->  
-> +		if (builtin && cfi_debug)
-> +			pr_info("CFI: rehashing all preambles\n");
->  		ret = cfi_rand_preamble(start_cfi, end_cfi);
->  		if (ret)
->  			goto err;
->  
-> +		if (builtin && cfi_debug)
-> +			pr_info("CFI: rehashing all indirect calls\n");
->  		ret = cfi_rand_callers(start_retpoline, end_retpoline);
->  		if (ret)
->  			goto err;
-> +	} else {
-> +		if (builtin && cfi_debug)
-> +			pr_info("CFI: rehashing disabled\n");
->  	}
->  
->  	switch (cfi_mode) {
->  	case CFI_OFF:
->  		if (builtin)
-> -			pr_info("Disabling CFI\n");
-> +			pr_info("CFI: disabled\n");
->  		return;
->  
->  	case CFI_KCFI:
-> +		if (builtin && cfi_debug)
-> +			pr_info("CFI: enabling all indirect call checking\n");
->  		ret = cfi_enable_callers(start_retpoline, end_retpoline);
->  		if (ret)
->  			goto err;
->  
->  		if (builtin)
-> -			pr_info("Using kCFI\n");
-> +			pr_info("CFI: Using %s kCFI\n",
-> +				cfi_rand ? "rehashed" : "retpoline");
->  		return;
->  
->  	case CFI_FINEIBT:
-> +		if (builtin && cfi_debug)
-> +			pr_info("CFI: adding FineIBT to all preambles\n");
->  		/* place the FineIBT preamble at func()-16 */
->  		ret = cfi_rewrite_preamble(start_cfi, end_cfi);
->  		if (ret)
->  			goto err;
->  
->  		/* rewrite the callers to target func()-16 */
-> +		if (builtin && cfi_debug)
-> +			pr_info("CFI: rewriting indirect call sites to use FineIBT\n");
->  		ret = cfi_rewrite_callers(start_retpoline, end_retpoline);
->  		if (ret)
->  			goto err;
->  
->  		/* now that nobody targets func()+0, remove ENDBR there */
-> +		if (builtin && cfi_debug)
-> +			pr_info("CFI: removing old endbr insns\n");
->  		cfi_rewrite_endbr(start_cfi, end_cfi);
->  
->  		if (builtin) {
-> @@ -2005,6 +2028,8 @@ bool decode_fineibt_insn(struct pt_regs *regs, unsigned long *target, u32 *type)
->  static void __apply_fineibt(s32 *start_retpoline, s32 *end_retpoline,
->  			    s32 *start_cfi, s32 *end_cfi, bool builtin)
->  {
-> +	if (builtin)
-> +		pr_info("CFI: Using standard kCFI\n");
->  }
->  
->  #ifdef CONFIG_X86_KERNEL_IBT
-> -- 
-> 2.34.1
-> 
+> * Accept that userprogs might not be runnable on the built kernel
+
+I do wonder how common running the userprogs are. Obviously you hit this
+in testing but I am curious if others have reported this.
+
+> * Let the user manually set CC_CAN_LINK to override the autodetection
+
+I am not sure I like this one but maybe we could have a hidden
+CC_MAY_LINK with something like the current CC_CAN_LINK then CC_CAN_LINK
+could be turned into something like
+
+    config CC_CAN_LINK
+        bool "Toolchain can link userspace executables" if !COMPILE_TEST
+        default CC_MAY_LINK
+
+I am not surethat would actually help us here plus I still do not like
+the idea of throwing this back to the user.
+
+> * Add separate handling for runnable userprogs
+
+What do you mean by this?
+
+> * Use tools/include/nolibc/ for userprogs instead of the toolchain libc
+>   (unlikely, but I wanted do mention the option)
+
+This could be interesting to explore but I assume using a cross libc
+could be desirable for some people depending on the testing?
+
+Cheers,
+Nathan
