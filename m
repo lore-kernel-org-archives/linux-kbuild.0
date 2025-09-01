@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D99A341AD6;
-	Mon,  1 Sep 2025 14:42:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA46F2DF140;
+	Mon,  1 Sep 2025 15:33:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756737758; cv=none; b=FLyLtpwkT+8KjV+ZokDtFhjA81kb1JCuZ9kSUeJgtscoqV1SP53TLukWU9mSYPQ+D2Vhc7BlUxnWQsxuTw5z6G2AuNNdk7jwXAy24/eFDZxMua+25VPvAnrH+cj02WW3GA7zHvHqRYL20POUVgVr78+i/ihpFeHWusmubOAMY9E=
+	t=1756740838; cv=none; b=Q5sEFKrdvy7kHoqTVxG0LZhjRUS49K2X6CKSd1IFto7QYTwkUb1YhdlxSSsFo9QvfSK9rOL5ALwzgqZGovAbJm31SI3fyxTM/etfEIPMBAFVhyUyldj0ttyuVJKrD9puBS8X/Xn1Qzv7BIk8dYne1M3lrr6BaFFb/Qxr1G3ZWDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756737758; c=relaxed/simple;
+	s=arc-20240116; t=1756740838; c=relaxed/simple;
 	bh=ns7DJA82/e6Ob35Yqd44aeEBJ4lyhEECsaqn+k5IhSQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=J1gZKTAkApKLimveudrvux6TaOkgnQ0BOc5YZ4DFuPW+PQO3TOxb8ThQqE42WYzFDe8eGo61JDcGkTTPBn0cPHcDSNg3cqaZAPWlngcR7Zt6b3/vFR15e0DhYHsmA515P3RZ5i4JbVWRRNNNvgMdtkppqWvt+sPYOFDrYvPhLhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ubZ3qbo5; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=iJgfSSA7g8DoZEyPWD1Nh0fSXZ1nni+pouy97yfgXyDqKoJxRnTQzywffSMdhjrFOn+g1kSJGx56PAWb5QFWmS9o9MrwXEB3CgqGvyP5AsSt6L7vGws/ITlgoFoRLG1eEF0r3Aq5KDQGkwBXabCH4rBvqjCh2yob3ZLzyD/PDQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OBc1VU8E; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ubZ3qbo5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90E87C113D0;
-	Mon,  1 Sep 2025 14:42:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OBc1VU8E"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B877C19425;
+	Mon,  1 Sep 2025 15:33:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756737757;
+	s=k20201202; t=1756740837;
 	bh=ns7DJA82/e6Ob35Yqd44aeEBJ4lyhEECsaqn+k5IhSQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ubZ3qbo5z5SP2vyUF9TCH9Q7+9EQOWnWjhsKFOX6T4PFczT2HOuFHIMAox3brRnlN
-	 gkFzi//l063OrM5v/M02Q1kaHXz8Pd5eDY0vA+H+k2d9PtpCPZ3+jOpIa41ueZtYBw
-	 YJSHoqoTXQVqqG/K4WRsbGBqH7hhDjMyhcD9SDooM0LBTER+66xED5fJzKCbYUeOLx
-	 NZLN6d6R8pZdhZvmjigL3/LBOvHrXu+avhcej7Si4LbMwBnjbHNHYtnV7bfFwzqPxq
-	 7J6Qz2FT6t5RwcdnrbZ6prH+6tP/Dx4/MOXuhjmpfFf+ZbmSl4a9JzY0+5zdsrYDyI
-	 0qRvUPQ2uU73g==
+	b=OBc1VU8E9d97bGmx97yhQXup/GDYG2yxTinkx+GUwYQnKNRTwNcUgay4wF0IeqM/W
+	 KMDpfG/ZHldp4rm1svSMD8h+S1StplLfwTH6i8ZqeeCFJZIm2NoPo/jkU6Umtp/Lq7
+	 wamc8G86jWKxDjW8eqMNiwj3aPSHZ4IIN1HZj1VwZc//0WZZHfSOEGAuFVGn9MRB51
+	 azUYb2p9W9aEFtvSobJqdxgRPKAKgwn52N6aa7vO48p+KLNIJx+x8fn+UEdZ3MlIru
+	 T7jRvQz/SsuK4adbZ7AERRD/atDx4dnIvZuFAvlNhBY87LjdDmgxM1cXZW+qjMXUYZ
+	 MeNl3f25kYUUw==
 Received: from mchehab by mail.kernel.org with local (Exim 4.98.2)
 	(envelope-from <mchehab+huawei@kernel.org>)
-	id 1ut5jv-00000003G40-3c5y;
-	Mon, 01 Sep 2025 16:42:35 +0200
+	id 1ut6Xb-00000003HMU-3op5;
+	Mon, 01 Sep 2025 17:33:55 +0200
 From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To: Jonathan Corbet <corbet@lwn.net>,
 	Linux Doc Mailing List <linux-doc@vger.kernel.org>
@@ -45,13 +45,13 @@ Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
 	Tamir Duberstein <tamird@gmail.com>,
 	linux-kbuild@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 14/15] docs: add support to build manpages from kerneldoc
-  output
-Date: Mon,  1 Sep 2025 16:42:30 +0200
-Message-ID: <ac7d1293de2ae907abdfbe30f10e974c2321503a.1756737440.git.mchehab+huawei@kernel.org>
+Subject: [PATCH RESEND v3 14/15] docs: add support to build manpages from
+  kerneldoc output
+Date: Mon,  1 Sep 2025 17:33:49 +0200
+Message-ID: <ac7d1293de2ae907abdfbe30f10e974c2321503a.1756740314.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1756737440.git.mchehab+huawei@kernel.org>
-References: <cover.1756737440.git.mchehab+huawei@kernel.org>
+In-Reply-To: <cover.1756740314.git.mchehab+huawei@kernel.org>
+References: <cover.1756740314.git.mchehab+huawei@kernel.org>
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
