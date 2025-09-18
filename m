@@ -1,318 +1,189 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AF54305955;
-	Thu, 18 Sep 2025 11:55:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B698212566
+	for <linux-kbuild@vger.kernel.org>; Thu, 18 Sep 2025 14:05:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758196507; cv=none; b=tvhCcZktByqP3XV2tepaM3Dr5BxFO/uWsqIQybUq/1+b3D6z6CSIVO2w8qZKm0VVZPVJERexRLFIwJWhRd4tV7hoj14OWGLgdDzHp924Fhd2fJ9yA+XcpcuuS+cWT9k3mXbqFX/uM0LON1rcgMbI4qFYpJXbPcgyGZHxBoOjFtA=
+	t=1758204333; cv=none; b=tKIPzpHjMOkW9vjaNqWxD0OJG46F6+8P+7cI98J6bYxPe1XJe/5sjYY4ef9hqvQi+UMklqP16o1W5VQL0BvM3ym+xW0GMA4s/PbSxLtIUYHCmhFlVl6cpLu8V3KXoxWtwaguloc+4tVwLKPuf0fXAbsSbw5jEkFYR4Ld9MBnz24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758196507; c=relaxed/simple;
-	bh=KDZQ/WnN5vw7Bl6a4chb+TcehefEfRpozxecUjS1tVU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=i5kVBjgG3ZAb19KLWIPcLB8RaFDw5yJoscvTI6p2uW/GiekAxhGgRxz6vlbX0Ym9ZDrKoTdVS/LIxupbIGhsen9UNlnJPkpBGSeJa+yxhxD/lr3/tSsz0PA+fQgjnS8sp0Ouyn1fWDJBWq+jgwmn+ZkPEAYOMe7mFPbtQf6+/Cw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UIoAbqlu; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1758204333; c=relaxed/simple;
+	bh=hWQTFclLDMz8VDIHIRpv8/WliytLJaAhdU6JNzWrg6Q=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=EroIqV/ZKMIjJeMCEjihH/GfFFwi3RSG62unkgVWBiUN2iz9NFGueI1v4R/vO1v+ZF3IrBawvnA7OOZCS4QUigrMoY92Cy+4tqyf20IHPWjDaFh4btojWeeJ4yTKT/zJYptXdvyEMJ1xMMNTZrnErBXsO59i6L3VcnzbN4U2bx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--elver.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FU49BucB; arc=none smtp.client-ip=209.85.128.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--elver.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UIoAbqlu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD548C113D0;
-	Thu, 18 Sep 2025 11:55:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758196507;
-	bh=KDZQ/WnN5vw7Bl6a4chb+TcehefEfRpozxecUjS1tVU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UIoAbqlur3zL/fLLqxQ568kKmQRSMV0renDu3v0Q/HE2qYKFVPWeus2WrH6ui7qR7
-	 5A5OKoMvYVoj0Bn8skXKMS2fJcj6n+PSQwn+LuZoQLEGDkJjr4hFP3SqflD8lR8u6x
-	 ycBgA/L81zlMYNPq08gthrsbCx0xy3w0Tb6vSUFyoZh4m+C7tVnuYiNkyuf5MukhO7
-	 veKohplinc9hRH53of3B6zQg4uBimuriwmKq6gkNAPgqdtUHWu32xSytafZmQuActV
-	 sf4Itd8T+HyCF2Pr2cm/BN8C0BRqlkpkMlTE8zHOKpDm71WPzfi3NtaQ18tF5JXISn
-	 YHN9ZAer0eimw==
-Received: from mchehab by mail.kernel.org with local (Exim 4.98.2)
-	(envelope-from <mchehab+huawei@kernel.org>)
-	id 1uzDE8-0000000CrtP-1Nkx;
-	Thu, 18 Sep 2025 13:55:04 +0200
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>
-Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-	"Akira Yokosawa" <akiyks@gmail.com>,
-	"Mauro Carvalho Chehab" <mchehab+huawei@kernel.org>,
-	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Masahiro Yamada <mchehab+huawei@kernel.org>,
-	Miguel Ojeda <mchehab+huawei@kernel.org>,
-	Nathan Chancellor <mchehab+huawei@kernel.org>,
-	Nicolas Schier <nicolas.schier@linux.dev>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Tamir Duberstein <tamird@gmail.com>,
-	linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v8 19/24] docs: add support to build manpages from kerneldoc output
-Date: Thu, 18 Sep 2025 13:54:53 +0200
-Message-ID: <3d248d724e7f3154f6e3a227e5923d7360201de9.1758196090.git.mchehab+huawei@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1758196090.git.mchehab+huawei@kernel.org>
-References: <cover.1758196090.git.mchehab+huawei@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FU49BucB"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-45de13167aaso9987815e9.1
+        for <linux-kbuild@vger.kernel.org>; Thu, 18 Sep 2025 07:05:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758204329; x=1758809129; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=sI2tSFnbkFXEHpzRn76LXPg2QDPG5jXGC+/0hf5kEII=;
+        b=FU49BucBWcWp+YVJUWl8w3U6ejvHKF66rHZXuwfQ9IDYnM4yc8HwS52AGeBN7vtSST
+         GHOBkpDX98Py3IPzJTGZIk68+OXnPkHDbbz7OYQyXjyeIthlSoiUwwZHepms3xJ98mLe
+         u9PC2tgaxYxXClcvaikdlgztvD4R8FJ6hih3UTTjt+B6+DJCBKR0T6DYHxemWscz1OZS
+         /lAq/FS8Tug7dOufvD6p/VTz/+nYACHs2pZHOdU8SZxMOcpPQSxUQR/sJE67s0EbqeAo
+         C3T+clgOry3xpRHZf7ISsMUfwL/S2RJppm2fKQZmacP0gP1gLhxAa1RDi7Lms1iOmGTF
+         Szzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758204329; x=1758809129;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sI2tSFnbkFXEHpzRn76LXPg2QDPG5jXGC+/0hf5kEII=;
+        b=VpQc2+1zrImMhr4zbPdvQKmhDNWdDGhVv8Yic6kS+1bphr0ARDAXqg9cTis0dV32mf
+         3sCffGJZzkQ9Nf41/yex62UntR7XFme59aEFoMGPoWrHNUllEZJ1YyZh7LOcYV+7RZD1
+         5E8XL6+1zxkliUs6iiAvfZLxAViZwQk6s0Wv3A/KppFvMOhTDTmgL7iHP5DtXtQoFtYf
+         LMvE+XKg7D+Gpm3yXxdNKdQD1AteXzvyR9Et9TrsRujkAiqn2F1+BlNWv+TpL/h9Fan6
+         5pwl3qIl7tSdAAcqwQnKYFhX3Z8cwqzxWBJNwVS2Kc5RttaHbNHajWkxeqsk+MQAvt8N
+         0J4w==
+X-Forwarded-Encrypted: i=1; AJvYcCUu5oDLHx75JtbcrK42AU7vGrbT2z02VcBrSz2TLyJYS2dy5zMZ8UmyR0ShyZVBgDrTyLJub+F5yV3IHT4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzIT+rvESZ7uLm/NyMTB0FKL4TrTcfNqXSkM4QpeSbZEA5oWvby
+	xPu7mJaU1Qzot74fmd4XRIL/MC/PfcOwVLbTfeA6oF1p16FGmiJGWBqO2g7sR3/j6IiZk7LSWoO
+	7iQ==
+X-Google-Smtp-Source: AGHT+IFRbToo2Bwf5/5PfOGlLkyE9BQ/OcfapdUErqx3YciffbcOiyjfesgIMrMTUrj6b+h7cxqfj4hCOQ==
+X-Received: from wmlv10.prod.google.com ([2002:a05:600c:214a:b0:45b:9c60:76bb])
+ (user=elver job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:b86:b0:455:f59e:fd9b
+ with SMTP id 5b1f17b1804b1-46205eb1674mr64702705e9.24.1758204329318; Thu, 18
+ Sep 2025 07:05:29 -0700 (PDT)
+Date: Thu, 18 Sep 2025 15:59:12 +0200
+In-Reply-To: <20250918140451.1289454-1-elver@google.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Mime-Version: 1.0
+References: <20250918140451.1289454-1-elver@google.com>
+X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
+Message-ID: <20250918140451.1289454-2-elver@google.com>
+Subject: [PATCH v3 01/35] compiler_types: Move lock checking attributes to compiler-capability-analysis.h
+From: Marco Elver <elver@google.com>
+To: elver@google.com, Peter Zijlstra <peterz@infradead.org>, 
+	Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>, Will Deacon <will@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, 
+	"Paul E. McKenney" <paulmck@kernel.org>, Alexander Potapenko <glider@google.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Bart Van Assche <bvanassche@acm.org>, Bill Wendling <morbo@google.com>, Christoph Hellwig <hch@lst.de>, 
+	Dmitry Vyukov <dvyukov@google.com>, Eric Dumazet <edumazet@google.com>, 
+	Frederic Weisbecker <frederic@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Ian Rogers <irogers@google.com>, 
+	Jann Horn <jannh@google.com>, Joel Fernandes <joelagnelf@nvidia.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Josh Triplett <josh@joshtriplett.org>, 
+	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>, 
+	Kentaro Takeda <takedakn@nttdata.co.jp>, Lukas Bulwahn <lukas.bulwahn@gmail.com>, 
+	Mark Rutland <mark.rutland@arm.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>, 
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, Thomas Gleixner <tglx@linutronix.de>, 
+	Thomas Graf <tgraf@suug.ch>, Uladzislau Rezki <urezki@gmail.com>, Waiman Long <longman@redhat.com>, 
+	kasan-dev@googlegroups.com, linux-crypto@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-security-module@vger.kernel.org, linux-sparse@vger.kernel.org, 
+	llvm@lists.linux.dev, rcu@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Generating man files currently requires running a separate
-script. The target also doesn't appear at the docs Makefile.
+The conditional definition of lock checking macros and attributes is
+about to become more complex. Factor them out into their own header for
+better readability, and to make it obvious which features are supported
+by which mode (currently only Sparse). This is the first step towards
+generalizing towards "capability analysis".
 
-Add support for mandocs at the Makefile, adding the build
-logic inside sphinx-build-wrapper, updating documentation
-and dropping the ancillary script.
+No functional change intended.
 
-Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Signed-off-by: Marco Elver <elver@google.com>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 ---
- Documentation/Makefile                 |  3 +-
- Documentation/doc-guide/kernel-doc.rst | 29 ++++-----
- Makefile                               |  2 +-
- scripts/split-man.pl                   | 28 ---------
- tools/docs/sphinx-build-wrapper        | 81 ++++++++++++++++++++++++--
- 5 files changed, 95 insertions(+), 48 deletions(-)
- delete mode 100755 scripts/split-man.pl
+ include/linux/compiler-capability-analysis.h | 32 ++++++++++++++++++++
+ include/linux/compiler_types.h               | 18 ++---------
+ 2 files changed, 34 insertions(+), 16 deletions(-)
+ create mode 100644 include/linux/compiler-capability-analysis.h
 
-diff --git a/Documentation/Makefile b/Documentation/Makefile
-index 05397b9d844d..aa42b2cb7030 100644
---- a/Documentation/Makefile
-+++ b/Documentation/Makefile
-@@ -53,7 +53,7 @@ ifeq ($(HAVE_SPHINX),0)
- else # HAVE_SPHINX
+diff --git a/include/linux/compiler-capability-analysis.h b/include/linux/compiler-capability-analysis.h
+new file mode 100644
+index 000000000000..7546ddb83f86
+--- /dev/null
++++ b/include/linux/compiler-capability-analysis.h
+@@ -0,0 +1,32 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Macros and attributes for compiler-based static capability analysis.
++ */
++
++#ifndef _LINUX_COMPILER_CAPABILITY_ANALYSIS_H
++#define _LINUX_COMPILER_CAPABILITY_ANALYSIS_H
++
++#ifdef __CHECKER__
++
++/* Sparse context/lock checking support. */
++# define __must_hold(x)		__attribute__((context(x,1,1)))
++# define __acquires(x)		__attribute__((context(x,0,1)))
++# define __cond_acquires(x)	__attribute__((context(x,0,-1)))
++# define __releases(x)		__attribute__((context(x,1,0)))
++# define __acquire(x)		__context__(x,1)
++# define __release(x)		__context__(x,-1)
++# define __cond_lock(x, c)	((c) ? ({ __acquire(x); 1; }) : 0)
++
++#else /* !__CHECKER__ */
++
++# define __must_hold(x)
++# define __acquires(x)
++# define __cond_acquires(x)
++# define __releases(x)
++# define __acquire(x)		(void)0
++# define __release(x)		(void)0
++# define __cond_lock(x, c)	(c)
++
++#endif /* __CHECKER__ */
++
++#endif /* _LINUX_COMPILER_CAPABILITY_ANALYSIS_H */
+diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
+index 16755431fc11..c24e60e75f36 100644
+--- a/include/linux/compiler_types.h
++++ b/include/linux/compiler_types.h
+@@ -24,6 +24,8 @@
+ # define BTF_TYPE_TAG(value) /* nothing */
+ #endif
  
- # Common documentation targets
--infodocs texinfodocs latexdocs epubdocs xmldocs pdfdocs linkcheckdocs:
-+mandocs infodocs texinfodocs latexdocs epubdocs xmldocs pdfdocs linkcheckdocs:
- 	$(Q)@$(srctree)/tools/docs/sphinx-pre-install --version-check
- 	+$(Q)$(PYTHON3) $(BUILD_WRAPPER) $@ \
- 		--sphinxdirs="$(SPHINXDIRS)" --conf="$(SPHINX_CONF)" \
-@@ -104,6 +104,7 @@ dochelp:
- 	@echo  '  htmldocs        - HTML'
- 	@echo  '  texinfodocs     - Texinfo'
- 	@echo  '  infodocs        - Info'
-+	@echo  '  mandocs         - Man pages'
- 	@echo  '  latexdocs       - LaTeX'
- 	@echo  '  pdfdocs         - PDF'
- 	@echo  '  epubdocs        - EPUB'
-diff --git a/Documentation/doc-guide/kernel-doc.rst b/Documentation/doc-guide/kernel-doc.rst
-index af9697e60165..4370cc8fbcf5 100644
---- a/Documentation/doc-guide/kernel-doc.rst
-+++ b/Documentation/doc-guide/kernel-doc.rst
-@@ -579,20 +579,23 @@ source.
- How to use kernel-doc to generate man pages
- -------------------------------------------
++#include <linux/compiler-capability-analysis.h>
++
+ /* sparse defines __CHECKER__; see Documentation/dev-tools/sparse.rst */
+ #ifdef __CHECKER__
+ /* address spaces */
+@@ -34,14 +36,6 @@
+ # define __rcu		__attribute__((noderef, address_space(__rcu)))
+ static inline void __chk_user_ptr(const volatile void __user *ptr) { }
+ static inline void __chk_io_ptr(const volatile void __iomem *ptr) { }
+-/* context/locking */
+-# define __must_hold(x)	__attribute__((context(x,1,1)))
+-# define __acquires(x)	__attribute__((context(x,0,1)))
+-# define __cond_acquires(x) __attribute__((context(x,0,-1)))
+-# define __releases(x)	__attribute__((context(x,1,0)))
+-# define __acquire(x)	__context__(x,1)
+-# define __release(x)	__context__(x,-1)
+-# define __cond_lock(x,c)	((c) ? ({ __acquire(x); 1; }) : 0)
+ /* other */
+ # define __force	__attribute__((force))
+ # define __nocast	__attribute__((nocast))
+@@ -62,14 +56,6 @@ static inline void __chk_io_ptr(const volatile void __iomem *ptr) { }
  
--If you just want to use kernel-doc to generate man pages you can do this
--from the kernel git tree::
-+To generate man pages for all files that contain kernel-doc markups, run::
- 
--  $ scripts/kernel-doc -man \
--    $(git grep -l '/\*\*' -- :^Documentation :^tools) \
--    | scripts/split-man.pl /tmp/man
-+  $ make mandocs
- 
--Some older versions of git do not support some of the variants of syntax for
--path exclusion.  One of the following commands may work for those versions::
-+Or calling ``script-build-wrapper`` directly::
- 
--  $ scripts/kernel-doc -man \
--    $(git grep -l '/\*\*' -- . ':!Documentation' ':!tools') \
--    | scripts/split-man.pl /tmp/man
-+  $ ./tools/docs/sphinx-build-wrapper mandocs
- 
--  $ scripts/kernel-doc -man \
--    $(git grep -l '/\*\*' -- . ":(exclude)Documentation" ":(exclude)tools") \
--    | scripts/split-man.pl /tmp/man
-+The output will be at ``/man`` directory inside the output directory
-+(by default: ``Documentation/output``).
-+
-+Optionally, it is possible to generate a partial set of man pages by
-+using SPHINXDIRS:
-+
-+  $ make SPHINXDIRS=driver-api/media mandocs
-+
-+.. note::
-+
-+   When SPHINXDIRS={subdir} is used, it will only generate man pages for
-+   the files explicitly inside a ``Documentation/{subdir}/.../*.rst`` file.
-diff --git a/Makefile b/Makefile
-index 6bfe776bf3c5..9bd44afeda26 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1800,7 +1800,7 @@ $(help-board-dirs): help-%:
- # Documentation targets
- # ---------------------------------------------------------------------------
- DOC_TARGETS := xmldocs latexdocs pdfdocs htmldocs epubdocs cleandocs \
--	       linkcheckdocs dochelp refcheckdocs texinfodocs infodocs
-+	       linkcheckdocs dochelp refcheckdocs texinfodocs infodocs mandocs
- PHONY += $(DOC_TARGETS)
- $(DOC_TARGETS):
- 	$(Q)$(MAKE) $(build)=Documentation $@
-diff --git a/scripts/split-man.pl b/scripts/split-man.pl
-deleted file mode 100755
-index 96bd99dc977a..000000000000
---- a/scripts/split-man.pl
-+++ /dev/null
-@@ -1,28 +0,0 @@
--#!/usr/bin/env perl
--# SPDX-License-Identifier: GPL-2.0
--#
--# Author: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
--#
--# Produce manpages from kernel-doc.
--# See Documentation/doc-guide/kernel-doc.rst for instructions
--
--if ($#ARGV < 0) {
--   die "where do I put the results?\n";
--}
--
--mkdir $ARGV[0],0777;
--$state = 0;
--while (<STDIN>) {
--    if (/^\.TH \"[^\"]*\" 9 \"([^\"]*)\"/) {
--	if ($state == 1) { close OUT }
--	$state = 1;
--	$fn = "$ARGV[0]/$1.9";
--	print STDERR "Creating $fn\n";
--	open OUT, ">$fn" or die "can't open $fn: $!\n";
--	print OUT $_;
--    } elsif ($state != 0) {
--	print OUT $_;
--    }
--}
--
--close OUT;
-diff --git a/tools/docs/sphinx-build-wrapper b/tools/docs/sphinx-build-wrapper
-index 8d1f77c4a880..7a6eb41837e6 100755
---- a/tools/docs/sphinx-build-wrapper
-+++ b/tools/docs/sphinx-build-wrapper
-@@ -47,12 +47,14 @@ the newer version.
- import argparse
- import locale
- import os
-+import re
- import shlex
- import shutil
- import subprocess
- import sys
- 
- from concurrent import futures
-+from glob import glob
- 
- from lib.python_version import PythonVersion
- from lib.latex_fonts import LatexFontChecker
-@@ -77,6 +79,7 @@ TARGETS = {
-     "epubdocs":      { "builder": "epub",    "out_dir": "epub" },
-     "texinfodocs":   { "builder": "texinfo", "out_dir": "texinfo" },
-     "infodocs":      { "builder": "texinfo", "out_dir": "texinfo" },
-+    "mandocs":       { "builder": "man",     "out_dir": "man" },
-     "latexdocs":     { "builder": "latex",   "out_dir": "latex" },
-     "pdfdocs":       { "builder": "latex",   "out_dir": "latex" },
-     "xmldocs":       { "builder": "xml",     "out_dir": "xml" },
-@@ -503,6 +506,71 @@ class SphinxBuilder:
-             except subprocess.CalledProcessError as e:
-                 sys.exit(f"Error generating info docs: {e}")
- 
-+    def handle_man(self, kerneldoc, docs_dir, src_dir, output_dir):
-+        """
-+        Create man pages from kernel-doc output
-+        """
-+
-+        re_kernel_doc = re.compile(r"^\.\.\s+kernel-doc::\s*(\S+)")
-+        re_man = re.compile(r'^\.TH "[^"]*" (\d+) "([^"]*)"')
-+
-+        if docs_dir == src_dir:
-+            #
-+            # Pick the entire set of kernel-doc markups from the entire tree
-+            #
-+            kdoc_files = set([self.srctree])
-+        else:
-+            kdoc_files = set()
-+
-+            for fname in glob(os.path.join(src_dir, "**"), recursive=True):
-+                if os.path.isfile(fname) and fname.endswith(".rst"):
-+                    with open(fname, "r", encoding="utf-8") as in_fp:
-+                        data = in_fp.read()
-+
-+                    for line in data.split("\n"):
-+                        match = re_kernel_doc.match(line)
-+                        if match:
-+                            if os.path.isfile(match.group(1)):
-+                                kdoc_files.add(match.group(1))
-+
-+        if not kdoc_files:
-+                sys.exit(f"Directory {src_dir} doesn't contain kernel-doc tags")
-+
-+        cmd = [ kerneldoc, "-m" ] + sorted(kdoc_files)
-+        try:
-+            if self.verbose:
-+                print(" ".join(cmd))
-+
-+            result = subprocess.run(cmd, stdout=subprocess.PIPE, text= True)
-+
-+            if result.returncode:
-+                print(f"Warning: kernel-doc returned {result.returncode} warnings")
-+
-+        except (OSError, ValueError, subprocess.SubprocessError) as e:
-+            sys.exit(f"Failed to create man pages for {src_dir}: {repr(e)}")
-+
-+        fp = None
-+        try:
-+            for line in result.stdout.split("\n"):
-+                match = re_man.match(line)
-+                if not match:
-+                    if fp:
-+                        fp.write(line + '\n')
-+                    continue
-+
-+                if fp:
-+                    fp.close()
-+
-+                fname = f"{output_dir}/{match.group(2)}.{match.group(1)}"
-+
-+                if self.verbose:
-+                    print(f"Creating {fname}")
-+                fp = open(fname, "w", encoding="utf-8")
-+                fp.write(line + '\n')
-+        finally:
-+            if fp:
-+                fp.close()
-+
-     def cleandocs(self, builder):           # pylint: disable=W0613
-         """Remove documentation output directory"""
-         shutil.rmtree(self.builddir, ignore_errors=True)
-@@ -531,7 +599,7 @@ class SphinxBuilder:
-         # Other targets require sphinx-build, so check if it exists
-         #
-         sphinxbuild = shutil.which(self.sphinxbuild, path=self.env["PATH"])
--        if not sphinxbuild:
-+        if not sphinxbuild and target != "mandocs":
-             sys.exit(f"Error: {self.sphinxbuild} not found in PATH.\n")
- 
-         if builder == "latex":
-@@ -619,10 +687,13 @@ class SphinxBuilder:
-                 output_dir,
-             ]
- 
--            try:
--                self.run_sphinx(sphinxbuild, build_args, env=self.env)
--            except (OSError, ValueError, subprocess.SubprocessError) as e:
--                sys.exit(f"Build failed: {repr(e)}")
-+            if target == "mandocs":
-+                self.handle_man(kerneldoc, docs_dir, src_dir, output_dir)
-+            else:
-+                try:
-+                    self.run_sphinx(sphinxbuild, build_args, env=self.env)
-+                except (OSError, ValueError, subprocess.SubprocessError) as e:
-+                    sys.exit(f"Build failed: {repr(e)}")
- 
-             #
-             # Ensure that each html/epub output will have needed static files
+ # define __chk_user_ptr(x)	(void)0
+ # define __chk_io_ptr(x)	(void)0
+-/* context/locking */
+-# define __must_hold(x)
+-# define __acquires(x)
+-# define __cond_acquires(x)
+-# define __releases(x)
+-# define __acquire(x)	(void)0
+-# define __release(x)	(void)0
+-# define __cond_lock(x,c) (c)
+ /* other */
+ # define __force
+ # define __nocast
 -- 
-2.51.0
+2.51.0.384.g4c02a37b29-goog
 
