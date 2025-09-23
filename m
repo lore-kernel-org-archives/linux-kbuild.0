@@ -1,94 +1,126 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA731A238C;
-	Tue, 23 Sep 2025 19:49:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF0218A6A5;
+	Tue, 23 Sep 2025 21:34:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758656968; cv=none; b=uuKYpqOPB+gMwo7j50EgroWVs2YAhiEwbHSFUREg3e32oT2t0BrkpjUMv6E/fBz3qjP9e6eNOsQVtz0wEphoPz/tTQRUa4Zp+ke/na1xBj6dZnFEXmhhr+82+F1IM6Y4xJL+MgbuASJDjXoszLRG7147UTC9psKI8boph2bAFJo=
+	t=1758663263; cv=none; b=FoUlROkgwClEGAV91wDpoPoTefJ3zcNKxfY5TlZWwVQwV28bm8wQU2BDti1WdPeOju47K2+b1IzHe3XAUzqDIvHDDL3NLGIdGmVi4dljXJ1KsE+qiKzVii/rJniB6h2ypqfhxuxbMFexL0wHZcEo637/ec3q+ij5iIwf+Je/2Kw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758656968; c=relaxed/simple;
-	bh=7gv2WzZ+nMC2bdsHIbBsKOEQPNt5h99Cw1wDY0M9npo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WEmNC3iy9+3bX40MeouekeAX3QwOEgeb9KdjiK0A5906Uq+MV+r94y9K6Y0LXEA8q9DH3eiEax9HAxXye3Qt1E3xv9XkCAr3EhvD+yea707Y6NVigqw0aD5FQpV8TTQ36qKLxsOZrNa0KfBiyWkWQUttCIjNYSJ0YA5MHHaRuv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PvIaGTqH; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1758663263; c=relaxed/simple;
+	bh=kzLRw90VPtGstaLwMBEFrpjL2J3zR4RxvRjKU0B7Zxw=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=HeMkDZieKoPQStz7SDTLfLevLbavWeQyH1VD1PDXmUGYKf2zjfGxy4CnRCZLxMi+15OZF/m6ivR+l+yOmjmZTI2ZOoelLgRwk4fTxKha2zLG+NjAaLAWHhXEKipTD0PcTrlCg+Er1GSUlv1KgEHSwLf5PiZ/XvEQBx/RXBLaafo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bp2a7tV3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PvIaGTqH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C0DAC4CEF5;
-	Tue, 23 Sep 2025 19:49:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bp2a7tV3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99DF8C4CEF5;
+	Tue, 23 Sep 2025 21:34:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758656966;
-	bh=7gv2WzZ+nMC2bdsHIbBsKOEQPNt5h99Cw1wDY0M9npo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PvIaGTqHdNU7Q1p9iQCyi7SI8rzgs+Fd2F62Wvt4e7U9M5ZbQ8qxnT0LiSPe4PKVR
-	 gehyR0Rm0ghRXneZ4tzjafcgpCRITUKyHFvb6JN4O9cuxWgjIBHK2hM2MF5Y/HqnMX
-	 n3nuIsdb1r2D9GFRjzSab+/uI7K6xmpOdsNRSsCVySBQ9n2ybIX4gsztX3PGvijcvT
-	 Sp/fUhAnCreO1LjGnNn/IXq6su5QDyv6TUFvnwV57AFOt5ZY8qGMFKUOL3RBXFtVX+
-	 bbjgLfFkLzJt+rxjoewVtxndm0w4xC2WwbySLCvFHwFbb5zcONvgE0SDuPCi7+lbEf
-	 evcKd6295D9ag==
-Date: Tue, 23 Sep 2025 12:49:15 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Marco Elver <elver@google.com>
-Cc: Christoph Hellwig <hch@lst.de>, Peter Zijlstra <peterz@infradead.org>,
-	Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Alexander Potapenko <glider@google.com>,
-	Arnd Bergmann <arnd@arndb.de>, Bart Van Assche <bvanassche@acm.org>,
-	Bill Wendling <morbo@google.com>,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Ian Rogers <irogers@google.com>, Jann Horn <jannh@google.com>,
-	Joel Fernandes <joelagnelf@nvidia.com>,
+	s=k20201202; t=1758663262;
+	bh=kzLRw90VPtGstaLwMBEFrpjL2J3zR4RxvRjKU0B7Zxw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Bp2a7tV3auNRR0cOKrWID8tkO9If9Ml0qmHS7upNGwa6xCxAqHq7e4eTGzYptNwqz
+	 aVB++QhOTlS+MXPCAWSScOEODuZdP38AHU5VjMD0xkzo0qAgeipKbEp8L2pdjcfQRK
+	 eZutv4F9DBtgC6NOQp+1gCrptcuzQBj9l+T66bMgFY8yplacm57uSlmHphcCGxFICc
+	 3qpfjogn9JRTFVmh4D0a59hGtuenbbmfMHMC52PeWek+uHBEA+rPIuvYZhoHL8JHJP
+	 hJ9yC4lqn2PzHuMqGoiEKeFmOpjFvlyfmV5SXkoANxEYxRVYyVfATWKyoSk9ZsnXzm
+	 dTAlKMaHJSlYw==
+From: Kees Cook <kees@kernel.org>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Kees Cook <kees@kernel.org>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Vegard Nossum <vegard.nossum@oracle.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	linux-kbuild@vger.kernel.org,
+	Sami Tolvanen <samitolvanen@google.com>,
 	Jonathan Corbet <corbet@lwn.net>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
-	Kentaro Takeda <takedakn@nttdata.co.jp>,
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
 	Mark Rutland <mark.rutland@arm.com>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	Thomas Gleixner <tglx@linutronix.de>, Thomas Graf <tgraf@suug.ch>,
-	Uladzislau Rezki <urezki@gmail.com>,
-	Waiman Long <longman@redhat.com>, kasan-dev@googlegroups.com,
-	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, linux-security-module@vger.kernel.org,
-	linux-sparse@vger.kernel.org, llvm@lists.linux.dev,
-	rcu@vger.kernel.org
-Subject: Re: [PATCH v3 00/35] Compiler-Based Capability- and Locking-Analysis
-Message-ID: <20250923194915.GA2127565@ax162>
-References: <20250918140451.1289454-1-elver@google.com>
- <20250918141511.GA30263@lst.de>
- <20250918174555.GA3366400@ax162>
- <20250919140803.GA23745@lst.de>
- <20250919140954.GA24160@lst.de>
- <aNEX46WJh2IWhVUc@elver.google.com>
+	Peter Zijlstra <peterz@infradead.org>,
+	Puranjay Mohan <puranjay@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH v3 1/3] kconfig: Fix BrokenPipeError warnings in selftests
+Date: Tue, 23 Sep 2025 14:34:17 -0700
+Message-Id: <20250923213422.1105654-1-kees@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250923213120.make.332-kees@kernel.org>
+References: <20250923213120.make.332-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aNEX46WJh2IWhVUc@elver.google.com>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2658; i=kees@kernel.org; h=from:subject; bh=kzLRw90VPtGstaLwMBEFrpjL2J3zR4RxvRjKU0B7Zxw=; b=owGbwMvMwCVmps19z/KJym7G02pJDBmXhaLmbU677Gx3r3BlRY3E1i2aJeYuJ6yNZk6QWzHx6 DZT70NVHaUsDGJcDLJiiixBdu5xLh5v28Pd5yrCzGFlAhnCwMUpABMx8GNkWGa/841DEceVLDGl KsmejA/a/9xdIibvSP6YrD5p618lZUaGdV3hzKoLrzxYb7iMY15L2Unf0/ExBSs3idQIbpnmtNa bDQA=
+X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
+Content-Transfer-Encoding: 8bit
 
-On Mon, Sep 22, 2025 at 11:33:23AM +0200, Marco Elver wrote:
-> [1] https://github.com/llvm/llvm-project/pull/159921
+The kconfig test harness ("make testconfig") was generating BrokenPipeError
+warnings when running interactive tests like oldaskconfig and oldconfig:
 
-Now that this is merged, I have pushed an updated snapshot for x86_64:
+  /usr/lib/python3/dist-packages/_pytest/unraisableexception.py:85: PytestUnraisableExceptionWarning: Exception ignored in: <_io.BufferedWriter name=12>
 
-https://mirrors.edge.kernel.org/pub/tools/llvm/files/prerelease/llvm-22.0.0-ca2e8fc928ad103f46ca9f827e147c43db3a5c47-20250923-185804-x86_64.tar.xz
+  Traceback (most recent call last):
+    File "/srv/code/scripts/kconfig/tests/conftest.py", line 127, in oldaskconfig
+      return self._run_conf('--oldaskconfig', dot_config=dot_config,
+             ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                            interactive=True, in_keys=in_keys)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  BrokenPipeError: [Errno 32] Broken pipe
 
-Cheers,
-Nathan
+The issue occurred when the test framework attempted to write to stdin
+after the conf subprocess had already exited.
+
+Wrap stdin write operations in try/except to catch BrokenPipeError and
+stop sending more input. Add explicit flush() after writes so we can see
+delivery errors immediately. Ignore BrokenPipeError when closing stdin.
+Explicitly call wait() to validate subprocess termination.
+
+Signed-off-by: Kees Cook <kees@kernel.org>
+---
+Cc: Nathan Chancellor <nathan@kernel.org>
+Cc: Nicolas Schier <nicolas.schier@linux.dev>
+Cc: Vegard Nossum <vegard.nossum@oracle.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>
+Cc: <linux-kbuild@vger.kernel.org>
+---
+ scripts/kconfig/tests/conftest.py | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/kconfig/tests/conftest.py b/scripts/kconfig/tests/conftest.py
+index 2a2a7e2da060..d94b79e012c0 100644
+--- a/scripts/kconfig/tests/conftest.py
++++ b/scripts/kconfig/tests/conftest.py
+@@ -81,7 +81,22 @@ class Conf:
+                 # For interactive modes such as oldaskconfig, oldconfig,
+                 # send 'Enter' key until the program finishes.
+                 if interactive:
+-                    ps.stdin.write(b'\n')
++                    try:
++                        ps.stdin.write(b'\n')
++                        ps.stdin.flush()
++                    except (BrokenPipeError, OSError):
++                        # Process has exited, stop sending input
++                        break
++
++            # Close stdin gracefully
++            try:
++                ps.stdin.close()
++            except (BrokenPipeError, OSError):
++                # Ignore broken pipe on close
++                pass
++
++            # Wait for process to complete
++            ps.wait()
+ 
+             self.retcode = ps.returncode
+             self.stdout = ps.stdout.read().decode()
+-- 
+2.34.1
+
