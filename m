@@ -1,186 +1,99 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1224813B58B
-	for <linux-kbuild@vger.kernel.org>; Sat, 27 Sep 2025 20:20:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CFAE34BA3B
+	for <linux-kbuild@vger.kernel.org>; Sun, 28 Sep 2025 04:28:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759004404; cv=none; b=WfTjOSWR43oGOPoUsjB6oL0EflpdUMAQXiR5wfmD7aT8uYP7tjTPZbWy6sA9Mh8xzsfoPLqRXwHCtVVyUSift/dXW9xaLseYor6woddUOxNEKBm05DBBXw+AT3ptJgESu6Jdm/JNP219+ytZBvyMq3gYdTi3mNXS2f8BkOHZDoc=
+	t=1759033701; cv=none; b=VIexTBPOnj6nWJILWcGVqvB9TQR7PYGxXmITAzrYWSHg4vkZ9GGB0yo11QqEZt08l+qnZeD9+F4qe3rb0FeSXRW+7tMqNUyy0K4J6ykaOb3pls58XWIJwGDm1sbEXsbuUrQK37v+lpJN2tsP9nduT1mloUwirJZaCynFSwRiRM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759004404; c=relaxed/simple;
-	bh=elBQlQ0lRBRyBHUGvss+kQFqw5050kVF34p620qcKFs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fs6GUeHHS30QL5VXMSDLjqFUSUkgtmQge2i+ntSqtu+Z1zgd1aUBym4iushJ/L6Hbu/+YpHXcMHVYs5w1jE36OBJ7QuajEplvTYSXdlWwT7KMnynM+FVS3glqIIkA6WTHzQsS9zdN61m/gShuKioMpii8z6wOAaYnvSrPCSdZCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KHdtofk7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1759033701; c=relaxed/simple;
+	bh=nuRR6zw90qB7SgrCrIDW+FhcmnpqZupfSWo58gy++mA=;
+	h=Date:From:To:cc:Subject:Message-ID:MIME-Version:Content-Type; b=Yyfj/mSfRDEh/Sshcl89iJRSXQgzhtRZuvETWB0qO/p5MAdUShCBmO2VMZ2+CBZaEZXemLi0sAocc2AA7H2X/X/5jAgqACqtzoXMR2V9FVhYOjx9rhnVNtYnXXw4L0wDfdg4HqCDDMsxk9AZ88xAOMwD8+KMJlVTKBwUUl8J8Wc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BB5NQwkD; arc=none smtp.client-ip=209.85.128.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KHdtofk7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36ECFC4CEE7;
-	Sat, 27 Sep 2025 20:20:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759004403;
-	bh=elBQlQ0lRBRyBHUGvss+kQFqw5050kVF34p620qcKFs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KHdtofk7f2Jt8wTG/39mRhRUDk/iXNLH9RnmF7dv5N3/+Q/SC6W1fjptLzE8J9H5j
-	 q6iHZucHdpQaR8S9XQMCbPiN3MzjOfNIRyfCnVWjcR0BtI7IZ6qDIED42tsL7DO47/
-	 KmjGhSntscKe7Tt9uR/xtAjHlma+ySkNBLbDk1AHbjoiViVhDn89z+JZOMROfk4//O
-	 vED2UWqOMlKmrWb8zv35FpBs+k3PH6RKu1jGHdi0bTreB7tpdfWme5SZyBDTuVu7cM
-	 u/ZGNXASgu2QWSPVDwSdewEn/JxWF8rIPdCgbifIYS65HvNgh7FMpcG98ZT/ptANFh
-	 co9+/vGMJoe/A==
-Date: Sat, 27 Sep 2025 22:18:47 +0200
-From: Nicolas Schier <nsc@kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Nathan Chancellor <nathan@kernel.org>, Borislav Petkov <bp@alien8.de>,
-	Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Subject: Re: Tool directory build problem..
-Message-ID: <aNhGp7NDCCrtwJqm@levanger>
-References: <CAHk-=wgYcmBXuE8OMoDF6vGwk9n_2XdwWbuh-5b0w0g7w-NK=g@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BB5NQwkD"
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-71d6051aeafso35291307b3.2
+        for <linux-kbuild@vger.kernel.org>; Sat, 27 Sep 2025 21:28:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1759033699; x=1759638499; darn=vger.kernel.org;
+        h=mime-version:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=6wp0fDq3k0/r9k12dCZGeSiwwlkTpuN3WtXOkQGhZJI=;
+        b=BB5NQwkDMZSN41F4T2WEk/Alg/TPUCxuJ4OCW702TKm1XJF3a9T4u0ddtVvvW+8vJT
+         Qbhgro6s9suOEXafR7DDNjY3LKB2G58fKeXaJ/8HBazT8dCTjR9zozIwubWKybRotmZ9
+         WCQXIQpn9/HrHz2S/qeKpgCQOyout1+w5d6/xwh59cI9ZU4XlyDeL2w9oaMLB2XLx8CP
+         3GYtKdseXI5iwZJQ4yH1p3Y5DUqMv8fY2GB9Sv3bgA6Z8KbrMUQAJ+36+Zc90ceY+myv
+         FLLGouy2SWr6iph4yJ38mq1+F7CIUDk9gv5hB/JqebmekD1k99cPskS05D/JKfA8f5+e
+         6F+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759033699; x=1759638499;
+        h=mime-version:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6wp0fDq3k0/r9k12dCZGeSiwwlkTpuN3WtXOkQGhZJI=;
+        b=vKYYG+kUwsmdtKiRkp1aS26iqNJYcTIj6nGvBEEdvvc8E5sgd1UoGeh1OyughOjsy5
+         F8WD2SHBWBTHr/GNCFB/G9riHzGEPuJymrUGFoapGq95GK7zJtrT75snme0V8i3VHMhk
+         +tDmjy+Z7Wk7dJUcRwbiOVy800gL9cBrJskN9p95GauIcYmdl6efjWhD+selIn4itA3F
+         jNlUY4KjCsefhxZdlJQ50kKVHcSZN/E3/gnz0mBE7M/4XmtEb8jRyk/vKUwEsUSdNF/r
+         nMrWrW7FMif2S7lQLMc7nmU/4TIRyUe9Tu6CR3zI3e3ufAMphR+8iyI74X61Fl9riaBq
+         4kZg==
+X-Forwarded-Encrypted: i=1; AJvYcCXR6KXzpnjL2x4st3e3XT+YnwCIi3QMhJhLz/p8pFGUQu0SR1IGNMrDXBBMlDBEj5PDUNLnr/l0KlZdbqA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwGb1kqthaPcBmyEwIqFUqpFfwqThXGE/58DCXtmEFtmfZtFfZg
+	B7No/UxUE8iz4rxg47JcnHmmIP4XJ16mj6CpiCMOjmYo62kywvRSP97lmOz+qX7+AA==
+X-Gm-Gg: ASbGncsezXiEqBScKH6YZG7lUe5PQQQnVa2172cpiTkidPKzzLkVdUubnd5eBVn0T0t
+	oFOD/SjkW73Akj345nHyXIWGTctV2AYFfqbGT1of2TWnNR9MGhO13N13HGyrFOOqzKbZ7PvRajv
+	MxRfAb+hwW8+4JqVvuH4X+aYDwvzF+QDsOJq+4P865QY0Qx6HvrLGNLrjmqnDT2a/G57vLA5h6g
+	GdWRbHPBERbyB7A3hI0kyzhrsXatnACRmLkw162Di7RjtibYnu3KW9H8GSoGiNzfF76VZo5aBBU
+	fgxZC2QsXn1HMKaSBAIvYFv0fwtWDWGWwloa0ZQmG/xlMwuVR/T2E1vsZzWXlQ+pl+ka8q5dphr
+	GsvsMP/t5gWl5rZR2y6MgTd4WoVmSbNMoKK58y9X+S7CIYbcL0xABa3rkSw0wrPzoQScw01JhVg
+	jkofOCPoWaiuCuQNYWrJJ8YVTUqUKT
+X-Google-Smtp-Source: AGHT+IEmjdyhyqxy5Fj/p/NzSZeWCCbu4ozrAL8XK6jcYUIhMH6CwQ6zd7Hg4Kbpnan97DOGis24Tg==
+X-Received: by 2002:a05:690e:259c:b0:634:7613:25a4 with SMTP id 956f58d0204a3-6361a73c57emr9911004d50.14.1759033698815;
+        Sat, 27 Sep 2025 21:28:18 -0700 (PDT)
+Received: from darker.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
+        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-eb383929c1bsm2473845276.19.2025.09.27.21.28.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 27 Sep 2025 21:28:17 -0700 (PDT)
+Date: Sat, 27 Sep 2025 21:28:06 -0700 (PDT)
+From: Hugh Dickins <hughd@google.com>
+To: Nathan Chancellor <nathan@kernel.org>
+cc: Alexey Gladkov <legion@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, 
+    Stephen Rothwell <sfr@canb.auug.org.au>, Nicolas Shier <nsc@kernel.org>, 
+    linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH next] modpost: Initialize builtin_modname to stop SIGSEGVs
+Message-ID: <4590a243-0a7e-b7e6-e2d3-cd1b41a12237@google.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="++043sky81sjvUI9"
-Content-Disposition: inline
-In-Reply-To: <CAHk-=wgYcmBXuE8OMoDF6vGwk9n_2XdwWbuh-5b0w0g7w-NK=g@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
 
+Segmentation fault ./scripts/mod/modpost -o vmlinux.symvers vmlinux.o
+stops the kernel build.  It comes when write_vmlinux_export_c_file()
+tries to buf_printf alias->builtin_modname.  malloc'ed memory is not
+necessarily zeroed.  NULL new->builtin_modname before adding to aliases.
 
---++043sky81sjvUI9
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Fixes: 5ab23c7923a1 ("modpost: Create modalias for builtin modules")
+Signed-off-by: Hugh Dickins <hughd@google.com>
+---
+ scripts/mod/file2alias.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Hi Linus,
-
-On Sat, Sep 27, 2025 at 11:23:22AM -0700, Linus Torvalds wrote:
-> This isn't new, but I hit the problem once again because I decided
-> that I should make sure to build-test the tools before the 6.17
-> release since I got another tool pull fairly late in the game..
->=20
-> And it fails annoyingly and immediately, with
->=20
->     make tools/all
->=20
-> failing quickly for the ACPI pfrut tool with
->=20
->     undefined reference to `uuid_unparse'
->=20
-> errors.
->=20
-> Those errors do *not* happen if you build it inside the tools/
-> directory itself. So doing
->=20
->     make -C tools all
->=20
-> works just fine, but we literally have a "tools/%" target that is
-> designed for this, and it doesn't work.
->=20
-> It doesn't work for that pfrut tool because the top-level Makefile
-> rule does this:
->=20
->     $(Q)$(MAKE) LDFLAGS=3D O=3D$(abspath $(objtree)) subdir=3Dtools -C
-> $(srctree)/tools/ $*
->=20
-> and that "LDFLAGS=3D" is an overriding variable assignment, so the use of
->=20
->     LDFLAGS +=3D -luuid
->=20
-> in tools/power/acpi/tools/pfrut/Makefile end sup not working.
->=20
-> But it works in all other situations, just not when build this way
-> from the top. Annoying.
->=20
-> I'm not sure *why* the top-level Makefile does that "LDFLAGS=3D"
-> override thing. It doesn't do it for anything else. Just that LDFLAGS
-> variable.
->=20
-> Yes, yes, the ACPI tool makefile could then use
->=20
->     override LDFLAGS +=3D -luuid
->=20
-> but why would it do something as crazy as that?
->=20
-> That "LDFLAGS=3D" override goes back many many years,  In fact, it goes
-> back to the very initial addition of those rules in commit
-> ea01fa9f63ae ("tools: Connect to the kernel build system").
-
-I have never really dived into the tools/ tree, thus I am not able to give
-helpful comment about build problems of any tools/% target,
-spontaneously.
-
-
-But I know that there has been a long-term strained relationship between
-kbuild and tools.  Masahiro put it this way in June 2024, when asked
-about his concerns about the tools/ integration in top-level Makefile:
-
-Masahiro put this
-
-    # The tools build system is not a part of Kbuild and tends to introduce
-    # its own unique issues. If you need to integrate a new tool into Kbuil=
-d,
-    # please consider locating that tool outside the tools/ tree and using =
-the
-    # standard Kbuild "hostprogs" syntax instead of adding a new tools/* en=
-try
-    # here. See Documentation/kbuild/makefiles.rst for details.
-
-into top-level Makefile after yet another troublesome patch discussion
-(referenced in commit 6e6ef2da3a28f3e02).
-
-
-Further, he mentioned worries about the (current) situation:
-
-    The tool build is integrated as a pattern rule in the top Makefile.
-    (tools/%)
-
-    So, you can build other tools from the top Makefile.
-
-    See commit ea01fa9f63aef, which did not get Ack from any Kbuild
-    maintainer, and caused subsequent troubles, and the benefit
-    of which I still do not understand.
-   =20
-    Supporting "make tools/perf" in addition to "make -C tools perf"
-    only saved a few characters to type.
-   =20
-    So, the problem remains, unless I revert ea01fa9f63aef.
-   =20
-    I decided to not care about it too much, as long as
-    such tools are not used during the kernel build.
-   =20
-    I am really worried about objtool and resolve_btfids,
-    as these two are used for building the kernel.
-
-    https://lore.kernel.org/linux-kbuild/CAK7LNASZi3A_BzFACOvZhwByHaVon-Cd5=
-H++uygsv4m_fhDOyQ@mail.gmail.com/
-
-So, to be honest, I doubt we have someone at hand right now who is able
-to fix the tools/ tree.
-
-Personally, I'd favor if we could work towards removal of the 'tools/%'
-rule in top-level Makefile, as long as tools/ is not kbuild-compliant.
-
-Kind regards,
-Nicolas
-
---++043sky81sjvUI9
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEh0E3p4c3JKeBvsLGB1IKcBYmEmkFAmjYRpgACgkQB1IKcBYm
-Emn6MhAA3LWKRKLounvgcD8jWkWKgG6Jl+8wM/oh/T6MfzjOiUTR/TEjFLUm20VM
-YZZJonC2mOMX/A8cYqhMKwkfP2XxDcuaWc1c3DGPqGL3QiLIrvphD4gMdk6o93HL
-dEKQkKsc9FZ5CTJjRTuNSCIWY7C2/skdei+51FW08ByKA+bdG3aIC2GO7DgsT/p+
-XnkKBsZ4d1fVPeHnoGk/j2ld0SDJ7EywJJMIf7POQwjokrAYksmFteYGKVi0oEt1
-+RksCLmRDF4NFsTU9drCEjAwva8I71TehciVpMvc1RsTMCOwYwFkOEpKrplWmDnv
-xowm+LXeQHCT75vp72VmhIgEMiBfsOFS/mWrMfuH+d+d7BoMSTI/F35xrdiDNXuy
-qWPjOGhaYScSM1PFnPVXwdtNRF+BRF3m8JOTsySKEGu6hfaM8llTqeUcyVo96RWQ
-s9F9pYzalUTo0v1OoLKl4+U/pHLzHMfDtuF+OJPraabpgnx17t9S5kJd25OyOfvx
-KFhpntkJvvK2D7c+6HUz8XvI81yQ8yg16FaYHT/f4++wT+tK5e6A2FxolYujV9Ak
-T+ZntMlwuGqYQyvHQaMa9xenmK3b0k0akFVCEIvYVeKOFhlnuBUBDgKoU2rdJrIb
-x2KKx7RDOM74TLG1j1iTBuNeQFC1SgAHegf9mFYhB1qFeg40Lzc=
-=lgzM
------END PGP SIGNATURE-----
-
---++043sky81sjvUI9--
+diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
+index 7da9735e7ab3..b3333560b95e 100644
+--- a/scripts/mod/file2alias.c
++++ b/scripts/mod/file2alias.c
+@@ -94,6 +94,7 @@ module_alias_printf(struct module *mod, bool append_wildcard,
+ 		}
+ 	}
+ 
++	new->builtin_modname = NULL;
+ 	list_add_tail(&new->node, &mod->aliases);
+ }
+ 
+-- 
+2.48.2
