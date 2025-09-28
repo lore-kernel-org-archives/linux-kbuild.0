@@ -1,168 +1,82 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F4F1A9FBE;
-	Sun, 28 Sep 2025 05:24:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B49194137;
+	Sun, 28 Sep 2025 05:38:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759037073; cv=none; b=CCQ6IPAT1s4LqjR3uO3AQ3pMoUy0ngdBOaHgBtx5mBGfnPSUWb0IPchr5Qs02YC/J/TNr+FqDEM/7/C3Di7rTAHuynOxTmoSRY9l17Ldz9NQnKTdksk5dSi2nXPAc6wGaftIMJrlSWjLtbV+ABtaq0fzFbqkKXX9K5BGzZlKIAo=
+	t=1759037889; cv=none; b=ucU34+0gE1MN+PI8iT7HLE5yyG7vh7ogZja63b9s7obsaptTg2wZWIZ+71U2O6/qoQdOz/f709YOY98W+uDQh2f6mqnCeg7EqHdveyjUT7f5ta/XrS7VpJxFZ2G+JyjKLBu49IgE+dsYatJE/x5wwvLViSbTGj7l4eCtxnAedeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759037073; c=relaxed/simple;
-	bh=L+EkAKSmc3OTz36a3wD0ZqaH7YXUNCh7rEnXSOrQhcs=;
+	s=arc-20240116; t=1759037889; c=relaxed/simple;
+	bh=03eDEl2vFW5dt8Z7i6VEbEDuWYL3FWijkg9sF9wftNg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V8Wcq4sg5Gl/4ev+OZhwPzYQ9bmL35ugvHylEdL4Xsppzf67rrR3L3Wr7D1HD561jJkto5AFZxjNAeN5Qeun7+aXDqvGtGmPDHPWp/7IzCXFGwdDtDCo05AP5IjUiQKi3Goa7N1HwLCggwjaQ37bvNsYx06TMkFE7UtONtK5o2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V//9x7o/; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=XMevw5TZMRDZ6Vmn5GFF99powHPCrVaA3BrFxU8MZsQ94MS6GkWTu9k2h6Hh9NGApKK0ke/k4mtm/Btf67oM1x8UF6KQirtE5ECGgAiGj95HgeGcMihRsu7W/cOxHCq0TsQlkcxgGBqzTGhfOY5TKqr5OcxBQhsqQmdtC/buD6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oEZvar7I; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V//9x7o/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1856C4CEF0;
-	Sun, 28 Sep 2025 05:24:32 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oEZvar7I"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C24BC4CEF0;
+	Sun, 28 Sep 2025 05:38:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759037073;
-	bh=L+EkAKSmc3OTz36a3wD0ZqaH7YXUNCh7rEnXSOrQhcs=;
+	s=k20201202; t=1759037888;
+	bh=03eDEl2vFW5dt8Z7i6VEbEDuWYL3FWijkg9sF9wftNg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=V//9x7o/J9oZqkmeKIwSySCF19pNgZhCLfXztsQEL6wKCsqagB9YL7A25fXIweQsu
-	 AYQaEoOqHH4SDDWLwgI0xZYxnlsfnvhQJ37whCo+xRnY1TUYRnpoeG6xYzl+TnZ5Ae
-	 nXxyr0346bzMx+LJ73v2k4zgNnkf+a31UyrhEco3QntPoZxyuFtnyoPOsgFMkb0A2o
-	 chHMgdlMHscUtwKzy7Q4o1Y1hjRTzz1NrXCPzqCNJMB7/BGpYIw/o9n1kZPIwgyhL+
-	 7huv7cfQl4zprLtomc3BX86amhXbZj+wyr5CdCEZgWZcY9RxH/fAoEuCSSbazpyomL
-	 i9dCfp9XopLBg==
-Date: Sat, 27 Sep 2025 22:35:00 +0200
+	b=oEZvar7IAFF6Eeao0yOf/cSCVqbwl3az4VUVb+2OH7LMx2Zo4iQ5rYdpCwSfCUitn
+	 sK0rzU3nO5+uHxbcPJEC6S3cHjkjgPES9pqfyl5+PoQyMsVq4vIsy+mCbpCbNLlxCY
+	 PuXg6+ia1ws30g4OnXJ8HURuo0SZ9GNvhTkiuoPzX7k40vOc6Up71NtXhzDtK+DHeI
+	 CUzfR8X0sg63eTrAwlZOXvJKxYIBOnAd6yhrjC7AUf6xqfsT/Fa/0CYVaWmyz0srJa
+	 dzBEG6HoejkdTp5FgGyMb251U9clu6qs1yj/mWuC3wzWbgn3pg8pkliLPcfqE8eghz
+	 f27CyXJInW0pg==
+Date: Sun, 28 Sep 2025 07:37:18 +0200
 From: Nicolas Schier <nsc@kernel.org>
-To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>, Akira Yokosawa <akiyks@gmail.com>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Tamir Duberstein <tamird@gmail.com>, linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 19/24] docs: add support to build manpages from
- kerneldoc output
-Message-ID: <aNhKdCrSM29uwvpn@levanger>
-References: <cover.1758196090.git.mchehab+huawei@kernel.org>
- <3d248d724e7f3154f6e3a227e5923d7360201de9.1758196090.git.mchehab+huawei@kernel.org>
+To: Hugh Dickins <hughd@google.com>
+Cc: Nathan Chancellor <nathan@kernel.org>,
+	Alexey Gladkov <legion@kernel.org>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH next] modpost: Initialize builtin_modname to stop SIGSEGVs
+Message-ID: <aNjJjoEKAzUjhZqj@levanger>
+References: <4590a243-0a7e-b7e6-e2d3-cd1b41a12237@google.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3d248d724e7f3154f6e3a227e5923d7360201de9.1758196090.git.mchehab+huawei@kernel.org>
+In-Reply-To: <4590a243-0a7e-b7e6-e2d3-cd1b41a12237@google.com>
 
-Please note that @kernel.org receipients are still not addressed
-correctly:
-
-> Date: Thu, 18 Sep 2025 13:54:53 +0200
-> From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-> To: Linux Doc Mailing List <linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>
-> Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, Akira Yokosawa <akiyks@gmail.com>,
->     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, Thomas Weiﬂschuh <thomas.weissschuh@linutronix.de>,
->     Alice Ryhl <aliceryhl@google.com>, Masahiro Yamada <mchehab+huawei@kernel.org>,
->     Miguel Ojeda <mchehab+huawei@kernel.org>, Nathan Chancellor <mchehab+huawei@kernel.org>,
->     Nicolas Schier <nicolas.schier@linux.dev>, Randy Dunlap <rdunlap@infradead.org>,
->     Tamir Duberstein <tamird@gmail.com>, linux-kbuild@vger.kernel.org,
->     linux-kernel@vger.kernel.org
-
-
-On Thu, Sep 18, 2025 at 01:54:53PM +0200, Mauro Carvalho Chehab wrote:
-> Generating man files currently requires running a separate
-> script. The target also doesn't appear at the docs Makefile.
+On Sat, Sep 27, 2025 at 09:28:06PM -0700, Hugh Dickins wrote:
+> Segmentation fault ./scripts/mod/modpost -o vmlinux.symvers vmlinux.o
+> stops the kernel build.  It comes when write_vmlinux_export_c_file()
+> tries to buf_printf alias->builtin_modname.  malloc'ed memory is not
+> necessarily zeroed.  NULL new->builtin_modname before adding to aliases.
 > 
-> Add support for mandocs at the Makefile, adding the build
-> logic inside sphinx-build-wrapper, updating documentation
-> and dropping the ancillary script.
-> 
-> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+> Fixes: 5ab23c7923a1 ("modpost: Create modalias for builtin modules")
+> Signed-off-by: Hugh Dickins <hughd@google.com>
 > ---
->  Documentation/Makefile                 |  3 +-
->  Documentation/doc-guide/kernel-doc.rst | 29 ++++-----
->  Makefile                               |  2 +-
->  scripts/split-man.pl                   | 28 ---------
->  tools/docs/sphinx-build-wrapper        | 81 ++++++++++++++++++++++++--
->  5 files changed, 95 insertions(+), 48 deletions(-)
->  delete mode 100755 scripts/split-man.pl
+>  scripts/mod/file2alias.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/Documentation/Makefile b/Documentation/Makefile
-> index 05397b9d844d..aa42b2cb7030 100644
-> --- a/Documentation/Makefile
-> +++ b/Documentation/Makefile
-> @@ -53,7 +53,7 @@ ifeq ($(HAVE_SPHINX),0)
->  else # HAVE_SPHINX
+> diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
+> index 7da9735e7ab3..b3333560b95e 100644
+> --- a/scripts/mod/file2alias.c
+> +++ b/scripts/mod/file2alias.c
+> @@ -94,6 +94,7 @@ module_alias_printf(struct module *mod, bool append_wildcard,
+>  		}
+>  	}
 >  
->  # Common documentation targets
-> -infodocs texinfodocs latexdocs epubdocs xmldocs pdfdocs linkcheckdocs:
-> +mandocs infodocs texinfodocs latexdocs epubdocs xmldocs pdfdocs linkcheckdocs:
->  	$(Q)@$(srctree)/tools/docs/sphinx-pre-install --version-check
->  	+$(Q)$(PYTHON3) $(BUILD_WRAPPER) $@ \
->  		--sphinxdirs="$(SPHINXDIRS)" --conf="$(SPHINX_CONF)" \
-> @@ -104,6 +104,7 @@ dochelp:
->  	@echo  '  htmldocs        - HTML'
->  	@echo  '  texinfodocs     - Texinfo'
->  	@echo  '  infodocs        - Info'
-> +	@echo  '  mandocs         - Man pages'
->  	@echo  '  latexdocs       - LaTeX'
->  	@echo  '  pdfdocs         - PDF'
->  	@echo  '  epubdocs        - EPUB'
-> diff --git a/Documentation/doc-guide/kernel-doc.rst b/Documentation/doc-guide/kernel-doc.rst
-> index af9697e60165..4370cc8fbcf5 100644
-> --- a/Documentation/doc-guide/kernel-doc.rst
-> +++ b/Documentation/doc-guide/kernel-doc.rst
-> @@ -579,20 +579,23 @@ source.
->  How to use kernel-doc to generate man pages
->  -------------------------------------------
+> +	new->builtin_modname = NULL;
+>  	list_add_tail(&new->node, &mod->aliases);
+>  }
 >  
-> -If you just want to use kernel-doc to generate man pages you can do this
-> -from the kernel git tree::
-> +To generate man pages for all files that contain kernel-doc markups, run::
->  
-> -  $ scripts/kernel-doc -man \
-> -    $(git grep -l '/\*\*' -- :^Documentation :^tools) \
-> -    | scripts/split-man.pl /tmp/man
-> +  $ make mandocs
->  
-> -Some older versions of git do not support some of the variants of syntax for
-> -path exclusion.  One of the following commands may work for those versions::
-> +Or calling ``script-build-wrapper`` directly::
+> -- 
+> 2.48.2
 
-For this very patch, there is no 'scripts-build-wrapper' but
-'sphinx-build-wrapper'.  Or am I missing something?
+Thanks!
 
->  
-> -  $ scripts/kernel-doc -man \
-> -    $(git grep -l '/\*\*' -- . ':!Documentation' ':!tools') \
-> -    | scripts/split-man.pl /tmp/man
-> +  $ ./tools/docs/sphinx-build-wrapper mandocs
->  
-> -  $ scripts/kernel-doc -man \
-> -    $(git grep -l '/\*\*' -- . ":(exclude)Documentation" ":(exclude)tools") \
-> -    | scripts/split-man.pl /tmp/man
-> +The output will be at ``/man`` directory inside the output directory
-> +(by default: ``Documentation/output``).
-> +
-> +Optionally, it is possible to generate a partial set of man pages by
-> +using SPHINXDIRS:
-> +
-> +  $ make SPHINXDIRS=driver-api/media mandocs
-> +
-> +.. note::
-> +
-> +   When SPHINXDIRS={subdir} is used, it will only generate man pages for
-> +   the files explicitly inside a ``Documentation/{subdir}/.../*.rst`` file.
-> diff --git a/Makefile b/Makefile
-> index 6bfe776bf3c5..9bd44afeda26 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1800,7 +1800,7 @@ $(help-board-dirs): help-%:
->  # Documentation targets
->  # ---------------------------------------------------------------------------
->  DOC_TARGETS := xmldocs latexdocs pdfdocs htmldocs epubdocs cleandocs \
-> -	       linkcheckdocs dochelp refcheckdocs texinfodocs infodocs
-> +	       linkcheckdocs dochelp refcheckdocs texinfodocs infodocs mandocs
->  PHONY += $(DOC_TARGETS)
->  $(DOC_TARGETS):
->  	$(Q)$(MAKE) $(build)=Documentation $@
+Reviewed-by: Nicolas Schier <nsc@kernel.org>
 
-Acked-by: Nicolas Schier <nsc@kernel.org>
+-- 
+Nicolas
