@@ -1,61 +1,64 @@
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 852BB2147E6
-	for <linux-kbuild@vger.kernel.org>; Fri, 10 Oct 2025 21:01:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1EEE2F6569
+	for <linux-kbuild@vger.kernel.org>; Fri, 10 Oct 2025 21:01:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760130103; cv=none; b=RNSzZx8J5R8RcYpziUjGqVnOa7EamrhICSWeCgRHhQNDSC7I3jO34RMm/snV3NJ7dxiFD8VgCGOP6z7ex3QJGlJ9fX/YXwlnjC7QyuXZk4SLA36rmhikhL/MPGzJ5+I2caBbTAKv3k/YlZhp6YqW4keMcDqRiE1wrAjmNzohJ/s=
+	t=1760130108; cv=none; b=nti2j4T2CPW51AO0qrcO1zRYdox9I+xHA7lofgfShcOPkQvWIVe0uzBflx+k0fkYIB0S199hPpNafiy90XqtatHA0rgDPO58hLQZ1UBLWEQ4+VK14wGhj9knYihPkwypkIRpm+DBqgBva3aBBrfxrY6yRKRKXCyBl603FzICaxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760130103; c=relaxed/simple;
-	bh=pNzMSoChkEhBW+/X5G6uJEBZN8r8OfLg2tfWvU2mwmc=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=MruqDQioR79iioDC1UPoe6WUL8Jt2jf2fn+qb0qW9SBVhJDEQNEHzMG+YXA8YncpdokSRaf+HtjciKp81w1vzMi+KvzScQ7yYhyTips22oTihbtr33Dh6o1k9021udHvrDMpAhldPBIFwAo0VhfvJl9gigUohgfUOWTAxiWwMnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--xur.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oVLBRLqO; arc=none smtp.client-ip=209.85.210.201
+	s=arc-20240116; t=1760130108; c=relaxed/simple;
+	bh=1tNnIlZv+wCE3kcdtXTHXlfMZ0yGaIOe9oMVqOUMQOg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Ypy6GVOUZ5rq1E8G6c3Z7feQWFvBsZSU5CQti12Ti+476rWG9YlWdfHx4xNI7l6aax6zyzSMtflzyhQizooRnPCNzpAR3FMI+FvreAGPZcrRBDBNWheuK4PR7/pvqUsdk7gcKE9O0oRW7gqwWC9rDtWRWfGgUTYV/TD2uK0R9w4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--xur.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oUhhkYu2; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--xur.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oVLBRLqO"
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7810912fc31so4512667b3a.3
-        for <linux-kbuild@vger.kernel.org>; Fri, 10 Oct 2025 14:01:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oUhhkYu2"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-330a4d5c4efso5613966a91.0
+        for <linux-kbuild@vger.kernel.org>; Fri, 10 Oct 2025 14:01:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760130102; x=1760734902; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=PsuLBV0OmF371x/EIPOn0emYjgD84JXkkOIG5F90Bro=;
-        b=oVLBRLqOet8mxj7jyyZseHV/kfd57Sou4yempgncmqeHyqX6D/kr9GpffXNqEUngvp
-         MM1d4/9V9DB83yeYpRReIW5vte63FcbUw+3BNP0g9lUed+VkPhFR+ezRFnKwrH0Q26Wk
-         wY2C5vfdNXNQZXnsL+hZQwmTh17zpldYJVzwYNxosi8VXlMcePkCC2xcEE1zBd/SfQFG
-         QgyEPZvlxziK/uUemx4jpxVGVrXPK+dNIslOihJkDafSmyxQCmTiTS28jY0FGdy6Tn0Q
-         PH7qWTD0wtDgXt7bTzNV6wL0SExBFTyxjrY3hHArg25HT1AGhl9OuxXd3I99aZuW2IcW
-         3LHw==
+        d=google.com; s=20230601; t=1760130106; x=1760734906; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HXUz0ruU1YA2Qg4rcZrXatiuVPj0CSzoMucbvJcULP4=;
+        b=oUhhkYu2mNxYWUzWWEZWYy1sWdic+tifDAj/+JqpuVKx/QrGYospqJ1S+trj7wTylQ
+         uoBHiqmGFbfWut0C9PrgjYr/mFSE1byHZeR1LFqjwaIjaq4q9bWQiV+EiGKOZnHrh6fb
+         u4dxB1WguBtzuqouhhdI/SJOwPv/Aj5lEMlwt27IFeQb8j37oJ1VQRj8mbUTow066V1U
+         I1O27QXVC/3B1+EA7VRGDshLSTsg6wWJqKqQPAba7yFgfctg3idV14zK9NKJ8Tm61dzW
+         SVTit7JTBxUXKYF9g1QLaQUZXpDFitbYHfJbdT/7kh1Aa0Z6PhIE2l902Ot7TsTr5C4B
+         54lg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760130102; x=1760734902;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=PsuLBV0OmF371x/EIPOn0emYjgD84JXkkOIG5F90Bro=;
-        b=hEV2dtSN8Htf0ayQ3+ba8Ig0xeFWwJv4jG7u1NCR0xiXe0vo7LVgA3nm0JWeXSxaXg
-         AIwiHdGbbSrv3vJF3dMrhv7N964XNHuD18gcckMb3THxRHEOBMwit4PrkVI+UdlIT/kk
-         ZHRKx/i/5uHdzByq1FzRBijkLg4eHzPdqU69rxIAXsohmWQUZBB79pMSL1tA0Y6UCArK
-         hzagg0tQcurbyjbhbMMVCBBhTZr1MTFCt2UQ3QUXPe5sztWKvjNvLMTGmazjpLMD0DXp
-         5MSR3O/ELGbYdJI6x+WVQN7TIjm/uJNfiN5K53D5zwW1UKdJHTqVfjlHt0gkU5IU3ZOE
-         cpnA==
-X-Gm-Message-State: AOJu0Yz1v7uPmeQk8C3O8r3c+ni9f0AJvVo3qHMJpMpWEj5dIu03NaAQ
-	tGcJgFlItOSTQ37stwBfrpddgvPlCpwqyYF+KyGLbP4NJmrX8MFGqTPlvYU/+ezlJSMIxA==
-X-Google-Smtp-Source: AGHT+IHz67BmbDRz7vaXdynm75bczZlJMUZRCdI88KE42hQdLfMx12/LTYPHuhem6rl8rxKh1lPnTUw=
-X-Received: from pga9.prod.google.com ([2002:a05:6a02:4f89:b0:b65:2c4c:b5ae])
- (user=xur job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:72a2:b0:32b:6e33:7cf8
- with SMTP id adf61e73a8af0-32da83e0614mr18673280637.42.1760130101786; Fri, 10
- Oct 2025 14:01:41 -0700 (PDT)
-Date: Fri, 10 Oct 2025 21:01:31 +0000
+        d=1e100.net; s=20230601; t=1760130106; x=1760734906;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HXUz0ruU1YA2Qg4rcZrXatiuVPj0CSzoMucbvJcULP4=;
+        b=YLS315obzzTh856eu1zaJUx27AslNC4oKFQZkmpzdlcO3Z2mVf2r1SkZ2izq7rGfGg
+         d7XRG2Ckwqg1KdbE89Ajuxl2FjvmJYPCAR0nfpuNfdl4cXGHJZoHVaJusgvT3pfluMsS
+         r5L/cN47JsjUkhpsL42lM7s3Vkaf6norkwLJgTrE05KryZNNSQgJ0tcSnUId+dCMDFGz
+         kwu4hcl+HRxg6ArkIWjvT+6X2O6mErOCEJ0NPAF1A5XfZXd+hIPp58q6w+KuZ0dZ9WXD
+         LsLGIyLpQFtNtRIZ1rU0DYR8MzJwyxrn15TZK76m9rQpmWoVnSICwqyvnIcAw+vSiqeB
+         KU6g==
+X-Gm-Message-State: AOJu0YzaYfyWVEShsyBFYfBU7SoXAhW8AbeVu5Ah7/nqJswueqlqo5Cr
+	LSiHdfJpvOfm0MM/H7X9hJoQNP1JcuuEI34rfE0a0qmcKZQxL73M9clIrDg3GCSg5L1jqA==
+X-Google-Smtp-Source: AGHT+IEL18I3C/IsW+RSJN6mqkTxkt6ylMjhVG9XKQ6e/h83iNo20YGDVvCHYqnvKVi3lRioj4PMQpE=
+X-Received: from plat12.prod.google.com ([2002:a17:902:e1cc:b0:267:fa7d:b637])
+ (user=xur job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3148:b0:327:e59d:2cc2
+ with SMTP id 98e67ed59e1d1-33b51148bcbmr17641763a91.10.1760130105796; Fri, 10
+ Oct 2025 14:01:45 -0700 (PDT)
+Date: Fri, 10 Oct 2025 21:01:33 +0000
+In-Reply-To: <20251010210134.2066321-1-xur@google.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20251010210134.2066321-1-xur@google.com>
 X-Mailer: git-send-email 2.51.0.740.g6adb054d12-goog
-Message-ID: <20251010210134.2066321-1-xur@google.com>
-Subject: [PATCH 1/4] kbuild: Fix Propeller flags
+Message-ID: <20251010210134.2066321-3-xur@google.com>
+Subject: [PATCH 3/4] kbuild: Remove MFS flags from Propeller profile generate builds
 From: xur@google.com
 To: Alexey Gladkov <legion@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
 	Ard Biesheuvel <ardb@kernel.org>, Bill Wendling <morbo@google.com>, Han Shen <shenhan@google.com>, 
@@ -74,25 +77,40 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Rong Xu <xur@google.com>
 
-Fix the code to enable/disable Propeller build flags to be
-consistent with the documentation.
+Propeller profile generation requires Machine Function Splitter (MFS)
+to be disabled.
 
 Signed-off-by: Rong Xu <xur@google.com>
 ---
- scripts/Makefile.lib | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/Makefile.propeller | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 1d581ba5df66f..53c02fc3b348a 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -121,7 +121,7 @@ endif
- #
- ifdef CONFIG_PROPELLER_CLANG
- _c_flags += $(if $(patsubst n%,, \
--	$(AUTOFDO_PROFILE_$(target-stem).o)$(AUTOFDO_PROFILE)$(PROPELLER_PROFILE))$(is-kernel-object), \
-+	$(PROPELLER_PROFILE_$(target-stem).o)$(PROPELLER_PROFILE)$(is-kernel-object)), \
- 	$(CFLAGS_PROPELLER_CLANG))
+diff --git a/scripts/Makefile.propeller b/scripts/Makefile.propeller
+index fa018098506b8..8c3e514dbcc04 100644
+--- a/scripts/Makefile.propeller
++++ b/scripts/Makefile.propeller
+@@ -13,8 +13,14 @@ else
+   else
+     CFLAGS_PROPELLER_CLANG := -fbasic-block-sections=labels
+   endif
++  # Disable Machine Function Splitter for Propeller.
++  # Propeller profile generation requires Machine Function Splitter to be disabled.
++  # We use -fno-split-machine-functions to override any prior AutoFDO/PGO flags
++  #(in Makefile.lib), assuming Propeller options are applied afterward.
++  CFLAGS_PROPELLER_CLANG += -fno-split-machine-functions
+ endif
+ 
++
+ # Propeller requires debug information to embed module names in the profiles.
+ # If CONFIG_DEBUG_INFO is not enabled, set -gmlt option. Skip this for AutoFDO,
+ # as the option should already be set.
+@@ -33,6 +39,8 @@ ifdef CONFIG_LTO_CLANG_THIN
+     else
+        _ldflags_propeller += --lto-basic-block-sections=labels
+     endif
++    # Again, we need to disable Machine Function Splitter.
++    LDFLAGS_vmlinux := $(filter-out -plugin-opt=-split-machine-functions, $(LDFLAGS_vmlinux))
+   endif
  endif
  
 -- 
