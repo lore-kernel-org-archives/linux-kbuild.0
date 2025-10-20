@@ -1,129 +1,234 @@
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9724F1B7F4
-	for <linux-kbuild@vger.kernel.org>; Mon, 20 Oct 2025 19:48:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 362CA20966B;
+	Mon, 20 Oct 2025 22:01:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760989729; cv=none; b=lgOoR1xXBxpfwyBIhR5u0jtab2Y3JO3uQWIbWoudNMyRPZWnO1sgjHogZLgNBqCcPi2AUtWJqXs8sN/RHbZjn/SOOGHbqzplOuRFXm1pBReEYAblsG6dLefqOsWFFn3F9qvYfVjB1COEnJL5Hx6ZEMqY2qZtfuowiajm1DDnUwo=
+	t=1760997679; cv=none; b=mu/SWYuimaMzUh/1keCRJ9edZ0c0SWNqVauSfkf+ohQ1mNav2kHudYedcscpHN72GNLa4NeRSNnJKFqQX7FgIoKADQfEmF28UFjmEccg6yRD+ddI2sBA+eTepeZ861ksa6yeypXPjSnINJWrCNX9VcSarAnOZCv65wsIQJAtbHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760989729; c=relaxed/simple;
-	bh=MgGpsHbRyLLEuSO5v1+IPH3mXujQi4ThCOVYq9DwidM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WbPS0vn7UN00Ki0pHMjNWJ/ZxH9QQsqKTPQZ9vL+tYo6bFjYIg9WtXkp1bEPmNv8Dz6J3zri8iJa/4VPT78omuybUuDxXQFSZcZrEB1+vz3BXWq76wwLCZryvk0ARH5WEKg7gQpBdqrN8jR4bAfomasaN5XfBp5C4AKC5ogYmUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=dOz6CSTW; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	s=arc-20240116; t=1760997679; c=relaxed/simple;
+	bh=/jk04nuQCuJInz/KNpaoxJIfVcgkemJOGj6M7ncv4Qs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=ZQfJ+dUIjxZzDJQ0jV5M/4oOSqZRVOnTUet7hWQGk9JUKKGxab883UNVo/xw29KF0LEpowrt0LS3SWHtLbLyxtlvOwrQWILvrHcWKcxwNGb9m2G7tXDjAUcWkug3MI4UQZLGSDm0sFDxBT5r7siajb6OFKkytvdc79QSdiUSKKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dVxw38Ss; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="dOz6CSTW"
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b40f11a1027so943644266b.2
-        for <linux-kbuild@vger.kernel.org>; Mon, 20 Oct 2025 12:48:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1760989726; x=1761594526; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=NptN9BDkwDpbcOFbQiGabvU6AAsiO9hE4CrjxRY1XC0=;
-        b=dOz6CSTWYXVxQsGMGkpUXnyayS2S70l/nSvjKXfe/OEs19ry23HhsRoO0/Fg06LvB9
-         ueX6vdqijllH1b3IsfGyOyLlSGzNG2kPgI+nfS/4G57LtRke23SxeSKcaWur9c9c3yaH
-         Mq/e16bOdRR6Mzgbff5hSI5KsbzslNGP4c4IM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760989726; x=1761594526;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NptN9BDkwDpbcOFbQiGabvU6AAsiO9hE4CrjxRY1XC0=;
-        b=ltOVzkx4RVRnV5ItO+Oc648yoPbj9rM9IRpe27TRJEzXRZIoqZLOdGg51orqOKgKIt
-         bZ9vluccJaoQH5mjj/OKCbdaC+KfNZ78dwVXyAp+rQPXwqk2D8YACOo/DaDXqip9mOBi
-         lP6H+48J4t0jlOpMp1stC1nf1aUXPfeDk0ciECaUk7+3nFU1g1nxuCG/SVQZuh97HvRP
-         zPRlE+9u2Gvc67PoZyaC9u4h5SzXtZxU03qVHN8xH7kOYN5R92zEptLfM/VAOU2FEZxJ
-         6BXCsjipT+eg1JFE1YKKL8/aohwsfuU9/UsFcV9udyduMH889OBd/pEVSYs5Y5NY9gYl
-         22ow==
-X-Forwarded-Encrypted: i=1; AJvYcCVUKF7lGer0NR9k8nshLxnHuO22LN3HaHi7VDA0SdKeVHjcBrFvmkls13vdM+purJ2U7cGLN2YJJB2sk9E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwATfRw4F+tFv8b0ZZfhix5hsdO1AYRA4UKl5Oct8xyZ2Ud1HH/
-	hl31TyhSs0uz/WA4NkBnPX2J2LlfCkq+mkt9KhIaylthTEf9RLUCW+sx27UpcZF/k2Xlxg1iB5Q
-	BzuEhRoA=
-X-Gm-Gg: ASbGncsbsSokQxj0qLR2hyTi9f8c/jqW+CvxuKKrlAgcrVppnxE3QJJ8G1cqnhyGDR7
-	/qwqOmLrwdpX4bck38+5BcsPITNfRowOMaW3mF+I+MB9DPNGYlzjsMzAGZxOtwlKwOzNdxZ3c51
-	6wTMQCGdUXaWBKCuBsuBlEQI+1TBZGPyw6aO+mN+GmAqOoXcS4YtAtENhZTKPilRzw3l94zzwij
-	pzJNMS/zW2QLnWQqGsJ4+koAEpSI19pdLt8l+yW3ZR/AZxSucmrThqRU9Ysn0qNVQKJAvXGdhgu
-	CqyQg7BIka6ErY9eSEceuFu9pIAKrnxFIR/KkFUUuEmpLZRX0Cv2XC1oAyHK1GDvjD4LzQ7C6vn
-	YBlJZJjyNDPd4MnhL4Dt6QMxS/PH54DIf3q1UGqtjI467gJ6S27DphlC0hYgocvfDzXcw0iEYU6
-	Pp6Xsnq1D67/lWWd7wrX+PUpN6XbLy61r+DJGeh+irIHwejxbGug==
-X-Google-Smtp-Source: AGHT+IHBmHxXh+Ep16Y90UKrj+VbVSBCDFt1UguCMHKZMVe4N+XxV82UHfZKCC+q3rlFfCCczxte8g==
-X-Received: by 2002:a17:907:d06:b0:b43:b740:b35d with SMTP id a640c23a62f3a-b6474b36015mr1646185266b.33.1760989724099;
-        Mon, 20 Oct 2025 12:48:44 -0700 (PDT)
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com. [209.85.208.46])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b65e7da33d1sm869587766b.7.2025.10.20.12.48.42
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Oct 2025 12:48:42 -0700 (PDT)
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-63d6ee383bdso478261a12.2
-        for <linux-kbuild@vger.kernel.org>; Mon, 20 Oct 2025 12:48:42 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUHlp6T2I4ixw4oJAJ8qdHg8gau1+1GZl0CUqCquUjVQ673MV5nu79GdUtFIT9wuqwq22PoYopjfE3L1u8=@vger.kernel.org
-X-Received: by 2002:a05:6402:4407:b0:63c:eb9:4778 with SMTP id
- 4fb4d7f45d1cf-63c1f626e36mr13356445a12.1.1760989722393; Mon, 20 Oct 2025
- 12:48:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dVxw38Ss"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5B51C113D0;
+	Mon, 20 Oct 2025 22:01:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760997678;
+	bh=/jk04nuQCuJInz/KNpaoxJIfVcgkemJOGj6M7ncv4Qs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=dVxw38SsaEBpGnRxtU9fHqd60UIUWUzTHw2ty+G4BbTMWORiV4MyiTJpF4KvhA6HZ
+	 rK9O1qOcWPaMXfeuHLiq0Bg8hKfdQXw9y8RkDHhh1iGeRwrutb187DsBvlrr90Q0Yq
+	 UBCTl/Nhx7ZnlWdgXKJei3iaZ4IrEpPJnszNExWSnU6rT64deH90moN6HekTC4upNz
+	 ZE93XY/NHce1wV/p7KSNacI805banw6BNKIzg6mRncZBrnhhXoeEl7uIHg5hp7y7ZY
+	 ddd3VWurUVb14fYcAjR71HOJH+00gBMsy5hJa9Zq6tBdO0P9XtEZQLSKlyuP9lrhdq
+	 GrNIDqrpXG13g==
+From: Kees Cook <kees@kernel.org>
+To: Miguel Ojeda <ojeda@kernel.org>
+Cc: Kees Cook <kees@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Marco Elver <elver@google.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	llvm@lists.linux.dev,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Jan Kara <jack@suse.cz>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Shuah Khan <shuah@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
+	Tamir Duberstein <tamird@gmail.com>,
+	Michael Kelley <mhklinux@outlook.com>,
+	kernel test robot <lkp@intel.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Uros Bizjak <ubizjak@gmail.com>,
+	Jan Hendrik Farr <kernel@jfarr.cc>,
+	Yafang Shao <laoar.shao@gmail.com>,
+	Marc Herbert <Marc.Herbert@linux.intel.com>,
+	Christopher Ferris <cferris@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Tejun Heo <tj@kernel.org>,
+	Jeff Xu <jeffxu@chromium.org>,
+	=?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Brian Gerst <brgerst@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kbuild@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH 1/3] compiler_types: Introduce __counted_by_ptr()
+Date: Mon, 20 Oct 2025 15:01:15 -0700
+Message-Id: <20251020220118.1226740-1-kees@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20251020220005.work.095-kees@kernel.org>
+References: <20251020220005.work.095-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251020142228.1819871-1-linux@rasmusvillemoes.dk> <20251020142228.1819871-3-linux@rasmusvillemoes.dk>
-In-Reply-To: <20251020142228.1819871-3-linux@rasmusvillemoes.dk>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Mon, 20 Oct 2025 09:48:25 -1000
-X-Gmail-Original-Message-ID: <CAHk-=wgHLkpQAEDpA9pwXp_oteWkdcs-56m7rnQD=Th0N2sW9g@mail.gmail.com>
-X-Gm-Features: AS18NWDyOPEZYLlpZ_IDtTxJF93fgCvTBpU4BXYpNtKXdpZRRnqLlSITzLAUJMM
-Message-ID: <CAHk-=wgHLkpQAEDpA9pwXp_oteWkdcs-56m7rnQD=Th0N2sW9g@mail.gmail.com>
-Subject: Re: [PATCH 2/2] btrfs: send: make use of -fms-extensions for defining
- struct fs_path
-To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Cc: David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org, 
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
-	linux-kbuild@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5213; i=kees@kernel.org; h=from:subject; bh=/jk04nuQCuJInz/KNpaoxJIfVcgkemJOGj6M7ncv4Qs=; b=owGbwMvMwCVmps19z/KJym7G02pJDBnfNuq8mHjJ6c3aRUtcjppaq+Zv9Uh+dn63Am9N/aT/H Bkcr3e/6ShlYRDjYpAVU2QJsnOPc/F42x7uPlcRZg4rE8gQBi5OAZiI+1lGhruzI19PnOUiJKb2 9kFKjBXH8+zPFi2rGKLSSzfFTHrxPpKR4ckJ1sSFxw6u68oRYcwszNzRt6CJ5b1t9ZuKQ3PZu+c eZQMA
+X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
+Content-Transfer-Encoding: 8bit
 
-On Mon, 20 Oct 2025 at 04:22, Rasmus Villemoes <linux@rasmusvillemoes.dk> wrote:
->
-> +struct __fs_path {
-> +       char *start;
-> +       char *end;
-> +
-> +       char *buf;
-> +       unsigned short buf_len:15;
-> +       unsigned short reversed:1;
-> +};
-> +static_assert(sizeof(struct __fs_path) < 256);
->  struct fs_path {
-> +       struct __fs_path;
-> +       /*
-> +        * Average path length does not exceed 200 bytes, we'll have
-> +        * better packing in the slab and higher chance to satisfy
-> +        * an allocation later during send.
-> +        */
-> +       char inline_buf[256 - sizeof(struct __fs_path)];
->  };
+Introduce __counted_by_ptr(), which works like __counted_by(), but for
+pointer struct members:
 
-It strikes me that this won't pack as well as it used to before the change.
+struct foo {
+	int a, b, c;
+	char *buffer __counted_by_ptr(bytes);
+	short nr_bars;
+	struct bar *bars __counted_by_ptr(nr_bars);
+	size_t bytes;
+};
 
-On 64-bit architectrures, 'struct __fs_path' will be 8-byte aligned
-due to the pointers in it, and that means that the size of it will
-also be aligned: it will be 32 bytes in size.
+Since "counted_by" can only be applied to pointer members in very recent
+compiler versions, its application ends up needing to be distinct from
+flexible array "counted_by" annotations, hence a separate macro.
 
-So you'll get 256-32 bytes of inline_buf.
+Unfortunately, this annotation cannot be used for "void *" members
+(since such a member is considered a pointer to an incomplete type,
+and neither Clang nor GCC developers could be convinced otherwise[1],
+even in the face of the GNU extension that "void *" has size "1 byte"
+for pointer arithmetic). For "void *" members, we must use the coming
+"sized_by" attribute.
 
-And it *used* to be that 'inline_buf[]' was packed righ after the
-16-bit buf_len / reversed bits, so it used to get an extra six bytes.
+Link: https://gcc.gnu.org/pipermail/gcc-patches/2025-May/683136.html [1]
+Signed-off-by: Kees Cook <kees@kernel.org>
+---
+Cc: Miguel Ojeda <ojeda@kernel.org>
+Cc: Nathan Chancellor <nathan@kernel.org>
+Cc: Nick Desaulniers <nick.desaulniers+lkml@gmail.com>
+Cc: Bill Wendling <morbo@google.com>
+Cc: Justin Stitt <justinstitt@google.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Marco Elver <elver@google.com>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: Johannes Weiner <hannes@cmpxchg.org>
+Cc: <llvm@lists.linux.dev>
+---
+ init/Kconfig                   | 11 +++++++++++
+ Makefile                       |  4 ++++
+ include/linux/compiler_types.h | 21 ++++++++++++++++++++-
+ include/uapi/linux/stddef.h    |  4 ++++
+ 4 files changed, 39 insertions(+), 1 deletion(-)
 
-I think it could be fixed with a "__packed" thing on that inner
-struct, but that also worries me a bit because we'd certainly never
-want the compiler to generate the code for unaligned accesses (on the
-broken architectures that would do that). You'd then have to mark the
-containing structure as being aligned to make compilers generate good
-code.
+diff --git a/init/Kconfig b/init/Kconfig
+index cab3ad28ca49..54691b086bc6 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -139,6 +139,17 @@ config CC_HAS_COUNTED_BY
+ 	# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=108896
+ 	default y if CC_IS_GCC && GCC_VERSION >= 150100
+ 
++config CC_HAS_COUNTED_BY_PTR_BARE
++	def_bool $(success,echo 'struct foo { int *ptr __attribute__((__counted_by__(count))); int count; };' | $(CC) $(CLANG_FLAGS) -x c - -c -o /dev/null -Werror)
++
++config CC_HAS_COUNTED_BY_PTR_EXP
++	def_bool $(success,echo 'struct foo { int *ptr __attribute__((__counted_by__(count))); int count; };' | $(CC) $(CLANG_FLAGS) -fexperimental-late-parse-attributes -x c - -c -o /dev/null -Werror)
++	depends on !CC_HAS_COUNTED_BY_PTR_BARE
++
++config CC_HAS_COUNTED_BY_PTR
++	def_bool y
++	depends on CC_HAS_COUNTED_BY_PTR_BARE || CC_HAS_COUNTED_BY_PTR_EXP
++
+ config CC_HAS_MULTIDIMENSIONAL_NONSTRING
+ 	def_bool $(success,echo 'char tag[][4] __attribute__((__nonstring__)) = { };' | $(CC) $(CLANG_FLAGS) -x c - -c -o /dev/null -Werror)
+ 
+diff --git a/Makefile b/Makefile
+index d14824792227..1b297dcbb0df 100644
+--- a/Makefile
++++ b/Makefile
+@@ -933,6 +933,10 @@ KBUILD_CFLAGS	+= $(CC_AUTO_VAR_INIT_ZERO_ENABLER)
+ endif
+ endif
+ 
++ifdef CONFIG_CC_HAS_COUNTED_BY_PTR_EXP
++KBUILD_CFLAGS	+= -fexperimental-late-parse-attributes
++endif
++
+ # Explicitly clear padding bits during variable initialization
+ KBUILD_CFLAGS += $(call cc-option,-fzero-init-padding-bits=all)
+ 
+diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
+index 59288a2c1ad2..f197ea03b593 100644
+--- a/include/linux/compiler_types.h
++++ b/include/linux/compiler_types.h
+@@ -353,11 +353,14 @@ struct ftrace_likely_data {
+ #endif
+ 
+ /*
++ * Runtime track number of flexible array member elements for use by
++ * CONFIG_FORTIFY_SOURCE and CONFIG_UBSAN_BOUNDS.
++ *
+  * Optional: only supported since gcc >= 15
+  * Optional: only supported since clang >= 18
+  *
+  *   gcc: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=108896
+- * clang: https://github.com/llvm/llvm-project/pull/76348
++ * clang: https://clang.llvm.org/docs/AttributeReference.html#counted-by-counted-by-or-null-sized-by-sized-by-or-null
+  *
+  * __bdos on clang < 19.1.2 can erroneously return 0:
+  * https://github.com/llvm/llvm-project/pull/110497
+@@ -371,6 +374,22 @@ struct ftrace_likely_data {
+ # define __counted_by(member)
+ #endif
+ 
++/*
++ * Runtime track number of objects pointed to by a pointer member for
++ * use by CONFIG_FORTIFY_SOURCE and CONFIG_UBSAN_BOUNDS.
++ *
++ * Optional: only supported since gcc >= 16
++ * Optional: only supported since clang >= 20
++ *
++ *   gcc: https://gcc.gnu.org/pipermail/gcc-patches/2025-April/681727.html
++ * clang: ...
++ */
++#ifdef CONFIG_CC_HAS_COUNTED_BY_PTR
++# define __counted_by_ptr(member)	__attribute__((__counted_by__(member)))
++#else
++# define __counted_by_ptr(member)
++#endif
++
+ /*
+  * Optional: only supported since gcc >= 15
+  * Optional: not supported by Clang
+diff --git a/include/uapi/linux/stddef.h b/include/uapi/linux/stddef.h
+index 9a28f7d9a334..111b097ec00b 100644
+--- a/include/uapi/linux/stddef.h
++++ b/include/uapi/linux/stddef.h
+@@ -72,6 +72,10 @@
+ #define __counted_by_be(m)
+ #endif
+ 
++#ifndef __counted_by_ptr
++#define __counted_by_ptr(m)
++#endif
++
+ #ifdef __KERNEL__
+ #define __kernel_nonstring	__nonstring
+ #else
+-- 
+2.34.1
 
-So either you lose some inline buffer space, or you end up having to
-add extra packing stuff. Either way is a bit of a bother.
-
-                  Linus
