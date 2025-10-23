@@ -1,41 +1,75 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F45430147E
-	for <linux-kbuild@vger.kernel.org>; Wed, 22 Oct 2025 21:22:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CB7535971;
+	Thu, 23 Oct 2025 00:47:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761168144; cv=none; b=jECBWuMA23I35av6T+3TaOYm22HfybvRQ5Ya+2eHNZYOcF+XVMZh4u7cNsyN5/VVi3GO1mVMs8jwTKR/i7R0NoN0exR3OZIXqOL6/VJks8TAeP1JPlavIUn7eVDP8fGWDRTNe9gCvQe3d2MiOij11HKN4D0n0y8pvO+I+H5M9k4=
+	t=1761180464; cv=none; b=sXP+DUQmNf6poApR+Ui5V4w5gNlGyyBK1L8mynlDSiCx+giZDJ4U8wm+vecXf/M3tLH+HKzx39B04U3vUFZklhfPVRfokRVwd0NHzGAlx7ginMmFMLtfPPQ08G2+6tnrNpsUMtPcTe+zthnaPcT9+dUQOVlMJjqpsPP0ZI+Y/7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761168144; c=relaxed/simple;
-	bh=wqIOzERtPFwQCr8wm9Br9AuomkrkgQs8SpouizTtC4I=;
+	s=arc-20240116; t=1761180464; c=relaxed/simple;
+	bh=x9rSFwmVcc1dqviTA6H/hsJMHWMdaIFdGDx7xFW94uM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r6AERLT+OYKF2iD1HhTamYeTnVEO5G996UgKNikb0DTm6E70Ob81QvWGXLBktGwDWhutikV3+/6XJyo9M778wCba0ieV50XV9BoatkpiXYmnXpX/teH6n55hV6zmKTcHCnSy3ued2NgEBkZmMo4bbgxUDOEJ0IKNjSIrL9JLfqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AGDyutDh; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=TFmXG/uZfg2RvoZznKZHqLUMsmQHX8ENqd+PHVUrJ/A6Wj2g3407zEbePuMQmZ+Jie4XAvGog5AJ2SF/xF6m+Q4Oz4bQ71pgWtiZ1IRCZ+OZReenVFg7K/C8tNrfSueXiU2eP3N7LM1nJfk3yXz0O2UscMJfjcppTINmU/tMmh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m8kpsJdF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AGDyutDh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41E51C4CEE7;
-	Wed, 22 Oct 2025 21:22:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m8kpsJdF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09DA9C4CEE7;
+	Thu, 23 Oct 2025 00:47:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761168143;
-	bh=wqIOzERtPFwQCr8wm9Br9AuomkrkgQs8SpouizTtC4I=;
+	s=k20201202; t=1761180464;
+	bh=x9rSFwmVcc1dqviTA6H/hsJMHWMdaIFdGDx7xFW94uM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AGDyutDh4I3Peo/mBijSf7P/0PqrM0m+BDcJ+h4Wa7LumPhq1OYTnVDmXxrvg1hcZ
-	 1NtJpJqS9flLlXwQTyuEsqBKcPumEe95yMGWaP3yUL3jZBUhgDkYp8k3rO83VrZMFI
-	 NNoCzEGim7r14stv3Bq2Tjpp2XAaQBmsylQg4ut42kR8wb5tydxgvobNqR27aN51ZA
-	 bVl1HryBCjlxasldjndr6OEyu1ABBqmfuzL/r7PRVbEdY+eg2MAFFzEAiFFOiUmw3n
-	 J4BNmHOm++YC0kUEYJES2wzYrLNaRKNUWC4Dn+2csOtAS6E+9qGrsu1vkPlsht2XTj
-	 JvBvtTSZQWjdg==
-Date: Wed, 22 Oct 2025 22:48:28 +0200
-From: Nicolas Schier <nsc@kernel.org>
-To: James Le Cuirot <chewi@gentoo.org>
-Cc: linux-kbuild@vger.kernel.org, Nathan Chancellor <nathan@kernel.org>,
+	b=m8kpsJdF4vUC1ysDarElbHTVBNPhQ4Os5dHN8IFNM36jK6EYrm0/27DnzrFm6FqBw
+	 ICkkcf2X0ed/Ch5CddqCNMblqtvRvRvRJd0vNiz7aNjcGZroYxm0qt2vFydOLoL14c
+	 oztNEWWSPZLJYjhMG6SAepWYWAnBGXgX9BXpuFikHw1lF5HpFLXgB3Pc0fnpyjQPH5
+	 OacjHZ1jODozGTrtkFMPjlTE1WfmdfqtrTpjEwst8ncCRH2KClWMwCQ+pE3Pj4V7zb
+	 /f6kL8pWuUcYyvSkDIYiQo48r2CY2oQOlgg7dqLuoU2IWC7k1mH28oxtPkrVR746ME
+	 F7hdchGd36MgA==
+Date: Wed, 22 Oct 2025 17:47:43 -0700
+From: Kees Cook <kees@kernel.org>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Marco Elver <elver@google.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
 	Masahiro Yamada <masahiroy@kernel.org>,
-	Inochi Amaoto <inochiama@gmail.com>
-Subject: Re: [PATCH] kbuild: install-extmod-build: Fix when given dir outside
- the build dir
-Message-ID: <aPlDHJUJZaRxupeI@levanger>
-References: <20251016091417.9985-1-chewi@gentoo.org>
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Johannes Weiner <hannes@cmpxchg.org>, llvm@lists.linux.dev,
+	Al Viro <viro@zeniv.linux.org.uk>, Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Shuah Khan <shuah@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>,
+	Tamir Duberstein <tamird@gmail.com>,
+	Michael Kelley <mhklinux@outlook.com>,
+	kernel test robot <lkp@intel.com>,
+	Heiko Carstens <hca@linux.ibm.com>, Uros Bizjak <ubizjak@gmail.com>,
+	Jan Hendrik Farr <kernel@jfarr.cc>,
+	Yafang Shao <laoar.shao@gmail.com>,
+	Marc Herbert <Marc.Herbert@linux.intel.com>,
+	Christopher Ferris <cferris@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Paolo Abeni <pabeni@redhat.com>, Tejun Heo <tj@kernel.org>,
+	Jeff Xu <jeffxu@chromium.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Brian Gerst <brgerst@gmail.com>, linux-kernel@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH 1/3] compiler_types: Introduce __counted_by_ptr()
+Message-ID: <202510221746.7C09BBE@keescook>
+References: <20251020220005.work.095-kees@kernel.org>
+ <20251020220118.1226740-1-kees@kernel.org>
+ <20251021095447.GL3245006@noisy.programming.kicks-ass.net>
+ <202510211210.84D670D1C@keescook>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -44,21 +78,26 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251016091417.9985-1-chewi@gentoo.org>
+In-Reply-To: <202510211210.84D670D1C@keescook>
 
-On Thu, Oct 16, 2025 at 10:14:17AM +0100, James Le Cuirot wrote:
-> Commit b5e395653546 ("kbuild: install-extmod-build: Fix build when
-> specifying KBUILD_OUTPUT") tried to address the "build" variable
-> expecting a relative path by using `realpath --relative-base=.`, but
-> this only works when the given directory is below the current directory.
-> `realpath --relative-to=.` will return a relative path in all cases.
-> 
-> Fixes: b5e395653546 ("kbuild: install-extmod-build: Fix build when specifying KBUILD_OUTPUT")
-> Signed-off-by: James Le Cuirot <chewi@gentoo.org>
-> ---
->  scripts/package/install-extmod-build | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Tue, Oct 21, 2025 at 12:24:05PM -0700, Kees Cook wrote:
+> On Tue, Oct 21, 2025 at 11:54:47AM +0200, Peter Zijlstra wrote:
+> > > [...]
+> > > Unfortunately, this annotation cannot be used for "void *" members
+> > > (since such a member is considered a pointer to an incomplete type,
+> > > and neither Clang nor GCC developers could be convinced otherwise[1],
+> > > even in the face of the GNU extension that "void *" has size "1 byte"
+> > > for pointer arithmetic). For "void *" members, we must use the coming
+> > > "sized_by" attribute.
+> > 
+> > So why do we need both __counted_by_ptr() and this __sized_by(), won't
+> > one be good enough?
+> [...]
+> Let me take another stab at it...
 
-Thanks!
+It seems this will be acceptable as long as it is gated by GNU
+extensions. GCC patch in progress. Clang PR here:
+https://github.com/llvm/llvm-project/pull/163698
 
-Reviewed-by: Nicolas Schier <nsc@kernel.org>
+-- 
+Kees Cook
