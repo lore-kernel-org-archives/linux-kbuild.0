@@ -1,174 +1,122 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C485341642;
-	Wed, 12 Nov 2025 14:45:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FBB72D130C;
+	Wed, 12 Nov 2025 16:48:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762958731; cv=none; b=ZWQk9UWlNF3UOZTaGncnNR2O3VARQbaRZSacdFpLAk3JVfXTy+jJsravbEBuLECGCnj9ZxCIPYd0ganCGmHTq92RtvPeuji/0mZ5XZnlkrdHa8hKgO50JRmBYxU+kRzNrVXquxWOeCBXwGAuX1NArmgYZKRmyvrdVZn9mBkYQ7s=
+	t=1762966103; cv=none; b=K8yoONJ96WlAk3Q/ktvhots212ElYcGNoCE+RoUOMVPcLehHGbqcq7h0X2SttK2U/UpAhLF4ZOn5kJqZXGdvkx3ODc+1/tPt9gMaxMzKBcmDSKwVrAdvF2sb3oBDVzx4pDOfcoDOdbBxB9d8/lbWkH6w5c0bZy5SyGwaDdeGqUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762958731; c=relaxed/simple;
-	bh=ZTNyhNFf+p9S6BsXERBUufVxby0L/rriRpDnCjmebu0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Y+HfB4367+6JE4M6txICxo34XPeUx+Bjo6QFObxj/pylCgURepi/rwq+WYC/gF4lMtGI8nyLzd3owH3ARxIqJdgYoAAFhl+h/SPha/g/T0ujmyHpB9aurNCE1ArQJTkSAVJRehyXJOk4Ahd7+xISlNIjq6Zdr86WZij4asE2Df8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c+eWFXLV; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762966103; c=relaxed/simple;
+	bh=jNXBwcauIctGxZlYI7hnjg2/rQapqiJy1yTJJHRlDGo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tAxLyoWJ1pdzEKKiacUOX7XW0GTgL/25lO4mQpZOtgvgIpFhgYwlONIUrdfw727kO9UIUE4dmq7l5phgJeGQinvQdtF9a4u36pOy2c2amAswWgtFtx897JrNwnyyJP7H4+sInwf81QLFCDiRFnXWJanYKfYwRxSC81vJfZS0GA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ONiq9J/n; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c+eWFXLV"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 30C6DC4CEF1;
-	Wed, 12 Nov 2025 14:45:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ONiq9J/n"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FFDEC4CEF7;
+	Wed, 12 Nov 2025 16:48:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762958731;
-	bh=ZTNyhNFf+p9S6BsXERBUufVxby0L/rriRpDnCjmebu0=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=c+eWFXLVVteOvv4fIzjsKblkThHYhc5ibkkgVCrxCYjAbRU9sZvC0W2NsRkPWDD7L
-	 wuClsqH0O8DEEqHgFdIYFdlSUl8pHqEd304fkB9tzkRiyoAB3sB227XVjrFfmi+Qfc
-	 W6BYl+TaXj5RSovSCewKJgS5/LMm2qCcM7+oVgBhmZMprkoCCcFiahsh7l3EsTaEh5
-	 VILyCGIZl0HDu9lhuqQiv6fwfsI4uhB8L1aV02m+vxyXbd2nlqO9Gjk11WMHjA4kcL
-	 64fIVPVSnsjRLCIoljDLNCShdloLJoEoCYX4DyXAC9QVKtTOC6gSiNl1vsCeeBB57k
-	 JVQBrC2Wh7H8g==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28BEBCD13D3;
-	Wed, 12 Nov 2025 14:45:31 +0000 (UTC)
-From: Manivannan Sadhasivam via B4 Relay <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org>
-Date: Wed, 12 Nov 2025 20:15:17 +0530
-Subject: [PATCH 5/9] serdev: Add modalias support for serdev client devices
+	s=k20201202; t=1762966102;
+	bh=jNXBwcauIctGxZlYI7hnjg2/rQapqiJy1yTJJHRlDGo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ONiq9J/nOYCU6JIsjV6en5nGh0WX/LkzKvKhs2tOxHnJZu1BLYUBrLW7EIBnRHqnZ
+	 4FSoHQxhcCyhy+XBsZB6lDf2/Bj4kIBQ5WtQ1+uHvBnl+jOt1nEeSujImRug3xm567
+	 LMtGvGIk4oDbA4tUk4Yb+6+tI2l2UlYfLlhvSAU6PBwMJR/pyiWfa666NNXxH0caSo
+	 rgORdw8NH66/Wc8d9DW/n+pHGysjx6oMdla5IHnxk9x97UrvW7bXx1U6j2MBclLXfI
+	 ZN8ODIPV/g5dTzXxnAgTsj4CRlFUs4Vw2b8loiPc9Hn2OBcshgJuYrCdWsgAOvfuEv
+	 RWrz8s3sKUduQ==
+Received: from johan by xi.lan with local (Exim 4.98.2)
+	(envelope-from <johan@kernel.org>)
+	id 1vJE17-000000007Kr-3lAr;
+	Wed, 12 Nov 2025 17:48:22 +0100
+Date: Wed, 12 Nov 2025 17:48:21 +0100
+From: Johan Hovold <johan@kernel.org>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Nicolas Schier <nicolas.schier@linux.dev>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>, linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Daniel Lezcano <daniel.lezcano@linaro.org>
+Subject: Re: [PATCH] modpost: drop '*_probe' from section check whitelist
+Message-ID: <aRS6VQCKB7dXGbXx@hovoldconsulting.com>
+References: <20251020091613.22562-1-johan@kernel.org>
+ <20251022203955.GA3256590@ax162>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251112-pci-m2-e-v1-5-97413d6bf824@oss.qualcomm.com>
-References: <20251112-pci-m2-e-v1-0-97413d6bf824@oss.qualcomm.com>
-In-Reply-To: <20251112-pci-m2-e-v1-0-97413d6bf824@oss.qualcomm.com>
-To: Rob Herring <robh@kernel.org>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- Jiri Slaby <jirislaby@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
- Nicolas Schier <nicolas.schier@linux.dev>, Hans de Goede <hansg@kernel.org>, 
- =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
- Mark Pearson <mpearson-lenovo@squebb.ca>, 
- "Derek J. Clark" <derekjohn.clark@gmail.com>, 
- Manivannan Sadhasivam <mani@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-kbuild@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
- linux-pci@vger.kernel.org, devicetree@vger.kernel.org, 
- linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
- linux-pm@vger.kernel.org, Stephan Gerhold <stephan.gerhold@linaro.org>, 
- Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, 
- Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3104;
- i=manivannan.sadhasivam@oss.qualcomm.com; h=from:subject:message-id;
- bh=d3crWSGCGUGn4wtoYTdDJMgOBARJSAYtgVh6kQhItYQ=;
- b=owEBbQGS/pANAwAKAVWfEeb+kc71AcsmYgBpFJ2HLBj0atRdQkoYoEtIlsRq/2nfEpNLLTmK8
- 0Ee8SHCPp2JATMEAAEKAB0WIQRnpUMqgUjL2KRYJ5dVnxHm/pHO9QUCaRSdhwAKCRBVnxHm/pHO
- 9ccoB/9JulXVNBQpte5g04Zu3cGVEtybP7nbcJRotlJ106/5GvyjbUjrShqI832UjbWtjgtNtc3
- myVXAVbBbIRPoaVWY356o/T3owMpyRDkiLZk1NFJ0RVInasTwuDM+GXTT3URoLQkCYbusx7nlfn
- pP+eHsk+ZjcXWswcI+pRcm1d63s65LwpVHyeZlcxQv8r/cg/MbUp/PMEZiSHw/e4Ka3pprDytt7
- 2Osv6Mynw2x9nJ5M+sb3n1u0NRLnqeM/D5s/sPFAwyMHsCHy2VVabnJSwo7BsY/opFJ4jUa1c/k
- ryGpgpPFOpTHT7cFdpd8gXslxG4YoRjCn7kZZjis3WqdlDMM
-X-Developer-Key: i=manivannan.sadhasivam@oss.qualcomm.com; a=openpgp;
- fpr=C668AEC3C3188E4C611465E7488550E901166008
-X-Endpoint-Received: by B4 Relay for
- manivannan.sadhasivam@oss.qualcomm.com/default with auth_id=461
-X-Original-From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-Reply-To: manivannan.sadhasivam@oss.qualcomm.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251022203955.GA3256590@ax162>
 
-From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+Hi Nathan,
 
-Add modlias support to serdev so that the serdev client driver can be
-autoloaded by udev when the serdev client device gets created.
+On Wed, Oct 22, 2025 at 10:39:55PM +0200, Nathan Chancellor wrote:
+> On Mon, Oct 20, 2025 at 11:16:13AM +0200, Johan Hovold wrote:
+> > Several symbol patterns used to be whitelisted to allow drivers to refer
+> > to functions annotated with __devinit and __devexit, which have since
+> > been removed.
+> > 
+> > Commit e1dc1bfe5b27 ("modpost: remove more symbol patterns from the
+> > section check whitelist") removed most of these patterns but left
+> > '*_probe' after a reported warning in an irqchip driver.
+> > 
+> > Turns out that was indeed an incorrect reference which has now been
+> > fixed by commit 9b685058ca93 ("irqchip/qcom-irq-combiner: Fix section
+> > mismatch").
+> > 
+> > A recently added clocksource driver also relies on this suffix to
+> > suppress another valid warning, and that is being fixed separately. [1]
+> > 
+> > Note that drivers with valid reasons for suppressing the warnings can
+> > use the __ref macros.
+> > 
+> > Link: https://lore.kernel.org/lkml/20251017054943.7195-1-johan@kernel.org/ [1]
+> > Signed-off-by: Johan Hovold <johan@kernel.org>
+> > ---
+> > 
+> > As mentioned above there are still two drivers relying on the "_probe"
+> > pattern to suppress valid warnings so perhaps it's best to hold off on
+> > merging this until the corresponding fixes are in mainline (e.g. next
+> > cycle or so unless Thomas can fast-track them).
+> 
+> Yeah, if it were fast tracked as a fix for 6.18, we could either use
+> that tag as the base for kbuild-next (as we have not take any patches
+> for 6.19 yet) or if they are 6.19 material, Thomas could provide us with
+> a signed tag or stable shared branch so that we could take this for 6.19
+> and have a clean tree. Whatever works.
 
-Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
----
- drivers/tty/serdev/core.c       | 15 +++++++++++----
- include/linux/mod_devicetable.h |  1 +
- scripts/mod/file2alias.c        |  8 ++++++++
- 3 files changed, 20 insertions(+), 4 deletions(-)
+Daniel has queued the clocksource fix for 6.19 now so I guess we can
+just wait until both fixes hit mainline and either send this one to
+Linus after that for -rc1 (or -rc2), or just wait until 6.20.
 
-diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
-index f90095cb778f2374303f98809d1639a000e0d9e0..8c2a40a537d93f4b9353a2f128cdf51b521929b1 100644
---- a/drivers/tty/serdev/core.c
-+++ b/drivers/tty/serdev/core.c
-@@ -34,7 +34,11 @@ static ssize_t modalias_show(struct device *dev,
- 	if (len != -ENODEV)
- 		return len;
+I'll send a reminder when both are in Linus's tree.
  
--	return of_device_modalias(dev, buf, PAGE_SIZE);
-+	len = of_device_modalias(dev, buf, PAGE_SIZE);
-+	if (len != -ENODEV)
-+		return len;
-+
-+	return sysfs_emit(buf, SERDEV_DEVICE_MODALIAS_FMT "\n", dev_name(dev));
- }
- static DEVICE_ATTR_RO(modalias);
- 
-@@ -48,13 +52,16 @@ static int serdev_device_uevent(const struct device *dev, struct kobj_uevent_env
- {
- 	int rc;
- 
--	/* TODO: platform modalias */
--
- 	rc = acpi_device_uevent_modalias(dev, env);
- 	if (rc != -ENODEV)
- 		return rc;
- 
--	return of_device_uevent_modalias(dev, env);
-+	rc = of_device_uevent_modalias(dev, env);
-+	if (rc != -ENODEV)
-+		return rc;
-+
-+	return add_uevent_var(env, "MODALIAS=" SERDEV_DEVICE_MODALIAS_FMT,
-+					dev_name(dev));
- }
- 
- static void serdev_device_release(struct device *dev)
-diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_devicetable.h
-index 70c54c4bedba2fcb8f5eb37c2d9ede05d5d91188..dad9637cf28552c3423affc4eb249efa6ba05514 100644
---- a/include/linux/mod_devicetable.h
-+++ b/include/linux/mod_devicetable.h
-@@ -976,6 +976,7 @@ struct coreboot_device_id {
- 	kernel_ulong_t driver_data;
- };
- 
-+#define SERDEV_DEVICE_MODALIAS_FMT "serdev:%s"
- #define SERDEV_NAME_SIZE 32
- 
- struct serdev_device_id {
-diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
-index b3333560b95ee998fbe5bdc9ed380847962d1bd1..27e9f7c718c4d48ca5dbd5538490529119df9509 100644
---- a/scripts/mod/file2alias.c
-+++ b/scripts/mod/file2alias.c
-@@ -1371,6 +1371,13 @@ static void do_coreboot_entry(struct module *mod, void *symval)
- 	module_alias_printf(mod, false, "coreboot:t%08X", tag);
- }
- 
-+/* Looks like: serdev:S */
-+static void do_serdev_entry(struct module *mod, void *symval)
-+{
-+	DEF_FIELD_ADDR(symval, serdev_device_id, name);
-+	module_alias_printf(mod, false, SERDEV_DEVICE_MODALIAS_FMT, *name);
-+}
-+
- /* Does namelen bytes of name exactly match the symbol? */
- static bool sym_is(const char *name, unsigned namelen, const char *symbol)
- {
-@@ -1467,6 +1474,7 @@ static const struct devtable devtable[] = {
- 	{"usb", SIZE_usb_device_id, do_usb_entry_multi},
- 	{"pnp", SIZE_pnp_device_id, do_pnp_device_entry},
- 	{"pnp_card", SIZE_pnp_card_device_id, do_pnp_card_entry},
-+	{"serdev", SIZE_serdev_device_id, do_serdev_entry},
- };
- 
- /* Create MODULE_ALIAS() statements.
+> Reviewed-by: Nathan Chancellor <nathan@kernel.org>
 
--- 
-2.48.1
+Thanks for reviewing.
 
+> >  scripts/mod/modpost.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+> > index 47c8aa2a6939..5c499dace0bb 100644
+> > --- a/scripts/mod/modpost.c
+> > +++ b/scripts/mod/modpost.c
+> > @@ -953,7 +953,7 @@ static int secref_whitelist(const char *fromsec, const char *fromsym,
+> >  	/* symbols in data sections that may refer to any init/exit sections */
+> >  	if (match(fromsec, PATTERNS(DATA_SECTIONS)) &&
+> >  	    match(tosec, PATTERNS(ALL_INIT_SECTIONS, ALL_EXIT_SECTIONS)) &&
+> > -	    match(fromsym, PATTERNS("*_ops", "*_probe", "*_console")))
+> > +	    match(fromsym, PATTERNS("*_ops", "*_console")))
+> >  		return 0;
+> >  
+> >  	/* Check for pattern 3 */
+> > -- 
+> > 2.49.1
+> > 
 
+Johan
