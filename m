@@ -1,108 +1,208 @@
-Received: from relay1.mymailcheap.com (relay1.mymailcheap.com [144.217.248.102])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926B635CBDC;
-	Wed, 12 Nov 2025 11:47:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.217.248.102
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5676823D7CD;
+	Wed, 12 Nov 2025 14:45:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762948075; cv=none; b=F2Ml//uypt9Lx6D2eRPwnYqYcqS2cbueRbcqbsUbw9IKJGIaAWbBktxvL/P79R173bCnAJxWH0ze+LRvA/q0KHzWJNUnBfqCyK9MRmLMzNSOATiV1YGxx+XX2GDOY0Pm7Tk/dE38LajWKtkPLfmLz4n9u97TKkumLQE7CwBg1nA=
+	t=1762958731; cv=none; b=IUYWAxfoP1LA+OAskdsN92KwrdlCcxo3MEex5VQZSPqDm49uxx2oFlpqVgFuasYwjZD+UBiYI7TUpiCsUkIQss4+rIuOMzVbTPXOQe1poipw1sfcaZlDbPfzdXqcHsNP1iVofHD4LxgHviW7ks993b/bboqU/HhMCHwR1suMjYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762948075; c=relaxed/simple;
-	bh=j2727zDvd9G/pRlFegMMtS5AtGImB4umCUDjqTbODNU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZWo3sr4GudmwAGzdfyA0Rlo86qqw/l9ragH0o2l5dv58BW3VdI44g9zVNp9G+s+UvOLEAny9ckF0Y8wW1fGUwi+MDGaGWL2efZCz6vZx9BUmmVgck3E+xMjQuKoVhERSzCX/ymo+KZS70Q32FwEYz2Uu2Vd9CWR/yZBJ0icCW9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=aosc.io; spf=pass smtp.mailfrom=aosc.io; dkim=pass (1024-bit key) header.d=aosc.io header.i=@aosc.io header.b=DkAWK0og; arc=none smtp.client-ip=144.217.248.102
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=aosc.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aosc.io
+	s=arc-20240116; t=1762958731; c=relaxed/simple;
+	bh=n4VGx5zAuR93d8nYMgZV1H2hgcadDo+HwhKU8BhAt7M=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=cAw/g+9WMn6tm2sF1JMlluxThhdSC/4eDO4RAEDmySNrsn/TI0EUup9IE3UHVS1gLWCOB4v81oclAzc+gVrx6qKeUWIywauUjBKnH1T0HDl9MlUclGy74JNr6Zn+pAGi70SmDlupw9lEMeq6rPLeRzUhr4j3u5MUTAsMRiKIFeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LYF4kRBA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=aosc.io header.i=@aosc.io header.b="DkAWK0og"
-Received: from nf1.mymailcheap.com (nf1.mymailcheap.com [51.75.14.91])
-	by relay1.mymailcheap.com (Postfix) with ESMTPS id 6F51F3E8C9;
-	Wed, 12 Nov 2025 11:47:45 +0000 (UTC)
-Received: from mail20.mymailcheap.com (mail20.mymailcheap.com [51.83.111.147])
-	by nf1.mymailcheap.com (Postfix) with ESMTPSA id 6C17C40085;
-	Wed, 12 Nov 2025 11:47:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=aosc.io; s=default;
-	t=1762948063; bh=j2727zDvd9G/pRlFegMMtS5AtGImB4umCUDjqTbODNU=;
-	h=From:To:Cc:Subject:Date:From;
-	b=DkAWK0ogq1xpMsg6jqZHRmiOHpZwjHm7wlkdBz/e/gxwr1xppmzzl6tzpz6Y+tql2
-	 /r+G48UteKG/L2FlHPIUyjjgcgGcYmkYRbdOnB5B3BPhD4qhKyXizWCP78pfM77ScP
-	 34Vo+HmWJtfwvbev6P6aZAWNgmt2/f6v2dA7JlJQ=
-Received: from avenger-XINGYAO-Series (unknown [223.104.43.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail20.mymailcheap.com (Postfix) with ESMTPSA id 65EE240C52;
-	Wed, 12 Nov 2025 11:47:38 +0000 (UTC)
-From: WangYuli <wangyuli@aosc.io>
-To: kees@kernel.org,
-	nathan@kernel.org,
-	nicolas@fjasle.eu
-Cc: linux-hardening@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kbuild@vger.kernel.org,
-	WangYuli <wangyl5933@chinaunicom.cn>,
-	WangYuli <wangyuli@aosc.io>
-Subject: [PATCH] fortify: Ignore intermediate *.tmp files
-Date: Wed, 12 Nov 2025 19:47:25 +0800
-Message-ID: <20251112114725.287349-1-wangyuli@aosc.io>
-X-Mailer: git-send-email 2.51.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LYF4kRBA"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0C078C113D0;
+	Wed, 12 Nov 2025 14:45:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762958731;
+	bh=n4VGx5zAuR93d8nYMgZV1H2hgcadDo+HwhKU8BhAt7M=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=LYF4kRBAPUsb+Lg+VTt5bz1GkokdfnPEyOYmdznIS05xlFl20JoTqmwgleDHEQSGr
+	 NSh1bdMzh+dWFY6hTy/cH6hbAbspOmFpjRO6n9INnRTdkUpcIH3FjQ8fh6TiUhtMf4
+	 W1Ghj/c58J+KQoOD9aetpDzt3niBbScoJ02fiL1EtST5HbD5bWQJc/dwHuqEm19d9Y
+	 YyPfGRBTtnQxkSsxM/ieDECLJaNc8qv4QpsLgZtSlBOC7Mo3CtrhL2wkGs/z6ld1U7
+	 sCa9WIscQ6msA36uiU9ymwhklUFNadVHtHm+GZxMwGRWd5lFQEBurzGqe/w9rAB6Up
+	 iroe+/0HetTkg==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF608CD1297;
+	Wed, 12 Nov 2025 14:45:30 +0000 (UTC)
+From: Manivannan Sadhasivam via B4 Relay <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org>
+Date: Wed, 12 Nov 2025 20:15:14 +0530
+Subject: [PATCH 2/9] serdev: Add serdev device based driver match support
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Server: nf1.mymailcheap.com
-X-Rspamd-Queue-Id: 6C17C40085
-X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.40 / 10.00];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	MIME_GOOD(-0.10)[text/plain];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:16276, ipnet:51.83.0.0/16, country:FR];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_ONE(0.00)[1];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	SPFBL_URIBL_EMAIL_FAIL(0.00)[wangyl5933.chinaunicom.cn:server fail,wangyuli.aosc.io:server fail];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_SOME(0.00)[];
-	RCVD_TLS_ALL(0.00)[]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20251112-pci-m2-e-v1-2-97413d6bf824@oss.qualcomm.com>
+References: <20251112-pci-m2-e-v1-0-97413d6bf824@oss.qualcomm.com>
+In-Reply-To: <20251112-pci-m2-e-v1-0-97413d6bf824@oss.qualcomm.com>
+To: Rob Herring <robh@kernel.org>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Jiri Slaby <jirislaby@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+ Nicolas Schier <nicolas.schier@linux.dev>, Hans de Goede <hansg@kernel.org>, 
+ =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
+ Mark Pearson <mpearson-lenovo@squebb.ca>, 
+ "Derek J. Clark" <derekjohn.clark@gmail.com>, 
+ Manivannan Sadhasivam <mani@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kbuild@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
+ linux-pci@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+ linux-pm@vger.kernel.org, Stephan Gerhold <stephan.gerhold@linaro.org>, 
+ Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, 
+ Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4197;
+ i=manivannan.sadhasivam@oss.qualcomm.com; h=from:subject:message-id;
+ bh=nlTsT1KuaCByFt+CSA6xTACxTdskiJ12kycskYPPccs=;
+ b=owGbwMvMwMUYOl/w2b+J574ynlZLYsgUmdv29OlUg/BV3A+d6k4uKeJU0Hk27zpng/n/ip/3/
+ Vty267EdDIaszAwcjHIiimypC911mr0OH1jSYT6dJhBrEwgUxi4OAVgIsYWHAyzO1dLnLyaOKXp
+ A3PP/5YuY9l5uw+I39568paoWoWXylnba4G8J5u09Hf1mD/5Wv5ZoKXx+b0NeuI3s77mPOJKqbw
+ y5xzvLcllfYWSfBufmlzZpGxYf2vuDcvXGSZHMpSbJHy2nrCX5jA+cHjb+hkr2Gs+nA3iizfKeJ
+ xiVKd6ybKOqflv/CO2k6tfOFTXn67QVlWJeHBGhycqYHqligOr+Z9rgl7h3vLSmku5a249UC/nf
+ eaowjspJmFllWdoxnfX5TVitodChToPruS8co3zgG9+TJNdhtyE0Gkdekkf7OpZLVKN5ynomOsn
+ TrZWV/yeHCai/lXuJYvK9asH9rS3rZrb8MbzoujRvlkFAA==
+X-Developer-Key: i=manivannan.sadhasivam@oss.qualcomm.com; a=openpgp;
+ fpr=C668AEC3C3188E4C611465E7488550E901166008
+X-Endpoint-Received: by B4 Relay for
+ manivannan.sadhasivam@oss.qualcomm.com/default with auth_id=461
+X-Original-From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+Reply-To: manivannan.sadhasivam@oss.qualcomm.com
 
-From: WangYuli <wangyl5933@chinaunicom.cn>
+From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 
-The test_fortify.sh script generates logs of build-time warnings
-for string and memory functions. To ensure the final log file is
-updated atomically, the script first writes its output to a temporary
-file with a .log.tmp extension. Upon successful completion, this
-temporary file is renamed to the final .log file.
+Add support to match serdev devices with serdev drivers based on the serdev
+ID table defined in serdev_device_driver::id_table.
 
-If the build process is interrupted before this rename operation,
-these *.log.tmp intermediate files will be left in the directory,
-creating a risk of them being accidentally added to the git repository.
+The matching function, serdev_driver_match_device() uses the serdev device
+name to match against the entries in serdev_device_driver::id_table.
 
-To prevent this from happening, add *.tmp to the .gitignore file to
-explicitly ignore these temporary files.
+If there is no serdev id_table for the driver, then serdev_device_match()
+will fallback to ACPI and DT based matching.
 
-Signed-off-by: WangYuli <wangyl5933@chinaunicom.cn>
-Signed-off-by: WangYuli <wangyuli@aosc.io>
+Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 ---
- lib/test_fortify/.gitignore | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/tty/serdev/core.c         | 23 ++++++++++++++++++++++-
+ include/linux/mod_devicetable.h   |  7 +++++++
+ include/linux/serdev.h            |  4 ++++
+ scripts/mod/devicetable-offsets.c |  3 +++
+ 4 files changed, 36 insertions(+), 1 deletion(-)
 
-diff --git a/lib/test_fortify/.gitignore b/lib/test_fortify/.gitignore
-index c1ba37d14b50..8056bc75b442 100644
---- a/lib/test_fortify/.gitignore
-+++ b/lib/test_fortify/.gitignore
-@@ -1,2 +1,3 @@
- # SPDX-License-Identifier: GPL-2.0-only
- /*.log
-+/*.tmp
+diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
+index b33e708cb2455fc144a9fd4ac40ce9118e1a8faa..2b5582cd5063a87c9a6c99f83a8ab071637eae57 100644
+--- a/drivers/tty/serdev/core.c
++++ b/drivers/tty/serdev/core.c
+@@ -85,12 +85,33 @@ static const struct device_type serdev_ctrl_type = {
+ 	.release	= serdev_ctrl_release,
+ };
+ 
++static int serdev_driver_match_device(struct device *dev, const struct device_driver *drv)
++{
++	const struct serdev_device_driver *serdev_drv = to_serdev_device_driver(drv);
++	struct serdev_device *serdev = to_serdev_device(dev);
++	const struct serdev_device_id *id;
++
++	if (!serdev_drv->id_table)
++		return 0;
++
++	for (id = serdev_drv->id_table; id->name[0]; id++) {
++		if (!strcmp(dev_name(dev), id->name)) {
++			serdev->id = id;
++			return 1;
++		}
++	}
++
++	return 0;
++}
++
+ static int serdev_device_match(struct device *dev, const struct device_driver *drv)
+ {
+ 	if (!is_serdev_device(dev))
+ 		return 0;
+ 
+-	/* TODO: platform matching */
++	if (serdev_driver_match_device(dev, drv))
++		return 1;
++
+ 	if (acpi_driver_match_device(dev, drv))
+ 		return 1;
+ 
+diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_devicetable.h
+index 6077972e8b45de3d07881c0226459d815dd1f83d..70c54c4bedba2fcb8f5eb37c2d9ede05d5d91188 100644
+--- a/include/linux/mod_devicetable.h
++++ b/include/linux/mod_devicetable.h
+@@ -976,4 +976,11 @@ struct coreboot_device_id {
+ 	kernel_ulong_t driver_data;
+ };
+ 
++#define SERDEV_NAME_SIZE 32
++
++struct serdev_device_id {
++	const char name[SERDEV_NAME_SIZE];
++	kernel_ulong_t driver_data;
++};
++
+ #endif /* LINUX_MOD_DEVICETABLE_H */
+diff --git a/include/linux/serdev.h b/include/linux/serdev.h
+index ab185cac556380dfa3cdf94b7af6ee168b677587..ee42e293445d928a311bd3c120e609214f89a5dd 100644
+--- a/include/linux/serdev.h
++++ b/include/linux/serdev.h
+@@ -39,6 +39,7 @@ struct serdev_device_ops {
+  * @ops:	Device operations.
+  * @write_comp	Completion used by serdev_device_write() internally
+  * @write_lock	Lock to serialize access when writing data
++ * @id:		serdev device ID entry
+  */
+ struct serdev_device {
+ 	struct device dev;
+@@ -47,6 +48,7 @@ struct serdev_device {
+ 	const struct serdev_device_ops *ops;
+ 	struct completion write_comp;
+ 	struct mutex write_lock;
++	const struct serdev_device_id *id;
+ };
+ 
+ #define to_serdev_device(d) container_of(d, struct serdev_device, dev)
+@@ -55,11 +57,13 @@ struct serdev_device {
+  * struct serdev_device_driver - serdev slave device driver
+  * @driver:	serdev device drivers should initialize name field of this
+  *		structure.
++ * @id_table:	serdev device ID table
+  * @probe:	binds this driver to a serdev device.
+  * @remove:	unbinds this driver from the serdev device.
+  */
+ struct serdev_device_driver {
+ 	struct device_driver driver;
++	const struct serdev_device_id *id_table;
+ 	int	(*probe)(struct serdev_device *);
+ 	void	(*remove)(struct serdev_device *);
+ };
+diff --git a/scripts/mod/devicetable-offsets.c b/scripts/mod/devicetable-offsets.c
+index d3d00e85edf73553ba3d9b5f9fccf1ff61c99026..c1bfa8eddc4d638c55db54cfd9b6407f47594b4c 100644
+--- a/scripts/mod/devicetable-offsets.c
++++ b/scripts/mod/devicetable-offsets.c
+@@ -280,5 +280,8 @@ int main(void)
+ 	DEVID(coreboot_device_id);
+ 	DEVID_FIELD(coreboot_device_id, tag);
+ 
++	DEVID(serdev_device_id);
++	DEVID_FIELD(serdev_device_id, name);
++
+ 	return 0;
+ }
+
 -- 
-2.51.0
+2.48.1
+
 
