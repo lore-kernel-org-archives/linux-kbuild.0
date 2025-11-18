@@ -1,123 +1,188 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1D0F2DA777
-	for <linux-kbuild@vger.kernel.org>; Tue, 18 Nov 2025 13:04:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3BC235A959
+	for <linux-kbuild@vger.kernel.org>; Tue, 18 Nov 2025 14:30:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763471047; cv=none; b=WLJccOINdNsPoNjXTUPA3+wE9e1VmLUIIBxydvU0lOaGfxXZGYZ8h/FJLn6SGHLq3/7G4UW7fceo9BDjtdLh8H4dNacUwLStQQ1/fm9MTlZL17mnJq7aaZSgvjYyefenqK1OyQ50DqFBM1dM5rEMGK72eAggdUDTyxBwJ3EEBeM=
+	t=1763476206; cv=none; b=rqZ+Dqr7aTQCuDtiGBKlsInieGaUpjMHMeCmn1+HvyCFhyfCRmfY7FVhVUZTZXq5d+m3Xir2MwepukyltHqEUTrZFJ/cZ9OkuiDIl8M3NV/R6SuC1TtO9xnjLLSSp/0LYW/aor9TJLFWg94tZb4xIp+tIGUa6YCe/GZX1sctKiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763471047; c=relaxed/simple;
-	bh=QY1OIrfV7wJNhoLm6jftQrdDzbys+UOJ7sTIBabxKQU=;
+	s=arc-20240116; t=1763476206; c=relaxed/simple;
+	bh=812u0/kE8U6KIifXA4o4gTvauRi/MWbHZ1WwZdLX1Rs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=L3XxNeOrmU13ynD3zt5qC9ollrfgccxLxTx8JJik2A4wObltLEBdzWLLf/ZewNeDJELi4o+yOy0uljXoWtVzR/j78e6ysSFy99COcmRGoM+mFa+stLU9hkLfYhZzT7gdGUTggqK7SwOB8u+jbY+tCd2pl94Uhbnb42J+yIVPhdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Eid/L6Fx; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=U7eBykUMRwC5oe5zz9g4tKGCPd0IRUDWZWOeRYfynNAH05IDWV/G2pMJn2dZgFheyRslc5W9LUqpJo8UGDCg0yaJVgRPzr6YBbGPQdAawQ/wCoTmprVS2Yy9kiZKvr730hSrogA1j17LfOOp25H+sCPmVTCRkc+7pFUVCtmd9JU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=Lq4z7uIo; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Eid/L6Fx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47D8CC2BC86
-	for <linux-kbuild@vger.kernel.org>; Tue, 18 Nov 2025 13:04:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763471046;
-	bh=QY1OIrfV7wJNhoLm6jftQrdDzbys+UOJ7sTIBabxKQU=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Eid/L6FxBAfeH5CqfmMyBOW63k1VrenwQw2zXA0r7ZPig0xuTdTXGzXWRrqEGuGm4
-	 aZX23pOTW4/p+tSmTdrSo0JRAIMN8HhqJ9qwRKsRE3RGxmkLNrSNu0XTqIQfAwSzEu
-	 lJq1Y+pjgdClixUMLaV9N+88rALAcKo4BQJO2LrdEV9pcSgOjeuaS9QtL2kNKQjU6w
-	 AAcgrtvBtHcMZ+oy93JZy3RvzFId3zQuso5gnhhfACVX7LRWy53j7pNMWQDcYew/5X
-	 iXPZI5JjSJ6KyIqfDwensoLJJZPLEmR3+rKyZ3RM+nyTZQydX4ZluwCfdz3JgUG4c6
-	 NB8viXj9azbYw==
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-6419aaced59so7395648a12.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 18 Nov 2025 05:04:06 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUZKFxUIbWmq/1mGdHdZCvdGdwzIsRxgj0UpOVKVTyJMsuxhX/9125dj23YMRqt0LUmvzzWFSsXaUWamcE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyxYEtyGnnH2KGKSv5FpEhc2u5cEOAtAc4DVNPHm9ibZDCDlSE+
-	oUFxyyl/FsOPuxm3STrYZvI3U5M+Hh5x3MFMmJuP8FvBL2UZcCzub/DnZyxu76bipoxYKwuwz0y
-	9+Vh2gNXBuQrV3x3svnA5Rf1mea8C/g==
-X-Google-Smtp-Source: AGHT+IGzaPWs9CO2/QqJ2lcK3lJrPrwRYsH8Qm8HjBS/YlxbWZYRORJiSB2uoxSx80hvbGBnIei2bDGhcwM4UJKc8fE=
-X-Received: by 2002:a05:6402:2809:b0:63c:2d72:56e3 with SMTP id
- 4fb4d7f45d1cf-64350e8e003mr14781379a12.23.1763471043426; Tue, 18 Nov 2025
- 05:04:03 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="Lq4z7uIo"
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5943b62c47dso5538720e87.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 18 Nov 2025 06:30:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1763476202; x=1764081002; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JPuRb3+haxxFSoGOZ/Vv3ClCGfszWqWGAZKDKrczFMg=;
+        b=Lq4z7uIoHwX+T0oZpnQeE7Sgq9N1okHHPsxFDCimKWGvAYYyd1L3RkOxAFX6qqwgAK
+         n7bdZ81LqGV1aeevTqZ8wYxo8zm2fcmodj9xNDXKeQJspHWeAezhpEaV3ItXy5cPjLX4
+         6lleapZWGYLkpOGJxS/+B70xq3sqzhS76pnHvh3KpwGhTjAk0fG5Bfaevs8HoAynZMpF
+         6Y9f9b3Bef5JuVIba38qaCDqJwveVXQ19CNrRhMaBrwVBCOxUcjdGZbK08iPRuO8sCQ+
+         nlyYi9cr1Cu3HHRMrga2WbosxHKUD2ZvZJFSImC9bw3VIP1RTXdGahqstC5GX3Xx94Lo
+         LSYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763476202; x=1764081002;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=JPuRb3+haxxFSoGOZ/Vv3ClCGfszWqWGAZKDKrczFMg=;
+        b=ngxI5t/6U47q8LBItZyYgV5PfkG1rfKtseBiTu3Q10W5AtLgsWrSTdikezu8iyf0V0
+         FfCODL+g/CLAoL+Ux1W2obKDwrHe+s77Nw9Da1HOUNR36DoJDzxBp1qoA+nkT3+ALqjT
+         clBoneiR0Wo4vqTMEUIVe3HN8WvrQHtId6qtn4Y5PSuqeRxoMly9Wd0onUq2HIvTUuxI
+         gzmnQQvpitGzaHRc+vlmJJ741af4QiqBFngZT1N2Rb1mmAM8LMHvET1FLCjghQJ28+HX
+         UdH4fdnNwJ5MBvUz+k1wI49GRRubjaBo5uKkjQlVDjy1gAqObwOwlhC7yRhKtsUsIb79
+         MGpw==
+X-Forwarded-Encrypted: i=1; AJvYcCUtMzOm3s3IFyY5p0rPK/W1rBZ8VpIOlHpDBNkUaP8wx3aF3UUWu5mUzK6kdtBNQgGVyuE4DOFPAq1nZg8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBY5N1ptiQsktOsrzkJCPxO+D1qrlF9iWFko0vXRwhbzFGgisS
+	wBEIU8eULA8T6FIdxnGEW1aCPTpbw2V5uwLo1UF1E+WUmRSbx2SGC+G3j7LX4+V4XLojDn/pYqn
+	e1i42UTjHotOlJVdvAHQoN3kFpFhpKSflJP6xGnSibQ==
+X-Gm-Gg: ASbGncvSZ0+NZCEBMgRbpRXtBgl9r3JbAX13ZBUDUB3TSolaY6giTWKuMwaFuQDLvuK
+	ySTBqDgqsk/IL+t5WvLvoIp7iSuvhIJzWhqXxxE0g14tewGEebhctfMhkI5uAhsKXD3vIFOqUOo
+	rzeabEfDIHFb/b334oh3XSzWCppTEQsash3uwQMvFG6Vvg1CEbT9fuAMI+r4T2TRhHKj8Thl9Zz
+	xBLHEaZu60MGqCRIb1ClwXK8BUVwwm6BgEKA8oOEKudmUyr1xn3BXfRCI/UluZa+D/rJpQL2LTV
+	qTAZyBHawqAqO+B9rnRppCsunr2jAg8BQuYg
+X-Google-Smtp-Source: AGHT+IG/8x599leRbcc55AKG5x7ewC54AAGqLK2r1ZPyGFLtbdnyvhRmFu7yQc8cTfZdSXpR6fRtj7AIKLBehJrw2m0=
+X-Received: by 2002:a05:6512:3ca2:b0:57a:2be1:d779 with SMTP id
+ 2adb3069b0e04-595841febd2mr6716947e87.31.1763476201587; Tue, 18 Nov 2025
+ 06:30:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251112-pci-m2-e-v1-0-97413d6bf824@oss.qualcomm.com> <20251112-pci-m2-e-v1-6-97413d6bf824@oss.qualcomm.com>
-In-Reply-To: <20251112-pci-m2-e-v1-6-97413d6bf824@oss.qualcomm.com>
-From: Rob Herring <robh@kernel.org>
-Date: Tue, 18 Nov 2025 07:03:51 -0600
-X-Gmail-Original-Message-ID: <CAL_JsqKBcXH0EWguto3EFY2cJ5p=8VUZczMHz1u5fNFocv-AmA@mail.gmail.com>
-X-Gm-Features: AWmQ_blGP-_XDvdtj3MDVFdTuQEWnKJrtZXKQUPHlGxcSMsdX4Hk0jJFpfTnlMY
-Message-ID: <CAL_JsqKBcXH0EWguto3EFY2cJ5p=8VUZczMHz1u5fNFocv-AmA@mail.gmail.com>
-Subject: Re: [PATCH 6/9] serdev: Skip registering serdev devices from DT is
- external connector is used
+References: <20251112-pci-m2-e-v1-0-97413d6bf824@oss.qualcomm.com> <20251112-pci-m2-e-v1-8-97413d6bf824@oss.qualcomm.com>
+In-Reply-To: <20251112-pci-m2-e-v1-8-97413d6bf824@oss.qualcomm.com>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Tue, 18 Nov 2025 15:29:49 +0100
+X-Gm-Features: AWmQ_bnS7J2LiofnEnjv4l_cFHHTAIWcbKZPMExzLrGKBD6vTSaTLBGi1oU52Ic
+Message-ID: <CAMRc=MdRw+spjN0ySJ7We_GJ8GaDU2Nb4unaxcnr2ZLjLOeSrA@mail.gmail.com>
+Subject: Re: [PATCH 8/9] Bluetooth: hci_qca: Add support for WCN7850 PCIe M.2 card
 To: manivannan.sadhasivam@oss.qualcomm.com
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jirislaby@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, 
-	Hans de Goede <hansg@kernel.org>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
+Cc: Rob Herring <robh@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Jiri Slaby <jirislaby@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nicolas Schier <nicolas.schier@linux.dev>, Hans de Goede <hansg@kernel.org>, 
+	=?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
 	Mark Pearson <mpearson-lenovo@squebb.ca>, "Derek J. Clark" <derekjohn.clark@gmail.com>, 
 	Manivannan Sadhasivam <mani@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
-	linux-pci@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-pm@vger.kernel.org, Stephan Gerhold <stephan.gerhold@linaro.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-serial@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org, 
+	Stephan Gerhold <stephan.gerhold@linaro.org>, 
 	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 12, 2025 at 8:45=E2=80=AFAM Manivannan Sadhasivam via B4 Relay
+On Wed, Nov 12, 2025 at 3:45=E2=80=AFPM Manivannan Sadhasivam via B4 Relay
 <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org> wrote:
 >
 > From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 >
-> If an external connector like M.2 is connected to the serdev controller
-> in DT, then the serdev devices will be created dynamically by the connect=
-or
-> driver. So skip registering devices from DT node as there will be no
-> statically defined devices.
-
-You could still have statically defined devices. You are just choosing
-to probe them later from the connector driver.
-
+> The WCN7850 PCIe M.2 card connected to the UART controller exposes the
+> 'WCN7850' serdev device and is controlled using the pwrseq framework.
+>
+> Hence, add support for it in the driver. It reuses the existing
+> 'qca_soc_data_wcn7850' driver data.
 >
 > Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.=
 com>
 > ---
->  drivers/tty/serdev/core.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
+>  drivers/bluetooth/hci_qca.c | 20 ++++++++++++++++++++
+>  1 file changed, 20 insertions(+)
 >
-> diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
-> index 8c2a40a537d93f4b9353a2f128cdf51b521929b1..1378587d386356ca4415fa455=
-b2ee722b5e44d3e 100644
-> --- a/drivers/tty/serdev/core.c
-> +++ b/drivers/tty/serdev/core.c
-> @@ -12,6 +12,7 @@
->  #include <linux/kernel.h>
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index 4cff4d9be3132561ee9bae4ddf2c8ac0bc13ecd7..09bfb3bba93698f496947775b=
+f6b31f2f20279f1 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -26,6 +26,7 @@
+>  #include <linux/mod_devicetable.h>
 >  #include <linux/module.h>
 >  #include <linux/of.h>
 > +#include <linux/of_graph.h>
->  #include <linux/of_device.h>
->  #include <linux/pm_domain.h>
->  #include <linux/pm_runtime.h>
-> @@ -560,6 +561,15 @@ static int of_serdev_register_devices(struct serdev_=
-controller *ctrl)
->         int err;
->         bool found =3D false;
+>  #include <linux/acpi.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/pwrseq/consumer.h>
+> @@ -2344,6 +2345,9 @@ static int qca_serdev_probe(struct serdev_device *s=
+erdev)
 >
-> +       /*
-> +        * When the serdev controller is connected to an external connect=
-or like
-> +        * M.2 in DT, then the serdev devices will be created dynamically=
- by the
-> +        * connector driver. So skip looking for devices in DT node as th=
-ere will
-> +        * be no statically defined devices.
-> +        */
-> +       if (of_graph_is_present(ctrl->dev.of_node))
-> +               return 0;
+>         qcadev->serdev_hu.serdev =3D serdev;
+>         data =3D device_get_match_data(&serdev->dev);
+> +       if (!data && serdev->id)
+> +               data =3D (const struct qca_device_data *) serdev->id->dri=
+ver_data;
+> +
+>         serdev_device_set_drvdata(serdev, qcadev);
+>         device_property_read_string_array(&serdev->dev, "firmware-name",
+>                                          qcadev->firmware_name, ARRAY_SIZ=
+E(qcadev->firmware_name));
+> @@ -2384,6 +2388,15 @@ static int qca_serdev_probe(struct serdev_device *=
+serdev)
+>         case QCA_WCN6855:
+>         case QCA_WCN7850:
+>         case QCA_WCN6750:
+> +               if (of_graph_is_present(dev_of_node(&serdev->ctrl->dev)))=
+ {
+> +                       qcadev->bt_power->pwrseq =3D devm_pwrseq_get(&ser=
+dev->ctrl->dev,
+> +                                                                  "uart"=
+);
+> +                       if (IS_ERR(qcadev->bt_power->pwrseq))
+> +                               qcadev->bt_power->pwrseq =3D NULL;
+> +                       else
+> +                               break;
+> +               }
 
-Where's the schema that allows graph nodes?
+Did you by any chance copy this logic from commit: db0ff7e15923
+("driver: bluetooth: hci_qca:fix unable to load the BT driver")? This
+commit is wrong and it flew under my radar during the summer and I
+never got around to fixing it. It doesn't take into account probe
+deferral.
 
-Rob
+Bartosz
+
+> +
+>                 if (!device_property_present(&serdev->dev, "enable-gpios"=
+)) {
+>                         /*
+>                          * Backward compatibility with old DT sources. If=
+ the
+> @@ -2740,6 +2753,12 @@ static const struct acpi_device_id qca_bluetooth_a=
+cpi_match[] =3D {
+>  MODULE_DEVICE_TABLE(acpi, qca_bluetooth_acpi_match);
+>  #endif
+>
+> +static const struct serdev_device_id qca_bluetooth_serdev_match[] =3D {
+> +       { "WCN7850", (kernel_ulong_t)&qca_soc_data_wcn7850 },
+> +       { },
+> +};
+> +MODULE_DEVICE_TABLE(serdev, qca_bluetooth_serdev_match);
+> +
+>  #ifdef CONFIG_DEV_COREDUMP
+>  static void hciqca_coredump(struct device *dev)
+>  {
+> @@ -2756,6 +2775,7 @@ static void hciqca_coredump(struct device *dev)
+>  static struct serdev_device_driver qca_serdev_driver =3D {
+>         .probe =3D qca_serdev_probe,
+>         .remove =3D qca_serdev_remove,
+> +       .id_table =3D qca_bluetooth_serdev_match,
+>         .driver =3D {
+>                 .name =3D "hci_uart_qca",
+>                 .of_match_table =3D of_match_ptr(qca_bluetooth_of_match),
+>
+> --
+> 2.48.1
+>
+>
