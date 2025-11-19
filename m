@@ -1,99 +1,97 @@
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FE7A2264D5
-	for <linux-kbuild@vger.kernel.org>; Fri, 21 Nov 2025 19:01:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D530B299931;
+	Fri, 21 Nov 2025 19:47:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763751702; cv=none; b=PswyLQds9F46FALb3o6Matisz4sQbfQu7IK5DQj4IasFuZADIbrpvfbwGyS914Vi3/WIJKd9FnHl04wKKqODMjhjAIsaY6u/y9n5NfQIs3cMAw9IuJIZogmG+XBZ3GbaNYf+xJai/at23oxsbJHtmHGfjkwsA8mIfBmJu9tPfaE=
+	t=1763754423; cv=none; b=KJKEgsMZ/YFaQSJQHRW9y7SlLkm35vrfBejJUCYdagDMtcX6VBn4xjOPcQxNauTK8nYYAx7H3eJcRclfdJaokELtEtef6Hg90POrimDr/18jPXNiPs/ggWz0YrVcyWCTrDA8dJRgQAtRVohrIjHIt3V7Mbn59PMWasoXKHx87Vk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763751702; c=relaxed/simple;
-	bh=znNrGtLO/y2KIKC6w6UbPHjCgvfwhBb8OCIlLO/42vU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YDXQ0KjKSaMVGgOhQP7lhGFMp3bAPOeRHEB44eqBj0Z1PKosZ0LdmV9xH1Ykku8446KUg2nUYxSm4ytaIsxFu04gdJffbUAsZNdpcghcrpkdqQXBk0K1+L6sbAQEqleWMYz3vFC1ZL6+yGk1j4fth8xjwvteswZJ0rZxWxvXpWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R66xKcqQ; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1763754423; c=relaxed/simple;
+	bh=cEdRCa2NBNmESBxc72utfubK3/50PKg3AObY9g7OMis=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PXEjAg3iGjiIRlipp+j83VISBjsMzV9R+yR/H+kq1e+vUCMmCfoUF1XgWPkHzOgbODLGLAWcH8Tg4IyzOqIm3S2wNgMajornnPdDDy4i/oZm8f5/pdBbEeCgdRENIP9sxG9FcuhzvoacPGwRxce2zHbEwIEXiULVTlW/+s5jfhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kSFFKfMe; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R66xKcqQ"
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-bc2c9a771b5so285828a12.3
-        for <linux-kbuild@vger.kernel.org>; Fri, 21 Nov 2025 11:01:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763751700; x=1764356500; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gMRrQ5UDUuelFdTKPrDDsaVzS+ehlFeWjYLK9O4YUmY=;
-        b=R66xKcqQ02lkyymRFnl1rGiQ2xkD981v28fgZ3OiB6Zt9qnHZnS2dMI5NKgfaTyyKN
-         fx0YDPzQAGtJVHl+pMDj0TU1L5QQZeIQbLz73fymRiwfEfcEXEW4qIoYsM1UTVAzQ2Kh
-         980wSSu0RStPflVFBzgdZbWjunA1c3g1QNqtaG9GvmBIKBrbXGfMmzdJ04belCIRLL7L
-         CfreugdCMgIygMyuGiLINXpDD6CIfFqhKj0GFeV8ysaUjRozURESk3xD6KwWXJZ3MzHP
-         nOSJTbZ2H8TA2gbfzzRIU7XOLlam/cYwvuhGa7nqoyXYKcRVaGAoDvvSCiCS4WcrzyvI
-         Q87w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763751700; x=1764356500;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=gMRrQ5UDUuelFdTKPrDDsaVzS+ehlFeWjYLK9O4YUmY=;
-        b=ICnThxN17qURw8FPQPExy8Fts6+B4q+N+KLQU0kSIagyxCp3X9Kaz5LsIBz90+MUqe
-         zDFfCMVQwdSAUuPIUXUX889U3mYYJgQsBOyZNJ/1nxkx7R9iqMinbDJUoIIA1bIEjW5S
-         G4AMAIsjIXeYEe5s4r+/e7C4v+IvsQ9DDLyiTct0c77mnEkxxsG2GWMcKm1PDXk7lllu
-         d+3grSTTqccC4lXaXpyTlR+7vBIgHCf5MgA9AJYmSRCKxHZgVrpCT/MOZqN6kL/pi1WU
-         f2pEF2q/S1Nut7INyOb7g62Ij62KhFwL5wWaekDWd8MkfjtWje9Qyi4vIDvWOa7izPtb
-         +ijQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXdtzexsPjZoK7OwJ8kEX68+P7wEVhzmo+eOecQ7RqNLF6mXx9u6AxIgOXvEYi7HCfm3YSmDfopv+J/cLc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1udYa2f/+Y0QQ9/4FWCtsDNEwsNjqtcVvsXMmVjU2/GWsddFk
-	/bFSf6nVaax1VpXlaCNtfb+mJT+vio5Rpq5hRWYXQTJ7ZBATU/rHknldrDsXDbfnavb+HT6BV/L
-	xOYrxZ5oWQ8kpnMoiXCcOvEtM6OTKcuE=
-X-Gm-Gg: ASbGncvpvfRP+GPYcaKBondrw2omqFtLs4QUkO1QJ3x4DPVuEZWhk+OUAH21EjlDbJq
-	JXu5Ztc5xQ3gGDd+dgxZT6TqBrh1d2GHDSiztWEKPwT8XGb40XsUaNrcM4TdNLgh9NVY81InyhN
-	62VRoVaPcJn9sbbaarrFE3IM7EEQZB6sDyMk0Kito8qg2APM5agpty6rjlCzNFDv/3JM9fPQ13G
-	a8oWZfZW5kBD/CGGwpvXuxmD4sdc67OzgHI5m9wJIMP50Fcv9VfOFNrY1+MVOGI7pwOhEHim4Jn
-	+0fdOAMX17mFrGV1A3xgzjKtXZG6Eqz3kEyWInzDiLkfya+DnIa8xwmCbjOAmBurUtvBzHPFvfY
-	CvbmP4RElRbcr4A==
-X-Google-Smtp-Source: AGHT+IHxzbdxx7SbQCrTEvxngdIKbtJYdfkpcAfmpDXK7Tu1gbYmvuvSxOavC3Q8fiaJxbZ3HHu3Yl70yC4dL2qOhV0=
-X-Received: by 2002:a05:693c:2a0c:b0:2a4:3593:5fc8 with SMTP id
- 5a478bee46e88-2a719277278mr918984eec.2.1763751699943; Fri, 21 Nov 2025
- 11:01:39 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kSFFKfMe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB1C9C4CEF1;
+	Fri, 21 Nov 2025 19:46:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763754420;
+	bh=cEdRCa2NBNmESBxc72utfubK3/50PKg3AObY9g7OMis=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kSFFKfMeMTUHsC8yj3jqUJ/m8QBV+GwQ/2LqO9m8lU6FGqr+MDNB9s41UgbZsY0tq
+	 PL6+i4/ySPvKoZyv0vYYrhIvHv1Np1oZXvA3RRYdt5YBGKcX0HwqEINffE7tatFMvF
+	 dGIgaxbXK7QEqTiOKMcR7eHx53Cn7tVkeAYhA+XTyTzDbxw967a5phtYgtwu6uxHTB
+	 Gx+mhXtJgUzU6IF84T7VLB7J+/eL0T4M5XMWb3/E0IWYU+UWWMrz6DfTs0aH00zJ5B
+	 txWs4Nmj3znlJOhLorrmIxXQufrgiPy0ZMLyu4JmUOpJwoYsFZq6caXJzpMPUY0qQh
+	 Qb3GiKPtwPb1g==
+Date: Wed, 19 Nov 2025 21:20:04 +0100
+From: Nicolas Schier <nsc@kernel.org>
+To: Simon Glass <sjg@chromium.org>
+Cc: linux-arm-kernel@lists.infradead.org,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Tom Rini <trini@konsulko.com>,
+	Ahmad Fatoum <a.fatoum@pengutronix.de>,
+	J =?iso-8859-1?Q?=2E_Neusch=E4fer?= <j.ne@posteo.net>,
+	Chen-Yu Tsai <wenst@chromium.org>, Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Tamir Duberstein <tamird@gmail.com>, linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev
+Subject: Re: [PATCH v6 5/8] kbuild: Split out module targets into a variable
+Message-ID: <aR4mdI3u51z4qhoN@derry.ads.avm.de>
+References: <20251119181333.991099-1-sjg@chromium.org>
+ <20251119181333.991099-6-sjg@chromium.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251121184342.it.626-kees@kernel.org>
-In-Reply-To: <20251121184342.it.626-kees@kernel.org>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Fri, 21 Nov 2025 20:01:27 +0100
-X-Gm-Features: AWmQ_blNjwG2ZHIL75QpaofqEmG2atnGSXOJBOn15FdezxxUNWzQjNXhbF1nmK8
-Message-ID: <CANiq72mzu_reg+A7vV9ARtu40g4R2rGr6ort5SgjX2Wozo6j-Q@mail.gmail.com>
-Subject: Re: [PATCH v2] kbuild: Enable GCC diagnostic context for
- value-tracking warnings
-To: Kees Cook <kees@kernel.org>
-Cc: "Gustavo A . R . Silva" <gustavoars@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nicolas.schier@linux.dev>, Masahiro Yamada <masahiroy@kernel.org>, 
-	Miguel Ojeda <ojeda@kernel.org>, linux-kbuild@vger.kernel.org, 
-	=?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, 
-	Tamir Duberstein <tamird@gmail.com>, linux-kernel@vger.kernel.org, 
-	linux-hardening@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251119181333.991099-6-sjg@chromium.org>
 
-On Fri, Nov 21, 2025 at 7:43=E2=80=AFPM Kees Cook <kees@kernel.org> wrote:
->
-> Fixes based on this work have already
-> been landing, e.g.:
->
->   4a6f18f28627 ("net/mlx4_core: Avoid impossible mlx4_db_alloc() order va=
-lue")
->   8a39f1c870e9 ("ovl: Check for NULL d_inode() in ovl_dentry_upper()")
->   e5f7e4e0a445 ("drm/amdgpu/atom: Work around vbios NULL offset false pos=
-itive")
+On Wed, Nov 19, 2025 at 11:13:26AM -0700, Simon Glass wrote:
+> Add a modules-targets variable to list the targets which cause modules
+> to be built, since we want to add a conditional target.
+> 
+> Signed-off-by: Simon Glass <sjg@chromium.org>
+> ---
+> 
+> (no changes since v5)
+> 
+> Changes in v5:
+> - Add a new patch to split out module targets into a variable
+> 
+>  Makefile | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index 638bc09a546a..8cd46222fc48 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -772,7 +772,12 @@ endif
+>  # in addition to whatever we do anyway.
+>  # Just "make" or "make all" shall build modules as well
+>  
+> -ifneq ($(filter all modules nsdeps compile_commands.json clang-%,$(MAKECMDGOALS)),)
+> +modules-targets := all
+> +modules-targets += modules
+> +modules-targets += nsdeps
+> +modules-targets += compile_commands.json
+> +modules-targets += clang-%
+> +ifneq ($(filter $(modules-targets),$(MAKECMDGOALS)),)
+>    KBUILD_MODULES := y
+>  endif
+>  
+> -- 
+> 2.43.0
+> 
 
-Thanks for the references & extra context!
+Reviewed-by: Nicolas Schier <nsc@kernel.org>
 
-Reviewed-by: Miguel Ojeda <ojeda@kernel.org>
-
-Cheers,
-Miguel
