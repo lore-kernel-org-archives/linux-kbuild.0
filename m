@@ -1,148 +1,102 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6AD435B126
-	for <linux-kbuild@vger.kernel.org>; Thu, 20 Nov 2025 15:14:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 097CF3644D0
+	for <linux-kbuild@vger.kernel.org>; Thu, 20 Nov 2025 16:22:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763651711; cv=none; b=MkwYaKlQFj+EP/TKZXSidwmzviwtWW6Y1Kb5gVqNOXvOxzLESe2I3E8Y0Nrm+6XBwih05Pr6De8JUjeec7xIDdlOL7rkJ/20FArKTKzJzQpZGSVDUh5Mi8ruswGkHQGyVVf541wXOQ1fGTvV+PqhoSeU96Lema5LaFMEK2noQ9M=
+	t=1763655751; cv=none; b=YqPo2Ce+Zt80rHRxd+Ll7TJLKtdQK0vKiDzZHWVymGbmVD9EGnr4tIOCrBopy8bRbgyubxD3aWQbr5y98gI3sVqZdCd/N5gbQRpHxSVRwUJAdhhrvpOD8LSPIunr1CbfxtPgb6wqH8VDXXTISMQ7U+CRGYlg2BFUr6xjSex6QcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763651711; c=relaxed/simple;
-	bh=JghkiwHvBvL6JcsywiEEh15XJk0LP4WSUGT+cTqq5kc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PHb+HJAqkgJXtTUPROOgWtfNBr5vWAzrRIUnWKLCQgLw29JAdLYKOaH85I9gRO0Lcei+/E0oxIDIV6JOAAySNJuoiIc54B1Ch5tJhbVEvvgsr/m/gKOIDc0d7xZ31MvJyBeHX25IoNRvgaqJTfUBd27E6QljVSa3rzxxeBnrBaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--elver.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CJHAYRpj; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--elver.bounces.google.com
+	s=arc-20240116; t=1763655751; c=relaxed/simple;
+	bh=bi/Po0AgpnEbGaYHxKxOmZ9YXa7BiIdYeqc0S3my3Xo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MlCHvOSj+eSgtja8UDQGx4Rx4RAT9YMTH9vOLLlBJBBnYe/qteceJaE5P1xVbj9CmggZjt9zpAFzY1EJrANu2eevqo7QFiJixlFmcPt7T7ByA0JeVbqak2sgGkpup33Z1zQHhKuZzcNT0JMyJGHl4rIKLKG6qH09xe7WVntArqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OJqg5gsj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CJHAYRpj"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-477a1e2b372so8553925e9.2
-        for <linux-kbuild@vger.kernel.org>; Thu, 20 Nov 2025 07:13:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763651635; x=1764256435; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Im5hsj1DltxV90KwIidFCTn0DS8FZncDFP7kTqaMpC0=;
-        b=CJHAYRpj8OdyNZb9AA1JEkkGxogTxd4rLTjbLE2ImVrpUNP7iruS7fNrJbcEcbFDmR
-         S4R0OuQRmnqP1zeN+epjN/RUXQcciANAC/S+LWnHaii0RAyiiT02phA5POdjnHUaMeDw
-         wp1XhYYHnkB8BWvNIwB9MM2D7GO0wERdk6U53yuEk2HVRbKTSQ3dE4PBA47tye4tNUBc
-         G6QqCwUs0XGMY53xRTBVYJnFcYzzcUZe1DsVIDWkTe5jl0Q21Nug0wQyG9AMTsGHD4P5
-         p3HwB23RqXXJD9VgamMqIW4abFlWzPcir+ji95zxTIsUttAENUCrTRjy0LI6SxOEQ7Ig
-         qejg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763651635; x=1764256435;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Im5hsj1DltxV90KwIidFCTn0DS8FZncDFP7kTqaMpC0=;
-        b=DfjuvQjrfhZTWZoLfotd53NjZMj4TBnWaYQhqCCmWHQ/PQu6gWOmPJfGjjrw7jOB5D
-         n4cZjXrHuyJUdv36J9kCFH1kUogcIStQv7xXBnYH7syIMWXVLntWUom7gN7lX00udBMd
-         gt1jwzZiOrHtj+VjCZ3cyXw9X2Boq/Fl7++WTXPG/y8uzgkVKKwyYusiOh//Y+2aSHgU
-         7i26g12pNe6tPmaZKZA0+qqDMyC7sVRmlHCNsjz41Z5BUiLWG3w/BRv11mFgocHp3YSz
-         7QyPNdmQ37ca4qWRa5agJSoQycKK80IYqJj4yAl/etlVVQAQMZLmRIURdjJskEC/h38Q
-         UXcw==
-X-Forwarded-Encrypted: i=1; AJvYcCUkBmliJgOPGyfCm7O3QTahRY/FNCTQ9m32qSGTtNsTd26CJjteVCNVlrJpcp1NX8OQo7ZGyP/RnKJaRZU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDw7eCD3EDaCeOSSXo06i8W94l3mL/+IgN4N4e0ZPYQCPQqQ9k
-	85hJ7e1yV2vLQN3/dv+voPTxBZQ6BRjJlRXWgfGEK1pFmMmTqNMsKXYAoaOkjPwFxtYD89dkSl5
-	gAA==
-X-Google-Smtp-Source: AGHT+IE0txFyfqWr7t8p06ZvcBdzNhQeJVfQ06tB7yPqhvYYx4yW0lw4v6t9Cn2mD+Uk9FOLbPP2gAnnVA==
-X-Received: from wmd10.prod.google.com ([2002:a05:600c:604a:b0:477:9c68:bd6])
- (user=elver job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:1c1b:b0:471:c72:c7f8
- with SMTP id 5b1f17b1804b1-477b9e1cbfbmr31262875e9.21.1763651635197; Thu, 20
- Nov 2025 07:13:55 -0800 (PST)
-Date: Thu, 20 Nov 2025 16:09:57 +0100
-In-Reply-To: <20251120151033.3840508-7-elver@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OJqg5gsj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE5A1C19425
+	for <linux-kbuild@vger.kernel.org>; Thu, 20 Nov 2025 16:22:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763655750;
+	bh=bi/Po0AgpnEbGaYHxKxOmZ9YXa7BiIdYeqc0S3my3Xo=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=OJqg5gsj68ksFZN0GbvCUrDOmfrmRxVknpZNcMdToGVZVvl4EawqQiK/RQ7e58ifU
+	 vwvTkArvsYgKhaFbPDYTNrAswmZJS94eTfPRPPhrE1hIJ7kn6kr7CgGow1eRsLVwh+
+	 Ubqao6grr+Ox/P33v8nvayEXUjcRzbzY/otv9qQWV46zE7hCP268zEkixGSjcQLuT1
+	 OM/SURl1hDHKSZYhO5shJ+N0LjpXKnP9vMougYMgUBNotoEzcNREMrmw3cuW13QsDJ
+	 nodPtUgFwQD7zQ1PbtHPPWCL9CX+kRLzBEnh0p3TRHH7doP1PaMme5cuOgaUtzKZJQ
+	 QD3VK61BRe7rg==
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-b71397df721so202328766b.1
+        for <linux-kbuild@vger.kernel.org>; Thu, 20 Nov 2025 08:22:30 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXsnYXaHuIedbthQBfghEZ5alIyR91nT1RLWG+I8deLIEqv77ptVSAN4URPKvQKNYEkc2griWikvq7XWLY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YylFn+7flto558b3QnQwYJHTxCpEkO87RGlhUxTkAL/Ko9TWPa2
+	xm3gMsG29YFP/GopdWJQJh64//ugfze06lqw+lR/aeGy/bfr7rXcaX8WedKuErdFrJ0U7DRQx6o
+	06+BbWBBiPcKmj459vwmFqdYq2S5whA==
+X-Google-Smtp-Source: AGHT+IEWkCgWatcHpdXr/OIRJiRj/QCEmSn/C4yEQfCtXou2e73E372BAB9bX3hhR6qzcGe6jCZ9JRVO/S+7C6PFF8E=
+X-Received: by 2002:a17:907:db16:b0:b72:d001:7653 with SMTP id
+ a640c23a62f3a-b7654de0b58mr374078966b.19.1763655748985; Thu, 20 Nov 2025
+ 08:22:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251120145835.3833031-2-elver@google.com> <20251120151033.3840508-7-elver@google.com>
-X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
-Message-ID: <20251120151033.3840508-33-elver@google.com>
-Subject: [PATCH v4 32/35] printk: Move locking annotation to printk.c
-From: Marco Elver <elver@google.com>
-To: elver@google.com, Peter Zijlstra <peterz@infradead.org>, 
-	Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>, Will Deacon <will@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, 
-	Chris Li <sparse@chrisli.org>, "Paul E. McKenney" <paulmck@kernel.org>, 
-	Alexander Potapenko <glider@google.com>, Arnd Bergmann <arnd@arndb.de>, Bart Van Assche <bvanassche@acm.org>, 
-	Christoph Hellwig <hch@lst.de>, Dmitry Vyukov <dvyukov@google.com>, Eric Dumazet <edumazet@google.com>, 
-	Frederic Weisbecker <frederic@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Ian Rogers <irogers@google.com>, 
-	Jann Horn <jannh@google.com>, Joel Fernandes <joelagnelf@nvidia.com>, 
-	Johannes Berg <johannes.berg@intel.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Josh Triplett <josh@joshtriplett.org>, Justin Stitt <justinstitt@google.com>, 
-	Kees Cook <kees@kernel.org>, Kentaro Takeda <takedakn@nttdata.co.jp>, 
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>, Mark Rutland <mark.rutland@arm.com>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Miguel Ojeda <ojeda@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Neeraj Upadhyay <neeraj.upadhyay@kernel.org>, 
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, Thomas Gleixner <tglx@linutronix.de>, 
-	Thomas Graf <tgraf@suug.ch>, Uladzislau Rezki <urezki@gmail.com>, Waiman Long <longman@redhat.com>, 
-	kasan-dev@googlegroups.com, linux-crypto@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-security-module@vger.kernel.org, linux-sparse@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, llvm@lists.linux.dev, rcu@vger.kernel.org
+MIME-Version: 1.0
+References: <20251112-pci-m2-e-v1-0-97413d6bf824@oss.qualcomm.com>
+ <20251112-pci-m2-e-v1-6-97413d6bf824@oss.qualcomm.com> <CAL_JsqKBcXH0EWguto3EFY2cJ5p=8VUZczMHz1u5fNFocv-AmA@mail.gmail.com>
+ <cjtnoqjr3v5o64caa6unllb2e2csyvybr6vnzwuqqrl453bgz7@drqmfkfbn5xg>
+In-Reply-To: <cjtnoqjr3v5o64caa6unllb2e2csyvybr6vnzwuqqrl453bgz7@drqmfkfbn5xg>
+From: Rob Herring <robh@kernel.org>
+Date: Thu, 20 Nov 2025 10:22:16 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqLoD5GiiGgWTEa6-g8VwyuPTko-ewe5CKPBWMgHDnKaHg@mail.gmail.com>
+X-Gm-Features: AWmQ_blvWXZ3OwaL5ikiIPwr7cVeDcTz_uslr7dP8flZZyL49YRBC5MiFZDf9vA
+Message-ID: <CAL_JsqLoD5GiiGgWTEa6-g8VwyuPTko-ewe5CKPBWMgHDnKaHg@mail.gmail.com>
+Subject: Re: [PATCH 6/9] serdev: Skip registering serdev devices from DT is
+ external connector is used
+To: Manivannan Sadhasivam <mani@kernel.org>
+Cc: manivannan.sadhasivam@oss.qualcomm.com, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jirislaby@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, 
+	Hans de Goede <hansg@kernel.org>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
+	Mark Pearson <mpearson-lenovo@squebb.ca>, "Derek J. Clark" <derekjohn.clark@gmail.com>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Bartosz Golaszewski <brgl@bgdev.pl>, linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
+	linux-pci@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-pm@vger.kernel.org, Stephan Gerhold <stephan.gerhold@linaro.org>, 
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-With Sparse support gone, Clang is a bit more strict and warns:
+On Wed, Nov 19, 2025 at 7:33=E2=80=AFAM Manivannan Sadhasivam <mani@kernel.=
+org> wrote:
+>
+> On Tue, Nov 18, 2025 at 07:03:51AM -0600, Rob Herring wrote:
+> > On Wed, Nov 12, 2025 at 8:45=E2=80=AFAM Manivannan Sadhasivam via B4 Re=
+lay
+> > <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org> wrote:
+> > >
+> > > From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+> > >
+> > > If an external connector like M.2 is connected to the serdev controll=
+er
+> > > in DT, then the serdev devices will be created dynamically by the con=
+nector
+> > > driver. So skip registering devices from DT node as there will be no
+> > > statically defined devices.
+> >
+> > You could still have statically defined devices. You are just choosing
+> > to probe them later from the connector driver.
+> >
+>
+> The point of coming up with the M.2 binding is to avoid hardcoding the de=
+vices
+> in DT. So static devices are ruled out IMO.
 
-./include/linux/console.h:492:50: error: use of undeclared identifier 'console_mutex'
-  492 | extern void console_list_unlock(void) __releases(console_mutex);
+Until you have any one of the reasons we have PCIe devices described
+even when in a standard slot. Take your pick. An ethernet adapter that
+omits an EEPROM for the MAC address.
 
-Since it does not make sense to make console_mutex itself global, move
-the annotation to printk.c. Context analysis remains disabled for
-printk.c.
-
-This is needed to enable context analysis for modules that include
-<linux/console.h>.
-
-Signed-off-by: Marco Elver <elver@google.com>
----
-v2:
-* New patch.
----
- include/linux/console.h | 4 ++--
- kernel/printk/printk.c  | 2 ++
- 2 files changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/include/linux/console.h b/include/linux/console.h
-index 031a58dc2b91..1eb3c9d9d6ae 100644
---- a/include/linux/console.h
-+++ b/include/linux/console.h
-@@ -488,8 +488,8 @@ static inline bool console_srcu_read_lock_is_held(void)
- extern int console_srcu_read_lock(void);
- extern void console_srcu_read_unlock(int cookie);
- 
--extern void console_list_lock(void) __acquires(console_mutex);
--extern void console_list_unlock(void) __releases(console_mutex);
-+extern void console_list_lock(void);
-+extern void console_list_unlock(void);
- 
- extern struct hlist_head console_list;
- 
-diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index 5aee9ffb16b9..7646952a92f1 100644
---- a/kernel/printk/printk.c
-+++ b/kernel/printk/printk.c
-@@ -245,6 +245,7 @@ int devkmsg_sysctl_set_loglvl(const struct ctl_table *table, int write,
-  * For console list or console->flags updates
-  */
- void console_list_lock(void)
-+	__acquires(&console_mutex)
- {
- 	/*
- 	 * In unregister_console() and console_force_preferred_locked(),
-@@ -269,6 +270,7 @@ EXPORT_SYMBOL(console_list_lock);
-  * Counterpart to console_list_lock()
-  */
- void console_list_unlock(void)
-+	__releases(&console_mutex)
- {
- 	mutex_unlock(&console_mutex);
- }
--- 
-2.52.0.rc1.455.g30608eb744-goog
-
+Rob
