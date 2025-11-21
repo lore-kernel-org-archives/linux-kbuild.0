@@ -1,151 +1,235 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC2A3302CAB;
-	Fri, 21 Nov 2025 19:47:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63AF92BE05F;
+	Fri, 21 Nov 2025 19:47:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763754424; cv=none; b=gOsy/bkLkDZyDcj1+9s5HI0CH2r8zTVdDScJfOXGF4g/McZNBeQsEOaB3xTkMYOwrRTHWcL6Y0TF0SkIxin53Q8e4tTa6u5G7u1+TD9o6MVKXYeUGtgIb2Mo9iLeta2D7FJ86WRWW+nibc0kIVQESZuqhm8FEEfS1w3/3wn48/E=
+	t=1763754427; cv=none; b=rl0fLG7aBDA7qaw9+XQhkg4iP/lwAq2tU540DNF8EzHjei6RNQ0pph6KYh9t29osyWSJWTdvnHPgerLh2RFDi6Egx8yGtFmmkhE0lKLtB5GedzS9Eb7POBJBfdOxz/N6XpHhuUo5l3KJyfoGlxr/299FVBRdOGFZ/oHm6MOv/DQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763754424; c=relaxed/simple;
-	bh=G12g/v72rpg6oHwIsKwW7r2AWt7vFH3TU2TWjKKMmTI=;
+	s=arc-20240116; t=1763754427; c=relaxed/simple;
+	bh=Vg/9WM4svuJxXmTZGYFyYyC/fQlAZAwS2uwXY2DgmR8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KLzRHgy3G4Ecb97SgHqWO3SE3OjjWcQMCa+qh/SaMUlCijq3oWVZ1PqPl54Zc6AHLA21HKlCENH8dEBqQPPejgtTmDfoXdgwDYNJb+8ttr/xQe2JOCNARfydg84Mi4pV7f5+sN001n+vdYh8zf22XgPTGQC5m7xvEhdS+aHDCJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vA0nnPi2; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jij1M28UKimHRs0r9FLeSa36bn+/Q2z3zP9iIQwBi/JWfinmmIihg/vacAinSuGCdO39s2wvhEGyDOqs216yiPIs9iMCDEU/CuXR6SNuMkkkIudPQnAXcF/b1M4+iXFeS2HhDS/4FRbTmaKrvIsp2HE9E6i8togBA9FUYkayE7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HS/I0gDR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vA0nnPi2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28A08C4CEF1;
-	Fri, 21 Nov 2025 19:47:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HS/I0gDR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 690D2C4CEF1;
+	Fri, 21 Nov 2025 19:47:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763754423;
-	bh=G12g/v72rpg6oHwIsKwW7r2AWt7vFH3TU2TWjKKMmTI=;
+	s=k20201202; t=1763754426;
+	bh=Vg/9WM4svuJxXmTZGYFyYyC/fQlAZAwS2uwXY2DgmR8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=vA0nnPi2O04n7Q5BW039HbXJtxLU0zsf+WGFpaPBzSwMaFdCStHsyGV0r4EQ5NcmW
-	 4AljIb7Mm8w1Q+0QbxTmLUGLDFa5TD8/PckwsAoc8Qvqkho6HvGFTwQV+7Do4HJfiK
-	 x6deAs6N7fhGNP9OQAnilEPoP5YuXB63Kzv/W8lEG0z5ExpFFFG02OQLB6QctjxKhn
-	 XV3tRvRC85odnCZjI6kHSTii8AHOMQbn2wsPmvUjoez117IMuoEobrkNkMMlycU9/M
-	 Lx6YmzfEgfrlezTqXCmHQBSRwR8tibr8smfoshaPW8yOJt0kJIAR1+pFJkYe7oXByZ
-	 37JqUibbW9QOg==
-Date: Wed, 19 Nov 2025 21:20:32 +0100
+	b=HS/I0gDRR5ulP8YpCKhY0pGoC//uLtHpesK93QeLmDwHiWXgVF9PfspYCcY8YDa4e
+	 QnodNPzsMmpz6DkDpNNgHyqQ4J63bUI2MoW12ViGmehzqFp9bWDuPmjnkp6kS0CvQS
+	 oabcR2BgJpsitAfB7NNHtgePHZblvY8fPs4S/l4KvQHoem1aliLIO4FMggaYN6eqI6
+	 PBCyKmFVL2E/c1ntLJU+gYavkSwA05ILhv6s7pKH1j6Mz7QkiodmlCv7istGTUFffJ
+	 ANaSC6cjqLNnAtUDr7Ap7skCr6YQHKCThhTudU1ChxaK3UZVeoVpj46DLusTf2ly+o
+	 VswKi+rmdKN6Q==
+Date: Fri, 21 Nov 2025 20:42:34 +0100
 From: Nicolas Schier <nsc@kernel.org>
-To: Simon Glass <sjg@chromium.org>
-Cc: linux-arm-kernel@lists.infradead.org,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Tom Rini <trini@konsulko.com>,
-	Ahmad Fatoum <a.fatoum@pengutronix.de>,
-	J =?iso-8859-1?Q?=2E_Neusch=E4fer?= <j.ne@posteo.net>,
-	Chen-Yu Tsai <wenst@chromium.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: "Rob Herring (Arm)" <robh@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>, Kees Cook <kees@kernel.org>,
-	Miguel Ojeda <ojeda@kernel.org>, Rong Xu <xur@google.com>,
-	Tamir Duberstein <tamird@gmail.com>, Will Deacon <will@kernel.org>,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 6/8] kbuild: Allow adding modules into the FIT ramdisk
-Message-ID: <aR4mkHDgVOj3715A@derry.ads.avm.de>
-References: <20251119181333.991099-1-sjg@chromium.org>
- <20251119181333.991099-7-sjg@chromium.org>
+	Will Deacon <will@kernel.org>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v2] kbuild: Support directory targets for building DTBs
+Message-ID: <aSDAqhUb8_76IP0Y@derry.ads.avm.de>
+References: <20251120204812.1983452-4-robh@kernel.org>
+ <20251121063033.GA571346@ax162>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="AfpfqPLkSPOJGvv9"
+Content-Disposition: inline
+In-Reply-To: <20251121063033.GA571346@ax162>
+
+
+--AfpfqPLkSPOJGvv9
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251119181333.991099-7-sjg@chromium.org>
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 19, 2025 at 11:13:27AM -0700, Simon Glass wrote:
-> Support 'make image.fit FIT_MODULES=1' to put all the modules into a
-> ramdisk image within the FIT.
-> 
-> Add image.fit as a target which requires modules, so that modules will
-> built automatically when using FIT_MODULES is not empty.
-> 
-> Signed-off-by: Simon Glass <sjg@chromium.org>
-> Suggested-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
-> Suggested-by: Reviewed-by: Nicolas Schier <nsc@kernel.org>
+On Thu, Nov 20, 2025 at 11:30:33PM -0700, Nathan Chancellor wrote:
+> On Thu, Nov 20, 2025 at 02:48:13PM -0600, Rob Herring (Arm) wrote:
+> > It is useful to be able to build all the DTBs for a vendor. One can list
+> > all the .dts files in a directory and convert those to %.dtb targets,
+> > but that doesn't work for base+overlay DTB targets.
+> >=20
+> > Adding the dts subdirectory is straight-forward, but building the
+> > DTBs should only happen for certain targets (dtbs, dtbs_check, %.dtb,
+> > %.dtbo, and the directory target(s)).
+> >=20
+> > The 'scripts_dtc' rule doesn't really depend on 'dt_binding_schemas',
+> > but the directory target only depends on 'scripts' which depends on
+> > 'scripts_dtc'.
+> >=20
+> > Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> > ---
+> > Please ack and I'll take this in the DT tree.
+> >=20
+> > I don't really like looking at MAKECMDGOALS, but that's the only way I
+> > could come up with that works. Maybe someone knows a better way.
+>=20
+> Yeah, I do worry that just looking for "dtb" in MAKECMDGOALS could
+> result in some false positives but in the tree now, I only see one .c
+> file that would trigger this logic, so maybe it is not that big of a
+> deal?
+>=20
+>   $ fd dtb
+>   arch/microblaze/boot/dts/linked_dtb.S
+>   arch/mips/include/asm/mach-loongson64/builtin_dtbs.h
+>   arch/um/kernel/dtb.c
+>   drivers/gpu/drm/ci/dtbs-check.sh
+>   scripts/Makefile.dtbinst
+>   scripts/Makefile.dtbs
+>=20
+> Unfortunately, my Make-fu is pretty weak right now so I do not have any
+> immediate suggestions but Nicolas might... otherwise, we could probably
+> ride this for right now and either revert it or forward fix it if
+> problems come up in further testing, since this does seem rather useful
+> for folks working on device tree files.
 
-I think the
+well, evaluating MAKECMDGOALS does not look that bad to me.  But I'd
+rather like to reduce the use of findstring, see below.
 
-Reviewed-by: Nicolas Schier <nsc@kernel.org>
+>=20
+> > v2:
+> >  - Convert arm, mips and riscv. The other DT enabled arches don't have=
+=20
+> >    vendor directories.
+> >  - Link to v1: https://lore.kernel.org/all/20251113225952.867138-1-robh=
+@kernel.org/=20
+> >=20
+> > ---
+> >  Makefile              | 2 +-
+> >  arch/arm/Kbuild       | 2 ++
+> >  arch/arm64/Kbuild     | 2 ++
+> >  arch/mips/Kbuild      | 2 ++
+> >  arch/riscv/Kbuild     | 2 ++
+> >  scripts/Makefile.dtbs | 3 +++
+> >  6 files changed, 12 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/Makefile b/Makefile
+> > index 17cfa11ca716..85018d461575 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -1494,7 +1494,7 @@ export CHECK_DTBS=3Dy
+> >  endif
+> > =20
+> >  ifneq ($(CHECK_DTBS),)
+> > -dtbs_prepare: dt_binding_schemas
+> > +scripts_dtc: dt_binding_schemas
+> >  endif
+> > =20
+> >  dtbs_check: dtbs
+> > diff --git a/arch/arm/Kbuild b/arch/arm/Kbuild
+> > index 69de6b6243c7..af7dd53585c3 100644
+> > --- a/arch/arm/Kbuild
+> > +++ b/arch/arm/Kbuild
+> > @@ -10,5 +10,7 @@ obj-y				+=3D probes/
+> >  obj-y				+=3D net/
+> >  obj-y				+=3D crypto/
+> > =20
+> > +subdir-y +=3D boot/dts
+> > +
+> >  # for cleaning
+> >  subdir- +=3D boot
+> > diff --git a/arch/arm64/Kbuild b/arch/arm64/Kbuild
+> > index 5bfbf7d79c99..9e9820af48c9 100644
+> > --- a/arch/arm64/Kbuild
+> > +++ b/arch/arm64/Kbuild
+> > @@ -5,5 +5,7 @@ obj-$(CONFIG_XEN)	+=3D xen/
+> >  obj-$(subst m,y,$(CONFIG_HYPERV))	+=3D hyperv/
+> >  obj-$(CONFIG_CRYPTO)	+=3D crypto/
+> > =20
+> > +subdir-y +=3D boot/dts
+> > +
+> >  # for cleaning
+> >  subdir- +=3D boot
+> > diff --git a/arch/mips/Kbuild b/arch/mips/Kbuild
+> > index e901bf554483..6125d00cdcef 100644
+> > --- a/arch/mips/Kbuild
+> > +++ b/arch/mips/Kbuild
+> > @@ -21,5 +21,7 @@ ifdef CONFIG_KVM
+> >  obj-y +=3D kvm/
+> >  endif
+> > =20
+> > +subdir-y +=3D boot/dts
+> > +
+> >  # for cleaning
+> >  subdir- +=3D boot
+> > diff --git a/arch/riscv/Kbuild b/arch/riscv/Kbuild
+> > index 126fb738fc44..3cf7f84eb287 100644
+> > --- a/arch/riscv/Kbuild
+> > +++ b/arch/riscv/Kbuild
+> > @@ -7,5 +7,7 @@ obj-$(CONFIG_KVM) +=3D kvm/
+> > =20
+> >  obj-$(CONFIG_ARCH_SUPPORTS_KEXEC_PURGATORY) +=3D purgatory/
+> > =20
+> > +subdir-y +=3D boot/dts
+> > +
+> >  # for cleaning
+> >  subdir- +=3D boot
+> > diff --git a/scripts/Makefile.dtbs b/scripts/Makefile.dtbs
+> > index 2d321b813600..4d0d164df275 100644
+> > --- a/scripts/Makefile.dtbs
+> > +++ b/scripts/Makefile.dtbs
+> > @@ -14,7 +14,10 @@ dtb-y           :=3D $(addprefix $(obj)/, $(dtb-y))
+> >  multi-dtb-y     :=3D $(addprefix $(obj)/, $(multi-dtb-y))
+> >  real-dtb-y      :=3D $(addprefix $(obj)/, $(real-dtb-y))
+> > =20
+> > +ifneq ($(findstring /dts/,$(MAKECMDGOALS))$(findstring dtb,$(MAKECMDGO=
+ALS)),)
 
-is enough :)
+Using '$(filter )' instead of '$(findstring )' reduces the risk of false
+positives, e.g.:
 
-Thanks.
+dtb-targets :=3D %/dts %.dtb %.dtbo dtbs dtbs_check
+ifneq ($(findstring /dts/,$(MAKECMDGOALS))$(filter $(dtb-targets),$(MAKECMD=
+GOALS)),)
 
 
-> Acked-by: Nathan Chancellor <nathan@kernel.org>
-> ---
-> 
-> Changes in v6:
-> - Mention that FIT_MODULES just needs to be non-empty
-> - Make use of modules.order instead of using 'find'
-> 
-> Changes in v5:
-> - Build modules automatically if needed (fix from Nicolas Schier)
-> 
-> Changes in v4:
-> - Rename the Makefile variable from 'EXTRA' to 'MAKE_FIT_FLAGS'
-> - Use an empty FIT_MODULES to disable the feature, instead of '0'
-> - Make use of the 'modules' dependency to ensure modules are built
-> - Pass the list of modules to the script
-> 
->  Makefile             | 1 +
->  arch/arm64/Makefile  | 1 +
->  scripts/Makefile.lib | 6 +++++-
->  3 files changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index 8cd46222fc48..4eccaef95826 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -773,6 +773,7 @@ endif
->  # Just "make" or "make all" shall build modules as well
->  
->  modules-targets := all
-> +modules-targets += $(if $(FIT_MODULES),image.fit)
->  modules-targets += modules
->  modules-targets += nsdeps
->  modules-targets += compile_commands.json
-> diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
-> index 73a10f65ce8b..7036f251ab40 100644
-> --- a/arch/arm64/Makefile
-> +++ b/arch/arm64/Makefile
-> @@ -174,6 +174,7 @@ endif
->  all:	$(notdir $(KBUILD_IMAGE))
->  
->  image.fit: dtbs
-> +image.fit: $(if $(FIT_MODULES),modules)
->  
->  vmlinuz.efi image.fit: Image
->  $(BOOT_TARGETS): vmlinux
-> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> index 1d581ba5df66..28e0cc0865b1 100644
-> --- a/scripts/Makefile.lib
-> +++ b/scripts/Makefile.lib
-> @@ -398,11 +398,15 @@ MAKE_FIT := $(srctree)/scripts/make_fit.py
->  # Use this to override the compression algorithm
->  FIT_COMPRESSION ?= gzip
->  
-> +# Set this to non-empty to include an initrd with all the kernel modules
-> +FIT_MODULES ?=
-> +
->  quiet_cmd_fit = FIT     $@
->        cmd_fit = $(MAKE_FIT) -o $@ --arch $(UIMAGE_ARCH) --os linux \
-> -		--name '$(UIMAGE_NAME)' \
-> +		--name '$(UIMAGE_NAME)' $(MAKE_FIT_FLAGS) \
->  		$(if $(findstring 1,$(KBUILD_VERBOSE)),-v) \
->  		$(if $(FIT_DECOMPOSE_DTBS),--decompose-dtbs) \
-> +		$(if $(FIT_MODULES),--modules @$(objtree)/modules.order) \
->  		--compress $(FIT_COMPRESSION) -k $< @$(word 2,$^)
->  
->  # XZ
-> -- 
-> 2.43.0
-> 
+With (something like) that:
+Tested-by: Nicolas Schier <nsc@kernel.org>
+Acked-by: Nicolas Schier <nsc@kernel.org>
 
--- 
+But [1] seems to break this patch.
+
+[1]: https://lore.kernel.org/linux-kbuild/20251120140645.478623-1-thomas.de=
+_schampheleire@nokia.com
+
+Kind regards,
 Nicolas
+
+--AfpfqPLkSPOJGvv9
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEh0E3p4c3JKeBvsLGB1IKcBYmEmkFAmkgwKoACgkQB1IKcBYm
+Emm8Qw/+MwI0xujbY4z6kH8eqisZOdw3rGVbln1KTIUnNXmON6raX7XFOnAxqaHI
+BhYiwbUYWUHKeHApq1XCTR4WKNtzMYiID+zA0HuwxuqOlzdPwl35Xn+nvBw/Mmfw
+xUF9nqlmFu7MH9xIOfbWotGMIgqBc5FKAflHwHGpjW009mvPQ5hnMqiXk0DVu8oz
+rVLhviLqgjsx2ESl0sgkfiOBt0ygtzFKvUrqSVixl/sB5nI7sOhU190u8qvpZ/bV
+Pc6s9+IUhTv5+iaxhTUcsQjZTgHp5KJSrlmcIUY5eLdwFQRFAB3w4Kx8xNY8NO02
+xLPZSQ28FcJaBuRyLTYFy4CaVOMKV2r2JW5DUdkUxuIwh9UdEkOjCQSWfomRALGc
+PlZzKpsUp7p76fW2WkbjN9r45qCRFdaWEN3olr9vBh0Y5u+1AnZh7Ej/lws7Cj4z
+sEBo6QdAlP0ofjB1JrNP98MMOQu1Tr3fOwkadCmyRtuYqJG72Tj7t6EBrC/JRoS0
+MFl/XEPHgQcjRgVIWEfFtCwrflq2jO/f2fbfTZHPxbMbj99CATyDDTy+QWzB8bhT
+RqrzlrejhI4WV27fReo4wMk/Og8ewO0/h2mloIi1hrORFClz5M+aU3CCEvFu2hfY
++hBhCWYDLSN4n5mUhA6nH/RFdZoNohijzS15aqmkCNWx1yM/g5I=
+=pv6m
+-----END PGP SIGNATURE-----
+
+--AfpfqPLkSPOJGvv9--
