@@ -1,85 +1,88 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4365314D0C;
-	Wed, 26 Nov 2025 19:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2574F16DEB0;
+	Wed, 26 Nov 2025 20:49:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764187199; cv=none; b=Re4mLQGfTA50zLJFjHkRaO+pLghNRi8ton/ivj7w8HE7kGqVCSOgy7YZTOSuMKidzLUct91aI0xOGNt7ws704OpCPy2DoT2YQ/qHZldCDVnfNeLxPwj+JMv2kETdl/JFZBBZADjmg7pQep4bSiEGNR3Pywrc4a/ZD36gxAyCwZk=
+	t=1764190151; cv=none; b=UaZTxJDfy+sU0XIgS/0MnI4PQ5cHXItK9wwl2RZQ/zc18K/ew4XaIfLeMXV/pM+0KxFca0yQK5UcNAxU4mBt6w9Yx2/wY00lYHs0UIkzx1Xkh/n6CFHIY3ME7lNusYN7hIXH0qB6NvdmPPKjq/j4bog3BD10QQncF/YPY6JgP4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764187199; c=relaxed/simple;
-	bh=JVkhGAnFuqOLyOevdPN+qYtg3KUlxPhUsvfr3ZMySPI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JD+NSlNexUHEq2/7sbMfWtAXMJafyjWfIJAfrWZjHEoYjW20cETT4D3SRA7ueRZtCQtK3MaHt3uwnr19bQ8isc7alGKkrBEUq9Txq22suZ3wwLZihLpNEVydieb81IMGAvZmx3hsIWxcF/ZnPsukS8DhM/uz4FAdK1NAzCaHYm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U65324fX; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764190151; c=relaxed/simple;
+	bh=bTg0AQnVQjYRj+5AwoOjeTHstG+BtnMifdDv+GuMp30=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qbl5lTiuG3VWMx5bqA5SKec8UQzE8+zshgyXQjoeGKzED77m1AjzHiF/i3lx8vPcCwc10MsmwG8sTZdpKlv8q2P1apFmZpQZJhrZLUclx8J6CmdV27fmiVOWvWAXpIev9zdUMBfgJN6/u8LrMHzy8bp0PwwoIAkC6PibZxAX+VE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=We4LevAm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U65324fX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB18FC4CEF7;
-	Wed, 26 Nov 2025 19:59:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="We4LevAm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89889C4CEF7;
+	Wed, 26 Nov 2025 20:49:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764187199;
-	bh=JVkhGAnFuqOLyOevdPN+qYtg3KUlxPhUsvfr3ZMySPI=;
-	h=Date:Reply-To:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=U65324fXGG4SAU0RxSSsnYMz4mPZOgiBdK+xN20jRu2PlWwEJehwLkEH0mQe199GS
-	 08EAZl3rjCxO2tl0b6nzDmvKa3ROgFF2bf5HN7bY6056yhIl4w9gixd5L3RQDmqzQe
-	 vlHgWv2f9UIxsGvvxqHcm5VgS1jmgILEHmCoP1ugNbSFSXJREDZZNSuoVueejtfYA/
-	 +w6NbiodaPC/iDD9t6JlbFA1byZxznuiEnljp/BYDOmrbVljxa6HHfM5xAx4Xcg74T
-	 8+2pLy9tRO2Cgaf+7TPNUFVkjDeuz7nOsIV+QT6UmA8Yg67pHSgskYPwEg+CNmIGpX
-	 YV+SfZyZ8wPTA==
-Message-ID: <9d9ca6f0-b4cc-4fef-9ca2-9cb754330581@kernel.org>
-Date: Wed, 26 Nov 2025 20:59:55 +0100
+	s=k20201202; t=1764190151;
+	bh=bTg0AQnVQjYRj+5AwoOjeTHstG+BtnMifdDv+GuMp30=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=We4LevAm6vT0xtHdJ09DrbSDHoVNv6I4HPXxld0JvAtNOAfEuY9kbMZmr4liIAvIF
+	 +ENVdod5Z3B6bKWYFu91Yz4buJJAAgkIPL9NWWHIpCpQT0z0Mh4jssnqn4164rCOye
+	 TbJMO+nB0d83/JeagXjw6yyGSWhLu3xbxaULQ++3Jq0Uyo8mIdt2XSKeTEJrVuxM9D
+	 1H0MM0BlOcKNH5LKKVJ0WAsvPabyyi7HcS+K345OVeUR/1uJEQ/0Y7mW1Frumw1cjY
+	 PTozM7FzDa5AYJbqgUPqB956vQlo1F8E/aOfDn2w19HAdMan4vGDw3GMDbxzYoJO+3
+	 oJtYIYtXCULBg==
+Date: Fri, 21 Nov 2025 20:56:59 +0100
+From: Nicolas Schier <nsc@kernel.org>
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Nathan Chancellor <nathan@kernel.org>, devicetree@vger.kernel.org,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] kbuild: Ensure .dtbo targets are applied to a base .dtb
+Message-ID: <aSDEC9D87nZB5RJp@derry.ads.avm.de>
+References: <20251114222759.4181152-1-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: Daniel Gomez <da.gomez@kernel.org>
-Subject: Re: [PATCH] gendwarfksyms: Fix build on 32-bit hosts
-To: Sami Tolvanen <samitolvanen@google.com>,
- =?UTF-8?Q?Michal_Such=C3=A1nek?= <msuchanek@suse.de>
-Cc: linux-modules@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>,
- Petr Pavlu <petr.pavlu@suse.com>, linux-kbuild@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20251117203806.970840-2-samitolvanen@google.com>
- <aRycVOe5ZXSJJFpn@kitsune.suse.cz>
- <CABCJKucc0bxLJ=b9rkiwWts6uA=ReLFr32K1OP9WH51D-hO4+A@mail.gmail.com>
-Content-Language: en-US
-From: Daniel Gomez <da.gomez@kernel.org>
-Organization: kernel.org
-In-Reply-To: <CABCJKucc0bxLJ=b9rkiwWts6uA=ReLFr32K1OP9WH51D-hO4+A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251114222759.4181152-1-robh@kernel.org>
 
-
-
-On 25/11/2025 21.09, Sami Tolvanen wrote:
-> On Tue, Nov 18, 2025 at 8:18 AM Michal Suchánek <msuchanek@suse.de> wrote:
->>
->> Hello,
->>
->> On Mon, Nov 17, 2025 at 08:38:07PM +0000, Sami Tolvanen wrote:
->>> We have interchangeably used unsigned long for some of the types
->>> defined in elfutils, assuming they're always 64-bit. This obviously
->>> fails when building gendwarfksyms on 32-bit hosts. Fix the types.
->>>
->>> Reported-by: Michal Suchánek <msuchanek@suse.de>
->>> Closes: https://lore.kernel.org/linux-modules/aRcxzPxtJblVSh1y@kitsune.suse.cz/
->>> Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
->>> ---
->>>  scripts/gendwarfksyms/dwarf.c   | 4 +++-
->>>  scripts/gendwarfksyms/symbols.c | 5 +++--
->>>  2 files changed, 6 insertions(+), 3 deletions(-)
->>
->> with this patch gendwarfksyms builds on 32bit x86 and Arm.
->>
->> Tested-by: Michal Suchánek <msuchanek@suse.de>
+On Fri, Nov 14, 2025 at 04:27:58PM -0600, Rob Herring (Arm) wrote:
+> It is a requirement that DT overlays in the kernel are applied at build
+> time to a base DTB in order to validate they can be applied and to
+> validate them against the DT schemas. DT overlays on their own may be
+> incomplete and can't be validated.
 > 
-> Great, thanks for testing!  Daniel, do you want to take this fix
-> through the modules tree?
+> Add a kbuild check so this doesn't have to be checked and fixed
+> periodically.
 > 
-> Sami
+> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> ---
+>  scripts/Makefile.dtbs | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/scripts/Makefile.dtbs b/scripts/Makefile.dtbs
+> index 2d321b813600..15473edc2589 100644
+> --- a/scripts/Makefile.dtbs
+> +++ b/scripts/Makefile.dtbs
+> @@ -10,6 +10,13 @@ real-dtb-y := $(call real-search, $(dtb-y), .dtb, -dtbs)
+>  # Base DTB that overlay is applied onto
+>  base-dtb-y := $(filter %.dtb, $(call real-search, $(multi-dtb-y), .dtb, -dtbs))
+>  
+> +# Ensure that any .dtbo is applied to at least one base .dtb. Otherwise, it
+> +# does not get validated.
+> +applied-dtbo := $(filter %.dtbo, \
+> +	$(call real-search, $(call multi-search, $(dtb-y) $(dtb-), .dtb, -dtbs), .dtb, -dtbs))
+> +unapplied-dtbo := $(filter-out $(applied-dtbo),$(filter %.dtbo, $(dtb-y)))
+> +$(if $(unapplied-dtbo), $(warning .dtbo is not applied to any base: $(unapplied-dtbo)))
+> +
+>  dtb-y           := $(addprefix $(obj)/, $(dtb-y))
+>  multi-dtb-y     := $(addprefix $(obj)/, $(multi-dtb-y))
+>  real-dtb-y      := $(addprefix $(obj)/, $(real-dtb-y))
+> -- 
+> 2.51.0
+> 
 
-Absolutely! Since we are at the end of the rc cycle, I'll merge this after
-sending the current queued patches.
+Acked-by: Nicolas Schier <nsc@kernel.org>
+
+Do you take this via DT tree?
+
+Kind regards,
+Nicolas
