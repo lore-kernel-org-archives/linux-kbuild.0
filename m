@@ -1,94 +1,88 @@
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1D71322C99
-	for <linux-kbuild@vger.kernel.org>; Tue, 25 Nov 2025 13:18:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BF373101C9
+	for <linux-kbuild@vger.kernel.org>; Tue, 25 Nov 2025 13:26:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764076734; cv=none; b=BZlLIs8uCU64gg90Iw9ZwYhxemshmQEPN7F81A+ltbhJk7nI6IhabK6UBsHgamqwVMsIxWnss/RV52uyDZfUW9OSPYXTPxHrSf4DNrAKi6J2UI3YCAvvBtTsoJ24LDjzUuSIS2bNcwGjdWbTowpvxcKypQ80h4dOERj2iB8CTEE=
+	t=1764077165; cv=none; b=ZKjdljuJdYrkW1bZMbOIIz2eKqXpHW2JazHoaDWlS9YIXSZkD6oLkqObBcT4Bg4iB+q12RhZlEWp7HeoKHwl2BWA87TLZ7Xzh7YqGQ4E/Bc2+ajE1Fcl8X/43nIYTR8ae/YevxhDEK+sm5Ygn5mPbBJwRgA51GEZ3Br5eU+/yxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764076734; c=relaxed/simple;
-	bh=5rrjmXwhas9OxIhsFINtvvydwxcmgr7QlC+fTAMLFfE=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=En+KPSLqskcaDC4yg26tIK8dQAPHRXUnqc7gipYEXitUpOD4XyEssPNM1d80z9878gZpD4hl5uqwn1NMgTf6GneGH+IoTG8PL7OpPJAFfFGZOt1OUVh+OH7ho8LQuO1qEm3U0lx/nm108jv23EuRHSBZCUuclTP2vKd8aptKOF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <a.fatoum@pengutronix.de>)
-	id 1vNswA-00041i-Uo; Tue, 25 Nov 2025 14:18:30 +0100
-Received: from dude05.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::54])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <a.fatoum@pengutronix.de>)
-	id 1vNswA-002PEX-23;
-	Tue, 25 Nov 2025 14:18:30 +0100
-Received: from localhost ([::1] helo=dude05.red.stw.pengutronix.de)
-	by dude05.red.stw.pengutronix.de with esmtp (Exim 4.98.2)
-	(envelope-from <a.fatoum@pengutronix.de>)
-	id 1vNswA-0000000243F-2LZF;
-	Tue, 25 Nov 2025 14:18:30 +0100
-From: Ahmad Fatoum <a.fatoum@pengutronix.de>
-Subject: [PATCH v2 0/2] kbuild: add target to build a cpio containing
- modules
-Date: Tue, 25 Nov 2025 14:18:18 +0100
-Message-Id: <20251125-cpio-modules-pkg-v2-0-aa8277d89682@pengutronix.de>
+	s=arc-20240116; t=1764077165; c=relaxed/simple;
+	bh=M0m7i3HqAAFepUal17tcRxZTSUzCfk3WUiGlWvRtVu0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MNkyqR0qHikgtgKqYinV3Jqw4vluIu6i09qQn65YDZUDe/Qn+eCV9Wm42T7s77jhBdwv+Q414bEzqZjBfmjrw8qA8pVj5L60mugeThoUrzey8+HfghHIdDChBeyZaNJGfS0aR1a/JcJXK6x9q3CEPUJVupwY3THD8gCRcFRjI9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ukM1tess; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ukM1tess"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19853C4CEF1
+	for <linux-kbuild@vger.kernel.org>; Tue, 25 Nov 2025 13:26:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764077165;
+	bh=M0m7i3HqAAFepUal17tcRxZTSUzCfk3WUiGlWvRtVu0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=ukM1tesseJW6LDDUZuOAxmmNWd9a91Zo1MH6l4eY2Bv57ugxN9hAiGrOBjc2BDIiF
+	 4rTeEfyjlOQikQddQgiN16NSy63gRRJDFYK6onYTSo68vjn3LJUyJ8/fez6Sp/w5u9
+	 7FWWwKMUGi1lh+567MEsArq+yM0lGHJEG+l9qF47qmrc37rdE62rZzQvJ3bJeOzioj
+	 C8+aNsoqGj348tUZfqq5+LIpA/KKBRSi0y+KJ7YK1lLFLtHX5G67/2xskDw546IwT1
+	 KpR4Cf3aJuNVgodqxzqHIE8+/i7WiuQcbiDPnrvapNwd62mXUB0yNN5fJIbFIqsspI
+	 htf5G66ipH+9g==
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-64074f01a6eso9736285a12.2
+        for <linux-kbuild@vger.kernel.org>; Tue, 25 Nov 2025 05:26:05 -0800 (PST)
+X-Gm-Message-State: AOJu0YwDlbH5DsVdRiiZKkO5aDC3sPspDtC3LgKmLQ8H06PpcT8UIY+f
+	AOOXyuaMYN6BQQDqIpIXSE/sjo3faqdJ73z/bLUCuLnbRugUh7yC7lcc8m01DltO0Wg+/UFMZSI
+	nDr6uO2t47ibFmvTbIaE8t1a/nE7UCg==
+X-Google-Smtp-Source: AGHT+IHoVO7mxKyEwTrUaY9TBwwXV/4RR+MmEXpxRRyiQkfAr1nwBXv4VAlqPGXgUsA9/vrCAzZ6A4YW5PqgmiVAitE=
+X-Received: by 2002:a05:6402:4405:b0:643:129f:9d8e with SMTP id
+ 4fb4d7f45d1cf-64555b9aafamr13080758a12.8.1764077163658; Tue, 25 Nov 2025
+ 05:26:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAJqsJWkC/32NQQ6CMBBFr2Jm7ZhOQwVceQ/DAukIE7VtWiAYw
- t2tHMDle8l/f4XEUTjB5bBC5FmSeJdBHw/QDa3rGcVmBq20ISKDXRCPb2+nFycMzx5LZSvTnuu
- q1nfIsxD5IcuevDWZB0mjj5/9Yaaf/RObCQkVWdOqsqiKQl8Du34ao3eynCxDs23bFxwH/AO1A
- AAA
-X-Change-ID: 20251115-cpio-modules-pkg-70d85a69892b
-To: Nathan Chancellor <nathan@kernel.org>, 
- Nicolas Schier <nicolas.schier@linux.dev>
-Cc: Simon Glass <sjg@chromium.org>, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, 
- kernel@pengutronix.de, linux-kernel@vger.kernel.org, 
- linux-kbuild@vger.kernel.org, Ahmad Fatoum <a.fatoum@pengutronix.de>, 
- Sascha Hauer <s.hauer@pengutronix.de>
-X-Mailer: b4 0.14.2
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-kbuild@vger.kernel.org
+References: <20251120140645.478623-1-thomas.de_schampheleire@nokia.com>
+ <20251124130747.GA3957523-robh@kernel.org> <aSWKdgypKqt1Mq_J@L-PF2SHBMP>
+In-Reply-To: <aSWKdgypKqt1Mq_J@L-PF2SHBMP>
+From: Rob Herring <robh@kernel.org>
+Date: Tue, 25 Nov 2025 07:25:51 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqK-M_CBVjXXCFrW8UKoDgSV2N8ctc2Ao6E4VZpfCj6chQ@mail.gmail.com>
+X-Gm-Features: AWmQ_bkcQFb9pmHx3xoYsnJAJHkTUbiNSWUKhXxMBBvxqa5SvicB6Jb0VtZJuBA
+Message-ID: <CAL_JsqK-M_CBVjXXCFrW8UKoDgSV2N8ctc2Ao6E4VZpfCj6chQ@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: fix compilation of dtb specified on command-line
+ without make rule
+To: Thomas De Schampheleire <thomas.de_schampheleire@nokia.com>
+Cc: linux-kbuild@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Nov 25, 2025 at 4:52=E2=80=AFAM Thomas De Schampheleire
+<thomas.de_schampheleire@nokia.com> wrote:
+>
+> On Mon, Nov 24, 2025 at 07:07:47AM -0600, Rob Herring wrote:
+> > On Thu, Nov 20, 2025 at 03:06:43PM +0100, Thomas De Schampheleire wrote=
+:
+> [...]
+> > > In this scenario, both 'dtb-y' and 'dtb-' are empty, and the inclusio=
+n of
+> > > scripts/Makefile.dtbs relies on 'targets' to contain the MAKECMDGOALS=
+. The
+> > > value of 'targets', however, is only final later in the code.
+> > >
+> > > Move the conditional include of scripts/Makefile.dtbs down to where t=
+he
+> > > value of 'targets' is final.
+> >
+> > This breaks 'make dtbs' (and just 'make' for arm64).
+>
+> I see the 'make dtbs' failure, I will investigate.
+>
+> I don't yet see a problem with 'make ARCH=3Darm64 CROSS_COMPILE=3D[...]' =
+after a
+> standard 'defconfig'. Can you please clarify how it fails for you?
 
----
-Changes in v2:
-- Add Simon's Tested-by and Reviewed-by
-- rename to modules-cpio-pkg (Nathan)
-- add separator/doc comment heading (Thomas)
-- Make temp directory ignoring and cleanup automatic (Thomas)
-- Use CONFIG_SHELL instead of shebang (Thomas)
-- Use -o instead of redirecting stdout when creating cpio (Thomas)
-- Drop superfluous -f as $(build)= overrides it (Thomas)
-- Add extra preparatory patch that makes hostprogs := gen_init_cpio
-  unconditional
-- Link to v1: https://lore.kernel.org/r/20251115-cpio-modules-pkg-v1-1-01d5a0748442@pengutronix.de
+Did it build the dtbs? "dtbs" is an implicit target for "all", so I'm
+assuming that wouldn't work either.
 
----
-Ahmad Fatoum (1):
-      initramfs: add gen_init_cpio to hostprogs unconditionally
-
-Sascha Hauer (1):
-      kbuild: add target to build a cpio containing modules
-
- scripts/Makefile.package | 20 ++++++++++++++++++++
- usr/Makefile             |  4 ++--
- 2 files changed, 22 insertions(+), 2 deletions(-)
----
-base-commit: e9a6fb0bcdd7609be6969112f3fbfcce3b1d4a7c
-change-id: 20251115-cpio-modules-pkg-70d85a69892b
-
-Best regards,
--- 
-Ahmad Fatoum <a.fatoum@pengutronix.de>
-
+Rob
