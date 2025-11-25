@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CE0B3246F0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E849A17C211;
 	Tue, 25 Nov 2025 14:45:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764081911; cv=none; b=O9UNZ5Xy0SHOuMSA4XPhUM+djfVRT6PegYyKnNqWfgfqsx8EOvk0UK1FxqxTdqlZqqd2sqykKdbt9i4pgsXl20d/FuAHSRCQWXKJtEZ3lt/LNMOpd06F2kNC1ISBCJlD8Xaj/pFpBv2t0ILjJNU6VmueMGp8zNmTAR20OEUt1LA=
+	t=1764081912; cv=none; b=MYu4hd6cWUeTOR8CY40FmnzQqYUmxSnYdRhrR0Sc4SO8rTQEgiiK7IvJIjUoOiKWG08aK0+oplTYlrVufKqRKSxpTnL+SB6AMeBapRxDR7nfXKFrnyXkM1/UZijEqz32RfgR9SvSXcArPY+nok4g+5yefzB1Uls+PMSmyKrx4Sw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764081911; c=relaxed/simple;
-	bh=rR3gz3yzpBRkBDHXSaogJdTENZ1CLw1h0jHGgJLehB8=;
+	s=arc-20240116; t=1764081912; c=relaxed/simple;
+	bh=FyDBDtcrrQWdwI3hnS/pB+Z0Cw9VWFu3vnv9gtL1Pzc=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Sk8wsfTDGL/ogDhkbm1iQJOuc67o8PZbFMKKIZxFt28TZOz432SsB94G/74afK003WGhUeyEJkLTgwF8oqXUtOd4Ab8wyZyv5kuyjHysGyvdoaMIKIWgcyav31nWC6PF4npzv2DMJIjxZfNH6IgUc8vNimBkI0+cthXwyZwMe+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uMri3jMC; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=tBhDu1E4qSerDbYTzayw6MQNIs5SStEtyv3QtJujRZvMkpVJar3y4aZ79YCFIN8xOg+3SjWTPtN7k6KYff1xDmqLaD/z8LVdMwvcN6X0Ahd//DWn9jEFulqi0C88/cobGl9lWkJl/EY3gQA6dEi/8m16dvHE2bdvK1e6c4WbUTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=odVLnF0s; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uMri3jMC"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2336BC19424;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="odVLnF0s"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8FF84C2BCB8;
 	Tue, 25 Nov 2025 14:45:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1764081911;
-	bh=rR3gz3yzpBRkBDHXSaogJdTENZ1CLw1h0jHGgJLehB8=;
+	bh=FyDBDtcrrQWdwI3hnS/pB+Z0Cw9VWFu3vnv9gtL1Pzc=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=uMri3jMCRqfuHCVaOSWbll6PTnM0TnPMc8C5vzQM6fRxFtJqOpoWHy6UTPZAPAUb+
-	 6lJsHRQ7hcKLNwptFIw5YoE042O1OKnxh08s+JrKDRlpelBzsRbyWImmg2tXPjrVQQ
-	 wfYjZ6ItFg8MEkyTEsN6ynsLjtrrT2YGIuxdvuD2iK5A2Gst9d1xRiribI7VsjktD/
-	 m9xEHnnWbVq6b357/ogRElVLXHR9tz1/1Xi2d00IGoIx658dqchqSh5OWHiW0LsWjm
-	 Wxha7qFSKPfqp7mzm1ZsFLKKnSvnkr3pbZTKqt7s+gV8eOdpokLkXNBzc7yihSzSAI
-	 gA/8S9EuIrZNQ==
+	b=odVLnF0scjlNrhsn/vBt9sRJy+ANSn2EQ2pLGo4zqxux71l7xhwykdlvtBDS2oPjW
+	 bZ9736PpZn9BSV8Mt7UlXbDTeYmxisclamqsCehxgoMb4QJ5R0kgO9Ij+KrLNaEtGF
+	 X55oCpqT5Simb4KRHpFgQkKwPeOlcdor2pB0c58N5o5irw/bpk+MQMa74sIkG5/0ZC
+	 PXce3f8ku9rjrR7bhyJPRitnXLIAq+tgGVS0OymjSrzSDNZ3+KZRHZ0NYydtxBeDFH
+	 ybZI0dcrsYnY2GK+MSPhxCr+jo/khL6C2MKGco7Li5jeC87miqJhqUdk07E6v8OEai
+	 NrDNq6Am28BdA==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CCFDD0E6F4;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82CEDD0E6F5;
 	Tue, 25 Nov 2025 14:45:11 +0000 (UTC)
 From: Manivannan Sadhasivam via B4 Relay <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org>
-Date: Tue, 25 Nov 2025 20:15:06 +0530
-Subject: [PATCH v2 02/10] serdev: Add serdev device based driver match
- support
+Date: Tue, 25 Nov 2025 20:15:12 +0530
+Subject: [PATCH v2 08/10] dt-bindings: connector: Add PCIe M.2 Mechanical
+ Key E connector
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -41,7 +41,7 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251125-pci-m2-e-v2-2-32826de07cc5@oss.qualcomm.com>
+Message-Id: <20251125-pci-m2-e-v2-8-32826de07cc5@oss.qualcomm.com>
 References: <20251125-pci-m2-e-v2-0-32826de07cc5@oss.qualcomm.com>
 In-Reply-To: <20251125-pci-m2-e-v2-0-32826de07cc5@oss.qualcomm.com>
 To: Rob Herring <robh@kernel.org>, 
@@ -64,16 +64,16 @@ Cc: linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org,
  Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, 
  Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3979;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=7776;
  i=manivannan.sadhasivam@oss.qualcomm.com; h=from:subject:message-id;
- bh=l5Ts3o61IXqTXA6cCJVPncMY06Qk0XS4grwShZ7YiiY=;
- b=owEBbQGS/pANAwAKAVWfEeb+kc71AcsmYgBpJcDy5aNQTrm4PBQrFGYoE/mpmzlHS14l3KcAg
- f67d/Vs8WOJATMEAAEKAB0WIQRnpUMqgUjL2KRYJ5dVnxHm/pHO9QUCaSXA8gAKCRBVnxHm/pHO
- 9WM0B/9vOuD1CGvFWE0LFie5T37/3Dlph915pP3GTxIx3fy/Ux553oVeUV7W9wQX2Mpi83Hb/F+
- ny6kHH7fV0no6NuuQHmyjyVEGvbG+Qw6zG2FOmkzIBBzVezUph+MvIBNwyrs76QAwW2uAHGQiDY
- Xdy1FAov0YL439699RHC7LXcD6sg4AvYgXLrIf0yHknev1pnXNtNUHtoMvmHcvFOidBpYuJTF9u
- LGvizzdk6qCPZj8HpGXD+2UCVGIDRpsK1ei3Qni3oSx4yPHm2zPUFFRwA7SsHjTZEhE9hSI/EEs
- LXHONCdvpTB80Hzk786sXqWYmP7FXNcojvZDERXUlhPN0hhE
+ bh=LsGXQguEIvUP58Y5FXjG9WlZPEnelHy8ukyjl47FhqQ=;
+ b=owEBbQGS/pANAwAKAVWfEeb+kc71AcsmYgBpJcDywix4o/qWbqg69fbCTdfFwwjg3RdzFKiFN
+ gHlI8DHQrOJATMEAAEKAB0WIQRnpUMqgUjL2KRYJ5dVnxHm/pHO9QUCaSXA8gAKCRBVnxHm/pHO
+ 9fRHB/9JdOYdNORzpfXaLxa2grUAjr9bG160Ncw7VspOQBbbbAHwgDHlqkyOGGWVZaJy8oiDGhr
+ ymS1ZBlFqUudeRlMoRrufcF237G9//bZPqjDxqfwdTL1IDQeBfyAqY0hNpX2t9+ziV8TU5t/1uu
+ T8L9d/80OJEItmJ1aLkXgzZEMq3JdMv8CJJx0dpMJE8GL0ltmdVQdxTPJZQZMPwC6XthSH0bmrW
+ 6iCImpLciFZaeeZ93r0Py4EjcTA5IP5y0RQbC8fYEbF7cEXkqVgNzXrurTNVtTBeHUXRU/PViFc
+ UDneR3Adh4b1t/L+UgvTMrxd2md8t47fOXRUrZ72tyVxabwh
 X-Developer-Key: i=manivannan.sadhasivam@oss.qualcomm.com; a=openpgp;
  fpr=C668AEC3C3188E4C611465E7488550E901166008
 X-Endpoint-Received: by B4 Relay for
@@ -83,125 +83,223 @@ Reply-To: manivannan.sadhasivam@oss.qualcomm.com
 
 From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 
-Add support to match serdev devices with serdev drivers based on the serdev
-ID table defined in serdev_device_driver::id_table.
+Add the devicetree binding for PCIe M.2 Mechanical Key E connector defined
+in the PCI Express M.2 Specification, r4.0, sec 5.1.2. This connector
+provides interfaces like PCIe or SDIO to attach the WiFi devices to the
+host machine, USB or UART+PCM interfaces to attach the Bluetooth (BT)
+devices along with additional interfaces like I2C for NFC solution. At any
+point of time, the connector can only support either PCIe or SDIO as the
+WiFi interface and USB or UART as the BT interface.
 
-The matching function, serdev_driver_match_device() uses the serdev device
-name to match against the entries in serdev_device_driver::id_table.
+The connector provides a primary power supply of 3.3v, along with an
+optional 1.8v VIO supply for the Adapter I/O buffer circuitry operating at
+1.8v sideband signaling.
 
-If there is no serdev id_table for the driver, then serdev_device_match()
-will fallback to ACPI and DT based matching.
+The connector also supplies optional signals in the form of GPIOs for fine
+grained power management.
 
 Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 ---
- drivers/tty/serdev/core.c         | 23 ++++++++++++++++++++++-
- include/linux/mod_devicetable.h   |  7 +++++++
- include/linux/serdev.h            |  4 ++++
- scripts/mod/devicetable-offsets.c |  3 +++
- 4 files changed, 36 insertions(+), 1 deletion(-)
+ .../bindings/connector/pcie-m2-e-connector.yaml    | 178 +++++++++++++++++++++
+ MAINTAINERS                                        |   1 +
+ 2 files changed, 179 insertions(+)
 
-diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
-index b33e708cb245..2b5582cd5063 100644
---- a/drivers/tty/serdev/core.c
-+++ b/drivers/tty/serdev/core.c
-@@ -85,12 +85,33 @@ static const struct device_type serdev_ctrl_type = {
- 	.release	= serdev_ctrl_release,
- };
+diff --git a/Documentation/devicetree/bindings/connector/pcie-m2-e-connector.yaml b/Documentation/devicetree/bindings/connector/pcie-m2-e-connector.yaml
+new file mode 100644
+index 000000000000..fe2c9a943a21
+--- /dev/null
++++ b/Documentation/devicetree/bindings/connector/pcie-m2-e-connector.yaml
+@@ -0,0 +1,178 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/connector/pcie-m2-e-connector.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: PCIe M.2 Mechanical Key E Connector
++
++maintainers:
++  - Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
++
++description:
++  A PCIe M.2 E connector node represents a physical PCIe M.2 Mechanical Key E
++  connector. Mechanical Key E connectors are used to connect Wireless
++  Connectivity devices including combinations of Wi-Fi, BT, NFC to the host
++  machine over interfaces like PCIe/SDIO, USB/UART+PCM, and I2C.
++
++properties:
++  compatible:
++    const: pcie-m2-e-connector
++
++  vpcie3v3-supply:
++    description: A phandle to the regulator for 3.3v supply.
++
++  vpcie1v8-supply:
++    description: A phandle to the regulator for VIO 1.8v supply.
++
++  ports:
++    $ref: /schemas/graph.yaml#/properties/ports
++    description: OF graph bindings modeling the interfaces exposed on the
++      connector. Since a single connector can have multiple interfaces, every
++      interface has an assigned OF graph port number as described below.
++
++    properties:
++      port@0:
++        $ref: /schemas/graph.yaml#/properties/port
++        description: Connector interfaces for Wi-Fi
++
++        properties:
++          endpoint@0:
++            $ref: /schemas/graph.yaml#/properties/endpoint
++            description: PCIe interface
++
++          endpoint@1:
++            $ref: /schemas/graph.yaml#/properties/endpoint
++            description: SDIO interface
++
++        anyOf:
++          - required:
++              - endpoint@0
++          - required:
++              - endpoint@1
++
++      port@1:
++        $ref: /schemas/graph.yaml#/properties/port
++        description: Connector interfaces for BT
++
++        properties:
++          endpoint@0:
++            $ref: /schemas/graph.yaml#/properties/endpoint
++            description: USB 2.0 interface
++
++          endpoint@1:
++            $ref: /schemas/graph.yaml#/properties/endpoint
++            description: UART interface
++
++        anyOf:
++          - required:
++              - endpoint@0
++          - required:
++              - endpoint@1
++
++      port@2:
++        $ref: /schemas/graph.yaml#/properties/port
++        description: PCM/I2S interface
++
++      port@3:
++        $ref: /schemas/graph.yaml#/properties/port
++        description: I2C interface
++
++    oneOf:
++      - required:
++          - port@0
++
++  clocks:
++    description: 32.768 KHz Suspend Clock (SUSCLK) input from the host system to
++      the M.2 card. Refer, PCI Express M.2 Specification r4.0, sec 3.1.12.1 for
++      more details.
++    maxItems: 1
++
++  w-disable1-gpios:
++    description: GPIO controlled connection to W_DISABLE1# signal. This signal
++      is used by the system to disable WiFi radio in the M.2 card. Refer, PCI
++      Express M.2 Specification r4.0, sec 3.1.12.3 for more details.
++    maxItems: 1
++
++  w-disable2-gpios:
++    description: GPIO controlled connection to W_DISABLE2# signal. This signal
++      is used by the system to disable BT radio in the M.2 card. Refer, PCI
++      Express M.2 Specification r4.0, sec 3.1.12.3 for more details.
++    maxItems: 1
++
++  viocfg-gpios:
++    description: GPIO controlled connection to IO voltage configuration
++      (VIO_CFG) signal. This signal is used by the M.2 card to indicate to the
++      host system that the card supports an independent IO voltage domain for
++      the sideband signals. Refer, PCI Express M.2 Specification r4.0, sec
++      3.1.15.1 for more details.
++    maxItems: 1
++
++  uim-power-src-gpios:
++    description: GPIO controlled connection to UIM_POWER_SRC signal. This signal
++      is used when the NFC solution is implemented and receives the power output
++      from WWAN_UIM_PWR signal of the another WWAN M.2 card. Refer, PCI Express
++      M.2 Specification r4.0, sec 3.1.11.1 for more details.
++    maxItems: 1
++
++  uim-power-snk-gpios:
++    description: GPIO controlled connection to UIM_POWER_SNK signal. This signal
++      is used when the NFC solution is implemented and supplies power to the
++      Universal Integrated Circuit Card (UICC). Refer, PCI Express M.2
++      Specification r4.0, sec 3.1.11.2 for more details.
++    maxItems: 1
++
++  uim-swp-gpios:
++    description: GPIO controlled connection to UIM_SWP signal. This signal is
++      used when the NFC solution is implemented and implements the Single Wire
++      Protocol (SWP) interface to the UICC. Refer, PCI Express M.2 Specification
++      r4.0, sec 3.1.11.3 for more details.
++    maxItems: 1
++
++required:
++  - compatible
++  - vpcie3v3-supply
++
++additionalProperties: false
++
++examples:
++  # PCI M.2 Key E connector for Wi-Fi/BT with PCIe/UART interfaces
++  - |
++    #include <dt-bindings/gpio/gpio.h>
++
++    connector {
++        compatible = "pcie-m2-e-connector";
++        vpcie3v3-supply = <&vreg_wcn_3p3>;
++        vpcie1v8-supply = <&vreg_l15b_1p8>;
++        w-disable1-gpios = <&tlmm 117 GPIO_ACTIVE_LOW>;
++        w-disable2-gpios = <&tlmm 116 GPIO_ACTIVE_LOW>;
++
++        ports {
++            #address-cells = <1>;
++            #size-cells = <0>;
++
++            port@0 {
++                #address-cells = <1>;
++                #size-cells = <0>;
++
++                reg = <0>;
++
++                endpoint@0 {
++                    reg = <0>;
++                    remote-endpoint = <&pcie4_port0_ep>;
++                };
++            };
++
++            port@1 {
++                #address-cells = <1>;
++                #size-cells = <0>;
++
++                reg = <1>;
++
++                endpoint@1 {
++                    reg = <1>;
++                    remote-endpoint = <&uart14_ep>;
++                };
++            };
++        };
++    };
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 9b3f689d1f50..f707f29d0a37 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -20478,6 +20478,7 @@ PCIE M.2 POWER SEQUENCING
+ M:	Manivannan Sadhasivam <mani@kernel.org>
+ L:	linux-pci@vger.kernel.org
+ S:	Maintained
++F:	Documentation/devicetree/bindings/connector/pcie-m2-e-connector.yaml
+ F:	Documentation/devicetree/bindings/connector/pcie-m2-m-connector.yaml
+ F:	drivers/power/sequencing/pwrseq-pcie-m2.c
  
-+static int serdev_driver_match_device(struct device *dev, const struct device_driver *drv)
-+{
-+	const struct serdev_device_driver *serdev_drv = to_serdev_device_driver(drv);
-+	struct serdev_device *serdev = to_serdev_device(dev);
-+	const struct serdev_device_id *id;
-+
-+	if (!serdev_drv->id_table)
-+		return 0;
-+
-+	for (id = serdev_drv->id_table; id->name[0]; id++) {
-+		if (!strcmp(dev_name(dev), id->name)) {
-+			serdev->id = id;
-+			return 1;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- static int serdev_device_match(struct device *dev, const struct device_driver *drv)
- {
- 	if (!is_serdev_device(dev))
- 		return 0;
- 
--	/* TODO: platform matching */
-+	if (serdev_driver_match_device(dev, drv))
-+		return 1;
-+
- 	if (acpi_driver_match_device(dev, drv))
- 		return 1;
- 
-diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_devicetable.h
-index 6077972e8b45..70c54c4bedba 100644
---- a/include/linux/mod_devicetable.h
-+++ b/include/linux/mod_devicetable.h
-@@ -976,4 +976,11 @@ struct coreboot_device_id {
- 	kernel_ulong_t driver_data;
- };
- 
-+#define SERDEV_NAME_SIZE 32
-+
-+struct serdev_device_id {
-+	const char name[SERDEV_NAME_SIZE];
-+	kernel_ulong_t driver_data;
-+};
-+
- #endif /* LINUX_MOD_DEVICETABLE_H */
-diff --git a/include/linux/serdev.h b/include/linux/serdev.h
-index ecde0ad3e248..aca92e0ee6e7 100644
---- a/include/linux/serdev.h
-+++ b/include/linux/serdev.h
-@@ -39,6 +39,7 @@ struct serdev_device_ops {
-  * @ops:	Device operations.
-  * @write_comp	Completion used by serdev_device_write() internally
-  * @write_lock	Lock to serialize access when writing data
-+ * @id:		serdev device ID entry
-  */
- struct serdev_device {
- 	struct device dev;
-@@ -47,6 +48,7 @@ struct serdev_device {
- 	const struct serdev_device_ops *ops;
- 	struct completion write_comp;
- 	struct mutex write_lock;
-+	const struct serdev_device_id *id;
- };
- 
- #define to_serdev_device(d) container_of_const(d, struct serdev_device, dev)
-@@ -55,11 +57,13 @@ struct serdev_device {
-  * struct serdev_device_driver - serdev slave device driver
-  * @driver:	serdev device drivers should initialize name field of this
-  *		structure.
-+ * @id_table:	serdev device ID table
-  * @probe:	binds this driver to a serdev device.
-  * @remove:	unbinds this driver from the serdev device.
-  */
- struct serdev_device_driver {
- 	struct device_driver driver;
-+	const struct serdev_device_id *id_table;
- 	int	(*probe)(struct serdev_device *);
- 	void	(*remove)(struct serdev_device *);
- };
-diff --git a/scripts/mod/devicetable-offsets.c b/scripts/mod/devicetable-offsets.c
-index d3d00e85edf7..c1bfa8eddc4d 100644
---- a/scripts/mod/devicetable-offsets.c
-+++ b/scripts/mod/devicetable-offsets.c
-@@ -280,5 +280,8 @@ int main(void)
- 	DEVID(coreboot_device_id);
- 	DEVID_FIELD(coreboot_device_id, tag);
- 
-+	DEVID(serdev_device_id);
-+	DEVID_FIELD(serdev_device_id, name);
-+
- 	return 0;
- }
 
 -- 
 2.48.1
