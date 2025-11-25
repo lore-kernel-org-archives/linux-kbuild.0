@@ -1,37 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E81C97B3E1;
-	Tue, 25 Nov 2025 14:45:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FA8F3271E7;
+	Tue, 25 Nov 2025 14:45:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764081912; cv=none; b=UXkOda5JSex+74cZFC4hYIdFZXpvOiFK4Wn9/6B+z/SIY4Ob2fj108AtHoFOjhHnZwrO0ZIW/qHCOyeRVEHlkCe7i75BDgVky6nruUJWUj2VkPbNMaeoVtPxAnpLMpNRycVN9g/SJWZiuKMI7SmL4DJaoC6qJAAHdHIHfmqRxkU=
+	t=1764081912; cv=none; b=dcKDjG8RrTYwgn7PaolmfjSe8xRfD+g2nzgyDohzTqMOoVUmNEvQeGHVXZl5hzphgBBh8tlv3UlVsfTjCSalt7jjK7VPLOjEjaasHiPPUQVQacSi+yiG70FUiYUJe+CMAPaxSOBRJ1PdLbNyaA+EvlUYSeh5VPDiz7FDnP1AF4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1764081912; c=relaxed/simple;
-	bh=/73Is6LSiZFdQQ1Wgzmm55BHcfPO7Tzrd+XL5DP+qdM=;
+	bh=fQZr7pUYhOD/jEojYwd8ZDtbZU5QJsTZEvoo6g+VOqM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Kfol+tpCjlvwy/MhzVVXkDB/DEqmudLs4GhA8n/FglxQDXGypwoL+3NvV81rOxXlm5m6lqmrdsvgsTvOthfq1E7scGyy90QsMyL/nHVf9YjfrMs3aF3Nv4mqh4b2hNgnJ/lL3FnO+IpHj5MUhqDYlOJ+V2hGfobkr8s7qhMEXgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ux4NijW3; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=X7RQ9FsnpNizpFq9H84PlEj2GVuGQoIX6uGm8OpAAnNhR97jPpoOMLSzw5hPXrM/446YO1FefWT3BaoU4hEm8eclFICumqNFu7z6wq5S6pJIv2D7zUhLv8K9BmwVQxiYy9/ktk2crvpy0YrBYtNoM3n5kdL9WDFLTU703qmkN8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k6VClFIs; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ux4NijW3"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6D06EC2BC86;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k6VClFIs"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A26FDC19422;
 	Tue, 25 Nov 2025 14:45:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1764081911;
-	bh=/73Is6LSiZFdQQ1Wgzmm55BHcfPO7Tzrd+XL5DP+qdM=;
+	bh=fQZr7pUYhOD/jEojYwd8ZDtbZU5QJsTZEvoo6g+VOqM=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=Ux4NijW3UFRboXv9u6LPlRCENKkwrVSZGw09iu6h3TUiFWO6PDC7Y0PEPJCeP5ycw
-	 9JuEM4/ABlvwZNaRZqnf6y4bZ7u0rPuQstCkvCDeh9KNtEemWropv8QWg3jiqfcO5y
-	 Zpi9TVppuVbBPxdF6WUOrnI3Em1wFzHdnAqOWWWGdG8evqEBeCiGt41slTywxAN57a
-	 ijt9DKlxofrYxI8L4gfmxqY4qQ24lYBtdaQkFTElZdiBuQUpuC62SsWBVjEr1LeTW3
-	 xAc88QY9beU3EcU9bOdOykVvweho+pKTdK0xS8+Lx4m455Bpx/kSQ+iXqOWwqU9ym4
-	 Ai2svALBh7V4g==
+	b=k6VClFIsVWbv8FvSi9LyVIUAs3350bj5ucgvFUvJqfgj8b9XHvTfjzsEtlyRFahqh
+	 qIUxRXjv4F9LFlLgCW7H02/Ax4vSqoZUij3DAsGzmEqGPT591rQ+LngcgrxLnwNTO5
+	 OPBAGnCK+vLfQPDKEtKsas7yM/2hw6wg0Vw59oXOnxPHi9TtoWQuQU3ShZdrnpiBGm
+	 7XDZmz8wI5LzeP/J8WDOVNcuSJ1mr/RuUNlE1VIRM0thSVK6kbaGW4LILzIreLbYFX
+	 nSNLhryg4fexmvAiK+7XM0DWHhiRh1g2AQiOreSj5PAa8vkqeBTkAuaA6o7YDJ/1+7
+	 FXmA1KwUU6OSg==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C5F8D0E6F1;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95FABD0E6C6;
 	Tue, 25 Nov 2025 14:45:11 +0000 (UTC)
 From: Manivannan Sadhasivam via B4 Relay <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org>
-Date: Tue, 25 Nov 2025 20:15:10 +0530
-Subject: [PATCH v2 06/10] dt-bindings: serial: Document the graph port
+Date: Tue, 25 Nov 2025 20:15:13 +0530
+Subject: [PATCH v2 09/10] Bluetooth: hci_qca: Add support for WCN7850 PCIe
+ M.2 card
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -40,7 +41,7 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251125-pci-m2-e-v2-6-32826de07cc5@oss.qualcomm.com>
+Message-Id: <20251125-pci-m2-e-v2-9-32826de07cc5@oss.qualcomm.com>
 References: <20251125-pci-m2-e-v2-0-32826de07cc5@oss.qualcomm.com>
 In-Reply-To: <20251125-pci-m2-e-v2-0-32826de07cc5@oss.qualcomm.com>
 To: Rob Herring <robh@kernel.org>, 
@@ -63,16 +64,16 @@ Cc: linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org,
  Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, 
  Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=924;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2637;
  i=manivannan.sadhasivam@oss.qualcomm.com; h=from:subject:message-id;
- bh=T/idG4KQSOfNt30dCJ08aa+KY4iI2ktYxKaU/4zNwXM=;
- b=owEBbQGS/pANAwAKAVWfEeb+kc71AcsmYgBpJcDyNiXGRYrPVp6/mZbLWkAyQuBwsrwnBd+/3
- 3QTUwQiV0uJATMEAAEKAB0WIQRnpUMqgUjL2KRYJ5dVnxHm/pHO9QUCaSXA8gAKCRBVnxHm/pHO
- 9VSfCACLeP9J91KGjkzLmAnSRJjUrVh9amjj5XEExSgeQkxJaA0bSIKjOT1ZqYrQI7azbYt6qqX
- zkjl/a3qz3YSEmkLZNG9Cy5HPwe1+VliFK0laziN/ChAfWukehX8S3cbzDKDp1eizMb3Uyes5wX
- yqNID4XZc9uwH1NrkqeTq3I6OMzDnxh72XPwg7O/v4UqkFHRcSHAIg9YnVdc4EPECTkiTWY9YI2
- Gi+6cQFpcOMHviCHuD1vhVU5l26gAJBwNpsNOl4yrzQe74EIZ5lTFgzMGhG/FTuVIx9VWwVv6Wu
- jPWJrbbjVb07i9Mee4GlZ4dSOVXP986oChp2dkFg3o2z/y/j
+ bh=zEZ8rEadVzPrGNr8RLnULvokKFhVGX7/QBoqApf/dmI=;
+ b=owEBbQGS/pANAwAKAVWfEeb+kc71AcsmYgBpJcDzqRvhavEAtyIdpgbq7HdybyTkQukIfRcUV
+ vXmEyI7PJWJATMEAAEKAB0WIQRnpUMqgUjL2KRYJ5dVnxHm/pHO9QUCaSXA8wAKCRBVnxHm/pHO
+ 9aQDB/wPxF9hhA7J5V9ZkfTIoBhTIN04bqoZH2i2TrRvvdp+9G18kp/R+SHrCxQtycJZbHPRkx/
+ DoBUmhkTkkeK7rwp5WIPR97L0JRCUVp7v3oajBLCtUhzuE07rBX4StDpHyFBscYoV8tdITB8Jup
+ OsSCbEScWfaNh7TrL3/7EOqiF5s0sTGMYffGC5+Ta0sJgHYQMz7ApJ/mwtK01nYC9Tt9kUc5+Bo
+ P9HcpV6cBQSZ/GcYn9xtG+8l4ZWMV4LEBdCKcRPmK9Oythi2wZy4gAGtLCOS1udXANa8PuP2RY8
+ ppz4zSvUZ9mvpGwDs/BCeEPfde5jQtO9OFuO2ns4HZxQNRcf
 X-Developer-Key: i=manivannan.sadhasivam@oss.qualcomm.com; a=openpgp;
  fpr=C668AEC3C3188E4C611465E7488550E901166008
 X-Endpoint-Received: by B4 Relay for
@@ -82,29 +83,75 @@ Reply-To: manivannan.sadhasivam@oss.qualcomm.com
 
 From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 
-A serial controller could be connected to an external connector like PCIe
-M.2 for controlling the serial interface of the card. Hence, document the
-OF graph port.
+The WCN7850 PCIe M.2 card connected to the UART controller exposes the
+'WCN7850' serdev device and is controlled using the pwrseq framework.
+
+Hence, add support for it in the driver. It reuses the existing
+'qca_soc_data_wcn7850' driver data.
 
 Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 ---
- Documentation/devicetree/bindings/serial/serial.yaml | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/bluetooth/hci_qca.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/serial/serial.yaml b/Documentation/devicetree/bindings/serial/serial.yaml
-index 6aa9cfae417b..96eb1de8771e 100644
---- a/Documentation/devicetree/bindings/serial/serial.yaml
-+++ b/Documentation/devicetree/bindings/serial/serial.yaml
-@@ -87,6 +87,9 @@ properties:
-     description:
-       TX FIFO threshold configuration (in bytes).
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 4cff4d9be313..35d08b455e40 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -26,6 +26,7 @@
+ #include <linux/mod_devicetable.h>
+ #include <linux/module.h>
+ #include <linux/of.h>
++#include <linux/of_graph.h>
+ #include <linux/acpi.h>
+ #include <linux/platform_device.h>
+ #include <linux/pwrseq/consumer.h>
+@@ -2344,6 +2345,9 @@ static int qca_serdev_probe(struct serdev_device *serdev)
  
-+  port:
-+    $ref: /schemas/graph.yaml#/properties/port
+ 	qcadev->serdev_hu.serdev = serdev;
+ 	data = device_get_match_data(&serdev->dev);
++	if (!data && serdev->id)
++		data = (const struct qca_device_data *) serdev->id->driver_data;
 +
- patternProperties:
-   "^(bluetooth|bluetooth-gnss|embedded-controller|gnss|gps|mcu|onewire)$":
-     if:
+ 	serdev_device_set_drvdata(serdev, qcadev);
+ 	device_property_read_string_array(&serdev->dev, "firmware-name",
+ 					 qcadev->firmware_name, ARRAY_SIZE(qcadev->firmware_name));
+@@ -2384,6 +2388,14 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+ 	case QCA_WCN6855:
+ 	case QCA_WCN7850:
+ 	case QCA_WCN6750:
++		if (of_graph_is_present(dev_of_node(&serdev->ctrl->dev))) {
++			qcadev->bt_power->pwrseq = devm_pwrseq_get(&serdev->ctrl->dev,
++								   "uart");
++			if (IS_ERR(qcadev->bt_power->pwrseq))
++				return PTR_ERR(qcadev->bt_power->pwrseq);
++			break;
++		}
++
+ 		if (!device_property_present(&serdev->dev, "enable-gpios")) {
+ 			/*
+ 			 * Backward compatibility with old DT sources. If the
+@@ -2740,6 +2752,12 @@ static const struct acpi_device_id qca_bluetooth_acpi_match[] = {
+ MODULE_DEVICE_TABLE(acpi, qca_bluetooth_acpi_match);
+ #endif
+ 
++static const struct serdev_device_id qca_bluetooth_serdev_match[] = {
++	{ "WCN7850", (kernel_ulong_t)&qca_soc_data_wcn7850 },
++	{ },
++};
++MODULE_DEVICE_TABLE(serdev, qca_bluetooth_serdev_match);
++
+ #ifdef CONFIG_DEV_COREDUMP
+ static void hciqca_coredump(struct device *dev)
+ {
+@@ -2756,6 +2774,7 @@ static void hciqca_coredump(struct device *dev)
+ static struct serdev_device_driver qca_serdev_driver = {
+ 	.probe = qca_serdev_probe,
+ 	.remove = qca_serdev_remove,
++	.id_table = qca_bluetooth_serdev_match,
+ 	.driver = {
+ 		.name = "hci_uart_qca",
+ 		.of_match_table = of_match_ptr(qca_bluetooth_of_match),
 
 -- 
 2.48.1
