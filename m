@@ -1,104 +1,118 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C95E27467D;
-	Tue, 25 Nov 2025 12:53:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C34BA2EB5D4
+	for <linux-kbuild@vger.kernel.org>; Tue, 25 Nov 2025 13:18:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764075184; cv=none; b=NS0Nu+Y42VJneZEYy0E3w6SW+WUpNRjfdbe8pSlhRDJ7ii0MCmN2kpOrsEDs5dsKHLcCDRE7qDtX6r+6jH1/42zGgeaidoFGOYcvnw2rJTSLtPLppXir27xI14VLP5FRieLw0TIa2zg93LM/FGjWU/VgNrGnrC1e/PAFFYCwgrA=
+	t=1764076721; cv=none; b=dyh1xjH3f60/dYGjNTmcyoed7n3f+oeSeNbR1liKJ+xsBQTvkCHRJvCtrZSjKBG1Z1KrQ/Dr4BSxOesmOycVYtVSKWxGFMjsn9/OAsN+/Ms+86LxDdzCl0XDYFNe1yJC668oV4EdQReWvNFgSBHtrhNpMnc4RUIuvCsqQv0d2gc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764075184; c=relaxed/simple;
-	bh=Qb6yADEJ6q0b5zhRUsbd+B9TbNhRB8As0A9B0/Zfd/4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QkqKRrgD4XPhPqaHgvVf5McuiljdjheCtMb/Wpw1IgRoAk3m3OzpZk6HIDKgXY5xYOJHkxFUh5ZGcIUAK0dWxMsHNRFp4F+FIf5dk5VuU9pYleCXNOt0yRorcD4Tzls0JncAy/jOdiy2S7w7h8tRn3vJwmCtxC+GYpXeGFFVMYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Um2gjLgo; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=7WN+rbmK; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Um2gjLgo";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="7WN+rbmK"
-Date: Tue, 25 Nov 2025 13:52:55 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1764075180;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gCxUOclmtbZH0FfIA8TitbS2pzMJSgpDS1M3y8P1PcI=;
-	b=Um2gjLgo3TnQatkVmZxEs+PAzzfwB4tlSBj95ieTk3fcTcT//EMzFH2OSbwwaIHXWXGn0N
-	g+CJ7bLa88Twi3YksxZZ5I56lN/rBjpcUS3DVLBO4mxLYKs3jDFOSUjDqC2ljT83zdOnmM
-	eVW9uYCmfLre76j4+2KBFTNsg/8QgEjidxE7Epil3CDzDL+10R9ie4vQ43Nf7j9iISZwa9
-	+bQotKqytgeVRfUA8W2SnST/6j3QlgrQg7GWs3t32SEXo41+khqEgOGlk3FMWBEuvObH7r
-	A0orZBoeKIF4vm4+hcobt4W2E+fv20hoQd5KHc90edwL6QtJpnZi8Fle8NGQiQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1764075180;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gCxUOclmtbZH0FfIA8TitbS2pzMJSgpDS1M3y8P1PcI=;
-	b=7WN+rbmKQh+/SlNZQM4vLvHm1dHdtykOX3BkXhPLpEiIlX0j/Uo4BYOqT2mjaYLL65WGW9
-	icThbs1AjNj6aZBA==
-From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-To: Ahmad Fatoum <a.fatoum@pengutronix.de>
-Cc: Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nicolas.schier@linux.dev>, Simon Glass <sjg@chromium.org>, kernel@pengutronix.de, 
-	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	Sascha Hauer <s.hauer@pengutronix.de>
-Subject: Re: [PATCH] kbuild: add target to build a cpio containing modules
-Message-ID: <20251125134030-7a8d0be5-7404-4885-b179-86b8aab4cd07@linutronix.de>
-References: <20251115-cpio-modules-pkg-v1-1-01d5a0748442@pengutronix.de>
- <20251120080325-536d8deb-fdfe-4dc0-9687-d5d73006376c@linutronix.de>
- <e358027d-a996-404f-b043-62b9c1b4d06c@pengutronix.de>
+	s=arc-20240116; t=1764076721; c=relaxed/simple;
+	bh=U3A6Xd9TSpMn+xkgCiCwE8rYfDb5pBA+PsQtjpsv/A0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=laGagOnrrZ0tZtGkPaDfqyf2gcu5f35zKyYSIb9tWgfHt2KabEb/61yxdqv3FSoxRjvPvgS71tpVZP94SOqIDzRhfCPLEMTsjqXISmqBNo+w/VNfBnSxoK921izdDzW0t6HHvwMHi0YkcGOcciecR4eclExv1rh3QW9mjkahtOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <a.fatoum@pengutronix.de>)
+	id 1vNswA-00041j-Uo; Tue, 25 Nov 2025 14:18:30 +0100
+Received: from dude05.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::54])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <a.fatoum@pengutronix.de>)
+	id 1vNswA-002PEZ-24;
+	Tue, 25 Nov 2025 14:18:30 +0100
+Received: from localhost ([::1] helo=dude05.red.stw.pengutronix.de)
+	by dude05.red.stw.pengutronix.de with esmtp (Exim 4.98.2)
+	(envelope-from <a.fatoum@pengutronix.de>)
+	id 1vNswA-0000000243F-2N7T;
+	Tue, 25 Nov 2025 14:18:30 +0100
+From: Ahmad Fatoum <a.fatoum@pengutronix.de>
+Date: Tue, 25 Nov 2025 14:18:20 +0100
+Subject: [PATCH v2 2/2] kbuild: add target to build a cpio containing
+ modules
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <e358027d-a996-404f-b043-62b9c1b4d06c@pengutronix.de>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20251125-cpio-modules-pkg-v2-2-aa8277d89682@pengutronix.de>
+References: <20251125-cpio-modules-pkg-v2-0-aa8277d89682@pengutronix.de>
+In-Reply-To: <20251125-cpio-modules-pkg-v2-0-aa8277d89682@pengutronix.de>
+To: Nathan Chancellor <nathan@kernel.org>, 
+ Nicolas Schier <nicolas.schier@linux.dev>
+Cc: Simon Glass <sjg@chromium.org>, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, 
+ kernel@pengutronix.de, linux-kernel@vger.kernel.org, 
+ linux-kbuild@vger.kernel.org, Sascha Hauer <s.hauer@pengutronix.de>, 
+ Ahmad Fatoum <a.fatoum@pengutronix.de>
+X-Mailer: b4 0.14.2
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-kbuild@vger.kernel.org
 
-On Tue, Nov 25, 2025 at 01:07:20PM +0100, Ahmad Fatoum wrote:
-> On 11/20/25 8:32 AM, Thomas Weißschuh wrote:
-> >> diff --git a/scripts/Makefile.package b/scripts/Makefile.package
-> >> index 74bcb9e7f7a4516473481468a0fcf700c3bead33..20eec9e2dec4dda3fa0ef64a15b80dccdcb55f90 100644
-> >> --- a/scripts/Makefile.package
-> >> +++ b/scripts/Makefile.package
+From: Sascha Hauer <s.hauer@pengutronix.de>
 
-(...)
+Add a new package target to build a cpio archive containing the kernel
+modules. This is particularly useful to supplement an existing initramfs
+with the kernel modules so that the root filesystem can be started with
+all needed kernel modules without modifying it.
 
-> >> +quiet_cmd_cpio = CPIO    $@
-> >> +      cmd_cpio = $(srctree)/usr/gen_initramfs.sh $< > $@
-> > 
-> > Use $(CONFIG_SHELL).
-> 
-> Can do. Is this to allow users to override CONFIG_SHELL from outside?
+Signed-off-by: Sascha Hauer <s.hauer@pengutronix.de>
+Reviewed-by: Simon Glass <sjg@chromium.org>
+Tested-by: Simon Glass <sjg@chromium.org>
+Co-developed-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
+Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
+---
+ scripts/Makefile.package | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-I think so. Some distributions do weird things.
+diff --git a/scripts/Makefile.package b/scripts/Makefile.package
+index 74bcb9e7f7a4516473481468a0fcf700c3bead33..83bfcf7cb09fd2d69b97e0c19a2b99c728835e8d 100644
+--- a/scripts/Makefile.package
++++ b/scripts/Makefile.package
+@@ -189,6 +189,25 @@ tar-pkg: linux-$(KERNELRELEASE)-$(ARCH).tar
+ tar%-pkg: linux-$(KERNELRELEASE)-$(ARCH).tar.% FORCE
+ 	@:
+ 
++# modules-cpio-pkg - generate an initramfs with the modules
++# ---------------------------------------------------------------------------
++
++.tmp_modules_cpio: FORCE
++	$(Q)$(MAKE) -f $(srctree)/Makefile
++	$(Q)rm -rf $@
++	$(Q)$(MAKE) -f $(srctree)/Makefile INSTALL_MOD_PATH=$@ modules_install
++
++quiet_cmd_cpio = CPIO    $@
++      cmd_cpio = $(CONFIG_SHELL) $(srctree)/usr/gen_initramfs.sh -o $@ $<
++
++modules-$(KERNELRELEASE)-$(ARCH).cpio: .tmp_modules_cpio
++	$(Q)$(MAKE) $(build)=usr usr/gen_init_cpio
++	$(call cmd,cpio)
++
++PHONY += modules-cpio-pkg
++modules-cpio-pkg: modules-$(KERNELRELEASE)-$(ARCH).cpio
++	@:
++
+ # perf-tar*-src-pkg - generate a source tarball with perf source
+ # ---------------------------------------------------------------------------
+ 
+@@ -245,6 +264,7 @@ help:
+ 	@echo '  tarbz2-pkg          - Build the kernel as a bzip2 compressed tarball'
+ 	@echo '  tarxz-pkg           - Build the kernel as a xz compressed tarball'
+ 	@echo '  tarzst-pkg          - Build the kernel as a zstd compressed tarball'
++	@echo '  modules-cpio-pkg    - Build the kernel modules as cpio archive'
+ 	@echo '  perf-tar-src-pkg    - Build the perf source tarball with no compression'
+ 	@echo '  perf-targz-src-pkg  - Build the perf source tarball with gzip compression'
+ 	@echo '  perf-tarbz2-src-pkg - Build the perf source tarball with bz2 compression'
 
-> If so, why not go one step further and remove shebangs from scripts
-> altogether to enforce that they are called with a $(VARIABLE) that can
-> be overridden?
+-- 
+2.47.3
 
-The shebang is also useful to enable syntax highlighting in editors, tell
-linters which shell dialect (POSIX/bash) is expected and to run the script
-without kbuild. I would just leave it as is.
-
-(...)
-
-> > Is the cpio-data= intended to make sure the line 'hostprogs := gen_init_cpio'
-> > is executed? I don't think this works as usr/Makefile will overwrite 'cpio-data'
-> > in any case. But it should be fine to make hostprogs definition unconditional.
-> 
-> Will add a commit making hostprogs := gen_init_cpio unconditional.
-> The current approach worked though, because specifying the variable on
-> the command line overrides cpio-data := assignments even if there are
-> multiple.
-
-Indeed. Good to know, thanks!
-
-
-Thomas
