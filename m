@@ -1,88 +1,114 @@
-Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284D9F50F
-	for <linux-kbuild@vger.kernel.org>; Wed, 26 Nov 2025 00:16:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD4D62F6586
+	for <linux-kbuild@vger.kernel.org>; Wed, 26 Nov 2025 01:29:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764116185; cv=none; b=dLpc6ek/vtYdG0t61gU8ZG9LwhX/qfyhsTwZsyTIrC53A1gB2sjGNFdSboiEkVaQp9sD2mLPPczOIryaCGFc4SZMLJPI5zvXE//sjAm60sObsRcFFJskLcH5OcBYlFK9ZRC3+sgBUPdYF1ukEqBUxY/Sjqzpr/IIyr2C0T2YkEw=
+	t=1764120574; cv=none; b=b6pOp/tkJ1UYd47FRlJJXdZ9JXwk5MLwD0dtS/L03i1UE92iCn8VB7g5unjtRy/+lsB20VNVw0hHryY8aRMlDLmoFPPqelxQ1hwnw83BqipHHICrxF63tGOEt/qhyjC/TdCuPYIppjQeW14YCp8pL6jk/Zn+/yGDjXR4mWe0rHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764116185; c=relaxed/simple;
-	bh=YA9qwV4XBiNOk3eL5MT3K8N/3agpG0aUPfqyJDtmfhg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UwHn5+1Zwbo0wRVQjcI0iyK+fZHZcy3LC7mIINpr6a3LYFYxuPwP1/0SWAEjiV+6BwcE0YFGmiFTD/XQsF8w04Fi5kUdKL9pe1pVHUZ37oMUMq+gX+KWp12UKsma0glAHuIJmCxO0qeFFliOZyfw3wfnxVOpobRrNlAIKBN1h+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=mC/f8CEs; arc=none smtp.client-ip=80.241.56.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+	s=arc-20240116; t=1764120574; c=relaxed/simple;
+	bh=0vPBXFkWZ/MzGH4tjLWdF3Fl9qTxFcaK/Jzqj1oLtgA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=HqFJlt3Agq4g8OtLaPJVVG8e09q0tbWYDGHRDvmKfl5U36xL3CHrhd7lEAw+PQutrLisxt+rg1fp0lNpzW2F3bHo92MZgAEsqIXf+lK3PAeR4tLN5+nbm9qx2mW5j4PwNVBLXs4OcqC0oJqnQgRBcq/ZBAtOsIVQ3InhpG18PnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MCaqU0Cu; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="mC/f8CEs"
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4dGKq82bs9z9t1n;
-	Wed, 26 Nov 2025 01:16:20 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1764116180;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MCaqU0Cu"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1764120570;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vpfrYYt9VH4ZHSXHnX2GiOC1U7mFKdrkL0zGl1+vDMk=;
-	b=mC/f8CEs0exMjehgw6nAaEeOlXMtx+WqfBqRr+bObAy3mO6/QhmxFE5qFKWKW06aySKzDe
-	d3+uruqIbuLvos3KtE4LW2WnITLzv/KuF3d11+F0Npo26LYI7I02+jSBvhwKhQWKr45qFo
-	nTAB7ltcJxa6ECX67hwX9BgcXovM7DevUpgmeWoSsxs+cKhF6SfRNVxz1Kbo2S/adENBl2
-	OvBcaVDKmWQ/kzRt/lJ9qjtcElwjuH0/Vsii2ypMdHTtdjKY8v9bkWFP0BObbaC1Fzy52d
-	nbH+5gO3IozMXwp6cV/DCK+HCbugEAyJUgko+EVRwfCWtbf8C8OMb2p+qZdPaw==
-Message-ID: <7e955a64-2fe6-4b8e-b49e-c3f827029b2b@mailbox.org>
-Date: Wed, 26 Nov 2025 01:16:16 +0100
+	bh=4xzNaBNG8jGgwOPkttRYQPmkjzfbEIAH53D/pi2LZps=;
+	b=MCaqU0Cup+kk5iU+XTEsWgK2C5cR4gPaOFtdx7Tp6e4LOtTwFJH/CidUDGTYNCdhUukKqj
+	TATIZPGq9cGcvF0aIY7FVyBVbv7obvfE5ITssPGkG6V4gEzrjQL+j3lNlnbA/FBEcggnUI
+	T63SBlPCsmMUKB+NnyIg8gRmXyTy7ms=
+From: Ihor Solodrai <ihor.solodrai@linux.dev>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>
+Cc: bpf@vger.kernel.org,
+	dwarves@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kbuild@vger.kernel.org,
+	Alan Maguire <alan.maguire@oracle.com>,
+	Donglin Peng <dolinux.peng@gmail.com>
+Subject: [PATCH bpf-next v1 1/4] resolve_btfids: rename object btf field to btf_path
+Date: Tue, 25 Nov 2025 17:26:53 -0800
+Message-ID: <20251126012656.3546071-2-ihor.solodrai@linux.dev>
+In-Reply-To: <20251126012656.3546071-1-ihor.solodrai@linux.dev>
+References: <20251126012656.3546071-1-ihor.solodrai@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH V2] modpost: Amend ppc64 save/restfpr symnames for -Os
- build
-To: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
- =?UTF-8?Q?Ren=C3=A9_Rebe?= <rene@exactco.de>, linux-kbuild@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org
-Cc: Madhavan Srinivasan <maddy@linux.ibm.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>
-References: <20251123.131330.407910684435629198.rene@exactco.de>
- <d69d7167-00d1-49c5-90ee-6bc0b7e8295f@kernel.org>
-Content-Language: en-US, de-DE
-From: Erhard Furtner <erhard_f@mailbox.org>
-In-Reply-To: <d69d7167-00d1-49c5-90ee-6bc0b7e8295f@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-MBO-RS-ID: b5caa0122b17562bad9
-X-MBO-RS-META: poewz48d1z6n4r6wgh4otp7nj5ig8b7u
+X-Migadu-Flow: FLOW_OUT
 
-On 11/23/25 15:57, Christophe Leroy (CS GROUP) wrote:
-> 
-> 
-> Le 23/11/2025 à 13:13, René Rebe a écrit :
->> Building a size optimized ppc64 kernel (-Os), gcc emits more FP
->> save/restore symbols, that the linker generates on demand into the
->> .sfpr section. Explicitly allow-list those in scripts/mod/modpost.c,
->> too. They are needed for the amdgpu in-kernel floating point support.
-> 
-> Would have been interested to know with which version of GCC the problem 
-> started.
+Rename the member of `struct object` holding the path to BTF data if
+provided via --btf arg. `btf_path` is less ambiguous.
 
-I can reproduce the modpost errors on GCC 15.2 and GCC 11.5.
+Signed-off-by: Ihor Solodrai <ihor.solodrai@linux.dev>
+---
+ tools/bpf/resolve_btfids/main.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Same kernel .config builds ok with CLANG 20.1.8 however.
+diff --git a/tools/bpf/resolve_btfids/main.c b/tools/bpf/resolve_btfids/main.c
+index d47191c6e55e..d2762487ce5f 100644
+--- a/tools/bpf/resolve_btfids/main.c
++++ b/tools/bpf/resolve_btfids/main.c
+@@ -113,7 +113,7 @@ struct btf_id {
+ 
+ struct object {
+ 	const char *path;
+-	const char *btf;
++	const char *btf_path;
+ 	const char *base_btf_path;
+ 
+ 	struct {
+@@ -550,11 +550,11 @@ static int symbols_resolve(struct object *obj)
+ 		}
+ 	}
+ 
+-	btf = btf__parse_split(obj->btf ?: obj->path, base_btf);
++	btf = btf__parse_split(obj->btf_path ?: obj->path, base_btf);
+ 	err = libbpf_get_error(btf);
+ 	if (err) {
+ 		pr_err("FAILED: load BTF from %s: %s\n",
+-			obj->btf ?: obj->path, strerror(-err));
++			obj->btf_path ?: obj->path, strerror(-err));
+ 		goto out;
+ 	}
+ 
+@@ -790,7 +790,7 @@ int main(int argc, const char **argv)
+ 	struct option btfid_options[] = {
+ 		OPT_INCR('v', "verbose", &verbose,
+ 			 "be more verbose (show errors, etc)"),
+-		OPT_STRING(0, "btf", &obj.btf, "BTF data",
++		OPT_STRING(0, "btf", &obj.btf_path, "BTF data",
+ 			   "BTF data"),
+ 		OPT_STRING('b', "btf_base", &obj.base_btf_path, "file",
+ 			   "path of file providing base BTF"),
+-- 
+2.52.0
 
-> By the way you seem to fix the problem for modules, but does it also 
-> work when amdgpu is in kernel ? I would have expected a need to add 
-> functions in arch/powerpc/lib/crtsavres.S as well, just like following 
-> commits:
-
-If I build amdgpu statically into the kernel I don't get the modpost 
-errors, the build finishes successfully. Only building amdgpu as module 
-leads to these errors Rene reported.
-
-Regards,
-Erhard
