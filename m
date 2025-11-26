@@ -1,156 +1,112 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58DA234321F;
-	Wed, 26 Nov 2025 20:49:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F9012FB99D
+	for <linux-kbuild@vger.kernel.org>; Wed, 26 Nov 2025 22:25:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764190161; cv=none; b=DM8ZE7gOlbZtGrwQ5S1nC/srt8kMibhI3qy5CA/afm4ubAL+lN7lZzYMr5dctTFkSQZoGEpmu9mOaQGiAO9Lufxpoo26gHGrp+5wU+Q8ntSz/sq5cyINbNA0SvUONf+pCiGnC/fmlH0xoY8LqlyRhgQ1EMKwW7ISXpB65Qk8BO4=
+	t=1764195937; cv=none; b=P6NOolOJtzgjw3GbzF9V9F5sfh5Q+LIVPEqxhkI1AfsswXpMubd6UxehIBH6BvS0y9cFhhC+xUGo+X8MjAACuX6QTDN+87X1x8e3nZePnbK7fF7/X1lxdtaHSWebIyyZ3Tc9Gt5xR8SEXeSxG9HeAjcZM9i6w80LfPAyJjacYrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764190161; c=relaxed/simple;
-	bh=zX3X98eW4so3HINCwpv3PaapQBnFQ3CAJqrkDiQqEMc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D/eu8R/Esl4SrQ6xQgW2y/wOtSxh+NI5QsnURM2xpmoeOt2YUlIvXu2MiZp9UYI530W9R3N8+FXWD8C94TE1jbTGbfYsIg5muNSHAAh7iBpWEOmYwEdfX6JmgYeHrg3gd6ImmWaZvMP+u04OppPGYzYt6FYo2QFdCJcOyI6THMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cDMgqPXY; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764195937; c=relaxed/simple;
+	bh=HOT4Gu96WDg1GNjhCNSzX+3zkGtP/7lynXOjNF7OuuM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=J0VrNvuSGZPPiM8HSw7oissPOU7mH1Loilm4uRT8sCcr3Ut0AbdFbMX7kcJcIkZt+AshAokOw9YyoY1CJSYQNjjz3CXiFVd/FVXo5V6z6hzDEBlOlcfZe/iTtiQ3xvZvEERSFOA4JL5sRRF9wFImynUrV3Dwl6vRMYNKDQaXA2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cXAKUNg+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cDMgqPXY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B627DC113D0;
-	Wed, 26 Nov 2025 20:49:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cXAKUNg+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D96BC116D0
+	for <linux-kbuild@vger.kernel.org>; Wed, 26 Nov 2025 22:25:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764190161;
-	bh=zX3X98eW4so3HINCwpv3PaapQBnFQ3CAJqrkDiQqEMc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cDMgqPXYUBjD/HrRd0sBrEzGdzDZDXW91qp5Ed6/tpokmCPQXvkCVec4VvIfSee/S
-	 KoeJQXZ9k/zNajxDFqbpctTUMlNJFEviUr53JjCP9mG2SKHbiYCc7cQCf1UGHMm/yS
-	 wj9KcLnjelK55pDEAXY21iFYn1A6wkDVxCZDCUZrSLZ8W/Je0yLkw34xPQie/yUQw4
-	 Ep+YFT14O9Uzp56bvnGNhi7jMQd89CZinwjQXHJ0BR9ue0lNe9hP5DLB7rUR460fks
-	 lTmdHil6hn56zgu/R7zalyIgs+T47uU5D62Lzp2D99FB4yYs/e+b16K2z7/aPoPZB8
-	 qm/fZ8RZZoe/A==
-Date: Wed, 26 Nov 2025 21:48:59 +0100
-From: Nicolas Schier <nsc@kernel.org>
-To: Ahmad Fatoum <a.fatoum@pengutronix.de>
-Cc: Nathan Chancellor <nathan@kernel.org>, Simon Glass <sjg@chromium.org>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	linux-kbuild@vger.kernel.org, Sascha Hauer <s.hauer@pengutronix.de>
-Subject: Re: [PATCH v2 2/2] kbuild: add target to build a cpio containing
- modules
-Message-ID: <aSdnuxCNjwAma4_X@derry.ads.avm.de>
-References: <20251125-cpio-modules-pkg-v2-0-aa8277d89682@pengutronix.de>
- <20251125-cpio-modules-pkg-v2-2-aa8277d89682@pengutronix.de>
+	s=k20201202; t=1764195937;
+	bh=HOT4Gu96WDg1GNjhCNSzX+3zkGtP/7lynXOjNF7OuuM=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=cXAKUNg+Gr8x07WTRiiU27RCxnDcBPNJEQH0PrsXtXeV4hichLIKK9JX39Tcu7qOj
+	 gCP/Z8fbtLS14P9Bzq0M9qy5YWymCuckR9cxtRIsD+DWH4IXT+j5xwl1JfLvNqL1M4
+	 SJNvuX2rFtk3svrxRFoAtwEsw0o+dL2uUl38HohDryoTgbxqCMYrFZtYPmHHG48fkW
+	 vIU31Udm/3/klGJ4v9iGMYNm2meHipJtl0kksh0dmhxFG0+nwcdT2L6qfgBOlHm0xL
+	 I+8ISJG1nHx/WIhRv50EYn7Q702gQaFY7MvqGy59VI7DgSGZAd0Epup65YVQAiIZtA
+	 XYrbv/FGcGc4g==
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-64074f01a6eso510707a12.2
+        for <linux-kbuild@vger.kernel.org>; Wed, 26 Nov 2025 14:25:37 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWX/nfCmp9rRb0NUbXGsG5XItE9pGXmA4oB/x3zThv2RK1CYrQT6FlVpNypVZczHjzt44uplFFSajN7Ck8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYoPRXRqLPDnIhCelO3KFeRBvJ9ifX+LYrtPVrdr/4ZYEN4S69
+	ZKYh+IVl+f2H6AOePzOyeegkYMjRgrjn3N673WYYZ6IIkVdesn0/APauvZHPGBQDrOaHuBPHYjV
+	hWl6/NiusmdJKBcknMw7Mg4nkVV/6LQ==
+X-Google-Smtp-Source: AGHT+IE8t9dgqpkksbjPh6GcMq0WGLROg6+4afEUls7q/K2hXXYpvpEA6HkyAjhC1SY4duWi9xNeDPU4OhqOOxqyumE=
+X-Received: by 2002:a05:6402:274e:b0:641:8644:f87f with SMTP id
+ 4fb4d7f45d1cf-64555cd9bd8mr20042023a12.17.1764195935712; Wed, 26 Nov 2025
+ 14:25:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="k2d4UkmjES/G39Gg"
-Content-Disposition: inline
-In-Reply-To: <20251125-cpio-modules-pkg-v2-2-aa8277d89682@pengutronix.de>
-
-
---k2d4UkmjES/G39Gg
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20251114222759.4181152-1-robh@kernel.org> <aSDEC9D87nZB5RJp@derry.ads.avm.de>
+In-Reply-To: <aSDEC9D87nZB5RJp@derry.ads.avm.de>
+From: Rob Herring <robh@kernel.org>
+Date: Wed, 26 Nov 2025 16:25:24 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqKJEZodVSo-6bZBcUTc0TfNCs6bEGfvy9ZdZbmSbu=cSA@mail.gmail.com>
+X-Gm-Features: AWmQ_blJXcfU7CfsdtSi-0_ppiE05WGbkk25QamtIsJcoqd1FjOKuZFah7ilsls
+Message-ID: <CAL_JsqKJEZodVSo-6bZBcUTc0TfNCs6bEGfvy9ZdZbmSbu=cSA@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: Ensure .dtbo targets are applied to a base .dtb
+To: Nicolas Schier <nsc@kernel.org>
+Cc: Nathan Chancellor <nathan@kernel.org>, devicetree@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 25, 2025 at 02:18:20PM +0100, Ahmad Fatoum wrote:
-> From: Sascha Hauer <s.hauer@pengutronix.de>
->=20
-> Add a new package target to build a cpio archive containing the kernel
-> modules. This is particularly useful to supplement an existing initramfs
-> with the kernel modules so that the root filesystem can be started with
-> all needed kernel modules without modifying it.
->=20
-> Signed-off-by: Sascha Hauer <s.hauer@pengutronix.de>
-> Reviewed-by: Simon Glass <sjg@chromium.org>
-> Tested-by: Simon Glass <sjg@chromium.org>
-> Co-developed-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
-> Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
-> ---
->  scripts/Makefile.package | 20 ++++++++++++++++++++
->  1 file changed, 20 insertions(+)
->=20
-> diff --git a/scripts/Makefile.package b/scripts/Makefile.package
-> index 74bcb9e7f7a4516473481468a0fcf700c3bead33..83bfcf7cb09fd2d69b97e0c19=
-a2b99c728835e8d 100644
-> --- a/scripts/Makefile.package
-> +++ b/scripts/Makefile.package
-> @@ -189,6 +189,25 @@ tar-pkg: linux-$(KERNELRELEASE)-$(ARCH).tar
->  tar%-pkg: linux-$(KERNELRELEASE)-$(ARCH).tar.% FORCE
->  	@:
-> =20
-> +# modules-cpio-pkg - generate an initramfs with the modules
-> +# ----------------------------------------------------------------------=
------
-> +
-> +.tmp_modules_cpio: FORCE
-> +	$(Q)$(MAKE) -f $(srctree)/Makefile
-> +	$(Q)rm -rf $@
-> +	$(Q)$(MAKE) -f $(srctree)/Makefile INSTALL_MOD_PATH=3D$@ modules_install
+On Wed, Nov 26, 2025 at 2:49=E2=80=AFPM Nicolas Schier <nsc@kernel.org> wro=
+te:
+>
+> On Fri, Nov 14, 2025 at 04:27:58PM -0600, Rob Herring (Arm) wrote:
+> > It is a requirement that DT overlays in the kernel are applied at build
+> > time to a base DTB in order to validate they can be applied and to
+> > validate them against the DT schemas. DT overlays on their own may be
+> > incomplete and can't be validated.
+> >
+> > Add a kbuild check so this doesn't have to be checked and fixed
+> > periodically.
+> >
+> > Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> > ---
+> >  scripts/Makefile.dtbs | 7 +++++++
+> >  1 file changed, 7 insertions(+)
+> >
+> > diff --git a/scripts/Makefile.dtbs b/scripts/Makefile.dtbs
+> > index 2d321b813600..15473edc2589 100644
+> > --- a/scripts/Makefile.dtbs
+> > +++ b/scripts/Makefile.dtbs
+> > @@ -10,6 +10,13 @@ real-dtb-y :=3D $(call real-search, $(dtb-y), .dtb, =
+-dtbs)
+> >  # Base DTB that overlay is applied onto
+> >  base-dtb-y :=3D $(filter %.dtb, $(call real-search, $(multi-dtb-y), .d=
+tb, -dtbs))
+> >
+> > +# Ensure that any .dtbo is applied to at least one base .dtb. Otherwis=
+e, it
+> > +# does not get validated.
+> > +applied-dtbo :=3D $(filter %.dtbo, \
+> > +     $(call real-search, $(call multi-search, $(dtb-y) $(dtb-), .dtb, =
+-dtbs), .dtb, -dtbs))
+> > +unapplied-dtbo :=3D $(filter-out $(applied-dtbo),$(filter %.dtbo, $(dt=
+b-y)))
+> > +$(if $(unapplied-dtbo), $(warning .dtbo is not applied to any base: $(=
+unapplied-dtbo)))
+> > +
+> >  dtb-y           :=3D $(addprefix $(obj)/, $(dtb-y))
+> >  multi-dtb-y     :=3D $(addprefix $(obj)/, $(multi-dtb-y))
+> >  real-dtb-y      :=3D $(addprefix $(obj)/, $(real-dtb-y))
+> > --
+> > 2.51.0
+> >
+>
+> Acked-by: Nicolas Schier <nsc@kernel.org>
 
-Do you know why '-f $(srctree)/Makefile' is necessary here?  As this
-and the make call two lines above call common top-level targets, I do
-not see the reason for explicitly adding the Makefile path.  Am I
-missing something; or have you observed problems without '-f'?
+Thanks!
 
-> +
-> +quiet_cmd_cpio =3D CPIO    $@
-> +      cmd_cpio =3D $(CONFIG_SHELL) $(srctree)/usr/gen_initramfs.sh -o $@=
- $<
-> +
-> +modules-$(KERNELRELEASE)-$(ARCH).cpio: .tmp_modules_cpio
-> +	$(Q)$(MAKE) $(build)=3Dusr usr/gen_init_cpio
-> +	$(call cmd,cpio)
+> Do you take this via DT tree?
 
-Removing the '$(MAKE) $(build)=3Dusr usr/gen_init_cpio' line and adding
+Yes, I'll take it.
 
-
-PHONY +=3D usr_gen_init_cpio
-usr_gen_init_cpio: scripts_basic
-	$(Q)$(MAKE) $(build)=3Dusr usr/gen_init_cpio
-
-modules-cpio-pkg: usr_gen_init_cpio
-
-
-to top-level Makefile could be used to allow make to compile
-gen_init_cpio in parallel instead of sequential.  And it simplifies a
-possible move of gen_init_cpio from usr/ to scripts/, as Nathan
-suggested.
-
-What do you think?  (Top-level Makefile addition should probably better
-be integrated into patch 1.)  I can also send this as a follow-up patch
-after merging your patches.
-
-
-Nevertheless,
-Tested-by: Nicolas Schier <nsc@kernel.org>
-
-If there are no further remarks, I am going to merge the patch set
-before the weekend.
-
-Thanks and kind regards,
-Nicolas
-
---k2d4UkmjES/G39Gg
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEh0E3p4c3JKeBvsLGB1IKcBYmEmkFAmknZ7cACgkQB1IKcBYm
-EmlUfBAA5pDBUFmSTlvwQGnfdBo3AIGp5rvNoCPJsJ/hSZgMW4cav1ckatPJBalB
-+J091VkfAyGzWAOZpI0Ze/fm6xt8QXCkZ4xCi5f7xfySkmB5cEg60WIG5q/Q5d4V
-qMMdRmd4QCVYB+mIZbLMS3SWnK7qRnn9dnpQTspXTRmf+gdXgsSyhYsdKmPNABMj
-kx9AY/R7onNPhX2D4vY1EHi51lz7aXJm4kCUUe0ibho2kdwhqZdHY2q1+4CvEU3q
-P2FZYXzVj6BjafIAhQ7faK9zFYOzIkinRjIBtDPbXOIo3VB+VcXCNr34Wp6ApAuM
-xXvl/rXH+JEsUjbp+LwnsSaYew0XcXGXpO+B/3TQaldy1sza6/16xkXH8+tkZavJ
-X5gTUKktFp/aJgRZLIrKDPXRE49GrR4O9vh8sQyrXydXh1aWOOZSpoprbolf1+yw
-uqg1RGlprBxpw0c2x/jZCQ3VvyUdLs83/gTeTYy9EJN4X+n1mbEwVd6a61NjbnmD
-gCUET8eS+2uw3WOz1ckYvyCzfyNggkmgtbnYogI/Vaa2wiDtBRSgeTyfvdCkQvUJ
-J78YQHmVPcOpycfvdSXj15TcACUkRvjABRadxhuSqs95FSlsvfV6A5a/yVQbWdyG
-40nD6us2o/tZxG7o/QUHjORMJedQHcJu/woGDWXKABNSfFIbLDE=
-=qu2e
------END PGP SIGNATURE-----
-
---k2d4UkmjES/G39Gg--
+Rob
