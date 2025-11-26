@@ -1,120 +1,156 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BA27340DBD;
-	Wed, 26 Nov 2025 20:49:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58DA234321F;
+	Wed, 26 Nov 2025 20:49:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764190155; cv=none; b=hfzhPBt49cG7JF+/b0E+WCJMxJ/zR4Fg6nd4N9wlnei2dQkRbjIyDfuhmXgt9Olglt31S677pPqbnZf78WcGHMES8xtr3wVtMsWEJ4qYUAJfGPOlt8CYtwL4QdjNuBOToS6r3SfCHxrpDg5Livi4H6U5o/YCzv9Ws5XCw9ZYbDk=
+	t=1764190161; cv=none; b=DM8ZE7gOlbZtGrwQ5S1nC/srt8kMibhI3qy5CA/afm4ubAL+lN7lZzYMr5dctTFkSQZoGEpmu9mOaQGiAO9Lufxpoo26gHGrp+5wU+Q8ntSz/sq5cyINbNA0SvUONf+pCiGnC/fmlH0xoY8LqlyRhgQ1EMKwW7ISXpB65Qk8BO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764190155; c=relaxed/simple;
-	bh=Ld6pg6klGN4n4kfd7qcFOY91BR7cRFdceB5VpT8strY=;
+	s=arc-20240116; t=1764190161; c=relaxed/simple;
+	bh=zX3X98eW4so3HINCwpv3PaapQBnFQ3CAJqrkDiQqEMc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IX8IWlErQ2eEv7PYwlbpuu/m6xUGTRKvwCnahma3p5Eb+AUu0Lar3XjuAeWG44EK3yXsBrsvJqQ+ITQVXw1cNJ0T71VZsGk6/w0t5hXcOOAh9OcMHWAsjbGznZt2BGWuzKesSNBgVFezNCvFZSxbJVrCsZ0ugbIwWtzp5ZLwKgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J6M0EEqH; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=D/eu8R/Esl4SrQ6xQgW2y/wOtSxh+NI5QsnURM2xpmoeOt2YUlIvXu2MiZp9UYI530W9R3N8+FXWD8C94TE1jbTGbfYsIg5muNSHAAh7iBpWEOmYwEdfX6JmgYeHrg3gd6ImmWaZvMP+u04OppPGYzYt6FYo2QFdCJcOyI6THMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cDMgqPXY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J6M0EEqH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37A8FC4CEF7;
-	Wed, 26 Nov 2025 20:49:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cDMgqPXY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B627DC113D0;
+	Wed, 26 Nov 2025 20:49:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764190154;
-	bh=Ld6pg6klGN4n4kfd7qcFOY91BR7cRFdceB5VpT8strY=;
+	s=k20201202; t=1764190161;
+	bh=zX3X98eW4so3HINCwpv3PaapQBnFQ3CAJqrkDiQqEMc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=J6M0EEqHVRfQA1jr09+cwgXWEAGXh9fvl57IVLxcAnc2gsBTRKn8rrnAK0x150wiB
-	 b5x9pilzhDcjkdEkys+NbSvPZ7O6/2e2kFvYudNcrLgfu+A6YTL8RKXeb0jJv24FBz
-	 hNBzjwPkRlayoBytNeRUQZYBqGsqdF+qRkKAFESnl3MXNGcPV6hTD3lhrG6A6x9G2+
-	 shVEHINKQDEjZdqN16YUpS8fnrcnR/AmpkxGHHk7nrT2vzRRZnQeiPA8emtbzY1FDp
-	 9DrW4aAxqA89Y1I+dv3L9+7sIQgVWW76KFeXrKu2bA8A7nya6DpAnShBhyHoPY5duJ
-	 4wGjxY//q5ZlQ==
-Date: Wed, 26 Nov 2025 08:49:41 +0100
+	b=cDMgqPXYUBjD/HrRd0sBrEzGdzDZDXW91qp5Ed6/tpokmCPQXvkCVec4VvIfSee/S
+	 KoeJQXZ9k/zNajxDFqbpctTUMlNJFEviUr53JjCP9mG2SKHbiYCc7cQCf1UGHMm/yS
+	 wj9KcLnjelK55pDEAXY21iFYn1A6wkDVxCZDCUZrSLZ8W/Je0yLkw34xPQie/yUQw4
+	 Ep+YFT14O9Uzp56bvnGNhi7jMQd89CZinwjQXHJ0BR9ue0lNe9hP5DLB7rUR460fks
+	 lTmdHil6hn56zgu/R7zalyIgs+T47uU5D62Lzp2D99FB4yYs/e+b16K2z7/aPoPZB8
+	 qm/fZ8RZZoe/A==
+Date: Wed, 26 Nov 2025 21:48:59 +0100
 From: Nicolas Schier <nsc@kernel.org>
-To: Kees Cook <kees@kernel.org>
-Cc: "Gustavo A . R . Silva" <gustavoars@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Miguel Ojeda <ojeda@kernel.org>, linux-kbuild@vger.kernel.org,
+To: Ahmad Fatoum <a.fatoum@pengutronix.de>
+Cc: Nathan Chancellor <nathan@kernel.org>, Simon Glass <sjg@chromium.org>,
 	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>,
-	Tamir Duberstein <tamird@gmail.com>, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v2] kbuild: Enable GCC diagnostic context for
- value-tracking warnings
-Message-ID: <aSaxFayrJEAUz1cT@derry.ads.avm.de>
-References: <20251121184342.it.626-kees@kernel.org>
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	linux-kbuild@vger.kernel.org, Sascha Hauer <s.hauer@pengutronix.de>
+Subject: Re: [PATCH v2 2/2] kbuild: add target to build a cpio containing
+ modules
+Message-ID: <aSdnuxCNjwAma4_X@derry.ads.avm.de>
+References: <20251125-cpio-modules-pkg-v2-0-aa8277d89682@pengutronix.de>
+ <20251125-cpio-modules-pkg-v2-2-aa8277d89682@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="k2d4UkmjES/G39Gg"
+Content-Disposition: inline
+In-Reply-To: <20251125-cpio-modules-pkg-v2-2-aa8277d89682@pengutronix.de>
+
+
+--k2d4UkmjES/G39Gg
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251121184342.it.626-kees@kernel.org>
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 21, 2025 at 10:43:48AM -0800, Kees Cook wrote:
-> Enable GCC 16's coming "-fdiagnostics-show-context=N" option[1] to
-> provide enhanced diagnostic information for value-tracking warnings,
-> which displays the control flow chain leading to the diagnostic. This
-> covers our existing use of -Wrestrict and -Wstringop-overread, and
-> gets us closer to enabling -Warray-bounds, -Wstringop-overflow, and
-> -Wstringop-truncation, so we can track the rationale for the warning,
-> letting us more quickly identify actual issues vs what have looked in
-> the past like false positives. Fixes based on this work have already
-> been landing, e.g.:
-> 
->   4a6f18f28627 ("net/mlx4_core: Avoid impossible mlx4_db_alloc() order value")
->   8a39f1c870e9 ("ovl: Check for NULL d_inode() in ovl_dentry_upper()")
->   e5f7e4e0a445 ("drm/amdgpu/atom: Work around vbios NULL offset false positive")
-> 
-> The context depth ("=N") provides the immediate decision path that led
-> to the problematic code location, showing conditional checks and branch
-> decisions that caused the warning. This will help us understand why
-> GCC's value-tracking analysis triggered the warning and makes it easier
-> to determine whether warnings are legitimate issues or false positives.
-> 
-> For example, an array bounds warning will now show the conditional
-> statements (like "if (i >= 4)") that established the out-of-bounds access
-> range, directly connecting the control flow to the warning location.
-> This is particularly valuable when GCC's interprocedural analysis can
-> generate warnings that are difficult to understand without seeing the
-> inferred control flow.
-> 
-> While my testing has shown that "=1" reports enough for finding
-> the origin of most bounds issues, I have used "=2" here just to be
-> conservative. Build time measurements with this option off, =1, and =2
-> are all with noise of each other, so there seems to be no harm in "turning
-> it up". If we need to, we can make this value configurable in the future.
-> 
-> Link: https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=6faa3cfe60ff9769d1bebfffdd2c7325217d7389 [1]
-> Signed-off-by: Kees Cook <kees@kernel.org>
+On Tue, Nov 25, 2025 at 02:18:20PM +0100, Ahmad Fatoum wrote:
+> From: Sascha Hauer <s.hauer@pengutronix.de>
+>=20
+> Add a new package target to build a cpio archive containing the kernel
+> modules. This is particularly useful to supplement an existing initramfs
+> with the kernel modules so that the root filesystem can be started with
+> all needed kernel modules without modifying it.
+>=20
+> Signed-off-by: Sascha Hauer <s.hauer@pengutronix.de>
+> Reviewed-by: Simon Glass <sjg@chromium.org>
+> Tested-by: Simon Glass <sjg@chromium.org>
+> Co-developed-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
+> Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
 > ---
-> Cc: Gustavo A. R. Silva <gustavoars@kernel.org>
-> Cc: Nathan Chancellor <nathan@kernel.org>
-> Cc: Nicolas Schier <nicolas.schier@linux.dev>
-> Cc: Masahiro Yamada <masahiroy@kernel.org>
-> Cc: Miguel Ojeda <ojeda@kernel.org>
-> Cc: <linux-kbuild@vger.kernel.org>
-> ---
->  Makefile | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/Makefile b/Makefile
-> index d14824792227..d97452441cd0 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -940,6 +940,9 @@ KBUILD_CFLAGS += $(call cc-option,-fzero-init-padding-bits=all)
->  # for the randomize_kstack_offset feature. Disable it for all compilers.
->  KBUILD_CFLAGS	+= $(call cc-option, -fno-stack-clash-protection)
->  
-> +# Get details on warnings generated due to GCC value tracking.
-> +KBUILD_CFLAGS	+= $(call cc-option, -fdiagnostics-show-context=2)
+>  scripts/Makefile.package | 20 ++++++++++++++++++++
+>  1 file changed, 20 insertions(+)
+>=20
+> diff --git a/scripts/Makefile.package b/scripts/Makefile.package
+> index 74bcb9e7f7a4516473481468a0fcf700c3bead33..83bfcf7cb09fd2d69b97e0c19=
+a2b99c728835e8d 100644
+> --- a/scripts/Makefile.package
+> +++ b/scripts/Makefile.package
+> @@ -189,6 +189,25 @@ tar-pkg: linux-$(KERNELRELEASE)-$(ARCH).tar
+>  tar%-pkg: linux-$(KERNELRELEASE)-$(ARCH).tar.% FORCE
+>  	@:
+> =20
+> +# modules-cpio-pkg - generate an initramfs with the modules
+> +# ----------------------------------------------------------------------=
+-----
 > +
->  # Clear used registers at func exit (to reduce data lifetime and ROP gadgets).
->  ifdef CONFIG_ZERO_CALL_USED_REGS
->  KBUILD_CFLAGS	+= -fzero-call-used-regs=used-gpr
-> -- 
-> 2.34.1
-> 
+> +.tmp_modules_cpio: FORCE
+> +	$(Q)$(MAKE) -f $(srctree)/Makefile
+> +	$(Q)rm -rf $@
+> +	$(Q)$(MAKE) -f $(srctree)/Makefile INSTALL_MOD_PATH=3D$@ modules_install
 
-Thanks!
+Do you know why '-f $(srctree)/Makefile' is necessary here?  As this
+and the make call two lines above call common top-level targets, I do
+not see the reason for explicitly adding the Makefile path.  Am I
+missing something; or have you observed problems without '-f'?
 
-Reviewed-by: Nicolas Schier <nsc@kernel.org>
+> +
+> +quiet_cmd_cpio =3D CPIO    $@
+> +      cmd_cpio =3D $(CONFIG_SHELL) $(srctree)/usr/gen_initramfs.sh -o $@=
+ $<
+> +
+> +modules-$(KERNELRELEASE)-$(ARCH).cpio: .tmp_modules_cpio
+> +	$(Q)$(MAKE) $(build)=3Dusr usr/gen_init_cpio
+> +	$(call cmd,cpio)
+
+Removing the '$(MAKE) $(build)=3Dusr usr/gen_init_cpio' line and adding
+
+
+PHONY +=3D usr_gen_init_cpio
+usr_gen_init_cpio: scripts_basic
+	$(Q)$(MAKE) $(build)=3Dusr usr/gen_init_cpio
+
+modules-cpio-pkg: usr_gen_init_cpio
+
+
+to top-level Makefile could be used to allow make to compile
+gen_init_cpio in parallel instead of sequential.  And it simplifies a
+possible move of gen_init_cpio from usr/ to scripts/, as Nathan
+suggested.
+
+What do you think?  (Top-level Makefile addition should probably better
+be integrated into patch 1.)  I can also send this as a follow-up patch
+after merging your patches.
+
+
+Nevertheless,
+Tested-by: Nicolas Schier <nsc@kernel.org>
+
+If there are no further remarks, I am going to merge the patch set
+before the weekend.
+
+Thanks and kind regards,
+Nicolas
+
+--k2d4UkmjES/G39Gg
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEh0E3p4c3JKeBvsLGB1IKcBYmEmkFAmknZ7cACgkQB1IKcBYm
+EmlUfBAA5pDBUFmSTlvwQGnfdBo3AIGp5rvNoCPJsJ/hSZgMW4cav1ckatPJBalB
++J091VkfAyGzWAOZpI0Ze/fm6xt8QXCkZ4xCi5f7xfySkmB5cEg60WIG5q/Q5d4V
+qMMdRmd4QCVYB+mIZbLMS3SWnK7qRnn9dnpQTspXTRmf+gdXgsSyhYsdKmPNABMj
+kx9AY/R7onNPhX2D4vY1EHi51lz7aXJm4kCUUe0ibho2kdwhqZdHY2q1+4CvEU3q
+P2FZYXzVj6BjafIAhQ7faK9zFYOzIkinRjIBtDPbXOIo3VB+VcXCNr34Wp6ApAuM
+xXvl/rXH+JEsUjbp+LwnsSaYew0XcXGXpO+B/3TQaldy1sza6/16xkXH8+tkZavJ
+X5gTUKktFp/aJgRZLIrKDPXRE49GrR4O9vh8sQyrXydXh1aWOOZSpoprbolf1+yw
+uqg1RGlprBxpw0c2x/jZCQ3VvyUdLs83/gTeTYy9EJN4X+n1mbEwVd6a61NjbnmD
+gCUET8eS+2uw3WOz1ckYvyCzfyNggkmgtbnYogI/Vaa2wiDtBRSgeTyfvdCkQvUJ
+J78YQHmVPcOpycfvdSXj15TcACUkRvjABRadxhuSqs95FSlsvfV6A5a/yVQbWdyG
+40nD6us2o/tZxG7o/QUHjORMJedQHcJu/woGDWXKABNSfFIbLDE=
+=qu2e
+-----END PGP SIGNATURE-----
+
+--k2d4UkmjES/G39Gg--
