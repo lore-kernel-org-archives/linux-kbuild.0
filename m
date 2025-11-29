@@ -1,128 +1,139 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B09F927AC28;
-	Fri, 28 Nov 2025 20:01:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C30E2475CF;
+	Sat, 29 Nov 2025 14:31:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764360118; cv=none; b=WVr0Cv3q2WI+3H0Fu1oEO3qPwISA5bmuDUzF8YsqUUXw5Ph1FFwV5vNVwLvUklP7kgRAay/RYWcaiRyHY9rrqNR3IjkFCDaH2ODcZwd2Jh5g4vBiRPm9F87bhDwzt3pVUfFsfPL4E8aggxY2wDfkQSaIiq3cvEl4SFipXYhJzek=
+	t=1764426674; cv=none; b=Sxo1hPp3WSd5PqN2GqITi1mZoFmIeGeo/36jarfEx8lnSxPMgawifVPSIz06jZ/DF7BV1RhbdK1rU0HRklUySiXM+6Q+3dm7o4xbODItXmaY36zkXJt6zGyibeOUbEhOUOP7tcy3Ln0klK5Swd4/FnL2Zo7cfcMPeEZG7gkFQ6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764360118; c=relaxed/simple;
-	bh=CSWaeCg0AtDlUP1nzlxnywheToBpLzx0wG6+SaKhy+Q=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=XxYGpD7W9tLVfZCSs1+1DIzzs58GYt0ZyDHHS8c5s8OykrLwcxeRSC0oBgipn66tEWChFl1SUcp9rzTG6eUK0VEs3xF9hTuFI60loL5A5rCyfJpEfSFLFQSUZqKhW0EU6y5T9cUTAFcmliymm8ikLI/rNscWJ1RV8wGNuqBpyYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bb9VnjF+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764426674; c=relaxed/simple;
+	bh=OOXM+8VJNr1jofMq1aDwIoY/tJO1ZvIsD3b19brw7lc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FCdDzs/duUsn4BXITUAsA78yUYV+ycWDFrOKQqPRv09WDwaYOG8NQ5VyRJWb7smtVbyLITP7KxwocUlAhoNl4N5VHqA9AR8qi9carSdI/ASsPPzqDzDXaSf/eUJ+F+MgnUkLypMKFzWgcPPnlfupXu38/SqX9mNx6/XDnkA91Og=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PWj4NUCZ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bb9VnjF+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 637B1C113D0;
-	Fri, 28 Nov 2025 20:01:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PWj4NUCZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E083AC4CEF7;
+	Sat, 29 Nov 2025 14:31:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764360118;
-	bh=CSWaeCg0AtDlUP1nzlxnywheToBpLzx0wG6+SaKhy+Q=;
-	h=From:Date:Subject:To:Cc:From;
-	b=bb9VnjF+Kf1KgZli+1/pRodyLmntzjEt6rYbYShSbO5aJMvfNZmUHUoxaT8l6Lx0+
-	 NVsSdnZq9J7jszB4u/dTn+l6dfxwlhfEDnDkPc9OpLdxIymK1B8L5GA0xa1/nQXirR
-	 UQyiWyc6mjY+yhcUOx67sXqsl0o1Zwt5jXc/IIACJ0G8vb5J2GebU7C/Q9RAhOnp0E
-	 raXRDZH86jRGZ3x3/JZyvxsAw2gMlo1xBxC0RyYBpxxs06mu4494rNf+OjloMAJTaT
-	 GI3OKaHElCkrs9zBxDmkRztgKc6a4TICYKffslShImS+8CB46ZQMh0XLNlgnDCbjPP
-	 hEDTa6to7qzbw==
-From: Nicolas Schier <nsc@kernel.org>
-Date: Fri, 28 Nov 2025 21:01:55 +0100
-Subject: [PATCH] kbuild: Add top-level target for building gen_init_cpio
+	s=k20201202; t=1764426671;
+	bh=OOXM+8VJNr1jofMq1aDwIoY/tJO1ZvIsD3b19brw7lc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=PWj4NUCZXJCf0cQOQb/LwGSzkgtSkTq3JT0SBX/1zyzCien82/KxUzpcFPaPNswO1
+	 LPsmXmQGJaV/nsBwXaRc+feT5qhOHUyfve6rwdiYNZTuZDq4ve43Lr9B6KzaOEx1BT
+	 3zmN40bldzF85pdUb/lerOgzou1GFRyUUPNCnRVlHr1SUTob626mzl5IcZJvMWTvAt
+	 OANnR3Mpymo9zIAywoq14c/rXgiM7+MbSLIw+wWZzQrHmOWro44T3QcT70eaQ626DY
+	 MvjC4jKdWWhEH5sfrKC/+iEzAFN9Gm2uGILsrHvsHzIGHMqlgMtiMcR6i1cpV+wLao
+	 gm220dgQpILkw==
+Message-ID: <9efa0a3c-ffef-488a-97f3-45b9649d35fd@kernel.org>
+Date: Sat, 29 Nov 2025 15:31:03 +0100
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 10/10] power: sequencing: pcie-m2: Add support for PCIe
+ M.2 Key E connectors
+To: manivannan.sadhasivam@oss.qualcomm.com, Rob Herring <robh@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Jiri Slaby <jirislaby@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
+ Nicolas Schier <nicolas.schier@linux.dev>, Hans de Goede <hansg@kernel.org>,
+ =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Mark Pearson <mpearson-lenovo@squebb.ca>,
+ "Derek J. Clark" <derekjohn.clark@gmail.com>,
+ Manivannan Sadhasivam <mani@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kbuild@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+ linux-pci@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ linux-pm@vger.kernel.org, Stephan Gerhold <stephan.gerhold@linaro.org>,
+ Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+References: <20251125-pci-m2-e-v2-0-32826de07cc5@oss.qualcomm.com>
+ <20251125-pci-m2-e-v2-10-32826de07cc5@oss.qualcomm.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20251125-pci-m2-e-v2-10-32826de07cc5@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251128-kbuild-add-top-level-target-for-building-gen_init_cpio-v1-1-84c63a8fc8d4@kernel.org>
-X-B4-Tracking: v=1; b=H4sIALL/KWkC/y2O0Y7CIBBFf6Xh2TFA1hb7tP+xMQbLFSe2wAJtT
- Iz/vt3q47k3M+c+RUFmFNE3T5GxcOEYVlC7Rgw3GzyI3cpCS31QShu6X2YeHVnnqMZEIxaMVG3
- 2qHSNmbaagyePcObA9TwkjtR+SQUJyE5JsT5PGVd+bOKf05szfufVX9+huNgCGuI0ce2bpd0rQ
- 3lQ/7cTSrHbsr757DrQZpmim0cUSndPiyZJ1hrddc4cW6O/E4Kfa46BH3sHcXq9/gCeG837/wA
- AAA==
-X-Change-ID: 20251128-kbuild-add-top-level-target-for-building-gen_init_cpio-6401e0ee0710
-To: Nathan Chancellor <nathan@kernel.org>, 
- Nicolas Schier <nicolas.schier@linux.dev>
-Cc: Ahmad Fatoum <a.fatoum@pengutronix.de>, 
- Sascha Hauer <s.hauer@pengutronix.de>, Simon Glass <sjg@chromium.org>, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, 
- linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Nicolas Schier <nsc@kernel.org>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1764360120; l=2347;
- i=nsc@kernel.org; s=20250924; h=from:subject:message-id;
- bh=CSWaeCg0AtDlUP1nzlxnywheToBpLzx0wG6+SaKhy+Q=;
- b=Z+yWRmNjum6svOFkmC5522o4YMrSA1IkHwNB2WAeVr77HSZBhpuW4g0bbnIlrdxAmi0Gsf4WO
- SYhgzEYRjRqCyQz1EbBt8NjBNlgiwqcsEsWtHK/qyP0q8JBvutqFBoN
-X-Developer-Key: i=nsc@kernel.org; a=ed25519;
- pk=+0ar7sBdSzOoVoXxW8B+48yZbV4azT4joSEm8UyP7z4=
 
-Add a top-level target for building gen_init_cpio to prevent re-entering
-kbuild for 'modules-cpio-pkg'.
+On 25/11/2025 15:45, Manivannan Sadhasivam via B4 Relay wrote:
+>  static const struct pwrseq_pcie_m2_pdata pwrseq_pcie_m2_m_of_data = {
+>  	.targets = pwrseq_pcie_m2_m_targets,
+>  };
+> @@ -92,6 +174,96 @@ static int pwrseq_pcie_m2_match(struct pwrseq_device *pwrseq,
+>  	return PWRSEQ_NO_MATCH;
+>  }
+>  
+> +static int pwrseq_m2_pcie_notify(struct notifier_block *nb, unsigned long action,
+> +			      void *data)
+> +{
+> +	struct pwrseq_pcie_m2_ctx *ctx = container_of(nb, struct pwrseq_pcie_m2_ctx, nb);
+> +	struct pci_dev *pdev = to_pci_dev(data);
+> +	struct device_node *pci_remote __free(device_node) = NULL;
 
-The recently introduced target 'modules-cpio-pkg' depends on
-gen_init_cpio but there is no simple way to add this dependency as a
-prerequisite that can be built in parallel to other recipes.
 
-Introducing the top-level target, enables fixing this and also prepares
-a possible move of gen_init_cpio from usr/ to scripts/.
+This is an undesired syntax explicitly documented as one to avoid. You
+need here proper assignment, not NULL. Please don't use cleanup.h if you
+do not intend to follow it because it does not make the code simpler.
 
-Signed-off-by: Nicolas Schier <nsc@kernel.org>
----
-This is based on the patch set from
-https://lore.kernel.org/linux-kbuild/20251125-cpio-modules-pkg-v2-0-aa8277d89682@pengutronix.de
----
- Makefile                 | 6 ++++++
- scripts/Makefile.package | 1 -
- 2 files changed, 6 insertions(+), 1 deletion(-)
+> +	struct device_node *serdev_remote __free(device_node) = NULL;
 
-diff --git a/Makefile b/Makefile
-index 17cfa11ca716..d5750e5bd633 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1383,6 +1383,10 @@ ifdef CONFIG_HEADERS_INSTALL
- prepare: headers
- endif
- 
-+PHONY += usr_gen_init_cpio
-+usr_gen_init_cpio: scripts_basic
-+	$(Q)$(MAKE) $(build)=usr usr/gen_init_cpio
-+
- PHONY += scripts_unifdef
- scripts_unifdef: scripts_basic
- 	$(Q)$(MAKE) $(build)=scripts scripts/unifdef
-@@ -1635,6 +1639,8 @@ distclean: mrproper
- # Packaging of the kernel to various formats
- # ---------------------------------------------------------------------------
- 
-+modules-cpio-pkg: usr_gen_init_cpio
-+
- %src-pkg: FORCE
- 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.package $@
- %pkg: include/config/kernel.release FORCE
-diff --git a/scripts/Makefile.package b/scripts/Makefile.package
-index 83bfcf7cb09f..0ec946f9b905 100644
---- a/scripts/Makefile.package
-+++ b/scripts/Makefile.package
-@@ -201,7 +201,6 @@ quiet_cmd_cpio = CPIO    $@
-       cmd_cpio = $(CONFIG_SHELL) $(srctree)/usr/gen_initramfs.sh -o $@ $<
- 
- modules-$(KERNELRELEASE)-$(ARCH).cpio: .tmp_modules_cpio
--	$(Q)$(MAKE) $(build)=usr usr/gen_init_cpio
- 	$(call cmd,cpio)
- 
- PHONY += modules-cpio-pkg
+This is even worse. Instead of making it local scope, you have automatic
+cleanup for entire function with completely redundant constructor.
 
----
-base-commit: cb6649f6217c0331b885cf787f1d175963e2a1d2
-change-id: 20251128-kbuild-add-top-level-target-for-building-gen_init_cpio-6401e0ee0710
-prerequisite-message-id: 20251125-cpio-modules-pkg-v2-0-aa8277d89682@pengutronix.de
-prerequisite-patch-id: 9132e567c46357daaf2bd728ff18bfda1c51a9cb
-prerequisite-patch-id: 0dfe03db654169d314d3baaba8536a9bfc9bcc70
+Please, use cleanup.h only if you really want to follow its spirit.
+Otherwise it does not make the code easier.
+
 
 Best regards,
--- 
-Nicolas
-
+Krzysztof
