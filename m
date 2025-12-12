@@ -1,66 +1,67 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C78B30F7F0
-	for <linux-kbuild@vger.kernel.org>; Fri, 12 Dec 2025 07:10:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C19E530FF3A
+	for <linux-kbuild@vger.kernel.org>; Fri, 12 Dec 2025 08:46:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765523429; cv=none; b=siupjOkoHC9IONfWrVYRQiR1B2kQI5dehuPz4dBJ5HT+O0dQFFVks6HFbYIXdGHQ4zNMpRTNzVZKAlxeRJTkS9dTMyRBKihQ14EXy73FwcN6DRQVxydGtnH5b/+BwYSAM6K122wM1LP6wevr5Zb4MI9owD/NO0CroV3vwirUIes=
+	t=1765529199; cv=none; b=W5h/7YjdxW1UHRsvejGg/MP8xaYf25aDWjW0suGiKLabaPqQDTM5Wl2Hb17h0bT89HwcteCAIarpRml0wfSyinGueOqpOImmac1zlWw9++/+Bo+BLi5JaBz+S3NAk1hGBfirB1fhLyeBovTye9T3u0/yvtx944ber+C0RlAWci4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765523429; c=relaxed/simple;
-	bh=W7uppCv7V1iw0fcoFOO1Ov19o0BqWyomQuPZ+QZwW24=;
+	s=arc-20240116; t=1765529199; c=relaxed/simple;
+	bh=JKozA+ihNq4x4Z9RrSdTKWeKEiQ1xyKxK4t4W67sS6Y=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ajjex9vgX1cSXU4rbe2+i+CKwpocJoLQm/Ar+UvJmUQs5+NOJ0tB9/IWIaZAm58yM2bJjCONTT+zkmRupwZ5IVdgJsXJ0g2Qi6r4zPXS/Lz81szyxXrS3YygTwSBCCx2ZsvKwH1tNGFdwkTneEZ8jUHN/xTsALLcTf15L7/oRpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kdYVYhXq; arc=none smtp.client-ip=209.85.216.54
+	 Content-Type:MIME-Version; b=TdrmSDZQ789dNLSLeQiznLfsF2m2biHKcpel/jDUg4yGVibMjvk5yUPa/cdmnkfczfzXl943xdHKuRJnjtNioktKvaqsq4R8Z0tuxKJC88NoMW4M5SFYohC9ye/SzJb9ZhB4aGGbN/O7UJKbseF9qQ2tHKvjVeI96c1yI6p7ugE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m705FxTY; arc=none smtp.client-ip=209.85.210.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kdYVYhXq"
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-343ff854297so1187127a91.1
-        for <linux-kbuild@vger.kernel.org>; Thu, 11 Dec 2025 23:10:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m705FxTY"
+Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-7c7503c73b4so543052a34.3
+        for <linux-kbuild@vger.kernel.org>; Fri, 12 Dec 2025 00:46:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765523426; x=1766128226; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1765529197; x=1766133997; darn=vger.kernel.org;
         h=mime-version:user-agent:content-transfer-encoding:references
          :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=W7uppCv7V1iw0fcoFOO1Ov19o0BqWyomQuPZ+QZwW24=;
-        b=kdYVYhXqwt4Vp7WzR2Q3Ynwt+4xcxM1ONflrrKsrY9nMGzVZdCkhv2dfB2w8mRsLID
-         9DuTzfN8qEdSvSjMfhTr0SBGj797Lw6iCvZL3HCY9Wi+0eYyP4m8tahPt2etrSpnY+Ff
-         gpz5kuONXKwpSsW13HeIkzbqyUNkpHZqBnBkvhtdwgSFmMX6ClB7RLMMs5eTQjpi3qBa
-         zBRFKybMsPpTRMKSZ/TCHmEnAM9Ft+EggdE04lSqtrOk2LNufzQkhpwuhYj4b/n53GZp
-         iYplcDZWs1xOcuzBlq9UtMcx25iGatvbMu1ubh+4gTDKxXFLNKj4mJ4a/AzFkheZCnxq
-         oRpw==
+        bh=JKozA+ihNq4x4Z9RrSdTKWeKEiQ1xyKxK4t4W67sS6Y=;
+        b=m705FxTY2GrEQpfT04JvBSNWZfcuHkbHkm9uVMmCOEf6exAa/cygowUOvXyZWxqlmV
+         +BjxraYRWxU4Et5VFn3zJwFh+6vfJLNGmxQ6EpzEjKufo99wx/MY8rXyvFZUUurWx5Y5
+         EV/l8aEM/bBvWNGu0EnM6e7lmWB0SNOD6Q0bwx/fj6HUoDT0pMAu97fjQA8IvXvCwTNI
+         bT1zlRzaVPJH21eL4IIsmUCfmoKNR5FYIYEDDnpotccbgIkhsFUg7sqwdLrfhQFF6vpy
+         M3l53dnRmtzU/6QPV2DrBJEFbvNMh/lpWMJe71Qh/v47UXbX8PQztVEQlJj6SV6oUGQd
+         bEHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765523426; x=1766128226;
+        d=1e100.net; s=20230601; t=1765529197; x=1766133997;
         h=mime-version:user-agent:content-transfer-encoding:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W7uppCv7V1iw0fcoFOO1Ov19o0BqWyomQuPZ+QZwW24=;
-        b=BvDXaZAsJKnbhXLnZGzpUUq8956rxPC2xC0aituZ9+8eaHLBHrJAi48Y3M8C6s4Ymk
-         aOrxsqqFbHHACM9a1gI7eRkC2dLSOYfm5GqDDQxQcTNrTtqeoFBelTxklxujTwCKRqDq
-         gjwO8rab5qhiVPsYqquLTitqDjaXd8oK9HSQxB1jyJhhTDCzt4SpjaGNMhZm4oZiR1O+
-         0S+99wpfYcofWh73oCGpWXTWXIkPO2BUFJEMprfHR09Hl6//aA97G0UaupRR35aHCGDR
-         L3Uk1uMsCkBrTmZbALV8nXE0JQjOduWDjVFcDirFGB8FC1lHGqmZL3aAWpIi3B+JFgNW
-         09oA==
-X-Forwarded-Encrypted: i=1; AJvYcCXR8n/lmREeVAqgyjvwCqqMcS9iMbprm1N4nGFPkOTycNfT8MJpxjWLuLQusvF0Vn9rFI+oimzJWJzqMow=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxBhu0RCN9HGAbXz9pwktdKJew3mrNOnERd1KTEM+7yB6oqKWP
-	Gcyo0/vOIfaB7C85CO/3G5KtpSt1u853obA6emUnAAKXQVyZ3a7jGx2a
-X-Gm-Gg: AY/fxX5X4dOn/WqJtWETkgz7Cg8Ey28LgOdl8IE9B78T0SIf3rxuuHN6MgdwzqXq65G
-	WooG5oahUM9VE5JcrE7+Edpi5rqYKdXZH/MwQptbasvR2uh6g9o6mpS+0bRbqIO3lo5GC8VwDQp
-	N1WhMpIy83MRyypWE2PhPrYttoRjFTmaTf0p9lrPlRV3gYJVgbeMmCbtjyKFR2FkyPSzjH1MhgO
-	i+xIeuux606voLXEWK6Ac0E/URqjCfGpYGeC0U3P8XR8bnXXs0rOBELJXso9ErTDi0jjHWoY+wA
-	rLFGWJzqSYAQwdEnnu/kkB9qx1UY5x+WieDRZLaBisc8z0vNRfjYCiMDvc41ORsadsxLRac26Sq
-	LH9TZ/VlKsESSfebe8zOPlzozBTjDKUGizCsEt0l/QVI0Ca06WCgLMlB2w1lH6UsDTdM7DofURY
-	noQgdG0N9SPSviSRMATuoRbH7Fi0MSKnsxFlke2fgVqoU=
-X-Google-Smtp-Source: AGHT+IFABMRkw8oyKCgA0tVnnLIaZDoEoQW4VZmuiRYNtTWUY/AN8gGPDAFTfjKFmICcMWMfhDD3Cw==
-X-Received: by 2002:a17:90b:3b50:b0:341:88c9:6eb2 with SMTP id 98e67ed59e1d1-34abd6b5d46mr1284217a91.1.1765523426298;
-        Thu, 11 Dec 2025 23:10:26 -0800 (PST)
+        bh=JKozA+ihNq4x4Z9RrSdTKWeKEiQ1xyKxK4t4W67sS6Y=;
+        b=nUfDRLnOxf0/0kzQOqZn5D9HBso1tiRG5mzk5o/vc6iG9MogLTHAglKKRwH9MchjR+
+         rQeskTROjdKY1sWjYMDqMkrXugBaUxm3MWGzdreW701YRDclglx31o6bpN+DzyFkLfRB
+         aOG2/5cZU+TY6dScpmZ0cFC2c9CH8BR2YWd1BAfQiqRlAqexyT3qd+b4z4OI2nkYzThf
+         2gpNRt+pzmHRXXr3AwlS+t3h+Fz7Z+OYmTkENpVjsXbhJ72lFAWa8Pxl6DCGbjHXhW3K
+         XAZE/DnhQjhG+OFUoIdJGl9q9mrAVKJuFNhd2h36uuBaGxz7N2e7aluhuDxDtmTzDEIu
+         Lwtg==
+X-Forwarded-Encrypted: i=1; AJvYcCUPf/2rHth1kYr2hOTjkscBTuhqMYfdngTDBPU3vcUocrdM9OUNxd8TJLxH1YSlxPasL2M7nV9t54VMero=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVOD+BeEijwfnPJwdvCtwNbynHoyxaqF3awhWGfU5qQbK+s7ee
+	0HDCp2ryNQlUGOpUfT1HwYcWeD/eX0ghU1XWkQu6z3QPjWNJTSc3rlDHBzJO3VWd
+X-Gm-Gg: AY/fxX77wUbzM6eyb+xS4hQL+LlkBDTDLbxgUu6xPFdy+C9z7iknvjm84Jcdr5Bh7NA
+	jftKB23/LTl4Im6IR0ZlNgtbdhHaXiJmxEUBsVa/CAodgtr/mPkKVetDIYTQCek7xeTTjMCS5kQ
+	kf2lVtlsej0VjlGaR8jbwhvMMTp7cbkgodIXg/HFz1u5Sn4AQzQPL5Jiyys6v1+Gfi/PZQ+aviA
+	jVfAR7xbmZQHq78uRkEPiUtsWPjpOK2GNwIDcXyUXj39V3eTM9eYgojDofgN9pmbWyb73FADzVa
+	ZWiztsVjrzG6jzTYg7AcqRsSbKo9tDeW0cfxAsntq9W8FNzy3snbsaEOobH+s874qQYFWF5Y2IR
+	DMMzHvMpVgKvz3Tc+P87lZeHlp5hb2C7QIdetkbk0so+A0eDKWEDGZ1YJ+LA1o5y69HUSwHa2z8
+	v6a85Be8wKETVBOdhnVkaQQ57H0gkL+S4LczxzBNaR4vsEaMlQfosTLA==
+X-Google-Smtp-Source: AGHT+IH321PbFRiMaWCDNl4lSGVuS0AwL6lMd2u2Ei57eaf0ISIe5GTqG0pgY602LItAKZZCrdasEQ==
+X-Received: by 2002:a17:902:f686:b0:295:9a46:a1d0 with SMTP id d9443c01a7336-29f23cd7cebmr12297065ad.45.1765523389898;
+        Thu, 11 Dec 2025 23:09:49 -0800 (PST)
 Received: from [10.200.2.32] (fs98a57d9c.tkyc007.ap.nuro.jp. [152.165.125.156])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34abe2aa5c8sm976435a91.15.2025.12.11.23.10.20
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29f2e40765csm5138155ad.0.2025.12.11.23.09.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Dec 2025 23:10:25 -0800 (PST)
-Message-ID: <bf7ed4cf0254fb3fa707ad49f3b2ed0be6b500c2.camel@gmail.com>
-Subject: Re: [PATCH bpf-next v3 2/6] resolve_btfids: Factor out load_btf()
+        Thu, 11 Dec 2025 23:09:49 -0800 (PST)
+Message-ID: <e509afe94b4492d64e27756f4db773b7a179e994.camel@gmail.com>
+Subject: Re: [PATCH bpf-next v3 4/6] lib/Kconfig.debug: Set the minimum
+ required pahole version to v1.22
 From: Eduard Zingerman <eddyz87@gmail.com>
 To: Ihor Solodrai <ihor.solodrai@linux.dev>, Alexei Starovoitov
  <ast@kernel.org>,  Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
@@ -78,10 +79,10 @@ To: Ihor Solodrai <ihor.solodrai@linux.dev>, Alexei Starovoitov
  <dolinux.peng@gmail.com>
 Cc: bpf@vger.kernel.org, dwarves@vger.kernel.org,
  linux-kernel@vger.kernel.org, 	linux-kbuild@vger.kernel.org
-Date: Fri, 12 Dec 2025 16:10:19 +0900
-In-Reply-To: <20251205223046.4155870-3-ihor.solodrai@linux.dev>
+Date: Fri, 12 Dec 2025 16:09:41 +0900
+In-Reply-To: <20251205223046.4155870-5-ihor.solodrai@linux.dev>
 References: <20251205223046.4155870-1-ihor.solodrai@linux.dev>
-		 <20251205223046.4155870-3-ihor.solodrai@linux.dev>
+		 <20251205223046.4155870-5-ihor.solodrai@linux.dev>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
@@ -93,12 +94,21 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
 On Fri, 2025-12-05 at 14:30 -0800, Ihor Solodrai wrote:
-> Increase the lifetime of parsed BTF in resolve_btfids by factoring
-> load_btf() routine out of symbols_resolve() and storing the base_btf
-> and btf pointers in the struct object.
+> Subsequent patches in the series change vmlinux linking scripts to
+> unconditionally pass --btf_encode_detached to pahole, which was
+> introduced in v1.22 [1][2].
+>=20
+> This change allows to remove PAHOLE_HAS_SPLIT_BTF Kconfig option and
+> other checks of older pahole versions.
+>=20
+> [1] https://github.com/acmel/dwarves/releases/tag/v1.22
+> [2] https://lore.kernel.org/bpf/cbafbf4e-9073-4383-8ee6-1353f9e5869c@orac=
+le.com/
 >=20
 > Signed-off-by: Ihor Solodrai <ihor.solodrai@linux.dev>
 > ---
 
 Acked-by: Eduard Zingerman <eddyz87@gmail.com>
+
+[...]
 
