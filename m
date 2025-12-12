@@ -1,242 +1,114 @@
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE88430FC04
-	for <linux-kbuild@vger.kernel.org>; Fri, 12 Dec 2025 09:04:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB07C279DCC;
+	Fri, 12 Dec 2025 09:32:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765530248; cv=none; b=sdmuIbdRs+Lt5sB+/fZRTpHIZJpEGXCFAGlgP3ngShlUacsoAF09EvdQ8pxSTl6RMccVCPfx4xfxDGC4ffR12a0qiS1yozM+Kd6Uj3QqcrgH65TZqrhHGyZANZQd7YkCMiSBLm0QE5bZWxfVkaafnVKO4Wd9vwLcYMMmbVEsfA0=
+	t=1765531937; cv=none; b=Y67D0XLuq/EkwhZHG/8jeXErTchIsFku2fYIhBc3sWzmEv6I9V8qg7L95sZlM0sjTFaOI5nqwivZWSRlm5skQURfbllq9BI/6TX3mp4UIvaNppAlVppjmkTpoN7Qd81Hh6mnkZ07xJTyA5Pyy2u2VIUQ2xTJDpW/YTlyZcu1TXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765530248; c=relaxed/simple;
-	bh=PcDog/To0UjbKuyFLuDAwEJCCxk0v1Bgpl+ObyVOA/w=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=qwJT10FLXHSqMpmKYKUTOCoXbjUhpJYdxxAwXVpTQkTxunaoBpUzXGXAAcnbGZBJbNmcInTQ9qbYvL0G31kbptAjKz7xtpGktZ6MHgaWASmOaf6cxvLsij4eSKdEeGu52eAzCB7t6X0visuXXRXV60JoJfis4X1zmXrWw2CgzpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YgxMLxH5; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1765531937; c=relaxed/simple;
+	bh=f9Da21adZQy/Oskm47YpQxay+GCPm29iHOfp24GOE3o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VhoL8J3z/jOh+HursG0/fEz4NFW/PS9h0/WAs0qevj4LAtH/2kwO9jXf53XTtqDfyv2fwlwSss4od2ODT1FpiCOjhS2SoKX4Xh3hQmRhp2muwEGsETGB7JPEg76aMG8+DE8BEn40cfoVfrNf/6xrLRE+NynTJi1g7fLYEFlTrBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=DMpgfaqC; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YgxMLxH5"
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-8b2da83f721so114774685a.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 12 Dec 2025 01:04:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765530244; x=1766135044; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=HA/4sr3TqfG74qmcWJYKn1Au1cNj4XE5l8roaw6U9kQ=;
-        b=YgxMLxH5FEpyFUTmPDLhjgrZH2r3x3k4JRiuyQ5M9jnz+RVcFI+57MVyT2/JRtaIsJ
-         RoomW416CSLohDDxnYng/AM43xvKqOpetJpBx/c8zpbAi+47ImKTK0iIiH/0tIF49mOo
-         OVpSdj3EpzU7jcEkQbG1nOvOY9LfUye8errSPywRrZtteLb8+HVDRbDHsGG8Fbcdi2Ls
-         +zFPHXra4pJEgDwRMYOS8l7uEnIA7oICh6OTIooiBWfiPiLKPB7mYFM8E0romhN9c0bP
-         RO520B9wQcDJCYDUpNO52Z9IHqZyEY+IXjMM2QhslMeOnxOZf/XbrPNEmr++s5m5LpI1
-         jr/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765530244; x=1766135044;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HA/4sr3TqfG74qmcWJYKn1Au1cNj4XE5l8roaw6U9kQ=;
-        b=qo93bHZnhcJY8xysUMrOAIjKaIxxJqkWwZfNsEIC0oHYViS+GhJ254VQ4kNpex09sf
-         V9ki+jePv6o9B5g1Mbgs4GQkMirwNZip51dhmpnF/HrXuZfhCqlb8s87mU/adYmTLgEN
-         ccyXrKw161RtEFAd3TseivVuX6bVzrvFFHioTKJc/qiEuHfsSwIy4ZVzc/zyR5kylXpI
-         pxub0CWw217YkUL+Psa9xUwZ9VA4JqRo7tNqMdwAzlj6C0qw2WTl+W0gSlg38eXWIEyI
-         Y+SQ1la1BlSwCVHCePvvUppjCnWe3ay/ukF9WIng3milIJ6/79NAGUEQQmVYxo27bXrh
-         NyFw==
-X-Forwarded-Encrypted: i=1; AJvYcCXkKUzr9uM4dMjDuwrpq/YW6DMGt9tmY+JKFlWCmX13fX+k+LPkc1ufENeDnQogflCf0PLAU2YWgRn9+ZE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOZkb8fbtC2lP3WAzVV+hMNC8x5K3EB5aKZlJKM3ZNxrc26+v2
-	6IfkPWJ2uq1Rb9G0IqXAQWqzIbGFWZX4C9vx9avZn21ZXE1vob+E784yQJFweQQ1
-X-Gm-Gg: AY/fxX64OtcBup33WPyeZW/qN5ebZtTMgjf7yDgBEtF1qwv8A1wPEhEsUkoUWGyg1bR
-	gqbqRu1hg4vVHkJoFYGz/G8QGRCOr6opuAImiApTOFq9FYfdyCWKJGRBCjM2v/3yeqnud23/BUq
-	WHt0/nX4jSrEp0dXEwRs1PFbmfKFA+p87W83dUoFojovqrGz+cggJS15yk0ilXLpFAHxqVj4la+
-	C6xONJO40G3hmU8FtTJpbNEdSpYB5NtXbTfQmDTNQAWneVxUB4OG2eWbt4k5b3HVl5+nVmN/OVq
-	IdxkDNtiLntqvYAGk5k8l2cubkh1rkFs0+ClWaPjY4lCKWKLvjTY1KRVaITTip/YiXstIxmloCL
-	UAzgSq//j5ilo/ZWSehjJU0aqVai95y72giZCnaoOGYpinW6c9w9/HLkR1Zk2mDlmpnIyoKP23t
-	3u2dktvXkNJsPbNr7hqdm/UnYJLZgswTKRU4UhHXQktH4=
-X-Google-Smtp-Source: AGHT+IFWTMFJQMKXlJUDxuMrVm62gSFXENwTcyB18RGeM1BcBDoReByl3fxu8tZ+slqa0tRQxxkuxQ==
-X-Received: by 2002:a17:902:d3ca:b0:298:68e:4042 with SMTP id d9443c01a7336-29eeec1d557mr31575955ad.26.1765523343711;
-        Thu, 11 Dec 2025 23:09:03 -0800 (PST)
-Received: from [10.200.2.32] (fs98a57d9c.tkyc007.ap.nuro.jp. [152.165.125.156])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29ee9d38b98sm44760935ad.34.2025.12.11.23.08.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Dec 2025 23:09:03 -0800 (PST)
-Message-ID: <b11c1ae3816842f7b1768072982680c0bc80d8f4.camel@gmail.com>
-Subject: Re: [PATCH bpf-next v3 6/6] resolve_btfids: change in-place update
- with raw binary output
-From: Eduard Zingerman <eddyz87@gmail.com>
-To: Ihor Solodrai <ihor.solodrai@linux.dev>, Alexei Starovoitov
- <ast@kernel.org>,  Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
- <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,  Song Liu
- <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend	
- <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
- Fomichev	 <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>,  Andrew Morton <akpm@linux-foundation.org>, Nathan
- Chancellor <nathan@kernel.org>, Nicolas Schier	 <nsc@kernel.org>, Tejun Heo
- <tj@kernel.org>, David Vernet <void@manifault.com>,  Andrea Righi
- <arighi@nvidia.com>, Changwoo Min <changwoo@igalia.com>, Shuah Khan
- <shuah@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
- Bill Wendling <morbo@google.com>, Justin Stitt	 <justinstitt@google.com>,
- Alan Maguire <alan.maguire@oracle.com>, Donglin Peng	
- <dolinux.peng@gmail.com>
-Cc: bpf@vger.kernel.org, dwarves@vger.kernel.org,
- linux-kernel@vger.kernel.org, 	linux-kbuild@vger.kernel.org
-Date: Fri, 12 Dec 2025 16:08:54 +0900
-In-Reply-To: <20251205223554.4159772-1-ihor.solodrai@linux.dev>
-References: <20251205223046.4155870-6-ihor.solodrai@linux.dev>
-	 <20251205223554.4159772-1-ihor.solodrai@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="DMpgfaqC"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=7N1yRupjJwsCEjdeUujuXdzSn7k5Mwr4a3y236fW66U=; b=DMpgfaqCYynagwlYCabdmyw/Bp
+	rUrSWkBegZ7jFRY2i5aeyB3mBsMgEJmvOI0UYVuZszBnKfB9R5n85wNsrF+pa+wV09POIzKpx0Plm
+	5ztxDsDOKPs08ziIzR4xEbQLew7usFxnN7+f3OYd+0FRhq3UKr+eIQumIXme//DjvI6A17dnCDjOv
+	UErEQ9Ybt3bC0AD21CkKRgFinT24xXYc+0CoUTjQkZa/8/sybPij8mY6g7IEQZKZbws0SII2upGj5
+	Pm0cIgInYYSL26iTrbPz5JyXnVLmPXf+7T6z44avAqu0UsbtenM0BV7SHv+qf468Pez8BP7yUSJsv
+	h8N4R/2w==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vTyde-0000000GP06-2F8E;
+	Fri, 12 Dec 2025 08:36:34 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 8C24F30041D; Fri, 12 Dec 2025 10:31:49 +0100 (CET)
+Date: Fri, 12 Dec 2025 10:31:49 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Marco Elver <elver@google.com>
+Cc: Boqun Feng <boqun.feng@gmail.com>, Ingo Molnar <mingo@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+	Chris Li <sparse@chrisli.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Alexander Potapenko <glider@google.com>,
+	Arnd Bergmann <arnd@arndb.de>, Bart Van Assche <bvanassche@acm.org>,
+	Christoph Hellwig <hch@lst.de>, Dmitry Vyukov <dvyukov@google.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Ian Rogers <irogers@google.com>, Jann Horn <jannh@google.com>,
+	Joel Fernandes <joelagnelf@nvidia.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
+	Kentaro Takeda <takedakn@nttdata.co.jp>,
+	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Thomas Gleixner <tglx@linutronix.de>, Thomas Graf <tgraf@suug.ch>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Waiman Long <longman@redhat.com>, kasan-dev@googlegroups.com,
+	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linux-security-module@vger.kernel.org,
+	linux-sparse@vger.kernel.org, linux-wireless@vger.kernel.org,
+	llvm@lists.linux.dev, rcu@vger.kernel.org
+Subject: Re: [PATCH v4 02/35] compiler-context-analysis: Add infrastructure
+ for Context Analysis with Clang
+Message-ID: <20251212093149.GJ3911114@noisy.programming.kicks-ass.net>
+References: <20251120145835.3833031-2-elver@google.com>
+ <20251120145835.3833031-4-elver@google.com>
+ <20251211120441.GG3911114@noisy.programming.kicks-ass.net>
+ <CANpmjNOyDW7-G5Op5nw722ecPEv=Ys5TPbJnVBB1_WGiM2LeWQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANpmjNOyDW7-G5Op5nw722ecPEv=Ys5TPbJnVBB1_WGiM2LeWQ@mail.gmail.com>
 
-On Fri, 2025-12-05 at 14:35 -0800, Ihor Solodrai wrote:
-> Currently resolve_btfids updates .BTF_ids section of an ELF file
-> in-place, based on the contents of provided BTF, usually within the
-> same input file, and optionally a BTF base.
->=20
-> Change resolve_btfids behavior to enable BTF transformations as part
-> of its main operation. To achieve this, in-place ELF write in
-> resolve_btfids is replaced with generation of the following binaries:
->   * ${1}.BTF with .BTF section data
->   * ${1}.BTF_ids with .BTF_ids section data if it existed in ${1}
->   * ${1}.BTF.base with .BTF.base section data for out-of-tree modules
->=20
-> The execution of resolve_btfids and consumption of its output is
-> orchestrated by scripts/gen-btf.sh introduced in this patch.
->=20
-> The motivation for emitting binary data is that it allows simplifying
-> resolve_btfids implementation by delegating ELF update to the $OBJCOPY
-> tool [1], which is already widely used across the codebase.
->=20
-> There are two distinct paths for BTF generation and resolve_btfids
-> application in the kernel build: for vmlinux and for kernel modules.
->=20
-> For the vmlinux binary a .BTF section is added in a roundabout way to
-> ensure correct linking. The patch doesn't change this approach, only
-> the implementation is a little different.
->=20
-> Before this patch it worked as follows:
->=20
->   * pahole consumed .tmp_vmlinux1 [2] and added .BTF section with
->     llvm-objcopy [3] to it
->   * then everything except the .BTF section was stripped from .tmp_vmlinu=
-x1
->     into a .tmp_vmlinux1.bpf.o object [2], later linked into vmlinux
->   * resolve_btfids was executed later on vmlinux.unstripped [4],
->     updating it in-place
->=20
-> After this patch gen-btf.sh implements the following:
->=20
->   * pahole consumes .tmp_vmlinux1 and produces a *detached* file with
->     raw BTF data
->   * resolve_btfids consumes .tmp_vmlinux1 and detached BTF to produce
->     (potentially modified) .BTF, and .BTF_ids sections data
->   * a .tmp_vmlinux1.bpf.o object is then produced with objcopy copying
->     BTF output of resolve_btfids
->   * .BTF_ids data gets embedded into vmlinux.unstripped in
->     link-vmlinux.sh by objcopy --update-section
->=20
-> For kernel modules, creating a special .bpf.o file is not necessary,
-> and so embedding of sections data produced by resolve_btfids is
-> straightforward with objcopy.
->=20
-> With this patch an ELF file becomes effectively read-only within
-> resolve_btfids, which allows deleting elf_update() call and satellite
-> code (like compressed_section_fix [5]).
->=20
-> Endianness handling of .BTF_ids data is also changed. Previously the
-> "flags" part of the section was bswapped in sets_patch() [6], and then
-> Elf_Type was modified before elf_update() to signal to libelf that
-> bswap may be necessary. With this patch we explicitly bswap entire
-> data buffer on load and on dump.
->=20
-> [1] https://lore.kernel.org/bpf/131b4190-9c49-4f79-a99d-c00fac97fa44@linu=
-x.dev/
-> [2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tr=
-ee/scripts/link-vmlinux.sh?h=3Dv6.18#n110
-> [3] https://git.kernel.org/pub/scm/devel/pahole/pahole.git/tree/btf_encod=
-er.c?h=3Dv1.31#n1803
-> [4] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tr=
-ee/scripts/link-vmlinux.sh?h=3Dv6.18#n284
-> [5] https://lore.kernel.org/bpf/20200819092342.259004-1-jolsa@kernel.org/
-> [6] https://lore.kernel.org/bpf/cover.1707223196.git.vmalik@redhat.com/
->=20
-> Signed-off-by: Ihor Solodrai <ihor.solodrai@linux.dev>
-> ---
+On Thu, Dec 11, 2025 at 02:12:19PM +0100, Marco Elver wrote:
 
-Acked-by: Eduard Zingerman <eddyz87@gmail.com>
+> What's a better name?
 
-> @@ -552,6 +528,13 @@ static int symbols_collect(struct object *obj)
->  	return 0;
->  }
-> =20
-> +static inline bool is_envvar_set(const char *var_name)
-> +{
-> +	const char *value =3D getenv(var_name);
-> +
-> +	return value && value[0] !=3D '\0';
-> +}
-> +
+That must be the hardest question in programming; screw this P-vs-NP
+debate :-)
 
-This is a leftover, not used anywhere.
+> context_lock_struct -> and call it "context lock" rather than "context
+> guard"; it might work also for things like RCU, PREEMPT, BH, etc. that
+> aren't normal "locks", but could claim they are "context locks".
+> 
+> context_handle_struct -> "context handle" ...
 
-[...]
+Both work for me I suppose, although I think I have a slight preference
+to the former: 'context_lock_struct'.
 
-> @@ -860,23 +913,34 @@ int main(int argc, const char **argv)
->  	 */
->  	if (obj.efile.idlist_shndx =3D=3D -1 ||
->  	    obj.efile.symbols_shndx =3D=3D -1) {
-> -		pr_debug("Cannot find .BTF_ids or symbols sections, nothing to do\n");
-> -		err =3D 0;
-> -		goto out;
-> +		pr_debug("Cannot find .BTF_ids or symbols sections, skip symbols resol=
-ution\n");
-> +		goto dump_btf;
->  	}
-> =20
->  	if (symbols_collect(&obj))
->  		goto out;
-> =20
-> -	if (load_btf(&obj))
-> -		goto out;
-> -
->  	if (symbols_resolve(&obj))
->  		goto out;
-> =20
->  	if (symbols_patch(&obj))
->  		goto out;
-> =20
-> +	err =3D make_out_path(out_path, obj.path, BTF_IDS_SECTION);
-> +	if (err || dump_raw_btf_ids(&obj, out_path))
-> +		goto out;
-> +
-> +dump_btf:
-> +	err =3D make_out_path(out_path, obj.path, BTF_ELF_SEC);
-> +	if (err || dump_raw_btf(obj.btf, out_path))
+One other possibility is wrapping things like so:
 
-Nit: 'err' is not set if dump_raw_btf() errors out.
-     Maybe use:
+#define define_context_struct(name) ... // the big thing
 
-     	   err =3D make_out_path(out_path, obj.path, BTF_ELF_SEC);
-     	   err =3D err ?: dump_raw_btf(obj.btf, out_path);
-	   if (err)
-	      goto out;
-     ?
+#define define_lock_struct(name) define_context_struct(name)
 
-> +		goto out;
-> +
-> +	if (obj.base_btf && obj.distill_base) {
-> +		err =3D make_out_path(out_path, obj.path, BTF_BASE_ELF_SEC);
-> +		if (err || dump_raw_btf(obj.base_btf, out_path))
-> +			goto out;
-> +	}
-> +
->  	if (!(fatal_warnings && warnings))
->  		err =3D 0;
->  out:
 
-[...]
