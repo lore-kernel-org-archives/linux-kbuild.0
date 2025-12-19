@@ -1,42 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6234A27462;
-	Fri, 19 Dec 2025 19:57:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4AB933B6D2;
+	Fri, 19 Dec 2025 20:12:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766174223; cv=none; b=pyniwLi921hmA/PPzKSliCxjHWRTMSMuEfdq9r2xaDCn3xvQcuo2IcVAi1XNaMTtb6vPBAoXx5rJ8YoRnopEO6r9ZlqbnqTli00vaobU7oFx4a9nslKhrWBBT+h4g/ZOhskkCxVUATs/eeQZJtBNlflKBuBXX1MZqp9i0hXaxB8=
+	t=1766175155; cv=none; b=McNAOVRvWmW3vTkukG6WkqbGv9ZdG4fB2OiSc0mfmQx9GRzFXJ5MrMtCG3pVDfU6tTzT8Nj1rCh1PfATwTUlbjdrqnJiVftuVrwU+P+yeyZlfTOrMhGKwdEJFfFxUJHcMJxUAlBxfgHjETgB8XwpwC/a/y5mKCxJS1417rMN950=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766174223; c=relaxed/simple;
-	bh=QXYUHgzoi7YUM3awj7oLYTaUx5+oOvo2cZMtizNWYH4=;
+	s=arc-20240116; t=1766175155; c=relaxed/simple;
+	bh=Gr5pezIU+Fq4Rna/0uP5EqxFSBA4aUqqWVBenzozi2U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T5v0CGhKcumoMBxwCQVRglC/09fY3yr4kgSFbDeyS17nzDM9Cv2S7WVn34oPtFwBbJftWmVr1u4TvpgxUCtPdQhkJ4I4cudPemKhm4+2ukwY/bMpg6nVgbR/LpPGINDP3eFNx+tm5Bmcp3X+qQ4UDsKRXKt/kVpaY2z9kjBE/vc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SzlxzxG1; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=hnAnliMwwzUi2GM5M6cYEn+K2sZb0hViJGYlfHOm0KvqNDLgQFAxLER/LomONmUDtT50SbnufmVRsiKdArl5Db7AJhNKG7JSbVuvlAA2/PIf4BK8uIWFARmkDElBZYE85DtcF8vTQX9jkzRz0j7SqIJO/b7rJm0h4ol7jFlWF+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FHGX5mCv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SzlxzxG1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0D0DC4CEF1;
-	Fri, 19 Dec 2025 19:57:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FHGX5mCv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 035E1C116D0;
+	Fri, 19 Dec 2025 20:12:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766174222;
-	bh=QXYUHgzoi7YUM3awj7oLYTaUx5+oOvo2cZMtizNWYH4=;
+	s=k20201202; t=1766175155;
+	bh=Gr5pezIU+Fq4Rna/0uP5EqxFSBA4aUqqWVBenzozi2U=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SzlxzxG13s5EhQyTTWJvFfCEn+qnmpeRS6YUeP9iANuM7OKD300GiC/kHVHnQ8PUJ
-	 0ZsMKbHwRdd9Omnxz+nhtiBgJIUDLdjA/o55urtJpWBQ3yEbZdMCt5R+YbuolQE6xI
-	 7vQAg5m5eTNpmim6gUYhHnx7heEIp1plA6JMt07420uIsi2/BMFopG/dltlKPmLV0i
-	 UUAwQe2jY4FC4RXH9EZGJmYGjUA3wX+ZuxHsk+31jJtDdmh36vXwpBGaoxYiTZTqgl
-	 oV82arJh2MEvEvLCAMujSwegM9eSvAXN3F1/4hOgD0DV0UqEcHbdJwXbmTb6YhrB8a
-	 hPgwMvzNHM8lg==
-Date: Fri, 19 Dec 2025 12:56:57 -0700
+	b=FHGX5mCv+seuLpNap9Ndy0UeJgad5WFPNkIfvg2k/akqV0GbZoooFOf3gtCp8WnpD
+	 MnpEO6KLTFNdpDK/p69polICYhdM3l88FYKnG+YusLsnSVYUa23NGBRgEDvRzmH2+d
+	 cby0Ny3m2ImYSuK3B1iMD8eHHcbpeafT3aOcu/AGxb0jHZ1bMJDoJYDCsdil3UCLLE
+	 Di4NPYHKwfcQ9D06SvPDMt8PrydztIe+DcEJ05MkeELwXvqDK3bZXRnh1o8GpuolYR
+	 xCoB04C6RxUjplnvtCAD5c/TwahuiCJ5ypl5mlzj2/qK1maHAU90T6i+5x1nIA6kOq
+	 W83UJYrvfhw2g==
+Date: Fri, 19 Dec 2025 13:12:31 -0700
 From: Nathan Chancellor <nathan@kernel.org>
-To: Graham Roff <grahamr@qti.qualcomm.com>
-Cc: Nicolas Schier <nsc@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Nicolas Pitre <nico@fluxnic.net>,
-	Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH v3] kconfig: Support conditional deps using "depends on X
- if Y"
-Message-ID: <20251219195657.GA1404453@ax162>
-References: <20251215-kconfig_conditional_deps-v3-1-59519af0a5df@qti.qualcomm.com>
+To: david.laight.linux@gmail.com
+Cc: Arnd Bergmann <arnd@arndb.de>, Nicolas Schier <nsc@kernel.org>,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/1] kbuild: Only enable
+ -Wtautological-constant-out-of-range-compare for W=2
+Message-ID: <20251219201231.GB1404453@ax162>
+References: <20251214131528.3648-1-david.laight.linux@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -45,38 +43,53 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251215-kconfig_conditional_deps-v3-1-59519af0a5df@qti.qualcomm.com>
+In-Reply-To: <20251214131528.3648-1-david.laight.linux@gmail.com>
 
-Hi Graham,
+Hi David,
 
-On Mon, Dec 15, 2025 at 03:06:54PM -0800, Graham Roff wrote:
-> From: Nicolas Pitre <nico@fluxnic.net>
+On Sun, Dec 14, 2025 at 01:15:28PM +0000, david.laight.linux@gmail.com wrote:
+> From: David Laight <david.laight.linux@gmail.com>
 > 
-> Extend the "depends on" syntax to support conditional dependencies
-> using "depends on X if Y". While functionally equivalent to "depends
-> on X || (Y == n)", "depends on X if Y" is much more readable and
-> makes the kconfig language uniform in supporting the "if <expr>"
-> suffix.
-> This also improves readability for "optional" dependencies, which
-> are the subset of conditional dependencies where X is Y.
-> Previously such optional dependencies had to be expressed as
-> the counterintuitive "depends on X || !X", now this can be
-> represented as "depends on X if X".
+> The kernel code style is to use !(expr) rather that (expr) == 0.
+> But clang complains that converting some constant expressions
+> (eg (0xffffu << 16)) to a boolean always evalutes to true.
+> This happens often in the validity checks in #defines.
+> Move tautological-constant-out-of-range-compare to W=2 (along with the
+> similar type-limits).
 > 
-> The change is implemented by converting the "X if Y" syntax into the
-> "X || (Y == n)" syntax during "depends on" token processing.
-> 
-> Signed-off-by: Nicolas Pitre <nico@fluxnic.net>
-> 
-> [Graham Roff: Rewrote commit message, updated patch, added tests]
-> 
-> Signed-off-by: Graham Roff <grahamr@qti.qualcomm.com>
+> Signed-off-by: David Laight <david.laight.linux@gmail.com>
 
-Thanks, I think this is a reasonable extension and the updates to v3
-clear up all of my concerns.
+I would like Arnd to comment on this before applying because the
+reasoning of this change does not feel good enough to disable this
+warning. It is not like '== 0' is inherently uncommon in the kernel or
+hard to write to avoid the implicit conversion warning. To be honest, I
+am a bit surprised -Wtautological-constant-out-of-range-compare fires
+for that instead of some sort of -Wconversion warning...
 
-I plan to apply this to kbuild-next in a week or so to give adequate
-time for people to comment and review it.
-
-Cheers,
-Nathan
+> ---
+>  scripts/Makefile.warn | 2 +-I
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/scripts/Makefile.warn b/scripts/Makefile.warn
+> index 68e6fafcb80c..e2d467835c5b 100644
+> --- a/scripts/Makefile.warn
+> +++ b/scripts/Makefile.warn
+> @@ -151,7 +151,6 @@ KBUILD_CFLAGS += -Wformat-insufficient-args
+>  endif
+>  endif
+>  KBUILD_CFLAGS += $(call cc-option, -Wno-pointer-to-enum-cast)
+> -KBUILD_CFLAGS += -Wno-tautological-constant-out-of-range-compare
+>  KBUILD_CFLAGS += $(call cc-option, -Wno-unaligned-access)
+>  KBUILD_CFLAGS += -Wno-enum-compare-conditional
+>  endif
+> @@ -179,6 +178,7 @@ KBUILD_CFLAGS += -Wno-shift-negative-value
+>  
+>  ifdef CONFIG_CC_IS_CLANG
+>  KBUILD_CFLAGS += -Wno-enum-enum-conversion
+> +KBUILD_CFLAGS += -Wno-tautological-constant-out-of-range-compare
+>  endif
+>  
+>  ifdef CONFIG_CC_IS_GCC
+> -- 
+> 2.39.5
+> 
