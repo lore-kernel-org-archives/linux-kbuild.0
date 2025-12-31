@@ -1,138 +1,173 @@
-Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90E7B27E040;
-	Wed, 31 Dec 2025 17:07:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CC812264A8
+	for <linux-kbuild@vger.kernel.org>; Wed, 31 Dec 2025 17:07:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767200865; cv=none; b=K5ovV8WP3lSwMnczKIoGZyo5lu9JfbCzMUH0llnZIgsMcSzHSjo74MRqlQ0S3L990T5WWT+hTud+Zj27gY+yaFVkvCkovNm6U5/avPz9DJ3BzzKMOWjfAQo9Ok2Q+l3KORhWkwxe7OhBy+5e6g5CaZ+WRqYcSyzMhJ+nH7p1TeY=
+	t=1767200876; cv=none; b=hEB8EFuK1nfbWA56ebpIAhZIANx/9Q4Ggd825jx6U65ei44Ss58jXezxoY4I61d8BL+3HXfAxMOlyr6MwvKMVJG/Ho5yuzS7hf/jGOL38XLZ7ETtJRV3398/gjKJzIUID1fdGpw1nBm31ztNiN8RVXwyWFoFCvRp/EmXRTwQlfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767200865; c=relaxed/simple;
-	bh=zXzBQVYOVZtCeBWwTOWDok+0Gmvjb9G1jyZ6W0/6hFY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JYqqjiujCxk9qjekYfEp1m8O5On7+DcrId7Fd135eVySJ/RjTJ5ZqEZIPhYkn8YLDbnGRR3hsg/PJav1AyXW1UIx+KbabGyFM2J2RzG0UrUVaSQ682B67cq9cDYySTFY+x6MYda8LFMT5KKVNOH12R5j372KRI/r2qfYVvyxrFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io; spf=pass smtp.mailfrom=gtucker.io; dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b=iuAbOG0r; arc=none smtp.client-ip=217.70.178.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gtucker.io
+	s=arc-20240116; t=1767200876; c=relaxed/simple;
+	bh=iz/UUlvU1upnV3KH0c/iPCBatJHmNiwakC/d+LY3L/Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eTBybEr9TeCirp5ymZov/UOTpQ2LBdaDlhPiN+Z59w/gnZo0kJauNH4DTJY53tUUQAdT7Iaw14vItSJPBJSw2X8qbeFQIAxFgZR45rIEX5TaGS79MXEtUHsJ+7w+r8cW5W364qyR++lClodLwLho3fvmK+OWU2rIFSTzkzjC2pU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jzIRqTTC; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b="iuAbOG0r"
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-	by mslow3.mail.gandi.net (Postfix) with ESMTP id 412A55801D7;
-	Wed, 31 Dec 2025 16:52:10 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 158CB44369;
-	Wed, 31 Dec 2025 16:51:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gtucker.io; s=gm1;
-	t=1767199921;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=evmHzmeXGr9WFVB5GGpxyKiY3i5zd0f9TxFsBMVcac8=;
-	b=iuAbOG0rBbSgMR2mu2b2SmprcEGhVesYdO+HGAar94r3nC80AoekfGc2MCnYBLiq3eVV7o
-	g6LxV9GjM5rmM4/IZhP85pvVoOjtcMScA39QanBdJePB/0w/3GepTleB/f0X7ZxlVCcj1O
-	XlVZ9GQeXzG08sY6L+dRykP5m8o3g8+9wkMtKs4p7dZY+8Wvr0xnL5u9oGgIlYx6n1X8vT
-	DYM9EJKWxcvxYoZDL5hnt0Y1eNuSoz/pweW+TO/m1YG3d8ReaSl+Wf+C+ADgyG/9KpStLk
-	W3leMld6vxyq9Y6IX3+Cgdvlg8jeBXXDB3m43jbHv3Eq23mhD6zNvmglzsp6Vw==
-From: Guillaume Tucker <gtucker@gtucker.io>
-To: Nathan Chancellor <nathan@kernel.org>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	David Gow <davidgow@google.com>,
-	=?UTF-8?q?Onur=20=C3=96zkan?= <work@onurozkan.dev>
-Cc: Guillaume Tucker <gtucker@gtucker.io>,
-	Arnd Bergmann <arnd@arndb.de>,
-	linux-kernel@vger.kernel.org,
-	rust-for-linux@vger.kernel.org,
-	linux-kbuild@vger.kernel.org,
-	automated-testing@lists.yoctoproject.org,
-	workflows@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: [PATCH v3 0/2] scripts: introduce containerized builds
-Date: Wed, 31 Dec 2025 17:51:48 +0100
-Message-ID: <cover.1767199119.git.gtucker@gtucker.io>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jzIRqTTC"
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-42e2e3c0dccso6570588f8f.2
+        for <linux-kbuild@vger.kernel.org>; Wed, 31 Dec 2025 09:07:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767200871; x=1767805671; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jLSVM7oT2x+mygqgfjoFl6JBKT9XHb0lY82HBBdL4IY=;
+        b=jzIRqTTCVdhEKKNGlwCIi+eUIBVfhK9wcYFD5AVOC3i6TjURwa50tigvn8003guT/U
+         RaxPVxFlVmHkTjnrUpdkrEz81IU54zhBKM6Ck45bK0QpjBhVTjYHGzrT6mcwDrVhxnIi
+         aMrUkv6HUdPmeE1aOUHUGCWQnTi4nZRJvVnN09seE+0QcGovDhypePzbUy6RZVA9qvXr
+         nn1uejQpafAjJwU77KrGgEOGTPYbtDdlxw3f8GzyS8aUZVQMuqYh3ejuYd/HU9CXlNco
+         ITTH4i0ghIfeDBgGm0wxQj6+M+TGN4AXLlLmvx6uzFweclgEZURDpGNN2m3eTAYq91LW
+         jh0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767200871; x=1767805671;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=jLSVM7oT2x+mygqgfjoFl6JBKT9XHb0lY82HBBdL4IY=;
+        b=VXCSy09Etv4DViP/c92RuSKW9gOBhjrzOqKvJGoB/JLQPuQ6L1N6J22TVusC+nL9ao
+         FP4YLG4nQXHBfUKkcak/mShQLLQzCDsxe10yGY6yfHYJrrKnERlQrK4Q4zgG2MlqfZBn
+         xqrMz3RVimXL6Dj4n7nTjc9q8nMwnwVL33PnN+FDJ8qsSn+wPAslj8V/VTGRwrysyOZH
+         LOPfoX5mjKN3rDxSwI/UbusTiJAjS3/0kyuNOXdeFJHqug/z3A9TBAbZIi97ktvFkrz5
+         yb2Xgd4hC6THppziTnuVSFb0tWjN8DBKSinpGfJB8WbiRDvxtUdmP4SXkLIsyPpRNg3e
+         ZSow==
+X-Forwarded-Encrypted: i=1; AJvYcCVd9mDihBJ91sELFtIC4nF8wm7XZTpcD2Ql06TS7vd/5h7UduZf9f3b4cNmk22vWBMDHB3tZUvygrxfCIo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCd3Pozj/J5qyLEsbUBbc69Ar1gYLQzU4xZ0bfnmGVZm1nIP1T
+	w82zB/lf9EbSH94Xml/BgoXnIreJ9D2B/CwozdAwy2DCIX3f9ck9UTrZiUv7Dwg64/XrOw8R/D7
+	42sMz58TbUkLtqaflv2AnRxrkv8Sm+J0=
+X-Gm-Gg: AY/fxX7BuGsypl/I8g/3rJKhYyddY52nPhDJw8YpdlAbeHJDpzR6oeYgbAk8K0nsJiC
+	N+eH5CFCbo4yYOp/qO7xKOmpz9/ydf/DyNtgbun7YeIg3Mtt7wGJTAWWf+MkGY60uJ5PMdk0EXd
+	OQs4OR8yiQBLfuDh/EvTooCaaq2m/fChOm2YdufIJlNPN3kv4i6pbAcdqXggmzlA4RRVukzfs0/
+	cxtFXaBbOecbHZUnMDckvCZ+oeQ2X+OSW6rhcs+MoEAxNXDgp4AMRNl8iEC8L5r4HUJs+GbqKzm
+	kWVMfM8xYw3cqsynYYc8LySVzZ7i
+X-Google-Smtp-Source: AGHT+IEkhAN3JBU8zznfxeuU4iqR4nG6AkymGS0XQpDyuqMfnwRYOj7A11/R/1jpmMlTRsWkkib46OaiAjAonYbdyx4=
+X-Received: by 2002:a05:6000:2886:b0:42f:dbbc:5103 with SMTP id
+ ffacd0b85a97d-4324e4fda18mr46838205f8f.35.1767200871338; Wed, 31 Dec 2025
+ 09:07:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: gtucker@gtucker.io
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdekfeegvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkofggtgfgsehtkeertdertdejnecuhfhrohhmpefiuhhilhhlrghumhgvucfvuhgtkhgvrhcuoehgthhutghkvghrsehgthhutghkvghrrdhioheqnecuggftrfgrthhtvghrnhepteehhffgudetheehheetffehtdfgvdehiefggedvhefgkeduvdfhgfdtteduteefnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghdpghhithhlrggsrdgtohhmnecukfhppedvtddtudemkeeiudemgegrgedtmeekiedvtdemhegtuggsmegrugeisgemjegvkegtmeegvdehfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvtddtudemkeeiudemgegrgedtmeekiedvtdemhegtuggsmegrugeisgemjegvkegtmeegvdehfedphhgvlhhopehrihhnghhordhlrghnpdhmrghilhhfrhhomhepghhtuhgtkhgvrhesghhtuhgtkhgvrhdrihhopdhqihgupeduheekveeugeegfeeiledpmhhouggvpehsmhhtphhouhhtpdhnsggprhgtphhtthhopeduvddprhgtphhtthhopehnrghthhgrnheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepohhjvggurgeskhgvrhhnvghlrdhorhhgpdhrtghpthhto
- hepuggrvhhiughgohifsehgohhoghhlvgdrtghomhdprhgtphhtthhopeifohhrkhesohhnuhhrohiikhgrnhdruggvvhdprhgtphhtthhopehgthhutghkvghrsehgthhutghkvghrrdhiohdprhgtphhtthhopegrrhhnugesrghrnhgusgdruggv
-X-GND-State: clean
-X-GND-Score: -100
+References: <20251231012558.1699758-1-ihor.solodrai@linux.dev>
+In-Reply-To: <20251231012558.1699758-1-ihor.solodrai@linux.dev>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 31 Dec 2025 09:07:40 -0800
+X-Gm-Features: AQt7F2rgOTewqDmcAzVEygDD_JCldDLnUICazgBgTeXp9vlBwTr9MFsimdJvJoQ
+Message-ID: <CAADnVQ+biTSDaNtoL=ct9XtBJiXYMUqGYLqu604C3D8N+8YH9A@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v2] resolve_btfids: Implement --patch_btfids
+To: Ihor Solodrai <ihor.solodrai@linux.dev>
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+	bpf <bpf@vger.kernel.org>, 
+	Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This proposal emerged from discussions over email and after a talk at
-Plumbers 2024:
+On Tue, Dec 30, 2025 at 5:26=E2=80=AFPM Ihor Solodrai <ihor.solodrai@linux.=
+dev> wrote:
+>
+> Recent changes in BTF generation [1] rely on ${OBJCOPY} command to
+> update .BTF_ids section data in target ELF files.
+>
+> This exposed a bug in llvm-objcopy --update-section code path, that
+> may lead to corruption of a target ELF file. Specifically, because of
+> the bug st_shndx of some symbols may be (incorrectly) set to 0xffff
+> (SHN_XINDEX) [2][3].
+>
+> While there is a pending fix for LLVM, it'll take some time before it
+> lands (likely in 22.x). And the kernel build must keep working with
+> older LLVM toolchains in the foreseeable future.
+>
+> Using GNU objcopy for .BTF_ids update would work, but it would require
+> changes to LLVM-based build process, likely breaking existing build
+> environments as discussed in [2].
+>
+> To work around llvm-objcopy bug, implement --patch_btfids code path in
+> resolve_btfids as a drop-in replacement for:
+>
+>     ${OBJCOPY} --update-section .BTF_ids=3D${btf_ids} ${elf}
+>
+> Which works specifically for .BTF_ids section:
+>
+>     ${RESOLVE_BTFIDS} --patch_btfids ${btf_ids} ${elf}
+>
+> This feature in resolve_btfids can be removed at some point in the
+> future, when llvm-objcopy with a relevant bugfix becomes common.
+>
+> [1] https://lore.kernel.org/bpf/20251219181321.1283664-1-ihor.solodrai@li=
+nux.dev/
+> [2] https://lore.kernel.org/bpf/20251224005752.201911-1-ihor.solodrai@lin=
+ux.dev/
+> [3] https://github.com/llvm/llvm-project/issues/168060#issuecomment-35335=
+52952
+>
+> Signed-off-by: Ihor Solodrai <ihor.solodrai@linux.dev>
+>
+> ---
+>
+> Successful BPF CI run: https://github.com/kernel-patches/bpf/actions/runs=
+/20608321584
+> ---
+>  scripts/gen-btf.sh                   |   2 +-
+>  scripts/link-vmlinux.sh              |   2 +-
+>  tools/bpf/resolve_btfids/main.c      | 117 +++++++++++++++++++++++++++
+>  tools/testing/selftests/bpf/Makefile |   2 +-
+>  4 files changed, 120 insertions(+), 3 deletions(-)
+>
+> diff --git a/scripts/gen-btf.sh b/scripts/gen-btf.sh
+> index 12244dbe097c..0aec86615416 100755
+> --- a/scripts/gen-btf.sh
+> +++ b/scripts/gen-btf.sh
+> @@ -123,7 +123,7 @@ embed_btf_data()
+>         fi
+>         local btf_ids=3D"${ELF_FILE}.BTF_ids"
+>         if [ -f "${btf_ids}" ]; then
+> -               ${OBJCOPY} --update-section .BTF_ids=3D${btf_ids} ${ELF_F=
+ILE}
+> +               ${RESOLVE_BTFIDS} --patch_btfids ${btf_ids} ${ELF_FILE}
+>         fi
+>  }
+>
+> diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+> index e2207e612ac3..1915adf3249b 100755
+> --- a/scripts/link-vmlinux.sh
+> +++ b/scripts/link-vmlinux.sh
+> @@ -266,7 +266,7 @@ vmlinux_link "${VMLINUX}"
+>
+>  if is_enabled CONFIG_DEBUG_INFO_BTF; then
+>         info OBJCOPY ${btfids_vmlinux}
+> -       ${OBJCOPY} --update-section .BTF_ids=3D${btfids_vmlinux} ${VMLINU=
+X}
+> +       ${RESOLVE_BTFIDS} --patch_btfids ${btfids_vmlinux} ${VMLINUX}
+>  fi
 
-    https://lore.kernel.org/all/affb7aff-dc9b-4263-bbd4-a7965c19ac4e@gtucker.io/
+Applied, but please follow up to reduce the verbosity
+  OBJCOPY net/mptcp/mptcp_diag.ko.BTF
+  OBJCOPY net/bridge/br_netfilter.ko.BTF
+  OBJCOPY net/bridge/netfilter/ebt_log.ko.BTF
+  OBJCOPY net/caif/caif.ko.BTF
+  OBJCOPY net/bridge/netfilter/ebt_ip.ko.BTF
+  BTFIDS  net/netfilter/ipvs/ip_vs.ko
+  OBJCOPY net/netfilter/ipvs/ip_vs.ko.BTF
+  BTFIDS  drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.ko
+  OBJCOPY drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.ko.BTF
 
-The aim is to facilitate reproducing builds for CI bots as well as
-developers using containers.  Here's an illustrative example with a
-kernel.org toolchain in a Docker image from tuxmake:
 
-    $ scripts/container -i tuxmake/korg-clang-21 make LLVM=1 defconfig
-      HOSTCC  scripts/basic/fixdep
-      HOSTCC  scripts/kconfig/conf.o
-    [...]
-      HOSTCC  scripts/kconfig/util.o
-      HOSTLD  scripts/kconfig/conf
-    *** Default configuration is based on 'x86_64_defconfig'
-    #
-    # configuration written to .config
-    #
+All of these OBJCOPY lines are not correct anymore and can
+be simply removed. No need to yell at the user about these steps.
 
-This patch series also includes a documentation page with all the
-relevant details and further examples about how to use the tool.
-
-To go one step further, I'm in the process of preparing reference
-container images with kernel.org toolchains and no third-party
-dependencies other than the base Debian distro.  See this thread for
-more details and options to host them in an upstream way:
-
-    https://lore.kernel.org/all/cc737636-2a43-4a97-975e-4725733f7ee4@gtucker.io/
-
-Say, to run KUnit using the latest kernel.org GCC toolchain:
-
-    scripts/container --shell \
-        -i registry.gitlab.com/gtucker/korg-containers/gcc:kunit -- \
-        tools/testing/kunit/kunit.py \
-            run \
-            --arch=x86_64 \
-            --cross_compile=x86_64-linux-
-
----
-Changes in v3:
-- Refactor common code for Docker and Podman
-- Add docs.kernel.org URL in help message
-- Use pathlib Python package
-- Handle signals in parent process by default
-- Add --shell option to use an interactive shell
-- Tweak debug messages in verbose mode
-- Specify Python 3.10 as minimum version in the docs
-- Provide an example env file in the docs
-- Update docs regarding interactive shell usage
-
-Changes in v2:
-- Drop default image but make -i option required
-- Look for Docker and Podman if no runtime specified
-- Catch SIGINT from user to abort container with Docker
-- Explicitly name each container with a UUID
-- Update documentation accordingly
-
----
-
-Guillaume Tucker (2):
-  scripts: add tool to run containerized builds
-  Documentation: dev-tools: add container.rst page
-
- Documentation/dev-tools/container.rst | 201 ++++++++++++++++++++++++++
- Documentation/dev-tools/index.rst     |   1 +
- scripts/container                     | 199 +++++++++++++++++++++++++
- 3 files changed, 401 insertions(+)
- create mode 100644 Documentation/dev-tools/container.rst
- create mode 100755 scripts/container
-
--- 
-2.47.3
-
+imo BTFIDS lines can be removed too. They just scroll on the screen.
