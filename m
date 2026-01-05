@@ -1,125 +1,197 @@
-Received: from earwig.ash.relay.mailchannels.net (earwig.ash.relay.mailchannels.net [23.83.222.54])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011051.outbound.protection.outlook.com [52.101.70.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4882E28750C;
-	Mon,  5 Jan 2026 17:41:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.222.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC4F11632C8;
+	Mon,  5 Jan 2026 19:53:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.51
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767634871; cv=pass; b=pETPLzI/WlpP1fUp81y0+x9uuAq8ha/bqvuT4FNBgIg5QUGrgf0dpYC0O9vrymGZCSeUZAc6G86L2TJ3KokVwTWEz+z0+EsxJx7gqcsDoAZRE+gLk7E2nIXKFHVo8zXNwEK7yc+agg93Uc4pUoUNjiyYkgyDcdGDBj7aWKId1w4=
+	t=1767642794; cv=fail; b=WV3NbdQT7rPg/rOcU0DFwiFkLaCg6Ao5zqtJ+KCV3k/huNTF1D74JRsNqUL6mOdQUuVrDwuNC785XR6C6kEinWsY0wLpdWFvWuwIdHXk7o4sbphTSDpr+05qQJACumTyMZZkb85QjZAczolu+9/A7UDv73qNnDgwcRQyN+/FQPg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767634871; c=relaxed/simple;
-	bh=afR4gIGQqWhtKSR1X6mRLeY3XvSaFBMOEvA0r09mFAg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=en7uGfq1YhrFE2EZt46YGlJbZco0oONq62e0xnHFd7Hpdg+4zZlJwOruLzhDpoEYV8GDf/vfVM1nL6RBlPkXPJkxxGyucgEP0M62/JYk9uteHbfgplM7DmZRPVA4zaS1QLSQ3GRTVdUYMinV2OH3QDK4agcDDPZ5tdAvM0j2Vm4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gotplt.org; spf=pass smtp.mailfrom=gotplt.org; dkim=pass (2048-bit key) header.d=gotplt.org header.i=@gotplt.org header.b=el1pXq7q; arc=pass smtp.client-ip=23.83.222.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gotplt.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gotplt.org
+	s=arc-20240116; t=1767642794; c=relaxed/simple;
+	bh=A8JOiklOCI4ENOpgSbeu5cZx5j89cGqdrrzsPjjc+Qg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=NQZ3Ia1NF/Ctbn9sW1tQ7+qUkO02Z0o7YK6cIFM3SVG0s2VtD9P5gnoOL1AF+M8HwyrEUQskbqi+VI+k8+1coRIjSO+sS7XEkPDK13W/EerYi22zKnCPngbJVMyncnX8Smdaxc+2Ba0zbnpjtm4GpmwuX+NDNcyi97ENnaQDR8s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=faqnr8QG; arc=fail smtp.client-ip=52.101.70.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gotplt.org header.i=@gotplt.org header.b="el1pXq7q"
-X-Sender-Id: dreamhost|x-authsender|siddhesh@gotplt.org
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-	by relay.mailchannels.net (Postfix) with ESMTP id 83EEB1222CA;
-	Mon, 05 Jan 2026 10:58:33 +0000 (UTC)
-Received: from pdx1-sub0-mail-a207.dreamhost.com (100-112-117-24.trex-nlb.outbound.svc.cluster.local [100.112.117.24])
-	(Authenticated sender: dreamhost)
-	by relay.mailchannels.net (Postfix) with ESMTPA id C7EDB12141B;
-	Mon, 05 Jan 2026 10:58:30 +0000 (UTC)
-ARC-Seal: i=1; a=rsa-sha256; d=mailchannels.net; s=arc-2022; cv=none;
-	t=1767610710;
-	b=yDaTHnunXJtHF1PfK/rKts/kNyY9OSz1ehYlnrSWv2j0FJ7+SY1cBIJbOQKNBLTFX+m+Xj
-	YP0WAAEOlUVbLIdGGBEfFmgPsAOK4f29csQFaA0AnZ2MN02m8E/lvxBn/CMK0liqh61lty
-	Q24mK6w9H0wumSr2I2p2Kpsd00i1pq3+V02VzF+ZOol1sAIudCo5tvE2e70mDUhGaBomva
-	SAPpk91dh7ERVFIZjbUkXzLICteXfypeV1/0IRGePPxCnOkqT69OL0JZ0GYYx12+HLKveB
-	13ye+z+KIXgupqCreSfaoMJQUAa4V/GETevGF1JYClfAYpJxp6n04ID7EnB+Gg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mailchannels.net;
-	s=arc-2022; t=1767610710;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:dkim-signature;
-	bh=cNmAC3AVapO1Aew1Ac2I+U6usxxH3KR/0xXLpeGV+Do=;
-	b=IECAN491GkOpwdje5h1E80O+A9zqT7fjr2aWt3pHSd4etSy8RbCIbmSPQcpnB/R6Y7dlsC
-	35CiPU4mXGyH6hNwaNcgevNJ7YosJ4sTQJWJKQEda7QZRu4cCBKfjnuF6Cs3PGDYLTYDzb
-	uGuqo1gc+zrI1ZccLx+ooeS9DoBe6FMYLOSLsZf8lE9b5McI8e9U93RsiaD2WfAJu0OFb2
-	JaOQoDjpeY4evi+1GhyrZe6qV554cZG1sN93XYm7MXgsEfojG4cJGZzfZm2OLP6havDnWp
-	Q3eozlhl+S2EPc21imUraZcvQICdPKDH7i1R21ldONZ3HGT7pdaDkJvkZXbQWw==
-ARC-Authentication-Results: i=1;
-	rspamd-85db7f4c96-t7gj4;
-	auth=pass smtp.auth=dreamhost smtp.mailfrom=siddhesh@gotplt.org
-X-Sender-Id: dreamhost|x-authsender|siddhesh@gotplt.org
-X-MC-Relay: Neutral
-X-MailChannels-SenderId: dreamhost|x-authsender|siddhesh@gotplt.org
-X-MailChannels-Auth-Id: dreamhost
-X-Tank-Battle: 5df69bd121c8e0dc_1767610713071_630209668
-X-MC-Loop-Signature: 1767610713071:3562879293
-X-MC-Ingress-Time: 1767610713070
-Received: from pdx1-sub0-mail-a207.dreamhost.com (pop.dreamhost.com
- [64.90.62.162])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
-	by 100.112.117.24 (trex/7.1.3);
-	Mon, 05 Jan 2026 10:58:33 +0000
-Received: from [192.168.0.135] (unknown [38.23.181.90])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: siddhesh@gotplt.org)
-	by pdx1-sub0-mail-a207.dreamhost.com (Postfix) with ESMTPSA id 4dlB9d0Rx9z2D;
-	Mon,  5 Jan 2026 02:58:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gotplt.org;
-	s=dreamhost; t=1767610710;
-	bh=cNmAC3AVapO1Aew1Ac2I+U6usxxH3KR/0xXLpeGV+Do=;
-	h=Date:Subject:To:Cc:From:Content-Type:Content-Transfer-Encoding;
-	b=el1pXq7qeqARVsRQgySVTc8sbPJZjNYilZVwzUIguE51RPtjZu0tjbqIsq+lAm/Fh
-	 MMk6tA5Db0T4g2wvhKp8acteRO/d2R9/eIjpv90MyHwaoVYwnHB8GuNEaQAwvQetVe
-	 KqnoRvM8xF65YvdaXssbc2aplhU6H0+X4dk46Kp0hX46ykF2pPqi3MCeVs2CQ1ieGX
-	 8uj35Et1QZcvQ1BF1Xa8zbfRn62UBnB4H7S7G9F4UPK8JlRHPEPImlHSUhiRWHHM3F
-	 M5e1eZh7xmobNQiYDhti2Mo2Dt1r+y318qQvTYgQgGdxLXqJ0JDS2QTNP7VSWwq/A/
-	 BXhmZ35ZIC5Lg==
-Message-ID: <68d83837-cc78-43d0-a084-d783b9de83e9@gotplt.org>
-Date: Mon, 5 Jan 2026 05:58:27 -0500
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="faqnr8QG"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=q5NmgpOoNkZseGwtKUBvb0A5+3JE0r0mlX/AIObAaCO83ldsh4TLzJAlS94t6QBAkQa+podj8FpMhO68ojot62Oua3EoSDIEUfr3AAy2UiIbyUdgOQh3OpywNYTPalSljAfCFtqis5QnoHJhLVnjAFpXJsO987/lvLf+KYof4DKgqFoASPJmxHryBG4SmZEYQkOMNix/QfOm03gCYd+b6Xqposq42CqI5JrHGGkmsNEyPOY18a+1WKqx0a9GN1R1CkyFaIB7kGuk98eRB4cb6ot8Ew9/gBxdh4MT8HLKqvfqEQm7xJwDyZwcIshJr9m9/rBM2Qxa0/CHzZ8kpDeVqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Zr4t/8QyQlnqFGVcCYJYhwCSuhwNHbjkktaJ4Q38Rxg=;
+ b=vtYE9yRH10PmIblkYL0UKX/qWCTeJ7J9+nTqR2SgRr5K0yZHbbpVJQa0KxCNZcj78AJhHOf12VuzLyuTkLYA7E60JLkoj8ikdhTa5GVkSNOKHmYayZj5KrXeyqLcR8bqhAaHSFNCMCqFth5MDSPx1xVui0TXAGIvIGuK6n2buLd7JUhmpf/HLdw60V8JTLRjYLOyk+DqalEbFoAe0ciXn/UvCjie/0gE2gAirQLi0rBabLkLCt6vtT3t8wpUC8etlhk+n16mQKhVF3mvaiOGl5+zkmyplti+K7/Tb32nk2aHFcLsAjnczRv5w+IPdfmhV1gNe4k+JeCD9P5/GILPFg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Zr4t/8QyQlnqFGVcCYJYhwCSuhwNHbjkktaJ4Q38Rxg=;
+ b=faqnr8QGa8GewZXadx7CFCnoHZok+h5iAx5xScKMm59Y9K+PkvB6jmBzf1H/qpabc3brvPiohk229jyCpSN5i8H3DM+5rmSvkVNuGHfrbRK8UDhhLieMnEDvwuttng97Si90+Q91m+gU5gCMBVtXv6CUepDFCCzBubsnmAQnZ2AZqQcAomJxJLFDezjKOvQWbhr58bZC10retCBhoIIcF0XuhvP/MhbPXIFeYKPpeIIUPBIKx+4QRUSnNhSqVUQxCIrXBlF1eG5tIyUK66XOSUBF6KXN6vK5si6m9iiwc3u+QO2c66HIlnQEE96tob0Pbok1k3z4ltaWiFjTuFzrIQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from DU2PR04MB8951.eurprd04.prod.outlook.com (2603:10a6:10:2e2::22)
+ by PAXPR04MB8607.eurprd04.prod.outlook.com (2603:10a6:102:21a::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9478.4; Mon, 5 Jan
+ 2026 19:53:10 +0000
+Received: from DU2PR04MB8951.eurprd04.prod.outlook.com
+ ([fe80::753c:468d:266:196]) by DU2PR04MB8951.eurprd04.prod.outlook.com
+ ([fe80::753c:468d:266:196%4]) with mapi id 15.20.9478.004; Mon, 5 Jan 2026
+ 19:53:10 +0000
+Date: Mon, 5 Jan 2026 14:53:00 -0500
+From: Frank Li <Frank.li@nxp.com>
+To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>
+Cc: devicetree@vger.kernel.org, imx@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-kbuild@vger.kernel.org, Shengjiu Wang <shengjiu.wang@nxp.com>,
+	Sherry Sun <sherry.sun@nxp.com>, Li Jun <jun.li@nxp.com>,
+	Fugang Duan <fugang.duan@nxp.com>
+Subject: Re: [PATCH 0/9] arm64: dts: imx8m*: misc update
+Message-ID: <aVwWnAMqVqE7jtCy@lizhi-Precision-Tower-5810>
+References: <20251110-misc_dts-v1-0-7564b9f69a18@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251110-misc_dts-v1-0-7564b9f69a18@nxp.com>
+X-ClientProxiedBy: SJ0PR03CA0005.namprd03.prod.outlook.com
+ (2603:10b6:a03:33a::10) To DU2PR04MB8951.eurprd04.prod.outlook.com
+ (2603:10a6:10:2e2::22)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] rust: Add -fdiagnostics-show-context to
- bindgen_skip_c_flags
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
- Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>
-Cc: rust-for-linux@vger.kernel.org, Kees Cook <kees@kernel.org>,
- Alice Ryhl <aliceryhl@google.com>, Miguel Ojeda <ojeda@kernel.org>,
- Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
- stable@vger.kernel.org,
- Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
- clang-built-linux <llvm@lists.linux.dev>
-References: <20251217150010.665153-1-siddhesh@gotplt.org>
- <20251217224050.1186896-1-siddhesh@gotplt.org>
- <CANiq72n0BtCxAsXOaNnSMWC-aW2bNTPzN=4VGb+ic8YA6jhsAw@mail.gmail.com>
-Content-Language: en-US
-From: Siddhesh Poyarekar <siddhesh@gotplt.org>
-In-Reply-To: <CANiq72n0BtCxAsXOaNnSMWC-aW2bNTPzN=4VGb+ic8YA6jhsAw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DU2PR04MB8951:EE_|PAXPR04MB8607:EE_
+X-MS-Office365-Filtering-Correlation-Id: 686c4858-1c45-4897-93dc-08de4c940d87
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|52116014|366016|376014|19092799006|7416014|1800799024|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?AGk+A9TnvtyQYKs08Y/X42W9nuQKG9CYAsvhwWKc7dBQjPEfc5yA5GVNtaoh?=
+ =?us-ascii?Q?kKDWJQDOVV3R0Ncr6vW32NMWQuxgRsMyIM2rM6k6yln+qaINdOLa9WmZXHMJ?=
+ =?us-ascii?Q?WURnMHbQXeX0f/fgZhlURqEYB7EbJOCccG1q1SnS3Gu7oi8FroQpxCKr8hEm?=
+ =?us-ascii?Q?fiqgnfb14LkM5+G0+fQsiPjLzxEqrrgECoD8cKEJBqz2RvbecdCAs+V1HecB?=
+ =?us-ascii?Q?+LusGIsxoQ9+dMHyRrc7UJNL3cBwrXf3+kf1eI1qilg0EZGWAt4HMnhuCIDb?=
+ =?us-ascii?Q?2f6ke7j2pEQwHJIFnUgJgd1yOaVGIhhNXtEYNkaLlIFSHiIAypM4fhJ404yc?=
+ =?us-ascii?Q?YnXMSnRWaII0NSZ0xTvwwQENzj2JEM3P9EUCgk2WoNi1zCArRSLmHwIZvzre?=
+ =?us-ascii?Q?RF660Wk41r3QFvLexSuHldbj1wb1ltIvqYEakmew/EqakcmY9KxDCZWAEJKO?=
+ =?us-ascii?Q?AzuHJTTFuQD/pdgYVI9dCQAiTHmlbBRrvtzB1r6bqKZy05/18dRVkyy08jah?=
+ =?us-ascii?Q?chsHwEmpzGm2aU9X0o3Mby2bt2SfwTy+zNgFXcwy5meMjyN4pP4RdCXjIKQB?=
+ =?us-ascii?Q?s/iqwPrE4qEqT3p/ViUFoy9cJj362SPkkQsLoDL/M42dvmMXGuvSjsKgtN/H?=
+ =?us-ascii?Q?AvKCdrECWO6MYfVrgsOlf1wLODIhwpFfLUNpcP1xSMJYZMOBUxSaCn6YTg6Y?=
+ =?us-ascii?Q?WwiTFBQtWfgYH/99gwrsPAToriFs/BbjLnBtY0RgQOlCAzpZ0YQqp6KOyI8U?=
+ =?us-ascii?Q?xXzy1XYuBWgpbudK4nifFjyhPn5nPAyK9TJ2pqI+og0maZ5t973danbLsFAr?=
+ =?us-ascii?Q?Gly3j2iwK1tgbQvbmcI7BjVcNHRe/od2ghHYXARBA4ELa8FLneeg+eDGqvwV?=
+ =?us-ascii?Q?eQAgWaWobzeHNMMAC3NsBgr5gwtVpe4rXmTSJpcyOD/b8ZAw+FBYicnc34Xk?=
+ =?us-ascii?Q?66fzYDagK8oKE+/hh5qJpT0JaCfNIX6cUdPWsGOB8v6ORAUaMvA/4Yg+axyE?=
+ =?us-ascii?Q?3lIqwJEn8kzfuubeX8oHg7PlkcorjfXQiBHk4fqu5odL9EC8ZUXh1+aFGE+F?=
+ =?us-ascii?Q?qv7STb3O0RXcB45xtiztnx+s4SPCr850Hz438MxcSWa4eVMh8fslQg7sgN3t?=
+ =?us-ascii?Q?VFUqHVeW2F0lKTT7ZYroN2jSC3ig8aVVLJLMkhgD2rOXQgRPV0E+71M0GVgU?=
+ =?us-ascii?Q?IRtJG9PApFhrtxyfDWbpbURjoF9gE1cfWMYKTy1nw9fATh3viHQ6Qa162o3R?=
+ =?us-ascii?Q?ddKs+TpMeX/X/Gs2I+8u7/KjJ1u88OV4n6m76XMmO7tJrHmlrf3ej8WU7eYX?=
+ =?us-ascii?Q?cl+RhBM832Pn70tLqux+YmAqn/VPLnuiBZja/48n0U6PxynUzgyk4ovEftMf?=
+ =?us-ascii?Q?IEV6uBbnEeLGgNB5nbbMRmiaXq7Bk6zfsF/hzg25EGEzNopVujto4gUFIV2I?=
+ =?us-ascii?Q?KSWhTk6lSY768nklqg4s3fN8w2lVVn6VdEiRMiTS94nWL6Waazi5FZ9WisM9?=
+ =?us-ascii?Q?IKMqupWSQ1QYjQchqrPbqnOaLYnqBdYTooGi?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU2PR04MB8951.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(366016)(376014)(19092799006)(7416014)(1800799024)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?ALyJipQVSWXH0kMiS7gEeVSdYWz5pJqdTXczoQ2TDFv6kXYyUb1xev9YayHH?=
+ =?us-ascii?Q?OiteRAf9swYNGkTX2P3u9qtkClfm4sB5njuqUZvcMMHhnNCvpwePhMv3YBjr?=
+ =?us-ascii?Q?e9alp2iFV34le4WH36hP1ajhzIfPPEBDWNFo7Yre8TsVtOU0t2BEImnctm5o?=
+ =?us-ascii?Q?5l2FngxipaDzszQDCUcGXimKwE5w2QdRTVzvShoF/yiDePgpFH7XIDKlYInE?=
+ =?us-ascii?Q?xrhoUnTZYKiyg0oOyP07kX0KptifbGqubW+jfec1R5g189KZ3GvAVcbq4POI?=
+ =?us-ascii?Q?/Z3t5WpTRY0IoNAqAisXKBaeFARGiaxUF+ypzE2LduVJRXnOunuZXC1FupG9?=
+ =?us-ascii?Q?6+QpBLD1JfVgWaJGUsmZ/Fz3pqEkqFHciXdKm/98uKyJyWNPGTJy1QK1sB1T?=
+ =?us-ascii?Q?8DiLnQ+txX8Et2y1ktaqIZGKxVetZcRD4odEmuQ3ypv1ekTs0zTmGezelk1I?=
+ =?us-ascii?Q?uS9gSZnpH0mfgqzVZcdIRM0J7fWe3bHGzjbKR/KqXchrOJ0X5xTmnFWh5Sv4?=
+ =?us-ascii?Q?rDvKFuLtWZ/NZa2x4sCLqv3hidf7t4WWy3NPO9rkPzmFsjDY2OcZtGLQYY7O?=
+ =?us-ascii?Q?QFnJTjUpQUOSpbK5Nz9SOcVQ4jnFHG/MECUWQwniMiuRacET0x/o6Q8T8+El?=
+ =?us-ascii?Q?iH58RAGdip0t42+shJWhJvh0wRdoPAba5SqLg1BOcnTbewUqC55CZ0d9gBLQ?=
+ =?us-ascii?Q?cdAiqKvm3fzzDi/bd6Ks1VKcn+UfTzqJwy+qDB7kfRxmZQnL26bIhgIRTXjE?=
+ =?us-ascii?Q?WGuJlNYTTZ30PKEP6QjrVsBqhXEjwOuZSz1981WNToLlpjn4rMFj3+FQETBX?=
+ =?us-ascii?Q?w1ZUQ+Y1wLqHGa3HGH5yq4zod1JtAghPN9GY6uI8iJq0AWHOPZF3s7AYqUbA?=
+ =?us-ascii?Q?eWDIHylPI1iBBoJeIqTIxh2X/l6VMokfiX/SMwm0enTjarXMDzXDDPqBSLZ6?=
+ =?us-ascii?Q?aP4/u8C275Z2eepTHvLtsL3s+w0wU5MPBY+lzi+Zp7aVb8rd8sx7mMpUrRvK?=
+ =?us-ascii?Q?8XDX6jAMNXYzHQDL8K8ifO2zKblHXB0Mge/RxBdwYmOb2CsyBv21COjsD2la?=
+ =?us-ascii?Q?J+57UaEe1XquZ1+dKXtXQtrLGNyzdRM9PWyQiNocylgJlRcM8PBBV/PUs9bN?=
+ =?us-ascii?Q?I1YJ5jdSUINyykv1ksNkAgQEt4G8iw/qjiWxm4WWOo4zHTMrkRJyIk/QT6Kh?=
+ =?us-ascii?Q?MPVGwPv4J/FvmwxryOEndvbZBD4c0aBbgGURz2lFUowZX4wbp9Y5tMQ1qdvc?=
+ =?us-ascii?Q?DA5uTERNE6xtx7J+zVYJIyk5bO97fFnPMNB+n/uoGyVTutdXP87fB2/f+bT2?=
+ =?us-ascii?Q?lGBjNuj2RKpZ+OVbwDakR0+bZSydqXZbh+BRLoZooCQXk0spX9bQagVeZL/G?=
+ =?us-ascii?Q?PrB031BgIJ6WMza6hp+HswV5W/kFmcx+pxN9vy6z10u2JigDj8yly2zzhW3l?=
+ =?us-ascii?Q?x6w7eKeTWYjMo1q/W6fCqKcBbPj/SvRlj2p0dvQH3CGLgxO6GnJhAjy0aAeT?=
+ =?us-ascii?Q?Zsf3c0n3gjy0sb1VTtBYnIpdGtzJq/IS7FCCQ/H3IX+LK+T9Rb+dq1Co/dhs?=
+ =?us-ascii?Q?07BlnZ0PnHwvDoZnzNzL1g93yseCeAY3pSI8RZ6Z8XwwLr/hV50Ri0GIe5Uj?=
+ =?us-ascii?Q?Tj9kHAZhtb4Dr3j4G3YbM0N7RrrJ8CW2AYIXd4VhT2tWg1EZwsFVZxJXNEk9?=
+ =?us-ascii?Q?PIHOqQ6orF1TNVRu5DGKYDJkFVksflppT5ER84fvsHRWkn6y?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 686c4858-1c45-4897-93dc-08de4c940d87
+X-MS-Exchange-CrossTenant-AuthSource: DU2PR04MB8951.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jan 2026 19:53:10.0983
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: OMFkgsii9ZwERZUTLque7au5S2UxBKJUwLwKxesrtOZb84HVoZgPGJBr+JXOnUkGtFFMr0nA1Xf7qjjk8LdKeQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8607
 
-On 2026-01-04 15:53, Miguel Ojeda wrote:
-> On Wed, Dec 17, 2025 at 11:41 PM Siddhesh Poyarekar <siddhesh@gotplt.org> wrote:
->>
->> but clang does not have this option, so avoid passing it to bindgen.
-> 
-> This looks indeed correct, although it is not yet in a released GCC
-> (testing quickly in Compiler Explorer, GCC 15.2 doesn't have it, but
-> GCC trunk has).
+On Mon, Nov 10, 2025 at 03:54:40PM -0500, Frank Li wrote:
+> Some misc update for imx8m* dts
+>
+> Signed-off-by: Frank Li <Frank.Li@nxp.com>
+> ---
+> Frank Li (2):
+>       arm64: dts: imx8mm-evk: replace space with tab
+>       arm64: dts: imx8mp-evk: replace space with tab
+>
+> Fugang Duan (1):
+>       arm64: dts: imx8mm-evk: add uart3 port
+>
+> Li Jun (2):
+>       arm64: dts: imx8mm-evk: add wakeup-source for usb phy
+>       arm64: dts: imx8mn: add wakeup-source for usb phy
+>
+> Shengjiu Wang (1):
+>       arm64: dts: imx8mm-evk: correct the spdif compatible string
+>
+> Sherry Sun (3):
+>       arm64: dts: imx8mm-evk: add uart1 and bluetooth node
+>       arm64: dts: imx8mn-evk: add bluetooth dts node
+>       arm64: dts: imx8mp-evk: add bluetooth dts node
+>
+>  arch/arm64/boot/dts/freescale/imx8mm-evk.dtsi | 78 ++++++++++++++++++++-------
+>  arch/arm64/boot/dts/freescale/imx8mm.dtsi     |  4 +-
+>  arch/arm64/boot/dts/freescale/imx8mn-evk.dtsi |  4 ++
+>  arch/arm64/boot/dts/freescale/imx8mn.dtsi     |  1 +
+>  arch/arm64/boot/dts/freescale/imx8mp-evk.dts  | 32 ++++++-----
+>  5 files changed, 85 insertions(+), 34 deletions(-)
+> ---
 
-Yes, sorry I didn't mention that in my commit message; it's mentioned in 
-Kees' commit message (7454048db27d6).
+Shawn:
 
-> I will apply it -- Cc'ing ClangBuiltLinux and Kbuild so that they are aware.
+	Can you help check these patches?  only patch 4 need remove "evk"
+at subject, do you need me respin it?
 
-Thank you!
+Frank
 
-Sid
+> base-commit: b9e97ce705fb1873265ba0004041b55258d26dad
+> change-id: 20251107-misc_dts-c4cc84f1ae5f
+>
+> Best regards,
+> --
+> Frank Li <Frank.Li@nxp.com>
+>
