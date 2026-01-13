@@ -1,104 +1,105 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C514285068;
-	Tue, 13 Jan 2026 11:48:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B327B2556E;
+	Tue, 13 Jan 2026 12:37:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768304897; cv=none; b=jEYLq31E42DszZl/Og1Bn4uOmh+FWnONXdDRxTzNnrTcztu/qnLjNnNFBa/q62Qxo6qi6qk8XGekW78Kq0PTpRJfzdSO5XIreu4yp0fYO/42fLRIkxYrR3ZFrGPiOLI8hbz45ZNAVK4pqswm2xTbdZQ2Wy9jhAVqSQzkVst2U58=
+	t=1768307865; cv=none; b=Y8gBB9FSTRvRH1DvDUnZgUBCDRRaDI4+JEkZTlnF3heuNxyfeoHElBbp2YL2of+sWPj5hAxkkz/V4bef2t29tQB63yomSEo64RdOtl555X8QjlMIMRDULshkoqdYMMb7uV+i8MLLlkv9A49kKw7QPr5+mUy2s0T/i/msD3QQN+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768304897; c=relaxed/simple;
-	bh=/KMIFQGR4Bul37gWLEtJAePhpTN+maF3gId13DkHyMg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RsHFNz+/8nHE0mmeL4oBp7hvDCZwCmuqei7puPHomrV9nuRxbIIJLKqfpsU2TYQ6aRQP9Wb3EYGRhWTIT2FRBs6fuWLLkoljdZXdLPhwpbLOZWGc8J48JG1EFyV7zykeo+v7dSFF2JKdFCo7DjJxMIG6ZQaR/Nkj0vECWrYHV0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Xu0+QRmj; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	s=arc-20240116; t=1768307865; c=relaxed/simple;
+	bh=C8ZnR8aqoKvJkB4QCMCRFoAe/2le+A5GtPBqy+Qa43c=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=QaSttpviYd6F/JgvNPZGJefSEe3dJXdYsuqBqbzkxbVJ5SBrXcB7ZYOU/QaPkcMPraxh+uWuYX/hBPXdqnI9GNn0Qc4Z9EwprFzi5jAWO48QvahKBSfxM2PoyZXMPhZtii2XVc4TxuU8U9q07yIYgCqkrG4T7h2zRop1zSvIRYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=R9PUdq/6; arc=none smtp.client-ip=159.69.126.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Xu0+QRmj"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 5470340E0028;
-	Tue, 13 Jan 2026 11:48:14 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id TuovWBZKXyO3; Tue, 13 Jan 2026 11:48:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1768304892; bh=rTbY8atxjKRjBA0y7/TdrF1D3ojAC1i7Hfmy4BpGVjk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Xu0+QRmjVzNBeP/SFAjZtAYJhh21/UMZZySy8yfoIPEBTM4uIy81JkjyYzMDkN+01
-	 n+8yvHO7z7BYTqramqSmlCga3GRnbhy7+aaGT9vruZ8fLyV2f6AyRnKg7EVljfIqK6
-	 lOHOIMZuDODjGpIdo4Qc2uqTKS9WoZmSXSetNTKJ/hoXL1K3f0EuVcGvghZ6XV2pje
-	 uSZa2REx13fy9H2mVCdKrJtb02uLGMEYUONgSqVGTtnI9OLu8V1NSDwPz7de71ETiO
-	 wBA9CcU/Bzp1kCBtzPupRc/pF1vb5GoIkk9j8U0lmI827DrbA0GGCKA9XqcU1poQqb
-	 uKIrf9KzbJYRxhJHXaSxcxLN52HneYEXBmDHVmSOgslImgxuumZkdJAvl4SVmu9BMy
-	 1ZNoNFr194LKYfVF+BxPzd5FSH2shoVaru+f41SJ+nEeSwAX29dBPVqqHxxnEo7Uua
-	 yy30+t1ym5n601GoZV5F76xpQhfo7AV29Y9mu3rWjfyxDPhVrHt53rWfTxzQ6bG+11
-	 UXsjKFSGRi/2UG/gm5Kh3HFtjczcjwwRG/cn6wYOMivXrevjw8nosm4zMs55sut6HD
-	 wAi/LWh0YyOYKy54CB2fW1apZheJfHlztDFVkJvkT1BYdgWEEW46JWy3RDdAcDDsHR
-	 FcYQ/RrS/jrxs8yaH2eXQqk8=
-Received: from zn.tnic (pd953023b.dip0.t-ipconnect.de [217.83.2.59])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id 78B1A40E0194;
-	Tue, 13 Jan 2026 11:47:06 +0000 (UTC)
-Date: Tue, 13 Jan 2026 12:47:05 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Maciej Wieczor-Retman <m.wieczorretman@pm.me>, corbet@lwn.net,
-	morbo@google.com, rppt@kernel.org, lorenzo.stoakes@oracle.com,
-	ubizjak@gmail.com, mingo@redhat.com, vincenzo.frascino@arm.com,
-	maciej.wieczor-retman@intel.com, maz@kernel.org,
-	catalin.marinas@arm.com, yeoreum.yun@arm.com, will@kernel.org,
-	jackmanb@google.com, samuel.holland@sifive.com, glider@google.com,
-	osandov@fb.com, nsc@kernel.org, luto@kernel.org,
-	jpoimboe@kernel.org, Liam.Howlett@oracle.com, kees@kernel.org,
-	jan.kiszka@siemens.com, thomas.lendacky@amd.com,
-	jeremy.linton@arm.com, dvyukov@google.com, axelrasmussen@google.com,
-	leitao@debian.org, ryabinin.a.a@gmail.com, bigeasy@linutronix.de,
-	peterz@infradead.org, mark.rutland@arm.com, urezki@gmail.com,
-	brgerst@gmail.com, hpa@zytor.com, mhocko@suse.com,
-	andreyknvl@gmail.com, weixugc@google.com, kbingham@kernel.org,
-	vbabka@suse.cz, nathan@kernel.org, trintaeoitogc@gmail.com,
-	samitolvanen@google.com, tglx@kernel.org, thuth@redhat.com,
-	surenb@google.com, anshuman.khandual@arm.com, smostafa@google.com,
-	yuanchu@google.com, ada.coupriediaz@arm.com,
-	dave.hansen@linux.intel.com, kas@kernel.org,
-	nick.desaulniers+lkml@gmail.com, david@kernel.org, ardb@kernel.org,
-	justinstitt@google.com, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, kasan-dev@googlegroups.com,
-	llvm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org,
-	x86@kernel.org
-Subject: Re: [PATCH v8 00/14] kasan: x86: arm64: KASAN tag-based mode for x86
-Message-ID: <20260113114705.GJaWYwubl3yCqa1POx@fat_crate.local>
-References: <cover.1768233085.git.m.wieczorretman@pm.me>
- <20260112102957.359c8de904b11dc23cffd575@linux-foundation.org>
+	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="R9PUdq/6"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+	s=mail; t=1768307859;
+	bh=C8ZnR8aqoKvJkB4QCMCRFoAe/2le+A5GtPBqy+Qa43c=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=R9PUdq/6C+yJVnO0ybvezWnXHMQKPKihc6b7mgRo1Ui/aV55w+gpn8aorgG2O0rN1
+	 vtIBjPzynlpD6eesPKHWZ1oMERg8xbGy6qq+7yhu1l/iaJpRglA2TfWK7jquq3STNn
+	 ovi55oV7d0liWgCuciPaYvSpgyHVHyg8xLH8qSqs=
+From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+Date: Tue, 13 Jan 2026 13:28:46 +0100
+Subject: [PATCH v4 02/17] powerpc/ima: Drop unnecessary check for
+ CONFIG_MODULE_SIG
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260112102957.359c8de904b11dc23cffd575@linux-foundation.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20260113-module-hashes-v4-2-0b932db9b56b@weissschuh.net>
+References: <20260113-module-hashes-v4-0-0b932db9b56b@weissschuh.net>
+In-Reply-To: <20260113-module-hashes-v4-0-0b932db9b56b@weissschuh.net>
+To: Nathan Chancellor <nathan@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
+ Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>, 
+ Sami Tolvanen <samitolvanen@google.com>, 
+ Daniel Gomez <da.gomez@samsung.com>, Paul Moore <paul@paul-moore.com>, 
+ James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, 
+ Jonathan Corbet <corbet@lwn.net>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
+ Naveen N Rao <naveen@kernel.org>, Mimi Zohar <zohar@linux.ibm.com>, 
+ Roberto Sassu <roberto.sassu@huawei.com>, 
+ Dmitry Kasatkin <dmitry.kasatkin@gmail.com>, 
+ Eric Snowberg <eric.snowberg@oracle.com>, 
+ Nicolas Schier <nicolas.schier@linux.dev>, 
+ Daniel Gomez <da.gomez@kernel.org>, Aaron Tomlin <atomlin@atomlin.com>, 
+ "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, 
+ Nicolas Schier <nsc@kernel.org>, 
+ Nicolas Bouchinet <nicolas.bouchinet@oss.cyber.gouv.fr>, 
+ Xiu Jianfeng <xiujianfeng@huawei.com>, Nicolas Schier <nsc@kernel.org>, 
+ Christophe Leroy <chleroy@kernel.org>
+Cc: =?utf-8?q?Fabian_Gr=C3=BCnbichler?= <f.gruenbichler@proxmox.com>, 
+ Arnout Engelen <arnout@bzzt.net>, Mattia Rizzolo <mattia@mapreri.org>, 
+ kpcyrd <kpcyrd@archlinux.org>, Christian Heusel <christian@heusel.eu>, 
+ =?utf-8?q?C=C3=A2ju_Mihai-Drosi?= <mcaju95@gmail.com>, 
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-arch@vger.kernel.org, linux-modules@vger.kernel.org, 
+ linux-security-module@vger.kernel.org, linux-doc@vger.kernel.org, 
+ linuxppc-dev@lists.ozlabs.org, linux-integrity@vger.kernel.org, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1768307859; l=965;
+ i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
+ bh=C8ZnR8aqoKvJkB4QCMCRFoAe/2le+A5GtPBqy+Qa43c=;
+ b=fOyWYKhWQ+jNMEiBfpyKRDrc+eKQtmdIHJd/6KYHr3QI2V48g5JUNn51K2jsWWbdtlvyanJM1
+ DKPnRJ2YqXVDVwecDFNjFeR+uDRGpALqpNP0f/cmiRLFo1HmKIbz5Hm
+X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
+ pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 
-On Mon, Jan 12, 2026 at 10:29:57AM -0800, Andrew Morton wrote:
-> The review process seems to be proceeding OK so I'll add this to
-> mm.git's mm-new branch, which is not included in linux-next.  I'll aim
-> to hold it there for a week while people check the patches over and
-> send out their acks (please).  Then I hope I can move it into mm.git's
-> mm-unstable branch where it will receive linux-next exposure.
+When CONFIG_MODULE_SIG is disabled set_module_sig_enforced() is defined
+as an empty stub, so the check is unnecessary.
+The specific configuration option for set_module_sig_enforced() is
+about to change and removing the check avoids some later churn.
 
-Yah, you can drop this one and take the next revision after all comments have
-been addressed.
+Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
+---
+ arch/powerpc/kernel/ima_arch.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Thx.
+diff --git a/arch/powerpc/kernel/ima_arch.c b/arch/powerpc/kernel/ima_arch.c
+index b7029beed847..690263bf4265 100644
+--- a/arch/powerpc/kernel/ima_arch.c
++++ b/arch/powerpc/kernel/ima_arch.c
+@@ -63,8 +63,7 @@ static const char *const secure_and_trusted_rules[] = {
+ const char *const *arch_get_ima_policy(void)
+ {
+ 	if (is_ppc_secureboot_enabled()) {
+-		if (IS_ENABLED(CONFIG_MODULE_SIG))
+-			set_module_sig_enforced();
++		set_module_sig_enforced();
+ 
+ 		if (is_ppc_trustedboot_enabled())
+ 			return secure_and_trusted_rules;
 
 -- 
-Regards/Gruss,
-    Boris.
+2.52.0
 
-https://people.kernel.org/tglx/notes-about-netiquette
