@@ -1,88 +1,146 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24E3927E04C;
-	Wed, 14 Jan 2026 13:57:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF49F2D8371;
+	Wed, 14 Jan 2026 14:01:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768399053; cv=none; b=g1VTRkxqWoK3zGtH9kciKrVyPo3A17LwFISXdxg5Kzmge0dQ7DN4Ni0WAdI7W2SQ4UEn4/cpq6JD12MeW6Lm3MJvSzG0kOaBfr3xzCSibYEEBtYJTTNgKjP8mVtFovlfyCx606XirPwBryL163UNxedoWHrINB2RuDcbfMxR6Xo=
+	t=1768399319; cv=none; b=XQiOvRnxHTqWGontaEdcXhPAfLJ/mnWZBkE6Yydz3EhmCDEOxV4VqudEDm4VMxUt1EG3QfQyUSm1gmivjb805041wQCV+/Xc7NVmU4ueyi8kFqD4Jl6JsPClIpyrhjXdXXMnGDyHFBAon/NHbSaQlKUso5hUmrFWzHlXRIHReXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768399053; c=relaxed/simple;
-	bh=3NPWjgIFeC3ixFYQv9odPWjjjUGvpIy2yYLgVym9m6A=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Xbf6bT/9x7mtVs8MVwWYoH0Jv6cWsgMLLgHM5+vbkovY1XVwvWSnwTsvzNZLTRRBPzza62uEqT99wUbDPTwcq2hqhNtvDITQWCw4mrQHzWNXNsDD2Gy4XRFAxz/eoJMLlwlIv9KTlfw2dhmNw5PSDNv/tG2wYrmlJmFg0d88Q6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U/91mWpE; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768399319; c=relaxed/simple;
+	bh=YThRr+SqFQrj1xWYbkZyAQfpTQhSxOJrEz7Vmu8eYO0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=D9vQBa5OfCgazENkjB0mwTCmeN0N5uI2g4mu9qPFtlpNLEV6HFB75GGCyg/5BUd6MTRQ5LDeH9DJJ3Y6e3u1euYS/J+ItnsGT/UDxC8TUUInzeIA7jD5i8GjoE8c91cpVvlT0eEWvV9vB3tg5VQTFyqwg1y054cJ75T+RaoG//8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GamcmtOM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U/91mWpE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70891C4CEF7;
-	Wed, 14 Jan 2026 13:57:32 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GamcmtOM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62176C19423;
+	Wed, 14 Jan 2026 14:01:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768399052;
-	bh=3NPWjgIFeC3ixFYQv9odPWjjjUGvpIy2yYLgVym9m6A=;
-	h=From:Subject:Date:To:Cc:From;
-	b=U/91mWpEHbp+Usz+siKT3npthvIf0V9TeX0zXWhhNn8otNI/8PTzt4W+rLHE/8ysm
-	 HBh2JYhwp9FaSCrEI3+Yg8aQ3FNYPFxOGNgi0Y2E2RTTgbFudviJstsHyua5J2xi38
-	 JxbqBpM1VVePkCt4ovmxc8E66BM5XFvPGjAn0vwVLTXNUREk6ZFHv5E4n55LZ787Ss
-	 Dqdz3rCK2rZObJuKuCACMKKR8jr3P1QLT5w94Tdfs07Q0EXh6xlisxcL7mvlpnQf/v
-	 S6PwHto4ZdYeZYWriemnGGx37AVm2HpqyFNw/W1PCvuBzu19wMLJwpppBZ3ZGLZWiZ
-	 XEuWpsOsawuRg==
-From: Nicolas Schier <nsc@kernel.org>
-Subject: [PATCH v2 0/2] fortify: test_fortify.sh: Improve handling of
- tempfile
-Date: Wed, 14 Jan 2026 14:57:13 +0100
-Message-Id: <20260114-fortify-improve-handling-of-tempfile-v2-0-63b86c4dbd0e@kernel.org>
+	s=k20201202; t=1768399318;
+	bh=YThRr+SqFQrj1xWYbkZyAQfpTQhSxOJrEz7Vmu8eYO0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=GamcmtOMZjUjnBtKP0uhc41XsMqZ5fSe9+uXZ30TVeZpZSpRIIMXLIZ6LSMmqmxZJ
+	 NMpWBOrVCw5ay9J9pII8Hg/QzzTF8slSB/w2unqe4TNoWuGWzngFiEoJoUAvAmqFB5
+	 Iwga7pBiI5Zhqw1J+tOTc30FaWvGC89yLrq+JlbFxL2kl2s3LxRjEpWvdFoSPyfKHh
+	 jTw7x+USzU8jCMBBzyudL54Ry+Ze3oj0BmfkDgneM6dbU0fXZXjVgZ4iNhOuJykciN
+	 khzGT4OdT3Wu+wQV1jAF14IH2be73WBLizVZPZCNbT/eImzvDLUXbcLvK5UdivHV/a
+	 mq/qzYKU6Fp5w==
+Message-ID: <2a44e967-ebae-4641-88d7-ccb4536ee3b7@kernel.org>
+Date: Wed, 14 Jan 2026 15:01:51 +0100
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIALmgZ2kC/5WNSw6DMAwFr4KyritI6XfVe1QsTOKAVUiQg6Iix
- N2bcoMu5+lpZlWRhCmqR7EqocSRg8+gD4UyPfqOgG1mpUt9rip9AxdkZrcAj5OERJBPdmDfQXA
- w0zg5Hgi01WgudYs1osqqScjxZ8+8msw9xznIsldT9Vv/DKQKSsDr3Zb2hK1B83yTeBqOQTrVb
- Nv2BeEgx+bZAAAA
-X-Change-ID: 20251128-fortify-improve-handling-of-tempfile-2d2ac64ba4aa
-To: Kees Cook <kees@kernel.org>
-Cc: linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Nicolas Schier <nsc@kernel.org>, 
- WangYuli <wangyuli@aosc.io>, Nathan Chancellor <nathan@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1768399036; l=1095;
- i=nsc@kernel.org; s=20250924; h=from:subject:message-id;
- bh=3NPWjgIFeC3ixFYQv9odPWjjjUGvpIy2yYLgVym9m6A=;
- b=eCqsmUA0L3BCmqQEQhLSowRycXWao9aLzZ+DkQO7nJNkUpa6S5Q1anL1idqijgNGE6rAIjuV2
- V599/SXbLjHCUK6fEPc1Ee42mSynahQeKg8LYTqfbw3LZmjshzI68Q2
-X-Developer-Key: i=nsc@kernel.org; a=ed25519;
- pk=+0ar7sBdSzOoVoXxW8B+48yZbV4azT4joSEm8UyP7z4=
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 2/9] serdev: Add an API to find the serdev controller
+ associated with the devicetree node
+To: manivannan.sadhasivam@oss.qualcomm.com, Rob Herring <robh@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Jiri Slaby <jirislaby@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
+ Nicolas Schier <nicolas.schier@linux.dev>,
+ =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Mark Pearson <mpearson-lenovo@squebb.ca>,
+ "Derek J. Clark" <derekjohn.clark@gmail.com>,
+ Manivannan Sadhasivam <mani@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Bartosz Golaszewski <brgl@bgdev.pl>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Bartosz Golaszewski <brgl@kernel.org>
+Cc: linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kbuild@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+ linux-pci@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ linux-pm@vger.kernel.org, Stephan Gerhold <stephan.gerhold@linaro.org>,
+ Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+ linux-acpi@vger.kernel.org
+References: <20260112-pci-m2-e-v4-0-eff84d2c6d26@oss.qualcomm.com>
+ <20260112-pci-m2-e-v4-2-eff84d2c6d26@oss.qualcomm.com>
+From: Hans de Goede <hansg@kernel.org>
+Content-Language: en-US, nl
+In-Reply-To: <20260112-pci-m2-e-v4-2-eff84d2c6d26@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-WangYuli reported [1] that the temporary file created by test_fortify.sh
-is recognised by git as untracked file, especially if it remains after
-non-common exits of test_fortify.sh (e.g. killed by signal).
+Hi Mani,
 
-The following two patches handle that by renaming the temporary file and
-by cleaning up the file in more situations.
+Thank you for your work in this.
 
-Link: https://lore.kernel.org/linux-kbuild/20251112114725.287349-1-wangyuli@aosc.io/ # [1]
-Signed-off-by: Nicolas Schier <nsc@kernel.org>
----
-Changes in v2:
-  * Fixed author/trailer inconsistency (Nathan)
-  * Added review trailers
-  * Link to v1: https://patch.msgid.link/20251128-fortify-improve-handling-of-tempfile-v1-0-a79d0d3abcac@kernel.org
+On 12-Jan-26 17:26, Manivannan Sadhasivam via B4 Relay wrote:
+> From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+> 
+> Add of_find_serdev_controller_by_node() API to find the serdev controller
+> device associated with the devicetree node.
+> 
+> Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+> ---
+>  drivers/tty/serdev/core.c | 16 ++++++++++++++++
+>  include/linux/serdev.h    |  9 +++++++++
+>  2 files changed, 25 insertions(+)
+> 
+> diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
+> index b33e708cb245..25382c2d63e6 100644
+> --- a/drivers/tty/serdev/core.c
+> +++ b/drivers/tty/serdev/core.c
+> @@ -504,6 +504,22 @@ struct serdev_controller *serdev_controller_alloc(struct device *host,
+>  }
+>  EXPORT_SYMBOL_GPL(serdev_controller_alloc);
+>  
+> +/**
+> + * of_find_serdev_controller_by_node() - Find the serdev controller associated
+> + *					 with the devicetree node
+> + * @node:	Devicetree node
+> + *
+> + * Return: Pointer to the serdev controller associated with the node. NULL if
+> + * the controller is not found.
+> + */
+> +struct serdev_controller *of_find_serdev_controller_by_node(struct device_node *node)
+> +{
+> +	struct device *dev = bus_find_device_by_of_node(&serdev_bus_type, node);
+> +
+> +	return (dev && dev->type == &serdev_ctrl_type) ? to_serdev_controller(dev) : NULL;
+> +}
+> +EXPORT_SYMBOL_GPL(of_find_serdev_controller_by_node);
+> +
 
----
-Nicolas Schier (2):
-      fortify: Rename temporary file to match ignore pattern
-      fortify: Cleanup temp file also on non-successful exit
+This new of_find_serdev_controller_by_node() function needs:
 
- lib/test_fortify/test_fortify.sh | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
----
-base-commit: 3a8660878839faadb4f1a6dd72c3179c1df56787
-change-id: 20251128-fortify-improve-handling-of-tempfile-2d2ac64ba4aa
+#ifdef CONFIG_OF ... #endif
 
-Best regards,
--- 
-Nicolas
+around it, to match the stubbing you are doing in serdev.h
+
+>  static int of_serdev_register_devices(struct serdev_controller *ctrl)
+>  {
+>  	struct device_node *node;
+> diff --git a/include/linux/serdev.h b/include/linux/serdev.h
+> index ecde0ad3e248..db9bfaba0662 100644
+> --- a/include/linux/serdev.h
+> +++ b/include/linux/serdev.h
+> @@ -333,4 +333,13 @@ static inline bool serdev_acpi_get_uart_resource(struct acpi_resource *ares,
+>  }
+>  #endif /* CONFIG_ACPI */
+>  
+> +#ifdef CONFIG_OF
+> +struct serdev_controller *of_find_serdev_controller_by_node(struct device_node *node);
+> +#else
+> +struct serdev_controller *of_find_serdev_controller_by_node(struct device_node *node)
+> +{
+> +	return NULL;
+> +}
+
+stubs like this one should be static inline to avoid warnings like this one:
+
+In file included from drivers/tty/serdev/core.c:21:
+./include/linux/serdev.h:339:27: warning: no previous prototype for ‘of_find_serdev_controller_by_node’ [-Wmissing-prototypes]
+  339 | struct serdev_controller *of_find_serdev_controller_by_node(struct device_node *node)
+      |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Regards,
+
+Hans
+
 
