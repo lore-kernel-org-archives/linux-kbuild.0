@@ -1,155 +1,123 @@
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DCE92D739B;
-	Wed, 14 Jan 2026 03:41:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CDBC397AC6;
+	Wed, 14 Jan 2026 11:48:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768362078; cv=none; b=b0VYrZOz116uK2v8Qu6oAsn7nikLHUyGWRtV3WhjQ+AJPa4ZSqxPeS52T0az2EiGY37uX+t/efGhLC5wvXyNHoR+6msoYuIkqpVCpKvXwM/AucwHL6Eq5upJdKeDXEur14VuakBRetFrYrsF4eNjrZWD825n6r5Oe/ptuA2uVUw=
+	t=1768391300; cv=none; b=LjLnxZM0GGSHQCo4QbluQp+hi8oiS7FvFKd/V4nIWRiTO7+UjE9SodDNLPsv/G/rZuKGEwgXZKJtR27BjzAqMjP+zwoh64raul+JDMjpqESUaf9uRZveeO1tTJ5EHdh420NeTlncf8WHGdLrb8HwtUzWhfhYhLoSJ496Cij7N+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768362078; c=relaxed/simple;
-	bh=fuHX1gJvEHLXSbrpNZBA4M1RZiyGD+1HT2Iv1MurZ9o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FZ5/UPKWHF6GQBFPlV0baX3R3bN4kr0/H9yGUgmlSsqegiUKO6VpQhqQWWkZnv4vgab2wj6nKmLvTj9tCYbX8x0PQEQZBMByuqrvAwNCnrx8aDsHWR5TUd00NQBhiKY9gi7DZI1QQeALkUeo4lHZtU6TYu2nCNnAyhkudVdhSlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kkyEAjf3; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1768391300; c=relaxed/simple;
+	bh=0O1tF7Rx6B7NMUTJaBjAs7O/JZvQflj27dnVV/aS0Ds=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=WrTj44nFKGkF2DVjIR8vHXSngGyOxT8XAi+9WghXVNqainfIDPtsVsaupAtt8FZyPrUv/lcnGt9iG8ZiEH2l3RQc0L19+DxtO4bwpgea09fMUXEW+FtaCu1ZRICmUouCuyRXaaGxcoNflf+4Fone3f+TUkwX1wYmQsFkH3uYJnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=StJIpipQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kkyEAjf3"
-Message-ID: <977d29f6-4157-4fdb-b0d6-c24def482c06@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1768362064;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wzuS26H8SYTScmOx3++ZwcMsS+D3jzSzvm/KUyjaJik=;
-	b=kkyEAjf3vAwmkpA6qQLnuaSZre5hBN1zivZR7feQaZvMwILYv8oANx8h+F6HDtKtMjlTGd
-	gn0lxegePRhz+XBSWXtBXaiKo9+/Gdy9/KJsL/7dx5iYjqhXvnXEZ+zWcHtH+MjVlHKQFM
-	4yb2rB8VCNXVTy1HzFsLEuwTZ+qx5q0=
-Date: Wed, 14 Jan 2026 11:40:51 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="StJIpipQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 36B75C16AAE;
+	Wed, 14 Jan 2026 11:48:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768391300;
+	bh=0O1tF7Rx6B7NMUTJaBjAs7O/JZvQflj27dnVV/aS0Ds=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=StJIpipQoDNgFUATVI+O9zBIFfboxc2ZsHkzyQdYITw+7bfo8yn+ssCTYeQIclF6T
+	 v2ckFIjqiXYbhzSueGZ+HnVSeAHCw7QKMKtk/lOcVHHbzOG/qZznFUKrm3vYQ5higf
+	 Dya2uLYg7VQRu4O+kCjpjno7l0wmfbLrHPAH/r4BhkmvzIDF6duCIpBj178GfakSV+
+	 sLWDKdsZZlmwxC1kRpVui/+V43tlsf82WSz7Fq5CUiltxAFx3Ezl/cJ+idGar7Xuz6
+	 Ma1ZxlpaHAbJKPX+QYI0GsB2+JKaq1HXV2Ay4ON4F0FU0EXXmdOInrNRO2eZhjlFjG
+	 VdhSj860IXWiQ==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 246DFD29FF7;
+	Wed, 14 Jan 2026 11:48:20 +0000 (UTC)
+From: Jihan LIN via B4 Relay <devnull+linjh22s.gmail.com@kernel.org>
+Date: Wed, 14 Jan 2026 19:47:44 +0800
+Subject: [PATCH v2 1/2] Documentation/kbuild: Document gendwarfksyms build
+ dependencies
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3 03/14] software node: Implement device_get_match_data
- fwnode callback
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- manivannan.sadhasivam@oss.qualcomm.com
-Cc: Rob Herring <robh@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Jiri Slaby <jirislaby@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
- Nicolas Schier <nicolas.schier@linux.dev>, Hans de Goede <hansg@kernel.org>,
- =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Mark Pearson <mpearson-lenovo@squebb.ca>,
- "Derek J. Clark" <derekjohn.clark@gmail.com>,
- Manivannan Sadhasivam <mani@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Bartosz Golaszewski <brgl@bgdev.pl>, Daniel Scally <djrscally@gmail.com>,
- Heikki Krogerus <heikki.krogerus@linux.intel.com>,
- Sakari Ailus <sakari.ailus@linux.intel.com>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>,
- Bartosz Golaszewski <brgl@kernel.org>, linux-serial@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
- platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org,
- devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org,
- Stephan Gerhold <stephan.gerhold@linaro.org>,
- Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
- linux-acpi@vger.kernel.org, linux-pci@vger.kernel.org
-References: <20260110-pci-m2-e-v3-0-4faee7d0d5ae@oss.qualcomm.com>
- <20260110-pci-m2-e-v3-3-4faee7d0d5ae@oss.qualcomm.com>
- <aWSpFk9z0zpyKjr6@smile.fi.intel.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sui Jingfeng <sui.jingfeng@linux.dev>
-In-Reply-To: <aWSpFk9z0zpyKjr6@smile.fi.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Message-Id: <20260114-documents_gendwarfksyms-v2-1-297c98bd62c6@gmail.com>
+References: <20260114-documents_gendwarfksyms-v2-0-297c98bd62c6@gmail.com>
+In-Reply-To: <20260114-documents_gendwarfksyms-v2-0-297c98bd62c6@gmail.com>
+To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+ Jonathan Corbet <corbet@lwn.net>, Miguel Ojeda <ojeda@kernel.org>, 
+ Boqun Feng <boqun.feng@gmail.com>, Sami Tolvanen <samitolvanen@google.com>, 
+ Masahiro Yamada <masahiroy@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>
+Cc: linux-modules@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Jihan LIN <linjh22s@gmail.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1768391298; l=1690;
+ i=linjh22s@gmail.com; s=linjh22s_machine; h=from:subject:message-id;
+ bh=zaWdvli633/VK3S2KUL14PgYlfdPOQbClm+Z3p3BhUE=;
+ b=kMzqRJLPJqr33VLRjq0RPNsdmz0bA0nnzM52+b1Yznalz4e6Xi+T+3tx9pdylN9m4W96yQ43T
+ LXR12zdX+BGC5BlQJHChFfDCzW/e24NiHXQ2OmYFX8auZna93/Zztkr
+X-Developer-Key: i=linjh22s@gmail.com; a=ed25519;
+ pk=MnRQAVFy1t4tiGb8ce7ohJwrN2YFXd+dA7XmzR6GmUc=
+X-Endpoint-Received: by B4 Relay for linjh22s@gmail.com/linjh22s_machine
+ with auth_id=592
+X-Original-From: Jihan LIN <linjh22s@gmail.com>
+Reply-To: linjh22s@gmail.com
+
+From: Jihan LIN <linjh22s@gmail.com>
+
+Although dependencies for gendwarfksyms were recently added to the
+packaging rules [1-2], the corresponding documentation was missing.
+
+Document the required build dependencies for gendwarfksyms, and
+include a few examples for installing these dependencies on some
+distributions.
+
+[1] commit 657f96cb7c06 ("kbuild: deb-pkg: Add libdw-dev:native to
+Build-Depends-Arch")
+[2] commit 5bd6bdd0f76e ("kbuild: rpm-pkg: Add (elfutils-devel or
+libdw-devel) to BuildRequires")
+Signed-off-by: Jihan LIN <linjh22s@gmail.com>
+---
+ Documentation/kbuild/gendwarfksyms.rst | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
+
+diff --git a/Documentation/kbuild/gendwarfksyms.rst b/Documentation/kbuild/gendwarfksyms.rst
+index ed366250a54eac3a72c2f529da94a9e803704ae4..0e153d13b052da6edcf65950739730c123cd49db 100644
+--- a/Documentation/kbuild/gendwarfksyms.rst
++++ b/Documentation/kbuild/gendwarfksyms.rst
+@@ -14,6 +14,29 @@ selected, **gendwarfksyms** is used instead to calculate symbol versions
+ from the DWARF debugging information, which contains the necessary
+ details about the final module ABI.
+ 
++Dependencies
++------------
++
++libelf, libdw and zlib are dependencies of gendwarfksyms.
++
++Here are a few examples for installing these dependencies:
++
++* Arch Linux and derivatives::
++
++	sudo pacman --needed -S zlib libelf
++
++* Debian, Ubuntu, and derivatives::
++
++	sudo apt install libelf-dev libdw-dev zlib1g-dev
++
++* Fedora and derivatives::
++
++	sudo dnf install elfutils-libelf-devel elfutils-devel zlib-devel
++
++* openSUSE and derivatives::
++
++	sudo zypper install libelf-devel libdw-devel zlib-devel
++
+ Usage
+ -----
+ 
+
+-- 
+2.51.0
 
 
-
-On 2026/1/12 15:56, Andy Shevchenko wrote:
-> On Sat, Jan 10, 2026 at 12:26:21PM +0530, Manivannan Sadhasivam via B4 Relay wrote:
-> 
->> Because the software node backend of the fwnode API framework lacks an
->> implementation for the .device_get_match_data function callback.
-> 
-> Maybe this is done on purpose. 
-
-
-It is a *fact* that the broken swnode lacks an implementation for the 
-.device_get_match_data stub.
-
-
-Otherwise, If it is really done *on purpose*, the maintainers of swnode
-backend probably shall document it in the source file *explicitly*.
-
-Have you thought about this aspect?
-> 
-
-If it is sure thing, then it shouldn't start with "Maybe ..."
-
-
->> This makes it difficult to use(and/or test) a few drivers that originates
->> from DT world on the non-DT platform.
-> 
-> How difficult? 
-
-The emphasis isn't on the 'difficult' word, it means 'inconvenience'
-
-> DSA implementation went to the way of taking DT overlay
-> approach. Why that one can't be applied here?
-
-
-Software node as an complement of ACPI, Therefore should do the same.
-
-
-
-DT overlay introduce extra overhead/side effects on the non-DT systems.
-
-Besides, DT overlay requires the OS distribution(such as ubuntu) has the 
-DT overlay config option selected.
-
-
-
-> 
->> Implement the .device_get_match_data fwnode callback, which helps to keep
->> the three backends of the fwnode API aligned as much as possible. This is
->> also a fundamental step to make a few drivers OF-independent truely
->> possible.
->>
->> Device drivers or platform setup codes are expected to provide a software
->> node string property, named as "compatible". At this moment, the value of
->> this string property is being used to match against the compatible entries
->> in the of_device_id table. It can be extended in the future though.
-> 
-> I really do not want to see this patch
-
-You can do that by dropping the maintainer-ship.
-
-Your endless, bruth-force ranting on such a straight-forward thing 
-doesn't make much sense, because that waste everybody's time.
-
-> without very good justification
-
-
-Justifications has been provided over and over again.
-
-> (note, there were at least two attempts in the past to add this stuff
-
-This exactly saying that the implementation is missing.
-
->   and no-one was merged, 
-
-That's the reason why you see it at least the second time.
-
-have you studied those cases?).
-> 
-
-The first one is not 100% correct.
