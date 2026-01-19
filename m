@@ -1,51 +1,51 @@
 Received: from mailgw02.zimbra-vnc.de (mailgw02.zimbra-vnc.de [148.251.102.236])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51EF3287505;
-	Mon, 19 Jan 2026 06:49:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6BDA2836A4;
+	Mon, 19 Jan 2026 06:49:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.102.236
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768805355; cv=none; b=r0JbP7JjhIL3mvcFR8hQPeI0supoKCgDrCEpbHW1kBq/6hTk602RohI175fU7zcEdM4X1785Ul1E3kdPzI9ZOyp53RcXtUeG7d9mQY66EfeZXimaHlXMB3lWS3/lYri7YuPjxtaw9AjUWX1bDg9EniQLoZRVN2W01OzPNCZ4hTw=
+	t=1768805355; cv=none; b=koBHF/dJQfYP6lvKks9u6AOJKyPaIP5HL1ARhzzLz857vNxrzQYRqo1mzFX8WZTrSyT3iOlVL2vmWQW0wuUzRKa5uQsO28D5xoAZihs8uguXMoQuunkp4XLPmn3C87cDuTPXsmUWa7/zoDviI6+PaGJXScwWu0QLt2bNGniukiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1768805355; c=relaxed/simple;
-	bh=ez5a+WumvQIjjvbD49Yq5HT9OYm6szJpON+MBC+8YLM=;
+	bh=z8VljajjmjjtZTPFHIokOKbe8xBe7rGROHsRV5zSb/A=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pfhuG12KZnwk7i+3mn9SXCWi+qfYRmhAK14YxH7i0IgnuKUZzdSOZFErXBaq+Xm/sp9NmVlyF1exalsZEdRPN+ib7RNCoO3+kCfEG3EBZ1u4qL1hXiy0iqQMe+7r5c0OU34NWei30307kodoJ5zkIFeq5nfzC0bkTqHQPyV81MI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com; spf=pass smtp.mailfrom=tngtech.com; dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b=MdEdt/82; arc=none smtp.client-ip=148.251.102.236
+	 MIME-Version; b=HgPa1HmuE2v4iw32an3MI3fbSAAdg+QbTvLjF3wE2YwfC1bU9sdeeNhyUfc1L0oL0PMAnd2J4qpe6hRJlW5kny+fch653XjPG391FcwzK9Hbu7K7lQocIJzXOBWoMRp2huGJREK5JBnK9PspoVw15xurTk9mSQpYsPTcosOv6Mo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com; spf=pass smtp.mailfrom=tngtech.com; dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b=Erwo7pz4; arc=none smtp.client-ip=148.251.102.236
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tngtech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b="MdEdt/82"
+	dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b="Erwo7pz4"
 Received: from zmproxy.tng.vnc.biz (zimbra-vnc.tngtech.com [35.234.71.156])
-	by mailgw02.zimbra-vnc.de (Postfix) with ESMTPS id 98EB4200C4;
-	Mon, 19 Jan 2026 07:49:02 +0100 (CET)
+	by mailgw02.zimbra-vnc.de (Postfix) with ESMTPS id AE150200CA;
+	Mon, 19 Jan 2026 07:49:07 +0100 (CET)
 Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 037A11FA56A;
-	Mon, 19 Jan 2026 07:49:01 +0100 (CET)
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 6EFDC1FA802;
+	Mon, 19 Jan 2026 07:49:06 +0100 (CET)
 Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
  by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10032)
- with ESMTP id KhnVjV6quD2d; Mon, 19 Jan 2026 07:49:00 +0100 (CET)
+ with ESMTP id u7bW7Pnd3q57; Mon, 19 Jan 2026 07:49:05 +0100 (CET)
 Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 2CB9A1FA64F;
-	Mon, 19 Jan 2026 07:49:00 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz 2CB9A1FA64F
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 1C3B41FA56A;
+	Mon, 19 Jan 2026 07:49:05 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz 1C3B41FA56A
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tngtech.com;
-	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1768805340;
-	bh=OKnOaZsE9vekhUBB87ltMNVf9erg123+/4oORO4xPkw=;
+	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1768805345;
+	bh=LoabRW+kGkUJFwZK9CX2TgFN9c/Ij+DUQn7JYqRv/B4=;
 	h=From:To:Subject:Date:Message-Id:MIME-Version;
-	b=MdEdt/82LrhfFgi2vPN1mzd0FGw08R3L9DiXSh92ZFQdqWA/77J6sf/yd4V8iHWyX
-	 izQs6tqi1Bc2r6poi+5wm67LHPWjZC6E6h6mUAbNuP8JUlFgDCWlesdLFpfcvM3X5I
-	 h2vRbfDicdCll7RpNyNZ2Nklsn4LgSJPO6Gp+g+pn1JVqjTlAWATPBFaraJGlKlIGP
-	 FobGR9Ry0Yw3R1F4CwqiUFWAKPr7kATjzff/+Oyws4b7c0KATrlljjt71YU7De0yBH
-	 ENWYjPAfyKfVP6pq91S61ppI0zggrYuEhM9axQLOxZMwKeT4TYlKbEb7ShltY0vwwh
-	 uuDRkasu22Rgg==
+	b=Erwo7pz47m0JxfJ8E/dEuut5OgFczgxo+16NdbnW+YlSdeiC5LJTpO5Tap3qLzVoz
+	 PdQAX/qSnYMCSphRLOAlTt1E8O/wudLrqDn6huxpGDkNtAybuKhZYyvnWYeUpYlLzz
+	 29BX0uz5IYedTsFzQ59hJr2CHDu7q6MmZWImnaRuqLddAFcLDX6QvEsZKvUvqfgU39
+	 Ik0JYC+SfxbsbidtRKPjBjdOWlhfDXqC/T2dw9AmkGn0L2+Ua7L1PCF4yXJ2xJpJBT
+	 zvIpFogbp7DcelERCHe47ldEino07ioSl93ppyvdPWS/VZbwltO8P6nyPmKJwEjU1f
+	 GKFCFNMiJMdWA==
 X-Virus-Scanned: amavis at zmproxy.tng.vnc.biz
 Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
  by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10026)
- with ESMTP id 3BGoVrna-qEp; Mon, 19 Jan 2026 07:49:00 +0100 (CET)
+ with ESMTP id 3taDP8DY47Ly; Mon, 19 Jan 2026 07:49:05 +0100 (CET)
 Received: from DESKTOP-0O0JV6I.localdomain (ipservice-092-208-231-176.092.208.pools.vodafone-ip.de [92.208.231.176])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id C79041FA56A;
-	Mon, 19 Jan 2026 07:48:59 +0100 (CET)
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id BDF6A1FA802;
+	Mon, 19 Jan 2026 07:49:04 +0100 (CET)
 From: Luis Augenstein <luis.augenstein@tngtech.com>
 To: nathan@kernel.org,
 	nsc@kernel.org
@@ -55,9 +55,9 @@ Cc: linux-kbuild@vger.kernel.org,
 	gregkh@linuxfoundation.org,
 	maximilian.huber@tngtech.com,
 	Luis Augenstein <luis.augenstein@tngtech.com>
-Subject: [PATCH 09/14] tools/sbom: collect file metadata
-Date: Mon, 19 Jan 2026 07:47:26 +0100
-Message-Id: <20260119064731.23879-10-luis.augenstein@tngtech.com>
+Subject: [PATCH 12/14] tools/sbom: add SPDX build graph
+Date: Mon, 19 Jan 2026 07:47:29 +0100
+Message-Id: <20260119064731.23879-13-luis.augenstein@tngtech.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260119064731.23879-1-luis.augenstein@tngtech.com>
 References: <20260119064731.23879-1-luis.augenstein@tngtech.com>
@@ -69,390 +69,427 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Implement the kernel_file module that collects file metadata,
-including license identifier for source files, SHA-256 hash,
-Git blob object ID, an estimation of the file type, and
-whether files belong to the source, build, or output SBOM.
+Implement the SPDX build graph to describe the relationships
+between source files in the source SBOM and output files in
+the output SBOM.
 
 Co-developed-by: Maximilian Huber <maximilian.huber@tngtech.com>
 Signed-off-by: Maximilian Huber <maximilian.huber@tngtech.com>
 Signed-off-by: Luis Augenstein <luis.augenstein@tngtech.com>
 ---
- .../sbom/sbom/spdx_graph/build_spdx_graphs.py |   2 +
- tools/sbom/sbom/spdx_graph/kernel_file.py     | 310 ++++++++++++++++++
- 2 files changed, 312 insertions(+)
- create mode 100644 tools/sbom/sbom/spdx_graph/kernel_file.py
+ .../sbom/sbom/spdx_graph/build_spdx_graphs.py |  17 +
+ .../sbom/sbom/spdx_graph/spdx_build_graph.py  | 317 ++++++++++++++++++
+ 2 files changed, 334 insertions(+)
+ create mode 100644 tools/sbom/sbom/spdx_graph/spdx_build_graph.py
 
 diff --git a/tools/sbom/sbom/spdx_graph/build_spdx_graphs.py b/tools/sbom=
 /sbom/spdx_graph/build_spdx_graphs.py
-index 9c47258a3..0f95f99d5 100644
+index a61257a90..eecc52156 100644
 --- a/tools/sbom/sbom/spdx_graph/build_spdx_graphs.py
 +++ b/tools/sbom/sbom/spdx_graph/build_spdx_graphs.py
-@@ -7,6 +7,7 @@ from typing import Protocol
+@@ -4,6 +4,7 @@
+ from datetime import datetime
+ from typing import Protocol
+=20
++import logging
  from sbom.config import KernelSpdxDocumentKind
  from sbom.cmd_graph import CmdGraph
  from sbom.path_utils import PathStr
-+from sbom.spdx_graph.kernel_file import KernelFileCollection
+@@ -11,6 +12,7 @@ from sbom.spdx_graph.kernel_file import KernelFileColle=
+ction
  from sbom.spdx_graph.spdx_graph_model import SpdxGraph, SpdxIdGeneratorC=
 ollection
  from sbom.spdx_graph.shared_spdx_elements import SharedSpdxElements
+ from sbom.spdx_graph.spdx_source_graph import SpdxSourceGraph
++from sbom.spdx_graph.spdx_build_graph import SpdxBuildGraph
+ from sbom.spdx_graph.spdx_output_graph import SpdxOutputGraph
 =20
-@@ -36,4 +37,5 @@ def build_spdx_graphs(
-         Dictionary of SPDX graphs
-     """
-     shared_elements =3D SharedSpdxElements.create(spdx_id_generators.bas=
-e, config.created)
-+    kernel_files =3D KernelFileCollection.create(cmd_graph, config.obj_t=
-ree, config.src_tree, spdx_id_generators)
-     return {}
-diff --git a/tools/sbom/sbom/spdx_graph/kernel_file.py b/tools/sbom/sbom/=
-spdx_graph/kernel_file.py
+=20
+@@ -61,5 +63,20 @@ def build_spdx_graphs(
+             shared_elements=3Dshared_elements,
+             spdx_id_generators=3Dspdx_id_generators,
+         )
++    else:
++        logging.info(
++            "Skipped creating a dedicated source SBOM because source fil=
+es cannot be "
++            "reliably classified when the source and object trees are id=
+entical. "
++            "Added source files to the build SBOM instead."
++        )
++
++    build_graph =3D SpdxBuildGraph.create(
++        cmd_graph,
++        kernel_files,
++        shared_elements,
++        output_graph.high_level_build_element,
++        spdx_id_generators,
++    )
++    spdx_graphs[KernelSpdxDocumentKind.BUILD] =3D build_graph
+=20
+     return spdx_graphs
+diff --git a/tools/sbom/sbom/spdx_graph/spdx_build_graph.py b/tools/sbom/=
+sbom/spdx_graph/spdx_build_graph.py
 new file mode 100644
-index 000000000..84582567b
+index 000000000..2956800fa
 --- /dev/null
-+++ b/tools/sbom/sbom/spdx_graph/kernel_file.py
-@@ -0,0 +1,310 @@
++++ b/tools/sbom/sbom/spdx_graph/spdx_build_graph.py
+@@ -0,0 +1,317 @@
 +# SPDX-License-Identifier: GPL-2.0-only OR MIT
 +# Copyright (C) 2025 TNG Technology Consulting GmbH
 +
 +from dataclasses import dataclass
-+from enum import Enum
-+import hashlib
-+import os
-+import re
++from typing import Mapping
 +from sbom.cmd_graph import CmdGraph
-+from sbom.path_utils import PathStr, is_relative_to
-+from sbom.spdx import SpdxId, SpdxIdGenerator
-+from sbom.spdx.core import Hash
-+from sbom.spdx.software import ContentIdentifier, File, SoftwarePurpose
-+import sbom.sbom_logging as sbom_logging
-+from sbom.spdx_graph.spdx_graph_model import SpdxIdGeneratorCollection
-+
-+
-+class KernelFileLocation(Enum):
-+    """Represents the location of a file relative to the source/object t=
-rees."""
-+
-+    SOURCE_TREE =3D "source_tree"
-+    """File is located in the source tree."""
-+    OBJ_TREE =3D "obj_tree"
-+    """File is located in the object tree."""
-+    EXTERNAL =3D "external"
-+    """File is located outside both source and object trees."""
-+    BOTH =3D "both"
-+    """File is located in a folder that is both source and object tree."=
-""
++from sbom.path_utils import PathStr
++from sbom.spdx import SpdxIdGenerator
++from sbom.spdx.build import Build
++from sbom.spdx.core import ExternalMap, NamespaceMap, Relationship, Spdx=
+Document
++from sbom.spdx.software import File, Sbom
++from sbom.spdx_graph.kernel_file import KernelFileCollection
++from sbom.spdx_graph.shared_spdx_elements import SharedSpdxElements
++from sbom.spdx_graph.spdx_graph_model import SpdxGraph, SpdxIdGeneratorC=
+ollection
++from sbom.spdx_graph.spdx_source_graph import source_file_license_elemen=
+ts
 +
 +
 +@dataclass
-+class KernelFile:
-+    """kernel-specific metadata used to generate an SPDX File element.""=
-"
-+
-+    absolute_path: PathStr
-+    """Absolute path of the file."""
-+    file_location: KernelFileLocation
-+    """Location of the file relative to the source/object trees."""
-+    name: str
-+    """Name of the file element. Should be relative to the source tree i=
-f
-+    file_location equals SOURCE_TREE and relative to the object tree if
-+    file_location equals OBJ_TREE. If file_location equals EXTERNAL, the
-+    absolute path is used."""
-+    license_identifier: str | None
-+    """SPDX license ID if file_location equals SOURCE_TREE or BOTH; othe=
-rwise None."""
-+    spdx_id_generator: SpdxIdGenerator
-+    """Generator for the SPDX ID of the file element."""
-+
-+    _spdx_file_element: File | None =3D None
-+
-+    @classmethod
-+    def create(
-+        cls,
-+        absolute_path: PathStr,
-+        obj_tree: PathStr,
-+        src_tree: PathStr,
-+        spdx_id_generators: SpdxIdGeneratorCollection,
-+        is_output: bool,
-+    ) -> "KernelFile":
-+        is_in_obj_tree =3D is_relative_to(absolute_path, obj_tree)
-+        is_in_src_tree =3D is_relative_to(absolute_path, src_tree)
-+
-+        # file element name should be relative to output or src tree if =
-possible
-+        if not is_in_src_tree and not is_in_obj_tree:
-+            file_element_name =3D str(absolute_path)
-+            file_location =3D KernelFileLocation.EXTERNAL
-+            spdx_id_generator =3D spdx_id_generators.build
-+        elif is_in_src_tree and src_tree =3D=3D obj_tree:
-+            file_element_name =3D os.path.relpath(absolute_path, obj_tre=
-e)
-+            file_location =3D KernelFileLocation.BOTH
-+            spdx_id_generator =3D spdx_id_generators.output if is_output=
- else spdx_id_generators.build
-+        elif is_in_obj_tree:
-+            file_element_name =3D os.path.relpath(absolute_path, obj_tre=
-e)
-+            file_location =3D KernelFileLocation.OBJ_TREE
-+            spdx_id_generator =3D spdx_id_generators.output if is_output=
- else spdx_id_generators.build
-+        else:
-+            file_element_name =3D os.path.relpath(absolute_path, src_tre=
-e)
-+            file_location =3D KernelFileLocation.SOURCE_TREE
-+            spdx_id_generator =3D spdx_id_generators.source
-+
-+        # parse spdx license identifier
-+        license_identifier =3D (
-+            _parse_spdx_license_identifier(absolute_path)
-+            if file_location =3D=3D KernelFileLocation.SOURCE_TREE or fi=
-le_location =3D=3D KernelFileLocation.BOTH
-+            else None
-+        )
-+
-+        return KernelFile(
-+            absolute_path,
-+            file_location,
-+            file_element_name,
-+            license_identifier,
-+            spdx_id_generator,
-+        )
-+
-+    @property
-+    def spdx_file_element(self) -> File:
-+        if self._spdx_file_element is None:
-+            self._spdx_file_element =3D _build_file_element(
-+                self.absolute_path,
-+                self.name,
-+                self.spdx_id_generator.generate(),
-+                self.file_location,
-+            )
-+        return self._spdx_file_element
-+
-+
-+@dataclass
-+class KernelFileCollection:
-+    """Collection of kernel files."""
-+
-+    source: dict[PathStr, KernelFile]
-+    build: dict[PathStr, KernelFile]
-+    output: dict[PathStr, KernelFile]
++class SpdxBuildGraph(SpdxGraph):
++    """SPDX graph representing build dependencies connecting source file=
+s and
++    distributable output files"""
 +
 +    @classmethod
 +    def create(
 +        cls,
 +        cmd_graph: CmdGraph,
-+        obj_tree: PathStr,
-+        src_tree: PathStr,
++        kernel_files: KernelFileCollection,
++        shared_elements: SharedSpdxElements,
++        high_level_build_element: Build,
 +        spdx_id_generators: SpdxIdGeneratorCollection,
-+    ) -> "KernelFileCollection":
-+        source: dict[PathStr, KernelFile] =3D {}
-+        build: dict[PathStr, KernelFile] =3D {}
-+        output: dict[PathStr, KernelFile] =3D {}
-+        root_node_paths =3D {node.absolute_path for node in cmd_graph.ro=
-ots}
-+        for node in cmd_graph:
-+            is_root =3D node.absolute_path in root_node_paths
-+            kernel_file =3D KernelFile.create(
-+                node.absolute_path,
-+                obj_tree,
-+                src_tree,
++    ) -> "SpdxBuildGraph":
++        if len(kernel_files.source) > 0:
++            return _create_spdx_build_graph(
++                cmd_graph,
++                kernel_files,
++                shared_elements,
++                high_level_build_element,
 +                spdx_id_generators,
-+                is_root,
 +            )
-+            if is_root:
-+                output[kernel_file.absolute_path] =3D kernel_file
-+            elif kernel_file.file_location =3D=3D KernelFileLocation.SOU=
-RCE_TREE:
-+                source[kernel_file.absolute_path] =3D kernel_file
-+            else:
-+                build[kernel_file.absolute_path] =3D kernel_file
-+
-+        return KernelFileCollection(source, build, output)
-+
-+    def to_dict(self) -> dict[PathStr, KernelFile]:
-+        return {**self.source, **self.build, **self.output}
-+
-+
-+def _build_file_element(absolute_path: PathStr, name: str, spdx_id: Spdx=
-Id, file_location: KernelFileLocation) -> File:
-+    verifiedUsing: list[Hash] =3D []
-+    content_identifier: list[ContentIdentifier] =3D []
-+    if os.path.exists(absolute_path):
-+        verifiedUsing =3D [Hash(algorithm=3D"sha256", hashValue=3D_sha25=
-6(absolute_path))]
-+        content_identifier =3D [
-+            ContentIdentifier(
-+                software_contentIdentifierType=3D"gitoid",
-+                software_contentIdentifierValue=3D_git_blob_oid(absolute=
-_path),
++        else:
++            return _create_spdx_build_graph_with_mixed_sources(
++                cmd_graph,
++                kernel_files,
++                shared_elements,
++                high_level_build_element,
++                spdx_id_generators,
 +            )
-+        ]
-+    elif file_location =3D=3D KernelFileLocation.EXTERNAL:
-+        sbom_logging.warning(
-+            "Cannot compute hash for {absolute_path} because file does n=
-ot exist.",
-+            absolute_path=3Dabsolute_path,
-+        )
-+    else:
-+        sbom_logging.error(
-+            "Cannot compute hash for {absolute_path} because file does n=
-ot exist.",
-+            absolute_path=3Dabsolute_path,
-+        )
 +
-+    # primary purpose
-+    primary_purpose =3D _get_primary_purpose(absolute_path)
 +
-+    return File(
-+        spdxId=3Dspdx_id,
-+        name=3Dname,
-+        verifiedUsing=3DverifiedUsing,
-+        software_primaryPurpose=3Dprimary_purpose,
-+        software_contentIdentifier=3Dcontent_identifier,
++def _create_spdx_build_graph(
++    cmd_graph: CmdGraph,
++    kernel_files: KernelFileCollection,
++    shared_elements: SharedSpdxElements,
++    high_level_build_element: Build,
++    spdx_id_generators: SpdxIdGeneratorCollection,
++) -> SpdxBuildGraph:
++    """
++    Creates an SPDX build graph where source and output files are refere=
+nced
++    from external documents.
++
++    Args:
++        cmd_graph: The dependency graph of a kernel build.
++        kernel_files: Collection of categorized kernel files involved in=
+ the build.
++        shared_elements: SPDX elements shared across multiple documents.
++        high_level_build_element: The high-level Build element reference=
+d by the build graph.
++        spdx_id_generators: Collection of generators for SPDX element ID=
+s.
++
++    Returns:
++        SpdxBuildGraph: The SPDX build graph connecting source files and=
+ distributable output files.
++    """
++    # SpdxDocument
++    build_spdx_document =3D SpdxDocument(
++        spdxId=3Dspdx_id_generators.build.generate(),
++        profileConformance=3D["core", "software", "build"],
++        namespaceMap=3D[
++            NamespaceMap(prefix=3Dgenerator.prefix, namespace=3Dgenerato=
+r.namespace)
++            for generator in [
++                spdx_id_generators.build,
++                spdx_id_generators.source,
++                spdx_id_generators.output,
++                spdx_id_generators.base,
++            ]
++            if generator.prefix is not None
++        ],
 +    )
 +
++    # Sbom
++    build_sbom =3D Sbom(
++        spdxId=3Dspdx_id_generators.build.generate(),
++        software_sbomType=3D["build"],
++    )
 +
-+def _sha256(path: PathStr) -> str:
-+    """Compute the SHA-256 hash of a file."""
-+    with open(path, "rb") as f:
-+        data =3D f.read()
-+    return hashlib.sha256(data).hexdigest()
++    # Src and object tree elements
++    obj_tree_element =3D File(
++        spdxId=3Dspdx_id_generators.build.generate(),
++        name=3D"$(obj_tree)",
++        software_fileKind=3D"directory",
++    )
++    obj_tree_contains_relationship =3D Relationship(
++        spdxId=3Dspdx_id_generators.build.generate(),
++        relationshipType=3D"contains",
++        from_=3Dobj_tree_element,
++        to=3D[],
++    )
++
++    # File elements
++    build_file_elements =3D [file.spdx_file_element for file in kernel_f=
+iles.build.values()]
++    file_relationships =3D _file_relationships(
++        cmd_graph=3Dcmd_graph,
++        file_elements=3D{key: file.spdx_file_element for key, file in ke=
+rnel_files.to_dict().items()},
++        high_level_build_element=3Dhigh_level_build_element,
++        spdx_id_generator=3Dspdx_id_generators.build,
++    )
++
++    # Update relationships
++    build_spdx_document.rootElement =3D [build_sbom]
++
++    build_spdx_document.import_ =3D [
++        *(
++            ExternalMap(externalSpdxId=3Dfile_element.spdx_file_element.=
+spdxId)
++            for file_element in kernel_files.source.values()
++        ),
++        ExternalMap(externalSpdxId=3Dhigh_level_build_element.spdxId),
++        *(ExternalMap(externalSpdxId=3Dfile.spdx_file_element.spdxId) fo=
+r file in kernel_files.output.values()),
++    ]
++
++    build_sbom.rootElement =3D [obj_tree_element]
++    build_sbom.element =3D [
++        obj_tree_element,
++        obj_tree_contains_relationship,
++        *build_file_elements,
++        *file_relationships,
++    ]
++
++    obj_tree_contains_relationship.to =3D [
++        *build_file_elements,
++        *(file.spdx_file_element for file in kernel_files.output.values(=
+)),
++    ]
++
++    # create Spdx graphs
++    build_graph =3D SpdxBuildGraph(
++        build_spdx_document,
++        shared_elements.agent,
++        shared_elements.creation_info,
++        build_sbom,
++    )
++    return build_graph
 +
 +
-+def _git_blob_oid(file_path: str) -> str:
++def _create_spdx_build_graph_with_mixed_sources(
++    cmd_graph: CmdGraph,
++    kernel_files: KernelFileCollection,
++    shared_elements: SharedSpdxElements,
++    high_level_build_element: Build,
++    spdx_id_generators: SpdxIdGeneratorCollection,
++) -> SpdxBuildGraph:
 +    """
-+    Compute the Git blob object ID (SHA-1) for a file, like `git hash-ob=
-ject`.
++    Creates an SPDX build graph where only output files are referenced f=
+rom
++    an external document. Source files are included directly in the buil=
+d graph.
 +
 +    Args:
-+        file_path: Path to the file.
++        cmd_graph: The dependency graph of a kernel build.
++        kernel_files: Collection of categorized kernel files involved in=
+ the build.
++        shared_elements: SPDX elements shared across multiple documents.
++        high_level_build_element: The high-level Build element reference=
+d by the build graph.
++        spdx_id_generators: Collection of generators for SPDX element ID=
+s.
 +
 +    Returns:
-+        SHA-1 hash (hex) of the Git blob object.
++        SpdxBuildGraph: The SPDX build graph connecting source files and=
+ distributable output files.
 +    """
-+    with open(file_path, "rb") as f:
-+        content =3D f.read()
-+    header =3D f"blob {len(content)}\0".encode()
-+    store =3D header + content
-+    sha1_hash =3D hashlib.sha1(store).hexdigest()
-+    return sha1_hash
++    # SpdxDocument
++    build_spdx_document =3D SpdxDocument(
++        spdxId=3Dspdx_id_generators.build.generate(),
++        profileConformance=3D["core", "software", "build"],
++        namespaceMap=3D[
++            NamespaceMap(prefix=3Dgenerator.prefix, namespace=3Dgenerato=
+r.namespace)
++            for generator in [
++                spdx_id_generators.build,
++                spdx_id_generators.output,
++                spdx_id_generators.base,
++            ]
++            if generator.prefix is not None
++        ],
++    )
++
++    # Sbom
++    build_sbom =3D Sbom(
++        spdxId=3Dspdx_id_generators.build.generate(),
++        software_sbomType=3D["build"],
++    )
++
++    # File elements
++    build_file_elements =3D [file.spdx_file_element for file in kernel_f=
+iles.build.values()]
++    file_relationships =3D _file_relationships(
++        cmd_graph=3Dcmd_graph,
++        file_elements=3D{key: file.spdx_file_element for key, file in ke=
+rnel_files.to_dict().items()},
++        high_level_build_element=3Dhigh_level_build_element,
++        spdx_id_generator=3Dspdx_id_generators.build,
++    )
++
++    # Source file license elements
++    source_file_license_identifiers, source_file_license_relationships =3D=
+ source_file_license_elements(
++        list(kernel_files.build.values()), spdx_id_generators.build
++    )
++
++    # Update relationships
++    build_spdx_document.rootElement =3D [build_sbom]
++    root_file_elements =3D [file.spdx_file_element for file in kernel_fi=
+les.output.values()]
++    build_spdx_document.import_ =3D [
++        ExternalMap(externalSpdxId=3Dhigh_level_build_element.spdxId),
++        *(ExternalMap(externalSpdxId=3Dfile.spdxId) for file in root_fil=
+e_elements),
++    ]
++
++    build_sbom.rootElement =3D [*root_file_elements]
++    build_sbom.element =3D [
++        *build_file_elements,
++        *source_file_license_identifiers,
++        *source_file_license_relationships,
++        *file_relationships,
++    ]
++
++    build_graph =3D SpdxBuildGraph(
++        build_spdx_document,
++        shared_elements.agent,
++        shared_elements.creation_info,
++        build_sbom,
++    )
++    return build_graph
 +
 +
-+# REUSE-IgnoreStart
-+SPDX_LICENSE_IDENTIFIER_PATTERN =3D re.compile(r"SPDX-License-Identifier=
-:\s*(?P<id>.*?)(?:\s*(\*/|$))")
-+# REUSE-IgnoreEnd
-+
-+
-+def _parse_spdx_license_identifier(absolute_path: str, max_lines: int =3D=
- 5) -> str | None:
++def _file_relationships(
++    cmd_graph: CmdGraph,
++    file_elements: Mapping[PathStr, File],
++    high_level_build_element: Build,
++    spdx_id_generator: SpdxIdGenerator,
++) -> list[Build | Relationship]:
 +    """
-+    Extracts the SPDX-License-Identifier from the first few lines of a s=
-ource file.
++    Construct SPDX Build and Relationship elements representing dependen=
+cy
++    relationships in the cmd graph.
 +
 +    Args:
-+        absolute_path: Path to the source file.
-+        max_lines: Number of lines to scan from the top (default: 5).
++        cmd_graph: The dependency graph of a kernel build.
++        file_elements: Mapping of filesystem paths (PathStr) to their
++            corresponding SPDX File elements.
++        high_level_build_element: The SPDX Build element representing th=
+e overall build process/root.
++        spdx_id_generator: Generator for unique SPDX IDs.
 +
 +    Returns:
-+        The license identifier string (e.g., 'GPL-2.0-only') if found, o=
-therwise None.
++        list[Build | Relationship]: List of SPDX Build and Relationship =
+elements
 +    """
-+    try:
-+        with open(absolute_path, "r") as f:
-+            for _ in range(max_lines):
-+                match =3D SPDX_LICENSE_IDENTIFIER_PATTERN.search(f.readl=
-ine())
-+                if match:
-+                    return match.group("id")
-+    except (UnicodeDecodeError, OSError):
-+        return None
-+    return None
++    high_level_build_ancestorOf_relationship =3D Relationship(
++        spdxId=3Dspdx_id_generator.generate(),
++        relationshipType=3D"ancestorOf",
++        from_=3Dhigh_level_build_element,
++        completeness=3D"complete",
++        to=3D[],
++    )
 +
++    # Create a relationship between each node (output file)
++    # and its children (input files)
++    build_and_relationship_elements: list[Build | Relationship] =3D [hig=
+h_level_build_ancestorOf_relationship]
++    for node in cmd_graph:
++        if next(node.children, None) is None:
++            continue
 +
-+def _get_primary_purpose(absolute_path: PathStr) -> SoftwarePurpose | No=
-ne:
-+    def ends_with(suffixes: list[str]) -> bool:
-+        return any(absolute_path.endswith(suffix) for suffix in suffixes=
-)
++        # .cmd file dependencies
++        if node.cmd_file is not None:
++            build_element =3D Build(
++                spdxId=3Dspdx_id_generator.generate(),
++                build_buildType=3Dhigh_level_build_element.build_buildTy=
+pe,
++                build_buildId=3Dhigh_level_build_element.build_buildId,
++                comment=3Dnode.cmd_file.savedcmd,
++            )
++            hasInput_relationship =3D Relationship(
++                spdxId=3Dspdx_id_generator.generate(),
++                relationshipType=3D"hasInput",
++                from_=3Dbuild_element,
++                to=3D[file_elements[child_node.absolute_path] for child_=
+node in node.children],
++            )
++            hasOutput_relationship =3D Relationship(
++                spdxId=3Dspdx_id_generator.generate(),
++                relationshipType=3D"hasOutput",
++                from_=3Dbuild_element,
++                to=3D[file_elements[node.absolute_path]],
++            )
++            build_and_relationship_elements +=3D [
++                build_element,
++                hasInput_relationship,
++                hasOutput_relationship,
++            ]
++            high_level_build_ancestorOf_relationship.to.append(build_ele=
+ment)
 +
-+    def includes_path_segments(path_segments: list[str]) -> bool:
-+        return any(segment in absolute_path for segment in path_segments=
-)
++        # incbin dependencies
++        if len(node.incbin_dependencies) > 0:
++            incbin_dependsOn_relationship =3D Relationship(
++                spdxId=3Dspdx_id_generator.generate(),
++                relationshipType=3D"dependsOn",
++                comment=3D"\n".join([incbin_dependency.full_statement fo=
+r incbin_dependency in node.incbin_dependencies]),
++                from_=3Dfile_elements[node.absolute_path],
++                to=3D[
++                    file_elements[incbin_dependency.node.absolute_path]
++                    for incbin_dependency in node.incbin_dependencies
++                ],
++            )
++            build_and_relationship_elements.append(incbin_dependsOn_rela=
+tionship)
 +
-+    # Source code
-+    if ends_with([".c", ".h", ".S", ".s", ".rs", ".pl"]):
-+        return "source"
++        # hardcoded dependencies
++        if len(node.hardcoded_dependencies) > 0:
++            hardcoded_dependency_relationship =3D Relationship(
++                spdxId=3Dspdx_id_generator.generate(),
++                relationshipType=3D"dependsOn",
++                from_=3Dfile_elements[node.absolute_path],
++                to=3D[file_elements[n.absolute_path] for n in node.hardc=
+oded_dependencies],
++            )
++            build_and_relationship_elements.append(hardcoded_dependency_=
+relationship)
 +
-+    # Libraries
-+    if ends_with([".a", ".so", ".rlib"]):
-+        return "library"
-+
-+    # Archives
-+    if ends_with([".xz", ".cpio", ".gz", ".tar", ".zip"]):
-+        return "archive"
-+
-+    # Applications
-+    if ends_with(["bzImage", "Image"]):
-+        return "application"
-+
-+    # Executables / machine code
-+    if ends_with([".bin", ".elf", "vmlinux", "vmlinux.unstripped", "bpfi=
-lter_umh"]):
-+        return "executable"
-+
-+    # Kernel modules
-+    if ends_with([".ko"]):
-+        return "module"
-+
-+    # Data files
-+    if ends_with(
-+        [
-+            ".tbl",
-+            ".relocs",
-+            ".rmeta",
-+            ".in",
-+            ".dbg",
-+            ".x509",
-+            ".pbm",
-+            ".ppm",
-+            ".dtb",
-+            ".uc",
-+            ".inc",
-+            ".dts",
-+            ".dtsi",
-+            ".dtbo",
-+            ".xml",
-+            ".ro",
-+            "initramfs_inc_data",
-+            "default_cpio_list",
-+            "x509_certificate_list",
-+            "utf8data.c_shipped",
-+            "blacklist_hash_list",
-+            "x509_revocation_list",
-+            "cpucaps",
-+            "sysreg",
-+        ]
-+    ) or includes_path_segments(["drivers/gpu/drm/radeon/reg_srcs/"]):
-+        return "data"
-+
-+    # Configuration files
-+    if ends_with([".pem", ".key", ".conf", ".config", ".cfg", ".bconf"])=
-:
-+        return "configuration"
-+
-+    # Documentation
-+    if ends_with([".md"]):
-+        return "documentation"
-+
-+    # Other / miscellaneous
-+    if ends_with([".o", ".tmp"]):
-+        return "other"
-+
-+    sbom_logging.warning("Could not infer primary purpose for {absolute_=
-path}", absolute_path=3Dabsolute_path)
++    return build_and_relationship_elements
 --=20
 2.34.1
 
