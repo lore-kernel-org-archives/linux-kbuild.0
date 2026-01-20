@@ -1,93 +1,130 @@
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B3473EDAC2;
-	Tue, 20 Jan 2026 12:37:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768912669; cv=none; b=HjfcjLvavmKc/W+FsMRN79zo/RflKtXyAlo6YDTVD52WpVuCpNVwUAnOYPS5Ac5TsUV1DgZUKjruuYle2iGTSq4vwnjqa3sxSvE8l/q3137bKKtrpxnh8KT6veh7JnnayTlPYOXjGswAWPOYuPOQMrUzmyjzaMXef9cwFgbXgEQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768912669; c=relaxed/simple;
-	bh=ZfHo7bsbhy7sebKLb2eJ3ODN4FdVc6bkl4K2lv7V9u0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=G2xO/Zn/8b6t6F2TdMGmmUFpofSpcrZm2MDwtpZv9+ePb0wae/g1ZI7OBazRI5QHRBXTyL4PQI4Wi63AsNF8loKt6iu7YCanlVErn667FHfBcrV+9JEykoXN8c66P+t0AMaMGCwEHBu7/mJVFR+vObOB1zSqrYcLp5ofOxqwtX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [113.200.148.30])
-	by gateway (Coremail) with SMTP id _____8CxqsISd29pDrgKAA--.34589S3;
-	Tue, 20 Jan 2026 20:37:38 +0800 (CST)
-Received: from linux.localdomain (unknown [113.200.148.30])
-	by front1 (Coremail) with SMTP id qMiowJAxWcEKd29py60nAA--.733S4;
-	Tue, 20 Jan 2026 20:37:37 +0800 (CST)
-From: Tiezhu Yang <yangtiezhu@loongson.cn>
-To: Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>
-Cc: linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [RFC PATCH 2/3] kbuild: Make sure to generate config file
-Date: Tue, 20 Jan 2026 20:37:29 +0800
-Message-ID: <20260120123730.30487-3-yangtiezhu@loongson.cn>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20260120123730.30487-1-yangtiezhu@loongson.cn>
-References: <20260120123730.30487-1-yangtiezhu@loongson.cn>
+Received: from mail-dl1-f45.google.com (mail-dl1-f45.google.com [74.125.82.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74B8542E00D
+	for <linux-kbuild@vger.kernel.org>; Tue, 20 Jan 2026 13:38:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768916330; cv=pass; b=CTLLkdi/kvOREzT/rCRKqlmd6+maLr5CJAKTjIMvaaTDcigOTcM75JuzI8Y0CXaOYDJ8KBcwAo6PEgbbnofyCC0hnwo+66JaPB3AKwjRKePWxckw2e9UlXv1cptQ0ffmmtmZq4uGQPkPpyG8+FFoMZM/3MhkWDFm2y3MTfVc1QA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768916330; c=relaxed/simple;
+	bh=SznF6db3fgh7dj6jHEF0swLk5Nz5mEnPdExmVdEzVj8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Qo9P5+QLGV8/RCJvQb1M3zap3k9yZkLeZydafrF5uqt0jTdgATCmj08wdGrOgkwsORM0UDkus1DFrURgxgcn7ocXHIezEIEshGATn7q9dzaqiAzPRpoiTs58R4drmlNnTQ5fCAcZDPqxbzG3/fXL7bbjmeYYPwYyfvNZbTj4uKY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hEuHPMSv; arc=pass smtp.client-ip=74.125.82.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hEuHPMSv"
+Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-1233e05c77bso266585c88.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 20 Jan 2026 05:38:47 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768916325; cv=none;
+        d=google.com; s=arc-20240605;
+        b=hPVdK6au5rjadE0rFNiXJ4xgYYF2zFRl9cBPT853f68Zf0xI6ZrEcUMk1MdjiutDIl
+         X0Xmbci6b6SN0bbqO3M2uB0ChiwyjLjNU1UpzyII5K8h3DYpmyzLtgzuQVXxxyfYnY6d
+         dJufZZePajmwF0/yPFPlnTJwa82TbfGl011DbJjLuSg7Xz2eVF3f2EKLj8QDThxkev0c
+         3FhjGwsdyg3kHBTNZLCALpIQqLr094MwHqJMGGBvlYm6BxD8ZW9WqMUjBDuOCD0Oe8NK
+         0klymmS3lCJHFWpFrechMbfniVndBpJquGEwkWqZZNF2V4V8zZCJ3xXWVfDd3NO5QTti
+         2YJA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=QhVXI4ukImXiW/E1rib2cPI5kyplJP0Bh1o3PRKkVpU=;
+        fh=VLoqpdSmk5MYompFG3DitkWQrAQDHkLotAkX6P7N/RM=;
+        b=YwqMNSUwCGdx1aPPHZZuKCl27naWQ5+QScnqMrK0twDGJceIEEdXfif1irboCywyOR
+         5YpCdWHEzY9jp/CgPMMTH+XXcPaEEO7WtyRDDu2oV/PsnIcLyq9Rcx4twV9JjibM6Hd6
+         zOLOjkEvjRHR8zoVb8WuPQq12evGo0qfFYZjE+dgB1uZ0YtNj7wJa+sshMDLDi5DwPwJ
+         sVyX0GYaaTCSgQHEuZqqyyiMT99Yi8ikoU4GJZbA6qJEGdWh6etLQ+c1qvRhjJR3OwSf
+         cDrCJeVm8bahy0SW7/vFMejc5MgqAmvXskIiEgkDyVnAKnPNQUdz5j3YPcMRVFLBgKGT
+         mHQg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768916325; x=1769521125; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QhVXI4ukImXiW/E1rib2cPI5kyplJP0Bh1o3PRKkVpU=;
+        b=hEuHPMSvFs9GdU+eJBe5bS/t0AAj1l9gCq6u20cwYpmqjL4Sa7PWqBXRegRTNzE7NA
+         +61piqBdXdI+PGXEcVUeLsptJk6gS/SMh7uVVRl3cRr4IZuCCMGUynVHfJjoNBq8kgjm
+         p9f6qXvdN0SYFc21OsMDzMmVX4dmfIt38qc/VQB3vHPCAQRR+P3W+4kx2HW7XIpWpGtd
+         ZFKteuAyh5+2d4nR5mdWj008yOjPPQin0oJDF2JMMM/xgbcUdli3fcdvHEXMpK6APWoU
+         882uNX9p9zntEewghQFWwuQapLEwLP/qKC30yTV+kVQDmKFFDMZ0mmp6GG4o4NukER6+
+         QFZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768916325; x=1769521125;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=QhVXI4ukImXiW/E1rib2cPI5kyplJP0Bh1o3PRKkVpU=;
+        b=O2pDrF83U+fOES217RYumK6iBz5H+lzoaeOKLLQwEY18mUms2rlnmZYzYpav+NoO58
+         VHarrijJcnIsC7dWejXvJx/EW6uXg0k5qq4JkpszWOYDAgW/mTrJc+HE6vn7lBWRoxJi
+         9wGt5upANiJRAzmQEGns2NYhisvgT8edsjsevQREgWX+IppELnWIhXdaOBu6/J/LD00f
+         oOACVxZcyd6QJBaOqjuuUnER6Lp7hTzPPChWRt9b58EoWRekOu6xh/gbakNxBCAe333j
+         +iRkdhlpbSbe7hpBFSRxyA+KYFBq6vTxPBCCsECZz4in8uAYXUTX4QvyvJRjRmRUhKpU
+         e5vw==
+X-Forwarded-Encrypted: i=1; AJvYcCXJMBZnMjbnG53NgZsaUf+f2nPFbCTWYCwD4FLjbYE8JACiC/JaJ82GQY1E/QKqqhp4TOJSgLHMYC8k/+c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZVLjcA7LhCYyyYZbRATYkdffi6x0GFPP4OImJHrqO6BdnSRLe
+	egsSyIC+0wjjsPa4W3C5qZIkWytcpagdJZ++W3UljXCzXitkW/Z3cULWcEdjAUnL3NeIK5jUQcZ
+	8IZADD+rXIvnSsWK8EURvtOnW1a0gL9U=
+X-Gm-Gg: AZuq6aIovle8lKCVSg+wq3TvMM9AymxA3cbOaFqjiwI+xMAZl4yfblnrheBfsjwpkOw
+	fzpJBQms83mop9h3rLeHC2l8eZsHYz9uZ9dOIdcxDmD8dEcDwICpIz2Z2qoxgpuarMDw75t9tqv
+	yHcfhHqIRksVBe+N7J7NFEarb+Hgpl4FNixengeCBpGut9ntMnip8ZPd5hTCpBhtXUJOykwMGPc
+	l1rAUv6NZgq9RMmVVVmXy1aGlb+pgs5Uy6GY+0x5ry/xQflC002aUowSP0pdtrVww5pRHfefmxu
+	qP01ASuWdrhyG1TLnf2gvaXfuk+QuEyg3MkJIvub1owW5LwG8F6R+ow8dRcnRRBCXGv5V0QD0FK
+	3RxdrKvZ2/KM4
+X-Received: by 2002:a05:7301:3f19:b0:2ac:2f3f:250f with SMTP id
+ 5a478bee46e88-2b6b3efe903mr6404610eec.3.1768916324925; Tue, 20 Jan 2026
+ 05:38:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJAxWcEKd29py60nAA--.733S4
-X-CM-SenderInfo: p1dqw3xlh2x3gn0dqz5rrqw2lrqou0/
-X-Coremail-Antispam: 1Uk129KBj9xXoWrtF43AFy8trykWryxCrWDWrX_yoWktrgEkF
-	WIq3WxAws5AFWS9F1qgrW8Xr12ga1DZryfAr1xZFnrJw1DXws7GasxZFWxCr1fW3yUZr95
-	GrZFvr92kr1UCosvyTuYvTs0mTUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUj1kv1TuYvT
-	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
-	cSsGvfJTRUUUb28YFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
-	vaj40_Wr0E3s1l1IIY67AEw4v_JrI_Jryl8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-	w2x7M28EF7xvwVC0I7IYx2IY67AKxVWUCVW8JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	W8JVWxJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6r4UJVWxJr1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44I27w
-	Aqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_Jw1lYx0Ex4A2jsIE
-	14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCF04k20xvY0x
-	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
-	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcV
-	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF
-	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7
-	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jY38nUUUUU=
+References: <20260120-ra-fix-v1-0-829e4e92818c@nvidia.com>
+In-Reply-To: <20260120-ra-fix-v1-0-829e4e92818c@nvidia.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Tue, 20 Jan 2026 14:38:32 +0100
+X-Gm-Features: AZwV_Qjz1wuPfQWkIWoNT_Z25qaYTJnwL7_LlXbJYtFdbq30ZnczlTtp-GgGmgo
+Message-ID: <CANiq72nEW9H2nhTpz1X9LoBos_taVOuzHX+LHFpPiiYJV4Viwg@mail.gmail.com>
+Subject: Re: [PATCH 0/6] scripts: generate_rust_analyzer: improve
+ rust-project.json generation
+To: Eliot Courtney <ecourtney@nvidia.com>, Tamir Duberstein <tamird@kernel.org>, 
+	Jesung Yang <y.j3ms.n@gmail.com>
+Cc: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-After commit 75cffd392bfa ("LoongArch: Using generic scripts/install.sh
-in `make install`"), arch/loongarch/boot/install.sh is usually not used,
-either /root/bin/installkernel or /sbin/installkernel is used if found.
+On Tue, Jan 20, 2026 at 9:54=E2=80=AFAM Eliot Courtney <ecourtney@nvidia.co=
+m> wrote:
+>
+> This series improves rust-analyzer rust-project.json generation by:
 
-Then it can not generate the config file in most cases, just copy it to
-the installation path. Otherwise there may be an error when testing bpf,
-for example.
+Cc'ing Tamir and Jesung, who are becoming maintainer and reviewer of
+the rust-analyzer support:
 
-  $ ./test_verifier
-  gzopen /boot/config-6.19.0-rc6: No such file or directory
+    https://lore.kernel.org/rust-for-linux/20260115214545.63262-1-ojeda@ker=
+nel.org/
 
-Signed-off-by: Tiezhu Yang <yangtiezhu@loongson.cn>
----
- scripts/install.sh | 6 ++++++
- 1 file changed, 6 insertions(+)
+> There is some overlap between this patch series and ones already sent
+> but not applied, but it's unclear to me what the status of those are.
 
-diff --git a/scripts/install.sh b/scripts/install.sh
-index 05d62ac513ee..ecf354d8f4f1 100755
---- a/scripts/install.sh
-+++ b/scripts/install.sh
-@@ -34,6 +34,12 @@ do
- 		continue
- 	fi
- 
-+	# Install kernel config file
-+	if [ -f ${INSTALL_PATH}/config-${KERNELRELEASE} ]; then
-+	  mv ${INSTALL_PATH}/config-${KERNELRELEASE} ${INSTALL_PATH}/config-${KERNELRELEASE}.old
-+	fi
-+	cp .config ${INSTALL_PATH}/config-${KERNELRELEASE}
-+
- 	# installkernel(8) says the parameters are like follows:
- 	#
- 	#   installkernel version zImage System.map [directory]
--- 
-2.42.0
+There is overlap, yeah. The multi-version support (which I could
+imagine they may possibly want to land first before tackling other
+things) is fairly clearly on the "being discussed/reviewed" side since
+it was sent some days ago:
 
+    https://lore.kernel.org/rust-for-linux/20260109-ra-fix-primitive-v2-0-2=
+49852a4145a@gmail.com/
+
+Thanks!
+
+Cheers,
+Miguel
