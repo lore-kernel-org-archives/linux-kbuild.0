@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18D87449EA0;
-	Tue, 20 Jan 2026 17:55:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B7D33EDAC3;
+	Tue, 20 Jan 2026 17:58:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768931754; cv=none; b=HPsgU6Ppg8Uh46cWUuk7fomVL7LnSCIZKhQYRIIux9IxItSnk7VGNhvSpTRba7InLOrWm6o16+vYP6ve3V53WXPie1G8HEu2skB9Muqu0WM8+WnZCog+/4pyyxJNq1uGTi9wjDhNfKlehNtYk2ne/02m8VrxaYpzeAfHZeGG+XU=
+	t=1768931935; cv=none; b=dWf6i9nklYaXEf7t9DQSkw7i4iOnAaG8I8XaHKmwXZejP2AksgrkmrERTdJoHh9JdylvofDFABDKRvsLpwJaTbOgGchsTliveS39wAbF4rkTInpT9LQaavji1Eh/J9IIwLYqkkOFkJ0Rc8sV6uvtoFf2sxp8wQ2kMwwKydAlZdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768931754; c=relaxed/simple;
-	bh=YdlHdpPvefXlQJs8q/aV3FbVwI7IGilgSt53A6aDmkI=;
+	s=arc-20240116; t=1768931935; c=relaxed/simple;
+	bh=Y9cZ7orhjjaxMihveN4lhxry2uDDss/+iMQKy1Nem28=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TYn9iPEyZP5Jr8K9DjukhFilYAsxUQhYIjLs4rKdikQMNNIIZKJHhebP/xaczollaFd0SfkB6YtdaC622f9YZSCSuFrNIsEJZHLRUNLkfs8Z88wzGIcr8Az51Xmd7dCPrKuQLK+5RcLqmyR30b3zt2AqPZhsW8+as7jWH/beWkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bIJUQCEB; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=m21pJK8N8N5PvJIwrFX9onB1z1dgnClsHNhf3f4F9oXds2LqJmPQC1DunErU3Kyaep9ny/oSpzSFdf38CGZIoZjP97f/SDgXB4Mj4NEfssVAMnbtixK24R/iJJ5z1/MhnvSTKUyG0Iz5DSKxDh0Ct2cYFlHqbRR4J8M8dDCWAuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sqrigPUg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bIJUQCEB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50556C16AAE;
-	Tue, 20 Jan 2026 17:55:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sqrigPUg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87471C16AAE;
+	Tue, 20 Jan 2026 17:58:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768931753;
-	bh=YdlHdpPvefXlQJs8q/aV3FbVwI7IGilgSt53A6aDmkI=;
+	s=k20201202; t=1768931934;
+	bh=Y9cZ7orhjjaxMihveN4lhxry2uDDss/+iMQKy1Nem28=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bIJUQCEBJCzX0meiRg0BArNr0wQH/PkDIgcKRlqN5FVUgdbGXbScY/M2Kl6t7xJkI
-	 FM3SOHLxeuNjfGuWw/93uJPDyqOS2xHIx0sZ94KvnpWmzlF3GrECyt+KM3kpnG9Nym
-	 n454XfYhRhtcJ2YaFbDCfvmvdSws0NqUZjO3XsD1ap0vB9i27jGIyir4cY61vAho3Z
-	 oiN+n92s81id5kCK4C7qt3jj0eGgstHImWAKUnJPj6FovBZF9Tj/j2jw2i70aojtMK
-	 P1FIWPyBkjgWTzwDWkzHa3T1ZeIFNdYxtY+A3NzxcSMRqXQfYJkiknp57mI+GktcoX
-	 +aVmU9QohPv6A==
-Date: Tue, 20 Jan 2026 10:55:48 -0700
+	b=sqrigPUgLp8CHIqvTB6si1zueozeU91+N/v9yWs4bY62qtFStLd53MjtG++o8a+s2
+	 Y/PFetqqq+kdWgw2TOBB3Ark2XGfAx8lIxZT3Win+m5i9IkRWA7Nmv3+hr0x0TtI8V
+	 GMqEyau6VYSSM/PYtVBat8h6sfJvLwPs7cRK710WYVD/xUBS32nmX5Q/V7QbbygWgA
+	 Mrcn4zD1hRBa9o3/D/YaduSNS9rukKrLc4PvCYMJB6ZSYEDZyPQ7zUNNBYeCJd6GgR
+	 4/4CRV3HqLkWCm/3Wcx4DkYxYNuOpDmBOT12se5HV6lOVjjllJO+cQf5sAWjVxrthb
+	 TkBvw2tXhLkVA==
+Date: Tue, 20 Jan 2026 10:58:49 -0700
 From: Nathan Chancellor <nathan@kernel.org>
 To: Guillaume Tucker <gtucker@gtucker.io>
 Cc: Miguel Ojeda <ojeda@kernel.org>, David Gow <davidgow@google.com>,
@@ -34,12 +34,13 @@ Cc: Miguel Ojeda <ojeda@kernel.org>, David Gow <davidgow@google.com>,
 	Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org,
 	rust-for-linux@vger.kernel.org, linux-kbuild@vger.kernel.org,
 	automated-testing@lists.yoctoproject.org, workflows@vger.kernel.org,
-	llvm@lists.linux.dev
+	llvm@lists.linux.dev, Nicolas Schier <nsc@kernel.org>
 Subject: Re: [PATCH v3 0/2] scripts: introduce containerized builds
-Message-ID: <20260120175548.GA2749368@ax162>
+Message-ID: <20260120175849.GB2749368@ax162>
 References: <cover.1767199119.git.gtucker@gtucker.io>
  <20260119213516.GA1051134@ax162>
- <4d4ec41f-1203-4cef-8f49-402440f3e983@gtucker.io>
+ <20260119214931.GA1058062@ax162>
+ <1766d2ae-1224-4d3e-bc9f-786702989a79@gtucker.io>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -48,31 +49,18 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4d4ec41f-1203-4cef-8f49-402440f3e983@gtucker.io>
+In-Reply-To: <1766d2ae-1224-4d3e-bc9f-786702989a79@gtucker.io>
 
-On Tue, Jan 20, 2026 at 10:46:15AM +0100, Guillaume Tucker wrote:
-> Well the tuxmake LLVM image is mentioned in the first example:
-> 
->     scripts/container -i tuxmake/korg-clang -- make LLVM=1 defconfig
->     scripts/container -i tuxmake/korg-clang -- make LLVM=1 -j$(nproc)
-> 
-> So that should just work out of the box.  Or did you mean to add
-> something else to the docs?
+On Tue, Jan 20, 2026 at 10:56:46AM +0100, Guillaume Tucker wrote:
+> Not at all, on the contrary I have some dedicated time and long-term
+> interest to keep maintaining this.  Please feel free to add me or I
+> can send an extra patch if you'd rather I did it.
 
-I was just envisioning a blurb like "Additionally, TuxMake has prebuilt
-containers for various architectures: https://hub.docker.com/u/tuxmake"
-or something like that at the end of the paragraph before "To build just
-``bzImage`` using Clang::" in the documentation.
+I can fold that into the two changes in a natural way.
 
-> But yes, the topic of available container images will be something to
-> expand upon once the tool starts getting used.  If things go well
-> with this initial version then we can try and move forward with
-> hosting first-party images as per the other discussion thread:
-> 
->     https://lore.kernel.org/all/cc737636-2a43-4a97-975e-4725733f7ee4@gtucker.io/
+> OK sounds good.  And sorry, get_maintainer.pl didn't mention Nicolas.
+> I should have checked the KERNEL BUILD entry by hand in the file...
 
-Yeah hopefully usage of this tool will spur some movement on that
-discussion thread.
-
-Cheers,
-Nathan
+No worries, I am sure there are quite a few scripts that we technically
+own but do not have an entry for it in MAINTAINERS. This won't be a
+problem going forward at least :)
