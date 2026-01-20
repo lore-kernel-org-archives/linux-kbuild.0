@@ -1,108 +1,125 @@
-Received: from mail-24416.protonmail.ch (mail-24416.protonmail.ch [109.224.244.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 806F844B661
-	for <linux-kbuild@vger.kernel.org>; Tue, 20 Jan 2026 14:41:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8529C44BC89
+	for <linux-kbuild@vger.kernel.org>; Tue, 20 Jan 2026 15:28:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768920096; cv=none; b=MdG/RzJ6QhW50hcNGGyHtvFrAMGkjvvl7EK5OGA1uDFUqk/5cme24Z0u/9UrHyEpzHzDFZVdKJYi+DjKeCwJ/argXOICo6HhizYNcCt+G4emXzCido3O8ttWO1GvO3tXgrzuqQg+e3oU6StIKSnzwHlK+LauTSOorL/rdvsgX2M=
+	t=1768922922; cv=none; b=m3U6OvQR4YQWLVs3OVrUGINIVFQ/v8kSr3f/qsMbNo26LhX7K2UZHbfyTqTA1dxGsjlNCSnJ7Myx8qxMKKe/4CG4YAAROfGNsZ5fE3B7NtdSJGAtql+sUZBzYsoohBKwr4a5dQirFAuA97+5xyHnd99JRNrZhkVXTr8n8US/O5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768920096; c=relaxed/simple;
-	bh=mpaAioP9xru6B/CFoG7LGoQcykHVJkLIzdsXpgUjdj8=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=F1/lPZYqwbJtaYm7KoC9vh+X5K30+hy146jKXDB3ZhgDlDXNe/fWBdL7SLY0ztExRGxKQCZPMsSu5SGoEcFVjTfZI8ExAr2uTjA8kljKXUe3CGfzGS1zxfMqNg12U24stvYJcmUlaeeAQz445y4EHtpwQ9ZVmPCZoCmVHJrfL/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me; spf=pass smtp.mailfrom=pm.me; dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b=PmYwNYnj; arc=none smtp.client-ip=109.224.244.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pm.me
+	s=arc-20240116; t=1768922922; c=relaxed/simple;
+	bh=N1p2eB8cizghq/v2wz0MGbnVNRrBVHwcukqm9lffkkw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HTtUpOuCulmeZSt3Sx6ULoOb+WcgX2OkVJoZKzHdrVW05DptKhPMUECtFYvFqgcUJrtMYiC0duURVtkQzr8qeUNV4ZUW/HU2fHOlGs04Q3b/OM6LcqIHT496zu4Jsu716aPG2qgUtwoBKBpTApQAwHvxcobrX1LOkYUfB+jud9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RfT2R8Do; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b="PmYwNYnj"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pm.me;
-	s=protonmail3; t=1768920090; x=1769179290;
-	bh=/QCjh1bIysDd4v5OZ14LNkObiBtwfe/ruaYSf4e0H0s=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=PmYwNYnjHnsEre5V0Q+WWJChYF2avoL+3kqOftMwwckzsmujMaXvqHZFV8Wy5wYUP
-	 mhtKCYS9nkhG3lZLKDxITWaJjl9TNA0fZFlD52WHxuUGkzdfth5H2GiPdUFNIYo1+6
-	 fTFX4oxnh5gtQCcSyf6OSnWQiA8kA8X9B/PeydnyXtB7QczE3435d2KhzMMATCWudh
-	 dWv8Gc6g2PLzaXEaMerEHuUaj2nGiN/ziE4b1SxNDcu+zk3VpKqI4a8sTQyVtnExHD
-	 jLVudsAXXBiu4fGPAx8oOj37AcI1MjyWQEsTBdNq+PR/VqNiq+HztXJBCPIQMbEnpx
-	 mbFW/BVWDxAOg==
-Date: Tue, 20 Jan 2026 14:41:25 +0000
-To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, Andrey Ryabinin <ryabinin.a.a@gmail.com>, Alexander Potapenko <glider@google.com>, Andrey Konovalov <andreyknvl@gmail.com>, Dmitry Vyukov <dvyukov@google.com>, Vincenzo Frascino <vincenzo.frascino@arm.com>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>
-From: Maciej Wieczor-Retman <m.wieczorretman@pm.me>
-Cc: m.wieczorretman@pm.me, Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, linux-kbuild@vger.kernel.org, kasan-dev@googlegroups.com, linux-kernel@vger.kernel.org, llvm@lists.linux.dev
-Subject: [PATCH v9 03/13] kasan: Fix inline mode for x86 tag-based mode
-Message-ID: <afb50f5db054f807b57f33f591fc43d79862e9a2.1768845098.git.m.wieczorretman@pm.me>
-In-Reply-To: <cover.1768845098.git.m.wieczorretman@pm.me>
-References: <cover.1768845098.git.m.wieczorretman@pm.me>
-Feedback-ID: 164464600:user:proton
-X-Pm-Message-ID: a28f2f4e8684592b68d763d58d259d63cccf2fce
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RfT2R8Do"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63563C2BC9E
+	for <linux-kbuild@vger.kernel.org>; Tue, 20 Jan 2026 15:28:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768922922;
+	bh=N1p2eB8cizghq/v2wz0MGbnVNRrBVHwcukqm9lffkkw=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=RfT2R8DoRDuGQkPCQJoPMx7lBL9QRfBIZM+PWyCFQ4P4YcLiS8OY4bY319pVLbiBo
+	 ogKC1Fz0jHoeSNd0HPA20PIvEJwoLbkC0vRKJw6KUyJ7d6hyXP4JQfXI9xOuztFOJ+
+	 C1m1H1JHcIUYwqMAXAM77uqa400Av8yDYc/qa+aTjaWsQgq1OMk6oIDEVhyZxqU2tu
+	 WcRxb7QBIwwa6jnbbTMfNdK9RoPK8P7uwoGzN/GrbunvGUa/bGeHi6fDiSsi/gXYgr
+	 VrXY5XVyx8eUuD+q5IpZ2NXf/uLNBZuRz/wwoJ2Z64wr7VuT81H6E/T0ifI1y776DF
+	 qG7dt1JGCDUwg==
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-383153e06d6so45536291fa.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 20 Jan 2026 07:28:42 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVkZJSfQsUl+eJEKFRCf4/ucTAfmV/qWA+gz+fDfHPk9MBKaRuwP08/X/53PV4kJFkY15bGGRbeuKFVZHM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWrFBEEMOmWsJnEjfeonyeHnNF+iPmvDSpxp5R9mmeF47dE89l
+	/XSa9WCRTLXgDRa9BCaWa5ZChcGN5mHLvV/NhUXStwxjJxTfu5hjMe4+s6VXQubPCrK83xTreP7
+	hVPzcKPuT2bo15HglXRGeP1QSF2Q53YE=
+X-Received: by 2002:a2e:b8cf:0:b0:383:1832:958a with SMTP id
+ 38308e7fff4ca-385a54b99bcmr9040841fa.44.1768922921008; Tue, 20 Jan 2026
+ 07:28:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20260120-ra-fix-v1-0-829e4e92818c@nvidia.com> <20260120-ra-fix-v1-1-829e4e92818c@nvidia.com>
+In-Reply-To: <20260120-ra-fix-v1-1-829e4e92818c@nvidia.com>
+From: Tamir Duberstein <tamird@kernel.org>
+Date: Tue, 20 Jan 2026 10:28:04 -0500
+X-Gmail-Original-Message-ID: <CAJ-ks9nhmTbGS0aeFkFnHLB=u_3g6A2qgpFhZu6E4oXrhP9U2A@mail.gmail.com>
+X-Gm-Features: AZwV_QhP_Ddj7lJs7tPk_tmydh7MIhX7Xt7MWWNNm2655zo1xcWwH_Gkb-SmWfU
+Message-ID: <CAJ-ks9nhmTbGS0aeFkFnHLB=u_3g6A2qgpFhZu6E4oXrhP9U2A@mail.gmail.com>
+Subject: Re: [PATCH 1/6] scripts: generate_rust_analyzer: rename cfg to generated_cfg
+To: Eliot Courtney <ecourtney@nvidia.com>
+Cc: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-From: Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>
+On Tue, Jan 20, 2026 at 3:54=E2=80=AFAM Eliot Courtney <ecourtney@nvidia.co=
+m> wrote:
+>
+> This variable is for the cfg from generated files. It's also easy to
+> confuse with the `cfg` parameter in append_crate(), so rename it.
+>
+> Signed-off-by: Eliot Courtney <ecourtney@nvidia.com>
 
-The LLVM compiler uses hwasan-instrument-with-calls parameter to setup
-inline or outline mode in tag-based KASAN. If zeroed, it means the
-instrumentation implementation will be pasted into each relevant
-location along with KASAN related constants during compilation. If set
-to one all function instrumentation will be done with function calls
-instead.
+I have the same change sitting around locally.
 
-The default hwasan-instrument-with-calls value for the x86 architecture
-in the compiler is "1", which is not true for other architectures.
-Because of this, enabling inline mode in software tag-based KASAN
-doesn't work on x86 as the kernel script doesn't zero out the parameter
-and always sets up the outline mode.
-
-Explicitly zero out hwasan-instrument-with-calls when enabling inline
-mode in tag-based KASAN.
-
-Signed-off-by: Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>
-Reviewed-by: Andrey Konovalov <andreyknvl@gmail.com>
-Reviewed-by: Alexander Potapenko <glider@google.com>
-Reviewed-by: Andrey Ryabinin <ryabinin.a.a@gmail.com>
----
-Changelog v9:
-- Add Andrey Ryabinin's Reviewed-by tag.
-
-Changelog v7:
-- Add Alexander's Reviewed-by tag.
-
-Changelog v6:
-- Add Andrey's Reviewed-by tag.
-
-Changelog v3:
-- Add this patch to the series.
-
- scripts/Makefile.kasan | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/scripts/Makefile.kasan b/scripts/Makefile.kasan
-index 0ba2aac3b8dc..e485814df3e9 100644
---- a/scripts/Makefile.kasan
-+++ b/scripts/Makefile.kasan
-@@ -76,8 +76,11 @@ CFLAGS_KASAN :=3D -fsanitize=3Dkernel-hwaddress
- RUSTFLAGS_KASAN :=3D -Zsanitizer=3Dkernel-hwaddress \
- =09=09   -Zsanitizer-recover=3Dkernel-hwaddress
-=20
-+# LLVM sets hwasan-instrument-with-calls to 1 on x86 by default. Set it to=
- 0
-+# when inline mode is enabled.
- ifdef CONFIG_KASAN_INLINE
- =09kasan_params +=3D hwasan-mapping-offset=3D$(KASAN_SHADOW_OFFSET)
-+=09kasan_params +=3D hwasan-instrument-with-calls=3D0
- else
- =09kasan_params +=3D hwasan-instrument-with-calls=3D1
- endif
---=20
-2.52.0
+Reviewed-by: Tamir Duberstein <tamird@kernel.org>
 
 
+> ---
+>  scripts/generate_rust_analyzer.py | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/scripts/generate_rust_analyzer.py b/scripts/generate_rust_an=
+alyzer.py
+> index 3b645da90092..c188d1f1fd5b 100755
+> --- a/scripts/generate_rust_analyzer.py
+> +++ b/scripts/generate_rust_analyzer.py
+> @@ -21,12 +21,12 @@ def args_crates_cfgs(cfgs):
+>
+>  def generate_crates(srctree, objtree, sysroot_src, external_src, cfgs, c=
+ore_edition):
+>      # Generate the configuration list.
+> -    cfg =3D []
+> +    generated_cfg =3D []
+>      with open(objtree / "include" / "generated" / "rustc_cfg") as fd:
+>          for line in fd:
+>              line =3D line.replace("--cfg=3D", "")
+>              line =3D line.replace("\n", "")
+> -            cfg.append(line)
+> +            generated_cfg.append(line)
+>
+>      # Now fill the crates list -- dependencies need to come first.
+>      #
+> @@ -173,7 +173,7 @@ def generate_crates(srctree, objtree, sysroot_src, ex=
+ternal_src, cfgs, core_edit
+>              display_name,
+>              srctree / "rust"/ display_name / "lib.rs",
+>              deps,
+> -            cfg=3Dcfg,
+> +            cfg=3Dgenerated_cfg,
+>          )
+>          crates[-1]["env"]["OBJTREE"] =3D str(objtree.resolve(True))
+>          crates[-1]["source"] =3D {
+> @@ -215,7 +215,7 @@ def generate_crates(srctree, objtree, sysroot_src, ex=
+ternal_src, cfgs, core_edit
+>                  name,
+>                  path,
+>                  ["core", "kernel"],
+> -                cfg=3Dcfg,
+> +                cfg=3Dgenerated_cfg,
+>              )
+>
+>      return crates
+>
+> --
+> 2.52.0
+>
+>
