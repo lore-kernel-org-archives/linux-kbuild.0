@@ -1,95 +1,92 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1917D32AAAD;
-	Tue, 20 Jan 2026 15:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06396312808;
+	Tue, 20 Jan 2026 16:10:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768923630; cv=none; b=k/xVnOME7CQVutrk2j9FW8Q2DTJohbbOhNWWTkNIDd+ZCBx349cKZ6nU+6wA4yMcoQvQdY3R6JJ0iv0IV9sW5udYkBqPfvlh9AVE6QD2zF5FEQI1axwQBFN5/CzhEGjo7FyC1QJOJcVZmUlG9Q5po9Dp6Gx6OkTGQxQN+w2ltc0=
+	t=1768925423; cv=none; b=qRC7JqX5qSGGnnRX/7cSbGchItIPGkSuroXoMcaADv+Ji3Rdc8rfZyH2SWAtONU0j4Fyv2wTeq3ynDs3i6mf4bwtU4Xgqcwx+UmbcyHUyRjLEUGP45wBf1hEc5+SD+q6CMa+6LyxSi/j4tPqpczGmCU3dBg02Z3xjv9WzVlkgzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768923630; c=relaxed/simple;
-	bh=zxaIXAseCVtYxMGgJS4o/87RKOfQi+T0x5kRdSr4SyQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OnFSHI6rjdZZbSBRAFJRCFWQzYNmZTCyzANqBiyE1OiMXXkINUgAPqQr0tcpZEB/yC7mfWjbmBvLkYPtButN3L+X7A8tJ26ELC1Hc0orStyXLkvYIVVgZ+AcMX0ZJsHN9t+XGn2W/0dUNt2HOPEp4UD7kuFN9NVt2LCK3mpv3Jo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=wCXTqLLZ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768925423; c=relaxed/simple;
+	bh=YUl+LhnCdonRpYGTMZ92bm3y+7z3+HXBMWV6TQ5ziSo=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Kn4gsf4+LIZUQEakCNSLvZMbWz/6r7SBj0/xhsO46h4WkO+zZ8LdJVAeSOchQvfN11+g1VQTuWZI3er0rhQIGokjbWoRzqVsGudAB5bABxXxf8BFITyHSPSIRESdEy+Zdbi2GlncEfSue3BfFXXCsnKtMv3A+jCf6iKxeU00N8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pXQWIyip; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="wCXTqLLZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29D82C16AAE;
-	Tue, 20 Jan 2026 15:40:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1768923629;
-	bh=zxaIXAseCVtYxMGgJS4o/87RKOfQi+T0x5kRdSr4SyQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=wCXTqLLZW+vHa/WJXSKH0JwDjY8ekiS//lP70u2wrP0vWlhvT33pYomDKIkaUTAMW
-	 zWUKhUUGIFv2iKWnkr5kwfgfqnTERibQ3Gqb/7RDbGu7ppb5Ek45d+dQvcj1luBLiD
-	 SUwWeiqIoyjODNzYhH5LIVTrN2wJ4/faE+1sIQnY=
-Date: Tue, 20 Jan 2026 16:40:09 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Luis Augenstein <luis.augenstein@tngtech.com>
-Cc: nathan@kernel.org, nsc@kernel.org, linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org, akpm@linux-foundation.org,
-	maximilian.huber@tngtech.com
-Subject: Re: [PATCH v2 00/14] Add SPDX SBOM generation tool
-Message-ID: <2026012035-entail-peddling-7b33@gregkh>
-References: <20260120115352.10910-1-luis.augenstein@tngtech.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pXQWIyip"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4495FC19422;
+	Tue, 20 Jan 2026 16:10:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768925421;
+	bh=YUl+LhnCdonRpYGTMZ92bm3y+7z3+HXBMWV6TQ5ziSo=;
+	h=From:Subject:Date:To:Cc:From;
+	b=pXQWIyipA5MW+2t2f/1VFbvHKqq1c2rW9JSPlgesNHHGnr/WZMjXqs38PYxr8xnVQ
+	 E8YGDU5zJER1bt6wr7Lb4/aVxhlxXkbeT10AFNo4b6rLJc5jXJGY2vFIzMcGdZXVU1
+	 nVkS83g0A8Hg8upRou7fwRaS2rRLzITq/nawVVU5ya9m57GqAj2ks2FRa3nhprTvlx
+	 u8AdIOpAnne3Syl7cm+zssxqMdkPU2V8XK8+bNlcnjDY4NQzW4YPQWkH5Ph6gGBCLd
+	 EZgO1n7GyD4rUWBVLB983nzCMR1V7jBIVurgX1FXZj/kL194BSR53anfOgDPM7gNqx
+	 22OEIazqsw3sg==
+From: Tamir Duberstein <tamird@kernel.org>
+Subject: [PATCH v2 0/2] rust: reduce duplicate information
+Date: Tue, 20 Jan 2026 11:10:09 -0500
+Message-Id: <20260120-rust-analyzer-pin-init-duplication-v2-0-a1c76f0d3bef@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260120115352.10910-1-luis.augenstein@tngtech.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/5WPTQ6CQAyFr0JmbQ3TyE9ceQ/DYoQKVTJgZyAi4
+ e4O4AVcfsnr+15n5UiYnDpHsxIa2XFnA+AhUmVjbE3AVWCFMaax1inI4DwYa9rpQwI9W2DLHqq
+ hb7k0PpyDQaziBFFnmVahqBe683uTXIud3XB7UOnX5jXRsPOdTNuKUa+5v4SjBg0J5UmZ5HgyM
+ V6eJJbaYye1KpZdKfQawnv+t2NZvuNb/Av8AAAA
+X-Change-ID: 20260116-rust-analyzer-pin-init-duplication-a22d05221771
+To: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun.feng@gmail.com>, 
+ Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+ Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+ Danilo Krummrich <dakr@kernel.org>, Jesung Yang <y.j3ms.n@gmail.com>
+Cc: rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+ Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, 
+ Tamir Duberstein <tamird@kernel.org>
+X-Mailer: b4 0.15-dev
+X-Developer-Signature: v=1; a=openssh-sha256; t=1768925419; l=979;
+ i=tamird@kernel.org; h=from:subject:message-id;
+ bh=YUl+LhnCdonRpYGTMZ92bm3y+7z3+HXBMWV6TQ5ziSo=;
+ b=U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgtYz36g7iDMSkY5K7Ab51ksGX7hJgs
+ MRt+XVZTrIzMVIAAAAGcGF0YXR0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5AAAA
+ QI1Ye+BSFkCY13+1/3wETPj/YKCMAD9lTdwd7uWuOC+j2NhFtcyxYI4mZ9wwnbW2kYgiKOcBlM/
+ YAt39LelotAI=
+X-Developer-Key: i=tamird@kernel.org; a=openssh;
+ fpr=SHA256:264rPmnnrb+ERkS7DDS3tuwqcJss/zevJRzoylqMsbc
 
-On Tue, Jan 20, 2026 at 12:53:38PM +0100, Luis Augenstein wrote:
-> This patch series introduces a Python-based tool for generating SBOM
-> documents in the SPDX 3.0.1 format for kernel builds.
-> 
-> A Software Bill of Materials (SBOM) describes the individual components
-> of a software product. For the kernel, the goal is to describe the
-> distributable build outputs (typically the kernel image and modules),
-> the source files involved in producing these outputs, and the build
-> process that connects the source and output files.
-> 
-> To achieve this, the SBOM tool generates three SPDX documents:
-> 
-> - sbom-output.spdx.json
->   Describes the final build outputs together with high-level
->   build metadata.
-> 
-> - sbom-source.spdx.json
->   Describes all source files involved in the build, including
->   licensing information and additional file metadata.
-> 
-> - sbom-build.spdx.json
->   Describes the entire build process, linking source files
->   from the source SBOM to output files in the output SBOM.
-> 
-> The sbom tool is optional and runs only when CONFIG_SBOM is enabled. It
-> is invoked after the build, once all output artifacts have been
-> generated. Starting from the kernel image and modules as root nodes,
-> the tool reconstructs the dependency graph up to the original source
-> files. Build dependencies are primarily derived from the .cmd files
-> generated by Kbuild, which record the full command used to build
-> each output file.
-> 
-> Currently, the tool only supports x86 and arm64 architectures.
-> 
-> Co-developed-by: Maximilian Huber <maximilian.huber@tngtech.com>
-> Signed-off-by: Maximilian Huber <maximilian.huber@tngtech.com>
-> Signed-off-by: Luis Augenstein <luis.augenstein@tngtech.com>
-> ---
-> Changes in v2:
-> - regenerate sbom documents when build configuration changes
+This series reuses `rust/Makefile`'s knowledge of `pin_init` and
+`pin_init_internal`'s `cfg`s in `scripts/generate_rust_analzyer.py` and
+reduces the ceremony needed to use that knowledge in the script.
 
-I'm still getting:
+Signed-off-by: Tamir Duberstein <tamird@kernel.org>
+---
+Changes in v2:
+- Split into two patches. (Miguel Ojeda)
+- CC kbuild. (Miguel Ojeda)
+- Link to v1: https://patch.msgid.link/20260116-rust-analyzer-pin-init-duplication-v1-1-5e85c5824a02@kernel.org
 
-	make[3]: Nothing to be done for 'sbom'.
+---
+Tamir Duberstein (2):
+      rust: kbuild: extract configs for reuse
+      scripts: generate_rust_analyzer.py: reduce cfg plumbing
 
-When rebuilding the kernel and nothing needs to be done for the sbom.
-That message should not be there, right?
+ rust/Makefile                     | 32 +++++++++++++++++++++++---------
+ scripts/generate_rust_analyzer.py | 13 +++++--------
+ 2 files changed, 28 insertions(+), 17 deletions(-)
+---
+base-commit: 24d479d26b25bce5faea3ddd9fa8f3a6c3129ea7
+change-id: 20260116-rust-analyzer-pin-init-duplication-a22d05221771
 
-thanks,
+Best regards,
+--  
+Tamir Duberstein <tamird@kernel.org>
 
-greg k-h
