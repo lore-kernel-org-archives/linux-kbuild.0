@@ -1,98 +1,120 @@
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3509F3A7F46;
-	Wed, 21 Jan 2026 10:14:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D44344CF22
+	for <linux-kbuild@vger.kernel.org>; Wed, 21 Jan 2026 10:58:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768990447; cv=none; b=j4kcb7eQj8VW2PYbqBL1OdFKrdFJuTBjzzzl11oc64+DX1urm09mROAu5pZxtomGZKLuIhNlBV7q0mtysHcnAKTf/H84BTQ08uj0l9FfTYFHCVxRXGC3dLK6IY096Pxv4Sx3X4ia7cqgL/Hq0hW0d6Zb/QvrLQIDzng1bYR3tzo=
+	t=1768993100; cv=none; b=GO3Sav7aBjUDRAbVzMHfH1LM+NIckfHBnkDQ0mHQ5lCnQLWYozRpE8GCJu/MvXyyv9AxwStUw2YBtHZWium1thAjIs6CpPxIn2zLVbk93BBgm5TvSVY1VboEiBEnNwn4wZYlNuAGzKAyQpDmMuOzlI4IX+si5Dyl4y4MfL5H8tE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768990447; c=relaxed/simple;
-	bh=pwh6f5VzaTK/a8Hxv/pzd+4XEZHCMvMiYB2JKPP4yXc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
-	 In-Reply-To:Content-Type; b=ueWsUXw6pc0gDwi4jAnvzidKx36foy2Ck/NMJ/os19EH0PrD04tkiQotFFqSADE/9sHyq2gA72dqaAwk5cQ40cVffUPBZYExk6/+G4g576NbjuNSXaujX8V/fRhVVuJyex7JLAfe/LZwGL+XlUQZiS8E7Oieplbdy9LTsGbPR8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io; spf=pass smtp.mailfrom=gtucker.io; dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b=jI/xZ/wz; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gtucker.io
+	s=arc-20240116; t=1768993100; c=relaxed/simple;
+	bh=+wk2OERHJcEIXCIoAHMUEQZtY7ZrHGtsxmhHSA5wVHU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PqxwJeX7uU3fKAv69/63egEvJX+ZwY+sFhapTpkHvngBDI6+XmPGcW16ywTo/YesMbSH21/zyoypXlvAZ2/8CHSMVvZRiKIVlP6E5x9hRAlXggZxeP8s7HWgulMZERARClKrY0j63sclUAECeVwdfYnf0hmMS5k7ovCl4k43IE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=woo91ueD; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=wE4POGjt; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=woo91ueD; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=wE4POGjt; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b="jI/xZ/wz"
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 10C09433D3;
-	Wed, 21 Jan 2026 10:13:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gtucker.io; s=gm1;
-	t=1768990437;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XSdVek+3nur9iWZzpy6Ip/w5pyhwEVGS8pZ2EUOfZJk=;
-	b=jI/xZ/wzkd3D4gjdSbPX12TmGCEtrWikuLQ0bTDQhy5VWAYUlBL6wXTrwhpApdq6IS17hq
-	UfVnLkazYlCeNB6G0/yh9sVKu54HVlxP8zOzl7Tzp8MfTrpuLzl7F8OEU/SFZWZSPnQr17
-	6kxfZkFC2IXJdpNxSsgrv78aBWlhftU1hvim/PAMofKdTtFTSrOjwU9PTuB1+Go8hJKQDD
-	Z7cHpPKn1qHt9B0V8mADlFgrE1omJ8daq8z/+XTW+Ygj19dIZjlOJrNADIkL9NB8kO2yWq
-	ILAuFthHqtElzNuNibFLaw9wPMhc2fAU2JhsUb4aCKbKNEUUSlOIhYNeoUauUQ==
-Message-ID: <d4020305-fc95-446f-b73c-5f0be68529c9@gtucker.io>
-Date: Wed, 21 Jan 2026 11:13:54 +0100
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="woo91ueD";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="wE4POGjt";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="woo91ueD";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="wE4POGjt"
+Received: from kitsune.suse.cz (unknown [10.100.12.127])
+	by smtp-out1.suse.de (Postfix) with ESMTP id 8D7B833694;
+	Wed, 21 Jan 2026 10:58:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1768993096; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=2gcYP/t5vvPuhymGiOtUEwwcFXhJPLA/oGTfjrYWk78=;
+	b=woo91ueDBpAiC/TA1/wjauv4XZ0ezUQqof2hs1F9e72WJJdcX9Q/c0KtCT/MvfOP1tIkLo
+	204Jg5k9sai2KSOqD/0kLyfUIyhXS/dNEcMA5xvFVL6FaDsaj1YwnKAN8xqrolpD0kPIAL
+	qtiRR6MZd7zEp65lW9oq3WjAdp3R70I=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1768993096;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=2gcYP/t5vvPuhymGiOtUEwwcFXhJPLA/oGTfjrYWk78=;
+	b=wE4POGjt57HC7F7UbF00UQ6KMjbHOVBjIfaT5BRRcCb8qaecjO0TzFHznUV2j8vPy+LqlP
+	obKoLK5khb4DVBCQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1768993096; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=2gcYP/t5vvPuhymGiOtUEwwcFXhJPLA/oGTfjrYWk78=;
+	b=woo91ueDBpAiC/TA1/wjauv4XZ0ezUQqof2hs1F9e72WJJdcX9Q/c0KtCT/MvfOP1tIkLo
+	204Jg5k9sai2KSOqD/0kLyfUIyhXS/dNEcMA5xvFVL6FaDsaj1YwnKAN8xqrolpD0kPIAL
+	qtiRR6MZd7zEp65lW9oq3WjAdp3R70I=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1768993096;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=2gcYP/t5vvPuhymGiOtUEwwcFXhJPLA/oGTfjrYWk78=;
+	b=wE4POGjt57HC7F7UbF00UQ6KMjbHOVBjIfaT5BRRcCb8qaecjO0TzFHznUV2j8vPy+LqlP
+	obKoLK5khb4DVBCQ==
+From: Michal Suchanek <msuchanek@suse.de>
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Suchanek <msuchanek@suse.de>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>,
+	Rob Clark <robin.clark@oss.qualcomm.com>,
+	Dmitry Baryshkov <lumag@kernel.org>,
+	Abhinav Kumar <quic_abhinavk@quicinc.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] kbuild: dummy-tools: Add python3
+Date: Wed, 21 Jan 2026 11:57:57 +0100
+Message-ID: <20260121105801.1827-1-msuchanek@suse.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 0/2] scripts: introduce containerized builds
-To: Nathan Chancellor <nathan@kernel.org>, Miguel Ojeda <ojeda@kernel.org>,
- David Gow <davidgow@google.com>, =?UTF-8?Q?Onur_=C3=96zkan?=
- <work@onurozkan.dev>, Nicolas Schier <nsc@kernel.org>
-References: <cover.1767199119.git.gtucker@gtucker.io>
- <aW-JJ5DT-LRSZkdF@derry.ads.avm.de>
-Content-Language: en-US
-From: Guillaume Tucker <gtucker@gtucker.io>
-Cc: Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org,
- rust-for-linux@vger.kernel.org, linux-kbuild@vger.kernel.org,
- automated-testing@lists.yoctoproject.org, workflows@vger.kernel.org,
- llvm@lists.linux.dev
-In-Reply-To: <aW-JJ5DT-LRSZkdF@derry.ads.avm.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: gtucker@gtucker.io
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddugeeftdduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkffggfgfuvfhfhfevjggtgfesthejredttddvjeenucfhrhhomhepifhuihhllhgruhhmvgcuvfhutghkvghruceoghhtuhgtkhgvrhesghhtuhgtkhgvrhdrihhoqeenucggtffrrghtthgvrhhnpefhleeiueelhedtveefheegiedvheevieetvddtgedvjeeljeegffehfeehveevleenucfkphepudejiedrudekkedrudejgedrudegudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedujeeirddukeekrddujeegrddugedupdhhvghloheplgduledvrdduieekrdduleekrdeigegnpdhmrghilhhfrhhomhepghhtuhgtkhgvrhesghhtuhgtkhgvrhdrihhopdhqihgupedutdevtdelgeeffefffedpmhhouggvpehsmhhtphhouhhtpdhnsggprhgtphhtthhopeduvddprhgtphhtthhopehnrghthhgrnheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepohhjvggurgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhhiughgohifsehgohhoghhlvgdrtghomhdprhgtphhtthhopeifohhrkhesohhnuhhrohiikhgrnhdruggvvhdprhgtphhtthhopehnshgtsehkvghrnhgvlhdro
- hhrghdprhgtphhtthhopegrrhhnugesrghrnhgusgdruggv
-X-GND-State: clean
+Content-Transfer-Encoding: 8bit
+X-Spam-Score: -2.80
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-0.982];
+	MIME_GOOD(-0.10)[text/plain];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	ARC_NA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_EQ_ENVFROM(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_COUNT_ZERO(0.00)[0];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email]
+X-Spam-Level: 
+X-Spam-Flag: NO
 
-Hi Nicolas,
+DRM_MSM_VALIDATE_XML depends on a python feature. Add a dummy python
+interpreter to make it possible to configure this option with dummy
+tools.
 
-On 20/01/2026 2:54 pm, Nicolas Schier wrote:
-> Out-of-source builds do not work on my system with podman.  If this is
-> expected, I think it would be great to mention that somewhere in the
-> documentation.
+Fixes: b587f413ca47 ("drm/msm/gen_header: allow skipping the validation")
+Signed-off-by: Michal Suchanek <msuchanek@suse.de>
+---
+ scripts/dummy-tools/python3 | 5 +++++
+ 1 file changed, 5 insertions(+)
+ create mode 100755 scripts/dummy-tools/python3
 
-Yes, as discussed with Nathan.  So here's the list of potential
-improvements gathered so far:
-
-* automatically pick Podman first, Docker second
-* explicitly mention docker.io registry in examples
-* mention TuxMake available images more explicitly in the docs
-* mention that out-of-tree builds aren't supported yet
-* distinguish true Docker from Docker-compatible Podman
-* add support for out-of-tree output build directory
-* add option for mounting source tree from arbitrary path
-   (needed for nested containers e.g. Docker-in-Docker)
-* detect when Docker has namespace support enabled and document
-* add user config file with default images and runtime etc.
-
-Then beyond that we could consider other container runtimes such as
-containerd, lxc, runc or whatever works in practice.
-
-> Nevertheless, thanks a lot!  I expect me to use that a lot in the
-> future!
-> 
-> For the whole patch set:
-> Tested-by: Nicolas Schier<nsc@kernel.org>
-> Acked-by: Nicolas Schier<nsc@kernel.org>
-
-Thank you!  Let's hope others will find it useful too.
-
-Cheers,
-Guillaume
+diff --git a/scripts/dummy-tools/python3 b/scripts/dummy-tools/python3
+new file mode 100755
+index 000000000000..1f3ac6541dd3
+--- /dev/null
++++ b/scripts/dummy-tools/python3
+@@ -0,0 +1,5 @@
++#!/bin/sh
++# SPDX-License-Identifier: GPL-2.0-only
++#
++
++true
+-- 
+2.51.0
 
