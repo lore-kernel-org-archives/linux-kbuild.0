@@ -1,79 +1,84 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 851D53624BE;
-	Wed, 21 Jan 2026 20:40:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 434D3213E9C;
+	Wed, 21 Jan 2026 21:05:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769028008; cv=none; b=kgbWwdWGCDAO7HeN1ySbOplhg4pqPdppUxdDQQimmljRq5pbo6JAZw0XXYnkZd13cSrViOVdlD3uRbHrA63exWN/7/CTloZr6ibodXQHbV3avMj9KyY9fS86bHqHkuZC/V/1ewCwyJJja64J80+LqzuCncGABvw3i3w/XmK9oUQ=
+	t=1769029553; cv=none; b=OabAl+Uo7Lea60KFfcOiZD6rvve5swBQw8CpAhM87ZfAMegoT5g1V6OHGWVyvz7+Lbci+C9PojUjk25iDo14xm6aF677Iy6NVnZM6MgMb9CrEU8qkwYrvxVJ3T3jOR4LMzKq7K2VD1yJ185m0XcfAwUiCAXsM3KN3Zp2D64LBxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769028008; c=relaxed/simple;
-	bh=gFJeBAg88zKE/u3gxrcj75Gml0nWNwcyyn9j3HnasaY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hyBW/kuh9pLHH4N3HBRNECM/2KluepSMDIYwiWCnnreUnNxIuOFgmPYubYjKx5vdMGVFftdaxRapS1Mwkjf7gKDuvAwdDzS+k88vrwpzqEgYaYxDjZGA7IpHW8EAYTrrN9l8O1xpA6uPc70H+2gBu17MSos4FOvHNhXb1tZ5EIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ToW32xAE; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1769029553; c=relaxed/simple;
+	bh=gg/sA0JHc6uueGjq+c5x5YlAceVPBMD+jAVHIE4qbSQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i6wHFoiOe86uYNudAqA+UQdSkZ4rTehN/zlFdmPj2fAgryrBPPdFxLlpVCnSYhpaCi1SAghPhLYkw24LApD95ObHOLne8ZLIHNOyaeVj9kQy9sTF4tLeAvRYU123N7pR2H1m7OKju2QGiDvCoZfTS0+aCRAhz39jh6uQgVPHKZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=toMgk0UL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ToW32xAE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD7FEC19425;
-	Wed, 21 Jan 2026 20:40:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="toMgk0UL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E195C4CEF1;
+	Wed, 21 Jan 2026 21:05:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769028007;
-	bh=gFJeBAg88zKE/u3gxrcj75Gml0nWNwcyyn9j3HnasaY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ToW32xAERcK6fHuvB1xv8/Oz5vmGKiDNzXEGPRj0jteeD7uYUkVf2va8HiW0K3YMJ
-	 xheKphHXKEtuzO9Difbdm8TZHIIwV7X2XEHziXPWEzrdn0n3QsI+LuRvXuY3D1SaWO
-	 a7SCjVmrCxkUmQwDkTpZ//bwyy5w+N5OA+p0WIOmEkEo+ItAWYYkCtDyC1iYpGJoEV
-	 REvCGMrH1m+5FgkJnx8GSwEKgbY7YOT3xfTboqxXsZV1sdKqUX6jNVC2XpekQWUnZC
-	 EyDS8xMA7FHZ9uSdng/lWEVtEH2q3ca70wV5xCwZR3NBMRn8rebmaE/NfYzNzeEsf1
-	 1UbG2Ro8+2C/g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 11B173808200;
-	Wed, 21 Jan 2026 20:40:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1769029552;
+	bh=gg/sA0JHc6uueGjq+c5x5YlAceVPBMD+jAVHIE4qbSQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=toMgk0UL6yQnPW3rB5A54LgWPcGmvG37hBrJSwfu3OCjElg7hP4BRJlNW08gGThP+
+	 jsaeyAsJmqdo3Y7VYWt2l5gBIBtrCJI/lqskLn0Zkh/ACQ3B/xi8CyDD0TkRfaDQGL
+	 TS3kKDlfZKZkKdWLWrFPZ0BLGssUYbRrvsccYwxvZ/AgMw+J7XD/ZBaLwKK8GNsBru
+	 J7cQQjCogu8Kgs9dYrrUXVjQxyFM+8GCEHcuEOmKNsvaLgyMQ80p0hlIiHCKHjrGcE
+	 6K8qQ/vnZxoyUKTf+yfFSHjXyO/onZm0U+k7jFgphhCJJmACSibxqc2p370shl4lrG
+	 54RUijhKS2aog==
+Date: Wed, 21 Jan 2026 22:05:04 +0100
+From: Nicolas Schier <nsc@kernel.org>
+To: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>
+Cc: Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>, linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
+	WangYuli <wangyuli@aosc.io>
+Subject: Re: [PATCH v2] kbuild: Reject unexpected values for LLVM=
+Message-ID: <aXE_gOfh9NwQcc8X@levanger>
+Mail-Followup-To: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>, linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
+	WangYuli <wangyuli@aosc.io>
+References: <20260121-kbuild-llvm-arg-v2-1-5e4d8dca4ad8@weissschuh.net>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next v1] scripts/gen-btf.sh: Use CONFIG_SHELL for
- execution
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176902800486.1439450.8530354445006332824.git-patchwork-notify@kernel.org>
-Date: Wed, 21 Jan 2026 20:40:04 +0000
-References: <20260121181617.820300-1-ihor.solodrai@linux.dev>
-In-Reply-To: <20260121181617.820300-1-ihor.solodrai@linux.dev>
-To: Ihor Solodrai <ihor.solodrai@linux.dev>
-Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- martin.lau@linux.dev, gary@garyguo.net, linux@weissschuh.net,
- nathan@kernel.org, nsc@kernel.org, bpf@vger.kernel.org,
- linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20260121-kbuild-llvm-arg-v2-1-5e4d8dca4ad8@weissschuh.net>
 
-Hello:
-
-This patch was applied to bpf/bpf-next.git (master)
-by Alexei Starovoitov <ast@kernel.org>:
-
-On Wed, 21 Jan 2026 10:16:17 -0800 you wrote:
-> According to the docs [1], kernel build scripts should be executed via
-> CONFIG_SHELL, which is sh by default.
+On Wed, Jan 21, 2026 at 02:42:39PM +0100, Thomas Weiﬂschuh wrote:
+> The LLVM argument is documented to accept one of three forms:
+> * a literal '1' to use the default 'clang',
+> * a toolchain prefix path, ending in a trailing '/',
+> * a version suffix.
 > 
-> Fixup gen-btf.sh to be runnable with sh, and use CONFIG_SHELL at every
-> invocation site.
+> All other values are silently treated as '1'. If for example
+> the user accidentally forgets the trailing '/' of a toolchain prefix,
+> kbuild will unexpectedly and silently fall back to the system toolchain.
 > 
-> See relevant discussion for context [2].
+> Instead report an error if the user specified an invalid value for LLVM.
 > 
-> [...]
+> Signed-off-by: Thomas Weiﬂschuh <linux@weissschuh.net>
+> ---
+> Changes in v2:
+> - Add pointer to the documentation.
+> - Link to v1: https://patch.msgid.link/20260112-kbuild-llvm-arg-v1-1-8e9bbdae996f@weissschuh.net
+> ---
+>  Makefile | 2 ++
+>  1 file changed, 2 insertions(+)
 
-Here is the summary with links:
-  - [bpf-next,v1] scripts/gen-btf.sh: Use CONFIG_SHELL for execution
-    https://git.kernel.org/bpf/bpf-next/c/26ad5d6e7630
+Reviewed-by: Nicolas Schier <nsc@kernel.org>
+Tested-by: Nicolas Schier <nsc@kernel.org>
 
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Nicolas
