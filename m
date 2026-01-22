@@ -1,103 +1,74 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E76047AF60;
-	Thu, 22 Jan 2026 06:35:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D74D3112DC;
+	Thu, 22 Jan 2026 07:20:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769063746; cv=none; b=uCZ4Pp5FsrJBGJMJ2h3o7/9MqWzPBLPjx710x25hM4WjAi+iDKSog1e/sgfIY4mx+WGguHb8kBhCzINL5OMjCWxoj32eYqb2sCqtUdYh1WHx9ehY4sofr0ZEXspwU8YADnTck8h7qVWIJ5RDfKFjf/OIW10KgNgkOUGS5JpJGI8=
+	t=1769066448; cv=none; b=swpUTnJH9pRPIhr+63cwcIU5KHrXsLP67h9wu1Hly1js/kwUyawqoHIPwz/e5nquESi77+FP13hJew39czzHOq7fhYjBt/LWf7DHzVnYxs3nh2uzAabt3rZtaZdHzUEpmEPZA7FobHtanUTH/A+hQ901HEt+0Bm4oUqttSJsxlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769063746; c=relaxed/simple;
-	bh=xbZV7r8uApzB1QtIO0wVqTBTa0EGZM2dlP4CZ+E8lew=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lYHwLIbBOKXv/k+EdPOqAyBfBPl8iiyuXm+vFmcBmTgBnD31UkFj+5bBsoZ/YiDNEsQSeS/ouyY60Bf+mPVbyftmA/zwbMOvYFwMF/+ozcRP14gKSUxA9JsTeORMd2f2ZjASg9Oe7OltADgICrHeIPgNMKWQ6phHi3ew1dl3LD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=O4tUdnFA; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="O4tUdnFA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47C5DC116C6;
-	Thu, 22 Jan 2026 06:35:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1769063745;
-	bh=xbZV7r8uApzB1QtIO0wVqTBTa0EGZM2dlP4CZ+E8lew=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=O4tUdnFA2Iv+C/l4IxYXQbIsTZLG/dzfAnOHY5WsDX0uQHhq5NvYozAM1KR73ljS1
-	 AgR0L/YQQUnPrXjMGzlhtQtNU2qcbEkdyzhTa3tqVN7BFCJJkApUyMmwvS54zhHUlx
-	 DQKO8nsz96WV/wGAJoomnQIoDtkm0xhRatMfHSHc=
-Date: Thu, 22 Jan 2026 07:35:42 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Luis Augenstein <luis.augenstein@tngtech.com>, nathan@kernel.org,
-	nsc@kernel.org, linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org, akpm@linux-foundation.org,
-	maximilian.huber@tngtech.com
-Subject: Re: [PATCH v2 00/14] Add SPDX SBOM generation tool
-Message-ID: <2026012214-magician-mashed-c84c@gregkh>
-References: <20260120115352.10910-1-luis.augenstein@tngtech.com>
- <CANiq72mtWhjVNNYc6nvxuQ3XAnMWBDiZyOvJ1BNN=M+097Wvpw@mail.gmail.com>
+	s=arc-20240116; t=1769066448; c=relaxed/simple;
+	bh=BZa0pFuhqQ8/F1bvIjyzdNRxP12JDQ3DvEVXmqCLjn0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aco792GO+LiaUUQDVR4yXBho28qwQJZoMSjZiDylPuNRQN0XA5RCBboAGLKhdkZqNjZybrOY3jSSvc+8whpiOxZv+dmSPfOLt5Ecd3YzlIeAUmKV4aYhCQ++zX1uV87jM0uBGAetMb43dmuVLs3qcIjT5lw03hqr6qjusaWAf9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn; spf=pass smtp.mailfrom=isrc.iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=isrc.iscas.ac.cn
+Received: from [192.168.1.209] (unknown [27.19.208.156])
+	by APP-01 (Coremail) with SMTP id qwCowAD3nWmmz3Fp3arABQ--.13364S2;
+	Thu, 22 Jan 2026 15:20:08 +0800 (CST)
+Message-ID: <1b0943c4-b1c5-460a-8944-c8d9c868b085@isrc.iscas.ac.cn>
+Date: Thu, 22 Jan 2026 15:20:06 +0800
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANiq72mtWhjVNNYc6nvxuQ3XAnMWBDiZyOvJ1BNN=M+097Wvpw@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 0/4] RISC-V: re-enable gcc + rust builds
+To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
+ Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
+ Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?=
+ <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>,
+ Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
+ Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>,
+ Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+ Jonathan Corbet <corbet@lwn.net>, Conor Dooley <conor@kernel.org>,
+ Mingcong Bai <jeffbai@aosc.io>, Han Gao <rabenda.cn@gmail.com>,
+ Vivian Wang <wangruikang@iscas.ac.cn>, Jason Montleon <jmontleo@redhat.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, llvm@lists.linux.dev,
+ linux-riscv@lists.infradead.org, linux-doc@vger.kernel.org
+References: <20251230-gcc-rust-v5-v6-0-2ac86ba728c8@isrc.iscas.ac.cn>
+Content-Language: en-US
+From: Asuna Yang <xinrui.riscv@isrc.iscas.ac.cn>
+In-Reply-To: <20251230-gcc-rust-v5-v6-0-2ac86ba728c8@isrc.iscas.ac.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:qwCowAD3nWmmz3Fp3arABQ--.13364S2
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUY67k0a2IF6F4UM7kC6x804xWl14x267AK
+	xVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGw
+	A2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26r1j
+	6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j6F4UM28EF7xvwVC2z280aVAFwI0_Jr
+	0_Gr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r4j6r4UJwAS0I0E0xvYzxvE52x082IY62kv
+	0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z2
+	80aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF
+	7I0E8cxan2IY04v7MxAIw28IcxkI7VAKI48JMxAqzxv26xkF7I0En4kS14v26r4a6rW5Mx
+	C20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAF
+	wI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20x
+	vE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v2
+	0xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxV
+	W8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8FD73UUUUU==
+X-CM-SenderInfo: x0lq233loux21fy6x21ufox2xfdvhtffof0/
 
-On Thu, Jan 22, 2026 at 07:18:18AM +0100, Miguel Ojeda wrote:
-> On Wed, Jan 21, 2026 at 6:55 AM Luis Augenstein
-> <luis.augenstein@tngtech.com> wrote:
-> >
-> > The sbom tool is optional and runs only when CONFIG_SBOM is enabled. It
-> > is invoked after the build, once all output artifacts have been
-> > generated. Starting from the kernel image and modules as root nodes,
-> > the tool reconstructs the dependency graph up to the original source
-> > files. Build dependencies are primarily derived from the .cmd files
-> > generated by Kbuild, which record the full command used to build
-> > each output file.
-> >
-> > Currently, the tool only supports x86 and arm64 architectures.
-> 
-> I am out of the loop, and I don't know the requirements here, but what
-> kind of approaches were considered for this?
+Gently ping. I think this patch is ready for review. Is there anything 
+else I need to do before merging?
 
-Lots of different attempts, usually using bpf and other run-time tracing
-tools.  But it was determined that we already have this info in our
-build dependancy files, so parsing them was picked.
+Best regards,
+Asuna Yang
 
-> Parsing the `.cmd`s seems a bit ad-hoc / after-the-fact approach, and
-> from a very cursory look at the patches, it seems to require a fair
-> amount of hardcoding, e.g. it seems we may need to list every
-> generator tool in `SINGLE_COMMAND_PARSERS`?
-
-If you know of a better way, that would be great!
-
-> Now, if this is meant to be best-effort and cover the most important
-> parts, it may be fine -- again, I don't know the requirements here.
-> But if it is meant to accurately match everything, then it will
-> require keeping those lists in sync with Kbuild, right?
-
-It should match everything, and yes, it will require keeping things in
-sync.
-
-> Hmm... I feel like changing the build system itself (whether at the
-> Kbuild level or even a customized Make itself if needed) to record
-> this information would be conceptually simpler / more elegant, even if
-> changing Kbuild itself can sometimes be quite a challenge.
-
-Changing kbuild would be great too, if you know of a way we can get that
-info out of it.
-
-> In addition, why does this need to be a `CONFIG_` option? Should this
-> be a separate tool or at most a target that supports whatever config
-> happens to be, rather than part of the config itself?
-
-It should be part of the kernel build process, and generated as part of
-it as it will want to go into some packages directly.  Having to run the
-build "again" is probably not a good idea (i.e. do you want to modify
-all the distro rpm scripts?)
-
-thanks,
-
-greg k-h
