@@ -1,94 +1,156 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from omta036.useast.a.cloudfilter.net (omta036.useast.a.cloudfilter.net [44.202.169.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 780E83DB757
-	for <linux-kbuild@vger.kernel.org>; Thu, 22 Jan 2026 23:27:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71358354AC8
+	for <linux-kbuild@vger.kernel.org>; Fri, 23 Jan 2026 01:51:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.202.169.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769124452; cv=none; b=oW5O3APbNlSdB467fgpX/eNQBqgPQ6d4EXTujOEFrumHsj5p6dS3flTAlMhRx9DBdErm7dA58RfAqQ8DUqhUOflZgwRSKHMrv36xvmMcNor4khAjTPPM9GWMlEj6KGWPY8tJ9GFEOfQgdeAfnJoq/3qXDSGnz0iRJW6eP4o58mA=
+	t=1769133112; cv=none; b=KSBC631QBYbv9Zuju0yokXwLty0PucgHYE7nbKDmyKHta1xzJxayYpUuU1TFT+KmPVp55OH9bJ2bVqgkmayJg9cn5c2Yq50zZU6p0IH9+SgLKp2ZRI6K5Rm2EMQPnR8gQPAbjRveoqcQ7HQgZePT6bLhjYvwbQwCYQYY+dEEh98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769124452; c=relaxed/simple;
-	bh=pEuQYhNfzcrqZS1sMzYI5aKtp9TjL+4Pg78eNcIsJM4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=YQHqiRxgrSVzVIWjpbvT0ox15OczEm3nfCMeitG8OXGnYZMBmU0eujxU9OQDN83zznlK1HfN6mVqREczpluftaI54n8QlpPvNDhgvRhlEo5FPW53i3q9Y8Yq7a/sCNt8k4E4zqba0WNYvitxssJKsSow4i0QB1Wb1HF310i+MeY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AgK2pGk1; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1769133112; c=relaxed/simple;
+	bh=IHIRZQBV+MSz5TKSASRY7/rL51uwa24mm1X4kAX3LnI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nmN3bhigK5YXfK6+mJvVJiE9YusNU0NEb7vOvRH5xarCkQlR3mlNadgcD1fP8O6j2yQc93p+jottO05sNg6T1q/079z7CFzERMEfOsCLoSSn8HBvGO1dcfVtOC43zxHTGQpO2miXzLjSRco5TMc0GS5ipJOmdNWIJeq6SQnKqVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=X54yplUW; arc=none smtp.client-ip=44.202.169.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AgK2pGk1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66559C116D0;
-	Thu, 22 Jan 2026 23:27:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769124450;
-	bh=pEuQYhNfzcrqZS1sMzYI5aKtp9TjL+4Pg78eNcIsJM4=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=AgK2pGk17ytzkNE1U7e7iW2wrz3nrFqeyzmM7Lbqd6pqHWSnGFMdzgtdNsEJ6Yacd
-	 p54UY56878bNJj5lTdaiTEK3v3Uhql+ObStzPTokvbs/5rrp/S6BjYJZ9FMx4jVghj
-	 /iB3GPDCt9x/PWv157P0Vw24e3iNPOS+LCYwWywjyfxnV9khj8564c0UsPym23e/mh
-	 OTOjbWiSDGPYCojeSEwgV9oDt4IVDAWOoTqhwM8wMpf28gtQbbwI6SaY+yDqO4R5Gi
-	 SVdqDNaa+uigtOlQ8muLshE1t0dlrSO8T+ZQgyjDjqJPq1j4TqOwpwntWG96VdxMyX
-	 OVJIiqHpPo+sw==
-From: Nathan Chancellor <nathan@kernel.org>
-Date: Thu, 22 Jan 2026 16:27:22 -0700
-Subject: [PATCH 2/3] scripts/container: Use list comprehension in
- get_names()
+	dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="X54yplUW"
+Received: from eig-obgw-6002b.ext.cloudfilter.net ([10.0.30.203])
+	by cmsmtp with ESMTPS
+	id iqYJvNInFKXDJj6KivxeDX; Fri, 23 Jan 2026 01:51:32 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id j6KhvUXh9PL32j6KhvKW4Z; Fri, 23 Jan 2026 01:51:31 +0000
+X-Authority-Analysis: v=2.4 cv=MqhS63ae c=1 sm=1 tr=0 ts=6972d423
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=aEbNOhhS7pL/zVeD3/sqyA==:17
+ a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10 a=7T7KSl7uo7wA:10 a=JfrnYn6hAAAA:8
+ a=_Wotqz80AAAA:8 a=c-n4J4-pAAAA:8 a=Z4Rwk6OoAAAA:8 a=NZ-89VFvAAAA:8
+ a=cm27Pg_UAAAA:8 a=VwQbUJbxAAAA:8 a=bvmN90g0j_jcDvpIWCMA:9 a=3ZKOabzyN94A:10
+ a=QEXdDO2ut3YA:10 a=1CNFftbPRP8L7MoqJWF3:22 a=buJP51TR1BpY-zbLSsyS:22
+ a=HkZW87K1Qel5hWWM3VKY:22 a=pm31WBKQz9GEXVZSZ1ft:22 a=2aFnImwKRvkU0tJ3nQRT:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Yb9luBccEYiQGqzgpuHlJ8IynzFPfzDts1Pibsw47oU=; b=X54yplUWPudXWzZQ06Td5F5KQm
+	TIYrNHoFizga2EJpHIUET5cdiDoFSo8Cvp1h4qf/VISk6Jy752OMWPfLI9ZIfyPOg/zuVcppIHYIU
+	9UmDvBeQVtGjNk/Iv6JPLGP6UsXaXryKyFVaCUKbzSgfQQyeigDAj9biktIYZ1CZ0YVHrYEYFeExS
+	AQ4Dq1UxgPek2eyaThS+jlbOLoPR55Fog4K2mU+j9DwRJYfh0mX1KE5NOWGeCc6AYuD2TcxDWmhsX
+	pk5Vf7i+0FRTdvRhvpU4O0bhY+xj3nj4yQpbq13PbKLsaijnjtCJz3RajsSyxsctryOo6HE5Ubs8m
+	2WtYHWrA==;
+Received: from m014013038128.v4.enabler.ne.jp ([14.13.38.128]:37038 helo=[10.79.109.44])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.99.1)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1vj6Kh-00000004Mjq-0Kee;
+	Thu, 22 Jan 2026 19:51:31 -0600
+Message-ID: <2cad92e2-3d21-46cc-b419-8df3226b3b58@embeddedor.com>
+Date: Fri, 23 Jan 2026 10:51:14 +0900
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260122-scripts-container-ruff-fixes-v1-2-fd1b928c3f10@kernel.org>
-References: <20260122-scripts-container-ruff-fixes-v1-0-fd1b928c3f10@kernel.org>
-In-Reply-To: <20260122-scripts-container-ruff-fixes-v1-0-fd1b928c3f10@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
- Guillaume Tucker <gtucker@gtucker.io>
-Cc: linux-kbuild@vger.kernel.org
-X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1104; i=nathan@kernel.org;
- h=from:subject:message-id; bh=pEuQYhNfzcrqZS1sMzYI5aKtp9TjL+4Pg78eNcIsJM4=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDJlFm+Lk066wHjqjIbpPoVfuTtfuxcp7G1Zq1PV2iEz5v
- Yn7pkBbRykLgxgXg6yYIkv1Y9XjhoZzzjLeODUJZg4rE8gQBi5OAZiIz12Gf+ZhxZeZJqzNnVMy
- 7znjf/ZQ70VdXjbz+FMUOTkPtGb/fcHwVy5Febf9nBUqnYJpX8KlxJy3H20Mvye30XpK2ZzMlMP
- T2AE=
-X-Developer-Key: i=nathan@kernel.org; a=openpgp;
- fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Makefile: Globally enable fall-through warning
+To: Simone Rea <hheh47660@gmail.com>, Randy Dunlap <rdunlap@infradead.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+ Masahiro Yamada <yamada.masahiro@socionext.com>,
+ Michal Marek <michal.lkml@markovi.net>, Kees Cook <keescook@chromium.org>,
+ linux-kbuild@vger.kernel.org
+References: <20260122155401.335643-1-hheh47660@gmail.com>
+ <ad197140-3781-4098-9a73-4d9f49356409@infradead.org>
+ <20260122104430.257b5d9f86275b37faed4757@linux-foundation.org>
+ <0f9f7ccf-8318-4d46-990f-4917b434ac81@infradead.org>
+ <CAEfWggNK7DgsRHXTE8BhWCTuDKyt6pMR_9UEHEs1NKPfPPyopw@mail.gmail.com>
+Content-Language: en-US
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <CAEfWggNK7DgsRHXTE8BhWCTuDKyt6pMR_9UEHEs1NKPfPPyopw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 14.13.38.128
+X-Source-L: No
+X-Exim-ID: 1vj6Kh-00000004Mjq-0Kee
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: m014013038128.v4.enabler.ne.jp ([10.79.109.44]) [14.13.38.128]:37038
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 1
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfHCBuOXafNwhoZaAvnND0Q9BSLTRxXA76usSFp/EZ7ozAT4A6RALgVNYbaA0WdqdHMXZJYBRljHn8czDSU7QZjeofxRNwshz5LFgMpp39ElxJtMMSJhA
+ 6grIm2Nn8WNLcH7IdA0eOazE7j7RMadfzLgmGX9KfXyX9v17M/QJODsLDUYyyhbJWv5G87Rl8Eias1BmRZWO9OWUjPuLo9xPnMwVNMLFPZypvkz1TxPWe66K
 
-'ruff check --select C4 scripts/container' warns:
 
-  C400 Unnecessary generator (rewrite as a list comprehension)
-     --> scripts/container:113:16
-      |
-  111 |     def get_names(cls):
-  112 |         """Get a list of all the runtime names"""
-  113 |         return list(runtime.name for runtime in cls.runtimes)
-      |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  114 |
-  115 |     @classmethod
-      |
-  help: Rewrite as a list comprehension
 
-Do as it suggests.
+On 1/23/26 03:48, Simone Rea wrote:
+> Guys I’m so sorry 🙏🙏🙏 I don’t know what I did, i’m justinf following a
+> tutorial…
 
-Signed-off-by: Nathan Chancellor <nathan@kernel.org>
----
- scripts/container | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This is the second time someone submit this same patch by mistake.
 
-diff --git a/scripts/container b/scripts/container
-index dae475c6d262..5afaad762492 100755
---- a/scripts/container
-+++ b/scripts/container
-@@ -110,7 +110,7 @@ class Runtimes:
-     @classmethod
-     def get_names(cls):
-         """Get a list of all the runtime names"""
--        return list(runtime.name for runtime in cls.runtimes)
-+        return [runtime.name for runtime in cls.runtimes]
- 
-     @classmethod
-     def get(cls, name):
+I'm curious about that tutorial. Can you please share with us a link to it?
 
--- 
-2.52.0
+Who's the author?
+
+Are you paying for it?
+
+Thanks
+-Gustavo
+
+> 
+> Il giorno gio 22 gen 2026 alle 19:46 Randy Dunlap <rdunlap@infradead.org>
+> ha scritto:
+> 
+>>
+>>
+>> On 1/22/26 10:44 AM, Andrew Morton wrote:
+>>> On Thu, 22 Jan 2026 10:19:56 -0800 Randy Dunlap <rdunlap@infradead.org>
+>> wrote:
+>>>
+>>>> On 1/22/26 7:53 AM, Simone Rea wrote:
+>>>>> From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+>>>>>
+>>>>> Now that all the fall-through warnings have been addressed in the
+>>>>> kernel, enable the fall-through warning globally.
+>>>>>
+>>>>> Also, update the deprecated.rst file to include implicit fall-through
+>>>>> as 'deprecated' so people can be pointed to a single location for
+>>>>> justification.
+>>>>>
+>>>>> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+>>>>> Cc: Andrew Morton <akpm@linux-foundation.org>
+>>>>> Cc: Michal Marek <michal.lkml@markovi.net>
+>>>>> Cc: Kees Cook <keescook@chromium.org>
+>>>>> Cc: linux-kbuild@vger.kernel.org
+>>>>> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+>>>>
+>>>> This is missing your Signed-off-by: line. See
+>>>> Documentation/process/submitting-patches.rst for info.
+>>>>
+>>>> Also you should copy the current KBUILD maintainers.
+>>>> See the MAINTAINERS file.
+>>>
+>>> This went into mainline in 2019 :) I suspect Gustavo had a slight IT
+>>> problem.
+>>
+>> I think Simone did.
+>>
+>> --
+>> ~Randy
+>>
+>>
+> 
 
