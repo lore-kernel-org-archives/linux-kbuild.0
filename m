@@ -1,206 +1,111 @@
-Received: from mailgw01.zimbra-vnc.de (mailgw01.zimbra-vnc.de [148.251.101.236])
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8FE026C3B0;
-	Mon, 26 Jan 2026 19:44:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.101.236
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCD822777EA;
+	Mon, 26 Jan 2026 21:36:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769456690; cv=none; b=k/oCZan3bZOaYTDljOQ2Mfd6GO1reOcOnWaPMCO5bZgOAIvMEd4IcWC1AHrXGgJlY6YHo1wo8/AtqGmmzuamz9QcOaSQLbkGf3ABjlP0UgDm47h/7Oyq0BZ7813izfzy3TiF6tH4Samb5PeKpDYMXCv1X7HLtb0Yc9U2E/cILwY=
+	t=1769463381; cv=none; b=nDHjsjv2RNvPWvCFX1VjdAU2PrezOZ3FCBaLqxKAJp4xd1r88BY+/g8z06Z+aP3pH5SZ62xzFyoXJYg5ZVk0P3Vkk5p8+p1mvVRlVLJLy66kn/wiXWBhcPxHn/bOFw3jgIerL5e9d8H4idOzNFOydKXNj6j8ZC6HuR1QH/eEuq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769456690; c=relaxed/simple;
-	bh=jfshPB0npxntwMtm0kNp0LwkUiIA29PhOAASS4SsJzE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gEGMvBj0oVP7rkayVod4f/VhOgIj78+pUvsazExTMAZsnwakxZ4CxkqoVVbfJz2/PccVYWYva9JokhIlknRuEn1b6Uwc7klShiwjPtUriiMHtrEICOup/qbyqhRyR2cGflqrIu2Gbkm5Jk0lP8fi541rxl4+CVKGA5YZi0nqKuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com; spf=pass smtp.mailfrom=tngtech.com; dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b=AZx0DEkH; arc=none smtp.client-ip=148.251.101.236
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tngtech.com
+	s=arc-20240116; t=1769463381; c=relaxed/simple;
+	bh=0RodAB8oLx7+8GpYTVBTyvE4SVADV1YdcMRUy25UdUM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IpVQStJcjvkPiTl9I+u4znw56yrHjediztwr8JCSSKkV90g/Xjh4l2gT8Oe+BAEq4q+BPoLocrfGmvKLkQ09ZQWWAUe2mjEUbuVu6o98hGmY0xTvBhOZsTGwnqrJ6Q47qqOOZFnK/riaLibMnH6RQhHLldrrveXx8uCLWjuiQJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=J6iAAvmt; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b="AZx0DEkH"
-Received: from zmproxy.tng.vnc.biz (zimbra-vnc.tngtech.com [35.234.71.156])
-	by mailgw01.zimbra-vnc.de (Postfix) with ESMTPS id 02FA33FAE4;
-	Mon, 26 Jan 2026 20:35:01 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 722531F8839;
-	Mon, 26 Jan 2026 20:35:00 +0100 (CET)
-Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
- by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10032)
- with ESMTP id f_Ph9zKHO_FK; Mon, 26 Jan 2026 20:34:59 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 285ED1FA3D7;
-	Mon, 26 Jan 2026 20:34:59 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz 285ED1FA3D7
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tngtech.com;
-	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1769456099;
-	bh=klR+aQDNslY9CCiARddqXptyOhsLMjGUilJbVjEBqvs=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version;
-	b=AZx0DEkHHZG3bQs5XEH4i3JA1UpjcML7W/FVkWRXmWaUk8m+jkhhBLgiy7l9Lj2Hr
-	 +NSUOgXvKVpEYaF3fGimjiM2ej2uf2hFfml6Knz/fPjrl20dJzN2XrMUm5jZGoQSNn
-	 KLUe2X/7fJ7lSkSnk3C8Vaobm33gCPD7RPwMvlJyY/Gf7Uaj1OD/AajW5giBuXsE+9
-	 sOYXeyU3ieyFUHhtMOm2hYRiz1dRPcSLLLmZ3cu6ziXHaeVAKwnFpzycZeO3jF8WsM
-	 lHeqh1+onGXt1h0JymFu/X9FstbzhlOrAxbGrA0nfl/GOWPd53jrMjsP9S6F8F60kn
-	 37fN4fbvL0W3Q==
-X-Virus-Scanned: amavis at zmproxy.tng.vnc.biz
-Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
- by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10026)
- with ESMTP id lM86InXxINY6; Mon, 26 Jan 2026 20:34:59 +0100 (CET)
-Received: from DESKTOP-0O0JV6I.localdomain (ipservice-092-208-231-176.092.208.pools.vodafone-ip.de [92.208.231.176])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id BE18A1F8839;
-	Mon, 26 Jan 2026 20:34:58 +0100 (CET)
-From: Luis Augenstein <luis.augenstein@tngtech.com>
-To: nathan@kernel.org,
-	nsc@kernel.org
-Cc: linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	akpm@linux-foundation.org,
-	gregkh@linuxfoundation.org,
-	maximilian.huber@tngtech.com,
-	Luis Augenstein <luis.augenstein@tngtech.com>
-Subject: [PATCH v3 00/14] Add SPDX SBOM generation tool
-Date: Mon, 26 Jan 2026 20:32:50 +0100
-Message-Id: <20260126193304.320916-1-luis.augenstein@tngtech.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="J6iAAvmt"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=IDX9AjD0dwjrQefXov9k2MtCld60dtQxGUUAV2j1WjI=; b=J6iAAvmtrgFJs9ze2z/3mvNozn
+	PZeYeQkBMpOoy6bARHpR02WAfbtaa7iTf6HiFwZskZHm4oN6foztXD1WXqeuhwHMSXWyJAFJbhTD5
+	qQ1+R5XWwGM3j+QSkNI1Q+zMTANXKoioCJJ8PtGwpUGGIcze5nZNWEXu1YR5X4maU7pfNt0Anyji+
+	GXAcVEho74qSXcSeKj2Ko+V9+LTubj1o43do861nH82B/ld1Fn3lt07jwKJr3drbI6UK0q+LPwinM
+	WYBkEgblZCF12DZiFoTwjzgiGipNv2h33OJAsRML39oXnwDKn1Bq0tULsElknva+RF0gidO6QOh3u
+	4kZob4og==;
+Received: from 2001-1c00-8d85-5700-266e-96ff-fe07-7dcc.cable.dynamic.v6.ziggo.nl ([2001:1c00:8d85:5700:266e:96ff:fe07:7dcc] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vkUFZ-00000005tyU-07kL;
+	Mon, 26 Jan 2026 21:35:57 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 41718300756; Mon, 26 Jan 2026 22:35:56 +0100 (CET)
+Date: Mon, 26 Jan 2026 22:35:56 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Marco Elver <elver@google.com>, Boqun Feng <boqun.feng@gmail.com>,
+	Ingo Molnar <mingo@kernel.org>, Will Deacon <will@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+	Chris Li <sparse@chrisli.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Alexander Potapenko <glider@google.com>,
+	Arnd Bergmann <arnd@arndb.de>, Christoph Hellwig <hch@lst.de>,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Ian Rogers <irogers@google.com>, Jann Horn <jannh@google.com>,
+	Joel Fernandes <joelagnelf@nvidia.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
+	Kentaro Takeda <takedakn@nttdata.co.jp>,
+	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Thomas Gleixner <tglx@linutronix.de>, Thomas Graf <tgraf@suug.ch>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Waiman Long <longman@redhat.com>, kasan-dev@googlegroups.com,
+	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linux-security-module@vger.kernel.org,
+	linux-sparse@vger.kernel.org, linux-wireless@vger.kernel.org,
+	llvm@lists.linux.dev, rcu@vger.kernel.org
+Subject: Re: [PATCH v5 15/36] srcu: Support Clang's context analysis
+Message-ID: <20260126213556.GQ171111@noisy.programming.kicks-ass.net>
+References: <20251219154418.3592607-1-elver@google.com>
+ <20251219154418.3592607-16-elver@google.com>
+ <dd65bb7b-0dac-437a-a370-38efeb4737ba@acm.org>
+ <aXez9fSxdfu5-Boo@elver.google.com>
+ <8c1bbab4-4615-4518-b773-a006d1402b8b@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8c1bbab4-4615-4518-b773-a006d1402b8b@acm.org>
 
-This patch series introduces a Python-based tool for generating SBOM
-documents in the SPDX 3.0.1 format for kernel builds.
+On Mon, Jan 26, 2026 at 10:54:56AM -0800, Bart Van Assche wrote:
 
-A Software Bill of Materials (SBOM) describes the individual components
-of a software product. For the kernel, the goal is to describe the
-distributable build outputs (typically the kernel image and modules),
-the source files involved in producing these outputs, and the build
-process that connects the source and output files.
+> Has it ever been considered to add support in the clang compiler for a
+> variant of __must_hold() that expresses that one of two capabilities
+> must be held by the caller? I think that would remove the need to
+> annotate SRCU update-side code with __acquire_shared(ssp) and
+> __release_shared(ssp).
 
-To achieve this, the SBOM tool generates three SPDX documents:
+Right, I think I've asked for logical operators like that. Although I
+think it was in the __guarded_by() clause rather than the __must_hold().
+Both || and && would be nice to have ;-)
 
-- sbom-output.spdx.json
-  Describes the final build outputs together with high-level
-  build metadata.
+Specifically, I think I asked for something like:
 
-- sbom-source.spdx.json
-  Describes all source files involved in the build, including
-  licensing information and additional file metadata.
+        cpumask_t       cpus_allowed __guarded_by(pi_lock && rq->__lock)
+                                     __guarded_shared_by(pi_lock || rq->__lock);
 
-- sbom-build.spdx.json
-  Describes the entire build process, linking source files
-  from the source SBOM to output files in the output SBOM.
 
-The `make sbom` target allows the SBOM tool to be run after all build
-artifacts have been generated. Starting from the kernel image and
-kernel modules as root nodes, the tool reconstructs the build
-dependency graph up to the original source files. Build dependencies
-are primarily derived from the `.cmd` files generated by Kbuild, which
-record the full command used to build each output file.
-
-Currently, the tool only supports x86 and arm64 architectures.
-
-Co-developed-by: Maximilian Huber <maximilian.huber@tngtech.com>
-Signed-off-by: Maximilian Huber <maximilian.huber@tngtech.com>
-Signed-off-by: Luis Augenstein <luis.augenstein@tngtech.com>
----
-Changes in v3:
-- Suppress make message "Nothing to be done" if sbom does not need to be
-  regenerated
-- Remove CONFIG_SBOM. Instead, introduce dedicated `make sbom` target to
-  invoke the tool
----
-Luis Augenstein (14):
-  tools/sbom: integrate tool in make process
-  tools/sbom: setup sbom logging
-  tools/sbom: add command parsers
-  tools/sbom: add cmd graph generation
-  tools/sbom: add additional dependency sources for cmd graph
-  tools/sbom: add SPDX classes
-  tools/sbom: add JSON-LD serialization
-  tools/sbom: add shared SPDX elements
-  tools/sbom: collect file metadata
-  tools/sbom: add SPDX output graph
-  tools/sbom: add SPDX source graph
-  tools/sbom: add SPDX build graph
-  tools/sbom: add unit tests for command parsers
-  tools/sbom: add unit tests for SPDX-License-Identifier parsing
-
- .gitignore                                    |   1 +
- MAINTAINERS                                   |   6 +
- Makefile                                      |  15 +-
- tools/Makefile                                |   3 +-
- tools/sbom/Makefile                           |  43 ++
- tools/sbom/README                             | 207 ++++++
- tools/sbom/sbom.py                            | 129 ++++
- tools/sbom/sbom/__init__.py                   |   0
- tools/sbom/sbom/cmd_graph/__init__.py         |   7 +
- tools/sbom/sbom/cmd_graph/cmd_file.py         | 149 ++++
- tools/sbom/sbom/cmd_graph/cmd_graph.py        |  46 ++
- tools/sbom/sbom/cmd_graph/cmd_graph_node.py   | 142 ++++
- tools/sbom/sbom/cmd_graph/deps_parser.py      |  52 ++
- .../sbom/cmd_graph/hardcoded_dependencies.py  |  83 +++
- tools/sbom/sbom/cmd_graph/incbin_parser.py    |  42 ++
- tools/sbom/sbom/cmd_graph/savedcmd_parser.py  | 664 ++++++++++++++++++
- tools/sbom/sbom/config.py                     | 335 +++++++++
- tools/sbom/sbom/environment.py                | 164 +++++
- tools/sbom/sbom/path_utils.py                 |  11 +
- tools/sbom/sbom/sbom_logging.py               |  88 +++
- tools/sbom/sbom/spdx/__init__.py              |   7 +
- tools/sbom/sbom/spdx/build.py                 |  17 +
- tools/sbom/sbom/spdx/core.py                  | 182 +++++
- tools/sbom/sbom/spdx/serialization.py         |  56 ++
- tools/sbom/sbom/spdx/simplelicensing.py       |  20 +
- tools/sbom/sbom/spdx/software.py              |  71 ++
- tools/sbom/sbom/spdx/spdxId.py                |  36 +
- tools/sbom/sbom/spdx_graph/__init__.py        |   7 +
- .../sbom/sbom/spdx_graph/build_spdx_graphs.py |  82 +++
- tools/sbom/sbom/spdx_graph/kernel_file.py     | 310 ++++++++
- .../sbom/spdx_graph/shared_spdx_elements.py   |  32 +
- .../sbom/sbom/spdx_graph/spdx_build_graph.py  | 317 +++++++++
- .../sbom/sbom/spdx_graph/spdx_graph_model.py  |  36 +
- .../sbom/sbom/spdx_graph/spdx_output_graph.py | 188 +++++
- .../sbom/sbom/spdx_graph/spdx_source_graph.py | 126 ++++
- tools/sbom/tests/__init__.py                  |   0
- tools/sbom/tests/cmd_graph/__init__.py        |   0
- .../tests/cmd_graph/test_savedcmd_parser.py   | 383 ++++++++++
- tools/sbom/tests/spdx_graph/__init__.py       |   0
- .../sbom/tests/spdx_graph/test_kernel_file.py |  32 +
- 40 files changed, 4086 insertions(+), 3 deletions(-)
- create mode 100644 tools/sbom/Makefile
- create mode 100644 tools/sbom/README
- create mode 100644 tools/sbom/sbom.py
- create mode 100644 tools/sbom/sbom/__init__.py
- create mode 100644 tools/sbom/sbom/cmd_graph/__init__.py
- create mode 100644 tools/sbom/sbom/cmd_graph/cmd_file.py
- create mode 100644 tools/sbom/sbom/cmd_graph/cmd_graph.py
- create mode 100644 tools/sbom/sbom/cmd_graph/cmd_graph_node.py
- create mode 100644 tools/sbom/sbom/cmd_graph/deps_parser.py
- create mode 100644 tools/sbom/sbom/cmd_graph/hardcoded_dependencies.py
- create mode 100644 tools/sbom/sbom/cmd_graph/incbin_parser.py
- create mode 100644 tools/sbom/sbom/cmd_graph/savedcmd_parser.py
- create mode 100644 tools/sbom/sbom/config.py
- create mode 100644 tools/sbom/sbom/environment.py
- create mode 100644 tools/sbom/sbom/path_utils.py
- create mode 100644 tools/sbom/sbom/sbom_logging.py
- create mode 100644 tools/sbom/sbom/spdx/__init__.py
- create mode 100644 tools/sbom/sbom/spdx/build.py
- create mode 100644 tools/sbom/sbom/spdx/core.py
- create mode 100644 tools/sbom/sbom/spdx/serialization.py
- create mode 100644 tools/sbom/sbom/spdx/simplelicensing.py
- create mode 100644 tools/sbom/sbom/spdx/software.py
- create mode 100644 tools/sbom/sbom/spdx/spdxId.py
- create mode 100644 tools/sbom/sbom/spdx_graph/__init__.py
- create mode 100644 tools/sbom/sbom/spdx_graph/build_spdx_graphs.py
- create mode 100644 tools/sbom/sbom/spdx_graph/kernel_file.py
- create mode 100644 tools/sbom/sbom/spdx_graph/shared_spdx_elements.py
- create mode 100644 tools/sbom/sbom/spdx_graph/spdx_build_graph.py
- create mode 100644 tools/sbom/sbom/spdx_graph/spdx_graph_model.py
- create mode 100644 tools/sbom/sbom/spdx_graph/spdx_output_graph.py
- create mode 100644 tools/sbom/sbom/spdx_graph/spdx_source_graph.py
- create mode 100644 tools/sbom/tests/__init__.py
- create mode 100644 tools/sbom/tests/cmd_graph/__init__.py
- create mode 100644 tools/sbom/tests/cmd_graph/test_savedcmd_parser.py
- create mode 100644 tools/sbom/tests/spdx_graph/__init__.py
- create mode 100644 tools/sbom/tests/spdx_graph/test_kernel_file.py
-
---=20
-2.34.1
+I think Marco's suggestion was to use 'fake' locks to mimic those
+semantics.
