@@ -1,51 +1,51 @@
 Received: from mailgw01.zimbra-vnc.de (mailgw01.zimbra-vnc.de [148.251.101.236])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B945A285C9F;
-	Mon, 26 Jan 2026 19:35:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A7B7279DB4;
+	Mon, 26 Jan 2026 19:35:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.101.236
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769456138; cv=none; b=g+/MA5poSRGycNWJEQc475SYxCuQcVqB9KoDMyzyGz2JffGTgTWMfNv5TD/YTXjWmySwWtaZBEOHcuJgBNrJPLQ/BbvAOUZUNkfZRgkVpequw9ALVColmXyMVa6VN7wI1A5YBopoeTGANkqV6WXGkBQQCVXFuaJV0OJTIUDyY7s=
+	t=1769456138; cv=none; b=j1a8pS5LOcqorCF7unIzRDZW2tlHiMX5v8PfY3RE2k32aT+9CnNt5a+uJDTa5S6TLIVzsiB/iU3KPvr7SSYORdjDT+Oo+ZUp44I1H4cXrtz8J7zy3U1ZIu/tGUivYAW1NlznxgBbSwQ/sqHsde8Jx4wz+aJIBCZjAUqg9ntHZLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769456138; c=relaxed/simple;
-	bh=z6SyEuqZWISo2mKzCJ/Rs7e+ADbOnLnBKeF6iFIeX3g=;
+	bh=43IjMcgeRygQOUsk3eXgdsrwNkFJC4lZjRbyJSdH1f8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BDIJPhX+5dOrEsa8E75f+dLbX5AO7vwCHd5AYeGlZd7Je8QiyOzczc6YQGf3XCIqaYvxQqVLNXyzXclleZ7y0o/yTLj1lhQpTxGzZgDjoxvXFYW0t7I1lougtzMQjf1eYVO+CgEXiLvqLCgNP8GH9a2tbexGT8xOVFAuemldUXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com; spf=pass smtp.mailfrom=tngtech.com; dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b=VOYA7nhx; arc=none smtp.client-ip=148.251.101.236
+	 MIME-Version; b=DS82QG/mqU40HUODl+3yJPL972huRzgekV1pvEdF/snO526ytW90ivTHtkzdbdXDaujAutbBb66tJdp0I4iiRHn/ijxg57cG7YebT6HVMkmAPAvk/jDWNFwDd06M9+oy9378cVzsHyxfyaPg8UZ9zNq9w0KczeFyScFss/UNDbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com; spf=pass smtp.mailfrom=tngtech.com; dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b=I2H/Vwck; arc=none smtp.client-ip=148.251.101.236
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tngtech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b="VOYA7nhx"
+	dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b="I2H/Vwck"
 Received: from zmproxy.tng.vnc.biz (zimbra-vnc.tngtech.com [35.234.71.156])
-	by mailgw01.zimbra-vnc.de (Postfix) with ESMTPS id 753DF3FAF7;
-	Mon, 26 Jan 2026 20:35:28 +0100 (CET)
+	by mailgw01.zimbra-vnc.de (Postfix) with ESMTPS id 46DA43FAF1;
+	Mon, 26 Jan 2026 20:35:30 +0100 (CET)
 Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id E69AC1FA7AF;
-	Mon, 26 Jan 2026 20:35:27 +0100 (CET)
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 274CC1F8839;
+	Mon, 26 Jan 2026 20:35:28 +0100 (CET)
 Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
  by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10032)
- with ESMTP id kL7VvzdFRIXK; Mon, 26 Jan 2026 20:35:25 +0100 (CET)
+ with ESMTP id HxzUARiz2WLU; Mon, 26 Jan 2026 20:35:26 +0100 (CET)
 Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 5B7D11FA872;
-	Mon, 26 Jan 2026 20:35:24 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz 5B7D11FA872
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id C22161FA6D0;
+	Mon, 26 Jan 2026 20:35:26 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz C22161FA6D0
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tngtech.com;
-	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1769456124;
-	bh=Y6QJgTF9k8xayps7mJRuz8W1zUuK7Yii9up8GhJ78h8=;
+	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1769456126;
+	bh=U14Rf/iGMHZtXdPtnYpV+SUKdW39dNHsGWJZ6qEpyDc=;
 	h=From:To:Subject:Date:Message-Id:MIME-Version;
-	b=VOYA7nhx9ZoUdnSPVj7LcLx2Wr+DvZtLibJQKm19w+aJsDHAzA2mh4AuMASYyiMMN
-	 LFOAJWgZKZQVuF2rPAOsCgQFPwjdrNuNmG2YyqZWpIokOMZFmOHUQfhrRo0ZY9viDo
-	 Weu6UeJ7F9u+V4oHdJfX15REvXi9fhGU2a/88izQoGOQYUXQM9HH7sUM1a5J0IyGwT
-	 k7gxPz7lOof/88tcd5Ep1XFyXymJVVDa+ycGyB1kjVJJ2qUfKAagM2jc/Lf8WmSGmh
-	 B8pxr1MntlISgkeHEXvvBC7OWEmfQEjttPb79bP5YrY7LShalWMEyr/CwsVYPg7kEP
-	 Mdpjoo8wbV4lQ==
+	b=I2H/VwckyYi/qDoUukmR4SyiW94zcEWMuawpzVPkm6R/kz0hdjndcSLqnlTRQZZc3
+	 kr9m6/Yeu7DD/gFo5P/Xl6md0xtOgjtTaOboT41aitLhBy0TesUqqr2SzebrgVjUSo
+	 Xh5KcxTjWykvU2CllY1sdYWSi3g7bksjyUbl2cv42+LbvyVPXPrrP34WslA7Dfh6oR
+	 MNI1swwmQKqsXWJxaW2t4+X1q9Oeyk4J1tVXlQFLS7NaupP4p2508yeGEQBqTqv7pM
+	 gR/U4S3Cs4mYCGXzARUM6NLfAx8AahZ3MsqEboatKvmlViJHDzBbq4nhRvpX6xATiv
+	 ofMps5C1Ionfg==
 X-Virus-Scanned: amavis at zmproxy.tng.vnc.biz
 Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
  by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10026)
- with ESMTP id lXPaLjvzKT_k; Mon, 26 Jan 2026 20:35:24 +0100 (CET)
+ with ESMTP id 2W-7no0dTjbl; Mon, 26 Jan 2026 20:35:26 +0100 (CET)
 Received: from DESKTOP-0O0JV6I.localdomain (ipservice-092-208-231-176.092.208.pools.vodafone-ip.de [92.208.231.176])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id 0F8EB1FA8C7;
-	Mon, 26 Jan 2026 20:35:22 +0100 (CET)
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id 33D5C1F8839;
+	Mon, 26 Jan 2026 20:35:26 +0100 (CET)
 From: Luis Augenstein <luis.augenstein@tngtech.com>
 To: nathan@kernel.org,
 	nsc@kernel.org
@@ -55,9 +55,9 @@ Cc: linux-kbuild@vger.kernel.org,
 	gregkh@linuxfoundation.org,
 	maximilian.huber@tngtech.com,
 	Luis Augenstein <luis.augenstein@tngtech.com>
-Subject: [PATCH v3 06/14] tools/sbom: add SPDX classes
-Date: Mon, 26 Jan 2026 20:32:56 +0100
-Message-Id: <20260126193304.320916-7-luis.augenstein@tngtech.com>
+Subject: [PATCH v3 09/14] tools/sbom: collect file metadata
+Date: Mon, 26 Jan 2026 20:32:59 +0100
+Message-Id: <20260126193304.320916-10-luis.augenstein@tngtech.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260126193304.320916-1-luis.augenstein@tngtech.com>
 References: <20260126193304.320916-1-luis.augenstein@tngtech.com>
@@ -69,521 +69,390 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Implement Python dataclasses to model the SPDX classes
-required within an SPDX document. The class and property
-names are consistent with the SPDX 3.0.1 specification.
+Implement the kernel_file module that collects file metadata,
+including license identifier for source files, SHA-256 hash,
+Git blob object ID, an estimation of the file type, and
+whether files belong to the source, build, or output SBOM.
 
 Co-developed-by: Maximilian Huber <maximilian.huber@tngtech.com>
 Signed-off-by: Maximilian Huber <maximilian.huber@tngtech.com>
 Signed-off-by: Luis Augenstein <luis.augenstein@tngtech.com>
 ---
- tools/sbom/sbom/spdx/__init__.py        |   7 +
- tools/sbom/sbom/spdx/build.py           |  17 +++
- tools/sbom/sbom/spdx/core.py            | 182 ++++++++++++++++++++++++
- tools/sbom/sbom/spdx/serialization.py   |  56 ++++++++
- tools/sbom/sbom/spdx/simplelicensing.py |  20 +++
- tools/sbom/sbom/spdx/software.py        |  71 +++++++++
- tools/sbom/sbom/spdx/spdxId.py          |  36 +++++
- 7 files changed, 389 insertions(+)
- create mode 100644 tools/sbom/sbom/spdx/__init__.py
- create mode 100644 tools/sbom/sbom/spdx/build.py
- create mode 100644 tools/sbom/sbom/spdx/core.py
- create mode 100644 tools/sbom/sbom/spdx/serialization.py
- create mode 100644 tools/sbom/sbom/spdx/simplelicensing.py
- create mode 100644 tools/sbom/sbom/spdx/software.py
- create mode 100644 tools/sbom/sbom/spdx/spdxId.py
+ .../sbom/sbom/spdx_graph/build_spdx_graphs.py |   2 +
+ tools/sbom/sbom/spdx_graph/kernel_file.py     | 310 ++++++++++++++++++
+ 2 files changed, 312 insertions(+)
+ create mode 100644 tools/sbom/sbom/spdx_graph/kernel_file.py
 
-diff --git a/tools/sbom/sbom/spdx/__init__.py b/tools/sbom/sbom/spdx/__in=
-it__.py
+diff --git a/tools/sbom/sbom/spdx_graph/build_spdx_graphs.py b/tools/sbom=
+/sbom/spdx_graph/build_spdx_graphs.py
+index 9c47258a31c6..0f95f99d560a 100644
+--- a/tools/sbom/sbom/spdx_graph/build_spdx_graphs.py
++++ b/tools/sbom/sbom/spdx_graph/build_spdx_graphs.py
+@@ -7,6 +7,7 @@ from typing import Protocol
+ from sbom.config import KernelSpdxDocumentKind
+ from sbom.cmd_graph import CmdGraph
+ from sbom.path_utils import PathStr
++from sbom.spdx_graph.kernel_file import KernelFileCollection
+ from sbom.spdx_graph.spdx_graph_model import SpdxGraph, SpdxIdGeneratorC=
+ollection
+ from sbom.spdx_graph.shared_spdx_elements import SharedSpdxElements
+=20
+@@ -36,4 +37,5 @@ def build_spdx_graphs(
+         Dictionary of SPDX graphs
+     """
+     shared_elements =3D SharedSpdxElements.create(spdx_id_generators.bas=
+e, config.created)
++    kernel_files =3D KernelFileCollection.create(cmd_graph, config.obj_t=
+ree, config.src_tree, spdx_id_generators)
+     return {}
+diff --git a/tools/sbom/sbom/spdx_graph/kernel_file.py b/tools/sbom/sbom/=
+spdx_graph/kernel_file.py
 new file mode 100644
-index 000000000000..4097b59f8f17
+index 000000000000..84582567bc4d
 --- /dev/null
-+++ b/tools/sbom/sbom/spdx/__init__.py
-@@ -0,0 +1,7 @@
++++ b/tools/sbom/sbom/spdx_graph/kernel_file.py
+@@ -0,0 +1,310 @@
 +# SPDX-License-Identifier: GPL-2.0-only OR MIT
 +# Copyright (C) 2025 TNG Technology Consulting GmbH
 +
-+from .spdxId import SpdxId, SpdxIdGenerator
-+from .serialization import JsonLdSpdxDocument
-+
-+__all__ =3D ["JsonLdSpdxDocument", "SpdxId", "SpdxIdGenerator"]
-diff --git a/tools/sbom/sbom/spdx/build.py b/tools/sbom/sbom/spdx/build.p=
-y
-new file mode 100644
-index 000000000000..180a8f1e8bd3
---- /dev/null
-+++ b/tools/sbom/sbom/spdx/build.py
-@@ -0,0 +1,17 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR MIT
-+# Copyright (C) 2025 TNG Technology Consulting GmbH
-+
-+from dataclasses import dataclass, field
-+from sbom.spdx.core import DictionaryEntry, Element, Hash
++from dataclasses import dataclass
++from enum import Enum
++import hashlib
++import os
++import re
++from sbom.cmd_graph import CmdGraph
++from sbom.path_utils import PathStr, is_relative_to
++from sbom.spdx import SpdxId, SpdxIdGenerator
++from sbom.spdx.core import Hash
++from sbom.spdx.software import ContentIdentifier, File, SoftwarePurpose
++import sbom.sbom_logging as sbom_logging
++from sbom.spdx_graph.spdx_graph_model import SpdxIdGeneratorCollection
 +
 +
-+@dataclass(kw_only=3DTrue)
-+class Build(Element):
-+    """https://spdx.github.io/spdx-spec/v3.0.1/model/Build/Classes/Build=
-/"""
++class KernelFileLocation(Enum):
++    """Represents the location of a file relative to the source/object t=
+rees."""
 +
-+    type: str =3D field(init=3DFalse, default=3D"build_Build")
-+    build_buildType: str
-+    build_buildId: str
-+    build_environment: list[DictionaryEntry] =3D field(default_factory=3D=
-list[DictionaryEntry])
-+    build_configSourceUri: list[str] =3D field(default_factory=3Dlist[st=
-r])
-+    build_configSourceDigest: list[Hash] =3D field(default_factory=3Dlis=
-t[Hash])
-diff --git a/tools/sbom/sbom/spdx/core.py b/tools/sbom/sbom/spdx/core.py
-new file mode 100644
-index 000000000000..c5de9194bb89
---- /dev/null
-+++ b/tools/sbom/sbom/spdx/core.py
-@@ -0,0 +1,182 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR MIT
-+# Copyright (C) 2025 TNG Technology Consulting GmbH
-+
-+from dataclasses import dataclass, field
-+from datetime import datetime, timezone
-+from typing import Any, Literal
-+from sbom.spdx.spdxId import SpdxId
-+
-+SPDX_SPEC_VERSION =3D "3.0.1"
-+
-+ExternalIdentifierType =3D Literal["email", "gitoid", "urlScheme"]
-+HashAlgorithm =3D Literal["sha256", "sha512"]
-+ProfileIdentifierType =3D Literal["core", "software", "build", "lite", "=
-simpleLicensing"]
-+RelationshipType =3D Literal[
-+    "contains",
-+    "generates",
-+    "hasDeclaredLicense",
-+    "hasInput",
-+    "hasOutput",
-+    "ancestorOf",
-+    "hasDistributionArtifact",
-+    "dependsOn",
-+]
-+RelationshipCompleteness =3D Literal["complete", "incomplete", "noAssert=
-ion"]
++    SOURCE_TREE =3D "source_tree"
++    """File is located in the source tree."""
++    OBJ_TREE =3D "obj_tree"
++    """File is located in the object tree."""
++    EXTERNAL =3D "external"
++    """File is located outside both source and object trees."""
++    BOTH =3D "both"
++    """File is located in a folder that is both source and object tree."=
+""
 +
 +
 +@dataclass
-+class SpdxObject:
-+    def to_dict(self) -> dict[str, Any]:
-+        def _to_dict(v: Any):
-+            return v.to_dict() if hasattr(v, "to_dict") else v
++class KernelFile:
++    """kernel-specific metadata used to generate an SPDX File element.""=
+"
 +
-+        d: dict[str, Any] =3D {}
-+        for field_name in self.__dataclass_fields__:
-+            value =3D getattr(self, field_name)
-+            if not value:
-+                continue
++    absolute_path: PathStr
++    """Absolute path of the file."""
++    file_location: KernelFileLocation
++    """Location of the file relative to the source/object trees."""
++    name: str
++    """Name of the file element. Should be relative to the source tree i=
+f
++    file_location equals SOURCE_TREE and relative to the object tree if
++    file_location equals OBJ_TREE. If file_location equals EXTERNAL, the
++    absolute path is used."""
++    license_identifier: str | None
++    """SPDX license ID if file_location equals SOURCE_TREE or BOTH; othe=
+rwise None."""
++    spdx_id_generator: SpdxIdGenerator
++    """Generator for the SPDX ID of the file element."""
 +
-+            if isinstance(value, Element):
-+                d[field_name] =3D value.spdxId
-+            elif isinstance(value, list) and len(value) > 0 and isinstan=
-ce(value[0], Element):  # type: ignore
-+                value: list[Element] =3D value
-+                d[field_name] =3D [v.spdxId for v in value]
++    _spdx_file_element: File | None =3D None
++
++    @classmethod
++    def create(
++        cls,
++        absolute_path: PathStr,
++        obj_tree: PathStr,
++        src_tree: PathStr,
++        spdx_id_generators: SpdxIdGeneratorCollection,
++        is_output: bool,
++    ) -> "KernelFile":
++        is_in_obj_tree =3D is_relative_to(absolute_path, obj_tree)
++        is_in_src_tree =3D is_relative_to(absolute_path, src_tree)
++
++        # file element name should be relative to output or src tree if =
+possible
++        if not is_in_src_tree and not is_in_obj_tree:
++            file_element_name =3D str(absolute_path)
++            file_location =3D KernelFileLocation.EXTERNAL
++            spdx_id_generator =3D spdx_id_generators.build
++        elif is_in_src_tree and src_tree =3D=3D obj_tree:
++            file_element_name =3D os.path.relpath(absolute_path, obj_tre=
+e)
++            file_location =3D KernelFileLocation.BOTH
++            spdx_id_generator =3D spdx_id_generators.output if is_output=
+ else spdx_id_generators.build
++        elif is_in_obj_tree:
++            file_element_name =3D os.path.relpath(absolute_path, obj_tre=
+e)
++            file_location =3D KernelFileLocation.OBJ_TREE
++            spdx_id_generator =3D spdx_id_generators.output if is_output=
+ else spdx_id_generators.build
++        else:
++            file_element_name =3D os.path.relpath(absolute_path, src_tre=
+e)
++            file_location =3D KernelFileLocation.SOURCE_TREE
++            spdx_id_generator =3D spdx_id_generators.source
++
++        # parse spdx license identifier
++        license_identifier =3D (
++            _parse_spdx_license_identifier(absolute_path)
++            if file_location =3D=3D KernelFileLocation.SOURCE_TREE or fi=
+le_location =3D=3D KernelFileLocation.BOTH
++            else None
++        )
++
++        return KernelFile(
++            absolute_path,
++            file_location,
++            file_element_name,
++            license_identifier,
++            spdx_id_generator,
++        )
++
++    @property
++    def spdx_file_element(self) -> File:
++        if self._spdx_file_element is None:
++            self._spdx_file_element =3D _build_file_element(
++                self.absolute_path,
++                self.name,
++                self.spdx_id_generator.generate(),
++                self.file_location,
++            )
++        return self._spdx_file_element
++
++
++@dataclass
++class KernelFileCollection:
++    """Collection of kernel files."""
++
++    source: dict[PathStr, KernelFile]
++    build: dict[PathStr, KernelFile]
++    output: dict[PathStr, KernelFile]
++
++    @classmethod
++    def create(
++        cls,
++        cmd_graph: CmdGraph,
++        obj_tree: PathStr,
++        src_tree: PathStr,
++        spdx_id_generators: SpdxIdGeneratorCollection,
++    ) -> "KernelFileCollection":
++        source: dict[PathStr, KernelFile] =3D {}
++        build: dict[PathStr, KernelFile] =3D {}
++        output: dict[PathStr, KernelFile] =3D {}
++        root_node_paths =3D {node.absolute_path for node in cmd_graph.ro=
+ots}
++        for node in cmd_graph:
++            is_root =3D node.absolute_path in root_node_paths
++            kernel_file =3D KernelFile.create(
++                node.absolute_path,
++                obj_tree,
++                src_tree,
++                spdx_id_generators,
++                is_root,
++            )
++            if is_root:
++                output[kernel_file.absolute_path] =3D kernel_file
++            elif kernel_file.file_location =3D=3D KernelFileLocation.SOU=
+RCE_TREE:
++                source[kernel_file.absolute_path] =3D kernel_file
 +            else:
-+                d[field_name] =3D [_to_dict(v) for v in value] if isinst=
-ance(value, list) else _to_dict(value)  # type: ignore
-+        return d
++                build[kernel_file.absolute_path] =3D kernel_file
++
++        return KernelFileCollection(source, build, output)
++
++    def to_dict(self) -> dict[PathStr, KernelFile]:
++        return {**self.source, **self.build, **self.output}
 +
 +
-+@dataclass(kw_only=3DTrue)
-+class IntegrityMethod(SpdxObject):
-+    """https://spdx.github.io/spdx-spec/v3.0.1/model/Core/Classes/Integr=
-ityMethod/"""
-+
-+
-+@dataclass(kw_only=3DTrue)
-+class Hash(IntegrityMethod):
-+    """https://spdx.github.io/spdx-spec/v3.0.1/model/Core/Classes/Hash/"=
-""
-+
-+    type: str =3D field(init=3DFalse, default=3D"Hash")
-+    hashValue: str
-+    algorithm: HashAlgorithm
-+
-+
-+@dataclass(kw_only=3DTrue)
-+class Element(SpdxObject):
-+    """https://spdx.github.io/spdx-spec/v3.0.1/model/Core/Classes/Elemen=
-t/"""
-+
-+    type: str =3D field(init=3DFalse, default=3D"Element")
-+    spdxId: SpdxId
-+    creationInfo: str =3D "_:creationinfo"
-+    name: str | None =3D None
-+    verifiedUsing: list[Hash] =3D field(default_factory=3Dlist[Hash])
-+    comment: str | None =3D None
-+
-+
-+@dataclass(kw_only=3DTrue)
-+class ExternalMap(SpdxObject):
-+    """https://spdx.github.io/spdx-spec/v3.0.1/model/Core/Classes/Extern=
-alMap/"""
-+
-+    type: str =3D field(init=3DFalse, default=3D"ExternalMap")
-+    externalSpdxId: SpdxId
-+
-+
-+@dataclass(kw_only=3DTrue)
-+class NamespaceMap(SpdxObject):
-+    """https://spdx.github.io/spdx-spec/v3.0.1/model/Core/Classes/Namesp=
-aceMap/"""
-+
-+    type: str =3D field(init=3DFalse, default=3D"NamespaceMap")
-+    prefix: str
-+    namespace: str
-+
-+
-+@dataclass(kw_only=3DTrue)
-+class ElementCollection(Element):
-+    """https://spdx.github.io/spdx-spec/v3.0.1/model/Core/Classes/Elemen=
-tCollection/"""
-+
-+    type: str =3D field(init=3DFalse, default=3D"ElementCollection")
-+    element: list[Element] =3D field(default_factory=3Dlist[Element])
-+    rootElement: list[Element] =3D field(default_factory=3Dlist[Element]=
-)
-+    profileConformance: list[ProfileIdentifierType] =3D field(default_fa=
-ctory=3Dlist[ProfileIdentifierType])
-+
-+
-+@dataclass(kw_only=3DTrue)
-+class SpdxDocument(ElementCollection):
-+    """https://spdx.github.io/spdx-spec/v3.0.1/model/Core/Classes/SpdxDo=
-cument/"""
-+
-+    type: str =3D field(init=3DFalse, default=3D"SpdxDocument")
-+    import_: list[ExternalMap] =3D field(default_factory=3Dlist[External=
-Map])
-+    namespaceMap: list[NamespaceMap] =3D field(default_factory=3Dlist[Na=
-mespaceMap])
-+
-+    def to_dict(self) -> dict[str, Any]:
-+        return {("import" if k =3D=3D "import_" else k): v for k, v in s=
-uper().to_dict().items()}
-+
-+
-+@dataclass(kw_only=3DTrue)
-+class ExternalIdentifier(SpdxObject):
-+    """https://spdx.github.io/spdx-spec/v3.0.1/model/Core/Classes/Extern=
-alIdentifier/"""
-+
-+    type: str =3D field(init=3DFalse, default=3D"ExternalIdentifier")
-+    externalIdentifierType: ExternalIdentifierType
-+    identifier: str
-+
-+
-+@dataclass(kw_only=3DTrue)
-+class Agent(Element):
-+    """https://spdx.github.io/spdx-spec/v3.0.1/model/Core/Classes/Agent/=
-"""
-+
-+    type: str =3D field(init=3DFalse, default=3D"Agent")
-+    externalIdentifier: list[ExternalIdentifier] =3D field(default_facto=
-ry=3Dlist[ExternalIdentifier])
-+
-+
-+@dataclass(kw_only=3DTrue)
-+class SoftwareAgent(Agent):
-+    """https://spdx.github.io/spdx-spec/v3.0.1/model/Core/Classes/Softwa=
-reAgent/"""
-+
-+    type: str =3D field(init=3DFalse, default=3D"SoftwareAgent")
-+
-+
-+@dataclass(kw_only=3DTrue)
-+class CreationInfo(SpdxObject):
-+    """https://spdx.github.io/spdx-spec/v3.0.1/model/Core/Classes/Creati=
-onInfo/"""
-+
-+    type: str =3D field(init=3DFalse, default=3D"CreationInfo")
-+    id: SpdxId =3D "_:creationinfo"
-+    specVersion: str =3D SPDX_SPEC_VERSION
-+    createdBy: list[Agent]
-+    created: str =3D field(default_factory=3Dlambda: datetime.now(timezo=
-ne.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))
-+    comment: str | None =3D None
-+
-+    def to_dict(self) -> dict[str, Any]:
-+        return {("@id" if k =3D=3D "id" else k): v for k, v in super().t=
-o_dict().items()}
-+
-+
-+@dataclass(kw_only=3DTrue)
-+class Relationship(Element):
-+    """https://spdx.github.io/spdx-spec/v3.0.1/model/Core/Classes/Relati=
-onship/"""
-+
-+    type: str =3D field(init=3DFalse, default=3D"Relationship")
-+    relationshipType: RelationshipType
-+    from_: Element  # underscore because 'from' is a reserved keyword
-+    to: list[Element]
-+    completeness: RelationshipCompleteness | None =3D None
-+
-+    def to_dict(self) -> dict[str, Any]:
-+        return {("from" if k =3D=3D "from_" else k): v for k, v in super=
-().to_dict().items()}
-+
-+
-+@dataclass(kw_only=3DTrue)
-+class Artifact(Element):
-+    """https://spdx.github.io/spdx-spec/v3.0.1/model/Core/Classes/Artifa=
-ct/"""
-+
-+    type: str =3D field(init=3DFalse, default=3D"Artifact")
-+    builtTime: str | None =3D None
-+    originatedBy: list[Agent] =3D field(default_factory=3Dlist[Agent])
-+
-+
-+@dataclass(kw_only=3DTrue)
-+class DictionaryEntry(SpdxObject):
-+    """https://spdx.github.io/spdx-spec/v3.0.1/model/Core/Classes/Dictio=
-naryEntry/"""
-+
-+    type: str =3D field(init=3DFalse, default=3D"DictionaryEntry")
-+    key: str
-+    value: str
-diff --git a/tools/sbom/sbom/spdx/serialization.py b/tools/sbom/sbom/spdx=
-/serialization.py
-new file mode 100644
-index 000000000000..c830d6b3cf19
---- /dev/null
-+++ b/tools/sbom/sbom/spdx/serialization.py
-@@ -0,0 +1,56 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR MIT
-+# Copyright (C) 2025 TNG Technology Consulting GmbH
-+
-+import json
-+from typing import Any
-+from sbom.path_utils import PathStr
-+from sbom.spdx.core import SPDX_SPEC_VERSION, SpdxDocument, SpdxObject
-+
-+
-+class JsonLdSpdxDocument:
-+    """Represents an SPDX document in JSON-LD format for serialization."=
-""
-+
-+    context: list[str | dict[str, str]]
-+    graph: list[SpdxObject]
-+
-+    def __init__(self, graph: list[SpdxObject]) -> None:
-+        """
-+        Initialize a JSON-LD SPDX document from a graph of SPDX objects.
-+        The graph must contain a single SpdxDocument element.
-+
-+        Args:
-+            graph: List of SPDX objects representing the complete SPDX d=
-ocument.
-+        """
-+        self.graph =3D graph
-+        spdx_document =3D next(element for element in graph if isinstanc=
-e(element, SpdxDocument))
-+        self.context =3D [
-+            f"https://spdx.org/rdf/{SPDX_SPEC_VERSION}/spdx-context.json=
-ld",
-+            {namespaceMap.prefix: namespaceMap.namespace for namespaceMa=
-p in spdx_document.namespaceMap},
++def _build_file_element(absolute_path: PathStr, name: str, spdx_id: Spdx=
+Id, file_location: KernelFileLocation) -> File:
++    verifiedUsing: list[Hash] =3D []
++    content_identifier: list[ContentIdentifier] =3D []
++    if os.path.exists(absolute_path):
++        verifiedUsing =3D [Hash(algorithm=3D"sha256", hashValue=3D_sha25=
+6(absolute_path))]
++        content_identifier =3D [
++            ContentIdentifier(
++                software_contentIdentifierType=3D"gitoid",
++                software_contentIdentifierValue=3D_git_blob_oid(absolute=
+_path),
++            )
 +        ]
-+        spdx_document.namespaceMap =3D []
++    elif file_location =3D=3D KernelFileLocation.EXTERNAL:
++        sbom_logging.warning(
++            "Cannot compute hash for {absolute_path} because file does n=
+ot exist.",
++            absolute_path=3Dabsolute_path,
++        )
++    else:
++        sbom_logging.error(
++            "Cannot compute hash for {absolute_path} because file does n=
+ot exist.",
++            absolute_path=3Dabsolute_path,
++        )
 +
-+    def to_dict(self) -> dict[str, Any]:
-+        """
-+        Convert the SPDX document to a dictionary representation suitabl=
-e for JSON serialization.
++    # primary purpose
++    primary_purpose =3D _get_primary_purpose(absolute_path)
 +
-+        Returns:
-+            Dictionary with @context and @graph keys following JSON-LD f=
-ormat.
-+        """
-+        return {
-+            "@context": self.context,
-+            "@graph": [item.to_dict() for item in self.graph],
-+        }
-+
-+    def save(self, path: PathStr, prettify: bool) -> None:
-+        """
-+        Save the SPDX document to a JSON file.
-+
-+        Args:
-+            path: File path where the document will be saved.
-+            prettify: Whether to pretty-print the JSON with indentation.
-+        """
-+        with open(path, "w", encoding=3D"utf-8") as f:
-+            if prettify:
-+                json.dump(self.to_dict(), f, indent=3D2)
-+            else:
-+                json.dump(self.to_dict(), f, separators=3D(",", ":"))
-diff --git a/tools/sbom/sbom/spdx/simplelicensing.py b/tools/sbom/sbom/sp=
-dx/simplelicensing.py
-new file mode 100644
-index 000000000000..750ddd24ad89
---- /dev/null
-+++ b/tools/sbom/sbom/spdx/simplelicensing.py
-@@ -0,0 +1,20 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR MIT
-+# Copyright (C) 2025 TNG Technology Consulting GmbH
-+
-+from dataclasses import dataclass, field
-+from sbom.spdx.core import Element
++    return File(
++        spdxId=3Dspdx_id,
++        name=3Dname,
++        verifiedUsing=3DverifiedUsing,
++        software_primaryPurpose=3Dprimary_purpose,
++        software_contentIdentifier=3Dcontent_identifier,
++    )
 +
 +
-+@dataclass(kw_only=3DTrue)
-+class AnyLicenseInfo(Element):
-+    """https://spdx.github.io/spdx-spec/v3.0.1/model/SimpleLicensing/Cla=
-sses/AnyLicenseInfo/"""
-+
-+    type: str =3D field(init=3DFalse, default=3D"simplelicensing_AnyLice=
-nseInfo")
++def _sha256(path: PathStr) -> str:
++    """Compute the SHA-256 hash of a file."""
++    with open(path, "rb") as f:
++        data =3D f.read()
++    return hashlib.sha256(data).hexdigest()
 +
 +
-+@dataclass(kw_only=3DTrue)
-+class LicenseExpression(AnyLicenseInfo):
-+    """https://spdx.github.io/spdx-spec/v3.0.1/model/SimpleLicensing/Cla=
-sses/LicenseExpression/"""
++def _git_blob_oid(file_path: str) -> str:
++    """
++    Compute the Git blob object ID (SHA-1) for a file, like `git hash-ob=
+ject`.
 +
-+    type: str =3D field(init=3DFalse, default=3D"simplelicensing_License=
-Expression")
-+    simplelicensing_licenseExpression: str
-diff --git a/tools/sbom/sbom/spdx/software.py b/tools/sbom/sbom/spdx/soft=
-ware.py
-new file mode 100644
-index 000000000000..208e0168b939
---- /dev/null
-+++ b/tools/sbom/sbom/spdx/software.py
-@@ -0,0 +1,71 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR MIT
-+# Copyright (C) 2025 TNG Technology Consulting GmbH
++    Args:
++        file_path: Path to the file.
 +
-+from dataclasses import dataclass, field
-+from typing import Literal
-+from sbom.spdx.core import Artifact, ElementCollection, IntegrityMethod
++    Returns:
++        SHA-1 hash (hex) of the Git blob object.
++    """
++    with open(file_path, "rb") as f:
++        content =3D f.read()
++    header =3D f"blob {len(content)}\0".encode()
++    store =3D header + content
++    sha1_hash =3D hashlib.sha1(store).hexdigest()
++    return sha1_hash
 +
 +
-+SbomType =3D Literal["source", "build"]
-+FileKindType =3D Literal["file", "directory"]
-+SoftwarePurpose =3D Literal[
-+    "source",
-+    "archive",
-+    "library",
-+    "file",
-+    "data",
-+    "configuration",
-+    "executable",
-+    "module",
-+    "application",
-+    "documentation",
-+    "other",
-+]
-+ContentIdentifierType =3D Literal["gitoid", "swhid"]
++# REUSE-IgnoreStart
++SPDX_LICENSE_IDENTIFIER_PATTERN =3D re.compile(r"SPDX-License-Identifier=
+:\s*(?P<id>.*?)(?:\s*(\*/|$))")
++# REUSE-IgnoreEnd
 +
 +
-+@dataclass(kw_only=3DTrue)
-+class Sbom(ElementCollection):
-+    """https://spdx.github.io/spdx-spec/v3.0.1/model/Software/Classes/Sb=
-om/"""
++def _parse_spdx_license_identifier(absolute_path: str, max_lines: int =3D=
+ 5) -> str | None:
++    """
++    Extracts the SPDX-License-Identifier from the first few lines of a s=
+ource file.
 +
-+    type: str =3D field(init=3DFalse, default=3D"software_Sbom")
-+    software_sbomType: list[SbomType] =3D field(default_factory=3Dlist[S=
-bomType])
++    Args:
++        absolute_path: Path to the source file.
++        max_lines: Number of lines to scan from the top (default: 5).
 +
-+
-+@dataclass(kw_only=3DTrue)
-+class ContentIdentifier(IntegrityMethod):
-+    """https://spdx.github.io/spdx-spec/v3.0.1/model/Software/Classes/Co=
-ntentIdentifier/"""
-+
-+    type: str =3D field(init=3DFalse, default=3D"software_ContentIdentif=
-ier")
-+    software_contentIdentifierType: ContentIdentifierType
-+    software_contentIdentifierValue: str
-+
-+
-+@dataclass(kw_only=3DTrue)
-+class SoftwareArtifact(Artifact):
-+    """https://spdx.github.io/spdx-spec/v3.0.1/model/Software/Classes/So=
-ftwareArtifact/"""
-+
-+    type: str =3D field(init=3DFalse, default=3D"software_Artifact")
-+    software_primaryPurpose: SoftwarePurpose | None =3D None
-+    software_additionalPurpose: list[SoftwarePurpose] =3D field(default_=
-factory=3Dlist[SoftwarePurpose])
-+    software_copyrightText: str | None =3D None
-+    software_contentIdentifier: list[ContentIdentifier] =3D field(defaul=
-t_factory=3Dlist[ContentIdentifier])
++    Returns:
++        The license identifier string (e.g., 'GPL-2.0-only') if found, o=
+therwise None.
++    """
++    try:
++        with open(absolute_path, "r") as f:
++            for _ in range(max_lines):
++                match =3D SPDX_LICENSE_IDENTIFIER_PATTERN.search(f.readl=
+ine())
++                if match:
++                    return match.group("id")
++    except (UnicodeDecodeError, OSError):
++        return None
++    return None
 +
 +
-+@dataclass(kw_only=3DTrue)
-+class Package(SoftwareArtifact):
-+    """https://spdx.github.io/spdx-spec/v3.0.1/model/Software/Classes/Pa=
-ckage/"""
++def _get_primary_purpose(absolute_path: PathStr) -> SoftwarePurpose | No=
+ne:
++    def ends_with(suffixes: list[str]) -> bool:
++        return any(absolute_path.endswith(suffix) for suffix in suffixes=
+)
 +
-+    type: str =3D field(init=3DFalse, default=3D"software_Package")
-+    name: str  # type: ignore
-+    software_packageVersion: str | None =3D None
-+    software_downloadLocation: str | None =3D None
++    def includes_path_segments(path_segments: list[str]) -> bool:
++        return any(segment in absolute_path for segment in path_segments=
+)
 +
++    # Source code
++    if ends_with([".c", ".h", ".S", ".s", ".rs", ".pl"]):
++        return "source"
 +
-+@dataclass(kw_only=3DTrue)
-+class File(SoftwareArtifact):
-+    """https://spdx.github.io/spdx-spec/v3.0.1/model/Software/Classes/Fi=
-le/"""
++    # Libraries
++    if ends_with([".a", ".so", ".rlib"]):
++        return "library"
 +
-+    type: str =3D field(init=3DFalse, default=3D"software_File")
-+    name: str  # type: ignore
-+    software_fileKind: FileKindType | None =3D None
-diff --git a/tools/sbom/sbom/spdx/spdxId.py b/tools/sbom/sbom/spdx/spdxId=
-.py
-new file mode 100644
-index 000000000000..589e85c5f706
---- /dev/null
-+++ b/tools/sbom/sbom/spdx/spdxId.py
-@@ -0,0 +1,36 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR MIT
-+# Copyright (C) 2025 TNG Technology Consulting GmbH
++    # Archives
++    if ends_with([".xz", ".cpio", ".gz", ".tar", ".zip"]):
++        return "archive"
 +
-+from itertools import count
-+from typing import Iterator
++    # Applications
++    if ends_with(["bzImage", "Image"]):
++        return "application"
 +
-+SpdxId =3D str
++    # Executables / machine code
++    if ends_with([".bin", ".elf", "vmlinux", "vmlinux.unstripped", "bpfi=
+lter_umh"]):
++        return "executable"
 +
++    # Kernel modules
++    if ends_with([".ko"]):
++        return "module"
 +
-+class SpdxIdGenerator:
-+    _namespace: str
-+    _prefix: str | None =3D None
-+    _counter: Iterator[int]
++    # Data files
++    if ends_with(
++        [
++            ".tbl",
++            ".relocs",
++            ".rmeta",
++            ".in",
++            ".dbg",
++            ".x509",
++            ".pbm",
++            ".ppm",
++            ".dtb",
++            ".uc",
++            ".inc",
++            ".dts",
++            ".dtsi",
++            ".dtbo",
++            ".xml",
++            ".ro",
++            "initramfs_inc_data",
++            "default_cpio_list",
++            "x509_certificate_list",
++            "utf8data.c_shipped",
++            "blacklist_hash_list",
++            "x509_revocation_list",
++            "cpucaps",
++            "sysreg",
++        ]
++    ) or includes_path_segments(["drivers/gpu/drm/radeon/reg_srcs/"]):
++        return "data"
 +
-+    def __init__(self, namespace: str, prefix: str | None =3D None) -> N=
-one:
-+        """
-+        Initialize the SPDX ID generator with a namespace.
++    # Configuration files
++    if ends_with([".pem", ".key", ".conf", ".config", ".cfg", ".bconf"])=
+:
++        return "configuration"
 +
-+        Args:
-+            namespace: The full namespace to use for generated IDs.
-+            prefix: Optional. If provided, generated IDs will use this p=
-refix instead of the full namespace.
-+        """
-+        self._namespace =3D namespace
-+        self._prefix =3D prefix
-+        self._counter =3D count(0)
++    # Documentation
++    if ends_with([".md"]):
++        return "documentation"
 +
-+    def generate(self) -> SpdxId:
-+        return f"{f'{self._prefix}:' if self._prefix else self._namespac=
-e}{next(self._counter)}"
++    # Other / miscellaneous
++    if ends_with([".o", ".tmp"]):
++        return "other"
 +
-+    @property
-+    def prefix(self) -> str | None:
-+        return self._prefix
-+
-+    @property
-+    def namespace(self) -> str:
-+        return self._namespace
++    sbom_logging.warning("Could not infer primary purpose for {absolute_=
+path}", absolute_path=3Dabsolute_path)
 --=20
 2.34.1
 
