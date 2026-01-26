@@ -1,51 +1,51 @@
 Received: from mailgw01.zimbra-vnc.de (mailgw01.zimbra-vnc.de [148.251.101.236])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 314DE28643C;
-	Mon, 26 Jan 2026 19:35:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76921286D4D;
+	Mon, 26 Jan 2026 19:35:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.101.236
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769456139; cv=none; b=nX+M8pJkyoA1m+rhIaC77U9V7IpWXg/Om2yHtJx2dpl5f0Yy3FHWO2K+Y/SuOFGk4N6oqmadqx9DuO0QqKfvPpa+ReqmY62/Ff6r+XwByS+4VStxJojE83KkDBeNLXdUKGMknNLMz+FJGalo6MN0hhOBqr1yyiIZZ3GS0qt8RyU=
+	t=1769456139; cv=none; b=K2FfHubQu97A6ze/HNHpuJl3gNU04coTAcCjHmuFyN+4Zpo4uJvdVohobV2gCXH8RwIF9xHHaqQUjYNtT2JB6nawVomQFZl7XKopnLy6wGWqAUVI7cDHhWDM4eS+T/Uax+dC+zexcThzGuA/PCy+4zYeV3V1yybDGFdNNiXWm4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769456139; c=relaxed/simple;
-	bh=cFNZRlIxT/34gp+dzxMA1w3STtnbLv+SCBygP3i6rMc=;
+	bh=ifK6y7ESTkLRQ3A93vdqh2szgwDr9S74b2hXw6gK29A=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=mQ15+O+pwDJSf52uXV/1BVrdFaZvcln0oh9uWr/9Z0Dys5dmrrp8EG7ehC7dYvRWDYdxpmRSzRLdLgXIuNEcaBma4qezWLfac4c9oyvFXThRwYj6NMxumGbkBHJroghElTIw0DJasPJ+YVAmSDKgKqCYmwqd9cWcyhHm7zHU5Qc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com; spf=pass smtp.mailfrom=tngtech.com; dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b=RllAyyu0; arc=none smtp.client-ip=148.251.101.236
+	 MIME-Version; b=aeTX9VW/RoYqKl8rAyXExemj1ts8ENhpKcBubdsBeK/mwrvWabyqTW+/VffNo+65bwyuVNMGCQ5axA5wI4dKqZBEhMHDTlAi9ItnmDb7fwsf6JHZ9eDo5Hw0tOvnctbEvCcOrTg15x9feePVZjGMCnX7PqFA/m7bcHEFo6MDvAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com; spf=pass smtp.mailfrom=tngtech.com; dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b=mU69tfIY; arc=none smtp.client-ip=148.251.101.236
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tngtech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b="RllAyyu0"
+	dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b="mU69tfIY"
 Received: from zmproxy.tng.vnc.biz (zimbra-vnc.tngtech.com [35.234.71.156])
-	by mailgw01.zimbra-vnc.de (Postfix) with ESMTPS id 45D743FAF9;
-	Mon, 26 Jan 2026 20:35:31 +0100 (CET)
+	by mailgw01.zimbra-vnc.de (Postfix) with ESMTPS id 29DBB3FAF2;
+	Mon, 26 Jan 2026 20:35:34 +0100 (CET)
 Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id EC1431FA7B4;
-	Mon, 26 Jan 2026 20:35:29 +0100 (CET)
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id E42901FA3D7;
+	Mon, 26 Jan 2026 20:35:32 +0100 (CET)
 Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
  by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10032)
- with ESMTP id 2QXBqrsOoFCz; Mon, 26 Jan 2026 20:35:29 +0100 (CET)
+ with ESMTP id GdYr0lHnBxoo; Mon, 26 Jan 2026 20:35:32 +0100 (CET)
 Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 45A251FA703;
-	Mon, 26 Jan 2026 20:35:29 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz 45A251FA703
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 5837F1FA7AF;
+	Mon, 26 Jan 2026 20:35:32 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz 5837F1FA7AF
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tngtech.com;
-	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1769456129;
-	bh=dZL1JaPMNMR+B1ET/+Ix+NpqGkk7K7L1IuuIEqfp/f0=;
+	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1769456132;
+	bh=gWg1ozqnV38gDPTbJjaTTr/2ExUrF6zZXVvlJpEkHhU=;
 	h=From:To:Subject:Date:Message-Id:MIME-Version;
-	b=RllAyyu08j3M9etTa7cZxkZHdKWEcGeuTFMs0AsjSLqInN5TFubJLiTiA4np0TvVq
-	 eEaiKZSxRvWcFsdyZRtgYXQ0HIAqxVMoEBGgHvik7Ga0ZY5vJ0FoQxDBj7a+b5hluq
-	 cDRshHaBuqQPUzyk1KWUmu8U4cjbeIXpKFVMnCvL7iSUDcnNapBEY1zUOzrv8zY9bg
-	 /kt7b38xad7R2gD5kdjrKwxSDxQQgiVAfhX8iE4SQNwt2OWY9pXrFVaIoqBFvyZXXM
-	 7PkcEvJFHMJMRMlA2u1XmmCKCsIFzwBZ+KyEHdjUrlqO0p++FiuJJe5KqvHCBqLrUq
-	 3+4KrHwT8GikQ==
+	b=mU69tfIYqOq/woFcGbijqrxxJsebqDl1A+bx6FxZGIhHu606pAzJhSNe6YWOeK0Rn
+	 ohuXJF9Nt36YqVCFF5H7HxtdhjYbjuAGUd5wxosTfl/UrA54kkBTyr1/qYMe8EY/Nc
+	 FEnL8FtURuxUEihF+Gx1m0C6C9H3SOFqPijq+7uo/Ir+N8/ZTN/phZOwG3LLk1yWAJ
+	 Im6Y8P0PvT23icxDUcY01UHlzdv9M9o+U+/JauQC39JhQbdxDth/8R1GkpM0PaPMJG
+	 NuXtLl3swjfDphaS/FCTKWGGt7C0doiKbLeBETWGJaeUQU3gPkOGG9Lqy62zo0LYkp
+	 y9IviNfdcsucA==
 X-Virus-Scanned: amavis at zmproxy.tng.vnc.biz
 Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
  by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10026)
- with ESMTP id SN6NnRY4-hPo; Mon, 26 Jan 2026 20:35:29 +0100 (CET)
+ with ESMTP id 2-8IAOAy3KXv; Mon, 26 Jan 2026 20:35:32 +0100 (CET)
 Received: from DESKTOP-0O0JV6I.localdomain (ipservice-092-208-231-176.092.208.pools.vodafone-ip.de [92.208.231.176])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id CF7CE1FA6D0;
-	Mon, 26 Jan 2026 20:35:28 +0100 (CET)
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id E82EE1FA3D7;
+	Mon, 26 Jan 2026 20:35:31 +0100 (CET)
 From: Luis Augenstein <luis.augenstein@tngtech.com>
 To: nathan@kernel.org,
 	nsc@kernel.org
@@ -55,9 +55,9 @@ Cc: linux-kbuild@vger.kernel.org,
 	gregkh@linuxfoundation.org,
 	maximilian.huber@tngtech.com,
 	Luis Augenstein <luis.augenstein@tngtech.com>
-Subject: [PATCH v3 11/14] tools/sbom: add SPDX source graph
-Date: Mon, 26 Jan 2026 20:33:01 +0100
-Message-Id: <20260126193304.320916-12-luis.augenstein@tngtech.com>
+Subject: [PATCH v3 14/14] tools/sbom: add unit tests for SPDX-License-Identifier parsing
+Date: Mon, 26 Jan 2026 20:33:04 +0100
+Message-Id: <20260126193304.320916-15-luis.augenstein@tngtech.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260126193304.320916-1-luis.augenstein@tngtech.com>
 References: <20260126193304.320916-1-luis.augenstein@tngtech.com>
@@ -69,192 +69,68 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Implement the SPDX source graph which contains all source files
-involved during the build, along with the licensing information
-for each file.
+Verify that SPDX-License-Identifier headers at the top of source files
+are parsed correctly.
 
 Co-developed-by: Maximilian Huber <maximilian.huber@tngtech.com>
 Signed-off-by: Maximilian Huber <maximilian.huber@tngtech.com>
 Signed-off-by: Luis Augenstein <luis.augenstein@tngtech.com>
 ---
- .../sbom/sbom/spdx_graph/build_spdx_graphs.py |   8 ++
- .../sbom/sbom/spdx_graph/spdx_source_graph.py | 126 ++++++++++++++++++
- 2 files changed, 134 insertions(+)
- create mode 100644 tools/sbom/sbom/spdx_graph/spdx_source_graph.py
+ tools/sbom/tests/spdx_graph/__init__.py       |  0
+ .../sbom/tests/spdx_graph/test_kernel_file.py | 32 +++++++++++++++++++
+ 2 files changed, 32 insertions(+)
+ create mode 100644 tools/sbom/tests/spdx_graph/__init__.py
+ create mode 100644 tools/sbom/tests/spdx_graph/test_kernel_file.py
 
-diff --git a/tools/sbom/sbom/spdx_graph/build_spdx_graphs.py b/tools/sbom=
-/sbom/spdx_graph/build_spdx_graphs.py
-index 2af0fbe6cdbe..a61257a905f3 100644
---- a/tools/sbom/sbom/spdx_graph/build_spdx_graphs.py
-+++ b/tools/sbom/sbom/spdx_graph/build_spdx_graphs.py
-@@ -10,6 +10,7 @@ from sbom.path_utils import PathStr
- from sbom.spdx_graph.kernel_file import KernelFileCollection
- from sbom.spdx_graph.spdx_graph_model import SpdxGraph, SpdxIdGeneratorC=
-ollection
- from sbom.spdx_graph.shared_spdx_elements import SharedSpdxElements
-+from sbom.spdx_graph.spdx_source_graph import SpdxSourceGraph
- from sbom.spdx_graph.spdx_output_graph import SpdxOutputGraph
-=20
-=20
-@@ -54,4 +55,11 @@ def build_spdx_graphs(
-         KernelSpdxDocumentKind.OUTPUT: output_graph,
-     }
-=20
-+    if len(kernel_files.source) > 0:
-+        spdx_graphs[KernelSpdxDocumentKind.SOURCE] =3D SpdxSourceGraph.c=
-reate(
-+            source_files=3Dlist(kernel_files.source.values()),
-+            shared_elements=3Dshared_elements,
-+            spdx_id_generators=3Dspdx_id_generators,
-+        )
-+
-     return spdx_graphs
-diff --git a/tools/sbom/sbom/spdx_graph/spdx_source_graph.py b/tools/sbom=
-/sbom/spdx_graph/spdx_source_graph.py
+diff --git a/tools/sbom/tests/spdx_graph/__init__.py b/tools/sbom/tests/s=
+pdx_graph/__init__.py
 new file mode 100644
-index 000000000000..16176c4ea5ee
+index 000000000000..e69de29bb2d1
+diff --git a/tools/sbom/tests/spdx_graph/test_kernel_file.py b/tools/sbom=
+/tests/spdx_graph/test_kernel_file.py
+new file mode 100644
+index 000000000000..bc44e7a97d2a
 --- /dev/null
-+++ b/tools/sbom/sbom/spdx_graph/spdx_source_graph.py
-@@ -0,0 +1,126 @@
++++ b/tools/sbom/tests/spdx_graph/test_kernel_file.py
+@@ -0,0 +1,32 @@
 +# SPDX-License-Identifier: GPL-2.0-only OR MIT
 +# Copyright (C) 2025 TNG Technology Consulting GmbH
 +
-+from dataclasses import dataclass
-+from sbom.spdx import SpdxIdGenerator
-+from sbom.spdx.core import Element, NamespaceMap, Relationship, SpdxDocu=
-ment
-+from sbom.spdx.simplelicensing import LicenseExpression
-+from sbom.spdx.software import File, Sbom
-+from sbom.spdx_graph.kernel_file import KernelFile
-+from sbom.spdx_graph.shared_spdx_elements import SharedSpdxElements
-+from sbom.spdx_graph.spdx_graph_model import SpdxGraph, SpdxIdGeneratorC=
-ollection
++import unittest
++from pathlib import Path
++import tempfile
++from sbom.spdx_graph.kernel_file import _parse_spdx_license_identifier  =
+# type: ignore
 +
 +
-+@dataclass
-+class SpdxSourceGraph(SpdxGraph):
-+    """SPDX graph representing source files"""
++class TestKernelFile(unittest.TestCase):
++    def setUp(self):
++        self.tmpdir =3D tempfile.TemporaryDirectory()
++        self.src_tree =3D Path(self.tmpdir.name)
 +
-+    @classmethod
-+    def create(
-+        cls,
-+        source_files: list[KernelFile],
-+        shared_elements: SharedSpdxElements,
-+        spdx_id_generators: SpdxIdGeneratorCollection,
-+    ) -> "SpdxSourceGraph":
-+        """
-+        Args:
-+            source_files: List of files within the kernel source tree.
-+            shared_elements: Shared SPDX elements used across multiple d=
-ocuments.
-+            spdx_id_generators: Collection of SPDX ID generators.
++    def tearDown(self):
++        self.tmpdir.cleanup()
 +
-+        Returns:
-+            SpdxSourceGraph: The SPDX source graph.
-+        """
-+        # SpdxDocument
-+        source_spdx_document =3D SpdxDocument(
-+            spdxId=3Dspdx_id_generators.source.generate(),
-+            profileConformance=3D["core", "software", "simpleLicensing"]=
++    def test_parse_spdx_license_identifier(self):
++        # REUSE-IgnoreStart
++        test_cases: list[tuple[str, str | None]] =3D [
++            ("/* SPDX-License-Identifier: MIT*/", "MIT"),
++            ("// SPDX-License-Identifier: GPL-2.0-only", "GPL-2.0-only")=
 ,
-+            namespaceMap=3D[
-+                NamespaceMap(prefix=3Dgenerator.prefix, namespace=3Dgene=
-rator.namespace)
-+                for generator in [spdx_id_generators.source, spdx_id_gen=
-erators.base]
-+                if generator.prefix is not None
-+            ],
-+        )
-+
-+        # Sbom
-+        source_sbom =3D Sbom(
-+            spdxId=3Dspdx_id_generators.source.generate(),
-+            software_sbomType=3D["source"],
-+        )
-+
-+        # Src Tree Elements
-+        src_tree_element =3D File(
-+            spdxId=3Dspdx_id_generators.source.generate(),
-+            name=3D"$(src_tree)",
-+            software_fileKind=3D"directory",
-+        )
-+        src_tree_contains_relationship =3D Relationship(
-+            spdxId=3Dspdx_id_generators.source.generate(),
-+            relationshipType=3D"contains",
-+            from_=3Dsrc_tree_element,
-+            to=3D[],
-+        )
-+
-+        # Source file elements
-+        source_file_elements: list[Element] =3D [file.spdx_file_element =
-for file in source_files]
-+
-+        # Source file license elements
-+        source_file_license_identifiers, source_file_license_relationshi=
-ps =3D source_file_license_elements(
-+            source_files, spdx_id_generators.source
-+        )
-+
-+        # Update relationships
-+        source_spdx_document.rootElement =3D [source_sbom]
-+        source_sbom.rootElement =3D [src_tree_element]
-+        source_sbom.element =3D [
-+            src_tree_element,
-+            src_tree_contains_relationship,
-+            *source_file_elements,
-+            *source_file_license_identifiers,
-+            *source_file_license_relationships,
++            ("/* SPDX-License-Identifier: GPL-2.0-or-later OR MIT */", "=
+GPL-2.0-or-later OR MIT"),
++            ("/* SPDX-License-Identifier: Apache-2.0 */\n extra text", "=
+Apache-2.0"),
++            ("int main() { return 0; }", None),
 +        ]
-+        src_tree_contains_relationship.to =3D source_file_elements
++        # REUSE-IgnoreEnd
 +
-+        source_graph =3D SpdxSourceGraph(
-+            source_spdx_document,
-+            shared_elements.agent,
-+            shared_elements.creation_info,
-+            source_sbom,
-+        )
-+        return source_graph
-+
-+
-+def source_file_license_elements(
-+    source_files: list[KernelFile], spdx_id_generator: SpdxIdGenerator
-+) -> tuple[list[LicenseExpression], list[Relationship]]:
-+    """
-+    Creates SPDX license expressions and links them to the given source =
-files
-+    via hasDeclaredLicense relationships.
-+
-+    Args:
-+        source_files: List of files within the kernel source tree.
-+        spdx_id_generator: Generator for unique SPDX IDs.
-+
-+    Returns:
-+        Tuple of (license expressions, hasDeclaredLicense relationships)=
-.
-+    """
-+    license_expressions: dict[str, LicenseExpression] =3D {}
-+    for file in source_files:
-+        if file.license_identifier is None or file.license_identifier in=
- license_expressions:
-+            continue
-+        license_expressions[file.license_identifier] =3D LicenseExpressi=
-on(
-+            spdxId=3Dspdx_id_generator.generate(),
-+            simplelicensing_licenseExpression=3Dfile.license_identifier,
-+        )
-+
-+    source_file_license_relationships =3D [
-+        Relationship(
-+            spdxId=3Dspdx_id_generator.generate(),
-+            relationshipType=3D"hasDeclaredLicense",
-+            from_=3Dfile.spdx_file_element,
-+            to=3D[license_expressions[file.license_identifier]],
-+        )
-+        for file in source_files
-+        if file.license_identifier is not None
-+    ]
-+    return ([*license_expressions.values()], source_file_license_relatio=
-nships)
++        for i, (file_content, expected_identifier) in enumerate(test_cas=
+es):
++            file_path =3D self.src_tree / f"file_{i}.c"
++            file_path.write_text(file_content)
++            self.assertEqual(_parse_spdx_license_identifier(str(file_pat=
+h)), expected_identifier)
 --=20
 2.34.1
 
