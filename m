@@ -1,96 +1,78 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB14133D51F;
-	Wed, 28 Jan 2026 09:08:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 935B72135D7;
+	Wed, 28 Jan 2026 11:27:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769591314; cv=none; b=BclEgplBtWrghWnDTBDtyqCZNWPc7rSx4RD5SeIfx1sU2s4ZM7LjkYaso1Nnk51gerBVW8ZAbgtAa/5Tf1S9I+NQ33kUs1v8654t7ZPzzcKU706ruszmSQpA80W0Q63J8EC/HvNHlwsqmSw1yH/RTCIQl3LG6D6+oWaAvQoC+Yc=
+	t=1769599662; cv=none; b=MC0RXr6d8lWA74Qnpvk18uh10Jfh8CvRnka3A+SN5zlDTQbOVqoERX4c/TIR2Bust0mcCbdKmm2fyYKqrPV5kmPkT8Gh6h5J7SgBDpi/Ydq5ghWDCNy4O8UpWill5JhW3mSsYn3ViEugSIATbO3s6+ooZH7adMjKUBROHS9r/C8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769591314; c=relaxed/simple;
-	bh=qMm7hX4PVk6Yh3XxSpUlBGaH4NHbgK3Mp/XYDMcbkRo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S/TMeLnHnpE8QRPz8Ye5h/l7aBwJevfKv+V3lheWUA8XOQa5XrBcJVU2oZzsChk1RJkg8CWpQowWBsjbpNxkL0xcOz4Y5VcM0emLxfg8z0L+LvFKMeDuk5V2EI7vzFynvw1HMuY0sSLbQftKG3mGTSM4fp1Tuhvqk/IJNLf4WvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a/fy8wA9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1769599662; c=relaxed/simple;
+	bh=TbvoE+0E9p/GUrAMIKnojbZbCEPTP1dl/M+LQf+yWzQ=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=mh/1WYEgY1xySC2fYkOUqgqJ0p8jRTxwoo6n9cyOfvGNle8qFsRbRN2gwX5v5+x586e296F+J2MRMoi4fUEXm08xTgA5F7vboH4DzrhC5CRsTrthPuR/9dpGAfpouF899lfQUVEtjmdAnpW/aWYiklv4dOTrwjkIGfB8BM2pEXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YPoCem+3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a/fy8wA9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32EBAC4CEF1;
-	Wed, 28 Jan 2026 09:08:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YPoCem+3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD9C6C19421;
+	Wed, 28 Jan 2026 11:27:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769591314;
-	bh=qMm7hX4PVk6Yh3XxSpUlBGaH4NHbgK3Mp/XYDMcbkRo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=a/fy8wA9Ztf/7aCePdtske0mvp+fqFqnCZsHDPJ/NDcxQ1pKTPzboloLlYqcHgEFo
-	 nqnipaJT9VkDVukFpSdOMKa7PcNjFHvebwoLcNFQuWheZq793us26RZq7cZXrYpVc5
-	 h2GA19GCxCfxUJ74kdMIR4h+mQ84c0ap1OaKRm83rK7a7KdqR5N6VpIxpq7qFRZCs/
-	 s68Wa1+DlG9UTXR9Ese3MSAX1Mv33dfsHa/9OnQmVSstz1DltU4pDiF5DhoJTKDU3o
-	 VBgQRiMaL1EMRHDhH14u8NVMR2O7BQ1wn9jl0X6CEOvUVEHyxayEzemBuA27+LUNuJ
-	 8SubglEKBH0xw==
-Date: Wed, 28 Jan 2026 09:16:13 +0100
+	s=k20201202; t=1769599662;
+	bh=TbvoE+0E9p/GUrAMIKnojbZbCEPTP1dl/M+LQf+yWzQ=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=YPoCem+3+LkLEmLlHwcFfLo5m1sdvx6oEB3v/cWJvIpNFLyI8MIsm7Ngt8Ib7QacH
+	 nkygb1YevWuj0S1hOa2FfrAVx+bvqYdELBRvCLDv46wdrJOtKf4eFQJgNDa40l1SHe
+	 joyXHKr5H1UJ2rm32VAHVX6zDsTb6kcXPzSO+/HZ3FKU4argoQ1bFOO3rzq5x7cvc2
+	 KovF+VyOQebzz7wb83p07979KVlay4dF7irU/AV8/YvCQCDKIu8q/ezpRxhjcSVo2T
+	 y3SlZ5wGjFAqGKDMaDXHysAg+sDL51RxxSLOpDUX0Niz6Zb2cRDsH6PUTXoUEuwRbF
+	 GbOSI7gZ2lIrQ==
 From: Nicolas Schier <nsc@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Ethan Zuo <yuxuan.zuo@outlook.com>, masahiroy@kernel.org,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] kbuild: Fix permissions of modules.builtin.modinfo
-Message-ID: <aXnFzbuV6oQJD_Sj@levanger>
-Mail-Followup-To: Nathan Chancellor <nathan@kernel.org>,
-	Ethan Zuo <yuxuan.zuo@outlook.com>, masahiroy@kernel.org,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <SY0P300MB0609BE844D61B504AB2013C99C90A@SY0P300MB0609.AUSP300.PROD.OUTLOOK.COM>
- <20260127205915.GA3856796@ax162>
+To: nathan@kernel.org, Ethan Zuo <yuxuan.zuo@outlook.com>
+Cc: masahiroy@kernel.org, linux-kbuild@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+In-Reply-To: <SY0P300MB0609F6916B24ADF65502940B9C91A@SY0P300MB0609.AUSP300.PROD.OUTLOOK.COM>
+References: <20260127205915.GA3856796@ax162>
+ <SY0P300MB0609F6916B24ADF65502940B9C91A@SY0P300MB0609.AUSP300.PROD.OUTLOOK.COM>
+Subject: Re: [PATCH v2] kbuild: Fix permissions of modules.builtin.modinfo
+Message-Id: <176959965192.1301244.16587395744422463112.b4-ty@kernel.org>
+Date: Wed, 28 Jan 2026 12:27:31 +0100
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260127205915.GA3856796@ax162>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.2
 
-On Tue, Jan 27, 2026 at 01:59:15PM -0700, Nathan Chancellor wrote:
-> Hi Ethan,
+On Wed, 28 Jan 2026 14:37:51 +0800, Ethan Zuo wrote:
+> Currently, modules.builtin.modinfo is created with executable permissions
+> (0755). This is because after commit 39cfd5b12160 ("kbuild: extract
+> modules.builtin.modinfo from vmlinux.unstripped"), modules.builtin.modinfo
+> is extracted from vmlinux.unstripped using objcopy. When extracting
+> sections, objcopy inherits attributes from the source ELF file.
 > 
-> On Wed, Jan 28, 2026 at 03:23:23AM +0800, Ethan Zuo wrote:
-> > Currently, modules.builtin.modinfo is created with executable permissions
-> > (0755). This is because after commit 39cfd5b12160 ("kbuild: extract
-> > modules.builtin.modinfo from vmlinux.unstripped"), modules.builtin.modinfo
-> > is extracted from vmlinux.unstripped using objcopy. When extracting
-> > sections, objcopy inherits attributes from the source ELF file.
+> Since modules.builtin.modinfo is a data file and not an executable,
+> it should have regular file permissions (0644). The executable bit
+> can trigger warnings in Debian's Lintian tool.
 > 
-> Ah, that explains why this is only visble after 39cfd5b12160, as
-> vmlinux.o was just a regular object file, whereas vmlinux.unstripped is
-> an executable. There was another patch submitted to address this issue
-> that did not explain that bit well:
-> 
-> https://lore.kernel.org/20251209-modinfo-executable-v1-1-ed0c553a4390@pengutronix.de/
-> 
-> > Since modules.builtin.modinfo is a data file and not an executable,
-> > it should have 0644 permissions. The executable bit can trigger
-> > warnings in Debian's Lintian tool.
-> 
-> I had asked on that previous submission what sort of issues could be
-> expected from being executable and warnings from tools is a reasonable
-> answer to that. Thanks for including that.
-> 
-> > Explicitly set the permissions to 0644 after generation.
-> 
-> Would it be better to do what the previous submission did and just
-> remove the execute bit via 'chmod -x'? That seems to be slightly more
-> common in the kernel (even though there are very few uses of 'chmod'
-> throughout Makefile instances) and seems to get at the issue a little
-> bit more. Not sure if the creation of these files respects umask, in
-> case someone had a more restrictive one, but that might be contrived.
-> 
-> > Fixes: 39cfd5b12160 ("kbuild: extract modules.builtin.modinfo from vmlinux.unstripped")
-> > Signed-off-by: Ethan Zuo <yuxuan.zuo@outlook.com>
-> 
-> Nicolas, do you want to take this as a fix for 6.19 or should I take it
-> via kbuild-next for 6.20/7.0?
-> 
+> [...]
 
-I'm happy to take it (v2) for kbuild-fixes this week.
-Thanks!
+Applied to kbuild/linux.git (kbuild-fixes-unstable), thanks!
 
+[1/1] kbuild: Fix permissions of modules.builtin.modinfo
+      https://git.kernel.org/kbuild/c/6d60354e
+
+Please look out for regression or issue reports or other follow up
+comments, as they may result in the patch/series getting dropped,
+reverted or modified (e.g. trailers). Patches applied to the
+kbuild-fixes-unstable branch are accepted pending wider testing in
+linux-next and any post-commit review; they will generally be moved
+to the kbuild-fixes branch in a week if no issues are found.
+
+Best regards,
 -- 
 Nicolas
+
+
