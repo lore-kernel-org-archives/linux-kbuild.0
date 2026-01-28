@@ -1,79 +1,88 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 369FE2135D7;
-	Wed, 28 Jan 2026 11:27:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8171C341056;
+	Wed, 28 Jan 2026 22:02:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769599665; cv=none; b=LrKDwcirZR3Xr9KRI48fzNI2ImmDQ+zLt+NqwCNaRch18WFS5rZ8dsizsOkyT6xqopWnGXikrQ8kStHajRV9cv+FzMC/aee9hf2227NjyCLGTyswY9sJplzDW/F3DO1IXn+XPoexByuggKa16IzOwXAVSyQGa8IvVrQVvjr4Mfs=
+	t=1769637744; cv=none; b=OwBQRdr5htetUqkIHwD4ocTJ5C5HDj3biIQVe2wj8P9d2zvFA2qb9ifjKWLGrVj275y4piPbLTLf1wC72mnYfgFRVXrxISVRgsZJk4QC+wA+fr9TRJLEJlvBgtl+BCL3V6bSxQxyBVpll34kVIjDpsQiaq2vqz5Iw7a5Id46WDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769599665; c=relaxed/simple;
-	bh=B7EggOGuQ49twJSOTy/UtZkBVafO8/Y3BubNTR+04eY=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=g874BaZcpI1MCAezHkSDh4p/BURWSMJxxoS97D6FdH38yzC5LwzfDMk76j7wP7ZcOOu1yID9cugdGQWzEztDOhHRZPzK0F8E+IMdVx0XP5D2T9ZWFdHaxGus1p+M5nOph9AO4aIQwl+FP+bW6NY8VH0DAm1W6dYqidQZgfhnOSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sHNIw78Q; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1769637744; c=relaxed/simple;
+	bh=p3Ov9GAWmc7miJdCYyGL4Sq5/XQCePT1md0p6UZP2ic=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XZqjohDHVQx/tFDKlxcl0U46Vsxm9Ss+O7eRcRMe64GVpI5x3IVRvM9BuALJT1Dx3YaMAQjIlhqx61CqPsJNOwVTOKBjEkYtkvFZ/DdZjAV0oF5QGHhWVhpY44hEbXkptVQg8V0of04GtlFNJNLzeC7hKpH7L6EcW3JoKKgjk1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rO7foRxJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sHNIw78Q"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E1D9C19421;
-	Wed, 28 Jan 2026 11:27:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rO7foRxJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97859C4CEF1;
+	Wed, 28 Jan 2026 22:02:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769599664;
-	bh=B7EggOGuQ49twJSOTy/UtZkBVafO8/Y3BubNTR+04eY=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=sHNIw78QbU1IMCoWQzIA621kMgagggccaTyLStgQqFF1nmJPH/2JjQECeIXLjUiM2
-	 a2B3NZxabGsEnWADUAGS+4U66ip/1p0RLWExh6KxkXxKK8yReFHMHvFxOUB0mplCI4
-	 228XkABbQInNFZt02rQUWUdW/Db81yS7JIQ+2p2+dnBOdUKvRftgO9mmo1j6e3Qd8O
-	 L39eQzL1HYJrwMwLnK9lCe1IN8/MscgZttmsJvulebdyFbehVUgeJBZjXH3mx3Xsmv
-	 aIAhfNmTkpOF5ew7jqzB7d6FQ4p47mEUyvlLSrVjuUJhqDQaepayT76Tzvo/lqkhWb
-	 EN7tTbjOJo0qA==
-From: Nicolas Schier <nsc@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Uday Shankar <ushankar@purestorage.com>, 
- Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Holger Kiehl <Holger.Kiehl@dwd.de>
-In-Reply-To: <20260121-fix-module-signing-binrpm-pkg-v1-1-8fc5832b6cbc@kernel.org>
-References: <20260121-fix-module-signing-binrpm-pkg-v1-1-8fc5832b6cbc@kernel.org>
-Subject: Re: [PATCH] kbuild: rpm-pkg: Generate debuginfo package manually
-Message-Id: <176959965189.1301244.15814296328206965994.b4-ty@kernel.org>
-Date: Wed, 28 Jan 2026 12:27:31 +0100
+	s=k20201202; t=1769637744;
+	bh=p3Ov9GAWmc7miJdCYyGL4Sq5/XQCePT1md0p6UZP2ic=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rO7foRxJTLPHd7EFmeFADSjhcLf68oqo1bXtvO276v0tpiQsHqoDKl3Z0sZDYap7t
+	 oydPLH8RBKr2xqRKSq1kNRdbC/KxMHWJfc5Bs3h22MxttrBp1njG4p1Ihr2nJaetTs
+	 oP4/2edOoXnbb/r3/tCwp1HMuxeuzicVNtonlF3UXOzUQCFGOVjccp8hfclO2o8GGx
+	 uzxpMsVGixvOKTxDevSSkBn/1L4CuyWoQv2AJc7UAaqnPls0dpZ4hD7krNH9xEX7OJ
+	 aTCWZkvUNwAFBcGKjxj7bLUPm1oupEZ2pvi3AXEFzfIwHDnrcxTSmsJeD7CTEW1eoo
+	 5xG1bDHuAJwIQ==
+Date: Wed, 28 Jan 2026 15:02:17 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Gary Guo <gary@garyguo.net>
+Cc: Alexandre Courbot <acourbot@nvidia.com>, Gary Guo <gary@kernel.org>,
+	Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>, Nicolas Schier <nsc@kernel.org>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+	Masahiro Yamada <masahiroy@kernel.org>, Kees Cook <kees@kernel.org>,
+	rust-for-linux@vger.kernel.org, linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 2/2] kbuild: rust: use klint to provide
+ CONFIG_FRAME_WARN
+Message-ID: <20260128220217.GA2129077@ax162>
+References: <20260127172330.1492107-1-gary@kernel.org>
+ <20260127172330.1492107-3-gary@kernel.org>
+ <DFZSRE43IHOU.2OZNE9IFIO3UB@nvidia.com>
+ <DFZTOMSDPOQM.3QW4TZ52N4MKZ@garyguo.net>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DFZTOMSDPOQM.3QW4TZ52N4MKZ@garyguo.net>
 
-On Wed, 21 Jan 2026 15:29:15 -0700, Nathan Chancellor wrote:
-> Commit a7c699d090a1 ("kbuild: rpm-pkg: build a debuginfo RPM") adjusted
-> the __spec_install_post macro to include __os_install_post, which runs
-> brp-strip. This ends up stripping module signatures, breaking loading
-> modules with lockdown enabled.
-> 
-> Undo most of the changes of the aforementioned debuginfo patch and
-> mirror commit 16c36f8864e3 ("kbuild: deb-pkg: use build ID instead of
-> debug link for dbg package") in kernel.spec to generate a functionally
-> equivalent debuginfo package while avoiding touching the modules after
-> they have already been signed during modules_install.
-> 
-> [...]
+On Wed, Jan 28, 2026 at 01:14:27AM +0000, Gary Guo wrote:
+> It might be possible to do more detailed analysis by checking what is using the
+> stack (e.g. perhaps recovery variable -> stack slots using DWARF if full
+> debuginfo is enabled, or find out the instruction that first touches the
 
-Applied to kbuild/linux.git (kbuild-fixes-unstable), thanks!
+Yeah Nick wrote a Python script to use debug info to give a better idea
+of stack usage to help us debug these warnings from clang:
 
-[1/1] kbuild: rpm-pkg: Generate debuginfo package manually
-      https://git.kernel.org/kbuild/c/62089b80
+  https://github.com/ClangBuiltLinux/frame-larger-than
 
-Please look out for regression or issue reports or other follow up
-comments, as they may result in the patch/series getting dropped,
-reverted or modified (e.g. trailers). Patches applied to the
-kbuild-fixes-unstable branch are accepted pending wider testing in
-linux-next and any post-commit review; they will generally be moved
-to the kbuild-fixes branch in a week if no issues are found.
+It is rather hacky and feels like there are a number of corner cases
+where things don't look quite right but it is better than nothing.
 
-Best regards,
--- 
-Nicolas
+> specific stack location and map it back like that), but doing so is quite tricky
+> and the marginal benefit is less than pointing out there's an issue to be
+> investigated in the first place.
 
+Does Rust have the equivalent of '-Rpass-analysis' from clang? There was
+'-Rpass-analysis=stack-frame-layout' that was added in LLVM 16:
 
+  https://github.com/llvm/llvm-project/commit/557a5bc336ffb9b03c53d4d13fd8f0bc9418ec96
+
+I assume that could be used from Rust as well since it is in the LLVM
+backend? It does not necessarily show exactly where the stack usage
+comes from aside from variables and spills but still, some information
+(especially accurate information at this level) is better than nothing.
+
+Cheers,
+Nathan
