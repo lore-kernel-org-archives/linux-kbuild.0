@@ -1,40 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 935B72135D7;
-	Wed, 28 Jan 2026 11:27:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 369FE2135D7;
+	Wed, 28 Jan 2026 11:27:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769599662; cv=none; b=MC0RXr6d8lWA74Qnpvk18uh10Jfh8CvRnka3A+SN5zlDTQbOVqoERX4c/TIR2Bust0mcCbdKmm2fyYKqrPV5kmPkT8Gh6h5J7SgBDpi/Ydq5ghWDCNy4O8UpWill5JhW3mSsYn3ViEugSIATbO3s6+ooZH7adMjKUBROHS9r/C8=
+	t=1769599665; cv=none; b=LrKDwcirZR3Xr9KRI48fzNI2ImmDQ+zLt+NqwCNaRch18WFS5rZ8dsizsOkyT6xqopWnGXikrQ8kStHajRV9cv+FzMC/aee9hf2227NjyCLGTyswY9sJplzDW/F3DO1IXn+XPoexByuggKa16IzOwXAVSyQGa8IvVrQVvjr4Mfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769599662; c=relaxed/simple;
-	bh=TbvoE+0E9p/GUrAMIKnojbZbCEPTP1dl/M+LQf+yWzQ=;
+	s=arc-20240116; t=1769599665; c=relaxed/simple;
+	bh=B7EggOGuQ49twJSOTy/UtZkBVafO8/Y3BubNTR+04eY=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=mh/1WYEgY1xySC2fYkOUqgqJ0p8jRTxwoo6n9cyOfvGNle8qFsRbRN2gwX5v5+x586e296F+J2MRMoi4fUEXm08xTgA5F7vboH4DzrhC5CRsTrthPuR/9dpGAfpouF899lfQUVEtjmdAnpW/aWYiklv4dOTrwjkIGfB8BM2pEXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YPoCem+3; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=g874BaZcpI1MCAezHkSDh4p/BURWSMJxxoS97D6FdH38yzC5LwzfDMk76j7wP7ZcOOu1yID9cugdGQWzEztDOhHRZPzK0F8E+IMdVx0XP5D2T9ZWFdHaxGus1p+M5nOph9AO4aIQwl+FP+bW6NY8VH0DAm1W6dYqidQZgfhnOSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sHNIw78Q; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YPoCem+3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD9C6C19421;
-	Wed, 28 Jan 2026 11:27:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sHNIw78Q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E1D9C19421;
+	Wed, 28 Jan 2026 11:27:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769599662;
-	bh=TbvoE+0E9p/GUrAMIKnojbZbCEPTP1dl/M+LQf+yWzQ=;
+	s=k20201202; t=1769599664;
+	bh=B7EggOGuQ49twJSOTy/UtZkBVafO8/Y3BubNTR+04eY=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=YPoCem+3+LkLEmLlHwcFfLo5m1sdvx6oEB3v/cWJvIpNFLyI8MIsm7Ngt8Ib7QacH
-	 nkygb1YevWuj0S1hOa2FfrAVx+bvqYdELBRvCLDv46wdrJOtKf4eFQJgNDa40l1SHe
-	 joyXHKr5H1UJ2rm32VAHVX6zDsTb6kcXPzSO+/HZ3FKU4argoQ1bFOO3rzq5x7cvc2
-	 KovF+VyOQebzz7wb83p07979KVlay4dF7irU/AV8/YvCQCDKIu8q/ezpRxhjcSVo2T
-	 y3SlZ5wGjFAqGKDMaDXHysAg+sDL51RxxSLOpDUX0Niz6Zb2cRDsH6PUTXoUEuwRbF
-	 GbOSI7gZ2lIrQ==
+	b=sHNIw78QbU1IMCoWQzIA621kMgagggccaTyLStgQqFF1nmJPH/2JjQECeIXLjUiM2
+	 a2B3NZxabGsEnWADUAGS+4U66ip/1p0RLWExh6KxkXxKK8yReFHMHvFxOUB0mplCI4
+	 228XkABbQInNFZt02rQUWUdW/Db81yS7JIQ+2p2+dnBOdUKvRftgO9mmo1j6e3Qd8O
+	 L39eQzL1HYJrwMwLnK9lCe1IN8/MscgZttmsJvulebdyFbehVUgeJBZjXH3mx3Xsmv
+	 aIAhfNmTkpOF5ew7jqzB7d6FQ4p47mEUyvlLSrVjuUJhqDQaepayT76Tzvo/lqkhWb
+	 EN7tTbjOJo0qA==
 From: Nicolas Schier <nsc@kernel.org>
-To: nathan@kernel.org, Ethan Zuo <yuxuan.zuo@outlook.com>
-Cc: masahiroy@kernel.org, linux-kbuild@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-In-Reply-To: <SY0P300MB0609F6916B24ADF65502940B9C91A@SY0P300MB0609.AUSP300.PROD.OUTLOOK.COM>
-References: <20260127205915.GA3856796@ax162>
- <SY0P300MB0609F6916B24ADF65502940B9C91A@SY0P300MB0609.AUSP300.PROD.OUTLOOK.COM>
-Subject: Re: [PATCH v2] kbuild: Fix permissions of modules.builtin.modinfo
-Message-Id: <176959965192.1301244.16587395744422463112.b4-ty@kernel.org>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Uday Shankar <ushankar@purestorage.com>, 
+ Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Holger Kiehl <Holger.Kiehl@dwd.de>
+In-Reply-To: <20260121-fix-module-signing-binrpm-pkg-v1-1-8fc5832b6cbc@kernel.org>
+References: <20260121-fix-module-signing-binrpm-pkg-v1-1-8fc5832b6cbc@kernel.org>
+Subject: Re: [PATCH] kbuild: rpm-pkg: Generate debuginfo package manually
+Message-Id: <176959965189.1301244.15814296328206965994.b4-ty@kernel.org>
 Date: Wed, 28 Jan 2026 12:27:31 +0100
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
@@ -46,23 +46,24 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.2
 
-On Wed, 28 Jan 2026 14:37:51 +0800, Ethan Zuo wrote:
-> Currently, modules.builtin.modinfo is created with executable permissions
-> (0755). This is because after commit 39cfd5b12160 ("kbuild: extract
-> modules.builtin.modinfo from vmlinux.unstripped"), modules.builtin.modinfo
-> is extracted from vmlinux.unstripped using objcopy. When extracting
-> sections, objcopy inherits attributes from the source ELF file.
+On Wed, 21 Jan 2026 15:29:15 -0700, Nathan Chancellor wrote:
+> Commit a7c699d090a1 ("kbuild: rpm-pkg: build a debuginfo RPM") adjusted
+> the __spec_install_post macro to include __os_install_post, which runs
+> brp-strip. This ends up stripping module signatures, breaking loading
+> modules with lockdown enabled.
 > 
-> Since modules.builtin.modinfo is a data file and not an executable,
-> it should have regular file permissions (0644). The executable bit
-> can trigger warnings in Debian's Lintian tool.
+> Undo most of the changes of the aforementioned debuginfo patch and
+> mirror commit 16c36f8864e3 ("kbuild: deb-pkg: use build ID instead of
+> debug link for dbg package") in kernel.spec to generate a functionally
+> equivalent debuginfo package while avoiding touching the modules after
+> they have already been signed during modules_install.
 > 
 > [...]
 
 Applied to kbuild/linux.git (kbuild-fixes-unstable), thanks!
 
-[1/1] kbuild: Fix permissions of modules.builtin.modinfo
-      https://git.kernel.org/kbuild/c/6d60354e
+[1/1] kbuild: rpm-pkg: Generate debuginfo package manually
+      https://git.kernel.org/kbuild/c/62089b80
 
 Please look out for regression or issue reports or other follow up
 comments, as they may result in the patch/series getting dropped,
