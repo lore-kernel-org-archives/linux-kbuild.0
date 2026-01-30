@@ -1,43 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 120A71BD9D0;
-	Fri, 30 Jan 2026 00:10:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A11DC186284;
+	Fri, 30 Jan 2026 00:10:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769731834; cv=none; b=DN4pVLQlLaj4EKnj8K8jpH+5eJPXnYd3AweQPN4nx/ZIgwVYxRYMuK6EK8ZaqPYSPbW3MfFqjd4nNbEK3DWS6Oai/Ry+WKPUVwLl4GQlBLOUWo5kkz9LNcxO1uSLmuenJXEGvwYSzBgZGbw2b+LYIDUiHc6SoJBLXn3ESWO77rA=
+	t=1769731835; cv=none; b=e62NeROsbrqZ/pazcxEyE6m0b54PN3O4pXLnFfh17I3VacBO+FQ5fbi7afznG5JUHkLKrt5yuaEn7ccGIbtnzVBw0UMvYZjdgmEFuZRYwECzuZRht+fhPXkyK2/iZo7HqIBbEg5eoSHEJi4xTH9vLHj5YVzrLujnkvjdoXXraHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769731834; c=relaxed/simple;
-	bh=PWynZwimuG+0Ms0GuPD3HOTG5tOoe7YputW33/OhNY4=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=AULTWd/iX6odKp+Te1/jL13BGGJM6Kda7VxQGW7GPKlgiRxVheuPUElupXVMYIIp0zzkGojwzYr/I+u6vQDZzgM0Y12BxyYV6/6oweHfRFIAIhiGdgXpZQW5nMHLMYlODD9sZKLKv4mFw58QlrMqmjUSob+YkjlP8o9/yJzNEtM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y+7Rhbzh; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1769731835; c=relaxed/simple;
+	bh=LoS+w0ZJyUAygbEUyB/TLXVll6leIC8mDvQ4Bj6W2JQ=;
+	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=pICU4r0xO1TO0wu2e61fgCCu3ICtC32lG9GA6INCJgoY8nfvwtZH09Z/HojI0XWDsKq7XZGibA84ZcFLUvkDZF9jvnPKsxn5x+AIjh2lzAIN2NFUp8G/rt1t0u4G8KskUJhPdPWjbX+UlRMe491qsNo+/UwDfUw0B0MfWdqLI/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TMuVh7gw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y+7Rhbzh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFA01C16AAE;
-	Fri, 30 Jan 2026 00:10:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TMuVh7gw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C59DC4CEF7;
+	Fri, 30 Jan 2026 00:10:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769731833;
-	bh=PWynZwimuG+0Ms0GuPD3HOTG5tOoe7YputW33/OhNY4=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=Y+7RhbzhmvJRxWUvIZXRw5ufdxMQ0QAahrYsbPkquIfhRoFBzgmtuPGkp5rgnzuec
-	 MMoLFT2yOsnw7q8bm4dACBac8qJ12lzqwLyur68+1TNfrb9RRLap9eZWQiyuzjzzKw
-	 JP8JCLtPPfRYsPS7gaEvWfiC778X3Fd7d1EjH0o+C/1lKUUTGwpG2Y6gQPjSW2Fpas
-	 anBLnWK/R5XKE0TzZn6g8rPju/YMkSCvNyVa84uNGlJIGYJn0egdk+hBdGfgx5tT50
-	 AGFJUPDCigy/jEXDiOfXSzmM1BnbT3irezqdFgu9yy3Fos918LqSu7w3FHBJvQ2gm6
-	 IwRtialxxDlYg==
+	s=k20201202; t=1769731835;
+	bh=LoS+w0ZJyUAygbEUyB/TLXVll6leIC8mDvQ4Bj6W2JQ=;
+	h=From:To:In-Reply-To:References:Subject:Date:From;
+	b=TMuVh7gw6JXexGrllsr9dTjSECTSFMDaN/8XLeO+zJV3DqNI7V5UomSyAxNHFHD/r
+	 wRzzJPUdYml3axmoaiqr5YXs/tzLQohgWgid9+G/IXHHGfk3lPtbV7VgXvvaCPI1xZ
+	 lRU3q1oRqaNF6goHpZpqppTaApsy2xmrn8amXSwsF+kKtAhU/Ukfx013U4oDL8FD8f
+	 i5/nGMcaChg16Kkbi6npexFVqMmRrLwcVYAOoY7uVOqzm9r5s/wRKbIDKe171vu76B
+	 P0wEu8qTdtQrMJvXn+mdSSkWlEpYcJnTSMPXkF5hNkXB4C4jKRxIRrzS0pbSvUlPFt
+	 6N/382UIPrCHA==
 From: Nathan Chancellor <nathan@kernel.org>
-To: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb+git@google.com>
-Cc: Ard Biesheuvel <ardb@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
- Nicolas Schier <nsc@kernel.org>, Kees Cook <kees@kernel.org>, 
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
- linux-kbuild@vger.kernel.org, linux-hardening@vger.kernel.org, 
- linux-mips@vger.kernel.org
-In-Reply-To: <20260116093359.2442297-4-ardb+git@google.com>
-References: <20260116093359.2442297-4-ardb+git@google.com>
-Subject: Re: [PATCH v2 0/2] Simplify kallsyms offset table generation
-Message-Id: <176973183159.175491.9742885221630963935.b4-ty@kernel.org>
-Date: Thu, 29 Jan 2026 17:10:31 -0700
+To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+ Anders Roxell <anders.roxell@linaro.org>, linux-kbuild@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Mikko Rapeli <mikko.rapeli@linaro.org>
+In-Reply-To: <20260122105751.2186609-1-mikko.rapeli@linaro.org>
+References: <20260122105751.2186609-1-mikko.rapeli@linaro.org>
+Subject: Re: [PATCH v3 1/3] scripts: kconfig: merge_config.sh: refactor
+ from shell/sed/grep to awk
+Message-Id: <176973183385.175491.5659819632977597738.b4-ty@kernel.org>
+Date: Thu, 29 Jan 2026 17:10:33 -0700
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -48,15 +46,14 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.15-dev
 
-On Fri, 16 Jan 2026 10:34:00 +0100, Ard Biesheuvel wrote:
-> From: Ard Biesheuvel <ardb@kernel.org>
-> 
-> v2:
-> - implement minimal PC32 support for MIPS so it can tolerate the symbol
->   references emitted by kallsyms
-> - use signed decimal to represent the offset, so that symbols appearing
->   before _text can be represented correctly.
-> - add Kees's ack
+On Thu, 22 Jan 2026 12:57:49 +0200, Mikko Rapeli wrote:
+> merge_config.sh shell/sed/grep loop scales poorly and is slow.
+> With Yocto genericarm64 kernel and around 190 config fragments
+> the script takes more than 20 minutes to run on a fast build machine.
+> Re-implementation with awk does the same job in 10 seconds.
+> Using awk since it is likely available in the build environments
+> and using perl, python etc would introduce more complex runtime
+> dependencies. awk is good enough and lot better than shell/sed/grep.
 > 
 > [...]
 
@@ -66,9 +63,11 @@ Applied to
 
 Thanks!
 
-[1/2] mips: Add support for PC32 relocations in vmlinux
+[1/3] scripts: kconfig: merge_config.sh: refactor from shell/sed/grep to awk
       (no commit info)
-[2/2] kallsyms: Get rid of kallsyms relative base
+[2/3] scripts: kconfig: merge_config.sh: use awk in checks too
+      (no commit info)
+[3/3] scripts: kconfig: merge_config.sh: warn on duplicate input files
       (no commit info)
 
 Please look out for regression or issue reports or other follow up
