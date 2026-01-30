@@ -1,45 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4E7229408;
-	Fri, 30 Jan 2026 00:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 120A71BD9D0;
+	Fri, 30 Jan 2026 00:10:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769731831; cv=none; b=kmN261+mT+181gjraHVef5CAYYW7zWpfus7fQhRwGRy+gBVVYAwkHkf9tW/rfNKWaZIc70nw6zrqJihjlCwDx1BVzFDy7sh/xEBZ6+246pXUdPdqWMT8E52AM+nqLdgYS40nrlx5944lSS0//sI7VHlXKQsRvHJfpR1+hs7p+MQ=
+	t=1769731834; cv=none; b=DN4pVLQlLaj4EKnj8K8jpH+5eJPXnYd3AweQPN4nx/ZIgwVYxRYMuK6EK8ZaqPYSPbW3MfFqjd4nNbEK3DWS6Oai/Ry+WKPUVwLl4GQlBLOUWo5kkz9LNcxO1uSLmuenJXEGvwYSzBgZGbw2b+LYIDUiHc6SoJBLXn3ESWO77rA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769731831; c=relaxed/simple;
-	bh=uCpT1aoAQoIgxEvOvkh2iuXiwJhn4Y56X/hb6Ii4gRA=;
+	s=arc-20240116; t=1769731834; c=relaxed/simple;
+	bh=PWynZwimuG+0Ms0GuPD3HOTG5tOoe7YputW33/OhNY4=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=ZpZIw2bzpMdato/+YjIvjE/E9HUDUrkGEhXA3wGz9etxRwmXd2loMVxL9bZyMa0VoamaVj0kcs5vNp74dWJIw3MkYN9FQPhs4DLRPlNyrwq16unPcqxRK8YaADjEtccm1WW+e1TgEUw0VkOvMxcUM/O2aiMhf0DXxI2G7KauGkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bV2HBPoV; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=AULTWd/iX6odKp+Te1/jL13BGGJM6Kda7VxQGW7GPKlgiRxVheuPUElupXVMYIIp0zzkGojwzYr/I+u6vQDZzgM0Y12BxyYV6/6oweHfRFIAIhiGdgXpZQW5nMHLMYlODD9sZKLKv4mFw58QlrMqmjUSob+YkjlP8o9/yJzNEtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y+7Rhbzh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bV2HBPoV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09F16C4CEF7;
-	Fri, 30 Jan 2026 00:10:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y+7Rhbzh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFA01C16AAE;
+	Fri, 30 Jan 2026 00:10:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769731831;
-	bh=uCpT1aoAQoIgxEvOvkh2iuXiwJhn4Y56X/hb6Ii4gRA=;
+	s=k20201202; t=1769731833;
+	bh=PWynZwimuG+0Ms0GuPD3HOTG5tOoe7YputW33/OhNY4=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=bV2HBPoVUTxQiQ79xN2dIs2tU03jHP+yhoRFLq4NT/txaj4TDT7kbe1iT+2z6W6b9
-	 zPNhc5nQJwNsmf2KCnEuFHxlfrGQuqbvg6bY1cXT73d5jLf6b+uPJwFEUjznsTaorF
-	 wBptvrTkFbVU0ZlJTOWremYIveGPqyw1m2GrSA2LGt9oQ5X7uDpVxQw2nknv84L+du
-	 3yA0b3D5Rcb2bt/ukzFZD0KipmSGBTqSRslB4Tlt+P1A+HltN+g01tJwAhEkWLgdxD
-	 Kc/wKZi9VvNGrk+rJvO2pZ6NjtadCP64wO4Jb5ODgxWnRlnVOlPuxSyKRl67QN2CGc
-	 9k8tQ5zClj/GA==
+	b=Y+7RhbzhmvJRxWUvIZXRw5ufdxMQ0QAahrYsbPkquIfhRoFBzgmtuPGkp5rgnzuec
+	 MMoLFT2yOsnw7q8bm4dACBac8qJ12lzqwLyur68+1TNfrb9RRLap9eZWQiyuzjzzKw
+	 JP8JCLtPPfRYsPS7gaEvWfiC778X3Fd7d1EjH0o+C/1lKUUTGwpG2Y6gQPjSW2Fpas
+	 anBLnWK/R5XKE0TzZn6g8rPju/YMkSCvNyVa84uNGlJIGYJn0egdk+hBdGfgx5tT50
+	 AGFJUPDCigy/jEXDiOfXSzmM1BnbT3irezqdFgu9yy3Fos918LqSu7w3FHBJvQ2gm6
+	 IwRtialxxDlYg==
 From: Nathan Chancellor <nathan@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
- Miguel Ojeda <ojeda@kernel.org>, David Gow <davidgow@google.com>, 
- =?utf-8?q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
- Guillaume Tucker <gtucker@gtucker.io>
-Cc: Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org, 
- rust-for-linux@vger.kernel.org, linux-kbuild@vger.kernel.org, 
- automated-testing@lists.yoctoproject.org, workflows@vger.kernel.org, 
- llvm@lists.linux.dev
-In-Reply-To: <cover.1769090419.git.gtucker@gtucker.io>
-References: <cover.1769090419.git.gtucker@gtucker.io>
-Subject: Re: [PATCH v4 0/2] scripts: introduce containerized builds
-Message-Id: <176973182876.175491.11533873021129857298.b4-ty@kernel.org>
-Date: Thu, 29 Jan 2026 17:10:28 -0700
+To: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb+git@google.com>
+Cc: Ard Biesheuvel <ardb@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+ Nicolas Schier <nsc@kernel.org>, Kees Cook <kees@kernel.org>, 
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+ linux-kbuild@vger.kernel.org, linux-hardening@vger.kernel.org, 
+ linux-mips@vger.kernel.org
+In-Reply-To: <20260116093359.2442297-4-ardb+git@google.com>
+References: <20260116093359.2442297-4-ardb+git@google.com>
+Subject: Re: [PATCH v2 0/2] Simplify kallsyms offset table generation
+Message-Id: <176973183159.175491.9742885221630963935.b4-ty@kernel.org>
+Date: Thu, 29 Jan 2026 17:10:31 -0700
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -50,15 +48,15 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.15-dev
 
-On Thu, 22 Jan 2026 15:06:58 +0100, Guillaume Tucker wrote:
-> This proposal emerged from discussions over email and after a talk at
-> Plumbers 2024:
+On Fri, 16 Jan 2026 10:34:00 +0100, Ard Biesheuvel wrote:
+> From: Ard Biesheuvel <ardb@kernel.org>
 > 
->     https://lore.kernel.org/all/affb7aff-dc9b-4263-bbd4-a7965c19ac4e@gtucker.io/
-> 
-> The aim is to facilitate reproducing builds for CI bots as well as
-> developers using containers.  Here's an illustrative example with a
-> kernel.org toolchain in a Docker image from tuxmake:
+> v2:
+> - implement minimal PC32 support for MIPS so it can tolerate the symbol
+>   references emitted by kallsyms
+> - use signed decimal to represent the offset, so that symbols appearing
+>   before _text can be represented correctly.
+> - add Kees's ack
 > 
 > [...]
 
@@ -68,9 +66,9 @@ Applied to
 
 Thanks!
 
-[1/2] scripts: add tool to run containerized builds
+[1/2] mips: Add support for PC32 relocations in vmlinux
       (no commit info)
-[2/2] Documentation: dev-tools: add container.rst page
+[2/2] kallsyms: Get rid of kallsyms relative base
       (no commit info)
 
 Please look out for regression or issue reports or other follow up
