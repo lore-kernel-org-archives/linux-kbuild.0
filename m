@@ -1,41 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A11DC186284;
-	Fri, 30 Jan 2026 00:10:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 249821F5437;
+	Fri, 30 Jan 2026 00:17:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769731835; cv=none; b=e62NeROsbrqZ/pazcxEyE6m0b54PN3O4pXLnFfh17I3VacBO+FQ5fbi7afznG5JUHkLKrt5yuaEn7ccGIbtnzVBw0UMvYZjdgmEFuZRYwECzuZRht+fhPXkyK2/iZo7HqIBbEg5eoSHEJi4xTH9vLHj5YVzrLujnkvjdoXXraHQ=
+	t=1769732260; cv=none; b=Pp5NoMS00xUbDOuZlCZyiuswI7L85XuSCXTIhUuDoQnNsr/o+IJQcagbWdGBXiSRPg3eOmZqgzJnM5X634QuCG/b916no6cc8IKYKCBfKj4iB81dw1dlKA+jR19hHt7XTDY9EdaICIbtoQfxjgsQIc4pr3xTBoXbrlC2mEI3CC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769731835; c=relaxed/simple;
-	bh=LoS+w0ZJyUAygbEUyB/TLXVll6leIC8mDvQ4Bj6W2JQ=;
-	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=pICU4r0xO1TO0wu2e61fgCCu3ICtC32lG9GA6INCJgoY8nfvwtZH09Z/HojI0XWDsKq7XZGibA84ZcFLUvkDZF9jvnPKsxn5x+AIjh2lzAIN2NFUp8G/rt1t0u4G8KskUJhPdPWjbX+UlRMe491qsNo+/UwDfUw0B0MfWdqLI/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TMuVh7gw; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1769732260; c=relaxed/simple;
+	bh=rREZ37tFgmMVHxsCH/VwEDtlOhX6q+2g2C5Wj9vcirU=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=YcZQQCZ79Ju1C5eeO4ql0prU/zGcrsjOUSbagpb4Dwls44kwePGnUqz8BJjH6wwYj3E/RJpIOcG4Yv2l0bQkKeoY5H9UX12XgCBChr0gN/4Kq0JRAoJ4pKvGn36DgXpYbIgM4V/IPiA4+s4/ASW3M4XcHkrHZ/Eq9qNdjdX6rRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZxfoPLeq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TMuVh7gw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C59DC4CEF7;
-	Fri, 30 Jan 2026 00:10:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZxfoPLeq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29B1DC4CEF7;
+	Fri, 30 Jan 2026 00:17:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769731835;
-	bh=LoS+w0ZJyUAygbEUyB/TLXVll6leIC8mDvQ4Bj6W2JQ=;
-	h=From:To:In-Reply-To:References:Subject:Date:From;
-	b=TMuVh7gw6JXexGrllsr9dTjSECTSFMDaN/8XLeO+zJV3DqNI7V5UomSyAxNHFHD/r
-	 wRzzJPUdYml3axmoaiqr5YXs/tzLQohgWgid9+G/IXHHGfk3lPtbV7VgXvvaCPI1xZ
-	 lRU3q1oRqaNF6goHpZpqppTaApsy2xmrn8amXSwsF+kKtAhU/Ukfx013U4oDL8FD8f
-	 i5/nGMcaChg16Kkbi6npexFVqMmRrLwcVYAOoY7uVOqzm9r5s/wRKbIDKe171vu76B
-	 P0wEu8qTdtQrMJvXn+mdSSkWlEpYcJnTSMPXkF5hNkXB4C4jKRxIRrzS0pbSvUlPFt
-	 6N/382UIPrCHA==
+	s=k20201202; t=1769732259;
+	bh=rREZ37tFgmMVHxsCH/VwEDtlOhX6q+2g2C5Wj9vcirU=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=ZxfoPLeqXGQu+epp8ITq+FSiQe19owD6NYV8SRD/JOLXjpLDsDDwzRY0bfOHW2uel
+	 Yrcfe3KoS3hunAfIHMwYJqXcuioo4A4N/ZbEC47CR+RN4q0C/r/MEb8ohkHtBQT2Dn
+	 pwQHed30gqi7wnLWY8BMVw3wXDkOtcGpqD+DKGMAsF+QgGyhCR2SteWmQf2VIXUlS+
+	 0wt0q5vxTiQ8k56fNETdZKlqJGtgiiOHk2rGIHIlLY6Jh7fHY8wrNHcbHDg2Ttt44u
+	 N6DHdvQqKqHr6VYlgFvm+nRBO8u6yfo5z0wsu1Itn+IPyEq21AsIVDTWQHIjlxM2Gt
+	 p6PKOtgZXMikw==
 From: Nathan Chancellor <nathan@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
- Anders Roxell <anders.roxell@linaro.org>, linux-kbuild@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Mikko Rapeli <mikko.rapeli@linaro.org>
-In-Reply-To: <20260122105751.2186609-1-mikko.rapeli@linaro.org>
-References: <20260122105751.2186609-1-mikko.rapeli@linaro.org>
-Subject: Re: [PATCH v3 1/3] scripts: kconfig: merge_config.sh: refactor
- from shell/sed/grep to awk
-Message-Id: <176973183385.175491.5659819632977597738.b4-ty@kernel.org>
-Date: Thu, 29 Jan 2026 17:10:33 -0700
+To: linux-kbuild@vger.kernel.org, Michal Suchanek <msuchanek@suse.de>
+Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+ Rob Clark <robin.clark@oss.qualcomm.com>, 
+ Dmitry Baryshkov <lumag@kernel.org>, 
+ Abhinav Kumar <quic_abhinavk@quicinc.com>, linux-kernel@vger.kernel.org
+In-Reply-To: <20260121105801.1827-1-msuchanek@suse.de>
+References: <20260121105801.1827-1-msuchanek@suse.de>
+Subject: Re: [PATCH] kbuild: dummy-tools: Add python3
+Message-Id: <176973225791.178709.17831414346066426792.b4-ty@kernel.org>
+Date: Thu, 29 Jan 2026 17:17:37 -0700
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -46,16 +47,12 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.15-dev
 
-On Thu, 22 Jan 2026 12:57:49 +0200, Mikko Rapeli wrote:
-> merge_config.sh shell/sed/grep loop scales poorly and is slow.
-> With Yocto genericarm64 kernel and around 190 config fragments
-> the script takes more than 20 minutes to run on a fast build machine.
-> Re-implementation with awk does the same job in 10 seconds.
-> Using awk since it is likely available in the build environments
-> and using perl, python etc would introduce more complex runtime
-> dependencies. awk is good enough and lot better than shell/sed/grep.
+On Wed, 21 Jan 2026 11:57:57 +0100, Michal Suchanek wrote:
+> DRM_MSM_VALIDATE_XML depends on a python feature. Add a dummy python
+> interpreter to make it possible to configure this option with dummy
+> tools.
 > 
-> [...]
+> 
 
 Applied to
 
@@ -63,12 +60,8 @@ Applied to
 
 Thanks!
 
-[1/3] scripts: kconfig: merge_config.sh: refactor from shell/sed/grep to awk
-      (no commit info)
-[2/3] scripts: kconfig: merge_config.sh: use awk in checks too
-      (no commit info)
-[3/3] scripts: kconfig: merge_config.sh: warn on duplicate input files
-      (no commit info)
+[1/1] kbuild: dummy-tools: Add python3
+      https://git.kernel.org/kbuild/c/76c73cfde7988
 
 Please look out for regression or issue reports or other follow up
 comments, as they may result in the patch/series getting dropped or
