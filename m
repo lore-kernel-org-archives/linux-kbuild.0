@@ -1,140 +1,163 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from omta038.useast.a.cloudfilter.net (omta038.useast.a.cloudfilter.net [44.202.169.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12AAC239E79;
-	Sat, 31 Jan 2026 15:29:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5E8D3612D8
+	for <linux-kbuild@vger.kernel.org>; Sat, 31 Jan 2026 20:34:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.202.169.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769873367; cv=none; b=nCu5Fyn4JmzYSfUblGLxwgc8KDCmSHfQK2bM07fJK+PYWcdlJ5kDppX4ehPwNbYdqjb2+SqlSPMq2UD+rDqq8zXu2kvz9uy+mHN7N4OpsB9Dh/bjx53Vb6xVJD4jJG7JoXUODYZ5uNLm6qrR+0b/QRrcY9yN6qhdEbcpJFOX2nU=
+	t=1769891657; cv=none; b=YwPiA9R86BJT0+EtG4M87cEQSURfoh4UbWmwx/xWMAXcRXtjuLt87lJDWPe1Wjw7X1lYkVGWIjn5QDAj9kCTltRPPdjtS2AsLXK7XnLQwT56S70GWeq/bTbXn9sHOPnaoSkdWRjfgVtF5lnMaMy/0KD11Hbd2sG/GVLlhIGuA/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769873367; c=relaxed/simple;
-	bh=acjTxQ7ZtIJYhVbnvKI5A1vrHYzg6i/oc2uPkZzgZyo=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=kD0/cGkoja90oRTdHkIxQa0QA9mwAs31/K5bUuPLH/V6N3v2+Td+Wq/YD7thtNcGlam1N4ydyqhDZmDDWVn+a3tVVmKVM+o7xCxvDoogsNw6zyOuOUQT9uVQrTHLZxC8xt1oNnY8CZVKAF4O5x0rlo4zzpr21K3GpRTwNiSqLmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qmhYeM6J; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1769891657; c=relaxed/simple;
+	bh=trW///4DZC+Gf3eWgnl0dDN5Cp3CVH1pn14LAtTFeVI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ct6PRjAV8EIz+4t5CUzKQxPZkHqnE7I8tv6/wvFfDNpExCuwP+5Pf/YAuhTfNEPf7Fc6qZqPhwaI9JnjWD6tHj4amHgy8d4eqJlMfabmofeJbZ8Lm2eKsVqHgIk6vrk1K1/vQzp1qa0R5evjZD19Vbv3F4UDlRtIxKv0g03hC40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=FyP9WMRg; arc=none smtp.client-ip=44.202.169.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qmhYeM6J"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11B42C4CEF1;
-	Sat, 31 Jan 2026 15:29:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769873366;
-	bh=acjTxQ7ZtIJYhVbnvKI5A1vrHYzg6i/oc2uPkZzgZyo=;
-	h=Date:From:To:Cc:Subject:From;
-	b=qmhYeM6JO1AlTyQE562OagUFRBiaqAT8zo/6hvz8Pjec9eWNUotTW+2BRpT2jM9lV
-	 j9L0SrSzzCnY5Oe0Qqf4lDWLQuo/nR0sI9Vz4ctTVGrJvHejU7V+kdG6kYz5FqcTg3
-	 6HVHjM3J+BFQPY3dvzyEtt0a34OjXasjmzVYFAyTcMV4tBJecpOs7riK76oBYXw1cq
-	 B02FJXLGYh/pUHFYTebgPEWkyec69On80ijhLbYKY9c+igtlgXtn24yENadG9nWAYg
-	 yC5dE41/9i3Vl2GNQfDOqk7JI9x0cF6eXcSFY5Gdi80QOjvZ8Ggeyx52Z5DrgxKixR
-	 fMao6JV3IYz2Q==
-Date: Sat, 31 Jan 2026 16:29:14 +0100
-From: Nicolas Schier <nsc@kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Kbuild Mailing List <linux-kbuild@vger.kernel.org>,
-	Ethan Zuo <yuxuan.zuo@outlook.com>,
-	Holger Kiehl <Holger.Kiehl@dwd.de>,
-	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Randy Dunlap <rdunlap@infradead.org>, Rong Zhang <i@rong.moe>,
-	Uday Shankar <ushankar@purestorage.com>
-Subject: [GIT PULL] Kbuild fixes for v6.19-rc7
-Message-ID: <aX4fytimtNnXTzQG@levanger>
-Mail-Followup-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Kbuild Mailing List <linux-kbuild@vger.kernel.org>,
-	Ethan Zuo <yuxuan.zuo@outlook.com>,
-	Holger Kiehl <Holger.Kiehl@dwd.de>,
-	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Randy Dunlap <rdunlap@infradead.org>, Rong Zhang <i@rong.moe>,
-	Uday Shankar <ushankar@purestorage.com>
+	dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="FyP9WMRg"
+Received: from eig-obgw-5005b.ext.cloudfilter.net ([10.0.29.189])
+	by cmsmtp with ESMTPS
+	id mHf7vNnJqSkcfmHfVv9VkT; Sat, 31 Jan 2026 20:34:09 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id mHfUviZ0BjAxumHfVvaDb0; Sat, 31 Jan 2026 20:34:09 +0000
+X-Authority-Analysis: v=2.4 cv=EoDSrTcA c=1 sm=1 tr=0 ts=697e6741
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=boSZjC74iCM+AjoU0vq/6A==:17
+ a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10 a=7T7KSl7uo7wA:10 a=ag1SF4gXAAAA:8
+ a=VwQbUJbxAAAA:8 a=sMBj6sIwAAAA:8 a=TFj8SqQbAAAA:8 a=_Wotqz80AAAA:8
+ a=c-n4J4-pAAAA:8 a=Z4Rwk6OoAAAA:8 a=NZ-89VFvAAAA:8 a=cm27Pg_UAAAA:8
+ a=WBVUFX3z8u_b3z711c8A:9 a=QEXdDO2ut3YA:10 a=d2ev92nbPIAA:10
+ a=Yupwre4RP9_Eg_Bd0iYG:22 a=pTDFpEv3elsvYK9BQVU7:22 a=buJP51TR1BpY-zbLSsyS:22
+ a=HkZW87K1Qel5hWWM3VKY:22 a=pm31WBKQz9GEXVZSZ1ft:22 a=2aFnImwKRvkU0tJ3nQRT:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=/IhkU1fxPPQsCPfhnyelknzkyfaLv2rdmRCMUd9KYGA=; b=FyP9WMRgnMM5wc1spZgAnDpAhX
+	jshI/uqabsR9VIxzCSRP9oxs9nR1fRFBREO3WFlcYOq5/HQy+go3jLFyupBzUYv6ozPVvz97jTNsz
+	dFuCMcLva3+b/2RltuCsnye+H9oHSkPCha7XhUX4eVn94YDACy+mZMO8dyy0oSJe8is7qKb4OAuWj
+	1C3ynH6YhqJ9jcuXXC+uw2B4SMstNs492dWUJog3nynM8IczPau7/M6jqt00ctNTR9wE4BGS8iYfC
+	FJz+SktczScZ8f13+yPx0d84OXK3JuTEbznFTvAeZFbXdD4ZQDj75Y5vZDzEaf3mKkbSyhdEttvv/
+	IH80ivZw==;
+Received: from [177.238.18.27] (port=45796 helo=[192.168.0.104])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.99.1)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1vmHfU-00000001W4v-26vi;
+	Sat, 31 Jan 2026 14:34:08 -0600
+Message-ID: <068adaf8-9f41-4918-b1dc-1104aad98abf@embeddedor.com>
+Date: Sat, 31 Jan 2026 14:33:27 +0900
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="68rGOsT7US5h8AJv"
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Makefile: Globally enable fall-through warning
+To: david@stennet.com, Shuah Khan <skhan@linuxfoundation.org>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Michal Marek <michal.lkml@markovi.net>, Kees Cook <keescook@chromium.org>,
+ linux-kbuild@vger.kernel.org
+References: <20260131054051.6938-1-david@stennet.com>
+ <20260131054051.6938-2-david@stennet.com>
+Content-Language: en-US
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <20260131054051.6938-2-david@stennet.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 177.238.18.27
+X-Source-L: No
+X-Exim-ID: 1vmHfU-00000001W4v-26vi
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.0.104]) [177.238.18.27]:45796
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 1
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfAySSZ5rOZdgU91a40FKkpPCJmiRpwW9DaY8u3D1F03y5b8M8nIBWjcxADR5woQRVHFQj1aVIerDOSJxa8O6EeVfq7NtNf3h/gxOfNdjdLy+Kce3AGFI
+ d3gIelKC5T7o4tj/L07WVfum9K4/C4kPx54YH4h060AAZ8DwGRVVH4zIcR5x9QQxK4j+uDwCjV1R6/5DIv80o0cku7y1tkqXExxFaVkGkynFqPQhTgZWWcRC
 
+Shuah,
 
---68rGOsT7US5h8AJv
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+People taking this[1] LF training have been wrongly submitting this
+patch since 2022 [2].
 
-Hi Linus,
+Why?
 
-please pull these two Kbuild fixes for 6.19-rc8.
+-Gustavo
 
-Thanks and best regards,
-Nicolas
+[1] https://training.linuxfoundation.org/training/a-beginners-guide-to-linux-kernel-development-lfd103/
+[2] https://lore.kernel.org/all/20220517195912.GA10952@embeddedor/
 
----
+On 1/31/26 14:40, david@stennet.com wrote:
+> From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+> 
+> Now that all the fall-through warnings have been addressed in the
+> kernel, enable the fall-through warning globally.
+> 
+> Also, update the deprecated.rst file to include implicit fall-through
+> as 'deprecated' so people can be pointed to a single location for
+> justification.
+> 
+> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: Michal Marek <michal.lkml@markovi.net>
+> Cc: Kees Cook <keescook@chromium.org>
+> Cc: linux-kbuild@vger.kernel.org
+> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+> ---
+>   Documentation/process/deprecated.rst | 14 ++++++++++++++
+>   Makefile                             |  3 +++
+>   2 files changed, 17 insertions(+)
+> 
+> diff --git a/Documentation/process/deprecated.rst b/Documentation/process/deprecated.rst
+> index 49e0f64a3427..053b24a6dd38 100644
+> --- a/Documentation/process/deprecated.rst
+> +++ b/Documentation/process/deprecated.rst
+> @@ -119,3 +119,17 @@ array may exceed the remaining memory in the stack segment. This could
+>   lead to a crash, possible overwriting sensitive contents at the end of the
+>   stack (when built without `CONFIG_THREAD_INFO_IN_TASK=y`), or overwriting
+>   memory adjacent to the stack (when built without `CONFIG_VMAP_STACK=y`)
+> +
+> +Implicit switch case fall-through
+> +---------------------------------
+> +The C language allows switch cases to "fall through" when
+> +a "break" statement is missing at the end of a case. This,
+> +however, introduces ambiguity in the code, as it's not always
+> +clear if the missing break is intentional or a bug. As there
+> +have been a long list of flaws `due to missing "break" statements
+> +<https://cwe.mitre.org/data/definitions/484.html>`_, we no longer allow
+> +"implicit fall-through". In order to identify an intentional fall-through
+> +case, we have adopted the marking used by static analyzers: a comment
+> +saying `/* Fall through */`. Once the C++17 `__attribute__((fallthrough))`
+> +is more widely handled by C compilers, static analyzers, and IDEs, we can
+> +switch to using that instead.
+> diff --git a/Makefile b/Makefile
+> index 9be5834073f8..bdf8eac51b07 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -843,6 +843,9 @@ NOSTDINC_FLAGS += -nostdinc -isystem $(shell $(CC) -print-file-name=include)
+>   # warn about C99 declaration after statement
+>   KBUILD_CFLAGS += -Wdeclaration-after-statement
+>   
+> +# Warn about unmarked fall-throughs in switch statement.
+> +KBUILD_CFLAGS += $(call cc-option,-Wimplicit-fallthrough=3,)
+> +
+>   # Variable Length Arrays (VLAs) should not be used anywhere in the kernel
+>   KBUILD_CFLAGS += -Wvla
+>   
 
-The following changes since commit 63804fed149a6750ffd28610c5c1c98cce6bd377:
-
-  Linux 6.19-rc7 (2026-01-25 14:11:24 -0800)
-
-are available in the Git repository at:
-
-  ssh://git@gitolite.kernel.org/pub/scm/linux/kernel/git/kbuild/linux.git tags/kbuild-fixes-6.19-3
-
-for you to fetch changes up to 8e24994872361212531a952c93adb01c485148f1:
-
-  kbuild: Do not run kernel-doc when building external modules (2026-01-31 16:12:01 +0100)
-
-----------------------------------------------------------------
-Kbuild fixes for 6.19, round 3
-
- - kbuild: rpm-pkg: Generate debuginfo package manually, allowing
-   signed kernel modules in rpm package, again
-
- - kbuild: Fix permissions of modules.builtin.modinfo
-
- - kbuild: Do not run kernel-doc when building external modules
-
-Cc: Ethan Zuo <yuxuan.zuo@outlook.com>
-Cc: Holger Kiehl <Holger.Kiehl@dwd.de>
-Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc: Nathan Chancellor <nathan@kernel.org>
-Cc: Randy Dunlap <rdunlap@infradead.org>
-Cc: Rong Zhang <i@rong.moe>
-Cc: Uday Shankar <ushankar@purestorage.com>
-Cc: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-
-----------------------------------------------------------------
-Ethan Zuo (1):
-      kbuild: Fix permissions of modules.builtin.modinfo
-
-Nathan Chancellor (2):
-      kbuild: rpm-pkg: Generate debuginfo package manually
-      kbuild: Do not run kernel-doc when building external modules
-
- scripts/Makefile.build      |  2 ++
- scripts/Makefile.vmlinux    |  3 ++-
- scripts/package/kernel.spec | 65 +++++++++++++++++++++------------------------
- 3 files changed, 34 insertions(+), 36 deletions(-)
-
---68rGOsT7US5h8AJv
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEh0E3p4c3JKeBvsLGB1IKcBYmEmkFAml+H8kACgkQB1IKcBYm
-EmndyBAA3wiGbA5yK7OqJ8y6F3hqI5eJ+Tmp1jPUzH+97c7G4MaS3+6yUkcnFqHy
-OT/2K5WF7gR59dUZXeUWMf4Fh1UHSpR6eRnqLnaDMx8gIc/8sQDbeLbfacmVJhDS
-s9SHMJ+or5YSHNj4PvfpodN/SXO72GT6b0pffCzUljAJwQ9XRJCXYKtBGelXpXng
-t9zeLpNu04B6LqbJQum2ooKkd8t7Fx2hqoI4oEjVQtJOykvV+BrEwzHDPQPlWEvC
-jHe/TpOqHlZI7caBdNRgXWB5+Mckk9a67EzejIrOK3YRJu7ZKfXEPbUT1HMh9wIc
-xQBbKugT6ZBh/9w9FpBozQIdcukBcvRy45m3fZ/AToveNQt5uPeLYUcpboao7Nw2
-Xp17URc38ErkpNJWYDuXR8NkULUOwP8XY44yw4buG0luWJ0NHJyWvBB5p8jhyidT
-UxF4YnZbBYRoq7mBC/o00MtPgTlJo0lMQBBNyIUUKf6cm8EnBbWC/ksfZAIzylfL
-fUnB/CX+0AR1/ipqh9Yltzjc2gLqKKRwtdndYnGHqNkQz8powMJOWU6FkpXzcZNg
-8L7o6R5xI1hkOC2f2hwwH2/+1p26aH54bTyC94T7xQcUPay8peOpAAi0rO/bEbpJ
-998of538yhwAK7T4567prM7GrFYirEJrE8tTewFopfXTrdkLQHc=
-=v8cf
------END PGP SIGNATURE-----
-
---68rGOsT7US5h8AJv--
