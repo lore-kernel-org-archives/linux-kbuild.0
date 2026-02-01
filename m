@@ -1,63 +1,93 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E614A239E79;
-	Sat, 31 Jan 2026 21:10:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EEF32E0916;
+	Sun,  1 Feb 2026 13:03:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769893811; cv=none; b=lOvo6cjR38ghowOgOhQF5drhXq0Nff8NftMjSfRRL0ye0Qt+PQnUw1c6N6u85bAatilsytzAIJVpCpvfcCkvGyKmoH0JKhB39djM9J8O2GHiYMDBY0KkNeJ2UbvFg6S8NjXsYDMmlBAgwB8cZ6ceIlh1/NCkQn1wCvgqixnZvH4=
+	t=1769951001; cv=none; b=uMPng9YK3Hz21Dq78U6A6Z73xJtlBHtiZSrAOWyFkpGPpQIX2rfvjtt2vp75BgtLC+LVKnzAxkvBnV5KTwc1agKcbd7svDsXl6uE2nvDhGtQGoXP6Cl3HSpPCnGfNqa3RfV80Wgs9DgRCkJ0KFfgHB5lCUVmqKxkZ8YbY4paJ3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769893811; c=relaxed/simple;
-	bh=+lLZJXKTfQQtShpaVjD/fphPzq1Q5whZ+fpAb7KoC0o=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=UicpkQUkidxgDnI0RVeh8WIjpUojV4Jq6A1mTmfr6m0dWdYYDgY6XgOmlWn4dypnEobJtJvbV2yp4rdZ4JNcfF1uv9cd1cmns9w+YDtVsyAqLc7RCy1M5PsEs2xTvlGfneZBbks0nB/3lZuXM9PD4gNEvTUW2e8mN504RCTlUvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tRzQMAbt; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tRzQMAbt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AC93C4CEF1;
-	Sat, 31 Jan 2026 21:10:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769893810;
-	bh=+lLZJXKTfQQtShpaVjD/fphPzq1Q5whZ+fpAb7KoC0o=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=tRzQMAbtQlSWD6DwGj5JU1VeGbwf4+oNFg96NsROfFiUOVyPu7Aej7SwFngPxDux5
-	 S9XgNYmfOKXYL7uqpqyhfyL6by6LWLQ1iQmivpui6SUkTda3Eule6W2sxo0KpmtfOI
-	 10ddrmqI/XccRNExWiTrOeTZwHdarrkiK3oooKQ7LB+MN/IImudxQQlVThSAsYZheo
-	 ipuxEYu9S5YSH+45hCU8CYtnba2HmRI3BUOGiyAmxaYOitJOZ+dNIewbDM6ybTi6p9
-	 D2l3ZQomEnll9nYapaDIq+SUOF8Xg9aC+huplYIICuuBFAn8WOoJBxzvNxdLd5q6+l
-	 ARjHi+kWmuXOQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 8BCA7380DBD4;
-	Sat, 31 Jan 2026 21:10:03 +0000 (UTC)
-Subject: Re: [GIT PULL] Kbuild fixes for v6.19-rc7
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <aX4fytimtNnXTzQG@levanger>
-References: <aX4fytimtNnXTzQG@levanger>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <aX4fytimtNnXTzQG@levanger>
-X-PR-Tracked-Remote: ssh://git@gitolite.kernel.org/pub/scm/linux/kernel/git/kbuild/linux.git tags/kbuild-fixes-6.19-3
-X-PR-Tracked-Commit-Id: 8e24994872361212531a952c93adb01c485148f1
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 44f4119c7c6aac5f6d476b51a0bc62dcbfcaad12
-Message-Id: <176989380206.4190632.10827669427649871313.pr-tracker-bot@kernel.org>
-Date: Sat, 31 Jan 2026 21:10:02 +0000
-To: Nicolas Schier <nsc@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild Mailing List <linux-kbuild@vger.kernel.org>, Ethan Zuo <yuxuan.zuo@outlook.com>, Holger Kiehl <Holger.Kiehl@dwd.de>, Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Rong Zhang <i@rong.moe>, Uday Shankar <ushankar@purestorage.com>
+	s=arc-20240116; t=1769951001; c=relaxed/simple;
+	bh=5lI0Qs1WhgJFgcxoXzwGq8XatThoD6keIsnSZjdGSWQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fAw3su5GGc5L9DgJRek1JAkdINzjcjJdn566jdYpjapmSx0f098LsSvAnuPty/uSIjpmsFRyOzMRsum8Rvc8T6cMn1enVV493zzqiQpRNPGC62nFEo0lIS0Ld+uUsh3uOrHlNuCBBe4XPrwgxTeUK24O42aHSIycXrOx61ewOyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from edelgard.fodlan.icenowy.me (unknown [112.94.102.235])
+	by APP-03 (Coremail) with SMTP id rQCowADX9t0IT39pWm5wBw--.13929S2;
+	Sun, 01 Feb 2026 21:03:05 +0800 (CST)
+From: Icenowy Zheng <zhengxingda@iscas.ac.cn>
+To: Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>
+Cc: Masahiro Yamada <masahiroy@kernel.org>,
+	Abel Vesa <abelvesa@kernel.org>,
+	Mingcong Bai <jeffbai@aosc.io>,
+	WangYuli <wangyuli@uniontech.com>,
+	Inochi Amaoto <inochiama@gmail.com>,
+	James Le Cuirot <chewi@gentoo.org>,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Icenowy Zheng <uwu@icenowy.me>,
+	Rong Zhang <i@rong.moe>,
+	Icenowy Zheng <zhengxingda@iscas.ac.cn>
+Subject: [PATCH] kbuild: install-extmod-build: do not exclude scripts/dtc/libfdt/
+Date: Sun,  1 Feb 2026 21:02:59 +0800
+Message-ID: <20260201130259.2906768-1-zhengxingda@iscas.ac.cn>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:rQCowADX9t0IT39pWm5wBw--.13929S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrtw1xKw1xuw1Dur15JrW8WFg_yoWkKFc_KF
+	yIq34fAa1Dt39Ikw1IgF47JrWIk3yrJan5K3WF9F1DZ3s5GF4qgasrKryUAF47WF4Ygr18
+	Can2qryxGw4fWjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb38FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
+	Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s
+	1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0
+	cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8Jw
+	ACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
+	v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
+	1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
+	AIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI
+	42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWI
+	evJa73UjIFyTuYvjfUonmRUUUUU
+X-CM-SenderInfo: x2kh0wp0lqwv3d6l2u1dvotugofq/
 
-The pull request you sent on Sat, 31 Jan 2026 16:29:14 +0100:
+There exists a header file in include/linux/ called libfdt.h that is
+just a wrapper for libfdt header file in scripts/dtc/libfdt/. This makes
+the headers inside libfdt copy at scripts/dtc/libfdt/ part of the kernel
+headers for building external modules.
 
-> ssh://git@gitolite.kernel.org/pub/scm/linux/kernel/git/kbuild/linux.git tags/kbuild-fixes-6.19-3
+Do not exclude them, otherwise modules that include <linux/libfdt.h>
+will fail to build externally.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/44f4119c7c6aac5f6d476b51a0bc62dcbfcaad12
+Fixes: aaed5c7739be ("kbuild: slim down package for building external modules")
+Signed-off-by: Icenowy Zheng <zhengxingda@iscas.ac.cn>
+---
+ scripts/package/install-extmod-build | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Thank you!
-
+diff --git a/scripts/package/install-extmod-build b/scripts/package/install-extmod-build
+index 2576cf7902dbb..d1e448d7f59f6 100755
+--- a/scripts/package/install-extmod-build
++++ b/scripts/package/install-extmod-build
+@@ -11,7 +11,8 @@ is_enabled() {
+ 
+ find_in_scripts() {
+ 	find scripts \
+-		\( -name atomic -o -name dtc -o -name kconfig -o -name package \) -prune -o \
++		\( -name atomic -o -name kconfig -o -name package -o \
++		   \( -path '*/dtc/*' -a ! -path '*/libfdt*' \) \) -prune -o \
+ 		! -name unifdef -a ! -name mk_elfconfig -a \( -type f -o -type l \) -print
+ }
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.52.0
+
