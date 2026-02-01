@@ -1,93 +1,108 @@
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EEF32E0916;
-	Sun,  1 Feb 2026 13:03:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC511261B8F;
+	Sun,  1 Feb 2026 16:22:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769951001; cv=none; b=uMPng9YK3Hz21Dq78U6A6Z73xJtlBHtiZSrAOWyFkpGPpQIX2rfvjtt2vp75BgtLC+LVKnzAxkvBnV5KTwc1agKcbd7svDsXl6uE2nvDhGtQGoXP6Cl3HSpPCnGfNqa3RfV80Wgs9DgRCkJ0KFfgHB5lCUVmqKxkZ8YbY4paJ3s=
+	t=1769962944; cv=none; b=WtrGi4yPv3bQaqLAL0d6U4yNWI+8xuiOgc/FeFhUABp/qVLVj5cxi31JtmhRwcxsy7j342RRCnLnin0UdnKTNAZUdXm5tpye82XTK+DbfCdHG5v8mMvu3PM4mtckwPxfIQlpk8eBjJV7aEGgg3SAfBri0TExBc/3kG8ngbTAzvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769951001; c=relaxed/simple;
-	bh=5lI0Qs1WhgJFgcxoXzwGq8XatThoD6keIsnSZjdGSWQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fAw3su5GGc5L9DgJRek1JAkdINzjcjJdn566jdYpjapmSx0f098LsSvAnuPty/uSIjpmsFRyOzMRsum8Rvc8T6cMn1enVV493zzqiQpRNPGC62nFEo0lIS0Ld+uUsh3uOrHlNuCBBe4XPrwgxTeUK24O42aHSIycXrOx61ewOyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from edelgard.fodlan.icenowy.me (unknown [112.94.102.235])
-	by APP-03 (Coremail) with SMTP id rQCowADX9t0IT39pWm5wBw--.13929S2;
-	Sun, 01 Feb 2026 21:03:05 +0800 (CST)
-From: Icenowy Zheng <zhengxingda@iscas.ac.cn>
-To: Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>
-Cc: Masahiro Yamada <masahiroy@kernel.org>,
-	Abel Vesa <abelvesa@kernel.org>,
-	Mingcong Bai <jeffbai@aosc.io>,
-	WangYuli <wangyuli@uniontech.com>,
-	Inochi Amaoto <inochiama@gmail.com>,
-	James Le Cuirot <chewi@gentoo.org>,
-	linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Icenowy Zheng <uwu@icenowy.me>,
-	Rong Zhang <i@rong.moe>,
-	Icenowy Zheng <zhengxingda@iscas.ac.cn>
-Subject: [PATCH] kbuild: install-extmod-build: do not exclude scripts/dtc/libfdt/
-Date: Sun,  1 Feb 2026 21:02:59 +0800
-Message-ID: <20260201130259.2906768-1-zhengxingda@iscas.ac.cn>
-X-Mailer: git-send-email 2.52.0
+	s=arc-20240116; t=1769962944; c=relaxed/simple;
+	bh=xlStmTRMhWVPt3fGtyXwEEDK5QLc9ZLigiHpsUvTOrc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QLHvyBQsrAQffTN7zZEXGg+NczdAqElK85oRg10p691IeqYUVqETZWC6gKQPCV0difis/p77bupvKeiE5n4V9jn4RARDzx3QFR6K4EIxgyqID9R6GHf/PBgzsUmN7gCYfgBEwCFe1189hNJk8jE0V98u12+Td13MKoYIzUv6JjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=bEfjssX6; arc=none smtp.client-ip=159.69.126.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="bEfjssX6"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+	s=mail; t=1769962934;
+	bh=xlStmTRMhWVPt3fGtyXwEEDK5QLc9ZLigiHpsUvTOrc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bEfjssX6nVvGGJYCjRv1Hgum2HvUXJPGA7CgYPlDg4pNFEnfuqh6BJNVd4xzoEnb/
+	 ZMmAJGEOHpCghTNwc5ybR5xqiScFWUgOJvwITdq0n0q7Kv6pPqNjU99FoLxmpQ1ILY
+	 /UCNvFIurX5sZ1rKb2ccqszu5PRz2lLOVB+DzJaQ=
+Date: Sun, 1 Feb 2026 17:22:12 +0100
+From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
+To: Mihai-Drosi =?utf-8?B?Q8OianU=?= <mcaju95@gmail.com>
+Cc: arnd@arndb.de, arnout@bzzt.net, atomlin@atomlin.com, 
+	bigeasy@linutronix.de, chleroy@kernel.org, christian@heusel.eu, corbet@lwn.net, 
+	coxu@redhat.com, da.gomez@kernel.org, da.gomez@samsung.com, 
+	dmitry.kasatkin@gmail.com, eric.snowberg@oracle.com, f.gruenbichler@proxmox.com, 
+	jmorris@namei.org, kpcyrd@archlinux.org, linux-arch@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-modules@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, lkp@intel.com, 
+	maddy@linux.ibm.com, mattia@mapreri.org, mcgrof@kernel.org, mpe@ellerman.id.au, 
+	nathan@kernel.org, naveen@kernel.org, nicolas.bouchinet@oss.cyber.gouv.fr, 
+	nicolas.schier@linux.dev, npiggin@gmail.com, nsc@kernel.org, paul@paul-moore.com, 
+	petr.pavlu@suse.com, roberto.sassu@huawei.com, samitolvanen@google.com, 
+	serge@hallyn.com, xiujianfeng@huawei.com, zohar@linux.ibm.com
+Subject: Re: [PATCH v4 00/17] module: Introduce hash-based integrity checking
+Message-ID: <1ff0f085-fe89-48b4-bae3-559777a56a0d@t-8ch.de>
+References: <20260113-module-hashes-v4-0-0b932db9b56b@weissschuh.net>
+ <20260131073636.65494-1-mcaju95@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowADX9t0IT39pWm5wBw--.13929S2
-X-Coremail-Antispam: 1UD129KBjvdXoWrtw1xKw1xuw1Dur15JrW8WFg_yoWkKFc_KF
-	yIq34fAa1Dt39Ikw1IgF47JrWIk3yrJan5K3WF9F1DZ3s5GF4qgasrKryUAF47WF4Ygr18
-	Can2qryxGw4fWjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb38FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
-	Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s
-	1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0
-	cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8Jw
-	ACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-	0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
-	v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
-	1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
-	AIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI
-	42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWI
-	evJa73UjIFyTuYvjfUonmRUUUUU
-X-CM-SenderInfo: x2kh0wp0lqwv3d6l2u1dvotugofq/
+In-Reply-To: <20260131073636.65494-1-mcaju95@gmail.com>
 
-There exists a header file in include/linux/ called libfdt.h that is
-just a wrapper for libfdt header file in scripts/dtc/libfdt/. This makes
-the headers inside libfdt copy at scripts/dtc/libfdt/ part of the kernel
-headers for building external modules.
+Hi Mihai-Drosi,
 
-Do not exclude them, otherwise modules that include <linux/libfdt.h>
-will fail to build externally.
+thanks for taking an interest into these patches!
 
-Fixes: aaed5c7739be ("kbuild: slim down package for building external modules")
-Signed-off-by: Icenowy Zheng <zhengxingda@iscas.ac.cn>
----
- scripts/package/install-extmod-build | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On 2026-01-31 09:36:36+0200, Mihai-Drosi Câju wrote:
+> > The current signature-based module integrity checking has some drawbacks
+> > in combination with reproducible builds. Either the module signing key
+> > is generated at build time, which makes the build unreproducible, or a
+> > static signing key is used, which precludes rebuilds by third parties
+> > and makes the whole build and packaging process much more complicated.
+> 
+> I think there is a middle ground where the module signing key is generated
+> using a key derivation function that has as an input a deterministic value
+> on the build host, such as /etc/machine-id . The problem with this approach
+> is that only hosts knowing the value will be able to reproduce the build.
 
-diff --git a/scripts/package/install-extmod-build b/scripts/package/install-extmod-build
-index 2576cf7902dbb..d1e448d7f59f6 100755
---- a/scripts/package/install-extmod-build
-+++ b/scripts/package/install-extmod-build
-@@ -11,7 +11,8 @@ is_enabled() {
- 
- find_in_scripts() {
- 	find scripts \
--		\( -name atomic -o -name dtc -o -name kconfig -o -name package \) -prune -o \
-+		\( -name atomic -o -name kconfig -o -name package -o \
-+		   \( -path '*/dtc/*' -a ! -path '*/libfdt*' \) \) -prune -o \
- 		! -name unifdef -a ! -name mk_elfconfig -a \( -type f -o -type l \) -print
- }
- 
--- 
-2.52.0
+The goal is to make the distro kernel packages rebuildable by the
+general public. Any involvement of secret values will break this goal.
 
+> Maybe this is a solution to NixOS secret management? Introduce minimal
+> impurity as a cryptographic seed and derive the rest of the secrets using
+> something like Argon2(seed, key_uuid).
+
+I am not familiar with NixOS and its secret management.
+This patchset serves a wider audience.
+
+> There might be another approach to code integrity rather than step-by-step
+> reproducibility. One may exploit the very cryptographic primitives that make
+> reproducibility hard to ensure that reproducibility is most  likely valid.
+> 
+> For example, the module signing issue, the build host publishes four artifacts:
+> * The source-code
+> * The compiled and signed binary
+> * The build environment
+> * Its public key
+> 
+> Now, we don't need to sign with the private key to know that building the source
+> code using the specific build environment and signing the result with the private
+> key will result in the claimed binary. We can just compile and verify with the
+> public key.
+
+This could work if the goal is only to verify the reproducibility of a
+single, signed-en-bloc artifact. But we also need to handle vmlinux which
+contains the corresponding public key. It would need different handling.
+We can add some special logic to strip that public key before
+comparision. But then vmlinux might be compressed or wrapped in some
+other format. Another whole collection of special logic.
+
+(...)
+
+
+Thomas
