@@ -1,151 +1,95 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2925032F763
-	for <linux-kbuild@vger.kernel.org>; Mon,  2 Feb 2026 16:46:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5F031F94F;
+	Mon,  2 Feb 2026 18:30:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770050778; cv=none; b=hadorxZtu0iBoPu1LLoaYELqjvAwJaToRo5MHPLTgTo1eHtAGTSXfJJAe4vfKCnMMfe79R868N+oajtKiC6eE/tUWUKBxxyDMMhCbGs5mqUrbu8MF6zox2De8rKGcE0B7lL7NK6/gCQY7ID1VyfSzJQgPB+J1991TBRMM5kFn2w=
+	t=1770057059; cv=none; b=XbVMF7IGpsoFuXWx3kMatg2+L1HLC25HNYowl2cpPrrev8tAwC2Np+M0yHkrsGxwMBeFE2hNIpccisJIRl5K8biIlRmYpy7pkoraVIaI7uiorw+OPvBo/Q0wQsw9e0yUD6JkT4tjVo7Vs9Kut5SavmHKb3N3X6x3byH70vgZfi4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770050778; c=relaxed/simple;
-	bh=Usnw3Gatub1oxTffhK0WXeLvi39STFWovIQLvfzLBCM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jOevJm1msYH8kLN5cJXHSIiq2J2PEH+O5GDIoiv2Re4l6+LQ4WqXjfv+/lfvh+4R+3nxs52OlfZdRhivrMqs4y2ZkLL9jG+UZL6IScQHqm6EbdaXnrA0yDwsuTzNj7coKEIVrFALeVAj5z3MX1CKygn2G0hJ1pgqyAJCaSJ+EJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GFYww28O; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1770057059; c=relaxed/simple;
+	bh=ba2/NLTkOhnfOM6fqK9CoYWWEtF7emjNfwqBUh4yBbA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WlZvBDx8HYpi8XkBOMm5jmOygl9VuQ3Jy1jnN8kSX1BII/Kq1xAAmyMCrDQz2ZZCeW+S9QpfaIcLtik81ABYW4Ob7+JGFDo30c6EUC38InJIxsBvnXI3yDCgj4YfyIctCEgL0ugRjatdgXB1q+yHaK6k9rHudaR0B/ZrpsFu5yo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jQdWElel; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GFYww28O"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2a7bceb6cd0so32452825ad.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 02 Feb 2026 08:46:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770050776; x=1770655576; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cvR2bhtkwHdzvpnOA5ZJ9EggNv6gPLY0gAmo2EM4ZPc=;
-        b=GFYww28OQF8Dt84Qq7csZWIgO2vhu9SOwyI6XVChd0pfU96XGkMYq6Agk7NJfC7Dvj
-         zGzbXup7E7vH3ke55ih/rNk62b/v0JI1qY6Fn+p1QHnOp+vCVSUW0vmS6EPQ5nC3aIIV
-         3o0eMRccaZ2eYrrPy9rr6RQ7+bKjr2veApxyv84HbiIpdFC0TT01STJJDcGhnI6N4O0c
-         +rqE3LWL/cMQPP3O+iyshlASpINeJx4EWaaLgrxFsqTvE/OScwkfTmFdBO9EbNG+QkAL
-         9SOYfEhJNTpqubDwx5phWZn5wEpf1ltVrOpngDcEONeGX4zbQRcU2fOUQMKTofsKWOWb
-         jupQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770050776; x=1770655576;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=cvR2bhtkwHdzvpnOA5ZJ9EggNv6gPLY0gAmo2EM4ZPc=;
-        b=t+vg63WGPHbDvLzJB1XEb+HTRwkkJCwEnWVa7yoOtA0UPV7Ks41LJJePICmXxyDYCU
-         6zqaX9Z7oeI/HELulrdpFynn4MHxWLnbmSZwclJEEZMcJMp5OHBiGE6oyFw7XdP5ArO+
-         sP/DNTHrMqT2gyxArpuLZVg9dDCwY/BtdP3lTnXRUo6gUzT1QO/tlirX0+X0vIWVrqTq
-         DdqF/VPEW07k1GXfdzkWbspRNj1CC/lJ03JwjFJybtKzTHedqBJ9c5xxCvX/LX6BC7Ag
-         BPYQIhETKGx9Zwl3mGIwLUTSJ71b4QlDafb0vj8pJE3TGazAf5wOnAc8x7840H3RmYaZ
-         ljVg==
-X-Forwarded-Encrypted: i=1; AJvYcCXT5uzxynDmuyucSyVNB7vArYi4K1LVAfqe/jC59DscWrdBzQyitQWRxxyjpIbPvUy4Bxnj3JoW9WrVW5M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzJ4m4uQ+wmnZPIZ1i01+Fd9b5rX76ReZxzFWIEISEIr8sje+9
-	Jv7N1vE6sKqOJoV7icqAmyA55OICLDpe3FiDbwQQ2TcFnnhEEAOK0Ahv
-X-Gm-Gg: AZuq6aLaQKSzl6+kijlOh+6abyE77TGmBgo1uQn2PXTkyccN/ZQeD+rwZkuTSsxh0uC
-	5YVuHgPIeQJL96VlAZAKYhruyvpdFqCqbw4gFGw6oiIXiWvZZYatLs1kyUF3lu/8WKD/baOoc5Q
-	r5D8GKc1Krkv3lGVJ67KEPG4AkvcWONDPMEtyx/TSaVAKv8qWKvMtxI+Ckpd3UL5bsPmLmYsZ9a
-	FtWu6cNUUIlW3hlsswgnRZnQn3QflLcu7gCdwUd3npyku71mMEzTkxYTrZq+52bqDSDMmsld3yR
-	v0Dehb/A8d99uHSJSFF55H5Ju24xlwQqC8MDKAnoM9JORrC6H+sX/ZnxjYzB14m89PDUhp15mYC
-	5jwUTvXaeZBywK+WYGerv5/MpETV4RFNyjKt+ZhtjSwNoYzyGjkO6+kKjs2NHCEPAm4Oc8g1czS
-	nWkMM=
-X-Received: by 2002:a17:903:2b07:b0:29d:7b9b:515b with SMTP id d9443c01a7336-2a8d96b1051mr138969065ad.20.1770050776360;
-        Mon, 02 Feb 2026 08:46:16 -0800 (PST)
-Received: from misys ([58.120.241.145])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a8bd74e9bbsm129294195ad.95.2026.02.02.08.46.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Feb 2026 08:46:16 -0800 (PST)
-From: HeeSu Kim <mlksvender@gmail.com>
-To: miguel.ojeda.sandonis@gmail.com
-Cc: a.hindborg@kernel.org,
-	aliceryhl@google.com,
-	bjorn3_gh@protonmail.com,
-	boqun@google.com,
-	charmitro@posteo.net,
-	dakr@kernel.org,
-	gary@garyguo.net,
-	linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lossin@kernel.org,
-	mlksvender@gmail.com,
-	nathan@kernel.org,
-	nsc@kernel.org,
-	ojeda@kernel.org,
-	rust-for-linux@vger.kernel.org,
-	tmgross@umich.edu
-Subject: Re: [PATCH v2] rust: Makefile: bound rustdoc workaround to affected versions
-Date: Tue,  3 Feb 2026 10:46:13 +0900
-Message-ID: <20260203014613.2708234-1-mlksvender@gmail.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <CANiq72n39eU9WE=Yh0_yJzmqMxo=QAaU2pN0UqP9jZ7bT7rhgA@mail.gmail.com>
-References: <CANiq72n39eU9WE=Yh0_yJzmqMxo=QAaU2pN0UqP9jZ7bT7rhgA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jQdWElel"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3D3BC116C6;
+	Mon,  2 Feb 2026 18:30:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770057059;
+	bh=ba2/NLTkOhnfOM6fqK9CoYWWEtF7emjNfwqBUh4yBbA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jQdWElelgsDi9Lay4j/hwJ03E13C+lgoT6EceyxP+5cYY6I6m7jHMoK+qOMfJiv86
+	 yQ3WpDDf9fgEhNukaSob3J6pFaTB/P4DCFJjyfM4Qjn/hK2D2RuxK//YXd1Is1nThp
+	 MMNKlgqT+Agvdn6PA3w3ZXA54il9ecGPcwQbfeIQVC1mCBJEN7XENg1MdrliWyx+hh
+	 BKgNv5CkNux1m/VqvUXQanwkHaGSibh10BbGrK26dHOS6DSO2GQpycuZCHpDaFERCb
+	 c/7E10hAvVtHrmBU33vel+eacqEbofbWdplYFbOlibC/SQaxmPqR8fKJZItMGwz9/Y
+	 /D38Ipq7pYTIQ==
+Date: Mon, 2 Feb 2026 10:30:55 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: =?us-ascii?B?PT9VVEYtOD9xP01paGFpLURyb3NpPTIwQz1DMz1BMmp1Pz0=?= <mcaju95@gmail.com>,
+	linux@weissschuh.net, arnd@arndb.de, arnout@bzzt.net,
+	atomlin@atomlin.com, bigeasy@linutronix.de, chleroy@kernel.org,
+	christian@heusel.eu, corbet@lwn.net, coxu@redhat.com,
+	da.gomez@kernel.org, da.gomez@samsung.com,
+	dmitry.kasatkin@gmail.com, eric.snowberg@oracle.com,
+	f.gruenbichler@proxmox.com, jmorris@namei.org, kpcyrd@archlinux.org,
+	linux-arch@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-integrity@vger.kernel.org, linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-modules@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, lkp@intel.com, maddy@linux.ibm.com,
+	mattia@mapreri.org, mcgrof@kernel.org, mpe@ellerman.id.au,
+	nathan@kernel.org, naveen@kernel.org,
+	nicolas.bouchinet@oss.cyber.gouv.fr, nicolas.schier@linux.dev,
+	npiggin@gmail.com, nsc@kernel.org, paul@paul-moore.com,
+	petr.pavlu@suse.com, roberto.sassu@huawei.com,
+	samitolvanen@google.com, serge@hallyn.com, xiujianfeng@huawei.com,
+	zohar@linux.ibm.com
+Subject: Re: [PATCH v4 00/17] module: Introduce hash-based integrity checking
+Message-ID: <20260202183055.GB2036@quark>
+References: <20260201201218.GA15755@quark>
+ <20260131073636.65494-1-mcaju95@gmail.com>
+ <20260113-module-hashes-v4-0-0b932db9b56b@weissschuh.net>
+ <2316630.1769965788@warthog.procyon.org.uk>
+ <2339369.1770024079@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2339369.1770024079@warthog.procyon.org.uk>
 
-On Mon, 3 Feb 2026, Miguel Ojeda wrote:
-> On Mon, Feb 3, 2025 at 1:09 AM HeeSu Kim <mlksvender@gmail.com> wrote:
-> >
-> > The `-Cunsafe-allow-abi-mismatch=fixed-x18` workaround was added to
-> > handle a rustdoc bug (rust-lang/rust#144521) where target modifiers
-> > were not properly saved.
-> >
-> > This bug was fixed in Rust 1.90.0 (rust-lang/rust#144523). Restrict
->
-> We tend to use `Link:` tags for these. Typically we write a line like:
->
->     Link: https://github.com/rust-lang/rust/issues/144521
->
-> If you want to reference it inline, you can also just put the full URL.
->
-> > Suggested-by: Gary Guo <gary@garyguo.net>
->
-> Please add a `Link:` tag after this one pointing to his message.
->
-> > Fixes: abbf9a449441 ("rust: workaround `rustdoc` target modifiers bug")
->
-> I am not so sure this is a fix -- after all, when you use `1.88` or
-> `1.89`, nothing would change. So it is more of a feature? i.e. the
-> ability to use `1.90`.
->
-> But I guess it could also be understood as "we should have applied
-> this only for affected versions to begin with", but then it would be
-> from a "code documentation" perspective, which is fine, but it is not
-> something that e.g. we would need to backport. So I am leaning towards
-> not having a `Fixes:` here.
->
-> And this has another issue (though a different patch): the `sanitizer`
-> modifier.
->
-> By the way, I wonder if we would want at least a `rustc-max-version`
-> (or an `-until` variant, or whatever) so that we can easily express
-> that range in a single call, and document the bounds together (I could
-> imagine that we could end up with a few of these over time, and then
-> they start to shift versions, they get spread across lines, etc.).
->
-> Perhaps the Kbuild maintainers can comment on whether that would be a
-> good idea or whether they already have something.
->
-> Cheers,
-> Miguel
+On Mon, Feb 02, 2026 at 09:21:19AM +0000, David Howells wrote:
+> Eric Biggers <ebiggers@kernel.org> wrote:
+> 
+> > With that being the case, why is there still effort being put into
+> > adding more features to module signing?  I would think efforts should be
+> > focused on hash-based module authentication, i.e. this patchset.
+> 
+> Because it's not just signing of modules
 
-Thanks for the detailed feedback.
+Module signing is indeed about the signing of modules.
 
-For v3, I will:
-- Use full Link: tags for GitHub references instead of shorthand
-- Add Link: tag after Suggested-by pointing to Gary's lore message
-- Remove the Fixes: tag
-- Add Cc: stable@vger.kernel.org # Useful in 6.18.y and later.
+> and it's not just modules built with the kernel.
 
-Regarding rustc-max-version, it would be useful for reading the code.
-I'll wait for Kbuild maintainers' reply.
+Could you give more details on this use case and why it needs
+signatures, as opposed to e.g. loading an additional Merkle tree root
+into the kernel to add to the set of allowed modules?
 
-Best regards,
-HeeSu Kim
+> Also a hash table just of module hashes built into the core
+> kernel image will increase the size of the kernel by around a third of a meg
+> (on Fedora 43 and assuming SHA512) with uncompressible data.
+
+This patchset already optimizes it to use Merkle tree proofs instead.
+While I'm a bit skeptical of the complexity myself (and distros
+shouldn't be shipping such an excessively large number of modules in the
+first place), if it's indeed needed it's already been solved.  It's
+still much simpler than the PKCS#7 signature mess.
+
+- Eric
