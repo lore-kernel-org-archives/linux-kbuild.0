@@ -1,137 +1,122 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 220F8E555
-	for <linux-kbuild@vger.kernel.org>; Tue,  3 Feb 2026 00:17:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D098877F39;
+	Tue,  3 Feb 2026 00:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770077875; cv=none; b=K55pNKJ3pNnC8m8mm67nUbSgH9r8LJ/AjnpXnLblOCrRDBD6xiEcR+w5spjsDHBQbrk1NIul+YWwG+guIrqRDR7m7DIx7jIk/5WNig1ILFjzBxoN2n/WfXT9WbLasVS0KxO1t8fGxop3Y9XE/oJ4YP8YaJXBbzNGRjdfP0jNrEk=
+	t=1770079236; cv=none; b=aybPxzW1cZ4MrKyfit7Kl131nG2SLJ06BnXwNcBmr0RVRZlMEqvLVnmnyCY+crvZ/oY/88+HeiBa+KoNQXrzqrbj9eTeldNOs/xH6Anqj/DnCekWpeUn2bfE2VW7kGjFDE3bTw/F2lUdLGfCWohn2gVIzz8U5LvY5pO6iHlKlcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770077875; c=relaxed/simple;
-	bh=ZJVy6cPRC9mVjPwe70OyZwHOLgx0hBKchie2Ey+56o4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FpSaUJ0LK0MHZeDAjAgn4TOY6xTuxTXQTiMH1v9RRibvILD5OKp7mVE0WCF865qDr9atUdVE9b8L1JIzvFhJ5uvSzwBc37l9pXmgBCcAwOBAEmfsMXCins4zWvFtNjImP2Ma30BuKw6s2D5U8gljCQG9J/+N8yjOqZGVPHSLbyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X4h5okCy; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1770079236; c=relaxed/simple;
+	bh=r07P9KyyXMWvtCnmo/ELc9mFvwuiiBSsYPtw1lMOTic=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ErwX1Zp4/im9GtcPVp3gS4flo3W47u2sQiwasIPDHkB/LTcxtk/wB2m6sO0Z+MClfcHziaklhMcuPo3KRl8f2oGb2IDTHejvsZ2pLqEwUTCqqcSNmEWIEEf7yJnVC3Q4Kr8J+0LLc4G6w7F7zuiBbfzcnAamiaUQrDJxp19kQ2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pCS9vnWY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X4h5okCy"
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2a0c09bb78cso2096645ad.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 02 Feb 2026 16:17:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770077873; x=1770682673; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SZ1ws/HZ3fMtoPm4mMzkQZSOpt+7LENYkmppWHzFdqA=;
-        b=X4h5okCysoBz/QiSq5/mM9++K1C1JQlcJxa107X0FYoJkks62N4Vo91K0uWw4MnW3Y
-         8e363Uw0SZ5YUckuF/CxOl97e9bS/2c1nm/qXPbEgW/NTN3genVWNb9eDDDXPvu1aLel
-         5W9fwyTBlskb0vjfws3Ccjg3eCQUuwmgHlaAOi4n5+soluSYXIzBfXVrWA4Dtl+sCcZU
-         6OxN/plGs059h4hIfKWlyXlRT6H/fgkz9qf25aACVQscHoTlAUBnp6tsP00Tm6vzgHqK
-         /5+chZvsJkeDiYPwU0K5QMHeXbWpQUtEVft7JOyUsXG3DXvEljLqB+9tBhNIUM77hMpX
-         M2kA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770077873; x=1770682673;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=SZ1ws/HZ3fMtoPm4mMzkQZSOpt+7LENYkmppWHzFdqA=;
-        b=DUlXwJlD3jG5irGpr0MtZo3Wp7TgXcQuYUCb5Kg+2uvimEI8JDUiDobW0FHN/gp003
-         47P4cXDj7IQbzfG6rl06k7m1GyjF2m+QcIJkrLqY4y/CXg7p3CM6wUO3Hi2mgpgwr/36
-         jRqoMVqA6BQGloQb9ceNjDolQCK7e2LfiDosI93/XFFHhR7XzKkZj4khX6KQIDb4Jw1R
-         rJ//JjFRr4tMLny18INfjtTjYdMnu3jlA7EcqZYNatgVSRuta9j8e+wbfF07rQ96aQAX
-         nm7S91avCChC/L9D/2FZfxKNWLgFU7D6svy0HNovW1pADJDthRKwcQ/9vRLy+h4Y6sQB
-         evYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXMPu8TEqeLLvOI4WX39/OIdLfyRcOHXjR+RuAZQsC8wC71Gf0sDaDmWbtYbSyaI6MlmoyFBVIsfnSZVQk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw32QmM1/IqLJqNgR2FKJ/+H8Bjd6lqN/HCRAOpvoedWgZYa7iu
-	EmM1tH5so6PQykTrtjdU1W7HPuIV+54tFxQPZ51HDa+Vkw4g59rCwuIR
-X-Gm-Gg: AZuq6aJU/5J+JZoXvdoLg+ETRxPeZsH1seVpV+X6zX9MVNWIoRUSTCInSq3d50+qgcL
-	MciAmEBJNsn0as/ogOzCCCT5fKzYqYhBEK+dvYY5yvgsnRsaabp4TyaMiMzG3N969cKSAeagKhh
-	7VuLY41KBATgOfylTnTifRs8xWFd4c/Hk1FN6tmoepRwMijTcTo5U437G7SQbPMzlGg5DhMiQrI
-	zRgsHEksDgnT5MIGqGEijIOw2WvbDxMCyZNCCRK702LD1+txYLY4azaiQYN0BhlzMPVEJ+zL/nw
-	D15OQxQKP+stuoKkUEeht8ExgNopUmD7C4Qyu+nQ5QnDrgQ5Wmtxh6NsSlZdNKbb/USQCdh54N4
-	8grN+RzY70hOpDlNPd1k7g0zocpf8aWydQFCX9um1o5QRQRRAi0ihykz6SMIKhp7eqQ8UPypeLB
-	Cq3Js=
-X-Received: by 2002:a17:903:2ecd:b0:2a7:b412:6cc8 with SMTP id d9443c01a7336-2a92458de40mr8592055ad.1.1770077873450;
-        Mon, 02 Feb 2026 16:17:53 -0800 (PST)
-Received: from misys ([58.120.241.145])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a88b6e4110sm149973765ad.84.2026.02.02.16.17.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Feb 2026 16:17:53 -0800 (PST)
-From: HeeSu Kim <mlksvender@gmail.com>
-To: miguel.ojeda.sandonis@gmail.com
-Cc: a.hindborg@kernel.org,
-	aliceryhl@google.com,
-	bjorn3_gh@protonmail.com,
-	boqun@google.com,
-	charmitro@posteo.net,
-	dakr@kernel.org,
-	gary@garyguo.net,
-	linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lossin@kernel.org,
-	nathan@kernel.org,
-	nsc@kernel.org,
-	ojeda@kernel.org,
-	rust-for-linux@vger.kernel.org,
-	tmgross@umich.edu,
-	HeeSu Kim <mlksvender@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v3] rust: Makefile: bound rustdoc workaround to affected versions
-Date: Tue,  3 Feb 2026 18:17:31 +0900
-Message-ID: <20260203091731.2731080-1-mlksvender@gmail.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <CANiq72n39eU9WE=Yh0_yJzmqMxo=QAaU2pN0UqP9jZ7bT7rhgA@mail.gmail.com>
-References: <CANiq72n39eU9WE=Yh0_yJzmqMxo=QAaU2pN0UqP9jZ7bT7rhgA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pCS9vnWY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16B47C116C6;
+	Tue,  3 Feb 2026 00:40:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770079236;
+	bh=r07P9KyyXMWvtCnmo/ELc9mFvwuiiBSsYPtw1lMOTic=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pCS9vnWYs2VJ0tS1tZryolzMh2XzSjDx+gVankLB/BrNjDRBzmAnEDMRk0fPznXo4
+	 lJdIZIh93M2QrgYTjwMZsvG7vuFN4NbqVI2p2Nd7kgou3pPNlBhsiLxONNiP5SHwlY
+	 P9w2wK1ZPz3q+NqO6Vz+r7NsKXw8ACT9kWyG1vmIW2rJEFaKA8nLFg5UuZjemApTAI
+	 u3Cu9EHYHivDsR/Rv5cDO7o3sI3rsxTuRB8IivPix05Z55j0qcPWMGOkVu4RuNGJ5G
+	 KIxHUHhWG87LVYA4lqacFNm9ksTSpN6UiGyrLANsCCCv70ej8C6r1KwwkAUXZ0Saml
+	 CZs5RDfT5Tk2g==
+Date: Mon, 2 Feb 2026 17:40:32 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Luis Augenstein <luis.augenstein@tngtech.com>
+Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
+	Greg KH <gregkh@linuxfoundation.org>, nsc@kernel.org,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	akpm@linux-foundation.org, maximilian.huber@tngtech.com
+Subject: Re: [PATCH v2 00/14] Add SPDX SBOM generation tool
+Message-ID: <20260203004032.GA52989@ax162>
+References: <20260120115352.10910-1-luis.augenstein@tngtech.com>
+ <CANiq72mtWhjVNNYc6nvxuQ3XAnMWBDiZyOvJ1BNN=M+097Wvpw@mail.gmail.com>
+ <2026012214-magician-mashed-c84c@gregkh>
+ <CANiq72mcDqAS-FUfkAnxa7OEO4Kq6r6=uvhEb_UW4sGattCOuQ@mail.gmail.com>
+ <2026012533-preflight-surviving-43e5@gregkh>
+ <CANiq72=_tPP4cPaUMPiM14h1kk97EXSf5vg-yHHYo-Px+31ZSg@mail.gmail.com>
+ <a01233b9-23a2-4666-91ed-f1cf030dcb9f@tngtech.com>
+ <20260127231037.GA3378797@ax162>
+ <6ed0fe99-3724-40c2-8d98-3309a3cf0104@tngtech.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <6ed0fe99-3724-40c2-8d98-3309a3cf0104@tngtech.com>
 
-The `-Cunsafe-allow-abi-mismatch=fixed-x18` workaround was added to
-handle a rustdoc bug where target modifiers were not properly saved [1].
+Hi Luis,
 
-This bug was fixed in Rust 1.90.0 [2]. Restrict the workaround to only
-apply for Rust 1.88.x and 1.89.x versions that are affected by the
-bug, preserving ABI compatibility checks on newer compiler versions.
+On Mon, Feb 02, 2026 at 05:28:39PM +0100, Luis Augenstein wrote:
+> > I wonder if it would be better for this to live within scripts/ instead
+> > of tools/, as that should allow it to be integrated into the build
+> > process a little bit more naturally, such as using $(Q) instead of @,
+> > $(PYTHON3) instead of the bare python3, being able to access
+> > CONFIG_MODULES directly, and cleaning up the actual implementation of
+> > the sbom target in Makefile.
+> 
+> Thanks, I wasn’t aware that targets under scripts/ have access to more
+> Make variables by default. During development, we didn’t have strong
 
-Link: https://github.com/rust-lang/rust/issues/144521 [1]
-Link: https://github.com/rust-lang/rust/pull/144523 [2]
-Suggested-by: Gary Guo <gary@garyguo.net>
-Link: https://lore.kernel.org/rust-for-linux/DG4JM9PU51M0.1YRGM9HVTY24U@garyguo.net/
-Cc: stable@vger.kernel.org # Useful in 6.18.y and later.
-Signed-off-by: HeeSu Kim <mlksvender@gmail.com>
----
-Changes in v3:
-- Remove Fixes: tag (this is a feature, not a fix)
-- Use full URLs with Link: tags instead of GitHub-style references
-- Add Link: to lore.kernel.org for Suggested-by attribution
-- Add Cc: stable for potential backporting to 6.18.y
+I think this is a byproduct of being fully within Kbuild at that point,
+rather than in the tools/ build system.
 
-Changes in v2:
-- Change approach: bound to affected Rust versions instead of ARM64-only
-  (the flag is simply ignored on non-ARM64 architectures)
+> reasons for choosing either tools/ or scripts/. I’m happy to move it to
+> scripts/ if that is the preferred location.
 
- rust/Makefile | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Yes please. If this tool is designed to run within and parse Kbuild, it
+should live fully within Kbuild, as the "tools build system" comment in
+Makefile added by Masahiro in commit 6e6ef2da3a28 ("Makefile: add
+comment to discourage tools/* addition for kernel builds") notes (even
+though this is not a C program so the hostprogs comment is irrelevant
+here). scripts/sbom seems entirely reasonable to me.
 
-diff --git a/rust/Makefile b/rust/Makefile
-index 5c0155b83454..55e2dc865207 100644
---- a/rust/Makefile
-+++ b/rust/Makefile
-@@ -136,7 +136,8 @@ pin_init-flags := \
+> Regarding $(Q) and $(PYTHON3), I noticed that these variables are
+> actually available within the tools/ directory as well, so we could
+> switch to using them even if we stay under tools/.
 
- # `rustdoc` did not save the target modifiers, thus workaround for
- # the time being (https://github.com/rust-lang/rust/issues/144521).
--rustdoc_modifiers_workaround := $(if $(call rustc-min-version,108800),-Cunsafe-allow-abi-mismatch=fixed-x18)
-+# The bug was fixed in Rust 1.90.0, so only apply for 1.88.x and 1.89.x.
-+rustdoc_modifiers_workaround := $(if $(call rustc-min-version,108800),$(if $(call test-lt,$(CONFIG_RUSTC_VERSION),109000),-Cunsafe-allow-abi-mismatch=fixed-x18))
+Ah, good to know. I do not delve into the tools build system all too
+much.
 
- # Similarly, for doctests (https://github.com/rust-lang/rust/issues/146465).
- doctests_modifiers_workaround := $(rustdoc_modifiers_workaround)$(if $(call rustc-min-version,109100),$(comma)sanitizer)
---
-2.52.0
+> CONFIG_MODULES and src_tree, on the other hand, need to be passed
+> explicitly when staying in tools/, whereas they would be available by
+> default under scripts/ in which case we could simply invoke the script via:
+> ```Makefile
+> PHONY += sbom
+> sbom: all
+> 	$(Q)$(MAKE) $(build)=scripts/sbom
+> ```
+> 
+> So yes, I think it makes sense to move it to scripts then.
 
+Yeah, that looks much cleaner to me. I suspect scripts/sbom/Makefile
+could be cleaned up a little bit as a result of that move as well.
+
+Also, two other comments I forgot to bring up:
+
+1. With the movement out of tools/, I think the README should become a
+   proper Documentation file so that its contents is more discoverable.
+   That should probably be separate from the change that adds the
+   initial SBOM scaffolding in Kbuild to help with review.
+
+2. This depends on having a clean initial build tree (either empty
+   directory or 'clean' as a make target) due to needing to parse the
+   .cmd files, which could be stale if someone builds a kernel, changes
+   their config, and rebuilds, right? This should be documented since I
+   do not think it is possible to do something like what Masahiro did in
+   commit 3d32285fa995 ("kbuild: wire up the build rule of
+   compile_commands.json to Makefile") because of the drawback that it
+   misses too many things.
+
+Cheers,
+Nathan
