@@ -1,371 +1,151 @@
-Received: from mailgw01.zimbra-vnc.de (mailgw01.zimbra-vnc.de [148.251.101.236])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16BC3783AE;
-	Mon,  2 Feb 2026 16:28:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.101.236
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2925032F763
+	for <linux-kbuild@vger.kernel.org>; Mon,  2 Feb 2026 16:46:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770049730; cv=none; b=CqOXhN6NTm3YUdVQpdSOrQZLnj7Lfa/axK144eMznl7pm30MFCkqMe5due5ywQv6CyUKni82GwRpyebcg7kmOPUu+5R5KNmsqiOQ31d02dpBkPOrFt3KcHM0ef3uoJNjIey+zIuHpxXz9+OIu37FjaoIjUUAKvjJhDmLmYcqfTc=
+	t=1770050778; cv=none; b=hadorxZtu0iBoPu1LLoaYELqjvAwJaToRo5MHPLTgTo1eHtAGTSXfJJAe4vfKCnMMfe79R868N+oajtKiC6eE/tUWUKBxxyDMMhCbGs5mqUrbu8MF6zox2De8rKGcE0B7lL7NK6/gCQY7ID1VyfSzJQgPB+J1991TBRMM5kFn2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770049730; c=relaxed/simple;
-	bh=2GzRS2jjewfS8XU5BvrDNxtYXk5R6UQ1u3ZzAx1FHyE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qyjnAa7Ppr3dVaC9XMdvkfYFOcndMp3ismTgmyQzdqdiUsgndqXx79gHtMCTBF7oBdU7uSkgFuy64sj8iVo6WqRDUhYlYK5S9FW3gcWQ+2/2hQS8UOLLuEaiP6uzXuwVFzIlAL8FzlfQaF2jWeSET+aLT3Bb6xYXmJlCNMPjlXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com; spf=pass smtp.mailfrom=tngtech.com; dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b=QYbZrYLn; arc=none smtp.client-ip=148.251.101.236
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tngtech.com
+	s=arc-20240116; t=1770050778; c=relaxed/simple;
+	bh=Usnw3Gatub1oxTffhK0WXeLvi39STFWovIQLvfzLBCM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=jOevJm1msYH8kLN5cJXHSIiq2J2PEH+O5GDIoiv2Re4l6+LQ4WqXjfv+/lfvh+4R+3nxs52OlfZdRhivrMqs4y2ZkLL9jG+UZL6IScQHqm6EbdaXnrA0yDwsuTzNj7coKEIVrFALeVAj5z3MX1CKygn2G0hJ1pgqyAJCaSJ+EJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GFYww28O; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b="QYbZrYLn"
-Received: from zmproxy.tng.vnc.biz (zimbra-vnc.tngtech.com [35.234.71.156])
-	by mailgw01.zimbra-vnc.de (Postfix) with ESMTPS id 2C79C3FB39;
-	Mon,  2 Feb 2026 17:28:40 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 7DCB61FA8CD;
-	Mon,  2 Feb 2026 17:28:39 +0100 (CET)
-Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
- by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10032)
- with ESMTP id WhJy-gfQI_O7; Mon,  2 Feb 2026 17:28:38 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id CA9481FA8D3;
-	Mon,  2 Feb 2026 17:28:38 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz CA9481FA8D3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tngtech.com;
-	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1770049718;
-	bh=jK+17fIRQ30GXuyCAacoP2dT2LXJ6ENZNPCWJ84k58g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=QYbZrYLnQROdRYGmpkA30FB+lcacnrHjBVPhGjkiYHq2CVqv6qZcvFt33ZPyi70gC
-	 eb/13Djvb/9po8A/UkFMuFdQkLm2sJcn7z4NKnUt4ZQnUy1f0NypHHL5CQCnypEcNz
-	 xHEve9+d3DC0ysZoPZC7W1IGjEzXPg/zWHi5y4aWnutPO2gspaUO7zLObIUXK8mahX
-	 DAvzAG0s9ZxH5eSVYcwvbs4fggqWTYzTxInjrssHKSd6hfhsKnJkXn0meJcPv5aqRH
-	 dVhqWcmAYoq/+OwtL2T/smM/Dk/CnHjesDFSX0fwwjWi0k51+5DPIkABOAUvstGge6
-	 ZNL+GzeKkk66g==
-X-Virus-Scanned: amavis at zmproxy.tng.vnc.biz
-Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
- by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10026)
- with ESMTP id zftG9paW1WPx; Mon,  2 Feb 2026 17:28:38 +0100 (CET)
-Received: from [192.168.0.168] (ipservice-092-208-231-176.092.208.pools.vodafone-ip.de [92.208.231.176])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id 3A2FE1FA8A6;
-	Mon,  2 Feb 2026 17:28:38 +0100 (CET)
-Message-ID: <6ed0fe99-3724-40c2-8d98-3309a3cf0104@tngtech.com>
-Date: Mon, 2 Feb 2026 17:28:39 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GFYww28O"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2a7bceb6cd0so32452825ad.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 02 Feb 2026 08:46:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770050776; x=1770655576; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cvR2bhtkwHdzvpnOA5ZJ9EggNv6gPLY0gAmo2EM4ZPc=;
+        b=GFYww28OQF8Dt84Qq7csZWIgO2vhu9SOwyI6XVChd0pfU96XGkMYq6Agk7NJfC7Dvj
+         zGzbXup7E7vH3ke55ih/rNk62b/v0JI1qY6Fn+p1QHnOp+vCVSUW0vmS6EPQ5nC3aIIV
+         3o0eMRccaZ2eYrrPy9rr6RQ7+bKjr2veApxyv84HbiIpdFC0TT01STJJDcGhnI6N4O0c
+         +rqE3LWL/cMQPP3O+iyshlASpINeJx4EWaaLgrxFsqTvE/OScwkfTmFdBO9EbNG+QkAL
+         9SOYfEhJNTpqubDwx5phWZn5wEpf1ltVrOpngDcEONeGX4zbQRcU2fOUQMKTofsKWOWb
+         jupQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770050776; x=1770655576;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=cvR2bhtkwHdzvpnOA5ZJ9EggNv6gPLY0gAmo2EM4ZPc=;
+        b=t+vg63WGPHbDvLzJB1XEb+HTRwkkJCwEnWVa7yoOtA0UPV7Ks41LJJePICmXxyDYCU
+         6zqaX9Z7oeI/HELulrdpFynn4MHxWLnbmSZwclJEEZMcJMp5OHBiGE6oyFw7XdP5ArO+
+         sP/DNTHrMqT2gyxArpuLZVg9dDCwY/BtdP3lTnXRUo6gUzT1QO/tlirX0+X0vIWVrqTq
+         DdqF/VPEW07k1GXfdzkWbspRNj1CC/lJ03JwjFJybtKzTHedqBJ9c5xxCvX/LX6BC7Ag
+         BPYQIhETKGx9Zwl3mGIwLUTSJ71b4QlDafb0vj8pJE3TGazAf5wOnAc8x7840H3RmYaZ
+         ljVg==
+X-Forwarded-Encrypted: i=1; AJvYcCXT5uzxynDmuyucSyVNB7vArYi4K1LVAfqe/jC59DscWrdBzQyitQWRxxyjpIbPvUy4Bxnj3JoW9WrVW5M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyzJ4m4uQ+wmnZPIZ1i01+Fd9b5rX76ReZxzFWIEISEIr8sje+9
+	Jv7N1vE6sKqOJoV7icqAmyA55OICLDpe3FiDbwQQ2TcFnnhEEAOK0Ahv
+X-Gm-Gg: AZuq6aLaQKSzl6+kijlOh+6abyE77TGmBgo1uQn2PXTkyccN/ZQeD+rwZkuTSsxh0uC
+	5YVuHgPIeQJL96VlAZAKYhruyvpdFqCqbw4gFGw6oiIXiWvZZYatLs1kyUF3lu/8WKD/baOoc5Q
+	r5D8GKc1Krkv3lGVJ67KEPG4AkvcWONDPMEtyx/TSaVAKv8qWKvMtxI+Ckpd3UL5bsPmLmYsZ9a
+	FtWu6cNUUIlW3hlsswgnRZnQn3QflLcu7gCdwUd3npyku71mMEzTkxYTrZq+52bqDSDMmsld3yR
+	v0Dehb/A8d99uHSJSFF55H5Ju24xlwQqC8MDKAnoM9JORrC6H+sX/ZnxjYzB14m89PDUhp15mYC
+	5jwUTvXaeZBywK+WYGerv5/MpETV4RFNyjKt+ZhtjSwNoYzyGjkO6+kKjs2NHCEPAm4Oc8g1czS
+	nWkMM=
+X-Received: by 2002:a17:903:2b07:b0:29d:7b9b:515b with SMTP id d9443c01a7336-2a8d96b1051mr138969065ad.20.1770050776360;
+        Mon, 02 Feb 2026 08:46:16 -0800 (PST)
+Received: from misys ([58.120.241.145])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a8bd74e9bbsm129294195ad.95.2026.02.02.08.46.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Feb 2026 08:46:16 -0800 (PST)
+From: HeeSu Kim <mlksvender@gmail.com>
+To: miguel.ojeda.sandonis@gmail.com
+Cc: a.hindborg@kernel.org,
+	aliceryhl@google.com,
+	bjorn3_gh@protonmail.com,
+	boqun@google.com,
+	charmitro@posteo.net,
+	dakr@kernel.org,
+	gary@garyguo.net,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lossin@kernel.org,
+	mlksvender@gmail.com,
+	nathan@kernel.org,
+	nsc@kernel.org,
+	ojeda@kernel.org,
+	rust-for-linux@vger.kernel.org,
+	tmgross@umich.edu
+Subject: Re: [PATCH v2] rust: Makefile: bound rustdoc workaround to affected versions
+Date: Tue,  3 Feb 2026 10:46:13 +0900
+Message-ID: <20260203014613.2708234-1-mlksvender@gmail.com>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <CANiq72n39eU9WE=Yh0_yJzmqMxo=QAaU2pN0UqP9jZ7bT7rhgA@mail.gmail.com>
+References: <CANiq72n39eU9WE=Yh0_yJzmqMxo=QAaU2pN0UqP9jZ7bT7rhgA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 00/14] Add SPDX SBOM generation tool
-To: Nathan Chancellor <nathan@kernel.org>,
- Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
- Greg KH <gregkh@linuxfoundation.org>
-Cc: nsc@kernel.org, linux-kbuild@vger.kernel.org,
- linux-kernel@vger.kernel.org, akpm@linux-foundation.org,
- maximilian.huber@tngtech.com
-References: <20260120115352.10910-1-luis.augenstein@tngtech.com>
- <CANiq72mtWhjVNNYc6nvxuQ3XAnMWBDiZyOvJ1BNN=M+097Wvpw@mail.gmail.com>
- <2026012214-magician-mashed-c84c@gregkh>
- <CANiq72mcDqAS-FUfkAnxa7OEO4Kq6r6=uvhEb_UW4sGattCOuQ@mail.gmail.com>
- <2026012533-preflight-surviving-43e5@gregkh>
- <CANiq72=_tPP4cPaUMPiM14h1kk97EXSf5vg-yHHYo-Px+31ZSg@mail.gmail.com>
- <a01233b9-23a2-4666-91ed-f1cf030dcb9f@tngtech.com>
- <20260127231037.GA3378797@ax162>
-From: Luis Augenstein <luis.augenstein@tngtech.com>
-Autocrypt: addr=luis.augenstein@tngtech.com; keydata=
- xsFNBGW7l0QBEAC++Fst8K0hAw6IK/nX+I8Xs/iCsUh/cwhrm2feHEjAtgStgaxDTEjgthIY
- qZ7tbAh1wKbii61oCcd1T1xHnYk+SlM6JHE2sAnwtehQoTnjXx512rHOEw4Sba2wu7H6WxV8
- /mFNCH9Typgs7rskJVln7cfWE9wbZZRQbh45iKnzVWFLRKYtAinfJ1mWgXb1R1DKttLOc9Ns
- PgDkC4pGgspZmJDkoXIm1iqvkOC7CjkNJet7v3Be7K7rdh4xyufg9QP0qSr9QBizajyI/jW2
- cJxh3HkskhKSNJh9UVEnqmP7MRoImeZNs0fYi6GPAitkzxdu6LJ16rL9eGpXSziAXqWatVIr
- vtQKj1+ORJZiWZPNBxBwfeCwQ5S2uNdZMLeTFYjOB2yvpdfSyfwKqBfcwL48tU6R4903Pp3l
- fXR8+gnVttahNQHfVVMQgF6VMAnjG1iUmh2vdo/wFbOIYjtG4uq/ensV3snBIcjT6KHnj0Y2
- Nl5Kqf+TUQVHGMZskQW2tO7KK7odoQJ2YTcHTsv9Glr/TSZXcbUQ73BfG8CfF4PObma5dn2Z
- DKjcmP3LfEAbTWeb60FksyPe+GL+YY7c6SLHMg55dC31o2Yp9A52Pbd9ZECq6YaeGlTTcOWg
- 65D6lcyQkvP6NViiT28kJLg5hMq+GsXk2zNu+tEs5jCe4IdK2wARAQABzS1MdWlzIEF1Z2Vu
- c3RlaW4gPGx1aXMuYXVnZW5zdGVpbkB0bmd0ZWNoLmNvbT7CwY0EEwEIADcWIQQnMGtafiof
- DlrSMBd5XIrKzdz7NAUCZbuXRQUJBaOagAIbAwQLCQgHBRUICQoLBRYCAwEAAAoJEHlcisrN
- 3Ps0DyoP/iI4rcAyba+A2sDES0Ro+TaACPxmdgKaRFpXd3ycjINlEhe2813Y02EQ/JJpDkj8
- 37TKjZREB7ohFo++Brhh7/omaBk60ZdhLDf3sj05tbbuEiBJXnH2Tp3IkAtVunM7kprvqN7S
- 2Imv0SwEu83pXu1QqMHTPVy5rqgJik2gGSQlMKmS0LuMkaCcQJgS6ZSvOzRCXm+1xLAnHBcg
- rejzOj9taJ5fsXZ5D6S9Vr1JH7HIEiHzPqENkwFrCUD4sCMlDhixw+UoyRXrwX0jLjOrt5fj
- /IWNzse1FDOGGc0gn5lcSXP1E0VUFf4zPgRxug3Qt2urGKPsACnm/DxgE2rar3k+G4KwHQ/c
- pyvqa8BMzB11xwgDrUFUUrg0jIavi8liEURvFnsKhkmQFRa/BxIarw8iBHJlOTUuzAvEQaai
- BlG9CXxwwdBw41Oh+grjn46wPxncx/Me2g3hx16jjD544It8874Ho3LRglmGnIP1IpYdwuDa
- WtWeEmM59ikM1gmNxsmeo1La9Bvi5rCado9xNVySAaB+P8bjqM5gTmGA6qIkezN3VdX9Hbv4
- all0ppjq6KxCddy1y1H8PSWD7W6zyYU5VPLrkM7AEH9ljyO+xwib5Z50FSUPYC8nz0MkYcIZ
- AqxtSRpyMxgBd18PeY2dsAfU1YcOxvU9NjLq3BDK9FMqzsFNBGW7l0UBEADDFXCGjGsmx4EW
- v6BZ1TODw8xvnkQ++1b+rsxVpqXyCx3C9B2cqhTyuD7QsYgrHAnvrGkPEBCsTvxsPBtWIHEO
- acUgiuLKtQToO7JXnTteD5yaAQnscPzx2fcvcrcEVJ9GklRWPLtDsju5vL6Bz3tcaMUO29ex
- dj5KNRJHUQBgQK4z+YdRRK3eC4sn7qw0oRwzrAlmR2L+r36xQZVXvlGMV4M3eqXFYLNn960I
- sQDrOX6zb6uq6S7EeDK442dt6g28ETjfZuI0xmPQIBovxdFwoptFZZPvNJlMFfpGWqJC/cEW
- Nirp5gTTImPptw0QeUTLvoIVkBwFW/hz3uvlyuGZb9f7Ut/PyqeqVpb17LN3dI9LWZ67p2Ni
- UNHO5SpURkjp7Jl6lQxOXA9LllAvOyChW9kBrCoYu1Pm8xtpknjdHz6qkXDZVYAEi3HeGGog
- 8a5g7mTWF2kKodo1urK2jv4zQyXaZXpQLdhJS1CKJUEAd+Ia1LBYEUI6FUTuO3gYVnF59IpG
- HnwX2CrUYGnkk/fidg19psEsmtj2UMT+lhoVGd8yAyIyrsngqH8aXgbElHVt0Cn2l97DHxKO
- pZoU0QOkzxgbuuJHo0UDYYwfNO4FMi2Mzl80ogjI7ul12cCTXOeVCB55FpwBZZf7O0sOz3rV
- MEmvWYJGx2IoeuiV7eJW2QARAQABwsF8BBgBCAAmFiEEJzBrWn4qHw5a0jAXeVyKys3c+zQF
- AmW7l0YFCQWjmoACGwwACgkQeVyKys3c+zS2oQ//X5gkadkJT5cd5o8ZyGI2FthTeD6oiQce
- GRUv07wht+LEGL14hdY6/f8Uf3YzSNceXQwmkNJGYup7M+lAhv9gIyAUZle9nncckKXQnxB7
- OYBaoRdG+cZaPJmbmw16wRaB6UY1+fsz1zp5cMTvvjFtcfKrCt+wsR8x+naln+JC8e5nhp+8
- cDTof2IR57OFV+7b21ryiVPnbhiEHsw3MembWRMMILVa/FH9IhbuWzAeVAwOd7JKOBXPpIJ4
- /lca7vgFzIa4C45ytFFQQI3oW0g23+BdLqx3F345DfeKnPHQubbyH8eY4uO7QEZxFg5yH9PO
- s1Qlsc7VSSsLDS61SJSIOJuD5TKE24Q83WS5R1lmFek0ts3iSXS40M2x4ZcUYkfow9JEwpLa
- +6AqKd4kAu6BJr2lgAhVudyZmGvzoN3XtyxJXSfDjqOFF97vYqK3FMCPXI7xTdubZRL6Ogpi
- PDT6iXvRUlgl/trWLkUu13V9Ey0Qwald52093tqHgdd1bdsjvxZoyFsF+qsKIiOD/Swf/HBm
- K0fJXDdJPTJ1HoB/ZD4zVxHTa9thaybbzLZJfwE46YcykYz999J/FsXjKaHL3hMX7GixYNtU
- gKIL1i5GfLGxpXY0jbEKei3Y6Pa0iOBL4IILkOvaXqgEII0AKKRJ9J0ZtQXRyz0F2tHrTjqK JQQ=
-In-Reply-To: <20260127231037.GA3378797@ax162>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------K3hsLa6AJy7M7Yi8kbaA0tO0"
+Content-Transfer-Encoding: 8bit
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------K3hsLa6AJy7M7Yi8kbaA0tO0
-Content-Type: multipart/mixed; boundary="------------8jVDsEtZ2wtLNTSkpm0JOv09";
- protected-headers="v1"
-Message-ID: <6ed0fe99-3724-40c2-8d98-3309a3cf0104@tngtech.com>
-Date: Mon, 2 Feb 2026 17:28:39 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 00/14] Add SPDX SBOM generation tool
-To: Nathan Chancellor <nathan@kernel.org>,
- Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
- Greg KH <gregkh@linuxfoundation.org>
-Cc: nsc@kernel.org, linux-kbuild@vger.kernel.org,
- linux-kernel@vger.kernel.org, akpm@linux-foundation.org,
- maximilian.huber@tngtech.com
-References: <20260120115352.10910-1-luis.augenstein@tngtech.com>
- <CANiq72mtWhjVNNYc6nvxuQ3XAnMWBDiZyOvJ1BNN=M+097Wvpw@mail.gmail.com>
- <2026012214-magician-mashed-c84c@gregkh>
- <CANiq72mcDqAS-FUfkAnxa7OEO4Kq6r6=uvhEb_UW4sGattCOuQ@mail.gmail.com>
- <2026012533-preflight-surviving-43e5@gregkh>
- <CANiq72=_tPP4cPaUMPiM14h1kk97EXSf5vg-yHHYo-Px+31ZSg@mail.gmail.com>
- <a01233b9-23a2-4666-91ed-f1cf030dcb9f@tngtech.com>
- <20260127231037.GA3378797@ax162>
-From: Luis Augenstein <luis.augenstein@tngtech.com>
-Autocrypt: addr=luis.augenstein@tngtech.com; keydata=
- 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 JQQ=
-In-Reply-To: <20260127231037.GA3378797@ax162>
-Autocrypt-Gossip: addr=maximilian.huber@tngtech.com; keydata=
- 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
- /5CE/Cgrmg==
+On Mon, 3 Feb 2026, Miguel Ojeda wrote:
+> On Mon, Feb 3, 2025 at 1:09 AM HeeSu Kim <mlksvender@gmail.com> wrote:
+> >
+> > The `-Cunsafe-allow-abi-mismatch=fixed-x18` workaround was added to
+> > handle a rustdoc bug (rust-lang/rust#144521) where target modifiers
+> > were not properly saved.
+> >
+> > This bug was fixed in Rust 1.90.0 (rust-lang/rust#144523). Restrict
+>
+> We tend to use `Link:` tags for these. Typically we write a line like:
+>
+>     Link: https://github.com/rust-lang/rust/issues/144521
+>
+> If you want to reference it inline, you can also just put the full URL.
+>
+> > Suggested-by: Gary Guo <gary@garyguo.net>
+>
+> Please add a `Link:` tag after this one pointing to his message.
+>
+> > Fixes: abbf9a449441 ("rust: workaround `rustdoc` target modifiers bug")
+>
+> I am not so sure this is a fix -- after all, when you use `1.88` or
+> `1.89`, nothing would change. So it is more of a feature? i.e. the
+> ability to use `1.90`.
+>
+> But I guess it could also be understood as "we should have applied
+> this only for affected versions to begin with", but then it would be
+> from a "code documentation" perspective, which is fine, but it is not
+> something that e.g. we would need to backport. So I am leaning towards
+> not having a `Fixes:` here.
+>
+> And this has another issue (though a different patch): the `sanitizer`
+> modifier.
+>
+> By the way, I wonder if we would want at least a `rustc-max-version`
+> (or an `-until` variant, or whatever) so that we can easily express
+> that range in a single call, and document the bounds together (I could
+> imagine that we could end up with a few of these over time, and then
+> they start to shift versions, they get spread across lines, etc.).
+>
+> Perhaps the Kbuild maintainers can comment on whether that would be a
+> good idea or whether they already have something.
+>
+> Cheers,
+> Miguel
 
---------------8jVDsEtZ2wtLNTSkpm0JOv09
-Content-Type: multipart/mixed; boundary="------------ma0IqkGSgsKVlJnnlBCskGhi"
+Thanks for the detailed feedback.
 
---------------ma0IqkGSgsKVlJnnlBCskGhi
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+For v3, I will:
+- Use full Link: tags for GitHub references instead of shorthand
+- Add Link: tag after Suggested-by pointing to Gary's lore message
+- Remove the Fixes: tag
+- Add Cc: stable@vger.kernel.org # Useful in 6.18.y and later.
 
-Hi Nathan,
+Regarding rustc-max-version, it would be useful for reading the code.
+I'll wait for Kbuild maintainers' reply.
 
-> I wonder if it would be better for this to live within scripts/ instead=
-
-> of tools/, as that should allow it to be integrated into the build
-> process a little bit more naturally, such as using $(Q) instead of @,
-> $(PYTHON3) instead of the bare python3, being able to access
-> CONFIG_MODULES directly, and cleaning up the actual implementation of
-> the sbom target in Makefile.
-
-Thanks, I wasn=E2=80=99t aware that targets under scripts/ have access to=
- more
-Make variables by default. During development, we didn=E2=80=99t have str=
-ong
-reasons for choosing either tools/ or scripts/. I=E2=80=99m happy to move=
- it to
-scripts/ if that is the preferred location.
-
-Regarding $(Q) and $(PYTHON3), I noticed that these variables are
-actually available within the tools/ directory as well, so we could
-switch to using them even if we stay under tools/.
-
-CONFIG_MODULES and src_tree, on the other hand, need to be passed
-explicitly when staying in tools/, whereas they would be available by
-default under scripts/ in which case we could simply invoke the script vi=
-a:
-```Makefile
-PHONY +=3D sbom
-sbom: all
-	$(Q)$(MAKE) $(build)=3Dscripts/sbom
-```
-
-So yes, I think it makes sense to move it to scripts then.
-
-Best,
-Luis
-
-
---=20
-Luis Augenstein * luis.augenstein@tngtech.com * +49-152-25275761
-TNG Technology Consulting GmbH, Beta-Str. 13, 85774 Unterf=C3=B6hring
-Gesch=C3=A4ftsf=C3=BChrer: Henrik Klagges, Dr. Robert Dahlke, Thomas Endr=
-es
-Aufsichtsratsvorsitzender: Christoph Stock
-Sitz: Unterf=C3=B6hring * Amtsgericht M=C3=BCnchen * HRB 135082
-
---------------ma0IqkGSgsKVlJnnlBCskGhi
-Content-Type: application/pgp-keys; name="OpenPGP_0x795C8ACACDDCFB34.asc"
-Content-Disposition: attachment; filename="OpenPGP_0x795C8ACACDDCFB34.asc"
-Content-Description: OpenPGP public key
-Content-Transfer-Encoding: quoted-printable
-
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-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
-tQXRyz0F2tHrTjqKJQQ=3D
-=3Dgh9z
------END PGP PUBLIC KEY BLOCK-----
-
---------------ma0IqkGSgsKVlJnnlBCskGhi--
-
---------------8jVDsEtZ2wtLNTSkpm0JOv09--
-
---------------K3hsLa6AJy7M7Yi8kbaA0tO0
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wsF5BAABCAAjFiEEJzBrWn4qHw5a0jAXeVyKys3c+zQFAmmA0LgFAwAAAAAACgkQeVyKys3c+zQv
-fQ/9EGg4UP4TcooaXNggzCEDpemw/pj7eNAJfgUOx6VYXTNTyTpGB96Zoi2dF7n4iiEELOJMyjv/
-OoY20+vcy52CoPc2RDslz6cC2eU9X7lF9C+t8GVOQpkxc+9fVkt28tCPdE7hOido0CInppfCySA5
-y096RqNNe+CUigCSqEAby1hjiCyEZWlMak5+fIOL+JhMMKg8oCfyUXlrubqrLIfMLXlbQdGQEMw6
-3lvJ/3+bOg5cE6J6UwW6xlSsWSnHB3JUkipFMOV+iV0RslQRQcKvemSwiewdXK2wQkaVlWSks9t5
-AYTvojpkPPeAjF9Yn4VesI6DPbeI/ioAk+KwcmpFa8jDZC/SVvhU6UcN4Vmv9T3TOncafQRSShnK
-zUdXCxbQOZgqY7QvXOoQYxuYE2VbgJLpgz43ZcQTv6lf67W/RNA33Y/OMTsBj3A6apYN50n3CYdc
-knhz4wmTzInK0Z1v2it+C1iofFkqFDJPsW3C0NeCFiUQpseUmM0zlp4QpXreaXPvNAdZIP6m8sII
-oo6/HNfMpQZewxs0v4YJsJFH8Xwb1PvDOTs0rKrivTSM6vew2btJi0vUaDVFpEzMFgOYBOWRMj7c
-GQLsgK+9B8O8QKbratypxz7mALvnhxBtiqGUtZQ5iqoYFWQZ1gVYgCfmcPer0HKoVNAfRhbnB3G0
-hXI=
-=g28a
------END PGP SIGNATURE-----
-
---------------K3hsLa6AJy7M7Yi8kbaA0tO0--
+Best regards,
+HeeSu Kim
