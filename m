@@ -1,132 +1,90 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 566983242D2;
-	Tue,  3 Feb 2026 22:12:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AAB41799F
+	for <linux-kbuild@vger.kernel.org>; Wed,  4 Feb 2026 00:16:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770156751; cv=none; b=e2TUFrzpf+q9hV/IxOdV2mgJHk6RnAnR4M0AlCTBYiSVfzPWHBYgsgF7LEkQLfMmVkndGa6waOjXREpdBd5op3ZOxTvOwCMtIxwCGDM997IInqEYnNgg69M+X1wOQa5bBDaD4j/2D1iUklQOWUwUw0l1Il4kIgzly4sArTQ9MEw=
+	t=1770164185; cv=none; b=Bq14FAORAMpWlRNF+io3jZkEQNELus3m2TmVOKsTTTzamCLbYTqKfSM4/2WE4/eqGyJwKuNnneM3QGVtr9C+N3zIL6ZFzHOnDCi9ywLNgezGD2u8tfjaPDeeEJ+b0Pn5ma6WdNepO0heIaXJA1Upv6Oal4YVx3W1ngMesDHiKEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770156751; c=relaxed/simple;
-	bh=lZ8fLajBaBKfxqRgm1/CsQg35IImhyp3WoJlRneemVQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i8KYgOUJ0ZziqKJnYMbDIVzIxif/pWCOJm/PHVrubRuwz+JvJZTNePqNfcOrVIrSUURFdJrq4BWPovmqkkD1Ctljq4C1QPJabpr0OVRCnUkV9b+2XoD0pFVLYDJ+gvBh0WOj++cQFZEicV9Q69bz3JO8GPeP3Hl6Vd3hXTSDwog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=USm5cm8L; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1770164185; c=relaxed/simple;
+	bh=K80kjauj3gB7Jo17QjyW9fAJg5bQlHqWL+gHT3QaFro=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=UdeNGU0FpGFAqKZGPeba4mDipUHgB5HX4YdtskUkvRj2vHVRna1it/7CBruQqI1OZ+NU/TnG+fLWJzeH1GDAOldE4GsSu1j1NTfp1LTq1aJQwR6dKBozf29cBDrd44ZrZvf1x3XP54behLAW9ij+OsPZi5xRaoWO+BctpWjt4U0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=im/Shf9V; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="USm5cm8L"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4123AC116D0;
-	Tue,  3 Feb 2026 22:12:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="im/Shf9V"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AFE0C116D0;
+	Wed,  4 Feb 2026 00:16:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770156750;
-	bh=lZ8fLajBaBKfxqRgm1/CsQg35IImhyp3WoJlRneemVQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=USm5cm8LNFz7Zpvvr/WC/z9iJEDDkb8V3Cyxo1LI1WmLyMzXA4oKVJZyuas1CgaKY
-	 PpMNh1Sk0dn/mxa0vbvjKHD7DCXnllbVOXBghDQ+IRdfOyz0akw1SIoy6ZAA6Jwnd4
-	 hGupHwZer3dXRy35+1tEXGlqppADY/e9s4OtvqvIQ870n1Wib0lRq6k7Dwt/eNxreK
-	 FOAdrcppaWnJVqKFD2ilNl+0NixHLyQHch5hyk48aIDJv+c6hmhCRUHOFUMdJLYPlH
-	 rFpLsbmNIY/dXx0G1KpSDlWfi7DJ349Q3wgxtTWnAZk/Cl2KsTJvTbb2WeQEEhML7h
-	 UOrs0pL4FLJ7Q==
-Date: Tue, 3 Feb 2026 15:12:24 -0700
+	s=k20201202; t=1770164184;
+	bh=K80kjauj3gB7Jo17QjyW9fAJg5bQlHqWL+gHT3QaFro=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=im/Shf9VnRED7e3BqjPU7hhTcrS51pSwo3vFZMKdMyEGkCCwShiX/ao9QZJgFak7H
+	 DktQyuLhHypAfvQegTSwPDBexF1MvC3EUx92ZHwnLYxTUtdoHzfs+ZPK0yafYujAh7
+	 OS8k1D38dK2XlihAsNaYQAj9kWB1txpfXCPs0KkrDWL5L2gd+9N32bU0a3815IP2XV
+	 bdd2RRBENSuiaS37s8tHvUOwis5pT1RqLN0Z0GqSGwC9/pBILXek+K+PP9PXzuC5cb
+	 /qopjQBBWJfwZpGTjP94qEiCG47OB9MOHmHVwhbolUOlTeHapsdUSz1YVy6uxFt+3l
+	 /E37sJhwCuWCg==
 From: Nathan Chancellor <nathan@kernel.org>
-To: HeeSu Kim <mlksvender@gmail.com>
-Cc: a.hindborg@kernel.org, aliceryhl@google.com, bjorn3_gh@protonmail.com,
-	boqun@google.com, charmitro@posteo.net, dakr@kernel.org,
-	gary@garyguo.net, linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org, lossin@kernel.org,
-	miguel.ojeda.sandonis@gmail.com, nsc@kernel.org, ojeda@kernel.org,
-	rust-for-linux@vger.kernel.org, tmgross@umich.edu,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v4] rust: Makefile: bound rustdoc workaround to affected
- versions
-Message-ID: <20260203221224.GA2703490@ax162>
-References: <20260203005627.GB52989@ax162>
- <20260203234843.2834885-1-mlksvender@gmail.com>
+To: linux-kbuild@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+ =?utf-8?q?Ren=C3=A9_Rebe?= <rene@exactco.de>
+Cc: Madhavan Srinivasan <maddy@linux.ibm.com>, 
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
+ Christophe Leroy <chleroy@kernel.org>
+In-Reply-To: <20251123.131330.407910684435629198.rene@exactco.de>
+References: <20251123.131330.407910684435629198.rene@exactco.de>
+Subject: Re: [PATCH V2] modpost: Amend ppc64 save/restfpr symnames for -Os
+ build
+Message-Id: <177016418333.1146354.10778952252153726089.b4-ty@kernel.org>
+Date: Tue, 03 Feb 2026 17:16:23 -0700
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260203234843.2834885-1-mlksvender@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.15-dev
 
-On Wed, Feb 04, 2026 at 08:48:43AM +0900, HeeSu Kim wrote:
-> The `-Cunsafe-allow-abi-mismatch=fixed-x18` workaround was added to
-> handle a rustdoc bug where target modifiers were not properly saved [1].
+On Sun, 23 Nov 2025 13:13:30 +0100, René Rebe wrote:
+> Building a size optimized ppc64 kernel (-Os), gcc emits more FP
+> save/restore symbols, that the linker generates on demand into the
+> .sfpr section. Explicitly allow-list those in scripts/mod/modpost.c,
+> too. They are needed for the amdgpu in-kernel floating point support.
 > 
-> This bug was fixed in Rust 1.90.0 [2]. Restrict the workaround to only
-> apply for Rust 1.88.x and 1.89.x versions that are affected by the
-> bug, preserving ABI compatibility checks on newer compiler versions.
+> MODPOST Module.symvers
+> ERROR: modpost: "_restfpr_20" [drivers/gpu/drm/amd/amdgpu/amdgpu.ko] undefined!
+> ERROR: modpost: "_restfpr_26" [drivers/gpu/drm/amd/amdgpu/amdgpu.ko] undefined!
+> ERROR: modpost: "_restfpr_22" [drivers/gpu/drm/amd/amdgpu/amdgpu.ko] undefined!
+> ERROR: modpost: "_savegpr1_27" [drivers/gpu/drm/amd/amdgpu/amdgpu.ko] undefined!
+> ERROR: modpost: "_savegpr1_25" [drivers/gpu/drm/amd/amdgpu/amdgpu.ko] undefined!
+> ERROR: modpost: "_restfpr_28" [drivers/gpu/drm/amd/amdgpu/amdgpu.ko] undefined!
+> ERROR: modpost: "_savegpr1_29" [drivers/gpu/drm/amd/amdgpu/amdgpu.ko] undefined!
+> ERROR: modpost: "_savefpr_20" [drivers/gpu/drm/amd/amdgpu/amdgpu.ko] undefined!
+> ERROR: modpost: "_savefpr_22" [drivers/gpu/drm/amd/amdgpu/amdgpu.ko] undefined!
+> ERROR: modpost: "_restfpr_15" [drivers/gpu/drm/amd/amdgpu/amdgpu.ko] undefined!
+> WARNING: modpost: suppressed 56 unresolved symbol warnings because there were too many)
 > 
-> Add `rustc-max-version` macro to `scripts/Makefile.compiler` for
-> version upper bound checks, mirroring the existing `rustc-min-version`.
-> 
-> Link: https://github.com/rust-lang/rust/issues/144521 [1]
-> Link: https://github.com/rust-lang/rust/pull/144523 [2]
-> Suggested-by: Gary Guo <gary@garyguo.net>
-> Link: https://lore.kernel.org/rust-for-linux/DG4JM9PU51M0.1YRGM9HVTY24U@garyguo.net/
-> Suggested-by: Miguel Ojeda <ojeda@kernel.org>
-> Link: https://lore.kernel.org/rust-for-linux/CANiq72n39eU9WE=Yh0_yJzmqMxo=QAaU2pN0UqP9jZ7bT7rhgA@mail.gmail.com/
-> Cc: stable@vger.kernel.org # Useful in 6.18.y and later.
-> Signed-off-by: HeeSu Kim <mlksvender@gmail.com>
+> [...]
 
-Acked-by: Nathan Chancellor <nathan@kernel.org>
+Applied to
 
-I assume Miguel will pick this up.
+  https://git.kernel.org/pub/scm/linux/kernel/git/kbuild/linux.git kbuild-next
 
-> ---
-> Changes in v4:
-> - Add rustc-max-version macro for cleaner version bounds
-> - Use rustc-max-version instead of test-lt for readability
-> 
-> Changes in v3:
-> - Remove Fixes: tag (this is a feature, not a fix)
-> - Use full URLs with Link: tags instead of GitHub-style references
-> - Add Link: to lore.kernel.org for Suggested-by attribution
-> - Add Cc: stable for potential backporting to 6.18.y
-> 
-> Changes in v2:
-> - Change approach: bound to affected Rust versions instead of ARM64-only
->   (the flag is simply ignored on non-ARM64 architectures)
-> 
->  rust/Makefile             | 3 ++-
->  scripts/Makefile.compiler | 4 ++++
->  2 files changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/rust/Makefile b/rust/Makefile
-> index 5c0155b83454..1e8a75bc2878 100644
-> --- a/rust/Makefile
-> +++ b/rust/Makefile
-> @@ -136,7 +136,8 @@ pin_init-flags := \
->  
->  # `rustdoc` did not save the target modifiers, thus workaround for
->  # the time being (https://github.com/rust-lang/rust/issues/144521).
-> -rustdoc_modifiers_workaround := $(if $(call rustc-min-version,108800),-Cunsafe-allow-abi-mismatch=fixed-x18)
-> +# The bug was fixed in Rust 1.90.0, so only apply for 1.88.x and 1.89.x.
-> +rustdoc_modifiers_workaround := $(if $(call rustc-min-version,108800),$(if $(call rustc-max-version,108999),-Cunsafe-allow-abi-mismatch=fixed-x18))
->  
->  # Similarly, for doctests (https://github.com/rust-lang/rust/issues/146465).
->  doctests_modifiers_workaround := $(rustdoc_modifiers_workaround)$(if $(call rustc-min-version,109100),$(comma)sanitizer)
-> diff --git a/scripts/Makefile.compiler b/scripts/Makefile.compiler
-> index ef91910de265..85268f6f1494 100644
-> --- a/scripts/Makefile.compiler
-> +++ b/scripts/Makefile.compiler
-> @@ -71,6 +71,10 @@ clang-min-version = $(call test-ge, $(CONFIG_CLANG_VERSION), $1)
->  # Usage: rustc-$(call rustc-min-version, 108500) += -Cfoo
->  rustc-min-version = $(call test-ge, $(CONFIG_RUSTC_VERSION), $1)
->  
-> +# rustc-max-version
-> +# Usage: rustc-$(call rustc-max-version, 109000) += -Cfoo
-> +rustc-max-version = $(call test-le, $(CONFIG_RUSTC_VERSION), $1)
+Thanks!
 
-Minor meta comment: It is generally perferred to add a macro like this
-in a separate change to make it easier to backport if it is needed in
-the future.
+[1/1] modpost: Amend ppc64 save/restfpr symnames for -Os build
+      https://git.kernel.org/kbuild/c/3cd9763ce4ad9
 
->  # ld-option
->  # Usage: KBUILD_LDFLAGS += $(call ld-option, -X, -Y)
->  ld-option = $(call try-run, $(LD) $(KBUILD_LDFLAGS) $(1) -v,$(1),$(2),$(3))
-> -- 
-> 2.52.0
-> 
+Please look out for regression or issue reports or other follow up
+comments, as they may result in the patch/series getting dropped or
+reverted. Patches applied to an "unstable" branch are accepted pending
+wider testing in -next and any post-commit review; they will generally
+be moved to the main branch in a week if no issues are found.
+
+Best regards,
+-- 
+Nathan Chancellor <nathan@kernel.org>
+
