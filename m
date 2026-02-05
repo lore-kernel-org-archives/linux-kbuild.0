@@ -1,108 +1,129 @@
-Received: from mail-06.mail-europe.com (mail-06.mail-europe.com [85.9.210.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EECBD37F0FB;
-	Wed,  4 Feb 2026 19:19:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.9.210.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14655287246
+	for <linux-kbuild@vger.kernel.org>; Thu,  5 Feb 2026 04:18:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770232788; cv=none; b=P5ZuoMFgdGTWl234Iom5r+4k2jybtwa/hwfsyZ7aQtXmiXrEer2gJC6SF7kT824oWb6oPLP5lc7yjoU9br81Pc3qUeYpe6HFPl/LptY6bn3wvL0Kl+MqtuwpBM8aGoGsvmd2PaoduGAptTYi/fqMoPB5SqaJ0zLVEnMGhmg7gwo=
+	t=1770265100; cv=none; b=KLunRZJFy36OVFZKp965Za0jENi7NnTsb5nFJWJOntHlL5l+qk0RqoeCXLbLH2vU4nE2PovBUYtr1K/loVYv9Do4yVVJde7/2VdJoJdyKo2V2ltPhu8TzlUY/fOLDFyJsiAddisoSMHvz//xlwZKRmJUlrGDVXBxfKy9zO4w3q4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770232788; c=relaxed/simple;
-	bh=dx/n2ZSnVbr5KLV93z31YExmyUZ4EQEgGgGeMkJk0wo=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=axOrC59i2eIt4a2xF6tFsq3WYQ70zxSM+4Z4ttjxUMERxt4b2hsOcwgp/+XbjE5WeMk7fTxT24raONo+YS7oU8qVSu5KW+AUzZcjIcmaiZRxOcK5iuGGzjqGheuo+2vQD4Ug/mQWWnALB41+8v+Lvsuev4/dlMECRsemYY385js=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me; spf=pass smtp.mailfrom=pm.me; dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b=Q376kZR8; arc=none smtp.client-ip=85.9.210.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pm.me
+	s=arc-20240116; t=1770265100; c=relaxed/simple;
+	bh=31cre535scK5YHPD5e8RzFX5ialuBer/1VI0lInaE4s=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=dWoD5Ke4AYjjdlbL5QoMXg6fAeecWo/Ri30VCI3Una/u3OHZ2nwViUXIAR340h16DQ/zpWtukU3jR8dGjdDQh3b3PqzZ1hbWGtf8aFLfK6t4Yofd5sm36jsjh4hvtBts/s07lVTRq2DX14gPF3c8/8buAZDIaf4A3Nwakl6+JP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YVXBsMdD; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b="Q376kZR8"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pm.me;
-	s=protonmail3; t=1770232778; x=1770491978;
-	bh=xt/M6F0af0Aewj/HTy9bWBamZzfKiE3bbOG01o2uFtM=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=Q376kZR8Pto71tvnj6n7GjgscdCs98sLMqjUgRQmz9oAx5a8WwuDDn655K2JU1/3d
-	 1lMyY7iBcsrKZHLByNeh4kVrYx30qm7/xA/xsxMWjZajX5jn8vPtm410ZakXeZOLaw
-	 Ze935eM/LjnMXgNX7dBQ12NTbWpSBCfrM8816cZ6L0oKa37a8AVJGSu64pldMMJjoe
-	 7wN047NUvVO51ok7tpvhmhsiBOhrSJ7rlesDsanEpDeOK8wOsBfmN6xh76pzz8gpkg
-	 zydmErghLTkxQgzLSmB/NZJttJzrCRmrWQWWN4hpag/EUbtp/feJsVr/CdHNp7YH5C
-	 4TulsISPmxZJw==
-Date: Wed, 04 Feb 2026 19:19:34 +0000
-To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, Andrey Ryabinin <ryabinin.a.a@gmail.com>, Alexander Potapenko <glider@google.com>, Andrey Konovalov <andreyknvl@gmail.com>, Dmitry Vyukov <dvyukov@google.com>, Vincenzo Frascino <vincenzo.frascino@arm.com>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>
-From: Maciej Wieczor-Retman <m.wieczorretman@pm.me>
-Cc: m.wieczorretman@pm.me, Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, linux-kbuild@vger.kernel.org, kasan-dev@googlegroups.com, linux-kernel@vger.kernel.org, llvm@lists.linux.dev
-Subject: [PATCH v10 03/13] kasan: Fix inline mode for x86 tag-based mode
-Message-ID: <2ee8abb956de90ce843a3fb7b971377887fe7a79.1770232424.git.m.wieczorretman@pm.me>
-In-Reply-To: <cover.1770232424.git.m.wieczorretman@pm.me>
-References: <cover.1770232424.git.m.wieczorretman@pm.me>
-Feedback-ID: 164464600:user:proton
-X-Pm-Message-ID: 4be30621188735452b609f7e3a4c7ebd98176383
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YVXBsMdD"
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2a7bceb6cd0so3141315ad.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 04 Feb 2026 20:18:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770265099; x=1770869899; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=U/ASwzBhyPImq3zCtz6w37YhpkrghJ23tPd6aSVQhgI=;
+        b=YVXBsMdDoJQvtLN2Pw8sC5fTbdRM6sH7LZERAESET2uSy6fwY2T7FzhEY8QW90lnIf
+         EY/n0BwVJDzN1S2bW6KkI4eq0H4PXN3KkCbncNT9SSIm3yZS3jLC6rokBUVzy+C3ASnw
+         5dpH0a1QhoMhkTDmLsT1C2BA0VPTagyWGsrTfJEsZiblw8621wNHifQ6lfg/egtm4QBP
+         GGiPv/iS4vw7P6JlW3sP3m2uPbGMrqlQUaOOPo99BULZGfFGIadvfygLUd/bUk+PFpUs
+         K5854mR0gVY13lBrgaOc9N42GiMZNnwn6DC0f59nbc0le05X0tA7mvdj+4Bit1IqKFVw
+         jQCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770265099; x=1770869899;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=U/ASwzBhyPImq3zCtz6w37YhpkrghJ23tPd6aSVQhgI=;
+        b=UkmU0AM1rqB3S6uYhrNo9alaqnceyEZjhGSpNY2NnCa+Bcgy0AErcunDVybCHkVvv7
+         X1NdB7Z2Lzly8Iq+AZSwqLfk1Io4Qkl328Vq3FGV/3CPRSj0Fi2Ea3fh0ZiBCkT+XOtO
+         Jxv2xqFTqqZ1+EM0boxQeX1HuL7VzaBZKZkOKMLWe41+lhe3FzZKcSrJ7cwUTUXRXfvr
+         1dKvzXLEklL5OPb23ttvUAUtwj6aHHClq4iEtdrrNVOM7oOlPlZypm5WKEetmosId+dj
+         N5S7QWcutUP4z0x6ocZ5OY+3OKn3Oskv2EMXdBQ3bY6BWM6w0RV6A8KlS4O2f5yeaD8O
+         2OiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV0UEUXcY1SfnVk3bBFQmJKOq/VPl11PnMEGN5OBq7EiWNoJdl9hSTdPyDkmZjLGHgBiZC/6Jxe1fpLj3M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwY8ednFHJXOxSGoFXBMfPCDpbZJ383AZ1n4DHXGwk9fi7WvF2n
+	ZecPqh/6dudzQOinRdzO7OhUC4hDy+w5go1SO3IM1FKV9K963tbWyTsk
+X-Gm-Gg: AZuq6aK/nSXPdLRfkqtgaSYtIhCRZd5GxlclI3Hx2R2WbQLQCFHuD7R3CttM9bjdtqm
+	6hadw9fj4UNzMhHRY5IAM7aiQDrFMOTKE0TR8tukZsh1APit36mUHB1Bxl912VOu6+rVYPCilXT
+	TZIYTwQMjXDzSZfmqFP/SWjo5Yf21PSfN4XLirCWmRz8LHujN8LcNge7RMJXepfgpCHLQZ6vXbY
+	9+OQDH7ltT6kFSl+WQN8yafhKRcIhhtbxccR1rraB6u4lknr8gd7c6IR5tDxkTBEeYXrIryNmNp
+	sRZgPWZAlnPfmC6FcIDhK0zr3mJoRi9v+bSMu8FrSVVooEsvzir/DW7rPKSMnubZNx0tAQiuvrv
+	3/SuChOHsmrNn7aL1wu1ySEQccNolCB7iojFlGPBWDCa8Xm0xeX7ova92880xG7tPaAUsEW6ghP
+	moTNY=
+X-Received: by 2002:a17:903:b4f:b0:2a0:cccf:9d24 with SMTP id d9443c01a7336-2a933cf7dd5mr46866155ad.16.1770265099390;
+        Wed, 04 Feb 2026 20:18:19 -0800 (PST)
+Received: from misys ([58.120.241.145])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a93396b2eesm38037785ad.78.2026.02.04.20.18.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Feb 2026 20:18:19 -0800 (PST)
+From: HeeSu Kim <mlksvender@gmail.com>
+To: nathan@kernel.org
+Cc: a.hindborg@kernel.org,
+	aliceryhl@google.com,
+	bjorn3_gh@protonmail.com,
+	boqun@google.com,
+	charmitro@posteo.net,
+	dakr@kernel.org,
+	gary@garyguo.net,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lossin@kernel.org,
+	miguel.ojeda.sandonis@gmail.com,
+	nsc@kernel.org,
+	ojeda@kernel.org,
+	rust-for-linux@vger.kernel.org,
+	stable@vger.kernel.org,
+	tmgross@umich.edu,
+	HeeSu Kim <mlksvender@gmail.com>
+Subject: [PATCH v5 1/2] kbuild: add rustc-max-version macro
+Date: Thu,  5 Feb 2026 22:18:14 +0900
+Message-ID: <20260205131815.2943152-1-mlksvender@gmail.com>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260203221224.GA2703490@ax162>
+References: <20260203221224.GA2703490@ax162>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-From: Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>
+Add `rustc-max-version` macro to `scripts/Makefile.compiler` for
+version upper bound checks, mirroring the existing `rustc-min-version`.
 
-The LLVM compiler uses hwasan-instrument-with-calls parameter to setup
-inline or outline mode in tag-based KASAN. If zeroed, it means the
-instrumentation implementation will be pasted into each relevant
-location along with KASAN related constants during compilation. If set
-to one all function instrumentation will be done with function calls
-instead.
+This will be used to bound workarounds to specific compiler version
+ranges.
 
-The default hwasan-instrument-with-calls value for the x86 architecture
-in the compiler is "1", which is not true for other architectures.
-Because of this, enabling inline mode in software tag-based KASAN
-doesn't work on x86 as the kernel script doesn't zero out the parameter
-and always sets up the outline mode.
-
-Explicitly zero out hwasan-instrument-with-calls when enabling inline
-mode in tag-based KASAN.
-
-Signed-off-by: Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>
-Reviewed-by: Andrey Konovalov <andreyknvl@gmail.com>
-Reviewed-by: Alexander Potapenko <glider@google.com>
-Reviewed-by: Andrey Ryabinin <ryabinin.a.a@gmail.com>
+Suggested-by: Miguel Ojeda <ojeda@kernel.org>
+Link: https://lore.kernel.org/rust-for-linux/CANiq72n39eU9WE=Yh0_yJzmqMxo=QAaU2pN0UqP9jZ7bT7rhgA@mail.gmail.com/
+Acked-by: Nathan Chancellor <nathan@kernel.org>
+Signed-off-by: HeeSu Kim <mlksvender@gmail.com>
 ---
-Changelog v9:
-- Add Andrey Ryabinin's Reviewed-by tag.
+Changes in v5:
+- Split rustc-max-version macro into separate patch for easier backporting
+  (was part of the workaround patch in v4)
 
-Changelog v7:
-- Add Alexander's Reviewed-by tag.
+ scripts/Makefile.compiler | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Changelog v6:
-- Add Andrey's Reviewed-by tag.
-
-Changelog v3:
-- Add this patch to the series.
-
- scripts/Makefile.kasan | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/scripts/Makefile.kasan b/scripts/Makefile.kasan
-index 0ba2aac3b8dc..e485814df3e9 100644
---- a/scripts/Makefile.kasan
-+++ b/scripts/Makefile.kasan
-@@ -76,8 +76,11 @@ CFLAGS_KASAN :=3D -fsanitize=3Dkernel-hwaddress
- RUSTFLAGS_KASAN :=3D -Zsanitizer=3Dkernel-hwaddress \
- =09=09   -Zsanitizer-recover=3Dkernel-hwaddress
-=20
-+# LLVM sets hwasan-instrument-with-calls to 1 on x86 by default. Set it to=
- 0
-+# when inline mode is enabled.
- ifdef CONFIG_KASAN_INLINE
- =09kasan_params +=3D hwasan-mapping-offset=3D$(KASAN_SHADOW_OFFSET)
-+=09kasan_params +=3D hwasan-instrument-with-calls=3D0
- else
- =09kasan_params +=3D hwasan-instrument-with-calls=3D1
- endif
---=20
-2.53.0
-
+diff --git a/scripts/Makefile.compiler b/scripts/Makefile.compiler
+index ef91910de265..85268f6f1494 100644
+--- a/scripts/Makefile.compiler
++++ b/scripts/Makefile.compiler
+@@ -71,6 +71,10 @@ clang-min-version = $(call test-ge, $(CONFIG_CLANG_VERSION), $1)
+ # Usage: rustc-$(call rustc-min-version, 108500) += -Cfoo
+ rustc-min-version = $(call test-ge, $(CONFIG_RUSTC_VERSION), $1)
+ 
++# rustc-max-version
++# Usage: rustc-$(call rustc-max-version, 109000) += -Cfoo
++rustc-max-version = $(call test-le, $(CONFIG_RUSTC_VERSION), $1)
++
+ # ld-option
+ # Usage: KBUILD_LDFLAGS += $(call ld-option, -X, -Y)
+ ld-option = $(call try-run, $(LD) $(KBUILD_LDFLAGS) $(1) -v,$(1),$(2),$(3))
+-- 
+2.52.0
 
