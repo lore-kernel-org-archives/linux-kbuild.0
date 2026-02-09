@@ -1,57 +1,57 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A187E32571F;
-	Mon,  9 Feb 2026 08:49:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA73C3242C8;
+	Mon,  9 Feb 2026 08:49:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770626965; cv=none; b=n8IoFKUho0Y5wZ7v+Gsu2dtdOblIRk/3KKNH7BuIPWoa+52ptETu0HVMMY1fORxD0OCCHuHKP3MJsayelLYgzfSCBoWC2Gyr7bHXgXBoDybt9XaqRcv+zWJduDrjn10RL8K9Gz+3KoWu+Bb06hHdjjWQ75ydQz13y7feuVYWaFk=
+	t=1770626966; cv=none; b=bov6ijNytX7G6/WtY+XPy8jKFCn4RpGpu6DzVb9To1kGeG7KTerBlytnG8tU9pYnfDoWBWWD7yjZm6bII5VfWM1jc6eKPr3j1cE6wnlL4V+OmHmifDJUtzsmoKhrEfFAyUaW+xb+weXPyKKLZo1RVTI6oJGlHxNmCEqBuC7QXcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770626965; c=relaxed/simple;
-	bh=Gj1a9EyQR16Fric/kz+4z6lDEBgbAmqodcIhTi7k+EE=;
+	s=arc-20240116; t=1770626966; c=relaxed/simple;
+	bh=b33lM7g4Mtd91TjJ9IVGi+uv5ciyNzrA4fTzxhiPqrE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=l5QTQdNKlUHJ/hqizJmuPNTd/nnnnfsUMWp6cFar9OGijDYGEZw41aolzTLGIRFTe5nG/HlYfz80De1d9m5jWeSvGWeoUUz1mHJYR8srAhthaLY1bIQLS/Ah/Ncc5KCN1mW1VwBBWcKRmZudFSrlg3CxvsPvumPiHFDsP7Ri9c8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=pMUhXotN; arc=none smtp.client-ip=148.163.158.5
+	 MIME-Version; b=l/LlG/tkv0SbPs2d4NA5wjbdbZqTf2s+gKPHli2t0kbMUoFQ+b3hcEUYMmX/0ypzGKOPut7mKKcPCMyA3BqG4vyrGil9YvE37wRpULeXQgRWwn984HtG7EYIF9AXkDHHevxd3kvTdBFJjBrim/ZS6f/Qyy0sRljmPC4ov9dSSfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qWztqHfi; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="pMUhXotN"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 618BvvYF3433326;
-	Mon, 9 Feb 2026 08:48:59 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qWztqHfi"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6191c5ap693544;
+	Mon, 9 Feb 2026 08:49:09 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=Vx7hbLDugiI3L3ECk
-	ZfvUG8sfxKhjD8t7xBTjwQ9vfA=; b=pMUhXotNE6QWIuJicnNQcIKepYc3H2K5n
-	7wD2OZ/mEVRO56fkHFgL5oLYfFWGpd7y4VZOiJSS5xcjFg7AJ2XDGB9PTBo06Juj
-	eis9Towvz9T0GDCobTHLVGYpmuBw2CfU8VQYBe83Axf93Thaf/uU+Ypde7XBmq5X
-	nwwd89B9rECFVTkqOeSv0O4Z9wpkws9bG9uI75aZzHYdITxp9hZNebL0LjxBkT0z
-	gr2kWFUtdqMXWqMS3A7RZVoZ32P7li9Ky1D74X9+p9I2eI9dEEOPt9CPCqkyINkz
-	JKrDEwY6kWnfHu/iHomDbPZy+DM3vuomIe/O6zAG2uhY51F+jbr7g==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4c696uvye4-1
+	:mime-version:references:subject:to; s=pp1; bh=6pTFAo/qNgU6OYUJN
+	OjZ00Qdyl2NOyAzAlaEd2uhLNU=; b=qWztqHfiEpwpI4HhhBtIrDr9C4e4Xgl4V
+	fdZ9VoSH4f0dvsgwDRqrWOvwxMgawnbPoMCl1p1jW7hl+GXF/dfTGssF6pb0e+xW
+	QmYk7I3xL7pPR1VUkQotJYBa+uFzfIga3iuYFZv+wbSsS8v3r8G8D9T5i0OrEw++
+	iSi/vviq1naoLblYvlbOVcxIQB4Y3ODadmp3/bNELFgBLVFOXSAQzjrE2oyQBRfL
+	sfCCN+ymmPzWaM6wOtGGBYJVGD+jUAwAUJA+BiYfaZvbmBeBK82oaSLJHO0iurwY
+	9bDbHbfVX8Ck7KHA8ur/oY38XgoVOLc4AWdrg8oi1mHLVfhp+1Now==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4c696vx67m-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Feb 2026 08:48:59 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 6197N6Lo002575;
-	Mon, 9 Feb 2026 08:48:58 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4c6fqsckyy-1
+	Mon, 09 Feb 2026 08:49:08 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 6194I9X6019336;
+	Mon, 9 Feb 2026 08:49:07 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4c6hxjv84b-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Feb 2026 08:48:58 +0000
+	Mon, 09 Feb 2026 08:49:07 +0000
 Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6198msjm50266568
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6198n39Q53543224
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 9 Feb 2026 08:48:54 GMT
+	Mon, 9 Feb 2026 08:49:03 GMT
 Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 02CDA2004E;
-	Mon,  9 Feb 2026 08:48:54 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 7634D20040;
+	Mon,  9 Feb 2026 08:49:03 +0000 (GMT)
 Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 449532004D;
-	Mon,  9 Feb 2026 08:48:50 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id B48A22004D;
+	Mon,  9 Feb 2026 08:48:59 +0000 (GMT)
 Received: from li-2fa77bcc-2701-11b2-a85c-cd621c23b6bd.in.ibm.com (unknown [9.79.195.233])
 	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  9 Feb 2026 08:48:50 +0000 (GMT)
+	Mon,  9 Feb 2026 08:48:59 +0000 (GMT)
 From: Sathvika Vasireddy <sv@linux.ibm.com>
 To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org
@@ -60,9 +60,9 @@ Cc: nathan@kernel.org, masahiroy@kernel.org, kees@kernel.org,
         npiggin@gmail.com, maddy@linux.ibm.com, segher@kernel.crashing.org,
         christophe.leroy@csgroup.eu, mingo@kernel.org, mpe@ellerman.id.au,
         sv@linux.ibm.com, nsc@kernel.org
-Subject: [RFC PATCH v3 2/6] objtool: Set ELF_F_LAYOUT flag to preserve vmlinux segment layout
-Date: Mon,  9 Feb 2026 14:18:16 +0530
-Message-ID: <20260209084820.57298-3-sv@linux.ibm.com>
+Subject: [RFC PATCH v3 4/6] objtool/powerpc: Skip jump destination analysis and unnanotated intra-function call warnings for --ftr-fixup
+Date: Mon,  9 Feb 2026 14:18:18 +0530
+Message-ID: <20260209084820.57298-5-sv@linux.ibm.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20260209084820.57298-1-sv@linux.ibm.com>
 References: <20260209084820.57298-1-sv@linux.ibm.com>
@@ -75,66 +75,116 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-GUID: Mf87jfHInFbk69MapXEC8CeS9cKIVSeh
-X-Proofpoint-ORIG-GUID: -apIo1t-HJUBbk6XG9wBOjLD7VpqBG94
-X-Authority-Analysis: v=2.4 cv=JdWxbEKV c=1 sm=1 tr=0 ts=69899f7b cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+X-Authority-Analysis: v=2.4 cv=YeCwJgRf c=1 sm=1 tr=0 ts=69899f84 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
  a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22 a=Mpw57Om8IfrbqaoTuvik:22
- a=GgsMoib0sEa3-_RKJdDe:22 a=VnNF1IyMAAAA:8 a=dGyo4u3eiptz4-Zsc8UA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjA5MDA3MiBTYWx0ZWRfX/knWIYESMxKs
- 0bei1RzS8Bs2yVrwie3PjynjnciDD49G0Hw5Pt1tZWp4WY7hWYwZRKHGetdR/NsLBmnL7rsjbnj
- KTM+N+R2ZZ06/Vl/CLlXtAzWmkpqj+dtil7dpdYMKVk7z1DM6tm/p2AbLnVemc2pS2xv65rn45h
- 9yrsHNpuhQ6jxa1NVo4t+zyIt8grbiwR1CXVSz7NeSMgKS1+MheCY57rkoClZzHeJ7FGF7iCG8r
- 3fwTxrqfy0h5nTxZCjY8tyh9X9c/idCS4LVUW/l9VHpISBVNx5eVISjxR7rYLV4kQZLg+R/SIE/
- zCc8Nd5VVEYmS4gaQirv1zh+oZ5h81TNXwmT8cy78R/pHsg1yoFW7PdKbKWKEj6JU9hxVMUVSFU
- EsUQ3ho/wMnGR92QgQFgRY59p/8xvtq7BkDwXS52tDfM8jwgs0VzknJ4/JpH7iCg89Ijevc0XSS
- 5uJaprYpErs+5N6eb0g==
+ a=GgsMoib0sEa3-_RKJdDe:22 a=VnNF1IyMAAAA:8 a=8-sZ6GPjQPUUxCpKAYwA:9
+X-Proofpoint-GUID: qDkfc-DJNCXacmFDikyxmhcNuGda5RJQ
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjA5MDA3MiBTYWx0ZWRfX+Ld5l8kAw2q7
+ 7eUbqIrsR7xEkqth1IaLV4St1LEvU4oZQY7P3puTEAJUrxEsm5TbXzxcF7NJWN2rKsBLyeq+B0R
+ 1TW9aiAkkXUfspi9BNa8UQTPSpvwSZ1qMgj+bxfyYWzosqHKnGXhaRllDGsWsmGPy0hTcMWn0kD
+ OMsJsaGSG7E306m/OPY2/wf37N2n2mZVuHX/W4g3WG3o88Nzq2Q0Q578iRSJPfEal5IjeEGP+So
+ WTugZr9Kz3QHYiAeheCOaWn6Zpwt3cIhitEPcIffMgH9wy7/Sl0a4WBZt4nFev8qnlUbLZphDkP
+ /zEQquIVSRwkKkOwshRCRDUu0oBkP/URk7Ww+dKot5wHD1a9y2MWpFqlxcBXQqnI0uHL79/gny0
+ Cuwl7CY6fX0E8bCHbUO0YwzUxdxEqQO0j6Txvm67YG8F0q4SLs0s05myS8rIi+9VQZ83g+rIz2U
+ 7ysMbEiPKgfKe2i3zQg==
+X-Proofpoint-ORIG-GUID: hlklK367W2znF8mxiCFFgnhIl6K75Mtr
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-02-08_05,2026-02-09_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 clxscore=1015 impostorscore=0 bulkscore=0
- lowpriorityscore=0 suspectscore=0 adultscore=0 spamscore=0 malwarescore=0
- phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
+ suspectscore=0 adultscore=0 bulkscore=0 malwarescore=0 phishscore=0
+ priorityscore=1501 lowpriorityscore=0 clxscore=1015 impostorscore=0
+ spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
  definitions=main-2602090072
 
-When objtool writes changes back to vmlinux with --ftr-fixup --link,
-libelf recalculates the file layout and inserts padding between
-sections. This corrupts the ELF segment structure, causing kexec to
-fail with:
+Objtool is throwing unannotated intra-function call warnings
+when run on vmlinux with --ftr-fixup option.
 
-    ELF Note corrupted !
-    Cannot determine the file type of vmlinux
+One such example:
 
-This happens because libelf's default behavior assumes it can freely
-rearrange section offsets when writing, which breaks the carefully
-constructed vmlinux layout produced by the linker.
+vmlinux: warning: objtool: .text+0x3d94:
+                        unannotated intra-function call
 
-Set ELF_F_LAYOUT after elf_begin() to instruct libelf that the
-application is responsible for the file layout. This prevents libelf
-from inserting padding or repositioning sections while still allowing
-data modifications to be written back.
+.text + 0x3d94 = c000000000008000 + 3d94 = c0000000000081d4
+
+c0000000000081d4: 45 24 02 48  bl c00000000002a618
+<system_reset_exception+0x8>
+
+c00000000002a610 <system_reset_exception>:
+c00000000002a610:       0e 01 4c 3c     addis   r2,r12,270
+                        c00000000002a610: R_PPC64_REL16_HA    .TOC.
+c00000000002a614:       f0 6c 42 38     addi    r2,r2,27888
+                        c00000000002a614: R_PPC64_REL16_LO    .TOC.+0x4
+c00000000002a618:       a6 02 08 7c     mflr    r0
+
+This is happening because we should be looking for destination
+symbols that are at absolute offsets instead of relative offsets.
+After fixing dest_off to point to absolute offset, there are still
+a lot of these warnings shown.
+
+In the above example, objtool is computing the destination
+offset to be c00000000002a618, which points to a completely
+different instruction. find_call_destination() is looking for this
+offset and failing. Instead, we should be looking for destination
+offset c00000000002a610 which points to system_reset_exception
+function.
+
+Even after fixing the way destination offset is computed, and
+after looking for dest_off - 0x8 in cases where the original offset
+is not found, there are still a lot of unannotated intra-function
+call warnings generated. This is due to symbols that are not
+properly annotated.
+
+So, for now, as a hack to curb these warnings, do not emit
+unannotated intra-function call warnings when objtool is run
+with --ftr-fixup option.
+
+Skip add_jump_destinations() and suppress intra-function call
+errors in --ftr-fixup mode. The feature fixup pass only needs fixup
+entry tables, relocation entries from .__ftr_alternates.text, and
+elf_write_insn() to patch branch offsets.
 
 Signed-off-by: Sathvika Vasireddy <sv@linux.ibm.com>
 ---
- tools/objtool/elf.c | 3 +++
- 1 file changed, 3 insertions(+)
+ tools/objtool/check.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/tools/objtool/elf.c b/tools/objtool/elf.c
-index 94370a470cbb..f7c6fd68ffcb 100644
---- a/tools/objtool/elf.c
-+++ b/tools/objtool/elf.c
-@@ -1159,6 +1159,9 @@ struct elf *elf_open_read(const char *name, int flags)
+diff --git a/tools/objtool/check.c b/tools/objtool/check.c
+index 92fe5dc05cdb..9c6b892792a4 100644
+--- a/tools/objtool/check.c
++++ b/tools/objtool/check.c
+@@ -1598,7 +1598,6 @@ static int add_jump_destinations(struct objtool_file *file)
+ 			    dest_off == func->offset + func->len)
+ 				continue;
  
- 	elf->elf = elf_begin(elf->fd, cmd, NULL);
+-
+ 			ERROR_INSN(insn, "can't find jump dest instruction at %s",
+ 				offstr(dest_sec, dest_off));
+ 			return -1;
+@@ -1680,7 +1679,7 @@ static int add_call_destinations(struct objtool_file *file)
+ 			if (func && func->ignore)
+ 				continue;
  
-+	if (opts.ftr_fixup)
-+		elf_flagelf(elf->elf, ELF_C_SET, ELF_F_LAYOUT);
-+
- 	if (!elf->elf) {
- 		ERROR_ELF("elf_begin");
- 		goto err;
+-			if (!insn_call_dest(insn)) {
++			if (!insn_call_dest(insn) && !opts.ftr_fixup) {
+ 				ERROR_INSN(insn, "unannotated intra-function call");
+ 				return -1;
+ 			}
+@@ -2636,8 +2635,10 @@ static int decode_sections(struct objtool_file *file)
+ 			return -1;
+ 	}
+ 
+-	if (add_jump_destinations(file))
+-		return -1;
++	if (!opts.ftr_fixup) {
++		if (add_jump_destinations(file))
++			return -1;
++	}
+ 
+ 	/*
+ 	 * Must be before add_call_destination(); it changes INSN_CALL to
 -- 
 2.43.0
 
