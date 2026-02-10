@@ -1,51 +1,51 @@
 Received: from mailgw01.zimbra-vnc.de (mailgw01.zimbra-vnc.de [148.251.101.236])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C0FD336EEB;
-	Tue, 10 Feb 2026 20:55:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3544D337BA4;
+	Tue, 10 Feb 2026 20:55:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.101.236
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770756916; cv=none; b=AGiCnZt9eozpHoYyKQ36xlJUXsWY8XOjrdt8IamSYYy6kqiBiMJn7XZDVoKcAEZhmtW4ZZvIeNA888aS5FVFyRgwQ1OqQ1F5C+79zLdXd6XGRFWcJhNQDilPmgWcj2jHOI49YHCykG/8UXyq714oQ8vsL1Qw5mCn1Af93VmloKM=
+	t=1770756917; cv=none; b=G3TZR/UuTqK7KCB2YwfhEvPUYYK0ZYvs6JmcoYgUrBkREUIm7FYhg791cDerZAVMiUOps1H0gnoAyUeZpPmNhk+bfTJVwzfXwm9P00gegHrRbHTq+8+ewVxEBSlEuys38ZbsyCl1VwXHg7xxU6xz4645uov+HnSSLsrVY6UTdOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770756916; c=relaxed/simple;
-	bh=lJK1wq5XaAcSH+NUG8vmQMcxlUAztEftr4qAmPiRleI=;
+	s=arc-20240116; t=1770756917; c=relaxed/simple;
+	bh=6sBEOTE+l0vVo7PIBudUNhudZ5Lxk36nUT9fmcEOEWI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=QnIYM/UKSg0Tfn6v6IDiJA0zH2GUKtEH8kKSo1n3LK6xJt/m7TlX4DVt+Q6rxK0l4kDtvEP98QvP5fbTqreQ+dpUndHojpl6PLxoTdMbtgxDJ/Qxm6tAfG8UBsDnrI/rcMPdts5RpfKkxTwqd3zCf3Ysevn7UDjoFCSlifE3as4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com; spf=pass smtp.mailfrom=tngtech.com; dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b=fbmLrs9+; arc=none smtp.client-ip=148.251.101.236
+	 MIME-Version; b=Cf70M2ps5MpXAKwXBT2W59RQ4XcDqSDot7C07DYACka0LkDHGbxDSQmuEwMgM9OPagDKkFV9DC8NyOrygrWrp2Ie9+TKcGJtcQKULdSx37tD0eafWlA8RqDV5DfuxD6D/qc6kcZyiXoB2VtWSy17Zj7hNF0PfYx9WsqtfqaczlU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com; spf=pass smtp.mailfrom=tngtech.com; dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b=OhqBUq3q; arc=none smtp.client-ip=148.251.101.236
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tngtech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b="fbmLrs9+"
+	dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b="OhqBUq3q"
 Received: from zmproxy.tng.vnc.biz (zimbra-vnc.tngtech.com [35.234.71.156])
-	by mailgw01.zimbra-vnc.de (Postfix) with ESMTPS id 5F9543FAF1;
-	Tue, 10 Feb 2026 21:55:07 +0100 (CET)
+	by mailgw01.zimbra-vnc.de (Postfix) with ESMTPS id 5148A3FAF2;
+	Tue, 10 Feb 2026 21:55:13 +0100 (CET)
 Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id F2B431FA999;
-	Tue, 10 Feb 2026 21:55:06 +0100 (CET)
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 3634D1FA99B;
+	Tue, 10 Feb 2026 21:55:13 +0100 (CET)
 Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
  by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10032)
- with ESMTP id FqBMxCPMSo-o; Tue, 10 Feb 2026 21:55:06 +0100 (CET)
+ with ESMTP id JQ0gZ__GOZKS; Tue, 10 Feb 2026 21:55:12 +0100 (CET)
 Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 5FBD91FA952;
-	Tue, 10 Feb 2026 21:55:06 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz 5FBD91FA952
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 802011FA999;
+	Tue, 10 Feb 2026 21:55:12 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz 802011FA999
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tngtech.com;
-	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1770756906;
-	bh=b7sPD0C7eiJnru6iQdD9xAaEij0bin6ziU3pjs4ZE0s=;
+	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1770756912;
+	bh=KJcoRnov97uDkXuQQOD7VnxuA4vLvXSr70B2GE3QuKg=;
 	h=From:To:Subject:Date:Message-Id:MIME-Version;
-	b=fbmLrs9+wus5I8iQHIK0Ii3TtpzQuWSNEWJ7KThUy1F4vspWBX7efwwayJEI/dKEq
-	 Uo3AdB8qWdWgVXBc7MbDfXOgdzY6l+mcQqMmiJPcuvS1XOxF0fGONx3G41maqCtgS9
-	 qPaXIkNWyvrIZf15gmSI+9WYX4tzTToaG59DgSG+RTJkacxRRefSB0bSy1dlFrM15m
-	 380WWASqnh8VAGRvBRgRxSgZG3Jg1steqQJspyOBPzSFnUmlniYX+BaDBWB6/O2O1X
-	 jq5wNpZaRnx475EXcY0fetdWmg7CtNEzGrmhnq9ZYN2G/1WDYt/WhFKzo9C5Wgve/F
-	 X+Ducbmgi6HxA==
+	b=OhqBUq3qIa9XzkAmpRA5YrW9VVPmxoSzkCR79qEbrDDANQ8F6jhcL3QpJvdCmmeLx
+	 WVTm8tOLv2P+sHyBG6sw8ankYUmZJsB/1Emb5weANpkBwIDp7AiVjr0U4sGt+3VAzK
+	 xzE0UIbtPXEyYrrStvxnZh+cyuTN7EvccIUXXTMQi0hPFcKN0ltIUu+n8aKlIq3AAW
+	 mQOBERol09Drs5H07swqVLeV1j/f0DnTmoCwJ0vdsahklFtvexYvpx66vJYPG+HXtD
+	 00gunJ0KqhE/qtwwB3QziGW1dWrNQRBNqhCyp4zGjpA5KB1vmmvTwtVfHXM03Q9+DC
+	 eJFIt6uyOARqw==
 X-Virus-Scanned: amavis at zmproxy.tng.vnc.biz
 Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
  by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10026)
- with ESMTP id gYWt_Tbf-9Ix; Tue, 10 Feb 2026 21:55:06 +0100 (CET)
+ with ESMTP id d4lYDrvun2Js; Tue, 10 Feb 2026 21:55:12 +0100 (CET)
 Received: from DESKTOP-0O0JV6I.localdomain (ipservice-092-208-231-176.092.208.pools.vodafone-ip.de [92.208.231.176])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id 0DCA01FA8CD;
-	Tue, 10 Feb 2026 21:55:06 +0100 (CET)
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id 15CF11FA9B1;
+	Tue, 10 Feb 2026 21:55:12 +0100 (CET)
 From: Luis Augenstein <luis.augenstein@tngtech.com>
 To: nathan@kernel.org,
 	nsc@kernel.org
@@ -56,9 +56,9 @@ Cc: linux-kbuild@vger.kernel.org,
 	kstewart@linuxfoundation.org,
 	maximilian.huber@tngtech.com,
 	Luis Augenstein <luis.augenstein@tngtech.com>
-Subject: [PATCH 02/15] scripts/sbom: integrate script in make process
-Date: Tue, 10 Feb 2026 21:54:11 +0100
-Message-Id: <20260210205424.11195-3-luis.augenstein@tngtech.com>
+Subject: [PATCH 06/15] scripts/sbom: add additional dependency sources for cmd graph
+Date: Tue, 10 Feb 2026 21:54:15 +0100
+Message-Id: <20260210205424.11195-7-luis.augenstein@tngtech.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260210205424.11195-1-luis.augenstein@tngtech.com>
 References: <20260210205424.11195-1-luis.augenstein@tngtech.com>
@@ -70,7 +70,8 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-integrate SBOM script into the kernel build process.
+Add hardcoded dependencies and .incbin directive parsing to
+discover dependencies not tracked by .cmd files.
 
 Assisted-by: Claude Sonnet 4.5
 Assisted-by: GLM-4.7
@@ -78,157 +79,188 @@ Co-developed-by: Maximilian Huber <maximilian.huber@tngtech.com>
 Signed-off-by: Maximilian Huber <maximilian.huber@tngtech.com>
 Signed-off-by: Luis Augenstein <luis.augenstein@tngtech.com>
 ---
- .gitignore            |  1 +
- MAINTAINERS           |  6 ++++++
- Makefile              | 11 +++++++++--
- scripts/sbom/Makefile | 33 +++++++++++++++++++++++++++++++++
- scripts/sbom/sbom.py  | 16 ++++++++++++++++
- 5 files changed, 65 insertions(+), 2 deletions(-)
- create mode 100644 scripts/sbom/Makefile
- create mode 100644 scripts/sbom/sbom.py
+ .../sbom/cmd_graph/hardcoded_dependencies.py  | 83 +++++++++++++++++++
+ scripts/sbom/sbom/cmd_graph/incbin_parser.py  | 42 ++++++++++
+ scripts/sbom/sbom/environment.py              | 14 ++++
+ 3 files changed, 139 insertions(+)
+ create mode 100644 scripts/sbom/sbom/cmd_graph/hardcoded_dependencies.py
+ create mode 100644 scripts/sbom/sbom/cmd_graph/incbin_parser.py
+ create mode 100644 scripts/sbom/sbom/environment.py
 
-diff --git a/.gitignore b/.gitignore
-index 3a7241c941f5..f3372f15eb1b 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -48,6 +48,7 @@
- *.s
- *.so
- *.so.dbg
-+*.spdx.json
- *.su
- *.symtypes
- *.tab.[ch]
-diff --git a/MAINTAINERS b/MAINTAINERS
-index f1b020588597..decbab52cef1 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -23365,6 +23365,12 @@ R:	Marc Murphy <marc.murphy@sancloud.com>
- S:	Supported
- F:	arch/arm/boot/dts/ti/omap/am335x-sancloud*
-=20
-+SBOM
-+M:	Luis Augenstein <luis.augenstein@tngtech.com>
-+M:	Maximilian Huber <maximilian.huber@tngtech.com>
-+S:	Maintained
-+F:	scripts/sbom/
-+
- SC1200 WDT DRIVER
- M:	Zwane Mwaikambo <zwanem@gmail.com>
- S:	Maintained
-diff --git a/Makefile b/Makefile
-index 9d38125263fb..46d4be490d7f 100644
---- a/Makefile
-+++ b/Makefile
-@@ -772,7 +772,7 @@ endif
- # in addition to whatever we do anyway.
- # Just "make" or "make all" shall build modules as well
-=20
--ifneq ($(filter all modules nsdeps compile_commands.json clang-%,$(MAKEC=
-MDGOALS)),)
-+ifneq ($(filter all modules nsdeps compile_commands.json clang-% sbom,$(=
-MAKECMDGOALS)),)
-   KBUILD_MODULES :=3D y
- endif
-=20
-@@ -1612,7 +1612,7 @@ CLEAN_FILES +=3D vmlinux.symvers modules-only.symve=
-rs \
- 	       modules.builtin.ranges vmlinux.o.map vmlinux.unstripped \
- 	       compile_commands.json rust/test \
- 	       rust-project.json .vmlinux.objs .vmlinux.export.c \
--               .builtin-dtbs-list .builtin-dtb.S
-+	       .builtin-dtbs-list .builtin-dtb.S sbom-*.spdx.json
-=20
- # Directories & files removed with 'make mrproper'
- MRPROPER_FILES +=3D include/config include/generated          \
-@@ -1728,6 +1728,7 @@ help:
- 	@echo  ''
- 	@echo  'Tools:'
- 	@echo  '  nsdeps          - Generate missing symbol namespace dependenc=
-ies'
-+	@echo  '  sbom            - Generate Software Bill of Materials'
- 	@echo  ''
- 	@echo  'Kernel selftest:'
- 	@echo  '  kselftest         - Build and run kernel selftest'
-@@ -2108,6 +2109,12 @@ nsdeps: export KBUILD_NSDEPS=3D1
- nsdeps: modules
- 	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/nsdeps
-=20
-+# Script to generate .spdx.json SBOM documents describing the build
-+# ----------------------------------------------------------------------=
------
-+PHONY +=3D sbom
-+sbom: all
-+	$(Q)$(MAKE) $(build)=3Dscripts/sbom
-+
- # Clang Tooling
- # ----------------------------------------------------------------------=
------
-=20
-diff --git a/scripts/sbom/Makefile b/scripts/sbom/Makefile
+diff --git a/scripts/sbom/sbom/cmd_graph/hardcoded_dependencies.py b/scri=
+pts/sbom/sbom/cmd_graph/hardcoded_dependencies.py
 new file mode 100644
-index 000000000000..6c8ec7356293
+index 000000000000..a5977f14ae49
 --- /dev/null
-+++ b/scripts/sbom/Makefile
-@@ -0,0 +1,33 @@
++++ b/scripts/sbom/sbom/cmd_graph/hardcoded_dependencies.py
+@@ -0,0 +1,83 @@
 +# SPDX-License-Identifier: GPL-2.0-only OR MIT
 +# Copyright (C) 2025 TNG Technology Consulting GmbH
 +
-+SBOM_SOURCE_FILE :=3D $(objtree)/sbom-source.spdx.json
-+SBOM_BUILD_FILE :=3D $(objtree)/sbom-build.spdx.json
-+SBOM_OUTPUT_FILE :=3D $(objtree)/sbom-output.spdx.json
-+SBOM_ROOTS_FILE :=3D $(objtree)/sbom-roots.txt
++import os
++from typing import Callable
++import sbom.sbom_logging as sbom_logging
++from sbom.path_utils import PathStr, is_relative_to
++from sbom.environment import Environment
++
++HARDCODED_DEPENDENCIES: dict[str, list[str]] =3D {
++    # defined in linux/Kbuild
++    "include/generated/rq-offsets.h": ["kernel/sched/rq-offsets.s"],
++    "kernel/sched/rq-offsets.s": ["include/generated/asm-offsets.h"],
++    "include/generated/bounds.h": ["kernel/bounds.s"],
++    "include/generated/asm-offsets.h": ["arch/{arch}/kernel/asm-offsets.=
+s"],
++}
 +
 +
-+ifeq ($(srctree),$(objtree))
-+    SBOM_TARGETS :=3D $(SBOM_BUILD_FILE) $(SBOM_OUTPUT_FILE)
-+else
-+    SBOM_TARGETS :=3D $(SBOM_SOURCE_FILE) $(SBOM_BUILD_FILE) $(SBOM_OUTP=
-UT_FILE)
-+endif
++def get_hardcoded_dependencies(path: PathStr, obj_tree: PathStr, src_tre=
+e: PathStr) -> list[PathStr]:
++    """
++    Some files in the kernel build process are not tracked by the .cmd d=
+ependency mechanism.
++    Parsing these dependencies programmatically is too complex for the s=
+cope of this project.
++    Therefore, this function provides manually defined dependencies to b=
+e added to the build graph.
 +
-+SBOM_DEPS :=3D $(objtree)/$(KBUILD_IMAGE) $(objtree)/include/generated/a=
-utoconf.h
-+ifdef CONFIG_MODULES
-+    SBOM_DEPS +=3D $(objtree)/modules.order
-+endif
++    Args:
++        path: absolute path to a file within the src tree or object tree=
+.
++        obj_tree: absolute Path to the base directory of the object tree=
+.
++        src_tree: absolute Path to the `linux` source directory.
 +
-+$(SBOM_TARGETS) &: $(SBOM_DEPS)
-+	$(Q)echo "  GEN     $(notdir $(SBOM_TARGETS))"
++    Returns:
++        list[PathStr]: A list of dependency file paths (relative to the =
+object tree) required to build the file at the given path.
++    """
++    if is_relative_to(path, obj_tree):
++        path =3D os.path.relpath(path, obj_tree)
++    elif is_relative_to(path, src_tree):
++        path =3D os.path.relpath(path, src_tree)
 +
-+	$(Q)printf "%s\n" "$(KBUILD_IMAGE)" > $(SBOM_ROOTS_FILE)
-+	$(Q)if [ "$(CONFIG_MODULES)" =3D "y" ]; then \
-+		sed 's/\.o$$/.ko/' $(objtree)/modules.order >> $(SBOM_ROOTS_FILE); \
-+	fi
++    if path not in HARDCODED_DEPENDENCIES:
++        return []
 +
-+	$(Q)$(PYTHON3) $(srctree)/scripts/sbom/sbom.py
++    template_variables: dict[str, Callable[[], str | None]] =3D {
++        "arch": lambda: _get_arch(path),
++    }
 +
-+	$(Q)rm $(SBOM_ROOTS_FILE)
++    dependencies: list[PathStr] =3D []
++    for dependency_template in HARDCODED_DEPENDENCIES[path]:
++        dependency =3D _evaluate_template(dependency_template, template_=
+variables)
++        if dependency is None:
++            continue
++        if os.path.exists(os.path.join(obj_tree, dependency)):
++            dependencies.append(dependency)
++        elif os.path.exists(os.path.join(src_tree, dependency)):
++            dependencies.append(os.path.relpath(dependency, obj_tree))
++        else:
++            sbom_logging.error(
++                "Skip hardcoded dependency '{dependency}' for '{path}' b=
+ecause the dependency lies neither in the src tree nor the object tree.",
++                dependency=3Ddependency,
++                path=3Dpath,
++            )
 +
-+$(obj)/: $(SBOM_TARGETS)
-diff --git a/scripts/sbom/sbom.py b/scripts/sbom/sbom.py
++    return dependencies
++
++
++def _evaluate_template(template: str, variables: dict[str, Callable[[], =
+str | None]]) -> str | None:
++    for key, value_function in variables.items():
++        template_key =3D "{" + key + "}"
++        if template_key in template:
++            value =3D value_function()
++            if value is None:
++                return None
++            template =3D template.replace(template_key, value)
++    return template
++
++
++def _get_arch(path: PathStr):
++    srcarch =3D Environment.SRCARCH()
++    if srcarch is None:
++        sbom_logging.error(
++            "Skipped architecture specific hardcoded dependency for '{pa=
+th}' because the SRCARCH environment variable was not set.",
++            path=3Dpath,
++        )
++        return None
++    return srcarch
+diff --git a/scripts/sbom/sbom/cmd_graph/incbin_parser.py b/scripts/sbom/=
+sbom/cmd_graph/incbin_parser.py
 new file mode 100644
-index 000000000000..9c2e4c7f17ce
+index 000000000000..130f9520837d
 --- /dev/null
-+++ b/scripts/sbom/sbom.py
-@@ -0,0 +1,16 @@
-+#!/usr/bin/env python3
++++ b/scripts/sbom/sbom/cmd_graph/incbin_parser.py
+@@ -0,0 +1,42 @@
 +# SPDX-License-Identifier: GPL-2.0-only OR MIT
 +# Copyright (C) 2025 TNG Technology Consulting GmbH
 +
-+"""
-+Compute software bill of materials in SPDX format describing a kernel bu=
-ild.
-+"""
++from dataclasses import dataclass
++import re
++
++from sbom.path_utils import PathStr
++
++INCBIN_PATTERN =3D re.compile(r'\s*\.incbin\s+"(?P<path>[^"]+)"')
++"""Regex pattern for matching `.incbin "<path>"` statements."""
 +
 +
-+def main():
-+    pass
++@dataclass
++class IncbinStatement:
++    """A parsed `.incbin "<path>"` directive."""
++
++    path: PathStr
++    """path to the file referenced by the `.incbin` directive."""
++
++    full_statement: str
++    """Full `.incbin "<path>"` statement as it originally appeared in th=
+e file."""
 +
 +
-+# Call main method
-+if __name__ =3D=3D "__main__":
-+    main()
++def parse_incbin_statements(absolute_path: PathStr) -> list[IncbinStatem=
+ent]:
++    """
++    Parses `.incbin` directives from an `.S` assembly file.
++
++    Args:
++        absolute_path: Absolute path to the `.S` assembly file.
++
++    Returns:
++        list[IncbinStatement]: Parsed `.incbin` statements.
++    """
++    with open(absolute_path, "rt") as f:
++        content =3D f.read()
++    return [
++        IncbinStatement(
++            path=3Dmatch.group("path"),
++            full_statement=3Dmatch.group(0).strip(),
++        )
++        for match in INCBIN_PATTERN.finditer(content)
++    ]
+diff --git a/scripts/sbom/sbom/environment.py b/scripts/sbom/sbom/environ=
+ment.py
+new file mode 100644
+index 000000000000..b3fb2f0ba61d
+--- /dev/null
++++ b/scripts/sbom/sbom/environment.py
+@@ -0,0 +1,14 @@
++# SPDX-License-Identifier: GPL-2.0-only OR MIT
++# Copyright (C) 2025 TNG Technology Consulting GmbH
++
++import os
++
++
++class Environment:
++    """
++    Read-only accessor for kernel build environment variables.
++    """
++
++    @classmethod
++    def SRCARCH(cls) -> str | None:
++        return os.getenv("SRCARCH")
 --=20
 2.34.1
 
