@@ -1,51 +1,51 @@
 Received: from mailgw01.zimbra-vnc.de (mailgw01.zimbra-vnc.de [148.251.101.236])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63113334C06;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6318C334C1F;
 	Tue, 10 Feb 2026 20:55:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.101.236
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770756914; cv=none; b=GUkYeXBSpV/Sq9rO66+ENtwEH7urzAn/B8H0WOI6QPXftJtvZe7TPxRAvd+VReDbsho5oZKiDHJdIJA5jJtaqb5VTVyjVA02r6eBnv0Po5xgUrg7CLicgc2iwqZE78gxsjqK418IfQdB2MuF14Zse6NQODJsWMMh1/BXfiHUjq8=
+	t=1770756915; cv=none; b=jW+wPQbIRVuQZczyI52DMzutNVIq0cVU0vW+NEJSJEdZpm34Q1Qn/JHwJkjrmGiNm+Dgq/3zJ3ZwWR0QjtFEUU1WcYcgUKulq5fth32UieNvhkt0euzoLkD5XctUkNy8k5IJfRGFuDqzaw1jOAD4NQMh5Ew3XCvj/N9WALJbBHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770756914; c=relaxed/simple;
-	bh=z46CzfEwCgubETXX+VR96PRcPHGksw4Omg2gBQOxuuQ=;
+	s=arc-20240116; t=1770756915; c=relaxed/simple;
+	bh=YK6n7e1emNg6WDIgLZ+H3Nlcku2YQm6VfLB508JVI9Y=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=VbCOszWEB60N5iZa+FJF54RIDt7egOT5sGFcdu10IW5EaX1Iuxpq+kZt/cKU9/M1+DCsU3qsmDj8CJV6nmHDPddfaUKRFcQ6vPoom+c3pgVzU/W0RbFoydr2WULj6YIoHfhBDCPYCWetI1noV7efWKiKobazZ0e4MtLCpva5AZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com; spf=pass smtp.mailfrom=tngtech.com; dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b=L83dx/cs; arc=none smtp.client-ip=148.251.101.236
+	 MIME-Version; b=jVyW6LrrVI9Op1B+q/0SQUQ4dmguirbGkNQlOPxm6a7kgFmuQjfqOqkZo6aLXfxVIS6Ar/IgQcdBUuOcZ7oAbxofbsbOX11A+oSReBlZgAc1hcvyF62H7YceHe/bac4BISlopUGp1A2hPLniCA0ygDCI1QFaUg8eRiEIUMikWpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com; spf=pass smtp.mailfrom=tngtech.com; dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b=O8LiG8+1; arc=none smtp.client-ip=148.251.101.236
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tngtech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b="L83dx/cs"
+	dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b="O8LiG8+1"
 Received: from zmproxy.tng.vnc.biz (zimbra-vnc.tngtech.com [35.234.71.156])
-	by mailgw01.zimbra-vnc.de (Postfix) with ESMTPS id 143ED3FAF0;
-	Tue, 10 Feb 2026 21:55:05 +0100 (CET)
+	by mailgw01.zimbra-vnc.de (Postfix) with ESMTPS id B2BB93FAF3;
+	Tue, 10 Feb 2026 21:55:10 +0100 (CET)
 Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id C1C901FA8CD;
-	Tue, 10 Feb 2026 21:55:04 +0100 (CET)
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 8D6AE1FA952;
+	Tue, 10 Feb 2026 21:55:10 +0100 (CET)
 Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
  by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10032)
- with ESMTP id qGfmRll1i-5L; Tue, 10 Feb 2026 21:55:04 +0100 (CET)
+ with ESMTP id cRh6p8fBx28s; Tue, 10 Feb 2026 21:55:09 +0100 (CET)
 Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id E81341FA952;
-	Tue, 10 Feb 2026 21:55:03 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz E81341FA952
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 45E8C1FA9A5;
+	Tue, 10 Feb 2026 21:55:09 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz 45E8C1FA9A5
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tngtech.com;
-	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1770756904;
-	bh=6roMjR2a619Wnado/gGPgnY04vOcE8DszX6XtCQQg6s=;
+	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1770756909;
+	bh=UkbCio6y+/j2JyJw3iees4lzSs0gyINva2aAlE1kE4s=;
 	h=From:To:Subject:Date:Message-Id:MIME-Version;
-	b=L83dx/csSm+rleoYA5U/ayxhvLpwAgTW6X/YlBuz73WGBzYpyoXkiOb2hrPg4Rfeg
-	 BXIY9B93X+uvaYaKDNIXGeLUiUKYv+s/M6l43g7X/ZTTQQ+Ztxoh6bWkyop7n6//v0
-	 0RPuG6CnNZGSnALQgUBGGDYSNMHei+LzPjLn184VyvHwx2koKDV5vVvIdL0HkvGaUH
-	 suq/2GJlTrTxDBqeg83EMANLP1EKEz+XXa5GIeECYwiI4mE8YMWfzOknp91qJRQiXx
-	 CQQtI2A2bpdf90Cwsp9zGxLD3oxm5VY2yZFjcmJwQhakWc2NWEvtcervQ0CxrYLCKz
-	 EnJ62VtdXLzCw==
+	b=O8LiG8+1ntVBKlxJjb8gPXSANA/HOpdsTWMy4igtBbPBTrEixqv15OsrC5BjJOqgj
+	 rbobXwF8Uc9DU3fchjX0cXCSeMlvc1Ul/msMVcLWwLCfqxbO6Ro7xrTDlR2nF9XJ49
+	 P+gSaOfihRf9re4EaxcgnbmYno+ZOXJZcoMCzDVN6JT0XRG2LXOI9cIHf1iLNATamV
+	 zfTOUR0Ydmzyf5dnwx7j1euSqPQyDpUezug4aij3JvgfnrSqs8LW+4t5erxgC4hz9J
+	 83MNlGTf1VXoZNqkcnYDZ2ulfac8rw+CpPK0Z8/x5x68/Crv8WrUzdHAtq4jeh2KM4
+	 lP0vNH03/lXBQ==
 X-Virus-Scanned: amavis at zmproxy.tng.vnc.biz
 Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
  by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10026)
- with ESMTP id B0Cu17xA9G7f; Tue, 10 Feb 2026 21:55:03 +0100 (CET)
+ with ESMTP id utVK6Y154spr; Tue, 10 Feb 2026 21:55:09 +0100 (CET)
 Received: from DESKTOP-0O0JV6I.localdomain (ipservice-092-208-231-176.092.208.pools.vodafone-ip.de [92.208.231.176])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id 8BFEE1FA8CD;
-	Tue, 10 Feb 2026 21:55:03 +0100 (CET)
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id D99421FA952;
+	Tue, 10 Feb 2026 21:55:08 +0100 (CET)
 From: Luis Augenstein <luis.augenstein@tngtech.com>
 To: nathan@kernel.org,
 	nsc@kernel.org
@@ -56,9 +56,9 @@ Cc: linux-kbuild@vger.kernel.org,
 	kstewart@linuxfoundation.org,
 	maximilian.huber@tngtech.com,
 	Luis Augenstein <luis.augenstein@tngtech.com>
-Subject: [PATCH 01/15] scripts/sbom: add documentation
-Date: Tue, 10 Feb 2026 21:54:10 +0100
-Message-Id: <20260210205424.11195-2-luis.augenstein@tngtech.com>
+Subject: [PATCH 04/15] scripts/sbom: add command parsers
+Date: Tue, 10 Feb 2026 21:54:13 +0100
+Message-Id: <20260210205424.11195-5-luis.augenstein@tngtech.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260210205424.11195-1-luis.augenstein@tngtech.com>
 References: <20260210205424.11195-1-luis.augenstein@tngtech.com>
@@ -70,248 +70,785 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Implement savedcmd_parser module for extracting input files
+from kernel build commands.
+
 Assisted-by: Claude Sonnet 4.5
 Assisted-by: GLM-4.7
 Co-developed-by: Maximilian Huber <maximilian.huber@tngtech.com>
 Signed-off-by: Maximilian Huber <maximilian.huber@tngtech.com>
 Signed-off-by: Luis Augenstein <luis.augenstein@tngtech.com>
 ---
- Documentation/tools/index.rst     |   1 +
- Documentation/tools/sbom/sbom.rst | 206 ++++++++++++++++++++++++++++++
- 2 files changed, 207 insertions(+)
- create mode 100644 Documentation/tools/sbom/sbom.rst
+ .../sbom/sbom/cmd_graph/savedcmd_parser.py    | 664 ++++++++++++++++++
+ 1 file changed, 664 insertions(+)
+ create mode 100644 scripts/sbom/sbom/cmd_graph/savedcmd_parser.py
 
-diff --git a/Documentation/tools/index.rst b/Documentation/tools/index.rs=
-t
-index 80488e290e10..6b0319b2d334 100644
---- a/Documentation/tools/index.rst
-+++ b/Documentation/tools/index.rst
-@@ -12,6 +12,7 @@ more additions are needed here:
-=20
-    rtla/index
-    rv/index
-+   sbom/sbom
-=20
- .. only::  subproject and html
-=20
-diff --git a/Documentation/tools/sbom/sbom.rst b/Documentation/tools/sbom=
-/sbom.rst
+diff --git a/scripts/sbom/sbom/cmd_graph/savedcmd_parser.py b/scripts/sbo=
+m/sbom/cmd_graph/savedcmd_parser.py
 new file mode 100644
-index 000000000000..029b08b6ad87
+index 000000000000..d72f781b4498
 --- /dev/null
-+++ b/Documentation/tools/sbom/sbom.rst
-@@ -0,0 +1,206 @@
-+.. SPDX-License-Identifier: GPL-2.0-only OR MIT
-+.. Copyright (C) 2025 TNG Technology Consulting GmbH
++++ b/scripts/sbom/sbom/cmd_graph/savedcmd_parser.py
+@@ -0,0 +1,664 @@
++# SPDX-License-Identifier: GPL-2.0-only OR MIT
++# Copyright (C) 2025 TNG Technology Consulting GmbH
 +
-+KernelSbom
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++import re
++import shlex
++from dataclasses import dataclass
++from typing import Any, Callable, Union
++import sbom.sbom_logging as sbom_logging
++from sbom.path_utils import PathStr
 +
-+Introduction
-+------------
 +
-+KernelSbom is a Python script ``scripts/sbom/sbom.py`` that can be
-+executed after a successful kernel build. When invoked, KernelSbom
-+analyzes all files involved in the build and generates Software Bill of
-+Materials (SBOM) documents in SPDX 3.0.1 format.
-+The generated SBOM documents capture:
++class CmdParsingError(Exception):
++    def __init__(self, message: str):
++        super().__init__(message)
++        self.message =3D message
 +
-+* **Final output artifacts**, typically the kernel image and modules
-+* **All source files** that contributed to the build with metadata
-+  and licensing information
-+* **Details of the build process**, including intermediate artifacts
-+  and the build commands linking source files to the final output
-+  artifacts
 +
-+KernelSbom is originally developed in the
-+`KernelSbom repository <https://github.com/TNG/KernelSbom>`_.
++@dataclass
++class Option:
++    name: str
++    value: str | None =3D None
 +
-+Requirements
-+------------
 +
-+Python 3.10 or later. No libraries or other dependencies are required.
++@dataclass
++class Positional:
++    value: str
 +
-+Basic Usage
-+-----------
 +
-+Run the ``make sbom`` target.
-+For example::
++_SUBCOMMAND_PATTERN =3D re.compile(r"\$\$\(([^()]*)\)")
++"""Pattern to match $$(...) blocks"""
 +
-+    $ make defconfig O=3Dkernel_build
-+    $ make sbom O=3Dkernel_build -j$(nproc)
 +
-+This will trigger a kernel build. After all build outputs have been
-+generated, KernelSbom produces three SPDX documents in the root
-+directory of the object tree:
++def _tokenize_single_command(command: str, flag_options: list[str] | Non=
+e =3D None) -> list[Union[Option, Positional]]:
++    """
++    Parse a shell command into a list of Options and Positionals.
++    - Positional: the command and any positional arguments.
++    - Options: handles flags and options with values provided as space-s=
+eparated, or equals-sign
++        (e.g., '--opt val', '--opt=3Dval', '--flag').
 +
-+* ``sbom-source.spdx.json``
-+  Describes all source files involved in the build and
-+  associates each file with its corresponding license expression.
++    Args:
++        command: Command line string.
++        flag_options: Options that are flags without values (e.g., '--ve=
+rbose').
 +
-+* ``sbom-output.spdx.json``
-+  Captures all final build outputs (kernel image and ``.ko`` module file=
-s)
-+  and includes build metadata such as environment variables and
-+  a hash of the ``.config`` file used for the build.
++    Returns:
++        List of `Option` and `Positional` objects in command order.
++    """
 +
-+* ``sbom-build.spdx.json``
-+  Imports files from the source and output documents and describes every
-+  intermediate build artifact. For each artifact, it records the exact
-+  build command used and establishes the relationship between
-+  input files and generated outputs.
++    #  Wrap all $$(...) blocks in double quotes to prevent shlex from sp=
+litting them.
++    command_with_protected_subcommands =3D _SUBCOMMAND_PATTERN.sub(lambd=
+a m: f'"$$({m.group(1)})"', command)
++    tokens =3D shlex.split(command_with_protected_subcommands)
 +
-+When invoking the sbom target, it is recommended to perform
-+out-of-tree builds using ``O=3D<objtree>``. KernelSbom classifies files =
-as
-+source files when they are located in the source tree and not in the
-+object tree. For in-tree builds, where the source and object trees are
-+the same directory, this distinction can no longer be made reliably.
-+In that case, KernelSbom does not generate a dedicated source SBOM.
-+Instead, source files are included in the build SBOM.
++    parsed: list[Option | Positional] =3D []
++    i =3D 0
++    while i < len(tokens):
++        token =3D tokens[i]
 +
-+Standalone Usage
-+----------------
++        # Positional
++        if not token.startswith("-"):
++            parsed.append(Positional(token))
++            i +=3D 1
++            continue
 +
-+KernelSbom can also be used as a standalone script to generate
-+SPDX documents for specific build outputs. For example, after a
-+successful x86 kernel build, KernelSbom can generate SPDX documents
-+for the ``bzImage`` kernel image::
++        # Option without value (--flag)
++        if (token.startswith("-") and i + 1 < len(tokens) and tokens[i +=
+ 1].startswith("-")) or (
++            flag_options and token in flag_options
++        ):
++            parsed.append(Option(name=3Dtoken))
++            i +=3D 1
++            continue
 +
-+    $ SRCARCH=3Dx86 python3 scripts/sbom/sbom.py \
-+        --src-tree . \
-+        --obj-tree ./kernel_build \
-+        --roots arch/x86/boot/bzImage \
-+        --generate-spdx \
-+        --generate-used-files \
-+        --prettify-json \
-+        --debug
++        # Option with equals sign (--opt=3Dval)
++        if "=3D" in token:
++            name, value =3D token.split("=3D", 1)
++            parsed.append(Option(name=3Dname, value=3Dvalue))
++            i +=3D 1
++            continue
 +
-+Note that when KernelSbom is invoked outside of the ``make`` process,
-+the environment variables used during compilation are not available and
-+therefore cannot be included in the generated SPDX documents. It is
-+recommended to set at least the ``SRCARCH`` environment variable to the
-+architecture for which the build was performed.
++        # Option with space-separated value (--opt val)
++        if i + 1 < len(tokens) and not tokens[i + 1].startswith("-"):
++            parsed.append(Option(name=3Dtoken, value=3Dtokens[i + 1]))
++            i +=3D 2
++            continue
 +
-+For a full list of command-line options, run::
++        raise CmdParsingError(f"Unrecognized token: {token} in command {=
+command}")
 +
-+    $ python3 scripts/sbom/sbom.py --help
++    return parsed
 +
-+Output Format
-+-------------
 +
-+KernelSbom generates documents conforming to the
-+`SPDX 3.0.1 specification <https://spdx.github.io/spdx-spec/v3.0.1/>`_
-+serialized as JSON-LD.
++def _tokenize_single_command_positionals_only(command: str) -> list[str]=
+:
++    command_parts =3D _tokenize_single_command(command)
++    positionals =3D [p.value for p in command_parts if isinstance(p, Pos=
+itional)]
++    if len(positionals) !=3D len(command_parts):
++        raise CmdParsingError(
++            f"Invalid command format: expected positional arguments only=
+ but got options in command {command}."
++        )
++    return positionals
 +
-+To reduce file size, the output documents use the JSON-LD ``@context``
-+to define custom prefixes for ``spdxId`` values. While this is compliant
-+with the SPDX specification, only a limited number of tools in the
-+current SPDX ecosystem support custom JSON-LD contexts. To use such
-+tools with the generated documents, the custom JSON-LD context must
-+be expanded before providing the documents.
-+See https://lists.spdx.org/g/Spdx-tech/message/6064 for more information=
++
++def _parse_dd_command(command: str) -> list[PathStr]:
++    match =3D re.match(r"dd.*?if=3D(\S+)", command)
++    if match:
++        return [match.group(1)]
++    return []
++
++
++def _parse_cat_command(command: str) -> list[PathStr]:
++    positionals =3D _tokenize_single_command_positionals_only(command)
++    # expect positionals to be ["cat", input1, input2, ...]
++    return [p for p in positionals[1:]]
++
++
++def _parse_compound_command(command: str) -> list[PathStr]:
++    compound_command_parsers: list[tuple[re.Pattern[str], Callable[[str]=
+, list[PathStr]]]] =3D [
++        (re.compile(r"dd\b"), _parse_dd_command),
++        (re.compile(r"cat.*?\|"), lambda c: _parse_cat_command(c.split("=
+|")[0])),
++        (re.compile(r"cat\b[^|>]*$"), _parse_cat_command),
++        (re.compile(r"echo\b"), _parse_noop),
++        (re.compile(r"\S+=3D"), _parse_noop),
++        (re.compile(r"printf\b"), _parse_noop),
++        (re.compile(r"sed\b"), _parse_sed_command),
++        (
++            re.compile(r"(.*/)scripts/bin2c\s*<"),
++            lambda c: [input] if (input :=3D c.split("<")[1].strip()) !=3D=
+ "/dev/null" else [],
++        ),
++        (re.compile(r"^:$"), _parse_noop),
++    ]
++
++    match =3D re.match(r"\s*[\(\{](.*)[\)\}]\s*>", command, re.DOTALL)
++    if match is None:
++        raise CmdParsingError("No inner commands found for compound comm=
+and")
++    input_files: list[PathStr] =3D []
++    inner_commands =3D _split_commands(match.group(1))
++    for inner_command in inner_commands:
++        if isinstance(inner_command, IfBlock):
++            sbom_logging.error(
++                "Skip parsing inner command {inner_command} of compound =
+command because IfBlock is not supported",
++                inner_command=3Dinner_command,
++            )
++            continue
++
++        parser =3D next((parser for pattern, parser in compound_command_=
+parsers if pattern.match(inner_command)), None)
++        if parser is None:
++            sbom_logging.error(
++                "Skip parsing inner command {inner_command} of compound =
+command because no matching parser was found",
++                inner_command=3Dinner_command,
++            )
++            continue
++        try:
++            input_files +=3D parser(inner_command)
++        except CmdParsingError as e:
++            sbom_logging.error(
++                "Skip parsing inner command {inner_command} of compound =
+command because of command parsing error: {error_message}",
++                inner_command=3Dinner_command,
++                error_message=3De.message,
++            )
++    return input_files
++
++
++def _parse_objcopy_command(command: str) -> list[PathStr]:
++    command_parts =3D _tokenize_single_command(command, flag_options=3D[=
+"-S", "-w"])
++    positionals =3D [part.value for part in command_parts if isinstance(=
+part, Positional)]
++    # expect positionals to be ['objcopy', input_file] or ['objcopy', in=
+put_file, output_file]
++    if not (len(positionals) =3D=3D 2 or len(positionals) =3D=3D 3):
++        raise CmdParsingError(
++            f"Invalid objcopy command format: expected 2 or 3 positional=
+ arguments, got {len(positionals)} ({positionals})"
++        )
++    return [positionals[1]]
++
++
++def _parse_link_vmlinux_command(command: str) -> list[PathStr]:
++    """
++    For simplicity we do not parse the `scripts/link-vmlinux.sh` script.
++    Instead the `vmlinux.a` dependency is just hardcoded for now.
++    """
++    return ["vmlinux.a"]
++
++
++def _parse_noop(command: str) -> list[PathStr]:
++    """
++    No-op parser for commands with no input files (e.g., 'rm', 'true').
++    Returns an empty list.
++    """
++    return []
++
++
++def _parse_ar_command(command: str) -> list[PathStr]:
++    positionals =3D _tokenize_single_command_positionals_only(command)
++    # expect positionals to be ['ar', flags, output, input1, input2, ...=
+]
++    flags =3D positionals[1]
++    if "r" not in flags:
++        # 'r' option indicates that new files are added to the archive.
++        # If this option is missing we won't find any relevant input fil=
+es.
++        return []
++    return positionals[3:]
++
++
++def _parse_ar_piped_xargs_command(command: str) -> list[PathStr]:
++    printf_command, _ =3D command.split("|", 1)
++    positionals =3D _tokenize_single_command_positionals_only(printf_com=
+mand.strip())
++    # expect positionals to be ['printf', '{prefix_path}%s ', input1, in=
+put2, ...]
++    prefix_path =3D positionals[1].rstrip("%s ")
++    return [f"{prefix_path}{filename}" for filename in positionals[2:]]
++
++
++def _parse_gcc_or_clang_command(command: str) -> list[PathStr]:
++    parts =3D shlex.split(command)
++    # compile mode: expect last positional argument ending in `.c` or `.=
+S` to be the input file
++    for part in reversed(parts):
++        if not part.startswith("-") and any(part.endswith(suffix) for su=
+ffix in [".c", ".S"]):
++            return [part]
++
++    # linking mode: expect all .o files to be the inputs
++    return [p for p in parts if p.endswith(".o")]
++
++
++def _parse_rustc_command(command: str) -> list[PathStr]:
++    parts =3D shlex.split(command)
++    # expect last positional argument ending in `.rs` to be the input fi=
+le
++    for part in reversed(parts):
++        if not part.startswith("-") and part.endswith(".rs"):
++            return [part]
++    raise CmdParsingError("Could not find .rs input source file")
++
++
++def _parse_rustdoc_command(command: str) -> list[PathStr]:
++    parts =3D shlex.split(command)
++    # expect last positional argument ending in `.rs` to be the input fi=
+le
++    for part in reversed(parts):
++        if not part.startswith("-") and part.endswith(".rs"):
++            return [part]
++    raise CmdParsingError("Could not find .rs input source file")
++
++
++def _parse_syscallhdr_command(command: str) -> list[PathStr]:
++    command_parts =3D _tokenize_single_command(command.strip(), flag_opt=
+ions=3D["--emit-nr"])
++    positionals =3D [p.value for p in command_parts if isinstance(p, Pos=
+itional)]
++    # expect positionals to be ["sh", path/to/syscallhdr.sh, input, outp=
+ut]
++    return [positionals[2]]
++
++
++def _parse_syscalltbl_command(command: str) -> list[PathStr]:
++    command_parts =3D _tokenize_single_command(command.strip())
++    positionals =3D [p.value for p in command_parts if isinstance(p, Pos=
+itional)]
++    # expect positionals to be ["sh", path/to/syscalltbl.sh, input, outp=
+ut]
++    return [positionals[2]]
++
++
++def _parse_mkcapflags_command(command: str) -> list[PathStr]:
++    positionals =3D _tokenize_single_command_positionals_only(command)
++    # expect positionals to be ["sh", path/to/mkcapflags.sh, output, inp=
+ut1, input2]
++    return [positionals[3], positionals[4]]
++
++
++def _parse_orc_hash_command(command: str) -> list[PathStr]:
++    positionals =3D _tokenize_single_command_positionals_only(command)
++    # expect positionals to be ["sh", path/to/orc_hash.sh, '<', input, '=
+>', output]
++    return [positionals[3]]
++
++
++def _parse_xen_hypercalls_command(command: str) -> list[PathStr]:
++    positionals =3D _tokenize_single_command_positionals_only(command)
++    # expect positionals to be ["sh", path/to/xen-hypercalls.sh, output,=
+ input1, input2, ...]
++    return positionals[3:]
++
++
++def _parse_gen_initramfs_command(command: str) -> list[PathStr]:
++    command_parts =3D _tokenize_single_command(command)
++    positionals =3D [p.value for p in command_parts if isinstance(p, Pos=
+itional)]
++    # expect positionals to be ["sh", path/to/gen_initramfs.sh, input1, =
+input2, ...]
++    return positionals[2:]
++
++
++def _parse_vdso2c_command(command: str) -> list[PathStr]:
++    positionals =3D _tokenize_single_command_positionals_only(command)
++    # expect positionals to be ['vdso2c', raw_input, stripped_input, out=
+put]
++    return [positionals[1], positionals[2]]
++
++
++def _parse_ld_command(command: str) -> list[PathStr]:
++    command_parts =3D _tokenize_single_command(
++        command=3Dcommand.strip(),
++        flag_options=3D[
++            "-shared",
++            "--no-undefined",
++            "--eh-frame-hdr",
++            "-Bsymbolic",
++            "-r",
++            "--no-ld-generated-unwind-info",
++            "--no-dynamic-linker",
++            "-pie",
++            "--no-dynamic-linker--whole-archive",
++            "--whole-archive",
++            "--no-whole-archive",
++            "--start-group",
++            "--end-group",
++        ],
++    )
++    positionals =3D [p.value for p in command_parts if isinstance(p, Pos=
+itional)]
++    # expect positionals to be ["ld", input1, input2, ...]
++    return positionals[1:]
++
++
++def _parse_sed_command(command: str) -> list[PathStr]:
++    command_parts =3D shlex.split(command)
++    # expect command parts to be ["sed", *, input]
++    input =3D command_parts[-1]
++    if input =3D=3D "/dev/null":
++        return []
++    return [input]
++
++
++def _parse_awk(command: str) -> list[PathStr]:
++    command_parts =3D _tokenize_single_command(command)
++    positionals =3D [p.value for p in command_parts if isinstance(p, Pos=
+itional)]
++    # expect positionals to be ["awk", input1, input2, ...]
++    return positionals[1:]
++
++
++def _parse_nm_piped_command(command: str) -> list[PathStr]:
++    nm_command, _ =3D command.split("|", 1)
++    command_parts =3D _tokenize_single_command(
++        command=3Dnm_command.strip(),
++        flag_options=3D["p", "--defined-only"],
++    )
++    positionals =3D [p.value for p in command_parts if isinstance(p, Pos=
+itional)]
++    # expect positionals to be ["nm", input1, input2, ...]
++    return [p for p in positionals[1:]]
++
++
++def _parse_pnm_to_logo_command(command: str) -> list[PathStr]:
++    command_parts =3D shlex.split(command)
++    # expect command parts to be ["pnmtologo", <options>, input]
++    return [command_parts[-1]]
++
++
++def _parse_relacheck(command: str) -> list[PathStr]:
++    positionals =3D _tokenize_single_command_positionals_only(command)
++    # expect positionals to be ["relachek", input, log_reference]
++    return [positionals[1]]
++
++
++def _parse_perl_command(command: str) -> list[PathStr]:
++    positionals =3D _tokenize_single_command_positionals_only(command.st=
+rip())
++    # expect positionals to be ["perl", input]
++    return [positionals[1]]
++
++
++def _parse_strip_command(command: str) -> list[PathStr]:
++    command_parts =3D _tokenize_single_command(command, flag_options=3D[=
+"--strip-debug"])
++    positionals =3D [p.value for p in command_parts if isinstance(p, Pos=
+itional)]
++    # expect positionals to be ["strip", input1, input2, ...]
++    return positionals[1:]
++
++
++def _parse_mkpiggy_command(command: str) -> list[PathStr]:
++    mkpiggy_command, _ =3D command.split(">", 1)
++    positionals =3D _tokenize_single_command_positionals_only(mkpiggy_co=
+mmand)
++    # expect positionals to be ["mkpiggy", input]
++    return [positionals[1]]
++
++
++def _parse_relocs_command(command: str) -> list[PathStr]:
++    if ">" not in command:
++        # Only consider relocs commands that redirect output to a file.
++        # If there's no redirection, we assume it produces no output fil=
+e and therefore has no input we care about.
++        return []
++    relocs_command, _ =3D command.split(">", 1)
++    command_parts =3D shlex.split(relocs_command)
++    # expect command_parts to be ["relocs", options, input]
++    return [command_parts[-1]]
++
++
++def _parse_mk_elfconfig_command(command: str) -> list[PathStr]:
++    positionals =3D _tokenize_single_command_positionals_only(command)
++    # expect positionals to be ["mk_elfconfig", "<", input, ">", output]
++    return [positionals[2]]
++
++
++def _parse_flex_command(command: str) -> list[PathStr]:
++    parts =3D shlex.split(command)
++    # expect last positional argument ending in `.l` to be the input fil=
+e
++    for part in reversed(parts):
++        if not part.startswith("-") and part.endswith(".l"):
++            return [part]
++    raise CmdParsingError("Could not find .l input source file in comman=
+d")
++
++
++def _parse_bison_command(command: str) -> list[PathStr]:
++    parts =3D shlex.split(command)
++    # expect last positional argument ending in `.y` to be the input fil=
+e
++    for part in reversed(parts):
++        if not part.startswith("-") and part.endswith(".y"):
++            return [part]
++    raise CmdParsingError("Could not find input .y input source file in =
+command")
++
++
++def _parse_tools_build_command(command: str) -> list[PathStr]:
++    positionals =3D _tokenize_single_command_positionals_only(command)
++    # expect positionals to be ["tools/build", "input1", "input2", "inpu=
+t3", "output"]
++    return positionals[1:-1]
++
++
++def _parse_extract_cert_command(command: str) -> list[PathStr]:
++    command_parts =3D shlex.split(command)
++    # expect command parts to be [path/to/extract-cert, input, output]
++    input =3D command_parts[1]
++    if not input:
++        return []
++    return [input]
++
++
++def _parse_dtc_command(command: str) -> list[PathStr]:
++    wno_flags =3D [command_part for command_part in shlex.split(command)=
+ if command_part.startswith("-Wno-")]
++    command_parts =3D _tokenize_single_command(command, flag_options=3Dw=
+no_flags)
++    positionals =3D [p.value for p in command_parts if isinstance(p, Pos=
+itional)]
++    # expect positionals to be [path/to/dtc, input]
++    return [positionals[1]]
++
++
++def _parse_bindgen_command(command: str) -> list[PathStr]:
++    command_parts =3D shlex.split(command)
++    header_file_input_paths =3D [part for part in command_parts if part.=
+endswith(".h")]
++    return header_file_input_paths
++
++
++def _parse_gen_header(command: str) -> list[PathStr]:
++    command_parts =3D shlex.split(command)
++    # expect command parts to be ["python3", path/to/gen_headers.py, ...=
+, "--xml", input]
++    i =3D next(i for i, token in enumerate(command_parts) if token =3D=3D=
+ "--xml")
++    return [command_parts[i + 1]]
++
++
++# Command parser registry
++SINGLE_COMMAND_PARSERS: list[tuple[re.Pattern[str], Callable[[str], list=
+[PathStr]]]] =3D [
++    # Compound commands
++    (re.compile(r"\(.*?\)\s*>", re.DOTALL), _parse_compound_command),
++    (re.compile(r"\{.*?\}\s*>", re.DOTALL), _parse_compound_command),
++    # Standard Unix utilities and system tools
++    (re.compile(r"^rm\b"), _parse_noop),
++    (re.compile(r"^mkdir\b"), _parse_noop),
++    (re.compile(r"^touch\b"), _parse_noop),
++    (re.compile(r"^cat\b.*?[\|>]"), lambda c: _parse_cat_command(c.split=
+("|")[0].split(">")[0])),
++    (re.compile(r"^echo[^|]*$"), _parse_noop),
++    (re.compile(r"^sed.*?>"), lambda c: _parse_sed_command(c.split(">")[=
+0])),
++    (re.compile(r"^sed\b"), _parse_noop),
++    (re.compile(r"^awk.*?<.*?>"), lambda c: [c.split("<")[1].split(">")[=
+0]]),
++    (re.compile(r"^awk.*?>"), lambda c: _parse_awk(c.split(">")[0])),
++    (re.compile(r"^(/bin/)?true\b"), _parse_noop),
++    (re.compile(r"^(/bin/)?false\b"), _parse_noop),
++    (re.compile(r"^openssl\s+req.*?-new.*?-keyout"), _parse_noop),
++    # Compilers and code generators
++    # (C/LLVM toolchain, Rust, Flex/Bison, Bindgen, Perl, etc.)
++    (re.compile(r"^([^\s]+-)?(gcc|clang)\b"), _parse_gcc_or_clang_comman=
+d),
++    (re.compile(r"^([^\s]+-)?ld(\.bfd)?\b"), _parse_ld_command),
++    (re.compile(r"^printf\b.*\| xargs ([^\s]+-)?ar\b"), _parse_ar_piped_=
+xargs_command),
++    (re.compile(r"^([^\s]+-)?ar\b"), _parse_ar_command),
++    (re.compile(r"^([^\s]+-)?nm\b.*?\|"), _parse_nm_piped_command),
++    (re.compile(r"^([^\s]+-)?objcopy\b"), _parse_objcopy_command),
++    (re.compile(r"^([^\s]+-)?strip\b"), _parse_strip_command),
++    (re.compile(r".*?rustc\b"), _parse_rustc_command),
++    (re.compile(r".*?rustdoc\b"), _parse_rustdoc_command),
++    (re.compile(r"^flex\b"), _parse_flex_command),
++    (re.compile(r"^bison\b"), _parse_bison_command),
++    (re.compile(r"^bindgen\b"), _parse_bindgen_command),
++    (re.compile(r"^perl\b"), _parse_perl_command),
++    # Kernel-specific build scripts and tools
++    (re.compile(r"^(.*/)?link-vmlinux\.sh\b"), _parse_link_vmlinux_comma=
+nd),
++    (re.compile(r"sh (.*/)?syscallhdr\.sh\b"), _parse_syscallhdr_command=
+),
++    (re.compile(r"sh (.*/)?syscalltbl\.sh\b"), _parse_syscalltbl_command=
+),
++    (re.compile(r"sh (.*/)?mkcapflags\.sh\b"), _parse_mkcapflags_command=
+),
++    (re.compile(r"sh (.*/)?orc_hash\.sh\b"), _parse_orc_hash_command),
++    (re.compile(r"sh (.*/)?xen-hypercalls\.sh\b"), _parse_xen_hypercalls=
+_command),
++    (re.compile(r"sh (.*/)?gen_initramfs\.sh\b"), _parse_gen_initramfs_c=
+ommand),
++    (re.compile(r"sh (.*/)?checkundef\.sh\b"), _parse_noop),
++    (re.compile(r"(.*/)?vdso2c\b"), _parse_vdso2c_command),
++    (re.compile(r"^(.*/)?mkpiggy.*?>"), _parse_mkpiggy_command),
++    (re.compile(r"^(.*/)?relocs\b"), _parse_relocs_command),
++    (re.compile(r"^(.*/)?mk_elfconfig.*?<.*?>"), _parse_mk_elfconfig_com=
+mand),
++    (re.compile(r"^(.*/)?tools/build\b"), _parse_tools_build_command),
++    (re.compile(r"^(.*/)?certs/extract-cert"), _parse_extract_cert_comma=
+nd),
++    (re.compile(r"^(.*/)?scripts/dtc/dtc\b"), _parse_dtc_command),
++    (re.compile(r"^(.*/)?pnmtologo\b"), _parse_pnm_to_logo_command),
++    (re.compile(r"^(.*/)?kernel/pi/relacheck"), _parse_relacheck),
++    (re.compile(r"^drivers/gpu/drm/radeon/mkregtable"), lambda c: [c.spl=
+it(" ")[1]]),
++    (re.compile(r"(.*/)?genheaders\b"), _parse_noop),
++    (re.compile(r"^(.*/)?mkcpustr\s+>"), _parse_noop),
++    (re.compile(r"^(.*/)polgen\b"), _parse_noop),
++    (re.compile(r"make -f .*/arch/x86/Makefile\.postlink"), _parse_noop)=
+,
++    (re.compile(r"^(.*/)?raid6/mktables\s+>"), _parse_noop),
++    (re.compile(r"^(.*/)?objtool\b"), _parse_noop),
++    (re.compile(r"^(.*/)?module/gen_test_kallsyms.sh"), _parse_noop),
++    (re.compile(r"^(.*/)?gen_header.py"), _parse_gen_header),
++    (re.compile(r"^(.*/)?scripts/rustdoc_test_gen"), _parse_noop),
++]
++
++
++# If Block pattern to match a simple, single-level if-then-fi block. Nes=
+ted If blocks are not supported.
++IF_BLOCK_PATTERN =3D re.compile(
++    r"""
++    ^if(.*?);\s*         # Match 'if <condition>;' (non-greedy)
++    then(.*?);\s*        # Match 'then <body>;' (non-greedy)
++    fi\b                 # Match 'fi'
++    """,
++    re.VERBOSE,
++)
++
++
++@dataclass
++class IfBlock:
++    condition: str
++    then_statement: str
++
++
++def _unwrap_outer_parentheses(s: str) -> str:
++    s =3D s.strip()
++    if not (s.startswith("(") and s.endswith(")")):
++        return s
++
++    count =3D 0
++    for i, char in enumerate(s):
++        if char =3D=3D "(":
++            count +=3D 1
++        elif char =3D=3D ")":
++            count -=3D 1
++            # If count is 0 before the end, outer parentheses don't matc=
+h
++            if count =3D=3D 0 and i !=3D len(s) - 1:
++                return s
++
++    # outer parentheses do match, unwrap once
++    return _unwrap_outer_parentheses(s[1:-1])
++
++
++def _find_first_top_level_command_separator(
++    commands: str, separators: list[str] =3D [";", "&&"]
++) -> tuple[int | None, int | None]:
++    in_single_quote =3D False
++    in_double_quote =3D False
++    in_curly_braces =3D 0
++    in_braces =3D 0
++    for i, char in enumerate(commands):
++        if char =3D=3D "'" and not in_double_quote:
++            # Toggle single quote state (unless inside double quotes)
++            in_single_quote =3D not in_single_quote
++        elif char =3D=3D '"' and not in_single_quote:
++            # Toggle double quote state (unless inside single quotes)
++            in_double_quote =3D not in_double_quote
++
++        if in_single_quote or in_double_quote:
++            continue
++
++        # Toggle braces state
++        if char =3D=3D "{":
++            in_curly_braces +=3D 1
++        if char =3D=3D "}":
++            in_curly_braces -=3D 1
++
++        if char =3D=3D "(":
++            in_braces +=3D 1
++        if char =3D=3D ")":
++            in_braces -=3D 1
++
++        if in_curly_braces > 0 or in_braces > 0:
++            continue
++
++        # return found separator position and separator length
++        for separator in separators:
++            if commands[i : i + len(separator)] =3D=3D separator:
++                return i, len(separator)
++
++    return None, None
++
++
++def _split_commands(commands: str) -> list[str | IfBlock]:
++    """
++    Splits a string of command-line commands into individual parts.
++
++    This function handles:
++    - Top-level command separators (e.g., `;` and `&&`) to split multipl=
+e commands.
++    - Conditional if-blocks, returning them as `IfBlock` instances.
++    - Preserves the order of commands and trims whitespace.
++
++    Args:
++        commands (str): The raw command string.
++
++    Returns:
++        list[str | IfBlock]: A list of single commands or `IfBlock` obje=
+cts.
++    """
++    single_commands: list[str | IfBlock] =3D []
++    remaining_commands =3D _unwrap_outer_parentheses(commands)
++    while len(remaining_commands) > 0:
++        remaining_commands =3D remaining_commands.strip()
++
++        # if block
++        matched_if =3D IF_BLOCK_PATTERN.match(remaining_commands)
++        if matched_if:
++            condition, then_statement =3D matched_if.groups()
++            single_commands.append(IfBlock(condition.strip(), then_state=
+ment.strip()))
++            full_matched =3D matched_if.group(0)
++            remaining_commands =3D remaining_commands.removeprefix(full_=
+matched).lstrip("; \n")
++            continue
++
++        # command until next separator
++        separator_position, separator_length =3D _find_first_top_level_c=
+ommand_separator(remaining_commands)
++        if separator_position is not None and separator_length is not No=
+ne:
++            single_commands.append(remaining_commands[:separator_positio=
+n].strip())
++            remaining_commands =3D remaining_commands[separator_position=
+ + separator_length :].strip()
++            continue
++
++        # single last command
++        single_commands.append(remaining_commands)
++        break
++
++    return single_commands
++
++
++def parse_inputs_from_commands(commands: str, fail_on_unknown_build_comm=
+and: bool) -> list[PathStr]:
++    """
++    Extract input files referenced in a set of command-line commands.
++
++    Args:
++        commands (str): Command line expression to parse.
++        fail_on_unknown_build_command (bool): Whether to fail if an unkn=
+own build command is encountered. If False, errors are logged as warnings=
 .
 +
-+How it Works
-+------------
-+
-+KernelSbom operates in two major phases:
-+
-+1. **Generate the cmd graph**, an acyclic directed dependency graph.
-+2. **Generate SPDX documents** based on the cmd graph.
-+
-+KernelSbom begins from the root artifacts specified by the user, e.g.,
-+``arch/x86/boot/bzImage``. For each root artifact, it collects all
-+dependencies required to build that artifact. The dependencies come
-+from multiple sources:
-+
-+* **.cmd files**: The primary source is the ``.cmd`` file of the
-+  generated artifact, e.g., ``arch/x86/boot/.bzImage.cmd``. These files
-+  contain the exact command used to build the artifact and often include
-+  an explicit list of input dependencies. By parsing the ``.cmd``
-+  file, the full list of dependencies can be obtained.
-+
-+* **.incbin statements**: The second source are include binary
-+  ``.incbin`` statements in ``.S`` assembly files.
-+
-+* **Hardcoded dependencies**: Unfortunately, not all build dependencies
-+  can be found via ``.cmd`` files and ``.incbin`` statements. Some build
-+  dependencies are directly defined in Makefiles or Kbuild files.
-+  Parsing these files is considered too complex for the scope of this
-+  project. Instead, the remaining gaps of the graph are filled using a
-+  list of manually defined dependencies, see
-+  ``scripts/sbom/sbom/cmd_graph/hardcoded_dependencies.py``. This list i=
-s
-+  known to be incomplete. However, analysis of the cmd graph indicates a
-+  ~99% completeness. For more information about the completeness analysi=
-s,
-+  see `KernelSbom #95 <https://github.com/TNG/KernelSbom/issues/95>`_.
-+
-+Given the list of dependency files, KernelSbom recursively processes
-+each file, expanding the dependency chain all the way to the version
-+controlled source files. The result is a complete dependency graph
-+where nodes represent files, and edges represent "file A was used to
-+build file B" relationships.
-+
-+Using the cmd graph, KernelSbom produces three SPDX documents.
-+For every file in the graph, KernelSbom:
-+
-+* Parses ``SPDX-License-Identifier`` headers,
-+* Computes file hashes,
-+* Estimates the file type based on extension and path,
-+* Records build relationships between files.
-+
-+Each root output file is additionally associated with an SPDX Package
-+element that captures version information, license data, and copyright.
-+
-+Advanced Usage
-+--------------
-+
-+Including Kernel Modules
-+~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+The list of all ``.ko`` kernel modules produced during a build can be
-+extracted from the ``modules.order`` file within the object tree.
-+For example::
-+
-+    $ echo "arch/x86/boot/bzImage" > sbom-roots.txt
-+    $ sed 's/\.o$/.ko/' ./kernel_build/modules.order >> sbom-roots.txt
-+
-+Then use the generated roots file::
-+
-+    $ SRCARCH=3Dx86 python3 scripts/sbom/sbom.py \
-+        --src-tree . \
-+        --obj-tree ./kernel_build \
-+        --roots-file sbom-roots.txt \
-+        --generate-spdx
-+
-+Equal Source and Object Trees
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+When the source tree and object tree are identical (for example, when
-+building in-tree), source files can no longer be reliably distinguished
-+from generated files.
-+In this scenario, KernelSbom does not produce a dedicated
-+``sbom-source.spdx.json`` document. Instead, both source files and build
-+artifacts are included together in ``sbom-build.spdx.json``, and
-+``sbom.used-files.txt`` lists all files referenced in the build document=
++    Returns:
++        list[PathStr]: List of input file paths required by the commands=
 .
++    """
 +
-+Unknown Build Commands
-+~~~~~~~~~~~~~~~~~~~~~~
++    def log_error_or_warning(message: str, /, **kwargs: Any) -> None:
++        if fail_on_unknown_build_command:
++            sbom_logging.error(message, **kwargs)
++        else:
++            sbom_logging.warning(message, **kwargs)
 +
-+Because the kernel supports a wide range of configurations and versions,
-+KernelSbom may encounter build commands in ``.cmd`` files that it does
-+not yet support. By default, KernelSbom will fail if an unknown build
-+command is encountered.
++    input_files: list[PathStr] =3D []
++    for single_command in _split_commands(commands):
++        if isinstance(single_command, IfBlock):
++            inputs =3D parse_inputs_from_commands(single_command.then_st=
+atement, fail_on_unknown_build_command)
++            if inputs:
++                log_error_or_warning(
++                    "Skipped parsing command {then_statement} because in=
+put files in IfBlock 'then' statement are not supported",
++                    then_statement=3Dsingle_command.then_statement,
++                )
++            continue
 +
-+If you still wish to generate SPDX documents despite unsupported
-+commands, you can use the ``--do-not-fail-on-unknown-build-command``
-+option. KernelSbom will continue and produce the documents, although
-+the resulting SBOM will be incomplete.
++        matched_parser =3D next(
++            (parser for pattern, parser in SINGLE_COMMAND_PARSERS if pat=
+tern.match(single_command)), None
++        )
++        if matched_parser is None:
++            log_error_or_warning(
++                "Skipped parsing command {single_command} because no mat=
+ching parser was found",
++                single_command=3Dsingle_command,
++            )
++            continue
++        try:
++            inputs =3D matched_parser(single_command)
++            input_files.extend(inputs)
++        except CmdParsingError as e:
++            log_error_or_warning(
++                "Skipped parsing command {single_command} because of com=
+mand parsing error: {error_message}",
++                single_command=3Dsingle_command,
++                error_message=3De.message,
++            )
 +
-+This option should only be used when the missing portion of the
-+dependency graph is small and an incomplete SBOM is acceptable for
-+your use case.
++    return [input.strip().rstrip("/") for input in input_files]
 --=20
 2.34.1
+
