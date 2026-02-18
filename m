@@ -1,41 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6759347FED;
-	Wed, 18 Feb 2026 20:49:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFF0333EB0A;
+	Wed, 18 Feb 2026 20:49:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771447747; cv=none; b=C36RH5nlXzLWtf+jbwVnftXanhh0/8LzQaqh4jydHeIQe7nSb1+hHymvMDrgjIXBIpMxqZ32lO7PY5G9mYuy1JOySC0Nr76rfG41/fUoe7dUHWtJ3B8botwoAti/bmU9IMDMvdNqf/deDovPGMXllRvhagZGFHlR6uNbXWnUD1U=
+	t=1771447748; cv=none; b=nrLoJRPjhRkyDKf+8RvAC1yjK3UGY+sBwCch84XIrQWVqDhzz3AslyWaql6yuYuQfammKxMCkoXZvmwhWY1/xzmbdLyJCZf0Vxwg084ZUZs0MTh0i5O4TlDUWGeZz4L5I3aOPQGGzNm8O8MGGFSf0A7tzLphUICPMWh8Sd+tmt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771447747; c=relaxed/simple;
-	bh=PlmPBj8TZCjsYePHS07VOUHDAcaaD0lAypmvUK8Z+lM=;
+	s=arc-20240116; t=1771447748; c=relaxed/simple;
+	bh=bxWWyHSrf8/A4PvPHv9QtZLk5SicanqgXuFDfx7pFQU=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=SUTO8huN/igbNNR5aNzHGUDX6672/ToDemKqWgKphvog8eBXUtegnIvZzsVW5CRmJa3evd2k7y9vLopAxKWRhl3BWr57HFewNphY217dgF7vXcElLVNR/Xbu/79hT3Qklkeabr70tkweIuEML/1Xeax0wJjNTPFuY7/RHARmHoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c5uT+x6y; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=iDeKfASiAtwNcfn+x8LunjMZWeDxAoTCLVdEtHfTqcqngI40KUy9YPOBKQdW9CaeO9m1GbHjO6iQunTOqVO/ijVK47TMULPjtc+cve9/OWuGqCcW7iRe+f83Sc0NrzK2/PQDotPH/Cs6vGY6wIEHXtbyi5MuKsZBNHv99Ku0Axk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=egAWHzpw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c5uT+x6y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79C1EC19423;
-	Wed, 18 Feb 2026 20:49:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="egAWHzpw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AE1DC19422;
+	Wed, 18 Feb 2026 20:49:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771447746;
-	bh=PlmPBj8TZCjsYePHS07VOUHDAcaaD0lAypmvUK8Z+lM=;
+	s=k20201202; t=1771447748;
+	bh=bxWWyHSrf8/A4PvPHv9QtZLk5SicanqgXuFDfx7pFQU=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=c5uT+x6yGtpWWr6CyONFwjLJbIGQ+rzcmeMz8BqaVI7M4kHlQuPDGAaUiG6abFfGC
-	 gaOJHZcBIaTUxGlocMlFTTR+jdsDpvzrOlgV9DiqUms/D7sNbndpfNZXB7WTkP7gUA
-	 /xILuLRTzvUr7I1kgfPEjGTR8l3CAfsub1kITIORPsavp/3k9iSEDR+twxiiGn503q
-	 +ZwVWaB3v3/O6sSUWhsUQwwGHu6X7HxyLathKyKDOCMhs+MMI3xZw0paF6RrxK/Q9s
-	 eOpFbPnn1L+2ys9K35Tt3/gZP8KgLaEKnNw0zyosewDBhz07k1a/54kVFm1tdDPDXt
-	 umqSCzeWjXr4A==
+	b=egAWHzpwwSzfpCk8RSqtNBNRZ80GTWT4/5pIpC7mRgDkDp++mHLPogPh0CPRVmKtT
+	 fCA7616oIeoieLVkfdeDSHgFuqGmYKVVtO6+yIZ0rB+tyruZOCE3X7bMiuy2CGzMf6
+	 Z4eXgqcihBE96NZ7iWXZNgQNOJVitg8w3K/c3MLVCb5suLzVNe2NaPcZ/788DMI5IM
+	 3pKBqSe82Hd9KhXK0gUr6Ov6FsRY6YVXmxd4YPPmkEYAVQnZFWXrNEo/GuWVmgBf81
+	 7fb0FDGRiS+6E+ecilleiKQ2YZFTfokhA1agU+N3Kns7gwJV8ekNIO1lsYaXT4VJuQ
+	 BgUN8g5UbIjXA==
 From: Nathan Chancellor <nathan@kernel.org>
 To: Nicolas Schier <nsc@kernel.org>, Nathan Chancellor <nathan@kernel.org>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
- stable@vger.kernel.org, Steve French <smfrench@gmail.com>
-In-Reply-To: <20260210-kbuild-fix-debuginfo-rpm-v1-0-0730b92b14bc@kernel.org>
-References: <20260210-kbuild-fix-debuginfo-rpm-v1-0-0730b92b14bc@kernel.org>
-Subject: Re: [PATCH 0/2] kbuild: rpm-pkg: Address -debuginfo build
- regression with RPM < 4.20.0
-Message-Id: <177144774521.1769768.16136759849288029825.b4-ty@kernel.org>
-Date: Wed, 18 Feb 2026 13:49:05 -0700
+ stable@vger.kernel.org, Lukas Herbolt <lukas@herbolt.com>
+In-Reply-To: <20260213-fix-debuginfo-srcrpm-pkg-v1-1-45cd0c0501b9@kernel.org>
+References: <20260213-fix-debuginfo-srcrpm-pkg-v1-1-45cd0c0501b9@kernel.org>
+Subject: Re: [PATCH] kbuild: rpm-pkg: Fix manual debuginfo generation when
+ using .src.rpm
+Message-Id: <177144774696.1769768.10484893215467443887.b4-ty@kernel.org>
+Date: Wed, 18 Feb 2026 13:49:06 -0700
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -46,18 +46,14 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.15-dev
 
-On Tue, 10 Feb 2026 00:04:47 -0700, Nathan Chancellor wrote:
-> Steve reported a build issue with commit 62089b804895 ("kbuild: rpm-pkg:
-> Generate debuginfo package manually") on RHEL9, which has an older
-> version of RPM than what I tested. Turns out that RPM 4.20.0 fixed an
-> issue with specifying %files for a -debuginfo subpackage.
-> 
-> The first patch restricts the new -debuginfo package generation process
-> to CONFIG_MODULE_SIG=y and RPM >= 4.20.0 to ensure it is actually
-> necessary and working. The second patch restores the original -debuginfo
-> package generation process from commit a7c699d090a1 ("kbuild: rpm-pkg:
-> build a debuginfo RPM") when CONFIG_MODULE_SIG is disabled to keep the
-> -debuginfo package around for older versions of RPM.
+On Fri, 13 Feb 2026 01:45:13 -0500, Nathan Chancellor wrote:
+> Commit 62089b804895 ("kbuild: rpm-pkg: Generate debuginfo package
+> manually") added uses of OBJCOPY and READELF, variables from Kbuild.
+> These variables are defined and work properly when using the binrpm-pkg
+> target because rpmbuild is run within Kbuild. However, these variables
+> are not defined when building from a source RPM package generated with
+> the srcrpm-pkg target, breaking the build when generating the debug info
+> subpackage.
 > 
 > [...]
 
@@ -67,10 +63,8 @@ Applied to
 
 Thanks!
 
-[1/2] kbuild: rpm-pkg: Restrict manual debug package creation
-      https://git.kernel.org/kbuild/c/6d6b8b0e28c46
-[2/2] kernel: rpm-pkg: Restore find-debuginfo.sh approach to -debuginfo package
-      https://git.kernel.org/kbuild/c/ffe9ac1ad56df
+[1/1] kbuild: rpm-pkg: Fix manual debuginfo generation when using .src.rpm
+      https://git.kernel.org/kbuild/c/afdfb71c018e9
 
 Please look out for regression or issue reports or other follow up
 comments, as they may result in the patch/series getting dropped or
