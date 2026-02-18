@@ -1,41 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87D7B1E8320;
-	Wed, 18 Feb 2026 20:49:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A52DC33EB0A;
+	Wed, 18 Feb 2026 20:49:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771447741; cv=none; b=sGBp4vZqfjYtdTqyrTTb6SQXCn41fqeJBLnK/87kIO6Mw4u/GjZ3Fog31O9nUQB4sJaJs8AgwrPa58d1tnncPDRoNmGGzgpqAjyD8eNiZ04AJwJ73cWBvZAk+DXzFh8jvkzxMYGa7AxnwfCHfnJk1mrN7R2c0V99q/GaQFoOeh0=
+	t=1771447743; cv=none; b=DB9ZJ8AfKISFbkWRln3xAP7RUZidxwHwKcIoV1bZgfjPWLIad8FXG3o9Y/Gn1FmLd/2W9jaUIZiGSreN6GworAMQlECt+fOQ7CkZAxQeTZwl0SG8NgvdQYq5ximo+Yxlk4C9KyzfWBkMbm5gR3hcWeKod/79KpaCdjU7ElSXwIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771447741; c=relaxed/simple;
-	bh=lbYfIBnmrnEFV7yelrf0h4WGBAGd3eyGfhL/lrbRAzc=;
+	s=arc-20240116; t=1771447743; c=relaxed/simple;
+	bh=xPKarhfYNVUmKwtqpzWKYWhVmCSVV61ACu+zC5FJb7o=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=rr5LqNWur6MZDrKrAdkG+1dhZsFsDkR/hOLHLAr0CUHU1vhPcb1toehF1jfyIrUmCqojovtzaK/A+FoBrvIy2ALo2+Oq5eupgyMO7vfGHMHJsL3K1s+GatIubWJHRI1YfBOnnThBLANFeNG2VFJMK3FoYxIgkcRxAcediQyeT0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XkI94K/j; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=TBhMDhglH/WVXmuywrb02IL3Lz2VybVzefy7Dh/iujtAQ62ZtfdOu3sLFIDx+oupxAQgIlmUb4hH0xsLiHS/4G0VjNhcxQZB4kn2lFUOrDt+z+DmzZiAaJej6IGHSU09Hv5rHdOX2AZIX3wdEzYSRDB3ybVsRJhYbzPOw7r/IM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AB55RHTv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XkI94K/j"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43574C116D0;
-	Wed, 18 Feb 2026 20:48:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AB55RHTv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9903DC19422;
+	Wed, 18 Feb 2026 20:49:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771447741;
-	bh=lbYfIBnmrnEFV7yelrf0h4WGBAGd3eyGfhL/lrbRAzc=;
+	s=k20201202; t=1771447743;
+	bh=xPKarhfYNVUmKwtqpzWKYWhVmCSVV61ACu+zC5FJb7o=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=XkI94K/jYhyRQI4XGgeXdB7Ey+V6LaYpNEfIkYWXi+h1v9UktR9CybCR0A1n4aIYQ
-	 exrx9n7TAaOtZmS5u9O8UJPOr/a7XxCLPr6TXGJMcJ5CTbPYQJnb70aLIwWqg2eE+i
-	 p1M2wZeabzE020zoKDxzzGyUH38G6HeNThf69nUWZ0V73eNMGPuCF5/fC+ttKPkFQZ
-	 0Y0sQJAemqXt0CaDfNWQokLbWkmC47iTGzFBX3ouMk8zd0VBqIDLK3e7fzp6dRBSTi
-	 6vP6jrMaY5GBJpQGVXyuoEW1WpnOrfmBa9TpaW2LyzyKPQ4r2+WuQzcMxjrSVCG9kx
-	 94It86s9YebeQ==
+	b=AB55RHTvyh3+GzyD7XUxy1WRlKdmYrZnrM+R7wh73xWo2yLDQbTzMcWrszF7yk2uM
+	 4bqenGLDf+j31DCxgTorpNoBB21EorspxQ4k1PDx7WQj9FHRUjGukI/a9klDtEbJWL
+	 evvllJ0RVH0TNq2Dlce4SgtFah2dcScCAR035diarEoYxhIJ8OGEO/okj3IrwyFezh
+	 332xmPlM/RNv31JWCTH9oOJ2M2k6TLfaj9Mp2zVhHVhrujIJU4ILt397PKmNI/p6wf
+	 evkZKx3Q4kDp5zMIb6q5Oj6LrEyx9yQWtxhau9cAwXmbQVycaUcCEl3g7G8+prcelQ
+	 FNW6dmCCkD2dA==
 From: Nathan Chancellor <nathan@kernel.org>
-To: x86@kernel.org, Josh Poimboeuf <jpoimboe@kernel.org>
-Cc: linux-kernel@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>, 
+To: linux-kbuild@vger.kernel.org, 
+ =?utf-8?q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+Cc: linux-kernel@vger.kernel.org, kernel-team@cloudflare.com, 
  Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
- linux-kbuild@vger.kernel.org, Jens Remus <jremus@linux.ibm.com>
-In-Reply-To: <968faf2ed30fa8b3519f79f01a1ecfe7929553e5.1770759919.git.jpoimboe@kernel.org>
-References: <968faf2ed30fa8b3519f79f01a1ecfe7929553e5.1770759919.git.jpoimboe@kernel.org>
-Subject: Re: [PATCH] kbuild: Add objtool to top-level clean target
-Message-Id: <177144773899.1769768.18400840674852001978.b4-ty@kernel.org>
-Date: Wed, 18 Feb 2026 13:48:58 -0700
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, 
+ stable@vger.kernel.org
+In-Reply-To: <20260212133544.1331437-1-mic@digikod.net>
+References: <20260212133544.1331437-1-mic@digikod.net>
+Subject: Re: [PATCH v1] kbuild: Fix CC_CAN_LINK detection
+Message-Id: <177144774134.1769768.8484959623764754517.b4-ty@kernel.org>
+Date: Wed, 18 Feb 2026 13:49:01 -0700
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -43,14 +45,18 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Mailer: b4 0.15-dev
 
-On Tue, 10 Feb 2026 13:45:22 -0800, Josh Poimboeuf wrote:
-> Objtool is an integral part of the build, make sure it gets cleaned by
-> "make clean" and "make mrproper".
+On Thu, 12 Feb 2026 14:35:43 +0100, Mickaël Salaün wrote:
+> Most samples cannot be build on some environments because they depend
+> on CC_CAN_LINK, which is set according to the result of
+> scripts/cc-can-link.sh called by cc_can_link_user.
 > 
+> Because cc-can-link.sh must now build without warning, it may fail
+> because it is calling printf() with an empty string:
 > 
+> [...]
 
 Applied to
 
@@ -58,8 +64,8 @@ Applied to
 
 Thanks!
 
-[1/1] kbuild: Add objtool to top-level clean target
-      https://git.kernel.org/kbuild/c/68b4fe32d7378
+[1/1] kbuild: Fix CC_CAN_LINK detection
+      https://git.kernel.org/kbuild/c/be55899b71630
 
 Please look out for regression or issue reports or other follow up
 comments, as they may result in the patch/series getting dropped or
