@@ -1,169 +1,125 @@
-Received: from bumble.birch.relay.mailchannels.net (bumble.birch.relay.mailchannels.net [23.83.209.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f180.google.com (mail-dy1-f180.google.com [74.125.82.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F65D54763;
-	Mon, 23 Feb 2026 01:25:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.209.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19EA5231C9F
+	for <linux-kbuild@vger.kernel.org>; Mon, 23 Feb 2026 02:25:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.180
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771809921; cv=pass; b=vFeoR1QR1sC3wU/uEiLU0TJZxFNSvxX/Yds22rbD+NcVm5i2rFIdlEevYAdA+6KrMWXEdeLMM8GH4qqkl5buJbJSffOP/tBCOoImXQCKHkrWK4XWg6iGvNYt9PUsi+s3fVbGP/A+Z/J6DANxamQt7InHRUYCv+q7gbeOxFtf/Vk=
+	t=1771813514; cv=pass; b=tWAkbv6duBLb/XTEINAPmgNWctf3IMWv4R3th2irlCfvloVozlqaHnBHCtdEl7YcQatd6tymfudEW5VzTrDGSw5b39MjTpZNmHWiJBNqbvAm640lLuZOPnBEXvW5i2v3otcFj1JrBGRzbHfRgevwgZxTsUAAWDOfvMZNmj6afjg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771809921; c=relaxed/simple;
-	bh=ya6JK5QpUEwhNPlRYYcgwO8/Mxw3gnYEeCTotxgTMU0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nng0rBJSRBfhaPypDJAL2kTE42Bo4lXeSaoNyyaQ3qLI6T8QUkZL8gFS3PuybCPlC+vRw/0sHzP7sezanMF8PYD/uBwAuO5U8u4s4SnrXnBdyDIXDkwz1qY1QRzqnNtOF5od7wIK0ldhCkbHMj/SAhJs0MnwSm/LhfjbwHW0D9w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=landley.net; spf=pass smtp.mailfrom=landley.net; dkim=pass (2048-bit key) header.d=landley.net header.i=@landley.net header.b=vZtnMJ+N; arc=pass smtp.client-ip=23.83.209.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=landley.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=landley.net
+	s=arc-20240116; t=1771813514; c=relaxed/simple;
+	bh=8tbHJF6hDFqsQ8A1dtHSJC/hy2VvSIYqdWhNls4XmMk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UQ0u1l0Q9GLEYOu+/9Svs+Lta/1Yj8fOxbGjEkRkf4YXSiJxOIcwrlUsLh4gdmbHE++M8clx24Met/TEJmslaibe/GYSyETSfEA32iNFSVMy0ypdO6t5RFwJ7qz2DoxGzNBXKkKo/1/QWf+d4klY5FMBTqb5qWb1NGlj3p6DrMk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fXnTB73J; arc=pass smtp.client-ip=74.125.82.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=landley.net header.i=@landley.net header.b="vZtnMJ+N"
-X-Sender-Id: dreamhost|x-authsender|rob@landley.net
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-	by relay.mailchannels.net (Postfix) with ESMTP id 372D91617D9;
-	Mon, 23 Feb 2026 01:15:51 +0000 (UTC)
-Received: from pdx1-sub0-mail-a220.dreamhost.com (100-106-196-237.trex-nlb.outbound.svc.cluster.local [100.106.196.237])
-	(Authenticated sender: dreamhost)
-	by relay.mailchannels.net (Postfix) with ESMTPA id ACA07161929;
-	Mon, 23 Feb 2026 01:15:50 +0000 (UTC)
-ARC-Seal: i=1; a=rsa-sha256; d=mailchannels.net; s=arc-2022; cv=none;
-	t=1771809350;
-	b=D5yB3HeM5MidXwq26kPQy1I/QzNs9TALf1vh236Lj8ONELIuFGUUQkX0GbQpT3TzgzKAcI
-	XuEK7OeSfQZgJKICrUK7f+77nu22yePPggbNgATKImdncJroPIDoo11c0P3/gNtMDnpo1M
-	BTM82yU6ro9MqcUFcHy0NAkfcaKBsjY6Rk3u5YiEoGKJV3l7jSz7pzWI3srijUrBIDnynq
-	TmE0Umgx8CrOeuy1ZFzz09kRmucWeRKaJ7u0MGdBs2RW5GRwZHqOStNG2HyyvRxtmxLkC5
-	erzkaZTYa4QWRBUWtY7u/efmtbtUNdZlaKQCkVQRgx6b/jcCYZ5GXzfl/RewMA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mailchannels.net;
-	s=arc-2022; t=1771809350;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:dkim-signature;
-	bh=3nv7pEazH1QjXd2mYdHZhHpxrx3ZA5FYW4d+2tDCmiQ=;
-	b=trSgABybJjbzwODRd5DdG5hlTIAOhO8Q8dpjpHL0QyDzIO/kFT2zhDmoHkiRHDo/RoQYIm
-	0O3MdQKGaFTyGgYwDYQAHztvSNLy5c5jMIfoFN8eGvmTKpr1v4FMFwgGNpgh8bGpjG7XdY
-	hEMvjEyiQ5r+vQ5ivYaEk56zWSbddEEo+GxtHi/qldMvIcO2Z6fRFLuaSaCC3BN6FnuGB6
-	MPWvu4Gel3+sHQ/diFCZLTfqDlI5pDQz8giAqEBJNLqu8y+OA8Pi6sBeuznHw4FCV2bM14
-	KQWOMsWL77GkIcvzspGWvveamYg36IzUCr3U1cGFnUTvwzoWfLkuoC2qRcxukA==
-ARC-Authentication-Results: i=1;
-	rspamd-6fbd58c58b-w75sr;
-	auth=pass smtp.auth=dreamhost smtp.mailfrom=rob@landley.net
-X-Sender-Id: dreamhost|x-authsender|rob@landley.net
-X-MC-Relay: Neutral
-X-MailChannels-SenderId: dreamhost|x-authsender|rob@landley.net
-X-MailChannels-Auth-Id: dreamhost
-X-Irritate-Reign: 76e2e42052ea090d_1771809351010_1604037466
-X-MC-Loop-Signature: 1771809351010:1092579335
-X-MC-Ingress-Time: 1771809351008
-Received: from pdx1-sub0-mail-a220.dreamhost.com (pop.dreamhost.com
- [64.90.62.162])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
-	by 100.106.196.237 (trex/7.1.3);
-	Mon, 23 Feb 2026 01:15:51 +0000
-Received: from [192.168.14.155] (unknown [209.81.127.98])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: rob@landley.net)
-	by pdx1-sub0-mail-a220.dreamhost.com (Postfix) with ESMTPSA id 4fK2wj5tGwzSH;
-	Sun, 22 Feb 2026 17:15:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=landley.net;
-	s=dreamhost; t=1771809350;
-	bh=3nv7pEazH1QjXd2mYdHZhHpxrx3ZA5FYW4d+2tDCmiQ=;
-	h=Date:Subject:To:Cc:From:Content-Type:Content-Transfer-Encoding;
-	b=vZtnMJ+N8NMTPnIkaZZU3a136hChZ78xb25P52LF4mQbflfEREk7p6//gCcHUbe21
-	 x2I2FssrGuuREHU4invWfhxuVzckVMU/mbFPWulpnJ9Tx8PqMhcA2mS91eib3vZoEz
-	 zV4eltIm5F98h5o5hPh6r4oot88nG0Hqn7K/iCfWVMjuJDBEyDOi38i44bY9uZf9Bj
-	 Kccwn4SwmFn7nMN20xKvLV4Gzc/aVr/rFmrZXuyjgqfpj/IYq+m7O18RsNwN1Gy4tu
-	 W2cfGlJNwBJ2GP0sLxcH0+R9FlP9N9giMvAEH8P/Ly0OrbVilUqvFu9htYQbjFOn+K
-	 SPxyL7HGHCeOg==
-Message-ID: <e67898f6-4e33-428b-8498-b8b28f817bd9@landley.net>
-Date: Sun, 22 Feb 2026 19:15:49 -0600
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fXnTB73J"
+Received: by mail-dy1-f180.google.com with SMTP id 5a478bee46e88-2bd6228af6aso203160eec.1
+        for <linux-kbuild@vger.kernel.org>; Sun, 22 Feb 2026 18:25:12 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771813512; cv=none;
+        d=google.com; s=arc-20240605;
+        b=RIeE4HO1TuOMUpmsm2SJ21221TOGNR2h7at62Ujs81gP5OAwP6ml1pLcnNnTItcCJY
+         ql3Plk+X3TC1sWVDUr9OeU9YbFVTTnF30WM/MFFloW/02OdCQOxN4Y/nf8kEDq2YIYt9
+         K9x9K/wVNAGF594VLJ2xNGno3CQ2EuRiOnTnuZDF6yzMGCg7i4Q8sJIftpeod4tUQSov
+         SP1ncdFWnp0zLMQ9Hu4FG0j1QXthfdrsceBurDfSMAt9DFQV+x6DmqnqW0WoGkwb1oaP
+         pmpQXG86mN4LPY/CU2VN8Gf87xsaXtdlM8T2T3gZ7b5lOPIehCnAeeUatByNBR6IKCaK
+         gg4Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=8tbHJF6hDFqsQ8A1dtHSJC/hy2VvSIYqdWhNls4XmMk=;
+        fh=EvXho2gv1nMOpHIPnUnSxDDa3mP7jAdWXP9uszR1Py0=;
+        b=G/ajkiGLd6Bw1W1Et0aEk5pl9ISa0ji2VRrzXodyonEYxd9ASDavP+R1EeMiYoUN3R
+         pSz6Hk4FnINv6erJ5O7Skb6/6aGLgI5/MUinX2zSRNpjmPJLaFAVkQ+1xnc3VV6Ry/Tl
+         30i9lFHN7X4d4qgXii3wgQHdJHpVC8NdgSNKAdmN59W83wFXZU8w6m5+UWJCSdB3zlR2
+         r6tn+Hax7KhGwvyGwcB8OVvY82jrXPmQiVNmSZzXTpy9iNLqMnZ63wqoENJR+dah5Th5
+         87bh7XxQvLx13y0eg1ZUuTsASuL9LLgKeOaJhXLWKhFabZh+yhrQmyDAk/QHqnfPX0ZG
+         7IPQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771813512; x=1772418312; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8tbHJF6hDFqsQ8A1dtHSJC/hy2VvSIYqdWhNls4XmMk=;
+        b=fXnTB73Jgk+PYqCJ6ZcUIxxqibaRUn/CSpA/tYUj+7rght1yEseqqkO2LFDLG628Jh
+         ynh4PHR/MD1n7IsuY9TfUdpbTENRXd7q+sj85T7GKS3b+u9AjEcZWhf/sRCS/tTIHkjr
+         ut2ewqhbnC/IcYTYHbm4X1ub71i8vhunHKIbs+Fcqam8F5HnMLwX+DrusxThWh82EFGP
+         PpGot3dJNwROCvrOXVQqr6uZQLe3cqVg9lWmDH9cLcQD4AiMjWUxirMcJ9nMzs/J/YEA
+         xJ0ftcMzs8EnRpZPOlsbZryVIzNN7Uv9WkMhXpwU3m5cJ0CzqYmV2LBN0p8Mn7GOTfZA
+         UwpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771813512; x=1772418312;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=8tbHJF6hDFqsQ8A1dtHSJC/hy2VvSIYqdWhNls4XmMk=;
+        b=rwyj6a080zjnpwZUllxuAJ4vdccEdxBbnmxIdmfT3QoXF6+SQYohjK56p1vWUZCwMm
+         2BHX/z/5LMeqpeFSbwFSPG48Ulzq5MJHHOdyWwSMjewsrsaf9XakBqR5yy1cHyU8qPwL
+         Q9XtzK6ATU2ZOjZnUCGEjBKBAwl3HVCUKFbPqPk6Qo+IBtXLbtX1+sJ/lZuRMX5GuKWY
+         lDRq6+6tv4pIlbO3TQBzxgTmZ+fof2swyO24eFwnwpKyuCOoIcwQLfF+ZsOd+WdgNLDS
+         07EdlzCmFlZ9oi9IO3SRMNRp3JludbWH71BxkDAgY5A3xMrytpoAAeLg8Se7Up36Y7An
+         QxJA==
+X-Forwarded-Encrypted: i=1; AJvYcCUMxtceDp3uIPZW98aNODv+CDI7NSOMKebREr0YdpPomwr8Tqp1BF0hKAKT4pt40hcEXS/8iaUUbs8wCqI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvXtkNQ/kp/bO+O4zzwmQY4gPZqjDvD24Iu/bXDRoYHaj/SzbX
+	x0O4uEmbqXZEO0w+ky5GulZtFvbGpmyJQvFr3hftjAeMapVa5jB/COfOgwHWTMzS0TaXgNUR0Zz
+	gswfKH2AX5Rtxh09oLiRPKw9EKbn7+9o=
+X-Gm-Gg: AZuq6aJ+GT+oNoev/6guUVeYFJ8yZDSGRQ7viKM1CaX8cq0zhvB/tIcCD87aXOvWCSU
+	TzDM7q81oKiqR1Rzg/RLIOKSh0kuv8zUjTw7kRJPh65Av+VWc+JUZhNLbYMyLVxOm7t8u7B/RJd
+	3gpd+RT11HlxhCJ/yTkKFMNin5EHYglnnyi24Pb6V1vyRYqMqDEZsWP7aIZ9whpqXkuM4soOsGN
+	2o0JpviNK57DqBT8OL0fL52IDLTlRSn9iF8KK8dbyIMu/KLQA4tAXy/T4QmLn/TmsnEyDH0awo+
+	J/Z4Mj7RuN52gsAE4wPv395jjDq00VoQhbzfF+4l5dhVaSPOSJWlDlMDG/2MYkhPSChYPnd7joy
+	8b5K8X8LYOkyFfS+4GXY5Y9Rl
+X-Received: by 2002:a05:7300:cc0c:b0:2ba:6f02:2939 with SMTP id
+ 5a478bee46e88-2bd7b9efccamr1605384eec.1.1771813512092; Sun, 22 Feb 2026
+ 18:25:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] init: ensure that /dev/null is (nearly) always
- available in initramfs
-To: Askar Safin <safinaskar@gmail.com>, linux-fsdevel@vger.kernel.org,
- Christian Brauner <brauner@kernel.org>,
- Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>
-Cc: Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org,
- linux-kbuild@vger.kernel.org, initramfs@vger.kernel.org,
- David Disseldorp <ddiss@suse.de>, Nathan Chancellor <nathan@kernel.org>,
- Nicolas Schier <nsc@kernel.org>, patches@lists.linux.dev
-References: <20260219210312.3468980-1-safinaskar@gmail.com>
- <20260219210312.3468980-3-safinaskar@gmail.com>
-Content-Language: en-US
-From: Rob Landley <rob@landley.net>
-In-Reply-To: <20260219210312.3468980-3-safinaskar@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <CAHk-=wgz_YNXErcC7FSr5kKAONTZC=SKLsbu6gFN1hCEE5JsKg@mail.gmail.com>
+In-Reply-To: <CAHk-=wgz_YNXErcC7FSr5kKAONTZC=SKLsbu6gFN1hCEE5JsKg@mail.gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Mon, 23 Feb 2026 03:24:59 +0100
+X-Gm-Features: AaiRm50lW9Xl71njyNGUysmdmXECtepW9tM9FUg6Hm0S35zjUK9PXq2xME2Xor8
+Message-ID: <CANiq72mKm7TO6RE_cofh=OiSz9sBuZ2EgAiXZHKpcTR0eDgEcQ@mail.gmail.com>
+Subject: Re: Rust build speed-ups - please?
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	rust-for-linux <rust-for-linux@vger.kernel.org>, 
+	Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2/19/26 15:03, Askar Safin wrote:
-> Binaries linked with bionic libc require /dev/null to be present,
+On Sun, Feb 22, 2026 at 11:09=E2=80=AFPM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+>
+> Yes, the actual "check that rust is available" part makes sense as a
+> prepare phase. The rest? Not so much. Why the heck does it build that
+> 'rust/core.o' file when I want to do a test-build of a totally
+> unrelated file?
 
-Elliott fixed that one back in 2021:
+The background is that we need to establish dependencies between Rust
+compilation units in order to build them (unlike C). But when Kbuild
+descends, the different `make`s do not know what the others are doing,
+i.e. there is no easy "treewide dependencies" support due to how
+Kbuild descends.
 
-http://lists.landley.net/pipermail/toybox-landley.net/2021-October/028766.html
+So, for the Rust initial integration, to keep things simple, I added
+everything that was not a "leaf" to the `prepare` step, since that
+allowed to have simple, normal dependencies in the Rust `Makefile` so
+that then the descend can build the rest just like in C.
 
-https://android-review.googlesource.com/c/platform/bionic/+/1869594
+I discussed in LPC a couple months ago my plans with Nathan regarding
+a new system for building the Rust bits, because we need to become
+more flexible for other reasons too (e.g. we want to split the
+`kernel` into smaller units and allow dependencies between crates
+elsewhere in the tree). I am focusing on that now.
 
-Are you saying it's reoccurred, or that you plan to run a 5 year old 
-userspace with a current kernel?
-
-> otherwise they will crash before entering "main", as explained
-> in https://landley.net/toybox/faq.html#cross3 .
-
-Oops, my documentation is out of date. Sorry. Added to the todo heap.
-
-(Although I can't say I've regression tested an init task statically 
-linked against bionic launching itself in an empty chroot recently 
-either. last I checked I still hadn't convinced the android guys to use 
-initramfs at all, and then they had those 12k layoffs (apparently 
-copying twitter's mass layoffs) and I largely gave up on the idea of 
-turning Android into a self-hosting development environment any time soon.)
-
-> So we should put /dev/null to initramfs, but this is impossible
-> if we create initramfs using "cpio" and we are running as normal
-> user.
-
-You could just automount devtmpfs using the existing plumbing (and 
-touching far fewer files, and having common behavior between the static 
-and initrd loader codepaths).
-
-I've been using this trick since 2015:
-
-https://landley.net/notes-2015.html#01-01-2015
-
-And first submitted it to linux-kernel in 2016:
-
-https://lkml.org/lkml/2016/6/22/686
-
-And resubmitted a half-dozen times since then. I linked to my most 
-recent one (tested against 6.17) last message, it's generally at 
-https://landley.net/bin/mkroot/latest/linux-patches/
-
-Debian had a bug back in something like 2017 (when its initramfs 
-script's attempt to mount devtmpfs on /dev failed -- because it was 
-already there -- the untested error path would rm -rf everything) but 
-they said they were fixing it ~8 years ago, so...
-
-I added workarounds to my reposts for a while (so new kernels could work 
-with old debians):
-
-https://lkml.org/lkml/2020/5/14/1584
-
-I don't remember if there's a newer post to this list than 
-https://lkml.iu.edu/2201.2/00174.html but nobody else ever seemed to 
-care. Oh well. I've posted new ones on my website every mkroot release, 
-regression tested against the then-current kernel.
-
-It would be great if I didn't have to worry about 
-https://github.com/landley/toybox/commit/0b2d5c2bb3f1 again, but special 
-case code instead of using an existing generic mechanism? Eh, I suppose 
-that _is_ the modern Linux way...
-
-Rob
+Cheers,
+Miguel
