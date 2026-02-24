@@ -1,178 +1,152 @@
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E504137D128
-	for <linux-kbuild@vger.kernel.org>; Mon, 23 Feb 2026 23:04:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.172
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771887898; cv=pass; b=BHCYWz4VH2S4c9tcCWcUASfqrFngKSIh88lQgjmaBq8TYqgPEh2iPl4S3T34uOr/UuNIUMlNdRtcvKCJw/qGyga/p0SOqpfFfPVLCrpAGI4D3KCF8eWL4dxJHCfbqinuDI2sK91Zz7PQ/EUYr/BTTrysb/Lgz+FEIA4WukmQtHs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771887898; c=relaxed/simple;
-	bh=5iVARBZLENhP06ggeySaiFzVdgp8bTAAtxPPZZI/s4k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Z+lv2esN5vGk1HfruGuzrnkiqPMHCTbjkdZ6XScqHl99AYm6GhDPs6HEu3VanQNdPL1zAtV+6AOXnIV4UliFKvOgfs7n+KV9kiXooutdSa4OamLJqio0ODyqiREJKTtE0vVh8NTKEYGI33Y+gZVJ2yA0v0DCCAZOsd01bfItGcw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DrAAB+3k; arc=pass smtp.client-ip=209.85.128.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47961917F1;
+	Tue, 24 Feb 2026 05:30:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771911052; cv=none; b=EB/7iTdUvY7RqC1sOXHw3wF2JNiIZFgKMlA3YFI+0mH8EOqVYQS94b1ZDGs/rwDKQp06rLe484cEsVTnA/+7FiY47IgoEDpTf6UaJP2P2QeZ4CiS9ys4qKkP8q6hJVsovH+ojIa6vd/9DszCgSNjRmb/URh5dzGwnUZW/6U8i4g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771911052; c=relaxed/simple;
+	bh=vHdj4hh+S9toSEoaqsyFG1+YlfiQ88QjpMwJdxwcVKw=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=EHukVlOvLLYtVQJ3bpdmd3qZ8RqhrUeT0LwRyge9LEqlk9Aj/qOLxmVQps/OwABa2LQlGiUJtILMu+cOe3VNGFxiwipnzSPp4jkvVbjwbojnFzhL5yOPCDCAnYRD+L+Oh3LLarYDRLJoPSLJnRR/JNE6kf7t5W3iWqNKHK3lMZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L+tKSlMM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DrAAB+3k"
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-797d3864d89so47144877b3.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 23 Feb 2026 15:04:56 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771887896; cv=none;
-        d=google.com; s=arc-20240605;
-        b=TQy4oy3rsXFSUuztP83wJsXq+WfVUkQnUg5Hv8pj13OrOxKXWlZlnRn5Knc5+rBreH
-         8OYuh266Pve7j/mnree3fO5wHb0WpyK5vm5IPH7vvA7DCRUqy1MZkBDeSyPNi9F7wWjY
-         t2e5Vl1aIMgP95b9w9dlM/NfkXoD8bNL4LNhzfqsHBN76nroQacTzYhP5BGVsPb0oA/4
-         dq+Xw9lNURRAEisnlaMrL/SsHmo23+kqLB7HKjYTx37YMKjwbO7McHnRpsqS+dZtxo4l
-         5WQBGlLm1Mgc1al6kxzhJDLBpFrueV3t0yZBIrjHVRCmi7HpfWj2tc8s1jN8/msDoi8G
-         7DOg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=5iVARBZLENhP06ggeySaiFzVdgp8bTAAtxPPZZI/s4k=;
-        fh=8zHxtt3VZvq21VxTvH8QeEelQItKgLZjgRMSCG+wuLo=;
-        b=Ovmyp+qsO5U3sCvNNONMNVGTbqkm3+KSnB6sv4t8xSIph2mWEJv5r7uq8kct60DN7j
-         E9g5u0knEhpMmvlsIt3BPs99FxeShPLJy/Q6lobPxeu7GFh/R7rWBvM/4tlYEgbGfoHi
-         WFeCuASgUqglzBQZJjSSwgSg+N70GxxkT/ka7HMVAzGwGZPSz22rYLTcWEy96TjRXotv
-         AKZhXe3CDkegsOiyXZvNu5pPg8zAPdF4a5/Hk5/R3/vUCYNQxQW3sCII6yKF0GxM7XAW
-         tSXc/2rG8aDwDI+SMwkI6asbdI5gwmgd6f/kgxK6/i25aqVOBV4MTi0RMjOn+WMeEX7C
-         WRJA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771887896; x=1772492696; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5iVARBZLENhP06ggeySaiFzVdgp8bTAAtxPPZZI/s4k=;
-        b=DrAAB+3krUOPSUGm37lQQJkEE9HoTlGF/HbNs4GdWUTZ4X3lXfQHENhFxfKUwTqVJL
-         4qeJbAIIy9RrdZgTqqPlnRE5+VUa+kwk97S8W3i5mryiRtrHkoyr1WORYyrUv5za3fcP
-         HSYlTgpFgrOrezAPiqjcfLlRqrwFOtQs82Dd/gT/gqDPupCekCkXs6vq6jiYIZ+SUf17
-         4PmtxsVvStJGhcGZh/PwkwWNH1erbD2wZRLF86q/Q3A7tOaieEfIlrVloBDA2jKBbQ+4
-         w0Fvmnd1XbjXStYEF4cDYW6VHqq55y1hnVpIYnQk8DXjaVET632P7JBM1bwSEbb9YNC8
-         TxCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771887896; x=1772492696;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=5iVARBZLENhP06ggeySaiFzVdgp8bTAAtxPPZZI/s4k=;
-        b=vp0Sz/6RtPTBP9urUPQpjl5lbi3zpmyv68dmS3RuEWQdtmkfviKlLeFqJ4qyRtkO9+
-         JiB0ZwdEhRe+YLxc7hfmIbUIQ5D9JiiOtrLQVBE9d6ipmZWbJawTOTj68OTLd+lqPPZT
-         AQLWEPPL/vR0pMeQ7w1rbRbbKLSfsCrpeDihHG3lgNRxt9uZYZ+r5ZM2Fv77MlPtMbef
-         n8lsHmCS+yxMc17m823jruWuJicDe4zU1nTEPybEgFMMsGrjIPJoonjQXRY5JWPIYtYG
-         xE2d8USVeqYeRPq4BBj0CioCqbgCyy3cAIqT7Kt/zwNo0qr1DB7n/zF2uBMM5OKSQPZ4
-         NrXA==
-X-Forwarded-Encrypted: i=1; AJvYcCUKAtmo3kFUGALcaaQspRrJBj/p6DP+rEBKQR1UCEDCoa8YQvmUSyoeg/WHdLmoUIX0hcbvP+agXl0Uy6Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyuCfUE6ZWLR7KBuLDSYDg8F2U2VGUQShPHD0rCMY/lTgRJHSfN
-	TkUtdOX2Gqg2E/7OdVS/IcG0ktZ93+LLTIJ+yqPvhaYeSX0u+gQu3DWJwIeOTtkHaUd8A5glCFj
-	0Q3VUiafe5L5vLsfvT6DpcHr4gQWSXQ0=
-X-Gm-Gg: ATEYQzyEVReyrR9bRc/S974wJ94QEuMCWBDimf/6dvbp8Z5w/rj5fdFeW+0yeaY9Kxt
-	549207kaX+N3s9VF1UmaS3qnZjR4WAWlT1GKgGCvsYAqaAR7y+K+itpEGL+5zZmKwYOpYASVJ2W
-	rdNJxduauWFlRhr5FdeVO/pWkLaGFn0pb2nIn2qYm65N5zSZiqwUeVwLCpbYn5MgsRJOSs2rwcL
-	M9tVjNzk7bgYeJsDS0NwTdn4xm0u71f/DWl+OwgRJxGx9P00f154WbnInTwYhsrV8riJa77A5Qc
-	VZDDU/M=
-X-Received: by 2002:a05:690c:f09:b0:798:5333:ce36 with SMTP id
- 00721157ae682-7985333d4f3mr19166357b3.7.1771887895866; Mon, 23 Feb 2026
- 15:04:55 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L+tKSlMM"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 86FC2C2BCB0;
+	Tue, 24 Feb 2026 05:30:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771911052;
+	bh=vHdj4hh+S9toSEoaqsyFG1+YlfiQ88QjpMwJdxwcVKw=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=L+tKSlMMT5r6dc2EMjgCGCq9a59fjbudd7g4l1yW3qtkpGcf01ND92z1k8iKKH7T9
+	 mJWL9OD4gaDEJaTABJ0hI9KdKN2PDVkxpxoSS1q3KBNosXQkSrhJGjfyn/BQyFN7nk
+	 a3HR8WewK58BhSJGJqkvJsTTLyCFGHjZAE0dhLaNdZ2wAw1PGTt/RgKZ9gBlUbo3u+
+	 bKnFROsYxjv2adEu8kalrWHmKyztOYBUxepBo1q/1d2LdQ22nxGckgB7WXKakxf9oS
+	 87C0iVnS62nNRJ/WvgFSOfIwzgamQhFkPuHZr29NfESE/yZZrP6I9YDai8LSoRcBl7
+	 hSCT4UhtMxcqQ==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78160EFB7FF;
+	Tue, 24 Feb 2026 05:30:52 +0000 (UTC)
+From: Manivannan Sadhasivam via B4 Relay <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org>
+Date: Tue, 24 Feb 2026 11:00:48 +0530
+Subject: [PATCH v5 2/9] serdev: Add an API to find the serdev controller
+ associated with the devicetree node
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260219210312.3468980-1-safinaskar@gmail.com>
- <20260219210312.3468980-2-safinaskar@gmail.com> <20260220105913.4b62e124.ddiss@suse.de>
- <6d34c95a-a2ea-46a4-b491-45e7cb86049b@landley.net>
-In-Reply-To: <6d34c95a-a2ea-46a4-b491-45e7cb86049b@landley.net>
-From: Askar Safin <safinaskar@gmail.com>
-Date: Tue, 24 Feb 2026 02:04:19 +0300
-X-Gm-Features: AaiRm51ShYWisRZxqEP2jfYkn9npSVqKeCstRJL8gtXtjrs-RidKNfYk8lXIBQs
-Message-ID: <CAPnZJGDDonspVK1WxDac2omkLJVX=_1Tybn4ne+sf3KyaAuofA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] init: ensure that /dev/console is (nearly) always
- available in initramfs
-To: Rob Landley <rob@landley.net>
-Cc: David Disseldorp <ddiss@suse.de>, linux-fsdevel@vger.kernel.org, 
-	Christian Brauner <brauner@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
-	Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, initramfs@vger.kernel.org, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, patches@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260224-pci-m2-e-v5-2-dd9b9501d33c@oss.qualcomm.com>
+References: <20260224-pci-m2-e-v5-0-dd9b9501d33c@oss.qualcomm.com>
+In-Reply-To: <20260224-pci-m2-e-v5-0-dd9b9501d33c@oss.qualcomm.com>
+To: Rob Herring <robh@kernel.org>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Jiri Slaby <jirislaby@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+ Nicolas Schier <nicolas.schier@linux.dev>, Hans de Goede <hansg@kernel.org>, 
+ =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
+ Mark Pearson <mpearson-lenovo@squebb.ca>, 
+ "Derek J. Clark" <derekjohn.clark@gmail.com>, 
+ Manivannan Sadhasivam <mani@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Bartosz Golaszewski <brgl@bgdev.pl>, 
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
+ Bartosz Golaszewski <brgl@kernel.org>
+Cc: linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kbuild@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
+ linux-pci@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+ linux-pm@vger.kernel.org, Stephan Gerhold <stephan.gerhold@linaro.org>, 
+ Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, 
+ linux-acpi@vger.kernel.org, 
+ Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>, 
+ Hans de Goede <johannes.goede@oss.qualcomm.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2175;
+ i=manivannan.sadhasivam@oss.qualcomm.com; h=from:subject:message-id;
+ bh=ZvwvgoFlf4z/ag5/olaI5ILEIEPSFo6zg+vO7wuanOo=;
+ b=owEBbQGS/pANAwAKAVWfEeb+kc71AcsmYgBpnTeIa56ffrPgmNucV18RPYqRHO94dF3VIWvvp
+ Zp7yqucqEWJATMEAAEKAB0WIQRnpUMqgUjL2KRYJ5dVnxHm/pHO9QUCaZ03iAAKCRBVnxHm/pHO
+ 9QihB/4pXR5cfUc1yznfMiQgbOZgzBXVtinCek2mr0WZVDia+3o/PbEyb03v5G1SyzX7+yxoOKA
+ UNAe/ugQlDvJuSaXmmKeZ2dnbghjwiqQpVGdTH6He1icNr0ieEQLGk/kk0g2R8SsIiP6DfF6bdd
+ aIF71gAd45wbJE5TTyrtEzID7oTSxBeBxBq45T1pSxXD+gATuUn8RC8BJ3i74DL4xg0Oz1dUkGi
+ 5KHBd3mSW7rwzoBPSseevM7nCO4+l9fw/LN2hiVA17m9J1mA9gA4qxX4AMGPM0hogrrkE6GO9gw
+ gwle1YNRoxaCtGCSnMvsfLTYLHl+pX58DEkQFkEnANIR9Kws
+X-Developer-Key: i=manivannan.sadhasivam@oss.qualcomm.com; a=openpgp;
+ fpr=C668AEC3C3188E4C611465E7488550E901166008
+X-Endpoint-Received: by B4 Relay for
+ manivannan.sadhasivam@oss.qualcomm.com/default with auth_id=461
+X-Original-From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+Reply-To: manivannan.sadhasivam@oss.qualcomm.com
 
-Rob, I THINK I KNOW HOW TO SOLVE YOUR PROBLEM! (See below.)
+From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 
-On Mon, Feb 23, 2026 at 4:27=E2=80=AFAM Rob Landley <rob@landley.net> wrote=
-:
->
-> On 2/19/26 17:59, David Disseldorp wrote:
-> >> This problem can be solved by using gen_init_cpio.
+Add of_find_serdev_controller_by_node() API to find the serdev controller
+device associated with the devicetree node.
 
-I said this, not David.
+Tested-by: Hans de Goede <johannes.goede@oss.qualcomm.com> # ThinkPad T14s gen6 (arm64)
+Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+---
+ drivers/tty/serdev/core.c | 19 +++++++++++++++++++
+ include/linux/serdev.h    |  9 +++++++++
+ 2 files changed, 28 insertions(+)
 
-> It used to work, then they broke it. (See below.)
+diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
+index 8f25510f89b6..bf88b95f7458 100644
+--- a/drivers/tty/serdev/core.c
++++ b/drivers/tty/serdev/core.c
+@@ -514,6 +514,25 @@ struct serdev_controller *serdev_controller_alloc(struct device *host,
+ }
+ EXPORT_SYMBOL_GPL(serdev_controller_alloc);
+ 
++#ifdef CONFIG_OF
++/**
++ * of_find_serdev_controller_by_node() - Find the serdev controller associated
++ *					 with the devicetree node
++ * @node:	Devicetree node
++ *
++ * Return: Pointer to the serdev controller associated with the node. NULL if
++ * the controller is not found. Caller is responsible for calling
++ * serdev_controller_put() to drop the reference.
++ */
++struct serdev_controller *of_find_serdev_controller_by_node(struct device_node *node)
++{
++	struct device *dev = bus_find_device_by_of_node(&serdev_bus_type, node);
++
++	return (dev && dev->type == &serdev_ctrl_type) ? to_serdev_controller(dev) : NULL;
++}
++EXPORT_SYMBOL_GPL(of_find_serdev_controller_by_node);
++#endif
++
+ static int of_serdev_register_devices(struct serdev_controller *ctrl)
+ {
+ 	struct device_node *node;
+diff --git a/include/linux/serdev.h b/include/linux/serdev.h
+index 0c7d3c27d1f8..188c0ba62d50 100644
+--- a/include/linux/serdev.h
++++ b/include/linux/serdev.h
+@@ -334,4 +334,13 @@ static inline bool serdev_acpi_get_uart_resource(struct acpi_resource *ares,
+ }
+ #endif /* CONFIG_ACPI */
+ 
++#ifdef CONFIG_OF
++struct serdev_controller *of_find_serdev_controller_by_node(struct device_node *node);
++#else
++static inline struct serdev_controller *of_find_serdev_controller_by_node(struct device_node *node)
++{
++	return NULL;
++}
++#endif /* CONFIG_OF */
++
+ #endif /*_LINUX_SERDEV_H */
 
-So you have a directory with rootfs, and you want to add /dev/console
-to it? Do I understand your problem correctly?
+-- 
+2.51.0
 
-This is how you can solve it.
 
-Option 1 (recommended).
-
-Let's assume you have your rootfs in a directory /tmp/rootfs . Then
-create /tmp/cplist with:
-
-dir /dev 0755 0 0
-nod /dev/console 0600 0 0 c 5 1
-
-And add this to your config:
-
-CONFIG_INITRAMFS_SOURCE=3D"/tmp/rootfs /tmp/cplist"
-
-This will create builtin initramfs with contents of /tmp/rootfs AND
-nodes from /tmp/cplist
-(i. e. /dev/console).
-
-This will work, I just checked it.
-No need to build the kernel twice.
-Does this solve your problem?
-
-Option 2.
-Alternatively (assuming you already built gen_init_cpio) you can
-create cpio with /dev/console using gen_init_cpio and then
-concatenate it with cpio archive with your rootfs.
-
-Unfortunately, this may require building the kernel twice, as I
-explained in my previous letter in this thread. But this option
-is still doable.
-
-Option 3.
-Yet another way: run
-
-usr/gen_initramfs.sh /tmp/rootfs /tmp/cplist > some-output.cpio
-
-(again, here /tmp/rootfs is a directory with your rootfs and
-/tmp/cplist is a list of nodes.)
-
-Unfortunately, this requires gen_init_cpio to be present, so, again,
-similarly to option 2, this may require building the kernel twice.
-But, again, this is doable.
-
-In fact, gen_initramfs.sh accepts same options as CONFIG_INITRAMFS_SOURCE,
-this is explained in
-https://elixir.bootlin.com/linux/v6.19/source/Documentation/driver-api/earl=
-y-userspace/early_userspace_support.rst#L70
-.
-
-Conclusion.
-As I said, option 1 is the best in my opinion. It does not require
-building the kernel twice,
-and, as well as I understand, fully solves your problem.
-
-If I miss something, please, tell me this.
-
-I really want to help you, Rob.
-I sent this patch, because I want to help you.
-
---=20
-Askar Safin
