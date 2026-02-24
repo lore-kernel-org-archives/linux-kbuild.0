@@ -1,128 +1,464 @@
-Received: from siberian.tulip.relay.mailchannels.net (siberian.tulip.relay.mailchannels.net [23.83.218.246])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 923B11D5170;
-	Tue, 24 Feb 2026 19:02:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.218.246
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771959773; cv=pass; b=XpyqOJLJWmT01efYL7StfDCyKvS33fzJ8jxW8fLDUDjmbBzsU9kBaHT+Vsn1b8Yr3jBn4vHnGTAwz8ChutrPig/OJ/Glf9azhaiZ6EBMNWr9ZAPtSnflhjX5xfqeNNaeUCGfJKopuFN6h146AHDtBSoN77NPdAh1tuLjLv3Mcf8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771959773; c=relaxed/simple;
-	bh=Jr/PDVnNKvKlpq+USPz3dMI/D1o2FqG9PRfJXdMbzxQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PNKb33NAL5409R7xjIQ7Dp/+0s2WY4bCBTUfAUzKDK26ToUUZaIiuDE7PDVC0JxI06Hti29LBPJYST/CQi6ZJ5dPgAOzSfC+Hs/GE/F2LN4r7zanGpudlZaqrVKNHjIXomnKp873Mz+Z7/dy3RurZuY8p2iSunzmpGXHj/erTT0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=landley.net; spf=pass smtp.mailfrom=landley.net; dkim=pass (2048-bit key) header.d=landley.net header.i=@landley.net header.b=ZlK/Uv01; arc=pass smtp.client-ip=23.83.218.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=landley.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=landley.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39ED86329;
+	Tue, 24 Feb 2026 20:46:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771965997; cv=none; b=MPKpYWmMbpI7JAuOUUaEA37eDT63aMm0sUwF9n6p36W5GeMEbnBKdsxY7LeIS4wiPT4hRU6pKjpKhAjlxQtPGsoGLJIw5f6oFl984TWpRbjfNv8o6/d4FQlI8rAatRIH5bI1EdD4fDE0SDG75uaJfnAqV6tKYKnlDAKCY8UcSNk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771965997; c=relaxed/simple;
+	bh=jmOYHt9cC6ZpKvMGks7yUQ5i9q/IGQvo01Y/3L+Bs24=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oZ1LOW3iiZeODh343wC2CcZ+QSOA0YPQrirytuiN3ZCsFVAXTNAtJorJQoZM9ITEEE3iefRyLYX59gjc37+lWUYlUb70qz0QFYBGHkEYgVER5upgH0cZZb+3VWJi+d1FqtkeXpd2wPZm8x/+14tlTbxS8huh6KDgUnxCpA4z4jo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DQrHKWTv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=landley.net header.i=@landley.net header.b="ZlK/Uv01"
-X-Sender-Id: dreamhost|x-authsender|rob@landley.net
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-	by relay.mailchannels.net (Postfix) with ESMTP id C9EE6181FB5;
-	Tue, 24 Feb 2026 19:02:47 +0000 (UTC)
-Received: from pdx1-sub0-mail-a209.dreamhost.com (100-99-12-80.trex-nlb.outbound.svc.cluster.local [100.99.12.80])
-	(Authenticated sender: dreamhost)
-	by relay.mailchannels.net (Postfix) with ESMTPA id 468A218277C;
-	Tue, 24 Feb 2026 19:02:47 +0000 (UTC)
-ARC-Seal: i=1; a=rsa-sha256; d=mailchannels.net; s=arc-2022; cv=none;
-	t=1771959767;
-	b=pvB/qBHCxCT0aHmBMwVI5e+2bMlJq8Cj+GFdb+Sox00GZWxo5WXxg+DhMdvEQGGAwviO2/
-	Q+PxTOLTcm5iM5iw+FAz+JpT14a0XQdwGRxsry+6TOERxrwrCredRnM70ZOmHqermKw/pk
-	KLyPHjCmVaBs/TbhTsmyq8NXgu9fXRSI+PH8MsLr8ykhi+57Eoe/f/wt3+wWq723G/W6pJ
-	WiiCSyzF+ov17/F1PYHyHAzilQBTY9/1GtJbFuhB6C2YjEyoLYLDrzI8DmWmBWSB1Nad7+
-	9n1rvsee4KUhrNX1tHyyKggC1sFcrVr178CzTkJZqWItIzI8Qoi4cGfbqgvnBA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mailchannels.net;
-	s=arc-2022; t=1771959767;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:dkim-signature;
-	bh=BKJGCewKEjcg+ipjOOUMSQ1gSJ8lDiWlCzg0lPxp+p8=;
-	b=bJQjHP5OPsK78libaOkE8diCp0+pfQ1K0djQ3GdAQQPTDPPXNV48+h/ZxdoB+H0c8pA6QU
-	uqloVPhDfsxBhwZOZ97iyKZGzCr6tjRTMqRMwR7B/4DM774XhKAoHQeIJG60a4bkKJ/pXe
-	ms49778XHbWt0KHRwuQcBtCEiofzoBdzzUlDcn/DZQ7B3fgh+S2s6gSR48q6Yi8l8BHPSn
-	SuKK3xijAApfyEW1Wdi9pR7yurwRST8hOG8dtoERHqqQkk8PUEN6hY1YnbPmzae4DWBJDJ
-	ZBpIF84pNoooSxRInfrwtsNmlfjy5krcuP4Dxw80YZHgJ2obEOoj31yudui+bg==
-ARC-Authentication-Results: i=1;
-	rspamd-7f65b64645-pztnx;
-	auth=pass smtp.auth=dreamhost smtp.mailfrom=rob@landley.net
-X-Sender-Id: dreamhost|x-authsender|rob@landley.net
-X-MC-Relay: Neutral
-X-MailChannels-SenderId: dreamhost|x-authsender|rob@landley.net
-X-MailChannels-Auth-Id: dreamhost
-X-Fearful-Lettuce: 4ec8746d1357a7d7_1771959767655_491962063
-X-MC-Loop-Signature: 1771959767655:2667290202
-X-MC-Ingress-Time: 1771959767654
-Received: from pdx1-sub0-mail-a209.dreamhost.com (pop.dreamhost.com
- [64.90.62.162])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
-	by 100.99.12.80 (trex/7.1.3);
-	Tue, 24 Feb 2026 19:02:47 +0000
-Received: from [192.168.88.6] (unknown [209.81.127.98])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: rob@landley.net)
-	by pdx1-sub0-mail-a209.dreamhost.com (Postfix) with ESMTPSA id 4fL6YK4QY7zTC;
-	Tue, 24 Feb 2026 11:02:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=landley.net;
-	s=dreamhost; t=1771959767;
-	bh=BKJGCewKEjcg+ipjOOUMSQ1gSJ8lDiWlCzg0lPxp+p8=;
-	h=Date:Subject:To:Cc:From:Content-Type:Content-Transfer-Encoding;
-	b=ZlK/Uv01G4CStwmTz++hMmyuEPPue6aqD3QQmJmKX61oV8Mc1a91AZfjp8H1Ro7dq
-	 0xU54vLor8XgZzFwEGghruMb0kbafUwQgai7nlI4muNOgg7OephR/snaicxNn/0LMY
-	 3b4Nvo0brV2P9bgfO6jNno/UJO7tARXrIjdyilRLWHWAu/ovsXRNZZFaxEkAOvbt4A
-	 py0RuSV1BsL2/o7bMkRIvvwgnC7/9M/NHf6yN0YKqEEr+yGaEEwpMLrQn7tB4klxqH
-	 oMHi33bHek9jPgWCsGrs9g3Ty7GW0EptpcXDkzGP3Hnt5MmcMcSZ9m0+jgGVbTAUnw
-	 45uzkY8a0rfIQ==
-Message-ID: <bd45c86c-e1ea-4995-bb00-df83cc873105@landley.net>
-Date: Tue, 24 Feb 2026 13:02:44 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DQrHKWTv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A161C116D0;
+	Tue, 24 Feb 2026 20:46:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771965996;
+	bh=jmOYHt9cC6ZpKvMGks7yUQ5i9q/IGQvo01Y/3L+Bs24=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DQrHKWTv4H+wrJveLnpCfS/RRPovjTtpmdrOphe68F38sGjJC0aYsPdsbvOaEPjJD
+	 zZ3bsTEGr9Qzt4u/c6pD6aZMu+PODtFLpS0yPAvooza3lMyBq9lRDxcec60lPu1kjB
+	 GivLbVCOI1sXiX9BQsLs2H+v8QiG6j2S+zPaTih9jLFqcyyXynfBtPY+A+F9ELbp3A
+	 M5tmc0c8fWq1ClDzTHJdU7RlfkPG5y95HPLz+5D2+EbY0cPJHgof8YdQNiTF2NB6Vx
+	 2x460+7+rQ6jjAbuPLQ83czEaNCpNO53f84okSCAu14LNqu/+trOXyUFO+1b75yL1l
+	 yp0wvWgoMel0A==
+Date: Tue, 24 Feb 2026 13:46:32 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Thorsten Leemhuis <regressions@leemhuis.info>,
+	Ed W <lists@wildgooses.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	masahiroy@kernel.org,
+	Linux Kernel Build System <linux-kbuild@vger.kernel.org>,
+	Nicolas Schier <nsc@kernel.org>,
+	Linux kernel regressions list <regressions@lists.linux.dev>
+Subject: Re: extlinux can't boot kernel after commit "kbuild: keep .modinfo
+ section in vmlinux.unstripped"
+Message-ID: <20260224204632.GA3510750@ax162>
+References: <587f25e0-a80e-46a5-9f01-87cb40cfa377@wildgooses.com>
+ <3ac876ca-0038-41e8-a1a0-3d5434f30473@leemhuis.info>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/2] init: ensure that /dev/console and /dev/null are
- (nearly) always available in initramfs
-To: Askar Safin <safinaskar@gmail.com>
-Cc: linux-fsdevel@vger.kernel.org, Christian Brauner <brauner@kernel.org>,
- Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
- Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org,
- linux-kbuild@vger.kernel.org, initramfs@vger.kernel.org,
- David Disseldorp <ddiss@suse.de>, Nathan Chancellor <nathan@kernel.org>,
- Nicolas Schier <nsc@kernel.org>, patches@lists.linux.dev
-References: <20260219210312.3468980-1-safinaskar@gmail.com>
- <a7cb199d-928d-4158-8f16-db7ae5309082@landley.net>
- <CAPnZJGAw9o8BetWs_wO2B6YD7mYuOopP0CwD=KCfOJXw2QU4Gg@mail.gmail.com>
-Content-Language: en-US
-From: Rob Landley <rob@landley.net>
-In-Reply-To: <CAPnZJGAw9o8BetWs_wO2B6YD7mYuOopP0CwD=KCfOJXw2QU4Gg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <3ac876ca-0038-41e8-a1a0-3d5434f30473@leemhuis.info>
 
-On 2/23/26 14:58, Askar Safin wrote:
-> On Mon, Feb 23, 2026 at 3:17â€¯AM Rob Landley <rob@landley.net> wrote:
->> FYI I've been using (and occasionally posting) variants of
->> https://landley.net/bin/mkroot/0.8.13/linux-patches/0003-Wire-up-CONFIG_DEVTMPFS_MOUNT-to-initramfs.patch
->> since 2017.
+Hi Ed and Thorsten,
+
+On Tue, Feb 24, 2026 at 01:11:05PM +0100, Thorsten Leemhuis wrote:
+> On 2/17/26 20:24, Ed W wrote:
+> > Hi, I wonder if I can get some help debugging a problem post the following commit. After trying to
+> > upgrade to a newer kernel build I encountered boot failures on my amd64 machine, booting via
+> > extlinux and git bisect narrowed it down to this commit:
 > 
-> drivers/base/Kconfig says on CONFIG_DEVTMPFS_MOUNT:
->> This option does not affect initramfs based booting
+> Thx for the report. Adding a few more recipients to this.
+
+Thank you for the linux-kbuild CC, this somehow ended up in my spam box,
+so I did not see it :/
+
+> Two things are likely worth checking:
 > 
-> So CONFIG_DEVTMPFS_MOUNT works as documented.
+> * Is 7.0-rc1 still affected?
+> * If it's possible to revert the culprit in 7.0-rc1, does it fix the
+> problem?
 
-I.E. they added that instead of merging any of my patches. Doubling down 
-on "initramfs isn't a REAL root filesystem"...
+I doubt this change will cleanly revert on 7.0-rc1, as it was an early
+patch in a series that touched a few places in Kbuild and it had several
+follow up fixes.
 
-*shrug*
+> > https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=v6.19.2&id=3e86e4d74c0490e5fc5a7f8de8f29e7579c9ffe5
+> > kbuild: keep .modinfo section in vmlinux.unstripped
+> 
+> FWIW: Masahiro Yamada, that's a change of yours.
 
-> (But I am not against your CONFIG_DEVTMPFS_MOUNT approach
-> if it helps you fix your problem.)
+Masahiro has stepped away from regular kernel development and
+maintenance:
 
-Oh I've been patching it locally for years. I'm only replying because I 
-was cc'd.
+  https://lore.kernel.org/20250804142007.776418-1-masahiroy@kernel.org/
 
-Rob
+So I will deal with this one, as I committed the series.
+
+> > Keep the .modinfo section during linking, but strip it from the final vmlinux. 
+> > Adjust scripts/mksysmap to exclude modinfo symbols from kallsyms. 
+> > This change will allow the next commit to extract the .modinfo section from the vmlinux.unstripped
+> > intermediate.
+> > 
+> > 
+> > The symptoms are that prior to this commit I can boot a kernel built using gcc-15 and binutils
+> > 2.45.1, however, adding that commit, or trying kernels up to 6.18.12, all fail to boot the bzImage file.
+> >  
+> > Extlinux apparently won't read (or otherwise rejects as invalid) the resulting bzImage kernel with
+> > error:
+> >     failed: I/O error
+> > So it doesn't even try to run the kernel, it appears to fail reading from disk (and presumably
+> > locating the entry point for execution?)
+> > 
+> > Kernel is relocatable and hence ends up being built with 
+> > VMLINUX_NEEDS_RELOCS=y
+> > 
+> > Curiously, if I build with clang then the resulting kernels all seem to work without a problem??
+> > 
+> > System is one of a cluster of Ryzen 9 5950X, but similar errors appear with older Ryzen 9 3900
+> > boxes. Underlying OS is gentoo, so packages approximately as per latest releases with that.
+> > 
+> > I'm not sure how to narrow down what precisely triggers the boot failure though. For example I see
+> > similar results to the following on both a working 6.17.0 and a broken 6.18.12
+> > 
+> > # readelf -l vmlinux | grep -A3 LOAD
+> >   LOAD           0x0000000000200000 0xffffffff81000000 0x0000000001000000
+> >                  0x0000000002a8b4d0 0x0000000002a8b4d0  R E    0x200000
+> >   LOAD           0x0000000002e00000 0xffffffff83c00000 0x0000000003c00000
+> >                  0x0000000001a00000 0x0000000001a00000  RW     0x200000
+> >   NOTE           0x0000000002c8b47c 0xffffffff83a8b47c 0x0000000003a8b47c
+> >                  0x0000000000000054 0x0000000000000054         0x4
+> > 
+> > On the non working 6.18.12 I see:
+> > # readelf -S vmlinux.unstripped | grep modinfo
+> >   [70] .modinfo          PROGBITS         ffffffff85600000  04800000
+> > # readelf -S vmlinux | grep modinfo
+> > 
+> > So it seems as though the modinfo sectors ARE being stripped?!
+
+Yes, that is expected. vmlinux.unstripped contains .modinfo for modpost
+processing at build time but it is removed from vmlinux because it is
+not needed at run time.
+
+> > My guess is that something has moved or become re-ordered such that the extlinux is rejecting the
+> > image?? 
+> > 
+> > At this point I'm honestly not quite sure what I am doing, so would some kind soul please help me
+> > figure out what is happening? I apologise in advance that I've likely not given enough information
+> > about the problem, please be gentle...
+
+I think you provided good information off the bat, so no worries on that
+front. I am not entirely positive that this is the root cause but now
+that I am looking at it and have some additional context from a recent
+7.0-rc1 commit [1], I think 3e86e4d74c04 adding .modinfo to ELF_DETAILS
+and removing it from DISCARDS results in .modinfo appears in certain
+places, namely arch/x86/boot/compressed/vmlinux, where it may not be
+expected. Why that breaks this bootloader, not sure, but I don't really
+think it matters. I think we should move .modinfo from ELF_DETAILS
+(which may be used in other non-vmlinux linker scripts) to its own
+macro, add that to all vmlinux linker scripts, and discard it from
+places where it used to be properly discarded. More code but I think
+it will result in fewer problems. As far as I can tell, this is the
+reason that commit d50f21091358 ("kbuild: align modinfo section for
+Secureboot Authenticode EDK2 compat") was needed and that change needed
+a further follow up fix in commit a26a6c93edfe ("kbuild: Strip trailing
+padding bytes from modules.builtin.modinfo"), so we could have saved
+some headache from doing it right from the beginning.
+
+Ed, could you test the below patch with your setup (it should apply
+cleanly to 6.18.13, 6.19.3, or 7.0-rc1) and see if it resolves your
+issue?
+
+[1] ddc6cbef3ef1 ("s390/boot/vmlinux.lds.S: Ensure bzImage ends with SecureBoot trailer")
+
+Cheers,
+Nathan
+
+diff --git a/arch/alpha/kernel/vmlinux.lds.S b/arch/alpha/kernel/vmlinux.lds.S
+index 2efa7dfc798a..2d136c63db16 100644
+--- a/arch/alpha/kernel/vmlinux.lds.S
++++ b/arch/alpha/kernel/vmlinux.lds.S
+@@ -71,6 +71,7 @@ SECTIONS
+ 
+ 	STABS_DEBUG
+ 	DWARF_DEBUG
++	MODINFO
+ 	ELF_DETAILS
+ 
+ 	DISCARDS
+diff --git a/arch/arc/kernel/vmlinux.lds.S b/arch/arc/kernel/vmlinux.lds.S
+index 61a1b2b96e1d..6af63084ff28 100644
+--- a/arch/arc/kernel/vmlinux.lds.S
++++ b/arch/arc/kernel/vmlinux.lds.S
+@@ -123,6 +123,7 @@ SECTIONS
+ 	_end = . ;
+ 
+ 	STABS_DEBUG
++	MODINFO
+ 	ELF_DETAILS
+ 	DISCARDS
+ 
+diff --git a/arch/arm64/kernel/vmlinux.lds.S b/arch/arm64/kernel/vmlinux.lds.S
+index ad6133b89e7a..2964aad0362e 100644
+--- a/arch/arm64/kernel/vmlinux.lds.S
++++ b/arch/arm64/kernel/vmlinux.lds.S
+@@ -349,6 +349,7 @@ SECTIONS
+ 
+ 	STABS_DEBUG
+ 	DWARF_DEBUG
++	MODINFO
+ 	ELF_DETAILS
+ 
+ 	HEAD_SYMBOLS
+diff --git a/arch/csky/kernel/vmlinux.lds.S b/arch/csky/kernel/vmlinux.lds.S
+index d718961786d2..81943981b3af 100644
+--- a/arch/csky/kernel/vmlinux.lds.S
++++ b/arch/csky/kernel/vmlinux.lds.S
+@@ -109,6 +109,7 @@ SECTIONS
+ 
+ 	STABS_DEBUG
+ 	DWARF_DEBUG
++	MODINFO
+ 	ELF_DETAILS
+ 
+ 	DISCARDS
+diff --git a/arch/hexagon/kernel/vmlinux.lds.S b/arch/hexagon/kernel/vmlinux.lds.S
+index 1150b77fa281..aae22283b5e0 100644
+--- a/arch/hexagon/kernel/vmlinux.lds.S
++++ b/arch/hexagon/kernel/vmlinux.lds.S
+@@ -62,6 +62,7 @@ SECTIONS
+ 
+ 	STABS_DEBUG
+ 	DWARF_DEBUG
++	MODINFO
+ 	ELF_DETAILS
+ 	.hexagon.attributes 0 : { *(.hexagon.attributes) }
+ 
+diff --git a/arch/loongarch/kernel/vmlinux.lds.S b/arch/loongarch/kernel/vmlinux.lds.S
+index 08ea921cdec1..d0e1377a041d 100644
+--- a/arch/loongarch/kernel/vmlinux.lds.S
++++ b/arch/loongarch/kernel/vmlinux.lds.S
+@@ -147,6 +147,7 @@ SECTIONS
+ 
+ 	STABS_DEBUG
+ 	DWARF_DEBUG
++	MODINFO
+ 	ELF_DETAILS
+ 
+ #ifdef CONFIG_EFI_STUB
+diff --git a/arch/m68k/kernel/vmlinux-nommu.lds b/arch/m68k/kernel/vmlinux-nommu.lds
+index 2624fc18c131..45d7f4b0177b 100644
+--- a/arch/m68k/kernel/vmlinux-nommu.lds
++++ b/arch/m68k/kernel/vmlinux-nommu.lds
+@@ -85,6 +85,7 @@ SECTIONS {
+ 	_end = .;
+ 
+ 	STABS_DEBUG
++	MODINFO
+ 	ELF_DETAILS
+ 
+ 	/* Sections to be discarded */
+diff --git a/arch/m68k/kernel/vmlinux-std.lds b/arch/m68k/kernel/vmlinux-std.lds
+index 1ccdd04ae462..7326586afe15 100644
+--- a/arch/m68k/kernel/vmlinux-std.lds
++++ b/arch/m68k/kernel/vmlinux-std.lds
+@@ -58,6 +58,7 @@ SECTIONS
+   _end = . ;
+ 
+   STABS_DEBUG
++  MODINFO
+   ELF_DETAILS
+ 
+   /* Sections to be discarded */
+diff --git a/arch/m68k/kernel/vmlinux-sun3.lds b/arch/m68k/kernel/vmlinux-sun3.lds
+index f13ddcc2af5c..1b19fef201fb 100644
+--- a/arch/m68k/kernel/vmlinux-sun3.lds
++++ b/arch/m68k/kernel/vmlinux-sun3.lds
+@@ -51,6 +51,7 @@ __init_begin = .;
+   _end = . ;
+ 
+   STABS_DEBUG
++  MODINFO
+   ELF_DETAILS
+ 
+   /* Sections to be discarded */
+diff --git a/arch/mips/kernel/vmlinux.lds.S b/arch/mips/kernel/vmlinux.lds.S
+index 2b708fac8d2c..579b2cc1995a 100644
+--- a/arch/mips/kernel/vmlinux.lds.S
++++ b/arch/mips/kernel/vmlinux.lds.S
+@@ -217,6 +217,7 @@ SECTIONS
+ 
+ 	STABS_DEBUG
+ 	DWARF_DEBUG
++	MODINFO
+ 	ELF_DETAILS
+ 
+ 	/* These must appear regardless of  .  */
+diff --git a/arch/nios2/kernel/vmlinux.lds.S b/arch/nios2/kernel/vmlinux.lds.S
+index 37b958055064..206f92445bfa 100644
+--- a/arch/nios2/kernel/vmlinux.lds.S
++++ b/arch/nios2/kernel/vmlinux.lds.S
+@@ -57,6 +57,7 @@ SECTIONS
+ 
+ 	STABS_DEBUG
+ 	DWARF_DEBUG
++	MODINFO
+ 	ELF_DETAILS
+ 
+ 	DISCARDS
+diff --git a/arch/openrisc/kernel/vmlinux.lds.S b/arch/openrisc/kernel/vmlinux.lds.S
+index 049bff45f612..9b29c3211774 100644
+--- a/arch/openrisc/kernel/vmlinux.lds.S
++++ b/arch/openrisc/kernel/vmlinux.lds.S
+@@ -101,6 +101,7 @@ SECTIONS
+ 	/* Throw in the debugging sections */
+ 	STABS_DEBUG
+ 	DWARF_DEBUG
++	MODINFO
+ 	ELF_DETAILS
+ 
+         /* Sections to be discarded -- must be last */
+diff --git a/arch/parisc/boot/compressed/vmlinux.lds.S b/arch/parisc/boot/compressed/vmlinux.lds.S
+index ab7b43990857..87d24cc824b6 100644
+--- a/arch/parisc/boot/compressed/vmlinux.lds.S
++++ b/arch/parisc/boot/compressed/vmlinux.lds.S
+@@ -90,6 +90,7 @@ SECTIONS
+ 	/* Sections to be discarded */
+ 	DISCARDS
+ 	/DISCARD/ : {
++		*(.modinfo)
+ #ifdef CONFIG_64BIT
+ 		/* temporary hack until binutils is fixed to not emit these
+ 		 * for static binaries
+diff --git a/arch/parisc/kernel/vmlinux.lds.S b/arch/parisc/kernel/vmlinux.lds.S
+index b445e47903cf..0ca93d6d7235 100644
+--- a/arch/parisc/kernel/vmlinux.lds.S
++++ b/arch/parisc/kernel/vmlinux.lds.S
+@@ -165,6 +165,7 @@ SECTIONS
+ 	_end = . ;
+ 
+ 	STABS_DEBUG
++	MODINFO
+ 	ELF_DETAILS
+ 	.note 0 : { *(.note) }
+ 
+diff --git a/arch/powerpc/kernel/vmlinux.lds.S b/arch/powerpc/kernel/vmlinux.lds.S
+index 15850296c0a9..8fc11d6565bf 100644
+--- a/arch/powerpc/kernel/vmlinux.lds.S
++++ b/arch/powerpc/kernel/vmlinux.lds.S
+@@ -397,6 +397,7 @@ SECTIONS
+ 	_end = . ;
+ 
+ 	DWARF_DEBUG
++	MODINFO
+ 	ELF_DETAILS
+ 
+ 	DISCARDS
+diff --git a/arch/riscv/kernel/vmlinux.lds.S b/arch/riscv/kernel/vmlinux.lds.S
+index 61bd5ba6680a..997f9eb3b22b 100644
+--- a/arch/riscv/kernel/vmlinux.lds.S
++++ b/arch/riscv/kernel/vmlinux.lds.S
+@@ -170,6 +170,7 @@ SECTIONS
+ 
+ 	STABS_DEBUG
+ 	DWARF_DEBUG
++	MODINFO
+ 	ELF_DETAILS
+ 	.riscv.attributes 0 : { *(.riscv.attributes) }
+ 
+diff --git a/arch/s390/kernel/vmlinux.lds.S b/arch/s390/kernel/vmlinux.lds.S
+index 53bcbb91bb9b..2b62395e35bf 100644
+--- a/arch/s390/kernel/vmlinux.lds.S
++++ b/arch/s390/kernel/vmlinux.lds.S
+@@ -221,6 +221,7 @@ SECTIONS
+ 	/* Debugging sections.	*/
+ 	STABS_DEBUG
+ 	DWARF_DEBUG
++	MODINFO
+ 	ELF_DETAILS
+ 
+ 	/*
+diff --git a/arch/sh/kernel/vmlinux.lds.S b/arch/sh/kernel/vmlinux.lds.S
+index 008c30289eaa..169c63fb3c1d 100644
+--- a/arch/sh/kernel/vmlinux.lds.S
++++ b/arch/sh/kernel/vmlinux.lds.S
+@@ -89,6 +89,7 @@ SECTIONS
+ 
+ 	STABS_DEBUG
+ 	DWARF_DEBUG
++	MODINFO
+ 	ELF_DETAILS
+ 
+ 	DISCARDS
+diff --git a/arch/sparc/kernel/vmlinux.lds.S b/arch/sparc/kernel/vmlinux.lds.S
+index f1b86eb30340..7ea510d9b42f 100644
+--- a/arch/sparc/kernel/vmlinux.lds.S
++++ b/arch/sparc/kernel/vmlinux.lds.S
+@@ -191,6 +191,7 @@ SECTIONS
+ 
+ 	STABS_DEBUG
+ 	DWARF_DEBUG
++	MODINFO
+ 	ELF_DETAILS
+ 
+ 	DISCARDS
+diff --git a/arch/um/kernel/dyn.lds.S b/arch/um/kernel/dyn.lds.S
+index a36b7918a011..ad3cefeff2ac 100644
+--- a/arch/um/kernel/dyn.lds.S
++++ b/arch/um/kernel/dyn.lds.S
+@@ -172,6 +172,7 @@ SECTIONS
+ 
+   STABS_DEBUG
+   DWARF_DEBUG
++  MODINFO
+   ELF_DETAILS
+ 
+   DISCARDS
+diff --git a/arch/um/kernel/uml.lds.S b/arch/um/kernel/uml.lds.S
+index a409d4b66114..30aa24348d60 100644
+--- a/arch/um/kernel/uml.lds.S
++++ b/arch/um/kernel/uml.lds.S
+@@ -113,6 +113,7 @@ SECTIONS
+ 
+   STABS_DEBUG
+   DWARF_DEBUG
++  MODINFO
+   ELF_DETAILS
+ 
+   DISCARDS
+diff --git a/arch/x86/boot/compressed/vmlinux.lds.S b/arch/x86/boot/compressed/vmlinux.lds.S
+index 587ce3e7c504..e0b152715d9c 100644
+--- a/arch/x86/boot/compressed/vmlinux.lds.S
++++ b/arch/x86/boot/compressed/vmlinux.lds.S
+@@ -88,7 +88,7 @@ SECTIONS
+ 	/DISCARD/ : {
+ 		*(.dynamic) *(.dynsym) *(.dynstr) *(.dynbss)
+ 		*(.hash) *(.gnu.hash)
+-		*(.note.*)
++		*(.note.*) *(.modinfo)
+ 	}
+ 
+ 	.got.plt (INFO) : {
+diff --git a/arch/x86/kernel/vmlinux.lds.S b/arch/x86/kernel/vmlinux.lds.S
+index d7af4a64c211..4ed82b1fe173 100644
+--- a/arch/x86/kernel/vmlinux.lds.S
++++ b/arch/x86/kernel/vmlinux.lds.S
+@@ -424,6 +424,7 @@ SECTIONS
+ 	.llvm_bb_addr_map : { *(.llvm_bb_addr_map) }
+ #endif
+ 
++	MODINFO
+ 	ELF_DETAILS
+ 
+ 	DISCARDS
+diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
+index 8ca130af301f..7b38ec8dc8dd 100644
+--- a/include/asm-generic/vmlinux.lds.h
++++ b/include/asm-generic/vmlinux.lds.h
+@@ -848,12 +848,14 @@
+ 
+ /* Required sections not related to debugging. */
+ #define ELF_DETAILS							\
+-		.modinfo : { *(.modinfo) . = ALIGN(8); }		\
+ 		.comment 0 : { *(.comment) }				\
+ 		.symtab 0 : { *(.symtab) }				\
+ 		.strtab 0 : { *(.strtab) }				\
+ 		.shstrtab 0 : { *(.shstrtab) }
+ 
++#define MODINFO								\
++		.modinfo : { *(.modinfo) . = ALIGN(8); }
++
+ #ifdef CONFIG_GENERIC_BUG
+ #define BUG_TABLE							\
+ 	. = ALIGN(8);							\
