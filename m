@@ -1,75 +1,48 @@
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80E6535A383
-	for <linux-kbuild@vger.kernel.org>; Thu, 26 Feb 2026 18:40:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF1B444D02F;
+	Thu, 26 Feb 2026 19:23:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772131245; cv=none; b=SmYlvcaT6qX66UKWyK35QYNBTvklaHzS1006osOnCpQjIEr7jUKxzVFxJRW6RfJfXVXBix/xqGaJYL+WZKJQ4CuONo38EAdFy+hAFbQkclbdSb6AFDTcM0dkSppD/OM74br46oPy3YG0TixJ0NF7Nx6ibfFnJMYJ37M/D6+ycJU=
+	t=1772133825; cv=none; b=MdnX62/AZhrM/wRyFLr2mDcVv/hBIogSgCD9J/j1OfWGNYbuoDXNCfMV+s9FyEyBmQU/l/KZi1J+sr4rFzytITtQ8tK2YNLLsyQ4PRFmsuNbuGhmB5drIFcLeKA9oAfEbuvHiLMpnPrIG1CKnYN9YbKRE/jvVLu4hMeX3scY1zM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772131245; c=relaxed/simple;
-	bh=5ty71ZP/kn9UYFYi5Gf8attnjAgfMP8XR0y3mMnTX88=;
+	s=arc-20240116; t=1772133825; c=relaxed/simple;
+	bh=V/abh2PD06BZ9zL+iou+q/cXLDf1mI0cbexVH9eklL8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BXB83sScKimDubpggPOm68r6KXGUx9l2mHflol37EeYhe/YWf2HhfRZv3dqO9gjU6uAWcx8l2TzaZUIxQ9hN4tR8BkAO/FeQ3i8f7osYq9bPGk94i7XUep466ZEsUjzv4Gs2Br7LAMlU5Ahr7J2Hfb4VYB8iDCHWMilcTgTdbEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RtEut1M1; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=UFTWvrK33iK0J22AfFDbb2TdYe8x3fAGfwwBIPu/Rfct0NCiWpzwXQE4ivHXAzKnV2nBNdUw5u5SR0DtM0ZxHgCDxXEt2+ebPX0gBOZdpPJPWVi1r04iMLHT869nmaDmFr0CPiBzAwN6kR1ZInOld70S3ExPEeY/qUwpHXklx80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X+xVlYCd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RtEut1M1"
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-65fa4713bd3so2308117a12.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 26 Feb 2026 10:40:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772131243; x=1772736043; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5ty71ZP/kn9UYFYi5Gf8attnjAgfMP8XR0y3mMnTX88=;
-        b=RtEut1M1Hf7ppzqlx6DFODu+jXyhzXeyJ4Fgkv9Kq0aWDsxSq491Bs0kaIapAgANAm
-         aTceN1nrdYtBVzb9tnge7sDTs5tGLEhoIc5Dpgtq4y1rIUI5cULRGr5ahkz0wrI2S7Qz
-         oCOkNmo68x/7Xv3jza925NTcvh67rk/IaHwDzLTrx+DAXVnZjTIdi1ESpqNxxAD83wID
-         S6zul0ykh8Y/521rRsjfJjCEEARESf/4E2yZOJhIDBJvtZz7VUmyybVzkzlyCiQunUhG
-         UpXuE93mRXJZLmJMcr6NmDHgDdKWOM024cHZuBmfIqYotDXfJ9uCh30Xn1521aQThXAh
-         UBeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772131243; x=1772736043;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5ty71ZP/kn9UYFYi5Gf8attnjAgfMP8XR0y3mMnTX88=;
-        b=j7tvh70/dw+GaALwlk4h2npSak2n+GGpfGdbAN6DPpcW3XifxELz40rvfiIM5BsE+U
-         SI8S4vx2g+RorgDRNsqxy/pJ4CmfnmiibBRQpZ3x0Eik8FyNKLosyqvztU7L0Hb+Xw6t
-         HcT164mZHOG+Em5zAc+3Hu5aVg8oQPr1z+nIuT1QwPGRcuI5TQg0JWV1rb7rs3BmHnSg
-         9Zky3e0TSAg3pJskJ8cYcp68Ka7KNCG02fwcdb0O1YVu43SdlpoZ1ljPMl1KRAo6jzUZ
-         3YJFnfcc/BF5BpczdxzcAHgWCSOFe8XRWJqv5mZME+reeYZhQC/kTNGgOJItxN8kFy+l
-         t+lQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXWDrN9l35fhc/QMuJiviTG6uHSAiZ7sgN4FHy2aIFoWcZS9Gzpg746Ay1Bawo935+lVevM5y4gBznzA+M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxzNs4iQLizpZ4rZjj5Md3Y/piZgD+VgDj6eWq5tw2jNUMXSy5Z
-	APduR+e3PWG49792bAu0rGHoxJ2TwZXTCxf8eKyHnyyX4hm7xgEK6YhB
-X-Gm-Gg: ATEYQzxQ3BYId4yhVGc1X+rT//m0J2BRrS2Cgr1rvufFpWEKRBNs94G1OxeZwk+h5FV
-	q5h9zxpLPT1obcU+gXmZJvfGG0ZisXTM4RB8F6jT6PCHfsalQ66cRGJF9Sl02JK6wHyrPvgL9wa
-	QRSsCkOyr1AqtbRUD0Z22AWlrVr+nA33/lC6CVGkVwDxrjQtPgaw55Ni3SZT3vgZ2gY1b+svKLV
-	WUM7AwEeiLWvRlhUaJ8isGEBhXoPlqlcNiIgFiU8CArlYN6qLgJLUzL85cBEcdKG9AzJlmtgKUu
-	zA2yjM2/s5CYq8pqydesUzmv44G13ZHTtf098d22nUdztdxLGTSbEOZ218BH5Hx6EVe+VUYPjb5
-	J+ft53hsr/6HEgLUkMUORQwh/Zx1P06OqkORxGDHGKnLMVXpeWnGx3C49cV5xLlM3Stt4YsyuNB
-	UCTVBXlxHS4JPw52s+HhOu/g2plsRrF2I0XIYxuup9j248WGQBRgraDcHRdbn+jajp3ex3cb4rl
-	sbWSx1+J1BBi+mDCY4cmki21awpVjPlNolBt89mYwNN0cQ=
-X-Received: by 2002:a05:6402:1467:b0:65f:9c21:e69b with SMTP id 4fb4d7f45d1cf-65fdd6e2ee8mr211415a12.10.1772131242711;
-        Thu, 26 Feb 2026 10:40:42 -0800 (PST)
-Received: from ddolgov-thinkpadt14sgen1.rmtde.csb (dslb-002-207-075-089.002.207.pools.vodafone-ip.de. [2.207.75.89])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-65fabd36219sm669054a12.3.2026.02.26.10.40.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Feb 2026 10:40:41 -0800 (PST)
-Date: Thu, 26 Feb 2026 19:40:38 +0100
-From: Dmitry Dolgov <9erthalion6@gmail.com>
-To: Ian Rogers <irogers@google.com>
-Cc: linux-perf-users@vger.kernel.org, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, Levi Zim <i@kxxt.dev>, 
-	Namhyung Kim <namhyung@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, rust-for-linux <rust-for-linux@vger.kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
-Subject: Re: [PATCH v5] tools build: Fix rust cross compilation
-Message-ID: <mnakvrusyjmuq2zwdjataxq5wc3m4bhyynbwdku2s3kdvtsi5f@2n7t65aqbupy>
-References: <20260226170025.517743-1-9erthalion6@gmail.com>
- <CAP-5=fV7OuWN9K-wnsS7zza+s0FQRSR_JCcJi5tvpgQAbh=Nnw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X+xVlYCd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81622C116C6;
+	Thu, 26 Feb 2026 19:23:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772133825;
+	bh=V/abh2PD06BZ9zL+iou+q/cXLDf1mI0cbexVH9eklL8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=X+xVlYCd2kcX++rnawQMPmH5HSUSwPpgSUP9ZQtXTjGcx5FIDI5g/HNbAKewJzezS
+	 L+rm8A6+NLA5lmDWbKwpOOdRaWlYW4qCW9h9LJKFPg/0oO8vmv+NxGqvdUNmmpaI+u
+	 7pKUKM2tw8B/ee7NWy+CJjb+/PPuMjzDi9GMph7jAGroiUy7RLbt0R2e4kCvoX19Ka
+	 vckOKCdHGXiypOKd0/7NazLxqojc1GupuO1Ix33F80Q3QSorD67Ohg9aptJD2g1eQy
+	 8xcjtRyr0OFPm9+rCNIPavWWNiL6hsvYoEnzkrhp+iM2d69t8ZMf/d1JnhpFpXOvX8
+	 LS12PDm9fD2qg==
+Date: Thu, 26 Feb 2026 20:21:02 +0100
+From: Nicolas Schier <nsc@kernel.org>
+To: Gary Guo <gary@garyguo.net>
+Cc: Nathan Chancellor <nathan@kernel.org>, Miguel Ojeda <ojeda@kernel.org>,
+	Boqun Feng <boqun@kernel.org>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+	Janne Grunau <j@jannau.net>, Asahi Lina <lina+kernel@asahilina.net>,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	rust-for-linux@vger.kernel.org
+Subject: Re: [PATCH v2] rust: build: remap path to avoid absolute path
+Message-ID: <aaCdHs8-A99569M1@derry.ads.avm.de>
+References: <20260226152112.3222886-1-gary@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -78,15 +51,49 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAP-5=fV7OuWN9K-wnsS7zza+s0FQRSR_JCcJi5tvpgQAbh=Nnw@mail.gmail.com>
+In-Reply-To: <20260226152112.3222886-1-gary@kernel.org>
 
-> On Thu, Feb 26, 2026 at 09:10:24AM -0800, Ian Rogers wrote:
-> Not a cross-compilation problem, but is there a way to pass-through
-> extra flags to the rust compiler? For CFLAGS we have EXTRA_CFLAGS as a
-> make variable, but I don't see an EXTRA_RUSTFLAGS. I was looking for
-> this because I was trying to make a build passing "-m32" to CFLAGS to
-> create a 32-bit perf binary. The link against the rust workload was
-> failing due to the different object types.
+On Thu, Feb 26, 2026 at 03:21:11PM +0000, Gary Guo wrote:
+> From: Gary Guo <gary@garyguo.net>
+> 
+> When building with a out directory (O=), absolute paths can end up in the
+> file name in `#[track_caller]` or the panic message. This is not desirable
+> as this leaks the exact path being used to build the kernel and means that
+> the same location can appear in two forms (relative or absolute).
+> 
+> This is reported by Asahi [1] and is being workaround in [2] previously to
+> force everything to be absolute path. Using absolute path for everything
+> sovles the inconsistency, however it does not address the reproducibility
+> issue. So, fix this by remap all absolute paths to srctree to relative path
+> instead.
+> 
+> This is previously attemped in commit dbdffaf50ff9 ("kbuild, rust: use
+> -fremap-path-prefix to make paths relative") but that was reverted as
+> remapping debug info causes some tool (e.g. objdump) to be unable to find
+> sources. Therefore, use `--remap-path-scope` to only remap macros but leave
+> debuginfo untouched. `--remap-path-scope` is only stable in Rust 1.95, so
+> use `rustc-option` to detect its presence. This feature has been available
+> as  `-Zremap-path-scope` for all versions that we support; hwoever due to
+> bugs in the Rust compiler, it does not work reliably until 1.94. I opted to
+> not enable it for 1.94 as it's just a single version that we missed.
+> 
+> This change can be validated by building a kernel with O=, strip debug info
+> on vmlinux, and then check if the absolute path exists in `strings
+> vmlinux`, e.g. `strings vmlinux |grep \/home`.
+> 
+> Reported-by: Janne Grunau <j@jannau.net>
+> Reported-by: Asahi Lina <lina+kernel@asahilina.net>
+> Closes: https://rust-for-linux.zulipchat.com/#narrow/channel/288089-General/topic/Per-call-site.20data.20and.20lock.20class.20keys/near/572466559 [1]
+> Link: https://github.com/AsahiLinux/linux/commit/54ab88878869036c9d6620101bfe17a81e88c2f9 [2]
+> Signed-off-by: Gary Guo <gary@garyguo.net>
+> ---
+> Changes since v1:
+> - Restrict remap scope to macro only
+> - Add to RUSTFLAGS instead of adding directly to scripts/Makefile.build
+> ---
+>  Makefile      | 3 +++
+>  rust/Makefile | 5 +++--
+>  2 files changed, 6 insertions(+), 2 deletions(-)
+> 
 
-Nope, not yet, currently one can only set global RUST_FLAGS or per build
-target. But sure, I'll add this in a separate patch.
+Acked-by: Nicolas Schier <nsc@kernel.org> # kbuild
