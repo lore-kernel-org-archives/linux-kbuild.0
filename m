@@ -1,46 +1,39 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D14AE2857CC;
-	Sat, 28 Feb 2026 11:08:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AE664315A;
+	Sat, 28 Feb 2026 17:29:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772276899; cv=none; b=uVza2ZGMciuIeR6eZ0syoS6xfEK67ojZpIUHSuUdZy/BKqAftmXlfpQMCJd/LPMolN7wZYPWHWrTNqU1DdPFObaQIshUE9NKDTg7ewHgX55zlf9/T9aV3VwYKae05xHgYdfWEJb4pXNYYsbNHNAntfm26pxNTaNmIOa1S3cJAO8=
+	t=1772299769; cv=none; b=ml3YXZM+tCJe1Za43yLjSkMdkZWMUxOH23eDSp3y/CFxCf1npEkTDCnc4KFAoNz/6CGfkMVQ+xYeaKm2hM84ZBxsC3zdMeZhkJpnXvaXZMJ5YSBf4b2AIgT9iagqKgVGHC389FS4hmRfrlOqhEm1OY5OPwfgif9/zltkK7tGk/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772276899; c=relaxed/simple;
-	bh=cj+uB9iWQKjnvIgtf9VcdUBIoGqJZsYxujbsNl9X+Ok=;
+	s=arc-20240116; t=1772299769; c=relaxed/simple;
+	bh=1l6KHwXEgtfxHia5hrfOcyDd++3EG0XjsSCjfOpNf8g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oity74DW5lX4PQq2wZWlSi7ohlZb2MkPfwOpNm07Xn2uwF4L5h1d9umcahX7KUwR3oCGpPOZw6WpvpElGRj5O/143EI7aw5RC77HVml9ZiSRlvTDFUbfA/u4Flms3SpLAlh64r/BNG81opUuzFIdywXTqzsae2YZg/PJEOMZCrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=he+9r9oU; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=M3Nt0K0GFPGGCCDqVny93UW9ryQaqcE0bJuNfnvRfSorFdVQZhRs8MWxkRetFGew+YeBiZjlMMflvPrnAxayk73xtXeR+MDt7IRFDF3NBb+Owy1uDBQE0iykIu1eYQ8APVCe6bxdmI1cE+Ur632C/VbdYWi3gFTTDsOJtOUo1/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VW5MidZW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="he+9r9oU"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=xsscHip4dCdmr5IZSPcgdwtNxNMKm418IeeKDj4ChVU=; b=he+9r9oUxEfld2ipnq/QlVUxh0
-	PU4r88DmHXquioH5j0Ao//QuM3AQRYt0BFV5Ld5yn+qFRCc+DA2GNcDYOyBDMig3to7LTmHjxa/7d
-	tQMAcPy/f2JsBfx0P24qREH1irsZ5/c+kwJyWPZfjuSBHuNjZR54LRfwaXrM6Cn4tbJfx1cN9Viym
-	fNtompsx8riYo3D1fPccs66tuMWfGHgRutdk/6GroFDeh2wKE2HjAUdyITw+IE4QTqT785nyCBue+
-	FftYyTcFXisVxa3dZhU/LOmqGr7uQr9m98gE+zbIKG2KZdKX/lCQ/tsEcLgUviGBl7B4OWUJIwD6P
-	ZZwbcAMA==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vwIBC-0000000686g-30ow;
-	Sat, 28 Feb 2026 11:08:14 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id A48DB3007C4; Sat, 28 Feb 2026 12:08:13 +0100 (CET)
-Date: Sat, 28 Feb 2026 12:08:13 +0100
-From: Peter Zijlstra <peterz@infradead.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VW5MidZW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A76FC116D0;
+	Sat, 28 Feb 2026 17:29:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772299768;
+	bh=1l6KHwXEgtfxHia5hrfOcyDd++3EG0XjsSCjfOpNf8g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VW5MidZWWs7yds9V1yUrycanrkpyg4QivdOk3m4xy61lh2F+52V0Ghwf8AVoIyI15
+	 jUh3nMAqDn24u+6TggyKykqHTXa+17ZIU7iNBasSjVStDDAGorRomCslAe//8ymnso
+	 pfSO/xZqoEdjes4ES1HXM6W+Vl6TQqjM1Bp9kVBKHtVrX5cIAbaz+/csVU1gzvC6UC
+	 FlVTQw6Yk+GYoD5vwFmVIR/8AdPG0E6OtVIyQ2Hx/NWOd41JIpKKpB4XD1vkczMQik
+	 o+o9WBs5FnmySsB7kXrshk/Cs2JjB+sjn+xg0FBv/dAMLoW8OyHvjiO0wHQMNvnHtI
+	 51XP5z2JVKqeg==
+Date: Sat, 28 Feb 2026 09:29:26 -0800
+From: Josh Poimboeuf <jpoimboe@kernel.org>
 To: Nathan Chancellor <nathan@kernel.org>
-Cc: Nicolas Schier <nsc@kernel.org>, Josh Poimboeuf <jpoimboe@kernel.org>,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org, Michal Suchanek <msuchanek@suse.de>,
-	Rainer Fiebig <jrf@mailbox.org>
+Cc: Nicolas Schier <nsc@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+	Michal Suchanek <msuchanek@suse.de>, Rainer Fiebig <jrf@mailbox.org>
 Subject: Re: [PATCH] kbuild: Leave objtool binary around with 'make clean'
-Message-ID: <20260228110813.GN1282955@noisy.programming.kicks-ass.net>
+Message-ID: <cwqd33ivhb55oyuzeajsqdosoa3oolq5edyyc3xg756wa3tu5m@p5m5mhzb7fue>
 References: <20260227-avoid-objtool-binary-removal-clean-v1-1-122f3e55eae9@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
@@ -48,7 +41,7 @@ List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <20260227-avoid-objtool-binary-removal-clean-v1-1-122f3e55eae9@kernel.org>
 
@@ -91,6 +84,9 @@ On Fri, Feb 27, 2026 at 10:40:48PM -0700, Nathan Chancellor wrote:
 > I can take this via kbuild-fixes with a proper Ack or it can go through
 > -tip, does not matter to me.
 
-Feel free to take though kbuild-fixes:
+Thanks for fixing it!
 
-Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Acked-by: Josh Poimboeuf <jpoimboe@kernel.org>
+
+-- 
+Josh
