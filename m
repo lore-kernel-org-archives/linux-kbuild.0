@@ -1,92 +1,114 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f179.google.com (mail-dy1-f179.google.com [74.125.82.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AE664315A;
-	Sat, 28 Feb 2026 17:29:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6200430BA7
+	for <linux-kbuild@vger.kernel.org>; Sat, 28 Feb 2026 23:38:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772299769; cv=none; b=ml3YXZM+tCJe1Za43yLjSkMdkZWMUxOH23eDSp3y/CFxCf1npEkTDCnc4KFAoNz/6CGfkMVQ+xYeaKm2hM84ZBxsC3zdMeZhkJpnXvaXZMJ5YSBf4b2AIgT9iagqKgVGHC389FS4hmRfrlOqhEm1OY5OPwfgif9/zltkK7tGk/M=
+	t=1772321919; cv=none; b=cKWKrlZ4Tnar4fCMwdEgJJrn2PBR000c2Rg5Fb9qumt7ZKPb93bE5XxMPmm/6rI7EEHL74EfK3EPUS+NK4UozK4PGgmsFTgeewA9dv6fE75YnSXjHKKyHBJeHoSGklchs4LUrnggh2CRzVD9+/cm81BSoY0vZFkmGiAjEcVJVv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772299769; c=relaxed/simple;
-	bh=1l6KHwXEgtfxHia5hrfOcyDd++3EG0XjsSCjfOpNf8g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M3Nt0K0GFPGGCCDqVny93UW9ryQaqcE0bJuNfnvRfSorFdVQZhRs8MWxkRetFGew+YeBiZjlMMflvPrnAxayk73xtXeR+MDt7IRFDF3NBb+Owy1uDBQE0iykIu1eYQ8APVCe6bxdmI1cE+Ur632C/VbdYWi3gFTTDsOJtOUo1/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VW5MidZW; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772321919; c=relaxed/simple;
+	bh=AW5T9Hc4nbKkDkGmRXK+0jMJLHNhZgY/umP29NnIa7A=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=AijOUldn+a2PXdRgCuhicSTLCGMzReROTVVa3xutPluFJJH+1yNXrDyHoWrWfokZWIxIL/TnHWp04bUcJ9wQETy0Mh7/rSKNhBBHwdPhBogQP/E2WuOPfLuQHsBnkKUOxHvSrLdWkoSoSFvg8YbBOJd/Rup/MepfoszJ7DvmPRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y+62m04m; arc=none smtp.client-ip=74.125.82.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VW5MidZW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A76FC116D0;
-	Sat, 28 Feb 2026 17:29:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772299768;
-	bh=1l6KHwXEgtfxHia5hrfOcyDd++3EG0XjsSCjfOpNf8g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VW5MidZWWs7yds9V1yUrycanrkpyg4QivdOk3m4xy61lh2F+52V0Ghwf8AVoIyI15
-	 jUh3nMAqDn24u+6TggyKykqHTXa+17ZIU7iNBasSjVStDDAGorRomCslAe//8ymnso
-	 pfSO/xZqoEdjes4ES1HXM6W+Vl6TQqjM1Bp9kVBKHtVrX5cIAbaz+/csVU1gzvC6UC
-	 FlVTQw6Yk+GYoD5vwFmVIR/8AdPG0E6OtVIyQ2Hx/NWOd41JIpKKpB4XD1vkczMQik
-	 o+o9WBs5FnmySsB7kXrshk/Cs2JjB+sjn+xg0FBv/dAMLoW8OyHvjiO0wHQMNvnHtI
-	 51XP5z2JVKqeg==
-Date: Sat, 28 Feb 2026 09:29:26 -0800
-From: Josh Poimboeuf <jpoimboe@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Nicolas Schier <nsc@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
-	Michal Suchanek <msuchanek@suse.de>, Rainer Fiebig <jrf@mailbox.org>
-Subject: Re: [PATCH] kbuild: Leave objtool binary around with 'make clean'
-Message-ID: <cwqd33ivhb55oyuzeajsqdosoa3oolq5edyyc3xg756wa3tu5m@p5m5mhzb7fue>
-References: <20260227-avoid-objtool-binary-removal-clean-v1-1-122f3e55eae9@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y+62m04m"
+Received: by mail-dy1-f179.google.com with SMTP id 5a478bee46e88-2be06c02f66so249382eec.1
+        for <linux-kbuild@vger.kernel.org>; Sat, 28 Feb 2026 15:38:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772321916; x=1772926716; darn=vger.kernel.org;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hziZ8HwNJIKxde4jYjnTUIsaI5Anyr71P4ZGtylHymA=;
+        b=Y+62m04madFEPG2Egzu4UaSzjbGXDICKcnrhiGXXheiJIWV8XF3Ust9Lzm9XRj1NOg
+         NxhlxYWqHfePx190ZNflO9TjXEQusCNXYWz83MgFxaozOytFzerq/9V+8uZfNiZNTmqg
+         I2Xukgvhy5yyMIjnNFbXDXsRFHnzq08+vLusCHGX3tNvszdulkTZO2A5CRx6QM4zGw16
+         Le9evq6pcjjH/ADl9nr3Zi5Q/NYUnRSe1JbL9XbR/o+QkVbteknIsqaQTv3MitFMVuc6
+         aAKwQqZhrUgL6ix1dd8js30UPZKEl3mraiY9wu/kr7LU5Rxm20KjYYQWodwNMeEsRi1U
+         Yo9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772321916; x=1772926716;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hziZ8HwNJIKxde4jYjnTUIsaI5Anyr71P4ZGtylHymA=;
+        b=neLsgUr05u1m4Hyk+PltdzOnPiG4o6AlaYKqplxg6mUH2d4/qAHnWfOYfpG0Fs3bJY
+         7OaRLdB78Y1z48WULhcdvVTYt32jS+p6VB0ZlD5+KKrqBH4V5rIhag0RVUi22SonLnun
+         izMSb2ycY8cWy7iA9n0rP/PuSEZm0AcPEEXp1dA5yBCY3y6L5IwiIeVIjx+VNNtEADA/
+         Nd68cKj9M1mEpfDPgEpMUyAofMUTEiDYNyc+wClyGdIlxMOQz/ZUuykZNTW1x6dXsOxI
+         9q6RS/pqGwdBk+LpwVNNXB4BVvnOCNz8ZcTw9rZY7NzvAisQQ4wwdzw0LGOaoQxOmf5p
+         +CBg==
+X-Forwarded-Encrypted: i=1; AJvYcCXOGhE8nhi/nro/Pfxjx/OsO3cMZeRLHywftZDBIBcM5WV/T7HGDMZt4EdGWdGh8XVnlDjUErnMDNQKiw0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8Xy8e/Jg6bcEfwNGZaPdXESp8zc98x1Wq6cqbwSVYgey+lrJE
+	xQ5JOJI50zE27ykWCyRlyucKIQXxUb/yL+PBbNPRkLOjgTClo+RAAqH4
+X-Gm-Gg: ATEYQzwxcJmSxWOcm1vcc2XpU6eV24YYAS7wVBac5Z2RrqMET4Zd+5TKC1f7Bw5CpoG
+	ATrBlLycJFf0gpS4Rnm9ST3gvWdCcX56xNoKRCSYGZ+RKvwD6PfCFf8dkGUnJEaKOPtcD+DcMkJ
+	Piax5+6Ho7AtJkA8+n/3BHxCsN/NjKET3YRBjaNvZ5DOmDJpNWu55m0sNlnFIRuqSwe8nvB5AUT
+	Pl+4D+C39+WITi0p4vZ9cjq6pcVZG/64DEgkuRx1OJG4sHrDE6BuakcA3GSDqWh7kfDktn0hXyE
+	r47LJ38CChr1iGBV+Dh69xX91Cv3r/0TDjJzD0rJ/pimBU2waCXyQGAuFNHHnLLoX0KUTMUXCS0
+	7UwfE2mbYWCUeRcGDAHBdzTOT2MLeZEKLjNmHrmwzEnGfaHH9ce7+ihToB1oBZoIoY9fj86XmeP
+	JMVY17vXJl6TBj3KFXb0abXI3ff7Sv1K1NuK+vyHdNWIbu
+X-Received: by 2002:a05:7300:a198:b0:2be:694:5713 with SMTP id 5a478bee46e88-2be069458e8mr203613eec.36.1772321915822;
+        Sat, 28 Feb 2026 15:38:35 -0800 (PST)
+Received: from localhost ([2603:8000:bb00:9b3f::18f6])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2bdfb3f898asm1293640eec.29.2026.02.28.15.38.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 28 Feb 2026 15:38:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260227-avoid-objtool-binary-removal-clean-v1-1-122f3e55eae9@kernel.org>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Sat, 28 Feb 2026 15:38:29 -0800
+Message-Id: <DGQZOLAH72HC.2OE3REDD7M7U7@gmail.com>
+Cc: <rust-for-linux@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linux-kbuild@vger.kernel.org>
+Subject: Re: [PATCH v2 1/2] rust: add projection infrastructure
+From: "Aditya Rajan" <adi.dev.github@gmail.com>
+To: "Gary Guo" <gary@garyguo.net>, "Miguel Ojeda" <ojeda@kernel.org>, "Boqun
+ Feng" <boqun@kernel.org>, =?utf-8?q?Bj=C3=B6rn_Roy_Baron?=
+ <bjorn3_gh@protonmail.com>, "Benno Lossin" <lossin@kernel.org>, "Andreas
+ Hindborg" <a.hindborg@kernel.org>, "Alice Ryhl" <aliceryhl@google.com>,
+ "Trevor Gross" <tmgross@umich.edu>, "Danilo Krummrich" <dakr@kernel.org>,
+ "Nathan Chancellor" <nathan@kernel.org>, "Nicolas Schier" <nsc@kernel.org>
+X-Mailer: aerc 0.21.0
+References: <20260226154656.3241736-1-gary@kernel.org>
+ <20260226154656.3241736-2-gary@kernel.org>
+In-Reply-To: <20260226154656.3241736-2-gary@kernel.org>
 
-On Fri, Feb 27, 2026 at 10:40:48PM -0700, Nathan Chancellor wrote:
-> The difference between 'make clean' and 'make mrproper' is documented in
-> 'make help' as:
-> 
->   clean     - Remove most generated files but keep the config and
->               enough build support to build external modules
->   mrproper  - Remove all generated files + config + various backup files
-> 
-> After commit 68b4fe32d737 ("kbuild: Add objtool to top-level clean
-> target"), running 'make clean' then attempting to build an external
-> module with the resulting build directory fails with
-> 
->   $ make ARCH=x86_64 O=build clean
-> 
->   $ make -C build M=... MO=...
->   ...
->   /bin/sh: line 1: .../build/tools/objtool/objtool: No such file or directory
-> 
-> as 'make clean' removes the objtool binary.
-> 
-> Split the objtool clean target into mrproper and clean like Kbuild does
-> and remove all generated artifacts with 'make clean' except for the
-> objtool binary, which is removed with 'make mrproper'.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 68b4fe32d737 ("kbuild: Add objtool to top-level clean target")
-> Reported-by: Michal Suchanek <msuchanek@suse.de>
-> Closes: https://lore.kernel.org/20260225112633.6123-1-msuchanek@suse.de/
-> Reported-by: Rainer Fiebig <jrf@mailbox.org>
-> Closes: https://lore.kernel.org/62d12399-76e5-3d40-126a-7490b4795b17@mailbox.org/
-> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
-> ---
-> I realize that this will technically decend into tools/objtool twice
-> during cleaning when running mrproper but I don't think it is the end of
-> the world for a much simpler implementation.
-> 
-> I can take this via kbuild-fixes with a proper Ack or it can go through
-> -tip, does not matter to me.
+On Thu Feb 26, 2026 at 7:46 AM PST, Gary Guo wrote:
+> From: Gary Guo <gary@garyguo.net>
+> diff --git a/rust/kernel/projection.rs b/rust/kernel/projection.rs
+> new file mode 100644
+> index 000000000000..186ec194f2b8
+> --- /dev/null
+> +++ b/rust/kernel/projection.rs
+> +unsafe impl<T> ProjectIndex<[T]> for usize {
+> +    type Output =3D T;
+> +
+> +    #[inline(always)]
+> +    fn get(self, slice: *mut [T]) -> Option<*mut T> {
+> +        if self > slice.len() {
+I am not sure but shouldn't this be `self >=3D slice.len()` ? I could be wr=
+ong but `slice.get(n)` should return `None` for slice 0..n ?
+There is a similar condition somewhere else in the code as well.
 
-Thanks for fixing it!
+[...]
 
-Acked-by: Josh Poimboeuf <jpoimboe@kernel.org>
+> +                // Check unaligned field. Not all users (e.g. DMA) can h=
+andle unaligned
+> +                // projections. (e.g. DMA).
+Nit: Comment mentions (e.g. DMA) twice
 
--- 
-Josh
+One question regarding the `in bounds` check otherwise LGTM
+
+Thanks
+Aditya
+
