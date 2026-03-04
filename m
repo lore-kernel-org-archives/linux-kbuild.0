@@ -1,70 +1,161 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18629386C0C;
-	Wed,  4 Mar 2026 09:23:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DE6F3AE194;
+	Wed,  4 Mar 2026 14:39:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772616214; cv=none; b=R7okEp1V2Rf3XOCTXisdMrfBUP40wgiuW+NKlNQK5zru2w5HRkgUE3LGJQbKBzUwwkBve1D1Vsbu22kFWatODEBqjdOTd98v3pPyzasX3jHrDIeEX/D3LR1UOaalB1DWmcCFdo17HbgHExe2NA15hkXrc6LrvqTFxe3ZkK3axvE=
+	t=1772635158; cv=none; b=mvi7m0ZuNCk9ainnlvfHlkc6WbDkB/u6TUxd7JChMvBtdQzOD3kpFBMwm6CIXM0SwHBkkHs6xeOf4QAB7r3HLN9DC3UJP75QRkBZEZPMv/aZ0Lju4BlJAx4MRriI8Z6Peq+EyVyPRcv7b6hSV7bK9xzobKavDUiiILhRUc8bcU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772616214; c=relaxed/simple;
-	bh=rFG0yKTU0uBkBGAcaVw7OE/xatWrPiHKyWJgjVKOtVU=;
+	s=arc-20240116; t=1772635158; c=relaxed/simple;
+	bh=jpHbkjBSvqWn6OcfIJDrEntNWYvpRmD8DXYmBcL7tLY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jHJhS8+Pls31UjloXS3Ut7JO0A5LOOKY97ESc6WdGzqCq6VbRjdBdNsuPa9+waGmi0aRgFOzBe+fpD7Nz5FhgbrGrnli/BSAC4p8NPsupP6wxxptT0ik7QIUQ/YM47lxsXEtOxIhqstBc1aojTF0tqVVYD1TCJSr8/vC+gR1Mv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 54084497;
-	Wed,  4 Mar 2026 01:23:26 -0800 (PST)
-Received: from localhost (e132581.arm.com [10.1.196.87])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 377853F694;
-	Wed,  4 Mar 2026 01:23:32 -0800 (PST)
-Date: Wed, 4 Mar 2026 09:23:30 +0000
-From: Leo Yan <leo.yan@arm.com>
-To: Namhyung Kim <namhyung@kernel.org>
-Cc: Quentin Monnet <qmo@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Ian Rogers <irogers@google.com>,
-	James Clark <james.clark@linaro.org>, Kees Cook <kees@kernel.org>,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, bpf@vger.kernel.org
-Subject: Re: [PATCH RESEND v2] tools build: Use -fzero-init-padding-bits=all
-Message-ID: <20260304092330.GJ1098637@e132581.arm.com>
-References: <20260224-tools_build_fix_zero_init-v2-1-b1acc817a01e@arm.com>
- <aaCTC86U9KjnmZmu@google.com>
- <99e7fe4e-72de-4b55-9a9a-ae51718a0e73@kernel.org>
- <20260227103611.GA1098637@e132581.arm.com>
- <c886c8c9-d336-4ec3-94c0-c4869dee7e7f@kernel.org>
- <aaeHcL7vEhZ0LWth@google.com>
- <2ff9897c-3822-4e31-acfb-884690448af0@kernel.org>
- <aaeMSBW_K827ARYJ@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=IBSbAInUQAxVC+1rCeDk9wttyyFz66+6tqzjoqjSlOUlrhaC3jDUu4qOxuT/WaVBBT6vCWS1cN6bAoCSC/6qXzGi/WbggCdDGOtSBkyxDnJyY8geudd4B4aZKEfum3r1HWf4KYRSHRT7luzhxozlcYM9a+77Q73XMF8MYy2TMOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oqYh3mbC; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oqYh3mbC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3438AC4CEF7;
+	Wed,  4 Mar 2026 14:39:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772635157;
+	bh=jpHbkjBSvqWn6OcfIJDrEntNWYvpRmD8DXYmBcL7tLY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oqYh3mbC6G+LZqZcA349+DHmgVGJez+uBJZFvNa/vvofVcpmLVlfolAwovLD1kpSr
+	 wqFBelLyJhq49roMuFGDnAoU8Kmr/N3htigXB42qH4Z8tKRe8F6f8yelEAuAKKKS91
+	 ZblkvtoBp/REJT6AFsI1bCjYhRG1cHkKEMcC9nHOOwjaaPNVrWZYWUVkdqHHzu5ky9
+	 MXEqQ6fTT3evFo1axez4UodBTySB5pJ6qzg0mcofU4oMP7DoUJal/l5hF/YSkWZYjj
+	 /oXFTEF+y8aOk858fCKQPlx0d2+Q4KbkDK86cBr99e0UuMtbjCjnUb+yXPSrE45y7x
+	 qJ99426pRHing==
+Date: Wed, 4 Mar 2026 11:39:14 -0300
+From: Arnaldo Carvalho de Melo <acme@kernel.org>
+To: Ian Rogers <irogers@google.com>
+Cc: Dmitrii Dolgov <9erthalion6@gmail.com>,
+	linux-perf-users@vger.kernel.org, Miguel Ojeda <ojeda@kernel.org>,
+	Levi Zim <i@kxxt.dev>, Namhyung Kim <namhyung@kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+	rust-for-linux <rust-for-linux@vger.kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>
+Subject: Re: [PATCH v4] tools build: Fix rust cross compilation
+Message-ID: <aahEEkHP5g-T_tFg@x1>
+References: <20260218154800.367720-1-9erthalion6@gmail.com>
+ <CAP-5=fXLNybYv08dDfAqAsDBzbOPzQY4EZQvdY0WZsfrMu9Yyg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <aaeMSBW_K827ARYJ@google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAP-5=fXLNybYv08dDfAqAsDBzbOPzQY4EZQvdY0WZsfrMu9Yyg@mail.gmail.com>
 
-On Tue, Mar 03, 2026 at 05:35:04PM -0800, Namhyung Kim wrote:
-
-[...]
-
-> > I don't want bpftool's HOST_CFLAGS to inherit
-> > -fzero-init-padding-bits=all if the compiler doesn't support it, which
-> > may happen with the current version of the patch. I'd prefer a version
-> > with separate EXTRA_CFLAGS and HOST_EXTRA_CFLAGS, as proposed by Leo and
-> > discussed above, to address the cross-compilation issue.
+On Tue, Feb 24, 2026 at 08:41:57AM -0800, Ian Rogers wrote:
+> On Wed, Feb 18, 2026 at 7:48 AM Dmitrii Dolgov <9erthalion6@gmail.com> wrote:
+> >
+> > Currently no target is specified to compile rust code when needed, which
+> > breaks cross compilation. E.g. for arm64:
+> >
+> >       LD      /tmp/build/tests/workloads/perf-test-in.o
+> >     aarch64-linux-gnu-ld: /tmp/build/tests/workloads/code_with_type.a(code_with_type.code_with_type.d12f4324cb53c560-cgu.0.rcgu.o): Relocations in generic ELF (EM: 62)
+> >     aarch64-linux-gnu-ld: /tmp/build/tests/workloads/code_with_type.a(code_with_type.code_with_type.d12f4324cb53c560-cgu.0.rcgu.o): Relocations in generic ELF (EM: 62)
+> >     [...repeated...]
+> >     aarch64-linux-gnu-ld: /tmp/build/tests/workloads/code_with_type.a(code_with_type.code_with_type.d12f4324cb53c560-cgu.0.rcgu.o): Relocations in generic ELF (EM: 62)
+> >     aarch64-linux-gnu-ld: /tmp/build/tests/workloads/code_with_type.a(code_with_type.code_with_type.d12f4324cb53c560-cgu.0.rcgu.o): Relocations in generic ELF (EM: 62)
+> >     aarch64-linux-gnu-ld: /tmp/build/tests/workloads/code_with_type.a: error adding symbols: file in wrong format
+> >     make[5]: *** [/perf/tools/build/Makefile.build:162: /tmp/build/tests/workloads/perf-test-in.o] Error 1
+> >     make[4]: *** [/perf/tools/build/Makefile.build:156: workloads] Error 2
+> >     make[3]: *** [/perf/tools/build/Makefile.build:156: tests] Error 2
+> >     make[2]: *** [Makefile.perf:785: /tmp/build/perf-test-in.o] Error 2
+> >     make[2]: *** Waiting for unfinished jobs....
+> >     make[1]: *** [Makefile.perf:289: sub-make] Error 2
+> >     make: *** [Makefile:76: all] Error 2
+> >
+> > Detect required target and pass it via rust_flags to the compiler.
+> >
+> > Note that CROSS_COMPILE might be different from what rust compiler
+> > expects, since it may omit the target vendor value, e.g.
+> > "aarch64-linux-gnu" instead of "aarch64-unknown-linux-gnu". Thus
+> > explicitly map supported CROSS_COMPILE values to corresponding Rust
+> > versions, as suggested by Miguel Ojeda.
+> >
+> > Tested using arm64 cross-compilation example from [1].
+> >
+> > Fixes: 2e05bb52a12 ("perf test workload: Add code_with_type test workload")
+> > Link: https://perfwiki.github.io/main/arm64-cross-compilation-dockerfile/ [1]
+> > Signed-off-by: Dmitrii Dolgov <9erthalion6@gmail.com>
+> > ---
+> > Changes in v4
+> > - Fixed incorrect target name for riscv
+> >
+> > Changes in v3
+> > - Improved commit message, add an example of the compilation failure
+> >
+> > Changes in v2:
+> > - Map supported CROSS_COMPILE values to corresponding Rust targets
+> >
+> >
+> >  tools/build/Build.include  |  9 +++++++++
+> >  tools/perf/Makefile.config | 14 ++++++++++++++
+> >  tools/perf/Makefile.perf   |  2 +-
+> >  3 files changed, 24 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/tools/build/Build.include b/tools/build/Build.include
+> > index e45b2eb0d24..cd0baa7a168 100644
+> > --- a/tools/build/Build.include
+> > +++ b/tools/build/Build.include
+> > @@ -98,6 +98,15 @@ c_flags_2 = $(filter-out $(CFLAGS_REMOVE_$(basetarget).o), $(c_flags_1))
+> >  c_flags   = $(filter-out $(CFLAGS_REMOVE_$(obj)), $(c_flags_2))
+> >  cxx_flags = -Wp,-MD,$(depfile) -Wp,-MT,$@ $(CXXFLAGS) -D"BUILD_STR(s)=\#s" $(CXXFLAGS_$(basetarget).o) $(CXXFLAGS_$(obj))
+> >
+> > +###
+> > +# Rust flags to be used on rule definition, includes:
+> > +# - global $(RUST_FLAGS)
+> > +# - per target Rust flags
+> > +# - per object Rust flags
+> > +rust_flags_1 = $(RUST_FLAGS) $(RUST_FLAGS_$(basetarget).o) $(RUST_FLAGS_$(obj))
+> > +rust_flags_2 = $(filter-out $(RUST_FLAGS_REMOVE_$(basetarget).o), $(rust_flags_1))
+> > +rust_flags   = $(filter-out $(RUST_FLAGS_REMOVE_$(obj)), $(rust_flags_2))
+> > +
+> >  ###
+> >  ## HOSTCC C flags
+> >
+> > diff --git a/tools/perf/Makefile.config b/tools/perf/Makefile.config
+> > index a8dc72cfe48..214d8f6d9b8 100644
+> > --- a/tools/perf/Makefile.config
+> > +++ b/tools/perf/Makefile.config
+> > @@ -1163,6 +1163,20 @@ ifndef NO_RUST
+> >      CFLAGS += -DHAVE_RUST_SUPPORT
+> >      $(call detected,CONFIG_RUST_SUPPORT)
+> >    endif
+> > +
+> > +  ifneq ($(CROSS_COMPILE),)
+> > +    RUST_TARGET_FLAGS_arm      := arm-unknown-linux-gnueabi
+> > +    RUST_TARGET_FLAGS_arm64    := aarch64-unknown-linux-gnu
+> > +    RUST_TARGET_FLAGS_m68k     := m68k-unknown-linux-gnu
+> > +    RUST_TARGET_FLAGS_mips     := mipsel-unknown-linux-gnu
+> > +    RUST_TARGET_FLAGS_powerpc  := powerpc64le-unknown-linux-gnu
+> > +    RUST_TARGET_FLAGS_riscv    := riscv64gc-unknown-linux-gnu
+> > +    RUST_TARGET_FLAGS_s390     := s390x-unknown-linux-gnu
+> > +    RUST_TARGET_FLAGS_x86      := x86_64-unknown-linux-gnu
+> > +    RUST_TARGET_FLAGS_x86_64   := x86_64-unknown-linux-gnu
+> > +
+> > +    RUST_FLAGS += --target=$(RUST_TARGET_FLAGS_$(ARCH))
 > 
-> Got it.  Leo, can you please update the patch?
+> I'm wondering about lesser tested platforms like loongarch, csky,
+> xtensa but I don't know how to concoct a triple for these. I wonder if
+> there should be a test for a missing string like:
+> 
+>   ifeq($(RUST_TARGET_FLAGS_$(ARCH)),)
+>     $(error Unknown rust cross compilation architecture $(ARCH))
+>   endif
+> 
+> other than this:
+> 
+> Reviewed-by: Ian Rogers <irogers@google.com>
 
-Yes, I will prepare a new patch series.
+Thanks, applied to perf-tools, for v7.0.
 
-Also thanks Quentin's detailed suggestions.
-
-Leo
+- Arnaldo
