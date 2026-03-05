@@ -1,47 +1,31 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 812C037AA97;
-	Thu,  5 Mar 2026 09:31:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F171A245031;
+	Thu,  5 Mar 2026 09:42:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772703107; cv=none; b=gTYbp0mQ2QTiSnmpGEhCICal6BwmJtoMoF84zgW7oUFZuAa84dPIYWaH3RYOiUYFtGsFaw1HzQoejBb36+xfdxrKL59HnZ2+1WNRe4ElpHmlJhVyQsWhtINhEtncFh0rWQf3qQe7UlpR15kc0ABslHBQLQ+Kip3GraB+3yuV/0k=
+	t=1772703734; cv=none; b=ZYWy22AhUterUUWTUm6xuYXfND435zVSEoK4a5yPF/woinztrCT/zMWhevW2ZPuOm5nXSWWkf3/BPVp3/ntGzQVAEykaAhspfme4wS32MDkcVpklR3KrRpBxdejEPvj1s52wPJaeasrlUh5ZV/Lj8/nnLhfFQ6ck0gHK2YGxySI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772703107; c=relaxed/simple;
-	bh=zLOR26cLBLYh5Klh+Pn0d+Hj/jKctPEuA5Lkndxr7M8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ffDQNn6nZ3A+DL6FxaTKRKCsfHA8yY6RTjy+7P+1N+kqe04JzZMQ5arYLD+yTgjh+kDwpxxNt1P+TAs8LmN+QJjlZ/fYStVDp23oCTm8wdN7DJyVSbpk/kkIfADIkzhh6qVqf3RN72aYY5m2MXnnmf7NpHiRrkzMx9U8nnT8jYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=u4Ey9NAy; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=bEppHdnl; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	s=arc-20240116; t=1772703734; c=relaxed/simple;
+	bh=Wx2LogNDbns541SnFVUv93/3oIAkkkOiWLeIhqW3jiU=;
+	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
+	 References:Date:Message-Id; b=u8iEdz0lhO4rK8VRIPCg6Xcm6QE9KucWOfZHX5+8AG50Q8R7RnIjvKXkvD29X6h80o0YkLIuq2CfEIxCa+BwhfueCcERxw85cTiSltGTln8dgF7S24VXouYbnmTw7N0nYKiqXBDltrCn8AHrQnsOK1TuQUeQHIA5tKkM96JQZpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A1Pqemu9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="u4Ey9NAy";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="bEppHdnl"
-From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1772703102;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=co01dxvIFWtkmzMGUBe0JJ0whr193iX3Ll+T6RjyBMU=;
-	b=u4Ey9NAyGUWhFzkNvW79whLpHoE678j2ZVNI7l110NkoHqN/cvmf1WNc3en60CY14hUlcd
-	kGiibB4af3kjSPeilIZYEZVe6jXa4M/ZzqJ7K24k+SsbED4eMaTIf7dq3jyeqyptm+uzzo
-	pajMZj8GX8f16XWZsq6rPOlGiLslBquq0Rwar2AumaULhH058WMlwnGrQkKGgFr4qf8Ujd
-	JeyEcLkiWaC/LgpXfmVyPchP4j+ox31IW901B3NWKwjirWkOfrbx00ujQHARucnXbzr39h
-	6qmNSlRU7Ksg/rNroUDh+eKhwj8+sBpNk4i5P/TkWF3Pp4pJLaGRco2c2F7wpA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1772703102;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=co01dxvIFWtkmzMGUBe0JJ0whr193iX3Ll+T6RjyBMU=;
-	b=bEppHdnlxpvy3m7oFR2YBsCtCjTREF5/5uSe5duOhyg3S0XxgXU4LtbYlykc9tTHgO6Ibx
-	csrqBtCXrUrD4UAA==
-Date: Thu, 05 Mar 2026 10:31:43 +0100
-Subject: [PATCH v3 7/8] sign-file: use 'struct module_signature' from the
- UAPI headers
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A1Pqemu9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D42BC116C6;
+	Thu,  5 Mar 2026 09:42:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772703733;
+	bh=Wx2LogNDbns541SnFVUv93/3oIAkkkOiWLeIhqW3jiU=;
+	h=Subject:From:To:Cc:In-Reply-To:References:Date:From;
+	b=A1Pqemu99Yfpw0QnYo8TB9yTHrR0fE2RDK9jTlVIN0EEeJ9kc/ThHQn3qrOSiVBD+
+	 8Dc7i2cY6yhupxUVvXmieUq1RNLqhjsB/T6lQu4x3vdMI6JSaJy/QeMZDZ320FAwfc
+	 tAa/hp/eLwBhINTBnXlcxHwqYaXcg0SIABHB5eARBlkdyTwNXfp9kcD1DFeKNUYg/J
+	 NJ8zpo86WEGlojPjbKfetcWgHiLXKLdJ49qGrboKbmI520xUAr7K5hJelqpA3vSuAN
+	 X/iDHVM4SEC552AwE/52wD9y1oTOb0sBdJQ/B/mthKQjTnx1/yzgVqRyZ7aGRpVk1+
+	 TyTSwmQIAXrwA==
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -50,127 +34,50 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20260305-module-signature-uapi-v3-7-92f45ea6028c@linutronix.de>
-References: <20260305-module-signature-uapi-v3-0-92f45ea6028c@linutronix.de>
-In-Reply-To: <20260305-module-signature-uapi-v3-0-92f45ea6028c@linutronix.de>
-To: David Howells <dhowells@redhat.com>, 
- David Woodhouse <dwmw2@infradead.org>, Luis Chamberlain <mcgrof@kernel.org>, 
- Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>, 
- Sami Tolvanen <samitolvanen@google.com>, Aaron Tomlin <atomlin@atomlin.com>, 
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
- Alexander Gordeev <agordeev@linux.ibm.com>, 
- Christian Borntraeger <borntraeger@linux.ibm.com>, 
- Sven Schnelle <svens@linux.ibm.com>, Mimi Zohar <zohar@linux.ibm.com>, 
- Roberto Sassu <roberto.sassu@huawei.com>, 
- Dmitry Kasatkin <dmitry.kasatkin@gmail.com>, 
- Eric Snowberg <eric.snowberg@oracle.com>, Paul Moore <paul@paul-moore.com>, 
- James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, 
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, 
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>
-Cc: keyrings@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-modules@vger.kernel.org, linux-s390@vger.kernel.org, 
- linux-integrity@vger.kernel.org, linux-security-module@vger.kernel.org, 
- linux-kbuild@vger.kernel.org, bpf@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
+Subject: Re: [PATCH 0/9] kbuild: uapi: remove usage of toolchain headers
+From: Nicolas Schier <nsc@kernel.org>
+To: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+ Brian Cain <bcain@kernel.org>, linux-kbuild@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, 
+ linux-hexagon@vger.kernel.org, 
  =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1772703098; l=3380;
- i=thomas.weissschuh@linutronix.de; s=20240209; h=from:subject:message-id;
- bh=zLOR26cLBLYh5Klh+Pn0d+Hj/jKctPEuA5Lkndxr7M8=;
- b=cbKMWPxLR0aa06YPMJMNH+3sP2FeyyExCNDYs8ZhrAmgMGdFUszFLlFGXUBMFrAX7ZUpY1tuP
- TT9qQLgbqBID7uuHWdtKTfOJ/DTI7Hziz33pfmvgOnHWrkQKgvv0/7w
-X-Developer-Key: i=thomas.weissschuh@linutronix.de; a=ed25519;
- pk=pfvxvpFUDJV2h2nY0FidLUml22uGLSjByFbM6aqQQws=
+In-Reply-To: <20260227-kbuild-uapi-libc-v1-0-c17de0d19776@weissschuh.net>
+References: <20260227-kbuild-uapi-libc-v1-0-c17de0d19776@weissschuh.net>
+Date: Thu, 05 Mar 2026 10:41:55 +0100
+Message-Id: <177270371590.103031.6257749379376584635@derry.ads.avm.de>
+X-Mailer: b4 0.15-dev-363b9
+X-Developer-Signature: v=1; a=openpgp-sha256; l=444; i=nsc@kernel.org;
+ s=20250924; h=from:subject:message-id;
+ bh=Wx2LogNDbns541SnFVUv93/3oIAkkkOiWLeIhqW3jiU=;
+ b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBpqU/qjDPfC5xvFortkyG0MKGDxmPaelRTIOk1e
+ ot9NlLEPwWJAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCaalP6gAKCRAHUgpwFiYS
+ aY3mEACXuJeGoqWpxF9yVei8JmJpgRj9WMvVu4Hw0bLHKIdgUwr0DJRshynekgezYGyd+EFFalL
+ VyHmc+utk5ykVt6Sewnt7Eguf6fe6HbR/A9ZlfAQnSVvIQp2s7L8NamyO4Fu9jLc0FeFg+Fp+FQ
+ tASyB9h1c1syQ6Hg6fqbKUETQztomVhjNfsXmP7ALSSgzJB6UIUwc3Jf9kYgmKtBJDgMey3mETe
+ e6b6Fc4fk9Yk2lpwVyo7Nh39f7ZPJwnjg++x7hYzhbElJvASjPIqyrtKUC9OCmhjwzOM4FkRdgg
+ xPGZomBnFPkbe/PjYM8Ly3TevVO4xvWNdYYEASlq+LXKDt4/xNbCV0srGJgFRtf3sLy0PbTg0Q6
+ XwhSs6Har2eyMs/KI79tvSh77gD2qoTQLFeN0EfDqQv/NziOuU526D2Pdh1wKABK7sVwlfP8vNG
+ qNSq8eZhTlMlyBbaqKbzFFLQG/j5VgvkK3DKGs5dceDgcuTb9fEpD8qeNEmZabV4KurgBmwlEtU
+ 0B2G9BdLriUFOoEGx8i8OG2qMsM4eSszExtNt5/Q0Iwn9gMdNjpr6OvZEAPLLsRlS2rR0qs4zcT
+ pe2G1r3GlNEgnOtR78MfD3Vcb8SQh4Jc3mRlhPOMbcpc8rROqH7W5vAeflb7smDiofeVJdMSzDi
+ SV3bXk6tN5CD6hg==
+X-Developer-Key: i=nsc@kernel.org; a=openpgp;
+ fpr=18ED52DBE34F860EE9FBC82B7D97093255A0CE7F
 
-Now that the UAPI headers provide the required definitions, use those.
-Some symbols have been renamed, adapt to those.
+On Fri, 27 Feb 2026 07:37:58 +0100, Thomas Weißschuh <linux@weissschuh.net> wrote:
+> Currently the test compilation of some UAPI headers requires a toolchain
+> libc headers. Remove that dependency.
 
-Also adapt the include path for the custom sign-file rule in the
-bpf selftests.
+Thanks a lot for the highly appreciated clean up!  Having -nostdinc in
+UAPI header tests is good thing!
 
-Signed-off-by: Thomas Weißschuh <thomas.weissschuh@linutronix.de>
-Reviewed-by: Petr Pavlu <petr.pavlu@suse.com>
----
- scripts/Makefile                     |  1 +
- scripts/sign-file.c                  | 19 ++++---------------
- tools/testing/selftests/bpf/Makefile |  1 +
- 3 files changed, 6 insertions(+), 15 deletions(-)
+Kind regards,
+Nicolas
 
-diff --git a/scripts/Makefile b/scripts/Makefile
-index 0941e5ce7b57..3434a82a119f 100644
---- a/scripts/Makefile
-+++ b/scripts/Makefile
-@@ -35,6 +35,7 @@ HOSTCFLAGS_sorttable.o = -I$(srctree)/tools/include
- HOSTLDLIBS_sorttable = -lpthread
- HOSTCFLAGS_asn1_compiler.o = -I$(srctree)/include
- HOSTCFLAGS_sign-file.o = $(shell $(HOSTPKG_CONFIG) --cflags libcrypto 2> /dev/null)
-+HOSTCFLAGS_sign-file.o += -I$(srctree)/tools/include/uapi/
- HOSTLDLIBS_sign-file = $(shell $(HOSTPKG_CONFIG) --libs libcrypto 2> /dev/null || echo -lcrypto)
- 
- ifdef CONFIG_UNWINDER_ORC
-diff --git a/scripts/sign-file.c b/scripts/sign-file.c
-index 73fbefd2e540..86b010ac1514 100644
---- a/scripts/sign-file.c
-+++ b/scripts/sign-file.c
-@@ -40,19 +40,7 @@
- #endif
- #include "ssl-common.h"
- 
--struct module_signature {
--	uint8_t		algo;		/* Public-key crypto algorithm [0] */
--	uint8_t		hash;		/* Digest algorithm [0] */
--	uint8_t		id_type;	/* Key identifier type [PKEY_ID_PKCS7] */
--	uint8_t		signer_len;	/* Length of signer's name [0] */
--	uint8_t		key_id_len;	/* Length of key identifier [0] */
--	uint8_t		__pad[3];
--	uint32_t	sig_len;	/* Length of signature data */
--};
--
--#define PKEY_ID_PKCS7 2
--
--static char magic_number[] = "~Module signature appended~\n";
-+#include <linux/module_signature.h>
- 
- static __attribute__((noreturn))
- void format(void)
-@@ -197,7 +185,7 @@ static X509 *read_x509(const char *x509_name)
- 
- int main(int argc, char **argv)
- {
--	struct module_signature sig_info = { .id_type = PKEY_ID_PKCS7 };
-+	struct module_signature sig_info = { .id_type = MODULE_SIGNATURE_TYPE_PKCS7 };
- 	char *hash_algo = NULL;
- 	char *private_key_name = NULL, *raw_sig_name = NULL;
- 	char *x509_name, *module_name, *dest_name;
-@@ -357,7 +345,8 @@ int main(int argc, char **argv)
- 	sig_size = BIO_number_written(bd) - module_size;
- 	sig_info.sig_len = htonl(sig_size);
- 	ERR(BIO_write(bd, &sig_info, sizeof(sig_info)) < 0, "%s", dest_name);
--	ERR(BIO_write(bd, magic_number, sizeof(magic_number) - 1) < 0, "%s", dest_name);
-+	ERR(BIO_write(bd, MODULE_SIGNATURE_MARKER, sizeof(MODULE_SIGNATURE_MARKER) - 1) < 0,
-+	    "%s", dest_name);
- 
- 	ERR(BIO_free(bd) != 1, "%s", dest_name);
- 
-diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftests/bpf/Makefile
-index 6776158f1f3e..2b1080892208 100644
---- a/tools/testing/selftests/bpf/Makefile
-+++ b/tools/testing/selftests/bpf/Makefile
-@@ -270,6 +270,7 @@ $(OUTPUT)/urandom_read: urandom_read.c urandom_read_aux.c $(OUTPUT)/liburandom_r
- $(OUTPUT)/sign-file: ../../../../scripts/sign-file.c
- 	$(call msg,SIGN-FILE,,$@)
- 	$(Q)$(CC) $(shell $(PKG_CONFIG) --cflags libcrypto 2> /dev/null) \
-+		  -I$(srctree)/tools/include/uapi/ \
- 		  $< -o $@ \
- 		  $(shell $(PKG_CONFIG) --libs libcrypto 2> /dev/null || echo -lcrypto)
- 
+Reviewed-by: Nicolas Schier <nsc@kernel.org>
+Tested-by: Nicolas Schier <nsc@kernel.org>
 
 -- 
-2.53.0
+Nicolas
 
