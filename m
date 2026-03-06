@@ -1,138 +1,119 @@
-Received: from 69-171-232-180.mail-mxout.facebook.com (69-171-232-180.mail-mxout.facebook.com [69.171.232.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00B6D36C0C4
-	for <linux-kbuild@vger.kernel.org>; Fri,  6 Mar 2026 03:43:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=69.171.232.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 855BA4A0C;
+	Fri,  6 Mar 2026 05:28:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772768619; cv=none; b=tcF357GDzJjEKC70j3BLrRPyR/sdM7MoRKEDF46mxxP5H8AsHlwNNhQDEW4k8j2xDTX12jTLWbGN3KUPUUiz45dhVvacm4piMGU9seTpIesw+ee4cscdb6xGTO/EsNlt2adEr9D4vozkGtsxOSpHCoINkYNvLoCuS5bWFmx0D/w=
+	t=1772774909; cv=none; b=T3m7F4e19a3Xzm94iMffzUxayPDdAECX/GoRqfk25kkocwTPyJLO8bX5LY8GJQeoO0nviou9W9i/jKGG8vzouA/lAoLAh3Xth/NF+cl6mneo6R7tnqjGu45jajVstbGVBPWQCFNFDFzfv+Cz2LEo8yYM9n5rxierQ+tcnKy0DcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772768619; c=relaxed/simple;
-	bh=XLF10N/BPmNrtU9Xp/CQSiynUMll3Pz+IJF3Ntemvbo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=O2AG5KjtsUm+caP30RxhDSuIMh0DLr6+xsz7Sxk3FRmpoXOfF5OzRJ9BUrxf+7iwM19nMvBwMREcNwS/VsjPMvtFJFDAxizUNpWWw519MX/WdHxT8RnrF9AHBD3nd1GdH0ZEHSK6ireBMtB+OecoPDYop55wPOlMqbO3rdBNEj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.dev; spf=fail smtp.mailfrom=linux.dev; arc=none smtp.client-ip=69.171.232.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=linux.dev
-Received: by devvm16039.vll0.facebook.com (Postfix, from userid 128203)
-	id 1A54A22BBCDDC; Thu,  5 Mar 2026 19:43:25 -0800 (PST)
-From: Yonghong Song <yonghong.song@linux.dev>
-To: linux-kbuild@vger.kernel.org,
-	live-patching@vger.kernel.org
-Cc: Josh Poimboeuf <jpoimboe@kernel.org>,
-	kernel-team@fb.com,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>,
-	Song Liu <song@kernel.org>
-Subject: [PATCH kbuild] kbuild: Allow to reduce the number of suffixes for clang thin-lto build
-Date: Thu,  5 Mar 2026 19:43:25 -0800
-Message-ID: <20260306034325.3605301-1-yonghong.song@linux.dev>
-X-Mailer: git-send-email 2.47.3
+	s=arc-20240116; t=1772774909; c=relaxed/simple;
+	bh=Mymp5YMe/lwJlGb/YeUoaONjTRY+VLjELsuskVN91j0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YY+w3i4c0kYMVZmYeZEUanv+8nI7WF5vVdAUEkEnmHIK2zkkhwYkDOj8Vo1ZoUj0zFKA7+t44AklDMcBB0xK0sYXS4J596hISVshAyu3mcv7dq0PYjlCIkx1Hc3eua0/BXCErHsARLxXxCqWw7zJezqpvsjafw5jjD5a7xN/2vA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=nQUCEu9O; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="nQUCEu9O"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=Vkfetqs+xpuG5oD7JT2fp2BAiX2HJc/0mpwWIS+EuZA=; b=nQUCEu9OEPJLY3czN25dwPTfJ5
+	rmbiVdnd5/maK1qpOsCtJkMYiUi1zsvvIBPdtlF0ZwdS9EIl8GlYuTr/rLGlf0wURU6wKgC4AeYdU
+	eWxmCjDAtxlZckaAmtqQiOjdyMfLRX+K0FLp70cjbE/y0j2stYSok5UTNKypGPypkXQfBXdrsfvi+
+	T0+L2RrWZzNvrAtdth/A303CX6+vgv3yQwo8Br7C+X31BAz5zWMnx+GeULLXg4jucp7GgjT3O8P5d
+	U7caQXDvfe3n0iZ75Z4t106YTdvtQ1ZjHzKlQRWORCtJ3de0KrQyZEDPRtH1A07d4gSNXlQ10BASW
+	YNdhM80g==;
+Received: from [50.53.43.113] (helo=[192.168.254.34])
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vyNjN-000000032qp-3jvw;
+	Fri, 06 Mar 2026 05:28:09 +0000
+Message-ID: <d7b0ec9a-85b6-469f-9058-322866ce2cdd@infradead.org>
+Date: Thu, 5 Mar 2026 21:28:09 -0800
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] kallsyms: embed source file:line info in kernel stack
+ traces
+To: Sasha Levin <sashal@kernel.org>, Andrew Morton
+ <akpm@linux-foundation.org>, Masahiro Yamada <masahiroy@kernel.org>,
+ Luis Chamberlain <mcgrof@kernel.org>,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ Richard Weinberger <richard@nod.at>, Juergen Gross <jgross@suse.com>,
+ Geert Uytterhoeven <geert@linux-m68k.org>,
+ James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Nathan Chancellor <nathan@kernel.org>,
+ Nicolas Schier <nsc@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>,
+ Daniel Gomez <da.gomez@kernel.org>, Greg KH <gregkh@linuxfoundation.org>,
+ Petr Mladek <pmladek@suse.com>, Steven Rostedt <rostedt@goodmis.org>,
+ Kees Cook <kees@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
+ Thorsten Leemhuis <linux@leemhuis.info>, Vlastimil Babka
+ <vbabka@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kbuild@vger.kernel.org, linux-modules@vger.kernel.org,
+ linux-doc@vger.kernel.org
+References: <20260303182103.3523438-1-sashal@kernel.org>
+ <20260303182103.3523438-2-sashal@kernel.org>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20260303182103.3523438-2-sashal@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The current clang thin-lto build often produces lots of symbols with
-suffix. The following is a partial list of such function call symbols:
-    ...
-    ethnl_module_fw_flash_ntf.llvm.7631589765585346066
-    __nf_conntrack_alloc.llvm.6438426151906658917
-    tcp_can_early_drop.llvm.11937612064648250727
-    tcp_print_conntrack.llvm.11937612064648250727
-    ...
 
-In my particular build with current bpf-next, the number of '*.llvm.<hash=
->'
-function calls is 1212. Such symbols make kernel live patching
-difficult since
-  - a minor code change will change the hash and then the '*.llvm.<hash>'
-    symbol becomes another one with a different hash or no hash, and
-  - a previous source-level symbol may become an one with suffix after li=
-ve
-    patching code.
 
-In [1], Song Liu suggested to reduce the number of '*.llvm.<hash>' functi=
-ons
-to make live patch easier. In respond of this, I implemented this
-in llvm ([2]). The same thin-lto build with [2] only has two symbols with
-suffix:
-    m_stop.llvm.14460341347352036579
-    m_next.llvm.14460341347352036579
-This should make live patch much easier.
+On 3/3/26 10:21 AM, Sasha Levin wrote:
+> diff --git a/Documentation/admin-guide/kallsyms-lineinfo.rst b/Documentation/admin-guide/kallsyms-lineinfo.rst
+> new file mode 100644
+> index 0000000000000..4dffc18dbcf5a
+> --- /dev/null
+> +++ b/Documentation/admin-guide/kallsyms-lineinfo.rst
+> @@ -0,0 +1,72 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+> +==================================
+> +Kallsyms Source Line Info (LINEINFO)
+> +==================================
 
-To support suffix symbol reduction, a new config
-    LTO_CLANG_THIN_SUFFIX_REDUCTION
-is introduced and the config depends on thin-lto and llvm23 or higher.
+Heading over/under lines must be at least as long as the heading.
 
-Two lld flags are necessary to enable this feature in kernel:
-    - Flag '--lto-whole-program-visibility' is needed as it ensures that =
-all
-      modules are available in the same process, which is true for kernel=
- at
-      thin-lto lld.
-    - Flag '-mllvm -always-rename-promoted-locals=3Dfalse' is needed to e=
-nable
-      suffix reduction. Currently in llvm [1], only process mode is suppo=
-rted.
-      There is another distributed mode (across different processes or ev=
-en
-      different machines) which is not supported yet ([2]).
+> +
+> +Overview
+> +========
+> +
+> +``CONFIG_KALLSYMS_LINEINFO`` embeds DWARF-derived source file and line number
+> +mappings into the kernel image so that stack traces include
+> +``(file.c:123)`` annotations next to each symbol.  This makes it significantly
+> +easier to pinpoint the exact source location during debugging, without needing
+> +to manually cross-reference addresses with ``addr2line``.
 
-  [1] https://lpc.events/event/19/contributions/2212
-  [2] https://github.com/llvm/llvm-project/pull/178587
 
-Signed-off-by: Yonghong Song <yonghong.song@linux.dev>
----
- Makefile     |  3 +++
- arch/Kconfig | 15 +++++++++++++++
- 2 files changed, 18 insertions(+)
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 61bf550fd37c2..ab987e74bb0f5 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -14278,6 +14278,12 @@ F:	lib/Kconfig.kmsan
+>  F:	mm/kmsan/
+>  F:	scripts/Makefile.kmsan
+>  
+> +KALLSYMS LINEINFO
+> +M:	Sasha Levin <sashal@kernel.org>
+> +S:	Maintained
+> +F:	Documentation/admin-guide/kallsyms-lineinfo.rst
+> +F:	scripts/gen_lineinfo.c
 
-diff --git a/Makefile b/Makefile
-index e944c6e71e81..9d6033595615 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1034,6 +1034,9 @@ endif
- ifdef CONFIG_LTO_CLANG
- ifdef CONFIG_LTO_CLANG_THIN
- CC_FLAGS_LTO	:=3D -flto=3Dthin -fsplit-lto-unit
-+ifdef CONFIG_LTO_CLANG_THIN_SUFFIX_REDUCTION
-+KBUILD_LDFLAGS +=3D --lto-whole-program-visibility -mllvm -always-rename=
--promoted-locals=3Dfalse
-+endif
- else
- CC_FLAGS_LTO	:=3D -flto
- endif
-diff --git a/arch/Kconfig b/arch/Kconfig
-index 102ddbd4298e..e1db64a3284e 100644
---- a/arch/Kconfig
-+++ b/arch/Kconfig
-@@ -861,8 +861,23 @@ config LTO_CLANG_THIN
- 	    https://clang.llvm.org/docs/ThinLTO.html
-=20
- 	  If unsure, say Y.
-+
- endchoice
-=20
-+config LTO_CLANG_THIN_SUFFIX_REDUCTION
-+	bool "Clang ThinLTO Suffix Reduction (EXPERIMENTAL)"
-+	depends on LTO_CLANG_THIN
-+	depends on CLANG_VERSION >=3D 230000
-+	default y
-+	help
-+	  This option allows to reduce the number of symbols with
-+	  '.llvm.<hash' suffixes. This can help KLP (kernel living
-+	  patch) as symbol name can stay stable in most cases.
-+
-+	  See https://github.com/llvm/llvm-project/pull/178587
-+
-+	  If unsure, say N.
-+
- config ARCH_SUPPORTS_AUTOFDO_CLANG
- 	bool
-=20
---=20
-2.47.3
+This entry should be in alphabetical order, just before KASAN.
+
+> +
+>  KPROBES
+>  M:	Naveen N Rao <naveen@kernel.org>
+>  M:	"David S. Miller" <davem@davemloft.net>
+
+-- 
+~Randy
 
