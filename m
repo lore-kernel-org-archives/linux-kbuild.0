@@ -1,32 +1,32 @@
 Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46F1A355F25;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 832E934EEED;
 	Sun,  8 Mar 2026 21:24:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773005049; cv=none; b=ftoKUb0DVF1aY0BsXHvvA5MjViVPYNcawM7M+vYyJNtSe0mkOvHHGx6mPyBFk28UCFDaqBqTuK6fFY2sG/YaeZi98Wdem61i0BsVJUyw3yRTBqq7h2tb2yyrzftsXHKphFRJ6+4SAvWWZWhT4/A4i+Sg9cKZUxK/2CNAD6baxaU=
+	t=1773005049; cv=none; b=oQ+VsRQSLB4LAKaISw/uvXUFkm/thFK7+04YuIWg6pWz3YuBtJVjQdrbj0/SS5KJZrpjYWn2gOLn+Itl2XypK7dp/PauigoiDH4EybNKLqShVxD8cFpq9oBTgUS78hjwFDoXDRKZdNrQg1mnCUFNbKYlem3xpwXgReepkYPCxRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1773005049; c=relaxed/simple;
-	bh=HwLfblw+VRZLHJdgjzQhIHg+sRaFcsc1K0c5qr+oBMY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=frfoDmLm5wbkV4udeaF9dMnYVJKh09238czFybUFXuEtm4NLlqzKmFcJ1zW1qyb/pQXqmdru/Nv7c48xKx0nACuZ9SsZ5rigH+RGAjDETDzhBpec32txGFH7ViNn7PJP6faIg/FJtTJ6U/mUlP7PFOlZ9WInqqNpc/zljCkVk/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=ebT2VyAB; arc=none smtp.client-ip=159.69.126.157
+	bh=9Ck8dKyO7rN5xpHErcHVSmjccYdqlZTzMQl/61jnnK0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=JpO3Ixfaulbs8U2tc3K1F1RTsfGiuOCkLYAe8CD4G/6Mg/RC+ioPVXa+kAxekGaJelvNCYwUR9e1Sq9DkuUE06e2PY6swmVWhHRf6ckgQ/jEVfWl0Tfmh7YGaT/FPU54tfCXmlv/l3hhibsUKu6yJyDQZxmCiGQwLqAoah54Wy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=sSkv6/je; arc=none smtp.client-ip=159.69.126.157
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="ebT2VyAB"
+	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="sSkv6/je"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-	s=mail; t=1773005045;
-	bh=HwLfblw+VRZLHJdgjzQhIHg+sRaFcsc1K0c5qr+oBMY=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=ebT2VyABQsUQ5DK/pJmOfS9GUdwU6LaQk8qxfBLC2h3+okQrXd8PHg6Cz54yF0xwq
-	 likZpZziXxOcMUpBsaYwZbMAKWfa388RlQVWhBtmXlONKd/KkHUTrqWUeFwYOanYGj
-	 UaedLySmuNzei4jTPVwC1Le58INJVQsS3L4t5www=
+	s=mail; t=1773005046;
+	bh=9Ck8dKyO7rN5xpHErcHVSmjccYdqlZTzMQl/61jnnK0=;
+	h=From:Subject:Date:To:Cc:From;
+	b=sSkv6/jeOfLs6ZZVSKzF3ynFBoGQm6Rz7svuVhj5GlWMhaOOlBwxL4ucVljvlaPp8
+	 2O0sTgFQOcelMLlW19FTlr1/paT4jeTrLFglHrnnOQMPiOAp+sWqCAhUqKJj4B7D9n
+	 qgeX02kbBpUUghAivQE3dfFvFUNiSThKucNy99hE=
 From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Date: Sun, 08 Mar 2026 22:24:03 +0100
-Subject: [PATCH RFC 3/5] kbuild: uapi: handle UML in architecture-specific
- exclusion lists
+Subject: [PATCH RFC 0/5] kbuild: uapi: also test UAPI headers against C++
+ compilers
+Date: Sun, 08 Mar 2026 22:24:00 +0100
+Message-Id: <20260308-kbuild-uapi-c-v1-0-86aae09a7f1d@weissschuh.net>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -35,80 +35,56 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20260308-kbuild-uapi-c-v1-3-86aae09a7f1d@weissschuh.net>
-References: <20260308-kbuild-uapi-c-v1-0-86aae09a7f1d@weissschuh.net>
-In-Reply-To: <20260308-kbuild-uapi-c-v1-0-86aae09a7f1d@weissschuh.net>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIzMDIyNj3eyk0sycFN3SxIJM3WRdQwsDA6NkyxTz5ERjJaCegqLUtMwKsHn
+ RSkFuzkqxtbUAQ+YbOGQAAAA=
+X-Change-ID: 20260223-kbuild-uapi-c-18002c9d7ca3
 To: Arnd Bergmann <arnd@arndb.de>, Nathan Chancellor <nathan@kernel.org>, 
  Nicolas Schier <nsc@kernel.org>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
  David Howells <dhowells@redhat.com>, 
  =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1773005045; l=1749;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1773005045; l=1377;
  i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
- bh=HwLfblw+VRZLHJdgjzQhIHg+sRaFcsc1K0c5qr+oBMY=;
- b=DIDGAfWpVSn7G2ouaCJofvVSnkFxYDIZQRSGfJxtScz56ikvQv5mWzrSigzV14hjhZO7nYBMm
- ZwakK5g3dZBAJ1ckmGOzCa8S+WqZ8s3ZQkMEO5YQdiN6bVsYie877+7
+ bh=9Ck8dKyO7rN5xpHErcHVSmjccYdqlZTzMQl/61jnnK0=;
+ b=BfRF2ak7oQAIdpnRDfBMFku8evXi1Dk1JvvgVI2uTjXZklTxlxARhkSLXmRL8qGliCnT0w4Rr
+ yn7vxAOOH+7B2bVlJNvRbs8tYQAd9+1+XQ0F+CFuOLsQJ6CaUiWoO0O
 X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
  pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 
-When building User Mode Linux SRCARCH is set to 'um', while the actual
-underlying architecture is provided in HEADER_ARCH.
+C++ language requirements differ from those of C.
 
-Allow the exclusion lists to work on UML by comparing against
-HEADER_ARCH when that is available.
+Also test the headers against C++ compilers to make sure no errors
+creep in accidentally.
+
+There was a previous attempt by David Howells[0], but today with the
+existing UAPI testing infrastructure the implementation is a bit nicer.
+This series does not derive from David's, as I found it only after
+writing my patches.
+
+[0] https://lore.kernel.org/lkml/nycvar.YFH.7.76.1809052120510.24932@n3.vanv.qr/
+
+This depends on my other series "kbuild: uapi: remove usage of toolchain
+headers", which is currently in kbuild-next-unstable.
 
 Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
 ---
- usr/include/Makefile | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+Thomas Weißschuh (5):
+      kbuild: uapi: move some compiler arguments out of the command definition
+      kbuild: uapi: move all include path flags together
+      kbuild: uapi: handle UML in architecture-specific exclusion lists
+      kbuild: uapi: provide a C++ compatible dummy definition of NULL
+      kbuild: uapi: also test UAPI headers against C++ compilers
 
-diff --git a/usr/include/Makefile b/usr/include/Makefile
-index 74f5ba24bb29..edeaf9d778c4 100644
---- a/usr/include/Makefile
-+++ b/usr/include/Makefile
-@@ -7,6 +7,7 @@
- # -std=c90 (equivalent to -ansi) catches the violation of those.
- # We cannot go as far as adding -Wpedantic since it emits too many warnings.
- UAPI_CFLAGS := -std=c90 -Werror=implicit-function-declaration
-+UAPI_ARCH := $(or $(HEADER_ARCH),$(SRCARCH))
- 
- override c_flags = $(KBUILD_USERCFLAGS) $(UAPI_CFLAGS) -Wp,-MMD,$(depfile)
- 
-@@ -48,11 +49,11 @@ no-header-test += xen/privcmd.h
- 
- # More headers are broken in some architectures
- 
--ifneq ($(filter arc openrisc xtensa nios2, $(SRCARCH)),)
-+ifneq ($(filter arc openrisc xtensa nios2, $(UAPI_ARCH)),)
- no-header-test += linux/bpf_perf_event.h
- endif
- 
--ifeq ($(SRCARCH),sparc)
-+ifeq ($(UAPI_ARCH),sparc)
- no-header-test += asm/uctx.h
- no-header-test += asm/fbio.h
- endif
-@@ -122,15 +123,15 @@ uses-libc += linux/wireless.h
- uses-libc += regulator/regulator.h
- uses-libc += scsi/fc/fc_els.h
- 
--ifeq ($(SRCARCH),hexagon)
-+ifeq ($(UAPI_ARCH),hexagon)
- uses-libc += asm/sigcontext.h
- endif
- 
--ifeq ($(SRCARCH),nios2)
-+ifeq ($(UAPI_ARCH),nios2)
- uses-libc += asm/ptrace.h
- endif
- 
--ifeq ($(SRCARCH),s390)
-+ifeq ($(UAPI_ARCH),s390)
- uses-libc += asm/chpid.h
- uses-libc += asm/chsc.h
- endif
+ usr/dummy-include/stddef.h |  5 +++++
+ usr/include/Makefile       | 47 ++++++++++++++++++++++++++++++++++++++--------
+ 2 files changed, 44 insertions(+), 8 deletions(-)
+---
+base-commit: c14d8386b0a38d45a4345f556d6491be3594cf8e
+change-id: 20260223-kbuild-uapi-c-18002c9d7ca3
 
+Best regards,
 -- 
-2.53.0
+Thomas Weißschuh <linux@weissschuh.net>
 
