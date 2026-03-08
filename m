@@ -1,89 +1,206 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57AB330E838
-	for <linux-kbuild@vger.kernel.org>; Sun,  8 Mar 2026 04:44:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC6D533F365;
+	Sun,  8 Mar 2026 16:46:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772945050; cv=none; b=GpESJc9Y/XGbt+mI7xNBotVuADLB2xZcpfHfBRnG5gGbom6JNGq9/ZwrfL0+qnpH1uDvZnR7BaW8/axqH8scsYz7VKmijcdf3Tc3e1QRjC3czParVB4UuTN2O5yzhyIgk2gTLphkiApP+wdm7Src0NjhnQGkkuVkMTKrhmJohbs=
+	t=1772988403; cv=none; b=jb99BPas1OjJWk1Tl9tEWG5emmHELzsm/tHxF0WEQW3yzy9fJoN3F/A5SvANA3QPn21pamQtUuoefo7m4ugh5dLDaROcgrNIu5P4TRMCYY4XJ4GzeunvErvLxsQ73xXIQV5iJ4qj6Ze5Ec7VXuYc4wWY5rtdyiTepP6xz1LdJEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772945050; c=relaxed/simple;
-	bh=BEPY31XRopedaqNS7+wBx1nQfYh0wICaNLCuQ20sGnQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YmKyF+zpHnGwFGs3BlmJl0txitNjDw0BtoStmRSrQ4B4JbA41QmrUmXAGAjiKNR9aTl7wF6ksYNdGzZCHDLqHwlO08FTWTv2u1mJHhjf3W5yFMaOnE659ZlOerK2wWbronguDcVkBDQ7xxrT72RKbe1zEsN81/a2pW+KDIyt8MA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jEiPsGH4; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jEiPsGH4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772945048;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=/tzKUblCF0tURXVep2oartxcy+yFAJCSL7GUTKu5zcA=;
-	b=jEiPsGH4riJeGyyhLwrTyRj37mSwvL069TGoJZuubK1MH5NA2NpYGJeubLlRxFzf8uOUaj
-	NPj/Jwg3lbDYhl8EMfuG7eTowwBj5et9yxVbaxrW5E8aMvifa1fMjt7Ztw9kUeS7DYISW/
-	iyDOfY18O53ictrA51CZzFPlCh7+7sk=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-571-MYFZZZJDPJqpiC_0NNJUBg-1; Sat,
- 07 Mar 2026 23:44:03 -0500
-X-MC-Unique: MYFZZZJDPJqpiC_0NNJUBg-1
-X-Mimecast-MFC-AGG-ID: MYFZZZJDPJqpiC_0NNJUBg_1772945041
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 91D1E1956089;
-	Sun,  8 Mar 2026 04:44:01 +0000 (UTC)
-Received: from cmirabil.redhat.com (unknown [10.2.16.11])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1E4DB30001BE;
-	Sun,  8 Mar 2026 04:43:59 +0000 (UTC)
-From: Charles Mirabile <cmirabil@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: Charles Mirabile <cmirabil@redhat.com>,
-	linux-kbuild@vger.kernel.org,
-	masahiroy@kernel.org,
-	nathan@kernel.org,
-	nicolas.schier@linux.dev,
-	stable@vger.kernel.org
-Subject: [PATCH] Delete .builtin-dtbs.S when running make clean
-Date: Sat,  7 Mar 2026 23:43:30 -0500
-Message-ID: <20260308044338.181403-1-cmirabil@redhat.com>
+	s=arc-20240116; t=1772988403; c=relaxed/simple;
+	bh=Tc0lndhA3qp3WkqrTPnPBNSk6pyPwX6QhyRxTEiuDnY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=FosQ8wCT7wwtrY3PpCbs489LROsLsiL7cJqFYjQ96PbzVszPZqmoCTKy68FC47lh7Jm/fqW3fy8nu0dm3ZoAohyr68XZInpovAiakcUCJKyOyCwVgXU1a5sKWNmoKE2d8MY1Ds3ozu7V5M3x/gPAGoYazNva6kaXHKP8bQVG5aU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B651D1758;
+	Sun,  8 Mar 2026 09:46:26 -0700 (PDT)
+Received: from e132581.arm.com (e132581.arm.com [10.1.196.87])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D8B843F694;
+	Sun,  8 Mar 2026 09:46:24 -0700 (PDT)
+From: Leo Yan <leo.yan@arm.com>
+Subject: [PATCH v3 00/30] tools build: Append -fzero-init-padding-bits=all
+ option
+Date: Sun, 08 Mar 2026 16:46:05 +0000
+Message-Id: <20260308-tools_build_fix_zero_init-v3-0-6477808123b7@arm.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-B4-Tracking: v=1; b=H4sIAM2nrWkC/42NXQ6CMBCEr0L22Rq6KjY+eQ9Dmv6ssgm0pEWiE
+ u5u5QQ+fpOZbxbIlJgyXKoFEs2cOYYCh10FrjPhQYJ9YcAamxrxKKYY+6ztk3uv7/zSH0pRc+B
+ JeHfCRlqvrLJQ9mOiUtjct7Zwx3mK6b1dzfhL/7HOKKSw0jin5NnUkq4mDXsXB2jXdf0CBGiwx
+ cAAAAA=
+X-Change-ID: 20260224-tools_build_fix_zero_init-dc5261bd8b8b
+To: Arnaldo Carvalho de Melo <acme@kernel.org>, 
+ Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>, 
+ James Clark <james.clark@linaro.org>, Kees Cook <kees@kernel.org>, 
+ Quentin Monnet <qmo@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+ Nicolas Schier <nsc@kernel.org>, 
+ Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, 
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+ Daniel Lezcano <daniel.lezcano@kernel.org>, Zhang Rui <rui.zhang@intel.com>, 
+ Lukasz Luba <lukasz.luba@arm.com>, Peter Zijlstra <peterz@infradead.org>, 
+ Ingo Molnar <mingo@redhat.com>, Mark Rutland <mark.rutland@arm.com>, 
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
+ Adrian Hunter <adrian.hunter@intel.com>, 
+ Masami Hiramatsu <mhiramat@kernel.org>, 
+ William Breathitt Gray <wbg@kernel.org>, Barry Song <baohua@kernel.org>, 
+ Qinxin Xia <xiaqinxin@huawei.com>, Bartosz Golaszewski <brgl@kernel.org>, 
+ Kent Gibson <warthog618@gmail.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+ Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>, 
+ Jonathan Cameron <jic23@kernel.org>, David Lechner <dlechner@baylibre.com>, 
+ =?utf-8?q?Nuno_S=C3=A1?= <nuno.sa@analog.com>, 
+ Andy Shevchenko <andy@kernel.org>, 
+ Andrew Morton <akpm@linux-foundation.org>, Willy Tarreau <w@1wt.eu>, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>, 
+ Josh Poimboeuf <jpoimboe@kernel.org>, Robert Moore <robert.moore@intel.com>, 
+ Len Brown <lenb@kernel.org>, 
+ Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, 
+ Tejun Heo <tj@kernel.org>, David Vernet <void@manifault.com>, 
+ Andrea Righi <arighi@nvidia.com>, Changwoo Min <changwoo@igalia.com>, 
+ Mark Brown <broonie@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
+ Gabriele Monaco <gmonaco@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+ Jiri Kosina <jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ llvm@lists.linux.dev, bpf@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+ Leo Yan <leo.yan@arm.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1772988384; l=5429;
+ i=leo.yan@arm.com; s=20250604; h=from:subject:message-id;
+ bh=Tc0lndhA3qp3WkqrTPnPBNSk6pyPwX6QhyRxTEiuDnY=;
+ b=/7RyLMM/efjUgseU6DFkghtJCkFtN/T0ka5j+jiiuEp7Td6vOngRngWVLncOqQAI8NGl1uWn0
+ sttzYZ4XOv0DoeW3cBuiqE34X3ALthVmG/knEHLBCH7w5mvdla4NVBx
+X-Developer-Key: i=leo.yan@arm.com; a=ed25519;
+ pk=k4BaDbvkCXzBFA7Nw184KHGP5thju8lKqJYIrOWxDhI=
 
-The makefile tries to delete a file named ".builtin-dtb.S" but the file
-created by scripts/Makefile.vmlinux is actually called ".builtin-dtbs.S".
+GCC-15 doesn't guarantee that a {0} initializer clears the whole union [1].
+This may cause bugs if data is not intialized properly.
 
-Fixes: 654102df2ac2a ("kbuild: add generic support for built-in boot DTBs")
-Cc: stable@vger.kernel.org
+The kernel enabld the -fzero-init-padding-bits=all option to tackle the
+issue, which was merged in commit dce4aab8441d ("kbuild: Use
+-fzero-init-padding-bits=all").
 
-Signed-off-by: Charles Mirabile <cmirabil@redhat.com>
+This series propagates the same flag to the tools build.  It uses
+tools/scripts/Makefile.include as the central place to add the
+option to EXTRA_CFLAGS and HOST_EXTRACFLAGS for the CC and HOSTCC
+compilers.  Each project under tools/ appends the variables as needed.
+
+The variable name HOST_EXTRACFLAGS comes from kbuild conventions (see
+Documentation/kbuild/makefiles.rst).
+
+This series is divided into three parts:
+
+  Patches 01 – 04: Preparation before adding the new compiler option.
+                   These patches adjust Makefiles to ensure the newly
+                   introduced option does not cause regressions.
+  Patch 05:        Propagate -fzero-init-padding-bits=all to
+                   EXTRA_CFLAGS and HOST_EXTRACFLAGS for the
+                   CC and HOSTCC compilers, respectively.
+  Patches 06 – 30: Apply EXTRA_CFLAGS and HOST_EXTRACFLAGS in
+                   project Makefiles.
+
+The change has been verified:
+
+Test 1: cross compiling perf with aarch64 GCC-15.2 [2]:
+
+  ARCH=arm64 CROSS_COMPILE=aarch64-none-linux-gnu- \
+       make LDFLAGS="-static" -C tools/perf VF=1 NO_JEVENTS=1 \
+       DEBUG=1 V=1 NO_LIBELF=1 NO_LIBTRACEEVENT=1
+
+Test 2: native selftest build on Arm64 machine:
+
+  make -C tools/testing/selftests TARGETS=hid SKIP_TARGETS="" V=1
+
+[1] https://gcc.gnu.org/gcc-15/changes.html
+[2] https://developer.arm.com/-/media/Files/downloads/gnu/15.2.rel1/binrel/arm-gnu-toolchain-15.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz
+
+Signed-off-by: Leo Yan <leo.yan@arm.com>
 ---
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Changes in v3:
+- Extended to support cross compilation (Quentin).
+- Link to v2: https://lore.kernel.org/r/20260224-tools_build_fix_zero_init-v2-1-b1acc817a01e@arm.com
 
-diff --git a/Makefile b/Makefile
-index d763c2c75cdbf..4d2a9d938f713 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1578,7 +1578,7 @@ CLEAN_FILES += vmlinux.symvers modules-only.symvers \
- 	       modules.builtin.ranges vmlinux.o.map vmlinux.unstripped \
- 	       compile_commands.json rust/test \
- 	       rust-project.json .vmlinux.objs .vmlinux.export.c \
--               .builtin-dtbs-list .builtin-dtb.S
-+               .builtin-dtbs-list .builtin-dtbs.S
- 
- # Directories & files removed with 'make mrproper'
- MRPROPER_FILES += include/config include/generated          \
+---
+Leo Yan (30):
+      bpftool: Avoid adding EXTRA_CFLAGS to HOST_CFLAGS
+      libbpf: Initialize CFLAGS before including Makefile.include
+      tools: lib: thermal: Initialize CFLAGS before including Makefile.include
+      tools/thermal: Initialize CFLAGS before including Makefile.include
+      tools build: Append -fzero-init-padding-bits=all to extra cflags
+      bpftool: Append extra host flags
+      perf build: Append extra host flags
+      tools/bpf: build: Append extra cflags
+      tools build: Append extra host cflags
+      tools build: Append extra cflags for feature
+      tools: bootconfig: Append extra cflags
+      tools: counter: Append extra cflags
+      tools: dma: Append extra cflags
+      tools: gpio: Append extra cflags
+      tools: hv: Append extra cflags
+      tools: iio: Append extra cflags
+      tools: mm: Append extra cflags
+      tools: nolibc: Append extra cflags
+      tools: objtool: Append extra host cflags
+      tools: power: acpi: Append extra cflags
+      tools: power: x86/intel-speed-select: Append extra cflags
+      tools: sched_ext: Append extra cflags
+      tools: spi: Append extra cflags
+      tools: tracing: Append extra cflags
+      tools: usb: Append extra cflags
+      tools: verification: Append extra cflags
+      selftests/bpf: Append extra cflags
+      selftests/hid: Append extra cflags
+      selftests/nolibc: Append extra cflags
+      selftests/sched_ext: Append extra cflags
+
+ tools/bootconfig/Makefile                      |  1 +
+ tools/bpf/Makefile                             |  1 +
+ tools/bpf/bpftool/Makefile                     |  9 +++++++--
+ tools/build/Makefile                           |  6 ++++--
+ tools/build/feature/Makefile                   |  2 ++
+ tools/counter/Makefile                         |  1 +
+ tools/dma/Makefile                             |  1 +
+ tools/gpio/Makefile                            |  1 +
+ tools/hv/Makefile                              |  1 +
+ tools/iio/Makefile                             |  1 +
+ tools/include/nolibc/Makefile                  |  2 +-
+ tools/lib/bpf/Makefile                         | 16 ++++++++-------
+ tools/lib/thermal/Makefile                     | 16 ++++++++-------
+ tools/mm/Makefile                              |  1 +
+ tools/objtool/Makefile                         |  2 ++
+ tools/perf/Makefile.config                     |  2 +-
+ tools/power/acpi/Makefile.config               |  1 +
+ tools/power/x86/intel-speed-select/Makefile    |  1 +
+ tools/sched_ext/Makefile                       |  1 +
+ tools/scripts/Makefile.include                 | 28 ++++++++++++++++++++++++++
+ tools/spi/Makefile                             |  1 +
+ tools/testing/selftests/bpf/Makefile           |  1 +
+ tools/testing/selftests/hid/Makefile           |  1 +
+ tools/testing/selftests/nolibc/Makefile.nolibc |  3 +++
+ tools/testing/selftests/sched_ext/Makefile     |  1 +
+ tools/thermal/lib/Makefile                     | 16 ++++++++-------
+ tools/tracing/latency/Makefile                 |  1 +
+ tools/usb/Makefile                             |  1 +
+ tools/verification/rv/Makefile                 |  1 +
+ 29 files changed, 93 insertions(+), 27 deletions(-)
+---
+base-commit: 4ae12d8bd9a830799db335ee661d6cbc6597f838
+change-id: 20260224-tools_build_fix_zero_init-dc5261bd8b8b
+
+Best regards,
 -- 
-2.53.0
+Leo Yan <leo.yan@arm.com>
 
