@@ -1,93 +1,93 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDB2C33B974
-	for <linux-kbuild@vger.kernel.org>; Mon,  9 Mar 2026 18:04:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DE3527467F
+	for <linux-kbuild@vger.kernel.org>; Mon,  9 Mar 2026 18:06:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.177
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773079487; cv=pass; b=Nktkr1rJhrN4+AIm7PzUqRfeXJT9cufvbhleUhD6pB3Q8eteU/9bhrGbxNozDeVmIBuGnVpw5+09W7j6eBLL9FSQAPf3eatFWIjBujxyjjceusE/lnK1wRe3Yqlgcw4CMV57HhoIiDBzKMaeSHGdo6ZmX5+RodsFUAdBQSShpXM=
+	t=1773079573; cv=pass; b=b56R2h1in6O6BZBbhdBaqenfCMD/KzX6I4YfDFGRqteHBButdRJWKZaKfbUVdnAi0hMQczz8Ad5hxmWSpbUe4XCKsD1PKbbW2L8wxbaT6w+vd5iBLgW/hTGdOZPb4lW8v/io6Ta5UJYvI7ZuDaNFbPNFDP+olsiO+M64sAbnmb8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773079487; c=relaxed/simple;
-	bh=npXWJ1Ogp4AocCs7RB8Gmks+wTJjIc4kyHvjbnfQFFo=;
+	s=arc-20240116; t=1773079573; c=relaxed/simple;
+	bh=42c9ZH1wrf48IJ9g6TUsDx3jUDNj6OlA/w9q9LS4OsQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mJNlT2CULDxwxNjRGbk5DMQtObJsUN+kfsFOCP5QCITxnqWnWq80nayEXDQgYM8aoFGHhwQ9dV3ojry/5tKvqwxRHcmudz5kAggbxYsoEOYTQhtKSnW/j//+jlPMZEPaAIK9J5/ljjZxVh7K+Ww+br+1r0UPPdFqDkKCBsu94pA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CCQexuhY; arc=pass smtp.client-ip=209.85.214.178
+	 To:Cc:Content-Type; b=f1VYqnBYNL7DURIRtLzAp7bffh0dO71do+zsNgBcbiKp/2FqIYQug0lWW7ReX7U4iZIFrF3aMdT8bjPRzKrIp3Sri+CVumPFpDkuWxdp8ujlSCB9b8TTvUaokohBVPpUXtD9I3nDOP0VApQ9CRvWMcDFsT0zLVGugs5YOFUgWqU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3lqW/qjJ; arc=pass smtp.client-ip=209.85.214.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CCQexuhY"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2ae4b40999bso17075ad.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 09 Mar 2026 11:04:46 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773079486; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3lqW/qjJ"
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2ae4b40999bso17435ad.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 09 Mar 2026 11:06:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773079570; cv=none;
         d=google.com; s=arc-20240605;
-        b=e0d6WBqdOFtPps400n3aL2FsKRXRfntSKSpH7VK+7VZ2TnALud0U0GQE+IZDcjvpjy
-         A5xEBRHIrgqtnXxYtXFW2uOwdClvyutkdKOB/cnL+LE/xf9wfimoY+WW4xFpm14JnSNZ
-         Lk7naPp0fvS7QvHgd5dD0Gr3pJGQ9k6Az98VB8ZtE0WGHc0RUvTRcI7VRUaGU6RN9zem
-         kaNg1XaEe8QyZoFmnUnJYZJHGe1S8cQWprZUzxWDbYUQtPJjjOLPZt8Aou1lii82JK8u
-         gS/Dzz3AHWaCdpZNJJS9HBohCI4a0rxzXIGo9HaPBGkdw1Nmb4ha0fKQofGtHq1G1pZ0
-         1HeQ==
+        b=QIO1qD+qWNolnWafpZL97oGHSkFLfXzRHxmVozbR5y/UzflcvCKaQl1WKbXGInOpJS
+         AazbgLG24+qtwUXQP9hcgDtECfQD00NJO0Xg1i+7S2du2TLbmxRgU+4r0jel3pqWAfMs
+         3w6t70tDUAhAydyF1o7YCtbrlr2AopaV3cGgV04AlWmKmsyHQWFBr682qFCXuVmm/Zm2
+         gFvxX/ZdPAyzc88PdbQniClJyg6nBTtHGT4+rSxZ0tMwSI3JWkV2lzvG6v7Du1Ds2nmD
+         fbRpqzqODIA+qQCPzrzQSNx/mE8qc750Gq7UJWbDtcajTNusl3hg7FUWQc7sflj/4oel
+         Tz1g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=DBqxxD+S7Du6uUzPbzqvi9ezyRX+g2oywK0VLlpuaLI=;
-        fh=NMybpmwUTdmMVFyoGq6XpDAm3YHVitYGXWbuwi6KtJo=;
-        b=T8BZCL3GyO/BLQdi5A51qLcfxgw28CM+lHEcW4AENx7kqnk2pj37IdsgMuCYf9iSlS
-         wNd9RtOHdwcsRcYDCiretMz3tRNvBAh9rYA6ijcC4Xn8+gz3xoUILSlXEP3yziTjK6dF
-         2rRFaKx8E94FDouR0Bhphm8p4KiFzbCbLztJ+KPG2ry+CSznrRH24qmGzyDEa0e7jHAG
-         OCd1FAM52lTkjiSwEsbAsVOho2J8xDxSBQAegXBabMVWkPfujt9pAZ4AH7FIpJOEO73u
-         DqjmYIbZkvURkGYdYHgdRx3S+7UKrTaVN5k6ZRjDxjcHhlOti3qfN+o9NtsTlFzYtDUe
-         pM/Q==;
+        bh=a8XdeGKgfNmQ0ihM13m4/+pDXEjwuXh/6MDXE3f2Ssk=;
+        fh=W/KZ1iTsdqDqiKnzOEK8mU3MhRvcwADoLiCM9/SFfYw=;
+        b=JOChal3bojKNAwO2iXhH6wbMaA1YAA84O7KTGJX5CNKDqUwvMV86PYBqiV3ASP6tBO
+         NY2wkqP7oTriOZSrJVTu8lEUT0ayRPj1sEIPKBpt0l+4w/Fbl/ccxqI7IBA97Bs3hMvg
+         QTS90TuoBd+Ym07az4q93FfnWQep4832BCTjo6DHfT7Z3RnxoiiCv0isAgHh88RAqI0v
+         U5nclSNQwA+BLphkWFzJ/ym1+GYkRgSl0o9yGPJiPqvbYXhk0lvSp+j5nsozSK2eSEwm
+         CWlyQVpNg0pe8CQZVKHZqyJnN8pXazlgzkPWUIt/I5tFanNuB8TLyJE2TaHM4QYXFmfF
+         B02g==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773079486; x=1773684286; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1773079570; x=1773684370; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DBqxxD+S7Du6uUzPbzqvi9ezyRX+g2oywK0VLlpuaLI=;
-        b=CCQexuhY4mc0JNj/a+moQm6hEV4Wx3OgS2MBtGCSp414fB7iumYRo3723/Ern8tROb
-         N3XwEYgq4zCaoQOm+9JkoZQATuuWNrVXeU2a+i1rdoBCeD4rdav13LVyRmm7fal1kjQ3
-         pLw422X7Th5P81JlLXQL3LI7yFatTG7RX4YIGJICZ3J5gJAhvqGb2lO3ht+fYIz2tTS/
-         DQIUVmOKoNQNZYHGFxJb1HgwG12jjx2jiCjjRfkHgULgtExj0b4IpClbgAHEM1+lYbrq
-         7hYdgVOvDZKCJTqRUlupKGLdIHwJrv5XslxWDtY87pzhFyFDMUFUk2JyS2x39flw9z7T
-         actQ==
+        bh=a8XdeGKgfNmQ0ihM13m4/+pDXEjwuXh/6MDXE3f2Ssk=;
+        b=3lqW/qjJ/A40fgCTjx+nk1JEN4FD2Iejutu4MU5MSH7QIu9fUP5EzC6c22S5eiLWoA
+         fIPC/+TAB4YVfQl4Ag+xsG9JgbEf4aGTh7cPhdLuL7A+9DRwZuHvTYmYqLcQiujE4VNL
+         B0RusBXunN0H6DY5ingObMA09KqUhKP7RwJ65c8SRtBu0xcS9qLIaMew4N0tg5JJQzv6
+         MUmRdiIiE1Vng3/5S5vZDO+SEfqoDPqzC0b44j1P1XBWXSlNAbpx/G+U6oS6M28eGFCO
+         xYs8cUYQeNcpM4ngkyzKJdIfCIdhU4ZJcuXOkob39fc3P25eREVwoYrVHMKuU9WEwU64
+         LXGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773079486; x=1773684286;
+        d=1e100.net; s=20230601; t=1773079570; x=1773684370;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=DBqxxD+S7Du6uUzPbzqvi9ezyRX+g2oywK0VLlpuaLI=;
-        b=mvk1DZr/9WU0pi5OGAlumolZQGEadC9yq5MeRN3Tb12mAMFI4UZvllwkioZ4/2oYoc
-         hDggr3CWx57jEsZ+9Y+DYijrakD53C/A2biWNtXt/9l6DrDhZK4o1iQueuFJ5YtREBQN
-         oW6WFQx/xexBht0A3ZeP3A1XF2LwSZsphNW3ejbsRx//shRjrayeabQHHKd5gCBdm7u7
-         vtVKS1akaGow3xQlo39a6AJXXBSSZtVjpzQoMk52E6PmGGcx+QL9QvwWyF32Ma3tMLbd
-         AG5gBpKf142m0gkuAZ8PQG5GrrmlZOpIXn5xkUWLEINtCP1cnoGnWfyJgUu590H8XMEw
-         Vlug==
-X-Forwarded-Encrypted: i=1; AJvYcCVEl5090OJck8fQj34WNMq8KPrJiesErtp8Xb80Q15ZQrtmUpreXkgmxvuZzT1XK4/GlMsvVsauZ3llT1w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSG4w8QDv1MqB6qE6b6g0Vxn1MxiWIpWLeVlB3DEvDyhAJT/BN
-	BgM0zXZurJ7MW6nbZyo/gXpcDnu3dpMPJHuf7L5tLI/bKJwjUpy8do2TtMvZRDZJd+o3XByncJd
-	NaZNFHkFbqlLlmzIyUYsqpsFAboHpCzljYNlbo5CD
-X-Gm-Gg: ATEYQzyCa6uc7aY5e1u0Lr02SygXeCH83gwMeJDD4I7AYX37A/YIttc17CdUpfwu4+E
-	klX8v8mJfozheC+tfO0BDtwZmQCouP457vGaiZzWg32Qo80598FjnhDMMWhR4wqfc624TKlB9nm
-	Qf2/qVTddmuy8PQ4M6scZLus9w3GFlk5rnSpLHMrZxNHPTtvVNK0AJdeCVwiUhNJjPMJyehT7VE
-	Tif/yX3t+n/xihcCC+5E7jA887YB6FPEeM+A+u+IDyysaaDnGB/EtaopjKxJEA/K7haaBS42Bzx
-	lMjA3mugHvBdKtFCRVoLqGbSw3NkrBzvOIc=
-X-Received: by 2002:a17:902:ebd2:b0:2ae:45bb:bc4e with SMTP id
- d9443c01a7336-2aea30ebe48mr266065ad.24.1773079485553; Mon, 09 Mar 2026
- 11:04:45 -0700 (PDT)
+        bh=a8XdeGKgfNmQ0ihM13m4/+pDXEjwuXh/6MDXE3f2Ssk=;
+        b=RVVuhXSQhU7wUg/2P8MSHKgIKFKXjmyGgk+/FYJAv7JU73ss9lDlL1pl6ZM/TMzX/H
+         LHXo2Nb82wBKi7TybH8sP+rtQIMAtN84MXRzmFpkIODWnVk9cTpa0Qput+nGjlCSn0AF
+         sLX8VNWmr4TL706K65gTN+pJ6iNwLD/nFfEi4FUr5J9o/Ygkeayw9IyJpW30zCLTibEG
+         VrdgS0f7op1ddaMR8OV7LX6YYXVj0tKst6ogd8rEpwRFrhd5TzL5T87EXrLdn/ft+IcZ
+         fnQlSq70pheiTEV8ue6Q2bNlwxL94V58J84jEEHXeJJPF7HKvVdx3Yl44gmHC4lLbjGz
+         3yaA==
+X-Forwarded-Encrypted: i=1; AJvYcCViznDlSLv6MopqpcvqJKo4ZK1daI6PrST5UKUEEaGNC4QZAGOS0ZK08dqSyxFAlqVEBgG/nyoK2wYNcoQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwB+rtZX47TmyCn9VxQ4UwaIq9WD0G+rTe9EDxPBbFNqcmrNtOR
+	RMqZs2NJW0VM0Y5M9wytjPZ9FoxleOG/ILf2xoM8pW2Ac3bxHdiNwLS7mdbjmh5yMcRiCj9gRNp
+	IlNckS8fa+QzsNEIkDfXH/ZvHbAWKBPbQM6Y0UysO
+X-Gm-Gg: ATEYQzy8SQBHuSGYxpNl8U+xGyhXaLWlum1+LugrnjufqQty2o55Md0cN1/tUpDvmlD
+	UAxx0TE5WABjgktXRMnScalDdqq3P/ss20X4snJZ2bpngwuHppppi7p01gp7nWF5THT8kBe1NsB
+	+bkDwFGJutteEt0tumY+Lu6HqmgTmtMC0mh/TJ7IrzW049Q7Qk44D/pDQ8AunscpbJkedEGU2KN
+	ZtjbiAXgNx0ebrkK8rMZrVm2hjdCx4hCujIFJ/he8pjclYq/RXk3PP02ybpEoSnajOmK92vK+JO
+	Q7d+uM41zgCVVih07Ll3w+b4se1a3BDgKu1QH0uQb7NBJQ==
+X-Received: by 2002:a17:902:aa85:b0:2ae:8039:fcb0 with SMTP id
+ d9443c01a7336-2aea3122a7cmr154565ad.5.1773079569456; Mon, 09 Mar 2026
+ 11:06:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260308-tools_build_fix_zero_init-v3-0-6477808123b7@arm.com> <20260308-tools_build_fix_zero_init-v3-25-6477808123b7@arm.com>
-In-Reply-To: <20260308-tools_build_fix_zero_init-v3-25-6477808123b7@arm.com>
+References: <20260308-tools_build_fix_zero_init-v3-0-6477808123b7@arm.com> <20260308-tools_build_fix_zero_init-v3-27-6477808123b7@arm.com>
+In-Reply-To: <20260308-tools_build_fix_zero_init-v3-27-6477808123b7@arm.com>
 From: Ian Rogers <irogers@google.com>
-Date: Mon, 9 Mar 2026 11:04:34 -0700
-X-Gm-Features: AaiRm50lc2gBLiSfkJ4Z4DE1wl9NNkgaEba7Sk-TcENnQ4sOXRAHypkvAN4AJdA
-Message-ID: <CAP-5=fVxSoN0EoWMG3BXAxrBxyaRaSOcgONcz-TCjn4=CTh0zg@mail.gmail.com>
-Subject: Re: [PATCH v3 25/30] tools: usb: Append extra cflags
+Date: Mon, 9 Mar 2026 11:05:58 -0700
+X-Gm-Features: AaiRm538eyfLQGrSYDrM92WeXq5PMuuL8X7tS3nLFN11znCK8k6pxl_hktQ-lc8
+Message-ID: <CAP-5=fVR6cTg4HU_DvK8sckgAqWw=HbgSGSdY9-prjb+TiOzbA@mail.gmail.com>
+Subject: Re: [PATCH v3 27/30] selftests/bpf: Append extra cflags
 To: Leo Yan <leo.yan@arm.com>
 Cc: Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
 	James Clark <james.clark@linaro.org>, Kees Cook <kees@kernel.org>, 
@@ -130,21 +130,24 @@ On Sun, Mar 8, 2026 at 9:50=E2=80=AFAM Leo Yan <leo.yan@arm.com> wrote:
 >
 > Signed-off-by: Leo Yan <leo.yan@arm.com>
 > ---
->  tools/usb/Makefile | 1 +
+>  tools/testing/selftests/bpf/Makefile | 1 +
 >  1 file changed, 1 insertion(+)
 >
-> diff --git a/tools/usb/Makefile b/tools/usb/Makefile
-> index c6235667dd46223b646bbab5c82c810221750182..db2ff5b8e5ab7b76e424df32e=
-d5a9458daa5d516 100644
-> --- a/tools/usb/Makefile
-> +++ b/tools/usb/Makefile
-> @@ -13,6 +13,7 @@ endif
->  # (this improves performance and avoids hard-to-debug behaviour);
->  MAKEFLAGS +=3D -r
+> diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftes=
+ts/bpf/Makefile
+> index 72a9ba41f95ebb825d25799c07ba3f0311243e45..29dfcdbe98c781b53f1e87dce=
+becf2027bafcd5d 100644
+> --- a/tools/testing/selftests/bpf/Makefile
+> +++ b/tools/testing/selftests/bpf/Makefile
+> @@ -49,6 +49,7 @@ srctree :=3D $(patsubst %/,%,$(dir $(srctree)))
+>  srctree :=3D $(patsubst %/,%,$(dir $(srctree)))
+>  endif
 >
-> +override CFLAGS +=3D $(EXTRA_CFLAGS)
->  override CFLAGS +=3D -O2 -Wall -Wextra -g -D_GNU_SOURCE -I$(OUTPUT)inclu=
-de -I$(srctree)/tools/include
+> +CFLAGS +=3D $(EXTRA_CFLAGS)
+>  CFLAGS +=3D -g $(OPT_FLAGS) -rdynamic -std=3Dgnu11                      =
+   \
+>           -Wall -Werror -fno-omit-frame-pointer                         \
+>           -Wno-unused-but-set-variable                                  \
 
 The append should probably happen last to allow the default values to
 be overridden.
@@ -152,9 +155,6 @@ be overridden.
 Thanks,
 Ian
 
->  override LDFLAGS +=3D -lpthread
->
->
 > --
 > 2.34.1
 >
