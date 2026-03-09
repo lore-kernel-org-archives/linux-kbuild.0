@@ -1,77 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FAB2362141;
-	Mon,  9 Mar 2026 06:49:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D5F73644C5;
+	Mon,  9 Mar 2026 07:56:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773038962; cv=none; b=B7+AmNz6X8Jej8OjJkQI37TW8srxZ03naSzdQ+kaInjc7KB/BULOW0qzvaC8EMOnBZyxIHNuZb+d69vhpcBGWw7Htte9Wy0C/FnkPVof/y/wOByVyvXPCZfWS0qDzP2oGjmZjO8Rj/Z5OKPTiV03EtwdxNECyc3o0Us3iL9QCtY=
+	t=1773043004; cv=none; b=OoAybckeg6o7WD8Bx1htjONOGxYvZgOlVtVDedfbyziFfTv6gnefJYYBN5VeUjydzTNuUNtBEL66FTkhazIIgGXhuw89Vbx6nerSxiE+3n7BohRgt3Gt0gGgAyg1dSL2Zv+AJvFHs4vcJJg+UEQAwR1r5Ka5wuVOwIM4cmIoCaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773038962; c=relaxed/simple;
-	bh=mBGAy+m59z4WIEXrNU6lVwn2ubiB5FyyhHyt/vKyIwQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Iln6jMmrEPQSx5ijIGvSf8Mga4IZvFAeavQGtnyczNTpsNvaOiheIy8DU7DkFRPReAStYQdGVUXmq3PqSyaYJwlPMhNzMaVDkhdH1IAj7mPvPrqVPH5N4wsvNFEx8eIt7O9gO1/F/01IQyidvDqBHZtSH41YJUjDO2kkAXuf40A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SAHCok30; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773043004; c=relaxed/simple;
+	bh=oxiQm3ysSjB86HMugJmEV+Zbw1IEqAlst55ORUBqRjM=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=hHOHYbq66Jm03Q3yhP/49lVG4e3HSc79EuzE4T+jG5hc1Z93MQYbgHLCikK+Y04OydAurcdkxlDcUNCo6kkaW34J18lVom60wAX83GEm3UhZgBsDRqV840xSJ//IC5uWXhbMYoQPm9LaF+FQ0UrxEqz/DKH3lafDv5KFf1Gqkuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GAIpuPAy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SAHCok30"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A789C4CEF7;
-	Mon,  9 Mar 2026 06:49:21 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GAIpuPAy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA84BC4CEF7;
+	Mon,  9 Mar 2026 07:56:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773038961;
-	bh=mBGAy+m59z4WIEXrNU6lVwn2ubiB5FyyhHyt/vKyIwQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SAHCok30el3I22tEqGLE1AsTFRcIxNAv18AGEYQTYGnuLynlmwQV37mqVXirUlEej
-	 z4I4v2lMrfd9uGw2WKlMubgUAX/oKqjPAYO0K5hKm6yXr25Y5FotuZ0D/r+YEkSdAM
-	 0EZY59yCS3qEnIhTmaI5ofWEtmyWNmIa2iEt45YWJ2h7IDT4in6/Z2FsGx8l0OqNn+
-	 gCQVwJ8jSVG5Qv5KjuL62+1sfKbp1nVDoJRB0C79e9WFAazt8pc1FLS/lNZQSYuPVI
-	 X+0LuwPPOLpnusHuaR0u/h3HuW/1BocPwfNrtCLot/ti//rWfPsZdw4Rp1z4IzG5jQ
-	 8a5GB68SEb+ag==
+	s=k20201202; t=1773043003;
+	bh=oxiQm3ysSjB86HMugJmEV+Zbw1IEqAlst55ORUBqRjM=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=GAIpuPAy/NrjX2GFj6cGB+KcsudSWCgms0x7go69KWek7dZCWcbAC7bKBLDWRpgzr
+	 MjedT5/CaFvJ108aXhZ/A+fPyHXUjyLxXRZBD6lVbsIU98V538YDw4t1XF7Fz6eJ+A
+	 qrFKk0GNyGJULKClAjOEyw9KwKVu5eQcyAHDEkBEkv2uWZehS1NWCBu64lVNinLIya
+	 Ry8ghlTX8SqBJYm6/ZF3VK2WMfrXGRM9ASTpBKqnYVJdQ7j08YDQpTyopJUDrcurAd
+	 rbZPb/rCEy7qXuqEEsAxBYHFRni9nclFBczXxZKhKjiiufAPwG3RGyV68IsGnKD4Tk
+	 IjKgSCINrgpTg==
 From: Nicolas Schier <nsc@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Nicolas Schier <nsc@kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-	Helge Deller <deller@gmx.de>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Kees Cook <kees@kernel.org>,
-	linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	loongarch@lists.linux.dev,
-	linux-parisc@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-s390@vger.kernel.org,
-	linux-efi@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: Re: [PATCH 0/2] kbuild: Switch from '-fms-extensions' to '-fms-anonymous-structs' when available
-Date: Mon,  9 Mar 2026 07:49:13 +0100
-Message-ID: <177303890212.240716.12941791284325631253.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260223-fms-anonymous-structs-v1-0-8ee406d3c36c@kernel.org>
-References: <20260223-fms-anonymous-structs-v1-0-8ee406d3c36c@kernel.org>
+Date: Mon, 09 Mar 2026 08:56:29 +0100
+Subject: [PATCH 1/2] kbuild: Mark usr_gen_init_cpio as no-dot-config-target
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -79,44 +36,59 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260309-move-gen_init_cpio-to-scripts-v1-1-0c5059b1ec5b@kernel.org>
+References: <20260309-move-gen_init_cpio-to-scripts-v1-0-0c5059b1ec5b@kernel.org>
+In-Reply-To: <20260309-move-gen_init_cpio-to-scripts-v1-0-0c5059b1ec5b@kernel.org>
+To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Askar Safin <safinaskar@gmail.com>
+X-Mailer: b4 0.15-dev-363b9
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1098; i=nsc@kernel.org;
+ s=20250924; h=from:subject:message-id;
+ bh=oxiQm3ysSjB86HMugJmEV+Zbw1IEqAlst55ORUBqRjM=;
+ b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBprn0zpDPjQqrNcMa7i8agXD/UCtmCyUynDRiq2
+ mEeF/AB8w6JAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCaa59MwAKCRAHUgpwFiYS
+ aZgED/0VQRcVtY9kLjf5KspmCrBdDAsBAM9it12R3PcHgs4DeCVYdBJUO8qP7OTtOlK3nq9wxzu
+ ywPZHYY/W0p6B/SYnfHbkWS0+DkEsOTBkELuTm55mYXcZ85Af6/eFrT4UGh63oCWkR6FuwquxRN
+ A5AFKJHhsifPZiRDFnKX0eb/wFMH34aRSR1Z5FYlYZ671z6BQZov+2Rdn6cuDp0bKreBqJY2aT1
+ gXCB9Uu1QE8+G3gPfPQD++wLMw7J5kKzpxVU0tKfDjEgMUI0J+y049I5wTKnhUjGNzU/pzNpSRK
+ /OMu0WFuZ1F/lv+B7/s7nx6UlfVy5E4sMpHbOXfyGkx/pKto5cj6ki3bvMuq+omKmjHNB1nBumF
+ 7AH7VZPpiRXJV8QIgCxaJurN81Lle3taOAvNAS0R2zyo6g6JWB4OnHAUIC3pcZiTWYQ/uhJpJ7W
+ pY2ghYia9vLMGwuMFzCC0hkektn4pOYc+RTTnVuF4M9ORQtW6cg1un2LGW5RCStHPLCOvoKA4E5
+ NtJyRxl4iIixWUEYiEvKpIT95JGceBZlb1H9gvceKoCV/jCYN9wiXVdDUnFM2HYO57l0iLnCkjE
+ hshSFjMZoRT2WMVh3MFpnbieFbDm40BPwIDi0OGDGzeOBTWSwXUMoNdhc/pXPFR6vZx3NhLBbYn
+ kvoZ6kYn5uhacHA==
+X-Developer-Key: i=nsc@kernel.org; a=openpgp;
+ fpr=18ED52DBE34F860EE9FBC82B7D97093255A0CE7F
 
-On Mon, 23 Feb 2026 12:10:27 -0700, Nathan Chancellor wrote:
-> The kernel enabled '-fms-extensions' in commit c4781dc3d1cf ("Kbuild:
-> enable -fms-extensions") in 6.19 to gain access to a Microsoft
-> (originally Plan 9) extension around including a tagged structure/union
-> anonymously in an other structure/union. Since then, Clang 23.0.0
-> (current main) has added a flag to enable only that extension, rather
-> than all Microsoft extensions, '-fms-anonymous-structs' [1]. Using this
-> narrower compiler option would have avoided the build error fixed by
-> commit a6773e6932cb ("jfs: Rename _inline to avoid conflict with clang's
-> '-fms-extensions'"). While these errors are not expected to be common,
-> using the narrower option when available has no drawbacks because the
-> kernel only cares about this extension in '-fms-extensions', no others.
-> While this could result in build errors for folks using
-> '-fms-anonymous-structs' if a developer uses another extension in
-> '-fms-extensions' (either intentionally or unintentionally), flagging
-> these uses for further scrutiny seems worthwhile.
-> 
-> [...]
+Let usr/gen_init_cpio be built also if there is no kernel configuration.
 
-Applied to kbuild/linux.git (kbuild-next-unstable), thanks!
+Askar Safin reported that gen_init_cpio may be of use before any kernel
+configuration is available.  Add usr_gen_init_cpio to list of targets
+that do not require a .config file.
 
-[1/2] kbuild: Consolidate C dialect options
-      https://git.kernel.org/kbuild/c/f3fead1c
-[2/2] kbuild: Use '-fms-anonymous-structs' if it is available
-      https://git.kernel.org/kbuild/c/c14d8386
+Reported-by: Askar Safin <safinaskar@gmail.com>
+Closes: https://lore.kernel.org/all/20260220191150.244006-1-safinaskar@gmail.com
+Fixes: f8e05c10631e ("kbuild: Add top-level target for building gen_init_cpio")
+Signed-off-by: Nicolas Schier <nsc@kernel.org>
+---
+ Makefile | 1 +
+ 1 file changed, 1 insertion(+)
 
-Acks and review trailers are still welcome!
+diff --git a/Makefile b/Makefile
+index e944c6e71e81..0e788ce45457 100644
+--- a/Makefile
++++ b/Makefile
+@@ -296,6 +296,7 @@ no-dot-config-targets := $(clean-targets) \
+ 			 $(version_h) headers headers_% archheaders archscripts \
+ 			 %asm-generic kernelversion %src-pkg dt_binding_check \
+ 			 outputmakefile rustavailable rustfmt rustfmtcheck \
++			 usr_gen_init_cpio \
+ 			 run-command
+ no-sync-config-targets := $(no-dot-config-targets) %install modules_sign kernelrelease \
+ 			  image_name
 
-Please look out for regression or issue reports or other follow up
-comments, as they may result in the patch/series getting dropped,
-reverted or modified (e.g. trailers). Patches applied to the
-kbuild-next-unstable branch are accepted pending wider testing in
-linux-next and any post-commit review; they will generally be moved
-to the kbuild-next branch in about a week if no issues are found.
-
-Best regards,
 -- 
-Nicolas
+2.51.0
 
