@@ -1,96 +1,242 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF67C364924;
-	Mon,  9 Mar 2026 07:56:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A29BE238C0A
+	for <linux-kbuild@vger.kernel.org>; Mon,  9 Mar 2026 08:41:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773043012; cv=none; b=tWV6RqxMzmZlqVyooRdP1Tb6z4cWT8uzbOhyH+18BSlc4X0MOt6B4KieiBjk1tqld4KyhqVLI+S9mIdd4Nh6aIPuy9uePMD/MY1IgtJ3tr1A+tPhqM5efbV5e66RFWWpRPgaq6XLRhXPUd3a0hTOfOHuDlzVrj+OfM3SyngoOdY=
+	t=1773045682; cv=none; b=Dx0p4M/WXAor5fB3QFtqqNEOkahJCswi8yYIAS2CRrZ8P3Z0LTuZXHseSyHjJm7lGaEaFaOXR/YCJL+BnQkucOzZ+GnbnuJw6NiicX9w9WD7zHr65kSD6mX8Kk7n5Tv5IZQS/eKwViKN1sNYjpuNwarj+kSlJTM9zPUc6y+Hw3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773043012; c=relaxed/simple;
-	bh=LdNQ3JN8g0by9MZoPIigvqjE791tW2nNAGImao5y4ao=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=CXFL9Ut+p+VDC7RyC7UpakfAkzfXztgooz0UAOsSO71W3520YZrlA5Ft6Y62zzWo5oLNtEuZLghEdHFBmsHGbugxhRfzHHQMBx6YRhZUE2oXj+BFhOZF+ks96f80ZJWK92B1M50R2UamKw9M0ydgjvufsDUS1rvUX5figGFLmrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OY5ugxVL; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773045682; c=relaxed/simple;
+	bh=QmC/1aZi1KMAI8qInvYmgDZW0GLqK+zvjW6rUzsfpMc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oXwnNEYPbwCGkflAjBeaHkFUBcAMAWHHVhdRGilajwaw+1JLfIJYdS+/+TCdhN2puWkdEG+FgtAmUCBtucD0SrqF/o4wyKpdBqDEDi51chHLc10IE3ZVfu3/avyArfzlsncPi84b4aUv7otG+GgwytiZfefw5VyJDXJsGbdupD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=SdsdnzuP; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=bQlbtZwo; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OY5ugxVL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11A48C19423;
-	Mon,  9 Mar 2026 07:56:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773043011;
-	bh=LdNQ3JN8g0by9MZoPIigvqjE791tW2nNAGImao5y4ao=;
-	h=From:Subject:Date:To:Cc:From;
-	b=OY5ugxVLPQHSPzGc6GwllIm2xgUeeoWwetxza0VIwTel3P5cU7BkAbdz4hMyUfH3c
-	 eU53+qCrxBCTCtZCqKWCyMb3zqG9OeIEc+Pu1eL2GK+kOJfXKy0/ihM6Aj5oEOS5hF
-	 RqdBSktkSkocyVjzG/+NzgL992g10Bfwp8nRHgWQSFud8CmyYBBnKdHsWXG0tMrfPk
-	 muIu135wCpTPP3c0btRS//CbfR9NCUYil5K+N5Xq5ar1IOFx2rzzTFW6mUQGTQVTYn
-	 cjbMwt5CK3U9vRnqo++t1X2/aYMwymhys6qfpogi9iT7fmwQjqNixsRuS5c9zISeqo
-	 zTnwPbTXkmf/g==
-From: Nicolas Schier <nsc@kernel.org>
-Subject: [PATCH 0/2] Move tool for generating initramfs cpio to scripts/
-Date: Mon, 09 Mar 2026 08:56:28 +0100
-Message-Id: <20260309-move-gen_init_cpio-to-scripts-v1-0-0c5059b1ec5b@kernel.org>
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="SdsdnzuP";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="bQlbtZwo"
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6298Wch12663851
+	for <linux-kbuild@vger.kernel.org>; Mon, 9 Mar 2026 08:41:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	xEa3WzuEsGwlSu+tKPUtbqO0QxG3vgk+PmyiHeY+Zck=; b=SdsdnzuPVbNbaNE+
+	W1d/LjZ27mcA+rlHb8qR7wYcsZhPHjwjUbo+SpJncaS3aMK/1HYPDbbI0LcwepaQ
+	30GJpjWD+PkJVv2pScUeOl5aWUQbl9z++HUSnRjG66CpBHebZOgbWCXdYicZd1It
+	iwM4OeGoSO5Xl9iKb5jKkifS8nh/lUEGu5E+EwK+Wacd6GAX+F3V/donu8lkQp0V
+	Sa/ijwZcGApL/bfuueQ3N31nGnyw7JJBY1ikDiYQZY3SGTL9vUy3rF514Nt+rcXp
+	nQK0esTLpI1LaVRUxRZwgsG7H5L+eXgLSMRKYF7M68zAJF2CCXXmvYJPvf6dc0u2
+	gnNa5w==
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cr9cpmvcs-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-kbuild@vger.kernel.org>; Mon, 09 Mar 2026 08:41:20 +0000 (GMT)
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-8cd7fec8d44so660403785a.2
+        for <linux-kbuild@vger.kernel.org>; Mon, 09 Mar 2026 01:41:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1773045680; x=1773650480; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xEa3WzuEsGwlSu+tKPUtbqO0QxG3vgk+PmyiHeY+Zck=;
+        b=bQlbtZwoYkK2UuwXiLhOB4YG+aekbjZkk8/6JPbtkTA8447mhi0St6zcOTbPPqwHWk
+         aBKkeqHx7RgKoOsmWVbrY+S4/A5bMifcnBYskgLrGd+8hP/UYBKrcxFb+/QInmpGiwM5
+         fbDoLbRfCtTLJb+7r0O37NTtXIQ9LD56Wb3v5OFFyYahpjxueVHKjbTj1WRrXuzW1egL
+         mN26aFUhDzAcOdMCtVQrG1lHxmO0SYg043OrYGSwuPkJx9ZtSLY5uWSIL9X+YXquBkGd
+         BW14wXNWIXOTYXVBzVonr0W9Atd6modCaBymlIhXvbMiVUcI9+LdCbo3gLcPU13JC6xC
+         b5Nw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773045680; x=1773650480;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xEa3WzuEsGwlSu+tKPUtbqO0QxG3vgk+PmyiHeY+Zck=;
+        b=mZPoT/3Nd9JWQhf+Yxyi/Az8GEizAp4fZOwK7sF1KJUe4i763Q9hiOvsv6obBk/Lbw
+         bat7WHC0H0RAgSK28VPYoUdfXWMbRchrcZXuF0hhbIIlPaWkhQu30vrlT2nbIBPwC4UW
+         p0aapEQqOh5HzL9S6cVJaUpVZftth5yJjbbNqp8q9IR59f/CKDlcPgyOHmvIWKar9RII
+         knfQoHxGGQ7aKh0HJT5RdXqst61VLZTKgziqTkjZgxN3iznAbI20eiww2l1HpuqcO1xL
+         fvKeCnnChMosIVorJ5ur4ikIydkNw3dX6KuftP49chrHmr/i8UL58+RM6QE8xbHjpqco
+         t0Ew==
+X-Gm-Message-State: AOJu0YwXtdeTsa3uhNgoE8X5eWpC+CjobYKRSXtLokgaE0DRFkEgwSzR
+	wEHoPumXMeTITJKwHUCf9coNjP0a8KeeRu7KIY2f34W+7xgEk5RPBniSg1mqBU0iTJ8rF50f+5Y
+	VY8qL+mtyBm9Z6bx6AfAWfj9v1iLiXN5W/8LUoQrVJaprROw5VDhMYyAoGXwF4VtcmJE=
+X-Gm-Gg: ATEYQzy3F+b7qwiuMuH7vVENR1dUnOs7xs6vOhx+POziXhfYiy4foAwZYuHy0ij5TKx
+	6ZFHVQ1emZHG895YK+KFHmp2snUrj/zI8rao46ywV8zFF0QWKGoGx6QrFiL0QZdyre04JPIMBQ0
+	q/pAyTeziIQE9PsNlevQBG4CbTPUxlu+4QXwwj6YScxlDrCSaQhVX4rH+j/lyPlMo2iNUiNBVm0
+	qVIuC5BScfPLdB4QnbxLnga1JGL85wRxyPFo4mfYyOYJQG3YFWLCllAbyIM1MQJ691ONIZ+A5oF
+	pFOuh9bccooifMb6KGh417uZZ4CSkow1nqEs9eRdYPmjK8uZRankDhAEsoS3ZDPqY5fveNzahCV
+	kobjHerGvIfmCsM+YIan7hHMsoDRlCVomun7Ts9/n/47v+rasORSVioqL6nPi+dUBlkN2N80+4w
+	nny3+yQ9/a
+X-Received: by 2002:a05:620a:1707:b0:8cb:b062:c2e5 with SMTP id af79cd13be357-8cd6d386908mr1323664185a.27.1773045679957;
+        Mon, 09 Mar 2026 01:41:19 -0700 (PDT)
+X-Received: by 2002:a05:620a:1707:b0:8cb:b062:c2e5 with SMTP id af79cd13be357-8cd6d386908mr1323656285a.27.1773045679422;
+        Mon, 09 Mar 2026 01:41:19 -0700 (PDT)
+Received: from ?IPV6:2a05:6e02:1041:c10:ae20:597c:99b8:d161? ([2a05:6e02:1041:c10:ae20:597c:99b8:d161])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4853a946978sm88693385e9.1.2026.03.09.01.41.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Mar 2026 01:41:18 -0700 (PDT)
+Message-ID: <2ae5e4e5-a860-4f94-9655-67368d558f86@oss.qualcomm.com>
+Date: Mon, 9 Mar 2026 09:41:16 +0100
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 04/30] tools/thermal: Initialize CFLAGS before
+ including Makefile.include
+To: Leo Yan <leo.yan@arm.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
+        James Clark <james.clark@linaro.org>, Kees Cook <kees@kernel.org>,
+        Quentin Monnet <qmo@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
+        Nicolas Schier <nsc@kernel.org>,
+        Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+        Bill Wendling <morbo@google.com>,
+        Justin Stitt <justinstitt@google.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Martin KaFai Lau
+ <martin.lau@linux.dev>,
+        Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+        Yonghong Song <yonghong.song@linux.dev>,
+        John Fastabend <john.fastabend@gmail.com>,
+        KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+        Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Daniel Lezcano <daniel.lezcano@kernel.org>,
+        Zhang Rui <rui.zhang@intel.com>, Lukasz Luba <lukasz.luba@arm.com>,
+        Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        William Breathitt Gray <wbg@kernel.org>,
+        Barry Song <baohua@kernel.org>, Qinxin Xia <xiaqinxin@huawei.com>,
+        Bartosz Golaszewski <brgl@kernel.org>,
+        Kent Gibson <warthog618@gmail.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+        Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>,
+        Jonathan Cameron <jic23@kernel.org>,
+        David Lechner <dlechner@baylibre.com>,
+        =?UTF-8?Q?Nuno_S=C3=A1?= <nuno.sa@analog.com>,
+        Andy Shevchenko <andy@kernel.org>,
+        Andrew Morton
+ <akpm@linux-foundation.org>, Willy Tarreau <w@1wt.eu>,
+        =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Robert Moore <robert.moore@intel.com>, Len Brown <lenb@kernel.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        Tejun Heo <tj@kernel.org>, David Vernet <void@manifault.com>,
+        Andrea Righi <arighi@nvidia.com>, Changwoo Min <changwoo@igalia.com>,
+        Mark Brown <broonie@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
+        Gabriele Monaco <gmonaco@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        Jiri Kosina <jikos@kernel.org>,
+        Benjamin Tissoires <bentiss@kernel.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        llvm@lists.linux.dev, bpf@vger.kernel.org,
+        linux-perf-users@vger.kernel.org
+References: <20260308-tools_build_fix_zero_init-v3-0-6477808123b7@arm.com>
+ <20260308-tools_build_fix_zero_init-v3-4-6477808123b7@arm.com>
+Content-Language: en-US
+From: Daniel Lezcano <daniel.lezcano@oss.qualcomm.com>
+In-Reply-To: <20260308-tools_build_fix_zero_init-v3-4-6477808123b7@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIACx9rmkC/x3MQQqDMBAF0KvIrDugAcX0KqWIpF/7F01CJkhBv
- HtDl2/zTjEUwuTenVJw0Jhiw3DrJLzXuEP5ahbXu6l3btRPOqA74sLIuoTMpDWphcJcTT1mj81
- 7jMMq7cgFG7////G8rh+ne1cWbwAAAA==
-X-Change-ID: 20260225-move-gen_init_cpio-to-scripts-9e89ef99e51a
-To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Askar Safin <safinaskar@gmail.com>
-X-Mailer: b4 0.15-dev-363b9
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1237; i=nsc@kernel.org;
- s=20250924; h=from:subject:message-id;
- bh=LdNQ3JN8g0by9MZoPIigvqjE791tW2nNAGImao5y4ao=;
- b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBprn0yHaHpQjsvUBQt6O3rNH0D0xiI07/pYNwmG
- SQCp26dR7GJAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCaa59MgAKCRAHUgpwFiYS
- aXphEADmnwr/n1NKcDXgo5SkJneoeKHits9MNkIGeBa+uD8n51abb3TO5+ZxBQSdetDs5AzAKMY
- uVCok3mCJt+HtbJaA/ZfIL6pH5PAlEC2jQQHk5fD0yfKY1YFFt+H2Jf3AVLhtNG6926BwTHZQSJ
- AoimjCRPwrUis2bHPz/uu1kz8PxSGP74NbJTDojeDuBYG8HZrnD+VvloWO4XPTtPk/U9UWtknd6
- fEUV8qY4kM5fJdWCu7NgAPDU9wU8dgbmqb6atkZ0OKaTt3XvC6bcrLDXI/3G3gwtAO9ADbGGpor
- IJFbfurDbpyTCvP2h9MUsGHIp3FPRW7/ihv4SRCWMJgXJ1Qo2bH5Dcs3HKJ8v9JUhKB0HiTGsGV
- 4Twiq0FoFXFvzJxKRelI2NJOkLSJwM3TGuZODtkQIO+kiNUhyzwByRXSSIKTnjLuS3PTDMvDY4L
- hbkYxtZb+xGDEK/macH+X+TpHvI8z8D0pZryP0Nvnscj2/xL5uf22cstlbOwxNgEqjCDEytSkXH
- PsN1Bx1lR+Z1O0CVv3bpqoec0DXjooD3kF16vfEwNTzxnRThc4uO4WhrSGx+1i3tSkMbdwMSEAM
- lcTN8HkqYfDZDz/Sa9XKjTu/CC6CvwxsLKc0I/j5FI0izafUsE+Pe5XXogx/mAU9sXw6OouX5JN
- sV0Y/AiclaHtAFA==
-X-Developer-Key: i=nsc@kernel.org; a=openpgp;
- fpr=18ED52DBE34F860EE9FBC82B7D97093255A0CE7F
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA5MDA3OSBTYWx0ZWRfX91AG3i3apXdz
+ nynU0zRm14h0p4MxKSLlgCS946955/YL8IKJt1z8AD9MsQhrAcPvVRVdq6wFtBzWFlDwdKVJfXA
+ X03MzNqZCNHFgchgybq4ncrUUXmReft1aDAWUJng2qLAsRpPsQexWSUbjJtkBRpYGsGvxKnNvsK
+ hIKopyuWWVLrEkpqWUKP8GwJKsAvFZ/4ipjMIADo0Yt9+d3ezXjjj8geGXg5zy+bHXjTatvD5eA
+ IPp4xt+HJFw+pEJYzpEzLPk3CuofvHVcW2VT2BNILsj9NmsD/lRsJh2r7FePfROBYHOzs1gqhVi
+ nZ5O9FtUHhZEi1djQiVRW9d94hCNuVDFwK2uPr8P3tlEHrFfJPoBndTtReNY79zXso0MOAJrA6t
+ RfJKEmbkxTbjytzG1BbVHLOLwGuT3tgXdHLP4fT+IYyJJtvbmtj4uAjv1Rltq3RGuzpty+1GZe/
+ jX1WOPFltpbHG9duKPw==
+X-Proofpoint-ORIG-GUID: RZh8RgCu3thRA5pX_skSzSfpgrlMxfic
+X-Proofpoint-GUID: RZh8RgCu3thRA5pX_skSzSfpgrlMxfic
+X-Authority-Analysis: v=2.4 cv=e7sLiKp/ c=1 sm=1 tr=0 ts=69ae87b0 cx=c_pps
+ a=HLyN3IcIa5EE8TELMZ618Q==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=rJkE3RaqiGZ5pbrm-msn:22 a=7CQSdrXTAAAA:8
+ a=ZAywS_63PuHDt0GrRrsA:9 a=QEXdDO2ut3YA:10 a=bTQJ7kPSJx9SKPbeHEYW:22
+ a=a-qgeE7W1pNrGK8U0ZQC:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-09_03,2026-03-06_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 lowpriorityscore=0 priorityscore=1501 adultscore=0
+ suspectscore=0 spamscore=0 bulkscore=0 impostorscore=0 malwarescore=0
+ clxscore=1011 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2602130000
+ definitions=main-2603090079
 
-initramfs cpio tools had been subject of several recent discussions on
-linux-kbuild.  Let's get two minor steps forward by enabling a
-top-level target for building gen_init_cpio w/o the need of a valid
-kbuild configuration [1] and move the tools for generating the builtin
-initramfs from usr/ to scripts/ [2].
 
-Link: https://lore.kernel.org/all/20260220191150.244006-1-safinaskar@gmail.com # [1]
-Link: https://lore.kernel.org/all/aSdrCFkUQup3qb-q@derry.ads.avm.de/ # [2]
----
-Nicolas Schier (2):
-      kbuild: Mark usr_gen_init_cpio as no-dot-config-target
-      kbuild: Move gen_init_cpio and gen_initramfs.sh to scripts/
+Hi Leo,
 
- MAINTAINERS                       | 1 +
- Makefile                          | 9 +++++----
- scripts/.gitignore                | 1 +
- scripts/Makefile                  | 2 ++
- {usr => scripts}/gen_init_cpio.c  | 0
- {usr => scripts}/gen_initramfs.sh | 2 +-
- scripts/remove-stale-files        | 2 ++
- usr/.gitignore                    | 4 +++-
- usr/Makefile                      | 4 +---
- 9 files changed, 16 insertions(+), 9 deletions(-)
----
-base-commit: 6de23f81a5e08be8fbf5e8d7e9febc72a5b5f27f
-change-id: 20260225-move-gen_init_cpio-to-scripts-9e89ef99e51a
+On 3/8/26 17:46, Leo Yan wrote:
+> Initialize CFLAGS to the default value before including
+> tools/scripts/Makefile.include.
+> 
+> Defer appending EXTRA_CFLAGS to CFLAGS until after including
+> Makefile.include, as it may extend EXTRA_CFLAGS in the future.
+> 
+> Signed-off-by: Leo Yan <leo.yan@arm.com>
+> ---
+>   tools/thermal/lib/Makefile | 16 +++++++++-------
+>   1 file changed, 9 insertions(+), 7 deletions(-)
+> 
+> diff --git a/tools/thermal/lib/Makefile b/tools/thermal/lib/Makefile
+> index 056d212f25cf51cd8c02260fbe2ef28dda5e4acb..1890779f1574ebd9015f3001b9bb31d4bc0ae5ce 100644
+> --- a/tools/thermal/lib/Makefile
+> +++ b/tools/thermal/lib/Makefile
+> @@ -23,6 +23,14 @@ INSTALL = install
+>   DESTDIR ?=
+>   DESTDIR_SQ = '$(subst ','\'',$(DESTDIR))'
+>   
+> +# Defer assigning EXTRA_CFLAGS to CFLAGS until after including
+> +# tools/scripts/Makefile.include, as it may add flags to EXTRA_CFLAGS.
+> +ifdef EXTRA_CFLAGS
+> +  CFLAGS :=
+> +else
+> +  CFLAGS := -g -Wall
+> +endif
+> +
 
-Best regards,
---  
-Nicolas
+Sorry, I don't get the comment :/
+
+Can you clarify the intended purpose with this change and the 'override' 
+directive below ?
+
+
+>   include $(srctree)/tools/scripts/Makefile.include
+>   include $(srctree)/tools/scripts/Makefile.arch
+>   
+> @@ -39,13 +47,6 @@ libdir = $(prefix)/$(libdir_relative)
+>   libdir_SQ = $(subst ','\'',$(libdir))
+>   libdir_relative_SQ = $(subst ','\'',$(libdir_relative))
+>   
+> -# Set compile option CFLAGS
+> -ifdef EXTRA_CFLAGS
+> -  CFLAGS := $(EXTRA_CFLAGS)
+> -else
+> -  CFLAGS := -g -Wall
+> -endif
+> -
+>   INCLUDES = \
+>   -I/usr/include/libnl3 \
+>   -I$(srctree)/tools/lib/thermal/include \
+> @@ -56,6 +57,7 @@ INCLUDES = \
+>   -I$(srctree)/tools/include/uapi
+>   
+>   # Append required CFLAGS
+> +override CFLAGS += $(EXTRA_CFLAGS)
+>   override CFLAGS += $(EXTRA_WARNINGS)
+>   override CFLAGS += -Werror -Wall
+>   override CFLAGS += -fPIC
+> 
 
