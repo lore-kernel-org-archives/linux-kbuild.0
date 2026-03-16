@@ -1,129 +1,173 @@
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 554F434A3DC
-	for <linux-kbuild@vger.kernel.org>; Mon, 16 Mar 2026 07:06:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.175
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773644769; cv=pass; b=YJ5Uy79wXEh5Ahz8gzeXBaRL3eSZS8t+fMbhJBgItc9hdDygMpknp1X/qYGLLhskQ2ME9rbHoJ/PSQ0LIFpN0yafbcb9NXGdgBY0Drh2a0z1qnYdrNeF28VrINNjOrjtpT+TrmaAYnqsLTzlfVDsY2fGGTPGP7q1zHEeNTY11Rs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773644769; c=relaxed/simple;
-	bh=DWa/MwbMbU4Cgy8HcLpzA6KnltFCFdwdVTLoxcjvQIo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MGxDwCfQnDggsFARzItD5A7X6ZUezKxEf/JE38rINShInrXpI/Y5Nz8AnbVmereSE4iofY94MmZGt1O6ooEFre3mG/NPiqNrrnhDDM7oCq5uGKLfBaY7Uw4HvUyJ3UjyNS7t2t92gZBhPxqt97YuIE3iUYYyjZhr3b1st5KvYqc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rrvNm/sp; arc=pass smtp.client-ip=209.85.208.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rrvNm/sp"
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-38a3fd333eeso33992081fa.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 16 Mar 2026 00:06:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773644766; cv=none;
-        d=google.com; s=arc-20240605;
-        b=I8CJ+F/NLZZgw+APjmqOy3zoOrXxorrjL14l3w2vHG4WZxK+wXAMZ8pE8lJW36T/N+
-         5ZfkZDY2C7CkNArOhR76KPKlGvWTeRtzCTg2lajOcdCSxklLCTLxt0D7jCljlQjYHLFv
-         xiBQBEWHqE48+EXuCGY9xZdaCqdOTYC0kVceMq5Mj9c7t1uEh+Yn/LhqR1CJD8xvk1rG
-         60fHMC8bPvUXgMD8JQbqBGadCWR1xKFHOhpo0gr+6OF0bhWmzbcYO9lTWKpfd+AkBqJX
-         bjWJauOR5+yWzP3McqUkiBKhbmISzCIZCLKT06Hi+HWaUWPGX6oTDPLrEWhfVeCDYfNm
-         PXdQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=DWa/MwbMbU4Cgy8HcLpzA6KnltFCFdwdVTLoxcjvQIo=;
-        fh=ilEwYtsiJxfiz8Ulo6DSplBqVOPOHPoLSoM6gOnjuOM=;
-        b=BX55EPcYFqHEZ3vx4gsox7YzfL1rTVNz789d5p+8ta0OlN+ZVmQidvnAxWif2S8w0Z
-         XTyxsWZdC5+38htTKJIOoVj++Zh1XrvZi1Wsor7Wo8N9KzHYWilJLZ84//beAWZccCu3
-         Rmfap19WWI7jj7mQ8S663PEvjcffgGZUDi7SsnzPd+SaH+ZIus5EyOT+JpZ/XmAa0bOz
-         bRBNHvKvJrULONsfazn7uCd7JeqtNp4EnRSbUoCSMXsiMukSvVBlpLIuU5f9Yq4Px4Cf
-         j/GykjnPfjhYIpuALUi3bQzmMxv52GjVVN02AJ9/s5AWk5IlGeUrHoFKjBYFtTEWaAp6
-         lCOQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773644766; x=1774249566; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=DWa/MwbMbU4Cgy8HcLpzA6KnltFCFdwdVTLoxcjvQIo=;
-        b=rrvNm/sp0ejqtQpts4YJvKIZJai0U7h6SimZ1+626FCi7l4L6Dzs/D5AfC15pRBoWr
-         kv/dIm7CfHnm9HMv/wH+hAenKg7VAAA/E7tVULHXPbxFq6YGS4qlbY3FPnHscS4jfzMo
-         D3dH3ecOve/eQGzSnAb4Ojy44wq5Nw/0FFYtscPxcItm710bCdD1kjJ/hOB3448XZy8f
-         K4xi4VdbUD1F+Vo4MhfBcbKbgnUdds5xx8LCHziC6xxbqHA6MvyjhOKbbiisyPVocwZ3
-         KxoLuACxgOlrc3AY0BNPbelvSOBLVO9w1iQzbOC3uVjI5svhEljwS33qC/sFSOyzUjaG
-         pJow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773644766; x=1774249566;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DWa/MwbMbU4Cgy8HcLpzA6KnltFCFdwdVTLoxcjvQIo=;
-        b=rmRVxZpU0KqszBX0I0lbpHeVL5zV3Xk44iU8Oqhfve3ZB04yqkCuaG84sxW46FEixE
-         +QsEDPtzJ8b3sK3lIcwitmY+q5p3y9D/uRQRTPuBrIY2nd5b/KHLt4vWiq3uKWtWDOxt
-         6Ek37AkG2qsCDs53zfG/mc+JAjVSzji4wYokjeFMnAjx72Py8+AVEoQ3ZB+Odl2g7mQU
-         ez/9ijdu513AmV01abPWbWTQITja7nV4SvYCyHdfBDMPEgYS2+atv3PlguhS2q5nCyEv
-         k+7d7I7OatBDvXB0O7yrhQwmp64ivDJROP39Vtlm3CJg3zVifAm7PpAgH9jinBhKuZY/
-         sWnw==
-X-Forwarded-Encrypted: i=1; AJvYcCXaon7p7WlrWwsKghBahr9iZDGp8q5/nAjzsUlJCkRsAmKOAZVh2rvao8SeQS/9TxnnkNs+7yjiSa1OLJQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3Slx1weh6HIjGjDELiOrknaNV2MkGs1tvVJAEHNv/yeReXlbC
-	hI6rDRDu7wWm1gfM/iGTxtwtg2WKmeeSw2eM9WzFRG8gsohicmHPYCzMeEdYw2weakpWe0C2chV
-	8Yp7tsIT7ihHREM6DUlhRB15lA2KwJ6aMki/pyQ/M
-X-Gm-Gg: ATEYQzxh1JMI3VcucGtqtWdRLQQ7qsLfbrPkrz9evbciZOi7TAd9qmdLCzuOawmpCcs
-	WkM4Adp8zcu19IpJ0yzKDS8JlAOiLJK55qG76/a+d0j/mfX1QN8cEu4ACAwPOJNPt1zG/TUpjIZ
-	V0d0jpUoAXNU10/bH6lF3K9jgGMG9wATxTs+I88RPuE2mY8G48W8cb69eAh4tBZQn45tAZnBYB5
-	/D95sQ0ZeZ1+/speegFayfSsdiM26IFU+2LuZKiyWy3etSgIGCftIh273gWkPka6tuQqZRksmcs
-	RvDRg5P1iICuK5h0vl2CykpcsI87Va6ThWhLBArKkMRTUCD+gF8YFsznXGxyULPtZDdpyg==
-X-Received: by 2002:a05:651c:4356:10b0:38a:2db9:eb72 with SMTP id
- 38308e7fff4ca-38a8864c94amr30667511fa.16.1773644766146; Mon, 16 Mar 2026
- 00:06:06 -0700 (PDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB8F383A14;
+	Mon, 16 Mar 2026 10:18:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773656285; cv=none; b=J2Nz/a/yUeKqcibAXiiFL1N3WA30do6PLq/rz/7Omp043mbxbWOV5gXCrrROiee+1I/HmPfO1wdQDDPtB6H2tgvwdBqfL32l7N4A4QFdN+LYxr1kN6wdv2x/HrCSk68/EQXOoTqE3Zka5G0lEkxipyiXuSWb5jEFUTiM6ZycYMg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773656285; c=relaxed/simple;
+	bh=c30q8cP+1tW7hMgKrmZODRuHGnO1oWLiLKKYH9vT2C8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tXVqCkEs09iLDfzGD7rSTlXB9+bIGIJCHgdgUKGRNap6YpVsr4TtR+e7xHDKZxe0PgZvRn26LAv8BOihsHpri5dZZjXj7cJBYQuX0bvVDTYMAk7GLLnBETHcotVlv5Y9kKDy4lJeZ36zYdXUQKTEcS3wCf45+z1B6BMqE9UAl+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 422051477;
+	Mon, 16 Mar 2026 03:17:57 -0700 (PDT)
+Received: from localhost (e132581.arm.com [10.1.196.87])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CAD483F73B;
+	Mon, 16 Mar 2026 03:18:02 -0700 (PDT)
+Date: Mon, 16 Mar 2026 10:18:00 +0000
+From: Leo Yan <leo.yan@arm.com>
+To: Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
+	James Clark <james.clark@linaro.org>, Kees Cook <kees@kernel.org>,
+	Quentin Monnet <qmo@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Daniel Lezcano <daniel.lezcano@kernel.org>,
+	Zhang Rui <rui.zhang@intel.com>, Lukasz Luba <lukasz.luba@arm.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>, Mark Rutland <mark.rutland@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	William Breathitt Gray <wbg@kernel.org>,
+	Barry Song <baohua@kernel.org>, Qinxin Xia <xiaqinxin@huawei.com>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	Kent Gibson <warthog618@gmail.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Long Li <longli@microsoft.com>, Jonathan Cameron <jic23@kernel.org>,
+	David Lechner <dlechner@baylibre.com>,
+	Nuno =?iso-8859-1?Q?S=E1?= <nuno.sa@analog.com>,
+	Andy Shevchenko <andy@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>, Willy Tarreau <w@1wt.eu>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Robert Moore <robert.moore@intel.com>, Len Brown <lenb@kernel.org>,
+	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+	Tejun Heo <tj@kernel.org>, David Vernet <void@manifault.com>,
+	Andrea Righi <arighi@nvidia.com>,
+	Changwoo Min <changwoo@igalia.com>, Mark Brown <broonie@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Gabriele Monaco <gmonaco@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	Jiri Kosina <jikos@kernel.org>,
+	Benjamin Tissoires <bentiss@kernel.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev, bpf@vger.kernel.org,
+	linux-perf-users@vger.kernel.org
+Subject: Re: [PATCH v4 07/30] libbpf: Initialize CFLAGS before including
+ Makefile.include
+Message-ID: <20260316101800.GB8048@e132581.arm.com>
+References: <20260311-tools_build_fix_zero_init-v4-0-9e35bdb99cb3@arm.com>
+ <20260311-tools_build_fix_zero_init-v4-7-9e35bdb99cb3@arm.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260313150928.2637368-1-sashal@kernel.org> <20260314111822.63a2ba4a@kernel.org>
-In-Reply-To: <20260314111822.63a2ba4a@kernel.org>
-From: Dmitry Vyukov <dvyukov@google.com>
-Date: Mon, 16 Mar 2026 08:05:53 +0100
-X-Gm-Features: AaiRm53tuutFjpddzDm8MgJQk_X6I9zzb6Uz-8-_BFX3BICSXZm9HxgKcE0xoPQ
-Message-ID: <CACT4Y+arWePyxnV3hWk5RanWZpoc7=ALQ6DV_2MCuQkNoTtJUw@mail.gmail.com>
-Subject: Re: [PATCH 0/9] Kernel API Specification Framework
-To: Jakub Kicinski <kuba@kernel.org>, syzkaller <syzkaller@googlegroups.com>
-Cc: Sasha Levin <sashal@kernel.org>, linux-api@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, workflows@vger.kernel.org, tools@kernel.org, 
-	x86@kernel.org, Thomas Gleixner <tglx@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Randy Dunlap <rdunlap@infradead.org>, Cyril Hrubis <chrubis@suse.cz>, Kees Cook <kees@kernel.org>, 
-	Jake Edge <jake@lwn.net>, David Laight <david.laight.linux@gmail.com>, 
-	Askar Safin <safinaskar@zohomail.com>, Gabriele Paoloni <gpaoloni@redhat.com>, 
-	Mauro Carvalho Chehab <mchehab@kernel.org>, Christian Brauner <brauner@kernel.org>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, 
-	Masahiro Yamada <masahiroy@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>, 
-	Ingo Molnar <mingo@redhat.com>, Arnd Bergmann <arnd@arndb.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260311-tools_build_fix_zero_init-v4-7-9e35bdb99cb3@arm.com>
 
-On Sat, 14 Mar 2026 at 19:18, Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Fri, 13 Mar 2026 11:09:10 -0400 Sasha Levin wrote:
-> > This enables static analysis tools to verify userspace API usage at compile
-> > time, test generation based on formal specifications, consistent error handling
-> > validation, automated documentation generation, and formal verification of
-> > kernel interfaces.
->
-> Could you give some examples? We have machine readable descriptions for
-> Netlink interfaces, we approached syzbot folks and they did not really
-> seem to care for those.
+Hi BPF maintainers,
 
-I think our reasoning wrt syzkaller was that not all interfaces in all
-relevant kernels are described with netlink yml descriptions, so we
-need to continue using the extraction of interfaces from the source
-code. And if we have that code, then using yml as an additional data
-source only adds code/complexity. Additionally, we may extract some
-extra constraints/info from code that are not present in yml.
+On Wed, Mar 11, 2026 at 08:29:32AM +0000, Leo Yan wrote:
+> tools/scripts/Makefile.include may expand EXTRA_CFLAGS in a future
+> change.  This could alter the initialization of CFLAGS, as the default
+> options "-g -O2" would never be set once EXTRA_CFLAGS is expanded.
+> 
+> Prepare for this by moving the CFLAGS initialization before including
+> tools/scripts/Makefile.include, so it is not affected by the extended
+> EXTRA_CFLAGS.
+> 
+> Append EXTRA_CFLAGS to CFLAGS only after including Makefile.include and
+> place it last so that the extra flags propagate properly and can
+> override the default options.
+> 
+> Signed-off-by: Leo Yan <leo.yan@arm.com>
 
-Realistically system call descriptions may have the same problem for
-us at this point, since we extract lots of info from the source code
-already:
-https://raw.githubusercontent.com/google/syzkaller/refs/heads/master/sys/linux/auto.txt
-(and LLMs obviously can allow us to extract more)
+Before sending a new version, I'd check if you have a chance to review
+the libbpf patches.  The libbpf change is crucial for this series.
+
+Another reason for pinging because I received a bpf-ci report about test
+failures for this series [1].  The failures looks to be unrelated, as
+the tests fail starting from the first patch, which is irrelevant to BPF
+code [2].  I tried reaching kernel-ci@meta.com last week but haven't
+received a response yet.
+
+If bpf-ci testing is mandatory for libbpf patches, could you advise me
+on the correct workflow (e.g., whether the patches should be based on a
+specific branch)?
+
+Thanks.
+
+[1] https://github.com/kernel-patches/bpf/actions/runs/22944268645
+[2] https://patchwork.kernel.org/project/netdevbpf/patch/20260311-tools_build_fix_zero_init-v4-1-9e35bdb99cb3@arm.com/
+
+> ---
+>  tools/lib/bpf/Makefile | 16 +++++++++-------
+>  1 file changed, 9 insertions(+), 7 deletions(-)
+> 
+> diff --git a/tools/lib/bpf/Makefile b/tools/lib/bpf/Makefile
+> index b1fbd0211c5edde7be3d98630b16e53e028d9116..eca584fb061e16013e76827e4203f6be0477a73e 100644
+> --- a/tools/lib/bpf/Makefile
+> +++ b/tools/lib/bpf/Makefile
+> @@ -49,6 +49,14 @@ man_dir_SQ = '$(subst ','\'',$(man_dir))'
+>  export man_dir man_dir_SQ INSTALL
+>  export DESTDIR DESTDIR_SQ
+>  
+> +# Defer assigning EXTRA_CFLAGS to CFLAGS until after including
+> +# tools/scripts/Makefile.include, as it may add flags to EXTRA_CFLAGS.
+> +ifdef EXTRA_CFLAGS
+> +  CFLAGS :=
+> +else
+> +  CFLAGS := -g -O2
+> +endif
+> +
+>  include $(srctree)/tools/scripts/Makefile.include
+>  
+>  # copy a bit from Linux kbuild
+> @@ -70,13 +78,6 @@ LIB_TARGET	= libbpf.a libbpf.so.$(LIBBPF_VERSION)
+>  LIB_FILE	= libbpf.a libbpf.so*
+>  PC_FILE		= libbpf.pc
+>  
+> -# Set compile option CFLAGS
+> -ifdef EXTRA_CFLAGS
+> -  CFLAGS := $(EXTRA_CFLAGS)
+> -else
+> -  CFLAGS := -g -O2
+> -endif
+> -
+>  # Append required CFLAGS
+>  override CFLAGS += -std=gnu89
+>  override CFLAGS += $(EXTRA_WARNINGS) -Wno-switch-enum
+> @@ -84,6 +85,7 @@ override CFLAGS += -Werror -Wall
+>  override CFLAGS += $(INCLUDES)
+>  override CFLAGS += -fvisibility=hidden
+>  override CFLAGS += -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
+> +override CFLAGS += $(EXTRA_CFLAGS)
+>  
+>  # flags specific for shared library
+>  SHLIB_FLAGS := -DSHARED -fPIC
+> 
+> -- 
+> 2.34.1
+> 
