@@ -1,119 +1,85 @@
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F551332EBB
-	for <linux-kbuild@vger.kernel.org>; Mon, 16 Mar 2026 16:16:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1C36339872;
+	Mon, 16 Mar 2026 16:52:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773677803; cv=none; b=lJ+ey6lgS26zAqzfZgu27yX838bpg0N646ykKbOqBlrKbTDqrSFUiMUw/iX07NdAXO9sMEVO3OKZufvM9JAdfT00FMRAAM4GaQIj7wyjUVsRq7dXTEfu9E6T6KcAcZzXXVWQSCSIMi9smDV4QEolQ8jES1XTQJ4zTOVmb/DF+j0=
+	t=1773679928; cv=none; b=YdwV6ImcUvup1bMeSyov7O9DJhKMFJrTPHJh6kjxqRZhaA08rjaWw+KFp2eznDsrNURyETgG8IvXDhpSNBaELR7d0En0ldP/pokgvhJIrgo1+5p1wuaThhNVM3a2db6PHH3+U8a//TD5DLfRvrheZOuVRDNgtaGQ8pminj3XLHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773677803; c=relaxed/simple;
-	bh=XwMJB8RHHvUhH/cZpiA4UN/3HmQRSD+owhzGHAnIW5Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=i5Zu1Hw0OirCUtKWWAoAr3i04rCEdoa5F5hbou5BRlZ211N4rIB9H9GijZ5QZ4QhyV0FRnN4SXb0RCcUA0yLKgOZTcJj7lxSHzQ1uRPnnoSfJNIykqx6ruFqHx9Zn2zS2epUvbdQKJws4ka40tnsZnSByYlkMD37zNmpJpfTpEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fEhzCv2N; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1773679928; c=relaxed/simple;
+	bh=fXZsbxaGn7gXyBNn9a1815Xva7zjv/XPM15Bx/AZ+u4=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=VjlgswWr3HKC1wl0lRinZKAZfF9Nq6J+zU54YMEJiIcw3QXHTZEMFuKnzRHhLc9zBzaHtdbHTYbvobsko4SK9kBC8UnB1HaASo/IPRSlY862psPlKJoTZzvmwNVKs51lGyBsT2Fh+babbYVQ8DFnHUbWIaBAwxYCDMqBZx4IdUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=omkWFqnb; arc=none smtp.client-ip=159.69.126.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fEhzCv2N"
-Message-ID: <6db3a2f6-d61c-42f1-9b9d-0aca021cc2d7@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1773677790;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YfUyA8FXap7FNQKwzw+IyJSbOMuEyJIojfw+PE3m8/I=;
-	b=fEhzCv2NC7ppyGlL+Dh0AsoUcCFzfEjoWteogjOIfI2Ka5M/pVgAa/MWCmBScQJFBaGpHH
-	Nq//NXTy5/1cethqEl6YNO7RgzXEqhWZFe9TC+3Ovfnl0S/9czc0pi+ZKqarKWIBC3tMpa
-	YXmBKnSshXDGusv1WqcEHpGC6qHhGHY=
-Date: Mon, 16 Mar 2026 09:16:26 -0700
+	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="omkWFqnb"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+	s=mail; t=1773679918;
+	bh=fXZsbxaGn7gXyBNn9a1815Xva7zjv/XPM15Bx/AZ+u4=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=omkWFqnb9oJVDsoh8uowWc6yiDRijjWldhocf/CFQDWuVmH1gn06GI4DwkpKSrkmM
+	 hhD09c4ziXrEYiBxx8GWAD89nb6E5et+WMBPfyNE+iNGMRzIDUE4oLl3IDsRk9hjyD
+	 WA8NK92E+w146iusW6Ysyg0A/88WcrrvRNcZeRG0=
+From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+Date: Mon, 16 Mar 2026 17:52:01 +0100
+Subject: [PATCH v2 4/5] kbuild: uapi: provide a C++ compatible dummy
+ definition of NULL
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: linux-next: build failure after merge of the kbuild tree
-Content-Language: en-GB
-To: Nicolas Schier <nsc@kernel.org>, Mark Brown <broonie@kernel.org>,
- Nathan Chancellor <nathan@kernel.org>,
- KBuild Mailing List <linux-kbuild@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Next Mailing List <linux-next@vger.kernel.org>
-References: <abgRRX3PH9IaExi8@sirena.org.uk> <abgph5Gk1G8UgG2E@levanger>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yonghong Song <yonghong.song@linux.dev>
-In-Reply-To: <abgph5Gk1G8UgG2E@levanger>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Message-Id: <20260316-kbuild-uapi-c-v2-4-35d6d0ed863f@weissschuh.net>
+References: <20260316-kbuild-uapi-c-v2-0-35d6d0ed863f@weissschuh.net>
+In-Reply-To: <20260316-kbuild-uapi-c-v2-0-35d6d0ed863f@weissschuh.net>
+To: Arnd Bergmann <arnd@arndb.de>, Nathan Chancellor <nathan@kernel.org>, 
+ Nicolas Schier <nsc@kernel.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ David Howells <dhowells@redhat.com>, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1773679918; l=774;
+ i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
+ bh=fXZsbxaGn7gXyBNn9a1815Xva7zjv/XPM15Bx/AZ+u4=;
+ b=WaOLXlWcq3BVZytcn52ZchCb+6Bx+FXm69Jws2mFBXzP2O0eLk7t7uZD4C3OCLwlMeWsHBeWD
+ e2h3UpXL/dsBM+Cuj/xK3Sr6Ox+IziPnsAiyXexo6eSZBKg7BXK3PcB
+X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
+ pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 
+NULL works differently in C++ compared to C.
 
+To allow testing the UAPI headers against C++ compilers, provide
+a variant of NULL which works with those.
 
-On 3/16/26 9:02 AM, Nicolas Schier wrote:
-> Hi Mark,
->
-> On Mon, Mar 16, 2026 at 02:18:45PM +0000, Mark Brown wrote:
->> Hi all,
->>
->> After merging the kbuild tree, today's linux-next build (arm64 perf)
->> failed like this:
->>
->> Auto-detecting system features:
->> ...                                   libdw: [ on  ]
->> ...                                   glibc: [ on  ]
->> ...                                  libelf: [ on  ]
->> ...                                 libnuma: [ on  ]
->> ...                  numa_num_possible_cpus: [ on  ]
->> ...                               libpython: [ on  ]
->> ...                             libcapstone: [ on  ]
->> ...                               llvm-perf: [ on  ]
->> ...                                    zlib: [ on  ]
->> ...                                    lzma: [ on  ]
->> ...                                     bpf: [ on  ]
->> ...                                  libaio: [ on  ]
->> ...                                 libzstd: [ on  ]
->> ...                              libopenssl: [ on  ]
->> ...                                    rust: [ on  ]
->>
->> Makefile:2254: *** extraneous 'endif'.  Stop.
->> Makefile:2254: *** extraneous 'endif'.  Stop.
->>    PERF_VERSION = .gbc1f864a1976
->> 52.34user 4.91system 0:56.88elapsed 100%CPU (0avgtext+0avgdata 140840maxresident)k
->> 0inputs+0outputs (0major+1379795minor)pagefaults 0swaps
->> Building: arm64 allnoconfig
->> Makefile:2254: *** extraneous 'endif'.  Stop.
->>
->> Presumably caused by commit
->>
->>    6a76b3c06a1d3 (kbuild: Reduce the number of compiler-generated suffixes for clang thin-lto build)
->>
->> though I don't immediately see how.  I have used the version from
->> next-20260313 instead.
-> thanks for the report.  Unfortunately, I cannot reproduce that anyhow;
-> but I pushed to kbuild/kbuild-for-next at 12:36 UTC, might that have
-> been a bad point in time?  Do you have your merge somewhere around where
-> I can fetch it for investigation?
+Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
+Reviewed-by: Nathan Chancellor <nathan@kernel.org>
+---
+ usr/dummy-include/stddef.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-I guess it probably due to my bad suggestions (sorry I should have tested before
-sending out).
+diff --git a/usr/dummy-include/stddef.h b/usr/dummy-include/stddef.h
+index a61703d1c896..525489daffe2 100644
+--- a/usr/dummy-include/stddef.h
++++ b/usr/dummy-include/stddef.h
+@@ -3,6 +3,11 @@
+ #define _DUMMY_STDDEF_H
+ 
+ #define offsetof(TYPE, MEMBER)	__builtin_offsetof(TYPE, MEMBER)
++
++#ifdef __cplusplus
++#define NULL 0
++#else
+ #define NULL ((void *)0)
++#endif
+ 
+ #endif /* _DUMMY_STDDEF_H */
 
-else
-CC_FLAGS_LTO := -flto=thin -fsplit-lto-unit
-+if CONFIG_LTO_CLANG_THIN
-+KBUILD_LDFLAGS += $(call ld-option,--lto-whole-program-visibility
--mllvm -always-rename-promoted-locals=false)
-+endif
-endifIt should be else
-CC_FLAGS_LTO := -flto=thin -fsplit-lto-unit
-+ifdef CONFIG_LTO_CLANG_THIN
-+KBUILD_LDFLAGS += $(call ld-option,--lto-whole-program-visibility
--mllvm -always-rename-promoted-locals=false)
-+endif
-endif
-
->
-> Kind regards,
-> Nicolas
+-- 
+2.53.0
 
