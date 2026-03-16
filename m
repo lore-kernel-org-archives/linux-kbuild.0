@@ -1,81 +1,51 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC6F233C1B2;
-	Mon, 16 Mar 2026 17:56:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDF5A33A9DD;
+	Mon, 16 Mar 2026 17:56:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773683810; cv=none; b=lNyYSy/u9DtaIxKMTjMIkjjhq8IArjRXWN0kmunVcGpdXSSvtIG3oJ2EzWKt9KPEwqBuN6GJ28I72YWDrTAb7hzobsPkayESctW+H974lnkGeoaizSLW2Go1QTcz5f8j7vWDTLuN6wzP6RLXfvq2Rw13FwsCUE3q426hNetYW9k=
+	t=1773683813; cv=none; b=OZC/Yf1HcURds0YO4wMxGWc9ZaydCkLDSUQFvJGqQNU8P/bN0usKDFhzB8zJ5592rHLJ+bJwMb3PjfQts5LubJu7rJgSbe28LTwvqcInauSciPycc3wQkVwkG0N+/cynmcsMqnRif4Re3VqFZx6dV6frr9XuBD6o2BBUvf9TVk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773683810; c=relaxed/simple;
-	bh=QsvI7xh+xmuVKe0toI6okbDwY6fJwH4DKn5xR2ODfgI=;
+	s=arc-20240116; t=1773683813; c=relaxed/simple;
+	bh=q0y8BC7GzfesebMNcpcg7i9dnaVgrshHFWjsHC4iOu8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m5XYNvzWAVBxa7uKpjpWWm504NOEEChBSoKL5lEF+H4/KwwG9UV1CN1i2+acaFyAQgzC31riYVqNeipE55x1cXNg4jSVHbRVn0sEtM4/V260hFwdjmyK7VwFLb+uWbSUrXt1c/fbpbHjNIgtg1GPbp5vXVJS5s9HZa5jph/S0hE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kcM+ccPB; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=soe/mTVQTavOw6YDZE5d5t9xTrFk87Fg+fgFSlgh62XnwGEbYcCTCRBsMzFIFueCigFeuaXdXJ3MGqNW+WhXpk5UtUEfddKd9tDF1YQVOa1cYOMj69FxIWg+Bi6Tu2AzcM5tX8iBZslQ3sg0QQMK0Z/j+NcYx1ssumVCV0SOquI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lFlEJVaX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kcM+ccPB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D633C19421;
-	Mon, 16 Mar 2026 17:56:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lFlEJVaX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BBD6C2BC87;
+	Mon, 16 Mar 2026 17:56:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773683810;
-	bh=QsvI7xh+xmuVKe0toI6okbDwY6fJwH4DKn5xR2ODfgI=;
+	s=k20201202; t=1773683813;
+	bh=q0y8BC7GzfesebMNcpcg7i9dnaVgrshHFWjsHC4iOu8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kcM+ccPBGh7N4ro6gnNhIsFjjtEtWhVRcNdHs2DLYgX8hl7QPmv9Tfvs9mJbvwlLQ
-	 oynayt0GbizqFxrD8PqPJ3olyhlI+tgZ01RpL6SbpyHzZ1BQBDPcYBN7vVv5Ri1BOA
-	 vu5HX6yAtqiPjehXhZV/SO/tAGFQSb7TwkIV+XeFkPsiu49TKoXJ+PVO9vhufFno99
-	 Ay8JB4CSnvE+mn6r/XXw6afL/kDwgAhpiuw9B/azIHKmj4YMB4L/Sj3A+8oidL0OaT
-	 Q+6pex4wR81B5kiFbhnkACxGt3YLpAclxbRV0eXEHCmztUncFMwRwuP6s9ARsFByIQ
-	 avTHcHOnFl8TA==
-Date: Mon, 16 Mar 2026 18:52:10 +0100
+	b=lFlEJVaXpE6jStGa3SJRMs060nrfHkpqXCSBBlRrN5jlZ/2qTCqCOaIOFhz6yK08u
+	 h0ZHmDZ6uMxqh3dzNGC7B+4KlewKD4gWjipXHt3XGStjoVWJqtQRjFYh77YRGv+Ed7
+	 /gTxcDluk4uDbiuffzVUWqD8LTMZQnbdS9pvhyDSrGj2cXHpxjBCzuUF+zRcnoaalM
+	 ij6Y4zrqahjLuLGyfZ3BJZFj/mFNZR+14bm0GtP1qwi8DYOiIsiDjeqwWcHJdVYyGU
+	 kG3KAfJvJEiNF5Rgvh27N5evzBrmHNTHTlX5YxxkRkJr2zTE9ubF+qmOH7AeUk/5Gx
+	 +UHjmssSaMbCQ==
+Date: Mon, 16 Mar 2026 18:56:29 +0100
 From: Nicolas Schier <nsc@kernel.org>
-To: Rong Xu <xur@google.com>
-Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
+To: Mark Brown <broonie@kernel.org>
+Cc: Yonghong Song <yonghong.song@linux.dev>,
 	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
-	Rafael Aquini <aquini@redhat.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Stafford Horne <shorne@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Piotr Gorski <piotrgorski@cachyos.org>,
-	Teresa Johnson <tejohnson@google.com>, linux-kernel@vger.kernel.org,
-	linux-kbuild@vger.kernel.org, llvm@lists.linux.dev,
-	Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH v5 1/2] kbuild: move vmlinux.a build rule to
- scripts/Makefile.vmlinux_a
-Message-ID: <abhDSrgevNJl-AUh@levanger>
-Mail-Followup-To: Nicolas Schier <nsc@kernel.org>, Rong Xu <xur@google.com>,
-	Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
+	KBuild Mailing List <linux-kbuild@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: Re: linux-next: build failure after merge of the kbuild tree
+Message-ID: <abhETba3IvIH1BU9@levanger>
+Mail-Followup-To: Nicolas Schier <nsc@kernel.org>,
+	Mark Brown <broonie@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
 	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
-	Rafael Aquini <aquini@redhat.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Stafford Horne <shorne@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Piotr Gorski <piotrgorski@cachyos.org>,
-	Teresa Johnson <tejohnson@google.com>, linux-kernel@vger.kernel.org,
-	linux-kbuild@vger.kernel.org, llvm@lists.linux.dev,
-	Arnd Bergmann <arnd@arndb.de>
-References: <20251028182822.3210436-1-xur@google.com>
- <20251028182822.3210436-2-xur@google.com>
- <abgGnfO5ZrpOUza7@levanger>
- <CANiq72mCpc9=2TN_zC4NeDMpFQtPXAFvyiP+gRApg2vzspPWmw@mail.gmail.com>
- <CAF1bQ=RarMBKd2KhBje9de-ymjPf+tKUVpgPxspJPm0yTao2Mw@mail.gmail.com>
+	KBuild Mailing List <linux-kbuild@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Next Mailing List <linux-next@vger.kernel.org>
+References: <abgRRX3PH9IaExi8@sirena.org.uk>
+ <abgph5Gk1G8UgG2E@levanger>
+ <d9a3537a-9abc-49f0-86df-13089ff35a3a@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -84,23 +54,34 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAF1bQ=RarMBKd2KhBje9de-ymjPf+tKUVpgPxspJPm0yTao2Mw@mail.gmail.com>
+In-Reply-To: <d9a3537a-9abc-49f0-86df-13089ff35a3a@sirena.org.uk>
 
-On Mon, Mar 16, 2026 at 05:27:01PM +0000, Rong Xu wrote:
-> I think the problem was $(AR) mPi and llvm-ar <= 14 do work correctly
-> in preserving the orders for "thin" archives without --thin.
+On Mon, Mar 16, 2026 at 05:42:17PM +0000, Mark Brown wrote:
+> On Mon, Mar 16, 2026 at 05:02:15PM +0100, Nicolas Schier wrote:
+> > On Mon, Mar 16, 2026 at 02:18:45PM +0000, Mark Brown wrote:
 > 
-> We can either
-> (1) Bump the LLVM version to 15 and remove the --thin flag, or
-> (2) Implement a condition, as the --thin flag is only required for
-> llvm-ar. I assume the reported error was using gcc? (can someone send
-> a link for the failure?)
+> > > Makefile:2254: *** extraneous 'endif'.  Stop.
+> > > Makefile:2254: *** extraneous 'endif'.  Stop.
+> > >   PERF_VERSION = .gbc1f864a1976
+> > > 52.34user 4.91system 0:56.88elapsed 100%CPU (0avgtext+0avgdata 140840maxresident)k
+> > > 0inputs+0outputs (0major+1379795minor)pagefaults 0swaps
+> > > Building: arm64 allnoconfig
+> > > Makefile:2254: *** extraneous 'endif'.  Stop.
 > 
-> I think (2) is less involved. I can prepare a updated patch.
+> > thanks for the report.  Unfortunately, I cannot reproduce that anyhow;
+> > but I pushed to kbuild/kbuild-for-next at 12:36 UTC, might that have
+> > been a bad point in time?  Do you have your merge somewhere around where
+> > I can fetch it for investigation?
+> 
+> I tend to start late mornings UTC so something in the middle of the
+> night won't be noticed.  I don't have my merge to hand, sorry - you'll
+> be able to see where I merged things by looking at the history of -next
+> for the kbuild merge when I publish today's -next.  IIRC there as
+> nothing other than merges and the commit I flagged in there, it's
+> possibly a merge issue with Linus' tree?
 
-Great, thanks!  Yes, the report was using gcc.
+Ok, thanks!  Then I'll have a look at it tomorrow (14h ahead) and hope
+to fix it for the next '-next' round.
 
-The report is at https://lore.kernel.org/linux-next/476507c9-a371-4864-9e87-572c1ecae82d@linux.ibm.com/
-
-Kind regards,
+-- 
 Nicolas
