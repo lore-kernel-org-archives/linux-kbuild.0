@@ -1,173 +1,154 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB8F383A14;
-	Mon, 16 Mar 2026 10:18:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CACF838F24A;
+	Mon, 16 Mar 2026 10:29:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773656285; cv=none; b=J2Nz/a/yUeKqcibAXiiFL1N3WA30do6PLq/rz/7Omp043mbxbWOV5gXCrrROiee+1I/HmPfO1wdQDDPtB6H2tgvwdBqfL32l7N4A4QFdN+LYxr1kN6wdv2x/HrCSk68/EQXOoTqE3Zka5G0lEkxipyiXuSWb5jEFUTiM6ZycYMg=
+	t=1773656976; cv=none; b=LAdIBxIFqbxeB54plh9V1J5pUmYMUeS4P08oRbZPYvZsuAVo6PR2McSX/yrtwlvOIMaVGeZ7+epGuq3A2UgoSy0ZNPEJHYFoZaix2hCfeYaKGkWg97B9lDKoJy4wA0zJQnHZM1Z0sELU4d52QsGHLEoBCCcpR6YASDFItDL3JqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773656285; c=relaxed/simple;
-	bh=c30q8cP+1tW7hMgKrmZODRuHGnO1oWLiLKKYH9vT2C8=;
+	s=arc-20240116; t=1773656976; c=relaxed/simple;
+	bh=aEX4QN5c8CL9OE1RZp1PM5q0rNqVRA4KwIpl/cQoysE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tXVqCkEs09iLDfzGD7rSTlXB9+bIGIJCHgdgUKGRNap6YpVsr4TtR+e7xHDKZxe0PgZvRn26LAv8BOihsHpri5dZZjXj7cJBYQuX0bvVDTYMAk7GLLnBETHcotVlv5Y9kKDy4lJeZ36zYdXUQKTEcS3wCf45+z1B6BMqE9UAl+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 422051477;
-	Mon, 16 Mar 2026 03:17:57 -0700 (PDT)
-Received: from localhost (e132581.arm.com [10.1.196.87])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CAD483F73B;
-	Mon, 16 Mar 2026 03:18:02 -0700 (PDT)
-Date: Mon, 16 Mar 2026 10:18:00 +0000
-From: Leo Yan <leo.yan@arm.com>
-To: Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
-	James Clark <james.clark@linaro.org>, Kees Cook <kees@kernel.org>,
-	Quentin Monnet <qmo@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=rPoGhiZvVbcsITC9UBQonbWRKnYwWkZ2z7nVLA1rXBroVnClqkBlhhNk0R6fnNfkFnXSEh8r0TLz6CL5CE7Ct1DaAvIu6lXsSU9njhaALiB1rULA1KIvhuhlh690B8r4kzqZFOBcH6ala4zquLSBaNTlOFprNrdvBixGDrRTSo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y+47v3iI; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y+47v3iI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A96DC19421;
+	Mon, 16 Mar 2026 10:29:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773656976;
+	bh=aEX4QN5c8CL9OE1RZp1PM5q0rNqVRA4KwIpl/cQoysE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Y+47v3iI+4kvn42T2jWbqKBDm43CcCm6M3z5QDiSOmlTsamspBVtd3yX2bACVWUu4
+	 /Yuwg2ImBDxJ+tEegQfsKt4mXCi21MBaF8MBRYPQ/thEBI6vB2o7UWp2q5iA3A4S1/
+	 934sREUs6YqhCclcetk/rVDltko00dxm4TehNayHbw12QEs4JZA2DGlS/PQ6foSDOT
+	 gZHWLC3bog7hy/78OrhGuznn9DasnzOnVM+CrIKKq7Ptj18LlHbp6pfXq/M+En9ZWg
+	 MhGM8I3cu40pLVyGg3Ed/XI019FTfL8QlYtmdiWMDaNgUd2i6ttLzX16rR8xNmzvJi
+	 uF8cViMdYxzRQ==
+Date: Mon, 16 Mar 2026 08:07:29 +0100
+From: Nicolas Schier <nsc@kernel.org>
+To: Yonghong Song <yonghong.song@linux.dev>
+Cc: linux-kbuild@vger.kernel.org, live-patching@vger.kernel.org,
+	Josh Poimboeuf <jpoimboe@kernel.org>, kernel-team@fb.com,
+	Nathan Chancellor <nathan@kernel.org>, Song Liu <song@kernel.org>
+Subject: Re: [PATCH kbuild v2] kbuild: Reduce the number of
+ compiler-generated suffixes for clang thin-lto build
+Message-ID: <abesMbRN2PFkobxY@levanger>
+Mail-Followup-To: Nicolas Schier <nsc@kernel.org>,
 	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Daniel Lezcano <daniel.lezcano@kernel.org>,
-	Zhang Rui <rui.zhang@intel.com>, Lukasz Luba <lukasz.luba@arm.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>, Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	William Breathitt Gray <wbg@kernel.org>,
-	Barry Song <baohua@kernel.org>, Qinxin Xia <xiaqinxin@huawei.com>,
-	Bartosz Golaszewski <brgl@kernel.org>,
-	Kent Gibson <warthog618@gmail.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Long Li <longli@microsoft.com>, Jonathan Cameron <jic23@kernel.org>,
-	David Lechner <dlechner@baylibre.com>,
-	Nuno =?iso-8859-1?Q?S=E1?= <nuno.sa@analog.com>,
-	Andy Shevchenko <andy@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>, Willy Tarreau <w@1wt.eu>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Robert Moore <robert.moore@intel.com>, Len Brown <lenb@kernel.org>,
-	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-	Tejun Heo <tj@kernel.org>, David Vernet <void@manifault.com>,
-	Andrea Righi <arighi@nvidia.com>,
-	Changwoo Min <changwoo@igalia.com>, Mark Brown <broonie@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Gabriele Monaco <gmonaco@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	Jiri Kosina <jikos@kernel.org>,
-	Benjamin Tissoires <bentiss@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, bpf@vger.kernel.org,
-	linux-perf-users@vger.kernel.org
-Subject: Re: [PATCH v4 07/30] libbpf: Initialize CFLAGS before including
- Makefile.include
-Message-ID: <20260316101800.GB8048@e132581.arm.com>
-References: <20260311-tools_build_fix_zero_init-v4-0-9e35bdb99cb3@arm.com>
- <20260311-tools_build_fix_zero_init-v4-7-9e35bdb99cb3@arm.com>
+	linux-kbuild@vger.kernel.org, live-patching@vger.kernel.org,
+	Josh Poimboeuf <jpoimboe@kernel.org>, kernel-team@fb.com,
+	Nathan Chancellor <nathan@kernel.org>, Song Liu <song@kernel.org>
+References: <20260307050250.3767489-1-yonghong.song@linux.dev>
+ <177332462174.82802.2344537821152391518.b4-ty@kernel.org>
+ <044bebc0-d996-4be3-9330-a64195c19a84@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20260311-tools_build_fix_zero_init-v4-7-9e35bdb99cb3@arm.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <044bebc0-d996-4be3-9330-a64195c19a84@linux.dev>
 
-Hi BPF maintainers,
-
-On Wed, Mar 11, 2026 at 08:29:32AM +0000, Leo Yan wrote:
-> tools/scripts/Makefile.include may expand EXTRA_CFLAGS in a future
-> change.  This could alter the initialization of CFLAGS, as the default
-> options "-g -O2" would never be set once EXTRA_CFLAGS is expanded.
+On Sun, Mar 15, 2026 at 09:37:22AM -0700, Yonghong Song wrote:
 > 
-> Prepare for this by moving the CFLAGS initialization before including
-> tools/scripts/Makefile.include, so it is not affected by the extended
-> EXTRA_CFLAGS.
 > 
-> Append EXTRA_CFLAGS to CFLAGS only after including Makefile.include and
-> place it last so that the extra flags propagate properly and can
-> override the default options.
+> On 3/12/26 7:12 AM, Nicolas Schier wrote:
+> > On Fri, 06 Mar 2026 21:02:50 -0800, Yonghong Song wrote:
+> > > The current clang thin-lto build often produces lots of symbols with
+> > > suffix. The following is a partial list of such function call symbols:
+> > >      ...
+> > >      ethnl_module_fw_flash_ntf.llvm.7631589765585346066
+> > >      __nf_conntrack_alloc.llvm.6438426151906658917
+> > >      tcp_can_early_drop.llvm.11937612064648250727
+> > >      tcp_print_conntrack.llvm.11937612064648250727
+> > >      ...
+> > > 
+> > > [...]
+> > Note: Due to application of [1] to kbuild-next-unstable, I had to update the
+> >        patch context.
+> > 
+> > [1]: https://lore.kernel.org/linux-kbuild/20251028182822.3210436-1-xur@google.com/
+> > 
+> > 
+> > 
+> > Applied to kbuild/kbuild-next.git (kbuild-next-unstable), thanks!
+> > 
+> > [1/1] kbuild: Reduce the number of compiler-generated suffixes for clang thin-lto build
+> >        https://git.kernel.org/kbuild/c/b7a7ce34
+> > 
+> > Please look out for regression or issue reports or other follow up
+> > comments, as they may result in the patch/series getting dropped,
+> > reverted or modified (e.g. trailers). Patches applied to the
+> > kbuild-next-unstable branch are accepted pending wider testing in
+> > linux-next and any post-commit review; they will generally be moved
+> > to the kbuild-next branch in about a week if no issues are found.
 > 
-> Signed-off-by: Leo Yan <leo.yan@arm.com>
-
-Before sending a new version, I'd check if you have a chance to review
-the libbpf patches.  The libbpf change is crucial for this series.
-
-Another reason for pinging because I received a bpf-ci report about test
-failures for this series [1].  The failures looks to be unrelated, as
-the tests fail starting from the first patch, which is irrelevant to BPF
-code [2].  I tried reaching kernel-ci@meta.com last week but haven't
-received a response yet.
-
-If bpf-ci testing is mandatory for libbpf patches, could you advise me
-on the correct workflow (e.g., whether the patches should be based on a
-specific branch)?
-
-Thanks.
-
-[1] https://github.com/kernel-patches/bpf/actions/runs/22944268645
-[2] https://patchwork.kernel.org/project/netdevbpf/patch/20260311-tools_build_fix_zero_init-v4-1-9e35bdb99cb3@arm.com/
-
-> ---
->  tools/lib/bpf/Makefile | 16 +++++++++-------
->  1 file changed, 9 insertions(+), 7 deletions(-)
+> Thanks, Nicolas,
 > 
-> diff --git a/tools/lib/bpf/Makefile b/tools/lib/bpf/Makefile
-> index b1fbd0211c5edde7be3d98630b16e53e028d9116..eca584fb061e16013e76827e4203f6be0477a73e 100644
-> --- a/tools/lib/bpf/Makefile
-> +++ b/tools/lib/bpf/Makefile
-> @@ -49,6 +49,14 @@ man_dir_SQ = '$(subst ','\'',$(man_dir))'
->  export man_dir man_dir_SQ INSTALL
->  export DESTDIR DESTDIR_SQ
->  
-> +# Defer assigning EXTRA_CFLAGS to CFLAGS until after including
-> +# tools/scripts/Makefile.include, as it may add flags to EXTRA_CFLAGS.
-> +ifdef EXTRA_CFLAGS
-> +  CFLAGS :=
-> +else
-> +  CFLAGS := -g -O2
+> I looked at the patch [1] and find that my patch needs some change.
+> The current change is
+> 
+> @@ -1047,6 +1047,7 @@ CC_FLAGS_LTO := -flto
+> else
+> CC_FLAGS_LTO := -flto=thin -fsplit-lto-unit
+> +KBUILD_LDFLAGS += $(call ld-option,--lto-whole-program-visibility -mllvm
+> -always-rename-promoted-locals=false)
+> endif
+> CC_FLAGS_LTO += -fvisibility=hidden Due to [1], the above change should be
+> @@ -1047,6 +1047,7 @@ CC_FLAGS_LTO := -flto
+> else
+> CC_FLAGS_LTO := -flto=thin -fsplit-lto-unit
+> +if CONFIG_LTO_CLANG_THIN
+> +KBUILD_LDFLAGS += $(call ld-option,--lto-whole-program-visibility -mllvm
+> -always-rename-promoted-locals=false)
 > +endif
-> +
->  include $(srctree)/tools/scripts/Makefile.include
->  
->  # copy a bit from Linux kbuild
-> @@ -70,13 +78,6 @@ LIB_TARGET	= libbpf.a libbpf.so.$(LIBBPF_VERSION)
->  LIB_FILE	= libbpf.a libbpf.so*
->  PC_FILE		= libbpf.pc
->  
-> -# Set compile option CFLAGS
-> -ifdef EXTRA_CFLAGS
-> -  CFLAGS := $(EXTRA_CFLAGS)
-> -else
-> -  CFLAGS := -g -O2
-> -endif
-> -
->  # Append required CFLAGS
->  override CFLAGS += -std=gnu89
->  override CFLAGS += $(EXTRA_WARNINGS) -Wno-switch-enum
-> @@ -84,6 +85,7 @@ override CFLAGS += -Werror -Wall
->  override CFLAGS += $(INCLUDES)
->  override CFLAGS += -fvisibility=hidden
->  override CFLAGS += -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
-> +override CFLAGS += $(EXTRA_CFLAGS)
->  
->  # flags specific for shared library
->  SHLIB_FLAGS := -DSHARED -fPIC
+> endif
+> CC_FLAGS_LTO += -fvisibility=hidden
 > 
-> -- 
-> 2.34.1
+> The reason likes below:
 > 
+> The patch [1] introduced CONFOG_LTO_CLANG_THIN_DIST and in Makefile, for the following change:
+> 
+>  ifdef CONFIG_LTO_CLANG
+> -ifdef CONFIG_LTO_CLANG_THIN -CC_FLAGS_LTO := -flto=thin -fsplit-lto-unit
+> -else +ifdef CONFIG_LTO_CLANG_FULL  CC_FLAGS_LTO	:= -flto
+> +else +CC_FLAGS_LTO := -flto=thin -fsplit-lto-unit  endif
+>  CC_FLAGS_LTO	+= -fvisibility=hidden
+> 
+> The else branch 'CC_FLAGS_LTO := -flto=thin -fsplit-lto-unit' will support both CONFIG_LTO_CLANG_THIN and CONFIG_LTO_CLANG_THIN_DIST.
+> 
+> My patch commit message mentioned that the new flag won't support
+> thinlto distributed mode yet. So The new ldflags
+>   $(call ld-option,--lto-whole-program-visibility -mllvm
+> -always-rename-promoted-locals=false) needs under LTO_CLANG_THIN but not
+> LTO_CLANG_THIN_DIST. There will be some effort in llvm to support
+> distributed thin-lto as well for suffix reduction. But it may take a little
+> bit time as llvm needs some infrastructure change before supporting
+> distributed thin-lto. Thanks!
+
+Thanks a lot!  I changed the commit as instructed:
+
+$ git range-diff b7a7ce345daa...6a76b3c06a1d
+1:  b7a7ce345daa ! 1:  6a76b3c06a1d kbuild: Reduce the number of compiler-generated suffixes for clang thin-lto build
+    @@ Makefile: ifdef CONFIG_LTO_CLANG_FULL
+      CC_FLAGS_LTO      := -flto
+      else
+      CC_FLAGS_LTO      := -flto=thin -fsplit-lto-unit
+    ++if CONFIG_LTO_CLANG_THIN
+     +KBUILD_LDFLAGS += $(call ld-option,--lto-whole-program-visibility -mllvm -always-rename-promoted-locals=false)
+    ++endif
+      endif
+      CC_FLAGS_LTO      += -fvisibility=hidden
+
+
+and it is pushed to kbuild/kbuild-next-unstable
+https://git.kernel.org/kbuild/c/6a76b3c06a1d359a3e84c37bc0fead370f6ccfc0
+
+
+-- 
+Nicolas
