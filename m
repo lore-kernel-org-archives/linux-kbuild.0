@@ -1,110 +1,104 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9017C175A86;
-	Sun, 22 Mar 2026 23:37:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED5AC40DFA1;
+	Mon, 23 Mar 2026 00:04:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774222634; cv=none; b=mUOayxGd1ZfBUVeEbG1smemsrP4ZxUuWqzIUjATYxYmVukwcIf7M6dqSNqOH4tPLnYya4w+qiiH5HWbM3t0PBbBcbFvmcPOC1SgBoWOEr4XJjeqxKzGBPpO0afuvePpU3nsAeRSjptqiXvYm4UOb1WPk4Fkp3IYtguyVDoSBMTQ=
+	t=1774224242; cv=none; b=RtbKHexj7obgKLOUp7KtZbzoBBwm4DcNX8S6uV+80NOrsgBG6c7S7lMuSSjKgecYKlg9VyRnKIwW7ajvOXR4BbUqtb/kHC18/jHIIufgpCs0MAENeEwOKdOwOf4d0sKTb0f7Q2lmaXU4Ww69s8M2G3IYEw+8HYfZbNcpQaXi9WU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774222634; c=relaxed/simple;
-	bh=C+cpYEwtbl8C0q9C0mMalH+TLGhOE8srxZhSJuIwx+g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iaGyXhjXCr31IXVxEMo8f0u4qbwwuIAf23hP9TPvLT10MNX5r3Y/RBgJAvprp3/98dPFeLGPEDi3oi75/jbFbHrN7svRIlNkDovNnW1kMa9Q0+ZgbCuqbi9+9dmt6OoP3hQ3r6A8WGeL/XaXqN61HlZwJknAc5YO/UcBXN7lpGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d+7WSNmZ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774224242; c=relaxed/simple;
+	bh=TIx02c+Ao/gjEr9Xh8zmMJ4cknC+KKpUO0TYsvtJrYU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=M2xZVFQI7nB9y3LUSzmSktYWYcMffH/IziKC8qUHMpBxWHslI/FcXBRyMxyhKvbWTgwRlUiysHfGXaVJXy/vrJsD1CZObjaIqG1mPXxvvvEltmFQr76lSFDUjA1KgG5YXwmTRdOguRO6QZHFvV3ORUdPtXtx4wu9GepKOcq2cAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qv6Jxmle; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d+7WSNmZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E31D6C19424;
-	Sun, 22 Mar 2026 23:37:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qv6Jxmle"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91BD7C19424;
+	Mon, 23 Mar 2026 00:03:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774222634;
-	bh=C+cpYEwtbl8C0q9C0mMalH+TLGhOE8srxZhSJuIwx+g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=d+7WSNmZj4S8oSiXYk5eP5KyTbdNiEYggcm6Uj+B/1sYgR/Ce4pTRNKUoSr1Gf26q
-	 A5k+Ilqbqq7SdtpY1NBZzaCqeQZInLxHSsLlO3hj7yq8dEwlhGRo74lYFri8GjW/PT
-	 rSD9CwyrDne9Wza2FNGZtS30s8K30TxX5FaiDedQeVP7C9sP4NfWf47cD849Xp+CvZ
-	 6SXhpdtgnrmxguPMgp9+RUUJDWQyfeF4bYe7iFpkUuC/zauJtzFqqbRBXCEPPcX2Ay
-	 I9Dj54Lg86HRUtj2hxAJajZR2EN/AacRIqEx7dnNHhO6miQ1JvJuyiBA3xdXxNgH0u
-	 9R/zGQG+rUdIQ==
-Date: Sun, 22 Mar 2026 18:37:13 -0500
-From: Rob Herring <robh@kernel.org>
-To: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jirislaby@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nicolas.schier@linux.dev>,
-	Hans de Goede <hansg@kernel.org>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Mark Pearson <mpearson-lenovo@squebb.ca>,
-	"Derek J. Clark" <derekjohn.clark@gmail.com>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Bartosz Golaszewski <brgl@kernel.org>, linux-serial@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-	platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org,
-	Stephan Gerhold <stephan.gerhold@linaro.org>,
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
-	linux-acpi@vger.kernel.org
-Subject: Re: [PATCH v6 6/9] dt-bindings: connector: m2: Add M.2 1620 LGA
- soldered down connector
-Message-ID: <20260322233713.GA98177-robh@kernel.org>
-References: <20260317-pci-m2-e-v6-0-9c898f108d3d@oss.qualcomm.com>
- <20260317-pci-m2-e-v6-6-9c898f108d3d@oss.qualcomm.com>
+	s=k20201202; t=1774224241;
+	bh=TIx02c+Ao/gjEr9Xh8zmMJ4cknC+KKpUO0TYsvtJrYU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Qv6JxmleN9/FehBcjvyaVa1MkmaXr4Sv6DcsFlJ96PsdiyVC/3pYc+m9Fwy/RrdSG
+	 k5iZa7SJc1Ft+h6UZKpE7yAG8OVAeY+4bKrG5ag2HU4QV8BqxvEHeMinl3wg76IP19
+	 XbngVTWCPutXEd0vLUj4yiykgEMAB738SKwiuyl2eLDpHKdp6Dn+XZO24604aijCIz
+	 vMZ00TvFd1eEU9/TTw62WquUyTwe31b33w4myELOF078ren7RgnzMj7AwOEOoJK8OO
+	 He1JYHC23hpTrczCRcVKZKDqpyOBK3ynq1rAxPlCOxuKwamlGfrVspQwrE3ZP8XexF
+	 uqm5O+jaQqgSA==
+From: Miguel Ojeda <ojeda@kernel.org>
+To: ojeda@kernel.org
+Cc: a.hindborg@kernel.org,
+	acourbot@nvidia.com,
+	akpm@linux-foundation.org,
+	aliceryhl@google.com,
+	anton.ivanov@cambridgegreys.com,
+	bjorn3_gh@protonmail.com,
+	boqun.feng@gmail.com,
+	dakr@kernel.org,
+	david@davidgow.net,
+	gary@garyguo.net,
+	johannes@sipsolutions.net,
+	justinstitt@google.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-um@lists.infradead.org,
+	linux@armlinux.org.uk,
+	llvm@lists.linux.dev,
+	lossin@kernel.org,
+	mark.rutland@arm.com,
+	mmaurer@google.com,
+	morbo@google.com,
+	nathan@kernel.org,
+	nick.desaulniers+lkml@gmail.com,
+	nicolas.schier@linux.dev,
+	nsc@kernel.org,
+	peterz@infradead.org,
+	richard@nod.at,
+	rust-for-linux@vger.kernel.org,
+	tmgross@umich.edu,
+	urezki@gmail.com,
+	will@kernel.org
+Subject: Re: Re: [PATCH v2 0/3] Inline helpers into Rust without full LTO
+Date: Mon, 23 Mar 2026 01:03:27 +0100
+Message-ID: <20260323000327.111235-1-ojeda@kernel.org>
+In-Reply-To: <20260322192159.88138-1-ojeda@kernel.org>
+References: <20260322192159.88138-1-ojeda@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260317-pci-m2-e-v6-6-9c898f108d3d@oss.qualcomm.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Mar 17, 2026 at 09:59:56AM +0530, Manivannan Sadhasivam wrote:
-> Lenovo Thinkpad T14s is found to have a soldered down version of M.2 1620
-> LGA connector. Though, there is no 1620 LGA form factor defined in the M.2
-> spec, it looks very similar to the M.2 Key E connector. So add the
-> "pcie-m2-1620-lga-connector" compatible with "pcie-m2-e-connector" fallback
-> to reuse the Key E binding.
+On Sun, 22 Mar 2026 20:21:59 +0100 Miguel Ojeda <ojeda@kernel.org> wrote:
+>
+>     On the other hand, regardless of whether we fix this (and another
+>     issue in a separate email found thanks to the UML build), we could
+>     instead add `depends on` listing explicitly the architectures where
+>     this is going to be actually tested. That way maintainers can decide
+>     whether they want to support it when they are ready. Thoughts?
 
-What is LGA?
+Another one for arm 32-bit:
 
-If not in the spec, is it really something generic?
+      LD      .tmp_vmlinux1
+    ld.lld: error: undefined symbol: __aeabi_read_tp
+    >>> referenced by uaccess.rs:349 (rust/kernel/uaccess.rs:349)
+    >>>               samples/rust/rust_misc_device.o:(<rust_misc_device::RustMiscDevice as kernel::miscdevice::MiscDevice>::ioctl) in archive vmlinux.a
+    >>> referenced by uaccess.rs:543 (rust/kernel/uaccess.rs:543)
+    >>>               samples/rust/rust_misc_device.o:(<rust_misc_device::RustMiscDevice as kernel::miscdevice::MiscDevice>::ioctl) in archive vmlinux.a
+    >>> referenced by uaccess.rs:543 (rust/kernel/uaccess.rs:543)
+    >>>               drivers/android/binder/rust_binder_main.o:(rust_binder_main::rust_binder_ioctl) in archive vmlinux.a
+    >>> referenced 36 more times
 
-> 
-> Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-> ---
->  .../devicetree/bindings/connector/pcie-m2-e-connector.yaml       | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/connector/pcie-m2-e-connector.yaml b/Documentation/devicetree/bindings/connector/pcie-m2-e-connector.yaml
-> index f7859aa9b634..d8cf9a9ec7d0 100644
-> --- a/Documentation/devicetree/bindings/connector/pcie-m2-e-connector.yaml
-> +++ b/Documentation/devicetree/bindings/connector/pcie-m2-e-connector.yaml
-> @@ -17,7 +17,14 @@ description:
->  
->  properties:
->    compatible:
-> -    const: pcie-m2-e-connector
-> +    oneOf:
-> +      - items:
-> +          - enum:
-> +              - pcie-m2-1620-lga-connector
-> +          - const: pcie-m2-e-connector
-> +      - items:
-> +          - enum:
-> +              - pcie-m2-e-connector
->  
->    vpcie3v3-supply:
->      description: A phandle to the regulator for 3.3v supply.
-> 
-> -- 
-> 2.51.0
-> 
+I think this reinforces the case that this is something that arch folks
+should think about case by case, and decide if they want to try -- we
+may want to start simple with x86_64 and arm64 or similar first.
+
+Thanks!
+
+Cheers,
+Miguel
