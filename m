@@ -1,109 +1,97 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 446F9257828;
-	Mon, 23 Mar 2026 15:16:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C58A3B2FEF;
+	Mon, 23 Mar 2026 15:18:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774279009; cv=none; b=LMlDW834VpyBL2rmt10WyCqy11kO4VO8v+VUnONMiTfNRtF6L3hhZXVfgI265CqyUlF+l8ksk2M5fPQZnZ0caaOndzcq37UO6hf8r4lnIc9RX45SeBnUA5AVokCt6LkGU0LLVuMx+okXfKqJe7T1jcFEJ/NS7IXtJBB5OhrQ3R8=
+	t=1774279129; cv=none; b=rne/jwOse9HAPD/4Q7ZEzh/GIUdAN7Z9DmAfgpUcOEO2WmSyd90K4kW0vV+6rR3Y6yEstCzfySu3/AUQ8LvVnfcyWyKRRdenuh+tb+32Ak1SpoSvTFWQjlqg1TKqRstFRqlyS49cWDFOpPQJD9Mxbxy4oJ0Cs+rxATIov4vPiQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774279009; c=relaxed/simple;
-	bh=u6vnl/Tc6siw5/z3VuI7EgUIJilNCagL/0epWPyB+xk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=BgRizvyKrBkDLqiBuGy7gP6/wDrM+MyGwGTwumtzGDJuEmohdC5Qftk4Eu1wYh9myIbO8vwz0+woxrwDhdkIu6EYjuoy7DziKydLvUs/9uRlxVx6mcLjEmqLAB7WSdfMPDpfqU2R7//FcFQn/iYJyjB6U76qD4Wq5RP6Gs8CewE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CEE28169E;
-	Mon, 23 Mar 2026 08:16:41 -0700 (PDT)
-Received: from e132581.arm.com (e132581.arm.com [10.1.196.87])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9102A3F694;
-	Mon, 23 Mar 2026 08:16:40 -0700 (PDT)
-From: Leo Yan <leo.yan@arm.com>
-Date: Mon, 23 Mar 2026 15:13:45 +0000
-Subject: [PATCH v6 24/24] selftests/sched_ext: Append extra cflags
+	s=arc-20240116; t=1774279129; c=relaxed/simple;
+	bh=pbXYxhzMz1CXELl5GAMQGqn3VS0cXr+c3mpboLxq4hA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VmSXXN8c2WtH3wQQynNMPQ/4OJ1Uiby0h0yibazGqP0nyC08VKPKrqEkc2mYo/CrLemmjYefUxJhEgk+j+9xtLRyyydgJDuY1dBsKpzwQVR5QpZnJ8ozea5zTzisYi+u0qHwyFw4HtTHUCBw2oZbBuStV0Gh2a7JNJHtZkfRpFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=CJ5hRoCK; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="CJ5hRoCK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72CCBC4CEF7;
+	Mon, 23 Mar 2026 15:18:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1774279129;
+	bh=pbXYxhzMz1CXELl5GAMQGqn3VS0cXr+c3mpboLxq4hA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CJ5hRoCKajUHc8KKiBAP2gYu1mVfUOfWRR6xc1nDC/KmFM8FTX4OS4y9Nfd8vhfAi
+	 J23Pc2XVcANhfXnjGTAo+urvXkyrzow5gFm2OspORm1S/DdOvkBQZXlQYlKUBUvn28
+	 tpGOuXncYvNz+HkAvROWP9p1b6eqV6ah8hy5xkd8=
+Date: Mon, 23 Mar 2026 14:52:58 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Sasha Levin <sashal@kernel.org>
+Cc: linux-api@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kbuild@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	workflows@vger.kernel.org, tools@kernel.org, x86@kernel.org,
+	Thomas Gleixner <tglx@kernel.org>,
+	"Paul E . McKenney" <paulmck@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Cyril Hrubis <chrubis@suse.cz>, Kees Cook <kees@kernel.org>,
+	Jake Edge <jake@lwn.net>,
+	David Laight <david.laight.linux@gmail.com>,
+	Askar Safin <safinaskar@zohomail.com>,
+	Gabriele Paoloni <gpaoloni@redhat.com>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Ingo Molnar <mingo@redhat.com>, Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH v2 3/9] kernel/api: add debugfs interface for kernel API
+ specifications
+Message-ID: <2026032309-jargon-stalling-28c2@gregkh>
+References: <20260322121026.869758-1-sashal@kernel.org>
+ <20260322121026.869758-4-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260323-tools_build_fix_zero_init-v6-24-235858c51af9@arm.com>
-References: <20260323-tools_build_fix_zero_init-v6-0-235858c51af9@arm.com>
-In-Reply-To: <20260323-tools_build_fix_zero_init-v6-0-235858c51af9@arm.com>
-To: Arnaldo Carvalho de Melo <acme@kernel.org>, 
- Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>, 
- James Clark <james.clark@linaro.org>, Kees Cook <kees@kernel.org>, 
- Quentin Monnet <qmo@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
- Nicolas Schier <nsc@kernel.org>, 
- Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, 
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
- Daniel Lezcano <daniel.lezcano@kernel.org>, Zhang Rui <rui.zhang@intel.com>, 
- Lukasz Luba <lukasz.luba@arm.com>, Peter Zijlstra <peterz@infradead.org>, 
- Ingo Molnar <mingo@redhat.com>, Mark Rutland <mark.rutland@arm.com>, 
- Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
- Adrian Hunter <adrian.hunter@intel.com>, 
- Masami Hiramatsu <mhiramat@kernel.org>, 
- William Breathitt Gray <wbg@kernel.org>, Barry Song <baohua@kernel.org>, 
- Qinxin Xia <xiaqinxin@huawei.com>, Bartosz Golaszewski <brgl@kernel.org>, 
- Kent Gibson <warthog618@gmail.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
- Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>, 
- Jonathan Cameron <jic23@kernel.org>, David Lechner <dlechner@baylibre.com>, 
- =?utf-8?q?Nuno_S=C3=A1?= <nuno.sa@analog.com>, 
- Andy Shevchenko <andy@kernel.org>, 
- Andrew Morton <akpm@linux-foundation.org>, Willy Tarreau <w@1wt.eu>, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>, 
- Josh Poimboeuf <jpoimboe@kernel.org>, Robert Moore <robert.moore@intel.com>, 
- Len Brown <lenb@kernel.org>, 
- Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, 
- Tejun Heo <tj@kernel.org>, David Vernet <void@manifault.com>, 
- Andrea Righi <arighi@nvidia.com>, Changwoo Min <changwoo@igalia.com>, 
- Mark Brown <broonie@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
- Gabriele Monaco <gmonaco@redhat.com>, Shuah Khan <shuah@kernel.org>, 
- Jiri Kosina <jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-perf-users@vger.kernel.org, Leo Yan <leo.yan@arm.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1774278820; l=901;
- i=leo.yan@arm.com; s=20250604; h=from:subject:message-id;
- bh=u6vnl/Tc6siw5/z3VuI7EgUIJilNCagL/0epWPyB+xk=;
- b=JnB8boJ/shijbI7Frbs+lXr4odCLHkM9IsCoC1pD8gcG/dHqVN/GVzbc0+8EoIOQxhHz59nI6
- 7YpKLa49EdBADtSb7aBBTX50pASK+NL+6KhSPC2qtt+p5qCos10gaMl
-X-Developer-Key: i=leo.yan@arm.com; a=ed25519;
- pk=k4BaDbvkCXzBFA7Nw184KHGP5thju8lKqJYIrOWxDhI=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260322121026.869758-4-sashal@kernel.org>
 
-Append EXTRA_CFLAGS to CFLAGS so that additional flags can be applied to
-the compiler.
+On Sun, Mar 22, 2026 at 08:10:17AM -0400, Sasha Levin wrote:
+> Add a debugfs interface to expose kernel API specifications at runtime.
+> This allows tools and users to query the complete API specifications
+> through the debugfs filesystem.
+> 
+> The interface provides:
+> - /sys/kernel/debug/kapi/list - lists all available API specifications
+> - /sys/kernel/debug/kapi/specs/<name> - detailed info for each API
+> 
+> Each specification file includes:
+> - Function name, version, and descriptions
+> - Execution context requirements and flags
+> - Parameter details with types, flags, and constraints
+> - Return value specifications and success conditions
+> - Error codes with descriptions and conditions
+> - Locking requirements and constraints
+> - Signal handling specifications
+> - Examples, notes, and deprecation status
+> 
+> This enables runtime introspection of kernel APIs for documentation
+> tools, static analyzers, and debugging purposes.
+> 
+> Signed-off-by: Sasha Levin <sashal@kernel.org>
 
-Acked-by: Andrea Righi <arighi@nvidia.com>
-Signed-off-by: Leo Yan <leo.yan@arm.com>
----
- tools/testing/selftests/sched_ext/Makefile | 1 +
- 1 file changed, 1 insertion(+)
+Debugfs logic looks sane, nice.
 
-diff --git a/tools/testing/selftests/sched_ext/Makefile b/tools/testing/selftests/sched_ext/Makefile
-index 006300ac6dff88a48104977398d8517753e7e385..2c8fbc9f8666ec4d6f75dbdd7602bd4f2b502aed 100644
---- a/tools/testing/selftests/sched_ext/Makefile
-+++ b/tools/testing/selftests/sched_ext/Makefile
-@@ -56,6 +56,7 @@ endif
- CFLAGS += -g -O2 -rdynamic -pthread -Wall -Werror $(GENFLAGS)			\
- 	  -I$(INCLUDE_DIR) -I$(GENDIR) -I$(LIBDIR)				\
- 	  -I$(TOOLSINCDIR) -I$(APIDIR) -I$(CURDIR)/include -I$(SCXTOOLSINCDIR)
-+CFLAGS += $(EXTRA_CFLAGS)
- 
- # Silence some warnings when compiled with clang
- ifneq ($(LLVM),)
+But this only works if the kabi stuff is built into the kernel image,
+right?  This doesn't work if any of these abi sections are in a module
+or am I missing that logic here?
 
--- 
-2.34.1
+thanks,
 
+greg k-h
