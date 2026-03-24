@@ -1,79 +1,112 @@
 Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03AE8342CA2;
-	Tue, 24 Mar 2026 17:05:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDAB32FFFB8;
+	Tue, 24 Mar 2026 17:16:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774371939; cv=none; b=s6yNZ8dLsRX8jbzzTt+DBkl5Drsl0URKZ6qOlN9Mf7m7tlbLt0QmCrU83KODQ0mY6UbZnt36hrUm+hCmOwjD3YaEHVYCM0bJPM88hxq0hK6tGYJOc8ckAe2s++uOp8CW+niL4x2/WXQuiWVxQ7IvCB2zW7aqpzD/vNwtJ2oPwbs=
+	t=1774372614; cv=none; b=ovW+QBjlfTujEGqWtr1QUmHfOB+kW4CS+yr8/6OQAj75PMPZthlbEPAAk8cVsrrZoxwAz2XYUtLyOSaqoJMmkcfDtEVgGxRa7Otv9uguPfoF4zPoYMyVOqZ5K4dXbUTozYd6U25K/vsUr4pZUUohoR0TGWHUp9FUKdHNaoFN8HY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774371939; c=relaxed/simple;
-	bh=+FmG+m+F+/0Dg1Ps29Is+I+2rhF1mrGBY+bR705CsXs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o8rvT4++au/oHXiMCW6AcptT6t4wiIr2p+CrMT4hc9oacV6bpxWECYCsOwkMhxfBS6fYchQgadZgXR3Ld7mZwgrx9ndYHO0SxGVvCY2lEFLoXonAbZ9JE3Pa+xRQ0ZovwrMKCN99va7wa5w8ilc5BrT8wW9qPSxCxk4+Kj+OSsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=F2M3w0ag; arc=none smtp.client-ip=159.69.126.157
+	s=arc-20240116; t=1774372614; c=relaxed/simple;
+	bh=dduxJCgHweVxYiNvudg2ZsGjXC2SsrE2dgbU9AwUCbA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=ln4v5ut0WsFxKR6KLun/8wwT44g15QrO4vC7aci2dUaWHxFEfFLXlmLYA9aJqg6BiPcqD+qiBgf8v0CD7fUa9pX3HBm6ng602pDUylqe4LVPzJDjIJnFV423Rjyu9IPtUzI+1qHTyh6qF0PXHQXsp4BSQ4VOJnGN1ujAN6qjA/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=ZFmMFyGH; arc=none smtp.client-ip=159.69.126.157
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="F2M3w0ag"
+	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="ZFmMFyGH"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-	s=mail; t=1774371935;
-	bh=+FmG+m+F+/0Dg1Ps29Is+I+2rhF1mrGBY+bR705CsXs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=F2M3w0agRT+3Jz042qU24xK8WW+V4UUFtjxIRCjn+KUaTvaOcD7X0Y2hTgiJ+M6NI
-	 rnNfX8xMYntCKd28GRSLFhjoWFr7qxG3yZvhxX687Iqo5ZNEW2F9timitnO0UmXdu4
-	 CNq7GndGffbsbF5BpEfVtjDvAMVE50poTZHi5FnM=
-Date: Tue, 24 Mar 2026 18:05:34 +0100
-From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, Nicolas Schier <nsc@kernel.org>, 
-	"Maciej W. Rozycki" <macro@orcam.me.uk>, Nick Huang <sef1548@gmail.com>, linux-kernel@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org
-Subject: Re: [PATCH] scripts: headers_install.sh: Normalize __ASSEMBLY__ to
- __ASSEMBLER__
-Message-ID: <3d6608fe-be15-497a-85a3-e6af2dbded0a@t-8ch.de>
-References: <20260309-uapi-assembly-v1-1-a7ebfbf14309@weissschuh.net>
- <20260313235618.GA4171564@ax162>
+	s=mail; t=1774372611;
+	bh=dduxJCgHweVxYiNvudg2ZsGjXC2SsrE2dgbU9AwUCbA=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=ZFmMFyGHh8xLPoK0dJkucVrkCeSoHuJSPlHpbGmwX0EQlK9L1DCVMrrJDusFkzKh0
+	 xCJtXs6P0TuSMxUwncWucmUDu148p4V6JUNYV3bK/FRwOe4Lw4Aw8pjE8a1rWVvqJv
+	 0NGxAkOKVmosMYCT9KpoKNbIAU5Hymj6lbpTtq64=
+From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+Date: Tue, 24 Mar 2026 18:16:46 +0100
+Subject: [PATCH v2 2/3] checksyscalls: only run when necessary
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260313235618.GA4171564@ax162>
+Message-Id: <20260324-kbuild-missing-syscalls-v2-2-651b8beb0bfd@weissschuh.net>
+References: <20260324-kbuild-missing-syscalls-v2-0-651b8beb0bfd@weissschuh.net>
+In-Reply-To: <20260324-kbuild-missing-syscalls-v2-0-651b8beb0bfd@weissschuh.net>
+To: Arnd Bergmann <arnd@arndb.de>, 
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+ Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
+Cc: linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-mips@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1774372608; l=1897;
+ i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
+ bh=dduxJCgHweVxYiNvudg2ZsGjXC2SsrE2dgbU9AwUCbA=;
+ b=kAHN5WQSNDvqL5cVowFQLOPm7uQNBmUnSkbP4ygCMbiQeekCS/sIu+2fTy5KCDGm4j8v1VgbI
+ q4my+qCwnmBDIkcsHl9d84DQ0j62lZRgBjGK+weUqVcAcZHkkxroKFZ
+X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
+ pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 
-Hi Nathan,
+Currently checksyscalls.sh is unconditionally executed during each build.
+Most of these executions are unnecessary.
 
-sorry for the late response, this seems to have fallen through the
-cracks.
+Only run checksyscalls.sh if one of its inputs have changed.
 
-On 2026-03-13 16:56:18-0700, Nathan Chancellor wrote:
-> On Mon, Mar 09, 2026 at 04:58:11PM +0100, Thomas Weißschuh wrote:
-> > There is an ongoing effort to replace the usage of __ASSEMBLER__ with
-> > __ASSEMBLY__ throughout the kernel tree, see for example
-> 
-> I think __ASSEMBLER__ and __ASSEMBLY__ are swapped here?
+This new logic does not work for the multiple invocations done for MIPS.
+The effect is that checksyscalls.sh is still executed unconditionally.
+However this is not worse than before.
 
-Indeed.
+Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
+---
+ Kbuild                   | 12 +++++++++---
+ scripts/checksyscalls.sh |  5 +++++
+ 2 files changed, 14 insertions(+), 3 deletions(-)
 
-(Also all the other cases)
+diff --git a/Kbuild b/Kbuild
+index 13324b4bbe23..515cc6a27477 100644
+--- a/Kbuild
++++ b/Kbuild
+@@ -47,12 +47,18 @@ $(rq-offsets-file): kernel/sched/rq-offsets.s FORCE
+ 
+ # Check for missing system calls
+ 
++missing-syscalls-file := .tmp_missing-syscalls
++
++targets += $(missing-syscalls-file)
++
+ quiet_cmd_syscalls = CALL    $<
+-      cmd_syscalls = $(CONFIG_SHELL) $< $(CC) $(c_flags) $(missing_syscalls_flags)
++      cmd_syscalls = DEPFILE=$(depfile) $(CONFIG_SHELL) $< $(CC) $(c_flags) $(missing_syscalls_flags); touch $@
++
++$(missing-syscalls-file): scripts/checksyscalls.sh $(rq-offsets-file) FORCE
++	$(call if_changed_dep,syscalls)
+ 
+ PHONY += missing-syscalls
+-missing-syscalls: scripts/checksyscalls.sh $(rq-offsets-file)
+-	$(call cmd,syscalls)
++missing-syscalls: $(missing-syscalls-file)
+ 
+ # Check the manual modification of atomic headers
+ 
+diff --git a/scripts/checksyscalls.sh b/scripts/checksyscalls.sh
+index 9becaf8d7b78..a6d0882f07e1 100755
+--- a/scripts/checksyscalls.sh
++++ b/scripts/checksyscalls.sh
+@@ -273,3 +273,8 @@ syscall_list() {
+ 
+ (ignore_list && syscall_list ${reference_table}) | \
+ $* -Wno-error -Wno-unused-macros -E -x c - > /dev/null
++
++# For fixdep
++if [ -n "${DEPFILE}" ]; then
++	echo "${0}: ${0} ${reference_table}" >> "${DEPFILE}"
++fi
 
-(...)
+-- 
+2.53.0
 
-> > automatically. So this migration may brake users.
-> 
-> It sounds like the "< GCC 3.0" part of that might not be true based on
-> Maciej's research?
-> 
->   https://lore.kernel.org/alpine.DEB.2.21.2603101412520.63708@angie.orcam.me.uk/
-
-Yes, indeed. In my opinion the consistency aspect is still sufficient
-to have this change. What do you think?
-
-(...)
-
-
-Thomas
