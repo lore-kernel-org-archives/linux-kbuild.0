@@ -1,31 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACE7B3C344E;
-	Wed, 25 Mar 2026 12:22:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F6C3CF68F;
+	Wed, 25 Mar 2026 12:27:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774441350; cv=none; b=lofEW6nBLAu+RtKXbTZxpY3JiLJrxQO6deDKnQPaEyJpOM2yYIUni488b4OLs+BfcXoiz/ORY5WRYWnhAMOy67ne0nxE7sTZY1/GBjduj7uAgTu5et0MCGLwbormg9j5fyqWhc7LZn4Yfs92OZq9LQ0kmgqT/7PRF7CbmjoWvBU=
+	t=1774441661; cv=none; b=CDvuneAptlRX7rO7ozgWgrw+Fn51HfTcSMR/ools6Crws840ZRQ60kq5wsneCOXZ9Xpw20t4XYQ34OwrHVjWA7KijlAZOUelAIdo32aU8+9r5uXtg13fx1l/eDdbq1lSQyG+a1NN2aQUYhzXz/iO1B/Ba++81kavtgIxmSk+Pc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774441350; c=relaxed/simple;
-	bh=jR++UhQwlnzd6tQ1GyMO+/4oIFawypTF5Dxm1zLj5gY=;
-	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
-	 References:Date:Message-Id; b=QNyHbCFPUBrsYHO0Bdyw89OTSKuyYjhvmnys0UGW1/wtpK+QCVRA95SnY42BM8vV0mG//WPgRKWNEd2JHS5E4CUyUIX7SQQXm1J2z287wl/zp3kNjHBAQXPnlXiUjFzC3WMn+X+QZgXytA7e0xtgiEn3oFdryguJHWvKRLZoQ8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PM33kyn8; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774441661; c=relaxed/simple;
+	bh=I9qOvfpmMqhhFBqDS8DN+mfdCofMKbVExq8WC1M0iH8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MvE5eYl3dw67XdxmEARks6E/IG6wiZQyUVCfaU+NpYtWZmHo6zkjRduSjkO1bgobLDt4KkDblypHINVqBxcHhmIB0wMbq66Dan42x3LTvC8AHr3QLkgfAUIerLULlr1UO0BpqW8mSMQJ9f4DOz/G5kj71FzBWBKak02eAUHsUS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MxP0w5oM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PM33kyn8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5DA4C4CEF7;
-	Wed, 25 Mar 2026 12:22:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MxP0w5oM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CC4FC4CEF7;
+	Wed, 25 Mar 2026 12:27:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774441350;
-	bh=jR++UhQwlnzd6tQ1GyMO+/4oIFawypTF5Dxm1zLj5gY=;
-	h=Subject:From:To:Cc:In-Reply-To:References:Date:From;
-	b=PM33kyn8vitYaRmDSHgKSEHxqs8XTeSaT9T3kixyJCkqUq2/P6SEq0HmjRvoGiivw
-	 4Ypu0ffZINEuqVXrtH6WPJamQ9hI23CKlJdcfwQryS9r3jCUnc/vx01Te3i+f1Fi9+
-	 hX4rhDtkQGJoSDT8o1e9KbOB4FvXPY1WqP79Z43QXnsgLe8SV2/GvVdj4LY4DgfXhY
-	 jmRRUq4x5onfkLBeP5woSaxH8z2YI7qYI+cCoWbrql7Opj4C2KO76EylQtUqb95j3D
-	 BttdjOCJJ/Hp2B86cy9jXleGoqkLkZnqvaTylp0jQDzZZ+tVo0F2wKcGO4ZToY77M3
-	 gIojBL+hhGtvA==
+	s=k20201202; t=1774441661;
+	bh=I9qOvfpmMqhhFBqDS8DN+mfdCofMKbVExq8WC1M0iH8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=MxP0w5oMLl+iP9gUhRyCVHW9h47CyKw3I00FIS8x5Dk4s7wgnh0evj6oEsrDrdPtT
+	 aA5I9tVS5dZp8BfzCgw9xC1xWMEe9k0hYC1M3tWTWp1QT8sURRLmHpvjQ9lB+X4MLC
+	 0Udq3DeSGDoKczrexGIuTlTbngSloAWufaCb8wf39mG1dcODrKMG3j4yj9lEGR+Pzo
+	 HPVMqVzsMR9+R+4ih0pCT3na9VFz+gBJYkamNNPLVGfYQKy5JoUYetEjS07gIdW8nX
+	 R58ypQNut9HpaIWfzbNo5oHybZEZ5kpp0aOEbcl+wQJGCGoRnuG10YTLl3pvZQcZy2
+	 c12ftEUtHGlqg==
+From: Nicolas Schier <nsc@kernel.org>
+To: Arnd Bergmann <arnd@arndb.de>,
+	Nathan Chancellor <nathan@kernel.org>,
+	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <linux@weissschuh.net>
+Cc: Nicolas Schier <nsc@kernel.org>,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH v2 0/5] kbuild: uapi: also test UAPI headers against C++ compilers
+Date: Wed, 25 Mar 2026 13:27:32 +0100
+Message-ID: <177444163005.452866.645641010354091252.b4-ty@b4>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260316-kbuild-uapi-c-v2-0-35d6d0ed863f@weissschuh.net>
+References: <20260316-kbuild-uapi-c-v2-0-35d6d0ed863f@weissschuh.net>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -33,71 +47,42 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH v6 1/2] kbuild: move vmlinux.a build rule to
- scripts/Makefile.vmlinux_a
-From: Nicolas Schier <nsc@kernel.org>
-To: xur@google.com
-Cc: Masahiro Yamada <masahiroy@kernel.org>, 
- Nathan Chancellor <nathan@kernel.org>, 
- Nicolas Schier <nicolas.schier@linux.dev>, 
- Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
- Miguel Ojeda <ojeda@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, 
- Alice Ryhl <aliceryhl@google.com>, Sami Tolvanen <samitolvanen@google.com>, 
- "Mike Rapoport (Microsoft)" <rppt@kernel.org>, 
- Rafael Aquini <aquini@redhat.com>, Michael Ellerman <mpe@ellerman.id.au>, 
- Stafford Horne <shorne@gmail.com>, 
- Christophe Leroy <christophe.leroy@csgroup.eu>, 
- Piotr Gorski <piotrgorski@cachyos.org>, 
- Venkat Rao Bagalkote <venkat88@linux.ibm.com>, 
- Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, 
- Teresa Johnson <tejohnson@google.com>, linux-kernel@vger.kernel.org, 
- linux-kbuild@vger.kernel.org, llvm@lists.linux.dev
-In-Reply-To: <20260316212930.120438-2-xur@google.com>
-References: <20260316212930.120438-1-xur@google.com>
- <20260316212930.120438-2-xur@google.com>
-Date: Wed, 25 Mar 2026 10:35:43 +0100
-Message-Id: <177443134349.415036.1506063887331719503.b4-review@b4>
-X-Mailer: b4 0.16-dev-ad80c
-X-Developer-Signature: v=1; a=openpgp-sha256; l=571; i=nsc@kernel.org;
- s=20250924; h=from:subject:message-id;
- bh=jR++UhQwlnzd6tQ1GyMO+/4oIFawypTF5Dxm1zLj5gY=;
- b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBpw6x0/rvVkQEUJ/tO5TepgqoorIVso1ZJNpQOA
- g4MRKedwU+JAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCacOsdAAKCRAHUgpwFiYS
- aeVDEADZMN8E6KRDDLcUW0koW04uz43MDa7i+cWO4iRXlV5HywppmYhzEPrleulMxhdLuD19JvS
- 7T3fy/YkZX/uOa+wPuV0cWTRGgDjXfT3hShkVnltVldX8nyprv0VyI56Mo87YmoCxPoyQeM1OWI
- DI7f+OQ2H8odwa2MyubsprN3CBIoJzeFp0y8GejAvcxzky3XG09nJCBRkMTAqgsFkrgVacyZgJe
- ZUc5Q4fRCKa+GmAScM70+CtgF+GZk+QxrAQXx87kXUflwvJ+4dkWI+RsrK8RbWjYbcXX0K3z8Kb
- 7Cp/EeKQmIkQbv6qfzAKNRnAKqIgnOE52/WowRa6GyPVq4gvCxh8WdE2ebJNce+EMsUdWcwJpMY
- 7ycB1pSASKKxMoiQQue5WXNKbAb7kquUE6YryvusarHhd657JWQSPpZpEZxxNzFjnxoZECbO9k3
- sCfrPvSQtXJD0OQ3Zmn1T1MJMhqJs/6d7P5JhDwJsOWtvuCK5z+rQ97YxJ6YThW931jC7dstp5k
- bx8gy1Lp4eAZZlXYmd8pwW/Z0TqESm04iCzZC60+fRa42U3UcEqMzxGELGUdpwPDVO5hBuif+xY
- A3LITeDAV+StjbSVei0CtS7CHhN77ZnMOLxjIiEkFSGqrl+A5d0C4Q8Gn5cGwmJqSvy5YnHcHZa
- SbGNh+mG1n5L/Jg==
-X-Developer-Key: i=nsc@kernel.org; a=openpgp;
- fpr=18ED52DBE34F860EE9FBC82B7D97093255A0CE7F
+Content-Transfer-Encoding: 8bit
 
-On Mon, 16 Mar 2026 21:29:29 +0000, xur@google.com <xur@google.com> wrote:
-
-Hi Rong,
-
-> Move the build rule for vmlinux.a to a separate file in preparation
-> for supporting distributed builds with Clang ThinLTO.
+On Mon, 16 Mar 2026 17:51:57 +0100, Thomas Weißschuh wrote:
+> C++ language requirements differ from those of C.
 > 
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> Tested-by: Rong Xu <xur@google.com>
+> Also test the headers against C++ compilers to make sure no errors
+> creep in accidentally.
+> 
+> There was a previous attempt by David Howells[0], but today with the
+> existing UAPI testing infrastructure the implementation is a bit nicer.
+> This series does not derive from David's, as I found it only after
+> writing my patches.
+> 
+> [...]
 
-As Masahiro's original patch is now being modified: I'd like to add
-something like
+Applied to kbuild/linux.git (kbuild-next-unstable), thanks!
 
-[rong xu: change '--thin' back to 'T' in Makefile.vmlinux_a]
+[1/5] kbuild: uapi: move some compiler arguments out of the command definition
+      https://git.kernel.org/kbuild/c/55d68ec5
+[2/5] kbuild: uapi: move all include path flags together
+      https://git.kernel.org/kbuild/c/cf822413
+[3/5] kbuild: uapi: handle UML in architecture-specific exclusion lists
+      https://git.kernel.org/kbuild/c/b4ec38cb
+[4/5] kbuild: uapi: provide a C++ compatible dummy definition of NULL
+      https://git.kernel.org/kbuild/c/b187c1a1
+[5/5] kbuild: uapi: also test UAPI headers against C++ compilers
+      https://git.kernel.org/kbuild/c/dcc99abe
 
-here before your 'Signed-off-by'.  Are you ok with that?
+Please look out for regression or issue reports or other follow up
+comments, as they may result in the patch/series getting dropped,
+reverted or modified (e.g. trailers). Patches applied to the
+kbuild-next-unstable branch are accepted pending wider testing in
+linux-next and any post-commit review; they will generally be moved
+to the kbuild-next branch in about a week if no issues are found.
 
-Kind regards,
-Nicolas
-
+Best regards,
 -- 
 Nicolas
 
