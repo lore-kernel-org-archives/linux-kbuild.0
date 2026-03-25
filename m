@@ -1,126 +1,143 @@
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF523337BA4
-	for <linux-kbuild@vger.kernel.org>; Wed, 25 Mar 2026 09:31:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A76BC3B893B;
+	Wed, 25 Mar 2026 10:33:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774431118; cv=none; b=aMTWxGwaa4s2+s6Ej0f6dm2YOSLDwWafVCqlCHT7o4OLstPehC1Nv6CiRIwq4gZd0lyO/B4iQ1kdty39IgQKuFseY7wXCfESCrBm4VrmLze46AaLXuzSEmOG7ijlwz48rC2ogHFMq8XZ9z54HWDvi7dQ4Bc5gpF/v/lKkBmG2ZE=
+	t=1774434826; cv=none; b=sC4+V3eUgRALXWRsT/Mg7W3pJr9LRE4jQU9enfr0dhSRP9QaOoPvoXhCRA3iMvNQdpiDi4R4ONFmAAJT5Ax+EDoNOD0OhtNwehUcnEQLxeulFcLbqKl9hZNebk6X7x+/O4uqV6tyBsM2CS4IS5aYqz6bWepuyL1gEXzJFLSAYpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774431118; c=relaxed/simple;
-	bh=w/hbKaEAf5xMVRyhYMppeW+IYPZFDrFUwVxsZEc+SsE=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-version:Content-type; b=dLvGt6BGY8NEP0VZcflRyVbp0QAH4tG7VvP/gqgYZ+umG6iUwPK1Svqyhf2BEqGqL7nYhlCO3SWyfcvLTKHVedhsQ1CAgE21pAvvvfZAllymOMMkey55q+7FqUU0zP1WfpNHlVT7mRPvn4x6GaEfAGkMFDxT3qZd7Z+AC0WWR8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MCNQphXg; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1774434826; c=relaxed/simple;
+	bh=aJiJufwALZTrMErym90lg9xadYFrtwTh9zLM612wdfU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=izvZ5uGt/141mDroqVgEWmmo3ckrTrrhH9zQMgYWQwNPkp5xP+r1Yu6Tbv/AKVQ/UKLalP0N2K3bY3vNQY04Uo/S/x0J7isRmTdtEpkfm3nQ2MgVW0aHH+bK04y1AZBSG5YdPfbL+KcUpProsDO0jcTL/qoq/lWVfAu5h9/zRMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IQ7wamBu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MCNQphXg"
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-358d80f60ccso1264501a91.3
-        for <linux-kbuild@vger.kernel.org>; Wed, 25 Mar 2026 02:31:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774431117; x=1775035917; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:message-id:date
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TF/+cxtFW65/t3CsODFg6Eg+Msha9EyFtJo/8aQf58o=;
-        b=MCNQphXgbc8EpPzAuqYR8djm6txUWJstcMPwRNfsTZk6b22vUePuvsml+PJUK3mm76
-         Lkow+Z82dj75WBS7/AA5c8i+Tr5QWwCvO3rRAZAhYLZ983FdJi/h8SQV9O7JB+SaQcAg
-         CwkiIgU1OWgGBovJCAhscMIfL/QNgLZ+Q5VAArKhAMVlaRHXUjSBtNSsQKFEMUymHf8y
-         kDYmx8nd7ephwuINvgjtBDyMaSYzZDpS/wIJOB7MzwDhWQzFKBHjCjduwobnkanxLXs5
-         aI1q19ZknrG3abF/C91ofTS62I+Q4OIWQZQ5XoOX6yO6ya5BppJUWdkzGTnTptZzBtTO
-         rOPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774431117; x=1775035917;
-        h=content-transfer-encoding:mime-version:references:message-id:date
-         :in-reply-to:subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=TF/+cxtFW65/t3CsODFg6Eg+Msha9EyFtJo/8aQf58o=;
-        b=d8gQpeGdkAQM8IdJzGhsl6QtCo5L/b5QmH46eVC4EvGjrCyoSSs79rzFtw9MqoI590
-         ofUTp8c2rZ/TT8HlJK3laQLxq75lllnVhHlR7HK3PIYrbVnWKabINRiI1sM/53R7AaZD
-         2eLtt8Jt18oitzNMKn1c6Wp23ePprRNQ44v5hq/Hg0/NVZeFGfIqcI3brMO5A+1gtyeE
-         1Qf6HnBV/f7mpGgEGds8J1ffjPCLtEw+8kGxmwfEWVRJQVDrngzOyHEooeWAed3MKNXr
-         dJIBGPmUyyP1vGQhe+4e8irkLnDiOMMqNzO9jE/5Qy46wZ0LdPVZXHK7iYg1nWT6F6t/
-         pSwg==
-X-Forwarded-Encrypted: i=1; AJvYcCVWvDT8VDlcm7Xz5IteAW9a+OC9sYU3lirkHLkEkBXOeVpt/eikEqziQKMbaBW1+sW6zgqF/3NFfkUqIZU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGroV4SfNQNtjgq98GHEBusOr/HHwSZ6BgRotGKPhFEAFpT/PO
-	teEjBLTJwo3eJz+uPj++2Pupn21Mrg67CHFPovYAlfiRKJ3WmYqQVddq
-X-Gm-Gg: ATEYQzx8bM83B1ORHfmNRRIHoJJCKLeHS97vCOGKxGCr969FPgfO2ZyIP6Bo1ONgmNF
-	jwEyi4BjeLmzkxGYFjda2sC0zZinoIwh4OvPeoLtT6N2ApVnSKg8AU0w6gpQGeBJU231cFUg0/q
-	n5gvZilt3ngk2Qjpw/Be4AIX89tdCsOgSSaO3TxzEhIFYfLuTUefmFj4/fA3t5/akH6+ukpgAZ1
-	CqikyZ+Zddg5OSDWC/7Lew5AOfQyFmhgLy9pwSW/WFF+AKTrgCOW68sGIuprAKqNumy+0J/XqWQ
-	3GV1jStm8/qXxhwgggA5pBSY9d+2JacbrW5+bE3vQtVUEwFaBjIsXnVtLeS8ykMxVgGSC++eMUL
-	SQ3hGKxb0XeZxdVFzuL2gt7l+dNzasoTh3OdjgLOPw0h5EDdRRqP5I9kg+UywXFEGaUdmpOVN4K
-	JTpLoYaLRxVctDTPp6Fy67VP+FyLc66mnR
-X-Received: by 2002:a17:903:37cf:b0:2b0:41bf:ca83 with SMTP id d9443c01a7336-2b0b0a48b14mr30087295ad.23.1774431117028;
-        Wed, 25 Mar 2026 02:31:57 -0700 (PDT)
-Received: from pve-server ([49.205.216.49])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b0b0129905sm25660755ad.27.2026.03.25.02.31.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Mar 2026 02:31:56 -0700 (PDT)
-From: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
-To: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, Venkat Rao Bagalkote <venkat88@linux.ibm.com>, arnd@arndb.de, gregkh@linuxfoundation.org
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, nathan@kernel.org, nsc@kernel.org, ojeda@kernel.org, masahiroy@kernel.org, linux@weissschuh.net, tamird@kernel.org, rostedt@goodmis.org, ihor.solodrai@linux.dev, maddy@linux.ibm.com, peterz@infradead.org
-Subject: Re: [PATCH v2] char: nvram: Remove unused nvram_mutex to fix -Wunused-variable warning
-In-Reply-To: <e6db8617-6b12-4f90-967d-85c9f7805823@kernel.org>
-Date: Wed, 25 Mar 2026 14:34:04 +0530
-Message-ID: <7br0nuuz.ritesh.list@gmail.com>
-References: <20260323073220.25798-1-venkat88@linux.ibm.com> <e6db8617-6b12-4f90-967d-85c9f7805823@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IQ7wamBu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45D04C4CEF7;
+	Wed, 25 Mar 2026 10:33:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774434826;
+	bh=aJiJufwALZTrMErym90lg9xadYFrtwTh9zLM612wdfU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=IQ7wamBuBswIV06YMQ512/86FaeSJDO1hVJmHF15aa7lwqSBhYRoh2/xQs7mCuMVn
+	 jIZx2QfPrLjG8x4HGTqwuohoFEss2YApWTN6VCPS6cZhs/Cz8meOXIe/nuz3nW3OfQ
+	 sW0aKsRm2pkCRj3Tz0xlGVf6Gag2qK2q2BHc6gd5m/lWaXyDpvlRC/a6o2Y0gsRKbw
+	 RfK3wED0pdnN0Lx0xk8dNqAWio6aPnfaaxOQ/5BjXGXYBkYeT67KblOmgVEwNZOcNA
+	 F7WJV99ADDvaoAhrnEG8aPpXAxBYDzixJeHIYfU0n1hRsq0hJGFAKTXaXIvu5adZgH
+	 fldf6DCQY3dFg==
+Message-ID: <965fe446-8f91-48bf-9453-878fef4eb1d0@kernel.org>
+Date: Wed, 25 Mar 2026 11:33:20 +0100
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
-MIME-version: 1.0
-Content-type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/9] scripts: kconfig: merge_config.sh: use POSIX '=' in
+ test
+To: Mikko Rapeli <mikko.rapeli@linaro.org>
+Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Matt Turner <mattst88@gmail.com>, Magnus Lindholm <linmag7@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Aaro Koskinen <aaro.koskinen@iki.fi>,
+ Andreas Kemnade <andreas@kemnade.info>, Kevin Hilman <khilman@baylibre.com>,
+ Roger Quadros <rogerq@kernel.org>, Tony Lindgren <tony@atomide.com>,
+ Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+ Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, Rich Felker <dalias@libc.org>,
+ John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+ Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Clark Williams <clrkwllms@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
+ Pablo Neira Ayuso <pablo@netfilter.org>,
+ Krzysztof Kozlowski <krzk@kernel.org>, Alim Akhtar
+ <alim.akhtar@samsung.com>, Frank Li <Frank.Li@nxp.com>,
+ Sascha Hauer <s.hauer@pengutronix.de>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>, Vladimir Zapolskiy <vz@mleia.com>,
+ Piotr Wojtaszczyk <piotr.wojtaszczyk@timesys.com>,
+ Liviu Dudau <liviu.dudau@arm.com>, Sudeep Holla <sudeep.holla@kernel.org>,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>,
+ Gregory CLEMENT <gregory.clement@bootlin.com>,
+ =?UTF-8?Q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>,
+ "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+ Helge Deller <deller@gmx.de>, Janusz Krzysztofik <jmkrzyszt@gmail.com>,
+ =?UTF-8?Q?Jonathan_Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
+ Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>,
+ Thomas Zimmermann <tzimmermann@suse.de>, Arnd Bergmann <arnd@arndb.de>,
+ Heiko Stuebner <heiko@sntech.de>,
+ Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>,
+ Mark Brown <broonie@kernel.org>, Eric Biggers <ebiggers@kernel.org>,
+ Ard Biesheuvel <ardb@kernel.org>,
+ Sricharan Ramabadhran <quic_srichara@quicinc.com>,
+ Bjorn Andersson <andersson@kernel.org>, Michael Walle <mwalle@kernel.org>,
+ Guenter Roeck <linux@roeck-us.net>,
+ Srinivas Kandagatla <srinivas.kandagatla@oss.qualcomm.com>,
+ "Rob Herring (Arm)" <robh@kernel.org>,
+ Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Anna Schumaker <anna.schumaker@oracle.com>,
+ Alexandre Gonzalo <alexandre.gonzalo@arm.com>, linux-kbuild@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-alpha@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-omap@vger.kernel.org,
+ loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
+ linux-rt-devel@lists.linux.dev, linux-samsung-soc@vger.kernel.org,
+ imx@lists.linux.dev, linux-renesas-soc@vger.kernel.org,
+ linux-parisc@vger.kernel.org, openbmc@lists.ozlabs.org
+References: <20260317-arm_defconf_cleanup-v1-0-8eecb7fdd24d@kernel.org>
+ <20260317-arm_defconf_cleanup-v1-1-8eecb7fdd24d@kernel.org>
+ <abkfJsyQSbW-VjxD@nuoska>
+From: "Vincent Mailhol (Arm)" <mailhol@kernel.org>
+Content-Language: en-US
+In-Reply-To: <abkfJsyQSbW-VjxD@nuoska>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-"Christophe Leroy (CS GROUP)" <chleroy@kernel.org> writes:
+On 3/17/26 10:30, Mikko Rapeli wrote:
+> Hi,
+> 
+> On Tue, Mar 17, 2026 at 10:13:37AM +0100, Vincent Mailhol (Arm) wrote:
+>> merge_config.sh yields this warning:
+>>
+>>   ./scripts/kconfig/merge_config.sh: 384: [: false: unexpected operator
+>>
+>> This happens because the script runs under /bin/sh but compares
+>> strings using the '==' operator, which is a bash extension. The POSIX
+>> test command only specifies '=' for string equality.
+>>
+>> Replace '==' with the POSIX-compatible '=' so the script works when
+>> run with /bin/sh as intended.
+>>
+>> Fixes: dfc97e1c5da5 ("scripts: kconfig: merge_config.sh: use awk in checks too")
+>> Signed-off-by: Vincent Mailhol (Arm) <mailhol@kernel.org>
+> 
+> This fix is already merged in kbuild trees:
+> 
+> https://lore.kernel.org/linux-kbuild/20260309121505.40454-1-o451686892@gmail.com/
+> https://git.kernel.org/pub/scm/linux/kernel/git/kbuild/linux.git/log/?h=kbuild-fixes-for-next
 
-> Le 23/03/2026 à 08:32, Venkat Rao Bagalkote a écrit :
->> v2:
->>    - Added missing Suggested-by tag from Ritesh Harjani (IBM)
->> 
->
-> Patch history must go _after_ the --- below, otherwise it will appear in 
-> the commit message when applied, which is pointless.
->
->> drivers/char/nvram.c defines a static mutex 'nvram_mutex' which is never
->> used. This results in a compiler warning on linux-next builds:
->
-> It is probably not only linux-next builds, I think the problem exists 
-> since 20e07af71f34 ("powerpc: Adopt nvram module for PPC64")
->
->> 
->>    warning: 'nvram_mutex' defined but not used [-Wunused-variable]
->> 
->> Remove the unused definition to avoid the warning.
->
-> It is not what you are doing.
->
-> You are just hiding the probleme by saying 'maybe it is used, maybe it 
-> is not used, I don't know I don't care".
+Noted! I actually started to write this before the other solution was
+posted, but, anyway, this will be removed in v2.
 
-Venkat, do cares about this warning, and hence he sent the patch in trying to fix it ;)
-I think, I missed seeing the upper #ifdef block of PPC, and hence
-suggested him to use __maybe_unused, instead of complicating it
-further with...  #if defined(CONFIG_PPC32) || defined(CONFIG_X86) || defined(CONFIG_M68K),
 
-> Please properly fix the problem instead.
->
-
-I agree, make sense.
-
-> I think the fix is probably to remove the #ifdef CONFIG_PPC32 around 
-> IOC_NVRAM_SYNC.
-> If you think it is important to return -ENOTTY on CONFIG_PPC64, just add:
->
-
-That make sense and I should have thought of that.
-
-However, I looked at the suggestions from Arnd, and I too agree that all
-underneath function operations already do their own locking, so I agree
-that we could just kill this nvram_mutex lock itself.
-
--ritesh
+Yours sincerely,
+Vincent Mailhol
 
