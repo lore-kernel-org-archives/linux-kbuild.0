@@ -1,189 +1,405 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3F353CE4A3;
-	Fri, 27 Mar 2026 08:02:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B4003D75B1;
+	Fri, 27 Mar 2026 08:17:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774598561; cv=none; b=BRwu1DnRN17DQEnzigcOT0ArWxeTpJRMAq//+EH+fds5pHV0LodsuRULvbaInXnEnrCnyoVw6ghvM/h5aoksGJI93Va2+W825NIHVRt6L9IOqNtfjlh521zhpxSpHVrdNWDsQJOTfoo4SwPSTJdT8XIMfCt1/U0hplcg7EVeATA=
+	t=1774599431; cv=none; b=K26qG/HsC+bNVHGHSTvdvCOXauYzB7/532BtmIN/DyjEzMDBWcUc5NiplmNhFJ26OGNJmBSRtEwqB0KMrEimrnbOm4B4NooNMjU016S6cukFRiNg85VRQ61HdVVe4n46ngdAMH9OjtqeILuWuYY2XWU1x02f2nTpMJHLBZNroEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774598561; c=relaxed/simple;
-	bh=4yElemxoldf70eF7hcKaNFQI55z5oAEHZ7RUijBnr5g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PnXXyH0JHFifqD0m9bYVYtdzkyE9y4UC2uc/QhhvA/wptMHZ85TFYdoxe4janVV6ZC4WbxICIeeCt4ZAGgYcJM/EKaXOP5p3i7TAWbMcui7FAExnHmtXePXpJEB3vpUvrOV3ZOrIqWms3ROS/KHj8VaoulCQXMlXyUB8IBhUN7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BFbL7bSg; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774599431; c=relaxed/simple;
+	bh=R3kEottU/ndTWHQjpnm4FGzkIKerUZEJz7gxDeqbnr4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=TgQCx1O9OUrLLott4KEkmzrJYfr2p0qppmTD+L7OrRQnnHtgL5CGNV7JMhm7yGdrG22mrsqrPZrNLAyei3S6jhBNkwkuPBw5nQYnMnr3XqXY/8EGR9VpAMVesJijrwFmbAuqmHdifUcGkvzFAmgNXFxt26oBxHFd7IkfteKNfO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=hYym+IrJ; arc=none smtp.client-ip=210.118.77.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BFbL7bSg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2A62C19423;
-	Fri, 27 Mar 2026 08:02:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774598561;
-	bh=4yElemxoldf70eF7hcKaNFQI55z5oAEHZ7RUijBnr5g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BFbL7bSgskzfoDKi/FKRm0HzHU9+zKYToteP1BoTs7aWO41cGNGhZp7n4eTeSImTt
-	 2mA18PnA6LV/NsOUjgeqyhNaZQTW7mHA2MbfJF1MpHHfOffJsApIIjcZWjvDOZmttq
-	 0OWn26vWhF5Mu13y7tW7kFvhUkW1lC1Tj9pENYAJVj1CDVZs9nQl6F0VjSzBVP3cQU
-	 2+T/bghmhKm0XrIuTIFAmlo4BU89MaNzmobfcOjH5k6GC+8d6JhIfRinRgKeyygR+m
-	 i48X9B4VzQj66nfjoFu4j52m+qI91CtPhALF7Z6a9tfPBYH00RnJ9qzaFLA0OntmZn
-	 ez/Ec/a9rvlVw==
-Date: Fri, 27 Mar 2026 08:59:50 +0100
-From: Nicolas Schier <nsc@kernel.org>
-To: xur@google.com
-Cc: Masahiro Yamada <masahiroy@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
-	Rafael Aquini <aquini@redhat.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Stafford Horne <shorne@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Piotr Gorski <piotrgorski@cachyos.org>,
-	Venkat Rao Bagalkote <venkat88@linux.ibm.com>,
-	Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-	Teresa Johnson <tejohnson@google.com>, linux-kernel@vger.kernel.org,
-	linux-kbuild@vger.kernel.org, llvm@lists.linux.dev
-Subject: Re: [PATCH v6 2/2] kbuild: distributed build support for Clang
- ThinLTO
-Message-ID: <acY49h_jpzbd74vq@levanger>
-Mail-Followup-To: Nicolas Schier <nsc@kernel.org>, xur@google.com,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
-	Rafael Aquini <aquini@redhat.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Stafford Horne <shorne@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Piotr Gorski <piotrgorski@cachyos.org>,
-	Venkat Rao Bagalkote <venkat88@linux.ibm.com>,
-	Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-	Teresa Johnson <tejohnson@google.com>, linux-kernel@vger.kernel.org,
-	linux-kbuild@vger.kernel.org, llvm@lists.linux.dev
-References: <20260316212930.120438-1-xur@google.com>
- <20260316212930.120438-3-xur@google.com>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="hYym+IrJ"
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20260327081656euoutp0159ffbf0a635c1b7e11620b7d0f98b0d3~gpMRSEAKq0448704487euoutp010;
+	Fri, 27 Mar 2026 08:16:56 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20260327081656euoutp0159ffbf0a635c1b7e11620b7d0f98b0d3~gpMRSEAKq0448704487euoutp010
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1774599416;
+	bh=OzrpGpkHqWUx/eMcJ1jKlsZ1lwKvENOYTWoZ0OfZ1qw=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=hYym+IrJIbRVHQG1K2UWuA0h9Vy29fYkdvIs8yKDeB0yJ5xCqXBaCsZmHZBarhjQg
+	 OCISHCnKlHEu/bJerBpD0vdOwTGPrgXPwT20DQxx9+LqEwPiyD9mT1YPKzcY4kn8L2
+	 Iz4H4PewEUdxdr5cQTnZYxMoNHTZIAFMZduYpLGg=
+Received: from eusmtip2.samsung.com (unknown [203.254.199.222]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+	20260327081656eucas1p2369161b823605f46f83f110ed6d23a01~gpMRDRogp1270412704eucas1p2M;
+	Fri, 27 Mar 2026 08:16:56 +0000 (GMT)
+Received: from [106.210.134.192] (unknown [106.210.134.192]) by
+	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20260327081653eusmtip255f1b4030f7274a851dfc4787d135774~gpMOrILMZ2779627796eusmtip2C;
+	Fri, 27 Mar 2026 08:16:53 +0000 (GMT)
+Message-ID: <9a19ccac-f7ce-4780-a251-f69a1fa45757@samsung.com>
+Date: Fri, 27 Mar 2026 09:16:52 +0100
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260316212930.120438-3-xur@google.com>
+User-Agent: Betterbird (Windows)
+Subject: Re: [PATCH v2 0/3] Inline helpers into Rust without full LTO
+To: Arnd Bergmann <arnd@arndb.de>, Miguel Ojeda <ojeda@kernel.org>, Robin
+	Murphy <robin.murphy@arm.com>, Danilo Krummrich <dakr@kernel.org>, Abdiel
+	Janulgue <abdiel.janulgue@gmail.com>, Daniel Almeida
+	<daniel.almeida@collabora.com>, Andreas Hindborg <a.hindborg@kernel.org>,
+	Christoph Hellwig <hch@lst.de>
+Cc: iommu@lists.linux.dev, driver-core@lists.linux.dev, acourbot@nvidia.com,
+	Andrew Morton <akpm@linux-foundation.org>, Alice Ryhl
+	<aliceryhl@google.com>, Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Boqun Feng
+	<boqun.feng@gmail.com>, David Gow <david@davidgow.net>, Gary Guo
+	<gary@garyguo.net>, Johannes Berg <johannes@sipsolutions.net>, Justin Stitt
+	<justinstitt@google.com>, linux-arm-kernel@lists.infradead.org,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linux-um@lists.infradead.org, Russell King
+	<linux@armlinux.org.uk>, llvm@lists.linux.dev, Benno Lossin
+	<lossin@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	mmaurer@google.com, Bill Wendling <morbo@google.com>, Nathan Chancellor
+	<nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Nicolas Schier <nicolas.schier@linux.dev>, Nicolas Schier <nsc@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>, Richard Weinberger <richard@nod.at>,
+	rust-for-linux@vger.kernel.org, Trevor Gross <tmgross@umich.edu>,
+	"Uladzislau Rezki (Sony)" <urezki@gmail.com>, Will Deacon <will@kernel.org>,
+	Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Language: en-US
+From: Marek Szyprowski <m.szyprowski@samsung.com>
+In-Reply-To: <7ad8bdf9-5eff-4443-ad15-c05355d793d1@app.fastmail.com>
+Content-Transfer-Encoding: 7bit
+X-CMS-MailID: 20260327081656eucas1p2369161b823605f46f83f110ed6d23a01
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20260326211326eucas1p28e4e09d74d0798124d3dd5943b5b4c83
+X-EPHeader: CA
+X-CMS-RootMailID: 20260326211326eucas1p28e4e09d74d0798124d3dd5943b5b4c83
+References: <20260322192159.88138-1-ojeda@kernel.org>
+	<20260322194616.89847-1-ojeda@kernel.org>
+	<CGME20260326211326eucas1p28e4e09d74d0798124d3dd5943b5b4c83@eucas1p2.samsung.com>
+	<7ad8bdf9-5eff-4443-ad15-c05355d793d1@app.fastmail.com>
 
-On Mon, Mar 16, 2026 at 09:29:30PM +0000, xur@google.com wrote:
-> From: Rong Xu <xur@google.com>
-> 
-> Add distributed ThinLTO build support for the Linux kernel.
-> This new mode offers several advantages: (1) Increased
-> flexibility in handling user-specified build options.
-> (2) Improved user-friendliness for developers. (3) Greater
-> convenience for integrating with objtool and livepatch.
-> 
-> Note that "distributed" in this context refers to a term
-> that differentiates in-process ThinLTO builds by invoking
-> backend compilation through the linker, not necessarily
-> building in distributed environments.
-> 
-> Distributed ThinLTO is enabled via the
-> `CONFIG_LTO_CLANG_THIN_DIST` Kconfig option. For example:
->  > make LLVM=1 defconfig
->  > scripts/config -e LTO_CLANG_THIN_DIST
->  > make LLVM=1 oldconfig
->  > make LLVM=1 vmlinux -j <..>
-> 
-> The build flow proceeds in four stages:
->   1. Perform FE compilation, mirroring the in-process ThinLTO mode.
->   2. Thin-link the generated IR files and object files.
->   3. Find all IR files and perform BE compilation, using the flags
->     stored in the .*.o.cmd files.
->   4. Link the BE results to generate the final vmlinux.o.
-> 
-> NOTE: This patch currently implements the build for the main kernel
-> image (vmlinux) only. Kernel module support is planned for a
-> subsequent patch.
-> 
-> Tested on the following arch: x86, arm64, loongarch, and
-> riscv.
-> 
-> The earlier implementation details can be found here:
-> https://discourse.llvm.org/t/rfc-distributed-thinlto-build-for-kernel/85934
-> 
-> Signed-off-by: Rong Xu <xur@google.com>
-> Co-developed-by: Masahiro Yamada <masahiroy@kernel.org>
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> Tested-by: Piotr Gorski <piotrgorski@cachyos.org>
-> Reviewed-by: Nathan Chancellor <nathan@kernel.org>
-> Tested-by: Nathan Chancellor <nathan@kernel.org>
-> ---
->  .gitignore                 |  2 ++
->  Makefile                   |  9 +++++----
->  arch/Kconfig               | 19 ++++++++++++++++++
->  scripts/Makefile.lib       |  7 +++++++
->  scripts/Makefile.thinlto   | 40 ++++++++++++++++++++++++++++++++++++++
->  scripts/Makefile.vmlinux_a | 37 +++++++++++++++++++++++++++++++++++
->  scripts/mod/modpost.c      | 15 +++++++++++---
->  7 files changed, 122 insertions(+), 7 deletions(-)
->  create mode 100644 scripts/Makefile.thinlto
-> 
-> diff --git a/.gitignore b/.gitignore
-> index 3a7241c941f5..c12bdf5a97f9 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -56,6 +56,7 @@
->  *.zst
->  Module.symvers
->  dtbs-list
-> +builtin.order
->  modules.order
->  
->  #
-> @@ -67,6 +68,7 @@ modules.order
->  /vmlinux.32
->  /vmlinux.map
->  /vmlinux.symvers
-> +/vmlinux.thinlto-index
->  /vmlinux.unstripped
->  /vmlinux-gdb.py
->  /vmlinuz
-> diff --git a/Makefile b/Makefile
-> index ba5eee68d5d2..4a399b7f3b48 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1033,10 +1033,10 @@ export CC_FLAGS_SCS
->  endif
->  
->  ifdef CONFIG_LTO_CLANG
-> -ifdef CONFIG_LTO_CLANG_THIN
-> -CC_FLAGS_LTO	:= -flto=thin -fsplit-lto-unit
-> -else
-> +ifdef CONFIG_LTO_CLANG_FULL
->  CC_FLAGS_LTO	:= -flto
-> +else
-> +CC_FLAGS_LTO	:= -flto=thin -fsplit-lto-unit
->  endif
->  CC_FLAGS_LTO	+= -fvisibility=hidden
->  
+On 26.03.2026 22:12, Arnd Bergmann wrote:
+> On Sun, Mar 22, 2026, at 20:46, Miguel Ojeda wrote:
+>> On Sun, 22 Mar 2026 20:21:59 +0100 Miguel Ojeda <ojeda@kernel.org> wrote:
+>>        BINDGEN rust/bindings/bindings_generated.rs - due to target
+>> missing
+>>      In file included from rust/helpers/helpers.c:59:
+>>      rust/helpers/dma.c:17:2: warning: static function 'dma_free_attrs'
+>> is used in an inline function with external linkage [-Wstatic-in-inline]
+>>         17 |         dma_free_attrs(dev, size, cpu_addr, dma_handle,
+>> attrs);
+>>            |         ^
+>>      rust/helpers/dma.c:12:1: note: use 'static' to give inline function
+>> 'rust_helper_dma_free_attrs' internal linkage
+>>         12 | __rust_helper void rust_helper_dma_free_attrs(struct device
+>> *dev, size_t size,
+>>            | ^
+>>            | static
+>>
+>> For some reason, `dma_free_attrs` is not marked `inline` in
+>> `include/linux/dma-mapping.h` to begin with, unlike the rest.
+>>
+>> Unless I am missing something and there is a reason for that, it looks
+>> like it has just been missing since it was added in commit ed6ccf10f24b
+>> ("dma-mapping: properly stub out the DMA API for !CONFIG_HAS_DMA").
+>>
+>> Do you want a patch?
+> I have an older patch to drop CONFIG_NO_DMA entirely, which
+> may be better here, since we know that nobody cares about the
+> empty stubs.
 
-This hunk does not apply on kbuild-next-unstable [1] (a possible
-conflict resolution: [2]).  Can you please rebase the patch set on
-kbuild-next-unstable as Nathan suggested [3] ?
+The inline fix is already merged to v7.0-rc, but I'm fine with stubs 
+removal and I can queue them to -next. Could You send a proper patch 
+separately so I can easily apply it?
 
-Thanks and kind regards
-Nicolas
 
-[1]: https://git.kernel.org/kbuild/l/kbuild-next-unstable
-[2]: https://git.kernel.org/nsc/kbuild/c/505471374cfb107
-[3]: https://lore.kernel.org/linux-kbuild/20260316204311.GA1329928@ax162/
+> The only targets that 'select NO_DMA' today are m68k (sun3
+> and dragonball), sh2 and um, which are some of the targets
+> that don't have any DMA masters, but there is little downside
+> of enabling the DMA mapping interfaces on those as well.
+>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+>
+> diff --git a/arch/m68k/Kconfig b/arch/m68k/Kconfig
+> index 11835eb59d94..19fb556357fc 100644
+> --- a/arch/m68k/Kconfig
+> +++ b/arch/m68k/Kconfig
+> @@ -38,7 +38,6 @@ config M68K
+>   	select MMU_GATHER_NO_RANGE if MMU
+>   	select MODULES_USE_ELF_REL
+>   	select MODULES_USE_ELF_RELA
+> -	select NO_DMA if !MMU && !COLDFIRE
+>   	select OLD_SIGACTION
+>   	select OLD_SIGSUSPEND3
+>   	select UACCESS_MEMCPY if !MMU
+> diff --git a/arch/m68k/Kconfig.cpu b/arch/m68k/Kconfig.cpu
+> index c9a7e602d8a4..adc50396b87d 100644
+> --- a/arch/m68k/Kconfig.cpu
+> +++ b/arch/m68k/Kconfig.cpu
+> @@ -38,7 +38,6 @@ config SUN3
+>   	depends on MMU
+>   	select HAVE_ARCH_PFN_VALID
+>   	select LEGACY_TIMER_TICK
+> -	select NO_DMA
+>   	select M68020
+>   	help
+>   	  This option enables support for the Sun 3 series of workstations
+> @@ -558,4 +557,4 @@ config COLDFIRE_COHERENT_DMA
+>   config M68K_NONCOHERENT_DMA
+>   	bool
+>   	default y
+> -	depends on HAS_DMA && !COLDFIRE_COHERENT_DMA
+> +	depends on HAS_DMA && !COLDFIRE_COHERENT_DMA && !SUN3
+> diff --git a/arch/m68k/include/asm/pgtable_mm.h b/arch/m68k/include/asm/pgtable_mm.h
+> index 7501ff030c63..d095ae6c19f9 100644
+> --- a/arch/m68k/include/asm/pgtable_mm.h
+> +++ b/arch/m68k/include/asm/pgtable_mm.h
+> @@ -159,8 +159,10 @@ static inline void update_mmu_cache_range(struct vm_fault *vmf,
+>   	    ? (__pgprot((pgprot_val(prot) & _CACHEMASK040) | _PAGE_NOCACHE_S))	\
+>   	    : (prot)))
+>   
+> +#ifndef CONFIG_SUN3
+>   pgprot_t pgprot_dmacoherent(pgprot_t prot);
+>   #define pgprot_dmacoherent(prot)	pgprot_dmacoherent(prot)
+> +#endif
+>   
+>   #endif /* CONFIG_COLDFIRE */
+>   #endif /* !__ASSEMBLER__ */
+> diff --git a/arch/m68k/kernel/dma.c b/arch/m68k/kernel/dma.c
+> index 16063783aa80..c52584e024af 100644
+> --- a/arch/m68k/kernel/dma.c
+> +++ b/arch/m68k/kernel/dma.c
+> @@ -8,7 +8,7 @@
+>   #include <linux/kernel.h>
+>   #include <asm/cacheflush.h>
+>   
+> -#ifndef CONFIG_COLDFIRE
+> +#if !defined(CONFIG_COLDFIRE) && !defined(CONFIG_SUN3)
+>   void arch_dma_prep_coherent(struct page *page, size_t size)
+>   {
+>   	cache_push(page_to_phys(page), size);
+> diff --git a/arch/sh/Kconfig b/arch/sh/Kconfig
+> index d5795067befa..e246f295ec48 100644
+> --- a/arch/sh/Kconfig
+> +++ b/arch/sh/Kconfig
+> @@ -63,7 +63,6 @@ config SUPERH
+>   	select LOCK_MM_AND_FIND_VMA
+>   	select MODULES_USE_ELF_RELA
+>   	select NEED_SG_DMA_LENGTH
+> -	select NO_DMA if !MMU && !DMA_COHERENT
+>   	select NO_GENERIC_PCI_IOPORT_MAP if PCI
+>   	select OLD_SIGACTION
+>   	select OLD_SIGSUSPEND
+> @@ -133,10 +132,10 @@ config SWAP_IO_SPACE
+>   	bool
+>   
+>   config DMA_COHERENT
+> -	bool
+> +	def_bool !MMU
+>   
+>   config DMA_NONCOHERENT
+> -	def_bool !NO_DMA && !DMA_COHERENT
+> +	def_bool !DMA_COHERENT
+>   	select ARCH_HAS_DMA_PREP_COHERENT
+>   	select ARCH_HAS_SYNC_DMA_FOR_DEVICE
+>   	select DMA_DIRECT_REMAP
+> diff --git a/arch/um/Kconfig b/arch/um/Kconfig
+> index 098cda44db22..dd3428a49614 100644
+> --- a/arch/um/Kconfig
+> +++ b/arch/um/Kconfig
+> @@ -25,7 +25,6 @@ config UML
+>   	select HAVE_DEBUG_KMEMLEAK
+>   	select HAVE_DEBUG_BUGVERBOSE
+>   	select HAVE_PAGE_SIZE_4KB
+> -	select NO_DMA if !UML_DMA_EMULATION
+>   	select OF_EARLY_FLATTREE if OF
+>   	select GENERIC_IRQ_SHOW
+>   	select GENERIC_CPU_DEVICES
+> diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
+> index 677c51ab7510..a96a22f857f1 100644
+> --- a/include/linux/dma-mapping.h
+> +++ b/include/linux/dma-mapping.h
+> @@ -138,7 +138,6 @@ static inline void debug_dma_map_single(struct device *dev, const void *addr,
+>   }
+>   #endif /* CONFIG_DMA_API_DEBUG */
+>   
+> -#ifdef CONFIG_HAS_DMA
+>   static inline int dma_mapping_error(struct device *dev, dma_addr_t dma_addr)
+>   {
+>   	debug_dma_mapping_error(dev, dma_addr);
+> @@ -200,146 +199,6 @@ void *dma_vmap_noncontiguous(struct device *dev, size_t size,
+>   void dma_vunmap_noncontiguous(struct device *dev, void *vaddr);
+>   int dma_mmap_noncontiguous(struct device *dev, struct vm_area_struct *vma,
+>   		size_t size, struct sg_table *sgt);
+> -#else /* CONFIG_HAS_DMA */
+> -static inline dma_addr_t dma_map_page_attrs(struct device *dev,
+> -		struct page *page, size_t offset, size_t size,
+> -		enum dma_data_direction dir, unsigned long attrs)
+> -{
+> -	return DMA_MAPPING_ERROR;
+> -}
+> -static inline void dma_unmap_page_attrs(struct device *dev, dma_addr_t addr,
+> -		size_t size, enum dma_data_direction dir, unsigned long attrs)
+> -{
+> -}
+> -static inline dma_addr_t dma_map_phys(struct device *dev, phys_addr_t phys,
+> -		size_t size, enum dma_data_direction dir, unsigned long attrs)
+> -{
+> -	return DMA_MAPPING_ERROR;
+> -}
+> -static inline void dma_unmap_phys(struct device *dev, dma_addr_t addr,
+> -		size_t size, enum dma_data_direction dir, unsigned long attrs)
+> -{
+> -}
+> -static inline unsigned int dma_map_sg_attrs(struct device *dev,
+> -		struct scatterlist *sg, int nents, enum dma_data_direction dir,
+> -		unsigned long attrs)
+> -{
+> -	return 0;
+> -}
+> -static inline void dma_unmap_sg_attrs(struct device *dev,
+> -		struct scatterlist *sg, int nents, enum dma_data_direction dir,
+> -		unsigned long attrs)
+> -{
+> -}
+> -static inline int dma_map_sgtable(struct device *dev, struct sg_table *sgt,
+> -		enum dma_data_direction dir, unsigned long attrs)
+> -{
+> -	return -EOPNOTSUPP;
+> -}
+> -static inline dma_addr_t dma_map_resource(struct device *dev,
+> -		phys_addr_t phys_addr, size_t size, enum dma_data_direction dir,
+> -		unsigned long attrs)
+> -{
+> -	return DMA_MAPPING_ERROR;
+> -}
+> -static inline void dma_unmap_resource(struct device *dev, dma_addr_t addr,
+> -		size_t size, enum dma_data_direction dir, unsigned long attrs)
+> -{
+> -}
+> -static inline int dma_mapping_error(struct device *dev, dma_addr_t dma_addr)
+> -{
+> -	return -ENOMEM;
+> -}
+> -static inline void *dma_alloc_attrs(struct device *dev, size_t size,
+> -		dma_addr_t *dma_handle, gfp_t flag, unsigned long attrs)
+> -{
+> -	return NULL;
+> -}
+> -static inline void dma_free_attrs(struct device *dev, size_t size,
+> -		void *cpu_addr, dma_addr_t dma_handle, unsigned long attrs)
+> -{
+> -}
+> -static inline void *dmam_alloc_attrs(struct device *dev, size_t size,
+> -		dma_addr_t *dma_handle, gfp_t gfp, unsigned long attrs)
+> -{
+> -	return NULL;
+> -}
+> -static inline void dmam_free_coherent(struct device *dev, size_t size,
+> -		void *vaddr, dma_addr_t dma_handle)
+> -{
+> -}
+> -static inline int dma_get_sgtable_attrs(struct device *dev,
+> -		struct sg_table *sgt, void *cpu_addr, dma_addr_t dma_addr,
+> -		size_t size, unsigned long attrs)
+> -{
+> -	return -ENXIO;
+> -}
+> -static inline int dma_mmap_attrs(struct device *dev, struct vm_area_struct *vma,
+> -		void *cpu_addr, dma_addr_t dma_addr, size_t size,
+> -		unsigned long attrs)
+> -{
+> -	return -ENXIO;
+> -}
+> -static inline bool dma_can_mmap(struct device *dev)
+> -{
+> -	return false;
+> -}
+> -static inline bool dma_pci_p2pdma_supported(struct device *dev)
+> -{
+> -	return false;
+> -}
+> -static inline int dma_set_mask(struct device *dev, u64 mask)
+> -{
+> -	return -EIO;
+> -}
+> -static inline int dma_set_coherent_mask(struct device *dev, u64 mask)
+> -{
+> -	return -EIO;
+> -}
+> -static inline u64 dma_get_required_mask(struct device *dev)
+> -{
+> -	return 0;
+> -}
+> -static inline bool dma_addressing_limited(struct device *dev)
+> -{
+> -	return false;
+> -}
+> -static inline size_t dma_max_mapping_size(struct device *dev)
+> -{
+> -	return 0;
+> -}
+> -static inline size_t dma_opt_mapping_size(struct device *dev)
+> -{
+> -	return 0;
+> -}
+> -static inline unsigned long dma_get_merge_boundary(struct device *dev)
+> -{
+> -	return 0;
+> -}
+> -static inline struct sg_table *dma_alloc_noncontiguous(struct device *dev,
+> -		size_t size, enum dma_data_direction dir, gfp_t gfp,
+> -		unsigned long attrs)
+> -{
+> -	return NULL;
+> -}
+> -static inline void dma_free_noncontiguous(struct device *dev, size_t size,
+> -		struct sg_table *sgt, enum dma_data_direction dir)
+> -{
+> -}
+> -static inline void *dma_vmap_noncontiguous(struct device *dev, size_t size,
+> -		struct sg_table *sgt)
+> -{
+> -	return NULL;
+> -}
+> -static inline void dma_vunmap_noncontiguous(struct device *dev, void *vaddr)
+> -{
+> -}
+> -static inline int dma_mmap_noncontiguous(struct device *dev,
+> -		struct vm_area_struct *vma, size_t size, struct sg_table *sgt)
+> -{
+> -	return -EINVAL;
+> -}
+> -#endif /* CONFIG_HAS_DMA */
+>   
+>   #ifdef CONFIG_IOMMU_DMA
+>   /**
+> diff --git a/kernel/dma/Kconfig b/kernel/dma/Kconfig
+> index 0748091339f7..228a3566d344 100644
+> --- a/kernel/dma/Kconfig
+> +++ b/kernel/dma/Kconfig
+> @@ -1,12 +1,7 @@
+>   # SPDX-License-Identifier: GPL-2.0-only
+>   
+> -config NO_DMA
+> -	bool
+> -
+>   config HAS_DMA
+> -	bool
+> -	depends on !NO_DMA
+> -	default y
+> +	def_bool y
+>   
+>   config DMA_OPS_HELPERS
+>   	bool
+>
+Best regards
+-- 
+Marek Szyprowski, PhD
+Samsung R&D Institute Poland
+
