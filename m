@@ -1,37 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 555452BE641;
-	Sat, 28 Mar 2026 04:09:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30F66149C6F;
+	Sat, 28 Mar 2026 21:03:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774670970; cv=none; b=qKxLlP83F2PHTWFhhkMFxW3hNwZEcZxWz9tAToZ29epHvy8PTGdRiC2w6wodzaf2vMTcxFc+uV1eGuIzQ5kxcIjcKoH1FbBbBRbGosGeyvrhh9MLuJsn9HeK9+8PSWgXQJoQxaXNSx7QW1WrFve0SqXT7pf+cgrp+usQ9w3ufhI=
+	t=1774731792; cv=none; b=sW6QorYBqN41G1D85xi68drUsxklBm9wzs/bD61dj03s27gSQMQYWHVBhS8u2LvBNGkzo0uDQMQQ2n+tbG3W9cuShrgU11SB7mq2MO22Zb1c3tuBCQKmyRlY9uIliJQh4hTPgMlBXXc1B6zjMwoR6fH6hfABONmmZRtkbJv/K60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774670970; c=relaxed/simple;
-	bh=YbnAxwVquRkd0IPccdIqCrEKo9AdVwOXrSUh2GHxfA8=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=EVr9fYSXqGD1bT0EmF5H2yQA3s4qrlq0Iw29TH5E1stEeM+b/ktXLMilYvv5QrKV240790R2xRKGxV4boj4kw7traw7YigjmgI/EGcKiW6zL6vMCa08ZLGFztqIMar2j47PFLnt5qpdnUwQXpE10+MZv+0uid0IinM9IK5g/0yY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=XgyTBxDE; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774731792; c=relaxed/simple;
+	bh=fASIccO/WUQzqpPRgf4C+i8dkWYgpGQO3RZFoS2eejc=;
+	h=Date:From:To:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=VHBSEgNgIBKfaYt/n72ErP5ioz550b/yruid+stWVmMVAqe+jo+6iIK7GtDN0mUw+uA+cusTVFpEpnnLHHHAhW6qwZycqHK5hZUli9TpzuYXdlRsBCnpZ5caNMzBksGSMstwT72w5Oao4g6sz2NaEJkiVGN82Eok4onsw3ki2BY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=bFsA+8iz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="XgyTBxDE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE3BCC4CEF7;
-	Sat, 28 Mar 2026 04:09:29 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="bFsA+8iz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7B24C4CEF7;
+	Sat, 28 Mar 2026 21:03:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-	s=korg; t=1774670969;
-	bh=YbnAxwVquRkd0IPccdIqCrEKo9AdVwOXrSUh2GHxfA8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XgyTBxDEoKO0SHxGTO6tEMwJrAUfm1cm6W0dez8ATPQ8E6BC5JHp9rSkE8AqL6VdK
-	 gjzCXES520ltPj0yzGcUsKCGXgXCzewsnHhsV8MF4Li/kEL95x+HqnX7egCwSvcaov
-	 m04k4dZCUy5xwOo6nXPl7bp2zJWA0tbQOJhlgbtc=
-Date: Fri, 27 Mar 2026 21:09:29 -0700
+	s=korg; t=1774731791;
+	bh=fASIccO/WUQzqpPRgf4C+i8dkWYgpGQO3RZFoS2eejc=;
+	h=Date:From:To:Subject:In-Reply-To:References:From;
+	b=bFsA+8izQRCwFFsAbpkIAI12l0+fZIKBanlnqUpFcy6XbQIkBLE3Sh48QAMFvRwki
+	 mLka7P/1zzsWx4qZnLUWwbvz4O5K9WlC3ufq8ktwxGjOZKxi3QFAorq9ls5PDHKabs
+	 RuoWsZGIUi1k/yIj1U/jJPbs1kYzFidKMMFbxajQ=
+Date: Sat, 28 Mar 2026 14:03:11 -0700
 From: Andrew Morton <akpm@linux-foundation.org>
-To: Li Wang <liwang@redhat.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kselftest@vger.kernel.org
+To: Li Wang <liwang@redhat.com>, linux-kbuild@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
 Subject: Re: tools/testing/selftests
-Message-Id: <20260327210929.f3a714186aed347f90f71246@linux-foundation.org>
-In-Reply-To: <acc49s7jbI9Q3a4f@redhat.com>
+Message-Id: <20260328140311.d6ce99302f93923b0cffb441@linux-foundation.org>
+In-Reply-To: <20260328135650.435b415f8c00835b2fa471e0@linux-foundation.org>
 References: <20260327143234.40bb8a0119bd55670ddfeec6@linux-foundation.org>
 	<acc49s7jbI9Q3a4f@redhat.com>
+	<20260328135650.435b415f8c00835b2fa471e0@linux-foundation.org>
 X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
@@ -42,81 +43,29 @@ Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sat, 28 Mar 2026 10:12:06 +0800 Li Wang <liwang@redhat.com> wrote:
+On Sat, 28 Mar 2026 13:56:50 -0700 Andrew Morton <akpm@linux-foundation.org> wrote:
 
-> On Fri, Mar 27, 2026 at 02:32:34PM -0700, Andrew Morton wrote:
-> > 
-> > whinges, perrmanits, maybe I'm doing it wrong, etc.
-> > 
-> > a)
-> > 
-> > At the top-level, neither `make mrproper' nor `make clean' remove the
-> > executables from tools/testing/selftests/mm/.  Seems wrong?
-> > 
-> > b)
-> > 
-> > Shouldn't I be able to run
-> > 
-> > 	make selftests
-> > 
-> > from the top level?
+> On Sat, 28 Mar 2026 10:12:06 +0800 Li Wang <liwang@redhat.com> wrote:
 > 
-> Should use:
-> 
->     make kselftest
->     make kselftest-clean
-
-Thanks.
-
-> Those two binaries (*_32 / *_64) are built by custom rules in mm/Makefile.
-> (Makefile: line #218, #226).
-> 
-> Other tests use shared rules from ../lib.mk, which are quieter (they hide
-> full commands and show short CC ... lines).
-> 
-> Maybe we need:
-> 
-> --- a/tools/testing/selftests/mm/Makefile
-> +++ b/tools/testing/selftests/mm/Makefile
-> @@ -215,7 +215,8 @@ ifeq ($(CAN_BUILD_I386),1)
->  $(BINARIES_32): CFLAGS += -m32 -mxsave
->  $(BINARIES_32): LDLIBS += -lrt -ldl -lm
->  $(BINARIES_32): $(OUTPUT)/%_32: %.c
-> -       $(CC) $(CFLAGS) $(EXTRA_CFLAGS) $(notdir $^) $(LDLIBS) -o $@
-> +       $(call msg,CC,,$@)
-> +       $(Q)$(CC) $(CFLAGS) $(EXTRA_CFLAGS) $(notdir $^) $(LDLIBS) -o $@
->  $(foreach t,$(VMTARGETS),$(eval $(call gen-target-rule-32,$(t))))
->  endif
-> 
-> @@ -223,7 +224,8 @@ ifeq ($(CAN_BUILD_X86_64),1)
->  $(BINARIES_64): CFLAGS += -m64 -mxsave
->  $(BINARIES_64): LDLIBS += -lrt -ldl
->  $(BINARIES_64): $(OUTPUT)/%_64: %.c
-> -       $(CC) $(CFLAGS) $(EXTRA_CFLAGS) $(notdir $^) $(LDLIBS) -o $@
-> +       $(call msg,CC,,$@)
-> +       $(Q)$(CC) $(CFLAGS) $(EXTRA_CFLAGS) $(notdir $^) $(LDLIBS) -o $@
->  $(foreach t,$(VMTARGETS),$(eval $(call gen-target-rule-64,$(t))))
->  endif
-
-OK, minor thing of course.
-
-> > d) within tools/testing/selftests/mm:
+> > > from the top level?
 > > 
-> > 	make clean
-> > 	make -j100
+> > Should use:
 > > 
-> >    compiles 3-4 things then ends.
-> > 
-> >    A subsequent `make -j1' compiles nothing.
+> >     make kselftest
 > 
-> Sorry, I wan't able to reproduce it.
-> Did you mean -j100 only build few source file but not the whole?
 
-Yes.
+I'm probably doing something wrong, but `make -j50 kselftest-all'
+appears to have scribbled on my top-level Makefile, so now I'm getting
 
-On my 128 core machine everything up to -j50 works.  -j51 and higher do
-this.
+ts:/usr/src/25> make kselftest-all 
+/usr/src/25/Makefile:5: *** Too many open files.  Stop.
 
-Another (32 core) machine runs -j100 successfully.
+ts:/usr/src/25> cat Makefile
+# Automatically generated by /usr/src/25/Makefile: don't edit
+export KBUILD_OUTPUT = .
+export KBUILD_EXTMOD = /usr/src/25
+export KBUILD_EXTMOD_OUTPUT = /usr/src/25
+include /usr/src/25/Makefile
 
-Weird.
+I've done this twice in succession now.  Any suggestions where I should
+look?
