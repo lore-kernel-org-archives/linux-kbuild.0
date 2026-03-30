@@ -1,79 +1,81 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A99431F30BB;
-	Mon, 30 Mar 2026 05:36:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF513806D7;
+	Mon, 30 Mar 2026 05:40:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774848969; cv=none; b=JhwgaWrKEqigqIY1G25UCjQhyCjcLKbky/atkYweKINUybVnEOVQauPzfO9VOLTBPZG/KrYaJB7fqfNg/JKRvzvYpdUBajZLKpNEfMpKpV3/kPiM3Jv0JzBAfDWA4a0PVBZxEFqSlyjnMy9+dX8H1nKOHE1HZFibZdz+aSmlxNw=
+	t=1774849214; cv=none; b=qL34Pv1KhD78MBjU3nq37l4Lljq1DNS6V/WNe8ksQJ2r11Jm4lSOelbZtPmZRZbmphs6CyHajbPRsAmuykIzu4BHWE8zyC/7Bb3b73Sy03eXKXG4/Xgzu2wG/JpyIFlScTQkR3L50pGALeBt+ZDwoH2R5XU0oOBtTUjjxOyZoeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774848969; c=relaxed/simple;
-	bh=37J2FedFq2slx06L2Z6thQB9dbAq/5grAfI/7vhrH9c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BXuc6Gt8bG4drkOLruf6IffNrh7n14sCJoKp04vDo/19dTgAOTSn4+Z0NtgZ/bjtXgESkQSlmefqpE/zHPqox2srmb5XJr1o5ypRidJPJb5MPdTAOpM5HhJOLWFWniz3876hvddB50Oyz6HDU+O3ITI9dz5ZzL911nnwC+GAxGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M0bfKkfZ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774849214; c=relaxed/simple;
+	bh=YMdSyQTtYlMxYLd1UqUMmS1B/4na2ForxBOSkAwQj1M=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=j2gLFrm0s/La3EA0d9kfx0+7PI22zg9mRukmoDA3VgBM32nSTuGWHqS+J4aCVV/HWWyAyfSu3CosFBEfsHCPplnCgwtQ9sm6tYEaS7xw+98MIJ16VW5uwQ1uz3LQ/xJ0C4bkhWYTh7t2NUjngVcdPgzsjwWKcUWinBaLIVCrkIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hSo0qZoR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M0bfKkfZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A5EEC4CEF7;
-	Mon, 30 Mar 2026 05:36:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hSo0qZoR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72BF1C4CEF7;
+	Mon, 30 Mar 2026 05:40:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774848969;
-	bh=37J2FedFq2slx06L2Z6thQB9dbAq/5grAfI/7vhrH9c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=M0bfKkfZfjuZwn6mM1WTeEaAxriNLOFG6mfcBIGKQ+khth0ZMNmyj61tqmtc3UAYA
-	 8IxXapWKrI97J2BG7lJ+Dcf1u/KVgsLscMsc6gygfPqnwYT24Ucb3/skS8B63aHZSG
-	 DK6UVV6fGoeoyzq7ryj4AegEIaWs85CPn/lk4+T7vkWrh0OhhXC9IHQ9Zgy77aAoJZ
-	 S3EQkvtHybOTa1eTT6pLPHY9WWiifHbW2mu6yCOwx0l6tKMDcK1BCb8hjfNdmUXijs
-	 uYRwrXbbrYqcQyfgSd1T+DYh6PxsTGSJkYMQC5n+YRy0McZP2BR7PgVlBF4vagEiq9
-	 9yFXxg2+L+/EA==
-Date: Mon, 30 Mar 2026 07:36:04 +0200
+	s=k20201202; t=1774849214;
+	bh=YMdSyQTtYlMxYLd1UqUMmS1B/4na2ForxBOSkAwQj1M=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=hSo0qZoR/2WzsZVgbslMBNyDLqqs5onpVtDiMfAeZmAGxXke1fZL+5VIXkUBCTiAB
+	 uHmecXKSmDt7ZojYCTRNy3c0Vqj1MZAe+69FFVQQiWtpPh+29X7j9jo4rLsMSYLEez
+	 e8+BGuaHpO5EhveV5zxVhJX86RtJ6ngJ6OSkSlYDDWQg5iAfuCxPEecZ/o2IQCB/EC
+	 +3asDblsG49WO0YvHLPr1aupDQ2C7I8kATjCjojQVe2lt0W6pIK3OkqoKrEzAAirmq
+	 uuIpmkKEJLXIbL6iQdUMLfn9OcvhdF7/I9hPZ/MTLE5skU8lQbDmsBKkZVMwCAnXB/
+	 8B4307jJz3twg==
 From: Nathan Chancellor <nathan@kernel.org>
-To: Kees Cook <kees@kernel.org>
-Cc: Justin Stitt <justinstitt@google.com>, Nicolas Schier <nsc@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>, linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev
-Subject: Re: [PATCH] kbuild: add -fdiagnostics-show-inlining-chain for
- FORTIFY_SOURCE
-Message-ID: <20260330053604.GA879042@ax162>
-References: <20260327-kbuild-show-inlining-v1-1-730ac2cae571@google.com>
- <20260327221837.GA3622500@ax162>
- <CAFhGd8pWwbjjLt=FSaDtFysqRU5k_YozDgBFMJBN4YmnAEaktw@mail.gmail.com>
- <202603292059.01A4CB14F2@keescook>
+To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+ Ahmad Fatoum <a.fatoum@pengutronix.de>, 
+ Sascha Hauer <s.hauer@pengutronix.de>, Janne Grunau <j@jannau.net>
+Cc: Simon Glass <sjg@chromium.org>, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, 
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ stable@vger.kernel.org
+In-Reply-To: <20260327-kbuild-modules-cpio-pkg-usr-merge-v3-1-ef507dfa006c@jannau.net>
+References: <20260327-kbuild-modules-cpio-pkg-usr-merge-v3-1-ef507dfa006c@jannau.net>
+Subject: Re: [PATCH v3] kbuild: modules-cpio-pkg: Respect INSTALL_MOD_PATH
+Message-Id: <177484921220.1009805.17340922567466216649.b4-ty@b4>
+Date: Mon, 30 Mar 2026 07:40:12 +0200
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <202603292059.01A4CB14F2@keescook>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.16-dev
 
-On Sun, Mar 29, 2026 at 08:59:51PM -0700, Kees Cook wrote:
-> On Fri, Mar 27, 2026 at 03:29:18PM -0700, Justin Stitt wrote:
-> > On Fri, Mar 27, 2026 at 3:18 PM Nathan Chancellor <nathan@kernel.org> wrote:
-> > The compile time impact is not measurable (within expected noise). The
-> > peak memory usage may increase by somewhere in the 0.5% to 1.5% range
-> > depending on build configuration.
-> > 
-> > I bundled this under fortify to limit initial impact as its had
-> > virtually no real-world testing and may produce unhelpful diagnostic
-> > notes under its heuristic mode. I don't expect folks to use `-g1` in
-> > the kernel (which would enable full-proof diagnostic notes).
-> > 
-> > > If not, maybe worth adding a Kconfig option that is force selected by FORTIFY_SOURCE with
-> > > clang or can be optionally enabled by a user?
-> > 
-> > I'll defer to you on this one. We could add
-> > CONFIG_SHOW_INLINING_CHAIN_NOTES or something similar?
+On Fri, 27 Mar 2026 09:30:29 +0100, Janne Grunau wrote:
+> The modules-cpio-pkg target added in commit 2a9c8c0b59d3 ("kbuild: add
+> target to build a cpio containing modules") is incompatible with
+> initramfs with merged /lib and /usr/lib directories [1]. "/lib" cannot
+> be a link and directory at the same time.
+> Respect a non-empty INSTALL_MOD_PATH in the modules-cpio-pkg target so
+> that `make INSTALL_MOD_PATH=/usr modules-cpio-pkg` results in the same
+> module install location as `make INSTALL_MOD_PATH=/usr modules_install`.
 > 
-> I would prefer to just unconditionally enable this when it is supported.
+> [...]
 
-Agreed. It cannot possibly be worse than the status quo, right? :) This
-feels very similar to -fdiagnostics-show-context=2, so maybe add it near
-there?
+Applied to
 
-Cheers,
-Nathan
+  https://git.kernel.org/pub/scm/linux/kernel/git/kbuild/linux.git kbuild-fixes
+
+Thanks!
+
+[1/1] kbuild: modules-cpio-pkg: Respect INSTALL_MOD_PATH
+      https://git.kernel.org/kbuild/c/742de64b62b69
+
+Please look out for regression or issue reports or other follow up
+comments, as they may result in the patch/series getting dropped or
+reverted. Patches applied to an "unstable" branch are accepted pending
+wider testing in -next and any post-commit review; they will generally
+be moved to the main branch in a week if no issues are found.
+
+Best regards,
+-- 
+Nathan Chancellor <nathan@kernel.org>
+
