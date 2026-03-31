@@ -1,135 +1,94 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 156F7371D04;
-	Tue, 31 Mar 2026 19:52:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E3DE330662;
+	Tue, 31 Mar 2026 20:02:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774986731; cv=none; b=FcOUQEOJIw9FkyBRh9k0wUgOCSDlttDWMIJbnHC9wy1opQCF3bWEqjG1MngUePOi765/Uf3gc9J4OKER7Et+SmdqfCHmTICaYIY8+/G33ImTXG9pWZ1GvUuEGYVGsYJQIDVauFa7QQYDCZvdQJXsKeZE1LeVW1onfvUYNlCZ0zg=
+	t=1774987323; cv=none; b=AOQSkzNYJPHx3tgRvGU9PGqncnpt5zULllWmSyejcnU4GtPk8CvLXaOXA/KNBrW7tPUj/w/Lgaw+mmAY4CiAy7v8iPkx4o9W9JIMshBRXusQLnDxuPqaBbOyPPua8wzJ3qNeiMKMFMMZ+m1B9JZ7I/sJju8MhZPo/BeYRiI87po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774986731; c=relaxed/simple;
-	bh=yDqHYQlphNi7NM7Fr9Z0F57GE+N/2wp/OlWZUNKCtFM=;
+	s=arc-20240116; t=1774987323; c=relaxed/simple;
+	bh=yz7Gkj/NB6A/nXg74Ru5bIaF98PkmZX1c1CyhRc6A6I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WS08QpLt+jRNutdD+YTG9aTdzB3lYuQVlft3/WlZIooirEHzDHQ90ihPdDwtyMAWvy/rh8mHgsPJ+O+UysnEhpQ5UC3ZI8iSVqKkxz9WWHs22Zjg5sYCi/yqnF6tqYIvOGDScW6OwBbvfUZeMPGysv/4m2pUri3EdITLbrlrYh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GoS4l/ty; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=R+IfB6LaATKT91o0aIeXCb2Fn4xRiPdQjVWyz1MU5PD7wh9jLZYKpmLieXoJl9LecpNrJqtFeCMyVj1Janl6I9hSywNsHcPx2yR8Sg2p8UUZHZ1zepWOLd8PT+RRGl15HTPdu9FQXYnu9VVv+SD4xmnpc/M2Vayw4mTLkyck84Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TKo24m+d; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GoS4l/ty"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 850ACC19423;
-	Tue, 31 Mar 2026 19:52:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TKo24m+d"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D902FC19423;
+	Tue, 31 Mar 2026 20:02:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774986730;
-	bh=yDqHYQlphNi7NM7Fr9Z0F57GE+N/2wp/OlWZUNKCtFM=;
+	s=k20201202; t=1774987323;
+	bh=yz7Gkj/NB6A/nXg74Ru5bIaF98PkmZX1c1CyhRc6A6I=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GoS4l/tyGpgkmFwUGs4aAbnB1/BYsqPONwZgpACMtl6kEqKP+DAfcl8RvP1T8zwha
-	 4q0mIhdzm5L84l9/QOKb1qs8zQw/vMoNicYpclxNEwoIUd9Fa4CyL5rIscq2G4oLDr
-	 xC8LiQi9xCR+HHp26+Sfh9RoSrP6eu82EuykpIIwt0+5N5zudICUDTYLKU8QECw4zy
-	 fFz4itvKaPgiJaSUKhqkKVdQW7ejg2YeCvQ6YrCY3ulZKEMkrj9Cmb84to6ppt3I5B
-	 jF0nNbH0Pxw5H55bdqdJ7jEEMjoc/kESkP7rAb2bkqS97TUb7HWnF7W20X/D1Fj7Oc
-	 o9WyB/1v1fIMg==
-Date: Tue, 31 Mar 2026 12:52:10 -0700
-From: Kees Cook <kees@kernel.org>
-To: Justin Stitt <justinstitt@google.com>
-Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Marco Elver <elver@google.com>,
-	Andrey Konovalov <andreyknvl@gmail.com>,
-	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>, kasan-dev@googlegroups.com,
-	linux-doc@vger.kernel.org, llvm@lists.linux.dev,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Nicolas Schier <nsc@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
-	linux-kbuild@vger.kernel.org
-Subject: Re: [PATCH 3/5] compiler_attributes: Add overflow_behavior macros
- __ob_trap and __ob_wrap
-Message-ID: <202603311249.30B44C66@keescook>
-References: <20260331163716.work.696-kees@kernel.org>
- <20260331163725.2765789-3-kees@kernel.org>
- <CANiq72mK9fz6Spmgt4js3hScqhqvZb2YP2T7tDfR0fHPDFWJ7g@mail.gmail.com>
- <CAFhGd8paijFboDVr8rJDjScob047q+zgYAs038WuVozOG0aYaQ@mail.gmail.com>
+	b=TKo24m+dZz8sQzl7Wg15ZeUFtoVdD9y3IJeagghzABNFHnWXHP2y62oweCV6ezrJs
+	 DiBMbkAPOsbEnSkAdsNgOL3uFIJ3Jf37FRdH840N5pR0OyzIK9K2HuPVpBKlfLO6mV
+	 HZRG8Z9ah/SUMu1rHnBh8YHJcsiAx0VcclWJi4iofExi2goD2sNLALIYfaxgmWKu7D
+	 j4BGF1e20RiMw74yAdwaVTDB6RKr1aqxsuyfJUO1GRrY1SOYyiu5IuO14FObnctW38
+	 Hy9G1YqtksFhmOBfzCsjFrUXrkCUUOM8QYZuqqVoBoKANaE+QXgzIGghsjJMTAvf3N
+	 CmL2wNkUQ9BfA==
+Date: Tue, 31 Mar 2026 21:38:24 +0200
+From: Nicolas Schier <nsc@kernel.org>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Jeff Johnson <jeff.johnson@oss.qualcomm.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev, stable@vger.kernel.org
+Subject: Re: [PATCH] modpost: Declare extra_warn with unused attribute
+Message-ID: <acwisFwJ3eMMQLIp@levanger>
+Mail-Followup-To: Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Jeff Johnson <jeff.johnson@oss.qualcomm.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev, stable@vger.kernel.org
+References: <20260325-modpost-extra_warn-unused-but-set-global-v1-1-2e84003b7e81@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAFhGd8paijFboDVr8rJDjScob047q+zgYAs038WuVozOG0aYaQ@mail.gmail.com>
+In-Reply-To: <20260325-modpost-extra_warn-unused-but-set-global-v1-1-2e84003b7e81@kernel.org>
 
-On Tue, Mar 31, 2026 at 10:09:33AM -0700, Justin Stitt wrote:
-> Hi,
+On Wed, Mar 25, 2026 at 06:20:30PM -0700, Nathan Chancellor wrote:
+> A recent strengthening of -Wunused-but-set-variable (enabled with -Wall)
+> in clang under a new subwarning, -Wunused-but-set-global, points out an
+> unused static global variable in scripts/mod/modpost.c:
 > 
-> On Tue, Mar 31, 2026 at 10:02 AM Miguel Ojeda
-> <miguel.ojeda.sandonis@gmail.com> wrote:
-> >
-> > On Tue, Mar 31, 2026 at 6:37 PM Kees Cook <kees@kernel.org> wrote:
-> > >
-> > > +/*
-> > > + * Optional: only supported by Clang with -Xclang -experimental-foverflow-behavior-types
-> > > + * passed via CONFIG_OVERFLOW_BEHAVIOR_TYPES. When not available, define empty macros for
-> > > + * the trap/wrap annotations.
-> > > + *
-> > > + * clang: https://clang.llvm.org/docs/OverflowBehaviorTypes.html
-> > > + */
-> > > +#if !__has_attribute(overflow_behavior) || !defined(OVERFLOW_BEHAVIOR_TYPES)
-> > > +# define __ob_trap
-> > > +# define __ob_wrap
-> > > +#endif
-> >
-> > Should that have `CONFIG_*`? i.e.
-> >
-> >      !defined(CONFIG_OVERFLOW_BEHAVIOR_TYPES)
-> >
-> > In addition, since this depends on a `CONFIG_`, with the current setup
-> > we would put them elsewhere instead of `compiler_attributes.h` until
-> > they are promoted to be "unconditional" (i.e. without the compiler
-> > flag):
-> >
-> >      * Any other "attributes" (i.e. those that depend on a configuration option,
-> >      * on a compiler, on an architecture, on plugins, on other attributes...)
-> >      * should be defined elsewhere (e.g. compiler_types.h or compiler-*.h).
-> >      * The intention is to keep this file as simple as possible, as well as
-> >      * compiler- and version-agnostic (e.g. avoiding GCC_VERSION checks).
-> >
-> > However, thinking about it, why is the config needed?
-> >
-> > i.e. if the compiler is not passed that flag, shouldn't the
-> > `__has_attribute` simply return false?
-> >
-> > Also, I am a bit confused -- does the compiler flag automatically
-> > recognize the names like `__ob_trap`? i.e. I see the docs mention
-> > using the attribute,
-> >
-> >     typedef unsigned int __attribute__((overflow_behavior(trap))) safe_uint;
-> >     typedef unsigned int __attribute__((overflow_behavior(wrap))) wrapping_uint;
-> >
-> > But then we don't actually use it?
+>   scripts/mod/modpost.c:59:13: error: variable 'extra_warn' set but not used [-Werror,-Wunused-but-set-global]
+>      59 | static bool extra_warn;
+>         |             ^
 > 
-> __ob_trap and __ob_wrap are defined by the compiler.
+> This variable has been unused since commit 6c6c1fc09de3 ("modpost:
+> require a MODULE_DESCRIPTION()") but that is expected, as there are
+> currently no extra warnings at W=1 right now. Declare the variable with
+> the unused attribute to make it clear to the compiler that this variable
+> may be unused.
 > 
-> There are some examples within the documentation additions of this patch.
+> Cc: stable@vger.kernel.org
+> Fixes: 6c6c1fc09de3 ("modpost: require a MODULE_DESCRIPTION()")
+> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+> ---
+> I will apply this to kbuild-fixes for 7.0.
+> ---
+>  scripts/mod/modpost.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Kees, is it possible to make it more clear about what we expect of
-> kernel developers in terms of style? Should they use keyword
-> spellings? attribute spellings? only use custom types?
 
-I think for this series, __ob_trap/__ob_wrap is what should be used.
+modpost is just used in-tree, right?  Can't we just remove the '-W' flag
+and the extra_warn variable completely?
 
-And for other folks, the background here is that we originally wanted
-to use macros for "__trap" and "__wrap", but the powerpc C compiler
-(both Clang and GCC) have a builtin macro named "__trap" already. So
-I switched to just using the Clang-native type qualifier. We can use
-the attribute style too, but there was a lot of confusion during the
-Clang development phases where people kept forgetting this was a type
-qualifier, not an attribute (i.e. the attribute is an internal alias
-for the qualifier, and the qualifier is a new type).
+Nevertheless,
+
+Reviewed-by: Nicolas Schier <nsc@kernel.org>
+
 
 -- 
-Kees Cook
+Nicolas
