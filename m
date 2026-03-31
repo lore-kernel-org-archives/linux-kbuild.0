@@ -1,143 +1,128 @@
-Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34AC3342C80
-	for <linux-kbuild@vger.kernel.org>; Tue, 31 Mar 2026 17:17:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774977476; cv=pass; b=Lx19rL7Zk12d2DErhnAZj6D4g4UTjSZ10lfBwDFHdinNhztNW2KknHSGjtNZS87KoJh6Tg21YUnsO88KQ0CzTCdhuYblqBN1IVAOej1s/os2X7K4HbuJAKUeo8vbER+DZa6Au2dvjf32ZZufW/dRWKuYMS7vEL5IEqeRDGbO+PM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774977476; c=relaxed/simple;
-	bh=XfvO/nNrfp6wJ8ltBre7ekP/xZ/Y79d2E/5o49cgJb8=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3970733F8C5
+	for <linux-kbuild@vger.kernel.org>; Tue, 31 Mar 2026 17:19:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774977563; cv=none; b=iWeYU5vcIcuUuZypeo3ecOW6KOlYoMBoVELUSqTgOIHAeEPkO5BFVlFr62+hFa2l99XP7OSYTKOXeEArOvw09hCP7JtsbmvCjwXsLCy/Hon2LnxJ5j723AM2huNmx++To5o5yXWEPk17b5n1Ek8u4980h3kaLrH/X5nItqUlacQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774977563; c=relaxed/simple;
+	bh=fvOPupQEnVmV/NcMv1g9ULLTpQ2SLYsqRQYOCWOIjsA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YPCcgrAitsij8lQrNG4HXEkRAnTSDq9z/fAWlbGfYkHMZR6R2xINOr5ssGUD6z4iBB3eRN3H2Y2eFVA0H/5EFfJkGoRqHpMF1CyFKUxfyPphonP8NDFk1WsGl/dMZ4tqeG24lk/ospIGmL2Ah/Phk3GzF7M+2pxzh4IlRIrjeFQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g4GSVzlP; arc=pass smtp.client-ip=209.85.217.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 To:Cc:Content-Type; b=qOlGN9agDpl8h1ueLYuXZ7cTQuuT6vKnlQSl1x9QeaGhMwueI1BWA8d4ASzbRzB/KOw9oHTvFylgv6QCNkgjQQgx1XuTzf09pr6nW8qNYVsmcX2XYSuI3RHmncmtPWno8B5usEnVaaa3NprjuVnrS5S+O2pC2+RkoX1DXYf8Law=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=O2LzJAfJ; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g4GSVzlP"
-Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-60328744754so3689436137.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 31 Mar 2026 10:17:55 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774977474; cv=none;
-        d=google.com; s=arc-20240605;
-        b=S8iaY1AYHwFsSynw4uL81OxghT07Ygc56+Mph7UPFAn0yCmaUlwROtWP0Mtqk0FOeF
-         zXZzyG8o+MfLWnHiXCjtrIJWmoGKqhkfhHDg3Fc2HfH1I8+UFWmxL7XPPT+Hwi5saicA
-         0EJBEQ4b2kZLbJCFjVei38PsiG2ymoYWXMctRJzV0AtUftq54vTlOuSkt/P1wa0LwczJ
-         Na8xe6FsD3tLWiGf7xIzYa8v7S/S8UuIdpXOFSMhiPB4PJDP8zifLnQnagRdV24XrGfE
-         yLcwGkX5vm86hYbxOY4e0aiodE9ih8whC9TiHB+n9dQe3G6gjCn3FoH0hu5wd8zNDjJ+
-         JtNA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=XfvO/nNrfp6wJ8ltBre7ekP/xZ/Y79d2E/5o49cgJb8=;
-        fh=d1nbMGA7SJZCjyLi1NFn/CQmML1lFw3bH2pjNXR1gWU=;
-        b=ccKYJgK+3WdesgYvrm99tEnE98cVUs9WtP5p2H9dQJ9cz2gSxH0API2QjnVxjh/guA
-         JMlA1DtGUKIKPmQVKvo5+Y7Lkv1VIMcy7BSp78EgPOpFz1cyEPp/PVMigoA0K5mlDBuZ
-         BzP3Z8n9st6p2K2CXmzVOI+qUga8Nnm090+IDNQTgYjP61rEkhd5xYv1L9U9XIZZIEp0
-         2txNEe4VKLnvpDyFA4VBMG9a7B4TyaT7QtHHC0+bQcSnS44RFQ+LjzfvRkm450wyl67w
-         29KCP9FSgfKWVR1pG0Wmv9du6CeIhi+EbLcXS0TN+YF3fu4NGSmEpo/TVUZa+uSEYSpA
-         F8ew==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="O2LzJAfJ"
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b9382e59c0eso960335066b.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 31 Mar 2026 10:19:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1774977474; x=1775582274; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XfvO/nNrfp6wJ8ltBre7ekP/xZ/Y79d2E/5o49cgJb8=;
-        b=g4GSVzlPvZyTxCdQRik9r58eeT3v3a/iTwQpqVjcArg3oZq/1wkwpys2I1Cf/kxCFH
-         6djOmhHrT7fomF/WgtcNZDLzyYQG7WnV6dNM9A7kHloTjNwFhbvPNBwNiPJCGMFgJvIv
-         nrhzSa9HTdWbe2JaOROrd9RyBsYf5ETfj7+f1cYQgn9sjWCJ6+9OaafpGTm7j+7zglNw
-         f/qze2XNhWiUM6J9/gfNoCCvR6g2PRwDDfs22f4RpveOsgfYG+5tEw0DLmTfMu8kRX1Y
-         BnOZP+h6/0JJ7yqPuJjm6+pnI+7oVbmcSmdZUcSCKm5Loyc7/zq8j0IZ99OVMY+olF7G
-         Jz4w==
+        d=linux-foundation.org; s=google; t=1774977560; x=1775582360; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=5+4YPeQId4Y1cXleVK3wn4GXPFCaXiKdSrMa6qJPwN4=;
+        b=O2LzJAfJ/EXdE7VNoKot6NIdPuBbdPf9fD0jmLX/oZ6rR2+kWaXkFvCzh3jBEeJD+K
+         Yi4wXN2H1B6za42ARp8PdO/g84uzbAVs0/8/Io8ZTLrWtp/1WQJPiae2StxrBNmVRquC
+         MnT9h4YnzipIWmlYhXvqhAtvis4AgxkW/Os7s=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774977474; x=1775582274;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=XfvO/nNrfp6wJ8ltBre7ekP/xZ/Y79d2E/5o49cgJb8=;
-        b=FRinY+MLeAbRfQGTwW9UkHE12VAv7M8PrfXkOXztZM7kq47kamH/ikk+UuMFgmbaVW
-         MgbGqzxtAR4cxkWS8tU9rl18pK/Wpft5Fdl6H3yxleERKmgMjXqZjKWPCN+0/uwtaeXl
-         S7gJTyNT+kpA5KPYh9GbSU9fuIM3+1v7k8UySg7O6NoSuEjYVYLpUKTxlgRgnQdCnjs+
-         FJ2fvgI5J/Tu/oOTcCDpojaXkqKiEvadY25b4pZ6bDMNiYUXUuj8QCdCXhqLuEXZOjFy
-         fQvmBpEpwDfhAVz+lg69npz5Pea9jtExyNACCgr8A5ebA+5UOchVrEEAWjBcLIq1wguB
-         Odrg==
-X-Forwarded-Encrypted: i=1; AJvYcCXR37xdAGN5uo0wAZSirb4z69qIqlxW2HJYity770qgrFllPdrQselNYD8YNdBlMuLUQyj/h5KnrdbMpiM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5dr2+g53wGmkObTFjgQDdGWBZUgJTxbdJ7hAR4BXyj6aIOp/C
-	p9JLsESI8jIidFXzneay5aUbHU2N8vQ85wieYz2ISNS5sBc+SR9pTLe/Zgrrz1IcgQ9WcCLmt9r
-	3fpMmMJsgs1i53XwsVlStxxgBuhepUYNI117zhpDP
-X-Gm-Gg: ATEYQzzcV/MLQEFKhCx2aLU2W7T9o2AiapgF6BF4FOp1VQyuvX7KfIqGvC44VxaZ5gz
-	9HQF9Py5idp0qSWpG4vBDmklEm4HxzXADV46yVrhCBK24TCXQ630SLjuPfTZfZPOlL84Ey73PwH
-	NsRoQI6tRKODb+Y9VATUu38NehVspZcVADvLaNJCOGf3DLXJk73pbX2NdSBS/67y+1n3lrU4TwB
-	8nqnScD8xhEOCtmLOri2nMhJgAF0gf5lZ9tH652a+CaDSOC0vQiN7xbdOOEwKp+tEg+HVN5A97g
-	cYX0s/E=
-X-Received: by 2002:a05:6102:c94:b0:602:ace8:f20e with SMTP id
- ada2fe7eead31-60567e8d127mr40188137.14.1774977473726; Tue, 31 Mar 2026
- 10:17:53 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1774977560; x=1775582360;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5+4YPeQId4Y1cXleVK3wn4GXPFCaXiKdSrMa6qJPwN4=;
+        b=kOJ3/jFe3o8c8/eCs0IyAhlrC1XjBf1NheNcilBq33WySb/bR3xsEhU1QpLrnEoiSF
+         lX52O+9JNcO6x9tPyyfdfh5dz8CFShDMRy1iocLmsWRpaAEwszICd25kZsbtmOXiiAPe
+         TO6sM7XSNB2ZnhgxMUR2P2Om/oBZtZaEQgtGr6ukMiNrOcl7rPYwtep7aU363IVGW+fl
+         4o2KBC4+BqAEoT0ANo8m+qc5PFeHPWEd7DNZkbcWT64OG/t9m/IgRVf+aesvabR7acg9
+         4h5gZczKyIq9LQmDb0vaTErRp6O+9biBmMiHk7EdnHvfSqDSTAUCwduCdsqjwXHMNLFU
+         OXkw==
+X-Forwarded-Encrypted: i=1; AJvYcCW6JQrwNILapTnvxVdZ8D6C4At6mbJ2qBUa3Lhx55uE0zetAZ6DwKyKF2qt8KX6UCFZNOpSckrkKbI9FDQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRVnWydvgzaX7qpvOpxdgnyjXr7UQ4eKwHMR2UP0uZAG1/TzHH
+	5qUcZPO3PN4D5L5ljup9EFENBuPLhS2pBjQTK984qsVzILf3+qtpukZ1/5R5ANsaQN+ySk8nlTm
+	Fz+yoCBJP9g==
+X-Gm-Gg: ATEYQzw0DZKIzNRcpa5GLw1/tgoGF7rq1X0CJDenxPLOIrzDHvXb8/jh18zjU3KOSoB
+	oMb1wLYn0HWpmdUfC+wVpnB57XMnoCFI1rlvP+f34t5NR2mInUf9a3aS6cfdoVWUepf0ZLoGwxI
+	Gpr85LwR9+EP5fJAYMe3aRyTvp5dWzpRTZd5tnBK/aQTjzwIaIa7WxgBSB037xRpwq/3zJiZUcL
+	Uhl5CT8y0clCXCUW1rLrTqi87kkt+2Grq5YGnSPhEUD2PT1MaSJZp/tLmkX0OL4lPneaAOrTqbu
+	M6WUpA2i+vGLQ6iV+GKXnDQuTLxTLZ9QBAPZM5P4jxejtFSZq5WTmzTTMCDZalFWHHMjCKcRZYn
+	zqDlfor94z9mQnLqkSLAz3XmrkMmIfEBhRdSQ3TIQVb5WVMgkndCJAZ1pIX1cKfnsu3y5XItPB8
+	E0JzEzv5U2fSNemSTeqPgMenAmuTSOtqfU45Q9koLp+uG/uoZYTnKqvynwirkG5FOziKnumAHH
+X-Received: by 2002:a17:907:a70b:b0:b98:13b6:38a1 with SMTP id a640c23a62f3a-b9c13aead54mr28715766b.28.1774977560063;
+        Tue, 31 Mar 2026 10:19:20 -0700 (PDT)
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com. [209.85.218.42])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9c0219ed10sm64193466b.41.2026.03.31.10.19.19
+        for <linux-kbuild@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 31 Mar 2026 10:19:19 -0700 (PDT)
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-b9841aecf72so723622466b.2
+        for <linux-kbuild@vger.kernel.org>; Tue, 31 Mar 2026 10:19:19 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUviRoWipPCWiLjEeABQbi7kltDJOYTUrZe+KdoCmo9F/XvE6WzvxrHCfmvh2zlLu9F7i1R+ifyBHhGW98=@vger.kernel.org
+X-Received: by 2002:a05:6402:320a:b0:66c:2ab4:1c17 with SMTP id
+ 4fb4d7f45d1cf-66db02ab9fcmr248797a12.9.1774977068945; Tue, 31 Mar 2026
+ 10:11:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260331163716.work.696-kees@kernel.org> <20260331163725.2765789-3-kees@kernel.org>
- <CANiq72mK9fz6Spmgt4js3hScqhqvZb2YP2T7tDfR0fHPDFWJ7g@mail.gmail.com>
- <CAFhGd8paijFboDVr8rJDjScob047q+zgYAs038WuVozOG0aYaQ@mail.gmail.com> <CANiq72mQPU2Uyz27mBtfT6UF4Zgoq_osodALs21kJ4qOFLVhUQ@mail.gmail.com>
-In-Reply-To: <CANiq72mQPU2Uyz27mBtfT6UF4Zgoq_osodALs21kJ4qOFLVhUQ@mail.gmail.com>
-From: Justin Stitt <justinstitt@google.com>
-Date: Tue, 31 Mar 2026 10:17:41 -0700
-X-Gm-Features: AQROBzDziq6Gf2V5ut4O-Crb8XfwsiZEe1mK1jC7L_WO2ZUVxZo1u0OLGaY1nqw
-Message-ID: <CAFhGd8o2C5T4_-p3zsSbygwi=yDPOdpDBPC69X=R8qoefbVXew@mail.gmail.com>
-Subject: Re: [PATCH 3/5] compiler_attributes: Add overflow_behavior macros
- __ob_trap and __ob_wrap
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Kees Cook <kees@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Marco Elver <elver@google.com>, Andrey Konovalov <andreyknvl@gmail.com>, 
-	Andrey Ryabinin <ryabinin.a.a@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Shuah Khan <skhan@linuxfoundation.org>, Miguel Ojeda <ojeda@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, 
-	llvm@lists.linux.dev, Linus Torvalds <torvalds@linux-foundation.org>, 
-	Nicolas Schier <nsc@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
+References: <20260331163716.work.696-kees@kernel.org> <20260331163725.2765789-5-kees@kernel.org>
+In-Reply-To: <20260331163725.2765789-5-kees@kernel.org>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Tue, 31 Mar 2026 10:10:52 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wiJ6Q_qMHSe-hs+QvqKVZphvDZjvFP_gQLw1eaWimv8+w@mail.gmail.com>
+X-Gm-Features: AQROBzDm3gEHu3WZ_nfCrD45b6_U9t89WHlDWMoUx8NfrAs9jBI1Qm6jv38zdhA
+Message-ID: <CAHk-=wiJ6Q_qMHSe-hs+QvqKVZphvDZjvFP_gQLw1eaWimv8+w@mail.gmail.com>
+Subject: Re: [PATCH 5/5] types: Add standard __ob_trap and __ob_wrap scalar types
+To: Kees Cook <kees@kernel.org>
+Cc: Peter Zijlstra <peterz@infradead.org>, Justin Stitt <justinstitt@google.com>, 
+	Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, 
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Mark Rutland <mark.rutland@arm.com>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Suren Baghdasaryan <surenb@google.com>, Thomas Gleixner <tglx@kernel.org>, Finn Thain <fthain@linux-m68k.org>, 
+	Geert Uytterhoeven <geert+renesas@glider.be>, 
+	=?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, 
+	llvm@lists.linux.dev, Marco Elver <elver@google.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Nicolas Schier <nsc@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, 
+	linux-hardening@vger.kernel.org, linux-doc@vger.kernel.org, 
 	linux-kbuild@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Tue, 31 Mar 2026 at 09:37, Kees Cook <kees@kernel.org> wrote:
+>
+> Current straw-man proposal is single letter suffix because it vaguely
+> felt like the least bad of all choices, and they should be short or
+> everyone will just continue to type "int". :)
 
-On Tue, Mar 31, 2026 at 10:14=E2=80=AFAM Miguel Ojeda
-<miguel.ojeda.sandonis@gmail.com> wrote:
->
-> On Tue, Mar 31, 2026 at 7:09=E2=80=AFPM Justin Stitt <justinstitt@google.=
-com> wrote:
-> >
-> > __ob_trap and __ob_wrap are defined by the compiler.
-> >
-> > There are some examples within the documentation additions of this patc=
-h.
-> >
-> > Kees, is it possible to make it more clear about what we expect of
-> > kernel developers in terms of style? Should they use keyword
-> > spellings? attribute spellings? only use custom types?
->
-> Yeah, I noticed that right after sending the email, sorry.
->
-> So I tried to use a macro even if happens to have the same name as the
-> keyword, since that form is a bit more flexible, but it is fine either
-> way.
->
-> What I would suggest is adding to the comment that these were decided
-> to be used as keywords, and thus we only need to define them as empty
-> in the disabled case.
+Violently disagree.
 
-Agreed.
+I'd rather have people continue to use other types than have somethign
+that isn't visually obvious for *VERY* subtle semantic changes.
 
->
-> Thanks!
->
-> Cheers,
-> Miguel
+If somebody starts using explicitly trapping types, they need to say
+so. Not just *say* so, but scream it at the top of their lungs. No
+hidden subtle behavior changes. This needs to look _very_different_.
 
-Justin
+No stupid one-character things. If we go down this path it would need
+to be "wrapping_u32" or whatever.
+
+That said, I think the trapping behavior is unacceptable unless
+there's some way to recover from it. An dno, that "some way" is not
+the broken C++ style exception handling. That thing is pure and utter
+shit, and fragile as hell. Anything that requires trying to unwind the
+stack is just a complete no-go because it's going to be buggy and
+untestable (sure, you can have test-cases and the unwinding will work
+for *those*, but...)
+
+I don't actually see any sane interface. The "unsafe_get_user()" thing
+with actual labels and exception tables works very well, but it would
+require wrapping all trapping operations in a macro.
+
+Which is maybe not a bad idea - it's almost certainly better than the
+overflow builtins - but might also be disgusting. Hard to tell.
+
+              Linus
