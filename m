@@ -1,159 +1,85 @@
-Received: from mail-dl1-f52.google.com (mail-dl1-f52.google.com [74.125.82.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AF4E43E9DF
-	for <linux-kbuild@vger.kernel.org>; Tue, 31 Mar 2026 17:47:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774979279; cv=pass; b=amSVsZdCtyx6UUkiZ5w4hhYgdIC4HMsYA6fVDakq14/MMS9XyFtxGNfpC5GAglyvhWC2nvdZsYFNTKr6vtSIi/NkoHLHr9QX0Sobwrbfpt3DpzrYQjdzdWWG0Immv5Q8tnN7SAY3xESiKqchUd/nQsZ3Qim3hHO9VVyJrDNkU9o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774979279; c=relaxed/simple;
-	bh=0gsHE02IRJdRhrhJLMxNqQrK8YKfaYio1tL3SdU4Cww=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CZkZLR7QtdCbu/Z4iKTfnMQwTCBIchFPegF/6bUzv/EkoH8N/8gJQLXQ5C3f21ip5X/9Rtt8XF1iECzI568CPZQo3U6xUHlN8bsbz2g+eARypWpW1RUZRw4cJjjiB0CujE3Np3bvr4Ehg8y6e8UcbDCdkIZ9NzcIxvKJCtfhUPY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=btmB3XFt; arc=pass smtp.client-ip=74.125.82.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77F9C441037;
+	Tue, 31 Mar 2026 17:50:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774979428; cv=none; b=eR4C66MrNiNhtP2nqss3pXcBewycl1r2rJQVBSHhi/hEm1nnvOuLClrHR7oWtN2oOSqupl6aRwClUxaaZwiHzMIc9oXD44nSu51jdelRdFokWOED15GjdFPFoF/8ie/kW6U7mGUqki/C7fb/sKMPGehAKwX7CNVjbOGIV7r26B0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774979428; c=relaxed/simple;
+	bh=hLUz8zQGrUGwTqqMl4TF4YPgdp0E2S0+yu6rruoAxx4=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=NjPG5SitS0gjQGFXGSl56aMq9YKk2M5volXNuOVCHj50KmX3Ag3SO4d5Oob70ZdVJ12OsYCbOdtVtE0q1iwQZwyuK2xBoCpZDoCXJoaPi4f40kesI1e/nxCUe6B7l/QWDQy35CqgYlWh5gvJmOdqMMo7P7r9VJlMUI/DyNevZGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=I+U7IW49; arc=none smtp.client-ip=159.69.126.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="btmB3XFt"
-Received: by mail-dl1-f52.google.com with SMTP id a92af1059eb24-12a77005d69so424756c88.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 31 Mar 2026 10:47:57 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774979277; cv=none;
-        d=google.com; s=arc-20240605;
-        b=hqNv1VDSvo4Kr1NHt2rhxeW2BGvvDSW7JF1i9u7qJzszV7hxmD/bOu9aYWcCv8LG7K
-         2l4LckiyBITdWl4R4VphUNLJgeU2IlZ0HYZYff3JMWK8PKTkxPFMtX28vOOtyMCgUM4q
-         ijbImj28r2Q1VPWpFGyIjOj24MyN1Sq4LI/kAXUSDKdSS+vGIjQJmuPYcwueiA027AoO
-         7DZIkFv6xJzjTAu4rQNuhMoiZv1F09EP5cz9J7C9TGWylE89wiIlfLFlsuk2L3KuRhwc
-         Tn5lUFotb7U61wJEYFLtfC2CUJsgIU6X6pgSDqlri4yAftxKBxd7GZeAg/gJUPm82BFz
-         pBUg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ysi2hafA+ptpgLLenBdk3UcWnvRmrwggzaNQGDWt5QA=;
-        fh=/Clldi3o+HYPxTK1XbYD7ZtQYc0c2VcGcLBCq6klEuE=;
-        b=Z2hqjTXOpLMiImDdm8hWsxrzKMYF9DyK843CCaHN/jdrOz9I59kCtCiya3S+4HfvBX
-         A0Z3Ebwv+N+FoyQ0ptcMve/bMWOpKFHDXmr1kaS5yZLA9JhTpVLeqHku+ufOniL5TxhA
-         HI7BVOiCPaziqHPTXNArABU4mnhbjHdh+nSgpx4SJNRzPRS4TDagL0vNnGsrBcw5zPUf
-         ls6KeUb/SwPKeu+gnwer9V8nqIuogBZ/Jjk6PWedAKbRkcH4w4dD7UKDfttll8fO3/1D
-         OI+KmRRDiB4zPR0iFT8YsAqKC6ti6COzXc04m0186wDdAir5HB5S/b1weuX7eiylgd50
-         ZfPA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774979277; x=1775584077; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ysi2hafA+ptpgLLenBdk3UcWnvRmrwggzaNQGDWt5QA=;
-        b=btmB3XFtp4LixOK2c4UFCeR5b6tfKUvUYhR3vnU3nFxkJHl4SrrkPapy+cHtb30M/v
-         k1eXNFxhdIPR86KCcF51ufDyUS//+/wo3RjBmQTQu6lejkedge4KdU3fsh+PzNJP/8OV
-         PtxHW274Ra/LVp97xypVHozFahjLQ22/etehT5ibRL2HZIoent9W2lsWOK4IZNWWktfE
-         rUAcPv824IJX8EgDkjViOgIdIyU6sIH84G3U6vMUyKalbRVvU2COz0dOzghIK4RSlk6T
-         B4W83BsNLiVSK4Yu6Z3Ucb3EBOWLFwRQzLxOmUW+/WdwxBLZUufRDHbCQqSNIeb7xW/4
-         39zQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774979277; x=1775584077;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ysi2hafA+ptpgLLenBdk3UcWnvRmrwggzaNQGDWt5QA=;
-        b=OuMWsg3Hcs4LaNvINYk74LwKtQHgl2rncjOY2OsJCA6m4wAPAQS49nInkKIe6FguG/
-         5QwuCYff5La3eEo5gGoumK3jFwWJpAURiPGYLhC0pVAK92G9xxwVFzwwC4ls2QoJz2FS
-         rNX6kgtu9ko+HqFhY9inl2kBw/B7I7Fq/9+8GKGCz6PAbbGqngvHtr41PMZlcL7dhGZ+
-         uRn71AXeJ72f8XiNzoggv1KtWTUzdFdCUNsZs7jtLnn6ekMSU/LKSanfDjDuLKfp8tMd
-         93SYpfMEpngOgLtvXzkppI6k5QVR5nIBKED7sitsEyTGO8v2cPoJsKyV9GGjwuU/uPj3
-         p1OA==
-X-Forwarded-Encrypted: i=1; AJvYcCWjXI/fDaxrCaylCp78Sd9Ylq39ro1LWV2iSdKwk792G0fT+uTecJjX1Tl60mjT/MJqeWF9ut/DLmQdne0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyw+HRJgdLCmX9o92Wdz/SU+fIZ0EwGt7DxlptgN52lmCJx5M8Z
-	+7R5Lxuu6SSeBGq0dKo42IDL5RcqoNx5xy2b6mE3u2F7lA+XKNQsq+2scYbBrirQ+vHPFwCur6Y
-	S1+M/wRXVc7N9IWMgwJvD235OCccRXnk=
-X-Gm-Gg: ATEYQzwBZwKiM+HuQVjPL5xLwbQJ2Ji3ZL7YJQGBuGAL6C6XMSQ7ZbM8kGuPqCvXXNs
-	8hvQ6m4BCjucBWMT4hNk6lgyhxzdSkleZP9Zoj4D9gIdDw3KmbVQLBm48hcJDtMbWOFBIUT0ZjW
-	4lM4wAG1ukD2LVq4GnHXfqFbOv561BI3isY4pC7oprSDxOLozrHQqVTVnT3fJEmvegNsODW65Vh
-	+vbuCGgLxHfii5aRzHGPPfmOx7gZkskoHapQC+OlX7CkYSvCPokWGJWLB5KXLql+INGhqXp2Jy6
-	SRNbHWxzcM/HC6RduKpUUuig9zV4uwKm1Q8KGdIDsSIT03NjrwH9Oy0Ht8L9kI8X7DzWeQpsIdj
-	CQJN8p72cji+WmmI2uN2umKc=
-X-Received: by 2002:a05:693c:3013:b0:2be:1f56:ed0d with SMTP id
- 5a478bee46e88-2c9333b1713mr40887eec.6.1774979276969; Tue, 31 Mar 2026
- 10:47:56 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="I+U7IW49"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+	s=mail; t=1774979424;
+	bh=hLUz8zQGrUGwTqqMl4TF4YPgdp0E2S0+yu6rruoAxx4=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=I+U7IW49M/DAk8IEMbSJqPr+RqE2WmjCxC4oVerAX1KA4m3YZ1YRF0wfARM6owdVQ
+	 tvv0VZO5fOvfU8UgSzv0DPlU0G7U602GamfVOT4TV1JnMjuYy3bKKdNQ2rayEsYPzT
+	 lejhStr4wwIKOHVasj4L19uVlCmlc88A+hYQUt2c=
+From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+Date: Tue, 31 Mar 2026 19:50:21 +0200
+Subject: [PATCH v2 3/4] kbuild: vdso_install: gracefully handle images
+ without build ID
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260331163716.work.696-kees@kernel.org> <20260331163725.2765789-5-kees@kernel.org>
- <CAHk-=wiJ6Q_qMHSe-hs+QvqKVZphvDZjvFP_gQLw1eaWimv8+w@mail.gmail.com>
-In-Reply-To: <CAHk-=wiJ6Q_qMHSe-hs+QvqKVZphvDZjvFP_gQLw1eaWimv8+w@mail.gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Tue, 31 Mar 2026 19:47:44 +0200
-X-Gm-Features: AQROBzCQ6Wo3TBLhc4gV7S4by1XCetN63ihcS6-yEhM3XyLxgnvaM_4biv0PCmo
-Message-ID: <CANiq72kL3rTKyDNYmD7wXiKCVJSfa1bnp2L8NShXU7OPmWjJ4w@mail.gmail.com>
-Subject: Re: [PATCH 5/5] types: Add standard __ob_trap and __ob_wrap scalar types
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Kees Cook <kees@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Justin Stitt <justinstitt@google.com>, Miguel Ojeda <ojeda@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Mark Rutland <mark.rutland@arm.com>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Suren Baghdasaryan <surenb@google.com>, Thomas Gleixner <tglx@kernel.org>, Finn Thain <fthain@linux-m68k.org>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, 
-	=?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, 
-	llvm@lists.linux.dev, Marco Elver <elver@google.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Nicolas Schier <nsc@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, 
-	linux-hardening@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20260331-kbuild-vdso-install-v2-3-606d0dc6beca@weissschuh.net>
+References: <20260331-kbuild-vdso-install-v2-0-606d0dc6beca@weissschuh.net>
+In-Reply-To: <20260331-kbuild-vdso-install-v2-0-606d0dc6beca@weissschuh.net>
+To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+X-Mailer: b4 0.15.1
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1774979424; l=952;
+ i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
+ bh=hLUz8zQGrUGwTqqMl4TF4YPgdp0E2S0+yu6rruoAxx4=;
+ b=0AQ7iiaWEAS7ng1Y5vuCUtOdXvP9RQ2+GY5wK54taKBVWEIP7I1ct5c2Pimd7f6t1/dk9Siaa
+ Zxom03mJwioAtI1nG6UDsFgBTWK2s6pNYwK2gJRfyzf5V1+IbahEs7Z
+X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
+ pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 
-On Tue, Mar 31, 2026 at 7:11=E2=80=AFPM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> No stupid one-character things. If we go down this path it would need
-> to be "wrapping_u32" or whatever.
+If the vDSO does not contain a build ID, skip the symlink step.
+This will allow the removal of the explicit list of architectures.
 
-That sounds close to similar types provided by Rust, i.e. if something
-like these types are used, then it would be nice to match names if
-possible (assuming they are similar enough, i.e. no surprises).
+Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
+Reviewed-by: Nicolas Schier <nsc@kernel.org>
+---
+ scripts/Makefile.vdsoinst | 3 +++
+ 1 file changed, 3 insertions(+)
 
-e.g. with generics they do `Wrapping<u32>` or, in other cases, without
-generics they name them something like e.g. `NonZeroU32`.
+diff --git a/scripts/Makefile.vdsoinst b/scripts/Makefile.vdsoinst
+index aed153b3120b..3de70218b8d4 100644
+--- a/scripts/Makefile.vdsoinst
++++ b/scripts/Makefile.vdsoinst
+@@ -22,12 +22,15 @@ $$(dest): $(1) FORCE
+ # Some architectures create .build-id symlinks
+ ifneq ($(filter arm s390 sparc x86, $(SRCARCH)),)
+ build-id-file := $$(shell $(READELF) -n $(1) 2>/dev/null | sed -n 's@^.*Build ID: \(..\)\(.*\)@\1/\2@p')
++
++ifneq ($$(build-id-file),)
+ link := $(install-dir)/.build-id/$$(build-id-file).debug
+ 
+ __default: $$(link)
+ $$(link): $$(dest) FORCE
+ 	$$(call cmd,symlink)
+ endif
++endif
+ 
+ endef
+ 
 
-Having said that...
+-- 
+2.53.0
 
-> This needs to look _very_different_.
-
-I think there is an actual risk of someone e.g. copying an expression
-from one place to another, with the operators behaving differently,
-yeah.
-
-In the Rust side, even if those "explicit" types like the
-`wrapping_u32` you suggest exist, we generally use the methods on the
-normal integers instead, e.g.
-
-    i.wrapping_add(1)
-
-    micros.saturating_mul(NSEC_PER_USEC)
-
-    self.index.checked_mul(page::PAGE_SIZE)?
-
-etc.
-
-The advantage is precisely that it is more explicit and avoids
-confusing the operators when copy-pasting code and so on.
-
-So that could perhaps be an option? Kees et al. have been thinking
-about this for a long time as far as I recall.
-
-[ And for the usual operators on integer primitives, we panic by
-default (configurable via Kconfig), but at least that applies to all
-Rust code, which is all new, and kernel developers get accustomed to
-think about what they actually want for a particular operation and
-whether they need one of the explicit behaviors above, so it has been
-good so far, but it remains to be seen what happens when we have way
-more code around etc. It does mean someone copying a simple math
-expression from C to Rust could forget about it, though... ]
-
-Cheers,
-Miguel
