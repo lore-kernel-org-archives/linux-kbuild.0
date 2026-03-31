@@ -1,124 +1,222 @@
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from LO0P265CU003.outbound.protection.outlook.com (mail-uksouthazon11022090.outbound.protection.outlook.com [52.101.96.90])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F07421A1C
-	for <linux-kbuild@vger.kernel.org>; Tue, 31 Mar 2026 21:04:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774991073; cv=none; b=WOP+w2jqQ8ie2oCQ0i6MgZ0orcVdebB7LX7FLWmB2VSXgZtkpTfY8jzlD2Af2Z6JIQKjua/omBf7PUD7quxUGWCdwNJGzX61k+AZE+1YOuYqB+b2GqZONewr6zYfA72XRsBNlCCsU5Qy5fedwNb4/56DRIZa5XaRTwf18FrUwqo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774991073; c=relaxed/simple;
-	bh=JdtX1HxX10vKkEIJTgN8UNt8Jx8wkMFYsFGA9S+Pp3s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WLj1+wrCYrJWJHEtBiyLKG4J6AAVAsQU88CUA8RXupa6nMtvlrXxObrHmQWeefAXXiq8VFAUz6y5NEvkHfxGxYRpK+7z4D3I/l0nlxgzknT1tnYyRaEFAwc9x/g4y/dJaskzDUXD3ZDOkm4iUo/maZR/q8Cw9l/JYsg7GIcuncM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=Nq1waGM0; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D173E3D6CBE;
+	Tue, 31 Mar 2026 21:07:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.96.90
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774991247; cv=fail; b=uLOmqbTn62oh1ODXiJrH+sYNkElVIloLsL9MDMYEF0r3/61kDeZIHbRiyeG8DIM734KiqdTrwWNrIicxy3ZqcVU/DVKgY74LVDPyzzaWhjziXqnDSiFMFiqpTIB5Sphe13DRM2oC5TiiGs3o3VZ+msu+pZHpzNGffJFt9aHw3G0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774991247; c=relaxed/simple;
+	bh=1lgLWVwflkyNUhGkpR8atonESCL4oUa1kdXPm6ZVzEs=;
+	h=Content-Type:Date:Message-Id:Subject:From:To:Cc:References:
+	 In-Reply-To:MIME-Version; b=apKypRt6Uxqh39sfI9cKoZFiK66h25Gyier/hkmpy6x21qW8Q3EWNYGV2rDH+1101DwUovTs6v6nQIZ+LaFHXn85J9Kylvv2aXlYCXJjLV/Blcf3fvoCgkC7TFfronJ/8Qg+0Cz9/2WOivrXiGd+Ctwa38oa8bOCIMVQxvLbCNU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=uChPHJWK; arc=fail smtp.client-ip=52.101.96.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garyguo.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="Nq1waGM0"
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-66dd0531d01so195713a12.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 31 Mar 2026 14:04:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1774991070; x=1775595870; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=dPaiD4OsZpalA+NXE9JYeLKvQIkP47+Rdll9Ghzi+s0=;
-        b=Nq1waGM0XWaKz+a07dKwiAWlNyX5XDHpe+44+STglDKEU6ygutX44ctiFdvoQNE2oh
-         RyC9wP5V9OKcBtPyVIP/JsiJWItVkEy81rASGBpw4HZC9l4ZLCzC3Mwq+hZX5530Gn2A
-         asaxq1TqROuq65GIMSCU5KjZQrh/meD34rWMs=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774991070; x=1775595870;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dPaiD4OsZpalA+NXE9JYeLKvQIkP47+Rdll9Ghzi+s0=;
-        b=rOd0H8EfFX1iHI1RDNgwhGPUJUyJaPFBkMpO15W5AnAlfUX1dvNAhldSrMlmrPFxju
-         RlsiotKrg6s9hiil+l+jBcHWl7iiUo5FJxWGO+hWGGsszTYfmdUi+lAEwSxjLh/cJBeV
-         plo3W3zMSuMu0hg4cAKoGk0Hnf+aWAu2QhpiM5oxfqePfUTWWOBjzsLZ6uQGAY1uuOoK
-         fGXCZIvO1C7REhD5FnNB0XNFdvbovADcAorOXvVST2T/mHQOav2+fkOFttee+n3HI1sW
-         dEyk0mhhBSgk9fy0obalbKiaHcGFzQNO7f+Sf04eZXI1IZq7ZJuc/3Z9KrBgv1VWItYh
-         eTyg==
-X-Forwarded-Encrypted: i=1; AJvYcCXb4BKGNZvhAsQjHxngnMT3KqBrhCms+DLz3Nc99LmVPaiWkOkULyyqAsMINf7X9IA1UlvygPNtu2is0R0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVZUrP1YHwOq7AQG8r5ZQH9YIQhL/jfl9tI+ux269RxwaPiKha
-	5vU2nUyeYGy2zngzzasPM50exSbqeCl7EN4DPMp7UIzzVw6yicqHui2rUZtAN0HG3GZ+3UEC/C3
-	SxhsRtvhKFA==
-X-Gm-Gg: ATEYQzxbsgbu+SEPs9cJyu2FwBtTabb75UBEkQ21CLVn/y1Y+3qqP0GiiqSHdDzh2JG
-	2sKpwOf8XkNO1LgQqoQJQ79RgsGF+WN/5xq2w1d6yFXKxwaC+IaGs8v03B6+5DPKuLySWAuzw0E
-	YHVaUXiXJaOvwOvOtgMZ1BwoRTfBCzHUujepRLl1UUha+Cjvkn9xQ3KzMkOR2CECryzRDp/fNk1
-	BsPbJ80zkMK+pL4DWt9u0n7zVmTVp5+I6+iThwxsAJQwieNdkdDH9qc1aGJMYYJ0LsMZwpDIG0P
-	aKN5m8Cp8qELGsksA6/07fKsjd+bq+QiZ7vMHHJ6MFvlRfqVTu6BOLGI+mzew9fqYkHUGrdVJnE
-	XbpbjjjYe65eeNbZ4kb3alDk5T8ecTPRVyP7SbSXOL+ZKy2s2aEopoXgFo8eYwiB19nDNzdm055
-	+ZRtOqZubvQrd29jEg5uxCrCVqH9nXfZnlugxt1RBFd2J5Vg0cVUNcGXCZTliqaoJ+I3puraKB
-X-Received: by 2002:a17:907:c297:b0:b97:e32f:7ee8 with SMTP id a640c23a62f3a-b9c13b50f35mr70062966b.37.1774991069891;
-        Tue, 31 Mar 2026 14:04:29 -0700 (PDT)
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com. [209.85.218.51])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9b7b1ee612sm449548366b.53.2026.03.31.14.04.29
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 Mar 2026 14:04:29 -0700 (PDT)
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-b7cf4a975d2so812385466b.2
-        for <linux-kbuild@vger.kernel.org>; Tue, 31 Mar 2026 14:04:29 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCXzeuCDXaD+peT8VRercdcqfc1JI8XDdzdLqoo+F4P0aS71S+WD7YH+nfIlPECBRdeN4rwiweRF3hinorc=@vger.kernel.org
-X-Received: by 2002:a17:907:84d1:b0:b9b:1b9f:8397 with SMTP id
- a640c23a62f3a-b9c13b0a2a8mr62577666b.31.1774990733647; Tue, 31 Mar 2026
- 13:58:53 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="uChPHJWK"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=zNtpWrE2Jp5/nURel55JIS45pUHbH278z37tC7nbPQsNvTwp+gehyR9JWsHMGn1hCg0xo5foT9p5DrXX1bmgo1jeibx1J8W0QauI+hYtoYAv02Ip+Jl8zd1SfXwgxBJxbICwE9YigN+HoLE5/kexcc4e06Xtx9X8tBk69mx3+Y96/XvgQDBeZ8qRVBUDflKFH/hmMjceNxU+SgFwnZ6D1T3/xnw+XKf2xnfzBTO/fSC42An4QpY5RSsAtV+F/JD+SGfvmSIsESpgUOwRPW26Tr79F5WBh862X5hwzXC6JttGKGXmR+nuV2OiUOYZ4RbBL1peEej8O8Hp3tPotRIZ3w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DokolR/ibShIit6LbJGIvre8QW66yAyZmVL3+hvZdAE=;
+ b=i2hd6aQEIDMA6XDxPvGLdnHq36Reh/1KFzJ566yH9qB7cp7g75Zw1ZqXNV92bcYcmhfHrRzgIvI2PABXB9tApiFNxeGc2CYLqul/mDgwe36asnLkPe7/Hsw6w+I9eIwplpyDG1NRfWUT6JS2oGi70k3aKYPi6RE7MADm6Lb93yu0xjp4exHEpHgrCUnZuGjVt4c4d3bqW9OqBcssrwzyTVGEGLGIuNdC9+LNA2PAOT//YO2PH2X3lyhkvWIVe7Bu3ZhuSbUq1BS86m4UAphw9Rt6KuFzxUOv1OlWW9nSgK0TIXQt4afPytLU8o5rCvFFIi5WOTpK1IZDxFjNgrWAVg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
+ dkim=pass header.d=garyguo.net; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=DokolR/ibShIit6LbJGIvre8QW66yAyZmVL3+hvZdAE=;
+ b=uChPHJWKbh/Pwkn1h4HwmRy41ZKFxhjdPeF4Lix0gjhY14oxFB2+KeQfOtwSWnBq1qDS6QSIoyb0NIPy0aeNhSa+V/8AChrLrdVYRfyq1jWazJ/kLr2KSAj0edvHc2gn3TvguyprtAgbgkiEsKx0hEuwC1uHDD766FgrQ6XHF38=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=garyguo.net;
+Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:488::16)
+ by LO6P265MB6523.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:2d2::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.17; Tue, 31 Mar
+ 2026 21:07:22 +0000
+Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::1c3:ceba:21b4:9986]) by LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::1c3:ceba:21b4:9986%4]) with mapi id 15.20.9769.014; Tue, 31 Mar 2026
+ 21:07:22 +0000
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 31 Mar 2026 22:07:21 +0100
+Message-Id: <DHH9VRFULJST.383BKVSWUTZ3E@garyguo.net>
+Subject: Re: [PATCH 1/2] kbuild: rust: allow `clippy::uninlined_format_args`
+From: "Gary Guo" <gary@garyguo.net>
+To: "Miguel Ojeda" <ojeda@kernel.org>, "Luis Chamberlain"
+ <mcgrof@kernel.org>, "Petr Pavlu" <petr.pavlu@suse.com>, "Daniel Gomez"
+ <da.gomez@kernel.org>, "Sami Tolvanen" <samitolvanen@google.com>, "Nathan
+ Chancellor" <nathan@kernel.org>, "Nicolas Schier" <nsc@kernel.org>
+Cc: "Boqun Feng" <boqun@kernel.org>, "Gary Guo" <gary@garyguo.net>,
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Benno Lossin"
+ <lossin@kernel.org>, "Andreas Hindborg" <a.hindborg@kernel.org>, "Alice
+ Ryhl" <aliceryhl@google.com>, "Trevor Gross" <tmgross@umich.edu>, "Danilo
+ Krummrich" <dakr@kernel.org>, <rust-for-linux@vger.kernel.org>, "Aaron
+ Tomlin" <atomlin@atomlin.com>, <linux-modules@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <linux-kbuild@vger.kernel.org>,
+ <stable@vger.kernel.org>
+X-Mailer: aerc 0.21.0
+References: <20260331205849.498295-1-ojeda@kernel.org>
+In-Reply-To: <20260331205849.498295-1-ojeda@kernel.org>
+X-ClientProxiedBy: LO4P302CA0028.GBRP302.PROD.OUTLOOK.COM
+ (2603:10a6:600:2c1::19) To LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:488::16)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260331163716.work.696-kees@kernel.org> <20260331163725.2765789-5-kees@kernel.org>
- <CAHk-=wiJ6Q_qMHSe-hs+QvqKVZphvDZjvFP_gQLw1eaWimv8+w@mail.gmail.com>
- <202603311253.95C54588E@keescook> <CAHk-=wjSOGaausLeTD13yAqso7qM09EnkDFiN7wF15kH0VWmZQ@mail.gmail.com>
- <202603311321.4EE9FEA@keescook>
-In-Reply-To: <202603311321.4EE9FEA@keescook>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Tue, 31 Mar 2026 13:58:37 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wj9pWsgsbrLDOk7ipKnHbz3JvuqsmQ3DhGg-OKgKS9DUA@mail.gmail.com>
-X-Gm-Features: AQROBzDlSIWhA3UXAi4kJQxb1nvYqS4u6S5fbtJpBgdW6doJTV11HfE6t_3dlps
-Message-ID: <CAHk-=wj9pWsgsbrLDOk7ipKnHbz3JvuqsmQ3DhGg-OKgKS9DUA@mail.gmail.com>
-Subject: Re: [PATCH 5/5] types: Add standard __ob_trap and __ob_wrap scalar types
-To: Kees Cook <kees@kernel.org>
-Cc: Peter Zijlstra <peterz@infradead.org>, Justin Stitt <justinstitt@google.com>, 
-	Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Mark Rutland <mark.rutland@arm.com>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Suren Baghdasaryan <surenb@google.com>, Thomas Gleixner <tglx@kernel.org>, Finn Thain <fthain@linux-m68k.org>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, 
-	=?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, 
-	llvm@lists.linux.dev, Marco Elver <elver@google.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Nicolas Schier <nsc@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, 
-	linux-hardening@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LOVP265MB8871:EE_|LO6P265MB6523:EE_
+X-MS-Office365-Filtering-Correlation-Id: 49a31d52-e810-4f7a-0034-08de8f698073
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|7416014|376014|10070799003|366016|13003099007|56012099003|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	K5XfsQjqhol89hoj2E6rgN4/2zLUxyDB9lXBtsfEV39XfbPxTJGS+1Far1jv13wf6Z9D9e9BnJKlsIIk1Z7Is0W9FlF4AupUU0yXU52EulhP4i2B9uxVhDuDDj3H/ER0n1KHXgFvXhUEJByTaKqKKoeeH6Be87udRspn6mHEtTYATNgK98BKwjqJr3xqs6xqE5F2hPMuxa28AAA4S+zSoxDrfkeB8hCoDKHqkt+DqB1LdagFLS4MDBbkbif0bG/20i7gYBNVELYxuN9Ddy7KjupLWFz1ezSc0pBS7MFm7oMstKVXRoVkxJuOW1aOAw14TnQOEfcJq0DAVm4hbkLq8me7LzylSWOyPIehSlLLGFenuq4A49Myh2p5BxXeL2eYHT2J/RhCpKJrSYBy44j7QaaaAXSiaHuJBeiZxMErp14T+zcGTDvEW0Tg7fN9upFSJBJhEAwi+aoIshGq7eSYEgkeYQdDPOmvDRYmYOwXVyn7rcCePE/4nrUjpP9qz6B6f3YtHF6PJfghdVWP7BKwEdB50Y+08MlKRcqZ2yRc257y/yU2Y+gGWyR9bnRjx2IYA9QJetkaEPPPSbcQpGYYjIkEi1ior/ap0tJgpk8OYNmYJdVWmKrgak51bplW4Z2qvLXf+RK7fVFfwdKJrE0C1xnlU0DLqpgPG1vaCYZnWDYH5+LrZj2mQ0cFT78CxbFw
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(10070799003)(366016)(13003099007)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?clZWQXU1RTRiQmN6TjYvbEpaWmVDZGNQai9PZ2ZYOTBVQmE5SlErRUp3Z3hX?=
+ =?utf-8?B?KzJLV1VwNGtHcTh2VE51YkpjWmsyZnR5cjgzSDNaZFFCd3VmRU4rOTZRYW13?=
+ =?utf-8?B?MXlKM3pPTEV5T2ZZK3VyTXZ4OG9BUWV3czNTMEhTalYzamdyb3dpbGhQVHZk?=
+ =?utf-8?B?N3p2aTRsMFFudFFqNTFpYVMrMFcxR0pVL1F3U285VHc2b1ZiMXMycm5HTWlt?=
+ =?utf-8?B?NTltcjJvR25TUllHZ2xBbkUrWmRsanZ1VGorSk9DQmlNUWVTcm9lYTJ1QWYz?=
+ =?utf-8?B?eGVmeTNKQWl6RHFtWGFjYmlreGhjWndNSWhsdWx0TlRVNGlxQjE2TlZKTUVp?=
+ =?utf-8?B?OTNGTWJwTUlPQkVuZDNnWjlJbmwxZXNhY1p0TTI1ZlUrdXJlQlpnOEJTdGVT?=
+ =?utf-8?B?eVdtRjdrejRSdkxYVWJMeU8xMU1hcERxMVR3UnhsSng0ZVdNSWNQVU1wc29x?=
+ =?utf-8?B?ZndVNFpnUTNvUytZZWl6eUF0RnQ0NVR6VmordzdsTFNOcEpJSUFrOVlpejNn?=
+ =?utf-8?B?b2lhMlFwKzFKNkpvQ2ROMGlFYnZIKzJrMzFlNDgxY0NITnAyNkxPVUQ1M0Zx?=
+ =?utf-8?B?WU80a3lGZWFPWUlNa0pzSUR3Zmx2WHpTTEZ2TXpwK1ZKbjFOdGtPaTFnbDJX?=
+ =?utf-8?B?RWZWRWRIY2xVenZVYktxZU9sTXJVQ3pwZlFkbUI2QUMxZjlQMjVibGpxbW42?=
+ =?utf-8?B?QjdJbkJxQnM2UWpJUG43ZlVFVEVlR0VwUzBXUXd5NWRGc1ZPc21JSUt4R0Vh?=
+ =?utf-8?B?bGtLSkg3SVRmcnZSdUN4bjhYb2ZEa0lZb0RzMk1Nc0JOZVdJUFhqbGxlRTY2?=
+ =?utf-8?B?NS9kbVYxSXcrV3IyRWRSekZmK0lSUmovSGxrRzV3NHpqVksraWFJVmpHZUpE?=
+ =?utf-8?B?RUxFQzZQWWlLS2ZSZlRRb2lXUmI4aVUvVklNbmxPL1lJYXE5bVZ1SzhLTTA4?=
+ =?utf-8?B?U0QvVFlGT2hrdTR1R1VpTHF4THBVK1Y0akZBNGNTYjEzTVdOeldFRUZvd0cx?=
+ =?utf-8?B?eHhsK1JUUjYzSVZVaDJmNG9LQWVGL2ZPc3QwQVp5V3BXL3JONkZBajhyWTd0?=
+ =?utf-8?B?c0hwaUJQeDNnR1dIbTczNDBxN2J4MVFXWG53RU5UOFN0RlBTUkt2KzVOVTMw?=
+ =?utf-8?B?cGhIdXNYOGEyL3ZENklPTnJ6MlRFS3FoYjVTQkdjNG5lUzZGamFPcmF2VHNs?=
+ =?utf-8?B?NHR5WndDTnhXbkxjeGhTd3RkTE56Wmx6R0tBQVpacHg5M1VwODRncTN0TVZP?=
+ =?utf-8?B?SS91K2hZU2dPUTkxRm0zVkV2dWp2eVZVQ2hlVUdtaXVjOXJOUmxvcXVZWjJP?=
+ =?utf-8?B?NW03bkJtK3ZGSlF1cEszYnhiVVRTRGR2TnhNMVRNbmoraDhidDUyVUQxeUpy?=
+ =?utf-8?B?V0Rydk5hR0MyL2ZzWEFWWURwc3lCV3JSM1NiSFdRNGUwTmVRbEJTZ3hGRUxi?=
+ =?utf-8?B?ZjYybUpFYXAxcHpZekVKYkEwd0FtMDV1QVUxMVhIaDdQMFdhTHVSNDFOcmlL?=
+ =?utf-8?B?bmxZYVpoNVhLN2lnMkhDa3c1ZGhTQzE5MklTYWorbW1TdVAyb3ErUlRkeW1z?=
+ =?utf-8?B?ODZoRGhyRWVvdUlzUGR1ZVRwWWIyd1g0Y3lHL0Q2VHE3RUtkaTcvL0Q4NUc4?=
+ =?utf-8?B?dWFSVDhtSkdpYzVDcUF1Z3RoN29CSnZpK0p0WGJMVlpkbVdDSEVxWENsSFhI?=
+ =?utf-8?B?Umt1dFI0c25JdTNXck9lakV2eDl2SEJvQ1Q4a1ZYZ2pKcTJZS0V4YXMrald6?=
+ =?utf-8?B?MTcvRUZvWDFWYUNwdjBnLzlaSEFLa0VqY0taNFlLR2RFVjJZOHd6MnRxRWxO?=
+ =?utf-8?B?M1VnclRhQWxpSFpuRmhud042bWZGMDlFY0lVNWRGL2ZNanB4bEtqYy9qUUZO?=
+ =?utf-8?B?eFAzK1JMczRZQklyZHFGK2MwZ2U3UXZXRnk3cC9ZQklRL0tiaFQ2U3kzQ00z?=
+ =?utf-8?B?RXc3bkdjNmw2RVpTYzF5dHY5Sk9jUm9sZ0dxZ3MrOGw3QldrUFFGcXBGUkpm?=
+ =?utf-8?B?WkJUOUFqbnVEaFQyeGlVNkRMcUNPeGVhbElBLytLVzlsRDNZeTlienRzcXUr?=
+ =?utf-8?B?YXg2TUxxU1ZKZUxFemxjQXgyMmZ4aEVCcmV4WDRqTmxjTlFpTGIzMzA5N3NP?=
+ =?utf-8?B?SHIybXdSZDlhYzMwYUZ3RVhJN2ptbHA0UThYS2pYaUE3V0djUG9sWFZHeFBa?=
+ =?utf-8?B?eEc3c2tPeE92SDVwT3FLWmFMOFNta2FZTXlzcm1GZ09vVE13djhkQW80TGZn?=
+ =?utf-8?B?WWhOdlkyTmJENW5NNWVMVnFQRTMvcGMrTE1vRFNrY0JweE9vWS9nd3pjdFQ1?=
+ =?utf-8?B?WE5pNU56d3NRL0t3blpCSUd1WS9yeDNNeGNxZmovNUpWMGVSVmk2Zz09?=
+X-OriginatorOrg: garyguo.net
+X-MS-Exchange-CrossTenant-Network-Message-Id: 49a31d52-e810-4f7a-0034-08de8f698073
+X-MS-Exchange-CrossTenant-AuthSource: LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Mar 2026 21:07:22.3497
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /Cmrp8+DabVTOQPULJCY12r8/jK7qyz7OxIYMx0Kp+A5FfVIt/9hZ9rlnJXsyaRM8Yy/ndGeBWG+dgcWavEqjg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO6P265MB6523
 
-On Tue, 31 Mar 2026 at 13:31, Kees Cook <kees@kernel.org> wrote:
+On Tue Mar 31, 2026 at 9:58 PM BST, Miguel Ojeda wrote:
+> Clippy in Rust 1.88.0 (only) reports [1]:
 >
-> (Isn't this just an implicit "try"?)
+>     warning: variables can be used directly in the `format!` string
+>        --> rust/macros/module.rs:112:23
+>         |
+>     112 |         let content =3D format!("{param}:{content}", param =3D =
+param, content =3D content);
+>         |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^=
+^^^^^^^^^^^^^^^^^^^^^
+>         |
+>         =3D help: for further information visit https://rust-lang.github.=
+io/rust-clippy/master/index.html#uninlined_format_args
+>         =3D note: `-W clippy::uninlined-format-args` implied by `-W clipp=
+y::all`
+>         =3D help: to override `-W clippy::all` add `#[allow(clippy::uninl=
+ined_format_args)]`
+>     help: change this to
+>         |
+>     112 -         let content =3D format!("{param}:{content}", param =3D =
+param, content =3D content);
+>     112 +         let content =3D format!("{param}:{content}");
+>
+>     warning: variables can be used directly in the `format!` string
+>        --> rust/macros/module.rs:198:14
+>         |
+>     198 |         t =3D> panic!("Unsupported parameter type {}", t),
+>         |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>         |
+>         =3D help: for further information visit https://rust-lang.github.=
+io/rust-clippy/master/index.html#uninlined_format_args
+>         =3D note: `-W clippy::uninlined-format-args` implied by `-W clipp=
+y::all`
+>         =3D help: to override `-W clippy::all` add `#[allow(clippy::uninl=
+ined_format_args)]`
+>     help: change this to
+>         |
+>     198 -         t =3D> panic!("Unsupported parameter type {}", t),
+>     198 +         t =3D> panic!("Unsupported parameter type {t}"),
+>         |
+>
+> The reason it only triggers in that version is that the lint was moved
+> from `pedantic` to `style` in Rust 1.88.0 and then back to `pedantic`
+> in Rust 1.89.0 [2][3].
+>
+> In the first case, the suggestion is fair and a pure simplification, thus
+> we will clean it up separately.
+>
+> To keep the behavior the same across all versions, and since the lint
+> does not work for all macros (e.g. custom ones like `pr_info!`), disable
+> it globally.
 
-Yes. And I think that's ok.
+Does it produce a false positive, or it's a false negative? If it's the lat=
+ter,
+I think we don't need to disable the lint.
 
-I think try/catch is broken for a few reasons, but the fact that catch
-and try are tied together so closely is the main one. You can't "try"
-inside a scope without having the "catch" inside the same scope.
+Best,
+Gary
 
-So then the solution is to just move the try to the outermost layer,
-and I think that's pretty much what everybody does.
+>
+> Cc: stable@vger.kernel.org # Needed in 6.12.y and later (Rust is pinned i=
+n older LTSs).
+> Link: https://lore.kernel.org/rust-for-linux/CANiq72=3DdrAtf3y_DZ-2o4jb6A=
+z9J3Yj4QYwWnbRui4sm4AJD3Q@mail.gmail.com/ [1]
+> Link: https://github.com/rust-lang/rust-clippy/pull/15287 [2]
+> Link: https://github.com/rust-lang/rust-clippy/issues/15151 [3]
+> Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
+> ---
+>  Makefile | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/Makefile b/Makefile
+> index 1a219bf1c771..a63684c36d60 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -494,6 +494,7 @@ export rust_common_flags :=3D --edition=3D2021 \
+>  			    -Wclippy::ptr_cast_constness \
+>  			    -Wclippy::ref_as_ptr \
+>  			    -Wclippy::undocumented_unsafe_blocks \
+> +			    -Aclippy::uninlined_format_args \
+>  			    -Wclippy::unnecessary_safety_comment \
+>  			    -Wclippy::unnecessary_safety_doc \
+>  			    -Wrustdoc::missing_crate_level_docs \
 
-But at that point, why not just move it *all* the way out, and make it
-implicit and invisible?
-
-Which is kind of exactly what your suggestion is all about, and that's
-why I like it so much.
-
-It *literally* fixes try/catch. It makes the only really valid usage
-model just work better.
-
-(There are other reasons I dislike try/catch too, the whole
-"exceptions across function boundaries" being another one that your
-model avoids).
-
-                Linus
