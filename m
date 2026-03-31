@@ -1,52 +1,59 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E3DE330662;
-	Tue, 31 Mar 2026 20:02:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8DB371D19;
+	Tue, 31 Mar 2026 20:03:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774987323; cv=none; b=AOQSkzNYJPHx3tgRvGU9PGqncnpt5zULllWmSyejcnU4GtPk8CvLXaOXA/KNBrW7tPUj/w/Lgaw+mmAY4CiAy7v8iPkx4o9W9JIMshBRXusQLnDxuPqaBbOyPPua8wzJ3qNeiMKMFMMZ+m1B9JZ7I/sJju8MhZPo/BeYRiI87po=
+	t=1774987386; cv=none; b=bhhYkfYrIAZUIKOxelBfTgsvET+3ZlWzkUR/RpMw1SF9SV7hbe8LCbB2PETKB1pXi9X82j63p8WVmoYeSJWBPOK55xMDQSpfuEyksW3bT+Vvtzy/XoA3GzQrFdCdRmU+cr2uL/508rRlS3oKoDMzpF6xcG7LnGCzJ7Q9Y67aH/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774987323; c=relaxed/simple;
-	bh=yz7Gkj/NB6A/nXg74Ru5bIaF98PkmZX1c1CyhRc6A6I=;
+	s=arc-20240116; t=1774987386; c=relaxed/simple;
+	bh=xX8PflvEnLDxFDAe0II3o/hEoXyXPKqwR8t9T1TR67Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R+IfB6LaATKT91o0aIeXCb2Fn4xRiPdQjVWyz1MU5PD7wh9jLZYKpmLieXoJl9LecpNrJqtFeCMyVj1Janl6I9hSywNsHcPx2yR8Sg2p8UUZHZ1zepWOLd8PT+RRGl15HTPdu9FQXYnu9VVv+SD4xmnpc/M2Vayw4mTLkyck84Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TKo24m+d; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=dJVJ+OEPsdzxY2e1t1xkyZugb/nYddvFdbUMXnGsV/Gz1teMj9+gI+bwpXcqjNFb7GtnBy934ZSu8iR8QUjIuCf+nPxZUdzNc1aobCrqYELQ4DPXk4i99r+Y6M/9QcygSTf25OuJ1OE11IljEjWfdaXXsZR8usEnTmVNgoQBKHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G1BcSPj5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TKo24m+d"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D902FC19423;
-	Tue, 31 Mar 2026 20:02:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G1BcSPj5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 516D3C19423;
+	Tue, 31 Mar 2026 20:03:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774987323;
-	bh=yz7Gkj/NB6A/nXg74Ru5bIaF98PkmZX1c1CyhRc6A6I=;
+	s=k20201202; t=1774987386;
+	bh=xX8PflvEnLDxFDAe0II3o/hEoXyXPKqwR8t9T1TR67Y=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TKo24m+dZz8sQzl7Wg15ZeUFtoVdD9y3IJeagghzABNFHnWXHP2y62oweCV6ezrJs
-	 DiBMbkAPOsbEnSkAdsNgOL3uFIJ3Jf37FRdH840N5pR0OyzIK9K2HuPVpBKlfLO6mV
-	 HZRG8Z9ah/SUMu1rHnBh8YHJcsiAx0VcclWJi4iofExi2goD2sNLALIYfaxgmWKu7D
-	 j4BGF1e20RiMw74yAdwaVTDB6RKr1aqxsuyfJUO1GRrY1SOYyiu5IuO14FObnctW38
-	 Hy9G1YqtksFhmOBfzCsjFrUXrkCUUOM8QYZuqqVoBoKANaE+QXgzIGghsjJMTAvf3N
-	 CmL2wNkUQ9BfA==
-Date: Tue, 31 Mar 2026 21:38:24 +0200
-From: Nicolas Schier <nsc@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
+	b=G1BcSPj5ocGNquHbNBcvPqVWwQhuyXmi8e80E9Ub+5yWjYcKcXY1aG/MuvcL1sI19
+	 9tFJZqy9iOG60YiRZ4NmN8AHHGD+UqeRFaO5bQVLQdaTvcXuBpTfa+NCJnOr7b03ih
+	 kvfgz9f/dMi1hdjpVxdEdYduOy6rsQjnH/3WijBKukwHXSb8+jly/9k4D05eplapL1
+	 eG9ZQTmR5/u0ZUkKvZ4D8beVsasHNlfvvuWuHjADxY3tF3UmlwnsxgVdUSW1/e7Dxb
+	 CvMXSDzTZ4B7jm/AQSBfQlt9LWpbBRuaJKzb/comSFOXODi3rU/SOjuakOXCJCZu3Y
+	 kX3af3qFmhWww==
+Date: Tue, 31 Mar 2026 13:03:05 -0700
+From: Kees Cook <kees@kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Peter Zijlstra <peterz@infradead.org>,
 	Justin Stitt <justinstitt@google.com>,
-	Jeff Johnson <jeff.johnson@oss.qualcomm.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, stable@vger.kernel.org
-Subject: Re: [PATCH] modpost: Declare extra_warn with unused attribute
-Message-ID: <acwisFwJ3eMMQLIp@levanger>
-Mail-Followup-To: Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Jeff Johnson <jeff.johnson@oss.qualcomm.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, stable@vger.kernel.org
-References: <20260325-modpost-extra_warn-unused-but-set-global-v1-1-2e84003b7e81@kernel.org>
+	Miguel Ojeda <ojeda@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Arnd Bergmann <arnd@arndb.de>, Mark Rutland <mark.rutland@arm.com>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Finn Thain <fthain@linux-m68k.org>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>,
+	llvm@lists.linux.dev, Marco Elver <elver@google.com>,
+	Jonathan Corbet <corbet@lwn.net>, Nicolas Schier <nsc@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com,
+	linux-hardening@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH 5/5] types: Add standard __ob_trap and __ob_wrap scalar
+ types
+Message-ID: <202603311253.95C54588E@keescook>
+References: <20260331163716.work.696-kees@kernel.org>
+ <20260331163725.2765789-5-kees@kernel.org>
+ <CAHk-=wiJ6Q_qMHSe-hs+QvqKVZphvDZjvFP_gQLw1eaWimv8+w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -55,40 +62,66 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260325-modpost-extra_warn-unused-but-set-global-v1-1-2e84003b7e81@kernel.org>
+In-Reply-To: <CAHk-=wiJ6Q_qMHSe-hs+QvqKVZphvDZjvFP_gQLw1eaWimv8+w@mail.gmail.com>
 
-On Wed, Mar 25, 2026 at 06:20:30PM -0700, Nathan Chancellor wrote:
-> A recent strengthening of -Wunused-but-set-variable (enabled with -Wall)
-> in clang under a new subwarning, -Wunused-but-set-global, points out an
-> unused static global variable in scripts/mod/modpost.c:
+On Tue, Mar 31, 2026 at 10:10:52AM -0700, Linus Torvalds wrote:
+> On Tue, 31 Mar 2026 at 09:37, Kees Cook <kees@kernel.org> wrote:
+> >
+> > Current straw-man proposal is single letter suffix because it vaguely
+> > felt like the least bad of all choices, and they should be short or
+> > everyone will just continue to type "int". :)
+> [...]
+> If somebody starts using explicitly trapping types, they need to say
+> so. Not just *say* so, but scream it at the top of their lungs. No
+> hidden subtle behavior changes. This needs to look _very_different_.
 > 
->   scripts/mod/modpost.c:59:13: error: variable 'extra_warn' set but not used [-Werror,-Wunused-but-set-global]
->      59 | static bool extra_warn;
->         |             ^
-> 
-> This variable has been unused since commit 6c6c1fc09de3 ("modpost:
-> require a MODULE_DESCRIPTION()") but that is expected, as there are
-> currently no extra warnings at W=1 right now. Declare the variable with
-> the unused attribute to make it clear to the compiler that this variable
-> may be unused.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 6c6c1fc09de3 ("modpost: require a MODULE_DESCRIPTION()")
-> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
-> ---
-> I will apply this to kbuild-fixes for 7.0.
-> ---
->  scripts/mod/modpost.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
+> No stupid one-character things. If we go down this path it would need
+> to be "wrapping_u32" or whatever.
 
-modpost is just used in-tree, right?  Can't we just remove the '-W' flag
-and the extra_warn variable completely?
+Yeah, that's fine. I'm fine calling these types whatever we want
+(regardless of how we ultimately bolt exception handling to them).
 
-Nevertheless,
+The only reason I had this proposal using a short forms was to make
+it "easy" to get counters/indexes/iterators with as few characters as
+possible. It all comes back to my "favorite" security flaw where a u8
+counter wrapped during post-increment in a while loop. Why was it "u8"?
+No good reason besides "it was even less to type than 'int'" AFAICT. :P
 
-Reviewed-by: Nicolas Schier <nsc@kernel.org>
+> I don't actually see any sane interface. The "unsafe_get_user()" thing
+> with actual labels and exception tables works very well, but it would
+> require wrapping all trapping operations in a macro.
 
+Mark Rutland had strong reservations about function-level annotations,
+but I wonder if the combination of new type _and_ function-level
+annotation could get us something near what would be palatable:
+
+
+int __overflow_label(boom)
+something(...)
+{
+	u8 __ob_trap count;
+	...
+	take_locks();
+	...
+	while (thing())
+		count++;
+	destroy_the_world_if_count_wraps(count);
+	...
+	return 0;
+
+boom:
+	unlock_and_clean_up(...);
+	return -EINVAL;
+}
+
+
+This way not _all_ math is covered by the label, only the trapping math.
+
+Or we could make the label a global part of the language itself so it
+wouldn't need to be a function annotation, but rather a _required_
+element of any function that uses a trapping type?
+
+-Kees
 
 -- 
-Nicolas
+Kees Cook
