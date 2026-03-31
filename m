@@ -1,165 +1,105 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1FD040758B;
-	Tue, 31 Mar 2026 15:30:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E08B411611;
+	Tue, 31 Mar 2026 15:32:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774971015; cv=none; b=qRRsXVAZH+tObQao4ie0GT6J1d8iW8YHDeh0oU3uVuxtdWnEYT1JjyChFvkKhbAeC3pCuBNgn/yIu8CueoAdRlgYw3E0WDrgxb5qqFeZ0Kq7N+fwODja3CFQz6XyyrVp00Umt28RG9MkuHnHB/fjWtJ06xKQ0m6Y7AeMx1drqeU=
+	t=1774971166; cv=none; b=StNlXQGOoeXsoIRR61cuscQzxevWcUzdAGq31wmSRlijoZeYJd+8m2FMj5MmsYFz8jiivnYqrv8LKzZqPYbtoALTRzj7b2a3BqkUvUsxKerhjTHS9XCgJTbpvpOYj4WHZ1ZsyyXArBRLwMTTdC/1BWVusgQThf73q6BeTMWQg/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774971015; c=relaxed/simple;
-	bh=njuWTh8CpT67Wac3qyvqBHHPqTXX9tvwfCgGLkQRVQA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ihZ2gxCZZHO7HcJGjE1CU8xfJOwDBqRr82DY7BqUcezH22FTRJAh3SnhDJ+ohoeB6BBqkmfT9qeK3GzMgLjUiriJIaqVUlt+TIZgu+QUl9USzxxwyFNdspAE0xjv59nVTiUGvBM5EEDvc0CBsXWQbVos/g9NEIUloiyAmLOWXNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LJKZh7d0; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774971166; c=relaxed/simple;
+	bh=YztkdcVwx0f+l7X6VNzBz+tYdrUS7mC5f1x7arJCixc=;
+	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
+	 References:Date:Message-Id; b=rTnOT60XG7cC/wCTuUgRmkPuJNOoxI4poK+MDqb5XgWysBXuW8ai+GCNGbYwee5MD4KSmoJiT9xSwcMQR+HIm35Mex/OD93rQTNz6E3B4QQ65OCmP06F/iwcQr3ZeuEtq0jkiYbfJrEAXFSydFx6nUynHtrHoDUFXDDi4PhX2Us=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LvxNrIpr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LJKZh7d0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2115C19423;
-	Tue, 31 Mar 2026 15:30:12 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LvxNrIpr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD153C19423;
+	Tue, 31 Mar 2026 15:32:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774971014;
-	bh=njuWTh8CpT67Wac3qyvqBHHPqTXX9tvwfCgGLkQRVQA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LJKZh7d0XYVqo8o89ooUTF3NOTK6mVdCySVMmEX1KPsWrQDHd5+qABSDxJpCCNiRq
-	 G3GNF9Kr83xL0NO2fJacdf+X73MMJd3dj3Ub4zLCz1cSf0dOXePLGe5vp6oOQV6JGS
-	 Vm2ucFMutdHu+U9k3jfKyYlzVoKtUCVrhIXFFhgK8oitIFUGAiRRRglgSGMcNUPMpG
-	 +ggkb3FaY7XMIZpCu/EI3ab967Zm3Pq59na92obc5N3C1PbNOgtYVmawghiKOPDJ6V
-	 XRGmfcjTKeTzV3OpEhiStKH38bTVXGcPiKhk0WZTfyp0W+aC9XVz7Ieirh67Qp0cW+
-	 rg8OtklTIk32w==
-Date: Tue, 31 Mar 2026 17:30:09 +0200
-From: Nathan Chancellor <nathan@kernel.org>
-To: Greg KH <gregkh@linuxfoundation.org>,
-	Luis Augenstein <luis.augenstein@tngtech.com>
-Cc: nsc@kernel.org, linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org, akpm@linux-foundation.org,
-	kstewart@linuxfoundation.org, maximilian.huber@tngtech.com
-Subject: Re: [PATCH 02/15] scripts/sbom: integrate script in make process
-Message-ID: <20260331153009.GA1103611@ax162>
-References: <20260210205424.11195-1-luis.augenstein@tngtech.com>
- <20260210205424.11195-3-luis.augenstein@tngtech.com>
- <20260330095011.GA1458050@ax162>
- <9120907b-9568-4f0e-9757-c9e3b8d530f4@tngtech.com>
- <2026033111-bolt-verse-4505@gregkh>
+	s=k20201202; t=1774971165;
+	bh=YztkdcVwx0f+l7X6VNzBz+tYdrUS7mC5f1x7arJCixc=;
+	h=Subject:From:To:Cc:In-Reply-To:References:Date:From;
+	b=LvxNrIprbGD7fOSnSdzc4DRNsgmSFDl64Ws6vCW3TJfN4JtB4XNp7WbzDNS47jRsR
+	 TrrwiHb1JxHvSZw9mz5eBE8QLA5pxpQhx2CAyUquaO1YtJ3xn7DAhZvKrAUefOEhc2
+	 mWQAK4qRzYSBDaDBa1VYBVCDL4RpaGO++zX4iNOXYdkQpvF7oXWFTV7yzgn9B9ZIRL
+	 SHA2NLYK9/Hc5f0MMRCS61XxJJ+FVDcV0xNt6yZ6NIWQ2AIRewOi2sId9uAdkFyPEZ
+	 sJ6xVrRFKut8WIS7bPzLcQHQa7hziaTQ1k90NRBjhdwVkpXJ1/ueU9QIEbiZ1WyyG7
+	 IlQ4JCceLAKzA==
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <2026033111-bolt-verse-4505@gregkh>
+Subject: Re: [PATCH 2/4] kbuild: vdso_install: hide readelf warnings
+From: Nicolas Schier <nsc@kernel.org>
+To: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20260320-kbuild-vdso-install-v1-2-e2e8a0970889@weissschuh.net>
+References: <20260320-kbuild-vdso-install-v1-0-e2e8a0970889@weissschuh.net>
+ <20260320-kbuild-vdso-install-v1-2-e2e8a0970889@weissschuh.net>
+Date: Tue, 31 Mar 2026 17:15:33 +0200
+Message-Id: <177497013330.2338582.5564722190225676953.b4-review@b4>
+X-Mailer: b4 0.16-dev-ad80c
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1257; i=nsc@kernel.org;
+ s=20250924; h=from:subject:message-id;
+ bh=YztkdcVwx0f+l7X6VNzBz+tYdrUS7mC5f1x7arJCixc=;
+ b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBpy+UY83SxSKE7lL6LQR/4ARGFGmfsc/o0aK6c9
+ qLl/kqGs1uJAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCacvlGAAKCRAHUgpwFiYS
+ ab3tEAC4cTjiS9+L+cJKSIhdZD8OHI6B1LFa7x6xzCDWpV9R9sii5L+RqjB88n54aIRufJ58Tis
+ YVUb1Dm6Bci8sOrAvCOsFukHX4XwNTmHn9JR6y+FUDx2q7cSGriBAgiESkm6P0+GutjnM9i38Kv
+ q0IkalaKri9PxRxrU10rB6mW3NMzl854a2zybdZVt8lOedtCI19jVnTh0FeC538ib9rj/jfYG7/
+ q4hupcpwm+qZwFRh5asWUmZXl1/KEf2zFUIf9MO+TS8+ksSpFmfjTji78P/j2E1YmXDLf5K82jo
+ BaTQiegjevX0IvJHc4gym+VQoU9424dYMzDj1F+4j4CHH+3B58bXJINjZ/UlWu+xWiPkBkcfKKk
+ ow4hsFOM1Bl0fCw9o684X2UsoESszu/zzZt68qeUDJn+HO8JJQIAkzxIWfAvORlLuIeTiYM2gXw
+ 17Q68K0ELSHY1r8jwIdKB9eEm3uBMnyp1BvM9Y0HZtVn4SgPkRVIuIdyrcXM3NR4VI/O5WlqehS
+ NLQH/C1TA3pzaTfzjyL7oaileF6VWt+y8nvwxbsMIk2CWAA0Ysx9Tl6KSqmuQaLtOpqHtoavebG
+ rCn0pIHzMI7napPz3hz5TfXkSEgxqgrotJSu4JAPQ9Anyb0k5sKUIvRCcK6bTA4yJWR74HapRa6
+ o3G+9OMRIDs21Sw==
+X-Developer-Key: i=nsc@kernel.org; a=openpgp;
+ fpr=18ED52DBE34F860EE9FBC82B7D97093255A0CE7F
 
-On Tue, Mar 31, 2026 at 07:15:35AM +0200, Greg KH wrote:
-> On Mon, Mar 30, 2026 at 10:32:00PM +0200, Luis Augenstein wrote:
-> > Hi Nathan,
-> > 
-> > thanks a lot for your recommendations.
-> > 
-> > > Does sbom-roots.txt need to be cleaned up as well?
-> > 
-> > This file is only required to pass the roots into the python script.
-> > We could also use a tmp file. Then we don't need to worry about clean
-> > up. Together with your other suggested changes something like this
-> > should work:
-> > 
-> > # Script to generate .spdx.json SBOM documents describing the build
-> > #
-> > ---------------------------------------------------------------------------
-> > 
-> > ifdef building_out_of_srctree
-> > sbom_targets := sbom-source.spdx.json
-> > endif
-> > sbom_targets += sbom-build.spdx.json sbom-output.spdx.json
-> > quiet_cmd_sbom = GEN     $(notdir $(sbom_targets))
-> >       cmd_sbom = roots_file=$$(mktemp); \
+On Fri, 20 Mar 2026 17:36:54 +0100, Thomas Weißschuh <linux@weissschuh.net> wrote:
+> If 'readelf -n' encounters a note it does not recognize it emits a
 
-I think I would rather have a named file in objtree instead of one in
-/tmp, as we want all output to remain in the build folder.
+,
 
-> >                  printf "%s\n" "$(KBUILD_IMAGE)" >"$$roots_file"; \
-> >                  $(if $(CONFIG_MODULES),sed 's/\.o$$/.ko/'
-> > $(objtree)/modules.order >> "$$roots_file";) \
-> >                  $(PYTHON3) $(srctree)/scripts/sbom/sbom.py \
-> >                      --src-tree $(abspath $(srctree)) \
-> >                      --obj-tree $(abspath $(objtree)) \
-> >                      --roots-file "$$roots_file" \
-> >                      --output-directory $(abspath $(objtree)) \
-> >                      --generate-spdx \
-> >                      --package-license "GPL-2.0 WITH Linux-syscall-note" \
-> >                      --package-version "$(KERNELVERSION)" \
-> >                      --write-output-on-error;
-> >                  rm -f "$$roots_file"
+> warning. This for example happen when inspecting a compat vDSO for
 
-The cmd macro uses 'set -e', so consider moving this up and making it
+happen -> happens
 
-    trap  "rm -rf $$roots_file" EXIT; \
-
-like try-run in scripts/Makefile.compiler does to ensure it is always
-cleaned up.
-
-> > PHONY += sbom
-> > sbom: $(notdir $(KBUILD_IMAGE)) include/generated/autoconf.h $(if
-> > $(CONFIG_MODULES),modules modules.order)
-> > 	$(call cmd,sbom)
-> > 
-> > Note, I will also add the --write-output-on-error flag by default such
-> > that the .spdx.json documents are generated as much as possible even if
-> > some build commands are unknown to the parser.
-
-Seems reasonable to me.
-
-> > > FWIW, I get errors like
-> > >
-> > >   $ make -kj"$(nproc)" ARCH=arm64 CROSS_COMPILE=aarch64-linux- O=build
-> > mrproper defconfig sbom
-> > >   ...
-> > >     GEN     sbom-source.spdx.json sbom-build.spdx.json
-> > sbom-output.spdx.json
-> > >   [ERROR] File "/src/scripts/sbom/sbom/cmd_graph/savedcmd_parser.py",
-> > line 630, in log_error_or_warning
-> > >   Skipped parsing command ccache aarch64-linux-gcc ... -o init/main.o
-> > /src/init/main.c because no matching parser was found
-> > >   [ERROR] File "/src/scripts/sbom/sbom/cmd_graph/savedcmd_parser.py",
-> > line 630, in log_error_or_warning
-> > >   Skipped parsing command ccache aarch64-linux-gcc ... -o
-> > arch/arm64/kernel/asm-offsets.s /src/arch/arm64/kernel/asm-offsets.c
-> > because no matching parser was found
-> > >   [ERROR] File "/src/scripts/sbom/sbom/cmd_graph/savedcmd_parser.py",
-> > line 630, in log_error_or_warning
-> > >   Skipped parsing command ccache aarch64-linux-gcc ... -o
-> > kernel/bounds.s /src/kernel/bounds.c because no matching parser was found
-> > >   ... (Found 10435 more instances of this error)
-> > >
-> > > when testing the whole series without any modifications, am I doing
-> > > something wrong?
-> > 
-> > I was not aware of ccache. If you rebuild without using ccache the gcc
-> > commands should be parsed correctly.
-> > 
-> > The parser expects gcc commands to be of the form
-> > 	"^([^\s]+-)?(gcc|clang)\b"
-> > When using tools like ccache this breaks. I will update the parser to
-> > look for
-> > 	"^(ccache\s+)?([^\s]+-)?(gcc|clang)\b"
-> > instead.
-> > 
-> > Feedback like this is very helpful—thanks! Do you know of any other
-> > commonly used tools that modify build commands in a similar way and
-> > should be considered?
+> which the main kernel toolchain was not used.
+> However the relevant build ID note is always readable, so the
+> warnings are pointless.
 > 
-> Ick, this might get messy as you can modify the compiler with the CC=
-> option to be anything.  There are other build tools out there that do
-> much the same as ccache does (which I should have caught this as I use
-> ccache on my build systems), like distcc and friends, so this might just
-> want to look at the result of "CC" instead?
+> Hide the warnings to make it possible to extrace build IDs for more
 
-Yeah, it would be much more robust to just look at $(CC) directly if it
-is set (i.e., running within Kbuild) vs. having a separate parser like
-this. If you want to keep a fallback for standalone usage for
-development and such, that's fine, but we should use the information we
-have available to be as accurate as possible.
+extrace -> extract
 
-Cheers,
-Nathan
+>
+>
+> diff --git a/scripts/Makefile.vdsoinst b/scripts/Makefile.vdsoinst
+> index 214c561651cf..aed153b3120b 100644
+> --- a/scripts/Makefile.vdsoinst
+> +++ b/scripts/Makefile.vdsoinst
+> @@ -21,7 +21,7 @@ $$(dest): $(1) FORCE
+>  
+>  # Some architectures create .build-id symlinks
+>  ifneq ($(filter arm s390 sparc x86, $(SRCARCH)),)
+> -build-id-file := $$(shell $(READELF) -n $(1) | sed -n 's@^.*Build ID: \(..\)\(.*\)@\1/\2@p')
+> +build-id-file := $$(shell $(READELF) -n $(1) 2>/dev/null | sed -n 's@^.*Build ID: \(..\)\(.*\)@\1/\2@p')
+>  link := $(install-dir)/.build-id/$$(build-id-file).debug
+>  
+>  __default: $$(link)
+
+Sound reasonable and the diff looks appropriate.  Thanks!
+
+Reviewed-by: Nicolas Schier <nsc@kernel.org>
+
+-- 
+Nicolas
+
