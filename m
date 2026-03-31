@@ -1,151 +1,147 @@
-Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B608815C14F
-	for <linux-kbuild@vger.kernel.org>; Tue, 31 Mar 2026 00:17:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.175
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774916274; cv=pass; b=iV/6a+uctB3pD/+Jp1vUwbr2ILt3KHmSoqC2UrklnnsooRUlS011EujXFFoLavgc+pFNNr77a4aeskOrqS77jnY5GPm9ugl1sjG1G9vuR7T3nMMyXQfKLtsW8/S3q35U6M402LYccTWW6CVDRYfhS9Uda/T62LVS2WRmjbwJkhg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774916274; c=relaxed/simple;
-	bh=n0+3yt8ogyNgCzzLsaG2fLhsr37EqQgBrSZLNfws7pk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uFvbh+5O+AhqjEPADMV1ByRxw6ri4vFkrXbdcDbOxG3iyKHStYQHkociTrWT2SJdxe4u/NnkRU41HkQDYU0A9g1InFAeVxN5S9XHG7KIpBG3R5o1my2tMAaowROsZW+eOJg0qvtHnUE/fDgguW+n8PEm4FG0cnb3o3J0cfVQKHc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sdfycjZm; arc=pass smtp.client-ip=209.85.221.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D213E35C190
+	for <linux-kbuild@vger.kernel.org>; Tue, 31 Mar 2026 01:52:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774921964; cv=none; b=Y9ELNWcv1RfFDanm9rNMXF0ksQ35p5ctYVAAsIHSKRi8NHqWNrRwH50glD7BQRm2ZL5nXuizwAqIjNWNMAZNRuRAyWR/f/I4dvO0kL7UsynzkNz/y2tFMxjiL4pAoFhAvZ1pcjcFl0aAl0Z1CUaxK8Hu8rayw9p6/RuY6cJjizI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774921964; c=relaxed/simple;
+	bh=95rFrOHvCv7v/K+6MKBLyHqB0RhvY533VlWoYA3J5DI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KCUcux1kCSzQaM06rutSyJ340Utaodj8Leh0eWih3Nx8PkGQpHFCaQn4FUvgXVAwFWGOeftx6LcCiuEgKmhkbNjYcZtR5GPTSas1khmwrNBp0jXkELsJqzk5nKxWwWZbRE6nC9MunUZ/F0daM2hPKah/sqLJBMrZJUA7dCJO4tk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=StiLg1x+; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=bw8Jei/2; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sdfycjZm"
-Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-56cf45deb45so3833455e0c.2
-        for <linux-kbuild@vger.kernel.org>; Mon, 30 Mar 2026 17:17:52 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774916272; cv=none;
-        d=google.com; s=arc-20240605;
-        b=DeemCukllm0IsQJsO+BZ1+XBClAMwgqmhVv2taaRUGmvHIUNrHNJHv6p8IRL1xKADq
-         YE/UmfjVZCmyFpff8dWxTy+kt5jygknoWGQICmI7+iaiX51U+t1XAoBIAXlBV2FfInn2
-         djNjR0jkbRfSCjif4LHjh+cNCKwxVo+TZZTYR+GQt8rSNzqRlMWRG4VCXTeFypovDyKQ
-         PMyTbUjPHuSNArBFeDETKeKQv5BPpsyvmfqpTLZy8uXEuSjeV/8E5NxjVjIetVlQJ04L
-         HkE1PCVrchsMYpFTpW9BOlUdZBqmSahehZwi5dswP2RLaoWnisSNabITYVeDsDQBzd9P
-         J0Zg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=n0+3yt8ogyNgCzzLsaG2fLhsr37EqQgBrSZLNfws7pk=;
-        fh=OYqpIHIwl3HNS4/qeBq12KKmiJWkQkbxPGsZuMuVQgY=;
-        b=QBIR0z1MXM3PH4lhVF/cr/RHnIWXPwdyj5VNDxZD5K9g+RFgSuOM56LddXjcAP6hwf
-         PTr8MQ2Z18n58mTvyW59h8ousLLwRhorPt7/I/lu7eGOtc7NJ7emRp9w+WX026qLtr3i
-         3SGlcNOG8EhtkomkH7Rqdl85bu7yLxFs0GD74X/YW8GpUdMOe7Cg6mr0MyMbMVCtnX96
-         xG5J5MpJqDDhr6ylYow6Ub7IkZWlbzaN9XLU2WYFl8RgXdt3ckt+yBEX3qk47pKSuFek
-         x0x0X7h3/nYMWY+OMu59uug+U4ZRE8ou5nWi+GAxJ8T1oAxSt8UEslvO2N6c38mEQN4B
-         bwyw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="StiLg1x+";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="bw8Jei/2"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1774921961;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5qE5Yi1PlmOFr6JMHkA02+Lnj7FFZQyWGNZvCfi3+DU=;
+	b=StiLg1x+Qcg/nRgWJWs7r3G21IT+/9fNpDxeWzPY/9lXmLap9wLTnaZ/bPvjGJrcR4JDNH
+	Bu9YONCbIloB25G7dQ6GHsLU/j2owknOqfdgoPit2udYEOs/fyLHnIrA/8F8WuD+xab3fX
+	OfaxeGGgRTABPTvQlPy52RXNAuBXAeU=
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
+ [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-352-BiNO2BBKMZimd6VnA2ZG8A-1; Mon, 30 Mar 2026 21:52:40 -0400
+X-MC-Unique: BiNO2BBKMZimd6VnA2ZG8A-1
+X-Mimecast-MFC-AGG-ID: BiNO2BBKMZimd6VnA2ZG8A_1774921959
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2b2497cc190so17227025ad.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 30 Mar 2026 18:52:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1774916272; x=1775521072; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=n0+3yt8ogyNgCzzLsaG2fLhsr37EqQgBrSZLNfws7pk=;
-        b=sdfycjZmq5SpSoSgo9zMzeS6RA+u9rqVE0wFOTVCfakew9Xk/k7qqmh+YEluowm+L6
-         tARsdd2PmPDVnRkNT+jbvaIjxl+yB5KUwl+sCqxJ7W1sZnCpugw8if/Ft23bvNHoER6F
-         rSW0W9cZozXGaD8hTQRKGw4GLLHKmlD8TI4tRcJryh6rg3+5sjw8XluG8qC0J4jdZcsU
-         eD9Mzj5FLY+YxHmuvlEVCwWN6IqicsG8vAhTBj+VmZu0I0zL+xRNGx25U5Cr0zpBM2UR
-         ECs1BiLlI1pSF84zRGLyij9cikKRRr9cKNOjtxMQNjUSPpBB1Ihc+IA0VEQAxhHjI+4b
-         jCwg==
+        d=redhat.com; s=google; t=1774921959; x=1775526759; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5qE5Yi1PlmOFr6JMHkA02+Lnj7FFZQyWGNZvCfi3+DU=;
+        b=bw8Jei/2aDiVHY7mCzcVehd1A3hfiw07IkMi2aCp3R65VVeCgxRvUQ8Sg0cLAvflBY
+         TcvVTSyk8/9bO7Ms0IccJzqV3GdAsava68C82p0IEz3pXDDsxYw2urOSjyTbDZkZ6Wfp
+         p/R6Kb9nXU8lwPMzmishYFc25RhUjvixuu4+qeLMGu3guiuWyf1APZqAHBDcQ+G5CoQv
+         7krmZ1xaSl5YeIhN5rIfzmEQAb9OaGO7yRkv7/wCJooFemyhJrFmSPpqNKEc3iz1WRE+
+         b9waE4/wQNVxKzHkqUK77f12UrVDgQO5bIzQMgh+7VDs14vK4oJI/veLXWMTUi4AKRwh
+         gjRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774916272; x=1775521072;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=n0+3yt8ogyNgCzzLsaG2fLhsr37EqQgBrSZLNfws7pk=;
-        b=DmVATsG19YF3DsEjHA+pjMT4wYUpLCFgT6/MLy90HIEWlz4/mM/vooy0x6LhCKFzF8
-         WUx9oW5gmLf+WQay28X6EHauIDMzbvXdv/IqWe0CcdcznJ82WV+OHkvpZ4jk040cKne+
-         x/7rOOCYcFG2sysUUKu6uGdecmGVJcnyxsY/m/PJzLjBv64HLSnT6HdeuSMBDdSfql9N
-         XodEDluxNOk2dc/QHat47GLGPLICCUyveEubs6v0RkfNDBGXcmUGij2f1tnd5NTTm6AP
-         1EBL3ABIi5DOGuhcQsorLPIwa9xZW+NyeKB80kEgSjcoS9XoUMIUm3d6EjlrQ/QtmTCh
-         7GgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVpA3KFYAmC8pkA6qEh/Em1UKMino7fsryxj15yN7XRTvuT/R00BHTHlaDSCApaneXtJjph9jQUWdnKagA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywh6pKVEe+FEALaZsfMrQnnSfyd9YZyFEJZDMbDmD0qO5G3hU5X
-	oCdC+Nv8cAmpKMuZmmvWrtanyHlFEv0Q37kZGaZ6qbbePzjZEyAJknEgbNcDnEdT/IPZWbu/0yS
-	3tJhpE4lXt5radBufvL0jMLY9LdMwOW5bbNDCx9Ra
-X-Gm-Gg: ATEYQzxGJ+WhckmCH7CaTxUIzjUavTM28zvAlYAW2kl0xNXM1oDVf1iBApMkso+DcX/
-	afu2yb1EVUarQXsOYTQ2/vWJ2eT8amhviMvAtdEdG6kXwGUEvOZMxE0VJZh6GLb74gQxPYeIkl3
-	c/41UvFW4lxls/9gAxR+PCKgVZmtxny8GRKtsTZxbZ3ie+BM8TeBIapOkKv0GNx/ePFuvC+/T9j
-	qZCL1/KKbXtiwqbCjUsG5dR61GOC/sbavDr3AIEBK1lR/CsdU85SZo8RmQcXE7axJhuxP9e7Fpu
-	zM/brrY=
-X-Received: by 2002:a05:6122:4698:b0:56a:ef51:4cae with SMTP id
- 71dfb90a1353d-56d4a4cab86mr6574629e0c.4.1774916271243; Mon, 30 Mar 2026
- 17:17:51 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1774921959; x=1775526759;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5qE5Yi1PlmOFr6JMHkA02+Lnj7FFZQyWGNZvCfi3+DU=;
+        b=FpI3WckHsKr3Yp7UPU1gcn/QmKTtII9DXPGklYtyPTHf9fgiEFzZbDLKahNXmwAFol
+         mstmdVbwM7u9c8pqGebygOpe6cOzbLWZJ7qS0HFUYm4/i6XHQ8vKIafbkCpmIBKQ/DdN
+         tNVN6bawGXZHs803wmw0DQ3pHbJTBamH4frjCIApD5sSv6z39yF+1UQLuatZaeGU4vTX
+         UnPyUxw4mGwD71VMzGWIWOeRpgnHR2f8KZbZ5aK9V2xqZBI0a7SYL9R3WXeFvuwlhRZY
+         sv7M5OqiyBYNVqCkXsgI2Nro59uIMAl25yrz1jgNSGhfa0nGPRvDYRWBc5Vpi6ULeBmS
+         JQNQ==
+X-Gm-Message-State: AOJu0YydzVYMYJNbvfuAjqn2Z3nugyxpKmIXc4czgayQMS0Va5W1gDw9
+	yi0Tb4IWxM+JM3NNA7OTyc1xlgMZx/ZII7tvNEwQKP3jgKCgkJhX3t2K+A7N1vg/pT1IPEugG1o
+	6npb9ExPtDSP4n2d2rmsE1HNAID1JRImq9XSRtyfdUiHk3dw90/tayltC4M/IBwvfAA==
+X-Gm-Gg: ATEYQzwaA+q/T+blE1kdgLhU215bspE6MrwKJTyOtIIBkwBkXD9zAemO8tEuosCVPZ+
+	fbwNgruGuoo5LCq1JeM0C3ZpD3L8vX/y+PcppbX0n0Mpmwqpxf3qOOfh/+gBu1Wk4wmD6VD6IiR
+	fUwwijMtDIF+SnnZnBJYSam3Ra0mFCKsJOZzk7jVN9in/dudQO0+/7BAweI6rerZ6QBZFr3w5Bs
+	Z9HD6c2ks7kzfTNuxuMUVep0QJtKXkXXjgqYQVjIZrHGABlpy1W8fJ2y8sJjUU6JIIjIOaRACar
+	0Jn1Lgbs5PUEoaCSCLbDdPqBSNhxjYK8ljnWtkDi0X+F6MKpR7ZGslhLo15Nmm1urDhuMUrf5bV
+	nTwh1WWYfQGhvGnbsNA==
+X-Received: by 2002:a17:902:da8f:b0:2b0:51be:f9d7 with SMTP id d9443c01a7336-2b25ef347c4mr15587645ad.18.1774921958946;
+        Mon, 30 Mar 2026 18:52:38 -0700 (PDT)
+X-Received: by 2002:a17:902:da8f:b0:2b0:51be:f9d7 with SMTP id d9443c01a7336-2b25ef347c4mr15587375ad.18.1774921958436;
+        Mon, 30 Mar 2026 18:52:38 -0700 (PDT)
+Received: from redhat.com ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b24b3a82f8sm64351325ad.63.2026.03.30.18.52.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Mar 2026 18:52:37 -0700 (PDT)
+Date: Tue, 31 Mar 2026 09:52:35 +0800
+From: Li Wang <liwang@redhat.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: tools/testing/selftests
+Message-ID: <acso4-02tZhFBnKI@redhat.com>
+References: <20260327143234.40bb8a0119bd55670ddfeec6@linux-foundation.org>
+ <acc49s7jbI9Q3a4f@redhat.com>
+ <20260328135650.435b415f8c00835b2fa471e0@linux-foundation.org>
+ <20260328140311.d6ce99302f93923b0cffb441@linux-foundation.org>
+ <acj5RK3lze7o704Y@redhat.com>
+ <20260330170954.47dfef29063afe9ea502505a@linux-foundation.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260327-kbuild-show-inlining-v1-1-730ac2cae571@google.com>
- <20260327221837.GA3622500@ax162> <CAFhGd8pWwbjjLt=FSaDtFysqRU5k_YozDgBFMJBN4YmnAEaktw@mail.gmail.com>
- <202603292059.01A4CB14F2@keescook> <20260330053604.GA879042@ax162> <202603301156.19EEEBE@keescook>
-In-Reply-To: <202603301156.19EEEBE@keescook>
-From: Justin Stitt <justinstitt@google.com>
-Date: Mon, 30 Mar 2026 17:17:37 -0700
-X-Gm-Features: AQROBzDfJ75j20Pt0fiuvNJg-VsI_kuMnBSed2bUkXNP6__lPP5g9i7kLDwy34I
-Message-ID: <CAFhGd8qUoYnpfMcaUy8=Xde1hkch50MD6WMSsmc7BJqNXz1FyQ@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: add -fdiagnostics-show-inlining-chain for FORTIFY_SOURCE
-To: Kees Cook <kees@kernel.org>
-Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260330170954.47dfef29063afe9ea502505a@linux-foundation.org>
 
-Hi,
+On Mon, Mar 30, 2026 at 05:09:54PM -0700, Andrew Morton wrote:
+> On Sun, 29 Mar 2026 18:04:52 +0800 Li Wang <liwang@redhat.com> wrote:
+> 
+> > > ts:/usr/src/25> cat Makefile
+> > > # Automatically generated by /usr/src/25/Makefile: don't edit
+> > > export KBUILD_OUTPUT = .
+> > > export KBUILD_EXTMOD = /usr/src/25
+> > > export KBUILD_EXTMOD_OUTPUT = /usr/src/25
+> > > include /usr/src/25/Makefile
+> > > 
+> > > I've done this twice in succession now.  Any suggestions where I should
+> > > look?
+> > 
+> > When build selftests from the top-level, sub-makes entered via `-C` may
+> > still inherit the caller's PWD from the environment.
+> > 
+> > Some selftests use $(PWD) in recursive kbuild invocations, which can
+> > then incorrectly resolve to the kernel top directory instead of the
+> > current test directory.
+> > 
+> > Maybe try export PWD in the ../selftests/lib.mk?
+> > 
+> >   export PWD := $(CURDIR)
+> 
+> Thanks, I'll get onto this stuff soon.
+ 
+I have created a patchset for those build tiny issues,
+let me send out to you to have a early try?
 
-On Mon, Mar 30, 2026 at 11:56=E2=80=AFAM Kees Cook <kees@kernel.org> wrote:
->
-> On Mon, Mar 30, 2026 at 07:36:04AM +0200, Nathan Chancellor wrote:
-> > On Sun, Mar 29, 2026 at 08:59:51PM -0700, Kees Cook wrote:
-> > > On Fri, Mar 27, 2026 at 03:29:18PM -0700, Justin Stitt wrote:
-> > > > On Fri, Mar 27, 2026 at 3:18=E2=80=AFPM Nathan Chancellor <nathan@k=
-ernel.org> wrote:
-> > > > The compile time impact is not measurable (within expected noise). =
-The
-> > > > peak memory usage may increase by somewhere in the 0.5% to 1.5% ran=
-ge
-> > > > depending on build configuration.
-> > > >
-> > > > I bundled this under fortify to limit initial impact as its had
-> > > > virtually no real-world testing and may produce unhelpful diagnosti=
-c
-> > > > notes under its heuristic mode. I don't expect folks to use `-g1` i=
-n
-> > > > the kernel (which would enable full-proof diagnostic notes).
-> > > >
-> > > > > If not, maybe worth adding a Kconfig option that is force selecte=
-d by FORTIFY_SOURCE with
-> > > > > clang or can be optionally enabled by a user?
-> > > >
-> > > > I'll defer to you on this one. We could add
-> > > > CONFIG_SHOW_INLINING_CHAIN_NOTES or something similar?
-> > >
-> > > I would prefer to just unconditionally enable this when it is support=
-ed.
-> >
-> > Agreed. It cannot possibly be worse than the status quo, right? :) This
-> > feels very similar to -fdiagnostics-show-context=3D2, so maybe add it n=
-ear
-> > there?
->
-> Yeah, similar. That'd be a good place for it. :)
+> Meanwhile, shouldn't this work?
+> 
+> ts:/usr/src/25/tools/testing/selftests/mm> make merge.i
+> make: *** No rule to make target 'merge.i'.  Stop.
 
-Thanks both of you for the suggestion:
+That's probably because Makefile explicitly disables the implicit .c to .i rule.
 
-Here's [v2] :)
+In line#43 of Makefile:
 
->
-> --
-> Kees Cook
+    MAKEFLAGS += --no-builtin-rules
 
-[v2]: https://lore.kernel.org/all/20260330-kbuild-show-inlining-v2-1-c0c481=
-a4ea7b@google.com/
+I doubt do we really need to add back the 'gcc -E' approach? 
+The selftests build system intentionally kills built-in rules to prevent
+half-broken implicit builds.
+(the comment line# 33~42 in the Makefile explains why)
 
-Justin
+-- 
+Regards,
+Li Wang
+
