@@ -1,93 +1,81 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D78733F0742;
-	Wed,  1 Apr 2026 23:03:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C72473CE48D;
+	Wed,  1 Apr 2026 23:04:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775084612; cv=none; b=XLPYrq2Py4GYUm3tEjtHxZy1UbM8Weer9mahvMN0SYB+NeSQY9+Zd/PKx/4Hvr14eJkRYsdSBDCarI+NXWqcV/4+OS+oXCgkNcKd2twoudWEQsxF7RsvL9CRlvR/IlKOO2mSJwluogjvi42bDKUj9Uj1EloIS2NnWOywMhNAqPs=
+	t=1775084682; cv=none; b=UckARAGVAgpektj74INWvGiqGDX48gfIazByRvydQo49hh3SkfQywJ7EdJOY4W3efxcewiJV1HvRc4K51AdWVEHvgVRmqwOcceDJJnpl14Z1cE2E8lb+Gfj4WOiChYLn45T9cVbyhTOyOxxBe3n27GqcsVUeM6ph/rzKIsoPP/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775084612; c=relaxed/simple;
-	bh=bMMivyWks1RUpM5OMtjkhP0IRWxx0+GxfgfoBpHShLo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XdoW/3Wa5kZuqEItTyd23lQ+jJpAeHp1Cowo94vNjUCo6NRE7C3o1UwLdqD2wolxye9yaihgBcD3j8rGnxRu2MDliQqGThGk3RNU3JQ6latEMTQTgzY/eEYcpZTVjwaWfeg/vqdbH8DRuyJO951UmnJ+9CSQce74KGc3g+3hqXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e9N3rMoT; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1775084682; c=relaxed/simple;
+	bh=979aSmaLio+8xpUh4kWBF1FSamarRf48YG0g0DqRC4Y=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=dNTFu8NKuPY1bYxxihCATE91su8UqRNGcqS2e+wn4mW4eot1cOfTIHYAkd+jpViPlbQPflGVe+bF1sHax+g+rN71zzio6NGAl7LfFdRaSbIrDrghovi9IJxPeXgJyltl0uxsNnlfX6z06qk2aOBgdefJcbxvulDwgN7++rSnxbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=njC9pNsM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e9N3rMoT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4658C116C6;
-	Wed,  1 Apr 2026 23:03:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="njC9pNsM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7F38C4CEF7;
+	Wed,  1 Apr 2026 23:04:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775084611;
-	bh=bMMivyWks1RUpM5OMtjkhP0IRWxx0+GxfgfoBpHShLo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=e9N3rMoTD+1qG8dh2/u8CvVe6Nt4/oKPipHOcx2jiOi/N2VexvxPv+LF6uEs7jBUN
-	 Ud93k5YIHySI0uy1izpwNYQtG2EcfmYOXNThRmZmolc63EPTGOOwo7TgwvHutjNGxL
-	 N59xfJohuLSbdLuBnSv4lmy4ic5zEpngxgJebAVr+3b05Q9Zx0m1kw3flLIoG1t+y3
-	 /JxuIAvr27TapcF2vJ+tSKIXSDGcrti61fNYXlmHl+JA5rQG0iOIhEh76mjNxc2MV7
-	 /lIMRcV3KZ/jD2f2ap1zY/Gd+RJOkKyOWz/zxnk+0RoHZD0iAKsU0eJ8kOzTmVvBcw
-	 9XvFkA7kt1aAw==
-Date: Thu, 2 Apr 2026 00:03:25 +0100
+	s=k20201202; t=1775084682;
+	bh=979aSmaLio+8xpUh4kWBF1FSamarRf48YG0g0DqRC4Y=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=njC9pNsM5mZ5gVUw0STRN+DeuDpvdItga/yiGd2oFUtvpZ6S9vyIyuV/jO161t22u
+	 H6XlHxBBBnYzusCNY0D+TkMWm26hz/ZH7K++v0ayu99Hm8VAwNbWuFl6s5FSL4JE0f
+	 LHDnEvWC176C4k1sA2dj2UlTJ8FkCfKG6JxNlnGgE402ly+CaLV6PcTymO5luj9KG4
+	 +XfFi3uA1qrjO05h9KZr4JawjJXZxeTvV4nm6kvl2vbJYdF9wI1+E4rQ0UU2gvxbuh
+	 PeU+kLQjkJMDlHRSxDipl5Q6lmqFSEj2o2fdCygFmwU97H24yECQqYVNI9mNyC/Yv1
+	 iln9WAtPN1Oww==
 From: Nathan Chancellor <nathan@kernel.org>
-To: Nicolas Schier <nsc@kernel.org>
-Cc: Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Jeff Johnson <jeff.johnson@oss.qualcomm.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, stable@vger.kernel.org
-Subject: Re: [PATCH] modpost: Declare extra_warn with unused attribute
-Message-ID: <20260401230325.GA1076298@ax162>
+To: Nicolas Schier <nsc@kernel.org>, Nathan Chancellor <nathan@kernel.org>
+Cc: Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+ Jeff Johnson <jeff.johnson@oss.qualcomm.com>, 
+ Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, llvm@lists.linux.dev, stable@vger.kernel.org
+In-Reply-To: <20260325-modpost-extra_warn-unused-but-set-global-v1-1-2e84003b7e81@kernel.org>
 References: <20260325-modpost-extra_warn-unused-but-set-global-v1-1-2e84003b7e81@kernel.org>
- <acwisFwJ3eMMQLIp@levanger>
+Subject: Re: (subset) [PATCH] modpost: Declare extra_warn with unused
+ attribute
+Message-Id: <177508467966.1735993.3178343195907981949.b4-ty@b4>
+Date: Thu, 02 Apr 2026 00:04:39 +0100
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <acwisFwJ3eMMQLIp@levanger>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.16-dev
 
-On Tue, Mar 31, 2026 at 09:38:24PM +0200, Nicolas Schier wrote:
-> On Wed, Mar 25, 2026 at 06:20:30PM -0700, Nathan Chancellor wrote:
-> > A recent strengthening of -Wunused-but-set-variable (enabled with -Wall)
-> > in clang under a new subwarning, -Wunused-but-set-global, points out an
-> > unused static global variable in scripts/mod/modpost.c:
-> > 
-> >   scripts/mod/modpost.c:59:13: error: variable 'extra_warn' set but not used [-Werror,-Wunused-but-set-global]
-> >      59 | static bool extra_warn;
-> >         |             ^
-> > 
-> > This variable has been unused since commit 6c6c1fc09de3 ("modpost:
-> > require a MODULE_DESCRIPTION()") but that is expected, as there are
-> > currently no extra warnings at W=1 right now. Declare the variable with
-> > the unused attribute to make it clear to the compiler that this variable
-> > may be unused.
-> > 
-> > Cc: stable@vger.kernel.org
-> > Fixes: 6c6c1fc09de3 ("modpost: require a MODULE_DESCRIPTION()")
-> > Signed-off-by: Nathan Chancellor <nathan@kernel.org>
-> > ---
-> > I will apply this to kbuild-fixes for 7.0.
-> > ---
-> >  scripts/mod/modpost.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
+On Wed, 25 Mar 2026 18:20:30 -0700, Nathan Chancellor wrote:
+> A recent strengthening of -Wunused-but-set-variable (enabled with -Wall)
+> in clang under a new subwarning, -Wunused-but-set-global, points out an
+> unused static global variable in scripts/mod/modpost.c:
 > 
-> modpost is just used in-tree, right?  Can't we just remove the '-W' flag
-> and the extra_warn variable completely?
-
-We could but I figured it was worth keeping it around in case we grow
-any other checks that we would want under W=1. Not sure what those would
-be but the dead code here is minimal so it did not seem worth it to
-clean it up just for this warning.
-
-> Nevertheless,
+>   scripts/mod/modpost.c:59:13: error: variable 'extra_warn' set but not used [-Werror,-Wunused-but-set-global]
+>      59 | static bool extra_warn;
+>         |             ^
 > 
-> Reviewed-by: Nicolas Schier <nsc@kernel.org>
+> [...]
+
+Applied to
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/kbuild/linux.git kbuild-fixes
 
 Thanks!
 
-Nathan
+[1/1] modpost: Declare extra_warn with unused attribute
+      https://git.kernel.org/kbuild/c/deb4605671cfa
+
+Please look out for regression or issue reports or other follow up
+comments, as they may result in the patch/series getting dropped or
+reverted. Patches applied to an "unstable" branch are accepted pending
+wider testing in -next and any post-commit review; they will generally
+be moved to the main branch in a week if no issues are found.
+
+Best regards,
+-- 
+Nathan Chancellor <nathan@kernel.org>
+
