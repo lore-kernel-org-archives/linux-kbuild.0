@@ -1,238 +1,125 @@
-Received: from mail-dl1-f53.google.com (mail-dl1-f53.google.com [74.125.82.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay.virtuozzo.com (relay.virtuozzo.com [130.117.225.111])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 947B3364927
-	for <linux-kbuild@vger.kernel.org>; Thu,  2 Apr 2026 13:48:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775137740; cv=pass; b=CnbmLPrCS8j1D+JrRrtje3LK9quzwaEwYRYAcCE3tg4diaJ1sfUWI2eS/gG+4MaTC9zy+440j7F4O7y11cDhnp6jfnvTTNDb70yKTDEulZReFxVCrPIReUqXYhSpxVYlaakLs1tgGBdVcAVAoL7gxK2D3y5mcxNAHRLRTngeaaA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775137740; c=relaxed/simple;
-	bh=l9tNbApyNKlKEGwYqWI2PPtB9POx0b+CnQVgR7HkWdQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WZZfwxlByb3dVPh2Xz3X4jkxwjwuAuAe/inXWMgFsPG0k7HamkfHbnZHYlx062pm98SDHTOeWt4SjFbbZSOK1qWJ+vrNlKo5D/FFv8DuI/3ku4o1zjaShEZM1zHXfKL+8ynMDXoDe82fWJ+nEfBR+MLPi2Ti8BsAfkI56gU+W6w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SLzQM8r0; arc=pass smtp.client-ip=74.125.82.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BF4B207DF7;
+	Thu,  2 Apr 2026 14:18:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.117.225.111
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775139521; cv=none; b=CwUccKuVXpwcDvB/6NBH7zfyUkMCXpjy7iDlpx14AnUDP7MbbYrjfzLwOgwy5YocpdTPP013hWR02WHMIaaCqtKin1fnpYwUbiI3vBHdyRNJ05mU2612wCA7J8kR9LB45LLjRTQ8NvD+ZCk9ekudD4JyhJa5uqCjeGzckOLwg/k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775139521; c=relaxed/simple;
+	bh=bIIn3wyBhTaGlRtuKDocl//BDHKJ8AKUQ1pFkXdpTP0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tm8uRUygU/tliMquEZmIEZ/nvf3RQLvsZI8tD9MQtcXnDwRvepNl0A8yLixHSEELuY+RU4yYzIVDR5hwL20tC/Q9RMvuBeJ43c9D/Fnj8rUks59I6lJsrMf7WMsreozhkIQvZtN43Ya+ZJk37uScrn2bGCMnhxMmFbpae8khh4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=NEJMkt9u; arc=none smtp.client-ip=130.117.225.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=virtuozzo.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SLzQM8r0"
-Received: by mail-dl1-f53.google.com with SMTP id a92af1059eb24-12bee82a1ecso2488071c88.0
-        for <linux-kbuild@vger.kernel.org>; Thu, 02 Apr 2026 06:48:58 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775137738; cv=none;
-        d=google.com; s=arc-20240605;
-        b=F14xuK0SVK1oqOjQxNFZDHngekGFpPz66fOwRDdwiOJIz5kHzjPIHzKlRuLAr5yzN4
-         pclZnQTDjyUbAKRTPp0YCpg//3eDyHPrCzQiXIkWD4kZIiJR9MsaVA6mekCZKNGGWbA6
-         ofbPnvTfJc17SkmceSnkMersIs1bxyfOs85Fjk3/7J4MwgdsWGQHM+7YMr0zEwRjQYDD
-         atnClW6TbGozvGivbCZXybMQ9sD4TKmEMsUMm2n230eYyfZq+Yh5twfc3qd175VEbscv
-         I60h3fP9Zz0u4cjcADmK6gUAVeRlh9A2K01gM0wSzGSc2JzpeRuhjYO4vu65kwTVf+lu
-         aE+Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=4odl4u5FIkYFl0AjuN4ex6RSgkq9844Lzudav/PrauU=;
-        fh=DZ7JeDJzjJzN13X/HofGyC/zE7WO4/LBwhDPJX8ZJyM=;
-        b=QATjN39Atc5iM790hypP/jHgBx/6i7xEdzYwi7tisvtmwwHuw6oPz68kIEqM+ODK85
-         crPrhjky+FcYICyQ/Ng3LPTDcPsrbm4IuiIawX9Qyun8dEpHV0vh4g3lGlnZbF1rL6Lz
-         WUOJHy2WQMqv/cy4TQeHEvwRxA0iJP3ldSNozsCK9zp3gCBVtCdlgDp+8asfvvIgkda5
-         yKOwsrkOJWM8gb4EKbOhRBcT6m7ARM66JWIa/t3QVuEChX6oftLVxVVakwMs+z/Sntnu
-         oNAd1SkE1ZfjlQtR5yTkjjr7KR0+xeealJRJBUUg0mT0zAKcQERT8QXdwa/pwbzQaR5P
-         XYqg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775137738; x=1775742538; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=4odl4u5FIkYFl0AjuN4ex6RSgkq9844Lzudav/PrauU=;
-        b=SLzQM8r04r8ZKVup576jMNr7dy/2s2DCum6qS3DJP77P+5KluGkmNryTfuyPbY6e1C
-         uTUexQI3QJX+lDe0h3B4Wbslf2Bb88BFvdiWsCne2Jf0m5uQtDJ1Y3CkKDFmeM98TIG3
-         GgaoW5w10PPgh5+HdbbAXevkQT1dzesYmLtjy1JrheujA0zaII1DhaEscciBtMvLWGgi
-         H1DUe9/shw38o9qoBdKmgcnfYmt+YcKiFrKvzuOaoNShZHBdm8Gbs7p7J2d72TAotZr4
-         C99+2J3YsS65O2JKEfoDlbpjnrhIhqhiEj+H2zcSFc1qwBdi3Ni1c1Ke9+hY6h9+SA+M
-         hsCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775137738; x=1775742538;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4odl4u5FIkYFl0AjuN4ex6RSgkq9844Lzudav/PrauU=;
-        b=IRIFFiRNNIAGUn/EFuQppVmdGV9EhmUTUk8yo1u4FqC9o78N6xtWM+yRIYYIBSX5x4
-         +ug3+j+XBOGfR5EfF3ciHE5yhBtJW/q4ZiSLJA2V8ZXdW+sdglG/sGZZ+gLypFevNPXR
-         AYnVUSidpw9/f1zzC0N6Sv467PISdWsL7r6/QeR52eT7VDV7bURErR+68IZOm4BSdiw3
-         AH7hf7xDrFsU/LxOmujLqGl8F7FWH39Jus0wTJyJs6hredgQvetOPdy7PyCXNlln9Vyo
-         j7iXiEmm32hPw+G4QNJN2t1d+xg7IuFJI+GNz+YPJEN2ITx4+de3Pgwc6kIwQw5tLvib
-         oVEA==
-X-Forwarded-Encrypted: i=1; AJvYcCU4t4jsz8aladdaPCAmS4ZgXUkaHtTXNRswURF1v9XutzRpAxMrH90i7mfKlRLxi/7L/0GcDgQCnsaHcGA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+h7OsjzLZam9c0uLB+GeY0qsD6LxZVyWN87SKuKg4wN4U7hSG
-	e2N6w5d8XqSPWamamrIWLrq9KLcnT4hbE8p54UoK9swggTbbQ49jj5pyhIlfX322jiqv7e465YN
-	nqih5JJVuTjQLYhh6UzVli1ldNDSv6SZio5O4NlKt
-X-Gm-Gg: ATEYQzyW/b8/ODBNblK6wtw5uVZ3uoVza/9Q6DOS7Tp4BO10m6kWYGYoeVrBqpnAKIP
-	5cq2Q5EN0zTe+QmQMSwk0EYVXH7QCkjLodga1+6geFyeK4YiH9b2g4UqtJ9/lohTzobB7fbo8BE
-	KSiXgpd9dKKA9keujIdih3/wg5w270v9rqPZdiVUPCliOQCyFpw8QaXxtt1/BZvbTvduTyTo4SU
-	V3WkZ9+lMjAh/DuG1sJayuVuNdWbZkko+QiNjoMVFL7RY0dAby/AvFaqGzs/u0nO6xeuc3mZLdw
-	lUfZXw6U9yrn7rto6AXeHSCDdpywiOpnKrkLrtk=
-X-Received: by 2002:a05:7022:4582:b0:11d:c86c:652e with SMTP id
- a92af1059eb24-12be64206a6mr4246421c88.5.1775137736932; Thu, 02 Apr 2026
- 06:48:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="NEJMkt9u"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=virtuozzo.com; s=relay; h=Content-Type:MIME-Version:Message-ID:Date:Subject
+	:From; bh=5LRbehgey3k3jFMPv3TD68ZHCD/cnTWjEGBb7/+0Nas=; b=NEJMkt9u4W+CVlQ/aHM
+	uYZh+QziFfyz+Le+clFvG+X8YrxmAtIgpgUjHjrErIIRLKXqz4/R1SP6YH8hSzdaE9BSabVFRByFK
+	NgAm0fYYh7ombhRM2w1WyoYRSqLAMOsRb6eLwno5sdq4zK/q3ibua04pTKAy4xJA8eFDUprXbNWZQ
+	jfiB8pEOdchcEsgOpU4/v+4thFuLarSC9zAlOaNtRigyXliolMM6qnqlXi7o8C37GyG6Y/wu5T64Y
+	pGD0NSwtNKv22i5ZagHChq49JJmkA7PANY2fbPoO1C9x1xE1T1Fajlb6CYL+EFkt7TYRPv8W/5Wz/
+	owg1hcTm1HZnXow==;
+Received: from [130.117.225.5] (helo=finist-alma9.vzint.dev)
+	by relay.virtuozzo.com with esmtp (Exim 4.96)
+	(envelope-from <khorenko@virtuozzo.com>)
+	id 1w8IqH-003geR-2b;
+	Thu, 02 Apr 2026 16:18:30 +0200
+From: Konstantin Khorenko <khorenko@virtuozzo.com>
+To: Peter Oberparleiter <oberpar@linux.ibm.com>,
+	Mikhail Zaslonko <zaslonko@linux.ibm.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>
+Cc: Masahiro Yamada <masahiroy@kernel.org>,
+	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Konstantin Khorenko <khorenko@virtuozzo.com>,
+	Pavel Tikhomirov <ptikhomirov@virtuozzo.com>,
+	Vasileios Almpanis <vasileios.almpanis@virtuozzo.com>,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH] gcov: use atomic counter updates to fix concurrent access crashes
+Date: Thu,  2 Apr 2026 17:18:31 +0300
+Message-ID: <20260402141831.1437357-2-khorenko@virtuozzo.com>
+X-Mailer: git-send-email 2.43.5
+In-Reply-To: <20260402141831.1437357-1-khorenko@virtuozzo.com>
+References: <20260402141831.1437357-1-khorenko@virtuozzo.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260331111240.153913-1-elver@google.com> <202604020400.jEq32K95-lkp@intel.com>
-In-Reply-To: <202604020400.jEq32K95-lkp@intel.com>
-From: Marco Elver <elver@google.com>
-Date: Thu, 2 Apr 2026 15:48:20 +0200
-X-Gm-Features: AQROBzBTzNfYUXOsbmlfPQCs1PnLUVzNWPXPqQybMa2GKboY40C31FthWXXrJZ4
-Message-ID: <CANpmjNOsM1e8jMvRKtEizMmZgPCCZ9YqpuZKad61Zg7PAGW7RA@mail.gmail.com>
-Subject: Re: [PATCH v1] slab: support for compiler-assisted type-based slab
- cache partitioning
-To: Dan Carpenter <error27@gmail.com>
-Cc: oe-kbuild@lists.linux.dev, Vlastimil Babka <vbabka@kernel.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, lkp@intel.com, oe-kbuild-all@lists.linux.dev, 
-	Linux Memory Management List <linux-mm@kvack.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
-	Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, 
-	Christoph Lameter <cl@linux-foundation.org>, Harry Yoo <harry.yoo@oracle.com>, 
-	Hao Li <hao.li@linux.dev>, David Rientjes <rientjes@google.com>, 
-	Roman Gushchin <roman.gushchin@linux.dev>, Kees Cook <kees@kernel.org>, 
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>, David Hildenbrand <david@kernel.org>, 
-	Lorenzo Stoakes <ljs@kernel.org>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
-	Mike Rapoport <rppt@kernel.org>, Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
-	Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, 
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
-	kasan-dev@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, 2 Apr 2026 at 15:33, Dan Carpenter <error27@gmail.com> wrote:
->
-> Hi Marco,
->
-> kernel test robot noticed the following build warnings:
->
-> https://git-scm.com/docs/git-format-patch#_base_tree_information]
->
-> url:    https://github.com/intel-lab-lkp/linux/commits/Marco-Elver/slab-support-for-compiler-assisted-type-based-slab-cache-partitioning/20260401-035608
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git mm-everything
-> patch link:    https://lore.kernel.org/r/20260331111240.153913-1-elver%40google.com
-> patch subject: [PATCH v1] slab: support for compiler-assisted type-based slab cache partitioning
-> config: um-randconfig-r072-20260401
-> compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-> smatch: v0.5.0-9004-gb810ac53
->
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Reported-by: Dan Carpenter <error27@gmail.com>
-> | Closes: https://lore.kernel.org/r/202604020400.jEq32K95-lkp@intel.com/
->
-> New smatch warnings:
-> drivers/misc/lkdtm/heap.c:118 lkdtm_READ_AFTER_FREE() warn: potential pointer math issue ('base' is a 32 bit pointer)
-> drivers/misc/lkdtm/heap.c:169 lkdtm_KFENCE_READ_AFTER_FREE() warn: potential pointer math issue ('base' is a 32 bit pointer)
+GCC's GCOV instrumentation can merge global branch counters with loop
+induction variables as an optimization.  In inflate_fast(), the inner
+copy loops get transformed so that the GCOV counter value is loaded
+multiple times to compute the loop base address, start index, and end
+bound.  Since GCOV counters are global (not per-CPU), concurrent
+execution on different CPUs causes the counter to change between loads,
+producing inconsistent values and out-of-bounds memory writes.
 
-How is this related to the patch I sent? Did the <linux/slab.h> change
-force rechecking of all these files and it found latent issues?
+The crash manifests during IPComp (IP Payload Compression) processing
+when inflate_fast() runs concurrently on multiple CPUs:
 
-> vim +118 drivers/misc/lkdtm/heap.c
->
-> 73f62e60d80c2d drivers/misc/lkdtm/heap.c Kees Cook    2022-03-03   92  static void lkdtm_READ_AFTER_FREE(void)
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26   93  {
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26   94   int *base, *val, saw;
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26   95   size_t len = 1024;
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26   96   /*
-> e12145cf1c3a80 drivers/misc/lkdtm/heap.c Kees Cook    2020-06-25   97    * The slub allocator will use the either the first word or
-> e12145cf1c3a80 drivers/misc/lkdtm/heap.c Kees Cook    2020-06-25   98    * the middle of the allocation to store the free pointer,
-> e12145cf1c3a80 drivers/misc/lkdtm/heap.c Kees Cook    2020-06-25   99    * depending on configurations. Store in the second word to
-> e12145cf1c3a80 drivers/misc/lkdtm/heap.c Kees Cook    2020-06-25  100    * avoid running into the freelist.
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  101    */
-> e12145cf1c3a80 drivers/misc/lkdtm/heap.c Kees Cook    2020-06-25  102   size_t offset = sizeof(*base);
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  103
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  104   base = kmalloc(len, GFP_KERNEL);
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  105   if (!base) {
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  106           pr_info("Unable to allocate base memory.\n");
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  107           return;
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  108   }
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  109
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  110   val = kmalloc(len, GFP_KERNEL);
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  111   if (!val) {
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  112           pr_info("Unable to allocate val memory.\n");
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  113           kfree(base);
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  114           return;
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  115   }
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  116
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  117   *val = 0x12345678;
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26 @118   base[offset] = *val;
->
-> This doesn't really matter, but the comment says we are writing to the
-> second word.  The base[] array holds 256 integers, so:
->
->         base[sizeof(int)] = *val;
->
-> would be the third word, right?  A word is unsigned long, right?  All
-> of a sudden I am unsure.  :P
+  BUG: unable to handle page fault for address: ffffd0a3c0902ffa
+  RIP: inflate_fast+1431
+  Call Trace:
+   zlib_inflate
+   __deflate_decompress
+   crypto_comp_decompress
+   ipcomp_decompress [xfrm_ipcomp]
+   ipcomp_input [xfrm_ipcomp]
+   xfrm_input
 
-???
+At the crash point, the compiler generated three loads from the same
+global GCOV counter (__gcov0.inflate_fast+216) to compute base, start,
+and end for an indexed loop.  Another CPU modified the counter between
+loads, making the values inconsistent — the write went 3.4 MB past a
+65 KB buffer.
 
-So this is clearly a minor defect in this existing code (comment wrong
-or code might want to match what the comment said), but "slab: support
-for compiler-assisted type-based slab cache partitioning" didn't touch
-that.
+Add -fprofile-update=atomic to CFLAGS_GCOV at the global level in the
+top-level Makefile.  This tells GCC that GCOV counters may be
+concurrently accessed, causing counter updates to use atomic
+instructions (lock addq) instead of plain load/store.  This prevents
+the compiler from merging counters with loop induction variables.
 
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  119   pr_info("Value in memory before free: %x\n", base[offset]);
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  120
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  121   kfree(base);
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  122
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  123   pr_info("Attempting bad read from freed memory\n");
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  124   saw = base[offset];
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  125   if (saw != *val) {
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  126           /* Good! Poisoning happened, so declare a win. */
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  127           pr_info("Memory correctly poisoned (%x)\n", saw);
-> 5b777131bd8005 drivers/misc/lkdtm/heap.c Kees Cook    2021-06-23  128   } else {
-> 5b777131bd8005 drivers/misc/lkdtm/heap.c Kees Cook    2021-06-23  129           pr_err("FAIL: Memory was not poisoned!\n");
-> 5b777131bd8005 drivers/misc/lkdtm/heap.c Kees Cook    2021-06-23  130           pr_expected_config_param(CONFIG_INIT_ON_FREE_DEFAULT_ON, "init_on_free");
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  131   }
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  132
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  133   kfree(val);
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  134  }
-> ffc514f3fcac4a drivers/misc/lkdtm_heap.c Kees Cook    2016-06-26  135
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  136  static void lkdtm_KFENCE_READ_AFTER_FREE(void)
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  137  {
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  138   int *base, val, saw;
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  139   unsigned long timeout, resched_after;
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  140   size_t len = 1024;
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  141   /*
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  142    * The slub allocator will use the either the first word or
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  143    * the middle of the allocation to store the free pointer,
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  144    * depending on configurations. Store in the second word to
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  145    * avoid running into the freelist.
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  146    */
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  147   size_t offset = sizeof(*base);
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  148
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  149   /*
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  150    * 100x the sample interval should be more than enough to ensure we get
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  151    * a KFENCE allocation eventually.
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  152    */
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  153   timeout = jiffies + msecs_to_jiffies(100 * kfence_sample_interval);
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  154   /*
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  155    * Especially for non-preemption kernels, ensure the allocation-gate
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  156    * timer can catch up: after @resched_after, every failed allocation
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  157    * attempt yields, to ensure the allocation-gate timer is scheduled.
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  158    */
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  159   resched_after = jiffies + msecs_to_jiffies(kfence_sample_interval);
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  160   do {
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  161           base = kmalloc(len, GFP_KERNEL);
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  162           if (!base) {
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  163                   pr_err("FAIL: Unable to allocate kfence memory!\n");
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  164                   return;
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  165           }
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  166
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  167           if (is_kfence_address(base)) {
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29  168                   val = 0x12345678;
-> aabf7c37dfbce3 drivers/misc/lkdtm/heap.c Stephen Boyd 2023-11-29 @169                   base[offset] = val;
->                                                                                         ^^^^^^^^^^^^^^^^^^
-> Same here.
+Applying this globally rather than per-subsystem not only addresses the
+observed crash in zlib but makes GCOV coverage data more consistent
+overall, preventing similar issues in any kernel code path that may
+execute concurrently.
 
-Unrelated to "slab: support for compiler-assisted type-based slab
-cache partitioning".
+Signed-off-by: Konstantin Khorenko <khorenko@virtuozzo.com>
+Tested-by: Peter Oberparleiter <oberpar@linux.ibm.com>
+Reviewed-by: Peter Oberparleiter <oberpar@linux.ibm.com>
+
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 6b1d9fb1a6b4..a55ad668d6ba 100644
+--- a/Makefile
++++ b/Makefile
+@@ -806,7 +806,7 @@ all: vmlinux
+ 
+ CFLAGS_GCOV	:= -fprofile-arcs -ftest-coverage
+ ifdef CONFIG_CC_IS_GCC
+-CFLAGS_GCOV	+= -fno-tree-loop-im
++CFLAGS_GCOV	+= -fno-tree-loop-im -fprofile-update=atomic
+ endif
+ export CFLAGS_GCOV
+ 
+-- 
+2.43.5
+
