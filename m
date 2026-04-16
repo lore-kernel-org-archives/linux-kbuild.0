@@ -1,100 +1,118 @@
-Received: from outbound.pv.icloud.com (pv-2005d-snip4-1.eps.apple.com [57.103.66.162])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4CBE2DECCB
-	for <linux-kbuild@vger.kernel.org>; Thu, 16 Apr 2026 21:01:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.66.162
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A15A34D4D2
+	for <linux-kbuild@vger.kernel.org>; Thu, 16 Apr 2026 21:15:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776373267; cv=none; b=IyQ063aMXpgwUIIOZJhiycmAj/6EZcu1OHxTS+qrPDQYFTIoVDPtAUs4xJQj1gw4W1ZaRq9tCFFygf2aXNkt2ijaZ5Mu6XHGoH2/I9LHK+7k3D9VWgnW0a0MlqjC7M457fhbsPNqEs8jyZ3e6CTuRzTED1XSQ2mp3flhanOAxFQ=
+	t=1776374134; cv=none; b=tLI6wUfrINVygIoIRImnby71NbSFnctXewX9Bzvvre9rZErLiDroyef/wsvqrJd+6JOMonTL39p0PW6VcXyspX+XOVCW5XivfnhDliJH2RLRiqwuHG1PzdIm0UW9qNZID2hel6bbEQE1MiWjC31QcB+upAwDYLCYskaXIEe0ftU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776373267; c=relaxed/simple;
-	bh=a0TqkyIxCKaNZFE+BPJXILAdoxPKdlxkhrujtT4KD1Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GrSfsVG/NIWwjAJv0YyfxI/kvBWMBWSk8nfSVHn2ALJ2g1NUKsNVYCdmZmt6woaMDfNAPjJu+9q+2Oi30vnlcIUHMSaTTCVEUBf+uWhA3YRd9FFnEIAf7P0eIEu0vpJ3pBiDOguqdZfgaseM68t3pwBGhU2BwDKEoLcdRkAIe0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sdhn.cc; spf=pass smtp.mailfrom=sdhn.cc; dkim=pass (2048-bit key) header.d=sdhn.cc header.i=@sdhn.cc header.b=YspsSGhp; arc=none smtp.client-ip=57.103.66.162
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sdhn.cc
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sdhn.cc
+	s=arc-20240116; t=1776374134; c=relaxed/simple;
+	bh=I1bLt47VSjWaeL4igpmdpjI+SkBgxLH9XmCMOiEEmaw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VzfZFoT2r9PSnNJ2hEM/wUcyFTZR8s0fSCZGPihYMBVdcKWou/mHN+Y2x1/QrIPBZcrohG9DgEyAElqCC1q+wxzDm0T5Kg5PeemMb4Q45ThXgrFxL3pnbfY95+ALH4QwN1fwg135p9dfTe8WaK2IV0PPbSKBvN9FePoHNPIbcVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=S/b2f6n+; arc=none smtp.client-ip=209.85.167.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sdhn.cc header.i=@sdhn.cc header.b="YspsSGhp"
-Received: from outbound.pv.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-west-1a-60-percent-8 (Postfix) with ESMTPS id DD751180015C;
-	Thu, 16 Apr 2026 21:01:04 +0000 (UTC)
-X-ICL-Out-Info: HUtFAUMHWwJACUgBTUQeDx5WFlZNRAJCTQtWC1UZWgNHF04KTVIPDx1WOEAJXwUcE1pYVQkKBl0wShxbAxkIUVBLGw5cAktaFVUXDgJCH1AfTBZXQ0cdHBlaFFwYU0VRH1RYQxlFVmlBC08dXRlbHEJkWFcJChhWGFdWUA4XBlsUBEReClgNShsKGVZYXAJCGEAKWRsBH1YWSBlCHVUMXxYNAkQdWF5ACgoKWBpRAVdDTQlfCndYUAVUDF8bUxhIHVRGExlOG1dNWg1AGVgGbRRWFVIEWQ==
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sdhn.cc; s=sig1; t=1776373266; x=1778965266; bh=eSLfBHVnOmnvJiODw4DmKmxzVKTcd81Fo471+gKsY3o=; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:x-icloud-hme; b=YspsSGhplRVCVy55Iv16icjwEQF4HLgfHM5l7wOJi4SHHh2Aq58FcbQEvzzLW6CRaEjWWYijlfiEhSnzd7bTvdHFx8264I/5fmKte8M+miRUE3Nh9D6R1G2srSRYbDui7zeMgy9XwBFa5WYkI+gdI4d6lJf3iO4B2omUuJW6JdkQzn4URfQlDs3t4KGOVyZYmpZUQzPlWElA9bHeAXw3OB340DcFBNhMDxI0cOU2L7clWeTVn+dpw2X+DjRt+2dq5sw2bB5WmnmI+H2ypcH/Azflwiox9SAMtroPZQAO4MI+FpfbXEHbyAmXxfT6LPiMkOBcRusHD13hNlhOPHSz1Q==
-mail-alias-created-date: 1772007648188
-Received: from sdhn.cc (unknown [17.56.9.36])
-	by p00-icloudmta-asmtp-us-west-1a-60-percent-8 (Postfix) with ESMTPSA id BB0D51800158;
-	Thu, 16 Apr 2026 21:01:00 +0000 (UTC)
-Date: Fri, 17 Apr 2026 00:00:58 +0300
-From: Mohamad Alsadhan <mo@sdhn.cc>
-To: Yoann Congal <yoann.congal@smile.fr>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, 
-	Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	=?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org
-Subject: Re: [PATCH v6] kbuild: host: use single executable for rustc -C
- linker
-Message-ID: <mgofxk3ae5kiphyrjv6tdfqaqpbgmf4zwpo5rz3rkwfje3tqlg@3bumtlvdszmm>
-References: <20260331000802.380-1-mo@sdhn.cc>
- <DHHL2VVCVYHU.5RMX7GJ73MDR@smile.fr>
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="S/b2f6n+"
+Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-467e8aaa865so22164b6e.2
+        for <linux-kbuild@vger.kernel.org>; Thu, 16 Apr 2026 14:15:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linuxfoundation.org; s=google; t=1776374132; x=1776978932; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fHMQmXQQ5iVP4ZwbqUQmktHmPMGw34HfaBhpS2wli1c=;
+        b=S/b2f6n+sQyL0NMCCzf4/LH+xamwDbL0YP/5Oyob73C1FpVTmAuCfQ8aqILmhbkPMt
+         2j7DJpX1VaUkFCUkaEhnUbOAvrPGfEGav50CF4XVcft3k0QM3jln1kYa9/rhwwSHOAX0
+         b6QRbWchb5s5Usu5rLPwh2j8E2bjFjC4zkdyo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776374132; x=1776978932;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fHMQmXQQ5iVP4ZwbqUQmktHmPMGw34HfaBhpS2wli1c=;
+        b=sYomEC35RDpSbOxvDvVILJApLVTzkqPGadtAltF2XA3gRHJv4lcyzkk96ngYKiPIaF
+         pZvyi5s5i234m4cWl8VGDrQONNeX0sh8p9VSk7WtJwdo+CalNRXv1a+Fa9Qy3lWKOYTc
+         4yFPu4r3e79Jf052w17orq/PZt6+eGU8x5/jeDywMxiBgmXy0Fu0ZH0E1iBF7B6gF6Sa
+         YxfhfdiLYITGE5FyO2NXr1sHMWgMcb9AVf9SiOzta5N3walQGJPQ9U34JlSUZ8xWlpFo
+         RY7QoDickKS+ioOLegQBlbtu4VaaTByBQI8dhsGTzBKs7ttU4lMM7DGl40aOFX35mUVs
+         V49w==
+X-Forwarded-Encrypted: i=1; AFNElJ+7nS9cFkzBAUXrYO0zZoEIMvbHQ17KVXoPAqYhHo9XZzUu7oVJJxsiwSOG8oO5zdbdgznJeyRAyO5zCJo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxzN5cnoLColFc3aI1M3Zgnu8FVF22scNcR7FeqdeAvP9xrPFmn
+	FAT39Vrq2q6TBVtEy0/S/LWvljV4BiYG6rcKrQ0SrJ8xczKdW1Is3x8Ms5oyp/CcCzA=
+X-Gm-Gg: AeBDiesSLtLKQJNElIBQKMW7vWw6LnwKN+uRzPAuvIMuNqYqMgqEJ+NXAjljCOwo6oG
+	80EA18TOkMatryjWMt4Uq+CeO+03O1RFTrN8Tuj6VvvUevKkYNkF8fHn//CpAuQ7bbcWxyNKQU1
+	YRL7nsjxAnVE8fd2uQTYMC4Ugp0SW3WwAeGZ7O9kTxHSwAAfseHEL1w7uXV6wMaX3pa52gi1hU7
+	ngtjca6VLdSfy+SI3eXBdy7Yqqy+4DcTDS5cDbEBzgcMzWBHiA7Xw2Q1JImJS7C1fUzvqcuA1vL
+	jIWS8YQbPNdmGlP5Inwkej6mMBl92wVhRHtuSnenX/OdKbXlnKB8FBIiGpj60sr7AGGUDk6WD3C
+	ZE05YDv9MIrRCFmoyQ+hP2ISiXMh88KOgLzEdoZp9ELuJGC2g5r0laEKi/hZ3MKIIMe0vSizJBF
+	lIX+u9aDXL22jK8dEsxxV3Un0UUF5kyowLu9JEjixDAg==
+X-Received: by 2002:a05:6808:180b:b0:467:bfa:bd9b with SMTP id 5614622812f47-4799a233197mr375962b6e.21.1776374132495;
+        Thu, 16 Apr 2026 14:15:32 -0700 (PDT)
+Received: from [192.168.1.14] ([38.15.57.99])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-47997dbaa4bsm771993b6e.5.2026.04.16.14.15.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Apr 2026 14:15:31 -0700 (PDT)
+Message-ID: <0420ebf1-2598-4f4f-bd09-95774156b48b@linuxfoundation.org>
+Date: Thu, 16 Apr 2026 15:15:30 -0600
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DHHL2VVCVYHU.5RMX7GJ73MDR@smile.fr>
-X-Proofpoint-GUID: 44JzuJBtJ42ID8ny4_slM3_ioBctoLOP
-X-Proofpoint-ORIG-GUID: 44JzuJBtJ42ID8ny4_slM3_ioBctoLOP
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDE2MDE5OSBTYWx0ZWRfX6eUQMZce1hBa
- PuNgNHWAEU30Z4kmyR9Ar4bCE/qeRmQjfPRgSLdxjKqbNsBxLOFJGwl8TKjLl5tPoRheJBhMRiL
- kNW6efvI/T1xGUmpozxqvic2XFfE3vZKZdpZd5B3a6MrzswsJ+QUWhwEpqlgeYGR+pvL+ilSy33
- va2GUFSVNqAxodpAijsEdvC0c8cUTbNAfSUt6BLTZbsPkZLRAbE3wag8oyU+c9Rk7rg2MvcgLV5
- IFnLa0pU9wPgsFM298vrAFvs5sDGvJMM1WLJRLPx3wCsWFIfiHV576wt3gM7YqLhMflZE5WXOyf
- zATxcALllSnv8Pfws/5OhLyMkYo6/bPB32ejXmvY8PnRGh2KyXxpTHCGV5x7Do=
-X-Authority-Info-Out: v=2.4 cv=Wv4m8Nfv c=1 sm=1 tr=0 ts=69e14e11
- cx=c_apl:c_pps:t_out a=azHRBMxVc17uSn+fyuI/eg==:117
- a=azHRBMxVc17uSn+fyuI/eg==:17 a=kj9zAlcOel0A:10 a=MKtGQD3n3ToA:10
- a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22 a=Z1zVT0qw5tCvtpFs8WsA:9
- a=CjuIK1q_8ugA:10
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 5/6] selftests: Preserve subtarget failures in all/install
+To: Mark Brown <broonie@kernel.org>
+Cc: =?UTF-8?Q?Ricardo_B=2E_Marli=C3=A8re?= <rbm@suse.com>,
+ torvalds@linux-foundation.org, Shuah Khan <shuah@kernel.org>,
+ Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kbuild@vger.kernel.org, Aishwarya.TCV@arm.com,
+ ben.copeland@linaro.org, kernelci@lists.linux.dev,
+ Shuah Khan <skhan@linuxfoundation.org>
+References: <20260320-selftests-fixes-v1-0-79144f76be01@suse.com>
+ <20260320-selftests-fixes-v1-5-79144f76be01@suse.com>
+ <ad-ZdjzQZXNgkpwv@sirena.co.uk>
+ <3cdf8e79-7c59-4831-9b38-e9c2cef97fe1@linuxfoundation.org>
+ <ad-8BIkw_ijCLqcF@sirena.co.uk>
+ <e4b82973-7d9e-454d-8f69-6d2a1a8ec7dc@sirena.org.uk>
+ <c834846c-96d5-405c-97d9-f182b8fe1569@linuxfoundation.org>
+ <a73aa838-d194-4867-86fb-42bc8d057fd9@sirena.org.uk>
+ <9c9f9851-5962-4281-9f34-a1f2e012b13e@linuxfoundation.org>
+Content-Language: en-US
+From: Shuah Khan <skhan@linuxfoundation.org>
+In-Reply-To: <9c9f9851-5962-4281-9f34-a1f2e012b13e@linuxfoundation.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Apologies for getting back to you late, I was busy with other things
-and I wanted to double-check things before replying.
-
-On 26/04/01 07:53am, Yoann Congal wrote:
+On 4/16/26 09:21, Shuah Khan wrote:
+> On 4/16/26 09:15, Mark Brown wrote:
+>> On Thu, Apr 16, 2026 at 09:08:17AM -0600, Shuah Khan wrote:
+>>> On 4/16/26 07:16, Mark Brown wrote:
+>>
+>>>> Sending shortly, FWIW I'm also seeing a buch of issues with:
+>>
+>>>> ./run_kselftest.sh: 5: ./kselftest/runner.sh: Bad substitution
+>>>> ./run_kselftest.sh: 5: .: cannot open ./ktap_helpers.sh: No such file
+>>
+>>> I will take a look and isolate the two commits that changes
+>>> run_kselftest.sh - sorry for the trouble with CI this time
+>>> around.
+>>
+>> Pretty sure it's 2964f6b816c2 (selftests: Use ktap helpers for
+>> runner.sh) - I've just put together a fix for that one, will throw it at
+>> my testing and send it later today all being well.  It uses readlink -e
+>> which isn't implemented by busybox.
 > 
-> Does using "scripts/" without a $(obj)/$(srctree)/... prefix always works?
-> I know I've suggested this as a quick fix. But I did not think about it
-> a lot.
+> Yes 2964f6b816c2 is my first suspect with ktap_helpers.sh no such file.
+> Thank you for fixing this. That way we can patch it and not revert it.
 > 
 
-You're in fact correct, it's not always correct. Thanks for pointing
-it out :)
+Just a quick note to say I applied all 3 patches and will send pr tomorrow.
 
-I assumed it was fine since the top-level build runs the scripts pass
-before rust/, and existing Kbuild commands commonly refer to generated
-tools under scripts/ using paths relative to the object tree.
-
-That misses some cases:
-
-- On e.g. ARM64 with `CONFIG_RUST_KERNEL_DOCTESTS=n`, no Rust hostprog
-  may be built in `scripts/`, so `scripts/rustc-wrapper` may never be
-  generated before `rust/Makefile` needs it.
-
-- `scripts/Makefile.host` is also used outside `scripts/`. For example,
-  `samples/rust/hostprogs/` generates
-  `samples/rust/hostprogs/rustc-wrapper`, but the hardcoded path
-   made rustc look for `scripts/rustc-wrapper`.
-
-A v7 patch is on the way that should fix this issue, by always
-generating `scripts/rustc-wrapper` for `CONFIG_RUST=y` and using
-`$(obj)/rustc-wrapper` for generic host Rust builds (+ some little
-hardening and cleaning).
-
-Best regards,
-Mo
+thanks,
+-- Shuah
