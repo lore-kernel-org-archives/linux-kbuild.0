@@ -1,63 +1,63 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89FD335C185
-	for <linux-kbuild@vger.kernel.org>; Sun, 19 Apr 2026 14:06:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7DC337E2FC
+	for <linux-kbuild@vger.kernel.org>; Sun, 19 Apr 2026 14:06:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776607579; cv=none; b=BY8BRBTMJIx7IjWAowNQuLfe4rFI3jNjhzubsUBm6mZRP5bz9Cy4vVozCAK5z32sNLycQG01Mn66R+wlLkqOewW3TGLOphhUecYZwVFQqoKRpfxZcEQHYwIyyUKAJQbNMvZidwWEMLy4gkml3Y1odDHMHyNhrEgpsqEn01eeRAY=
+	t=1776607583; cv=none; b=cnR6fdw/01Sr7clO595S4OM3NvG9/u8j+2LKcqRyqGtOchX0NK82aumvOqTGSyvlOiwkJrmfn1+aJip8Sq/Zo+EBS6dBc1gT173L/Wr8CF4HIX6ToSsnq9DCoIq754d37kgKQvGVpNBX/fwiK73UTIsAQdTHWuaD83pzWnY3s0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776607579; c=relaxed/simple;
-	bh=6GSGT8vDPiYQI4YGHLluie648X2Cni+IOPr/N/E3cXA=;
+	s=arc-20240116; t=1776607583; c=relaxed/simple;
+	bh=3WWp9rUozTrqD9jYJJIxf3iZIrIrmP3btVTinVMXXjs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lz59tWegtnMxdE3iA+Axq+XFnjzRJZq8sB+NTHSZZHv3T3p/6ha+d27Lh4Mh8TodVWRjAFyREenaypLqrAQXzOXynX+lwp3al/VnWGTWMfPH9rjHcAKtrTGYJ7vcWJGeyaNJGYKimhu9CHd0i+iZm8DFexh+yK5QpF2lcXZPbZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S+wifKV2; arc=none smtp.client-ip=209.85.216.41
+	 MIME-Version; b=JIygIH9mrhMnyjQk1f3AjxaCeQs+f7isULDY0Ogup9A6tJc4X55v014ecGtaXHYhXm+osqnancQ07TuvfBaozGGLkXJkHFJs4DlDOOjtd9U92W/VYUd3p6dBNb42ubSuexWH3YjNQds4JNLlTXP5x7sQF5TzPpwyewCESJU1OIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J+xnDSv+; arc=none smtp.client-ip=209.85.216.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S+wifKV2"
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-356337f058aso1351238a91.2
-        for <linux-kbuild@vger.kernel.org>; Sun, 19 Apr 2026 07:06:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J+xnDSv+"
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-356337f058aso1351262a91.2
+        for <linux-kbuild@vger.kernel.org>; Sun, 19 Apr 2026 07:06:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776607578; x=1777212378; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1776607581; x=1777212381; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0MAzEojvrGMWtL4vp0RLBqclc7WFfe3ybUbm3n1AbJ0=;
-        b=S+wifKV2ocGrbF//7oJUX8XtbvZxx+YH/TjDfTDx3jpnwTHln41BITOaycAUKXCqgJ
-         OMwAN1vN34i2CttY5WoWULqeuIQy4A9JtCaK0gFuW/O6awKA9Cghwv9v5DUAPKtpkLll
-         VN3RS1B5e11O4T/D+oAxh5oFgETCgd3NKB42+J+1vvcjSWnjeXWtkjHpXkjoEwQztbxn
-         blgoVh9296avlWaFst+pCaC/p7wrqT33VETAopPQGWaQO0v0HNsz50y5v+30Y9jXohqg
-         iKDbhwHOpYkKODT92Vl6e1kisN1NW7Vt+ZMsDGJDRKcmTc/kSlpVyREVVkYfD2DcFTZs
-         kcJg==
+        bh=au3wY7wHMTJZKx13iEN8EAIoe19OdnlK/RWrodbzRlg=;
+        b=J+xnDSv+u78mVhjouID8LyShxnk7yOdGHPy/vsXV0tS4t6S2DgPFdA2qYYi9tT/kUd
+         7V56H12W4WTpoKwO6QVSOvWfWhIcRjnaIRg8KSiXEJL3PYNICnrm7UwO37K9vY9aDhb0
+         kQXZqSXfqHck0CheFLhnTUaXCc0vy1kuBXNDHtjic+9UdeAlFL3/6fE5u2JwSJV4OEIZ
+         5e9NVY6sIQ90KKpZPmBUj/shW5iaiYSX0ixYxskYV8MkZnSmJlle6b7Nu7uY0uPJG7wl
+         WPEudXqWW2912nkL14wbt4xpfE3cVNHoNCrpI/EkAhMIwLv67wKbd7/BjvjbHQS3jUVs
+         EwJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776607578; x=1777212378;
+        d=1e100.net; s=20251104; t=1776607581; x=1777212381;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=0MAzEojvrGMWtL4vp0RLBqclc7WFfe3ybUbm3n1AbJ0=;
-        b=FiYaOzMdpBtcsrddqYmO1rKIqCvHsv6Z5J++lA5oTEeaQO9091T8LHmEtS/sPboe45
-         ZAot5I1wDHJBtPEz866+xFP3lLcRg8ZBbGRmByNtH0VKMVTKx0MMo7Ep3RF+VeXAKqWO
-         l9O2P6FnnYcs8cy/TANx3maMPVsHRCphNHzKhSAlraimJp7yTTBWD5NDK3yKDw8XSDo4
-         S0Lezkd+G9ayPlNl1M3Vpb9J57Jjgp/8Wbxx5IIEnb5Svi2GVPQ1UqHWeRIwfcIi/Xg8
-         aWf2JcrWBYfi/5l6+J/HDQHMW29VtFZ29Yufi6LEWNQjxON02wSlcdZSx416xrMC1Rle
-         wp/g==
-X-Forwarded-Encrypted: i=1; AFNElJ9jiUXIroxSslhe53o0nklT51cBMuNcU4Z6wTYbSUO3nkaGiRozqFy5EzloLTxyYteeTcsIkwdwNX+2ImQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8x7rTj4H1WXPk1AIPVSaOQmD7biMjS15E+LobwSAAJHuhpkr8
-	/xLeULldtJJ0e9kFvlGl/SqZM6NbLNLE0yE6Jl9sQdSnpWcJSf7Q8L6i
-X-Gm-Gg: AeBDies6nzCDTnWHYzMkoO5fFHXPLI0+l5lHU0WiptkCwblKhIJ145RXWuGx0Dhs09k
-	UCbunSxAzw0dvndjXyfScAkTZ+oDwIQ3hH48vjMbJJpcwDRzHflEPrCnYjmsXE1I8lchzNpmRi/
-	pjYsUnFCPvzn1F2nE+09I6uODaTVy0ryGq/JCeyBFsCblsZqIcc3r0gqi7O+K4/2BGHg2U4zYAP
-	gLexzEb0k5UlsBNtFMaG3j97tA9+LhYuwPOLtHATy44dYhbEmnznAVFh9L2xATwgXsCzFvUAfOX
-	3ZFlb7w0PuRVL/0oAddwgHO9D7BHeWaGTcgMkdSxYTrVgNOIsPzoPMvpOHeZ9vHZGpEonXSHlb/
-	b+mS0q5McjekuPAZr5aUGxyvpfHlTALQ1pK/uocxJlooQn48UpSnl3mmfwSqmFhDt1rZE2Dd3Za
-	zjbP8uCucm0LaGRdcWOngwwtnBClw2HruUkMrw
-X-Received: by 2002:a17:90b:5112:b0:35c:30a8:32a with SMTP id 98e67ed59e1d1-361403f4e8cmr9215960a91.9.1776607577877;
-        Sun, 19 Apr 2026 07:06:17 -0700 (PDT)
+        bh=au3wY7wHMTJZKx13iEN8EAIoe19OdnlK/RWrodbzRlg=;
+        b=X8WeKYn+XKqU40ROIjeChrsWR5+hwG1F5fXv8VGSirkkhq9sOGz33wHz773A4RGDKi
+         UYO10UH7XheYPL3QXHhCSaiG4My3DbBy5S7gHiHtlYf9tlqWOO2cojkJ0OLfK97yiuen
+         eBRa73sb4dkQQKnQdqTyCiHP46OEjIvwR562mqCUcbDm9Oj+0aVjg9wphSWITO6rVm7+
+         JJi+Z/KQubzk7iGbCYF6dpiBETVKYEUYVcDgR/tHMMjdVr4SmN13gBPSignOspWwu39n
+         5fm7rYq/K8mhIfcQNvpEYcEWBoWrS1kYKeO/VO9+kPkll78QlSzHUB1lU4TCwjgynFaf
+         Lp5A==
+X-Forwarded-Encrypted: i=1; AFNElJ/VOFL3zgkgqBlUB7dxFvROlKx2b4TV/QZSaovf6WPS8TWEVriyDazDfgkwslk2q59hMbqOmC7mo96mKJw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwyMpKplsnYS+Ig+JGOUpiN2PgK/C5pOqnooxUgOyjDoswmfG6j
+	M5r86a39NEhiqdE5u+zjch/IcT77R26h40hr7WZrnFDv47AIGGiHTcdN
+X-Gm-Gg: AeBDiesfdRBrk+dA5sLcYApm4GKPON3YMXy/ra0JG6BMcaSZJOovC+7crFrjfKfUYcl
+	2rZGfm1Fv5SMygc0zo37ChdVP8KjDtUwQ7NXE0qhV/K+/EvoE9zZ/Wp9Bxz755dZWteSE1GcMpc
+	n+zSrB7raswvpMigkfbQ0K19racxYCkrfEJIi3NPN9RtNvL5KzGL5EGJPm6VCTtxZBTtLqgokk6
+	Dip6lgKhDW6M8yzccEdxZcRAMlaObHw0PNyMukwO41FgBSTgX4lwKGIzBpq9aHY7c3IELUREV6I
+	5Pj/2DllluDT7In2lBTkrqd2XH3YxS45952djd+RizafLapYkU2ZBXUCqAswXwwXIxxJ3yMYKaT
+	yLrYBxY5S92svtvLvORLqX7iVXqilQRgcVUhxYPSn61+jtpRTNea/BG6VB71DC6OwIMQgvb3/I7
+	GP8BsUbcOmQio2hhsuD2gF117hOKJv3ZeGFiOB
+X-Received: by 2002:a17:90a:d09:b0:361:45df:102 with SMTP id 98e67ed59e1d1-36145df0c75mr5534160a91.17.1776607581141;
+        Sun, 19 Apr 2026 07:06:21 -0700 (PDT)
 Received: from misys ([58.120.241.145])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36141898ebasm7718121a91.7.2026.04.19.07.06.14
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36141898ebasm7718121a91.7.2026.04.19.07.06.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Apr 2026 07:06:17 -0700 (PDT)
+        Sun, 19 Apr 2026 07:06:20 -0700 (PDT)
 From: HeeSu Kim <mlksvender@gmail.com>
 To: miguel.ojeda.sandonis@gmail.com
 Cc: a.hindborg@kernel.org,
@@ -77,12 +77,12 @@ Cc: a.hindborg@kernel.org,
 	rust-for-linux@vger.kernel.org,
 	stable@vger.kernel.org,
 	tmgross@umich.edu
-Subject: [PATCH v6 0/2] rust: Makefile: bound rustdoc workaround to affected versions
-Date: Sun, 19 Apr 2026 23:06:11 +0900
-Message-ID: <cover.1776607331.git.mlksvender@gmail.com>
+Subject: [PATCH v6 1/2] kbuild: add rustc-lt-version macro
+Date: Sun, 19 Apr 2026 23:06:12 +0900
+Message-ID: <498f49f1c0b34535309f9dedf87ac4de8e7c132b.1776607331.git.mlksvender@gmail.com>
 X-Mailer: git-send-email 2.52.0
-In-Reply-To: <CANiq72nnuKJaKrxrut6+noR13PUiSoWWyyp-pGx-fe_2O6ayFA@mail.gmail.com>
-References: <CANiq72nnuKJaKrxrut6+noR13PUiSoWWyyp-pGx-fe_2O6ayFA@mail.gmail.com>
+In-Reply-To: <cover.1776607331.git.mlksvender@gmail.com>
+References: <cover.1776607331.git.mlksvender@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -90,53 +90,50 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Message-ID: <20260419140611.MNRDDx-MquqrXOCfyIxnilRgBh_JE8sZaFPvSNqmkLk@z>
+Message-ID: <20260419140612.5zAiR8Y4GTRAhfiOUcADEsCnh-P3LnS-QuLurhKUGpA@z>
 
-This series bounds the `-Cunsafe-allow-abi-mismatch=fixed-x18` workaround
-in `rust/Makefile` to the compiler versions that are actually affected by
-the rustdoc (#144521, fixed in 1.90.0) and doctests (#146465, fixed in
-1.92.0) target-modifier bugs, so that ABI compatibility checks run again
-on newer toolchains.
+Add `rustc-lt-version` macro to `scripts/Makefile.compiler` for version
+upper bound checks, mirroring the existing `rustc-min-version`.
 
-Changes since v5 [1] [2]:
- - Patch 1/2 is v5 1/2 renamed from `rustc-max-version` to
-   `rustc-lt-version` per Miguel's plan to rename on apply [3] and to
-   avoid the `99` form. Nathan's [4] and Nicolas' [5] Acked-bys from
-   v5 1/2 are carried over as Miguel indicated they would be preserved
-   through the rename.
- - Patch 2/2 reworks v5 2/2 to fix the doctests case that Miguel
-   pointed out [6]: the v5 form reused `$(rustdoc_modifiers_workaround)`
-   as a prefix, so on rustc >= 1.91 the doctests variable expanded to
-   a stray `,sanitizer`. Use Miguel's suggested explicit
-   `ifeq`/`else ifeq` layout with `rustc-min-version` +
-   `rustc-lt-version` combined inline, so each affected range is
-   visible on its own line.
+Use a non-inclusive (less-than) comparison so that callers can express
+clean version boundaries such as `109000` (Rust 1.90.0) rather than
+`108999`, which is also easier to remove once the toolchain minimum
+version is bumped past the bound.
 
-The `rustc-version-range` macro Miguel mentioned as an "improvement on
-top" [3] is intentionally left out of this series; I will send it as a
-separate follow-up patch once this lands, as Miguel suggested.
+This will be used to bound workarounds to specific compiler version
+ranges.
 
-Tested by building `make rustdoc` and `make rusttest` on rustc 1.93.0:
-both succeed with the workaround disabled (empty expansion), confirming
-the bugs really are fixed in 1.92+ and no regressions are introduced.
-Macro expansion was also spot-checked across simulated rustc versions
-1.87 through 1.93 to verify each range matches the expected flag value.
+Originally posted as `rustc-max-version` in v5 [1]; renamed to
+`rustc-lt-version` on this respin per Miguel's direction to simplify
+the delta and avoid the `99` form [2].
 
 [1] https://lore.kernel.org/rust-for-linux/20260205131522.2942928-1-mlksvender@gmail.com/
-[2] https://lore.kernel.org/rust-for-linux/20260205131815.2943152-2-mlksvender@gmail.com/
-[3] https://lore.kernel.org/rust-for-linux/CANiq72n-z0v_deUVPWeg1h0c6KQ+r6xfNDf72o29_0yy6KbqGA@mail.gmail.com/
-[4] https://lore.kernel.org/rust-for-linux/20260203221224.GA2703490@ax162/
-[5] https://lore.kernel.org/rust-for-linux/aYS9bRugxr1rUvA3@levanger/
-[6] https://lore.kernel.org/rust-for-linux/CANiq72nnuKJaKrxrut6+noR13PUiSoWWyyp-pGx-fe_2O6ayFA@mail.gmail.com/
+[2] https://lore.kernel.org/rust-for-linux/CANiq72n-z0v_deUVPWeg1h0c6KQ+r6xfNDf72o29_0yy6KbqGA@mail.gmail.com/
 
-HeeSu Kim (2):
-  kbuild: add rustc-lt-version macro
-  rust: Makefile: bound rustdoc workaround to affected versions
+Suggested-by: Miguel Ojeda <ojeda@kernel.org>
+Link: https://lore.kernel.org/rust-for-linux/CANiq72n39eU9WE=Yh0_yJzmqMxo=QAaU2pN0UqP9jZ7bT7rhgA@mail.gmail.com/
+Acked-by: Nathan Chancellor <nathan@kernel.org>
+Acked-by: Nicolas Schier <nsc@kernel.org>
+Signed-off-by: HeeSu Kim <mlksvender@gmail.com>
+---
+ scripts/Makefile.compiler | 4 ++++
+ 1 file changed, 4 insertions(+)
 
- rust/Makefile             | 18 ++++++++++++------
- scripts/Makefile.compiler |  4 ++++
- 2 files changed, 16 insertions(+), 6 deletions(-)
-
+diff --git a/scripts/Makefile.compiler b/scripts/Makefile.compiler
+index ef91910de265..fd039e228800 100644
+--- a/scripts/Makefile.compiler
++++ b/scripts/Makefile.compiler
+@@ -71,6 +71,10 @@ clang-min-version = $(call test-ge, $(CONFIG_CLANG_VERSION), $1)
+ # Usage: rustc-$(call rustc-min-version, 108500) += -Cfoo
+ rustc-min-version = $(call test-ge, $(CONFIG_RUSTC_VERSION), $1)
+ 
++# rustc-lt-version
++# Usage: rustc-$(call rustc-lt-version, 109000) += -Cfoo
++rustc-lt-version = $(if $(call rustc-min-version,$1),,y)
++
+ # ld-option
+ # Usage: KBUILD_LDFLAGS += $(call ld-option, -X, -Y)
+ ld-option = $(call try-run, $(LD) $(KBUILD_LDFLAGS) $(1) -v,$(1),$(2),$(3))
 -- 
 2.52.0
 
