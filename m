@@ -1,135 +1,103 @@
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F5303A4511
-	for <linux-kbuild@vger.kernel.org>; Wed, 22 Apr 2026 18:30:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776882627; cv=pass; b=m7t734ME0NyekbuP7lKpTA7Tr1y8mfViMLqF3VqBNUeKwQiyfgOGlhX5uLoTe4dIlJ5Ce30aJYpfIb8qFew3U4Fz6yPjNinmWY7nJSkMf3hc6Bw0dyO/dWX7fBkFgK2Dq2kJwR0BR2frCf1KuEWgrrg9ATBG0PLjVFpCxAqFIJM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776882627; c=relaxed/simple;
-	bh=brFxvU4IGxAK8GOm2f9zW61WD0Rnnc69BRJA89xIkm4=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=kwZ6Ai9jzIOZLHMjNDyIRBalZdJGyp9xsjp65wV6dx6xsd19VFt5JyhCoa+tkYO2+bga8lfyGGNzEyOFTBbRUMazmDQpr+tlHTrU7GwWzn61as2a3+3srj2y7fLb3JfylHvemyl/uKVSSZLmuV8cs2flwjV53/NFGuBJs5A4VBQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HeeHKV8n; arc=pass smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1270367F2F;
+	Wed, 22 Apr 2026 20:05:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776888330; cv=none; b=KrXH6SzKFKEhueTW1wreUY952AIzOEGAgvgkuUgVOuC2PEPnJSiSXkZ4OeFhXH6ZMdo1mWXYQyVcLd6Y10fdpffRbRGjN82Unn5xATBV/aNWW8lQHZe/Wvd8cwBW1w7jd3fsSMfLZ/nGJ8GAYeCmdvaQ+uxnJn2/uB5t+LaUreo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776888330; c=relaxed/simple;
+	bh=hfRWP/pM9/Dhb7cq9eGorLzOjWJy4KbF7w3c2roLQZc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hxa4a4IWIlOM8xHUbhiZ+LtJw74vYbEgSTA0YaIPaybiJmsPWTYKS4Xax2+lMc+6c2u0zZD95CHO4PFgSNqpGJst5Lub2rotsY4nfEQABBuAgiy5j+d1YyOuxxd79nZ3OQtE5GM+bmcuaNQTxIE8YpSm53+QtsoHS1Ux9Tr4YbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XdP0AT8p; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HeeHKV8n"
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-ba6b39871a3so621475966b.0
-        for <linux-kbuild@vger.kernel.org>; Wed, 22 Apr 2026 11:30:26 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776882625; cv=none;
-        d=google.com; s=arc-20240605;
-        b=F5vOZPXqJh4aPccetKcxM7ffJLJun+HCgTyuhHlRqGqJ3RZOyA6SWkfJHKf7QcAomt
-         TPWMIcdpp4+JRoocvRgXyVgZULWQyLY2nGS0Vq69hjmXNOilgBGlJ8eGdlG4c8L5jqQg
-         SVPNueJac1S4DdIXmTwAtZfUDoeI7/kb2EAQkura7PXS8VTu/9hoGwBPMnKFW9k6Ha2I
-         kIgcXiXYFoL7xvTXGaRunLAiCvT36R+J3zXBckYxNbLizapDmPmroP1G3tnEvWoJvY21
-         RriKLtHnAaPD3pFhm8sE9AXmI/UN6i5YhYCgcGtXDncrK1D1lex8dJwVHgjGBARWqWop
-         RTeA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=ODjxza3t7xSvwwhG4TtHB183PsdDEfUIQcK2rH+NfOs=;
-        fh=yTH0h7X9/K8FnF4eIep9pU4hXWkkXgaz2ZUi2Bs9ecs=;
-        b=QHWzM1+Qcm/u87nf+kCgmdnrxlrwx/f+nHqfuh2UPqNMd4gHXnktqtsRDhU0jU7E6B
-         pvOxiXcVsk1tBLMAgI+iAkozKKuXPUTah1lrBvnE3WwbJB6/HQDMd3cu+pFE9T+BqGAW
-         QQCEDiHZhNWfRwz9jvblWARIBjTs9s192emFbzhwQpsrlExROhbMBIVaFf22b/dkSS6e
-         XWVjHqBf/6tT+IeOLqfWjhene3l5DW18E6VoojBudU30BgmmfF8cDJX9+QYsG8jn+5S1
-         FItR/a/OFFrCOf5N+nt27Jd0VI6uV9H6P0siikIZL/XD/z2HSpnGwJRdGVZPL3/KtWYe
-         3l+A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776882625; x=1777487425; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ODjxza3t7xSvwwhG4TtHB183PsdDEfUIQcK2rH+NfOs=;
-        b=HeeHKV8nZbt8nz2Eh0BjpL5XrsYjwwPEDYK8e4rn/s4PNvQj+qUlf5DraZ0LY/i1jK
-         iUgyT4uKyCxNix1SCfpGd1940ls3vZBCRRGiQRueXSmU9wUyfEmlsWZjj1VcYMUwGHeN
-         bBLPtVg2+6GzDHTXqbkQtLcFPvOCyWQHz4pQbbVNDMMsgZr2WiU40nzBvToreOQZx2Cr
-         dzSZSMZ+3mKSjZE3tCx0wNw7jSLAYn26D8df1GbwJFNXxGeynRbTziIVnFGqmXwe/vO9
-         Vu5DTJ4gSGWUrjdeRlE10A94v7dENkVLy47Uz3VHf3TgQj/BUpbIp5AEjrfdTReWs0Jw
-         gb1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776882625; x=1777487425;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ODjxza3t7xSvwwhG4TtHB183PsdDEfUIQcK2rH+NfOs=;
-        b=RNXo4QZ4emsXxKLwC502jD7B8tpgNMyM7FERZhPLVqMyz+pBTX2LlpJyMYK3dqBwoN
-         G8WUKg+5SjRrdf0O2TjCikEU5DzKCNn9IlXxkNRWAPrqElA/n2Vsnk0m3UMaA+ABf5xZ
-         f8yFjv/qxEwymL/dc2lgHlU8AOfpqS0rWaHgu7DcpD7nCLz4Q5Sy9NtK4grt29y2kV5P
-         O5+3Gb60sOmFKi2WCoMapQyUrmULGsC85YO78EGRRiP9deU4Wu5go59O0tN5FeSbULx9
-         SYdfR3D263GSbAMigZTi85rD+6p82abtWZnEcWnEzRSpX99HN1Y+6lRcX/8xJmcts/2w
-         ByhA==
-X-Gm-Message-State: AOJu0YyYaSNO9CX4IjarZtrMrL25KM8MT5VUajpI/zQFYZR7cUgjNYXg
-	haydOBI7kt9zA6hrTEI8e0vahTwQKAhYdo32RtlZur4nRqTaKWkhHrJ8ydnb4ihkFP9ekXsPdUy
-	z9Mjkm/W96YAi1uEko/ZDg4UBETs/Je4=
-X-Gm-Gg: AeBDiesqFd83Ok9kLWp5BhYHzR1j0/yPoc+yxCv8DUQriF5AdQuhBKPNwVEXSUw0TOR
-	DO2kX+mY+mIyUaN+jzKpNl+YC4w1Zd8Lq2elQzmRdJr+50rH7qiHU6HF4+tFF0rf9vex0oZMuxZ
-	1rXqNFN6H0o1P/HuthoTfryd0i4sYFhci449iprvXneL/McO/n66O1riHnE875RILs45hecjEe9
-	eD9eSrGuPQyWrU6op7gPyvi9Pu/4VT6lvReJrme9Ah5SK4hpIPs0F6jZqyBXS6k+IVBf2T3rzlL
-	bjv9ZbtbKAT0GJiJRb/h8TJrmUixz5kbc0VyVY+sO+A3IueBEp4YuFO7AxFh8N4=
-X-Received: by 2002:a17:907:968f:b0:ba6:4eea:c1e1 with SMTP id
- a640c23a62f3a-ba64eeaca99mr830428266b.17.1776882624536; Wed, 22 Apr 2026
- 11:30:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XdP0AT8p"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 180C5C19425;
+	Wed, 22 Apr 2026 20:05:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776888330;
+	bh=hfRWP/pM9/Dhb7cq9eGorLzOjWJy4KbF7w3c2roLQZc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XdP0AT8pMXKcL8WkY/jr8ZzwORKQ7jhMPA1xrlHgdahevjcDQLvX9eWI9KEtJtdHd
+	 va8pS6zLyr9mX61x/gulDsljwyJOWu1TlN6LGHlV1RBgKSzbps0cedWuQkkJeWVO7a
+	 zc3pRoZaXlqhUN3W6DG4ZGIAipq1TRJMHb3PnTLIz1UQZhqc3cEnlx967F1IRR/Jkz
+	 t5xi/p+GhKbWFLc/wHH8JniDhk3JsuVTS7Bu7K6VG7jxi6nw95X5WcQXDl40lXciWW
+	 4DPgpLhPUNkgh1TxrByxopDV8CMs7e5+FFrOUlpykWiezH2XETysiinHKQzN1QEzU/
+	 KXv+9Pj/s5Zmg==
+Date: Wed, 22 Apr 2026 13:05:26 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>
+Cc: Nicolas Schier <nsc@kernel.org>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>,
+	Miguel Ojeda <ojeda@kernel.org>, linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] kbuild: Never respect CONFIG_WERROR / W=e to fixdep
+Message-ID: <20260422200526.GA310618@ax162>
+References: <20260422-kbuild-scripts-basic-werror-v1-1-8c6912ff22e0@weissschuh.net>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Jill Ravaliya <jillravaliya@gmail.com>
-Date: Thu, 23 Apr 2026 00:00:12 +0530
-X-Gm-Features: AQROBzA02brXfbwemie5ZnZL5rzDR1hYjl5c-92v8lbdHzytNkerNa402Cmh-PA
-Message-ID: <CAHr0PbumU-Y4G9rmuffd3crfOpqgxvQii0cVEYFC_sdjjNEZRw@mail.gmail.com>
-Subject: [PATCH] kbuild: deb-pkg: propagate hook script failures in builddeb
-To: masahiroy@kernel.org
-Cc: linux-kbuild@vger.kernel.org, Nathan Chancellor <nathan@kernel.org>, nicolas@fjasle.eu
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260422-kbuild-scripts-basic-werror-v1-1-8c6912ff22e0@weissschuh.net>
 
-From 1d7c7d8bf70c3d2b2abbb5ead3c654978ead419a Mon Sep 17 00:00:00 2001
-From: jillravaliya <jillravaliya@gmail.com>
-Date: Wed, 22 Apr 2026 23:37:39 +0530
-Subject: [PATCH] kbuild: deb-pkg: propagate hook script failures in builddeb
+On Wed, Apr 22, 2026 at 05:10:27PM +0200, Thomas Weiﬂschuh wrote:
+> The fixdep hostprog may be built multiple times during a single build.
+> Once during the configuration phase and later during the regular phase.
+> As only the regular build phase respects CONFIG_WERROR / W=e, the
+> compiler flags might change between the phases, leading to rebuilds.
+> 
+> Example, the rebuilds will happen twice on each invocation of the build:
+> 
+>   $ make allyesconfig prepare
+>   make[1]: Entering directory '/tmp/deleteme'
+>     HOSTCC  scripts/basic/fixdep
+>   #
+>   # No change to .config
+>   #
+>     HOSTCC  scripts/basic/fixdep
+>     DESCEND objtool
+>     INSTALL libsubcmd_headers
+>   make[1]: Leaving directory '/tmp/deleteme'
+> 
+> Fix the compilation flags used for scripts/basic/ before
+> scripts/Makefile.warn is evaluated to stop CONFIG_WERROR / W=e
+> influencing the fixdep build to avoid the spurious rebuilds.
+> 
+> Fixes: 7ded7d37e5f5 ("scripts/Makefile.extrawarn: Respect CONFIG_WERROR / W=e for hostprogs")
+> Signed-off-by: Thomas Weiﬂschuh <linux@weissschuh.net>
 
-The 'builddeb' script generates maintainer scripts for Debian-based
-distributions. Currently, it invokes post-installation hooks via
-run-parts but unconditionally exits with code 0. This masks failures
-from downstream hooks (e.g., initramfs generation or DKMS).
+Reviewed-by: Nathan Chancellor <nathan@kernel.org>
 
-On systems with modular storage drivers (CONFIG_BLK_DEV_NVME=m), an
-unnoticed failure in an early hook can prevent the initrd from being
-correctly updated. This results in a successful package installation
-exit code despite a broken boot configuration, leading to a
-'VFS: unknown-block(0,0)' panic on reboot.
-
-This patch ensures that failures in 'run-parts' are correctly
-propagated, allowing the package manager to abort the installation
-upon hook failure.
-
-Signed-off-by: jillravaliya <jillravaliya@gmail.com>
-Link: https://bugs.launchpad.net/ubuntu/+source/systemd/+bug/2141741
----
- scripts/package/builddeb | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 3627ca227..6ea768f08 100755
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -98,7 +98,12 @@ install_maint_scripts () {
-  hookdirs="\$hookdirs \$dir/${script}.d"
-  done
-  hookdirs="\${hookdirs# }"
-- test -n "\$hookdirs" && run-parts --arg="${KERNELRELEASE}"
---arg="/${installed_image_path}" \$hookdirs
-+ if [ -n "\$hookdirs" ]; then
-+                    if ! run-parts --arg="\${KERNELRELEASE}"
---arg="/\${installed_image_path}" \$hookdirs; then
-+                         echo "E: Post-install hooks failed." >&2
-+                         exit 1
-+                    fi
-+                fi
-  exit 0
-  EOF
-  chmod 755 "${pdir}/DEBIAN/${script}"
--- 
-2.51.1
+> ---
+>  Makefile | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/Makefile b/Makefile
+> index 54e1ae602000..6c8a1b2e7c8a 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -657,6 +657,8 @@ export RCS_FIND_IGNORE := \( -name SCCS -o -name BitKeeper -o -name .svn -o    \
+>  
+>  # Basic helpers built in scripts/basic/
+>  PHONY += scripts_basic
+> +scripts_basic: KBUILD_HOSTCFLAGS := $(KBUILD_HOSTCFLAGS)
+> +scripts_basic: KBUILD_HOSTLDFLAGS := $(KBUILD_HOSTLDFLAGS)
+>  scripts_basic:
+>  	$(Q)$(MAKE) $(build)=scripts/basic
+>  
+> 
+> ---
+> base-commit: 6596a02b207886e9e00bb0161c7fd59fea53c081
+> change-id: 20260422-kbuild-scripts-basic-werror-f8f7bfc39cfc
+> 
+> Best regards,
+> --  
+> Thomas Weiﬂschuh <linux@weissschuh.net>
+> 
