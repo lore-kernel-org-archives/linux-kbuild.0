@@ -1,33 +1,32 @@
 Received: from relay.virtuozzo.com (relay.virtuozzo.com [130.117.225.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D87213E9F93;
-	Wed, 22 Apr 2026 13:07:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 415253E9F88;
+	Wed, 22 Apr 2026 13:07:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.117.225.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776863242; cv=none; b=LfQygPq3h3XnThR/KdfS0bd1cF/ZbYz58MWzHntTWMUHG6OeWI+x4sV1Q4Rw/BNbnDFbzAADCYbagtmgDL9BQTu98Oxn9xNjE0HTgAow+d0KQNShYItkURzE0WrL2wADB98Vu4zZHNnM67CkS65T/Dris+pYMpD48pk9QEegCIg=
+	t=1776863247; cv=none; b=SK9KW2V8iaIoF9nLQrW5LNrrKT0J7hra0WmSXwdBpa+VsSXeLJuv3I2lAK1bKEVSHTVwvOJlS4PWG201PzGO6YP2vXgdSJF5BqPt+ubcPbPrnVX3cCF7AORV/PPOAPugmTIdOQQIgIMpoLlCqrrd5h7blS+YUWeIS4WBjodnTbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776863242; c=relaxed/simple;
-	bh=/Z8LSG0HFpfexJuBdVnuvmnAlcJTQ74i5kzEek3kQW4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IGQvGhxoJ/iusHAL94kzs7aRxcoBEmhIwl6Wv/x4eE0urOUEpJrVrnsMMwT+aIBi9fIfZPwStlI0o1bL6dwq76UOTTkjoqRTz0rrHmnajNYKbcJPm5fs5cNvFmbrgAKyYNEeM9n8rtD7W8x4+Pl35eQwaCJkZlJ8jUWh1wqzYrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=kZszklg/; arc=none smtp.client-ip=130.117.225.111
+	s=arc-20240116; t=1776863247; c=relaxed/simple;
+	bh=evNR7J0pcfb6sn4T3R+aNvJ1eR6Fx606WeIXRBYH3KU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hGxkr3EM47/vrtHq26nhSTFvDCpT2t57FCLXEqx+X3yI6v9+Jl8I0YB9TBleCpGx1Hsx5ANtUE4JfpTieIzg5zdhcqTHQpG+BCHDET0Hcm9qHLMuvCVv5//8kTb2+R8869iETovdD6fUfKpiyNdsmubose1WmGPtz4Ijxi9i0HM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=NLFfrkjJ; arc=none smtp.client-ip=130.117.225.111
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=virtuozzo.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="kZszklg/"
+	dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="NLFfrkjJ"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=virtuozzo.com; s=relay; h=MIME-Version:Message-ID:Date:Subject:From:
-	Content-Type; bh=mO6gEj5gP5uWX1qVD+4zDL3jj6QWAq33DiIsMQzCVG4=; b=kZszklg/LyCY
-	VxS2k0g645CuMxTYNv+Y2RFRS6FZ75qVGmM41D3VWJNkyRmGy9fNY+NQ2IJtOL3sL3tyLiLQBMdAB
-	E46quvX5cW9jXADZjdGHjojQATbqYo7S5cefFiY1in5T6PdqOIRTZQdtWbFoZT21CWN8VcIkccDft
-	VTGxvm1OwJjrxnhJaox6N/LhCP494uo2loSc6qW4W6xCB6qc6js91AZRPd1eK+XvsOaotjiFxhAlV
-	HzT8Qxi8SXpLEsBpGoYVeWU5K+yTdTn+8PJ0GI8OXFzJjoPpckxHmrb5e2uqraw8r4Ui0IrsPb6X/
-	bRvFkFxf7E0nAM6qMq3LLw==;
+	Content-Type; bh=fOE3sgOQyp7VICH7tsJs57Cyi0la9YEcfBDY6IS2sk0=; b=NLFfrkjJwYzv
+	KGdyenMrFlE0rRsvDNgq6LJ7+SKt1Eqp2fPAllFxa8qqbNJXZ9Sz8DH9JChMAwHB/lmvbLYBnxzqc
+	kijJs5zPoL8xLvvTuGmBJzLXBwZQOuG4XSBCIqOXbc5CKxvMYKR6VQmsVWzdVA16tPD4bh9+ropQs
+	/qMMeb9OetGeucQ6z394l3QCg9fhiSel+zpGoEMjkhMrQDtlckmGcY8tmSjSxPr7+Ln/LZ6VW+GaG
+	afoPPt3hhsO+9/2bh5TupEoZ3xtJNx7S9ryWT6mbI5WjGAqNkvTDM9UKh1vrstInvJWnsw2XKoIPf
+	ECrIDmyjn1mS+E9d5cMo1w==;
 Received: from [130.117.225.5] (helo=finist-alma9.vzint.dev)
 	by relay.virtuozzo.com with esmtp (Exim 4.96)
 	(envelope-from <khorenko@virtuozzo.com>)
-	id 1wFX0G-00Efps-2U;
+	id 1wFX0G-00Efps-2I;
 	Wed, 22 Apr 2026 14:51:12 +0200
 From: Konstantin Khorenko <khorenko@virtuozzo.com>
 To: Peter Oberparleiter <oberpar@linux.ibm.com>,
@@ -43,12 +42,10 @@ Cc: Mikhail Zaslonko <zaslonko@linux.ibm.com>,
 	Konstantin Khorenko <khorenko@virtuozzo.com>,
 	Pavel Tikhomirov <ptikhomirov@virtuozzo.com>,
 	Vasileios Almpanis <vasileios.almpanis@virtuozzo.com>
-Subject: [PATCH v2] gcov: use atomic counter updates to fix concurrent access crashes
-Date: Wed, 22 Apr 2026 15:51:12 +0300
-Message-ID: <20260422125112.3583649-2-khorenko@virtuozzo.com>
+Subject: [PATCH v2 0/1] gcov: use -fprofile-update=prefer-atomic to fix concurrent access crashes
+Date: Wed, 22 Apr 2026 15:51:11 +0300
+Message-ID: <20260422125112.3583649-1-khorenko@virtuozzo.com>
 X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20260422125112.3583649-1-khorenko@virtuozzo.com>
-References: <20260422125112.3583649-1-khorenko@virtuozzo.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -57,16 +54,57 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-GCC's GCOV instrumentation can merge global branch counters with loop
-induction variables as an optimization.  In inflate_fast(), the inner
-copy loops get transformed so that the GCOV counter value is loaded
-multiple times to compute the loop base address, start index, and end
-bound.  Since GCOV counters are global (not per-CPU), concurrent
-execution on different CPUs causes the counter to change between loads,
-producing inconsistent values and out-of-bounds memory writes.
+This patch adds -fprofile-update=prefer-atomic to global CFLAGS_GCOV in
+the top-level Makefile to fix crashes caused by GCC merging GCOV
+counters with loop induction variables in concurrent code paths.
 
-The crash manifests during IPComp (IP Payload Compression) processing
-when inflate_fast() runs concurrently on multiple CPUs:
+Changes in v2
+-------------
+
+ - Use -fprofile-update=prefer-atomic instead of -fprofile-update=atomic
+   to avoid a "target does not support atomic profile update, single
+   mode is selected" warning emitted by GCC for every translation unit
+   on architectures that lack atomic profile update support (reported
+   by the kernel test robot on m68k-allmodconfig):
+
+     https://lore.kernel.org/all/202604111946.Erd3tguU-lkp@intel.com/
+
+   On architectures that do support atomic profile updates (x86_64,
+   arm64, s390, ...) behaviour is unchanged: GCC still emits atomic
+   instructions (e.g. lock addq) for GCOV counter updates, which is
+   exactly what prevents the counter/induction-variable merging and
+   the observed crash.  On architectures that do not support atomic
+   profile updates (m68k and other small/UP targets) GCC silently
+   falls back to the non-atomic 'single' mode, so behaviour there is
+   no worse than before this patch.
+
+ - No functional change on all previously tested architectures (see
+   Testing below).
+
+History
+-------
+
+v1 (per-subsystem gcov submission):
+  https://lore.kernel.org/lkml/20260402141831.1437357-1-khorenko@virtuozzo.com/T/#t
+
+This was originally posted as a zlib-only fix:
+  https://lore.kernel.org/lkml/20260330143256.306326-1-khorenko@virtuozzo.com/T/#t
+
+During review, it was suggested to apply the flag globally instead of
+per-subsystem, as it not only fixes the observed crash but makes GCOV
+coverage data more consistent overall.  A combined series was posted:
+  https://lore.kernel.org/lkml/20260401142020.1434243-1-khorenko@virtuozzo.com/T/#t
+
+That combined series was then split per subsystem as requested by
+reviewers; this is v2 of the gcov piece.
+
+The GCC bug report for the underlying compiler issue:
+  https://gcc.gnu.org/bugzilla/show_bug.cgi?id=124749
+
+The crash
+---------
+
+Observed during LTP IPComp stress testing on a GCOV-enabled kernel:
 
   BUG: unable to handle page fault for address: ffffd0a3c0902ffa
   RIP: inflate_fast+1431
@@ -78,48 +116,34 @@ when inflate_fast() runs concurrently on multiple CPUs:
    ipcomp_input [xfrm_ipcomp]
    xfrm_input
 
-At the crash point, the compiler generated three loads from the same
-global GCOV counter (__gcov0.inflate_fast+216) to compute base, start,
-and end for an indexed loop.  Another CPU modified the counter between
-loads, making the values inconsistent - the write went 3.4 MB past a
-65 KB buffer.
+GCC merged a global GCOV counter with the loop induction variable.
+Another CPU modified the counter between loads, causing a write 3.4 MB
+past a 65 KB buffer.  -fprofile-update=prefer-atomic forces atomic
+counter updates on supported targets and prevents this merging.
 
-Add -fprofile-update=prefer-atomic to CFLAGS_GCOV at the global level in
-the top-level Makefile. On architectures where the target supports
-atomic profile updates (x86_64, arm64, ...) GCC emits atomic
-instructions (e.g. lock addq) for GCOV counter updates instead of plain
-load/store, which prevents the compiler from merging counters with loop
-induction variables and fixes the observed concurrent-access crash.
+Testing
+-------
 
-On architectures that do not support atomic profile updates (m68k and
-other small/UP targets) GCC silently falls back to the non-atomic
-'single' mode, so behaviour there is no worse than before this patch.
+Build-tested with CONFIG_GCOV_PROFILE_ALL=y using GCC 11.4.1 and
+GCC 16.0.1 20260327 (experimental).
 
-Applying this globally rather than per-subsystem not only addresses the
-observed crash in zlib but makes GCOV coverage data more consistent
-overall, preventing similar issues in any kernel code path that may
-execute concurrently.
+Assembly-verified that -fprofile-update=prefer-atomic prevents
+counter-IV merging in inflate_fast() on both compiler versions (emits
+the same atomic lock addq sequence as plain -fprofile-update=atomic on
+x86_64).
 
-Signed-off-by: Konstantin Khorenko <khorenko@virtuozzo.com>
-Tested-by: Peter Oberparleiter <oberpar@linux.ibm.com>
-Reviewed-by: Peter Oberparleiter <oberpar@linux.ibm.com>
----
+Also tested by Peter Oberparleiter (on the v1 payload, which differs
+only in the 'prefer-' prefix on the GCC flag):
+
+Quote: "Successfully tested this series on s390 (except for patch 3
+which depends on x86) using GCC 15.2.0, GCC 10.1.0, and current Clang
+from git (20260401)."
+
+Konstantin Khorenko (1):
+  gcov: use atomic counter updates to fix concurrent access crashes
+
  Makefile | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Makefile b/Makefile
-index 54e1ae602000..402c640120ac 100644
---- a/Makefile
-+++ b/Makefile
-@@ -824,7 +824,7 @@ all: vmlinux
- 
- CFLAGS_GCOV	:= -fprofile-arcs -ftest-coverage
- ifdef CONFIG_CC_IS_GCC
--CFLAGS_GCOV	+= -fno-tree-loop-im
-+CFLAGS_GCOV	+= -fno-tree-loop-im -fprofile-update=prefer-atomic
- endif
- export CFLAGS_GCOV
- 
 -- 
 2.43.5
-
