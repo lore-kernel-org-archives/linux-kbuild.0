@@ -1,1095 +1,137 @@
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95A7F32B9B6;
-	Wed, 29 Apr 2026 14:21:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777472519; cv=none; b=RsxyZu+0Ir5C2Y9y16iUrb26vy41AvPR6O21dNN7gNFpPQhTAuAle8S+pqGJgUV+DRAdKUkKqN9wQ69xryK/oBz4HI54KnALGyBHmBlEFq1cYYMZga/+KHHx51MamEbVI6kfZPXvDXzOal9yBqZhMhywP3VtOFXad6ILrmLtdqM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777472519; c=relaxed/simple;
-	bh=28Q0SiyrrhL+SHF2mxJU9yecoqjBEhvzXU2ByJ5qRLI=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pbv0aikXLyj6NjigdROH4PjSH3BqaMayP58sPvWiu3FxD7xQtusQGxyKt+s68ioe69kgezufrmeHaIPcDz1+bFOGg30O99z3xcRshNZV0ittW89zCgdm9Mu0UNPQdtpjLQGuE9j3m8SHanQtVoMyJ9SmjQPShKBq+WGjgRkpur8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1wI5nK-000000002S5-3mLo;
-	Wed, 29 Apr 2026 14:21:43 +0000
-Date: Wed, 29 Apr 2026 15:21:39 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>,
-	Saravana Kannan <saravanak@kernel.org>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-	Tamir Duberstein <tamird@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Aleksander Jan Bajkowski <olek2@wp.pl>,
-	Test User <test@example.com>, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
-Subject: [PATCH v2 3/3] dt-bindings: add self-test fixtures for style checker
-Message-ID: <4b913d4e903c56ac479a4f3715159d63ea5cdcea.1777471439.git.daniel@makrotopia.org>
-References: <cover.1777471439.git.daniel@makrotopia.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6887E382F1D
+	for <linux-kbuild@vger.kernel.org>; Wed, 29 Apr 2026 16:43:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.171
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777481021; cv=pass; b=o11jptb+NsxOQslE7yFojDnxXgreeXQuBxpsdZYtFO6fM2NhTMP3qKRw/AjXUDgB99aBbt+RHY+EgWlGMeIpZxf0/hSydnKCeYBeM/aBcFto0nLMQyXyQY86yfP4FFPQeJmHtDuHfWee0m9VtfHJ4YPPVFKMldYhjbg8Ro5fjaI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777481021; c=relaxed/simple;
+	bh=MqSqhGjtNDbnEb2QTBR92Es5KtPX+3lXEjPCy9wPhoA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UdYXI77SoXyLuGyJccQyEO8CUyglOxZG/weJzhuRBliaawm+QGN+Dni/vNXkwLZT2mSb/9HHkBRKjCKQLsHZRrxjwKLUpthP44tJcwr05asOoFHAWhNQvGU7ubdzaCMzBAWKERgkVtAdbMalMUM6sOQZp1FRhAoSLgiYS3dor30=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z6XPu6rp; arc=pass smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z6XPu6rp"
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-50d864c23bdso806851cf.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 29 Apr 2026 09:43:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777481019; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Fw5q3VmmlKf/Hf1g7+X2wz3LZtWuB2VhEgzm7lMC2ytnZYDFRMTI1wVCWh18Opfu2u
+         y1fkOSsTZMviyk+9+P2XRI2ZxvxaPCyUnPifvFKmTWRyJApNgk5aC7Qlda1O8em0yJKX
+         gAse2KValTQyzfX8Id8KXjlfkK110Gt1fVUxGS6/uuSzOVXsxDrNVYU9XywSZz0CwDDD
+         NwUdVBWgKZcjvsVaibF7U/HztaZcPh8RVBDZuz6OkWdvZ6/gmBZiIdgN2pP6+Im3lNgn
+         7DhM93ty6MwRQ8XqeLVCPtSYPY851RHJc5+LsDeYNJvg3r9qS+Ca8MqdP+sq76FX+NNK
+         d73w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=imZEw5SCLY9qEQ69oWbenh4ppLOBEqp0hlK19phWzpc=;
+        fh=of7Qma3/cqSxBmPbVHU4nROPJgH0rsKx0uglYteFmTo=;
+        b=ChaH2dNH0dDiYFFAHQqv7myLu5HAHQ3J40E6RwMXw2Vb2na/2Pe9yGH0FyXdygpc+O
+         fULsOSQQFU4BFd3dma6/0EMTwQsVEj7o9wc6Ch+k85Lqg+A4X6u8mmrwL4NxbEYpFJY4
+         4OR/rU8kc5zTUjCDK9gou2a1X7e2LeqmlSXjWR4G1/IGEMK44HbJY6EMh3m+OJNu/kio
+         yLqo7dcb+G1xFSFkDg9T/xm0Ux8iO/mCaUk2j7u/aCx9Mp3Ez6XnNlFTj7D6+rCzZA7K
+         CmPEeGAPr9FeReq7eFMjj/AzTNEk4KFJdLwOw33og8KFLF6FiADcau/0r3E1jIJP21vQ
+         JAmg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777481019; x=1778085819; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=imZEw5SCLY9qEQ69oWbenh4ppLOBEqp0hlK19phWzpc=;
+        b=Z6XPu6rpkEKRzvJxn99dlqvnt2uE8V4iDCHr9VrgKifkNBfDU6RoDm4ZVAC2xQsVk7
+         rzeJwIlhVje96cN2+qAT0uDadXADykT3COvJJYr5R5CJB4Yv9gP/2zrpwR0YhcQ4+/Qi
+         UfxlVy6n3N6FFzOvb5qweFE6JDL5RIXebJIe3NkpkunHeg/Kwf0IsYcXmbAkhFfpURw2
+         Nqx2zQQo64sNxxYB1WeKZArShSBT1mJPXGE3bLkGKcD2UtX7EoJpBVwEx/X6kuiu0/g0
+         bywjxEV+f0yAW+BD2LvA2O5jnD/G1RoU7bktd0/MbGgV9QF2eG8RbrqSfgIoo4geWopT
+         69eg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777481019; x=1778085819;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=imZEw5SCLY9qEQ69oWbenh4ppLOBEqp0hlK19phWzpc=;
+        b=en+3hl/zE+8JLbQErPBhoLxbs+2GGoDRmnKm+0G5O5JvaTDMH6WPUd6t1LHH275jkZ
+         rd+GvKjGmaPD1qePOiz0vbbwojqv6LRFrcRpHQ1ksEI1DqdM75uJfIJ26MSbVIhloOfa
+         KpqgBPfa7XvEWg2kH/+SWBsoO98T22QNWemS9p8LG5Vi7DhERKy5ctwKsEMoUGQUZ6km
+         9yy+GfsyVwi0/dS84il7jos4xTFMSqf2yJFqns2+qHGpohWtuMv4JuFL7MQfTQpyb8GB
+         H7oNaQL9tOW78ZD2Q6j08gY8e/O0fVDDPO4HDPyG0/HiqqgDPABkGGi2tWo6MFT1v867
+         sG6Q==
+X-Forwarded-Encrypted: i=1; AFNElJ8wTWIawcgZgWoTd0VwLSj3VHSiJAJQ91b3LS8jPPFr7jP9eFdNapI7rlzDwZjv2msgHzzsH+jP18vk2yQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhMjCeS14stDCv9BSdBX8J6V0lL7xSi5roQo1ChisFw17QG/dl
+	zzQHT8YdY7MvCuLGjaB4gtAxgBrXU+cnXYif1/jWO6smoof/j61f35VmraIUD4ZFlKGXoo0C5/8
+	loTGDKtDWrwqWg9KJymvam05C0C/q/MMeGOLRg2lI
+X-Gm-Gg: AeBDiesdBYqIOfvYhlAgez0PjcXvNazj1dF/Or2Iz0G/AzDVFAeKLo6+gd3XzcZ8Cqn
+	Og3iWas/7mllPCe/JGiYUKMWVkggUrm+MdwUgl/6u9qVVP2TeKVhg9h0keLMaen7oRAHqReYTNR
+	VyGmNGrVNJYf1Uwwzs/4U4EOv9zOu+D+3HlMld7SETvAIfImMsEekJAgz/VWllV6YX3uamCb2kK
+	fig+aXasMkVpZ+LQYF8k0cxFcQPOBGCBC+uAEIP0IkH1scB3SKY7LavV27LLpb6yP8/a3daQ3MD
+	UOzYR6boHaTqsTbJARgiWLEG3Ys9W6n8cS1KlavIE/MtGJDgA/jSbLP9/JY=
+X-Received: by 2002:a05:622a:1b12:b0:50b:8d3c:5bd7 with SMTP id
+ d75a77b69052e-5101a60b0aamr15133791cf.9.1777481018705; Wed, 29 Apr 2026
+ 09:43:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1777471439.git.daniel@makrotopia.org>
+References: <20260428-bump-minimum-supported-llvm-version-to-17-v1-0-81d9b2e8ee75@kernel.org>
+ <20260428-bump-minimum-supported-llvm-version-to-17-v1-6-81d9b2e8ee75@kernel.org>
+In-Reply-To: <20260428-bump-minimum-supported-llvm-version-to-17-v1-6-81d9b2e8ee75@kernel.org>
+From: Rong Xu <xur@google.com>
+Date: Wed, 29 Apr 2026 09:43:25 -0700
+X-Gm-Features: AVHnY4Ik3LqgaCUyRYx0CryX47pN-vmu9vi1p76k09ZWMtV3tzrvTc04VbRHK4M
+Message-ID: <CAF1bQ=Q9bZHBT13K7OzY9-QHHzm7D1ZZ3fM3M+-oVzdU+G4yhA@mail.gmail.com>
+Subject: Re: [PATCH 06/14] arch/Kconfig: Remove tautological condition from AUTOFDO_CLANG
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Nicolas Schier <nsc@kernel.org>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
+	linux-kbuild@vger.kernel.org, Han Shen <shenhan@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Provide good/ and bad/ DTS and YAML fixtures plus a small runner that
-feeds them to dt-check-style and diffs the output against expected
-text files. Wired into a new top-level dt_style_selftest make target
-so the suite can be exercised independently of the full tree.
+This looks good to me.
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
-Changes since v1:
- - new patch (Krzysztof: "would be happy to see at least a few test
-   cases for it")
+Reviewed-by: Rong Xu <xur@google.com>
 
- Makefile                                      |  6 ++
- .../dtc/dt-style-selftest/bad/dts-spaces.dts  | 13 ++++
- .../bad/yaml-child-addr-order.yaml            | 41 ++++++++++++
- .../bad/yaml-child-name-order.yaml            | 37 ++++++++++
- .../bad/yaml-cont-align.yaml                  | 30 +++++++++
- .../dt-style-selftest/bad/yaml-hex-case.yaml  | 29 ++++++++
- .../bad/yaml-indent-strict.yaml               | 29 ++++++++
- .../bad/yaml-line-length.yaml                 | 29 ++++++++
- .../bad/yaml-mixed-indent.yaml                | 29 ++++++++
- .../bad/yaml-node-close.yaml                  | 31 +++++++++
- .../bad/yaml-prop-order.yaml                  | 29 ++++++++
- .../bad/yaml-prop-pairing.yaml                | 33 +++++++++
- .../bad/yaml-required-blank.yaml              | 33 +++++++++
- .../dtc/dt-style-selftest/bad/yaml-tab.yaml   | 29 ++++++++
- .../bad/yaml-trailing-ws.yaml                 | 29 ++++++++
- .../dt-style-selftest/bad/yaml-unit-addr.yaml | 29 ++++++++
- .../bad/yaml-unused-label.yaml                | 29 ++++++++
- .../dt-style-selftest/bad/yaml-value-ws.yaml  | 29 ++++++++
- .../expected/dts-spaces.dts.txt               |  2 +
- .../expected/yaml-child-addr-order.yaml.txt   |  2 +
- .../expected/yaml-child-name-order.yaml.txt   |  2 +
- .../expected/yaml-cont-align.yaml.txt         |  2 +
- .../expected/yaml-hex-case.yaml.txt           |  2 +
- .../expected/yaml-indent-strict.yaml.txt      |  2 +
- .../expected/yaml-line-length.yaml.txt        |  2 +
- .../expected/yaml-mixed-indent.yaml.txt       |  3 +
- .../expected/yaml-node-close.yaml.txt         |  2 +
- .../expected/yaml-prop-order.yaml.txt         |  2 +
- .../expected/yaml-prop-pairing.yaml.txt       |  3 +
- .../expected/yaml-required-blank.yaml.txt     |  3 +
- .../expected/yaml-tab.yaml.txt                |  2 +
- .../expected/yaml-trailing-ws.yaml.txt        |  2 +
- .../expected/yaml-unit-addr.yaml.txt          |  2 +
- .../expected/yaml-unused-label.yaml.txt       |  2 +
- .../expected/yaml-value-ws.yaml.txt           |  2 +
- .../dtc/dt-style-selftest/good/dts-tab.dts    | 30 +++++++++
- .../dt-style-selftest/good/yaml-4space.yaml   | 41 ++++++++++++
- scripts/dtc/dt-style-selftest/run.sh          | 67 +++++++++++++++++++
- 38 files changed, 689 insertions(+)
- create mode 100644 scripts/dtc/dt-style-selftest/bad/dts-spaces.dts
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-child-addr-order.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-child-name-order.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-cont-align.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-hex-case.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-indent-strict.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-line-length.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-mixed-indent.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-node-close.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-prop-order.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-prop-pairing.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-required-blank.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-tab.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-trailing-ws.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-unit-addr.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-unused-label.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-value-ws.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/expected/dts-spaces.dts.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-child-addr-order.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-child-name-order.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-cont-align.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-hex-case.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-indent-strict.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-line-length.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-mixed-indent.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-node-close.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-prop-order.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-prop-pairing.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-required-blank.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-tab.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-trailing-ws.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-unit-addr.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-unused-label.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-value-ws.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/good/dts-tab.dts
- create mode 100644 scripts/dtc/dt-style-selftest/good/yaml-4space.yaml
- create mode 100755 scripts/dtc/dt-style-selftest/run.sh
+-Rong
 
-diff --git a/Makefile b/Makefile
-index e27c91ea56fc..c5513b573bbd 100644
---- a/Makefile
-+++ b/Makefile
-@@ -295,6 +295,7 @@ no-dot-config-targets := $(clean-targets) \
- 			 cscope gtags TAGS tags help% %docs check% coccicheck \
- 			 $(version_h) headers headers_% archheaders archscripts \
- 			 %asm-generic kernelversion %src-pkg dt_binding_check \
-+			 dt_style_selftest \
- 			 outputmakefile rustavailable rustfmt rustfmtcheck \
- 			 run-command
- no-sync-config-targets := $(no-dot-config-targets) %install modules_sign kernelrelease \
-@@ -1643,6 +1644,10 @@ PHONY += dt_compatible_check
- dt_compatible_check: dt_binding_schemas
- 	$(Q)$(MAKE) $(build)=$(dtbindingtree) $@
- 
-+PHONY += dt_style_selftest
-+dt_style_selftest:
-+	$(Q)$(srctree)/scripts/dtc/dt-style-selftest/run.sh
-+
- # ---------------------------------------------------------------------------
- # Modules
- 
-@@ -1845,6 +1850,7 @@ help:
- 		echo '  dtbs_install       - Install dtbs to $(INSTALL_DTBS_PATH)'; \
- 		echo '  dt_binding_check   - Validate device tree binding documents and examples'; \
- 		echo '  dt_binding_schemas - Build processed device tree binding schemas'; \
-+		echo '  dt_style_selftest  - Run dt-check-style fixture tests'; \
- 		echo '  dtbs_check         - Validate device tree source files';\
- 		echo '')
- 
-diff --git a/scripts/dtc/dt-style-selftest/bad/dts-spaces.dts b/scripts/dtc/dt-style-selftest/bad/dts-spaces.dts
-new file mode 100644
-index 000000000000..905a91824a50
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/bad/dts-spaces.dts
-@@ -0,0 +1,13 @@
-+/*
-+ * SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-+ *
-+ * Test fixture: a .dts using space indent (must use tabs).
-+ */
-+
-+/dts-v1/;
-+
-+/ {
-+    compatible = "example,test-board";
-+    #address-cells = <1>;
-+    #size-cells = <1>;
-+};
-diff --git a/scripts/dtc/dt-style-selftest/bad/yaml-child-addr-order.yaml b/scripts/dtc/dt-style-selftest/bad/yaml-child-addr-order.yaml
-new file mode 100644
-index 000000000000..3df56e69a1ff
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/bad/yaml-child-addr-order.yaml
-@@ -0,0 +1,41 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/test-bad-child-order.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Test fixture with addressed children out of order
-+
-+maintainers:
-+  - Test User <test@example.com>
-+
-+properties:
-+  compatible:
-+    const: example,test-child-order
-+  reg:
-+    maxItems: 1
-+
-+required:
-+  - compatible
-+  - reg
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    bus@10000 {
-+        compatible = "simple-bus";
-+        reg = <0x10000 0x1000>;
-+        #address-cells = <1>;
-+        #size-cells = <1>;
-+
-+        device@200 {
-+            compatible = "example,test-child-order";
-+            reg = <0x200 0x10>;
-+        };
-+
-+        device@100 {
-+            compatible = "example,test-child-order";
-+            reg = <0x100 0x10>;
-+        };
-+    };
-diff --git a/scripts/dtc/dt-style-selftest/bad/yaml-child-name-order.yaml b/scripts/dtc/dt-style-selftest/bad/yaml-child-name-order.yaml
-new file mode 100644
-index 000000000000..35d85e5573c2
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/bad/yaml-child-name-order.yaml
-@@ -0,0 +1,37 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/test-bad-child-name-order.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Test fixture with unaddressed children out of name order
-+
-+maintainers:
-+  - Test User <test@example.com>
-+
-+properties:
-+  compatible:
-+    const: example,test-child-name-order
-+  reg:
-+    maxItems: 1
-+
-+required:
-+  - compatible
-+  - reg
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    bus@10000 {
-+        compatible = "simple-bus";
-+        reg = <0x10000 0x1000>;
-+
-+        foo {
-+            label = "foo";
-+        };
-+
-+        bar {
-+            label = "bar";
-+        };
-+    };
-diff --git a/scripts/dtc/dt-style-selftest/bad/yaml-cont-align.yaml b/scripts/dtc/dt-style-selftest/bad/yaml-cont-align.yaml
-new file mode 100644
-index 000000000000..92778540b056
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/bad/yaml-cont-align.yaml
-@@ -0,0 +1,30 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/test-bad-cont-align.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Test fixture with mis-aligned multi-line property
-+
-+maintainers:
-+  - Test User <test@example.com>
-+
-+properties:
-+  compatible:
-+    const: example,test-cont-align
-+  reg:
-+    maxItems: 2
-+
-+required:
-+  - compatible
-+  - reg
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    foo@1000 {
-+        compatible = "example,test-cont-align";
-+        reg = <0x1000 0x100>,
-+            <0x2000 0x100>;
-+    };
-diff --git a/scripts/dtc/dt-style-selftest/bad/yaml-hex-case.yaml b/scripts/dtc/dt-style-selftest/bad/yaml-hex-case.yaml
-new file mode 100644
-index 000000000000..b26d1bf58de9
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/bad/yaml-hex-case.yaml
-@@ -0,0 +1,29 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/test-bad-hex-case.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Test fixture with uppercase hex literals
-+
-+maintainers:
-+  - Test User <test@example.com>
-+
-+properties:
-+  compatible:
-+    const: example,test-hex-case
-+  reg:
-+    maxItems: 1
-+
-+required:
-+  - compatible
-+  - reg
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    foo@1000 {
-+        compatible = "example,test-hex-case";
-+        reg = <0xABCD 0x100>;
-+    };
-diff --git a/scripts/dtc/dt-style-selftest/bad/yaml-indent-strict.yaml b/scripts/dtc/dt-style-selftest/bad/yaml-indent-strict.yaml
-new file mode 100644
-index 000000000000..bee4cf118d73
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/bad/yaml-indent-strict.yaml
-@@ -0,0 +1,29 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/test-bad-indent-strict.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Test fixture using 2-space indent (rejected by strict mode)
-+
-+maintainers:
-+  - Test User <test@example.com>
-+
-+properties:
-+  compatible:
-+    const: example,test-indent-strict
-+  reg:
-+    maxItems: 1
-+
-+required:
-+  - compatible
-+  - reg
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    device@1000 {
-+      compatible = "example,test-indent-strict";
-+      reg = <0x1000 0x100>;
-+    };
-diff --git a/scripts/dtc/dt-style-selftest/bad/yaml-line-length.yaml b/scripts/dtc/dt-style-selftest/bad/yaml-line-length.yaml
-new file mode 100644
-index 000000000000..64427bf1c385
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/bad/yaml-line-length.yaml
-@@ -0,0 +1,29 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/test-bad-line-length.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Test fixture exceeding 80 columns
-+
-+maintainers:
-+  - Test User <test@example.com>
-+
-+properties:
-+  compatible:
-+    const: example,test-line-length
-+  reg:
-+    maxItems: 1
-+
-+required:
-+  - compatible
-+  - reg
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    foo@1000 {
-+        compatible = "example,test-line-length-this-is-a-very-long-name-indeed-yeah";
-+        reg = <0x1000 0x100>;
-+    };
-diff --git a/scripts/dtc/dt-style-selftest/bad/yaml-mixed-indent.yaml b/scripts/dtc/dt-style-selftest/bad/yaml-mixed-indent.yaml
-new file mode 100644
-index 000000000000..5401d1a423a1
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/bad/yaml-mixed-indent.yaml
-@@ -0,0 +1,29 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/test-bad-mixed-indent.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Test fixture mixing tabs and spaces in indent
-+
-+maintainers:
-+  - Test User <test@example.com>
-+
-+properties:
-+  compatible:
-+    const: example,test-mixed
-+  reg:
-+    maxItems: 1
-+
-+required:
-+  - compatible
-+  - reg
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    device@1000 {
-+    	   compatible = "example,test-mixed";
-+        reg = <0x1000 0x100>;
-+    };
-diff --git a/scripts/dtc/dt-style-selftest/bad/yaml-node-close.yaml b/scripts/dtc/dt-style-selftest/bad/yaml-node-close.yaml
-new file mode 100644
-index 000000000000..e107659fd9e8
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/bad/yaml-node-close.yaml
-@@ -0,0 +1,31 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/test-bad-node-close.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Test fixture with closing brace not on its own line
-+
-+maintainers:
-+  - Test User <test@example.com>
-+
-+properties:
-+  compatible:
-+    const: example,test-node-close
-+  reg:
-+    maxItems: 1
-+
-+required:
-+  - compatible
-+  - reg
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    bus@10000 {
-+        compatible = "simple-bus";
-+        reg = <0x10000 0x1000>;
-+
-+        empty {};
-+    };
-diff --git a/scripts/dtc/dt-style-selftest/bad/yaml-prop-order.yaml b/scripts/dtc/dt-style-selftest/bad/yaml-prop-order.yaml
-new file mode 100644
-index 000000000000..75582a3d2f6e
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/bad/yaml-prop-order.yaml
-@@ -0,0 +1,29 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/test-bad-prop-order.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Test fixture with reg before compatible
-+
-+maintainers:
-+  - Test User <test@example.com>
-+
-+properties:
-+  compatible:
-+    const: example,test-prop-order
-+  reg:
-+    maxItems: 1
-+
-+required:
-+  - compatible
-+  - reg
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    device@1000 {
-+        reg = <0x1000 0x100>;
-+        compatible = "example,test-prop-order";
-+    };
-diff --git a/scripts/dtc/dt-style-selftest/bad/yaml-prop-pairing.yaml b/scripts/dtc/dt-style-selftest/bad/yaml-prop-pairing.yaml
-new file mode 100644
-index 000000000000..767ab21c39f3
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/bad/yaml-prop-pairing.yaml
-@@ -0,0 +1,33 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/test-bad-prop-pairing.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Test fixture exercising <x>-names and pinctrl-names pairing
-+
-+maintainers:
-+  - Test User <test@example.com>
-+
-+properties:
-+  compatible:
-+    const: example,test-prop-pairing
-+  reg:
-+    maxItems: 1
-+
-+required:
-+  - compatible
-+  - reg
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    foo@1000 {
-+        compatible = "example,test-prop-pairing";
-+        reg = <0x1000 0x100>;
-+        clock-names = "bus";
-+        clocks = <&clk 0>;
-+        pinctrl-names = "default";
-+        pinctrl-0 = <&p0>;
-+    };
-diff --git a/scripts/dtc/dt-style-selftest/bad/yaml-required-blank.yaml b/scripts/dtc/dt-style-selftest/bad/yaml-required-blank.yaml
-new file mode 100644
-index 000000000000..8bb53240cffa
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/bad/yaml-required-blank.yaml
-@@ -0,0 +1,33 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/test-bad-required-blank.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Test fixture missing required blank lines
-+
-+maintainers:
-+  - Test User <test@example.com>
-+
-+properties:
-+  compatible:
-+    const: example,test-required-blank
-+  reg:
-+    maxItems: 1
-+
-+required:
-+  - compatible
-+  - reg
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    bus@10000 {
-+        compatible = "simple-bus";
-+        reg = <0x10000 0x1000>;
-+        status = "okay";
-+        child@100 {
-+            reg = <0x100>;
-+        };
-+    };
-diff --git a/scripts/dtc/dt-style-selftest/bad/yaml-tab.yaml b/scripts/dtc/dt-style-selftest/bad/yaml-tab.yaml
-new file mode 100644
-index 000000000000..487d07ff8cb6
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/bad/yaml-tab.yaml
-@@ -0,0 +1,29 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/test-bad-tab.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Test fixture with a tab in a DTS line
-+
-+maintainers:
-+  - Test User <test@example.com>
-+
-+properties:
-+  compatible:
-+    const: example,test-tab
-+  reg:
-+    maxItems: 1
-+
-+required:
-+  - compatible
-+  - reg
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    device@1000 {
-+        compatible = "example,test-tab";
-+        reg = <0x1000 0x100>;	/* registers */
-+    };
-diff --git a/scripts/dtc/dt-style-selftest/bad/yaml-trailing-ws.yaml b/scripts/dtc/dt-style-selftest/bad/yaml-trailing-ws.yaml
-new file mode 100644
-index 000000000000..5c4b4bd833c5
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/bad/yaml-trailing-ws.yaml
-@@ -0,0 +1,29 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/test-bad-trailing.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Test fixture with trailing whitespace
-+
-+maintainers:
-+  - Test User <test@example.com>
-+
-+properties:
-+  compatible:
-+    const: example,test-trailing
-+  reg:
-+    maxItems: 1
-+
-+required:
-+  - compatible
-+  - reg
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    device@1000 {
-+        compatible = "example,test-trailing";
-+        reg = <0x1000 0x100>;
-+    };
-diff --git a/scripts/dtc/dt-style-selftest/bad/yaml-unit-addr.yaml b/scripts/dtc/dt-style-selftest/bad/yaml-unit-addr.yaml
-new file mode 100644
-index 000000000000..93705cd45410
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/bad/yaml-unit-addr.yaml
-@@ -0,0 +1,29 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/test-bad-unit-addr.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Test fixture with malformed unit address
-+
-+maintainers:
-+  - Test User <test@example.com>
-+
-+properties:
-+  compatible:
-+    const: example,test-unit-addr
-+  reg:
-+    maxItems: 1
-+
-+required:
-+  - compatible
-+  - reg
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    foo@01000 {
-+        compatible = "example,test-unit-addr";
-+        reg = <0x1000 0x100>;
-+    };
-diff --git a/scripts/dtc/dt-style-selftest/bad/yaml-unused-label.yaml b/scripts/dtc/dt-style-selftest/bad/yaml-unused-label.yaml
-new file mode 100644
-index 000000000000..28d7176cbf08
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/bad/yaml-unused-label.yaml
-@@ -0,0 +1,29 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/test-bad-unused-label.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Test fixture with an unused label
-+
-+maintainers:
-+  - Test User <test@example.com>
-+
-+properties:
-+  compatible:
-+    const: example,test-unused-label
-+  reg:
-+    maxItems: 1
-+
-+required:
-+  - compatible
-+  - reg
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    dev: device@1000 {
-+        compatible = "example,test-unused-label";
-+        reg = <0x1000 0x100>;
-+    };
-diff --git a/scripts/dtc/dt-style-selftest/bad/yaml-value-ws.yaml b/scripts/dtc/dt-style-selftest/bad/yaml-value-ws.yaml
-new file mode 100644
-index 000000000000..4360454d19a0
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/bad/yaml-value-ws.yaml
-@@ -0,0 +1,29 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/test-bad-value-ws.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Test fixture with extra whitespace inside <...>
-+
-+maintainers:
-+  - Test User <test@example.com>
-+
-+properties:
-+  compatible:
-+    const: example,test-value-ws
-+  reg:
-+    maxItems: 1
-+
-+required:
-+  - compatible
-+  - reg
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    foo@1000 {
-+        compatible = "example,test-value-ws";
-+        reg = <0x1000  0x100>;
-+    };
-diff --git a/scripts/dtc/dt-style-selftest/expected/dts-spaces.dts.txt b/scripts/dtc/dt-style-selftest/expected/dts-spaces.dts.txt
-new file mode 100644
-index 000000000000..2e7f9f6b8dce
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/expected/dts-spaces.dts.txt
-@@ -0,0 +1,2 @@
-+# mode=relaxed
-+bad/dts-spaces.dts:1: [indent-unit-dts] indent unit must be 1 tab in DTS, got '    '
-\ No newline at end of file
-diff --git a/scripts/dtc/dt-style-selftest/expected/yaml-child-addr-order.yaml.txt b/scripts/dtc/dt-style-selftest/expected/yaml-child-addr-order.yaml.txt
-new file mode 100644
-index 000000000000..bb56e8868c7f
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/expected/yaml-child-addr-order.yaml.txt
-@@ -0,0 +1,2 @@
-+# mode=strict
-+bad/yaml-child-addr-order.yaml:37: example 0 [child-address-order] child node @100 out of address order
-\ No newline at end of file
-diff --git a/scripts/dtc/dt-style-selftest/expected/yaml-child-name-order.yaml.txt b/scripts/dtc/dt-style-selftest/expected/yaml-child-name-order.yaml.txt
-new file mode 100644
-index 000000000000..1a6a04151eb5
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/expected/yaml-child-name-order.yaml.txt
-@@ -0,0 +1,2 @@
-+# mode=strict
-+bad/yaml-child-name-order.yaml:34: example 0 [child-name-order] child node 'bar' out of name order
-\ No newline at end of file
-diff --git a/scripts/dtc/dt-style-selftest/expected/yaml-cont-align.yaml.txt b/scripts/dtc/dt-style-selftest/expected/yaml-cont-align.yaml.txt
-new file mode 100644
-index 000000000000..4637963b377f
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/expected/yaml-cont-align.yaml.txt
-@@ -0,0 +1,2 @@
-+# mode=strict
-+bad/yaml-cont-align.yaml:29: example 0 [continuation-alignment] continuation should align to column 11 (under "<" or \")
-\ No newline at end of file
-diff --git a/scripts/dtc/dt-style-selftest/expected/yaml-hex-case.yaml.txt b/scripts/dtc/dt-style-selftest/expected/yaml-hex-case.yaml.txt
-new file mode 100644
-index 000000000000..e9e4585fc10a
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/expected/yaml-hex-case.yaml.txt
-@@ -0,0 +1,2 @@
-+# mode=strict
-+bad/yaml-hex-case.yaml:28: example 0 [hex-case] hex literal '0xABCD' must be lowercase
-\ No newline at end of file
-diff --git a/scripts/dtc/dt-style-selftest/expected/yaml-indent-strict.yaml.txt b/scripts/dtc/dt-style-selftest/expected/yaml-indent-strict.yaml.txt
-new file mode 100644
-index 000000000000..495c1c0b2a22
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/expected/yaml-indent-strict.yaml.txt
-@@ -0,0 +1,2 @@
-+# mode=strict
-+bad/yaml-indent-strict.yaml:26: example 0 [indent-unit-strict] indent unit must be 4 spaces in strict mode, got '  '
-\ No newline at end of file
-diff --git a/scripts/dtc/dt-style-selftest/expected/yaml-line-length.yaml.txt b/scripts/dtc/dt-style-selftest/expected/yaml-line-length.yaml.txt
-new file mode 100644
-index 000000000000..81a76e47aed5
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/expected/yaml-line-length.yaml.txt
-@@ -0,0 +1,2 @@
-+# mode=strict
-+bad/yaml-line-length.yaml:27: example 0 [line-length] line exceeds 80 columns (81)
-\ No newline at end of file
-diff --git a/scripts/dtc/dt-style-selftest/expected/yaml-mixed-indent.yaml.txt b/scripts/dtc/dt-style-selftest/expected/yaml-mixed-indent.yaml.txt
-new file mode 100644
-index 000000000000..2ff2ccaed715
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/expected/yaml-mixed-indent.yaml.txt
-@@ -0,0 +1,3 @@
-+# mode=relaxed
-+bad/yaml-mixed-indent.yaml:27: example 0 [mixed-indent-chars] mixed tabs and spaces in indent
-+bad/yaml-mixed-indent.yaml:27: example 0 [tab-in-dts] tab character not allowed in DTS example
-\ No newline at end of file
-diff --git a/scripts/dtc/dt-style-selftest/expected/yaml-node-close.yaml.txt b/scripts/dtc/dt-style-selftest/expected/yaml-node-close.yaml.txt
-new file mode 100644
-index 000000000000..54e63bc97644
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/expected/yaml-node-close.yaml.txt
-@@ -0,0 +1,2 @@
-+# mode=strict
-+bad/yaml-node-close.yaml:30: example 0 [node-close-alone] closing brace must be on its own line
-\ No newline at end of file
-diff --git a/scripts/dtc/dt-style-selftest/expected/yaml-prop-order.yaml.txt b/scripts/dtc/dt-style-selftest/expected/yaml-prop-order.yaml.txt
-new file mode 100644
-index 000000000000..c8f1669e2ee3
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/expected/yaml-prop-order.yaml.txt
-@@ -0,0 +1,2 @@
-+# mode=strict
-+bad/yaml-prop-order.yaml:28: example 0 [property-order] property 'compatible' out of canonical order (should sort before 'reg')
-\ No newline at end of file
-diff --git a/scripts/dtc/dt-style-selftest/expected/yaml-prop-pairing.yaml.txt b/scripts/dtc/dt-style-selftest/expected/yaml-prop-pairing.yaml.txt
-new file mode 100644
-index 000000000000..f44ebead0f46
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/expected/yaml-prop-pairing.yaml.txt
-@@ -0,0 +1,3 @@
-+# mode=strict
-+bad/yaml-prop-pairing.yaml:30: example 0 [property-order] property 'clocks' out of canonical order (should sort before 'clock-names')
-+bad/yaml-prop-pairing.yaml:32: example 0 [property-order] property 'pinctrl-0' out of canonical order (should sort before 'pinctrl-names')
-\ No newline at end of file
-diff --git a/scripts/dtc/dt-style-selftest/expected/yaml-required-blank.yaml.txt b/scripts/dtc/dt-style-selftest/expected/yaml-required-blank.yaml.txt
-new file mode 100644
-index 000000000000..d79f683713d9
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/expected/yaml-required-blank.yaml.txt
-@@ -0,0 +1,3 @@
-+# mode=strict
-+bad/yaml-required-blank.yaml:29: example 0 [required-blank-lines] "status" must be preceded by a blank line
-+bad/yaml-required-blank.yaml:30: example 0 [required-blank-lines] child node must be preceded by a blank line
-\ No newline at end of file
-diff --git a/scripts/dtc/dt-style-selftest/expected/yaml-tab.yaml.txt b/scripts/dtc/dt-style-selftest/expected/yaml-tab.yaml.txt
-new file mode 100644
-index 000000000000..d63974093946
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/expected/yaml-tab.yaml.txt
-@@ -0,0 +1,2 @@
-+# mode=relaxed
-+bad/yaml-tab.yaml:28: example 0 [tab-in-dts] tab character not allowed in DTS example
-\ No newline at end of file
-diff --git a/scripts/dtc/dt-style-selftest/expected/yaml-trailing-ws.yaml.txt b/scripts/dtc/dt-style-selftest/expected/yaml-trailing-ws.yaml.txt
-new file mode 100644
-index 000000000000..35e8d55b3404
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/expected/yaml-trailing-ws.yaml.txt
-@@ -0,0 +1,2 @@
-+# mode=relaxed
-+bad/yaml-trailing-ws.yaml:27: example 0 [trailing-whitespace] trailing whitespace
-\ No newline at end of file
-diff --git a/scripts/dtc/dt-style-selftest/expected/yaml-unit-addr.yaml.txt b/scripts/dtc/dt-style-selftest/expected/yaml-unit-addr.yaml.txt
-new file mode 100644
-index 000000000000..c2841f172862
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/expected/yaml-unit-addr.yaml.txt
-@@ -0,0 +1,2 @@
-+# mode=strict
-+bad/yaml-unit-addr.yaml:26: example 0 [unit-address-format] unit address '01000' has leading zeros
-\ No newline at end of file
-diff --git a/scripts/dtc/dt-style-selftest/expected/yaml-unused-label.yaml.txt b/scripts/dtc/dt-style-selftest/expected/yaml-unused-label.yaml.txt
-new file mode 100644
-index 000000000000..92879c8eb12b
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/expected/yaml-unused-label.yaml.txt
-@@ -0,0 +1,2 @@
-+# mode=strict
-+bad/yaml-unused-label.yaml:26: example 0 [unused-labels] label 'dev' defined but never &-referenced
-\ No newline at end of file
-diff --git a/scripts/dtc/dt-style-selftest/expected/yaml-value-ws.yaml.txt b/scripts/dtc/dt-style-selftest/expected/yaml-value-ws.yaml.txt
-new file mode 100644
-index 000000000000..24a69463fe77
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/expected/yaml-value-ws.yaml.txt
-@@ -0,0 +1,2 @@
-+# mode=strict
-+bad/yaml-value-ws.yaml:28: example 0 [value-whitespace] multiple spaces inside <...>
-\ No newline at end of file
-diff --git a/scripts/dtc/dt-style-selftest/good/dts-tab.dts b/scripts/dtc/dt-style-selftest/good/dts-tab.dts
-new file mode 100644
-index 000000000000..14295811c2bc
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/good/dts-tab.dts
-@@ -0,0 +1,30 @@
-+/*
-+ * SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-+ *
-+ * Test fixture: a properly formatted .dts using one-tab indent.
-+ */
-+
-+/dts-v1/;
-+
-+/ {
-+	compatible = "example,test-board";
-+	#address-cells = <1>;
-+	#size-cells = <1>;
-+
-+	bus@10000 {
-+		compatible = "simple-bus";
-+		reg = <0x10000 0x1000>;
-+		#address-cells = <1>;
-+		#size-cells = <1>;
-+
-+		device@100 {
-+			compatible = "example,test";
-+			reg = <0x100 0x10>;
-+		};
-+
-+		device@200 {
-+			compatible = "example,test";
-+			reg = <0x200 0x10>;
-+		};
-+	};
-+};
-diff --git a/scripts/dtc/dt-style-selftest/good/yaml-4space.yaml b/scripts/dtc/dt-style-selftest/good/yaml-4space.yaml
-new file mode 100644
-index 000000000000..1502f803c24c
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/good/yaml-4space.yaml
-@@ -0,0 +1,41 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/test-good-4space.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Test fixture for dt-check-style
-+
-+maintainers:
-+  - Test User <test@example.com>
-+
-+properties:
-+  compatible:
-+    const: example,test-4space
-+  reg:
-+    maxItems: 1
-+
-+required:
-+  - compatible
-+  - reg
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    bus@10000 {
-+        compatible = "simple-bus";
-+        reg = <0x10000 0x1000>;
-+        #address-cells = <1>;
-+        #size-cells = <1>;
-+
-+        device@100 {
-+            compatible = "example,test-4space";
-+            reg = <0x100 0x10>;
-+        };
-+
-+        device@200 {
-+            compatible = "example,test-4space";
-+            reg = <0x200 0x10>;
-+        };
-+    };
-diff --git a/scripts/dtc/dt-style-selftest/run.sh b/scripts/dtc/dt-style-selftest/run.sh
-new file mode 100755
-index 000000000000..821d635ddc15
---- /dev/null
-+++ b/scripts/dtc/dt-style-selftest/run.sh
-@@ -0,0 +1,67 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0-only
-+#
-+# Run dt-check-style against fixtures under good/ and bad/.
-+# good/ files must produce no output and exit 0 in both modes.
-+# bad/ files must produce the expected output (in expected/<name>.txt)
-+# and exit 1.
-+#
-+# The mode used for a bad fixture is whichever produces a violation:
-+# trailing-whitespace and tab fixtures use the default (relaxed),
-+# the rest use --mode=strict. The expected output files name the
-+# mode in their first line.
-+
-+set -u
-+
-+here=$(cd "$(dirname "$0")" && pwd)
-+tool="$here/../dt-check-style"
-+fail=0
-+
-+run() {
-+    file=$1
-+    mode=$2
-+    "$tool" --mode="$mode" "$file" 2>&1
-+}
-+
-+# good/ -- must exit 0 and produce no output in both modes
-+for f in "$here"/good/*; do
-+    [ -e "$f" ] || continue
-+    for mode in relaxed strict; do
-+        out=$(run "$f" "$mode") || true
-+        if [ -n "$out" ]; then
-+            echo "FAIL good/$mode: $(basename "$f"):"
-+            echo "$out" | sed 's/^/  /'
-+            fail=$((fail + 1))
-+        fi
-+    done
-+done
-+
-+# bad/ -- must match expected/<name>.txt
-+for f in "$here"/bad/*; do
-+    [ -e "$f" ] || continue
-+    name=$(basename "$f")
-+    expected="$here/expected/$name.txt"
-+    if [ ! -f "$expected" ]; then
-+        echo "FAIL bad: missing $expected"
-+        fail=$((fail + 1))
-+        continue
-+    fi
-+    mode=$(head -1 "$expected" | sed 's/^# mode=//')
-+    body=$(tail -n +2 "$expected")
-+    out=$(run "$f" "$mode") || true
-+    # Strip the directory prefix so expected files are portable.
-+    out=$(printf '%s\n' "$out" | sed "s|$here/bad/|bad/|g")
-+    if [ "$out" != "$body" ]; then
-+        echo "FAIL bad/$mode: $name:"
-+        diff -u <(printf '%s\n' "$body") <(printf '%s\n' "$out") | \
-+            sed 's/^/  /'
-+        fail=$((fail + 1))
-+    fi
-+done
-+
-+if [ "$fail" -eq 0 ]; then
-+    echo "PASS"
-+    exit 0
-+fi
-+echo "FAILED ($fail)"
-+exit 1
--- 
-2.54.0
+On Tue, Apr 28, 2026 at 8:00=E2=80=AFPM Nathan Chancellor <nathan@kernel.or=
+g> wrote:
+>
+> Now that the minimum supported version of LLVM for building the kernel
+> has been raised to 17.0.1, the clang version check in
+> CONFIG_AUTOFDO_CLANG can be removed because it is always true.
+>
+> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+> ---
+> Cc: Rong Xu <xur@google.com>
+> Cc: Han Shen <shenhan@google.com>
+> ---
+>  arch/Kconfig | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/arch/Kconfig b/arch/Kconfig
+> index 0d34bcafecaa..5d6e9f56210b 100644
+> --- a/arch/Kconfig
+> +++ b/arch/Kconfig
+> @@ -866,7 +866,7 @@ config ARCH_SUPPORTS_AUTOFDO_CLANG
+>  config AUTOFDO_CLANG
+>         bool "Enable Clang's AutoFDO build (EXPERIMENTAL)"
+>         depends on ARCH_SUPPORTS_AUTOFDO_CLANG
+> -       depends on CC_IS_CLANG && CLANG_VERSION >=3D 170000
+> +       depends on CC_IS_CLANG
+>         help
+>           This option enables Clang=E2=80=99s AutoFDO build. When
+>           an AutoFDO profile is specified in variable
+>
+> --
+> 2.54.0
+>
