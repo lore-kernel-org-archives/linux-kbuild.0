@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81E2935C185;
-	Wed, 29 Apr 2026 03:00:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E6FF35C185;
+	Wed, 29 Apr 2026 03:00:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777431635; cv=none; b=dbYr7McWTgyszd3fMtI9nEanhKn9qUnjTiFhyD5VZ/gjueF1UoIv900sbF9D9XsTyjBBgXgeSoOs3hRX3X23C09Mlgg0TuZuLR62BodXzczYpskbE++5g3YlXW2OIpZ4tUfrWAYYPjkGmHpYSv/ydXsH5wYnI34pn+zuJpsHM1g=
+	t=1777431638; cv=none; b=MO6oMNpqPMS5Lzi/AejJ84iezWVhsnPHsrHB3kXs71vCrdhl3lBVkNeUxuFtHpChA/tMFRtdFB6UnYSJXazrEdPpKGtfz9iMgUGM709LHAEXzlqrQmdF1g2mqeHYzKS9XzlKO/T5lU9FhgTmDXAgHk17abgkaZOH7p08GUPXt/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777431635; c=relaxed/simple;
-	bh=c9+QXpL1/MOlQ50MSgrezJUyfRhaKifKsnEpuNq+/fo=;
+	s=arc-20240116; t=1777431638; c=relaxed/simple;
+	bh=n/MbJYWiGew4ocTzX5ZLLlt6hjO+FEPD5hl7/uoM04g=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=lViqcFAaRbr02MTlArc4IFRdE0MwmrIeaHMiyrIhdck/pFrJlNMVfDdCibcbg/5zwBE9TIutJbcWrOEy7WwK83bK15pLvhYal11mxfMkbNuj5sCg8iaCzGGRPfwOLjiW2IJeFTo/lpfA1zV9jiUC7H+YmOqhu1lq41r+l2d5hlg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FdLOtsPX; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=pS8C13tgU1yeGBaEMLAkIs5pHIs5eI1psPuz6qRIMiDJG/2v2QimREnCIhqKDRson2tmmaCh0OdtXT1BMgpg/dUMQNSpDAAY41XReYa0KYETm8aPO9TxZ75ZAJrfBvifiz2Di0elB1kTlvQCln0W/z1volhNsOi/4C50gFShsfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L316QQR6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FdLOtsPX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B881C2BCB7;
-	Wed, 29 Apr 2026 03:00:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L316QQR6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93FCEC2BCF4;
+	Wed, 29 Apr 2026 03:00:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777431635;
-	bh=c9+QXpL1/MOlQ50MSgrezJUyfRhaKifKsnEpuNq+/fo=;
+	s=k20201202; t=1777431638;
+	bh=n/MbJYWiGew4ocTzX5ZLLlt6hjO+FEPD5hl7/uoM04g=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=FdLOtsPXzwZyht00abRsUPqroa32rOWhd3YU/hL19N5hK30x5Kdz+VMtgcG3cD9Ln
-	 Dh9qEkKGEmeDBzy8l0r09/iuzmexkVNn6EXJiyy4gi2fs1BBE3YImcksXz8vaGZ47l
-	 SsK5inPYWw0qQuLzBsVJEFonB8+rSlV0dDPay8qC8ddhMfzElFBJI2hK0VfCQfbEsE
-	 2jOCnWeAVvR71Jfe701lNlkEb58BMFX5FC4GKPsSy9+2Q9/VReXRRcTETKUvUTuVKJ
-	 SGS7bAdJa3Dz0LSyAZm3HNyXvIVVuQmMkgPHfX6rL7JRMFwsEvhksBTI7Er+B1H9+C
-	 oDBe4Ik/H+Alg==
+	b=L316QQR6uISAm50eY3ZdZr3b5Mtdyx500Rp/bwF93Af8QgYggRPXEZQXrUoroaFwT
+	 Cx+XQJbWt131CeZAvhD7SowN+ujnx2w2Bm3jJxqBJ2MI+xdbSJVHH0Heu0s6OSZNM5
+	 RNBjt+oQfHFKA6E/BVniS8cDOQZImsUbIKAQAJ6fbwVcM85k+V6hVbg1vyK9RVx2SM
+	 VDOff+6gjvnYHk3G2Sj0lcS4/9PTRXctiskL/ZqA266WaiASouXcqk1g2I3VH4OagA
+	 K0Py6ISEpPcfMpfyUFsIivNAv5spdEQAA9FYK/Ktl35pRSHC9AiPpEZ6KqgJ9zotsc
+	 ZqeC+wlOqeRhg==
 From: Nathan Chancellor <nathan@kernel.org>
-Date: Tue, 28 Apr 2026 22:59:16 -0400
-Subject: [PATCH 10/14] scripts/Makefile.warn: Drop -Wformat handling for
- clang < 16
+Date: Tue, 28 Apr 2026 22:59:17 -0400
+Subject: [PATCH 11/14] x86/build: Drop unused '-ffreestanding' addition to
+ KBUILD_CFLAGS
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -38,55 +38,60 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260428-bump-minimum-supported-llvm-version-to-17-v1-10-81d9b2e8ee75@kernel.org>
+Message-Id: <20260428-bump-minimum-supported-llvm-version-to-17-v1-11-81d9b2e8ee75@kernel.org>
 References: <20260428-bump-minimum-supported-llvm-version-to-17-v1-0-81d9b2e8ee75@kernel.org>
 In-Reply-To: <20260428-bump-minimum-supported-llvm-version-to-17-v1-0-81d9b2e8ee75@kernel.org>
 To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
  Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
  Nick Desaulniers <nick.desaulniers+lkml@gmail.com>
 Cc: linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
- linux-kbuild@vger.kernel.org
+ linux-kbuild@vger.kernel.org, Thomas Gleixner <tglx@kernel.org>, 
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+ "H. Peter Anvin" <hpa@zytor.com>
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1318; i=nathan@kernel.org;
- h=from:subject:message-id; bh=c9+QXpL1/MOlQ50MSgrezJUyfRhaKifKsnEpuNq+/fo=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDJkfS4yeP7wq8LZvlv5BuZOB3QJ94uY7fNPWRvVyeG/+Z
- DSN5/ncjlIWBjEuBlkxRZbqx6rHDQ3nnGW8cWoSzBxWJpAhDFycAjARIy5GhmUMSXw8y76Hp3LH
- XCi5nZ26fu7tZ8VCU5edrdq4UviSdC/DP6PqwA9i3QI/VASDrr0/H1K2QLA+VeJx7xnp6xW/tGz
- FWQA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1092; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=n/MbJYWiGew4ocTzX5ZLLlt6hjO+FEPD5hl7/uoM04g=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDJkfS4zTXrFUsG46cEA3Mkr69g6/ZVPvvmjNCuzttqyeb
+ bdId8/JjlIWBjEuBlkxRZbqx6rHDQ3nnGW8cWoSzBxWJpAhDFycAjCRb98Y/ofziYspxuXOttmZ
+ Hxz4nCfMZKfn9nXXnpXaJFqz29tds2b4p7o8/v7rT2JZXx7wzgrdoKh445ih9Wzbb4nX6nk38eT
+ e5gEA
 X-Developer-Key: i=nathan@kernel.org; a=openpgp;
  fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
 Now that the minimum supported version of LLVM for building the kernel
-has been raised to 17.0.1, the block dealing with -Wformat with clang
-prior to 16 can be removed since the condition for its inclusion is
-always false.
+has been raised to 17.0.1, the condition to add '-ffreestanding' to
+KBUILD_CFLAGS for 32-bit x86 is always false, so the if block can be
+removed.
 
 Signed-off-by: Nathan Chancellor <nathan@kernel.org>
 ---
- scripts/Makefile.warn | 10 ----------
- 1 file changed, 10 deletions(-)
+Cc: Thomas Gleixner <tglx@kernel.org>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: x86@kernel.org
+Cc: H. Peter Anvin <hpa@zytor.com>
+---
+ arch/x86/Makefile | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/scripts/Makefile.warn b/scripts/Makefile.warn
-index e77ca875aea4..35af7d6c6d18 100644
---- a/scripts/Makefile.warn
-+++ b/scripts/Makefile.warn
-@@ -135,16 +135,6 @@ KBUILD_CFLAGS += $(call cc-option, -Wno-stringop-truncation)
- KBUILD_CFLAGS += -Wno-override-init # alias for -Wno-initializer-overrides in clang
+diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+index 46fec0b08487..5720f2470cfc 100644
+--- a/arch/x86/Makefile
++++ b/arch/x86/Makefile
+@@ -124,11 +124,6 @@ ifeq ($(CONFIG_X86_32),y)
+         include $(srctree)/arch/x86/Makefile_32.cpu
+         KBUILD_CFLAGS += $(cflags-y)
  
- ifdef CONFIG_CC_IS_CLANG
--# Clang before clang-16 would warn on default argument promotions.
--ifneq ($(call clang-min-version, 160000),y)
--# Disable -Wformat
--KBUILD_CFLAGS += -Wno-format
--# Then re-enable flags that were part of the -Wformat group that aren't
--# problematic.
--KBUILD_CFLAGS += -Wformat-extra-args -Wformat-invalid-specifier
--KBUILD_CFLAGS += -Wformat-zero-length -Wnonnull
--KBUILD_CFLAGS += -Wformat-insufficient-args
--endif
- KBUILD_CFLAGS += -Wno-pointer-to-enum-cast
- KBUILD_CFLAGS += -Wno-tautological-constant-out-of-range-compare
- KBUILD_CFLAGS += -Wno-unaligned-access
+-    ifneq ($(call clang-min-version, 160000),y)
+-        # https://github.com/llvm/llvm-project/issues/53645
+-        KBUILD_CFLAGS += -ffreestanding
+-    endif
+-
+         percpu_seg := fs
+ else
+         BITS := 64
 
 -- 
 2.54.0
