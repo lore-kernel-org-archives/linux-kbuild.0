@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F59C374185;
-	Wed, 29 Apr 2026 03:00:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A935136D517;
+	Wed, 29 Apr 2026 03:00:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777431645; cv=none; b=IxzwXzrkTYVu3BgV8riGpss8NISLzlujH127vkuiSXtq9Ce0S2TDhzIaqDzvyHTUC/COVsXoD/AIvVjVORAqBI0kZLlTEcD7VYDJRPDZr9IJpxujZq+s1BucT7ev1SjZOdRzcJICi+mQN95RLDiziaakFCEa498XDJihuk58aXo=
+	t=1777431647; cv=none; b=raT2GmN5YOCgNhaNMvShdWoFRA8UOT4nUHPJmtaFxX/2fkTDdi9R8Oot0+IGJ2MRsOlKFkPAlW1/lCrGxITfNRW/NSC0FvV7lqn7BuKAljUolOCOnhOtDniQSqpeTQj9v/b9m2stQCXeFnjE0ry0TeKKIc1GkDypFApxZAHZFX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777431645; c=relaxed/simple;
-	bh=Aq5GmgfDmff3OP518UkeGEZ+rAWTGDqxT2c9ksNlieU=;
+	s=arc-20240116; t=1777431647; c=relaxed/simple;
+	bh=p29GNujMGgy4u9zyDlNqemqJP0uhDc8uvzvz9n4B3sk=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=GbJEi0fTtT7ufM/iZx7AMrigdq5onNwMZuPIwFAQwqhDy+PuoZORKPvGA1ZoAHBtJEAoBTjZLK1GmAnMQkRZUDtDko+jwcOjAuaPRmU1PJ/ACLCpxyX00yLg4gExRkqmNwkemy7+6ZSMNrNC1yDu8TdJ2ea6LqArk5WTESinNmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R3/COKAc; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=mHgq6AAVNJNxe/LJHRBsNKyyyS3M6uvDMTFcIEKLEKfTxY8tyEVrEaGcgbBb0SF/JWn+sTnAsRvTAvVPXW8/04fwtIWpMIhReoe0iiU47Pn2ot8Q9ICqVkAHn43D6a/yT4UUitMzwxzvqcgjDg1kXyTfJlF+Ly+lBzQV+TAjxyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KBYZjgxu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R3/COKAc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2856C2BCB9;
-	Wed, 29 Apr 2026 03:00:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KBYZjgxu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D8AAC2BCC4;
+	Wed, 29 Apr 2026 03:00:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777431644;
-	bh=Aq5GmgfDmff3OP518UkeGEZ+rAWTGDqxT2c9ksNlieU=;
+	s=k20201202; t=1777431647;
+	bh=p29GNujMGgy4u9zyDlNqemqJP0uhDc8uvzvz9n4B3sk=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=R3/COKAc6JdE7HukEJtQUtdo0Q8ytnJ+9ii48RIe88S2IXS9R3MrWjNh5FahLAEtH
-	 iUj3smY6tndVw5l8eqAJxF5IjxB2XtaNaCDTNmrFRxQ+EN25CWiIyogCr0S8qj6QxL
-	 yJ/c4EmNkCtaze0OM/D/lelyL5zXk5OQWkQ2pSRIFi2jTbGBrinsgGSTKdpGN6g/c3
-	 fIMCTp2h4nQBeIH+FePhn0gxTFoiYKNR2A3RTZZ1LMq1jeDzoq/6Y7v2klC2o1DOp1
-	 l0O5JkpbMXJpLuwINvUCoCOzbUTuXuBOwmxDWwkRGQEm+pjLXeoz88AMkeIyLLK1dG
-	 d0bfKOu5q/GHA==
+	b=KBYZjgxuRqomfmssP4fr9HYmPjfm9VxITY2IKRj/wH2EpuYoxQe5s6ign6y8l927E
+	 16o3SGjUkEi13bLxLmlfL10CoEoL+Q6SUMOcnbmH2wrWW3uU7k+3rUsMFAEqc7cKlk
+	 4gSV7ojNv9K76Yfr5tzHhbvRpeDcWeDQaPexeZ2UsYGtthmcqxNOrWwpDQmthEx7Cj
+	 vVorY0O52Rc0jmS9PHUJxV37cMx5JGjAT7yskwg10mqXWXxfDnK736PCzRbiZIW+n1
+	 jjiv6DNSxFQmhGNborV19HYRei/RYc0mcGTBURBAxNeIbLrB0yv9IN5FlhymEqiKUp
+	 tf8q/jX2MxA1A==
 From: Nathan Chancellor <nathan@kernel.org>
-Date: Tue, 28 Apr 2026 22:59:19 -0400
-Subject: [PATCH 13/14] x86/entry/vdso32: Remove conditional omission of
- '.cfi_offset eflags'
+Date: Tue, 28 Apr 2026 22:59:20 -0400
+Subject: [PATCH 14/14] kbuild: Remove check for broken scoping with clang <
+ 17 in CC_HAS_ASM_GOTO_OUTPUT
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -38,7 +38,7 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260428-bump-minimum-supported-llvm-version-to-17-v1-13-81d9b2e8ee75@kernel.org>
+Message-Id: <20260428-bump-minimum-supported-llvm-version-to-17-v1-14-81d9b2e8ee75@kernel.org>
 References: <20260428-bump-minimum-supported-llvm-version-to-17-v1-0-81d9b2e8ee75@kernel.org>
 In-Reply-To: <20260428-bump-minimum-supported-llvm-version-to-17-v1-0-81d9b2e8ee75@kernel.org>
 To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
@@ -46,62 +46,45 @@ To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
  Nick Desaulniers <nick.desaulniers+lkml@gmail.com>
 Cc: linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
  linux-kbuild@vger.kernel.org, Thomas Gleixner <tglx@kernel.org>, 
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
- Dave Hansen <dave.hansen@linux.intel.com>, 
- Peter Zijlstra <peterz@infradead.org>, x86@kernel.org, 
- "H. Peter Anvin" <hpa@zytor.com>
+ Peter Zijlstra <peterz@infradead.org>
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1513; i=nathan@kernel.org;
- h=from:subject:message-id; bh=Aq5GmgfDmff3OP518UkeGEZ+rAWTGDqxT2c9ksNlieU=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDJkfS4yDZ6094c/MXubGvlgm+XinsSjnwT3VM6bdnfn8w
- q0z0RwSHaUsDGJcDLJiiizVj1WPGxrOOct449QkmDmsTCBDGLg4BWAiH9UZ/gdcniHwOpV74brT
- i92yNsmILvRYE+4q+qv4vJVQlmBstBcjw459Cg5HNSKLs1nf6P4su9X45rFESqSekxTXzx+SUSr
- eHAA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1298; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=p29GNujMGgy4u9zyDlNqemqJP0uhDc8uvzvz9n4B3sk=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDJkfS4xvaTKmGup2TnT0i2zeZZVt/W9FV0ye+rHXC3qSn
+ NN2HYjrKGVhEONikBVTZKl+rHrc0HDOWcYbpybBzGFlAhnCwMUpABPZco7hn5bdux7uQhdjLh1j
+ 6wOp2n2HEyydn3lVJ8k18kSJH49kZWT4xaNm+E4uSG4i/03Gu4v28Chej4sO/VI6gVlhX+zSRh4
+ uAA==
 X-Developer-Key: i=nathan@kernel.org; a=openpgp;
  fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
 Now that the minimum supported version of LLVM for building the kernel
-has been raised to 17.0.1, the inclusion condition added by
-
-  3e30278e0c71 ("x86/entry/vdso32: Omit '.cfi_offset eflags' for LLVM < 16")
-
-will always be true. Revert the change to clean up the source code.
+has been raised to 17.0.1, the check added to CC_HAS_ASM_GOTO_OUTPUT by
+commit e2ffa15b9baa ("kbuild: Disable CC_HAS_ASM_GOTO_OUTPUT on clang <
+17") can be removed, as the issue it detects is guaranteed to be fixed.
 
 Signed-off-by: Nathan Chancellor <nathan@kernel.org>
 ---
 Cc: Thomas Gleixner <tglx@kernel.org>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>
 Cc: Peter Zijlstra <peterz@infradead.org>
-Cc: x86@kernel.org
-Cc: H. Peter Anvin <hpa@zytor.com>
 ---
- arch/x86/entry/vdso/vdso32/sigreturn.S | 10 ----------
- 1 file changed, 10 deletions(-)
+ init/Kconfig | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/arch/x86/entry/vdso/vdso32/sigreturn.S b/arch/x86/entry/vdso/vdso32/sigreturn.S
-index b33fcc501ba3..328bd3a4ef51 100644
---- a/arch/x86/entry/vdso/vdso32/sigreturn.S
-+++ b/arch/x86/entry/vdso/vdso32/sigreturn.S
-@@ -22,17 +22,7 @@
- 	CFI_OFFSET	cs,     IA32_SIGCONTEXT_cs
- 	CFI_OFFSET	ss,     IA32_SIGCONTEXT_ss
- 	CFI_OFFSET	ds,     IA32_SIGCONTEXT_ds
--/*
-- * .cfi_offset eflags requires LLVM 16 or newer:
-- *
-- *   https://github.com/llvm/llvm-project/commit/67bd3c58c0c7389e39c5a2f4d3b1a30459ccf5b7
-- *
-- * Check for 16.0.1 to ensure the support is present, as 16.0.0 may be a
-- * prerelease version.
-- */
--#if defined(CONFIG_AS_IS_GNU) || (defined(CONFIG_AS_IS_LLVM) && CONFIG_AS_VERSION >= 160001)
- 	CFI_OFFSET	eflags, IA32_SIGCONTEXT_flags
--#endif
- .endm
+diff --git a/init/Kconfig b/init/Kconfig
+index 2937c4d308ae..6da6cf019d1a 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -118,10 +118,7 @@ config GCC_ASM_GOTO_OUTPUT_BROKEN
+ config CC_HAS_ASM_GOTO_OUTPUT
+ 	def_bool y
+ 	depends on !GCC_ASM_GOTO_OUTPUT_BROKEN
+-	# Detect basic support
+ 	depends on $(success,echo 'int foo(int x) { asm goto ("": "=r"(x) ::: bar); return x; bar: return 0; }' | $(CC) -x c - -c -o /dev/null)
+-	# Detect clang (< v17) scoped label issues
+-	depends on $(success,echo 'void b(void **);void* c(void);int f(void){{asm goto(""::::l0);return 0;l0:return 1;}void *x __attribute__((cleanup(b)))=c();{asm goto(""::::l1);return 2;l1:return 3;}}' | $(CC) -x c - -c -o /dev/null)
  
- /*
+ config CC_HAS_ASM_GOTO_TIED_OUTPUT
+ 	depends on CC_HAS_ASM_GOTO_OUTPUT
 
 -- 
 2.54.0
