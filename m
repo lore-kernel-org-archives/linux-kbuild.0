@@ -1,217 +1,102 @@
-Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 419D3347BD4;
-	Tue,  5 May 2026 09:10:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F5EB37FF77;
+	Tue,  5 May 2026 11:41:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777972248; cv=none; b=lgC4MFwyo1FD1pfZM48nchWgLWz0DkX2jN4CAP5FjatgWztg3gZpGDnQjca9CgfWwfJ8kgU/Yk3CO+rppHklLgp0UMlfsbfR+CMwpg0XE3ikxzrrrUebLTmSEAJ6nFZGAR6ApW98eLKR0R3tKdLDGardjezfnsmi4INngOnICxk=
+	t=1777981287; cv=none; b=Ol9ItvmQtGuvyqqPL+X4HVTEImkjaxo9XjeQsAvj5imJlBc8zbIqeK6M/9qmlARt2+fQkrlaub9GKf3Cf1KfTxrRyHVoK7mZr/YsLKzYvhYY0MOeABhDAt92z50EQ4GSrS5pTL7dTiNjngmD8ZEpcf4C6fBlEdDNA/ioDUDCnvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777972248; c=relaxed/simple;
-	bh=4sym237a3wzjHBQDzN72ZtH7iFNxSpm8gXdzQ0UrWmw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=V9ZzR9uTZDuIZFiJde7o/jZXWdJRkXjk/nT8S/JesTzQYzpMvn3C6v6y1EZfgE+Ll7HZmNcgoZrdXhki2TKxcku4XLd0FZQJSbVB8e9fjp6DqwsWDECgHolNQJ7/pLPHcPDhICOFM4WJRVVMQWblt68JselEf8SXBLFAzFQJYec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=Up2Yt+/i; arc=none smtp.client-ip=159.69.126.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
+	s=arc-20240116; t=1777981287; c=relaxed/simple;
+	bh=IvxSJ6wSXMpdGU24O8+//7T3aKyKYbVLBx0r1/MZJDk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fh4IrzBs2hv8DlBDivYq+qbJDu+iGIhaukY8mdagF/NPOnC0fmm63jMPQMX82nyISBZh46BrCf2wNirL4g1jaIz4CKnMtupn+ELfYiUBmK7E9x7eD6Y995YlPnyNJybNON3B5XHQ4yGQToqeg28EnUq5iEs4VMLl2ZfwPWEvYlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=bQPhnhR1; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="Up2Yt+/i"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-	s=mail; t=1777972242;
-	bh=4sym237a3wzjHBQDzN72ZtH7iFNxSpm8gXdzQ0UrWmw=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=Up2Yt+/iewqFT4CdTJtEHClfccc2bXaZkDpSUGByup4Vjop5SUh30Qw8cs4enAqE3
-	 ezzRxbNnLJYJrCGV+ryDaz+xSLJTy627+iEeBG9M2YPm1ZbEn/3tJi93kE1vSEhuZG
-	 GHsrlN1CEma0J6DFPiAPBGPBIuHEuzWSdyzkEtF0=
-From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Date: Tue, 05 May 2026 11:05:17 +0200
-Subject: [PATCH v5 13/14] kbuild: move handling of module stripping to
- Makefile.lib
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="bQPhnhR1"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=yFBmDMiqVVdvXI0VWnfnnQuotGbmMWFyRknnB3DwonA=; b=bQPhnhR1wdVG2cEHidi7ur8gMd
+	xp4YArmFshZwqdmpwhYlb3oWfHCn2kM0rmrLrEZdk3xK8oJH/WxEvolgyMUtJiLkTfvz+CXuzQPWG
+	wyrfV2hh6uzrlJIDf6lHJdij6hkWE2SJuFAnYAiTWCJtVIiS8oWel1M+LbLD5r8Lkdon4CeuIJKoR
+	X1HY07bxr5tcJw787TdgYAonuSGWWlqa3cLkSen4p9bsE2Cpsqw39tT/mnYWFA7LIZbI0oAqpiIdD
+	+VIhZvOs5EwpgS5grReVmB+rowu8g+I7wolRrWFsHtaXXeNuriDCkNJnWSvTdsGEdEMPSEA/zkwe9
+	tTXBIf9g==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1wKE8y-00000002gt8-0xg3;
+	Tue, 05 May 2026 11:40:52 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id CA0D4300969; Tue, 05 May 2026 13:40:50 +0200 (CEST)
+Date: Tue, 5 May 2026 13:40:50 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Sathvika Vasireddy <sv@linux.ibm.com>
+Cc: nathan@kernel.org, nsc@kernel.org, maddy@linux.ibm.com,
+	mpe@ellerman.id.au, npiggin@gmail.com, chleroy@kernel.org,
+	jpoimboe@kernel.org, ojeda@kernel.org, masahiroy@kernel.org,
+	lossin@kernel.org, tamird@kernel.org,
+	thomas.weissschuh@linutronix.de, rostedt@goodmis.org,
+	ihor.solodrai@linux.dev, thuth@redhat.com, pmladek@suse.com,
+	aliceryhl@google.com, elver@google.com, kees@kernel.org,
+	legion@kernel.org, ardb@kernel.org, yuxuan.zuo@outlook.com,
+	alexghiti@rivosinc.com, alexandre.chartre@oracle.com, bp@alien8.de,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH v1 0/6] objtool: Fixup alternate feature relative
+ addresses
+Message-ID: <20260505114050.GW3126523@noisy.programming.kicks-ass.net>
+References: <20260505084628.17940-1-sv@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20260505-module-hashes-v5-13-e174a5a49fce@weissschuh.net>
-References: <20260505-module-hashes-v5-0-e174a5a49fce@weissschuh.net>
-In-Reply-To: <20260505-module-hashes-v5-0-e174a5a49fce@weissschuh.net>
-To: Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
- Eduard Zingerman <eddyz87@gmail.com>, 
- Kumar Kartikeya Dwivedi <memxor@gmail.com>, 
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
- Arnd Bergmann <arnd@arndb.de>, Luis Chamberlain <mcgrof@kernel.org>, 
- Petr Pavlu <petr.pavlu@suse.com>, Sami Tolvanen <samitolvanen@google.com>, 
- Daniel Gomez <da.gomez@samsung.com>, Paul Moore <paul@paul-moore.com>, 
- James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, 
- Jonathan Corbet <corbet@lwn.net>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
- Naveen N Rao <naveen@kernel.org>, Mimi Zohar <zohar@linux.ibm.com>, 
- Roberto Sassu <roberto.sassu@huawei.com>, 
- Dmitry Kasatkin <dmitry.kasatkin@gmail.com>, 
- Eric Snowberg <eric.snowberg@oracle.com>, 
- Nicolas Schier <nicolas.schier@linux.dev>, 
- Daniel Gomez <da.gomez@kernel.org>, Aaron Tomlin <atomlin@atomlin.com>, 
- "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, 
- Nicolas Bouchinet <nicolas.bouchinet@oss.cyber.gouv.fr>, 
- Xiu Jianfeng <xiujianfeng@huawei.com>, 
- Christophe Leroy <chleroy@kernel.org>
-Cc: Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, 
- bpf@vger.kernel.org, 
- =?utf-8?q?Fabian_Gr=C3=BCnbichler?= <f.gruenbichler@proxmox.com>, 
- Arnout Engelen <arnout@bzzt.net>, Mattia Rizzolo <mattia@mapreri.org>, 
- kpcyrd <kpcyrd@archlinux.org>, Christian Heusel <christian@heusel.eu>, 
- =?utf-8?q?C=C3=A2ju_Mihai-Drosi?= <mcaju95@gmail.com>, 
- Eric Biggers <ebiggers@kernel.org>, 
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
- linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-arch@vger.kernel.org, linux-modules@vger.kernel.org, 
- linux-security-module@vger.kernel.org, linux-doc@vger.kernel.org, 
- linuxppc-dev@lists.ozlabs.org, linux-integrity@vger.kernel.org, 
- debian-kernel@lists.debian.org, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1777971921; l=3531;
- i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
- bh=4sym237a3wzjHBQDzN72ZtH7iFNxSpm8gXdzQ0UrWmw=;
- b=yK767BHsapJV15dUfHNe8idRaS/QEQT7THkpmPRTFTWVR8JNmIEaIi786mZC/3G3QxzBTTSEr
- ElIP5qYLNiJD4Y2+AainUiunn1D7qpG9VUvSrTlTN7McIL/cM3ZvgES
-X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
- pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260505084628.17940-1-sv@linux.ibm.com>
 
-To allow CONFIG_MODULE_HASHES in combination with INSTALL_MOD_STRIP,
-this logc will also be used by Makefile.modfinal.
+On Tue, May 05, 2026 at 02:16:22PM +0530, Sathvika Vasireddy wrote:
+> This patch series implements build-time fixup of alternate feature
+> relative addresses for powerpc.
+> 
+> Previously, Nicholas Piggin proposed a build-time solution using a
+> custom PowerPC tool [1], which provided the foundation for this approach.
+> The current implementation leverages objtool's existing ELF parsing
+> infrastructure to do the same.
+> 
+> This patchset applies atop powerpc/merge branch.
+> 
+> [1] Original PowerPC tool approach:
+>     http://patchwork.ozlabs.org/project/linuxppc-dev/patch/20170521010130.13552-1-npiggin@gmail.com/
+> 
+> Testing:
+> Build and Boot tested on ppc64le, ppc64be, and ppc32be configs.
+> 
+> Sathvika Vasireddy (6):
+>   objtool/powerpc: Add build-time fixup of alternate feature branch
+>     targets
+>   objtool: Set ELF_F_LAYOUT flag to preserve vmlinux segment layout
+>   objtool: Fix "can't find starting instruction" warnings on vmlinux
+>   objtool/powerpc: Skip jump destination analysis and unnanotated
+>     intra-function call warnings for --ftr-fixup
+>   kbuild: Add objtool integration for PowerPC feature fixups
+>   powerpc: Enable build-time feature fixup processing by default
 
-Move it to a shared location to enable reuse.
+Ooh, so 2/3 are because you're not running objtool on vmlinux.o, but
+you're running it later in the link stage?
 
-Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
----
- scripts/Makefile.lib     | 32 ++++++++++++++++++++++++++++++++
- scripts/Makefile.modinst | 37 +++++--------------------------------
- 2 files changed, 37 insertions(+), 32 deletions(-)
+AFAICT ELF_F_LAYOUT should not hurt the normal objtool run, but it
+shouldn't be needed either, because we run much earlier, before sections
+are placed.
 
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 0718e39cedda..bb713a1a11be 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -484,6 +484,38 @@ define sed-offsets
- 	s:->::; p;}'
- endef
- 
-+#
-+# Module Installation
-+#
-+quiet_cmd_install_mod = INSTALL $@
-+      cmd_install_mod = cp $< $@
-+
-+# Module Strip
-+# ---------------------------------------------------------------------------
-+#
-+# INSTALL_MOD_STRIP, if defined, will cause modules to be stripped after they
-+# are installed. If INSTALL_MOD_STRIP is '1', then the default option
-+# --strip-debug will be used. Otherwise, INSTALL_MOD_STRIP value will be used
-+# as the options to the strip command.
-+ifeq ($(INSTALL_MOD_STRIP),1)
-+mod-strip-option := --strip-debug
-+else
-+mod-strip-option := $(INSTALL_MOD_STRIP)
-+endif
-+
-+# Strip
-+ifdef INSTALL_MOD_STRIP
-+
-+quiet_cmd_strip_mod = STRIP   $@
-+      cmd_strip_mod = $(STRIP) $(mod-strip-option) $@
-+
-+else
-+
-+quiet_cmd_strip_mod =
-+      cmd_strip_mod = :
-+
-+endif
-+
- # Use filechk to avoid rebuilds when a header changes, but the resulting file
- # does not
- define filechk_offsets
-diff --git a/scripts/Makefile.modinst b/scripts/Makefile.modinst
-index 68708a039a62..b95f613e23c8 100644
---- a/scripts/Makefile.modinst
-+++ b/scripts/Makefile.modinst
-@@ -8,6 +8,7 @@ __modinst:
- 
- include $(objtree)/include/config/auto.conf
- include $(srctree)/scripts/Kbuild.include
-+include $(srctree)/scripts/Makefile.lib
- 
- install-y :=
- 
-@@ -36,7 +37,7 @@ install-y += $(addprefix $(MODLIB)/, modules.builtin modules.builtin.modinfo)
- install-$(CONFIG_BUILTIN_MODULE_RANGES) += $(MODLIB)/modules.builtin.ranges
- 
- $(addprefix $(MODLIB)/, modules.builtin modules.builtin.modinfo modules.builtin.ranges): $(MODLIB)/%: % FORCE
--	$(call cmd,install)
-+	$(call cmd,install_mod)
- 
- endif
- 
-@@ -65,40 +66,12 @@ install-$(CONFIG_MODULES) += $(modules)
- __modinst: $(install-y)
- 	@:
- 
--#
--# Installation
--#
--quiet_cmd_install = INSTALL $@
--      cmd_install = cp $< $@
--
--# Strip
--#
--# INSTALL_MOD_STRIP, if defined, will cause modules to be stripped after they
--# are installed. If INSTALL_MOD_STRIP is '1', then the default option
--# --strip-debug will be used. Otherwise, INSTALL_MOD_STRIP value will be used
--# as the options to the strip command.
--ifdef INSTALL_MOD_STRIP
--
- ifdef CONFIG_MODULE_HASHES
- ifeq ($(KBUILD_EXTMOD),)
-+ifdef INSTALL_MOD_STRIP
- $(error CONFIG_MODULE_HASHES and INSTALL_MOD_STRIP are mutually exclusive)
- endif
- endif
--
--ifeq ($(INSTALL_MOD_STRIP),1)
--strip-option := --strip-debug
--else
--strip-option := $(INSTALL_MOD_STRIP)
--endif
--
--quiet_cmd_strip = STRIP   $@
--      cmd_strip = $(STRIP) $(strip-option) $@
--
--else
--
--quiet_cmd_strip =
--      cmd_strip = :
--
- endif
- 
- #
-@@ -131,8 +104,8 @@ endif
- $(foreach dir, $(sort $(dir $(install-y))), $(shell mkdir -p $(dir)))
- 
- $(dst)/%.ko: %.ko FORCE
--	$(call cmd,install)
--	$(call cmd,strip)
-+	$(call cmd,install_mod)
-+	$(call cmd,strip_mod)
- 	$(call cmd,sign)
- 
- ifdef CONFIG_MODULES
+And that also explains why you're the first to have trouble with 'can't
+find starting instruction'. vmlinux.o will have unplaced sections that
+are all relative 0.
 
--- 
-2.54.0
-
+Hmm... perhaps this ftr fixup should be its own command, like klp. Not
+munged into check thing. Josh?
