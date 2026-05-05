@@ -1,366 +1,108 @@
-Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 351BD3DC4C2;
-	Tue,  5 May 2026 09:05:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7514D3F23A2;
+	Tue,  5 May 2026 09:05:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777971939; cv=none; b=EdtA7t/Ti+FBBumvyDWne9L5EBxvQUFrhKO2NpQ/VnRbjRWYFi7hqPZ5+BSmKcMQ3rTTFhk68PULODP9L0I1lYxqAcwA58CMoHKcOUeRrD38el6u2LL3L942jekk4O7MxYgBedPdNOKFU/B25gSIDvvsJ47x0P1WVmJ3CVS4aEw=
+	t=1777971946; cv=none; b=jHolpN3ai4+mUQw7F7F1K2NcF2gXD/PcRTiMO9luxu0Z5nGtN/y5CeC4TwzXdBgbbjmw/t1p05Zpvz7El4Zwxru+JvOs0niJciH9Dm3tK9S/Yt90rNEsavrqw34s2ySgEixuk8aVPmaz7d1kkmusl5S1FybmZ03ZcvEF8SrT72o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777971939; c=relaxed/simple;
-	bh=z587DQf7ydM5gOPKNIBxSBWu9EUeBOTRuUfIH6UhiJM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=eOHt9CyB/yR3txJMsmxyAHQ2e7xeITzBSNBNpTVPM7BSC6eyVkLP8NyqJRRKBwiexNg4cTYhu+b8hIPNmCXKbB7e6i1495+QXoet+aHMBeLK8Cri25Hh0agRVzC/64Z24y+hefh85t1+oIzzysGzVJK2fq1B+9uqcJWZK6/PumM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=aIgpWDKX; arc=none smtp.client-ip=159.69.126.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
+	s=arc-20240116; t=1777971946; c=relaxed/simple;
+	bh=4UCQ3QN2QWNXrWHKBHRPi0SoBfJaK8yevcbCvXDwQRI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=b2oGQrT8SjO7s7UbpT3qIFJ+XHGUGsDK8TTy1YRhLlPEx0gI2/r6xUqTY5DS2IXxtnVSOFwrbuCGPvXLCx7ACy4BIIUibS1PcT8Ecc5k3NffwFWzSN5Y1yiwnEOc9Pqt6JYDXIPR7XMR8BPhx0lthn5mWloObNu8/ARFfC2FHk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RMb9118o; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="aIgpWDKX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-	s=mail; t=1777971923;
-	bh=z587DQf7ydM5gOPKNIBxSBWu9EUeBOTRuUfIH6UhiJM=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=aIgpWDKXrg76P12O4zkGtJLBuZn8YCeI7ZzPJs6xm6dzdrhNjHvlCsyJmUEjNrCDX
-	 nnsToJ9+zngAbg5KnB2apzV2zul/tNtdLxtFkKFMh/CCZJG5ISZHQPcUMzBA/S/C/H
-	 yDIMRiiPrmSBoXKa210qmdtwe3j1bEA6l8n1iwS4=
-From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Date: Tue, 05 May 2026 11:05:12 +0200
-Subject: [PATCH v5 08/14] module: Move authentication logic into dedicated
- new file
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RMb9118o"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50F0FC2BCC9;
+	Tue,  5 May 2026 09:05:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777971946;
+	bh=4UCQ3QN2QWNXrWHKBHRPi0SoBfJaK8yevcbCvXDwQRI=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=RMb9118oEn/g2hQTEza+TcqN7fPkdsI+GbNLQYi2lM1GOv21ELF6l+bC5+TntjDzH
+	 z8WagyI9GdPcttqqk7+L84RwC6zYv/Z6FreCuTwN/4IMpJ2GSegMnZSO6C56M7wsJa
+	 at05/XZ3+2/5Lp4WM6Pl2RO3l5wLuderbvA0cVxI3TEpFh/3Ot08pzI3vt0zenbhxE
+	 kUYkSg6Uk9x1HhJ5pnAX03SvxvnERm5cOs9CPSf+IIwE6uM45CRUn8wrpa3M7Hz7aq
+	 c7XYAkdSdkQbfJeVpGkwUNgK2kB4uSVsm9uneXL4M4ynU6lQhoZNuVdt9SGqDxmg0D
+	 9LZh2ZiC5KzTg==
+Message-ID: <c8249a6d-55ee-4ad2-83ac-c25f86759a46@kernel.org>
+Date: Tue, 5 May 2026 11:05:35 +0200
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 0/6] objtool: Fixup alternate feature relative
+ addresses
+To: Sathvika Vasireddy <sv@linux.ibm.com>, nathan@kernel.org, nsc@kernel.org,
+ maddy@linux.ibm.com, mpe@ellerman.id.au, npiggin@gmail.com,
+ jpoimboe@kernel.org, peterz@infradead.org, ojeda@kernel.org,
+ masahiroy@kernel.org, lossin@kernel.org, tamird@kernel.org,
+ thomas.weissschuh@linutronix.de, rostedt@goodmis.org,
+ ihor.solodrai@linux.dev, thuth@redhat.com, pmladek@suse.com,
+ aliceryhl@google.com, elver@google.com, kees@kernel.org, legion@kernel.org,
+ ardb@kernel.org, yuxuan.zuo@outlook.com, alexghiti@rivosinc.com,
+ alexandre.chartre@oracle.com, bp@alien8.de, linux-kbuild@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+References: <20260505084628.17940-1-sv@linux.ibm.com>
+Content-Language: fr-FR
+From: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
+In-Reply-To: <20260505084628.17940-1-sv@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Message-Id: <20260505-module-hashes-v5-8-e174a5a49fce@weissschuh.net>
-References: <20260505-module-hashes-v5-0-e174a5a49fce@weissschuh.net>
-In-Reply-To: <20260505-module-hashes-v5-0-e174a5a49fce@weissschuh.net>
-To: Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
- Eduard Zingerman <eddyz87@gmail.com>, 
- Kumar Kartikeya Dwivedi <memxor@gmail.com>, 
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
- Arnd Bergmann <arnd@arndb.de>, Luis Chamberlain <mcgrof@kernel.org>, 
- Petr Pavlu <petr.pavlu@suse.com>, Sami Tolvanen <samitolvanen@google.com>, 
- Daniel Gomez <da.gomez@samsung.com>, Paul Moore <paul@paul-moore.com>, 
- James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, 
- Jonathan Corbet <corbet@lwn.net>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
- Naveen N Rao <naveen@kernel.org>, Mimi Zohar <zohar@linux.ibm.com>, 
- Roberto Sassu <roberto.sassu@huawei.com>, 
- Dmitry Kasatkin <dmitry.kasatkin@gmail.com>, 
- Eric Snowberg <eric.snowberg@oracle.com>, 
- Nicolas Schier <nicolas.schier@linux.dev>, 
- Daniel Gomez <da.gomez@kernel.org>, Aaron Tomlin <atomlin@atomlin.com>, 
- "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, 
- Nicolas Bouchinet <nicolas.bouchinet@oss.cyber.gouv.fr>, 
- Xiu Jianfeng <xiujianfeng@huawei.com>, 
- Christophe Leroy <chleroy@kernel.org>
-Cc: Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, 
- bpf@vger.kernel.org, 
- =?utf-8?q?Fabian_Gr=C3=BCnbichler?= <f.gruenbichler@proxmox.com>, 
- Arnout Engelen <arnout@bzzt.net>, Mattia Rizzolo <mattia@mapreri.org>, 
- kpcyrd <kpcyrd@archlinux.org>, Christian Heusel <christian@heusel.eu>, 
- =?utf-8?q?C=C3=A2ju_Mihai-Drosi?= <mcaju95@gmail.com>, 
- Eric Biggers <ebiggers@kernel.org>, 
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
- linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-arch@vger.kernel.org, linux-modules@vger.kernel.org, 
- linux-security-module@vger.kernel.org, linux-doc@vger.kernel.org, 
- linuxppc-dev@lists.ozlabs.org, linux-integrity@vger.kernel.org, 
- debian-kernel@lists.debian.org, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1777971921; l=8567;
- i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
- bh=z587DQf7ydM5gOPKNIBxSBWu9EUeBOTRuUfIH6UhiJM=;
- b=0QD9Bo5ArZ/toPAgrZ/Kwp8g1MN5vGvLlI3JacHftC7LXDAwqZfm7Tb5hscKQ74Tdp4pPzyNi
- hUJ9tsUkDfZBUtISxftgnKStnD51XKADZgJpNxcoo2sKOBdHsu9omPS
-X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
- pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 
-The module authentication functionality will also be used by the
-hash-based module authentication. To make it usable even if
-CONFIG_MODULE_SIG is disabled, move it to a new file.
 
-Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
----
- kernel/module/auth.c     | 85 +++++++++++++++++++++++++++++++++++++++++++++
- kernel/module/internal.h | 14 ++++++--
- kernel/module/main.c     |  6 ++--
- kernel/module/signing.c  | 90 ++----------------------------------------------
- 4 files changed, 103 insertions(+), 92 deletions(-)
 
-diff --git a/kernel/module/auth.c b/kernel/module/auth.c
-index 956ac63d9d33..831a13eb0c9b 100644
---- a/kernel/module/auth.c
-+++ b/kernel/module/auth.c
-@@ -5,10 +5,16 @@
-  * Written by David Howells (dhowells@redhat.com)
-  */
- 
-+#include <linux/errno.h>
- #include <linux/export.h>
- #include <linux/module.h>
-+#include <linux/module_signature.h>
- #include <linux/moduleparam.h>
-+#include <linux/security.h>
-+#include <linux/string.h>
- #include <linux/types.h>
-+#include <uapi/linux/module.h>
-+#include "internal.h"
- 
- #undef MODULE_PARAM_PREFIX
- #define MODULE_PARAM_PREFIX "module."
-@@ -30,3 +36,82 @@ void set_module_sig_enforced(void)
- {
- 	sig_enforce = true;
- }
-+
-+static int mod_verify_sig(const void *mod, struct load_info *info)
-+{
-+	struct module_signature ms;
-+	size_t sig_len, modlen = info->len;
-+	int ret;
-+
-+	if (modlen <= sizeof(ms))
-+		return -EBADMSG;
-+
-+	memcpy(&ms, mod + (modlen - sizeof(ms)), sizeof(ms));
-+
-+	ret = mod_check_sig(&ms, modlen, "module");
-+	if (ret)
-+		return ret;
-+
-+	sig_len = be32_to_cpu(ms.sig_len);
-+	modlen -= sig_len + sizeof(ms);
-+	info->len = modlen;
-+
-+	return module_sig_check(mod, modlen, mod + modlen, sig_len);
-+}
-+
-+int module_auth_check(struct load_info *info, int flags)
-+{
-+	int err = -ENODATA;
-+	const unsigned long markerlen = sizeof(MODULE_SIGNATURE_MARKER) - 1;
-+	const char *reason;
-+	const void *mod = info->hdr;
-+	bool mangled_module = flags & (MODULE_INIT_IGNORE_MODVERSIONS |
-+				       MODULE_INIT_IGNORE_VERMAGIC);
-+	/*
-+	 * Do not allow mangled modules as a module with version information
-+	 * removed is no longer the module that was signed.
-+	 */
-+	if (!mangled_module &&
-+	    info->len > markerlen &&
-+	    memcmp(mod + info->len - markerlen, MODULE_SIGNATURE_MARKER, markerlen) == 0) {
-+		/* We truncate the module to discard the signature */
-+		info->len -= markerlen;
-+		err = mod_verify_sig(mod, info);
-+		if (!err) {
-+			info->auth_ok = true;
-+			return 0;
-+		}
-+	}
-+
-+	/*
-+	 * We don't permit modules to be loaded into the trusted kernels
-+	 * without a valid signature on them, but if we're not enforcing,
-+	 * certain errors are non-fatal.
-+	 */
-+	switch (err) {
-+	case -ENODATA:
-+		reason = "unsigned module";
-+		break;
-+	case -ENOPKG:
-+		reason = "module with unsupported crypto";
-+		break;
-+	case -ENOKEY:
-+		reason = "module with unavailable key";
-+		break;
-+
-+	default:
-+		/*
-+		 * All other errors are fatal, including lack of memory,
-+		 * unparseable signatures, and signature check failures --
-+		 * even if signatures aren't required.
-+		 */
-+		return err;
-+	}
-+
-+	if (is_module_sig_enforced()) {
-+		pr_notice("Loading of %s is rejected\n", reason);
-+		return -EKEYREJECTED;
-+	}
-+
-+	return security_locked_down(LOCKDOWN_MODULE_SIGNATURE);
-+}
-diff --git a/kernel/module/internal.h b/kernel/module/internal.h
-index f8f425b167f1..d923e31a5d8e 100644
---- a/kernel/module/internal.h
-+++ b/kernel/module/internal.h
-@@ -336,14 +336,24 @@ void module_mark_ro_after_init(const Elf_Ehdr *hdr, Elf_Shdr *sechdrs,
- 			       const char *secstrings);
- 
- #ifdef CONFIG_MODULE_SIG
--int module_sig_check(struct load_info *info, int flags);
-+int module_sig_check(const void *mod, size_t mod_len, const void *sig, size_t sig_len);
- #else /* !CONFIG_MODULE_SIG */
--static inline int module_sig_check(struct load_info *info, int flags)
-+static inline int module_sig_check(const void *mod, size_t mod_len,
-+				   const void *sig, size_t sig_len)
- {
- 	return 0;
- }
- #endif /* !CONFIG_MODULE_SIG */
- 
-+#ifdef CONFIG_MODULE_AUTH
-+int module_auth_check(struct load_info *info, int flags);
-+#else /* !CONFIG_MODULE_AUTH */
-+static inline int module_auth_check(struct load_info *info, int flags)
-+{
-+	return 0;
-+}
-+#endif /* !CONFIG_MODULE_AUTH */
-+
- #ifdef CONFIG_DEBUG_KMEMLEAK
- void kmemleak_load_module(const struct module *mod, const struct load_info *info);
- #else /* !CONFIG_DEBUG_KMEMLEAK */
-diff --git a/kernel/module/main.c b/kernel/module/main.c
-index cd8a74df117e..55a010383a8d 100644
---- a/kernel/module/main.c
-+++ b/kernel/module/main.c
-@@ -3428,8 +3428,8 @@ static int load_module(struct load_info *info, const char __user *uargs,
- 	char *after_dashes;
- 
- 	/*
--	 * Do the signature check (if any) first. All that
--	 * the signature check needs is info->len, it does
-+	 * Do the authentication checks (if any) first. All that
-+	 * the authentication checks need is info->len, it does
- 	 * not need any of the section info. That can be
- 	 * set up later. This will minimize the chances
- 	 * of a corrupt module causing problems before
-@@ -3439,7 +3439,7 @@ static int load_module(struct load_info *info, const char __user *uargs,
- 	 * off the sig length at the end of the module, making
- 	 * checks against info->len more correct.
- 	 */
--	err = module_sig_check(info, flags);
-+	err = module_auth_check(info, flags);
- 	if (err)
- 		goto free_copy;
- 
-diff --git a/kernel/module/signing.c b/kernel/module/signing.c
-index 07a786723221..a49317e3c66f 100644
---- a/kernel/module/signing.c
-+++ b/kernel/module/signing.c
-@@ -5,98 +5,14 @@
-  * Written by David Howells (dhowells@redhat.com)
-  */
- 
--#include <linux/kernel.h>
--#include <linux/errno.h>
--#include <linux/module.h>
--#include <linux/module_signature.h>
--#include <linux/string.h>
-+#include <linux/types.h>
- #include <linux/verification.h>
--#include <linux/security.h>
--#include <crypto/public_key.h>
--#include <uapi/linux/module.h>
- #include "internal.h"
- 
--/*
-- * Verify the signature on a module.
-- */
--static int mod_verify_sig(const void *mod, struct load_info *info)
-+int module_sig_check(const void *mod, size_t mod_len, const void *sig, size_t sig_len)
- {
--	struct module_signature ms;
--	size_t sig_len, modlen = info->len;
--	int ret;
--
--	if (modlen <= sizeof(ms))
--		return -EBADMSG;
--
--	memcpy(&ms, mod + (modlen - sizeof(ms)), sizeof(ms));
--
--	ret = mod_check_sig(&ms, modlen, "module");
--	if (ret)
--		return ret;
--
--	sig_len = be32_to_cpu(ms.sig_len);
--	modlen -= sig_len + sizeof(ms);
--	info->len = modlen;
--
--	return verify_pkcs7_signature(mod, modlen, mod + modlen, sig_len,
-+	return verify_pkcs7_signature(mod, mod_len, sig, sig_len,
- 				      VERIFY_USE_SECONDARY_KEYRING,
- 				      VERIFYING_MODULE_SIGNATURE,
- 				      NULL, NULL);
- }
--
--int module_sig_check(struct load_info *info, int flags)
--{
--	int err = -ENODATA;
--	const unsigned long markerlen = sizeof(MODULE_SIGNATURE_MARKER) - 1;
--	const char *reason;
--	const void *mod = info->hdr;
--	bool mangled_module = flags & (MODULE_INIT_IGNORE_MODVERSIONS |
--				       MODULE_INIT_IGNORE_VERMAGIC);
--	/*
--	 * Do not allow mangled modules as a module with version information
--	 * removed is no longer the module that was signed.
--	 */
--	if (!mangled_module &&
--	    info->len > markerlen &&
--	    memcmp(mod + info->len - markerlen, MODULE_SIGNATURE_MARKER, markerlen) == 0) {
--		/* We truncate the module to discard the signature */
--		info->len -= markerlen;
--		err = mod_verify_sig(mod, info);
--		if (!err) {
--			info->auth_ok = true;
--			return 0;
--		}
--	}
--
--	/*
--	 * We don't permit modules to be loaded into the trusted kernels
--	 * without a valid signature on them, but if we're not enforcing,
--	 * certain errors are non-fatal.
--	 */
--	switch (err) {
--	case -ENODATA:
--		reason = "unsigned module";
--		break;
--	case -ENOPKG:
--		reason = "module with unsupported crypto";
--		break;
--	case -ENOKEY:
--		reason = "module with unavailable key";
--		break;
--
--	default:
--		/*
--		 * All other errors are fatal, including lack of memory,
--		 * unparseable signatures, and signature check failures --
--		 * even if signatures aren't required.
--		 */
--		return err;
--	}
--
--	if (is_module_sig_enforced()) {
--		pr_notice("Loading of %s is rejected\n", reason);
--		return -EKEYREJECTED;
--	}
--
--	return security_locked_down(LOCKDOWN_MODULE_SIGNATURE);
--}
+Le 05/05/2026 à 10:46, Sathvika Vasireddy a écrit :
+> This patch series implements build-time fixup of alternate feature
+> relative addresses for powerpc.
+> 
+> Previously, Nicholas Piggin proposed a build-time solution using a
+> custom PowerPC tool [1], which provided the foundation for this approach.
+> The current implementation leverages objtool's existing ELF parsing
+> infrastructure to do the same.
 
--- 
-2.54.0
+What are the changes since last RFC 
+https://lore.kernel.org/linuxppc-dev/20260316062237.30948-1-sv@linux.ibm.com/
+
+> 
+> This patchset applies atop powerpc/merge branch.
+> 
+> [1] Original PowerPC tool approach:
+>      http://patchwork.ozlabs.org/project/linuxppc-dev/patch/20170521010130.13552-1-npiggin@gmail.com/
+> 
+> Testing:
+> Build and Boot tested on ppc64le, ppc64be, and ppc32be configs.
+> 
+> Sathvika Vasireddy (6):
+>    objtool/powerpc: Add build-time fixup of alternate feature branch
+>      targets
+>    objtool: Set ELF_F_LAYOUT flag to preserve vmlinux segment layout
+>    objtool: Fix "can't find starting instruction" warnings on vmlinux
+>    objtool/powerpc: Skip jump destination analysis and unnanotated
+>      intra-function call warnings for --ftr-fixup
+>    kbuild: Add objtool integration for PowerPC feature fixups
+>    powerpc: Enable build-time feature fixup processing by default
+> 
+>   Makefile                                  |   7 +
+>   arch/powerpc/Kconfig                      |   3 +
+>   arch/powerpc/Makefile                     |   5 +
+>   arch/powerpc/include/asm/feature-fixups.h |   2 +-
+>   arch/powerpc/kernel/vmlinux.lds.S         |   8 +-
+>   arch/powerpc/lib/feature-fixups.c         |  12 -
+>   scripts/Makefile.lib                      |   4 +-
+>   scripts/Makefile.vmlinux                  |  11 +-
+>   tools/objtool/arch/powerpc/decode.c       |  15 +-
+>   tools/objtool/arch/powerpc/special.c      | 451 ++++++++++++++++++++++
+>   tools/objtool/builtin-check.c             |   2 +
+>   tools/objtool/check.c                     |  57 ++-
+>   tools/objtool/elf.c                       |   4 +
+>   tools/objtool/include/objtool/builtin.h   |   1 +
+>   tools/objtool/include/objtool/special.h   |  56 +++
+>   tools/objtool/special.c                   |  29 ++
+>   16 files changed, 637 insertions(+), 30 deletions(-)
+> 
 
