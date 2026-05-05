@@ -1,108 +1,116 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7514D3F23A2;
-	Tue,  5 May 2026 09:05:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7917E386440;
+	Tue,  5 May 2026 09:10:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777971946; cv=none; b=jHolpN3ai4+mUQw7F7F1K2NcF2gXD/PcRTiMO9luxu0Z5nGtN/y5CeC4TwzXdBgbbjmw/t1p05Zpvz7El4Zwxru+JvOs0niJciH9Dm3tK9S/Yt90rNEsavrqw34s2ySgEixuk8aVPmaz7d1kkmusl5S1FybmZ03ZcvEF8SrT72o=
+	t=1777972245; cv=none; b=BTQ8HQ16oHoV15U+ZSr1tNO6Zua45p/D6MDpbNsVq0weClfGIgVhHGtk9MdZFdq9MjyQ/4TDs5Pti0XCNjkpEDtX+wmhv/L0G1BYx1iaUQLTZ8XeiJIBPhSRetSXxbnakU9f0T+2Nny3+1TUq5HMK2WYzh+aSmHhwBT1089ao5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777971946; c=relaxed/simple;
-	bh=4UCQ3QN2QWNXrWHKBHRPi0SoBfJaK8yevcbCvXDwQRI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=b2oGQrT8SjO7s7UbpT3qIFJ+XHGUGsDK8TTy1YRhLlPEx0gI2/r6xUqTY5DS2IXxtnVSOFwrbuCGPvXLCx7ACy4BIIUibS1PcT8Ecc5k3NffwFWzSN5Y1yiwnEOc9Pqt6JYDXIPR7XMR8BPhx0lthn5mWloObNu8/ARFfC2FHk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RMb9118o; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1777972245; c=relaxed/simple;
+	bh=OjVEQENALnBrLz41nWZb6yT3a4erxpjD/nxLglpoCvs=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=t3P1qiJgwc2oNuuyI3hIytDKRjepMkm/zm69/g4ZCtUfN2XfhiegqEID3mvGSFoaoTnJ3/mUYOJIM36qOG/j2gGvVwk9nHk8IbaRrbiIJRh73ElPotepacLfSsc+AoX0H1+6hBL44DICI93P0mG1b2+ombvhhxmMAkK8Rrbxk6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=XYlaUPL2; arc=none smtp.client-ip=159.69.126.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RMb9118o"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50F0FC2BCC9;
-	Tue,  5 May 2026 09:05:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777971946;
-	bh=4UCQ3QN2QWNXrWHKBHRPi0SoBfJaK8yevcbCvXDwQRI=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=RMb9118oEn/g2hQTEza+TcqN7fPkdsI+GbNLQYi2lM1GOv21ELF6l+bC5+TntjDzH
-	 z8WagyI9GdPcttqqk7+L84RwC6zYv/Z6FreCuTwN/4IMpJ2GSegMnZSO6C56M7wsJa
-	 at05/XZ3+2/5Lp4WM6Pl2RO3l5wLuderbvA0cVxI3TEpFh/3Ot08pzI3vt0zenbhxE
-	 kUYkSg6Uk9x1HhJ5pnAX03SvxvnERm5cOs9CPSf+IIwE6uM45CRUn8wrpa3M7Hz7aq
-	 c7XYAkdSdkQbfJeVpGkwUNgK2kB4uSVsm9uneXL4M4ynU6lQhoZNuVdt9SGqDxmg0D
-	 9LZh2ZiC5KzTg==
-Message-ID: <c8249a6d-55ee-4ad2-83ac-c25f86759a46@kernel.org>
-Date: Tue, 5 May 2026 11:05:35 +0200
+	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="XYlaUPL2"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+	s=mail; t=1777972242;
+	bh=OjVEQENALnBrLz41nWZb6yT3a4erxpjD/nxLglpoCvs=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=XYlaUPL2+1keZjN6BW3dcVpUl1RE38eQ/mlaVVvGmo2i9QCzRFbU331m2UYsSbCld
+	 hta5KOZvDq0W86hZIs2n1rYUwCZ+NdnAkIxcW5Y5qHrZWxaytUG2jOyjEHymCGLDmA
+	 Xja87gSXTb9+q0HubyhjmtkQGlwGOrsIzkE2RZwc=
+From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+Date: Tue, 05 May 2026 11:05:15 +0200
+Subject: [PATCH v5 11/14] module: update timestamp of modules.order after
+ modules are built
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 0/6] objtool: Fixup alternate feature relative
- addresses
-To: Sathvika Vasireddy <sv@linux.ibm.com>, nathan@kernel.org, nsc@kernel.org,
- maddy@linux.ibm.com, mpe@ellerman.id.au, npiggin@gmail.com,
- jpoimboe@kernel.org, peterz@infradead.org, ojeda@kernel.org,
- masahiroy@kernel.org, lossin@kernel.org, tamird@kernel.org,
- thomas.weissschuh@linutronix.de, rostedt@goodmis.org,
- ihor.solodrai@linux.dev, thuth@redhat.com, pmladek@suse.com,
- aliceryhl@google.com, elver@google.com, kees@kernel.org, legion@kernel.org,
- ardb@kernel.org, yuxuan.zuo@outlook.com, alexghiti@rivosinc.com,
- alexandre.chartre@oracle.com, bp@alien8.de, linux-kbuild@vger.kernel.org,
- linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-References: <20260505084628.17940-1-sv@linux.ibm.com>
-Content-Language: fr-FR
-From: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
-In-Reply-To: <20260505084628.17940-1-sv@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+Message-Id: <20260505-module-hashes-v5-11-e174a5a49fce@weissschuh.net>
+References: <20260505-module-hashes-v5-0-e174a5a49fce@weissschuh.net>
+In-Reply-To: <20260505-module-hashes-v5-0-e174a5a49fce@weissschuh.net>
+To: Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+ Eduard Zingerman <eddyz87@gmail.com>, 
+ Kumar Kartikeya Dwivedi <memxor@gmail.com>, 
+ Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+ Arnd Bergmann <arnd@arndb.de>, Luis Chamberlain <mcgrof@kernel.org>, 
+ Petr Pavlu <petr.pavlu@suse.com>, Sami Tolvanen <samitolvanen@google.com>, 
+ Daniel Gomez <da.gomez@samsung.com>, Paul Moore <paul@paul-moore.com>, 
+ James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, 
+ Jonathan Corbet <corbet@lwn.net>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
+ Naveen N Rao <naveen@kernel.org>, Mimi Zohar <zohar@linux.ibm.com>, 
+ Roberto Sassu <roberto.sassu@huawei.com>, 
+ Dmitry Kasatkin <dmitry.kasatkin@gmail.com>, 
+ Eric Snowberg <eric.snowberg@oracle.com>, 
+ Nicolas Schier <nicolas.schier@linux.dev>, 
+ Daniel Gomez <da.gomez@kernel.org>, Aaron Tomlin <atomlin@atomlin.com>, 
+ "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, 
+ Nicolas Bouchinet <nicolas.bouchinet@oss.cyber.gouv.fr>, 
+ Xiu Jianfeng <xiujianfeng@huawei.com>, 
+ Christophe Leroy <chleroy@kernel.org>
+Cc: Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, 
+ bpf@vger.kernel.org, 
+ =?utf-8?q?Fabian_Gr=C3=BCnbichler?= <f.gruenbichler@proxmox.com>, 
+ Arnout Engelen <arnout@bzzt.net>, Mattia Rizzolo <mattia@mapreri.org>, 
+ kpcyrd <kpcyrd@archlinux.org>, Christian Heusel <christian@heusel.eu>, 
+ =?utf-8?q?C=C3=A2ju_Mihai-Drosi?= <mcaju95@gmail.com>, 
+ Eric Biggers <ebiggers@kernel.org>, 
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-arch@vger.kernel.org, linux-modules@vger.kernel.org, 
+ linux-security-module@vger.kernel.org, linux-doc@vger.kernel.org, 
+ linuxppc-dev@lists.ozlabs.org, linux-integrity@vger.kernel.org, 
+ debian-kernel@lists.debian.org, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1777971921; l=973;
+ i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
+ bh=OjVEQENALnBrLz41nWZb6yT3a4erxpjD/nxLglpoCvs=;
+ b=uffap1Yp7A9oUyxJAg/JMqLbZ7j2qeL8SXGije4OWjL3Lmqea939UF78GetZTKRZdUELCxw7k
+ wcm9ivOs6zTCvQInib7BHj9Xe5zk405K6/DXSFSlvx+rY7B0KYo+1yw
+X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
+ pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 
+Make sure that modules.order is always newer than the module .ko files.
+Other rules can then use modules.order as a prerequisite and rerun if
+any module is (re-)built.
 
+Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
+---
+ scripts/Makefile.modfinal | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-Le 05/05/2026 à 10:46, Sathvika Vasireddy a écrit :
-> This patch series implements build-time fixup of alternate feature
-> relative addresses for powerpc.
-> 
-> Previously, Nicholas Piggin proposed a build-time solution using a
-> custom PowerPC tool [1], which provided the foundation for this approach.
-> The current implementation leverages objtool's existing ELF parsing
-> infrastructure to do the same.
+diff --git a/scripts/Makefile.modfinal b/scripts/Makefile.modfinal
+index b09040ccddd2..44a382689a5a 100644
+--- a/scripts/Makefile.modfinal
++++ b/scripts/Makefile.modfinal
+@@ -66,6 +66,13 @@ endif
+ 
+ targets += $(modules:%.o=%.ko) $(modules:%.o=%.mod.o) .module-common.o
+ 
++# Update modules.order when a module is (re-)built.
++# Allow using it as target dependency.
++targets += modules.order
++__modfinal: modules.order
++modules.order: $(modules:%.o=%.ko)
++	@touch $@
++
+ # Add FORCE to the prerequisites of a target to force it to be always rebuilt.
+ # ---------------------------------------------------------------------------
+ 
 
-What are the changes since last RFC 
-https://lore.kernel.org/linuxppc-dev/20260316062237.30948-1-sv@linux.ibm.com/
-
-> 
-> This patchset applies atop powerpc/merge branch.
-> 
-> [1] Original PowerPC tool approach:
->      http://patchwork.ozlabs.org/project/linuxppc-dev/patch/20170521010130.13552-1-npiggin@gmail.com/
-> 
-> Testing:
-> Build and Boot tested on ppc64le, ppc64be, and ppc32be configs.
-> 
-> Sathvika Vasireddy (6):
->    objtool/powerpc: Add build-time fixup of alternate feature branch
->      targets
->    objtool: Set ELF_F_LAYOUT flag to preserve vmlinux segment layout
->    objtool: Fix "can't find starting instruction" warnings on vmlinux
->    objtool/powerpc: Skip jump destination analysis and unnanotated
->      intra-function call warnings for --ftr-fixup
->    kbuild: Add objtool integration for PowerPC feature fixups
->    powerpc: Enable build-time feature fixup processing by default
-> 
->   Makefile                                  |   7 +
->   arch/powerpc/Kconfig                      |   3 +
->   arch/powerpc/Makefile                     |   5 +
->   arch/powerpc/include/asm/feature-fixups.h |   2 +-
->   arch/powerpc/kernel/vmlinux.lds.S         |   8 +-
->   arch/powerpc/lib/feature-fixups.c         |  12 -
->   scripts/Makefile.lib                      |   4 +-
->   scripts/Makefile.vmlinux                  |  11 +-
->   tools/objtool/arch/powerpc/decode.c       |  15 +-
->   tools/objtool/arch/powerpc/special.c      | 451 ++++++++++++++++++++++
->   tools/objtool/builtin-check.c             |   2 +
->   tools/objtool/check.c                     |  57 ++-
->   tools/objtool/elf.c                       |   4 +
->   tools/objtool/include/objtool/builtin.h   |   1 +
->   tools/objtool/include/objtool/special.h   |  56 +++
->   tools/objtool/special.c                   |  29 ++
->   16 files changed, 637 insertions(+), 30 deletions(-)
-> 
+-- 
+2.54.0
 
