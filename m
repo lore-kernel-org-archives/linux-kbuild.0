@@ -1,94 +1,84 @@
-Received: from mout.freenet.de (mout.freenet.de [194.97.196.11])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 031211459FA;
-	Wed, 13 May 2026 23:20:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.97.196.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3950625B09B;
+	Wed, 13 May 2026 23:31:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778714424; cv=none; b=rLuIOjDcIaqFUODt0AL65hgJtgbKdsamZIoE+PQHLUPsekfPJFuVs4VuO4lweMb9fADJEM5kDGE9wMs+ZYJLe7fFIyZO2JbhzLmFu9qlox6SKuXHt5CmKUquVi3ZIsYRtByqklicwvRjIoT6NKhN2StNa39qa+RPTm0GttuNrTA=
+	t=1778715067; cv=none; b=kKiCCX22k4jN2qhCbRbO3SHNNnBhWtSNofgOmz1enIvJOtdQAeFMPZM953zfV/24/a3eJBGLPh8yqUWTQdmv9k9YUoeB8QhQG6wqgdsiuaOOhtJ0htVd6NjmI+2HndhHqtJOsswR3mi4XHw8Gi0jV6EtvAWyAxHl8PIClkLE1V8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778714424; c=relaxed/simple;
-	bh=IZ2IrZsIPzlWZefd17MYjYiQUCX9p8wxUFk0/+rsJMw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=iN5+lY3PEqLsEkZIH3yELbARhaXGSQoLa40Uz063SpfPSo+IFHofoO1KF6OfM//RJbTlHXpdi9+9kKPF6nWQdS7u8Np+iIbug2KmTcbIGeG2JMo9qQIckMiH4tCmeqLONOQ0hYWqphFmm7tlZDuFLVcM34hxoXN9/RNY1xWAW+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=freenet.de; spf=pass smtp.mailfrom=freenet.de; dkim=pass (2048-bit key) header.d=freenet.de header.i=@freenet.de header.b=IEw74ey6; arc=none smtp.client-ip=194.97.196.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=freenet.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freenet.de
+	s=arc-20240116; t=1778715067; c=relaxed/simple;
+	bh=bfoJR+cp92Pc+7sxpkLF5l1KjEDO9Q555ahXmwt8i/E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TVl9jW3x+pEO1lW78uuJbokqVFqHVr0ytWBjEcqJD1s2LyqUMsVAdDqDXEkpiI7S35XW4U1/qPgVsYuwTjVeve3WlVoNPUi0cTbyNoKPDIT0BGg5MDamAARM7mBWnRsldYy3/5RmHK+ksTugtUh4BKRhUJTsfyIERka1AOC3uEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=bPWNUcM2; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=freenet.de header.i=@freenet.de header.b="IEw74ey6"
-Received: from [2001:748:400:1319::5] (helo=sub7.mail.fnrz.de)
-	by mout1.mail.fnrz.de with esmtpa (ID viktor.jaegerskuepper@freenet.de) (port 25) (Exim 4.98.2 #2)
-	id 1wNIsA-0000000DTRA-160m;
-	Thu, 14 May 2026 01:20:14 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=freenet.de;
-	s=mjaymdexmjqk; h=Content-Transfer-Encoding:Content-Type:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=A9MyNYBU4nN2pJdTo/OBoee4omBI9iNGtPz7t0rpd2A=; b=IEw74ey6/haqlOQBXkKMAT3OSK
-	Tqp4Q2MbAy9IhsNr9FrZqPwRfdGU7IjCDqAIvv8ZqMwol3VJb4Rf+2GHP/kGGFNPB9yQnx/NxDgHA
-	2AcR570N8nZlDRYvCGmn/xwfrossGI2RshPCBvzeyxvqVoTO5TLBxnTI4knUEq9UZWTyRSLI6ZDCr
-	6znSUJspiRyaunaW6he/dEDnXegHwXovzPSFxodWQi1L9CQa/A8LQYkPPNK/9b7O4ww2zhVnaPUhN
-	UZkLndpY+v3WPmjiYwC6dpKc4GBgSc/h/ScMzC1T2oZKoqMsuImYjC3QSwLZwyWN2w/1GByKSAUgc
-	WkziWo3A==;
-Received: from [2a02:8071:a85:f020:1cd2:ea20:ef58:f08c] (port=49706 helo=einstein)
-	by sub7.mail.fnrz.de with esmtpsa (ID viktor.jaegerskuepper@freenet.de) (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (port 465) (Exim 4.96 #2)
-	id 1wNIsA-00DQDo-0J;
-	Thu, 14 May 2026 01:20:14 +0200
-From: =?UTF-8?q?Viktor=20J=C3=A4gersk=C3=BCpper?= <viktor_jaegerskuepper@freenet.de>
-To: =?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Cc: =?UTF-8?q?Viktor=20J=C3=A4gersk=C3=BCpper?= <viktor_jaegerskuepper@freenet.de>,
-	Christian Heusel <christian@heusel.eu>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>,
-	linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] kbuild: pacman-pkg: make "rc" releases adhere to pacman versioning scheme
-Date: Thu, 14 May 2026 01:17:29 +0200
-Message-ID: <20260513231745.51780-1-viktor_jaegerskuepper@freenet.de>
-X-Mailer: git-send-email 2.54.0
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="bPWNUcM2"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=huRuWpMpBeJX9TrDd8V9NJj7n2mcOd9/ELoRA1aGWCA=; b=bPWNUcM2BbYdaYRsj6//H/lkfh
+	57QSDDfpr3lt2Pq0n8O2m6JivzC2mHiJnI9p096wUo5MKFf8TkHNJVi2LVqL+sXHYBXjb1wKnsq1e
+	Rpb6mgSLSU2xrRiiviGS/J+3qlhtU1lRo+3gzBBtJWKjCopdqPuIEnKfe2o3KxxN5zmF0i+/6Zi9j
+	OFBb+AiIHpyvUYjO8M41YHN8DrZqeuvtQs792oEaQWeMTJ14vn8uylmupl6en5UuVm+nfqH1MKwaQ
+	mV6Hc1xrgLFU/Wbs441IfSw38F0IRVZA/9eenm1Dsry/8eDYi63OD3tkyR4CN85pWeWVbvACkKwzp
+	2uns16NA==;
+Received: from [50.53.43.113] (helo=[192.168.254.34])
+	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wNJ2e-000000042H4-2VEN;
+	Wed, 13 May 2026 23:31:04 +0000
+Message-ID: <f3ed50d2-24e3-4816-a811-44a03faafc8f@infradead.org>
+Date: Wed, 13 May 2026 16:31:04 -0700
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] kconfig: add kconfig-sym-check static checker
+To: Andrew Jones <andrew.jones@linux.dev>, linux-kbuild@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: nathan@kernel.org, nsc@kernel.org, andriy.shevchenko@linux.intel.com
+References: <20260513210329.637892-1-andrew.jones@linux.dev>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20260513210329.637892-1-andrew.jones@linux.dev>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-FN-MUUID: 1778714414F369F8B55949O
-X-Scan-TS: Thu, 14 May 2026 01:20:14 +0200
+Content-Transfer-Encoding: 7bit
 
-The package versioning scheme does not enable smooth upgrades from "rc"
-releases to the corresponding stable releases (e.g. 7.0.0-rc7 -> 7.0.0)
-because pacman considers that a downgrade due to the underscore in
-pkgver (e.g. 7.0.0_rc7), see e.g. vercmp(8) for an explanation of the
-package version comparison used by pacman. Package versions which are
-derived from said releases (e.g. built from git revisions) are
-similarly affected. Fix this by modifying pkgver in order to remove the
-hyphen from kernel versions containing "-rc".
 
-Signed-off-by: Viktor Jägersküpper <viktor_jaegerskuepper@freenet.de>
----
- scripts/package/PKGBUILD | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/package/PKGBUILD b/scripts/package/PKGBUILD
-index 452374d63c24..fe629074b4e8 100644
---- a/scripts/package/PKGBUILD
-+++ b/scripts/package/PKGBUILD
-@@ -10,7 +10,7 @@ for pkg in $_extrapackages; do
- 	pkgname+=("${pkgbase}-${pkg}")
- done
- 
--pkgver="${KERNELRELEASE//-/_}"
-+pkgver="$(echo "${KERNELRELEASE}" | sed 's/-rc/rc/;s/-/_/g')"
- # The PKGBUILD is evaluated multiple times.
- # Running scripts/build-version from here would introduce inconsistencies.
- pkgrel="${KBUILD_REVISION}"
+On 5/13/26 2:03 PM, Andrew Jones wrote:
+> Add 'make kconfig-sym-check', a static checker that finds Kconfig
+> symbols referenced in expressions (select, depends on, default, etc.)
+> but never defined via config/menuconfig anywhere in the tree. New
+> dangling symbols are reported as errors (exit 1) unless they are
+> listed in an exclusion file, e.g.
+> 
+>  KCONFIG_SYM_CHECK_EXCLUDES=sym-check-excludes make kconfig-sym-check
+> 
+> The checker also warns about uppercase N/Y/M used as tristate literal
+> values following the same logic as checkpatch.
+> 
+> This new static checker is the script used for [1] with a few
+> improvements to avoid some false positives.
+> 
+> Link: https://bugzilla.kernel.org/show_bug.cgi?id=216748 [1]
+> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+> ---
+>  Makefile                             |  7 ++-
+>  scripts/kconfig/kconfig-sym-check.pl | 93 ++++++++++++++++++++++++++++
+>  2 files changed, 99 insertions(+), 1 deletion(-)
+>  create mode 100755 scripts/kconfig/kconfig-sym-check.pl
 
----
-base-commit: 254f49634ee16a731174d2ae34bc50bd5f45e731
+Acked-by: Randy Dunlap <rdunlap@infradead.org>
+Tested-by: Randy Dunlap <rdunlap@infradead.org>
 
-Best regards,
-Viktor
+Thanks.
+
 -- 
-2.54.0
+~Randy
