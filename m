@@ -1,83 +1,96 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout.freenet.de (mout.freenet.de [194.97.204.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5BC9282F3A;
-	Thu, 14 May 2026 16:01:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8CFE2DEA6B;
+	Thu, 14 May 2026 21:46:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.97.204.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778774503; cv=none; b=ItQmMq7ami6JXtg6o7z2Uy4LLe0hjkkqDSpViIJ+JWA+Tog+vFLhWE1E7faqPiInyZdVJglgoEjNY6ND/eeb0UR4KfjMwyQcJDC/Jp4I1gLQHLJLxd48MWwYDHov6QIkEP3IlJtgfo5tThdk83J/FywDoujNCY+jh1VmLbGF5h4=
+	t=1778795214; cv=none; b=bCPVtAVYuZQ6F0z544s3gu7LE7xex+wQPYEQ7VOXCQZCBKo4kWtzodqcazMa7T1zNk//FkctJ6w+OD+/ai8T1f08hbRDxcb6Mxexj8W982R1BXul7JLrOygIcO7f8n33fzohsLxNiA980+IWY3Sf1ZlkLKptZ2f9/IlP/IlDPKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778774503; c=relaxed/simple;
-	bh=NwiqWl07mMFzTIpcBLHSV/jNNYcGeaGAae+sSXAbZzM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LmORrWvB4PMGCt3XSdZVhGkj2RKd9KHyq8c5jOxbDQNzEfrcsYBGd8OpRImtDSxZyr8qfMoiAwS7FKugF+P1sBGHUXSH9Bs6kyQa+7wlva81cUdDMdaN3pneVWAt8iJDlwuXbZqVj4QGFKFnYvk8bBwaA6JsKAu3mVW46MOMDE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ibM6y1Kw; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1778795214; c=relaxed/simple;
+	bh=veVSEXVJ6Q5ddh0VuttcCpPQIr0Bwm6dgdTEvG4gEqk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=B1mYtO8i5yeEmtE52eTvGxQ0o2bXEPv25ychBY9NcMjONaPZdGcVRhDbjVRIj+ljbTXhrNR+0G+E4t32M9ADBggzVr8wfHoblVh3RzeqiqtJu4eTPXv6m6Zgp9w0D5pVZKimBo2FEAc+gbndk6V/U2l1vNgw0M7LRMCloAw1eek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=freenet.de; spf=pass smtp.mailfrom=freenet.de; dkim=pass (2048-bit key) header.d=freenet.de header.i=@freenet.de header.b=ulsz5YT9; arc=none smtp.client-ip=194.97.204.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=freenet.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freenet.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ibM6y1Kw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFC95C2BCB3;
-	Thu, 14 May 2026 16:01:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778774503;
-	bh=NwiqWl07mMFzTIpcBLHSV/jNNYcGeaGAae+sSXAbZzM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ibM6y1KwVQy3VzJyCivePtjEwT25FqDNjV76bB9SN/dFykRlL0P/45q/6mMcPX/+s
-	 ihQ+dBlgCu6AjX4y3cWWkwt5lfpIaXAhQ6s2PnPa/8ONc1Zfbwto7SEj4x2gCfFHyM
-	 kkYJGpvLz6eBn6tXTak+T1QWu12YuCFlqzdrLvhf0ZHT0sLXcIADx1HlWM04r1R8iI
-	 AZE2m5mj2PF6yuunrb37PpABcipWhyYM+Fbh6LjnwOfucIrU2vHueWW8Q7v4QRMUrT
-	 Fg7dRL9X9W3kIr2qifGz2kIwIP6kDatOiH7q09PpP5cEzg7iNf+71ziu2gABuRcuQP
-	 iN1oqe2Ti5s7Q==
-Date: Fri, 15 May 2026 01:01:39 +0900
-From: Nathan Chancellor <nathan@kernel.org>
-To: Julian Braha <julianbraha@gmail.com>
-Cc: Andrew Jones <andrew.jones@linux.dev>, linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org, nsc@kernel.org,
-	andriy.shevchenko@linux.intel.com
-Subject: Re: [PATCH] kconfig: add kconfig-sym-check static checker
-Message-ID: <20260514160139.GB2229579@ax162>
-References: <20260513210329.637892-1-andrew.jones@linux.dev>
- <177876553250.305249.17848321995033732158.b4-review@b4>
- <6d11bbb5-4877-4707-9f98-1b6ba2744ce8@gmail.com>
+	dkim=pass (2048-bit key) header.d=freenet.de header.i=@freenet.de header.b="ulsz5YT9"
+Received: from [2001:748:400:2319::5] (helo=sub8.mail.fnrz.de)
+	by mout2.mail.fnrz.de with esmtpa (ID viktor.jaegerskuepper@freenet.de) (port 25) (Exim 4.98.2 #2)
+	id 1wNdtD-0000000AZoA-09LO;
+	Thu, 14 May 2026 23:46:43 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=freenet.de;
+	s=mjaymdexmjqk; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=jlzr0g4jR9iZt1q75zv+hpNOZ87/5VQyOSeF+F7qTAs=; b=ulsz5YT9viXxhGV6rxIvKQeR0z
+	y1GhInjA8Ca7YTPpwGztDD1WQYojLcepmhUQv1lIYqYsFqZf36SlOTjMMhlMIdwUo2q4HInot+J09
+	Fk3B+o+t4SX24uSEynUlxPr8VpCxDTD45oRA8LGReHkMdffVVEOEVUZAr9dvgifbdon+wpPId1Hi1
+	rpAnC9kDLmw1rtZUpCqtj+FwV9DwDvO/bKyIwR//ZWz6adhDi75GfANqEIcJkc2gX+YkLGIaZgw77
+	jsLVS5zh9OdyoxQcKz4art9YmmpIWUk7mMR31cXIdO+hvhEUSXpsdLJLBVeYPEkg6wlpplgNLfEoh
+	3AFO/Xqw==;
+Received: from [2a02:8071:a85:f020:8de4:42bc:8f23:736f] (port=43970 helo=[127.0.0.1])
+	by sub8.mail.fnrz.de with esmtpsa (ID viktor.jaegerskuepper@freenet.de) (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128) (port 465) (Exim 4.96 #2)
+	id 1wNdtC-007C1a-2u;
+	Thu, 14 May 2026 23:46:42 +0200
+Message-ID: <5d5f8ee1-9615-4624-9606-97a6d0943785@freenet.de>
+Date: Thu, 14 May 2026 23:46:57 +0200
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6d11bbb5-4877-4707-9f98-1b6ba2744ce8@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] kbuild: pacman-pkg: make "rc" releases adhere to pacman
+ versioning scheme
+Content-Language: en-US
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+ Christian Heusel <christian@heusel.eu>, Nicolas Schier <nsc@kernel.org>,
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260513231745.51780-1-viktor_jaegerskuepper@freenet.de>
+ <177876476891.305249.12721845256238248028.b4-review@b4>
+From: =?UTF-8?B?VmlrdG9yIErDpGdlcnNrw7xwcGVy?=
+ <viktor_jaegerskuepper@freenet.de>
+In-Reply-To: <177876476891.305249.12721845256238248028.b4-review@b4>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-FN-MUUID: 1778795202338BBDD3DD1DO
+X-Scan-TS: Thu, 14 May 2026 23:46:42 +0200
 
-On Thu, May 14, 2026 at 04:26:42PM +0100, Julian Braha wrote:
-> On 5/14/26 14:32, Nathan Chancellor wrote:
-> > On Wed, 13 May 2026 16:03:29 -0500, Andrew Jones <andrew.jones@linux.dev> wrote:
-> > 
-> > Hi Andrew,
-> > 
-> >> [...]
-> >>
-> >> This new static checker is the script used for [1] with a few
-> >> improvements to avoid some false positives.
-> >>
-> >> Link: https://bugzilla.kernel.org/show_bug.cgi?id=216748 [1]
-> >> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
-> > 
-> > I think something like this is reasonable, as least until kconfirm
-> > is potentially ready for integration into the tree.
-> > 
-> >   https://lore.kernel.org/20260509203808.1142311-1-julianbraha@gmail.com/
-> > 
-> Agreed, don't let kconfirm block this. While I do have future plans to
-> support these same alarms in that tool, there's currently no overlap
-> between these two, and no ETA on that support either ;)
+On 5/14/26 15:19, Nathan Chancellor wrote:
+> On Thu, 14 May 2026 01:17:29 +0200, Viktor Jägersküpper <viktor_jaegerskuepper@freenet.de> wrote:
+>> diff --git a/scripts/package/PKGBUILD b/scripts/package/PKGBUILD
+>> index 452374d63c24..fe629074b4e8 100644
+>> --- a/scripts/package/PKGBUILD
+>> +++ b/scripts/package/PKGBUILD
+>> @@ -10,7 +10,7 @@ for pkg in $_extrapackages; do
+>>  	pkgname+=("${pkgbase}-${pkg}")
+>>  done
+>>  
+>> -pkgver="${KERNELRELEASE//-/_}"
+>> +pkgver="$(echo "${KERNELRELEASE}" | sed 's/-rc/rc/;s/-/_/g')"
 > 
-> Side note, this script was actually part of my inspiration to go
-> searching for more misusage of kconfig and build kconfirm. I also
-> previously cleaned up some dead code, thanks to this script:
-> https://lore.kernel.org/all/20260309122321.1528622-1-julianbraha@gmail.com/
+> Sashiko notes [1] (with a contrived example) that this could result in
+> custom localversions being matched and adjusted. While I don't think it
+> is that big of a deal given how specific the example is, it takes little
+> effort to make the match more restrictive to make such a situation less
+> likely:
+> 
+>   pkgver="$(echo "${KERNELRELEASE}" | sed 's/-\(rc[0-9]\+\)/\1/;s/-/_/g')"
+> 
+> [1]: https://sashiko.dev/#/patchset/20030
 
-Thanks a lot for that additional context, especially around the lack of
-overlap between the two tools. This seems worth pursuing then.
+I agree this is much better. Actually I should have looked at the
+script "mkdebian" for Debian packages which has this line:
 
--- 
-Cheers,
-Nathan
+upstream_version=$("${srctree}/scripts/setlocalversion" --no-local "${srctree}" | sed 's/-\(rc[1-9]\)/~\1/')
+
+This is incorrect for the (hopefully rare) case that we have 10 or more
+"rc" releases, but that can be fixed in another patch.
+
+Best regards,
+Viktor
