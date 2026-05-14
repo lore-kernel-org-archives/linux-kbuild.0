@@ -1,81 +1,67 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0C35357D1F;
-	Thu, 14 May 2026 10:13:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F7E5388378;
+	Thu, 14 May 2026 11:31:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778753615; cv=none; b=B6Ak4NmpJWH6PvTiZiNE9rX+NRPiyMfYTMtj7ePjxcxzWFxkDRCVSxgznxkT7DFJ6ZDxwlzYVHhS0NXloYHxS/eba7A97jCFIv9ETybwzva34iqedKlUbbaDh1PtEEM03MDDef4VFqp+QaK9A69ZR3qS1BdCPNpabUSke+qRiXg=
+	t=1778758273; cv=none; b=t+NHXxT6sJcyz0w4dAjeYaPC7BO731sfJAE16skwfan2SDyW3uBitEn+vpa+NO1cxQv186bWQP0Vm6h/Qx5u/lBTdGJJU+0R5pqFwfx3TO59HI2qkyOLe3gzM6A+qslF/ad3CXCklV6FPe3sKsaS8tvJFymYqClP/9Gi7IhXx4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778753615; c=relaxed/simple;
-	bh=pyFB4ur/KVLGcKl/yLNGIfGo7BXMPQnbBHd8aTS1kt0=;
+	s=arc-20240116; t=1778758273; c=relaxed/simple;
+	bh=ogt7RJ7TLjf5SRY4nGaMYBaqSNNoRwxFevzQIxH5QFI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kcyBow3IBiEXO/NwysvtGv7Gd4RJVM77paNXMvT3L6uIGDDiwCdtbDq8g6yR7RHXiInLEE+RK1jht0ONCth5LXYSVyOHy6Ucp+qH5ClTurpXqqXaVC2ETHMSvUNIWnhj3br8xFsOjUgoeAooo5e3XKPwUW57eICe/ZVO9DWd/N8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VNOUZxJy; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=QudHfxllZWILKEDSaKEcykBl4ZpmAuRj2sE9acgSENno7Z7qXi0XZXdiUFT/ERPB2UFSjSztwDOxEFaOIvGnARyZ9vNS4YxkYR5RnX/347rjQHPYBpOkToq5h3lL5ohY/6soKm4q0lPmhozEpOYYfnI7Sch8PAW7VXP85kkJE4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=IR3s6tyQ; arc=none smtp.client-ip=159.69.126.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VNOUZxJy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C0C1C2BCB8;
-	Thu, 14 May 2026 10:13:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778753614;
-	bh=pyFB4ur/KVLGcKl/yLNGIfGo7BXMPQnbBHd8aTS1kt0=;
+	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="IR3s6tyQ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+	s=mail; t=1778758269;
+	bh=ogt7RJ7TLjf5SRY4nGaMYBaqSNNoRwxFevzQIxH5QFI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VNOUZxJyCkN4NYFp1NdTxIviv6fdawFQatfOjrTjzUFG5RC8e2NCC0DV935mjzNBQ
-	 TZei+awNzZKo3nMD8AykyxLwChCts8nwLKZedeUXLi9EWZLSYbqrVDRGEQL//xDNUg
-	 M7PAyBJcV26zRYDU2OnWw+KdiSR14zuT1u7e1qLuWWZIRwSqo/1lUYf1xSVMs08VAI
-	 qyP+RI/VF8ZJCPwSf/SO5cYTH+LIA1jHr90zhyMz+RG+khuUUCf3nmJ5B2JNQa89jd
-	 b3LmwFwsbOnim/OouN+nFUdEVHG5o71G9ay1tAkaE1Kk6pEkGuU3m4oZ1d3YG5fx7F
-	 bsazcJySO0Uyg==
-Date: Thu, 14 May 2026 19:13:30 +0900
-From: "Harry Yoo (Oracle)" <harry@kernel.org>
-To: "Vlastimil Babka (SUSE)" <vbabka@kernel.org>
-Cc: Marco Elver <elver@google.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>, 
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>, Andrey Konovalov <andreyknvl@gmail.com>, 
-	Bill Wendling <morbo@google.com>, David Hildenbrand <david@kernel.org>, 
-	David Rientjes <rientjes@google.com>, Dmitry Vyukov <dvyukov@google.com>, Jann Horn <jannh@google.com>, 
-	Justin Stitt <justinstitt@google.com>, KP Singh <kpsingh@kernel.org>, Kees Cook <kees@kernel.org>, 
-	Lorenzo Stoakes <ljs@kernel.org>, Matteo Rizzo <matteorizzo@google.com>, 
-	Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
-	Roman Gushchin <roman.gushchin@linux.dev>, Suren Baghdasaryan <surenb@google.com>, 
-	linux-hardening@vger.kernel.org, Nicolas Schier <nsc@kernel.org>, Dennis Zhou <dennis@kernel.org>, 
-	Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@gentwo.org>, Hao Li <hao.li@linux.dev>, 
-	"Liam R. Howlett" <liam@infradead.org>, Alexander Potapenko <glider@google.com>, 
-	Miguel Ojeda <ojeda@kernel.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, kasan-dev@googlegroups.com, llvm@lists.linux.dev, 
-	GONG Ruiqi <gongruiqi1@huawei.com>, Jonathan Corbet <corbet@lwn.net>, 
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>
-Subject: Re: [PATCH v4 1/3] slab: support for compiler-assisted type-based
- slab cache partitioning
-Message-ID: <gmzc5ul56yvsdgha4ly53zckhmhnbylak2rcxwxlerhkt2d5lm@gellfjmlzmr3>
-References: <20260511200136.3201646-1-elver@google.com>
- <560a84ed-7daf-4a78-a314-b867c73bce22@kernel.org>
+	b=IR3s6tyQHgiIPzlJgpz5y5eoTdE5I7/o82+qvZ+IOWkuYbTJRrn6SaH7SWblDH4dW
+	 ynIaJboSKPZdMLD617ACuklj3hNbbsSrvktkNr7fY9NK9MfXJp7gLl0ER5k+4QH1k6
+	 ++NTaIE6nRo2zZhqAUzS0EH05YXVxB+XZi757Qyg=
+Date: Thu, 14 May 2026 13:31:08 +0200
+From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
+To: Viktor =?utf-8?B?SsOkZ2Vyc2vDvHBwZXI=?= <viktor_jaegerskuepper@freenet.de>
+Cc: Christian Heusel <christian@heusel.eu>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, linux-kbuild@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] kbuild: pacman-pkg: make "rc" releases adhere to pacman
+ versioning scheme
+Message-ID: <ac256794-25c2-46bf-8375-e65b2f0b06ff@t-8ch.de>
+References: <20260513231745.51780-1-viktor_jaegerskuepper@freenet.de>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <560a84ed-7daf-4a78-a314-b867c73bce22@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260513231745.51780-1-viktor_jaegerskuepper@freenet.de>
 
-On Thu, May 14, 2026 at 11:01:26AM +0200, Vlastimil Babka (SUSE) wrote:
-> Applied [1] to slab/for-next, thanks. That means including the kernel-doc
-> workarounds in patch 3. I know Jon said someone might hate it, but maybe it
-> will motivate them for creating a proper fix :) It seems better than leaving
-> doc generation broken or not applying this series at all.
+On 2026-05-14 01:17:29+0200, Viktor Jägersküpper wrote:
+> The package versioning scheme does not enable smooth upgrades from "rc"
+> releases to the corresponding stable releases (e.g. 7.0.0-rc7 -> 7.0.0)
+> because pacman considers that a downgrade due to the underscore in
+> pkgver (e.g. 7.0.0_rc7), see e.g. vercmp(8) for an explanation of the
+> package version comparison used by pacman. Package versions which are
+> derived from said releases (e.g. built from git revisions) are
+> similarly affected. Fix this by modifying pkgver in order to remove the
+> hyphen from kernel versions containing "-rc".
 > 
-> https://git.kernel.org/pub/scm/linux/kernel/git/vbabka/slab.git/log/?h=slab/for-7.2/alloc_token
-> 
-> I did the following fixup to remove passing an unnecessary NULL argument for
-> __kmalloc_nolock() with buckets enabled. Made bloat-o-meter happier a bit.
+> Signed-off-by: Viktor Jägersküpper <viktor_jaegerskuepper@freenet.de>
 
-[...]
+Acked-by: Thomas Weißschuh <linux@weissschuh.net>
 
-Looks reasonable to me, thanks!
+Thanks!
 
--- 
-Cheers,
-Harry / Hyeonggon
+> ---
+>  scripts/package/PKGBUILD | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+
+(...)
