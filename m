@@ -1,51 +1,51 @@
 Received: from mailgw02.zimbra-vnc.de (mailgw02.zimbra-vnc.de [148.251.102.236])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44C2E3DDDCD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56C763890E2;
 	Mon, 18 May 2026 06:21:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.102.236
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779085304; cv=none; b=peg7NqAneyJf0b35ENM5n8AOaVR5L3SCErMokMelKh3wQCfxuvAihXdIkQjAkIvUmOT62RCWPAAhQxfQRRkgqeuLhDdHdXE/utStl9MGRvLHhWhctuwfoieLxMpb6S+UrB8a+LNgga2kxS3GWzhMrzc0yZzwid07MavbNtxZolI=
+	t=1779085305; cv=none; b=hAjdsOtFvy4NsnnPptPnu7whBtekTQCdMT2X8VKbC5NG4xt3HUNPrIdnSVRrS/f4S6En7NVSehTdB+/nBvjv3iWoH1CjrGg8JF2/EkZEgKye6Om3uSLShULZrd/NlfaPtmytFfSPIzjks6hxmBcrvFmptni3DiTrn/8Kdi0Z/VY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779085304; c=relaxed/simple;
-	bh=+v4Q6VCD4q79YgY9ngs/9H9auNUc3ghr/wPj0DcRo6g=;
+	s=arc-20240116; t=1779085305; c=relaxed/simple;
+	bh=bdItrdgPyiTB3vWGzgQeGi3b8ybVRDHiRyFx0UTZtJQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=J6qBDzIcwM6iZGLLBDvY5XYonREfaD2bAsUEbjfYlitBRGFem21q00PHh7LVnE16gOKwizs1Uggn+xKRAmvklblMR4xwWrpvieMSCrrkA+ssMJKlthyARO7pCMdyfMk2/n/hAJzQ8j0+LRWiu1Bwzj9rH9UkXbzrOaOmPLBJ9sE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com; spf=pass smtp.mailfrom=tngtech.com; dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b=Huw8/KiC; arc=none smtp.client-ip=148.251.102.236
+	 MIME-Version; b=tIbEZJxAo8gGwMJIk19DC0kZMKyDjOqo52xFgG/UR1Q4UcyszxGxmyKiwB8iTRB43iLdHb2WlcJ8+rcecu4Djd7WmuoAErCeK9C0jwiwoH7u+D8d9RHHgOe8Gl0XmW3O+87oj08JjXSVfXtHQW5mfTK/PeGHhwbbD63BkXhZGIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com; spf=pass smtp.mailfrom=tngtech.com; dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b=QOya4Cdf; arc=none smtp.client-ip=148.251.102.236
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tngtech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b="Huw8/KiC"
+	dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b="QOya4Cdf"
 Received: from zmproxy.tng.vnc.biz (zimbra-vnc.tngtech.com [35.234.71.156])
-	by mailgw02.zimbra-vnc.de (Postfix) with ESMTPS id D7E79200C6;
-	Mon, 18 May 2026 08:21:28 +0200 (CEST)
+	by mailgw02.zimbra-vnc.de (Postfix) with ESMTPS id 39A44200CD;
+	Mon, 18 May 2026 08:21:31 +0200 (CEST)
 Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 2B68A1F8989;
-	Mon, 18 May 2026 08:21:28 +0200 (CEST)
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 0CEFE1F8989;
+	Mon, 18 May 2026 08:21:31 +0200 (CEST)
 Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
  by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10032)
- with ESMTP id vRYrDHPwlS2J; Mon, 18 May 2026 08:21:27 +0200 (CEST)
+ with ESMTP id OmGHK_MbeaCO; Mon, 18 May 2026 08:21:30 +0200 (CEST)
 Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 3C4B11F89A8;
-	Mon, 18 May 2026 08:21:27 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz 3C4B11F89A8
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 668421FAD23;
+	Mon, 18 May 2026 08:21:30 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz 668421FAD23
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tngtech.com;
-	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1779085287;
-	bh=XEgu4LUSVjfZgcscCYcZaHyuAzW000Lwm3mdeHvwOPE=;
+	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1779085290;
+	bh=FD6c3aam+X5MsDPR+uNQsdOzwvzHC15J+0Psqfwx3og=;
 	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=Huw8/KiCqeXLXdCl2/ARDiGYf76i/NDmS/+rcvhK3a/YhRWUCj9XxSLZjyBCTuQu2
-	 7WGBxRQk8HIiqE9T3AwIAuKUXKgz/EjOVuqWvZ5l0D8wh+N923atEGfS5oFJaZO3pI
-	 AHIo8E9L7ah7qzqZQ2cxHFhDeLESGnwAr2/Dp2f7nYOBjMIbNcxiOtvaniuehiyliJ
-	 7O2DO7G78XAFUbrN1UUEcai7qqb/zgauQ+yJNV4RlW7AGwxv49JhNX5OWoMqK33znc
-	 3zjmeiGA9ZNNcpnBVnIltq7pU3Mzo8BLkHT7HUs8agr3dQELBf5+Oh4v++5gD8F1RV
-	 gDQvcmNvFQ7WQ==
+	b=QOya4Cdfk7OIkay1YU08etboNEx0ZNCdXqQgQuMrZSqGcKPxpEu5cm9imvoNW72Sh
+	 wgyyJo6IDle7B2CsyHDASNDPiJe8wYP20Ku50FwzisxtG/gwSciVNIKJSlTHsziuFc
+	 2acgooF0Ns42J59DTp7poAJDQq7JG0WYffEbYVGysrjp14X8Bql1yckym3x3/NJp78
+	 sZ52zxE5ZrGo3URZWVm0sHhbZs8xpH7uIMAjHtBZTW+pE9tMC4TfOO79QnvUeBiRFK
+	 lbOfPtgWOsoMBj1LAxOSg28XXLpJAfxDrEcYP+kcjH5f4U5aQ3Lsr3wDaHFJsQ/MwF
+	 Iqq9lBhoQ302Q==
 X-Virus-Scanned: amavis at zmproxy.tng.vnc.biz
 Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
  by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10026)
- with ESMTP id VTlSXSMZ_0cU; Mon, 18 May 2026 08:21:27 +0200 (CEST)
+ with ESMTP id EUmYUuGJIfnU; Mon, 18 May 2026 08:21:30 +0200 (CEST)
 Received: from luis-Precision-5480.. (ipservice-092-209-239-167.092.209.pools.vodafone-ip.de [92.209.239.167])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id DC17D1F8989;
-	Mon, 18 May 2026 08:21:26 +0200 (CEST)
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id 0CC2B1FAD21;
+	Mon, 18 May 2026 08:21:30 +0200 (CEST)
 From: Luis <luis.augenstein@tngtech.com>
 To: nathan@kernel.org,
 	nsc@kernel.org
@@ -56,9 +56,9 @@ Cc: linux-kbuild@vger.kernel.org,
 	kstewart@linuxfoundation.org,
 	maximilian.huber@tngtech.com,
 	Luis Augenstein <luis.augenstein@tngtech.com>
-Subject: [PATCH v7 13/15] scripts/sbom: add SPDX build graph
-Date: Mon, 18 May 2026 08:21:00 +0200
-Message-ID: <20260518062102.2051814-14-luis.augenstein@tngtech.com>
+Subject: [PATCH v7 15/15] scripts/sbom: add unit tests for SPDX-License-Identifier parsing
+Date: Mon, 18 May 2026 08:21:02 +0200
+Message-ID: <20260518062102.2051814-16-luis.augenstein@tngtech.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260518062102.2051814-1-luis.augenstein@tngtech.com>
 References: <20260518062102.2051814-1-luis.augenstein@tngtech.com>
@@ -72,9 +72,8 @@ Content-Transfer-Encoding: quoted-printable
 
 From: Luis Augenstein <luis.augenstein@tngtech.com>
 
-Implement the SPDX build graph to describe the relationships
-between source files in the source SBOM and output files in
-the output SBOM.
+Verify that SPDX-License-Identifier headers at the top of source files
+are parsed correctly.
 
 Assisted-by: Cursor:claude-sonnet-4-5
 Assisted-by: OpenCode:GLM-4-7
@@ -82,423 +81,65 @@ Co-developed-by: Maximilian Huber <maximilian.huber@tngtech.com>
 Signed-off-by: Maximilian Huber <maximilian.huber@tngtech.com>
 Signed-off-by: Luis Augenstein <luis.augenstein@tngtech.com>
 ---
- .../sbom/sbom/spdx_graph/build_spdx_graphs.py |  17 +
- .../sbom/sbom/spdx_graph/spdx_build_graph.py  | 318 ++++++++++++++++++
- 2 files changed, 335 insertions(+)
- create mode 100644 scripts/sbom/sbom/spdx_graph/spdx_build_graph.py
+ scripts/sbom/tests/spdx_graph/__init__.py     |  0
+ .../sbom/tests/spdx_graph/test_kernel_file.py | 35 +++++++++++++++++++
+ 2 files changed, 35 insertions(+)
+ create mode 100644 scripts/sbom/tests/spdx_graph/__init__.py
+ create mode 100644 scripts/sbom/tests/spdx_graph/test_kernel_file.py
 
-diff --git a/scripts/sbom/sbom/spdx_graph/build_spdx_graphs.py b/scripts/=
-sbom/sbom/spdx_graph/build_spdx_graphs.py
-index f2567d44960..ee24e9eaf60 100644
---- a/scripts/sbom/sbom/spdx_graph/build_spdx_graphs.py
-+++ b/scripts/sbom/sbom/spdx_graph/build_spdx_graphs.py
-@@ -4,6 +4,7 @@
- from datetime import datetime
- from typing import Protocol
-=20
-+import logging
- from sbom.config import KernelSpdxDocumentKind
- from sbom.cmd_graph import CmdGraph
- from sbom.path_utils import PathStr
-@@ -11,6 +12,7 @@ from sbom.spdx_graph.kernel_file import KernelFileColle=
-ction
- from sbom.spdx_graph.spdx_graph_model import SpdxGraph, SpdxIdGeneratorC=
-ollection
- from sbom.spdx_graph.shared_spdx_elements import SharedSpdxElements
- from sbom.spdx_graph.spdx_source_graph import SpdxSourceGraph
-+from sbom.spdx_graph.spdx_build_graph import SpdxBuildGraph
- from sbom.spdx_graph.spdx_output_graph import SpdxOutputGraph
-=20
-=20
-@@ -62,5 +64,20 @@ def build_spdx_graphs(
-             shared_elements=3Dshared_elements,
-             spdx_id_generators=3Dspdx_id_generators,
-         )
-+    else:
-+        logging.info(
-+            "Skipped creating a dedicated source SBOM because source fil=
-es cannot be "
-+            "reliably classified when the source and object trees are id=
-entical. "
-+            "Added source files to the build SBOM instead."
-+        )
-+
-+    build_graph =3D SpdxBuildGraph.create(
-+        cmd_graph,
-+        kernel_files,
-+        shared_elements,
-+        output_graph.high_level_build_element,
-+        spdx_id_generators,
-+    )
-+    spdx_graphs[KernelSpdxDocumentKind.BUILD] =3D build_graph
-=20
-     return spdx_graphs
-diff --git a/scripts/sbom/sbom/spdx_graph/spdx_build_graph.py b/scripts/s=
-bom/sbom/spdx_graph/spdx_build_graph.py
+diff --git a/scripts/sbom/tests/spdx_graph/__init__.py b/scripts/sbom/tes=
+ts/spdx_graph/__init__.py
 new file mode 100644
-index 00000000000..4d738bc3b3e
+index 00000000000..e69de29bb2d
+diff --git a/scripts/sbom/tests/spdx_graph/test_kernel_file.py b/scripts/=
+sbom/tests/spdx_graph/test_kernel_file.py
+new file mode 100644
+index 00000000000..35a63a768ba
 --- /dev/null
-+++ b/scripts/sbom/sbom/spdx_graph/spdx_build_graph.py
-@@ -0,0 +1,318 @@
++++ b/scripts/sbom/tests/spdx_graph/test_kernel_file.py
+@@ -0,0 +1,35 @@
 +# SPDX-License-Identifier: GPL-2.0-only OR MIT
 +# Copyright (C) 2025 TNG Technology Consulting GmbH
 +
-+from dataclasses import dataclass
-+from typing import Mapping
-+from sbom.cmd_graph import CmdGraph
-+from sbom.path_utils import PathStr
-+from sbom.spdx import SpdxIdGenerator
-+from sbom.spdx.build import Build
-+from sbom.spdx.core import ExternalMap, NamespaceMap, Relationship, Spdx=
-Document
-+from sbom.spdx.software import File, Sbom
-+from sbom.spdx_graph.kernel_file import KernelFileCollection
-+from sbom.spdx_graph.shared_spdx_elements import SharedSpdxElements
-+from sbom.spdx_graph.spdx_graph_model import SpdxGraph, SpdxIdGeneratorC=
-ollection
-+from sbom.spdx_graph.spdx_source_graph import source_file_license_elemen=
-ts
++import unittest
++from pathlib import Path
++import tempfile
++from sbom.spdx_graph.kernel_file import _parse_spdx_license_identifier  =
+# type: ignore
 +
 +
-+@dataclass
-+class SpdxBuildGraph(SpdxGraph):
-+    """SPDX graph representing build dependencies connecting source file=
-s and
-+    distributable output files"""
++class TestKernelFile(unittest.TestCase):
++    def setUp(self):
++        self.tmpdir =3D tempfile.TemporaryDirectory()
++        self.src_tree =3D Path(self.tmpdir.name)
 +
-+    @classmethod
-+    def create(
-+        cls,
-+        cmd_graph: CmdGraph,
-+        kernel_files: KernelFileCollection,
-+        shared_elements: SharedSpdxElements,
-+        high_level_build_element: Build,
-+        spdx_id_generators: SpdxIdGeneratorCollection,
-+    ) -> "SpdxBuildGraph":
-+        if len(kernel_files.source) > 0:
-+            return _create_spdx_build_graph(
-+                cmd_graph,
-+                kernel_files,
-+                shared_elements,
-+                high_level_build_element,
-+                spdx_id_generators,
-+            )
-+        else:
-+            return _create_spdx_build_graph_with_mixed_sources(
-+                cmd_graph,
-+                kernel_files,
-+                shared_elements,
-+                high_level_build_element,
-+                spdx_id_generators,
-+            )
++    def tearDown(self):
++        self.tmpdir.cleanup()
 +
++    def test_parse_spdx_license_identifier(self):
++        # REUSE-IgnoreStart
++        test_cases: list[tuple[str, str | None]] =3D [
++            ("/* SPDX-License-Identifier: MIT*/", "MIT"),
++            ("// SPDX-License-Identifier: GPL-2.0-only", "GPL-2.0-only")=
+,
++            ("# SPDX-License-Identifier: GPL-2.0-only", "GPL-2.0-only"),
++            ("#!/bin/bash\n# SPDX-License-Identifier: GPL-2.0-only", "GP=
+L-2.0-only"),
++            ("/* SPDX-License-Identifier: GPL-2.0-or-later OR MIT */", "=
+GPL-2.0-or-later OR MIT"),
++            ("/* SPDX-License-Identifier: Apache-2.0 */\n extra text", "=
+Apache-2.0"),
++            ("<!-- SPDX-License-Identifier: GPL-2.0 -->", "GPL-2.0"),
++            ("int main() { return 0; }", None),
++        ]
++        # REUSE-IgnoreEnd
 +
-+def _create_spdx_build_graph(
-+    cmd_graph: CmdGraph,
-+    kernel_files: KernelFileCollection,
-+    shared_elements: SharedSpdxElements,
-+    high_level_build_element: Build,
-+    spdx_id_generators: SpdxIdGeneratorCollection,
-+) -> SpdxBuildGraph:
-+    """
-+    Creates an SPDX build graph where source and output files are refere=
-nced
-+    from external documents.
-+
-+    Args:
-+        cmd_graph: The dependency graph of a kernel build.
-+        kernel_files: Collection of categorized kernel files involved in=
- the build.
-+        shared_elements: SPDX elements shared across multiple documents.
-+        high_level_build_element: The high-level Build element reference=
-d by the build graph.
-+        spdx_id_generators: Collection of generators for SPDX element ID=
-s.
-+
-+    Returns:
-+        SpdxBuildGraph: The SPDX build graph connecting source files and=
- distributable output files.
-+    """
-+    # SpdxDocument
-+    build_spdx_document =3D SpdxDocument(
-+        spdxId=3Dspdx_id_generators.build.generate(),
-+        profileConformance=3D["core", "software", "build"],
-+        namespaceMap=3D[
-+            NamespaceMap(prefix=3Dgenerator.prefix, namespace=3Dgenerato=
-r.namespace)
-+            for generator in [
-+                spdx_id_generators.build,
-+                spdx_id_generators.source,
-+                spdx_id_generators.output,
-+                spdx_id_generators.base,
-+            ]
-+            if generator.prefix is not None
-+        ],
-+    )
-+
-+    # Sbom
-+    build_sbom =3D Sbom(
-+        spdxId=3Dspdx_id_generators.build.generate(),
-+        software_sbomType=3D["build"],
-+    )
-+
-+    # Src and object tree elements
-+    obj_tree_element =3D File(
-+        spdxId=3Dspdx_id_generators.build.generate(),
-+        name=3D"$(obj_tree)",
-+        software_fileKind=3D"directory",
-+    )
-+    obj_tree_contains_relationship =3D Relationship(
-+        spdxId=3Dspdx_id_generators.build.generate(),
-+        relationshipType=3D"contains",
-+        from_=3Dobj_tree_element,
-+        to=3D[],
-+    )
-+
-+    # File elements
-+    build_file_elements =3D [file.spdx_file_element for file in kernel_f=
-iles.build.values()]
-+    file_relationships =3D _file_relationships(
-+        cmd_graph=3Dcmd_graph,
-+        file_elements=3D{key: file.spdx_file_element for key, file in ke=
-rnel_files.to_dict().items()},
-+        high_level_build_element=3Dhigh_level_build_element,
-+        spdx_id_generator=3Dspdx_id_generators.build,
-+    )
-+
-+    # Update relationships
-+    build_spdx_document.rootElement =3D [build_sbom]
-+
-+    build_spdx_document.import_ =3D [
-+        *(
-+            ExternalMap(externalSpdxId=3Dfile.spdx_file_element.spdxId)
-+            for file in (*kernel_files.source.values(), *kernel_files.ex=
-ternal.values())
-+        ),
-+        ExternalMap(externalSpdxId=3Dhigh_level_build_element.spdxId),
-+        *(ExternalMap(externalSpdxId=3Dfile.spdx_file_element.spdxId) fo=
-r file in kernel_files.output.values()),
-+    ]
-+
-+    build_sbom.rootElement =3D [obj_tree_element]
-+    build_sbom.element =3D [
-+        obj_tree_element,
-+        obj_tree_contains_relationship,
-+        *build_file_elements,
-+        *file_relationships,
-+    ]
-+
-+    obj_tree_contains_relationship.to =3D [
-+        *build_file_elements,
-+        *(file.spdx_file_element for file in kernel_files.output.values(=
-)),
-+    ]
-+
-+    # create Spdx graphs
-+    build_graph =3D SpdxBuildGraph(
-+        build_spdx_document,
-+        shared_elements.agent,
-+        shared_elements.creation_info,
-+        build_sbom,
-+    )
-+    return build_graph
-+
-+
-+def _create_spdx_build_graph_with_mixed_sources(
-+    cmd_graph: CmdGraph,
-+    kernel_files: KernelFileCollection,
-+    shared_elements: SharedSpdxElements,
-+    high_level_build_element: Build,
-+    spdx_id_generators: SpdxIdGeneratorCollection,
-+) -> SpdxBuildGraph:
-+    """
-+    Creates an SPDX build graph where only output files are referenced f=
-rom
-+    an external document. Source files are included directly in the buil=
-d graph.
-+
-+    Args:
-+        cmd_graph: The dependency graph of a kernel build.
-+        kernel_files: Collection of categorized kernel files involved in=
- the build.
-+        shared_elements: SPDX elements shared across multiple documents.
-+        high_level_build_element: The high-level Build element reference=
-d by the build graph.
-+        spdx_id_generators: Collection of generators for SPDX element ID=
-s.
-+
-+    Returns:
-+        SpdxBuildGraph: The SPDX build graph connecting source files and=
- distributable output files.
-+    """
-+    # SpdxDocument
-+    build_spdx_document =3D SpdxDocument(
-+        spdxId=3Dspdx_id_generators.build.generate(),
-+        profileConformance=3D["core", "software", "build"],
-+        namespaceMap=3D[
-+            NamespaceMap(prefix=3Dgenerator.prefix, namespace=3Dgenerato=
-r.namespace)
-+            for generator in [
-+                spdx_id_generators.build,
-+                spdx_id_generators.output,
-+                spdx_id_generators.base,
-+            ]
-+            if generator.prefix is not None
-+        ],
-+    )
-+
-+    # Sbom
-+    build_sbom =3D Sbom(
-+        spdxId=3Dspdx_id_generators.build.generate(),
-+        software_sbomType=3D["build"],
-+    )
-+
-+    # File elements
-+    build_file_elements =3D [file.spdx_file_element for file in kernel_f=
-iles.build.values()]
-+    external_file_elements =3D [file.spdx_file_element for file in kerne=
-l_files.external.values()]
-+    file_relationships =3D _file_relationships(
-+        cmd_graph=3Dcmd_graph,
-+        file_elements=3D{key: file.spdx_file_element for key, file in ke=
-rnel_files.to_dict().items()},
-+        high_level_build_element=3Dhigh_level_build_element,
-+        spdx_id_generator=3Dspdx_id_generators.build,
-+    )
-+
-+    # Source file license elements
-+    source_file_license_identifiers, source_file_license_relationships =3D=
- source_file_license_elements(
-+        list(kernel_files.build.values()), spdx_id_generators.build
-+    )
-+
-+    # Update relationships
-+    build_spdx_document.rootElement =3D [build_sbom]
-+    root_file_elements =3D [file.spdx_file_element for file in kernel_fi=
-les.output.values()]
-+    build_spdx_document.import_ =3D [
-+        ExternalMap(externalSpdxId=3Dhigh_level_build_element.spdxId),
-+        *(ExternalMap(externalSpdxId=3Dfile.spdxId) for file in root_fil=
-e_elements),
-+    ]
-+
-+    build_sbom.rootElement =3D [*root_file_elements]
-+    build_sbom.element =3D [
-+        *build_file_elements,
-+        *external_file_elements,
-+        *source_file_license_identifiers,
-+        *source_file_license_relationships,
-+        *file_relationships,
-+    ]
-+
-+    build_graph =3D SpdxBuildGraph(
-+        build_spdx_document,
-+        shared_elements.agent,
-+        shared_elements.creation_info,
-+        build_sbom,
-+    )
-+    return build_graph
-+
-+
-+def _file_relationships(
-+    cmd_graph: CmdGraph,
-+    file_elements: Mapping[PathStr, File],
-+    high_level_build_element: Build,
-+    spdx_id_generator: SpdxIdGenerator,
-+) -> list[Build | Relationship]:
-+    """
-+    Construct SPDX Build and Relationship elements representing dependen=
-cy
-+    relationships in the cmd graph.
-+
-+    Args:
-+        cmd_graph: The dependency graph of a kernel build.
-+        file_elements: Mapping of filesystem paths (PathStr) to their
-+            corresponding SPDX File elements.
-+        high_level_build_element: The SPDX Build element representing th=
-e overall build process/root.
-+        spdx_id_generator: Generator for unique SPDX IDs.
-+
-+    Returns:
-+        list[Build | Relationship]: List of SPDX Build and Relationship =
-elements
-+    """
-+    high_level_build_ancestorOf_relationship =3D Relationship(
-+        spdxId=3Dspdx_id_generator.generate(),
-+        relationshipType=3D"ancestorOf",
-+        from_=3Dhigh_level_build_element,
-+        completeness=3D"complete",
-+        to=3D[],
-+    )
-+
-+    # Create a relationship between each node (output file)
-+    # and its children (input files)
-+    build_and_relationship_elements: list[Build | Relationship] =3D [hig=
-h_level_build_ancestorOf_relationship]
-+    for node in cmd_graph:
-+        # .cmd file dependencies
-+        if node.cmd_file is not None:
-+            build_element =3D Build(
-+                spdxId=3Dspdx_id_generator.generate(),
-+                build_buildType=3Dhigh_level_build_element.build_buildTy=
-pe,
-+                build_buildId=3Dhigh_level_build_element.build_buildId,
-+                comment=3Dnode.cmd_file.savedcmd,
-+            )
-+            build_and_relationship_elements.append(build_element)
-+
-+            if node.cmd_file_dependencies:
-+                hasInput_relationship =3D Relationship(
-+                    spdxId=3Dspdx_id_generator.generate(),
-+                    relationshipType=3D"hasInput",
-+                    from_=3Dbuild_element,
-+                    to=3D[file_elements[dep.absolute_path] for dep in no=
-de.cmd_file_dependencies],
-+                )
-+                build_and_relationship_elements.append(hasInput_relation=
-ship)
-+
-+            hasOutput_relationship =3D Relationship(
-+                spdxId=3Dspdx_id_generator.generate(),
-+                relationshipType=3D"hasOutput",
-+                from_=3Dbuild_element,
-+                to=3D[file_elements[node.absolute_path]],
-+            )
-+            build_and_relationship_elements.append(hasOutput_relationshi=
-p)
-+
-+            high_level_build_ancestorOf_relationship.to.append(build_ele=
-ment)
-+
-+        # incbin dependencies
-+        if len(node.incbin_dependencies) > 0:
-+            incbin_dependsOn_relationship =3D Relationship(
-+                spdxId=3Dspdx_id_generator.generate(),
-+                relationshipType=3D"dependsOn",
-+                comment=3D"\n".join([incbin_dependency.full_statement fo=
-r incbin_dependency in node.incbin_dependencies]),
-+                from_=3Dfile_elements[node.absolute_path],
-+                to=3D[
-+                    file_elements[incbin_dependency.node.absolute_path]
-+                    for incbin_dependency in node.incbin_dependencies
-+                ],
-+            )
-+            build_and_relationship_elements.append(incbin_dependsOn_rela=
-tionship)
-+
-+        # hardcoded dependencies
-+        if len(node.hardcoded_dependencies) > 0:
-+            hardcoded_dependency_relationship =3D Relationship(
-+                spdxId=3Dspdx_id_generator.generate(),
-+                relationshipType=3D"dependsOn",
-+                from_=3Dfile_elements[node.absolute_path],
-+                to=3D[file_elements[n.absolute_path] for n in node.hardc=
-oded_dependencies],
-+            )
-+            build_and_relationship_elements.append(hardcoded_dependency_=
-relationship)
-+
-+    return build_and_relationship_elements
++        for i, (file_content, expected_identifier) in enumerate(test_cas=
+es):
++            file_path =3D self.src_tree / f"file_{i}.c"
++            file_path.write_text(file_content)
++            self.assertEqual(_parse_spdx_license_identifier(str(file_pat=
+h)), expected_identifier)
 --=20
 2.43.0
 
