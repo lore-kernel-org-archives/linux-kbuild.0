@@ -1,50 +1,51 @@
 Received: from mailgw02.zimbra-vnc.de (mailgw02.zimbra-vnc.de [148.251.102.236])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40DCC3DC4B3;
-	Mon, 18 May 2026 06:21:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EEA6385529;
+	Mon, 18 May 2026 06:21:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.102.236
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779085282; cv=none; b=ryPv0CF8LC8DRE89ncIC+Zb8qSoVS6WkunJQZsTgZZYs1IGxwR8tZ/r2Ixp0QKd9uW31tempgn+q2yMGrorHFulFon2CId+PFw/fBCd73030SFWMMmMjz7mMkficY2p5Bm1eQyPLpGhSmWSnCJ/oBXvXGcJLwGNB1WC7Z+NkyM4=
+	t=1779085282; cv=none; b=I36qDkyICKAb8WJTiWVo0djT0u3W9WrOAmxIi0xgePqasWMo3gfhdss7fn3/qqtknnH+TMoHP3jgDR0sha5uUKm2TP3IMQdjYYQRqj5JDazwxYjtLgpyiAX7eZWkVBykQzUbt6WJRA/NR0Tp/sMHxllilG/AcvsIEV3rRurwZ+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1779085282; c=relaxed/simple;
-	bh=ke2YY+ybQALuGdEa47sIk65VRJEoMyxdRAgy959xSa0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lCgs/Df8H9F1Jyj/rIBedYX25C0y55O8p2LVWC3x6nbEy/Tv0uXq45GvgWrzcZvE6xqYsLHSUHB6CpsA2TqJwnwWBbdYRUwfjvuGIYvR6xfLKMZiF7CvUOnJxb6x0icE9gUSac1pEZxuF4SuvSNnN6Qbl6DiqMJXEoGiBsWNy0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com; spf=pass smtp.mailfrom=tngtech.com; dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b=NITlygem; arc=none smtp.client-ip=148.251.102.236
+	bh=htGuP00MUFwoIi1DwFkohLV4asminO75kiVwRXChVBo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=WjhEPCzsQGmlK3819MWRv2PeBX/WPRwXXke5p/ARtXT9JzXWWmKpU4fmeMuLvFZUk9tWvmL/E6tOGLgN0KTdKBKWJXSNzRhjZ22s5+y5Xgj5B2xYgqOL6AYxjxHmJnVEZC93bjomV7qeRZit+NtVQeCeiER6YEbc9cvySM4uUa0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com; spf=pass smtp.mailfrom=tngtech.com; dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b=KxEOhiD6; arc=none smtp.client-ip=148.251.102.236
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tngtech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b="NITlygem"
+	dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b="KxEOhiD6"
 Received: from zmproxy.tng.vnc.biz (zimbra-vnc.tngtech.com [35.234.71.156])
-	by mailgw02.zimbra-vnc.de (Postfix) with ESMTPS id 40776200B9;
-	Mon, 18 May 2026 08:21:09 +0200 (CEST)
+	by mailgw02.zimbra-vnc.de (Postfix) with ESMTPS id 56BC0200BB;
+	Mon, 18 May 2026 08:21:15 +0200 (CEST)
 Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id EFF731FAD33;
-	Mon, 18 May 2026 08:21:08 +0200 (CEST)
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 384221F8989;
+	Mon, 18 May 2026 08:21:15 +0200 (CEST)
 Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
  by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10032)
- with ESMTP id UkCNogEjTyRV; Mon, 18 May 2026 08:21:05 +0200 (CEST)
+ with ESMTP id x4pW-AO9AM1z; Mon, 18 May 2026 08:21:10 +0200 (CEST)
 Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 4A0B11F89A8;
-	Mon, 18 May 2026 08:21:05 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz 4A0B11F89A8
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id E85311F89A8;
+	Mon, 18 May 2026 08:21:09 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz E85311F89A8
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tngtech.com;
-	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1779085265;
-	bh=XAqRMLliPhxSJycxcU31JTG8cpSswXgtgQvm2BmuETw=;
+	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1779085270;
+	bh=OfOkKkqhycGPczYqB2DRqx74nqpSOhYRT84EwmYdtfQ=;
 	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=NITlygemeYkliKshuu2gUIYlbQkSWzlLkKRINDqpsuuwX8t1vgkSldp85IQk/4V6S
-	 Vj3plEiFLsWarSd2AGmeipWRcRMd5EW6186Jpv56+ScEV433sgV3OBr4JNqkmZPKSM
-	 /R4Cl1z7Kr53Y4qCRNhlpSJK86Lh0PfLossReN258QRQ0PAIsBe1eXtXV0CZQPUe6j
-	 9aeoRUx8RxVSR0o721X/zMUE41dkP0G1x6hqiY4a+mzWvLGJtMbMzKH7kLoBkDo5tk
-	 XotSmhYL65RdoHtRuVfg8vHTNi9a06/G6sy4/j8Q2DcdycC7W50XofL7L3n3SOzeXh
-	 IEoe/CWcCGcAA==
+	b=KxEOhiD6PRRzQU5TUOYKElQ5+E7mmGAA5Vb5MUXZK/e3dw4RWJN/81hZfrlHd+kV1
+	 MgsYYbwyRopIcSH514Wr/nh/SiiSLHtoxaifCnO0UuhOQb8d0X1k+hCualK8q7XnHd
+	 +S/fKnVsAy3XJzhnweMhNDWHHEFRCHLcOkskbmdFJ/spkBOaBa9EtyPDxniub9/2Ta
+	 SJ9m8KePpleS1iDoRg2DSFRgn2anpncCv2AZ6hqoLkCqJi3e27vXJ0reuORmE2WJcG
+	 RJuIDgrtqQsQ8jG0/JvfqYw/V0pzinqRdb5G9rRmQrvURWMhfpIrBbRzrv48SoplSg
+	 GTV94h2pLyheA==
 X-Virus-Scanned: amavis at zmproxy.tng.vnc.biz
 Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
  by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10026)
- with ESMTP id HFHffwbMEIQI; Mon, 18 May 2026 08:21:05 +0200 (CEST)
+ with ESMTP id DaWqdEyf8ibC; Mon, 18 May 2026 08:21:09 +0200 (CEST)
 Received: from luis-Precision-5480.. (ipservice-092-209-239-167.092.209.pools.vodafone-ip.de [92.209.239.167])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id DDA621F8989;
-	Mon, 18 May 2026 08:21:04 +0200 (CEST)
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id 91FE81F8989;
+	Mon, 18 May 2026 08:21:09 +0200 (CEST)
 From: Luis <luis.augenstein@tngtech.com>
 To: nathan@kernel.org,
 	nsc@kernel.org
@@ -54,11 +55,13 @@ Cc: linux-kbuild@vger.kernel.org,
 	gregkh@linuxfoundation.org,
 	kstewart@linuxfoundation.org,
 	maximilian.huber@tngtech.com,
-	Luis <luis.augenstein@tngtech.com>
-Subject: [PATCH v7 00/15] add SPDX SBOM generation script
-Date: Mon, 18 May 2026 08:20:47 +0200
-Message-ID: <20260518062102.2051814-1-luis.augenstein@tngtech.com>
+	Luis Augenstein <luis.augenstein@tngtech.com>
+Subject: [PATCH v7 02/15] scripts/sbom: integrate script in make process
+Date: Mon, 18 May 2026 08:20:49 +0200
+Message-ID: <20260518062102.2051814-3-luis.augenstein@tngtech.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260518062102.2051814-1-luis.augenstein@tngtech.com>
+References: <20260518062102.2051814-1-luis.augenstein@tngtech.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -67,46 +70,9 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This patch series introduces a Python-based script for generating SBOM
-documents in the SPDX 3.0.1 format for kernel builds.
+From: Luis Augenstein <luis.augenstein@tngtech.com>
 
-A Software Bill of Materials (SBOM) describes the individual components
-of a software product. For the kernel, the goal is to describe the
-distributable build outputs (typically the kernel image and modules),
-the source files involved in producing these outputs, and the build
-process that connects the source and output files.
-
-To achieve this, the sbom script generates three SPDX documents:
-
-- sbom-output.spdx.json
-  Describes the final build outputs together with high-level
-  build metadata.
-
-- sbom-source.spdx.json
-  Describes all source files involved in the build, including
-  licensing information and additional file metadata.
-
-- sbom-build.spdx.json
-  Describes the entire build process, linking source files
-  from the source SBOM to output files in the output SBOM.
-
-The sbom script is optional. It can be invoked via the `make sbom` target=
-.
-This target depends on `all` and triggers a standard kernel build. Once a=
-ll
-output artifacts have been generated, starting from the kernel image and
-modules as root nodes, the script reconstructs the dependency graph up
-to the original source files. Build dependencies are primarily derived fr=
-om
-the `.cmd` files generated by Kbuild, which record the full command used
-to build each output file.
-
-Currently, the script only supports x86 and arm64 architectures.
-
-This series was developed with assistance from AI tools, namely Cursor
-with Claude Sonnet 4.5 and OpenCode with GLM-4.7. The AI was used for
-documentation, exploring the repository, and iterating on design
-questions and implementation details such as regex patterns.
+integrate SBOM script into the kernel build process.
 
 Assisted-by: Cursor:claude-sonnet-4-5
 Assisted-by: OpenCode:GLM-4-7
@@ -114,122 +80,125 @@ Co-developed-by: Maximilian Huber <maximilian.huber@tngtech.com>
 Signed-off-by: Maximilian Huber <maximilian.huber@tngtech.com>
 Signed-off-by: Luis Augenstein <luis.augenstein@tngtech.com>
 ---
-Changes in v7:
-- parsers: Add command parsers for gen-kernel-hwcaps.sh, mkuboot.sh, and =
-syscallnr.sh scripts.
-- sashiko:
-  - bugfix: Create SPDX Build element for generated files without depende=
-ncies/inputs
-  - robustness: several minor improvements to make the script more robust=
- against unexpected inputs, uncommon build setups, and invalid assumption=
-s
----
-Luis Augenstein (15):
-  scripts/sbom: add documentation
-  scripts/sbom: integrate script in make process
-  scripts/sbom: setup sbom logging
-  scripts/sbom: add command parsers
-  scripts/sbom: add cmd graph generation
-  scripts/sbom: add additional dependency sources for cmd graph
-  scripts/sbom: add SPDX classes
-  scripts/sbom: add JSON-LD serialization
-  scripts/sbom: add shared SPDX elements
-  scripts/sbom: collect file metadata
-  scripts/sbom: add SPDX output graph
-  scripts/sbom: add SPDX source graph
-  scripts/sbom: add SPDX build graph
-  scripts/sbom: add unit tests for command parsers
-  scripts/sbom: add unit tests for SPDX-License-Identifier parsing
-
- .gitignore                                    |   1 +
- Documentation/tools/index.rst                 |   1 +
- Documentation/tools/sbom/sbom.rst             | 206 +++++++
- MAINTAINERS                                   |   6 +
- Makefile                                      |  28 +-
- scripts/sbom/sbom.py                          | 135 +++++
- scripts/sbom/sbom/__init__.py                 |   0
- scripts/sbom/sbom/cmd_graph/__init__.py       |   7 +
- scripts/sbom/sbom/cmd_graph/cmd_file.py       | 162 ++++++
- scripts/sbom/sbom/cmd_graph/cmd_graph.py      |  46 ++
- scripts/sbom/sbom/cmd_graph/cmd_graph_node.py | 142 +++++
- scripts/sbom/sbom/cmd_graph/deps_parser.py    |  52 ++
- .../sbom/cmd_graph/hardcoded_dependencies.py  |  87 +++
- scripts/sbom/sbom/cmd_graph/incbin_parser.py  |  42 ++
- .../cmd_graph/savedcmd_parser/__init__.py     |   6 +
- .../command_parser_registry.py                | 516 ++++++++++++++++++
- .../savedcmd_parser/command_splitter.py       | 128 +++++
- .../savedcmd_parser/savedcmd_parser.py        |  67 +++
- .../cmd_graph/savedcmd_parser/tokenizer.py    |  92 ++++
- scripts/sbom/sbom/config.py                   | 320 +++++++++++
- scripts/sbom/sbom/environment.py              | 192 +++++++
- scripts/sbom/sbom/path_utils.py               |  22 +
- scripts/sbom/sbom/sbom_logging.py             |  94 ++++
- scripts/sbom/sbom/spdx/__init__.py            |   7 +
- scripts/sbom/sbom/spdx/build.py               |  17 +
- scripts/sbom/sbom/spdx/core.py                | 170 ++++++
- scripts/sbom/sbom/spdx/serialization.py       |  62 +++
- scripts/sbom/sbom/spdx/simplelicensing.py     |  20 +
- scripts/sbom/sbom/spdx/software.py            |  69 +++
- scripts/sbom/sbom/spdx/spdxId.py              |  36 ++
- scripts/sbom/sbom/spdx_graph/__init__.py      |   7 +
- .../sbom/sbom/spdx_graph/build_spdx_graphs.py |  83 +++
- scripts/sbom/sbom/spdx_graph/kernel_file.py   | 315 +++++++++++
- .../sbom/spdx_graph/shared_spdx_elements.py   |  32 ++
- .../sbom/sbom/spdx_graph/spdx_build_graph.py  | 318 +++++++++++
- .../sbom/sbom/spdx_graph/spdx_graph_model.py  |  36 ++
- .../sbom/sbom/spdx_graph/spdx_output_graph.py | 187 +++++++
- .../sbom/sbom/spdx_graph/spdx_source_graph.py | 130 +++++
- scripts/sbom/tests/__init__.py                |   0
- scripts/sbom/tests/cmd_graph/__init__.py      |   0
- .../tests/cmd_graph/test_savedcmd_parser.py   | 443 +++++++++++++++
- scripts/sbom/tests/spdx_graph/__init__.py     |   0
- .../sbom/tests/spdx_graph/test_kernel_file.py |  35 ++
- 43 files changed, 4317 insertions(+), 2 deletions(-)
- create mode 100644 Documentation/tools/sbom/sbom.rst
+ .gitignore           |  1 +
+ MAINTAINERS          |  6 ++++++
+ Makefile             | 20 ++++++++++++++++++--
+ scripts/sbom/sbom.py | 16 ++++++++++++++++
+ 4 files changed, 41 insertions(+), 2 deletions(-)
  create mode 100644 scripts/sbom/sbom.py
- create mode 100644 scripts/sbom/sbom/__init__.py
- create mode 100644 scripts/sbom/sbom/cmd_graph/__init__.py
- create mode 100644 scripts/sbom/sbom/cmd_graph/cmd_file.py
- create mode 100644 scripts/sbom/sbom/cmd_graph/cmd_graph.py
- create mode 100644 scripts/sbom/sbom/cmd_graph/cmd_graph_node.py
- create mode 100644 scripts/sbom/sbom/cmd_graph/deps_parser.py
- create mode 100644 scripts/sbom/sbom/cmd_graph/hardcoded_dependencies.py
- create mode 100644 scripts/sbom/sbom/cmd_graph/incbin_parser.py
- create mode 100644 scripts/sbom/sbom/cmd_graph/savedcmd_parser/__init__.=
-py
- create mode 100644 scripts/sbom/sbom/cmd_graph/savedcmd_parser/command_p=
-arser_registry.py
- create mode 100644 scripts/sbom/sbom/cmd_graph/savedcmd_parser/command_s=
-plitter.py
- create mode 100644 scripts/sbom/sbom/cmd_graph/savedcmd_parser/savedcmd_=
-parser.py
- create mode 100644 scripts/sbom/sbom/cmd_graph/savedcmd_parser/tokenizer=
-.py
- create mode 100644 scripts/sbom/sbom/config.py
- create mode 100644 scripts/sbom/sbom/environment.py
- create mode 100644 scripts/sbom/sbom/path_utils.py
- create mode 100644 scripts/sbom/sbom/sbom_logging.py
- create mode 100644 scripts/sbom/sbom/spdx/__init__.py
- create mode 100644 scripts/sbom/sbom/spdx/build.py
- create mode 100644 scripts/sbom/sbom/spdx/core.py
- create mode 100644 scripts/sbom/sbom/spdx/serialization.py
- create mode 100644 scripts/sbom/sbom/spdx/simplelicensing.py
- create mode 100644 scripts/sbom/sbom/spdx/software.py
- create mode 100644 scripts/sbom/sbom/spdx/spdxId.py
- create mode 100644 scripts/sbom/sbom/spdx_graph/__init__.py
- create mode 100644 scripts/sbom/sbom/spdx_graph/build_spdx_graphs.py
- create mode 100644 scripts/sbom/sbom/spdx_graph/kernel_file.py
- create mode 100644 scripts/sbom/sbom/spdx_graph/shared_spdx_elements.py
- create mode 100644 scripts/sbom/sbom/spdx_graph/spdx_build_graph.py
- create mode 100644 scripts/sbom/sbom/spdx_graph/spdx_graph_model.py
- create mode 100644 scripts/sbom/sbom/spdx_graph/spdx_output_graph.py
- create mode 100644 scripts/sbom/sbom/spdx_graph/spdx_source_graph.py
- create mode 100644 scripts/sbom/tests/__init__.py
- create mode 100644 scripts/sbom/tests/cmd_graph/__init__.py
- create mode 100644 scripts/sbom/tests/cmd_graph/test_savedcmd_parser.py
- create mode 100644 scripts/sbom/tests/spdx_graph/__init__.py
- create mode 100644 scripts/sbom/tests/spdx_graph/test_kernel_file.py
 
+diff --git a/.gitignore b/.gitignore
+index 3044b9590f0..f0d35a9d591 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -49,6 +49,7 @@
+ *.s
+ *.so
+ *.so.dbg
++*.spdx.json
+ *.su
+ *.symtypes
+ *.tab.[ch]
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 6aa3fe2ee1b..3dd2ce9ef0c 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -23903,6 +23903,12 @@ R:	Marc Murphy <marc.murphy@sancloud.com>
+ S:	Supported
+ F:	arch/arm/boot/dts/ti/omap/am335x-sancloud*
+=20
++SBOM
++M:	Luis Augenstein <luis.augenstein@tngtech.com>
++M:	Maximilian Huber <maximilian.huber@tngtech.com>
++S:	Maintained
++F:	scripts/sbom/
++
+ SC1200 WDT DRIVER
+ M:	Zwane Mwaikambo <zwanem@gmail.com>
+ S:	Maintained
+diff --git a/Makefile b/Makefile
+index b7b80e84e1e..36f43a9e2ae 100644
+--- a/Makefile
++++ b/Makefile
+@@ -787,7 +787,7 @@ endif
+ # in addition to whatever we do anyway.
+ # Just "make" or "make all" shall build modules as well
+=20
+-ifneq ($(filter all modules nsdeps compile_commands.json clang-%,$(MAKEC=
+MDGOALS)),)
++ifneq ($(filter all modules nsdeps compile_commands.json clang-% sbom,$(=
+MAKECMDGOALS)),)
+   KBUILD_MODULES :=3D y
+ endif
+=20
+@@ -1692,7 +1692,7 @@ CLEAN_FILES +=3D vmlinux.symvers modules-only.symve=
+rs \
+ 	       modules.builtin.ranges vmlinux.o.map vmlinux.unstripped \
+ 	       compile_commands.json rust/test \
+ 	       rust-project.json .vmlinux.objs .vmlinux.export.c \
+-               .builtin-dtbs-list .builtin-dtbs.S
++	       .builtin-dtbs-list .builtin-dtbs.S sbom-*.spdx.json
+=20
+ # Directories & files removed with 'make mrproper'
+ MRPROPER_FILES +=3D include/config include/generated          \
+@@ -1811,6 +1811,7 @@ help:
+ 	@echo  ''
+ 	@echo  'Tools:'
+ 	@echo  '  nsdeps          - Generate missing symbol namespace dependenc=
+ies'
++	@echo  '  sbom            - Generate Software Bill of Materials'
+ 	@echo  ''
+ 	@echo  'Kernel selftest:'
+ 	@echo  '  kselftest         - Build and run kernel selftest'
+@@ -2197,6 +2198,21 @@ nsdeps: export KBUILD_NSDEPS=3D1
+ nsdeps: modules
+ 	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/nsdeps
+=20
++# Script to generate .spdx.json SBOM documents describing the build
++# ----------------------------------------------------------------------=
+-----
++
++ifdef building_out_of_srctree
++sbom_targets :=3D sbom-source.spdx.json
++endif
++sbom_targets +=3D sbom-build.spdx.json sbom-output.spdx.json
++quiet_cmd_sbom =3D GEN     $(sbom_targets)
++      cmd_sbom =3D printf "%s\n" "$(KBUILD_IMAGE)" >"$(tmp-target)"; \
++                 $(if $(CONFIG_MODULES),sed 's/\.o$$/.ko/' $(objtree)/mo=
+dules.order >> "$(tmp-target)";) \
++                 $(PYTHON3) $(srctree)/scripts/sbom/sbom.py;
++PHONY +=3D sbom
++sbom: $(notdir $(KBUILD_IMAGE)) include/generated/autoconf.h $(if $(CONF=
+IG_MODULES),modules modules.order)
++	$(call cmd,sbom)
++
+ # Clang Tooling
+ # ----------------------------------------------------------------------=
+-----
+=20
+diff --git a/scripts/sbom/sbom.py b/scripts/sbom/sbom.py
+new file mode 100644
+index 00000000000..9c2e4c7f17c
+--- /dev/null
++++ b/scripts/sbom/sbom.py
+@@ -0,0 +1,16 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: GPL-2.0-only OR MIT
++# Copyright (C) 2025 TNG Technology Consulting GmbH
++
++"""
++Compute software bill of materials in SPDX format describing a kernel bu=
+ild.
++"""
++
++
++def main():
++    pass
++
++
++# Call main method
++if __name__ =3D=3D "__main__":
++    main()
 --=20
 2.43.0
 
