@@ -1,96 +1,227 @@
-Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE229367F31;
-	Tue, 19 May 2026 18:19:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F3403DF00B
+	for <linux-kbuild@vger.kernel.org>; Tue, 19 May 2026 21:58:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779214787; cv=none; b=PxWQIkMIxnzU9KjKP3QEOzTBJqd7J6oAJNey82EcyM5D5kxWKbcp+7aqBYH8CePKtJ0c9UcSILjvl7N3uLuYi0w5lc8H0OzhYsb262KoU5M3+SurOFH0UD1yaQ7Fj7kgPszL3mmZHVgaoK+kXdx6X8SKUjSvmgykaO8+zqk8QxM=
+	t=1779227902; cv=none; b=ggY3wS5fer/83NHxKfD5lm/RvU15N2hmlhckA8T4WqvZ5dpIXqRk0pYplICEiPjAjDVpjkzcQK4tWKf7hLXkgtsnO/+72lkxW+nyOmz6JeIfVEg7nKQR3uyvWomKFZdtu2jO0EuKKv+NUhyLF03VHUi2VWE84LCmn7T+YkKrv/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779214787; c=relaxed/simple;
-	bh=v4SY6HigQ/OOsllBvHWhDfaSzCSvRwcpB55NIroxYRI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uXDLTIbSjkKCvW8FSKka23dSeioBLkP/TF9hvv1x+D/ma2+wwp80AraaRtSREogQ1SpbPs7rHTceF4HhiBIhXC8xxpfUWZaq1U1NXf+LOpfMtpPmzDFriYNB/ec3xyBrHUzahilqPpfw3iQTdYYVd2ALec4zXI++SlTBg9Zu6Ic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=NdQD2zkT; arc=none smtp.client-ip=159.69.126.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
+	s=arc-20240116; t=1779227902; c=relaxed/simple;
+	bh=O76m9x95ybgxP6M6PHgexbLF1DdcN8mN1tXO3hy8lL8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r9UtlAqRupM3en6T0AnLpKNkWGs7/R+Qfpn8mBXfUwemfG5C3hIJZwMbXXhoNcmSdlEJ3QShd5qsOXgfDuuFqeWkbKfiNy0dYoMTbsPjr23z8GRwaDNcKbiknou7DmLijksLhWDSQp7tJkSkaeXnOwB3WDYyCgp3t5mdRcxPOTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XiTrhhGn; arc=none smtp.client-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="NdQD2zkT"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-	s=mail; t=1779214783;
-	bh=v4SY6HigQ/OOsllBvHWhDfaSzCSvRwcpB55NIroxYRI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NdQD2zkTt1Vg9+d5xPbFs/rZabXzVYqYNbkmay7bmbURQRlVQgmdR/B+lNrKO/wnl
-	 1sbEfjBOCBZinr7ADwsrKwPOLPyNy01sn050oiI8Z1+dSOENnfOYkdJcWLo/dMo86Q
-	 BmkG/C5RjZiti4BDcsEE/fXj4HnkbrPupz3pqug4=
-Date: Tue, 19 May 2026 20:19:43 +0200
-From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
-To: Sami Tolvanen <samitolvanen@google.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Kumar Kartikeya Dwivedi <memxor@gmail.com>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>, 
-	Daniel Gomez <da.gomez@samsung.com>, Paul Moore <paul@paul-moore.com>, 
-	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
-	Naveen N Rao <naveen@kernel.org>, Mimi Zohar <zohar@linux.ibm.com>, 
-	Roberto Sassu <roberto.sassu@huawei.com>, Dmitry Kasatkin <dmitry.kasatkin@gmail.com>, 
-	Eric Snowberg <eric.snowberg@oracle.com>, Nicolas Schier <nicolas.schier@linux.dev>, 
-	Daniel Gomez <da.gomez@kernel.org>, Aaron Tomlin <atomlin@atomlin.com>, 
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, Nicolas Bouchinet <nicolas.bouchinet@oss.cyber.gouv.fr>, 
-	Xiu Jianfeng <xiujianfeng@huawei.com>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
-	Jiri Olsa <jolsa@kernel.org>, bpf@vger.kernel.org, 
-	Fabian =?utf-8?Q?Gr=C3=BCnbichler?= <f.gruenbichler@proxmox.com>, Arnout Engelen <arnout@bzzt.net>, 
-	Mattia Rizzolo <mattia@mapreri.org>, kpcyrd <kpcyrd@archlinux.org>, 
-	Christian Heusel <christian@heusel.eu>, =?utf-8?B?Q8OianU=?= Mihai-Drosi <mcaju95@gmail.com>, 
-	Eric Biggers <ebiggers@kernel.org>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
-	linux-modules@vger.kernel.org, linux-security-module@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, linux-integrity@vger.kernel.org, debian-kernel@lists.debian.org
-Subject: Re: [PATCH v5 00/14] module: Introduce hash-based integrity checking
-Message-ID: <e00a5b59-71c9-4c52-9747-0447d5e66b51@t-8ch.de>
-References: <20260505-module-hashes-v5-0-e174a5a49fce@weissschuh.net>
- <20260518215543.GA1878854@google.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XiTrhhGn"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1779227898;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=y0e120dmylbFo+t9+HsasQpy/PPb563dhdsUNVHdkro=;
+	b=XiTrhhGn364Qiz6mpExlUeSRTrmk9/r/mULX/dQYXifCCG+vZMwZX8znCySLlYGZ5X3pXC
+	IqVHtmfVUpyrL8gFtfBLWXAD0xEB1MN4Hievry6sTu6bHvQXGVGHLR5dYNexq9iCIoSrr/
+	Li6Z3td2gWE0zI0JLe7ZEN1DX+h+wzs=
+From: Andrew Jones <andrew.jones@linux.dev>
+To: linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: nathan@kernel.org,
+	nsc@kernel.org,
+	andriy.shevchenko@linux.intel.com,
+	rdunlap@infradead.org,
+	julianbraha@gmail.com
+Subject: [PATCH v2] kconfig: add kconfig-sym-check static checker
+Date: Tue, 19 May 2026 16:58:04 -0500
+Message-ID: <20260519215804.84025-1-andrew.jones@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260518215543.GA1878854@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Sami,
+Add 'make kconfig-sym-check', a static checker that finds Kconfig
+symbols referenced in expressions (select, depends on, default, etc.)
+but never defined via config/menuconfig anywhere in the tree. New
+dangling symbols are reported as errors (exit 1) unless they are
+listed in an exclusion file, e.g.
 
-On 2026-05-18 21:55:43+0000, Sami Tolvanen wrote:
-> On Tue, May 05, 2026 at 11:05:04AM +0200, Thomas Weißschuh wrote:
-> > The current signature-based module integrity checking has some drawbacks
-> > in combination with reproducible builds. Either the module signing key
-> > is generated at build time, which makes the build unreproducible, or a
-> > static signing key is used, which precludes rebuilds by third parties
-> > and makes the whole build and packaging process much more complicated.
-> > 
-> > The goal is to reach bit-for-bit reproducibility. Excluding certain
-> > parts of the build output from the reproducibility analysis would be
-> > error-prone and force each downstream consumer to introduce new tooling.
-> > 
-> > Introduce a new mechanism to ensure only well-known modules are loaded
-> > by embedding a merkle tree root of all modules built as part of the full
-> > kernel build into vmlinux.
-> 
-> I noticed Sashiko had a few concerns about the build changes. Would you
-> mind taking a look to see if they're valid?
-> 
-> https://sashiko.dev/#/patchset/20260505-module-hashes-v5-0-e174a5a49fce%40weissschuh.net
+ KCONFIG_SYM_CHECK_EXCLUDES=sym-check-excludes make kconfig-sym-check
 
-I definitively have these on my list. Unfortunately I am busy with
-something else right now. But this series and the Sashiko comments
-are next.
+The checker also warns about uppercase N/Y/M used as tristate literal
+values following the same logic as checkpatch.
 
+This new static checker is the script used for [1] with a few
+improvements to avoid some false positives.
 
-Thomas
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=216748 [1]
+Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+Acked-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Acked-by: Randy Dunlap <rdunlap@infradead.org>
+Tested-by: Randy Dunlap <rdunlap@infradead.org>
+---
+
+v2:
+  - Added Andy's and Randy's tags
+  - Accept srctree as first argument so the Makefile can drop 'cd $(srctree)' [Nathan]
+  - Replace git ls-files with git+find fallback [Nathan and Andy]
+  - Changes thanks to sashiko's review
+    - strip quoted strings before inline comments to avoid '#' inside a string
+    - use [^)]* instead of .* in macro strip regex to avoid greedy match
+      eating tokens between adjacent $(macro) expansions
+
+ Makefile                             |  7 +-
+ scripts/kconfig/kconfig-sym-check.pl | 97 ++++++++++++++++++++++++++++
+ 2 files changed, 103 insertions(+), 1 deletion(-)
+ create mode 100755 scripts/kconfig/kconfig-sym-check.pl
+
+diff --git a/Makefile b/Makefile
+index fbc67fcb6cdb..b86ccc1e08cd 100644
+--- a/Makefile
++++ b/Makefile
+@@ -293,6 +293,7 @@ version_h := include/generated/uapi/linux/version.h
+ clean-targets := %clean mrproper cleandocs
+ no-dot-config-targets := $(clean-targets) \
+ 			 cscope gtags TAGS tags help% %docs check% coccicheck \
++			 kconfig-sym-check \
+ 			 $(version_h) headers headers_% archheaders archscripts \
+ 			 %asm-generic kernelversion %src-pkg dt_binding_check \
+ 			 outputmakefile rustavailable rustfmt rustfmtcheck \
+@@ -1811,6 +1812,7 @@ help:
+ 	@echo  '  includecheck    - Check for duplicate included header files'
+ 	@echo  '  headerdep       - Detect inclusion cycles in headers'
+ 	@echo  '  coccicheck      - Check with Coccinelle'
++	@echo  '  kconfig-sym-check - Check for dangling Kconfig symbol references'
+ 	@echo  '  clang-analyzer  - Check with clang static analyzer'
+ 	@echo  '  clang-tidy      - Check with clang-tidy'
+ 	@echo  ''
+@@ -2232,7 +2234,7 @@ endif
+ # Scripts to check various things for consistency
+ # ---------------------------------------------------------------------------
+ 
+-PHONY += includecheck versioncheck coccicheck
++PHONY += includecheck versioncheck coccicheck kconfig-sym-check
+ 
+ includecheck:
+ 	find $(srctree)/* $(RCS_FIND_IGNORE) \
+@@ -2247,6 +2249,9 @@ versioncheck:
+ coccicheck:
+ 	$(Q)$(BASH) $(srctree)/scripts/$@
+ 
++kconfig-sym-check:
++	$(Q)$(PERL) $(srctree)/scripts/kconfig/kconfig-sym-check.pl $(srctree) $(KCONFIG_SYM_CHECK_EXCLUDES)
++
+ PHONY += checkstack kernelrelease kernelversion image_name
+ 
+ # UML needs a little special treatment here.  It wants to use the host
+diff --git a/scripts/kconfig/kconfig-sym-check.pl b/scripts/kconfig/kconfig-sym-check.pl
+new file mode 100755
+index 000000000000..6bf32fb37929
+--- /dev/null
++++ b/scripts/kconfig/kconfig-sym-check.pl
+@@ -0,0 +1,97 @@
++#!/usr/bin/env perl
++# SPDX-License-Identifier: GPL-2.0
++
++use warnings;
++use strict;
++
++my $srctree = shift @ARGV;
++my $kconfig_sym_check_excludes = defined $ARGV[0] ? $ARGV[0] : undef;
++
++my @files = `git -C \Q$srctree\E ls-files '*Kconfig*' 2>/dev/null`;
++if (@files) {
++	chomp @files;
++	@files = map { "$srctree/$_" } @files;
++} else {
++	@files = `find \Q$srctree\E -name '*Kconfig*'`;
++	chomp @files;
++}
++
++my %configs = ();
++my %refs = ();
++
++foreach my $file (@files) {
++	open F, $file or die "Cannot open $file: $!";
++
++	my $help = 0;
++	my $help_level;
++	my $level;
++
++	while (<F>) {
++		chomp;
++
++		next if /^\s*$/;
++		next if /^\s*#/;
++
++		/^(\s*)/;
++		$level = length $1;
++
++		if ($help && $level < $help_level) {
++			$help = 0;
++		}
++
++		next if ($help);
++
++		if (/^\s*(help|\-\-\-help\-\-\-)$/) {
++			$help = 1;
++			$_ = <F>;
++			/^(\s*)/;
++			$help_level = length $1;
++			next;
++		}
++
++		if (/^\s*(config|menuconfig)\s+([a-zA-Z0-9_]+)\s*(#.*)?$/) {
++			$configs{$2}++;
++			next;
++		}
++
++		if (/^\s*(default|def_bool|def_tristate|select|depends\s+on|imply|visible\s+if|range|if)\s+(.+)\s*$/) {
++			my $s = $2;
++			$s =~ s/"[^"]*"//g;
++			$s =~ s/'[^']*'//g;
++			$s =~ s/#.*//;
++			$s =~ s/\$\([^)]*\)//g;
++			$s =~ s/%%[^%]*%%//g;
++			my @syms = split /[^a-zA-Z0-9_]+/, $s;
++			map {
++				$refs{$_}++ if (/[a-zA-Z]/ && $_ ne "if" && $_ ne "y" && $_ ne "n" && $_ ne "m" && !(/^0[xX]/ && !/[g-wy-zG-WY-Z]/));
++			} @syms
++		}
++	}
++
++	close F;
++}
++
++my %known_syms = ();
++if (defined $kconfig_sym_check_excludes) {
++	my $file = $kconfig_sym_check_excludes;
++	open F, $file or die "Cannot open $file: $!";
++	while (<F>) {
++		chomp;
++		next if /^\s*$/;
++		next if /^\s*#/;
++		$known_syms{$1}++ if (/^\s*([a-zA-Z0-9_]+)\s*(#.*)?$/);
++	}
++}
++
++my $ret = 0;
++foreach my $k (sort keys %refs) {
++	next if (exists $configs{$k} || exists $known_syms{$k});
++
++	print "$k";
++	print " - warning: '$k' is probably not what you want; Kconfig tristate literals are always lowercase ('n', 'y', 'm')" if ($k eq "N" || $k eq "Y" || $k eq "M");
++	print "\n";
++
++	$ret = 1;
++}
++
++exit $ret;
+-- 
+2.43.0
+
