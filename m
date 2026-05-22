@@ -1,16 +1,16 @@
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D46FC367B66;
-	Fri, 22 May 2026 18:04:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D355367F26;
+	Fri, 22 May 2026 18:04:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779473101; cv=none; b=hi8ufp9UVirdTrySArzldLEwIfz3Sw/QGvyezFhx8NrgJGXMDXOFp6n3yVPiSTUakY7RLUr0x2IrD8wNwmg2xTfQ2QnJluHYSrFNdcuXKkZquluf1tw8JhOyBweq+3WDzBP1eE8fK5i1mBDlDFmX8Tq/KPfwMRYsZGcdETuFP4c=
+	t=1779473102; cv=none; b=M0xjsCVUybjEO/x+CqFOfdg0pOrEsgZ+Anii7B2HXQ8NgrAUJzK4NtzoJ4eU43/0cf5OXHfBLzGviMN9oIjf4L1GEhIAVQaYwQvQ8LGXgwo8aXFzyU7u2ExlyFYY940vzPmzO28rSgX7xC+ajaTMHN8BR6YoahmogBGrb8h/bE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779473101; c=relaxed/simple;
-	bh=ZNPNnmdTmcXx9k6u5BDKVQ2XCygxOrLU+ZqaUd8cphc=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=gFse9nL8iuMHA+ulhl94L2uBQpHL9ZJ7zvLS2wt///4ppzQxID/mIbcIM7wsrUSgtZrqkY0whzdrnmmL4aLVj1nmTMmVg0faTfc5GpqAW2Siwy3lAA21lLCf6bG02GNVOGKswcV2XwISQezeeGBfc3I1zN6I6e3ysp1VGHMysvM=
+	s=arc-20240116; t=1779473102; c=relaxed/simple;
+	bh=VdzibMjS69RcKL42m6TG47UmRNAwDIGZjTq8j4b6w38=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=K9FZwBJW3ZpvJSzI+Njmwuc2WwjmOCAg431lY6eCJY5PejrPnvNT5qD/iPKptjWHoTAvIozVIUz6V3PIoiwnaoD4qKgh+0Ejwkx6/guFPUYfMhGEHVvBbbn/021IrdzhQvyTHvMnq80J59xNsFKDO8MirLTN++nVku+BUTXNECg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -18,9 +18,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.99)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1wQUEg-000000006xH-3TEA;
-	Fri, 22 May 2026 18:04:38 +0000
-Date: Fri, 22 May 2026 19:04:34 +0100
+	id 1wQUEu-000000006y0-1kS3;
+	Fri, 22 May 2026 18:04:52 +0000
+Date: Fri, 22 May 2026 19:04:49 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
@@ -37,9 +37,9 @@ To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Guenter Roeck <linux@roeck-us.net>, Test User <test@example.com>,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-kbuild@vger.kernel.org
-Subject: [PATCH v4 0/3] dt-bindings: automated coding style check for DTS
- examples
-Message-ID: <cover.1779472837.git.daniel@makrotopia.org>
+Subject: [PATCH v4 2/3] dt-bindings: wire style checker into dt_binding_check
+Message-ID: <93923232b32423d33dc3b6632165ccc9571dea8f.1779472837.git.daniel@makrotopia.org>
+References: <cover.1779472837.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -48,252 +48,101 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <cover.1779472837.git.daniel@makrotopia.org>
 
-Documentation/devicetree/bindings/dts-coding-style.rst documents
-the style expected of DT examples and source files, but nothing
-existing actually enforces it. dtc tolerates arbitrary whitespace,
-yamllint only sees the YAML envelope and not the DTS content
-inside literal block scalars, and so reviewers spend cycles
-flagging issues that tooling could catch.
+Run dt-check-style as part of dt_binding_check_one. The recipe wraps
+the tool with scripts/jobserver-exec so worker count follows the GNU
+make jobserver -- `make -j N dt_binding_check` constrains the checker
+to N workers rather than spawning one per CPU.
 
-Add scripts/dtc/dt-check-style, a Python tool that checks DTS
-coding style on YAML binding examples and on .dts/.dtsi/.dtso
-source files. Rules live in a small declarative registry; each
-rule is tagged 'relaxed' (default) or 'strict' (opt-in for new
-submissions). Promoting a rule from strict to relaxed is a
-one-line edit once the tree catches up.
+Default mode (relaxed) is zero-violation on the current tree, so this
+does not introduce new warnings into make dt_binding_check. Stricter
+rules are available via --mode=strict (eg. for use by checkpatch.pl in
+a future series).
 
-Relaxed mode covers trailing whitespace, tab characters in YAML
-examples, mixed tab+space indents, and the per-input-type indent
-character (1 tab for .dts/.dtsi/.dtso). It is zero-violation on
-the current tree and runs as part of dt_binding_check_one, so no
-new warnings appear in `make dt_binding_check`.
-
-Strict mode adds indent unit and depth consistency; blank-line
-policy (no consecutive blanks or blanks at body edges; required
-blank line before each child node and before "status"); property
-ordering by canonical bucket (compatible, reg/reg-names, ranges,
-standard, vendor, status) with declarative within-bucket pairing
-rules (<x>-names follows <x>, pinctrl-names follows the last
-pinctrl-N) and natural-sort fallback; sibling node ordering by
-unit address or natural-sort name; line length (80 columns);
-continuation alignment of multi-line property values under the
-first '<' or '"' after the '='; lowercase hex literals and unit
-addresses; no whitespace padding inside <...>; closing-brace
-placement; and unused-label detection (skipped for .dtsi/.dtso
-since labels there are exported to includers/applies-to).
-Together these constrain a DT structure to a single canonical
-rendering modulo the author's choice of when to wrap properties
-for readability. Comments are intentionally out of scope. Strict
-mode is opt-in, intended for use by checkpatch.pl in a follow-up
-series.
-
-The tool reads file paths from @argfile and parallelises across
-CPUs via -j N. With no -j given it picks up $PARALLELISM (set by
-scripts/jobserver-exec from the GNU make jobserver) and falls
-back to os.cpu_count() otherwise. Running as one Python
-invocation amortises the ruamel.yaml import across the whole
-tree -- ~2s on a 32-CPU host vs ~28s sequential. ruamel.yaml is
-the only non-stdlib dependency, already required by dtschema.
-
-A selftest under scripts/dtc/dt-style-selftest/ pairs good/ and
-bad/ fixtures with expected output so rule behaviour can be
-exercised independently of the full tree via the
-dt_style_selftest top-level make target.
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
-v1: https://lore.kernel.org/all/cover.1776700167.git.daniel@makrotopia.org/
-v2: https://lore.kernel.org/all/cover.1777471439.git.daniel@makrotopia.org/
-v3: https://lore.kernel.org/all/cover.1778454442.git.daniel@makrotopia.org/
-
 Changes since v3:
- - dt-check-style: accept node and property names that begin
-   with a digit (the DT spec permits names like 1wire@10)
- - dt-check-style: strip trailing // and /* */ comments before
-   line classification, so a trailing comment on a node-open or
-   property line no longer causes misclassification
- - dt-check-style: continuation-alignment compares display
-   columns (tabs expanded to 8) instead of raw string length,
-   removing many false positives on tab-indented .dts files
- - dt-check-style: value-whitespace flags only whitespace directly
-   inside the brackets (after '<', before '>'), on single- and
-   multi-line cell lists; it no longer flags inter-value spacing,
-   which is often deliberate column alignment
- - Makefile: build the @argfile with mktemp and remove it, so no
-   stale .tmp_.dt-style.checked is left in the build tree
- - run.sh: drop bash-only process substitution (POSIX sh now)
-   and check the checker's exit status
- - selftest: add fixtures for the above (digit-leading nodes,
-   trailing comments, multi-line cell arrays, tab+space aligned
-   continuations) and update yaml-value-ws for the reworked
-   value-whitespace rule
+ - build the @argfile with f=$(mktemp) and remove it with rm -f
+   (matching cmd_mk_schema), instead of Kbuild's $(tmp-target)
+   which leaves a stale .tmp_.dt-style.checked in the build tree
 
 Changes since v2:
- - route findings to stderr so a quiet dt_binding_check produces
-   no output (Rob)
- - switch the Makefile recipe from mktemp to Kbuild's
-   $(tmp-target) so build output stays inside the build folder
-   (Nathan)
- - collapse the recipe's exit-handling tail into the familiar
+ - use Kbuild's $(tmp-target) instead of mktemp so build output
+   stays inside the build folder (Nathan)
+ - collapse the conditional cleanup tail into the familiar
    "&& touch $@ || true" pattern, matching cmd_chk_bindings;
    keeps future warnings non-fatal (Rob, Nathan)
- - explain in patch 2/3 why the recipe uses an explicit
-   $(PYTHON3) prefix where the neighbouring recipes call their
-   scripts directly (Rob)
- - append a trailing newline to every expected/*.txt selftest
-   fixture (Rob)
- - restore the trailing whitespace inside yaml-trailing-ws.yaml
-   that had been silently stripped during re-application, so the
-   selftest actually exercises the trailing-whitespace rule
+ - retained the explicit $(PYTHON3) prefix (Rob asked why it
+   differs from the rest of this Makefile): per
+   Documentation/kbuild/makefiles.rst "Script invocation",
+   in-tree scripts should be called through their interpreter so
+   the executable bit and shebang are not relied on and the
+   user's $(PYTHON3) override is respected. The neighbouring
+   recipes invoke their Python helpers directly because those
+   come from external packages (dtschema's dt-extract-*,
+   dt-check-compatible, dt-doc-validate), which is the case Rob
+   asked about and which sits outside that rule.
 
 Changes since v1:
- - rules declared in a registry tagged relaxed/strict; default
-   relaxed mode is zero-violation on the current tree
- - tool now also accepts .dts/.dtsi/.dtso files directly (with a
-   tab-indent variant); unused-labels skipped for .dtsi/.dtso
-   where labels are exported to includers/applies-to
- - renamed dt-check-example-style -> dt-check-style
- - added -j N with $PARALLELISM (jobserver) awareness
- - dropped node-name [a-z0-9-] check (Rob: better as a meta-schema)
- - property-order rebuilt around buckets + declarative pairing
-   rules plus natural-sort fallback
- - added child-name-order, required-blank-lines, hex-case,
-   unit-address-format, value-whitespace, node-close-alone,
-   line-length and continuation-alignment to strict mode
- - new selftest patch (Krzysztof: "would be happy to see at
-   least a few test cases for it")
+ - dropped xargs -n200 -P$(nproc) sharding; single Python invocation
+   with file list via @argfile
+ - dropped `|| true`: relaxed mode is zero-output today
+ - wrapped under scripts/jobserver-exec so worker count follows the
+   make jobserver
+---
+ Documentation/devicetree/bindings/Makefile | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
 
-Default relaxed mode is zero-violation on the current tree.
-
-Strict-mode violation counts on a current tree (5506 YAML
-bindings, 6530 in-tree .dts/.dtsi/.dtso under arch/):
-
-  rule                     yaml      dts
-  property-order          14554   245000
-  continuation-alignment   1857    93536
-  indent-consistent        1562    48720
-  required-blank-lines     1876    48563
-  line-length               105    26322
-  child-name-order          667    16821
-  mixed-indent-chars          0    13294
-  unused-labels            3611    11628
-  child-address-order        63     4076
-  blank-lines                82     1866
-  node-close-alone           38      774
-  value-whitespace           38      715
-  hex-case                   78      669
-  indent-unit-dts            --      190
-  unit-address-format         5       39
-  trailing-whitespace         0       10
-  indent-unit-strict       1492       --
-  indent-unit               179       --
-
-(YAML and DTS columns reflect the rules that apply to each input
-type; e.g. indent-unit-strict is YAML-only since .dts files use
-tabs, indent-unit-dts is the equivalent DTS-only check.
-unused-labels is skipped for .dtsi/.dtso since labels there are
-exported to includers/applies-to.)
-
-The script was written with generous help from Claude Opus 4.7,
-since my Python is even worse than my DTS coding style.
-
-Daniel Golle (3):
-  dt-bindings: add DTS style checker
-  dt-bindings: wire style checker into dt_binding_check
-  dt-bindings: add self-test fixtures for style checker
-
- Documentation/devicetree/bindings/Makefile    |   19 +-
- Makefile                                      |    6 +
- scripts/dtc/dt-check-style                    | 1120 +++++++++++++++++
- .../dtc/dt-style-selftest/bad/dts-spaces.dts  |   13 +
- .../bad/yaml-child-addr-order.yaml            |   41 +
- .../bad/yaml-child-name-order.yaml            |   37 +
- .../bad/yaml-cont-align.yaml                  |   30 +
- .../bad/yaml-digit-node-order.yaml            |   37 +
- .../dt-style-selftest/bad/yaml-hex-case.yaml  |   29 +
- .../bad/yaml-indent-strict.yaml               |   29 +
- .../bad/yaml-line-length.yaml                 |   29 +
- .../bad/yaml-mixed-indent.yaml                |   29 +
- .../bad/yaml-node-close.yaml                  |   31 +
- .../bad/yaml-prop-order.yaml                  |   29 +
- .../bad/yaml-prop-pairing.yaml                |   33 +
- .../bad/yaml-required-blank.yaml              |   33 +
- .../dtc/dt-style-selftest/bad/yaml-tab.yaml   |   29 +
- .../bad/yaml-trailing-comment.yaml            |   26 +
- .../bad/yaml-trailing-ws.yaml                 |   29 +
- .../dt-style-selftest/bad/yaml-unit-addr.yaml |   29 +
- .../bad/yaml-unused-label.yaml                |   29 +
- .../bad/yaml-value-ws-multiline.yaml          |   27 +
- .../dt-style-selftest/bad/yaml-value-ws.yaml  |   29 +
- .../expected/dts-spaces.dts.txt               |    2 +
- .../expected/yaml-child-addr-order.yaml.txt   |    2 +
- .../expected/yaml-child-name-order.yaml.txt   |    2 +
- .../expected/yaml-cont-align.yaml.txt         |    2 +
- .../expected/yaml-digit-node-order.yaml.txt   |    2 +
- .../expected/yaml-hex-case.yaml.txt           |    2 +
- .../expected/yaml-indent-strict.yaml.txt      |    2 +
- .../expected/yaml-line-length.yaml.txt        |    2 +
- .../expected/yaml-mixed-indent.yaml.txt       |    3 +
- .../expected/yaml-node-close.yaml.txt         |    2 +
- .../expected/yaml-prop-order.yaml.txt         |    2 +
- .../expected/yaml-prop-pairing.yaml.txt       |    3 +
- .../expected/yaml-required-blank.yaml.txt     |    3 +
- .../expected/yaml-tab.yaml.txt                |    2 +
- .../expected/yaml-trailing-comment.yaml.txt   |    2 +
- .../expected/yaml-trailing-ws.yaml.txt        |    2 +
- .../expected/yaml-unit-addr.yaml.txt          |    2 +
- .../expected/yaml-unused-label.yaml.txt       |    2 +
- .../expected/yaml-value-ws-multiline.yaml.txt |    2 +
- .../expected/yaml-value-ws.yaml.txt           |    2 +
- .../dt-style-selftest/good/dts-cont-align.dts |   27 +
- .../dtc/dt-style-selftest/good/dts-tab.dts    |   30 +
- .../dt-style-selftest/good/yaml-4space.yaml   |   41 +
- scripts/dtc/dt-style-selftest/run.sh          |   71 ++
- 47 files changed, 1953 insertions(+), 2 deletions(-)
- create mode 100755 scripts/dtc/dt-check-style
- create mode 100644 scripts/dtc/dt-style-selftest/bad/dts-spaces.dts
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-child-addr-order.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-child-name-order.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-cont-align.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-digit-node-order.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-hex-case.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-indent-strict.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-line-length.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-mixed-indent.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-node-close.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-prop-order.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-prop-pairing.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-required-blank.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-tab.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-trailing-comment.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-trailing-ws.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-unit-addr.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-unused-label.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-value-ws-multiline.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/bad/yaml-value-ws.yaml
- create mode 100644 scripts/dtc/dt-style-selftest/expected/dts-spaces.dts.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-child-addr-order.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-child-name-order.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-cont-align.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-digit-node-order.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-hex-case.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-indent-strict.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-line-length.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-mixed-indent.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-node-close.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-prop-order.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-prop-pairing.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-required-blank.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-tab.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-trailing-comment.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-trailing-ws.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-unit-addr.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-unused-label.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-value-ws-multiline.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/expected/yaml-value-ws.yaml.txt
- create mode 100644 scripts/dtc/dt-style-selftest/good/dts-cont-align.dts
- create mode 100644 scripts/dtc/dt-style-selftest/good/dts-tab.dts
- create mode 100644 scripts/dtc/dt-style-selftest/good/yaml-4space.yaml
- create mode 100755 scripts/dtc/dt-style-selftest/run.sh
-
+diff --git a/Documentation/devicetree/bindings/Makefile b/Documentation/devicetree/bindings/Makefile
+index 7b668f7fd400..00149e824261 100644
+--- a/Documentation/devicetree/bindings/Makefile
++++ b/Documentation/devicetree/bindings/Makefile
+@@ -46,6 +46,18 @@ quiet_cmd_chk_bindings = CHKDT   $(src)
+ 			  xargs -n200 -P$$(nproc) $(DT_DOC_CHECKER) -u $(src)) \
+ 			  && touch $@ || true
+ 
++DT_CHK_STYLE = $(srctree)/scripts/dtc/dt-check-style
++
++# Feed the file list to the checker via @argfile in a single Python
++# process so the ruamel.yaml import is paid once. scripts/jobserver-exec
++# claims slots from the GNU make jobserver and exposes the count via
++# $PARALLELISM, which dt-check-style picks up to size its worker pool.
++quiet_cmd_chk_style = STYLE   $(src)
++      cmd_chk_style = f=$$(mktemp) && $(find_cmd) > $$f && \
++		      $(PYTHON3) $(srctree)/scripts/jobserver-exec \
++		      $(PYTHON3) $(DT_CHK_STYLE) @$$f \
++		      && touch $@ || true; rm -f $$f
++
+ quiet_cmd_mk_schema = SCHEMA  $@
+       cmd_mk_schema = f=$$(mktemp) ; \
+                       $(find_all_cmd) > $$f ; \
+@@ -62,13 +74,16 @@ override DTC_FLAGS := \
+ $(obj)/processed-schema.json: $(DT_DOCS) check_dtschema_version FORCE
+ 	$(call if_changed,mk_schema)
+ 
+-targets += .dt-binding.checked .yamllint.checked
++targets += .dt-binding.checked .yamllint.checked .dt-style.checked
+ $(obj)/.yamllint.checked: $(DT_DOCS) $(src)/.yamllint FORCE
+ 	$(if $(DT_SCHEMA_LINT),$(call if_changed,yamllint),)
+ 
+ $(obj)/.dt-binding.checked: $(DT_DOCS) FORCE
+ 	$(call if_changed,chk_bindings)
+ 
++$(obj)/.dt-style.checked: $(DT_DOCS) FORCE
++	$(call if_changed,chk_style)
++
+ always-y += processed-schema.json
+ targets += $(patsubst $(obj)/%,%, $(CHK_DT_EXAMPLES))
+ targets += $(patsubst $(obj)/%.dtb,%.dts, $(CHK_DT_EXAMPLES))
+@@ -82,7 +97,7 @@ dt_compatible_check: $(obj)/processed-schema.json
+ 	$(Q)$(srctree)/scripts/dtc/dt-extract-compatibles $(srctree) | xargs dt-check-compatible -v -s $<
+ 
+ PHONY += dt_binding_check_one
+-dt_binding_check_one: $(obj)/.dt-binding.checked $(obj)/.yamllint.checked
++dt_binding_check_one: $(obj)/.dt-binding.checked $(obj)/.yamllint.checked $(obj)/.dt-style.checked
+ 
+ PHONY += dt_binding_check
+ dt_binding_check: dt_binding_check_one $(CHK_DT_EXAMPLES)
 -- 
 2.54.0
