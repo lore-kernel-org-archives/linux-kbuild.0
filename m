@@ -1,16 +1,16 @@
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BE9E279903;
-	Wed, 27 May 2026 19:32:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EDF037B014;
+	Wed, 27 May 2026 19:32:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779910357; cv=none; b=bo6DpxpdY2FkekuuueCvtoUTZIe68isuw/D7aYK1j+aF7SiLANjyWdEjVUubN8lGABpTQ/zAM6k5h3X+Mmy6wCEHJHTiAhZNamv5qBtZ76p5u/iW1EOq0CYQFJf8rgCMWdOngvTBxv8vvEM3aQKHghxuCZditZV+GMKNa28MZ0A=
+	t=1779910367; cv=none; b=H6HnDOC5uB77SK++FBMrYOfjcKhc2FPQajyqnF36S3XdGoEDy2ExxqQzIJUkeVKYlmEGKib6m2qlVPpasSWM0mAm6xYO7nEjN2pcST8O6Plresgd1a6tHFvLvdPAICcIxssfjDEUStcpaz6knSerm7lgDQmvKH6LnuRlWF/v+pI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779910357; c=relaxed/simple;
-	bh=XrV6pvz7EmVN8mpKSGyJZ16fe1BTF9LlQZAPlUsFwqc=;
+	s=arc-20240116; t=1779910367; c=relaxed/simple;
+	bh=kyZhNlSDqzh8l7yoNiR9oreYSQU8Ysja1AwT56cWrmg=;
 	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TrVKdUW7/CW4fuPhIpd6eUNTLUnS2kaxr9GVdF6sxL9z9phci8cDzUFoQPhE8PrG4ok0b8AMhtlJDgs2hxb+Nbp4j+J3aOhRDUPuW3KF3DaJf+1St8wrJJ2ukAroq4Nscf2g/0rTW07+iOKogTRTchOljCl7ybwvNsDtbJPQe30=
+	 Content-Type:Content-Disposition:In-Reply-To; b=JRdrXqP42Bo+gvIp2MfyovbxQR5Gvx6evq/0rzXcis8T/sZsamjGnBiamGaLw9WN75pFE2IihC93WjBYs6VENvKDW7Jnk5Awq4Lwyxr0ucm4Vf0C1TRSLCam+yxDiYVFWW/BVN0lEDxMI18rHnq26/5UuI1QnibY38ERlOZTu0Q=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -18,9 +18,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.99)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1wSJzL-000000003hp-0GZn;
-	Wed, 27 May 2026 19:32:23 +0000
-Date: Wed, 27 May 2026 20:32:18 +0100
+	id 1wSJzS-000000003iR-1HQ7;
+	Wed, 27 May 2026 19:32:30 +0000
+Date: Wed, 27 May 2026 20:32:26 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
@@ -54,8 +54,8 @@ To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-kbuild@vger.kernel.org
-Subject: [PATCH v5 2/4] scripts/jobserver-exec: propagate child exit status
-Message-ID: <660368ca16e2d3845577a9fd157d2f37f0e09e85.1779908995.git.daniel@makrotopia.org>
+Subject: [PATCH v5 3/4] dt-bindings: wire style checker into dt_binding_check
+Message-ID: <a14fdbded0acdc4fef1c1278100f2f4c6a93a488.1779908995.git.daniel@makrotopia.org>
 References: <cover.1779908995.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
@@ -67,49 +67,103 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1779908995.git.daniel@makrotopia.org>
 
-main() called JobserverExec().run() and discarded its return value,
-then the script exited with the implicit status 0. As a result, any
-Makefile that wired a build step through jobserver-exec saw the step
-silently succeed even when the wrapped command had failed.
+Run dt-check-style as part of dt_binding_check_one. The recipe wraps
+the tool with scripts/jobserver-exec so worker count follows the GNU
+make jobserver -- `make -j N dt_binding_check` constrains the checker
+to N workers rather than spawning one per CPU.
 
-Two in-tree callers were affected:
-
-  Documentation/devicetree/bindings/Makefile
-    cmd_chk_style runs a python checker via jobserver-exec and uses
-    "&& touch $@ || true" so failures leave the stamp file untouched
-    and the next make rerun reports them again. The swallowed exit
-    code made the stamp file get created even on failure, caching the
-    failed run and hiding the reported issues until the inputs change.
-
-  scripts/Makefile.vmlinux_o
-    cmd_gen_initcalls_lds runs scripts/generate_initcall_order.pl via
-    jobserver-exec; a perl failure was masked by the wrapper.
-
-Return the subprocess exit code from main() and pass it to sys.exit()
-so the wrapped command's status reaches make.
+Default mode (relaxed) is zero-violation on the current tree, so this
+does not introduce new warnings into make dt_binding_check. Stricter
+rules are available via --mode=strict (eg. for use by checkpatch.pl in
+a future series).
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
-v5: new patch; prereq for chk_style in 3/4 so style failures
-    leave the stamp file untouched instead of being cached
+v5:
+ - no change; depends on the new jobserver-exec fix in 2/4 so
+   style failures stay visible instead of being cached
 
- scripts/jobserver-exec | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+v4:
+ - build the @argfile with f=$(mktemp) and remove it with rm -f
+   (matching cmd_mk_schema), instead of Kbuild's $(tmp-target)
+   which leaves a stale .tmp_.dt-style.checked in the build tree
 
-diff --git a/scripts/jobserver-exec b/scripts/jobserver-exec
-index 758e947a6fb9..21b319e6c9a5 100755
---- a/scripts/jobserver-exec
-+++ b/scripts/jobserver-exec
-@@ -28,8 +28,8 @@ def main():
-         sys.exit("usage: " + name +" command [args ...]\n" + __doc__)
+v3:
+ - use Kbuild's $(tmp-target) instead of mktemp so build output
+   stays inside the build folder (Nathan)
+ - collapse the conditional cleanup tail into the familiar
+   "&& touch $@ || true" pattern, matching cmd_chk_bindings;
+   keeps future warnings non-fatal (Rob, Nathan)
+ - retained the explicit $(PYTHON3) prefix (Rob asked why it
+   differs from the rest of this Makefile): per
+   Documentation/kbuild/makefiles.rst "Script invocation",
+   in-tree scripts should be called through their interpreter so
+   the executable bit and shebang are not relied on and the
+   user's $(PYTHON3) override is respected. The neighbouring
+   recipes invoke their Python helpers directly because those
+   come from external packages (dtschema's dt-extract-*,
+   dt-check-compatible, dt-doc-validate), which is the case Rob
+   asked about and which sits outside that rule.
+
+v2:
+ - dropped xargs -n200 -P$(nproc) sharding; single Python invocation
+   with file list via @argfile
+ - dropped `|| true`: relaxed mode is zero-output today
+ - wrapped under scripts/jobserver-exec so worker count follows the
+   make jobserver
+
+ Documentation/devicetree/bindings/Makefile | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/Makefile b/Documentation/devicetree/bindings/Makefile
+index 7b668f7fd400..00149e824261 100644
+--- a/Documentation/devicetree/bindings/Makefile
++++ b/Documentation/devicetree/bindings/Makefile
+@@ -46,6 +46,18 @@ quiet_cmd_chk_bindings = CHKDT   $(src)
+ 			  xargs -n200 -P$$(nproc) $(DT_DOC_CHECKER) -u $(src)) \
+ 			  && touch $@ || true
  
-     with JobserverExec() as jobserver:
--        jobserver.run(sys.argv[1:])
-+        return jobserver.run(sys.argv[1:])
++DT_CHK_STYLE = $(srctree)/scripts/dtc/dt-check-style
++
++# Feed the file list to the checker via @argfile in a single Python
++# process so the ruamel.yaml import is paid once. scripts/jobserver-exec
++# claims slots from the GNU make jobserver and exposes the count via
++# $PARALLELISM, which dt-check-style picks up to size its worker pool.
++quiet_cmd_chk_style = STYLE   $(src)
++      cmd_chk_style = f=$$(mktemp) && $(find_cmd) > $$f && \
++		      $(PYTHON3) $(srctree)/scripts/jobserver-exec \
++		      $(PYTHON3) $(DT_CHK_STYLE) @$$f \
++		      && touch $@ || true; rm -f $$f
++
+ quiet_cmd_mk_schema = SCHEMA  $@
+       cmd_mk_schema = f=$$(mktemp) ; \
+                       $(find_all_cmd) > $$f ; \
+@@ -62,13 +74,16 @@ override DTC_FLAGS := \
+ $(obj)/processed-schema.json: $(DT_DOCS) check_dtschema_version FORCE
+ 	$(call if_changed,mk_schema)
  
+-targets += .dt-binding.checked .yamllint.checked
++targets += .dt-binding.checked .yamllint.checked .dt-style.checked
+ $(obj)/.yamllint.checked: $(DT_DOCS) $(src)/.yamllint FORCE
+ 	$(if $(DT_SCHEMA_LINT),$(call if_changed,yamllint),)
  
- if __name__ == "__main__":
--    main()
-+    sys.exit(main())
+ $(obj)/.dt-binding.checked: $(DT_DOCS) FORCE
+ 	$(call if_changed,chk_bindings)
+ 
++$(obj)/.dt-style.checked: $(DT_DOCS) FORCE
++	$(call if_changed,chk_style)
++
+ always-y += processed-schema.json
+ targets += $(patsubst $(obj)/%,%, $(CHK_DT_EXAMPLES))
+ targets += $(patsubst $(obj)/%.dtb,%.dts, $(CHK_DT_EXAMPLES))
+@@ -82,7 +97,7 @@ dt_compatible_check: $(obj)/processed-schema.json
+ 	$(Q)$(srctree)/scripts/dtc/dt-extract-compatibles $(srctree) | xargs dt-check-compatible -v -s $<
+ 
+ PHONY += dt_binding_check_one
+-dt_binding_check_one: $(obj)/.dt-binding.checked $(obj)/.yamllint.checked
++dt_binding_check_one: $(obj)/.dt-binding.checked $(obj)/.yamllint.checked $(obj)/.dt-style.checked
+ 
+ PHONY += dt_binding_check
+ dt_binding_check: dt_binding_check_one $(CHK_DT_EXAMPLES)
 -- 
 2.54.0
