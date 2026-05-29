@@ -1,64 +1,61 @@
-Received: from mail-dy1-f201.google.com (mail-dy1-f201.google.com [74.125.82.201])
+Received: from mail-dy1-f202.google.com (mail-dy1-f202.google.com [74.125.82.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAEC23F39DE
-	for <linux-kbuild@vger.kernel.org>; Fri, 29 May 2026 18:53:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6954219FE
+	for <linux-kbuild@vger.kernel.org>; Fri, 29 May 2026 18:53:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780080835; cv=none; b=ezYfnQ3Kjtn5ZtZg9T7KSxd0j7hKuexhAb0HywRSsoNfg/c5AAWEdH7PpNqJks/RT9iCmRxOCFtUwo+EyqncHHHxF+oAZ5j/oXlZl6yDSiVJoobdD3QfjlZvhWWfqASyUqV54fs9okNCixURGrDy2384ArnNICg13iSqt5/LJAg=
+	t=1780080836; cv=none; b=dmTz/aqF8M7EW123OfoZ9iYNr19llnjFaxXV9vQO/YN2VHkIYAS7GaNnuKycZKZpX9TUDj1r2d7as518HyPf9S6XamJkD+FQ5rM8EmtqxVOqhP1cXB69xlETJxssaobJIo60qqcvEr/1kpcJZHjHDrqOLz0L8IWeXB/Q2+jjc7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780080835; c=relaxed/simple;
-	bh=s7bt/YWGN9UF4BwynJHskbfVkLN9m3OOGrUY7+PeC50=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=AOTo/beavmpO+Oz3qRPb9awGwFPFXPvkFex9Iclp6XQ1GKlruHiQOk72rqA8t+HfSIIE2ajxnSqtyGvW3p4eQKlWMELFLEQkGRP5djOIoduGiPHUSd/sAlyg8o/SgkhfZ8fQgq3Wl0OvdPFKymTPBX34QeZ26vuWLWYVdHbfA74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--xur.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fuGSjKYj; arc=none smtp.client-ip=74.125.82.201
+	s=arc-20240116; t=1780080836; c=relaxed/simple;
+	bh=/lNacLdW9sEOoTS/HBDmtkyIRf4qRh3MXKPb+7r4ATI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=CrpHkhAWyctgz3BkJRvUBgO4RCjbHgUWjUt0wJyAFT0RBLDDsy/FMIz9RnDB+aug5oSl2UzO0qVqz/YFSrkmBqiXy4dPLLbCqLrZqIJZO21XQghgI1ypLorBA0FuqxmhZeTiqTRejMd2Rb+fYEvudZOzJQCVTJtzllndMeL5NuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--xur.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qx3CuErx; arc=none smtp.client-ip=74.125.82.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--xur.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fuGSjKYj"
-Received: by mail-dy1-f201.google.com with SMTP id 5a478bee46e88-304ec73b015so558309eec.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 29 May 2026 11:53:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qx3CuErx"
+Received: by mail-dy1-f202.google.com with SMTP id 5a478bee46e88-304ee7d1368so775775eec.0
+        for <linux-kbuild@vger.kernel.org>; Fri, 29 May 2026 11:53:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780080832; x=1780685632; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0JV5t//kdKJl6/uVoDLYHDKpOZGmoUYcNXdk8MLbmZA=;
-        b=fuGSjKYjpStzD/MiX39EYg4T+iPs+EDWiaMck/A4AMDEEAB5ob+ZRgRMi43ian8Lgk
-         VcKt8a3lmzDvAgh4C8Q5v+gcOVtWsugqerU3KVJctcWMU8yHvibb0FurLaagv+OIOTRg
-         BLZvIUTtPVHT2hgeWcZnTBDVUX6LT7d1hSb9wdUhXLldqnUkmq6NncydeGVJpkcDPw9f
-         nQYn4LkEuWAKerc9iVlH07L3OThU2bhqpUK2xDkhUd7V6AYqAHjtpyeEeNUdETOzVR2g
-         vvRi61kS3Ei9kIKxqLBX52AZOP54a3kXcQiFri/TPTdGvWBbi7b7R6iv5Sg9H8Gh8dDX
-         tNmQ==
+        d=google.com; s=20251104; t=1780080830; x=1780685630; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=81SwLsYV+fPUwbYdTwTcJ7io6v2ZR/O+UY0W6GoVbVk=;
+        b=qx3CuErx9L9OsiXJ8CZc3sHsPyqI7CFMtdxuk5M213/1WzNXPY+6w8kDe36L5B7ieY
+         fjsemuHDmKijqq1a48tOcz/OCNbEXVUPQ1/Nqi9VSsRLVRqfJWFMQDuUllqfwzMeg9sX
+         e2MeDTCb6v0B734vWYQTOKFIqcTNg3DrfmgLkaF50UgUHmvOxVsUfF42ySVAIoTW0HSJ
+         uNuK7fRiZFNDbwld+HBqcSA4eEkAHkIwCT9Y42Rolur5btKJe3ZtsaR928B8kyWWSirE
+         wrHFWu5g++SxEwTHhfsLlol+H6BpveDVAUh6nmJKvTQfJp+DlAFCBLR/AUwcaP4tKi0j
+         /33g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780080832; x=1780685632;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0JV5t//kdKJl6/uVoDLYHDKpOZGmoUYcNXdk8MLbmZA=;
-        b=aKbmfIe1dTsTslHbrQiJplKTJxjd41+9N1jPCdoZU1hi+GqtIUVVKXFKVMI/z69WJh
-         IsCAwQ+mAKDBHSWT32bmS6mIt3QLwkWMFoAiKETCNQmEx2LOfh47EEMJRyZuQdxMK7MV
-         CPQMQUcP88Jnk4sZJc1/1HTXiW8eUgVXv8UNgdUZbQB8zvW1ZQAJI00ijIlmqkSsYIop
-         Xi1kkzjyQCPglevNN4Z/07PXQYsaK1y3J6rD3OGytRDXOaOMEce1OV71d4K1Nk4ena9f
-         6A4hMDupjEbbfxihSSf1jrWqQV/41jvY+p0kICR5AOuYrTscLzqE0Jv+slSHgSNEnYrT
-         GTow==
-X-Forwarded-Encrypted: i=1; AFNElJ9t+eIzlJU0hw6gYAVv0ATpHVZIYeWBnyX3vpcJy9p79Dl9jEKccfUBdydWuJbeKg/EqPOWImT0oVxvieY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCLvLeiexyDA7LejwDorPfTURl6lMzFfC0LQyqMomc2Gg3mYVd
-	4HhbUYfbdvF789NeIuVUPqhRSYZ6zchTJKRBnqBRaZU7hEWrfbcB3VVZwlGxcK8mYwALKQ==
-X-Received: from dycme17.prod.google.com ([2002:a05:693c:2411:b0:303:9118:b1ef])
- (user=xur job=prod-delivery.src-stubby-dispatcher) by 2002:a05:7300:214c:b0:2c5:ed1b:ca9
- with SMTP id 5a478bee46e88-304fa4a9576mr574362eec.1.1780080831505; Fri, 29
- May 2026 11:53:51 -0700 (PDT)
-Date: Fri, 29 May 2026 11:53:45 -0700
-In-Reply-To: <20260529185347.2418373-1-xur@google.com>
+        d=1e100.net; s=20251104; t=1780080830; x=1780685630;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=81SwLsYV+fPUwbYdTwTcJ7io6v2ZR/O+UY0W6GoVbVk=;
+        b=lbrOcs8OtG5+4xEjz8IHHa4a44EbsjuCSGN1vN6K7QuK3gWN5/dm0aol+y9ehIes0z
+         dbOlwoBUqv1y86ND3QxLg2J2rfvDUfb2EtPeKF0yoREkWn6XTkBKBhQPtz1mkWgqq5Co
+         CTLxRiUP6PSwATxxkqhGA9kn/YcsdaFIrhrpZ01NGSRmduhgX/gUJsbMye3tdKslKAfw
+         Uzt5DeJcssC3qd9pXMAGSWO7EhBgNuoiQiq+esqRtn/XEanxDU/Jz3fGwBuJjqG0JVcl
+         5FbRAmQa77ETsW8/vciYCHns4KesAFhcUoK/zgsrfTB9HLQ7Q2C1U3jbVsyBR+yD5ILC
+         zAMg==
+X-Forwarded-Encrypted: i=1; AFNElJ9qryXJpGYWRz+mtEuxSmtx+0cRkDHjQKG9J0x/hPnF7PVg8ZRMB6WQkyNqcG6w3aEv4hBSaVBjmGsPj4U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6RCDIC47FfG7VjyQJZtLqeXuAW7JFltXLU1W+JpsD5b3yf3QL
+	sgEa2TJYNFecGeCqsbPpUh873JXGBdg3nP7EB2W72kkhadkl4ZSThhUx4kUzMPOKujntTQ==
+X-Received: from dlbcf5.prod.google.com ([2002:a05:7022:4585:b0:136:8b77:210a])
+ (user=xur job=prod-delivery.src-stubby-dispatcher) by 2002:a05:7022:f96:b0:136:5c88:d928
+ with SMTP id a92af1059eb24-137d426d0e5mr388314c88.19.1780080829713; Fri, 29
+ May 2026 11:53:49 -0700 (PDT)
+Date: Fri, 29 May 2026 11:53:43 -0700
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20260529185347.2418373-1-xur@google.com>
 X-Mailer: git-send-email 2.54.0.823.g6e5bcc1fc9-goog
-Message-ID: <20260529185347.2418373-3-xur@google.com>
-Subject: [PATCH v12 2/3] kbuild: change --thin back to 'T' in $(AR)
+Message-ID: <20260529185347.2418373-1-xur@google.com>
+Subject: [PATCH v12 0/3] kbuild: distributed build support for Clang ThinLTO
 From: xur@google.com
 To: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
 	Nicolas Schier <nicolas.schier@linux.dev>, 
@@ -77,40 +74,48 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Rong Xu <xur@google.com>
 
-The '-T' flag in $(AR) is no longer problematic since the minimum
-requirement for LLVM has been updated to version 15. As of LLVM 14
-and onward, the '-T' flag functions identically to the '--thin' flag.
+ChangeLog:
 
-Fixed the issue seen on IBM Power11 System:
-  ar: unrecognized option '--thin'
+V12: Fixed an build error reported by Nathan Chancellor:
+     Reverted to v10 shell script based approach to get saved_c_flags.
+V11: Integrated feedback from Sashiko (Nathan Chancellor):
+     (1) Included modkern_cflags within the saved _c_flags.
+     (2) Replaced the shell command with $(saved_c_flags_$(<)).
+     (3) Refined the file matching for ar_vmlinux.a.
+V10: Fixed a minor build error in v9 and added comments.
+V9:  Fixed a minor build error.
+V8:  Disabled -always-rename-promoted-locals=false for the distrubute
+     mode, based on Yonghong and Nathan's comments.
+V7: (1) Resolved a conflict by rebasing to kbuild/kbuild-next-unstable.
+    (2) Separated the '--thin' to 'T' change into its own patch to
+        preserve Masahiro's original version.
+V6: Change '--thin' back to 'T' in Makefile.vmlinux_a to fix
+    reported the build error from old ar.
+V5: Handle single quote escaping in echo _c_flags to fix
+    Piotr Gorski's reported error.
+V4: This is based on the reimplementation provided by Masahiro Yamada
+on May 26. The difference is that this version now saves the compiler
+flags (_c_flags) from the Front-End (FE) compilation and re-uses them
+for the subsequent Back-End (BE) compilation.
 
-Reported-by: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
-Closes: https://lore.kernel.org/linux-next/476507c9-a371-4864-9e87-572c1ecae82d@linux.ibm.com/
-Signed-off-by: Rong Xu <xur@google.com>
----
- scripts/Makefile.vmlinux_a | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Rong Xu (3):
+  kbuild: move vmlinux.a build rule to scripts/Makefile.vmlinux_a
+  kbuild: change --thin back to 'T' in $(AR)
+  kbuild: distributed build support for Clang ThinLTO
 
-diff --git a/scripts/Makefile.vmlinux_a b/scripts/Makefile.vmlinux_a
-index 9774f02b43b2..650d44330d1f 100644
---- a/scripts/Makefile.vmlinux_a
-+++ b/scripts/Makefile.vmlinux_a
-@@ -10,12 +10,12 @@ include $(srctree)/scripts/Makefile.lib
- # Link of built-in-fixup.a
- # ---------------------------------------------------------------------------
- 
--# '$(AR) mPi' needs --thin to workaround the bug of llvm-ar <= 14
-+# '$(AR) mPi' needs 'T' to workaround the bug of llvm-ar <= 14
- quiet_cmd_ar_builtin_fixup = AR      $@
-       cmd_ar_builtin_fixup = \
- 	rm -f $@; \
--	$(AR) cDPrS --thin $@ $(KBUILD_VMLINUX_OBJS); \
--	$(AR) mPi --thin $$($(AR) t $@ | sed -n 1p) $@ $$($(AR) t $@ | grep -F -f $(srctree)/scripts/head-object-list.txt)
-+	$(AR) cDPrST $@ $(KBUILD_VMLINUX_OBJS); \
-+	$(AR) mPiT $$($(AR) t $@ | sed -n 1p) $@ $$($(AR) t $@ | grep -F -f $(srctree)/scripts/head-object-list.txt)
- 
- targets += built-in-fixup.a
- built-in-fixup.a: $(KBUILD_VMLINUX_OBJS) scripts/head-object-list.txt FORCE
+ .gitignore                 |  2 +
+ Makefile                   | 30 +++++++-------
+ arch/Kconfig               | 19 +++++++++
+ scripts/Makefile.lib       |  8 ++++
+ scripts/Makefile.thinlto   | 40 ++++++++++++++++++
+ scripts/Makefile.vmlinux_a | 83 ++++++++++++++++++++++++++++++++++++++
+ scripts/mod/modpost.c      | 15 +++++--
+ 7 files changed, 180 insertions(+), 17 deletions(-)
+ create mode 100644 scripts/Makefile.thinlto
+ create mode 100644 scripts/Makefile.vmlinux_a
+
+
+base-commit: 2c31897a17e55a6da529b4e797e98c6febc60fd2
 -- 
 2.54.0.823.g6e5bcc1fc9-goog
 
