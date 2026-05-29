@@ -1,97 +1,116 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f201.google.com (mail-dy1-f201.google.com [74.125.82.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24BF9425CE1;
-	Fri, 29 May 2026 18:47:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAEC23F39DE
+	for <linux-kbuild@vger.kernel.org>; Fri, 29 May 2026 18:53:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780080444; cv=none; b=VpolKhmJS2Fo+W04nMe2Fof/emRQQl0qETz3L1ZKjZWaE7TJTqhDIJkeuquAt307H1YsmS80ogZkPg/v7+lpQTxcp/792IahvTulmLlwuOG0I4Gacp9u04txt9RgBZHlcj8ByV+7G8tHKwmq9Cm9rcCwrc6XFC5IPYNVmvLjOqU=
+	t=1780080835; cv=none; b=ezYfnQ3Kjtn5ZtZg9T7KSxd0j7hKuexhAb0HywRSsoNfg/c5AAWEdH7PpNqJks/RT9iCmRxOCFtUwo+EyqncHHHxF+oAZ5j/oXlZl6yDSiVJoobdD3QfjlZvhWWfqASyUqV54fs9okNCixURGrDy2384ArnNICg13iSqt5/LJAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780080444; c=relaxed/simple;
-	bh=Y2BfjIOohy7qzAHN359pShO4LMVZ0g/7OgqTF8A8sRk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iCi2I3/QUBW7XgmgbO6yHJTwoZOpIOf8MsvWE/LS7nEp48BfsONSTDwTynHl9mkfeUDCwht8Iq/EZZ14VsxUqEfK7nU9Ww3PQGJdzoYYMlfY4XH+Z4ehqxHYCtc7lun5wxb45Q/rXUJ6JVzJy7X7aXhVi70fV6EFwaMHL3rePZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HmRPQV+c; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780080835; c=relaxed/simple;
+	bh=s7bt/YWGN9UF4BwynJHskbfVkLN9m3OOGrUY7+PeC50=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=AOTo/beavmpO+Oz3qRPb9awGwFPFXPvkFex9Iclp6XQ1GKlruHiQOk72rqA8t+HfSIIE2ajxnSqtyGvW3p4eQKlWMELFLEQkGRP5djOIoduGiPHUSd/sAlyg8o/SgkhfZ8fQgq3Wl0OvdPFKymTPBX34QeZ26vuWLWYVdHbfA74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--xur.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fuGSjKYj; arc=none smtp.client-ip=74.125.82.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--xur.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HmRPQV+c"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDFAD1F00893;
-	Fri, 29 May 2026 18:47:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780080442;
-	bh=r2c2Odd8JPefWuQj2wE16E72FC1VtLLMGPUbupxPPIg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=HmRPQV+cqmN/y4kJjAffLC/vkDxIEMLsAcp4Rw4NQ3J8TdUpnwGSjAnEEaVGLz08M
-	 9fJqOV7t4QX6WzfClGDu/wL2+1oxs8vuOKsh4yCEfUioFHVafOf1+FE1JL1q4DtHMd
-	 K8WwpqH7d7ZhsfY2Et2AtSa94sY0d6YOt8QkL3CZblb8AOIPCcs4PVnf8o2nU3NOoW
-	 EAG5OmujNWXCGchqvjOek7W9i/hBXywLIF3m/bVEWN8EF6vcPYCpKmm7yUlXm85p67
-	 aso5S5XJEiLjbjeyYZdodDAyA+XFbjomLpadt+fTbU63SZopevSUd6w3r6EsIMa/9H
-	 ELeL0RzX4fnNw==
-Date: Fri, 29 May 2026 11:47:14 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Rong Xu <xur@google.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>,
-	Nicolas Schier <nicolas.schier@linux.dev>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
-	Rafael Aquini <aquini@redhat.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Stafford Horne <shorne@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Piotr Gorski <piotrgorski@cachyos.org>,
-	Venkat Rao Bagalkote <venkat88@linux.ibm.com>,
-	Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-	Teresa Johnson <tejohnson@google.com>, linux-kernel@vger.kernel.org,
-	linux-kbuild@vger.kernel.org, llvm@lists.linux.dev
-Subject: Re: [PATCH v11 3/3] kbuild: distributed build support for Clang
- ThinLTO
-Message-ID: <20260529184714.GA2059596@ax162>
-References: <20260528203905.687687-1-xur@google.com>
- <20260528203905.687687-4-xur@google.com>
- <178000602351.678078.3534988919326810792.b4-review@b4>
- <CAF1bQ=SOG3qr4K3h=SBgM=e42RmV6WjOfyMOmi_qBOpYMoVaEQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fuGSjKYj"
+Received: by mail-dy1-f201.google.com with SMTP id 5a478bee46e88-304ec73b015so558309eec.1
+        for <linux-kbuild@vger.kernel.org>; Fri, 29 May 2026 11:53:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1780080832; x=1780685632; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0JV5t//kdKJl6/uVoDLYHDKpOZGmoUYcNXdk8MLbmZA=;
+        b=fuGSjKYjpStzD/MiX39EYg4T+iPs+EDWiaMck/A4AMDEEAB5ob+ZRgRMi43ian8Lgk
+         VcKt8a3lmzDvAgh4C8Q5v+gcOVtWsugqerU3KVJctcWMU8yHvibb0FurLaagv+OIOTRg
+         BLZvIUTtPVHT2hgeWcZnTBDVUX6LT7d1hSb9wdUhXLldqnUkmq6NncydeGVJpkcDPw9f
+         nQYn4LkEuWAKerc9iVlH07L3OThU2bhqpUK2xDkhUd7V6AYqAHjtpyeEeNUdETOzVR2g
+         vvRi61kS3Ei9kIKxqLBX52AZOP54a3kXcQiFri/TPTdGvWBbi7b7R6iv5Sg9H8Gh8dDX
+         tNmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780080832; x=1780685632;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0JV5t//kdKJl6/uVoDLYHDKpOZGmoUYcNXdk8MLbmZA=;
+        b=aKbmfIe1dTsTslHbrQiJplKTJxjd41+9N1jPCdoZU1hi+GqtIUVVKXFKVMI/z69WJh
+         IsCAwQ+mAKDBHSWT32bmS6mIt3QLwkWMFoAiKETCNQmEx2LOfh47EEMJRyZuQdxMK7MV
+         CPQMQUcP88Jnk4sZJc1/1HTXiW8eUgVXv8UNgdUZbQB8zvW1ZQAJI00ijIlmqkSsYIop
+         Xi1kkzjyQCPglevNN4Z/07PXQYsaK1y3J6rD3OGytRDXOaOMEce1OV71d4K1Nk4ena9f
+         6A4hMDupjEbbfxihSSf1jrWqQV/41jvY+p0kICR5AOuYrTscLzqE0Jv+slSHgSNEnYrT
+         GTow==
+X-Forwarded-Encrypted: i=1; AFNElJ9t+eIzlJU0hw6gYAVv0ATpHVZIYeWBnyX3vpcJy9p79Dl9jEKccfUBdydWuJbeKg/EqPOWImT0oVxvieY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCLvLeiexyDA7LejwDorPfTURl6lMzFfC0LQyqMomc2Gg3mYVd
+	4HhbUYfbdvF789NeIuVUPqhRSYZ6zchTJKRBnqBRaZU7hEWrfbcB3VVZwlGxcK8mYwALKQ==
+X-Received: from dycme17.prod.google.com ([2002:a05:693c:2411:b0:303:9118:b1ef])
+ (user=xur job=prod-delivery.src-stubby-dispatcher) by 2002:a05:7300:214c:b0:2c5:ed1b:ca9
+ with SMTP id 5a478bee46e88-304fa4a9576mr574362eec.1.1780080831505; Fri, 29
+ May 2026 11:53:51 -0700 (PDT)
+Date: Fri, 29 May 2026 11:53:45 -0700
+In-Reply-To: <20260529185347.2418373-1-xur@google.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAF1bQ=SOG3qr4K3h=SBgM=e42RmV6WjOfyMOmi_qBOpYMoVaEQ@mail.gmail.com>
+Mime-Version: 1.0
+References: <20260529185347.2418373-1-xur@google.com>
+X-Mailer: git-send-email 2.54.0.823.g6e5bcc1fc9-goog
+Message-ID: <20260529185347.2418373-3-xur@google.com>
+Subject: [PATCH v12 2/3] kbuild: change --thin back to 'T' in $(AR)
+From: xur@google.com
+To: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nicolas Schier <nicolas.schier@linux.dev>, 
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Yonghong Song <yonghong.song@linux.dev>, 
+	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+	Miguel Ojeda <ojeda@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Alice Ryhl <aliceryhl@google.com>, 
+	Sami Tolvanen <samitolvanen@google.com>, "Mike Rapoport (Microsoft)" <rppt@kernel.org>, 
+	Rafael Aquini <aquini@redhat.com>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Stafford Horne <shorne@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>, 
+	Piotr Gorski <piotrgorski@cachyos.org>, Rong Xu <xur@google.com>, 
+	Venkat Rao Bagalkote <venkat88@linux.ibm.com>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, 
+	Teresa Johnson <tejohnson@google.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, May 28, 2026 at 04:09:10PM -0700, Rong Xu wrote:
-> On Thu, May 28, 2026 at 3:07 PM Nathan Chancellor <nathan@kernel.org> wrote:
-> > Sashiko has another comment as well.
-> >
-> >   https://sashiko.dev/#/patchset/26003?part=3
-> 
-> Are you referring to KBUILD_VMLINUX_OBJS and KBUILD_VMLINUX_LIBS part?
+From: Rong Xu <xur@google.com>
 
-Yes.
+The '-T' flag in $(AR) is no longer problematic since the minimum
+requirement for LLVM has been updated to version 15. As of LLVM 14
+and onward, the '-T' flag functions identically to the '--thin' flag.
 
-> I'm not sure if that's true: in my build, KBUILD_VMLINUX_OBJS includes
-> lib/lib.a etc.
-> In line 1296 of Makefile:
-> KBUILD_VMLINUX_OBJS := built-in.a $(patsubst %/, %/lib.a, $(filter %/,
-> $(libs-y)))
-> 
-> We can see native objects in lib/*.
-> % find lib -name '*.thinlto-native.o' |wc
->     204     204    7104
+Fixed the issue seen on IBM Power11 System:
+  ar: unrecognized option '--thin'
 
-Ah yes, I should have double checked that before brining it up.
-KBUILD_VMLINUX_LIBS would contain archives such as
-drivers/firmware/efi/libstub/lib.a, which we obviously do not want to
-process into vmlinux.a, so I think that comment is obviously invalid.
+Reported-by: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
+Closes: https://lore.kernel.org/linux-next/476507c9-a371-4864-9e87-572c1ecae82d@linux.ibm.com/
+Signed-off-by: Rong Xu <xur@google.com>
+---
+ scripts/Makefile.vmlinux_a | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
+diff --git a/scripts/Makefile.vmlinux_a b/scripts/Makefile.vmlinux_a
+index 9774f02b43b2..650d44330d1f 100644
+--- a/scripts/Makefile.vmlinux_a
++++ b/scripts/Makefile.vmlinux_a
+@@ -10,12 +10,12 @@ include $(srctree)/scripts/Makefile.lib
+ # Link of built-in-fixup.a
+ # ---------------------------------------------------------------------------
+ 
+-# '$(AR) mPi' needs --thin to workaround the bug of llvm-ar <= 14
++# '$(AR) mPi' needs 'T' to workaround the bug of llvm-ar <= 14
+ quiet_cmd_ar_builtin_fixup = AR      $@
+       cmd_ar_builtin_fixup = \
+ 	rm -f $@; \
+-	$(AR) cDPrS --thin $@ $(KBUILD_VMLINUX_OBJS); \
+-	$(AR) mPi --thin $$($(AR) t $@ | sed -n 1p) $@ $$($(AR) t $@ | grep -F -f $(srctree)/scripts/head-object-list.txt)
++	$(AR) cDPrST $@ $(KBUILD_VMLINUX_OBJS); \
++	$(AR) mPiT $$($(AR) t $@ | sed -n 1p) $@ $$($(AR) t $@ | grep -F -f $(srctree)/scripts/head-object-list.txt)
+ 
+ targets += built-in-fixup.a
+ built-in-fixup.a: $(KBUILD_VMLINUX_OBJS) scripts/head-object-list.txt FORCE
 -- 
-Cheers,
-Nathan
+2.54.0.823.g6e5bcc1fc9-goog
+
