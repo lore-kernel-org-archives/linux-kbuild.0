@@ -1,221 +1,211 @@
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E4ED34C124
-	for <linux-kbuild@vger.kernel.org>; Mon,  1 Jun 2026 21:19:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ED99366570
+	for <linux-kbuild@vger.kernel.org>; Mon,  1 Jun 2026 22:18:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780348762; cv=none; b=VMJNKvpNBgBYa2GxlHWM2WuCJofUckFZbdk/kJrQzPtBw9LviR1W2C0VWD4bH4evPc1tHY1BLwBg6BEClLMJlDDFiVMkoVI1INThyaWJ5lYeduOXxF0UkG2kA7QoD9t5B7z3xUNlkT0gsse/oLASuCGFTXj3XNCYbNsZH/y3uT8=
+	t=1780352331; cv=none; b=JxfCZ9eLJPM/n2zvusD4HKq38RxbnDPxDmNWXq8A4/zI9JiVaFeRK2Nf/L4wBHZUB3YzOUg47Vkm1gyUK7h8cJIgPASV/HRLRrJ0Q8NSCpZ2Io35K5Ga8Va2O3W7BRzLmFBVEgCUNTbW7ltNGXFwr6DIwWXfH0ixP1bsoOAgR50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780348762; c=relaxed/simple;
-	bh=IfPIiZW0gCIHgOF0/+IIrxBC8ZG3r9xHJsxK0+0F0kg=;
+	s=arc-20240116; t=1780352331; c=relaxed/simple;
+	bh=9kkXs74naFLkR7tsQ97HfR/dSsWcR0xtD7xs9YcLoNA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Tex8rxZlxJKCZoLiWh/z35bQMliLzs+b8wuzBCw9pEesfKHSxwvM3MUUiTbU44gzRTBZ3sPZyl1N/6tJrExsa3N2vvASkEqjtfU3d+BIE3FuKWFPch5esYDttdbFIz76u3KtGx96bcsxMe/cDXeUP1xr4ZIlEFfkNvQf8p8M+wE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=o3ipgcmU; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 MIME-Version; b=AfTm9Dy7R55L9zihFFa3/UHuPghmRE6qhl9L4EHQjEE3LD5XsAssQKLQHSNkE2ACj4lUerMsbvHNhcxrLxGEu4W7NBoj0u4YmvuomQFu/lOoGRK7dFw8QBdhRSJyEwWGS7vKFwylAc+RiDt2tATdSeFw1N+ZNHLxi5scLZ4FcNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Up5FO+UB; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o3ipgcmU"
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-45ef29c5561so1877574f8f.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 01 Jun 2026 14:19:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780348758; x=1780953558; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JuVHAspRZOzT54Q3CeGYfhWxBcncLtAKm4G7e3ZGvNU=;
-        b=o3ipgcmUluH9ud6bWumsrmuDdH9Gtfcr7BDcN1KYANa/V7Wyrm0ZVKSPv/9tWDyiPf
-         4wt8MHAgTn2cIT3CPJ+zDvhzP6OeLiSMnGVEcUMK2Urcxi0Mzdj439ocdQqDtvOFBb3D
-         YSdRJfc0PKf4SLJhXWipVSQr5uSt3RgB48vKJfH2WzinHUmvphwqPqEioWQQduieJ/x4
-         B6JmYc9s84jSJAuZzTqA+lqeEth4SUky09gKVQRykYU2MsCu2pEAT0FxVj9iNhvr9Vr+
-         Z75yW6cD0C5m+fDElR2DU+dpqjFAcyud7fGJ3g0NAwB1jw4nv4i4RSV2hQdqxh2HlAOG
-         5hNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780348758; x=1780953558;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=JuVHAspRZOzT54Q3CeGYfhWxBcncLtAKm4G7e3ZGvNU=;
-        b=B5kDVb7QxtCkAkKPY+qeUkIp5zBay1igBZ2Dc3lT5UM9OyFP1F1QGcpk6oJUrDTXX4
-         8LxtKrntQmPTXfS0lzHvnLN8dce9A5cJemPd/+3bgVe/LxYD50r6/WPXKfQ35bUu2vmt
-         JTQzZRLC6teOocNO8yJYmQW3AxwwSCHpTcYsWq3LNIOcRlDY/mnv2/HgQDnx6sOIvvJe
-         cWGEnc+jLmzd19XQ4mNkztBt5pDcBrbF+O1Jh1INhr97ci9zIKdtYciduSCk9A/vTd0t
-         XgE2ZFemW0XE2N5e0tVnjM+kVi/69FmaG4QHIRQe1j2Dt/76YpS6kuqnS5NAVM61UCdu
-         ynVA==
-X-Forwarded-Encrypted: i=1; AFNElJ9HeKXOpped+R34e2QHcgyM17SOHhIoTdt8f+GCPTdaQx9cdfs3xGo2TFEERlpE2sw5GS1Cz5vIlfu39ZQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzmggxZaSkSiTNsT3WlgwNOqlby1S8ziCTw3CVuIY4IUlfUZ/FF
-	lE6Y0/NcHFAkQNxAsUHDwcl5hSPmzcTaIPHX8FkhYkrtLasLvFRGkJQb
-X-Gm-Gg: Acq92OFM0x87u0P6l2g3EdFGWXJBmKdl0ask6OKB1h5BIetg40CF39kqUjmQyypGSC3
-	S8pxWAlqwvdEy0hUCF9u7UwGg121jGFemdkonfW7crvx/iF0S/5RxZaD3JmAZ2VY6Z2rXWX7Qyy
-	6f3pBClhs4j0xnecBCrJEdWQpl/0agKzjcn+SKFB3I9aRgXlAT2CEx6rNwd6DYq6+gep7J+UwWs
-	DESkC26gaeyKsgfR9D/xxfio2NZ076byWHdVzxmRHiB/mUGKxLFn4NEYzV6Pf/EC/uz+SkyrNdG
-	JrILDdiuoQfGQTNTFG0txvpZFm83TX/YK1yV6VvN2C/RK8awcUyZzCbklxxkRlPi5hO7x19JMFA
-	EMbJx9uojw/NC8iSZaxTl6zN9D28cklTnxkw/LGCVe6PqxHWYrcSmaXg47Fc3HK93Dz3VJayecP
-	Sv78miBTq3p3syGmv13E220fiflLflhfsrPTvqsuKbQietXe0CJzHoWmA=
-X-Received: by 2002:a05:6000:4b02:b0:45f:1bd:a053 with SMTP id ffacd0b85a97d-45f01bda1famr19783269f8f.1.1780348757529;
-        Mon, 01 Jun 2026 14:19:17 -0700 (PDT)
-Received: from localhost (a89-182-201-205.net-htp.de. [89.182.201.205])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-45ef3587072sm28494538f8f.34.2026.06.01.14.19.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Jun 2026 14:19:17 -0700 (PDT)
-From: Sergei Litvin <litvindev@gmail.com>
-To: miguel.ojeda.sandonis@gmail.com,
-	nathan@kernel.org,
-	nsc@kernel.org
-Cc: rust-for-linux@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kbuild@vger.kernel.org,
-	ojeda@kernel.org,
-	Sergei Litvin <litvindev@gmail.com>
-Subject: [PATCH v3] scripts/tags.sh: fix "make COMPILED_SOURCE=1 cscope" command ends up with *.rlib, *.rmeta, *.so filenames in cscope.files
-Date: Mon,  1 Jun 2026 23:18:50 +0200
-Message-ID: <20260601211850.3378-1-litvindev@gmail.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <CANiq72mBkBxGk4CbTrjeNYZ5ZUsD=wVfLVyP2Bcm_v9BExQaGQ@mail.gmail.com>
-References: <CANiq72mBkBxGk4CbTrjeNYZ5ZUsD=wVfLVyP2Bcm_v9BExQaGQ@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Up5FO+UB"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1780352327;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=K2JCsshQIRcXFwnXyputxFVFmahr9SGDljCocSGVm/Y=;
+	b=Up5FO+UB5h6tx5ksrDhelY6HFkzLeCig85pG/Sny9EUbbWmnUdqI5M3pSVaEWNPRyZ1KyD
+	vWEsGY4WyBhsiHKEZcIfda4uwuA8btqMU7igwJPRX5xfzgKNYWks4a76ihdcTp3+eHh2xF
+	S/guf9j9AZIj0ukFGUsSLORahh3AhTw=
+From: Ihor Solodrai <ihor.solodrai@linux.dev>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Cc: Alan Maguire <alan.maguire@oracle.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	bpf@vger.kernel.org,
+	linux-kbuild@vger.kernel.org
+Subject: [PATCH bpf-next v1 01/14] tools/bpf: Sync btf_ids.h to tools
+Date: Mon,  1 Jun 2026 15:17:52 -0700
+Message-ID: <20260601221805.821394-2-ihor.solodrai@linux.dev>
+In-Reply-To: <20260601221805.821394-1-ihor.solodrai@linux.dev>
+References: <20260601221805.821394-1-ihor.solodrai@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-PROBLEM
+Sync tools/include/linux/btf_ids.h with include/linux/btf_ids.h so
+tools-side code can use BTF_ID_FLAGS(), BTF_SET8_START(), and
+BTF_KFUNCS_START().
 
-(1) When executing the command `make COMPILED_SOURCE=1 cscope`, the
-`cscope.files` file generated by it includes filenames with the
-extensions *.rlib, *.rmeta, and *.so (taken from *.cmd files, which, in turn,
-are generated from *.d dependency files by the `fixdep` utility).
+Keep the tools copy's existing compiler header dependency:
+tools/include/linux/compiler.h already provides __maybe_unused and
+tools/include/linux/compiler_attributes.h does not exist.
 
-(2) When executing the command `make cscope`, the `cscope.files` file generated
-by it includes only filenames with the extensions *.h, *.c, *.S and not includes
-filenames with *.rs extensions.
-
-SOLUTION
-
-(1) Modify the regular expression in the `all_compiled_sources()` function so
-that only files with the extensions *.h, *.c, *.S, and *.rs are accepted.
-
-This causes `make COMPILED_SOURCE=1 cscope` command to generate the
-`cscope.files` file that contains only files with the extensions *.h, *.c, *.S,
-and *.rs.
-
-(2) Modify the functions `find_arch_sources()`, `find_arch_include_sources()`,
-`find_include_sources()`, and `find_other_sources()` so that they no longer
-accept the filename pattern as the last argument, but instead retrieve it from
-the new variable `pattern` (analogous to the variables `ignore`, `prune`, and
-`tree`) which includes *.rs along with *.h, *.c, *.S.
-
-This causes `make cscope` command to generate a `cscope.files` file that
-contains *.rs files along with *.h, *.c, *.S
-
-Signed-off-by: Sergei Litvin <litvindev@gmail.com>
-
+Signed-off-by: Ihor Solodrai <ihor.solodrai@linux.dev>
 ---
+ tools/include/linux/btf_ids.h | 78 ++++++++++++++++++++++++++++++++---
+ 1 file changed, 73 insertions(+), 5 deletions(-)
 
-Changes since V2:
-https://lore.kernel.org/lkml/20260530085821.19689-1-litvindev@gmail.com/
-
-- The functions find_arch_sources()`, `find_arch_include_sources()`,
-`find_include_sources()`, and `find_other_sources()` have been modified rather
-than having their calls duplicated to avoid redundant directory
-traversals (suggested by Sashiko).
-
-– The regular expression in the `all_compiled_sources()` function was improved
-by adding a lookahead anchor (?=\s) to the first branch (also suggested by Sashiko).
-
-Changes between the V1 and V2:
-https://lore.kernel.org/lkml/20260530085821.19689-1-litvindev@gmail.com/
-https://lore.kernel.org/lkml/20260530070631.14955-1-litvindev@gmail.com/
-
-- In Version V1, the `-name` parameters to the `find` calls in the functions
-`find_arch_sources()`, `find_arch_include_sources()`, `find_include_sources()`,
-and `find_other_sources()` were replaced by `-regextype posix-extended
--regex`. However, as noted by Sashiko, the `-regextype` option is a GNU-specific
-extension; therefore, in V2, duplicate function calls were introduced instead.
----
- scripts/tags.sh | 23 +++++++++++++----------
- 1 file changed, 13 insertions(+), 10 deletions(-)
-
-diff --git a/scripts/tags.sh b/scripts/tags.sh
-index 243373683f98..be7c2ffd2d4e 100755
---- a/scripts/tags.sh
-+++ b/scripts/tags.sh
-@@ -12,6 +12,9 @@ if [[ "$KBUILD_VERBOSE" =~ 1 ]]; then
- 	set -x
- fi
+diff --git a/tools/include/linux/btf_ids.h b/tools/include/linux/btf_ids.h
+index 72ea363d434d..4fe5c5f1558c 100644
+--- a/tools/include/linux/btf_ids.h
++++ b/tools/include/linux/btf_ids.h
+@@ -10,6 +10,9 @@ struct btf_id_set {
+ 	u32 ids[];
+ };
  
-+# sources to searh
-+pattern="( -name *.[chS] -o -name *.rs )"
++/* This flag implies BTF_SET8 holds kfunc(s) */
++#define BTF_SET8_KFUNCS		(1 << 0)
 +
- # RCS_FIND_IGNORE has escaped ()s -- remove them.
- ignore="$(echo "$RCS_FIND_IGNORE" | sed 's|\\||g' )"
- # tags and cscope files should also ignore MODVERSION *.mod.c files
-@@ -52,7 +55,7 @@ find_arch_sources()
- 	for i in $archincludedir; do
- 		local prune="$prune ( -path $i ) -prune -o"
- 	done
--	find ${tree}arch/$1 $ignore $prune -name "$2" -not -type l -print;
-+	find ${tree}arch/$1 $ignore $prune $pattern -not -type l -print;
- }
+ struct btf_id_set8 {
+ 	u32 cnt;
+ 	u32 flags;
+@@ -22,6 +25,7 @@ struct btf_id_set8 {
+ #ifdef CONFIG_DEBUG_INFO_BTF
  
- # find sources in arch/$1/include
-@@ -61,14 +64,14 @@ find_arch_include_sources()
- 	local include=$(find ${tree}arch/$1/ -name include -type d -print);
- 	if [ -n "$include" ]; then
- 		archincludedir="$archincludedir $include"
--		find $include $ignore -name "$2" -not -type l -print;
-+		find $include $ignore $pattern -not -type l -print;
- 	fi
- }
+ #include <linux/compiler.h> /* for __PASTE */
++#include <linux/stringify.h>
  
- # find sources in include/
- find_include_sources()
- {
--	find ${tree}include $ignore -name config -prune -o -name "$1" \
-+	find ${tree}include $ignore -name config -prune -o $pattern \
- 		-not -type l -print;
- }
+ /*
+  * Following macros help to define lists of BTF IDs placed
+@@ -35,7 +39,7 @@ struct btf_id_set8 {
  
-@@ -78,21 +81,21 @@ find_other_sources()
- {
- 	find ${tree}* $ignore \
- 	     \( -path ${tree}include -o -path ${tree}arch -o -name '.tmp_*' \) -prune -o \
--	       -name "$1" -not -type l -print;
-+	       $pattern -not -type l -print;
- }
+ #define BTF_IDS_SECTION ".BTF_ids"
  
- all_sources()
- {
--	find_arch_include_sources ${SRCARCH} '*.[chS]'
-+	find_arch_include_sources ${SRCARCH}
- 	if [ -n "$archinclude" ]; then
--		find_arch_include_sources $archinclude '*.[chS]'
-+		find_arch_include_sources $archinclude
- 	fi
--	find_include_sources '*.[chS]'
-+	find_include_sources
- 	for arch in $ALLSOURCE_ARCHS
- 	do
--		find_arch_sources $arch '*.[chS]'
-+		find_arch_sources $arch
- 	done
--	find_other_sources '*.[chS]'
-+	find_other_sources
- }
+-#define ____BTF_ID(symbol)				\
++#define ____BTF_ID(symbol, word)			\
+ asm(							\
+ ".pushsection " BTF_IDS_SECTION ",\"a\";       \n"	\
+ ".local " #symbol " ;                          \n"	\
+@@ -43,10 +47,11 @@ asm(							\
+ ".size  " #symbol ", 4;                        \n"	\
+ #symbol ":                                     \n"	\
+ ".zero 4                                       \n"	\
++word							\
+ ".popsection;                                  \n");
  
- all_compiled_sources()
-@@ -100,7 +103,7 @@ all_compiled_sources()
- 	{
- 		echo include/generated/autoconf.h
- 		find $ignore -name "*.cmd" -exec \
--			grep -Poh '(?<=^  )\S+|(?<== )\S+[^\\](?=$)' {} \+ |
-+			grep -Poh '(?<=^  )\S+\.([chS]|rs)(?=\s)|(?<== )\S+\.(?1)(?=$)' {} \+ |
- 		awk '!a[$0]++'
- 	} | xargs realpath -esq $([ -z "$KBUILD_ABS_SRCTREE" ] && echo --relative-to=.) |
- 	sort -u
+-#define __BTF_ID(symbol) \
+-	____BTF_ID(symbol)
++#define __BTF_ID(symbol, word) \
++	____BTF_ID(symbol, word)
+ 
+ #define __ID(prefix) \
+ 	__PASTE(__PASTE(prefix, __COUNTER__), __LINE__)
+@@ -56,7 +61,14 @@ asm(							\
+  * to 4 zero bytes.
+  */
+ #define BTF_ID(prefix, name) \
+-	__BTF_ID(__ID(__BTF_ID__##prefix##__##name##__))
++	__BTF_ID(__ID(__BTF_ID__##prefix##__##name##__), "")
++
++#define ____BTF_ID_FLAGS(prefix, name, flags) \
++	__BTF_ID(__ID(__BTF_ID__##prefix##__##name##__), ".long " #flags "\n")
++#define __BTF_ID_FLAGS(prefix, name, flags, ...) \
++	____BTF_ID_FLAGS(prefix, name, flags)
++#define BTF_ID_FLAGS(prefix, name, ...) \
++	__BTF_ID_FLAGS(prefix, name, ##__VA_ARGS__, 0)
+ 
+ /*
+  * The BTF_ID_LIST macro defines pure (unsorted) list
+@@ -155,10 +167,58 @@ asm(							\
+ ".popsection;                                 \n");	\
+ extern struct btf_id_set name;
+ 
++/*
++ * The BTF_SET8_START/END macros pair defines sorted list of
++ * BTF IDs and their flags plus its members count, with the
++ * following layout:
++ *
++ * BTF_SET8_START(list)
++ * BTF_ID_FLAGS(type1, name1, flags)
++ * BTF_ID_FLAGS(type2, name2, flags)
++ * BTF_SET8_END(list)
++ *
++ * __BTF_ID__set8__list:
++ * .zero 8
++ * list:
++ * __BTF_ID__type1__name1__3:
++ * .zero 4
++ * .word (1 << 0) | (1 << 2)
++ * __BTF_ID__type2__name2__5:
++ * .zero 4
++ * .word (1 << 3) | (1 << 1) | (1 << 2)
++ *
++ */
++#define __BTF_SET8_START(name, scope, flags)		\
++__BTF_ID_LIST(name, local)				\
++asm(							\
++".pushsection " BTF_IDS_SECTION ",\"a\";       \n"	\
++"." #scope " __BTF_ID__set8__" #name ";        \n"	\
++"__BTF_ID__set8__" #name ":;                   \n"	\
++".zero 4                                       \n"	\
++".long " __stringify(flags)                   "\n"	\
++".popsection;                                  \n");
++
++#define BTF_SET8_START(name)				\
++__BTF_SET8_START(name, local, 0)
++
++#define BTF_SET8_END(name)				\
++asm(							\
++".pushsection " BTF_IDS_SECTION ",\"a\";      \n"	\
++".size __BTF_ID__set8__" #name ", .-" #name "  \n"	\
++".popsection;                                 \n");	\
++extern struct btf_id_set8 name;
++
++#define BTF_KFUNCS_START(name)				\
++__BTF_SET8_START(name, local, BTF_SET8_KFUNCS)
++
++#define BTF_KFUNCS_END(name)				\
++BTF_SET8_END(name)
++
+ #else
+ 
+-#define BTF_ID_LIST(name) static u32 __maybe_unused name[5];
++#define BTF_ID_LIST(name) static u32 __maybe_unused name[128];
+ #define BTF_ID(prefix, name)
++#define BTF_ID_FLAGS(prefix, name, ...)
+ #define BTF_ID_UNUSED
+ #define BTF_ID_LIST_GLOBAL(name, n) u32 __maybe_unused name[n];
+ #define BTF_ID_LIST_SINGLE(name, prefix, typename) static u32 __maybe_unused name[1];
+@@ -166,6 +226,10 @@ extern struct btf_id_set name;
+ #define BTF_SET_START(name) static struct btf_id_set __maybe_unused name = { 0 };
+ #define BTF_SET_START_GLOBAL(name) static struct btf_id_set __maybe_unused name = { 0 };
+ #define BTF_SET_END(name)
++#define BTF_SET8_START(name) static struct btf_id_set8 __maybe_unused name = { 0 };
++#define BTF_SET8_END(name)
++#define BTF_KFUNCS_START(name) static struct btf_id_set8 __maybe_unused name = { .flags = BTF_SET8_KFUNCS };
++#define BTF_KFUNCS_END(name)
+ 
+ #endif /* CONFIG_DEBUG_INFO_BTF */
+ 
+@@ -215,5 +279,9 @@ MAX_BTF_TRACING_TYPE,
+ };
+ 
+ extern u32 btf_tracing_ids[];
++extern u32 bpf_cgroup_btf_id[];
++extern u32 bpf_local_storage_map_btf_id[];
++extern u32 btf_bpf_map_id[];
++extern u32 bpf_kmem_cache_btf_id[];
+ 
+ #endif
 -- 
 2.54.0
 
