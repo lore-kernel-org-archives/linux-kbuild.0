@@ -1,129 +1,107 @@
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1593395D8E
-	for <linux-kbuild@vger.kernel.org>; Tue,  2 Jun 2026 21:09:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F748399D0C;
+	Tue,  2 Jun 2026 21:27:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780434551; cv=none; b=UkUBDKudqN5yV665Svg5rhQ74NxA1tyZ1B2exAswWesnkn1uGi+/Drb6O3R9qt7GRHHuUdg3x3Yja8PMgY4Yn7EdO5WWmaoRJvvey8oW9GJwgQvT7aK6pr0dzK8yVnVfrbVFjQKxZo0UI36P6o/173Hj2E5SlUFV1rkRVpWiNBw=
+	t=1780435668; cv=none; b=GR4dHwXdasyvQSFhGjbLldc+0z8ePI/RFpxinFU3dMJaFM07TpZf8Y1a0DaaAIVJOmVaZX6oNlqIiUiMBHDtomIQ/tcjWZow3T8O1ElRR+HQ3YktM6Olhb3bwOpLJuVdTILUamN7UpaF6rc1xEZ1Lc4A21e3ESBGD5JHNVPQUhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780434551; c=relaxed/simple;
-	bh=dNGkSx2tM1qxsXApQVddpm2XfsR6us8p4reR7Pi9/q8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NFF4Q90OaJU/WYGPgPALflKwFOhYUxFUSRviJ3fy6cZWZKdqBZc0o/xsBqM6lKGPQZvv6WG6CC7HzLP1n15Djx9d92zLURsgSeZT6834Nu465EMcUAIAC7+yiGuX+7ETbPdZMqO6OOqyIGaPsCFMmymlNZOUUNRqvn29d2Z4Lao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xZkjmCQq; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1780435668; c=relaxed/simple;
+	bh=CqLzbxZx9AH9FzAh4LvVUVVPW2K6cBHPv0ACAyIlCFE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KFjC5JSdKbRg0fBDR+Du0QHvoMMZh6PehUIg+UEp5JrvqNffk4NPFTZaN+vKH7vzqjM9TbaNoTPGgsB6Y3PcKcVSH0FUZolR7kcXDU9mHpv66+P2HG/iyGTwRRVelbLUSXgLu8jkL7H/E8dIapuW5XUiCTQc/NSfml0abvTAm3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oGbxiqAf; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xZkjmCQq"
-Message-ID: <3ba6ed89-82b3-4dbb-99d4-5e34e496fc33@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780434537;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zeurb2c9F7oUWsVkVTj1COrkRc3hnNlwZ2PJ3T6Sw8o=;
-	b=xZkjmCQq172aGjiyhf3GfFYl9aAefj82joEGbZtlKGCeKicndPOVdXRKGsDNN9QHmebHfv
-	Na8Spkj50s3WgWsBbFKXUO53I8ZloIbh3qbAec5FWZ8qp5lncFIffmTBQEfnUMAckBRDFq
-	qkqtGnh97m1eoJtWZpC+o27MrRIaxX0=
-Date: Tue, 2 Jun 2026 14:08:46 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oGbxiqAf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F6AD1F00893;
+	Tue,  2 Jun 2026 21:27:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780435666;
+	bh=5Im0aFGY86Ref4h5NVxgo8G6mRjIHIC6V6c+NmxpZ7w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=oGbxiqAf5/9Y37S9HurefgORKKsuPw05nH9IaXGYJ3uBLDnVOVjyszYkL3c3RZkQz
+	 z65VmHRuY4iQzjYrBAE+acFqfOFxAQpDyBqtBSUKaRJOFsYXdtrDFHcGySOm6LKDJA
+	 CEptzPpFcny128FUjz37Rnqx2lnQnZhFJrHkRkpdWDLMiVBw+ZkpHnd4omyl47Gx0R
+	 m1eKvM4EeQl6Ch3F8UDCKTQ9HcX6Mu2HPJdJseugvn4EdlvXaGkz/IELAptZhP4Sg0
+	 FO/geevFdVsri9FF+Y7G2XCHLp50NjD8vA2Dto2phqkcXGf2owpAQf04c9thU9RiUG
+	 HbJJKyR+J5e+w==
+Date: Tue, 2 Jun 2026 11:27:45 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Leo Yan <leo.yan@arm.com>
+Cc: Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
+	James Clark <james.clark@linaro.org>, Kees Cook <kees@kernel.org>,
+	Quentin Monnet <qmo@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Daniel Lezcano <daniel.lezcano@kernel.org>,
+	Zhang Rui <rui.zhang@intel.com>, Lukasz Luba <lukasz.luba@arm.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>, Mark Rutland <mark.rutland@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	William Breathitt Gray <wbg@kernel.org>,
+	Barry Song <baohua@kernel.org>, Qinxin Xia <xiaqinxin@huawei.com>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	Kent Gibson <warthog618@gmail.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Long Li <longli@microsoft.com>, Jonathan Cameron <jic23@kernel.org>,
+	David Lechner <dlechner@baylibre.com>,
+	Nuno =?iso-8859-1?Q?S=E1?= <nuno.sa@analog.com>,
+	Andy Shevchenko <andy@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>, Willy Tarreau <w@1wt.eu>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Robert Moore <robert.moore@intel.com>, Len Brown <lenb@kernel.org>,
+	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+	David Vernet <void@manifault.com>, Andrea Righi <arighi@nvidia.com>,
+	Changwoo Min <changwoo@igalia.com>, Mark Brown <broonie@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Gabriele Monaco <gmonaco@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	Jiri Kosina <jikos@kernel.org>,
+	Benjamin Tissoires <bentiss@kernel.org>,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org
+Subject: Re: [PATCH v7 19/23] tools: sched_ext: Append extra cflags
+Message-ID: <ah9K0WzLJz3qL_cu@slm.duckdns.org>
+References: <20260602-tools_build_fix_zero_init-v7-0-631baf679fe7@arm.com>
+ <20260602-tools_build_fix_zero_init-v7-19-631baf679fe7@arm.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v1 06/14] resolve_btfids: Discover kfuncs from
- BTF ID sets
-To: Jiri Olsa <olsajiri@gmail.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Eduard Zingerman
- <eddyz87@gmail.com>, Kumar Kartikeya Dwivedi <memxor@gmail.com>,
- Alan Maguire <alan.maguire@oracle.com>, bpf@vger.kernel.org,
- linux-kbuild@vger.kernel.org
-References: <20260601221805.821394-1-ihor.solodrai@linux.dev>
- <20260601221805.821394-7-ihor.solodrai@linux.dev> <ah8-6CNIHPCJxAOM@krava>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Ihor Solodrai <ihor.solodrai@linux.dev>
-In-Reply-To: <ah8-6CNIHPCJxAOM@krava>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260602-tools_build_fix_zero_init-v7-19-631baf679fe7@arm.com>
 
-On 6/2/26 1:36 PM, Jiri Olsa wrote:
-> On Mon, Jun 01, 2026 at 03:17:57PM -0700, Ihor Solodrai wrote:
->> collect_kfuncs() currently uses bpf_kfunc decl tags to identify the
->> list of kfuncs. The decl tags are generated by pahole, which makes
->> current implementation implicitly rely on those tags being generated.
->>
->> The authoritative source, used by the the BPF verifier for kfunc
->> registration, of functions being BPF kfuncs are
->> BTF_KFUNCS_START()/END() declarations. These are BTF_ID_SET8 under the
->> hood. Currently resolve_btfids reads kfunc flags from these sets, and
->> populates them with BTF IDs.
->>
->> Implement kfunc discovery from BTF_ID_SET8 symbols in resolve_btfids,
->> removing the dependency on pahole's emmission of decl tags.
->>
->> Walk BTF_ID_KIND_SET8 sets, and use the address-to-symbol index to
->> look up set entry's BTF_ID symbol name (before .BTF_ids is patched),
->> recording the paired flags directly. This makes find_kfunc_flags()
->> helper unnecessary, so it's removed.
->>
->> Kernel functions can appear in more than one set, which is legitimate,
->> since kfunc sets are prog-type dependent in the kernel. So for btf2btf
->> processing deduplicate kfuncs by BTF ID, accumulate (OR) the flags,
->> and warn on flags mismatch to catch inconsistent declarations.
->>
->> Signed-off-by: Ihor Solodrai <ihor.solodrai@linux.dev>
->> ---
->>  tools/bpf/resolve_btfids/main.c | 122 ++++++++++++++------------------
->>  1 file changed, 55 insertions(+), 67 deletions(-)
->>
->> diff --git a/tools/bpf/resolve_btfids/main.c b/tools/bpf/resolve_btfids/main.c
->> index 43512af13148..d35a7b2460e8 100644
->> --- a/tools/bpf/resolve_btfids/main.c
->> +++ b/tools/bpf/resolve_btfids/main.c
->> @@ -970,6 +970,23 @@ static int push_kfunc(struct btf2btf_context *ctx, struct kfunc *kfunc)
->>  	struct kfunc *arr = ctx->kfuncs;
->>  	u32 cap = ctx->max_kfuncs;
->>  
->> +	/*
->> +	 * A kfunc can be listed in multiple BTF ID sets.
->> +	 * In this case, dedup by btf_id and accumulate kfunc flags.
->> +	 */
->> +	for (u32 i = 0; i < ctx->nr_kfuncs; i++) {
->> +		if (ctx->kfuncs[i].btf_id != kfunc->btf_id)
->> +			continue;
->> +
->> +		if (ctx->kfuncs[i].flags != kfunc->flags) {
->> +			pr_err("WARN: resolve_btfids: inconsistent flags for kfunc %s: 0x%x != 0x%x\n",
->> +			       kfunc->name, ctx->kfuncs[i].flags, kfunc->flags);
->> +			warnings++;
->> +		}
+On Tue, Jun 02, 2026 at 03:40:53PM +0100, Leo Yan wrote:
+> Append EXTRA_CFLAGS to CFLAGS so that additional flags can be applied to
+> the compiler.
 > 
-> hit few of those
-> 
-> WARN: resolve_btfids: inconsistent flags for kfunc hid_bpf_allocate_context: 0x5 != 0x25
-> WARN: resolve_btfids: inconsistent flags for kfunc hid_bpf_release_context: 0x2 != 0x22
-> WARN: resolve_btfids: inconsistent flags for kfunc hid_bpf_hw_request: 0x0 != 0x20
-> WARN: resolve_btfids: inconsistent flags for kfunc hid_bpf_hw_output_report: 0x0 != 0x20
-> WARN: resolve_btfids: inconsistent flags for kfunc hid_bpf_input_report: 0x0 != 0x20
-> 
-> I'd think flags like KF_SLEEPABLE might vary in different sets for the same kfunc,
-> IIUC you don't need to use KF_SLEEPABLE for syscall hook, because syscall programs
-> are already sleepable.. not sure there are other examples
+> Signed-off-by: Leo Yan <leo.yan@arm.com>
 
-That's a good point.
+Acked-by: Tejun Heo <tj@kernel.org>
 
-I think from the PoV of resolve_btfids what matters is the mismatch of
-flags that trigger BTF changes, like KF_IMPLICIT_ARGS. We could check for
-the specific flags here, or filter out acceptable inconsistencies (KF_SLEEPABLE).
+Thanks.
 
-Any other ideas?
-
-> 
-> jirka
-
+-- 
+tejun
