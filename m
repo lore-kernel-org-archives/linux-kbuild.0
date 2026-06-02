@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 954083FC5C6;
-	Tue,  2 Jun 2026 17:30:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA6923FADE9;
+	Tue,  2 Jun 2026 17:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780421408; cv=none; b=Aec687VU7q28o8jZcolJirtTmeMDwK9f8RKqpbuzfQ6npDCTyIfyEEZ6CT5FMj1VJuTRmeNZOCWuOZm98pIKZZaeB7sewGDZlZQg4QcMr/Ln0LFAK+XxYYKWOCK5LB43f88TkMYRq+DFBKYHy4C6+/SSTHeHQ94nuoa3a2qR66Y=
+	t=1780421412; cv=none; b=b962T3lxbTMJNiBGmf37I83qDssA44BwU+QebZ/1GAf0sDTnSOAy94PUA/8oRPbCHI7zNlY1A8vjtYXMMR84zRO/mpYOyQWA8cjMtWmAGaE/y8p6TbBFnW99af08JNePEBerPttatP3/kfTERgpQAUdJ0+xjxoRL6VXdolHSGM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780421408; c=relaxed/simple;
-	bh=QWKNmlcXmd8bksVMALW2+Pkn6Ik/tZKZZxPnL6TC3gk=;
+	s=arc-20240116; t=1780421412; c=relaxed/simple;
+	bh=VKWeIlilx8Hjdc8d7oGM3f9Fk0wQo4iOK5gAVJKsEuE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=P74dbkY6Gs4IEbiTJxAXSx8G8/5W26EDR1Q26t6dCkyQ1iJ67+sVJ2kLRuaWTmlmZNB9vcNugupmJGSjowlsGIV0cuml1mgoPxg7vjIGNFWaoLMMiDmHdim2RrC269lDyj7g+2L33qAgIY/gtCcfz9Sx1wAHchH/UQqd+opMobA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VCI/Fe1C; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=JOmNUUhBRFGVGtY+rPrpqqzrvAcJx4eL9fgI66Qwng8HwfjbZGw3Y5uG4ZPC0bVOhYMEjldDBNNX4bRxdYYFVjzvmMPUdHxdNB9FiBo3J49Y9tYApk5K+YBHjNz6rDO4tHs+6zIuTrCkQWsiUbzLXQm98yBofPFI6v/iJz2hUbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SLWgW98v; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VCI/Fe1C"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 208CF1F00893;
-	Tue,  2 Jun 2026 17:30:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SLWgW98v"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 039B71F00898;
+	Tue,  2 Jun 2026 17:30:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780421407;
-	bh=a6Q6paeXCHqIdE2CqjfDFH1/QNPLzwnI/+N6DZqqx4c=;
+	s=k20260515; t=1780421411;
+	bh=jcoqkp35kMn/myQ8G/VTXOSWFKdPEXBbCgmhn69Y/Vk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=VCI/Fe1CrQLI56Jd0lWC31JHVnQRwzbRHslwhm/aS/RqZOISJpYXl6EwrbOW3Nqe/
-	 RQhzHDh8FJGRGqJhFVqzUdVXRXDmsFBadFeeUkYAY2XIOysgHPkabmVWd4a86iw9UW
-	 EHC31JuX3bKThR53HltmfF6FtPdJizo2khPSHzAGd2+oAykMTrQjmV5nRsPxk1O/HA
-	 seVcwzcm4zXPmblJuLaSOR3g0yYzmlHAQI+JPlwTZD2jY2yeGG00RhxxzEa0n3mvM/
-	 4qThPEzOTQ1kRXqiUHPqRpE/4wCuGp1zPybh6BNoXkWpkYG13ctr1AXC1EblFajgJg
-	 cOuxvpryp7Ouw==
+	b=SLWgW98vg7ZmDWbkVTG9I0HltGSbUnLVLZpW+V5JbN/YHXWCgehe2bTXQC0rqoQoA
+	 +tixVM+Jw+4oOQm3npd6jERgGylWFZdqPQ8rDv6WJrozG/2UFv6Qrjnf+zMt1L3tMe
+	 vstyZfBI2auCKtY4dci08MVhjaF79gMmELrG35PhA2MeCpjk9EKm1y31h1h1n+Jacz
+	 xKWr6y4RBYLUUJfVgBXKSoViOYCxLQrB6CEApkW16APowVyiuQn6J63UcsrinKbZtI
+	 7xK1IXdm28mlMA6rUXA1I52EK0e0N8KFRzn+fTUMJlr5fupJ1ytaZv/ipGCVHBoYJg
+	 j9DB1zIx/A+Rg==
 From: Miguel Ojeda <ojeda@kernel.org>
 To: Miguel Ojeda <ojeda@kernel.org>,
 	Nathan Chancellor <nathan@kernel.org>,
@@ -42,9 +42,9 @@ Cc: Boqun Feng <boqun@kernel.org>,
 	linux-kbuild@vger.kernel.org,
 	Joshua Liebow-Feeser <joshlf@google.com>,
 	Jack Wrenn <jswrenn@amazon.com>
-Subject: [PATCH 06/18] rust: kbuild: support per-target environment variables
-Date: Tue,  2 Jun 2026 19:29:07 +0200
-Message-ID: <20260602172920.30342-7-ojeda@kernel.org>
+Subject: [PATCH 07/18] rust: kbuild: support `skip_clippy` for `rustc_procmacro`
+Date: Tue,  2 Jun 2026 19:29:08 +0200
+Message-ID: <20260602172920.30342-8-ojeda@kernel.org>
 In-Reply-To: <20260602172920.30342-1-ojeda@kernel.org>
 References: <20260602172920.30342-1-ojeda@kernel.org>
 Precedence: bulk
@@ -55,44 +55,32 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Certain vendored crates, like the upcoming `zerocopy`, use extra
-environment variables (e.g. via `env!`).
+Certain vendored crates, like the upcoming `zerocopy-derive`, do not
+need to be built with Clippy since we `--cap-lints=allow` them anyway.
 
-Thus add support to easily specify those.
+Thus add support to skip Clippy for proc macro crates.
 
 Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
 ---
- rust/Makefile | 3 +++
- 1 file changed, 3 insertions(+)
+ rust/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/rust/Makefile b/rust/Makefile
-index df90fabefb70..61f07b1303ce 100644
+index 61f07b1303ce..b790afc0d371 100644
 --- a/rust/Makefile
 +++ b/rust/Makefile
-@@ -144,6 +144,7 @@ doctests_modifiers_workaround := $(rustdoc_modifiers_workaround)$(if $(call rust
+@@ -543,9 +543,9 @@ $(obj)/libsyn.rlib: private rustc_target_flags = $(syn-flags)
+ $(obj)/libsyn.rlib: $(src)/syn/lib.rs $(obj)/libquote.rlib FORCE
+ 	+$(call if_changed_dep,rustc_procmacrolibrary)
  
- quiet_cmd_rustdoc = RUSTDOC $(if $(rustdoc_host),H, ) $<
-       cmd_rustdoc = \
-+	$(rustc_target_envs) \
- 	OBJTREE=$(abspath $(objtree)) \
- 	$(RUSTDOC) $(filter-out $(skip_flags) --remap-path-scope=%,$(if $(rustdoc_host),$(rust_common_flags),$(rust_flags))) \
- 		$(rustc_target_flags) -L$(objtree)/$(obj) \
-@@ -250,6 +251,7 @@ rustdoc-clean: FORCE
- 
- quiet_cmd_rustc_test_library = $(RUSTC_OR_CLIPPY_QUIET) TL $<
-       cmd_rustc_test_library = \
-+	$(rustc_target_envs) \
- 	OBJTREE=$(abspath $(objtree)) \
- 	$(RUSTC_OR_CLIPPY) $(filter-out $(skip_flags),$(rust_common_flags) $(rustc_target_flags)) \
- 		@$(objtree)/include/generated/rustc_cfg \
-@@ -567,6 +569,7 @@ $(obj)/$(libpin_init_internal_name): $(src)/pin-init/internal/src/lib.rs \
- # since Rust 1.95.0 (https://github.com/rust-lang/rust/pull/151534).
- quiet_cmd_rustc_library = $(if $(skip_clippy),RUSTC,$(RUSTC_OR_CLIPPY_QUIET)) L $@
-       cmd_rustc_library = \
-+	$(rustc_target_envs) \
- 	OBJTREE=$(abspath $(objtree)) \
- 	$(if $(skip_clippy),$(RUSTC),$(RUSTC_OR_CLIPPY)) \
- 		$(filter-out $(skip_flags),$(rust_flags)) $(rustc_target_flags) \
+-quiet_cmd_rustc_procmacro = $(RUSTC_OR_CLIPPY_QUIET) P $@
++quiet_cmd_rustc_procmacro = $(if $(skip_clippy),RUSTC,$(RUSTC_OR_CLIPPY_QUIET)) P $@
+       cmd_rustc_procmacro = \
+-	$(RUSTC_OR_CLIPPY) $(rust_common_flags) $(rustc_target_flags) \
++	$(if $(skip_clippy),$(RUSTC),$(RUSTC_OR_CLIPPY)) $(rust_common_flags) $(rustc_target_flags) \
+ 		-Clinker-flavor=gcc -Clinker=$(HOSTCC) \
+ 		-Clink-args='$(call escsq,$(KBUILD_PROCMACROLDFLAGS))' \
+ 		--emit=dep-info=$(depfile) --emit=link=$@ --extern proc_macro \
 -- 
 2.54.0
 
