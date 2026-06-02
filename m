@@ -1,115 +1,100 @@
-Received: from mail-dl1-f46.google.com (mail-dl1-f46.google.com [74.125.82.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mta-65-144.flowmailer.net (mta-65-144.flowmailer.net [185.136.65.144])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE2631DDBF
-	for <linux-kbuild@vger.kernel.org>; Tue,  2 Jun 2026 07:36:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780385812; cv=pass; b=mEV0+UQlqrlN4vB2b6igveDVrc3lOgks0dlsF1rxz6m+ywW3SnRH9wrppBdzHziCumN2l/2bmnWCZYYpenMly3y0VmquLVZYkIkfQdLQfxETfOI4bN5FdGQNuG2ZrRpTwOQHmUDrPZRzoVYqwQAiQgGPBpqlBNFDfM2C/hd6ER8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780385812; c=relaxed/simple;
-	bh=+A/GV5o2sUlHF+5jSvNVL6GHuIN8ETVy4HVJ/HHAPUA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iZgo5VVUjY1uimoUCHVvJoDcjavfAsVRW0cRpL4AyhYta+LhgxG94CGGSvhySYFSNHjZVy2bZwpJ62Znoeq4VMsRnLVb3cgqQFWlAEjRlRjV4hKvNBiWMYcHN88xi7xwV5crzRm1MEjcCj6OP+mZY9SaCHp62M519EKor35I6B8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PrVkap4I; arc=pass smtp.client-ip=74.125.82.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3403E3A8FE8
+	for <linux-kbuild@vger.kernel.org>; Tue,  2 Jun 2026 07:53:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.65.144
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780386816; cv=none; b=rbv93VYivN/H9IhyW7EkBTGWPI347WDPsSTXK9Ag/sB9y/RjIYO4E5fw56nuv8F1Bb9SlHoAO7KkggOGS4zte98X+wEdvbe0bPurkEjJ60luyhaVlSXdKBN41FRyEKGDVCrsqRNuJFNYb/Y1+mddCsiJpv+Kiy92I9hzzua+hyA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780386816; c=relaxed/simple;
+	bh=rTMmvdqLn8XGVIbwx6QxILaPnIKuu93HhNdO2BLhr54=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z9n4Q3V/uJbOFdYaV/3KSZdeM8cHlwcYdw27jfF2HWTbWADqKUY0O/WuOaf5r1Eq4muChxU/08e75zG3GItHd531Elrw0g7TZI7icPuctYJ65H/UhbNk8facXZoF2CsIH0P1dI13OXWVMSu5OTsAHY2NNlpEF6rK3T3cxYuKJsI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens-energy.com; spf=pass smtp.mailfrom=errorhandling.siemens-energy.com; dkim=pass (1024-bit key) header.d=flowmailer.net header.i=@flowmailer.net header.b=Toge8bLz; dkim=pass (2048-bit key) header.d=siemens-energy.com header.i=schuster.simon@siemens-energy.com header.b=ec+PfJIe; arc=none smtp.client-ip=185.136.65.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens-energy.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=errorhandling.siemens-energy.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PrVkap4I"
-Received: by mail-dl1-f46.google.com with SMTP id a92af1059eb24-137eb8e3491so91859c88.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 02 Jun 2026 00:36:48 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780385808; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Z8NfKt4aK16JIZ+ruRh1pcWDKxNOdBnchP9sDfhh1nlmsP4BkRUdrl8AhXjaD/dFwJ
-         wFtpBStbv9//63hxC32eWIeSkfamhbx04L8SlBCgN2ywVXmZz9jDmePJWBPdxtewi6ef
-         2MRDDaVGKoIZpTCij7fFmpNzrkn9OWaYYlNURY+E1DC3WPeXG2oyUThI+2Z7OwhfNrgp
-         VsIYYObs7jaC5Eynj0OEQOuEI6zQH5l4eiq1N7sABcMFEO8dhkNKfoB7YgE3qyCxHD2Q
-         wc5Ep8I97Ty+wjY0WX5vbfqFWSFEsg8zmcmpSkKfCBmepqRaRq39vyRAEia6aBhqwM9q
-         aXXQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=+A/GV5o2sUlHF+5jSvNVL6GHuIN8ETVy4HVJ/HHAPUA=;
-        fh=rlsccMMkOlOIgkCmbEQNz7AnLaTnNWsp2mRCwqzAavI=;
-        b=JMGNhPndg7mFicPVHrgc8TDIw6itTgpjBMYHue/frR4hl7az11n3YIUYkjgOodCidM
-         Bh2NZSo3UOdXLqsz5FtVOe5fJecwyeQRxJfWa/nTLG+pVVtIBQzOChdjWv6H5EeL0o8t
-         N0cc3xiFYKURbXGVmCg30P4dINcSmqdB/0xy+uewk7KS+y9e5YDkPYCRwaNj2vMEuqLJ
-         DpjJCZ/NsZCXrli0PQp/nVzd926TMvE8dudO+a7EAXGyncta2FpZPWugEIOXcHaB8UUW
-         RQgwHsn7eu6ROC0ZT3NedwUj7+JhDzzo6PARuMIzL6LE+mWvSlm9RhUnzwDfNY/e2zWE
-         Y9SA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780385808; x=1780990608; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+A/GV5o2sUlHF+5jSvNVL6GHuIN8ETVy4HVJ/HHAPUA=;
-        b=PrVkap4I57y8fhb6AwoV4w6aKSd2xz8XwYil/5/WNN3F+u4NhsSRflSPIsRbpFib/D
-         IFg8YylzjPYqQuijTKVND0mrezqwA3JQjhbkVhcGKd9qscnlg4rWy6NTvyTZAU7o+/LT
-         XbR4G5Kf3KHzEjvYeZJLo1z9kDCKPWniR1+YNtaSIeV6kUOVJT9WsOoLq7rhdTJcheOU
-         Jz8oJ1LlPP2DM+69ZDug2FuQckFal6aJiSTUU8psUWn8i6ABdK6QqX560a3xtufV7sl8
-         9Aiaw7HvKrtwQV3y7aRuN3FsmUFwt/IygnPD6xaTpgIRYkbCtk2SAOzVMKGCBflTyr/7
-         WyXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780385808; x=1780990608;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=+A/GV5o2sUlHF+5jSvNVL6GHuIN8ETVy4HVJ/HHAPUA=;
-        b=SKp89tl+AGEVA8JmDTblVP9s90vawgtFtcs5OQmcYtuwwM4gTIkoanZelv2rk4LiQj
-         NXHTikWCRvWgZLbjaSzO4KFRVpEw1bK2j/+0weZUz1fQzKuhqhG07EYdwl58lgQ8E7o8
-         +1Dm0mbnFeFktAj3S6664G6a2q0PIOUPO7BNcu0KHBCBEmOwqPrUd73ZHb/HpcSNGIaa
-         dRIhlrmbnZ3i9IJQMoE5cll/soKOnF5vRM4Ds8pmV6jorM7GRtqT71BUk4pCWFk9r22p
-         uMN8P2Y8gjSpWyVXgyr4oY5P48Hpc2JOXC6zw9Ecwfhj5X0Pr9Ansgpvs/vlyz2Cl8BF
-         3xTw==
-X-Forwarded-Encrypted: i=1; AFNElJ91z8Wp1wNe/r6Ym7/3Z4luJztvw1n5KMJQyHX3bsPsv2MvyOEKIGY3dgeNGshilTQzMVO7orhA8oCJ6sE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwaSq3onjAxK1Q3k0Vubs8hYXpJBMjLkQXf7/0S8hZFuoc2gW35
-	Zr0uUSMZadMDk5CtTh5vM/7fcxiHM9ZHfNxtKB+S1BBboUsA8eBhMwTUR8hZTimroH7YxTAIpE4
-	3mUZNCo4exHvjdafKy/Fjrchd74BXkqY=
-X-Gm-Gg: Acq92OELNmIRJ39ExgU0u50JHrJuPMieX3znQ6ktLP9IzY6A7TXp7fgnY5nhNPsK5A7
-	JZAE8B0UYw27DVd7kAnQ6HMmQbzfZN6wuVwoVEMLww/qnItxAMS+Ujtik1+kVFeCs1z5LEwWdCF
-	k9DcDpkt+XDob4cPQKkeyjsLneKMIszIZgBbqPW3ewNI4Pzj0mUftR1DaoRQw10CBETBG7LI0lo
-	3DtIHVBsXGTRJsPbny4qovXUj+wSbOZxi8nL92Zm6r/0sZfR6PUBgzroVnLwr7MHJ6Qoxc5afOP
-	Ncq80ps7Ok5WVzlNm1CDuYEwFs7uxeh3fgtikTaei5LTkbgoyObOy98TroCZnBEAMCkduppLp7Y
-	kPRTdyd7JSD2eGz19cYFn1IX8sl5LZsu53g==
-X-Received: by 2002:a05:7300:fd02:b0:304:c73b:79ea with SMTP id
- 5a478bee46e88-304fa65935fmr3407438eec.3.1780385807836; Tue, 02 Jun 2026
- 00:36:47 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=flowmailer.net header.i=@flowmailer.net header.b="Toge8bLz";
+	dkim=pass (2048-bit key) header.d=siemens-energy.com header.i=schuster.simon@siemens-energy.com header.b="ec+PfJIe"
+Received: by mta-65-144.flowmailer.net with ESMTPSA id 2026060207131465935dc9300019fdd2
+        for <linux-kbuild@vger.kernel.org>;
+        Tue, 02 Jun 2026 09:13:14 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=s1;
+ d=flowmailer.net;
+ h=from:from:sender:to:to:cc:cc:subject:subject:content-type:content-type:content-transfer-encoding:References:In-Reply-To:Date:Message-ID:MIME-Version;
+ bh=rTMmvdqLn8XGVIbwx6QxILaPnIKuu93HhNdO2BLhr54=;
+ b=Toge8bLz2dyLab0qL8rkthmm38M0DIbWMwxIZTkHCglUndNKtXlsEFzupMzU1i/vzCdijc
+ miocQZzlL9bzz0ZuwDfASqzdjU/d6NY+xy09C5rIOtPgu1bTsWHtrNYMYexJC33Ow7Pw9BIh
+ 4PggmgbDjvYm9EN9UTfgesMkNvRAg=;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm3;
+ d=siemens-energy.com; i=schuster.simon@siemens-energy.com;
+ h=from:from:sender:to:to:cc:cc:subject:subject:content-type:content-type:content-transfer-encoding:References:In-Reply-To:Date:Message-ID:MIME-Version;
+ bh=rTMmvdqLn8XGVIbwx6QxILaPnIKuu93HhNdO2BLhr54=;
+ b=ec+PfJIeqY0XmjF70C+uM3vKHeUzZAh1oTg2/qKJ7kPp6hfzDsi97fQ48IoGRskdwuz7Cu
+ BGbuFZJ1Q9hHZckYImkEVD3l7jGDitagbUlrsjtMZGp7BQq6QWHs2rCwJGEOP6xEi685QNoj
+ Dhxnc4HYfsbAg8Fm/fRfi0hYIxCejI2QpzVxqaXoytvcWrW15vVIQ9nYgGgotDILZbmKgedc
+ b8LJKCIxu/nklS6gM/yKotmExl+J8oVb93bKKA61U9r3GprrFfQDONQGoXo5/evBr8Iz8wW4
+ xRQAllgjoeOQIpdd6p46Xuo84qL1JvVLvPqgCUmzpiwzXycLeLiQhrYQ==;
+Date: Tue, 2 Jun 2026 09:13:11 +0200
+From: Simon Schuster <schuster.simon@siemens-energy.com>
+To: Andy Shevchenko <andriy.shevchenko@intel.com>
+Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Ethan Nelson-Moore
+ <enelsonmoore@gmail.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>,
+ Peter Zijlstra <peterz@infradead.org>, Arnd Bergmann <arnd@arndb.de>, Dinh
+ Nguyen <dinguyen@kernel.org>, linux-doc@vger.kernel.org,
+ devicetree@vger.kernel.org, workflows@vger.kernel.org, Linux-Arch
+ <linux-arch@vger.kernel.org>, dmaengine@vger.kernel.org,
+ linux-i2c@vger.kernel.org, linux-iio@vger.kernel.org, Netdev
+ <netdev@vger.kernel.org>, linux-pci@vger.kernel.org,
+ linux-pwm@vger.kernel.org, linux-hardening@vger.kernel.org,
+ linux-kbuild@vger.kernel.org, "linux-csky@vger.kernel.org"
+ <linux-csky@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Shuah Khan
+ <skhan@linuxfoundation.org>, Rob Herring <robh@kernel.org>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Daniel
+ Lezcano <daniel.lezcano@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
+ Alex Shi <alexs@kernel.org>, Yanteng Si <si.yanteng@linux.dev>, Dongliang
+ Mu <dzm91@hust.edu.cn>, Hu Haowen <2023002089@link.tyut.edu.cn>, Kees Cook
+ <kees@kernel.org>, Oleg Nesterov <oleg@redhat.com>, Will Deacon
+ <will@kernel.org>, "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>, Nicholas Piggin
+ <npiggin@gmail.com>, Vinod Koul <vkoul@kernel.org>, Frank Li
+ <Frank.Li@kernel.org>, Dave Penkler <dpenkler@gmail.com>, Andi Shyti
+ <andi.shyti@kernel.org>, Jonathan Cameron <jic23@kernel.org>, David Lechner
+ <dlechner@baylibre.com>, =?ISO-8859-1?Q?Nuno_S=E1?= <nuno.sa@analog.com>,
+ Andy Shevchenko <andy@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>, Krzysztof
+ WilczyDski <kwilczynski@kernel.org>, Andreas Oetken
+ <andreas.oetken@siemens-energy.com>
+Subject: Re: [PATCH] nios2: remove the architecture
+Message-ID: <20260602071311.gtvif43wcjyulphh@dev-vm-schuster>
+References: <20260518042833.272221-1-enelsonmoore@gmail.com>
+ <d40b1e80-37fc-4c88-9d7f-dae6458efe6c@app.fastmail.com>
+ <20260518105735.GW3126523@noisy.programming.kicks-ass.net>
+ <20260518172444.zyd47mcagrcwu7wt@dev-vm-schuster>
+ <CADkSEUjhq6HSdg4ignzbuJiN5uXATsTdxFbRJ3BMxs5=WUWLDg@mail.gmail.com>
+ <20260519103012.blot4bssgiqfer6p@dev-vm-schuster>
+ <CANiq72=6oYtHf0Q1NaLXZ+25uQyYbej2xnvUhtgpHyvozhP7_Q@mail.gmail.com>
+ <ah3TN93e7lRpVihW@ashevche-desk.local>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260530184944.10459-1-contact@jkam.dev> <20260601165042.8450-1-contact@jkam.dev>
- <20260601192305.GA965997@ax162>
-In-Reply-To: <20260601192305.GA965997@ax162>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Tue, 2 Jun 2026 09:36:34 +0200
-X-Gm-Features: AVHnY4JJ4SVDYenG-jUsNBsnkOBJxlBK42SYK7J_hB85geQn0FH46b8_Yiq3DeU
-Message-ID: <CANiq72nwsocH1xypqFegtAuopaARid_3NHCdbZNhDWjYOtNe5g@mail.gmail.com>
-Subject: Re: [PATCH v3] kbuild: rust: make `*.long-type-*.txt` a target for cleanup
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Joel Kamminga <contact@jkam.dev>, a.hindborg@kernel.org, aliceryhl@google.com, 
-	bjorn3_gh@protonmail.com, boqun@kernel.org, dakr@kernel.org, gary@garyguo.net, 
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, lossin@kernel.org, 
-	nsc@kernel.org, ojeda@kernel.org, rust-for-linux@vger.kernel.org, 
-	tmgross@umich.edu
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ah3TN93e7lRpVihW@ashevche-desk.local>
 
-On Mon, Jun 1, 2026 at 9:23=E2=80=AFPM Nathan Chancellor <nathan@kernel.org=
-> wrote:
->
-> Not that I think it is worth resending over but I personally find the
-> "clean '...' files" title easier to understand than the "make '...' a
-> target for cleanup".
+Hello Andy,
 
-Agreed, I can take it and use that title (with the `kbuild: rust:`
-prefix mentioned in v2).
+On Mon, Jun 01, 2026 at 09:45:11PM +0300, Andy Shevchenko wrote:
+> Supported implies that one gets real money for the job. Is this the case here?
 
-Thanks for the tag!
+Thank you for caring about NIOSII. I'm doing so as part of my
+employment at Siemens Energy; if this is real enough then yes :)
 
-Cheers,
-Miguel
+Best regards
+Simon
