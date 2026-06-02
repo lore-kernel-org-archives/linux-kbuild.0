@@ -1,34 +1,34 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42B443F1AA2;
-	Tue,  2 Jun 2026 14:43:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A2A83EC2E6;
+	Tue,  2 Jun 2026 14:43:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780411401; cv=none; b=VjjQUWAhS+FRy9UVHjMtm+WxnEOBivSj1ZalNizeqV2pheCyGqXd+YNCQwzkH6OQJ5ejILv6RzatGffEHY/NYLb2d6zNrOtbPKRaygUPmubdKc2+LT2ratvQO1UpNCZqSVyuawXFmF0QiGAmc0bEG55heV0jrTUJWq5bgeHBC74=
+	t=1780411411; cv=none; b=ggoUakkZP1xVdYETvDWictvF77lV5X0cYyo5gN9Irc+ahWjfObxTzYOlQztkMVzz0KLdjOzV57j4Bgq8GA2Cqg3bYsdemzQ4VlznDdoy4y2TRZh/0ft80Ha4MZPTCLBOzmyaXaGkSHdPAF4IR/JW+mI7zce6gM1gZ64TmJDhvgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780411401; c=relaxed/simple;
-	bh=jfPMQMukoDZOL2OvxeLdX83+munt2aPbdkWuPZ1sqGM=;
+	s=arc-20240116; t=1780411411; c=relaxed/simple;
+	bh=+JjISCoCiswO66KwqDpEEqU/V/TxnMe7dGCpZMrmE4A=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=TJG5gu4ibF+GUESPGgfmViUih8zTsYG3fjt4JwOkzLcjNMawxPmTexL7XAll/hfYVMY9ma7jq8sd3TOOGqrjIzB1W1dTWuHSn+uNM6g27xhPJ2Wfcve4oqq1SEkg7hxQldAtmdS9jVvK53o7c2+nXxsjnPVXNeTGc/hL/sGA5qs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=RGcWXYat; arc=none smtp.client-ip=217.140.110.172
+	 In-Reply-To:To:Cc; b=GJZz0bCuYMZ5KF5YyaL12wIqJDtU5Idj6ALf5mIa40oDs+7cU0xI/0mjMVpS2X0AeXGN229LWig2ZSonrYscWLnyEdgHvij7ib5O89Qm1jd6/ezBrVw8TSBXhP+pXL4jrV+1YUP8XThA6MeXnvW6gtoGeH+ttwPDfinoL5RBrwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=V9ZX2jCD; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="RGcWXYat"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="V9ZX2jCD"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D32E73573;
-	Tue,  2 Jun 2026 07:43:14 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 05C57356E;
+	Tue,  2 Jun 2026 07:43:24 -0700 (PDT)
 Received: from e132581.arm.com (e132581.arm.com [10.1.196.87])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 00A543F632;
-	Tue,  2 Jun 2026 07:43:10 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1CD593F632;
+	Tue,  2 Jun 2026 07:43:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1780411399; bh=jfPMQMukoDZOL2OvxeLdX83+munt2aPbdkWuPZ1sqGM=;
+	t=1780411408; bh=+JjISCoCiswO66KwqDpEEqU/V/TxnMe7dGCpZMrmE4A=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=RGcWXYat2NM8LPQrAF5MQ3I2F8tjxJMhsilOBlR8V2qc8MKkfS3VV65E0IWkmHQ4t
-	 UelqzXs2AP5Lkk8wT8vbEIqZJd1Cpk8lrTwkH8sZ0DN0U8TDWc5qiYPGd/ym1Zr1jO
-	 JqD0awy88GlRXYLL6xVNEK4A7qjIlwEGyz7ak/mo=
+	b=V9ZX2jCDyP9qjkOwDtwtzKOGrcoTW3D73X0pzYCV3g2NIC79MJMHkHO2jBAOhmsQ3
+	 ccq8giJ4waiUIG7yLRj40A78SKpO0NOwpqoengJ7wCjnFjGJuSoOYmcKFrMtZjds6m
+	 TPAfDigmHg4Y4RcMeTmCxNt2nlcJps3R2rGomNtY=
 From: Leo Yan <leo.yan@arm.com>
-Date: Tue, 02 Jun 2026 15:40:50 +0100
-Subject: [PATCH v7 16/23] tools: objtool: Append extra host cflags
+Date: Tue, 02 Jun 2026 15:40:51 +0100
+Subject: [PATCH v7 17/23] tools: power: acpi: Append extra cflags
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260602-tools_build_fix_zero_init-v7-16-631baf679fe7@arm.com>
+Message-Id: <20260602-tools_build_fix_zero_init-v7-17-631baf679fe7@arm.com>
 References: <20260602-tools_build_fix_zero_init-v7-0-631baf679fe7@arm.com>
 In-Reply-To: <20260602-tools_build_fix_zero_init-v7-0-631baf679fe7@arm.com>
 To: Arnaldo Carvalho de Melo <acme@kernel.org>, 
@@ -82,36 +82,34 @@ To: Arnaldo Carvalho de Melo <acme@kernel.org>,
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
  linux-perf-users@vger.kernel.org, Leo Yan <leo.yan@arm.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1780411243; l=842;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1780411243; l=763;
  i=leo.yan@arm.com; s=20250604; h=from:subject:message-id;
- bh=jfPMQMukoDZOL2OvxeLdX83+munt2aPbdkWuPZ1sqGM=;
- b=yySehyugf/1SO1lNOh/His1EzgG82GjsloGp7XZFdQ7OSz0wFSpH3T0jnpsaX4lhJa5gmCNVP
- jNLH5FEbrdTCRrJbwKM/iI6NESXZR0xZ7umiPgR2La9y0UFUfKliVbt
+ bh=+JjISCoCiswO66KwqDpEEqU/V/TxnMe7dGCpZMrmE4A=;
+ b=7LjJSh8MJwdaVLXDHF/0kIuW1U8oyVBDXhz04hZ7GdsAiozMYrKA1G3vu5zLSJY0UKLUnYgyL
+ 41EofHyHJmWCeZDUKTneh//aee2xdKv0fWkiSeNUMwRy7cXOLVrmMke
 X-Developer-Key: i=leo.yan@arm.com; a=ed25519;
  pk=k4BaDbvkCXzBFA7Nw184KHGP5thju8lKqJYIrOWxDhI=
 
-Append HOST_EXTRACFLAGS to HOSTCFLAGS so that additional flags can be
-applied to the host compiler.
+Append EXTRA_CFLAGS to CFLAGS so that additional flags can be applied to
+the compiler.
 
-Acked-by: Josh Poimboeuf <jpoimboe@kernel.org>
 Signed-off-by: Leo Yan <leo.yan@arm.com>
 ---
- tools/objtool/Makefile | 2 ++
- 1 file changed, 2 insertions(+)
+ tools/power/acpi/Makefile.config | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tools/objtool/Makefile b/tools/objtool/Makefile
-index b71d1886022e9b3d9fde52bf73bd502aa20d173e..182d0ab47a6ce8925ec8618f337d2664965b6c9c 100644
---- a/tools/objtool/Makefile
-+++ b/tools/objtool/Makefile
-@@ -11,6 +11,8 @@ ifeq ($(SRCARCH),loongarch)
- 	BUILD_ORC	   := y
- endif
+diff --git a/tools/power/acpi/Makefile.config b/tools/power/acpi/Makefile.config
+index cd7106876a5f39dfda38e286c54c3a7c268b34a2..11088deab42ee5a793f978feb9f4f7bb7024c48c 100644
+--- a/tools/power/acpi/Makefile.config
++++ b/tools/power/acpi/Makefile.config
+@@ -69,6 +69,7 @@ KERNEL_INCLUDE := $(OUTPUT)include
+ ACPICA_INCLUDE := $(srctree)/../../../drivers/acpi/acpica
+ CFLAGS += -D_LINUX -I$(KERNEL_INCLUDE) -I$(ACPICA_INCLUDE)
+ CFLAGS += $(WARNINGS)
++CFLAGS += $(EXTRA_CFLAGS)
+ MKDIR = mkdir
  
-+HOSTCFLAGS += $(HOST_EXTRACFLAGS)
-+
- ifeq ($(ARCH_HAS_KLP),y)
- 	HAVE_XXHASH = $(shell printf "$(pound)include <xxhash.h>\nXXH3_state_t *state;int main() {}" | \
- 		      $(HOSTCC) $(HOSTCFLAGS) -xc - -o /dev/null -lxxhash 2> /dev/null && echo y || echo n)
+ ifeq ($(strip $(V)),false)
 
 -- 
 2.34.1
