@@ -1,135 +1,170 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59F3437F72C;
-	Tue,  2 Jun 2026 08:46:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09FF384039;
+	Tue,  2 Jun 2026 09:13:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780389986; cv=none; b=Nuo/pseyZY9tIAP90H0eGBKU4MRn+ZOuXlDneOJX0iF1DhD/0jGQMlJYNgBcqn7OafNWcuqV9uN5mZ65eUXnkkLcBODW9MsRAjUiRVXZeDIIjYFTjvN/npgIa32urY5syQsZdhuhwDhRECYxTiskZiKJJ9QQ6C2fwQXGEhb++iE=
+	t=1780391620; cv=none; b=UncD0ryIqI7V0MKFCrNoz4RofGGKRxqA4sBxZNv/iU/mxZpgJXX8GTDASvwK6iuGov/zPZQiVJJLASyzLQPUGkskfBzaNKyDbrTYpzM1utqMTyL9gcWoADLFuaKJHjzoXXWNL53c+tu9L0o5K8jee8MNg7ctG5nqIfHWOXz2/9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780389986; c=relaxed/simple;
-	bh=Yly/9TkX4qC1aY9J1UIfDu2NNS9l9GnPQ4iSfLDo52k=;
+	s=arc-20240116; t=1780391620; c=relaxed/simple;
+	bh=N/W5GnT3aYPeOayZmgcsaSiHOGnJk7qmg6loCwMLd8k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VQjKF+GkBuEVy0kyuMJ6Q1MWx4ZDrwr8XOkoS0fzRXINTHUECHPFwEmhpltPIKjUvtMgfM7x+CQJDn/Y53bSKV6/ZrHrEPGxbLaeG1rJEcE242JtCI+0R7tXu9uipanEUUWbLr8ucfWff4CdByaMHQVPQX85vBKgjGR23/KqHlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bn2ozam5; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=kxAnDQs5+MO6xIUfVdTSnp4cKjhoBuyWiAQJwo9gPT9jhE807nph7e0jaVrr8QiRsTJwmpuQZqq0C3zoGcuNLO8XlyojEfv+U1esC2ra+w/jDXpewFfc0WHd1CsZS8GUtQp2cI/ddwVD5AATwF6Jko/NDKnNPg8WXkhtcKJN4Q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kVOJC3P1; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bn2ozam5"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 6C1FC1F00893;
-	Tue,  2 Jun 2026 08:46:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780389983;
-	bh=nSa/bVNfdYiyA49UH1PPtv6q9fMVuj8Fn5WF3XWIBNw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Bn2ozam59//JguX23Q4JgXlfhYftdLZuLYhnBlHGR9Wn49zXmx39VqvDlVZWizLGH
-	 Y4wdgqb+ziraqJ/Su6JETVqzWybpZ+ePzeIFYvDTxgUY1R8OKvqlQ2H/yX8wPsofhq
-	 u5CglFWIgJMVjQ5glxSmE0ew+QJhuONDJW6l1Z9Qu4fuAdekZymOuQ+/noqRpGmfWV
-	 AYtA6gKMz+vFMSdoh2DkvAHc7QiebXfzzEqma7uGM85TigszixDfqZstFsntmf7WQo
-	 2hgqQpJyMFR0RGr/JyO+SArR9fR1o0dTu4U1mbhi+LAfJxsIiIOUU/+trhv1noB9+p
-	 zO/SxqlMQtRXA==
-Date: Tue, 2 Jun 2026 09:17:41 +0200
-From: Nicolas Schier <nsc@kernel.org>
-To: xur@google.com
-Cc: Masahiro Yamada <masahiroy@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
-	Rafael Aquini <aquini@redhat.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Stafford Horne <shorne@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Piotr Gorski <piotrgorski@cachyos.org>,
-	Venkat Rao Bagalkote <venkat88@linux.ibm.com>,
-	Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-	Teresa Johnson <tejohnson@google.com>, linux-kernel@vger.kernel.org,
-	linux-kbuild@vger.kernel.org, llvm@lists.linux.dev
-Subject: Re: [PATCH v12 2/3] kbuild: change --thin back to 'T' in $(AR)
-Message-ID: <ah6DleoCYipTwcO_@levanger>
-Mail-Followup-To: xur@google.com, Masahiro Yamada <masahiroy@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
-	Rafael Aquini <aquini@redhat.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Stafford Horne <shorne@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Piotr Gorski <piotrgorski@cachyos.org>,
-	Venkat Rao Bagalkote <venkat88@linux.ibm.com>,
-	Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-	Teresa Johnson <tejohnson@google.com>, linux-kernel@vger.kernel.org,
-	linux-kbuild@vger.kernel.org, llvm@lists.linux.dev
-References: <20260529185347.2418373-1-xur@google.com>
- <20260529185347.2418373-3-xur@google.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kVOJC3P1"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1780391618; x=1811927618;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=N/W5GnT3aYPeOayZmgcsaSiHOGnJk7qmg6loCwMLd8k=;
+  b=kVOJC3P10E6iPnYwxBozX51B2XK8FU1Vs1AIemIhGcw+wzKHEOEPZrYG
+   r5ebdZf7S59et8qrTqI8Ekxp+qTQe08bEAADREjT+BvukATiRz+ay/Rzx
+   T9f7LGEP5H2A1cg+CSOj/WvPug7u8rm/b0F8MV12URHQ6GbLCz6wFSEI5
+   qUqSyQT5Ju+tIYqY7yKgCFbFGISqvK8vPJH/cg4WVg/7HWuX3mcZlkTnc
+   niICDd+QcT/avhVttoEZGXiBaMfvwOIRtOyL2ioTo/x96RloLc5qoh7bK
+   JnVmsI0IMJBVZwjW1uKQ9g4Vk8LzVgGTuCImuv+kz0Qaq7lGtgXEN0pQe
+   w==;
+X-CSE-ConnectionGUID: DyUz0Ij4Q/uBTTsaXEE1vw==
+X-CSE-MsgGUID: nvDKC2hISq+HN4bizMMeIw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11804"; a="68715992"
+X-IronPort-AV: E=Sophos;i="6.24,183,1774335600"; 
+   d="scan'208";a="68715992"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2026 02:13:04 -0700
+X-CSE-ConnectionGUID: 3+3R3jxMQMmQZn7bA3CRLQ==
+X-CSE-MsgGUID: mMU/fu7MToKTU05qbHFMrw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,183,1774335600"; 
+   d="scan'208";a="237505018"
+Received: from mkosciow-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.229])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2026 02:13:00 -0700
+Date: Tue, 2 Jun 2026 12:12:57 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Muchun Song <muchun.song@linux.dev>
+Cc: Kaitao Cheng <kaitao.cheng@linux.dev>, nsc@kernel.org,
+	nathan@kernel.org, paulmck@kernel.org, akpm@linux-foundation.org,
+	dhowells@redhat.com, rdunlap@infradead.org,
+	luca.ceresoli@bootlin.com, chengkaitao@kylinos.cn, acme@redhat.com,
+	irogers@google.com, peterz@infradead.org, namhyung@kernel.org,
+	swapnil.sapkal@amd.com, linux-kernel@vger.kernel.org,
+	linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH] list: Add safe entry iterators without an explicit n
+ cursor
+Message-ID: <ah6emVXKcAfWNAC0@ashevche-desk.local>
+References: <20260529082149.76764-1-kaitao.cheng@linux.dev>
+ <2B3BFA1E-08B8-42AB-87D6-A28BF15E5C58@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260529185347.2418373-3-xur@google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2B3BFA1E-08B8-42AB-87D6-A28BF15E5C58@linux.dev>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-On Fri, May 29, 2026 at 11:53:45AM -0700, xur@google.com wrote:
-> From: Rong Xu <xur@google.com>
+On Sat, May 30, 2026 at 02:49:14PM +0800, Muchun Song wrote:
+> > On May 29, 2026, at 16:21, Kaitao Cheng <kaitao.cheng@linux.dev> wrote:
+
+> > The list_for_each_entry_safe*() helpers are useful for loops which may
+> > remove the current entry, but they require callers to provide a second
+> > cursor named by convention as n. Some users do not need to inspect or
+> > reset that cursor; they only need the iterator to keep the next entry
+> > available while the current entry may be removed.
+> > 
+> > Add entry iterators which hide that temporary next cursor while otherwise
+> > following the traversal pattern of the corresponding
+> > list_for_each_entry_safe*() helpers.
+> > 
+> > Do not fold this behavior into list_for_each_entry(). That iterator
 > 
-> The '-T' flag in $(AR) is no longer problematic since the minimum
-> requirement for LLVM has been updated to version 15. As of LLVM 14
-> and onward, the '-T' flag functions identically to the '--thin' flag.
+> On the contrary, it might be better to modify list_for_each_entry() itself.
+> This prevents us from introducing multiple new interfaces, which could be
+> overwhelming and confusing for new users.
 
-For correctness: it's called "'T' modifier"  (instead of "'-T' flag").
++1 here.
 
+> If we do this, almost most callers of list_for_each_entry_safe() can be
+> replaced by list_for_each_entry(), as the new modification enables it to
+> properly handle the removal of the current loop cursor. As you'd expect,
+> this would simplify usage to some extent by eliminating the need to pass
+> a temporary variable.
 > 
-> Fixed the issue seen on IBM Power11 System:
->   ar: unrecognized option '--thin'
+> > advances from pos after the loop body, and a few existing callers rely
+> > on that semantics to observe list changes made during the body. For
+> > example, stress_reorder_work() in kernel/locking/test-ww_mutex.c moves
+> > the current entry to the list head with list_move(&ll->link, &locks) and
+> > documents that this restarts iteration. If list_for_each_entry() cached
+> > the next entry before running the body, the loop would continue from the
+> > stale saved next entry instead of honoring the modified list order.
 > 
-> Reported-by: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
-> Closes: https://lore.kernel.org/linux-next/476507c9-a371-4864-9e87-572c1ecae82d@linux.ibm.com/
-> Signed-off-by: Rong Xu <xur@google.com>
-> ---
->  scripts/Makefile.vmlinux_a | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+> I used an AI to scan the entire repository, and the results are as follows
+> (analyzed based on commit e98d21c170b0):
 > 
-> diff --git a/scripts/Makefile.vmlinux_a b/scripts/Makefile.vmlinux_a
-> index 9774f02b43b2..650d44330d1f 100644
-> --- a/scripts/Makefile.vmlinux_a
-> +++ b/scripts/Makefile.vmlinux_a
-> @@ -10,12 +10,12 @@ include $(srctree)/scripts/Makefile.lib
->  # Link of built-in-fixup.a
->  # ---------------------------------------------------------------------------
->  
-> -# '$(AR) mPi' needs --thin to workaround the bug of llvm-ar <= 14
-> +# '$(AR) mPi' needs 'T' to workaround the bug of llvm-ar <= 14
-
-This comment should be removed.
-
->  quiet_cmd_ar_builtin_fixup = AR      $@
->        cmd_ar_builtin_fixup = \
->  	rm -f $@; \
-> -	$(AR) cDPrS --thin $@ $(KBUILD_VMLINUX_OBJS); \
-> -	$(AR) mPi --thin $$($(AR) t $@ | sed -n 1p) $@ $$($(AR) t $@ | grep -F -f $(srctree)/scripts/head-object-list.txt)
-> +	$(AR) cDPrST $@ $(KBUILD_VMLINUX_OBJS); \
-> +	$(AR) mPiT $$($(AR) t $@ | sed -n 1p) $@ $$($(AR) t $@ | grep -F -f $(srctree)/scripts/head-object-list.txt)
->  
->  targets += built-in-fixup.a
->  built-in-fixup.a: $(KBUILD_VMLINUX_OBJS) scripts/head-object-list.txt FORCE
-> -- 
-> 2.54.0.823.g6e5bcc1fc9-goog
+> There are 9,925 list_for_each_entry() call sites in total. Among them,
+> 9,919 do not require any adaptation, and only 6 need to be refactored:
 > 
+>     • sound/soc/soc-dapm.c:258
+>     • drivers/firewire/core-topology.c:275
+>     • drivers/gpu/drm/i915/i915_scheduler.c:193
+>     • drivers/gpu/drm/ttm/ttm_execbuf_util.c:89
+>     • kernel/locking/locktorture.c:647
+>     • kernel/locking/test-ww_mutex.c:522
+> 
+> As for list_for_each_entry_safe(), there are 4,572 callers. 4,550 of them
+> can be directly replaced by the new list_for_each_entry(), while 22 cannot
+> be replaced:
+> 
+>     • drivers/gpio/gpiolib.c:527
+>     • drivers/gpu/drm/i915/gem/i915_gem_context.c:1437
+>     • drivers/gpu/drm/i915/gem/i915_gem_object.c:249
+>     • drivers/gpu/drm/i915/gt/intel_gt_requests.c:143
+>     • drivers/gpu/drm/i915/gt/intel_timeline.c:423
+>     • drivers/gpu/drm/i915/i915_perf.c:2715
+>     • drivers/gpu/drm/i915/pxp/intel_pxp.c:501
+>     • drivers/gpu/drm/ttm/ttm_execbuf_util.c:90
+>     • drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c:7762
+>     • drivers/net/wireless/marvell/mwifiex/init.c:559
+>     • drivers/net/wireless/mediatek/mt76/mt7915/mac.c:2195
+>     • drivers/net/wireless/mediatek/mt76/mt7996/mac.c:3066
+>     • drivers/scsi/lpfc/lpfc_hbadisc.c:2574
+>     • drivers/target/iscsi/iscsi_target.c:4693
+>     • drivers/usb/c67x00/c67x00-sched.c:985
+>     • drivers/usb/isp1760/isp1760-hcd.c:1060
+>     • fs/btrfs/extent-tree.c:4666
+>     • kernel/locking/locktorture.c:647
+>     • kernel/locking/test-ww_mutex.c:522
+>     • kernel/rcu/tasks.h:1059
+>     • mm/page_reporting.c:183
+>     • mm/shmem.c:1552"
+> 
+> During the AI's retrieval process, I noticed that it writes a script to
+> perform a simple syntax analysis. This script filters out call sites within
+> loops that don't involve any modifications to the list being iterated over
+> (such as add, del, or move). In fact, this already eliminates the vast
+> majority of call sites. As a result, there are very few instances that
+> require manual or AI verification, which significantly improves the
+> reliability of the AI's analysis.
+> 
+> "Of course, the results above are just for reference, and there's no
+> guarantee that the AI won't miss something. My suggestion is to have the
+> AI write the script first. Once we human-verify that the script is correct,
+> we can run it to collect the remaining call sites that need manual review.
+> After that, the AI can assist us in analyzing those remaining sites to
+> minimize the risk of introducing new issues.
 
-Thanks!
+Do not forget that we have coccinelle and semantic grep & patch.
 
-Reviewed-by: Nicolas Schier <nsc@kernel.org>
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
