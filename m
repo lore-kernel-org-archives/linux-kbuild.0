@@ -1,125 +1,135 @@
-Received: from mail-dl1-f42.google.com (mail-dl1-f42.google.com [74.125.82.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73D0136AB44
-	for <linux-kbuild@vger.kernel.org>; Tue,  2 Jun 2026 08:16:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780388172; cv=pass; b=GVu+en0RQznotbpTtuHRrxcLuea6UXclNtgIa36aOJptCea821zYTY9GL5z0IEztNXd8GczJz4zvMS+T+SdzFYeEF2jwHrEWgyGZzQe4qUeIPtsUYLmCbqG4Q2+NQkMp+gSfyJ8TT3gKDblttCsuzK/obRez7iHTaZOfVUzxEek=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780388172; c=relaxed/simple;
-	bh=vPW8wLW+xTLNb8dxBfNISJORukiYVfndRQqDrDRQtJo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dryagrTxJevZw8MMDhQlNbTPOGJW34q1HEQH2EBYmGdCCkUYoRW8fEay0Kmn7JRU3MJNzhfDICM4LYdCC5TzPVB5URqm6F9YgZdO77wju4s1NuqVkvIah4LQjKl3Vy7MyrhxQ5nFBsak8IGXmKmZA26kWJR+p4wA8Bz/wGs6qgI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PiuOTSup; arc=pass smtp.client-ip=74.125.82.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59F3437F72C;
+	Tue,  2 Jun 2026 08:46:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780389986; cv=none; b=Nuo/pseyZY9tIAP90H0eGBKU4MRn+ZOuXlDneOJX0iF1DhD/0jGQMlJYNgBcqn7OafNWcuqV9uN5mZ65eUXnkkLcBODW9MsRAjUiRVXZeDIIjYFTjvN/npgIa32urY5syQsZdhuhwDhRECYxTiskZiKJJ9QQ6C2fwQXGEhb++iE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780389986; c=relaxed/simple;
+	bh=Yly/9TkX4qC1aY9J1UIfDu2NNS9l9GnPQ4iSfLDo52k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VQjKF+GkBuEVy0kyuMJ6Q1MWx4ZDrwr8XOkoS0fzRXINTHUECHPFwEmhpltPIKjUvtMgfM7x+CQJDn/Y53bSKV6/ZrHrEPGxbLaeG1rJEcE242JtCI+0R7tXu9uipanEUUWbLr8ucfWff4CdByaMHQVPQX85vBKgjGR23/KqHlU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bn2ozam5; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PiuOTSup"
-Received: by mail-dl1-f42.google.com with SMTP id a92af1059eb24-137dd497007so177154c88.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 02 Jun 2026 01:16:09 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780388168; cv=none;
-        d=google.com; s=arc-20240605;
-        b=LNxZKVuo8sWA62aWfxEWdcQYOrHlkC23OTEMRDHkZGUurR57HYX3TkW4n7kxZNrboy
-         mdO/2NGQYpbOVt4G036qu0W6tN7OPuEOL81fkuTZTbOG78n2omu2E1VmM0yZD+7yVG0I
-         E/GdcJxp98sEONq9Rev6sZppCztZXhNL5bJsTPaY/vfGPuEknqlyKhxcBIfeUnp0NEqq
-         YwDd46eO8BqyBx7jaH6l1khZakFnXXHvlIYSeJidc/Z8t/vAN9x5qOhEZthPyxDKM61j
-         AU+AGsaMYuwKKVW9/AODGlUMUmE8mAlTzKdjWSK1IgnVEr7DFtuaS0dW6FuaLrrGtp2h
-         dulg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ch5pZyCWm4hnwRyszRObv2D+1iLVbXGqsVV4DrLX8U4=;
-        fh=Rwq5WS29QFT2a3ZgU35Tq+9A4L80IbUx/FByFsr1UhM=;
-        b=YimOOChwRaVT6zJRnwbJ5ntpdLEtpWsAUMOa00GgTVvEY3tYbWHrpRidAg4KCHlWaI
-         xDrxKOLgE9bHgGX8xlv3iYN2ryrP7wyUS94fMZ4VoMCOwSu8JXLt87eAGMheFLewiTIM
-         DmXo96Jjn2WXKLYOHaDRLV98y/OpS2Ib0GDGQk01WqCSrOuB7ffcrcJWv+0Sf7w+C4N/
-         9BH+HntNeit0wDqY3PtAlHuvb/ne+AHkSZmaSZ6JWl+bXn4JNqwzBV0DOgkM6jpSu6rG
-         Eh7nSo0VRYEJie5+PHEB7mUEJZ+qhGe9d2e0fmwquFZxbNL6gQzuJVa0tyrqLKExtVk3
-         aGTA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780388168; x=1780992968; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ch5pZyCWm4hnwRyszRObv2D+1iLVbXGqsVV4DrLX8U4=;
-        b=PiuOTSup2AeWIdIePo7noWcVlGZukB95pFHkXd41EgxH9ez/3MLFX8Q/Zn1KZ09/U3
-         yOVQZJogfDTp+5Auk3gQt+Xi/FB6rT2iWU8/0jLohFIpXEW5U8uVjUSYgnwx10VZwaGl
-         /lW8hG5HbJ21gEZ7UJqSQa9SrPT+hNY2Ly57e7lN6RBrQvS217BQA6rkipkLD5h9ehGg
-         xTg7JrtEJN3YkViB1zYD1R9c1KqP7tTKcuG53dkou9WlMO5np7Hzn2f38UdLrWUehJUl
-         wftmXdWDLbYWygQSsx+LDZtdtqQSbKQccMtXC8kcj/hR3EWC+w7k65f2cFDm9dYp/HMg
-         fCdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780388168; x=1780992968;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ch5pZyCWm4hnwRyszRObv2D+1iLVbXGqsVV4DrLX8U4=;
-        b=nIRLpnLKxeX99q/XxjiO3Tr/7Cpd7fdSO1vq3dmcoEvezu+2LjWOzaCx3MXRa99fiU
-         YcT6kue2UGUBjFUnCMMNsP6SOWs641BXESF2E9nxNCVuSh7Xj72T0/SHy94NWHLM2s6B
-         +7sq8lNmjj8/nnv9Ao5n+b/veQCqZ4TW59fc2Xmhv+y1g8Q/qCU2ANHw83igy9iUVzmp
-         CYcbZWTpS1n4HIwOZl7GcA89qpMOnBTLA0Hvvp08RNZzvj3CTPiuXAQc/xYRvgRjxxex
-         9bOByqRWg/z1oWmQEOC4MRgo5r98jUHGrwcZxERlzPBMSrE7YZMo0kd0CS1XgY1z+Gpk
-         9WOQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+E0OEghPeVG9bYJjPHZyBwNA2QASAP3Mp1bxuvwD+4yaIWElKso1OFGXW7twCNmLu5PhsyUg6bSF+ZJUY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzm4i5z6lobeDaN/wcXxSvMTQPctiJf7jQgdkolkEtRVwwdvfKH
-	Gh4NcaO2DA86xT6hzEhQaYjpYctr+RFsK18Ym8smKPCPmp1U5jo0OwrB+HT4I2I4AWXQnR944+R
-	daiV8Nv65ahSYtJkyIblpvL9lDcq589o=
-X-Gm-Gg: Acq92OHsIFodwV+clLqmR3GF6dSNZSxHUkODlEngIvgic0PRmfHFhTWfUAgmgM3dVou
-	s+HrQO0qS/knJ3GKrolXudS3+9cItguUWJzSxftxxZISmZC/yl8lyxWjaCp9/LpfhCMbuUHzVMy
-	+8sG6nsw78vTOkHNIPzBDPve/Z8dnuYMN/2sazpS7wQsQWQL2LP3jt50Ocot2i4O4Yew0yt5aG7
-	jzFOMsnb09vOSEtugrS2Lr0HuEknNzmRd8nXjG0grNo/v7VUKhxaeZcs/XOJPNksJDD10Fr87ic
-	rYRcuzbMDrdXFIXs1GsmYqJ8JPXa/qUJ2vxZGsGZ6zWBh1V6G217itQAMFBo+48Hn36OsrYyZg7
-	UI5t2nCtY11T4ECI6ZA+J6Ncr7oAUx4KhBQ==
-X-Received: by 2002:a05:7301:688a:b0:2d1:9b35:4f03 with SMTP id
- 5a478bee46e88-304fa6a2df3mr3064799eec.5.1780388168347; Tue, 02 Jun 2026
- 01:16:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bn2ozam5"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 6C1FC1F00893;
+	Tue,  2 Jun 2026 08:46:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780389983;
+	bh=nSa/bVNfdYiyA49UH1PPtv6q9fMVuj8Fn5WF3XWIBNw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Bn2ozam59//JguX23Q4JgXlfhYftdLZuLYhnBlHGR9Wn49zXmx39VqvDlVZWizLGH
+	 Y4wdgqb+ziraqJ/Su6JETVqzWybpZ+ePzeIFYvDTxgUY1R8OKvqlQ2H/yX8wPsofhq
+	 u5CglFWIgJMVjQ5glxSmE0ew+QJhuONDJW6l1Z9Qu4fuAdekZymOuQ+/noqRpGmfWV
+	 AYtA6gKMz+vFMSdoh2DkvAHc7QiebXfzzEqma7uGM85TigszixDfqZstFsntmf7WQo
+	 2hgqQpJyMFR0RGr/JyO+SArR9fR1o0dTu4U1mbhi+LAfJxsIiIOUU/+trhv1noB9+p
+	 zO/SxqlMQtRXA==
+Date: Tue, 2 Jun 2026 09:17:41 +0200
+From: Nicolas Schier <nsc@kernel.org>
+To: xur@google.com
+Cc: Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
+	Rafael Aquini <aquini@redhat.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Stafford Horne <shorne@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Piotr Gorski <piotrgorski@cachyos.org>,
+	Venkat Rao Bagalkote <venkat88@linux.ibm.com>,
+	Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
+	Teresa Johnson <tejohnson@google.com>, linux-kernel@vger.kernel.org,
+	linux-kbuild@vger.kernel.org, llvm@lists.linux.dev
+Subject: Re: [PATCH v12 2/3] kbuild: change --thin back to 'T' in $(AR)
+Message-ID: <ah6DleoCYipTwcO_@levanger>
+Mail-Followup-To: xur@google.com, Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
+	Rafael Aquini <aquini@redhat.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Stafford Horne <shorne@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Piotr Gorski <piotrgorski@cachyos.org>,
+	Venkat Rao Bagalkote <venkat88@linux.ibm.com>,
+	Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
+	Teresa Johnson <tejohnson@google.com>, linux-kernel@vger.kernel.org,
+	linux-kbuild@vger.kernel.org, llvm@lists.linux.dev
+References: <20260529185347.2418373-1-xur@google.com>
+ <20260529185347.2418373-3-xur@google.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260530184944.10459-1-contact@jkam.dev>
-In-Reply-To: <20260530184944.10459-1-contact@jkam.dev>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Tue, 2 Jun 2026 10:15:55 +0200
-X-Gm-Features: AVHnY4Kr2rO_WdzWReX31YPA6BhQ7X-dBlpTnNN1R-LvP3fsnSXU7SQN06u2DVg
-Message-ID: <CANiq72kUgSZ_xD4iFqUftY+r3Q1oL-z2qHdZJDSSK+J2opxWTw@mail.gmail.com>
-Subject: Re: [PATCH v3] kbuild: rust: make `*.long-type-*.txt` a target for cleanup
-To: Joel Kamminga <contact@jkam.dev>
-Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, 
-	Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, rust-for-linux@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260529185347.2418373-3-xur@google.com>
 
-On Sat, May 30, 2026 at 8:51=E2=80=AFPM Joel Kamminga <contact@jkam.dev> wr=
-ote:
->
-> This cleans up files generated by rustc compiler in the case of an
-> error containing an excessively long type name that doesn't fit in
-> a single line. Such types appear relatively frequently so the risk
-> of generating these files certainly exists. These files are purely
-> compiler artifacts and are not created intentionally by the build
-> system. They should be added to the `clean` target to stop from
-> cluttering up the source tree.
->
-> Suggested-by: Miguel Ojeda <ojeda@kernel.org>
-> Link: https://github.com/Rust-for-Linux/linux/issues/1236
-> Signed-off-by: Joel Kamminga <contact@jkam.dev>
+On Fri, May 29, 2026 at 11:53:45AM -0700, xur@google.com wrote:
+> From: Rong Xu <xur@google.com>
+> 
+> The '-T' flag in $(AR) is no longer problematic since the minimum
+> requirement for LLVM has been updated to version 15. As of LLVM 14
+> and onward, the '-T' flag functions identically to the '--thin' flag.
 
-Applied to `rust-next` -- thanks everyone!
+For correctness: it's called "'T' modifier"  (instead of "'-T' flag").
 
-    [ Reworded and linked to the previous related commit. - Miguel ]
+> 
+> Fixed the issue seen on IBM Power11 System:
+>   ar: unrecognized option '--thin'
+> 
+> Reported-by: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
+> Closes: https://lore.kernel.org/linux-next/476507c9-a371-4864-9e87-572c1ecae82d@linux.ibm.com/
+> Signed-off-by: Rong Xu <xur@google.com>
+> ---
+>  scripts/Makefile.vmlinux_a | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/scripts/Makefile.vmlinux_a b/scripts/Makefile.vmlinux_a
+> index 9774f02b43b2..650d44330d1f 100644
+> --- a/scripts/Makefile.vmlinux_a
+> +++ b/scripts/Makefile.vmlinux_a
+> @@ -10,12 +10,12 @@ include $(srctree)/scripts/Makefile.lib
+>  # Link of built-in-fixup.a
+>  # ---------------------------------------------------------------------------
+>  
+> -# '$(AR) mPi' needs --thin to workaround the bug of llvm-ar <= 14
+> +# '$(AR) mPi' needs 'T' to workaround the bug of llvm-ar <= 14
 
-Joel: please check the rewording.
+This comment should be removed.
 
-Cheers,
-Miguel
+>  quiet_cmd_ar_builtin_fixup = AR      $@
+>        cmd_ar_builtin_fixup = \
+>  	rm -f $@; \
+> -	$(AR) cDPrS --thin $@ $(KBUILD_VMLINUX_OBJS); \
+> -	$(AR) mPi --thin $$($(AR) t $@ | sed -n 1p) $@ $$($(AR) t $@ | grep -F -f $(srctree)/scripts/head-object-list.txt)
+> +	$(AR) cDPrST $@ $(KBUILD_VMLINUX_OBJS); \
+> +	$(AR) mPiT $$($(AR) t $@ | sed -n 1p) $@ $$($(AR) t $@ | grep -F -f $(srctree)/scripts/head-object-list.txt)
+>  
+>  targets += built-in-fixup.a
+>  built-in-fixup.a: $(KBUILD_VMLINUX_OBJS) scripts/head-object-list.txt FORCE
+> -- 
+> 2.54.0.823.g6e5bcc1fc9-goog
+> 
+
+Thanks!
+
+Reviewed-by: Nicolas Schier <nsc@kernel.org>
