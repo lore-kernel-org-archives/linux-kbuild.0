@@ -1,169 +1,196 @@
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A402938425A
-	for <linux-kbuild@vger.kernel.org>; Wed,  3 Jun 2026 23:46:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 844F24DBD9D
+	for <linux-kbuild@vger.kernel.org>; Wed,  3 Jun 2026 23:46:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.45
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780530383; cv=pass; b=IsM+PB+3xjDWGMHLrm5i4cdZh4B+gerFCAehxTo1PFa4EVELc8nWuB08RJr4DOE73S+hQcNxTuMR7Q0ieDMzrDM6Cg9Vc9mg8NZITntswYJsbDdfapx+3EUZH7zuHR6nFpdmQ+tDWSDGXD9yUaldBji7IXWQq+aS7MsO3MCtRC0=
+	t=1780530384; cv=pass; b=hNN+gkvM6WQA378dWatEwCfFeCEe00cb+a9OPt/Xg9vR29VeAxgD8vBmzrCC1U2PPTxWhXAKyR2qBxqoknNQz0j6csI7/VmkhgtrkewukjYN2lOGORD9QBXtMOEGU6L6+1Xyj1tbAWxJsgMthMUSfQN3bWZVCUdtHbv77vdU6mA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780530383; c=relaxed/simple;
-	bh=uEKPPLQfM4icf+qUY66iMp8/4n891RiLDCoONieODKI=;
+	s=arc-20240116; t=1780530384; c=relaxed/simple;
+	bh=2OsX9xrQkx5Cw7QY9LKXYujkkjGcngs8n91bjdXwvg0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZAIBuXrl5frHOtfvEoTX52AnscyWDWoy63qY/GOiHxl9074OZOCu6zqIldrQ6aU2osetw+Yo80/IfFA1utjIGM3rSCEAKAtK23Ets6t/gt1uxeOT5wb+6L8da+t+8gefBM2NndaJ0adtTCwUvZeTASe/fcSSO46sLKu1ls5KCOM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eRYFcd1h; arc=pass smtp.client-ip=209.85.210.177
+	 To:Cc:Content-Type; b=OVNN001PUuTzavIONca2Wd3RwSWZLo1ZLTyGlAzAg9w/JKGkll+VwMNXSDl8xHXsv/bvLp4g0XyWM3+YvbD3dlJTPhqENhLqx9a5QrpE+11lCstJx7jAheGoGO9p5v/830dgg1BQaq0WLrxViOx1AmlMk1+SpD046z8H63ckWHY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PoTGy5n+; arc=pass smtp.client-ip=209.85.216.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eRYFcd1h"
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-842307472d4so25091b3a.0
-        for <linux-kbuild@vger.kernel.org>; Wed, 03 Jun 2026 16:46:20 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780530380; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PoTGy5n+"
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-36d9794d82aso37034a91.0
+        for <linux-kbuild@vger.kernel.org>; Wed, 03 Jun 2026 16:46:23 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780530383; cv=none;
         d=google.com; s=arc-20240605;
-        b=X3VZfsGM5OvrxQnMuCVjFxpkk60DrndY0jH9BWKMoXeZ5yIkflnQ/riryC3t0djmct
-         W65pNlYal8BkhKXDP5zWdVhSc2VgicAt7xqYVjlbcTovCmjL90Gdf5QDinG3SVR5GVKY
-         PcYp5PHHUtNTNnyEM89SD9Yi6aLp+R8Gd+xqYP7bEmztyx1s6tnMVXEW7r415gYCsFN3
-         rLopFppb3H4UJGiGoOroAYDysR3WcX705M7EvUDU3Os3uOXebah6Rrc8EWxETINb5nsF
-         z1UFTu9qGW73haz4wuD/v3KV4c6EHLw+dynsv2CN+1lD1pTSpFcDPdkD8vJsCQmY40+X
-         4idQ==
+        b=OxyW7BpCJuVcloK/E4T+up/p/IXVfYWE8wklkBCI9DLlaurvybCQl1aQPA14Nvrzdw
+         5LdvGBH1zAM8ygJSpNSqSe/kgH7y08PBg77f/llKAjrT5pmnD25jyKMOqCehXY6QR5To
+         /cujsjvb69G7c1oMSuKbBWowtdbGYI85WxU/oNG3Yka6BmK6BQM0aq5j1ZOZr2j/MmB9
+         jpY0Zfht9WkV8HmSzev0fgbxV20lCo4mQUPtOiZBwwkujOyzvsPa7/V5QO3Xv4qYWAUR
+         D6K0VMoe/x43DWJzoBnS1fQ7owLl8x9KnnBNL4EmHYFkkIc9oShppENd2PcHyTSWtyy3
+         Fn3w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=wWifozZk3TtNmr926sSEkL+CQRYN/IPWUzdtFc43uDE=;
-        fh=HnOx7RDfXxtntKQvtbxDQ5Sa6xgI6fSuDQru/ktngPw=;
-        b=PYQ6+WaaJuP7V7B7sqyXF6BfewKr4oWlZo81gLP/d+Pos3yNIFDMbP8CCxXs15WSXe
-         OSnGj7dn+xATd1J46fsEKYY3hrhQqXUYY9VNV4Xm1ZT3AfCsSSK+dTu1PpTx3AL+0FZJ
-         8vjlKagBJsVvPT8eYpm6YOc/Cwzz7DYWGks/ouMWTVfNK4h7RG/wUL+WP6QLxY0p9Luw
-         GCppAJO0ORtBDTAXeKwiai6vQMQ12FUNqGlMnkKEHxr4FjJdNnsS5A6LPbakMGMgBObz
-         7dfqkGWBChD0wIX1M0O/DAEGydfIYkNBnI2uvvkZIOqs/NJftrcrESPBH5Fge0rpi9Vg
-         fJSQ==;
+        bh=oDqq79L2KNI1fcXdkS7SY6qPxkZmqKsIeFSaYmJ87+I=;
+        fh=DFvIyL5T/SvjpMhNbP7xIQGj8/GkQ7cC8UzRLB49PC4=;
+        b=er6bWszgqsKWC5ZLN9R4yNYqdk+AeGuTB3wG42Q7sb/Q1yYzsneYkhoNpvdD2vBBTg
+         6X4tIgWZkv7u8EfnQznPCzRgXuVxvhbhp3/RSwdDqMskSh7bq5CISQOOmJfrt2iNuLEx
+         2TPvMNtyVbtZHCH/8m0fbMr4RVfI/9JudJGn/KD7GvE9/fU6Ta5sUK+cDtWFowRg5tXV
+         vSLJuU1MW6cienJcs1ahghUWihARggb4KXc0kFEfsR2TcyqDBJyFRKxZ8CnOjSgEdxXo
+         GxL+5zL6fYX19K1kXaq2O0Nipew0ZPyH+pvdqm+cWn5A2sgk9ffAuCZHOpDdBf4Z8RrF
+         w2Ig==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780530380; x=1781135180; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1780530383; x=1781135183; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wWifozZk3TtNmr926sSEkL+CQRYN/IPWUzdtFc43uDE=;
-        b=eRYFcd1htJzEiRyD7fjsZrDzr/JGlJmnXbZcDtTpUr65ZDJ2MekLqOIvno4UCedaw2
-         H6385mJALOhKThbvUqy2qsG7Y2z9NABzo34xdQnTwC2HvTccmzqmV76n06imZjyuoduQ
-         U7cit+x3jRgRlX9lpY9M8jgpZ9jegDhY0Z9xBSgD2RehfELYmAQJyR0gHEJJi2g9yLWd
-         AkTmFFbLfCt52KHRVkS8BMg4uZDs2Vuixb7OThe51V5Y5cfMqSy1zwQdEbmr9aUxz/O7
-         GuiygGImmsVK/Y057BPP1QReKhj4mEcQeCWmXAR6e4n9Onwjp7YO7OI9/qfdMR5Sy04/
-         pMJQ==
+        bh=oDqq79L2KNI1fcXdkS7SY6qPxkZmqKsIeFSaYmJ87+I=;
+        b=PoTGy5n+ne9RqA617+Xq9bMfQYfLLOLuh6K53Aid5WquiqR9NJcEXoGPO5snv6b+xe
+         TCYrBsJiYDIhv67L0GtulbsavVHAT72bQPXOjlIDyVuetKmkwJd3m6SyyhVzEP+KdX6D
+         ptvVXIyn9nxYZzHC1MB8BqR+jrX8IdnxxRNz0eq5bDDxeL9WyxjTuD8R1K3B7oGrB/L1
+         bUFUyEjZr1sIIgUuTAeU1QsvyJUFOyAfKkHvueYh30Jsn4fAIYB7SOZwsaC7p9mc1I1o
+         hRKVb7dvOQBNj3xzAygupO3DuqbTq1i8KABSTc7Zwgbd0oVJuPkPq/7T/k2P6b1PbZ1W
+         HcJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780530380; x=1781135180;
+        d=1e100.net; s=20251104; t=1780530383; x=1781135183;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=wWifozZk3TtNmr926sSEkL+CQRYN/IPWUzdtFc43uDE=;
-        b=cqDedXxEamLzJ5CaKg4F8+0s8TnGGLod8Ncx7TlVXZh2YvgKjyBCH1ZkIbU9knA9NM
-         EG+GAYR8O2VI98CatgqF8v65NbZupVL2tNZxSuOMnK8YXSRnVFaLh4hNu6J1jnhLR5sW
-         ioE8Yn3OF5OKOa7bvqNUqv1nb57LlEU3FRm2S4C2UHelLQIbxtAMik9u0QnU9xrr8r1/
-         5669Q1/qu22ToECbyYmnClewKnmfXQL0wM+uXZJix2mrQviIFktAlkMdETRAByh+d++s
-         4e14zEERtBFzJdd6T2foGL41xb3AkNINQeYq67jCFrqWgferhzeLLzs/niWcJnJcDif4
-         mE/A==
-X-Forwarded-Encrypted: i=1; AFNElJ9AOkuQEhUYMsE6anf4L94XXj7rqewC5+7KvBM1Xq4lGLM+YlTbEM4i+7dSt8KLW09LWUBX5jPAKpoOXjY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwEca3jv9RTwDSP2uSzdBFF+1G0PnYXNyF0AiGwEoVWxjyQT7VP
-	0RPFoDl2DjBmfMNU/pWHxeanbetpnXaghDaUNkJ0T1KdLPxF0/A7priLQJglUhHoSpxUA8iyCeB
-	t+2TTrwBSaDTDpwJIrYvVVaCwi67kd+4=
-X-Gm-Gg: Acq92OFRCeLVHMykGwha4a+xECmBQGj9Hc1DDoCFprP+HQDnUdY/BnVhZVKpVd3Clhg
-	Ld+fUWj2vZSRGLPrg2946+vb59PeII1vtTS+PmMTlvqDiSG/eXEZDjgFJIgHsMm6OyZz9jffSh/
-	yTCj+YWwPIIfPCW5KpAAhPUwkoSkiTQ/xFaVeyokSxY9/e0cAq0xoAOloq3D41qRTmWGWVk/Xxv
-	yVo3pdQdiPUcbZviLZHIvD0Sod0/S87UpIvSXrH0i3e0blMcOXe4yU4BGYDSKPu6AdboagQ+iZ3
-	FFmg+1khJSKxuFcafdChzAU9PP4MEULKD+cvVELNpA5nScD/rVn/5fLpzuECTw01WNH+LJSkWQE
+        bh=oDqq79L2KNI1fcXdkS7SY6qPxkZmqKsIeFSaYmJ87+I=;
+        b=TdQWmvG3mVxsnrywS7mNsB0JIaByhn3foJtSlveszbvhF+YtQr21hwZNdNt8r9nSD8
+         dpaVxwKTGFTY4yptAi+KXMBJLq9pKmwIExHIhwkuC4DCZRwmB8/068JyJ/LxaB8XmK8a
+         mSQCGVDYIvGNa2nj620r6JwFf5KZ+YLa7Q2tDAJr6qHyzp3ynrl52vYlnlyIpYA9EaLl
+         SdgW5kqgXxiNEJuyuRWvngRPT+62DeeTwpuJHBs3G8pDnGv86fwobB2CRtRMrKnoR6Vq
+         guTvztESZvoFvLuMzU030xzxK56fIMkwHc6n6r9Ki7tHwdiu87hQSqurKwnZhympdtz3
+         OPXA==
+X-Forwarded-Encrypted: i=1; AFNElJ8jlYr0nY0EHFJM6ZsTrBwofg5CfAi5I/k8kP8jlv9/elM0V+fIhqR1t0WtClxOrKRO1uI80gTd75vr+yQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOU75hoxExys7NQpY6/tiCHoM5t4ZTqutHWBBslzax4FENxytK
+	Wv5i6qq3ywcxARvneeHgTp6FrhG+EltEM9yeSsLpj/DV5c8wWpyjrADoWCIwD99VQ1Y9XRuRnsL
+	YAj9d+nj7H1qZoWvhOgDIj7xvjMHb94o=
+X-Gm-Gg: Acq92OHTiHEN9QntDePdmcFqjR8fC8aIebrTJcPbDVof6u1K8q9wSxEDwrVrK7xpKPO
+	4Waxrpr2zwcVkCqBdjsUo/f+jzjV0in9iCfyfxOdQB4Pjd7EDJhPJm4SulZQnPKRZiMywiUcRtZ
+	oVI7IDVQkZJ25Ga696sNk81+qHkAfoJMD3pLPzHQPIEvyjvOJCLcL60Gkxv0AWsu0EISwpJEcNV
+	rh2SO0NS70qWvEQ9vYZ1FGDi+dVLdoLP/BC4fNa4WkNfsTJqI6ncwyXg8OecD7B6CoIS7AUVwVQ
+	igcrczDwyMPsOiJoexP4bp0QNFjD3AbDMkk70Gsyy12U1pwhppif6vR/oZNXs8lHkrcugYg7QR8
 	=
-X-Received: by 2002:a05:6a00:2d94:b0:836:3f6a:3e7a with SMTP id
- d2e1a72fcca58-84284ed934emr5074401b3a.26.1780530379860; Wed, 03 Jun 2026
- 16:46:19 -0700 (PDT)
+X-Received: by 2002:a17:90b:55c5:b0:36d:bc21:4ae1 with SMTP id
+ 98e67ed59e1d1-36e33ba4a37mr5389366a91.27.1780530382688; Wed, 03 Jun 2026
+ 16:46:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260601221805.821394-1-ihor.solodrai@linux.dev> <20260601221805.821394-7-ihor.solodrai@linux.dev>
-In-Reply-To: <20260601221805.821394-7-ihor.solodrai@linux.dev>
+References: <20260601221805.821394-1-ihor.solodrai@linux.dev>
+ <20260601221805.821394-7-ihor.solodrai@linux.dev> <ah8-6CNIHPCJxAOM@krava> <3ba6ed89-82b3-4dbb-99d4-5e34e496fc33@linux.dev>
+In-Reply-To: <3ba6ed89-82b3-4dbb-99d4-5e34e496fc33@linux.dev>
 From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Wed, 3 Jun 2026 16:45:52 -0700
-X-Gm-Features: AVHnY4II1XspEqXUzLfqoHxyDZsyGuE1IrfFO2Nd3EGWuxYDmRs2Cj2n_EVwCTU
-Message-ID: <CAEf4BzaLzX3mXvQzxv+gbmZOh84XvYofLjMSWFYghNjS-ohEZg@mail.gmail.com>
+Date: Wed, 3 Jun 2026 16:45:45 -0700
+X-Gm-Features: AVHnY4J5wyC2MeMT_qZAFOzQr-pOLtU2IeLlkAkvBiLJsMe6_YTKdKXFgXdBid8
+Message-ID: <CAEf4Bzaq5w33tqNwXeSbi0FoP2q6qSEnyZqWoY2RwUzs_M+sEg@mail.gmail.com>
 Subject: Re: [PATCH bpf-next v1 06/14] resolve_btfids: Discover kfuncs from
  BTF ID sets
 To: Ihor Solodrai <ihor.solodrai@linux.dev>
-Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Eduard Zingerman <eddyz87@gmail.com>, 
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Alan Maguire <alan.maguire@oracle.com>, Jiri Olsa <jolsa@kernel.org>, 
-	bpf@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: Jiri Olsa <olsajiri@gmail.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Kumar Kartikeya Dwivedi <memxor@gmail.com>, 
+	Alan Maguire <alan.maguire@oracle.com>, bpf@vger.kernel.org, linux-kbuild@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 1, 2026 at 3:19=E2=80=AFPM Ihor Solodrai <ihor.solodrai@linux.d=
+On Tue, Jun 2, 2026 at 2:09=E2=80=AFPM Ihor Solodrai <ihor.solodrai@linux.d=
 ev> wrote:
 >
-> collect_kfuncs() currently uses bpf_kfunc decl tags to identify the
-> list of kfuncs. The decl tags are generated by pahole, which makes
-> current implementation implicitly rely on those tags being generated.
->
-> The authoritative source, used by the the BPF verifier for kfunc
-> registration, of functions being BPF kfuncs are
-> BTF_KFUNCS_START()/END() declarations. These are BTF_ID_SET8 under the
-> hood. Currently resolve_btfids reads kfunc flags from these sets, and
-> populates them with BTF IDs.
->
-> Implement kfunc discovery from BTF_ID_SET8 symbols in resolve_btfids,
-> removing the dependency on pahole's emmission of decl tags.
->
-> Walk BTF_ID_KIND_SET8 sets, and use the address-to-symbol index to
-> look up set entry's BTF_ID symbol name (before .BTF_ids is patched),
-> recording the paired flags directly. This makes find_kfunc_flags()
-> helper unnecessary, so it's removed.
->
-> Kernel functions can appear in more than one set, which is legitimate,
-> since kfunc sets are prog-type dependent in the kernel. So for btf2btf
-> processing deduplicate kfuncs by BTF ID, accumulate (OR) the flags,
-> and warn on flags mismatch to catch inconsistent declarations.
->
-> Signed-off-by: Ihor Solodrai <ihor.solodrai@linux.dev>
-> ---
->  tools/bpf/resolve_btfids/main.c | 122 ++++++++++++++------------------
->  1 file changed, 55 insertions(+), 67 deletions(-)
->
-> diff --git a/tools/bpf/resolve_btfids/main.c b/tools/bpf/resolve_btfids/m=
-ain.c
-> index 43512af13148..d35a7b2460e8 100644
-> --- a/tools/bpf/resolve_btfids/main.c
-> +++ b/tools/bpf/resolve_btfids/main.c
-> @@ -970,6 +970,23 @@ static int push_kfunc(struct btf2btf_context *ctx, s=
-truct kfunc *kfunc)
->         struct kfunc *arr =3D ctx->kfuncs;
->         u32 cap =3D ctx->max_kfuncs;
->
-> +       /*
-> +        * A kfunc can be listed in multiple BTF ID sets.
-> +        * In this case, dedup by btf_id and accumulate kfunc flags.
-> +        */
-> +       for (u32 i =3D 0; i < ctx->nr_kfuncs; i++) {
-> +               if (ctx->kfuncs[i].btf_id !=3D kfunc->btf_id)
-> +                       continue;
-> +
-
-with hundreds of kfuncs, this O(N^2) approach is going to be a bit
-slow, should we use rb tree for lookups?
-
-> +               if (ctx->kfuncs[i].flags !=3D kfunc->flags) {
-> +                       pr_err("WARN: resolve_btfids: inconsistent flags =
+> On 6/2/26 1:36 PM, Jiri Olsa wrote:
+> > On Mon, Jun 01, 2026 at 03:17:57PM -0700, Ihor Solodrai wrote:
+> >> collect_kfuncs() currently uses bpf_kfunc decl tags to identify the
+> >> list of kfuncs. The decl tags are generated by pahole, which makes
+> >> current implementation implicitly rely on those tags being generated.
+> >>
+> >> The authoritative source, used by the the BPF verifier for kfunc
+> >> registration, of functions being BPF kfuncs are
+> >> BTF_KFUNCS_START()/END() declarations. These are BTF_ID_SET8 under the
+> >> hood. Currently resolve_btfids reads kfunc flags from these sets, and
+> >> populates them with BTF IDs.
+> >>
+> >> Implement kfunc discovery from BTF_ID_SET8 symbols in resolve_btfids,
+> >> removing the dependency on pahole's emmission of decl tags.
+> >>
+> >> Walk BTF_ID_KIND_SET8 sets, and use the address-to-symbol index to
+> >> look up set entry's BTF_ID symbol name (before .BTF_ids is patched),
+> >> recording the paired flags directly. This makes find_kfunc_flags()
+> >> helper unnecessary, so it's removed.
+> >>
+> >> Kernel functions can appear in more than one set, which is legitimate,
+> >> since kfunc sets are prog-type dependent in the kernel. So for btf2btf
+> >> processing deduplicate kfuncs by BTF ID, accumulate (OR) the flags,
+> >> and warn on flags mismatch to catch inconsistent declarations.
+> >>
+> >> Signed-off-by: Ihor Solodrai <ihor.solodrai@linux.dev>
+> >> ---
+> >>  tools/bpf/resolve_btfids/main.c | 122 ++++++++++++++-----------------=
+-
+> >>  1 file changed, 55 insertions(+), 67 deletions(-)
+> >>
+> >> diff --git a/tools/bpf/resolve_btfids/main.c b/tools/bpf/resolve_btfid=
+s/main.c
+> >> index 43512af13148..d35a7b2460e8 100644
+> >> --- a/tools/bpf/resolve_btfids/main.c
+> >> +++ b/tools/bpf/resolve_btfids/main.c
+> >> @@ -970,6 +970,23 @@ static int push_kfunc(struct btf2btf_context *ctx=
+, struct kfunc *kfunc)
+> >>      struct kfunc *arr =3D ctx->kfuncs;
+> >>      u32 cap =3D ctx->max_kfuncs;
+> >>
+> >> +    /*
+> >> +     * A kfunc can be listed in multiple BTF ID sets.
+> >> +     * In this case, dedup by btf_id and accumulate kfunc flags.
+> >> +     */
+> >> +    for (u32 i =3D 0; i < ctx->nr_kfuncs; i++) {
+> >> +            if (ctx->kfuncs[i].btf_id !=3D kfunc->btf_id)
+> >> +                    continue;
+> >> +
+> >> +            if (ctx->kfuncs[i].flags !=3D kfunc->flags) {
+> >> +                    pr_err("WARN: resolve_btfids: inconsistent flags =
 for kfunc %s: 0x%x !=3D 0x%x\n",
-> +                              kfunc->name, ctx->kfuncs[i].flags, kfunc->=
+> >> +                           kfunc->name, ctx->kfuncs[i].flags, kfunc->=
 flags);
-> +                       warnings++;
-> +               }
-> +               ctx->kfuncs[i].flags |=3D kfunc->flags;
-> +               return 0;
-> +       }
-> +
->         if (ctx->nr_kfuncs + 1 > cap) {
->                 cap =3D max(cap + 256, cap * 2);
->                 arr =3D realloc(arr, sizeof(struct kfunc) * cap);
+> >> +                    warnings++;
+> >> +            }
+> >
+> > hit few of those
+> >
+> > WARN: resolve_btfids: inconsistent flags for kfunc hid_bpf_allocate_con=
+text: 0x5 !=3D 0x25
+> > WARN: resolve_btfids: inconsistent flags for kfunc hid_bpf_release_cont=
+ext: 0x2 !=3D 0x22
+> > WARN: resolve_btfids: inconsistent flags for kfunc hid_bpf_hw_request: =
+0x0 !=3D 0x20
+> > WARN: resolve_btfids: inconsistent flags for kfunc hid_bpf_hw_output_re=
+port: 0x0 !=3D 0x20
+> > WARN: resolve_btfids: inconsistent flags for kfunc hid_bpf_input_report=
+: 0x0 !=3D 0x20
+> >
+> > I'd think flags like KF_SLEEPABLE might vary in different sets for the =
+same kfunc,
+> > IIUC you don't need to use KF_SLEEPABLE for syscall hook, because sysca=
+ll programs
+> > are already sleepable.. not sure there are other examples
+>
+> That's a good point.
+>
+> I think from the PoV of resolve_btfids what matters is the mismatch of
+> flags that trigger BTF changes, like KF_IMPLICIT_ARGS. We could check for
+> the specific flags here, or filter out acceptable inconsistencies (KF_SLE=
+EPABLE).
+>
+> Any other ideas?
 
-[...]
+I'd only collect and check inconsistency of flags we care about (and
+those should be consistent) and ignore the rest.
+
+>
+> >
+> > jirka
+>
