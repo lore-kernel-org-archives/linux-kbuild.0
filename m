@@ -1,88 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F748399D0C;
-	Tue,  2 Jun 2026 21:27:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5173A2B9A4;
+	Wed,  3 Jun 2026 01:16:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780435668; cv=none; b=GR4dHwXdasyvQSFhGjbLldc+0z8ePI/RFpxinFU3dMJaFM07TpZf8Y1a0DaaAIVJOmVaZX6oNlqIiUiMBHDtomIQ/tcjWZow3T8O1ElRR+HQ3YktM6Olhb3bwOpLJuVdTILUamN7UpaF6rc1xEZ1Lc4A21e3ESBGD5JHNVPQUhA=
+	t=1780449395; cv=none; b=tRa2cOhyurvRRR6sxq7MGxT7XyLgKpkioQonqbUSNFa/A9nub/RHsJCBMsT2bXAYhTKFNS1hebQnK3Kbf5fqZ7gIELxJp155/gIt3SaXZEPw+Ye/qLKHjpJbkwDg8W1uzXIPOcinh3Zukf1p5Dsxqm0WH8zfPkkjF8mgoI8T1ZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780435668; c=relaxed/simple;
-	bh=CqLzbxZx9AH9FzAh4LvVUVVPW2K6cBHPv0ACAyIlCFE=;
+	s=arc-20240116; t=1780449395; c=relaxed/simple;
+	bh=aSxhV7Dzuxt+88a2tyUyNJwTZ/2Z2mfgZ9AhdPFwnAg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KFjC5JSdKbRg0fBDR+Du0QHvoMMZh6PehUIg+UEp5JrvqNffk4NPFTZaN+vKH7vzqjM9TbaNoTPGgsB6Y3PcKcVSH0FUZolR7kcXDU9mHpv66+P2HG/iyGTwRRVelbLUSXgLu8jkL7H/E8dIapuW5XUiCTQc/NSfml0abvTAm3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oGbxiqAf; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=ssFMl8m0785Oc+Y294/KD7Udv9GYFgLcFWdpg07oX47byOKKE1sVXxGM9F8yAFfgnUtT6ZE6Wjgl8HPXVhjSqysr+xZbY39Z7c4e83pWKvpJ9UDxaCxhMcSvOZqn2WykCvu+Q0KyvW51OvcZTB8PFHGZewsJnWaci88uHSc6fPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YuJa5eYa; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oGbxiqAf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F6AD1F00893;
-	Tue,  2 Jun 2026 21:27:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YuJa5eYa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5272D1F00893;
+	Wed,  3 Jun 2026 01:16:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780435666;
-	bh=5Im0aFGY86Ref4h5NVxgo8G6mRjIHIC6V6c+NmxpZ7w=;
+	s=k20260515; t=1780449393;
+	bh=0fBTevK6gNCF+y1Qpad9tw8VN5c/evrMNB7AyYy+84U=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=oGbxiqAf5/9Y37S9HurefgORKKsuPw05nH9IaXGYJ3uBLDnVOVjyszYkL3c3RZkQz
-	 z65VmHRuY4iQzjYrBAE+acFqfOFxAQpDyBqtBSUKaRJOFsYXdtrDFHcGySOm6LKDJA
-	 CEptzPpFcny128FUjz37Rnqx2lnQnZhFJrHkRkpdWDLMiVBw+ZkpHnd4omyl47Gx0R
-	 m1eKvM4EeQl6Ch3F8UDCKTQ9HcX6Mu2HPJdJseugvn4EdlvXaGkz/IELAptZhP4Sg0
-	 FO/geevFdVsri9FF+Y7G2XCHLp50NjD8vA2Dto2phqkcXGf2owpAQf04c9thU9RiUG
-	 HbJJKyR+J5e+w==
-Date: Tue, 2 Jun 2026 11:27:45 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Leo Yan <leo.yan@arm.com>
-Cc: Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
-	James Clark <james.clark@linaro.org>, Kees Cook <kees@kernel.org>,
-	Quentin Monnet <qmo@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Daniel Lezcano <daniel.lezcano@kernel.org>,
-	Zhang Rui <rui.zhang@intel.com>, Lukasz Luba <lukasz.luba@arm.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>, Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	William Breathitt Gray <wbg@kernel.org>,
-	Barry Song <baohua@kernel.org>, Qinxin Xia <xiaqinxin@huawei.com>,
-	Bartosz Golaszewski <brgl@kernel.org>,
-	Kent Gibson <warthog618@gmail.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Long Li <longli@microsoft.com>, Jonathan Cameron <jic23@kernel.org>,
-	David Lechner <dlechner@baylibre.com>,
-	Nuno =?iso-8859-1?Q?S=E1?= <nuno.sa@analog.com>,
-	Andy Shevchenko <andy@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>, Willy Tarreau <w@1wt.eu>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Robert Moore <robert.moore@intel.com>, Len Brown <lenb@kernel.org>,
-	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-	David Vernet <void@manifault.com>, Andrea Righi <arighi@nvidia.com>,
-	Changwoo Min <changwoo@igalia.com>, Mark Brown <broonie@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Gabriele Monaco <gmonaco@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	Jiri Kosina <jikos@kernel.org>,
-	Benjamin Tissoires <bentiss@kernel.org>,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org
-Subject: Re: [PATCH v7 19/23] tools: sched_ext: Append extra cflags
-Message-ID: <ah9K0WzLJz3qL_cu@slm.duckdns.org>
-References: <20260602-tools_build_fix_zero_init-v7-0-631baf679fe7@arm.com>
- <20260602-tools_build_fix_zero_init-v7-19-631baf679fe7@arm.com>
+	b=YuJa5eYan0ZRGi8oX/AjTIbHCBHT/Ab4ivKUR1dGtqh+w5Iy7fwxqMBm9qeKbgS3l
+	 S+bjWNgN/1rVyijVXS/p1B0ca+/H05ffed0UBnCw7LKt1vAtdUnTbWIo4OQ9OL7CRD
+	 dqhFRBD0dEzSgbkK11hU2HeV/VxwTKv9JX7ihC1rhS6UdVYRColXC7TQ82YqWLmvAg
+	 rzXhbHBuveKfmU9l8fRbEE9wldOn2+GxvLg8EtXAxEaYcCDOlxq4weQWzulUH50t45
+	 hWaE2YdgG4oc7Dlj5e7J5FmoHcpttn4uoQxSd3kTYaG8a34b7qqXSNL5J/RUG8BHl+
+	 cdEOmgC6zhWBw==
+Date: Tue, 2 Jun 2026 18:16:29 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Nicolas Schier <nsc@kernel.org>,
+	KBuild Mailing List <linux-kbuild@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: Re: linux-next: manual merge of the kbuild tree with the clang-fixes
+ tree
+Message-ID: <20260603011629.GA1940387@ax162>
+References: <ah7geBSoDn696L9S@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -91,17 +45,62 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260602-tools_build_fix_zero_init-v7-19-631baf679fe7@arm.com>
+In-Reply-To: <ah7geBSoDn696L9S@sirena.org.uk>
 
-On Tue, Jun 02, 2026 at 03:40:53PM +0100, Leo Yan wrote:
-> Append EXTRA_CFLAGS to CFLAGS so that additional flags can be applied to
-> the compiler.
+On Tue, Jun 02, 2026 at 02:54:00PM +0100, Mark Brown wrote:
+> Hi all,
 > 
-> Signed-off-by: Leo Yan <leo.yan@arm.com>
+> Today's linux-next merge of the kbuild tree got a conflict in:
+> 
+>   include/linux/compiler-clang.h
+> 
+> between commit:
+> 
+>   175db11786bde ("Disable -Wattribute-alias for clang-23 and newer")
+> 
+> from the clang-fixes tree and commit:
 
-Acked-by: Tejun Heo <tj@kernel.org>
+Technically now Linus's tree after he merged clang-fixes in
 
-Thanks.
+  77590cacabb3 ("Merge tag 'clang-fixes-7.1-2' of git://git.kernel.org/pub/scm/linux/kernel/git/nathan/linux")
+
+>   c919893eabb43 ("compiler-clang.h: Drop explicit version number from "all" diagnostic macro")
+> 
+> from the kbuild tree.
+> 
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
+> 
+> diff --cc include/linux/compiler-clang.h
+> index 527e4e1360205,a105e2e8016c2..0000000000000
+> --- a/include/linux/compiler-clang.h
+> +++ b/include/linux/compiler-clang.h
+> @@@ -131,16 -122,10 +122,16 @@@
+>   #define __diag_str(s)		__diag_str1(s)
+>   #define __diag(s)		_Pragma(__diag_str(clang diagnostic s))
+>   
+>  +#if CONFIG_CLANG_VERSION >= 230000
+>  +#define __diag_clang_23(s)	__diag(s)
+>  +#else
+>  +#define __diag_clang_23(s)
+>  +#endif
+>  +
+> - #define __diag_clang_13(s)	__diag(s)
+> + #define __diag_clang_all(s)	__diag(s)
+>   
+>   #define __diag_ignore_all(option, comment) \
+> - 	__diag_clang(13, ignore, option)
+> + 	__diag_clang(all, ignore, option)
+>   
+>   /*
+>    * clang has horrible behavior with "g" or "rm" constraints for asm
+
+Thanks a lot, looks good to me and noted for my 7.2 Kbuild pull request.
 
 -- 
-tejun
+Cheers,
+Nathan
