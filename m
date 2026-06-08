@@ -1,180 +1,101 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B108326951;
-	Sun,  7 Jun 2026 10:45:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 594EF30FC03;
+	Mon,  8 Jun 2026 02:29:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780829107; cv=none; b=Da3euVAuG5XxLCJliM7cHMtChpQrOzbCjZjKUQlgk/7kDn60O9TtHd8ySNPnmccDxppxB0yI6WzEAhBElrGtjTvlIEyKwzvkB8Hh7uuQmGqkZSGPPEYtEUxh+K5zqV1Y457ajnP/avc5ygOKFhjj8WwRvaIU+43N1w5u3JPrXiE=
+	t=1780885759; cv=none; b=BNY5/nOafboctXi162LbLROAGqhLxa2j0dH7cZExMTWlwcfwdWNpXpRbzTT8+ojYxCmr9KGjBDTvxT8qULtHEiR7KF9yKwrwPeSgHTGeTN/dfKfiC4dfom9HHisUEEbs0pGH3j0pXdvSUQwoObEU+cZL4pEnrkSFnAFoQ9kFBpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780829107; c=relaxed/simple;
-	bh=25bpVRvxfeeRgveFRyrV0u657RJ0ynDaXSK53wsLQ+M=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=D0gn5CKEhcYkiEQZjzJqFwLD2xSgkVVhUOZcaDIEWz3RAlf1mae6aJt0xlqFy5QlzYWH/xqxAX2mM/UI1It7oKB5nm7Oui2C1t53m8Ur56Nka8CDtx5oBGGM5IgH1mvxCfsyu4DpgG8wbwbpbU5lDbemoyuUkdeLss8MYgZdkZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=ngdaQwKz; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780885759; c=relaxed/simple;
+	bh=1yW3nGF+k1cyd6TOnr3aI6fuKTkcHeoCFzAPA0owvD4=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=DAHfWbAiJuXk4GufugxYWmGH9WR8ZmQ1rdGUWDM02FIhpBr6kXS3fuRdLRauSILod1mN3nvJ7f5cPuHi52PhSzLdotDOuySxaoG/5JbNJaqdNF+Ti+aq33t9YvIvwxtIk/DLJetdxFDBNkMD/pRnE+WerCs3yvfJWw70bYuMpS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YryrMEOK; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="ngdaQwKz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80F381F00893;
-	Sun,  7 Jun 2026 10:45:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1780829106;
-	bh=QME1HOrEUsar/w4YFfn+vg3CFAZK3nlJWlcU+khdTFY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=ngdaQwKz1bPLe8BWg+xeq4Fa6Cy32nOyDQS7e8ifyo2QHP2GGreuIKrgdZKyuKMa2
-	 obR1g9gpxyvqdruvmFUTb5pcQUF2SDZbAwRzSpyK+EBacwXAQEMX+XL9HdFTN9ddhu
-	 +LkvDO0JCytqcmlV2EAuY7jLqQe/TXBgmEf5VjsA=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	Will Deacon <will@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	linux-kbuild@vger.kernel.org,
-	Arnd Bergmann <arnd@arndb.de>,
-	Joerg Roedel <joerg.roedel@amd.com>
-Subject: [PATCH 6.12 196/307] iommu, debugobjects: avoid gcc-16.1 section mismatch warnings
-Date: Sun,  7 Jun 2026 11:59:53 +0200
-Message-ID: <20260607095734.921924124@linuxfoundation.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260607095727.647295505@linuxfoundation.org>
-References: <20260607095727.647295505@linuxfoundation.org>
-User-Agent: quilt/0.69
-X-stable: review
-X-Patchwork-Hint: ignore
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YryrMEOK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AADE1F00893;
+	Mon,  8 Jun 2026 02:29:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780885758;
+	bh=aBSarULtiAIbNgz7EOEuuFuqzWO+yqoqqHghdSCdJ5U=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=YryrMEOKa/URJl9Ed4LYJYVdYFN79dFfhRsvvv/Z2A1pqVOsyC+1yNXergIxdOPcj
+	 nb/sKI5iK0Bp6WZ1ZQ12IUDbIhbFAUkhWBeZXZRe9MFmyuESIXFgQS/K2Js3xzaB4W
+	 EKNs5xdDxxgzs8r3dlyHGfmcJI2VpUUrMPhRA2DGA+TbFbWlHUhLjnYURUDgy0xqMx
+	 FMq5r7u6B5QLeBGREwD6tuajwJ7pRsuhRTtzmKrPdAl/aMbPPIGjDv3QXFMo3CPU6D
+	 QpVVgtwoFki47KPVdduvlwH2a1Jky7Lt5byDMZ4ly2wCl8Ah5rk1xiJjDi08WxdnD2
+	 6qhyn9rpUdaxg==
+Date: Mon, 8 Jun 2026 11:29:11 +0900
+From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Nathan Chancellor
+ <nathan@kernel.org>, paulmck@kernel.org, Nicolas Schier <nsc@kernel.org>,
+ Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav
+ Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+ linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linux-kbuild@vger.kernel.org, bpf@vger.kernel.org, kernel-team@meta.com
+Subject: Re: [PATCH v2 3/6] bootconfig: render embedded bootconfig as a
+ kernel cmdline at build time
+Message-Id: <20260608112911.ec62dfd24adf235b6db5506b@kernel.org>
+In-Reply-To: <20260605-bootconfig_using_tools-v2-3-d309f544b5f7@debian.org>
+References: <20260605-bootconfig_using_tools-v2-0-d309f544b5f7@debian.org>
+	<20260605-bootconfig_using_tools-v2-3-d309f544b5f7@debian.org>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-6.12-stable review patch.  If anyone has any objections, please let me know.
+Hi Breno,
 
-------------------
+On Fri, 05 Jun 2026 05:03:34 -0700
+Breno Leitao <leitao@debian.org> wrote:
 
-From: Arnd Bergmann <arnd@arndb.de>
-
-commit 4c9ad387aa2d6785299722e54224d34764edaeb3 upstream.
-
-gcc-16 has gained some more advanced inter-procedual optimization
-techniques that enable it to inline the dummy_tlb_add_page() and
-dummy_tlb_flush() function pointers into a specialized version of
-__arm_v7s_unmap:
-
-WARNING: modpost: vmlinux: section mismatch in reference: __arm_v7s_unmap+0x2cc (section: .text) -> dummy_tlb_add_page (section: .init.text)
-ERROR: modpost: Section mismatches detected.
-
->From what I can tell, the transformation is correct, as this is only
-called when __arm_v7s_unmap() is called from arm_v7s_do_selftests(),
-which is also __init. Since __arm_v7s_unmap() however is not __init,
-gcc cannot inline the inner function calls directly.
-
-In debug_objects_selftest(), the same thing happens. Both the
-caller and the leaf function are __init, but the IPA pulls
-it into a non-init one:
-
-WARNING: modpost: vmlinux: section mismatch in reference: lookup_object_or_alloc+0x7c (section: .text.lookup_object_or_alloc) -> is_static_object (section: .init.text)
-
-Marking the affected functions as not "__init" would reliably avoid this
-issue but is not a good solution because it removes an otherwise correct
-annotation. I tried marking the functions as 'noinline', but that ended
-up not covering all the affected configurations.
-
-With some more experimenting, I found that marking these functions as
-__attribute__((noipa)) is both logical and reliable.
-
-In order to keep the syntax readable, add a custom macro for this in
-include/linux/compiler_attributes.h next to other related macros and
-use it to annotate both files.
-
-Link: https://lore.kernel.org/all/abRB6g-48ZX6Yl2r@willie-the-truck/
-Cc: Will Deacon <will@kernel.org>
-Cc: Thomas Gleixner <tglx@kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: Miguel Ojeda <ojeda@kernel.org>
-Cc: linux-kbuild@vger.kernel.org
-Cc: stable@vger.kernel.org
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-Acked-by: Will Deacon <will@kernel.org>
-Acked-by: Thomas Gleixner <tglx@kernel.org>
-Acked-by: Miguel Ojeda <ojeda@kernel.org>
-Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- drivers/iommu/io-pgtable-arm-v7s.c  |   18 ++++++++++++------
- include/linux/compiler_attributes.h |   11 +++++++++++
- lib/debugobjects.c                  |    2 +-
- 3 files changed, 24 insertions(+), 7 deletions(-)
-
---- a/drivers/iommu/io-pgtable-arm-v7s.c
-+++ b/drivers/iommu/io-pgtable-arm-v7s.c
-@@ -894,21 +894,27 @@ struct io_pgtable_init_fns io_pgtable_ar
- 
- static struct io_pgtable_cfg *cfg_cookie __initdata;
- 
--static void __init dummy_tlb_flush_all(void *cookie)
-+/*
-+ * __noipa prevents gcc from turning indirect iommu_flush_ops calls
-+ * into direct calls from a specialized __arm_v7s_unmap() that triggers
-+ * a build time section mismatch assertion.
-+ */
-+static __noipa void __init dummy_tlb_flush_all(void *cookie)
- {
- 	WARN_ON(cookie != cfg_cookie);
- }
- 
--static void __init dummy_tlb_flush(unsigned long iova, size_t size,
--				   size_t granule, void *cookie)
-+static __noipa void __init dummy_tlb_flush(unsigned long iova, size_t size,
-+					   size_t granule, void *cookie)
- {
- 	WARN_ON(cookie != cfg_cookie);
- 	WARN_ON(!(size & cfg_cookie->pgsize_bitmap));
- }
- 
--static void __init dummy_tlb_add_page(struct iommu_iotlb_gather *gather,
--				      unsigned long iova, size_t granule,
--				      void *cookie)
-+static __noipa void __init dummy_tlb_add_page(struct iommu_iotlb_gather *gather,
-+					      unsigned long iova,
-+					      size_t granule,
-+					      void *cookie)
- {
- 	dummy_tlb_flush(iova, granule, granule, cookie);
- }
---- a/include/linux/compiler_attributes.h
-+++ b/include/linux/compiler_attributes.h
-@@ -397,6 +397,17 @@
- #endif
- 
- /*
-+ * Optional: not supported by clang
-+ *
-+ *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Attributes.html#index-noipa
-+ */
-+#if __has_attribute(noipa)
-+# define __noipa __attribute__((noipa))
-+#else
-+# define __noipa
-+#endif
-+
-+/*
-  *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-weak-function-attribute
-  *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-weak-variable-attribute
-  */
---- a/lib/debugobjects.c
-+++ b/lib/debugobjects.c
-@@ -1075,7 +1075,7 @@ struct self_test {
- 
- static __initconst const struct debug_obj_descr descr_type_test;
- 
--static bool __init is_static_object(void *addr)
-+static __noipa bool __init is_static_object(void *addr)
- {
- 	struct self_test *obj = addr;
- 
+> diff --git a/tools/bootconfig/Makefile b/tools/bootconfig/Makefile
+> index 90eb47c9d8de..aa75a7828685 100644
+> --- a/tools/bootconfig/Makefile
+> +++ b/tools/bootconfig/Makefile
+> @@ -15,10 +15,14 @@ override CFLAGS += -Wall -g -I$(CURDIR)/include
+>  ALL_TARGETS := bootconfig
+>  ALL_PROGRAMS := $(patsubst %,$(OUTPUT)%,$(ALL_TARGETS))
+>  
+> -all: $(ALL_PROGRAMS) test
+> +all: $(ALL_PROGRAMS)
+>  
+> +# bootconfig is a build host tool: Kbuild's prepare hook runs it on the
+> +# build machine to render the embedded cmdline, so always compile it with
+> +# $(HOSTCC). Using $(CC) would cross-compile it under ARCH=... builds and
+> +# fail to exec on the host ("Exec format error").
+>  $(OUTPUT)bootconfig: main.c include/linux/bootconfig.h $(LIBSRC)
+> -	$(CC) $(filter %.c,$^) $(CFLAGS) $(LDFLAGS) -o $@
+> +	$(HOSTCC) $(filter %.c,$^) $(CFLAGS) $(LDFLAGS) -o $@
 
 
+> Is it safe to pass $(CFLAGS) and $(LDFLAGS) to $(HOSTCC) here?
+> When cross-compiling, $(CFLAGS) and $(LDFLAGS) often contain target-specific
+> flags. Passing these target flags to the host compiler might cause it to fail,
+> or incorrectly generate binaries for the target architecture that fail to
+> execute on the build host.
+
+Sashiko found a problem here. Hmm, I would like to build the bootconfig
+tool just as a tool. (like `cd tools/bootconfig; make`)
+Can we identify the build (make) is called from kernel build process or not
+and switching CC/CFLAGS/LDFLAGS?
+
+> 
+> Additionally, since bootconfig is an administrative utility meant to be
+> deployed on the target system, will permanently hardcoding $(HOSTCC) prevent
+> users from cross-compiling it for their target devices?
+
+This is also a good point. We need cros build binary and host binary.
+
+Thank you,
+
+-- 
+Masami Hiramatsu (Google) <mhiramat@kernel.org>
