@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA4F63CC9EA;
-	Mon,  8 Jun 2026 14:16:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8133C98AE;
+	Mon,  8 Jun 2026 14:16:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780928167; cv=none; b=Y3wfsVbYskPR/PEXtpXr1B4FhdxSgf/Qbzfzvo3YB4WO5Nhm6270gKUTH/F4C84woij7PXN0RbwFvajT3KBR70QkuhTj1AUJp6f9Vf7DDQ4iBkbJK7gA2SV0K1FfHqq1wurTM0QhVF+fFLQaGf5ojOLNR7zQXdE+kP9zqcI3L5I=
+	t=1780928174; cv=none; b=a+dapmLRWBUzbDQqgwPm8y58Bq5Jsl89ebhApmktvbBvvN+w00DWnFQwjWnrZY6D+PIWB2S3Ewf5zV77/XFQ0Ql0o8AKa6fVTmjO6eE1x79kmlHNbjsYQsf8EiGrAOqvuK8xaTlKZJe26KlEyP0z4nMG46wpWrl07pW/Yg0xdc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780928167; c=relaxed/simple;
-	bh=srva8HB7eVbJIRysZf4JJ7N/BdgMOtdL2DZBBINCaSk=;
+	s=arc-20240116; t=1780928174; c=relaxed/simple;
+	bh=L1kTDIzT7Dfh1Vj+k1k6Avq5m33aMOojlNj78e36isQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YOYDpdtXNj72LQzualgmFWneGpvDTQLSKCpcWpxCE+8Vm57zcNSSF7RJpHSKM/IT4eJGVqEt60cQIasE+W8OXJWuxbpgGT30EMtOCUparWUJhopcmSOLwdVNn+nEPSuKHBX9P1d/mRFiBgk2F5oCuwWi1xjhaPYnk17zi7IQAgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VJZPPNYR; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=jqd/7/rFpnf/afYy0RO6QlrDJwj/LSb+i7RgdZbEotjULBW6DT03/v2PrmXgzg4jCa+AJ+7YKxlB1AWHDdeVKneIjICSMULBxKXjwUlD3JTep36mpyMRUT/U52NKruKLgx1Vuez9DYmf0B5WFYMecttj/FaYecH4p8aBO8zEKhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qaf3bk6+; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VJZPPNYR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB7551F0089A;
-	Mon,  8 Jun 2026 14:16:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qaf3bk6+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEC091F0089C;
+	Mon,  8 Jun 2026 14:16:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780928165;
-	bh=rF1H54qh6cTQCWrj20dxDSKZ4D90sLDUNqD3SXg53F8=;
+	s=k20260515; t=1780928173;
+	bh=EtNoJetG4uKCY26KFky9CdnJyiwhu5pznsLhq1+NM5M=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=VJZPPNYRB19qzKx+pgdy6+A+IjvIWZeObPvRCg5JvOGdeoFfFdmveqq2NWu2/CYP5
-	 u4El/ozNM+tbdioQJhMFDB0lQK9YmogKUqYwd3XgQMYiomEu5A4ZpD+tIh2yficGML
-	 2zenS99xAW2n+NzS0bU0kkgIZnXxTs2E+BS86rMOHTzs8jPeaAi0sPb8qrdHiE3fzL
-	 qB7Qu2FGCz6i+dR1GhbQEwxK1WfmkNsZNMY5L4JzvwfVCyZyRycokD7O+WuQL253Ab
-	 hY9XPcvGSn5c2HnQ8oRcog2FeyGojgkslflnoDz+HtjX+X6xBY9BD9rNJyHC9HIQi2
-	 iFM+CJaQ3u5bA==
+	b=Qaf3bk6+yUf19QcLywQ168GIUYMSwxv8qvvV/daYugjCtRWZ/8G3zc/R817KblGLZ
+	 dzVXlDWb82mQTqpZe3BWLD/xyx79faVY0TUCvLVV2Vh+vDrmVdGIXkXgD/7yziVezW
+	 PVkeXbr/rS5cYqWG4kr9jsntmd3sOpmThMREMaDew/trdPqseOjAfBYVdPTLw4ATOi
+	 yPoinWoyZmH1aMt6gdVB44UAt4ZGLcI6JFL5UdMon2btZc+STZEXVR9xlsRNqgHYE9
+	 jpEQ2hKmuK0xJ3XlqtD3Nk8jCJ1fi41bchb/Y/XnGPBIJlObfqtaOmcdY04+A5b6cm
+	 xtSlj4F5lqPjw==
 From: Miguel Ojeda <ojeda@kernel.org>
 To: Miguel Ojeda <ojeda@kernel.org>,
 	Nathan Chancellor <nathan@kernel.org>,
@@ -42,9 +42,9 @@ Cc: Boqun Feng <boqun@kernel.org>,
 	linux-kbuild@vger.kernel.org,
 	Joshua Liebow-Feeser <joshlf@google.com>,
 	Jack Wrenn <jswrenn@google.com>
-Subject: [PATCH v2 12/19] rust: zerocopy: enable support in kbuild
-Date: Mon,  8 Jun 2026 16:14:31 +0200
-Message-ID: <20260608141439.182634-13-ojeda@kernel.org>
+Subject: [PATCH v2 14/19] rust: zerocopy-derive: add SPDX License Identifiers
+Date: Mon,  8 Jun 2026 16:14:33 +0200
+Message-ID: <20260608141439.182634-15-ojeda@kernel.org>
 In-Reply-To: <20260608141439.182634-1-ojeda@kernel.org>
 References: <20260608141439.182634-1-ojeda@kernel.org>
 Precedence: bulk
@@ -55,210 +55,130 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-With all the new files in place and ready from the new crate, enable
-the support for it in the build system.
+Originally, when the Rust upstream `alloc` standard library crate was
+vendored, the SPDX License Identifiers were added to every file so that
+the license on those was clear. The same happened with the vendoring of
+`proc_macro2`, `quote` and `syn`. Please see:
 
-In addition, skip formatting for this vendored crate.
+  commit 057b8d257107 ("rust: adapt `alloc` crate to the kernel")
+  commit 69942c0a8965 ("rust: syn: add SPDX License Identifiers")
+  commit ddfa1b279d08 ("rust: quote: add SPDX License Identifiers")
+  commit a9acfceb9614 ("rust: proc-macro2: add SPDX License Identifiers")
 
-Finally, there are no generated symbols expected from `zerocopy`, thus
-skip adding the `exports` generation.
+Thus do the same for the `zerocopy-derive` crate.
 
+This makes `scripts/spdxcheck.py` pass: use parentheses like commit
+06e9bfc1e57d ("ionic: make spdxcheck.py happy") did since we have two
+`OR` operators in the expression (three licenses).
+
+Finally, as requested, I filed an issue [1] with upstream about it.
+
+Cc: Joshua Liebow-Feeser <joshlf@google.com>
+Cc: Jack Wrenn <jswrenn@google.com>
+Link: https://github.com/google/zerocopy/issues/3428 [1]
 Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
 ---
- Makefile                          |  1 +
- rust/Makefile                     | 45 ++++++++++++++++++++++++++-----
- scripts/Makefile.build            |  1 +
- scripts/generate_rust_analyzer.py | 10 +++++--
- 4 files changed, 49 insertions(+), 8 deletions(-)
+ rust/zerocopy-derive/derive/from_bytes.rs     | 2 ++
+ rust/zerocopy-derive/derive/into_bytes.rs     | 2 ++
+ rust/zerocopy-derive/derive/known_layout.rs   | 2 ++
+ rust/zerocopy-derive/derive/mod.rs            | 2 ++
+ rust/zerocopy-derive/derive/try_from_bytes.rs | 2 ++
+ rust/zerocopy-derive/derive/unaligned.rs      | 2 ++
+ rust/zerocopy-derive/lib.rs                   | 2 ++
+ rust/zerocopy-derive/repr.rs                  | 2 ++
+ rust/zerocopy-derive/util.rs                  | 2 ++
+ 9 files changed, 18 insertions(+)
 
-diff --git a/Makefile b/Makefile
-index 3a265e7e3347..33135f39bbee 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1956,6 +1956,7 @@ rustfmt:
- 			-path $(srctree)/rust/proc-macro2 \
- 			-o -path $(srctree)/rust/quote \
- 			-o -path $(srctree)/rust/syn \
-+			-o -path $(srctree)/rust/zerocopy \
- 		\) -prune -o \
- 		-type f -a -name '*.rs' -a ! -name '*generated*' -print \
- 		| xargs $(RUSTFMT) $(rustfmt_flags)
-diff --git a/rust/Makefile b/rust/Makefile
-index 7b1db0d5d423..a87b33926cdf 100644
---- a/rust/Makefile
-+++ b/rust/Makefile
-@@ -6,6 +6,8 @@ rustdoc_output := $(objtree)/Documentation/output/rust/rustdoc
- obj-$(CONFIG_RUST) += core.o compiler_builtins.o ffi.o
- always-$(CONFIG_RUST) += exports_core_generated.h
- 
-+obj-$(CONFIG_RUST) += zerocopy.o
+diff --git a/rust/zerocopy-derive/derive/from_bytes.rs b/rust/zerocopy-derive/derive/from_bytes.rs
+index ad8b6233fe54..d693a63b7645 100644
+--- a/rust/zerocopy-derive/derive/from_bytes.rs
++++ b/rust/zerocopy-derive/derive/from_bytes.rs
+@@ -1,3 +1,5 @@
++// SPDX-License-Identifier: (BSD-2-Clause OR Apache-2.0) OR MIT
 +
- ifdef CONFIG_RUST_INLINE_HELPERS
- always-$(CONFIG_RUST) += helpers/helpers.bc helpers/helpers_module.bc
- else
-@@ -81,6 +83,12 @@ core-flags := \
-     --edition=$(core-edition) \
-     $(call cfgs-to-flags,$(core-cfgs))
- 
-+zerocopy-flags := \
-+    --cap-lints=allow
+ use proc_macro2::{Span, TokenStream};
+ use syn::{
+     parse_quote, Data, DataEnum, DataStruct, DataUnion, Error, Expr, ExprLit, ExprUnary, Lit, UnOp,
+diff --git a/rust/zerocopy-derive/derive/into_bytes.rs b/rust/zerocopy-derive/derive/into_bytes.rs
+index 8c1e1009dd91..ad52a6b45d28 100644
+--- a/rust/zerocopy-derive/derive/into_bytes.rs
++++ b/rust/zerocopy-derive/derive/into_bytes.rs
+@@ -1,3 +1,5 @@
++// SPDX-License-Identifier: (BSD-2-Clause OR Apache-2.0) OR MIT
 +
-+zerocopy-envs := \
-+    CARGO_PKG_VERSION=0.8.50
+ use proc_macro2::{Span, TokenStream};
+ use quote::quote;
+ use syn::{Data, DataEnum, DataStruct, DataUnion, Error, Type};
+diff --git a/rust/zerocopy-derive/derive/known_layout.rs b/rust/zerocopy-derive/derive/known_layout.rs
+index b91b4de0098c..fddffd167c82 100644
+--- a/rust/zerocopy-derive/derive/known_layout.rs
++++ b/rust/zerocopy-derive/derive/known_layout.rs
+@@ -1,3 +1,5 @@
++// SPDX-License-Identifier: (BSD-2-Clause OR Apache-2.0) OR MIT
 +
- proc_macro2-cfgs := \
-     feature="proc-macro" \
-     wrap_proc_macro \
-@@ -167,7 +175,7 @@ quiet_cmd_rustdoc = RUSTDOC $(if $(rustdoc_host),H, ) $<
- # command-like flags to solve the issue. Meanwhile, we use the non-custom case
- # and then retouch the generated files.
- rustdoc: rustdoc-core rustdoc-macros rustdoc-compiler_builtins \
--    rustdoc-kernel rustdoc-pin_init
-+    rustdoc-kernel rustdoc-pin_init rustdoc-zerocopy
- 	$(Q)grep -Ehro '<a href="srctree/([^"]+)"' $(rustdoc_output) | \
- 		cut -d'"' -f2 | cut -d/ -f2- | while read f; do \
- 			if [ ! -e "$(srctree)/$$f" ]; then \
-@@ -219,6 +227,13 @@ rustdoc-compiler_builtins: private is-kernel-object := y
- rustdoc-compiler_builtins: $(src)/compiler_builtins.rs rustdoc-core FORCE
- 	+$(call if_changed,rustdoc)
- 
-+rustdoc-zerocopy: private rustc_target_envs := $(zerocopy-envs)
-+rustdoc-zerocopy: private is-kernel-object := y
-+rustdoc-zerocopy: private rustc_target_flags = $(zerocopy-flags) \
-+    --extend-css $(src)/zerocopy/rustdoc/style.css
-+rustdoc-zerocopy: $(src)/zerocopy/src/lib.rs rustdoc-clean rustdoc-core FORCE
-+	+$(call if_changed,rustdoc)
+ use proc_macro2::TokenStream;
+ use quote::quote;
+ use syn::{parse_quote, Data, Error, Type};
+diff --git a/rust/zerocopy-derive/derive/mod.rs b/rust/zerocopy-derive/derive/mod.rs
+index a3d066ed2b4d..665ba7da55a8 100644
+--- a/rust/zerocopy-derive/derive/mod.rs
++++ b/rust/zerocopy-derive/derive/mod.rs
+@@ -1,3 +1,5 @@
++// SPDX-License-Identifier: (BSD-2-Clause OR Apache-2.0) OR MIT
 +
- rustdoc-ffi: private is-kernel-object := y
- rustdoc-ffi: $(src)/ffi.rs rustdoc-core FORCE
- 	+$(call if_changed,rustdoc)
-@@ -240,7 +255,8 @@ rustdoc-pin_init: $(src)/pin-init/src/lib.rs rustdoc-pin_init_internal \
- rustdoc-kernel: private is-kernel-object := y
- rustdoc-kernel: private rustc_target_flags = --extern ffi --extern pin_init \
-     --extern build_error --extern macros \
--    --extern bindings --extern uapi
-+    --extern bindings --extern uapi \
-+    --extern zerocopy
- rustdoc-kernel: $(src)/kernel/lib.rs rustdoc-core rustdoc-ffi rustdoc-macros \
-     rustdoc-pin_init rustdoc-compiler_builtins $(obj)/$(libmacros_name) \
-     $(obj)/bindings.o FORCE
-@@ -260,6 +276,11 @@ quiet_cmd_rustc_test_library = $(RUSTC_OR_CLIPPY_QUIET) TL $<
- 		-L$(objtree)/$(obj)/test \
- 		--crate-name $(subst rusttest-,,$(subst rusttestlib-,,$@)) $<
- 
-+rusttestlib-zerocopy: private rustc_target_envs := $(zerocopy-envs)
-+rusttestlib-zerocopy: private rustc_target_flags = $(zerocopy-flags)
-+rusttestlib-zerocopy: $(src)/zerocopy/src/lib.rs FORCE
-+	+$(call if_changed,rustc_test_library)
+ pub mod from_bytes;
+ pub mod into_bytes;
+ pub mod known_layout;
+diff --git a/rust/zerocopy-derive/derive/try_from_bytes.rs b/rust/zerocopy-derive/derive/try_from_bytes.rs
+index 4e36ab40bcf8..ce9c926d5b8e 100644
+--- a/rust/zerocopy-derive/derive/try_from_bytes.rs
++++ b/rust/zerocopy-derive/derive/try_from_bytes.rs
+@@ -1,3 +1,5 @@
++// SPDX-License-Identifier: (BSD-2-Clause OR Apache-2.0) OR MIT
 +
- rusttestlib-build_error: $(src)/build_error.rs FORCE
- 	+$(call if_changed,rustc_test_library)
- 
-@@ -300,10 +321,11 @@ rusttestlib-pin_init: $(src)/pin-init/src/lib.rs rusttestlib-macros \
- 
- rusttestlib-kernel: private rustc_target_flags = --extern ffi \
-     --extern build_error --extern macros --extern pin_init \
--    --extern bindings --extern uapi
-+    --extern bindings --extern uapi \
-+    --extern zerocopy
- rusttestlib-kernel: $(src)/kernel/lib.rs rusttestlib-bindings rusttestlib-uapi \
-     rusttestlib-build_error rusttestlib-pin_init $(obj)/$(libmacros_name) \
--    $(obj)/bindings.o FORCE
-+    $(obj)/bindings.o rusttestlib-zerocopy FORCE
- 	+$(call if_changed,rustc_test_library)
- 
- rusttestlib-bindings: private rustc_target_flags = --extern ffi --extern pin_init
-@@ -337,6 +359,7 @@ quiet_cmd_rustdoc_test_kernel = RUSTDOC TK $<
- 		-L$(objtree)/$(obj) --extern ffi --extern pin_init \
- 		--extern kernel --extern build_error --extern macros \
- 		--extern bindings --extern uapi \
-+		--extern zerocopy \
- 		--no-run --crate-name kernel -Zunstable-options \
- 		--sysroot=/dev/null \
- 		$(doctests_modifiers_workaround) \
-@@ -599,6 +622,7 @@ rust-analyzer:
- 		--cfgs='syn=$(syn-cfgs)' \
- 		--cfgs='pin_init_internal=$(pin_init_internal-cfgs)' \
- 		--cfgs='pin_init=$(pin_init-cfgs)' \
-+		--envs='zerocopy=$(zerocopy-envs)' \
- 		$(realpath $(srctree)) $(realpath $(objtree)) \
- 		$(rustc_sysroot) $(RUST_LIB_SRC) $(if $(KBUILD_EXTMOD),$(srcroot)) \
- 		> rust-project.json
-@@ -670,6 +694,13 @@ $(obj)/compiler_builtins.o: private rustc_objcopy = -w -W '__*'
- $(obj)/compiler_builtins.o: $(src)/compiler_builtins.rs $(obj)/core.o FORCE
- 	+$(call if_changed_rule,rustc_library)
- 
-+$(obj)/zerocopy.o: private skip_clippy = 1
-+$(obj)/zerocopy.o: private skip_gendwarfksyms = 1
-+$(obj)/zerocopy.o: private rustc_target_envs := $(zerocopy-envs)
-+$(obj)/zerocopy.o: private rustc_target_flags = $(zerocopy-flags)
-+$(obj)/zerocopy.o: $(src)/zerocopy/src/lib.rs $(obj)/compiler_builtins.o FORCE
-+	+$(call if_changed_rule,rustc_library)
+ use proc_macro2::TokenStream;
+ use quote::quote;
+ use syn::{
+diff --git a/rust/zerocopy-derive/derive/unaligned.rs b/rust/zerocopy-derive/derive/unaligned.rs
+index 819d84984a03..d6dea0a11f1e 100644
+--- a/rust/zerocopy-derive/derive/unaligned.rs
++++ b/rust/zerocopy-derive/derive/unaligned.rs
+@@ -1,3 +1,5 @@
++// SPDX-License-Identifier: (BSD-2-Clause OR Apache-2.0) OR MIT
 +
- $(obj)/pin_init.o: private skip_gendwarfksyms = 1
- $(obj)/pin_init.o: private rustc_target_flags = $(pin_init-flags)
- $(obj)/pin_init.o: $(src)/pin-init/src/lib.rs $(obj)/compiler_builtins.o \
-@@ -705,9 +736,11 @@ $(obj)/uapi.o: $(src)/uapi/lib.rs \
- 	+$(call if_changed_rule,rustc_library)
+ use proc_macro2::{Span, TokenStream};
+ use syn::{Data, DataEnum, DataStruct, DataUnion, Error};
  
- $(obj)/kernel.o: private rustc_target_flags = --extern ffi --extern pin_init \
--    --extern build_error --extern macros --extern bindings --extern uapi
-+    --extern build_error --extern macros --extern bindings --extern uapi \
-+    --extern zerocopy
- $(obj)/kernel.o: $(src)/kernel/lib.rs $(obj)/build_error.o $(obj)/pin_init.o \
--    $(obj)/$(libmacros_name) $(obj)/bindings.o $(obj)/uapi.o FORCE
-+    $(obj)/$(libmacros_name) $(obj)/bindings.o $(obj)/uapi.o \
-+    $(obj)/zerocopy.o FORCE
- 	+$(call if_changed_rule,rustc_library)
- 
- ifdef CONFIG_JUMP_LABEL
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 3498d25b15e8..ddf0461dda6a 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -329,6 +329,7 @@ rust_common_cmd = \
- 	-Zcrate-attr=no_std \
- 	-Zcrate-attr='feature($(rust_allowed_features))' \
- 	-Zunstable-options --extern pin_init --extern kernel \
-+	--extern zerocopy \
- 	--crate-type rlib -L $(objtree)/rust/ \
- 	--sysroot=/dev/null \
- 	--out-dir $(dir $@) --emit=dep-info=$(depfile)
-diff --git a/scripts/generate_rust_analyzer.py b/scripts/generate_rust_analyzer.py
-index 2477209e1e94..80f7647f633a 100755
---- a/scripts/generate_rust_analyzer.py
-+++ b/scripts/generate_rust_analyzer.py
-@@ -276,6 +276,12 @@ def generate_crates(
-         [core, compiler_builtins],
-     )
- 
-+    zerocopy = append_crate(
-+        "zerocopy",
-+        srctree / "rust" / "zerocopy" / "src" / "lib.rs",
-+        [core, compiler_builtins],
-+    )
+diff --git a/rust/zerocopy-derive/lib.rs b/rust/zerocopy-derive/lib.rs
+index a1d10a2ada27..c517ea7db1eb 100644
+--- a/rust/zerocopy-derive/lib.rs
++++ b/rust/zerocopy-derive/lib.rs
+@@ -1,3 +1,5 @@
++// SPDX-License-Identifier: (BSD-2-Clause OR Apache-2.0) OR MIT
 +
-     def append_crate_with_generated(
-         display_name: str,
-         deps: List[Dependency],
-@@ -304,7 +310,7 @@ def generate_crates(
-     bindings = append_crate_with_generated("bindings", [core, ffi, pin_init])
-     uapi = append_crate_with_generated("uapi", [core, ffi, pin_init])
-     kernel = append_crate_with_generated(
--        "kernel", [core, macros, build_error, pin_init, ffi, bindings, uapi]
-+        "kernel", [core, macros, build_error, pin_init, ffi, bindings, uapi, zerocopy]
-     )
- 
-     scripts = srctree / "scripts"
-@@ -349,7 +355,7 @@ def generate_crates(
-             append_crate(
-                 crate_name,
-                 path,
--                [core, kernel, pin_init],
-+                [core, kernel, pin_init, zerocopy],
-                 cfg=generated_cfg,
-             )
- 
+ // Copyright 2019 The Fuchsia Authors
+ //
+ // Licensed under a BSD-style license <LICENSE-BSD>, Apache License, Version 2.0
+diff --git a/rust/zerocopy-derive/repr.rs b/rust/zerocopy-derive/repr.rs
+index 57014b38b2da..74fd376d9fda 100644
+--- a/rust/zerocopy-derive/repr.rs
++++ b/rust/zerocopy-derive/repr.rs
+@@ -1,3 +1,5 @@
++// SPDX-License-Identifier: (BSD-2-Clause OR Apache-2.0) OR MIT
++
+ // Copyright 2019 The Fuchsia Authors
+ //
+ // Licensed under a BSD-style license <LICENSE-BSD>, Apache License, Version 2.0
+diff --git a/rust/zerocopy-derive/util.rs b/rust/zerocopy-derive/util.rs
+index 4ec28bf95758..5ba5228e2a44 100644
+--- a/rust/zerocopy-derive/util.rs
++++ b/rust/zerocopy-derive/util.rs
+@@ -1,3 +1,5 @@
++// SPDX-License-Identifier: (BSD-2-Clause OR Apache-2.0) OR MIT
++
+ // Copyright 2019 The Fuchsia Authors
+ //
+ // Licensed under a BSD-style license <LICENSE-BSD>, Apache License, Version 2.0
 -- 
 2.54.0
 
