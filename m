@@ -1,41 +1,53 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2692248F57;
-	Tue,  9 Jun 2026 23:47:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B54901E492D;
+	Tue,  9 Jun 2026 23:51:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781048861; cv=none; b=WEMzDdTyFAKfnXRbtESdqHzWu8UUN9pJAGWHtp35+mHmPNcvCuqNPWJxpyGCfmn3IjoWZLinPWX1LTwZcXxrkJsmRcKkpcHKbgVTVrsqlifqBbQXX4+KBTmR5nNC9i8To0+wDN+A/HThpLuL/EIrH0uaUH5thfs0zQvzc4N4ths=
+	t=1781049085; cv=none; b=Oo69QqJ131eXgaSsmRqgqWude7kywKfs7R+vYHs2OkpOh7wKxCyE5hAkGYh0HDqNdaz/mM/dn8orGitXe+RBfKDv5fV0H9dr7KeqZ/zAyzMx1yWsBeFcq/BJ4tm55XGWDhm1XPLDpP8FZZRxrSOhi1a6zG+Ylt39I/iqtjSmvWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781048861; c=relaxed/simple;
-	bh=xyvZSfANfzwob45aEYEgsFp7Rm1LenbyUR14Tph2xlw=;
+	s=arc-20240116; t=1781049085; c=relaxed/simple;
+	bh=Vyr+KMrlmuFfvy74m/59of/SuyIpDkHClr60ZNAXz+E=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=rpXG6x8lPzqkBELxYsNeNBhzA84JTGK31H9mA5yT3U03ITmqX8DXDTA1yijYkOnLJWPkIuRJJub+fBioPFNhSMceRwfzUwSIfgtEdFr5mNBJSkG+KmiF8OTOEoTSLTa21I502B+LLr8VslOTcgmAgczHs8yuhuYdqCn+vbsk5Ic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fDUI2Fgu; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=YqcLCxMsEzddx5mNLgAGWgbaJpVT94bxuaJ9UjtSU5Yxn2HInRxzynwY147QLn9C2nUdRLoitEflZSxILQHpzT3ktgN7CLr+EZW4PKtfTXNa/tMMprhOTBNUxMJlwS+5MV5v+zDHf5Iu+ecTJ8ub4jnUFHpwwjf5+madwkXtJmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lTUYgUz3; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fDUI2Fgu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 944951F00893;
-	Tue,  9 Jun 2026 23:47:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lTUYgUz3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50B261F00893;
+	Tue,  9 Jun 2026 23:51:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781048860;
-	bh=qBkxIyUYviGYhbJDgZkW3tzAsMz1sZjwOrEzHE3Husk=;
+	s=k20260515; t=1781049084;
+	bh=sAM1OjvV4RCwTsEIs65/1PqOKnexTxy5ur/iwOgCTSs=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Date;
-	b=fDUI2Fgug7VX+8/QSBJ9LFTQt1F8cmPWAgiHV2xUbUZAApOZZ56bbPPlyiFSC3umR
-	 i0TCao7PufOOijoLO9RlkT+RB1dIou2//qaoCWZHJwQkGaBJ1G6hxjtrSFzI34Cwqi
-	 k/y9/3rWoHoZe2aetGwYXw8tCuXSBZuhGip0P1wcSI5aN7KXevpEagP8b40w/DESfk
-	 +5OB/7s+5+z0n+QvNhvF4PjysL023XLNojvY/qZNJwMVPTl7mQWDUyOCWbAltoM4Pe
-	 dN+YVvr3IFNnTBnIS4svZHyX7E5iNdalMu8IzUsmoltGFAw8boxFWxnVLNfUq8ZSh1
-	 T1p+0mrGM81wg==
+	b=lTUYgUz3Mdv7RPVcFILnc3/AFwXeanB+AJJJxW07H+QCgQbpM5ByJFdy/NEuIzKvk
+	 DguYVORopKTN8OQpNUyIE1ulMqH91/0XUfjj1ZGq4lpiACMlWLwXlj4VHgsjvoTxzn
+	 El/edqU1dvHDVE6YxV9pU+gM4e8KwkZ7F3sl5s4+PVp+rLlhBJ3XvQ+uuOPPL3qFIS
+	 KX2BYI7k6vzyhEY9B5WOrrawG6I2bWMVbsg4X0MyigrY8Mp06wYhKprAUqO1tmd/bN
+	 iGQnAAhL98N9txhAynrxFpLUif1QlktU0OMDTNGLa4zfedTo/jCNelGwwwG+tP8ZeY
+	 QPtHxYUnITtcA==
 From: Nathan Chancellor <nathan@kernel.org>
-To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Andrew Jones <andrew.jones@linux.dev>
-Cc: nsc@kernel.org, andriy.shevchenko@linux.intel.com, 
- rdunlap@infradead.org, julianbraha@gmail.com
-In-Reply-To: <20260527142703.107110-1-andrew.jones@linux.dev>
-References: <20260527142703.107110-1-andrew.jones@linux.dev>
-Subject: Re: [PATCH v4] kconfig: add kconfig-sym-check static checker
-Message-Id: <178104876973.2707941.12816857648925597603.b4-ty@b4>
-Date: Tue, 09 Jun 2026 16:46:09 -0700
+To: Masahiro Yamada <masahiroy@kernel.org>, 
+ Nicolas Schier <nicolas.schier@linux.dev>, 
+ Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
+ Yonghong Song <yonghong.song@linux.dev>, Bill Wendling <morbo@google.com>, 
+ Justin Stitt <justinstitt@google.com>, Miguel Ojeda <ojeda@kernel.org>, 
+ Alice Ryhl <aliceryhl@google.com>, Sami Tolvanen <samitolvanen@google.com>, 
+ "Mike Rapoport (Microsoft)" <rppt@kernel.org>, 
+ Rafael Aquini <aquini@redhat.com>, Michael Ellerman <mpe@ellerman.id.au>, 
+ Stafford Horne <shorne@gmail.com>, Piotr Gorski <piotrgorski@cachyos.org>, 
+ Venkat Rao Bagalkote <venkat88@linux.ibm.com>, 
+ Teresa Johnson <tejohnson@google.com>, Thomas Gleixner <tglx@kernel.org>, 
+ Christophe Leroy <chleroy@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, 
+ xur@google.com
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+ llvm@lists.linux.dev
+In-Reply-To: <20260529185347.2418373-1-xur@google.com>
+References: <20260529185347.2418373-1-xur@google.com>
+Subject: Re: [PATCH v12 0/3] kbuild: distributed build support for Clang
+ ThinLTO
+Message-Id: <178104893725.2707941.7165957214704818524.b4-ty@b4>
+Date: Tue, 09 Jun 2026 16:48:57 -0700
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -45,21 +57,48 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=913; i=nathan@kernel.org;
- h=from:subject:message-id; bh=xyvZSfANfzwob45aEYEgsFp7Rm1LenbyUR14Tph2xlw=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDFkay6SChaaGlTmaCqRsOLdkyZZt+Rx3b66R2r3phrG+Z
- ZZIW/q6jlIWBjEuBlkxRZbqx6rHDQ3nnGW8cWoSzBxWJpAhDFycAjCRAx4M/9SnPDp+fsrL2Jf3
- Z1tL5jTuOlN2RlJXdfPbWx//lwv+6O1h+B/VzrF2UoJcDx+TFOPPExb6MlySc8UfyXglHBKeuGj
- PQj4A
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2283; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=Vyr+KMrlmuFfvy74m/59of/SuyIpDkHClr60ZNAXz+E=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDFkay75vKGk+Xtg851D/R94Snl0f3qe9XpRs6xCyK6Vv1
+ tRPelExHaUsDGJcDLJiiizVj1WPGxrOOct449QkmDmsTCBDGLg4BWAihtaMDLOC5tislvkgc3Tf
+ f22Bvb4XJYUlryeYBDX+P7DkceqMr0qMDMtUpf78UGyNfWQ2w9f7a+GXlJ8zGy1ak29O613JfTj
+ DlR8A
 X-Developer-Key: i=nathan@kernel.org; a=openpgp;
  fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-On Wed, 27 May 2026 09:27:03 -0500, Andrew Jones wrote:
-> kconfig: add kconfig-sym-check static checker
+On Fri, 29 May 2026 11:53:43 -0700, xur@google.com wrote:
+> kbuild: distributed build support for Clang ThinLTO
+> 
+> From: Rong Xu <xur@google.com>
+> 
+> ChangeLog:
+> 
+> V12: Fixed an build error reported by Nathan Chancellor:
+>      Reverted to v10 shell script based approach to get saved_c_flags.
+> V11: Integrated feedback from Sashiko (Nathan Chancellor):
+>      (1) Included modkern_cflags within the saved _c_flags.
+>      (2) Replaced the shell command with $(saved_c_flags_$(<)).
+>      (3) Refined the file matching for ar_vmlinux.a.
+> V10: Fixed a minor build error in v9 and added comments.
+> V9:  Fixed a minor build error.
+> V8:  Disabled -always-rename-promoted-locals=false for the distrubute
+>      mode, based on Yonghong and Nathan's comments.
+> V7: (1) Resolved a conflict by rebasing to kbuild/kbuild-next-unstable.
+>     (2) Separated the '--thin' to 'T' change into its own patch to
+>         preserve Masahiro's original version.
+> V6: Change '--thin' back to 'T' in Makefile.vmlinux_a to fix
+>     reported the build error from old ar.
+> V5: Handle single quote escaping in echo _c_flags to fix
+>     Piotr Gorski's reported error.
+> V4: This is based on the reimplementation provided by Masahiro Yamada
+> on May 26. The difference is that this version now saves the compiler
+> flags (_c_flags) from the Front-End (FE) compilation and re-uses them
+> for the subsequent Back-End (BE) compilation.
+> 
+> [...]
 
-I took this in its current form since perfect is the enemy of good but I
-think some of Nicolas's comments are certainly relevant, so please feel
-free to set fixups on top of kbuild-next as you see fit.
+As noted elsewhere in the thread, I squashed patches 1 and 2 to avoid
+bisection issues.
 
 Applied to
 
@@ -67,8 +106,10 @@ Applied to
 
 Thanks!
 
-[1/1] kconfig: add kconfig-sym-check static checker
-      https://git.kernel.org/kbuild/c/f58316a441b46
+[1/2] kbuild: move vmlinux.a build rule to scripts/Makefile.vmlinux_a
+      https://git.kernel.org/kbuild/c/9c72d26e9fe3b
+[2/2] kbuild: distributed build support for Clang ThinLTO
+      https://git.kernel.org/kbuild/c/9f2aee8f7d184
 
 Please look out for regression or issue reports or other follow up
 comments, as they may result in the patch/series getting dropped or
