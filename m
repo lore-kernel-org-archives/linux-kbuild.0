@@ -1,88 +1,163 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D4B12741B6;
-	Sat, 13 Jun 2026 16:57:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42C22321420;
+	Sat, 13 Jun 2026 17:41:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781369864; cv=none; b=eoPO54xlcP/VPCvaV9o4iPhZ6dej2Wtnww12SbOM7NO1odnA+HWB5IuRGWKMs4Eu7JTIuNm7e8TsxPB/n4tV9NjYYRqSQDWxMqwmRxOQwHa3Uq8BU9lOtCpmwsrDNIbAFSjcwlTA9v5/Yu6IFC8h+HpUV1wyp75FiyZVFkEU8tk=
+	t=1781372499; cv=none; b=qdfElrvMZJJUq32MBZeBmoOJMo1T7e04sZf+4yMbe//38UZzDoCjcKDXZv7GHG/4eiVjX8aSIo/3rkSSoxLRit72m1IoQ3cSS64eyqaAR+tEyccg5zGeYdxCTDW/VUcFUT/kumjrh8evYl+UzqCoAKIaStmvCrTznHjrADyRf7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781369864; c=relaxed/simple;
-	bh=gBl6HYf2cYjTVKCP6gyydKpLvyLum+plGHiCXwPUrxQ=;
+	s=arc-20240116; t=1781372499; c=relaxed/simple;
+	bh=Yu34RnKrBOohm55m9lVO18WTTRs0FIgd/HBlln191Uw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZFnyTu1xkkZbxQ8bNDkYbUt4A2xXYWgHdpVdlBRbxybJxUevlQTtm9YPmdvYISq6F212Z0wWg5pKZMyACAmH4zZK36kQaG/DbptOeH7+ahfSO1Z8bVJAhOdOlgulZFQvcl4pX00ZSONr70W3PA/NuDxkEsYh9z3tuHXqdE0WJRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F244cEWm; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=C1jrd4TkmHMzXyfHu2A+rtqfRrAqwMuOVkxfeT737Khi2gA/vq2De2J/j2t2Huk8rwwuyU5uBq2erzJBnPNpT05p06SmpD6jchl6kWxtD8aaj7seVp52O5hphlQlPDZMMFK7lEvq/XJnp1AL6bn3odSdKPXVCT5iOX4Ab6Hl7aU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FkzL/nFv; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F244cEWm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FC1A1F000E9;
-	Sat, 13 Jun 2026 16:57:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FkzL/nFv"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 2ED241F000E9;
+	Sat, 13 Jun 2026 17:41:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781369862;
-	bh=35IHbTu3tEKf360Pfg5kvbRcvSef/I2tzHiMDnwImus=;
+	s=k20260515; t=1781372497;
+	bh=CrVbd8XiWduTJRK7vc9W39csYSLbgHJhf+UYLd6BDuM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=F244cEWmHnbJibbpiKRprqc6qHovylKhChnoyg4aofPNwbGTnM1haO2LY6NXOpyuN
-	 8CTBMDShd4n3g1JV9phkkK21tJ7HzEwSQ5rmm3rgH97eWphy8KSEgLdBCcs1GuzDFk
-	 Kl4dthrklx3MvAN7Zne0uBiqDoKxzcxdhh0yHFhMu1hYWifobF1Lorx8X6F7oUjhlO
-	 MhTeEYvghJOA49XDzksMbxRHdW0fFBTs1RCbrSu0CqJSp3s/AlIIP6XdTRQrpVsGK+
-	 jrphqAuz+sz8LywVc/Lv2We1GWQ+QORKn0MEsnntsVQpKyhbZhg24FrfN0EZ8UlxWY
-	 VSYFlXYe1AdTQ==
-Date: Sat, 13 Jun 2026 12:57:38 -0400
-From: Nathan Chancellor <nathan@kernel.org>
-To: Nicolas Schier <nsc@kernel.org>
-Cc: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-	Arnd Bergmann <arnd@arndb.de>,
-	"Maciej W. Rozycki" <macro@orcam.me.uk>,
-	Nick Huang <sef1548@gmail.com>, linux-kernel@vger.kernel.org,
+	b=FkzL/nFvNt1fcsrClUg1MSbg9oBfgW/svfpZ6dVZVwz1+EGeToY0wNgOdzbvlnKqB
+	 7bp/HlnAPrb+zPhZRY5LKx2Kb65TnHsSF7hc11RG020tdbPmMffIVnbhkCjXib1H5h
+	 zrSmKndqowCxYQyP+0rpuqakU0sOlkaqKUf7Q+uHOiE5BfXTDnqwc/sRBOtV5wVZ68
+	 3VG5/njFW1mE3F1i/rhydVd0WwjU85tDFbw8N1rLKmJ7KQ1L6wlTtbzNc/bB/smo2e
+	 dIEYmdbFhdUau9TGdM3zr3ig+OOYnmP7IxY0fxNtM3kidJkJZ5zRh1+31KVQQ/AFsl
+	 YjZkEHzaoPvbw==
+Date: Sat, 13 Jun 2026 19:39:04 +0200
+From: Nicolas Schier <nsc@kernel.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Saravana Kannan <saravanak@kernel.org>,
+	Ping-Ke Shih <pkshih@realtek.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	David Sterba <dsterba@suse.com>,
+	Bryan O'Donoghue <bryan.odonoghue@linaro.org>,
+	Hariharan Basuthkar <quic_hbasuthk@quicinc.com>,
+	Jeff Hugo <jeff.hugo@oss.qualcomm.com>,
+	Filipe Manana <fdmanana@suse.com>,
+	Bitterblue Smith <rtl8821cerfe2@gmail.com>,
+	Wei Yang <richard.weiyang@gmail.com>, Takashi Iwai <tiwai@suse.de>,
+	Aurabindo Pillai <aurabindo.pillai@amd.com>,
+	Chih-Kang Chang <gary.chang@realtek.com>,
+	David Lechner <dlechner@baylibre.com>,
+	Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>,
+	Tamir Duberstein <tamird@kernel.org>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+	Pagadala Yesu Anjaneyulu <pagadala.yesu.anjaneyulu@intel.com>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	Jorge Ramirez-Ortiz <jorge.ramirez@oss.qualcomm.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Aleksander Jan Bajkowski <olek2@wp.pl>, Boris Burkov <boris@bur.io>,
+	Blake Jones <blakejones@google.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-kbuild@vger.kernel.org
-Subject: Re: [PATCH] scripts: headers_install.sh: Normalize __ASSEMBLY__ to
- __ASSEMBLER__
-Message-ID: <20260613165738.GA3152432@ax162>
-References: <20260309-uapi-assembly-v1-1-a7ebfbf14309@weissschuh.net>
- <20260313235618.GA4171564@ax162>
- <3d6608fe-be15-497a-85a3-e6af2dbded0a@t-8ch.de>
- <20260324183501.GA3704429@ax162>
- <a31f2655-2ce8-4029-a63d-321c849730f7@t-8ch.de>
- <ai0tYULNorM5UDqd@levanger>
+Subject: Re: [PATCH v5 2/4] scripts/jobserver-exec: propagate child exit
+ status
+Message-ID: <ai2VuFWUxVRGjGKR@levanger>
+Mail-Followup-To: Daniel Golle <daniel@makrotopia.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Saravana Kannan <saravanak@kernel.org>,
+	Ping-Ke Shih <pkshih@realtek.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	David Sterba <dsterba@suse.com>,
+	Bryan O'Donoghue <bryan.odonoghue@linaro.org>,
+	Hariharan Basuthkar <quic_hbasuthk@quicinc.com>,
+	Jeff Hugo <jeff.hugo@oss.qualcomm.com>,
+	Filipe Manana <fdmanana@suse.com>,
+	Bitterblue Smith <rtl8821cerfe2@gmail.com>,
+	Wei Yang <richard.weiyang@gmail.com>, Takashi Iwai <tiwai@suse.de>,
+	Aurabindo Pillai <aurabindo.pillai@amd.com>,
+	Chih-Kang Chang <gary.chang@realtek.com>,
+	David Lechner <dlechner@baylibre.com>,
+	Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>,
+	Tamir Duberstein <tamird@kernel.org>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+	Pagadala Yesu Anjaneyulu <pagadala.yesu.anjaneyulu@intel.com>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	Jorge Ramirez-Ortiz <jorge.ramirez@oss.qualcomm.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Aleksander Jan Bajkowski <olek2@wp.pl>, Boris Burkov <boris@bur.io>,
+	Blake Jones <blakejones@google.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kbuild@vger.kernel.org
+References: <cover.1779908995.git.daniel@makrotopia.org>
+ <660368ca16e2d3845577a9fd157d2f37f0e09e85.1779908995.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ai0tYULNorM5UDqd@levanger>
+In-Reply-To: <660368ca16e2d3845577a9fd157d2f37f0e09e85.1779908995.git.daniel@makrotopia.org>
 
-On Sat, Jun 13, 2026 at 12:13:53PM +0200, Nicolas Schier wrote:
-> On Tue, Mar 24, 2026 at 08:58:08PM +0100, Thomas Weißschuh wrote:
-> > On 2026-03-24 11:35:01-0700, Nathan Chancellor wrote:
-> > > On Tue, Mar 24, 2026 at 06:05:34PM +0100, Thomas Weißschuh wrote:
-> > > > On 2026-03-13 16:56:18-0700, Nathan Chancellor wrote:
-> > > > > It sounds like the "< GCC 3.0" part of that might not be true based on
-> > > > > Maciej's research?
-> > > > > 
-> > > > >   https://lore.kernel.org/alpine.DEB.2.21.2603101412520.63708@angie.orcam.me.uk/
-> > > > 
-> > > > Yes, indeed. In my opinion the consistency aspect is still sufficient
-> > > > to have this change. What do you think?
-> > > 
-> > > Yes, I think so. Will you keep it as going from __ASSEMBLY__ to
-> > > __ASSEMBLER__? It probably makes more sense that way given there should
-> > > be no regressions on the compiler side and that is the intended end
-> > > result?
-> > 
-> > I would have stuck to the old name '__ASSEMBLY__', just for robustness
-> > and because we are late in the cycle.
-> > Then we can switch it early in the next cycle.
+On Wed, May 27, 2026 at 08:32:18PM +0100, Daniel Golle wrote:
+> main() called JobserverExec().run() and discarded its return value,
+> then the script exited with the implicit status 0. As a result, any
+> Makefile that wired a build step through jobserver-exec saw the step
+> silently succeed even when the wrapped command had failed.
 > 
-> What's the state with this?  Shall this show up in linux-next early this
-> cycle?
+> Two in-tree callers were affected:
+> 
+>   Documentation/devicetree/bindings/Makefile
+>     cmd_chk_style runs a python checker via jobserver-exec and uses
+>     "&& touch $@ || true" so failures leave the stamp file untouched
+>     and the next make rerun reports them again. The swallowed exit
+>     code made the stamp file get created even on failure, caching the
+>     failed run and hiding the reported issues until the inputs change.
+> 
+>   scripts/Makefile.vmlinux_o
+>     cmd_gen_initcalls_lds runs scripts/generate_initcall_order.pl via
+>     jobserver-exec; a perl failure was masked by the wrapper.
+> 
+> Return the subprocess exit code from main() and pass it to sys.exit()
+> so the wrapped command's status reaches make.
+> 
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
+> v5: new patch; prereq for chk_style in 3/4 so style failures
+>     leave the stamp file untouched instead of being cached
+> 
+>  scripts/jobserver-exec | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/scripts/jobserver-exec b/scripts/jobserver-exec
+> index 758e947a6fb9..21b319e6c9a5 100755
+> --- a/scripts/jobserver-exec
+> +++ b/scripts/jobserver-exec
+> @@ -28,8 +28,8 @@ def main():
+>          sys.exit("usage: " + name +" command [args ...]\n" + __doc__)
+>  
+>      with JobserverExec() as jobserver:
+> -        jobserver.run(sys.argv[1:])
+> +        return jobserver.run(sys.argv[1:])
+>  
+>  
+>  if __name__ == "__main__":
+> -    main()
+> +    sys.exit(main())
+> -- 
+> 2.54.0
 
-This fell off my radar. I think the commit message needs some small
-updates based on my review upthread but once resent, we should be able
-to take it when 7.2-rc1 is out?
+Good catch, thanks!
+
+For kbuild:
+Reviewed-by: Nicolas Schier <nsc@kernel.org>
 
 -- 
-Cheers,
-Nathan
+Nicolas
