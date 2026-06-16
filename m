@@ -1,180 +1,191 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE2D36E47E;
-	Tue, 16 Jun 2026 18:14:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781633694; cv=none; b=MmjZDuZkBIReJSwS98uN0oKdm7jhVSg17eTG8IkhQXWzQtkLMODAPlBw+p6RYoQwMq+iS9gEv7ij//0mO2EK2544hYs3zIfZewR0AP5OpxBA6iX3S0pq9ZvOs+scULVQOI6UsoZipGEOGV76dCRlkarG4UoJ9A0eczXiLiIWYMI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781633694; c=relaxed/simple;
-	bh=MOjF37jcI96HcQIucbAVcnm8CsGXKvqtc0awIowUu6g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Y2HcbZ86CG3KO35eAGi/Lo8smG+nFRh3GSdwtuXizuXW+XJUtg2wY55HYQvbz93X6SM17zfxw+pJM6B5fMfNqCqIyH2VS/Mv6YM68ld4MbQjNvwANzh5OH3BKuGf9CEw08SvsqzoAGd3eZHSRw6+ilBJATG4MKiHYOMQ8lZpxJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Nqf6pDMO; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F7EB3D8902
+	for <linux-kbuild@vger.kernel.org>; Tue, 16 Jun 2026 18:33:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781634832; cv=pass; b=ddi0384vHeg5wlBR7M4+OGxqyXUjF7Jb7V2r3hzztpZgClwk5EL38JvSTQQOzAxZpjysKYfMglSIqB5m2Iht+Ev+Y5IRUka71weWAVeyTM8Vy/BPbME//QFgNvS9SykU0tlbcFolsr3HoL15cCei+mp2QK6XBvHJga5hMtKImF8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781634832; c=relaxed/simple;
+	bh=sOhlqxN1qxKBwhvm+ri4qwEDLQ9bJn8qASOPOcgsuPM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=C9ozDIVT1FxB+jc29PJ1gicAwJ6/7uj/kMBE7dvCXrlGSlGUzYEg/QO7G2/NPbgr5d4eNR40EjqAzeu3EeezJA1qhto9DUomnDzymABY4rtUkdj8PeYF3pIvyaAijFhJd51Ri82bwG4E8VI2qDLIFocUUqvV6sts1+18uVZTK4c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MaSJ4b+G; arc=pass smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Nqf6pDMO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E94041F000E9;
-	Tue, 16 Jun 2026 18:14:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1781633692;
-	bh=BsoBU2/rCAa9m+CLYf5iXc5GpoYNsiCHWhQPx+rLAhs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Nqf6pDMOOKgguz6QgvaNa7ow/oYjSAbP7iBGSSt6EBIAeDVLhgE+CBqS9g5PidLIu
-	 jst4LmH8ak1P8RoPGeND8rfq3BQKunaQyLz54uYYvKlw7lQIL6+5doTMZKf1aAUj53
-	 9ylYgYMZ6iGCDkyvhV4anApnl314+n1rP5DPnGcY=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	Will Deacon <will@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	linux-kbuild@vger.kernel.org,
-	Arnd Bergmann <arnd@arndb.de>,
-	Joerg Roedel <joerg.roedel@amd.com>
-Subject: [PATCH 5.15 094/411] iommu, debugobjects: avoid gcc-16.1 section mismatch warnings
-Date: Tue, 16 Jun 2026 20:25:32 +0530
-Message-ID: <20260616145105.217431532@linuxfoundation.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260616145100.376842714@linuxfoundation.org>
-References: <20260616145100.376842714@linuxfoundation.org>
-User-Agent: quilt/0.69
-X-stable: review
-X-Patchwork-Hint: ignore
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MaSJ4b+G"
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-36b95eb4bb4so3103692a91.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 16 Jun 2026 11:33:51 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781634830; cv=none;
+        d=google.com; s=arc-20240605;
+        b=copsDa2BrbzCKqjYS1XqqU1gf40t85nDIfyypYj/sG3tsKbA6a7kvDASyGiqvx+Gz2
+         0MdpqFLKGRmbZuyTIcsdcoC8E2dQ3GxfnuLmw3ZgmnByG2ioYYZTxEjsJiKf4APgamj1
+         D1hvs131V3e/jygqxqCEI3/EzyqKYKrETvnVS9yc0XzBleW+RVxZZKvfEySs3Atsq2pS
+         nLVEHDlCruZm6210TZwJFRxM+I3c+Gm2BK9rPw33QHEBxMw0OibGd62PYYBYXGzdtGeo
+         L29yzZ8Q0O8Lr5o4vGXBly8HFEoLj+Jp0P7J6jOfWAp+WMdVzjIRgwot7rNa1C4p4fRX
+         oEYg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=z2GD8QHUKY/U9GJPMUu0PNTy3ueaGFFkhZ/ZmWvkLEU=;
+        fh=y5WTjYyYJPOdSwJazevqfPauL2wxy560kN7WmdLOw/8=;
+        b=f7PH5p4g9cbSXBbRjd0mcdB65jch2J0nxCKxKU9EnO6RW8bu9fmaAI5gwVaWmd2zS/
+         uJX8wSYbzlT+xYvuQDVIDZubkgl1jZ3i6GfLebVCDAUD3/pKGU0ytAv325AoIuW4zOj4
+         XI55K3AdPBt37yGupg8Zq23wmYo0LYOKXYu55fMxu2y2/Nzkxp06VQxo4J6WaWQt5o8Z
+         TO9ZTTAoysTNudxsXMX2S0wbal4zUuXiir+vrcdyx3H8iyFYveOQxVJBZLa49bXyfFIn
+         YB2GtY0DyHhusi2f1q4qTIIGSSoUdJtcXE+Qy5ePeE3QSTVZFkRs/mR3+LulIw0zsE9B
+         CGCg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781634830; x=1782239630; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=z2GD8QHUKY/U9GJPMUu0PNTy3ueaGFFkhZ/ZmWvkLEU=;
+        b=MaSJ4b+GpHCOQGqvy7YaWVhtMTHbCT/bEDKnu0pfaJqD4lxKIKA+p7nAcUlHG6bK+T
+         J5V6lGhyeA32y/8MzT5MPoz3yd3vKIUimYV4jz9ajYG6vTb4s1dEdCuiXdH1TOXtp0QQ
+         ubiHx+WWbWxfIsm9wa5mh0rFsQlRDadW+DsNrHKMTfJ/k3aZjYQvAyjw86ccF/bj3qCf
+         mLVSB4xNffxFPYxl1B4pFoS+1ZVDhxN5bE3P016rTVrsXoIi7bx9YO++8dU8ODcWlPtD
+         VqPwKsm0nA73jFGaAl14Y+96vYJMb4fpW/fuFMJxrIwXPEWZmAAQ3P3LfpwE6cAwErB7
+         tN5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781634830; x=1782239630;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=z2GD8QHUKY/U9GJPMUu0PNTy3ueaGFFkhZ/ZmWvkLEU=;
+        b=DqjZX0DZsp8OMM87+iL+oXBLuuvbh2QYA4Du2g5gY8m3JRHJequC54y/Y1QVlUkAoa
+         OQZJCD6v7Dfa1lFTEEuvcHN2qMZaucjt7G8F0JFvaAflvK0Nbp/fzr88ISMtAtr1tSHN
+         +d5bPy1NU1GFM8f8otBgTFNxxpLD7Fm42z3jIR1pNw1EJerCLxwbRJ8Q97fIa4ljch7S
+         1l/SKyZLY8bXXiMxuzGzOr253qk9mlBUGLDwMFJA1pzl2F7YlaptRH1NNPmlCS7W/HKs
+         hPbhfA+/JPS4JU58RSUJxITWdJUs2kWFbiB2cd7Qwc1tqxCCDSINFkL5aoQe0fVGc/6V
+         7ejg==
+X-Forwarded-Encrypted: i=1; AFNElJ8bukFTojtQKkI5Xjxqu/9X4QyByTGdsZ+9P+Z7D4e5i5z7YLOlBpd42yTiIg4sJt7m5ekvqIBej/Y8pT0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyz45HtfbTyidHZ60oe7PlaBJynIXNj/eKyOKLwmgAKQb7Qa8T1
+	U8i5shQgXiNXmQwxPE/dwZrEjz5D8PruJi6Qq6PRqBAuRdhXderbAMga2Kezn1+3runu08Qq/ch
+	QopnG2ruLwjGIbtzeFsuVz0J2i6SuhR0=
+X-Gm-Gg: Acq92OF1UYh2FEyc26JoR9NTRdSgVnGiXB7zDFeSAoX1161ByyuzT8YwhicUApPtgpW
+	QtH9c75Rdaw6GY0iRtgVu3n1V3QEYZkXi1Lt79HnoohQHDwSO+f7Ujl8e5/HQnJQSvGCckfAQd/
+	DuQqEC9SKPe8Kdv0hAAwEgIbkzXXbuofmC3R4+heA4s4Kpzmwk8r3KDtaNPO9c++8iXx1d3OcPd
+	QPo8t66m1mNgk8EgRm1MELURLOYp0OqYcwqyqh3+eRhOqSBqs1ozQPSQIHhANTeSjHMZdpSk8zz
+	Mf32TpiEPOOjpmPhtCoAf8tMsz3ZcFErqbtSzSedM/ZCsf73BFbt5v38Qu4875YrCPB/8vYS8un
+	s
+X-Received: by 2002:a17:90b:3849:b0:36b:bbee:fb28 with SMTP id
+ 98e67ed59e1d1-37c92eaa16fmr646672a91.2.1781634830501; Tue, 16 Jun 2026
+ 11:33:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260601221805.821394-1-ihor.solodrai@linux.dev>
+ <20260601221805.821394-5-ihor.solodrai@linux.dev> <DJAA8M3U5PJ7.W84BYRNJA7UY@etsalapatis.com>
+In-Reply-To: <DJAA8M3U5PJ7.W84BYRNJA7UY@etsalapatis.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Tue, 16 Jun 2026 11:33:39 -0700
+X-Gm-Features: AVVi8CccuGGJNiwf-tGInm6V6RfMkfsCHF2OFCLNtmu8oCH_6xSRE0ygqN0a8qA
+Message-ID: <CAADnVQLLcDPnt5q3MdYjHC1zCJuBPrbRYgoY__5Gk=GKoBvWAg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v1 04/14] selftests/bpf: Add kfunc set test to resolve_btfids
+To: Emil Tsalapatis <emil@etsalapatis.com>
+Cc: Ihor Solodrai <ihor.solodrai@linux.dev>, Alexei Starovoitov <ast@kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Kumar Kartikeya Dwivedi <memxor@gmail.com>, 
+	Alan Maguire <alan.maguire@oracle.com>, Jiri Olsa <jolsa@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-5.15-stable review patch.  If anyone has any objections, please let me know.
+On Tue, Jun 16, 2026 at 12:07=E2=80=AFAM Emil Tsalapatis <emil@etsalapatis.=
+com> wrote:
+>
+> On Mon Jun 1, 2026 at 6:17 PM EDT, Ihor Solodrai wrote:
+> > Extend the resolve_btfids selftest to cover kfunc sets defined with
+> > BTF_KFUNCS_START/BTF_KFUNCS_END.
+> >
+> > The test verifies that resolve_btfids correctly processes BTF_ID_FLAGS,
+> > resolves function IDs, and checks the kfunc set is sorted.
+> >
+> > Signed-off-by: Ihor Solodrai <ihor.solodrai@linux.dev>
+>
+> Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
+>
+> One nit below.
+>
+> > ---
+> >  .../selftests/bpf/prog_tests/resolve_btfids.c | 56 +++++++++++++++++++
+> >  tools/testing/selftests/bpf/progs/btf_data.c  | 10 ++++
+> >  2 files changed, 66 insertions(+)
+> >
+> > diff --git a/tools/testing/selftests/bpf/prog_tests/resolve_btfids.c b/=
+tools/testing/selftests/bpf/prog_tests/resolve_btfids.c
+> > index d0e51979d455..f6fd79b9dd23 100644
+> > --- a/tools/testing/selftests/bpf/prog_tests/resolve_btfids.c
+> > +++ b/tools/testing/selftests/bpf/prog_tests/resolve_btfids.c
+> > @@ -10,6 +10,10 @@
+> >  #include <linux/btf_ids.h>
+> >  #include "test_progs.h"
+> >
+> > +#ifndef KF_FASTCALL
+> > +#define KF_FASTCALL (1 << 12)
+> > +#endif
+> > +
+> >  struct symbol {
+> >       const char      *name;
+> >       int              type;
+> > @@ -26,6 +30,17 @@ struct symbol test_symbols[] =3D {
+> >       { "func",    BTF_KIND_FUNC,    -1 },
+> >  };
+> >
+> > +struct kfunc_symbol {
+> > +     const char      *name;
+> > +     s32              id;
+> > +     u32              flags;
+> > +};
+> > +
+> > +static struct kfunc_symbol kfunc_symbols[] =3D {
+> > +     { "kfunc_a", -1, 0 },
+> > +     { "kfunc_b", -1, KF_FASTCALL },
+> > +};
+> > +
+> >  /* Align the .BTF_ids section to 4 bytes */
+> >  asm (
+> >  ".pushsection " BTF_IDS_SECTION " ,\"a\"; \n"
+> > @@ -77,7 +92,13 @@ BTF_ID(union,   U)
+> >  BTF_ID(func,    func)
+> >  BTF_SET_END(test_set)
+> >
+> > +BTF_KFUNCS_START(test_kfunc_set)
+> > +BTF_ID_FLAGS(func, kfunc_a)
+> > +BTF_ID_FLAGS(func, kfunc_b, KF_FASTCALL)
+> > +BTF_KFUNCS_END(test_kfunc_set)
+> > +
+> >  #pragma GCC visibility pop
+> > +
+> >  static int
+> >  __resolve_symbol(struct btf *btf, int type_id)
+> >  {
+> > @@ -108,6 +129,18 @@ __resolve_symbol(struct btf *btf, int type_id)
+> >                       test_symbols[i].id =3D type_id;
+> >       }
+> >
+> > +     if (BTF_INFO_KIND(type->info) =3D=3D BTF_KIND_FUNC) {
+> > +             str =3D btf__name_by_offset(btf, type->name_off);
+> > +             if (str) {
+>
+> This can be rewritten to collapse the nesting:
+> if (BTF_INFO_KIND(type->info) !=3D BTF_KIND_FUNC)
+>         return 0;
+>
+> str =3D btf__name_by_offset(btf, type->name_off);
+> if (!str)
+>         return 0;
+>
+> <the rest>
 
-------------------
+Thank you for this comment :)
 
-From: Arnd Bergmann <arnd@arndb.de>
-
-commit 4c9ad387aa2d6785299722e54224d34764edaeb3 upstream.
-
-gcc-16 has gained some more advanced inter-procedual optimization
-techniques that enable it to inline the dummy_tlb_add_page() and
-dummy_tlb_flush() function pointers into a specialized version of
-__arm_v7s_unmap:
-
-WARNING: modpost: vmlinux: section mismatch in reference: __arm_v7s_unmap+0x2cc (section: .text) -> dummy_tlb_add_page (section: .init.text)
-ERROR: modpost: Section mismatches detected.
-
->From what I can tell, the transformation is correct, as this is only
-called when __arm_v7s_unmap() is called from arm_v7s_do_selftests(),
-which is also __init. Since __arm_v7s_unmap() however is not __init,
-gcc cannot inline the inner function calls directly.
-
-In debug_objects_selftest(), the same thing happens. Both the
-caller and the leaf function are __init, but the IPA pulls
-it into a non-init one:
-
-WARNING: modpost: vmlinux: section mismatch in reference: lookup_object_or_alloc+0x7c (section: .text.lookup_object_or_alloc) -> is_static_object (section: .init.text)
-
-Marking the affected functions as not "__init" would reliably avoid this
-issue but is not a good solution because it removes an otherwise correct
-annotation. I tried marking the functions as 'noinline', but that ended
-up not covering all the affected configurations.
-
-With some more experimenting, I found that marking these functions as
-__attribute__((noipa)) is both logical and reliable.
-
-In order to keep the syntax readable, add a custom macro for this in
-include/linux/compiler_attributes.h next to other related macros and
-use it to annotate both files.
-
-Link: https://lore.kernel.org/all/abRB6g-48ZX6Yl2r@willie-the-truck/
-Cc: Will Deacon <will@kernel.org>
-Cc: Thomas Gleixner <tglx@kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: Miguel Ojeda <ojeda@kernel.org>
-Cc: linux-kbuild@vger.kernel.org
-Cc: stable@vger.kernel.org
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-Acked-by: Will Deacon <will@kernel.org>
-Acked-by: Thomas Gleixner <tglx@kernel.org>
-Acked-by: Miguel Ojeda <ojeda@kernel.org>
-Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- drivers/iommu/io-pgtable-arm-v7s.c  |   18 ++++++++++++------
- include/linux/compiler_attributes.h |   11 +++++++++++
- lib/debugobjects.c                  |    2 +-
- 3 files changed, 24 insertions(+), 7 deletions(-)
-
---- a/drivers/iommu/io-pgtable-arm-v7s.c
-+++ b/drivers/iommu/io-pgtable-arm-v7s.c
-@@ -910,21 +910,27 @@ struct io_pgtable_init_fns io_pgtable_ar
- 
- static struct io_pgtable_cfg *cfg_cookie __initdata;
- 
--static void __init dummy_tlb_flush_all(void *cookie)
-+/*
-+ * __noipa prevents gcc from turning indirect iommu_flush_ops calls
-+ * into direct calls from a specialized __arm_v7s_unmap() that triggers
-+ * a build time section mismatch assertion.
-+ */
-+static __noipa void __init dummy_tlb_flush_all(void *cookie)
- {
- 	WARN_ON(cookie != cfg_cookie);
- }
- 
--static void __init dummy_tlb_flush(unsigned long iova, size_t size,
--				   size_t granule, void *cookie)
-+static __noipa void __init dummy_tlb_flush(unsigned long iova, size_t size,
-+					   size_t granule, void *cookie)
- {
- 	WARN_ON(cookie != cfg_cookie);
- 	WARN_ON(!(size & cfg_cookie->pgsize_bitmap));
- }
- 
--static void __init dummy_tlb_add_page(struct iommu_iotlb_gather *gather,
--				      unsigned long iova, size_t granule,
--				      void *cookie)
-+static __noipa void __init dummy_tlb_add_page(struct iommu_iotlb_gather *gather,
-+					      unsigned long iova,
-+					      size_t granule,
-+					      void *cookie)
- {
- 	dummy_tlb_flush(iova, granule, granule, cookie);
- }
---- a/include/linux/compiler_attributes.h
-+++ b/include/linux/compiler_attributes.h
-@@ -328,6 +328,17 @@
- #endif
- 
- /*
-+ * Optional: not supported by clang
-+ *
-+ *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Attributes.html#index-noipa
-+ */
-+#if __has_attribute(noipa)
-+# define __noipa __attribute__((noipa))
-+#else
-+# define __noipa
-+#endif
-+
-+/*
-  *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-weak-function-attribute
-  *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-weak-variable-attribute
-  */
---- a/lib/debugobjects.c
-+++ b/lib/debugobjects.c
-@@ -1059,7 +1059,7 @@ struct self_test {
- 
- static __initconst const struct debug_obj_descr descr_type_test;
- 
--static bool __init is_static_object(void *addr)
-+static __noipa bool __init is_static_object(void *addr)
- {
- 	struct self_test *obj = addr;
- 
-
-
+Together we can fight claude habits :)
