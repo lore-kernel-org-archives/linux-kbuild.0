@@ -1,220 +1,180 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FAD23D7D9F
-	for <linux-kbuild@vger.kernel.org>; Tue, 16 Jun 2026 18:09:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE2D36E47E;
+	Tue, 16 Jun 2026 18:14:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781633366; cv=none; b=jicCGBthkn9gD1V283XKGezRRVM6rhqhKARVLeSotiSHK5gRNJy3iaH23CBGsF9dMM1xz89mJKkvJ6aw+GD/7lDq5sbaxrhJJCxuM1YLCYdSJguk0awTKKe4JRF29sqk6RaorsRCCiqTf3xukTFpdLBi5DGvcUKSqycifj6y260=
+	t=1781633694; cv=none; b=MmjZDuZkBIReJSwS98uN0oKdm7jhVSg17eTG8IkhQXWzQtkLMODAPlBw+p6RYoQwMq+iS9gEv7ij//0mO2EK2544hYs3zIfZewR0AP5OpxBA6iX3S0pq9ZvOs+scULVQOI6UsoZipGEOGV76dCRlkarG4UoJ9A0eczXiLiIWYMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781633366; c=relaxed/simple;
-	bh=QotbZv7vjLrREeiiHMvKmU0dv3R+anoFnJbihk/prqo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=MBgPe++8fsLGbjF42kbt9w/HCgkExOMdiKOHlZRl2jMXt2AMvKIq9v1iyzbg++rY/f616SYbh7tVQlhB8VuT9EtmGRPrrJ3mtQpGBrRtJfgqWn79DBYIPNkhTTGcCiVBuDFskIkgFZI4sYc+H5hTjndhhUabKk0Q/5ZH/Dnoo3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=esYTsWvE; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=SEzQHRZF; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1781633694; c=relaxed/simple;
+	bh=MOjF37jcI96HcQIucbAVcnm8CsGXKvqtc0awIowUu6g=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Y2HcbZ86CG3KO35eAGi/Lo8smG+nFRh3GSdwtuXizuXW+XJUtg2wY55HYQvbz93X6SM17zfxw+pJM6B5fMfNqCqIyH2VS/Mv6YM68ld4MbQjNvwANzh5OH3BKuGf9CEw08SvsqzoAGd3eZHSRw6+ilBJATG4MKiHYOMQ8lZpxJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Nqf6pDMO; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="esYTsWvE";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="SEzQHRZF"
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65GH94uf3747401
-	for <linux-kbuild@vger.kernel.org>; Tue, 16 Jun 2026 18:09:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	0jagAJ5kWTSod7R143j9Inn4eTzLl+m9fNAglUfCFpo=; b=esYTsWvEh4aOuFSh
-	7viw280LQ4FQ+iMiZ3Y15ia3pIAC4sBuchx3OffabSvixwod+V8pzoS6vytuIl2w
-	qncsz8k5xextFHajpYa+ZeoHtcso8KJGhMWOeheYa56XsMRDGZCHVog+5TigKwNZ
-	PbpcNaklhblOajAKAcRKxffNAKMJn8H1vUd6NVkDQgjv7qvBfSn1vpdtAmJ3/biS
-	NUf/eUz4L0/IvgURbN0AjagvbEgNYTU842Q/Tk2IKqrOf/MT9YiC1zwqEZd+UpIa
-	PMsrJNrBSkKkWisiu/UJrhu5lQVaVFQzb/TxJXCfbMUKRDeYWHS4rysm8+Znb8fl
-	1nU1Ow==
-Received: from mail-dl1-f69.google.com (mail-dl1-f69.google.com [74.125.82.69])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4eu0a7uepd-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-kbuild@vger.kernel.org>; Tue, 16 Jun 2026 18:09:24 +0000 (GMT)
-Received: by mail-dl1-f69.google.com with SMTP id a92af1059eb24-138acbc0e69so4840595c88.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 16 Jun 2026 11:09:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1781633364; x=1782238164; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0jagAJ5kWTSod7R143j9Inn4eTzLl+m9fNAglUfCFpo=;
-        b=SEzQHRZFV4BJSqX35BHEzmUKN8V8wqTvXFbuAeORQuybVfoORg1RwVJv262ODETifc
-         ZUCWlkmHA8GATM/ydvYugQYxZFj/h0SXD9brfQ6v8/5vYm4DxnWbcgyb4RvhBtWW4J8a
-         EZK7wDKM5SdY4ShnB1vBUZT2wzyMIqWaQypc7RjdWVN8Z5jZCl6AwjPzdcz7/A30QB2i
-         kjXX7c2uILkMTaI+9QioHUCa5JF7olKvCQ2e4GuF+pWtGAQlLcHALRTqhdfL+LeeYZ74
-         +xbBkgozLYZinFB/bI4s3LjUXOgV5Cww3TA+/soNiqu4hjX0zh0GuDyjSj5OhR7bl78w
-         1USQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781633364; x=1782238164;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=0jagAJ5kWTSod7R143j9Inn4eTzLl+m9fNAglUfCFpo=;
-        b=dfdYCDYbo5vNUx9H+xXiwiyUsXNTaVJT0x+m9CNd9yHn0dJhuAtUwk3vkcFBMbGhAF
-         KEQzmlHOWlWJvPKll9TGYVrCqnFuk987mIL+PIbiTIQwwvsZ+rmAzbaRzzXSzk1L9in5
-         VzmCmeaUaVG9sp6be93FSfThvgZ2a1UWkI0ubkT9m+jJ7jNAAx/gxCNLHrNbhMS8ukjH
-         wvp880pChjnR8QhpxszeLUqZ3rWgUsvPrJwIDXduFkmO/05rlfMObG/8kZJ1RkkbAj1u
-         bJR5VwtEIzDKCjd+WdWEinbfxoTAYKVf2nq2Y/Vl1uP8TGtacH3w3opjOdvBYoBc+QBY
-         dhSA==
-X-Forwarded-Encrypted: i=1; AFNElJ+BQdGY0WA58BFJ1zvbK1351vxRQC17zB4oOCFGjmTRPLT96GoESnDOp/6TsPZ4+WFt9+iGIBP4v2UWZ90=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQIarpYRYAi+JyvOazf0obaNCpb9kKamzc3fKx/N644GsZ7rf5
-	MdlVHNy4gCKthOGRO1YFdAuLIJggf3Gq9weYMA0UErBsIWX7+VKa7V8iT0cn1Dw8tB2G17ztkl3
-	born26ygMTOJb7RY5yfd3A3rS3S6S6a/5gZjmC2qN906A7zn3plrjovCUOoiuV8wQ764=
-X-Gm-Gg: Acq92OEBSJFRRobDWMUuOLEmCPmbQFRa18kn52b6TVoyOPbwCidYU9VrnDe5WImTvMl
-	85UZk8fZktfclybCERz0FC1co5Iz85/pnfUsX/T2KzsBLtt/M4KiVugYWrClGJP/kwTjkEFFMb3
-	66nISN/87CxJSfa0R1MoGmUigyQ0aeQHHLhBi/tdteNhTsZKZ2Ud+dgeDNfllmC87Re/YPUerCK
-	gdq1BJTexpMF5Hun3mE+u709YUd59Q93/E56S8vmaLtahnxdjnj9ArgjY26llacpPA/PntN6Pdz
-	XfnTkjVjKeyxrMYwOEn6ClYKATdNBHzgLQXL5QsmUoPevlupb4RX+JU/GGgTgyvIbHsRHcTo79C
-	3Ndfk6McL4whc1Vfevz4KBO7ZJlXvXO2La9GaOo3jHhl/CH+bUJCCEN3bJMujfDo=
-X-Received: by 2002:a05:7022:112:b0:138:4f8f:e2f3 with SMTP id a92af1059eb24-1398f6df39bmr14530c88.32.1781633364095;
-        Tue, 16 Jun 2026 11:09:24 -0700 (PDT)
-X-Received: by 2002:a05:7022:112:b0:138:4f8f:e2f3 with SMTP id a92af1059eb24-1398f6df39bmr14514c88.32.1781633363605;
-        Tue, 16 Jun 2026 11:09:23 -0700 (PDT)
-Received: from [169.254.0.13] (Global_NAT1.qualcomm.com. [129.46.96.20])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1384b916b2bsm13747124c88.6.2026.06.16.11.09.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jun 2026 11:09:23 -0700 (PDT)
-From: Bjorn Andersson <bjorn.andersson@oss.qualcomm.com>
-Date: Tue, 16 Jun 2026 18:09:16 +0000
-Subject: [PATCH 2/2] firmware: arm_scmi: request modules for discovered
- protocols
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Nqf6pDMO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E94041F000E9;
+	Tue, 16 Jun 2026 18:14:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
+	s=korg; t=1781633692;
+	bh=BsoBU2/rCAa9m+CLYf5iXc5GpoYNsiCHWhQPx+rLAhs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=Nqf6pDMOOKgguz6QgvaNa7ow/oYjSAbP7iBGSSt6EBIAeDVLhgE+CBqS9g5PidLIu
+	 jst4LmH8ak1P8RoPGeND8rfq3BQKunaQyLz54uYYvKlw7lQIL6+5doTMZKf1aAUj53
+	 9ylYgYMZ6iGCDkyvhV4anApnl314+n1rP5DPnGcY=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	Will Deacon <will@kernel.org>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	linux-kbuild@vger.kernel.org,
+	Arnd Bergmann <arnd@arndb.de>,
+	Joerg Roedel <joerg.roedel@amd.com>
+Subject: [PATCH 5.15 094/411] iommu, debugobjects: avoid gcc-16.1 section mismatch warnings
+Date: Tue, 16 Jun 2026 20:25:32 +0530
+Message-ID: <20260616145105.217431532@linuxfoundation.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260616145100.376842714@linuxfoundation.org>
+References: <20260616145100.376842714@linuxfoundation.org>
+User-Agent: quilt/0.69
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260616-scmi-modalias-v1-2-662b8dd52ab2@oss.qualcomm.com>
-References: <20260616-scmi-modalias-v1-0-662b8dd52ab2@oss.qualcomm.com>
-In-Reply-To: <20260616-scmi-modalias-v1-0-662b8dd52ab2@oss.qualcomm.com>
-To: Sudeep Holla <sudeep.holla@kernel.org>,
-        Cristian Marussi <cristian.marussi@arm.com>,
-        Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
-Cc: arm-scmi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        Hans de Goede <johannes.goede@oss.qualcomm.com>,
-        Bjorn Andersson <bjorn.andersson@oss.qualcomm.com>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1781633360; l=3049;
- i=bjorn.andersson@oss.qualcomm.com; s=20230915; h=from:subject:message-id;
- bh=QotbZv7vjLrREeiiHMvKmU0dv3R+anoFnJbihk/prqo=;
- b=mB3teymLVnjogVQ6ExoR0B8j71yObnhG9+mpy3G/YKYbRRmaxd/rbtwdNPct9ZL7MkcP9BRiV
- D/b62Do9yGlCbNRbysR8nEk0uZCXaj60e9kojVb6CI+ua3aIcERljQj
-X-Developer-Key: i=bjorn.andersson@oss.qualcomm.com; a=ed25519;
- pk=VkhObtljigy9k0ZUIE1Mvr0Y+E1dgBEH9WoLQnUtbIM=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjE2MDE4NiBTYWx0ZWRfX9xiJzGQNDYpd
- 5D56wsGJi7HSKS30DOIdIKRuBDHxyXowFFXUrPH19hlqVf55PxtOMoUshZ3q0IWwruAyalOfWmL
- QqoOPx2nKL1XRB/ip/l260G9zVZKS1MczNnvNF0wDwdBUivMzKxvWgA2g8jcsHntF7wLzkydpxT
- o6gyN2oeDQ4quo4mBDxM6dcv6UQSyTUJMLBq0Ze1bdVR/YJcQedg1pR2IO3vwGl/mWOSERzAviH
- O7pPNNKJiIqe41Mq5d4f2GmrEYRwwYZlOqh+1SDy901paCNamBArS7TO8lc2/P2HgBj83xdIDaO
- 7lgF+HQoMNWuB8EXHErF8Kl0OSrfaTt/H1gd1iJ8OL9poZDv24PQNM1aRg3h5n1TUNRey2aHx/d
- WQUYTazNX55M8CY4l4ymRhzVZ5kMBHMs0DXZFVIbrWpqcciv2g1bLQJtaeMDs5v4KPE3/7DIaT6
- zbMYfm/5P3VsfC9TpQA==
-X-Authority-Analysis: v=2.4 cv=JKALdcKb c=1 sm=1 tr=0 ts=6a319154 cx=c_pps
- a=kVLUcbK0zfr7ocalXnG1qA==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
- a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=_K5XuSEh1TEqbUxoQ0s3:22
- a=EUspDBNiAAAA:8 a=pziBBDB2UT3EZnJ0EPMA:9 a=QEXdDO2ut3YA:10
- a=vr4QvYf-bLy2KjpDp97w:22
-X-Proofpoint-ORIG-GUID: o8KdxDAb7yEwRnU5-iXEqw-bS74YJrZZ
-X-Proofpoint-GUID: o8KdxDAb7yEwRnU5-iXEqw-bS74YJrZZ
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjE2MDE4NiBTYWx0ZWRfX0bEIwnM8aVKP
- vkzLPkm9/cdSOnrzY0xOtKCKyvK2Jza1asqoEUQb36R5rxYy+eujNIjf8ooJG3Z/8cUEkICETt7
- oaRtJfq15aVbXMS5MXeICZWvgP0sCHE=
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-16_05,2026-06-16_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 lowpriorityscore=0 bulkscore=0 impostorscore=0 spamscore=0
- priorityscore=1501 adultscore=0 clxscore=1015 suspectscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606040000 definitions=main-2606160186
+Content-Transfer-Encoding: 8bit
 
-SCMI client devices are created from SCMI driver id tables. If such a
-driver is modular, the core does not know the driver's client name until
-the module has already loaded, so normal device uevent based autoloading
-cannot break the dependency cycle.
+5.15-stable review patch.  If anyone has any objections, please let me know.
 
-Emit a protocol-level alias for each SCMI device id table entry and
-request that alias when the SCMI core discovers an implemented protocol.
-This loads modules that have registered interest in the protocol; their
-normal SCMI driver registration then requests the concrete client device
-and the SCMI bus matches it by protocol and name.
+------------------
 
-This allows e.g. ARM_SCMI_CPUFREQ=m to autoload on systems that expose
-only the SCMI Performance protocol node, where the cpufreq client name
-is Linux-internal and not available from firmware before loading the
-module.
+From: Arnd Bergmann <arnd@arndb.de>
 
-Assisted-by: Codex:GPT-5.5
-Signed-off-by: Bjorn Andersson <bjorn.andersson@oss.qualcomm.com>
+commit 4c9ad387aa2d6785299722e54224d34764edaeb3 upstream.
+
+gcc-16 has gained some more advanced inter-procedual optimization
+techniques that enable it to inline the dummy_tlb_add_page() and
+dummy_tlb_flush() function pointers into a specialized version of
+__arm_v7s_unmap:
+
+WARNING: modpost: vmlinux: section mismatch in reference: __arm_v7s_unmap+0x2cc (section: .text) -> dummy_tlb_add_page (section: .init.text)
+ERROR: modpost: Section mismatches detected.
+
+>From what I can tell, the transformation is correct, as this is only
+called when __arm_v7s_unmap() is called from arm_v7s_do_selftests(),
+which is also __init. Since __arm_v7s_unmap() however is not __init,
+gcc cannot inline the inner function calls directly.
+
+In debug_objects_selftest(), the same thing happens. Both the
+caller and the leaf function are __init, but the IPA pulls
+it into a non-init one:
+
+WARNING: modpost: vmlinux: section mismatch in reference: lookup_object_or_alloc+0x7c (section: .text.lookup_object_or_alloc) -> is_static_object (section: .init.text)
+
+Marking the affected functions as not "__init" would reliably avoid this
+issue but is not a good solution because it removes an otherwise correct
+annotation. I tried marking the functions as 'noinline', but that ended
+up not covering all the affected configurations.
+
+With some more experimenting, I found that marking these functions as
+__attribute__((noipa)) is both logical and reliable.
+
+In order to keep the syntax readable, add a custom macro for this in
+include/linux/compiler_attributes.h next to other related macros and
+use it to annotate both files.
+
+Link: https://lore.kernel.org/all/abRB6g-48ZX6Yl2r@willie-the-truck/
+Cc: Will Deacon <will@kernel.org>
+Cc: Thomas Gleixner <tglx@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Miguel Ojeda <ojeda@kernel.org>
+Cc: linux-kbuild@vger.kernel.org
+Cc: stable@vger.kernel.org
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Acked-by: Will Deacon <will@kernel.org>
+Acked-by: Thomas Gleixner <tglx@kernel.org>
+Acked-by: Miguel Ojeda <ojeda@kernel.org>
+Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- drivers/firmware/arm_scmi/driver.c | 2 ++
- include/linux/mod_devicetable.h    | 1 +
- scripts/mod/file2alias.c           | 4 +++-
- 3 files changed, 6 insertions(+), 1 deletion(-)
+ drivers/iommu/io-pgtable-arm-v7s.c  |   18 ++++++++++++------
+ include/linux/compiler_attributes.h |   11 +++++++++++
+ lib/debugobjects.c                  |    2 +-
+ 3 files changed, 24 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/firmware/arm_scmi/driver.c b/drivers/firmware/arm_scmi/driver.c
-index 3e0d975ec94c..8538eedc7c3a 100644
---- a/drivers/firmware/arm_scmi/driver.c
-+++ b/drivers/firmware/arm_scmi/driver.c
-@@ -47,6 +47,7 @@
- #include <trace/events/scmi.h>
+--- a/drivers/iommu/io-pgtable-arm-v7s.c
++++ b/drivers/iommu/io-pgtable-arm-v7s.c
+@@ -910,21 +910,27 @@ struct io_pgtable_init_fns io_pgtable_ar
  
- #define SCMI_VENDOR_MODULE_ALIAS_FMT	"scmi-protocol-0x%02x-%s"
-+#define SCMI_MODULE_ALIAS_FMT		SCMI_PROTOCOL_MODULE_PREFIX "0x%02x"
+ static struct io_pgtable_cfg *cfg_cookie __initdata;
  
- static DEFINE_IDA(scmi_id);
- 
-@@ -3362,6 +3363,7 @@ static int scmi_probe(struct platform_device *pdev)
- 		}
- 
- 		of_node_get(child);
-+		request_module(SCMI_MODULE_ALIAS_FMT, prot_id);
- 		scmi_create_protocol_devices(child, info, prot_id, NULL);
- 	}
- 
-diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_devicetable.h
-index 769382f2eadd..2cc7e78e35a3 100644
---- a/include/linux/mod_devicetable.h
-+++ b/include/linux/mod_devicetable.h
-@@ -477,6 +477,7 @@ struct rpmsg_device_id {
- 
- #define SCMI_NAME_SIZE		32
- #define SCMI_MODULE_PREFIX	"scmi:"
-+#define SCMI_PROTOCOL_MODULE_PREFIX	"scmi-protocol-"
- 
- struct scmi_device_id {
- 	__u8 protocol_id;
-diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
-index a5283f4c8e6f..40a37b6bf1ad 100644
---- a/scripts/mod/file2alias.c
-+++ b/scripts/mod/file2alias.c
-@@ -852,7 +852,7 @@ static void do_rpmsg_entry(struct module *mod, void *symval)
- 	module_alias_printf(mod, false, RPMSG_DEVICE_MODALIAS_FMT, *name);
- }
- 
--/* Looks like: scmi:NN:S */
-+/* Looks like: scmi:NN:S and scmi-protocol-0xNN */
- static void do_scmi_entry(struct module *mod, void *symval)
+-static void __init dummy_tlb_flush_all(void *cookie)
++/*
++ * __noipa prevents gcc from turning indirect iommu_flush_ops calls
++ * into direct calls from a specialized __arm_v7s_unmap() that triggers
++ * a build time section mismatch assertion.
++ */
++static __noipa void __init dummy_tlb_flush_all(void *cookie)
  {
- 	DEF_FIELD(symval, scmi_device_id, protocol_id);
-@@ -860,6 +860,8 @@ static void do_scmi_entry(struct module *mod, void *symval)
- 
- 	module_alias_printf(mod, false, SCMI_MODULE_PREFIX "%02x:%s",
- 			    protocol_id, *name);
-+	module_alias_printf(mod, false, SCMI_PROTOCOL_MODULE_PREFIX "0x%02x",
-+			    protocol_id);
+ 	WARN_ON(cookie != cfg_cookie);
  }
  
- /* Looks like: i2c:S */
+-static void __init dummy_tlb_flush(unsigned long iova, size_t size,
+-				   size_t granule, void *cookie)
++static __noipa void __init dummy_tlb_flush(unsigned long iova, size_t size,
++					   size_t granule, void *cookie)
+ {
+ 	WARN_ON(cookie != cfg_cookie);
+ 	WARN_ON(!(size & cfg_cookie->pgsize_bitmap));
+ }
+ 
+-static void __init dummy_tlb_add_page(struct iommu_iotlb_gather *gather,
+-				      unsigned long iova, size_t granule,
+-				      void *cookie)
++static __noipa void __init dummy_tlb_add_page(struct iommu_iotlb_gather *gather,
++					      unsigned long iova,
++					      size_t granule,
++					      void *cookie)
+ {
+ 	dummy_tlb_flush(iova, granule, granule, cookie);
+ }
+--- a/include/linux/compiler_attributes.h
++++ b/include/linux/compiler_attributes.h
+@@ -328,6 +328,17 @@
+ #endif
+ 
+ /*
++ * Optional: not supported by clang
++ *
++ *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Attributes.html#index-noipa
++ */
++#if __has_attribute(noipa)
++# define __noipa __attribute__((noipa))
++#else
++# define __noipa
++#endif
++
++/*
+  *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-weak-function-attribute
+  *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-weak-variable-attribute
+  */
+--- a/lib/debugobjects.c
++++ b/lib/debugobjects.c
+@@ -1059,7 +1059,7 @@ struct self_test {
+ 
+ static __initconst const struct debug_obj_descr descr_type_test;
+ 
+-static bool __init is_static_object(void *addr)
++static __noipa bool __init is_static_object(void *addr)
+ {
+ 	struct self_test *obj = addr;
+ 
 
--- 
-2.53.0
 
