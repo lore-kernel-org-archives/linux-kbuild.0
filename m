@@ -1,131 +1,180 @@
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E49183624C1
-	for <linux-kbuild@vger.kernel.org>; Tue, 16 Jun 2026 14:22:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49CE7466B4B;
+	Tue, 16 Jun 2026 16:50:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781619735; cv=none; b=Lji8+CiRiEfnpBrpJCo2RSRw57ZHMFDB+6XMtVK40kXYE2Yt3icd8XbKtQqrcLWhYu3EAiHk7qSdDK9EJxafxhm3Ko3ufGgFmcjcx4LmcHcQOQlsnbMHplpff8J46Z6E4SXxW6O7njIZ+wJr49QmrYBS1f5Tp/FRZfQgUvEdFos=
+	t=1781628642; cv=none; b=aSM+UITmy3zQWKOBKttuiOd9WRbGlAe6KyNnvDL4MGhyffObdtx2iwj1OpEXyzGA8mBUMSaxqRtQC0IHXHr/HTAbV7/DY5SaaKnGP+Go8/W5rf4MRRPZvqRRPU8vZVK7otMbaKAUrax4jEEiXFyAluI/PcnvcpYG6GOJCZpahYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781619735; c=relaxed/simple;
-	bh=CA5nnvkspGUyTEG8HxXRVVazyc5v2cKfqM0DPMwJ6Iw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tS1gX2vZSv1g40S3PPPc6opxFOmbza6IpjRQIg6vSHFT0r2Sg0XiXomVmXrS/qzSqoaslTekb500RSJYDj4GkNMT9oXgFlHnjp96lkcZUdcwzBpJyvS0ATq48ROFGwczWrs0XxmO/7lx/zcdfCykbQ+GuudZju6zrJqi2Jyf1rE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=srcRDnwH; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1781628642; c=relaxed/simple;
+	bh=2yHt6t+x7BzCR8MZjiU+qU0jDGz5O7+DTnfo+RczACM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=r3+WciMopAFfG1nXEpWyX15hLi+Gws5LAOzEl1VZ86osTQL1g7GqzYHTuTLtyuUBC0MLqqjSoQmVvjcklAZXCL4LGNb6pRkuFmJE6KQgcDfbmYo/ijJFYAvmNQt29SR9lFzvYwlxoW5DMYcQrmS6cwQaDJD2EqgmV6/UeweSs44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Kvh5/8oi; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="srcRDnwH"
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-490ace40f4bso43686815e9.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 16 Jun 2026 07:22:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781619732; x=1782224532; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=hlgJdoH4I+7g281+Nqd5PThHYlDh2fBtSR189+cjOCE=;
-        b=srcRDnwHagNIDelp/dm360BkJC4+dNV59gqeTl1AAIIviuS3XRUu4JQ3xkeHejlNWb
-         IJ1B2yAF/s5XDUjoIlx6CCCSYY4N1N083X7NpJqb/8fAYybeF6m1EYvawVdzTEDXfSUs
-         d1xKj0asBeHYcU1ls1SgHEJBEEvKCR6B4h7GViYpniOuqY4sVkjHDxAodu9Fuap2+sTA
-         GdH9f6WwBkUC44HNlnhkOOS0rNmHnT/vI1Y51rXfgLi7RmwOmxmxrT052lHXX9cI706C
-         Ihs3DEdqXlNlNvm8lFyqU7edMrzfz+nc4w2iZKOqBohbV1y56aSJkqhKM+85xyOwSit5
-         sImw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781619732; x=1782224532;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hlgJdoH4I+7g281+Nqd5PThHYlDh2fBtSR189+cjOCE=;
-        b=IhikgMaizWznR66rbdAWPcK2U0DJdUvNDURjVvwjHE4FAZmm6/Q8IYRUy794EkcVb/
-         lkuRg/lf7ux8owpNUW953oWmDC6aQF2oozInMCyTV87Vx+PUTv9da4uArFvUFqfg2SZw
-         HBI8ckt5G6rYhcSRd2z829iKmo32MlUkvTFYcvLGQZUt5jztTPcLHMaLx2DeA6B52azm
-         fqQOX9hRScpRackqFR5YR8iO38fCoHN9S7Vcdnd4imp5DM1ZEDGACZ+qM84QbhRDbGgv
-         UbWhZYug31VLvmJ9bTOCO15VhYd1djbcq2xr80iATI1Yl51EIoFUY1PVAu/1VllOGkRN
-         UGbQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9R7x9fqnA+DOStJ566qXUnmjVNMFxF+qwWJMDZobaAMhUpErzr0zaOgDAXeCEQQ6rg7m9KNN18igFoKyU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxYzfQX4DshO+/0iOsu09wegVSuVATIONH/Pbe2d6+XQ/ZVEql
-	o47pd2If/KOlEIoFf43czCjuAzHtxq+xsS5XXodZeX7fzvErfkwFmGn0
-X-Gm-Gg: Acq92OGIAdf+87rB3XTc2ZATxp13WKlB1gH9zN6I566NiSpaCiDBnNF4qkQ6gyGNt2/
-	3BXmsrZYpra8dV4f52abryxpRFrQeAHFbi0S+TJMWwL83G8cc3VV23Ig3YPRkZRghg0gSm0qsj4
-	BGbA0Y7TOWtZqFMPfqd8avGFu7lnNy3jZeQc+GACHTJAL0eg/D0n116AlbTO0a7lF99Q9HbjsUZ
-	t0NqqzIeX02hh00NVR3pgVVxgNHZdrxpv8qAY8YYib1e/QSC3wvElcrCPKAmdBTJoCQBU5r4nFx
-	j9GSi0FqHH9pmTrbOQ2yBM5lJ8SnkRIcF1l1ZzV9NPuFYd4yzFRyC0zfUm0hqRUcgkfPFqdSjXb
-	d/1u/b+1dOGOm/40VQ/WZ8zH/E0uHtHHt8c2B4jhdR6a4FECj9U4jwyNAjjW+je5mb/cFxLj2Dx
-	BrfcjsnObJdUt8rt7BGq7bxOd8zPwLTNlOCCjZVd3rA9Rcb5+KMxwUZrsOkdd90mEwIjuseVykp
-	d1Rae/96ejNwUimSgY=
-X-Received: by 2002:a05:600c:2d0c:b0:490:58ef:cea7 with SMTP id 5b1f17b1804b1-492200dce50mr128613795e9.22.1781619731860;
-        Tue, 16 Jun 2026 07:22:11 -0700 (PDT)
-Received: from [10.128.10.215] (195-23-151-163.net.novis.pt. [195.23.151.163])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4606f2ce361sm43051695f8f.31.2026.06.16.07.22.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Jun 2026 07:22:11 -0700 (PDT)
-Sender: Julian Braha <julian.braha@gmail.com>
-Message-ID: <b3c2fecb-0aa3-4ab0-b7a1-c8b9985e028b@gmail.com>
-Date: Tue, 16 Jun 2026 15:22:10 +0100
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Kvh5/8oi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39E431F00A3D;
+	Tue, 16 Jun 2026 16:50:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
+	s=korg; t=1781628641;
+	bh=nIHo+HT0QVAPFcBd7m06hz22Eb3GMVAllNqOmp06iI8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=Kvh5/8oiBqd+tC8fM9Lzh837SjZfWFnPTQMwUovdmax5GavVF11vZOt1sxHmpaWtK
+	 u1AwTV3uHvERwSQ0VU8iMLvZpgbjQPnHNLGQXsAdtPzpbCyxvAlXGqsLPUyT7HXdUy
+	 pwYvyyBADgmoTKHxD25ucNN5vP4qptmU2bGHtq64=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	Will Deacon <will@kernel.org>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	linux-kbuild@vger.kernel.org,
+	Arnd Bergmann <arnd@arndb.de>,
+	Joerg Roedel <joerg.roedel@amd.com>
+Subject: [PATCH 6.6 134/452] iommu, debugobjects: avoid gcc-16.1 section mismatch warnings
+Date: Tue, 16 Jun 2026 20:26:01 +0530
+Message-ID: <20260616145124.773030844@linuxfoundation.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260616145117.796205997@linuxfoundation.org>
+References: <20260616145117.796205997@linuxfoundation.org>
+User-Agent: quilt/0.69
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Ironic visualization in menuconfig for NTFS_FS vs NTFS3_FS
-To: Xi Ruoyao <xry111@xry111.site>, linux-kbuild@vger.kernel.org
-Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
- Hyunchul Lee <hyc.lee@gmail.com>, Mingcong Bai <jeffbai@aosc.io>,
- linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org
-References: <cbe95c15d2760f6fce8eaf207c969ce8fd3703aa.camel@xry111.site>
-Content-Language: en-US
-From: Julian Braha <julianbraha@gmail.com>
-In-Reply-To: <cbe95c15d2760f6fce8eaf207c969ce8fd3703aa.camel@xry111.site>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi Xi,
+6.6-stable review patch.  If anyone has any objections, please let me know.
 
-On 6/16/26 10:24, Xi Ruoyao wrote:
-> Hi,
-> 
-> In the Kconfig for NTFS3 we now have:
-> 
-> config NTFS3_FS
->     tristate "NTFS Read-Write file system support"
->     depends on !NTFS_FS || m
-> 
-> It basically means some sort of conflict between NTFS_FS and NTFS3_FS. 
-> But then menuconfig is apparently puzzled to believe NTFS3_FS "depends
-> on" NTFS_FS, and put NTFS3_FS as a subentry of NTFS_FS:
-> 
->   │ │    <M> NTFS file system support                                     │ │  
->   │ │    [ ]   NTFS debugging support (NEW)                               │ │  
->   │ │    [ ]   NTFS POSIX Access Control Lists (NEW)                      │ │  
->   │ │    <M>   NTFS Read-Write file system support                        │ │  
->   │ │    [ ]     64 bits per NTFS clusters                                │ │  
->   │ │    [*]     activate support of external compressions lzx/xpress     │ │  
->   │ │    [ ]     NTFS POSIX Access Control Lists                          │  
+------------------
 
-This looks like a bug in menuconfig's behavior, as from
-Documentation/kbuild/kconfig-language.rst:
-"If a menu entry somehow depends on the previous entry, it can be made a
-submenu of it."
+From: Arnd Bergmann <arnd@arndb.de>
 
-And since Kconfig treats 'source' similarly to C's '#include' (the text
-of the file effectively just gets copy-pasted in), it's like the config
-options in fs/ntfs3/Kconfig immediately follow the options in
-fs/ntfs/Kconfig since the sources are back-to-back.
+commit 4c9ad387aa2d6785299722e54224d34764edaeb3 upstream.
 
-You can test this by simply adding some other, unrelated config option
-between the two 'source' entries that doesn't depend on NTFS_FS or
-!NTFS_FS.
+gcc-16 has gained some more advanced inter-procedual optimization
+techniques that enable it to inline the dummy_tlb_add_page() and
+dummy_tlb_flush() function pointers into a specialized version of
+__arm_v7s_unmap:
 
-So, anyway, it seems to be simply ignoring the '!', and just treating it
-as a dependency.
-And you can test this by removing that dependency on !NTFS_FS, which
-causes menuconfig to stop rendering it as part of the menu.
+WARNING: modpost: vmlinux: section mismatch in reference: __arm_v7s_unmap+0x2cc (section: .text) -> dummy_tlb_add_page (section: .init.text)
+ERROR: modpost: Section mismatches detected.
 
-I think your workaround is okay (there are other similar 'NO_' config
-options in the kernel), but it would be better to fix this menuconfig
-bug.
+>From what I can tell, the transformation is correct, as this is only
+called when __arm_v7s_unmap() is called from arm_v7s_do_selftests(),
+which is also __init. Since __arm_v7s_unmap() however is not __init,
+gcc cannot inline the inner function calls directly.
 
-- Julian Braha
+In debug_objects_selftest(), the same thing happens. Both the
+caller and the leaf function are __init, but the IPA pulls
+it into a non-init one:
+
+WARNING: modpost: vmlinux: section mismatch in reference: lookup_object_or_alloc+0x7c (section: .text.lookup_object_or_alloc) -> is_static_object (section: .init.text)
+
+Marking the affected functions as not "__init" would reliably avoid this
+issue but is not a good solution because it removes an otherwise correct
+annotation. I tried marking the functions as 'noinline', but that ended
+up not covering all the affected configurations.
+
+With some more experimenting, I found that marking these functions as
+__attribute__((noipa)) is both logical and reliable.
+
+In order to keep the syntax readable, add a custom macro for this in
+include/linux/compiler_attributes.h next to other related macros and
+use it to annotate both files.
+
+Link: https://lore.kernel.org/all/abRB6g-48ZX6Yl2r@willie-the-truck/
+Cc: Will Deacon <will@kernel.org>
+Cc: Thomas Gleixner <tglx@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Miguel Ojeda <ojeda@kernel.org>
+Cc: linux-kbuild@vger.kernel.org
+Cc: stable@vger.kernel.org
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Acked-by: Will Deacon <will@kernel.org>
+Acked-by: Thomas Gleixner <tglx@kernel.org>
+Acked-by: Miguel Ojeda <ojeda@kernel.org>
+Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/iommu/io-pgtable-arm-v7s.c  |   18 ++++++++++++------
+ include/linux/compiler_attributes.h |   11 +++++++++++
+ lib/debugobjects.c                  |    2 +-
+ 3 files changed, 24 insertions(+), 7 deletions(-)
+
+--- a/drivers/iommu/io-pgtable-arm-v7s.c
++++ b/drivers/iommu/io-pgtable-arm-v7s.c
+@@ -894,21 +894,27 @@ struct io_pgtable_init_fns io_pgtable_ar
+ 
+ static struct io_pgtable_cfg *cfg_cookie __initdata;
+ 
+-static void __init dummy_tlb_flush_all(void *cookie)
++/*
++ * __noipa prevents gcc from turning indirect iommu_flush_ops calls
++ * into direct calls from a specialized __arm_v7s_unmap() that triggers
++ * a build time section mismatch assertion.
++ */
++static __noipa void __init dummy_tlb_flush_all(void *cookie)
+ {
+ 	WARN_ON(cookie != cfg_cookie);
+ }
+ 
+-static void __init dummy_tlb_flush(unsigned long iova, size_t size,
+-				   size_t granule, void *cookie)
++static __noipa void __init dummy_tlb_flush(unsigned long iova, size_t size,
++					   size_t granule, void *cookie)
+ {
+ 	WARN_ON(cookie != cfg_cookie);
+ 	WARN_ON(!(size & cfg_cookie->pgsize_bitmap));
+ }
+ 
+-static void __init dummy_tlb_add_page(struct iommu_iotlb_gather *gather,
+-				      unsigned long iova, size_t granule,
+-				      void *cookie)
++static __noipa void __init dummy_tlb_add_page(struct iommu_iotlb_gather *gather,
++					      unsigned long iova,
++					      size_t granule,
++					      void *cookie)
+ {
+ 	dummy_tlb_flush(iova, granule, granule, cookie);
+ }
+--- a/include/linux/compiler_attributes.h
++++ b/include/linux/compiler_attributes.h
+@@ -384,6 +384,17 @@
+ #endif
+ 
+ /*
++ * Optional: not supported by clang
++ *
++ *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Attributes.html#index-noipa
++ */
++#if __has_attribute(noipa)
++# define __noipa __attribute__((noipa))
++#else
++# define __noipa
++#endif
++
++/*
+  *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-weak-function-attribute
+  *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-weak-variable-attribute
+  */
+--- a/lib/debugobjects.c
++++ b/lib/debugobjects.c
+@@ -1076,7 +1076,7 @@ struct self_test {
+ 
+ static __initconst const struct debug_obj_descr descr_type_test;
+ 
+-static bool __init is_static_object(void *addr)
++static __noipa bool __init is_static_object(void *addr)
+ {
+ 	struct self_test *obj = addr;
+ 
+
+
