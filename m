@@ -1,288 +1,180 @@
-Received: from mail-dl1-f41.google.com (mail-dl1-f41.google.com [74.125.82.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D434C3CFF55
-	for <linux-kbuild@vger.kernel.org>; Tue, 16 Jun 2026 18:45:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A776B35AC3E;
+	Tue, 16 Jun 2026 18:46:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781635561; cv=none; b=cKJfJgXRwJk8sNVIAnPRsG0CvB5Qd0UBW4iHBWHMxvWgqOUcXVR0eQsODCgxG0loLS/yjGG0WjvXuOVi+TYM1KP2+LHCZK8l3StHcHygMiM2wRGc+u/3jUKWaLArvu1hT5cb6aMjZBdgU8mQn6xr4AvxCV88iAWLBhujIXBd2t0=
+	t=1781635589; cv=none; b=oig42LDfP2/mDhPoBSwezza7YIfOanz51lqfx6ujyTtx7pHusW77MaHbT9C0aaT/8uK8vSL8q/JHqMOR5z5wGOGvlPqqv3pVF1oIVnGCeZdcaTTXHQXjW4CEbC6QIdQJQTtTDsIBOz649UakX8o4Ex5Yt83njksFQNvzXXMPtEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781635561; c=relaxed/simple;
-	bh=xRAnsk63hEPHzAYY/5s1W+Y7VqNWc6G6rnpC5TQG6+c=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=nDqvvvK3N2xKN6+JuQBGy/5YdwEqhr6vOBw4lY6TrLkJ2g3TLJ/r4xsdqoe2q/I8JOc1/P6T7YcW5Rqv95Iklws4gn6NmdJdDmoZDRn3xbO25cdr5zvX4Gd3NiIq2TJyIzJdRwd/NlcfWu04TzNiP8yT9Ut1A47MocM2xlTWswU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b=vPHFnLJg; arc=none smtp.client-ip=74.125.82.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=etsalapatis.com
+	s=arc-20240116; t=1781635589; c=relaxed/simple;
+	bh=KpoO620Ay7eHieF3q/BUjEMiONRMTQpm5LODoYC7JLk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=PGrekVoS96No156kenmjaXLqYsKlv8eqkKkYpdbUizVRibXSKQIiaT/yn2KpKKpPtgl9tZn51iCT+xH+PtJB/I/SAERI/CSMid3F+1AnvAFL1wcF+AwHOIJMBcBblL19WiapADl3WAk3UlHQ+jsa67F2CiWK2CYmZQreX5s4OOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=VVr9n1KC; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b="vPHFnLJg"
-Received: by mail-dl1-f41.google.com with SMTP id a92af1059eb24-13721dfd471so5437564c88.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 16 Jun 2026 11:45:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=etsalapatis-com.20251104.gappssmtp.com; s=20251104; t=1781635559; x=1782240359; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1NLIEWJdLWivuk8iq8yhitx8CxAOZpJDc0aqqsb3250=;
-        b=vPHFnLJgZbn3SXz9pTeix6doV7dtQ3y/1bNMUZSffyr16W/L+rx0OwNIi+lwgIe1Yd
-         sAw6I1WjhHUNaPD9ep9W+AXzw3LsqSitXrYqCSAU8aczRXwx3guRjMjg8RTvWXtfBfkV
-         Awb3KF3iy8mjZHzd4Jt6+Y7gqiK5jCnifAetw9gG32KUmNU9pOsulzN7BkWGWljtyacb
-         yZolZJp0BSwKoiCynFNTgjFijPISBW0YXl9so9bJZioTG/d3QGy9rip6qTyXfCXAZyNa
-         OGrDdmQbkt9o16CRVrWAN/V8yk0tK5BPClI0eMEp9qiFBYGKrl6hGF2KpQdMAXjvIHbv
-         mj8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781635559; x=1782240359;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1NLIEWJdLWivuk8iq8yhitx8CxAOZpJDc0aqqsb3250=;
-        b=Rd20GjYj4ZxaMPNPlxoclejo9JIbm+Yn6UIXzypzw+osoUu+Vg4fR/Sdzk9fdqfJmP
-         uPnWKDjIdkEgkjKJRS/VdQx1gKy4zIBwAofODOKfwRra6rYcMZRu/HagykqZEdw1s2mb
-         86LWE6C8jdJ2JXQibDiMi9XMPHuLXn5BxFAXa1x7c4wKjK59gK3i1vD5WA+bj83v2olk
-         dV3QucElMWZMOSZGI+4I5V0y3oSgktd3V5mYvtBlb9xA+YXAJD+2i0/7DFKwW3bSLewf
-         9/Xr3NtGiLzF8iHT2pv9gRuLAt8oRC34DShjN3FqArZT9Ci7VsB5tROT5E5mejWo6bKo
-         56rw==
-X-Forwarded-Encrypted: i=1; AFNElJ97nmalAQjjOqh322IiEcQBuKD9NTD/PJUsDZ6wNDkkMywuKSrFLVgDiEs39jalFOoh6CQYXyl/kU0APsE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yye/0OWbrBJieYbOsWrb6bgmhJauj1IuuFmYEs/n8k/SV2KVmAw
-	5q3XJ49pm8zMmBNAAiMrQQFu7/pmMk68Vd0ShtCLegygbHjTxNE2BaYH0TwkSBOSev5SfvS9TJB
-	Kf9HdKbVr/Q==
-X-Gm-Gg: Acq92OH9ZbXPnH2iSsa5MdAC0E9piXu8UutDOvMpEoz4SZXCojHNC4sQ/mvRoKulQ5N
-	MYvFL3KeQ5I/5vfZAvHMxK2x1gTOwuVwM/jmA4dtxe1IvByOCpFFwuH+EAhZYYu7YlYlrPGpM72
-	E3NTqqvaDitxBcizmqOSc88OxA6FhdBRyfIhRKFZPCjU5iBZj+IqJqtsY7LqqN7sPRYozDr0SY4
-	g+TPqEWJOKZ91ln2ioTESEoSrmKNtIANKjL0IkK13sa87mm0mZ2gURIvD3RzKtFjzLcwjoR/xE5
-	QNDJBN0whb7Xwf/d0mwRTPfV9UYGdBj7MQ3A8SwLDOmcuGslnji2mGsQ1u//qt5kdPRv4ig1fgJ
-	zd6PevuUDWpiazIEtDOIGMiUjqUc4StBiFYbGW6Itni1szwcReQxbmTVZsOzn7RH7zS9UOwRst0
-	V9iZEg
-X-Received: by 2002:a05:7022:f92:b0:135:f5ed:868 with SMTP id a92af1059eb24-1398f6c9a68mr109659c88.17.1781635558681;
-        Tue, 16 Jun 2026 11:45:58 -0700 (PDT)
-Received: from localhost ([2620:10d:c090:600::1a8e])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1384b910c51sm14191480c88.4.2026.06.16.11.45.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Jun 2026 11:45:58 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="VVr9n1KC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F0AF1F000E9;
+	Tue, 16 Jun 2026 18:46:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
+	s=korg; t=1781635588;
+	bh=tceClaZt/TtK42/do8rxtDjL9jlwEQawWMGmzk+3eNU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=VVr9n1KCJZmbATx2axU0+69puVLWWceYthHdAKA3e4eADs9S4bzTtxPm3u6BuagWq
+	 Ii/VtJVEjtAC7B+EMOHe4ob80WM2xNAUnBJhk/j27x9mC433gcv0+3PK9eMUMr0vC6
+	 MhrKvlNw7MUAMElrdS/xcWj1FjDC8hOX4oLFq2ao=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	Will Deacon <will@kernel.org>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	linux-kbuild@vger.kernel.org,
+	Arnd Bergmann <arnd@arndb.de>,
+	Joerg Roedel <joerg.roedel@amd.com>
+Subject: [PATCH 5.10 077/342] iommu, debugobjects: avoid gcc-16.1 section mismatch warnings
+Date: Tue, 16 Jun 2026 20:26:13 +0530
+Message-ID: <20260616145051.831826170@linuxfoundation.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260616145048.348037099@linuxfoundation.org>
+References: <20260616145048.348037099@linuxfoundation.org>
+User-Agent: quilt/0.69
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 16 Jun 2026 14:45:56 -0400
-Message-Id: <DJAP3FDYA9GP.O5139CT1RYW3@etsalapatis.com>
-Cc: "Alan Maguire" <alan.maguire@oracle.com>, "Jiri Olsa"
- <jolsa@kernel.org>, <bpf@vger.kernel.org>, <linux-kbuild@vger.kernel.org>
-Subject: Re: [PATCH bpf-next v1 05/14] resolve_btfids: Index BTF ID symbols
- by address
-From: "Emil Tsalapatis" <emil@etsalapatis.com>
-To: "Ihor Solodrai" <ihor.solodrai@linux.dev>, "Alexei Starovoitov"
- <ast@kernel.org>, "Andrii Nakryiko" <andrii@kernel.org>, "Daniel Borkmann"
- <daniel@iogearbox.net>, "Eduard Zingerman" <eddyz87@gmail.com>, "Kumar
- Kartikeya Dwivedi" <memxor@gmail.com>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260601221805.821394-1-ihor.solodrai@linux.dev>
- <20260601221805.821394-6-ihor.solodrai@linux.dev>
-In-Reply-To: <20260601221805.821394-6-ihor.solodrai@linux.dev>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Mon Jun 1, 2026 at 6:17 PM EDT, Ihor Solodrai wrote:
-> Keep an address-sorted index of parsed .BTF_ids symbols so code that
-> the original BTF_ID symbol name can be recovered from an entry
-> address.
->
-> Use the index in find_kfunc_flags() to scan BTF_SET8_KFUNCS entries
-> directly and match each entry back to the requested kfunc.
->
-> Signed-off-by: Ihor Solodrai <ihor.solodrai@linux.dev>
+5.10-stable review patch.  If anyone has any objections, please let me know.
 
-Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
+------------------
 
-Some notes on clarity below.
+From: Arnd Bergmann <arnd@arndb.de>
 
-> ---
->  tools/bpf/resolve_btfids/main.c | 103 +++++++++++++++++++++++++-------
->  1 file changed, 80 insertions(+), 23 deletions(-)
->
-> diff --git a/tools/bpf/resolve_btfids/main.c b/tools/bpf/resolve_btfids/m=
-ain.c
-> index f8a91fa7584f..43512af13148 100644
-> --- a/tools/bpf/resolve_btfids/main.c
-> +++ b/tools/bpf/resolve_btfids/main.c
-> @@ -119,6 +119,11 @@ struct btf_id {
->  	Elf64_Addr	 addr[ADDR_CNT];
->  };
-> =20
-> +struct addr_sym {
-> +	Elf64_Addr	 addr;
-> +	const char	*name;
-> +};
-> +
->  struct object {
->  	const char *path;
->  	const char *btf_path;
-> @@ -150,6 +155,10 @@ struct object {
->  	int nr_structs;
->  	int nr_unions;
->  	int nr_typedefs;
-> +
-> +	struct addr_sym *addr_syms;
-> +	int nr_addr_syms;
-> +	int max_addr_syms;
->  };
-> =20
->  #define KF_IMPLICIT_ARGS (1 << 16)
-> @@ -480,6 +489,49 @@ static int elf_collect(struct object *obj)
->  	return 0;
->  }
-> =20
-> +static int push_addr_sym(struct object *obj, Elf64_Addr addr, const char=
- *name)
-> +{
-> +	struct addr_sym *arr =3D obj->addr_syms;
-> +	int cap =3D obj->max_addr_syms;
-> +
-> +	if (obj->nr_addr_syms + 1 > cap) {
-> +		cap =3D max(cap + 256, cap * 2);
-> +		arr =3D realloc(arr, sizeof(*arr) * cap);
-> +		if (!arr)
-> +			return -ENOMEM;
-> +		obj->max_addr_syms =3D cap;
-> +		obj->addr_syms =3D arr;
-> +	}
-> +
-> +	obj->addr_syms[obj->nr_addr_syms].addr =3D addr;
-> +	obj->addr_syms[obj->nr_addr_syms].name =3D name;
-> +	obj->nr_addr_syms++;
-> +
-> +	return 0;
-> +}
-> +
-> +static int cmp_addr_sym(const void *a, const void *b)
-> +{
-> +	Elf64_Addr aa =3D ((const struct addr_sym *)a)->addr;
-> +	Elf64_Addr ab =3D ((const struct addr_sym *)b)->addr;
-> +
-> +	if (aa < ab)
-> +		return -1;
-> +	if (aa > ab)
-> +		return 1;
-> +	return 0;
-> +}
-> +
-> +static const char *find_name_by_addr(struct object *obj, Elf64_Addr addr=
-)
-> +{
-> +	struct addr_sym key =3D { .addr =3D addr };
-> +	struct addr_sym *res;
-> +
-> +	res =3D bsearch(&key, obj->addr_syms, obj->nr_addr_syms,
-> +		      sizeof(*obj->addr_syms), cmp_addr_sym);
-> +	return res ? res->name : NULL;
-> +}
-> +
->  static int symbols_collect(struct object *obj)
->  {
->  	Elf_Scn *scn =3D NULL;
-> @@ -573,8 +625,14 @@ static int symbols_collect(struct object *obj)
->  			return -1;
->  		}
->  		id->addr[id->addr_cnt++] =3D sym.st_value;
-> +
-> +		if (push_addr_sym(obj, sym.st_value, id->name))
-> +			return -1;
->  	}
-> =20
-> +	qsort(obj->addr_syms, obj->nr_addr_syms, sizeof(*obj->addr_syms),
-> +	      cmp_addr_sym);
-> +
->  	return 0;
->  }
-> =20
-> @@ -946,43 +1004,41 @@ static int collect_decl_tags(struct btf2btf_contex=
-t *ctx)
->  }
-> =20
->  /*
-> - * To find the kfunc flags having its struct btf_id (with ELF addresses)
-> - * we need to find the address that is in range of a set8.
-> - * If a set8 is found, then the flags are located at addr + 4 bytes.
-> + * To find kfunc flags, scan BTF_SET8_KFUNCS entries and use the entry
-> + * address to recover the corresponding BTF_ID symbol name.
->   * Return 0 (no flags!) if not found.
->   */
->  static u32 find_kfunc_flags(struct object *obj, struct btf_id *kfunc_id)
->  {
->  	const u32 *elf_data_ptr =3D obj->efile.idlist->d_buf;
-> -	u64 set_lower_addr, set_upper_addr, addr;
->  	struct btf_id *set_id;
->  	struct rb_node *next;
-> -	u32 flags;
-> -	u64 idx;
-> +	u64 idx, set_addr;
-> +	u32 set_flags;
-> =20
->  	for (next =3D rb_first(&obj->sets); next; next =3D rb_next(next)) {
->  		set_id =3D rb_entry(next, struct btf_id, rb_node);
->  		if (set_id->kind !=3D BTF_ID_KIND_SET8 || set_id->addr_cnt !=3D 1)
->  			continue;
-> =20
-> -		set_lower_addr =3D set_id->addr[0];
-> -		set_upper_addr =3D set_lower_addr + set_id->cnt * sizeof(u64);
-> +		set_addr =3D set_id->addr[0];
-> +		idx =3D (set_addr - obj->efile.idlist_addr) / sizeof(u32) + 1;
+commit 4c9ad387aa2d6785299722e54224d34764edaeb3 upstream.
 
-Is the +1 because the set8-global flags are in &((char *)btf_id_set8)[4]?
-If that's the case, can you add a comment that you're checking the
-set-global flags to decide whether to skip all of it?
+gcc-16 has gained some more advanced inter-procedual optimization
+techniques that enable it to inline the dummy_tlb_add_page() and
+dummy_tlb_flush() function pointers into a specialized version of
+__arm_v7s_unmap:
 
-> +		set_flags =3D elf_data_ptr[idx];
-> +		if (!(set_flags & BTF_SET8_KFUNCS))
-> +			continue;
-> =20
-> -		for (u32 i =3D 0; i < kfunc_id->addr_cnt; i++) {
-> -			addr =3D kfunc_id->addr[i];
-> -			/*
-> -			 * Lower bound is exclusive to skip the 8-byte header of the set.
-> -			 * Upper bound is inclusive to capture the last entry at offset 8*cnt=
-.
-> -			 */
-> -			if (set_lower_addr < addr && addr <=3D set_upper_addr) {
-> -				pr_debug("found kfunc %s in BTF_ID_FLAGS %s\n",
-> -					 kfunc_id->name, set_id->name);
-> -				idx =3D addr - obj->efile.idlist_addr;
-> -				idx =3D idx / sizeof(u32) + 1;
-> -				flags =3D elf_data_ptr[idx];
-> -
-> -				return flags;
-> -			}
-> +		for (u32 i =3D 0; i < set_id->cnt; i++) {
-> +			Elf64_Addr addr =3D set_addr + sizeof(u64) * (i + 1);
+WARNING: modpost: vmlinux: section mismatch in reference: __arm_v7s_unmap+0x2cc (section: .text) -> dummy_tlb_add_page (section: .init.text)
+ERROR: modpost: Section mismatches detected.
 
-Same here, can you point out that the +1 is to skip the set header?
+>From what I can tell, the transformation is correct, as this is only
+called when __arm_v7s_unmap() is called from arm_v7s_do_selftests(),
+which is also __init. Since __arm_v7s_unmap() however is not __init,
+gcc cannot inline the inner function calls directly.
 
-> +			const char *name =3D find_name_by_addr(obj, addr);
-> +
-> +			if (!name || strcmp(name, kfunc_id->name) !=3D 0)
-> +				continue;
-> +
-> +			pr_debug("found kfunc %s in BTF_ID_FLAGS %s\n",
-> +				 kfunc_id->name, set_id->name);
-> +
-> +			idx =3D (addr - obj->efile.idlist_addr) / sizeof(u32) + 1;
+In debug_objects_selftest(), the same thing happens. Both the
+caller and the leaf function are __init, but the IPA pulls
+it into a non-init one:
 
-This seems to be the same calculation as we do for the whole set8 flag,
-but AFAICT the context is different and here we're indexing into the pair.=
-=20
-Can you add a comment for this?
+WARNING: modpost: vmlinux: section mismatch in reference: lookup_object_or_alloc+0x7c (section: .text.lookup_object_or_alloc) -> is_static_object (section: .init.text)
 
-> +			return elf_data_ptr[idx];
->  		}
->  	}
-> =20
-> @@ -1575,6 +1631,7 @@ int main(int argc, const char **argv)
->  	btf_id__free_all(&obj.typedefs);
->  	btf_id__free_all(&obj.funcs);
->  	btf_id__free_all(&obj.sets);
-> +	free(obj.addr_syms);
->  	if (obj.efile.elf) {
->  		elf_end(obj.efile.elf);
->  		close(obj.efile.fd);
+Marking the affected functions as not "__init" would reliably avoid this
+issue but is not a good solution because it removes an otherwise correct
+annotation. I tried marking the functions as 'noinline', but that ended
+up not covering all the affected configurations.
+
+With some more experimenting, I found that marking these functions as
+__attribute__((noipa)) is both logical and reliable.
+
+In order to keep the syntax readable, add a custom macro for this in
+include/linux/compiler_attributes.h next to other related macros and
+use it to annotate both files.
+
+Link: https://lore.kernel.org/all/abRB6g-48ZX6Yl2r@willie-the-truck/
+Cc: Will Deacon <will@kernel.org>
+Cc: Thomas Gleixner <tglx@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Miguel Ojeda <ojeda@kernel.org>
+Cc: linux-kbuild@vger.kernel.org
+Cc: stable@vger.kernel.org
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Acked-by: Will Deacon <will@kernel.org>
+Acked-by: Thomas Gleixner <tglx@kernel.org>
+Acked-by: Miguel Ojeda <ojeda@kernel.org>
+Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/iommu/io-pgtable-arm-v7s.c  |   18 ++++++++++++------
+ include/linux/compiler_attributes.h |   11 +++++++++++
+ lib/debugobjects.c                  |    2 +-
+ 3 files changed, 24 insertions(+), 7 deletions(-)
+
+--- a/drivers/iommu/io-pgtable-arm-v7s.c
++++ b/drivers/iommu/io-pgtable-arm-v7s.c
+@@ -848,21 +848,27 @@ struct io_pgtable_init_fns io_pgtable_ar
+ 
+ static struct io_pgtable_cfg *cfg_cookie __initdata;
+ 
+-static void __init dummy_tlb_flush_all(void *cookie)
++/*
++ * __noipa prevents gcc from turning indirect iommu_flush_ops calls
++ * into direct calls from a specialized __arm_v7s_unmap() that triggers
++ * a build time section mismatch assertion.
++ */
++static __noipa void __init dummy_tlb_flush_all(void *cookie)
+ {
+ 	WARN_ON(cookie != cfg_cookie);
+ }
+ 
+-static void __init dummy_tlb_flush(unsigned long iova, size_t size,
+-				   size_t granule, void *cookie)
++static __noipa void __init dummy_tlb_flush(unsigned long iova, size_t size,
++					   size_t granule, void *cookie)
+ {
+ 	WARN_ON(cookie != cfg_cookie);
+ 	WARN_ON(!(size & cfg_cookie->pgsize_bitmap));
+ }
+ 
+-static void __init dummy_tlb_add_page(struct iommu_iotlb_gather *gather,
+-				      unsigned long iova, size_t granule,
+-				      void *cookie)
++static __noipa void __init dummy_tlb_add_page(struct iommu_iotlb_gather *gather,
++					      unsigned long iova,
++					      size_t granule,
++					      void *cookie)
+ {
+ 	dummy_tlb_flush(iova, granule, granule, cookie);
+ }
+--- a/include/linux/compiler_attributes.h
++++ b/include/linux/compiler_attributes.h
+@@ -316,6 +316,17 @@
+ #endif
+ 
+ /*
++ * Optional: not supported by clang
++ *
++ *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Attributes.html#index-noipa
++ */
++#if __has_attribute(noipa)
++# define __noipa __attribute__((noipa))
++#else
++# define __noipa
++#endif
++
++/*
+  *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-weak-function-attribute
+  *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-weak-variable-attribute
+  */
+--- a/lib/debugobjects.c
++++ b/lib/debugobjects.c
+@@ -1068,7 +1068,7 @@ struct self_test {
+ 
+ static __initconst const struct debug_obj_descr descr_type_test;
+ 
+-static bool __init is_static_object(void *addr)
++static __noipa bool __init is_static_object(void *addr)
+ {
+ 	struct self_test *obj = addr;
+ 
+
 
