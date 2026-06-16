@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49CE7466B4B;
-	Tue, 16 Jun 2026 16:50:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3F3F40E8C1;
+	Tue, 16 Jun 2026 17:29:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781628642; cv=none; b=aSM+UITmy3zQWKOBKttuiOd9WRbGlAe6KyNnvDL4MGhyffObdtx2iwj1OpEXyzGA8mBUMSaxqRtQC0IHXHr/HTAbV7/DY5SaaKnGP+Go8/W5rf4MRRPZvqRRPU8vZVK7otMbaKAUrax4jEEiXFyAluI/PcnvcpYG6GOJCZpahYU=
+	t=1781630965; cv=none; b=PP+dZCJz27IKu70C8wp7zYoIuYwCTZZy+El/BTZfcjkMOR+6CemRZyjjpWiPrBXMU8phpsK+OL0wErfRBqw6i1YO6/ne1TsGjYnZSJEUW38k3N6XTGkdylXQeALougWzXUU0HCyiASCTkfpto+ijd5HJcobBDGg5BlNVz9ZEqIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781628642; c=relaxed/simple;
-	bh=2yHt6t+x7BzCR8MZjiU+qU0jDGz5O7+DTnfo+RczACM=;
+	s=arc-20240116; t=1781630965; c=relaxed/simple;
+	bh=n2P+zzlB/ETo6E5V2yVpiDmUne1Vwi83s+gUu0FeIEc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=r3+WciMopAFfG1nXEpWyX15hLi+Gws5LAOzEl1VZ86osTQL1g7GqzYHTuTLtyuUBC0MLqqjSoQmVvjcklAZXCL4LGNb6pRkuFmJE6KQgcDfbmYo/ijJFYAvmNQt29SR9lFzvYwlxoW5DMYcQrmS6cwQaDJD2EqgmV6/UeweSs44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Kvh5/8oi; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=Debsdaeb0LtmwXPT+tum0ZUOVgRuhaedSFTNnn8nAJMlWepBGEaCiCZP9CEFpKJaNSNbB8ANy9Tvw4DbTmKogdpRpaMnqC+d0BVWGFgihP6OqXkXk4HuSRzTvuik4uQLY7Apn3jprbN7Pv3K7Fgnsyu3MtnNkVn8KI8+AmJulmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=ZaNY79Ov; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Kvh5/8oi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39E431F00A3D;
-	Tue, 16 Jun 2026 16:50:39 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="ZaNY79Ov"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A81611F000E9;
+	Tue, 16 Jun 2026 17:29:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1781628641;
-	bh=nIHo+HT0QVAPFcBd7m06hz22Eb3GMVAllNqOmp06iI8=;
+	s=korg; t=1781630964;
+	bh=35tWwtyNJFXPvtSquc0NW99mvWl6KCS5+jfK9dXJFyI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Kvh5/8oiBqd+tC8fM9Lzh837SjZfWFnPTQMwUovdmax5GavVF11vZOt1sxHmpaWtK
-	 u1AwTV3uHvERwSQ0VU8iMLvZpgbjQPnHNLGQXsAdtPzpbCyxvAlXGqsLPUyT7HXdUy
-	 pwYvyyBADgmoTKHxD25ucNN5vP4qptmU2bGHtq64=
+	b=ZaNY79OvCuKX1/emRar5f1k4aq3R450ZAgnYEUWvQNOO2B7lseFynSUpGCAAvesfT
+	 YSM4D/3DnVaeePWGMKE1jcL/KQWqq+GzUF8vHYRccNqPTljWhhcaRn6sANUiIsHB1A
+	 Gh8fkWt0MsY6ae8Nh732qBPPKjhi36gyKnsXvvxM=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -34,12 +34,12 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	linux-kbuild@vger.kernel.org,
 	Arnd Bergmann <arnd@arndb.de>,
 	Joerg Roedel <joerg.roedel@amd.com>
-Subject: [PATCH 6.6 134/452] iommu, debugobjects: avoid gcc-16.1 section mismatch warnings
-Date: Tue, 16 Jun 2026 20:26:01 +0530
-Message-ID: <20260616145124.773030844@linuxfoundation.org>
+Subject: [PATCH 6.1 129/522] iommu, debugobjects: avoid gcc-16.1 section mismatch warnings
+Date: Tue, 16 Jun 2026 20:24:36 +0530
+Message-ID: <20260616145132.138669703@linuxfoundation.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260616145117.796205997@linuxfoundation.org>
-References: <20260616145117.796205997@linuxfoundation.org>
+In-Reply-To: <20260616145125.307082728@linuxfoundation.org>
+References: <20260616145125.307082728@linuxfoundation.org>
 User-Agent: quilt/0.69
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -51,7 +51,7 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.6-stable review patch.  If anyone has any objections, please let me know.
+6.1-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -111,7 +111,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/drivers/iommu/io-pgtable-arm-v7s.c
 +++ b/drivers/iommu/io-pgtable-arm-v7s.c
-@@ -894,21 +894,27 @@ struct io_pgtable_init_fns io_pgtable_ar
+@@ -909,21 +909,27 @@ struct io_pgtable_init_fns io_pgtable_ar
  
  static struct io_pgtable_cfg *cfg_cookie __initdata;
  
@@ -147,7 +147,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  }
 --- a/include/linux/compiler_attributes.h
 +++ b/include/linux/compiler_attributes.h
-@@ -384,6 +384,17 @@
+@@ -385,6 +385,17 @@
  #endif
  
  /*
@@ -167,7 +167,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
   */
 --- a/lib/debugobjects.c
 +++ b/lib/debugobjects.c
-@@ -1076,7 +1076,7 @@ struct self_test {
+@@ -1065,7 +1065,7 @@ struct self_test {
  
  static __initconst const struct debug_obj_descr descr_type_test;
  
