@@ -1,56 +1,38 @@
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19A3826A0B9;
-	Wed, 24 Jun 2026 15:50:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B6573A7849;
+	Wed, 24 Jun 2026 22:57:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782316252; cv=none; b=JguZEAN8TtI92/Ce4APzPuoXNOyzFu8qbBGQW40szIvmEUvqtJmfdQ2AuDNw+2wPoQ+cHqfpZ1Z6iZB8QUYSSyhuC+Sxsx6DDS6OnW8sCePWJMqy2EXtlOn+Nkj9vPR7J70Cl+nemrP5ezNLWNsNvhBApSy5PNmqBNVvVX7qtxc=
+	t=1782341836; cv=none; b=F17V/8f0F4YAb0Q62nGTAWagQxQG3HzgJR8PZo2+GMr129tO5CHf6yvWOJ2ku6LoeqsKJ/nokG24CluCEZLcU9xyCAb0zEJMvYqutJXTY1SW7baqLBE/faE6Obg99F1GepOU7DU2uN7ZELX9o1GjG4UeNiCy3egIxFgXxwMVBm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782316252; c=relaxed/simple;
-	bh=uQtzTJ6URDqpjagy1a7OXpydALicjh7xI3FPLQtdz6E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FxTu+1LE+/lizjqzBYkEVf3ZwauHWs6Px5YcwNdHYIxMtW7HElZbtUVtVN7uJ848/TGXRKsNIg15+3brnDF4rR0WdabIInpgojZfIkIZwwwL81llsV7ZCfNLAUBm73CbHJUCrMGmxCoAVslJjaQ/wdTqE9z8RF8EydeLX95RWtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=nVZynwdc; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=debian.org
+	s=arc-20240116; t=1782341836; c=relaxed/simple;
+	bh=BUGth9T6GFsiGzDwFVeylUwGIQThA5Saz/Fdsq0tD7U=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=cp1llZfHepdvMnqP2onC0q3dQUn3WaeJdadu3BCrMQa6zIpGv/+428coT85/R+nHYimRb8cs+UfY73C8wy46szhGNaRDQXSO6LY193auf7S3oIpZpZS+6rv2leXNGWm4B7iuBrGFzzSrlykDsnhotupJpioSKNpGxJFI5N6B0fs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lIWiff4c; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="nVZynwdc"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=7pRlBLyW0rZ9a8pbzBcOWWJR3Cglg/eninZwUlynwgk=; b=nVZynwdcx5kKz0BZiDTzoFN+8W
-	qam37WbJaU26Mi0zC7cLhqAd/2HT/VoKM3IlJ5RDzTke7Aj7UQhJqMSqdiTSPTR6diY9EcPXcA0X9
-	7QlU4W206TL/k7iipxTFTab7WudMlJOoFsTqoBOxXehVAHlhLjfB9Ll9MALNOnoycloeHramf1bd5
-	M9Q78G2yED5HKOmsx/nuKbmczZ8Cekh+mZLhIGVRN57ln7cDL1Jn47UNWokk0x+SPDUb8uK8ksa+a
-	ePqIhlG36LdDVu3lGQ3rrTgQRCdg24ZqRj2RW5O+QAXUcnJOm43sgymznmSAYJ9EryVUzwzXmKyo+
-	8RvvlLAA==;
-Received: from authenticated-user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <leitao@debian.org>)
-	id 1wcPru-002X68-31;
-	Wed, 24 Jun 2026 15:50:27 +0000
-Date: Wed, 24 Jun 2026 08:50:20 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Masami Hiramatsu <mhiramat@kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	Nathan Chancellor <nathan@kernel.org>, paulmck@kernel.org, Nicolas Schier <nsc@kernel.org>, 
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Shuah Khan <skhan@linuxfoundation.org>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
-	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	bpf@vger.kernel.org, llvm@lists.linux.dev, linux-doc@vger.kernel.org, 
-	kernel-team@meta.com
-Subject: Re: [PATCH v6 6/8] Documentation: bootconfig: document build-time
- cmdline rendering
-Message-ID: <ajv8puUv7wE7raef@gmail.com>
-References: <20260623-bootconfig_using_tools-v6-0-640c2f587a3c@debian.org>
- <20260623-bootconfig_using_tools-v6-6-640c2f587a3c@debian.org>
- <20260624174737.a4862dcd86f3d746b788d197@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lIWiff4c"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57D131F000E9;
+	Wed, 24 Jun 2026 22:57:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782341835;
+	bh=vtpbjEzV0D9KX1/I3OrkLx2o++DBkjj7lU9MtNcwOXc=;
+	h=Date:From:To:Cc:Subject;
+	b=lIWiff4cfj5duibCM28sK8EXgZinmeOTihzEhyowHr1NP9CcWqVvE1/gEk5HtQqdH
+	 cxZgFos1ps68IfD70hWaGVci2SKopIrhmAad1HT5jPedXAcnV1vc63akv3gCdvIBYb
+	 4WfsEf5r2t+nuQTnmjVngNU6zPQzDE8j3mJeEMfbylis7SfFvoYBCiwR1dHA95xePv
+	 dtug4Kbwe3RjYTqKSuv2qrQ/E+9kRz2KetaMfPKAiC8fmnWJ5AN9ofGCeYJTeCug4p
+	 N+l4UOpyTQCBvoW9V+jMSKXtwgEmpbhDoA3NiAb0nVh3V7J+CG/ZXtkZBHuk/isPw8
+	 QyLC2sCnNC6kA==
+Date: Wed, 24 Jun 2026 15:57:11 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-kernel@vger.kernel.org, Nicolas Schier <nsc@kernel.org>,
+	linux-kbuild@vger.kernel.org
+Subject: [GIT PULL] Kbuild updates for 7.2 #2
+Message-ID: <20260624225711.GA1132314@ax162>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -59,23 +41,70 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260624174737.a4862dcd86f3d746b788d197@kernel.org>
-X-Debian-User: leitao
 
-On Wed, Jun 24, 2026 at 05:47:37PM +0900, Masami Hiramatsu wrote:
-> On Tue, 23 Jun 2026 09:15:33 -0700
-> >
-> > +The option requires ``CONFIG_BOOT_CONFIG_EMBED=y``, a non-empty
-> > +``CONFIG_BOOT_CONFIG_EMBED_FILE``, and an architecture that selects
-> > +``CONFIG_ARCH_SUPPORTS_CMDLINE_FROM_BOOTCONFIG``. Currently only x86
-> > +selects it; on other architectures the embedded bootconfig still works,
-> > +but only through the late runtime parser.
-> 
-> As commented by Sashiko, here we need to mention that this option requires
-> CONFIG_CMDLINE to be empty. This means user can NOT set both option
-> at once (This also means user doesn't have to worry about configuration
-> conflicts.)
+Hi Linus,
 
-Ack! I will update.
+Please pull this second round of Kbuild changes for 7.2. It has all been
+in next for at least a few cycles. If there are any problems, please let
+me know.
 
---breno
+Cheers,
+Nathan
+
+The following changes since commit 1a1e62a5a48494cdf33e3bfb82fb8f408da7c4cc:
+
+  kconfig: tests: fix typo in comment (2026-06-09 16:28:46 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/kbuild/linux.git tags/kbuild-7.2-2
+
+for you to fetch changes up to 645323a7f4e55bb3abb0cb003b6b9dc715c8dc21:
+
+  kconfig: add optional warnings for changed input values (2026-06-18 11:46:32 -0700)
+
+----------------------------------------------------------------
+Second round of Kbuild changes for 7.2
+
+- Link host programs with ld.lld when $(LLVM) is set to match user's
+  expectations that LLVM will be used exclusively during the build
+  process
+
+- Fix modpost warnings from static variable name promotion that can
+  happen more aggressively with the recently merged distributed ThinLTO
+  support
+
+- Add an optional warning for user-supplied Kconfig values that changed
+  after processing, such as out of range values or options that have
+  incorrect / missing dependencies
+
+Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+
+----------------------------------------------------------------
+Nathan Chancellor (1):
+      kbuild: Use ld.lld for linking host programs when LLVM is set
+
+Pengpeng Hou (1):
+      kconfig: add optional warnings for changed input values
+
+Rong Xu (1):
+      modpost: Ignore Clang LTO suffixes in symbol matching
+
+ Documentation/kbuild/kconfig.rst                   |   5 +
+ Makefile                                           |   3 +
+ scripts/kconfig/confdata.c                         | 106 ++++++++++++++++++++-
+ scripts/kconfig/tests/conftest.py                  |   8 +-
+ scripts/kconfig/tests/warn_changed_input/Kconfig   |  40 ++++++++
+ .../kconfig/tests/warn_changed_input/__init__.py   |  33 +++++++
+ scripts/kconfig/tests/warn_changed_input/config    |   3 +
+ .../tests/warn_changed_input/expected_config       |   6 ++
+ .../tests/warn_changed_input/expected_defconfig    |   1 +
+ .../tests/warn_changed_input/expected_stderr       |   4 +
+ scripts/mod/modpost.c                              |   2 +-
+ 11 files changed, 204 insertions(+), 7 deletions(-)
+ create mode 100644 scripts/kconfig/tests/warn_changed_input/Kconfig
+ create mode 100644 scripts/kconfig/tests/warn_changed_input/__init__.py
+ create mode 100644 scripts/kconfig/tests/warn_changed_input/config
+ create mode 100644 scripts/kconfig/tests/warn_changed_input/expected_config
+ create mode 100644 scripts/kconfig/tests/warn_changed_input/expected_defconfig
+ create mode 100644 scripts/kconfig/tests/warn_changed_input/expected_stderr
