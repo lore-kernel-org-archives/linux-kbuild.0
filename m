@@ -1,86 +1,115 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.avm.de (mail.avm.de [212.42.244.120])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC40284693;
-	Mon, 13 Jul 2026 12:33:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0BF637BE93;
+	Mon, 13 Jul 2026 12:57:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783945985; cv=none; b=fNJeGghueyjZjrYaP25QEksLTm+qKb/F6h9vzZySr4oFmRjn7UqQ9UykTJo1T7EYZaHejXk9Am3wYCyFOcGyghwXZ+yjRgguy11dfXgoyXlKStY4zN3pxVSxdfPtesiFdIyfX94fWYeFUMtLYfNxZz/hoFNgtfvxhdnfAwdv/aw=
+	t=1783947424; cv=none; b=I8QwI1J6FErbHBU0cMUGUbFEjSFab42KLUd9CnHeYstaan8XCmC0rtEEZY/cS/AQV294U7bh2MZA3eltQHBlwtLzb5rcgcLWvRSm5au1ZV42bVmkFT8enOBSFpeEMEn7kzF+dK36wHn6UPWdTE676EPeHTB5/C8ngTxqDXq07+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783945985; c=relaxed/simple;
-	bh=u2B1y5AG8z+QeVX67OnFbZ6v9dnXY5cf7Tcft3d6/T8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VQezMkipA4DPzyAf+vvhJcErQitky/BpREDhWxS/jyhhUWzYpAM80rvmrbRGsebKzZ5FpCh64YTdb2TzLmaTpF4rM2XTL0jpT/oSwMbf14uUSnKpJz4u60wIb4mFJK1P+pWNU1j0/Ml6sqUHlP/st1GQovgvtOTKE3Wupv8Zb54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ahCNqYYD; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ahCNqYYD"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 26FBA1F000E9;
-	Mon, 13 Jul 2026 12:33:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783945982;
-	bh=JY/FqE4KfpeLdqxO5SEnfQ2rmTvCTJVxh/VnIGWxr/Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=ahCNqYYDQj184C28Zp/IyYSl35JjGtJE8jU2IaoFnHs9upAuK3YcRubnOtbKW9gb9
-	 FIJatEDK0N6SjwcalzktMcqj0N1xURA+/Gi323fO892q/2zJ1ouBQZtUJWft2V4mO2
-	 0ayQxdCCNJMbI8n0ahV+NxjDu9KwNgrlpaR1kC3nSEnTqZfm2hBaYlI7X1kAKF5zDc
-	 0rJ07YBhMkw7hUXLejdregDztba4ntRyzAu4GhXUQlYK7RTMwZMPIy6ZISmYSfmuG4
-	 j41LN/Ow+S22jIareAY33T/FCRg9oMYBQTRMEUIGHwk9+gszJuKXShqoKZE5uAr/eK
-	 Av2DMz410n5Hw==
-From: Nicolas Schier <nsc@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Petr Pavlu <petr.pavlu@suse.com>
-Cc: Nicolas Schier <nsc@kernel.org>,
-	Peter Collingbourne <pcc@google.com>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Daniel Gomez <da.gomez@kernel.org>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Aaron Tomlin <atomlin@atomlin.com>,
-	linux-kbuild@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-modules@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] kbuild: Use --force-group-allocation when linking modules
-Date: Mon, 13 Jul 2026 14:32:48 +0200
-Message-ID: <178394595379.708416.8197126658182660959.b4-ty@b4>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260612133139.1919042-1-petr.pavlu@suse.com>
-References: <20260612133139.1919042-1-petr.pavlu@suse.com>
+	s=arc-20240116; t=1783947424; c=relaxed/simple;
+	bh=bIRqCHpriQsXZf5XV0nkylnIIJScooWgklVhK7I/yP8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WKoJNbZPIBORYiRaW38NFdzVVoIw4kCk1qpCfsF0siUw/7v8QT/eeNcyq6PU3O8C/+QDdG1QgPKVZS+IhPh5Zwdh0ysGLAIh3SX4yBStjF4SDlxn6uRyjythz/WKmFfIA2DS8lItVtvITbUTLGtoYk95XkZUhUTwdGHhcHEGeM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com; spf=pass smtp.mailfrom=fritz.com; arc=none smtp.client-ip=212.42.244.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fritz.com
+Received: from [2001:bf0:244:244::78] (helo=mail.avm.de)
+	by mail.avm.de with ESMTP (eXpurgate 4.57.1)
+	(envelope-from <n.schier@fritz.com>)
+	id 6a54e095-7cb1-7f0000032729-7f0000018c44-1
+	for <multiple-recipients>; Mon, 13 Jul 2026 14:56:53 +0200
+Received: from mail-auth.fritz.com (unknown [IPv6:2001:bf0:244:244::78])
+	by mail.avm.de (Postfix) with ESMTPS;
+	Mon, 13 Jul 2026 14:56:53 +0200 (CEST)
+Date: Mon, 13 Jul 2026 14:56:52 +0200
+From: Nicolas Schier <n.schier@fritz.com>
+To: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
+Cc: Arnd Bergmann <arnd@arndb.de>, Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>,
+	"Maciej W. Rozycki" <macro@orcam.me.uk>,
+	Nick Huang <sef1548@gmail.com>, linux-kernel@vger.kernel.org,
+	linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH v2] scripts: headers_install.sh: Normalize __ASSEMBLER__
+ to __ASSEMBLY__
+Message-ID: <20260713-authentic-nimble-walrus-d4b40b@l-nschier-z2>
+References: <20260630-uapi-assembly-v2-1-8e7bee2fe816@weissschuh.net>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260630-uapi-assembly-v2-1-8e7bee2fe816@weissschuh.net>
+Organization: FRITZ! Technology GmbH
+x-ms-reactions: disallow
+X-purgate-ID: 149429::1783947413-74E981B0-ABE2B4B2/0/0
+X-purgate-type: clean
+X-purgate-size: 2368
+X-purgate: This mail is considered clean (visit https://www.eleven.de for further information)
+X-purgate: clean
+X-pfmilter: queueID: 18055A0349
 
-On Fri, 12 Jun 2026 15:31:37 +0200, Petr Pavlu wrote:
-> Specific code, such as outlined KASAN checks, may be placed in
-> COMDAT-deduplicated sections. When linking modules as relocatable files,
-> the linker by default preserves such groups, potentially leaving multiple
-> copies in the resulting modules and unnecessary group metadata.
+On Tue, Jun 30, 2026 at 11:15:00PM +0200, Thomas Weißschuh wrote:
+> There is an ongoing effort to replace the usage of __ASSEMBLY__ with
+> __ASSEMBLER__ throughout the kernel tree, see for example
+> commit 287d163322b7 ("arm64: Replace __ASSEMBLY__ with __ASSEMBLER__ in
+> non-uapi headers"). The latter is automatically provided by all compilers
+> and preprocessors supported by the kernel, so the explicit definitions
+> of __ASSEMBLY__ can be removed.
 > 
-> Use --force-group-allocation to have the linker resolve the COMDAT groups
-> and place their members as regular sections. The option is available from
-> ld.bfd 2.29 and ld.lld 19.1.0.
+> However the UAPI headers might be used with non-GCC-compatible
+> compilers, which do not define __ASSEMBLER__ automatically.
+> So this migration may break users. Also during the migration phase, the
+> UAPI headers will use a mix of *both* __ASSEMBLY__ and __ASSEMBLER__ at
+> the same time, which is ugly and inconsistent.
 > 
-> [...]
+> For now make sure that the exported UAPI headers consistently use
+> __ASSEMBLY__ as before.
+> 
+> Link: https://lore.kernel.org/lkml/164baf81-2824-4943-bbc1-4ae8a160c0cc@t-8ch.de/
+> Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
+> ---
+> Changes in v2:
+> - Normalize *to* __ASSEMBLY__.
+> - Link to v1: https://patch.msgid.link/20260309-uapi-assembly-v1-1-a7ebfbf14309@weissschuh.net
+> ---
+> This should go either through kbuild or asm-generic, I think.
+> ---
+>  scripts/headers_install.sh | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/scripts/headers_install.sh b/scripts/headers_install.sh
+> index 9c15e748761c..83e447596878 100755
+> --- a/scripts/headers_install.sh
+> +++ b/scripts/headers_install.sh
+> @@ -36,6 +36,7 @@ sed -E -e '
+>  	s/(^|[^a-zA-Z0-9])__packed([^a-zA-Z0-9_]|$)/\1__attribute__((packed))\2/g
+>  	s/(^|[[:space:](])(inline|asm|volatile)([[:space:](]|$)/\1__\2__\3/g
+>  	s@#(ifndef|define|endif[[:space:]]*/[*])[[:space:]]*_UAPI@#\1 @
+> +	s/__ASSEMBLER__/__ASSEMBLY__/g
+>  ' $INFILE > $TMPFILE || exit 1
+>  
+>  scripts/unifdef -U__KERNEL__ -D__EXPORTED_HEADERS__ $TMPFILE > $OUTFILE
+> 
+> ---
+> base-commit: dc59e4fea9d83f03bad6bddf3fa2e52491777482
+> change-id: 20260302-uapi-assembly-0bb7213b41f1
+> 
+> Best regards,
+> --  
+> Thomas Weißschuh <linux@weissschuh.net>
+> 
 
-Applied to kbuild/linux.git (kbuild-next-unstable), thanks!
+Thanks, I'll take it via kbuild.  Please veto, if it shall go through 
+asm-generic instead.
 
-[1/1] kbuild: Use --force-group-allocation when linking modules
-      https://git.kernel.org/kbuild/c/54747629
+Reviewed-by: Nicolas Schier <n.schier@fritz.com>
+Tested-by: Nicolas Schier <n.schier@fritz.com>
 
-Please look out for regression or issue reports or other follow up
-comments, as they may result in the patch/series getting dropped,
-reverted or modified (e.g. trailers). Patches applied to the
-kbuild-next-unstable branch are accepted pending wider testing in
-linux-next and any post-commit review; they will generally be moved
-to the kbuild-next branch in about a week if no issues are found.
 
-Best regards,
--- 
+Kind regards,
 Nicolas
-
