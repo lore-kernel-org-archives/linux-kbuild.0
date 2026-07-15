@@ -1,76 +1,95 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66FEB3EBF19;
-	Wed, 15 Jul 2026 09:03:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F364F4156DB;
+	Wed, 15 Jul 2026 09:13:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784106239; cv=none; b=C6kBO71TALRpemTcAZ/QRk0zIfOPDnwC+AFv0+oa9tqUExs0a3nLLWHj3jjytNNXnwiWf3VKIGh2x7gD8SLgjJbWGlyKyYP2QOmds96s+yBTmmAm+TTX8RvE6zPGSsa5MIpxuVyMJCcyAgOGmO44wza2EyWk/paEsp0+YX7KxsA=
+	t=1784106784; cv=none; b=TiOdrs++wH1urLyLMp6gojBmB2MlqiLfBUESLakgRWaN2Jn3IpMRhVBwJNae2yqp+wihu1FGkKDujRVZMDDU+WC7odVnIibNlbXKvGEncvk8DZmyY3ek6y62tLzVo/WEJbjsyFNxPNdu9Iaxk8vuj6jvoXJwjMYdPv3tUYYmquQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784106239; c=relaxed/simple;
-	bh=VX7v5KznOGst/S32zIq13isYK9aQbcFUdNYlBguUuc0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=txYEbw9RYV8GTRaHxLgMlMDh31ZiqNr39Rdt+sq2bE3oum+k7DfOJqlnqPr5netxxI6rN7kLozxie73tQS0fmda7Lgf0gKwUqPNRcomrQJY+8TRfpc0e6kVYKEXcd3vEqzp9amoVjTol8crrDbG3szKV/ZLoPRLliNrsgvEfPY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mp9b9tA1; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784106784; c=relaxed/simple;
+	bh=ZuI6c56qCbvtlQu9iW6eSgb7tuRCOSj5bRlR3Wi83aU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gkGi2B82JoNaK7/btP12IHTR6g40w+JFm3ZxNSYHiZadx+Tzd8OMVvyOhkkevFlDbZTPG3eyijcR9BPV+HrEveVggM39jiaeZEDuKJ4t+pY60RXw8Io4AX+nQ4d6/3+fEfwMu6wP8ILR3OIms9keZN68P7BFJYdE31HG7r0b0Ck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cdW6QMex; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mp9b9tA1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 110871F000E9;
-	Wed, 15 Jul 2026 09:03:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cdW6QMex"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id DB95F1F000E9;
+	Wed, 15 Jul 2026 09:12:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784106230;
-	bh=VX7v5KznOGst/S32zIq13isYK9aQbcFUdNYlBguUuc0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=Mp9b9tA1KsQJcysDV5RgBKBMJTWV+8PyD1YK/DtL5YbfSJnfI2mdI68YW8UhLCZsN
-	 yHzbUs5VcVEC4mFb+D2l+PtQWybslLwNtVqM7ljXGi8kYsmMs56+Ijv0vyr+iRpsC8
-	 vOP7qSTE8VGiPtNWfpzA4RhaYAMQMF0cuxho3kGHt/9zuP7emOkG0JxyBE2dIs4Zzj
-	 i7WyuimjZqPZ6UkZO9oPeX19hsIGSbz06E13ot/gmtLrxK24748nIGVEqQI+cbKF/d
-	 Sm4O626cWSzvQEDbEtTWkY9c4yJvyd4TGLZfKBAuRRkw7ohLEo2/kz0DKlHbUrG8lY
-	 ZgWrFIC1PQf0w==
-From: Thomas Gleixner <tglx@kernel.org>
-To: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-Cc: Arnd Bergmann <arnd@arndb.de>, Andy Lutomirski <luto@kernel.org>,
- Vincenzo Frascino <vincenzo.frascino@arm.com>, Nathan Chancellor
- <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, Thomas Bogendoerfer
- <tsbogend@alpha.franken.de>, Daniel Lezcano <daniel.lezcano@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>, Paul
- Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
- <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, Huacai Chen
- <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
- linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kbuild@vger.kernel.org, linux-mips@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org,
- loongarch@lists.linux.dev
-Subject: Re: [PATCH 3/7] MIPS: csrc-r4k: Replace CONFIG_GENERIC_GETTIMEOFDAY
- ifdeffery with IS_ENABLED()
-In-Reply-To: <20260715102751-d1ed7195-f541-484e-9843-73ee4237b7b5@linutronix.de>
-References: <20260709-vdso-arch-clockmodes-v1-0-3fd780bbf851@linutronix.de>
- <20260709-vdso-arch-clockmodes-v1-3-3fd780bbf851@linutronix.de>
- <87wluwoe1c.ffs@fw13>
- <20260715102751-d1ed7195-f541-484e-9843-73ee4237b7b5@linutronix.de>
-Date: Wed, 15 Jul 2026 11:03:47 +0200
-Message-ID: <87tsq0oc98.ffs@fw13>
+	s=k20260515; t=1784106780;
+	bh=bbsxyVWqOGFhtr4W+a8jv4bdeufYTgNlzVGO/0yDsl0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=cdW6QMexC3OBVbgSpjjXQqo42CJ0wcbnhev8oKN0bF56iq/0jgg/Vg1/a958vAFBk
+	 /LnU9l+qWYidpPizZBb6d8ggzR9+6c36kCaxelGu3kq4p7t0x9uw4nWYYLbZa9COCD
+	 OLqOw3mG+V/9IFz5aC7KiMakxWew3Q1jdZr9N8itGJjZkFzRJHmW5nlRIlVWBjen4f
+	 8BVYdEyYoU5r3+ah9eERkcUoUPiqZizBHC5wherA8qCDm9+DJS2FBazI/uwFWNvvSH
+	 qWKAM7WiilJhVxzcsfMNT4IR9QPgeHYJVlsq62kE7m9XfEU/Zptit6be5s3cPXseDV
+	 qLufT9NBiQInw==
+Date: Wed, 15 Jul 2026 11:12:04 +0200
+From: Nicolas Schier <nsc@kernel.org>
+To: Sergei Litvin <litvindev@gmail.com>
+Cc: miguel.ojeda.sandonis@gmail.com, rust-for-linux@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+	Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
+	Gary Guo <gary@garyguo.net>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Daniel Almeida <daniel.almeida@collabora.com>,
+	Tamir Duberstein <tamird@kernel.org>,
+	Alexandre Courbot <acourbot@nvidia.com>,
+	Onur =?iso-8859-1?Q?=D6zkan?= <work@onurozkan.dev>,
+	nathan@kernel.org
+Subject: Re: [PATCH v4] scripts/tags.sh: Add support for rust source files
+Message-ID: <aldO5D9hHVSdcM_W@levanger>
+Mail-Followup-To: Sergei Litvin <litvindev@gmail.com>,
+	miguel.ojeda.sandonis@gmail.com, rust-for-linux@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+	Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
+	Gary Guo <gary@garyguo.net>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Daniel Almeida <daniel.almeida@collabora.com>,
+	Tamir Duberstein <tamird@kernel.org>,
+	Alexandre Courbot <acourbot@nvidia.com>,
+	Onur =?iso-8859-1?Q?=D6zkan?= <work@onurozkan.dev>,
+	nathan@kernel.org
+References: <20260714122441.78158-1-litvindev@gmail.com>
+ <20260714125259.78824-1-litvindev@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260714125259.78824-1-litvindev@gmail.com>
 
-On Wed, Jul 15 2026 at 10:43, Thomas Wei=C3=9Fschuh wrote:
-> On Wed, Jul 15, 2026 at 10:25:19AM +0200, Thomas Gleixner wrote:
->> and then you can just unconditionally set clocksource::vdso_clock_mode
->> in all drivers.
->>=20
->> No?
->
-> It will weaken the sanity check in __clocksouce_register_scale() if
-> CONFIG_GENERIC_GETTIMEOFDAY=3Dn. I am not sure what that sanity check
-> is supposed to protect against, so I left it as is.
-> If we can weaken the check, or maybe even remove it,
-> I'm all for your simpler aproach.
+On Tue, Jul 14, 2026 at 02:52:59PM +0200, Sergei Litvin wrote:
+> When executing the command `make cscope`, the `cscope.files` file generated
+> by it includes only filenames with the extensions *.h, *.c, *.S and not includes
+> filenames with *.rs extensions.
 
-The sanity check is there to catch random numbers being assigned. I
-does not weaken when it's actually unused :)
+With removed Cc trailers and adjusted line break in the commit message, applied
+to kbuild/linux.git (kbuild-next-unstable), thanks!
 
+[1/1] scripts/tags.sh: Prevent binary files appearing in cscope.files
+      https://git.kernel.org/kbuild/c/4859c0d5
+
+Please look out for regression or issue reports or other follow up
+comments, as they may result in the patch/series getting dropped,
+reverted or modified (e.g. trailers). Patches applied to the
+kbuild-next-unstable branch are accepted pending wider testing in
+linux-next and any post-commit review; they will generally be moved
+to the kbuild-next branch in about a week if no issues are found.
+
+Best regards,
+-- 
+Nicolas
