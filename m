@@ -1,37 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F732278156;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F87829B78F;
 	Thu, 16 Jul 2026 05:32:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784179923; cv=none; b=E2GYsTB/GXaBo9p4m7RqlFQEGjRgf9AQiSyySIhEPX1z3wtjaUeB/+LNyZMT0DcG+Wt0VfthGGTFGvFUKdkMpTlCFbscu3DTRTo+sG+j68M23RSsA6DdXrph8LSzBvAJvSVlTVdxvnjhWf2/4bcxnunGzk+YtUMOz7Pa39i2hoc=
+	t=1784179923; cv=none; b=E/DiSRagTYc7LZ/AryjT8X2EegjdvmYUGjq0EUy5+0gHrf6dlM76kevyIB8OPNs9iqJ3VuMT7B8tz5iX9ZZGPUzXyqfsEmKytvy8ILyY83InRPDMw/Steaxgi9mUD75VQaa/CzgTyGP+dmVrBoZnSNOB5OtkFuu9MVj12a3U69c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1784179923; c=relaxed/simple;
-	bh=3Q0vryF+5lbA0CL/FU1QlEBnnVpEBBCyvs3z8P+VlO0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=LMCvzlLGifsW47bHCz0hNc3707AErnhZnCYKUZY2Fhiuqgmg1d2JaCEmPHtxqjRwELxxPbXoi67d30wIfk0QppSqzY0rl4q8oEMZ+oeyU8DObgtZwtHdYl/Kipf6xISY7ZsaqMJehTtoL74z9/Qk1TC+vcb39jZ4RrVSUFQm25U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WyXGZoHE; arc=none smtp.client-ip=10.30.226.201
+	bh=jrgmCjWRCYkHgrBgI9ADeNJXL3DFWZsSnbuE9Bzc+tc=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Z07MERg7ynrkwC4bZYw6n5mbq6MyC9+TlcTWktNnXyOrgGlkfaTTT2nmTlCq3FXqrBbINJ4jrjmehDOM3BxmrTSlBQPxC3RlL1n65apTsSfyGN/lnCF97m5rQmn//hJeG3yFn854E7rsGYnaqpUsxCw2Yr0xXtfd40v96lF1arU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pJI4c8JU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WyXGZoHE"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 06939C2BCF5;
-	Thu, 16 Jul 2026 05:32:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pJI4c8JU"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DE43EC19425;
+	Thu, 16 Jul 2026 05:32:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1784179923;
-	bh=3Q0vryF+5lbA0CL/FU1QlEBnnVpEBBCyvs3z8P+VlO0=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=WyXGZoHEKYeMDS/XHao1XBXyCkblFtOuLwg2OROf2gJkvAZxl4n7Q8hiDaY6Srd2z
-	 sl4DN4Ytoavfqy/K7zXBmYrpM4Nbqy+Dt1kEEduCjUZ63gza3NY8FitUMMuVqCo9+b
-	 EpAmYC3ZZhiq42qjvvgL6dmW9vJ1V+W1mE6dN2kqVE7MIkFriDBvifgi2Y0cLDI2XI
-	 fIDjgg+3ncWHpQU3qqQiz5+7QRdvKIj2nZu0SJGrwZeT4KyiTDVYdU7U2RKqagWdGq
-	 Z4zxX5XNgmDMMj7hIH8gTVOCBd1pRa3O8+XzBJCjzfBzUiKhhbOcmsREgqZKDr6RIz
-	 PTTYUOMiQd9PA==
+	s=k20201202; t=1784179922;
+	bh=jrgmCjWRCYkHgrBgI9ADeNJXL3DFWZsSnbuE9Bzc+tc=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=pJI4c8JUcUzZISAlFXwjjalZS1Z++wqUzp9ZoBA2/zJXNqcD7Ke2jRAAiUyw4Wfpr
+	 uA7NHDzmhYoTyfFGy4jX9PZXMH0v8KRp9THJbTxTCOVvvgiTzZH7M+2NOKw9ALkWbA
+	 NPzgTyIhA+i3wHa5szpt5msE/SJEaJvPD50AS25GMiQDy6d1ZEtLReR/LItLIh5WdG
+	 b4PJdLKbYoUtvLseJLPMeJSn5z3eOiT8bmDa0DHX5sk6kLqDePtNZb8HtzXJe5CwN5
+	 x4iEAE8LmT8b+hrzQqvbqRgP4AW6eQQzlraLfnpYvpuwfl10lXeEqJQ6ZdnKxISoKO
+	 r6t/tlU2tWnkw==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC5E2C44501;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBC66C43458;
 	Thu, 16 Jul 2026 05:32:02 +0000 (UTC)
 From: Jia Wang via B4 Relay <devnull+wangjia.ultrarisc.com@kernel.org>
-Date: Thu, 16 Jul 2026 13:31:50 +0800
-Subject: [PATCH 2/2] modpost: handle RISC-V relative extable relocations
+Subject: [PATCH 0/2] modpost: fix RISC-V randconfig section mismatch false
+ positives
+Date: Thu, 16 Jul 2026 13:31:48 +0800
+Message-Id: <20260716-modpost-v1-0-8eab36cc7310@ultrarisc.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -40,20 +41,21 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260716-modpost-v1-2-8eab36cc7310@ultrarisc.com>
-References: <20260716-modpost-v1-0-8eab36cc7310@ultrarisc.com>
-In-Reply-To: <20260716-modpost-v1-0-8eab36cc7310@ultrarisc.com>
+X-B4-Tracking: v=1; b=H4sIAMRsWGoC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIzMDc0Mz3dz8lIL84hJdY4MU0xQjixTLFDMTJaDqgqLUtMwKsEnRsRB+cWl
+ SVmpyCUi7Um0tAJEOAGtrAAAA
+X-Change-ID: 20260716-modpost-30d5d28d9d64
 To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
  Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
  Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
  linux-riscv@lists.infradead.org, Jia Wang <wangjia@ultrarisc.com>
 X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1784179921; l=4201;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1784179921; l=1729;
  i=wangjia@ultrarisc.com; s=20260515; h=from:subject:message-id;
- bh=Q9Kl2WTnEgc/AGpok4mr/A3MQcvAYwsHz1JLGJEq9t8=;
- b=4mewT8X7Ur3HG+8XYP1s+yvdBIpVetFnR+mZb9M/hui6GV4SQChyjtuRkydw2zNCzqkB/hNOn
- 7PnbxmgAboSAD7tJc/c2fQpxNPkIes31RxXlCDzvuxg5FJuYB4X18IN
+ bh=jrgmCjWRCYkHgrBgI9ADeNJXL3DFWZsSnbuE9Bzc+tc=;
+ b=s6auCp5CqXZZZviC++F8fu8iaXugrrqEm4ism6ga+ZXfB5FqqR8/e0vvIzSRyG8UAuEHdh8XD
+ jPi/vzdz9PSDNYUdItfeEu2Gwj+ilU89w2B4Uc/DImVTcQFZkuQNVJt
 X-Developer-Key: i=wangjia@ultrarisc.com; a=ed25519;
  pk=wGVm18siRScehKOkOz0WKxgxDy7IezHEszhnN4/TUCY=
 X-Endpoint-Received: by B4 Relay for wangjia@ultrarisc.com/20260515 with
@@ -61,140 +63,48 @@ X-Endpoint-Received: by B4 Relay for wangjia@ultrarisc.com/20260515 with
 X-Original-From: Jia Wang <wangjia@ultrarisc.com>
 Reply-To: wangjia@ultrarisc.com
 
-From: Jia Wang <wangjia@ultrarisc.com>
+This series fixes two modpost false-positive section mismatch cases seen
+with RISC-V randconfig builds.
 
-RISC-V relative exception tables emit an R_RISCV_ADD32 and
-R_RISCV_SUB32 relocation pair for each field. modpost already
-ignores the SUB32 half, but still checks the ADD32 symbol section
-directly.
+The first patch filters compiler-generated GCOV symbols and RISC-V local
+branch/PC-relative relocations when they point at init or exit sections.
+These references can come from instrumentation or local compiler/linker
+details rather than from real kernel section lifetime dependencies.
 
-After a relocatable link, that ADD32 symbol can name an unrelated
-local debug symbol. This makes modpost report that __ex_table
-references non-executable .debug* sections even though the original
-exception table entry points at text.
+The second patch handles RISC-V relative exception table entries as
+R_RISCV_ADD32/R_RISCV_SUB32 relocation pairs. modpost already skipped the
+SUB32 half, but still checked the ADD32 symbol directly. After a
+relocatable link, that symbol can name an unrelated local debug symbol and
+trigger false .debug* section mismatch diagnostics from these __ex_table
+relocation pairs.
 
-Recognize the RISC-V ADD32/SUB32 pair for __ex_table. Ignore ADD32
-entries that have been resolved to debug symbols, and otherwise
-validate the resolved relative target address against executable
-sections.
+The issues are reproducible with both GCC 14 and GCC 15. They were
+reproduced or validated with:
 
-This was seen with an rv32 randconfig using KCONFIG_SEED=4721 with
-CONFIG_MMU=y and CONFIG_DEBUG_INFO=y. The resulting vmlinux.o contains
-R_RISCV_ADD32/R_RISCV_SUB32 relocation pairs in __ex_table, and the
-fixed modpost run completes without the false .debug* section mismatch
-diagnostics.
+  - rv32 randconfig, KCONFIG_SEED=277518,
+    CONFIG_GCOV_PROFILE_ALL=y, CONFIG_KCOV_INSTRUMENT_ALL=y,
+    CONFIG_DEBUG_INFO_BTF=y
+
+  - rv32 randconfig, KCONFIG_SEED=4721,
+    CONFIG_MMU=y, CONFIG_DEBUG_INFO=y
+
+With the fixes applied, the corresponding RISC-V randconfig builds complete
+successfully. Other unrelated modpost warnings may still remain.
 
 Signed-off-by: Jia Wang <wangjia@ultrarisc.com>
 ---
- scripts/mod/modpost.c | 79 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 79 insertions(+)
+Jia Wang (2):
+      modpost: ignore generated GCOV and RISC-V local relocs
+      modpost: handle RISC-V relative extable relocations
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 6869822446bd..04a12eebb381 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -1356,6 +1356,10 @@ static Elf_Addr addend_mips_rel(uint32_t *location, unsigned int r_type)
- #define EM_RISCV		243
- #endif
- 
-+#ifndef R_RISCV_ADD32
-+#define R_RISCV_ADD32		35
-+#endif
-+
- #ifndef R_RISCV_SUB32
- #define R_RISCV_SUB32		39
- #endif
-@@ -1406,6 +1410,76 @@ static void get_rel_type_and_sym(struct elf_info *elf, uint64_t r_info,
- 	*r_sym = ELF_R_SYM(r_info);
- }
- 
-+static bool section_contains_addr(struct elf_info *elf, unsigned int secndx,
-+				  Elf_Addr addr)
-+{
-+	Elf_Shdr *sechdr;
-+
-+	if (secndx >= elf->num_sections)
-+		return false;
-+
-+	sechdr = &elf->sechdrs[secndx];
-+
-+	return addr >= sechdr->sh_addr &&
-+	       addr - sechdr->sh_addr < sechdr->sh_size;
-+}
-+
-+static bool addr_is_executable(struct elf_info *elf, Elf_Addr addr)
-+{
-+	unsigned int i;
-+
-+	for (i = 1; i < elf->num_sections; i++) {
-+		if ((elf->sechdrs[i].sh_flags & SHF_EXECINSTR) &&
-+		    section_contains_addr(elf, i, addr))
-+			return true;
-+	}
-+
-+	return false;
-+}
-+
-+static bool is_debug_section(const char *secname)
-+{
-+	return match(secname, PATTERNS(".debug*", ".zdebug*"));
-+}
-+
-+static bool riscv_extable_rela_valid(struct elf_info *elf,
-+				     const Elf_Rela *start,
-+				     const Elf_Rela *stop,
-+				     const Elf_Rela *rela,
-+				     Elf_Addr r_offset,
-+				     Elf_Sym *add_sym)
-+{
-+	Elf_Addr add_addr, sub_addr, target_addr;
-+	unsigned int r_type, r_sym;
-+	const Elf_Rela *pair;
-+	Elf_Sym *sub_sym;
-+
-+	/*
-+	 * RISC-V relative exception tables emit an ADD32/SUB32 pair for each
-+	 * field. After ld -r, the ADD32 symbol may name an unrelated local
-+	 * debug symbol. Otherwise, validate the resolved relative target.
-+	 */
-+	for (pair = start; pair < stop; pair++) {
-+		get_rel_type_and_sym(elf, pair->r_info, &r_type, &r_sym);
-+		if (TO_NATIVE(pair->r_offset) == r_offset &&
-+		    r_type == R_RISCV_SUB32)
-+			break;
-+	}
-+
-+	if (pair == stop)
-+		return false;
-+
-+	sub_sym = elf->symtab_start + r_sym;
-+	if (is_debug_section(sec_name(elf, get_secindex(elf, add_sym))))
-+		return true;
-+
-+	add_addr = add_sym->st_value + TO_NATIVE(rela->r_addend);
-+	sub_addr = sub_sym->st_value + TO_NATIVE(pair->r_addend);
-+	target_addr = r_offset + add_addr - sub_addr;
-+
-+	return addr_is_executable(elf, target_addr);
-+}
-+
- static void section_rela(struct module *mod, struct elf_info *elf,
- 			 unsigned int fsecndx, const char *fromsec,
- 			 const Elf_Rela *start, const Elf_Rela *stop)
-@@ -1428,6 +1502,11 @@ static void section_rela(struct module *mod, struct elf_info *elf,
- 			if (!strcmp("__ex_table", fromsec) &&
- 			    r_type == R_RISCV_SUB32)
- 				continue;
-+			if (!strcmp("__ex_table", fromsec) &&
-+			    r_type == R_RISCV_ADD32 &&
-+			    riscv_extable_rela_valid(elf, start, stop, rela,
-+						     r_offset, tsym))
-+				continue;
- 			break;
- 		case EM_LOONGARCH:
- 			switch (r_type) {
+ scripts/mod/modpost.c | 157 +++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 150 insertions(+), 7 deletions(-)
+---
+base-commit: 58717b2a1365d06c8c64b72aa948541b53fe31eb
+change-id: 20260716-modpost-30d5d28d9d64
 
--- 
-2.34.1
+Best regards,
+--  
+Jia Wang <wangjia@ultrarisc.com>
 
 
