@@ -1,95 +1,91 @@
-Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
+Received: from mail-106111.protonmail.ch (mail-106111.protonmail.ch [79.135.106.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F7B142CAFA;
-	Fri, 17 Jul 2026 15:28:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB94D2773C3;
+	Fri, 17 Jul 2026 20:00:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784302115; cv=none; b=YBtLs7RTKbhhm3ScCC6SxMFj+AZNHQ5Vur+rpH/3VDLfk2747l496uZ08ZhlpNkoU3BvI1Ki0lk1Ht4PEhgkbf0DJHdYP8SwwlyB8vZC389ymok1C+fYAWhnm60qYBJPvaelszn1LvktLHvxMlj8PZJvfDF8isaREdp/KYzKRCs=
+	t=1784318425; cv=none; b=GgaVvx/XQYO9Qvbe36f3IMd5gVRcsuz45qxbfw9yifK4WP83HdsD6twGPqbnTQbVTNoj9MVJTdF+U+L8IA7uxpBPxZq9DUJFfSRxORmzxN9fTlIqm1ZmeWey9UCPwD7TXwCCeRBSq6qwI6DaHdML5CHr4v56tCIistGL4AZEAPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784302115; c=relaxed/simple;
-	bh=+POp8cyKfyuhg9JAwcR7WcSPAhyJ4Vsnffx9TIdKPoU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fc7GgKfmX9LIITPUmTRdOCLKI/71ofmSxYgPN1dYigA/q/8pzOw36EiCbDFKUpXrFVE4O0ZID4jbipIc2mtaaOIZJXE65l6RzBDjVKdyv2nyHbmgOGuK8kbN/lIx/2rF4c54GzlBTxxzYFCylii1bIehTrhgkZF9NbD/thMV9g4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=q4NUtxTg; arc=none smtp.client-ip=159.69.126.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
+	s=arc-20240116; t=1784318425; c=relaxed/simple;
+	bh=Sj1D/q8Ne/UveYsM48w+ga6aEv5JTRSOvBNW2QlwS3k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OldDpxn6xoLLGtsnL+06LIKfV0RC5+tCT0oiwsUMjhFDfKqoKAhqCAzxZdB74U3r92Z08lvV2DIbjKbm7dKlGgmQqpuHJdT+hXarLfF/63/PcqeJ1YaglzWedE6THc/yqLvSAeL5/SiN07jP9jOPMpBtxpNTlhshGkbqqWjTW5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=elc.moe; spf=pass smtp.mailfrom=elc.moe; dkim=pass (2048-bit key) header.d=elc.moe header.i=@elc.moe header.b=GJ8y04xs; arc=none smtp.client-ip=79.135.106.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=elc.moe
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=elc.moe
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="q4NUtxTg"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-	s=mail; t=1784302111;
-	bh=+POp8cyKfyuhg9JAwcR7WcSPAhyJ4Vsnffx9TIdKPoU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=q4NUtxTgUvok/+ohVhPKDOOQjPb5PEHb47TL6TqwiSoejArFOObjxq6SttA45TnyQ
-	 anYgBIeZ5Fa2N2gr7S3sl1xAWtvg6W3xJ82mHXrGDrW6LTDF/qHz4oCR5T68c4wSJ2
-	 4XtUQ8RP2C/y5bENsp3PJovhRWUVWB30EVKs1qec=
-Date: Fri, 17 Jul 2026 17:28:26 +0200
-From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nsc@kernel.org>, "Maciej W. Rozycki" <macro@orcam.me.uk>, 
-	Nick Huang <sef1548@gmail.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
-Subject: Re: [PATCH] scripts: headers_install.sh: Normalize __ASSEMBLY__ to
- __ASSEMBLER__
-Message-ID: <6525047d-cc21-40d4-b22e-f85bf1eb1f0d@t-8ch.de>
-References: <20260309-uapi-assembly-v1-1-a7ebfbf14309@weissschuh.net>
- <823e3bf3-ef3d-47cf-aff8-1668875a2f38@redhat.com>
- <5e05be8c-e9b7-4da7-a182-eefc5043cd2e@t-8ch.de>
- <2030a963-33bc-43fe-9a2b-9c626d7d8360@redhat.com>
+	dkim=pass (2048-bit key) header.d=elc.moe header.i=@elc.moe header.b="GJ8y04xs"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=elc.moe;
+	s=protonmail; t=1784318418; x=1784577618;
+	bh=2lC8cAkV3puOxL86BXLZW1BX5KpevTFyAdcIBPWl2p0=;
+	h=From:To:Cc:Subject:Date:Message-ID:From:To:Cc:Date:Subject:
+	 Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=GJ8y04xsv0lGqgWN4ywDG6Tnhsb5oNGap+eGvDm17w8TV0ItpWON1MXJxRfAQ+2Y9
+	 RXwv3s+O9szLL2GDTaEwMK1GrVfwGIPHd4utgn0IK7vSxBtfNvedZsx44sGPWgM0mX
+	 aA//IIO8DQaSoa8ppHUqfs4tV0D11O5QKPRJu/sJQi6k6WvdOqtGHud6jXcN2DNOoO
+	 eeyKfoEQEkF8kf6v8lCe+aWDpyxXz2c0IoBUNI8sOJGiKkIjcMxo4B6S35G2bNt/jP
+	 OPjl0f1gb+xAwwPtrcA23iHdGnRduOdrWrRuRSRCjW1ATbECwXv3c70VAEYijP2Nfj
+	 fHpGNNsbseHiw==
+X-Pm-Submission-Id: 4h213g5ZhCz1DFFL
+From: Elsie Heck <its@elc.moe>
+To: nathan@kernel.org,
+	nsc@kernel.org
+Cc: linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Elsie Heck <its@elc.moe>
+Subject: [PATCH] fixdep: make gendered language gender-neutral
+Date: Fri, 17 Jul 2026 13:59:39 -0600
+Message-ID: <20260717195939.25130-1-its@elc.moe>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <2030a963-33bc-43fe-9a2b-9c626d7d8360@redhat.com>
 
-On 2026-07-16 20:52:19+0200, Thomas Huth wrote:
-> On 16/07/2026 18.40, Thomas Weißschuh wrote:
-> > On 2026-07-16 12:24:07+0200, Thomas Huth wrote:
-> > > On 09/03/2026 16.58, Thomas Weißschuh wrote:
-> > > > There is an ongoing effort to replace the usage of __ASSEMBLER__ with
-> > > > __ASSEMBLY__ throughout the kernel tree, see for example
-> > > > commit 287d163322b7 ("arm64: Replace __ASSEMBLY__ with __ASSEMBLER__ in
-> > > > non-uapi headers"). The latter is automatically provided by all compilers
-> > > > and preprocessors supported by the kernel, so the explicit definitions
-> > > > of __ASSEMBLER__ can be removed.
-> > > > 
-> > > > However the UAPI headers might be used with older (< GCC 3.0) or
-> > > > non-GCC-compatible compilers, which do not define __ASSEMBLY__
-> > > > automatically.
-> > > 
-> > > I just had a try with gcc 2.95.4 from a Debian Woody installation, and it
-> > > defines __ASSEMBLER__ automatically when compiling *.S files, i.e. gcc 2.95
-> > > does not seem to be a problem. So can you point me to a real case where
-> > > someone tried to use a user space compiler where __ASSEMBLER__ was not
-> > > defined automatically? Otherwise, I think this patch could be reverted
-> > > again.
-> > 
-> > I don't have a specific case I can point you to. My goal was
-> > consistency. Therefore I am against reverting the patch as long as
-> > both __ASSEMBLER__ and __ASSEMBLY__ are used in the UAPI headers.
-> 
-> I've got patches for all files ready and posted them a couple of times
-> already - the problem is, some maintainers are not responsive / ignoring me
-> ... so I'm afraid but I guess we'll be in this inconsistent state for a
-> little bit longer...
+Fix awkward phrasing and change instances of gendered language
+to gender-neutral in code comments to improve consistency and clarity.
 
-Yeah, this is how these things usually go...
+Signed-off-by: Elsie Heck <its@elc.moe>
+---
+ scripts/basic/fixdep.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-> > If we want to switch to __ASSEMBLER__ for the UAPI headers today,
-> > we should instead invert the logic of this patch to consistently use it
-> > everywhere. After all UAPI headers are migrated, the normalization can
-> > then be removed.
-> That sounds like the better idea to me. Could you maybe send a patch, or
-> want me to do it?
+diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
+index cdd5da7e009b..54063d980442 100644
+--- a/scripts/basic/fixdep.c
++++ b/scripts/basic/fixdep.c
+@@ -15,13 +15,13 @@
+  * gcc produces a very nice and correct list of dependencies which
+  * tells make when to remake a file.
+  *
+- * To use this list as-is however has the drawback that virtually
++ * However, to use this list as-is has the drawback that virtually
+  * every file in the kernel includes autoconf.h.
+  *
+  * If the user re-runs make *config, autoconf.h will be
+  * regenerated.  make notices that and will rebuild every file which
+  * includes autoconf.h, i.e. basically all files. This is extremely
+- * annoying if the user just changed CONFIG_HIS_DRIVER from n to m.
++ * annoying if the user just changed CONFIG_USER_DRIVER from n to m.
+  *
+  * So we play the same trick that "mkdep" played before. We replace
+  * the dependency on autoconf.h by a dependency on every config
+@@ -33,9 +33,9 @@
+  * which then let make pick up the changes and the files that use
+  * the config symbols are rebuilt.
+  *
+- * So if the user changes his CONFIG_HIS_DRIVER option, only the objects
+- * which depend on "include/config/HIS_DRIVER" will be rebuilt,
+- * so most likely only his driver ;-)
++ * So if the user changes their CONFIG_USER_DRIVER option, only the objects
++ * which depend on "include/config/USER_DRIVER" will be rebuilt,
++ * so most likely only the user's driver ;-)
+  *
+  * The idea above dates, by the way, back to Michael E Chastain, AFAIK.
+  *
+-- 
+2.55.0
 
-As you are the one driving this effort, it would be great if you could
-send the patch. If the patch would make it into v7.3 I am also fine with
-merging both patches into one if the kbuild maintainers prefer.
-
-
-Thomas
