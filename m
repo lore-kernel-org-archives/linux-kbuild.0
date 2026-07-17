@@ -1,47 +1,40 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ED743ADBA3;
-	Fri, 17 Jul 2026 06:15:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4884F3BD22C;
+	Fri, 17 Jul 2026 12:57:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784268907; cv=none; b=HulM3DYm+iWJ6N+SPNh2gSjKnKyVh8mw9KUVvPi6uSHGJ/SHR/M8HEFYxj4+uzadePveu8Dkbn/F+VlWWedSMyJ3TzwlfcMR2MhZjSFBRTvsC2DDg87hA7i99HLtIMdaF+u+JeL8p5YWvzSC3CoYWd+ytObZmZVhJUIa7rzuUN0=
+	t=1784293027; cv=none; b=MkqADoBBMwlEs7O/gUXsWWk7Ctxl2h52SKiZchOm7rm+JWMjD9xQ3Vx69Bz7wYoRqUYjjCosT+ulcfW0rokjhQB5gUxyhpJBb7FMqx6S7oTJX5ryIKA04c7F8F9tIKekENJQTBpVv0Na3JAMbh87CcwsA0jYzB6SvS1+gGZyhkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784268907; c=relaxed/simple;
-	bh=/YNIeu5dDcZIdRrt5u3jACXGrJAGqwCKT4gDnUxNTGQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=WsHRZVbZpRKQtF/XMC4Q2IIPGUXsvKUoCxJI1Z/RKqnZr2o4ucIgMcZKLowI5sQQLLH4L/cXvoi+X/2oIMNjPrlLr6GDNi17UNKG3coABeEW1IYaE7ZRCV2i0sWpP3OwFiKqxdA5dsIhTgDPJyKmkplx+gnbuqnCqXt6/cWdGwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=VNVPYOsb; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=8I1DwzTV; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	s=arc-20240116; t=1784293027; c=relaxed/simple;
+	bh=PxnDocnD9vdqFt4QXMIfMXqJ/qL9s73tgzS/h4wMJXk=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=A20ACz9RUUQu9nmzzrYE4E8rKJCzDyC/BiqPDynh/x3YzrQdY+nQTsoNctebXT4lkfME924G5QgTBpmG7uYAz02hcRiHD1scgna0mH5er4rpXDxIaiuti9yloFFXmtrIojOQkP+BbfvurnjE28K/jsD3ZSuDgtCIvUr1NYsSriU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HNdT9+fG; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="VNVPYOsb";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="8I1DwzTV"
-From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1784268903;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cIw1nW13D3Q7KVGq3dxw/myoCljjqPSm8YvxUaQYWA0=;
-	b=VNVPYOsbX7c1CIM8F7eHlMuXMtSmy45txWJpFs2iCH7yQCSNeiVTBBxJzTSjtvXQpK0oZT
-	T997yxk4Kvu4sGaAjJ8mFfOQFaoe4MTKbfoblYxFpjtu8DBhE9mp5dDdjiKgXDBgnwpKOG
-	yaSqIl5Qu7s9pXI19F1iv9O83rPG11nKgjtL/xSm+aXdXBzLbwKqviRgJArMflNwQF5cYE
-	CHJ+IduAZn5/lCKKZ+U4ULJNDQH/Hmgz8ZEhKrz3WG+6lx2TgHawzdzvn+oOfK/uycAkeO
-	1FN2BnXWt8HguVWd7fQ65Rj/MiELe+m6gXxvU0PbF1XZ0WBwxgy1+ZVRFu1I5A==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1784268903;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cIw1nW13D3Q7KVGq3dxw/myoCljjqPSm8YvxUaQYWA0=;
-	b=8I1DwzTVpqUUamtI9UCb2EvwLrfrAAHexhzpGSaqZ+r2SqkHmQdH0+k5ovmHZIJ4CS9lRd
-	wLwAc6+3LDduDkBQ==
-Date: Fri, 17 Jul 2026 08:14:51 +0200
-Subject: [PATCH v2 7/7] LoongArch: Remove CONFIG_GENERIC_GETTIMEOFDAY
- ifdeffery
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HNdT9+fG"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 64B3C1F00A3A;
+	Fri, 17 Jul 2026 12:57:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784293025;
+	bh=3/vQTR/mA+mB+6f26loAhD4gVyWN203Yu2SD2mDIs2A=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date;
+	b=HNdT9+fGadryAswWVQDFqOdal1LBOc6TdryJNT9c+eGXVzm6H2USw7zOJDTbuoFHS
+	 l0lfIceJMVolscewS0YwMVEd0cu9vL9lv89zLYxBE3kunxoqvXvoZ0G213oDVUgthU
+	 6VQnt/zIC9BaGg7cDV35IZCS3Gnrw/GG3jzmKP0+VGvuINfvqtyseoc/RhCBIUqiO/
+	 558J11HkSwP934fZGbG7VhA+8saoHN6G5cpn/9IFamVoxk/N4BCtLudK7ejsPSBarq
+	 gBjcnjf0xPIOtG6BLbxii5CadOsbpVH4Xlpt7sMSSWySgJvBrOkfCmuygbkFJfozxF
+	 suZ/YbaSHOrmg==
+From: Nicolas Schier <nsc@kernel.org>
+To: LKML <linux-kernel@vger.kernel.org>, Simon Glass <sjg@chromium.org>
+Cc: Nathan Chancellor <nathan@kernel.org>, 
+ Xingjing Deng <micro6947@gmail.com>, linux-kbuild@vger.kernel.org
+In-Reply-To: <20260714133545.3294648-1-sjg@chromium.org>
+References: <20260714133545.3294648-1-sjg@chromium.org>
+Subject: Re: [PATCH] kconfig: abort rather than loop for ever on EOF
+Message-Id: <178429243591.892424.16900332762546960932.b4-ty@b4>
+Date: Fri, 17 Jul 2026 14:47:15 +0200
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -49,56 +42,43 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20260717-vdso-arch-clockmodes-v2-7-756f5a5d1467@linutronix.de>
-References: <20260717-vdso-arch-clockmodes-v2-0-756f5a5d1467@linutronix.de>
-In-Reply-To: <20260717-vdso-arch-clockmodes-v2-0-756f5a5d1467@linutronix.de>
-To: Arnd Bergmann <arnd@arndb.de>, Andy Lutomirski <luto@kernel.org>, 
- Thomas Gleixner <tglx@kernel.org>, 
- Vincenzo Frascino <vincenzo.frascino@arm.com>, 
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
- Daniel Lezcano <daniel.lezcano@kernel.org>, 
- Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>, 
- Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
- Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, 
- Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>
-Cc: linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-kbuild@vger.kernel.org, linux-mips@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org, 
- loongarch@lists.linux.dev, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1784268894; l=780;
- i=thomas.weissschuh@linutronix.de; s=20240209; h=from:subject:message-id;
- bh=/YNIeu5dDcZIdRrt5u3jACXGrJAGqwCKT4gDnUxNTGQ=;
- b=214rtg/06/j2dYk14bVrr0sJ50TBCWX3iVo+aQXbK8yH33e5JHAj4jo6f6SALe1iyxSeGi8nJ
- TGV415gYICwBJYPC4sSsDENn7Hc4S5CQJ40r3cOD43Mp0pwgiakUKLQ
-X-Developer-Key: i=thomas.weissschuh@linutronix.de; a=ed25519;
- pk=pfvxvpFUDJV2h2nY0FidLUml22uGLSjByFbM6aqQQws=
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.16-dev-4217c
+X-Developer-Signature: v=1; a=openpgp-sha256; l=708; i=nsc@kernel.org;
+ s=20250924; h=from:subject:message-id;
+ bh=PxnDocnD9vdqFt4QXMIfMXqJ/qL9s73tgzS/h4wMJXk=;
+ b=owEBbAKT/ZANAwAKAQdSCnAWJhJpAcsmYgBqWiRdxaU+k+pH9SGMr39mv6EXnFDhuUKeYuMzr
+ 4rZ1+1/PxyJAjIEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCalokXQAKCRAHUgpwFiYS
+ afRYD/YjcLJezeExHPjy9oe6PlX0jdf2BWJe3trDwO4vp7U7RQk6mqWLQ3BBGzdw3pgXlHX2ECO
+ IzQOvMHdLea84FRFKd/mh1fJcaegz1HzTyMJzol2JFPRlOClsGFgKUaGLy57sHYJBiiAACVs1dY
+ jRGWu98/5XjCjmlp+wI1ob4LaUMyfNlar/Gk1gBl5dWVnOdqpVUuHNgJO9bVmqOyZon754fb+Bc
+ a9oJCbrUcsK36UN3v5EI0Gvv/RO493F/72wmWFC23xZrKMthH2+kCQ5TjeXXAA3tQMwBZZZ9W79
+ X5mTMC2olUBD60Ua/4SpCliJ1asayGBI2JIr8tmHM1ayM083AjiKzC5QFsnxIt8eJLQxHlJJpZX
+ F9uNuv/J286khBgec8pkvNX+oFTYlk7Ars0J1JMnygVq17uqdveO3KtipIHGGe1XGY31bhWPjsB
+ rfS4ZBytWJw9tW1fTIaxp+2cMgGGWRJ55ggcyLrnQGbC67lSUiY0IJVSuwbncCfb6dwLz0UDFso
+ HFCb+rRjf79mnnAU8DQEBq8AIERYwGgdTHM1i/95Bf6M5Jzt4Kmt438P7F9EsjNPrfN/LVxrUAR
+ FkxKKTyU1n9Hjr3ujNhfeZXmXbtJRmovEME906KAylP7dDr6PEy3Ku5GfKFWuC28UyX9k58IUvX
+ DpM91rFUzl7sm
+X-Developer-Key: i=nsc@kernel.org; a=openpgp;
+ fpr=18ED52DBE34F860EE9FBC82B7D97093255A0CE7F
 
-Now that there is a definition of VDSO_CLOCKMODE_CPU even if no
-vDSO is built, the ugly ifdeffery can be removed.
+On Tue, 14 Jul 2026 07:35:42 -0600, Simon Glass wrote:
+> kconfig: abort rather than loop for ever on EOF
 
-Signed-off-by: Thomas Weißschuh <thomas.weissschuh@linutronix.de>
----
- arch/loongarch/kernel/time.c | 2 --
- 1 file changed, 2 deletions(-)
+Applied to kbuild/linux.git (kbuild-next-unstable), thanks!
 
-diff --git a/arch/loongarch/kernel/time.c b/arch/loongarch/kernel/time.c
-index dbaaabcaf6f0..5892f6da07a5 100644
---- a/arch/loongarch/kernel/time.c
-+++ b/arch/loongarch/kernel/time.c
-@@ -212,9 +212,7 @@ static struct clocksource clocksource_const = {
- 	.read = read_const_counter,
- 	.mask = CLOCKSOURCE_MASK(64),
- 	.flags = CLOCK_SOURCE_IS_CONTINUOUS,
--#ifdef CONFIG_GENERIC_GETTIMEOFDAY
- 	.vdso_clock_mode = VDSO_CLOCKMODE_CPU,
--#endif
- };
- 
- int __init constant_clocksource_init(void)
+[1/1] kconfig: abort rather than loop for ever on EOF
+      https://git.kernel.org/kbuild/c/7b406f92
 
+Please look out for regression or issue reports or other follow up
+comments, as they may result in the patch/series getting dropped,
+reverted or modified (e.g. trailers). Patches applied to the
+kbuild-next-unstable branch are accepted pending wider testing in
+linux-next and any post-commit review; they will generally be moved
+to the kbuild-next branch in about a week if no issues are found.
+
+Best regards,
 -- 
-2.55.0
+Nicolas
+
 
