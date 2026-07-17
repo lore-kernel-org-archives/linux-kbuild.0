@@ -1,77 +1,79 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 852223FBB47;
-	Fri, 17 Jul 2026 12:57:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DC5E42E8D5;
+	Fri, 17 Jul 2026 15:25:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784293029; cv=none; b=NluYFIlO6YVewOHEynAfU7u/NOEzlvKlBUt2j3vSoyFmYqmFBn/iJNPOPzjLox0qRquu84OSinimfgIbscxSboGNmh6cOWXv2OqEGUltzEQc9nekKz3IBeSAJPZfji9W9Fv7cGg2cqGhu4FjeRg2PVWqO81Nw9g/dpF/NY5oqAE=
+	t=1784301932; cv=none; b=keQbttE7a0BBGO6kKn3bdyl1ViUFd6/EuQ6GwoBkElxfoagr9zxo+GsGg9mXQZFpQCqNP1ovn6Y5Eg5JkX0B+zQLXXr3KQpTB3sPtaTd/S6Nl12zjbkYOvPMOdn0/JTnZ52i83QeGLWgTQ7Z7Xub/wdpVbZOTERzfKmSSpuTIQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784293029; c=relaxed/simple;
-	bh=uGm1dD0hllx7J5A+PZcz/hBVa4TPv+HV7yqi/blkTds=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Bc4x7pc2adesIGOF4r35wXFk4jFR+9EHECukWI/WA7L8beyf9MkxoJJlxZj7i0ff3vLcBK1MY4ZJ0q1nWmERNcT1IOzS3W7+kouXhEOrPkKKbBxznnL9qlF/0cOoZ9YZDFj5WNeIVbyo8t5Em8UNcx6PeCB0Aqg1t0b0ncNzol0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DySYTvnU; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784301932; c=relaxed/simple;
+	bh=2WAVdJysnUkmZTJ3yfISH2a/X9t2BsDVTFY9LZQ+lOk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=slnsxGNXKg/mu/Vlg9dGXmBoY8caJAEZ8+uK+10c3zqSyP0IgBNOL3QNgb87sPRNRMUpFIYGEVyrgpJPbDJMx/eLcUvqbYVbLA9g+qzTjmwKiUaBK+QjfchKjMTiJFpyINlc9XFXmijUgQ4Yt31LAv1YyJHg28SoFMtQR27yPuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=loIMOPvl; arc=none smtp.client-ip=159.69.126.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DySYTvnU"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id B4D251F000E9;
-	Fri, 17 Jul 2026 12:57:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784293028;
-	bh=eJSiuVtIuxtECGcjXEZ1uHFjFO4eeXXGrOs1hRr0mNU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=DySYTvnU1r+4/SLAyFuPvkhtVsu5Y9GEK56KSPAGK8/76mPZI9DdtzoUUa+/ZMcbx
-	 RS+jBUz8TOrBwCKcUrvp/Zz+dHw1qes0lpu+j22XUC+JsglQklYmsyMTeEYc6ZocrE
-	 4I+GRi7zbjKSkDgkYPD2dSkkPVEbxANIvp9Gly2MucdI+mSiNTVXnsJoUjgyPhuwuC
-	 GaMZsPe39Ls1kZidc+IwtO6YWUNVIoZ6k5zpWl15OiefqVSIUneoHeiIvi/WbzcM/B
-	 AXNu0MRCpbJJQ0UtXf3JIGnl7lSPEXRnnSB3e8/XyudM2Y1fsksWqirDCMjlpT/r9X
-	 iAsyN5cTXA9qQ==
-From: Nicolas Schier <nsc@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	Martin Weiss <martin.githubacc@gmail.com>
-Cc: Nicolas Schier <nsc@kernel.org>,
-	Martin Weiss <Martin.weiss2410@gmail.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Ihor Solodrai <ihor.solodrai@linux.dev>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Alexey Gladkov <legion@kernel.org>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	linux-kbuild@vger.kernel.org
-Subject: Re: [PATCH 1/4] scripts: fix spelling mistakes
-Date: Fri, 17 Jul 2026 14:55:49 +0200
-Message-ID: <178429289936.1083038.15159314533495342459.b4-ty@b4>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260629082812.551273-1-Martin.weiss2410@gmail.com>
-References: <20260629082812.551273-1-Martin.weiss2410@gmail.com>
+	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="loIMOPvl"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+	s=mail; t=1784301925;
+	bh=2WAVdJysnUkmZTJ3yfISH2a/X9t2BsDVTFY9LZQ+lOk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=loIMOPvlDvmkruLX/NleWqZPTc9pT4fjT9CyIqShBZlQlGC/ZLANnKWpEu4vvrduV
+	 yrg1uFUAqm6VP5tUVm5Np9ebPTu5jy80k4KuuUnxEetxx5+i+11mVpCWvB/az14nm5
+	 nF0q11JAY6y4my2vcBuUSxKpIcRzoMnoETXhhksw=
+Date: Fri, 17 Jul 2026 17:25:18 +0200
+From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
+To: "Maciej W. Rozycki" <macro@orcam.me.uk>
+Cc: Thomas Huth <thuth@redhat.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, Nick Huang <sef1548@gmail.com>, 
+	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH] scripts: headers_install.sh: Normalize __ASSEMBLY__ to
+ __ASSEMBLER__
+Message-ID: <02978413-55eb-4a1d-8ccc-d73060e46795@t-8ch.de>
+References: <20260309-uapi-assembly-v1-1-a7ebfbf14309@weissschuh.net>
+ <823e3bf3-ef3d-47cf-aff8-1668875a2f38@redhat.com>
+ <5e05be8c-e9b7-4da7-a182-eefc5043cd2e@t-8ch.de>
+ <alpine.DEB.2.21.2607161908060.64835@angie.orcam.me.uk>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <alpine.DEB.2.21.2607161908060.64835@angie.orcam.me.uk>
 
-On Mon, 29 Jun 2026 15:28:06 +0700, Martin Weiss wrote:
+On 2026-07-16 19:16:26+0100, Maciej W. Rozycki wrote:
+> On Thu, 16 Jul 2026, Thomas Weißschuh wrote:
 > 
+> > > > However the UAPI headers might be used with older (< GCC 3.0) or
+> > > > non-GCC-compatible compilers, which do not define __ASSEMBLY__
+> > > > automatically.
+> > > 
+> > > I just had a try with gcc 2.95.4 from a Debian Woody installation, and it
+> > > defines __ASSEMBLER__ automatically when compiling *.S files, i.e. gcc 2.95
+> > > does not seem to be a problem. So can you point me to a real case where
+> > > someone tried to use a user space compiler where __ASSEMBLER__ was not
+> > > defined automatically? Otherwise, I think this patch could be reverted
+> > > again.
+> > 
+> > I don't have a specific case I can point you to. My goal was
+> > consistency. Therefore I am against reverting the patch as long as
+> > both __ASSEMBLER__ and __ASSEMBLY__ are used in the UAPI headers.
+> > If we want to switch to __ASSEMBLER__ for the UAPI headers today,
+> > we should instead invert the logic of this patch to consistently use it
+> > everywhere. After all UAPI headers are migrated, the normalization can
+> > then be removed.
+> 
+>  I believe Thomas specifically refers to the mention of the alleged 
+> shortcoming of pre-3.0 GCC, which we've since verified not to be true, as 
+> quoted elsewhere in this thread, so the note needs to be dropped in a 
+> respin.
 
+It *was* dropped in a respin[0], which is the patch that got applied.
 
-Applied to kbuild/linux.git (kbuild-next-unstable) with a minimal commit
-message added, thanks!
-
-[1/4] scripts: fix spelling mistakes
-      https://git.kernel.org/kbuild/c/ab3f7f5e
-
-Please look out for regression or issue reports or other follow up
-comments, as they may result in the patch/series getting dropped,
-reverted or modified (e.g. trailers). Patches applied to the
-kbuild-next-unstable branch are accepted pending wider testing in
-linux-next and any post-commit review; they will generally be moved
-to the kbuild-next branch in about a week if no issues are found.
-
-Best regards,
--- 
-Nicolas
-
+[0] https://lore.kernel.org/lkml/20260630-uapi-assembly-v2-1-8e7bee2fe816@weissschuh.net/
