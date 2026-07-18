@@ -1,42 +1,45 @@
-Received: from mail-106111.protonmail.ch (mail-106111.protonmail.ch [79.135.106.111])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB94D2773C3;
-	Fri, 17 Jul 2026 20:00:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD6D843F0B5
+	for <linux-kbuild@vger.kernel.org>; Sat, 18 Jul 2026 04:03:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784318425; cv=none; b=GgaVvx/XQYO9Qvbe36f3IMd5gVRcsuz45qxbfw9yifK4WP83HdsD6twGPqbnTQbVTNoj9MVJTdF+U+L8IA7uxpBPxZq9DUJFfSRxORmzxN9fTlIqm1ZmeWey9UCPwD7TXwCCeRBSq6qwI6DaHdML5CHr4v56tCIistGL4AZEAPE=
+	t=1784347396; cv=none; b=ZutyWfNkup9RYs75C0sViTO5QYJZk5ugxuQFtxVtBTs4R2TM8AMjKeakavIBOHdFv3QKsGacGpf8BpxW3RcSxZ2w8NztTb77JpNr+pU1HKk4l5AC4vAJlOqcAO0qKzwD7yfp4Tx/YJ1SyblOIQdsHPjDhtGy+K4Q7ApAUb1E96w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784318425; c=relaxed/simple;
-	bh=Sj1D/q8Ne/UveYsM48w+ga6aEv5JTRSOvBNW2QlwS3k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OldDpxn6xoLLGtsnL+06LIKfV0RC5+tCT0oiwsUMjhFDfKqoKAhqCAzxZdB74U3r92Z08lvV2DIbjKbm7dKlGgmQqpuHJdT+hXarLfF/63/PcqeJ1YaglzWedE6THc/yqLvSAeL5/SiN07jP9jOPMpBtxpNTlhshGkbqqWjTW5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=elc.moe; spf=pass smtp.mailfrom=elc.moe; dkim=pass (2048-bit key) header.d=elc.moe header.i=@elc.moe header.b=GJ8y04xs; arc=none smtp.client-ip=79.135.106.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=elc.moe
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=elc.moe
+	s=arc-20240116; t=1784347396; c=relaxed/simple;
+	bh=ouJbhNEySa6wtHXigz28qZUwmmTdTjqDteAFtha4ajo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GxotLqmC2qrgiFJBubFc8cd92bu7oVqaLG6PEVCt061YWstXyEmwai7xWVfCPa449GkCf4tfZpJOoP1hzf4dY1nxKjbgYxzT+dcZVh7ZLGvN8aU5kbOiuJbmg6JLkss8BfsO+pv1v8ZMeVqJye7Gvn4u4rB1YCrc+uG47U7LdHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xhf7Iyrk; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=elc.moe header.i=@elc.moe header.b="GJ8y04xs"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=elc.moe;
-	s=protonmail; t=1784318418; x=1784577618;
-	bh=2lC8cAkV3puOxL86BXLZW1BX5KpevTFyAdcIBPWl2p0=;
-	h=From:To:Cc:Subject:Date:Message-ID:From:To:Cc:Date:Subject:
-	 Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=GJ8y04xsv0lGqgWN4ywDG6Tnhsb5oNGap+eGvDm17w8TV0ItpWON1MXJxRfAQ+2Y9
-	 RXwv3s+O9szLL2GDTaEwMK1GrVfwGIPHd4utgn0IK7vSxBtfNvedZsx44sGPWgM0mX
-	 aA//IIO8DQaSoa8ppHUqfs4tV0D11O5QKPRJu/sJQi6k6WvdOqtGHud6jXcN2DNOoO
-	 eeyKfoEQEkF8kf6v8lCe+aWDpyxXz2c0IoBUNI8sOJGiKkIjcMxo4B6S35G2bNt/jP
-	 OPjl0f1gb+xAwwPtrcA23iHdGnRduOdrWrRuRSRCjW1ATbECwXv3c70VAEYijP2Nfj
-	 fHpGNNsbseHiw==
-X-Pm-Submission-Id: 4h213g5ZhCz1DFFL
-From: Elsie Heck <its@elc.moe>
-To: nathan@kernel.org,
-	nsc@kernel.org
-Cc: linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Elsie Heck <its@elc.moe>
-Subject: [PATCH] fixdep: make gendered language gender-neutral
-Date: Fri, 17 Jul 2026 13:59:39 -0600
-Message-ID: <20260717195939.25130-1-its@elc.moe>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xhf7Iyrk"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1784347391;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ffPTsUAYPTy3t9bpVraPeoscXLu0Pse7ijb8l0qwCA8=;
+	b=xhf7Iyrk+q4u5Qvic4KSm9oiycSPxJPavJa57bf9bbvkM86NT/5YDfmqFfJ9zmp3VcZ+iC
+	0n92cW+Nu59RtKrKo/JkONKdjzmf5uLkkX7yDNjeGzXJescNKb9RcnhYHVEQiLXdWn7rN+
+	GZmTGyT8efxCYGJLDdI4DNe4MLJzOKM=
+From: Yuntao Wang <yuntao.wang@linux.dev>
+To: linux-kernel@vger.kernel.org,
+	linux-kbuild@vger.kernel.org
+Cc: Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Gary Guo <gary@garyguo.net>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Thomas De Schampheleire <thomas.de_schampheleire@nokia.com>,
+	Tamir Duberstein <tamird@kernel.org>,
+	Alexandre Courbot <acourbot@nvidia.com>,
+	Yuntao Wang <yuntao.wang@linux.dev>
+Subject: [PATCH] kbuild: set the initial value of subdir-rustflags-y
+Date: Sat, 18 Jul 2026 12:01:46 +0800
+Message-ID: <20260718040146.294700-1-yuntao.wang@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -44,48 +47,28 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Fix awkward phrasing and change instances of gendered language
-to gender-neutral in code comments to improve consistency and clarity.
+Initialize subdir-rustflags-y to an empty value to prevent it from being
+inadvertently affected by an environment variable of the same name.
 
-Signed-off-by: Elsie Heck <its@elc.moe>
+Signed-off-by: Yuntao Wang <yuntao.wang@linux.dev>
 ---
- scripts/basic/fixdep.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ scripts/Makefile.build | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-index cdd5da7e009b..54063d980442 100644
---- a/scripts/basic/fixdep.c
-+++ b/scripts/basic/fixdep.c
-@@ -15,13 +15,13 @@
-  * gcc produces a very nice and correct list of dependencies which
-  * tells make when to remake a file.
-  *
-- * To use this list as-is however has the drawback that virtually
-+ * However, to use this list as-is has the drawback that virtually
-  * every file in the kernel includes autoconf.h.
-  *
-  * If the user re-runs make *config, autoconf.h will be
-  * regenerated.  make notices that and will rebuild every file which
-  * includes autoconf.h, i.e. basically all files. This is extremely
-- * annoying if the user just changed CONFIG_HIS_DRIVER from n to m.
-+ * annoying if the user just changed CONFIG_USER_DRIVER from n to m.
-  *
-  * So we play the same trick that "mkdep" played before. We replace
-  * the dependency on autoconf.h by a dependency on every config
-@@ -33,9 +33,9 @@
-  * which then let make pick up the changes and the files that use
-  * the config symbols are rebuilt.
-  *
-- * So if the user changes his CONFIG_HIS_DRIVER option, only the objects
-- * which depend on "include/config/HIS_DRIVER" will be rebuilt,
-- * so most likely only his driver ;-)
-+ * So if the user changes their CONFIG_USER_DRIVER option, only the objects
-+ * which depend on "include/config/USER_DRIVER" will be rebuilt,
-+ * so most likely only the user's driver ;-)
-  *
-  * The idea above dates, by the way, back to Michael E Chastain, AFAIK.
-  *
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 911745743246..e60d97ef535a 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -28,6 +28,7 @@ ldflags-y  :=
+ 
+ subdir-asflags-y :=
+ subdir-ccflags-y :=
++subdir-rustflags-y :=
+ 
+ # Read auto.conf if it exists, otherwise ignore
+ -include $(objtree)/include/config/auto.conf
 -- 
-2.55.0
+2.54.0
 
