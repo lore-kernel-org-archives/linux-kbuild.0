@@ -1,44 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BC933B27C7;
-	Tue, 21 Jul 2026 14:31:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE7B63B27CF;
+	Tue, 21 Jul 2026 14:31:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784644268; cv=none; b=sbFYboljbK1dF/69IjA1oa5Qs7uDa0PiuJyDN7USOGjwui2QS3Ee2XQcWhlotFv2UpP8E+iZcMFiktPgPu2x1jrWUJYkUbVWI/zllWoANvxMIQCclYw9gbj3FqJu5799VtxeH0p7k56CAy4Wch1gsnnnvlIcuxFBAT40nluvjc4=
+	t=1784644270; cv=none; b=llixY+8fn9KwMgM09fQ2iEBxu9+4O0TYkIIBlc3KAIb9/7po/5BF1bqOWwocgrec87Aj4UVClZwsyQigRuiX2l2GDfZ5glqFMsHW7D+fOWfqm1CJmT2ALeTpLmLbHIasj1FxgheCt4HBbTU+kiniL5tj/XWJdgFOpSBGXeWORCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784644268; c=relaxed/simple;
-	bh=L+yupFsH+Op5IxoHE8zLXI60QIOpa6SP56mCEIPpys0=;
+	s=arc-20240116; t=1784644270; c=relaxed/simple;
+	bh=+UIp0tEAqNQZiFa9EmIzj7WbIEWmgViyRRe8+rCd9CY=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=PAp7I4qXRwzMb78XzejbfunjjEYwcGT8kD4iPlzERNjw1KnY7QTCsjhrPzHjZBiFXBFwUjcEG29mXcjhlwS9AqzCJqKW4KiD08XchgCDSjosQy+azK0aX8S+cUFNoODfUFX5eX7bCM28boPQB7Q9yUjLUUFjCgIBbSYsOLm8f6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tg2GBQIu; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=LBDiR+JZTp2UIa5Ke63qsRhgWh1UFKHw2lnX5YQFMvwwS9g8I07KN51rMusJ0+WCp0dgilTS/vYeyo+PviFIJ62ZwtX6/hTCVHn2yrejDobddHilvPhUQFk01ddU7OMeR8idKB4F6cTuJ+jtr0fZGmL15wiJZA7k3Pr36eP4sOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P29gFW54; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tg2GBQIu"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id BE1431F000E9;
-	Tue, 21 Jul 2026 14:31:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P29gFW54"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 28C671F000E9;
+	Tue, 21 Jul 2026 14:31:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784644267;
-	bh=XUwxaNNO+umtBmadm93D8hyxppzEAPQjD3J+qEgQn4o=;
+	s=k20260515; t=1784644269;
+	bh=7QW5v5YazYjTOsHZNRYYmwW18u9BbGdsLwAAjPtmPak=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Date;
-	b=Tg2GBQIuLiBwhiCq/Yl3iZFw7U4rCwDRz9KtjpV3FjUXbd4bccXjafNs0GhuozUi5
-	 MklAjrskBwzWblP4y4gWNyyVaDea/ezLrJLtpzvuFVnitu0xdiCSAkvrGvYWytGTgy
-	 YyOU62YGc8vLMhRow7E9O+lRnvrHOQJOB4WPYYJITF9oOKUcjKep8i18zs1kKu0zQi
-	 rkTKWlHi13ucvtn/0RkAkJ7rBKIFpbK/tnnojkTOQhucA3K+Z7nv7bibJHhp7WU8uW
-	 zQbKpCjiDpcNFrDs2FocYaTmGNlIw9mI2CAUuhULhkP7m58DC4jxg8f6WqMrXvbuvl
-	 fEm7i63DWguuQ==
+	b=P29gFW545R16isTmakZIiYed0T40ssMxWKD54Ny4GEZGBp/wLQiHI1Kz41iSq4EF5
+	 vdof6/6rm+Ki61JY/8fVP+Zz55KiQ2p+b1OUxrxRLaKPLvRhY5Ux1Gjy1ibf91EtCk
+	 /kHrAUAfSIIkp2leaf4pcsCCV26bn+L+h/eyFtKLV2h19bjKkwKZAmU5XgKqzmRSi7
+	 DdoTIzfwBeStvHHCtwqvLNvv2v4JbjIz9tNTGWY7CSGNwpcvzSeI41EPsn7NWabDD1
+	 yJP3XpRL4x6pH235qBYUvTPA9mIa5aRQ4KN3+/aF78SUifllATfoMU7RJLayjBF/f/
+	 pQu+IMgNn6RZg==
 From: Nicolas Schier <nsc@kernel.org>
-To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
- Yuntao Wang <yuntao.wang@linux.dev>
-Cc: Nathan Chancellor <nathan@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, 
- Gary Guo <gary@garyguo.net>, Alice Ryhl <aliceryhl@google.com>, 
- Thomas De Schampheleire <thomas.de_schampheleire@nokia.com>, 
- Tamir Duberstein <tamird@kernel.org>, 
- Alexandre Courbot <acourbot@nvidia.com>
-In-Reply-To: <20260718040146.294700-1-yuntao.wang@linux.dev>
-References: <20260718040146.294700-1-yuntao.wang@linux.dev>
-Subject: Re: [PATCH] kbuild: set the initial value of subdir-rustflags-y
-Message-Id: <178463122223.1439086.3596322964446838792.b4-ty@b4>
-Date: Tue, 21 Jul 2026 12:53:42 +0200
+To: nathan@kernel.org, Elsie Heck <its@elc.moe>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20260717195939.25130-1-its@elc.moe>
+References: <20260717195939.25130-1-its@elc.moe>
+Subject: Re: [PATCH] fixdep: make gendered language gender-neutral
+Message-Id: <178463135126.1439086.14460524097392154145.b4-ty@b4>
+Date: Tue, 21 Jul 2026 12:55:51 +0200
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -48,31 +43,35 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.16-dev-4217c
-X-Developer-Signature: v=1; a=openpgp-sha256; l=719; i=nsc@kernel.org;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=828; i=nsc@kernel.org;
  s=20250924; h=from:subject:message-id;
- bh=L+yupFsH+Op5IxoHE8zLXI60QIOpa6SP56mCEIPpys0=;
- b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBqX0/CZVs3QmMVAh9PWNTTjDY+FrCtG4DzXCvof
- xNUpruDOqOJAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCal9PwgAKCRAHUgpwFiYS
- aRUQEADTkU9Kktts5aKVUcXUj0MX3GxdurAn2i2hPvWGhEKzPVjS5SHYqoyJrIBqX8fggmvisyD
- kQm/3LH66rm4pHoluHtmGWkoyisL5WjNKBBNyM9jf406S55/rA3Q1ecejWZNjA/vmpaqKOzV5Qk
- mCGyAaOnVXtbqEpnV/Mx36ZWxVm3PUoPnqLR08qBtI77HoX4vqldME8wPLHYbD4OKkDC6Jlof8E
- wgYPmRNK5tCUxQsGsZv7iAyMEHXssM8nEh7WUC4ftafsbaHmmtOW8TyxvsWPGY9YHPR4tNUfzzW
- I59+E18qTG+YRsnVZ17dFZ1UwkpXxVFZRdO/XI5PtD7Ygm7ssyxFzEbA+iIZkfHcD7m7uXKz6st
- s7nT6r/uulXi3KZs02J4h6az9zMP2ngSpCuXYM7wHXfJx5mELKjtV+N3PokF/ZIJXomuYRHV2oq
- y/6v1cROrcpKrI4sBWOENwB96mMSHjYfMnW8zOcO96N5HfP8qCKrUI0BRepdxWIO06EhquBuEPI
- QhQphGH2khRjdX9CE88TSnLh7JNfU8S3fJm4+5eM4f9OPjcG1Pn/XVctjIm8eoCDKJqjKnBicoc
- lyWc4BDhXFf9lqrBUhPSXcqIlK0Vmo3TIFsmhRGLB8vgOLx6Kfqt/oH2F8qSf8RL5XxybgUVinC
- 4sxrDR7xOm/hdWg==
+ bh=+UIp0tEAqNQZiFa9EmIzj7WbIEWmgViyRRe8+rCd9CY=;
+ b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBqX1CaFVPgj4vahCK9a+u2Z9OzeQZW3ruYiaupU
+ Xf2d5X2afmJAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCal9QmgAKCRAHUgpwFiYS
+ afb0EACLgZAzBMWeWXMy27gBt7xV/ilkkrzqul2XYoS6Lf43JLXVdLJDOt1w8b9SQdKr8Zw0Mj1
+ iY+eyr2XSBJNQp102yfgCTTtGECawDrNF5Zkuz2n/cuHI6q1INTBJBinGNknwHJlZMaSO5f2XO4
+ CNdWBDyuIrPVi1YZHMjZi70VWo7FIW91v3g6X4pKPnZ0pNc+F+bi3zE6b7jrgf17aoPXQAb4X/D
+ Xdh+Xm67OJOPrtzJAc4yCHnLGpfff1m0mZgJ4Wv0oM1wBVhAaIcVbA4rJfeEf2Ldw4h/WiLsF4g
+ p5cHV5IlJiz/wN8QLOxcpYwiskSrW81092Q9pux3tNDKVLyMRr15fUD+ejFJtFvUitb6nevHI8B
+ CJBEx1bq5DlGUmmlbp2apBjdtl/636OM+zdAZwQcDp0LYJyvgAMGaXNaGQrY238lT6IlMeV9C7p
+ s48kt1OHxggSBBxQuFdosiSO7pt6AbrXfahTQlCSvvTgTglBlzMhR047J9rYRERgz4kc4yBumbE
+ NmiBGIGD0GIWUWlMph/KrCtBUSf5aAvLLS6hIrpI6SuTfmnV1AjvQ5+0H3PKUY6G9VhKERoWG6w
+ KrTkDHrlHTnROIJmjAVR1/YWHSsCGFkgMb/hfvQi2qm1lfkzFnPTRFjAoTNrvG5rmpadl/fy9Om
+ Ios7Bn78Es0sD+w==
 X-Developer-Key: i=nsc@kernel.org; a=openpgp;
  fpr=18ED52DBE34F860EE9FBC82B7D97093255A0CE7F
 
-On Sat, 18 Jul 2026 12:01:46 +0800, Yuntao Wang wrote:
-> kbuild: set the initial value of subdir-rustflags-y
+On Fri, 17 Jul 2026 13:59:39 -0600, Elsie Heck wrote:
+> fixdep: make gendered language gender-neutral
+
+Personally, I think CONFIG_SOME_DRIVERS would be even better, but
+changing it to whatever is a good thing.  Thanks.
+
 
 Applied to kbuild/linux.git (kbuild-next-unstable), thanks!
 
-[1/1] kbuild: set the initial value of subdir-rustflags-y
-      https://git.kernel.org/kbuild/c/2c5a2273
+[1/1] fixdep: make gendered language gender-neutral
+      https://git.kernel.org/kbuild/c/26171fab
 
 Please look out for regression or issue reports or other follow up
 comments, as they may result in the patch/series getting dropped,
