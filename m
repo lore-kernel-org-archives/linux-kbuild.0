@@ -1,39 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE7B63B27CF;
-	Tue, 21 Jul 2026 14:31:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 604AA3B4E98;
+	Tue, 21 Jul 2026 14:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784644270; cv=none; b=llixY+8fn9KwMgM09fQ2iEBxu9+4O0TYkIIBlc3KAIb9/7po/5BF1bqOWwocgrec87Aj4UVClZwsyQigRuiX2l2GDfZ5glqFMsHW7D+fOWfqm1CJmT2ALeTpLmLbHIasj1FxgheCt4HBbTU+kiniL5tj/XWJdgFOpSBGXeWORCA=
+	t=1784644273; cv=none; b=HEiWtgvoav/6XwI0yFy3Tb5Kcio2Zl9Z7AsJSU6cDFxbsbZjDg8n9GzNOEcY0U7GNvsDVTC5nohqLJ8x5bS72cc5iW+78jE+4seXYZi+XZsPvhYfm9Le1F+xfkp02FrxZ2VrSmL0TefpNSzJi7qvTkvb/5HGsr8aQdbrgoIvOP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784644270; c=relaxed/simple;
-	bh=+UIp0tEAqNQZiFa9EmIzj7WbIEWmgViyRRe8+rCd9CY=;
+	s=arc-20240116; t=1784644273; c=relaxed/simple;
+	bh=pjGtvZqDJgQRwJWmHuyxyl7+6o8nwY9GIFn31394HM4=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=LBDiR+JZTp2UIa5Ke63qsRhgWh1UFKHw2lnX5YQFMvwwS9g8I07KN51rMusJ0+WCp0dgilTS/vYeyo+PviFIJ62ZwtX6/hTCVHn2yrejDobddHilvPhUQFk01ddU7OMeR8idKB4F6cTuJ+jtr0fZGmL15wiJZA7k3Pr36eP4sOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P29gFW54; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=NSY3lyt606jMgBy2EhEwReh4ttbmeAmqKP0NJJ2qXxdCXyGnG7Gc4UOniOfC3jXsFU8vZoTLtfBUav+HlGZ54k1OhC6GS1FqA3X+gEHKwmfDdz6zVhbuZRb6J91Yg9+vUM6+Jvpagq4Qk3SXNZKqKR0KwSiypqslHwgy5Kw0LuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hNgRS9hZ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P29gFW54"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 28C671F000E9;
-	Tue, 21 Jul 2026 14:31:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hNgRS9hZ"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 869F81F000E9;
+	Tue, 21 Jul 2026 14:31:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784644269;
-	bh=7QW5v5YazYjTOsHZNRYYmwW18u9BbGdsLwAAjPtmPak=;
+	s=k20260515; t=1784644272;
+	bh=mO0Vt3bPhGVEGHIRZHRwhGECRXSL7Hu0md+6vJzaYWc=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Date;
-	b=P29gFW545R16isTmakZIiYed0T40ssMxWKD54Ny4GEZGBp/wLQiHI1Kz41iSq4EF5
-	 vdof6/6rm+Ki61JY/8fVP+Zz55KiQ2p+b1OUxrxRLaKPLvRhY5Ux1Gjy1ibf91EtCk
-	 /kHrAUAfSIIkp2leaf4pcsCCV26bn+L+h/eyFtKLV2h19bjKkwKZAmU5XgKqzmRSi7
-	 DdoTIzfwBeStvHHCtwqvLNvv2v4JbjIz9tNTGWY7CSGNwpcvzSeI41EPsn7NWabDD1
-	 yJP3XpRL4x6pH235qBYUvTPA9mIa5aRQ4KN3+/aF78SUifllATfoMU7RJLayjBF/f/
-	 pQu+IMgNn6RZg==
+	b=hNgRS9hZSNzl3Izuq1xBU0FGbe6kWiVRbonjNBLWZM4jn/LVyrQuFdy42ZClwTk/0
+	 nf+KVHEyB1zUt9KULpEKJe4JGyywY1f5xRlbtDqgXoG2+ZxWeU3vRjYiqEx67BJa2m
+	 ctyjNRI2tFcZibzib2HtGSsSYx+GuuKjNpeSOtppl2mODBFflkc7RxOs9Lg1Ufu8uC
+	 51W5BgdfxXdVsX7YlfH8CAgY335wYncTiUIKtI0xie1Gsv39ImG9DOnS3GtK1ZQ31H
+	 qTzeflKZiF1jS0iB7T7nZlXhjqKwt1d8A5SSKMi/agi1mpDAuHGZWvI3l3qYd5RbuV
+	 njkcwutFOgpjQ==
 From: Nicolas Schier <nsc@kernel.org>
-To: nathan@kernel.org, Elsie Heck <its@elc.moe>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20260717195939.25130-1-its@elc.moe>
-References: <20260717195939.25130-1-its@elc.moe>
-Subject: Re: [PATCH] fixdep: make gendered language gender-neutral
-Message-Id: <178463135126.1439086.14460524097392154145.b4-ty@b4>
-Date: Tue, 21 Jul 2026 12:55:51 +0200
+To: nathan@kernel.org, corbet@lwn.net, skhan@linuxfoundation.org, 
+ Julian Braha <julianbraha@gmail.com>
+Cc: arnd@arndb.de, stefan.hengelein@fau.de, linux-kbuild@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, nico@fluxnic.net, 
+ officialnaumansabir@gmail.com, rdunlap@infradead.org, 
+ vegard.nossum@oracle.com, kees@kernel.org, tj@kernel.org
+In-Reply-To: <20260715220149.48700-1-julianbraha@gmail.com>
+References: <20260715220149.48700-1-julianbraha@gmail.com>
+Subject: Re: [PATCH] Documentation: warn users not to use select on choice
+ options in Kconfig
+Message-Id: <178463155540.1439086.8303526519325878284.b4-ty@b4>
+Date: Tue, 21 Jul 2026 12:59:15 +0200
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -43,35 +48,31 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.16-dev-4217c
-X-Developer-Signature: v=1; a=openpgp-sha256; l=828; i=nsc@kernel.org;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=762; i=nsc@kernel.org;
  s=20250924; h=from:subject:message-id;
- bh=+UIp0tEAqNQZiFa9EmIzj7WbIEWmgViyRRe8+rCd9CY=;
- b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBqX1CaFVPgj4vahCK9a+u2Z9OzeQZW3ruYiaupU
- Xf2d5X2afmJAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCal9QmgAKCRAHUgpwFiYS
- afb0EACLgZAzBMWeWXMy27gBt7xV/ilkkrzqul2XYoS6Lf43JLXVdLJDOt1w8b9SQdKr8Zw0Mj1
- iY+eyr2XSBJNQp102yfgCTTtGECawDrNF5Zkuz2n/cuHI6q1INTBJBinGNknwHJlZMaSO5f2XO4
- CNdWBDyuIrPVi1YZHMjZi70VWo7FIW91v3g6X4pKPnZ0pNc+F+bi3zE6b7jrgf17aoPXQAb4X/D
- Xdh+Xm67OJOPrtzJAc4yCHnLGpfff1m0mZgJ4Wv0oM1wBVhAaIcVbA4rJfeEf2Ldw4h/WiLsF4g
- p5cHV5IlJiz/wN8QLOxcpYwiskSrW81092Q9pux3tNDKVLyMRr15fUD+ejFJtFvUitb6nevHI8B
- CJBEx1bq5DlGUmmlbp2apBjdtl/636OM+zdAZwQcDp0LYJyvgAMGaXNaGQrY238lT6IlMeV9C7p
- s48kt1OHxggSBBxQuFdosiSO7pt6AbrXfahTQlCSvvTgTglBlzMhR047J9rYRERgz4kc4yBumbE
- NmiBGIGD0GIWUWlMph/KrCtBUSf5aAvLLS6hIrpI6SuTfmnV1AjvQ5+0H3PKUY6G9VhKERoWG6w
- KrTkDHrlHTnROIJmjAVR1/YWHSsCGFkgMb/hfvQi2qm1lfkzFnPTRFjAoTNrvG5rmpadl/fy9Om
- Ios7Bn78Es0sD+w==
+ bh=pjGtvZqDJgQRwJWmHuyxyl7+6o8nwY9GIFn31394HM4=;
+ b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBqX1EGyuBJ7S7pstmwCy2rjt81jjLU9qiGYpK2m
+ d0AwGkjbEaJAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCal9RBgAKCRAHUgpwFiYS
+ aT2LEADLtbD91Wccch0+fByTi9ZRHxCXj0F2oo5UFc6EDf1NNbxkRHO63iId+gUWOo0j6H4+CsC
+ P0gXFib37EutYftd5PmdS+UHmLFRd5zE3MnYg5yClgl6M0YLasHFd2jV8z2WRLa25Rt0K8BTccS
+ mDbmoxtsq8DBo416aqx9qRhV1sCftfTOef1JyexfIeKiAaetLg5ZqhJ32OcErsuTPJEGJ2VBS/s
+ j+it8jE2fEjxbaEGfOiL/z74uv1MV/GUz/iX4/gkHzpfbulFzxWXswaM3c7ynfeHP2NjruMh2/9
+ a5tfj0eg4kMiHBLcfm3teNiWAU3BnDauNgvXvyBjME8b7knkZZCcm8niZYu4VARRmQ/kHkQlUEe
+ BNxiYNtchvZH55B8vaWcdqFf76X+m6204BojCfJh5pxcfqY/yQN706svf1Ou0qw5+A1wwsNCLDV
+ zwXyC/tiXHnmJXQlB2hOqrGo/50PXfQ4FdrBJ9vntxmIkpnO5bELGiuijcnmTyjmwrFaFetc+xl
+ XLFYLfw7wZxHT3v1bdjT4DZnlAMuXHz7hghIERdnMV/7NRWCDmBUIQ/TxM/ithZOlI/+FOCFV1B
+ WDsQ/aUKqJcVvQMXWieZ/wLxuBMLTUKlkELbk2xrPtXe35xXMwbU9kMaEGbQl4HIjQ6N6IaHrcI
+ M8FzyZwizyXmYHQ==
 X-Developer-Key: i=nsc@kernel.org; a=openpgp;
  fpr=18ED52DBE34F860EE9FBC82B7D97093255A0CE7F
 
-On Fri, 17 Jul 2026 13:59:39 -0600, Elsie Heck wrote:
-> fixdep: make gendered language gender-neutral
-
-Personally, I think CONFIG_SOME_DRIVERS would be even better, but
-changing it to whatever is a good thing.  Thanks.
-
+On Wed, 15 Jul 2026 23:01:49 +0100, Julian Braha wrote:
+> Documentation: warn users not to use select on choice options in Kconfig
 
 Applied to kbuild/linux.git (kbuild-next-unstable), thanks!
 
-[1/1] fixdep: make gendered language gender-neutral
-      https://git.kernel.org/kbuild/c/26171fab
+[1/1] Documentation: warn users not to use select on choice options in Kconfig
+      https://git.kernel.org/kbuild/c/d10cfe72
 
 Please look out for regression or issue reports or other follow up
 comments, as they may result in the patch/series getting dropped,
