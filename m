@@ -1,171 +1,189 @@
-Received: from sender4-op-o15.zoho.com (sender4-op-o15.zoho.com [136.143.188.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76E304F7970;
-	Tue, 21 Jul 2026 17:51:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784656275; cv=pass; b=nY12fK2TKV1zwlXYRNOx1rcBScBuleIMrqWdpwEu/lPxobvrhrSR2Ln8ordYl7MnLo2ekdtQQIvhl7UJc1cLPEBj5iytkU9FiR/rcYQBb+dNJ/XnBQVJdEErjE7nugwt8zk9GTMZyxIoG/bY3AJPR2mu6MUa/8Dxbp8Jok0NAlk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784656275; c=relaxed/simple;
-	bh=/bHZxP24S/a32ddemO2nyQzVvN6SB+5I8ulGT9BPtZA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=kpMKgcN9GihFrTnKC+MVLIRODyqcaCHTxylubUw/mH82vTJSIMTEsYBam2mR5rfw9fEZ13ieXc98duDRFuykPaAAwd2hfmNHf55EmNT3FMvrYh0uEPDvIIIdGp62JovVBHdTjgSnPUMWwbx+gT/yEVGAFzL7yHAsv3saCgAV5uw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rong.moe; spf=pass smtp.mailfrom=rong.moe; dkim=pass (2048-bit key) header.d=rong.moe header.i=i@rong.moe header.b=QRXfWSfB; arc=pass smtp.client-ip=136.143.188.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rong.moe
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rong.moe
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32B711AF0BB
+	for <linux-kbuild@vger.kernel.org>; Tue, 21 Jul 2026 19:30:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784662236; cv=none; b=apGu3iYHtGxTBamTD7qtTEyPeivPYg13zccBz1PWc38OTbXTqgOSefmioCd34XLH2+gh/VcIXfG6WULhTgOeKhO/KGna7UrnZNFHCqODMELvSdtqh+eGxwEkUT5++WOBOhSYDL5Kq+eQ9iIMyPP5AiiqvcKUv097WZXBiN9ZMfg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784662236; c=relaxed/simple;
+	bh=/4ykxTnVW6KNXSdeCHEyJQFbqKYCjEuXbs9jf6IxfA4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=APxd11T5K7aER97psbmvPlpy+f6HdGpv7HOiY4b2LWusCxA4u9frLzR3rvB3mgBJUKTOmxdwTVCF8FIGlWZY9ZjYIET7fjB9ZMYjfbCPuV9Na6yoFcxs4Wkf+EXBUrvpP8gjKoD10yJ9iipzJ2frFzFHzMf5YpP2l72stXG0NbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KK03iiKl; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rong.moe header.i=i@rong.moe header.b="QRXfWSfB"
-ARC-Seal: i=1; a=rsa-sha256; t=1784656265; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=YL6Czc2YzKz8Es/jJE2VNf0uMY9QW2SP1qU5A9whE+EQi7+NLKh/PAkojA/m8YxzceWNvjorHRpHI6kC5g5LQBkWP5TLAO3NBa9fyPZDPCbyWadbQ7zdzyHT4b5dVGTQCLnCdy1cDBoya1hE4IFTL9okKMNIEsLcycpq9EP0AQQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1784656265; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=iClaI/sWwaLtVWHmwtEQ7Uu96zELQpNcbpHi63H13HE=; 
-	b=juz+/k+Pv+YKxeoGV2lPWy3X62qERJd7I1zkL2f2y16zbujeDpoj02XY8usnPFeFOr1DxgTjl9g3+LJBILLri5YwfC/5Id3z6wF4rJJ2Shi7QGmhsIe8ahEo0htFwnnRg0ubVGfEbeTOdmOhH0n2b2+jHj8HOo7Sf5wAUR4JdK4=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=rong.moe;
-	spf=pass  smtp.mailfrom=i@rong.moe;
-	dmarc=pass header.from=<i@rong.moe>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1784656265;
-	s=zmail2048; d=rong.moe; i=i@rong.moe;
-	h=From:From:Date:Date:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Message-Id:In-Reply-To:To:To:Cc:Cc:Reply-To;
-	bh=iClaI/sWwaLtVWHmwtEQ7Uu96zELQpNcbpHi63H13HE=;
-	b=QRXfWSfBy7n8SAGLbY7lR1z1gKCT3924oagvX1ipGQaTyJpTQfLzdUewv6OHAAm7
-	gJZOr/jQyCRGnOIuW1/uCR0QmqoEjhxn+hYqp47CLlTpQlynj8nNxtMJDLRP8t0+DN+
-	R/5SrtAVHxonDA0wKWpHKBK6C9/elMeIPfP3ya1d7ex7XR7eJUKk5P7firHKCjB1E+e
-	iHucb56n+uqZYZw9ECF7ugdLTKahsWsgdIfNsIW9e+3C1mj3pTemcgGyt51npVt/7rf
-	8tdz960qXtgOM5lCF19VRrQ+V8ZZUkz/VBVqdY3NX0I91T0R9QW1ctkihrRkS7btzFa
-	2/8WA4IwvQ==
-Received: by mx.zohomail.com with SMTPS id 1784656261808226.94518967895692;
-	Tue, 21 Jul 2026 10:51:01 -0700 (PDT)
-From: Rong Zhang <i@rong.moe>
-Date: Wed, 22 Jul 2026 01:50:49 +0800
-Subject: [PATCH v2 2/2] scripts/config: Use in-place editing (-i) in sed
- portably
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KK03iiKl"
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-49558ce01afso24848425e9.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 21 Jul 2026 12:30:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784662233; x=1785267033; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=9m9AKq8jynDHRD5GVA4V3Nt+Cij+XKuND1K/KFrp4pQ=;
+        b=KK03iiKlEA+YGIgSAuCFdsD1w0oBy/S2faQa3vtuqINtIX5F/7TMfb+3mJbniWfbyX
+         yUImqwK3G0K8OmhvbHXT98GE+sgYFZp5gP3lFkmTA1hwAJWbhADd0Vk5KGiSl+de+dkZ
+         HtbPk/8x/X+Gwk/zcua/+fyV36cqEvctMCtnFc3HJ8/GgiuhQpXClprpPoCUGtCDQOkI
+         FPHJ9Wjzdx74bvPppY/jxPsy5OchktLu9J1gY9yh32TK2YJ7yHi/MRBrIrspCmlyjvIt
+         M4QPSBza7Gqo2EmXfuhKUFKtWyTGq5UmlIWyBwrejZAd8xjTVaXpJvQ30GJsCCxZG96X
+         CmRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784662233; x=1785267033;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=9m9AKq8jynDHRD5GVA4V3Nt+Cij+XKuND1K/KFrp4pQ=;
+        b=ZSiuqNaJX3jhR4Ag0tkHxQtPCQ25N+L/ZUYCQIop7NjmFubRZ/bWSD1Au/+JZCWkd9
+         4Jd6Y8uSkMJHNGxYWbaOP5MDm4WSuNdlQ1/VtMn9GpW9AXOuf9xsTrS50KknX4q8GHpS
+         Pfnx0QYvG4ZK32RXpJJf9FrT6iqFOfrsOkzzDkvlI4u/oSLaSWqfVWwvfbC4tk3QssV1
+         LcidJg3v5IUW9JWilPspUmx4gcbSPwP6tuWT4s/EsOCw9uGrqfm0ld206AFZxn3LFbIC
+         nyTO6KxHiOAzprEht31VnKv4uk6cSWLVjhhMirI6tEpewvliwMm5xJAbT8s9exkD5hiy
+         ihTQ==
+X-Forwarded-Encrypted: i=1; AHgh+RosAUblgVWH6vdUawg6S55CNcg5l50yPPwlRV1iCliimfaf9KWaEJSoUwFFZk/xb1QIcvb6rL9f2m8v2ZE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyuPMSWkZjMcmQljCbbMqk1lDFCfFUjdg8TM1Kk6+/ngnBy9ra/
+	SvbTRnP6fv6vV3xdf7koAzKpbfAPQs02ScwcHuNlzgikVEcuYYmCWqXt
+X-Gm-Gg: AfdE7ck75WdjuTMSjNVavDiRaLQ0KP9L3Red30RKHDB2LggPffxXDUNN6N26shIs757
+	u7Lgt0wP6rnksEzv2xKPQr4pRXOkkN8HyVPUUR7TBD7t5laBqWB2uhfW4RPFWcFUsfysFSnLrHD
+	UxOiV1Psc1k2UYrHyuk82M3G1kK7v/VbUd0dYSil2MUUbvuNO08qclkd9iYHiUdpf8mUblTrs0Z
+	XfHMAwK2LON5D43em+czFzsvyMpJrDsjK1awk+4Ab5UTGSx053xUFU13QzQeSIpucqDCzELziKR
+	rfmAco8gDXz6+kNrRo8TEl51jbbFsq6VV4wgm0kVl1ONXe1YNsq4NIgcb9VePv8eERksT0IFuxl
+	uXmywLuTHMghuVQiRIXUOXE2aGKW5aKxrVL8lpfmChid91GMR9/i2R5CpDWPKhVux36Wba9dwkN
+	twneg04gkFT4Cf4xrPC54D7M1herF50ppm+X4NmRPN
+X-Received: by 2002:a05:600c:1509:b0:495:3f5e:e7a with SMTP id 5b1f17b1804b1-4954a51dee6mr160279525e9.34.1784662233223;
+        Tue, 21 Jul 2026 12:30:33 -0700 (PDT)
+Received: from nixos-office ([2001:8a0:e962:d100:3552:6c88:7143:3dc1])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4956a509901sm25547815e9.8.2026.07.21.12.30.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Jul 2026 12:30:32 -0700 (PDT)
+Sender: Julian Braha <julian.braha@gmail.com>
+From: Julian Braha <julianbraha@gmail.com>
+To: nathan@kernel.org,
+	nsc@kernel.org,
+	kees@kernel.org
+Cc: xry111@xry111.site,
+	hyc.lee@gmail.com,
+	jeffbai@aosc.io,
+	vegard.nossum@oracle.com,
+	rdunlap@infradead.org,
+	grahamr@qti.qualcomm.com,
+	nico@fluxnic.net,
+	masahiroy@kernel.org,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Julian Braha <julianbraha@gmail.com>
+Subject: [PATCH] kconfig: fix submenu rendering of negative dependencies
+Date: Tue, 21 Jul 2026 20:30:28 +0100
+Message-ID: <20260721193028.313342-1-julianbraha@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260722-config-sed-v2-2-9f2c4b164666@rong.moe>
-References: <20260722-config-sed-v2-0-9f2c4b164666@rong.moe>
-In-Reply-To: <20260722-config-sed-v2-0-9f2c4b164666@rong.moe>
-To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Rong Zhang <i@rong.moe>
-X-Mailer: b4 0.16-dev-4217c
-X-ZohoMailClient: External
+Content-Transfer-Encoding: 8bit
 
-The use of in-place editing was removed by commit 83e8b90e1d2c
-("scripts/config: use sed's POSIX interface").
+This fixes the "ironic visualization" issue reported here:
+https://lore.kernel.org/linux-kbuild/cbe95c15d2760f6fce8eaf207c969ce8fd3703aa.camel@xry111.site/
 
-Before that, the script used bare `-i' to skip creating a backup file.
-In fact, major sed implementations have supported `-i' for over a
-decade. It's really doubtful if anyone would still build Linux on a Unix
-system without it. The issue is more about how we use it:
+where a config option FOO is nested in the submenu of the previous option
+BAR, despite FOO actually depending on !BAR.
 
-FreeBSD and macOS disallow bare `-i'. To skip creating a backup, an
-empty string ("zero-length extension") must be passed as a separate
-argument following `-i'.
+I've only tested locally on x86, but as far as I can tell, this only
+changes how 2 options are rendered in the menu:
+1. NTFS3_FS, no longer in the NTFS_FS submenu, and
+2. MTD_BLOCK_RO, no longer in the MTD_BLOCK submenu.
 
-GNU and other BSDs accept bare `-i' to skip creating a backup, but
-disallow passing a zero-length extension.
-
-That being said, when thinking about it optimistically, using `-i' is
-portable as long as a backup is created.
-
-Use in-place editing (-i) in a portable manner by creating a backup file
-with a .swp extension (the same name as the current temporary file). The
-backup file will be deleted on exit.
-
-A rough benchmark with ~1000 editions showed a 14.4% speedup (5.27s =>
-4.51s, GNU sed). The FreeBSD sed showed a similar speedup.
-
-Reviewed-by: Nicolas Schier <nsc@kernel.org>
-Signed-off-by: Rong Zhang <i@rong.moe>
+Assisted-by: Claude:claude-4.8-opus
+Signed-off-by: Julian Braha <julianbraha@gmail.com>
 ---
-Changes in v2:
-- Fix a typo in commit message (thanks Nicolas Schier)
-- Do not delete .swp file when sed is not invoked, e.g., `--state'
-  - In my test, unnecessarily deleting .swp file makes `--state' 10%
-    slower due to the overhead of extra fork() and execve()
-  - Unnecessarily deleting .swp file may corrupt Vim even if no editing
-    command is passed
----
- scripts/config | 31 +++++++++++++++++++------------
- 1 file changed, 19 insertions(+), 12 deletions(-)
+ scripts/kconfig/expr.c | 33 +++++++++++++++++++++++++++++++++
+ scripts/kconfig/expr.h |  1 +
+ scripts/kconfig/menu.c | 10 ++++++++++
+ 3 files changed, 44 insertions(+)
 
-diff --git a/scripts/config b/scripts/config
-index 1f290372a4ce..7c083c860341 100755
---- a/scripts/config
-+++ b/scripts/config
-@@ -71,35 +71,34 @@ txt_append() {
- 	local anchor="$1"
- 	local insert="$2"
- 	local infile="$3"
--	local tmpfile="$infile.swp"
- 
- 	# sed append cmd: 'a\' + newline + text + newline
- 	cmd="$(printf "a\\%b$insert" "\n")"
- 
--	sed -E -e "/$anchor/$cmd" "$infile" >"$tmpfile"
--	# replace original file with the edited one
--	mv "$tmpfile" "$infile"
-+	# We don't really need a backup file, but in-place editing with backup
-+	# skipped is not portable due to different implementations parsing
-+	# arguments in incompatible manners.
-+	# Create a backup file anyway to ensure portability. The file will be
-+	# deleted on exit.
-+	sed -E -i.swp -e "/$anchor/$cmd" "$infile"
-+	SED_EDITED=1
+diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
+index 16f92c4a775a..2b91d16bf14f 100644
+--- a/scripts/kconfig/expr.c
++++ b/scripts/kconfig/expr.c
+@@ -738,6 +738,39 @@ bool expr_contains_symbol(struct expr *dep, struct symbol *sym)
+ 	return false;
  }
  
- txt_subst() {
- 	local before="$1"
- 	local after="$2"
- 	local infile="$3"
--	local tmpfile="$infile.swp"
- 
--	sed -E -e "s$SED_DELIM$before$SED_DELIM$after$SED_DELIM" "$infile" >"$tmpfile"
--	# replace original file with the edited one
--	mv "$tmpfile" "$infile"
-+	sed -E -i.swp -e "s$SED_DELIM$before$SED_DELIM$after$SED_DELIM" "$infile"
-+	SED_EDITED=1
- }
- 
- txt_delete() {
- 	local text="$1"
- 	local infile="$2"
--	local tmpfile="$infile.swp"
- 
--	sed -E -e "/$text/d" "$infile" >"$tmpfile"
--	# replace original file with the edited one
--	mv "$tmpfile" "$infile"
-+	sed -E -i.swp -e "/$text/d" "$infile"
-+	SED_EDITED=1
- }
- 
- set_var() {
-@@ -122,6 +121,14 @@ undef_var() {
- 	txt_delete "^($name=|# $name is not set)" "$FN"
- }
- 
-+SED_EDITED=0
-+on_exit() {
-+	if [ "$SED_EDITED" -ge 1 ]; then
-+		rm -f "$FN.swp"
-+	fi
-+}
-+trap on_exit EXIT
++/*
++ * Check if the expression references 'sym' in a way that is satisfiable
++ * with 'sym' disabled, e.g.'sym!=y'.
++ *
++ * Expects that expr_transform() was already called on 'expr'.
++ */
++bool expr_contains_symbol_negated(struct expr *dep, struct symbol *sym)
++{
++	if (!dep)
++		return false;
 +
- FN=.config
- CMDS=()
- while [[ $# -gt 0 ]]; do
-
++	switch (dep->type) {
++	case E_AND:
++	case E_OR:
++		return expr_contains_symbol_negated(dep->left.expr, sym) ||
++		       expr_contains_symbol_negated(dep->right.expr, sym);
++	case E_NOT:
++		return dep->left.expr->type == E_SYMBOL &&
++		       dep->left.expr->left.sym == sym;
++	case E_EQUAL:
++		/* sym=n */
++		return dep->left.sym == sym && dep->right.sym == &symbol_no;
++	case E_UNEQUAL:
++		/* sym!=y, sym!=m */
++		return dep->left.sym == sym &&
++		       (dep->right.sym == &symbol_yes ||
++			dep->right.sym == &symbol_mod);
++	default:
++		break;
++	}
++	return false;
++}
++
+ bool expr_depends_symbol(struct expr *dep, struct symbol *sym)
+ {
+ 	if (!dep)
+diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
+index fa3823a97d72..b580f9fa0f29 100644
+--- a/scripts/kconfig/expr.h
++++ b/scripts/kconfig/expr.h
+@@ -307,6 +307,7 @@ tristate expr_calc_value(struct expr *e);
+ struct expr *expr_eliminate_dups(struct expr *e);
+ struct expr *expr_transform(struct expr *e);
+ bool expr_contains_symbol(struct expr *dep, struct symbol *sym);
++bool expr_contains_symbol_negated(struct expr *dep, struct symbol *sym);
+ bool expr_depends_symbol(struct expr *dep, struct symbol *sym);
+ struct expr *expr_trans_compare(struct expr *e, enum expr_type type, struct symbol *sym);
+ 
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index b2d8d4e11e07..9c079e92a9ed 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -428,9 +428,19 @@ static void _menu_finalize(struct menu *parent, bool inside_choice)
+ 			if (!expr_contains_symbol(dep, sym))
+ 				/* No dependency, quit */
+ 				break;
++			/*
++			 * Note that it's actually possible to depend on both
++			 * 'SYM!=y' and 'SYM=y', so we need to first check if
++			 * it's a positive dependency before checking if it's
++			 * a negative dependency. See example:
++			 * 'SFC && MTD && !(SFC=y && MTD=m)'
++			 */
+ 			if (expr_depends_symbol(dep, sym))
+ 				/* Absolute dependency, put in submenu */
+ 				goto next;
++			if (expr_contains_symbol_negated(dep, sym))
++				/* Negative dependency, quit */
++				break;
+ 
+ 			/*
+ 			 * Also consider it a dependency on sym if our
 -- 
-2.53.0
+2.54.0
 
