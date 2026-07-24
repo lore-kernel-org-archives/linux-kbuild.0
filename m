@@ -1,43 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A9CE254B03;
-	Fri, 24 Jul 2026 05:13:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 563A23655D8;
+	Fri, 24 Jul 2026 05:13:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784869982; cv=none; b=h1GVzvJQDOzxYcwZYA+z9qSCAYDolef0RBH6/BzMtW27w85KjRC4uZUfwqZ+rK9A88mWo5GET7T5oqdsW47Joi5u9qlZ5h8m/90kB2dSivixtf7UoqSql74PLJPlUrtWm//rIgGG1zVfWIQpfFgiPtZLPgb92rbZcMfTd0BAxrE=
+	t=1784869985; cv=none; b=eYy6eqw9FeYP5mxJkJOBQ9sEkekdwLKPdW+QYWAZl605Ew+gru67IZiH/AcawnjAN+heMG+z+jIz7g/7+wVbfMe0eIABk3qJIjVExzGTv5+meGyFm0rYPsp/z9Bo74LAET7G9LLNTPd7Z9wGvXgu1T3gJIlMe5j6PZTGfQUFNhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784869982; c=relaxed/simple;
-	bh=2Opi6ydBH20RwNEDfM5dlMwEbUj4aba/tUpAUfMKpj0=;
+	s=arc-20240116; t=1784869985; c=relaxed/simple;
+	bh=aZaIhBWGLisPCeYu6TskeMgbguCJ6B/WhIXDVKyXQMo=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=ZxLGD9DAhGj3gQdGbditZBRJ9mqVEYSHM3wKk1YOnazVv/UyS8kukRk1Ofgq59G4seae8Z3TVPcsgcwOwM8dmkv9WEDvkWyuOZa2QYblpwRya0IsZMX/tKUsLayTDJ6bh/JfRhKt//C2G3i77YKRwT3fiIqMb6dNSKmkq1ku8WI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a6KPqz75; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=lhOBNlKTp6VmTQ4TbQRca/w9Txl4A6Qsd6D4eyzOE4wmxFe/QPXJKweCGqJf/U18xc/swJWiyjgy8jEvhz/Gdva+WKAHE6m7V7V9K98tAz0NaE0Cm/N0ISuerDUHWHtdvNe8IuVP/2DbOxfIcK7x8hLej4Nkc3G5aMkm0mhHrQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iBLCmcpD; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a6KPqz75"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id D57591F000E9;
-	Fri, 24 Jul 2026 05:13:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iBLCmcpD"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 7BF9E1F000E9;
+	Fri, 24 Jul 2026 05:13:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784869981;
-	bh=YYZ1eJMD9M25QQed3wbx3rRk4lzC3vqT40+IpX+lUZE=;
+	s=k20260515; t=1784869983;
+	bh=25616Ldk2j/7DZSEQzSSH1I12tZNHb600NxPAJa/HL4=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Date;
-	b=a6KPqz759S3l+D4xzzzpnXsXgf0idkzO7tow8JoNhh1WLYoFjLg5tHoLCdnyIUe7Y
-	 z9stMfVxtS74lSZYvDHqtYp9WHRvo4Sj/9sP7WvvMr8JG2QCHHeFMPR4hkWNjWkbRB
-	 uzVT1wA4hcorjCTPa0tLW3aDda5/nbWlSJhOPqs9NaX3iSSyZOt4aDiwtqLBbcRgVe
-	 xR2lVUt7ybdTs+vvl/C3gqAX2tGQ0IMeRc/a0w2MNv+zdWl8kC5UrAGhNTfYoTT2I4
-	 vGK+r8Hu8Qgpt2CxVn9Pw7jLG8u48GiAZgTg3/t9l/9RTe6JEKHGw4hY8TFI/CmTZN
-	 2wf44WLMQ5VcA==
+	b=iBLCmcpDkldCC78cHhkGvMx/Dp1TIDlKgBXdDf3XSjSs1U07+r7vXnLIrPbmUmnUV
+	 EaWr0KPQr8blPqiY5cht7XyuB86G8mPT9/h/pRH+F9kNm7kbFs0cA0FUG4TxOanS2T
+	 ZkC728TSg9+mXq2PHT5+3zdzDL1dsmKqI31cO2SDgCbGIPB8LOM85jFhp5HnLF0diC
+	 49X6CTyACbvMfxBJBsJQTm5ANyJhdf1vsQz4PYCxL3yCSM99yuLG+wb00cJtedN1ZX
+	 xZ2XAqnOLiCH9hf4lKeh5nHNrYE4eioTojJvpoQHycTUCwnYDKw9QdSAnYK6pYlzi2
+	 DVJCILzGdDizQ==
 From: Nicolas Schier <nsc@kernel.org>
-To: linux-kernel@vger.kernel.org, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>, 
- Thomas Huth <thuth@redhat.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Nick Huang <sef1548@gmail.com>, 
- linux-kbuild@vger.kernel.org, Nathan Chancellor <nathan@kernel.org>
-In-Reply-To: <20260722072928.24500-1-thuth@redhat.com>
-References: <20260722072928.24500-1-thuth@redhat.com>
-Subject: Re: [PATCH v2] scripts: headers_install.sh: Normalize __ASSEMBLY__
- to __ASSEMBLER__
-Message-Id: <178486942643.1793472.12072264488475701058.b4-ty@b4>
-Date: Fri, 24 Jul 2026 07:03:46 +0200
+To: nathan@kernel.org, Robertus Diawan Chris <robertusdchris@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kernel-mentees@lists.linuxfoundation.org, skhan@linuxfoundation.org, 
+ me@brighamcampbell.com
+In-Reply-To: <20260624044742.144852-1-robertusdchris@gmail.com>
+References: <20260624044742.144852-1-robertusdchris@gmail.com>
+Subject: Re: [PATCH v2] modpost: prevent leak when early return no suffix
+ .o in read_symbols()
+Message-Id: <178486966441.1793472.16336529421470867133.b4-ty@b4>
+Date: Fri, 24 Jul 2026 07:07:44 +0200
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -47,38 +46,31 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.16-dev-5acee
-X-Developer-Signature: v=1; a=openpgp-sha256; l=984; i=nsc@kernel.org;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=767; i=nsc@kernel.org;
  s=20250924; h=from:subject:message-id;
- bh=2Opi6ydBH20RwNEDfM5dlMwEbUj4aba/tUpAUfMKpj0=;
- b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBqYvKqysZO8sT46OvNJfe17KGv2dx2GfzMunhzZ
- 6lVxMiuFdCJAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCamLyqgAKCRAHUgpwFiYS
- aR20EADMd0MsAmj9i0waqfQkoFdkv+vM7mmBbJbIJLYALw1CegM+MHVwoOf5koraJm7mWNioddF
- e5QREtEPH4xjW919GttBvBRbaD5ZAjXhzxzutMSAc/KJKtwou4s4Bp26qZQ9fE3KWZ1DWJWJ3Ob
- +L7jPLHNUN9uuCxVHtKUNVYRPAtA9zlKtOkP4Qa4NKBdZpRR70JH/wHSLcAYZTGr+g9vWF/a/kT
- Mr7nNL2MwEURj3hcwP5Sxc5Xc9qh0v2VT+hbCjd4luuTdRvRG2e7TllK66wD9/DyRFegTzZpfz2
- FrS2fSulufu9BpBKzXW+ALRbpbazAFbfX9iiPSFAq9CN77bRdK99997c54JTqDT0Q5XZY9YsnDC
- 70GDHYofVryPATXW5W/nH3p/UpqiVJB6130QBeRgs6OrNLY+Pcd56jVuhibgtm6GJpOvIjcMCbs
- hoeCN2qPAHLdmBDiBAIzdySVY2kkcCWGSWKJfSDaNdbb2KdQcO48gYetIdDbZSpvsFkAapSMxXQ
- fkJX4tF39xeHTezXEZJscB+Zd9qsKKlGxgXGam/Vk2TulhA0d52SHtEnO3tUH0bVlOM4lmP9OEM
- qCDfn6ZEXgBid0V2nj2FMUKFi3Nd3gA0DJiomzq5PCtgRQe4EHhP32T12vYKSOkafyUKQaepX6W
- iEWoRt0VKOnjKdQ==
+ bh=aZaIhBWGLisPCeYu6TskeMgbguCJ6B/WhIXDVKyXQMo=;
+ b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBqYvMmxUaC5E0eWRBuYgDzkCHYKlA7L2UEkH8Tr
+ RmID7tmxZGJAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCamLzJgAKCRAHUgpwFiYS
+ aYTaEACXuHA6nhAwfHthyTN+zf93HW5ATZGcCryLEUxIP6Q3g4+xLSI6xmlCIj2U3OaJGRWxaYP
+ 4DXEIXl2IlqVk4/XLUpcRvC3nkb8Jp8NlZzJr8HKV+8AN63p3T4g4hbH5PnhxmYW/gowOOpUHjE
+ Pmo6xLO9rqm8hcQ0aSn8HZhFam1uwhmyBgOvgxMuqSP9GGU3VZVjGCTUUSgU6J3kbWrYLUaJ2El
+ gWZoe0rZ8Fhz+NwnV65wqa6SM5iHxa8RjT/+DWYudDJ9VepDzYKrvqTNMK8tciXZTTntYIiQ/E5
+ WoNzhSZYxkSwUKjaddG2dUtWVb3Q1qLf4zHU0WcXm3iwC3G8CoVuMZ+XOXhJ0oFq73OVoENGbwf
+ 5K+YtAS5nF9GJX6qZNzEuwL4ibzwroka1Ese/w+0PEqQZGK2YZ+AUsrkT/AzsEANBEce9fs+Fa1
+ X0iQPrHnP0xDZwGIIeVvczVrIsU8pPD+u7Nr633uZ48A4z4eDA8ZiodbhvVD81wZg1nQfolSj0i
+ Cv8Zy0j+aR8WVmsi/9IeO7rSTGC0NrvDMxR6OqUgyIcCy973ak5nSR7hFy2HKpOhv4MuI4GWKbx
+ mxbmsm0UrO/V9Ld5BBs+Ut7sneEMRTSjB2yPAL7VnErrPI2ez15PyJiM9BDbqq7LVEWeTo4y85/
+ pelk2VbdB5znm/A==
 X-Developer-Key: i=nsc@kernel.org; a=openpgp;
  fpr=18ED52DBE34F860EE9FBC82B7D97093255A0CE7F
 
-On Wed, 22 Jul 2026 09:29:28 +0200, Thomas Huth wrote:
-> scripts: headers_install.sh: Normalize __ASSEMBLY__ to __ASSEMBLER__
+On Wed, 24 Jun 2026 11:47:42 +0700, Robertus Diawan Chris wrote:
+> modpost: prevent leak when early return no suffix .o in read_symbols()
 
 Applied to kbuild/linux.git (kbuild-next-unstable), thanks!
 
-I apply this early to kbuild-next-unstable for that we have it in
-linux-next.  I am still happy to apply trailers for at least a week,
-maybe longer.  If there is (still) an issue with the commit message,
-please call out.
-
-
-
-[1/1] scripts: headers_install.sh: Normalize __ASSEMBLY__ to __ASSEMBLER__
-      https://git.kernel.org/kbuild/c/77e9bd85
+[1/1] modpost: prevent leak when early return no suffix .o in read_symbols()
+      https://git.kernel.org/kbuild/c/f2308dd4
 
 Please look out for regression or issue reports or other follow up
 comments, as they may result in the patch/series getting dropped,
