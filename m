@@ -1,205 +1,106 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C65233926;
-	Fri, 24 Jul 2026 19:50:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6975A2FD694;
+	Fri, 24 Jul 2026 20:00:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784922639; cv=none; b=oBsfqryV6jy2JB6O3Fut0CPl4bUarcTTfXRDX490PEkIADBsz0kEQc2shf6XWkVNgK0S/oucUY0nZJVLSnGIVoMrdWBTrt5OjieWCnffyl696veV3814YRZ+OBsDoJxO28S33rJxoHbNRpWEPU4SBZKqExq3lovedjPKfDtelwI=
+	t=1784923237; cv=none; b=n4NJucYajfhoolrvHkQEohEZkQrxamITbHpsQdLQW2vlv2t3zIzG0KI922jdyLh4SGSt/D3Tfy07v2KXS5r7GPSEuMzkMwJp3ei2tBlxYGmbPOJTk0fqcq46Usbsh4A8c4TC2LFFgY8A90wvZOAmS0Cw/2FojpX26H/LRlA+SzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784922639; c=relaxed/simple;
-	bh=NoE+xy0UkbhTAXqkSxv2IuMHsApWUps4QQDy0yXorHU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LbTTwQ7RdndXUTLXUOpyIszsmYEx5kc0FGN5NPBuQF1KS0RGr9u6ZCwHamTVA/zaHtE4uF/zSxYc4bKqqPFj4YhZLu0yhGmO9+y3RiVQPkWM/FNQvPT3vqKy2RTRp0NCmmLPG4bJT7mU8P9dOTvH7YDvF3IgSe6c8C44s8PazdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BtYv7zqd; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784923237; c=relaxed/simple;
+	bh=++FxkPl/GziZ9jf1z01jagAQe2bVE3MsirCWFyF1NAM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Cbx/2Va6hEpC17EWgcefQxg5F6IuAcSVwUUfmeeOH2oiX2ZIPBHkWMtkobXcNS4AssTVzi0FjzbsIcLNe8TfSqyV5md6A0vPkhqicDJTry/XP+FKO59XGRsJkaXy5mfSbjyBrRLERDHWpRdAIVMHNIyQdY5Tk5mk1Qw4he6MTfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=YhaEvuQ6; arc=none smtp.client-ip=213.97.179.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BtYv7zqd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D67C1F000E9;
-	Fri, 24 Jul 2026 19:50:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784922637;
-	bh=uYZYJpTXfDcHeTDqTQZMaqHJlAmMBAVkn93HWhktHe0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=BtYv7zqddpucBXaaJwMzAyxzhsc9MJMRfHJFF5SqL5QEGqEUXUGuu7IPOHWq/tZxV
-	 LwBmCOdkdB+JaC8madHMT6EVUv9zBdLXy6bxjjSG6c5XaRw1MZE+SQdQV5WqEej35A
-	 kLqYD14gFOIW4jszjfZ+3z/yFT2thi8JUgnDRR5bJREoaLfW5UF+hM8nyv1nF8Mc8j
-	 xRoE/PGRsR2v3AF7Ei9vOFpE+CBy5Gf0wxVjpoJxNgY20TilndiOCtfq8C7R04P9YD
-	 +2kmJhPSQ/JPxxVuBTRs4TiUCg0w45n+JfaG0N4KbJivpNwpbuIGOLO/EiP4Ns1cQL
-	 ONn50oT6sRcrQ==
-Date: Fri, 24 Jul 2026 12:50:34 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Yafang Shao <laoar.shao@gmail.com>
-Cc: sashiko-reviews@lists.linux.dev, bpf@vger.kernel.org,
-	linux-kbuild@vger.kernel.org, Nicolas Schier <nsc@kernel.org>
-Subject: Re: [PATCH v2] kbuild: rpm-pkg: Preserve .BTF section in kernel
- modules during debuginfo stripping
-Message-ID: <20260724195034.GB1461047@ax162>
-References: <20260716025342.42628-1-laoar.shao@gmail.com>
- <20260716030116.C613E1F000E9@smtp.kernel.org>
- <CALOAHbBQhAsTMHMMZH5Sen0cDYg8GREZMmQcT4Njc9VW_WHe4Q@mail.gmail.com>
- <20260724000015.GA2803569@ax162>
- <CALOAHbCaKNF2=Q0qCHbQttP4+LOwOdnxHKbdLeiJi0+2JKkvNQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="YhaEvuQ6"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
+	Message-Id:Date:Subject:From:From:Reply-To;
+	bh=FEy5QmzAoN+9TFMenjgUC/Es0w9ErX3BXE0B6PncuV4=; b=YhaEvuQ6WVydYp3d1ntFNlY9Pz
+	un9Z+4u2DydboxElXj7u/P8TuhIpwK+tRc5uPtmdkxRsviZPuU5v9STpCF6fNLpsE4bXmBplLWhwu
+	LAn7UMxxHYLFYXB75Q7XHJLeTTy9yyPzIaDTg/IzoMBTUIKJJ51f26pe62eTEkehYr8G6BnGHfzIn
+	g003eV/Jvfkrzz2fDfPKzK3sOgp+B4936aWJqMdRQQxxiL1ENOnpnE7k3Na7kmuBnfOZl5iLfIbiq
+	J9eBKn9MtEhpejzf1+UW9Oi7oqWU0bIrI/wWcm+ZJaDGT9bMoSxAw201k0L8No1PqlPgU+z8ZXo4A
+	G3GVtHpg==;
+Received: from [179.118.190.213] (helo=[192.168.15.100])
+	by fanzine2.igalia.com with esmtpsa 
+	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
+	id 1wnM4E-0057cp-Sa; Fri, 24 Jul 2026 22:00:23 +0200
+From: =?utf-8?q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
+Subject: [PATCH RFC 0/4] syscalls: Add a shared table for all archs
+Date: Fri, 24 Jul 2026 17:00:10 -0300
+Message-Id: <20260724-tonyk-syscall_table-v1-0-9c53188423da@igalia.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALOAHbCaKNF2=Q0qCHbQttP4+LOwOdnxHKbdLeiJi0+2JKkvNQ@mail.gmail.com>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIzMDcyMT3ZL8vMps3eLK4uTEnJz4ksSknFRdSyOLpKQkwyQjs6QkJaDOgqL
+ UtMwKsKnRSkFuzkqxEMHi0qSs1OQSkHlKtbUAhd3WdnwAAAA=
+X-Change-ID: 20260724-tonyk-syscall_table-928bbb1b26bb
+To: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
+ "H. Peter Anvin" <hpa@zytor.com>, Nathan Chancellor <nathan@kernel.org>, 
+ Arnd Bergmann <arnd@arndb.de>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+ kernel-dev@igalia.com, 
+ =?utf-8?q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
+X-Mailer: b4 0.15.2
 
-On Fri, Jul 24, 2026 at 10:49:24AM +0800, Yafang Shao wrote:
-> On Fri, Jul 24, 2026 at 8:00 AM Nathan Chancellor <nathan@kernel.org> wrote:
-> >
-> > On Thu, Jul 16, 2026 at 05:11:05PM +0800, Yafang Shao wrote:
-> > > On Thu, Jul 16, 2026 at 11:01 AM <sashiko-bot@kernel.org> wrote:
-> > > >
-> > > > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> > > > - [Medium] The check for `find-debuginfo.sh` capabilities in `mkspec` hardcodes host properties into `kernel.spec`, breaking SRPM portability across distributions and failing silently when the tool is not in `$PATH`.
-> > > > --
-> > > >
-> > > > --- Patch [1]: [PATCH v2] kbuild: rpm-pkg: Preserve .BTF section in kernel modules during debuginfo stripping ---
-> > > > commit 99202060a54c32638e01a2bfdc4d23b190f3f77c
-> > > > Author: Yafang Shao <laoar.shao@gmail.com>
-> > > >
-> > > > kbuild: rpm-pkg: Preserve .BTF section in kernel modules during debuginfo stripping
-> > > >
-> > > > This commit updates the RPM packaging scripts to pass --keep-section .BTF
-> > > > to find-debuginfo.sh. This ensures that BTF information is preserved when
-> > > > debuginfo is stripped from kernel modules.
-> > > >
-> > > > > diff --git a/scripts/package/mkspec b/scripts/package/mkspec
-> > > > > index c604f8c174e2c..00acef348ba84 100755
-> > > > > --- a/scripts/package/mkspec
-> > > > > +++ b/scripts/package/mkspec
-> > > > [ ... ]
-> > > > > @@ -65,6 +65,11 @@ fi
-> > > > >  echo "%define with_debuginfo_manual $with_debuginfo_manual"
-> > > > >  echo "%define with_debuginfo_rpm $with_debuginfo_rpm"
-> > > > >
-> > > > > +# Detect if find-debuginfo.sh supports --keep-section (RHEL 9+)
-> > > > > +if find-debuginfo.sh --help 2>&1 | grep -q keep-section; then
-> > > > > +     echo "%global with_keep_section 1"
-> > > > > +fi
-> > > >
-> > > > [Severity: Medium]
-> > > > Is it safe to assume find-debuginfo.sh is in the standard user $PATH?
-> > > >
-> > > > On many systems, this script resides in /usr/lib/rpm/, which isn't typically
-> > > > in the $PATH. This could cause the check to silently fail and strip the .BTF
-> > > > section during a local make rpm-pkg build.
-> > > >
-> > > > Also, since mkspec runs during SRPM generation (make srcrpm-pkg), doesn't
-> > > > this statically bake the generation host's capabilities into the resulting
-> > > > kernel.spec file?
-> > > >
-> > > > If the SRPM is rebuilt on an older distribution, rpmbuild might fail because
-> > > > the older script rejects the --keep-section argument. If generated on an
-> > > > older host and built on a newer one, BTF info would be silently stripped.
-> > > > Could we dynamically query the target host's capabilities using something
-> > > > like %(__find_debuginfo) inside the spec file itself?
-> > > >
-> > > > --
-> > > > Sashiko AI review · https://sashiko.dev/#/patchset/20260716025342.42628-1-laoar.shao@gmail.com?part=1
-> > >
-> > > I believe we could use the builtin _rpmconfigdir to locate
-> > > find-debuginfo.sh reliably. This avoids relying on $PATH.
-> > > What do you think about the following change?
-> >
-> > Just an FYI, this was not sent to anyone with authority to comment on
-> > said change, as the Kbuild folks were not included in the AI review
-> > thread. I just happened to find this when browsing the archives.
-> 
-> My apologies, I failed to notice that the linux-kbuild mailing list
-> was excluded from Sashiko's reply.
+While implementing a new syscall, we need to wire up it's number to the arch
+table. Since syscall number 403, all architectures are on sync regarding the
+number (except alpha), which make things a lot easier but more repetitive as
+well. Have a look at commit b36d4b6aa88 ("arch: hookup listns() system call"),
+with 15 lines of mostly:
 
-No problem at all, I just wanted to make it obvious why you may not have
-gotten a response to your suggestion and for this issue to get lost.
+  +470    common  listns                          sys_listns
 
-> > > diff --git a/scripts/package/kernel.spec b/scripts/package/kernel.spec
-> > > index c732415662ef..4335e99f2aca 100644
-> > > --- a/scripts/package/kernel.spec
-> > > +++ b/scripts/package/kernel.spec
-> > > @@ -67,7 +67,21 @@ This package provides debug information for the
-> > > kernel image and modules from th
-> > >  %undefine _unique_debug_srcs
-> > >  %undefine _debugsource_packages
-> > >  %undefine _debuginfo_subpackages
-> > > +
-> > > +# Preserve .BTF section in kernel modules during debuginfo stripping
-> > > +# find-debuginfo.sh (from debugedit) uses eu-strip which removes
-> > > +# non-allocated ELF sections like .BTF by default.
-> > > +# --keep-section .BTF preserves BPF Type Format information.
-> > > +#
-> > > +# Uses _rpmconfigdir for reliable script location instead of relying on $PATH.
-> > > +%{!?with_keep_section:%global __fd %{_rpmconfigdir}/find-debuginfo.sh}
-> > > +%{!?with_keep_section:%global with_keep_section %(%{__fd} --help 2>&1
-> > > | grep -c keep-section)}
-> > > +%if %{with_keep_section}
-> > > +%global _find_debuginfo_opts -r --keep-section .BTF
-> > > +%else
-> > >  %global _find_debuginfo_opts -r
-> > > +%endif
-> > > +
-> > >  %global _missing_build_ids_terminate_build 1
-> > >  %global _no_recompute_build_ids 1
-> > >  %{debug_package}
-> > >
-> > > Please let me know if this approach works or if there are any concerns.
-> >
-> > /usr/lib/rpm/find-debuginfo.sh might not exist on certain distributions
-> > that can build .rpm packages like Arch Linux:
-> >
-> >   $ ls -l /usr/lib/rpm/find-debuginfo.sh
-> >   "/usr/lib/rpm/find-debuginfo.sh": No such file or directory (os error 2)
-> >
-> > Even on modern Fedora, this is a symlink:
-> >
-> >   $ ls -l /usr/lib/rpm/find-debuginfo.sh
-> >   lrwxrwxrwx@ - root 19 Jul 17:00 /usr/lib/rpm/find-debuginfo.sh -> ../../bin/find-debuginfo
-> >
-> > I think we would be better off just using the __find_debuginfo rpm
-> > macro:
-> >
-> >   $ rg -m 1 find-debuginfo /usr/lib/rpm/macros
-> >   69:%__find_debuginfo    /usr/bin/find-debuginfo
-> >
-> > This appears to work for me, it would be good if you can confirm this
-> > works for you as well.
-> >
-> > diff --git a/scripts/package/kernel.spec b/scripts/package/kernel.spec
-> > index c732415662ef..590b5b2e1b40 100644
-> > --- a/scripts/package/kernel.spec
-> > +++ b/scripts/package/kernel.spec
-> > @@ -67,7 +67,18 @@ This package provides debug information for the kernel image and modules from th
-> >  %undefine _unique_debug_srcs
-> >  %undefine _debugsource_packages
-> >  %undefine _debuginfo_subpackages
-> > +
-> > +# Preserve .BTF section in kernel modules during debuginfo stripping
-> > +# find-debuginfo.sh (from debugedit) uses eu-strip which removes
-> > +# non-allocated ELF sections like .BTF by default.
-> > +%global with_keep_section %(%{__find_debuginfo} --help 2>&1 | grep -c keep-section)
-> > +%if %{with_keep_section}
-> > +%global _find_debuginfo_opts -r --keep-section .BTF
-> > +%else
-> >  %global _find_debuginfo_opts -r
-> > +%endif
-> > +
-> >  %global _missing_build_ids_terminate_build 1
-> >  %global _no_recompute_build_ids 1
-> >  %{debug_package}
-> 
-> This works for me, thanks for the improvement.
-> Do you plan to send the official patch, or would you like me to send a
-> new version?
+There's already a "common" table shared with a bunch of archs at
+`scripts/syscall.tbl`, but due to historical reasons some archs will never be
+able to move to this table and share all the numbers.
 
-You can send a new version, as your message makes it clear what is going
-on here. If you feel so inclined, you can add a Suggested-by tag but I
-don't think this is substantially different from what you suggested.
+In order to make things a bit easier, this patchset creates yet another common
+syscall table with a subset of numbers that are already being shared among the
+syscalls. I've started from syscall 442 (mount_setattr) to avoid dealing with
+compat syscalls for now, but this already have the benefit of adding or rebasing
+a new syscall much easier. If this work sounds reasonable I can later add more
+syscalls, removing more repetitive lines from the code.
 
--- 
-Cheers,
-Nathan
+I've tested this with x86 and arm64, by comparing the syscalls_*.h and
+unistd_*.h files generated before and after this patchset and they are
+identical.
+
+Thanks!
+	André
+
+---
+André Almeida (4):
+      syscalls: Create unified partial table for all archs
+      syscalls: Add support for x86_x32 for the common syscall table
+      x86: Use common syscall table
+      scripts/syscall.tbl: Use the common table
+
+ arch/arm64/tools/syscall_32.tbl        | 30 -------------
+ arch/x86/entry/syscalls/Makefile       | 15 ++++---
+ arch/x86/entry/syscalls/syscall_32.tbl | 30 -------------
+ arch/x86/entry/syscalls/syscall_64.tbl | 30 -------------
+ scripts/Makefile.asm-headers           |  4 +-
+ scripts/syscall.tbl                    | 30 -------------
+ scripts/syscall_common.tbl             | 34 ++++++++++++++
+ scripts/syscallhdr.sh                  | 81 +++++++++++++++++++++++++++++-----
+ scripts/syscalltbl.sh                  | 26 ++++++++---
+ 9 files changed, 134 insertions(+), 146 deletions(-)
+---
+base-commit: af5e34a41cd607c00ef752e00331736570992354
+change-id: 20260724-tonyk-syscall_table-928bbb1b26bb
+
+Best regards,
+--  
+André Almeida <andrealmeid@igalia.com>
+
