@@ -1,72 +1,72 @@
 Received: from fhigh-a7-smtp.messagingengine.com (fhigh-a7-smtp.messagingengine.com [103.168.172.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7064E377AB9;
-	Fri, 24 Jul 2026 20:09:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C353B23395C;
+	Fri, 24 Jul 2026 20:16:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784923778; cv=none; b=NcZPMP+u2ODuteNF4RMOpIy6HljLVikn9C9UxVnlQ/ylEYgqlQkemA+cXa/91yIvvOWhcw1x6vRsSduzmiaVYAhPPlAe1cWqfAw2XtnWrC0JyDxpd90iPC+gLwHKkBSWcxMM4CmjEh4R516DrtSb6L5IqEt6wAkFx7xN/rapLtg=
+	t=1784924195; cv=none; b=m+2CkCEiEmJE7F0Eu92lEv7RnFEFenw5XiZvGnenJxg2nx5nSxszAGAImbr+PjnfHuwUkzxW+lZI3zG7gC/5D0pajEi9lP02YorkZrnkEPlomeD+fkUBNFFcHp0tOysNOffJX/P7uwPn1UsxI1qBVXbywU8zjk1kWHnMPhrMuAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784923778; c=relaxed/simple;
-	bh=xGUap47vDPyOzGIiwQbtJhPm46Qu52WofeMUY1dNB5s=;
+	s=arc-20240116; t=1784924195; c=relaxed/simple;
+	bh=TeF0LNB1zp2MAvAf/zEZYjFj56kAph/eMmB2+L6nGLw=;
 	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=tBkNOUPv8UK5Ek63r0gbaqZ6mg7JXYl8yzBmMG8q1JaWKrNlK3/8TL78Aq626YFPLepxGsi5ElBG1xxmafFDZmAJhV5tLpKIIQDpIZ3E3g57XH3Tm+5dZgSs/spuIbXzMiWdC+LWwjef3Xr27ussTMkBWgeWQJ/qtvn+fL9ucD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=A4oVMbrE; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=AFucMXfh; arc=none smtp.client-ip=103.168.172.158
+	 Subject:Content-Type; b=JLAKj8hiPTK5ros+cpm6IMcFVHq13UyitfIq06b6iKQOW/cwmEkYxupV5JniEGmF7P78YXsqMDQZbQIkE9eqbNv3ZVV6hl7OhB77veAHCzOLbAqZKVC4fGMyI2YxtQGc0CUCoGIdcTVZ15WoMO4QxVx7xqf30syexzVG5uBzpHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=TV0fTtaV; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=FIuOj+95; arc=none smtp.client-ip=103.168.172.158
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="A4oVMbrE";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="AFucMXfh"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="TV0fTtaV";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="FIuOj+95"
 Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 8CE9714000A7;
-	Fri, 24 Jul 2026 16:09:35 -0400 (EDT)
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 26E1C14000B4;
+	Fri, 24 Jul 2026 16:16:31 -0400 (EDT)
 Received: from phl-imap-05 ([10.202.2.95])
-  by phl-compute-04.internal (MEProxy); Fri, 24 Jul 2026 16:09:35 -0400
+  by phl-compute-04.internal (MEProxy); Fri, 24 Jul 2026 16:16:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
 	:cc:content-transfer-encoding:content-type:content-type:date
 	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1784923775;
-	 x=1785010175; bh=rw3u2ylz3QgHwmqpV5ep8DhCbsINe8W+IzNU33xk2i0=; b=
-	A4oVMbrE9Z80XPfXX/Z56XBF1drME9UV6q+zmM9SpMiOSrBoHmYCQIU99mprpc1G
-	+B7vMvaDFKD0p4q3HXMSIzHjYcEm9aTXnhLxYOIR459DHpVUqjLy1hc4XfZxevly
-	VRRfCo5nWVS4JMBQoNjWXvcaOIxj/wMTTRcc/MQQFJsDgsLn93Nugdh5VA2pDM3I
-	GQ1f8jzL5aORLOAfSDJlpCN8H5i6a/Mx2allIJUIHO4pcooHUfbM/de21jOFITTR
-	Cj2wuIR/nsz9tMkc1VLm9FqvcGlJlPfzi90aBpBBrFjFyhRR8Gruuc81riwOjfZe
-	1L3+oRPTzRESz+Sh0iQFxg==
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1784924191;
+	 x=1785010591; bh=ID8Gh1yVkE/8Q3kWAoTjvXK0TRtzbGH1IFnXhc0a/dI=; b=
+	TV0fTtaVdKHIS1OXdPSLtARcRYZ7kz3EvHgivhDHATvjwQgGpYgmhH3tgU5wq+BT
+	NG2OwojOmdYfRJCia7fqe8vn6CAEDjbk/K7uU9pK7lemRkbMdowQhDlWSZjPn9Py
+	Fv4e9dgqOhsdkWYUrtYVWPwmGupOJHZbK/QA922lY1YfzjjFqPyfpCLebPhTe4gq
+	w9m0zdfIxcldRVcf6bHyCrZef12gX8qiyv/FG3GuWbp3sag1RfbwBX+lQ1+Y+jdK
+	HUNb1AK37WwNdhafSuiLku4A+dfHpp6Rp3Ff7G5Ui246iQ0wrY6GqfwOrKJ9muFM
+	AYlm0jEoXsXxW/2dkm777w==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:content-type:date:date:feedback-id:feedback-id
 	:from:from:in-reply-to:in-reply-to:message-id:mime-version
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1784923775; x=
-	1785010175; bh=rw3u2ylz3QgHwmqpV5ep8DhCbsINe8W+IzNU33xk2i0=; b=A
-	FucMXfhca46KpFHByOrZAOdlaXT5uaFP7FKaCbChiqSYjpC/l9TTh8+vLOz6hRqP
-	RATHSvqIPmR5GiytFAgHM9w8qJ2eVAazAR8VWXi0XVcXk9MNAmv3S/Y5qZV5VuGF
-	eYagZAbXZTdVxvCRzgxeynnD39J9vxHEgr23xhFgIqnDQRwQ8D5t3/ZDXEBSbQkm
-	lcDL+9Vxp3RN2P715XkqMleV4jPnWdPXfMhteKVP85vYwBF3ZVExM/qG5tiPLeQ5
-	s2Uh7if7yakI3/tbqAFIzUL7N8s8cqRKnLLikcvGS22UZAJQbc0zPVozStbNfQSF
-	9wte18/8Qznd00GketU3w==
-X-ME-Sender: <xms:fsZjapDaCmEDrsSlvh2CqAb5T_Ev2AmC-eg9X6E8DsV_QLGyL8CBxg>
-    <xme:fsZjaiVDS0qXu4m_Y9lk4_IdRc-oKLnZxu1nJYD0UqOD9YKyz0IGJIG3XW54Sv5UU
-    pAIDowjv68YJefs1FtiPWRwsMNRmsD6B4EE5XaNncPW3_YI_zxp_IY>
-X-ME-Proxy-Cause: dmFkZTGpjDdrWXRvB/ncNBGXPPAvNs8M5DXfJmRz5zLT4rDuGtEhKVeTfAjQ+hrpZokBBa
-    QFsdBKuzP+fC8eLhL+Ajw0v/aWxElwdNSQCQkLIEjjCI4F33TEtHAyasV9aEV5G3OsH2p9
-    OL4Am1vdedA6TgTC0AXRqQMD4Yv+dicyticP/wRgiUE7kXlB3TBTf9T79p+amgLLC92qvZ
-    EXnZeyF/G+1yiVZaEQLu6NXCeJ4j2hTv9BY24hIZjTINjLKlO1xbiSU7WKnLGXct7+ohD1
-    HLknqerghLd6GZuf9NCf6s7WMlqAM0i7n30UyhVJqZzB8rR5h/gu/XDF0btfAHw+XYg+m8
-    OVXggDIxJju7zkfoKgvHaM6eROI59x07Xt9s92CjKTK7DFZWcrNrUYamlyITNqeIcSq41g
-    WPMhnwiwLTHgpSmIQwSG/zFxq8YLchGIxhMOjKyVhn7a26Y1ej99uW7gH1T0WS6Z7QwTqn
-    LGClw4Ut57gdqnu1+oaYLu4uc6Vj+dXVcIDdDsVNSEmduGXuvZ0hxBvFljYmXjXMwI+NzG
-    qoPgKvzhR+tx8RiRzPB/q0bHvJom9jp5WsS/tM5cq4H+x6lHwNykuMUpIhOT3+pzdP4A77
-    OAgZP9qlgv2WynL0mpV+y7e0+i0XaIj8QdIrdaifxCcsxsjnTReIMzZXBq1Q
-X-ME-Proxy: <xmx:fsZjasnDvs6_6myHwYnXUZmBf9SIwD8hZMZmxHCByoMlBM5Mr1MmCg>
-    <xmx:fsZjakAD3vj7A2NPIMoNPqsvnDxCNQP9yyi1RIYOMsIrCzS_Iweluw>
-    <xmx:fsZjamOk7XV1xJj_UdVO5t6V1fAAQh2Gz-iznXSxs5Z1kL3kQuEj2w>
-    <xmx:fsZjajN2nH8Lwd2v-aik8jMwLSWJf1UO4Kq7EE6MorI2Eyuq0HU6tg>
-    <xmx:f8ZjauXQLna0smge_jkeASZvBjtmwE5gCa-GsAsM3pxASpbx70QX3U2v>
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1784924191; x=
+	1785010591; bh=ID8Gh1yVkE/8Q3kWAoTjvXK0TRtzbGH1IFnXhc0a/dI=; b=F
+	IuOj+95buZTOouncW8aGUqueIg6h6FxQgdzEjAv3MkBeVwZswtjaI0cQ0FRtWRXB
+	Y8dlN9RojWblRz4S/cyFzvN6WxQfwpz2fbdrRm8qKvbhxK8ceV7HlAjBI0vm1zhr
+	BcYLj/ENDg6aewsGJWtewRZlteaGPBNKAOOhYnjWQk71au07/9TI5zFgGVKaMJnY
+	eZh9NoUT9XSELoY7/hr3xVMgRnGp5Lw8DPu0LFs3goksHPLaevvmtYxOi8x7eyJ9
+	F3D4MoiWLOL4y0XESL34jcxxXxHTEwns73buOzScg5G27dsvima/w7msGhXzHnFN
+	xtueSoYUp13s+ldL+LXQg==
+X-ME-Sender: <xms:Hshjav7UjqmeGrXLbmzu4T73GuHcV6AC5FIovY1aT4HCCGOimW5e9Q>
+    <xme:Hshjavu34_5KactIRuBGHQzV1N0584GdZcdMk1k_auMY7hcenygzYqX1K9pltJDbX
+    U2yuW0kBKqvqr8nQOiEjvXcniztDVoehBU6OWRwjGCF4Bj9wbhA1zQ4>
+X-ME-Proxy-Cause: dmFkZTGuWKceVEyPWwT1hpr+hAGJd9LfFGn8pj0ZKA+y2N7mz1gVTAQj3uZ1dJ5AkyzEPF
+    TrUMY1VCP0st+fZr8JF3mICPw+yAbPPGeXWTuAhsG6WdacfVjRx+XsQyYggv3IGkROQ2qh
+    o9c8yNsGcFpKU2GyT6yrjxyCm30nlKajhaeDeM6u3pa2twRXf72rOPDPemLy46eLrzA3zb
+    MjPlN22DyM+KsKM6Jy5iJvi5V+tke1S5wyiuSa16TRiqartzDzZlAoYdSgxTvSrhX4YNyl
+    URjuankCMJiA0iKOr2y58qZA70LoLCeVybiCXb5Fyb0hJ7ruTE3o4Sb7shJWwutJAys8ni
+    d6ptLpXLjY2NFx+Xsxg0l1tDypLlFlwRx1s2zBSAFF9to8Pa2F9eIjBNDztEl9jP9Az7xf
+    IGAaOqC4H2JDGPKvSyNE6jMUXXT84Gt/2eJDFjZSiQElaY0DwTl8M4uO/PksFJFP9Wga2B
+    k/6myR1yPpVAj4yX8DqC+04oHds5rRvYgQPmJBENTLv5drC9SyMVGb/oo0b7oEdhLUa+Mv
+    AiSWENjzAU1o3aqzTgxt61zUyGe1pfS7TCguzRe5m8Sq/fHV3UVT/7YdLsDIzH4nhLDEUj
+    UQ4CD5VHTxDkfGq02JC1x94SZlUnI2PS2VAualv5LsRpPY/nllIMLj+uM31w
+X-ME-Proxy: <xmx:Hshjahc1CIh1wZsoIbQrKKQMFzGm8h3PHstTjDndaLdVyXJRv2gZaw>
+    <xmx:HshjanZV1_DjiVwbUNXLvhkqcGpN-69VOlG6UOyhGWJwuoEYEuL37w>
+    <xmx:HshjamEpuqif5f_Pzv1V6rTNQknWLLNzoRea-Hg0bnU2MNQNVBoXcA>
+    <xmx:HshjallKVb6fgnB_cRdQmg2UW-GnU6ZIEaIcFwq8smmkgYVYfxp5cQ>
+    <xmx:H8hjavtn9LgsxCXSdp3eYWPegJsVGYqzx5IH8C9wqD-If76uM-nF032b>
 Feedback-ID: i56a14606:Fastmail
 Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 7DD5B182007E; Fri, 24 Jul 2026 16:09:34 -0400 (EDT)
+	id C2CEB182007E; Fri, 24 Jul 2026 16:16:30 -0400 (EDT)
 X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
@@ -74,8 +74,8 @@ List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AEcurKPZ2CIZ
-Date: Fri, 24 Jul 2026 22:09:14 +0200
+X-ThreadId: AJXRYo5zINsw
+Date: Fri, 24 Jul 2026 22:16:09 +0200
 From: "Arnd Bergmann" <arnd@arndb.de>
 To: =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>,
  "Thomas Gleixner" <tglx@kernel.org>, "Ingo Molnar" <mingo@redhat.com>,
@@ -84,52 +84,41 @@ To: =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>,
  "H. Peter Anvin" <hpa@zytor.com>, "Nathan Chancellor" <nathan@kernel.org>
 Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
  kernel-dev@igalia.com
-Message-Id: <3a481359-72d0-4c58-8a63-b6d941a22482@app.fastmail.com>
-In-Reply-To: <20260724-tonyk-syscall_table-v1-1-9c53188423da@igalia.com>
+Message-Id: <5b4e3a79-c170-4c48-ae38-d457a85c792f@app.fastmail.com>
+In-Reply-To: <20260724-tonyk-syscall_table-v1-2-9c53188423da@igalia.com>
 References: <20260724-tonyk-syscall_table-v1-0-9c53188423da@igalia.com>
- <20260724-tonyk-syscall_table-v1-1-9c53188423da@igalia.com>
-Subject: Re: [PATCH RFC 1/4] syscalls: Create unified partial table for all archs
+ <20260724-tonyk-syscall_table-v1-2-9c53188423da@igalia.com>
+Subject: Re: [PATCH RFC 2/4] syscalls: Add support for x86_x32 for the common syscall
+ table
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On Fri, Jul 24, 2026, at 22:00, Andr=C3=A9 Almeida wrote:
-> To take advantage of the subset of syscall numbers that are guaranteed=
- to
-> be shared, create a new table and adapt generation scripts to use it. =
-In
-> that way, every new syscall can be added to a single file.
+> x86_x32 has a peculiar ordering: first, goes the x86 syscalls. Then, t=
+he
+> shared syscall numbers from the common table, and finally the x86_x32
+> syscall numbers. Adapt syscallhdr.sh script to take this into account.
+>
+> Let's hope that x32 is deprecated before the syscall table reaches sys=
+call
+> 512, to avoid making the shared table more confusing.
 >
 > Signed-off-by: Andr=C3=A9 Almeida <andrealmeid@igalia.com>
 
-Thanks a lot for working on this, I had planned to do this myself
-for a while but had never quite gotten around to finish it.
+The suggestion at the moment is to remove x32 in linux-7.4, and
+I don't think your patches will hit 7.3 at this point, so hopefully
+we don't need this bit either.
 
-> +#
-> +# syscall numbers shared by architectures
-> +
-> +442	common	mount_setattr			sys_mount_setattr
-> +443	common	quotactl_fd			sys_quotactl_fd
-> +444	common	landlock_create_ruleset		sys_landlock_create_ruleset
-> +445	common	landlock_add_rule		sys_landlock_add_rule
-
-It should really be anything starting at 403, not just 442 and higher.
-
-There are some trivial differences that have crept in over time,
-but we should be able to work around those.
-
-> index 22e34cd46b9b..77934a2d0f51 100755
-> --- a/scripts/syscallhdr.sh
-> +++ b/scripts/syscallhdr.sh
-> @@ -26,6 +26,7 @@ usage() {
->  	echo >&2 "  --emit-nr          Emit the macro of the number of=20
-> syscalls (__NR_syscalls)"
->  	echo >&2 "  --offset OFFSET    The offset of syscall numbers"
->  	echo >&2 "  --prefix PREFIX    The prefix to the macro like=20
-> __NR_<PREFIX><NAME>"
-> +	echo >&2 "  --common-tbl       Use the common number table"
->  	exit 1
-
-Ideally we shouldn't even need this bit either, though it may
-help for the transition phase.
+As we discussed recently [1], we likely still need to stay away from
+the x32 range to avoid having conflicting numbers on x86-64 between
+future number assignments and old kernels (< linux-5.4) that fail
+to return -ENOSYS for x32 special syscalls. The only way we could
+arguably consider reusing them is if glibc increases the minimum
+kernel version from 3.2 to 5.4 before we get to that number, but
+that is still slightly fragile because glibc is not the only
+runtime to consider here.
 
      Arnd
+
+[1] https://lore.kernel.org/lkml/29bdbdc4-caef-4486-8816-84422c23bc20@ap=
+p.fastmail.com/
