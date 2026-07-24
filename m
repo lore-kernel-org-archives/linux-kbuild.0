@@ -1,42 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 563A23655D8;
-	Fri, 24 Jul 2026 05:13:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C612119C54E;
+	Fri, 24 Jul 2026 05:13:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784869985; cv=none; b=eYy6eqw9FeYP5mxJkJOBQ9sEkekdwLKPdW+QYWAZl605Ew+gru67IZiH/AcawnjAN+heMG+z+jIz7g/7+wVbfMe0eIABk3qJIjVExzGTv5+meGyFm0rYPsp/z9Bo74LAET7G9LLNTPd7Z9wGvXgu1T3gJIlMe5j6PZTGfQUFNhE=
+	t=1784869988; cv=none; b=XUQ0loPJBicKJuve7pRhlNpRTN3HJBSAJ+pug3iz6QVtQsBrXcDnuvA13/SKicnc7Z0hxyZNKKcdaPDWt0okiNAqzFOVLiAVfFD4OPB+rFCGN/fOMa2dfii+/4qLrq6UF0q5Pbz4PPT1M5fD5CEj/9CL+gi0o/r4dZDA5KK1Xwo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784869985; c=relaxed/simple;
-	bh=aZaIhBWGLisPCeYu6TskeMgbguCJ6B/WhIXDVKyXQMo=;
+	s=arc-20240116; t=1784869988; c=relaxed/simple;
+	bh=TgtKngEpilMd54yyDtKWiOjJYBDP+igJbUMGlI0i6qQ=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=lhOBNlKTp6VmTQ4TbQRca/w9Txl4A6Qsd6D4eyzOE4wmxFe/QPXJKweCGqJf/U18xc/swJWiyjgy8jEvhz/Gdva+WKAHE6m7V7V9K98tAz0NaE0Cm/N0ISuerDUHWHtdvNe8IuVP/2DbOxfIcK7x8hLej4Nkc3G5aMkm0mhHrQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iBLCmcpD; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=InrdNrEzzhyXQKLUseLhLPz4Y52F896+B1hYEx3gZauQlsBqqynNRitnWFhAsIGypRuolqAyxtegXCUy7yfU5BbA9/mydaDuEYmCFozvCLNTNTOjgStNklGXwCJRzn3I2qk5Wr8eFD6V8glxKLlE4TVUVuUk43qcLpH/0cEuins=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=STkTxWeP; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iBLCmcpD"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 7BF9E1F000E9;
-	Fri, 24 Jul 2026 05:13:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="STkTxWeP"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id D252F1F000E9;
+	Fri, 24 Jul 2026 05:13:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784869983;
-	bh=25616Ldk2j/7DZSEQzSSH1I12tZNHb600NxPAJa/HL4=;
+	s=k20260515; t=1784869986;
+	bh=U3xKA8bd0zjEScpqvohK39ADERhuhwrqVGmM3MikYz0=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Date;
-	b=iBLCmcpDkldCC78cHhkGvMx/Dp1TIDlKgBXdDf3XSjSs1U07+r7vXnLIrPbmUmnUV
-	 EaWr0KPQr8blPqiY5cht7XyuB86G8mPT9/h/pRH+F9kNm7kbFs0cA0FUG4TxOanS2T
-	 ZkC728TSg9+mXq2PHT5+3zdzDL1dsmKqI31cO2SDgCbGIPB8LOM85jFhp5HnLF0diC
-	 49X6CTyACbvMfxBJBsJQTm5ANyJhdf1vsQz4PYCxL3yCSM99yuLG+wb00cJtedN1ZX
-	 xZ2XAqnOLiCH9hf4lKeh5nHNrYE4eioTojJvpoQHycTUCwnYDKw9QdSAnYK6pYlzi2
-	 DVJCILzGdDizQ==
+	b=STkTxWePvUFyV5vCwyYUUBkn+lA0Ct0ZNhAc5aG6C+t6ts2Jghlxx0Qrvdb5FHTNY
+	 /K53HJgPzo49gY98u4m11kOxK3/KgLqV/8ZAUW90JGgXx7GBOjsuWP8XOu91cmbRvS
+	 ms6aIOW4LA7/yyCNBaXdPWCXgfNyCkIsGRt/63yjAYnCtWftGT2uloaEn+bnGx6cXP
+	 XQbEaTSzAdAGSbHkAH12oj4hA4jSHJsi5/0+c1tBwQ6H9pgoOgY+WNzxOkj0TnXjmr
+	 Z/BTMDEeteG0s4tDZsqmc5FNK8fKV90QsnKcqwZp8Q9Xegh5GeoRZK7Ay3ek3BdgJK
+	 fwRvM2ZSKw5/g==
 From: Nicolas Schier <nsc@kernel.org>
-To: nathan@kernel.org, Robertus Diawan Chris <robertusdchris@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-kernel-mentees@lists.linuxfoundation.org, skhan@linuxfoundation.org, 
- me@brighamcampbell.com
-In-Reply-To: <20260624044742.144852-1-robertusdchris@gmail.com>
-References: <20260624044742.144852-1-robertusdchris@gmail.com>
-Subject: Re: [PATCH v2] modpost: prevent leak when early return no suffix
- .o in read_symbols()
-Message-Id: <178486966441.1793472.16336529421470867133.b4-ty@b4>
-Date: Fri, 24 Jul 2026 07:07:44 +0200
+To: Nathan Chancellor <nathan@kernel.org>, Rong Zhang <i@rong.moe>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20260722-config-sed-v2-0-9f2c4b164666@rong.moe>
+References: <20260722-config-sed-v2-0-9f2c4b164666@rong.moe>
+Subject: Re: [PATCH v2 0/2] scripts/config: Use ERE (-E) and in-place
+ editing (-i) in sed portably
+Message-Id: <178486989881.1795696.1026826281219622287.b4-ty@b4>
+Date: Fri, 24 Jul 2026 07:11:38 +0200
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -46,31 +44,46 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.16-dev-5acee
-X-Developer-Signature: v=1; a=openpgp-sha256; l=767; i=nsc@kernel.org;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1466; i=nsc@kernel.org;
  s=20250924; h=from:subject:message-id;
- bh=aZaIhBWGLisPCeYu6TskeMgbguCJ6B/WhIXDVKyXQMo=;
- b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBqYvMmxUaC5E0eWRBuYgDzkCHYKlA7L2UEkH8Tr
- RmID7tmxZGJAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCamLzJgAKCRAHUgpwFiYS
- aYTaEACXuHA6nhAwfHthyTN+zf93HW5ATZGcCryLEUxIP6Q3g4+xLSI6xmlCIj2U3OaJGRWxaYP
- 4DXEIXl2IlqVk4/XLUpcRvC3nkb8Jp8NlZzJr8HKV+8AN63p3T4g4hbH5PnhxmYW/gowOOpUHjE
- Pmo6xLO9rqm8hcQ0aSn8HZhFam1uwhmyBgOvgxMuqSP9GGU3VZVjGCTUUSgU6J3kbWrYLUaJ2El
- gWZoe0rZ8Fhz+NwnV65wqa6SM5iHxa8RjT/+DWYudDJ9VepDzYKrvqTNMK8tciXZTTntYIiQ/E5
- WoNzhSZYxkSwUKjaddG2dUtWVb3Q1qLf4zHU0WcXm3iwC3G8CoVuMZ+XOXhJ0oFq73OVoENGbwf
- 5K+YtAS5nF9GJX6qZNzEuwL4ibzwroka1Ese/w+0PEqQZGK2YZ+AUsrkT/AzsEANBEce9fs+Fa1
- X0iQPrHnP0xDZwGIIeVvczVrIsU8pPD+u7Nr633uZ48A4z4eDA8ZiodbhvVD81wZg1nQfolSj0i
- Cv8Zy0j+aR8WVmsi/9IeO7rSTGC0NrvDMxR6OqUgyIcCy973ak5nSR7hFy2HKpOhv4MuI4GWKbx
- mxbmsm0UrO/V9Ld5BBs+Ut7sneEMRTSjB2yPAL7VnErrPI2ez15PyJiM9BDbqq7LVEWeTo4y85/
- pelk2VbdB5znm/A==
+ bh=TgtKngEpilMd54yyDtKWiOjJYBDP+igJbUMGlI0i6qQ=;
+ b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBqYvQUWqxgsNypblF5tSQN8w8BH8x+ZZGg7e/kg
+ Y/Kj0TUzamJAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCamL0FAAKCRAHUgpwFiYS
+ aaoBD/47f5gvbiN4Vj6nLQuOywkH/4gewqNISKtjLSZSMMynyB8sQVg7+D58keymNtw40nfD7mo
+ R/9laTMFP7EOia/H+66zPm89D9qtKUv6Z7vLbZ2HZY+wsSO4Hg33HR/mSpb2vtZ8ltmeDCw0aQp
+ 03WS+cT3yZQN3hKQc5BGwx1CWfzm7SjcP9P9t+GjEgMrTqrjOB4KuotmgiM6iHdNYtPCRv5apmJ
+ ekynvXkuNLgBS+bGRIlD7NaodzHliO0ZezlXhW8lf9k/lUN6TzK4Z8ZzV9iheBpeGurw7+p0QLU
+ ALpnZbVQH7/oXWrda5D2XfPvkBtRUx9w3UUB8OfRu0gztsWTFCdu0R8jnBeWHnv6GqudO6GlRnV
+ 0wKNTcCmVZpi2jf6/NAGcTAB34ysT3/eCG55z8bwggI2skiiZuY38l4KDKOoVapNkR4SaH3PrOK
+ 7xKoETHj54Y0/oMlY8RzgNIKEjF5lMdTAF8obkJ2PWyleFQfQseU6MG+HY+PAZl4nUiD58sHQi3
+ HDdnUjTgjFdYs4u/ptmByNLDEEPkCUuMzavj5KCNqlItqpKruoBl6HPS4AQxD/agFlU8RPycOh9
+ yNM5P3Z/9cLz9L/rE6VPU3IKUYWaT///YFKF1H8otHzs6kmHqRm5VjHANuiwOGCwKNi8x6hRnBU
+ +aa3SsCnS7BnNAg==
 X-Developer-Key: i=nsc@kernel.org; a=openpgp;
  fpr=18ED52DBE34F860EE9FBC82B7D97093255A0CE7F
 
-On Wed, 24 Jun 2026 11:47:42 +0700, Robertus Diawan Chris wrote:
-> modpost: prevent leak when early return no suffix .o in read_symbols()
+On Wed, 22 Jul 2026 01:50:47 +0800, Rong Zhang wrote:
+> scripts/config: Use ERE (-E) and in-place editing (-i) in sed portably
+> 
+> The use of Extended Regular Expressions and in-place editing was removed
+> by commit 83e8b90e1d2c ("scripts/config: use sed's POSIX interface").
+> 
+> Before that, the script used `-r' to enable ERE, which is indeed
+> non-portable. However, POSIX.1-2024 [1][2] has accepted `-E' as a
+> standard option to use ERE for matching, and major sed implementations
+> (GNU, FreeBSD, OpenBSD, NetBSD, macOS) have supported `-E' for over two
+> decades, so it makes no sense to use Basic Regular Expressions any more.
+> Hence, we can safely take the advantage of ERE and merge chained calls
+> to sed.
+> 
+> [...]
 
 Applied to kbuild/linux.git (kbuild-next-unstable), thanks!
 
-[1/1] modpost: prevent leak when early return no suffix .o in read_symbols()
-      https://git.kernel.org/kbuild/c/f2308dd4
+[1/2] scripts/config: Use POSIX standard ERE (-E) in sed
+      https://git.kernel.org/kbuild/c/1d553517
+[2/2] scripts/config: Use in-place editing (-i) in sed portably
+      https://git.kernel.org/kbuild/c/005d6382
 
 Please look out for regression or issue reports or other follow up
 comments, as they may result in the patch/series getting dropped,
