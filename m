@@ -1,112 +1,125 @@
-Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09C7236A364;
-	Fri, 24 Jul 2026 15:36:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 453983C062C
+	for <linux-kbuild@vger.kernel.org>; Fri, 24 Jul 2026 17:01:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784907379; cv=none; b=OBou+SGWKm7zQnfoGzbXXW0xZBhRf3+N+S31IDiq8Nhpnk/4hmjVGwgPBuK/TKq1qxn9Dn/1G6EME11/T7A4GMiXLIJkBFHfU+8OoIgeWNCQPSSR3Yc28ChG35QeMo/NkWe5sww6KlJCfuxD6N3dP+8XgOIjIjpkcdQYWIU4HL4=
+	t=1784912508; cv=none; b=UjOAJt2F4Sw/0x8V4vpeJshSpJnD4sD7t/LDa8IxmxGamwLilNFm0hxs+Z4beNByeQBvEngpoGL9sBN/ayUA+GZAlInL3zqowByDBS8sHDbi/CDXv8d5iLiioWGqyPSf3vPnK3x9D86d3f6LsAwzwXU3fKgZUldjrDkdwgt7crM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784907379; c=relaxed/simple;
-	bh=m9886DTZxZUmgzBG7IAktqA66LvQHvEdg6xLD1umT1o=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=PEotCy6UbvQSe96Wz0Ej9mNVANAcgr+cDVCdWBRDHvJHdxB3yNxFiCAMNkFu1CVhpUhW/zT1BadmnACUpKWnFKoFD2AITQKirVL+0hpI1EsEQiYdgy92k2YTae5ys5dq9vZyuGMF0iVjv6VbE4a+4R3WMbMvccTPHSQEzQB1YD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=IqYInc+V; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=PnX28sV0; arc=none smtp.client-ip=202.12.124.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1784912508; c=relaxed/simple;
+	bh=NYj+eTtxAqvadIcZfHt5XhMrogsytK7vyrzUZuzSgC4=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=AltV/ZQMs75aR+CuvNbZqlkn5BoWFZ+NrAts9hHhRYapVGcRuum5oOU0iXx82RTzPu382WL0nFvy0hu0gcyXZbp3pMG6TpHHP39NmIxT1lukW7eNX5Q1fiODlAJ6fKTplsoE473i8U3Ba7iGngbWA01/YD4IHwRK6rQrqwwJ/Hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZPiwYvsG; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="IqYInc+V";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="PnX28sV0"
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id B7E187A0124;
-	Fri, 24 Jul 2026 11:36:15 -0400 (EDT)
-Received: from phl-imap-05 ([10.202.2.95])
-  by phl-compute-04.internal (MEProxy); Fri, 24 Jul 2026 11:36:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1784907375;
-	 x=1784993775; bh=nJx9erbMI6Umeum9I7sz5pMb7h4Dd2cP8Kh6+htAYmc=; b=
-	IqYInc+VxQ766NPYg/XaDaMJzGKlJmaIWoLUR+x3Bd7IA0JLH+i8moUqwVoxAvqp
-	6JJQisOedh+nB5wtVOD+WDF/JEe4QlhAZEvaf0203lkVLnEGX1KLwL5f7lecs2ni
-	e9gt8rnJukHQg8tnrBzbq6gwjJHE6VWewj6kLp+fOrwLwLAAXIa6ccINSOlX2QFC
-	zTBSlhmUzNc+Z+qMvr++xnXinYytV0HZNUOcaPoIMbInvEKvR7OIyR8EvXXk/tH1
-	3hJV3PXaXw5/9k1xKxcU1zta8GbatDbtm/NqaacO04/s1A36Cireiy6nqh2G1mdb
-	LsY2sga2OWidN0y41GdaFA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1784907375; x=
-	1784993775; bh=nJx9erbMI6Umeum9I7sz5pMb7h4Dd2cP8Kh6+htAYmc=; b=P
-	nX28sV0YAlcP4slQGYCswfWSq1q4Rk8zYcqv/5b8KpIyhdQEAF/AL9dPOFHuAu+1
-	Wi0/vbNiMSEhleGd4N0k94b76W7UaJjllnXLq1wkzt29vFf1n5wffRHLYAfmjE9J
-	dBYncr9weIaKLwBEZEN+xwxTqTvYEFQ3QZzX5e+6r0DGZBdpy78oUUFm2XZGlkOR
-	zRVdmM8qGHb4Thl6+pEtT4nn+l+nGP1OM0jEhiRz3dwuFl4SKEs3qQqRDp3hIt1u
-	AEK90L+KuUhe+k6hpeagiOKtXzQqvW4qS7oXT08aHqUU43Yl9i8VxYLcpfxxw9pI
-	q+L+9fzkeJ+QN5vfYDJ7w==
-X-ME-Sender: <xms:boZjat0837C9CMVbGwKZTVI0ArNKZwZlwxUK9VNCnlcZMhyUAP6tyA>
-    <xme:boZjau5LBn2wIAOhzwJIA_GAe1u-QHANQYNOERVeWmoBbpgLHxop2IhJ6aBMId-lC
-    S5BniKUW9ZKnh7qu0twWNv8wUKGfQi5iMnDS0T3nAB0buTgSpEaw6X9>
-X-ME-Proxy-Cause: dmFkZTEMfEHYIgpoA/3PlruiwgrIPcgD1hPvJjO7FyUK5BNxWPNY9Z8orahmII+bn0MUMr
-    2tC5a7ntxzpEwq03Wul786vQTKZT3T0LAkwqBudqNkRkhQiTVoTAWcabgU7yEGRMLGz7fF
-    Em+pcNi6WifywFD01fxTU4RioOdXDkF4VXR2ArGtqlpPywnjtA+ksdn8PPpvyaF5ZGkLn2
-    KoXm8e38Kn1K3oqr6Z0M06jXJtCxeSVlHBTj+H2Q1RcdgSkr1NACuMnAXM6nsIdBvz/ubX
-    Fr5j+jdGFBXnb3RpYJLNj6jkjuHBHTlaxFgMLCDQYQ4eeIW0LZVBswrRIDQ4Ixts2Lidr/
-    V/WNF/VC2wmyOMIxXmG85ksS9tA8S6Qn9NBllz5FVYqck92wyhKuF1mAHf2wzP2huUsehY
-    71iYYjWo01BNQDqXI7IfonqBznsP3fOqpb4gJNCSCHFcGEoWzhv31B/sXjCv0Mr8pZOOj6
-    6+bbcBhTt0erOVbcnSy3FGj7dDQuurmSO9GU9A3Y/CTnz/ELPo2FzMzRUU/qmRYkBw9DJR
-    CzpZVaUW6+F0tOXXfvvBxnhrPkl3BDkclOaT8Wyd6EdWUEOcuj6nocBURz42zquF5JGtSH
-    JLZWz30eMmDGhqo/pVaRXnxBRW1TQr/wj9+0lIi2aKjJGwLj/CKuvh7cR6bA
-X-ME-Proxy: <xmx:b4ZjapuukwjKXzCDykq3LodqXHHO6QJ7ZqhryNRUjreKAhl0x50_oQ>
-    <xmx:b4ZjaunIRg-qFbZY73kz1cMrE9kaDS-hrglqnvslFjLT0vTU5YruVg>
-    <xmx:b4Zjaoktu4a8E93z0ESwdd61S3-5iKiIoL8dPLlU51MNGWLcaMfBQw>
-    <xmx:b4ZjapgUROQRKAb6ljG6iiIWduvN1Owhz_42HQIy8ybqxkzVeDkKZA>
-    <xmx:b4ZjamtbVxKnjR5gnU4eKqtoVaowYZ30qW4XSuzEXH6NelKvjocsYkDJ>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id E52E5182007E; Fri, 24 Jul 2026 11:36:14 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZPiwYvsG"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1784912506;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=BZktO/gi5TYKbrSSgcg4YA+R7zPX2u1qrVEEQZusSxE=;
+	b=ZPiwYvsGm8U7Ar8h0Pov08VrduMdLhVYegp3z2i3Stwq78A85JyOcnP31A/Qzn5Fl+uqB/
+	wCU3/xtxGELXkiXaw59aGpr22HWVXLISpTfdvddyyd8X8m8EzIqE61vQlJxiyfj/jUzunF
+	f9We+IGWqh4CpNvtaOmMtkN56B1ZmDQ=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-576-HVDgtrHTNieVSNbwpi0UMA-1; Fri,
+ 24 Jul 2026 13:01:39 -0400
+X-MC-Unique: HVDgtrHTNieVSNbwpi0UMA-1
+X-Mimecast-MFC-AGG-ID: HVDgtrHTNieVSNbwpi0UMA_1784912497
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C5C7D1882804;
+	Fri, 24 Jul 2026 17:01:36 +0000 (UTC)
+Received: from paumurph-thinkpadp1gen7.redhat.corp (headnet04.pony-001.prod.iad2.dc.redhat.com [10.2.32.116])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C95A630002E2;
+	Fri, 24 Jul 2026 17:01:33 +0000 (UTC)
+From: Paul Murphy <murp@redhat.com>
+To: Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Boqun Feng <boqun@kernel.org>,
+	Gary Guo <gary@garyguo.net>,
+	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Daniel Almeida <daniel.almeida@collabora.com>,
+	Tamir Duberstein <tamird@kernel.org>,
+	Alexandre Courbot <acourbot@nvidia.com>,
+	=?UTF-8?q?Onur=20=C3=96zkan?= <work@onurozkan.dev>,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	rust-for-linux@vger.kernel.org
+Subject: [PATCH] rust: enable fentry support
+Date: Fri, 24 Jul 2026 12:01:26 -0500
+Message-ID: <20260724170132.3783816-1-murp@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: ADo26MvqZlrJ
-Date: Fri, 24 Jul 2026 17:35:54 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
- "Andy Lutomirski" <luto@kernel.org>, "Thomas Gleixner" <tglx@kernel.org>,
- "Vincenzo Frascino" <vincenzo.frascino@arm.com>,
- "Nathan Chancellor" <nathan@kernel.org>, "Nicolas Schier" <nsc@kernel.org>,
- "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>,
- "Daniel Lezcano" <daniel.lezcano@kernel.org>,
- "Mark Rutland" <mark.rutland@arm.com>, "Marc Zyngier" <maz@kernel.org>,
- "Paul Walmsley" <pjw@kernel.org>, "Palmer Dabbelt" <palmer@dabbelt.com>,
- "Albert Ou" <aou@eecs.berkeley.edu>, "Alexandre Ghiti" <alex@ghiti.fr>,
- "Huacai Chen" <chenhuacai@kernel.org>, "WANG Xuerui" <kernel@xen0n.name>
-Cc: Linux-Arch <linux-arch@vger.kernel.org>, linux-kernel@vger.kernel.org,
- linux-kbuild@vger.kernel.org, linux-mips@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org,
- loongarch@lists.linux.dev
-Message-Id: <6f0ed8d4-42ed-4ad8-9667-11f9bedee06a@app.fastmail.com>
-In-Reply-To: <20260724-vdso-arch-clockmodes-v4-0-ddbe447be860@linutronix.de>
-References: <20260724-vdso-arch-clockmodes-v4-0-ddbe447be860@linutronix.de>
-Subject: Re: [PATCH v4 0/7] vDSO: Remove CONFIG_GENERIC_GETTIMEOFDAY ifdeffery
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Fri, Jul 24, 2026, at 15:36, Thomas Wei=C3=9Fschuh wrote:
-> Always provide the definitions of the VDSO_CLOCKMODE_* constants and
-> remove some ifdeffery from the clocksource drivers.
->
-> Signed-off-by: Thomas Wei=C3=9Fschuh <thomas.weissschuh@linutronix.de>
-> ---
+Turn it on when available if CONFIG_HAVE_FENTRY=y.
 
-Looks all good to me. I assume you'll merge this through the
-tip/timers/vdso branch, but let me know if I should pick it
-up into the asm-generic tree instead.
+Rust support was added in 1.98.0 with support for x86 and s390x targets.
 
-     Arnd
+Signed-off-by: Paul Murphy <murp@redhat.com>
+---
+ Makefile                        | 2 ++
+ scripts/generate_rust_target.rs | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index bfb47ad8cb9a..bdfe93702a33 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1053,10 +1053,12 @@ ifdef CONFIG_HAVE_FENTRY
+     CC_FLAGS_FTRACE	+= -mfentry
+     CC_FLAGS_USING	+= -DCC_USING_FENTRY
+   endif
++  RUSTFLAGS_FTRACE := $(if $(call rustc-min-version,109800),-Zinstrument-mcount=fentry,)
+ endif
+ export CC_FLAGS_FTRACE
+ KBUILD_CFLAGS	+= $(CC_FLAGS_FTRACE) $(CC_FLAGS_USING)
+ KBUILD_AFLAGS	+= $(CC_FLAGS_USING)
++KBUILD_RUSTFLAGS += $(RUSTFLAGS_FTRACE)
+ endif
+ 
+ # We trigger additional mismatches with less inlining
+diff --git a/scripts/generate_rust_target.rs b/scripts/generate_rust_target.rs
+index 3bf296581a88..eb80a06d50d3 100644
+--- a/scripts/generate_rust_target.rs
++++ b/scripts/generate_rust_target.rs
+@@ -198,6 +198,7 @@ fn main() {
+         ts.push("arch", "x86_64");
+         if cfg.rustc_version_atleast(1, 98, 0) {
+             ts.push("rustc-abi", "softfloat");
++            ts.push("supports-fentry", true);
+         } else if cfg.rustc_version_atleast(1, 86, 0) {
+             ts.push("rustc-abi", "x86-softfloat");
+         }
+@@ -240,6 +241,7 @@ fn main() {
+         ts.push("arch", "x86");
+         if cfg.rustc_version_atleast(1, 98, 0) {
+             ts.push("rustc-abi", "softfloat");
++            ts.push("supports-fentry", true);
+         } else if cfg.rustc_version_atleast(1, 86, 0) {
+             ts.push("rustc-abi", "x86-softfloat");
+         }
+
+base-commit: 7059bdf4f04a3e14f4fafb3ac35fdca913e3e21a
+-- 
+2.55.0
+
