@@ -1,134 +1,142 @@
-Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AB893644C5;
-	Sat, 25 Jul 2026 08:26:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F1412F6596
+	for <linux-kbuild@vger.kernel.org>; Sun, 26 Jul 2026 02:53:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784967974; cv=none; b=ppNWNm+hwHsxy6OoGAz+A1JH8jakTl2WwxqZFgmv69kDdc527J9MFrVK1TJRqqzGho5ZNJCfOoqpH62d+4vcL4RN8e4tOYg6I7FBk2q2Wx/XTfGGmhtef1jpPkxBIbrgC0Y6NXJJi0mm4zvtV7iw8Xpas3S+6W7sz5yR+nWpS2w=
+	t=1785034394; cv=none; b=c6Sz9+jfjhyiu9XEGa789WrEludook9vpzO5CGCBJmdF/TwFeaBE82pIcnozOTFfAN+ZkS+jzCYSxSpNT7CW017hAsxIALSNiqN1T7vGv94UqLGSZP1wRQXp122+07ERE3q8LiH7CYD//TcZUdu9slsWuKJW4qhD3sRV/jOHrTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784967974; c=relaxed/simple;
-	bh=Yqw/IytsBhFnFa8Y4xvjgMY9i35m0yEFfHW6L+jpCZU=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=uh/jQWSWPr+gBIBmOg6N9bFxAL6W4jC9VB9FYLUf/Pdl+a/Ap80pD4t5NHAxPzlwm6fDoVJX8luPOeS0vwgyFx2WGSD/v9rnh6tL1x3r5gmQz61VXFCAkQ05Kizz9fgzedZkXQ+8kLJZ6aI8xt4s+DdzSTR9xIsvDY558JzJQB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=KdFLn4c9; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=k++cLYjd; arc=none smtp.client-ip=202.12.124.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1785034394; c=relaxed/simple;
+	bh=ur7J3+xa2ZE/P0fviH4Md/Wp2oKnOCvVnY95NF6AUpg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aA+3ptmv/xYZCpjz+7uFxZpb6Ufcw9fqdTNKzw1MwIdqb5rMQ5CU2AP8ZnX05Igs9T0vK0zCkM4MFAakc6afXaO5WRnoVb4X9BqyTmlwSlnBf8wyWcUzXmbyviiWLp9agu4iWxLsfURz7+4QUjI35uKNac0vM301EGkbZfJmSVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sa/4ZN+V; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="KdFLn4c9";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="k++cLYjd"
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 97A5D7A02A8;
-	Sat, 25 Jul 2026 04:26:11 -0400 (EDT)
-Received: from phl-imap-05 ([10.202.2.95])
-  by phl-compute-04.internal (MEProxy); Sat, 25 Jul 2026 04:26:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1784967971;
-	 x=1785054371; bh=H9TCAsXrxBD4nvG0mIu7k1mjs1LSwjpcjW8TJh4wn1w=; b=
-	KdFLn4c9RpFBe+0YYl+TxCCIlBYTLNSYjK1txcQj1Q9h3loUAeXh8Mn/fY1+uuut
-	1n0il2HIB5l24T+mNLlLAMOGp2NZdI4z4qycelKP/HCCs2tnL2lbZPZD5AkiJzl8
-	PMkAM1/3btZYGLhXxkXataJWc7WMflP7g91qFdjwDv904fMgShdcNNOaYmmfvWDv
-	1rfiueTIZLwXq25dEtUdPi+19KckIM3R1or8HRb7VMi5BLWAy+lFKZBom92YWerl
-	KOAQt+Begp8Fxrb1nV8Et1ThEVhQejmJAfHBJcWkX8QLskCNdjW/4RrQzlSkbjlr
-	OSBxCDVvhEdm+r4VAXjUvg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1784967971; x=
-	1785054371; bh=H9TCAsXrxBD4nvG0mIu7k1mjs1LSwjpcjW8TJh4wn1w=; b=k
-	++cLYjdrDshkNLPG5DIPpxtIa/+hqcAZO2IhjzKytURlln70F2hc6bZWI6FgXNh8
-	2uTzqf9OygO/EMdDmXPo8tVJ4Udti7/HJH9ZmxXLz1HhmjOc48aZjB2ybIyeon8F
-	zXxVNwXNrddW45PD+Hy/+PACt5H2YOt0QSmVaSlXAFjR7JaVUVMlPOHGCqFcCotz
-	eaT5Id5ENhPdMs7r4uP+PxHyMOx9bFPcJLR/laYQGQj7ca5VRHUyTOrNKQff8FB9
-	jJeNkYJmKEgDZ3VVZMxyMbSETEbhVVedA96mYVykbNqDcrw9b+zZSJxKCRi1eOw8
-	ZAC/Cy0I8hfbKLuNfbbdg==
-X-ME-Sender: <xms:InNkahot-8y_W9lPuIdPGPna9unuGS_0xPAuP5mYiaC1G50siRwJJA>
-    <xme:InNkaudj_uw1GLkRiIucP5TcYvkWBoshxGS1WGc1AEBaGJy_jHUVHGbXqDDropx6m
-    E3ZhOvnOAbE3rtGWd55vBY3juHKvVlwWPDORqjSIDgOOqC5_P35g4Zb>
-X-ME-Proxy-Cause: dmFkZTEcbeDozwnHAtefzxCdjVrxy44eQ0W4JMcITvdA6nFiw47286weUj1gDYTliSHH4a
-    Rfqdz8Mrz97dBI+IwH04tfuE//abx6WtmjpzZg/LAsqMogvt9wWgFFWmmSQRyPty5Nblel
-    m5mYI+9xEWV2DsFXbtKB7jR/rStjdu+K54REUm0gLnliqYggb/yCjX6+PhETHeSyElMsdc
-    HayPYCXV/o8dR3r0loJwZEEqh6eM2h0Ablsw8+0M156E3Iqn1byCf60SNceA2hnHquj7Jp
-    +Dj5/8RQEWUTcuBM4dLYqAIyuLOfa56oA6gYoWD57ExcXmY9ZbKQ4m9jrZVijEfzFO1jPy
-    WCJ5Xw67hyN4Ay4hWGK9UGrYprN3TuXJXZGouGoVJqAFNDTp9HVWAdKtC9zergK8G6GNpA
-    gkWc4Coi9Od852jtnj/wfnZ+AvspqYcyTaEzMBU7ULmEq4az03IJKHKmfI2QNwJftcN839
-    ixNewjok96+mGfHbim+ouDAw7PuA4jt468FiqbjUah4rAhP4Ov/7novyx1eZicT7AkWiJ1
-    UlOoox36cM3+Fk6EPA8WqVvzc0K40NiwWKmr478zCCUFlZI1j7W7z3uVTWreOlEgEX7qnf
-    yIh+j9vAU60iyiFf+ylTjBDuWvrBes/xdclnpbohPjaQ+eYUbq6JwCnugK4Q
-X-ME-Proxy: <xmx:InNkavOuY-_ghHYOvuEExSk_HEUWTwOJJEJNqFtGNxMwgIkzsxPSHA>
-    <xmx:InNkaiLgFUGYRtvMSJGV7gxw2S5R9Y7AbYhV_hoEepOwfr58w9lWLA>
-    <xmx:InNkap28gQL1hB5OVU18F4ljY4wXeS5vtsZwMuTQVnntOlTkbc83RQ>
-    <xmx:InNkauXi5gm5i7O0c-Y5mC8GvPeMju9flC0aw2cqze5KfGGFntDAqg>
-    <xmx:I3NkagWKjbfbNzKk6Olutx__XBlj2U9gdHkI-1rc7Ij8sysMvc48CeUI>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 4AA14182007E; Sat, 25 Jul 2026 04:26:10 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sa/4ZN+V"
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2caed617615so17151585ad.3
+        for <linux-kbuild@vger.kernel.org>; Sat, 25 Jul 2026 19:53:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785034393; x=1785639193; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=A+fZlpoNwUNiIF9UMejK6Q5RLcRANFeTV+evvoYlWpc=;
+        b=sa/4ZN+VqkOZ9H7mpmfN1XffHKNmq2HaibTGqRcVepjMgrpID2zavKEgQ5Ie56vAWr
+         JPkkUyLD05HdvD6al4y7wYaI5BZ26NMeg+bsVfAdiw9t4mtHXDXDsHOv9Jx5EjQWEzT8
+         /usVp1HtC8ejNdNSeXKvStQzG0u3fboWuLft+6mvAuj1FIEiSvlF4AgBrrna8LdxeMYa
+         bIPDQ0ZGSP21M2cnVTnVswvYkYzzNtqTSM2e/xvrCgCqRjSlElOfIN3TKTl4nJPdcRLL
+         23qm4e38vufZUg18zcxeEhgYw8QNvp4s8u6iK5i9hkfss29wu6D0/F5Gj/1nSqKuCa5E
+         9fYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785034393; x=1785639193;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=A+fZlpoNwUNiIF9UMejK6Q5RLcRANFeTV+evvoYlWpc=;
+        b=o+GmDywRJeFzQdmtxErALpJUfiTCv6ReQ801bC/57IgOEl4gce78Xl7Um0wEE8Kcr6
+         cUujpCdJOrccmbmMtyRbOIhAJSNoH2sPfpmjXEY6hOVmtduB106465Jj1AkF9V+0b8ow
+         qzShhDR0MDiZyK0etoK78ltNKXmAVtIHeaMx8h0+JnN3LhQ+70E2Gaz5PothOSMaKBJp
+         sa0vZk67nNocVhxs0h0nmyNetRb4BNan29DSFU9QlvnH2a+J6ySIqxkIl0TJ69x/IRhG
+         NEw/towZkAT+OiajxEMwcQjVmKBzJ9S6/t/U6ZX5PGp2umHIYfT+aPZ4b5b3qIZiGk7x
+         gY3w==
+X-Gm-Message-State: AOJu0YwytffBrWuhcK+l4pTZKazCDLZRTUVGX7RjKEPiPKQn62mUwnWB
+	P0EpCEBva0zq5XoNpx53KLPRtzkiZZD+fiEM/TfxtGs/EB4BGxCXh1ay
+X-Gm-Gg: AR+sD13X72mNtia+ol0xnSyeXJCr6SaxZA+me4iqGNKZ5+9HHjgTb2D/2DxKfU3/ASE
+	G6suuwiKY1ntvu52ge9dKFOEeW9ISBiTPLWsaalDDZRcQYYRE1mnWGcv/MzKVy/oTmiQUWGH8/x
+	Lq6VaSKOqn7/mtxWlTTuTMliaPgyEXZkZMryxKf4647KrJsmB5bMZfgnvLg+IBsn3sJOMq5RReH
+	s89dMqr91pceEs0mPRyg3xel0f1gmGNijqYQCR40WRHKyiwIA7qCgL0YfDwILWwXcmIWRTHfbmq
+	N510aWZzykppArOW0lX4azWU8zxpNj/088QR6znGQ51CMCyen+Pmbrst819Z9S+3KDw90IBeAc0
+	RteSI1fnXATb7JIuKxA5y/zEBCAoZW1yfo+GgbAl+sUL2VJoOY3YpXgXc3iaoS7QCuq7sOdkVyQ
+	U2Djw6ACAu9dpjKzeiBhdD5ClK453wt/zQWgPz8a89yMTZLWVEGI0Az1RfZ1nsiRKLCz3zdIw=
+X-Received: by 2002:a17:90b:2b50:b0:38e:75f3:ad4d with SMTP id 98e67ed59e1d1-38f2939e6c4mr3721113a91.7.1785034392599;
+        Sat, 25 Jul 2026 19:53:12 -0700 (PDT)
+Received: from localhost.localdomain ([240e:46c:2000:294d:9ad:36c8:10e3:4aa8])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38f2951eb8dsm1324936a91.13.2026.07.25.19.53.08
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sat, 25 Jul 2026 19:53:11 -0700 (PDT)
+From: Yafang Shao <laoar.shao@gmail.com>
+To: nathan@kernel.org,
+	nsc@kernel.org
+Cc: linux-kbuild@vger.kernel.org,
+	bpf@vger.kernel.org,
+	Yafang Shao <laoar.shao@gmail.com>
+Subject: [PATCH v3] kbuild: rpm-pkg: Preserve .BTF section in kernel modules during debuginfo stripping
+Date: Sun, 26 Jul 2026 10:52:42 +0800
+Message-ID: <20260726025242.42245-1-laoar.shao@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AEcurKPZ2CIZ
-Date: Sat, 25 Jul 2026 10:25:49 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "H. Peter Anvin" <hpa@zytor.com>,
- =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
-Cc: "Dave Hansen" <dave.hansen@linux.intel.com>,
- "Borislav Petkov" <bp@alien8.de>, linux-kernel@vger.kernel.org,
- linux-kbuild@vger.kernel.org, kernel-dev@igalia.com,
- "Thomas Gleixner" <tglx@kernel.org>, "Nathan Chancellor" <nathan@kernel.org>,
- "Ingo Molnar" <mingo@redhat.com>
-Message-Id: <97cafb31-fd66-47a3-bc1d-d335c25d9523@app.fastmail.com>
-In-Reply-To: <D43E56E4-209C-4E77-97EA-C62DE6D7BBC2@zytor.com>
-References: <20260724-tonyk-syscall_table-v1-0-9c53188423da@igalia.com>
- <20260724-tonyk-syscall_table-v1-1-9c53188423da@igalia.com>
- <3a481359-72d0-4c58-8a63-b6d941a22482@app.fastmail.com>
- <9a9caecf-5d72-4c68-ad46-5779c3fb73f0@igalia.com>
- <8550e179-3905-4275-afff-c19990a329ab@app.fastmail.com>
- <D43E56E4-209C-4E77-97EA-C62DE6D7BBC2@zytor.com>
-Subject: Re: [PATCH RFC 1/4] syscalls: Create unified partial table for all archs
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jul 24, 2026, at 23:22, H. Peter Anvin wrote:
-> On July 24, 2026 1:25:05 PM PDT, Arnd Bergmann <arnd@arndb.de> wrote:
+After switching to the kernel's default package scripts for our local
+kernel RPM builds, we noticed that module BTF entries were missing:
 
->>> It will wrongly add
->>>
->>> __SYSCALL_WITH_COMPAT(441, sys_epoll_pwait2, compat_sys_epoll_pwait2)
->>>
->>> to arch/x86/include/generated/asm/syscalls_64.h.
->>>
->>> Maybe I could add a --ignore-compat to scripts/syscalltbl.sh, and add 
->>> this flag for 64 builds. What do you think?
->>
->>IIRC, we can just use compat_sys_epoll_pwait2 for both i386
->>and x32, because compat_sigset_t is compatible with sigset_t --
->>they are only really different on big-endian targets, which
->>count the bits in a u64 different from two u32.
->>
->>This problem also goes away once x32 is gone.
->
-> No reason to introduce another entry point if there's no difference. 
->
-> x86, after all, is littleendian and alignment-tolerant.
+  $ ls /sys/kernel/btf/
+  vmlinux    <<<< only vmlinux, no module BTF
 
-What I meant was the reverse: if the common table has the
-compat_sys_epoll_pwait2 entry for compat targets and x32 is
-the only outlier, we don't need a special case for that
-to force it to use the sys_epoll_pwait2 variant since they
-are identical on x86.
+Root cause: find-debuginfo.sh (from the debugedit package) prefers
+eu-strip over strip when elfutils is installed, which is the common
+case on RHEL 9. eu-strip removes non-allocated ELF sections, including
+the .BTF section that contains BPF Type Format information for kernel
+modules. Without .BTF, BPF tools (bpftool, bcc, bpftrace) cannot resolve
+kernel types at runtime, and /sys/kernel/btf/<module> entries are not
+created when modules are loaded.
 
-Looking again at the x86 table, I see that x32 is not even
-described as a compat target and just takes the second (native
-64-bit) argument of __SYSCALL_WITH_COMPAT() instead of third
-anyway, so there wouldn't even be a problem if native
-and compat were different.
+Fix by passing --keep-section .BTF via _find_debuginfo_opts, which adds
+-K .BTF to the eu-strip/strip command, preserving the .BTF section while
+allowing normal debuginfo extraction to proceed.
 
-     Arnd
+After this change, all module BTF files are properly generated:
+
+  $ ls /sys/kernel/btf/
+  aesni_intel         drm                 i2c_i801            mfd_core
+  ahci                drm_client_lib      i2c_mux             net_failover
+  backlight           drm_kms_helper      i2c_smbus           pcspkr
+  ccp                 drm_shmem_helper    input_leds          qemu_fw_cfg
+  dm_log              failover            intel_rapl_common   sch_fq_codel
+  dm_mirror           fat                 intel_rapl_msr      serio_raw
+  dm_mod              fuse                irqbypass           sunrpc
+  dm_region_hash      gf128mul            iTCO_wdt            vfat
+  virtio_balloon      virtio_console      virtio_dma_buf      virtio_gpu
+  virtio_net          virtio_rng          virtio_blk          vmlinux
+  xfs
+
+Suggested-by: Nathan Chancellor <nathan@kernel.org>
+Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
+---
+ scripts/package/kernel.spec | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+v2->v3: use %{__find_debuginfo} (Nathan)
+v1->v2: check if find-debuginfo.sh supports --keep-section (sashiko-bot)
+
+diff --git a/scripts/package/kernel.spec b/scripts/package/kernel.spec
+index c732415662ef..1032f337a71c 100644
+--- a/scripts/package/kernel.spec
++++ b/scripts/package/kernel.spec
+@@ -67,7 +67,17 @@ This package provides debug information for the kernel image and modules from th
+ %undefine _unique_debug_srcs
+ %undefine _debugsource_packages
+ %undefine _debuginfo_subpackages
++
++# Preserve .BTF section in kernel modules during debuginfo stripping
++# find-debuginfo.sh (from debugedit) uses eu-strip which removes
++# non-allocated ELF sections like .BTF by default.
++%global with_keep_section %(%{__find_debuginfo} --help 2>&1 | grep -c keep-section)
++%if %{with_keep_section}
++%global _find_debuginfo_opts -r --keep-section .BTF
++%else
+ %global _find_debuginfo_opts -r
++%endif
++
+ %global _missing_build_ids_terminate_build 1
+ %global _no_recompute_build_ids 1
+ %{debug_package}
+-- 
+2.52.0
+
