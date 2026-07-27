@@ -1,64 +1,65 @@
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 927CA1DDC2B
-	for <linux-kbuild@vger.kernel.org>; Mon, 27 Jul 2026 00:16:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6250D1C5D59
+	for <linux-kbuild@vger.kernel.org>; Mon, 27 Jul 2026 00:16:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785111400; cv=none; b=OoHkdQWW6RCpHscLDE/Mf2sfvVFKxUm9o09Bwacd+iVrJA6tRJ7ipRyhLTIrCATBkp254rfZEM0tvzcS9H4wa8puCoucv2Q0HOwyzt7NdFit088kLMj9aUr+nxroZW9x5eLm+x+VIt2sv7KmxW8jcrYJ/JOLMwkLbKddY2scGEI=
+	t=1785111401; cv=none; b=LcEK3b6et+2QV5LUzwMKXx43PvD4wXree44NOKHimc6CpOsX/bwrHM3OEhaHvdsDaIhanFMDA7kLpN7ZRFC7d5x3AVCnvVjJ5ylws72vLo5h5vbYLQt7TPKyajo/tmNMbglypF48RTDcH4Lqriae31TORMIzIEbjtYH+YBVHB0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785111400; c=relaxed/simple;
-	bh=jTzPryTH2CVEZgemHn8cADl5fR/QakT2FfYvWO5YPIQ=;
+	s=arc-20240116; t=1785111401; c=relaxed/simple;
+	bh=mPYKxLawYTF8HSasCpnt+nClA0qSbdehEBnCbizigV8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aUl88Z15X5s5vvRPdCpXgW+924ICq6gXpycLVE9//zVmC9HZtehLaTYPhKmVlKtxAU5sFUcPY774+mc5mICJg7+Nz0qvS8DVORoZHDP3km7lNE+W6ZvZOhLgNQklCDlHvZ/tKymsSpX8hXQeUJHS8+drgYnDwOzrRtpF2viLPu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YwBcDpko; arc=none smtp.client-ip=209.85.128.43
+	 MIME-Version; b=eMN3YwrxLz9+EtwX3d8UaMw4L/mcwnNm25xV1tTZsa2V47VOkZ/gVNY0I8Yv2jLA9ahtCSTlU/Q8Sb0x3TH9xmAuRdgxFokPUesR/hyf8n9TsUjDIW2KPAmMIDPkAJbvrIeK65U14UZuT3s/0uy2KZ05VXysAMPehveYte5vXL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nqokETad; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YwBcDpko"
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4956242332dso18917735e9.2
-        for <linux-kbuild@vger.kernel.org>; Sun, 26 Jul 2026 17:16:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nqokETad"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4954d29264cso10610795e9.2
+        for <linux-kbuild@vger.kernel.org>; Sun, 26 Jul 2026 17:16:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785111395; x=1785716195; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:sender:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=imb6/XH0fKYXI04n1Ki2zc81WcuhhBpNWae+C/ggjgA=;
-        b=YwBcDpkobu0SLp7Kdgl34dPOWF07agrh6Gr/VHQZEcOuB5yS1ss4dABsAN7QFYW6qT
-         4vupYTGyWXGnTSNrahlbLg0mbWJ5DTg1rVquU/SygCzGJZam+1YjM/D2Oc4wml7dNyjx
-         B9Ne1Il2fKNdmXxx7sZbA9YRsmYtE76nag1DS2eFsMqe8ginpxXIvECbXHSJ2ioWxV+Q
-         Zmq8VXkBvK/EbFph1Qb7EW5kEoftT3Bo76wYsnQhY801QNhbInFCL1P3xVrskpR0dfxt
-         BVmLgqQwlrg2XU7hlAavcIHsg3aRTcH6Eq4Rti+4JmKGMV+mwPCg+FvRhyTuiNabhCzF
-         OAzA==
+        d=gmail.com; s=20251104; t=1785111398; x=1785716198; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=PF7yOTCO8cyhQPZ9+iu5bcy6EKeJnZbLGZt0DtiR6BI=;
+        b=nqokETadg5fLYZDVYxGtMOLGNkbzKVFDrEk6RB1FKdlu3GuXcmFsv6TeCwAF9Shhw3
+         x2/VwcXm32D+dYxv22U/3ssOUrfLkZRhH3BS12pXLvjau41nuPtKsIfDEFCCtjN8pJD0
+         06RZv+2is0j8LSpm33PW02WtplaKKIoGa1glCnL6l3nHo0aVXR/yp1vwXaJeLN7ftzG3
+         DrieS/sk4P5yu+vsczjex47qZJX1OQ/ib5T3C2q4LXanvZN4E2UGcIcexesGRvMcINom
+         ciU2nPA9K/Pr4QGaBr2rdFgdc1oKrqx2DkIo9NqREP+M4KTCSkcod5Vr7T0hCNW+pFM3
+         cuGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785111395; x=1785716195;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:sender:x-gm-gg
+        d=1e100.net; s=20251104; t=1785111398; x=1785716198;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:sender:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=imb6/XH0fKYXI04n1Ki2zc81WcuhhBpNWae+C/ggjgA=;
-        b=X/BYYJoWSl3a4sKobOMIsB+MY/IDBdl9Fj9d1Mf57JZ9fktG/SGUneRHFrYnoZLWTy
-         AbMGVc5ygcDC46csIflJGtlRhxrGWmwVCFocO5voHSRqrUTg8pxmlGIzNhIgioRVslQj
-         Hq+5PMT9eTjb/KW8JL6qNrRQWzBhgjOj//9EWK1APzUnQpIg8bo0Sm/vp8evJmN0vVqi
-         EwMEzrMQa9bZhkQFi2p0lSh+Mac2dQGxo8SZXORgJ1EXoBzWIHCK5CK/5hCWTeUcoSxS
-         C8tbN+WMJdZssawzCKe2OeU5wnuHe2HZEJ3owfsPb1NR4kOvRYMYiVMat9M4CkHm2wGJ
-         r7Yw==
-X-Forwarded-Encrypted: i=1; AHgh+RplddAhfX72UvZFPn3bsLlvCPfYiLc3+80XyDlS39lOPqVFMLspb59CinXhRgV2kJB9TQejYjAaP19SHUo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxR+IUxLlVHFWMXKgZEsUTURdBG8IRZBooKOnDio6Tu7B0arUpG
-	hynyKQUomOdtQhbJoNDtHMYVJeTHS1Jci4L2Tat4YsbAhTEi1Ft3bi9N
-X-Gm-Gg: AR+sD12kc/8uVech1tiHA2CvWKP5Hq1HUMoGcnyu9q3GGI913+AvvIRdyL1vwOHtppp
-	dApQ37QRP1tiAPx9bKxGrfsVkuAY0nomfjMuWtGQ6Z8somcH+iZrqY5HIdySyp6nkACuJvyAK8S
-	yDXebJgC1JAOHH8RtvY5Z5AmE1sAF09X7o0vH6V99TJTaX9YJJtFzRHvmhSHEOBptilmuoXxCf9
-	Gxzfxl+6jWBQSF67zmU0OvjnYjzRpwEIndTip2ZQbhKbey9wTpWEAZ8oSlBE7XFLVRwuxm6c+Bs
-	wJEtY44YBCk5wlvvFsMgyD4cd3FrwdvNA8NGXO4jlf9grSpjUbLMnNvv/bZbIJUrrY+mWQPW9qv
-	o44X/KN/LRYBx7v73bSbPu0dow2SHgGGlp4ydbSvhqahh/GL0iQ7IDVthMPOXfd0GlZWe9FoZ/H
-	3GgkkKinN7IF9OPSWnIOqiXRLO1STySzuHPDI7T3PTCaknRZRI4+Xk42PNWvoKnHtIUg==
-X-Received: by 2002:a05:600c:c87:b0:495:4a34:16d9 with SMTP id 5b1f17b1804b1-496b570148amr82282755e9.31.1785111395275;
-        Sun, 26 Jul 2026 17:16:35 -0700 (PDT)
+        bh=PF7yOTCO8cyhQPZ9+iu5bcy6EKeJnZbLGZt0DtiR6BI=;
+        b=ayHqYu5CEwltzDGksKv5CwltJhMCKyKpYEbCiNiaWf5ZMueLWEkOe+tSfrBt76CLHj
+         o9H3xjSlmaAloV8OAbms0fmf2EV/nDckHqBglHUfz2Shw5yKYqcmmMdsRUqsoNLEhq8L
+         tMApEgSiNTTNUhXWpXkGmVpxk1HOIGHps2Uefse9VKIjVWbqKZm/1n2zwF1O8Xqq8syS
+         pCkdRXKovlzNu3GTvuYAM5GTjUB2LAadvKHNGVqkS82rBfmIacX02EYUpnpsnn3+v96M
+         O9mnJo7kT+LBKnajhafzJp2kMXQ7mgLbsBHePDrOV4VeaO7SglvqLA+BYwOr5NB631VZ
+         myjw==
+X-Forwarded-Encrypted: i=1; AHgh+Rol3VJLcyAs05Bs5YRgj74UzAxCcM0UUQlvPgcd8BN24/KQLxYJex23pm4AI1xH5Lm7PmkqkYrSYlatJEg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1XZZXixcV93cPDzm/miyOnefvt4LAbf1LD53XuWNcRn57vIu2
+	vGmPE1pv6hdksumZh5egU5SHi+8npAlFO7xgQBrRTO2hsHfP06kmHpus
+X-Gm-Gg: AR+sD10T7dozTWw0CnxP7B8+CkU79mg9hIwvZlVuat/sgnxcWaOuGxeT2/N0q9M2m5L
+	UNiV0FxopZ+b6+RSkm7edj7kwczID/7PnV/ImCltVLa64IiSr26bCvgN0UzfpHlge0nd+enTx8L
+	nfddgOEuvILcuZhLUQZcrgCAElgv0yhL733piYVLagVWdjv2qEmqKASUPscaz2lXAM/n0HluPKN
+	yh5CQcHDeNnmP8wFdtmmtJWw8swtloRQ1yLSOTDkCc8V4QGLzwgvfAQpxbnugnHP5Y7Fg3XhcCs
+	KAiRlLDS3Jm9JnGO3msk7Co9shEU98Q5ooRlOGIGM8frGJKu8Ny3AygzHwTMhLw4nNNMWZfoGC9
+	D5nMvQEe/F9/tqSH9Q52/Pwj+YcwVWkK0RTtHKlUhxK9Mx4p3KMqmX1/FiiLtb/whR8b05dNpB/
+	YnC/58EJwt83MgRRAm9cl+LboKiWXILTkXlKMNIRQKKH+v8PLTdRVqZZ4q0slw7kMpogx1GbQdo
+	oBV
+X-Received: by 2002:a05:600c:c8f:b0:493:e983:806e with SMTP id 5b1f17b1804b1-496b56e6df4mr76757955e9.3.1785111397588;
+        Sun, 26 Jul 2026 17:16:37 -0700 (PDT)
 Received: from nixos-office (195-23-151-163.net.novis.pt. [195.23.151.163])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-496b485f65csm176403555e9.5.2026.07.26.17.16.33
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-496b485f65csm176403555e9.5.2026.07.26.17.16.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Jul 2026 17:16:34 -0700 (PDT)
+        Sun, 26 Jul 2026 17:16:37 -0700 (PDT)
 Sender: Julian Braha <julian.braha@gmail.com>
 From: Julian Braha <julianbraha@gmail.com>
 To: nathan@kernel.org,
@@ -81,9 +82,9 @@ Cc: ojeda@kernel.org,
 	linux-doc@vger.kernel.org,
 	linux-kbuild@vger.kernel.org,
 	Julian Braha <julianbraha@gmail.com>
-Subject: [PATCH v4 3/5] kconfirm: add tests
-Date: Mon, 27 Jul 2026 01:16:21 +0100
-Message-ID: <20260727001623.2794156-4-julianbraha@gmail.com>
+Subject: [PATCH v4 4/5] Documentation: add kconfirm
+Date: Mon, 27 Jul 2026 01:16:22 +0100
+Message-ID: <20260727001623.2794156-5-julianbraha@gmail.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260727001623.2794156-1-julianbraha@gmail.com>
 References: <20260727001623.2794156-1-julianbraha@gmail.com>
@@ -93,868 +94,262 @@ List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Add tests for kconfirm using pytest, as Kconfig does. The tests cover all
-of kconfirm’s checks, and any additional, future checks need to add tests
-as well.
+Add usage documentation and a brief description of kconfirm to
+Documentation/dev-tools/
 
-Assisted-by: Claude:claude-fable-5
 Signed-off-by: Julian Braha <julianbraha@gmail.com>
 ---
- .../kconfig/kconfirm/tests/arch/arm/Kconfig   |   9 +
- .../kconfirm/tests/arch/powerpc/Kconfig       |   4 +
- .../kconfig/kconfirm/tests/arch/riscv/Kconfig |   9 +
- .../kconfig/kconfirm/tests/arch/sh/Kconfig    |   4 +
- .../kconfirm/tests/arch/testarch/Kconfig      |   4 +
- .../kconfig/kconfirm/tests/arch/um/Kconfig    |   4 +
- .../kconfig/kconfirm/tests/arch/x86/Kconfig   |   4 +
- .../kconfirm/tests/architecture.Kconfig       |   4 +
- .../tests/architecture_common.Kconfig         |  19 +
- .../kconfirm/tests/conditional_prompt.Kconfig |  17 +
- scripts/kconfig/kconfirm/tests/conftest.py    |  93 +++++
- ...nt_condition_negative_expression_1.Kconfig |  13 +
- ...nt_condition_negative_expression_2.Kconfig |  13 +
- ...nstant_condition_negative_symbol_1.Kconfig |  13 +
- ...nstant_condition_negative_symbol_2.Kconfig |  13 +
- .../kconfig/kconfirm/tests/dead_link.Kconfig  |  12 +
- .../tests/default_categorization.Kconfig      |  20 +
- scripts/kconfig/kconfirm/tests/pytest.ini     |   2 +
- scripts/kconfig/kconfirm/tests/ranges.Kconfig |  39 ++
- .../kconfirm/tests/select_imply.Kconfig       |  28 ++
- .../kconfig/kconfirm/tests/test_kconfirm.py   | 358 ++++++++++++++++++
- 21 files changed, 682 insertions(+)
- create mode 100644 scripts/kconfig/kconfirm/tests/arch/arm/Kconfig
- create mode 100644 scripts/kconfig/kconfirm/tests/arch/powerpc/Kconfig
- create mode 100644 scripts/kconfig/kconfirm/tests/arch/riscv/Kconfig
- create mode 100644 scripts/kconfig/kconfirm/tests/arch/sh/Kconfig
- create mode 100644 scripts/kconfig/kconfirm/tests/arch/testarch/Kconfig
- create mode 100644 scripts/kconfig/kconfirm/tests/arch/um/Kconfig
- create mode 100644 scripts/kconfig/kconfirm/tests/arch/x86/Kconfig
- create mode 100644 scripts/kconfig/kconfirm/tests/architecture.Kconfig
- create mode 100644 scripts/kconfig/kconfirm/tests/architecture_common.Kconfig
- create mode 100644 scripts/kconfig/kconfirm/tests/conditional_prompt.Kconfig
- create mode 100644 scripts/kconfig/kconfirm/tests/conftest.py
- create mode 100644 scripts/kconfig/kconfirm/tests/constant_condition/default_constant_condition_negative_expression_1.Kconfig
- create mode 100644 scripts/kconfig/kconfirm/tests/constant_condition/default_constant_condition_negative_expression_2.Kconfig
- create mode 100644 scripts/kconfig/kconfirm/tests/constant_condition/default_constant_condition_negative_symbol_1.Kconfig
- create mode 100644 scripts/kconfig/kconfirm/tests/constant_condition/default_constant_condition_negative_symbol_2.Kconfig
- create mode 100644 scripts/kconfig/kconfirm/tests/dead_link.Kconfig
- create mode 100644 scripts/kconfig/kconfirm/tests/default_categorization.Kconfig
- create mode 100644 scripts/kconfig/kconfirm/tests/pytest.ini
- create mode 100644 scripts/kconfig/kconfirm/tests/ranges.Kconfig
- create mode 100644 scripts/kconfig/kconfirm/tests/select_imply.Kconfig
- create mode 100644 scripts/kconfig/kconfirm/tests/test_kconfirm.py
+ Documentation/dev-tools/index.rst    |   1 +
+ Documentation/dev-tools/kconfirm.rst | 229 +++++++++++++++++++++++++++
+ 2 files changed, 230 insertions(+)
+ create mode 100644 Documentation/dev-tools/kconfirm.rst
 
-diff --git a/scripts/kconfig/kconfirm/tests/arch/arm/Kconfig b/scripts/kconfig/kconfirm/tests/arch/arm/Kconfig
+diff --git a/Documentation/dev-tools/index.rst b/Documentation/dev-tools/index.rst
+index 59cbb77b33ff..130ebc0d7282 100644
+--- a/Documentation/dev-tools/index.rst
++++ b/Documentation/dev-tools/index.rst
+@@ -40,3 +40,4 @@ Documentation/process/debugging/index.rst
+    autofdo
+    propeller
+    container
++   kconfirm
+diff --git a/Documentation/dev-tools/kconfirm.rst b/Documentation/dev-tools/kconfirm.rst
 new file mode 100644
-index 000000000000..5922782a5f4d
+index 000000000000..64ab9d1c3057
 --- /dev/null
-+++ b/scripts/kconfig/kconfirm/tests/arch/arm/Kconfig
-@@ -0,0 +1,9 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+# Copyright (C) 2026 Julian Braha <julianbraha@gmail.com>
-+
-+source "architecture_common.Kconfig"
-+
-+config ARM_ONLY
-+	bool
-+	depends on ARM_PREREQUISITE
-+	depends on ARM_PREREQUISITE
-diff --git a/scripts/kconfig/kconfirm/tests/arch/powerpc/Kconfig b/scripts/kconfig/kconfirm/tests/arch/powerpc/Kconfig
-new file mode 100644
-index 000000000000..45e94dc6cec6
---- /dev/null
-+++ b/scripts/kconfig/kconfirm/tests/arch/powerpc/Kconfig
-@@ -0,0 +1,4 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+# Copyright (C) 2026 Julian Braha <julianbraha@gmail.com>
-+
-+source "architecture_common.Kconfig"
-diff --git a/scripts/kconfig/kconfirm/tests/arch/riscv/Kconfig b/scripts/kconfig/kconfirm/tests/arch/riscv/Kconfig
-new file mode 100644
-index 000000000000..9f760f673064
---- /dev/null
-+++ b/scripts/kconfig/kconfirm/tests/arch/riscv/Kconfig
-@@ -0,0 +1,9 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+# Copyright (C) 2026 Julian Braha <julianbraha@gmail.com>
-+
-+source "architecture_common.Kconfig"
-+
-+config RISCV_ONLY
-+	bool
-+	depends on RISCV_PREREQUISITE
-+	depends on RISCV_PREREQUISITE
-diff --git a/scripts/kconfig/kconfirm/tests/arch/sh/Kconfig b/scripts/kconfig/kconfirm/tests/arch/sh/Kconfig
-new file mode 100644
-index 000000000000..45e94dc6cec6
---- /dev/null
-+++ b/scripts/kconfig/kconfirm/tests/arch/sh/Kconfig
-@@ -0,0 +1,4 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+# Copyright (C) 2026 Julian Braha <julianbraha@gmail.com>
-+
-+source "architecture_common.Kconfig"
-diff --git a/scripts/kconfig/kconfirm/tests/arch/testarch/Kconfig b/scripts/kconfig/kconfirm/tests/arch/testarch/Kconfig
-new file mode 100644
-index 000000000000..bb5c0e4b3829
---- /dev/null
-+++ b/scripts/kconfig/kconfirm/tests/arch/testarch/Kconfig
-@@ -0,0 +1,4 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+# Copyright (C) 2026 Julian Braha <julianbraha@gmail.com>
-+
-+# Dynamically discovered test architecture.
-diff --git a/scripts/kconfig/kconfirm/tests/arch/um/Kconfig b/scripts/kconfig/kconfirm/tests/arch/um/Kconfig
-new file mode 100644
-index 000000000000..45e94dc6cec6
---- /dev/null
-+++ b/scripts/kconfig/kconfirm/tests/arch/um/Kconfig
-@@ -0,0 +1,4 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+# Copyright (C) 2026 Julian Braha <julianbraha@gmail.com>
-+
-+source "architecture_common.Kconfig"
-diff --git a/scripts/kconfig/kconfirm/tests/arch/x86/Kconfig b/scripts/kconfig/kconfirm/tests/arch/x86/Kconfig
-new file mode 100644
-index 000000000000..45e94dc6cec6
---- /dev/null
-+++ b/scripts/kconfig/kconfirm/tests/arch/x86/Kconfig
-@@ -0,0 +1,4 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+# Copyright (C) 2026 Julian Braha <julianbraha@gmail.com>
-+
-+source "architecture_common.Kconfig"
-diff --git a/scripts/kconfig/kconfirm/tests/architecture.Kconfig b/scripts/kconfig/kconfirm/tests/architecture.Kconfig
-new file mode 100644
-index 000000000000..a4f1c68548b4
---- /dev/null
-+++ b/scripts/kconfig/kconfirm/tests/architecture.Kconfig
-@@ -0,0 +1,4 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+# Copyright (C) 2026 Julian Braha <julianbraha@gmail.com>
-+
-+source "arch/$(SRCARCH)/Kconfig"
-diff --git a/scripts/kconfig/kconfirm/tests/architecture_common.Kconfig b/scripts/kconfig/kconfirm/tests/architecture_common.Kconfig
-new file mode 100644
-index 000000000000..3205d0d59071
---- /dev/null
-+++ b/scripts/kconfig/kconfirm/tests/architecture_common.Kconfig
-@@ -0,0 +1,19 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+# Copyright (C) 2026 Julian Braha <julianbraha@gmail.com>
-+
-+config SHARED_SELECTEE
-+	bool "Shared target"
-+	help
-+	  This is a test-only symbol with a visible prompt.
-+	  Kconfirm uses it as the target of a select statement.
-+	  The architecture tests verify that selecting this symbol
-+	  produces the expected select-visible diagnostic.
-+
-+config SHARED_SELECTOR
-+	bool
-+	select SHARED_SELECTEE
-+
-+config SHARED_DEPENDENCY
-+	bool
-+	depends on SHARED_PREREQUISITE
-+	depends on SHARED_PREREQUISITE
-diff --git a/scripts/kconfig/kconfirm/tests/conditional_prompt.Kconfig b/scripts/kconfig/kconfirm/tests/conditional_prompt.Kconfig
-new file mode 100644
-index 000000000000..f2fef6ea874b
---- /dev/null
-+++ b/scripts/kconfig/kconfirm/tests/conditional_prompt.Kconfig
-@@ -0,0 +1,17 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+# Copyright (C) 2026 Julian Braha <julianbraha@gmail.com>
-+
-+config SELECTEE
-+	bool "Target" if PROMPT_CONDITION
-+	help
-+	  This is a test-only symbol with a conditional prompt.
-+	  Kconfirm uses it as the target of a select statement.
-+	  The test verifies that the prompt condition is included
-+	  when deciding whether the target is visible.
-+
-+config SELECTOR
-+	bool
-+	select SELECTEE
-+
-+config PROMPT_CONDITION
-+	bool
-diff --git a/scripts/kconfig/kconfirm/tests/conftest.py b/scripts/kconfig/kconfirm/tests/conftest.py
-new file mode 100644
-index 000000000000..005681e7e337
---- /dev/null
-+++ b/scripts/kconfig/kconfirm/tests/conftest.py
-@@ -0,0 +1,93 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+# Copyright (C) 2026 Julian Braha <julianbraha@gmail.com>
-+
-+"""Fixtures for kconfirm regression tests."""
-+
-+import os
-+import subprocess
-+from pathlib import Path
-+
-+import pytest
-+
-+
-+class Kconfirm:
-+    """Test kconfirm against Kconfig fixtures."""
-+
-+    def __init__(self, binary):
-+        self._binary = Path(binary).resolve()
-+        self._test_dir = Path(__file__).resolve().parent
-+
-+    def run_cli(self, arguments, *, arch="x86", environment=None,
-+                should_succeed=True):
-+        """Run kconfirm with an explicit argument list."""
-+        command = [str(self._binary), *arguments]
-+
-+        process_environment = os.environ.copy()
-+        process_environment.pop("SRCARCH", None)
-+        process_environment.pop("HEADER_ARCH", None)
-+        if arch is None:
-+            process_environment.pop("ARCH", None)
-+        else:
-+            process_environment["ARCH"] = arch
-+        if environment:
-+            process_environment.update(environment)
-+
-+        process = subprocess.run(
-+            command,
-+            capture_output=True,
-+            cwd=self._test_dir,
-+            env=process_environment,
-+            check=False,
-+            text=True,
-+        )
-+
-+        print("[command]\n{}\n".format(" ".join(command)))
-+        print("[retcode]\n{}\n".format(process.returncode))
-+        print("[stdout]\n{}".format(process.stdout))
-+        print("[stderr]\n{}".format(process.stderr))
-+
-+        if should_succeed:
-+            assert process.returncode == 0
-+        else:
-+            assert process.returncode != 0
-+
-+        return process
-+
-+    def run(self, kconfig, *, arch="x86", enable_check=None,
-+            disable_check=None, environment=None, should_succeed=True):
-+        """Run kconfirm against one Kconfig fixture."""
-+        arguments = [
-+            "--linux-path",
-+            str(self._test_dir),
-+            "--kconfig",
-+            kconfig,
-+        ]
-+
-+        if enable_check:
-+            arguments.extend(["--enable-check", enable_check])
-+        if disable_check:
-+            arguments.extend(["--disable-check", disable_check])
-+
-+        return self.run_cli(
-+            arguments,
-+            arch=arch,
-+            environment=environment,
-+            should_succeed=should_succeed,
-+        )
-+
-+
-+def pytest_addoption(parser):
-+    parser.addoption(
-+        "--kconfirm",
-+        metavar="PATH",
-+        help="path to the kconfirm executable",
-+    )
-+
-+
-+@pytest.fixture(scope="session")
-+def kconfirm(request):
-+    binary = request.config.getoption("--kconfirm")
-+    if not binary:
-+        raise pytest.UsageError("--kconfirm is required")
-+
-+    return Kconfirm(binary)
-diff --git a/scripts/kconfig/kconfirm/tests/constant_condition/default_constant_condition_negative_expression_1.Kconfig b/scripts/kconfig/kconfirm/tests/constant_condition/default_constant_condition_negative_expression_1.Kconfig
-new file mode 100644
-index 000000000000..3e3cc1c72ecf
---- /dev/null
-+++ b/scripts/kconfig/kconfirm/tests/constant_condition/default_constant_condition_negative_expression_1.Kconfig
-@@ -0,0 +1,13 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+# Copyright (C) 2026 Julian Braha <julianbraha@gmail.com>
-+
-+config A
-+	tristate
-+	depends on !(B || C)
-+	default y if B || C
-+
-+config B
-+	bool
-+
-+config C
-+	tristate
-diff --git a/scripts/kconfig/kconfirm/tests/constant_condition/default_constant_condition_negative_expression_2.Kconfig b/scripts/kconfig/kconfirm/tests/constant_condition/default_constant_condition_negative_expression_2.Kconfig
-new file mode 100644
-index 000000000000..64a1778b2981
---- /dev/null
-+++ b/scripts/kconfig/kconfirm/tests/constant_condition/default_constant_condition_negative_expression_2.Kconfig
-@@ -0,0 +1,13 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+# Copyright (C) 2026 Julian Braha <julianbraha@gmail.com>
-+
-+config A
-+	tristate
-+	depends on B || C
-+	default y if !(B || C)
-+
-+config B
-+	bool
-+
-+config C
-+	tristate
-diff --git a/scripts/kconfig/kconfirm/tests/constant_condition/default_constant_condition_negative_symbol_1.Kconfig b/scripts/kconfig/kconfirm/tests/constant_condition/default_constant_condition_negative_symbol_1.Kconfig
-new file mode 100644
-index 000000000000..34afd2a48396
---- /dev/null
-+++ b/scripts/kconfig/kconfirm/tests/constant_condition/default_constant_condition_negative_symbol_1.Kconfig
-@@ -0,0 +1,13 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+# Copyright (C) 2026 Julian Braha <julianbraha@gmail.com>
-+
-+config A
-+	tristate
-+	depends on B
-+	default y if !B
-+
-+config B
-+	bool
-+
-+config C
-+	tristate
-diff --git a/scripts/kconfig/kconfirm/tests/constant_condition/default_constant_condition_negative_symbol_2.Kconfig b/scripts/kconfig/kconfirm/tests/constant_condition/default_constant_condition_negative_symbol_2.Kconfig
-new file mode 100644
-index 000000000000..d578b130faab
---- /dev/null
-+++ b/scripts/kconfig/kconfirm/tests/constant_condition/default_constant_condition_negative_symbol_2.Kconfig
-@@ -0,0 +1,13 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+# Copyright (C) 2026 Julian Braha <julianbraha@gmail.com>
-+
-+config A
-+	tristate
-+	depends on !B
-+	default y if B
-+
-+config B
-+	bool
-+
-+config C
-+	tristate
-diff --git a/scripts/kconfig/kconfirm/tests/dead_link.Kconfig b/scripts/kconfig/kconfirm/tests/dead_link.Kconfig
-new file mode 100644
-index 000000000000..29bce7aa30fc
---- /dev/null
-+++ b/scripts/kconfig/kconfirm/tests/dead_link.Kconfig
-@@ -0,0 +1,12 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+# Copyright (C) 2026 Julian Braha <julianbraha@gmail.com>
-+
-+config HAS_DEAD_LINK
-+	bool
-+	help
-+	  The obsolete documentation was at https://example.invalid/obsolete.
-+
-+config HAS_DUPLICATE_DEAD_LINK
-+	bool
-+	help
-+	  The same documentation was at https://example.invalid/obsolete.
-diff --git a/scripts/kconfig/kconfirm/tests/default_categorization.Kconfig b/scripts/kconfig/kconfirm/tests/default_categorization.Kconfig
-new file mode 100644
-index 000000000000..45ff769ad1c8
---- /dev/null
-+++ b/scripts/kconfig/kconfirm/tests/default_categorization.Kconfig
-@@ -0,0 +1,20 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+# Copyright (C) 2026 Julian Braha <julianbraha@gmail.com>
-+
-+config DUPLICATE_UNCONDITIONAL
-+	bool
-+	default y
-+	default y
-+
-+config DEAD_AFTER_UNCONDITIONAL
-+	bool
-+	default y
-+	default n
-+
-+config DUPLICATE_CONDITIONAL
-+	bool
-+	default y if CONDITION
-+	default y if CONDITION
-+
-+config CONDITION
-+	bool
-diff --git a/scripts/kconfig/kconfirm/tests/pytest.ini b/scripts/kconfig/kconfirm/tests/pytest.ini
-new file mode 100644
-index 000000000000..2e24f7bc9f2c
---- /dev/null
-+++ b/scripts/kconfig/kconfirm/tests/pytest.ini
-@@ -0,0 +1,2 @@
-+[pytest]
-+addopts = --verbose
-diff --git a/scripts/kconfig/kconfirm/tests/ranges.Kconfig b/scripts/kconfig/kconfirm/tests/ranges.Kconfig
-new file mode 100644
-index 000000000000..4ced953247e1
---- /dev/null
-+++ b/scripts/kconfig/kconfirm/tests/ranges.Kconfig
-@@ -0,0 +1,39 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+# Copyright (C) 2026 Julian Braha <julianbraha@gmail.com>
-+#
-+# Fixture for toggling duplicate_range and dead_range independently of each
-+# other, and for categorizing repeated ranges correctly.
-+
-+config GATE
-+	bool
-+
-+config OTHER_GATE
-+	bool
-+
-+config RANGED_DUP
-+	int
-+	range 1 5
-+	range 1 5
-+
-+config RANGED_DEAD
-+	int
-+	range 1 5
-+	range 2 6 if GATE
-+
-+config RANGED_CONDITIONAL_FIRST
-+	int
-+	range 1 5 if GATE
-+	range 2 6
-+
-+config RANGED_DEAD_UNCONDITIONAL
-+	int
-+	range 1 5
-+	range 2 6
-+
-+config RANGED_MULTIPLE
-+	int
-+	range 1 5 if GATE
-+	range 2 6 if OTHER_GATE
-+	range 3 7
-+	range 4 8 if GATE
-+	range 5 9
-diff --git a/scripts/kconfig/kconfirm/tests/select_imply.Kconfig b/scripts/kconfig/kconfirm/tests/select_imply.Kconfig
-new file mode 100644
-index 000000000000..ac8f2aa1b66c
---- /dev/null
-+++ b/scripts/kconfig/kconfirm/tests/select_imply.Kconfig
-@@ -0,0 +1,28 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+# Copyright (C) 2026 Julian Braha <julianbraha@gmail.com>
-+#
-+# Fixture for toggling duplicate_select/dead_select and
-+# duplicate_imply/dead_imply independently of each other.
-+
-+config SELECTEE
-+	bool
-+
-+config OTHER_SELECTEE
-+	bool
-+
-+config GATE
-+	bool
-+
-+config SELECTOR
-+	bool
-+	select SELECTEE
-+	select SELECTEE if GATE
-+	select OTHER_SELECTEE
-+	select OTHER_SELECTEE
-+
-+config IMPLIER
-+	bool
-+	imply SELECTEE
-+	imply SELECTEE if GATE
-+	imply OTHER_SELECTEE
-+	imply OTHER_SELECTEE
-diff --git a/scripts/kconfig/kconfirm/tests/test_kconfirm.py b/scripts/kconfig/kconfirm/tests/test_kconfirm.py
-new file mode 100644
-index 000000000000..5e23f7d2b0cb
---- /dev/null
-+++ b/scripts/kconfig/kconfirm/tests/test_kconfirm.py
-@@ -0,0 +1,358 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+# Copyright (C) 2026 Julian Braha <julianbraha@gmail.com>
-+
-+"""Regression tests for kconfirm."""
-+
-+import shutil
-+from pathlib import Path
-+
-+import pytest
-+
-+
-+TEST_DIR = Path(__file__).resolve().parent
-+
-+
-+@pytest.mark.parametrize(
-+    "fixture",
-+    [
-+        "default_constant_condition_negative_expression_1.Kconfig",
-+        "default_constant_condition_negative_expression_2.Kconfig",
-+        "default_constant_condition_negative_symbol_1.Kconfig",
-+        "default_constant_condition_negative_symbol_2.Kconfig",
-+    ],
-+)
-+def test_negative_constant_condition(kconfirm, fixture):
-+    process = kconfirm.run("constant_condition/{}".format(fixture))
-+
-+    assert "[constant_condition] [X86] config A:" in process.stdout
-+    assert "will always be false" in process.stdout
-+
-+
-+def test_default_categorization(kconfirm):
-+    process = kconfirm.run("default_categorization.Kconfig")
-+
-+    assert (
-+        "[duplicate_default] [X86] config DUPLICATE_UNCONDITIONAL: "
-+        "duplicate default of y"
-+    ) in process.stdout
-+    assert (
-+        "[dead_default] [X86] config DUPLICATE_UNCONDITIONAL:"
-+    ) not in process.stdout
-+    assert (
-+        "[dead_default] [X86] config DEAD_AFTER_UNCONDITIONAL: "
-+        "dead default of n"
-+    ) in process.stdout
-+    assert (
-+        "[duplicate_default] [X86] config DUPLICATE_CONDITIONAL: "
-+        "duplicate default of y"
-+    ) in process.stdout
-+
-+
-+def test_select_and_imply_checks(kconfirm):
-+    process = kconfirm.run("select_imply.Kconfig")
-+
-+    assert (
-+        "[dead_select] [X86] config SELECTOR: dead select of SELECTEE"
-+    ) in process.stdout
-+    assert (
-+        "[dead_imply] [X86] config IMPLIER: dead imply of SELECTEE"
-+    ) in process.stdout
-+
-+
-+def test_disable_dead_select_and_imply_checks(kconfirm):
-+    process = kconfirm.run(
-+        "select_imply.Kconfig",
-+        disable_check="dead_select,dead_imply",
-+    )
-+
-+    assert "[dead_select]" not in process.stdout
-+    assert "[dead_imply]" not in process.stdout
-+    assert (
-+        "[duplicate_select] [X86] config SELECTOR: "
-+        "duplicate select of OTHER_SELECTEE"
-+    ) in process.stdout
-+    assert (
-+        "[duplicate_imply] [X86] config IMPLIER: "
-+        "duplicate imply of OTHER_SELECTEE"
-+    ) in process.stdout
-+
-+
-+def test_disable_duplicate_select_and_imply_checks(kconfirm):
-+    process = kconfirm.run(
-+        "select_imply.Kconfig",
-+        disable_check="duplicate_select,duplicate_imply",
-+    )
-+
-+    assert "[duplicate_select]" not in process.stdout
-+    assert "[duplicate_imply]" not in process.stdout
-+    assert (
-+        "[dead_select] [X86] config SELECTOR: dead select of SELECTEE"
-+    ) in process.stdout
-+    assert (
-+        "[dead_imply] [X86] config IMPLIER: dead imply of SELECTEE"
-+    ) in process.stdout
-+
-+
-+def test_range_checks(kconfirm):
-+    process = kconfirm.run("ranges.Kconfig")
-+
-+    assert (
-+        "[duplicate_range] [X86] config RANGED_DUP: duplicate range 1 5"
-+    ) in process.stdout
-+    assert "[dead_range] [X86] config RANGED_DUP:" not in process.stdout
-+    assert (
-+        "[dead_range] [X86] config RANGED_DEAD: dead range of 2 6"
-+    ) in process.stdout
-+    assert (
-+        "[dead_range] [X86] config RANGED_DEAD_UNCONDITIONAL: "
-+        "dead range of 2 6"
-+    ) in process.stdout
-+    assert (
-+        "[dead_range] [X86] config RANGED_CONDITIONAL_FIRST:"
-+    ) not in process.stdout
-+    assert process.stdout.count(
-+        "[dead_range] [X86] config RANGED_MULTIPLE:"
-+    ) == 2
-+
-+
-+def test_disable_dead_range_check(kconfirm):
-+    process = kconfirm.run(
-+        "ranges.Kconfig",
-+        disable_check="dead_range",
-+    )
-+
-+    assert "[dead_range]" not in process.stdout
-+    assert (
-+        "[duplicate_range] [X86] config RANGED_DUP: duplicate range 1 5"
-+    ) in process.stdout
-+
-+
-+def test_disable_duplicate_range_check(kconfirm):
-+    process = kconfirm.run(
-+        "ranges.Kconfig",
-+        disable_check="duplicate_range",
-+    )
-+
-+    assert "[duplicate_range]" not in process.stdout
-+    assert (
-+        "[dead_range] [X86] config RANGED_DEAD: dead range of 2 6"
-+    ) in process.stdout
-+
-+
-+def test_architecture_directory_is_discovered(kconfirm):
-+    process = kconfirm.run(
-+        "default_categorization.Kconfig",
-+        arch="testarch",
-+    )
-+
-+    assert (
-+        "[duplicate_default] [TESTARCH] config DUPLICATE_UNCONDITIONAL:"
-+    ) in process.stdout
-+
-+
-+def test_unknown_architecture_is_rejected(kconfirm):
-+    process = kconfirm.run(
-+        "conditional_prompt.Kconfig",
-+        arch="missing",
-+        should_succeed=False,
-+    )
-+    output = process.stdout + process.stderr
-+
-+    assert "unexpected architecture from ARCH" in output
-+    for architecture in ["arm", "powerpc", "riscv", "sh", "testarch", "um", "x86"]:
-+        assert architecture in output
-+
-+
-+def test_missing_architecture_is_rejected(kconfirm):
-+    process = kconfirm.run(
-+        "conditional_prompt.Kconfig",
-+        arch=None,
-+        should_succeed=False,
-+    )
-+
-+    assert "ARCH environment variable is required" in process.stderr
-+
-+
-+def test_conditional_prompt_is_not_select_visible(kconfirm):
-+    process = kconfirm.run(
-+        "conditional_prompt.Kconfig",
-+        enable_check="select_visible",
-+    )
-+
-+    assert "[select_visible]" not in process.stdout
-+
-+
-+@pytest.mark.parametrize(
-+    ("arch", "arch_config", "specific_symbol", "specific_dependency"),
-+    [
-+        ("arm", "ARM", "ARM_ONLY", "ARM_PREREQUISITE"),
-+        ("riscv", "RISCV", "RISCV_ONLY", "RISCV_PREREQUISITE"),
-+    ],
-+)
-+def test_architecture_findings(
-+    kconfirm,
-+    arch,
-+    arch_config,
-+    specific_symbol,
-+    specific_dependency,
-+):
-+    process = kconfirm.run(
-+        "architecture.Kconfig",
-+        arch=arch,
-+        enable_check="select_visible",
-+    )
-+
-+    assert (
-+        f"[duplicate_dependency] [{arch_config}] config SHARED_DEPENDENCY: "
-+        "duplicate dependency on SHARED_PREREQUISITE"
-+    ) in process.stdout
-+    assert (
-+        f"[select_visible] [{arch_config}] config SHARED_SELECTOR: "
-+        "selects the visible SHARED_SELECTEE"
-+    ) in process.stdout
-+    assert (
-+        f"[duplicate_dependency] [{arch_config}] config {specific_symbol}: "
-+        f"duplicate dependency on {specific_dependency}"
-+    ) in process.stdout
-+
-+
-+@pytest.mark.parametrize(
-+    ("arch", "arch_config"),
-+    [
-+        ("x86_64", "X86"),
-+        ("powerpc", "PPC"),
-+        ("sh", "SUPERH"),
-+        ("um", "UML"),
-+    ],
-+)
-+def test_architecture_alias_selects_source_directory(kconfirm, arch, arch_config):
-+    process = kconfirm.run(
-+        "architecture.Kconfig",
-+        arch=arch,
-+        enable_check="select_visible",
-+    )
-+
-+    assert (
-+        f"[duplicate_dependency] [{arch_config}] config SHARED_DEPENDENCY: "
-+        "duplicate dependency on SHARED_PREREQUISITE"
-+    ) in process.stdout
-+
-+
-+@pytest.mark.skipif(shutil.which("curl") is None, reason="requires curl")
-+def test_dead_links_are_deduplicated(kconfirm):
-+    # Both fixture config options point at the same example.invalid URL. That
-+    # TLD is reserved and never resolves (RFC 6761), so curl should fail
-+    # deterministically, and the link reported once. The second config option
-+    # referencing it should be deduplicated.
-+    process = kconfirm.run(
-+        "dead_link.Kconfig",
-+        enable_check="dead_link",
-+    )
-+
-+    assert (
-+        "[dead_link] [X86] config HAS_DEAD_LINK:"
-+    ) in process.stdout
-+    assert (
-+        "[dead_link] [X86] config HAS_DUPLICATE_DEAD_LINK:"
-+    ) not in process.stdout
-+
-+
-+def test_dead_link_requires_curl(kconfirm):
-+    process = kconfirm.run(
-+        "dead_link.Kconfig",
-+        enable_check="dead_link",
-+        environment={"PATH": ""},
-+        should_succeed=False,
-+    )
-+
-+    assert "dead_link requires the `curl` command" in process.stderr
-+
-+
-+@pytest.mark.parametrize(
-+    "arguments",
-+    [
-+        [
-+            f"--linux-path={TEST_DIR}",
-+            "--kconfig=conditional_prompt.Kconfig",
-+            "--enable-check=select_visible",
-+            "--disable-check=dead_range",
-+        ],
-+        [
-+            f"-l{TEST_DIR}",
-+            "-kconditional_prompt.Kconfig",
-+            "-eselect_visible",
-+            "-ddead_range",
-+        ],
-+    ],
-+)
-+def test_attached_option_values(kconfirm, arguments):
-+    process = kconfirm.run_cli(arguments)
-+
-+    assert "[select_visible]" not in process.stdout
-+
-+
-+def test_repeated_check_options(kconfirm):
-+    process = kconfirm.run_cli(
-+        [
-+            "--linux-path",
-+            str(TEST_DIR),
-+            "--kconfig",
-+            "conditional_prompt.Kconfig",
-+            "--enable-check",
-+            "select_visible",
-+            "--enable-check",
-+            "duplicate_default_value",
-+            "--disable-check",
-+            "dead_range",
-+            "--disable-check",
-+            "reverse_range",
-+        ],
-+    )
-+
-+    assert process.stderr == ""
-+
-+
-+def test_help(kconfirm):
-+    process = kconfirm.run_cli(["--help"])
-+
-+    assert "Usage: kconfirm --linux-path PATH" in process.stdout
-+
-+
-+@pytest.mark.parametrize(
-+    ("arguments", "message"),
-+    [
-+        ([], "--linux-path is required"),
-+        (["--unknown"], "unrecognized option '--unknown'"),
-+        (
-+            [
-+                "--linux-path",
-+                str(TEST_DIR),
-+                "--enable-check",
-+                "not_a_check",
-+            ],
-+            "check not_a_check does not exist",
-+        ),
-+        (
-+            [
-+                "--linux-path",
-+                str(TEST_DIR),
-+                "--enable-check",
-+                "ungrouped_attribute",
-+            ],
-+            "check ungrouped_attribute does not exist",
-+        ),
-+    ],
-+)
-+def test_cli_errors(kconfirm, arguments, message):
-+    process = kconfirm.run_cli(arguments, should_succeed=False)
-+
-+    assert message in process.stdout + process.stderr
-+
-+
-+def test_invalid_linux_path(kconfirm):
-+    process = kconfirm.run_cli(
-+        ["--linux-path", str(TEST_DIR / "does-not-exist")],
-+        should_succeed=False,
-+    )
-+
-+    assert "No such file or directory" in process.stderr
++++ b/Documentation/dev-tools/kconfirm.rst
+@@ -0,0 +1,229 @@
++.. SPDX-License-Identifier: GPL-2.0-only
++.. Copyright (C) 2026 Julian Braha <julianbraha@gmail.com>
++
++========
++kconfirm
++========
++
++kconfirm is a static analysis tool for the kernel's Kconfig.  It checks
++the entire tree-wide Kconfig, and reports misusage like dead code.  In the
++case of dead default statements, these can be a code smell.
++
++kconfirm has some additional, optional checks. The first is for dead links
++in the Kconfig help texts.  Since this has a high potential for false
++positives (due to websites blocking bots) and slows down runtime
++significantly, it is disabled by default.
++
++Another optional check is for config options that select visible config
++options.  Examples of how to enable the optional checks are included
++below.
++
++kconfirm is written in Rust and lives in ``scripts/kconfig/kconfirm``.  Other
++than the dead link checks, kconfirm aims for zero false positives, though some
++will necessarily happen for config options that use macros referencing the host
++environment.  These are common for host compiler-related options.
++
++kconfirm checks one architecture per run.  When run with ``make kconfirm``, it
++checks the same architecture as the kernel build.  That is, it reads the
++``ARCH`` environment variable, similarly to the build system.  Findings include
++the source architecture Kconfig option as a tag; for example, ``[RISCV]``
++indicates a finding from a tree that sourced ``arch/riscv/Kconfig``.
++
++**NOTE**: kconfirm does not build the kernel; it is strictly a static checker.
++Also note that parsing Kconfig runs Kconfig's own ``$(shell,...)`` and
++``$(success,...)`` feature probes, just as ``make menuconfig`` does, so some
++scripts under ``scripts/`` are executed and your compiler is queried along the
++way.
++
++
++Getting Started
++===============
++
++
++Beyond the usual kernel build environment, kconfirm needs the Rust toolchain:
++``rustc`` and ``bindgen`` (which in turn uses libclang). See also
++Documentation/rust/quick-start.rst for how to install and set it up, and
++Documentation/process/changes.rst for the minimum versions.  kconfirm's
++Minimum Supported Rust Version follows the kernel's host-Rust toolchain
++requirement.
++
++kconfirm is built directly by Kbuild with ``rustc`` and has no third-party
++Rust dependencies.  Bindgen generates the raw Rust bindings directly from the
++Kconfig parser's headers in ``scripts/kconfig``; the generated file is kept in
++the Kbuild output tree.  ``make kconfirm`` verifies that ``rustc`` and
++``bindgen`` are available and recent enough before building, and exits with
++guidance when they are not.
++
++The optional ``dead_link`` check verifies HTTP and HTTPS links and requires the
++``curl`` command at runtime.
++Attempting to enable ``dead_link`` without ``curl`` available in ``PATH`` exits
++with an error.  An internet connection is only required when this check is run.
++
++kconfirm can be built and run from the top of the kernel source tree::
++
++  make kconfirm
++
++The compiled binary will be available at
++``scripts/kconfig/kconfirm/kconfirm`` for an in-tree build, or under the
++corresponding ``scripts/kconfig/kconfirm`` directory in the Kbuild output
++tree when using ``O=``.
++
++Run the kconfirm tests with::
++
++  make kconfirmtest
++
++Run the tests with the kernel's Rust lint configuration with::
++
++  make CLIPPY=1 kconfirmtest
++
++The default checks currently cover dead code analysis, as well as invalid
++(reverse) ranges and constant conditions.  ``select_visible`` and
++``dead_link`` must be turned on explicitly with ``--enable-check``;
++conversely, any default check can be turned off with ``--disable-check``.  Both
++options accept either a comma-separated list or repeated flags, so the
++following two invocations are equivalent::
++
++  make ARCH=x86 kconfirm KCONFIRM_ARGS="--enable-check select_visible,dead_link"
++  make ARCH=x86 kconfirm KCONFIRM_ARGS="--enable-check select_visible --enable-check dead_link"
++
++
++Command-line options
++====================
++
++**NOTE**: kconfirm's arguments must be provided in the ``KCONFIRM_ARGS`` make
++variable. See `Examples`_.
++
++Every option below also has a single-letter form, and accepts its value
++either as the next argument or attached with ``=``, so
++``--enable-check dead_link``, ``--enable-check=dead_link`` and
++``-e dead_link`` are all equivalent.
++
++Available options:
++
++``-l, --linux-path PATH``
++
++  The path to the linux source tree to analyze.  Required.  ``make`` uses
++  this internal option to pass the current linux tree.
++
++``-e, --enable-check CHECK[,CHECK...]``
++
++  Enable one or more checks in addition to the default set.  May be
++  given multiple times, or as a single comma-separated list.  See
++  `Available checks`_ below for valid names.
++
++``-d, --disable-check CHECK[,CHECK...]``
++
++  Disable one or more checks from the default set.  May be given
++  multiple times, or as a single comma-separated list.
++
++``-k, --kconfig FILE``
++
++  The top-level Kconfig file to start from, relative to ``--linux-path``.
++  Defaults to ``Kconfig``.  ``make`` passes the same file that the other
++  Kconfig targets use, so ``KBUILD_KCONFIG`` is honoured.
++
++``-h, --help``
++
++  Show the help message and exit.
++
++
++Available checks
++================
++
++Each check has a string name that is accepted by ``--enable-check`` and
++``--disable-check``.  Checks marked *(default)* are enabled unless turned
++off explicitly.
++
++``duplicate_dependency`` *(default)*
++
++  Reports duplicated ``depends on`` entries on a single Kconfig symbol.
++
++``duplicate_range`` *(default)*
++
++  Reports duplicated ``range`` entries on a single Kconfig symbol.
++
++``dead_range`` *(default)*
++
++  Reports ``range`` entries that will never be evaluated, due to an
++  unconditional range entry.
++
++``duplicate_select`` *(default)*
++
++  Reports duplicated ``select`` entries on a single Kconfig symbol.
++
++``dead_select`` *(default)*
++
++  Reports dead ``select`` entries that will never be evaluated, due to an
++  unconditional select entry of the same config option.
++
++``duplicate_imply`` *(default)*
++
++  Reports duplicated ``imply`` entries on a single Kconfig symbol.
++
++``dead_imply`` *(default)*
++
++  Reports dead ``imply`` entries that will never be evaluated, due to an
++  unconditional imply entry for the same config option.
++
++``duplicate_default`` *(default)*
++
++  Reports duplicated ``default`` entries on a single Kconfig symbol.
++
++``dead_default`` *(default)*
++
++  Reports ``default`` entries that can never be selected because an earlier
++  unconditional default or a default with the same condition takes
++  precedence.
++
++``constant_condition`` *(default)*
++
++  Reports conditions on defaults, selects, implies, and ranges that always
++  evaluate to ``true`` or ``false`` because the condition, or its negation,
++  is already a dependency.
++
++``reverse_range`` *(default)*
++
++  Reports invalid ranges for int and hex configuration options.
++
++``select_visible``
++
++  Reports configuration options that ``select`` a config option that is
++  visible to users.
++
++``dead_link``
++
++  Reports broken HTTP and HTTPS URLs found in Kconfig help text.  Because this
++  performs network requests it can be quite slow, and is disabled by
++  default. May also have false positives.
++
++``duplicate_default_value``
++
++  Reports duplicate default values that have different conditions.
++  Suggests combining the conditions using a logical-or ``||``.
++  This is a style check, and is disabled by default.
++
++
++Examples
++========
++
++Compile (as needed) and run on the current tree::
++
++  make kconfirm
++
++To additionally enable the dead link and select-visible checks::
++
++  make kconfirm KCONFIRM_ARGS="--enable-check=dead_link,select_visible"
++
++To disable a check (here, ``duplicate_dependency``) while keeping the
++rest of the default set::
++
++  make kconfirm KCONFIRM_ARGS="--disable-check duplicate_dependency"
++
++To check another architecture, such as RISC-V::
++
++  make ARCH=riscv kconfirm
++
++To run the default checks from a kernel tree separate from the current
++directory, such as ``~/repos/linux``::
++
++  make -C ~/repos/linux ARCH=x86 kconfirm
 -- 
 2.54.0
 
