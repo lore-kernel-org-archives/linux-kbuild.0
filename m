@@ -1,72 +1,72 @@
-Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
+Received: from fout-a5-smtp.messagingengine.com (fout-a5-smtp.messagingengine.com [103.168.172.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1569C3B71D8;
-	Tue, 28 Jul 2026 06:47:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACB6940313D;
+	Tue, 28 Jul 2026 08:31:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785221277; cv=none; b=R5jDtiX1T6KgcB02c4fRrl/buBQ4+uc2FxM5nseVy13kMwA6GRF1G3TnuBGYVfacl9jbKJqphgCrRvd1+alnbpxEDYyO5A0j6fA+9PqH45ysdSfUy5qjIlz903H4Hl0x2DIyHdLCMrXmgqduK277rTI2mpuq7sDRScdu0xE1wCU=
+	t=1785227488; cv=none; b=Ny9+MyaPdv/mVlSXasx2PzKiQEmFwoFkxkPlBo+3PzuZYCfeSibt+taBwkLJ1DOvIr1VgXFt4zfyRx/uetsvrw/ie1jDZGLcYm9gfGSDV5EYg8z+VpwcEoXxHJrFAGp1yleuFd4mPwXve1SCEp1us59UGul4M19+18xcT9Kh71s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785221277; c=relaxed/simple;
-	bh=jL1HNMpPt/GO3liJ24E58urnwtF1g3pDEJDCdT2S8DA=;
+	s=arc-20240116; t=1785227488; c=relaxed/simple;
+	bh=BmhiRXsF/Xkdvqt4B1Tv407/jwwHAOdQHkqv4CuchV4=;
 	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=tUXW9ZIn+i0kXUTnC1NCGuRRITyY6bdJRSbwUqRnmkWiHiUpYaFbFGZJ7oSB88D5+gvFe5ExgFVxasKLE5uX5SXIqUPbUtMel4Akcy8i5g4ncYunAzbGX5JR2jq2d9NJ6ItPiS04KTFzh4Gtz4i3eMTFWbftccYHGjW0jvWFBBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=ZKn7BQvN; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=JLXtEnpN; arc=none smtp.client-ip=103.168.172.144
+	 Subject:Content-Type; b=GqTsVbxuP7l2eyb6/hFrCZcETUJL/yfDpC21SPN1+mCVRfjgrlabCmszNkAYOm1ptW6lLnHB3z21F694UIKrFD1mKHUy9M6ZXqyJto5RcHr80wIgX2Ac4OsPk0pE5JAoV0D3cE3TprdlUTyG1D/Ze/it6Cl8xhQO+fFE24jyp/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=K5wGLAPn; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=M4KALdE6; arc=none smtp.client-ip=103.168.172.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="ZKn7BQvN";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="JLXtEnpN"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="K5wGLAPn";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="M4KALdE6"
 Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfout.phl.internal (Postfix) with ESMTP id 0F83BEC001B;
-	Tue, 28 Jul 2026 02:47:54 -0400 (EDT)
+	by mailfout.phl.internal (Postfix) with ESMTP id 5B2ABEC01BC;
+	Tue, 28 Jul 2026 04:31:24 -0400 (EDT)
 Received: from phl-imap-05 ([10.202.2.95])
-  by phl-compute-04.internal (MEProxy); Tue, 28 Jul 2026 02:47:54 -0400
+  by phl-compute-04.internal (MEProxy); Tue, 28 Jul 2026 04:31:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
 	:cc:content-transfer-encoding:content-type:content-type:date
 	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1785221274;
-	 x=1785307674; bh=jTrQIT2U8agEh1+MZm0yljI85ghxytmZiTqziruUcx4=; b=
-	ZKn7BQvNzgfpLb8/QmPPyh2aloURbjIdz2l8GRiUBkIfOoJzPJLkpyW4YPgm3XEW
-	e4hKQzIwOZHMiRuVSbVzWY9yRXUxHhQMUagj0a6CG5ysY8mc5x/B46dMsnIyL530
-	FpmFGll0012R4Z3FR+9suDjXLkPcosgMvG8CtFFSskKxzZTwXrOo9oclG3m1sPW+
-	thYu9UePC4tLj9Uyz9Qkt2hjSJXx0V5gjlc1+urkeRtIBVEN9Fldlh/4PGpishKH
-	7I1t/s5twy9sxAI3QWivzgMh95Q6dkMVjXbsezlkdwt1n2AgUjy2I/3ysxj0I9Aj
-	v5l9MLuGjcF6e11Xkf/XsA==
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1785227484;
+	 x=1785313884; bh=WmV9ogVI7KdnzvIZ9clI/94mDKwEc52x603Rw7OWgZc=; b=
+	K5wGLAPnmmUNdAAfBLkr90npgtnZ7KsCovyybociNQoXiUAvkJL/QjSAmgdKagoq
+	35GOZCJthOScQJiDNTFTuYX3sE3WEznu1/ADAXWJJv5fdKNMwvHXBXIei0qKIndE
+	px26DDxREN6/25N0t/zV5h4Cr3kOsvQL/kg9cWAYe2DsUx6B50McHDIM5vQgFggO
+	pX2WgGJeTZg8kssFQqKB5dnP6TO9yNgsSX3OQEgqQgo84Zc4ZuXMG78JJwr8ltbE
+	4yperzTPWHlh8NVdQyWAQ5mTop4JqBvqvKOPLX1B4cMB8DZnmj2cstmG04WX5i+B
+	j8J1MWoLwOC+YcXbTU1Hpw==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:content-type:date:date:feedback-id:feedback-id
 	:from:from:in-reply-to:in-reply-to:message-id:mime-version
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1785221274; x=
-	1785307674; bh=jTrQIT2U8agEh1+MZm0yljI85ghxytmZiTqziruUcx4=; b=J
-	LXtEnpNhJQiAUj//LIEAuYsS0ToJfLiENcXWpybngZj46c4KzvzCMMkOkhL286bP
-	lEKylNjAZjTtQtagVQlZ5+pyjjeq4p1tk20JIQ1nTqKLbHzwzunkjJifQDV0KV+D
-	I2qaaIDzuXtP0AG2q/fYiHtwDR7CZ49Oc7oAWYOQRvGo1/9uqCcUJ6TnsxQgEjvz
-	ABUH0gWuBVGEr0HATC4mMAU+va4qnFbNYGdTnIYZFjF2HKetHcymD/+B3jm7eoQ0
-	3CX7kV1fF5RODA4YKQv2D8uH/NWa43ARqUOBWYtCbawrBCrP8XDq1dTPxzUY3/jN
-	JI0P3C6XHtD+e/V9EWBqQ==
-X-ME-Sender: <xms:mFBoavzfEEcOkUEIwTlJ0PpjTaQtxuQoM5zXbvDrnNsmSTEViM9oAA>
-    <xme:mFBoaiGaSkv4YwV0_BWiIuLXl8VZuShYxoj_K0SvpnVyzL-SsCNp8mK30tgnON3sF
-    UAGxiLjd7EL8bj0ZTSBRh1NcFkG9EHhAkyDjkRsneT7NkLw0mciWtM>
-X-ME-Proxy-Cause: dmFkZTEjoCVHaVjPXuzYKRValcescawsEq0DteW7bQchJ3/qpPslBVDXzh9z1hcsCXO1I1
-    iekoN9/2A2ADqBRUkJRPVrOJf9ogXtzGnZ2aIeqaxKmBAesU4kk+gMkwSrOcayX1TbK/4+
-    /M4oHiJyCO0MDl/xHBfenG3CkTk10yqUiYN3VAFvfVYkU1rZVz3yd7cd44nSJGSzoEvw4s
-    TmXWZrSHxJghiYKcS6NGAIXwlVvtxLa+tHQ5FZOr8VDymAwsP55O+vQHkyk7/KK7SDP73e
-    Kh76Xu7b3Qoa3PC6nYEHcjRAn/kWKp1gD9RK+0AzqWTrPwcjRl2QdxArjTI7If8F0raQH2
-    8SEn+xnUl8QXYvu0VcM02yr7llR482fMx2krje6evb0Kef5Uu6tc63hqSllYVwOEW2F77F
-    Bt38XGTQ1/BQBpPUTOr1vvSHqF8C/HQmUNWRJLeb+G5PI0kgze6UZPOQpUFgUzLaj6szvv
-    bk6rp4DDoOg7F3ZSq5mJPQ4crvCE9+Wj7jey8+fJxdDhpjvTNlEE8PCljkmCsWlnL9iJOq
-    CaC844OaY4n1AAq4bPsGreaRGBFDzmWvUDohwM37b7ONu2LdanxgHCW4tIpSyzABukQ7b7
-    X8eeD3mIvDmgZHWhZXVVJ1t73+RJnOq7vXTCTtBuy87Q/V28iE9cwWjxgO+w
-X-ME-Proxy: <xmx:mFBoavU_Yghwq5OMH_6sucyD_h1UMGHR9gJk6AHRglZ-_672E5Fe0g>
-    <xmx:mFBoavxpmQW3fGSj6PlnXsiDTYQHXAx6mK6OuDxva_WM_liZmMmqDw>
-    <xmx:mFBoam9KVf0imbbRwoArz1jo60unXVm2LSqE9a-uLsq2FezgHdBi-A>
-    <xmx:mFBoak_x_MDSdRT-XLu48KJSB6ItKgpuPDS7NIxpWQQccexnWvVN0g>
-    <xmx:mlBoamHagtu53e8KPMtj_0eqy-_EnO7yVrftkwtCzu0nzwgvMU0qMGnW>
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1785227484; x=
+	1785313884; bh=WmV9ogVI7KdnzvIZ9clI/94mDKwEc52x603Rw7OWgZc=; b=M
+	4KALdE6IvfSKgD+AnQ6cDg1FoAb65RwCbTX5yEH+eBzOEFSPB+cHx7eV9cuHaLKF
+	mZyrYM38UAVIos29bCNoY8cqELBNykFXlU9pC4UW3X2gC7xpKtgO8EuHyXh1I7Et
+	C+Y/N+EKHqjMBwG3Bu5IU82HTg1znsgF+pVElXS8bs0hLI9OjjRQkF8p2DtiOEit
+	T3J84y2dpm+XhEhieguVrPqYX9BOV/chjyWSzwZdbynvDXqoTAO78q8gcwasYNme
+	WuDsS6jOY9PNYJsfSeHhN9kxl0zJNfB2vjfqn7H9+eOR1gTN+x+VIIRHKoy/YDxx
+	ZGwXXFDSiNpT773AoXDNw==
+X-ME-Sender: <xms:22hoaglDW-y3JLMi9hl_63cM7D3GuXjlRqlNuLIWRCPT2YQJCMwo4A>
+    <xme:22hoaqp08BY1ph4wzGWVjkxk3jrUpoD3ySBK6N041Pq2JBOJh4CZL7Hhm3hB9boXF
+    SpA81RlMUvgz91mdiBV7ZOs9trnjFiw2Vpiz0f1-bvYMhb3fF4OADw>
+X-ME-Proxy-Cause: dmFkZTFchfChdxIe856QZRrA3eWV6srr4bWEz5VSEi8kLA7G3a6a/ZcjhWegZqGnQdi3/3
+    bcpb+NxCK+qVIEDAs7V/gsf3g0pDVjcramgkfEohzopDbbA414abiecHAWFfzjKLvsf4z5
+    5835pfj+3YwSrbY9kAuz/pFBBoSJCmhASklKzW9QBJU2N1wjaXmd9LoAQQSg4Xljt0rTWr
+    vi5zROALystdp3euF2Avp+G2bZIu5yLGfWA0NWQ8AZi0oyow6LV7vozKAewyqyo4lS/cam
+    G6ceC/ZNphzaK6HvPBXbeFfPVBS3n3JsnuREZuToEHOjB00xF4nwutLNjkhhh7c210C3HX
+    MXSBv2ox3JJXrD9Pd3o8J8hRv6PURihq4jsJ/1eLrIJWkDxkczUqP1fPEc087Bj8l59K9A
+    GoiH71zjEgxL1IsjislIDW2NvWTTQwRfuCQ1UKuzmsSmLiVnXqnGnowbfj5Vv4yiC4uQTF
+    6N1lip1oW5W25/jkG4lnwTTjO+jztbIzfegN3+3vGYrqqR6FqXDp2k1ZtNhCgGrXJgq419
+    B/YLsTef8VWXAMPCS3Yyxuw6f/KgNo4Uh5BVd4s4asb+WIuEyHZg2DrD6+qcqHLws5tEYj
+    82jNP1ZtkMwGYm7Nb8JBUmeIMDoNl6NWyc59ANIwgcDeVIp3rG/+kFCoQmgQ
+X-ME-Proxy: <xmx:22hoahUFhGeud3IJaLCL7xkLU2_kTfn0YhL6MJP4-iLZHEnSJjx5nA>
+    <xmx:22hoahTKnR6YZfavdPC6GtIpvmnKcnUOj2QGjOzP47N0u69xTmO9rQ>
+    <xmx:22hoapCIpdHE0YbnInGsh0W1SgdfDe1hNRW4HztP3I1puu2AP2v5hA>
+    <xmx:22hoagLJOrig4_9vrRlAw9LQfQ7reBCpk9KIOvu0CjYkZHAfRppyuA>
+    <xmx:3Ghoamj6IPxUMQUbUgy-VDdjAgyjgRYhK5Crz_vSBjO8v7F59K0OqHKd>
 Feedback-ID: i56a14606:Fastmail
 Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id A44B7182007E; Tue, 28 Jul 2026 02:47:52 -0400 (EDT)
+	id 3532B182007E; Tue, 28 Jul 2026 04:31:23 -0400 (EDT)
 X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
@@ -74,8 +74,8 @@ List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AAUiJyq0JrqF
-Date: Tue, 28 Jul 2026 08:47:12 +0200
+X-ThreadId: AlbVG-vHP6D3
+Date: Tue, 28 Jul 2026 10:30:52 +0200
 From: "Arnd Bergmann" <arnd@arndb.de>
 To: =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>,
  "Thomas Gleixner" <tglx@kernel.org>, "Ingo Molnar" <mingo@redhat.com>,
@@ -84,33 +84,59 @@ To: =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>,
  "H. Peter Anvin" <hpa@zytor.com>, "Nathan Chancellor" <nathan@kernel.org>
 Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
  kernel-dev@igalia.com
-Message-Id: <7ada7223-3fd5-4637-95c8-d24165d0b7bb@app.fastmail.com>
-In-Reply-To: <20260727-tonyk-syscall_table-v2-1-95d4f1ee471f@igalia.com>
+Message-Id: <a10b536c-42d5-4884-bfd4-2210845b1f7d@app.fastmail.com>
+In-Reply-To: <20260727-tonyk-syscall_table-v2-0-95d4f1ee471f@igalia.com>
 References: <20260727-tonyk-syscall_table-v2-0-95d4f1ee471f@igalia.com>
- <20260727-tonyk-syscall_table-v2-1-95d4f1ee471f@igalia.com>
-Subject: Re: [PATCH RFC v2 1/4] syscalls: Create unified partial table for all archs
+Subject: Re: [PATCH RFC v2 0/4] syscalls: Add a shared table for all archs
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On Tue, Jul 28, 2026, at 04:47, Andr=C3=A9 Almeida wrote:
+> The generic table starts from 403 (clock_gettime64), the first common =
+syscall.
+> The scripts are adapted to x86 specifics, like not generating the comp=
+at entry
+> point for x86_64 and placing x86_x32 things in the proper order. x32 i=
+s likely
+> to be dropped from Linux soon but for the moment I left the support th=
+ere. If
+> this sounds good, next revision I can add the docs bits too.
 
->  	echo >&2 "options:"
->  	echo >&2 "  --abis ABIS        ABI(s) to handle (By default, all=20
-> lines are handled)"
-> +	echo >&2 "  --common-tbl       Use the common syscall number table"
-> +	echo >&2 "  --no-compat        Don't generated the compat version"
->  	exit 1
+It may be easier to skip x32/x86-64 for the moment and focus on
+the architectures that we know need small changes (mips, powerpc,
+alpha).
 
-You don't explain what the --no-compat flag is good for.
+The patch at
+https://lore.kernel.org/all/20260707212252.bYk3-AlU@linutronix.de/
+still hasn't been picked up yet. If your series is done before
+we actually remove x32, we may still need to add a temporary
+workaround for it, but it would be easier to avoid that altogether
+by waiting a bit.
 
-I would hope we can avoid adding even more flags here since
-there may be other (external) scripts that process the same data=20
-and that need to stay in sync.
+> I've tested this with x86 and arm64, by comparing the syscalls_*.h and
+> unistd_*.h files generated before and after this patchset and they are
+> identical.
 
-> +COMMON_TBL_PATH=3D"../scripts/syscall_common.tbl"
+I've had another look at what I tried previously, here is the list of
+things we have to figure out to do this properly across all
+architectures:
 
-Hardcoding the path here means the script can no longer work
-outside of the kernel tree.  Maybe you can you combine this with
-the --common-tbl argument to pass the file name?
+- separate offsets for base and common table on alpha. Maybe we can
+  just process the two tables separately here and combine the
+  output files afterwards?
+- special __sys_clone3 entry points on alpha, m68k, mips, parisc and
+  sparc.
+- combine mips n32/n64 tables into a single file with regular
+  use of compat entries for n32, in order to handle compat entry
+  for the common calls (epoll_pwait2, pselect_time64, ppoll_time64,
+  io_pgetevents_time64, recvmmsg_time64, rt_sigtimedwait_time64)
+- come up with a solution for nospu syscalls on powerpc (clone3,
+  set_mempolicy_home_node, rseq_slice_yield). Possibly dropping support
+  for spu syscalls entirely, making all common syscalls implicitly
+  nospu, incorporating this in the common table, or handling this
+  in the syscall implementation where necessary.
+  note that newlib still supports spu syscalls, but only lists
+  numbers up to __NR_sync_file_range2 (#308). gcc-10 and higher
+  no longer support SPU at all.
 
-     Arnd
+       Arnd
