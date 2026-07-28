@@ -1,109 +1,123 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8E6131E84B
-	for <linux-kbuild@vger.kernel.org>; Tue, 28 Jul 2026 15:58:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB73730D405;
+	Tue, 28 Jul 2026 16:12:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785254321; cv=none; b=msAzOBhKXhxkwD/x6XVCMzLh+HYHjKAnvjT3jy1rq4tSi5A2hh4G+u12WiT/+sXC6bYM4QLEfe4pWIzk5HRo/1xOZePN7exZRE1d4bUBT2UWhoGSLtY30wd0Ei+OPMn+EN6M7rRHbILsJx9wq1nQ05bGgBcN9Hq3TlJv6TKorj8=
+	t=1785255180; cv=none; b=U/c33r5/C9PNmiLhu6PmNmt8g3hJ/QrLI0mlNws6g8yU2fu1ALxWxuYuFYpvV1JEVZc+uWXORrNx24c9Qul2q2WJjfDYEhzhdO3XWBxnpKRzt3jHFap0yFgZJyhi9aD7Gsr9TJJuYwzsACo9nqLu9MjGoIYkm2auv/gpdLz/+cI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785254321; c=relaxed/simple;
-	bh=bhtTGh3WhKGfAJ2ZgmW3tEJx+gzkw/LVZhI4XjwwUFg=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=C+bXXr1oPUtL/yIpqxm0778lIcR/RjUnXdHZX2SFl7htWft7n2duHCz4vrvJxy3zT31v5jtAqdH3KnRNrCkaOXH5s0CsH2tcNcb+4wz9f36+L5FW3a844/cKPCPgxkBrOVhRa1jBebNYm084TtjviA6iMMOVM1iN7mVv9F4vifM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UbsDr0L5; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785255180; c=relaxed/simple;
+	bh=cSpsTArrUzdKo6lgjXa5SA4zESw++v68dqlCte8Y7zA=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=H5pEK9RClaUBvUVxzICaMHBAc6O+1U7pB6+WytLTYq2KhlIajCJyazCevgLVSXcsvQEXxntxYvTFuSes5xCB0mZUi3cDtbnJ35Wwfd5gQlUKagTauO5NVFcneg2n0OGKY/3KtkNfhgfJMJO3RfdWZDi5FfylfvxbNYCT9Z6RwLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=sseMI+iH; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UbsDr0L5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C34691F00A3D;
-	Tue, 28 Jul 2026 15:58:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785254320;
-	bh=YMsTw/tkD0NUqorU0KlJogo4RGg+JnwEwCWMocAIXp8=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject;
-	b=UbsDr0L5jBAXI3auKrIqD6mHfkiAqE8LzOvnhvYTXMSutyTg71li6QKQewaKLU32D
-	 cJvBzgQ9CW8nj0+wWDkPdV7ohTbSping0Z1eq+NOd7Rfj4zr2/qOojc5sODEzbm9QC
-	 ADsLEtV/GS7HQLCxwM4a4GZnjVjoTonm2B3fuHdhS3ZrSTxEZL88KjHie7meA1EqG2
-	 TCCsKjQnVhUmcaNxpqqpmJQHjYjqC563oW06pakgvdxd95UtzKNfjjxpZ8U79l/nLs
-	 Aw8yleIu4DZY1JtuGAv5Qnu7HCOduyLMrdsHPZQqYrD4MLz9lsBvDo+0tYNFK9nPAl
-	 ol18d4uqyZCzQ==
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfauth.phl.internal (Postfix) with ESMTP id AB8ECF4006A;
-	Tue, 28 Jul 2026 11:58:38 -0400 (EDT)
-Received: from phl-imap-05 ([10.202.2.95])
-  by phl-compute-01.internal (MEProxy); Tue, 28 Jul 2026 11:58:38 -0400
-X-ME-Sender: <xms:rtFoahW3-kMnOB3m5LZOP5HfDX2gfYXwgNesuAG4rEiVN6cSKNCpqA>
-    <xme:rtFoasalJwsilIMD1GP0mca7EORw4mG6YJy4gvhK58_IYz2p3KGh-zO29-fDg2ymJ
-    bArY1vw6lFqmw2cPL8Kq1ybPjj6WxK6nHkNWbUjsjuhLWoBcLFkHr0>
-X-ME-Proxy-Cause: dmFkZTFXEph7YmYEKJKvkqx/ZdeTEJLglIKkWgafepB9fHJPn8OsK8iconXZhQciu0skzK
-    qgqISs0IRHKhxPOikf5HYnN4B9n8zgjgnqLpKCH0YUlwfAlLpjkOqe2eSCHDoXnT0kwtkG
-    ZN9l3+otou1NmMDVhiYufCajc3kHrICYrXpUwdI+1WWUQmWl5yT3ImOr4nRUpZsvE6+6NB
-    a5xikz8zrLhB5zXQpzxqTfBLfjFuHZwDvjjWtJbGbggF1TZm8F/Xvbswf6MOID1iq8Xn3H
-    t1cJD5hBxOYFuwWDnyVF0K9rBM5EGxqwSHMOcjbppDplGJksVmxq3U44IBQPSgzZRphQcJ
-    s6pUjJcyeC7t9F7IKyH22h8ocZCjQF38nAvrNLm1OISgE49jLC8zL853f9MXLmqUn3CG00
-    Ja+X9g5/maHKDxmrmBiSiJhLd3VGTALr4UYgPbhWof3ZxvZl+AOlxD53XMpdn1saCHMM6E
-    dZXJgxj2XL+SYcA8Ed91V9D1vbWm1zxzBhMsDNdD/3Qct/prcJXTBie5rhAit/mB7PyNOg
-    hebvDMMjKiOMICNi60zmLlKzes035In/dwSoXdNlwEiEVFGaa2tfO98TOOGJev6M8XMjSB
-    badIHUxvdjTz5ywH0/5EhoWLgcHreubmDN01ga0QRoj1sbm2TJcv9Qsgb92g
-X-ME-Proxy: <xmx:rtFoaoGSuh4txDuVS2kLzVLGiKpuPIASZo0I6qJ1TF1xoO3vz6uafw>
-    <xmx:rtFoahwOab2CqPH-fRxQ9yZyE7y23V21mZ2h_H707csdAMfmntIaow>
-    <xmx:rtFoanlt9iZg0B8ey5_QHiIcWYxMZaeJM2KA0dhpNVXw5UKmYiGUKQ>
-    <xmx:rtFoaoCpC-2_1Ys9mQ4NCqyFfprLNEImXl9ZgD_D9eOGcn-P-XfueA>
-    <xmx:rtFoaiKk96He8-dMZPoBHVWFvkBlzNlvN5cjFKMb40UTyJsedHx_fyXa>
-Feedback-ID: ice86485a:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 8CEA9182007E; Tue, 28 Jul 2026 11:58:38 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="sseMI+iH"
+Received: from ehlo.thunderbird.net (c-76-133-66-138.hsd1.ca.comcast.net [76.133.66.138])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 66SG5bc32606012
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Tue, 28 Jul 2026 09:05:38 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 66SG5bc32606012
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2026062701; t=1785254739;
+	bh=HRK60T+Wtw8FN+HR/sReC2H3XrbSD61nlM4UqigidL0=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=sseMI+iHbalc9ZBH9lO3M0Mc2aVcen6eZKX/rppoQ3dcrSkUM+maPCoj9JE2h1znH
+	 zXgeD4+g8jxddLSiRc/NVNuI23wzdgnZPWMyskZGLVdtgqwzNJcBp6Is5lDedpPymN
+	 PTNzU+nJlhPzgKd7XYKkv1u2UKb2sFTk3NxLY+0sxx/NVeMp0cIhVTjvB/+0voi1g3
+	 VXMDueZNGq9fq/Ng3YxejDvgKyCpx0njvXKHPH0pdgI5Cc+bXzT+ND+LXFM6D3jhmd
+	 ZHLE/rEOkga7QYzun4vgJC9KMjYNWxsnnYq5s2V7olR3fD8AiLxhe3lgw+ZCnTGyXY
+	 oVZXpg0GhVOCg==
+Date: Tue, 28 Jul 2026 09:05:32 -0700
+From: "H. Peter Anvin" <hpa@zytor.com>
+To: Mingcong Bai <jeffbai@aosc.io>, linux-kernel@vger.kernel.org
+CC: Kexy Biscuit <kexybiscuit@aosc.io>, Xi Ruoyao <xry111@xry111.site>,
+        Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
+        Nick Terrell <terrelln@fb.com>, David Sterba <dsterba@suse.com>,
+        Ard Biesheuvel <ardb@kernel.org>, Jan Stancek <jstancek@redhat.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>, Petr Mladek <pmladek@suse.com>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        =?ISO-8859-1?Q?Thomas_Wei=DFschuh?= <thomas.weissschuh@linutronix.de>,
+        Simon Glass <sjg@chromium.org>, Marco Elver <elver@google.com>,
+        linux-kbuild@vger.kernel.org
+Subject: Re: [RFC PATCH] x86/boot: use zstd -19 if building for 32-bit
+User-Agent: K-9 Mail for Android
+In-Reply-To: <20260728143141.2870515-1-jeffbai@aosc.io>
+References: <20260728143141.2870515-1-jeffbai@aosc.io>
+Message-ID: <A7B9C461-C3EE-45FB-83E0-FFABB65F09B3@zytor.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: Ap1sJ7tdW81F
-Date: Tue, 28 Jul 2026 18:58:17 +0300
-From: "Ard Biesheuvel" <ardb@kernel.org>
-To: "Mingcong Bai" <jeffbai@aosc.io>, linux-kernel@vger.kernel.org
-Cc: "Kexy Biscuit" <kexybiscuit@aosc.io>, "Xi Ruoyao" <xry111@xry111.site>,
- "Thomas Gleixner" <tglx@kernel.org>, "Ingo Molnar" <mingo@redhat.com>,
- "Borislav Petkov" <bp@alien8.de>,
- "Dave Hansen" <dave.hansen@linux.intel.com>, x86@kernel.org,
- "H . Peter Anvin" <hpa@zytor.com>, "Nathan Chancellor" <nathan@kernel.org>,
- "Nicolas Schier" <nsc@kernel.org>, "Nick Terrell" <terrelln@fb.com>,
- "David Sterba" <dsterba@suse.com>, "Jan Stancek" <jstancek@redhat.com>,
- "Josh Poimboeuf" <jpoimboe@kernel.org>, "Petr Mladek" <pmladek@suse.com>,
- "Peter Zijlstra" <peterz@infradead.org>,
- =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
- "Simon Glass" <sjg@chromium.org>, "Marco Elver" <elver@google.com>,
- linux-kbuild@vger.kernel.org
-Message-Id: <f833d263-9f47-454e-bc64-818ac42d63dd@app.fastmail.com>
-In-Reply-To: <20260728143141.2870515-1-jeffbai@aosc.io>
-References: <20260728143141.2870515-1-jeffbai@aosc.io>
-Subject: Re: [RFC PATCH] x86/boot: use zstd -19 if building for 32-bit
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+On July 28, 2026 7:31:35 AM PDT, Mingcong Bai <jeffbai@aosc=2Eio> wrote:
+>When using native build environments (that is, 32-bit x86 chroot/containe=
+r
+>as build environment for 32-bit x86 binaries), `zstd -22' requests more
+>virtual memory than that could be allowed on 32-bit hosts=2E
+>
+>Introduce `cmd_zstd_with_size' for CONFIG_X86_32 builds=2E
+>
+>This is quite possibly just stupid=2E=2E=2E But there doesn't seem to be =
+a way
+>to detect the host environment=2E So I'm sending this patch as a means to
+>ask for your opinions=2E
+>
+>Any help would be greated appreciated=2E
+>
+>Signed-off-by: Mingcong Bai <jeffbai@aosc=2Eio>
+>---
+> arch/x86/boot/compressed/Makefile | 5 +++++
+> scripts/Makefile=2Elib              | 3 +++
+> 2 files changed, 8 insertions(+)
+>
+>diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed=
+/Makefile
+>index 07e0e64b9a98=2E=2E2261fb0d4d1d 100644
+>--- a/arch/x86/boot/compressed/Makefile
+>+++ b/arch/x86/boot/compressed/Makefile
+>@@ -143,8 +143,13 @@ $(obj)/vmlinux=2Ebin=2Elzo: $(vmlinux=2Ebin=2Eall-y)=
+ FORCE
+> 	$(call if_changed,lzo_with_size)
+> $(obj)/vmlinux=2Ebin=2Elz4: $(vmlinux=2Ebin=2Eall-y) FORCE
+> 	$(call if_changed,lz4_with_size)
+>+ifdef CONFIG_X86_32
+>+$(obj)/vmlinux=2Ebin=2Ezst: $(vmlinux=2Ebin=2Eall-y) FORCE
+>+	$(call if_changed,zstd_with_size)
+>+else
+> $(obj)/vmlinux=2Ebin=2Ezst: $(vmlinux=2Ebin=2Eall-y) FORCE
+> 	$(call if_changed,zstd22_with_size)
+>+endif
+>=20
+> suffix-$(CONFIG_KERNEL_GZIP)	:=3D gz
+> suffix-$(CONFIG_KERNEL_BZIP2)	:=3D bz2
+>diff --git a/scripts/Makefile=2Elib b/scripts/Makefile=2Elib
+>index 0718e39cedda=2E=2E09910dc57af3 100644
+>--- a/scripts/Makefile=2Elib
+>+++ b/scripts/Makefile=2Elib
+>@@ -464,6 +464,9 @@ quiet_cmd_xzmisc =3D XZMISC  $@
+> quiet_cmd_zstd =3D ZSTD    $@
+>       cmd_zstd =3D cat $(real-prereqs) | $(ZSTD) -19 > $@
+>=20
+>+quiet_cmd_zstd =3D ZSTD    $@
+>+      cmd_zstd_with_size =3D { cat $(real-prereqs) | $(ZSTD) -19; $(size=
+_append); } > $@
+>+
+> quiet_cmd_zstd22 =3D ZSTD22  $@
+>       cmd_zstd22 =3D cat $(real-prereqs) | $(ZSTD) -22 --ultra > $@
+>=20
 
-
-On Tue, 28 Jul 2026, at 17:31, Mingcong Bai wrote:
-> When using native build environments (that is, 32-bit x86 chroot/container
-> as build environment for 32-bit x86 binaries), `zstd -22' requests more
-> virtual memory than that could be allowed on 32-bit hosts.
->
-> Introduce `cmd_zstd_with_size' for CONFIG_X86_32 builds.
->
-> This is quite possibly just stupid... But there doesn't seem to be a way
-> to detect the host environment. So I'm sending this patch as a means to
-> ask for your opinions.
->
-> Any help would be greated appreciated.
->
-> Signed-off-by: Mingcong Bai <jeffbai@aosc.io>
-> ---
->  arch/x86/boot/compressed/Makefile | 5 +++++
->  scripts/Makefile.lib              | 3 +++
->  2 files changed, 8 insertions(+)
->
-
-Doesn't this mean ZSTD -22 is generally broken on 32-bit? How is this
-specific to the kernel?
-
+This is really just stupid=2E Basing it on the config setting is just plai=
+n wrong=2E
