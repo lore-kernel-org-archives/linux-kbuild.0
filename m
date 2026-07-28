@@ -1,142 +1,129 @@
-Received: from fout-a5-smtp.messagingengine.com (fout-a5-smtp.messagingengine.com [103.168.172.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACB6940313D;
-	Tue, 28 Jul 2026 08:31:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F9843ACF02
+	for <linux-kbuild@vger.kernel.org>; Tue, 28 Jul 2026 12:43:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785227488; cv=none; b=Ny9+MyaPdv/mVlSXasx2PzKiQEmFwoFkxkPlBo+3PzuZYCfeSibt+taBwkLJ1DOvIr1VgXFt4zfyRx/uetsvrw/ie1jDZGLcYm9gfGSDV5EYg8z+VpwcEoXxHJrFAGp1yleuFd4mPwXve1SCEp1us59UGul4M19+18xcT9Kh71s=
+	t=1785242589; cv=none; b=POekoQeWAXbRLXiWe5dO2XyRVszFzhQjsCglQeLM2lzmQqLHsVY2inEsg8k0T55uOcXwKRmAqEsyvhondqsp6Ww87FwP1Q0zNbwTSfBIL6nLA7Jx4BegwfhNi3tWGYUE/Y8LPdiDe3IZCHHw9/3eVnJBVM+NKUtpLEBZSgZtzDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785227488; c=relaxed/simple;
-	bh=BmhiRXsF/Xkdvqt4B1Tv407/jwwHAOdQHkqv4CuchV4=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=GqTsVbxuP7l2eyb6/hFrCZcETUJL/yfDpC21SPN1+mCVRfjgrlabCmszNkAYOm1ptW6lLnHB3z21F694UIKrFD1mKHUy9M6ZXqyJto5RcHr80wIgX2Ac4OsPk0pE5JAoV0D3cE3TprdlUTyG1D/Ze/it6Cl8xhQO+fFE24jyp/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=K5wGLAPn; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=M4KALdE6; arc=none smtp.client-ip=103.168.172.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1785242589; c=relaxed/simple;
+	bh=+I542TCyEiR2dkdc/EjJMpQVyAenOURWCaveKVfQk5U=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=EKAX06hcZjslc8NJ6BLDOr+IX1OsKQFSQjMlSNiozuCMoAqm62+8AK/VFPxKijCZK1UGB/Dkb7YmOM07yD/LoHfkf0gc5eZA1SVE2XR2AyONt+2fiW5dqaHr9JAoaK3Dz9pBc7Ofht5i+gWujJ12izYlALcBPYmA/Z1/SD/KS8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=fOEwYyTS; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="K5wGLAPn";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="M4KALdE6"
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfout.phl.internal (Postfix) with ESMTP id 5B2ABEC01BC;
-	Tue, 28 Jul 2026 04:31:24 -0400 (EDT)
-Received: from phl-imap-05 ([10.202.2.95])
-  by phl-compute-04.internal (MEProxy); Tue, 28 Jul 2026 04:31:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1785227484;
-	 x=1785313884; bh=WmV9ogVI7KdnzvIZ9clI/94mDKwEc52x603Rw7OWgZc=; b=
-	K5wGLAPnmmUNdAAfBLkr90npgtnZ7KsCovyybociNQoXiUAvkJL/QjSAmgdKagoq
-	35GOZCJthOScQJiDNTFTuYX3sE3WEznu1/ADAXWJJv5fdKNMwvHXBXIei0qKIndE
-	px26DDxREN6/25N0t/zV5h4Cr3kOsvQL/kg9cWAYe2DsUx6B50McHDIM5vQgFggO
-	pX2WgGJeTZg8kssFQqKB5dnP6TO9yNgsSX3OQEgqQgo84Zc4ZuXMG78JJwr8ltbE
-	4yperzTPWHlh8NVdQyWAQ5mTop4JqBvqvKOPLX1B4cMB8DZnmj2cstmG04WX5i+B
-	j8J1MWoLwOC+YcXbTU1Hpw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1785227484; x=
-	1785313884; bh=WmV9ogVI7KdnzvIZ9clI/94mDKwEc52x603Rw7OWgZc=; b=M
-	4KALdE6IvfSKgD+AnQ6cDg1FoAb65RwCbTX5yEH+eBzOEFSPB+cHx7eV9cuHaLKF
-	mZyrYM38UAVIos29bCNoY8cqELBNykFXlU9pC4UW3X2gC7xpKtgO8EuHyXh1I7Et
-	C+Y/N+EKHqjMBwG3Bu5IU82HTg1znsgF+pVElXS8bs0hLI9OjjRQkF8p2DtiOEit
-	T3J84y2dpm+XhEhieguVrPqYX9BOV/chjyWSzwZdbynvDXqoTAO78q8gcwasYNme
-	WuDsS6jOY9PNYJsfSeHhN9kxl0zJNfB2vjfqn7H9+eOR1gTN+x+VIIRHKoy/YDxx
-	ZGwXXFDSiNpT773AoXDNw==
-X-ME-Sender: <xms:22hoaglDW-y3JLMi9hl_63cM7D3GuXjlRqlNuLIWRCPT2YQJCMwo4A>
-    <xme:22hoaqp08BY1ph4wzGWVjkxk3jrUpoD3ySBK6N041Pq2JBOJh4CZL7Hhm3hB9boXF
-    SpA81RlMUvgz91mdiBV7ZOs9trnjFiw2Vpiz0f1-bvYMhb3fF4OADw>
-X-ME-Proxy-Cause: dmFkZTFchfChdxIe856QZRrA3eWV6srr4bWEz5VSEi8kLA7G3a6a/ZcjhWegZqGnQdi3/3
-    bcpb+NxCK+qVIEDAs7V/gsf3g0pDVjcramgkfEohzopDbbA414abiecHAWFfzjKLvsf4z5
-    5835pfj+3YwSrbY9kAuz/pFBBoSJCmhASklKzW9QBJU2N1wjaXmd9LoAQQSg4Xljt0rTWr
-    vi5zROALystdp3euF2Avp+G2bZIu5yLGfWA0NWQ8AZi0oyow6LV7vozKAewyqyo4lS/cam
-    G6ceC/ZNphzaK6HvPBXbeFfPVBS3n3JsnuREZuToEHOjB00xF4nwutLNjkhhh7c210C3HX
-    MXSBv2ox3JJXrD9Pd3o8J8hRv6PURihq4jsJ/1eLrIJWkDxkczUqP1fPEc087Bj8l59K9A
-    GoiH71zjEgxL1IsjislIDW2NvWTTQwRfuCQ1UKuzmsSmLiVnXqnGnowbfj5Vv4yiC4uQTF
-    6N1lip1oW5W25/jkG4lnwTTjO+jztbIzfegN3+3vGYrqqR6FqXDp2k1ZtNhCgGrXJgq419
-    B/YLsTef8VWXAMPCS3Yyxuw6f/KgNo4Uh5BVd4s4asb+WIuEyHZg2DrD6+qcqHLws5tEYj
-    82jNP1ZtkMwGYm7Nb8JBUmeIMDoNl6NWyc59ANIwgcDeVIp3rG/+kFCoQmgQ
-X-ME-Proxy: <xmx:22hoahUFhGeud3IJaLCL7xkLU2_kTfn0YhL6MJP4-iLZHEnSJjx5nA>
-    <xmx:22hoahTKnR6YZfavdPC6GtIpvmnKcnUOj2QGjOzP47N0u69xTmO9rQ>
-    <xmx:22hoapCIpdHE0YbnInGsh0W1SgdfDe1hNRW4HztP3I1puu2AP2v5hA>
-    <xmx:22hoagLJOrig4_9vrRlAw9LQfQ7reBCpk9KIOvu0CjYkZHAfRppyuA>
-    <xmx:3Ghoamj6IPxUMQUbUgy-VDdjAgyjgRYhK5Crz_vSBjO8v7F59K0OqHKd>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 3532B182007E; Tue, 28 Jul 2026 04:31:23 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fOEwYyTS"
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-c15f020a223so511582466b.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 28 Jul 2026 05:43:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1785242586; x=1785847386; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=fD4Ka0zrPbVAg4KYEq8UyY0zj2IasFwu7KBSI8jg6EM=;
+        b=fOEwYyTSwntIMbmpNZ9dr72rIj35P1rw9BIpPPHbhkCk8EkiGd/NPCLNyDx7lIn4F1
+         PXbDcWC+7UNAXarBNbdDuHts+GQDdDQb+hEQpKo46snu0Q+uw0arvRZTnWsGElWknXDo
+         GOv1DplO0IoHtm2FsyukSVPsCEeuUjmDhtoFoqn6OJoQBRjuy6omCsFpuzJGlTrzpUTK
+         D1AaIjvok5D7oj/TfwrlBPAmgDZT8VSQidhwgFS3cVI86EjIo5N0EGXgcLlogZuQrexB
+         sewOHlUodBFdv25ndVoff5NRpS8tX3ZB/5OQry8gIKNPxbi4QN5GuB0W9lO+dFp/aD6l
+         PSkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785242586; x=1785847386;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=fD4Ka0zrPbVAg4KYEq8UyY0zj2IasFwu7KBSI8jg6EM=;
+        b=ZWdz0XpZdJACJ6octAwhiEpU6asbI1WXJWZN037ZPoLAy5SS+e+DRMNBWis9WWTn1R
+         BESeDtzhJTp+Mo+FGUnL/xm6A4RGXAfYwypiz/k3ZCIGPvC6f6LV9c2XUoVDK2B+VPQ4
+         TzF3m6FZ3ODxX4HqP+5DF1ji6WClKNuhNyxq3tamBHr5dNZIhnrKSngLZ0dAu/bC5lyr
+         7O2T75csq+SAagI+dEhahmYOlBZh7eXk1Ty8SaYL2tUKO/Hbg2UWQHQxY0aXr45Mcvm3
+         OXTc3uQJTg6p7qIyvPFyMIVsAY9Y6/VP59VksY5t0FzeuXXwdllIvAL6WuIFb/jdcOWz
+         FSHA==
+X-Forwarded-Encrypted: i=1; AHgh+Rorga/fXzfXSv26fJED5coblhtYh2eEh6FZ3waFKvL5ZhIii5dfvS0XxEKfsfgeCKlbc0fuMdxZIdUYkZM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzvfo6lQCynw61f/B01vj9GsE08fioTYypukZeJHS7GlAad099X
+	7OjWyq09HrD41+xoyuo5MmbsSBo+QF87CL5CkTT6SaspnwxlyWNO2/bShrmPcvXHbRQ=
+X-Gm-Gg: AR+sD12DruLere1cq9EkBo5l7Y/6/pfDE26+AoVcvE/UzvpyF3zpWNpcuJFm/F1BROa
+	vncG5i7ic/XddQGtTFhouhAZzb51xMSCKf2leCmyCJr7OptIxESDIMzGPFUvMG+EKPh/n9Sw7wY
+	GhGf5PHVY9qJt+OhcShwaxVWHP4AMN+oL7N4FZcMW9MrlvvHwsgccNmYW72Xi6gCoUBKSvQuWN8
+	SRy2+YKY4LExdzJ0m1h7v2DngYbaEWE4cpyRESlBhUrbeD79J2+kFEgE5Z1erLeYcEUKm5X4t5p
+	sSt7RiyZcfSnYppZH1URx4jB0FLNurWF6i11/Y5BKq5MbtiQQAPLp1sUZrStQiVBBGgAja1hRwf
+	/hgZxAHii/pDwoY7C058DJd3u8y/fgEY583QKtbY0HuKp7rPR0o4+7k14TcgwrmkI1Z9Llme+M5
+	ujpsUY5FbXJiUvFVeM7DLHpg4et1wjDVlzc3daCf/2cpA0S1arqpgFlsmKh85cN0WM7Q==
+X-Received: by 2002:a17:907:d113:b0:c12:5e26:da50 with SMTP id a640c23a62f3a-c1f7223e43amr112857566b.65.1785242585774;
+        Tue, 28 Jul 2026 05:43:05 -0700 (PDT)
+Received: from puffmais2.c.googlers.com (150.230.32.34.bc.googleusercontent.com. [34.32.230.150])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c1c32c902d2sm745805766b.34.2026.07.28.05.43.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Jul 2026 05:43:04 -0700 (PDT)
+From: =?utf-8?q?Andr=C3=A9_Draszik?= <andre.draszik@linaro.org>
+Subject: [PATCH 0/2] kbuild: link-vmlinux.sh: more reliable 3rd pass
+ linking
+Date: Tue, 28 Jul 2026 13:42:38 +0100
+Message-Id: <20260728-linux-kallsyms-fix-v1-0-1a665156c898@linaro.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AlbVG-vHP6D3
-Date: Tue, 28 Jul 2026 10:30:52 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>,
- "Thomas Gleixner" <tglx@kernel.org>, "Ingo Molnar" <mingo@redhat.com>,
- "Borislav Petkov" <bp@alien8.de>,
- "Dave Hansen" <dave.hansen@linux.intel.com>,
- "H. Peter Anvin" <hpa@zytor.com>, "Nathan Chancellor" <nathan@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
- kernel-dev@igalia.com
-Message-Id: <a10b536c-42d5-4884-bfd4-2210845b1f7d@app.fastmail.com>
-In-Reply-To: <20260727-tonyk-syscall_table-v2-0-95d4f1ee471f@igalia.com>
-References: <20260727-tonyk-syscall_table-v2-0-95d4f1ee471f@igalia.com>
-Subject: Re: [PATCH RFC v2 0/4] syscalls: Add a shared table for all archs
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAL6jaGoC/x2MSQqAMAwAvyI5G9C6+xXx4JJqsFZpUBTx7xaPM
+ zDzgJBjEqiDBxydLLxZD3EYwDB3diLk0TOoSOVRoUo0bI8Ll84YuVdBzRdWGWmdVn2R9Qn4cHf
+ k9T9t2vf9AII7pq5kAAAA
+X-Change-ID: 20260728-linux-kallsyms-fix-95eff49b75b3
+To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+ Nick Desaulniers <ndesaulniers@google.com>, 
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>
+Cc: Peter Griffin <peter.griffin@linaro.org>, 
+ Tudor Ambarus <tudor.ambarus@linaro.org>, Juan Yescas <jyescas@google.com>, 
+ Guenter Roeck <linux@roeck-us.net>, kernel-team@android.com, 
+ linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+ llvm@lists.linux.dev, 
+ =?utf-8?q?Andr=C3=A9_Draszik?= <andre.draszik@linaro.org>
+X-Mailer: b4 0.14.3
 
-On Tue, Jul 28, 2026, at 04:47, Andr=C3=A9 Almeida wrote:
-> The generic table starts from 403 (clock_gettime64), the first common =
-syscall.
-> The scripts are adapted to x86 specifics, like not generating the comp=
-at entry
-> point for x86_64 and placing x86_x32 things in the proper order. x32 i=
-s likely
-> to be dropped from Linux soon but for the moment I left the support th=
-ere. If
-> this sounds good, next revision I can add the docs bits too.
+link-vmlinux.sh currently only uses the file size of
+.tmp_vmlinux?.kallsyms.o to determine if it needs to do a third pass. I
+was hitting a case where file size didn't change, but symbols changed
+sufficiently to still move subsequent symbols in vmlinux to invalidate
+kallsyms.
 
-It may be easier to skip x32/x86-64 for the moment and focus on
-the architectures that we know need small changes (mips, powerpc,
-alpha).
+In particular kallsyms_names grew by one byte between
+.tmp_vmlinux1.kallsyms.o and .tmp_vmlinux2.kallsyms.o, moving the next
+symbol to the next alignment offset (4 bytes), moving many subsequent
+symbols in the final vmlinux image in turn (until abosrbed by further
+alignment instructions). This failed the final link with:
 
-The patch at
-https://lore.kernel.org/all/20260707212252.bYk3-AlU@linutronix.de/
-still hasn't been picked up yet. If your series is done before
-we actually remove x32, we may still need to add a temporary
-workaround for it, but it would be easier to avoid that altogether
-by waiting a bit.
+    Inconsistent kallsyms data
+    Try "make KALLSYMS_EXTRA_PASS=1" as a workaround
 
-> I've tested this with x86 and arm64, by comparing the syscalls_*.h and
-> unistd_*.h files generated before and after this patchset and they are
-> identical.
+The two patches here are independent of each other:
+* Patch 2 in this series addresses the actual issue and also has a more
+  detailed explanation with exact failure case
+* Patch 1 could be omitted if deemed useless, but I found it useful
+  while debugging the issue. It just updates the kallsyms.c to instruct
+  the assembler to also emit symbol sizes.
 
-I've had another look at what I tried previously, here is the list of
-things we have to figure out to do this properly across all
-architectures:
+Cheers,
+Andre'
 
-- separate offsets for base and common table on alpha. Maybe we can
-  just process the two tables separately here and combine the
-  output files afterwards?
-- special __sys_clone3 entry points on alpha, m68k, mips, parisc and
-  sparc.
-- combine mips n32/n64 tables into a single file with regular
-  use of compat entries for n32, in order to handle compat entry
-  for the common calls (epoll_pwait2, pselect_time64, ppoll_time64,
-  io_pgetevents_time64, recvmmsg_time64, rt_sigtimedwait_time64)
-- come up with a solution for nospu syscalls on powerpc (clone3,
-  set_mempolicy_home_node, rseq_slice_yield). Possibly dropping support
-  for spu syscalls entirely, making all common syscalls implicitly
-  nospu, incorporating this in the common table, or handling this
-  in the syscall implementation where necessary.
-  note that newlib still supports spu syscalls, but only lists
-  numbers up to __NR_sync_file_range2 (#308). gcc-10 and higher
-  no longer support SPU at all.
+Signed-off-by: André Draszik <andre.draszik@linaro.org>
+---
+André Draszik (2):
+      kallsyms: add symbol size for kallsyms symbols that can change size
+      kbuild: link-vmlinux.sh: improve detection of third pass requirement
 
-       Arnd
+ scripts/kallsyms.c      |  4 ++++
+ scripts/link-vmlinux.sh | 20 +++++++++++++++++++-
+ 2 files changed, 23 insertions(+), 1 deletion(-)
+---
+base-commit: 0d33d21e47d9dc66f91e44da3fc9220c74d93df7
+change-id: 20260728-linux-kallsyms-fix-95eff49b75b3
+
+Best regards,
+-- 
+André Draszik <andre.draszik@linaro.org>
+
