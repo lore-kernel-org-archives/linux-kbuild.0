@@ -1,90 +1,110 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D8A3397942;
-	Wed, 29 Jul 2026 15:10:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7DC5383C89;
+	Wed, 29 Jul 2026 17:38:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785337819; cv=none; b=FuG1OViRI55WiEGxYs87cdbUB02DOf5V381dI8MjPRc50oyxiNZNWtOllzTNvFVFH/blPWYPhx6aZr1q2Y+mbJyQyPC8wAd5vcju1HtW4sWtGohqySjsw6qa3kOtyyCZy4M9+cFjmC4G45Kxp5r2XtI9+iyte3We+UfBJnZGSOs=
+	t=1785346704; cv=none; b=XULgGjWIFR3IvomGD3s73q2CigJZgPFMQeJNUPXSmZdH58QTbissEtOBbLUGk6zUbh5m5Ll1O5SDEm1IZ3jop5mcJuG2yZfQPOeM0qxQ3y+5z56DZkJ3VJcr7OAdgaR4UeZci4orWIOBCNblG84DMhWfjiWrc4ISFaUm/b2jDW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785337819; c=relaxed/simple;
-	bh=oCfTxDq+a656t5RgFUHIkq6G6GXDBOjbPfM9vHiXq6Y=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=nBDGtlM5o5E8jbvuVCG5UaGkwZcShW1Ld5gvUOlPMlePf6EY6LzQGlpy0hsoGDo+5fPo2h/NNR1m47cq4+e0iylpA75gtBv6bX2cHYLEx5r39TL5EE99cLCh9YfxnzAu0RPcSNRM3J0xGOhEdt9d+xmNI1kVOGkKG3xZfXAAD2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CWRnwc69; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1785346704; c=relaxed/simple;
+	bh=bsLvFynu/CXBMzHlGGgM/SFQd72ZoIg57HRnqcar0O0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=I5avC22OjVDzEKSgwzIrBNQeaWYOZZ3nPygLxvARUPpquwliSDReMWpTc5V360gTdWb6eZONtC7C0XUlpYQSIjnhQxHCf6meNNOXaol3XKGjZ2SWmTQk7DJC6kq0MPE1eAcR6FXsk/nyD9bc172A07NHJK8l5fbSahhDaylvrlc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o2kYbAil; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CWRnwc69"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1785337817; x=1816873817;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=oCfTxDq+a656t5RgFUHIkq6G6GXDBOjbPfM9vHiXq6Y=;
-  b=CWRnwc697Kr+7kZrtLp6J2bvCJGuPKW7WqUMQkZdmymhBfn3H7zU2A2Y
-   xOIseZz8DVZEC8j8HTNGXVyflU5mMWviDvQXTQeq+tbPchBM41QH9lgZX
-   FCx+x03jENqC9xmLQyu6Hv3ndgT18waThSUKwXQJXgKz87tRvDR3jf/TW
-   89+bxfrEd8hu32ACzrSfUqEDUowRNU3avXUB62UceSjT4bpvqu8Is5sae
-   0yuCB+2GMYbV9WfUQQiyM9gQpqDQr6xEcWRZUp7D7QCYbTNkZ3PRHr4yi
-   giFyCRNWLuMTrEivjCq6csz+8GScxNytB0Fn0eBSD0ABjCIdfRQAkxomK
-   Q==;
-X-CSE-ConnectionGUID: dAdsRdo2QP+pz3XrtjuGiQ==
-X-CSE-MsgGUID: iSUNsWclRSycIyoWYqu1FA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11859"; a="85961579"
-X-IronPort-AV: E=Sophos;i="6.25,192,1779174000"; 
-   d="scan'208";a="85961579"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2026 08:10:16 -0700
-X-CSE-ConnectionGUID: rWIgYwpZRMCK10Lj65brMg==
-X-CSE-MsgGUID: +0SDdbEDRySkUHmWip9Crw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,192,1779174000"; 
-   d="scan'208";a="265065823"
-Received: from slindbla-desk.ger.corp.intel.com (HELO localhost) ([10.245.244.212])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2026 08:10:06 -0700
-From: Jani Nikula <jani.nikula@linux.intel.com>
-To: Julian Braha <julianbraha@gmail.com>, Kees Cook <kees@kernel.org>
-Cc: nathan@kernel.org, nsc@kernel.org, corbet@lwn.net,
- skhan@linuxfoundation.org, arnd@arndb.de, stefan.hengelein@fau.de,
- linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, nico@fluxnic.net,
- officialnaumansabir@gmail.com, rdunlap@infradead.org,
- vegard.nossum@oracle.com, tj@kernel.org
-Subject: Re: [PATCH] Documentation: warn users not to use select on choice
- options in Kconfig
-In-Reply-To: <a4d8cb79-a696-4016-8c8a-a56b14992309@gmail.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park,
- 6 krs Bertel Jungin Aukio 5, 02600 Espoo, Finland
-References: <20260715220149.48700-1-julianbraha@gmail.com>
- <202607152119.BF8E377B@keescook>
- <a4d8cb79-a696-4016-8c8a-a56b14992309@gmail.com>
-Date: Wed, 29 Jul 2026 18:10:04 +0300
-Message-ID: <f362ddf2e0f3ecf41ed81f03f77577473c3e21bc@intel.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o2kYbAil"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 480FF1F000E9;
+	Wed, 29 Jul 2026 17:38:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785346697;
+	bh=cz3Xwd0Y4aNXwEwh2ZkPURxr8/lpAyUMfh9PAUbMSNQ=;
+	h=From:To:Cc:Subject:Date;
+	b=o2kYbAilKOp8oNGZlW7MTddzfR7pp/8dz0PSNFo/Ffi4RNDGafA6HNJ+DcInk2f2x
+	 b7ezGj1qX58jCgfqPLq6IEz7dxbous1YiX6ymgqAP51pvloyccDb8ySCrXzBKn7CH5
+	 Urg4pxIZ744ztzD0dzcXWKcZiQsaX2dC8okA7KYCOS2mTpd+GX/ds8XYiASZMd/q57
+	 UWOVjujp0xZeP9DMS1Rdr4L9WkCFDvweamu/BZhWoegkou2HOQEAYs0JLtxEGtJDjB
+	 SDP07vcN4oFCL+LlCUltHSH+GandNvNSH42Q9Bnga6BcPq2smvgs7dZb8teX0/jCRv
+	 THxao0tngdkSQ==
+From: Miguel Ojeda <ojeda@kernel.org>
+To: Miguel Ojeda <ojeda@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>
+Cc: Boqun Feng <boqun@kernel.org>,
+	Gary Guo <gary@garyguo.net>,
+	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Daniel Almeida <daniel.almeida@collabora.com>,
+	Tamir Duberstein <tamird@kernel.org>,
+	Alexandre Courbot <acourbot@nvidia.com>,
+	=?UTF-8?q?Onur=20=C3=96zkan?= <work@onurozkan.dev>,
+	rust-for-linux@vger.kernel.org,
+	linux-kbuild@vger.kernel.org,
+	Antoni Boucher <bouanto@zoho.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] rust: kbuild: disambiguate `zerocopy` for `rusttest`
+Date: Wed, 29 Jul 2026 19:38:03 +0200
+Message-ID: <20260729173803.13459-1-ojeda@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-On Thu, 16 Jul 2026, Julian Braha <julianbraha@gmail.com> wrote:
-> Hi Kees,
->
-> On 7/16/26 05:19, Kees Cook wrote:
->> Yeah, it'd be good to add a checkpatch or even build-time check too.
->
-> I'll look into adding a check for this into the kconfig interpreter.
+From: Antoni Boucher <bouanto@zoho.com>
 
-This. I wish there was a kconfig lint option that would whine about all
-the things that kconfig-language.rst explicitly tells you *not* to use
-select for. (So I could perhaps eventually stop replying to people with
-that stuff.)
+Starting with Rust 1.76.0, `zerocopy` was added as an (indirect)
+compiler dependency [1]. In turn, this meant that the `rustc-dev`
+component started including a precompiled `zerocopy` crate in the sysroot.
 
-BR,
-Jani.
+This makes `rusttest` fail because the compiler finds several candidates:
 
+    error[E0464]: multiple candidates for `rmeta` dependency `zerocopy` found
+      --> rust/kernel/prelude.rs:64:9
+       |
+    64 | pub use zerocopy::{
+       |         ^^^^^^^^
+       |
+       = note: candidate #1: .../lib/rustlib/x86_64-unknown-linux-gnu/lib/libzerocopy-dfef4cb07ca752aa.rmeta
+       = note: candidate #2: ./rust/test/libzerocopy.rlib
 
+We cannot use `--sysroot=/dev/null` for these, thus point to the dependency
+explicitly.
+
+Assisted-by: LLM
+Not-yet-Signed-off-by: Antoni Boucher <bouanto@zoho.com>
+Link: https://github.com/rust-lang/rust/pull/118546 [1]
+Cc: stable@vger.kernel.org
+Fixes: 567621523ab7 ("rust: zerocopy: enable support in kbuild")
+[ Investigated when it started happening, reworded to add that and to
+  follow our usual style and sent on behalf of Antoni, who found this
+  during his work to support Rust for Linux with the GCC backend, i.e.
+  with `rustc_codegen_gcc`. - Miguel ]
+Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
+---
+ rust/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/rust/Makefile b/rust/Makefile
+index 627ed79dc6f5..fbe0accc51a3 100644
+--- a/rust/Makefile
++++ b/rust/Makefile
+@@ -350,7 +350,7 @@ rusttestlib-pin_init: $(src)/pin-init/src/lib.rs rusttestlib-macros \
+ rusttestlib-kernel: private rustc_target_flags = --extern ffi \
+     --extern build_error --extern macros --extern pin_init \
+     --extern bindings --extern uapi \
+-    --extern zerocopy --extern zerocopy_derive
++    --extern zerocopy=$(objtree)/$(obj)/test/libzerocopy.rlib --extern zerocopy_derive
+ rusttestlib-kernel: $(src)/kernel/lib.rs rusttestlib-bindings rusttestlib-uapi \
+     rusttestlib-build_error rusttestlib-pin_init $(obj)/$(libmacros_name) \
+     $(obj)/bindings.o rusttestlib-zerocopy rusttestlib-zerocopy_derive FORCE
+
+base-commit: fc02acf6ac0ccde0c805c2daa9148683cdd01ba8
 -- 
-Jani Nikula, Intel
+2.55.0
+
