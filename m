@@ -1,93 +1,90 @@
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB0B63E5A2F
-	for <linux-kbuild@vger.kernel.org>; Wed, 29 Jul 2026 07:19:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D8A3397942;
+	Wed, 29 Jul 2026 15:10:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785309566; cv=none; b=PNz6A1VGeMo8nwmgLLJlpCMD4EfkMyupSpv1R8y5isjZzY1xIa3meavtZzqKyfjs3YmcD0Vujq8zCky3PLUijrH3E1n4oc6pBooLtxN9ZH08KpPL0ikQOuNJd0XfwvKfzmYY6A4woDRsHHkmB7PKHP88peUifg5JCu9/Kf7ZKI8=
+	t=1785337819; cv=none; b=FuG1OViRI55WiEGxYs87cdbUB02DOf5V381dI8MjPRc50oyxiNZNWtOllzTNvFVFH/blPWYPhx6aZr1q2Y+mbJyQyPC8wAd5vcju1HtW4sWtGohqySjsw6qa3kOtyyCZy4M9+cFjmC4G45Kxp5r2XtI9+iyte3We+UfBJnZGSOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785309566; c=relaxed/simple;
-	bh=pP4fF1laRgJDuWZ4+i9SyoiKqvqfiQpUxWe0F0Jh9Ak=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lvZ0KQ1FKzy+ob8uA6SuTA5p7z5ZpPvbEfDlD37Zt7SWtI56sfncX0wxIdPiUpHb63SyjzIjlKpUvODhoYDDvlRvT9jL0m42A2gD4xkHK6v3kuXjKDl+3J88Am5ppRJBO3x3BRAoDYsYcLrXLFJEYUB2KFEyheF306fowjJMLqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lY8Ol8l2; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1785337819; c=relaxed/simple;
+	bh=oCfTxDq+a656t5RgFUHIkq6G6GXDBOjbPfM9vHiXq6Y=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=nBDGtlM5o5E8jbvuVCG5UaGkwZcShW1Ld5gvUOlPMlePf6EY6LzQGlpy0hsoGDo+5fPo2h/NNR1m47cq4+e0iylpA75gtBv6bX2cHYLEx5r39TL5EE99cLCh9YfxnzAu0RPcSNRM3J0xGOhEdt9d+xmNI1kVOGkKG3xZfXAAD2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CWRnwc69; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lY8Ol8l2"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1785309557;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=AWvv/tGxm6QJaUEHZNsJBGjnnWIXBs2hBaZEuk3xjWU=;
-	b=lY8Ol8l29OuC6IEg8FnIQP7um37VM4AYSiAEkuZHCPVoV37TXlwC0Pv1wvUcz/QHqn/V7p
-	qie0rXwjLjirkNdHtihFWY2z0loIAXb9EStmm3p4s0mEZeqJmv+evjnK9fHbQpQz4RxbGj
-	Q7OH6fQnMhhH9A/ymq0BBllrsxzN9u8=
-From: Yuntao Wang <yuntao.wang@linux.dev>
-To: linux-kernel@vger.kernel.org,
-	linux-kbuild@vger.kernel.org
-Cc: Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Gary Guo <gary@garyguo.net>,
-	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <linux@weissschuh.net>,
-	Luis Augenstein <luis.augenstein@tngtech.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	Alexey Gladkov <legion@kernel.org>,
-	Yuntao Wang <yuntao.wang@linux.dev>
-Subject: [PATCH] kbuild: fix modules.builtin(.modinfo) targets in the top-level Makefile
-Date: Wed, 29 Jul 2026 15:17:37 +0800
-Message-ID: <20260729071737.818007-1-yuntao.wang@linux.dev>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CWRnwc69"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1785337817; x=1816873817;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=oCfTxDq+a656t5RgFUHIkq6G6GXDBOjbPfM9vHiXq6Y=;
+  b=CWRnwc697Kr+7kZrtLp6J2bvCJGuPKW7WqUMQkZdmymhBfn3H7zU2A2Y
+   xOIseZz8DVZEC8j8HTNGXVyflU5mMWviDvQXTQeq+tbPchBM41QH9lgZX
+   FCx+x03jENqC9xmLQyu6Hv3ndgT18waThSUKwXQJXgKz87tRvDR3jf/TW
+   89+bxfrEd8hu32ACzrSfUqEDUowRNU3avXUB62UceSjT4bpvqu8Is5sae
+   0yuCB+2GMYbV9WfUQQiyM9gQpqDQr6xEcWRZUp7D7QCYbTNkZ3PRHr4yi
+   giFyCRNWLuMTrEivjCq6csz+8GScxNytB0Fn0eBSD0ABjCIdfRQAkxomK
+   Q==;
+X-CSE-ConnectionGUID: dAdsRdo2QP+pz3XrtjuGiQ==
+X-CSE-MsgGUID: iSUNsWclRSycIyoWYqu1FA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11859"; a="85961579"
+X-IronPort-AV: E=Sophos;i="6.25,192,1779174000"; 
+   d="scan'208";a="85961579"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2026 08:10:16 -0700
+X-CSE-ConnectionGUID: rWIgYwpZRMCK10Lj65brMg==
+X-CSE-MsgGUID: +0SDdbEDRySkUHmWip9Crw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,192,1779174000"; 
+   d="scan'208";a="265065823"
+Received: from slindbla-desk.ger.corp.intel.com (HELO localhost) ([10.245.244.212])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2026 08:10:06 -0700
+From: Jani Nikula <jani.nikula@linux.intel.com>
+To: Julian Braha <julianbraha@gmail.com>, Kees Cook <kees@kernel.org>
+Cc: nathan@kernel.org, nsc@kernel.org, corbet@lwn.net,
+ skhan@linuxfoundation.org, arnd@arndb.de, stefan.hengelein@fau.de,
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, nico@fluxnic.net,
+ officialnaumansabir@gmail.com, rdunlap@infradead.org,
+ vegard.nossum@oracle.com, tj@kernel.org
+Subject: Re: [PATCH] Documentation: warn users not to use select on choice
+ options in Kconfig
+In-Reply-To: <a4d8cb79-a696-4016-8c8a-a56b14992309@gmail.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park,
+ 6 krs Bertel Jungin Aukio 5, 02600 Espoo, Finland
+References: <20260715220149.48700-1-julianbraha@gmail.com>
+ <202607152119.BF8E377B@keescook>
+ <a4d8cb79-a696-4016-8c8a-a56b14992309@gmail.com>
+Date: Wed, 29 Jul 2026 18:10:04 +0300
+Message-ID: <f362ddf2e0f3ecf41ed81f03f77577473c3e21bc@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
 
-Commit 7a342e6c7735 ("kbuild: move modules.builtin(.modinfo) rules to
-Makefile.vmlinux_o") moved the modules.builtin(.modinfo) rules from
-link-vmlinux.sh to Makefile.vmlinux_o, and added the corresponding
-targets to the top-level Makefile.
+On Thu, 16 Jul 2026, Julian Braha <julianbraha@gmail.com> wrote:
+> Hi Kees,
+>
+> On 7/16/26 05:19, Kees Cook wrote:
+>> Yeah, it'd be good to add a checkpatch or even build-time check too.
+>
+> I'll look into adding a check for this into the kconfig interpreter.
 
-Commit 39cfd5b12160 ("kbuild: extract modules.builtin.modinfo from
-vmlinux.unstripped") later moved these rules from Makefile.vmlinux_o to
-Makefile.vmlinux, but left the corresponding targets in the top-level
-Makefile unchanged.
+This. I wish there was a kconfig lint option that would whine about all
+the things that kconfig-language.rst explicitly tells you *not* to use
+select for. (So I could perhaps eventually stop replying to people with
+that stuff.)
 
-These modules.builtin(.modinfo) targets in the top-level Makefile should
-be moved alongside the vmlinux target, since they are now generated by
-Makefile.vmlinux.
+BR,
+Jani.
 
-However, simply removing these trivial targets might be a better choice,
-as it makes the Makefile cleaner and avoids the need to keep them in sync
-across multiple files, reducing the chance of future mistakes.
 
-Fixes: 39cfd5b12160 ("kbuild: extract modules.builtin.modinfo from vmlinux.unstripped")
-Signed-off-by: Yuntao Wang <yuntao.wang@linux.dev>
----
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/Makefile b/Makefile
-index 2f5bf24e3389..5f3f460fd10f 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1352,7 +1352,7 @@ PHONY += vmlinux_o
- vmlinux_o: vmlinux.a $(KBUILD_VMLINUX_LIBS)
- 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.vmlinux_o
- 
--vmlinux.o modules.builtin.modinfo modules.builtin: vmlinux_o
-+vmlinux.o: vmlinux_o
- 	@:
- 
- PHONY += vmlinux
 -- 
-2.55.0
-
+Jani Nikula, Intel
