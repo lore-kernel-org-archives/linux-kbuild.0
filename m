@@ -1,65 +1,86 @@
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C47B408017
-	for <linux-kbuild@vger.kernel.org>; Thu, 30 Jul 2026 09:52:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EC742CCB9
+	for <linux-kbuild@vger.kernel.org>; Thu, 30 Jul 2026 14:01:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785405148; cv=none; b=WPci65sjI8uWDOBn684VzSTsRH0H7W8r6og/BcrYi6G+5y+yYB1syuOgQXxEP06t3Cbvwril7MNTY2hePqH6Ds0Sqgd8m7pQvJSkjswqj0hdgZHXctAoCSbzxYmyZ37n1seqMrvyzFYvjY3GeUrK7fYS94Y0MAwziLaMUPP941A=
+	t=1785420104; cv=none; b=KOErB+uV9+0H5m18bP7cOeOtDeUOhP7bevXOLuGcjPpFSw3Hndx2RKDDqeiaNjwkJt7ENlpbjqzRmc9CgBlIBjuUAoy2gfG0BvRnVvmUjXDVPeg3+RapMK+k4hwhMFtxeo3YfJAnl7wvCqsonanct3+PiibrMuVrKW3ig8etHbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785405148; c=relaxed/simple;
-	bh=g41LPGlnsDih4SbTsmtxbI2yU3X3+FVOF4ti+MCeimU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=js0ddpoe7GD2O/1kuiNwCpfMlPdjxlVChaG727zZiI+XG229rQle/gPgKmIMOLx7oxxEi2xMcku4h2xx5W71oHMunXV34IOAyD5Moj7Zd/D6L/wGfM5FK8MCvZjq0S6nuwZbnGH+LAQybCKnfR08s9QWjxIgc5YsZauKVcZ9/Rc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iw5TG7Vv; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1785420104; c=relaxed/simple;
+	bh=ri9MLwB0DvTFmAF7fuhBZmWK0NcRSRkk+obgkZ9ss54=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fMaWfWMUFoZUafQBT6JRAIko8wczan6Qk+z+Rayw4qpAIlrYdMXM5ZQD/M/hoiC+AynP15MBMCnBlvFkKzZRIjUTRYOjyOkMIiP5+ECzQU1OZPytwUVnadSw85MoTY/IqJ+yxsCRm5586Jv0jQH8rPFOwIPnJ20QyQSjjCjKIlY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FQIEka0u; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iw5TG7Vv"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1785405144;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TRG4Zw+fd32dwmDHtovGrWaB11wnJdHnHih5cbrfc0g=;
-	b=iw5TG7VvBMUvRbogNUesI9ryROp6ySyACamlFeJolZ7aBu+pXR658l8IKsq1Ld3blkXJr6
-	j4IM1Yk+lWQCqGojd/LnP+Ep0uerK7PKfqP76nj7mUsRdz4ifvpzwFw6DO74eYh47ImwL3
-	BeDkxHFRMyQ4pR/2bILY4c4RN7K/BZI=
-From: Kaitao Cheng <kaitao.cheng@linux.dev>
-To: David Laight <david.laight.linux@gmail.com>,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-	David Hildenbrand <david@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Nicolas Schier <nsc@kernel.org>
-Cc: Christian Brauner <brauner@kernel.org>,
-	"Paul E . McKenney" <paulmck@kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	Simona Vetter <simona.vetter@ffwll.ch>,
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
-	Luca Ceresoli <luca.ceresoli@bootlin.com>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Kaitao Cheng <chengkaitao@kylinos.cn>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Philipp Stanner <phasta@kernel.org>,
-	Alex Williamson <alex@shazbot.org>,
-	David Matlack <dmatlack@google.com>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	"Joy H . J . Lee" <rkr0k0r@gmail.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ian Rogers <irogers@google.com>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Swapnil Sapkal <swapnil.sapkal@amd.com>,
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FQIEka0u"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4954aff6088so19795785e9.3
+        for <linux-kbuild@vger.kernel.org>; Thu, 30 Jul 2026 07:01:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785420101; x=1786024901; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=MM+a2ReeoFL4RNqETaQgicGycDtbnrFeItVUphw4i3o=;
+        b=FQIEka0ut0coGrT4W3F7Xd0zzFJuiHQUQm7Rp7ESw9XFbheEHLUWmKxz2I77k/BvTa
+         hpwP1Je4c6yVSt5YFY0pX4zv8GCQQooTHk6Sg8gQfOSkC/Itikr4bQwzd8v/748uwb74
+         2qrrZ0dcUp2xUOEe/1j3x051Ggljgylh20aseRHjobaSQQ1VlfWAq02JYBmQ6hWnNXeK
+         2Tp2OULGYk7/YOi8lwlaPFzY5NYPRGAg+BG/EPM6aTEZRPyFsgJDzYlnvafBkfCkwlIG
+         UdcZXqxiygn8Ehd3NKEnf1vrCVLGmq7xOgXB0oCNML8NABp9iMnXC82gYT08TDTGGOaj
+         ZIJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785420101; x=1786024901;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=MM+a2ReeoFL4RNqETaQgicGycDtbnrFeItVUphw4i3o=;
+        b=mMtNNoOvAobO6JSBy+7PmJGEyE7LjG8w23ZZpiAsHWY9dUCUnqUI6m7bJaTPpUp0rZ
+         Tledee+jXKV89ctKSDeeDbRn9uP2UPgIrIVl+0VePOIhYQtANX6l1243xkUJAOzT+4+U
+         nrKflQonGofAM27ETuSnEQPBJfZYVOhXz9/1hqe/TrP0f7v6BcXwTDhki440aEhlF5cb
+         wnOz3lkOLVNAHujJ9XCKEwRI6fD9VYFxALqIDRVUQqDrKQlGMIDxQcAKRtsQ1PwO2LL4
+         yQdaz51dSXRIVtYtecdVdfUg+8AtzosKyz3KxT0lAakOMX/B7DBFv80NE6IW3U+jgpHs
+         y8cg==
+X-Forwarded-Encrypted: i=1; AHgh+Rrjzuh/YNHwNtrbM3deoTGRhz9jVhsKYLFs1YeQBuzEj4KVRzd0PxW6q0/5plQkeVhcAG0pLrp6U3WdWDU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVQoTUh+pSRrzPZyXpqtiEsffpfFfCoQSGm8Byl37zpWBAtsPM
+	S4VzHNQMIChCGosVjnqRwmCWKdZTLVsi+jycKI9+mDQxM6l+RA2p2Ht1
+X-Gm-Gg: AR+sD11KnBHnvgno5V45aHeKFXp/L62c4xrlK5wHTWaecHGyqhifMOrcIai26Z8zh69
+	DTY1PhtdpGV+zMrNt/wZsCBSkBCVS9HM+SM7ICFVbLtx3VQsuSJVG9oSUhpqkRdKn7R4V6VfvrN
+	3faK6l/11CEMjSLHs38ANXLjFKxKgQ1FRWH6HL/NvYFS2h/MB/7O3ZYiQPfbRRgqKkmYycvwbnl
+	WTPuRUIU6qLivCkYDzZhvPinp/oVP8VIqQOnpj4PAD+B59FLmpW8V2njr9WHRs7M9wbGN/qmEfv
+	mxrnJldSNlOQ7wKbBqPy+PpGySVSxRYHRkmmNOR8KyofIF4KteGINsr8IGU/PnPoWfeCuW6g5FU
+	qz+UgK6wc6pCjHDS+ldAL3ZHYsdTdxDAkLfVJMqgc7Icb2tsIifgSr5wS6WYhCkdzCB+7k8UQi+
+	XwqhkToVhEfcD596ccEY9KGl6yqD1P7aVQ/Aw5FIhBakTBeaEj6QFBYoVY4fwQJSpp0E6nDFAbq
+	XQ+1TJg8qMS9l+JB2q7tjbzBqFETKL2khyQzjvhTB/14fWPz3hL
+X-Received: by 2002:a05:600c:e557:10b0:493:bcba:46a4 with SMTP id 5b1f17b1804b1-49800ea21a6mr25943175e9.20.1785420100866;
+        Thu, 30 Jul 2026 07:01:40 -0700 (PDT)
+Received: from nixos-office (195-23-151-163.net.novis.pt. [195.23.151.163])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49800f1a91fsm58238575e9.6.2026.07.30.07.01.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Jul 2026 07:01:39 -0700 (PDT)
+Sender: Julian Braha <julian.braha@gmail.com>
+From: Julian Braha <julianbraha@gmail.com>
+To: nathan@kernel.org,
+	nsc@kernel.org,
+	corbet@lwn.net,
+	skhan@linuxfoundation.org
+Cc: jani.nikula@linux.intel.com,
+	arnd@arndb.de,
+	stefan.hengelein@fau.de,
 	linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v4 4/4] scripts/list: Add mutable iterator variants
-Date: Thu, 30 Jul 2026 17:50:36 +0800
-Message-ID: <20260730095041.35715-5-kaitao.cheng@linux.dev>
-In-Reply-To: <20260730095041.35715-1-kaitao.cheng@linux.dev>
-References: <20260730095041.35715-1-kaitao.cheng@linux.dev>
+	linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	nico@fluxnic.net,
+	officialnaumansabir@gmail.com,
+	rdunlap@infradead.org,
+	vegard.nossum@oracle.com,
+	kees@kernel.org,
+	tj@kernel.org,
+	Julian Braha <julianbraha@gmail.com>
+Subject: [PATCH] Documentation: warn against using int, hex, string options as expressions in Kconfig
+Date: Thu, 30 Jul 2026 15:01:08 +0100
+Message-ID: <20260730140108.683967-1-julianbraha@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -67,128 +88,54 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-From: Kaitao Cheng <chengkaitao@kylinos.cn>
+I've been working on type checking Kconfig, and found some instances of
+dead code due to conditions that always evaluate to false.
 
-The kernel has added mutable iterator variants, so sync the scripts/list
-implementation accordingly. The safe iterators require callers to declare
-and pass a temporary cursor even when the loop body only needs to remove
-the current entry.
+For example:
 
-Add list_for_each_entry_mutable() and hlist_for_each_entry_mutable() so
-callers can use removal-safe iteration without exposing the temporary
-cursor. Keep the existing safe variants for users that need direct access
-to the cursor, and document the distinction.
+config FOO
+  int
 
-Add local __PASTE() and __UNIQUE_ID() helpers to generate the internal
-cursor name, matching the format used by include/linux/compiler.h.
+config BAR
+  bool
+  default 'y' if FOO
 
-Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
+This 'if FOO' will always be false, regardless of FOO's value (even when
+FOO=1). The same goes for strings and hex.
+
+See also this related patch:
+https://lore.kernel.org/all/20260729210546.394392-1-julianbraha@gmail.com/
+
+Let's warn users against this usage.
+
+Signed-off-by: Julian Braha <julianbraha@gmail.com>
 ---
- scripts/include/list.h | 56 ++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 54 insertions(+), 2 deletions(-)
+ Documentation/kbuild/kconfig-language.rst | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/scripts/include/list.h b/scripts/include/list.h
-index 8bdcaadca709..ff1c84339344 100644
---- a/scripts/include/list.h
-+++ b/scripts/include/list.h
-@@ -9,6 +9,16 @@
- /* Are two types/vars the same type (ignoring qualifiers)? */
- #define __same_type(a, b) __builtin_types_compatible_p(typeof(a), typeof(b))
+diff --git a/Documentation/kbuild/kconfig-language.rst b/Documentation/kbuild/kconfig-language.rst
+index ab2822d7ca1c..aee84b294a56 100644
+--- a/Documentation/kbuild/kconfig-language.rst
++++ b/Documentation/kbuild/kconfig-language.rst
+@@ -320,6 +320,17 @@ An expression can have a value of 'n', 'm' or 'y' (or 0, 1, 2
+ respectively for calculations). A menu entry becomes visible when its
+ expression evaluates to 'm' or 'y'.
  
-+#ifndef __PASTE
-+/* Indirect macros required for expanded argument pasting, eg. __LINE__. */
-+#define ___PASTE(a, b) a##b
-+#define __PASTE(a, b) ___PASTE(a, b)
-+#endif
++Note that options of int, hex, or string type should not be used directly
++as expressions; these will always evaluate to 'n'. Instead, to check if
++one of these options is in use, consider using one of these heuristics::
 +
-+#ifndef __UNIQUE_ID
-+#define __UNIQUE_ID(name) __PASTE(__UNIQUE_ID_, __PASTE(name, __PASTE(_, __COUNTER__)))
-+#endif
++  <symbol> != 0
++  <symbol> != 0x0
++  <symbol> != ""
 +
- /**
-  * container_of - cast a member of a structure out to the containing structure
-  * @ptr:	the pointer to the member.
-@@ -298,11 +308,15 @@ static inline int list_empty(const struct list_head *head)
- 	     pos = list_prev_entry(pos, member))
- 
- /**
-- * list_for_each_entry_safe - iterate over list of given type. Safe against removal of list entry
-+ * list_for_each_entry_safe - iterate over list of given type safe against
-+ *	removal of list entry with a caller-provided temporary cursor
-  * @pos:	the type * to use as a loop cursor.
-  * @n:		another type * to use as temporary storage
-  * @head:	the head for your list.
-  * @member:	the name of the list_head within the struct.
-+ *
-+ * If the caller does not need to access the temporary cursor, use
-+ * list_for_each_entry_mutable() instead.
-  */
- #define list_for_each_entry_safe(pos, n, head, member)			\
- 	for (pos = list_first_entry(head, typeof(*pos), member),	\
-@@ -310,6 +324,22 @@ static inline int list_empty(const struct list_head *head)
- 	     !list_entry_is_head(pos, head, member);			\
- 	     pos = n, n = list_next_entry(n, member))
- 
-+#define __list_for_each_entry_mutable(pos, tmp, head, member)		\
-+	for (typeof(pos) tmp = list_next_entry(pos =			\
-+		list_first_entry(head, typeof(*pos), member), member);	\
-+	     !list_entry_is_head(pos, head, member);			\
-+	     pos = tmp, tmp = list_next_entry(tmp, member))
++because int, hex, and string options will take these values of '0', '0x0',
++and the empty string, respectively, when the dependencies are unmet.
 +
-+/**
-+ * list_for_each_entry_mutable - iterate over a list safe against removal of
-+ *	list entry with an internal temporary cursor
-+ * @pos:	the type * to use as a loop cursor.
-+ * @head:	the head for your list.
-+ * @member:	the name of the list_head within the struct.
-+ */
-+#define list_for_each_entry_mutable(pos, head, member)			\
-+	__list_for_each_entry_mutable(pos, __UNIQUE_ID(next), head, member)
-+
- /*
-  * Double linked lists with a single pointer list head.
-  * Mostly useful for hash tables where the two pointer list head is
-@@ -414,15 +444,37 @@ static inline void hlist_add_head(struct hlist_node *n, struct hlist_head *h)
- 	     pos = hlist_entry_safe((pos)->member.next, typeof(*(pos)), member))
- 
- /**
-- * hlist_for_each_entry_safe - iterate over list of given type safe against removal of list entry
-+ * hlist_for_each_entry_safe - iterate over list of given type safe against
-+ *	removal of list entry with a caller-provided temporary cursor
-  * @pos:	the type * to use as a loop cursor.
-  * @n:		a &struct hlist_node to use as temporary storage
-  * @head:	the head for your list.
-  * @member:	the name of the hlist_node within the struct.
-+ *
-+ * If the caller does not need to access the temporary cursor, use
-+ * hlist_for_each_entry_mutable() instead.
-  */
- #define hlist_for_each_entry_safe(pos, n, head, member) 		\
- 	for (pos = hlist_entry_safe((head)->first, typeof(*pos), member);\
- 	     pos && ({ n = pos->member.next; 1; });			\
- 	     pos = hlist_entry_safe(n, typeof(*pos), member))
- 
-+#define __hlist_for_each_entry_mutable(pos, tmp, head, member)		\
-+	for (struct hlist_node *tmp = (pos =				\
-+		hlist_entry_safe((head)->first, typeof(*pos), member)) ? \
-+		pos->member.next : NULL;				\
-+	     pos;							\
-+	     pos = hlist_entry_safe(tmp, typeof(*pos), member),		\
-+		tmp = pos ? pos->member.next : NULL)
-+
-+/**
-+ * hlist_for_each_entry_mutable - iterate over hlist safe against removal of
-+ *	list entry with an internal temporary cursor
-+ * @pos:	the type * to use as a loop cursor.
-+ * @head:	the head for your hlist.
-+ * @member:	the name of the hlist_node within the struct.
-+ */
-+#define hlist_for_each_entry_mutable(pos, head, member)			\
-+	__hlist_for_each_entry_mutable(pos, __UNIQUE_ID(next), head, member)
-+
- #endif /* LIST_H */
+ There are two types of symbols: constant and non-constant symbols.
+ Non-constant symbols are the most common ones and are defined with the
+ 'config' statement. Non-constant symbols consist entirely of alphanumeric
 -- 
-2.43.0
+2.55.0
 
