@@ -1,141 +1,92 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EC742CCB9
-	for <linux-kbuild@vger.kernel.org>; Thu, 30 Jul 2026 14:01:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0485B41DED0;
+	Thu, 30 Jul 2026 19:11:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785420104; cv=none; b=KOErB+uV9+0H5m18bP7cOeOtDeUOhP7bevXOLuGcjPpFSw3Hndx2RKDDqeiaNjwkJt7ENlpbjqzRmc9CgBlIBjuUAoy2gfG0BvRnVvmUjXDVPeg3+RapMK+k4hwhMFtxeo3YfJAnl7wvCqsonanct3+PiibrMuVrKW3ig8etHbs=
+	t=1785438717; cv=none; b=FsZKE1hes4DkJHh29vMWgdeJ0OKk0lJ7K56i/CQIdugeDhk1pTgvZySf2/u2I1jrXmq6eW/5QH7RcoA5ZrQXDrwA0Iz2K/PRjXV0wql/L8s45/AVcu4hvmqKc6Vb3TLYWiZt9T5kKeh6YbadxlI/9Gwtf9CJsQkrbNNhQhZqETI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785420104; c=relaxed/simple;
-	bh=ri9MLwB0DvTFmAF7fuhBZmWK0NcRSRkk+obgkZ9ss54=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fMaWfWMUFoZUafQBT6JRAIko8wczan6Qk+z+Rayw4qpAIlrYdMXM5ZQD/M/hoiC+AynP15MBMCnBlvFkKzZRIjUTRYOjyOkMIiP5+ECzQU1OZPytwUVnadSw85MoTY/IqJ+yxsCRm5586Jv0jQH8rPFOwIPnJ20QyQSjjCjKIlY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FQIEka0u; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1785438717; c=relaxed/simple;
+	bh=t2Bn8w4wKZsAbUaN/GA+4G/1K5glKVe/ur+UC1KE7Vg=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=pNWPtW5jtwHeNrlbb+2dMmCKKeM47yRfw2yEpkPLiNrsX6xsjVMH/+baXAqguNQzBhtcsJWZ9RScf6Zhvw547yzxUTC7HRiMvJoVV0x3Oi5Z5lAXu1zult2NLudJMea3GEUaKWdewQwDI9IAxDiPFSXEo/AkDmB3iSHd6xjYBQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=Xnvacv9i; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FQIEka0u"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4954aff6088so19795785e9.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 30 Jul 2026 07:01:42 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="Xnvacv9i"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AB521F000E9;
+	Thu, 30 Jul 2026 19:11:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785420101; x=1786024901; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=MM+a2ReeoFL4RNqETaQgicGycDtbnrFeItVUphw4i3o=;
-        b=FQIEka0ut0coGrT4W3F7Xd0zzFJuiHQUQm7Rp7ESw9XFbheEHLUWmKxz2I77k/BvTa
-         hpwP1Je4c6yVSt5YFY0pX4zv8GCQQooTHk6Sg8gQfOSkC/Itikr4bQwzd8v/748uwb74
-         2qrrZ0dcUp2xUOEe/1j3x051Ggljgylh20aseRHjobaSQQ1VlfWAq02JYBmQ6hWnNXeK
-         2Tp2OULGYk7/YOi8lwlaPFzY5NYPRGAg+BG/EPM6aTEZRPyFsgJDzYlnvafBkfCkwlIG
-         UdcZXqxiygn8Ehd3NKEnf1vrCVLGmq7xOgXB0oCNML8NABp9iMnXC82gYT08TDTGGOaj
-         ZIJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785420101; x=1786024901;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=MM+a2ReeoFL4RNqETaQgicGycDtbnrFeItVUphw4i3o=;
-        b=mMtNNoOvAobO6JSBy+7PmJGEyE7LjG8w23ZZpiAsHWY9dUCUnqUI6m7bJaTPpUp0rZ
-         Tledee+jXKV89ctKSDeeDbRn9uP2UPgIrIVl+0VePOIhYQtANX6l1243xkUJAOzT+4+U
-         nrKflQonGofAM27ETuSnEQPBJfZYVOhXz9/1hqe/TrP0f7v6BcXwTDhki440aEhlF5cb
-         wnOz3lkOLVNAHujJ9XCKEwRI6fD9VYFxALqIDRVUQqDrKQlGMIDxQcAKRtsQ1PwO2LL4
-         yQdaz51dSXRIVtYtecdVdfUg+8AtzosKyz3KxT0lAakOMX/B7DBFv80NE6IW3U+jgpHs
-         y8cg==
-X-Forwarded-Encrypted: i=1; AHgh+Rrjzuh/YNHwNtrbM3deoTGRhz9jVhsKYLFs1YeQBuzEj4KVRzd0PxW6q0/5plQkeVhcAG0pLrp6U3WdWDU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVQoTUh+pSRrzPZyXpqtiEsffpfFfCoQSGm8Byl37zpWBAtsPM
-	S4VzHNQMIChCGosVjnqRwmCWKdZTLVsi+jycKI9+mDQxM6l+RA2p2Ht1
-X-Gm-Gg: AR+sD11KnBHnvgno5V45aHeKFXp/L62c4xrlK5wHTWaecHGyqhifMOrcIai26Z8zh69
-	DTY1PhtdpGV+zMrNt/wZsCBSkBCVS9HM+SM7ICFVbLtx3VQsuSJVG9oSUhpqkRdKn7R4V6VfvrN
-	3faK6l/11CEMjSLHs38ANXLjFKxKgQ1FRWH6HL/NvYFS2h/MB/7O3ZYiQPfbRRgqKkmYycvwbnl
-	WTPuRUIU6qLivCkYDzZhvPinp/oVP8VIqQOnpj4PAD+B59FLmpW8V2njr9WHRs7M9wbGN/qmEfv
-	mxrnJldSNlOQ7wKbBqPy+PpGySVSxRYHRkmmNOR8KyofIF4KteGINsr8IGU/PnPoWfeCuW6g5FU
-	qz+UgK6wc6pCjHDS+ldAL3ZHYsdTdxDAkLfVJMqgc7Icb2tsIifgSr5wS6WYhCkdzCB+7k8UQi+
-	XwqhkToVhEfcD596ccEY9KGl6yqD1P7aVQ/Aw5FIhBakTBeaEj6QFBYoVY4fwQJSpp0E6nDFAbq
-	XQ+1TJg8qMS9l+JB2q7tjbzBqFETKL2khyQzjvhTB/14fWPz3hL
-X-Received: by 2002:a05:600c:e557:10b0:493:bcba:46a4 with SMTP id 5b1f17b1804b1-49800ea21a6mr25943175e9.20.1785420100866;
-        Thu, 30 Jul 2026 07:01:40 -0700 (PDT)
-Received: from nixos-office (195-23-151-163.net.novis.pt. [195.23.151.163])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49800f1a91fsm58238575e9.6.2026.07.30.07.01.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jul 2026 07:01:39 -0700 (PDT)
-Sender: Julian Braha <julian.braha@gmail.com>
-From: Julian Braha <julianbraha@gmail.com>
-To: nathan@kernel.org,
-	nsc@kernel.org,
-	corbet@lwn.net,
-	skhan@linuxfoundation.org
-Cc: jani.nikula@linux.intel.com,
-	arnd@arndb.de,
-	stefan.hengelein@fau.de,
-	linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	nico@fluxnic.net,
-	officialnaumansabir@gmail.com,
-	rdunlap@infradead.org,
-	vegard.nossum@oracle.com,
-	kees@kernel.org,
-	tj@kernel.org,
-	Julian Braha <julianbraha@gmail.com>
-Subject: [PATCH] Documentation: warn against using int, hex, string options as expressions in Kconfig
-Date: Thu, 30 Jul 2026 15:01:08 +0100
-Message-ID: <20260730140108.683967-1-julianbraha@gmail.com>
-X-Mailer: git-send-email 2.55.0
+	d=linux-foundation.org; s=korg; t=1785438712;
+	bh=2D2dlgf/lEFrepZjIxzuaV1xiILgoxdYGvRf1fwBpbw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=Xnvacv9imqCW2SN3z99zPlKh4L04zVEmzCCOrbpCVUwRvGOHBpSbD80+LRyfBCoL3
+	 29KsboLGwkeP3kkidxYNrgBizYFs454EINUp3Y/D/jcJMgfCOQqytPqIoOTgrtsoj5
+	 6nwo8TsBW4mrvMkLph9ePhsnIJtCnh+GBM0Pw+l8=
+Date: Thu, 30 Jul 2026 12:11:51 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Kaitao Cheng <kaitao.cheng@linux.dev>
+Cc: David Laight <david.laight.linux@gmail.com>, Jani Nikula
+ <jani.nikula@linux.intel.com>, Christian =?ISO-8859-1?Q?K=F6nig?=
+ <christian.koenig@amd.com>, David Hildenbrand <david@kernel.org>, Nathan
+ Chancellor <nathan@kernel.org>, Andy Shevchenko
+ <andriy.shevchenko@linux.intel.com>, Nicolas Schier <nsc@kernel.org>,
+ Christian Brauner <brauner@kernel.org>, "Paul E . McKenney"
+ <paulmck@kernel.org>, David Howells <dhowells@redhat.com>, Simona Vetter
+ <simona.vetter@ffwll.ch>, Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+ Luca Ceresoli <luca.ceresoli@bootlin.com>, Randy Dunlap
+ <rdunlap@infradead.org>, Kaitao Cheng <chengkaitao@kylinos.cn>, Philipp
+ Stanner <phasta@kernel.org>, Alex Williamson <alex@shazbot.org>, David
+ Matlack <dmatlack@google.com>, Shuah Khan <skhan@linuxfoundation.org>,
+ "Joy H . J . Lee" <rkr0k0r@gmail.com>, Peter Zijlstra
+ <peterz@infradead.org>, Ian Rogers <irogers@google.com>, Namhyung Kim
+ <namhyung@kernel.org>, Swapnil Sapkal <swapnil.sapkal@amd.com>,
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 0/4] Prepare mutable list iterators to cache cursor
+ state
+Message-Id: <20260730121151.9d0577c2772b70c5e648b27d@linux-foundation.org>
+In-Reply-To: <20260730095041.35715-1-kaitao.cheng@linux.dev>
+References: <20260730095041.35715-1-kaitao.cheng@linux.dev>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-I've been working on type checking Kconfig, and found some instances of
-dead code due to conditions that always evaluate to false.
+On Thu, 30 Jul 2026 17:50:32 +0800 Kaitao Cheng <kaitao.cheng@linux.dev> wrote:
 
-For example:
+> The list_for_each*_safe() helpers are used when the loop body may remove
+> the current entry.  Their current interface, however, forces every caller
+> to define a temporary cursor outside the macro and pass it in, even when
+> the caller never uses that cursor directly.  For most call sites this
+> extra cursor is just boilerplate required by the macro implementation.
+> 
+> This is awkward because the saved next pointer is an internal detail of
+> the iteration.  Callers that only remove or move the current entry do not
+> need to spell it out.
+> 
+> The _safe() suffix has also caused confusion.  Christian Koenig pointed
+> out that the name is easy to read as a thread-safe variant, especially
+> for beginners, even though it only means that the iterator keeps enough
+> state to tolerate removal of the current entry.  He suggested _mutable()
+> as a clearer description of what the loop permits.
+> 
+> Add *_mutable() iterator variants for list, hlist and llist. The caller
+> omits the temporary cursor and the macro creates a unique internal cursor
+> with typeof(pos) and __UNIQUE_ID(). The existing *_safe() helpers remain
+> available for compatibility.
 
-config FOO
-  int
+I can't say I'm very motivated about this proposal, sorry.
 
-config BAR
-  bool
-  default 'y' if FOO
+It adds nearly 500 lines of tricky new macros.
 
-This 'if FOO' will always be false, regardless of FOO's value (even when
-FOO=1). The same goes for strings and hex.
+It churns ancient interfaces which have more than 6,000 callsites.  Are
+maintainers to spend the next decade receiving "switch to *_mutable"
+cleanups?
 
-See also this related patch:
-https://lore.kernel.org/all/20260729210546.394392-1-julianbraha@gmail.com/
-
-Let's warn users against this usage.
-
-Signed-off-by: Julian Braha <julianbraha@gmail.com>
----
- Documentation/kbuild/kconfig-language.rst | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/Documentation/kbuild/kconfig-language.rst b/Documentation/kbuild/kconfig-language.rst
-index ab2822d7ca1c..aee84b294a56 100644
---- a/Documentation/kbuild/kconfig-language.rst
-+++ b/Documentation/kbuild/kconfig-language.rst
-@@ -320,6 +320,17 @@ An expression can have a value of 'n', 'm' or 'y' (or 0, 1, 2
- respectively for calculations). A menu entry becomes visible when its
- expression evaluates to 'm' or 'y'.
- 
-+Note that options of int, hex, or string type should not be used directly
-+as expressions; these will always evaluate to 'n'. Instead, to check if
-+one of these options is in use, consider using one of these heuristics::
-+
-+  <symbol> != 0
-+  <symbol> != 0x0
-+  <symbol> != ""
-+
-+because int, hex, and string options will take these values of '0', '0x0',
-+and the empty string, respectively, when the dependencies are unmet.
-+
- There are two types of symbols: constant and non-constant symbols.
- Non-constant symbols are the most common ones and are defined with the
- 'config' statement. Non-constant symbols consist entirely of alphanumeric
--- 
-2.55.0
-
+Unless I'm missing something here, my vote is to let it be and go do
+more productive things.
