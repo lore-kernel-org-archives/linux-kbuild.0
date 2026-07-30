@@ -1,118 +1,395 @@
-Received: from mail-106118.protonmail.ch (mail-106118.protonmail.ch [79.135.106.118])
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C53F3CB577
-	for <linux-kbuild@vger.kernel.org>; Thu, 30 Jul 2026 09:43:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 835253FC5BE
+	for <linux-kbuild@vger.kernel.org>; Thu, 30 Jul 2026 09:52:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785404620; cv=none; b=uXi+EzoX2Z83jRfWzkTiZf6BFui+FkS6ODYt17cfRsKQFOp/TN5MnIifg5zHf6PPNZSUdI0f6gmaxPMd5oP8Oa/mtAffUvfbB0fahUE2D7evMLpjuySwL/qafymUuTZ1QTzPmRNjQuML4pPv3+/QxeUkiAWm7lnnZAFJcy1e8Z4=
+	t=1785405125; cv=none; b=QICpo83yvU7ofLnJMhPefweXnImX/wF/weA2S3x7PYyfmj5JyIsCk7ab5tChGcxdIvOiQy0GUPysYld8tRK/GzGLef1PQPsrzkp6SyUgoPdoFXzNfSh1Od50jdbldxPmrzN/MvVH7RimAmhbr+VxQa7+ERtxZ2EMw6K2+Ehnb3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785404620; c=relaxed/simple;
-	bh=yhREa5E7QoDb2zLXJVFqRq4DwDaXk/DbGXCUnlmD6VE=;
-	h=Date:To:From:Subject:Message-ID:MIME-Version:Content-Type; b=smeoMTFYgqer5Hxav5AVZDc7ZqP6awqLDU66OskaC8kr2sYLgYvyMI8zIQJ38fiHhBE2/zUL9EWNqEz7t6Avq+1ljOZQu+wGBbOcnYfH8gTDDQVleNNRTh+ODzmciZiKr+5o7ra2pge1+FTl7x+gddwjYBo5tjhUuwoB+ezbWeo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=E571459Z; arc=none smtp.client-ip=79.135.106.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	s=arc-20240116; t=1785405125; c=relaxed/simple;
+	bh=zlyr+r/YTogNPxWGfoZqZcgPakTVwq1Ne16gJlEwTfk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=lroBAaryq859WF1845z/XsDjEBQrEBAsiD06oFqT4p4d2YkFrGHqCrE1xth7qzJAeFUSVzbqZ2T4yfRxtxl5hv7J8jTkBg4RLQ0ZWylYip9CuWoDrTHedviVYoP3bLqbtnuXUTi1FuR4m2+m3Yj3IyTinjaBj9AD26gsZhXD5fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=K6DUHt5q; arc=none smtp.client-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="E571459Z"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1785404613; x=1785663813;
-	bh=8X46T2qYvgBQvvU9t+RSIyEg9Zw+0CJ/5Sh0Ady8eaU=;
-	h=Date:To:From:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=E571459Zzdt4yx4t/v9y503UA4PVkKzwy+hYvat0aOcM41piPZ3DpxdIgPDaY/5eO
-	 LkEb0fvArTggn+YvbwwpBizBU3ZOfCQEyu3f3if3TD356tr7d7JT2v7LiUu0OVyYGL
-	 Qg6UQLWKTP3Tpu5YCE/c4GHUlQFtZkrRa6dyv0Q+Actpu1kNbxV2xhCcl9qXJVw+qS
-	 8+beFZX/FkXvME7TTpYRFzpEWbcUMet7N9ZY35Tv5VeNx8pr0Ci0Kwob5HIa6t8GCQ
-	 eZ9J0MyGmYeo0fgjAgXfTwxXYrpdrl79p83wljcFLwXLmrKoSwz6OQjL5jxvP3Joxb
-	 HasGN0sLW4mcg==
-Date: Thu, 30 Jul 2026 09:43:27 +0000
-To: linux-kbuild@vger.kernel.org, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
-From: Tj <tj.iam.tj@proton.me>
-Subject: How to move usr/Makefile call to just before vmlinux_a target ?
-Message-ID: <869aa706-004a-44b8-a007-8ea5d4aa60bb@proton.me>
-Feedback-ID: 113488376:user:proton
-X-Pm-Message-ID: 839cb776e08eb748809207c611b692c686652a56
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="K6DUHt5q"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1785405119;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nKi/FzTy1mqYQNs0ejXxXVLcSkWtLo7PgWnA/p8PpcQ=;
+	b=K6DUHt5qJ+pxb2pbwJpXLmnaSQY7yT9rnOu9D8Z+99Fh565/8kCatsrPWQYghSpR+ZWxs7
+	2abMOjBOIf/RGHdVG668iIoZA3CYc+rVJnrkPeN5lTM3W5Ht0BBgWkRAVfZGcCR1v3M1gP
+	NsMq5N97+l1rjh+oTQie52+2w8H4fxo=
+From: Kaitao Cheng <kaitao.cheng@linux.dev>
+To: David Laight <david.laight.linux@gmail.com>,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+	David Hildenbrand <david@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Nicolas Schier <nsc@kernel.org>
+Cc: Christian Brauner <brauner@kernel.org>,
+	"Paul E . McKenney" <paulmck@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Simona Vetter <simona.vetter@ffwll.ch>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Luca Ceresoli <luca.ceresoli@bootlin.com>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Kaitao Cheng <chengkaitao@kylinos.cn>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Philipp Stanner <phasta@kernel.org>,
+	Alex Williamson <alex@shazbot.org>,
+	David Matlack <dmatlack@google.com>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	"Joy H . J . Lee" <rkr0k0r@gmail.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ian Rogers <irogers@google.com>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Swapnil Sapkal <swapnil.sapkal@amd.com>,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v4 1/4] list: Add mutable iterator variants
+Date: Thu, 30 Jul 2026 17:50:33 +0800
+Message-ID: <20260730095041.35715-2-kaitao.cheng@linux.dev>
+In-Reply-To: <20260730095041.35715-1-kaitao.cheng@linux.dev>
+References: <20260730095041.35715-1-kaitao.cheng@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Note: re-send since original accidentally only got sent to Nicholas.
+From: Kaitao Cheng <chengkaitao@kylinos.cn>
 
-I've developed a new feature for CONFIG_INITRAMFS_SOURCE implemented in usr=
-/gen_initramfs.sh that extends dir_filelist(). The feature enables includin=
-g a directory filter of the form:
+The list_for_each*_safe() helpers allow the current entry to be removed
+while iterating, but require callers to declare and pass a temporary
+cursor. Most callers never use that cursor directly, so exposing it adds
+boilerplate and leaks an implementation detail into each call site.
 
- =C2=A0filter:/path/to/script:/path/to/dir/
+Add *_mutable() variants for list and hlist iterators. These variants
+keep the temporary cursor in a uniquely named local variable inside the
+macro while preserving the removal-safe iteration semantics.
 
-where /path/to/script decides the list of files to include from /path/to/di=
-r/
+Keep the existing *_safe() variants for callers that need to access or
+reset the temporary cursor, and update their documentation to clarify
+which interface to use.
 
-My current usage is=C2=A0 to take a dynamic selection of modules from the c=
-urrent build and include them in the initramfs.
+Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
+---
+ include/linux/list.h | 180 +++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 175 insertions(+), 5 deletions(-)
 
-One of the purposes is to create a self-contained kernel image for automate=
-d rapid bisect/pre-build or bisect/build/test iterations that avoid requiri=
-ng building an external initrd.img or adding modules to a root file-system =
-and can be passed directly to qemu -kernel.
-
-This all works fine. The problem I have struggled with over the last day or=
- so is how to move the call to usr/Makefile to just before the vmlinux_a ta=
-rget so that the CPIO, compressed, and usr/built-in.a files are built after=
- all modules are complete and just prior to all the built-in.a's being asse=
-mbled together ?
-
--- 8-< snip original additional info that Nicholas' response renders mute -=
---
-
-Nicholas pointed me to the November 2025 mailing-list discussions, I was no=
-t aware of, on this topic that appear to have a similar aim:
-
-*https://lore.kernel.org/linux-kbuild/28e18785-1336-4fbc-9f2b-69aa6bb06375@=
-pengutronix.de/
-*https://lore.kernel.org/all/20251125-cpio-modules-pkg-v2-0-aa8277d89682@pe=
-ngutronix.de/
-
-Based on Nicholas' response to me regarding the need to fully build vmlinux=
- first there is an obvious chicken-and-egg problem. However, I wonder if th=
-ere's a sneaky way around it?
-
-Whilst I was doing my (now hundreds) of test cycles I was fooled a few time=
-s when the initramfs was correctly populated - making me think the changes =
-I'd made were working.
-
-After some thought I realised it was because the incremental build benefite=
-d from the module builds of the previous full build and therefore although =
-usr/Makefile executes early it can create a valid working initramfs that is=
- embedded in the normal flow.
-
-Thinking on this and Nicholas' observation I wonder if the solution here is=
- to create a new top-level target something like this:
-
-vmlinux_initramfs: initramfs_modules
-
-initramfs_modules: vmlinux modules
-     $(Q)$(MAKE) -f $(srctree)/usr/Makefile ... initramfs_add_modules
-     # rebuild vmlinux to include usr/built-in.a
-     $(Q)$(MAKE) -f $(srctree)/scripts/Makefile.vmlinux
-
-Adding a new target (or modifying existing) in usr/Makefile
-
-initramfs_add_modules: ...
-     ...
-
-There are other details to take care of for this approach such as ensuring =
-modules.dep and any other prerequisites are built.
-
-The second call to Makefile.vmlinux should only need to repeat the AR task,=
- I think.
-
-Comments and suggestions welcome - especially if they prevent me exploring =
-futile paths!
-
+diff --git a/include/linux/list.h b/include/linux/list.h
+index 09d979976b3b..373b08b929d3 100644
+--- a/include/linux/list.h
++++ b/include/linux/list.h
+@@ -765,26 +765,62 @@ static inline void list_splice_tail_init(struct list_head *list,
+ 
+ /**
+  * list_for_each_safe - iterate over a list safe against removal of list entry
++ *	with a caller-provided temporary cursor
+  * @pos:	the &struct list_head to use as a loop cursor.
+  * @n:		another &struct list_head to use as temporary storage
+  * @head:	the head for your list.
++ *
++ * If the caller does not need to access the temporary cursor, use
++ * list_for_each_mutable() instead.
+  */
+ #define list_for_each_safe(pos, n, head) \
+ 	for (pos = (head)->next, n = pos->next; \
+ 	     !list_is_head(pos, (head)); \
+ 	     pos = n, n = pos->next)
+ 
++#define __list_for_each_mutable(pos, tmp, head)				\
++	for (typeof(pos) tmp = (pos = (head)->next)->next;		\
++	     !list_is_head(pos, (head));				\
++	     pos = tmp, tmp = pos->next)
++
++/**
++ * list_for_each_mutable - iterate over a list safe against entry removal
++ *	with an internal temporary cursor
++ * @pos:	the &struct list_head to use as a loop cursor.
++ * @head:	the head for your list.
++ */
++#define list_for_each_mutable(pos, head)				\
++	__list_for_each_mutable(pos, __UNIQUE_ID(next), head)
++
+ /**
+- * list_for_each_prev_safe - iterate over a list backwards safe against removal of list entry
++ * list_for_each_prev_safe - iterate over a list backwards safe against removal
++ *	of list entry with a caller-provided temporary cursor
+  * @pos:	the &struct list_head to use as a loop cursor.
+  * @n:		another &struct list_head to use as temporary storage
+  * @head:	the head for your list.
++ *
++ * If the caller does not need to access the temporary cursor, use
++ * list_for_each_prev_mutable() instead.
+  */
+ #define list_for_each_prev_safe(pos, n, head) \
+ 	for (pos = (head)->prev, n = pos->prev; \
+ 	     !list_is_head(pos, (head)); \
+ 	     pos = n, n = pos->prev)
+ 
++#define __list_for_each_prev_mutable(pos, tmp, head)			\
++	for (typeof(pos) tmp = (pos = (head)->prev)->prev;		\
++	     !list_is_head(pos, (head));				\
++	     pos = tmp, tmp = pos->prev)
++
++/**
++ * list_for_each_prev_mutable - iterate over a list backwards safe against entry
++ *	removal with an internal temporary cursor
++ * @pos:	the &struct list_head to use as a loop cursor.
++ * @head:	the head for your list.
++ */
++#define list_for_each_prev_mutable(pos, head)				\
++	__list_for_each_prev_mutable(pos, __UNIQUE_ID(prev), head)
++
+ /**
+  * list_count_nodes - count nodes in the list
+  * @head:	the head for your list.
+@@ -896,11 +932,15 @@ static inline size_t list_count_nodes(struct list_head *head)
+ 	     pos = list_prev_entry(pos, member))
+ 
+ /**
+- * list_for_each_entry_safe - iterate over list of given type safe against removal of list entry
++ * list_for_each_entry_safe - iterate over list of given type safe against
++ *	removal of list entry with a caller-provided temporary cursor
+  * @pos:	the type * to use as a loop cursor.
+  * @n:		another type * to use as temporary storage
+  * @head:	the head for your list.
+  * @member:	the name of the list_head within the struct.
++ *
++ * If the caller does not need to access the temporary cursor, use
++ * list_for_each_entry_mutable() instead.
+  */
+ #define list_for_each_entry_safe(pos, n, head, member)			\
+ 	for (pos = list_first_entry(head, typeof(*pos), member),	\
+@@ -908,8 +948,25 @@ static inline size_t list_count_nodes(struct list_head *head)
+ 	     !list_entry_is_head(pos, head, member); 			\
+ 	     pos = n, n = list_next_entry(n, member))
+ 
++#define __list_for_each_entry_mutable(pos, tmp, head, member)		\
++	for (typeof(pos) tmp = list_next_entry(pos =			\
++		list_first_entry(head, typeof(*pos), member), member);	\
++	     !list_entry_is_head(pos, head, member);			\
++	     pos = tmp, tmp = list_next_entry(tmp, member))
++
++/**
++ * list_for_each_entry_mutable - iterate over a list safe against entry removal
++ *	with an internal temporary cursor
++ * @pos:	the type * to use as a loop cursor.
++ * @head:	the head for your list.
++ * @member:	the name of the list_head within the struct.
++ */
++#define list_for_each_entry_mutable(pos, head, member)			\
++	__list_for_each_entry_mutable(pos, __UNIQUE_ID(next), head, member)
++
+ /**
+  * list_for_each_entry_safe_continue - continue list iteration safe against removal
++ *	with a caller-provided temporary cursor
+  * @pos:	the type * to use as a loop cursor.
+  * @n:		another type * to use as temporary storage
+  * @head:	the head for your list.
+@@ -917,6 +974,9 @@ static inline size_t list_count_nodes(struct list_head *head)
+  *
+  * Iterate over list of given type, continuing after current point,
+  * safe against removal of list entry.
++ *
++ * If the caller does not need to access the temporary cursor, use
++ * list_for_each_entry_mutable_continue() instead.
+  */
+ #define list_for_each_entry_safe_continue(pos, n, head, member) 		\
+ 	for (pos = list_next_entry(pos, member), 				\
+@@ -924,8 +984,28 @@ static inline size_t list_count_nodes(struct list_head *head)
+ 	     !list_entry_is_head(pos, head, member);				\
+ 	     pos = n, n = list_next_entry(n, member))
+ 
++#define __list_for_each_entry_mutable_continue(pos, tmp, head, member)	\
++	for (typeof(pos) tmp = list_next_entry(pos =			\
++		list_next_entry(pos, member), member);			\
++	     !list_entry_is_head(pos, head, member);			\
++	     pos = tmp, tmp = list_next_entry(tmp, member))
++
+ /**
+- * list_for_each_entry_safe_from - iterate over list from current point safe against removal
++ * list_for_each_entry_mutable_continue - continue list iteration safe against
++ *	removal with an internal temporary cursor
++ * @pos:	the type * to use as a loop cursor.
++ * @head:	the head for your list.
++ * @member:	the name of the list_head within the struct.
++ *
++ * Iterate over list of given type, continuing after current point,
++ * safe against removal of list entry.
++ */
++#define list_for_each_entry_mutable_continue(pos, head, member)		\
++	__list_for_each_entry_mutable_continue(pos, __UNIQUE_ID(next), head, member)
++
++/**
++ * list_for_each_entry_safe_from - iterate over list from current point safe
++ *	against removal with a caller-provided temporary cursor
+  * @pos:	the type * to use as a loop cursor.
+  * @n:		another type * to use as temporary storage
+  * @head:	the head for your list.
+@@ -933,14 +1013,36 @@ static inline size_t list_count_nodes(struct list_head *head)
+  *
+  * Iterate over list of given type from current point, safe against
+  * removal of list entry.
++ *
++ * If the caller does not need to access the temporary cursor, use
++ * list_for_each_entry_mutable_from() instead.
+  */
+ #define list_for_each_entry_safe_from(pos, n, head, member) 			\
+ 	for (n = list_next_entry(pos, member);					\
+ 	     !list_entry_is_head(pos, head, member);				\
+ 	     pos = n, n = list_next_entry(n, member))
+ 
++#define __list_for_each_entry_mutable_from(pos, tmp, head, member)	\
++	for (typeof(pos) tmp = list_next_entry(pos, member);		\
++	     !list_entry_is_head(pos, head, member);			\
++	     pos = tmp, tmp = list_next_entry(tmp, member))
++
++/**
++ * list_for_each_entry_mutable_from - iterate over list from current point safe
++ *	against removal with an internal temporary cursor
++ * @pos:	the type * to use as a loop cursor.
++ * @head:	the head for your list.
++ * @member:	the name of the list_head within the struct.
++ *
++ * Iterate over list of given type from current point, safe against
++ * removal of list entry.
++ */
++#define list_for_each_entry_mutable_from(pos, head, member)		\
++	__list_for_each_entry_mutable_from(pos,	__UNIQUE_ID(next), head, member)
++
+ /**
+- * list_for_each_entry_safe_reverse - iterate backwards over list safe against removal
++ * list_for_each_entry_safe_reverse - iterate backwards over list safe against
++ *	removal with a caller-provided temporary cursor
+  * @pos:	the type * to use as a loop cursor.
+  * @n:		another type * to use as temporary storage
+  * @head:	the head for your list.
+@@ -948,6 +1050,9 @@ static inline size_t list_count_nodes(struct list_head *head)
+  *
+  * Iterate backwards over list of given type, safe against removal
+  * of list entry.
++ *
++ * If the caller does not need to access the temporary cursor, use
++ * list_for_each_entry_mutable_reverse() instead.
+  */
+ #define list_for_each_entry_safe_reverse(pos, n, head, member)		\
+ 	for (pos = list_last_entry(head, typeof(*pos), member),		\
+@@ -955,6 +1060,25 @@ static inline size_t list_count_nodes(struct list_head *head)
+ 	     !list_entry_is_head(pos, head, member); 			\
+ 	     pos = n, n = list_prev_entry(n, member))
+ 
++#define __list_for_each_entry_mutable_reverse(pos, tmp, head, member)	\
++	for (typeof(pos) tmp = list_prev_entry(pos =			\
++		list_last_entry(head, typeof(*pos), member), member);	\
++	     !list_entry_is_head(pos, head, member);			\
++	     pos = tmp, tmp = list_prev_entry(tmp, member))
++
++/**
++ * list_for_each_entry_mutable_reverse - iterate backwards over list safe
++ *	against removal with an internal temporary cursor
++ * @pos:	the type * to use as a loop cursor.
++ * @head:	the head for your list.
++ * @member:	the name of the list_head within the struct.
++ *
++ * Iterate backwards over list of given type, safe against removal
++ * of list entry.
++ */
++#define list_for_each_entry_mutable_reverse(pos, head, member)		\
++	__list_for_each_entry_mutable_reverse(pos, __UNIQUE_ID(prev), head, member)
++
+ /**
+  * list_safe_reset_next - reset a stale list_for_each_entry_safe loop
+  * @pos:	the loop cursor used in the list_for_each_entry_safe loop
+@@ -1185,10 +1309,34 @@ static inline void hlist_splice_init(struct hlist_head *from,
+ #define hlist_for_each(pos, head) \
+ 	for (pos = (head)->first; pos ; pos = pos->next)
+ 
++/**
++ * hlist_for_each_safe - iterate over a hlist safe against entry removal
++ *	with a caller-provided temporary cursor
++ * @pos:	the &struct hlist_node to use as a loop cursor.
++ * @n:		another &struct hlist_node to use as temporary storage.
++ * @head:	the head for your hlist.
++ *
++ * If the caller does not need to access the temporary cursor, use
++ * hlist_for_each_mutable() instead.
++ */
+ #define hlist_for_each_safe(pos, n, head) \
+ 	for (pos = (head)->first; pos && ({ n = pos->next; 1; }); \
+ 	     pos = n)
+ 
++#define __hlist_for_each_mutable(pos, tmp, head)			\
++	for (typeof(pos) tmp = (pos = (head)->first) ? pos->next : NULL; \
++	     pos;							\
++	     pos = tmp, tmp = pos ? pos->next : NULL)
++
++/**
++ * hlist_for_each_mutable - iterate over a hlist safe against entry removal
++ *	with an internal temporary cursor
++ * @pos:	the &struct hlist_node to use as a loop cursor.
++ * @head:	the head for your hlist.
++ */
++#define hlist_for_each_mutable(pos, head)				\
++	__hlist_for_each_mutable(pos, __UNIQUE_ID(next), head)
++
+ #define hlist_entry_safe(ptr, type, member) \
+ 	({ typeof(ptr) ____ptr = (ptr); \
+ 	   ____ptr ? hlist_entry(____ptr, type, member) : NULL; \
+@@ -1225,17 +1373,39 @@ static inline void hlist_splice_init(struct hlist_head *from,
+ 	     pos = hlist_entry_safe((pos)->member.next, typeof(*(pos)), member))
+ 
+ /**
+- * hlist_for_each_entry_safe - iterate over list of given type safe against removal of list entry
++ * hlist_for_each_entry_safe - iterate over list of given type safe against
++ *	removal of list entry with a caller-provided temporary cursor
+  * @pos:	the type * to use as a loop cursor.
+  * @n:		a &struct hlist_node to use as temporary storage
+  * @head:	the head for your list.
+  * @member:	the name of the hlist_node within the struct.
++ *
++ * If the caller does not need to access the temporary cursor, use
++ * hlist_for_each_entry_mutable() instead.
+  */
+ #define hlist_for_each_entry_safe(pos, n, head, member) 		\
+ 	for (pos = hlist_entry_safe((head)->first, typeof(*pos), member);\
+ 	     pos && ({ n = pos->member.next; 1; });			\
+ 	     pos = hlist_entry_safe(n, typeof(*pos), member))
+ 
++#define __hlist_for_each_entry_mutable(pos, tmp, head, member)		\
++	for (struct hlist_node *tmp = (pos =				\
++		hlist_entry_safe((head)->first, typeof(*pos), member)) ? \
++		pos->member.next : NULL;				\
++	     pos;							\
++	     pos = hlist_entry_safe((tmp), typeof(*pos), member),	\
++		tmp = pos ? pos->member.next : NULL)
++
++/**
++ * hlist_for_each_entry_mutable - iterate over hlist safe against entry removal
++ *	with an internal temporary cursor
++ * @pos:	the type * to use as a loop cursor.
++ * @head:	the head for your hlist.
++ * @member:	the name of the hlist_node within the struct.
++ */
++#define hlist_for_each_entry_mutable(pos, head, member)			\
++	__hlist_for_each_entry_mutable(pos, __UNIQUE_ID(next), head, member)
++
+ /**
+  * hlist_count_nodes - count nodes in the hlist
+  * @head:	the head for your hlist.
+-- 
+2.43.0
 
