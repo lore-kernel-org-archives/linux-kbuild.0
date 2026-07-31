@@ -1,106 +1,154 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f44.google.com (mail-yx1-f44.google.com [74.125.224.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 411D03314AE;
-	Fri, 31 Jul 2026 19:36:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0509730DEB2
+	for <linux-kbuild@vger.kernel.org>; Fri, 31 Jul 2026 22:07:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785526590; cv=none; b=lO300uoV3JwPi1xCDRB5x3Yp4HqSO6wHZf175GGKprQ9y1csCNf/EUcvNiM8WHkWZrE7LZFPjfUJd3UnI/MCSEk5Uldx3MU24gUzLrTNcd81Fy9Ynzn1m3cTjIhawzy4nCsYFODCAketrX3jKjVQaS57y4S+ebhgXxEYm7Qw8JI=
+	t=1785535643; cv=none; b=WqmxMFBdsxY+31SOqF0UMSCBecKgRecl2lW164sdSWkF7Kc1ICqhlyWvneLOk+0HHpG/Wrd+I/aPWO46/YroZ3Z+Jej7Yl6U6naqmrK48Lq/mq8M0Dl4B2RH2OFPsl7efUf+mKrbCyn8TFWAGLqVEUETy9Jr4zLk+gA7U8CwEvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785526590; c=relaxed/simple;
-	bh=QNV5A2UXKlk8CbB+i7b7XolK33UGzsvQwIcvYdo/ZKs=;
-	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
-	 References:Date:Message-Id; b=DxjEulxLbwDTluD70iVWR2h/ezZ+GtpocIqTEOHF8BejaphWpcyqOxxFRLz4G8WKpl5Hw1AFncBAz45dZkR8XsQV5Lj1hRV/pyVRfNXON1SEpu9rOaVTmb0WIOE29JVUml2pDkv5DqE6PuAVtNBJ3StoHxiIvzx1SXp2oK5Fc9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kgVJUJYV; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785535643; c=relaxed/simple;
+	bh=OIn675hjNJRvCax+siqTy5GlefZli5clf+OOhh2uufM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YwZ4xkYcnDi1mKOS/E5Oyl/J+K64ba2lLKpRRXYmures0DSoXKA1DFzNsbIvGLOHCEDj99wGGO9jbtOsamx/+qxi7cxF8M8EA9qoSvwnimKBvXXPsfWUVmFjHX3cpJodqwySlocmZC9RvTgnMSJ3Gy5TiCSjHczIgu6b8Z092Lc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y+ke4+ZQ; arc=none smtp.client-ip=74.125.224.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kgVJUJYV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B46671F00AC4;
-	Fri, 31 Jul 2026 19:36:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785526588;
-	bh=TYe75eE/VoVNu1aNr+DZWxE9tNnF3J5Pen/XQ4HPV+4=;
-	h=Subject:From:To:Cc:In-Reply-To:References:Date;
-	b=kgVJUJYVMb8GbvXwPnP2UivIbzImAxMEtMYSO7wm2b9vkGfXKuFeChnhGF0TgfSkC
-	 KxMoFKONBdeMy1qAs5zCp3nzmKRIdFhZxsNtObbDqmE++h2YM4mLvwa8J+4b8jlTxM
-	 gNb46mbdZoKQwcBjdurHBDCrdXOyOpB13x2wSnL5Ugq7XLBigMqe8+me9GVUc/mYCE
-	 dqq1y/u8KH/tg5HpWHsJ9ZfNwQPwihX+0DN7vPK0QTLmV6YztHw88VaKZrKrZpmWEI
-	 +BeySdu6gIrerIpiqa/9G2ildlz37SdAUf7CsrzN35lCYv6E15WrcAoXqq2OjbVok+
-	 yRB2WT5PxndnQ==
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y+ke4+ZQ"
+Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-668296d0ff3so1989407d50.0
+        for <linux-kbuild@vger.kernel.org>; Fri, 31 Jul 2026 15:07:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785535641; x=1786140441; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:mail-followup-to:message-id:subject:cc:to:from:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=lLVrqlJPaYUyQ/s2uocQTjVeXAjhrYhz/clQBuZIliE=;
+        b=Y+ke4+ZQZfSJUKkDIgMzFWCpIx17RrfpGMJldR2pZnXhKKQF6A2d1YGKPhulNqG9GF
+         GHP5VyvxDWh6IDSslQ6nuFn6GfXXZk+tUHn6uwgAg8vkoKWhi4KAmaouVYP/bhoYOOLg
+         TEaZQ3hQrErMk4Ag4aVxYag2U0aV/8wg2+C4q5PBepwC4lVsuk2l+Fkk8xYOiE4bVNrv
+         O1JN3FZXNG7EzRd5d868HdPrMICXwnLITftZGxG+jC6JloL+GXYAJM34iMGDEUGGQ72r
+         KM3s+IkV6oJmWrS/Yg0LEH4963DQlvMZ8Avaor1fyUhoKLrVNCWtllNXRFy7du5+7gJo
+         fxxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785535641; x=1786140441;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=lLVrqlJPaYUyQ/s2uocQTjVeXAjhrYhz/clQBuZIliE=;
+        b=BoEMNp2phy7ziEedOJYtU6lMVGdLCkvL1nF4/VbwKoi+DS/XlAbKvPRs5FsFWR7e8l
+         BWxTrNIHlpWTepz8rifOT1Ug6nzgr4pwHXXH4ui15p1eMZDSEkbCSPYHVnNlbep97gqs
+         B42PrjnPiRImdDHCUJrOeQp2252Z+6jhA0qoh95duTFcL29nS754WzFz5/fbrFbalb7D
+         gMlQcu4f1f2L5VtjRQzZ5kXkyGt6z0nB6eii+yAs1D2ZmKAk5383N6rVDC2hg6QvCNY9
+         BTwee0wepukaSIetgkaksN4MDCLvVuJETEhomNao8JccXvM5BJb4ym0PUwRGUYukNcds
+         21Zg==
+X-Forwarded-Encrypted: i=1; AHgh+RpgyXxAWRIk9i+xr9hgFGS8F2Xo7JXH67pTEIFvQPPqqdOtZKoV6AIgU4Xr6wi+qNrToFrWlNxWiB5VjA4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwoS+E0NHyEEyfIpiAMi7YjZVVsUItY0lsE6sFmHngFg1PfTkZQ
+	dB3qFdr7wbGpIGt0DyaqoIScfxsZ31S5y5kq0RDcMtq3qERj1fJOpoHN
+X-Gm-Gg: AR+sD11jgdJQCSjavwXLOxZVcA8S2ZLh2Kzs2u3UoIFynfAz1GMKEhiZTgMqR22YCaI
+	++A98PG++YZZmDVRg0LOjONxvsgWguydHbvC1e9Ku1v7UQLHqeAsG7duADxu6TuR2wuveToPxSF
+	LGMR1mFXYvzvrF7y83mpxwIBVgHhgnQ4hJKI3VEY0zcdNCZiYOZLGzHTJfMv8l48fedim/bcOVx
+	mYVD91NXsIMQeI5FIK88/B2bcQtQdq6b+q/i00nsSM/GJiY5DR4saYcIFBmVkPtRjvsGrnmQapS
+	oed0rT6KeF75ZUnQNkziKHtSY6IdX/R71eGs9FnPSc5mJy/oxLJADovW+dIbM4AFhLw/tTFDHiA
+	QqLIeVifs8V9x5tEI7s9R+X0NmXMHQ/gW4pDkI9u0uflj6h/UBE7G656LrbJbQiW5RAN1/Fru2n
+	gKfD85VkT4OgLEi5CtnexTVxDo3GHxJyxC1EHXH1dfJRMVc+tJ88iKQ7U=
+X-Received: by 2002:a05:690e:43d6:b0:668:8b5b:75a7 with SMTP id 956f58d0204a3-6694f08c3b8mr1660952d50.11.1785535640713;
+        Fri, 31 Jul 2026 15:07:20 -0700 (PDT)
+Received: from Gentoo ([191.96.227.11])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-66948b98babsm1442207d50.0.2026.07.31.15.07.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 31 Jul 2026 15:07:20 -0700 (PDT)
+Date: Sat, 1 Aug 2026 03:37:12 +0530
+From: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: nathan@kernel.org, nsc@kernel.org, linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] usr: Correct a spelling by changing a latter
+Message-ID: <am0ckPayPdCQjnCL_Gentoo@unixbhaskar-laptop>
+Mail-Followup-To: Bhaskar Chowdhury <unixbhaskar@gmail.com>,
+	Randy Dunlap <rdunlap@infradead.org>, nathan@kernel.org,
+	nsc@kernel.org, linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+References: <20260731102211.2327476-1-unixbhaskar@gmail.com>
+ <219d161a-8d8b-45e5-84d6-195c80a24ddc@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH v2 2/2] kbuild: Move gen_init_cpio and gen_initramfs.sh
- to scripts/
-From: Nathan Chancellor <nathan@kernel.org>
-To: Nicolas Schier <nsc@kernel.org>
-Cc: Nathan Chancellor <nathan@kernel.org>, linux-kbuild@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Askar Safin <safinaskar@gmail.com>, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-In-Reply-To: <20260720-move-gen_init_cpio-to-scripts-v2-2-26b7e15c7133@kernel.org>
-References: <20260720-move-gen_init_cpio-to-scripts-v2-0-26b7e15c7133@kernel.org>
- <20260720-move-gen_init_cpio-to-scripts-v2-2-26b7e15c7133@kernel.org>
-Date: Fri, 31 Jul 2026 12:36:19 -0700
-Message-Id: <178552657997.3004192.6811032535007922482.b4-review@b4>
-X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2997; i=nathan@kernel.org;
- h=from:subject:message-id; bh=QNV5A2UXKlk8CbB+i7b7XolK33UGzsvQwIcvYdo/ZKs=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDFk5P61lzh/JljWvmeNvfPF+5OsEKbsZZ26tcTux7GJQx
- 0SelVGNHaUsDGJcDLJiiizVj1WPGxrOOct449QkmDmsTCBDGLg4BWAibc2MDEf7Tjp2+xUYh78R
- 2XnJOijqW77i93+yi/73MPz7s+FwwkNGhoPZLtmTogTmRZifFevar7A7+MrZji2bVkdvzrvatfL
- CMSYA
-X-Developer-Key: i=nathan@kernel.org; a=openpgp;
- fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="jz0uGldF3vn8rCHO"
+Content-Disposition: inline
+In-Reply-To: <219d161a-8d8b-45e5-84d6-195c80a24ddc@infradead.org>
 
-> diff --git a/usr/gen_init_cpio.c b/scripts/gen_init_cpio.c
-> similarity index 100%
-> rename from usr/gen_init_cpio.c
-> rename to scripts/gen_init_cpio.c
-> diff --git a/usr/gen_initramfs.sh b/scripts/gen_initramfs.sh
-> similarity index 99%
-> rename from usr/gen_initramfs.sh
-> rename to scripts/gen_initramfs.sh
-> index 7eba2fddf0ef..27ac1fd48001 100755
-> --- a/usr/gen_initramfs.sh
-> +++ b/scripts/gen_initramfs.sh
 
-The cpio commmand in scripts/Makefile.package needs an update for this
-move, otherwise modules-cpio-pkg will be broken.
+--jz0uGldF3vn8rCHO
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
 
-Additionally, I see a number of references to "usr/gen_init" even after
-this is applied:
+On 07:45 Fri 31 Jul 2026, Randy Dunlap wrote:
+>
+>
+>On 7/31/26 3:20 AM, Bhaskar Chowdhury wrote:
+>> s/dit/did/
+>>
+>> Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+>
+>Looks good except that the Subject has a typo in it.
+>
+  Gosh! What a paradox!! V2 coming ...
 
-$ git grep usr/gen_init
-Documentation/driver-api/early-userspace/early_userspace_support.rst:usr/gen_init_cpio utility (run 'usr/gen_init_cpio -h' to get the
-Documentation/driver-api/early-userspace/early_userspace_support.rst:usr/gen_init_cpio.
-Documentation/driver-api/early-userspace/early_userspace_support.rst:usr/gen_initramfs.sh.  This means that CONFIG_INITRAMFS_SOURCE
-Documentation/driver-api/early-userspace/early_userspace_support.rst:usr/gen_init_cpio file directives are output.  If a file is
-Documentation/driver-api/early-userspace/early_userspace_support.rst:specified as an argument to usr/gen_initramfs.sh then the
-Documentation/driver-api/early-userspace/early_userspace_support.rst:processed by usr/gen_init_cpio.
-Documentation/driver-api/early-userspace/early_userspace_support.rst:See also 'usr/gen_initramfs.sh -h'.
-Documentation/driver-api/early-userspace/early_userspace_support.rst:   into initramfs either via modifying usr/gen_init_cpio.c or via the new
-Documentation/filesystems/ramfs-rootfs-initramfs.rst:Run "usr/gen_init_cpio" (after the kernel build) to get a usage message
-Documentation/filesystems/ramfs-rootfs-initramfs.rst:usr/gen_initramfs.sh), and proceeds to package up that directory
-Documentation/filesystems/ramfs-rootfs-initramfs.rst:using the config file (by feeding it to usr/gen_init_cpio, which is created
-Documentation/filesystems/ramfs-rootfs-initramfs.rst:from usr/gen_init_cpio.c).  The kernel's build-time cpio creation code is
-Documentation/filesystems/ramfs-rootfs-initramfs.rst:   explained in buffer-format.rst, created in usr/gen_init_cpio.c, and
-scripts/remove-stale-files:rm -f usr/gen_init_cpio
-scripts/sbom/tests/cmd_graph/test_savedcmd_parser.py:        cmd = "sh ../usr/gen_initramfs.sh -o usr/initramfs_data.cpio -l usr/.initramfs_data.cpio.d    ../usr/default_cpio_list"
-tools/testing/selftests/kho/vmtest.sh:        "$build_dir/usr/gen_init_cpio" "$tmp_dir/cpio_list" > "$initrd"
-tools/testing/selftests/nolibc/Makefile.nolibc:        $(QUIET_GEN)echo 'file /init nolibc-test 755 0 0' | $(objtree)/usr/gen_init_cpio - > initramfs.cpio
-usr/Kconfig:          "usr/gen_init_cpio" program in the kernel tree.
+>Acked-by: Randy Dunlap <rdunlap@infradead.org>
+>Thanks.
+>
+>> ---
+>>  usr/initramfs_data.S | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/usr/initramfs_data.S b/usr/initramfs_data.S
+>> index cd67edc38797..e92fb59b3fba 100644
+>> --- a/usr/initramfs_data.S
+>> +++ b/usr/initramfs_data.S
+>> @@ -3,7 +3,7 @@
+>>    initramfs_data includes the compressed binary that is the
+>>    filesystem used for early user space.
+>>    Note: Older versions of "as" (prior to binutils 2.11.90.0.23
+>> -  released on 2001-07-14) dit not support .incbin.
+>> +  released on 2001-07-14) did not support .incbin.
+>>    If you are forced to use older binutils than that then the
+>>    following trick can be applied to create the resulting binary:
+>>
+>> --
+>> 2.54.0
+>>
+>>
+>
+>--
+>~Randy
 
-Otherwise, this seems reasonable to me. Feel free to carry
+--
+Thanks,
+Bhaskar
 
-Reviewed-by: Nathan Chancellor <nathan@kernel.org>
+"Here's looking at you kid"-- Casablanca
+https://about.me/unixbhaskar
 
-on the respin.
+--jz0uGldF3vn8rCHO
+Content-Type: application/pgp-signature; name=signature.asc
 
--- 
-Cheers,
-Nathan
+-----BEGIN PGP SIGNATURE-----
 
+iQFPBAABCAA5FiEEnwF+nWawchZUPOuwsjqdtxFLKRUFAmptHIgbFIAAAAAABAAO
+bWFudTIsMi41KzEuMTIsMiwyAAoJELI6nbcRSykVFngIAJZUmCrwBzus3pyzqYcy
+CsVIziTYXNPeGluGM4sYSK2FCXs7UJVcy4zPNpoLGtBmSyC9FlEvQEwlT7o82gNd
+ZW1KItp9WpJDePL4y5zVZkP9/z6wfKtjWFzxaM7By8k52wKt/iYKliERwXAjk1bs
+ity5IiVeC7Pf1Eo0AFhGJXtrbmJQon6CqugyIdRNe6JHt0gWu6lt8CaAsrgpXEIx
+XAcgkBWzV2jBQVgyi11kNB6EyD/hqbYjQFik9WZUQGuqCLDlHLdQC12s9f9FdOSb
+stw7aYYkwloedCjFcp1XEGUpySrUaUu6sHY2zOeCXkvkTjnQRMcoKMcckeqUR8N8
+v94=
+=9RSh
+-----END PGP SIGNATURE-----
+
+--jz0uGldF3vn8rCHO--
