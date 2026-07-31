@@ -1,123 +1,105 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEC9C29BDB1;
-	Fri, 31 Jul 2026 00:32:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40DD123E35F;
+	Fri, 31 Jul 2026 01:00:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785457986; cv=none; b=tKkOcRIMVkLrFr2jiyzNPQtKTAsUFJ5N/obK8COFVDnTAt/cxmdF9nvczrBv1XLLqf0uETwPstYRkCfgclhpidzTtZxlem6c4NOcrudzDYmbBU6U6y8sH54o7mUglpGBKUmfTWEEkfo3IBo9xZsiMz1PSLq7LgekEGiBVxhZrDc=
+	t=1785459611; cv=none; b=at/OvCZUkwJELUuQTdSFCRsvDFq7mN90xM4mifKeepqBKDfwdhGGXKi33Yki+Z9KLAuPTWpB3/McHptgipM9tfLqA9cHW3SUovrn7hSsXg/HN99BCvabHOeN0n8ie9eFFzsEw2CIVo30MH6NXQpn++QUUNUWmakEyudga1OXyx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785457986; c=relaxed/simple;
-	bh=SVvbfIcAP8682s9VFSvwN5VzjsyB34OUmCjoRDaaLW8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J9stdodZtKFmjh3Axzh1pwXX/1eXUTkmmxles+hmHF1HAP41LSjB1JelSqVSPdWZ1ZXW6ZXLc2QeQxN8ZXqwQcgL2L4YMaicYX8apwHFjecUTlcZWmeR5s2rFnecFCnzpAXDHflFnfzPW1P++tofCBOSgQHiEf3UvKfW1StJd8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=0XeNK4Ww; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1785459611; c=relaxed/simple;
+	bh=2z0GRfTKeZwLgYvKvsdrfdVjwQFTcBUVD0ATs/nkh6g=;
+	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
+	 References:Date:Message-Id; b=APKYBbKLBUsadRQuL3UZdJQfy3XP0ScdACFG+TfHQieWdNpW50NtPKyfsKfVOhhQG2msHNwkrSqETTZGBmtdA+RGQNYy/SXniUeTIUD5hS2dTZSl7+qQX5nkPV6HrvJWFMQxti76Lbn7UdcTrFVdTSptzQx8bzcOtvJAI1FUZC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pu+esVdR; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="0XeNK4Ww"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=oO1CDOT9gnOjmaMCIdL5hkiO1oxiUXMIc71j6JK28vs=; b=0XeNK4Wwtd+ZSoEmb1/YASz+Mk
-	jAN22g245EZWos2l2XQ9gh/4i8tnB7EzEM17uxZk4P/QIc7ViQtFSuDyUi3eFaRKAGFT7Ow+bGFTR
-	IG9GVAFxjnK62GoPHURZXsa/T4D76/BXdCJGB2LEC9qo+UAf/nLZcEtlND6jxrR4eJmdBGIQomRpK
-	DjfSZD6Wv+bfyl8H9kI0Ykc5jkDHcHJMe7dhm2eJByJSj01LUmn68KeoZYU2lBZ3PrBnAax2lZAYd
-	SlNmeLzj42WONH1eYw0F9rWew1zGySuipbL0gpXng5Hc+ls9TACPejvMMYVkAJCugKzJA0ICDS4Go
-	L4qxJmqg==;
-Received: from [50.53.43.113] (helo=[192.168.254.34])
-	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wpbBG-0000000BYUw-1DHP;
-	Fri, 31 Jul 2026 00:32:54 +0000
-Message-ID: <d8d934fd-fb24-42d2-8a43-ee43a2fc1405@infradead.org>
-Date: Thu, 30 Jul 2026 17:32:53 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pu+esVdR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 637A11F000E9;
+	Fri, 31 Jul 2026 01:00:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785459609;
+	bh=SMiUO+LO+UmXH2tAJwCdb5LT/UkZqB36a8S71AyaG0Q=;
+	h=Subject:From:To:Cc:In-Reply-To:References:Date;
+	b=Pu+esVdRDXV+PPI8dBzEgT7AIw2uFvx691DKiSHw5AIKo9Ti5f9K9N1g0v5JpWfXe
+	 3zPz4gp8htQyE8jfWdl2bG/cPioLt3b7GxKQJNcPFL1w1nXYfGgebNLIDgOvT4i0+9
+	 VnO3AQGmCpNAGTQ1fGzsyKV+8ezJpYM1IxY9O7slEdBaATdmZJxgS5Rg455Ft1EuDB
+	 mU9//pOw1xvgTpqkEVi6shduXFhgU4VeMQNhGn+GofWuLBfLuPpFoY2UkDBF7H5T2z
+	 xkvNNwVHCjJ3TavOs2WrT1Mq0mDi9E5EVpTU4QZD/cMuAsa5k6g4zPE9VC292IGuFL
+	 0WTqkyc78Dt5g==
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Documentation: warn against using int, hex, string
- options as expressions in Kconfig
-To: Julian Braha <julianbraha@gmail.com>, nathan@kernel.org, nsc@kernel.org,
- corbet@lwn.net, skhan@linuxfoundation.org
-Cc: jani.nikula@linux.intel.com, arnd@arndb.de, stefan.hengelein@fau.de,
- linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, nico@fluxnic.net, officialnaumansabir@gmail.com,
- vegard.nossum@oracle.com, kees@kernel.org, tj@kernel.org
-References: <20260730140108.683967-1-julianbraha@gmail.com>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20260730140108.683967-1-julianbraha@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH] kconfig: fix submenu rendering of negative
+ dependencies
+From: Nathan Chancellor <nathan@kernel.org>
+To: Julian Braha <julianbraha@gmail.com>
+Cc: nathan@kernel.org, nsc@kernel.org, kees@kernel.org, xry111@xry111.site, 
+ hyc.lee@gmail.com, jeffbai@aosc.io, vegard.nossum@oracle.com, 
+ rdunlap@infradead.org, grahamr@qti.qualcomm.com, nico@fluxnic.net, 
+ masahiroy@kernel.org, linux-kbuild@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+In-Reply-To: <20260721193028.313342-1-julianbraha@gmail.com>
+References: <20260721193028.313342-1-julianbraha@gmail.com>
+Date: Thu, 30 Jul 2026 18:00:02 -0700
+Message-Id: <178545960208.3004192.10262827405138720875.b4-review@b4>
+X-Mailer: b4 0.16-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1719; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=2z0GRfTKeZwLgYvKvsdrfdVjwQFTcBUVD0ATs/nkh6g=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDFnZn6dzmNRNkV913DawVbxS7OrBFQxf/rtuiVQXrz12p
+ fWn/5zyjlIWBjEuBlkxRZbqx6rHDQ3nnGW8cWoSzBxWJpAhDFycAjCRYFGGfzqH1/0TTl5zZdac
+ XVm7vfli56+bN1Nx8nOH6SabzfR1HkUyMuxTS5FimVGzM7Aua77jOYmwW6z3pmy5JC8u8/vAzY6
+ 4iawA
+X-Developer-Key: i=nathan@kernel.org; a=openpgp;
+ fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-Hi,
-I haven't had time to really look at this yet, but...
-
-
-On 7/30/26 7:01 AM, Julian Braha wrote:
-> I've been working on type checking Kconfig, and found some instances of
-> dead code due to conditions that always evaluate to false.
+> This fixes the "ironic visualization" issue reported here:
+> https://lore.kernel.org/linux-kbuild/cbe95c15d2760f6fce8eaf207c969ce8fd3703aa.camel@xry111.site/
 > 
-> For example:
-> 
-> config FOO
->   int
-> 
-> config BAR
->   bool
->   default 'y' if FOO
-> 
-> This 'if FOO' will always be false, regardless of FOO's value (even when
-> FOO=1). The same goes for strings and hex.
+> where a config option FOO is nested in the submenu of the previous option
+> BAR, despite FOO actually depending on !BAR.
 
-Does it help to say
-	default y if FOO > 0
-or
-	default y if FOO != 0
+I would prefer to have a short standalone blurb about the issue reported
+at that link so that the commit message is self-contained. Move the link
+to the trailers with the Closes: tag.
 
-Oh, I think that's what you suggested below. :)
-Sorry, I just read that part.
+> I've only tested locally on x86, but as far as I can tell, this only
+> changes how 2 options are rendered in the menu:
+> 1. NTFS3_FS, no longer in the NTFS_FS submenu, and
+> 2. MTD_BLOCK_RO, no longer in the MTD_BLOCK submenu.
 
-This is unfortunate IMO but yes, let's at least document it.
-Thanks.
+These both seem like correct changes from what I can tell.
 
-> See also this related patch:
-> https://lore.kernel.org/all/20260729210546.394392-1-julianbraha@gmail.com/
-> 
-> Let's warn users against this usage.
-> 
+> Assisted-by: Claude:claude-4.8-opus
 > Signed-off-by: Julian Braha <julianbraha@gmail.com>
-> ---
->  Documentation/kbuild/kconfig-language.rst | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/Documentation/kbuild/kconfig-language.rst b/Documentation/kbuild/kconfig-language.rst
-> index ab2822d7ca1c..aee84b294a56 100644
-> --- a/Documentation/kbuild/kconfig-language.rst
-> +++ b/Documentation/kbuild/kconfig-language.rst
-> @@ -320,6 +320,17 @@ An expression can have a value of 'n', 'm' or 'y' (or 0, 1, 2
->  respectively for calculations). A menu entry becomes visible when its
->  expression evaluates to 'm' or 'y'.
+
+Tested-by: Nathan Chancellor <nathan@kernel.org>
+
+> diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
+> index 16f92c4a775a..2b91d16bf14f 100644
+> --- a/scripts/kconfig/expr.c
+> +++ b/scripts/kconfig/expr.c
+> @@ -738,6 +738,39 @@ bool expr_contains_symbol(struct expr *dep, struct symbol *sym)
+>  	return false;
+>  }
 >  
-> +Note that options of int, hex, or string type should not be used directly
-> +as expressions; these will always evaluate to 'n'. Instead, to check if
-> +one of these options is in use, consider using one of these heuristics::
-> +
-> +  <symbol> != 0
-> +  <symbol> != 0x0
-> +  <symbol> != ""
-> +
-> +because int, hex, and string options will take these values of '0', '0x0',
-> +and the empty string, respectively, when the dependencies are unmet.
-> +
->  There are two types of symbols: constant and non-constant symbols.
->  Non-constant symbols are the most common ones and are defined with the
->  'config' statement. Non-constant symbols consist entirely of alphanumeric
+> +/*
+> + * Check if the expression references 'sym' in a way that is satisfiable
+> + * with 'sym' disabled, e.g.'sym!=y'.
+> + *
+> + * Expects that expr_transform() was already called on 'expr'.
+> + */
+> +bool expr_contains_symbol_negated(struct expr *dep, struct symbol *sym)
+
+I get that this mostly mirrors expr_contains_symbol() but I am not sure
+I love the name since the symbol might not actually be negated. That
+said, I don't really have a better suggestion :/
 
 -- 
-~Randy
+Cheers,
+Nathan
 
