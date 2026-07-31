@@ -1,154 +1,104 @@
-Received: from mail-yx1-f44.google.com (mail-yx1-f44.google.com [74.125.224.44])
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0509730DEB2
-	for <linux-kbuild@vger.kernel.org>; Fri, 31 Jul 2026 22:07:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEBAF489865
+	for <linux-kbuild@vger.kernel.org>; Fri, 31 Jul 2026 22:18:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785535643; cv=none; b=WqmxMFBdsxY+31SOqF0UMSCBecKgRecl2lW164sdSWkF7Kc1ICqhlyWvneLOk+0HHpG/Wrd+I/aPWO46/YroZ3Z+Jej7Yl6U6naqmrK48Lq/mq8M0Dl4B2RH2OFPsl7efUf+mKrbCyn8TFWAGLqVEUETy9Jr4zLk+gA7U8CwEvg=
+	t=1785536318; cv=none; b=NWRAmLHa9VyMDzWLDzuoQMs1QY39ZOk1r8kq4nO/I7x5ws8H/D2sd3Kn6E4a5jBsbjuz0gp78KsdHb6eyvmeTySTShW1+G17gqCjXzYYMF88hdWCNll8rsCMJJE0Uv5fc7igYlnHr8LUBAvBISgQViyb0HvUlm3QZ4IbNTaCS4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785535643; c=relaxed/simple;
-	bh=OIn675hjNJRvCax+siqTy5GlefZli5clf+OOhh2uufM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YwZ4xkYcnDi1mKOS/E5Oyl/J+K64ba2lLKpRRXYmures0DSoXKA1DFzNsbIvGLOHCEDj99wGGO9jbtOsamx/+qxi7cxF8M8EA9qoSvwnimKBvXXPsfWUVmFjHX3cpJodqwySlocmZC9RvTgnMSJ3Gy5TiCSjHczIgu6b8Z092Lc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y+ke4+ZQ; arc=none smtp.client-ip=74.125.224.44
+	s=arc-20240116; t=1785536318; c=relaxed/simple;
+	bh=agteeWmzM+kF99xjI2oWqvM/xRpVrp2hM0FjBwpIj9s=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=WjIPE3xPmShZhHV1R5VfE4O0MILtxAVPgs/chaDFa6KWfQkkZRy3ysJqFGSgQtZW35KhSnomnm1yNMTmFazvuMnAQEy0gVF0jU0aDYj62RCXIBWDzx+IQ84B92LTPW/QRJMbNu+ls4IqYFSOJ8S2I7GonAo6MV2A2TJ3Msk3OW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c7ohCio7; arc=none smtp.client-ip=209.85.128.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y+ke4+ZQ"
-Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-668296d0ff3so1989407d50.0
-        for <linux-kbuild@vger.kernel.org>; Fri, 31 Jul 2026 15:07:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c7ohCio7"
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-81ed073fed0so21946327b3.0
+        for <linux-kbuild@vger.kernel.org>; Fri, 31 Jul 2026 15:18:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785535641; x=1786140441; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:mail-followup-to:message-id:subject:cc:to:from:date:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=lLVrqlJPaYUyQ/s2uocQTjVeXAjhrYhz/clQBuZIliE=;
-        b=Y+ke4+ZQZfSJUKkDIgMzFWCpIx17RrfpGMJldR2pZnXhKKQF6A2d1YGKPhulNqG9GF
-         GHP5VyvxDWh6IDSslQ6nuFn6GfXXZk+tUHn6uwgAg8vkoKWhi4KAmaouVYP/bhoYOOLg
-         TEaZQ3hQrErMk4Ag4aVxYag2U0aV/8wg2+C4q5PBepwC4lVsuk2l+Fkk8xYOiE4bVNrv
-         O1JN3FZXNG7EzRd5d868HdPrMICXwnLITftZGxG+jC6JloL+GXYAJM34iMGDEUGGQ72r
-         KM3s+IkV6oJmWrS/Yg0LEH4963DQlvMZ8Avaor1fyUhoKLrVNCWtllNXRFy7du5+7gJo
-         fxxg==
+        d=gmail.com; s=20251104; t=1785536316; x=1786141116; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=Fn+/0u9SivieYVyZToaK0JcxBLpMkaVPj2mno+LIjIQ=;
+        b=c7ohCio7/YsRvJhlEGWs2u1qA00dey5VKoL8s8L9597zQF/sDpwo3rwJ8JypJ61s5S
+         NvYBkMavLLQivhEZ4w3bwzlTHmMIuLeDxATI7vapv5kCSfgubjBabLPvDoCijDXdcY6y
+         dLMtkeB38wLzD4KHYXM/liU7dwJCtbZoCgdiPSSD3bcKPaq7DeFeLGWZkO929uOvaYPX
+         GgX6AOdMd0kaX6lBu08AI/aQApNYEjnOb14j0UWt1PIRNTfILE2bpd0eWG1kT4fOKRjm
+         bSmI39ZZ4RXs9BRgkUGDWD5njqv07BIYQh/sMso8e0A44FYh9QVTHYMhcfFJeb2TKLya
+         FLYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785535641; x=1786140441;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20251104; t=1785536316; x=1786141116;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=lLVrqlJPaYUyQ/s2uocQTjVeXAjhrYhz/clQBuZIliE=;
-        b=BoEMNp2phy7ziEedOJYtU6lMVGdLCkvL1nF4/VbwKoi+DS/XlAbKvPRs5FsFWR7e8l
-         BWxTrNIHlpWTepz8rifOT1Ug6nzgr4pwHXXH4ui15p1eMZDSEkbCSPYHVnNlbep97gqs
-         B42PrjnPiRImdDHCUJrOeQp2252Z+6jhA0qoh95duTFcL29nS754WzFz5/fbrFbalb7D
-         gMlQcu4f1f2L5VtjRQzZ5kXkyGt6z0nB6eii+yAs1D2ZmKAk5383N6rVDC2hg6QvCNY9
-         BTwee0wepukaSIetgkaksN4MDCLvVuJETEhomNao8JccXvM5BJb4ym0PUwRGUYukNcds
-         21Zg==
-X-Forwarded-Encrypted: i=1; AHgh+RpgyXxAWRIk9i+xr9hgFGS8F2Xo7JXH67pTEIFvQPPqqdOtZKoV6AIgU4Xr6wi+qNrToFrWlNxWiB5VjA4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwoS+E0NHyEEyfIpiAMi7YjZVVsUItY0lsE6sFmHngFg1PfTkZQ
-	dB3qFdr7wbGpIGt0DyaqoIScfxsZ31S5y5kq0RDcMtq3qERj1fJOpoHN
-X-Gm-Gg: AR+sD11jgdJQCSjavwXLOxZVcA8S2ZLh2Kzs2u3UoIFynfAz1GMKEhiZTgMqR22YCaI
-	++A98PG++YZZmDVRg0LOjONxvsgWguydHbvC1e9Ku1v7UQLHqeAsG7duADxu6TuR2wuveToPxSF
-	LGMR1mFXYvzvrF7y83mpxwIBVgHhgnQ4hJKI3VEY0zcdNCZiYOZLGzHTJfMv8l48fedim/bcOVx
-	mYVD91NXsIMQeI5FIK88/B2bcQtQdq6b+q/i00nsSM/GJiY5DR4saYcIFBmVkPtRjvsGrnmQapS
-	oed0rT6KeF75ZUnQNkziKHtSY6IdX/R71eGs9FnPSc5mJy/oxLJADovW+dIbM4AFhLw/tTFDHiA
-	QqLIeVifs8V9x5tEI7s9R+X0NmXMHQ/gW4pDkI9u0uflj6h/UBE7G656LrbJbQiW5RAN1/Fru2n
-	gKfD85VkT4OgLEi5CtnexTVxDo3GHxJyxC1EHXH1dfJRMVc+tJ88iKQ7U=
-X-Received: by 2002:a05:690e:43d6:b0:668:8b5b:75a7 with SMTP id 956f58d0204a3-6694f08c3b8mr1660952d50.11.1785535640713;
-        Fri, 31 Jul 2026 15:07:20 -0700 (PDT)
+        bh=Fn+/0u9SivieYVyZToaK0JcxBLpMkaVPj2mno+LIjIQ=;
+        b=YSKL0O5D7KA11YdzQGvTqdBh4mRPfw9F/uswcydJP5/VNTw720THTDWnobipKu4lob
+         omlCcSXPV8wEiDwUHaEavdr0RQyxMcgatJqkbOUD9gBJodl6RbbPyK0y8S8fhl818icZ
+         585682/F3FcEMzQkdJTzroP9DIG8Fd3rHvDOoDWPjmroZzvm2EAttvZ3axM8CZUlrXKo
+         gAxXFm/BKXmWqkQl8cBBU/Pr0OJjMBWb3jimvsL+8DPsr5PjlXPLab5A4b+k7D++U5Oy
+         09kcRGFN8WZr9vv+mQs1IyAFK/t0vl4rh9qVlBM6GGJSKEUm1pGrOJed6CJtvfIJ1or7
+         9c+A==
+X-Forwarded-Encrypted: i=1; AHgh+RqFWoAvPY1z9f3WINt1Lv8eeRr/eUtc21vKG3WUXscyVW+J9R7YiSWpex4gfhDqjvDvfXH+A8ESUprrdZ0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyi/MuePMKuh6q4k8U/laV9MiNj2HxR8eRNviba7mE4bixiNaBm
+	ZBfX5AsJu3LJrJqLnB4/Vw8bjAvAZgsrWj5Fn35EgsaUtdBUJH41ioGc
+X-Gm-Gg: AR+sD10a6dk8ZVT+2VNwIYk/Fg0U8/7ry4CQaTXx/NH+7NI+DAGY/LUSnGet50Ac1/f
+	0bJO8m2aDCv7DhcaOHysKiWAvSoPZIaH7Rgdbtvx+RNuUpwxzeq5/7s5kF9BnvMjkGFxD5/Cn8v
+	77hu5dONfS1iXJu7Z4lLZSS8ZTaB/SAU5tsJ547J9p0pkVO+xf1DTwFSSVNpKyvF8iX4TZ60uKn
+	kiCF8BlV3ynwbm8irkUIbk5wCyHobH892BAImFxl78URmZzeo0IotgyTBbQWesGPe4yARgscobk
+	bGMPHxirsI8j4wXnsf+l14eZwpsId0Tdw8FgeBekDHelZ3IzYaHFtB/SgYr8QxlMhx3GyHcnBVx
+	LqYnt+Z7vDr+fVP605ZxgYPftdz5Y2vJEPTFGgjZmmOaGgznwhPCxnNpWtRj5VCAPI9UW1wXDi3
+	7jCn/CfmWEzu/s4U/N/m0I47On8lsiuBZJEeEqm+EjxBBA+qlVcGzRF7izq40Fs6Ijqg==
+X-Received: by 2002:a05:690c:630c:b0:81c:8dc5:29e4 with SMTP id 00721157ae682-81fd4c0d6ecmr21174597b3.32.1785536315836;
+        Fri, 31 Jul 2026 15:18:35 -0700 (PDT)
 Received: from Gentoo ([191.96.227.11])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-66948b98babsm1442207d50.0.2026.07.31.15.07.17
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-81fd71a9033sm3794367b3.4.2026.07.31.15.18.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Jul 2026 15:07:20 -0700 (PDT)
-Date: Sat, 1 Aug 2026 03:37:12 +0530
+        Fri, 31 Jul 2026 15:18:34 -0700 (PDT)
 From: Bhaskar Chowdhury <unixbhaskar@gmail.com>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: nathan@kernel.org, nsc@kernel.org, linux-kbuild@vger.kernel.org,
+To: nathan@kernel.org,
+	nsc@kernel.org,
+	unixbhaskar@gmail.com,
+	linux-kbuild@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] usr: Correct a spelling by changing a latter
-Message-ID: <am0ckPayPdCQjnCL_Gentoo@unixbhaskar-laptop>
-Mail-Followup-To: Bhaskar Chowdhury <unixbhaskar@gmail.com>,
-	Randy Dunlap <rdunlap@infradead.org>, nathan@kernel.org,
-	nsc@kernel.org, linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-References: <20260731102211.2327476-1-unixbhaskar@gmail.com>
- <219d161a-8d8b-45e5-84d6-195c80a24ddc@infradead.org>
+Subject: [PATCH V2] usr: Correct a spelling by changing a letter
+Date: Sat,  1 Aug 2026 03:42:11 +0530
+Message-ID: <20260731221556.3638651-2-unixbhaskar@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="jz0uGldF3vn8rCHO"
-Content-Disposition: inline
-In-Reply-To: <219d161a-8d8b-45e5-84d6-195c80a24ddc@infradead.org>
+Content-Transfer-Encoding: 8bit
 
+s/dit/did/
 
---jz0uGldF3vn8rCHO
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
+cc:rdunlap@infradead.org
 
-On 07:45 Fri 31 Jul 2026, Randy Dunlap wrote:
->
->
->On 7/31/26 3:20 AM, Bhaskar Chowdhury wrote:
->> s/dit/did/
->>
->> Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
->
->Looks good except that the Subject has a typo in it.
->
-  Gosh! What a paradox!! V2 coming ...
+Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+---
+ V2 changes from V1:
+ Subject line typo, thanks Randy to point out.
 
->Acked-by: Randy Dunlap <rdunlap@infradead.org>
->Thanks.
->
->> ---
->>  usr/initramfs_data.S | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/usr/initramfs_data.S b/usr/initramfs_data.S
->> index cd67edc38797..e92fb59b3fba 100644
->> --- a/usr/initramfs_data.S
->> +++ b/usr/initramfs_data.S
->> @@ -3,7 +3,7 @@
->>    initramfs_data includes the compressed binary that is the
->>    filesystem used for early user space.
->>    Note: Older versions of "as" (prior to binutils 2.11.90.0.23
->> -  released on 2001-07-14) dit not support .incbin.
->> +  released on 2001-07-14) did not support .incbin.
->>    If you are forced to use older binutils than that then the
->>    following trick can be applied to create the resulting binary:
->>
->> --
->> 2.54.0
->>
->>
->
->--
->~Randy
+ usr/initramfs_data.S | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/usr/initramfs_data.S b/usr/initramfs_data.S
+index cd67edc38797..e92fb59b3fba 100644
+--- a/usr/initramfs_data.S
++++ b/usr/initramfs_data.S
+@@ -3,7 +3,7 @@
+   initramfs_data includes the compressed binary that is the
+   filesystem used for early user space.
+   Note: Older versions of "as" (prior to binutils 2.11.90.0.23
+-  released on 2001-07-14) dit not support .incbin.
++  released on 2001-07-14) did not support .incbin.
+   If you are forced to use older binutils than that then the
+   following trick can be applied to create the resulting binary:
 
 --
-Thanks,
-Bhaskar
+2.54.0
 
-"Here's looking at you kid"-- Casablanca
-https://about.me/unixbhaskar
-
---jz0uGldF3vn8rCHO
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iQFPBAABCAA5FiEEnwF+nWawchZUPOuwsjqdtxFLKRUFAmptHIgbFIAAAAAABAAO
-bWFudTIsMi41KzEuMTIsMiwyAAoJELI6nbcRSykVFngIAJZUmCrwBzus3pyzqYcy
-CsVIziTYXNPeGluGM4sYSK2FCXs7UJVcy4zPNpoLGtBmSyC9FlEvQEwlT7o82gNd
-ZW1KItp9WpJDePL4y5zVZkP9/z6wfKtjWFzxaM7By8k52wKt/iYKliERwXAjk1bs
-ity5IiVeC7Pf1Eo0AFhGJXtrbmJQon6CqugyIdRNe6JHt0gWu6lt8CaAsrgpXEIx
-XAcgkBWzV2jBQVgyi11kNB6EyD/hqbYjQFik9WZUQGuqCLDlHLdQC12s9f9FdOSb
-stw7aYYkwloedCjFcp1XEGUpySrUaUu6sHY2zOeCXkvkTjnQRMcoKMcckeqUR8N8
-v94=
-=9RSh
------END PGP SIGNATURE-----
-
---jz0uGldF3vn8rCHO--
