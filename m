@@ -1,104 +1,93 @@
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEBAF489865
-	for <linux-kbuild@vger.kernel.org>; Fri, 31 Jul 2026 22:18:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 210E73C3F6B;
+	Fri, 31 Jul 2026 23:15:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785536318; cv=none; b=NWRAmLHa9VyMDzWLDzuoQMs1QY39ZOk1r8kq4nO/I7x5ws8H/D2sd3Kn6E4a5jBsbjuz0gp78KsdHb6eyvmeTySTShW1+G17gqCjXzYYMF88hdWCNll8rsCMJJE0Uv5fc7igYlnHr8LUBAvBISgQViyb0HvUlm3QZ4IbNTaCS4o=
+	t=1785539707; cv=none; b=uR9M7pNibAtl/iV4cz2mxDa1qKUjtDil1uapIQ7FJFmr+NQKO1PP86PnT08Mc6aIoCKzF54OIeGb6arx0rCmaJ0nlPHA79Z/XhSQ8SwDHn2e6Uu6dMqKPACVNwA/BtbLuTMpZyoZ+Sd8Ws+CivLKAKaNY5FIobxxjiG8huIP//U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785536318; c=relaxed/simple;
-	bh=agteeWmzM+kF99xjI2oWqvM/xRpVrp2hM0FjBwpIj9s=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=WjIPE3xPmShZhHV1R5VfE4O0MILtxAVPgs/chaDFa6KWfQkkZRy3ysJqFGSgQtZW35KhSnomnm1yNMTmFazvuMnAQEy0gVF0jU0aDYj62RCXIBWDzx+IQ84B92LTPW/QRJMbNu+ls4IqYFSOJ8S2I7GonAo6MV2A2TJ3Msk3OW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c7ohCio7; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1785539707; c=relaxed/simple;
+	bh=vxEnu3o4iTK2rNnkkmrOB1atDv6/Yty15Qe/t4D5oOQ=;
+	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
+	 References:Date:Message-Id; b=nPYtpvNR3ELTQMJfiNw0MVE/3bY7K0bb0jDl/IQ0gwI6syBMqSP93FW4ObV1tinAgylHvOJZHNWHL9z7nnDgmqGzBfVQPewJjESdwMqXtRLtpqP/755GCb4caaoAPS4VzWOKT/QC6J+9yYrTfCCNtprGsEz/LZZP6/sXDqqy75k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K4RdqPDr; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c7ohCio7"
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-81ed073fed0so21946327b3.0
-        for <linux-kbuild@vger.kernel.org>; Fri, 31 Jul 2026 15:18:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785536316; x=1786141116; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Fn+/0u9SivieYVyZToaK0JcxBLpMkaVPj2mno+LIjIQ=;
-        b=c7ohCio7/YsRvJhlEGWs2u1qA00dey5VKoL8s8L9597zQF/sDpwo3rwJ8JypJ61s5S
-         NvYBkMavLLQivhEZ4w3bwzlTHmMIuLeDxATI7vapv5kCSfgubjBabLPvDoCijDXdcY6y
-         dLMtkeB38wLzD4KHYXM/liU7dwJCtbZoCgdiPSSD3bcKPaq7DeFeLGWZkO929uOvaYPX
-         GgX6AOdMd0kaX6lBu08AI/aQApNYEjnOb14j0UWt1PIRNTfILE2bpd0eWG1kT4fOKRjm
-         bSmI39ZZ4RXs9BRgkUGDWD5njqv07BIYQh/sMso8e0A44FYh9QVTHYMhcfFJeb2TKLya
-         FLYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785536316; x=1786141116;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=Fn+/0u9SivieYVyZToaK0JcxBLpMkaVPj2mno+LIjIQ=;
-        b=YSKL0O5D7KA11YdzQGvTqdBh4mRPfw9F/uswcydJP5/VNTw720THTDWnobipKu4lob
-         omlCcSXPV8wEiDwUHaEavdr0RQyxMcgatJqkbOUD9gBJodl6RbbPyK0y8S8fhl818icZ
-         585682/F3FcEMzQkdJTzroP9DIG8Fd3rHvDOoDWPjmroZzvm2EAttvZ3axM8CZUlrXKo
-         gAxXFm/BKXmWqkQl8cBBU/Pr0OJjMBWb3jimvsL+8DPsr5PjlXPLab5A4b+k7D++U5Oy
-         09kcRGFN8WZr9vv+mQs1IyAFK/t0vl4rh9qVlBM6GGJSKEUm1pGrOJed6CJtvfIJ1or7
-         9c+A==
-X-Forwarded-Encrypted: i=1; AHgh+RqFWoAvPY1z9f3WINt1Lv8eeRr/eUtc21vKG3WUXscyVW+J9R7YiSWpex4gfhDqjvDvfXH+A8ESUprrdZ0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyi/MuePMKuh6q4k8U/laV9MiNj2HxR8eRNviba7mE4bixiNaBm
-	ZBfX5AsJu3LJrJqLnB4/Vw8bjAvAZgsrWj5Fn35EgsaUtdBUJH41ioGc
-X-Gm-Gg: AR+sD10a6dk8ZVT+2VNwIYk/Fg0U8/7ry4CQaTXx/NH+7NI+DAGY/LUSnGet50Ac1/f
-	0bJO8m2aDCv7DhcaOHysKiWAvSoPZIaH7Rgdbtvx+RNuUpwxzeq5/7s5kF9BnvMjkGFxD5/Cn8v
-	77hu5dONfS1iXJu7Z4lLZSS8ZTaB/SAU5tsJ547J9p0pkVO+xf1DTwFSSVNpKyvF8iX4TZ60uKn
-	kiCF8BlV3ynwbm8irkUIbk5wCyHobH892BAImFxl78URmZzeo0IotgyTBbQWesGPe4yARgscobk
-	bGMPHxirsI8j4wXnsf+l14eZwpsId0Tdw8FgeBekDHelZ3IzYaHFtB/SgYr8QxlMhx3GyHcnBVx
-	LqYnt+Z7vDr+fVP605ZxgYPftdz5Y2vJEPTFGgjZmmOaGgznwhPCxnNpWtRj5VCAPI9UW1wXDi3
-	7jCn/CfmWEzu/s4U/N/m0I47On8lsiuBZJEeEqm+EjxBBA+qlVcGzRF7izq40Fs6Ijqg==
-X-Received: by 2002:a05:690c:630c:b0:81c:8dc5:29e4 with SMTP id 00721157ae682-81fd4c0d6ecmr21174597b3.32.1785536315836;
-        Fri, 31 Jul 2026 15:18:35 -0700 (PDT)
-Received: from Gentoo ([191.96.227.11])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-81fd71a9033sm3794367b3.4.2026.07.31.15.18.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Jul 2026 15:18:34 -0700 (PDT)
-From: Bhaskar Chowdhury <unixbhaskar@gmail.com>
-To: nathan@kernel.org,
-	nsc@kernel.org,
-	unixbhaskar@gmail.com,
-	linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH V2] usr: Correct a spelling by changing a letter
-Date: Sat,  1 Aug 2026 03:42:11 +0530
-Message-ID: <20260731221556.3638651-2-unixbhaskar@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K4RdqPDr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 050621F00AC4;
+	Fri, 31 Jul 2026 23:15:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785539705;
+	bh=YpKVr7iZ+A0rdfx7JkqFbzI44ufb1YFoHd/We2OY17k=;
+	h=Subject:From:To:Cc:In-Reply-To:References:Date;
+	b=K4RdqPDr+mThzuhMOCOTS0bf0XGHPoQYqp6Pj+zmn9d4/lrCQNhdYyMvfvU+NCpRT
+	 qOoJ2PWakrLCROwbcTLUs7U+hkaBH5FcmFBWRnY1w/l5LFy8BS9hhTdCAgl7Xr5wJA
+	 XHvZX1Aa8Lwfi6tjzhdD/MkVmhiiG106jYrevFXvIJAnRHl48xSyeHZTXNC59QHJYD
+	 QJ9F/XBO3fRZBfPiw1mwLX/uM58YlVjcRoh770hqp2MVGZmxsxBEgzz+odanXIx6/y
+	 EPSEizX8on+0yTfWrk9G+auTFdpifaNSfyMr3cZmQAEpqWmSOuPGlFyQEkge91B0pj
+	 6rclky4S5n9yg==
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH] kbuild: fix modules.builtin(.modinfo) targets in the
+ top-level Makefile
+From: Nathan Chancellor <nathan@kernel.org>
+To: Yuntao Wang <yuntao.wang@linux.dev>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+ Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+ Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>, 
+ Luis Augenstein <luis.augenstein@tngtech.com>, 
+ Steven Rostedt <rostedt@goodmis.org>, 
+ Masahiro Yamada <masahiroy@kernel.org>, 
+ Andrew Jones <andrew.jones@linux.dev>, Alexey Gladkov <legion@kernel.org>
+In-Reply-To: <20260729071737.818007-1-yuntao.wang@linux.dev>
+References: <20260729071737.818007-1-yuntao.wang@linux.dev>
+Date: Fri, 31 Jul 2026 16:14:57 -0700
+Message-Id: <178553969779.3652505.9437808895468969032.b4-review@b4>
+X-Mailer: b4 0.16-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1298; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=vxEnu3o4iTK2rNnkkmrOB1atDv6/Yty15Qe/t4D5oOQ=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDFm5OmWykRwrqk946EVpPZZRZX2oI1lwU3LZ7acnuHYdn
+ rOtvnlCRykLgxgXg6yYIkv1Y9XjhoZzzjLeODUJZg4rE8gQBi5OAZiISBAjw5q2myUcaor34o8L
+ bsn6qtXU7/nJW1Fg2hM/X7N7N2MuAlXcczTvVtuw9OrS71zV2RKn8iabt/d6nTgRecimevXEi/q
+ 8AA==
+X-Developer-Key: i=nathan@kernel.org; a=openpgp;
+ fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-s/dit/did/
+> Commit 7a342e6c7735 ("kbuild: move modules.builtin(.modinfo) rules to
+> Makefile.vmlinux_o") moved the modules.builtin(.modinfo) rules from
+> link-vmlinux.sh to Makefile.vmlinux_o, and added the corresponding
+> targets to the top-level Makefile.
+> 
+> Commit 39cfd5b12160 ("kbuild: extract modules.builtin.modinfo from
+> vmlinux.unstripped") later moved these rules from Makefile.vmlinux_o to
+> Makefile.vmlinux, but left the corresponding targets in the top-level
+> Makefile unchanged.
+> 
+> These modules.builtin(.modinfo) targets in the top-level Makefile should
+> be moved alongside the vmlinux target, since they are now generated by
+> Makefile.vmlinux.
+> 
+> However, simply removing these trivial targets might be a better choice,
+> as it makes the Makefile cleaner and avoids the need to keep them in sync
+> across multiple files, reducing the chance of future mistakes.
+> 
+> Fixes: 39cfd5b12160 ("kbuild: extract modules.builtin.modinfo from vmlinux.unstripped")
+> Signed-off-by: Yuntao Wang <yuntao.wang@linux.dev>
 
-cc:rdunlap@infradead.org
+Well I suppose if nobody has reported these targets being broken, it
+probably means nobody is using them. It is easy enough to put them back
+if somebody needs/wants them.
 
-Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
----
- V2 changes from V1:
- Subject line typo, thanks Randy to point out.
+Reviewed-by: Nathan Chancellor <nathan@kernel.org>
 
- usr/initramfs_data.S | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/usr/initramfs_data.S b/usr/initramfs_data.S
-index cd67edc38797..e92fb59b3fba 100644
---- a/usr/initramfs_data.S
-+++ b/usr/initramfs_data.S
-@@ -3,7 +3,7 @@
-   initramfs_data includes the compressed binary that is the
-   filesystem used for early user space.
-   Note: Older versions of "as" (prior to binutils 2.11.90.0.23
--  released on 2001-07-14) dit not support .incbin.
-+  released on 2001-07-14) did not support .incbin.
-   If you are forced to use older binutils than that then the
-   following trick can be applied to create the resulting binary:
-
---
-2.54.0
+-- 
+Cheers,
+Nathan
 
