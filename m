@@ -1,99 +1,123 @@
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EAF141736B
-	for <linux-kbuild@vger.kernel.org>; Fri, 31 Jul 2026 10:22:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A959416857;
+	Fri, 31 Jul 2026 10:33:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785493360; cv=none; b=faVsTzu+RNmvO17/Y4YdTX+lQUYfjKGRmJhwaWVOHg5HgtD0I7He7Jo4iJHNeq7YH81MtFc/ht06H4d5Bs1V6JcvolqQXVt7KwhzemQE0FkfigfIyN8WSKLZZg55a2mrb3J2LDQ/PRWJ7atf/OL7rbhGFiwU9KPH1D4WmU7JHEo=
+	t=1785494041; cv=none; b=EnXwdAuJlF/yc3u1wFZ9kg156Icsj+MEcA/w+mme1tOOwxn+bEoHM8SN4XOc9kpxGUSiSrKqggHhSG2yd+0PUbRie7qrOQVSDKQK0Ehr4IWb7IaWssPsSt6ex6EH7O1XpN5OCrotAyIOTELXd+TvGaEiPD11T+0n4uDr8s0xtkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785493360; c=relaxed/simple;
-	bh=qzyo+QnTFnmrAYUBPCsnn0eKLSz6YYxKWoVA9EDKIQs=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=tbhawiGswt3tHIe8qk92pzvOVaQcsEctxUn8xs53AKzCRjNKRxRuVoubAcT1UqAzUiw9dQpyHe8MSJ5saxEbKgaUhpy++LJLm9u8acwqvcrURVpHYocM6/DLV65+C9pVdXZ57ETU60d5Se95gGZuAO2mzJaHnTU61khQOOK9n6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bzjzO917; arc=none smtp.client-ip=209.85.128.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1785494041; c=relaxed/simple;
+	bh=EWHAT9zISehbazohcL0ZK2/Eu4oaxgyF3e/L1zw4deI=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=Q6K97dtFIe4Ef9FL85P0FOJ66bZR2wv1fcG4pWvdKFhZs8n3+pfyQ6H27g2eSNHUGSNnvLaAwuLk00lZ9SVcwMuNCsPcHpQFtDQxxN7/OYgUlrDrRqtP6x8d7SLsD29VVtALmFaXoMbdiMQADFN2gkOyYJ/aZeNC8NAOo+sHyfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=Ij+tZ6TK; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ZUg08VX0; arc=none smtp.client-ip=103.168.172.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bzjzO917"
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-81e9f7491ffso12822707b3.0
-        for <linux-kbuild@vger.kernel.org>; Fri, 31 Jul 2026 03:22:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785493352; x=1786098152; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=yAih+EkoeJkECqgrlhNFazVCvb2E5wCnFNuHCFELofo=;
-        b=bzjzO9175SkKUyx4v/P3+mKPuudf7z3/OBKg/RgLATqEXcD1VJegwZgG3evhVnSgQD
-         8hkkmS2XigvUm7VYWOoC5CFN0KhTDulIjhSTH+T1E+f8oPBX9IdSgIqWw05EGEQWZ3OJ
-         0fUa8C+y9xTbEuhVNMUeh7c8WTDdzoueQdtP9BqmmHvkqtnpLVBg5fGmpDYfFvyO21KZ
-         2RniGRlLCuLfmk+A8t3n/Qtd4KUVnLdzwsfGjhWE02L1cZGns3iL99buiV9DbC8K0oVZ
-         jHDqCr8IUC5Xtaw4rIODbX5VnN44ZzbW0G/iBc06GMreBpVcFn8jNA4DFcKQqhIRJg4C
-         0UGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785493352; x=1786098152;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=yAih+EkoeJkECqgrlhNFazVCvb2E5wCnFNuHCFELofo=;
-        b=Pzwm+BNPNesTZxa+SK937gf6tJRNIg7Oainq8escbM6dw1dS/bLTFd94LXrXyHYsGR
-         QArVI94YJw0ToUQlP9L2l68vjPnVW55rBumYIEuwKsBvy2uVC/PEAKODj0Zb9JyMngCf
-         UTbWaCGjs7G5i7+CPpXttiw9GWM2o5+mNuQ8B2+HPAhU/K0UR5bn430HnHaPQEoHGscY
-         5993p2qHkhaeVJDTD4TghpVzHbiJlBZdmJXhPNuGm+jDmcGSzhodoFsg3yvYIv8c8Tg1
-         RS4hlXO4morR8Sua1nSwh/54FmDr8QIDd/qYMSAyhe1w13iMNCHTNhAHqsNDLb/NoFDN
-         Qc1g==
-X-Forwarded-Encrypted: i=1; AHgh+Rq64hHQDZ9TAdQLLcgCg2RzWbKzZkOk/4mWMi2QNeNlVu8hwJjGG6jPG5Cn7GyKNqCKmz/zHGFJuoOFV20=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyaepXplEl0gaFhVKLd3/ks34+RZ1f9oSUlIZnMuq1n9JIJvbWX
-	CkVCM3/k9MxZzLlO2seeQG49wO30D1QOi0QPuLBNmOvZcNDyTdl2xjzj
-X-Gm-Gg: AR+sD130s0Wvl55aCRs55RCheTqJrWXKRQCVXEkhLXPrjAUjeNUh9eAK9tTcIUX9467
-	Fjc6sT3VIiV/zdkXnXGtkMUcvkoo4+9l4Sqy0DQ6MTmru1g65zxRNtL31BXW+mMfUo+yBnH/wzY
-	jBby4fSoiYlqxaYZ79DQYeDW3R5bfjHsVdTDM2JRBbTr6/69LYct+tZw6r7TpdNXbAUSKEv+QMW
-	yjvrcLTC8kzH2W+UC+tDs87cEiFzSKo9B0b98f3sZZfaJHMU4DMVAedkQNOISxYpfzvyqzWS7Bh
-	lUchSnyX7F5y0lzZnpzilKvVL/9omrBsQPDrMI7dVkqlu6c9/OdPmE7KPBK/acKO1yIMGbMYszI
-	75j3ErQ7mwW3GvYfUuriC9JGx3T33eDxEG+pF4oE/Y+gTwvARZaaii8aqqMxSb/gGvys+WTTKFP
-	kcJtbbCRIUhLQudGvYdfdIEi4oPa7R17xadpqsJIBSfWI6euXEHgeeYR6rbhb2xzNFKqY=
-X-Received: by 2002:a05:690c:e0c5:10b0:809:fd83:a88b with SMTP id 00721157ae682-81fcec457dbmr4861587b3.3.1785493352235;
-        Fri, 31 Jul 2026 03:22:32 -0700 (PDT)
-Received: from Gentoo ([191.96.150.98])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-81fccd799b5sm4466817b3.0.2026.07.31.03.22.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Jul 2026 03:22:31 -0700 (PDT)
-From: Bhaskar Chowdhury <unixbhaskar@gmail.com>
-To: nathan@kernel.org,
-	nsc@kernel.org,
-	unixbhaskar@gmail.com,
-	linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] usr: Correct a spelling by changing a latter
-Date: Fri, 31 Jul 2026 15:50:10 +0530
-Message-ID: <20260731102211.2327476-1-unixbhaskar@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="Ij+tZ6TK";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ZUg08VX0"
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfout.phl.internal (Postfix) with ESMTP id 1B5A9EC0099;
+	Fri, 31 Jul 2026 06:33:37 -0400 (EDT)
+Received: from phl-imap-05 ([10.202.2.95])
+  by phl-compute-04.internal (MEProxy); Fri, 31 Jul 2026 06:33:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1785494017;
+	 x=1785580417; bh=fRkbjbM3Ek1+ircvljzCclMWH898hvdpeWVxglMvLwc=; b=
+	Ij+tZ6TKF9cUjepHXSDmjRC4YrXr/78NXT8iJwJi/yPuu4LBuApUfkZtXPjg/4qF
+	a/o/+43AKk3mz9Sws+eM+TRsD1Q9JPO/EWzxNUdKqbC/GxQgST5Ut9AKUT31ulhl
+	IhTjrx4YsqSSDEKM4N9CgedMiih4UVITxWdpNResTiMkllWkHKh9vkXLOSpXrX/l
+	7MH+pvTLKfQLyx2DBM8twyji2wuQxs1328KaKGIo4KA84oJYV9HPrFIwxRkUnfds
+	24KHtjrOjenWJaDH73jJwBcdZ0PpWHvHIgHl4IPu6D4d3YbUd8VtZGhY3y18xFw8
+	m8h0ImQ3mC6DNAp5w8tV+w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1785494017; x=
+	1785580417; bh=fRkbjbM3Ek1+ircvljzCclMWH898hvdpeWVxglMvLwc=; b=Z
+	Ug08VX00J2B9UFqjBrLk9od356ruwXqOyBwZyw49CRo06QEsDqfY2/2V5D4t6fCH
+	vC7W4ppHb3/k297uMojLDxkOCgPoZoIt2UTSnSsHG3QZEe0F7QL8MGun1ccJLAoa
+	WLUovBDs7LnBbXRjlwn4XRaiwR6+FRGF2jmEVrgMsjAGYPF8/SvUQIIb6lWgnmQH
+	ScBrxDFA6JW/n9FhpmXiSjXqpG4OFhbYXVXDRkZCxu7d1neFV2XW9/HpDI2LpA2D
+	OgB/rktlmthvpnN+igMBv4Or+LlJ9mq3xH+bjjeyr2vcm23Opu6whpY2BMvzDqY1
+	kTR+GLWL3tqqt6uzjE/MA==
+X-ME-Sender: <xms:_3lsajNnYyz769Ic3abDEFYO0OhYIge4jaFw3JFTiAFEVWMLymHfig>
+    <xme:_3lsaoyWnW06IHiQ96WDe3K1mrqI956TxGQd9hKkdyZRoM9jLqwR6awFkVpPKjTcw
+    uwouMDT8JEcrf1G8B5ftmKlJld8h1Om47luLPWdlc7ZAazLmQGyLyI>
+X-ME-Proxy-Cause: dmFkZTGT8YwHAAsEm3rVDPUnQchmR0iyDLaHRiKiOoictZ6yGIdoo5nnOi24zP+jRd+d2e
+    c7xn9+TzMVrFx6E1pywDmq/ii10y6eUpCctzGlEFP0PQnObHimAxbqf1iKtFhrDwe43FAq
+    mclxyQ0JPuUp2HSYXMFL51f6JDOaRBn+E4cRzVert+XRyf+iyqfXS0mCcPU98s9gnOwQei
+    Uyfn7iS3Ry6Zl6cjGOWhP9961O3iBZiyWzQNPDZf/w4AjiGqZhKI6I1Bhf8G3oiE6Uq+uy
+    r7xdnUBffa7uYjzF8zmnJ9tVltc7svMKSlIQbITHg5CcJO4o4jpDG4kJsVRJ5emTrA++qC
+    5V3V5KqFVZbZGWdiiAs7KJnCB49GMbqLktdfEyRuwGhqViicx8Gj1XK65wu48JFHG1X2bz
+    vIdaUaCcdz+7SR6LMMAK3EJSD6JoMooNfd0OA36x4c/nrAZiQU24hG3E3jDaZjzfUJtzFA
+    uBKj+Ia2YUDBicyJX1hgiL7iM6Hsd5knBgJahcMi5s5LCsB7m7/xAzjxIaVVb2JbjfYyQ9
+    ClWYrhoh3N1GB+pB4cLejKDOwYhEVpNZKyu6LlcgybEaoAOmFPzk0pN6oRcOrop0AG4jQg
+    H9ic6RK7zO7ACiO2aikyPl+tiVN7B/aV5jDfeFbr+pL/VPTW4ZswqOkY5xWg
+X-ME-Proxy: <xmx:_3lsakQIO2Ob0hoFX3KIyATZrwPupWbXbG_h1sEwTO6y2V5GYS-rTA>
+    <xmx:_3lsarLopbHyccsKIK4iTqNF-50HB45eQyJC_SZXRTuyP4ov91X6HA>
+    <xmx:_3lsaqU9y2LiJREhdAA2QyuQ5-f09sNBFzSfcWppnJcHZmt4lyovCA>
+    <xmx:_3lsanj7P9AM03-BWzhLy556kyZSckmptAGvsiJmQtTuXKModVttfw>
+    <xmx:AXpsajDiQGAqxgBX2BLaZWd0HqBv7-krU06jv5Y5HEC-Jhpw5yRDH58Q>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id BD3E6182007E; Fri, 31 Jul 2026 06:33:35 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-ThreadId: ASxzv5og6Sd3
+Date: Fri, 31 Jul 2026 12:33:13 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Julian Braha" <julianbraha@gmail.com>,
+ "Nathan Chancellor" <nathan@kernel.org>
+Cc: "Nicolas Schier" <nsc@kernel.org>, "Jonathan Corbet" <corbet@lwn.net>,
+ "Shuah Khan" <skhan@linuxfoundation.org>,
+ "Jani Nikula" <jani.nikula@linux.intel.com>, stefan.hengelein@fau.de,
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, "Nicolas Pitre" <nico@fluxnic.net>,
+ officialnaumansabir@gmail.com, "Randy Dunlap" <rdunlap@infradead.org>,
+ "Vegard Nossum" <vegard.nossum@oracle.com>, "Kees Cook" <kees@kernel.org>,
+ "Tejun Heo" <tj@kernel.org>
+Message-Id: <dd9e809e-82dd-4010-8a26-f7a477e75c47@app.fastmail.com>
+In-Reply-To: <b756801d-873a-4b77-9385-d4a43f7dd28e@gmail.com>
+References: <20260730140108.683967-1-julianbraha@gmail.com>
+ <178545753473.3004192.2499981065379649802.b4-review@b4>
+ <b756801d-873a-4b77-9385-d4a43f7dd28e@gmail.com>
+Subject: Re: [PATCH] Documentation: warn against using int, hex, string options as
+ expressions in Kconfig
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-s/dit/did/
+On Fri, Jul 31, 2026, at 11:43, Julian Braha wrote:
+> On 7/31/26 01:25, Nathan Chancellor wrote:
+>>> This 'if FOO' will always be false, regardless of FOO's value (even when
+>>> FOO=1). The same goes for strings and hex.
+>> Hmmm, it might be kind of nice to either:
+>> 
+>> 1. Warn about this in Kconfig directly (if possible)
+>> 2. Support this usage in Kconfig how one would intuitively expect from
+>>    either C or Python where symbols with values of 0, 0x0, and '' would
+>>    be treated as false and every other value set as true.
+>
+> Agreed, an interpreter change for this is on my roadmap. Though I was
+> also considering to make this error out.
+>
+> Would be good to get some more feedback from others on which approach is
+> preferred (Jani, Arnd?)
 
-Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
----
- usr/initramfs_data.S | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I'm fine with either of the two approaches, both seem better than
+to document the current behavior just to change that again later.
 
-diff --git a/usr/initramfs_data.S b/usr/initramfs_data.S
-index cd67edc38797..e92fb59b3fba 100644
---- a/usr/initramfs_data.S
-+++ b/usr/initramfs_data.S
-@@ -3,7 +3,7 @@
-   initramfs_data includes the compressed binary that is the
-   filesystem used for early user space.
-   Note: Older versions of "as" (prior to binutils 2.11.90.0.23
--  released on 2001-07-14) dit not support .incbin.
-+  released on 2001-07-14) did not support .incbin.
-   If you are forced to use older binutils than that then the
-   following trick can be applied to create the resulting binary:
+If it's going to cause a hard error, we have to be sure to fix
+all existing instances first, otherwise a warning would be better.
 
---
-2.54.0
-
+       Arnd
