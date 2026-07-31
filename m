@@ -1,130 +1,98 @@
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93A3124676D;
-	Fri, 31 Jul 2026 06:54:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBC372BEFF5
+	for <linux-kbuild@vger.kernel.org>; Fri, 31 Jul 2026 09:35:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785480880; cv=none; b=Zp2coVZu47Sgg+YXpESB+veD6y167xohBHK3MhiAx5OFgYR0rpf15gZ5p7ynxbjXfQ8a/NItvPhSOspM7IR6+poZ2w6Xc2/+GiZEO+cLQI9QGczPZA0I9HnNNgsSrhxq8ItjjLfUgaY3SQhMon21fyD5gZ34It5zKGy2xrdC24k=
+	t=1785490513; cv=none; b=ftGdzNJ1FurBMXXvs85PXZ0wJ/NI04MfA8RkyjjR8PuM3JLIk+cYl86RGodAWThbm5SfSeXGbHvKSaAAWlcxWyU/0dXAwfeS1xwS60YwHzfhQrk4pI+jp9guEQmnLgZCm+PC3FGaEFNYjB2KE0lUacknkt+Ujmd5ga/LF5jvyWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785480880; c=relaxed/simple;
-	bh=XBanGmDsEUDA2QUCG6QvFsyVxo/YW+uNFqHVB4E/Idk=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=d5JZuFTiztO3kqrGtXBGOPzGU1/oUVSU2FaxA2J0P+WWwpz7d3Jp5bDa7Q+X1JDDsYnidJ3lz5Zc1ndDBYupPNkX8VZsfBF16wJk0zHlgqnzY1FF8ZdE1DCJQG3fST0m65v5zjcDALkGsP1E16b7C8AabiRM6fPyI6kDPfrtRpk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=kC5k/8im; arc=none smtp.client-ip=80.241.56.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+	s=arc-20240116; t=1785490513; c=relaxed/simple;
+	bh=TD3qbGmT7SiLuJPo5iSxSemNSrhEq28v0D6rRhrKe5E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QCJIQbfjIAnLKVwcZomQnYAg9CYsgDc++xFTVqmzZP46BfzRVVnrid36a8f4eUl5/WhZcaFGUCl8PcTMVpMMagGGnq3WtqdZ3AruOl6ClIh/w8CD97CWs1dVIyNG1l3YjkK2q+CUd23vuUKf6QhS+u0cp/vFq3CS9r4R4GBbr6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O+Zs0EqL; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="kC5k/8im"
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4hBGyS0ZBcz8v2W;
-	Fri, 31 Jul 2026 08:54:24 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1785480864; h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OG3025m+E3cOsSzM3kKyvSKPHIR9PU9Elpi0M8CJFE8=;
-	b=kC5k/8imgrQvg2iwOVJUdbIU10OP0+IrIw0J87DAYuuOAVsA7ntIOZVeyP/jKXF7CxaZdn
-	iN5mI3WO7sxlct/yH4LbeZ80NiqBiWyQTcUwyAuZOQRPkrGD0HR2XhjInzVfCRLxFziBx4
-	QzWk92Xg69A6kwaygyk2Zg1Xb/d4FkMgEOmHuKCf4p+k5yb+LMN0Ze3xjNIC7+nTzJeJ7x
-	cjC2tqSQYxOGw1jzr0QMvdE13SRVj9/Sq3BkhEpPxhzPMEF9DtdTk7fa+Ixvp+7lFYiXYC
-	W0tPrYw8K2vgZN92Qe7K/Xte1qt6/GjOXL4EjJfy9fC6E2GasQAfUQNApHmfJQ==
-Message-ID: <fa3d31c188640d013c8da2f3a1be32188926e4a5.camel@mailbox.org>
-Subject: Re: [PATCH v4 1/4] list: Add mutable iterator variants
-From: Philipp Stanner <phasta@mailbox.org>
-Reply-To: phasta@kernel.org
-To: Kaitao Cheng <kaitao.cheng@linux.dev>, David Laight	
- <david.laight.linux@gmail.com>, Jani Nikula <jani.nikula@linux.intel.com>, 
- Christian =?ISO-8859-1?Q?K=F6nig?=	 <christian.koenig@amd.com>, David
- Hildenbrand <david@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Andy
- Shevchenko <andriy.shevchenko@linux.intel.com>, Nicolas Schier	
- <nsc@kernel.org>
-Cc: Christian Brauner <brauner@kernel.org>, "Paul E . McKenney"	
- <paulmck@kernel.org>, David Howells <dhowells@redhat.com>, Simona Vetter	
- <simona.vetter@ffwll.ch>, Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
- Luca Ceresoli <luca.ceresoli@bootlin.com>, Randy Dunlap
- <rdunlap@infradead.org>, Kaitao Cheng	 <chengkaitao@kylinos.cn>, Andrew
- Morton <akpm@linux-foundation.org>, Philipp Stanner <phasta@kernel.org>,
- Alex Williamson <alex@shazbot.org>, David Matlack <dmatlack@google.com>, 
- Shuah Khan <skhan@linuxfoundation.org>, "Joy H . J . Lee"
- <rkr0k0r@gmail.com>, Peter Zijlstra	 <peterz@infradead.org>, Ian Rogers
- <irogers@google.com>, Namhyung Kim	 <namhyung@kernel.org>, Swapnil Sapkal
- <swapnil.sapkal@amd.com>, 	linux-kbuild@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Date: Fri, 31 Jul 2026 08:54:14 +0200
-In-Reply-To: <20260730095041.35715-2-kaitao.cheng@linux.dev>
-References: <20260730095041.35715-1-kaitao.cheng@linux.dev>
-	 <20260730095041.35715-2-kaitao.cheng@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O+Zs0EqL"
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-6a02aedabadso1138362a12.1
+        for <linux-kbuild@vger.kernel.org>; Fri, 31 Jul 2026 02:35:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785490510; x=1786095310; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:sender:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=TD3qbGmT7SiLuJPo5iSxSemNSrhEq28v0D6rRhrKe5E=;
+        b=O+Zs0EqLNNE38pu2aBg5SJ8xVt/fqwjMBdJlRLAor7eO50U5mqQqPzoK2mHZyzuooC
+         5Is5W/XY3OQ0skG1orphyfn3UuLvJJRHRN+tufgLtKewGAl7YAq0yZH/CdpzqonMgYYt
+         sxdlgTbW0uawJjLDjM0stAISZq4lURJVDuIz58YQwac1+8t0okcPs9+X8U4TMMe2YaMN
+         WYsmNL5nPuuVtIE0/qmTrnDc8aBPBy4puOp520U4eNC76OPCbW70yY6/xKDkW/vHrXMK
+         liSberHo9SM4aDQZ0ln717QD+ttdfEFM0jWtJBw48tBP+emy4zxzoSP2Dr7qmzgfS+Ep
+         MlJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785490510; x=1786095310;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:sender:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=TD3qbGmT7SiLuJPo5iSxSemNSrhEq28v0D6rRhrKe5E=;
+        b=rfTCrbBAFW0SiQ+PTjPL62sHSEpRsEBmbYbsXp0b6IhfWLR6aw7r5YsdImyUoxDQ9J
+         /4dbnBj8wrLVBPBDAHvMFQ9o3CyaVSco7CRwzhKWIIBuoRuvEC7F4C+pbtkG/8VB5FzO
+         yX9Zuef+YlQLVGuE7iWIjBNfqUmFCsSUUde8EcWDWDq7JC5S9aBF+c/pQggCM3jBo6oW
+         KFBdAAWz70rcggnEiJJgTA8IFR/sPfh/kH8qxTgo1mfHgPQhvKkkt3wUKp0R3UDBLxen
+         1gSLv5/Ma+6lPorIa2mEznqwJjoW1pyFdVD4O+6Rcg7/OIzByaDqomEqE01we9OTtoLO
+         Zg8A==
+X-Forwarded-Encrypted: i=1; AHgh+RqLSNyuOvSJpAnThlvBfKpZaOb8YTYgKijuPt7gPiQn3jM3AKcdne9jQb8uhAySr73pQYl7y7YMeg4SEHk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRJdX+UlPnHAYqrAat5hFv9OQa3oEjiik0JJRJwjHdlDQ//1sI
+	mosd2Ocrv6PxQJMlw4Z0y0yYs3y/Jg7nw5AT8k0o8dvsHagZqkbQirhR
+X-Gm-Gg: AR+sD131gTxX7sbesN64ypeOiWj7N1YSG6xVB/o01y1VMjAfkodG8fYabTj/girxonB
+	IQtEES0PTAEWJiNe55jWB3BZSXvbKVNaaltX854gTX8EbofpnSWBg3ZDhQ5IivQGGCXYu56lGN3
+	Q0Ipfm21tFgzUB2WJCL+5LWftbQ/JDKNWIXk257ZmfOl8ChAwRoq/1s9LDGwfcQQlmgoH39h7mO
+	/WZ3uLxkELpA/mvaJv12hY0qGlqz2xpzvqeXvyTElguzFS7/uGa1tzi/Qlv0iOhGjvzuKXsBgP/
+	gghricjzpfDccxGDkrqMBNvQ9xuWR3fGZCUaB+hHKB7qn+Eer6ISLlQ5Ugn7x+zfeUT7P4/n4Tj
+	8HS0BxRx2yudK5KOI16wL2xf0lm1sajWIzGNuM0jHCnNKaJgB202C4B8m1QPEMePn0/7T/Tjm7+
+	YHmQbINk1zd+wFM7UsYNexaXWqBGDo2b6dsG+7E9vSxSMOdiDL9D2z1aXl3qCM3+gmwQfV+y2zq
+	LM3Rjx8ZzgJcE7e6l6lhGcO+8uJji7pGDi+L5YocZo4nYh2p0OeucqdvWi7P8JjVwRVZXZr2AJs
+	T/WB/fQ=
+X-Received: by 2002:a05:6402:4505:b0:6a0:97b3:6491 with SMTP id 4fb4d7f45d1cf-6a098ccc5femr607691a12.18.1785490509851;
+        Fri, 31 Jul 2026 02:35:09 -0700 (PDT)
+Received: from ?IPV6:2001:8a0:e962:d100:1418:46b6:4675:1031? ([2001:8a0:e962:d100:1418:46b6:4675:1031])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6a09c66109csm951329a12.26.2026.07.31.02.35.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 31 Jul 2026 02:35:09 -0700 (PDT)
+Sender: Julian Braha <julian.braha@gmail.com>
+Message-ID: <222d4234-f4b0-40a4-ab50-7f537ccc9b53@gmail.com>
+Date: Fri, 31 Jul 2026 10:35:08 +0100
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MBO-RS-ID: 74ae807c07d1d091a3f
-X-MBO-RS-META: 6g3t6de5zrg34cts5jkseqjse478cuho
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] kconfig: fix submenu rendering of negative dependencies
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: nsc@kernel.org, kees@kernel.org, xry111@xry111.site, hyc.lee@gmail.com,
+ jeffbai@aosc.io, vegard.nossum@oracle.com, rdunlap@infradead.org,
+ grahamr@qti.qualcomm.com, nico@fluxnic.net, masahiroy@kernel.org,
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260721193028.313342-1-julianbraha@gmail.com>
+ <178545960208.3004192.10262827405138720875.b4-review@b4>
+Content-Language: en-US
+From: Julian Braha <julianbraha@gmail.com>
+In-Reply-To: <178545960208.3004192.10262827405138720875.b4-review@b4>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi,
+Hi Nathan,
 
-On Thu, 2026-07-30 at 17:50 +0800, Kaitao Cheng wrote:
-> From: Kaitao Cheng <chengkaitao@kylinos.cn>
->=20
-> The list_for_each*_safe() helpers allow the current entry to be removed
-> while iterating, but require callers to declare and pass a temporary
-> cursor. Most callers never use that cursor directly, so exposing it adds
-> boilerplate and leaks an implementation detail into each call site.
->=20
-> Add *_mutable() variants for list and hlist iterators. These variants
-> keep the temporary cursor in a uniquely named local variable inside the
-> macro while preserving the removal-safe iteration semantics.
->=20
-> Keep the existing *_safe() variants for callers that need to access or
-> reset the temporary cursor, and update their documentation to clarify
-> which interface to use.
->=20
-> Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
-> ---
-> =C2=A0include/linux/list.h | 180 ++++++++++++++++++++++++++++++++++++++++=
-+--
-> =C2=A01 file changed, 175 insertions(+), 5 deletions(-)
->=20
-> diff --git a/include/linux/list.h b/include/linux/list.h
-> index 09d979976b3b..373b08b929d3 100644
-> --- a/include/linux/list.h
-> +++ b/include/linux/list.h
-> @@ -765,26 +765,62 @@ static inline void list_splice_tail_init(struct lis=
-t_head *list,
-> =C2=A0
-> =C2=A0/**
-> =C2=A0 * list_for_each_safe - iterate over a list safe against removal of=
- list entry
-> + *	with a caller-provided temporary cursor
-> =C2=A0 * @pos:	the &struct list_head to use as a loop cursor.
-> =C2=A0 * @n:		another &struct list_head to use as temporary storage
-> =C2=A0 * @head:	the head for your list.
-> + *
-> + * If the caller does not need to access the temporary cursor, use
-> + * list_for_each_mutable() instead.
-> =C2=A0 */
-> =C2=A0#define list_for_each_safe(pos, n, head) \
-> =C2=A0
+On 7/31/26 02:00, Nathan Chancellor wrote:
+> I would prefer to have a short standalone blurb about the issue reported
+> at that link so that the commit message is self-contained. Move the link
+> to the trailers with the Closes: tag.
 
-I as a reader would probably be confused by this. What temporary
-cursor? pos? n?
+Thank you for reviewing, will send a v2 with this change.
 
-I tend to agree with Andrew's comment, that we would have to wonder how
-much of an improvement more functions to choose from are, when
-considering the cost-benefit-ratio.
-
-Sure the temporary variables are often not needed, but sometimes APIs
-are (have to be) just like that. With spin_lock_irqsave() you're also
-forced to carry an integer around that you yourself never need.
-
-Philipp
+- Julian Braha
