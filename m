@@ -1,123 +1,106 @@
-Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A959416857;
-	Fri, 31 Jul 2026 10:33:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15E5742C515;
+	Fri, 31 Jul 2026 13:03:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785494041; cv=none; b=EnXwdAuJlF/yc3u1wFZ9kg156Icsj+MEcA/w+mme1tOOwxn+bEoHM8SN4XOc9kpxGUSiSrKqggHhSG2yd+0PUbRie7qrOQVSDKQK0Ehr4IWb7IaWssPsSt6ex6EH7O1XpN5OCrotAyIOTELXd+TvGaEiPD11T+0n4uDr8s0xtkc=
+	t=1785502982; cv=none; b=eY6QJAOV6O0cgHAe5wUplstcIK/eokC+VxyA1E7vTqtp2qInbYiYJ+YDAP24p4LTxwdn7gcw5JhnY3s7ocSX46YDErMLxxSatyigpWzHpLsBGsuKE+cTnZUS6JYFNQ0WTlzl17TkUnjMIXa26+SIkuT4uDYZ6Ko4rTgFmx1V7xc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785494041; c=relaxed/simple;
-	bh=EWHAT9zISehbazohcL0ZK2/Eu4oaxgyF3e/L1zw4deI=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=Q6K97dtFIe4Ef9FL85P0FOJ66bZR2wv1fcG4pWvdKFhZs8n3+pfyQ6H27g2eSNHUGSNnvLaAwuLk00lZ9SVcwMuNCsPcHpQFtDQxxN7/OYgUlrDrRqtP6x8d7SLsD29VVtALmFaXoMbdiMQADFN2gkOyYJ/aZeNC8NAOo+sHyfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=Ij+tZ6TK; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ZUg08VX0; arc=none smtp.client-ip=103.168.172.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1785502982; c=relaxed/simple;
+	bh=bLWCrFAN9m0vThC6I8y0IhbGnstlgg2nHWrMKYuN8LM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=CKeeAhQ+GjL/70aX6mQOJnCYLtYB/3xNCN+0paSWoCxZJ19qECG9ITUrKvF5vLJzyqF5O1kvIM3iF7YFS/AdI/FEy2ySnbcZ+F9avzfciyWeR+QAeMgjBuiEDFoauqhH7wimSc+uiUfCz19NR1H8hjU0/vNvtmuWQLMQiYxhusI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=ZGJCtWF4; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="Ij+tZ6TK";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ZUg08VX0"
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfout.phl.internal (Postfix) with ESMTP id 1B5A9EC0099;
-	Fri, 31 Jul 2026 06:33:37 -0400 (EDT)
-Received: from phl-imap-05 ([10.202.2.95])
-  by phl-compute-04.internal (MEProxy); Fri, 31 Jul 2026 06:33:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1785494017;
-	 x=1785580417; bh=fRkbjbM3Ek1+ircvljzCclMWH898hvdpeWVxglMvLwc=; b=
-	Ij+tZ6TKF9cUjepHXSDmjRC4YrXr/78NXT8iJwJi/yPuu4LBuApUfkZtXPjg/4qF
-	a/o/+43AKk3mz9Sws+eM+TRsD1Q9JPO/EWzxNUdKqbC/GxQgST5Ut9AKUT31ulhl
-	IhTjrx4YsqSSDEKM4N9CgedMiih4UVITxWdpNResTiMkllWkHKh9vkXLOSpXrX/l
-	7MH+pvTLKfQLyx2DBM8twyji2wuQxs1328KaKGIo4KA84oJYV9HPrFIwxRkUnfds
-	24KHtjrOjenWJaDH73jJwBcdZ0PpWHvHIgHl4IPu6D4d3YbUd8VtZGhY3y18xFw8
-	m8h0ImQ3mC6DNAp5w8tV+w==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1785494017; x=
-	1785580417; bh=fRkbjbM3Ek1+ircvljzCclMWH898hvdpeWVxglMvLwc=; b=Z
-	Ug08VX00J2B9UFqjBrLk9od356ruwXqOyBwZyw49CRo06QEsDqfY2/2V5D4t6fCH
-	vC7W4ppHb3/k297uMojLDxkOCgPoZoIt2UTSnSsHG3QZEe0F7QL8MGun1ccJLAoa
-	WLUovBDs7LnBbXRjlwn4XRaiwR6+FRGF2jmEVrgMsjAGYPF8/SvUQIIb6lWgnmQH
-	ScBrxDFA6JW/n9FhpmXiSjXqpG4OFhbYXVXDRkZCxu7d1neFV2XW9/HpDI2LpA2D
-	OgB/rktlmthvpnN+igMBv4Or+LlJ9mq3xH+bjjeyr2vcm23Opu6whpY2BMvzDqY1
-	kTR+GLWL3tqqt6uzjE/MA==
-X-ME-Sender: <xms:_3lsajNnYyz769Ic3abDEFYO0OhYIge4jaFw3JFTiAFEVWMLymHfig>
-    <xme:_3lsaoyWnW06IHiQ96WDe3K1mrqI956TxGQd9hKkdyZRoM9jLqwR6awFkVpPKjTcw
-    uwouMDT8JEcrf1G8B5ftmKlJld8h1Om47luLPWdlc7ZAazLmQGyLyI>
-X-ME-Proxy-Cause: dmFkZTGT8YwHAAsEm3rVDPUnQchmR0iyDLaHRiKiOoictZ6yGIdoo5nnOi24zP+jRd+d2e
-    c7xn9+TzMVrFx6E1pywDmq/ii10y6eUpCctzGlEFP0PQnObHimAxbqf1iKtFhrDwe43FAq
-    mclxyQ0JPuUp2HSYXMFL51f6JDOaRBn+E4cRzVert+XRyf+iyqfXS0mCcPU98s9gnOwQei
-    Uyfn7iS3Ry6Zl6cjGOWhP9961O3iBZiyWzQNPDZf/w4AjiGqZhKI6I1Bhf8G3oiE6Uq+uy
-    r7xdnUBffa7uYjzF8zmnJ9tVltc7svMKSlIQbITHg5CcJO4o4jpDG4kJsVRJ5emTrA++qC
-    5V3V5KqFVZbZGWdiiAs7KJnCB49GMbqLktdfEyRuwGhqViicx8Gj1XK65wu48JFHG1X2bz
-    vIdaUaCcdz+7SR6LMMAK3EJSD6JoMooNfd0OA36x4c/nrAZiQU24hG3E3jDaZjzfUJtzFA
-    uBKj+Ia2YUDBicyJX1hgiL7iM6Hsd5knBgJahcMi5s5LCsB7m7/xAzjxIaVVb2JbjfYyQ9
-    ClWYrhoh3N1GB+pB4cLejKDOwYhEVpNZKyu6LlcgybEaoAOmFPzk0pN6oRcOrop0AG4jQg
-    H9ic6RK7zO7ACiO2aikyPl+tiVN7B/aV5jDfeFbr+pL/VPTW4ZswqOkY5xWg
-X-ME-Proxy: <xmx:_3lsakQIO2Ob0hoFX3KIyATZrwPupWbXbG_h1sEwTO6y2V5GYS-rTA>
-    <xmx:_3lsarLopbHyccsKIK4iTqNF-50HB45eQyJC_SZXRTuyP4ov91X6HA>
-    <xmx:_3lsaqU9y2LiJREhdAA2QyuQ5-f09sNBFzSfcWppnJcHZmt4lyovCA>
-    <xmx:_3lsanj7P9AM03-BWzhLy556kyZSckmptAGvsiJmQtTuXKModVttfw>
-    <xmx:AXpsajDiQGAqxgBX2BLaZWd0HqBv7-krU06jv5Y5HEC-Jhpw5yRDH58Q>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id BD3E6182007E; Fri, 31 Jul 2026 06:33:35 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="ZGJCtWF4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3C901F00A3A;
+	Fri, 31 Jul 2026 13:02:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
+	s=korg; t=1785502980;
+	bh=VDgNzLLzldqfhcRMHA2BBCtFqiecgmjA0e2OTYYxoy0=;
+	h=From:Subject:Date:To:Cc;
+	b=ZGJCtWF427tq8SDRAPngVDA2yEBzZaUpgbdf7kRKqqeey/Sl89N5MPqVNV2P2Vf/l
+	 GSlQIPkYmLTcYmphtTAzJ3McSM/WcbfoOdqu8vqUndZ0RZ1g5CDx1t39Vh+dbQ6iXX
+	 406kVdxaqR+jNajJXX3ABli0a/MPmCxEpvhxUMIY=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [PATCH v2 0/2] module: remove MODULE_VERSION() and srcversion
+Date: Fri, 31 Jul 2026 15:02:22 +0200
+Message-Id: <20260731-module_ver_remove-v2-0-c9163858f382@linuxfoundation.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: ASxzv5og6Sd3
-Date: Fri, 31 Jul 2026 12:33:13 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Julian Braha" <julianbraha@gmail.com>,
- "Nathan Chancellor" <nathan@kernel.org>
-Cc: "Nicolas Schier" <nsc@kernel.org>, "Jonathan Corbet" <corbet@lwn.net>,
- "Shuah Khan" <skhan@linuxfoundation.org>,
- "Jani Nikula" <jani.nikula@linux.intel.com>, stefan.hengelein@fau.de,
- linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, "Nicolas Pitre" <nico@fluxnic.net>,
- officialnaumansabir@gmail.com, "Randy Dunlap" <rdunlap@infradead.org>,
- "Vegard Nossum" <vegard.nossum@oracle.com>, "Kees Cook" <kees@kernel.org>,
- "Tejun Heo" <tj@kernel.org>
-Message-Id: <dd9e809e-82dd-4010-8a26-f7a477e75c47@app.fastmail.com>
-In-Reply-To: <b756801d-873a-4b77-9385-d4a43f7dd28e@gmail.com>
-References: <20260730140108.683967-1-julianbraha@gmail.com>
- <178545753473.3004192.2499981065379649802.b4-review@b4>
- <b756801d-873a-4b77-9385-d4a43f7dd28e@gmail.com>
-Subject: Re: [PATCH] Documentation: warn against using int, hex, string options as
- expressions in Kconfig
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXMWwqDMBBG4a3IPDeQC7bQrUgRY37bKWrKRENB3
+ HtjffweztkoQRiJ7tVGgsyJ41xgLxX1r25+QnEoJqvtVd+cUVMM64g2Q1rBFDPUEGpde2e9MYZ
+ K9xEM/P0/m8fptPo3+uUY0b7/AMQ5Dil1AAAA
+X-Change-ID: 20260731-module_ver_remove-fd505b32b111
+To: Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>, 
+ Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, 
+ Aaron Tomlin <atomlin@atomlin.com>, 
+ Shyam Saini <shyamsaini@linux.microsoft.com>, Kees Cook <kees@kernel.org>, 
+ Thorsten Blum <thorsten.blum@linux.dev>, 
+ Christoph Hellwig <hch@infradead.org>, linux-kernel@vger.kernel.org, 
+ linux-kbuild@vger.kernel.org, linux-modules@vger.kernel.org, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Christoph Hellwig <hch@lst.de>
+X-Mailer: b4 0.16-dev-401aa
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2003;
+ i=gregkh@linuxfoundation.org; h=from:subject:message-id;
+ bh=bLWCrFAN9m0vThC6I8y0IhbGnstlgg2nHWrMKYuN8LM=;
+ b=owGbwMvMwCRo6H6F97bub03G02pJDFk5c75edT0ukeOXuc1j/eyL59/Uf9MSvvjLtH35pfOff
+ fS6VojHdsSyMAgyMciKKbJ82cZzdH/FIUUvQ9vTMHNYmUCGMHBxCsBE3gQzzHdkv/C53k6HMynk
+ YXX1yUzx/59kNBnmWWUU5zkvzfSw5MxULGI8+eNL+tvlAA==
+X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp;
+ fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
 
-On Fri, Jul 31, 2026, at 11:43, Julian Braha wrote:
-> On 7/31/26 01:25, Nathan Chancellor wrote:
->>> This 'if FOO' will always be false, regardless of FOO's value (even when
->>> FOO=1). The same goes for strings and hex.
->> Hmmm, it might be kind of nice to either:
->> 
->> 1. Warn about this in Kconfig directly (if possible)
->> 2. Support this usage in Kconfig how one would intuitively expect from
->>    either C or Python where symbols with values of 0, 0x0, and '' would
->>    be treated as false and every other value set as true.
->
-> Agreed, an interpreter change for this is on my roadmap. Though I was
-> also considering to make this error out.
->
-> Would be good to get some more feedback from others on which approach is
-> preferred (Jani, Arnd?)
+Module "versions" do not make sense as the kernel is built all at once,
+the "version" is the overall kernel version number, so modules can not
+really be described as having a unique version given that they rely on
+the infrastructure of the whole kernel.
 
-I'm fine with either of the two approaches, both seem better than
-to document the current behavior just to change that again later.
+So remove the version and the srcversion fields as there is no need for
+them anymore.
 
-If it's going to cause a hard error, we have to be sure to fix
-all existing instances first, otherwise a warning would be better.
+Note, for now, MODULE_VERSION() is just an "empty" define, to keep
+existing code building properly as the tree is slowly purged of the use
+of this over time.  This macro will be removed entirely in the future
+when there are no in-tree users.
 
-       Arnd
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+Changes in v2:
+  - remove version from struct module and the sysfs file
+  - amd driver THIS_MODULE->version logic removal as it's pointless.
+  - add second patch in series to remove srcversion
+  - Link to v1: https://lore.kernel.org/r/2026031341-evolve-repeater-987b@gregkh
+
+---
+Greg Kroah-Hartman (2):
+      module: remove MODULE_VERSION()
+      module: remove srcversion module attribute
+
+ Documentation/ABI/stable/sysfs-module    | 12 -------
+ arch/x86/tools/relocs.c                  |  1 -
+ drivers/block/drbd/drbd_buildtag.c       |  7 +---
+ drivers/gpu/drm/amd/amdgpu/amdgpu_virt.c |  7 +---
+ include/asm-generic/vmlinux.lds.h        |  5 ---
+ include/linux/module.h                   | 58 ++++++--------------------------
+ kernel/module/Kconfig                    | 11 ------
+ kernel/module/main.c                     | 32 ------------------
+ kernel/params.c                          | 30 -----------------
+ scripts/Makefile.modpost                 |  1 -
+ scripts/mod/modpost.c                    | 24 -------------
+ scripts/mod/modpost.h                    |  1 -
+ 12 files changed, 13 insertions(+), 176 deletions(-)
+---
+base-commit: 8ba098e6b6ff0db8edf28528d1552be261af30d4
+change-id: 20260731-module_ver_remove-fd505b32b111
+
+Best regards,
+--  
+Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
