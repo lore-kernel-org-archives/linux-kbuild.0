@@ -1,90 +1,63 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8509A264614;
-	Sat,  1 Aug 2026 02:46:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 673593EAC8B;
+	Sat,  1 Aug 2026 04:14:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785552363; cv=none; b=DMRUkugoqbwKNvXUnadJPV7U653xUwpGGMhgEBjPGKh3c1LvuZnuy02Viy2EiibPCf2QAHVc8XC7L93QgOnZG/9cmPkgR2E7MwLUIgXzXaeQMzpTkDKOfIrmz9+/NPfwYrtwvaHJKl7JObpERvxDCLGvost4dnhgZAnmGQoCaCc=
+	t=1785557669; cv=none; b=buKRw8BMh9n3W3cq86y2NjDftrnv1Pk4VwB6rIU9QbK5wnpKY2FMxoWKCGP9mhmP2BpL5CySCaAaTPBJZA4qPUcXOvt633fYx613gL8MPH+KepizDD58YLOXu77GvKuey427QYzRVnR8IogKzTwDAOBmmS8RQ1u1l96IC0hqphg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785552363; c=relaxed/simple;
-	bh=AKNVupBIliX71nVKXpQfG/jXNwHlQYpopEZsfwsDSws=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=Ia6FDZ8+GwoPlvWXfHxC0SWdJ2723HbAsfHhVXkPpVnDyRr1Fy1NnZ1m05DDLC4p8m02mGvrElT5ScRs9L+om02y2Zb8WHMnUCloZrQNafsKrMqh0bGe90NNwfgZ+rtOY1KO/TGEI7O81AJT14OarC/XDgLL2EfDYeNIN2S39pc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hJ/9h2MV; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785557669; c=relaxed/simple;
+	bh=L+4zBx2ZaZIEJTFw8On55ZOk1eKCmkLG68McRiC/wtM=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=mNny/xB6sdpwf4N6yZnWSbZN/pmJfbcq4kEb7HGYf7nLhpEmYBwu6Q9761KezOTGuE1wIZ7ouH6HcbFVz8le6zXkU/nDoSpQ1BN5DmJjgAwdSNzO3C/wQCs0cMnX9oiB63kHs+PJeD9+L60X9EYS5sECXGwQ/JD/j5goYDhZtPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cevmdt+G; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hJ/9h2MV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05D241F00AC4;
-	Sat,  1 Aug 2026 02:46:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cevmdt+G"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F87E1F00AC4;
+	Sat,  1 Aug 2026 04:14:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785552362;
-	bh=8/w544Fh9LS5ZAwTWvhItfs7vu9NmU1vhXuIlwGWR0M=;
-	h=Date:From:To:Cc:Subject;
-	b=hJ/9h2MV17AHOibq7nYDZx8zQZv2Sk6lVRBd9WwVIO+ILnlBKRIyAeyFEqCQjaj1n
-	 FrNwGisBxMUT9Kq/8nEMASC1hUQ8OEadUAkj8vMpzdQ46XYVrgAyaZsHx0o4vo45Np
-	 X0ePiv8S0wSNxkzBO1rfA8MO9twD8YDmOBC6y8fLmIxwTH4LhR52SmDr4P1+hY958p
-	 D5UnDOElBMyS1ONbggbQh9rHpneZ9A3Gz53DIfYS4ZF+WSo6mIrqFiVt/vjYbwdz2x
-	 Yrc4drwn7wTnS1yDOZzh7MfjOYruYcdSW+wJyMGBvCN6urSrjbO517VF2iwJkBVJ8F
-	 mtdporqm/H7oA==
-Date: Fri, 31 Jul 2026 19:45:58 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: linux-kernel@vger.kernel.org, Nicolas Schier <nsc@kernel.org>,
-	linux-kbuild@vger.kernel.org
-Subject: [GIT PULL] Kbuild fixes for 7.2 #1
-Message-ID: <20260801024558.GA3862889@ax162>
+	s=k20260515; t=1785557668;
+	bh=WD5Ax6u2RvfoVza16XJhjlqCeRHrkZKECC16qrIsBZU=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc;
+	b=cevmdt+GoIereOEz1oFsM05TUPX/cAfajecYdvBmREI+NjUIqWuYfNy5bwnA+do26
+	 7utiqX2ryQSiVQ9yvL5wl2yk6Crp2djl+CbhXYPL7atp9gTZCZ+d6olw33Xz9qkdDY
+	 mK27oXKMkt5sPgoEq5Bz3lk4aUDCxao6LhT8gKLsFrxaoud7hMzAL5BXf+cv7pcSMD
+	 CNJS+r1sX5ptEL7MkMLREIU8csbmqgdUpsvxyniMVs3TUDbXM5ngxw/quQx5abyJno
+	 xPjm0L3/bqJYUjv3EwHbvHIUXGRYkjp6qeDH5jRdNhm2KLHI+ohqvTmC73yX8bQHXo
+	 F5Xu/wC0MxW1g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0AFA392665F;
+	Sat,  1 Aug 2026 04:13:51 +0000 (UTC)
+Subject: Re: [GIT PULL] Kbuild fixes for 7.2 #1
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20260801024558.GA3862889@ax162>
+References: <20260801024558.GA3862889@ax162>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20260801024558.GA3862889@ax162>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/kbuild/linux.git tags/kbuild-fixes-7.2-1
+X-PR-Tracked-Commit-Id: e5a259d98823a93459643b239b71fed7589ab669
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 02dc699f83d04069fdabc996fc22d47cda47a4a9
+Message-Id: <178555763030.1016574.456009109526804823.pr-tracker-bot@kernel.org>
+Date: Sat, 01 Aug 2026 04:13:50 +0000
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-kernel@vger.kernel.org, Nicolas Schier <nsc@kernel.org>, linux-kbuild@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 
-Hi Linus,
+The pull request you sent on Fri, 31 Jul 2026 19:45:58 -0700:
 
-Please consider pulling these two Kbuild fixes for 7.2. It has been
-rather quiet on the Kbuild front for fixes this cycle, hence the first
-fixes pull at -rc6, but the first one was a bad regression from 7.1 and
-the second is localized to the .rpm package building infrastructure, so
-I think they are worth taking now.
+> https://git.kernel.org/pub/scm/linux/kernel/git/kbuild/linux.git tags/kbuild-fixes-7.2-1
 
-If there are any issues or concerns, please let me know.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/02dc699f83d04069fdabc996fc22d47cda47a4a9
 
-Cheers,
-Nathan
+Thank you!
 
-The following changes since commit 1590cf0329716306e948a8fc29f1d3ee87d3989f:
-
-  Linux 7.2-rc4 (2026-07-19 13:54:41 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/kbuild/linux.git tags/kbuild-fixes-7.2-1
-
-for you to fetch changes up to e5a259d98823a93459643b239b71fed7589ab669:
-
-  kbuild: rpm-pkg: Preserve BTF sections in kernel modules during debuginfo stripping (2026-07-29 16:21:42 -0700)
-
-----------------------------------------------------------------
-First round of Kbuild fixes for 7.2
-
-- Fix regression with MO= when building out of tree kernel modules due
-  to incorrectly overwriting build tree's Makefile
-
-- Avoid stripping .BTF sections from modules when building debug .rpm
-  packages
-
-Signed-off-by: Nathan Chancellor <nathan@kernel.org>
-
-----------------------------------------------------------------
-Nicolas Schier (1):
-      kbuild: Stop modifying $(objtree)/Makefile when building oot-kmods oos
-
-Yafang Shao (1):
-      kbuild: rpm-pkg: Preserve BTF sections in kernel modules during debuginfo stripping
-
- Makefile                    |  8 +++-----
- scripts/package/kernel.spec | 11 +++++++++++
- 2 files changed, 14 insertions(+), 5 deletions(-)
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
