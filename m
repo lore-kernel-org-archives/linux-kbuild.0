@@ -1,94 +1,73 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 341F23B47CB;
-	Sat,  1 Aug 2026 20:06:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92CE63C8C77;
+	Sat,  1 Aug 2026 20:06:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785614765; cv=none; b=hZxshKiedMh/DAF3TfilkFexSMBITvyXq0hK0CpUMwUjug/gZmTqSdWV63SzjogUp4FFEut52j/tGHP6i/K8iOpp3mxiUSew8vbRrCKBM1MR/8xmPVjQm6Qg0FrrF4hb449juBRnxJx+WCgq5vnAUtNUA/nJ7El4hNbzdi4m+9k=
+	t=1785614767; cv=none; b=ldPd6j2rozBdz9DMcKyh1KY1p3VSaHCCiI33/gQsYc9vI55ExwNpD+MCIpSlYElieJ2E+KKzbiDbEBj8sFkHQ7a0dDpT66cutUhVTn1mZStN8GsV8RwjGxDU8V/vazXlmUn8VQ2byRQAduc2NtCb2EYjBTgBseVao02E7wkeiZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785614765; c=relaxed/simple;
-	bh=mi24yNucDnK+MVz/notCdSGBQ//16YTB2Ott1Bmw7yY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oTNFWaOzWq1KJnDF7jL08XFvmGgzhnPx/KtAYictXo+kZ8B4xIIOVYScgJIfrTzbGRmj6GbktiHpQ6jyqxVr2NcdIru2bZUvcGUyoxn+3DliQ8O8RgT6ZunFlq5OxGOzyk8SDuY7FKLKOw+oWF67PAHGpMomp6ToDPljM/NTMJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UXWlvNCd; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785614767; c=relaxed/simple;
+	bh=qtPaFZSEqEwBIXL9aJzonQGfEqiYUPDBfGvQke8jXXM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ebANY4qLD8+ng8Gw70N5VsjJNB6OM/JUier5TxPOnKqBwso7wvYkONWjfGzOu2Ms6C2tCh5irpNOMrZmQ70kd/Q+jK5eRf5oZetCE97MAofDrRJV0PjVDvwN81J9CmqPSeNfAa83ds/amGWBFEf/gUzW2No1w2D7WnjKBJmWgqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FJIlL19f; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UXWlvNCd"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 88B161F00AC4;
-	Sat,  1 Aug 2026 20:06:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FJIlL19f"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id B4C9A1F00AC4;
+	Sat,  1 Aug 2026 20:06:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785614763;
-	bh=I0SfXUXMtSrNefeP6z0+jCm5Ax5j2BS48uRwbXVnHO8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=UXWlvNCdGenJa5IUxi3PF1EalXmvVAYmby3CC+ZzZ24Li/MGRmJIS57u57+kZhTg/
-	 qLbPh3zF5AcZHCUs7LiCZ3AD0lj59GROwxnE+QY9Jb1Xbzv60HFjWtNUMAzfnzIo0x
-	 GV3P863qtrWGXbw04oVRak6oa2haJY/R6c2qybzIUzpyaCswxdRihKSzlZsSmj/0XA
-	 +uABqdyvPxqbCGJFOKOgyhB88Xgqn5NpLxKAesUDmsdXip5wW0AzQ8twrpIt8aioBN
-	 x2Yh1RzRMLgncy9iYJP27X6AmzZhZdWimsLrf98/zyapaHdbBrhMiLqVAGTIbguf3d
-	 I0Mli4Hg9U3RQ==
-Date: Sat, 1 Aug 2026 21:44:34 +0200
+	s=k20260515; t=1785614766;
+	bh=1z9cMPzKbjEgDq+iKrdcXiEF2ZO9llGh/nbLbApC4rE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=FJIlL19f96jHWnm2KnpZq6PBC1HJ4LTjXjpqfuWSSdvFGm/Rd2+7OhPP6bf41PLzq
+	 2NYjrenXKAZvzog7CmPbz0SpZSY6e+kfIESc389JIYbscBDdcANtswg0a3GoU31nkD
+	 wU6zqbWWClYe8GWhvEtG+UfyGt6FtlD29GIf+UE0xEjRcU0L3V4Ir5ypOZt2YGe1uN
+	 3iQVL0znRtbvvqEwt8kXnzT5+2JrSg4Y1Py3ByZgQJOpe2x3cPtcJi3BzrICOC9iOP
+	 YRbBLRaq8e6vW/SbOL3ORgtmqfpH3SOTxHUBoG7EL12SauycRZtKnD4469+2APtbbn
+	 2Q9bQvwvvhGLQ==
 From: Nicolas Schier <nsc@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Askar Safin <safinaskar@gmail.com>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>
-Subject: Re: [PATCH v2 2/2] kbuild: Move gen_init_cpio and gen_initramfs.sh
- to scripts/
-Message-ID: <am5Moi6DBgMSnuO1@levanger>
-Mail-Followup-To: Nicolas Schier <nsc@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>, linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Askar Safin <safinaskar@gmail.com>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>
-References: <20260720-move-gen_init_cpio-to-scripts-v2-0-26b7e15c7133@kernel.org>
- <20260720-move-gen_init_cpio-to-scripts-v2-2-26b7e15c7133@kernel.org>
- <178552657997.3004192.6811032535007922482.b4-review@b4>
+To: nathan@kernel.org,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Bhaskar Chowdhury <unixbhaskar@gmail.com>
+Cc: Nicolas Schier <nsc@kernel.org>
+Subject: Re: [PATCH V2] usr: Correct a spelling by changing a letter
+Date: Sat,  1 Aug 2026 21:50:10 +0200
+Message-ID: <178561376738.3102982.5583483956873568015.b4-ty@b4>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260731221556.3638651-2-unixbhaskar@gmail.com>
+References: <20260731221556.3638651-2-unixbhaskar@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <178552657997.3004192.6811032535007922482.b4-review@b4>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jul 31, 2026 at 12:36:19PM -0700, Nathan Chancellor wrote:
-> > diff --git a/usr/gen_init_cpio.c b/scripts/gen_init_cpio.c
-> > similarity index 100%
-> > rename from usr/gen_init_cpio.c
-> > rename to scripts/gen_init_cpio.c
-> > diff --git a/usr/gen_initramfs.sh b/scripts/gen_initramfs.sh
-> > similarity index 99%
-> > rename from usr/gen_initramfs.sh
-> > rename to scripts/gen_initramfs.sh
-> > index 7eba2fddf0ef..27ac1fd48001 100755
-> > --- a/usr/gen_initramfs.sh
-> > +++ b/scripts/gen_initramfs.sh
+On Sat, 01 Aug 2026 03:42:11 +0530, Bhaskar Chowdhury wrote:
+> s/dit/did/
 > 
-> The cpio commmand in scripts/Makefile.package needs an update for this
-> move, otherwise modules-cpio-pkg will be broken.
+> cc:rdunlap@infradead.org
 
-Good catch, thanks!
+Removed the stray 'cc:' but added Randy's Acked-by and applied to
+kbuild/linux.git (kbuild-next-unstable), thanks!
 
-> Additionally, I see a number of references to "usr/gen_init" even after
-> this is applied:
-> 
-> $ git grep usr/gen_init
-> Documentation/driver-api/early-userspace/early_userspace_support.rst:usr/gen_init_cpio utility (run 'usr/gen_init_cpio -h' to get the
-> Documentation/driver-api/early-userspace/early_userspace_support.rst:usr/gen_init_cpio.
-[...]
-> tools/testing/selftests/kho/vmtest.sh:        "$build_dir/usr/gen_init_cpio" "$tmp_dir/cpio_list" > "$initrd"
-> tools/testing/selftests/nolibc/Makefile.nolibc:        $(QUIET_GEN)echo 'file /init nolibc-test 755 0 0' | $(objtree)/usr/gen_init_cpio - > initramfs.cpio
-> usr/Kconfig:          "usr/gen_init_cpio" program in the kernel tree.
+[1/1] usr: Correct a spelling by changing a letter
+      https://git.kernel.org/kbuild/c/4b842947
 
-oh well, thanks!  I completely forgot checking for references.
+Please look out for regression or issue reports or other follow up
+comments, as they may result in the patch/series getting dropped,
+reverted or modified (e.g. trailers).
 
-> Otherwise, this seems reasonable to me. Feel free to carry
-> 
-> Reviewed-by: Nathan Chancellor <nathan@kernel.org>
-> 
-> on the respin.
+Patches applied to the kbuild-next-unstable branch are accepted pending
+wider testing in linux-next and any post-commit review; they will
+generally be moved to the kbuild-next branch in about a week if no
+issues are found.
 
-Will do, thank for the review!
-
+Best regards,
+-- 
 Nicolas
+
