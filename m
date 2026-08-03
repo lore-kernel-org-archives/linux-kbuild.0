@@ -1,124 +1,149 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 387763921DD
-	for <linux-kbuild@vger.kernel.org>; Mon,  3 Aug 2026 06:04:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16298385519
+	for <linux-kbuild@vger.kernel.org>; Mon,  3 Aug 2026 06:48:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.47
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785737087; cv=pass; b=IKVm+c4J6/H+zJf41I+OOacBXyLO0Tnca8pgzO+o6KJcbygvaRMppAhBysQXieJKyem01BrKryOxNzBHlTzPRvzRaDodZWkFILDH0a2lHFlcI97wm1ELXmeIKKCylKUedCyxFCKMAWDyyDTvsDKAjsqqbtbyC6it5ytl4SK93CI=
+	t=1785739708; cv=pass; b=AvHxE8vmyApWDhHUVGZ2iBPG7rr6HQa4NCaIunwnjozBIonR3YWkMrRpE7dPBvpOrw+0EvZVmMTHADb8qo6tlr8ThuZUFJ1ksrXY0RkP7xJhwGE29xXjHwsmD9grHVga28NhkEJZ9El12fsx+CcSXTxT0u8oT7osHP9cJhscJwE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785737087; c=relaxed/simple;
-	bh=9vMbfMGekR6L5LEMy6L9Ow5VA2S82pVj+na1pJDz8R4=;
+	s=arc-20240116; t=1785739708; c=relaxed/simple;
+	bh=ggw+muFFAaFfC2b4AAgdDK63S2vV+ASj+i8ZzmEkKRw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LA871uZbtVMhHP2PEHFcqA2itp0uEhXIJS3MF+/ptIdovLEARNL8bkfafWrP/pWG9Vx2NU/oFPrIB+ZewpL9exeE0WUgQyezX5KSVsGYOfGZwVz+78nfsVMqq9iLLfkbveZe0vfiM8JC8noxYXuGJ/keGdxIvH5POSAuL8D8qKU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a29FPTti; arc=pass smtp.client-ip=209.85.214.182
+	 To:Cc:Content-Type; b=s67U0slwnQyqQQdSK+9uOaElCLtK7ah7wvJMnJse8HmdzYU8wEF/8/J01TcDzwp5rEqoj+eIfCAKfFC2HYAcJIZarfVh5lt644PBUBvrdoyDOCh8QDXIcQZbpuR5gb20dmCSL6oYJQK1l3Zo/mMuXuCXcE2/aRxX5h4vMDN3vKU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iTc+ANJY; arc=pass smtp.client-ip=209.85.216.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a29FPTti"
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2cf49dc28ccso3729915ad.0
-        for <linux-kbuild@vger.kernel.org>; Sun, 02 Aug 2026 23:04:45 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1785737085; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iTc+ANJY"
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-37f9e2642deso395289a91.1
+        for <linux-kbuild@vger.kernel.org>; Sun, 02 Aug 2026 23:48:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1785739706; cv=none;
         d=google.com; s=arc-20260327;
-        b=QLWtHOzVHPQgKp9OMpJFoJ4lrujApMcEEUUVRjAca51BzSjO2F04VaGgfqBN2NGBQf
-         oUVVtOhdSTWRwb/smdoOfH3DwlVHn99FRR/d/JG3QdKzQSdL54m5SZ6Sj1Y1ljSLZwCM
-         O7hr8IYdEDFFTZ9ppmICuvY5yirFDl2DdCOOeTj+oeTPM+sE5LM3T2S5tVg+rNhTWR16
-         MUPzE7ivBb1chps7Udcj9wFOgRCOrsvXE1XkA528rWepsj2xq9B7oipejXqSw4ItZ+8G
-         p9LqgGPWuvKQ9SOKUfgt8jxmkW14BDg3ZZD0MpvJPf5b4JEutAAqJh1FvOzbnhUu7DgD
-         6+uQ==
+        b=lFAKWXs74jykyKRsmIwoPPtT81JH8mBf9hmlybnogKx+oufsnKUQqwecOULLzf5vnJ
+         CKxE9g9AyVRvvkD9g/fW65GekbVMQPPmS9aJC11zA/sxnB6ULXgpYwxnox6kFPNzq02/
+         KKxyISeF3CVkBpcd3R749wF4faqX20/VaYVDWd2JbSHA3FNR+k9BZ+YRFOaaC/mGnl3S
+         Wqd/ZEF7KsF1tLYT6DVmw3HrRBdYEAe20ifKdD1P/uCaWEnpuh7UEaZobGPbanPuGcce
+         e9UrCH85E3CFp5qn/rCTRvv7n/iaUJbP+TvJ9IyHVflEQg+i2S+jXbUVRaOoNG3pB1BM
+         tfYw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=qA4isvNouelXiQWM1erQEPSc3lHghlduG5dGLUbCZnM=;
-        fh=vMJx+jLURRvfSWpZ9dQpVZEUPOhKdrb7ovS+IKiLskQ=;
-        b=dC0bL8gRsEpivjOfIIaHGtOuG+WWkwrmVLwonqgNnkSjuwQuJvsDvooPyizyALgRaO
-         iheEffK6tvL8rseEA/qKmIg29BNsqikCPYkxa9LgqLsC3VW6nMflL97hh+w09vXHlP/v
-         j6Cvtj1OCKEIiDoQUDGLILiBqSqi8kX9tzD8v6TNxniTaUiclkcyIIZEQyB6zUMkEthQ
-         PeecvMkuOxQ8f5gGZu7ksPZNc7wqX8lvXTo7jsVR6NarIH4KIjgZ73zOWMaQ1s1cbHBl
-         5Xu+8iCAcxpy3iSwIYT7xylpi+jwIXFZ6pD2YFDgGgMD0fYO1p92LreV+QSFTnSm8T9h
-         tsUQ==;
+        bh=gcuQshpEc3oEbrwYaDSyL2PkFa3C8K+8uk8C2LXbIHE=;
+        fh=PFb/wa4UuuKqrkRcfBCMiLRFxCpnQRHMI09vs36KBh8=;
+        b=hwbKNRwCMnWPzaS4G2GtO+2beDT8TKH74/qjmR7S0uytRLGc988G33mTHTgj0vLH5u
+         3HOaSmnqzlN1R5gyD3tzfbL9Mu3JZP/sFncjeMPy9zvxk/Mz1qV5ZJXgl60rjdKSTYCz
+         YhGlKXUazjOkH8h+fb6c8It2EY8v/Z9qw1ot8m950xgNnduB3rVuFImdSfHh+9sPaxd0
+         8twYUeI7k5Fo+B3sXUkfbQ61xHuAXB9DmtlV5s63C3A2aACEEtpWGxgrgbdcHaRXvSPi
+         umfRXN3r0am+1wzJfhe3rV2hu1AEhNRwA8HlsbQYj0pxwH0ce3WYx5bbkRx3gj0F3jrv
+         sMCw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785737085; x=1786341885; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1785739706; x=1786344506; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=qA4isvNouelXiQWM1erQEPSc3lHghlduG5dGLUbCZnM=;
-        b=a29FPTticia/dR32cnGgiI5h/J89CwLSYc1V2k7SEFeU7XiVqwqUDKUOxoVpUTJATW
-         qc8PKyaHzxAGrlCT3Q/h0YUqqAUMSZhgj8c+wDc/4j/1Hz1ZZ+lK3hx/JMaEojlOR5Ei
-         FvbWJsmEr7O38PeCyNEs9rxIrU+WG4gwToJpxwfJJ4QP0C1ZQA92JjlAvzjGnTEsWDzO
-         NfL8L0zQhauRPwfqeJ8anZjaqfwxh9HF1JBVdVhcVRc4VCy/3GjelY9XJEzU7OKa33+A
-         0m01bBZA3qMxBNgNcQCUAOIekebYMW9rE4SSxKHz7HESrNQBEd2UJQxpWFPppVpfHtKE
-         IrDg==
+        bh=gcuQshpEc3oEbrwYaDSyL2PkFa3C8K+8uk8C2LXbIHE=;
+        b=iTc+ANJY0T37GaKSYt5vwmRVrEs0rBBhRr4a8v+VN18cZvEzav/HOtStmDGs4Fh41/
+         +VEwtAcHJAsvRqQk07nqKsIxoo3QE2OnvPFKJ0LeVHMY2Is3cG3FV+u9xH7lqm5QWzAe
+         IAUp03MS0MLO+cH9IjTrhrn88X6nkR9dhsO51PFnE84YnXgZBhHADESKdg02erDTFs1Z
+         8AXnD7dNa72zIyCmod8zEx2uSb6gF8losEM3Rr5FgR1yKyxmCXX1e8M+jdNtVeGBZ2SX
+         tcGJZNEfrr6kRtNT1i6+bL6gJHwFq92hOcy2D6Q1yN/we+tf4Mf3T5rr8MuuYtSAmtg9
+         JPQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785737085; x=1786341885;
+        d=1e100.net; s=20251104; t=1785739706; x=1786344506;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=qA4isvNouelXiQWM1erQEPSc3lHghlduG5dGLUbCZnM=;
-        b=B9FR7jn+UjOC2sGh6AGZvUtjeadayfGeMpZBD2cZGOOJmEmOszNS9ZGDTAwkgpueuQ
-         VOKA+C6IcW58Nm3pSJ2f6QUaO85u7XIz/1fJVzyKCyF3MY5NGPRUebVtU2sYmekfEw/7
-         d2aqOVLWY9MoXMOatcJMDRDq+pQLVrCJxM/SDj+glf2+a3GFUkeZfGV0U1RtLW9oRuJy
-         WdWCEb8WwHbkUyjRvaMCTTdEA7WD9orPNQS62XoeJVESmKv/JkjS8avopARDWbiZsm7C
-         +eDXHmsFdqTruU1E7R9PlUyqph4VWTHRmvN1z1WFbC5RBWR7paYhcVc0MHXIArwYHXV/
-         2wdw==
-X-Forwarded-Encrypted: i=1; AHgh+RqQbMI3We9HfluRjP+pzM1ILGvLjQpi7wwbYYkE5jw0MtAqqOKnB7I+UJ6Jcmhu0raeNKTvpmi68Wr53Hk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyem2MLfBrTmnjK45cxz2vGrUzssx78p14+kxZT4Us8EM2kRo2x
-	cn6PALwIx9UcCkkbyIzrRHVw1hCx5qG+5R9BTqkAErAbGiQZQA2CfhS0sA5U4hgRSlFoTs1ML3H
-	H95UsxfEhn6Vtc0YY6xQcN81PIrS4ihc=
-X-Gm-Gg: AR+sD13DDhrEKg6IgVQEus/dctl8a+INg0Awt9rFBtYs5r9iNf8VhMbvpi2l/L204In
-	a/NtxVy5Xnj3Qy4YFdw85uDl9JmWp75JFrYuGv4W0V9/HFTV7MYMpDXXjdwtU3It/C407uClrrr
-	oXw/B56pFtGDY1s0UucreLBlPeAR3q2WSChJU7iF+l/5aN5DEntqll/yrrFYzfXizAVz7Bkp6mA
-	VhXSN2h/9n0t3hWQaNzohDqTnSE8k9fRhVO108rBtVN1M+ESkguoDXdiyXEI+oseczfd8hNDE/U
-	ZE4DeCANXvJLJWeNaSsFaBdjHGroq3q1WjJf4NtdigDoVMu9ewaZqIpO1zwXWkM8MWCojos2vD/
-	iIhPxjf9KPYC1cxWK3wQHD77dBUbdJp22cpdIg8SbiDVkEWWEouJLPKj32Cbb
-X-Received: by 2002:a17:903:234c:b0:2cb:2b50:d9da with SMTP id
- d9443c01a7336-2d05291e7f6mr106471735ad.3.1785737085398; Sun, 02 Aug 2026
- 23:04:45 -0700 (PDT)
+        bh=gcuQshpEc3oEbrwYaDSyL2PkFa3C8K+8uk8C2LXbIHE=;
+        b=nW9mYYFcy83SY69vg2HhXgyxT9JHwIt5F/5ZSdNjZ4EQMmnGIBGnDHNH1WdCcQa0QB
+         RH1qLak6LZmoIqHUWAyFTjYo1eY6kWROJwdPUSCvJAsTkdrLGmGYgkNjcMm9s4yps48S
+         TDvxwb6WosSCSk4pxyYpbjlcEhJ4+FU8tQwi/49pgiMHvFWVfwofGj/BFMVyy9oz+Ics
+         jLXP3FJojRle2mqKDT2XU6Qhko4PhSxe44crPjCocxIokL5KQaz1iFqfTY+YxVSiztJR
+         /b6Cq1aOIqR37gxKx0fkoa/eI6yyL/Xwtm9tT5nwJZaM7QwF9u1nK39vCtLMxV1X5k+e
+         aVtg==
+X-Forwarded-Encrypted: i=1; AHgh+RojGkIdkzo7poVc4jO+ESAgpL18gzn5ww8OzFIhPYH4KshcFQCnorHtofjyg9w4jHQhq58f6ZOHG/Q+zLQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy15QPokf7+0D0CnIgu+aVVTxKSBZUMgXOmVaPT8KNQjTzIhEq9
+	FybDXuYQ69fP2ddMmpBxWoPOz5btfFZ7XgK5txmKSvTBtjv1ey9e9mGnfeTeW2/B1NlPOlTw5LO
+	inKlVnq3Vg0IPGya4Yh0oTtfRA4Qw7uo=
+X-Gm-Gg: AR+sD12RyaPKJ4HT1cuS7WA5+fKFxzvMeU9SoQzckTAQUT2ynsN7rwgInoukpm3lkb6
+	YqQZhfhwp/ToKE9kU+Y1jjPZ2nTZ04dk8XFhrSH7/lEgfzylIM4LDm3quLC1TGoW0x9MMhvZw1L
+	UgNd9F2tuUrwsocYxMSxDQ4YpZAAaoXxmlCbIO014MUd+bVOlD2oN5OTHAOvXfzWoKvR4W+Eg5Z
+	6hqETpk8RD0+TbjnQJ/PCklfcU44YEor87qvg/+joHmOZyHyE/X/svPsP1T0Y4cWq0W89cOM3lq
+	0wPuNJFnYoalkPi2SJKLD1QWiGOzMeSXWtpL+0lgQZvXkaaebtzPWlsyx+BTIB+7ogwjjly6xJZ
+	6bcqrQhGjF9Lq3cv2hwIofLfb8VuirjFZbQu2lMWxA3oNu3fq8EFKZRnO+Bru
+X-Received: by 2002:a17:902:f78b:b0:2c9:e846:a582 with SMTP id
+ d9443c01a7336-2d05206277emr118828115ad.0.1785739706173; Sun, 02 Aug 2026
+ 23:48:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260719130723.162899-1-ojeda@kernel.org>
-In-Reply-To: <20260719130723.162899-1-ojeda@kernel.org>
+References: <20260729173803.13459-1-ojeda@kernel.org>
+In-Reply-To: <20260729173803.13459-1-ojeda@kernel.org>
 From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Mon, 3 Aug 2026 08:04:31 +0200
-X-Gm-Features: AUfX_mx-rpdHacm21bSkc3uU5DWNngLdmwUdEU-PNwOi8pLd7KAzIYJfcPvxWqk
-Message-ID: <CANiq72nE8_7sUWOtDZMqqCTcvw4bdCX90WtY6dWTXGu9r1AKvA@mail.gmail.com>
-Subject: Re: [PATCH] rust: rust_is_available: support testing with `bash` as `/bin/sh`
+Date: Mon, 3 Aug 2026 08:48:13 +0200
+X-Gm-Features: AUfX_mwuzwdP6nxeRWpgmu6tvIOqTJdDLP6cx79YtVLMLU9QsM8nZQfv9wD7MiU
+Message-ID: <CANiq72mH9EkHr-0XNqbX1NpQLu+UTO00tieYrG_oXiNTuqaihA@mail.gmail.com>
+Subject: Re: [PATCH] rust: kbuild: disambiguate `zerocopy` for `rusttest`
 To: Miguel Ojeda <ojeda@kernel.org>
-Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, linux-kbuild@vger.kernel.org, 
-	Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, Boqun Feng <boqun@kernel.org>, 
+	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
 	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
 	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
 	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
 	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
 	=?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
-	rust-for-linux@vger.kernel.org
+	rust-for-linux@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	Antoni Boucher <bouanto@zoho.com>, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jul 19, 2026 at 3:07=E2=80=AFPM Miguel Ojeda <ojeda@kernel.org> wro=
+On Wed, Jul 29, 2026 at 7:38=E2=80=AFPM Miguel Ojeda <ojeda@kernel.org> wro=
 te:
 >
-> `command -v` behaves differently on `dash` vs. `bash` when faced with
-> a file without the execute bit.
+> From: Antoni Boucher <bouanto@zoho.com>
 >
-> Thus, for the non-executable `rustc` and `bindgen` tests, support both
-> possible outputs that the script currently gives.
+> Starting with Rust 1.76.0, `zerocopy` was added as an (indirect)
+> compiler dependency [1]. In turn, this meant that the `rustc-dev`
+> component started including a precompiled `zerocopy` crate in the sysroot=
+.
 >
-> This makes the test script clean on distributions like Fedora.
+> This makes `rusttest` fail because the compiler finds several candidates:
 >
+>     error[E0464]: multiple candidates for `rmeta` dependency `zerocopy` f=
+ound
+>       --> rust/kernel/prelude.rs:64:9
+>        |
+>     64 | pub use zerocopy::{
+>        |         ^^^^^^^^
+>        |
+>        =3D note: candidate #1: .../lib/rustlib/x86_64-unknown-linux-gnu/l=
+ib/libzerocopy-dfef4cb07ca752aa.rmeta
+>        =3D note: candidate #2: ./rust/test/libzerocopy.rlib
+>
+> We cannot use `--sysroot=3D/dev/null` for these, thus point to the depend=
+ency
+> explicitly.
+>
+> Assisted-by: LLM
+> Not-yet-Signed-off-by: Antoni Boucher <bouanto@zoho.com>
+> Link: https://github.com/rust-lang/rust/pull/118546 [1]
+> Cc: stable@vger.kernel.org
+> Fixes: 567621523ab7 ("rust: zerocopy: enable support in kbuild")
+> [ Investigated when it started happening, reworded to add that and to
+>   follow our usual style and sent on behalf of Antoni, who found this
+>   during his work to support Rust for Linux with the GCC backend, i.e.
+>   with `rustc_codegen_gcc`. - Miguel ]
 > Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
 
-Applied to `rust-next` -- thanks everyone!
+Applied to `rust-next` -- thanks!
 
-    [ Added custom assertion message as suggested. - Miguel ]
+I changed the Assisted-by tag with the details that Antoni gave me.
 
 Cheers,
 Miguel
