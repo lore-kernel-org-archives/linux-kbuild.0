@@ -1,83 +1,76 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E73793ADBA5;
-	Tue,  4 Aug 2026 15:14:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE9F3EAC98;
+	Tue,  4 Aug 2026 15:55:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785856462; cv=none; b=Y00eyktVtgYbcPGkaYrFLZGLCI/6vcjqnbjJUTuf4iSvAV4QfouB+R3YNxy+OHIJFMMn1sZ5u39YWRdLttxPXzwhttc6yykNhFIxX3x+96jVn7lUDmOj8nctfwhQPsylMT7ZJzdXFGTgfqm88D0+jd3prZeHkiPtIbj8HglV4lA=
+	t=1785858949; cv=none; b=sja3fXEJVILrcEKeMp2bVVUA8EufntY9jFPQP2EjDoSz0N2Ve8vRhVjQ63JBHOJXq11v6Lmj12igdZ413s+XR7Le+WWq0wJ9hItsfMigdYiyYycQsVRgE8lIPecou7cBoeya/FIlpKsDS/mLED2JeuUiVebylI7xhTnD2Uh4t4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785856462; c=relaxed/simple;
-	bh=arP6j2ECDEOIayF5TjZFUg/hX8iTTTIkXCS/xGG8S3E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=E6zXClDX86sTLDUhalpNHyAcBdJbw87sjoSLiyZbHVo3TXNbzP7x59VMxTYOQIafxt3R7tFjfjfXUDh2WOcIjd7XEm+nXgP1pbAuCtrGv6GQPaZlD9U4zK9dsx6Gml2A42LCu6j4et6RNOYQBmAJSzkrvlfStBw0ZNndRshgzVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=jlI0AiQo; arc=none smtp.client-ip=198.137.202.133
+	s=arc-20240116; t=1785858949; c=relaxed/simple;
+	bh=348FefFW3KfG8ml7pOSWJxBRb4s2ds1rqeNBJzuCsNM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UEhlddNocZvJ0gDD8H6Sm2M4iaQFq1uaQfIzpnvbs2z/PufTZej6PXtvbqFY+JsGsPxN2unPjaFmWWFLDCwVA8nZrQZgU+cXd2AGcC4IaPvljl3KWHEb4VdJXdI+g4UV8E7gs5XhXN6i54NpGwR4HQ4IWf4oqkPwzgMz/UFcHj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=wauY2bia; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="jlI0AiQo"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="wauY2bia"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=L6k6bUOJfkMaMOwNHqgRraQHVkTGpDwodsemPczGGhE=; b=jlI0AiQoTzn5uegQcj3uwNfnv3
-	FSoaf8z3lkeK9nZ5q4lieLORo5rMGXBrX2rBU96dUt0aRPL2w2Mskj5DGIX+TmqaaIWsg4SzgpiG8
-	IZirRTFtP3o4l9c7wqXJDsTM8IwdJWZSOIpx31csWP+OZd3+KLNTGLC5IMbM68Gy49a8SnEwtz9cy
-	+gb1K8LuoODrMPlKboId6TPGOhJ2zwgz91ItystrVi2Ebfw8mjI84IE5RiqVTFv/Zwn8sE4x8BAKG
-	fQsIHjBIQePbJh6fi088Jy25UD8VOMtiKW69KlJKIVHayrVYg0JrRlM+RXBVWvj0BZSBeOvBlnCxo
-	pnS5W8MQ==;
-Received: from [50.53.43.113] (helo=[192.168.254.34])
-	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wrGqP-00000002BR2-3oCM;
-	Tue, 04 Aug 2026 15:14:17 +0000
-Message-ID: <583c8bfd-0687-4277-84db-55e0f5654238@infradead.org>
-Date: Tue, 4 Aug 2026 08:14:12 -0700
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=6JIa7jcIfkYcMT1Qc75/bq+S9jWjbB8g7z9rF0o0oLc=; b=wauY2bia2VUNqfL9sY1WQyMhj+
+	2KSHkCYoFhiORbhTz/d4xVBYyOmzGlMLnn7TAvnOnI0/+U9eCrm0x1MCodI9GAap1hRsWPF1iIReF
+	UaEgs9xXvTX6KJesGaBDHFDz/sG2dYPWqGf5KYj6AA5UDSicu0nX1i5cjVZIiRBo3EhTDhh+cnVdc
+	LRlqYeNcY8EtqIcsGm4k9BVZ6++zECR6Rv5wbJf1xBh+Ispsnzr1dhkjwr3O4owbVuHDASytPrwSD
+	MvMZl6ObXCq6yYae4zEdZGZ2fHjuGnQsNtF+p1LgHIPFL7HF+AMjczk/3HgOMJdbgtKLfEcNInv4K
+	PzNwwv9A==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wrHUU-00000002Fc4-0FkS;
+	Tue, 04 Aug 2026 15:55:42 +0000
+Date: Tue, 4 Aug 2026 08:55:42 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>,
+	Daniel Gomez <da.gomez@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Aaron Tomlin <atomlin@atomlin.com>,
+	Shyam Saini <shyamsaini@linux.microsoft.com>,
+	Kees Cook <kees@kernel.org>,
+	Thorsten Blum <thorsten.blum@linux.dev>,
+	Christoph Hellwig <hch@infradead.org>, linux-kernel@vger.kernel.org,
+	linux-kbuild@vger.kernel.org, linux-modules@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v2 1/2] module: remove MODULE_VERSION()
+Message-ID: <anILftPYWfY3y-Ba@infradead.org>
+References: <20260731-module_ver_remove-v2-0-c9163858f382@linuxfoundation.org>
+ <20260731-module_ver_remove-v2-1-c9163858f382@linuxfoundation.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] MAINTAINERS: add Julian Braha as Kconfig reviewer
-To: Julian Braha <julianbraha@gmail.com>, nsc@kernel.org, nathan@kernel.org
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260804141436.1451211-1-julianbraha@gmail.com>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20260804141436.1451211-1-julianbraha@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260731-module_ver_remove-v2-1-c9163858f382@linuxfoundation.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-
-
-On 8/4/26 7:14 AM, Julian Braha wrote:
-> Add myself as Kconfig reviewer, as privately discussed with the Kconfig
-> maintainers.
+On Fri, Jul 31, 2026 at 03:02:23PM +0200, Greg Kroah-Hartman wrote:
+> Module "versions" do not make sense as the kernel is built all at once,
+> the "version" is the overall kernel version number, so modules can not
+> really be described as having a unique version given that they rely on
+> the infrastructure of the whole kernel.
 > 
-
-Nice. Thanks.
-
-> Signed-off-by: Julian Braha <julianbraha@gmail.com>
-
-Acked-by: Randy Dunlap <rdunlap@infradead.org>
-
-> ---
->  MAINTAINERS | 1 +
->  1 file changed, 1 insertion(+)
+> For now, just make this an "empty" define, to keep existing code
+> building properly as the tree is slowly purged of the use of this over
+> time.
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 03febbc91a06..e248136bf3dd 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -14029,6 +14029,7 @@ F:	scripts/Makefile.kasan
->  KCONFIG
->  M:	Nathan Chancellor <nathan@kernel.org>
->  M:	Nicolas Schier <nsc@kernel.org>
-> +R:	Julian Braha <julianbraha@gmail.com>
->  L:	linux-kbuild@vger.kernel.org
->  S:	Odd Fixes
->  Q:	https://patchwork.kernel.org/project/linux-kbuild/list/
+> This macro will be removed entirely in the future when there are no
+> in-tree users.
 
--- 
-~Randy
+Looks good:
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+
