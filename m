@@ -1,41 +1,55 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A369B3859E2
-	for <linux-kbuild@vger.kernel.org>; Tue,  4 Aug 2026 11:47:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 392ED37F317;
+	Tue,  4 Aug 2026 11:47:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785844053; cv=none; b=grvZscPSfY4MV+//tc8EmBVzeq6J82+wdgqTHpqxmCKjdFYKUFGNsc5HjR+oTk/dR+CtAnYUoxk1krxYGABATt3IGzf/b8i6LZsmO3+dya5BbtTxCJeDRq+1QhAf/MVSjq1/MdZlpPW+noozReF2Zh7ojshcLzKDVspUB96+ti4=
+	t=1785844056; cv=none; b=BdW5XJPf4GK7hbMKxMuDwrjSWEGrFUTEpmVbpG9cxiDEvUmlf9lrI6/FO8C/jAnRS9WBqTLIzjchayGdvni9q73O70W+CLBuNgwDRMEWr+HI4He7+OKpe0B/u2uImS886/+nx/CHql/AO0Gmr8/giTrjGUfauBQanSngNw0zvOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785844053; c=relaxed/simple;
-	bh=YxTihr2FKqqg15L4T+zYc4haluog+fODFjtwP/2zRQg=;
+	s=arc-20240116; t=1785844056; c=relaxed/simple;
+	bh=/aLADYUHbzdPB/rxjzUy7ZoYtsk8Y54o1w7CyE+cffc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lJfRnwtfQ+tb9zUE8xPSbZJsTXQ31nxUvzJ7L9mwB4hH+sX0IpO+2kHqsGWXbQbgBPb18KecvatdakzHLgVmg/OAyL7UGMsdUnMDtvdNim9Df1xjy03+bVm3Hy8baPgsfy23D7O+Q5pKT51gyuqbHsHioXDmH3OuNMPJfHSyQOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bcTAN2dB; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=shukgkmoKyFtdWaUqwddF6gb37xJuEskYVQM8RWbi6A3XGAGbQXzMHTOecNG7F4HiF1dtfSdMrIBSz+yHpk0GvaIQY0EcjesQx3nVwrXkAsPDCqzTNd85FVUmIGf88k8482OAztyC+o7+SkD4RdfJau4xqyPCeZ2/N9mO/05l0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lxbUhdZB; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bcTAN2dB"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id E91AF1F000E9;
-	Tue,  4 Aug 2026 11:47:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lxbUhdZB"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 5A9BD1F000E9;
+	Tue,  4 Aug 2026 11:47:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785844052;
-	bh=RqIMvCEKi8L5o/D23Z1ZdSRlk6yoWYsdiou41oaSKDc=;
+	s=k20260515; t=1785844054;
+	bh=qnG7ioML9pnbleihEkIPHjMMg9P5H3fvGYFuWEZU2I4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=bcTAN2dB6HcCgzehkQiJjSedv7SQ2/PZyLJs50cat34WL6880XNrRHHTQMLGmPiAd
-	 BBQUuekY++++l5eEn9xeIpfcFFY/ev3d9SZEeo9GIPshtKkwC+wRKjgWKndq858uTK
-	 JENWDqvgTvB6ltTBX0DmpyhTOE57rG4owiI1nRZxhSjkRYCb/zlNeRWulAF3oD7vdE
-	 iduLdGHWLMpq/KbIlTFnLh0aIeJfh8IiJMbFf5jKsyyqvJCuQ2JWodJ/lyeqzvXCN9
-	 /8Hjp9qQXFNkcLkoHD0lmaIj0UQMqKF6nFGAiJpj71+U0NJ0Y/StBaOKr31Scbkm4x
-	 TMKfarsivzGFg==
-Date: Tue, 4 Aug 2026 13:38:41 +0200
+	b=lxbUhdZBm8Vf8NsFulA7P6V5eoN3d2Lsx4KjgALMkThhvJefcwcUZivrfOxA7KZUH
+	 RBvancpbaUnPm1wJUJ6K5hmd5KuIrg6T/Rod06/iX6E58ceKshWWSLc7WfFQTSQrqP
+	 ZWLgjTnuc2t57E9iKMtBA0cMp/ubEDIdV4Vi93DZfmd/Ec//6Q9sJynTKWGHVKeW4F
+	 M/XWdbVgSHJ3Gwr2RlIx1Fs4mRcNPi3r4QHHtr3szYgNdyUsyyoJYt6SihdTovLukw
+	 R+8vBttONSlPvcToRWkFHfHueFfxnDxRxA9TMfgFOFB+3pkkVt9dRkuS8A9AWpvKS5
+	 PSWqgmW0Y93ww==
+Date: Tue, 4 Aug 2026 13:47:16 +0200
 From: Nicolas Schier <nsc@kernel.org>
-To: Tj <tj.iam.tj@proton.me>
-Cc: linux-kbuild@vger.kernel.org, Nathan Chancellor <nathan@kernel.org>
-Subject: Re: [PATCH v2 0/2] Move tool for generating initramfs cpio to
- scripts/
-Message-ID: <anHPQQp0Fjd3HPwj@levanger>
-Mail-Followup-To: Tj <tj.iam.tj@proton.me>, linux-kbuild@vger.kernel.org,
-	Nathan Chancellor <nathan@kernel.org>
-References: <anEE6Zy9DmNzOqDZ@mail.iam.tj>
+To: Julian Braha <julianbraha@gmail.com>
+Cc: Nathan Chancellor <nathan@kernel.org>, corbet@lwn.net,
+	skhan@linuxfoundation.org, arnd@arndb.de, stefan.hengelein@fau.de,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, nico@fluxnic.net,
+	officialnaumansabir@gmail.com, rdunlap@infradead.org,
+	vegard.nossum@oracle.com, kees@kernel.org, tj@kernel.org
+Subject: Re: [PATCH] Documentation: warn users not to use select on choice
+ options in Kconfig
+Message-ID: <anHRRDliJ777LnhB@levanger>
+Mail-Followup-To: Julian Braha <julianbraha@gmail.com>,
+	Nathan Chancellor <nathan@kernel.org>, corbet@lwn.net,
+	skhan@linuxfoundation.org, arnd@arndb.de, stefan.hengelein@fau.de,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, nico@fluxnic.net,
+	officialnaumansabir@gmail.com, rdunlap@infradead.org,
+	vegard.nossum@oracle.com, kees@kernel.org, tj@kernel.org
+References: <20260715220149.48700-1-julianbraha@gmail.com>
+ <am-W4tuI0k7MKXVP@levanger>
+ <30650585-9d4d-4771-af7c-7c3908281719@gmail.com>
+ <20260803174736.GA1067866@ax162>
+ <58a8c7fe-378e-44be-80d1-01479c425f5a@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -44,48 +58,26 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <anEE6Zy9DmNzOqDZ@mail.iam.tj>
+In-Reply-To: <58a8c7fe-378e-44be-80d1-01479c425f5a@gmail.com>
 
-On Mon, Aug 03, 2026 at 09:15:39PM +0000, Tj wrote:
-> I've almost finished the feature to add to usr/gen_initramfs.sh::dir_filelist()
-> parsing of:
-> 
-> filter:/path/to/filter_script.sh:/path/to/directory/
-> 
-> A generic solution that can generate a cpio list dynamically.
-> 
-> My feature's current status is "working well".
-> 
-> I use it to include a sub-set of just-built modules in the initramfs
-> with some additional ./Makefile top-level magic.
-> 
-> I noticed this proposal to move scripts so want to provide a heads-up.
-> 
-> I described the technique as 'sneaky' in my email of 30th July:
-> 
-> "How to move usr/Makefile call to just before vmlinux_a target ?"
-> 
-> In it I add usr/Makefile.add_modules. It relies on being able to include,
-> unmodified, usr/Makefile, and use its targets.
-> 
-> Does moving usr/gen_initramfs.sh to scripts/ infer my 'example' script
-> 
-> usr/gen_initramfs_dirlist_filter.sh
-> 
-> should also be prepared to move to scripts/ ? It feels like that would
-> be moving it from its logical home.
+On Mon, Aug 03, 2026 at 07:26:28PM +0100, Julian Braha wrote:
+> On 8/3/26 18:47, Nathan Chancellor wrote:
+> > It looks like number 4 has been picked up as well. Given that we only
+> > need three more patches to be accepted to turn this into a hard error, I
+> > think it would be better to hold off on taking the documentation patch
+> > and just push for the hard error next cycle. If these patches are not
+> > applied to other trees before 7.3-rc1, we can ask to take them via
+> > Kbuild with Acks and/or stable branches for 7.4.
 
-I think so, but guessing w/o concrete patches is probably not very
-reliable.
+sounds good.  I'll prepare a patch for the hard error.
 
-> Due to the trial-and-error process whilst developing it, and much additional debug
-> logging to understand call flows, it is not currently in a state to propose.
+> All good on my end, we can drop this patch.
+
+thanks, removed commit 63dad1769941 ("Documentation: warn users not to
+use select on choice options in Kconfig") from kbuild-next-unstable.
+
 > 
-> My aim is to clean it up by end of this week (8th August) and post an
-> RFC patch series.
-
-Please go ahead.  I will not able to have a in-depth look at it before
-mid-August.
+> - Julian Braha
 
 -- 
 Nicolas
