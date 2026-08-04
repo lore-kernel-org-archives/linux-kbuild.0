@@ -1,127 +1,101 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 053BD36194B;
-	Tue,  4 Aug 2026 12:45:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D82E46C83E
+	for <linux-kbuild@vger.kernel.org>; Tue,  4 Aug 2026 14:14:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785847552; cv=none; b=DiDNC3f0Czi+HW6kkiSdklyFc+35PpzjjnG360Oy2OgadLiCpWHawFoviR4eFXqXDz00AtoxW88k+R4BFM4ZKMoA77Fb3udxwUv4hGt2TC75GGe1qQibmTRdExPYq5wapPA6WpI187yUnnAuu7HzyVkRGjY0VSVwAAMtKnUP0x8=
+	t=1785852896; cv=none; b=UPwaRroUBF2EooDLjP6CtOv82xIqCvxsSBrJoxLQjz2TFIVngOPgP5qao8IeKceBnwoigOvNm+sBlkldKyfuZM6qIbqz7iC5VpizD61UUH/xxGrR9d0iepE8mRmAehe/3A13uhM0J70bBjK3dNCB4BmzbD+vyLlys/UcrgfA+cI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785847552; c=relaxed/simple;
-	bh=0dmebcuEyVuQ4JtEfj2pXsBJawVvFBQAFFrpkvtmlRU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=XjioerPTHBHkqPfaqXPSuISuVJ1CLxHO6WV8iUsekVcsxjP0DA7riie+Mb/rRH1U2tGT6kzBFhQAJFrt58U/1HFn0YzmnQCdszd4uk+LFiocIkIlK+dILRqFMvNbAujSGTLB6Tf+GKv12dqA06H0g42CcB2bqdzrgVs11H3q+jY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=flto9Vzp; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785852896; c=relaxed/simple;
+	bh=P+vjawshhcK66kpzi+ttzhrOzeylTFmVFIjJIijqlWM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RLYgDgcWeW+f3HxYLmIck8EkBKEQdWRvgGezNmElpJJPbNKK9YWrU0WshOELaJCEWwOiblH3x1TlltepoL6z7r6mvYuOjgCwfImRfWkL+dzXSvq/qWmHJt/zPtmbospUl3d3lFEc1m8+RaR1M/DwJjOY7na1yrBYqPlDyf/sGs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hRe28OaB; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="flto9Vzp"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 1F4AA1F000E9;
-	Tue,  4 Aug 2026 12:45:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785847550;
-	bh=cNyCi7lRc19Uf0QlAzBQj+4Sbh7Agb3Ei/VpQH9fyds=;
-	h=From:Date:Subject:To:Cc;
-	b=flto9Vzp1VxtMGKIsXCjKNWUfg1H6ChKEMHvIch8jCuqEfEuDK7osxzjSUFQ8s8bl
-	 ChXH7bYDMb4FOVboF7b7TtBv6yU2NC/AY/7+NwZER7T65ZFoelfaMBtZwAHYjSgir/
-	 dhE9PRInYVdrqmejXcidmS33E5SBVIOzclDQF5IJUhLSeYVqaGTEbalrkjc52MqPiG
-	 N98CLQoOoF5GGJKNUpEdyZ4ineXkdWCDP5jb9aJoJVEO4vlUp77iMUZHc2rBKf+Ro6
-	 mI9LeLPINKLPbmFvIsXp8z+AzdgFpNXWp60cMU3py1mA/k5I5HWe3afxBxnT2hGSaO
-	 9qbeDxmOKZOtA==
-From: Nicolas Schier <nsc@kernel.org>
-Date: Tue, 04 Aug 2026 14:45:32 +0200
-Subject: [PATCH] kconfig: Warn on dead select or imply for choice values
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hRe28OaB"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-493b966dd74so18593155e9.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 04 Aug 2026 07:14:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785852887; x=1786457687; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=8W3PWSGOXwpEy335A7Edw5MasYhAcjkF4w8RpVGlkRQ=;
+        b=hRe28OaBU1aKYpq5dRFROF/ubkgmUBQ2CqGW+zi/yfRAuDFF8jd2r7gEgI4BMd/76b
+         TruRb86SRAppXDjk/1PVN5E6b78x3tkrpqrt9sDH7Q7G8PJOBGFeG53kMeZHW7UeH13B
+         nEKOVpE5KKgPyQ8VNt0er3PWmDtGSps7UcQJSesEv647mCn43xOqDeuxhU+EQaK+YVVz
+         yOJC3ortT7xL1LmeAkdR5AzqbuhODPATSHCKYP6/th+iGBvZnMeS5r8WLCYcfoJKkxR1
+         vgAjYZoIs0AePkyAkBmJBvS2O+Rd8UetQU4Lk5aaMtOjGoVQbqdjCoWL6Y0AX4Y9qAp/
+         zXSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785852887; x=1786457687;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=8W3PWSGOXwpEy335A7Edw5MasYhAcjkF4w8RpVGlkRQ=;
+        b=oS83x1B2veVY2M58sXIGZr0e65+Rdmmprc4sSnAxcRv6f6JvOHyqdOYi1jQ+UNeKL7
+         oGhrxBtndtzNU/Qms/qVscFStEHzUBDzEFHbGIMP2VLTQk8HhVxtftIZBTnXpTyGjrkK
+         5n9cB+vGv3rOw6fROIkRVwQwNeKCGwbrzJVeT7Rr+AKdv49155Y5jAUayNdzz+hXXB/A
+         S1CwkoBpXid0cjOS3RtAEwsU6esjr4V87poi3MxTg1zr2o8S04rt3oSr6ZN7Xl/8Ea0R
+         8JbyKwhRnKt96WlAyC9LdoJC0hsLrTJviRO6HAgcDzMuEmUD+VvNP5+vPbuXC0o3akQU
+         kgoA==
+X-Gm-Message-State: AOJu0YwmXxaYjHDsMTp3pXRq7ov55Ka3KtiADGpYWfqQs5Tr8ayjY2t/
+	wNLlD69GQc+NAJ3c2X/2L0v4fXndbQHqEjbmEt8DxGFudJvxfBqNDLnW
+X-Gm-Gg: AR+sD13qkBliejtJjtKvklmXHOpg9xnVCZ1FQs9Pr6lVyM0VywQhemRkqqatFOuoaVO
+	M4S/e4ElpQG6Us5oSLeNwk3pODiNDsX9C8GYDyN+lQGiPSrJGROzOcnYb1ML9tclPd1cEKqKk0n
+	QaztN/xte1kvXpdLedgtmssJEnV4tBn/nQ/pkMkWmbbahzZLfRScg7UAvmEVKqJAez+7sWHmjag
+	Aq4sGW+9FaZBxWs111KKorFiOXRzXY97qbgx882GmtNAxWcdnUhjgsF8SviPLobMxFv7/9/rBob
+	UKm+VPrWn0NzaaWX3RwowvQznroRXiJ+68watc9Y7ewJs3tnltpYGLzGEgBrdcRypwWkKOqhMWN
+	eT58L8KEeZ9KhTcC1j6vJ7/u1G35zCDDARRdsvo0ogDEFZg3MSEf6yCQBJurezdpxHI0D25jWqf
+	oXcN453D34IIueBEJpUCAIoniSPo08l2sKKSwpawTJNtClPujuLDjDYabGBalFuS+bMienrlULU
+	N2jOaJXdFvZno9ukBSQkEgrcFX5L66EhRUSVEbb6tmdqXvIEBWmbmx2ZSMXZDGw
+X-Received: by 2002:a05:600c:6092:b0:497:ff28:6deb with SMTP id 5b1f17b1804b1-4980c64b8bfmr408949505e9.11.1785852886684;
+        Tue, 04 Aug 2026 07:14:46 -0700 (PDT)
+Received: from nixos-office (195-23-151-163.net.novis.pt. [195.23.151.163])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49807b2a61asm233702225e9.0.2026.08.04.07.14.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Aug 2026 07:14:46 -0700 (PDT)
+Sender: Julian Braha <julian.braha@gmail.com>
+From: Julian Braha <julianbraha@gmail.com>
+To: nsc@kernel.org,
+	nathan@kernel.org
+Cc: linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Julian Braha <julianbraha@gmail.com>
+Subject: [PATCH] MAINTAINERS: add Julian Braha as Kconfig reviewer
+Date: Tue,  4 Aug 2026 15:14:36 +0100
+Message-ID: <20260804141436.1451211-1-julianbraha@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260804-kconfig-warn-on-dead-select-for-choice-value-v1-1-e5c9a274d291@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAOvecWoC/52Ry07DMBBFfyXymolmbDd2IoT4D9SF40xbt3mAn
- QSkqv+O27KERVle6Z47R5qzSBwDJ9EUZxF5DSlMYw70VAh/cOOeIXQ5C4myQosSTn4ad2EPny6
- OMI3Qsesgcc9+ht0UwR+m4BlW1y8MbWfIUcfk6krkyffIu/B1O/e2vee0tMfMXm/8NCJ/LNljv
- tdE6xKDn4YhzE2xmlJC9PpaHTgldxNsiuebn5G1RGX1plTWSFUDwXHpgxvb6A7udT+40Jd56uV
- 33CJRhaSxzCwh4oO8IU0kUWdHhdpuqkd5qQh1rVRJZDSpf+BSWrKlVub6qj/x7eXyDY2wzHH5A
- QAA
-X-Change-ID: 20260802-kconfig-warn-on-dead-select-for-choice-value-bd71a1de1a96
-To: Nathan Chancellor <nathan@kernel.org>, 
- Julian Braha <julianbraha@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Kees Cook <kees@kernel.org>, Jani Nikula <jani.nikula@linux.intel.com>, 
- Nicolas Schier <nsc@kernel.org>
-X-Mailer: b4 0.16-dev-5acee
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2698; i=nsc@kernel.org;
- s=20250924; h=from:subject:message-id;
- bh=0dmebcuEyVuQ4JtEfj2pXsBJawVvFBQAFFrpkvtmlRU=;
- b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBqcd7yRFWGdApG/BPgZT2EJESNsqpnlQeX3DxGk
- SdC9hRDB4GJAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCanHe8gAKCRAHUgpwFiYS
- afWyEACDyP/LBr+GX6HAssy4Iht3xJcU53LrzSsyw7Cah2ABiYB2CtyXLzxwG9cZE5AKinp77r8
- LHwVU7VJT1sIamlXBQBv8y731AYvVITif0EmY/VE/xdU0AtDc0KICNcO/IJnJ8at6vlohAQFWll
- qPCoRHOeu8JHe3kT+MVA8gK7VdVZhNsohsnnAH5dKqWUHH7e9E8L4HOOkGfOv/ZerRGJztAhFRA
- lOY0ORvfV++T2SbFqhfDF0LwhRpZmmVA18n0Xf1jxwsGLR5jrl8ORavi97b32Zi0UeV6IHfnJjH
- u4lFqRwLG7T61raaIiMzQJViUf9vfb60d7t71hK8aCCYXUJcWIfYcmRa/wKz6W0sAWjSeDKiYaB
- eewvtsc0A12vpvu2sB39q/gXvRq3k3cCCex4acRGa3hGtpyUhd9D5D8lzj/i3mCvtZmtZ2rILOm
- U/hfuKY9/0EbUpPmOav+WAH0Wu9b98uXDXMssua+FhHyPFpVIukt+HbXhYtVXyKHaZCX9MLre6N
- CpzLGygOpe6LHzq2ux+rgl3AgPe7NEHQVjD/kMl3C9QgAooVH2fC34saxBO4HdxV569FepbcwNA
- zuKq4AuiZCXAs5oeaRRHdFPdtCR7I4i54RsdEHm+SIoT60ssG9ZeoGsjxPYGL8X9XNTDFB0m1wY
- TmJewKiAaAg5xAg==
-X-Developer-Key: i=nsc@kernel.org; a=openpgp;
- fpr=18ED52DBE34F860EE9FBC82B7D97093255A0CE7F
+Content-Transfer-Encoding: 8bit
 
-Update the internal kconfig check to print a warning on 'select' and
-'imply' statements that target on choice values.
+Add myself as Kconfig reviewer, as privately discussed with the Kconfig
+maintainers.
 
-Julian Braha reported that kconfig's 'select' and 'imply' do not work
-for choice values but have no effect all.  Show a warning instead of
-error-out to allow kconfig to check the whole kconfig rule set.
-
-Reported-by: Julian Braha <julianbraha@gmail.com>
-Closes: https://lore.kernel.org/linux-kbuild/20260715220149.48700-1-julianbraha@gmail.com/ # [1]
-Suggested-by: Kees Cook <kees@kernel.org>
-Suggested-by: Jani Nikula <jani.nikula@linux.intel.com>
-Signed-off-by: Nicolas Schier <nsc@kernel.org>
+Signed-off-by: Julian Braha <julianbraha@gmail.com>
 ---
-Depends on related fixes in Kconfig files:
-https://lore.kernel.org/r/20260729203845.387239-1-julianbraha@gmail.com # change-requested
-https://lore.kernel.org/r/20260801160140.2391000-1-julianbraha@gmail.com # under-review
-https://lore.kernel.org/r/20260714112047.2304856-1-julianbraha@gmail.com # under-review
-https://lore.kernel.org/r/20260723104933.117413-1-julianbraha@gmail.com # applied to mips-next
-https://lore.kernel.org/r/20260723122818.437802-1-julianbraha@gmail.com # applied
----
- scripts/kconfig/menu.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-index b2d8d4e11e07..fc8d8cfe034d 100644
---- a/scripts/kconfig/menu.c
-+++ b/scripts/kconfig/menu.c
-@@ -287,6 +287,10 @@ static void sym_check_prop(struct symbol *sym)
- 				    "'%s' has wrong type. '%s' only "
- 				    "accept arguments of bool and "
- 				    "tristate type", sym2->name, use);
-+			if (sym_is_choice_value(sym2))
-+				prop_warn(prop,
-+					  "config symbol '%s' uses %s for '%s', but '%s' is a choice value",
-+					  sym->name, use, sym2->name, sym2->name);
- 			break;
- 		case P_RANGE:
- 			if (sym->type != S_INT && sym->type != S_HEX)
-
----
-base-commit: 6946cd5d0aa4dd10a414ddcb7a10844fdb0ad345
-change-id: 20260802-kconfig-warn-on-dead-select-for-choice-value-bd71a1de1a96
-prerequisite-message-id: <20260729203845.387239-1-julianbraha@gmail.com>
-prerequisite-patch-id: 3bb796da65f588d1df5003dac5af7a9d7420f266
-prerequisite-message-id: <20260801160140.2391000-1-julianbraha@gmail.com>
-prerequisite-patch-id: 5277c28b2d25752fb7e5827ed744b0cf0c619574
-prerequisite-message-id: <20260714112047.2304856-1-julianbraha@gmail.com>
-prerequisite-patch-id: bef2d24caba30e7dc2ac5189c10b6473485a1e3c
-prerequisite-message-id: <20260723104933.117413-1-julianbraha@gmail.com>
-prerequisite-patch-id: da49e2868fbb19afc3195cbd2868739a94aa02c3
-prerequisite-message-id: <20260723122818.437802-1-julianbraha@gmail.com>
-prerequisite-patch-id: 3c894964a57e4e30515fcb14226dae725555c25e
-
-Best regards,
---  
-Nicolas
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 03febbc91a06..e248136bf3dd 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -14029,6 +14029,7 @@ F:	scripts/Makefile.kasan
+ KCONFIG
+ M:	Nathan Chancellor <nathan@kernel.org>
+ M:	Nicolas Schier <nsc@kernel.org>
++R:	Julian Braha <julianbraha@gmail.com>
+ L:	linux-kbuild@vger.kernel.org
+ S:	Odd Fixes
+ Q:	https://patchwork.kernel.org/project/linux-kbuild/list/
+-- 
+2.55.0
 
