@@ -1,82 +1,82 @@
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45A42377A86
-	for <linux-kbuild@vger.kernel.org>; Wed,  5 Aug 2026 05:55:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B65FD3D952C
+	for <linux-kbuild@vger.kernel.org>; Wed,  5 Aug 2026 18:56:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785909312; cv=none; b=nGYko3PuiCgWQoKYMEXw5CccOTAFrROzOaln/Dn56vjR7LtEjJTPLDhsENXo2W45LPLvd62b3slVOViUYpJBceBMC2Mjo51fwXZeRaJ5aNRsseHwWLJCfSgD71QM8xBuA5fHxC8/2o2e2MNh71odUWthHkUyDmjoN5C/3cPLsps=
+	t=1785956164; cv=none; b=DwIxHgjtT88+LjUhbt4fS53ljrx/Kt+MnymmqK6HFjfagB7PRIf53e33M4FcHmmjxs8jSa+mDlfyEC8zR83VL3kD2FBYHLNVR+FjeXFKrn/nFeZm6ww4F2SKA/Db0L8EU9aSg4vSens3Cnl4CA+d9GHy6MOdKqbnwnBBqtAvy30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785909312; c=relaxed/simple;
-	bh=hNu5OzkiiKB1hod0eLP3Mcrxrl4RJaAjWg0Akk7RKOs=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=T01OcQw2hcGWeslHH5enG8PDHVqQm4ghPbkuo5rqVzPJyo9Dbdvv4iCNCaOUw/M0uwAUN6JjgxHyFvX5n44gI6zEKS2E9lyct11cB7lwziMECfbvaDOJZYHMsPFot0VoXUrAz6ogM6eJF5NyYKjFU9i8YRG/u4AGW5CLWj3VEoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ctk5dKbK; arc=none smtp.client-ip=209.85.222.181
+	s=arc-20240116; t=1785956164; c=relaxed/simple;
+	bh=X/sheB2HerNRDwMRSjJhuRwSfkYyfYB880Mu9Bm0zM8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=NtZcx5/pI/l/HMX5/RAdCFeCNvuW1phT3Q/XG9SL5RdWbCh4xX+QfLMPIjgMuhWSCMjVQHrxet71pGXs6ZHV5BBrRY/BE9jWaVzX6IzMI6B5BOXdusD/qCDntnmNW2jZZysF2Pa1S1tpi78hJF4tnbkbRpwSWxSzrn3yKvemj5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cPmT/+uL; arc=none smtp.client-ip=209.85.128.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ctk5dKbK"
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-92e65e18969so53477785a.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 04 Aug 2026 22:55:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cPmT/+uL"
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-81f3b227a4aso21980697b3.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 05 Aug 2026 11:56:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785909310; x=1786514110; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=jdkA4cKJBsXoZIn8gr/e/FUgv7zUR1X9l5opTMXg4NQ=;
-        b=ctk5dKbKoTkNGD6xFvdINrLIcxTXv58mjUigXZ2elBPj631BWOXthHUbPwFClpcZAS
-         rXzTUjvjYUEWfum1WHiM2Emo4BvnWhx/9AfWk9XJYviQ5LyPHP4eqOOOyM0fXoi9HF7T
-         f50c6b0vygRVebR1ewJkFEl81VjCy8umfKk4gwF4LOF3Cd4E1mnfgEWjjX3Z7RoRIFqS
-         TlcHGN3l27pQFLtdsqAJHgxucbY4slgVavfRp+pfn07OYcfhVK6xaNFqotdCTcQutbSW
-         w8E6bLd1oJ8mvHGgJYnZtePnc8EN7a4vr2pZEgiTD8qw/tuNQR3YCGSIlcyOkpAcJWtL
-         smTA==
+        d=gmail.com; s=20251104; t=1785956160; x=1786560960; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=TGeYBl1VUIwt/G4nfmKLTgCtjzdo27V8KoUvBJpzzDw=;
+        b=cPmT/+uLpce8SKENudlRxESni5y8tchI2GJAosBoI7UNsrQMWVUhdh9jGiw2DZSV3H
+         bp7Eh1iJAmwk4s9U3Qby6oTesb588lrHrS7I5t4S7vlckBf7S/TPaiqgACP2vThFKX7I
+         xIfP1M5Wzw7/8SQOq3v+tFtzbC/IA6Lol1iUilBa97PVQtznFFVu/1Ssy9UF8JOQD4ob
+         POu3Wb+N0sO+szx9u+5tXoLKOMb/X+pJYE6Ejplh+vSI267sq51g8pNlDwt7KjQyXfuT
+         8QLyGCDhEgbEK7vk/h1WA897qVGW04btQT9Vf7QbbrdcMhebtUplbdWrnlgUnhCet5Xm
+         S8Uw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785909310; x=1786514110;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=jdkA4cKJBsXoZIn8gr/e/FUgv7zUR1X9l5opTMXg4NQ=;
-        b=ncwxmHazYMzxwxM/OduhrmbhT1qv4LIFa13mXZ5AbaZ3d9gHSDQVshq0hNJpfHHppi
-         QJ4M1ie+BCprLdI4suTKiKBWYhHRUA72lvdbV3bvw5Gwkq5w81C4GqfVCq0FFDxc77B1
-         CbtkFZaoYEa2XrifgicZoQIWmu0sWfWkGEoZ/mpwNnfwpeOe4MQWYCGZ4eFCsLXQHGf5
-         lgWYyQrNy7N0rZnWwarT/hsCbiHkzvLPF6/o0M7RIEw59j97yKnnXFswzgPX1VyBzRq7
-         S+qN61oS20Gzf7rJC7+U/2kukDAgRInNKqmWp83tgvFp4k8OY7UH72I34CQPp8C495f8
-         ZXnQ==
-X-Forwarded-Encrypted: i=1; AHgh+RrORnOd0US/Bcs71QqDcAlOmuI37BVQfjveqv0xUKqaXorjuFawP7DgNoXpOvn4fb34X7iO5FCxd3sbzrA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydDyTCqp5AmvHUjxizc2vUX5aQEb7UyI+4psp191pw90yO48lf
-	tyeOqDvELLn/r+pbfpCV1cQXcO09olk3Djc//japApeQLBWHckKl08YqfYvSyQ==
-X-Gm-Gg: AR+sD10Y0rbQSPernDqFgubfVhgCaAuxhdozQWqMbgn6NLzMKaWDf98eB2L0UISLToS
-	0w54mZ/AXWV374F2JfOoqcihyakHrO5gDFjEmbfYuEX2BoK3Y1yfvi2ZU41YMu7yZ9JsGHnaDKu
-	LmhLXCKUqVmELjlOACYYNDtuTEFEDc+k05v5JjEU2xqyiJrF5t84y/pgk9XQ3IywqMTuTJmirkp
-	A538b3py1Ir1EiYnFnEi9HvPGaWhNR4kTUUYqt3UC3WguO9ll1l3bKKLq0Qy4BO8lMB0ZvVsjPi
-	lSfnBvYqnHJY/qcWe/1upLyMNfRsVSTIkbKrHYRm6wRNGRL0/GxvvqIRJo3dygwUdvId5L59P2k
-	H2NKUZEpL/xM09Ql/BhriLScQw1dNv63W4cVj5WV93FqaMo/77USUba20ma7xcS+iHk70lyrhgI
-	z86/fAkUHHK86fXD8MHxAjo+/bh3XAdbojeawlQxHef4+f6gqIixEf0x7fFnQtYlDaBTHhsMuDP
-	EH565MwLP5NvBHRLo7fb4Wtv32wQH0=
-X-Received: by 2002:a05:620a:8aca:b0:932:db03:4da3 with SMTP id af79cd13be357-9363192efebmr784775785a.19.1785909309977;
-        Tue, 04 Aug 2026 22:55:09 -0700 (PDT)
-Received: from localhost.localdomain (pppoe-209-91-167-254.vianet.ca. [209.91.167.254])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-9364a566d28sm85981685a.32.2026.08.04.22.55.08
+        d=1e100.net; s=20251104; t=1785956160; x=1786560960;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=TGeYBl1VUIwt/G4nfmKLTgCtjzdo27V8KoUvBJpzzDw=;
+        b=RcXtwC/JSf9FcLYHmEr0NGiCda1f7AE9qAsb63GeB8FJULGcCtvjihtBHgra/MVJMH
+         DPMhOaPfRangUnNPEfL8w9hLNGHuKYkYSb0SXfySuONDSGgSkMh9crNYruAstc/8G52y
+         SVLDy2icsLlmGOhbGsixCUAmaxmfvWlZJ1TK9ma9eaoq4bE4m09TojbrS4vQxMTai8vm
+         aJZ4aWTOU+EJzo4nNYK186dZnpq4Eo1wGAlvrLMW3XMedOwaZXDr9ZjDyCHUa901CB/1
+         SuHBM9e3CtN0AUljQ7+xjCbNbhq1deJ6dKsADtiQ/ghM2YIZDIMAh9E9QwOJgprKkR+d
+         QgbA==
+X-Forwarded-Encrypted: i=1; AHgh+RrBaBvyOwQZDBd0fA49JPTjPRFCoE2xbqnLxzU6ImP+c5JgQVcmUxk0ymADjOnCEYcGxmB4hrBVgjtBAus=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyON0bKgvw85hrtHrV96qDh+PGqebwIoERCj/Bx1BBBxJZdRmrn
+	WWr9NFu1v7/6liAwmk+GOwTovxVN+ZlGDRoPylKVQ+hEIgODH32NxRlf
+X-Gm-Gg: AR+sD10LscHloYOmKvzustaML+E9KSj4xQm+N5n9Enwot3LBfn4Vf9i946z3s3GD+HO
+	9lvfBt9fyX3nESbemQ8QJmQNmt0sY8p5YEoD99Ka1VgGhHx3FWq3ce9CTjfoCd5aWvJz5BX9PVN
+	LYzZf6LbGp3ZV7qt+jnk1+lMrzFvooHvu4DxgGdR13WtwdHb08Me71RcjnbZnzifG0HvtG0Kd7h
+	pii3RYvBxftTU+8hkEEAfSGF/9jmdeNLZ2OFPqvNPlxAuucPtUHwTR2zbmS9oAvfa0mBwmaCQpu
+	v1CgJLnFIRXrHa4b94XcqHHoYfGh3rKn3Otz5rJsaWEAGuyjDHLGnJpAWD/KpVQzVqWoj6yovw+
+	18KV4gbzQdmA6Amw1HYj2QN9Omxes32pk0OKXVy5XQ1Hkl68r015ILFrKXKvCYGy8nD+t5sz5tf
+	tO+eDWUa9xdTUup5Ad6Ew0K7v9E+MbZaK1DZ1nzAhpm00rgPCilJV80G0yt4uK
+X-Received: by 2002:a05:690c:6212:b0:81f:64cf:2c58 with SMTP id 00721157ae682-8201bccf8ddmr51869547b3.6.1785956159995;
+        Wed, 05 Aug 2026 11:55:59 -0700 (PDT)
+Received: from localhost ([2600:1702:7a90:6f9f:8bc4:8aec:108d:7a04])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-820131d9135sm25910817b3.6.2026.08.05.11.55.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Aug 2026 22:55:09 -0700 (PDT)
-From: Trevor Woerner <twoerner@gmail.com>
-To: linux-kernel@vger.kernel.org,
+        Wed, 05 Aug 2026 11:55:58 -0700 (PDT)
+From: Matt Turner <mattst88@gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>,
+	Matt Turner <mattst88@gmail.com>,
+	Magnus Lindholm <linmag7@gmail.com>,
 	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Gang Yan <yangang@kylinos.cn>,
-	David Disseldorp <ddiss@suse.de>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Gary Guo <gary@garyguo.net>,
-	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <linux@weissschuh.net>,
-	Luis Augenstein <luis.augenstein@tngtech.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	linux-kbuild@vger.kernel.org (open list:KERNEL BUILD + files below scripts/ (unless mai...),
-	linux-doc@vger.kernel.org (open list:DOCUMENTATION)
-Subject: [PATCH] kbuild: let the environment set HOSTPKG_CONFIG
-Date: Wed,  5 Aug 2026 01:54:35 -0400
-Message-ID: <20260805055438.3482019-1-twoerner@gmail.com>
-X-Mailer: git-send-email 2.51.0
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Nicolas Schier <nsc@kernel.org>
+Cc: linux-alpha@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev,
+	linux-kbuild@vger.kernel.org
+Subject: [PATCH v2 1/2] alpha: pass -Wa,-mev6 only when using GNU as
+Date: Wed,  5 Aug 2026 14:55:57 -0400
+Message-ID: <20260805185557.3283233-1-mattst88@gmail.com>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260803-alpha-clang-v1-0-1c4ba5ba7a64@gmail.com>
+References: <20260803-alpha-clang-v1-0-1c4ba5ba7a64@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -85,75 +85,53 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-HOSTPKG_CONFIG was added so that "tooling that builds the kernel" could
-choose which pkg-config the host tools ask about their dependencies, but
-it is assigned with '=', so only a make command line assignment takes
-effect. Exporting it does nothing, silently.
+That flag exists to stop gas emulating instructions the assembler thinks
+the target lacks.  It is a gas-only option, and LLVM's integrated
+assembler does not emulate instructions in the first place, so nothing
+is needed there.
 
-That is surprising, because the other inputs to host program builds do
-honour the environment: HOSTCFLAGS, HOSTCXXFLAGS, HOSTLDFLAGS and
-HOSTLDLIBS are all read from it and documented in kbuild.rst as such.
+Condition it on CONFIG_AS_IS_GNU rather than the compiler, so it is
+still passed for clang builds using GNU as (LLVM_IAS=0) and omitted only
+for the integrated assembler.
 
-It also matters. A cross development environment sets
-PKG_CONFIG_SYSROOT_DIR and PKG_CONFIG_PATH so that pkg-config answers
-for the target rather than the build machine. Those settings are correct
-for everything that will run on the target and wrong for a program that
-has to run on the build machine. objtool asks pkg-config where libelf is,
-gets the target's include directory, and compiles a host tool against
-the target's C library headers. Because the directory arrives as -I it
-is not treated as a system header directory, -Wno-system-headers no
-longer covers it, and the build stops on warnings that would otherwise
-be suppressed:
-
-  usr/include/sys/cdefs.h:486: error: "__attribute_const__" redefined [-Werror]
-  tools/include/linux/compiler.h:123: note: previous definition
-  usr/include/stdio.h:449: error: redundant redeclaration of 'fscanf'
-
-An environment that knows it is cross building can then say
-
-  export HOSTPKG_CONFIG="env -u PKG_CONFIG_SYSROOT_DIR \
-                             -u PKG_CONFIG_PATH pkg-config"
-
-once, in the shell it hands to the user, instead of every make command
-line growing an override. Build systems that already pass it on the
-command line are unaffected.
-
-Assisted-by: Codex:claude-opus-5
-Signed-off-by: Trevor Woerner <twoerner@gmail.com>
+Signed-off-by: Matt Turner <mattst88@gmail.com>
 ---
- Documentation/kbuild/kbuild.rst | 5 +++++
- Makefile                        | 2 +-
- 2 files changed, 6 insertions(+), 1 deletion(-)
+Only this patch changed; patch 2/2 ("alpha: read $gp and $sp explicitly
+for clang") is unchanged from v1 and is not resent.
 
-diff --git a/Documentation/kbuild/kbuild.rst b/Documentation/kbuild/kbuild.rst
-index 5a9013bacfb7..6d7de86764be 100644
---- a/Documentation/kbuild/kbuild.rst
-+++ b/Documentation/kbuild/kbuild.rst
-@@ -110,6 +110,11 @@ HOSTLDLIBS
- ----------
- Additional libraries to link against when building host programs.
+Changes in v2:
+- Drop the scripts/Makefile.clang CLANG_TARGET_FLAGS_alpha entry.  It
+  will be sent separately when the alpha backend is upstreamed to LLVM.
+- Condition -Wa,-mev6 on CONFIG_AS_IS_GNU rather than CONFIG_CC_IS_GCC,
+  so it is still passed for clang builds using GNU as (LLVM_IAS=0).
+- Reword the subject and commit message for the reduced scope.
+- Link to v1: https://lore.kernel.org/r/20260803-alpha-clang-v1-0-1c4ba5ba7a64@gmail.com
+
+ arch/alpha/Makefile | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/arch/alpha/Makefile b/arch/alpha/Makefile
+index 35445ff2e489..7074602dca94 100644
+--- a/arch/alpha/Makefile
++++ b/arch/alpha/Makefile
+@@ -27,10 +27,16 @@ cpuflags-$(CONFIG_ALPHA_GENERIC)	:= -mcpu=ev56 -mtune=ev6
+ cflags-y				+= $(cpuflags-y)
  
-+HOSTPKG_CONFIG
-+--------------
-+The pkg-config to use when building host programs. Set this when cross
-+building, where the default would otherwise answer for the target.
+ 
++KBUILD_CFLAGS += $(cflags-y)
 +
- .. _userkbuildflags:
+ # For TSUNAMI, we must have the assembler not emulate our instructions.
+ # The same is true for IRONGATE, POLARIS, PYXIS.
+ # BWX is most important, but we don't really want any emulation ever.
+-KBUILD_CFLAGS += $(cflags-y) -Wa,-mev6
++# Only gas emulates instructions the target does not implement, and only gas
++# understands -mev6.  LLVM's integrated assembler never emulates.
++ifdef CONFIG_AS_IS_GNU
++KBUILD_CFLAGS += -Wa,-mev6
++endif
  
- USERCFLAGS
-diff --git a/Makefile b/Makefile
-index 902f3f3d54b7..ba64518d5309 100644
---- a/Makefile
-+++ b/Makefile
-@@ -461,7 +461,7 @@ HOSTCC	= gcc
- HOSTCXX	= g++
- endif
- HOSTRUSTC = rustc
--HOSTPKG_CONFIG	= pkg-config
-+HOSTPKG_CONFIG	?= pkg-config
+ libs-y				+= arch/alpha/lib/
  
- # the KERNELDOC macro needs to be exported, as scripts/Makefile.build
- # has a logic to call it
 -- 
-2.51.0
+2.54.0
 
