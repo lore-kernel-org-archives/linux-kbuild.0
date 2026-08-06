@@ -1,191 +1,86 @@
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF08C3E00BC
-	for <linux-kbuild@vger.kernel.org>; Wed,  5 Aug 2026 21:27:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785965253; cv=pass; b=gtj94zWIR9bs60PXdSoAitnT09GQfmIl4kbzj3rNnvb1A/PaLAdZ0F948vSS7idL6+x8qn1Uh9OBcvwes+Ikyh0OLg8UUiNAxzl7kvU8j/GOY/iO4JUSAJPyw17HaK1QcjGa5RDJLqKvNxSrICXZn+B939dYsG0cPPT0xfXtwB0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785965253; c=relaxed/simple;
-	bh=CRFBAY+HVM5zLw5Wlht8AEmJgsCvF8cPSHZXyZDpiFA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pCRZb+Yn6ikaVPOk4RAT0qlqh2kzFQ9x5lT7mFuNDlMQhtf/vCW6J1Hri38l4Wu+61I95/U3bj55Xt5TXI94Pw7voMzLmTwGVjEJSqxfzt35+lqkNwKrGjzz3+isMbnSkS8DYQeg5Sgm5G+v32G6+0KPaQpaVZykkiLQtH7rv5o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HtQkbLeJ; arc=pass smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74D8E244692;
+	Thu,  6 Aug 2026 12:43:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786020218; cv=none; b=RfGAI8Lwc2z2tW/otIbYlFhbScM6Rvq4ARlcPexw6Le9qFfyAz02n9mKAwYPzjLjLnpLYLD/mU1dLgSTgSp2RmHaiMraiej9888/pJcsXPjgSSEEH72I2wtNBS6cQgJ8VSNOayN0q7Xx8h6jek4X/jpQRTmylTSGmlvri9CnNIM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786020218; c=relaxed/simple;
+	bh=V8wGbZUtUTTvzd5sMok+xWhw6lTZggtI6ivctMLdN0I=;
+	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
+	 References:Date:Message-Id; b=SpBdWdtczYtdeBb7nxT6N6P5a38/2tEQSha58LiFxY2QajSyzNIj5BQyheb+bvCW6EixUC1GQsj+ATWYkywEjQDVo0kf+9xJEVkJcXfAvr/yNOzK720a0olyl+wxAgYi2QM37EBrsIEZtPAfJkvVJY4KZX4GY4KwFLzVtnz5jxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cXGoKDRL; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HtQkbLeJ"
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-c2055573c8cso86402866b.3
-        for <linux-kbuild@vger.kernel.org>; Wed, 05 Aug 2026 14:27:30 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1785965249; cv=none;
-        d=google.com; s=arc-20260327;
-        b=rHq9b9jJ/1i2tDpyVFRh6hKyB5GLrsQ4dPLTyeWqe2/FvFDFbJ8YT4sHRRhWVUa/Sd
-         UcksLxbj0eKZsHE00w4eEzPv8KG/v4d6h2rMxL7BRfVbeKHEZAZ7YiQwlI41/gEIuOXM
-         v1FnQcP0RIFvMQuVss4XvZX+UQ/PruO7t7Ye//APIZ92lsGEU6vWZW/5u1bVe2lBab+7
-         e0BA3jlVSI+7EMLks0sanw6imiFfmlVfSkURiRryaOehAuXsQroEfQeoXL21Q8A+78E1
-         cs44FYO8Z52nTKLrQWECwPtNQ8049VYSxf3/Ur+usHyiMc0lb4YX2pNgIkdPwm/NFGqx
-         Zbug==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=GOdQ3KJo0a8j9UIgNBxKoFYFjfq0XRlteuFhE33+c6E=;
-        fh=eUfI4aAxr/GCak7Olnxkr04dICSgAr/nwlfThbgFHew=;
-        b=QcDnx3xj9glcVnOBzaW8lL46D3HRw3rEBPNDCrH1xhF5MpeCGNeVr7QIdDbsThuon1
-         kS/oqp/7nFP1SBfufhx5ub9yQxgcbgHFNzDUg577af1TVkE0Is2x8QvviIvJKHF5A4bC
-         ff4mNy+wPNCwCyUjBOOoc+3Q8GdYwP5BJAPwULjOTpsSEsoN3qrSz/t192Add31Vujbk
-         ciZlqIP85U0TIBK9WbQ/jGW4O+G7zB6YumJdtlN+Xl+KWOd7fO1O6DsGX9lQv9aRF2Vj
-         xM+bn9nY1dliutjAQPPNYyHnbnYpuKl/1M/EiAg2+JbtOvdctzq2d2sj9FZ5ERVhmUsi
-         9kiQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785965249; x=1786570049; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=GOdQ3KJo0a8j9UIgNBxKoFYFjfq0XRlteuFhE33+c6E=;
-        b=HtQkbLeJe6G/jD9t8OsAh+hijYU8IpwyLGrwwDRUmi8awu4Mj8WnHMMScGwZz+RX5K
-         aOVIHaUmjZhercpSRkv0gU6sbALUwILlGaLLD+Hz7ms+Vjdi86326+IVLL4pJyApvLlH
-         N1lUGG/fsyyFh5zFYvO0vxoOB3ol5U2iYK8I45LOEJDxkt7HGdEPflIsx5Z1WyAVZMzf
-         Q6e+5rmnQeaC1XdFAFfHr+yigOMO958PvMXq3Z8qbu++Tr8dUlNadRrce4SwYWbosJeH
-         R33emAiSfRx//MD53DWeW1bRGE2339dD6yhe1uDi0ePc0UUdxoTF2H/GgOYiQwqwy04L
-         Ovjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785965249; x=1786570049;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=GOdQ3KJo0a8j9UIgNBxKoFYFjfq0XRlteuFhE33+c6E=;
-        b=DsL9mBcU/XiDcz5m8jhDXLHlhUbvtDQhtPXf8cUQePRHxkRISXjHaMUgm4bpXaRjAJ
-         cu6hyG7kMiQDqUbXtZC1aYVCqp+RAfRp182+MOIjoA9vJQDy1Rx6UiOvI0ClNYIi5JXG
-         HSonfF93cWC5+sDPAh/grB6BZEWprrm2g4gbkTQ2FBub/x2lxlC2utv5SIo1XJ2lg3CN
-         t7PIMfsQaMbKCRUI7DlOOJ4/N6S34Eqv43JvTccBJkI6VWpBNAhv/3GoMlphlXkOozfV
-         o47Bo/js4p8rzqQDXVHpAd+fWrV46CHvZTHWKFpU5ZXvLmVGWqzqZX870kdPHGu0uuQ4
-         624A==
-X-Forwarded-Encrypted: i=1; AHgh+RpZaCv4mbFLT0NpbRzOgPnzu7c/HKBN4dPHFfnNVCSJhQkgxUKnuNCdlJroxl8i1JWltnnRK5HP6AAET4A=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyj1bHnmgoY9QSNUoWAXzXvSa3jtsLfkaTTW31Bk+x/iJcjwOAW
-	6IgWVfddiXaMvVXjHKqRL2VkWdO/plwAz5c2t7tTCBPkECCwt3bmkPEY1rZ6wvjOby5hsZttlua
-	td4l7mfd8/C3uslsIg+zIoGIX8x0Ya7KNsBYBA0I=
-X-Gm-Gg: AR+sD11CxcdjSkJXtbfXsWa+NT0qBCHNjnxVyfNuSnVw1OAsMFR0GbisrGIT11nc29g
-	aw6Fkw4nRtVOKygixpr7F7PMmCN+PCCLsGNbo2BqETWSFMi4nHhslzJqdWbX++rj/6j05UMgvU9
-	TYwF3PR4fAX+UrOSU3bxF1ijmTfHwutAtX0/Sy8fTPV/6w8Ai9ZKLPI8ic2ExbTo/We2lMNwe6o
-	HqFxbNN2re4hPFxtsxRKgHPnublSaAzHtyQjl4NEYooO3fSiSQkuFayjLoGAtYmAmFKibNE49PB
-	cRF2KMRGktVh2UlJshJI1rXVny38n7V/Fvnd4TD4GCweWdCAWlt7I5mzeGQ5XsdPC6OmQx59XRT
-	cGGjx2EbWNCYAkZGqPWc8pv60rOx5soFFqoUUBabYbQ==
-X-Received: by 2002:a17:906:ee8b:b0:c16:2f5d:6153 with SMTP id
- a640c23a62f3a-c2039c4a94emr567212566b.20.1785965249055; Wed, 05 Aug 2026
- 14:27:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cXGoKDRL"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 77EA61F000E9;
+	Thu,  6 Aug 2026 12:43:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786020216;
+	bh=uSkAoOw6V12txOsK42uldTLZWYp7dipZRGOana9YV5k=;
+	h=Subject:From:To:Cc:In-Reply-To:References:Date;
+	b=cXGoKDRLdlqueJ9J0gjPY2lSJXPwL6s+daGsUqNtbOIHps3+D/gEc15EGeSWjeefx
+	 KIXBTWzRq0p387X+O/Vw8WprtNVvxVAxOX7q3f7P1XGUzahTK5X6PEvq42Td/W8xKn
+	 uv6PTc/VkxeRmZcq5SQHkVr3xR0IvuYgfpsrr8tLwDyenYHBIKSVPUpl+uaZJs/dPq
+	 WTsfHle1NIjqLlPz/G7ePNVStTjberWK+42MyWde0v8VAin0A/QErI1cugjWFTisVE
+	 cWz8rZtQ1JJTZyjrMFa594zN7mcEoBGxN2jyW/GSWWAu/nXJN9ZP4mfwkaFaxO5mIB
+	 PmEz5uVMKOL4w==
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260803-alpha-clang-v1-0-1c4ba5ba7a64@gmail.com> <20260805185557.3283233-1-mattst88@gmail.com>
-In-Reply-To: <20260805185557.3283233-1-mattst88@gmail.com>
-From: Magnus Lindholm <linmag7@gmail.com>
-Date: Wed, 5 Aug 2026 23:27:17 +0200
-X-Gm-Features: AUfX_mwhW36EMELKBgfQ1098UaTRK9ltJYMKUq2mejLmJKQ4TTnz3ZPoJGmZ6UM
-Message-ID: <CA+=Fv5T-+awQU1R5cKXdEwUdtCTTw4T29DomYEFBTNakBKjOAw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] alpha: pass -Wa,-mev6 only when using GNU as
-To: Matt Turner <mattst88@gmail.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Nicolas Schier <nsc@kernel.org>, linux-alpha@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
-	linux-kbuild@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH v2] kconfig: fix submenu rendering of negative
+ dependencies
+From: Nicolas Schier <nsc@kernel.org>
+To: Julian Braha <julianbraha@gmail.com>
+Cc: nathan@kernel.org, nsc@kernel.org, kees@kernel.org, xry111@xry111.site, 
+ hyc.lee@gmail.com, jeffbai@aosc.io, vegard.nossum@oracle.com, 
+ rdunlap@infradead.org, grahamr@qti.qualcomm.com, nico@fluxnic.net, 
+ masahiroy@kernel.org, linux-kbuild@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+In-Reply-To: <20260801145238.2140291-1-julianbraha@gmail.com>
+References: <20260801145238.2140291-1-julianbraha@gmail.com>
+Date: Thu, 06 Aug 2026 14:37:25 +0200
+Message-Id: <178601984547.3769299.10178477594396432625.b4-review@b4>
+X-Mailer: b4 0.16-dev-5acee
+X-Developer-Signature: v=1; a=openpgp-sha256; l=603; i=nsc@kernel.org;
+ s=20250924; h=from:subject:message-id;
+ bh=V8wGbZUtUTTvzd5sMok+xWhw6lTZggtI6ivctMLdN0I=;
+ b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBqdIAJaTtVG0I0erw9TlIWtqkUQQQCL9reyLQwl
+ p6hh5fqf1WJAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCanSACQAKCRAHUgpwFiYS
+ abGkD/0dJiNMAjDTOLNcekjDo8mx9BFS2QuKI3Z61BEucfaybdzuI/28DwXePQbg/ut8U9uddy8
+ RDu4ngi+hdpff8Kr3Iyjzvp/6cF0IVjksX/ujT1K7lIlD7vDSNv2s6msHiz2ztFvmXMqw4mYWoE
+ xo/ryjfAyfdv5jBrQG7cQpPiOmA9UKYpCcjV7oawgs+wJCJYqKIeLygSofBymnUzPGBCQe4TnMz
+ UP1cvI4ZxWSZUFt17GFY6u9eTjkPiTA0r+z6AT9hBp0/lSq7fFAI41AYTsSP3+hmTwwQJIF3uFC
+ MTP68v3XvvuIqTW6q9drdHpAYyx7wA9KFqkfv4Z4kVCv7SMGPL3HFwmRZk5IMMqynW9FqPEOxu1
+ cdLo2P3YdUV2GQWLcHhd0X3uG9mXcbwqq/lfqXqATXIQ41YSSADEEbd3KZgyY1i0c2AStAYzM51
+ Q4h8RNS9PF0w6UcxSpAqvT3DU6Oh4zlAR5i+q5zvc5r8DSBTjy1UTZb0wA4tx42IXfX36I0GRNY
+ 2vpyeG7wUz6xX4r8qJQVGaWzRVzGWFHOw/GufR7joQjyYHvJ2FtYvqjnBrF3qoHw1PkNSOdbbVa
+ iK4PKH/SNIHmOwrciwUTDopb4+oov1VPE7nQsub4Lah4jpK/3dYkXtaRJNflxAP781W3GlTggXU
+ lemGScJ1SBiSpPw==
+X-Developer-Key: i=nsc@kernel.org; a=openpgp;
+ fpr=18ED52DBE34F860EE9FBC82B7D97093255A0CE7F
 
-Hi Matt,
+On Sat, 01 Aug 2026 15:52:38 +0100, Julian Braha <julianbraha@gmail.com> wrote:
+> The Kconfig frontend should render options that depend on a
+> previous option in the submenu of that previous option. But
+> currently, this breaks for negative dependencies. For example,
+> option FOO may be rendered in the submenu of option BAR, despite
+> FOO actually depending on !BAR.
+> 
+> Let's fix this ironic rendering by modifying Kconfig to explicitly
+> check negative dependencies.
+> 
+> [...]
 
-On Wed, Aug 5, 2026 at 8:56=E2=80=AFPM Matt Turner <mattst88@gmail.com> wro=
-te:
->
-> That flag exists to stop gas emulating instructions the assembler thinks
-> the target lacks.  It is a gas-only option, and LLVM's integrated
-> assembler does not emulate instructions in the first place, so nothing
-> is needed there.
->
-> Condition it on CONFIG_AS_IS_GNU rather than the compiler, so it is
-> still passed for clang builds using GNU as (LLVM_IAS=3D0) and omitted onl=
-y
-> for the integrated assembler.
->
-> Signed-off-by: Matt Turner <mattst88@gmail.com>
-> ---
-> Only this patch changed; patch 2/2 ("alpha: read $gp and $sp explicitly
-> for clang") is unchanged from v1 and is not resent.
->
-> Changes in v2:
-> - Drop the scripts/Makefile.clang CLANG_TARGET_FLAGS_alpha entry.  It
->   will be sent separately when the alpha backend is upstreamed to LLVM.
-> - Condition -Wa,-mev6 on CONFIG_AS_IS_GNU rather than CONFIG_CC_IS_GCC,
->   so it is still passed for clang builds using GNU as (LLVM_IAS=3D0).
-> - Reword the subject and commit message for the reduced scope.
-> - Link to v1: https://lore.kernel.org/r/20260803-alpha-clang-v1-0-1c4ba5b=
-a7a64@gmail.com
->
->  arch/alpha/Makefile | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/alpha/Makefile b/arch/alpha/Makefile
-> index 35445ff2e489..7074602dca94 100644
-> --- a/arch/alpha/Makefile
-> +++ b/arch/alpha/Makefile
-> @@ -27,10 +27,16 @@ cpuflags-$(CONFIG_ALPHA_GENERIC)    :=3D -mcpu=3Dev56=
- -mtune=3Dev6
->  cflags-y                               +=3D $(cpuflags-y)
->
->
-> +KBUILD_CFLAGS +=3D $(cflags-y)
-> +
->  # For TSUNAMI, we must have the assembler not emulate our instructions.
->  # The same is true for IRONGATE, POLARIS, PYXIS.
->  # BWX is most important, but we don't really want any emulation ever.
-> -KBUILD_CFLAGS +=3D $(cflags-y) -Wa,-mev6
-> +# Only gas emulates instructions the target does not implement, and only=
- gas
-> +# understands -mev6.  LLVM's integrated assembler never emulates.
-> +ifdef CONFIG_AS_IS_GNU
-> +KBUILD_CFLAGS +=3D -Wa,-mev6
-> +endif
->
->  libs-y                         +=3D arch/alpha/lib/
->>
->  arch/alpha/Makefile | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/alpha/Makefile b/arch/alpha/Makefile
-> index 35445ff2e489..7074602dca94 100644
-> --- a/arch/alpha/Makefile
-> +++ b/arch/alpha/Makefile
-> @@ -27,10 +27,16 @@ cpuflags-$(CONFIG_ALPHA_GENERIC)    :=3D -mcpu=3Dev56=
- -mtune=3Dev6
->  cflags-y                               +=3D $(cpuflags-y)
->
->
-> +KBUILD_CFLAGS +=3D $(cflags-y)
-> +
->  # For TSUNAMI, we must have the assembler not emulate our instructions.
->  # The same is true for IRONGATE, POLARIS, PYXIS.
->  # BWX is most important, but we don't really want any emulation ever.
-> -KBUILD_CFLAGS +=3D $(cflags-y) -Wa,-mev6
-> +# Only gas emulates instructions the target does not implement, and only=
- gas
-> +# understands -mev6.  LLVM's integrated assembler never emulates.
-> +ifdef CONFIG_AS_IS_GNU
-> +KBUILD_CFLAGS +=3D -Wa,-mev6
-> +endif
->
->  libs-y                         +=3D arch/alpha/lib/
->
+Reviewed-by: Nicolas Schier <nsc@kernel.org>
+Tested-by: Nicolas Schier <nsc@kernel.org>
 
-Thanks for the update. This looks good to me.
+-- 
+Nicolas
 
-Reviewed-by: Magnus Lindholm linmag7@gmail.com
-
-Thanks,
-Magnus
