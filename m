@@ -1,31 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74D8E244692;
-	Thu,  6 Aug 2026 12:43:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5B0F257845;
+	Thu,  6 Aug 2026 12:43:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786020218; cv=none; b=RfGAI8Lwc2z2tW/otIbYlFhbScM6Rvq4ARlcPexw6Le9qFfyAz02n9mKAwYPzjLjLnpLYLD/mU1dLgSTgSp2RmHaiMraiej9888/pJcsXPjgSSEEH72I2wtNBS6cQgJ8VSNOayN0q7Xx8h6jek4X/jpQRTmylTSGmlvri9CnNIM=
+	t=1786020219; cv=none; b=D6Ol6/6m6zUXBnf/9cuQ5hUcR40cLmkqDNCRJVgnClEdoTZOSC0uVvdIcljpOQVP4gVG4ldrbqwxq4koEBBjX8imMx2Prw/xzoGAT04nstnqsEmQJjy8E5xpqFBbEz2HuXqV27YiXQ7PqaLQDqzHPv/XK4VOOho5SBWP9saSmcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786020218; c=relaxed/simple;
-	bh=V8wGbZUtUTTvzd5sMok+xWhw6lTZggtI6ivctMLdN0I=;
-	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
-	 References:Date:Message-Id; b=SpBdWdtczYtdeBb7nxT6N6P5a38/2tEQSha58LiFxY2QajSyzNIj5BQyheb+bvCW6EixUC1GQsj+ATWYkywEjQDVo0kf+9xJEVkJcXfAvr/yNOzK720a0olyl+wxAgYi2QM37EBrsIEZtPAfJkvVJY4KZX4GY4KwFLzVtnz5jxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cXGoKDRL; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786020219; c=relaxed/simple;
+	bh=fVcGdIr/dtMfYJw9VpWAs6VnKHKzA5ZGNOjloCem1yI=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=ldtiGMxmS30qqyqcN07yLpzmv4g/wJl9XM/niTzD2HwDh2HaZpxZPPuxdRKl4pFA8z2RrWWh8D6TSBWg8RI6ziUOgSj0C5kI9GyAKGOoP9hQ79rowICc+jz6xQM4smGk4SYRTwtzmxs2/M0JSfVFchNUXUTM5et6xtMrmnN8UiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fveR5hJt; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cXGoKDRL"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 77EA61F000E9;
-	Thu,  6 Aug 2026 12:43:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fveR5hJt"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id C6F671F00A3A;
+	Thu,  6 Aug 2026 12:43:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786020216;
-	bh=uSkAoOw6V12txOsK42uldTLZWYp7dipZRGOana9YV5k=;
-	h=Subject:From:To:Cc:In-Reply-To:References:Date;
-	b=cXGoKDRLdlqueJ9J0gjPY2lSJXPwL6s+daGsUqNtbOIHps3+D/gEc15EGeSWjeefx
-	 KIXBTWzRq0p387X+O/Vw8WprtNVvxVAxOX7q3f7P1XGUzahTK5X6PEvq42Td/W8xKn
-	 uv6PTc/VkxeRmZcq5SQHkVr3xR0IvuYgfpsrr8tLwDyenYHBIKSVPUpl+uaZJs/dPq
-	 WTsfHle1NIjqLlPz/G7ePNVStTjberWK+42MyWde0v8VAin0A/QErI1cugjWFTisVE
-	 cWz8rZtQ1JJTZyjrMFa594zN7mcEoBGxN2jyW/GSWWAu/nXJN9ZP4mfwkaFaxO5mIB
-	 PmEz5uVMKOL4w==
+	s=k20260515; t=1786020218;
+	bh=wu/hc3B4sUYs59GrCAeju8VE0zwF43AdqUZ4Fyqpeuo=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date;
+	b=fveR5hJt9dF/AazWqjOYRG7Pw2LCO9vfACi5sfJ9ko7VntEEpyzsM/U1OBh3VDTAZ
+	 fmTh4jNhkUh5pXv2x2JDTA0WuM5+yPqYmL395Hr+jq6Mc2V8HgaYVI421TCnMKanPk
+	 JGG6eYcisa66W/v0zabrqSXn+Ub4w8QvRCMHkyyXxRXAXwpTtQLtZNk6G+oilu/aqA
+	 KLrgx9bWFtU+JKQSDBcDn5NgsjYssvoMEsXoLQjdSPvk4uUgbHuetPMfJa/kQWRe0x
+	 Ih/UqGgRL8CxYSFvmbDjV92+y8+2NtAd43O7RDnEe76GXnZsahHHCctDhNpOhLvhPX
+	 c9x8XTMP+Roug==
+From: Nicolas Schier <nsc@kernel.org>
+To: nathan@kernel.org, kees@kernel.org, 
+ Julian Braha <julianbraha@gmail.com>
+Cc: xry111@xry111.site, hyc.lee@gmail.com, jeffbai@aosc.io, 
+ vegard.nossum@oracle.com, rdunlap@infradead.org, grahamr@qti.qualcomm.com, 
+ nico@fluxnic.net, masahiroy@kernel.org, linux-kbuild@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+In-Reply-To: <20260801145238.2140291-1-julianbraha@gmail.com>
+References: <20260801145238.2140291-1-julianbraha@gmail.com>
+Subject: Re: [PATCH v2] kconfig: fix submenu rendering of negative
+ dependencies
+Message-Id: <178601989987.3769299.11655387246373515994.b4-ty@b4>
+Date: Thu, 06 Aug 2026 14:38:19 +0200
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -34,53 +47,44 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH v2] kconfig: fix submenu rendering of negative
- dependencies
-From: Nicolas Schier <nsc@kernel.org>
-To: Julian Braha <julianbraha@gmail.com>
-Cc: nathan@kernel.org, nsc@kernel.org, kees@kernel.org, xry111@xry111.site, 
- hyc.lee@gmail.com, jeffbai@aosc.io, vegard.nossum@oracle.com, 
- rdunlap@infradead.org, grahamr@qti.qualcomm.com, nico@fluxnic.net, 
- masahiroy@kernel.org, linux-kbuild@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-In-Reply-To: <20260801145238.2140291-1-julianbraha@gmail.com>
-References: <20260801145238.2140291-1-julianbraha@gmail.com>
-Date: Thu, 06 Aug 2026 14:37:25 +0200
-Message-Id: <178601984547.3769299.10178477594396432625.b4-review@b4>
 X-Mailer: b4 0.16-dev-5acee
-X-Developer-Signature: v=1; a=openpgp-sha256; l=603; i=nsc@kernel.org;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=728; i=nsc@kernel.org;
  s=20250924; h=from:subject:message-id;
- bh=V8wGbZUtUTTvzd5sMok+xWhw6lTZggtI6ivctMLdN0I=;
- b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBqdIAJaTtVG0I0erw9TlIWtqkUQQQCL9reyLQwl
- p6hh5fqf1WJAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCanSACQAKCRAHUgpwFiYS
- abGkD/0dJiNMAjDTOLNcekjDo8mx9BFS2QuKI3Z61BEucfaybdzuI/28DwXePQbg/ut8U9uddy8
- RDu4ngi+hdpff8Kr3Iyjzvp/6cF0IVjksX/ujT1K7lIlD7vDSNv2s6msHiz2ztFvmXMqw4mYWoE
- xo/ryjfAyfdv5jBrQG7cQpPiOmA9UKYpCcjV7oawgs+wJCJYqKIeLygSofBymnUzPGBCQe4TnMz
- UP1cvI4ZxWSZUFt17GFY6u9eTjkPiTA0r+z6AT9hBp0/lSq7fFAI41AYTsSP3+hmTwwQJIF3uFC
- MTP68v3XvvuIqTW6q9drdHpAYyx7wA9KFqkfv4Z4kVCv7SMGPL3HFwmRZk5IMMqynW9FqPEOxu1
- cdLo2P3YdUV2GQWLcHhd0X3uG9mXcbwqq/lfqXqATXIQ41YSSADEEbd3KZgyY1i0c2AStAYzM51
- Q4h8RNS9PF0w6UcxSpAqvT3DU6Oh4zlAR5i+q5zvc5r8DSBTjy1UTZb0wA4tx42IXfX36I0GRNY
- 2vpyeG7wUz6xX4r8qJQVGaWzRVzGWFHOw/GufR7joQjyYHvJ2FtYvqjnBrF3qoHw1PkNSOdbbVa
- iK4PKH/SNIHmOwrciwUTDopb4+oov1VPE7nQsub4Lah4jpK/3dYkXtaRJNflxAP781W3GlTggXU
- lemGScJ1SBiSpPw==
+ bh=fVcGdIr/dtMfYJw9VpWAs6VnKHKzA5ZGNOjloCem1yI=;
+ b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBqdIBAKLfWlKpWZxSUa/ZlpztXnBFSSDmN5IFot
+ frnbOAIiVqJAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCanSAQAAKCRAHUgpwFiYS
+ aRu9EADtQUxfLKTKl47CNMFqjgSi/4LLPX7uSTQTMA50l0UsXiyx5IoWAUEnERJhNik5jlhIpTL
+ B6azUN6AMryBMZ9+lShRp/yQu4CaSjtyDWAW6aJKdlpE9FMyZ0mA2W2M5XHPlSAJ78tD65KEHNF
+ Hu8l0pyOh+ia3Gy7JxMxS1fBzhXNT2jkgmEGtn7xoKWU6qIywnnX4Nix6Dtp/fhIJ3TMQGuUSEi
+ Pw/Ik5Sf1aqntqgM69Diu8k1ewJgxH0gTsnaxxgoEU2Oa1by/5agAffirlHxfnNSzF1Kzvk0n7B
+ dvOSW6XcX0KVeC4r+cfcjPUw5Pr5DASPIWmOm+CAwt6OV9UdVeu26QQ4Y/ilzrxI13+DIb68uHe
+ J4lMbm3vuSnSW2zcUypSqiL+1pWQpDKpKB433i0MC6ZJgnjY/2CbKLG0OzHPNRZDLJNaBny/Hy7
+ iaFziA5GP61oW05uOiRChdNVNJfRwGcgiHSddHpDHBbVrow0E0GTtM6lzd8V5uR2wXXRA7HrLCz
+ W/gXbeaheuZfKi3mqdcXDOMF1F/EjFys3TGswZ+462wR+MxkXSkDiRcgCuXr7C0nGFXw5It+mRi
+ XcA+n0Kj4gC6/V5Hrw6rWN5UGV72FvVuBsp93Nd5BoNiObMvK5a4EG6ngEP2YSNvsWAN9JgdPdC
+ OIvD0DCl1xLGsdA==
 X-Developer-Key: i=nsc@kernel.org; a=openpgp;
  fpr=18ED52DBE34F860EE9FBC82B7D97093255A0CE7F
 
-On Sat, 01 Aug 2026 15:52:38 +0100, Julian Braha <julianbraha@gmail.com> wrote:
-> The Kconfig frontend should render options that depend on a
-> previous option in the submenu of that previous option. But
-> currently, this breaks for negative dependencies. For example,
-> option FOO may be rendered in the submenu of option BAR, despite
-> FOO actually depending on !BAR.
-> 
-> Let's fix this ironic rendering by modifying Kconfig to explicitly
-> check negative dependencies.
-> 
-> [...]
+On Sat, 01 Aug 2026 15:52:38 +0100, Julian Braha wrote:
+> kconfig: fix submenu rendering of negative dependencies
 
-Reviewed-by: Nicolas Schier <nsc@kernel.org>
-Tested-by: Nicolas Schier <nsc@kernel.org>
+Applied to kbuild/linux.git (kbuild-next-unstable), thanks!
 
+[1/1] kconfig: fix submenu rendering of negative dependencies
+      https://git.kernel.org/kbuild/c/8fbf553d
+
+Please look out for regression or issue reports or other follow up
+comments, as they may result in the patch/series getting dropped,
+reverted or modified (e.g. trailers).
+
+Patches applied to the kbuild-next-unstable branch are accepted pending
+wider testing in linux-next and any post-commit review; they will
+generally be moved to the kbuild-next branch in about a week if no
+issues are found.
+
+Best regards,
 -- 
 Nicolas
+
 
