@@ -1,37 +1,31 @@
-Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A2F3890E8;
-	Fri,  7 Aug 2026 20:00:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 355F841F376;
+	Fri,  7 Aug 2026 20:06:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786132851; cv=none; b=CI6Eo81+lQCtEYL2XM+/gV5/iBgCEn7wXsa/1UKZwAYhCiFN/koqeFQOAJI7JJVxQLiKn53XXeU4ibZMAGhquQCd5OoGq3uN1yGSi1eYmjWkoyIhfqzo+u+O/Q0dW58Y4cX8hmsiiImMCqlvjZjByh4zr9qER54svOqWX1kMaMA=
+	t=1786133204; cv=none; b=q5cchysGqmpZMGiLOGYzkj0SiqYiXWKu8sS1W/dTJ8gV6ROqtjBgWmg84EwZDWh8/3KOUKErufV/HTU7k3BWGLJQEpamF3fZiZsB+jX7iOPlh6utxdjqf+Yoytoov/wKEIBFK0iiWFzZhJ7KKNHcKNkmHJdUf+Yn1I3dzPmQKqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786132851; c=relaxed/simple;
-	bh=v/qAF5KAEaK0gsiTIRKaQ+xh7VFSAxELNXzp8uYiRrk=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=gpN5TWLGfS/iPXjYcPhFiwEW7Wn5muUewYUoK/5V4/6qqMGqWrNupDhiTls/8h47I65W5BVO6BTX+sBOvo0eQv8AjG1YB7gC3YVHyA9J7hEmuXla5qmFp56hH7zNyveJhDXHGh3opbGwDJX6kilNnKVQseWChLST1eKNgty4j7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=PCGZ1HCD; arc=none smtp.client-ip=213.97.179.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
+	s=arc-20240116; t=1786133204; c=relaxed/simple;
+	bh=AvhU7K12OooOC2zFe14qGuEMZoKYYhX8FEiv1Kml7e4=;
+	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
+	 References:Date:Message-Id; b=Yih++ukjRxcXfzjxmeD2EZFrigMvhAs/tQ1OrC2av87095XEp8twoad654j2+5Tee4izOqtA4Yko0l0Oq66b7Eln3lxMiQm3rH07Hk0mnGyfFxCLCOvIshf8hDG2I5CdWfQ2rwdklGkFD4HfgDbvAQ3mZQirmmpNjZDs+d7YOLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lkBXz61y; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="PCGZ1HCD"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
-	Message-Id:Date:Subject:From:From:Reply-To;
-	bh=sOkK/TjyPJP7dHlqTvwdVuVzPDhRJqJNSj8QNTgo/3k=; b=PCGZ1HCDEHK8f7pWqjCktTABYD
-	b1LUZoOqfdd3QbOCNE2G7FIXg8ffdJhd1YnH+qnJS3ChtuU3g1Udpo7nK4GkOTv4QF2sRl+eSamn1
-	6qTbci53lU2r/kjReQTGyeHpeCf60PFzwBgyVAFUaNRdUtmTKm5yzDHrD4jBdr/J+HmZcywrVFkma
-	TvuhENFppYcCEsL8pMJSUflgw79eRnhLztAYon/st9+ikAWKdYBd8g5xl3qhEyrtTyz/SgRDeRBzL
-	Hhyk3oGn9QSw26LCIkUMrX1qewUSLKIIeyWQ8+qslf5j+2YlrgBECJgW1HzVM5qm3myby6T3znq1T
-	fUklysvQ==;
-Received: from [179.118.190.213] (helo=[192.168.15.100])
-	by fanzine2.igalia.com with esmtpsa 
-	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
-	id 1wsQL8-00Fa08-Oe; Fri, 07 Aug 2026 21:34:46 +0200
-From: =?utf-8?q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
-Subject: [PATCH RFC v3 0/8] syscalls: Add a shared table for all archs
-Date: Fri, 07 Aug 2026 16:34:27 -0300
-Message-Id: <20260807-tonyk-syscall_table-v3-0-7c45a23c50b5@igalia.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lkBXz61y"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 61B041F000E9;
+	Fri,  7 Aug 2026 20:06:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786133200;
+	bh=Q7zr4Kfwuib3CpCydRnKIf1Tv86Px7aoNBmpJaDigx4=;
+	h=Subject:From:To:Cc:In-Reply-To:References:Date;
+	b=lkBXz61ycFbaiLC1JojAStWtlue2Y4HNeffD/mVg0hmlPFcTDIm7qAiRTbOkfwu6j
+	 5NxoKhPP2emcFp52J0x/MjMcAN000BGrCY5e7OsZIwyHXl9saWrICBamJH7wHhn4zy
+	 KML3sPGca0NXTlaunHB4F+D/CBic8z8GtUwt2eawq3rhNRO1HqoaKTGkzuYgCIizUm
+	 8aP1A4y1QFGf2dULIMJN8HFznhGxoAbroeRKzcHZFmYTMRZoiBDAMdPHHttb3VPHfu
+	 iCDuxKCVWu4MxnWPiMXfdZZIlqqaPRvhn/QTmm/3QsSqsSplPBaG00JAHmR+nW9Hgg
+	 +OYbBWIDhhBRg==
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -39,87 +33,60 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/33NTQrCMBAF4KuUrI00afrnShA8gFsRSdJpG42NJ
- DVYSu9uGzcK4vINb743IgdWgUObaEQWvHLKdHNIVhGSLe8awKqaM6IxzeKcMtybbrhiNzjJtT7
- 3XGjAJS2EEETQTAg0f94t1OoZ1CM67Hfo9D66h7iA7BdvqbXK9cYOYduTUP474wmOcSnThBQFo
- 0nFt6rhWvG1NLcw4eknkv9G6IKkFasJAMtJ/YVM0/QCoqoPOhMBAAA=
-X-Change-ID: 20260724-tonyk-syscall_table-928bbb1b26bb
-To: Thomas Gleixner <tglx@kernel.org>, 
- Nathan Chancellor <nathan@kernel.org>, 
- Masami Hiramatsu <mhiramat@kernel.org>, Arnd Bergmanon <arnd@arndb.de>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
- kernel-dev@igalia.com, 
- =?utf-8?q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
-X-Mailer: b4 0.15.2
+Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH 0/2] modpost: error logging cleanups
+From: Nicolas Schier <nsc@kernel.org>
+To: Jani Nikula <jani.nikula@intel.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
+In-Reply-To: <cover.1786120005.git.jani.nikula@intel.com>
+References: <cover.1786120005.git.jani.nikula@intel.com>
+Date: Fri, 07 Aug 2026 22:06:13 +0200
+Message-Id: <178613317332.4111548.5289716748030449836.b4-review@b4>
+X-Mailer: b4 0.17-dev-362b8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=740; i=nsc@kernel.org;
+ s=20250924; h=from:subject:message-id;
+ bh=AvhU7K12OooOC2zFe14qGuEMZoKYYhX8FEiv1Kml7e4=;
+ b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBqdjq28Kryq8ApwcrHWO/gaJUgXVqmzSyNzxk+p
+ 3zjmJSuWYqJAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCanY6tgAKCRAHUgpwFiYS
+ acg0EACdX63WEUbwLEQCxCDVeP8wN2pEeiQARW6MFRDlqz96hZlBbC2sqIm2JFuDkdKqnewkc3t
+ Bsg/VQ+BxC3NXISFgHOvKreAzMk6IkzDmOnvUx4+GDNvYyirKVpuWE0e+YzslHEYh5YMFWRU/of
+ VPko/qwRuNhwRePk8ePB2ihzJAXHNfsNZ7hnr5Zzfi58e0DzyJ5NPGXUypJt0FoVziOL058n4tO
+ WOd7pSZmRboKF8MQsKjs86toLSYqVHxxr2JiRMnzWdZkJdwYQ175hqT0KqONIY4ZsOmUAxORWjv
+ N4qfu+D6FpTO3FJgWSaieAoyVI7GWzfz+qGHNBDP6mdiirdQkbynEc4Y7hI+ymP82XXzBtJ8NI6
+ gk5M2Hlhf+UdJpscD9/MhYRVeqazJElXIzOV0vZn2YxUOnz0WBZzAG6T1SA8mZuL3IphmOrekvE
+ KioQ9LkUD3zhxrCxH6k5e2rzqd20zHi9xESZSy7wEJBsUCLyxWytYv9Z/dQMzoXyHsxolqLg1Zb
+ 8RsB+oUehgWnJtXb7gthtqtOHtgqR9PT6Bs+AfrIAPwsgDNB6yZ5fGxLOlmgsCfSuBQ1r3n9qlU
+ ZENs2HrJvMZHMlCImIxR1mnB4Yh6/L9R/Xb2AoIjg2ocF5F5TFnkGFeHcABiiEWvhfrgriXW37T
+ k9ZdXgNzzKj+xoQ==
+X-Developer-Key: i=nsc@kernel.org; a=openpgp;
+ fpr=18ED52DBE34F860EE9FBC82B7D97093255A0CE7F
 
-While implementing a new syscall, we need to wire up it's number to the arch
-table. Since syscall number 403, all architectures are on sync regarding the
-number (except alpha), which make things a lot easier but more repetitive as
-well. Have a look at commit b36d4b6aa88 ("arch: hookup listns() system call"),
-with 15 lines of mostly:
+> I was doing some refactoring, and kept hitting modpost errors and
+> warnings. It was getting a bit annoying that a lot of the modpost
+> messages have different formats for modules, and different quoting for
+> symbols, sections, and namespaces.
+> 
+> Clean them up a bit.
+> 
+> BR,
+> Jani.
+> 
+> Jani Nikula (2):
+>   modpost: add module as parameter to modpost_log()
+>   modpost: use mod_warn() and mod_error(), clean up logging
+> 
+>  scripts/mod/modpost.c | 112 +++++++++++++++++++++---------------------
+>  scripts/mod/modpost.h |   8 +--
+>  2 files changed, 60 insertions(+), 60 deletions(-)
+> 
+> --
+> 2.47.3
 
-  +470    common  listns                          sys_listns
+Thanks for the cleanup!  Looks good to me.
 
-There's already a "common" table shared with a bunch of archs at
-`scripts/syscall.tbl`, but due to historical reasons some archs will never be
-able to move to this table and share all the numbers.
+Reviewed-by: Nicolas Schier <nsc@kernel.org>
 
-The generic table starts from 403 (clock_gettime64), the first common syscall.
-
-I've compile tested for arm32, arm64, s390, mips and sparc, by comparing the
-syscalls_*.h and unistd_*.h files generated before and after this patchset. For
-most of cases the files are identical, for the few cases that they are not,
-there's a note in the commit explaining why they are equivalent.
-
-Thanks!
-	André
-
-Changes in v3:
-- Removed x86 for now, let's wait till x32 is dropped
-- Added much more archs
-- v2: https://patch.msgid.link/20260727-tonyk-syscall_table-v2-0-95d4f1ee471f@igalia.com
-
-Changes in v2:
-- Managed to move to the real first common syscall: 403 (clock_gettime64)
-- Added -no-compat option to be used with x86_64
-- v1: https://patch.msgid.link/20260724-tonyk-syscall_table-v1-0-9c53188423da@igalia.com
-
----
-André Almeida (8):
-      syscalls: Make --abis parsing more robust
-      syscalls: Create unified partial table for all archs
-      scripts/syscall.tbl: Use the common table
-      arm: Use the common syscall table
-      s390: Use the common syscall table
-      sparc: Use the common syscall table
-      mips: Remove duplicated syscallnr.sh
-      mips: Use the common syscall table
-
- arch/arm/tools/Makefile                   | 10 ++--
- arch/arm/tools/syscall.tbl                | 68 -------------------------
- arch/arm64/tools/syscall_32.tbl           | 68 -------------------------
- arch/mips/kernel/scall64-n32.S            |  1 +
- arch/mips/kernel/syscalls/Makefile        | 27 +++++++---
- arch/mips/kernel/syscalls/syscall_n32.tbl | 68 -------------------------
- arch/mips/kernel/syscalls/syscall_n64.tbl | 48 ------------------
- arch/mips/kernel/syscalls/syscall_o32.tbl | 68 -------------------------
- arch/mips/kernel/syscalls/syscallnr.sh    | 26 ----------
- arch/s390/kernel/syscalls/Makefile        |  8 ++-
- arch/s390/kernel/syscalls/syscall.tbl     | 48 ------------------
- arch/sparc/kernel/syscalls/Makefile       |  8 ++-
- arch/sparc/kernel/syscalls/syscall.tbl    | 68 -------------------------
- scripts/Makefile.asm-headers              |  9 ++--
- scripts/syscall.tbl                       | 68 -------------------------
- scripts/syscall_common.tbl                | 83 +++++++++++++++++++++++++++++++
- scripts/syscallhdr.sh                     | 62 +++++++++++++++++------
- scripts/syscalltbl.sh                     | 38 +++++++++++---
- 18 files changed, 205 insertions(+), 571 deletions(-)
----
-base-commit: 075b74841bd0065a3bda3440873c747938e69b68
-change-id: 20260724-tonyk-syscall_table-928bbb1b26bb
-
-Best regards,
---  
-André Almeida <andrealmeid@igalia.com>
+-- 
+Nicolas
 
