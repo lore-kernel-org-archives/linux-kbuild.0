@@ -1,104 +1,85 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFEC219B5B1;
-	Fri,  7 Aug 2026 00:39:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A424C46D0B0;
+	Fri,  7 Aug 2026 16:29:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786063161; cv=none; b=UT6KFL+dZ7OTZxLew6sXC5VZm4nJIr1t2svcQj6ehTIAkkH/aZvGGNGOnSIrq8datBxUHXsVoI67dGKxOSxo3Qe+z3h2bzLr69MYN/v7bipaC/C6Kna6T/Rg4QjTsprPzusxs183owtqcmRx5KGn8F7Bv+GX0lwpd9di5RCxqaE=
+	t=1786120193; cv=none; b=FtBCgKuHMQgZAaTAMwgafqH8OjSuB9MCGQr1La6L5DTEgIIj5nP3TWQ5D3u3C5aXQmmlm/7TxutfHtgvKEIOrbs00gR3Dyy+Kiz2QhxbhCeTl7rcRRV5de7OH6OXJ4Q4VDBHdl3QUZKvqQ+NVyZfL7LF8UMj3gyh1yUQw+KN2AY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786063161; c=relaxed/simple;
-	bh=350wj4IYOzCgZEGLxeCjUvl2zZTwTBoasnL05zAqtZo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BOtDB2/7chHQegLWxWXEyv+87IRgdFHUN8nPwvIALm40WC+bRGAz6wn0LFudwtM2H+0I8/2ChALwNj+xPW0skuK4TNsykFNBU+n5zT3nXIjqhQRErKEAgskvMylxbEAZneOWvNWmxzUhluUAPsc1/MDN4k52DJEVSibUEde4MGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fcs+ti4M; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1786120193; c=relaxed/simple;
+	bh=8QXu4lXV1Ny/IMecBFER7nYsO2oQP8P248Jz+qfQc4c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k6oDL9wYzxrgD3X6EIUD3ELA5PEls9hbuIT9bo4ytnl5pvmG9I6BANkksZkkG33e1Sjw5memt5Rr47pM1et+eNkU9daaf1IckuhnGB7/OUee3xgXU9Gh5/Jv1xUjzOo9qYzLsSuofZQstk1nVg93j2RxDZIX0GQXUWB5mtKsMcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QlkwF5oZ; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fcs+ti4M"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QlkwF5oZ"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1786063159; x=1817599159;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=350wj4IYOzCgZEGLxeCjUvl2zZTwTBoasnL05zAqtZo=;
-  b=fcs+ti4MgfMSHDcJkU25JYbzjBKsWTY+8eZCEla8zSlcGMQzqVH8f11o
-   XaeI6Bi/nGUsCsNaftkXVdG26JUN7rGg9ERbGXreyQJahIP+nFAHtTXCg
-   wsGatt3qZMTcGeo1+OabT++Bh+uWDO6aBUrM3XSzRmF4ETzPoScWmOUFa
-   J6B71Pp6rpLLsdUaAGqQuv6M0nM6IODl7dNM9IdWtMtG5xB0nS7mP+SVr
-   yTVn0onK84d2Vw9KZfShu//febSsD7XxLPG8KYobLzoo2b11z1NEf26mP
-   A6UvUXA7UOOtKWK9W22ldNUxLOelUAwX2bPqbcuwVPLcnOFNDWzwtDAUM
-   A==;
-X-CSE-ConnectionGUID: 5ySmRi2jRSCOVBfWWK2ucA==
-X-CSE-MsgGUID: yAUwSpGjTZywT85aNZS25w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11867"; a="86877315"
-X-IronPort-AV: E=Sophos;i="6.25,209,1779174000"; 
-   d="scan'208";a="86877315"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2026 17:39:19 -0700
-X-CSE-ConnectionGUID: 4bSyfMdVSR2PwGo5uLHLQQ==
-X-CSE-MsgGUID: IqXm05y7Rsan6GI5mj93IA==
+  t=1786120192; x=1817656192;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=8QXu4lXV1Ny/IMecBFER7nYsO2oQP8P248Jz+qfQc4c=;
+  b=QlkwF5oZ8EjusLiyeT1UgxVyrOM6DzUeJzNTLvEYhy3pZiV+en4eDe5J
+   Q5L94GLYGQs5XmC+nFWEuCZL0DwKQai4I54+L36DqUZqDlGOtj0aGwOAP
+   f47VKpczo7MCC4O0cd5sBlTtVuZCWV3e+6caxODY4VTWGIGGH+yf9a5Sx
+   H7aPay/fLUjElx/eJGlHu0y6qMD8ML1AoVjDV2NRFkPxaLbtMf4EU/po3
+   HLxOm1RDV/vtXOdUYQwKvB63H/BrfTwArMvaZ2OH1nkrYMmjBDwbLAq9g
+   0TUnYqGSxZyUD4iVjHsae6Eef6/6UrudgfAv6RSJuXUd699A9qWLh714p
+   Q==;
+X-CSE-ConnectionGUID: NRVcaiizSkClvOIGmQ8TCQ==
+X-CSE-MsgGUID: atWho93VT02Xmfs8iR5IYg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11868"; a="86493093"
+X-IronPort-AV: E=Sophos;i="6.25,210,1779174000"; 
+   d="scan'208";a="86493093"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2026 09:29:52 -0700
+X-CSE-ConnectionGUID: q9tO6YXXQuyTZAGy5ElA8g==
+X-CSE-MsgGUID: VqQUpjQwSTi75rnz6YiGGA==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,209,1779174000"; 
-   d="scan'208";a="300465395"
-Received: from ettammin-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.245.50])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2026 17:39:13 -0700
-Date: Fri, 7 Aug 2026 03:39:09 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: phasta@kernel.org
-Cc: Kaitao Cheng <kaitao.cheng@linux.dev>,
-	David Laight <david.laight.linux@gmail.com>,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	David Hildenbrand <david@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
+X-IronPort-AV: E=Sophos;i="6.25,210,1779174000"; 
+   d="scan'208";a="258585269"
+Received: from ijarvine-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.152])
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2026 09:29:48 -0700
+From: Jani Nikula <jani.nikula@intel.com>
+To: linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Nathan Chancellor <nathan@kernel.org>,
 	Nicolas Schier <nsc@kernel.org>,
-	Christian Brauner <brauner@kernel.org>,
-	"Paul E . McKenney" <paulmck@kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	Simona Vetter <simona.vetter@ffwll.ch>,
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
-	Luca Ceresoli <luca.ceresoli@bootlin.com>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Kaitao Cheng <chengkaitao@kylinos.cn>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Alex Williamson <alex@shazbot.org>,
-	David Matlack <dmatlack@google.com>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	"Joy H . J . Lee" <rkr0k0r@gmail.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
-	Swapnil Sapkal <swapnil.sapkal@amd.com>,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 1/4] list: Add mutable iterator variants
-Message-ID: <anUpLYVuq-q6W0HB@ashevche-desk.local>
-References: <20260730095041.35715-1-kaitao.cheng@linux.dev>
- <20260730095041.35715-2-kaitao.cheng@linux.dev>
- <fa3d31c188640d013c8da2f3a1be32188926e4a5.camel@mailbox.org>
+	jani.nikula@intel.com
+Subject: [PATCH 0/2] modpost: error logging cleanups
+Date: Fri,  7 Aug 2026 19:29:39 +0300
+Message-ID: <cover.1786120005.git.jani.nikula@intel.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fa3d31c188640d013c8da2f3a1be32188926e4a5.camel@mailbox.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6 krs Bertel Jungin Aukio 5, 02600 Espoo, Finland
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jul 31, 2026 at 08:54:14AM +0200, Philipp Stanner wrote:
-> On Thu, 2026-07-30 at 17:50 +0800, Kaitao Cheng wrote:
+I was doing some refactoring, and kept hitting modpost errors and
+warnings. It was getting a bit annoying that a lot of the modpost
+messages have different formats for modules, and different quoting for
+symbols, sections, and namespaces.
 
-...
+Clean them up a bit.
 
-> With spin_lock_irqsave() you're also
-> forced to carry an integer around that you yourself never need.
+BR,
+Jani.
 
-Maybe not the best example since we have cleanup.h :-)
+
+Jani Nikula (2):
+  modpost: add module as parameter to modpost_log()
+  modpost: use mod_warn() and mod_error(), clean up logging
+
+ scripts/mod/modpost.c | 112 +++++++++++++++++++++---------------------
+ scripts/mod/modpost.h |   8 +--
+ 2 files changed, 60 insertions(+), 60 deletions(-)
 
 -- 
-With Best Regards,
-Andy Shevchenko
-
+2.47.3
 
