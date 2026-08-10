@@ -1,124 +1,112 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CD386DCE1;
-	Sat,  8 Aug 2026 05:50:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCB8B3DC4CD;
+	Mon, 10 Aug 2026 13:19:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786168213; cv=none; b=Um8RJ386z0EBBm8U5RAjzz0ANWH/xvlVDOeOCXU4NT+rf1n5ea2RN7apC1HNqpkLX5NDT8Y18GeSHh5Otk4aa4UsaxCDetJgIRktgzVZbSm9s6Ki6W6HeX5dvyGLopFmhuFt4+OvMcoN3DHF5lnEYfXzMdAWwKZEmyCrQuu/y/Q=
+	t=1786367971; cv=none; b=c+YMMlOHo6slGaWA3X/K7EGBEaIazm5YqfuZcQ6T/o3OyOdz8mYU5cK6aGNhkKf4tFQ+MAyy1474Gs4YRIZd155deHB+rM53DPsxRdV6su3yVxhm1C65rydjknDOexBqEqgA1EDDmDQwT8FGpgBb+Jha5n1iQB+K7hFgZQqqkg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786168213; c=relaxed/simple;
-	bh=yE9JytNoYGPtnWbWlO8L1vmDZy5Ky7DvLVAie5U/l/M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HieVcAMuA/lLfptiTgIpT7w4rNv+QD/HwdoGG4JXDoYlrb26iSudFB+5DY04eQMTl/NhY7uEqcf5ZwboMQw7Y7pZk2k09S2yWobnRLsxgHVfm/bzMGvXJWM2lA7+6DxZl4R7vQnt8705KhJyBqu7UHKsAT8955IwJKKMrCCmKfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GZA+GnI+; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786367971; c=relaxed/simple;
+	bh=bvxec+HOf4NpO7ObHrQwXh9yD0N3VL2pMqm/9I9MkTA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=r1a66A4CVXqEC2LwekGzUYys2XTVjmAJwUT3LbDMQ2ygoCk3HOChVxmtz3hv4T9rzzN9f5anu/1vUzUO2nNzivjKCcDHpeb3czYAXOYueNDKMAhWtmEqiQedt5+uCrJa5ih41Iq1ZevYiYRALIsQQYW8UTBjmm+bhiTz2uPVkpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=TeQClYvt; arc=none smtp.client-ip=213.97.179.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GZA+GnI+"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 417EB1F000E9;
-	Sat,  8 Aug 2026 05:50:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786168211;
-	bh=BLQuC8sVLOXnQ7Yxqi2Qk8Xn9pnaDhDNAOKDGBqR57U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=GZA+GnI+rUiEQpp+JK9lBgiDeSfstgKZXVgDSQohnva3MP1uvpTHhA2nW2WZPuGj1
-	 c+Mfxj+2FycaIXwQsxi0Y8+LoX+3gGizEwvk5wpMcV8MpoiQUWylkK4jFamfH41/ml
-	 zK1F+0ebgrNQ0fJeb+++1t/rCGUgCkxQxDePNL54lI41Gku9jJH4mVtlT+spYwVagE
-	 M3BgCpqBohS5yJQV0Du2idEyr5DpW9Rp+iJ1Jg3w94OuYOKY6tNV1S3aYzgWulyICE
-	 TZWKGR3qg5yC775dei5axXGL6eTw6xY+4Zvo1DKmx3mFLGqa8UhJmJCqtPf1lDSKHB
-	 6JwWOerd1DJnA==
-Date: Sat, 8 Aug 2026 07:31:17 +0200
-From: Nicolas Schier <nsc@kernel.org>
-To: Trevor Woerner <twoerner@gmail.com>
-Cc: linux-kernel@vger.kernel.org, Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Gang Yan <yangang@kylinos.cn>, David Disseldorp <ddiss@suse.de>,
-	Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-	Luis Augenstein <luis.augenstein@tngtech.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Andrew Jones <andrew.jones@linux.dev>, linux-kbuild@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH] kbuild: let the environment set HOSTPKG_CONFIG
-Message-ID: <ana_JYJJY5Gqycj6@levanger>
-Mail-Followup-To: Trevor Woerner <twoerner@gmail.com>,
-	linux-kernel@vger.kernel.org, Nathan Chancellor <nathan@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Gang Yan <yangang@kylinos.cn>, David Disseldorp <ddiss@suse.de>,
-	Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-	Luis Augenstein <luis.augenstein@tngtech.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Andrew Jones <andrew.jones@linux.dev>, linux-kbuild@vger.kernel.org,
-	linux-doc@vger.kernel.org
-References: <20260805055438.3482019-1-twoerner@gmail.com>
+	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="TeQClYvt"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; h=Content-Transfer-Encoding:Content-Type:From:Cc:To:Subject:
+	MIME-Version:Date:Message-ID:From:Reply-To;
+	bh=i7Vk+WZyhYml/oqXvC0ojS0hIvc0X/CBUrzfBHLQ43M=; b=TeQClYvtBbv2hzod8xpBvWdLRQ
+	6c5ioa0dlqxBYnC/vfvuQs3sMZ3Qh+GAgdr3lumT/aHiJ08SREOJlKPssUBnj+vN/o+zP1Mj6bJua
+	mlQ6G0WlvlYRAzzbjexM70fZE97zV8LDN4SR7IjqxUEy1PMN54vKB3DDMgQoMOLn4idu7Tee2V2NI
+	Pu2K0xb5HZqnKo3x8Chg6KuofcMdtNfovSWVANXnt0t3InBOpoO2C6P+XOvZ0KSpW0PRhwE6TiekY
+	QjEvlM/mt5O6bFQjiJg5IMXSJR/5eZ06FgVn2XnddDa0cfEdlNLhIbN+Hfpa1QpT/w+7vGUnptKw6
+	sh7KMZEA==;
+Received: from [179.118.190.92] (helo=[192.168.15.100])
+	by fanzine2.igalia.com with esmtpsa 
+	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128) (Exim)
+	id 1wtPuV-00GbM0-OR; Mon, 10 Aug 2026 15:19:23 +0200
+Message-ID: <099046ab-ca4d-4a1e-97ad-e2fe05b9e81b@igalia.com>
+Date: Mon, 10 Aug 2026 10:19:21 -0300
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260805055438.3482019-1-twoerner@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v3 2/8] syscalls: Create unified partial table for all
+ archs
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: linux-kernel@vger.kernel.org, Masami Hiramatsu <mhiramat@kernel.org>,
+ Nathan Chancellor <nathan@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
+ linux-kbuild@vger.kernel.org, kernel-dev@igalia.com
+References: <20260807-tonyk-syscall_table-v3-0-7c45a23c50b5@igalia.com>
+ <20260807-tonyk-syscall_table-v3-2-7c45a23c50b5@igalia.com>
+ <fc9361d7-2505-4ec7-9d47-966b4f5a9fc2@app.fastmail.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
+In-Reply-To: <fc9361d7-2505-4ec7-9d47-966b4f5a9fc2@app.fastmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-[resending from 2026-08-05, as my mail client broke the reply recipient
- list]
-
-On Wed, Aug 05, 2026 at 01:54:35AM -0400, Trevor Woerner wrote:
-> HOSTPKG_CONFIG was added so that "tooling that builds the kernel" could
-> choose which pkg-config the host tools ask about their dependencies, but
-> it is assigned with '=', so only a make command line assignment takes
-> effect. Exporting it does nothing, silently.
+Em 07/08/2026 17:40, Arnd Bergmann escreveu:
+> On Fri, Aug 7, 2026, at 21:34, André Almeida wrote:
+>> To take advantage of the subset of syscall numbers that are guaranteed to
+>> be shared, create a new table and adapt generation scripts to use it. In
+>> that way, every new syscall can be added to a single file.
+>>
+>> Create special ABIs in order to make the table work for different archs:
+>>
+>>   - `memfd_secret` for archs that implements it
 > 
-> That is surprising, because the other inputs to host program builds do
-> honour the environment: HOSTCFLAGS, HOSTCXXFLAGS, HOSTLDFLAGS and
-> HOSTLDLIBS are all read from it and documented in kbuild.rst as such.
+> This was already there, so it's not really a new addition. We could
+> also avoid this entirely and just rely on the stub implementation
+> from kernel/sys_ni.c for those architectures that don't need it.
+> They still get the macro definition, but it should be fine to define
+> that for everyone.
 > 
-> It also matters. A cross development environment sets
-> PKG_CONFIG_SYSROOT_DIR and PKG_CONFIG_PATH so that pkg-config answers
-> for the target rather than the build machine. Those settings are correct
-> for everything that will run on the target and wrong for a program that
-> has to run on the build machine. objtool asks pkg-config where libelf is,
-> gets the target's include directory, and compiles a host tool against
-> the target's C library headers. Because the directory arrives as -I it
-> is not treated as a system header directory, -Wno-system-headers no
-> longer covers it, and the build stops on warnings that would otherwise
-> be suppressed:
+>>   - `cln3` for archs that use the common clone3 entry
+>>   - `__cln3` for archs that use their own special entry point
 > 
->   usr/include/sys/cdefs.h:486: error: "__attribute_const__" redefined [-Werror]
->   tools/include/linux/compiler.h:123: note: previous definition
->   usr/include/stdio.h:449: error: redundant redeclaration of 'fscanf'
+> I guess that's one way to do it. I would probably use the full
+> clone3/__clone3 name here for consistency.
 > 
-> An environment that knows it is cross building can then say
+>> Some archs only care about the native entry point and have no compat, so
+>> create a option to never generate __SYSCALL_WITH_COMPAT() and always
+>> generate __SYSCALL().
 > 
->   export HOSTPKG_CONFIG="env -u PKG_CONFIG_SYSROOT_DIR \
->                              -u PKG_CONFIG_PATH pkg-config"
+> I don't see the purpose of this and would prefer to not add that
+> extra option if the scripts works fine without it.
 > 
-> once, in the shell it hands to the user, instead of every make command
-> line growing an override.
 
-Thank for the patch with the detailed description.  This sounds to be
-consistent, but looking at the other variables that effectively can be
-set via environment it looks differently to me:  Environment variables
-are honoured especially for _flags_, while most variables for _tooling
-paths_ (e.g. HOSTCC) are to be overriden via make command line (w/
-exceptions e.g. CROSS_COMPILE, LLVM).  Right now, I am not aware of the
-reason for this distinction, but before opening the gate for tooling
-overrides via environment, we should think it through (aka Chesterton's
-Fence).
+Some archs don't define __SYSCALL_WITH_COMPAT() (see x86_64 for 
+instance), so that's why I have added this option. But I can define 
+__SYSCALL_WITH_COMPAT() as SYSCALL(nr, native) for those archs.
 
-Another simple way of not piling up overrides could be something like:
+>>   usage() {
+>> -	echo >&2 "usage: $0 [--abis ABIS] [--emit-nr] [--offset OFFSET]
+>> [--prefix PREFIX] INFILE OUTFILE" >&2
+>> +	echo >&2 "usage: $0 [--abis ABIS] [--emit-nr] [--offset OFFSET]
+>> [--prefix PREFIX] [--common-tbl] INFILE OUTFILE" >&2
+> 
+> This needs to be changed to include the argument of common-tbl
+> 
+>> diff --git a/scripts/syscalltbl.sh b/scripts/syscalltbl.sh
+>> index c4b1f85c2dd6..c0fd6af2d892 100755
+>> --- a/scripts/syscalltbl.sh
+>> +++ b/scripts/syscalltbl.sh
+>> @@ -16,18 +16,23 @@
+>>   set -e
+>>
+>>   usage() {
+>> -	echo >&2 "usage: $0 [--abis ABIS] INFILE OUTFILE" >&2
+>> +	echo >&2 "usage: $0 [--abis ABIS] [--common-tbl] [--no-compat] INFILE
+> 
+> same here
+> 
+>       Arnd
 
-    cat <<-eof >Makefile.cross
-    override HOSTPKG_CONFIG := env -u PKG_CONFIG_SYSROOT_DIR -u PKG_CONFIG_PATH pkg-config
-    include Makefile
-    eof
-
-    make -f Makefile.cross
-
-So, I suggest to wait a bit and see if further arguments come up.
-
-Kind regards,
-Nicolas
