@@ -1,115 +1,91 @@
-Received: from fhigh-a2-smtp.messagingengine.com (fhigh-a2-smtp.messagingengine.com [103.168.172.153])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8E143E316C;
-	Mon, 10 Aug 2026 14:23:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.153
+Received: from angie.orcam.me.uk (angie.orcam.me.uk [78.133.224.34])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23A1430BB80;
+	Tue, 11 Aug 2026 11:10:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.133.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786371816; cv=none; b=rUbV/pi8TrC333AY2oWKF/bA1/pGUsLR9cQsTV8ISft4Mk1DWTe31skDZNymJxrchHNE/6L5A32YqD8L2ClKV/1du+vgqx3zHrlLPEn6fY4CU6rS/sJHqc+SKFYrfMyT11U+eYByzmB15VRPQDZkcYbeNB6NNUDgNHvFxiDR3Vg=
+	t=1786446607; cv=none; b=qjimRrHbNnNWDfuDLJ4JDr5fzs7LDpgeOEQRu6g2T0Z7VxXgdE8cytFAYH5DntGNxh0iTDmK+9ifFjT2m4swGwZBYqr7qTJuYmUugsgQt8jaR+RNxlkjxPOf7caAvlituBqnEpM+/bhgTAUAkMqVsMfg+RyPsfNZjrt43sGtLh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786371816; c=relaxed/simple;
-	bh=9jNxGlXallHAdyL9sjZpIow6/2sSIuEbXpQOx0hWBek=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=GTYrHO3uzcSW6b2jOu2ginbqgkZn1rw5vGi+ayCLGefzLd0vZYPSUHTjj3PERgtGc17B4myG/2/LJsRp7jg2JoXg+wfK2TnhqZes7WT952kqTp3nq6BB3xQY3SN7WevJDGSYxDNFYHhbElAW8dCRedqO4/rceezZ3MVQMEsn3YA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=Sf5LQk42; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ZuY1Jp6+; arc=none smtp.client-ip=103.168.172.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="Sf5LQk42";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ZuY1Jp6+"
-Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 3CF4514000DD;
-	Mon, 10 Aug 2026 10:23:33 -0400 (EDT)
-Received: from ams-imap-03 ([10.64.2.23])
-  by ams-compute-02.internal (MEProxy); Mon, 10 Aug 2026 10:23:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1786371812;
-	 x=1786458212; bh=01aWyB0jO+hirf4mpVEx6ve0TtGZ5raTV9mAo/SKW8I=; b=
-	Sf5LQk42X/q42nG7BnEsJB3oUURfU3Yrdwm6//0HQzC8XmeBUwYlxjD8QQD26hjL
-	YFwYHtqLb/NENAm/6nqSV8018x09SVSEtujuggrBp7NXIMHr8RdfoAWFe8BEpVt2
-	L6X21emS0SYm7KjVPuRyjU7PAGkTxCmvICJS5T6ohHJJpit5ruBqTwgZX0qkjDHG
-	D9iSVwossxsLuNFbcCH9S+smWam0YCL/3W4TiMbnb7OHadXY0/qqBzwWacrSKa+O
-	Imj/WfGucOiPRCnfNU1GF2SCRiLj+/1o9oVEQE8mIlrp0GIgJ7Ha0Owsz7uk3Ftd
-	mabgFcUiKvgsijEHWkGLTQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1786371812; x=
-	1786458212; bh=01aWyB0jO+hirf4mpVEx6ve0TtGZ5raTV9mAo/SKW8I=; b=Z
-	uY1Jp6+9BJs/h82f7IVwQgDY7Rmz2Bf+sLuXv8uO5bRdCX0RtrqIfFnSDUHQpIwG
-	2aOhcG3PtASv6PvQ68B2Xkpu1QICLk8Drgn2q9ev1J8kDVYynq233YLJgePiRvrZ
-	pe+JZM/WINqcvi9BKYfOKIbaS3BT7PVG1bFGep/FelPJiBaj94ivkcTCk9qbc1xT
-	871BTQr2tW19Zq30aBehJiHDur/LEO4D6lfmS37R+Kb+TiJyqH+b9U25EVhv4aH2
-	99kjPC2lipIwbccMBiH7qt4ixRR9Zwh5QCFiWgJdVqf+YgqiwhfWwa7cHbKd701V
-	Qz2+2FMMJZme2iDcl6dMA==
-X-ME-Sender: <xms:4N55atfPVErxwJAoWwBm4Tc4Q_V8yLOAK0H2E4gsJCpe0nGp2lMa-Q>
-    <xme:4N55amB8msDLHaSHy9TBpeIoC-vNXQjzys7unlYYM9F2Zxj-Ub1aASeIRl6ke5JoI
-    zVFd2aggYckbxyPFLhYAFZnVvfzbbvLQi3k5Qy1ICVKBzelcEwEl_v8>
-X-ME-Proxy-Cause: dmFkZTGu9DP5HWBOipFngztFbWST67medsxWAfQZS3v94VTt9XfObrU4aI0izZKri29LrU
-    auT6uHgQZjplYzA+X8AvnisWNe+fRdd+5Z9C6w09I+Nwvcm5WC2UxzEZ6hc4ChVz5Xe0Lk
-    1QKhYmzJtrvA8JVwrygv3fOmv8NtRD0351ajohwzIjpb69nBZ7B4KvILyF4eQk0O2M9q0b
-    eHhshtaD/9RL6s4L055hfZpufjA+I2TtSt8VBXXzdtw/oyzK8UQDdyRqsvc1R+9aCxlsf7
-    21D+r31FtofR4uOt4D3fAKR7QmAUH9jfXOt/cUcRmwCSO1uVOEeFVjHynLiXQftaTMLsWH
-    B/FNkAY3Urk0qsN4ius6XEGLf3zysZ08wAddKgh4XB71LIEauShVTDvRxLNZkMhBBavka5
-    rQ864Kpb1qQYyFw+ZUlbKafAwk85VthnrTvTwdIhPNv6n7GMoFlGIVhTTm1R6N01QbXIOB
-    Tv683Ocl5QsVegdeoWDDGN+DmU60NGZ15QA+L0gl2k2H+CdesChLLITgSEVrZxqVZzUt6n
-    DosXNUTcJ/M/3tipKRk3KSU3YfHycmjR4JDELvDJ2dAiiH78Qd4PB2bpznytxm6kjvENPK
-    4oVmy1PR/+bartb2IndPNj3OswODb9viBAfLiMcMC/E85AeBOqeN9miC2s7g
-X-ME-Proxy: <xmx:4t55anHNJBDrjrYIwtJoLCnVhYupi3ZAGdpcJDuZlKCQ3JEtBbbOjg>
-    <xmx:4t55auZeuKTvkMHrUCfeMzu-4xkFPecHNDkR1KGp9-5wFNo-bS1LAg>
-    <xmx:4t55apBnpSu5cGHhQQ3uxh9w_ocYdULLMFF9IXfowL0zgoORLJx7hQ>
-    <xmx:4t55amlzoRflpj_RMG-Grbh7N3RayfKoNAtGO89ntmIq4HDSm2TEwA>
-    <xmx:5N55agUEBsGYWAoLlk2g6TjWbOnH69guSc88agZcDm-RdWdNG7zLx05z>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.ams.internal (Postfix, from userid 501)
-	id D3FF132A006C; Mon, 10 Aug 2026 10:23:28 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1786446607; c=relaxed/simple;
+	bh=UxWeefAb6krFvq7Fg9Ob9zIpY3o8Sn9GV7JIMzZAUVY=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=ZoC1ubmUPbwJiHEhHnDmV8z6eGdn+wlOqieP/hjJr+eL2DpYf09O7jazLANVa5J32JFKTmChyJgYlq1tWJm1GoWiXwNVC/Qa0REaCrMU2jPOWaVPHchstkXh8OgYidJVWDNKjuaLbJsGCsInr3EEltZxLqT0QYU76hkhOIB4Qn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk; spf=none smtp.mailfrom=orcam.me.uk; arc=none smtp.client-ip=78.133.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=orcam.me.uk
+Received: by angie.orcam.me.uk (Postfix, from userid 500)
+	id 901AE92009C; Tue, 11 Aug 2026 13:09:55 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by angie.orcam.me.uk (Postfix) with ESMTP id 81B6B92009B;
+	Tue, 11 Aug 2026 12:09:55 +0100 (BST)
+Date: Tue, 11 Aug 2026 12:09:55 +0100 (BST)
+From: "Maciej W. Rozycki" <macro@orcam.me.uk>
+To: Magnus Lindholm <linmag7@gmail.com>, Magnus Lindholm <lindholm@kernel.org>
+cc: Matt Turner <mattst88@gmail.com>, 
+    Richard Henderson <richard.henderson@linaro.org>, 
+    Nathan Chancellor <nathan@kernel.org>, 
+    Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
+    Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+    Nicolas Schier <nsc@kernel.org>, linux-alpha@vger.kernel.org, 
+    linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
+    linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH 2/2] alpha: read $gp and $sp explicitly for clang
+In-Reply-To: <CA+=Fv5R0tdFeEKWgSVTjfXbs=guZmR8zy8FGbqUZNSKiyB24aA@mail.gmail.com>
+Message-ID: <alpine.DEB.2.21.2608110653370.48788@angie.orcam.me.uk>
+References: <20260803-alpha-clang-v1-0-1c4ba5ba7a64@gmail.com> <20260803-alpha-clang-v1-2-1c4ba5ba7a64@gmail.com> <CA+=Fv5R0tdFeEKWgSVTjfXbs=guZmR8zy8FGbqUZNSKiyB24aA@mail.gmail.com>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: Aq3x9tlyO1VR
-Date: Mon, 10 Aug 2026 16:22:48 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
-Cc: linux-kernel@vger.kernel.org, "Masami Hiramatsu" <mhiramat@kernel.org>,
- "Nathan Chancellor" <nathan@kernel.org>, "Thomas Gleixner" <tglx@kernel.org>,
- linux-kbuild@vger.kernel.org, kernel-dev@igalia.com
-Message-Id: <3ee5b6f6-8d71-4a01-bd50-3768ddb02b4a@app.fastmail.com>
-In-Reply-To: <099046ab-ca4d-4a1e-97ad-e2fe05b9e81b@igalia.com>
-References: <20260807-tonyk-syscall_table-v3-0-7c45a23c50b5@igalia.com>
- <20260807-tonyk-syscall_table-v3-2-7c45a23c50b5@igalia.com>
- <fc9361d7-2505-4ec7-9d47-966b4f5a9fc2@app.fastmail.com>
- <099046ab-ca4d-4a1e-97ad-e2fe05b9e81b@igalia.com>
-Subject: Re: [PATCH RFC v3 2/8] syscalls: Create unified partial table for all archs
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
 
-On Mon, Aug 10, 2026, at 15:19, Andr=C3=A9 Almeida wrote:
-> Em 07/08/2026 17:40, Arnd Bergmann escreveu:
->>=20
->> I don't see the purpose of this and would prefer to not add that
->> extra option if the scripts works fine without it.
->>=20
->
-> Some archs don't define __SYSCALL_WITH_COMPAT() (see x86_64 for=20
-> instance), so that's why I have added this option. But I can define=20
-> __SYSCALL_WITH_COMPAT() as SYSCALL(nr, native) for those archs.
+On Mon, 3 Aug 2026, Magnus Lindholm wrote:
 
-Yes, I think that is the best solution here, yes. We certainly need
-to use the compat version for .tbl files that only have one entry
-but do use the compat ones (mips n32, arm64 aarch32), and using it
-everywhere helps remove another special case here.
+> > diff --git a/arch/alpha/kernel/traps.c b/arch/alpha/kernel/traps.c
+> > index 7631129ac914..5b4f1ae2b74b 100644
+> > --- a/arch/alpha/kernel/traps.c
+> > +++ b/arch/alpha/kernel/traps.c
+> > @@ -925,7 +925,9 @@ void
+> >  trap_init(void)
+> >  {
+> >         /* Tell PAL-code what global pointer we want in the kernel.  */
+> > -       register unsigned long gptr __asm__("$29");
+> > +       unsigned long gptr;
+> > +
+> > +       __asm__ volatile("mov $29, %0" : "=r"(gptr));
+> >         wrkgp(gptr);
+> >
+> >         wrent(entArith, 1);
+> 
+> This looks good to me. The explicit $gp read and use of
+> current_stack_pointer avoid relying on the unsupported local
+> register-asm behavior.
 
-Side note: in the long run, I would hope we can remove those
-intermediate macros entirely and just output a readable version
-of the switch/case style top-level function that x86 generates
-from the table.
+ It could have been worth mentioning in the change description that no 
+code quality regression results here with GCC:
 
-      Arnd
+--- arch/alpha/kernel/traps-0.dump	2026-08-11 11:57:59.895247441 +0100
++++ arch/alpha/kernel/traps-1.dump	2026-08-11 11:56:31.788713285 +0100
+@@ -2223,8 +2223,8 @@
+ 			1b70: GPDISP	.text+0x4
+     1b74:	00 00 bd 23 	lda	gp,0(gp)
+     1b78:	f0 ff de 23 	lda	sp,-16(sp)
+-    1b7c:	10 04 fd 47 	mov	gp,a0
+-    1b80:	00 00 5e b7 	stq	ra,0(sp)
++    1b7c:	00 00 5e b7 	stq	ra,0(sp)
++    1b80:	10 04 fd 47 	mov	gp,a0
+     1b84:	37 00 00 00 	call_pal	0x37
+     1b88:	04 00 00 c2 	br	a0,1b9c <trap_init+0x2c>
+     1b8c:	08 00 1e a6 	ldq	a0,8(sp)
+
+ Also I think our coding style would rather see the asm written as:
+
+	__asm__ __volatile__("mov $29, %0" : "=r" (gptr));
+
+ Otherwise:
+
+Reviewed-by: Maciej W. Rozycki <macro@orcam.me.uk>
+
+  Maciej
