@@ -1,113 +1,232 @@
-Received: from fout-a6-smtp.messagingengine.com (fout-a6-smtp.messagingengine.com [103.168.172.149])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49DFE4028FF;
-	Wed, 12 Aug 2026 09:17:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.149
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FE15412BFA
+	for <linux-kbuild@vger.kernel.org>; Wed, 12 Aug 2026 09:36:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786526246; cv=none; b=AGeycRRdPeHJyEAe1ONnT5AUMjlYiFw56efS/EDcMLmk9510EhKIMCBmKEAVtZWCWfBAFp5AjlD2DG5Y9hh8c62B8jWoZOMexyKOpxwYAALJ/mhknksESshSZ2w5I40wd5WkpJQANZmP/QZw9eVg8U++sF7LJzsluC7oElOMqSw=
+	t=1786527384; cv=none; b=DmGo0WTM5+Ye6JCMVL9rZGkayLp86AEjEfk9ECpLwT3pr0jNJGINkCRdeIK5QwCswKcJLYWyMIieMNrFxyZo2ZPEU3cHGoqNN4/x7w6f4zpNBxeccWVj6rvm+mz4fMGgm+T9Ccx4BSj2fC7fwpaycv/r2EzjCP4iZy4Y0L7iNic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786526246; c=relaxed/simple;
-	bh=lG4XIUQoEyQzBegmAKmdIxYgkDG1FkH+wJO1/BG9EEE=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=ttCqY8vAf+aTspoGRk6m9ZI+k+q5ZJwAEmawaF/qEca6Es9ux3OvhUGe8sD4BTRqMHl6TpPNHwXoqrwIZIcmfCuK14vklf5gdAn5dMPLna3nMs0mr7282wGA5h+bVOc2Izy4sCLpI2PaG4nuA62QpYm9l2ZLDCEQSJm3nlpKLbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=EhKHZfAj; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=QCZ6XVu8; arc=none smtp.client-ip=103.168.172.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="EhKHZfAj";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="QCZ6XVu8"
-Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
-	by mailfout.phl.internal (Postfix) with ESMTP id AAA99EC021A;
-	Wed, 12 Aug 2026 05:17:23 -0400 (EDT)
-Received: from ams-imap-03 ([10.64.2.23])
-  by ams-compute-02.internal (MEProxy); Wed, 12 Aug 2026 05:17:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1786526243;
-	 x=1786612643; bh=JMHRZkTThzL4/D2z2n6orsf9ZiqWCo1mWUhOS/9wsRE=; b=
-	EhKHZfAjZlk1TOyMzugGhsGEWU+sn5be0ZUg2UKDIrbY8dBBZtPOyKY4aBtRuSaH
-	UHHIDtkBP2r2UveKtLpEj8iJ//MMnlgfdRPNrLv8qT510Jw01KFNAwbi1ED4pi9j
-	Z5AjeI/kK1J99i1tjJ9HuF6xDXGRVGOEROeocXvSEM8Knddb2LXzLqohmD2DVPOk
-	L75JdnsjpxIwMoAWDz1ksxBjHCdcFi/z26sG62JnRwhYVr8kIUgcWmQfH1S8s9ud
-	LWQv32ZrjVEdKT0bDGpM3VcXK2XTBdaLyH+ARYwBM/7w1JxwvJThKZKF2sOhNYJI
-	6ORzOilPT9srRmQ8KeChrw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1786526243; x=
-	1786612643; bh=JMHRZkTThzL4/D2z2n6orsf9ZiqWCo1mWUhOS/9wsRE=; b=Q
-	CZ6XVu86puHoSkjabl6Z2NRElvpCi10HTfWqxrvGbu56p2Fx9BiU8KF8PFk+DD5n
-	rQUR5r6fdsesxlK9zLXQM3HpkiTvhV93ikgQLDOL7yWd2284QbPjDfjkLEbN27CN
-	2gvJyPEnU9gjPTrEl+PWHvPa/TFlMl9XXqkA44fGTy61NvO9taCd0ddotWio6mKW
-	zWqi5qZIKhc/0Q2f1IyhLjfRUeMdYOBdAozcqWxC6fSv54fZPrn83PqgQbTC8Sr0
-	ogPoMJP2Amwml6Tc5YJWIsZD26RF9y3M8m/7MKgSWbFasXiGiWEiSnX3CLWb6IGs
-	qgZwL6WT3wYjInYB8iYSQ==
-X-ME-Sender: <xms:Hzp8aui9Nr_iO_jIRGI5_tjcZ8gbv0qt-a-Alvs15rVq0d0iVr7oaw>
-    <xme:Hzp8ap0fXLZNLajmxLqgGr5L5cF-lpg5GLFk6o1NOTEehPAn7LegLHu6NQabU2x_6
-    0VHWHeqFb5GwIxv7uZX1FcTfIjI_nQUZD__BfEg3vA-ji90q63vfHxM>
-X-ME-Proxy-Cause: dmFkZTFEO3+Mv0fUlPA8/fF1P4u/45A7I749cOt0O09DdbJrIQFErCuWKjS8b8NaFx45H0
-    JqucUDqvp7OD7IizGui7364FfoeWpSg3IWjeqe8KZuNFqLaBiU8JEFlVo01VPL9lvsmamd
-    k+k/tWB+VCcY7iEfR67OHBmH/sjpCo8QDxG/tkuG7VopQP/MOkQtf4PZsjQPGIjsm3HOTo
-    7BvjBNOqC80ufvl9vNdgp64FaWQnmDFv2h5h5JoQ+plpbIbI8eKqCtW0v1PX02JidZP23U
-    IX/IZogBCW1Q34kJ0D8DMTHIu9w0rB8X0hUmFSE11T7Bmo01sKQQbQUf32KeIEEwK+mIeM
-    GfripWP8ivJ5/wD/pqVIBi0cKyIx3zRQoC5n9xtwHfxTNFJ6RWa+OsBlKo9Mqu3du/IDyH
-    +d00Bcj2KVX0iZfDYKAyiD6Armi7uu9tyQ0AFYmnb/DdCWy18rs9Kyv9/+YG0d3d/Yv5uu
-    mFAMn8OxlycUb16cxDmu65fFWzTk+0EPA5E1ZpgMp0OH5P3iZcJDc6A5/1xmFENqrig3dL
-    rzugJTKjXrs+NU/4CcWca76UkoUV1JdFbjxj4aZ1Eio2h2lh4l83rmZCKr2e2zm0WIWOfH
-    TzUvwgavWf++JTWauBJ0KLXXlgEaBt0AlMcYOkl9Ke2dGrmr1CKDX9IhLOlg
-X-ME-Proxy: <xmx:ITp8akLebwAkz96JK1JwmzFfbIh0mgK0zs5M5qMOqSpmVVSmJZrEGg>
-    <xmx:ITp8auNNdiR8nxkwZgPBYEkG4epukzEDoue9NiRCrJpEQ3-2rPHnBQ>
-    <xmx:ITp8akl3d-tla9BMPZZJnt_zpP0UVHCJ6khEJOe_WPQy3HIDRYNLlg>
-    <xmx:ITp8ai5bvmrPGRfg7nJ6Bk4-pT-MYBQOc4gr2Xe18M2nQl_X5tvEDA>
-    <xmx:Izp8aqbP035RSb0iq8Zqh6fFGpuFXfOjfbbxf92PMCbl-t8qg26vzVJF>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.ams.internal (Postfix, from userid 501)
-	id 6719E32A006E; Wed, 12 Aug 2026 05:17:19 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1786527384; c=relaxed/simple;
+	bh=mb1vwLfGnoz/AiE/5mRjeVCRWWyUDyrnEFQJJPGmlE8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fMXZv1dkPZK6aVHoDcDpOMbxvJcxrTn8aJwLom8S71oqahhP+ipgm5SmTgPg+801V5GkCkGBGl1UMFc4q6KhR5ULXjLzCDwLKTtorfhjwXtY0vB8VpTEvh+mdoNtErGmF+ijauEcAYQDqsuAOONxo7WUMiTRlOTjvRox8tgEVe0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-92e5d6f35c1so73007385a.0
+        for <linux-kbuild@vger.kernel.org>; Wed, 12 Aug 2026 02:36:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786527380; x=1787132180;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=HsKpew/NpbmRwJwh6JVQkfOwogDxzHNyZba/zwHTTH0=;
+        b=V7QkL7q0hu2rkmr0xuSIDzKFq1LNT9pe4KyyWHU4SscSTrTMLN1V+CkLKyyT2yV3o8
+         43VJHCNowNatHD6HKAsxiaLWEFo9rBJBD+wjaoxUgxZWJaUvubFqGBzEEx3ejShMOup0
+         plOnavmm6+BDKyPk3TqT3jhyq+H58jLWk3+CSqk7eq51G0Z42Se8lsL5mNKvdpGK+n3F
+         Yq28ofJSzqeY61sxqfkYw6qegbu4lWTbNAqjLK+TgDj0QgIfYJ6AbntEIEC5EXmT+X8N
+         X43lRJHVUysnBTGS9es30U7sStgi4Vnvq12rC7fGC8cVh9HC826oIpz+ultjUFBPbgm6
+         /E7g==
+X-Forwarded-Encrypted: i=1; AHgh+RoqvfJIeOhMuh8wh9AUxRKtfPyEna4nzop8j4fn7NxpKDAzjK6LKFHa24SeT2KdsIr0wtiWsVCVtnK7gCI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwaRwUUeQrSV1JB2IK7QWknkGxp0Qo9Rlruizu2/u+NhR5XzF//
+	8URcuI3qgxPKeqoOw0GCNTnVDzEJRWuFAVJcwMV4AnlZymgTlCqJx+3cJyJ6DO5I
+X-Gm-Gg: AR+sD10+wR7Grd872oMkn9hrEzkRMvnlvzUYqvSH0H0w81P6w2FmRjH0WBKACd8aaVm
+	3zAWQ0ifMhDmt8WjHgnbT8uZt6KtVGDH+yGHtGkq9zKCaUzo7zfX2zYFhdEpl6JNq9nHcSfbYLC
+	7IwEsgvV+xKp090oGVRMhwh7LLuJVLiPmHfHsvVIOpHybINCNwScMfmOkD1oMxihwjL9vh1SkYc
+	1chn0qg/TRRFn0mlRPBeYtXMFt7te8diT8OTWjR5/sHTvaI9IgLQFI2QOFN/h748j3EM8rAN3Ea
+	MjE8DuDgzC1tOXOb/4DRiAVZUeN4/XWZ0TD1uUO1YmLiOrHq8DdB3VTumnbLfm1KA26OiBlQmKE
+	g5nSMDTE5kiwjvvBITNRs1Z4p6zIXA/Ww71wo+Cfefjfc86xv5cxyV2B9LwUT3jDaE1nO/rFTTR
+	aXxM4BUMvgoAp8kffECo1lSBOFvUDy8ZkLjn8cRurnnPfRvJbaTI0U27a9sNTXa/8EitHBQi9Bp
+	aR4UkD10yJhlXucJPr/wkAG0lCr+w==
+X-Received: by 2002:a05:620a:4506:b0:92e:46cd:72a0 with SMTP id af79cd13be357-936b3a42011mr264929485a.6.1786527379509;
+        Wed, 12 Aug 2026 02:36:19 -0700 (PDT)
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com. [209.85.222.172])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-936b5f17eb3sm88929885a.23.2026.08.12.02.36.19
+        for <linux-kbuild@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Aug 2026 02:36:19 -0700 (PDT)
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-92e5d6f35c1so73006185a.0
+        for <linux-kbuild@vger.kernel.org>; Wed, 12 Aug 2026 02:36:19 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+Rpon7lX0z1pYofNhJVCIljOfF9ccMXRieQbwHB412SPZBydwBDVN5Rz0V2Deqmc6yfq+dit0yFiH3Dop2Y=@vger.kernel.org
+X-Received: by 2002:a05:6102:3c87:b0:737:f0ba:508f with SMTP id
+ ada2fe7eead31-76c87872117mr743103137.3.1786527025984; Wed, 12 Aug 2026
+ 02:30:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: A8cq6fax0o8Z
-Date: Wed, 12 Aug 2026 11:16:59 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>,
- "Thomas Gleixner" <tglx@kernel.org>, "Nathan Chancellor" <nathan@kernel.org>,
- "Masami Hiramatsu" <mhiramat@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
- kernel-dev@igalia.com
-Message-Id: <ca0326a0-ce13-4bfc-b36c-5612d73335fa@app.fastmail.com>
-In-Reply-To: <20260812-tonyk-syscall_table-v4-8-748d0229ad40@igalia.com>
-References: <20260812-tonyk-syscall_table-v4-0-748d0229ad40@igalia.com>
- <20260812-tonyk-syscall_table-v4-8-748d0229ad40@igalia.com>
-Subject: Re: [PATCH v4 08/12] mips: Get rid of custom mips ABIs for syscall tables
-Content-Type: text/plain; charset=utf-8
+References: <amhMsk5Z6P0IA8sr@XiangdeMacBook-Pro.local> <20260728065447.91511-1-sj@kernel.org>
+ <CAMuHMdWq1eutRM4u1Q3r50f8W4oSejo_XAgyjEKuwi4Lw6K7jQ@mail.gmail.com>
+ <anBYnPELPotUiNjv@monoceros> <CAMuHMdXUyAX0TV0Sq9_YxvipzkVOBX=4s_r5mVQcZ_7nL=-AQw@mail.gmail.com>
+ <87853c96-cc8f-49e6-81b1-02bfe409e372@roeck-us.net> <CAJJ9bXyC=piPamaGJN=VMA72Ws+WqgJbYZgTj_w6NFzyLa_mMg@mail.gmail.com>
+ <anuyFHLUGDjZWY4K@XiangdeMacBook-Pro.local>
+In-Reply-To: <anuyFHLUGDjZWY4K@XiangdeMacBook-Pro.local>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Wed, 12 Aug 2026 11:30:14 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdWQLwgShMK7G-6soiZxtRPYWLizBLRdouwxFUcFXUJM-Q@mail.gmail.com>
+X-Gm-Features: AUfX_mxA9clRzUNdd2GP67STTBu3d3CfSgby0ufuk5IkGAlxaBZE-BZi7BRVSMc
+Message-ID: <CAMuHMdWQLwgShMK7G-6soiZxtRPYWLizBLRdouwxFUcFXUJM-Q@mail.gmail.com>
+Subject: Re: [PATCH v3] erofs: cap LZMA stream pool size
+To: Gao Xiang <xiang@kernel.org>
+Cc: Guenter Roeck <linux@roeck-us.net>, Michael Bommarito <michael.bommarito@gmail.com>, 
+	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@baylibre.com>, 
+	SJ Park <sj@kernel.org>, Gao Xiang <hsiangkao@linux.alibaba.com>, Yue Hu <zbestahu@gmail.com>, 
+	Jeffle Xu <jefflexu@linux.alibaba.com>, Sandeep Dhavale <dhavale@google.com>, 
+	Chunhai Guo <guochunhai@vivo.com>, linux-erofs@lists.ozlabs.org, 
+	linux-kernel@vger.kernel.org, Chao Yu <chao@kernel.org>, 
+	David Hildenbrand <david@redhat.com>, linux-kbuild <linux-kbuild@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 12, 2026, at 05:33, Andr=C3=A9 Almeida wrote:
-> Get rid of the mips exclusive ABIs for the syscall tables and replace =
-them
-> with the common ABI names, replacing n32 and o32 with 32 and n64 with =
-64.
+Hi Gao,
+
+On Wed, 12 Aug 2026 at 01:37, Gao Xiang <xiang@kernel.org> wrote:
+> On Tue, Aug 11, 2026 at 03:37:38PM -0400, Michael Bommarito wrote:
+> > On Tue, Aug 11, 2026 at 3:35=E2=80=AFPM Guenter Roeck <linux@roeck-us.n=
+et> wrote:
+> > > > Any progress with fixing this for v7.2?
+> >
+> > I would like to fix this since I started the problem with the original
+> > patch, but I feel a bit stuck.  My v1 and v2 patches would not have
+> > triggered the build failure, but Gao made valid points about the
+> > trade-offs that led us to this v3.  Maybe it would be worth your
+> > opinion on the config approach in those earlier patches?
 >
-> No functional change happens, but it simplifies and helps to unify the
-> tables.
+> Sorry about the late reply.
 >
-> Signed-off-by: Andr=C3=A9 Almeida <andrealmeid@igalia.com>
+> As I said, I really dislike hardcoded range, but it is an issue that no
+> NR_CPUS definition on CONFIG_SMP:
+>
+> I wonder if the following diff resolves the m68k issue (I'm not an
+> Kconfig expert but it seems to work on x86_64 !CONFIG_SMP):
+>
+> diff --git a/fs/erofs/Kconfig b/fs/erofs/Kconfig
+> index 8ca1767dafb6..2dfc313588d2 100644
+> --- a/fs/erofs/Kconfig
+> +++ b/fs/erofs/Kconfig
+> @@ -134,7 +134,8 @@ config EROFS_FS_ZIP_LZMA
+>  config EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS
+>         int "EROFS LZMA default maximum decompression streams"
+>         depends on EROFS_FS_ZIP_LZMA
+> -       range 1 NR_CPUS
+> +       range 1 NR_CPUS if SMP
+> +       range 1 1 if !SMP
+>         default 16
+>         help
+>           By default EROFS allocates one LZMA decompression stream per CP=
+U.
 
-I had expected you to use 'common' instead of '32' and '64' here. Since =
-you
-did not combine the n32/n64 tables, this makes no practical difference,
-but it still makes the tables look different from all the other ones, and
-it means that the following patch to unify the tables is harder to
-validate since the inputs are still not line-identical.
+Thank you, that seems to work (despite still seeing the warning on m68k,
+as NR_CPUS does not exist).
 
-Is there some reason you went with this approach?
+Test runs on ARM (NR_CPUS depends on SMP, like most architectures), m68k
+(no CONFIG_NR_CPUS), and x86 (NR_CPUS is always defined) before/after:
 
-     Arnd
+     $ make ARCH=3Darm allmodconfig
+     $ grep CONFIG_EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS .config
+     CONFIG_EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS=3D4
+
+ SMP is OK.
+
+     $ sed -i "/CONFIG_SMP=3Dy/d" .config
+     $ yes "" | make ARCH=3Darm oldconfig
+-
+-No warning...
+-
+     $ grep CONFIG_EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS .config
+-    CONFIG_EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS=3D0
++    CONFIG_EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS=3D1
+
+-... but automatic configuration is silently broken on UP.
++UP is OK with automatic configuration.
+
+     $ sed -i "/CONFIG_EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS.*/d" .config
+     $ yes "" | make ARCH=3Darm oldconfig
+-            EROFS LZMA default maximum decompression streams
+(EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS) [0] (NEW)
+-    [infinite loop]
++    $ grep CONFIG_EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS .config
++    CONFIG_EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS=3D1
+
+-Manual configuration is broken.
++UP is OK with manual configuration.
+
+ --------------------------------------------------------------------------=
+------
+
+      $ make ARCH=3Dm68k allmodconfig
+     fs/erofs/Kconfig:137:warning: range is invalid
+
+ Warning...
+
+     $ grep CONFIG_EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS .config
+-    CONFIG_EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS=3DNR_CPUS
+-
+-... but this will actually build and work, as <linux/threads.h> has:
+-
+-    #ifndef CONFIG_NR_CPUS
+-    /* FIXME: This should be fixed in the arch's Kconfig */
+-    #define CONFIG_NR_CPUS  1
+-    #endif
+-
+-    /* Places which use this should consider cpumask_var_t. */
+-    #define NR_CPUS         CONFIG_NR_CPUS
++    CONFIG_EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS=3D1
++
++... but UP is OK with automatic configuration.
+
+     $ sed -i "/CONFIG_EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS.*/d" .config
+     $ yes "" | make ARCH=3Dm68k oldconfig
+-            EROFS LZMA default maximum decompression streams
+(EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS) [NR_CPUS] (NEW)
+-    [infinite loop]
++    fs/erofs/Kconfig:137:warning: range is invalid
++
++Warning...
++
++    $ grep CONFIG_EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS .config
++    CONFIG_EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS=3D1
+
+-Manual configuration is broken.
++... but UP is OK with manual configuration.
+
+ --------------------------------------------------------------------------=
+------
+
+     $ make ARCH=3Dx86 allmodconfig
+     $ grep CONFIG_EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS .config
+     CONFIG_EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS=3D16
+
+ SMP is OK.
+
+     $ sed -i "/CONFIG_SMP=3Dy/d" .config
+     $ yes "" | make ARCH=3Dx86 oldconfig
+     $ grep CONFIG_EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS .config
+     CONFIG_EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS=3D1
+
+ UP is OK with automatic configuration.
+
+     $ sed -i "/CONFIG_EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS.*/d" .config
+     $ yes "" | make ARCH=3Dx86 oldconfig
+     $ grep CONFIG_EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS .config
+     CONFIG_EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS=3D1
+
+ UP is OK with manual configuration.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
