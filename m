@@ -1,37 +1,38 @@
 Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 434F62F6931;
-	Wed, 12 Aug 2026 03:33:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2A7358372;
+	Wed, 12 Aug 2026 03:33:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786505593; cv=none; b=Z2cWa56GTwM8tzknbH9UqTLpbB9uzRfea7LrWxe0SLhJQMojZR814iqXP2bdoZXeOV6Y8WWC93MIgSAGJQIByVIcEkdnws+6ZmnWzd2l8RCHxdOoepVIN9KFs9LDoXIB+iv0+JxcNJeLyFUPraXe24c+pLMCTEEIdcTZr8pp2hw=
+	t=1786505594; cv=none; b=Ucd2p4W6T7lxstEwtAV47Z9e/Wt5hpZXaaBlBlAVTxosWNW6m7TabW9YPxttqTSv/+Mg7mWnIZtPodANnlwbgyDRLV8eT8yk7kE2gP6M7QftssPujnNlTQBYB+8fTO2o+Rse+3RTmCiSTWqhX/qyOerNICF6j+pxfiZyK09nmLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786505593; c=relaxed/simple;
-	bh=wrTEcN6TO354Mdq5ylYUXKC8F+M5nmWtZzQ+W6wEUz8=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=DtSB4dT1SwynT2GcYLDEkz2Pw1HHOQBO2ry6UyETHCmHWXOfyLchEKtNMNR0mfOmAmiCyItBaJUCbXNqPeq0NK12+YRyLCAOd+hxAjIH8mjDgP1aQf8efhimBGF/6ex0dZkxvHQC94/f+Gef7pZXFErqp26Ou8tmkspJNOe/lKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=C9SVNyJB; arc=none smtp.client-ip=213.97.179.56
+	s=arc-20240116; t=1786505594; c=relaxed/simple;
+	bh=la6W3RqEFxZFM/gwIzPZsNnY1aHfY43Qg41EPomCa5Y=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=dY1NbYyUG937F0bVZG/qIPCCeNc/Dd3oEYEY/GUUA4MbwUA0JcLWe7qMc+G+Ny4nKi6avs/fBQsn/AuIiVCpgVb5QQkbjUWcGbZbl7PMBqTBBrU3t2IBLhIISIJtobeufHLmjU9+trzCxbtCwjhxgCUgpRX7jMhu5nts7z6vEkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=ckFfJNj5; arc=none smtp.client-ip=213.97.179.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="C9SVNyJB"
+	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="ckFfJNj5"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
-	Message-Id:Date:Subject:From:From:Reply-To;
-	bh=bDcjtixa0z6fn2j6lLnTkOiREkWS9pilzWyFhIk8Lc4=; b=C9SVNyJBviZfa4OaeCT3cUPsso
-	eixODsZwMx/LAO5ndwVi+VXxN7gKHkc6Rf/N9NpsJTviyr3tHTrC/P7f2BicYXHGsb95YTdD3EWMF
-	M0L2QKknTkHwW6lGmTfvmPiTGmCM6jUC8TlmedyVDtU31RttTCKCp5WACYtxqvjUn1QCfXCC5F8Xh
-	BRwVZ5+rPuYaz4Dn8qszr4x8dU9ZLU8k8NCG0F3HubLcdhZeRNrgjZ9jPLTM4y/Tuo/WRN7i4AOYg
-	vufMHoYXVbMeseVX6dwT6eg3gm7eFIH0DsmAFV6w02Oqw0oW+Pn6D0burZyX+bbDb4mfrVPW9goJd
-	Mp9g7vfQ==;
+	s=20170329; h=Cc:To:Message-Id:Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Subject:Date:From:From:Reply-To;
+	bh=K3L0urHHnNsCfnXEcfgOe0LXU5kW7y+bZr76ke8Ew2k=; b=ckFfJNj59ACTvHFQYEeEttqunt
+	kNAZWfE6nCTnPvjfaMB0rFaNnsNRXJfC2FsT/O8eKTGU3ZLsa7wYjdHixJoz5th+qtyiGk5MFGp6q
+	PqUI4Tu3GZoTCgOKZDk1k7g33OAP4A3kRp0ywh3pN8qneGAUjjdiLhvtyIB3ubp4R8Kph4it19s66
+	tYwQTQQ8zJGUipBODnOxG7UEFS+oKuAAp/Sn6ZRUwZy8aYzgbve8SIje6tuwkE8+IdP4ZO81pZXHR
+	GcHR2psG6ta2Ug1Xv8TWpXm4MIG42ji+NgqZb4RMt5vShl7n0Z472vzeRCk1vB9aqH/NmG4slgsSO
+	w1K+WK3Q==;
 Received: from [177.139.22.20] (helo=[192.168.15.100])
 	by fanzine2.igalia.com with esmtpsa 
 	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
-	id 1wtziB-00HTm1-4c; Wed, 12 Aug 2026 05:33:03 +0200
+	id 1wtziF-00HTm1-P8; Wed, 12 Aug 2026 05:33:07 +0200
 From: =?utf-8?q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
-Subject: [PATCH v4 00/12] syscalls: Add a shared table for all archs
-Date: Wed, 12 Aug 2026 00:32:56 -0300
-Message-Id: <20260812-tonyk-syscall_table-v4-0-748d0229ad40@igalia.com>
+Date: Wed, 12 Aug 2026 00:32:58 -0300
+Subject: [PATCH v4 02/12] syscalls: Create unified partial table for all
+ archs
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -40,11 +41,9 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/33NzQ6CMBAE4FcxPVvTbltBT76HMaZbFq0iGIpEQ
- nh3qR7U+HOcZOabngWqPQW2nPSsptYHX5Vj0NMJc3tb7oj7bMwMBMxFApo3VdkdeeiCs0WxbSw
- WxBeQIqJEmCOycXmuKffXu7rePHK44IFcE6nY2PvQVHV3v21l7P1/aCUXfOGMkmmqQWV25Xe28
- HbmqhOLFy28Isl3BCJiMp1LIp3I/ANRTyQVPxA1IonTxoJyRqB5Q4ZhuAHEbQmeUwEAAA==
-X-Change-ID: 20260724-tonyk-syscall_table-928bbb1b26bb
+Message-Id: <20260812-tonyk-syscall_table-v4-2-748d0229ad40@igalia.com>
+References: <20260812-tonyk-syscall_table-v4-0-748d0229ad40@igalia.com>
+In-Reply-To: <20260812-tonyk-syscall_table-v4-0-748d0229ad40@igalia.com>
 To: Thomas Gleixner <tglx@kernel.org>, 
  Nathan Chancellor <nathan@kernel.org>, 
  Masami Hiramatsu <mhiramat@kernel.org>, Arnd Bergmanon <arnd@arndb.de>
@@ -53,92 +52,303 @@ Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
  =?utf-8?q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
 X-Mailer: b4 0.15.2
 
-While implementing a new syscall, we need to wire up it's number to the arch
-table. Since syscall number 403, all architectures are on sync regarding the
-number (except alpha), which make things a lot easier but more repetitive as
-well. Have a look at commit b36d4b6aa88 ("arch: hookup listns() system call"),
-with 15 lines of mostly:
+To take advantage of the subset of syscall numbers that are guaranteed to
+be shared, create a new table and adapt generation scripts to use it. In
+that way, every new syscall can be added to a single file.
 
-  +470    common  listns                          sys_listns
+Create special ABIs in order to make the table work for different archs:
 
-There's already a "common" table shared with a bunch of archs at
-`scripts/syscall.tbl`, but due to historical reasons some archs will never be
-able to move to this table and share all the numbers.
+ - `clone3` for archs that use the common clone3 entry
+ - `__clone3` for archs that use their own special entry point
 
-The generic table starts from 403 (clock_gettime64), the first common syscall.
+Create flags for syscall Makefiles to use the common table.
 
-I've compile tested for arm32, arm64, s390, mips, sparc and alpha by comparing
-the syscalls_*.h and unistd_*.h files generated before and after this patchset.
-For most of cases the files are identical, for the few cases that they are not,
-there's a note in the commit explaining why they are equivalent.
-
-Thanks!
-	André
-
-Changes in v4:
-- Replace cln3 with clone3 in the ABIs
-- mips: Get rid of custom mips ABIs (o32, n32, n64) and use 32 and 64
-- mips: Unify n32 and n64 tables
-- Add alpha to the syscall party, along with it's adaptations
-- Remove --no-compat option and define SYSCALL_WITH_COMPAT() macro for archs
-that need it
-- v3: https://patch.msgid.link/20260807-tonyk-syscall_table-v3-0-7c45a23c50b5@igalia.com
-
-Changes in v3:
-- Removed x86 for now, let's wait till x32 is dropped
-- Added much more archs
-- v2: https://patch.msgid.link/20260727-tonyk-syscall_table-v2-0-95d4f1ee471f@igalia.com
-
-Changes in v2:
-- Managed to move to the real first common syscall: 403 (clock_gettime64)
-- Added -no-compat option to be used with x86_64
-- v1: https://patch.msgid.link/20260724-tonyk-syscall_table-v1-0-9c53188423da@igalia.com
-
+Signed-off-by: André Almeida <andrealmeid@igalia.com>
 ---
-André Almeida (12):
-      syscalls: Make --abis parsing more robust
-      syscalls: Create unified partial table for all archs
-      scripts/syscall.tbl: Use the common table
-      arm: Use the common syscall table
-      s390: Use the common syscall table
-      sparc: Use the common syscall table
-      mips: Remove duplicated syscallnr.sh
-      mips: Get rid of custom mips ABIs for syscall tables
-      mips: Use the common syscall table
-      syscalls: Add an option for offsetting the common table
-      alpha: Define entry point for set_mempolicy_home_node syscall
-      alpha: Use the common syscall table
+ scripts/syscall_common.tbl | 83 ++++++++++++++++++++++++++++++++++++++++++++++
+ scripts/syscallhdr.sh      | 60 +++++++++++++++++++++++++--------
+ scripts/syscalltbl.sh      | 29 ++++++++++++----
+ 3 files changed, 152 insertions(+), 20 deletions(-)
 
- arch/alpha/kernel/syscalls/Makefile       |  10 +-
- arch/alpha/kernel/syscalls/syscall.tbl    |  48 --
- arch/alpha/kernel/systbls.S               |   1 +
- arch/arm/tools/Makefile                   |  10 +-
- arch/arm/tools/syscall.tbl                |  68 ---
- arch/arm64/tools/syscall_32.tbl           |  68 ---
- arch/mips/kernel/scall64-n32.S            |   1 +
- arch/mips/kernel/scall64-n64.S            |   2 +
- arch/mips/kernel/syscalls/Makefile        |  31 +-
- arch/mips/kernel/syscalls/syscall_n.tbl   | 464 +++++++++++++++++
- arch/mips/kernel/syscalls/syscall_n32.tbl | 412 ---------------
- arch/mips/kernel/syscalls/syscall_n64.tbl | 388 --------------
- arch/mips/kernel/syscalls/syscall_o32.tbl | 826 ++++++++++++++----------------
- arch/mips/kernel/syscalls/syscallnr.sh    |  26 -
- arch/s390/kernel/syscall.c                |   2 +
- arch/s390/kernel/syscalls/Makefile        |   8 +-
- arch/s390/kernel/syscalls/syscall.tbl     |  48 --
- arch/sparc/kernel/syscalls/Makefile       |   8 +-
- arch/sparc/kernel/syscalls/syscall.tbl    |  68 ---
- scripts/Makefile.asm-headers              |   9 +-
- scripts/syscall.tbl                       |  68 ---
- scripts/syscall_common.tbl                |  84 +++
- scripts/syscallhdr.sh                     |  79 ++-
- scripts/syscalltbl.sh                     |  44 +-
- 24 files changed, 1083 insertions(+), 1690 deletions(-)
----
-base-commit: 075b74841bd0065a3bda3440873c747938e69b68
-change-id: 20260724-tonyk-syscall_table-928bbb1b26bb
+diff --git a/scripts/syscall_common.tbl b/scripts/syscall_common.tbl
+new file mode 100644
+index 000000000000..81e326a8172f
+--- /dev/null
++++ b/scripts/syscall_common.tbl
+@@ -0,0 +1,83 @@
++# SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note
++#
++# syscall numbers shared by all architectures
++#
++# The format is:
++# <number> <abi> <name> <entry point> [<compat entry point> [noreturn]]
++#
++# The abi can be "32", "clone3", "__cln3" and "memfd_secret"
++#
++# clone3 stands for the common clone3 entry, used by most archs. Some archs have
++# their special entry and should use "__clone3".
++#
++# "memfd_secret" is not implemented by every architecture
++
++403	32	clock_gettime64			sys_clock_gettime
++404	32	clock_settime64			sys_clock_settime
++405	32	clock_adjtime64			sys_clock_adjtime
++406	32	clock_getres_time64		sys_clock_getres
++407	32	clock_nanosleep_time64		sys_clock_nanosleep
++408	32	timer_gettime64			sys_timer_gettime
++409	32	timer_settime64			sys_timer_settime
++410	32	timerfd_gettime64		sys_timerfd_gettime
++411	32	timerfd_settime64		sys_timerfd_settime
++412	32	utimensat_time64		sys_utimensat
++413	32	pselect6_time64			sys_pselect6			compat_sys_pselect6_time64
++414	32	ppoll_time64			sys_ppoll			compat_sys_ppoll_time64
++416	32	io_pgetevents_time64		sys_io_pgetevents		compat_sys_io_pgetevents_time64
++417	32	recvmmsg_time64			sys_recvmmsg			compat_sys_recvmmsg_time64
++418	32	mq_timedsend_time64		sys_mq_timedsend
++419	32	mq_timedreceive_time64		sys_mq_timedreceive
++420	32	semtimedop_time64		sys_semtimedop
++421	32	rt_sigtimedwait_time64		sys_rt_sigtimedwait		compat_sys_rt_sigtimedwait_time64
++422	32	futex_time64			sys_futex
++423	32	sched_rr_get_interval_time64	sys_sched_rr_get_interval
++424	common	pidfd_send_signal		sys_pidfd_send_signal
++425	common	io_uring_setup			sys_io_uring_setup
++426	common	io_uring_enter			sys_io_uring_enter
++427	common	io_uring_register		sys_io_uring_register
++428	common	open_tree			sys_open_tree
++429	common	move_mount			sys_move_mount
++430	common	fsopen				sys_fsopen
++431	common	fsconfig			sys_fsconfig
++432	common	fsmount				sys_fsmount
++433	common	fspick				sys_fspick
++434	common	pidfd_open			sys_pidfd_open
++435	clone3	clone3				sys_clone3
++435	__clone3	clone3			__sys_clone3
++436	common	close_range			sys_close_range
++437	common	openat2				sys_openat2
++438	common	pidfd_getfd			sys_pidfd_getfd
++439	common	faccessat2			sys_faccessat2
++440	common	process_madvise			sys_process_madvise
++441	common	epoll_pwait2			sys_epoll_pwait2		compat_sys_epoll_pwait2
++442	common	mount_setattr			sys_mount_setattr
++443	common	quotactl_fd			sys_quotactl_fd
++444	common	landlock_create_ruleset		sys_landlock_create_ruleset
++445	common	landlock_add_rule		sys_landlock_add_rule
++446	common	landlock_restrict_self		sys_landlock_restrict_self
++447	memfd_secret	memfd_secret		sys_memfd_secret
++448	common	process_mrelease		sys_process_mrelease
++449	common	futex_waitv			sys_futex_waitv
++450	common	set_mempolicy_home_node		sys_set_mempolicy_home_node
++451	common	cachestat			sys_cachestat
++452	common	fchmodat2			sys_fchmodat2
++453	common	map_shadow_stack		sys_map_shadow_stack
++454	common	futex_wake			sys_futex_wake
++455	common	futex_wait			sys_futex_wait
++456	common	futex_requeue			sys_futex_requeue
++457	common	statmount			sys_statmount
++458	common	listmount			sys_listmount
++459	common	lsm_get_self_attr		sys_lsm_get_self_attr
++460	common	lsm_set_self_attr		sys_lsm_set_self_attr
++461	common	lsm_list_modules		sys_lsm_list_modules
++462	common	mseal				sys_mseal
++463	common	setxattrat			sys_setxattrat
++464	common	getxattrat			sys_getxattrat
++465	common	listxattrat			sys_listxattrat
++466	common	removexattrat			sys_removexattrat
++467	common	open_tree_attr			sys_open_tree_attr
++468	common	file_getattr			sys_file_getattr
++469	common	file_setattr			sys_file_setattr
++470	common	listns				sys_listns
++471	common	rseq_slice_yield		sys_rseq_slice_yield
+diff --git a/scripts/syscallhdr.sh b/scripts/syscallhdr.sh
+index bad1ab606a0f..54e09d3e686c 100755
+--- a/scripts/syscallhdr.sh
++++ b/scripts/syscallhdr.sh
+@@ -16,7 +16,7 @@
+ set -e
+ 
+ usage() {
+-	echo >&2 "usage: $0 [--abis ABIS] [--emit-nr] [--offset OFFSET] [--prefix PREFIX] INFILE OUTFILE" >&2
++	echo >&2 "usage: $0 [--abis ABIS] [--emit-nr] [--offset OFFSET] [--prefix PREFIX] [--common-tbl PATH] INFILE OUTFILE" >&2
+ 	echo >&2
+ 	echo >&2 "  INFILE    input syscall table"
+ 	echo >&2 "  OUTFILE   output header file"
+@@ -26,6 +26,7 @@ usage() {
+ 	echo >&2 "  --emit-nr          Emit the macro of the number of syscalls (__NR_syscalls)"
+ 	echo >&2 "  --offset OFFSET    The offset of syscall numbers"
+ 	echo >&2 "  --prefix PREFIX    The prefix to the macro like __NR_<PREFIX><NAME>"
++	echo >&2 "  --common-tbl PATH  Use the common number table"
+ 	exit 1
+ }
+ 
+@@ -34,6 +35,8 @@ abis=
+ emit_nr=
+ offset=
+ prefix=
++common_tbl=
++common_tbl_path=
+ 
+ while [ $# -gt 0 ]
+ do
+@@ -50,6 +53,10 @@ do
+ 	--prefix)
+ 		prefix=$2
+ 		shift 2;;
++	--common-tbl)
++		common_tbl=1
++		common_tbl_path=$2
++		shift 2;;
+ 	-*)
+ 		echo "$1: unknown option" >&2
+ 		usage;;
+@@ -69,13 +76,33 @@ guard=_UAPI_ASM_$(basename "$outfile" |
+ 	sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/' \
+ 	-e 's/[^A-Z0-9_]/_/g' -e 's/__/_/g')
+ 
+-grep -E "^[0-9A-Fa-fXx]+[[:space:]]+$abis" "$infile" | {
++emit_start_guard() {
+ 	echo "#ifndef $guard"
+ 	echo "#define $guard"
+ 	echo
++}
++
++# emit_nr(prefix, nr)
++emit_nr() {
++	local nr=$1
++	local prefix=$2
++	echo
++	echo "#ifdef __KERNEL__"
++	echo "#define __NR_${prefix}syscalls $nr"
++	echo "#endif"
++}
++
++emit_end_guard() {
++	echo
++	echo "#endif /* $guard */"
++}
++
++max=0
++# gen_hdr(infile)
++gen_hdr() {
++	input=$1
+ 
+-	max=0
+-	while read nr abi name native compat ; do
++	while read nr abi name native compat; do
+ 
+ 		max=$nr
+ 
+@@ -84,15 +111,20 @@ grep -E "^[0-9A-Fa-fXx]+[[:space:]]+$abis" "$infile" | {
+ 		fi
+ 
+ 		echo "#define __NR_$prefix$name $nr"
+-	done
+ 
+-	if [ -n "$emit_nr" ]; then
+-		echo
+-		echo "#ifdef __KERNEL__"
+-		echo "#define __NR_${prefix}syscalls $(($max + 1))"
+-		echo "#endif"
+-	fi
++	done < <(grep -E "^[0-9A-Fa-fXx]+[[:space:]]+$abis" "$input")
++}
+ 
+-	echo
+-	echo "#endif /* $guard */"
+-} > "$outfile"
++emit_start_guard > $outfile
++
++gen_hdr $infile >> $outfile
++
++if [ -n "$common_tbl" ]; then
++	gen_hdr $common_tbl_path  >> "$outfile"
++fi
++
++if [ -n "$emit_nr" ]; then
++	emit_nr $(($max + 1)) $prefix >> $outfile
++fi
++
++emit_end_guard >> $outfile
+diff --git a/scripts/syscalltbl.sh b/scripts/syscalltbl.sh
+index c4b1f85c2dd6..91c135143b22 100755
+--- a/scripts/syscalltbl.sh
++++ b/scripts/syscalltbl.sh
+@@ -16,18 +16,21 @@
+ set -e
+ 
+ usage() {
+-	echo >&2 "usage: $0 [--abis ABIS] INFILE OUTFILE" >&2
++	echo >&2 "usage: $0 [--abis ABIS] [--common-tbl PATH] INFILE OUTFILE" >&2
+ 	echo >&2
+ 	echo >&2 "  INFILE    input syscall table"
+ 	echo >&2 "  OUTFILE   output header file"
+ 	echo >&2
+ 	echo >&2 "options:"
+ 	echo >&2 "  --abis ABIS        ABI(s) to handle (By default, all lines are handled)"
++	echo >&2 "  --common-tbl PATH  Use the common syscall number table"
+ 	exit 1
+ }
+ 
+ # default unless specified by options
+ abis=
++common_tbl=
++common_tbl_path=
+ 
+ while [ $# -gt 0 ]
+ do
+@@ -35,6 +38,10 @@ do
+ 	--abis)
+ 		abis="($(echo "${2%,}" | tr ',' '|'))"
+ 		shift 2;;
++	--common-tbl)
++		common_tbl=1
++		common_tbl_path=$2
++		shift 2;;
+ 	-*)
+ 		echo "$1: unknown option" >&2
+ 		usage;;
+@@ -52,12 +59,14 @@ outfile="$2"
+ 
+ nxt=0
+ 
+-grep -E "^[0-9]+[[:space:]]+$abis" "$infile" | {
++# gen_tbl(infile)
++gen_tbl() {
++	input=$1
+ 
+ 	while read nr abi name native compat noreturn; do
+ 
+ 		if [ $nxt -gt $nr ]; then
+-			echo "error: $infile: syscall table is not sorted or duplicates the same syscall number" >&2
++			echo "error: $input: syscall table is not sorted or duplicates the same syscall number" >&2
+ 			exit 1
+ 		fi
+ 
+@@ -72,7 +81,7 @@ grep -E "^[0-9]+[[:space:]]+$abis" "$infile" | {
+ 
+ 		if [ -n "$noreturn" ]; then
+ 			if [ "$noreturn" != "noreturn" ]; then
+-				echo "error: $infile: invalid string \"$noreturn\" in 'noreturn' column"
++				echo "error: $input: invalid string \"$noreturn\" in 'noreturn' column"
+ 				exit 1
+ 			fi
+ 			if [ -n "$compat" ]; then
+@@ -88,5 +97,13 @@ grep -E "^[0-9]+[[:space:]]+$abis" "$infile" | {
+ 			echo "__SYSCALL($nr, sys_ni_syscall)"
+ 		fi
+ 		nxt=$((nr + 1))
+-	done
+-} > "$outfile"
++
++	done < <(grep -E "^[0-9]+[[:space:]]+$abis" "$input")
++
++}
++
++gen_tbl $infile  > "$outfile"
++
++if [ -n "$common_tbl" ]; then
++	gen_tbl $common_tbl_path >> "$outfile"
++fi
 
-Best regards,
---  
-André Almeida <andrealmeid@igalia.com>
+-- 
+2.55.0
 
