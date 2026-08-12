@@ -1,72 +1,72 @@
-Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
+Received: from fout-a6-smtp.messagingengine.com (fout-a6-smtp.messagingengine.com [103.168.172.149])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3E793FC5B9;
-	Wed, 12 Aug 2026 09:10:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49DFE4028FF;
+	Wed, 12 Aug 2026 09:17:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786525832; cv=none; b=k/18+W8RW3ZmQKNPc8ikVcndjjb8T88O7ebA5cxp51Gx6M8mvDyLR9jX/XFyup456tcU6BTsJ6JKkf4Jicyj2824XYkiwsRh7h8rMDf/S6x4zc6m3LYCPatYEUrRA49sbddu23s1AmhBaS1hSP/hByZM+3i8NqBafAMSFp6TEm0=
+	t=1786526246; cv=none; b=AGeycRRdPeHJyEAe1ONnT5AUMjlYiFw56efS/EDcMLmk9510EhKIMCBmKEAVtZWCWfBAFp5AjlD2DG5Y9hh8c62B8jWoZOMexyKOpxwYAALJ/mhknksESshSZ2w5I40wd5WkpJQANZmP/QZw9eVg8U++sF7LJzsluC7oElOMqSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786525832; c=relaxed/simple;
-	bh=LlSlC2XBoGBa2O7Ah7cZpj5ywnpH6leXj2oEmCpYe7I=;
+	s=arc-20240116; t=1786526246; c=relaxed/simple;
+	bh=lG4XIUQoEyQzBegmAKmdIxYgkDG1FkH+wJO1/BG9EEE=;
 	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=QG/odxyfoC5PUhsL4/rN2wpWynflhoNG2htLwNZfejvrqtqY3kRH72ctmvsO8xX5VWbfQs7Asf5zCjZdwmJfVz2mXRm45S/vPRxqR34zqnCZSYsUNFGXi/vpY7mNki4FS36axlzOQH0tDLDb4DEfdAw4uNQ94B6Ji/jNK8yc5Xg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=ebuYXKZw; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=lKy6kshP; arc=none smtp.client-ip=103.168.172.157
+	 Subject:Content-Type; b=ttCqY8vAf+aTspoGRk6m9ZI+k+q5ZJwAEmawaF/qEca6Es9ux3OvhUGe8sD4BTRqMHl6TpPNHwXoqrwIZIcmfCuK14vklf5gdAn5dMPLna3nMs0mr7282wGA5h+bVOc2Izy4sCLpI2PaG4nuA62QpYm9l2ZLDCEQSJm3nlpKLbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=EhKHZfAj; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=QCZ6XVu8; arc=none smtp.client-ip=103.168.172.149
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="ebuYXKZw";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="lKy6kshP"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="EhKHZfAj";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="QCZ6XVu8"
 Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 972A714000FF;
-	Wed, 12 Aug 2026 05:10:25 -0400 (EDT)
+	by mailfout.phl.internal (Postfix) with ESMTP id AAA99EC021A;
+	Wed, 12 Aug 2026 05:17:23 -0400 (EDT)
 Received: from ams-imap-03 ([10.64.2.23])
-  by ams-compute-02.internal (MEProxy); Wed, 12 Aug 2026 05:10:26 -0400
+  by ams-compute-02.internal (MEProxy); Wed, 12 Aug 2026 05:17:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
 	:cc:content-transfer-encoding:content-type:content-type:date
 	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1786525824;
-	 x=1786612224; bh=m43/NCxgYLAmMjSMLcEsEYangpIMm56Zhl7/o3eXPj8=; b=
-	ebuYXKZwxPi7GaNUK9oaW4s9ZoyYuZtE6z4Vk7Ag8WpTQHhoLyAdVC5AmMlkcR72
-	b2ZgNJMbQhqI5FDPPqwyDdtiP8s+0AoEKWinh2f2ALkDl1pda6F1oDDbdyvgK06g
-	26ol5+VipRUJ6NbRFrBei42xEy2iqGeDidS5Y6y3QqtMdhFpP9laVksJaVMSX2L/
-	qhmlWPrd8qL29DGKyCx89XbcohdzXavbYr8+k28w+xHF2cC3IBQ3aa0ZG/+TuT8q
-	cSu+GAxsUtdfhcFfJ2JNVjJMDnymAykJaa2hnj0RKoMzz8WQtfZG8SN47tGm1p8A
-	NpHV5GPCCJydkdBVsy3JUQ==
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1786526243;
+	 x=1786612643; bh=JMHRZkTThzL4/D2z2n6orsf9ZiqWCo1mWUhOS/9wsRE=; b=
+	EhKHZfAjZlk1TOyMzugGhsGEWU+sn5be0ZUg2UKDIrbY8dBBZtPOyKY4aBtRuSaH
+	UHHIDtkBP2r2UveKtLpEj8iJ//MMnlgfdRPNrLv8qT510Jw01KFNAwbi1ED4pi9j
+	Z5AjeI/kK1J99i1tjJ9HuF6xDXGRVGOEROeocXvSEM8Knddb2LXzLqohmD2DVPOk
+	L75JdnsjpxIwMoAWDz1ksxBjHCdcFi/z26sG62JnRwhYVr8kIUgcWmQfH1S8s9ud
+	LWQv32ZrjVEdKT0bDGpM3VcXK2XTBdaLyH+ARYwBM/7w1JxwvJThKZKF2sOhNYJI
+	6ORzOilPT9srRmQ8KeChrw==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:content-type:date:date:feedback-id:feedback-id
 	:from:from:in-reply-to:in-reply-to:message-id:mime-version
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1786525824; x=
-	1786612224; bh=m43/NCxgYLAmMjSMLcEsEYangpIMm56Zhl7/o3eXPj8=; b=l
-	Ky6kshPQU8wWPN4/Lr2NMAHy24Hnw/MMWkCbwT70us8cY4pI1r+u7zrOKZAC+zAk
-	zrvyjJthE4y0/B6iiJV6wXuQQoAiNM9C1qg6RCrrTqGhxG2lBN+Uz+Iz5FBW2cQ2
-	KTpaNz51WFdAc7JUZXm6ZQkF1rushyAE8rpB3o4FJ+kV/cwVEr4F02ec1YZ7vg16
-	JFrvdkF+geAtNBKWG27uqFIjRwZbFRRjZNTlXKxpUTvH8fx8xofi/3JCJAmmKJnX
-	Mr94V+Dhd3Dn+IPD/ORBEyjIz2CgnXOv4rg/ZQbucncpdMM0uKlcakdweP+XMUIJ
-	mBNNl+u5HfIPAFtlXV6Eg==
-X-ME-Sender: <xms:fDh8amxc47gB9kYP_1kYKPMEwHsJXVJYnHFhZtxArhrk9FeqLs0JkA>
-    <xme:fDh8atE19rQyhksZBfzCtt-3relQZ4xa0FzN68eQI2RgqS9PgcQDC8kGsY0wEHKcg
-    hr6R9K756HxpbYA8RJqYzRYnpF5qCwXEwaqInFKQjR83js2Sw7uxd4>
-X-ME-Proxy-Cause: dmFkZTFdIhn5hHb5V558QRGjUpbW+zxDlt9QLcRAwNtIyTiMh5QSnlLXx10c2du9ipXiVW
-    gStStPe1U0f5qx1ZdZMkaJxh7C/+mtOR8a0j+5wGCidyxwXBvkRe6bothSzhF7neVogH+1
-    7RO7Us0zUY4US+Bp81PMDiMNysl33VfYprT0CSNFCnMTvboDPCtrkiq7Y0TyhZdsOXfv/+
-    02/YRfKS0oOrQvAloo8u7s3h5Jx239Fw7WVow7oewihA41uGZv/Q3kzuQhaUHWQ/YwRpuD
-    IH/ePtzD6p4GCF+H4tAzcH0TFbVfTQZAOUzvPedVeAHazrF1JKcKcypsL0J5wMX5QmTyhn
-    zRqiDA6CcXJ+Co5fUIcv7cIZpxPba9eUhddBDEz6ZG1dSZyIpwwdZSLTno6poIj8ms+EtR
-    6WzBDvAvOfKqHuZWii5PzG5sDPPFSTSUxJtSkFxYKA/DjSr77mZ3WSXIbvaybhDGlLlcRc
-    CBfo89+9HqnIOVQrNTAC7of10N81mnadR/LFnVKUK2lNuO+k9KucVOnJplDTn07YhwkFck
-    exhj9l8jkLSImalysnxfGfnV8FdkJvVxXkDeMqqkiI6GWqcBRFZm7L7PR0OTejQoIIDNGq
-    YFTQ5aPYCJdDl0ckXX5MBBxSXojIMA0CBtjy1XiNrFYVPjBdczEf+TYJCFdQ
-X-ME-Proxy: <xmx:fjh8asY3v_kuXHXw3E1_2Wya1rQ8viNi13qYrMxenNteYEHqB4eQlQ>
-    <xmx:fjh8ahcDXJPhgkn4scSd3xkLHF_UQKZ6O42gve0oCsjLDCgXlrFfvw>
-    <xmx:fjh8am1WAqjZARVzp3w5Jc-3y8z_gKFthRSSNI9X35K2SbXyjfEqaQ>
-    <xmx:fjh8aoK1iWMKhojD6XQaowNIDIVRQQj5J1_B5mtlZA5XYlPmgbKVlQ>
-    <xmx:gDh8ampoVgODlSEPFGab6HJgvsYzLRE2fZ5WjBZCHKcdQDovvxuxYlRN>
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1786526243; x=
+	1786612643; bh=JMHRZkTThzL4/D2z2n6orsf9ZiqWCo1mWUhOS/9wsRE=; b=Q
+	CZ6XVu86puHoSkjabl6Z2NRElvpCi10HTfWqxrvGbu56p2Fx9BiU8KF8PFk+DD5n
+	rQUR5r6fdsesxlK9zLXQM3HpkiTvhV93ikgQLDOL7yWd2284QbPjDfjkLEbN27CN
+	2gvJyPEnU9gjPTrEl+PWHvPa/TFlMl9XXqkA44fGTy61NvO9taCd0ddotWio6mKW
+	zWqi5qZIKhc/0Q2f1IyhLjfRUeMdYOBdAozcqWxC6fSv54fZPrn83PqgQbTC8Sr0
+	ogPoMJP2Amwml6Tc5YJWIsZD26RF9y3M8m/7MKgSWbFasXiGiWEiSnX3CLWb6IGs
+	qgZwL6WT3wYjInYB8iYSQ==
+X-ME-Sender: <xms:Hzp8aui9Nr_iO_jIRGI5_tjcZ8gbv0qt-a-Alvs15rVq0d0iVr7oaw>
+    <xme:Hzp8ap0fXLZNLajmxLqgGr5L5cF-lpg5GLFk6o1NOTEehPAn7LegLHu6NQabU2x_6
+    0VHWHeqFb5GwIxv7uZX1FcTfIjI_nQUZD__BfEg3vA-ji90q63vfHxM>
+X-ME-Proxy-Cause: dmFkZTFEO3+Mv0fUlPA8/fF1P4u/45A7I749cOt0O09DdbJrIQFErCuWKjS8b8NaFx45H0
+    JqucUDqvp7OD7IizGui7364FfoeWpSg3IWjeqe8KZuNFqLaBiU8JEFlVo01VPL9lvsmamd
+    k+k/tWB+VCcY7iEfR67OHBmH/sjpCo8QDxG/tkuG7VopQP/MOkQtf4PZsjQPGIjsm3HOTo
+    7BvjBNOqC80ufvl9vNdgp64FaWQnmDFv2h5h5JoQ+plpbIbI8eKqCtW0v1PX02JidZP23U
+    IX/IZogBCW1Q34kJ0D8DMTHIu9w0rB8X0hUmFSE11T7Bmo01sKQQbQUf32KeIEEwK+mIeM
+    GfripWP8ivJ5/wD/pqVIBi0cKyIx3zRQoC5n9xtwHfxTNFJ6RWa+OsBlKo9Mqu3du/IDyH
+    +d00Bcj2KVX0iZfDYKAyiD6Armi7uu9tyQ0AFYmnb/DdCWy18rs9Kyv9/+YG0d3d/Yv5uu
+    mFAMn8OxlycUb16cxDmu65fFWzTk+0EPA5E1ZpgMp0OH5P3iZcJDc6A5/1xmFENqrig3dL
+    rzugJTKjXrs+NU/4CcWca76UkoUV1JdFbjxj4aZ1Eio2h2lh4l83rmZCKr2e2zm0WIWOfH
+    TzUvwgavWf++JTWauBJ0KLXXlgEaBt0AlMcYOkl9Ke2dGrmr1CKDX9IhLOlg
+X-ME-Proxy: <xmx:ITp8akLebwAkz96JK1JwmzFfbIh0mgK0zs5M5qMOqSpmVVSmJZrEGg>
+    <xmx:ITp8auNNdiR8nxkwZgPBYEkG4epukzEDoue9NiRCrJpEQ3-2rPHnBQ>
+    <xmx:ITp8akl3d-tla9BMPZZJnt_zpP0UVHCJ6khEJOe_WPQy3HIDRYNLlg>
+    <xmx:ITp8ai5bvmrPGRfg7nJ6Bk4-pT-MYBQOc4gr2Xe18M2nQl_X5tvEDA>
+    <xmx:Izp8aqbP035RSb0iq8Zqh6fFGpuFXfOjfbbxf92PMCbl-t8qg26vzVJF>
 Feedback-ID: i56a14606:Fastmail
 Received: by mailuser.ams.internal (Postfix, from userid 501)
-	id 8EC2432A006E; Wed, 12 Aug 2026 05:10:20 -0400 (EDT)
+	id 6719E32A006E; Wed, 12 Aug 2026 05:17:19 -0400 (EDT)
 X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
@@ -74,68 +74,40 @@ List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: ALvAeZC0UQTs
-Date: Wed, 12 Aug 2026 11:09:44 +0200
+X-ThreadId: A8cq6fax0o8Z
+Date: Wed, 12 Aug 2026 11:16:59 +0200
 From: "Arnd Bergmann" <arnd@arndb.de>
 To: =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>,
  "Thomas Gleixner" <tglx@kernel.org>, "Nathan Chancellor" <nathan@kernel.org>,
  "Masami Hiramatsu" <mhiramat@kernel.org>
 Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
  kernel-dev@igalia.com
-Message-Id: <581ec9d7-d308-4fcf-bcf9-f243661fcc59@app.fastmail.com>
-In-Reply-To: <20260812-tonyk-syscall_table-v4-12-748d0229ad40@igalia.com>
+Message-Id: <ca0326a0-ce13-4bfc-b36c-5612d73335fa@app.fastmail.com>
+In-Reply-To: <20260812-tonyk-syscall_table-v4-8-748d0229ad40@igalia.com>
 References: <20260812-tonyk-syscall_table-v4-0-748d0229ad40@igalia.com>
- <20260812-tonyk-syscall_table-v4-12-748d0229ad40@igalia.com>
-Subject: Re: [PATCH v4 12/12] alpha: Use the common syscall table
+ <20260812-tonyk-syscall_table-v4-8-748d0229ad40@igalia.com>
+Subject: Re: [PATCH v4 08/12] mips: Get rid of custom mips ABIs for syscall tables
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On Wed, Aug 12, 2026, at 05:33, Andr=C3=A9 Almeida wrote:
-> Remove some of the duplicated code by using the common syscall number
->=20
->  quiet_cmd_syshdr =3D SYSHDR  $@
-> -      cmd_syshdr =3D $(CONFIG_SHELL) $(syshdr) --emit-nr $< $@
-> +      cmd_syshdr =3D $(CONFIG_SHELL) $(syshdr) --emit-nr \
-> +		   --common-tbl $(systbl_common) --common-offset 110 \
-> +		   --abis $(abis) $< $@
->=20
->  quiet_cmd_systbl =3D SYSTBL  $@
-> -      cmd_systbl =3D $(CONFIG_SHELL) $(systbl) $< $@
-> +      cmd_systbl =3D $(CONFIG_SHELL) $(systbl) \
-> +		   --common-tbl $(systbl_common) --common-offset 110 \
-> +		   --abis $(abis) $< $@
+> Get rid of the mips exclusive ABIs for the syscall tables and replace =
+them
+> with the common ABI names, replacing n32 and o32 with 32 and n64 with =
+64.
+>
+> No functional change happens, but it simplifies and helps to unify the
+> tables.
+>
+> Signed-off-by: Andr=C3=A9 Almeida <andrealmeid@igalia.com>
 
-The --common-offset agument does seem simple enough here and it
-avoids processing the files separately.
+I had expected you to use 'common' instead of '32' and '64' here. Since =
+you
+did not combine the n32/n64 tables, this makes no practical difference,
+but it still makes the tables look different from all the other ones, and
+it means that the following patch to unify the tables is harder to
+validate since the inputs are still not line-identical.
 
-> @@ -45,6 +45,7 @@
->  434	common	pidfd_open			sys_pidfd_open
->  435	clone3	clone3				sys_clone3
->  435	__clone3	clone3			__sys_clone3
-> +435     alpha  	clone3                          alpha_clone3
->  436	common	close_range			sys_close_range
->  437	common	openat2				sys_openat2
->  438	common	pidfd_getfd			sys_pidfd_getfd
-
-I think it would be nicer to change the "fork_like" macro in
-arch/alpha/kernel/entry.S to use the same __sys_clone3 name
-(and fork/vfork/clone) that we have on
-m68k/mips/nios2/openrisc/sparc and save another special case.
-
-Or we could do this the way that nios2 does with a redirect
-in the syscall_table.c file, which does:
-
-#define __SYSCALL(nr, call) [nr] =3D (call),
-#define __SYSCALL_WITH_COMPAT(nr, native, compat)        __SYSCALL(nr, n=
-ative)
-
-#define sys_clone3 __sys_clone3
-
-void *sys_call_table[__NR_syscalls] =3D {
-        [0 ... __NR_syscalls-1] =3D sys_ni_syscall,
-#include <asm/syscall_table_32.h>
-};
-
-This could just completely avoid having two entries for clone3.
+Is there some reason you went with this approach?
 
      Arnd
