@@ -1,36 +1,36 @@
 Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54A9243BDA1;
-	Wed, 12 Aug 2026 12:53:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3B2C3515FA;
+	Wed, 12 Aug 2026 12:55:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786539210; cv=none; b=fMQ3GP1qZTn274LoDeDx+60L6aaQfaAffZJVOA1BE+Rd/wrjeM2JVShqOaRgE3ksRs8oNRJ1v20RML5YclmBL/gM1CgKmMu/Z6F9uxlyJhc1+9sRBcqnyQUYfKK46yX2qYgfIT77lqDPcSfHOhh27mchFUOTI6fCdpFGbz2wHu4=
+	t=1786539350; cv=none; b=DEPwsRz9M8117SeP4y9joEkkC0QayzUBJqi801im7wSRN22w/Cf9DaJPtQY6wba3nuAKFIpz3g45Gtt2YTgKyKQfzRvH2sgplaAQshEX74ZxgG8FxLLEuKFLPte8sOsM5Uhk0RrZgv2p6rQ1n1pXw39J9pkJJRh5OO0Rxj7eWmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786539210; c=relaxed/simple;
-	bh=tLbhtegLnHHyBYb+4Zf3AqPKth7kmsWZhWHOk4l3trk=;
+	s=arc-20240116; t=1786539350; c=relaxed/simple;
+	bh=2JYqUjxLrCbUCuhOVWJCfZ6oYrSWMLxvI0oDfO0uHRw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VJBNvWQiLtgfTLtOTDt5GtqyhYQ625aIdtBxiYL0rhJPI8j8Elu+lDWTNyxe/e+xuKxl5waYi/4wSwVVsPYBOczAT2O0QlsCkPZXd7rasHoV+GI7oc4QAoEB9bSQ9n//7HBHWhlV9VvQAR/0h/U6k1ujK3MQFOBjpcqtG1w8LK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=jSPD8Wh1; arc=none smtp.client-ip=213.97.179.56
+	 In-Reply-To:Content-Type; b=pRseWoDP5D2Z5NJxGnsp2y3tuQvAQzx9pZejfW2GYzzBzB1bG86lUOjowvRDnzH1BJv3O6WeVsZc2pM88dRrU22oJ5PIU5s9d1lzuQNfNOawIZddVfHFE9B1RGBtKft3OARGIeqW4GhPgF62S0UacQ8HmXy6GiOsZtSw/YM7Hu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=I9zSYmRC; arc=none smtp.client-ip=213.97.179.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="jSPD8Wh1"
+	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="I9zSYmRC"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
 	s=20170329; h=Content-Transfer-Encoding:Content-Type:From:Cc:To:Subject:
 	MIME-Version:Date:Message-ID:From:Reply-To;
-	bh=ymajvFEoy0q2y1+jHdhgdGXTB3/6CBb7zkw8dtenTkg=; b=jSPD8Wh16i92t5krm9TlllJAUI
-	kXV/icsfQZ/0GiR+5nZ3CpAIvjr3XwN2w5LUCLqEKIE2auHTtfxVlme+vPLikjRd7lK+dukqXk39c
-	+0c3emwvieTv2lfXyA2C4h4wQoNWRFSQJvWXT2Gd3x0yaRDpx+UfaJEf9WB9Z/4LpHd4OpiIlXd6s
-	Tl133usb5960g3McUSRoHL333wHvOVX7lNl+XVfQSbsZ+hoCG+7zL7XwaIo/SysMshjpG4dvsUx23
-	Q+SYMswo2snHejLdBF8cophM6is1areEYQy0FezDZjJY5CLtoxbqoUZEjRAHYnXtq9N0N4QN/rqiQ
-	2Sfil3Lw==;
+	bh=XPkrCBTNanvCZK+8HXh6gZ3h01dtwTp03SUOd/IcgqI=; b=I9zSYmRChLEZGLe0q7pdBIF247
+	y6yk2hP2DAnojqnD/03m3Y24AJ4nX5QyJGsTixPkiqAtR7tLgDNtf+WeCe3Yu58Lg7WeSWL8g6opn
+	VkFLpCaXRvJ/K070wr9JiGZb8tdUEKpVyu9gjRiIuup3fN/EqloBHFdT2trdaLNaQ6IpeiTRIPl5S
+	t9ESP+AabnzAxTJhpgjtVhe7LVbIl94krJZxQgh5nVjjk5ksPpWdepJFBW1KiA4o+Q5ehNE0rpxym
+	NaJtkPqsAET9VXJdor8Tw1CMvyP6Z+hcWh04dsHi4SmodoaEPrNlgv2GjjGWlT9+cxTM8LZ7MAjAc
+	629LVnRw==;
 Received: from [177.139.22.20] (helo=[192.168.15.100])
 	by fanzine2.igalia.com with esmtpsa 
 	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128) (Exim)
-	id 1wu8SR-0001wz-OW; Wed, 12 Aug 2026 14:53:23 +0200
-Message-ID: <b1d599ef-bdf2-43e4-9746-4fc8d8f1e817@igalia.com>
-Date: Wed, 12 Aug 2026 09:53:21 -0300
+	id 1wu8Ui-0001zu-Eu; Wed, 12 Aug 2026 14:55:44 +0200
+Message-ID: <f06d1b64-aec2-4f9e-9621-fed95f40ae61@igalia.com>
+Date: Wed, 12 Aug 2026 09:55:44 -0300
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -38,39 +38,54 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 08/12] mips: Get rid of custom mips ABIs for syscall
- tables
+Subject: Re: [PATCH v4 12/12] alpha: Use the common syscall table
 To: Arnd Bergmann <arnd@arndb.de>
 Cc: linux-kernel@vger.kernel.org, Masami Hiramatsu <mhiramat@kernel.org>,
  Nathan Chancellor <nathan@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
  linux-kbuild@vger.kernel.org, kernel-dev@igalia.com
 References: <20260812-tonyk-syscall_table-v4-0-748d0229ad40@igalia.com>
- <20260812-tonyk-syscall_table-v4-8-748d0229ad40@igalia.com>
- <ca0326a0-ce13-4bfc-b36c-5612d73335fa@app.fastmail.com>
+ <20260812-tonyk-syscall_table-v4-12-748d0229ad40@igalia.com>
+ <581ec9d7-d308-4fcf-bcf9-f243661fcc59@app.fastmail.com>
 Content-Language: en-US
 From: =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
-In-Reply-To: <ca0326a0-ce13-4bfc-b36c-5612d73335fa@app.fastmail.com>
+In-Reply-To: <581ec9d7-d308-4fcf-bcf9-f243661fcc59@app.fastmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Em 12/08/2026 06:16, Arnd Bergmann escreveu:
+Em 12/08/2026 06:09, Arnd Bergmann escreveu:
 > On Wed, Aug 12, 2026, at 05:33, André Almeida wrote:
->> Get rid of the mips exclusive ABIs for the syscall tables and replace them
->> with the common ABI names, replacing n32 and o32 with 32 and n64 with 64.
+>> Remove some of the duplicated code by using the common syscall number
 >>
->> No functional change happens, but it simplifies and helps to unify the
->> tables.
+>>   quiet_cmd_syshdr = SYSHDR  $@
+>> -      cmd_syshdr = $(CONFIG_SHELL) $(syshdr) --emit-nr $< $@
+>> +      cmd_syshdr = $(CONFIG_SHELL) $(syshdr) --emit-nr \
+>> +		   --common-tbl $(systbl_common) --common-offset 110 \
+>> +		   --abis $(abis) $< $@
 >>
->> Signed-off-by: André Almeida <andrealmeid@igalia.com>
+>>   quiet_cmd_systbl = SYSTBL  $@
+>> -      cmd_systbl = $(CONFIG_SHELL) $(systbl) $< $@
+>> +      cmd_systbl = $(CONFIG_SHELL) $(systbl) \
+>> +		   --common-tbl $(systbl_common) --common-offset 110 \
+>> +		   --abis $(abis) $< $@
 > 
-> I had expected you to use 'common' instead of '32' and '64' here. Since you
-> did not combine the n32/n64 tables, this makes no practical difference,
-> but it still makes the tables look different from all the other ones, and
-> it means that the following patch to unify the tables is harder to
-> validate since the inputs are still not line-identical.
+> The --common-offset agument does seem simple enough here and it
+> avoids processing the files separately.
 > 
-> Is there some reason you went with this approach?
+>> @@ -45,6 +45,7 @@
+>>   434	common	pidfd_open			sys_pidfd_open
+>>   435	clone3	clone3				sys_clone3
+>>   435	__clone3	clone3			__sys_clone3
+>> +435     alpha  	clone3                          alpha_clone3
+>>   436	common	close_range			sys_close_range
+>>   437	common	openat2				sys_openat2
+>>   438	common	pidfd_getfd			sys_pidfd_getfd
 > 
-Ops, no good reason here, it was a mistake :) I will redo it to use 
-common from [1, 211] syscalls. What about o32? Should I kept it as o32, 
-giving that it doesn't make much difference?
+> I think it would be nicer to change the "fork_like" macro in
+> arch/alpha/kernel/entry.S to use the same __sys_clone3 name
+> (and fork/vfork/clone) that we have on
+> m68k/mips/nios2/openrisc/sparc and save another special case.
+> 
+
+Ok, I will follow this approach for now.
+
+Thanks!
