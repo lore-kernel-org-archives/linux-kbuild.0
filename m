@@ -1,101 +1,88 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A4F246E00C;
-	Wed, 12 Aug 2026 16:48:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CBC9472F63;
+	Wed, 12 Aug 2026 17:37:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786553336; cv=none; b=lxaNkbDygjmKal4co0gdCTmjn1AT0+8teqTPPi/bl+7Vn4/FuYaB6WQC6KU7jrSx83t0iTg36VCbC3Y4j2HzrWHyF+5bn6MC3bRZv8KXF85gL5GSkqWmpEzPy/E7X7Cz+3AQr980j3C6Bn/lXKuU5zoyaVDZbBbTVEDwwoIw4K8=
+	t=1786556226; cv=none; b=iOY07/IW3xnd4X/mNsFGevS+Lte7iV2sCgLrpNa6ws18e+sWBka4/+LLV4cIs9zACImw3aajpS0hD7D94+jUnnwmUjClmRAaT3KnUeOztXtowUPVzk9rkjT4wQtZbJ5cNazbNZr45u8b+Wy6Dxl0+24AMl/3rEYekBY47WIPmb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786553336; c=relaxed/simple;
-	bh=QwjhAqTt3dEveZCzlOocb+v/HtmO1PeTWsEkY6OVfAE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q9INHg3Zojk+DNmXWCo4m30XSfH6oPrl6Xb6nbEw85vV+zJbcrDIcbfTXjnJlkxYXMKCVA6if9qZsa5JUsBr1hEGahiFbsomk1pESkwKU46rKAkeR+vD+iDtk7jqP1Eh1qqpS4Gd+jv499O7oaKI7d3MYlYWixzUv0KTYMLaSVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iZP52QaI; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786556226; c=relaxed/simple;
+	bh=QFo+YFnSP43pZiDbc5modT6S/XD/336zm0WFm/8l/6w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WgRmBcgUQ8/LUxJjr/8wKX+idO9Dmmsw+UJ94hgeKwcWpDehlTp9g/5XFmU4lsMAl/QHQf8BMJgY+DvkCASqTInnQU/rJw/Hbl6iRGaNAugWQF2ldpBlqYFMFGw9v0ZvIm3Y4+RTZmoqgeU31/tisr4NN2Lm+Iv6qQytFwlSE5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=r8EgoiUq; arc=none smtp.client-ip=213.97.179.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iZP52QaI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 997391F000E9;
-	Wed, 12 Aug 2026 16:48:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786553334;
-	bh=I1Tk7m6Wylnvrzyr+XDUWzqimWzftfVph1WXIEMhmN4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=iZP52QaIyhwOYrDoZNhoDM/qB+oFahA2Fm2kbQLM3ue4F5hvPhwKZivOE4lYZB2ah
-	 4De/2qmlGa4hEPwO9/LGQaY5Ay92fotdaGLlucCz0DQ19/5i7h9BZkJsIC8hBJyfOJ
-	 5ZcrcQ9rwy7+2SCu+pXF6G6QfE3SaHl9H27aCUhduht7wwylqZ5d5dElkL2rgYpH48
-	 KDVEz1k+Ash66vT7rQ9DN2M4RBa5aBurRVgkQNnh0X9uVeOunO1eFwBOi+SWiOz0Bm
-	 EQEovgpHb452NSMtT5EPRlzTg6iZrkTJxCn5n2FnZPKZoz+JKoCmy9AtLq5+fvpzuT
-	 U1hriMfMAHiTw==
-Date: Wed, 12 Aug 2026 09:48:50 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Jaihind Yadav <jaihindy@qti.qualcomm.com>
-Cc: Nicolas Schier <nsc@kernel.org>, "kees@kernel.org" <kees@kernel.org>,
-	"linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
-	"linux-hardening@vger.kernel.org" <linux-hardening@vger.kernel.org>,
-	"gustavoars@kernel.org" <gustavoars@kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 1/1] scripts: kstack_erase: use relative stackleak plugin
- path
-Message-ID: <20260812164850.GA104682@ax162>
-References: <20260720093545.3836066-1-jaihindy@qti.qualcomm.com>
- <20260720093545.3836066-2-jaihindy@qti.qualcomm.com>
- <20260722-ubiquitous-stork-of-hail-3ba047@l-nschier-aarch64>
- <BN0PR02MB8128563CD267288E68943157E2C12@BN0PR02MB8128.namprd02.prod.outlook.com>
- <BN0PR02MB81287EC4BD8A7C0D7E6B5E31E2C12@BN0PR02MB8128.namprd02.prod.outlook.com>
- <amPIsTxtNPhbDU-z@levanger>
- <20260803181217.GB1067866@ax162>
- <CY5PR02MB89911C30B7E51FE706061818E2DC2@CY5PR02MB8991.namprd02.prod.outlook.com>
+	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="r8EgoiUq"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; h=Content-Transfer-Encoding:Content-Type:From:Cc:To:Subject:
+	MIME-Version:Date:Message-ID:From:Reply-To;
+	bh=oTQe4NQGl55sCmpir0edgktW3GYYzoRIotlUKbOQzTs=; b=r8EgoiUqXgBm4JUMqjnyJ3mvVw
+	ZoUyQu5ZW2kitJvy+QQbBZ85vEizIvjKsxumgFDoKSSUnkPT2WtWJBU7g6vqIsotXT5t2fuHrOnqH
+	ODzL4xBiR82HUR9jZtTC+7+QJ6hpl9QDkfbteLZm+IutD9LMDURCoiVfNoxJ23Ksp/vC7Gp+br8Es
+	TBAK3UogfIx2Jex8u/kx28wscFntZRnDZInq4aVjaeJzJUbCwf3PG0+hoQFhvnNKYZUOsnDJ39bp+
+	sFvpI8UTj2NIUTAY/tQcPsbAX0NCQ6nWhzrd5Mf0koCnGRsL3HQ8p4mBUv4EIqXg6tnyP+cAkorTJ
+	LRfJ4fwg==;
+Received: from [177.139.22.20] (helo=[192.168.15.100])
+	by fanzine2.igalia.com with esmtpsa 
+	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128) (Exim)
+	id 1wuCsm-000FG2-P7; Wed, 12 Aug 2026 19:36:52 +0200
+Message-ID: <af92da09-4e89-4ec1-8286-01c0526f8c51@igalia.com>
+Date: Wed, 12 Aug 2026 14:36:50 -0300
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CY5PR02MB89911C30B7E51FE706061818E2DC2@CY5PR02MB8991.namprd02.prod.outlook.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 08/12] mips: Get rid of custom mips ABIs for syscall
+ tables
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: linux-kernel@vger.kernel.org, Masami Hiramatsu <mhiramat@kernel.org>,
+ Nathan Chancellor <nathan@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
+ linux-kbuild@vger.kernel.org, kernel-dev@igalia.com,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+References: <20260812-tonyk-syscall_table-v4-0-748d0229ad40@igalia.com>
+ <20260812-tonyk-syscall_table-v4-8-748d0229ad40@igalia.com>
+ <ca0326a0-ce13-4bfc-b36c-5612d73335fa@app.fastmail.com>
+ <b1d599ef-bdf2-43e4-9746-4fc8d8f1e817@igalia.com>
+ <a1d0c110-d23a-418e-9155-23b13b590445@app.fastmail.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
+In-Reply-To: <a1d0c110-d23a-418e-9155-23b13b590445@app.fastmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Aug 12, 2026 at 10:55:38AM +0000, Jaihind Yadav wrote:
-> Hi Nathan And Nicolas ,
+Em 12/08/2026 10:11, Arnd Bergmann escreveu:
+> On Wed, Aug 12, 2026, at 14:53, André Almeida wrote:
+>> Em 12/08/2026 06:16, Arnd Bergmann escreveu:
+>>> On Wed, Aug 12, 2026, at 05:33, André Almeida wrote:
+>>> I had expected you to use 'common' instead of '32' and '64' here. Since you
+>>> did not combine the n32/n64 tables, this makes no practical difference,
+>>> but it still makes the tables look different from all the other ones, and
+>>> it means that the following patch to unify the tables is harder to
+>>> validate since the inputs are still not line-identical.
+>>>
+>>> Is there some reason you went with this approach?
+>>>
+>> Ops, no good reason here, it was a mistake :) I will redo it to use
+>> common from [1, 211] syscalls.
 > 
-> Thanks for the feedback.
+> I can see this done in one of two ways:
 > 
-> I took another look at this and experimented with a different approach for external modules:
+> a) make everything in the mips specific files 'common' and keep the
+>     three separate files
+> b) make only the first 211 syscalls in n32/n64 common, using compat
+>     entries where those differ, then use 32/64 as the ABI for the
+>     ones where the numbers went out of sync, and merge the two
+>     files into one.
 > 
-> diff --git a/scripts/Makefile.kstack_erase b/scripts/Makefile.kstack_erase
-> index ee7e4ef7b892..xxxxxxxxxxxx 100644
-> --- a/scripts/Makefile.kstack_erase
-> +++ b/scripts/Makefile.kstack_erase
-> @@ -5,6 +5,10 @@ kstack-erase-cflags-y += -fplugin=$(objtree)/scripts/gcc-plugins/stackleak_plugin.so
->  kstack-erase-cflags-y += -fplugin-arg-stackleak_plugin-track-min-size=$(CONFIG_KSTACK_ERASE_TRACK_MIN_SIZE)
->  kstack-erase-cflags-y += -fplugin-arg-stackleak_plugin-arch=$(SRCARCH)
->  kstack-erase-cflags-$(CONFIG_GCC_PLUGIN_STACKLEAK_VERBOSE) += -fplugin-arg-stackleak_plugin-verbose
-> +ifneq ($(KBUILD_EXTMOD),)
-> +# Avoid embedding absolute -fplugin paths into external module DWARF metadata.
-> +kstack-erase-cflags-y += -gno-record-gcc-switches
-> +endif
->  DISABLE_KSTACK_ERASE := -fplugin-arg-stackleak_plugin-disable
->  endif
+> I've added Thomas Bogendörfer to Cc, he may have an opinion one
+> way or the other.
 > 
-> In my testing, this prevents the absolute stackleak plugin path specified via
-> 
->     -fplugin=$(objtree)/scripts/gcc-plugins/stackleak_plugin.so
-> 
-> from being recorded in the DWARF information of out-of-tree modules, while avoiding the use of platform-specific utilities such as realpath/readlink --relative-to.
-> 
-> I agree this does not solve the broader issue for all GCC plugins, but it appears to address the specific KSTACK_ERASE case that originally motivated the discussion.
-> 
-> Would this direction be more acceptable than the previous relative-path approach, or would suppressing GCC switch recording for external modules be considered undesirable from a debugging-information perspective?
 
-This seems more reasonable to me. You could save a couple of lines by
-making it
-
-  kstack-erase-cflags-$(if $(KBUILD_EXTMOD),y) += -gno-record-gcc-switches
-
-but I guess that is personal style. I doubt it would hamper debugging to
-have this done unconditionally but we could always revisit it if someone
-complains.
-
--- 
-Cheers,
-Nathan
+I believe b) is the best option here, as we can remove one more common 
+file. I will add Thomas Bogendörfer in Cc for the next round.
