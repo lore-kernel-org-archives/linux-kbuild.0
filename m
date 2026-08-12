@@ -1,64 +1,103 @@
-Received: from angie.orcam.me.uk (angie.orcam.me.uk [78.133.224.34])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29F1342FCD3;
-	Tue, 11 Aug 2026 21:56:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.133.224.34
+Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 434792931C3;
+	Wed, 12 Aug 2026 03:33:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786485405; cv=none; b=NZ5x1VODQsRd3mniVuNdYy6PdUXdUecPCjnPmVTXBspDy/noDB0Q9zGneTV2tP8dooiR8UXqX1mJp98Z6hfyT0hgvNwT0N+CtsWQvBivPFpAnoJFTfu0OIOchTlxusVhA5BuiHe55KwmejxjLB1+ykyejL9TXZMJm+XwAWUKffY=
+	t=1786505592; cv=none; b=QDaVGk619Oe/zniDCLa8G6BWx5umFOObl2PqVgTTksx6qPFzKItIKERLEYQCs7sQNS22r3N/9DHC0aaaqJheOyKguV3C0ktTvFdMHum275L9dGg14zaXddEh4z+JO9gKCYSda5t68tji6GfWbEVogo18BkyTIbgU+Y6d7jt912o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786485405; c=relaxed/simple;
-	bh=DFh4pT7sRpZIacXDi7lJU5sEpNXuQ6gNgK0k8Tv8/+A=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=aCfCshCWgAmP3E3JOXPVssu4yMm190uTMX2EiRM4wWsBmfMwbf+zzFRBsKXWUZUuvKBYk9NnsbYIEv/Ro7aGdL1VOl6GGOJAMVK5DBcg83R1HaikhU3o2XF1JQeZ35Ebw9/a1m23rmgniaHr/2GD89X8qkUndPf4yn4iHeAFiws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk; spf=none smtp.mailfrom=orcam.me.uk; arc=none smtp.client-ip=78.133.224.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=orcam.me.uk
-Received: by angie.orcam.me.uk (Postfix, from userid 500)
-	id 2C93892009C; Tue, 11 Aug 2026 23:56:40 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by angie.orcam.me.uk (Postfix) with ESMTP id 25DD692009B;
-	Tue, 11 Aug 2026 22:56:40 +0100 (BST)
-Date: Tue, 11 Aug 2026 22:56:40 +0100 (BST)
-From: "Maciej W. Rozycki" <macro@orcam.me.uk>
-To: Magnus Lindholm <linmag7@gmail.com>
-cc: Magnus Lindholm <lindholm@kernel.org>, Matt Turner <mattst88@gmail.com>, 
-    Richard Henderson <richard.henderson@linaro.org>, 
-    Nathan Chancellor <nathan@kernel.org>, 
-    Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
-    Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
-    Nicolas Schier <nsc@kernel.org>, linux-alpha@vger.kernel.org, 
-    linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
-    linux-kbuild@vger.kernel.org
-Subject: Re: [PATCH 2/2] alpha: read $gp and $sp explicitly for clang
-In-Reply-To: <CA+=Fv5SvjHgf7_5aXp_xBpE42FmM1XTXLrEkzjdQ60NRHKkwpw@mail.gmail.com>
-Message-ID: <alpine.DEB.2.21.2608112254100.48788@angie.orcam.me.uk>
-References: <20260803-alpha-clang-v1-0-1c4ba5ba7a64@gmail.com> <20260803-alpha-clang-v1-2-1c4ba5ba7a64@gmail.com> <CA+=Fv5R0tdFeEKWgSVTjfXbs=guZmR8zy8FGbqUZNSKiyB24aA@mail.gmail.com> <alpine.DEB.2.21.2608110653370.48788@angie.orcam.me.uk>
- <CA+=Fv5SvjHgf7_5aXp_xBpE42FmM1XTXLrEkzjdQ60NRHKkwpw@mail.gmail.com>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+	s=arc-20240116; t=1786505592; c=relaxed/simple;
+	bh=voYeUFRGxJF51AdGg0Ie0IWOP6zIt8JXqOyKZWKsO3I=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=G37wHEeUmnlxDEDEznfzhQGIiJ+lvLSE1pNZPOWB1LRl6qFoM3j6Q5ETyfKOIoDQcvIKvqC1wXo1r20GQLkVrVRJlStcsKgE0vE0MtdACmkaUmCxh/fQvK/Hd1ftVs+WHNFWhDGrlNh9FYbHGx3bNEvySMUSMd8c9i2CKS/bMVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=kxywSdhY; arc=none smtp.client-ip=213.97.179.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="kxywSdhY"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; h=Cc:To:Message-Id:Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Subject:Date:From:From:Reply-To;
+	bh=1Mqf8IivruERMP6fZwT8V4CKtJjvaF7LKzl37WPzoRE=; b=kxywSdhYM8iwMYkdwPYmup0Bdi
+	MOYwwrKCFrodvQy/0LbrOe7WZX++WfWWs8s9tYm2lXtn+9ZYCJe6zAo3XSibg8/e4LZJKxLU/xzxx
+	pqkHrxk5erxb7gw3Ubwp7jAOSz4EEfEq+qB9/fSRd4KwAsc2zNyV2gteCrb1DjAhiXmpd0jco6Za7
+	/tMXriG/MlrYEednzOM6wB9A8KGdgNYks3R92GFo39yQyRTv8pxL6borwgjLvdPbOxC9bT8JxymNe
+	cVmpjAIwv5b61IZzupysVPl36EIRn/DqyNQ8ts9EVflkRl+epnCD6jQLiCGiuMJg7qj8vSd97whPj
+	T4vysc7w==;
+Received: from [177.139.22.20] (helo=[192.168.15.100])
+	by fanzine2.igalia.com with esmtpsa 
+	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
+	id 1wtziD-00HTm1-Eu; Wed, 12 Aug 2026 05:33:05 +0200
+From: =?utf-8?q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
+Date: Wed, 12 Aug 2026 00:32:57 -0300
+Subject: [PATCH v4 01/12] syscalls: Make --abis parsing more robust
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20260812-tonyk-syscall_table-v4-1-748d0229ad40@igalia.com>
+References: <20260812-tonyk-syscall_table-v4-0-748d0229ad40@igalia.com>
+In-Reply-To: <20260812-tonyk-syscall_table-v4-0-748d0229ad40@igalia.com>
+To: Thomas Gleixner <tglx@kernel.org>, 
+ Nathan Chancellor <nathan@kernel.org>, 
+ Masami Hiramatsu <mhiramat@kernel.org>, Arnd Bergmanon <arnd@arndb.de>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+ kernel-dev@igalia.com, 
+ =?utf-8?q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
+X-Mailer: b4 0.15.2
 
-On Tue, 11 Aug 2026, Magnus Lindholm wrote:
+Some archs Makefile have something like this as the rule for making the
+syscall files:
 
-> >  Also I think our coding style would rather see the asm written as:
-> >
-> >         __asm__ __volatile__("mov $29, %0" : "=r" (gptr));
-> 
-> Given Maciej's comment on the inline asm style, do you want to send a v2
-> of this patch, or are you happy for me to fold the
-> 
-> __asm__ volatile(...)
-> 
-> to
-> 
-> __asm__ __volatile__(...)
-> 
-> style change in when I apply it to the Alpha tree?
+  cmd_systbl = $(CONFIG_SHELL) $(systbl) --abis common,$* $< $@
 
- FAOD it's also the space in `"=r" (gptr)'.
+The $* symbol is evaluated to the variable found at $(uapi)/unistd-%.h,
+where % is 32 or 64, resulting in e.g. `--abis common,32`. Sometimes the
+rule for the file won't have a %, resulting in a trailing comma e.g.
+`--abis common,`.
 
-  Maciej
+Currently this input is transformed into (common|). This is problematic
+because grep will then match any ABI because of the trailing `|`. Make the
+syscalls scripts more robust by removing any trailing comma.
+
+Signed-off-by: André Almeida <andrealmeid@igalia.com>
+---
+ scripts/syscallhdr.sh | 2 +-
+ scripts/syscalltbl.sh | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/syscallhdr.sh b/scripts/syscallhdr.sh
+index 22e34cd46b9b..bad1ab606a0f 100755
+--- a/scripts/syscallhdr.sh
++++ b/scripts/syscallhdr.sh
+@@ -39,7 +39,7 @@ while [ $# -gt 0 ]
+ do
+ 	case $1 in
+ 	--abis)
+-		abis=$(echo "($2)" | tr ',' '|')
++		abis="($(echo "${2%,}" | tr ',' '|'))"
+ 		shift 2;;
+ 	--emit-nr)
+ 		emit_nr=1
+diff --git a/scripts/syscalltbl.sh b/scripts/syscalltbl.sh
+index 6a903b87a7c2..c4b1f85c2dd6 100755
+--- a/scripts/syscalltbl.sh
++++ b/scripts/syscalltbl.sh
+@@ -33,7 +33,7 @@ while [ $# -gt 0 ]
+ do
+ 	case $1 in
+ 	--abis)
+-		abis=$(echo "($2)" | tr ',' '|')
++		abis="($(echo "${2%,}" | tr ',' '|'))"
+ 		shift 2;;
+ 	-*)
+ 		echo "$1: unknown option" >&2
+
+-- 
+2.55.0
+
