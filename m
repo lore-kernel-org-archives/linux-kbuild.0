@@ -1,161 +1,181 @@
-Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35EEF481A92;
-	Wed, 12 Aug 2026 17:39:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D22A4382F15
+	for <linux-kbuild@vger.kernel.org>; Wed, 12 Aug 2026 20:16:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786556380; cv=none; b=FJtfl1IEUqyKnzMTeTF3Tflgly4OK06bQrF8SKVsiDfjkwPO47CcnU3MjsXHnmWIonztNAkF1HZcv9IG9UFBmEhhH+Jb+k+gL0uDh0QMU2VpudcpQKqLg3O+pk8an/1kxPCVQTO1v+8ru4F2CiHluyvN3sWO8fCCowQ5FmUOvhI=
+	t=1786565790; cv=none; b=J1oAyk/cT5lsRKkAPqT3BtJFOI09WbPoKkv1XMNU5XGoDzk1Nz7lEbc2enfLay34i77SBf6+fDY4CkQ5d6vf1QBiZDsdqpLnSXMcKk/R/Bi0HMFaaV4NgMpEPaLRfsPLrF8ARDwqY9XfiNA+2q2BPWdR8jGzrgFkAz2YrrUzZ2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786556380; c=relaxed/simple;
-	bh=T2C2IQIC8AENMabj+b1Yh+MlqE8tkw02mH6onEU6zqE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=uFwesvZqTy7t2vhBByzEhzKsT2E4qtTy0uZgZDjewTa2aZSNipodO8umwdNOaPS7HASQoNcnKOzLHx49Y3xOuQRZ+ahVOnsr5ZT2D20uSDJRItVtp6VYfJYTNYLhdbxLWmtehf/tqKNRtm5Kkq7QWCSrkW3VPB2MmDYj2piS1kI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=JP3/SjcW; arc=none smtp.client-ip=213.97.179.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
+	s=arc-20240116; t=1786565790; c=relaxed/simple;
+	bh=AiVQmdE36y6QXny0Mmw4Gw6HubeIeMk4S/c50LTZycs=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Saj4CBJeo6Tt3+r7yb1h7CFv4DjU24cnncNW1NtfZJNr7C6ewF/rg76u5hvB6YAOWh5b6SyBEdk3Mq85Nbr97TX35uK5UgqSf9Il2w7nm+62tECZSjBBYN8mKVKOIHT945JgPapMaqSuKc7vc7cryeW6SQhJqs6Y3wR7oIKCdYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L78PHBzC; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="JP3/SjcW"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; h=Cc:To:Message-Id:Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Subject:Date:From:From:Reply-To;
-	bh=xw7jIcOsSg0tBd7gNAqEYhzUy1bQIgWLTtkuMdy3GPA=; b=JP3/SjcW4cYIiHFvmK39FYekco
-	BFV5gnZDe1H68KsQRgJCoy6+n1+XRiteVypBEdMePoev1w1TlXPKUg+66AOI0A5JapTk9c82qn2aB
-	lAP09cksFDK4OFjb0HZu5243s/sRJZzE7an339IC39SxIH4AxXwKOcZ78fXtdbtfoy6DwWEI++drJ
-	3rVAvcjqaqCJoucjUb2md8KaAsvGjpK5jerzNQ03wknc1C2Ne9wlhOig6URP5WCyp90F4rrG59KTi
-	redlI1duW7V7pEOikC3Qk0weyBSmoNoAZ2SemZJcjScwSgeEFV9CmQ5IKbA+44OGG/0l8yASFLRYq
-	vYA19Q/Q==;
-Received: from [177.139.22.20] (helo=[192.168.15.100])
-	by fanzine2.igalia.com with esmtpsa 
-	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
-	id 1wuCvP-000FR2-6K; Wed, 12 Aug 2026 19:39:35 +0200
-From: =?utf-8?q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
-Date: Wed, 12 Aug 2026 14:38:44 -0300
-Subject: [PATCH v5 13/13] alpha: Use the common syscall table
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L78PHBzC"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1786565787;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=gbcpa277ERO4n9n/VE9xEGfG5jSz1Qxd5sN8vPZTwBk=;
+	b=L78PHBzCKY2c5g6dhgCJ1ElH8xaXg+5yMNbbO4pSZQNfEzzIUF0O94UmSPVPGC9Zc9HFF+
+	DEd0osmViBszpcvYNkeGM5qrbvd3YzAR69vJqIHJj2Xdb9J8C5OytA4MK5X+se7EYr9iE7
+	nO4p2gDP3uZLeCIyWwoUGcqYX1aQ4Fo=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-352-Rs2ig2MqOKyLS9wXj7Lc7A-1; Wed,
+ 12 Aug 2026 16:16:24 -0400
+X-MC-Unique: Rs2ig2MqOKyLS9wXj7Lc7A-1
+X-Mimecast-MFC-AGG-ID: Rs2ig2MqOKyLS9wXj7Lc7A_1786565780
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A9E0C19560B5;
+	Wed, 12 Aug 2026 20:16:19 +0000 (UTC)
+Received: from paumurph-thinkpadp1gen7.redhat.corp (headnet05.pony-001.prod.iad2.dc.redhat.com [10.2.32.117])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4C6151800348;
+	Wed, 12 Aug 2026 20:16:14 +0000 (UTC)
+From: Paul Murphy <murp@redhat.com>
+To: Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Boqun Feng <boqun@kernel.org>,
+	Gary Guo <gary@garyguo.net>,
+	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Daniel Almeida <daniel.almeida@collabora.com>,
+	Tamir Duberstein <tamird@kernel.org>,
+	Alexandre Courbot <acourbot@nvidia.com>,
+	=?UTF-8?q?Onur=20=C3=96zkan?= <work@onurozkan.dev>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+	Luis Augenstein <luis.augenstein@tngtech.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Andrew Jones <andrew.jones@linux.dev>,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	rust-for-linux@vger.kernel.org,
+	llvm@lists.linux.dev
+Subject: [PATCH v2] rust: enable fentry support
+Date: Wed, 12 Aug 2026 15:16:06 -0500
+Message-ID: <20260812201613.1783592-1-murp@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20260812-tonyk-syscall_table-v5-13-3d383927c609@igalia.com>
-References: <20260812-tonyk-syscall_table-v5-0-3d383927c609@igalia.com>
-In-Reply-To: <20260812-tonyk-syscall_table-v5-0-3d383927c609@igalia.com>
-To: Masami Hiramatsu <mhiramat@kernel.org>, Arnd Bergmanon <arnd@arndb.de>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
- kernel-dev@igalia.com, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
- linux-alpha@vger.kernel.org, linux-s390@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, soc@lists.linux.dev, 
- linux-mips@vger.kernel.org, parclinux@vger.kernel.org, 
- =?utf-8?q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
-X-Mailer: b4 0.15.2
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Remove some of the duplicated code by using the common syscall number
-table.
+Turn it on if CONFIG_HAVE_FENTRY=y and rustc supports a compatible
+fentry option. Nightly rustc supports fentry, fentry-record, and
+fentry-nop-record. These are equivalent gcc's -mfentry, -mfentry
+-mrecord-mcount, and -mfentry -mnop-mcount -mrecord-mcount.
 
-Signed-off-by: André Almeida <andrealmeid@igalia.com>
+Rust 1.98 adds support for x86 and s390x targets for
+-Zinstrument-mcount=fentry.
+
+Rust nightly supports all three options on s390. x86 supports only
+fentry (this is a limitation of the x86 llvm backend). The expanded
+options should arrive with Rust 1.99.
+
+Signed-off-by: Paul Murphy <murp@redhat.com>
+Link: https://github.com/rust-lang/rust/pull/152122
+Link: https://github.com/rust-lang/rust/pull/158036
+Link: https://github.com/rust-lang/rust/pull/160184
+
 ---
- arch/alpha/kernel/syscalls/Makefile    | 10 +++++--
- arch/alpha/kernel/syscalls/syscall.tbl | 48 ----------------------------------
- arch/alpha/kernel/systbls.S            |  1 +
- 3 files changed, 9 insertions(+), 50 deletions(-)
 
-diff --git a/arch/alpha/kernel/syscalls/Makefile b/arch/alpha/kernel/syscalls/Makefile
-index b265e4bc16c2..18682418327b 100644
---- a/arch/alpha/kernel/syscalls/Makefile
-+++ b/arch/alpha/kernel/syscalls/Makefile
-@@ -7,12 +7,18 @@ $(shell mkdir -p $(uapi) $(kapi))
- syscall := $(src)/syscall.tbl
- syshdr := $(srctree)/scripts/syscallhdr.sh
- systbl := $(srctree)/scripts/syscalltbl.sh
-+systbl_common := $(srctree)/scripts/syscall_common.tbl
-+abis := common,__clone3
- 
- quiet_cmd_syshdr = SYSHDR  $@
--      cmd_syshdr = $(CONFIG_SHELL) $(syshdr) --emit-nr $< $@
-+      cmd_syshdr = $(CONFIG_SHELL) $(syshdr) --emit-nr \
-+		   --common-tbl $(systbl_common) --common-offset 110 \
-+		   --abis $(abis) $< $@
- 
- quiet_cmd_systbl = SYSTBL  $@
--      cmd_systbl = $(CONFIG_SHELL) $(systbl) $< $@
-+      cmd_systbl = $(CONFIG_SHELL) $(systbl) \
-+		   --common-tbl $(systbl_common) --common-offset 110 \
-+		   --abis $(abis) $< $@
- 
- $(uapi)/unistd_32.h: $(syscall) $(syshdr) FORCE
- 	$(call if_changed,syshdr)
-diff --git a/arch/alpha/kernel/syscalls/syscall.tbl b/arch/alpha/kernel/syscalls/syscall.tbl
-index 34151d1653d6..7066a3920899 100644
---- a/arch/alpha/kernel/syscalls/syscall.tbl
-+++ b/arch/alpha/kernel/syscalls/syscall.tbl
-@@ -463,51 +463,3 @@
- 532	common	getppid				sys_getppid
- # all other architectures have common numbers for new syscall, alpha
- # is the exception.
--534	common	pidfd_send_signal		sys_pidfd_send_signal
--535	common	io_uring_setup			sys_io_uring_setup
--536	common	io_uring_enter			sys_io_uring_enter
--537	common	io_uring_register		sys_io_uring_register
--538	common	open_tree			sys_open_tree
--539	common	move_mount			sys_move_mount
--540	common	fsopen				sys_fsopen
--541	common	fsconfig			sys_fsconfig
--542	common	fsmount				sys_fsmount
--543	common	fspick				sys_fspick
--544	common	pidfd_open			sys_pidfd_open
--545	common	clone3				__clone3
--546	common	close_range			sys_close_range
--547	common	openat2				sys_openat2
--548	common	pidfd_getfd			sys_pidfd_getfd
--549	common	faccessat2			sys_faccessat2
--550	common	process_madvise			sys_process_madvise
--551	common	epoll_pwait2			sys_epoll_pwait2
--552	common	mount_setattr			sys_mount_setattr
--553	common	quotactl_fd			sys_quotactl_fd
--554	common	landlock_create_ruleset		sys_landlock_create_ruleset
--555	common	landlock_add_rule		sys_landlock_add_rule
--556	common	landlock_restrict_self		sys_landlock_restrict_self
--# 557 reserved for memfd_secret
--558	common	process_mrelease		sys_process_mrelease
--559	common  futex_waitv                     sys_futex_waitv
--560	common	set_mempolicy_home_node		sys_set_mempolicy_home_node
--561	common	cachestat			sys_cachestat
--562	common	fchmodat2			sys_fchmodat2
--563	common	map_shadow_stack		sys_map_shadow_stack
--564	common	futex_wake			sys_futex_wake
--565	common	futex_wait			sys_futex_wait
--566	common	futex_requeue			sys_futex_requeue
--567	common	statmount			sys_statmount
--568	common	listmount			sys_listmount
--569	common	lsm_get_self_attr		sys_lsm_get_self_attr
--570	common	lsm_set_self_attr		sys_lsm_set_self_attr
--571	common	lsm_list_modules		sys_lsm_list_modules
--572	common  mseal				sys_mseal
--573	common	setxattrat			sys_setxattrat
--574	common	getxattrat			sys_getxattrat
--575	common	listxattrat			sys_listxattrat
--576	common	removexattrat			sys_removexattrat
--577	common	open_tree_attr			sys_open_tree_attr
--578	common	file_getattr			sys_file_getattr
--579	common	file_setattr			sys_file_setattr
--580	common	listns				sys_listns
--581	common	rseq_slice_yield		sys_rseq_slice_yield
-diff --git a/arch/alpha/kernel/systbls.S b/arch/alpha/kernel/systbls.S
-index 68f3e4f329eb..9a67d29f7818 100644
---- a/arch/alpha/kernel/systbls.S
-+++ b/arch/alpha/kernel/systbls.S
-@@ -7,6 +7,7 @@
- 
- #include <asm/unistd.h>
- 
-+#define __SYSCALL_WITH_COMPAT(nr, native, compat)        __SYSCALL(nr, native)
- #define __SYSCALL(nr, entry) .quad entry
- 	.data
- 	.align 3
+Changes in v2:
+- Refactor for consistency
+- Export RUSTC_FLAGS_FTRACE
+- When FTRACE_MCOUNT_USE_CC is set, use rust's extended fentry support
+  if supported or not at all.
+- Link to v1: https://lore.kernel.org/rust-for-linux/20260724170132.3783816-1-murp@redhat.com/
+---
+ Makefile                        | 20 +++++++++++++++++++-
+ scripts/generate_rust_target.rs |  2 ++
+ 2 files changed, 21 insertions(+), 1 deletion(-)
 
+diff --git a/Makefile b/Makefile
+index bfb47ad8cb9a..7ece5a327c53 100644
+--- a/Makefile
++++ b/Makefile
+@@ -832,9 +832,11 @@ endif # KBUILD_EXTMOD
+ # Defaults to vmlinux, but the arch makefile usually adds further targets
+ all: vmlinux
+ 
+-# The arch Makefiles can override CC_FLAGS_FTRACE. We may also append it later.
++# The arch Makefiles can override CC_FLAGS_FTRACE or RUSTC_FLAGS_FTRACE.
++# We may also append them later.
+ ifdef CONFIG_FUNCTION_TRACER
+   CC_FLAGS_FTRACE := -pg
++  RUSTC_FLAGS_FTRACE :=
+ endif
+ 
+ ifdef CONFIG_TRACEPOINTS
+@@ -1053,10 +1055,26 @@ ifdef CONFIG_HAVE_FENTRY
+     CC_FLAGS_FTRACE	+= -mfentry
+     CC_FLAGS_USING	+= -DCC_USING_FENTRY
+   endif
++  ifdef CONFIG_FTRACE_MCOUNT_USE_CC
++    # Support for mcount record/nop is not gated by rustc version for all architectures.
++    ifdef CONFIG_HAVE_NOP_MCOUNT
++      ifeq ($(call rustc-option-yn, -Zinstrument-mcount=fentry-nop-record),y)
++        RUSTC_FLAGS_FTRACE += -Zinstrument-mcount=fentry-nop-record
++      endif
++    else
++      ifeq ($(call rustc-option-yn, -Zinstrument-mcount=fentry-record),y)
++        RUSTC_FLAGS_FTRACE += -Zinstrument-mcount=fentry-record
++      endif
++    endif
++  else
++      RUSTC_FLAGS_FTRACE += $(if $(call rustc-min-version,109800),-Zinstrument-mcount=fentry,)
++  endif
+ endif
+ export CC_FLAGS_FTRACE
++export RUSTC_FLAGS_FTRACE
+ KBUILD_CFLAGS	+= $(CC_FLAGS_FTRACE) $(CC_FLAGS_USING)
+ KBUILD_AFLAGS	+= $(CC_FLAGS_USING)
++KBUILD_RUSTFLAGS += $(RUSTC_FLAGS_FTRACE)
+ endif
+ 
+ # We trigger additional mismatches with less inlining
+diff --git a/scripts/generate_rust_target.rs b/scripts/generate_rust_target.rs
+index 3bf296581a88..eb80a06d50d3 100644
+--- a/scripts/generate_rust_target.rs
++++ b/scripts/generate_rust_target.rs
+@@ -198,6 +198,7 @@ fn main() {
+         ts.push("arch", "x86_64");
+         if cfg.rustc_version_atleast(1, 98, 0) {
+             ts.push("rustc-abi", "softfloat");
++            ts.push("supports-fentry", true);
+         } else if cfg.rustc_version_atleast(1, 86, 0) {
+             ts.push("rustc-abi", "x86-softfloat");
+         }
+@@ -240,6 +241,7 @@ fn main() {
+         ts.push("arch", "x86");
+         if cfg.rustc_version_atleast(1, 98, 0) {
+             ts.push("rustc-abi", "softfloat");
++            ts.push("supports-fentry", true);
+         } else if cfg.rustc_version_atleast(1, 86, 0) {
+             ts.push("rustc-abi", "x86-softfloat");
+         }
+
+base-commit: 7059bdf4f04a3e14f4fafb3ac35fdca913e3e21a
 -- 
 2.55.0
 
