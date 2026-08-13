@@ -1,76 +1,57 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D22A4382F15
-	for <linux-kbuild@vger.kernel.org>; Wed, 12 Aug 2026 20:16:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E6143D4EE;
+	Thu, 13 Aug 2026 08:30:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786565790; cv=none; b=J1oAyk/cT5lsRKkAPqT3BtJFOI09WbPoKkv1XMNU5XGoDzk1Nz7lEbc2enfLay34i77SBf6+fDY4CkQ5d6vf1QBiZDsdqpLnSXMcKk/R/Bi0HMFaaV4NgMpEPaLRfsPLrF8ARDwqY9XfiNA+2q2BPWdR8jGzrgFkAz2YrrUzZ2M=
+	t=1786609824; cv=none; b=BjEdhuZ8IpNeD2Ep1qFYCJtKNQy6joTasUt4oRQi8hOiyMyREkyFSuHXduI4nQDQkLI4q7ApPAASs+Af1mRim2wQdTy/DlpzD7mYD2nu+HhxxluoBupXOK8mlAOfvuMmaWh50mVqJ0PGCbFfGlrBzREyvzqkNVg2Qvih2t4zhGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786565790; c=relaxed/simple;
-	bh=AiVQmdE36y6QXny0Mmw4Gw6HubeIeMk4S/c50LTZycs=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Saj4CBJeo6Tt3+r7yb1h7CFv4DjU24cnncNW1NtfZJNr7C6ewF/rg76u5hvB6YAOWh5b6SyBEdk3Mq85Nbr97TX35uK5UgqSf9Il2w7nm+62tECZSjBBYN8mKVKOIHT945JgPapMaqSuKc7vc7cryeW6SQhJqs6Y3wR7oIKCdYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L78PHBzC; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1786609824; c=relaxed/simple;
+	bh=LrspAeAx/yOVOn1WlpqcgTETe1zfP8oNMzYeylLkjRs=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fZJPU/5vCzeakvAihoLRYaZO1h/0EH6lM+k1OdOd+JhpEDd8QLXuEKQRcOjWed5GeAtuEnscn1KUffystW2ntv8Ggt+UOvhdj5no/YMzUvnJkC1KWX+82We9V8NZ8rS432wtv4By74Yg38Lkjb7PnMc3mKILRepZqnkR3g29aho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=qti.qualcomm.com; spf=pass smtp.mailfrom=qti.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Zgx2T3i2; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=qti.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qti.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L78PHBzC"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1786565787;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=gbcpa277ERO4n9n/VE9xEGfG5jSz1Qxd5sN8vPZTwBk=;
-	b=L78PHBzCKY2c5g6dhgCJ1ElH8xaXg+5yMNbbO4pSZQNfEzzIUF0O94UmSPVPGC9Zc9HFF+
-	DEd0osmViBszpcvYNkeGM5qrbvd3YzAR69vJqIHJj2Xdb9J8C5OytA4MK5X+se7EYr9iE7
-	nO4p2gDP3uZLeCIyWwoUGcqYX1aQ4Fo=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-352-Rs2ig2MqOKyLS9wXj7Lc7A-1; Wed,
- 12 Aug 2026 16:16:24 -0400
-X-MC-Unique: Rs2ig2MqOKyLS9wXj7Lc7A-1
-X-Mimecast-MFC-AGG-ID: Rs2ig2MqOKyLS9wXj7Lc7A_1786565780
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A9E0C19560B5;
-	Wed, 12 Aug 2026 20:16:19 +0000 (UTC)
-Received: from paumurph-thinkpadp1gen7.redhat.corp (headnet05.pony-001.prod.iad2.dc.redhat.com [10.2.32.117])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4C6151800348;
-	Wed, 12 Aug 2026 20:16:14 +0000 (UTC)
-From: Paul Murphy <murp@redhat.com>
-To: Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Boqun Feng <boqun@kernel.org>,
-	Gary Guo <gary@garyguo.net>,
-	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
-	Benno Lossin <lossin@kernel.org>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Trevor Gross <tmgross@umich.edu>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Daniel Almeida <daniel.almeida@collabora.com>,
-	Tamir Duberstein <tamird@kernel.org>,
-	Alexandre Courbot <acourbot@nvidia.com>,
-	=?UTF-8?q?Onur=20=C3=96zkan?= <work@onurozkan.dev>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <linux@weissschuh.net>,
-	Luis Augenstein <luis.augenstein@tngtech.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	rust-for-linux@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: [PATCH v2] rust: enable fentry support
-Date: Wed, 12 Aug 2026 15:16:06 -0500
-Message-ID: <20260812201613.1783592-1-murp@redhat.com>
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Zgx2T3i2"
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67D5g7T21072366;
+	Thu, 13 Aug 2026 08:30:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	V+OQevDySdUiNlsVYK3I5naRXIe8nUtnNrYUvXaCa/8=; b=Zgx2T3i2IFpPi8Xc
+	iIdrcQfRq5N2BD4OOZQ5rRDMmWWCrDT1apPrCLK+e8DkUIZ89WLo0CAwG6luqVWq
+	HnAntnatc+LES2vXDzeWNCqCwda2RVpYWVKBUIIMs71G8YVBBSZrFr74mDfqhcFg
+	3BTxHtuv4bYJgKPdbJuXEwEXyax3G0vUNTD4Xi5pcoLTP/SP1dZEJvasixWWQQXz
+	ZBWxikrSNolkBxkM1XG26LU+pD329zW9Pd3ZChkVp9RaaoBfHw+WwPW0bbuUOE98
+	gKwVmwaZmRAl3DEvmU9syn2L2biZdYH7zT1+/mHInRxMLsErrqNEVLsTPWAz0doc
+	iCP1Aw==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4g14syhca0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 13 Aug 2026 08:30:13 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA01.qualcomm.com (8.18.1.7/8.18.1.7) with ESMTPS id 67D8UCcb009415
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 13 Aug 2026 08:30:12 GMT
+Received: from quicinc.com (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.43; Thu, 13 Aug
+ 2026 01:30:10 -0700
+From: Jaihind Yadav <jaihindy@qti.qualcomm.com>
+To: <nathan@kernel.org>, <nsc@kernel.org>
+CC: <linux-kbuild@vger.kernel.org>, <linux-hardening@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Jaihind Yadav <jaihindy@qti.qualcomm.com>
+Subject: [PATCH v2] kstack_erase: suppress -grecord-gcc-switches for external module builds
+Date: Thu, 13 Aug 2026 13:59:49 +0530
+Message-ID: <20260813082949.1622045-1-jaihindy@qti.qualcomm.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260803181217.GB1067866@ax162>
+References: <20260803181217.GB1067866@ax162>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -78,104 +59,70 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Authority-Analysis: v=2.4 cv=ZcQt8MVA c=1 sm=1 tr=0 ts=6a7d8095 cx=c_pps
+ a=ouPCqIW2jiPt+lZRy3xVPw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
+ a=GEpy-HfZoHoA:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=DJpcGTmdVt4CTyJn9g5Z:22 a=VwQbUJbxAAAA:8
+ a=EUspDBNiAAAA:8 a=O4BMjXmnfS_GZb3uHPoA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODEzMDA1OCBTYWx0ZWRfXzc/x3lmBd0k8
+ FpOTS2CnfpVhCeqEi8A9HyvwpQrL79UDSoC3/fmy5MY4ynGyOrDO9AhsecbP5tPY/yAk6BJyqzc
+ CN6DHkmXT3lfOz1ubZfebw966hCoYLbglT5eYGMIHjSj0f042xkKXy4+rNeSTzftQchEgHtf3/A
+ RGnXkcCW103xmIRQqZViA+3xKI5nKJR3RfOtpyoPHEliG7yl2N0HsdqfPzm/gGIrfSeW7sbz6eN
+ 8LDnzu3wVorde+9soWO2OVdkKqofGM1uLQ/qTP3VzcgzlxhRuGoeO2yatkU0DaR9baSKnWRQfGJ
+ S2Oh3hG/uuy35efnwJL/ZBFwRrtYEmrq9Q0WS1tYmHEkqy4+d6nNR52oiCW/LiwM0XS9IdxFZtH
+ Rn0OL1zBkjeJudJfgf65HHneWp5K0kzuhkNeb2fH29uCXX/CYB9m9YREQQyQoVT+F3R0cTcuQKu
+ g3KLHyut3U1bfyBMbmA==
+X-Proofpoint-ORIG-GUID: l2Rc4SpdEorkfkAZJshjKaYmLy1Mh3kB
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODEzMDA1OCBTYWx0ZWRfX2eT0Ll2U9Yj+
+ v3qFysTdBH5sl86vTiFCcqlmdIKNuA80RuzEWX4B6BKDv7v/leJXomzOupOELIvtjTod9+i6FqU
+ uFLcloIbCcwXxk+gvIZo6WSoeCOhYgI=
+X-Proofpoint-GUID: l2Rc4SpdEorkfkAZJshjKaYmLy1Mh3kB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-08-13_02,2026-08-12_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 impostorscore=0 phishscore=0 malwarescore=0 suspectscore=0
+ adultscore=0 bulkscore=0 priorityscore=1501 spamscore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608130058
 
-Turn it on if CONFIG_HAVE_FENTRY=y and rustc supports a compatible
-fentry option. Nightly rustc supports fentry, fentry-record, and
-fentry-nop-record. These are equivalent gcc's -mfentry, -mfentry
--mrecord-mcount, and -mfentry -mnop-mcount -mrecord-mcount.
+With CONFIG_GCC_PLUGIN_STACKLEAK=y, kstack erase adds:
 
-Rust 1.98 adds support for x86 and s390x targets for
--Zinstrument-mcount=fentry.
+  -fplugin=$(objtree)/scripts/gcc-plugins/stackleak_plugin.so
 
-Rust nightly supports all three options on s390. x86 supports only
-fentry (this is a limitation of the x86 llvm backend). The expanded
-options should arrive with Rust 1.99.
+For KBUILD_EXTMOD builds, recording gcc switches can embed this host/build
+specific plugin path into module DWARF producer strings, which trips QA
+checks looking for absolute path leakage.
 
-Signed-off-by: Paul Murphy <murp@redhat.com>
-Link: https://github.com/rust-lang/rust/pull/152122
-Link: https://github.com/rust-lang/rust/pull/158036
-Link: https://github.com/rust-lang/rust/pull/160184
+Disable gcc switch recording only for external modules by adding
+-gno-record-gcc-switches to kstack-erase-cflags when KBUILD_EXTMOD is set.
 
+This keeps stackleak plugin instrumentation enabled while avoiding leakage
+of host-specific paths in external module debug metadata.
+
+Suggested-by: Nathan Chancellor <nathan@kernel.org>
+Link: https://lore.kernel.org/all/20260803181217.GB1067866@ax162/
+Signed-off-by: Jaihind Yadav <jaihindy@qti.qualcomm.com>
 ---
+ scripts/Makefile.kstack_erase | 1 +
+ 1 file changed, 1 insertion(+)
 
-Changes in v2:
-- Refactor for consistency
-- Export RUSTC_FLAGS_FTRACE
-- When FTRACE_MCOUNT_USE_CC is set, use rust's extended fentry support
-  if supported or not at all.
-- Link to v1: https://lore.kernel.org/rust-for-linux/20260724170132.3783816-1-murp@redhat.com/
----
- Makefile                        | 20 +++++++++++++++++++-
- scripts/generate_rust_target.rs |  2 ++
- 2 files changed, 21 insertions(+), 1 deletion(-)
-
-diff --git a/Makefile b/Makefile
-index bfb47ad8cb9a..7ece5a327c53 100644
---- a/Makefile
-+++ b/Makefile
-@@ -832,9 +832,11 @@ endif # KBUILD_EXTMOD
- # Defaults to vmlinux, but the arch makefile usually adds further targets
- all: vmlinux
- 
--# The arch Makefiles can override CC_FLAGS_FTRACE. We may also append it later.
-+# The arch Makefiles can override CC_FLAGS_FTRACE or RUSTC_FLAGS_FTRACE.
-+# We may also append them later.
- ifdef CONFIG_FUNCTION_TRACER
-   CC_FLAGS_FTRACE := -pg
-+  RUSTC_FLAGS_FTRACE :=
+diff --git a/scripts/Makefile.kstack_erase b/scripts/Makefile.kstack_erase
+index ee7e4ef7b892..6f31a3915d24 100644
+--- a/scripts/Makefile.kstack_erase
++++ b/scripts/Makefile.kstack_erase
+@@ -5,6 +5,7 @@ kstack-erase-cflags-y += -fplugin=$(objtree)/scripts/gcc-plugins/stackleak_plugi
+ kstack-erase-cflags-y += -fplugin-arg-stackleak_plugin-track-min-size=$(CONFIG_KSTACK_ERASE_TRACK_MIN_SIZE)
+ kstack-erase-cflags-y += -fplugin-arg-stackleak_plugin-arch=$(SRCARCH)
+ kstack-erase-cflags-$(CONFIG_GCC_PLUGIN_STACKLEAK_VERBOSE) += -fplugin-arg-stackleak_plugin-verbose
++kstack-erase-cflags-$(if $(KBUILD_EXTMOD),y) += -gno-record-gcc-switches
+ DISABLE_KSTACK_ERASE := -fplugin-arg-stackleak_plugin-disable
  endif
  
- ifdef CONFIG_TRACEPOINTS
-@@ -1053,10 +1055,26 @@ ifdef CONFIG_HAVE_FENTRY
-     CC_FLAGS_FTRACE	+= -mfentry
-     CC_FLAGS_USING	+= -DCC_USING_FENTRY
-   endif
-+  ifdef CONFIG_FTRACE_MCOUNT_USE_CC
-+    # Support for mcount record/nop is not gated by rustc version for all architectures.
-+    ifdef CONFIG_HAVE_NOP_MCOUNT
-+      ifeq ($(call rustc-option-yn, -Zinstrument-mcount=fentry-nop-record),y)
-+        RUSTC_FLAGS_FTRACE += -Zinstrument-mcount=fentry-nop-record
-+      endif
-+    else
-+      ifeq ($(call rustc-option-yn, -Zinstrument-mcount=fentry-record),y)
-+        RUSTC_FLAGS_FTRACE += -Zinstrument-mcount=fentry-record
-+      endif
-+    endif
-+  else
-+      RUSTC_FLAGS_FTRACE += $(if $(call rustc-min-version,109800),-Zinstrument-mcount=fentry,)
-+  endif
- endif
- export CC_FLAGS_FTRACE
-+export RUSTC_FLAGS_FTRACE
- KBUILD_CFLAGS	+= $(CC_FLAGS_FTRACE) $(CC_FLAGS_USING)
- KBUILD_AFLAGS	+= $(CC_FLAGS_USING)
-+KBUILD_RUSTFLAGS += $(RUSTC_FLAGS_FTRACE)
- endif
- 
- # We trigger additional mismatches with less inlining
-diff --git a/scripts/generate_rust_target.rs b/scripts/generate_rust_target.rs
-index 3bf296581a88..eb80a06d50d3 100644
---- a/scripts/generate_rust_target.rs
-+++ b/scripts/generate_rust_target.rs
-@@ -198,6 +198,7 @@ fn main() {
-         ts.push("arch", "x86_64");
-         if cfg.rustc_version_atleast(1, 98, 0) {
-             ts.push("rustc-abi", "softfloat");
-+            ts.push("supports-fentry", true);
-         } else if cfg.rustc_version_atleast(1, 86, 0) {
-             ts.push("rustc-abi", "x86-softfloat");
-         }
-@@ -240,6 +241,7 @@ fn main() {
-         ts.push("arch", "x86");
-         if cfg.rustc_version_atleast(1, 98, 0) {
-             ts.push("rustc-abi", "softfloat");
-+            ts.push("supports-fentry", true);
-         } else if cfg.rustc_version_atleast(1, 86, 0) {
-             ts.push("rustc-abi", "x86-softfloat");
-         }
-
-base-commit: 7059bdf4f04a3e14f4fafb3ac35fdca913e3e21a
 -- 
-2.55.0
+2.43.0
 
