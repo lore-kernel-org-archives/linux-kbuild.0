@@ -1,134 +1,150 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86F683546E7;
-	Fri, 14 Aug 2026 18:24:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E82845C6EB;
+	Fri, 14 Aug 2026 18:26:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786731885; cv=none; b=EWL+ReMFhtUiG/BOPG36XjN98uWYqVWYqqksN6hK0dMkLgx8cclN7iC109R7ISlbI6S5mCHQOJVj4KZlJwM7qt4bg+ao7hhjknGgsoWej8u4MQIQF0HMB8Q4Zm0qx2P701ApFEcaJgR0cpAVsfhxM/X3zxa3W/6gZUx+CuY2F/g=
+	t=1786731995; cv=none; b=NazN3js2G5ig+0jGgyl6rkjy/Hynpz6ztin1D2j0n/H+U2M3+k4JcpfFAxHcoZTFKCk4hhgKTyTQmM6+MhYnN4KiAqtEYQMEEbpBEVZXCu1F+E84apbJC+El4pdqITUed+l6G2JvlceSu1SVRF0/Y+DAhbyTw64nA/CHGxpyngE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786731885; c=relaxed/simple;
-	bh=vu+zfzNe1WEav0e72HiaOs0RrGg13nrgBqLNFQl29LE=;
+	s=arc-20240116; t=1786731995; c=relaxed/simple;
+	bh=7g3+y2yv5JH0FxSJZB3t086UVZzSKWNd84ckVrWDpRs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=de5Nx0jlwxf/3G3js62Cb9OBVDW5ae+cFdJdnGSOJT+LqhsLJVV/3dFG8ls/Mm/+UFLtD6/Iff93+Cp5sJvGEPrG+p/i6Od8my88pVOz2I0lFBK750qReOSy0u0QIMEL/gGpvdzqfsXhpSAU7pYEg4/UCmzVhf2ILbkgJ5en8hI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B3xC16AE; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=qPCWSLAVNevG62eGIiTOPY9PG+ck8PM6ZZhWdMa7m8yJuOw4xzm9y24d9DmrDoFyzpn+ziTA8FwnzW/wmc4cFxQ2jBpVOBHZHk5Qbba52MSlAIeOat7w4sV7g4emfDAsutyOfdnkSPhz+LkVKA9Jrv36fnQ0/SqOdiDbTW0qQ0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JEq5KU6M; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B3xC16AE"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id ADD521F000E9;
-	Fri, 14 Aug 2026 18:24:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JEq5KU6M"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7BBA1F000E9;
+	Fri, 14 Aug 2026 18:26:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786731883;
-	bh=m1gghI+TDeiW059JYb2+KGqrR0PA5N3lWmxT++HB6Z8=;
+	s=k20260515; t=1786731994;
+	bh=CgfrDtYSv7XSiQrsZBc5JqmKYf95u/1czGarXlJCkhg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=B3xC16AEGuQu4TAKX96OJOZO3H7opkNjCXH2/zMfsHBZRXvjmxPeJ23y8S7pWKDnr
-	 8rN/hTxh4TD8ozwWybnM6tIC+KTLs7aMfLH4NUTHHNwGF6B2650JGQ5TapzqWc89oQ
-	 BGYyE+lyQ7/OXs6rSAQlvt+p3PFC1fJ0/5mDnqfdaCvyA5mxMNIN2JTaNA2sHvbo4S
-	 s0Tpky85PMJR6Amf71MV3f8qDJEcFonEb0HHdtm8P6zCR7P9OmRlL2+bfKzGgB6Ky3
-	 y7FWy8TPs7PbVmtY+Usf5tRz7ra2CbuWiQ/txJgua/UfGkCHiCK638lJnqEboEmIpJ
-	 BNDB0nIqI0mcA==
-Date: Fri, 14 Aug 2026 20:23:02 +0200
-From: Nicolas Schier <nsc@kernel.org>
-To: Jaihind Yadav <jaihindy@qti.qualcomm.com>
-Cc: Kees Cook <kees@kernel.org>, nathan@kernel.org,
-	linux-kbuild@vger.kernel.org, linux-modules@vger.kernel.org,
-	linux-hardening@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] kstack_erase: suppress -grecord-gcc-switches for
- external module builds
-Message-ID: <an9dBpYEIb4GWhAC@levanger>
-Mail-Followup-To: Jaihind Yadav <jaihindy@qti.qualcomm.com>,
-	Kees Cook <kees@kernel.org>, nathan@kernel.org,
-	linux-kbuild@vger.kernel.org, linux-modules@vger.kernel.org,
-	linux-hardening@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260803181217.GB1067866@ax162>
- <20260813082949.1622045-1-jaihindy@qti.qualcomm.com>
- <202608130942.4FFA5AAB9D@keescook>
- <CY5PR02MB8991D4B48F9391D1849B2CFCE2DA2@CY5PR02MB8991.namprd02.prod.outlook.com>
+	b=JEq5KU6MMJBQlMCl5YG3XPNvkI397ajcdFHnneLMtZoi6TFgDkvbm6lN2rJNUDBdF
+	 /RVB0B990cDS7UqjAt/RmPrYDYc18+PIV1TzRnPghaQoRZxQ3+XOmnlO0ddsx5k5uh
+	 lZgsV5PNoakXZNf2u+e+foMImznsvWLkdq/gFEC+72yuohnaWjg6kknGdjt1z2DhMt
+	 cHPugJtnfp4VjX28rqBnrbp/LGgUtNxY40lVD2JHZlkmjHcjHmKj5V4wAo8RCb9+RO
+	 zL2ahAR6vF8yMnl9vPyWUASy1HqBNY/ML2wj/1Nl5u3m1Uztk5FsDTWAC88g0eTGSd
+	 C0dd10UcZHl2g==
+Date: Sat, 15 Aug 2026 02:26:27 +0800
+From: Gao Xiang <xiang@kernel.org>
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Gao Xiang <xiang@kernel.org>,
+	Michael Bommarito <michael.bommarito@gmail.com>,
+	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
+	SJ Park <sj@kernel.org>, Gao Xiang <hsiangkao@linux.alibaba.com>,
+	Yue Hu <zbestahu@gmail.com>, Jeffle Xu <jefflexu@linux.alibaba.com>,
+	Sandeep Dhavale <dhavale@google.com>,
+	Chunhai Guo <guochunhai@vivo.com>, linux-erofs@lists.ozlabs.org,
+	linux-kernel@vger.kernel.org, Chao Yu <chao@kernel.org>,
+	David Hildenbrand <david@redhat.com>,
+	linux-kbuild <linux-kbuild@vger.kernel.org>
+Subject: Re: [PATCH v3] erofs: cap LZMA stream pool size
+Message-ID: <an9d0zxE5J8txxf6@XiangdeMacBook-Pro.local>
+Mail-Followup-To: Guenter Roeck <linux@roeck-us.net>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Gao Xiang <xiang@kernel.org>,
+	Michael Bommarito <michael.bommarito@gmail.com>,
+	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
+	SJ Park <sj@kernel.org>, Gao Xiang <hsiangkao@linux.alibaba.com>,
+	Yue Hu <zbestahu@gmail.com>, Jeffle Xu <jefflexu@linux.alibaba.com>,
+	Sandeep Dhavale <dhavale@google.com>,
+	Chunhai Guo <guochunhai@vivo.com>, linux-erofs@lists.ozlabs.org,
+	linux-kernel@vger.kernel.org, Chao Yu <chao@kernel.org>,
+	David Hildenbrand <david@redhat.com>,
+	linux-kbuild <linux-kbuild@vger.kernel.org>
+References: <20260728065447.91511-1-sj@kernel.org>
+ <CAMuHMdWq1eutRM4u1Q3r50f8W4oSejo_XAgyjEKuwi4Lw6K7jQ@mail.gmail.com>
+ <anBYnPELPotUiNjv@monoceros>
+ <CAMuHMdXUyAX0TV0Sq9_YxvipzkVOBX=4s_r5mVQcZ_7nL=-AQw@mail.gmail.com>
+ <87853c96-cc8f-49e6-81b1-02bfe409e372@roeck-us.net>
+ <CAJJ9bXyC=piPamaGJN=VMA72Ws+WqgJbYZgTj_w6NFzyLa_mMg@mail.gmail.com>
+ <anuyFHLUGDjZWY4K@XiangdeMacBook-Pro.local>
+ <CAMuHMdWQLwgShMK7G-6soiZxtRPYWLizBLRdouwxFUcFXUJM-Q@mail.gmail.com>
+ <anxQ-DohuQvuKwAH@XiangdeMacBook-Pro.local>
+ <5825b5c2-06b3-4358-91b0-d7bf437528a3@roeck-us.net>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CY5PR02MB8991D4B48F9391D1849B2CFCE2DA2@CY5PR02MB8991.namprd02.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5825b5c2-06b3-4358-91b0-d7bf437528a3@roeck-us.net>
 
-[ Please reply interleaved,
-  cp.  Documentation/process/submitting-patches.rst ]
+Hi Guenter,
 
-On Fri, Aug 14, 2026 at 08:27:58AM +0000, Jaihind Yadav wrote:
-> Hi Kees,
+On Wed, Aug 12, 2026 at 07:25:50AM -0700, Guenter Roeck wrote:
+
+...
+
+> > > 
+> > > Thank you, that seems to work (despite still seeing the warning on m68k,
+> > > as NR_CPUS does not exist).
+> > > 
+> > 
+> > ...
+> > 
+> > > 
+> > >        $ make ARCH=m68k allmodconfig
+> > >       fs/erofs/Kconfig:137:warning: range is invalid
+> > > 
+> > >   Warning...
+> > > 
+> > 
+> > Yes, other arches shouldn't have the warning because I think other
+> > arches (including microblaze) defines NR_CPUS in Kconfig, except m68k.
+> > 
 > 
->   That's a fair point.
+> That is not entirely true. openrisc only has it if SMP=y. But it still
+> does not generate the warning for some reason.
 > 
->   In my testing, the issue was observed specifically with the STACKLEAK
->   plugin path being recorded in DWARF producer strings for KBUILD_EXTMOD
->   builds via:
-> 
->     -fplugin=$(objtree)/scripts/gcc-plugins/stackleak_plugin.so
-> 
->   The motivation for this patch was to address that specific issue with
->   the smallest possible change.
-> 
->   I agree the same behavior may apply to other GCC plugins when their
->   -fplugin arguments contain build-specific absolute paths. A more general
->   solution may make sense, but I wasn't sure whether disabling recorded
->   GCC switches more broadly would be desirable from a debugging
->   information perspective.
 
-[...]
-> On Thu, Aug 13, 2026 at 01:59:49PM +0530, Jaihind Yadav wrote:
-> > With CONFIG_GCC_PLUGIN_STACKLEAK=y, kstack erase adds:
-> >
-> >   -fplugin=$(objtree)/scripts/gcc-plugins/stackleak_plugin.so
-> >
-> > For KBUILD_EXTMOD builds, recording gcc switches can embed this 
-> > host/build specific plugin path into module DWARF producer strings, 
-> > which trips QA checks looking for absolute path leakage.
-> 
-> Isn't this a problem for all Linux gcc plugins, though?
-> 
-> -Kees
-> 
-> >
-> > Disable gcc switch recording only for external modules by adding 
-> > -gno-record-gcc-switches to kstack-erase-cflags when KBUILD_EXTMOD is set.
-> >
-> > This keeps stackleak plugin instrumentation enabled while avoiding 
-> > leakage of host-specific paths in external module debug metadata.
-> >
-> > Suggested-by: Nathan Chancellor <nathan@kernel.org>
-> > Link: https://lore.kernel.org/all/20260803181217.GB1067866@ax162/
-> > Signed-off-by: Jaihind Yadav <jaihindy@qti.qualcomm.com>
-> > ---
-> >  scripts/Makefile.kstack_erase | 1 +
-> >  1 file changed, 1 insertion(+)
-> >
-> > diff --git a/scripts/Makefile.kstack_erase b/scripts/Makefile.kstack_erase
-> > index ee7e4ef7b892..6f31a3915d24 100644
-> > --- a/scripts/Makefile.kstack_erase
-> > +++ b/scripts/Makefile.kstack_erase
-> > @@ -5,6 +5,7 @@ kstack-erase-cflags-y += -fplugin=$(objtree)/scripts/gcc-plugins/stackleak_plugi
-> >  kstack-erase-cflags-y += -fplugin-arg-stackleak_plugin-track-min-size=$(CONFIG_KSTACK_ERASE_TRACK_MIN_SIZE)
-> >  kstack-erase-cflags-y += -fplugin-arg-stackleak_plugin-arch=$(SRCARCH)
-> >  kstack-erase-cflags-$(CONFIG_GCC_PLUGIN_STACKLEAK_VERBOSE) += -fplugin-arg-stackleak_plugin-verbose
-> > +kstack-erase-cflags-$(if $(KBUILD_EXTMOD),y) += -gno-record-gcc-switches
+I looked into the documentation a bit
+(https://docs.kernel.org/kbuild/kconfig-language.html), especially the
+following parts:
 
-As -gno-record-gcc-switches is not specific to kstack-erase, I am not
-convinced that CONFIG_GCC_PLUGIN_STACKLEAK is a good switch for it.
-Might it be that someone has CONFIG_GCC_PLUGIN_STACKLEAK enabled but
-wants (some other) gcc switches to be recorded?
+ - type definition: “bool”/”tristate”/”string”/”hex”/”int” ...
+ - input prompt: “prompt” <prompt> [“if” <expr>] ...
+     and "If a prompt is not present, the config option is
+          a non-visible symbol, ..."
 
+ - dependencies: “depends on” <expr> [“if” <expr>] ...
+ - Menu dependencies ..
 
-If there is a need for external kmods to to have 
+and I think that is true, taking openrisc for example:
 
-  make modules KCFLAGS=-gno-record-gcc-switches
+config NR_CPUS
+        int "Maximum number of CPUs (2-32)"
+        range 2 32
+        depends on SMP
+        default "2"
 
-automated in kbuild, I'd rather like to see a new Kconfig symbol for
-that flag (some CONFIG_EXT_MOD_NO_RECORD_GCC_SWITCHES) but a Kconfig
-symbol only for external kmods feels odd to me, too.
+which can be transformed into
 
-HTH.
+config NR_CPUS
+        int
+	prompt "Maximum number of CPUs (2-32)"
+	range 2 32
+	depends on SMP
+        default "2"
 
-Kind regards,
-Nicolas
+which can be then transformed into
+
+config NR_CPUS
+        int
+	prompt "Maximum number of CPUs (2-32)" if SMP
+	range 2 32 if SMP
+        default "2" if SMP
+
+so if `SMP=n`, it's equivalent to
+
+config NR_CPUS
+        int
+
+so NR_CPUS symbol is still there I think (and its value is 0.)
+
+Thanks,
+Gao Xiang
