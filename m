@@ -1,128 +1,134 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6480846DFFC;
-	Fri, 14 Aug 2026 12:49:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86F683546E7;
+	Fri, 14 Aug 2026 18:24:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786711795; cv=none; b=hU72iEsCE8wqqF0hQI4YEBCfHMMLC6DA2sTaAecanYJHDFBvMlKeX7QKxDG72DmkY3rlbhdBvrRr4Xt8c2tRFMLvenn8M5SkGSWiwJLYwqwiSUEnzcOQp82GqmlCGNPI7PiEm7uNOts/UeuVO+IxBvwA/0d4xVt+M/Ngr8QxgrE=
+	t=1786731885; cv=none; b=EWL+ReMFhtUiG/BOPG36XjN98uWYqVWYqqksN6hK0dMkLgx8cclN7iC109R7ISlbI6S5mCHQOJVj4KZlJwM7qt4bg+ao7hhjknGgsoWej8u4MQIQF0HMB8Q4Zm0qx2P701ApFEcaJgR0cpAVsfhxM/X3zxa3W/6gZUx+CuY2F/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786711795; c=relaxed/simple;
-	bh=N6Wm7zvO1O97Kiw/b6HRbmjzTds561mSYObozWbWlp4=;
+	s=arc-20240116; t=1786731885; c=relaxed/simple;
+	bh=vu+zfzNe1WEav0e72HiaOs0RrGg13nrgBqLNFQl29LE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QdtxOcSDzDzXR9ITkjL+s0zwxAQmLpLAE98iIODtqPV9FsLa9jQgjvM6x/VxXT/5k0HJ+4j8ngzNxj6GV5uKL+DKNPQk5XBTpRVB0GSzic3TKGkMJCiYMvuH0c3LSC9UHzeFcTqjgeBbSYUPM/sGuQlZZ0ni7/XaEzRSQ6Br3zQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YWTGi5Q7; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=de5Nx0jlwxf/3G3js62Cb9OBVDW5ae+cFdJdnGSOJT+LqhsLJVV/3dFG8ls/Mm/+UFLtD6/Iff93+Cp5sJvGEPrG+p/i6Od8my88pVOz2I0lFBK750qReOSy0u0QIMEL/gGpvdzqfsXhpSAU7pYEg4/UCmzVhf2ILbkgJ5en8hI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B3xC16AE; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YWTGi5Q7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D80B61F000E9;
-	Fri, 14 Aug 2026 12:49:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B3xC16AE"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id ADD521F000E9;
+	Fri, 14 Aug 2026 18:24:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786711787;
-	bh=/N/HX1GSPPOcqxWY/4dtIRIphxWYu1pio+UkOSgheTs=;
+	s=k20260515; t=1786731883;
+	bh=m1gghI+TDeiW059JYb2+KGqrR0PA5N3lWmxT++HB6Z8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=YWTGi5Q7f/pZmJbmyIgbKJXzr77Dl+/MMrgnXHtQhpdZC8lW4AM2lJ29i/13HYRdd
-	 ZQKimYvkaspsstjrhlp1dq/ocDqT+e9aYeFGesZYVmKzima9JfENh95wImTEFhAOOF
-	 InlnEDgETc0DXUW/G9AqEj8peU3XxtQ8u3hD8h31hatop8+Hh8AjZU393+lWriyc/Z
-	 EVITiCpW6A/dgpEBJrpHeJdXAzSOokK69IItB/oZQJMvMjkSmvkKYCrS9oZWm39vIJ
-	 V0pIfa1+uydAKd2dHEyqaNtmy1/312M8sPv1nFW1nNhSKMxOOlcZBEOhOyutdrHw5Y
-	 mPs6QRNcCyzvA==
-Date: Fri, 14 Aug 2026 14:49:31 +0200
-From: Manivannan Sadhasivam <mani@kernel.org>
-To: Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
-	manivannan.sadhasivam@oss.qualcomm.com, Rob Herring <robh@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jirislaby@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, 
-	Hans de Goede <hansg@kernel.org>, Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>, 
-	Mark Pearson <mpearson-lenovo@squebb.ca>, "Derek J. Clark" <derekjohn.clark@gmail.com>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, Daniel Scally <djrscally@gmail.com>, 
-	Heikki Krogerus <heikki.krogerus@linux.intel.com>, Sakari Ailus <sakari.ailus@linux.intel.com>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
-	Bartosz Golaszewski <brgl@kernel.org>, linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-pm@vger.kernel.org, Stephan Gerhold <stephan.gerhold@linaro.org>, 
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, linux-acpi@vger.kernel.org, 
-	Sui Jingfeng <sui.jingfeng@linux.dev>
-Subject: Re: [PATCH v3 03/14] software node: Implement device_get_match_data
- fwnode callback
-Message-ID: <ks2nm67zp5i2grzomu7mjb7uhkuwtd7w5stoqp5kri2clpxpsp@ayn42h7meh5l>
-References: <20260110-pci-m2-e-v3-0-4faee7d0d5ae@oss.qualcomm.com>
- <20260110-pci-m2-e-v3-3-4faee7d0d5ae@oss.qualcomm.com>
- <aWSpFk9z0zpyKjr6@smile.fi.intel.com>
- <6l3rs5pv6xnrbygpvqrdxqoqtybjyefsltk5bl4336q56rfoza@ejo3sxuufghe>
- <aWSwgRiEkT9unYw9@smile.fi.intel.com>
- <6peb6afhpm4l7opxbdt3b5sx32longevwds5c3dlqji2hr5dlh@kxuvj55jkqgi>
- <ljqd5ovcsg7t62tdzd77w5mv5buawm3x7xyapy7n7l7azcaorh@tytj46t2lxyb>
+	b=B3xC16AEGuQu4TAKX96OJOZO3H7opkNjCXH2/zMfsHBZRXvjmxPeJ23y8S7pWKDnr
+	 8rN/hTxh4TD8ozwWybnM6tIC+KTLs7aMfLH4NUTHHNwGF6B2650JGQ5TapzqWc89oQ
+	 BGYyE+lyQ7/OXs6rSAQlvt+p3PFC1fJ0/5mDnqfdaCvyA5mxMNIN2JTaNA2sHvbo4S
+	 s0Tpky85PMJR6Amf71MV3f8qDJEcFonEb0HHdtm8P6zCR7P9OmRlL2+bfKzGgB6Ky3
+	 y7FWy8TPs7PbVmtY+Usf5tRz7ra2CbuWiQ/txJgua/UfGkCHiCK638lJnqEboEmIpJ
+	 BNDB0nIqI0mcA==
+Date: Fri, 14 Aug 2026 20:23:02 +0200
+From: Nicolas Schier <nsc@kernel.org>
+To: Jaihind Yadav <jaihindy@qti.qualcomm.com>
+Cc: Kees Cook <kees@kernel.org>, nathan@kernel.org,
+	linux-kbuild@vger.kernel.org, linux-modules@vger.kernel.org,
+	linux-hardening@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] kstack_erase: suppress -grecord-gcc-switches for
+ external module builds
+Message-ID: <an9dBpYEIb4GWhAC@levanger>
+Mail-Followup-To: Jaihind Yadav <jaihindy@qti.qualcomm.com>,
+	Kees Cook <kees@kernel.org>, nathan@kernel.org,
+	linux-kbuild@vger.kernel.org, linux-modules@vger.kernel.org,
+	linux-hardening@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260803181217.GB1067866@ax162>
+ <20260813082949.1622045-1-jaihindy@qti.qualcomm.com>
+ <202608130942.4FFA5AAB9D@keescook>
+ <CY5PR02MB8991D4B48F9391D1849B2CFCE2DA2@CY5PR02MB8991.namprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ljqd5ovcsg7t62tdzd77w5mv5buawm3x7xyapy7n7l7azcaorh@tytj46t2lxyb>
+In-Reply-To: <CY5PR02MB8991D4B48F9391D1849B2CFCE2DA2@CY5PR02MB8991.namprd02.prod.outlook.com>
 
-On Mon, Jan 12, 2026 at 10:01:23PM +0530, Manivannan Sadhasivam wrote:
-> On Mon, Jan 12, 2026 at 02:32:21PM +0530, Manivannan Sadhasivam wrote:
-> > On Mon, Jan 12, 2026 at 10:27:45AM +0200, Andy Shevchenko wrote:
-> > > On Mon, Jan 12, 2026 at 01:49:54PM +0530, Manivannan Sadhasivam wrote:
-> > > > + Dmitry Torokhov (who was against this patch previously)
-> > > > 
-> > > > On Mon, Jan 12, 2026 at 09:56:06AM +0200, Andy Shevchenko wrote:
-> > > > > On Sat, Jan 10, 2026 at 12:26:21PM +0530, Manivannan Sadhasivam via B4 Relay wrote:
-> > > > > 
-> > > > > > Because the software node backend of the fwnode API framework lacks an
-> > > > > > implementation for the .device_get_match_data function callback.
-> > > > > 
-> > > > > Maybe this is done on purpose. Have you thought about this aspect?
-> > > > 
-> > > > IMO, software nodes were introduced to add sub-properties to the existing
-> > > > firmware nodes, but it has usecase/potential to go beyond that. More below.
-> > > 
-> > > Potential doesn't mean the necessity.
-> > > 
-> > > > > > This makes it difficult to use(and/or test) a few drivers that originates
-> > > > > > from DT world on the non-DT platform.
-> > > > > 
-> > > > > How difficult? DSA implementation went to the way of taking DT overlay
-> > > > > approach. Why that one can't be applied here?
-> > > > 
-> > > > Sometimes you do not have any DT node at all.
-> > > 
-> > > Yes, that is exactly the case I have referred to. The PCI core (in Linux)
-> > > is able to create DT subtree on non-OF based platforms.
-> > > 
-> > 
-> > Maybe I should look into creating dynamic DT node for the device and insert it
-> > to the uart node. Theoretically it should work.
-> > 
+[ Please reply interleaved,
+  cp.  Documentation/process/submitting-patches.rst ]
+
+On Fri, Aug 14, 2026 at 08:27:58AM +0000, Jaihind Yadav wrote:
+> Hi Kees,
 > 
-> It worked flawlessly. So I sent v4 incorporating this design:
-> https://lore.kernel.org/linux-pci/20260112-pci-m2-e-v4-0-eff84d2c6d26@oss.qualcomm.com/
+>   That's a fair point.
 > 
+>   In my testing, the issue was observed specifically with the STACKLEAK
+>   plugin path being recorded in DWARF producer strings for KBUILD_EXTMOD
+>   builds via:
+> 
+>     -fplugin=$(objtree)/scripts/gcc-plugins/stackleak_plugin.so
+> 
+>   The motivation for this patch was to address that specific issue with
+>   the smallest possible change.
+> 
+>   I agree the same behavior may apply to other GCC plugins when their
+>   -fplugin arguments contain build-specific absolute paths. A more general
+>   solution may make sense, but I wasn't sure whether disabling recorded
+>   GCC switches more broadly would be desirable from a debugging
+>   information perspective.
 
-Andy, I had to revive this old thread of a merged series as Krzk is not in
-favour of adding DT overlay or dynamic OF nodes for these BT devices [1]. His
-objections are due to the fact that we are just adding BT nodes of a
-discoverable device (M.2 PCIe device) without any resources. So the node just
-contains the compatible to match with the serdev driver and nothing else.
+[...]
+> On Thu, Aug 13, 2026 at 01:59:49PM +0530, Jaihind Yadav wrote:
+> > With CONFIG_GCC_PLUGIN_STACKLEAK=y, kstack erase adds:
+> >
+> >   -fplugin=$(objtree)/scripts/gcc-plugins/stackleak_plugin.so
+> >
+> > For KBUILD_EXTMOD builds, recording gcc switches can embed this 
+> > host/build specific plugin path into module DWARF producer strings, 
+> > which trips QA checks looking for absolute path leakage.
+> 
+> Isn't this a problem for all Linux gcc plugins, though?
+> 
+> -Kees
+> 
+> >
+> > Disable gcc switch recording only for external modules by adding 
+> > -gno-record-gcc-switches to kstack-erase-cflags when KBUILD_EXTMOD is set.
+> >
+> > This keeps stackleak plugin instrumentation enabled while avoiding 
+> > leakage of host-specific paths in external module debug metadata.
+> >
+> > Suggested-by: Nathan Chancellor <nathan@kernel.org>
+> > Link: https://lore.kernel.org/all/20260803181217.GB1067866@ax162/
+> > Signed-off-by: Jaihind Yadav <jaihindy@qti.qualcomm.com>
+> > ---
+> >  scripts/Makefile.kstack_erase | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/scripts/Makefile.kstack_erase b/scripts/Makefile.kstack_erase
+> > index ee7e4ef7b892..6f31a3915d24 100644
+> > --- a/scripts/Makefile.kstack_erase
+> > +++ b/scripts/Makefile.kstack_erase
+> > @@ -5,6 +5,7 @@ kstack-erase-cflags-y += -fplugin=$(objtree)/scripts/gcc-plugins/stackleak_plugi
+> >  kstack-erase-cflags-y += -fplugin-arg-stackleak_plugin-track-min-size=$(CONFIG_KSTACK_ERASE_TRACK_MIN_SIZE)
+> >  kstack-erase-cflags-y += -fplugin-arg-stackleak_plugin-arch=$(SRCARCH)
+> >  kstack-erase-cflags-$(CONFIG_GCC_PLUGIN_STACKLEAK_VERBOSE) += -fplugin-arg-stackleak_plugin-verbose
+> > +kstack-erase-cflags-$(if $(KBUILD_EXTMOD),y) += -gno-record-gcc-switches
 
-And he suggested to use swnodes or other similar mechanisms to plug with the
-serdev driver as that's the only thing we want here, not a true hardware
-description.
+As -gno-record-gcc-switches is not specific to kstack-erase, I am not
+convinced that CONFIG_GCC_PLUGIN_STACKLEAK is a good switch for it.
+Might it be that someone has CONFIG_GCC_PLUGIN_STACKLEAK enabled but
+wants (some other) gcc switches to be recorded?
 
-Since you strongly objected the swnode approach in this series, I wanted to hear
-your opinion before I rework the code.
 
-- Mani
+If there is a need for external kmods to to have 
 
-[1] https://lore.kernel.org/linux-pci/768142f0-2638-41f3-a34f-dc80bb99eb7f@kernel.org
+  make modules KCFLAGS=-gno-record-gcc-switches
 
--- 
-மணிவண்ணன் சதாசிவம்
+automated in kbuild, I'd rather like to see a new Kconfig symbol for
+that flag (some CONFIG_EXT_MOD_NO_RECORD_GCC_SWITCHES) but a Kconfig
+symbol only for external kmods feels odd to me, too.
+
+HTH.
+
+Kind regards,
+Nicolas
