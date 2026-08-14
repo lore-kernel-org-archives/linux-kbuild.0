@@ -1,51 +1,50 @@
 Received: from mailgw02.zimbra-vnc.de (mailgw02.zimbra-vnc.de [148.251.102.236])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D73945C709;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C40838D6B8;
 	Fri, 14 Aug 2026 11:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.102.236
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786706885; cv=none; b=QotccvJJle708v91TlvmiIT5uz4QUhySHTWvqEMxHfDBB/o1q8HJ8c55p2wyeNGHI93kyTc2LwDOu2uUeLt4inUofEpuy3LnJ45FemZ3FujOJDXyI3wfglDmZcR9a41tFMHZ+mWT31sNm3i/qwe6veG5ZRK7SuxbskU4npzNMmc=
+	t=1786706885; cv=none; b=gKMsXum7mFczoUduBnRpOkgDRhINvNFsHMxFq+71tjJQl6NbCw+h4dTE2i0+tELi/n6mu6k4euJbEqukWonTa855siajC/p2XgEfC4tkoHxiWCCPJ8OOrC6h0C7IzFhJNZO/MzevuTPMIrkPlOW+MBxS7bt4y9Rkm9eAkpSplAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1786706885; c=relaxed/simple;
-	bh=ZSrdGJ91T6CxixqPYylRRl3s+EYE4henuTN3VS6vJrY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aIqBVEqa8gn/ZilHbKGjAM956OHcK3KBrFXtXqu6HcyQWCYO9xp1sh6huvoY1t7vSOlLkX96gv3EcjxAaAI/hYI4cUxF7TYcH88EUkkJJz750eKelzIRtatuwhmYIZ3lz95fh0HMeu1zLr52blazSMpa9vpK7zhJ4SEd5dw/C6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com; spf=pass smtp.mailfrom=tngtech.com; dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b=I0yyFL7V; arc=none smtp.client-ip=148.251.102.236
+	bh=Qo0Ti5Gp3OxNkMB0l306rDnqCRK/48kSyY9CGWHOYrs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XyrI6rDypN1TvBduppTdyT8nRslCr7ZJ5EejhDZaLWon1bvbXewGsflNhU9381Dve/coJm0CcTsdWpL1HViClO/rmAve69hnEmrL+1H/JuVIrU9FIBWIasYCNAF8EO6b3uXNdZTfFDUBYKhDXw4F6RjFyedBTca4adNGp/jFuCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com; spf=pass smtp.mailfrom=tngtech.com; dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b=llUdXEFF; arc=none smtp.client-ip=148.251.102.236
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tngtech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b="I0yyFL7V"
+	dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b="llUdXEFF"
 Received: from zmproxy.tng.vnc.biz (zimbra-vnc.tngtech.com [35.234.71.156])
-	by mailgw02.zimbra-vnc.de (Postfix) with ESMTPS id D4E0B200C4;
-	Fri, 14 Aug 2026 13:22:24 +0200 (CEST)
+	by mailgw02.zimbra-vnc.de (Postfix) with ESMTPS id 802ED200C1;
+	Fri, 14 Aug 2026 13:22:22 +0200 (CEST)
 Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id A35A81FB67B;
-	Fri, 14 Aug 2026 13:22:24 +0200 (CEST)
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 537121FB67B;
+	Fri, 14 Aug 2026 13:22:22 +0200 (CEST)
 Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
  by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10032)
- with ESMTP id WNkOOA096SIZ; Fri, 14 Aug 2026 13:22:23 +0200 (CEST)
+ with ESMTP id DjeCytI5e7GD; Fri, 14 Aug 2026 13:22:21 +0200 (CEST)
 Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id D0CAE1FB763;
-	Fri, 14 Aug 2026 13:22:23 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz D0CAE1FB763
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 7C2EB1FB763;
+	Fri, 14 Aug 2026 13:22:21 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz 7C2EB1FB763
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tngtech.com;
-	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1786706543;
-	bh=EVnMzX+rhgvXGSFLubHi4UW2nRDtz61k93aQxc8Kbic=;
+	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1786706541;
+	bh=XHmLoz9IiEX22y6m3c7/kXwhrWw1Xq8DoqnRRXFX7XU=;
 	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=I0yyFL7VJGCuDNgOZAoL9j2EbLqQaHJlNXFgBPWBkao0/3/hHOXdIAP9KyEPp645L
-	 KFlL3Y4mQjM/4mMPAmPAK9ZQiev5PCnDwXTq/dyQiqwKu2g3TG15E2slPcDajbpiOG
-	 hIto0ogDx9f7pJV+5TwdIfVyt1CJF3lU8fcfmNwmc8QqvBR3E8jGSywpE3X0+5qPQL
-	 ioowpEhlXIn06hGCTkR1ddgCnIgu5+KDXdeas4tvmREV1/1BluAMLpQLv0c8G2b8SS
-	 7dL2sW0qo9f7b3ILhW+7W7wNGM/g9vNXTNFd+LGFfCwp9b2hnuCPOiaZ92uLNO8njq
-	 VX5T1wrV3SAUw==
+	b=llUdXEFFkPdHnkvPnOwbO72VESxx4fGu0cAH7etlYcLJmX1T3BTSrDXe4QAoDR7Bl
+	 pNtk6f86FXXIstE42Fx8fa5uHcg0OqSNaUgNeqzwBUXnMPvOvICKJCFP1Qk+CwK3pF
+	 d9cegj1++a9NjZ3afvTBqdTNlReKxSHU98B8uokEicQkhU5C9tkoFPdhmWMqbsoNrP
+	 fHR/IiLVSzf0YC+yGEoL4lZMJ44qn2V+QjqDAsmmwXB7v2hlD1k/ZtNmx/nMSbLts+
+	 pabTh0RocOuhi3k18wqUoVvZINKH5nGNWACNbGt6xWLqBVqd5X3q4sqNro3Zjwvi1q
+	 TLlYA6lReul7w==
 X-Virus-Scanned: amavis at zmproxy.tng.vnc.biz
 Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
  by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10026)
- with ESMTP id qjLuq_oFYeVk; Fri, 14 Aug 2026 13:22:23 +0200 (CEST)
+ with ESMTP id YKLl2SpdpOIE; Fri, 14 Aug 2026 13:22:21 +0200 (CEST)
 Received: from luis-Precision-5480.local (fire-karlsruhe-raumfabrik.tngtech.com [213.144.24.146])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id 95D621FB67B;
-	Fri, 14 Aug 2026 13:22:23 +0200 (CEST)
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id 308401FB67B;
+	Fri, 14 Aug 2026 13:22:21 +0200 (CEST)
 From: Luis Augenstein <luis.augenstein@tngtech.com>
 To: nathan@kernel.org,
 	nsc@kernel.org
@@ -56,12 +55,10 @@ Cc: linux-kbuild@vger.kernel.org,
 	kstewart@linuxfoundation.org,
 	maximilian.huber@tngtech.com,
 	Luis Augenstein <luis.augenstein@tngtech.com>
-Subject: [PATCH 1/1] kbuild: record real-prereqs in .cmd files
-Date: Fri, 14 Aug 2026 13:21:34 +0200
-Message-ID: <20260814112134.832243-2-luis.augenstein@tngtech.com>
+Subject: [PATCH 0/1] kbuild: record real-prereqs in .cmd files
+Date: Fri, 14 Aug 2026 13:21:33 +0200
+Message-ID: <20260814112134.832243-1-luis.augenstein@tngtech.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260814112134.832243-1-luis.augenstein@tngtech.com>
-References: <20260814112134.832243-1-luis.augenstein@tngtech.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -70,163 +67,118 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Record $(real-prereqs), the non-phony prerequisites of the target, in a
-new metadata field:
+KernelSbom (scripts/sbom/sbom.py) reconstructs the kernel build graph
+from the .cmd files written by Kbuild. For most build outputs,
+KernelSbom must infer the build inputs from the shell command stored in
+savedcmd_*. This requires command-specific parsers, which add
+unnecessary complexity and are difficult to maintain.
+
+Kbuild already knows these inputs as $(real-prereqs), the non-phony
+prerequisites of the Make rule. This patch records them in .cmd files
+using a new metadata field:
 
     make_prereqs_<target> :=3D <prerequisites>
 
-Write the field from both cmd_and_savecmd and cmd_and_fixdep.
+KernelSbom will be able to read the new field instead of parsing the
+shell command. This submission only records the field, support for using
+it in KernelSbom will follow separately.
 
-Update scripts/make_fit.py to read only savedcmd_* instead of parsing the
-complete .cmd file.
+The issue of manually parsing shell commands was originally mentioned in
+https://lore.kernel.org/r/a01233b9-23a2-4666-91ed-f1cf030dcb9f@tngtech.co=
+m.
+This patch is a proposal to address that.
 
-Ignore make_prereqs_* in KernelSbom.
+Cmd writers and consumers
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-Link: https://lore.kernel.org/r/a01233b9-23a2-4666-91ed-f1cf030dcb9f@tngt=
-ech.com
-Assisted-by: Cursor:GPT-5.6 Sol
-Co-developed-by: Maximilian Huber <maximilian.huber@tngtech.com>
-Signed-off-by: Maximilian Huber <maximilian.huber@tngtech.com>
-Signed-off-by: Luis Augenstein <luis.augenstein@tngtech.com>
----
+The new field should not affect existing behavior.=20
+Below is a summary of what I checked.
+
+.cmd files are primarily written by cmd_and_savecmd and cmd_and_fixdep.
+This patch extends both writers to add make_prereqs_*.
+
+The following rules append information to existing .cmd files.
+None of these is affected by the new field:
+
+- scripts/Makefile.lib: cmd_gen_objtooldep only appends new rule
+  target: $(wildcard ./tools/objtool/objtool)
+- scripts/Makefile.build: gen_symversions only appends comments
+  #SYMVER <name> <crc>
+- scripts/Makefile.lib: cmd_save_c_flags only appends a variable
+  saved_c_flags_<target> :=3D <flags>
+- rust/Makefile: cmd_gendwarfksyms only appends comments
+  #SYMVER <name> <crc>
+- kernel/Makefile: kheaders_data_dep appends a deps_* block
+  deps_<target> :=3D <headers>.
+
+This patch updates the following .cmd file consumers to account for the
+new field:
+
+- scripts/sbom/sbom/cmd_graph/cmd_file.py: CmdFile.create() parses
+  savedcmd_<target>, source_<target>, and deps_<target>. It is updated
+  to ignore make_prereqs_<target> for now. Parsing the new field will
+  follow in a separate patch.
+- scripts/make_fit.py: process_dtb() previously read and split the
+  complete .cmd file to find the fdtoverlay command. It is changed to
+  read only savedcmd_<target>.
+
+The remaining consumers are not affected:
+
+- Kbuild Makefiles: -include reads .cmd files as Makefile fragments. The
+  new field is an ordinary variable assignment not used in any dependency
+  rule.
+- scripts/Makefile.thinlto: the saved_c_flags_* lookup only reads
+  saved_c_flags_<target> :=3D <flags>.
+- scripts/mod/modpost.c: extract_crcs_for_object() only reads comments
+  #SYMVER <name> <crc>.
+- scripts/mod/sumversion.c: parse_source_files() only reads
+  source_<target> :=3D <source> and deps_<target> :=3D <dependencies>.
+- scripts/clang-tools/gen_compile_commands.py: main() only reads the
+  first line containing savedcmd_<target> :=3D <command>.
+- scripts/generate_builtin_ranges.awk and
+  scripts/verify_builtin_ranges.awk: get_module_info() only reads the
+  first line and searches the saved command for DKBUILD_MODFILE or
+  RUST_MODFILE.
+
+Alternative: extending the deps_* field
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+An alternative to the new make_prereqs_* field is to merge $(real-prereqs=
+)
+into the existing deps_* field for both cmd_and_savecmd and cmd_and_fixde=
+p.
+This would avoid a new field and provide one dependency list. However, it
+would broaden the meaning of deps_* from dependencies discovered through
+generated .d files to include prerequisites already declared to Make.
+This increases the risk of undesired side effects.
+
+The writers listed above would need to ensure that each .cmd file
+contains only one deps_* block. In particular, kheaders_data_dep would
+need to merge its header dependencies into the block written by
+cmd_and_savecmd instead of appending a second deps_* block.
+cmd_and_fixdep, or fixdep.c depending on the implementation, would
+likewise need to merge $(real-prereqs) with the generated dependencies.
+
+Apart from KernelSbom, scripts/mod/sumversion.c is the only consumer
+that explicitly reads deps_*. It uses selected dependency files to
+calculate a module's srcversion. Extending deps_* could change this
+module metadata. Such an unrelated change should probably be avoided.
+
+Kbuild Makefiles also consume deps_* by including .cmd files. This
+should not be an issue though, because $(real-prereqs) are already
+present on the original target rule, so repeating them through deps_*
+should not change rebuild behavior.
+
+Luis Augenstein (1):
+  kbuild: record real-prereqs in .cmd files
+
  scripts/Kbuild.include                  |  9 +++++++--
  scripts/basic/fixdep.c                  | 16 ++++++++++------
  scripts/make_fit.py                     |  2 +-
  scripts/sbom/sbom/cmd_graph/cmd_file.py |  4 ++++
  4 files changed, 22 insertions(+), 9 deletions(-)
 
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 8c311b997e2..6daa244ba0e 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -181,6 +181,9 @@ endif
- # (needed for the shell)
- make-cmd =3D $(call escsq,$(subst $(pound),$$(pound),$(subst $$,$$$$,$(c=
-md_$(1)))))
-=20
-+# prerequisites to record in .cmd files, excluding those covered in deps=
-_*
-+cmd-prereqs =3D $(call escsq,$(filter-out $(deps_$@), $(real-prereqs)))
-+
- # Find any prerequisites that are newer than target or that do not exist=
-.
- # PHONY targets skipped in both cases.
- # If there is no prerequisite other than phony targets, $(newer-prereqs)=
- becomes
-@@ -198,14 +201,16 @@ if_changed =3D $(if $(if-changed-cond),$(cmd_and_sa=
-vecmd),@:)
-=20
- cmd_and_savecmd =3D                                                     =
-       \
- 	$(cmd);                                                              \
--	printf '%s\n' 'savedcmd_$@ :=3D $(make-cmd)' > $(dot-target).cmd
-+	printf '%s\n\n%s\n' 'savedcmd_$@ :=3D $(make-cmd)'                    \
-+		'make_prereqs_$@ :=3D $(cmd-prereqs)' > $(dot-target).cmd
-=20
- # Execute the command and also postprocess generated .d dependencies fil=
-e.
- if_changed_dep =3D $(if $(if-changed-cond),$(cmd_and_fixdep),@:)
-=20
- cmd_and_fixdep =3D                                                      =
-       \
- 	$(cmd);                                                              \
--	$(objtree)/scripts/basic/fixdep $(depfile) $@ '$(make-cmd)' > $(dot-tar=
-get).cmd;\
-+	$(objtree)/scripts/basic/fixdep $(depfile) $@ '$(make-cmd)'          \
-+		'$(cmd-prereqs)' > $(dot-target).cmd;                        \
- 	rm -f $(depfile)
-=20
- # Usage: $(call if_changed_rule,foo)
-diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-index cdd5da7e009..03831a6f8f7 100644
---- a/scripts/basic/fixdep.c
-+++ b/scripts/basic/fixdep.c
-@@ -62,15 +62,17 @@
-  *
-  * It is invoked as
-  *
-- *   fixdep <depfile> <target> <cmdline>
-+ *   fixdep <depfile> <target> <cmdline> <prereqs>
-  *
-  * and will read the dependency file <depfile>
-  *
-  * The transformed dependency snipped is written to stdout.
-  *
-- * It first generates a line
-+ * It first generates the lines
-  *
-- *   savedcmd_<target> =3D <cmdline>
-+ *   savedcmd_<target> :=3D <cmdline>
-+ *
-+ *   make_prereqs_<target> :=3D <prereqs>
-  *
-  * and then basically copies the .<target>.d file to stdout, in the
-  * process filtering out the dependency on autoconf.h and adding
-@@ -103,7 +105,7 @@
-=20
- static void usage(void)
- {
--	fprintf(stderr, "Usage: fixdep <depfile> <target> <cmdline>\n");
-+	fprintf(stderr, "Usage: fixdep <depfile> <target> <cmdline> <prereqs>\n=
-");
- 	exit(1);
- }
-=20
-@@ -409,17 +411,19 @@ static void parse_dep_file(char *p, const char *tar=
-get)
-=20
- int main(int argc, char *argv[])
- {
--	const char *depfile, *target, *cmdline;
-+	const char *depfile, *target, *cmdline, *prereqs;
- 	void *buf;
-=20
--	if (argc !=3D 4)
-+	if (argc !=3D 5)
- 		usage();
-=20
- 	depfile =3D argv[1];
- 	target =3D argv[2];
- 	cmdline =3D argv[3];
-+	prereqs =3D argv[4];
-=20
- 	printf("savedcmd_%s :=3D %s\n\n", target, cmdline);
-+	printf("make_prereqs_%s :=3D %s\n\n", target, prereqs);
-=20
- 	buf =3D read_file(depfile);
- 	parse_dep_file(buf, target);
-diff --git a/scripts/make_fit.py b/scripts/make_fit.py
-index 15ba26974fd..346e8a7ec12 100755
---- a/scripts/make_fit.py
-+++ b/scripts/make_fit.py
-@@ -288,7 +288,7 @@ def process_dtb(fname, args):
-         path, basename =3D os.path.split(fname)
-         cmd_fname =3D os.path.join(path, f'.{basename}.cmd')
-         with open(cmd_fname, 'r', encoding=3D'ascii') as inf:
--            cmd =3D inf.read()
-+            cmd =3D inf.readline()
-=20
-         if 'scripts/dtc/fdtoverlay' in cmd:
-             # This depends on the structure of the composite DTB command
-diff --git a/scripts/sbom/sbom/cmd_graph/cmd_file.py b/scripts/sbom/sbom/=
-cmd_graph/cmd_file.py
-index dcd63e284a3..08819b4d117 100644
---- a/scripts/sbom/sbom/cmd_graph/cmd_file.py
-+++ b/scripts/sbom/sbom/cmd_graph/cmd_file.py
-@@ -50,6 +50,10 @@ class CmdFile:
-         with open(cmd_file_path, "rt", encoding=3D"utf-8") as f:
-             lines =3D [line.strip() for line in f.readlines() if line.st=
-rip() !=3D "" and not line.startswith("#")]
-=20
-+        # make_prereqs_* is recorded for future use. Ignore it for now t=
-o
-+        # preserve the existing parser behavior.
-+        lines =3D [line for line in lines if not line.startswith("make_p=
-rereqs_")]
-+
-         # savedcmd
-         match =3D SAVEDCMD_PATTERN.match(lines[0] if lines else "")
-         if match is None:
 --=20
 2.43.0
 
