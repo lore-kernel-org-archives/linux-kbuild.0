@@ -1,269 +1,239 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02A5845000;
-	Sat, 15 Aug 2026 19:15:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786821347; cv=none; b=Zw35Y29MgQn3ocB7evaGW6M3Cx/hcIHEIfWak1oZyBHhhno5fih6BKDKyAi9Xi9xNXCXuvK6WkWEpvDRJowUrewyKpmrA3qs4dlz4Q+O20ZCQimotEsmztoukHHTBAXIOdtw8Z2MC7L0kIYW7CW4mBNGASZUmdp3niBt3Vvjv5Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786821347; c=relaxed/simple;
-	bh=Ri9an3elSKgP/MLKFimIITL23yBLMVAshQS5rKkn9WM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=Ryi7nt8wuacV8d+rIKEPXC1UbU48IS/YgsF2hpvRirLeBzMcmwfUT60nPDLH8q664uFvla3D8+/zbbywxvryh5J3B8uGeWS0pZ5DymJFLxILIpTClN+GjxehXnrSubqKOLya7i2kHOB9ETLlWr1WIwNFvMGByI58NJydxoV+6U8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E8wgdkLz; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17EBD189B84;
+	Sun, 16 Aug 2026 08:11:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.180.131
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786867870; cv=fail; b=PuODSINmbS2QdjKbLisb6BCJCxbIdtXQ3HXzdlKzpJFpE32V9A/EiOt0QSzzOg996PPNedQ2w9Kzd59xpiytiyJW2bN0VfMUCPh5yFz7AFK/qN9GrKvkOkas27i6xEGarW28pJgigmWYtBfz5grhZWP1MciactUht6DIWd4qshU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786867870; c=relaxed/simple;
+	bh=2P03EjtSbn09yculyIYTp3SK09nrFqoitpkfx9hq9A4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=hynRqOfwzQzfI/Ut4hFapLb5Khz1fixBKZaYKaEVM4L3CupsHOA6lVmf6hp5p7luQcWEDD4o8nF8TEfVaq3368uyccZBFhN06OZ4vK47Znta41fPUYuQnqICqaI9spEtjBjx2MJ2gNrM8feecu8HOPlstcBACWg+8sStTD4kcR4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=qti.qualcomm.com; spf=pass smtp.mailfrom=qti.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=bWTqG+MV; arc=fail smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=qti.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qti.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E8wgdkLz"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 22B101F000E9;
-	Sat, 15 Aug 2026 19:15:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786821345;
-	bh=M0ivvrBMFLkRgM77e4Uue97QeXb55ofiKiyUxo04XLo=;
-	h=Date:From:To:Cc:Subject;
-	b=E8wgdkLz4F9e3UFZ7ZROKXn2PpVmVc8ZSfXnw1vdpbdE1m8q0ltxB7JyP9biAvLB7
-	 fJKV9ul+kv2Dktwq6eUntagTKxnVknSbh13fBwZ0Giy93bY1maj3kxI7iGV63r2Tf6
-	 YdkDh83B/GdFA04Zfd8aP4JrVqqVncxQ1JeGUmMnMzMLCXY76WmnqNl64QJOX0hUd1
-	 OpqLdcdDD0BUjnVULtrHieDiE/57s3hxOQJS5te+x5ctjBX72guu1/hPImTtx0GNQ1
-	 dRfi43cxHrL5avsigNn1NKJPMS5GtXUm/SdQOWy/5662EqPz9ka2hcbtDSqCu01DKm
-	 nkfZ9z9uyROIw==
-Date: Sat, 15 Aug 2026 21:15:38 +0200
-From: Nicolas Schier <nsc@kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-	=?iso-8859-1?Q?Andr=E9?= Draszik <andre.draszik@linaro.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Ben Dooks <ben.dooks@codethink.co.uk>,
-	Bhaskar Chowdhury <unixbhaskar@gmail.com>,
-	Breno Leitao <leitao@debian.org>, Elsie Heck <its@elc.moe>,
-	Gustavo Luiz Duarte <gustavold@gmail.com>,
-	Jani Nikula <jani.nikula@intel.com>,
-	Julian Braha <julianbraha@gmail.com>,
-	"Maciej W. Rozycki" <macro@orcam.me.uk>,
-	Martin Weiss <Martin.weiss2410@gmail.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Huang <sef1548@gmail.com>, Nicolas Schier <n.schier@fritz.com>,
-	Nicolas Schier <nsc@kernel.org>,
-	Peter Collingbourne <pcc@google.com>,
-	Petr Pavlu <petr.pavlu@suse.com>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Robertus Diawan Chris <robertusdchris@gmail.com>,
-	Rong Zhang <i@rong.moe>, Sergei Litvin <litvindev@gmail.com>,
-	Simon Glass <sjg@chromium.org>, Thomas Huth <thuth@redhat.com>,
-	Xi Ruoyao <xry111@xry111.site>, Yuntao Wang <yuntao.wang@linux.dev>
-Subject: [GIT PULL] Kbuild and Kconfig updates for 7.3
-Message-ID: <aoC62sXUrC5okGsd@levanger>
-Mail-Followup-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-	=?iso-8859-1?Q?Andr=E9?= Draszik <andre.draszik@linaro.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Ben Dooks <ben.dooks@codethink.co.uk>,
-	Bhaskar Chowdhury <unixbhaskar@gmail.com>,
-	Breno Leitao <leitao@debian.org>, Elsie Heck <its@elc.moe>,
-	Gustavo Luiz Duarte <gustavold@gmail.com>,
-	Jani Nikula <jani.nikula@intel.com>,
-	Julian Braha <julianbraha@gmail.com>,
-	"Maciej W. Rozycki" <macro@orcam.me.uk>,
-	Martin Weiss <Martin.weiss2410@gmail.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Huang <sef1548@gmail.com>,
-	Peter Collingbourne <pcc@google.com>,
-	Petr Pavlu <petr.pavlu@suse.com>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Robertus Diawan Chris <robertusdchris@gmail.com>,
-	Rong Zhang <i@rong.moe>, Sergei Litvin <litvindev@gmail.com>,
-	Simon Glass <sjg@chromium.org>, Thomas Huth <thuth@redhat.com>,
-	Xi Ruoyao <xry111@xry111.site>, Yuntao Wang <yuntao.wang@linux.dev>
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="bWTqG+MV"
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67G72Dcs2810821;
+	Sun, 16 Aug 2026 08:11:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	Iz7+1tFKHy/NoRcd7G64NWzdIrZdXAj9ft1xfk3K69I=; b=bWTqG+MVXm50JD2Y
+	zi8uxykdxI6Xh9BKTngvaGkmPbBM3pImTXQ/4knG2o/Yi08Yh24Dc9orC0gxlq0M
+	hRbCV+jvKoiHh1TSttZ2NSPDKkmdqWA9ox8VjT63z2DETIeEgdJfnkusfX/GEOml
+	/ld8JrRweqw306uy8ameSHsdAaMm2EfPjDX0fCLNd0ZZp/KLM2qLWk8oHx1ox2AP
+	uHivRgHkGshByavJppYKqGi7lHr5QZHqQhlawvWOemnHgfSVCL/8tBI1vw/wp8QK
+	MzG68W6WJ9fTHZrGwaBk+pSRWYeRqU5Nf/m7j4tiuIe8s3txOYaghxlagm1hzPBe
+	unVqcQ==
+Received: from ds2pr08cu001.outbound.protection.outlook.com (mail-ds2pr08cu00102.outbound.protection.outlook.com [40.93.13.50])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4g2ghek40g-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Sun, 16 Aug 2026 08:11:05 +0000 (GMT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=BrcSXbIkb+/vKM8HbmFom6WO1XSYDF7ekTAz7X6G/9df68DJcTDtMrfuqBlvLKUv25x4SijTIGgUPwxHKFGmtmcKTdLiasUBnc2JbfhiT0lGY8b+R9k+rCsP6434EDTZVw40D37fMBvjDoizhuVq9Z9ND6Rps3tKpOSrbRUcys6ggWHVP2GxsNEXVSS+XRGhUxFJi02/MIBEAGCP52cJiiP5q3sG3C39Ob/iy3k3kPvXc3d0oIJs32ddRGn9iUtAyZo2RzQ6t+hUfHxR2q6aE/G3Ut/uM7EcqdixDSsGiMdxqBp1t9Evby6JAz49FchAVUQGwF0PRfWCHF61e/GTnw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Iz7+1tFKHy/NoRcd7G64NWzdIrZdXAj9ft1xfk3K69I=;
+ b=UkMDUyKB97GZgwzQpLJ8U52O/3o5yZBW/DBFkgGIfSg8oEPjsk1NrHoqCvujIkIDe/7HRqbSQ7oXTgKqWJOnj8+DugxdbCz8akwuP8lf6vmabH07iboy9ua8gs8kSkDu2sA4aCAUnGxXflohdFhBry3A2R47uEDN3YOKLrGDFNqbQ2jUOmUCU8gj1U0FZ6RnGdUvGe3d+jjOHrYPO368FCvkCZFRwnwXjquq6KPveXJchup+04XZpHx2LbtY6DjLtWFXHSsAIEwKzhUSN9nduRJqa0yqRPrN86u9BTIKJY4OCy1ezMkDIuFMFr5BRD0mBSIqR4gyae4jtz+oIirCWQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=qti.qualcomm.com; dmarc=pass action=none
+ header.from=qti.qualcomm.com; dkim=pass header.d=qti.qualcomm.com; arc=none
+Received: from CY5PR02MB8991.namprd02.prod.outlook.com (2603:10b6:930:38::17)
+ by CYYPR02MB9886.namprd02.prod.outlook.com (2603:10b6:930:c9::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.315.17; Sun, 16 Aug
+ 2026 08:11:02 +0000
+Received: from CY5PR02MB8991.namprd02.prod.outlook.com
+ ([fe80::6c24:88a6:606f:d52]) by CY5PR02MB8991.namprd02.prod.outlook.com
+ ([fe80::6c24:88a6:606f:d52%4]) with mapi id 15.21.0315.016; Sun, 16 Aug 2026
+ 08:11:01 +0000
+From: Jaihind Yadav <jaihindy@qti.qualcomm.com>
+To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
+CC: Kees Cook <kees@kernel.org>,
+        "linux-kbuild@vger.kernel.org"
+	<linux-kbuild@vger.kernel.org>,
+        "linux-modules@vger.kernel.org"
+	<linux-modules@vger.kernel.org>,
+        "linux-hardening@vger.kernel.org"
+	<linux-hardening@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v2] kstack_erase: suppress -grecord-gcc-switches for
+ external module builds
+Thread-Topic: [PATCH v2] kstack_erase: suppress -grecord-gcc-switches for
+ external module builds
+Thread-Index: AQHdKv35rL7DoRisNUSDvIbYNgWT5LacL4gAgAEHwHCAAKaeAIAASWwAgAIwE1A=
+Date: Sun, 16 Aug 2026 08:11:01 +0000
+Message-ID:
+ <CY5PR02MB8991C91E71C153EEF452972FE2D82@CY5PR02MB8991.namprd02.prod.outlook.com>
+References: <20260803181217.GB1067866@ax162>
+ <20260813082949.1622045-1-jaihindy@qti.qualcomm.com>
+ <202608130942.4FFA5AAB9D@keescook>
+ <CY5PR02MB8991D4B48F9391D1849B2CFCE2DA2@CY5PR02MB8991.namprd02.prod.outlook.com>
+ <an9dBpYEIb4GWhAC@levanger> <20260814224550.GA3553101@ax162>
+In-Reply-To: <20260814224550.GA3553101@ax162>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CY5PR02MB8991:EE_|CYYPR02MB9886:EE_
+x-ms-office365-filtering-correlation-id: e80193b5-6c7a-4857-c1fe-08defb6de8ea
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|1800799024|366016|23010399003|38070700021|6133799003|10067099003|56012099006|4143699003|11063799006|18002099003|22082099003;
+x-microsoft-antispam-message-info:
+ QClgWqW6ojpZIdzfzIs0FElqwKBs06MvQM7rQNtWn8HIHzxhfPSBLpdNRm3unXPpa2jcwkTQgz1m1UUO8soW6P66agoSuymA5fr1fDkNeuk6Jjb41snFRrzxZgOEY5l27Ch5v80rU5ubMP1ECwHIbHFOKNNIdqFmY+BK7w2h9yv+gXXUVDZf1rx2x02yDN4hmbimkGM3O4D71/+Kxv7p+thAGiMlzDo8ZqxtorD/dTfo2azKwACV0BHqrv8LWu36nDdRXlwK4Bod7Vs1MRDDW7BEPdPcoVJgYGzavHHZ9GCLSIdDPky5PmFjlVqO9vwUekzFieFV8GFH+M7b1wwX4h5m2uJ4FOLiuyr8flA5MM6uJQmOa2kkvj3hXuKkr2NPDrwtgGYPteCsSCQocZBatUK91/Jbon6EAsHWAxXOWDGMQM0ZQgNOhdyTLVjHkjWeUSie0A8VRZzHPFobcYHIXHhjH1hRTU5AGIqzPPZTQQwcs7xdEmk2JhoIsRVt4AMY5oJvCkelnJ6H10kE2txXPFD4HPI8FckM0rlMVAC38ojeCjPWknlKpWqebPlOEFbVn/1zioCGF1wFNlqC7Jn2yaNfnEtAwLjPwUgDiEPHlzmwITf9vAy3FLJnxLkK1VR9H+VXHLokVLG70dq6LqOBy5pZtM02Nrv5TObUIZ0nNAqLx07udUb0/ZU4eBVFTLDwmwcBCiFubHdD0N2dEW9aj4aULSja3aYItQZAB8LQ2ng=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR02MB8991.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(23010399003)(38070700021)(6133799003)(10067099003)(56012099006)(4143699003)(11063799006)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?m1L+HwaqFUAUa5AAkp1Tq2KXna1VMEkdFU5EWD8N9eMru1eVcatU2R29jrJK?=
+ =?us-ascii?Q?ecYjPNjWnZd3UjPE1gJ7+LoYp6ClvqWYiZNobsHJqnBk0psfKUakY08Xwdbe?=
+ =?us-ascii?Q?eYkQzCTMWd891CxEtXpW3TubOWi+W10or+iAXj2mrq2SUyGexWP/enZBDBbb?=
+ =?us-ascii?Q?Dov/kMaz0uqK/MDExwwWDRhq6ucCjrbMzjJZlV68KgXrWuuR8uyNXFYZCFei?=
+ =?us-ascii?Q?YBrIYZh6zZav7DjulCUeXwILTIq77JtRv/n7pS6ngFlyEjqkiGJ/lMlxuwpP?=
+ =?us-ascii?Q?tIKPi36mLqynl9oKUDqwCmMXGTFC3B0YY9igmM/Li1Ae5vgyRv25HP+lOfKE?=
+ =?us-ascii?Q?ekINuiu/WloxXDPUyVGANHqfR50zGkZ26y9FXieaZKFOGVHcrDGj7PSnIbFr?=
+ =?us-ascii?Q?ZFzmYEbihvx7fPYLG6cY+XFyOAZyBTPsvKldEACKH6PpriyBYiaCY8QvdZ8e?=
+ =?us-ascii?Q?9sTtFGLl0OpP/xJP8GPQ6Of9BnUojBWsV42eyToA+4slT2lVH/XkXi1yCT9m?=
+ =?us-ascii?Q?EKXlQG535+JCwFGWuaOljTKG42g79JsJmLv6y9MWZ8M6KLPnuqovJxE12sZN?=
+ =?us-ascii?Q?D/AYHeAYO/jS5HNwJdtLDbVKyrjHeD23e1DV/biWy3mLYmc6EcYKsI5kbRf2?=
+ =?us-ascii?Q?JMiSomc6C/53+610Ws1z6ZZlam+kN92dtOn6ZK4waoHur1Yju7PRE1oeLZ27?=
+ =?us-ascii?Q?ciXMGfTNyOpK0dVnQ1xEYzmmZXFDAwcD0OVfrQf5ebQwpHiytgQFOj2na+5x?=
+ =?us-ascii?Q?d5KvBb3nJ2T4fwS9HHPlAwoQKGsM6kOoDZ6ase6c+gZ71NCPRxzjhaOYVZad?=
+ =?us-ascii?Q?bklWAY/ATDP+jcwhc++LYHju40d6okVjjCpISRm4pC+qQaz+9k3Fp3mjYVll?=
+ =?us-ascii?Q?8UFq49dqbSsq/ZeYLYWHkSZUSr0kIqr4UVjgU95SnAB/HoVzjKp7C5bXo11f?=
+ =?us-ascii?Q?dyPsXFjRbC9xeidrxr17OC36AGBawDDyseeIY5nR/GiStqhiT9Cc6/f3cH26?=
+ =?us-ascii?Q?futJVaKqwkA4LcwqFIiF2ix1+EmtuQ/pvCFgVRbKLPvVaJ4PbIRD/VI5Mbq3?=
+ =?us-ascii?Q?PDN5/cUVnmBkgSAJfCicBypMo4Fsu7moNYdRtsFk8dCqdgQoZI56NX7wkk9h?=
+ =?us-ascii?Q?UdWHVFe7sMou36TknxjS5d8kJXMp/J6RlpY9/U2g88Smg6pbdsgdGdeVFgMN?=
+ =?us-ascii?Q?uKr1PvpCdPOW7yLhL0i6DxtFJoDrXUTTikun40iKEyrAJbkhHfGChLVZV3SL?=
+ =?us-ascii?Q?Z36RYqp0sZNg7niEkDsOaTJZEkJeQpxNdW13+DLu5385A1htaPqxWybL2SWv?=
+ =?us-ascii?Q?MUGTekC0vmUeK5XR3nV/1H7UqlJwc3gx5x/+KyDac4/uTQ2ijpg4z+LY/xVm?=
+ =?us-ascii?Q?Gf+n3RWpoPc6Cc7STDwZtrFiGe/SHx4KqZ8+s+QHW7FaH1Oc55bTVBe38/YT?=
+ =?us-ascii?Q?cgyE8Heq/8ultqS2IOfK68oV4B5yNxqqmT4oJJplwQ8shDt9VpSAprTc7UxK?=
+ =?us-ascii?Q?I+9hvpRJ1QgtBO9FoDGUAbghMxixVlp4nd3nuC9Nl4kS96lkQ4ZzCyQJX93G?=
+ =?us-ascii?Q?YQAdgZ5Lhv3qHLzRq64TCU6vzryqnbIIUfUxOz5GgWUDgRdjZjUuMZrOp6bz?=
+ =?us-ascii?Q?90EfGKTBEhFURkp2dZnLrcJ8DD3yXPTB1IRdn/EYLCOB8NYfkzBBT2j1dD41?=
+ =?us-ascii?Q?SeXrHQb2D6ijq3ySjDBtq/Qr4GMw3PCfaTUSQuljlvlOYIYTKhGa/MDD7r/J?=
+ =?us-ascii?Q?ig0V+yMDXg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="frAejL4U7TYiDwWt"
-Content-Disposition: inline
+X-Exchange-RoutingPolicyChecked:
+	qPnEp0UhUBjS2pOklh4ILJrNSWt9ZYC/9Q9hx+8ePVnFw8A+MoPzSGI+kS7tHbBtLRzVWmjY5bhUqrTExWxZHW0AT9rfOTyUSHz1tnX1Du3Ey7HW1rLXewLMo3rZCA+iokfcZSaiVEiJaOhFGweAT8vXalifhy4IZpWDrZaBMoeKIfgMnvp+gmnMfWqxUiSD0JdgPipIdLNKMvjmdTNdO33qZbIgI4eTpfDzDKtqMCbGDhAIKw0rGUvfl4QeyXhfV1i2QQ/L4VeFQd7VRJ3ud65ucfj7GpufDn4g3a1Ux9Wrk7XFH0VD8WdDdvxcf2h2s5b16ul3RS8tWecClxiGVg==
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	Hcu7RCpuwjdXvCcNN2KlU/zzcoWOiptHYadaaq48h1csca4/zexpyAI+Oz/IG6juj33VUbmSxT+KQbvFuqjxkkHdsP9xk8wiWjVIULP8TrhdlnFfN7UOwx0RR5DS67U5Pb4gn55sTcTK0ZUEveQzt9PoJdw3obwaURrIPcE5mGfisCbYMzDSoNEyozRxQSTKSYajuR0mcEciwSDnf7/dOSo9ZSdWZbNdMDFmHM7Tmg2W0QZXhS6zOxCEawKFTnseRx9BNBEvcAzVNso01/T2z4B0kOWsHRKfyr1rEvuKQnX0gRegzo6bzibqVdOUei8xLy/fjSFtUYLvs5ud102ScIRov6cZT7L95gCGosmotwAJpKXjkYIK9BIud0jL9Wd44QmTSVGSZXI9v6YhTaL9dL/2XJCYHhqPwmvgUTT89/QQVttFKafpVHSSx5QICq8G2ZHD6Pw6pqqvdycj1l40Q+445rU7kLsA5yL8Qnr1peaJ5g4r3zZeJdyYK5zFensO9lHvd7ES/qdEUCTQB8Hw48HnRyGOSVwz5p8iZzZSnWkqAlXAKeldh/f6LQAeRpLTpbGZ5Bmb0XWpzNphmiDSq6xqAqQVmm4jlQC1fKd8MH31vbzY9sUDIg/+KKeVbYmV
+X-OriginatorOrg: qti.qualcomm.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR02MB8991.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e80193b5-6c7a-4857-c1fe-08defb6de8ea
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Aug 2026 08:11:01.0544
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: J/jZ/lnEf/GxuPhYcx48A9olxcTz7NNFOkYBzjKUrDfb8QMW1PPx6Q8YEYMG1TxWjU5tTuDEPPsKNhKCfv8SaKHoh1+x4gInN4N/7eklhOo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR02MB9886
+X-Authority-Analysis: v=2.4 cv=EKc2FVZC c=1 sm=1 tr=0 ts=6a817099 cx=c_pps
+ a=ITiX5wGoaVWtfJBAqtKqhw==:117 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
+ a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
+ a=gowsoOTTUOVcmtlkKump:22 a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8
+ a=Z8vxkzJkRz7waHGfg2oA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODE2MDA1OCBTYWx0ZWRfX8Hs82jqRTPZa
+ TGuCjdy6Aj8CxY9RtOhrXAzv6MOKmUQQ3sMnzuQ5LSdGuHM/CZforOkjaAFUTOkMQfDHGY03KGW
+ nJMyEVQo9T1pqDJ0cx8sFj0n4oTp/tY=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODE2MDA1OCBTYWx0ZWRfXy1MMPEn/6Tk/
+ 6afRmiK9Bad54TfVrAUmhoSeuP+Y7pVUDl9XDCc3xGUWEJ3f9VGmp+GCtd2Px4DdHcmaeW9BILW
+ ZcW4dWPIf4qHgMO1Gf8mSvbigDlZBtbZdzMk3cALWiNJ1PzJ2ZwY/5iR+J88XI5JKRuPqw76Qto
+ vJIY1jJrCxY6jRp2owWHtNy1qlKow5ztxdYF9uDjPBZR1NFG2lVoV683Rxq04s3lgnv1Xc7S9u1
+ OHryKOQuQiRVflD97bapzkAaBjExRSPRwfgw75vlpFlfSRWfPW883rGrQT6/Uu5k+fmy+ckoS7d
+ eO3ev+aiiCiK8HtJXR+TUwULuSnVSvO+X+97cfYRKAkksMx0NbEKD8h5lXFE81IrYiXqy5nqVGO
+ Qp08+7lSYwaHDa1sgznyZPEU7sy7W7L7noZdk3nNhxYTum2jbeJzfhiOVm051PVlGdf/5qAwbOn
+ GwZI1LS2nI8ZaFkKp2A==
+X-Proofpoint-GUID: sTOEvF7SXFz80fUQl7DApfsGGfInKdeI
+X-Proofpoint-ORIG-GUID: sTOEvF7SXFz80fUQl7DApfsGGfInKdeI
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-08-16_02,2026-08-12_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 spamscore=0 clxscore=1011 impostorscore=0 lowpriorityscore=0
+ malwarescore=0 adultscore=0 bulkscore=0 priorityscore=1501 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608160058
 
+  Hi Nicolas, Nathan, Kees,
 
---frAejL4U7TYiDwWt
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+  Thanks for the feedback.
 
-Hi Linus,
+  Would it be acceptable to handle this generically for external modules in
+  top-level kbuild (`Makefile`) instead of tying it to kstack_erase? I was
+  thinking about adding:
 
-please pull these changes to Kbuild and Kconfig for v7.3.
+    diff --git a/Makefile b/Makefile
+    @@ -1057,6 +1057,10 @@ include $(addprefix $(srctree)/, $(include-y))
+     # Do not add $(call cc-option,...) below this line. When you build the=
+ kernel
+     # from the clean source tree, the GCC plugins do not exist at this poi=
+nt.
 
-All changes have been in -next for several cycles without reported problems.
+    +ifneq ($(KBUILD_EXTMOD),)
+    +KBUILD_CFLAGS +=3D -gno-record-gcc-switches
+    +endif
+    +
+     # Add user supplied CPPFLAGS, AFLAGS, CFLAGS and RUSTFLAGS as the last=
+ assignments
 
-Thanks and kind regards,
-Nicolas
+  This would avoid per-module changes and also avoid coupling a generic
+  compiler switch-recording behavior to `CONFIG_GCC_PLUGIN_STACKLEAK`.
 
+  If this direction looks reasonable, I can send it as an RFC patch for rev=
+iew.
 
+  Thanks,
+  Jaihind
 
-The following changes since commit dc59e4fea9d83f03bad6bddf3fa2e52491777482:
+-----Original Message-----
+From: Nathan Chancellor <nathan@kernel.org>=20
+Sent: Saturday, August 15, 2026 4:16 AM
+To: Nicolas Schier <nsc@kernel.org>
+Cc: Jaihind Yadav <jaihindy@qti.qualcomm.com>; Kees Cook <kees@kernel.org>;=
+ linux-kbuild@vger.kernel.org; linux-modules@vger.kernel.org; linux-hardeni=
+ng@vger.kernel.org; linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] kstack_erase: suppress -grecord-gcc-switches for ex=
+ternal module builds
 
-  Linux 7.2-rc1 (2026-06-28 12:01:31 -0700)
+WARNING: This email originated from outside of Qualcomm. Please be wary of =
+any links or attachments, and do not enable macros.
 
-are available in the Git repository at:
+On Fri, Aug 14, 2026 at 08:23:02PM +0200, Nicolas Schier wrote:
+> If there is a need for external kmods to to have
+>
+>   make modules KCFLAGS=3D-gno-record-gcc-switches
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/kbuild/linux.git tags/kbu=
-ild-7.3-1
+Ah yeah, I forgot about KCFLAGS for the external module build. An external =
+module could also include
 
-for you to fetch changes up to d900723d78adec229996aefbab0dcaa66a177b77:
+  ccflags-y :=3D -gno-record-gcc-switches
 
-  modpost: use mod_warn() and mod_error(), clean up logging (2026-08-15 21:=
-01:51 +0200)
+in its build file as well if this is a requirement of their build setup.
+Perhaps we could revisit this within Kbuild if there is enough interest fro=
+m various parties.
 
-----------------------------------------------------------------
-Kbuild/Kconfig updates for 7.3
-
-Kbuild updates
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  * Use --force-group-allocation when linking modules
-
-    Have the linker resolve the COMDAT groups and place their members as
-    regular sections instead of possibly leaving multiple copies in the
-    resulting modules and unnecessary group metadata.
-
-  * UAPI header files: Canonicalize __ASSEMBLER__ / __ASSEMBLY__ mixed
-    use to __ASSEMBLER__
-
-    There is an ongoing effort to change __ASSEMBLY__ to __ASSEMBLER__
-    treewide.  For consistency, UAPI headers are normalised to use
-    __ASSEMBLER__ only.  Normalisation is done in two subsequent patches
-    to simplify a revert in the unexpected case of a regression report.
-
-  * link-vmlinux.sh: Improve detection of third pass requirement
-
-  * modpost: Canonicalize format of warnings and errors
-
-  * Minor changes:
-    - Remove srctree path from CHECK output
-    - Set the initial value of subdir-rustflags-y
-    - Remove broken and unused modules.builtin(.modinfo) targets from
-      the top-level Makefile
-    - Add symbol size for kallsyms symbols that can change size
-    - modpost: Prevent leak when early return no suffix .o in
-      read_symbols()
-    - scripts/config: Update usage of POSIX sed
-    - 'make tags': Add support for rust source files and prevent binary
-      files from being analysed
-    - Several spelling mistakes and rephrasing
-
-Kconfig updates
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  * Add Julian Braha as Kconfig reviewer
-
-  * Fix submenu rendering of negative dependencies
-
-  * Minor changes:
-    - merge_config.sh: Keep temp file in the output dir
-    - Abort rather than loop for ever on EOF
-
-
-----------------------------------------------------------------
-Andr=E9 Draszik (2):
-      kallsyms: add symbol size for kallsyms symbols that can change size
-      kbuild: link-vmlinux.sh: improve detection of third pass requirement
-
-Ben Dooks (1):
-      kbuild: remove srctree path from CHECK output
-
-Bhaskar Chowdhury (1):
-      usr: Correct a spelling by changing a letter
-
-Elsie Heck (1):
-      fixdep: make gendered language gender-neutral
-
-Gustavo Luiz Duarte (1):
-      scripts: kconfig: merge_config.sh: keep temp file in the output dir
-
-Jani Nikula (2):
-      modpost: add module as parameter to modpost_log()
-      modpost: use mod_warn() and mod_error(), clean up logging
-
-Julian Braha (3):
-      MAINTAINERS: add Julian Braha as Kconfig reviewer
-      kconfig: fix minor typos in comments
-      kconfig: fix submenu rendering of negative dependencies
-
-Martin Weiss (1):
-      scripts: fix spelling mistakes
-
-Petr Pavlu (1):
-      kbuild: Use --force-group-allocation when linking modules
-
-Robertus Diawan Chris (1):
-      modpost: prevent leak when early return no suffix .o in read_symbols()
-
-Rong Zhang (2):
-      scripts/config: Use POSIX standard ERE (-E) in sed
-      scripts/config: Use in-place editing (-i) in sed portably
-
-Sergei Litvin (2):
-      scripts/tags.sh: Prevent binary files appearing in cscope.files
-      scripts/tags.sh: Add support for rust source files
-
-Simon Glass (1):
-      kconfig: abort rather than loop for ever on EOF
-
-Thomas Huth (1):
-      scripts: headers_install.sh: Normalize __ASSEMBLY__ to __ASSEMBLER__
-
-Thomas Wei=DFschuh (1):
-      scripts: headers_install.sh: Normalize __ASSEMBLER__ to __ASSEMBLY__
-
-Yuntao Wang (2):
-      kbuild: set the initial value of subdir-rustflags-y
-      kbuild: fix modules.builtin(.modinfo) targets in the top-level Makefi=
-le
-
- MAINTAINERS                         |   1 +
- Makefile                            |   8 ++-
- arch/arm64/include/asm/module.lds.h |  13 ----
- scripts/Makefile.build              |   5 +-
- scripts/basic/fixdep.c              |  10 +--
- scripts/config                      |  44 ++++++++------
- scripts/headers_install.sh          |   1 +
- scripts/kallsyms.c                  |   4 ++
- scripts/kconfig/conf.c              |  17 ++++++
- scripts/kconfig/expr.c              |  33 ++++++++++
- scripts/kconfig/expr.h              |   5 +-
- scripts/kconfig/menu.c              |  10 +++
- scripts/kconfig/merge_config.sh     |   2 +-
- scripts/link-vmlinux.sh             |  22 ++++++-
- scripts/mod/modpost.c               | 118 ++++++++++++++++++--------------=
-----
- scripts/mod/modpost.h               |   8 +--
- scripts/tags.sh                     |  42 ++++++++++---
- usr/initramfs_data.S                |   2 +-
- 18 files changed, 225 insertions(+), 120 deletions(-)
-
---=20
-Nicolas
-
---frAejL4U7TYiDwWt
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEh0E3p4c3JKeBvsLGB1IKcBYmEmkFAmqAutkACgkQB1IKcBYm
-EmlaihAAhqttUh3YAGsUtXqqf4Mmb7OKAhafhWYqCQQjHFHU4eywsqs3v3iBlc5K
-rS9s9EDUIzBwFtN4xaZT5lDCAHzmN42CI0cIBl5IQ7EqfYZUOJu9C/axZx9n0lv9
-jP4Uv2PoKpJ+SFFCMQKN+MVPFiNYYK6L+XE0wwXRIv9YtPPBXXRQ83c8qPzb9x3r
-feOfyoMAHV7x9Zp8wDfctY5jSU+njE77Vc5nTkQgyDndMolJSZqeeU3E6p+CldZ+
-xIiARoX6MKO5QUeRkkBtPZ5mTkJk5F/R6o5aBhXPXL/CW46LJE2FtLHXOxjWAesu
-sEb0WiEc6+PGjE3dhZWubx4gbVZUzvQnMaROWcZY2DFl1PZuG51Qm5oUYOXs0Fnz
-s/OAygnptgLBs/ryMiVBcmjjt8U/v5gzoLH9+k1mQ4mXbw5wofy8UH9rl2rvTWA7
-//JeIDK1d2h0cTsaixpd6hOpMLMCFNy4RqbYgcUp8Qhy8Le1Tvj8a6WYHtYZvkkC
-YpKCUr9YXs7Qpp5JHi43nT4ltqrIp5Eqt9I5NNeM44/gomX2P9AfZuPviM5IaaX2
-XBB8bvGsQWQV32LPpixuASmYBsI0ICsHHN+IZ86liWhC/W98JW18XOPcYyfe2s9h
-UbGMa8uoy9aQxeSmge1CEn+MMZMoMHQS3tj673LbG4zhPQcJMq8=
-=USYt
------END PGP SIGNATURE-----
-
---frAejL4U7TYiDwWt--
+--
+Cheers,
+Nathan
