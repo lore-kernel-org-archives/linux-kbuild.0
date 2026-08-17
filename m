@@ -1,107 +1,100 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 619213A9879;
-	Mon, 17 Aug 2026 18:51:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D2253BB12A
+	for <linux-kbuild@vger.kernel.org>; Mon, 17 Aug 2026 23:11:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786992712; cv=none; b=WOo/NwFXfZV3Sry+qhZ+k/FDIvuoI+YC8smXxYD+UpSeg7B125jkSI8w+LjnpgfrhcxapEvJCkycsB4y87r32lrPaOv+/GwdFpg4esJeFJRAPWPumMeS7enbmAi/9gNBn2TXwbMAkD4NZORPU5/EB9FRfk7NblZdZYdJViBfqcw=
+	t=1787008279; cv=none; b=kYfjqMR4HmUNHv8JQIh/eV2RwBOdt4G9CfznLRNvC/FoAtEcLJIdJInnTYEwJisCDIKqPU3zarArQCRtr64rFirKhIGlKwjwv+pw87tsucrvjpLZyuVRGHv18EEBatn9LsikSuZG4rK2Y4VDrn1d5kF/XKDurpi3Kb5LI5Ea5xU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786992712; c=relaxed/simple;
-	bh=261p/DeBpAyQF1el8SnPnh7ho2GfmZRpRR1Wtc323fM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ROKy1qsMQC9e0AiQ+27t9xUbYHdDczRr7jiD5Hw8OxbJCp04xtqD5bLSPppAl/mPwUJRYgAblIyBY1LOBLmo+aIYiWzxThzcMIGhe/sDeBGrbdWsYmM0LIByPNpZuq7yDrw88s3vZxJi/Q3XomiUNZ1QHtz8/hrWDIwEfA5n6Dk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=elKEjTdu; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787008279; c=relaxed/simple;
+	bh=bom+sO/3itmB4RbdUuIFtM6u7kj2BzzYmX4ckOa7QOY=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=rkktQuNvRkJUCh3wVOPnTQc4cXg23nsr3Ff33KG8ZeblW0N02co6dR3edbPga8tfoQrXSO9lIBTQSF4+Jty9NJQ4TkyBe3IbAe7e0SltxzK4d5BxE7QlNLud7/B/JBmjTUD5g8mnFFbT3ts13o17pdDfrf1QV2cXTDY570aZXUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hzj9MU8F; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="elKEjTdu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 635CC1F000E9;
-	Mon, 17 Aug 2026 18:51:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786992710;
-	bh=GmaLjdPS/A0zeV66ab0EU7MLb8KKncXJ0C5BdXmW+XI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=elKEjTduH3qqyur+kF0U+eLHFaDIHAxA4s3XrWcu8KV8CRygieleBSrFmyLgkPWcT
-	 iqnbAubcyHqYymCoj8nE3z7w1iUFD65XZgc6lgF3/nLHF0A+TgWt558tp6fOcQGL8W
-	 72LIvWfLBGOyPuLjsg/tmNdFm0UwS+C6Jd63u480L23jeSIdoAFV84TbaYtv/7M8dY
-	 96poqGjT0BkIvHuAzqbQazs/bfs1SstSaotB+CifxvHiaN7t3R0VdxEgTT/pKg07DO
-	 vO6HtcAASAVjR+FT1VhAuVBVDp3ykvdq9KoypmZfXbTjLggpSBBC/nhn39jDfB21Rc
-	 FhK4Rit9IJFGw==
-Date: Mon, 17 Aug 2026 11:51:46 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Jaihind Yadav <jaihindy@qti.qualcomm.com>
-Cc: Nicolas Schier <nsc@kernel.org>, Kees Cook <kees@kernel.org>,
-	"linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
-	"linux-modules@vger.kernel.org" <linux-modules@vger.kernel.org>,
-	"linux-hardening@vger.kernel.org" <linux-hardening@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2] kstack_erase: suppress -grecord-gcc-switches for
- external module builds
-Message-ID: <20260817185146.GC1249844@ax162>
-References: <20260803181217.GB1067866@ax162>
- <20260813082949.1622045-1-jaihindy@qti.qualcomm.com>
- <202608130942.4FFA5AAB9D@keescook>
- <CY5PR02MB8991D4B48F9391D1849B2CFCE2DA2@CY5PR02MB8991.namprd02.prod.outlook.com>
- <an9dBpYEIb4GWhAC@levanger>
- <20260814224550.GA3553101@ax162>
- <CY5PR02MB8991C91E71C153EEF452972FE2D82@CY5PR02MB8991.namprd02.prod.outlook.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hzj9MU8F"
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-51c2a76536bso37937451cf.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 17 Aug 2026 16:11:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787008277; x=1787613077; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=PTQLSacLNQAZe1bmh5PVj19bRQdT+z6zMy0cKH0987M=;
+        b=Hzj9MU8F/JQYCFk7MSte17ovL7MkrsPw7Mc3IR38Krp245M4jJ4F2zbl94m4Wcn3YA
+         khqNYOVISwgjC0DEE4x+wtzHZK3EpCJbyXlYAQ/pl8A/VkGhqijex8f+5CPvmHo8A0Cj
+         9rDTFmeZT9JGsedChmj9ny/LUEWh2YZGRW1cus6sP/iwzKl59YoKym8DdDoMHNt8TR8x
+         UeldBit72R8BO9BDLvjDU/lAzjFvYvO65IGYSfIIkT8espv4U10yIzwVBlGWpu+Q1nIP
+         UaYA7hmrFFyIQZcDAg5VE2fJlYEGTJSwKuz8nN9DZB4TmdQz7/aRGfroOeC+P0YRdj3q
+         MmVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787008277; x=1787613077;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=PTQLSacLNQAZe1bmh5PVj19bRQdT+z6zMy0cKH0987M=;
+        b=DQZDJYytqhLDkfdMy0eDEO87v08pEiQBt1W+80yYMwLTnhE2jC0Q/y42203JjGFhkE
+         TjcuyFRU06L6yFMIC8Yq66OxlbGAS65aPuqUw38/BCvHHAHhMgTzuCzEKISu0yBrUJpF
+         HuWl2R6dYXejG44o0gkgOSbc79tAEbYuOPF2VPdcVESrkala6aJuJIwwKkxnS8IHS3wA
+         U9MFoG2FbqDQ8VnVF/NTgFIc6HSv+ctKba8+WqeNQPs1LwIX0dIV0Nw/5pRhz2X0V0A4
+         1t4O15gJcorEwtNflqa9iBNmAgXB1MHFV9HSZxM89ka7Z/t4myPwGuIF7wJlint9uswT
+         vUTg==
+X-Forwarded-Encrypted: i=1; AHgh+Rrj8gN1zmPvgPEcfv+GWbZ2FwvHgSGnUWyltyMvOqjpNPxv44AYVSB4Qbd5wqi9xllipByRduNUbrN+ioQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1QQ09aM6eI/cs7+UbcoN7rzF+3rUoiBN+psnjifhIDudtgF7N
+	e26ukNloMemLTVdNdbx8a8Rta+YRCJAkk2O6o295bO9mjwwcGkdANj9P
+X-Gm-Gg: AR+sD136OFHdLCf015v3L5OrSIhqb2FA5ReBlFi+IKthsg0qapX0t0xYexchpPL3ebt
+	r9BU8GuBybP0xaOdjDT/wCDUYpf80gMTymiDaq2ijMDedE0FcNsruBKbhEylIGZjIsxO2HdZh/c
+	vq3BNtGOxCAfkuk/sRoqe31ZwMIxlfVEhZ6bQ63uTdtRp38YPb/t0OLQWS4QMuNIOTsZvn/DKu9
+	WnLkIgS8ghaaOYWsNNwP7MMtbQDA8W5LANtmfvaXOQCab0o2wEzXXXpo+EqD4ZKGT0z9+YSmob2
+	fLnh8OwW2OxYsMr4sWIrZ0G/LzojsKHheh1PhiK7RozfF0mqi66jxS4NqHkCaIzGGMLETfBkNt6
+	eAc/T2SNyQ2hR2Gp5c9buneL2Z3KBZoOtuxlyW7j8cV21+MAGtvQKL0EpFd28/0yaii5DZoQoR2
+	BAhhWRbdjagUU7mcJri27zIoGHFUs/wKOJpn+NYv+5Yhn3FLfbJtS3uFva
+X-Received: by 2002:ac8:5e49:0:b0:51b:ec6c:766c with SMTP id d75a77b69052e-52d853cb00fmr294206011cf.12.1787008276782;
+        Mon, 17 Aug 2026 16:11:16 -0700 (PDT)
+Received: from Gentoo ([158.173.25.156])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-90c4567a2a1sm19530756d6.0.2026.08.17.16.11.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Aug 2026 16:11:16 -0700 (PDT)
+From: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+To: nathan@kernel.org,
+	nsc@kernel.org,
+	unixbhaskar@gmail.com,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] scripts: Make the code use consistent syntax
+Date: Tue, 18 Aug 2026 04:33:34 +0530
+Message-ID: <20260817230915.3860140-1-unixbhaskar@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CY5PR02MB8991C91E71C153EEF452972FE2D82@CY5PR02MB8991.namprd02.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Jaihind,
+The code was using a different form of syntax. So, make it more
+consistent with a similar kind of syntax.
 
-On Sun, Aug 16, 2026 at 08:11:01AM +0000, Jaihind Yadav wrote:
->   Would it be acceptable to handle this generically for external modules in
->   top-level kbuild (`Makefile`) instead of tying it to kstack_erase? I was
->   thinking about adding:
-> 
->     diff --git a/Makefile b/Makefile
->     @@ -1057,6 +1057,10 @@ include $(addprefix $(srctree)/, $(include-y))
->      # Do not add $(call cc-option,...) below this line. When you build the kernel
->      # from the clean source tree, the GCC plugins do not exist at this point.
-> 
->     +ifneq ($(KBUILD_EXTMOD),)
->     +KBUILD_CFLAGS += -gno-record-gcc-switches
->     +endif
->     +
->      # Add user supplied CPPFLAGS, AFLAGS, CFLAGS and RUSTFLAGS as the last assignments
-> 
->   This would avoid per-module changes and also avoid coupling a generic
->   compiler switch-recording behavior to `CONFIG_GCC_PLUGIN_STACKLEAK`.
-> 
->   If this direction looks reasonable, I can send it as an RFC patch for review.
+Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+---
+ scripts/mkcompile_h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I do find this direction to get more at the heart of the problem but
-shouldn't this live in scripts/Makefile.gcc-plugins?
-
-diff --git a/scripts/Makefile.gcc-plugins b/scripts/Makefile.gcc-plugins
-index b0e1423b09c2..9b9899580571 100644
---- a/scripts/Makefile.gcc-plugins
-+++ b/scripts/Makefile.gcc-plugins
-@@ -8,6 +8,10 @@ ifdef CONFIG_GCC_PLUGIN_LATENT_ENTROPY
- endif
- export DISABLE_LATENT_ENTROPY_PLUGIN
- 
-+# Disable recording GCC options in debug info when building external modules to
-+# avoid leaking absolute host build paths
-+gcc-plugin-cflags-$(if $(KBUILD_EXTMOD),y) += -gno-record-gcc-switches
-+
- # All the plugin CFLAGS are collected here in case a build target needs to
- # filter them out of the KBUILD_CFLAGS.
- GCC_PLUGINS_CFLAGS := $(strip $(addprefix -fplugin=$(objtree)/scripts/gcc-plugins/, $(gcc-plugin-y)) $(gcc-plugin-cflags-y)) -DGCC_PLUGINS
+diff --git a/scripts/mkcompile_h b/scripts/mkcompile_h
+index 2596f78e52ef..bf0d5669d9bc 100755
+--- a/scripts/mkcompile_h
++++ b/scripts/mkcompile_h
+@@ -11,7 +11,7 @@ else
+ 	LINUX_COMPILE_BY=$KBUILD_BUILD_USER
+ fi
+ if test -z "$KBUILD_BUILD_HOST"; then
+-	LINUX_COMPILE_HOST=`uname -n`
++	LINUX_COMPILE_HOST=$(uname -n)
+ else
+ 	LINUX_COMPILE_HOST=$KBUILD_BUILD_HOST
+ fi
 --
+2.54.0
 
-Otherwise, this would apply to every external module build, not just
-ones that enable GCC plugins.
-
-I defer to Kees on whether this is actually acceptable though.
-
--- 
-Cheers,
-Nathan
