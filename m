@@ -1,195 +1,170 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2FF9246774
-	for <linux-kbuild@vger.kernel.org>; Sun, 16 Aug 2026 21:54:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44F4418DB1F;
+	Mon, 17 Aug 2026 06:35:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786917250; cv=none; b=pCxNk5w0qTqPGUKVt/VCSopy+odFZLYXNjPFJj1FeDXpp0UIIHMUVOR5VIPI5NpdYcxZiP/VeQYVuKQZzH0gB+NJwFGJdabTn78u5YwJK4UT+t+AQ1vgY9jV7Hfwk1mMfyLiD7psaHBk7Fqon4oscpCn3qzky/zq+mOA6n9xgzQ=
+	t=1786948518; cv=none; b=JJiX17bw9X3CG1KKksNynJeby0i8uN8svdOSWAId8QIhI9TxOHePz/I9hjQjSgs7SkwbDYkRf3FRDnSFEaqqMhwriXsAUnibaIc4gGNjMj78T3lxlMgLKKb90MjRvzvT+5y76Pjd7AiaC+0UtmqSABUbLmuM7lL4g4E2eCEeYL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786917250; c=relaxed/simple;
-	bh=R1Ocnxy5s4ML8UfdoZ1jafHArHGdF3fkqDWYKWsXZVc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mYVt+T78GbQya6LOQlZLK2tjuawrNX+B+3hLR1QZznZuDy8e/iOsZl+GKLmDemJeZlIme/a3duOnFar0PbaBlZm00Cjt3+JvqqbCdbo04AqExxkRAaWhf0IqH8CqWNkwOS0kUicn6sp32Gri4al1TsEFQVh8wghg+aPQUiDNkvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ap7hC5ej; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1786948518; c=relaxed/simple;
+	bh=OHb/Ukkl5wYeXcU02S+w/kjomGU6EOUWgSlaJ0dzaLA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gxTToffa/+GnD3RPjl4Rqip1hbCpKThnYg7W8TR835C/zsG7rm3qVQHVN/0DbKh0h5qBNY3ym/mWH8c/DShlBNQUGJdFDuC3ZHsB3Unq+/cVUsHVDcIpsuIaPKHbwkXgo+BdJuwauij4SVYbU5BrVWQD6CBbq9RQbhKavYk6xds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Gt80AMwm; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ap7hC5ej"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4954dff6536so20692755e9.0
-        for <linux-kbuild@vger.kernel.org>; Sun, 16 Aug 2026 14:54:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786917247; x=1787522047; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=cKSHWQgwdR30Bs+BMpgTKUy/VKU4EsEuaszA/Toc6Fc=;
-        b=ap7hC5ej+SAl76pc5gShNxXaeY4Y/lKvTveU5mx2JROBOxWFUnZlREtzhmgcaXnT/6
-         1h34J1mfTlutYmm0YRchkLlhp+a7ZlZCGRpyV91E+ix7AbWQvb4/VOMgmu+6E/z77CsC
-         dEtu7/jBlhhleQTSgnB8TnLyulkC05dmIfSdJNNZtr8R+SHw6BxAWxzv00hWo1JRX/SE
-         y8/JHIfSBVtTFQRYZ9GS5bBWaynPqGJ+J7TgIMja8tc2oWmXdA6Qmi7T923RFw8/AruN
-         eHY7VBFeDiMjij8KYNC49gq7CphiVyuK6QBYFDszzNDPQGAYywJ7lw8Vy3J37lMhq3qM
-         0k2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786917247; x=1787522047;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=cKSHWQgwdR30Bs+BMpgTKUy/VKU4EsEuaszA/Toc6Fc=;
-        b=ei0d229aqDos03VqXJYM1BsgEfUIPM2NqUPxTNs2omKv7TbABOvpVZZdDRVhpD01Vv
-         BGrGheS55Tzg0r/BbM0sVuMHoRdQWV1MvfHette7I/bHC5GKuXoEfDdQVtKMJBvgCx5P
-         XZDQrd92/dbnlJFbmvVw4JCdciB1HifCjKY9qgj5yUH/VIczahbv3fNlLX4vA/xPbnay
-         5Ehw8anasFetnuwXYfCDXZKgurgOvA/pQgjorhpJG9vK+wonPXa5cZ+dZ52anMlCmg61
-         X+b0+4lidLCLfB1SPIYtbiH+gaMmBhdqcg8ndxHyoo1qy/tPr17L1tfROzpGZR8fL3Ce
-         76Rg==
-X-Forwarded-Encrypted: i=1; AHgh+Rrh4WCWq32swZQeikBFob57vAxkPjfMZYhpNMS5sNEEOhlhp+4UQy2A9psCgwqFKP6f3Xy90bNXnmx+buY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwiDWCxS+sKHRGLYyF6xuPKnKeiLM55L6jYu7MXHg0ifCIXxxXc
-	ChhLF8JolBA3kIUyCmj9MBoIVFCufb4nhT6pHtEiCbGW/DBbrvdOPLmS
-X-Gm-Gg: AR+sD11TKpKXuFrOVaQEFc07eZqC5YdGidyKB4aGjmilFLDI5ayjHMFSApUFrrF7P8C
-	m0/Cng7w3fIR85oQuMgHcVa0byCezS4amwGVYr29uHnmBhjLEiwa8PNEg2fY9Q1IPwzl1DWTQPu
-	G5mXF7f05WW57+9iEa3IaHSg4YXlkE7CgtEiPIIeqi8rTbGbq83CZArJ8B0oxo8qBSlw+g7UWaG
-	sJPPMl1Sv5DF7QRh7VCves3FlrJv+eS2fO31TzY91Fky1WfAkiv/zOSYagNHXemUfhhRsdI1dHS
-	FzKxSt5vDxix9qIu09GnWjakZOLgEoMhg+/+5/qUYmlVQt1rgUpRwlpq9ljXiGySlEJN2wMLxew
-	h6LlDoggWmpvXYxJ2SCKW+/AEzK3VQmoJL4/yIviJXltBmhs6bZBURlfyR6lwGtv+DeRq/NYLt4
-	bEXcT5ShKlnrHgUuK8hoe2h5fuMZyv0UEs5Joj75kDGC7TxoNyn8Mw40Ws17JTclRUuz4p6VqJ0
-	BjtxRAV3MvVGr3+xmotc0PUgK34QGcjFBMqnQc9eMb61k0A/6m9
-X-Received: by 2002:a05:600c:37ca:b0:499:858e:de42 with SMTP id 5b1f17b1804b1-49987935039mr306469345e9.6.1786917246843;
-        Sun, 16 Aug 2026 14:54:06 -0700 (PDT)
-Received: from nixos-office (195-23-151-163.net.novis.pt. [195.23.151.163])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4999610e18fsm68307625e9.8.2026.08.16.14.54.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 16 Aug 2026 14:54:06 -0700 (PDT)
-Sender: Julian Braha <julian.braha@gmail.com>
-From: Julian Braha <julianbraha@gmail.com>
-To: nathan@kernel.org,
-	nsc@kernel.org
-Cc: kees@kernel.org,
-	vegard.nossum@oracle.com,
-	linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Julian Braha <julianbraha@gmail.com>
-Subject: [PATCH] kconfig: error out for recursive range
-Date: Sun, 16 Aug 2026 22:53:54 +0100
-Message-ID: <20260816215354.1499059-1-julianbraha@gmail.com>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Gt80AMwm"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1786948517; x=1818484517;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=OHb/Ukkl5wYeXcU02S+w/kjomGU6EOUWgSlaJ0dzaLA=;
+  b=Gt80AMwm3dRhwyIlWYe0uwLEBO0GF+ShUN4MLS1uMPOellMpIRM5ZUSI
+   BxHMi+3EFTyGFQ5p1OU1hLrD1xb7k4LNMERy7XBDuFAmryqvzwqA4K29a
+   n5yvb+vtE6EUj5h+IXabgkLqIdkxH/HH2S9VFu5mrfZGaJkBI5jEUegEV
+   kqvFOrYFSwv6MRcFkQwbMiKOjB/tFhC9Km2buQPGP/JltwmjC3nBn139f
+   +oxzFwfU/vkaJWPWlc+4WL3/uXT7Z4Oi+M8u2RWOK0dwsFQ9EU9cbUfDD
+   EEnzYT0PW1YnSou8X++QcnrYgl5PvpVAQVTYQmkK64ZXG7jx2vs9m+IYO
+   Q==;
+X-CSE-ConnectionGUID: bPZdBcAzTtW+ZqWAkUxZqQ==
+X-CSE-MsgGUID: gDw6KLBASFmqNheIplwzFw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11877"; a="98780143"
+X-IronPort-AV: E=Sophos;i="6.25,228,1779174000"; 
+   d="scan'208";a="98780143"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2026 23:35:15 -0700
+X-CSE-ConnectionGUID: IhYXXzm8SKWwRseS0Ppuig==
+X-CSE-MsgGUID: LS7+ULQkQqmleKkMf5wgXA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,228,1779174000"; 
+   d="scan'208";a="264865206"
+Received: from klitkey1-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.67])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2026 23:35:07 -0700
+Date: Mon, 17 Aug 2026 09:35:05 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Manivannan Sadhasivam <mani@kernel.org>
+Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	manivannan.sadhasivam@oss.qualcomm.com,
+	Rob Herring <robh@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Hans de Goede <hansg@kernel.org>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Mark Pearson <mpearson-lenovo@squebb.ca>,
+	"Derek J. Clark" <derekjohn.clark@gmail.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	Daniel Scally <djrscally@gmail.com>,
+	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Bartosz Golaszewski <brgl@kernel.org>, linux-serial@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+	platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org,
+	Stephan Gerhold <stephan.gerhold@linaro.org>,
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+	linux-acpi@vger.kernel.org, Sui Jingfeng <sui.jingfeng@linux.dev>
+Subject: Re: [PATCH v3 03/14] software node: Implement device_get_match_data
+ fwnode callback
+Message-ID: <aoKrmZzmYsyvRJ-5@ashevche-desk.local>
+References: <20260110-pci-m2-e-v3-0-4faee7d0d5ae@oss.qualcomm.com>
+ <20260110-pci-m2-e-v3-3-4faee7d0d5ae@oss.qualcomm.com>
+ <aWSpFk9z0zpyKjr6@smile.fi.intel.com>
+ <6l3rs5pv6xnrbygpvqrdxqoqtybjyefsltk5bl4336q56rfoza@ejo3sxuufghe>
+ <aWSwgRiEkT9unYw9@smile.fi.intel.com>
+ <6peb6afhpm4l7opxbdt3b5sx32longevwds5c3dlqji2hr5dlh@kxuvj55jkqgi>
+ <ljqd5ovcsg7t62tdzd77w5mv5buawm3x7xyapy7n7l7azcaorh@tytj46t2lxyb>
+ <ks2nm67zp5i2grzomu7mjb7uhkuwtd7w5stoqp5kri2clpxpsp@ayn42h7meh5l>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ks2nm67zp5i2grzomu7mjb7uhkuwtd7w5stoqp5kri2clpxpsp@ayn42h7meh5l>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-Currently, it is possible to create recursive ranges with Kconfig, such as:
+On Fri, Aug 14, 2026 at 02:49:31PM +0200, Manivannan Sadhasivam wrote:
+> On Mon, Jan 12, 2026 at 10:01:23PM +0530, Manivannan Sadhasivam wrote:
+> > On Mon, Jan 12, 2026 at 02:32:21PM +0530, Manivannan Sadhasivam wrote:
+> > > On Mon, Jan 12, 2026 at 10:27:45AM +0200, Andy Shevchenko wrote:
+> > > > On Mon, Jan 12, 2026 at 01:49:54PM +0530, Manivannan Sadhasivam wrote:
+> > > > > + Dmitry Torokhov (who was against this patch previously)
+> > > > > 
+> > > > > On Mon, Jan 12, 2026 at 09:56:06AM +0200, Andy Shevchenko wrote:
+> > > > > > On Sat, Jan 10, 2026 at 12:26:21PM +0530, Manivannan Sadhasivam via B4 Relay wrote:
+> > > > > > 
+> > > > > > > Because the software node backend of the fwnode API framework lacks an
+> > > > > > > implementation for the .device_get_match_data function callback.
+> > > > > > 
+> > > > > > Maybe this is done on purpose. Have you thought about this aspect?
+> > > > > 
+> > > > > IMO, software nodes were introduced to add sub-properties to the existing
+> > > > > firmware nodes, but it has usecase/potential to go beyond that. More below.
+> > > > 
+> > > > Potential doesn't mean the necessity.
+> > > > 
+> > > > > > > This makes it difficult to use(and/or test) a few drivers that originates
+> > > > > > > from DT world on the non-DT platform.
+> > > > > > 
+> > > > > > How difficult? DSA implementation went to the way of taking DT overlay
+> > > > > > approach. Why that one can't be applied here?
+> > > > > 
+> > > > > Sometimes you do not have any DT node at all.
+> > > > 
+> > > > Yes, that is exactly the case I have referred to. The PCI core (in Linux)
+> > > > is able to create DT subtree on non-OF based platforms.
+> > > > 
+> > > 
+> > > Maybe I should look into creating dynamic DT node for the device and insert it
+> > > to the uart node. Theoretically it should work.
+> > > 
+> > 
+> > It worked flawlessly. So I sent v4 incorporating this design:
+> > https://lore.kernel.org/linux-pci/20260112-pci-m2-e-v4-0-eff84d2c6d26@oss.qualcomm.com/
+> > 
+> 
+> Andy, I had to revive this old thread of a merged series as Krzk is not in
+> favour of adding DT overlay or dynamic OF nodes for these BT devices [1]. His
+> objections are due to the fact that we are just adding BT nodes of a
+> discoverable device (M.2 PCIe device) without any resources. So the node just
+> contains the compatible to match with the serdev driver and nothing else.
+> 
+> And he suggested to use swnodes or other similar mechanisms to plug with the
+> serdev driver as that's the only thing we want here, not a true hardware
+> description.
 
-config C
-  int "Enable C"
-  default 1
-  range A B
+SW nodes are not for describing HW from scratch. They are for fixing missing
+pieces. If you can justify your case as a missing piece for the *existing*
+device (which is enumerated using standard mechanisms), you can add a property
+that fills the gap.
 
-config A
-  int "Enable A"
-  default 2
-  range B C
+Unfortunately I see that there are `PROPERTY_ENTRY_STRING("compatible", ...)`
+cases in the kernel (only 9 drivers so far), and I can't say if they describing
+missing pieces or a SW-made descriptions of the hardware. For the latter the
+DT/ACPI/other means but swnodes should be used.
 
-config B
-  int "Enable B"
-  default 3
-  range A C
+> Since you strongly objected the swnode approach in this series, I wanted to hear
+> your opinion before I rework the code.
 
-The current outcome of this example above, is that all 3 options are set to 2.
-There is currently no warning or error if a user attempts this.
+> [1] https://lore.kernel.org/linux-pci/768142f0-2638-41f3-a34f-dc80bb99eb7f@kernel.org
 
-Several attributes are already checked for recursion, including 'depends on',
-'select', and 'imply', and we can extend this to 'range' for numeric options
-(int and hex types).
-
-Recursive ranges are currently not used anywhere in the tree, so it is already
-safe to make this a hard error.
-
-Assisted-by: Codex:gpt-5.6-sol
-Signed-off-by: Julian Braha <julianbraha@gmail.com>
----
- scripts/kconfig/symbol.c                      |  5 +++-
- .../kconfig/tests/err_recursive_dep/Kconfig   | 24 +++++++++++++++++++
- .../tests/err_recursive_dep/expected_stderr   | 13 ++++++++++
- 3 files changed, 41 insertions(+), 1 deletion(-)
-
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index 7e81b3676ee9..e82f330fb8ee 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -1196,6 +1196,7 @@ static struct symbol *sym_check_expr_deps(const struct expr *e)
- 	case E_GTH:
- 	case E_LEQ:
- 	case E_LTH:
-+	case E_RANGE:
- 	case E_UNEQUAL:
- 		sym = sym_check_deps(e->left.sym);
- 		if (sym)
-@@ -1243,7 +1244,9 @@ static struct symbol *sym_check_sym_deps(struct symbol *sym)
- 		sym2 = sym_check_expr_deps(prop->visible.expr);
- 		if (sym2)
- 			break;
--		if (prop->type != P_DEFAULT || sym_is_choice(sym))
-+		if (sym_is_choice(sym))
-+			continue;
-+		if (prop->type != P_DEFAULT && prop->type != P_RANGE)
- 			continue;
- 		stack.expr = &prop->expr;
- 		sym2 = sym_check_expr_deps(prop->expr);
-diff --git a/scripts/kconfig/tests/err_recursive_dep/Kconfig b/scripts/kconfig/tests/err_recursive_dep/Kconfig
-index ebdb3ffd8717..bd1ff92bcab2 100644
---- a/scripts/kconfig/tests/err_recursive_dep/Kconfig
-+++ b/scripts/kconfig/tests/err_recursive_dep/Kconfig
-@@ -61,3 +61,27 @@ config G
- 	bool "G"
- 
- endmenu
-+
-+# depends on and range
-+
-+config H1
-+	int
-+	depends on H2 < H3
-+
-+config H2
-+	int
-+	range H3 H1
-+
-+config H3
-+	int
-+	range H1 H2
-+
-+# range
-+
-+config I1
-+	int
-+	range I2 I2
-+
-+config I2
-+	int
-+	range I1 I1
-diff --git a/scripts/kconfig/tests/err_recursive_dep/expected_stderr b/scripts/kconfig/tests/err_recursive_dep/expected_stderr
-index fc2e860af082..08f843087678 100644
---- a/scripts/kconfig/tests/err_recursive_dep/expected_stderr
-+++ b/scripts/kconfig/tests/err_recursive_dep/expected_stderr
-@@ -36,3 +36,16 @@ error: recursive dependency detected!
- 	symbol G depends on G
- For a resolution refer to Documentation/kbuild/kconfig-language.rst
- subsection "Kconfig recursive dependency limitations"
-+
-+error: recursive dependency detected!
-+	symbol H1 depends on H2
-+	symbol H2 range value contains H3
-+	symbol H3 range value contains H1
-+For a resolution refer to Documentation/kbuild/kconfig-language.rst
-+subsection "Kconfig recursive dependency limitations"
-+
-+error: recursive dependency detected!
-+	symbol I1 range value contains I2
-+	symbol I2 range value contains I1
-+For a resolution refer to Documentation/kbuild/kconfig-language.rst
-+subsection "Kconfig recursive dependency limitations"
 -- 
-2.55.0
+With Best Regards,
+Andy Shevchenko
+
 
