@@ -1,193 +1,184 @@
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from LO3P265CU004.outbound.protection.outlook.com (mail-uksouthazon11020141.outbound.protection.outlook.com [52.101.196.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91CAA35F5E7
-	for <linux-kbuild@vger.kernel.org>; Tue, 18 Aug 2026 03:28:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC7CE45040B;
+	Tue, 18 Aug 2026 10:54:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.196.141
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787023723; cv=pass; b=UPohM/hlPHJLe4M55ndPw1je+Ua3AQSxEFbgSEUWTkdj4VDuEe52CJy3nNRUo+ner9fL+5hpwqjotZkbUKWDdHTNGvRQE3NNTpmeJkjeR7Fzmm/Ep0k1tXOVN0Ae/9t5gTUVPmTRxfbszaYNFPd8Y6aDIaDGsyYXy4gbhYSlP9k=
+	t=1787050463; cv=fail; b=i+Ra/6IHz8oSZOnl0Iaa0crTusGSKvIP6uQnfUSXo03HjjVtVisCj2lwoxHf+IzsCwvJ6eeUZQRH7VrtH9Iy7dEodL/PWTtPXVxwGdR/V4K57L4MJb3hTJonLXi8cK/MC48dp0I3Jj0TGP/zoWG542l/ZPT0kxTHBzBz6DcB5mc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787023723; c=relaxed/simple;
-	bh=r5Zdltp6LAiYTHO3zsA88inj2HBXb4iZZpW73+FezSk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QAX+YNnNI3l3k3qW4rb0aN1CsQSBc/9JyW9KFcQY6Ia3bVMLx3ydcjwzJetpJN1q/prRCQ5hXxzQy3I37j0YUBMpW8eUAdM7uSZW8+L2tKPmEkkHqoVyK5q5UIx4U2ZqgUDGYxPpaBNdcm1q7qioR9OseAiqMzJJyub+VlYSZ6A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d1iMLsUw; arc=pass smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1787050463; c=relaxed/simple;
+	bh=KNIhILLBYfztdXlUVH44UZcqqLKctA5vZ9/Wh6yHkMY=;
+	h=Content-Type:Date:Message-Id:Cc:Subject:From:To:References:
+	 In-Reply-To:MIME-Version; b=OXTPxcucVrM3O6AzJtEX7XyXNF4OfgDhrfrQBcaWW0LGY1WhVSDewZ5u1o7CAcGU0n2pJnT+Ns3MFE2O/juShUT+JbUc48rUUyCfhlRwmGeC+RDpQto29vkoiPRD4Hj0IpGPssTYxZwQ9cB3sI6QP06lSsi5kDWv2+CI66JTVB0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=IIgJ9wq0; arc=fail smtp.client-ip=52.101.196.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garyguo.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d1iMLsUw"
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5aeb2bc82ccso4795502e87.2
-        for <linux-kbuild@vger.kernel.org>; Mon, 17 Aug 2026 20:28:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1787023720; cv=none;
-        d=google.com; s=arc-20260327;
-        b=Oo3gPZ/A+fyTLVkGjBCek103+8p9zauAVceN8kxdg7KAl2pzlMmMcdKXY26ANmc9/0
-         UUPDpxRyDnup2w03E0C/uJvXae/sp+ddWQ6PFF2PiLNVC6kuuQbo9Dt2idoWIqML/66/
-         Y4FWpJ4kW62IhE48ktMTw2Iqavcbm5IlpuYZa7oNPd9CC0GxXgnqJTbKUd1l0KOIm0I9
-         iwQLimeQrnfX2phEPxHF6WBo33AWDzfAKtJ02nWYL8Mj7ggqp6GDtjbDaiZZm/Zk6NfW
-         dm9FFTddQ6G+3zIp+VrzylwNSqSEiK/jQ36lrVHBKIKB9qud3f/9w1+hP6BQxYGa9oKR
-         fZWA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=6z3l6JiM3xD5bZ85VYSBuxGVuvcg5CMcHjaAX+UkSSo=;
-        fh=joymvIAk2Zq2S+56gbFrWaJpujMuyZq4bluWEKRvWn4=;
-        b=ZQ1apLB9O1Krwo49IbnYvCIcCPM3eUobURVy3PxF/x+CNUQ48ccqKN5PhYOMthwSzO
-         Pz51T4fsGc5brP+vtNrEvu21Ery1Edovh6n/G9dSYLWsTIHMoibDqcgv1AZAP8XAL7zg
-         aSNw+GFGgbe5jTAqTww4jmml9fYN43cQICa3SPTJafYXbw+pMFKxCfzHill+iZ9MfY2+
-         4RSLIQBEKWOYKTNwScebIr3Rs9vuuAU6DIepxx0nw+J/vaRuMP1ScJSx3Nps+78mL9ze
-         JUuUVZfwMea+NAqwF/QfCxHBtOSQhD2OnwSEprS9/LoH5GZXQmdKLCUH0YmSua83C0pG
-         fYxg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787023720; x=1787628520; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=6z3l6JiM3xD5bZ85VYSBuxGVuvcg5CMcHjaAX+UkSSo=;
-        b=d1iMLsUwDR/E2ZNEn90G81ig1mscXxQ/ozaUy167uiKb5jsUeva5+QM8q/bnRmVR72
-         palPthg2rF81vx+WOsDedp7DkmAc0KwdSYZGqmLQcw5jmEze/qcSUOPXR3xxy9ONO7y9
-         VXCxk+Ts4FbuPVbdy2R7fbC6N/733o5BFOcuRQHJjjdIvQVa4ORdWF/YAw55cZSXl7fa
-         8/kLK4INrjUkgjFjx9rz5Oh63o+wuuvvUIBgI24zblPT4ijRTfI35Zc6KKpk3eZiCMrQ
-         GANbBJGUJbd/Gg4p9wka3973IolQXvRENJ9g3T7hjphooL7VGHhYQTPbjTVvGvju6OXC
-         At3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787023720; x=1787628520;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=6z3l6JiM3xD5bZ85VYSBuxGVuvcg5CMcHjaAX+UkSSo=;
-        b=MyciX6wOJeORgm1PYyv4G0uJPOJToncv+3MborzuU7o7UJhe/5AVqOh9tPtTLcEWL7
-         sCBEd76PWShj3Dob13Cu8Q+deqH7afrf9CHkVWr8joqFhKjPDfV9qQ2tm0qySf1uZr/2
-         l7ZbAoTd8NjycKFRo9jt2D+aeUgv8COiDnVKzt6f3uXbFJ5MmbnF5idqTpCsKt2KQ+kB
-         BtphIOShqBcnG14LlnLF5DLGbu3ncqA2WPEgAmfjXKqW0lxv3tuyktvShRyMXCsJXMRN
-         o2jEmn6M/fBG3JxktimGUQOEJ/mlWbG5aHAKf3QsFeLEYJR3ql+VEe48vMXLdllrU+p8
-         7dxA==
-X-Forwarded-Encrypted: i=1; AHgh+Roj1guCvlgN1gBnsb2kFItc/LDVTjaItrSscAYjzaOHlE2qFuH5uYcNPZAME9haBqNzWlZtfMPZisNYAvU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwREIymovoWMCnMpj4Q5B6vLIi74QuzEHX2/0LJKz/PwhVQkaxx
-	8/pDaT+FQ/MUOsssaxki2e7OQou7+jeRblSDLPTk6xNEgSJqoXxsqmPaU2qjjKzLPW6iG1+GJg/
-	+Ax2pQKNY/54yLVNQdpfQlmw/GNGn2KM=
-X-Gm-Gg: AR+sD13BFqS89y5x3EDKUdl1lSPPE9+ti7sGacV6sgRJdnUP0MMDlSIj3G/kmHfEk1L
-	9o4wRijUOLQC/HUNr34+azsMTAwFRu9T4Jl06Ugu0goqx57qO7C0+lABVXsq/io0kcnmvJ6dMUs
-	lkPuhjMaH1whVZDeFBech6xkz3sqdl59DwEGonVtrhr+JN8q7WckG87IHT+MGe1qXsljKI71HwU
-	IyXNNZWAaDskbb027rcI4pBp2wFHDCDWm90b8O/PEMWTq6YamnLCfDQ9dGrXKn++MBwqT/Z7uRb
-	U1PIP/V7FeNSVbm8oc4Ylu9oIFK72lS+LnfcehhfDbkvC4iRpPITsqLJc6jTvEtrWvP65Y1rPIm
-	I0gUdAqfR
-X-Received: by 2002:a05:6512:8384:b0:5b2:a353:e4bb with SMTP id
- 2adb3069b0e04-5b45910e12dmr3433140e87.3.1787023719369; Mon, 17 Aug 2026
- 20:28:39 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="IIgJ9wq0"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=BmDd+R0t/dBhaqVBMsP0HPSKZV6o2IF0K+YklByVP2NBDdXj4Ydxxyrq4n77rT5Rp2d0xm4HkfzGRYgn8ac17JRrFuISh81AOUP/j6rcDsLp/EJl4qmO6pyuEzn4OQufIuqAun1fehvvR6ACbQZBSKPAGLHsOIzh458RQJk+te9xamaNGA6DsILhU938KW31sj/i4HgWGz66XD5eiz83vKELJfkBAd4GGSYiggycopHJA6NVP5wRW1xJvDw826igwsFRQoemcpnbeW7eWU6ZI1ksJuiPbboVxDm0UIkeqtz5cZCFOwn1y+bCB0K5I57IqwvRGo78Olf1smXSJfv8UA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=s/AK2Kn17MsLDx+kPG7ak0FjfVdkHRtRfHgxHLpSIIw=;
+ b=sOspWFfi1a0kOvNbqazHwbGG95lSHgUFmN2th9B8OPeAk3SnXi33H7IbhBBNpI63SBcS4X78Zva0uxN21/4Qy5N+WoC0EaxDO+oM8drDWUwThalb/M/sOeyQQKIrffW0YuvKr/11t+sEoET2WjXR6D+ze3t/Z6KLTGFGNOgJjTDoh1iR3OZZTBkwh/1GYPDVhbNq6fTY20ambQUc7VpLjeGA7DqVIVKN5mZdSQuPytphvRZnU7x29n9VrrfVA//+3h54k8pk7ZwpVDF2+ibQr0m76QQ+zsHU3LEui66SpbjbjP4vM/QtEwOqeKwGhhvsC4TXxi75R+o8QgnyZj8x3g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
+ dkim=pass header.d=garyguo.net; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=s/AK2Kn17MsLDx+kPG7ak0FjfVdkHRtRfHgxHLpSIIw=;
+ b=IIgJ9wq0SDe/u8pwTRybwWyWrd/raP0b54CdmgohCtfnSKQgxkemXgcEaOdHnxBEP52CAqX0oWabxWxzcOqyFjli1MWYthA5HDXOR6l413RwqJNi7nHPNnTntoQ9NNC0TMS0knU2/H/xK0oF3J9Xj8i0T7gKik3sdXcMQqKMb/A=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=garyguo.net;
+Received: from LOAP265MB8560.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:4ab::19)
+ by LO3P265MB1916.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:b6::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.339.8; Tue, 18 Aug
+ 2026 10:54:17 +0000
+Received: from LOAP265MB8560.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::f60b:1537:68d7:4fc1]) by LOAP265MB8560.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::f60b:1537:68d7:4fc1%4]) with mapi id 15.21.0339.007; Tue, 18 Aug 2026
+ 10:54:16 +0000
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 18 Aug 2026 11:54:15 +0100
+Message-Id: <DKS0ILSW36D1.20JOSTOVBQZP2@garyguo.net>
+Cc: "Nathan Chancellor" <nathan@kernel.org>, "Nicolas Schier"
+ <nsc@kernel.org>, "Boqun Feng" <boqun@kernel.org>, "Gary Guo"
+ <gary@garyguo.net>, "Matthew Maurer" <mmaurer@google.com>, "Alice Ryhl"
+ <aliceryhl@google.com>, "Peter Zijlstra" <peterz@infradead.org>,
+ <linux-kbuild@vger.kernel.org>, =?utf-8?q?Bj=C3=B6rn_Roy_Baron?=
+ <bjorn3_gh@protonmail.com>, "Benno Lossin" <lossin@kernel.org>, "Andreas
+ Hindborg" <a.hindborg@kernel.org>, "Trevor Gross" <tmgross@umich.edu>,
+ "Danilo Krummrich" <dakr@kernel.org>, "Daniel Almeida"
+ <daniel.almeida@collabora.com>, "Tamir Duberstein" <tamird@kernel.org>,
+ "Alexandre Courbot" <acourbot@nvidia.com>, =?utf-8?q?Onur_=C3=96zkan?=
+ <work@onurozkan.dev>, <rust-for-linux@vger.kernel.org>,
+ <stable@vger.kernel.org>
+Subject: Re: [PATCH 1/2] kbuild: rust: preserve unreachable traps with
+ inline helpers
+From: "Gary Guo" <gary@garyguo.net>
+To: "Josh Poimboeuf" <jpoimboe@kernel.org>, "Miguel Ojeda"
+ <ojeda@kernel.org>
+X-Mailer: aerc 0.22.0
+References: <20260816133233.197500-1-ojeda@kernel.org>
+ <aoPOqlGAlLOJ3wgx@jpoimboe>
+In-Reply-To: <aoPOqlGAlLOJ3wgx@jpoimboe>
+X-ClientProxiedBy: LO4P123CA0002.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:150::7) To LOAP265MB8560.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:4ab::19)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260803-alpha-clang-v1-0-1c4ba5ba7a64@gmail.com>
- <20260803195135.GA1083357@ax162> <CAKwvOdnLVh3uhBTcHVcag7gL+i8Cj3B0YUa2V+UdL1TQ3p=KvA@mail.gmail.com>
-In-Reply-To: <CAKwvOdnLVh3uhBTcHVcag7gL+i8Cj3B0YUa2V+UdL1TQ3p=KvA@mail.gmail.com>
-From: Matt Turner <mattst88@gmail.com>
-Date: Mon, 17 Aug 2026 23:28:27 -0400
-X-Gm-Features: AcwNN1VO344mKCA8QMRP88i0pSnKKcGvbPVE5XDaO1o6Xs5HQ_NMVQdUDXtu7kI
-Message-ID: <CAEdQ38HhVk0rmq5ZRHbQABgLix8hq49QjzxNDodk_++DmA5Thw@mail.gmail.com>
-Subject: Re: [PATCH 0/2] alpha: enable building with clang
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, Magnus Lindholm <linmag7@gmail.com>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
-	Nicolas Schier <nsc@kernel.org>, linux-alpha@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	llvm@lists.linux.dev, linux-kbuild@vger.kernel.org, 
-	Nathan Chancellor <nathan@kernel.org>, 
-	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LOAP265MB8560:EE_|LO3P265MB1916:EE_
+X-MS-Office365-Filtering-Correlation-Id: 456ed17a-bfa4-4aa2-8d3c-08defd170c19
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|10070799003|366016|7416014|23010399003|10067099003|56012099006|6133799003|18002099003|22082099003|4143699003;
+X-Microsoft-Antispam-Message-Info:
+	daainh9tFEtBRQc7F3GRpcvPwkfSJnvt2Wj77BNsdpLet5pxal/dUFK3d9uUzEhsnHlQ7WqqVBDKGGLs5/aaGCY33x3NjT8SB9Pr0QNhmnZvCnqS3dVWPPZzn3OjpHHFmDmYLAsagNaUd0GpZLeNmlJ21aq4/0vTh97tJaVVskgu1gK4mwrzc1ERNfxm+W8awUz7U0usDNS2leu1ADSnBRXRi9XbMcUi9YCMRLQm2v4QiIqhzhdUxX7Kgy+I+oR+Qu5rTT6oJl0xws8P8HI1vs9IoTXISLO1oz3nm0bgQMJX9YYr93UfM8+6Wo9bHeM74QGMKMAosknlgbK9xRtzmTv57O/h/v7SFieUVS20+uXlRZ7lu+iwJ+xvzqKApJ5wOp0CKBHcILDr2gJxMCHgZtdi0sC24pAq8uocIMg+fuHgelE78/JRamtxOTLtoFSbk49hrAs6GM2FTt8E4o8Avodtsyl9E3mylSlzZIStJsoPvNvbuFkNlLSiTeq0AK1P4oWRPKy1u2wKAKEciIIjV9eNE5IUAuNhTc1tLcsKGn42PpbOWQQ1WJb156pHAZZhngFggYxdE4CIjuUtXfmo+uwpbFYeYwr1IqR3YjQ4SHr/RpJJFCe0sr9rbX0yGbPQ4vAQclYMG4wNNUQulmak0WHXVYcz+q9HcyQ5GUojwz8=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOAP265MB8560.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(10070799003)(366016)(7416014)(23010399003)(10067099003)(56012099006)(6133799003)(18002099003)(22082099003)(4143699003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?eGtzOTFQVWFDM2Z4VXhNSmpOWkxTTFZETGJlZ2lGME0yQ0wzdStBQVQ1dHFW?=
+ =?utf-8?B?VVRFck5haEVSN0tZRU9XRTljK3cwK3dibVJCYlpXZXpIYVZsZUFoRnBLcm02?=
+ =?utf-8?B?SElBZnQvR25wejdnNWNqRjVFTVhRTGN5U3Q1VkVpcXBQcFI2S1UvRmhUUWV3?=
+ =?utf-8?B?c0xtdUdvOW9FOXI1blQyaGRtNXplSmFCQ1IyVHNPaVhtQUJEa3JxL2lXcThI?=
+ =?utf-8?B?SURUS2Z0UWVFNFVRcFZLTVFnNzFXakVvR2F0NmgyZmFiZjB3UDNsblRMM202?=
+ =?utf-8?B?WkdHUk4xNTVlNGxiOGRiazJNYWc5MzBRNExTdmw3YUFlVVZWL1oySmozVWRC?=
+ =?utf-8?B?QUVKMEd5WXRvckdOSlFXdmt2RWpoY3FQc2ZvaFVieEMzTGtmSHJzZDNOMlBk?=
+ =?utf-8?B?eC9qdE5SU1Q2WFl0RVlsN2ZnZTltaWQ5c2lpeXF0bjlGRlRKMjhlcmJERisy?=
+ =?utf-8?B?dkEwMW1kVHlGVWRCR2xTbjFyWTJ0ejgzaTNTMGlBSGNZWVpBYVlzMjZBcEg1?=
+ =?utf-8?B?SXQvZ0xWdTR5RE5IUFdCa1RTK1pHcFlUaDhmYWxpbGkzbU81cWNLYndWd3ly?=
+ =?utf-8?B?S1c0ekJXR3ltQ0hNOGxuVUlHc0NxZ3JKak5kUk5DekRHR1crdE53NEI1RHl1?=
+ =?utf-8?B?ZXJ2ZmZCOW5BaEJLWDRlQ1h4aHl1OUJNU3VGdXRxVmlsNXZQd3ZTVVBxM3VZ?=
+ =?utf-8?B?LzF3Mllhd00zYWl5RzY4RGs2cE1aOU1qQVh2ZG1xdVZFeXN0Q3VMclpjcnM4?=
+ =?utf-8?B?TGpPTkVIbS9IRHRUaWgxMlU1Q21uK1UrcWpRUnZVWkVhdnd5cGJ1T2NpU2pt?=
+ =?utf-8?B?aHoybHAxMThLMndvakQrSGNFN3ZqVFIySlRuVmtEVFdHY2F6ejhxS3hTL29O?=
+ =?utf-8?B?OURkMHhreVVuOHFVS2VraUlobjQ3cmxTY3ZDY3RuVzhNbElhbUN6UmgrNkpT?=
+ =?utf-8?B?UVB0UEtwWVo0R0hrNkFQMnVINU9GNzdSdi9mWU9ndTJFMUJHekR3amhpZ2VN?=
+ =?utf-8?B?a3c2azN6NW5Wd1ZHOEpPYW51cHZMSk5SMkE1eXFYdnhiZGtjL0VjaGk5TzhC?=
+ =?utf-8?B?Mk1ScjFWUzJsc2tYYnlEZkZnV21HdVFES1d6d2tsenprbDlSZDViTDVKWENU?=
+ =?utf-8?B?bTJNNkQwL0pMOGRQb2prL0RNem52bzJxNHVsV3pTOG5OTEEySHNXa2g5U2ZF?=
+ =?utf-8?B?OWJqMEMvQmIvUnFJd29uZXVlRDJYMFFRNFE4cC9mRTdUS0xWZ0MvY01lQU5T?=
+ =?utf-8?B?SkIyVHp1U1RnRXNVYU80Q3g3aW1sYWNMQkxtZjFOMjVhTnE3U2ZvSFlOZHV4?=
+ =?utf-8?B?QTloMDFXbkZMc1BSK2VkNWljMDl3RTMxcDZmSC9MSDJNditoaEFpRFZHOHd3?=
+ =?utf-8?B?U0Z0eVdxYldqMlBKbzhRVjgvY1c5UlFDUi9XQStNVGdHTE1OWUZRajQ1dnpC?=
+ =?utf-8?B?U2V3Z3VCVUN5MlZEam5YY2JhZDFQQ0hhVkppOW9yTE12dWdPYWJNZjMrLzlC?=
+ =?utf-8?B?Qmp2M3IxNzljVXo4QWxvN2JiUDBWVStpYWNaRjNGRW5Pc2tYYis3Um94SGxC?=
+ =?utf-8?B?V3FycGV3dGdRQmIwSDRMOGlUem53OFpWcDVwNC82ajI2aHZrMGhSeWIvZXBB?=
+ =?utf-8?B?NVJwdXpPOXorUmIrcnZ3VWtyczZFR2ZHaXo0T21vRmJiTzlIM25ieDdxcm9t?=
+ =?utf-8?B?L0FRQkJQNlRQOWU5OGNabFBnR2dTV2lSaE5DSERqanBFMlkrK20rQzdMdE9L?=
+ =?utf-8?B?RnFhK3doaG90ZXdjekdiWlA2S0xzcUFvaWJjS1Q5MG02N1F0dDB4VDdxSy9U?=
+ =?utf-8?B?NGxvRlZ6ZzR4QThDQ1czdnhKSWJnTGtjSnM5YVp5ZjRVZjR6QXdtdVNwVnVE?=
+ =?utf-8?B?ZFdqdTl4SWZjL1hXUlV6RUtCZzV1dFBRa0ROMmtxaFBRdWlmRHY3OVRveTBk?=
+ =?utf-8?B?cVhRUVJ6QUNYbm9DSkN4SjhIU1FCZkdzWS9STldvWVRxeUxUa2FDbm9udnJw?=
+ =?utf-8?B?aHFpeDJkSDJPNmx2UjI3aTllZTAwdGZOMjRHNVRlSUhuZkQ5a1QweWFIV2RM?=
+ =?utf-8?B?VzJaZlB0R2Ntci9zTDduVzA3b1krZzFYWDFvZzYzRGJxNjQwcGhiUzYwYjhB?=
+ =?utf-8?B?czBaalZ1MThkUjllZlNLaXFsNHEzeVRYTm5nc2tQcGcrREVtbDE0WVFwa1dT?=
+ =?utf-8?B?UEMwbURieFFGOGVOTGVCQVNLdTBjQm52V3VNbzRWeHdsQTdiK1RkT3NydDhi?=
+ =?utf-8?B?Zk1BdEttQjVXSUNOL0s1eGVZLzlhWHBEM2VUalE3TC9KaUp6SGR5aFlnUURV?=
+ =?utf-8?B?SHhxd3JLdzh3eHV6SkhUNWdaUnBSVmpvaFFsR0NuVnk4NnBpVXhEZz09?=
+X-OriginatorOrg: garyguo.net
+X-MS-Exchange-CrossTenant-Network-Message-Id: 456ed17a-bfa4-4aa2-8d3c-08defd170c19
+X-MS-Exchange-CrossTenant-AuthSource: LOAP265MB8560.GBRP265.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Aug 2026 10:54:16.3013
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: xO4010TIbN/EV8j6sa3/0kH2P4v/k5ranmviuP102lRJEjehQRPRR3606zBpogB+3Zhwv3IgFp8+fRXRUNVlhQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO3P265MB1916
 
-On Mon, Aug 17, 2026 at 7:16=E2=80=AFPM Nick Desaulniers
-<ndesaulniers@google.com> wrote:
+On Tue Aug 18, 2026 at 4:18 AM BST, Josh Poimboeuf wrote:
+> On Sun, Aug 16, 2026 at 03:32:32PM +0200, Miguel Ojeda wrote:
+>> When `CONFIG_RUST_INLINE_HELPERS` is enabled, it is possible to hit
+>> `objtool` warnings like:
+>>=20
+>>     vmlinux.o: warning: objtool: _R..._4cmdq12CommandToGsp4init()
+>>     falls through to next function _R..._4core5array4iter8IntoIterRShKj3=
+_EEEBa_()
+>>=20
+>> `rustc` normally emits traps for unreachable paths. However, under
+>> `CONFIG_RUST_INLINE_HELPERS=3Dy`, `rustc` emits LLVM bitcode and Clang
+>> performs final code generation after the helper bitcode is linked,
+>> but Clang does not trap unreachable IR by default.
+>>=20
+>> In turn, this means `objtool` follows compiler-generated impossible Rust
+>> `enum` paths through alignment padding into the next function, resulting
+>> in fallthrough warnings.
+>>=20
+>> Thus pass the LLVM `trap-unreachable` option to the final Clang invocati=
+on
+>> and suppress traps immediately after `noreturn` calls, which `objtool`
+>> already recognizes as dead ends. The combination of both flags makes it
+>> match `rustc`'s behavior.
+>>=20
+>> Rust 1.85.0 (the minimum supported one) supports LLVM >=3D 18, and both
+>> flags are available in LLVM 18.
 >
-> + John Paul
->
-> On Mon, Aug 3, 2026 at 12:51=E2=80=AFPM Nathan Chancellor <nathan@kernel.=
-org> wrote:
-> >
-> > Hi Matt,
-> >
-> > On Mon, Aug 03, 2026 at 01:08:40PM -0400, Matt Turner wrote:
-> > > Two small patches to let the alpha kernel build with clang.
-> >
-> > Nice!
-> >
-> > > The first registers the clang target triple and stops passing -Wa,-me=
-v6
-> > > when the compiler is not gcc.  That flag exists to keep gas from emul=
-ating
-> > > instructions it believes the target lacks; it is a gas-only option an=
-d
-> > > clang's integrated assembler does not emulate instructions, so it is =
-not
-> > > needed there.
-> > >
-> > > The second fixes two uses of local register-asm variables that clang =
-does
-> > > not honor.  clang treats `register unsigned long x __asm__("$N")` as =
-the
-> > > named register only where the variable appears as an inline-asm opera=
-nd,
-> > > so reading one to get the live $gp or $sp yields an undefined value.
-> > > trap_init() passed that to PAL_wrkgp and load_PCB() stored it into th=
-e
-> > > PCB for swpctx, either of which wedges an early boot.
-> > >
-> > > Note that the alpha backend is not in upstream LLVM.  It lives in
-> > >
-> > >   https://github.com/alphalinux-org/llvm-project
-> > >
-> > > and is a work in progress, so the scripts/Makefile.clang entry has no
-> > > effect with an upstream clang today.  I am sending this now because t=
-he
-> > > second patch is a real bug in its own right -- the register-asm reads=
- are
-> > > only guaranteed to work by gcc's implementation, not by anything eith=
-er
-> > > compiler documents -- but I understand if the kbuild side would rathe=
-r
-> > > wait for the backend to land upstream.
-> >
-> > Yeah, I am not sure how I feel taking the target triple part of the
-> > first patch. On the one hand, I want it to be easy for you to test
-> > against upstream Linux but on the other, I do not want people to read
-> > this Makefile and assume that ARCH=3Dalpha will work with an upstream
-> > clang.
->
-> Right. It's cool you have something building. I'm curious if the
-> resulting image boots? (That's the next major milestone).
->
-> I'm curious, since we've yet to have such a case of an out of tree
-> llvm backend, what's your plan, if any, to upstream your backend in
-> llvm-project proper? Perhaps as an experimental backend?  We have bugs
-> filed in our issue track for m68k which is experimental (but upstream)
-> in LLVM.
+> FWIW, I've been working on some patches that should hopefully let us get
+> rid of all the objtool hard-coded noreturn lists altogether.  I'll try to=
+ post
+> those soon.
 
-It builds a kernel that boots in qemu and on real hardware.
+That'll be nice. I once prototyped a generator for such list by using dwarf
+debug info, but obviously that cannot be part of objtool because objtool
+operates independently from dwarf.
 
-As of two days ago, it's capable of building itself and the 373
-packages of a Gentoo stage3 + a few other things. These include glibc
-and other core components (in a qemu-backend container on a fast
-multicore amd64 system).
+Looking forward to your approach and how you solve this. Please keep me (an=
+d the
+rust-for-linux list) in cc when you do.
 
-I would very much prefer to have the backend upstream, and I plan to
-start a discussion on discourse.llvm.org this week. I think an
-experimental backend is probably the limit of what makes sense for
-Alpha?
-
-If you have advice on going about this, I would welcome it (privately
-or in reply to this thread).
-
-Current diffstat is
-
-461 files changed, 29735 insertions(+), 88 deletions(-)
-
-of which {llvm,lld,clang}/test is
-
-266 files changed, 9871 insertions(+), 4 deletions(-)
-
-Currently reviewing and cleaning up, so the numbers will change.
+Thanks,
+Gary
