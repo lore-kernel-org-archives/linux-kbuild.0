@@ -1,130 +1,146 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E20713ACA59;
-	Thu, 20 Aug 2026 06:01:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70DC3400961
+	for <linux-kbuild@vger.kernel.org>; Thu, 20 Aug 2026 10:15:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787205708; cv=none; b=aI51brNyRmgtit1XAnqYAKQyxpDuX+vC8caQJ9iMpoC5xQRYWhZWCxZf2V8zuaNAK9+WjmN2RhR9woM4clmn7mkEED8wRYrobNq2WyypHVhf49u1jztbfT+7fW+6wDLAnfqv9YAXaFp/L9ov4bY8/RJK1HA0n7qTo6DWMVrhLOs=
+	t=1787220964; cv=none; b=lOqpjqS/Pg66K+MTSuc4mcsC+LkyG6yhj0ZJ4Gj0MwiysT8Tn47+1Uv3uBTYfXaBE5aLZdXW2ek4X11/bGb9UrscPe+e7DNLn/9J9WhJGgpu8DX7ad+viA6QmZjBP6YcL4mvr6TyhiLA1JhXMvfrKUMXVCMDLu51zVxsWscTGC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787205708; c=relaxed/simple;
-	bh=8uS5dsRPHfi7icvqcmgyhb3CNDYj77hQkpwH8ooc2yo=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jKbDdW2A0M3N9auZVdKRgyLLwDFcNOhlxsgLDXZeJj4KuOkP5UQrGrP9wdeRJKAs6aw/7NAujHl6UAm/m3+FnnjhP+n+INYkum/izIDfwbSDxWC07cC/aH2cRZL5yt76ewTIXz0jAqCOUAwZCaYh/+1Mrj77V7FWTzgVSQS/Wx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=qti.qualcomm.com; spf=pass smtp.mailfrom=qti.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=lpTkDIuB; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=qti.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qti.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="lpTkDIuB"
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67JL8S041354410;
-	Thu, 20 Aug 2026 06:01:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	VVQjbC9+fnH6Vyr1Zks+xvDk69G/N0rKNtI8rI2rI8A=; b=lpTkDIuBMxLSHxGQ
-	xxQtqNBLoluswlZbAqJxAqTpsnVpo5I7a5i2NQ4FwmLUbiUQraekDicZISS59HGy
-	2XxY8vQBNVfMVLTKdCyGxOxxpHj6FkkMvcXu7ea9iJrnj1/YM+wQUu26ndwjh2AJ
-	svZuRtJB+2rSvc/TvypRitOBhXqvmJwPWcav1MW1uvKaoayeVBLqY7pNi/coo3UY
-	cQD0a60brLjzpN8bY/MkBWnLZLBf7WNgoVN950hAlV13sE1ypdZN6P8Y3hgvqdTB
-	Sc6KJkY0lTesR6yZLMgJ0gVMm5i+r4lOunZ1SCqXxh/kIshoHOrMy5I9NZF8XqPi
-	4BRXng==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4g5es5bdk3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 20 Aug 2026 06:01:44 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA02.qualcomm.com (8.18.1.7/8.18.1.7) with ESMTPS id 67K61hBv002831
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 20 Aug 2026 06:01:43 GMT
-Received: from quicinc.com (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.43; Wed, 19 Aug
- 2026 23:01:39 -0700
-From: Jaihind Yadav <jaihindy@qti.qualcomm.com>
-To: <kees@kernel.org>
-CC: <nathan@kernel.org>, <nsc@kernel.org>, <linux-hardening@vger.kernel.org>,
-        <linux-kbuild@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-modules@vger.kernel.org>,
-        Jaihind Yadav <jaihindy@qti.qualcomm.com>
-Subject: [PATCH v3] scripts/gcc-plugins: suppress recorded GCC switches for extmod builds
-Date: Thu, 20 Aug 2026 11:31:16 +0530
-Message-ID: <20260820060116.786173-1-jaihindy@qti.qualcomm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260817185146.GC1249844@ax162>
-References: <20260817185146.GC1249844@ax162>
+	s=arc-20240116; t=1787220964; c=relaxed/simple;
+	bh=7f2co051PmLuwxtETwPSxom72qfoz1MUOtiujyQ2QOI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UtXs/QNZMPGaS5/dRXDC24UYh8GpCOCStfbmbYEoK0nWhs9Yt2wp6fZO8QH+l719h9hnWwaT9E5hT4amqy3UZ5ymf2Mpc5zsu4NDjoo1xiQyyCQh7B4Mf2OpN9CuOKAFeEaqi4OO9aEUXIV0EjzUXiYNAP34InkJQaL0U79MNyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-5bf9466412fso1844264e0c.1
+        for <linux-kbuild@vger.kernel.org>; Thu, 20 Aug 2026 03:15:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787220946; x=1787825746;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=y+o9iLBsNyZevlXTHABv43DjobImxTsPK2gLQOnstcQ=;
+        b=XvAhMAzS3Q01J5yXuo97eenHzpJpHqQ32RAHANzk6qvHdyFhtiuhjMFJ4EBazmtzKJ
+         51p8KHPvJmV9dggMEYmg47PDSFBppqwBV6wL9M2+UMlLFQ0XYoVm7jickiFFHfHTTkcS
+         N1kt4gRKHDweit9n+IEwPaBcMPCOdk06hZPyzpkJPT0gJSTQu20CrtmSsLrjc3K5jXDQ
+         HJjfEztTbxJOIyQonlWeDQVa7SRtz891TopANRio1GDewPzvXaG/fRNeLPurB9v+3gH3
+         5tQdTZEZRritFmgI1cFV+sQ3wI6ivsOpAT6HpCngRTlIT9v45QHz860rpw+bdPnTNPrR
+         k2vA==
+X-Forwarded-Encrypted: i=1; AHgh+RqIJKiHgfSwxBJhTzdVWGkxf8zJzkR0nSe5FIoEozoDgaQLWl77FeKg9t9ZIkN5Dv0yvSXmNrEOQRYY+fQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGmi/9iCUdtKFhuHnbjVo7hffXa+EMrXJBzWPGh/Zu/1vAEpdD
+	dqPDMCC7zi0u34oZJqavUnoPlw4YEZnXeOLn6naufKZNazmXOtDwm0eEmRdyxVG8
+X-Gm-Gg: AR+sD12DTJoQ8p1zP4gPj+ywLicXqi+zgpjxwx3rv37oX6t6yzDhSMsHipy+X05aaV3
+	gLHGAhEQjipDdR5wW5SehJlwLXMm/pFo/2z9vdy1tvsLn48rCZN8WHZbyL9FpG/Zo02UzM6KYxq
+	tFkX7RJU+DyEdWDkRfG4/eJwPk92d9HL/BfLmzizRnPTqfUgVMjmAHtftuM25w3kb8CtZKTqEGw
+	FaGg630b9K+6cn1/jg0yGr3V7gJnlw0ZzNSBT7HAvgkiSGvtPhh+42Xqg+oolylqwgPYEN5VpcA
+	PC16gdrdbJuWdvjZ1uubZISWpvzi9NnRbcCd7A9MzA9kDYfynRXRWt8CQazi44JXHULke93l/Ll
+	BXEKh/dIMxgndNc/tWIgLxXGAy1Omt+nHFzOEHOh5yjVsW5ycteG8rrHiPrNEFvjMaETmhcRfjG
+	4g6VxZIJ72eq0JTXKtD2cr2I75yFmyA62yPk8cmPzF2j0ujr8CY/Il4qK+HSBkqtzQ3klv2ccWx
+	LM4jUu/nIJgwvejv/AW6cbVxg==
+X-Received: by 2002:a05:6122:e463:b0:5c2:cffc:2c55 with SMTP id 71dfb90a1353d-5c5e3b6c852mr4875226e0c.0.1787220945848;
+        Thu, 20 Aug 2026 03:15:45 -0700 (PDT)
+Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com. [209.85.222.49])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c5e2639be2sm5114768e0c.8.2026.08.20.03.15.44
+        for <linux-kbuild@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Aug 2026 03:15:44 -0700 (PDT)
+Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-97c637bf788so217824241.1
+        for <linux-kbuild@vger.kernel.org>; Thu, 20 Aug 2026 03:15:44 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+Rod5h/mVjf3LCoscziBq43/mraHPr3eXluOUKdTPBcBqrrlNp6S/BLxsRDJLHOhDrPwPL2gLSB+oQrTAC8=@vger.kernel.org
+X-Received: by 2002:a05:6102:2b9c:b0:779:2dc9:1f40 with SMTP id
+ ada2fe7eead31-7792dc9231dmr1821162137.3.1787220944749; Thu, 20 Aug 2026
+ 03:15:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-ORIG-GUID: n2s15Jq5oFV4WnoqJlERk3BkmEGGKM4M
-X-Proofpoint-GUID: n2s15Jq5oFV4WnoqJlERk3BkmEGGKM4M
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODIwMDA0MiBTYWx0ZWRfX8ZbtTo307tc2
- gAhQoZu2fa5sWlT0TIfJa3xfy01cB7qgltZKIdx7OSbguvSV3Zad3CdVBmd1Bu1JBJqK9bdlvRi
- t2OfXpvdwWq11t+/zOg4/fZv+90r2h0=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODIwMDA0MiBTYWx0ZWRfXx5HwNLJSQir6
- ENZEGZNwwh8fAZwyqjXwXRcvzrqB/8bFoywgOupNQ+ZYM70J0WJ/i4q/UCcwsZyX7Ca2mJZqE8/
- 9euaRA+rwrrTSUsltvG8AL+wXmnlpTg+0tn+TYGwhgivHCgGzjVvHTtQeIbvMLhs044J+ZyJcNI
- wG8+eh+qKsWT8NsLSQm/rMaOcvOAD2nHPCCrkKjlOAzTJqCc9n8u64pJq582ID7qdLYQVHexQN+
- oKUXQT1yo61l/K95z+5VMNzsHFfY+8HUfNhhyEBZ481lMdXM0sXV47EZEwDY1RVbgZaw0UBosVf
- CZk+JOOPf2cBeX0okjdT3jSJP9ujY7rRf+gucUg8UuZDfFIbwmQ/BcyF2LgeSMreM2j/PjNEs7y
- efD5j2QrqN0vUB1zn681Pw5uIOycdFYYC0GnM6oa2h0sWLLjxeP7xgcmf4BSHqAmjcMk0RLe35r
- bO8crs/uGqLRzhnw5BQ==
-X-Authority-Analysis: v=2.4 cv=Oc+oyBTY c=1 sm=1 tr=0 ts=6a869848 cx=c_pps
- a=ouPCqIW2jiPt+lZRy3xVPw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
- a=GEpy-HfZoHoA:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=rJkE3RaqiGZ5pbrm-msn:22 a=VwQbUJbxAAAA:8
- a=EUspDBNiAAAA:8 a=jsFOyA_XevxqPLBfZcQA:9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-19_06,2026-08-19_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 bulkscore=0 adultscore=0 lowpriorityscore=0
- priorityscore=1501 phishscore=0 malwarescore=0 spamscore=0 suspectscore=0
- clxscore=1015 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2608200042
+References: <c480ed6b8bf38822263e2c5b7cf32b28600f212d.1787219898.git.geert+renesas@glider.be>
+In-Reply-To: <c480ed6b8bf38822263e2c5b7cf32b28600f212d.1787219898.git.geert+renesas@glider.be>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu, 20 Aug 2026 12:15:33 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdVyUAA3L4mUkSjmnuE3cvj-+N8z-Bhxsh1wa-FQWc=fjw@mail.gmail.com>
+X-Gm-Features: AcwNN1UWhRa382Q8SMeXb2Oyrd1gOh-npcOHUcLlPC7nVo2RmYwaP-iNW8vv0Bw
+Message-ID: <CAMuHMdVyUAA3L4mUkSjmnuE3cvj-+N8z-Bhxsh1wa-FQWc=fjw@mail.gmail.com>
+Subject: Re: [PATCH] erofs: Fix EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS default logic
+To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
+Cc: Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>, Yue Hu <zbestahu@gmail.com>, 
+	Jeffle Xu <jefflexu@linux.alibaba.com>, Sandeep Dhavale <dhavale@google.com>, 
+	Hongbo Li <hongbohbli@tencent.com>, Chunhai Guo <guochunhai@vivo.com>, 
+	Michael Bommarito <michael.bommarito@gmail.com>, linux-erofs@lists.ozlabs.org, 
+	linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-With GCC plugins enabled, external module builds can record
--fplugin=... paths in DWARF producer metadata via
--grecord-gcc-switches, leaking host/build specific paths and
-triggering QA checks.
+CC kbuild
 
-Handle this in scripts/Makefile.gcc-plugins for KBUILD_EXTMOD
-builds by adding -gno-record-gcc-switches to plugin cflags.
+On Thu, 20 Aug 2026 at 12:01, Geert Uytterhoeven
+<geert+renesas@glider.be> wrote:
+> When NR_CPUS is less than 16, or when SMP is disabled, the default value
+> of 16 is invalid.
+>
+> While actual configuration picks up a sensible and valid default
+> (NR_CPUS or 1), "make savedefconfig" will still write a line like
+>
+>     CONFIG_EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS=1
+>
+> to the defconfig file, even if that matches the sensible default.
 
-This keeps plugin behavior unchanged while avoiding absolute
-plugin path leakage in external module debug metadata.
+Is this a bug in kconfig?
 
-Suggested-by: Nathan Chancellor <nathan@kernel.org>
-Link: https://lore.kernel.org/all/20260817185146.GC1249844@ax162/
-Signed-off-by: Jaihind Yadav <jaihindy@qti.qualcomm.com>
----
- scripts/Makefile.gcc-plugins | 4 ++++
- 1 file changed, 4 insertions(+)
+> Avoid needlessly enlarging the defconfig files, and reduce churn for
+> updating them, by specifying valid defaults depending on SMP and
+> NR_CPUS.
+>
+> While at it, make the prompt depend on SMP, as there is no point in
+> asking the user about the maximum number of decompression streams if
+> there is only one valid answer.
+>
+> Fixes: c9b47e6b23114e93 ("erofs: cap LZMA stream pool size")
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> ---
+>  fs/erofs/Kconfig | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
+>
+> diff --git a/fs/erofs/Kconfig b/fs/erofs/Kconfig
+> index 2dfc313588d283a0..37495e95a78d9bf6 100644
+> --- a/fs/erofs/Kconfig
+> +++ b/fs/erofs/Kconfig
+> @@ -132,11 +132,13 @@ config EROFS_FS_ZIP_LZMA
+>           Say N if you want to disable LZMA compression support.
+>
+>  config EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS
+> -       int "EROFS LZMA default maximum decompression streams"
+> +       int "EROFS LZMA default maximum decompression streams" if SMP
+>         depends on EROFS_FS_ZIP_LZMA
+>         range 1 NR_CPUS if SMP
+>         range 1 1 if !SMP
+> -       default 16
+> +       default 16 if SMP && NR_CPUS >= 16
+> +       default NR_CPUS if SMP
+> +       default 1
+>         help
+>           By default EROFS allocates one LZMA decompression stream per CPU.
+>           Each stream can hold a dictionary of up to 8 MiB taken from the
+> @@ -144,7 +146,7 @@ config EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS
+>           of memory.  This caps the default; the lzma_streams module parameter
+>           still overrides it.
+>
+> -         If unsure, keep the default of 16.
+> +         If unsure, keep the suggested default (16 or lower).
+>
+>  config EROFS_FS_ZIP_DEFLATE
+>         bool "EROFS DEFLATE compressed data support"
 
-diff --git a/scripts/Makefile.gcc-plugins b/scripts/Makefile.gcc-plugins
-index b0e1423b09c2..9b9899580571 100644
---- a/scripts/Makefile.gcc-plugins
-+++ b/scripts/Makefile.gcc-plugins
-@@ -8,6 +8,10 @@ ifdef CONFIG_GCC_PLUGIN_LATENT_ENTROPY
- endif
- export DISABLE_LATENT_ENTROPY_PLUGIN
- 
-+# Disable recording GCC options in debug info when building external modules to
-+# avoid leaking absolute host build paths
-+gcc-plugin-cflags-$(if $(KBUILD_EXTMOD),y) += -gno-record-gcc-switches
-+
- # All the plugin CFLAGS are collected here in case a build target needs to
- # filter them out of the KBUILD_CFLAGS.
- GCC_PLUGINS_CFLAGS := $(strip $(addprefix -fplugin=$(objtree)/scripts/gcc-plugins/, $(gcc-plugin-y)) $(gcc-plugin-cflags-y)) -DGCC_PLUGINS
+Gr{oetje,eeting}s,
+
+                        Geert
+
 -- 
-2.43.0
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
