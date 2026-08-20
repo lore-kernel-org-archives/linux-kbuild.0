@@ -1,422 +1,130 @@
-Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC5E73B47E0;
-	Wed, 19 Aug 2026 18:17:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E20713ACA59;
+	Thu, 20 Aug 2026 06:01:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787163445; cv=none; b=M49MnuhJYm13Bzg6Og+gz/LLBawU03/z507F6Y33Ka2DaIWLuQEQNIF3bWnr+r5TP0RAmpE8wqcYSym58yfGBrjEG8W5ZfkLoLJ/1xppoD5verCSfzwBwOpFr3Kzg44lbEY1cJ+VQyhQFcHxh64mAuem1T1URLSEt3lWhw9l0ss=
+	t=1787205708; cv=none; b=aI51brNyRmgtit1XAnqYAKQyxpDuX+vC8caQJ9iMpoC5xQRYWhZWCxZf2V8zuaNAK9+WjmN2RhR9woM4clmn7mkEED8wRYrobNq2WyypHVhf49u1jztbfT+7fW+6wDLAnfqv9YAXaFp/L9ov4bY8/RJK1HA0n7qTo6DWMVrhLOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787163445; c=relaxed/simple;
-	bh=WQRS2RHH2akgWDVpelBmiZG1coEA2yQ3av12m9vmhk4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=fOtTMMRm2ztIGrpW0OkSdiG/1cKylhDZH9DWVOiyXui7e/R8rAOUEQfbQTYj7L0pi84BFLUom7aRb+xu+N6PKM6bgIrY6rAMQgUE+34tbF9sxArt2S0aByqsXFQgQ8akK0M5Yc+RnpJ5f7nCgFYAQKEZQApgcROodMgGjWA79dQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=rIAa4iWO; arc=none smtp.client-ip=213.97.179.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
+	s=arc-20240116; t=1787205708; c=relaxed/simple;
+	bh=8uS5dsRPHfi7icvqcmgyhb3CNDYj77hQkpwH8ooc2yo=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jKbDdW2A0M3N9auZVdKRgyLLwDFcNOhlxsgLDXZeJj4KuOkP5UQrGrP9wdeRJKAs6aw/7NAujHl6UAm/m3+FnnjhP+n+INYkum/izIDfwbSDxWC07cC/aH2cRZL5yt76ewTIXz0jAqCOUAwZCaYh/+1Mrj77V7FWTzgVSQS/Wx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=qti.qualcomm.com; spf=pass smtp.mailfrom=qti.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=lpTkDIuB; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=qti.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qti.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="rIAa4iWO"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; h=Cc:To:Message-Id:Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Subject:Date:From:From:Reply-To;
-	bh=jKOtxlRf7QwQPlRJp8elszSh59Tvs6EEuFjMe2Gw8W0=; b=rIAa4iWOu300Mt0xJf/kHgsZxB
-	wwc8d4w2ZzpPAguxJYkf9Efsz9XPxW+CrpDnxK9np0s+2sFX667qE7+008RASjD9kCLI89C3oIugG
-	ap2k9horEn1ErTZvHVp2nrd07Rd82KEhzag3VltGdsJWKrfP05PE/Gp7aPk26ALy4oKAEzh8gB5DC
-	v4vzgUNX3jwzoT7r2ZJZfCFHZXC52qU6Bduieb8vVP6u/QyeStQ0KRg26BppZsbtRf1wLLg1uczJA
-	czhwMwL3kaRxR5H6o5NaxdnScHzifbt9bVHqKiupBXdW9Hcj3weQrrIHAquk/TbMzSRrYz94sB1KE
-	RP5a0xkQ==;
-Received: from 186-249-147-181.shared.desktop.com.br ([186.249.147.181] helo=[127.0.1.1])
-	by fanzine2.igalia.com with esmtpsa 
-	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
-	id 1wwkqn-006ENH-88; Wed, 19 Aug 2026 20:17:21 +0200
-From: Mauricio Faria de Oliveira <mfo@igalia.com>
-Date: Wed, 19 Aug 2026 15:16:26 -0300
-Subject: [PATCH RFC v3 13/13] modpost: handle MODULE_SYSCTL_TABLE symbols
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="lpTkDIuB"
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67JL8S041354410;
+	Thu, 20 Aug 2026 06:01:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	VVQjbC9+fnH6Vyr1Zks+xvDk69G/N0rKNtI8rI2rI8A=; b=lpTkDIuBMxLSHxGQ
+	xxQtqNBLoluswlZbAqJxAqTpsnVpo5I7a5i2NQ4FwmLUbiUQraekDicZISS59HGy
+	2XxY8vQBNVfMVLTKdCyGxOxxpHj6FkkMvcXu7ea9iJrnj1/YM+wQUu26ndwjh2AJ
+	svZuRtJB+2rSvc/TvypRitOBhXqvmJwPWcav1MW1uvKaoayeVBLqY7pNi/coo3UY
+	cQD0a60brLjzpN8bY/MkBWnLZLBf7WNgoVN950hAlV13sE1ypdZN6P8Y3hgvqdTB
+	Sc6KJkY0lTesR6yZLMgJ0gVMm5i+r4lOunZ1SCqXxh/kIshoHOrMy5I9NZF8XqPi
+	4BRXng==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4g5es5bdk3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 20 Aug 2026 06:01:44 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA02.qualcomm.com (8.18.1.7/8.18.1.7) with ESMTPS id 67K61hBv002831
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 20 Aug 2026 06:01:43 GMT
+Received: from quicinc.com (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.43; Wed, 19 Aug
+ 2026 23:01:39 -0700
+From: Jaihind Yadav <jaihindy@qti.qualcomm.com>
+To: <kees@kernel.org>
+CC: <nathan@kernel.org>, <nsc@kernel.org>, <linux-hardening@vger.kernel.org>,
+        <linux-kbuild@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-modules@vger.kernel.org>,
+        Jaihind Yadav <jaihindy@qti.qualcomm.com>
+Subject: [PATCH v3] scripts/gcc-plugins: suppress recorded GCC switches for extmod builds
+Date: Thu, 20 Aug 2026 11:31:16 +0530
+Message-ID: <20260820060116.786173-1-jaihindy@qti.qualcomm.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260817185146.GC1249844@ax162>
+References: <20260817185146.GC1249844@ax162>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260819-sysctl-module-aliases-v3-13-aab90569365d@igalia.com>
-References: <20260819-sysctl-module-aliases-v3-0-aab90569365d@igalia.com>
-In-Reply-To: <20260819-sysctl-module-aliases-v3-0-aab90569365d@igalia.com>
-To: Kees Cook <kees@kernel.org>, Joel Granados <joel.granados@kernel.org>, 
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: kernel-dev@igalia.com, linux-riscv@lists.infradead.org, 
- linux-kernel@vger.kernel.org, fsverity@lists.linux.dev, 
- keyrings@vger.kernel.org, bpf@vger.kernel.org, 
- linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
- netdev@vger.kernel.org, linux-wpan@vger.kernel.org, 
- lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org, 
- coreteam@netfilter.org, linux-sctp@vger.kernel.org, 
- linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org, 
- bridge@lists.linux.dev, mptcp@lists.linux.dev, rds-devel@oss.oracle.com, 
- virtualization@lists.linux.dev, Mauricio Faria de Oliveira <mfo@igalia.com>
-X-Mailer: b4 0.14.2
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-ORIG-GUID: n2s15Jq5oFV4WnoqJlERk3BkmEGGKM4M
+X-Proofpoint-GUID: n2s15Jq5oFV4WnoqJlERk3BkmEGGKM4M
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODIwMDA0MiBTYWx0ZWRfX8ZbtTo307tc2
+ gAhQoZu2fa5sWlT0TIfJa3xfy01cB7qgltZKIdx7OSbguvSV3Zad3CdVBmd1Bu1JBJqK9bdlvRi
+ t2OfXpvdwWq11t+/zOg4/fZv+90r2h0=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODIwMDA0MiBTYWx0ZWRfXx5HwNLJSQir6
+ ENZEGZNwwh8fAZwyqjXwXRcvzrqB/8bFoywgOupNQ+ZYM70J0WJ/i4q/UCcwsZyX7Ca2mJZqE8/
+ 9euaRA+rwrrTSUsltvG8AL+wXmnlpTg+0tn+TYGwhgivHCgGzjVvHTtQeIbvMLhs044J+ZyJcNI
+ wG8+eh+qKsWT8NsLSQm/rMaOcvOAD2nHPCCrkKjlOAzTJqCc9n8u64pJq582ID7qdLYQVHexQN+
+ oKUXQT1yo61l/K95z+5VMNzsHFfY+8HUfNhhyEBZ481lMdXM0sXV47EZEwDY1RVbgZaw0UBosVf
+ CZk+JOOPf2cBeX0okjdT3jSJP9ujY7rRf+gucUg8UuZDfFIbwmQ/BcyF2LgeSMreM2j/PjNEs7y
+ efD5j2QrqN0vUB1zn681Pw5uIOycdFYYC0GnM6oa2h0sWLLjxeP7xgcmf4BSHqAmjcMk0RLe35r
+ bO8crs/uGqLRzhnw5BQ==
+X-Authority-Analysis: v=2.4 cv=Oc+oyBTY c=1 sm=1 tr=0 ts=6a869848 cx=c_pps
+ a=ouPCqIW2jiPt+lZRy3xVPw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
+ a=GEpy-HfZoHoA:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=rJkE3RaqiGZ5pbrm-msn:22 a=VwQbUJbxAAAA:8
+ a=EUspDBNiAAAA:8 a=jsFOyA_XevxqPLBfZcQA:9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-08-19_06,2026-08-19_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 bulkscore=0 adultscore=0 lowpriorityscore=0
+ priorityscore=1501 phishscore=0 malwarescore=0 spamscore=0 suspectscore=0
+ clxscore=1015 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2608200042
 
-Update file2alias.c to handle 'mod_devicetable' symbols with type 'sysctl'.
+With GCC plugins enabled, external module builds can record
+-fplugin=... paths in DWARF producer metadata via
+-grecord-gcc-switches, leaking host/build specific paths and
+triggering QA checks.
 
-The key operation is to iterate over relocation entries, so add the helper
-for_each_reloc() with a function callback, and the functions to:
+Handle this in scripts/Makefile.gcc-plugins for KBUILD_EXTMOD
+builds by adding -gno-record-gcc-switches to plugin cflags.
 
-1) Find the sysctl path and table in the 'sysctl' module symbol.
+This keeps plugin behavior unchanged while avoiding absolute
+plugin path leakage in external module debug metadata.
 
-2) Find the sysctl table's entries and their '.procname' field,
-   adding a module alias 'sysctl:*/<path>/<procname>' for each.
-
-Originally-by: Mauricio Faria de Oliveira <mfo@canonical.com>
-Signed-off-by: Mauricio Faria de Oliveira <mfo@igalia.com>
+Suggested-by: Nathan Chancellor <nathan@kernel.org>
+Link: https://lore.kernel.org/all/20260817185146.GC1249844@ax162/
+Signed-off-by: Jaihind Yadav <jaihindy@qti.qualcomm.com>
 ---
- scripts/mod/file2alias.c | 237 +++++++++++++++++++++++++++++++++++++++++++++++
- scripts/mod/modpost.c    |  11 ++-
- scripts/mod/modpost.h    |  23 +++++
- 3 files changed, 269 insertions(+), 2 deletions(-)
+ scripts/Makefile.gcc-plugins | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
-index 8d36c74dec2d55840de60b3f8ec22b646d16ff8b..abf6ce69831e2ed80a72e38df1353e44d886562c 100644
---- a/scripts/mod/file2alias.c
-+++ b/scripts/mod/file2alias.c
-@@ -1531,6 +1531,238 @@ static const struct devtable devtable[] = {
- 	{"pnp_card", SIZE_pnp_card_device_id, do_pnp_card_entry},
- };
+diff --git a/scripts/Makefile.gcc-plugins b/scripts/Makefile.gcc-plugins
+index b0e1423b09c2..9b9899580571 100644
+--- a/scripts/Makefile.gcc-plugins
++++ b/scripts/Makefile.gcc-plugins
+@@ -8,6 +8,10 @@ ifdef CONFIG_GCC_PLUGIN_LATENT_ENTROPY
+ endif
+ export DISABLE_LATENT_ENTROPY_PLUGIN
  
-+// Looks like: sysctl:*/path/procname
-+static void do_sysctl_entry(const char *procname, const char *path,
-+			    struct module *mod)
-+{
-+	const char *src, *end_src = path + strlen(path);
-+	char *dst, buf[256], *end_dst = buf + sizeof(buf) - 1; /* -1 for NUL. */
++# Disable recording GCC options in debug info when building external modules to
++# avoid leaking absolute host build paths
++gcc-plugin-cflags-$(if $(KBUILD_EXTMOD),y) += -gno-record-gcc-switches
 +
-+	/* Replace '%s' from path template with '*' for wildcard in modprobe. */
-+	for (src = path, dst = buf; src < end_src && *src && dst < end_dst; src++, dst++)
-+		*dst = (*src == '%') ? (src++, '*') : *src;
-+	*dst = '\0';
-+
-+	module_alias_printf(mod, false, "sysctl:*/%s/%s", buf, procname);
-+}
-+
-+/*
-+ * Execute a callback function for each relocation entry in relocation section.
-+ * The caller must ensure sechdr->sh_type is SHT_RELA or SHT_REL.
-+ */
-+static void for_each_reloc(struct elf_info *elf, unsigned int shndx,
-+			   bool (*fn)(struct elf_info *elf, Elf_Shdr *sechdr,
-+				      Elf_Sym *sym, Elf_Addr r_offset,
-+				      Elf_Addr r_addend, void *data),
-+			   void *data)
-+{
-+	Elf_Shdr *sechdr = &elf->sechdrs[shndx];
-+	const Elf_Rela *rela; /* used as Elf_Rel[a] on SHT_REL[A] */
-+	const Elf_Rela *start = (void *) elf->hdr + sechdr->sh_offset;
-+	const Elf_Rela *stop = (void *) start + sechdr->sh_size;
-+	size_t size = (sechdr->sh_type == SHT_RELA) ? sizeof(Elf_Rela)
-+						    : sizeof(Elf_Rel);
-+
-+	for (rela = start; rela < stop; rela = (Elf_Rela *)((void *) rela + size)) {
-+		Elf_Sym *sym;
-+		Elf_Addr r_offset, r_addend;
-+		unsigned int r_type, r_sym;
-+
-+		r_offset = TO_NATIVE(rela->r_offset);
-+		get_rel_type_and_sym(elf, rela->r_info, &r_type, &r_sym);
-+
-+		sym = elf->symtab_start + r_sym;
-+		r_addend = (sechdr->sh_type == SHT_RELA)
-+					? TO_NATIVE(rela->r_addend)
-+					: addend_rel(elf, sechdr->sh_info,
-+						     r_type, r_offset, sym);
-+
-+		if (fn(elf, sechdr, sym, r_offset, r_addend, data))
-+			break;
-+	}
-+}
-+
-+/*
-+ * Callback parameters and function to loop over the sysctl entries in struct
-+ * module_sysctl_table's .table symbol (found below) in its reloction section.
-+ */
-+struct sysctl_entries {
-+	Elf_Addr table_offset;
-+	ssize_t table_size;
-+	ssize_t entry_size;
-+	const char *path;
-+	const char *modsymname;
-+	struct module *mod;
-+};
-+
-+static bool do_sysctl_entries(struct elf_info *elf, Elf_Shdr *sechdr, Elf_Sym *sym,
-+			      Elf_Addr r_offset, Elf_Addr r_addend, void *data)
-+{
-+	struct sysctl_entries *sysctl_entries = (struct sysctl_entries *) data;
-+
-+	/* Skip until .table starts */
-+	if (r_offset < sysctl_entries->table_offset)
-+		return false;
-+
-+	/* Stop after .table ends */
-+	if (r_offset >= sysctl_entries->table_offset + sysctl_entries->table_size)
-+		return true;
-+
-+	/* Check for alignment with an array entry (.procname at offset zero) */
-+	if ((r_offset - sysctl_entries->table_offset) % sysctl_entries->entry_size == 0) {
-+
-+		/* The symbol for .procname points to a string */
-+		const char *procname = (const char *)
-+				       sym_get_data_addend(elf, sym, r_addend);
-+
-+		if (!procname) {
-+			warn("%s [%s] found entry with NULL .procname (skip)\n",
-+			     sysctl_entries->modsymname, sysctl_entries->mod->name);
-+			return false;
-+		}
-+
-+		do_sysctl_entry(procname, sysctl_entries->path, sysctl_entries->mod);
-+	}
-+
-+	/* Continue at next entry */
-+	return false;
-+}
-+
-+/*
-+ * Callback parameters and function to search for struct module_sysctl_table's
-+ * pointers (.path and .table) in relocation entries of a relocation section.
-+ */
-+struct sysctl_pointers {
-+	/* Input: offsets */
-+	Elf_Addr path_offset;
-+	Elf_Addr table_offset;
-+
-+	/* Output: symbols and relocation addends */
-+	Elf_Sym *path_sym;
-+	Elf_Sym *table_sym;
-+	Elf_Addr path_r_addend;
-+	Elf_Addr table_r_addend;
-+};
-+
-+static bool do_sysctl_pointers(struct elf_info *elf, Elf_Shdr *sechdr, Elf_Sym *sym,
-+			       Elf_Addr r_offset, Elf_Addr r_addend, void *data)
-+{
-+	struct sysctl_pointers *sysctl_pointers = (struct sysctl_pointers *) data;
-+
-+	/* Check for relocation entry's offset matching .path or .table */
-+	if (!sysctl_pointers->path_sym &&
-+	     sysctl_pointers->path_offset == r_offset) {
-+		sysctl_pointers->path_sym = sym;
-+		sysctl_pointers->path_r_addend = r_addend;
-+	} else if (!sysctl_pointers->table_sym &&
-+		    sysctl_pointers->table_offset == r_offset) {
-+		sysctl_pointers->table_sym = sym;
-+		sysctl_pointers->table_r_addend = r_addend;
-+	}
-+
-+	/* Stop once both .path and .table are found */
-+	return (sysctl_pointers->path_sym && sysctl_pointers->table_sym);
-+}
-+
-+static void do_sysctl_table(const char *modsymname, void *modsymval,
-+			    Elf_Sym *modsym, struct module *mod,
-+			    struct elf_info *info)
-+{
-+	/*
-+	 * The struct module_sysctl_table symbol contains 4 fields:
-+	 *  .path: pointer to string with the dirname in /proc/sys
-+	 *  .table: pointer to struct ctl_table array with filenames (.procname)
-+	 *  .table_size: size of struct ctl_table array
-+	 *  .entry_size: size of struct ctl_table entry in the array
-+	 */
-+
-+	/* The size values can be read directly. */
-+	DEF_FIELD(modsymval, module_sysctl_table, table_size);
-+	DEF_FIELD(modsymval, module_sysctl_table, entry_size);
-+
-+	struct sysctl_entries sysctl_entries = {
-+		.table_size = table_size,
-+		.entry_size = entry_size,
-+		.modsymname = modsymname,
-+		.mod = mod,
-+	};
-+
-+	/*
-+	 * Step 1:
-+	 *
-+	 * Each pointer has a relocation entry in a relocation section,
-+	 * that links the pointer with the symbol it points to.
-+	 *
-+	 * In order to access the symbols pointed to by .path and .table pointers:
-+	 * 1) find the relocation section of the struct module_sysctl_table symbol;
-+	 * 2) find the relocation entries for these pointers by their field offset;
-+	 * 3) then use the symbols found in these relocation entries.
-+	 */
-+
-+	struct sysctl_pointers sysctl_pointers = {
-+		.path_offset = modsym->st_value + OFF_module_sysctl_table_path,
-+		.path_sym = NULL,
-+		.table_offset = modsym->st_value + OFF_module_sysctl_table_table,
-+		.table_sym = NULL,
-+	};
-+
-+	unsigned int shndx;
-+
-+	/* Find the relocation section for struct module_sysctl_table symbol. */
-+	shndx = get_reloc_secindex(info, modsym);
-+	if (shndx == SHN_UNDEF) {
-+		error("%s [%s.ko] cannot find relocation section for symbol\n",
-+		      modsymname, mod->name);
-+		return;
-+	}
-+
-+	/* Find the relocation entries for the .path and .table pointers. */
-+	for_each_reloc(info, shndx, do_sysctl_pointers, &sysctl_pointers);
-+	if (!sysctl_pointers.path_sym || !sysctl_pointers.table_sym) {
-+		error("%s [%s.ko] cannot find relocation entry for path/table\n",
-+		      modsymname, mod->name);
-+		return;
-+	}
-+
-+	/*
-+	 * Step 2:
-+	 *
-+	 * The .table symbol is the struct ctl_table array where each entry has
-+	 * a .procname pointer with a relocation entry for the filename string.
-+	 *
-+	 * In order to access the strings pointed to by .procname pointers:
-+	 * 1) Find the relocation section of the struct ctl_table array symbol;
-+	 * 2) Find the relocation entries for these pointers by their field offset;
-+	 * 3) Then use the symbols found in these relocation entries.
-+	 */
-+
-+	/* Find the relocation section for the struct ctl_table array. */
-+	shndx = get_reloc_secindex(info, sysctl_pointers.table_sym);
-+	if (shndx == SHN_UNDEF) {
-+		/* Edge case: empty .table: no relocation section. */
-+		return;
-+	}
-+
-+	/* The .path symbol can be read directly. */
-+	sysctl_entries.path = (const char *)
-+			   sym_get_data_addend(info, sysctl_pointers.path_sym,
-+						sysctl_pointers.path_r_addend);
-+
-+	/* The .table symbol is the struct ctl_table array. */
-+	sysctl_entries.table_offset = sysctl_pointers.table_sym->st_value +
-+				   sysctl_pointers.table_r_addend;
-+
-+	/* The .entry_size value must not be zero. */
-+	if (sysctl_entries.entry_size == 0) {
-+		error("%s [%s.ko] invalid entry size (zero)\n",
-+		      modsymname, mod->name);
-+		return;
-+	}
-+
-+	/* Add module aliases for entries in the struct ctl_table array. */
-+	for_each_reloc(info, shndx, do_sysctl_entries, &sysctl_entries);
-+}
-+
- /* Create MODULE_ALIAS() statements.
-  * At this time, we cannot write the actual output C source yet,
-  * so we write into the mod->dev_table_buf buffer. */
-@@ -1542,6 +1774,7 @@ void handle_moddevtable(struct module *mod, struct elf_info *info,
- 	const char *type, *name, *modname;
- 	size_t typelen, modnamelen;
- 	static const char *prefix = "__mod_device_table__";
-+	bool sym_is_devtable = false;
- 
- 	/* We're looking for a section relative symbol */
- 	if (!sym->st_shndx || get_secindex(info, sym) >= info->num_sections)
-@@ -1586,10 +1819,14 @@ void handle_moddevtable(struct module *mod, struct elf_info *info,
- 		if (sym_is(type, typelen, p->device_id)) {
- 			do_table(name, symval, sym->st_size, p->id_size,
- 				 p->device_id, p->do_entry, mod);
-+			sym_is_devtable = true;
- 			break;
- 		}
- 	}
- 
-+	if (!sym_is_devtable && sym_is(type, typelen, "sysctl"))
-+		do_sysctl_table(name, symval, sym, mod, info);
-+
- 	if (mod->is_vmlinux) {
- 		struct module_alias *alias;
- 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index d18a87b882a67f06d5f75ee92f4c26dc713d83b8..10eb7273cdd817da788fa3bce87d695661dd1b93 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -340,6 +340,13 @@ void *sym_get_data(const struct elf_info *info, const Elf_Sym *sym)
- 				      sym->st_value);
- }
- 
-+void *sym_get_data_addend(const struct elf_info *info, const Elf_Sym *sym,
-+			  Elf_Addr r_addend)
-+{
-+	return sym_get_data_by_offset(info, get_secindex(info, sym),
-+				      sym->st_value + r_addend);
-+}
-+
- static const char *sech_name(const struct elf_info *info, Elf_Shdr *sechdr)
- {
- 	return sym_get_data_by_offset(info, info->secindex_strings,
-@@ -1338,8 +1345,8 @@ Elf_Addr addend_rel(struct elf_info *elf, unsigned int secndx,
- #define R_LARCH_ALIGN		102
- #endif
- 
--static void get_rel_type_and_sym(struct elf_info *elf, uint64_t r_info,
--				 unsigned int *r_type, unsigned int *r_sym)
-+void get_rel_type_and_sym(struct elf_info *elf, uint64_t r_info,
-+			  unsigned int *r_type, unsigned int *r_sym)
- {
- 	typedef struct {
- 		Elf64_Word    r_sym;	/* Symbol index */
-diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
-index a98811552bd2996c31cf73fd3619e6c58bac8a6d..409fdfc844c4bfcea30fd6ae758f4042384e3e56 100644
---- a/scripts/mod/modpost.h
-+++ b/scripts/mod/modpost.h
-@@ -186,6 +186,25 @@ static inline unsigned int get_secindex(const struct elf_info *info,
- 	return index;
- }
- 
-+/* Find the relocation section for the section of a symbol */
-+static inline unsigned int get_reloc_secindex(const struct elf_info *info,
-+					      const Elf_Sym *sym)
-+{
-+	unsigned int sym_secindex = get_secindex(info, sym);
-+	unsigned int secindex;
-+
-+	for (secindex = 0; secindex < info->num_sections; secindex++) {
-+		Elf_Shdr *shdr = &info->sechdrs[secindex];
-+
-+		if ((shdr->sh_type == SHT_RELA || shdr->sh_type == SHT_REL) &&
-+		    (shdr->sh_flags & SHF_INFO_LINK) &&
-+		    shdr->sh_info == sym_secindex)
-+			return secindex;
-+	}
-+
-+	return SHN_UNDEF;
-+}
-+
- /*
-  * If there's no name there, ignore it; likewise, ignore it if it's
-  * one of the magic symbols emitted used by current tools.
-@@ -222,8 +241,12 @@ const char *get_basename(const char *path);
- char *read_text_file(const char *filename);
- char *get_line(char **stringp);
- void *sym_get_data(const struct elf_info *info, const Elf_Sym *sym);
-+void *sym_get_data_addend(const struct elf_info *info, const Elf_Sym *sym,
-+			  Elf_Addr r_addend);
- Elf_Addr addend_rel(struct elf_info *elf, unsigned int secndx,
- 		    unsigned int r_type, Elf_Addr r_offset, Elf_Sym *tsym);
-+void get_rel_type_and_sym(struct elf_info *elf, uint64_t r_info,
-+			  unsigned int *r_type, unsigned int *r_sym);
- 
- void __attribute__((format(printf, 3, 4)))
- modpost_log(bool is_error, struct module *mod, const char *fmt, ...);
-
+ # All the plugin CFLAGS are collected here in case a build target needs to
+ # filter them out of the KBUILD_CFLAGS.
+ GCC_PLUGINS_CFLAGS := $(strip $(addprefix -fplugin=$(objtree)/scripts/gcc-plugins/, $(gcc-plugin-y)) $(gcc-plugin-cflags-y)) -DGCC_PLUGINS
 -- 
-2.47.3
+2.43.0
 
