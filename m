@@ -1,134 +1,188 @@
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45E7381B0E
-	for <linux-kbuild@vger.kernel.org>; Thu, 20 Aug 2026 23:43:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787269407; cv=pass; b=PixZXy0g/14YCe3hhUMQwthXoQEqGkdQ5LaDAXG9LbfI1LvBnjDfKsmvv32/LDy2qjNogHERwXeydbdDWASZ1ulc1Vt5PdqMpzeTVjMYxMjnZL096rNFt0HOMR+5rnbMTQKkIOLwpxYY68IYvMJ9/AxC7J29bOXP/KhBXfzEsQM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787269407; c=relaxed/simple;
-	bh=+6/iD9uitv2o8+BkquhyWkx4ZTHDQ/4DAVwS8twCjao=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uqaOUs9WXssWOy1uBQe7NV+gNjTNMofuFlEMIEqC2YhZCqVU761YxoH4EtKSgI23w49hX1vIBI66U9Doly3dwGrMPlPr9QySpR1o3asNCunToOWlAMRtBIdQqTi1zr+X44538ZQgogbOTY+kL5MJa+ffhZmlR2swwKEfP9QC2KY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hcSzIvL8; arc=pass smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0403839CD15
+	for <linux-kbuild@vger.kernel.org>; Fri, 21 Aug 2026 07:34:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787297663; cv=none; b=Mi02l3GlcUVs6f3630pScO1dPNRwtlIePRC7WFe8HwlUos8zMlVuXqAtq76TfGhfFOJmJB39ZKOOvUXDS4a7g5eKFQN0RJ3SBm2qH2OXuXnb6OIlWNQSeyjzAS3x4yaL4uthWP8lzofRrFjyxrD9TYN/gcTk0SGWT9M4do9RviU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787297663; c=relaxed/simple;
+	bh=/mYai3BRAUDtUio0FeZCqaBs35nCba5d4UWYCst/DXg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Cmkt/xKYl8MdCRiv8cG7D7u72B2peIaUVoGEwHpzkngYmExcmVcCNJ11fb/DBrpkkwGTq/14PeJ4SzktLyf343BdKsXYQKn//SjT5jqg67sq2KlEMhnH7Sg/xvGDrnbqSjlJ77ippnlxcNJJRk9PA6q0Kkc9rgB538HxUVDoxms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Eyo4+qk7; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=cdIgSVMp; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hcSzIvL8"
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-499b1409a75so6565e9.1
-        for <linux-kbuild@vger.kernel.org>; Thu, 20 Aug 2026 16:43:25 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1787269404; cv=none;
-        d=google.com; s=arc-20260327;
-        b=aAzegL2gmMHHucuEG3MmjP81ylAE5ySqnws4WjL40UywopXfLndH0tIpzwcq4RsBOT
-         N87r6qxh2+2BpTxKDVEhoXCYP+xQkZA3u9U8pIheL/hswfo1IWI6b6YgiGgcFBdxL5q/
-         tiy0/cQY5owHjtRXIBoXAns6qt/IJb13vvmMS7M0h96TJ6BLrr9s5IFS93yRzAgXhFxq
-         yYIb/3iKmJzliDM7P+6XcTRlDRfl+ASMb0prjFBfryc5D+Fs2LHUOwtniMAVsPWOZkL/
-         7306vUbafpMfSsZB9okQlCUU5ELcY/9r1SleubVsEM+vsk8XUykRDLtyskMVL40V21X5
-         GlOA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=+6/iD9uitv2o8+BkquhyWkx4ZTHDQ/4DAVwS8twCjao=;
-        fh=J1ZhK62nT4d6loxpWd4PHW7LaG0U3R3zJ3IVTGFDwjs=;
-        b=LrgdNaF4UwhqAOP7JtciDNV3G199f2676L/EL4Nt0q8zFfc/4OYSMXao01IqM+Q1qT
-         HgqJy99FOxlfyervl07LEPpQgTbU2hs/deqkWiBwRHXdBwx52ougFZtXUrNXv1wHVPxH
-         1LknWE/nutUOi4HuboyyatpXFkeLruQCeXZHV2qVnHaWIkdDTDCehsj0yMf1p0/224pw
-         zRzM6FTYm5Bs0bj9i9KnsL9mpakkVeOuh4ecrDI/vGkiYX4hdPdqAXNQs7ox98A3/Ow9
-         kRnz2XFOl8sI0a0u6CSdcKrh6nQeH+jaYtxoEsVqhJGfB9hgpYEX3RAckVliHZSwvkrP
-         7xgA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Eyo4+qk7";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="cdIgSVMp"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1787297649;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=iZliJAMCxrV8BQaJTNvGaLRgIXasVWojRYBcZ1Jzkfg=;
+	b=Eyo4+qk7vlidTPgZUFWV4XC9i9gm7TxaQNCxWBt6fj1SPCRrPlJ8DS7QPp+jxLQa9evLGc
+	5wb4nlTGIsqPYkX7oqF0KI2OzpLwLzcTVm6SbAcucDRzh5RtoikReLTjUeyDrxd/x1suTg
+	vCzrgywR/IWpTUSz5oRpHW12+a9Nh8o=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-130-CUmBkx73Ol2C-COehOu2OQ-1; Fri, 21 Aug 2026 03:34:07 -0400
+X-MC-Unique: CUmBkx73Ol2C-COehOu2OQ-1
+X-Mimecast-MFC-AGG-ID: CUmBkx73Ol2C-COehOu2OQ_1787297646
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-c15cec1ccb6so57247066b.1
+        for <linux-kbuild@vger.kernel.org>; Fri, 21 Aug 2026 00:34:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1787269404; x=1787874204; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=+6/iD9uitv2o8+BkquhyWkx4ZTHDQ/4DAVwS8twCjao=;
-        b=hcSzIvL8HJOp5DFbBG0CGbsHTQtGs1e1c1P+B6MQ36RM3md2ZE9+Z1R42U5NLSCH6c
-         XdGoaVofnef4u1QbXsJDOcO7rTqpwOlCHExztpxvV5TsmKsLMIp8r/IRNBqGBLYilr0n
-         y2ijE8EKOB024mxc2RvtChy9Fuec51VdHWXTW+LfJH1JApeZy5OHe9z+vccj3ebBsGVP
-         YWvGc7SvdQOpNRJCKXvuifG+MOuvfTfVNlsDob1F8iWUHAcsmWk0Z+xNN16Nl32lMbh6
-         xug3LhH7jtalTneULFz6p8YYA9iJJfXcMYycPq2XJslBn357Tl8DQc+JBlMPwHPtb6YH
-         0jiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787269404; x=1787874204;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=redhat.com; s=google; t=1787297646; x=1787902446; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=+6/iD9uitv2o8+BkquhyWkx4ZTHDQ/4DAVwS8twCjao=;
-        b=msc4XALeiVHfI64Gueds7cTUetvqa84yEcjfXjcVXVCZjuG8MIusE0002KCXboLLta
-         WnbvzytvlUAlfFCd2DGGnIeJsAWTPSwAM4EStDlhJnmSEBigpT9gNG+JsHhdE2GsMG77
-         Q9xj5PLk8zbZEsKHBlegWcYsAuTD6EeoOVWhqPtvQG2pPeiji/gpaxCwwGEdJTWVV1GD
-         6B7m0aRPfW+yVy8jBzFGqZ1OppPRs/c/M0UGmXVaO4P3B3aTxSGi0J0Y5abo2mTvwVET
-         Q2tDiP+3bs1FUIHCn24V/dplFmxiPkbuXvFihx/hfyJY7OXc3UzgHix/LBdQK41Odf99
-         qayw==
-X-Forwarded-Encrypted: i=1; AHgh+RpGAkgdEigChtRAarDE/Xu/HUDsFyDkljgBF1+HF+wlG/TQhKYHW32h84g5WUCcF427+Jb5ApYN7XffJls=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywf3xCH+eHXgqy17PIsAeyW7T00OHvdedHQEOMRUlVTzcT+eI17
-	SuG8rWwEwyKviWaQxetOat1NUyiDh0yeeHDIH4IOsK12iud/zoQ0itBGLKSc/bpiC6UuvkRRp3j
-	4lDEzeX2jPAzWQ++IpCMCSRTTyb+MOBKKAY6KpTv4
-X-Gm-Gg: AR+sD11SEokgvsYUqB5yBbvwfVOPmY5SccI0cfz210A96edQ9JptQTrIUeFBUKS+iIz
-	DEtMvuodyyyTOHyRXi/yfBmOsDNqqc7ITtIxaPW8IzEkIZNF16k83z3U7F2wG419zHRwi4x6MV3
-	OjG5fkBsiQ6Kqyro3v3F7CBNKiOEQNIosZzVtkGyHXGdJbgdT+CJ2qDPJ+Uipkf7BT0sj2yZ0qD
-	ak5edk67d8hCqcmLZof7zEJmDhbmZjmnu4PZdoegj3+8jApnfS/Nr1xCWfYqcsz/xczygjqL1k2
-	zv1geVOUbgMcaVyaZNU9jEJAzOdgkISkL1nM81qD9bDx07Zzi3JG8j4CSGNtR0Ofmybhfl9y2gr
-	gVdPz4JLp
-X-Received: by 2002:a05:600d:8498:10b0:495:3ffd:5e39 with SMTP id
- 5b1f17b1804b1-499b96bb829mr206755e9.3.1787269403807; Thu, 20 Aug 2026
- 16:43:23 -0700 (PDT)
+        bh=iZliJAMCxrV8BQaJTNvGaLRgIXasVWojRYBcZ1Jzkfg=;
+        b=cdIgSVMpHtgr6wnNjDJrjocdqQGB/uPGvGrXMJztgEx8Op80zJ1krNbu8iPGX2Kmhn
+         Q6zhqIW5Jy++AIfU9l61eRBJPV/sjGEzgr24gWQhcpOJWFBSqyNgi7O9fnPJKxH+RNVY
+         HqtwZMIQdzpowr3DbRvdJhmL7RAHk3ptGOu80p5ddjS/r6wl0EGKLMC3hfKJJvUzL77P
+         sS4A1FDQU8MLc5uGvVEwLU3eufuhndxYS0oOkmlqaF32JvS2cdsVcpuctIm0dSLmzzGn
+         8JSXmsCx1JQtDVqmedypFQJLMyEHEgODzrOLUDOSFvN246wVmL2kcbXFElrNjbG8sfzH
+         tvrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787297646; x=1787902446;
+        h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=iZliJAMCxrV8BQaJTNvGaLRgIXasVWojRYBcZ1Jzkfg=;
+        b=OI6DbtHUfQoL7PbszSFH03clWX1yjVD61t70m6usaiimNSB8cqUmoY+evjCQ5U7sRt
+         88IaOgs63/Ka7mtuALy1ZXnmFmb9FgcuFgSsFeCtUqCkoK94mmmiPaNZif6k0WKeiVuZ
+         r2EtoW6QuHTeMPtV4SrAfVTQ0v3+p6gpykDP4Ef4JO+efwnhbeZKuLWIJSf7PYNmJRuN
+         1snqTlwnK9wDw2/ckFzVTmweYA3R8Yf8Dl1Jq29iMAYoi1/M71sDh0Lo/LwrzZmYY9WZ
+         1rMw/WEsbh1oBX5ld7uoMM6yyO9dKEsyeeGc7QJ2U6pEKvvt9V54xQHSqlJJFj3RVK+3
+         jkYA==
+X-Forwarded-Encrypted: i=1; AHgh+RrNBB9X7jiI1czIMGXt1TcjG6iCOchWkI5y6Up01H16DaZtdQB0ISgiaG4Eus2o60JUAFuyofwdU4hy0a0=@vger.kernel.org
+X-Gm-Message-State: AFuF++lZj68NJ5LEpiM10Z7dYyY6W7+ybxQ6BEvmekc2ADTIZfvB7RXU
+	daoWiv4M49El/q/ZSvJh1IJk2d6h481qW5Mglc7t8tfFuauQMSiEj/vvVwmGDjFYO4XdW8zXFll
+	vXehf+QSp620UpvaKUZGcuzk1RkdToACngk+u9kiTlNxdiqQMP+bVrwQSQn7aRJkXkw==
+X-Gm-Gg: AR+sD13VpNzKJUEpyd17jr7khFKVywATrvV8Kan7AvVpmNJfALe0/GIG+u1BI18FTfw
+	sckr+Tmor6qIJevs1a3Cc7980F5wDAEUNWqbEcC3KepXVjmtLQfpmoQaYIV4k6AGeYQDbYnCXCo
+	hZLpvvNl3ITEtUyTHqJ9+zbjF3Q/Gt3w+6WlPScaVdkoWMisjpfGWYSevr4sz1CICAXLt41hIuz
+	FFveLgL3wMtOwdpTHuR7eOhDlgitV5WjlLKhNguH4WVKCUttVpgj5Y/1aAxAbwUb3oSfmngVgFZ
+	ZY96bBsnYPEe6CFdKpbHD23JheqpfH6ucRDC6Y7QwJB0WCwykDTQF2opuY5aU48ljd6ESHD1
+X-Received: by 2002:a17:907:1c18:b0:c20:88a6:8210 with SMTP id a640c23a62f3a-c246a4f0b8cmr439962566b.9.1787297646281;
+        Fri, 21 Aug 2026 00:34:06 -0700 (PDT)
+X-Received: by 2002:a17:907:1c18:b0:c20:88a6:8210 with SMTP id a640c23a62f3a-c246a4f0b8cmr439959666b.9.1787297645962;
+        Fri, 21 Aug 2026 00:34:05 -0700 (PDT)
+Received: from [192.168.0.9] ([47.64.113.47])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6a3ff0d5f70sm5208136a12.13.2026.08.21.00.34.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Aug 2026 00:34:04 -0700 (PDT)
+Message-ID: <695b505b-75bc-4aba-a161-c1061f219a2a@redhat.com>
+Date: Fri, 21 Aug 2026 09:34:03 +0200
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260820135733.37121-1-gary@kernel.org> <DKTW8F3C5TC1.BE0JLOWMZCTX@garyguo.net>
-In-Reply-To: <DKTW8F3C5TC1.BE0JLOWMZCTX@garyguo.net>
-From: Sami Tolvanen <samitolvanen@google.com>
-Date: Thu, 20 Aug 2026 16:42:46 -0700
-X-Gm-Features: AcwNN1Udef14G2LArp7Ykr4UYTpyjp3Xzj1gv8pPpjTIgCKojktSd_xlqRtrfuM
-Message-ID: <CABCJKueCgEZ9XePNnJhbxbOP=v5X6-PvFg4poRfo=j6htovJFw@mail.gmail.com>
-Subject: Re: [PATCH] rust: cfi: disable function merging if CFI is enabled
-To: Gary Guo <gary@garyguo.net>
-Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, 
-	Boqun Feng <boqun@kernel.org>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
-	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
-	=?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, kernel test robot <yi1.lai@intel.com>, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 1/8] arm: Replace __ASSEMBLY__ with __ASSEMBLER__ in
+ uapi headers
+To: Oleg Nesterov <oleg@redhat.com>
+Cc: linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kbuild@vger.kernel.org, Russell King <linux@armlinux.org.uk>
+References: <20260409094708.1687376-1-thuth@redhat.com>
+ <20260409094708.1687376-2-thuth@redhat.com>
+Content-Language: en-US
+From: Thomas Huth <thuth@redhat.com>
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <20260409094708.1687376-2-thuth@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 20, 2026 at 9:06=E2=80=AFAM Gary Guo <gary@garyguo.net> wrote:
->
-> On Thu Aug 20, 2026 at 2:57 PM BST, Gary Guo wrote:
-> > From: Gary Guo <gary@garyguo.net>
-> >
-> > In Rust doc tests, there is a dummy `__module_firmware_test_init` funct=
-ion
-> > generated by the example in `module_firmware!`'s documentation, which j=
-ust
-> > returns zero. Many other documentation generates function that produces
-> > zero. LKP test robot reports a `Flags::zeroed` instance; my local
-> > reproduction has a `Bounded::new::<0>`.
-> >
-> > LLVM's MergeFunctionsPass incorrectly merge functions with the same KCF=
-I
->
-> This should read "with different KCFI type" (obviously).
+On 09/04/2026 11.47, Thomas Huth wrote:
+> From: Thomas Huth <thuth@redhat.com>
+> 
+> __ASSEMBLY__ is only defined by the Makefile of the kernel, so
+> this is not really useful for uapi headers (unless the userspace
+> Makefile defines it, too). Let's switch to __ASSEMBLER__ which
+> gets set automatically by the compiler when compiling assembly
+> code.
+> 
+> Cc: Russell King <linux@armlinux.org.uk>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>   arch/arm/include/uapi/asm/ptrace.h | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm/include/uapi/asm/ptrace.h b/arch/arm/include/uapi/asm/ptrace.h
+> index 2ef917957005c..15e6bff56b609 100644
+> --- a/arch/arm/include/uapi/asm/ptrace.h
+> +++ b/arch/arm/include/uapi/asm/ptrace.h
+> @@ -110,7 +110,7 @@
+>   #define PT_DATA_ADDR		0x10004
+>   #define PT_TEXT_END_ADDR	0x10008
+>   
+> -#ifndef __ASSEMBLY__
+> +#ifndef __ASSEMBLER__
+>   
+>   /*
+>    * This struct defines the way the registers are stored on the
+> @@ -149,6 +149,6 @@ struct pt_regs {
+>   #define ARM_VFPREGS_SIZE ( 32 * 8 /*fpregs*/ + 4 /*fpscr*/ )
+>   
+>   
+> -#endif /* __ASSEMBLY__ */
+> +#endif /* __ASSEMBLER__ */
+>   
+>   #endif /* _UAPI__ASM_ARM_PTRACE_H */
 
-Also the comment in the Makefile. With both instances fixed:
+Ping!
 
-Reviewed-by: Sami Tolvanen <samitolvanen@google.com>
+Oleg, could you maybe take this patch through your ptrace tree?
 
-The LLVM fix itself is trivial, and it looks like a pull request for
-it already exists. I assume we'll want to drop this flag for fixed
-LLVM versions when they're available.
+  Thanks,
+   Thomas
 
-Sami
