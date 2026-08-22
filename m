@@ -1,81 +1,146 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10FCB3A16BC;
-	Fri, 21 Aug 2026 20:26:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A85D9397E75
+	for <linux-kbuild@vger.kernel.org>; Sat, 22 Aug 2026 13:41:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787343964; cv=none; b=eCafyJDXR2ciSy22lmPePi3CtCtFhp0dCcPZdkb6b7A5awPMm28MPON96Geob6jNnGBxrVnqSUSR1jRspG1JElEUclSHc7DfDHf2IVXscN8fLqnxURGPG4yobFW3049iTjcv99OoWv8QATg/XVxVMPmQnW8wej3aQhBQbtfRT6w=
+	t=1787406119; cv=none; b=lf9Vx2IjXSk8tKeky+jTmvhpxizv7zGWzDeWupE24tWq3uH8WdtS/Lj+RdgVj0wWd1hMCEL0HrXw/EdTomY+MJ9GfFGfMfnb8GC7WC7II4YPx2ZDlCl5mpEkCudRjZ6FRYDFQB1M7SWQlbKLarUC7jRbfm6eCI4fDMgPq2ZavmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787343964; c=relaxed/simple;
-	bh=2PioAhecL387m/i4/N1rfwNSB//nT+ce04hbehkjF1M=;
+	s=arc-20240116; t=1787406119; c=relaxed/simple;
+	bh=ShtTkIU3ezbFJIydaBLYCMvhC/wGsulze2uz5bQe5G4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UC+S1W4/M+dzCJmHVDKiu9OWLl2MdSJpDAT/UxG0IP9eEivuoj9gIx34UafW3b9Av2usY88iuc4MuS56ARKQzio/xRVE77JCGn1HD6SYp4sf1svBF7QJ7+qo7uRPtrH+3X+oS/XvUyfsJdmHqNZO/C4OYVViA4Jn2Q70EjEVocA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NosmJLww; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=fqDGkBcvOV4xbBLMGAdU9fQ/H4OYs+AUyAr5vrXzmzHlJh6M3cM3CnGETa4CKEGlmqOPRQHCA5iklS+YDBwu5uV259R72NbUwG40arytROg8JR2kTc5KBXKjXq7kPfyKIRsTYEV/uFHZsUx6GidjKkOBNPIK3P2tIF+1ucutFFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b=NWr95Y6+; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NosmJLww"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 4B2761F01559;
-	Fri, 21 Aug 2026 20:26:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787343961;
-	bh=rnrVivgWRYHdZwOF5bKzXlao47K/VKzxzftXq658NTI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=NosmJLwwObu1FeaLJzu+UmaBEj7n32p29qYerHf3/uVGiOyrABOPDKsJXZHWEav73
-	 mHYrLzt0uA2qitpP/kCy0+ibJ8NoeCNe1abcECj4UXXyHYv95faHnnMSiy4dXgImCH
-	 waRVTOVQ1FCGFD46VWosQs9pQK41l6huNY8HgQugtHh7cAPD6Y90U/AQTGmLDS/WTv
-	 OwXwAoidVH05IKlGl1hkKJ5UFAAeoVwVaprcuBPJCu2iqkgbcxx3UQbYVox5B6CSXM
-	 my2z4zJ44l/w7E5G8D63c4EScFw736nV8BOUK2ZL5najR0eEqq50Jm1FiHvI1HYicd
-	 hG5XBciUyOsqg==
-Date: Fri, 21 Aug 2026 21:52:28 +0200
-From: Nicolas Schier <nsc@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Ferran Duarri <ferran.duarri@me.com>, linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Kees Cook <kees@kernel.org>,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] kbuild: ubsan: skip UBSAN for external modules by default
-Message-ID: <aoisfLPgD33M0sRt@levanger>
-Mail-Followup-To: Nathan Chancellor <nathan@kernel.org>,
-	Ferran Duarri <ferran.duarri@me.com>, linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Kees Cook <kees@kernel.org>,
-	linux-hardening@vger.kernel.org
-References: <20260820190200.203185-1-ferran.duarri@me.com>
- <20260821190701.GA3030879@ax162>
+	dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b="NWr95Y6+"
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-c15cb6f5c12so352919766b.0
+        for <linux-kbuild@vger.kernel.org>; Sat, 22 Aug 2026 06:41:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre.com; s=google; t=1787406114; x=1788010914; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=Aj3ZYubTvLgnR11pZYHVat4EVUJdKX6AnHgTVge4+Wc=;
+        b=NWr95Y6+8gr1dd6kImBWVKkc9Ow7+W1hOqUbome1tczYJ0l7VolXq0eP+XhSlE2lop
+         cfrU27AzjWjNSHtmZZ6RuHDw63H/Aw3j1SR3ZUJxRQSBgNqaamZlv7pWt8qP16vXkNr8
+         RFuxFu+K2wzi5JQkrBzAM56wOg7B0Pw6h7m1cwa5fQL+1N4vZ9VmnU0fSvXmiMFSSbLp
+         PwxvZznnm7VHgzn3KPh0fvhzv105HloBofPB+0hansRG9f8EL4WMC1/pwoxYuig5g5ac
+         rHPjkA9B4VHQUiuu3DSUboCniUrCCNStbMPToZGTj1YRemJ0JduZoppZNUOsUtWyRRr6
+         6eqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787406114; x=1788010914;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Aj3ZYubTvLgnR11pZYHVat4EVUJdKX6AnHgTVge4+Wc=;
+        b=qIwM15o+ZmQaD7jd1S8+ZzOzy0BsWkGqk7xlOnJX2DKOMiKPcNhcjXMp2RNQ2nPVGH
+         e/z66+pZTRL4z1YsxzorJo33Xu/4UbtiGAN8/+8VNKYb/CM+WHfNUQVjcJoRi234cYdl
+         uv0+ZS4vmUCFyG0zquhtmwX7KzvF3zLw9eXROLDtxCOY1/izfSfXge9aC3qVrC1tvE/w
+         lIi+9yj8langPTcbZBwHcGZ+bTLUsIDI9tke+4VfS/XhYn+v0r2sZIWpkrjYuEwymYU1
+         SRGIEU4eHJ29dLygfZ2IfKac87CeZpo+zFRCWY5WhQ0D37oYt6Qr1zyQ9Q/JX8ecq3g3
+         csHA==
+X-Forwarded-Encrypted: i=1; AHgh+RoXLoM/amAMr0sd24Wsd5qpHc6I8U4VF83Qqrd9dt34Eiy/rYDRe9YYB7RaZ/yyCMdPdrPJkmYeuVxrqc8=@vger.kernel.org
+X-Gm-Message-State: AFuF++kOg72/q2/Gv/7lqUdv88w9p4EReFU9f06lUX+U6MAWHx5sJZ6/
+	rrSaxe/AMvisVPEsEKvjJm4GTlufpLI6iQ8npETjRxU4GGKxDw9ekAWAQIAa1IUR+Bo=
+X-Gm-Gg: AR+sD11k+rVvE4nCeXv7QZhUOsCQ+Tu8XF/opvj9EeH746LAN8V0BhqKyKOR4W+w36h
+	YyEEfPicjj64WmxQ5TRzo0FnEMBw92cnn0oMGvkJJmH+E6QlLRyin715c1exxV+u+RhYYalDQer
+	aGAP+OzWd2UupjnwDF7gy1Q9GKklLY9j1Mldn15KC5aZIlgCJ2I8loe8P3daxBJGmUTe/kDrKH9
+	v6Cq8qUoqxRpww2J52sI+j3SAywuugmaDs3nHReENojBS+CGFCEj8V69xBbwrS4ZH5NdMRL1cbU
+	Ll9sHrfIt1emL1u0coFjBAmnJ7HJrMZtNGm07EbyZInC59y6nR06VrqzJu+UKouNu/Af0OqmoIt
+	j2SGUJc9uf/WEHtZQzBAb2N+w1XvAIhXNN1XY07+twLKiWE5zIXtUemDHm0qThM1AEbVmh2qkkZ
+	5nxVg5VcQP1FzSpIN9EnhHq974ySiEUyDp0NWtM6OLEcHD5ywww37hyiqkKkMvkhEpng==
+X-Received: by 2002:a17:907:8908:b0:c21:35d0:f435 with SMTP id a640c23a62f3a-c24924db408mr547750766b.10.1787406113365;
+        Sat, 22 Aug 2026 06:41:53 -0700 (PDT)
+Received: from localhost ([2a02:8071:56d1:2de0:1d24:d58d:2b65:c291])
+        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-c249606a8fasm387614266b.8.2026.08.22.06.41.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 22 Aug 2026 06:41:52 -0700 (PDT)
+Date: Sat, 22 Aug 2026 15:41:50 +0200
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+To: Mauricio Faria de Oliveira <mfo@igalia.com>
+Cc: Kees Cook <kees@kernel.org>, Joel Granados <joel.granados@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	kernel-dev@igalia.com, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	fsverity@lists.linux.dev, keyrings@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-wpan@vger.kernel.org, lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+	coreteam@netfilter.org, linux-sctp@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	linux-s390@vger.kernel.org, bridge@lists.linux.dev, mptcp@lists.linux.dev, 
+	rds-devel@oss.oracle.com, virtualization@lists.linux.dev
+Subject: Re: [PATCH RFC v3 03/13] sysctl, mod_devicetable: add macro
+ MODULE_SYSCTL_TABLE
+Message-ID: <aomlfGJM61qZKxx2@monoceros>
+References: <20260819-sysctl-module-aliases-v3-0-aab90569365d@igalia.com>
+ <20260819-sysctl-module-aliases-v3-3-aab90569365d@igalia.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="akn7oxv4v2qk2wdq"
 Content-Disposition: inline
-In-Reply-To: <20260821190701.GA3030879@ax162>
+In-Reply-To: <20260819-sysctl-module-aliases-v3-3-aab90569365d@igalia.com>
 
-On Fri, Aug 21, 2026 at 12:07:01PM -0700, Nathan Chancellor wrote:
-> + Kees and linux-hardening@ for visibility
-> 
-> On Thu, Aug 20, 2026 at 09:01:58PM +0200, Ferran Duarri wrote:
-> > External modules built with KBUILD_EXTMOD set inherit UBSAN sanitizer
-> > flags from the kernel's KBUILD_CFLAGS because is-kernel-object is 'y'
-> > for any obj-m object. This silently breaks third-party modules whose
-> > source code (e.g. VMware vmnet/vmmon) triggers UBSAN UB checks at
-> > runtime, causing packet-forwarding failures and VM instability while
-> > the module itself loads successfully.
-> > 
-> > Make UBSAN opt-in for external modules: skip the is-kernel-object 'y'
-> > fallback when KBUILD_EXTMOD is set. External modules that explicitly
-> > need UBSAN can still opt in by setting UBSAN_SANITIZE := y.
-> > 
-> > In-kernel module builds are not affected.
-> > Signed-off-by: Ferran Duarri <ferran.duarri@me.com>
-> 
-> I am open to other opinions but I am not inclined to apply this change.
-> If an external module has issues with these checks, it should either be
-> fixed or 'UBSAN_SANITIZE := n' can be added to the module's Makefile,
-> rather than making the default worse for everyone else, especially given
-> the importance of UBSAN_BOUNDS for avoiding out of bounds accesses and
-> writes.
 
-Yes, I second that.
+--akn7oxv4v2qk2wdq
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH RFC v3 03/13] sysctl, mod_devicetable: add macro
+ MODULE_SYSCTL_TABLE
+MIME-Version: 1.0
 
--- 
-Nicolas
+Hello,
+
+On Wed, Aug 19, 2026 at 03:16:16PM -0300, Mauricio Faria de Oliveira wrote:
+> The MODULE_SYSCTL_TABLE macro emits a struct module_sysctl_table variable
+> with pointers to a sysctl table's path and entries, and table/entry sizes.
+
+That new struct doesn't seem to contain any pointer?
+
+> That symbol will be handled by file2alias.c (modpost) with the changes in
+> mod_devicetable.h and devicetable-offsets.c.
+>=20
+> The option macros MODULE_SYSCTL_TABLE_{DISABLE,UNIQUE_ID} can be used on
+> a per-file basis to disable the macro and change the symbol name pattern.
+>=20
+> Signed-off-by: Mauricio Faria de Oliveira <mfo@igalia.com>
+> ---
+>  include/linux/mod_devicetable.h   |  7 +++++++
+>  include/linux/sysctl.h            | 42 +++++++++++++++++++++++++++++++++=
+++++++
+>  scripts/mod/devicetable-offsets.c |  6 ++++++
+>  3 files changed, 55 insertions(+)
+
+Please put the new struct in a separate header. Apart from not being
+about a device table, I'm currently work on removing
+<linux/mod_devicetable.h>. See commit
+ad428f5811bd7fb3d91fa002174de533f9da94d7 for more details.
+
+Best regards
+Uwe
+
+--akn7oxv4v2qk2wdq
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmqJpxsACgkQj4D7WH0S
+/k5bfgf9HJoNnVEr9RCdAghOTP5QqFmH5ae7Kbmnodv6c6Pi9JGIjjGbeT5eKw3e
+JkSKqdEnlVMrLoKrhneRsxwTDGPrZvrLZrPLdZwJmPWZn5Fg+kkOO9yFAGPeMsPX
+S6UP1NY9kaCiBtlcsGT9EvMWz0jWVAWX1xb7Y2WcVZJsCWdcPhvWc3/lIbw3E4o7
+PqLtSFblkQmtGl2OL4WkP6xhEPH6qQO9BAmhLVKKZwFW5/l4sHmXRrpgSJlroR3b
+iH3liIeS6wxFp/fMYuFRryGHNMXn6gC447OnOCTmGNEj7+7Y3COwSGivgubcRIzI
+RkmxkMf2Iuntnwp4oQzCbipE5EiKGA==
+=SPY4
+-----END PGP SIGNATURE-----
+
+--akn7oxv4v2qk2wdq--
