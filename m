@@ -1,46 +1,53 @@
-Received: from mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C74B126299
-	for <linux-kbuild@vger.kernel.org>; Sun, 23 Aug 2026 09:50:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDFA8392C2A;
+	Sun, 23 Aug 2026 19:35:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787478623; cv=none; b=c2cPL/Ua+W38viFD2EvjkqZUDZgOV+NRxE04s4/j8/1dQ54mdXK7vSnLWH3pQsWL7pfUcrHBGQYKEIlAx9jlo3lCbuh0JSqIlaEYMVGTXgTwa299wTH8K4Kgnz3zM7QtKYVUlq/GzHcyg656DRy2A/hXR/W7Gv2sllCLic/F/z4=
+	t=1787513757; cv=none; b=BnECSMULYWHhxgMEnZBFooKokfH/swystKld98EWEIeTjmeJsmZOrDgHv86alojK5Ym2cWMnzpNwtbdx1PMBQyBMqTN5fvCzv0msvBNWzXdF/j9MzscESAIlShN6H1ZZdbwSIFC25IUKZxh3EJg63OUkaS5cQKopHSLHbUIWlc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787478623; c=relaxed/simple;
-	bh=+dOKv6BitXrrWcEMIFlt8ELgiy+e7BvkjeNNID8iu/A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TLE5bcqD3u5yUJRxGbJAsUuJoq4pLBPMhjFNjGX3ZVkzeQtGRBZgLof4Io4BGDtYkjGF/BVWebzwpvESIF2/eDZJMcUYJFZTcnbQqZAQrxhVjBRBrfA0Kfs2AXceQTe6Qtk//f6tJHXh8RTJC6aRjZVhZo/KUUfgpCfQKe4G6Fs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JoyBVq6v; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1787513757; c=relaxed/simple;
+	bh=B0EHy5luBwpbyVkzNvJNHLHYVgfhcpDnZmTQmLL3YP4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uJHpoJrHwMUnYqJplCFXzZx9MKWNbVsCFza0gsQZ1XiAQpv7fi/nwNONTeza89zJL2nH3vS5Rk0+wE55ClPolw8nczTup5uA6E9Vcv6WDAVkh08+O2t7Nwf2C5oOoYxiIJEwNp6kSM+mOtUk+5RxI9PxXFIplHKVjGfOHM3YYqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nmPHkESJ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JoyBVq6v"
-X-Envelope-To: linux-kbuild@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=+dOKv6BitXrrWcEMIFlt8ELgiy+e7BvkjeNNID8iu/A=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1787478617; v=1; x=1788083417;
- b=JoyBVq6v0BDpldfM6AaNwJZaAo4V6EU5HuN0wv0k3iY8t+sy24meLB9nloU3EMBRc6zk227e
- 3jZqIXnXIXMtC1UeAMWfk5nk9fQuyJhhhpaCmv2YjCcxc28uDRD4vJGp/aB+be1ZrzmHd4UjPME
- 4bB7RZLQoMhS4oYoIoJr+aNI=
-X-Envelope-To: linux-kbuild@vger.kernel.org
-Received: from nixos (149.28.209.68)
-	by smtp.migadu.com with ESMTPS id 3eff0bb7133e5f9c;
-	Sun, 23 Aug 2026 09:50:17 +0000
-X-Mizu-Trace-ID: 3eff0bb7133e5f9c
-X-Migadu-Flow: FLOW_OUT
-From: Yuntao Wang <yuntao.wang@linux.dev>
-To: linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Masahiro Yamada <masahiroy@kernel.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nmPHkESJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4112A1F000E9;
+	Sun, 23 Aug 2026 19:35:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1787513755;
+	bh=GyaiaqYBOLAIDvcsIPioUD4VrBP8Th+NKRAqNY6Pp3o=;
+	h=From:To:Cc:Subject:Date;
+	b=nmPHkESJSxbNFBvzH/Tdk5p7a431mlLs9C60STZAfwyo+p94T6D/DyPLyqPRhzl/e
+	 QU/NfvGanAFLhFFX3t9MeWoGvJRyVjA6z0oKEFGqDqEd5xIjcN9gWSdLBxeNdWIwlX
+	 e7Nsg9NIlpWpvDbvVDFtvk3JLp8WB7ZJUf4zjC9wHumjMkaAc1mNa4RV0eUwkQWlnm
+	 RYJPmjoZnlQ5aSgcPMqViNgVDcHPx4wxKisXoFWMK9mfivA6dkjlv9Z289gXcqdYDD
+	 kzZQ9syfGR3LiLG63LQJpHak6gkYpG1pXwbGaxz7rtQUcRYaVTFRmILPU6RIOM8McH
+	 F/HJY621U5wAQ==
+From: Miguel Ojeda <ojeda@kernel.org>
+To: Miguel Ojeda <ojeda@kernel.org>,
 	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Yuntao Wang <yuntao.wang@linux.dev>
-Subject: [PATCH] setlocalversion: make tag local to try_tag()
-Date: Sun, 23 Aug 2026 17:49:13 +0800
-Message-ID: <20260823094913.421144-1-yuntao.wang@linux.dev>
-X-Mailer: git-send-email 2.55.0
+	Nicolas Schier <nsc@kernel.org>
+Cc: Boqun Feng <boqun@kernel.org>,
+	Gary Guo <gary@garyguo.net>,
+	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Daniel Almeida <daniel.almeida@collabora.com>,
+	Tamir Duberstein <tamird@kernel.org>,
+	Alexandre Courbot <acourbot@nvidia.com>,
+	=?UTF-8?q?Onur=20=C3=96zkan?= <work@onurozkan.dev>,
+	rust-for-linux@vger.kernel.org,
+	linux-kbuild@vger.kernel.org,
+	Antoni Boucher <bouanto@zoho.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] rust: kbuild: disambiguate `zerocopy_derive` for `rusttest`
+Date: Sun, 23 Aug 2026 21:35:29 +0200
+Message-ID: <20260823193529.156066-1-ojeda@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -49,40 +56,51 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The tag variable is only used by try_tag(), but is currently declared
-local to scm_version() and modified by try_tag().
+The `rustc-dev` components for Rust 1.82.0 through 1.87.0 include a
+precompiled `zerocopy_derive` procedural macro in the sysroot. This
+range includes Rust 1.85.0, our minimum supported version.
 
-Make tag local to try_tag() instead and remove the unused declaration
-from scm_version().
+This makes `rusttest` fail because the compiler finds both the sysroot
+copy and the copy built in `rust/test`:
 
-No functional changes.
+    error[E0464]: multiple candidates for `dylib` dependency `zerocopy_derive` found
+      --> rust/kernel/prelude.rs:70:9
+       |
+    70 | pub use zerocopy_derive::{
+       |         ^^^^^^^^^^^^^^^
+       |
+       = note: candidate #1: .../lib/rustlib/x86_64-unknown-linux-gnu/lib/libzerocopy_derive-54d2b38896fa6bc5.so
+       = note: candidate #2: .../rust/test/libzerocopy_derive.so
 
-Signed-off-by: Yuntao Wang <yuntao.wang@linux.dev>
+Commit fe39a233ea52 ("rust: kbuild: disambiguate `zerocopy` for
+`rusttest`") fixed the equivalent ambiguity for `zerocopy`.
+
+Thus point to the dependency explicitly in this case too.
+
+Cc: Antoni Boucher <bouanto@zoho.com>
+Cc: stable@vger.kernel.org
+Fixes: 506054980429 ("rust: zerocopy-derive: enable support in kbuild")
+Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
 ---
- scripts/setlocalversion | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ rust/Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/setlocalversion b/scripts/setlocalversion
-index 28169d7e143b..f264c2460ad7 100755
---- a/scripts/setlocalversion
-+++ b/scripts/setlocalversion
-@@ -33,7 +33,7 @@ if test $# -gt 0 -o ! -d "$srctree"; then
- fi
- 
- try_tag() {
--	tag="$1"
-+	local tag="$1"
- 
- 	# Is $tag an annotated tag?
- 	if [ "$(git cat-file -t "$tag" 2> /dev/null)" != tag ]; then
-@@ -59,7 +59,6 @@ scm_version()
- {
- 	local short=false
- 	local no_dirty=false
--	local tag
- 
- 	while [ $# -gt 0 ];
- 	do
+diff --git a/rust/Makefile b/rust/Makefile
+index fbe0accc51a3..a346a01bb3eb 100644
+--- a/rust/Makefile
++++ b/rust/Makefile
+@@ -350,7 +350,8 @@ rusttestlib-pin_init: $(src)/pin-init/src/lib.rs rusttestlib-macros \
+ rusttestlib-kernel: private rustc_target_flags = --extern ffi \
+     --extern build_error --extern macros --extern pin_init \
+     --extern bindings --extern uapi \
+-    --extern zerocopy=$(objtree)/$(obj)/test/libzerocopy.rlib --extern zerocopy_derive
++    --extern zerocopy=$(objtree)/$(obj)/test/libzerocopy.rlib \
++    --extern zerocopy_derive=$(objtree)/$(obj)/test/libzerocopy_derive.so
+ rusttestlib-kernel: $(src)/kernel/lib.rs rusttestlib-bindings rusttestlib-uapi \
+     rusttestlib-build_error rusttestlib-pin_init $(obj)/$(libmacros_name) \
+     $(obj)/bindings.o rusttestlib-zerocopy rusttestlib-zerocopy_derive FORCE
+
+base-commit: d24f5cdbeff8b6a063fca92d0a1f94122a799b59
 -- 
 2.55.0
 
