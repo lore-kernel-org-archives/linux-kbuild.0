@@ -1,157 +1,235 @@
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FEEB246BCD
-	for <linux-kbuild@vger.kernel.org>; Mon, 24 Aug 2026 01:15:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.215.169
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787534126; cv=pass; b=lfEIxLhLVVVH63b9R1bXx6EGx3AdoynppSiqD+Iz0t9Lzo0A65c3ggYX1AHtTG7d+dZPDWqeO4VNrnSjeLz02s5kgp4toxZXwpdZBEW6t4gKd75F6555UN67x3mxcHBRPWqlyEppYkMtnRae41e45olwSI1JbktF9Qs4fe95ChU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787534126; c=relaxed/simple;
-	bh=Wac+pf0DsXlahTayTTxHtjZ+4vjz4sfCHeWQqn9W9gY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XpFVZqysbTomzu5vETy6mPXYsROHA8oRmmGQE8C7m1QlOrnWdMKk/lnackA/orLGS/SvYMfFHOBRp/8cuCVotCygv+FtUSPYGSH+fk4BK0E2AjtGFFBQyXcilLDET18DkVKl5xcWIRVAaODcg+SKVvk7nHSfOV8YT/LhO9xxIZk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lVozVddr; arc=pass smtp.client-ip=209.85.215.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25FF7397929;
+	Mon, 24 Aug 2026 10:06:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787565968; cv=none; b=EiKU0Qqbl653lKe0n8aHC1XPxPr8NTdsYkEIZJSV95F45ubDEgpQs1R1cET3q+KAZFjqbsTRoj3V4GA9tUv1A4NJo2tRppQq+9puWLFoULMNgNuIue4VsU9/gBz9pj3fW659Opq8ra0ZzQbarVKoCTr6oEcX4LlrCviExmD2oA0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787565968; c=relaxed/simple;
+	bh=4CwM7EWYdHg3PgNpg9gblRJLHG+VNjmpcCtdsFr7CVU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=E84nBSBfi53TBSa4b9MEhu6+32N2Ea27eIieF2mvd6oONC0EtOAfjY7uXw0fU4yMRkeAMOVr8Dg7SvhT0qK/rcn0/ciMbT6sWEm2zfeikTUkWd22tYG8XHlwQ1F4L3LJOaNL0oHDwR7uUxyRsqGUUO5B75qW/OAIEiGLPGHb2SQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io; spf=pass smtp.mailfrom=gtucker.io; dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b=CadK3VPY; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gtucker.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lVozVddr"
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-cbe4592c193so244856a12.3
-        for <linux-kbuild@vger.kernel.org>; Sun, 23 Aug 2026 18:15:25 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1787534125; cv=none;
-        d=google.com; s=arc-20260327;
-        b=c5SufAjP8rxSyV4ceGB2xrDEag1XV3MIlaZeBZfOJUOG7NKOeZ6K2QnGP34mBSc5nS
-         38KnlXQZCUMmt5Qj1b6yGHcFoJU9zsimG0blMfZhjgm01Mf/3eHXMi4PIGMRiNta1vTI
-         tYY7U4G9Arjif0yw41XKwpYUbopv0RDawKEkSkCGyFOkrAU50WvfP8KynQ+MXrbA4HGE
-         9u0mTDLgy80sCtiCtZI5pIGnyWKYxQXvQUE9Hddwyr71N0S2yBiAg5Jsalqod5oNJQDd
-         b2Ua7fH+irmNoyESsC5DOt9dWY0lJNCRzyu5mmC+RJYwqVlG1HIujxcbCxpiYcqa7qyI
-         QLpA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=vGMvIaOFIbBkf0XrXpqeWleC5i415rguPHvnUqjmn7c=;
-        fh=GFhmnCq14433Xwc5C/rggXq6vjOMpGtdabcfVzy198A=;
-        b=ASMGWXhQf1gBx6IUZXFJn0XDKZaz0EjAHi1KdErDpJtWJjrNT0CkY6YeDj7US+hwlX
-         6TP3fYKg3B2xLH0MfLYBIpR5EcszXcBN1eGxqVbJncjS822eO5n2U4DT6Up1ECwkLsuv
-         QWHJddh53Ll9xPg21nSGMmCWytw3uqPofU1pTZecS3C51SX+SjAZOghrCWTv4TH/+73B
-         pj7LuDYvnPDgDHoUTpsuegbOEOs+K3CLe60jCLCUJOH/7QLk7N5vdJ1uF15z7NvLNL89
-         jPqGTKPufILjs9dawraT47MP0Nrkk6nUUc3QRzEdS2i/qMZvKezrP9+sWM4gCOTo2KOI
-         PnAg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787534125; x=1788138925; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=vGMvIaOFIbBkf0XrXpqeWleC5i415rguPHvnUqjmn7c=;
-        b=lVozVddrwveh9RYPQj+CvqDsGC1Ji7CNqy60SL6ouwK4UQ/Uek66mBSz3K2DQ6HciC
-         pRKOYoZ2HyaR4jGjlfd2xE/J5F1GL0iVw26dLHp2JotyYjN0yqd40yppG1vRnj/+8Udk
-         +qaMP4M3lW+x5NZZ41IrSQ7wIaywOV9qUmoLulLLedv1gFh7rIlMOiXKj9x+xPUwm4FT
-         CK4P2epy3tZul+qe2vQHD/gHIrVN7mWCdY0VDtmW6LI93D3CA0B3NQlABsbghGnnqZcc
-         xq/+jfmoZTB4wl41/hCQbTqNXytX9iWBwzD5lqq41hk3m/thKZ53zIvBfVe7mjHRknjp
-         n4fA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787534125; x=1788138925;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=vGMvIaOFIbBkf0XrXpqeWleC5i415rguPHvnUqjmn7c=;
-        b=MbRXbUmW9Lu7wnJYA1FqVDNxlDbvFyS5cHzcHd6TQgkS0ldNqdz04eEJRq/DGGOeGq
-         yO+ZNhNjjorkS507ISp7F5clJZHCWYjGAW7enY941+g/FyJj7WqUDzL97IRiwfgCIKCH
-         wXCA87U9pSaY5tPcQ4M2QYbOTkZUNUKnJEwc/ozqt8HgCuydZQBHgvNY9MiIHAjd6Hvs
-         wsz0Q7ju4v1W64FqJby3MkMa+148PXo+7QFIHIXkiciCMEgmuwKL7MSv37sT8z22bbod
-         7V87DXXYeFffDCKZjSgXcvoJAjEnF81AZLeSox4FiVcXx03a6DTaAi8bIhCW17WZ42cs
-         iS8Q==
-X-Forwarded-Encrypted: i=1; AHgh+RqkgaahTCMn6dYnWOpazADe4x3yaUotzoRG4y7bF7V82zQaaLX5ouBpnEkzePG0ejB4ZoUknhjgk9glNEk=@vger.kernel.org
-X-Gm-Message-State: AFuF++mx2Gx/PEDwAN+JH/rMa3Nub2BDyR6MwqfBeEBBD6xRcK0picDA
-	zzJ2VhM57vw0rtQQVHXvGCS1UUe4TnEaAfEfWFqECeyPVn9JYY08UmLrZSAFXIM1icK5czNWc89
-	vt6XuKc08yCvnBR4L+TIw4CqyLc2KcG8=
-X-Gm-Gg: AR+sD13yXS384UlmgcVuTKdbObVczylVuottFN2HCN4BU0YbPLPjt4kxwE0P4VNzmu2
-	NeRqcG1iMNK2Z9l1gI/DYKjWKjZ8RIKo+Eq5tiVjf5LKcKZtw6E2sZrvte9euRsOSlLfNBljMZq
-	NW28/+jzhjNV+IyDuP/R/dq00P8H9sUlARE108Pi0gDUvInazOJwbA78xT1C6V8Djr5rVk0WX63
-	4U1CJ3oF0BvX0ZoKkObWSX7HveoW8uOwyiqX22t8tMNpDqT4l4d23EJuhZPpAcB+Tn4VmCozR0M
-	LiPvpd0Qn0oShoqvm6/VRPrY2im/qLuM47nAWyDKUNtIpRtNoHRQJ+s2AofmUJeVzFLOnZS/Esp
-	9iK2JjsSoRMi8rk+XnvdVzjd+azpSQTjMlmtM3sT1nN63efN6BpOl6rM0UNtx
-X-Received: by 2002:a17:903:1447:b0:2ca:ecf6:9115 with SMTP id
- d9443c01a7336-2d64b009f3fmr217086915ad.2.1787534124733; Sun, 23 Aug 2026
- 18:15:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b="CadK3VPY"
+Received: by mail.gandi.net (Postfix) with ESMTPSA id CCB7E3EC1E;
+	Mon, 24 Aug 2026 10:05:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gtucker.io; s=gm1;
+	t=1787565956;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=HpQJyDryWNsJ4+BVt3c52mjGAweVhhKFwzzcVcyE/z8=;
+	b=CadK3VPYOS3qbpO1pUJqO74ouJHQYQZm/1jqueYzbEO884jKgMzRTgfXKct/aHKyucQWX6
+	v4xnIrzkk513vqRgn8Iu6mIeMcdvpa3dT+GNQTwjuP6GAMBJKaSZi11fYeFYG4TPMgx3rl
+	YYBbHQB5gCF+vgy6YsQiwKiy9mjhx2hALcTRhLoaVGK5U7gXmLMUHzNCSJBWt+gd5DGSQY
+	+nQpcaVMdQGUETGu6sEv0K2VPz+Oxu09EkRf2tGmQIwShRn7O0g0cIxPutssl7z0vVCpb4
+	9T7Qo+0TpPbGOkdDIntIbw/L4FE0AnSpsRY/bh82YFl5I1w6cgZkx+kS5YWG/g==
+From: Guillaume Tucker <gtucker@gtucker.io>
+To: Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>
+Cc: Guillaume Tucker <gtucker@gtucker.io>,
+	=?UTF-8?q?Onur=20=C3=96zkan?= <work@onurozkan.dev>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	linux-doc@vger.kernel.org,
+	workflows@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kbuild@vger.kernel.org,
+	automated-testing@lists.yoctoproject.org
+Subject: [PATCH 1/2] scripts: add TOML config to container tool
+Date: Mon, 24 Aug 2026 12:05:47 +0200
+Message-ID: <7d8ba914cd174d716340bb2b88723bef0f330627.1787565460.git.gtucker@gtucker.io>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260820135733.37121-1-gary@kernel.org>
-In-Reply-To: <20260820135733.37121-1-gary@kernel.org>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Mon, 24 Aug 2026 03:15:11 +0200
-X-Gm-Features: AcwNN1UtjcFt1AZ5tdG-mZdaQzytXvl_AMwSBSeb5Dd5Blo5Jox-8q4zsp724Yo
-Message-ID: <CANiq72=SL4A-UQbOxngRy8-6Q-qHKyGbqOTvqo=uJNyhr5nTzw@mail.gmail.com>
-Subject: Re: [PATCH] rust: cfi: disable function merging if CFI is enabled
-To: Gary Guo <gary@garyguo.net>
-Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, 
-	Boqun Feng <boqun@kernel.org>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
-	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
-	=?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, kernel test robot <yi1.lai@intel.com>, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: gtucker@gtucker.io
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: dmFkZTE6b2S6b+oj7uSxZC5pLUQqZ2pegruwOSkdRK/oqgw0D53ObXZpu6P4HwLOhPIsko/55EXPtTrJOQ9eRzP4brfxVhFQAe70wZ6uqcs40Ha7BbXY5fH4Sp2TwsVTSYg+Km1WwZM8ql5QCjQbQtooPdTXdJ3XKp3qRME6TQm3GabKvj9DzFndCstVvRNBuIgZNPADXae4WhphpFxj17mRNQr8MsN4CJ8GIRtIsorXAV0J9i4g8RuN4F90/CR80aINhnBWkGVmHAz1bXkasWPdTWb4ACaE0oOkGjSUT0q8k3tCp3U6Net07qLbgLDaQcf2sHBIbIIcA/cZsFSs5tMiXDYbSKXhR5BQNIkfsXUpyf2xwtnTwRWvu7u9Daj9N+y1lB57cA3NFeBg76ciuaoXJ906M3g06uT1PF3ZIRKOt5gnaqFVsdus6z+b6PB6lmBkGe+ySJU/BwybwX446k7LPyvMUVPjz0YKIaBojm3cVsn9iB1UxSYWShy9xxUp/4lfUMgy608r4GuVEsvqgXSgN/vPaO3dgX//Bo8jXK52sK7RoGJBPQxfqLWcF80/QaZlsI95HkK5Urin+TGo+kw9dqgT8y7XTo/6ztP0ctuJR0/RlQcFpe/Gx44LL1yviEi6RzEZhYLvqVOEYTT/rumhdtHhhRYuN18ShT+KSS6QYJxM1Q
 
-On Thu, Aug 20, 2026 at 3:57=E2=80=AFPM Gary Guo <gary@kernel.org> wrote:
->
-> From: Gary Guo <gary@garyguo.net>
->
-> In Rust doc tests, there is a dummy `__module_firmware_test_init` functio=
-n
-> generated by the example in `module_firmware!`'s documentation, which jus=
-t
-> returns zero. Many other documentation generates function that produces
-> zero. LKP test robot reports a `Flags::zeroed` instance; my local
-> reproduction has a `Bounded::new::<0>`.
->
-> LLVM's MergeFunctionsPass incorrectly merge functions with the same KCFI
-> type, causing `__module_firmware_test_init` being merged into one of the
-> zero-returning function. As module init is invoked via indirect function
-> call, KCFI is checked and this produces a KCFI failure.
->
-> I've reported this bug to upstream LLVM [1]; in the mean time, disable
-> function merging if CFI is enabled. No separate treatment is needed for
-> CONFIG_RUST_INLINE_HELPERS, as Clang does not enable function merging by
-> default.
->
-> Reported-by: kernel test robot <yi1.lai@intel.com>
-> Closes: https://lore.kernel.org/oe-lkp/202608201017.100a4511-lkp@intel.co=
-m
-> Link: https://github.com/llvm/llvm-project/issues/217629 [1]
-> Signed-off-by: Gary Guo <gary@garyguo.net>
+Add support for a TOML configuration file to the scripts/container
+tool.  This improves user experience by not having to keep passing the
+same command line options all the time or overly relying on built-in
+default values.  Include the concept of 'profiles' with different
+named sections in the file to cover various use cases.
 
-    [ LLVM already has a pending PR:
+Command line options take precedence over the config file, and values
+defined in profile sections take precedence over the default one.
 
-        https://github.com/llvm/llvm-project/pull/217665
+Add a -c option to override the location of the .container.toml config
+file which should otherwise be located in the current working
+directory.  If not found, the file is silently ignored as it is not
+strictly required unless the -c option is used.
 
-      which solves the issue. In addition, I asked upstream Rust if the
-      unstable `-Zmerge-functions=3Ddisabled` flag will remain around:
+Add a -p option to choose a particular profile section in the config
+file rather than the default.
 
-        https://rust-lang.zulipchat.com/#narrow/channel/425075-rust-for-lin=
-ux/topic/.60-Zmerge-functions.3Ddisabled.60/
+Signed-off-by: Guillaume Tucker <gtucker@gtucker.io>
+---
+ scripts/container | 81 ++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 70 insertions(+), 11 deletions(-)
 
-      and it does indeed look like that will be the case. - Miguel ]
+diff --git a/scripts/container b/scripts/container
+index b05333d8530b..cf126fa13510 100755
+--- a/scripts/container
++++ b/scripts/container
+@@ -1,17 +1,19 @@
+ #!/usr/bin/env python3
+ # SPDX-License-Identifier: GPL-2.0-only
+-# Copyright (C) 2025 Guillaume Tucker
++# Copyright (C) 2025-2026 Guillaume Tucker
+ 
+ """Containerized builds"""
+ 
+ import abc
+ import argparse
++import dataclasses
+ import logging
+ import os
+ import pathlib
+ import shutil
+ import subprocess
+ import sys
++import tomllib
+ import uuid
+ 
+ 
+@@ -20,10 +22,14 @@ class ContainerRuntime(abc.ABC):
+ 
+     name = None  # Property defined in each implementation class
+ 
+-    def __init__(self, args, logger):
+-        self._uid = args.uid or os.getuid()
+-        self._gid = args.gid or args.uid or os.getgid()
+-        self._env_file = args.env_file
++    def __init__(self, args, config, logger):
++        self._uid = args.uid or config.uid or os.getuid()
++        self._gid = (
++            args.gid or config.gid or
++            args.uid or config.uid or
++            os.getgid()
++        )
++        self._env_file = args.env_file or config.env_file
+         self._shell = args.shell
+         self._logger = logger
+ 
+@@ -131,6 +137,41 @@ class Runtimes:
+         raise ValueError("no runtime found")
+ 
+ 
++@dataclasses.dataclass
++class Config:
++    """Container configuration"""
++    image: str = None
++    runtime: str = None
++    registry: str = None
++    env_file: str = None
++    uid: int = None
++    gid: int = None
++
++    @classmethod
++    def from_toml(cls, config_file_path, profile_name):
++        """Create a config object from a TOML file"""
++        if not config_file_path:
++            config_file_path = '.container.toml'
++            if not os.path.exists(config_file_path):
++                return cls()
++        elif not os.path.exists(config_file_path):
++            raise ValueError(f"config file not found: {config_file_path}")
++        with open(config_file_path, 'rb') as config_file:
++            config = tomllib.load(config_file)
++        default = config.get('DEFAULT', {})
++        if not profile_name:
++            profile = {}
++        else:
++            profile = config.get(profile_name)
++            if profile is None:
++                raise ValueError(f"unknown profile: {profile_name}")
++        fields = (field.name for field in dataclasses.fields(cls))
++        kwargs = {
++            opt: profile.get(opt) or default.get(opt) for opt in fields
++        }
++        return cls(**kwargs)
++
++
+ def _get_logger(verbose):
+     """Set up a logger with the appropriate level"""
+     logger = logging.getLogger('container')
+@@ -147,13 +188,21 @@ def main(args):
+     """Main entry point for the container tool"""
+     logger = _get_logger(args.verbose)
+     try:
+-        cls = Runtimes.get(args.runtime) if args.runtime else Runtimes.find()
++        config = Config.from_toml(args.config_file, args.config_profile)
++        runtime = args.runtime or config.runtime
++        cls = Runtimes.get(runtime) if runtime else Runtimes.find()
+     except ValueError as ex:
+         logger.error(ex)
+         return 1
+     logger.debug("runtime: %s", cls.name)
+-    logger.debug("image: %s", args.image)
+-    return cls(args, logger).run(args.image, args.cmd)
++    image = args.image or config.image
++    if not image:
++        logger.error("no image specified")
++        return 1
++    if config.registry:
++        image = '/'.join((config.registry, image))
++    logger.debug("image: %s", image)
++    return cls(args, config, logger).run(image, args.cmd)
+ 
+ 
+ if __name__ == '__main__':
+@@ -162,18 +211,28 @@ if __name__ == '__main__':
+         description="See the documentation for more details: "
+         "https://docs.kernel.org/dev-tools/container.html"
+     )
++    parser.add_argument(
++        '-c', '--config-file',
++        help="Path to the config file.  If not specified, the default is to "
++        "look for .container.toml in the current working directory."
++    )
+     parser.add_argument(
+         '-e', '--env-file',
+         help="Path to an environment file to load in the container."
+     )
+     parser.add_argument(
+-        '-g', '--gid',
++        '-g', '--gid', type=int,
+         help="Group ID to use inside the container."
+     )
+     parser.add_argument(
+-        '-i', '--image', required=True,
++        '-i', '--image',
+         help="Container image name."
+     )
++    parser.add_argument(
++        '-p', '--config-profile',
++        help="Profile section to use in the config file.  This will override"
++        "any values defined in the DEFAULT section."
++    )
+     parser.add_argument(
+         '-r', '--runtime', choices=Runtimes.get_names(),
+         help="Container runtime name.  If not specified, the first one found "
+@@ -184,7 +243,7 @@ if __name__ == '__main__':
+         help="Run the container in an interactive shell."
+     )
+     parser.add_argument(
+-        '-u', '--uid',
++        '-u', '--uid', type=int,
+         help="User ID to use inside the container.  If the -g option is not "
+         "specified, the user ID will also be set as the group ID."
+     )
+-- 
+2.47.3
 
-    [ Fixed typos as discussed. Reworded slightly for other typos. - Miguel=
- ]
-
-    Link: https://github.com/llvm/llvm-project/issues/217629 [2]
-
-    Cc: stable@vger.kernel.org
-    Fixes: ca627e636551 ("rust: cfi: add support for CFI_CLANG with Rust")
-
-Cheers,
-Miguel
