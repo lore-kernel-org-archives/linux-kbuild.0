@@ -1,217 +1,132 @@
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2894403AFD;
-	Mon, 24 Aug 2026 10:06:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787565969; cv=none; b=OqtcUGGyloI8yyjrnpOjRJQF8a7uyqiqS6AkM7IKRhkHtuL9zlruJhQ8TOvIomdipjnz9Io8k9m3+EqI7dM56hivNAHI/5CO/wfgDsqOzFqIc3XyTej3ZE/I+ebMdOYdmWiL7RIx7cbOUW01iUWCg5RrKK7klYd/2bhfNRW6A/I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787565969; c=relaxed/simple;
-	bh=n89gxyfi9GTlw2gpxZJBbyCju3OtwzBnoR7HrKFwXw0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SDjKXewvTssYKl08RyBK0ILLt6ruy0KimvWc/GNwnGrQRSphAIj35vvXrAq1BIU1cWprWxXhb/6GNUgjFrhmHjKE1XBHGEUaj5uPRlclTyQ8SoDgLgL82PldQ7hm+KJ0js6WK+SE5dSEF3t7cpCjvY4B6iMOR68TAXFm+mpTKIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io; spf=pass smtp.mailfrom=gtucker.io; dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b=Z4CIuQS7; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gtucker.io
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2FCD3F65EF
+	for <linux-kbuild@vger.kernel.org>; Mon, 24 Aug 2026 10:33:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.175
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787567637; cv=pass; b=B8xFlLgX7nlieVUgFIsp87ZJhnpKsFofhy8PtzvtqyPmUgyTqjgujbcGn7kGAyLVYdJR0xYa7J6lcVP5miuG//oE7ifq0nfnUaTu/CgN/D/r6c4w592gi55uu6eozsvjWbyhmNMZ3mQI0UtIoJiuTixBdpbnF643lgj70H4AHaM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787567637; c=relaxed/simple;
+	bh=rTsk7zAhD79ApS0/sKWkLliFhDHabfK66J0Rk8Rj+zY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NmHdk5ZGBDhJz8lIxKHOgE/jODpluK0MBv/oxPAlm9zH4A1GFo1dj3uBofq+2aB8YccYKqvy7xoS/Z5yq+X7fwO93H7uz+iCy9jbMSAPrmvsI1iBnGtKUNFhElxvKe080a2V54BrXlM4n2YHt6904MDPkaibUZOQj5aF8IUVcd4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QulusW1J; arc=pass smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b="Z4CIuQS7"
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A25FE3EC5F;
-	Mon, 24 Aug 2026 10:05:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gtucker.io; s=gm1;
-	t=1787565957;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nl5nj2dyLj8feaqrv6wqjRChnaJ23iqb7k3L25yRyT8=;
-	b=Z4CIuQS75yJACKHAFNKar7qkk4nrHdXRiuU4eTr863eDCcRCzmwr3mZxPYqIhwX9IM6r8/
-	7ExaBTjB3TVrJVUbLOS+SqgEycYE31EPFiUffmwF9q/RaxymkHZf7HFy/n1wnEfCxbjweE
-	mruNb1w6HBX83vojA1cPDX8vcSQo+1zUv68jT5gWqx0pXX+5soxeMZVfjEJlNvee7GulSD
-	gcEVp9GPmR90kVDCbGqQOZNUNwWkcSMovfV832Mnir9A8axNFqR/Q3e+t4c0IXQoLjZxFr
-	TzKtioW/2vdk0FGKCLmiH9SE98QFKU/UYM//Qu0K7P2DvQ+egcjjAg6TxzRNhw==
-From: Guillaume Tucker <gtucker@gtucker.io>
-To: Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>
-Cc: Guillaume Tucker <gtucker@gtucker.io>,
-	=?UTF-8?q?Onur=20=C3=96zkan?= <work@onurozkan.dev>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	linux-doc@vger.kernel.org,
-	workflows@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kbuild@vger.kernel.org,
-	automated-testing@lists.yoctoproject.org
-Subject: [PATCH 2/2] Documentation: dev-tools: update container.rst with config file
-Date: Mon, 24 Aug 2026 12:05:48 +0200
-Message-ID: <13dc85e4d0b1b1f6fcfc7782238b137061f2dd7c.1787565460.git.gtucker@gtucker.io>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <7d8ba914cd174d716340bb2b88723bef0f330627.1787565460.git.gtucker@gtucker.io>
-References: <7d8ba914cd174d716340bb2b88723bef0f330627.1787565460.git.gtucker@gtucker.io>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QulusW1J"
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-84a6f026675so225728b3a.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 24 Aug 2026 03:33:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1787567635; cv=none;
+        d=google.com; s=arc-20260327;
+        b=KyjuTogFeyfhARzGOo2F6u2XYumiPETisCeEQMR1qx2PdLrwozYFldCOhRxwNGvAm1
+         yhsCDLjt6/22u/Yei1JQrpIYjpjrubS/Sj0vgzsYHMbt8tcGjQW42FAH/EmJC5i/mdp6
+         t1FbInfJ/wqMxPVbBfAPCUdnkTtfGn00kq59aTqiUFHSeU4fND7Gl1bpay+s+Zi6MqUR
+         83icMXJ3XefEXpZyvUJV1ZgdV1c8EWVbrmlzdDeXVdFHlmfnvCUMWeQJCq4FBuPTRi21
+         RiLMnR5M/HQXG8sd2VoVjSXEnn6rtfdMHwPiEuwyZunq7BspfiWsjklK1S7XYD+KeJlK
+         6t4w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=3Sxqv7JcbCSLDzUPku5fhjtOE0dghfe3mxOBWPzMEpk=;
+        fh=5feZuSB0+uCRGWaGvDvab2J+si3OGDd+PoXU4k7t+Y0=;
+        b=F+oLoscB1hkJR9LexkounK9BJpbXq6+My04K2xQxdonsC4800Ghhjl40z/361IVx+W
+         t8MlENcz7aub5dcnOBXRbWZHang7yM5KS/vvjt/7agigc/CwQvLJienFOR/Tu6wUpyzk
+         d6Rc/nGtSsy5Mkmb63ISjVJwFamrY2o76gVKj0L32xUUkteLNGwznxKSUXkq/+Tf44MN
+         yElVnIPXahN5bBsEw0kfuxV5fz4MvOqcry5MFkhgdzhytk2Yor3CvzGDfbBAOGih6ilp
+         01F6tXEjbVxPNYPF1hXPLtV0B5C3ebDPazC99M5NEjG7TkBGvcrJ6oQL8y5XNLR4R78x
+         aPYA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787567635; x=1788172435; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=3Sxqv7JcbCSLDzUPku5fhjtOE0dghfe3mxOBWPzMEpk=;
+        b=QulusW1JRP++7Bg5FKks8SIRgRBjw05QfmLWOjf86PEGu/25FoRfYgne2kTZh5kjsU
+         TtJdA6AxUyf6TJ/to1jFsgX1BMk2ArJA5rqhp0OcUQSA7AtlOes5qOoagnPXu6j8cYJi
+         AL4IaDaWBqYs3azjZch6k5F8JOl31M8lwbZn8WfKdW8MzWD/S35YFatxvdwg7Xn6Xa5R
+         kia/LAtRP/bijM9+tOEpqAMsGerS2TOfH3072gOA6w0T+HsvBYeIJYV7TisdxuEUHyPI
+         MiX237+bE0hiM8Ff7KNtqGTxDCDIjbNVs1WOZ4LSXkYPOIWX+0Xwz3SIR8lCbcZBpsBS
+         mhdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787567635; x=1788172435;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=3Sxqv7JcbCSLDzUPku5fhjtOE0dghfe3mxOBWPzMEpk=;
+        b=jWLoNTeTBuIlWSIDUsb/wqh0QJ5NHsleClgs+8dnJ1VrQv5Di0XYfpW06SBu835gzY
+         40Kr4LUPSof1zeR5Rn5toi8NJkHnyhw3bRNgsxrpDKglM9jZ9+wUQAEzEvgod+G+PQu9
+         eDNadab3K2esTOzo1MhQBOPt5GBAma07NQ59fn2cRqhZfvmTqfi1dAnIikBTcOHSQjQK
+         iNuT4CWkZeQsJxffTwdCfnEAetsDjZzA56SIerIc5JDbKmMeRjjNXl+wfPN7v7BpuyiK
+         sRQcYTdrB6tLL7U0u+VQVrA9NlTL3A8qvNqtY4VTIv/zPLDMM6Wu/VUFIT4W9JHuZ9BH
+         djHA==
+X-Forwarded-Encrypted: i=1; AHgh+RpGP9hwxW7V8nHsmHB+ialHHaXvT0mvTASCCuCIjfmV3loc46kWLkoJFYUQhtIgj1InkHJgraVfni1K30c=@vger.kernel.org
+X-Gm-Message-State: AFuF++n9lXNXuZu5pN5BfWTibOq2akkQtboZdRV/f2DTermbnwTQAeHx
+	aPQ5jZDPWQrxnCUrLa0VpZzYC4ShnGqFh/ESXzi6p5tmeELC3uwDC9Np+NVCjPbD9slt0gdsh7Q
+	S8cjrsMMzIIqo3grjoUgv9+twTysTGKg=
+X-Gm-Gg: AR+sD12ELGilAwXH97AcV8xMVkCftoIPJ7Sf4iNeVpkZYnCPKUQvNIjrlylBMSOHn02
+	zGiOVRMuPTBOYCUNz/im/dkWGWlUHCSBGoSHRw3PGVP8qLcwW2RRznN05EvhcbJwmVui/JNT7Mr
+	EaV/OxynhDiDYmkXCMOFI3j4lbFlul8Q6FwOzWmkbtorytT5hV5iZz1wzzwiiB+0D1V0b0YRHtx
+	bNeAs9bud47aADG+TLXulX+sHxLcuznt+n6X7nVU/l1AmmxTcfP4NR4vPq2WzAbo0AJrZ6rdNiz
+	jIbFSw63tZ+/bfXFbo/mTcj4isxred6/vF+uq/+Duec3EBbxj2ttdFGcfov264OM/7zMGXD1TWD
+	Yz1mmDF4JkwhGR1nXJZVN4kCr7txDJK9XijklFU63K7sRnGDvBSdpWFzoD09k
+X-Received: by 2002:a17:903:b43:b0:2d2:a952:2628 with SMTP id
+ d9443c01a7336-2d64b0d7b26mr223449495ad.2.1787567635111; Mon, 24 Aug 2026
+ 03:33:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: gtucker@gtucker.io
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: dmFkZTFdgo9GXW4KXiuQ99TzGaJpC9677ILr6tf8lNXSF0/do8SjfMh9c+NdYcL5Y5oGa8musRN679hD+p0oOSCOj2vYSVYEfKNBZ7e4zEVWQDcrR40p/hhN8cof5Jgml7fS6O5A8rjT6NxhySZe7Tga5lwB3E5VOY1k+glMeihNihoc9AKj/NAzMtknNeoq7NPZ51hZneDA2MHyWVSiwK1TEsBx8wBsiRcvSfw2ZKf4HpnELxLuyFLP0J4BD6QACTuKJ1Ad7J7QiIafXgvUsEdp5LTt8nE+hPlKFINCktnTC5l/MFCIaSib/cJCmOycwHveHyZhpN8OhUvZ0M67AE/LBwKloj3p7mvj4oky4ejP3I65Zu5j2lk/45aufotMXa0Rv2anMIi0g6JbW+Ep72qbeNEwsMGW4Ev3lHv51bpeDFuX8mCOoW9CVjty3bjsOQh3OlSIEY21l+e7IjYccZHrGJKjEjN59ljCEhkNg5BO6eqQdpGYCTQJXkuf/oWN8CbEZ+ynZgg+IqyiQQvvsMlc6jBzC8yOrMBoZhmrSj1OZthfvV6URYGHkeJaM6wc7Gbu91YFwP6KPa2bBlNNMmdZ6lZ9hqeZsScgJEi/f+hUbf5cneDi4PZdckt7Ir5RM6V0Pd8/BSc1tZCM8iJL3AHiTAk3/Kfy5ADp/zUAe+4SBnLPmA
+References: <20260816133233.197500-1-ojeda@kernel.org> <20260816133233.197500-2-ojeda@kernel.org>
+ <20260817181212.GA1249844@ax162>
+In-Reply-To: <20260817181212.GA1249844@ax162>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Mon, 24 Aug 2026 12:33:42 +0200
+X-Gm-Features: AcwNN1UQhMeA17Nam-JDCwmn02-8UCEoZ5cc2iWtmyDKrZlCDreN1zPgzdBNxyQ
+Message-ID: <CANiq72mAy93vnGZJ+wfwh2epJqSpOhF6XBK7K9XWC6mVEcPT8g@mail.gmail.com>
+Subject: Re: [PATCH 2/2] kbuild: rust: keep Rust objects out of Clang LTO with
+ inline helpers
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Miguel Ojeda <ojeda@kernel.org>, Nicolas Schier <nsc@kernel.org>, Boqun Feng <boqun@kernel.org>, 
+	Gary Guo <gary@garyguo.net>, Matthew Maurer <mmaurer@google.com>, Alice Ryhl <aliceryhl@google.com>, 
+	Josh Poimboeuf <jpoimboe@kernel.org>, Peter Zijlstra <peterz@infradead.org>, linux-kbuild@vger.kernel.org, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
+	Daniel Almeida <daniel.almeida@collabora.com>, Tamir Duberstein <tamird@kernel.org>, 
+	Alexandre Courbot <acourbot@nvidia.com>, =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
+	rust-for-linux@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Update the container.rst documentation page with a new section for the
-TOML configuration file, its associated command line options and an
-intro paragraph.
+On Mon, Aug 17, 2026 at 8:12=E2=80=AFPM Nathan Chancellor <nathan@kernel.or=
+g> wrote:
+>
+> I am not sure we can use '-mllvm -trap-unreachable' for C code, as that
+> would mess with manually inserted calls to __builtin_unreachable(). It
+> has come up before:
+>
+>   https://lore.kernel.org/CAHk-=3DwgPCbZv0JgqoNWMOO+p=3DN772YW16xYk_pmb1G=
+U7aeuPFA@mail.gmail.com/
+>
+> It is possible the '-no-trap-after-noreturn' avoids that particular
+> issue but I still think the "compiler inserted" vs. "user inserted"
+> distinction that Linus comments on is likely still potentially relevant.
 
-Provide a sample config using the TuxMake images with an example to
-show how to simplify the command line syntax.
+Thanks Nathan -- yeah, that is the kind of "intended" thing I was
+wondering about in my note above... It would be nice if there could be
+a distinction between the developer-provided ones and the ones that
+get inserted for other reasons.
 
-Bump the requirement from Python 3.10 to 3.11 which is when tomllib
-was introduced.  Also, Python 3.10 is about to reach its end of life.
+Ok, I picked these up to fix the immediate issue, since they only
+affect the experimental mode and only the Rust side. If there is a
+better approach available in the future, then great.
 
-Signed-off-by: Guillaume Tucker <gtucker@gtucker.io>
----
- Documentation/dev-tools/container.rst | 98 ++++++++++++++++++++++++++-
- 1 file changed, 95 insertions(+), 3 deletions(-)
-
-diff --git a/Documentation/dev-tools/container.rst b/Documentation/dev-tools/container.rst
-index 452415b64662..5847637e0396 100644
---- a/Documentation/dev-tools/container.rst
-+++ b/Documentation/dev-tools/container.rst
-@@ -26,6 +26,11 @@ Command line syntax::
- 
- Available options:
- 
-+``-c, --config-file CONFIG_FILE``
-+
-+    Path to the config file.  If not specified, the default is to look for
-+    ``.container.toml`` in the current working directory.
-+
- ``-e, --env-file ENV_FILE``
- 
-     Path to an environment file to load in the container.
-@@ -38,6 +43,11 @@ Available options:
- 
-     Container image name (required).
- 
-+``-p, --config-profile CONFIG_PROFILE``
-+
-+    Profile section to use in the config file.  This will override any values
-+    defined in the ``DEFAULT`` section.
-+
- ``-r, --runtime RUNTIME``
- 
-     Container runtime name.  Supported runtimes: ``docker``, ``podman``.
-@@ -53,8 +63,8 @@ Available options:
- 
-     User id to use inside the container.
- 
--    If the ``-g`` option is not specified, the user id will also be used for
--    the group id.
-+    If the ``-g`` option is not specified, the user id will also be set as the
-+    group id.
- 
- ``-v, --verbose``
- 
-@@ -86,9 +96,13 @@ container with SIGINT (Ctrl-C).  To run commands interactively with a TTY, the
- shell directly rather than the parent ``container`` process.  To exit an
- interactive shell, use Ctrl-D or ``exit``.
- 
-+A :ref:`configuration file<config_file>` may be used to facilitate running
-+containers for various use cases.  It also removes the burden of repeatedly
-+providing the same options on the command line.
-+
- .. note::
- 
--   The only host requirement aside from a container runtime is Python 3.10 or
-+   The only host requirement aside from a container runtime is Python 3.11 or
-    later.
- 
- .. note::
-@@ -225,3 +239,81 @@ To build the HTML documentation, which requires the ``kdocs`` image built with
- ``make PREFIX=kernel.org/ extra`` as it's not a compiler toolchain::
- 
-   scripts/container -i kernel.org/kdocs make htmldocs
-+
-+.. _config_file:
-+
-+Configuration File
-+==================
-+
-+By default, the tool will look for configuration a file named
-+``.container.toml`` in the current working directory.  If not found, it will be
-+silently ignored as it's not required.  Alternatively, any other path can be
-+specified with the ``-c`` option in which case the file needs to be present or
-+an error will be raised.
-+
-+Its data follows the standard TOML format and is made up of different sections
-+with ``DEFAULT`` as the default one.  Other sections may be used to define
-+alternative profiles under arbitrary names which can be selected by the ``-p``
-+option.  Command line options take precedence over configuration values, and
-+profile sections take precedence over the default one.
-+
-+Supported options in each section are:
-+
-+``env_file``
-+
-+    Path to an environment file to load in the container, equivalent to the
-+    ``-e`` command line option.
-+
-+``image``
-+
-+    Name of the container image to use, equivalent to the ``-i`` command line
-+    option.
-+
-+``registry``
-+
-+    Name of the container image registry to use.  This will be used as a prefix
-+    before the image name with a ``/`` separator.
-+
-+    For example, a ``docker.io`` registry and a ``myuser/myimage`` image will
-+    result in ``docker.io/myuser/myimage`` as the full image path.
-+
-+``runtime``
-+
-+    Name of the container runtime, equivalent to the ``-r`` command line option.
-+
-+``uid`` / ``gid`` (integers)
-+
-+    User and group id numbers to use inside the container, equivalents to the
-+    ``-u`` and ``-g`` command line options respectively.
-+
-+
-+Here's a sample configuration with an extra ``clang`` profile::
-+
-+  [DEFAULT]
-+  runtime = "podman"
-+  registry = "docker.io"
-+  image = "tuxmake/korg-gcc"
-+
-+  [clang]
-+  image = "tuxmake/korg-clang"
-+  env_file = ".clang.env"
-+
-+It mentions a ``.clang.env`` file which simply contains this flag::
-+
-+  LLVM=1
-+
-+Let's take a look again at this example mentioned earlier::
-+
-+  scripts/container -i docker.io/tuxmake/korg-clang -- make LLVM=1 defconfig
-+
-+Using the configuration file, it can now be simplified into this::
-+
-+  scripts/container -p clang -- make defconfig
-+
-+Then to override the default runtime, the ``-r`` option can still be used::
-+
-+  scripts/container -p clang -r docker -- make defconfig
-+
-+This also illustrates how values take precedence over each other: the registry
-+is loaded from the ``DEFAULT`` section, the image from the ``clang`` section
-+and the runtime from the command line ``-r`` option.
--- 
-2.47.3
-
+Cheers,
+Miguel
