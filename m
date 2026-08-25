@@ -1,200 +1,140 @@
-Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8533A3B6BFE;
-	Tue, 25 Aug 2026 19:10:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787685054; cv=none; b=MBPFQ3JgaDmKBiwp2KDEEb4ecL+mLtph2ZDH5dUDq281tYFeEFrYTLqmj0fBsymWglvCHWxzIyTDZH9MReokSD6fJm8HvhUVSdj64YaC6gFEul3gP+c1AhtP9aAPtjK4OhXlImrdGrh8yAEgF7mDS3GGgLhWgOKsl1c6AF3TeI4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787685054; c=relaxed/simple;
-	bh=OtchHb6GBRRv68k/gioU/7xbxZ19B8WsvvWJaYWNtpk=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=ipvLNwRYVe5qMCdwNi3DiLYUr8wa3BDCTTRR0oDbzguPyZv8t4cUzxHe9TeftT02dHk+LbW69SxsAwO7zSBhor2O9024k3t1P3Jqc+SNVIrIC9YItyp7L0nInMqvVzRwIKyPuzRPy4Mm4VQ7gBGxSu1mtANzzbw4nfK7j1dIW1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=RHvx1Ado; arc=none smtp.client-ip=213.97.179.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC66A35C693
+	for <linux-kbuild@vger.kernel.org>; Tue, 25 Aug 2026 23:36:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.174
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787701013; cv=pass; b=ibeI6ZYrEsDPj9xGmeQ7w5ld9nYNfZ5ec3EVh4MuDIMiNGCBT3YWcF0yTf7Epo+ciGFlI0bzGMeTlEshhyYJNecbkVWdD8vhFjQVrddw466p933eJP7kaDoHL6eXGD2JkE344E7yurxXxBPgC3Q/vcwun9LAa5WI0pWYztE7BEI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787701013; c=relaxed/simple;
+	bh=h1DbMee42kDTE/h0M3ZhHKpBRN+EYlu3Xiaw/VOWNzw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VhX21P/wJfuaHsLfElF7GE6Bithqv6IwH8mxRx8VXkrmAkeF1jBELwJ+QvtbHQiR0dfRaFi6ZnGfhV568TVdimhxgmEAoVsHuJUcwa7UovouLsa4+oEP0Qfes8NimetcitAkK/2lzVIpFlbwNIEes1OmqwZr+cyjAtOdHAvY7yY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cq5aUTeC; arc=pass smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="RHvx1Ado"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; h=Content-Transfer-Encoding:Content-Type:Message-ID:Subject:Cc:To
-	:From:Date:MIME-Version:From:Reply-To;
-	bh=elAJm2a/yvCuwNZQN8cT8iWBlOljI1OpyGvFLYC11uo=; b=RHvx1Ado+WH9EzbHIOX+ZddNR4
-	p497xG/usjgdtyDE/kA/xbjOpyLIBJuOI92EZRwc1yOZOItUmNe5+oSRd4oxCZHOSJIg77xqmE+Tc
-	K5PFV0rWFpwnhQ6m9KAj6Aq1yxVDoopN2BKsaUVqLC48h9H3wG5IGBXSnMlrjvxadR17ZpA62zFv6
-	qnk+hsPSnk1nJmmcLcs7OjTT5cXXOefE42zyl0b94RK82DSvgwElUXWEAW9MTO2l5NBp9Zejkwn6T
-	YNgx8l8tDqfY2WGCtiFY0jVvYc0jEiv34rN7tch6qSf2TkOPn3XRxDKM1uTJZIDi4f2h9zACbsB7B
-	9kW+H63w==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
-	by fanzine2.igalia.com with esmtps 
-	(Cipher TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
-	id 1wywXL-009BHb-A7; Tue, 25 Aug 2026 21:10:19 +0200
-Received: from webmail.service.igalia.com ([192.168.21.45])
-	by mail.igalia.com with esmtp (Exim)
-	id 1wywXJ-00530G-Og; Tue, 25 Aug 2026 21:10:19 +0200
-Received: from localhost ([127.0.0.1] helo=webmail.igalia.com)
-	by webmail.service.igalia.com with esmtp (Exim 4.98.2)
-	(envelope-from <mfo@igalia.com>)
-	id 1wywXJ-00000003he5-2ugE;
-	Tue, 25 Aug 2026 21:10:17 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cq5aUTeC"
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2d5862bc921so1092755ad.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 25 Aug 2026 16:36:51 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1787701011; cv=none;
+        d=google.com; s=arc-20260327;
+        b=bqeAFqdyp+qDJgxvmfKs1+jrP+4yBroyM5rJox4jjaOCjXEvuTMdHGUi+DTfBQ8Zi0
+         SBIpAhKIuFxCrSuF8Of9qaX3zSzfarYL22A/eShwanBoOO8PGC1uywWHW2MPxnDeNWjJ
+         JW/JeR8psI8sjYj47IlXqA+LHYnka6miz/7cPuX/V4hrzZTHn3tJaRplI6FmQv+5e3qb
+         16X9bWQH6W74OFhHY7IDpBt9srKJ0l8HaZyvMl+77ENM6OUNvC49Oxn6gGT9ua5WbAQT
+         qYT/ERt1Mmep8v7mYd3eeDWtnFUITxIHfHI1jaTWSGkl3BmcuuuKslymo/krHiir0gT8
+         RJQQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=2fMZcIr7PJYUKtYt6N73x4GUy9xmDK+BvFmvurRf9/Q=;
+        fh=v6ShFZ8xDPxKMUmmUEECk4uYW56Y/6hFEuCMdCT9PrQ=;
+        b=nrtk429tIJPqfJv2dlX92ek4jV5Xuiu7oETavYSzDaK0p70i/5qiQCQXq3G9ZiKHFw
+         vcC2iB1xAJ+I/0iByNR2TlIbpuuwIR70vkXn6OPzS6R2mXYko5+Ye3B9QhgjV81DsL4J
+         VhvadP2q03hrXvRm1/pS28BW9JfqnM9eZjCpdsFJKr1e3PnCHoCfCNq8Bv4dAzINXDtd
+         K9UUM3qyPfVDwNkuxbo6EPSCPud6B8bz5fugBZeFFAgRoBmvQLonwAvdPxnGAIRGn1uU
+         WWspcYdER6dkwAgk8WUV2SEKT21r9dDZvKROMfp0KgMDzAmn4+tLwqv2ZzEcYTBdPpVn
+         AajQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787701011; x=1788305811; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=2fMZcIr7PJYUKtYt6N73x4GUy9xmDK+BvFmvurRf9/Q=;
+        b=cq5aUTeCIAE4mPtjyZVij1Hq4AplR5/esWhQPkNAERpwIuaaWIPVGtfFgZstEhFweB
+         pVprFD7Z26WLT36SDmmhso44Pw5y3eJJ4CGWxpt/0kMkyQFS1459igOdKymQnRGZLfVq
+         gE9Q6RCmNodQEOMsKejWCjBl+3ZuR+kihYHbMZjB1tbPNGi68C/P0mVCVHY/VkwBKY41
+         EgSrSi3jUvk+ZK9zbs1/tYQDh5qE/8OPY4YzjYKQfMS7EaQixYtsf8k3oPCTrsq/5zkK
+         1EY5tldB36zoQowFXpBqhhiX138FcQoJcT66X28v0gm67EMWKqTl5EAtfCBoF/QTFf64
+         LTYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787701011; x=1788305811;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=2fMZcIr7PJYUKtYt6N73x4GUy9xmDK+BvFmvurRf9/Q=;
+        b=R9dqLhfaCUJi0gZtpKzKGfkh/Cz15R2dOLJ+yJbTH45/Bc+BA5kR3mr2AH6K3DvLWT
+         KJXQ116QNls3ZT2ftzm+QvF10hVuctye6/DDr9lzEUpeVHgGX5f9QEBrzPqapxn6XN8e
+         mBTuM+MCm7mX8VSrth8DDndrHtbIIUplaLGd235boLOKRGYN/TQQDwNvh6BObvi20MxM
+         6ykb1ih2ve6fZmra+kSlfqEY4TY9yeMux6ivQFe/j4NulA2jyRa7rjf7vJ6NCA8orTad
+         qbvnlzPXpEVG5x7Vne1u+gPf6w06clXM9N1QcJh+YZU+Dxjfk+m/dVwMoGw4DY3dGtOj
+         Wcaw==
+X-Forwarded-Encrypted: i=1; AHgh+RrsTe22yqticloh4XnsWSFOoMtUtMu18UvkrLdxZ7dFSFKUbbpnjVYTjjOYgRV6DA6gnYjDqIl2OYMIVXw=@vger.kernel.org
+X-Gm-Message-State: AFuF++nfJhb63XUh/tbmsvKrN9DZ1Zcss2jQ28dLU+qIiRmTqWim1z76
+	OlIEw18tWTieVCIXHDVk0ytdjNrbQ+0p0VPiPynqGi0D1jrgrix+QtQl3k66kQMafrtVQcQlw9f
+	eRbBFqgDnL8qfIuXAl/g2pePVsPKbTr4=
+X-Gm-Gg: AR+sD11voC+5veqad185VIsXDu1jr8Zk5X4RLMp7W0XPZPQVc8Ie39H4t2K3perghSw
+	RLvwsADfpP7FSyEuvWNiHXN9hwQLATtcoJSBClATtSxtKhtA2FarpFMLqaS4+L6WDaDEwwzlkiF
+	rBOViEJtszNvHuccrrUFtKNcfQbkj8Os5L8gNVyXBS3sJNNbIw+v5gV/mWMDNI9OOxTPAgXSD8w
+	//487phrO871GFuFHzpyb03OvQJP94jz1koqKcdn3VC1kdUUCMItT69jPswUsa2cGg2JZ3/QC/u
+	bPm9IPn9sF7rE6ItPdS9RQPZOCGBFu9uaYz/b1kt5JZTHUFnMLWstal02G2HGMK0bf8Lgm+GvYw
+	tNUDtt5IrZU2p1A6g8U4vkZJIheQSkJF1TxR4SOBGF+damj1FGX2nqUQPFCYQXGAZ8Sm+RoQ=
+X-Received: by 2002:a17:902:f789:b0:2c9:ed4a:c3a4 with SMTP id
+ d9443c01a7336-2d7077710ffmr16923965ad.0.1787701011201; Tue, 25 Aug 2026
+ 16:36:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Tue, 25 Aug 2026 16:10:17 -0300
-From: Mauricio Faria de Oliveira <mfo@igalia.com>
-To: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-Cc: Kees Cook <kees@kernel.org>, Joel Granados <joel.granados@kernel.org>,
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, kernel-dev@igalia.com,
- linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
- fsverity@lists.linux.dev, keyrings@vger.kernel.org, bpf@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org,
- netdev@vger.kernel.org, linux-wpan@vger.kernel.org,
- lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, linux-sctp@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
- bridge@lists.linux.dev, mptcp@lists.linux.dev, rds-devel@oss.oracle.com,
- virtualization@lists.linux.dev
-Subject: Re: [PATCH RFC v3 03/13] sysctl, mod_devicetable: add macro
- MODULE_SYSCTL_TABLE
-In-Reply-To: <ao1P_mEJdyRExG3v@monoceros>
-References: <20260819-sysctl-module-aliases-v3-0-aab90569365d@igalia.com>
- <20260819-sysctl-module-aliases-v3-3-aab90569365d@igalia.com>
- <aomlfGJM61qZKxx2@monoceros> <4e3eaf1d3419e808be046035f114bf6c@igalia.com>
- <aotteDcc588iwC6g@monoceros> <4aa22e41e8ff4bab6638cf0baaa9d07b@igalia.com>
- <ao1P_mEJdyRExG3v@monoceros>
-Message-ID: <4a7925a800f0c9b36078a70bf35e960d@igalia.com>
-X-Sender: mfo@igalia.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Report: NO, Score=-2.1, Tests=ALL_TRUSTED=-3,BAYES_50=0.8,KAM_DMARC_NONE=0.125,KAM_DMARC_STATUS=0.005
-X-Spam-Score: -20
-X-Spam-Bar: --
+References: <20260823193529.156066-1-ojeda@kernel.org>
+In-Reply-To: <20260823193529.156066-1-ojeda@kernel.org>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Wed, 26 Aug 2026 01:36:37 +0200
+X-Gm-Features: AcwNN1XJUdcU-uaWrJb_MWdWJsZH9EysTDIt0KdNtGRwRojvJo_C-_WfkW_E10w
+Message-ID: <CANiq72=AXhvxG3TD5QgnLMmL1hcPyahn55wO28MOsWTAo6F_Ww@mail.gmail.com>
+Subject: Re: [PATCH] rust: kbuild: disambiguate `zerocopy_derive` for `rusttest`
+To: Miguel Ojeda <ojeda@kernel.org>
+Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, Boqun Feng <boqun@kernel.org>, 
+	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
+	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
+	=?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
+	rust-for-linux@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	Antoni Boucher <bouanto@zoho.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2026-08-25 05:24, Uwe Kleine-König wrote:
-> Hello,
-> 
-> On Mon, Aug 24, 2026 at 06:04:03PM -0300, Mauricio Faria de Oliveira wrote:
->> On 2026-08-23 19:12, Uwe Kleine-König wrote:
->> > On Sat, Aug 22, 2026 at 01:57:24PM -0300, Mauricio Faria de Oliveira wrote:
->> >> On 2026-08-22 10:41, Uwe Kleine-König wrote:
->> >> > On Wed, Aug 19, 2026 at 03:16:16PM -0300, Mauricio Faria de Oliveira wrote:
->> >> >> The MODULE_SYSCTL_TABLE macro emits a struct module_sysctl_table variable
->> >> >> with pointers to a sysctl table's path and entries, and table/entry sizes.
->> >> >
->> >> > That new struct doesn't seem to contain any pointer?
->> >>
->> >> The struct module_sysctl_table fields .path and .table are pointers,
->> >> although with kernel_ulong_t type so that the same 32/64-bit size is
->> >> used in file2alias.c based on KERNEL_ELFCLASS (and not on the host,
->> >> which might differ with CROSS_COMPILE).
->> >
->> > Cross compilation isn't an issue for the already existing device id
->> > structures; many of them also contain pointers.
->> > (While modpost doesn't use the pointers, the size of the structures must
->> > be known to correctly interpret the arrays.)
->> 
->> Indeed. I missed some device_id structures with pointers, and that
->> devicetable-offsets.c is cross-compiled to generate
->> devicetable-offsets.h for file2alias.c to use offsets and sizes of the
->> target architecture.
->> 
->> I'll change .path and .table to pointers in the next version.
-> 
-> I *think* the existing device-id structs use char[] for strings that are
-> relevant for modpost. I look forward to you finding out if there is
-> still a justification for that :-D
+On Sun, Aug 23, 2026 at 9:35=E2=80=AFPM Miguel Ojeda <ojeda@kernel.org> wro=
+te:
+>
+> The `rustc-dev` components for Rust 1.82.0 through 1.87.0 include a
+> precompiled `zerocopy_derive` procedural macro in the sysroot. This
+> range includes Rust 1.85.0, our minimum supported version.
+>
+> This makes `rusttest` fail because the compiler finds both the sysroot
+> copy and the copy built in `rust/test`:
+>
+>     error[E0464]: multiple candidates for `dylib` dependency `zerocopy_de=
+rive` found
+>       --> rust/kernel/prelude.rs:70:9
+>        |
+>     70 | pub use zerocopy_derive::{
+>        |         ^^^^^^^^^^^^^^^
+>        |
+>        =3D note: candidate #1: .../lib/rustlib/x86_64-unknown-linux-gnu/l=
+ib/libzerocopy_derive-54d2b38896fa6bc5.so
+>        =3D note: candidate #2: .../rust/test/libzerocopy_derive.so
+>
+> Commit fe39a233ea52 ("rust: kbuild: disambiguate `zerocopy` for
+> `rusttest`") fixed the equivalent ambiguity for `zerocopy`.
+>
+> Thus point to the dependency explicitly in this case too.
+>
+> Cc: Antoni Boucher <bouanto@zoho.com>
+> Cc: stable@vger.kernel.org
+> Fixes: 506054980429 ("rust: zerocopy-derive: enable support in kbuild")
+> Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
 
-AFAICT, an array is simpler to read in file2alias as it is stored
-directly in the symbol:
+Applied to `rust-fixes`.
 
-For example:
-
-@ include/linux/device-id/of.h 
-
-	struct of_device_id {
-	...
-		char compatible[128];
-	...
-
-@ drivers/net/ethernet/korina.c
-
-	static const struct of_device_id korina_match[] = {
-		{
-		        .compatible = "idt,3243x-emac",
-	...
-	MODULE_DEVICE_TABLE(of, korina_match);
-
-which builds
-
-	$ objdump -t drivers/net/ethernet/korina.o | grep __mod_device_table
-	0000000000001020 l     O .rodata	0000000000000190
-__mod_device_table__kmod_korina__of__korina_match
-
-	$ objdump -s -j .rodata --start-address=0x1020
---stop-address=$((0x1020+0x190)) drivers/net/ethernet/korina.o
-	...
-	 1020 00000000 00000000 00000000 00000000  ................
-	 1030 00000000 00000000 00000000 00000000  ................
-	 1040 00000000 00000000 00000000 00000000  ................
-	 1050 00000000 00000000 00000000 00000000  ................
-	 1060 6964742c 33323433 782d656d 61630000  idt,3243x-emac..
-	 1070 00000000 00000000 00000000 00000000  ................
-	...
-
-@ scripts/mod/file2lias.c
-
-	#define DEF_FIELD_ADDR(m, devid, f) \
-		typeof(((struct devid *)0)->f) *f = ((m) + OFF_##devid##_##f)
-
-	static void do_of_entry(struct module *mod, void *symval)
-	{
-	...
-		DEF_FIELD_ADDR(symval, of_device_id, compatible);
-	...
-	
-void handle_moddevtable(struct module *mod, struct elf_info *info,
-                        Elf_Sym *sym, const char *symname)
-{
-        void *symval;
-...
-                symval = sym_get_data(info, sym);
-
-On the other hand, a pointer is stored indirectly through a relocation
-in the symbol, which is not as simple to read (i.e., 1. find the
-relocation section for the symbol's section; 2. find the relocation in
-that section by matching relocation offsets with an offset in the symbol
-+ symbol address; 3. finally read the relocation's target).
-
->> > I would be great if your series didn't introduce a new obstacle for
->> > [CHERI].
->> 
->> Absolutely. I'll be happy to adjust the series and testing for that.
->> 
->> Could you please confirm one should just follow [1], which uses [2] to
->> build the LLVM toolchain, and use it to build the kernel [3]?
->> 
->> [1] https://github.com/cheri-linux#building-and-running
->> [2] https://github.com/cheri-linux/buildroot
->> [3] https://github.com/CHERI-Alliance/linux/tree/codasip-cheri-riscv-7.1
-> 
-> I used
-> https://github.com/CHERI-Alliance/meta-cheri/tree/codasip-scarthgap and
-> didn't care about toolchain and rootfs. It also has qemu integrated, so
-> you can actually test it.
-
-I'll take a look; thanks!
-
-cheers,
-
-> 
-> Best regards
-> Uwe
-
--- 
-Mauricio
+Cheers,
+Miguel
