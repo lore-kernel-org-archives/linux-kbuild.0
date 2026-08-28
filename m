@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C67653CCFD4;
-	Fri, 28 Aug 2026 04:52:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E6FE3CF030;
+	Fri, 28 Aug 2026 04:52:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787892728; cv=none; b=ZdVehNNhuXThLoLWI5YwjUMvRUucUesTTh4Vq7cg2JgYfos6LujIQRKYfhenOKHerr+hzzPLNFPyxNNItF3KtcBOZ2B9OF5Uew5Imx9ZJ7InAmxiOgGDGH+NSP3/+GHnJmO4eZN2webxGZvSyl9qjuo7xY8PDMZ94Fb9TVQemeo=
+	t=1787892728; cv=none; b=WuNWakkZj4zyWFdbGMeea5N1UlJhk3FcSTNWPAJj/FY+f3Gqa23AJSVGupgm1cQLgFA2+imRAQMOIOmjPW5vFgPGMs74EuOVpDIfpCGgosMxXQ6CsTdDoNN4Qcp33O15/UbPvlNDfjq8MPObmw8VBP4oWB8rb7bMBk3jxsAc2qs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1787892728; c=relaxed/simple;
-	bh=vOtShQW5hqWtQLsF6JJqqLEy9K1H2NwWlw6Q7PKK47w=;
+	bh=TpI+ZyO/PPBysvaK3C3nLy5+GCCO4xCb/6Qhoxzxr9U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=a0MnyNihhpy+buR66H5mn5RW9a3VerXP30PQuoSIekkWn4npUgz/0NR/Do4qiiyGUTA7AvRMZqKLYa5oh1lxkXO88Oah2zoYH6/11o9NhvEonneeCLVRms/CANW5u4FqCeMQPIIttde2MyFeJq8GVwMnMwNAsVIuGK4urQijp/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AjgD8tBy; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=UyCES+dEQ7LndT77Rv2yBcuFl857iMRSIUvPrLb4XY2LBfT0bYXQOnegxtej7KyfH2ZyMlDxPAf5rFdXPEeHJdLue4usxTohnDTeRTgnBTRksM8icit6V6D6cNfqXulXczBuuAuEqpzGyW99yJkn/aeZt2/HctOPYKLSKZYT4G8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=emMgM5C7; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AjgD8tBy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AB531F00A3D;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="emMgM5C7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D63BE1F00A3E;
 	Fri, 28 Aug 2026 04:52:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787892726;
-	bh=q4UKoS/KEgRJIb5nCfv+d+0dqJKoVa0rpn2ix/q0LHA=;
+	s=k20260515; t=1787892727;
+	bh=TtBngXEZ/h+4/NjsyRr1cZakc5vH2AOdgLkSOM9C10Q=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=AjgD8tBymtQ7msSsHc/RxbIZCDsTlTIMP/HZ06sEyWyfh/RsGspLco1VegYAU8k5n
-	 bDH1dq4HoGaaugJalUn3Nqiy16T3WyujJrSxF4mZ3Bv2hMe1JIoOBELNtTkSTCpABM
-	 MjGL3tqGsuVd5ZkIgEYt1q1+NAZaRx/jgqgwdeMem38rTNcNgCytaHCHnBCTnS5J58
-	 j0Vkr9O/XG00+XR0rJvse0HOA1Jcjm10HYUZ97ttJgAtauWNUTuTJK7t+w6V7ly+ph
-	 ZicE582fmHuePYq01r/EEzogB0CTbODERiBmo+vr1M1V/1BdpwXJ9JC4Ir80V7cFmM
-	 iijvS5HksAm7A==
+	b=emMgM5C7dG7XxifqWh5asWDCERItrgL12f/7ZOUWIxugGUn6fVx3CRH72Dt9cOT0p
+	 LLrQG2FpjIETq6NIVFRY+q23eyX2n0OfAQPPiYpHI2c/J01ANpoC9i/ku2y1GUf4lu
+	 W/0v/EFIdBAy/mtUSff+Lr0KkaQllxiNTlXBfhRY2AiwW06uyDU1H4HDJzzxnUbqOl
+	 qEPF9Pfj3UjnlDTGYzSVB6JYoKFXdXcdegNBEKMlWVyIam68JXCNCGjUYCw6rR3DAB
+	 5dCqajxvJd7LSvBP0e3j7fPKzqHOW3vFxM7xfsHROux4oIQFhq7jbtR6Bsp2Ji5U6y
+	 MzSvaUplLXi2Q==
 From: Josh Poimboeuf <jpoimboe@kernel.org>
 To: x86@kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Nicolas Schier <nsc@kernel.org>,
 	linux-kbuild@vger.kernel.org,
 	Huacai Chen <chenhuacai@kernel.org>
-Subject: [PATCH 13/27] rust: Annotate the intrinsic stubs as returnable
-Date: Thu, 27 Aug 2026 21:51:42 -0700
-Message-ID: <00f55392e4640b835027a30b0dad79b4b53a56ad.1787890035.git.jpoimboe@kernel.org>
+Subject: [PATCH 14/27] panic: Mark abort() __noreturn
+Date: Thu, 27 Aug 2026 21:51:43 -0700
+Message-ID: <ce84b125053b74045fd59906c082bc2123e73aca.1787890035.git.jpoimboe@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <cover.1787890035.git.jpoimboe@kernel.org>
 References: <cover.1787890035.git.jpoimboe@kernel.org>
@@ -52,70 +52,72 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When building the Rust core library, the compiler emits calls to
-compiler-rt builtins like __udivti3() for 128-bit arithmetic, which the
-kernel doesn't want, so objcopy is used to redirect those calls to stubs
-which just panic.
-
-Problem is, their call sites still expect them to return, which confuses
-objtool.
-
-Objtool doesn't report any warnings today because the stubs are weak,
-which noreturn detection currently ignores.  In preparation for removing
-that restriction, annotate them as returnable.
+abort() is a C compiler builtin interface, so compilers already know it
+doesn't return, but mark it as such explicitly for documentation
+purposes.
 
 Signed-off-by: Josh Poimboeuf <jpoimboe@kernel.org>
 ---
- rust/.gitignore |  1 +
- rust/Makefile   | 17 +++++++++++++++++
- 2 files changed, 18 insertions(+)
+ arch/arc/kernel/traps.c | 4 +++-
+ arch/arm/kernel/traps.c | 2 +-
+ include/linux/panic.h   | 2 +-
+ kernel/exit.c           | 2 +-
+ 4 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/rust/.gitignore b/rust/.gitignore
-index d3829ffab80ba..c198d1a52e60e 100644
---- a/rust/.gitignore
-+++ b/rust/.gitignore
-@@ -6,5 +6,6 @@ doctests_kernel_generated.rs
- doctests_kernel_generated_kunit.c
- uapi_generated.rs
- exports_*_generated.h
-+intrinsics_annotate_generated.c
- doc/
- test/
-diff --git a/rust/Makefile b/rust/Makefile
-index 627ed79dc6f50..1cbee6f1ca098 100644
---- a/rust/Makefile
-+++ b/rust/Makefile
-@@ -33,6 +33,9 @@ endif
- 
- obj-$(CONFIG_RUST) += exports.o
- 
-+always-$(CONFIG_RUST) += intrinsics_annotate_generated.c
-+obj-$(CONFIG_RUST) += intrinsics_annotate_generated.o
+diff --git a/arch/arc/kernel/traps.c b/arch/arc/kernel/traps.c
+index 8d2ea2cbd98b0..803c131c6aa78 100644
+--- a/arch/arc/kernel/traps.c
++++ b/arch/arc/kernel/traps.c
+@@ -153,7 +153,9 @@ void do_insterror_or_kprobe(unsigned long address, struct pt_regs *regs)
+ /*
+  * abort() call generated by older gcc for __builtin_trap()
+  */
+-void abort(void)
++void __noreturn abort(void)
+ {
+ 	__asm__ __volatile__("trap_s  5\n");
 +
- always-$(CONFIG_RUST) += libproc_macro2.rlib libquote.rlib libsyn.rlib
++	unreachable();
+ }
+diff --git a/arch/arm/kernel/traps.c b/arch/arm/kernel/traps.c
+index afbd2ebe5c39d..a3bd26d41612f 100644
+--- a/arch/arm/kernel/traps.c
++++ b/arch/arm/kernel/traps.c
+@@ -777,7 +777,7 @@ asmlinkage void __div0(void)
+ }
+ EXPORT_SYMBOL(__div0);
  
- always-$(CONFIG_RUST_KERNEL_DOCTESTS) += doctests_kernel_generated.rs
-@@ -684,6 +687,20 @@ ifneq ($(or $(CONFIG_ARM64),$(and $(CONFIG_RISCV),$(CONFIG_64BIT))),)
- 		__ashlti3 __lshrti3
- endif
+-void abort(void)
++void __noreturn abort(void)
+ {
+ 	BUG();
  
-+# For objtool, annotate the redirect-intrinsics as returnable.  Their call
-+# sites were compiled against the returnable intrinsics, but the redirected
-+# versions are noreturn.
-+quiet_cmd_intrinsics_annotate = GEN     $@
-+      cmd_intrinsics_annotate = { \
-+	echo '/* Generated by rust/Makefile - do not edit */'; \
-+	echo '\#include <linux/annotate.h>'; \
-+	for s in $(redirect-intrinsics); do \
-+		echo "ANNOTATE_IGNORE_NORETURN(__rust$$s);"; \
-+	done; } > $@
-+
-+$(obj)/intrinsics_annotate_generated.c: $(srctree)/rust/Makefile FORCE
-+	$(call if_changed,intrinsics_annotate)
-+
- ifdef CONFIG_MODVERSIONS
- cmd_gendwarfksyms = $(if $(skip_gendwarfksyms),, \
- 	$(call rust_exports,$@,"%s\n") | \
+diff --git a/include/linux/panic.h b/include/linux/panic.h
+index f1dd417e54b29..da8778360dadf 100644
+--- a/include/linux/panic.h
++++ b/include/linux/panic.h
+@@ -33,7 +33,7 @@ extern int sysctl_panic_on_stackoverflow;
+ extern bool crash_kexec_post_notifiers;
+ 
+ extern void __stack_chk_fail(void);
+-void abort(void);
++void abort(void) __noreturn;
+ 
+ /*
+  * panic_cpu is used for synchronizing panic() and crash_kexec() execution. It
+diff --git a/kernel/exit.c b/kernel/exit.c
+index 2c0b1c02920f4..2c55dc0fbbec8 100644
+--- a/kernel/exit.c
++++ b/kernel/exit.c
+@@ -2028,7 +2028,7 @@ COMPAT_SYSCALL_DEFINE5(waitid,
+  *
+  * See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=88345#c11
+  */
+-__weak __function_aligned void abort(void)
++__weak __function_aligned void __noreturn abort(void)
+ {
+ 	BUG();
+ 
 -- 
 2.55.0
 
