@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 019853CF942;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC963D16E2;
 	Fri, 28 Aug 2026 04:52:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787892729; cv=none; b=lNHrNCnk4lYvNOYgZs5Y4c22KjRbkqe4dyQJdbI5QbNr6hDP1mwawRY3ezDABbt6282WW2ti2glGtQSQ5fvZXPil+565zmqjx0o/qvHcY4MIcWTRVn4E5jbFI/+e/qTGwZWIrNgCN5EnJozB8tK77IrLTCM+f53WFmpSy3GpCmg=
+	t=1787892729; cv=none; b=anvHTwMlKySpGDeGIcifBiGCoH5VB+0eZUsFN3Pd6IQa8sVqnWFcxNvWprltAmBjz6xouPwjxOi3o54LLCdfR6hpC+HsuvHioiWpTmfs9z85bVlw/Ox8QLoql4uahPoQ8uOl5UoSIFZeahETW+W6F5voTvtjQonFYy259rtRxGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1787892729; c=relaxed/simple;
-	bh=MoxkdQ1PZtbscQc+lhfZEsLtnTOuV5Kr1isBaLFfg/8=;
+	bh=38+V5eWfdyUtykT7i6weS0PX+rdW2i6FUhGg/knvi8A=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YUTbPwrWB6uslDwnM/HjBzTdS8FldjuRBh43efjKRlTxd/t27qr8YNPX69eg3bgUHzat41SIRrVmiN2IlAmR9riHg7JpCRDKN5tR9EN+DEs/O+v8BIYRbrgI0ivKVpmVMhQi/fVbtime3VZJWb1KBLS1k/zZ/SajSdGG4M4SX1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WGYkbray; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=a9kKge9R8qmqIUgLSzka/GMJfuKufGU358ec8XNBkf+vmsfZJCdunIt9Az9F8hRSRu/b6Jm1Zs9umlrWTAAj5ccDjYZezdQlZ5GTruQHE1wmekbp2or3z+Tqt99xNytKRMllkhmqLHLc5GA7enwLLNQqLRUXGqzfCi+0mMJ/AT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FsxeR4Jb; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WGYkbray"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 714311F00AC4;
-	Fri, 28 Aug 2026 04:52:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FsxeR4Jb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 136041F00A3F;
+	Fri, 28 Aug 2026 04:52:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787892727;
-	bh=oMAVVsJ+ySiw/1VP59+j9m215Ku23i+uiwwAe+dcMn8=;
+	s=k20260515; t=1787892728;
+	bh=QCPC2VydWNhBNTfMl1c4YlqwNYEoCQHQqQsxRdGOi6I=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=WGYkbrayep8wN20L0/XBZuHDOxbEe8AgyfYpOAlQmGtDY4yd9pzgOF0M4qLArdG7i
-	 N6aXq3Mtbo/moiXKNw57N832d45cUx8mfO06h+83mJtquDfNKt/4KbweCPGfacu8V3
-	 LU5Dl7KQD5vJo8LZMwoHko4Qa7jnlDuDxok96/1LBriEczUHq5wKvN1cZiekE4o/5i
-	 RV73VYixMP4Jg32e4uif971h5QPx/k1plRf4vNPPzK39XnBXVs91yvbMWiKcQx/9Pn
-	 RlsE8zRCQYNbPGXW71EGvZo/KZtuBlUvm/7cqPNjZ4E2JuxvdOX5KAEXPN2eGgRv6J
-	 CxNoO7n/lbxBQ==
+	b=FsxeR4JbYkH/M8xs/73HsrxnTvw+pviVBtoq+ROLeZZT8B9Zh8P6JYyk5rsS5/DT1
+	 MWAnBTj9L4N16G3NP8UgXvp9YkCP920cQjHlaDWsz63f2rkkig56LXgStWzvRqu1R1
+	 zBUjoW6ZS3FDyA7w5r5DDHQh2hS5Ayt4rLq8iPYIaIul5EeKbe2b6M7AwT3xJmo4qI
+	 CK1jFSSNFAwClB61kGm9KKPKEYkB4xdDIHpsDTes1bnMvt08NbT8UAjipPuhACpdbx
+	 DzdNnXhmqHwKHGsHr7AinmFs8SrSmziEkiFpJXGhUTUAyyTmxQJnz+1GAKQnRxGZkE
+	 R9A6s+AgDPDHA==
 From: Josh Poimboeuf <jpoimboe@kernel.org>
 To: x86@kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -37,11 +37,10 @@ Cc: linux-kernel@vger.kernel.org,
 	Nathan Chancellor <nathan@kernel.org>,
 	Nicolas Schier <nsc@kernel.org>,
 	linux-kbuild@vger.kernel.org,
-	Huacai Chen <chenhuacai@kernel.org>,
-	kernel test robot <lkp@intel.com>
-Subject: [PATCH 15/27] x86/xen: Ignore noreturn status of weak mem_map_via_hcall()
-Date: Thu, 27 Aug 2026 21:51:44 -0700
-Message-ID: <d38468fc69fa077c883d06012dd6084efbedda61.1787890035.git.jpoimboe@kernel.org>
+	Huacai Chen <chenhuacai@kernel.org>
+Subject: [PATCH 16/27] objtool: Detect noreturns in weak functions
+Date: Thu, 27 Aug 2026 21:51:45 -0700
+Message-ID: <9142b469c79880bd3a33db6e4f7c27d3a40e43c5.1787890035.git.jpoimboe@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <cover.1787890035.git.jpoimboe@kernel.org>
 References: <cover.1787890035.git.jpoimboe@kernel.org>
@@ -53,29 +52,56 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Unlike the non-weak version, the weak version of mem_map_via_hcall()
-doesn't return.  Tell objtool to ignore that, as the protoype (and the
-non-weak version) aren't noreturn so its callers can't assume it.
+The skipping of weak functions in the noreturn detection logic is a bit
+weird, as a function's return/noreturn ABI shouldn't change regardless
+of which version gets linked.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202608280214.c28GlIx6-lkp@intel.com/
+Fix that, and update the global noreturns list as needed.
+
+Note that abort() now needs to be added to the list: while objtool on
+vmlinux.o can detect that its noreturn, modules have no way of knowing.
+
 Signed-off-by: Josh Poimboeuf <jpoimboe@kernel.org>
 ---
- arch/x86/platform/pvh/enlighten.c | 1 +
- 1 file changed, 1 insertion(+)
+ tools/objtool/check.c     | 3 ---
+ tools/objtool/noreturns.h | 3 +--
+ 2 files changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/arch/x86/platform/pvh/enlighten.c b/arch/x86/platform/pvh/enlighten.c
-index f2053cbe9b0ce..9f227f06cbaf5 100644
---- a/arch/x86/platform/pvh/enlighten.c
-+++ b/arch/x86/platform/pvh/enlighten.c
-@@ -37,6 +37,7 @@ void __init __weak mem_map_via_hcall(struct boot_params *ptr __maybe_unused)
- 	xen_raw_printk("Error: Could not find memory map\n");
- 	BUG();
- }
-+ANNOTATE_IGNORE_NORETURN(mem_map_via_hcall);
+diff --git a/tools/objtool/check.c b/tools/objtool/check.c
+index ddb8dbe7f71d9..c55851ec389cd 100644
+--- a/tools/objtool/check.c
++++ b/tools/objtool/check.c
+@@ -260,9 +260,6 @@ static bool might_return(struct objtool_file *file, struct symbol *func)
+ 	struct instruction *insn;
+ 	struct symbol *dest;
  
- static void __init init_pvh_bootparams(bool xen_guest)
- {
+-	if (is_weak_sym(func))
+-		return true;
+-
+ 	func_for_each_insn(file, func, insn) {
+ 		if (insn->type == INSN_RETURN)
+ 			return true;
+diff --git a/tools/objtool/noreturns.h b/tools/objtool/noreturns.h
+index cd41f580ccb72..26f62f98bc8ef 100644
+--- a/tools/objtool/noreturns.h
++++ b/tools/objtool/noreturns.h
+@@ -11,15 +11,14 @@ NORETURN(__kunit_abort)
+ NORETURN(__module_put_and_kthread_exit)
+ NORETURN(__stack_chk_fail)
+ NORETURN(__ubsan_handle_builtin_unreachable)
++NORETURN(abort)
+ NORETURN(acpi_processor_ffh_play_dead)
+ NORETURN(do_exit)
+ NORETURN(kthread_complete_and_exit)
+ NORETURN(kunit_try_catch_throw)
+ NORETURN(mpt_halt_firmware)
+-NORETURN(nmi_panic_self_stop)
+ NORETURN(panic)
+ NORETURN(vpanic)
+-NORETURN(panic_smp_self_stop)
+ NORETURN(rewind_stack_and_make_dead)
+ NORETURN(rust_helper_BUG)
+ NORETURN(sev_es_terminate)
 -- 
 2.55.0
 
