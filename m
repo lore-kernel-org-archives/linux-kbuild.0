@@ -1,170 +1,101 @@
-Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CDA73B2D04;
-	Fri, 28 Aug 2026 23:20:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB09835E1A2;
+	Sat, 29 Aug 2026 08:56:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787959230; cv=none; b=c1oeegBOdyatre4xhPFyx/xpPmcEOlunG7UhMY/iv48b4RLPB/FaACCtmuwo3gXsOVP4Ad/AKhZ4alTmXw+rCkz8taQUm1NEWWaqT42dmk5PSwgXbz3T8A3QMKMQbGnlG1lfJNDWnzqj/IY4VeWvud4YZujbedKzp8/mqPgz9v8=
+	t=1787993824; cv=none; b=YIpR3oLndEfZHnzvYNXNB0AKrrwEDGOACsICQNrK1tMHNbKMZmpXL8vsuPzbnyKRzd6BqPOnBMpMA7fA5/UmDAWFAtRWYmErE4t7nHOp894eDd7EvMPr0ZDiYmOMJOMhV8BIygyKG4dsKNygUn2Vix4UTcVFK+mcIZ0ue4vb+QM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787959230; c=relaxed/simple;
-	bh=eYxNeCvy4p71IloUWnXnyvA9fBmKrgyjMUcMHXcwN74=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=biTX0Fai5WJbYLxJqm4X8ruUjv/HaLRPc53I8lybVYqP8QJIENY/d6HEMsj63PNeHuQ46SYawsyX12A7fWyAzx8ha9d9fjsfhdY/kl/UHzg0V6itAz47NouxNKXhagPJ97gHNJzlQPbcsuTKnoNcIzGYvAXZmi1oIp4pPHLlpwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=kURH8nMb; arc=none smtp.client-ip=213.97.179.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
+	s=arc-20240116; t=1787993824; c=relaxed/simple;
+	bh=LGACgt+8Df37Y3JPPTb1rL1JX2ET15vTRLVxMOSpkqw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QWB+0b2JVElVla6tLY8NT4WTqcMUASzo5rmgZv/9v5y8Y6pU/YszbNJzLG60759bEv5A4RnNXMl5z8GHCzbIzyw3gVYF7HtapoeqmjxvUcDinuWLvJikqkiMHMhacRXYd8c7XoWGr7vdzc2CcFv/hA4Xbl2qHeMQEBS37ewqptU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io; spf=pass smtp.mailfrom=gtucker.io; dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b=ERwauQZq; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gtucker.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="kURH8nMb"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; h=Cc:To:Message-Id:Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Subject:Date:From:From:Reply-To;
-	bh=VjIF0aVYBJ9Ga527Xyl4l3TJ4nkphldiKj6rE37lIV8=; b=kURH8nMba3wk5Wd8yrgdvs1vIN
-	nVKxK2b/+FrRkot/NlLSOXFC7RCJzguxd+LH2Dnw++w2iqpmq0mcAHLTYX2Rfa8HVJKggWgdrszlS
-	oi/c6+Drex7sEtdWe2gxg6Fme5PSsMckcu14yYlRkhSgA/bQWF6C+PziFe0FrjnLLDidORjGg3L3Y
-	gDvLGuCNRtTAyrb25IzGYZa+kmuNMoSv3lc2mEukrl3wxjTi+Eqfv3Z39/PvUW9Xv3Dwntcvk/No9
-	AL9kLE/Z+TDDJFVe3/oJfaHl/3t3TrRkidK6mRdG1Mr3RO6XPOy+SxcH5y1v1tEhp9B4dz07vjktA
-	205ULykQ==;
-Received: from [187.57.78.212] (helo=[192.168.15.100])
-	by fanzine2.igalia.com with esmtpsa 
-	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
-	id 1x05s2-00B3sF-4m; Sat, 29 Aug 2026 01:20:26 +0200
-From: =?utf-8?q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
-Date: Fri, 28 Aug 2026 20:19:40 -0300
-Subject: [PATCH v6 13/13] alpha: Use the common syscall table
+	dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b="ERwauQZq"
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 6C3FB3EB86;
+	Sat, 29 Aug 2026 08:56:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gtucker.io; s=gm1;
+	t=1787993810;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Y+CpA5GAaRjy3INgxdWrQaq/dl9yZxsAV6OWAodl4SI=;
+	b=ERwauQZq5v/JxXo0++DXBPYJ1nC5x6lxfoj5NA84VfazDKD03CsWHlZtxDylaPWhvVTh3G
+	/AtcxXnK33qFDHWfv+lWmbzYGeAJd6f2EpNrY1UKnygCRNwywdmtpFXkU3QtNOR5t/CLYL
+	1c5AOsfzWPcGe+UqdqVSgSyAYBca6q+68HYVQrXpXb7Vx1DW88w1SAl0+dhu+xJ97ynJM6
+	GBcFKtjgBqrp9ycsXm54FnQH7myICAT9wHvHmDLDQqPcilSI/XB4JFk88k0dVF4Vi/Lvgh
+	nhNhMaa94dSIIk+WQNByI5u5S76U+/4kXBk1NDZQumJBiMh4PzAgiCGRbb7nWw==
+Message-ID: <faa022bc-bda5-47ee-9984-4e8ff067c6e1@gtucker.io>
+Date: Sat, 29 Aug 2026 10:56:47 +0200
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] scripts: add TOML config to container tool
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: Nathan Chancellor <nathan@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>,
+ Nick Desaulniers <ndesaulniers@google.com>, Miguel Ojeda <ojeda@kernel.org>,
+ linux-doc@vger.kernel.org, workflows@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+ automated-testing@lists.yoctoproject.org,
+ "kernelci lists.linux.dev" <kernelci@lists.linux.dev>
+References: <7d8ba914cd174d716340bb2b88723bef0f330627.1787565460.git.gtucker@gtucker.io>
+ <apG3hwaPA8f7SJeI@levanger> <b45e7864-928c-4b3c-aa62-64f4f63d85c7@gtucker.io>
+ <CANiq72k6T9Y_Vubih6pFMQBxju2xQq0VQkCXT1WL0qSyCXKxyA@mail.gmail.com>
+Content-Language: en-US
+From: Guillaume Tucker <gtucker@gtucker.io>
+In-Reply-To: <CANiq72k6T9Y_Vubih6pFMQBxju2xQq0VQkCXT1WL0qSyCXKxyA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Message-Id: <20260828-tonyk-syscall_table-v6-13-fdd358456cf1@igalia.com>
-References: <20260828-tonyk-syscall_table-v6-0-fdd358456cf1@igalia.com>
-In-Reply-To: <20260828-tonyk-syscall_table-v6-0-fdd358456cf1@igalia.com>
-To: Masami Hiramatsu <mhiramat@kernel.org>, Arnd Bergmanon <arnd@arndb.de>
-Cc: Christian Brauner <brauner@kernel.org>, linux-kernel@vger.kernel.org, 
- linux-kbuild@vger.kernel.org, kernel-dev@igalia.com, 
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
- linux-alpha@vger.kernel.org, linux-s390@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, soc@lists.linux.dev, 
- linux-mips@vger.kernel.org, sparclinux@vger.kernel.org, 
- =?utf-8?q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
-X-Mailer: b4 0.15.2
+X-GND-Sasl: gtucker@gtucker.io
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: dmFkZTE1dvSdG2yLVPvYEeDPLpZvAqI4U17AliU/2sONyT60xA9QjvCGHnYlEEn9XGIt3XbuHahlbWdvwXEWRImKnijMDijjF2iSVw6SqEgNXE/BrKi7EEDrX8+WbrF59CL2xLw0pS6tQP9xXF8O52/ynmGpOHva4BnOei9JSPVRSE+k+TSCD9P0CW1zOsWTKk+uSqXBqJCS2BRzojx8J0iCiaCfT9qHvVDYNDnOHw2yCWfDPYN2Ufu5sl/oKs5pxXqo0dmSjctTpcBZRUhE1JQ28sQftLyHKp31QfSW0mthak4nsb/QNkpYXs71gNZfoYCf8rxDEkrg/b6ZKUBKCsCuaIBqqfsrrC6Kh+OvfU1PFK7MYd62ghSoEreATXwdQTSDdEay7t7VoVeXCLFx2eAJrpWqhQ2OcKonA5A+t6x8yZ22ngtl6BSoQTMRZAJjKVcRBc3l7GsaiNhuW5vBqehUbaOeVqQ6YI7NJqYWv1OIixd9H9NChW6W23/i1g0vTLP0u9TkLE5uyfPAdVRE/fUQh9UPdh8jIMha4OTgQ/IcHyF9eNw02GzScnTcz8kVnnZ75h80i9rHHAi1Q1LDKQn56ffRooY+vmP+baIyC1SAXUofDKwSMeRK6D3q3ciNB27e+JVZTS5lEWVyLQ2EDs9DRNjLF8MuNOXEBG5N/9Xl4kA9/g
 
-Remove some of the duplicated code by using the common syscall number
-table.
+Hi Miguel,
 
-Signed-off-by: André Almeida <andrealmeid@igalia.com>
----
- arch/alpha/kernel/syscalls/Makefile    | 14 +++++++---
- arch/alpha/kernel/syscalls/syscall.tbl | 49 ----------------------------------
- arch/alpha/kernel/systbls.S            |  1 +
- 3 files changed, 11 insertions(+), 53 deletions(-)
+On 28/08/2026 7:35 pm, Miguel Ojeda wrote:
+> On Fri, Aug 28, 2026 at 7:25 PM Guillaume Tucker <gtucker@gtucker.io> wrote:
+>>
+>> It states Python 3.9 which was already older than the 3.10 minimum
+>> set when the container tool was merged.  Also my understanding is
+>> that it's not a hard requirement for all the kernel tools, only for
+>> building and producing a functioning kernel.  If I misunderstood this
+> 
+> I didn't check at the moment, but at least back when the "(optional)"
+> tag was removed, it was only required for certain configurations from
+> what I understand (I am not sure why the tag was removed).
+> 
+> In any case, it is nice if we could just say that it is required -- it
+> is quite useful to have around, especially due to its standard
+> library.
 
-diff --git a/arch/alpha/kernel/syscalls/Makefile b/arch/alpha/kernel/syscalls/Makefile
-index b265e4bc16c2..03099daff6b9 100644
---- a/arch/alpha/kernel/syscalls/Makefile
-+++ b/arch/alpha/kernel/syscalls/Makefile
-@@ -7,17 +7,23 @@ $(shell mkdir -p $(uapi) $(kapi))
- syscall := $(src)/syscall.tbl
- syshdr := $(srctree)/scripts/syscallhdr.sh
- systbl := $(srctree)/scripts/syscalltbl.sh
-+systbl_common := $(srctree)/scripts/syscall_common.tbl
-+abis := common,__clone3
- 
- quiet_cmd_syshdr = SYSHDR  $@
--      cmd_syshdr = $(CONFIG_SHELL) $(syshdr) --emit-nr $< $@
-+      cmd_syshdr = $(CONFIG_SHELL) $(syshdr) --emit-nr \
-+		   --common-tbl $(systbl_common) --common-offset 110 \
-+		   --abis $(abis) $< $@
- 
- quiet_cmd_systbl = SYSTBL  $@
--      cmd_systbl = $(CONFIG_SHELL) $(systbl) $< $@
-+      cmd_systbl = $(CONFIG_SHELL) $(systbl) \
-+		   --common-tbl $(systbl_common) --common-offset 110 \
-+		   --abis $(abis) $< $@
- 
--$(uapi)/unistd_32.h: $(syscall) $(syshdr) FORCE
-+$(uapi)/unistd_32.h: $(syscall) $(systbl_common) $(syshdr) FORCE
- 	$(call if_changed,syshdr)
- 
--$(kapi)/syscall_table.h: $(syscall) $(systbl) FORCE
-+$(kapi)/syscall_table.h: $(syscall) $(systbl_common) $(systbl) FORCE
- 	$(call if_changed,systbl)
- 
- uapisyshdr-y		+= unistd_32.h
-diff --git a/arch/alpha/kernel/syscalls/syscall.tbl b/arch/alpha/kernel/syscalls/syscall.tbl
-index a41276634923..7066a3920899 100644
---- a/arch/alpha/kernel/syscalls/syscall.tbl
-+++ b/arch/alpha/kernel/syscalls/syscall.tbl
-@@ -463,52 +463,3 @@
- 532	common	getppid				sys_getppid
- # all other architectures have common numbers for new syscall, alpha
- # is the exception.
--534	common	pidfd_send_signal		sys_pidfd_send_signal
--535	common	io_uring_setup			sys_io_uring_setup
--536	common	io_uring_enter			sys_io_uring_enter
--537	common	io_uring_register		sys_io_uring_register
--538	common	open_tree			sys_open_tree
--539	common	move_mount			sys_move_mount
--540	common	fsopen				sys_fsopen
--541	common	fsconfig			sys_fsconfig
--542	common	fsmount				sys_fsmount
--543	common	fspick				sys_fspick
--544	common	pidfd_open			sys_pidfd_open
--545	common	clone3				__clone3
--546	common	close_range			sys_close_range
--547	common	openat2				sys_openat2
--548	common	pidfd_getfd			sys_pidfd_getfd
--549	common	faccessat2			sys_faccessat2
--550	common	process_madvise			sys_process_madvise
--551	common	epoll_pwait2			sys_epoll_pwait2
--552	common	mount_setattr			sys_mount_setattr
--553	common	quotactl_fd			sys_quotactl_fd
--554	common	landlock_create_ruleset		sys_landlock_create_ruleset
--555	common	landlock_add_rule		sys_landlock_add_rule
--556	common	landlock_restrict_self		sys_landlock_restrict_self
--# 557 reserved for memfd_secret
--558	common	process_mrelease		sys_process_mrelease
--559	common  futex_waitv                     sys_futex_waitv
--560	common	set_mempolicy_home_node		sys_set_mempolicy_home_node
--561	common	cachestat			sys_cachestat
--562	common	fchmodat2			sys_fchmodat2
--563	common	map_shadow_stack		sys_map_shadow_stack
--564	common	futex_wake			sys_futex_wake
--565	common	futex_wait			sys_futex_wait
--566	common	futex_requeue			sys_futex_requeue
--567	common	statmount			sys_statmount
--568	common	listmount			sys_listmount
--569	common	lsm_get_self_attr		sys_lsm_get_self_attr
--570	common	lsm_set_self_attr		sys_lsm_set_self_attr
--571	common	lsm_list_modules		sys_lsm_list_modules
--572	common  mseal				sys_mseal
--573	common	setxattrat			sys_setxattrat
--574	common	getxattrat			sys_getxattrat
--575	common	listxattrat			sys_listxattrat
--576	common	removexattrat			sys_removexattrat
--577	common	open_tree_attr			sys_open_tree_attr
--578	common	file_getattr			sys_file_getattr
--579	common	file_setattr			sys_file_setattr
--580	common	listns				sys_listns
--581	common	rseq_slice_yield		sys_rseq_slice_yield
--582	common	fchroot				sys_fchroot
-diff --git a/arch/alpha/kernel/systbls.S b/arch/alpha/kernel/systbls.S
-index 68f3e4f329eb..9a67d29f7818 100644
---- a/arch/alpha/kernel/systbls.S
-+++ b/arch/alpha/kernel/systbls.S
-@@ -7,6 +7,7 @@
- 
- #include <asm/unistd.h>
- 
-+#define __SYSCALL_WITH_COMPAT(nr, native, compat)        __SYSCALL(nr, native)
- #define __SYSCALL(nr, entry) .quad entry
- 	.data
- 	.align 3
+OK so I'll leave this part as-is for now unless someone makes a
+strong case for downgrading to v3.9, thanks for confirming.
 
--- 
-2.55.0
+> And regarding the minimum version, it would be nice to eventually have
+> a single minimum for all Python scripts, no? Debian oldstable is
+> already at 3.11, so I think we could perhaps bump the minimum already.
+> And Debian stable is 3.13, which from your list would be enough for
+> everything on your list, right? So we could perhaps set that as the
+> actual minimum for everything in the future.
+
+I was wondering about this too, especially since v3.10 is soon going
+to reach end-of-life which means no more security patches.  In
+principle newer, version should be backwards compatible so if we just
+bumped the minimum to v3.13 older scripts that were written for v3.9
+should still work - but it'd be nice to have a way to test that.
+
+Well that's beyond this series anyway, maybe something for KernelCI?
+
+Guillaume
 
