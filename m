@@ -1,84 +1,127 @@
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC8463502A9;
-	Sat, 29 Aug 2026 09:02:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787994182; cv=none; b=U/afQ1Nuk5eB+R5zulh0Rm6t9B96RikqhS6858+m7xmUOHbupEZRjmoG+x+UObcVLBBPrTxPi7CPSzRRONoNfN32BMLiuGYyA8HkF3P13ofUbGj6AUXD7nWnJIjGwglr/wUtan0BAARbxR2SGR5FedpBBfk2Qtlg3a5s2PmwGfE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787994182; c=relaxed/simple;
-	bh=jEIKQgSNiXdm+fNuAyeKlmdiaBDspiGGjX8c9Rjjsr0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A83ETsCtkz0QSIoCK/u6MIBzxqeWij9AGYilVPjKpol5N96qbrpEUiP/vGk3ADoOwYxszqweMaaY4SxbDpBeAChRify9/JhVeEXRevR7QTMh442OmfVeSM/Qg9kSZCAj3FArNdz+JZOiGt+H3inpCHKcRD4YeFU+vC75LCfXnAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io; spf=pass smtp.mailfrom=gtucker.io; dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b=anR1vMks; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gtucker.io
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA1CE340282
+	for <linux-kbuild@vger.kernel.org>; Sat, 29 Aug 2026 10:57:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.179
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788001057; cv=pass; b=GR3dPaBvaLboTG8qb9gvepBHN4DQRnkh68EpXxOrSF9hytK7nOnm9XjrBED7uNx0WBSo3xwQe6W6IN98vuMCW3T/Zk4KgNrYcrJ5ITZTteV6SUGERkIc17KxSmLxib7ek15UY+zVX3HBbfAcZnccuEaUmpmkFBSY194VLgkHETE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788001057; c=relaxed/simple;
+	bh=hsBKohLfCZd0jfnALC1cEzA++W2MrcDhahlgqPLVM7Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VmJ0qU20IDcrvW6qZpI3WdCxy+xyc1FoD4Z+6NOUWO88PKINuLgw/4ZJ1tV9/cgO/hInc6weCGtnJJXDauhqc3PyCJJB1or78Qhi2Cqm0nsorfwg1Ew2DrmPRhRRaFB8h5jXRzhcs7iA0nZNmFVEAI+XHfrDt+Jl9eiOatUeb6U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qxB9/ucO; arc=pass smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b="anR1vMks"
-Received: by mail.gandi.net (Postfix) with ESMTPSA id CC2883EC03;
-	Sat, 29 Aug 2026 09:02:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gtucker.io; s=gm1;
-	t=1787994172;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cNDTOYX+Alcwl8fq0Y/kyG2b3q+u6oLf2cqqDD9VlRE=;
-	b=anR1vMksCcdcjDImtUdbTFMp8hsE2h7s9wTp4Go3LrhRs7by/E54qGXJHvTqYFaX8TrA0c
-	1Pxmm4SBZCPFZCw4t6Y7wFYT8w7C9J4NX8WhAt/QtgaT9eyqd1fLXKtP6Jx0OqWQBzXFpz
-	x/YRlxfYmRXQpf9bN6kVLdzeomoXh5gMrNFB//TCKfdZvd5nIv9EJtxBZPDqFpuZxvTH12
-	oDfEFt1cAeiz2jTnY48JDauadmMZrlvLINXBn7sjezbuiiveZlzQ4Gy6iVs7PZOB40Rvl4
-	FB2KfE5r4loca4CreLL+gkhEwEvEfyu/3wXa/jRsfGh5p2nhsKo7z8Vo0ymSEA==
-Message-ID: <9a3eabd1-4057-45cf-99b9-9c3c1b6260d3@gtucker.io>
-Date: Sat, 29 Aug 2026 11:02:49 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qxB9/ucO"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2d5862bc921so4444255ad.1
+        for <linux-kbuild@vger.kernel.org>; Sat, 29 Aug 2026 03:57:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1788001056; cv=none;
+        d=google.com; s=arc-20260327;
+        b=cPewEblMmi6j+Vw0+EGP8lf/tn2Onoz1T09nuLfzCi5y4pkF9KfKbtv7bNcpZYQ+5C
+         t/x+jmWZOmMApwJbCC4WVuNMh2AoFnp1vBWLUJL9RhK/R1nVDTU2RbznyGajax3FsVAR
+         mb9KS5UDbQ/PYKazHfyvk5EDiTm4zOIF+Bcee8c8nk6Z8g+XCZZAvaagjWLBREPBC+U8
+         72KSvyOWM4mQNiilAjCbKoD2EDw9UPP7eUtLJQXoy8IpvCdrfY6LzsesK9HcSUSWoA3o
+         o69MwTeEBPBD+//1eMg2FFJfolVLa8J5gojtbMPOy6xKMi3cewaGNJ6shJuAFPxqCGz0
+         iIWQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=3yoXZjSinVl6bLZjtfCsRoIy2CcONJCPzcPUWytAk2w=;
+        fh=2i5a3meXOuM1eSEHWpg5rvRM9BEptXSLc+B7uf7xkCI=;
+        b=mH6LZ5nfSGu1//O9lWtWS9Rs1FQl88Hyejx6F1S79AD9YVXKg8Ku8N4/62YNpobWrd
+         CSmk8K51tSg9sgXX/9CourpRIlUwhQjoaP2y8ijkrggmaHkpXh64xjfObZHUI7YuXtb6
+         0iSy6f14Z5ZRau+PXNRB+MUVW80SCMymJm2LveU7bwqgLl/IwGnZJPuHNX564rLi/iz/
+         riD7yy/ItROc+rlZyYYBI7OiClTRvr3Ttk4lVgRTTzKeY1uAEblo0ABfw+6MZ5VTPiod
+         cgcj+f38m5mm2bkz8tV32ze9PfrZOFZOA/D7acSFOJiutdDsOel4wD3rSJKVYRdsNPR1
+         j6Ug==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788001056; x=1788605856; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=3yoXZjSinVl6bLZjtfCsRoIy2CcONJCPzcPUWytAk2w=;
+        b=qxB9/ucOSNJYhkRxeEyJuIaaChnbkIeziSSD+2tZkrRhLbLNtPwwaw4AnOsFMkGHgH
+         g8av33wNg8aFOi0uNrjq+Yypt2oDfrdfygCqbkDmAzG5fuTS1GaoG3u/rzSOQp64bZcr
+         Wr8t+It1pfy/S1oP/PjrrW6Lt8BGDP9OyfNZoC6PKX9aTpe0hvxrhZVOb2JooagrMlPz
+         TUMkgAqwJXV3g83TJ0bJH6Fnm2rHWOxxW7ClpQ3zjd3BOyBL4NDx9juMBCRdInYkLope
+         g97Vy96kHGCKy87vUJsdUFVo8/sZJhGJwdy6K//5s348jFOgAAUIsevfCJRcwtlGtwCE
+         +tfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788001056; x=1788605856;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=3yoXZjSinVl6bLZjtfCsRoIy2CcONJCPzcPUWytAk2w=;
+        b=FgwXorn8axx6Ie+sYlFWX8LKCw3lkStdFo/AIAea24payI+4zQsjnUbtUky2jc6ha/
+         2FM6/ZYHTgZTKDoLcX6CGYTj0Gyhr7q3d0FTNqXcCQxht0Jlmwag1Z9KrYe3iTMaKPJW
+         01mrgAS3OJGkPE0jEKH4YwlBx+p7HMu2D6r0AjF80wp11b3v1S12HQ1L2LsqD74WWxA4
+         nVy/mTIWmAp6K40B9Arm7nBDmRhI6pl+mziWz79q7aArTXtFKbcTK3e+kUZ5Opme/Qmd
+         ri+5JM1TEVsJgsVDiWYhl+5gQ9M//lEn33HIP+L8rTsGJFISGHejYhU0vJsI2gYMLqd9
+         ZtpA==
+X-Forwarded-Encrypted: i=1; AKwUvByVJePHaF6kZmUUO4cBc6UbS1z4fPrkPjr8co5hU50iZyf7goGG8TcEDSiEWSulHP6sNl4zzL/nPN1sKPw=@vger.kernel.org
+X-Gm-Message-State: AFuF++l3gOn2q3PREV4oi/dEKvUGVJQ/MnY8PB/5/mIs5ow4iyQAcrQq
+	1+qVIf/2opY6GoYPmsf490UEQdiBMsoIQL+ElKCbgPzmuAB7gW1qCxTXlZ147d0fGA4OQtYptjM
+	35CXS7jEKJFm6hlAklBwnnl32o2EzNxk=
+X-Gm-Gg: AR+sD10PnzAgR+glQsPZkWLnmg6gMgPwRan62+NkDakrlI19eI1V07fj1wsHMWfXl9e
+	xA0QwtkRwG80yL/b5OoVlZO/ECYph9GANv7iI64AG/IFlWao5r/jsvuifhIuT6MtcgbrRWi6de6
+	3wxpsbhyDBcATVzdE2iNaLhoniYay4OsMF0FxFbeTYJE8/zcZtycZAc0lmf20U0dHO7m4Yc0+uv
+	HWq/4pSlx536glr0L0kYcXOIoxjKaLy+2wanrvz+43mcdn/Fa4AtYr8LweHsd70CkTeJk38ozTz
+	2Xoq33hj1z/6x08qwNd1SVANaV/LNxNAvwxRxPUy9FwJ5keEoRmDQ9WE1wLoN73yFwUM/KukUcV
+	TNh9K7aqu7fucvTQb8XkvVNE6Y9UZ/4u2muiz67J3o/J1qVTkRQ/RC/NrWrnc
+X-Received: by 2002:a17:903:1104:b0:2c9:8287:fd0d with SMTP id
+ d9443c01a7336-2d74df62ccemr115727945ad.3.1788001055774; Sat, 29 Aug 2026
+ 03:57:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] scripts: add TOML config to container tool
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Nathan Chancellor <nathan@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>,
- Nick Desaulniers <ndesaulniers@google.com>, Miguel Ojeda <ojeda@kernel.org>,
- linux-doc@vger.kernel.org, workflows@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
- automated-testing@lists.yoctoproject.org,
- "kernelci lists.linux.dev" <kernelci@lists.linux.dev>
 References: <7d8ba914cd174d716340bb2b88723bef0f330627.1787565460.git.gtucker@gtucker.io>
  <apG3hwaPA8f7SJeI@levanger> <b45e7864-928c-4b3c-aa62-64f4f63d85c7@gtucker.io>
- <CANiq72k6T9Y_Vubih6pFMQBxju2xQq0VQkCXT1WL0qSyCXKxyA@mail.gmail.com>
-Content-Language: en-US
-From: Guillaume Tucker <gtucker@gtucker.io>
-In-Reply-To: <CANiq72k6T9Y_Vubih6pFMQBxju2xQq0VQkCXT1WL0qSyCXKxyA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: gtucker@gtucker.io
-X-GND-Score: -100
-X-GND-Cause: dmFkZTFWBQihkoJMTIE/mv9EszDwvkztOeC7orN5Cjkcw2DG26ZprwrwIJYUTzVG8t3ZdtynxeITFUpg8ofrB+dJvCmN2gVYOeGDX7lzC1AlKF6foAGJYhLKsEQ+yyIlAPXzUK8g1GMVnu2HoNG45fGSbXL9TBKWsdTcj6jUW+phskt2JASpvKa19ZfCIl7pOkJF5unF1D9VBlUSSkJfcHUoQLKkFUGy2SFc/TmUk75wtrYEDK+nhuxe6zkY+CMOgStTWIhZ+/FmcH7m3JWTBlE6nkgZBY33uq+5sKTpx/DcQ3EmzNn+7Lp8pB47E7SGMzLLbERP5Jkbq0dq8rFZ2l9YmSf2MDWWyeQ1mqHzU2YGqUlyXWTk+/yycUUR6nsWMVn53Hvfrp2wouZmg0R3eCu0bsFg1qvMJqaWXr3xXQOwV5vaQyyXOgbQjpjyHpUg13r00Sv0PldZWPg/BnPlMOrgf1qnZ5uUQ7Y3du6q6UXzJ3ncbOyOdwV4WvBWwG+5WtAZmg+a9FqVNR6Ck1oo2adqQ1QmfmsEmH0HxZAQX1R5KlOgg3sOfCbqTIi6H67xS93LD2iVccO2i5eupR006mDGuDVrGfzkmNoT9BOqCEr8905K5/118lkNbxk/Ibwj0O2oWFAUXJoZWsqvqsfnqmiCH0qgdh4fcTAZR8iwl2Ck8vQy9g
-X-GND-State: clean
+ <CANiq72k6T9Y_Vubih6pFMQBxju2xQq0VQkCXT1WL0qSyCXKxyA@mail.gmail.com> <9a3eabd1-4057-45cf-99b9-9c3c1b6260d3@gtucker.io>
+In-Reply-To: <9a3eabd1-4057-45cf-99b9-9c3c1b6260d3@gtucker.io>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Sat, 29 Aug 2026 12:57:22 +0200
+X-Gm-Features: AcwNN1U4Xd-ZPEH0J5NkeG85FCsQEWIBZhyX8xsSVfYp0sl8uMCqeYTmtDyhT2w
+Message-ID: <CANiq72m0eemCPbEAvZSC49OZHyaNvQgbMdSDphT01no1B+YWEA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] scripts: add TOML config to container tool
+To: Guillaume Tucker <gtucker@gtucker.io>
+Cc: Nathan Chancellor <nathan@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	=?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Miguel Ojeda <ojeda@kernel.org>, linux-doc@vger.kernel.org, 
+	workflows@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, automated-testing@lists.yoctoproject.org, 
+	"kernelci lists.linux.dev" <kernelci@lists.linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 28/08/2026 7:35 pm, Miguel Ojeda wrote:
-> On Fri, Aug 28, 2026 at 7:25 PM Guillaume Tucker<gtucker@gtucker.io> wrote:
->> It states Python 3.9 which was already older than the 3.10 minimum
->> set when the container tool was merged.  Also my understanding is
->> that it's not a hard requirement for all the kernel tools, only for
->> building and producing a functioning kernel.  If I misunderstood this
-> I didn't check at the moment, but at least back when the "(optional)"
-> tag was removed, it was only required for certain configurations from
-> what I understand (I am not sure why the tag was removed).
+On Sat, Aug 29, 2026 at 11:02=E2=80=AFAM Guillaume Tucker <gtucker@gtucker.=
+io> wrote:
+>
+> See "bc20c56e98e0 docs: changes: better document Python needs"
+>
+> Also it's explained briefly in the docs here:
+>
+>    https://www.kernel.org/doc/html/latest/process/changes.html#python
+>
+> So I guess that if it's needed for at least one build configuration,
+> then it's not optional anymore.
 
-See "bc20c56e98e0 docs: changes: better document Python needs"
+Yeah, that is the commit I was referring to, but I am not sure what
+that commit meant, i.e. if that were the case, then e.g. Rust would be
+mandatory too since it is required for at least one build
+configuration... :)
 
-Also it's explained briefly in the docs here:
+I guess the commit was trying to say "used in enough places" or
+perhaps "the default config of at least one architecture" or "some
+`make` targets" or a combination of all those, but it is not clear.
 
-   https://www.kernel.org/doc/html/latest/process/changes.html#python
-
-So I guess that if it's needed for at least one build configuration,
-then it's not optional anymore.
-
-Guillaume
-
+Cheers,
+Miguel
