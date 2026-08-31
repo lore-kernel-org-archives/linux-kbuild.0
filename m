@@ -1,143 +1,69 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from outbound.st.icloud.com (st-2003l-snip4-11.eps.apple.com [57.103.77.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B219A1A3160;
-	Mon, 31 Aug 2026 13:02:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CEEB414A04
+	for <linux-kbuild@vger.kernel.org>; Mon, 31 Aug 2026 13:17:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.77.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788181375; cv=none; b=roO945B8KuWAl6RaSweciDI/Zn8dbxHFQ6R04pfLp8ZWD92U6d4/a2DY6z2O15L2lg2ZfAxGIpg9p7SWkiGANrdf+tRouiceJVABc2Ko5VLioXcRhDXuOXLd4u19yLdXs8TPi0pCKC8qLxIInSMWs/JidE38CGI2Lo0wwZDKDaU=
+	t=1788182248; cv=none; b=nhonT+wGlRbpuhsjKKW4iUHsoWIaCctddj911gEiA5HEib1e4iIaGlNvYRgYQVHFYijVBrsUcDZUQLDMr5LIAwQkim66dTEh4BrwXvpqxAp0z8ZWbJiy67P8Fd8COFe8clQ/UeMxITdLxRhCG2rmHJ27ECtAJacT5swlvet+8gY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788181375; c=relaxed/simple;
-	bh=DgUGDzDsFcaHkO/kfFjyblEG2ccdokJ8aFjLP+oZEss=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D2kD7ZJXZItgnzoNEVKZzFl4LXicGkLYwVqwlLMkZtX2B/JdlTUPfYmCvzDN9xmv/3wZC60vuGnhuyPAHU+I4cI5/B9yFXL/0+pqTt0mrBA9b3sZf3Fru8EVY0qdKonnM24REHyHzvOnPpzVBk5vbnOksUZOibXrQE3coiisYcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W95mgbnZ; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788182248; c=relaxed/simple;
+	bh=/NXqggHsuDWw6b/862OcbvRPaN5QM214yMR59irur7g=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=uG3RbppQ9LcHdGVw9ZCDNOr8snI0KbhjlWQlP7B8cN/evZyQK/k+S+CRN2ayKmy8KkbGnT5vZ2E7lKsAhv81fAMqlGu3UTzAi+ilfcxY7ugKbAnPL/1itVq3PMQAJPz1PC8pb4Tt28ig2nVaQb22X0LKArNhq8eB5Jhl6nDfYLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=me.com; spf=pass smtp.mailfrom=me.com; dkim=pass (2048-bit key) header.d=me.com header.i=@me.com header.b=YWoZMdbj; arc=none smtp.client-ip=57.103.77.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=me.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=me.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W95mgbnZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F37371F000E9;
-	Mon, 31 Aug 2026 13:02:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788181374;
-	bh=Vh+bXtqB0JrmOUc7Cfb62eydik9BcrlwIErB4WGzYVY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=W95mgbnZSp3BKeR7gGy563E1S8nGYEOO9jEEqz96V9WeLaRNbpV394kayreuxjKfO
-	 ucfpy3x7RxAUezg6X9VoVkKpUSmQIRwz/iuFDRfJn6q4nKl0+Yo4Mf13WJcluJwKmZ
-	 cYTWrSHszAGqUVQtdChncE2y29CuqlSqoGhMHtTzdnvIojdK/dxMpxaGKNrZrutfPy
-	 0+osd4l8GKdnaU+l2Nsgy8ZfLgcDAVVvpWFHak3w4H9iij3MFGPKosrd7+ReK0hg+7
-	 Te1kuVXW6ni0cgIcHVdT2LJ0Wvn1jq1zBsJ9xg+FWrFPIY04pM1MCVRRVHhvkg8G59
-	 FXLsUTQYOiZ9w==
-Date: Mon, 31 Aug 2026 15:02:29 +0200
-From: Manivannan Sadhasivam <mani@kernel.org>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>, Rob Herring <robh@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jirislaby@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, 
-	Hans de Goede <hansg@kernel.org>, Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>, 
-	Mark Pearson <mpearson-lenovo@squebb.ca>, "Derek J. Clark" <derekjohn.clark@gmail.com>, 
-	Conor Dooley <conor+dt@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Bartosz Golaszewski <brgl@bgdev.pl>, 
-	Daniel Scally <djrscally@gmail.com>, Heikki Krogerus <heikki.krogerus@linux.intel.com>, 
-	Sakari Ailus <sakari.ailus@linux.intel.com>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Danilo Krummrich <dakr@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
-	linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org, 
-	Stephan Gerhold <stephan.gerhold@linaro.org>, Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, 
-	linux-acpi@vger.kernel.org, Sui Jingfeng <sui.jingfeng@linux.dev>
-Subject: Re: [PATCH v3 03/14] software node: Implement device_get_match_data
- fwnode callback
-Message-ID: <vawuqud4z54ucbj4j4sbu5de3vh7fz6q7kvlluaw36vko443ki@7qdmd3trra2n>
-References: <20260110-pci-m2-e-v3-0-4faee7d0d5ae@oss.qualcomm.com>
- <20260110-pci-m2-e-v3-3-4faee7d0d5ae@oss.qualcomm.com>
- <aWSpFk9z0zpyKjr6@smile.fi.intel.com>
- <6l3rs5pv6xnrbygpvqrdxqoqtybjyefsltk5bl4336q56rfoza@ejo3sxuufghe>
- <aWSwgRiEkT9unYw9@smile.fi.intel.com>
- <6peb6afhpm4l7opxbdt3b5sx32longevwds5c3dlqji2hr5dlh@kxuvj55jkqgi>
- <ljqd5ovcsg7t62tdzd77w5mv5buawm3x7xyapy7n7l7azcaorh@tytj46t2lxyb>
- <ks2nm67zp5i2grzomu7mjb7uhkuwtd7w5stoqp5kri2clpxpsp@ayn42h7meh5l>
- <aoKrmZzmYsyvRJ-5@ashevche-desk.local>
- <aoMGJqwcEAHWmZX9@black.igk.intel.com>
+	dkim=pass (2048-bit key) header.d=me.com header.i=@me.com header.b="YWoZMdbj"
+Received: from outbound.st.icloud.com (unknown [127.0.0.2])
+	by p00-icloudmta-asmtp-us-east-1a-20-percent-0 (Postfix) with ESMTPS id C82C018000AB;
+	Mon, 31 Aug 2026 13:17:24 +0000 (UTC)
+X-ICL-RepId: 01a057f7-ad82-7cef-bcb4-8287cc81275c
+X-ICL-Out-Info: HUtFAUMHWwJACUgATUQeDx5WFlZNRAJCTQhABkMAWBxBDkkdXwVaEhVdRVUIRRlTHhccRgxFGVswVB0dDlgGEhZdRV4IGQhdHRkKUFAAS1oVVRcOAkIfUB9MFldDRB8cGVoUXBhTRVEfVFhDGUVWaUELTx1dGVscQmRYVwkKBldeWhdeTVoCVk0FSgNfAVsKQwhJAFwAWgpeC0gDVARfH0EUHlYfRQpcXl0NUh9FAnIdXFZQAlpVEgRACFZQXgheH0wc
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=me.com; s=1a1hai; t=1788182246; x=1790774246; bh=/NXqggHsuDWw6b/862OcbvRPaN5QM214yMR59irur7g=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=YWoZMdbjwCIHeb+zsnvWKlg+V5rJSlhlcqvizPdNk+pUNeoqDDWovVaibmsK/vn/MT48KEsQf11z4uK7xVnhqXZqrryAdzMLSTshMxuvYPA9tp92JSrMLg1t0e+M7r6QDPb+YqzCmx+QyfAfRosq19aEsm49XXCV9B9iy61Wz1vpHbBONYZ4U4XHfWIJnKMS0nE7VEL7TB/WE/+BnQfx4JSBzc80CQCseIcUBJMS/MUyaiEsc9Fuz+mClHOQF0ztNKcWX3rZUP0QclUK9Aa1A1yZ/XMoHVbAafGNzg7FjuFJv2A9oQIjow7VUaYpf8kwQvq8Fgii8eq+aSE3sVQQBQ==
+Received: from ncore (unknown [17.156.216.30])
+	by p00-icloudmta-asmtp-us-east-1a-20-percent-0 (Postfix) with ESMTPSA id D7F6818001D8;
+	Mon, 31 Aug 2026 13:17:22 +0000 (UTC)
+From: Ferran Duarri <ferran.duarri@me.com>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Nicolas Schier <nsc@kernel.org>,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Kees Cook <kees@kernel.org>,
+	linux-hardening@vger.kernel.org,
+	Ferran Duarri <ferran.duarri@me.com>
+Subject: Re: [PATCH] kbuild: ubsan: skip UBSAN for external modules by default
+Date: Mon, 31 Aug 2026 15:17:17 +0200
+Message-ID: <20260831131718.200934-1-ferran.duarri@me.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260821190701.GA3030879@ax162>
+References: <20260821190701.GA3030879@ax162>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <aoMGJqwcEAHWmZX9@black.igk.intel.com>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODMxMDExNSBTYWx0ZWRfX+nvHO2Wkl41N
+ bYPdAXHv+lue6T+9xE4Zhm+ELlV8yLPYOXl9VfqqGkKTKtYf2AcA74uKX2+mPAVcQ/uS9euE57f
+ Rdp0zevF0Xd2uRlBzFth76XIQmGSTkZkI9SAr7cPALaCaLe+y8ENZ6Y4Tk/NF810NJO/xihqdYT
+ GhVqidXq6GC8FwIree9NNLNfkL/ChKcEpiPLjGLhzZP84NZZJRnBJwVF1aCptcMESs2MC1UNBlK
+ wsxjsdEaddxy7uJ1eQ5oirGvWYVtP7jC+cVspUJrSqR+srY8+sd1xWy13vqWB7KvPQI28w7Jb6S
+ OYOfGfuToRY4gDjYeWCOTUnvUU981tC2qojuGSCM/57FuG2V4IivzsAJKCCZ20=
+X-Proofpoint-ORIG-GUID: 9j-KgrMVfH6gzULv84ydPs8Z63Ynt-go
+X-Proofpoint-GUID: 9j-KgrMVfH6gzULv84ydPs8Z63Ynt-go
+X-Authority-Info-Out: v=2.4 cv=ZYcQ98VA c=1 sm=1 tr=0 ts=6a957ee5
+ cx=c_apl:c_pps:t_out a=oyWFxbOnq+dmhQrAPgaJYA==:117
+ a=oyWFxbOnq+dmhQrAPgaJYA==:17 a=Sv0fKeRqtYgA:10 a=x7bEGLp0ZPQA:10
+ a=B9nqV3Rn1-QA:10 a=VkNPw1HP01LnGYTKEx00:22 a=LMDzS8KKjDtqAWibp1EA:9
+X-JNJ: AAAAAAAB9S9rmiJ65TXhQlyBQOc9xr0kE/GOC2HQq+H/9qrEj5UQh60/AgfR/+NN8mz6+g/9Y6xJTYxh/U0DxVQToKsDKyI/apjBxOZBoaFFpivFtACALM9t7dpysYGolaQF6x+cy1yjZchQwgqATg+SnHx3m42RiuRH0SoFhCXdtjdM5a8bmgbYQrGEcCZzjCCWYtx7Iqvvj+LSE3PvGThGmNq/zgdfyWQ43lCeAnYEepJeT3pbPKsUgnI8kKxAS50/f8cOsCUE9H3JoZwtMG5GUzvjg1M7UK+q67bxPr9nex1CfyhMia4Fljk0MJqA1zF1y1e6QDlD9rZtrVFSXVrPzIXD/rSZJUhojTtAj6lvYN4T5A8LcmbIPDncPpA+GhG/pT80zY1BToXbzGXSnX/B4gVBHaGgfv/MsxQoIrQU0YDEXLeDqFZPnC3u4ZZ9iKPWtQeekFqXZnoxFKkJuthnJxQHVW0tb5XKyk6gA4Ti2snNIwto358NuYaJItE+nljb6dXq0ZkUQa+z2cOqLp7vuqxcKiTjkexcMstYac+5zdzs1jQkP/ERKB2UJC/uU4Wk26GqRKzPXCnt63tj9TbKLsX2rAVpvn5h48LGCbAwFXxlRttVbJDl9bdRIfwqRtjRXzYkoAbCLnXelKWyDbFd+Kx7K3qk8LxuJm1UWUXjF97mZoUsyHCwa6q8xgEnQbJ7CO2q4CLRLrFDM4WXJkwmBnFVspHhz6ME2hG004QDhMkiQZ5nPUCjuXl38c+Bc09KW6Ssl/d/Vi+YTufZth6GffhmEFDtcoVy1hqV8Geu0R3/DXKXpxOW+EpMRC2oiSlTEQMU4gVsHNvw0eiDPw/Dq7TdD9baMbsXNmzEoIm2ATfaL6/K2cX51YTeK6zPrk0Jkb438kouZQLY4ED7xUYcRxSIC2Z1WlgAJGh3cGrwMB+wewhH2t3Tj+oVdaItsJNEhi7cOhfCSHLP6DcQPtPJ1i2OjgB
+ zIZQqlkNbwt6PEW49xKwOttW54V4O2pbPZhDvJ/pHmZ2jckh/kEwOi0ERZ+3AdqNVPlZlK1L/AgEPAGlEMCtPO/5+Xj/lp+OthB5xhEpZSFKUb+RDq8nb/shg9HU6xXgSIs6hZaMJTrYCpU1ih22H9zNWNbgKwjeJXwRBlVLdGv4o0hQpyqikSZdlAZBvNunhnYk/KvPlIQe/YKc7ekk1pLMIT3Eq1QWZuFHqPKtVZqZxDqDQKaiR8GA=
 
-On Mon, Aug 17, 2026 at 03:01:26PM +0200, Andy Shevchenko wrote:
-> On Mon, Aug 17, 2026 at 09:35:05AM +0300, Andy Shevchenko wrote:
-> > On Fri, Aug 14, 2026 at 02:49:31PM +0200, Manivannan Sadhasivam wrote:
-> > > On Mon, Jan 12, 2026 at 10:01:23PM +0530, Manivannan Sadhasivam wrote:
-> > > > On Mon, Jan 12, 2026 at 02:32:21PM +0530, Manivannan Sadhasivam wrote:
-> > > > > On Mon, Jan 12, 2026 at 10:27:45AM +0200, Andy Shevchenko wrote:
-> > > > > > On Mon, Jan 12, 2026 at 01:49:54PM +0530, Manivannan Sadhasivam wrote:
-> > > > > > > + Dmitry Torokhov (who was against this patch previously)
-> > > > > > > 
-> > > > > > > On Mon, Jan 12, 2026 at 09:56:06AM +0200, Andy Shevchenko wrote:
-> > > > > > > > On Sat, Jan 10, 2026 at 12:26:21PM +0530, Manivannan Sadhasivam via B4 Relay wrote:
-> > > > > > > > 
-> > > > > > > > > Because the software node backend of the fwnode API framework lacks an
-> > > > > > > > > implementation for the .device_get_match_data function callback.
-> > > > > > > > 
-> > > > > > > > Maybe this is done on purpose. Have you thought about this aspect?
-> > > > > > > 
-> > > > > > > IMO, software nodes were introduced to add sub-properties to the existing
-> > > > > > > firmware nodes, but it has usecase/potential to go beyond that. More below.
-> > > > > > 
-> > > > > > Potential doesn't mean the necessity.
-> > > > > > 
-> > > > > > > > > This makes it difficult to use(and/or test) a few drivers that originates
-> > > > > > > > > from DT world on the non-DT platform.
-> > > > > > > > 
-> > > > > > > > How difficult? DSA implementation went to the way of taking DT overlay
-> > > > > > > > approach. Why that one can't be applied here?
-> > > > > > > 
-> > > > > > > Sometimes you do not have any DT node at all.
-> > > > > > 
-> > > > > > Yes, that is exactly the case I have referred to. The PCI core (in Linux)
-> > > > > > is able to create DT subtree on non-OF based platforms.
-> > > > > 
-> > > > > Maybe I should look into creating dynamic DT node for the device and insert it
-> > > > > to the uart node. Theoretically it should work.
-> > > > 
-> > > > It worked flawlessly. So I sent v4 incorporating this design:
-> > > > https://lore.kernel.org/linux-pci/20260112-pci-m2-e-v4-0-eff84d2c6d26@oss.qualcomm.com/
-> > > 
-> > > Andy, I had to revive this old thread of a merged series as Krzk is not in
-> > > favour of adding DT overlay or dynamic OF nodes for these BT devices [1]. His
-> > > objections are due to the fact that we are just adding BT nodes of a
-> > > discoverable device (M.2 PCIe device) without any resources. So the node just
-> > > contains the compatible to match with the serdev driver and nothing else.
-> > > 
-> > > And he suggested to use swnodes or other similar mechanisms to plug with the
-> > > serdev driver as that's the only thing we want here, not a true hardware
-> > > description.
-> > 
-> > SW nodes are not for describing HW from scratch. They are for fixing missing
-> > pieces. If you can justify your case as a missing piece for the *existing*
-> > device (which is enumerated using standard mechanisms), you can add a property
-> > that fills the gap.
-> > 
-> > Unfortunately I see that there are `PROPERTY_ENTRY_STRING("compatible", ...)`
-> > cases in the kernel (only 9 drivers so far), and I can't say if they describing
-> > missing pieces or a SW-made descriptions of the hardware. For the latter the
-> > DT/ACPI/other means but swnodes should be used.
-> 
-> I have read all replies by @krzk and the question here, why don't you use
-> auxiliary bus? It seems the best suit for the case.
-> 
+Nathan, Nicolas - fair, and it's the right call: making UBSAN weaker for
+everyone to fix one out-of-tree module's problem is a bad trade. Dropping
+this, thanks.
 
-I agree and I realised it very late. I've prototyped aux device locally and it
-works.
-
-Will submit the rework after some more testing, thanks!
-
-- Mani
-
--- 
-மணிவண்ணன் சதாசிவம்
+Cheers,
+Ferran
