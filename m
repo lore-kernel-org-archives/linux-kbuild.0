@@ -1,117 +1,143 @@
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D964D3DB326
-	for <linux-kbuild@vger.kernel.org>; Mon, 31 Aug 2026 12:48:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B219A1A3160;
+	Mon, 31 Aug 2026 13:02:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788180486; cv=none; b=OtHJbmczST4ehSRwZpLDVYmyR9SaJZ+hUqLLcXMHw6TXBk9k2He4Scx6ibMos2Fj2F9m61deVYJ4bHnZ+TqkURj2bcX7iviJVNCeRVycvEua1wkRy7fJpLqmwDn4M9Mj+WgPN4A/9XI62nmRK25iagycCQdToW4kjca/AK9YovU=
+	t=1788181375; cv=none; b=roO945B8KuWAl6RaSweciDI/Zn8dbxHFQ6R04pfLp8ZWD92U6d4/a2DY6z2O15L2lg2ZfAxGIpg9p7SWkiGANrdf+tRouiceJVABc2Ko5VLioXcRhDXuOXLd4u19yLdXs8TPi0pCKC8qLxIInSMWs/JidE38CGI2Lo0wwZDKDaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788180486; c=relaxed/simple;
-	bh=KkkehfMd9n3LK2UIAbLrDl0c9I3JEeWBic8VihxWB28=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rSNaJs/bgGRaq2kBqsJ7CESKIFS0F/WGiIrw4r18GgHl2Ok99+e6RuMqM2O/Tr/5KssLUzCu2grEpjNF8nPPauHtlFxuhOz93WB4vxVHivBi85AWSJxd6+x5rF4flNgquU6QmRlkU0/vQinyjnRaITmKRq4m4StJhjO6NEioZjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-4b1ba286f6bso3493860b6e.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 31 Aug 2026 05:48:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788180480; x=1788785280;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=yDjQEmaO8nMillvg6lw6y5CLfKSX+705cRaL+2tb0Tk=;
-        b=OqbXhFt8Y58A1QLX5RwsgWLZjiA0/oPXjwLpSpshF8TvaByWC/HtB6THvqQhAz7Q/B
-         FX3Nqx+A7KnHmQNV4UgKIbDVhNpLWW1Sv2GTAaflM26pRJjcZFCP6mi6BXuPe1sdpIRK
-         4IqhTzXe33tYlXUG1zAOE23JXI9I8G6JzNp+K19cKG7AUkgUT/ARpPS1f5qcRo4GHFO+
-         5uqCuv1EgS3fjmub56l1d26LGHT59I2WLbeYunMn3PfvJemUpoK+CftK/ABsya1oc3gE
-         U6ak1fMpAunbVENoYPonGYd7mN3ZeMGOotG66hoQxsCHS2t3E0kWBJnVo+MvR0AhxBsI
-         s3SA==
-X-Forwarded-Encrypted: i=1; AHgh+RodeBkvYbESRUAOhcrIqDwk0lKwm0F2ybZkXyyv2cIa7e7WKs8Uh05Vtd1F6i8FgiX3VOUuPKovmx/pEl0=@vger.kernel.org
-X-Gm-Message-State: AFuF++ks/4G3R0pdX35l9nzUVZ+vpMMD+e0TNDdVlZu86IvjFyoRke0a
-	NwlJkXOKnlUVBGPGmOYPnnJX1qK6cxY8kx0U1deAWf8ZCuKsDlbH3/4fMqMfy0BJ
-X-Gm-Gg: AR+sD11S2z1Sg3MeVKtjs99MLKdkPdvA5thCqLo4UA9j+9qkWNQ+92X3hkwCn5jDBWR
-	H9YJA6ekSdOhBW3k/3MM6XaxKO4IVkQTC10t4JWrhiLKnoYdgAk5jIFtmkZVBIdpwzsQFSAdIvE
-	g2OLltL427z0HRFLZTDdTRP5ZcU33k0dXa2XT7/KgdKuWV7gLLKTBCj/cigW79qOyxiH6ZuNux4
-	uvEjaja+Ii3/C6wB5NjE/Scqj619ccD+GQwcgpKyxQw7ZEPZVlUO8/z975DrNm4nHyWQfJsyVsE
-	KTOl4JYxMGAx2mIBlP71IE0lljTxyScjIzHZ6sajCpAtRaRsDFluVfmSnnRG+0kqtEZ20L13+X/
-	XYYGysbej/E7H6188i6AGigBxFnfu2ToeuGhtjhO9IVcGHLfN5jy6RM5A7WAx1xVdYHdUxvx9ga
-	f1Bbikm3Jf2XGG9CddhT8B6EDp0Vm5s3xZVsak5BU0BOcXLUqgsA7p1qWSRUl8hsS2Tl1VGlSbt
-	sA9JdLg/yfPi3MJr1NyJRIyAA==
-X-Received: by 2002:a05:6808:3514:b0:4a4:64b0:bf5e with SMTP id 5614622812f47-4b59e6f973bmr6057389b6e.2.1788180480339;
-        Mon, 31 Aug 2026 05:48:00 -0700 (PDT)
-Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com. [209.85.160.41])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-4b3a1a3621bsm8248846b6e.18.2026.08.31.05.47.59
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 31 Aug 2026 05:48:00 -0700 (PDT)
-Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-4678d3e490bso3716907fac.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 31 Aug 2026 05:47:59 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RqERcrsXwkfgj8gc/KMyuNvpa2NoagLnGCVjBfrjzILqdxCfmR0cYN39s6OxrZO+1qlZFAbfLgE3h6741Q=@vger.kernel.org
-X-Received: by 2002:a05:6102:2c85:b0:744:d517:b0b0 with SMTP id
- ada2fe7eead31-789dc7e86f7mr1577779137.10.1788180020647; Mon, 31 Aug 2026
- 05:40:20 -0700 (PDT)
+	s=arc-20240116; t=1788181375; c=relaxed/simple;
+	bh=DgUGDzDsFcaHkO/kfFjyblEG2ccdokJ8aFjLP+oZEss=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D2kD7ZJXZItgnzoNEVKZzFl4LXicGkLYwVqwlLMkZtX2B/JdlTUPfYmCvzDN9xmv/3wZC60vuGnhuyPAHU+I4cI5/B9yFXL/0+pqTt0mrBA9b3sZf3Fru8EVY0qdKonnM24REHyHzvOnPpzVBk5vbnOksUZOibXrQE3coiisYcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W95mgbnZ; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W95mgbnZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F37371F000E9;
+	Mon, 31 Aug 2026 13:02:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788181374;
+	bh=Vh+bXtqB0JrmOUc7Cfb62eydik9BcrlwIErB4WGzYVY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=W95mgbnZSp3BKeR7gGy563E1S8nGYEOO9jEEqz96V9WeLaRNbpV394kayreuxjKfO
+	 ucfpy3x7RxAUezg6X9VoVkKpUSmQIRwz/iuFDRfJn6q4nKl0+Yo4Mf13WJcluJwKmZ
+	 cYTWrSHszAGqUVQtdChncE2y29CuqlSqoGhMHtTzdnvIojdK/dxMpxaGKNrZrutfPy
+	 0+osd4l8GKdnaU+l2Nsgy8ZfLgcDAVVvpWFHak3w4H9iij3MFGPKosrd7+ReK0hg+7
+	 Te1kuVXW6ni0cgIcHVdT2LJ0Wvn1jq1zBsJ9xg+FWrFPIY04pM1MCVRRVHhvkg8G59
+	 FXLsUTQYOiZ9w==
+Date: Mon, 31 Aug 2026 15:02:29 +0200
+From: Manivannan Sadhasivam <mani@kernel.org>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>, Rob Herring <robh@kernel.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jirislaby@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, 
+	Hans de Goede <hansg@kernel.org>, Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>, 
+	Mark Pearson <mpearson-lenovo@squebb.ca>, "Derek J. Clark" <derekjohn.clark@gmail.com>, 
+	Conor Dooley <conor+dt@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Bartosz Golaszewski <brgl@bgdev.pl>, 
+	Daniel Scally <djrscally@gmail.com>, Heikki Krogerus <heikki.krogerus@linux.intel.com>, 
+	Sakari Ailus <sakari.ailus@linux.intel.com>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Danilo Krummrich <dakr@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
+	linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org, 
+	Stephan Gerhold <stephan.gerhold@linaro.org>, Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, 
+	linux-acpi@vger.kernel.org, Sui Jingfeng <sui.jingfeng@linux.dev>
+Subject: Re: [PATCH v3 03/14] software node: Implement device_get_match_data
+ fwnode callback
+Message-ID: <vawuqud4z54ucbj4j4sbu5de3vh7fz6q7kvlluaw36vko443ki@7qdmd3trra2n>
+References: <20260110-pci-m2-e-v3-0-4faee7d0d5ae@oss.qualcomm.com>
+ <20260110-pci-m2-e-v3-3-4faee7d0d5ae@oss.qualcomm.com>
+ <aWSpFk9z0zpyKjr6@smile.fi.intel.com>
+ <6l3rs5pv6xnrbygpvqrdxqoqtybjyefsltk5bl4336q56rfoza@ejo3sxuufghe>
+ <aWSwgRiEkT9unYw9@smile.fi.intel.com>
+ <6peb6afhpm4l7opxbdt3b5sx32longevwds5c3dlqji2hr5dlh@kxuvj55jkqgi>
+ <ljqd5ovcsg7t62tdzd77w5mv5buawm3x7xyapy7n7l7azcaorh@tytj46t2lxyb>
+ <ks2nm67zp5i2grzomu7mjb7uhkuwtd7w5stoqp5kri2clpxpsp@ayn42h7meh5l>
+ <aoKrmZzmYsyvRJ-5@ashevche-desk.local>
+ <aoMGJqwcEAHWmZX9@black.igk.intel.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <c480ed6b8bf38822263e2c5b7cf32b28600f212d.1787219898.git.geert+renesas@glider.be>
- <CAMuHMdVyUAA3L4mUkSjmnuE3cvj-+N8z-Bhxsh1wa-FQWc=fjw@mail.gmail.com>
- <apGqg5a5I9g1CoF_@levanger> <CAMuHMdXwmCrzLZiPnQejJ+dTvVNf2zTzgKwTWEFEkfKRkZQpPQ@mail.gmail.com>
- <apHfhILRL0-lFOEh@levanger> <9de2f5e7-079b-472f-9d98-91d878dcefd3@gmail.com>
-In-Reply-To: <9de2f5e7-079b-472f-9d98-91d878dcefd3@gmail.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Mon, 31 Aug 2026 14:40:09 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdVbdO_aY+_CZ6KV23Y-XGfhb1+F8yLQVBY6Tw31PTKzvw@mail.gmail.com>
-X-Gm-Features: AcwNN1VSJrr9aEDo0FVQh3lxnRuPny3ZCLnXQftv09uT0Kmgcq1-H6pLZpi5V5U
-Message-ID: <CAMuHMdVbdO_aY+_CZ6KV23Y-XGfhb1+F8yLQVBY6Tw31PTKzvw@mail.gmail.com>
-Subject: Re: [PATCH] erofs: Fix EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS default logic
-To: Julian Braha <julianbraha@gmail.com>
-Cc: Nathan Chancellor <nathan@kernel.org>, Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>, 
-	Yue Hu <zbestahu@gmail.com>, Jeffle Xu <jefflexu@linux.alibaba.com>, 
-	Sandeep Dhavale <dhavale@google.com>, Hongbo Li <hongbohbli@tencent.com>, 
-	Chunhai Guo <guochunhai@vivo.com>, Michael Bommarito <michael.bommarito@gmail.com>, 
-	linux-erofs@lists.ozlabs.org, linux-kernel@vger.kernel.org, 
-	linux-kbuild <linux-kbuild@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aoMGJqwcEAHWmZX9@black.igk.intel.com>
 
-Hi Julian,
+On Mon, Aug 17, 2026 at 03:01:26PM +0200, Andy Shevchenko wrote:
+> On Mon, Aug 17, 2026 at 09:35:05AM +0300, Andy Shevchenko wrote:
+> > On Fri, Aug 14, 2026 at 02:49:31PM +0200, Manivannan Sadhasivam wrote:
+> > > On Mon, Jan 12, 2026 at 10:01:23PM +0530, Manivannan Sadhasivam wrote:
+> > > > On Mon, Jan 12, 2026 at 02:32:21PM +0530, Manivannan Sadhasivam wrote:
+> > > > > On Mon, Jan 12, 2026 at 10:27:45AM +0200, Andy Shevchenko wrote:
+> > > > > > On Mon, Jan 12, 2026 at 01:49:54PM +0530, Manivannan Sadhasivam wrote:
+> > > > > > > + Dmitry Torokhov (who was against this patch previously)
+> > > > > > > 
+> > > > > > > On Mon, Jan 12, 2026 at 09:56:06AM +0200, Andy Shevchenko wrote:
+> > > > > > > > On Sat, Jan 10, 2026 at 12:26:21PM +0530, Manivannan Sadhasivam via B4 Relay wrote:
+> > > > > > > > 
+> > > > > > > > > Because the software node backend of the fwnode API framework lacks an
+> > > > > > > > > implementation for the .device_get_match_data function callback.
+> > > > > > > > 
+> > > > > > > > Maybe this is done on purpose. Have you thought about this aspect?
+> > > > > > > 
+> > > > > > > IMO, software nodes were introduced to add sub-properties to the existing
+> > > > > > > firmware nodes, but it has usecase/potential to go beyond that. More below.
+> > > > > > 
+> > > > > > Potential doesn't mean the necessity.
+> > > > > > 
+> > > > > > > > > This makes it difficult to use(and/or test) a few drivers that originates
+> > > > > > > > > from DT world on the non-DT platform.
+> > > > > > > > 
+> > > > > > > > How difficult? DSA implementation went to the way of taking DT overlay
+> > > > > > > > approach. Why that one can't be applied here?
+> > > > > > > 
+> > > > > > > Sometimes you do not have any DT node at all.
+> > > > > > 
+> > > > > > Yes, that is exactly the case I have referred to. The PCI core (in Linux)
+> > > > > > is able to create DT subtree on non-OF based platforms.
+> > > > > 
+> > > > > Maybe I should look into creating dynamic DT node for the device and insert it
+> > > > > to the uart node. Theoretically it should work.
+> > > > 
+> > > > It worked flawlessly. So I sent v4 incorporating this design:
+> > > > https://lore.kernel.org/linux-pci/20260112-pci-m2-e-v4-0-eff84d2c6d26@oss.qualcomm.com/
+> > > 
+> > > Andy, I had to revive this old thread of a merged series as Krzk is not in
+> > > favour of adding DT overlay or dynamic OF nodes for these BT devices [1]. His
+> > > objections are due to the fact that we are just adding BT nodes of a
+> > > discoverable device (M.2 PCIe device) without any resources. So the node just
+> > > contains the compatible to match with the serdev driver and nothing else.
+> > > 
+> > > And he suggested to use swnodes or other similar mechanisms to plug with the
+> > > serdev driver as that's the only thing we want here, not a true hardware
+> > > description.
+> > 
+> > SW nodes are not for describing HW from scratch. They are for fixing missing
+> > pieces. If you can justify your case as a missing piece for the *existing*
+> > device (which is enumerated using standard mechanisms), you can add a property
+> > that fills the gap.
+> > 
+> > Unfortunately I see that there are `PROPERTY_ENTRY_STRING("compatible", ...)`
+> > cases in the kernel (only 9 drivers so far), and I can't say if they describing
+> > missing pieces or a SW-made descriptions of the hardware. For the latter the
+> > DT/ACPI/other means but swnodes should be used.
+> 
+> I have read all replies by @krzk and the question here, why don't you use
+> auxiliary bus? It seems the best suit for the case.
+> 
 
-On Sat, 29 Aug 2026 at 01:19, Julian Braha <julianbraha@gmail.com> wrote:
-> On 8/28/26 20:20, Nicolas Schier wrote:
-> > Cc: Julian
->
-> Thanks for looping me in.
->
-> So it's not great usage of the Kconfig language to have the 'range 1 1'
-> and the 'default 16' here contradicting each other. But, it's currently
-> legal.
->
-> I would prefer to disallow this, but a proper check would actually
-> require SAT solving (or similar) in the general case, so it's unlikely
-> to become an error in the near future.
->
-> Anyway, as long as we're continuing to allow it, savedefconfig should be
-> considered bugged for not handling it accordingly.
->
-> Let me see if I can send something out this weekend.
+I agree and I realised it very late. I've prototyped aux device locally and it
+works.
 
-Thank you, my patch can be reverted again once your "PATCH] kconfig:
-fix extra output from savedefconfig on out-of-range defaults"[1]
-has been accepted upstream.
+Will submit the rework after some more testing, thanks!
 
-[1] https://lore.kernel.org/20260830221129.2668354-1-julianbraha@gmail.com
-
-Gr{oetje,eeting}s,
-
-                        Geert
+- Mani
 
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+மணிவண்ணன் சதாசிவம்
