@@ -1,148 +1,164 @@
-Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85ECB37B40E
-	for <linux-kbuild@vger.kernel.org>; Tue,  1 Sep 2026 10:17:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 063DB3CAE9B
+	for <linux-kbuild@vger.kernel.org>; Tue,  1 Sep 2026 13:48:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788257857; cv=none; b=gZGPyGwUxEcA+eWLCXNExe6awphjuZcv95zhVQihc+c/T40Z1uA6t6D43kgmyJu7zJKyPmjTuLHhRanuEKOOmHt1BZqkzfsPykGR+/FI3sQubnv4ZT/V+BB+DdTYaeMwAGmj5IWPrmrnOSaRF+IBkVEMIzfYFtS4LIjXBI9AAGQ=
+	t=1788270533; cv=none; b=fLkw3CGUCAcVcvusMGHIlRL7ki/Wb+b7nQ74W0XGkr7gn0r4I1WxWnmeaKvs6kKJmGyH1UXvMqZ8DQUs+bd7nbKCYHVxF05f81+ByZ1eB224ZAIpVTYEhDCkA4dFYASvSWVaG4rszGRrNqlErY1yANkWYcfBoQgto0rjDK4b2x8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788257857; c=relaxed/simple;
-	bh=f3IaTrQW3PdwJG2CI8iddb29hq+NAzAZPlqiyZ/dPEc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=elxCcBuF3b0pfSh5i+oulK/G+9ZXa1OTzNOvVfcVe1tLOUzqJ9hbnAj/5MJ9vCpQPsZK+Jkh0jkdYmpUiDtE/qyR6gaTBAAgqKKcsf7lIUWVkHZ1LyuYlY3OTK0Osk1+lkJx39uxwrBhXpnyrHCyqUsiOhBNF3fY3i9G93PrgEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+	s=arc-20240116; t=1788270533; c=relaxed/simple;
+	bh=FhGox9gXqmh4I7C5JglwAnrOhoH6H+CLn2mkAQ+mXqM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=M/cTu5VDuwn2xio9MArozHu2pbSH5+rx1fRzhxCi+7bpgQ4uK+aKvss/4l31FFke6tG0rnlB9s26OXgTwuXjcRzGEOn3Tf51OSrx0hd+9HQ0HalwUFhrkZKr/n2MLSUUU/X1yBXmxzUp/L+YKAaKY4tmN76yn0bKE322TK1Xj7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pRwRh/z7; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-5c6670fd413so730245e0c.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 01 Sep 2026 03:17:35 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pRwRh/z7"
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-482e2fdf5abso2304580f8f.2
+        for <linux-kbuild@vger.kernel.org>; Tue, 01 Sep 2026 06:48:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788270530; x=1788875330; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:sender:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=yTQx2GsPa85XjvX9iVGk5mcgWwxcHbSTKInQpmNkpgQ=;
+        b=pRwRh/z7/Owf/eTBs5AAF7tg3JvZzLsXaYx30TPMVj2/cc0vOdd4KzMs1cTiuIpgrh
+         7fO8ZScGwGw2vzFvXiRga6sPAnRiDQP0GfcnjgluYzQ1uuY0LXUqMpnJq0uVycECql2Z
+         +QgLWvNqT7bGFFRp87aNuB4JphLK0h2+brfqEFbQWmGLBD4Bu1WQv/9tGkBRHa8Es+0U
+         xrYYqSuAB7LJ66DAS3omSCfk8lBczdLPSxNsdQ3EAN16HgpdKA+X6hHMhrPMXy82nAJ5
+         7Jkc57FvutklxQ4kbq19B0JBmTHxvqkECIJZ8JOOzM51SNQfx7oKF7s1SkDTgmebcIBT
+         hZyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788257854; x=1788862654;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20251104; t=1788270530; x=1788875330;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:sender:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=jjjR751nJX1Dlxj+MGQJnqs6zskSNN1F11sy8NVh7g0=;
-        b=PNrRlC85+R8zRNc7+jXbMgxKHGEF6WDrW0t5j4spbJ5x1z3Ly//tMsMo0CYH4rA/Dk
-         8gUns+Vo9b5uaTpLkbDs3t6WB8lJvHwuX3Ku4mo1o87iXxu33/njPeBBQrLxD24u9jNo
-         FWDq02PA5w/dGuK1ech+DHlpqc4DtTH8G0x1tvj0E5dbpqrC5BbUmRXXN8Ks7e/t3hLz
-         /1Sljmzdd5PQQsdJz+i64Rt/3sj0ngn52UGr+vm4AIqke5+GIfb+7pHt5OfrW65XUC8Q
-         fgo9pAns+L5Zb3fnNjdgfpLUo7qbOUFHigpVYj0d2DRySvjnfWFOp1PP2ygEPARsxc9N
-         uO6g==
-X-Forwarded-Encrypted: i=1; AHgh+RrIVJzd7W5DKvxGejYp0wWPAa35ZDHdhImThX7DE2fhaQkhFB212xx6V9degeuXf3n/zpeGiLlJ1T/mLlk=@vger.kernel.org
-X-Gm-Message-State: AFuF++m/Yaq6PgdrOzKNy+5JLt/Vde7immEKmN8pHt8jYiF6kOqnTxKI
-	rF+v2mw6EjslwyRhmW8Qn4fViHNF0p2pdriqaMjVpIFM5amSwGcTXlSQfQJx9O89
-X-Gm-Gg: AYBFou2dkh/CpaAaFhanfmThfVb7bCGunfcKGnKaurphX6YxrBbcr4P6k2m3OdFdyJJ
-	Fggj2pftwoTm0X5uI8XggA9uc786QvjLk0vWccIjxruJ6akGbJrQ0D/FVwVWYPgezycH/92cl76
-	rl9U8ddbK215TjG6lXk0SAhm14uebUAPWdbqyZNfDAZfMRhrFcMDTITcA6tKOyfisrPbiT/wHuz
-	onYzlOVbnMO+3/vzS/5hdTlU5Axuob8ncxNa4rUAShv2WzeUIBK5fLDrImWXf4r+8Bnd9TtyH+u
-	/NW+ibvrcFhf3m/W+3FFFPsZ/f9RnVNcc4yvAfyRLjTj6E1sMwCsXAxdHEp2jbZPnlcQCw1GQYk
-	oSbDKYWmB15PwmwwDLywa95n7w8z1rb4I//fqFmZKXg2MyFMricwsxZDimJ9til86h5qhV4ftjv
-	wergN+rcY019D0F08ND/A2vEcPJk8XGKLaAUnlvf6/HHEbNV/H0wkOn3lAN8DiIN71NSuvX6TX7
-	E2sIiGX25ZHQEOSJQqbe/zD+Q==
-X-Received: by 2002:a05:6102:cd1:b0:781:1ac:8242 with SMTP id ada2fe7eead31-78a0293d570mr1220681137.7.1788257854225;
-        Tue, 01 Sep 2026 03:17:34 -0700 (PDT)
-Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com. [209.85.217.43])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-785f532aa2fsm8754277137.2.2026.09.01.03.17.33
-        for <linux-kbuild@vger.kernel.org>
+        bh=yTQx2GsPa85XjvX9iVGk5mcgWwxcHbSTKInQpmNkpgQ=;
+        b=Q/U1Jxbv5xZdH7YjHuUCA95kmkYqVP31+4fqp7ntGcMAehxQfzHNGDBea4r7ef3tcx
+         NhCkSMIyMtoOZZTAXhMASle1cAe3PUcCBunh4xK4ykawC1JoWSFc4tvIUZhmhsckT69/
+         CwFZXzIoQs2W6pSEq9aRMy5/sQ0U5OrhnqLNfVBvZv+ldqqnFrPZkU+rzQ32RbMQ8fgt
+         04NAmMDP6pTDTuMc3JSHMA3Zjqgk9iZ9yUwVTHk4l5CIPQIjt3/H/LgsM5QbthA/8KYj
+         q7t3XRnl+e1H/PuKdDsQ+K3ww5IzXB1LA0EQ+bwNnFMFRpycUYfZ0JL/sA7dkpfXtx6q
+         DkSw==
+X-Forwarded-Encrypted: i=1; AKwUvBwNItNdvG8K3knDL0KqNegXdMpPruzxYvUllxpITs79jpeXQZjX4lYVMWbQGrtfG/RyDZ/TFVuFvIfPZsM=@vger.kernel.org
+X-Gm-Message-State: AFuF++nSGBvKMAFCXB03OD35YVR9yS87Ms258OYKBOTZ7X695987ClYF
+	aWQvOJRhw2Md7uymCsfdvlAWlZZbMati2dwjwxVEAdfCs4lKCEsxLVaN
+X-Gm-Gg: AYBFou2BOCIxVHm9nrHJxxFuJg5Pgw9T5HKh5KDi6AqRKR7SWN7st4a0N/VXDI3wE6n
+	9Lvz/6t+lA/KdQovsEIupevkJAlKLx4dZ0H2We1HWIJj0Qo8rK9qzWY61Yij/BH1kUnPvfvlnhX
+	mLU9CT3zUytA6kzmwZJ412P2koNsepwWnRGgyMqQqdvEedbEoQ67qesTkJGdd/9AZpJB6OOY+YH
+	BkJDVluJClbNpFPmWhwfDHqFOq48PyofyNA6oY26go/Yn2RJ4oh7XFHJ6tWus1vCg/EYaIKlzrO
+	e9WZ0YxeURK1moyhjF9qQ506Fpq8QpiuwVFotkFdqSEG+0VkF3YnAguiqXbMi6roGH8hA7IB5/5
+	uAXRw1NBJz7nS8dq3eTJx/GUYs2hiWBkE7d8Lud7bzC/VzjS8QL1kLGvZs/pHYeN6Fzz/9VWZgM
+	KgdtWCwbdi5Cy+xXE4hkiQuPieKUl6JKjQ9px0c2kuDIRbDK/0sQcdUWbSO2OXqirq3kLthhzdz
+	x3Amo5mBs6MUFkoJYooMcO18aW/0yA7XFeXe68snvZAwsxAVEGxZEUD
+X-Received: by 2002:a05:6000:4010:b0:482:f528:be4 with SMTP id ffacd0b85a97d-482f79bab3cmr50727081f8f.16.1788270529641;
+        Tue, 01 Sep 2026 06:48:49 -0700 (PDT)
+Received: from [10.128.10.232] (195-23-151-163.net.novis.pt. [195.23.151.163])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48442d3b4f1sm4512147f8f.9.2026.09.01.06.48.48
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Sep 2026 03:17:33 -0700 (PDT)
-Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-7564b7a9490so662475137.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 01 Sep 2026 03:17:33 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+Ro8jSOV39IDJ1cqe0S65gaVKMhy6Pw9VloeCaS+8Y20Hhb4DnoBYKdqhqfONUzCMTuUM0SyrpcWWkrkVUc=@vger.kernel.org
-X-Received: by 2002:a05:6102:1a06:10b0:787:ebf8:77ad with SMTP id
- ada2fe7eead31-78a02a6eb7fmr955834137.18.1788257853731; Tue, 01 Sep 2026
- 03:17:33 -0700 (PDT)
+        Tue, 01 Sep 2026 06:48:49 -0700 (PDT)
+Sender: Julian Braha <julian.braha@gmail.com>
+Message-ID: <0c445767-a4fa-4c44-b81a-64863be3de2d@gmail.com>
+Date: Tue, 1 Sep 2026 14:48:47 +0100
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260830221129.2668354-1-julianbraha@gmail.com> <CAMuHMdWkPtJinDa10S_r7Pj2DTgcKpwgxt7U3tqm7fnSwGxm-Q@mail.gmail.com>
-In-Reply-To: <CAMuHMdWkPtJinDa10S_r7Pj2DTgcKpwgxt7U3tqm7fnSwGxm-Q@mail.gmail.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Tue, 1 Sep 2026 12:17:22 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdUywobKkt5Zozh3GdOW57nF_XhydJh7PaqTBoGB-2XvTQ@mail.gmail.com>
-X-Gm-Features: AcwNN1XlRAlFl-Ap4ZBsvizrQPe_wtXEO1vr6JdvvpwQv8gi-7uGjhpumvEIf0U
-Message-ID: <CAMuHMdUywobKkt5Zozh3GdOW57nF_XhydJh7PaqTBoGB-2XvTQ@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] kconfig: fix extra output from savedefconfig on
  out-of-range defaults
-To: Julian Braha <julianbraha@gmail.com>
-Cc: nathan@kernel.org, nsc@kernel.org, xiang@kernel.org, chao@kernel.org, 
-	zbestahu@gmail.com, jefflexu@linux.alibaba.com, dhavale@google.com, 
-	hongbohbli@tencent.com, guochunhai@vivo.com, michael.bommarito@gmail.com, 
-	kees@kernel.org, vegard.nossum@oracle.com, sam@ravnborg.org, 
-	u.kleine-koenig@pengutronix.de, mmarek@suse.cz, linux-kernel@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, 
-	"open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: nathan@kernel.org, nsc@kernel.org, xiang@kernel.org, chao@kernel.org,
+ zbestahu@gmail.com, jefflexu@linux.alibaba.com, dhavale@google.com,
+ hongbohbli@tencent.com, guochunhai@vivo.com, michael.bommarito@gmail.com,
+ kees@kernel.org, vegard.nossum@oracle.com, sam@ravnborg.org,
+ u.kleine-koenig@pengutronix.de, mmarek@suse.cz,
+ linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+ "open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>,
+ Arnd Bergmann <arnd@arndb.de>,
+ "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, mpe@ellerman.id.au
+References: <20260830221129.2668354-1-julianbraha@gmail.com>
+ <CAMuHMdWkPtJinDa10S_r7Pj2DTgcKpwgxt7U3tqm7fnSwGxm-Q@mail.gmail.com>
+ <CAMuHMdUywobKkt5Zozh3GdOW57nF_XhydJh7PaqTBoGB-2XvTQ@mail.gmail.com>
+Content-Language: en-US
+From: Julian Braha <julianbraha@gmail.com>
+In-Reply-To: <CAMuHMdUywobKkt5Zozh3GdOW57nF_XhydJh7PaqTBoGB-2XvTQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, 31 Aug 2026 at 14:36, Geert Uytterhoeven <geert@linux-m68k.org> wrote:
-> On Mon, 31 Aug 2026 at 00:12, Julian Braha <julianbraha@gmail.com> wrote:
-> > The Kconfig interpreter currently allows defaults that are outside of the
-> > range bounds.
-> >
-> > In these cases, the 'sym_validate_range' function will adjust the default
-> > value to the nearest range bound. For example, see this example:
-> >
-> >   config A
-> >     int
-> >     range 1 2
-> >     default 16
-> >
-> > Here, since the default value of 16 is greater than the bounds, the
-> > effective default value gets adjusted down to the upper bound, 2.
-> >
-> > However, 'savedefconfig' writes non-default values, and without being
->
-> s/non-default/non-adjusted/?
->
-> > aware of the automatic adjustment to the range bound, it would write: A=2
-> >
-> > This limitation is also documented in a comment: "The following fails to
-> > handle the situation where a default value is further limited by the valid
-> > range."
-> >
-> > To resolve this, let's factor out the default-range adjustment logic from
-> > the existing 'sym_validate_range' function into its own
-> > 'sym_get_near_range_bound' function for 'savedefconfig' to use too, so
-> > that it compares against the effective value.
-> >
-> > Adds tests, accordingly.
-> >
-> > Fixes: 7cf3d73b4360 ("kconfig: add savedefconfig")
-> > Assisted-by: Codex:gpt-5.6-sol
-> > Reported-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> > Closes: https://lore.kernel.org/lkml/CAMuHMdVyUAA3L4mUkSjmnuE3cvj-+N8z-Bhxsh1wa-FQWc=fjw@mail.gmail.com/
-> > Signed-off-by: Julian Braha <julianbraha@gmail.com>
->
-> Thanks, this fixes the issue, and would let us revert commit
-> ab74edaeb1ae7c71 ("erofs: Fix EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS
-> default logic") in v7.3-rc1.
->
-> Tested-by: Geert Uytterhoeven <geert+renesas@glider.be>
+CC: Arnd, Christophe
 
-FTR, this will impact all defconfigs that restrict SERIAL_8250_NR_UARTS
-to a value lower than 4:
+On 9/1/26 11:17, Geert Uytterhoeven wrote:
 
-    config SERIAL_8250_NR_UARTS
-            int "Maximum number of 8250/16550 serial ports"
-            depends on SERIAL_8250
-            default "4"
+> FTR, this will impact all defconfigs that restrict SERIAL_8250_NR_UARTS
+> to a value lower than 4:
+> 
+>     config SERIAL_8250_NR_UARTS
+>             int "Maximum number of 8250/16550 serial ports"
+>             depends on SERIAL_8250
+>             default "4"
+> 
+>     config SERIAL_8250_RUNTIME_UARTS
+>             int "Number of 8250/16550 serial ports to register at runtime"
+>             depends on SERIAL_8250
+>             range 0 SERIAL_8250_NR_UARTS
+>             default "4"
 
-    config SERIAL_8250_RUNTIME_UARTS
-            int "Number of 8250/16550 serial ports to register at runtime"
-            depends on SERIAL_8250
-            range 0 SERIAL_8250_NR_UARTS
-            default "4"
+I suspected that there could be some cases where these out-of-range
+defaults were actually accidents and causing bugs, so I added a check
+with my SMT solver [1], which also detected these two (powerpc-only):
 
-Gr{oetje,eeting}s,
 
-                        Geert
+  config DATA_SHIFT
+    int "Data shift" if DATA_SHIFT_BOOL
+    default 24 if STRICT_KERNEL_RWX && PPC64
+    range 17 28 if (STRICT_KERNEL_RWX || DEBUG_PAGEALLOC || KFENCE) &&
+PPC_BOOK3S_32
+    range 14 23 if (STRICT_KERNEL_RWX || DEBUG_PAGEALLOC || KFENCE) &&
+PPC_8xx
+    range 20 24 if (STRICT_KERNEL_RWX || DEBUG_PAGEALLOC || KFENCE) &&
+PPC_85xx
+    default 22 if STRICT_KERNEL_RWX && PPC_BOOK3S_32
+    default 18 if (DEBUG_PAGEALLOC || KFENCE) && PPC_BOOK3S_32
+    default 23 if (STRICT_KERNEL_RWX || DEBUG_PAGEALLOC || KFENCE) &&
+PPC_8xx && \
+      (PIN_TLB_DATA || PIN_TLB_TEXT)
+    default 19 if (STRICT_KERNEL_RWX || DEBUG_PAGEALLOC || KFENCE) &&
+PPC_8xx
+    default 24 if STRICT_KERNEL_RWX && PPC_85xx
+    default PAGE_SHIFT
 
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+  config MODULES_SIZE
+    int "Size of modules/execmem area (In Mbytes)" if MODULES_SIZE_BOOL
+    range 1 256 if EXECMEM
+    default 64 if EXECMEM && PPC_BOOK3S_32
+    default 32 if EXECMEM && PPC_8xx
+    default 0
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+
+The DATA_SHIFT case may be bug, where it should be 12, but incorrectly
+adjusts to 20 when:
+  PPC_85xx=y
+
+  DEBUG_PAGEALLOC=y
+
+  STRICT_KERNEL_RWX=n
+
+  PAGE_SHIFT=12
+
+The MODULES_SIZE case seems harmless since the only systems using that
+option are PPC_BOOK3S_32 and PPC_8xx.
+
+Anyway, this change to savedefconfig would also affect those 2.
+
+[1] https://github.com/julianbraha/kconfirm/tree/smt
+
+- Julian Braha
+
+
