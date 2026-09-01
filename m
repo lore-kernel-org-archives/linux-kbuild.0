@@ -1,118 +1,148 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C9D83C81B2;
-	Tue,  1 Sep 2026 01:46:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85ECB37B40E
+	for <linux-kbuild@vger.kernel.org>; Tue,  1 Sep 2026 10:17:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788227213; cv=none; b=InYkMMPi78jgW4xpSS3QIdin4df02OrgNJs/PZCL6++0RKXxPhOUFrwZUcZym3oP4TozqB57RYFO5VaSiieP6ljfZwpR0LCAB2n19XpnZJHT7z0kkEQfg9siMSrRgENd1va22ZQv3BYiF+XFWYMSmUcXAM+iu6qkxrepIupzgAk=
+	t=1788257857; cv=none; b=gZGPyGwUxEcA+eWLCXNExe6awphjuZcv95zhVQihc+c/T40Z1uA6t6D43kgmyJu7zJKyPmjTuLHhRanuEKOOmHt1BZqkzfsPykGR+/FI3sQubnv4ZT/V+BB+DdTYaeMwAGmj5IWPrmrnOSaRF+IBkVEMIzfYFtS4LIjXBI9AAGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788227213; c=relaxed/simple;
-	bh=9ZxkfOw4TOE1Obq8/2i/Q1JnSICiUGC/3m4Hm3cdZxU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=kAsXNq3XomVl5H6Q4frIqvdpPAySqXw8vqX/RCYTIR/mB/Bly4D9TRJUNyW61c1wDsU6VBKRfu//VdUxbPCZ9yvBidBRy/PLrCyaOw908tc+XidBkkg/Y10ERjGLpqMhboi7s2Zab6wChv144mQWZWjFPYUWKOTQxqopDTN++rA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QU3QSXFP; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QU3QSXFP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B39551F000E9;
-	Tue,  1 Sep 2026 01:46:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788227198;
-	bh=tv/giztluJ3mJ3RD/dlXAJAOrQrL283c0fCKgwhPQNw=;
-	h=From:Date:Subject:To:Cc;
-	b=QU3QSXFP8x1XBB2jqxBwYMIYC6tpOLXpJIxKHzWmZF+v3OYf22PrEiVCgo92nFeXa
-	 JQaHAMGUP2etlCoyZrEjas5G/HZCLEnZDYnnm8XAy8Ph0urEGPjZAxfPKlz9Pu8P/9
-	 78gVz7MQ8b2ephK9Tbo8KCVQbnRmZhijkxIPDR8nhD/VuOmME1nrI0WIgRg98XK8NJ
-	 wQFgMmJ4BS1zLHnFzBHFt0nAhZRDOAhvrgalkbRDCnaK3ro5UgnzMp+HOTpJeKtiCL
-	 PxRiue+v22OwsenIxO1eMX0MFwFnPNxcKNK1nosXtdhkqelL67k+zXOiI130Z7MNrl
-	 d0f7wucaYad5A==
-From: Nathan Chancellor <nathan@kernel.org>
-Date: Mon, 31 Aug 2026 18:46:31 -0700
-Subject: [PATCH] scripts/sorttable: Mark long_size as __maybe_unused
+	s=arc-20240116; t=1788257857; c=relaxed/simple;
+	bh=f3IaTrQW3PdwJG2CI8iddb29hq+NAzAZPlqiyZ/dPEc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=elxCcBuF3b0pfSh5i+oulK/G+9ZXa1OTzNOvVfcVe1tLOUzqJ9hbnAj/5MJ9vCpQPsZK+Jkh0jkdYmpUiDtE/qyR6gaTBAAgqKKcsf7lIUWVkHZ1LyuYlY3OTK0Osk1+lkJx39uxwrBhXpnyrHCyqUsiOhBNF3fY3i9G93PrgEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-5c6670fd413so730245e0c.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 01 Sep 2026 03:17:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788257854; x=1788862654;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=jjjR751nJX1Dlxj+MGQJnqs6zskSNN1F11sy8NVh7g0=;
+        b=PNrRlC85+R8zRNc7+jXbMgxKHGEF6WDrW0t5j4spbJ5x1z3Ly//tMsMo0CYH4rA/Dk
+         8gUns+Vo9b5uaTpLkbDs3t6WB8lJvHwuX3Ku4mo1o87iXxu33/njPeBBQrLxD24u9jNo
+         FWDq02PA5w/dGuK1ech+DHlpqc4DtTH8G0x1tvj0E5dbpqrC5BbUmRXXN8Ks7e/t3hLz
+         /1Sljmzdd5PQQsdJz+i64Rt/3sj0ngn52UGr+vm4AIqke5+GIfb+7pHt5OfrW65XUC8Q
+         fgo9pAns+L5Zb3fnNjdgfpLUo7qbOUFHigpVYj0d2DRySvjnfWFOp1PP2ygEPARsxc9N
+         uO6g==
+X-Forwarded-Encrypted: i=1; AHgh+RrIVJzd7W5DKvxGejYp0wWPAa35ZDHdhImThX7DE2fhaQkhFB212xx6V9degeuXf3n/zpeGiLlJ1T/mLlk=@vger.kernel.org
+X-Gm-Message-State: AFuF++m/Yaq6PgdrOzKNy+5JLt/Vde7immEKmN8pHt8jYiF6kOqnTxKI
+	rF+v2mw6EjslwyRhmW8Qn4fViHNF0p2pdriqaMjVpIFM5amSwGcTXlSQfQJx9O89
+X-Gm-Gg: AYBFou2dkh/CpaAaFhanfmThfVb7bCGunfcKGnKaurphX6YxrBbcr4P6k2m3OdFdyJJ
+	Fggj2pftwoTm0X5uI8XggA9uc786QvjLk0vWccIjxruJ6akGbJrQ0D/FVwVWYPgezycH/92cl76
+	rl9U8ddbK215TjG6lXk0SAhm14uebUAPWdbqyZNfDAZfMRhrFcMDTITcA6tKOyfisrPbiT/wHuz
+	onYzlOVbnMO+3/vzS/5hdTlU5Axuob8ncxNa4rUAShv2WzeUIBK5fLDrImWXf4r+8Bnd9TtyH+u
+	/NW+ibvrcFhf3m/W+3FFFPsZ/f9RnVNcc4yvAfyRLjTj6E1sMwCsXAxdHEp2jbZPnlcQCw1GQYk
+	oSbDKYWmB15PwmwwDLywa95n7w8z1rb4I//fqFmZKXg2MyFMricwsxZDimJ9til86h5qhV4ftjv
+	wergN+rcY019D0F08ND/A2vEcPJk8XGKLaAUnlvf6/HHEbNV/H0wkOn3lAN8DiIN71NSuvX6TX7
+	E2sIiGX25ZHQEOSJQqbe/zD+Q==
+X-Received: by 2002:a05:6102:cd1:b0:781:1ac:8242 with SMTP id ada2fe7eead31-78a0293d570mr1220681137.7.1788257854225;
+        Tue, 01 Sep 2026 03:17:34 -0700 (PDT)
+Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com. [209.85.217.43])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-785f532aa2fsm8754277137.2.2026.09.01.03.17.33
+        for <linux-kbuild@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Sep 2026 03:17:33 -0700 (PDT)
+Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-7564b7a9490so662475137.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 01 Sep 2026 03:17:33 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+Ro8jSOV39IDJ1cqe0S65gaVKMhy6Pw9VloeCaS+8Y20Hhb4DnoBYKdqhqfONUzCMTuUM0SyrpcWWkrkVUc=@vger.kernel.org
+X-Received: by 2002:a05:6102:1a06:10b0:787:ebf8:77ad with SMTP id
+ ada2fe7eead31-78a02a6eb7fmr955834137.18.1788257853731; Tue, 01 Sep 2026
+ 03:17:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260831-sorttable-long_size-unused-but-set-global-v1-1-8a96b88697e5@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXN0QoCIRBA0V9Z5rkBdWHb+pWIUHeyCdFwNKJl/
- z2rx/Ny7wpChUngOKxQ6MnCOXXo3QD+ZlMg5KUbjDKTmkeNkkut1kXCmFO4CL8JW2pCC7pWUah
- iiNnZiGYyXs370Wp7gN57FLry6/c6nf+W5u7k63cA2/YBchsEko0AAAA=
-X-Change-ID: 20260831-sorttable-long_size-unused-but-set-global-262c0873a1a9
-To: Steven Rostedt <rostedt@goodmis.org>, Nicolas Schier <nsc@kernel.org>
-Cc: Nick Desaulniers <ndesaulniers@google.com>, 
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
- linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
- llvm@lists.linux.dev, stable@vger.kernel.org, 
- Nathan Chancellor <nathan@kernel.org>
-X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2119; i=nathan@kernel.org;
- h=from:subject:message-id; bh=9ZxkfOw4TOE1Obq8/2i/Q1JnSICiUGC/3m4Hm3cdZxU=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDFnT9Cr/zv6ov/LiJsZC/iOTVGze1d6xCZ3R0fJHtDI6+
- Jx7nOy6jhIWBjEuBlkxRZbqx6rHDQ3nnGW8cWoSzBxWJpAhDFycAjCRn3MZfmya8nb7sfn/RftC
- DjoIKPRviG9jnuDeOevD7ZWNK70kDBn+OzHdfSGpHXpedyl/Y9revT9Z+dUijPJyBMSWqfjslHr
- JAQA=
-X-Developer-Key: i=nathan@kernel.org; a=openpgp;
- fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
+References: <20260830221129.2668354-1-julianbraha@gmail.com> <CAMuHMdWkPtJinDa10S_r7Pj2DTgcKpwgxt7U3tqm7fnSwGxm-Q@mail.gmail.com>
+In-Reply-To: <CAMuHMdWkPtJinDa10S_r7Pj2DTgcKpwgxt7U3tqm7fnSwGxm-Q@mail.gmail.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 1 Sep 2026 12:17:22 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdUywobKkt5Zozh3GdOW57nF_XhydJh7PaqTBoGB-2XvTQ@mail.gmail.com>
+X-Gm-Features: AcwNN1XlRAlFl-Ap4ZBsvizrQPe_wtXEO1vr6JdvvpwQv8gi-7uGjhpumvEIf0U
+Message-ID: <CAMuHMdUywobKkt5Zozh3GdOW57nF_XhydJh7PaqTBoGB-2XvTQ@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: fix extra output from savedefconfig on
+ out-of-range defaults
+To: Julian Braha <julianbraha@gmail.com>
+Cc: nathan@kernel.org, nsc@kernel.org, xiang@kernel.org, chao@kernel.org, 
+	zbestahu@gmail.com, jefflexu@linux.alibaba.com, dhavale@google.com, 
+	hongbohbli@tencent.com, guochunhai@vivo.com, michael.bommarito@gmail.com, 
+	kees@kernel.org, vegard.nossum@oracle.com, sam@ravnborg.org, 
+	u.kleine-koenig@pengutronix.de, mmarek@suse.cz, linux-kernel@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, 
+	"open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-When building in a kernel tree prior to commit b055f4c431e3 ("sorttable:
-Move ELF parsing into scripts/elf-parse.[ch]") with clang-23 or newer,
-which implements a new warning under -Wunused-but-set-variable for
-static global variable, there is a warning from sorttable because
-long_size is unused when MCOUNT_SORT_ENABLED is not set:
+On Mon, 31 Aug 2026 at 14:36, Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+> On Mon, 31 Aug 2026 at 00:12, Julian Braha <julianbraha@gmail.com> wrote:
+> > The Kconfig interpreter currently allows defaults that are outside of the
+> > range bounds.
+> >
+> > In these cases, the 'sym_validate_range' function will adjust the default
+> > value to the nearest range bound. For example, see this example:
+> >
+> >   config A
+> >     int
+> >     range 1 2
+> >     default 16
+> >
+> > Here, since the default value of 16 is greater than the bounds, the
+> > effective default value gets adjusted down to the upper bound, 2.
+> >
+> > However, 'savedefconfig' writes non-default values, and without being
+>
+> s/non-default/non-adjusted/?
+>
+> > aware of the automatic adjustment to the range bound, it would write: A=2
+> >
+> > This limitation is also documented in a comment: "The following fails to
+> > handle the situation where a default value is further limited by the valid
+> > range."
+> >
+> > To resolve this, let's factor out the default-range adjustment logic from
+> > the existing 'sym_validate_range' function into its own
+> > 'sym_get_near_range_bound' function for 'savedefconfig' to use too, so
+> > that it compares against the effective value.
+> >
+> > Adds tests, accordingly.
+> >
+> > Fixes: 7cf3d73b4360 ("kconfig: add savedefconfig")
+> > Assisted-by: Codex:gpt-5.6-sol
+> > Reported-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> > Closes: https://lore.kernel.org/lkml/CAMuHMdVyUAA3L4mUkSjmnuE3cvj-+N8z-Bhxsh1wa-FQWc=fjw@mail.gmail.com/
+> > Signed-off-by: Julian Braha <julianbraha@gmail.com>
+>
+> Thanks, this fixes the issue, and would let us revert commit
+> ab74edaeb1ae7c71 ("erofs: Fix EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS
+> default logic") in v7.3-rc1.
+>
+> Tested-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
-  scripts/sorttable.c:452:12: error: variable 'long_size' set but not used [-Werror,-Wunused-but-set-global]
-    452 | static int long_size;
-        |            ^
+FTR, this will impact all defconfigs that restrict SERIAL_8250_NR_UARTS
+to a value lower than 4:
 
-Mark long_size as __maybe_unused to avoid inserting more ugly #ifdef
-directives while insuring the warning does not reappear, as the
-aforementioned change does not alter the uses of long_size, so it
-appears to be coincidence that the warning disappears after this
-refactoring.
+    config SERIAL_8250_NR_UARTS
+            int "Maximum number of 8250/16550 serial ports"
+            depends on SERIAL_8250
+            default "4"
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Nathan Chancellor <nathan@kernel.org>
----
-This is breaking our builds on stable:
+    config SERIAL_8250_RUNTIME_UARTS
+            int "Number of 8250/16550 serial ports to register at runtime"
+            depends on SERIAL_8250
+            range 0 SERIAL_8250_NR_UARTS
+            default "4"
 
-  https://github.com/ClangBuiltLinux/continuous-integration2/actions/runs/33143924291
+Gr{oetje,eeting}s,
 
-There was a previous patch sent for this issue
+                        Geert
 
-  https://lore.kernel.org/20260603191708.27241-1-beakthoven@gmail.com/
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-but it was marked as stable only. I think this should be taken via
-mainline and backported the normal way, as it appears to be coincidence
-that the warning is not present in mainline. It does not look like
-scripts/sorttable.c has a formal owner according to MAINTAINERS so this
-could either go through one of Steve's trees or the kbuild tree.
----
- scripts/sorttable.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/scripts/sorttable.c b/scripts/sorttable.c
-index d8dc2a1b7c31..d7b50581c732 100644
---- a/scripts/sorttable.c
-+++ b/scripts/sorttable.c
-@@ -116,7 +116,7 @@ static inline void *get_index(void *start, int entsize, int index)
- }
- 
- static int extable_ent_size;
--static int long_size;
-+static int long_size __maybe_unused;
- 
- #define ERRSTR_MAXSZ	256
- 
-
----
-base-commit: cee9395acd8043be0644b25c34bfa86623f2b935
-change-id: 20260831-sorttable-long_size-unused-but-set-global-262c0873a1a9
-
-Best regards,
---  
-Cheers,
-Nathan
-
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
