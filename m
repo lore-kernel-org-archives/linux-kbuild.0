@@ -1,74 +1,113 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38C183C3F6B;
-	Thu,  3 Sep 2026 20:27:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B99481FD1;
+	Thu,  3 Sep 2026 22:28:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788467244; cv=none; b=Rj2jEUTVW64vPx5M05PHY5fVGvxTjL9H+FYD5YdCIsefcOQ9PEj/r6wiAcfeykl6so8UV9lPoTVnjPCsJJ6FBLGqCnX8xf0Ql9NFa/bvyOxh7QDqiIbkW17I5K525SmS4z1CM7aRtKjjZNRC11ctFEL9w+Cjk8IxNmEwxcRTRsg=
+	t=1788474540; cv=none; b=DSRhdzEpJ98n3Ova0shb4eBN0L5Slsx6vtQhQ/Rjt2nJ5Q+kkvbM+ydc+hQt+K/Xmy4aizA7HI68+8eOEcvP0lWXnRIwn7wnAwMFbFyJDadMh8irx7zvxtHPgz7KBewsy/SDJEharv8ky7jJihMjao+nkF1irFPbuvLJ7cUJ3iw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788467244; c=relaxed/simple;
-	bh=l91/UGkIDrl42dnGZ8e+BDegYiQ2Y+Zc+gpuFCj9TVE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b8UkrJB8d9K2hhdQHxKigWIezRZb3VKRDQXuyJlNr06jIr5edUoHqDanpFJgdobIBImxQgmXSUjzvW6Ne3hwTSVqnqHhq+9OCwJB2ik650DLOzOjalZUjfrkcKZjJtlIsL5dd1hTkr3TihkZdLcNm4G7d7+jufPFFHPNDMYj0D8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UEOKV5xL; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788474540; c=relaxed/simple;
+	bh=SyITXCnjJlaxlH52HX2p2vD8eItiZZmrSazF0nbgEjQ=;
+	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
+	 References:Date:Message-Id; b=N5i9bREUdxcY3kuLVWRDB1l64j7cKlvCLINsZZf/sVfaezMEgPU+Mv0MdM6ssp3mSo7ha5EQUH6ERYaxbKeA6BwBkcmD76Uc+XIcWeH69JITbXG4ZzMh4cLkBsLC7JqV5bkPpmrp1OIAMi8ZMGq1KhTpu5WxvZEvW65a53835UM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fdnVy40B; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UEOKV5xL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C6571F000E9;
-	Thu,  3 Sep 2026 20:27:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fdnVy40B"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A5C61F00A3D;
+	Thu,  3 Sep 2026 22:28:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788467225;
-	bh=elkp0fXEfvHG6ANCalHkLSTiGly333WXYxFdC6tJUZg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=UEOKV5xL2pQxlkjJ1XVy7dMHYWTQqpMC63KRwDOArms6ZDlYnhluOig5OX27kLFPV
-	 0B4mLTol/O9bYfPMciSNSfxJy8nc1tpWePKtvbI7WaPKsVZYjXrYDK1D6j/Hq8vUze
-	 k6F8kZyhE7jrM+vVLxGsqy3vmWkbYMsyiL5gY/qUhgm6zt4FBBUv5Xc3c5XtIGz7Oc
-	 J756KeB4ZdWJUuo10pBpcGt5lv5tosWkL6OuxngnDtMmGrsIwKwrR2+hfQai6fGgK+
-	 9Zl5vBTazLyddJLAE9DCDia5KNbHPpyAoJLLwErRoaQjRJMlApJO5OvQqDoaSWfPNK
-	 pFhHfK2hr7zCw==
-Date: Thu, 3 Sep 2026 13:27:00 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Guillaume Tucker <gtucker@gtucker.io>
-Cc: Jonathan Corbet <corbet@lwn.net>, Miguel Ojeda <ojeda@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>, linux-doc@vger.kernel.org,
-	workflows@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kbuild@vger.kernel.org,
-	automated-testing@lists.yoctoproject.org,
-	"kernelci@lists.linux.dev" <kernelci@lists.linux.dev>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Onur =?iso-8859-1?Q?=D6zkan?= <work@onurozkan.dev>
-Subject: Re: [PATCH 1/2] scripts: add TOML config to container tool
-Message-ID: <20260903202700.GA3790602@ax162>
-References: <7d8ba914cd174d716340bb2b88723bef0f330627.1787565460.git.gtucker@gtucker.io>
- <apG3hwaPA8f7SJeI@levanger>
- <b45e7864-928c-4b3c-aa62-64f4f63d85c7@gtucker.io>
- <ed43b869-6fd4-4b00-8fd2-e9dd9aaf3349@gtucker.io>
+	s=k20260515; t=1788474538;
+	bh=jefocC3SdEz+teSp9iBjOKBiNcjgY2UDGd3nAgnVDLk=;
+	h=Subject:From:To:Cc:In-Reply-To:References:Date;
+	b=fdnVy40B/KXBTrSyIGoVn3phAZvpkFa/F1KosDiMDxT/Y04cLDqU+ECvKZpE8PGLJ
+	 a4HGOlI47rioW/5Z6yjpafoQAcMeIN8QmbwHVhKoXU82Bbng8DYKq2+nSkDB1LgaTw
+	 0SxssdmUY7XwiScLN96O7V7PLuN4mS5bTT5SUYLcIvuhUYEm8iCfHTyhYNWimdAyNe
+	 fsjenl9ln09wdjjFE/NfyPHmden7ADl4vwzXSpQz+GiFNhN1sJ4UXoFaDaWiFwGBFI
+	 H96wuwMpV24tY1bbLrAF7Xhh7pDBeXMx+kLk9FJYVNhLovZA21VX5tK/+k0xvpXWMe
+	 gaVCycnYl6N6g==
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ed43b869-6fd4-4b00-8fd2-e9dd9aaf3349@gtucker.io>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH] kconfig: fix extra output from savedefconfig on
+ out-of-range defaults
+From: Nathan Chancellor <nathan@kernel.org>
+To: Julian Braha <julianbraha@gmail.com>
+Cc: nathan@kernel.org, nsc@kernel.org, geert@linux-m68k.org, 
+ xiang@kernel.org, chao@kernel.org, zbestahu@gmail.com, 
+ jefflexu@linux.alibaba.com, dhavale@google.com, hongbohbli@tencent.com, 
+ guochunhai@vivo.com, michael.bommarito@gmail.com, kees@kernel.org, 
+ vegard.nossum@oracle.com, sam@ravnborg.org, u.kleine-koenig@pengutronix.de, 
+ mmarek@suse.cz, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+ Geert Uytterhoeven <geert+renesas@glider.be>
+In-Reply-To: <20260830221129.2668354-1-julianbraha@gmail.com>
+References: <20260830221129.2668354-1-julianbraha@gmail.com>
+Date: Thu, 03 Sep 2026 15:28:42 -0700
+Message-Id: <178847452255.440755.3609720780671235760.b4-review@b4>
+X-Mailer: b4 0.17-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1926; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=SyITXCnjJlaxlH52HX2p2vD8eItiZZmrSazF0nbgEjQ=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDFkzvywKaDxtVb26870DI8OhooWfm9JC4tct4WPx+3xbp
+ mjjmSU+HaUsDGJcDLJiiizVj1WPGxrOOct449QkmDmsTCBDGLg4BWAi19kY/rtq5DOKXON6tvOE
+ upXpxuJXK8u0n89hPLxtfXvjqSc2XZcZGfrNqqbUbPl8xNZXSvzKunlBMXbGQVGlDquW3tq4//H
+ H14wA
+X-Developer-Key: i=nathan@kernel.org; a=openpgp;
+ fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-On Wed, Sep 02, 2026 at 12:26:29PM +0200, Guillaume Tucker wrote:
-> So to recap, here's what I would suggest:
+> The Kconfig interpreter currently allows defaults that are outside of the
+> range bounds.
 > 
-> * keep Python 3.10 for this series, continue discussion about minimum
->   and optional version numbers tree-wide in other threads
+> In these cases, the 'sym_validate_range' function will adjust the default
+> value to the nearest range bound. For example, see this example:
 > 
-> * drop registry config file option in v4 then add it in a follow-up
->   series along with image name validation and parsing using regex
+>   config A
+>     int
+>     range 1 2
+>     default 16
 > 
-> * leave TypeError exceptions as-is in this series, improve user
->   experience and error handling altogether in another follow-up
+> Here, since the default value of 16 is greater than the bounds, the
+> effective default value gets adjusted down to the upper bound, 2.
+> 
+> However, 'savedefconfig' writes non-default values, and without being
+> aware of the automatic adjustment to the range bound, it would write: A=2
 
-Sure, I think this sounds fine. I tend to ignore existing issue comments
-from Sashiko when it comes to accepting a series, I would always prefer
-them to be handled in a separate series.
+Should that 'A=2' be 'A=16'?
+
+> This limitation is also documented in a comment: "The following fails to
+> handle the situation where a default value is further limited by the valid
+> range."
+> 
+> To resolve this, let's factor out the default-range adjustment logic from
+> the existing 'sym_validate_range' function into its own
+> 'sym_get_near_range_bound' function for 'savedefconfig' to use too, so
+> that it compares against the effective value.
+> 
+> Adds tests, accordingly.
+> 
+> Fixes: 7cf3d73b4360 ("kconfig: add savedefconfig")
+> Assisted-by: Codex:gpt-5.6-sol
+> Reported-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> Closes: https://lore.kernel.org/lkml/CAMuHMdVyUAA3L4mUkSjmnuE3cvj-+N8z-Bhxsh1wa-FQWc=fjw@mail.gmail.com/
+> Signed-off-by: Julian Braha <julianbraha@gmail.com>
+
+Thanks for the patch!
+
+Reviewed-by: Nathan Chancellor <nathan@kernel.org>
+
+Given this is a long standing issue, it should probably go via
+kbuild-next for 7.4, especially in case this results in problems like
+noted downthread. I would revert commit ab74edaeb1ae ("erofs: Fix
+EROFS_FS_ZIP_LZMA_DEFAULT_MAX_STREAMS default logic") on top of that.
+
+I will wait a little bit for the folks CC'd downthread to reply to those
+instances impacted by this change before applying this.
 
 -- 
 Cheers,
 Nathan
+
