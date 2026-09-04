@@ -1,89 +1,85 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.avm.de (mail.avm.de [212.42.244.119])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEE553911B5;
-	Fri,  4 Sep 2026 18:19:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73FE651E437;
+	Fri,  4 Sep 2026 18:34:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788545983; cv=none; b=TpqsvXfvWssaCiZUaOXX87Q96hbqcGy0u+n5BnEt2c1TfG/7ytLPiYkeqYP5p/AErfAY22SHQ5da8NLCcwBS7C1uJrQDhW3hxYZ7MDo1WmIAL/elTyBJ2sQb4u7RN1Na/d+4kaowMP59gY3lIXd0atgtMVibgSGAVOYic8oCIhU=
+	t=1788546868; cv=none; b=pLLJnPf/z+U5pilgikAJlc9TIO0LNXy/mLMLSkyI0y6oHgV6ig9qdtkxjtXNB7j1WIPOfRBJcsgPhCQfLvVJxMGxafOgT/CAIitSl8D1HMeeRZVnNQTFNfQphvOcsvFccrpdRdFaQTcadtxnRyl0BXcMDGnSNrOQZ+hYtO0cn6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788545983; c=relaxed/simple;
-	bh=K67UAh45lnHiRxuKGWLeFyuTLdyFRfNm+f8uGnyvfx0=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=fxXgkAK/m3J5VmrzuTCFlKhJls5z7W7E7rYRkAsThdOTthCqUaRZmEVksKr0LxyrhflC5a8KGgsks5VUdyBLNvQRfQ3Fe85JAq2V/In2ac61Fzh6zbc+Mp5brTBvtNVouSC0JYubP8SHP8ATOYT4IcJPnH0F/ytwloiTBrXV0ec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a6ZJq9kI; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788546868; c=relaxed/simple;
+	bh=lt27UchPaDdsqKXnly6UKAN5TMB885tT3yzomVzDTSE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oifutjMi6Nai547jcNXBNoUYJYqlWXVBmDVvd8aWpAZv59x/kMSRZgVXlDewAgvPeNgxgNX9q8ihtifrZxmkyOv9RvoZrcqyGta+Ed6YMXEF7u+1+1FL81Z7y8/tvXjkPeWHFBiuf8FZGQcSUCscDy07awCfD/WG1/QTxzqlBzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com; spf=pass smtp.mailfrom=fritz.com; dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b=ZA7WEWT8; arc=none smtp.client-ip=212.42.244.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fritz.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a6ZJq9kI"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id E370B1F00A3D;
-	Fri,  4 Sep 2026 18:19:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788545982;
-	bh=62jm9Q77S2sVZx0JPQ7aMm4YDbqkZyG9GTqZdJ8kxUg=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date;
-	b=a6ZJq9kIsIVCK6/Fjg8Td1RT85Fn0E0YjzWuzBazyUtqo1zVcL3MVaXQ2q6c/Izs7
-	 8N1MB9R/SUGbQG+sCokn3qiLjKV0KKHn5sHpIsyGEhNwhI2MUOV8jyZqX5UsSpmnWJ
-	 f5Dm+oBcKUBPSaoT4nvVnVTzZRu0du/Q2RqF1XXGCJcYfpgSgM4KLsfrMnHsEc/Yve
-	 d9egC3AmYhENDVAb9bujt9sVQ+Fve42gt+IQb4gCRU7kIs25Dhv0z53iuHGJ2JxobY
-	 RCgfnaKTuWG7DuJ0ZHc1MosIbgZ6yVOD+c8Uc5l++OJXRr3JaPgrPDoKJYqgo33foQ
-	 cKW/BmeJHDxbg==
-From: Nicolas Schier <nsc@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>, 
- Vlad Poenaru <vlad.wing@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
- regressions@lists.linux.dev, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-In-Reply-To: <20260902161347.4163577-1-vlad.wing@gmail.com>
-References: <20260902161347.4163577-1-vlad.wing@gmail.com>
-Subject: Re: [PATCH] kbuild: don't delete in-flight filechk temporaries in
- asm-headers
-Message-Id: <178854595964.42024.7648905452681649287.b4-ty@b4>
-Date: Fri, 04 Sep 2026 20:19:19 +0200
+	dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b="ZA7WEWT8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fritz.com; s=mail;
+	t=1788546851; bh=lt27UchPaDdsqKXnly6UKAN5TMB885tT3yzomVzDTSE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZA7WEWT8PvUePYK6h0M0D7q9FCa4n+xSrwoZlC/l2d8QV8Eq+6s5toGo3mpg51wUt
+	 WyjWErMoTEmCwm57JC/a7HNycGlTlHpadYg52NJ3SE2+YVEb9e7r+GyGLj7sr2dyGP
+	 AQ0Kfbp6cWFUsIDM78q6si9tPIqsJdazRMJE3cWmPPPzIZcgRL6Es7hailiYu9C6cK
+	 t4fX6NRPRfkoYkk3ccnHOvMW7o+a9MWMDrCsDcQorktVLIKbR2TNkHshMy1uk08WEg
+	 Sc2Q3TH8xx370zszHMmilEbmbXmrN+SLUayGqs0ryjryH7k+PEV+1hQcUP2ZUqDXVB
+	 BAxMZT77o2jxg==
+Received: from [212.42.244.78] (helo=mail.avm.de)
+	by mail.avm.de with ESMTP (eXpurgate 4.57.1)
+	(envelope-from <n.schier@fritz.com>)
+	id 6a9b0f23-c6f5-7f0000032729-7f000001d34e-1
+	for <multiple-recipients>; Fri, 04 Sep 2026 20:34:11 +0200
+Received: from mail-auth.fritz.com (unknown [212.42.244.78])
+	by mail.avm.de (Postfix) with ESMTPS;
+	Fri,  4 Sep 2026 20:34:11 +0200 (CEST)
+Date: Fri, 4 Sep 2026 20:34:09 +0200
+From: Nicolas Schier <n.schier@fritz.com>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Hemanth Selam <hemanth.selam@gmail.com>,
+	Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
+	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH] kbuild: fix typo "funtions" in comment
+Message-ID: <20260904-quick-gleaming-kakapo-aed84a@l-nschier-aarch64>
+References: <20260904122002.27960-1-hemanth.selam@gmail.com>
+ <CANiq72=QNpuvP01TfXEkjj4i7p4QU5WGj4mjHjrKyrUMsjEwWw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.17-dev-1f2f7
-X-Developer-Signature: v=1; a=openpgp-sha256; l=755; i=nsc@kernel.org;
- s=20250924; h=from:subject:message-id;
- bh=K67UAh45lnHiRxuKGWLeFyuTLdyFRfNm+f8uGnyvfx0=;
- b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBqmwu2Djz4T/jH8vD193mYB/Tka2Kq+5JaLPktO
- zBde6kfFz+JAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCapsLtgAKCRAHUgpwFiYS
- aY6CD/wKnFfvFi0SWkA9oRvBxG8GLVFkblgSXPSouPD2RzreZ690ag/EyY5gZqRe7wnhhXkh30t
- vuBPwg0ayCSA0xi56CE0LVl5YImVI9pOekJ46VbmUrpsrcaWA+muZR6smqExcu3g7RodscG0Kyc
- 6e92I80ayBLk/jcQ6u9kg5QFQEKwnfJYUMZhFW+gg0iiC0jxR83LCEKPIjT5z3NrmjOcgZ/fQZ1
- oJ6OPaupSBFlN+Db72U7Jo+lRNquJdh/iDPbO4phbNy34+REx8qByXhCMmI3huA7tkFTTITzxII
- XJ+rNcXTrxuZZREZnB5jf+/wMuYjgBpSvmQSpwFv8X5tcT9sxwF/xkvaIGfn+fO11TxQOqWoNdB
- Cm2cuLvFRRZWxEztUhnkJbvTGjji4tMwDF41O8II/M+gbTGJZ+Fy3OgIiO2l11NK21HEqTuQsg9
- +S6wLXk2W/8ya810whR7JsNOd2KGXvskr1jgac34BguFAeCvk7l4ucxqQnWRZpS/o41gN8E8LQF
- ZjTRO5mzzNn7cp4A0ePlIg8v7QjtqGge5J2sZaiL/eJmzy8xdGeB9i5ISXXWQWz0ZZxuVg3w5Up
- 1EvJjZbzRVYgZXkvAaINN4GUu6i/0z1q2YJb50OkV+cHs2tQeOzRJ1GkuYj7cDcTHpi/nItsm9s
- 0fhvUnB+eT8hf8w==
-X-Developer-Key: i=nsc@kernel.org; a=openpgp;
- fpr=18ED52DBE34F860EE9FBC82B7D97093255A0CE7F
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANiq72=QNpuvP01TfXEkjj4i7p4QU5WGj4mjHjrKyrUMsjEwWw@mail.gmail.com>
+Organization: FRITZ! Technology GmbH
+x-ms-reactions: disallow
+X-purgate-ID: 149429::1788546851-64C0BB9A-5D0DD5E9/0/0
+X-purgate-type: clean
+X-purgate-size: 805
+X-Notice: Whitelisted
+X-purgate: This mail is considered clean (visit https://www.eleven.de for further information)
+X-purgate: clean
+X-pfmilter: host: postfix-mx-02  mail-id: 46279A048E  external: no
 
-On Wed, 02 Sep 2026 09:13:47 -0700, Vlad Poenaru wrote:
-> kbuild: don't delete in-flight filechk temporaries in asm-headers
+On Fri, Sep 04, 2026 at 04:23:28PM +0200, Miguel Ojeda wrote:
+> On Fri, Sep 4, 2026 at 3:11 PM Hemanth Selam <hemanth.selam@gmail.com> wrote:
+> >
+> > Correct "funtions" to "functions", reported by scripts/checkpatch.pl using
+> > the misspelling list in scripts/spelling.txt.  Only touches comments, no
+> > code changes.
+> >
+> > Assisted-by: Cursor:claude-opus-5
+> > Signed-off-by: Hemanth Selam <hemanth.selam@gmail.com>
+> 
+> Welcome! I noticed this one in my spam folder.
+> 
+> But, yeah, it looks wrong:
+> 
+> Fixes: 5270316c9fec ("kbuild: Use -fmin-function-alignment when available")
 
-Applied to kbuild/linux.git (kbuild-fixes-unstable), thanks!
+thanks for the patch and the Fixes: trailer.  As this is not relevant 
+for the build, Nathan will probably pick it up for kbuild-next (aka v7.4).
 
-[1/1] kbuild: don't delete in-flight filechk temporaries in asm-headers
-      https://git.kernel.org/kbuild/c/94f7bba7
-
-Please look out for regression or issue reports or other follow up
-comments, as they may result in the patch/series getting dropped,
-reverted or modified (e.g. trailers).
-
-Patches applied to the kbuild-fixes-unstable branch are accepted pending
-wider testing in linux-next and any post-commit review; they will
-generally be moved to the kbuild-fixes branch within about a week if
-no issues are found.
-
-Best regards,
--- 
-Nicolas
-
-
+Reviewed-by: Nicolas Schier <n.schier@fritz.com>
