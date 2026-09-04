@@ -1,117 +1,89 @@
-Received: from mail.avm.de (mail.avm.de [212.42.244.94])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 261763F8707;
-	Fri,  4 Sep 2026 17:48:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.94
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEE553911B5;
+	Fri,  4 Sep 2026 18:19:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788544126; cv=none; b=qw9VxpHwBwmdLhFQ1LUaKK03FEkp5ZW08I4IIFRFQczs3lb51Cx1AIMYS4lCcP/ZlDfu3tGIESjaA40Zi33QJJpOuTqXdussQPzzDBtcqyvCsTMNnAMGnLEnZALqBx7tmGPuw6htf8boDXGr8wU4tJc+Z41nTCNgQyBoZ0JA3z4=
+	t=1788545983; cv=none; b=TpqsvXfvWssaCiZUaOXX87Q96hbqcGy0u+n5BnEt2c1TfG/7ytLPiYkeqYP5p/AErfAY22SHQ5da8NLCcwBS7C1uJrQDhW3hxYZ7MDo1WmIAL/elTyBJ2sQb4u7RN1Na/d+4kaowMP59gY3lIXd0atgtMVibgSGAVOYic8oCIhU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788544126; c=relaxed/simple;
-	bh=wZR0nfZTHKQ7zSiD1VAn6J0Jda9xMGneONF/vDHoaDM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Bcgi3VFIfdlT6mg29m3ETKCjj0wQsU0jYbUpAL3OPOxEz5UH/5Yc2JAbwZ7NUN+JJ1AlZlb+NFAsu9fDoPoGGDCpQofZoBAvDk+LPXmhgzJYpBzXWp6D9Aguzr/Oa/oohr/WZv1DfFxMt0kTgCJrMoFQEF1jo516TFnnEb8v33o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com; spf=pass smtp.mailfrom=fritz.com; dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b=gRExlL8h; arc=none smtp.client-ip=212.42.244.94
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fritz.com
+	s=arc-20240116; t=1788545983; c=relaxed/simple;
+	bh=K67UAh45lnHiRxuKGWLeFyuTLdyFRfNm+f8uGnyvfx0=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=fxXgkAK/m3J5VmrzuTCFlKhJls5z7W7E7rYRkAsThdOTthCqUaRZmEVksKr0LxyrhflC5a8KGgsks5VUdyBLNvQRfQ3Fe85JAq2V/In2ac61Fzh6zbc+Mp5brTBvtNVouSC0JYubP8SHP8ATOYT4IcJPnH0F/ytwloiTBrXV0ec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a6ZJq9kI; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b="gRExlL8h"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fritz.com; s=mail;
-	t=1788544081; bh=wZR0nfZTHKQ7zSiD1VAn6J0Jda9xMGneONF/vDHoaDM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gRExlL8hqy782Vwh7J+EwPne/uQduQsZPzRu2ZIMaxeFZ8LuiUEXeLa7jIHaznLfP
-	 E32gYj+6vCdN8PvHODDlgqvqo9x5cUenCF+FZEjWSB1uz9VvQ5oVa35VOKNQy8SlvE
-	 qa9ZW2y63K7qfWXQufOssIM+kkZ7KTvHnCvSG9kjCtdjdaXKv+vPUas8aIsLXNNinm
-	 DhrtqDdDvxvZiyn+gGzq83JDWWBWSO2YU140VvYwguuCBKz/rnNnEJZyASmMRGC7/a
-	 FNLY6FIRIjvxHtGvUx46sVFDUwkX2oaA89robJVc0gADmTgZuRAEK/Ndx2PGXPF1x8
-	 Aj29mzGMGkIJw==
-Received: from [2001:bf0:244:244::78] (helo=mail.avm.de)
-	by mail.avm.de with ESMTP (eXpurgate 4.57.1)
-	(envelope-from <n.schier@fritz.com>)
-	id 6a9b0451-13a0-7f0000032729-7f0000018018-1
-	for <multiple-recipients>; Fri, 04 Sep 2026 19:48:01 +0200
-Received: from mail-auth.fritz.com (unknown [IPv6:2001:bf0:244:244::78])
-	by mail.avm.de (Postfix) with ESMTPS;
-	Fri,  4 Sep 2026 19:48:01 +0200 (CEST)
-Date: Fri, 4 Sep 2026 19:47:59 +0200
-From: Nicolas Schier <n.schier@fritz.com>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Vlad Poenaru <vlad.wing@gmail.com>, linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org, regressions@lists.linux.dev,
-	Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a6ZJq9kI"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id E370B1F00A3D;
+	Fri,  4 Sep 2026 18:19:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788545982;
+	bh=62jm9Q77S2sVZx0JPQ7aMm4YDbqkZyG9GTqZdJ8kxUg=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date;
+	b=a6ZJq9kIsIVCK6/Fjg8Td1RT85Fn0E0YjzWuzBazyUtqo1zVcL3MVaXQ2q6c/Izs7
+	 8N1MB9R/SUGbQG+sCokn3qiLjKV0KKHn5sHpIsyGEhNwhI2MUOV8jyZqX5UsSpmnWJ
+	 f5Dm+oBcKUBPSaoT4nvVnVTzZRu0du/Q2RqF1XXGCJcYfpgSgM4KLsfrMnHsEc/Yve
+	 d9egC3AmYhENDVAb9bujt9sVQ+Fve42gt+IQb4gCRU7kIs25Dhv0z53iuHGJ2JxobY
+	 RCgfnaKTuWG7DuJ0ZHc1MosIbgZ6yVOD+c8Uc5l++OJXRr3JaPgrPDoKJYqgo33foQ
+	 cKW/BmeJHDxbg==
+From: Nicolas Schier <nsc@kernel.org>
+To: Nathan Chancellor <nathan@kernel.org>, 
+ Vlad Poenaru <vlad.wing@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ regressions@lists.linux.dev, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+In-Reply-To: <20260902161347.4163577-1-vlad.wing@gmail.com>
+References: <20260902161347.4163577-1-vlad.wing@gmail.com>
 Subject: Re: [PATCH] kbuild: don't delete in-flight filechk temporaries in
  asm-headers
-Message-ID: <20260904-adorable-cordial-pronghorn-6ccaf4@l-nschier-aarch64>
-References: <20260902161347.4163577-1-vlad.wing@gmail.com>
- <20260903064544.GA1942038@ax162>
+Message-Id: <178854595964.42024.7648905452681649287.b4-ty@b4>
+Date: Fri, 04 Sep 2026 20:19:19 +0200
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20260903064544.GA1942038@ax162>
-Organization: FRITZ! Technology GmbH
-x-ms-reactions: disallow
-X-purgate-ID: 149429::1788544081-0C787EB7-782975CE/0/0
-X-purgate-type: clean
-X-purgate-size: 2426
-X-purgate: This mail is considered clean (visit https://www.eleven.de for further information)
-X-purgate: clean
-X-pfmilter: host: postfix-mx-03  mail-id: 334E0A015E  external: no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.17-dev-1f2f7
+X-Developer-Signature: v=1; a=openpgp-sha256; l=755; i=nsc@kernel.org;
+ s=20250924; h=from:subject:message-id;
+ bh=K67UAh45lnHiRxuKGWLeFyuTLdyFRfNm+f8uGnyvfx0=;
+ b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBqmwu2Djz4T/jH8vD193mYB/Tka2Kq+5JaLPktO
+ zBde6kfFz+JAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCapsLtgAKCRAHUgpwFiYS
+ aY6CD/wKnFfvFi0SWkA9oRvBxG8GLVFkblgSXPSouPD2RzreZ690ag/EyY5gZqRe7wnhhXkh30t
+ vuBPwg0ayCSA0xi56CE0LVl5YImVI9pOekJ46VbmUrpsrcaWA+muZR6smqExcu3g7RodscG0Kyc
+ 6e92I80ayBLk/jcQ6u9kg5QFQEKwnfJYUMZhFW+gg0iiC0jxR83LCEKPIjT5z3NrmjOcgZ/fQZ1
+ oJ6OPaupSBFlN+Db72U7Jo+lRNquJdh/iDPbO4phbNy34+REx8qByXhCMmI3huA7tkFTTITzxII
+ XJ+rNcXTrxuZZREZnB5jf+/wMuYjgBpSvmQSpwFv8X5tcT9sxwF/xkvaIGfn+fO11TxQOqWoNdB
+ Cm2cuLvFRRZWxEztUhnkJbvTGjji4tMwDF41O8II/M+gbTGJZ+Fy3OgIiO2l11NK21HEqTuQsg9
+ +S6wLXk2W/8ya810whR7JsNOd2KGXvskr1jgac34BguFAeCvk7l4ucxqQnWRZpS/o41gN8E8LQF
+ ZjTRO5mzzNn7cp4A0ePlIg8v7QjtqGge5J2sZaiL/eJmzy8xdGeB9i5ISXXWQWz0ZZxuVg3w5Up
+ 1EvJjZbzRVYgZXkvAaINN4GUu6i/0z1q2YJb50OkV+cHs2tQeOzRJ1GkuYj7cDcTHpi/nItsm9s
+ 0fhvUnB+eT8hf8w==
+X-Developer-Key: i=nsc@kernel.org; a=openpgp;
+ fpr=18ED52DBE34F860EE9FBC82B7D97093255A0CE7F
 
-On Wed, Sep 02, 2026 at 11:45:44PM -0700, Nathan Chancellor wrote:
-> On Wed, Sep 02, 2026 at 09:13:47AM -0700, Vlad Poenaru wrote:
-> > Commit 2d69b891e646 ("kbuild: Support generated asm-headers in
-> > subdirectories") switched the stale-wrapper sweep in
-> > scripts/Makefile.asm-headers from $(wildcard $(obj)/*.h) to a find(1)
-> > invocation, so that generated headers in subdirectories are considered.
-> >=20
-> > The two do not match the same set of files. Make's $(wildcard) uses glob
-> > semantics, where a leading '.' has to be matched explicitly, whereas
-> > find's -name uses fnmatch() without FNM_PERIOD, so '*.h' matches
-> > dotfiles as well. filechk writes its output to $(dir $@).tmp_$(notdir $=
-@)
-> > before renaming it into place, so such a scratch file, if it happens to
-> > exist in $(obj) when the sub-make is parsed, is now picked up in
-> > old-headers. It appears in neither generic-y, generated-y nor syscall-y,
-> > is therefore classified as unwanted, and cmd_remove deletes it.
-> >=20
-> > On x86 this races with archprepare, which lists both asm-generic and
-> > arch/x86/include/generated/asm/cpufeaturemasks.h as prerequisites. Under
-> > -j they run concurrently against the same directory, and the build fails
-> > intermittently:
-> >=20
-> >   mv: cannot stat 'arch/x86/include/generated/asm/.tmp_cpufeaturemasks.=
-h': No such file or directory
-> >   make[1]: *** [arch/x86/Makefile:269: arch/x86/include/generated/asm/c=
-pufeaturemasks.h] Error 1
-> >=20
-> > The same commit also converted the generic wrapper rule to filechk, so
-> > those wrappers now create .tmp_*.h in $(obj) too and can race among
-> > themselves.
-> >=20
-> > Restore the previous behaviour by excluding dotfiles from the sweep.
-> > Subdirectories, which is what the find(1) conversion was for, keep being
-> > descended into. While at it, quote the -name argument: it is currently
-> > expanded by the shell against the build directory before find sees it.
-> >=20
-> > Fixes: 2d69b891e646 ("kbuild: Support generated asm-headers in subdirec=
-tories")
-> > Signed-off-by: Vlad Poenaru <vlad.wing@gmail.com>
->=20
-> Oof :( that's unfortunate, thanks a lot for tracking this down!
->=20
-> Reviewed-by: Nathan Chancellor <nathan@kernel.org>
->=20
-> Nicolas, I assume you will pick this up for 7.3.
+On Wed, 02 Sep 2026 09:13:47 -0700, Vlad Poenaru wrote:
+> kbuild: don't delete in-flight filechk temporaries in asm-headers
 
-Sure, sorry for the delay.
+Applied to kbuild/linux.git (kbuild-fixes-unstable), thanks!
 
-Reviewed-by: Nicolas Schier <n.schier@fritz.com>
+[1/1] kbuild: don't delete in-flight filechk temporaries in asm-headers
+      https://git.kernel.org/kbuild/c/94f7bba7
 
---=20
+Please look out for regression or issue reports or other follow up
+comments, as they may result in the patch/series getting dropped,
+reverted or modified (e.g. trailers).
+
+Patches applied to the kbuild-fixes-unstable branch are accepted pending
+wider testing in linux-next and any post-commit review; they will
+generally be moved to the kbuild-fixes branch within about a week if
+no issues are found.
+
+Best regards,
+-- 
 Nicolas
+
+
