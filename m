@@ -1,51 +1,50 @@
 Received: from mail.avm.de (mail.avm.de [212.42.244.120])
 	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97CAC4A3859;
-	Fri,  4 Sep 2026 19:19:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EE9E422556;
+	Fri,  4 Sep 2026 19:34:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788549593; cv=none; b=LWt3rDmS9SgDiUOJC9MRaF2Sr4mR8mO65plrMdY4lstNLSln6WaIMkQ520/3NeFFC3Q+0DYUjSpEAbZjpKclfCsrzp5+0rwiQiKfGPkeyuA+FiCdoKepHBlRpzR7N9e3Kau2OrRPNvd/sHLH1BaqcJFaJtS36aDGG24ggLvwogQ=
+	t=1788550457; cv=none; b=SWErOYWW86eMOI07qWVf0NGPhW6Zr0kdZAdZ/xJdb6CBcNAG6eI3QEP9YmE3Ee9x71R82q5GywGNbHC/mkqUyuFkVYbG7tmxdIYeGmg6xp1vCBh0CSrPpJgHzphlohnew0sFE2ssdX1DN5rA+QsmrEx3mqhIkgzbik2h2/sci0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788549593; c=relaxed/simple;
-	bh=mz5R28uNnIWFGlQsYQ78S1ocY+93UGGXn1Zf85uYZ0w=;
+	s=arc-20240116; t=1788550457; c=relaxed/simple;
+	bh=ul2Pp845XsmKQL5GK4uGTi+u/lX7nZmo/2YJ5Kq7L3M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o+Yd+igS6xnIejvRgVp2wrupbDlG9vH+IGNIEFdg5fTkcX/5PdHimaBooKepA5ILKW7T0lzAQhPUui2dmiJZA5Jdhu/OuMOOjwwZme/1pR/GMtX6kk3cH+5J4tYg0XeZVUW+c/IT7S4X+dmjd3w8fWPrKw0hZS72oaHWJ2Wr3k8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com; spf=pass smtp.mailfrom=fritz.com; dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b=OrhVzU61; arc=none smtp.client-ip=212.42.244.120
+	 Content-Type:Content-Disposition:In-Reply-To; b=tcJgbrOY8G1MkYgV4BAX624iHuz2RMtHLyLUw7AHFghSWJqHZpvoES72MdLfNZZE8Ij0bKud8IvmPXqcndXANQaZ9fAS0mp7anFiTNrXrDf2b68xOQkZ3Vz+HL1hDCs1iOURvhhE5818jvZOVnkraVbD7A8xAaD+8ETpxDPeY/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com; spf=pass smtp.mailfrom=fritz.com; dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b=RkDEoQft; arc=none smtp.client-ip=212.42.244.120
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fritz.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b="OrhVzU61"
+	dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b="RkDEoQft"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fritz.com; s=mail;
-	t=1788549584; bh=mz5R28uNnIWFGlQsYQ78S1ocY+93UGGXn1Zf85uYZ0w=;
+	t=1788550452; bh=ul2Pp845XsmKQL5GK4uGTi+u/lX7nZmo/2YJ5Kq7L3M=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OrhVzU61wsW6eMAkF14seAFAlX4NikPMwrFwzp7/q0aif/EZDVKOrXEfUPhTsDyFa
-	 +kdKop9hprtpetO43lY1TQCro5xyBNTx1CPJwt2VVY51DtjoVwpjdAaFz3UFiDFhXg
-	 ZwcTgAzXkCpzq+e9pz2d+YVTEWDmT0iQIPrKZkNtbg0VAjfWCG/vr8ofzbxDI1kEDK
-	 5mtL8VYKJc+PFLsa8GYN2NEy5pGZIz5PmSnqNQWYYNzntFw6Q4+RCs8BRWr1+r9Ra6
-	 q7GD9s/xUtLRfir4jtghM4atsKzj20phfgbSzcs+mDGDttoJMbocjvqbBxIsGdu9yp
-	 zXvF7ZBxpkGUQ==
-Received: from [2001:bf0:244:244::78] (helo=mail.avm.de)
+	b=RkDEoQftAc6i3bh8mLGyHEPOoazbjCmA9oGyIbuUik5U5o5utl+oYIY0a2oBwS5mb
+	 csRwSXCy9udULbg5wyavD3GQwoYdBopsNsgvWgwHhs7ryu5GSLPsAGvwUGjvUaPXs0
+	 hIVCcvgsDPNVkgUs1UiMWEDhmQDD+Wi+sojTj+6xGBwlZkrEMthhPiCCwWhMcTSNxz
+	 CIsK4GmX3iPmjx5ZJjwWjBN8z5NmMvRYtElg3RkdlvC2af7E7/Ox5GbtC24KDnm+Lh
+	 WoFbPXA2WOPaf7ZPvUm9T5tivY4OzsJ9i9lqX9CetiV/+TOI4Mn5Wn55bQN8FZZ3B5
+	 jFLIolKAgpdxA==
+Received: from [212.42.244.78] (helo=mail.avm.de)
 	by mail.avm.de with ESMTP (eXpurgate 4.57.1)
 	(envelope-from <n.schier@fritz.com>)
-	id 6a9b19d0-2a57-7f0000032729-7f000001b004-1
-	for <multiple-recipients>; Fri, 04 Sep 2026 21:19:44 +0200
-Received: from mail-auth.fritz.com (unknown [IPv6:2001:bf0:244:244::78])
+	id 6a9b1d34-2a57-7f0000032729-7f000001d982-1
+	for <multiple-recipients>; Fri, 04 Sep 2026 21:34:12 +0200
+Received: from mail-auth.fritz.com (unknown [212.42.244.78])
 	by mail.avm.de (Postfix) with ESMTPS;
-	Fri,  4 Sep 2026 21:19:44 +0200 (CEST)
-Date: Fri, 4 Sep 2026 21:19:43 +0200
+	Fri,  4 Sep 2026 21:34:12 +0200 (CEST)
+Date: Fri, 4 Sep 2026 21:34:10 +0200
 From: Nicolas Schier <n.schier@fritz.com>
-To: Guillaume Tucker <gtucker@gtucker.io>
-Cc: Nathan Chancellor <nathan@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Onur =?utf-8?B?w5Z6a2Fu?= <work@onurozkan.dev>,
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Steven Rostedt <rostedt@goodmis.org>,
 	Nick Desaulniers <ndesaulniers@google.com>,
-	Miguel Ojeda <ojeda@kernel.org>, linux-doc@vger.kernel.org,
-	workflows@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kbuild@vger.kernel.org, kernelci@lists.linux.dev,
-	automated-testing@lists.yoctoproject.org
-Subject: Re: [PATCH RESEND v3 1/3] scripts: add TOML config to container tool
-Message-ID: <20260904-invaluable-nifty-salmon-cf7767@l-nschier-aarch64>
-References: <0a88d9d0ebd73a9f6e72399f93705ebc7b49ae9c.1788341513.git.gtucker@gtucker.io>
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>, linux-kernel@vger.kernel.org,
+	linux-kbuild@vger.kernel.org, llvm@lists.linux.dev,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] scripts/sorttable: Mark long_size as __maybe_unused
+Message-ID: <20260904-dancing-cobalt-ibex-8a039c@l-nschier-aarch64>
+References: <20260831-sorttable-long_size-unused-but-set-global-v1-1-8a96b88697e5@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -54,52 +53,58 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <0a88d9d0ebd73a9f6e72399f93705ebc7b49ae9c.1788341513.git.gtucker@gtucker.io>
+In-Reply-To: <20260831-sorttable-long_size-unused-but-set-global-v1-1-8a96b88697e5@kernel.org>
 Organization: FRITZ! Technology GmbH
 x-ms-reactions: disallow
-X-purgate-ID: 149429::1788549584-FABC270C-BB7A4DCA/0/0
+X-purgate-ID: 149429::1788550452-5FCA770C-C8D5CEF8/0/0
 X-purgate-type: clean
-X-purgate-size: 1513
+X-purgate-size: 1785
+X-Notice: Whitelisted
 X-purgate: This mail is considered clean (visit https://www.eleven.de for further information)
 X-purgate: clean
-X-pfmilter: host: postfix-mx-01  mail-id: 6291CA0385  external: no
+X-pfmilter: host: postfix-mx-01  mail-id: 773A0A0389  external: no
 
-On Wed, Sep 02, 2026 at 11:33:00AM +0200, Guillaume Tucker wrote:
-> Add support for a TOML configuration file to the scripts/container
-> tool.  This improves user experience by not having to keep passing the
-> same command line options all the time or overly relying on built-in
-> default values.  Include the concept of 'profiles' with different
-> named sections in the file to cover various use cases.
->=20
-> Command line options take precedence over the config file, and values
-> defined in profile sections take precedence over the default one.
->=20
-> Add a -c option to override the location of the .container.toml config
-> file which should otherwise be located in the current working
-> directory.  If not found, the file is silently ignored as it is not
-> strictly required unless the -c option is used.
->=20
-> Add a -p option to choose a particular profile section in the config
-> file rather than the default.
->=20
-> Signed-off-by: Guillaume Tucker <gtucker@gtucker.io>
+On Mon, Aug 31, 2026 at 06:46:31PM -0700, Nathan Chancellor wrote:
+> When building in a kernel tree prior to commit b055f4c431e3 ("sorttable:
+> Move ELF parsing into scripts/elf-parse.[ch]") with clang-23 or newer,
+> which implements a new warning under -Wunused-but-set-variable for
+> static global variable, there is a warning from sorttable because
+> long_size is unused when MCOUNT_SORT_ENABLED is not set:
+> 
+>   scripts/sorttable.c:452:12: error: variable 'long_size' set but not used [-Werror,-Wunused-but-set-global]
+>     452 | static int long_size;
+>         |            ^
+> 
+> Mark long_size as __maybe_unused to avoid inserting more ugly #ifdef
+> directives while insuring the warning does not reappear, as the
+> aforementioned change does not alter the uses of long_size, so it
+> appears to be coincidence that the warning disappears after this
+> refactoring.
+> 
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
 > ---
->=20
-> Notes:
->     Changes in v2:
->     - fix uid / gid handling when set to 0 (root)
->    =20
->     Changes in v3:
->     - fix logic when loading config profiles using None
->     - fix typo with missing whitespace in help message
->     - clarify how UID gets used as default value for GID
->=20
->  scripts/container | 89 ++++++++++++++++++++++++++++++++++++++++-------
->  1 file changed, 77 insertions(+), 12 deletions(-)
->=20
+> This is breaking our builds on stable:
+> 
+>   https://github.com/ClangBuiltLinux/continuous-integration2/actions/runs/33143924291
+> 
+> There was a previous patch sent for this issue
+> 
+>   https://lore.kernel.org/20260603191708.27241-1-beakthoven@gmail.com/
+> 
+> but it was marked as stable only. I think this should be taken via
+> mainline and backported the normal way, as it appears to be coincidence
+> that the warning is not present in mainline. It does not look like
+> scripts/sorttable.c has a formal owner according to MAINTAINERS so this
+> could either go through one of Steve's trees or the kbuild tree.
+> ---
+>  scripts/sorttable.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
 
-Acked-by: Nicolas Schier <n.schier@fritz.com>
+Thanks!
 
---=20
+Tested-by: Nicolas Schier <n.schier@fritz.com>
+
+-- 
 Nicolas
