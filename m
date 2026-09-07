@@ -1,62 +1,62 @@
 Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A20244AB8A
-	for <linux-kbuild@vger.kernel.org>; Mon,  7 Sep 2026 10:38:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5654466AE1
+	for <linux-kbuild@vger.kernel.org>; Mon,  7 Sep 2026 10:38:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788777485; cv=none; b=I5a6IAcwtW65xe+vsmac+40mZD/1HbvKGhmcdnP9WurMjXSOFOUxYVWXUuQqqBQxnhRVeGCyTQ44bJnyKj2SrGQG1oIiljBUuzMU2rifYCwgjSu4K9vFh9HfwhPK0pFKaTLXDqV4qs1hWVuPh0+jcTydnWJS+9jVnx1QoutRx1E=
+	t=1788777486; cv=none; b=sBB3ux+iBO4coG3cxUvrv4Q46vPJLKPA30U1Nxe8IP9lK+fNCQ8Pu+rsRPjYl9wuOiSc8v0S82nfz3D1ZQVDqRszeqXnZog1ghzeaVLb+vQyb+1XVMC439jJZy0NRb2FoMBvLbpstPgOzetAJzZlBKL2u/Rn8LJjb6I2sQlV9hA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788777485; c=relaxed/simple;
-	bh=QmR/Yx3GrmMipQLhapvopexweDGgNDUHESy75coOzxM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dNn5rzAD6c44V2NqOuX/19ebcfdFRFz+I+IJnwUv0pPJewHiB5Hzww8v+9+TKZ6C8f9PsBBltwtxzxnJhVh75Esftnd6K9Mu7cByn8wOxpIdDQwytKFJMMSs6GUxUAIqbV/zyXWc2c4F2VTkwAofttWQBpuH295AKkuI5Nj6sy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jRysfNPx; arc=none smtp.client-ip=209.85.128.46
+	s=arc-20240116; t=1788777486; c=relaxed/simple;
+	bh=ZP0v0FbC59/0C24ZWn/MoBhMdBld/zG+x2hSIlkc6M0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gcVl0gG8Ie2GQog6n7WnvslQf60w+xv8GYmG/pqUmbKE7k5pqNApkKduoKG+MUrProBfDbVbPwvclblEOvXCukTFPGf8Bqj9nE76hVrvqWL7bikfaZ3sask8ydD07ax7f9Ix5INv9sVREUYTORY44kJqXplhVlt3FDT/CS6iJl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YeRxMWsK; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jRysfNPx"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-49ccfae359fso30134175e9.3
-        for <linux-kbuild@vger.kernel.org>; Mon, 07 Sep 2026 03:38:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YeRxMWsK"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-49954b88fffso25470005e9.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 07 Sep 2026 03:38:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788777481; x=1789382281; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1788777483; x=1789382283; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=f3dNc7Al5lEDIZNoArJSIQ8XFdfYUdjRGc8JYGTevN8=;
-        b=jRysfNPxAaRespYuYAXv0Wh42dSEnnYk463AOwDHEO5PUTfbri8mkeAVb65wSpeMJL
-         Vj+uFukEVJVJDafsY+mangsQ2asvI5BaLPDL5TLQGrpZLZZDTTVnZPr2NBxAH9MpFhAY
-         fy0N+/U3MHLgKaZYuzwi7apltQPeeg8QqQ5kAgT/bt3qB9D7OK1xCfBHNc42p6z0rmk8
-         OCn3E1tJd/1/zo17U1UA1j2+Vq9+TKLd91wAbKQOUOCrhbu0c6cxeaBuEK4mNGpsBKd/
-         fBDqtAACalLoRBBGJxJlshf7W1Q0DMki2hemYXTromSt4wpwAf6rCMpC8uvrYWa1Zjsq
-         Tt9A==
+        bh=LfFVHzcpV0I36UPxeD3SH8L9Tgicjr0WOI5DBup3i1c=;
+        b=YeRxMWsKlyhDC0i464VVvJZnatrt3H+V9dIe3s1UAF4WG0dSvMORcoxJ4QOdm89lBj
+         TZai8Pix7AbnUPHxfB+Nfk4gFVZTN0mef3jR0340BMIgLyB/8llyuPgeljp+Iimy2EOJ
+         tmbum3O4ubQG729dDzM3U0A7gcLAwlVUDlkygTNdjnepzrc0iwXLQn0pyRCF47Un+to8
+         2KM43EHm0jUeB+z58DW6iJVrBliV0mCCMnvtvOZgEGSLdODPIpgZVXcaiapoqLNOqU+M
+         x6+fFIWmXZDNKrgOXNSz0bmIeptjSPLpt2jk8rXmJIdiGWRIG317BlTxXOv1SBZOb4Rc
+         etkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788777481; x=1789382281;
+        d=1e100.net; s=20251104; t=1788777483; x=1789382283;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=f3dNc7Al5lEDIZNoArJSIQ8XFdfYUdjRGc8JYGTevN8=;
-        b=qDvghrlnExfF0+IvKN9FD00gNhs92mAYdOTbAxKJfOPzx7hiws43EePMYtOT1y/rlH
-         yW8BNsK2H3TjhsGHORpRfIUy5xbxvxh5+WkA8GYWCFM263YPHAzT0bZi5+AGZP5tp4dg
-         bAdNajPdRZrD1zybliu7Z4pLVjgDytbKM2N/TovD8uj1XDB+eYTVM0z6M6U21L6/xlso
-         4hkiDDcptReHDPg1JSssZLQYY2S7HxLVOUiGTquPros6RbPKxNUyI7Sj6wnW0E0GGjjy
-         ttX+DYLjBqIygJkb4edeGmSDK2Oo24u3PUFXywuaXjf2K6k05rh6PXMYLXnlRDJ0Nt8q
-         liZw==
-X-Forwarded-Encrypted: i=1; AKwUvBwAsjrwUNZf8KQmSfP1IA842l6ADk9aUOSq4BqPohMpW6C5UFemkxvoe70R8MPPA09bCKdewwI5CyZ08qA=@vger.kernel.org
-X-Gm-Message-State: AFuF++nRWuW9VRVA0+AvdfRyCVVpYPwEYEzGk46YlJaoxAMOqiTiAloy
-	790FDydePFGyYmOXZ/PjTnu+Z3Q52QP4CroaCcn6hthGkaqOk+CfkOLE
-X-Gm-Gg: AYBFou1QXdhIwydYZR7o/eEGDj0jew6v7s8y8h24wluRjOHPqeWVp36uK6zt08v6Nd4
-	gdFqZFu8hYICy1nSgqaMCoBnjDdqLZ8HYhj2PbI7Kq5Oc+urHVrp16FwZVMowSSdV6IGMAUVAV8
-	vjaLb7Rrl+rZLn+nrhcpJTLSSKWThvERVsSrwtMoTQxyHMhaDFI4/b6/SL1HxX0JQxxp9O0/nKO
-	V6rTBJWd7mrLDu6zONkFWPU5cg08o4EPjhbZ/Th0UihWerPJpU7jEOc4QO/iNor+drI8sJ8y4qo
-	mLh2/VaNv3LixBMz6csANtviviwz2uzzwjb9MgIzYfrJz9sL0L8qO0O3DIR6afHViDoQ7HiYA+9
-	AWOOmUbqtTcuRZEMyVV2+TbNXvPL2YMn0viyFaD8Ms08csl4/P3jqhz239hWZJZmruo3v6zn2w2
-	QEoN5769s+QFTKvL3G8vTyk9sciL2jf8kMMaEruvR0aRVt4EK/LwmmoDHBLD64MAUrCGrrzadyc
-	92xy31QV527JxZb1O3Vc1WNsdZUHEuGR2DAcGkAd9RvQdSn4mcm6ElqdlEpHg==
-X-Received: by 2002:a05:600d:8481:20b0:49c:fde6:8b39 with SMTP id 5b1f17b1804b1-49cfde68bacmr131347985e9.29.1788777481081;
-        Mon, 07 Sep 2026 03:38:01 -0700 (PDT)
+        bh=LfFVHzcpV0I36UPxeD3SH8L9Tgicjr0WOI5DBup3i1c=;
+        b=hZIDBFEeemAfVepHWhigBTVbcObQ0RxM7jsOjNJP+qQJ+Q13E53D9FsK0bmdto0XL3
+         gDGL2XXwRsvEnkj++kG3nWX76qWnEwmTUu4FcQFnuot3KKQocL6SmLVxtwQCuNxIUcgP
+         059n4/CfB/8HUd9IGN3iLwZURNDwErq4IxfKvsKkdMyMPn8xzwD+L9G38U1FoB2PRCLX
+         Uhc2k9nNM6Lu5bxnmIQfaQwPZrf/N2niYkr9yybzCc6fMkuXuXL2hXvmDlw7GG1bRuuk
+         TxTyX7faPqNPXpN8Fs3HgG1Eea5du2K58/iAPGhtqPm2TmCqQuskNNO2zKQSfwKLuxvV
+         /0FA==
+X-Forwarded-Encrypted: i=1; AKwUvBzgZsSoHvBTL/Kp74tow0NEmLWPK9ZbnJyU4Lp4YosSvljJ0JYxDel965KULGOtk6Miyi2gbPvtT/t4cr0=@vger.kernel.org
+X-Gm-Message-State: AFuF++mMcSMACEXQOdqvQqG4tkIGsryNVAeM9JDF9QIkOI7w4uClvuZ4
+	flNKBSoG1Oz9hJmRhuRoO24ZoBq3qchwm8EQ5Q76G4dJjgXv+W0UZp25
+X-Gm-Gg: AYBFou3bsvoUbTTxzI5N6YxXhhgWj2a1V1XY54bhYr0u4q/t9qPT51RMkiYtVQTvz7B
+	YEJPckdvmPXsUXakYp1G3PY4q/G09/KfUOGkKoBSirH0bvAa4O3Q0vYRFCLDWJTrNCkbjWm2/wW
+	mDd0QD9Li4Rcr3vp2+Hk49d0qhLbvPQdYmsa5cq2hs/zAnqFcpg29cV4lK3wfP9WUbXlSua9T9d
+	wZ4ONxdn7xi6PlYzD6ig5H8p96GYSRBPXdtXBjLvwalCuWMbtbHABd0TgQtCzBF4JcUq1J3vaqU
+	8mSoLZjmBRG3OWE2mQpjpu8i8l9Z7JjOKuIOHYqrbDzXyGzEfN/fXPAlItobsNB8eHoTw1Pzrcg
+	KhGlZA5TrZUYXmWfuC4QG6P8XCv/F0FhPbzemlTIg+p2c513fkns9jBjnmouKn+iNrBUBcS4MV8
+	wr5GdQqwErlC/RUFs/Jz/tIeLyGa7D33sDDKkW9XVKKpbm0YEB0X004TRbUeMUQIUb4rQK7Akw4
+	mVWhfhYBuH94gfo56jo73g+ZY5OpDeT45SqZdAwpPtoSPG/VhojMwXbxKqSYw==
+X-Received: by 2002:a05:600c:3e1a:b0:49c:fc6c:bdff with SMTP id 5b1f17b1804b1-49cfc6cc078mr168749475e9.22.1788777482725;
+        Mon, 07 Sep 2026 03:38:02 -0700 (PDT)
 Received: from localhost.localdomain ([95.3.12.38])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49ce5533ffbsm311944285e9.3.2026.09.07.03.37.59
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49ce5533ffbsm311944285e9.3.2026.09.07.03.38.01
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 07 Sep 2026 03:38:00 -0700 (PDT)
+        Mon, 07 Sep 2026 03:38:02 -0700 (PDT)
 From: Erkan Erdem <hexvalid@gmail.com>
 To: Nathan Chancellor <nathan@kernel.org>,
 	Nicolas Schier <nsc@kernel.org>
@@ -64,19 +64,13 @@ Cc: Erkan Erdem <hexvalid@gmail.com>,
 	Julian Braha <julianbraha@gmail.com>,
 	linux-kbuild@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	linux-doc@vger.kernel.org,
 	Nick Desaulniers <ndesaulniers@google.com>,
 	Bill Wendling <morbo@google.com>,
 	Justin Stitt <justinstitt@google.com>,
-	Kees Cook <kees@kernel.org>,
-	Masahiro Yamada <masahiroy@kernel.org>,
 	llvm@lists.linux.dev
-Subject: [PATCH v2] docs: kconfig: fix shell function syntax in caveats
-Date: Mon,  7 Sep 2026 13:37:37 +0300
-Message-ID: <20260907103739.23212-1-hexvalid@gmail.com>
+Subject: [PATCH v2] kconfig: preserve the final answer when input has no newline
+Date: Mon,  7 Sep 2026 13:37:38 +0300
+Message-ID: <20260907103739.23212-2-hexvalid@gmail.com>
 X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
@@ -86,68 +80,104 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Kconfig separates a function name from its arguments with a comma, but
-the caveats section uses Make-style whitespace in its shell calls.
-These expressions expand as undefined variables rather than invoking
-the shell function, so the supposedly working CC_HAS_ENDIAN_FLAG
-example fails to parse.
+conf_string() unconditionally removes the last character returned by
+fgets(), assuming that it is a newline. When redirected input ends
+without a newline, the last character is part of the answer instead.
+For example, feeding 42 to an integer prompt stores 4, and feeding
+0xff to a hexadecimal prompt stores 0xf. Both commands succeed despite
+silently changing the supplied value.
 
-Add the missing commas to the shell calls in this section. Keep the
-Make examples unchanged.
+Strip the newline with strcspn() so that a complete answer at EOF is
+preserved. Keep the existing handling of newline-terminated and empty
+answers unchanged.
 
-Fixes: 316d55d55f49 ("Documentation: kconfig: document a new Kconfig macro language")
+Add regression tests for string, int and hex answers, with and without
+a final newline, in oldaskconfig and oldconfig.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
 Assisted-by: LLM
 Signed-off-by: Erkan Erdem <hexvalid@gmail.com>
 ---
 
 Changes in v2, addressing Julian Braha's review:
-- Remove whitespace after the comma in the three remaining shell calls.
+- Add an in-tree regression test under scripts/kconfig/tests for string,
+  int and hex answers, with and without a final newline, in oldconfig
+  and oldaskconfig. The shared test harness is unchanged.
+- Submit this fix independently of the checkkconfigsymbols.py change.
+- Refresh Cc from scripts/get_maintainer.pl, including the LLVM contacts.
 
-v1: https://lore.kernel.org/all/20260905124045.42713-1-hexvalid@gmail.com/
+v1: https://lore.kernel.org/all/20260905123237.40670-1-hexvalid@gmail.com/
 
-The issue, patch and changelog were prepared with an AI coding assistant.
-The assistant also prepared the v2 revision and ran the checks below.
+An AI coding assistant found the issue, prepared the fix and changelog,
+and ran the original verification. The assistant also prepared the new
+regression test and this v2 revision.
 
 Validation:
-- Re-ran the documented working CC_HAS_ENDIAN_FLAG example using the
-  Kconfig conf tool built with Clang on macOS. With a test helper returning
-  y for either endian flag, the original example fails to parse; v2
-  executes both probes and sets CC_HAS_ENDIAN_FLAG=y for both endiannesses.
-- Rebuilt the changed page alone with Sphinx, treating warnings as errors.
-- The complete kernel documentation set and kernel were not built.
+- Built original and fixed conf with Clang on macOS and GCC in an
+  x86_64 Linux container, using -Wall -Wmissing-prototypes
+  -Wstrict-prototypes -Werror.
+- On both platforms, the original conf fails all six unterminated-input
+  cases and passes all six newline-terminated controls.
+- The fixed conf passes the complete 33-test Kconfig suite on both
+  platforms, including all 12 new cases.
+- This tests the host configuration tool; a complete kernel was not built.
 
- Documentation/kbuild/kconfig-macro-language.rst | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ scripts/kconfig/conf.c                        |  2 +-
+ .../kconfig/tests/conf_no_newline/__init__.py | 32 +++++++++++++++++++
+ 2 files changed, 33 insertions(+), 1 deletion(-)
+ create mode 100644 scripts/kconfig/tests/conf_no_newline/__init__.py
 
-diff --git a/Documentation/kbuild/kconfig-macro-language.rst b/Documentation/kbuild/kconfig-macro-language.rst
-index 6163467f6..c427bece3 100644
---- a/Documentation/kbuild/kconfig-macro-language.rst
-+++ b/Documentation/kbuild/kconfig-macro-language.rst
-@@ -225,7 +225,7 @@ not work::
-             $(MY_TYPE) "foo"
-             default y
- 
--Obviously from the design, $(shell command) is expanded in the textual
-+Obviously from the design, $(shell,command) is expanded in the textual
- substitution phase. You cannot pass symbols to the 'shell' function.
- 
- The following does not work as expected::
-@@ -236,12 +236,12 @@ The following does not work as expected::
-             default "-mlittle-endian" if CPU_LITTLE_ENDIAN
- 
-     config CC_HAS_ENDIAN_FLAG
--            def_bool $(shell $(srctree)/scripts/gcc-check-flag ENDIAN_FLAG)
-+            def_bool $(shell,$(srctree)/scripts/gcc-check-flag ENDIAN_FLAG)
- 
- Instead, you can do like follows so that any function call is statically
- expanded::
- 
-     config CC_HAS_ENDIAN_FLAG
-             bool
--            default $(shell $(srctree)/scripts/gcc-check-flag -mbig-endian) if CPU_BIG_ENDIAN
--            default $(shell $(srctree)/scripts/gcc-check-flag -mlittle-endian) if CPU_LITTLE_ENDIAN
-+            default $(shell,$(srctree)/scripts/gcc-check-flag -mbig-endian) if CPU_BIG_ENDIAN
-+            default $(shell,$(srctree)/scripts/gcc-check-flag -mlittle-endian) if CPU_LITTLE_ENDIAN
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index fe8ba09b0..46c9ca646 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -343,7 +343,7 @@ static int conf_string(struct menu *menu)
+ 			}
+ 			/* fall through */
+ 		default:
+-			line[strlen(line)-1] = 0;
++			line[strcspn(line, "\n")] = 0;
+ 			def = line;
+ 		}
+ 		if (def && sym_set_string_value(sym, def))
+diff --git a/scripts/kconfig/tests/conf_no_newline/__init__.py b/scripts/kconfig/tests/conf_no_newline/__init__.py
+new file mode 100644
+index 000000000..0fca696d2
+--- /dev/null
++++ b/scripts/kconfig/tests/conf_no_newline/__init__.py
+@@ -0,0 +1,32 @@
++# SPDX-License-Identifier: GPL-2.0
++"""
++Preserve complete string, int and hex answers at end of input.
++"""
++
++import subprocess
++
++import pytest
++
++from conftest import CONF_PATH
++
++
++@pytest.mark.parametrize('mode', ['--oldaskconfig', '--oldconfig'])
++@pytest.mark.parametrize('newline', ['', '\n'], ids=['eof', 'newline'])
++@pytest.mark.parametrize('symbol_type, value, expected', [
++    ('string', 'abcdef', '"abcdef"'),
++    ('int', '42', '42'),
++    ('hex', '0xff', '0xff'),
++])
++def test(mode, newline, symbol_type, value, expected, tmp_path, monkeypatch):
++    (tmp_path / 'Kconfig').write_text(
++        'config TEST\n\t{} "Test value"\n'.format(symbol_type))
++    monkeypatch.setenv('srctree', str(tmp_path))
++    monkeypatch.setenv('KCONFIG_DEFCONFIG_LIST', '')
++
++    result = subprocess.run([CONF_PATH, mode, 'Kconfig'],
++                            input=value + newline, text=True,
++                            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
++                            cwd=tmp_path, timeout=10)
++
++    assert result.returncode == 0, result.stderr
++    assert 'CONFIG_TEST={}\n'.format(expected) in (tmp_path / '.config').read_text()
 
 base-commit: 4d7d9486c04d917265f64c55bd23b2cc4fe7749c
 -- 
