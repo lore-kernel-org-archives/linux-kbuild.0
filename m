@@ -1,106 +1,143 @@
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pz2-f12.google.com (mail-pz2-f12.google.com [74.125.228.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD09478870;
-	Mon,  7 Sep 2026 11:28:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788780538; cv=none; b=UpuYyqNNCeL7712lDtqFGCx/2QMA5xbZcIky7y/qZhp37xgMhMw6XnZQbbrrXBY9vi1HW5CyoXPwo9I++iD0xq5+iJs0CrPSUbQoaxYj0i2WCIRp2AcEzSDy9rSqKokF/DNbLD9T+EIp/kv9qyIsNq65VWpJ2G+gvQi3TZVYUdI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788780538; c=relaxed/simple;
-	bh=4R0oW681/U498bcQXGtV5FfgxlhTh7wut+xWKFqIdIc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bYUpVs9LMvmyMTlvMIqzUfBK7JYhPQAttoRfl2De2Ppksp9ghB2kmBmk3OTNal8T4DqHccMDTxDPydlPiF1aTSYoGOMQ6LOHxFHH0AleTUWEwEMjkvgbUEBo+yPS/XzaK5FULmWJsDJUHR6cjmlgH8lJ6Kc0KvQRBH2ivBuSDbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io; spf=pass smtp.mailfrom=gtucker.io; dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b=T9dpmgIc; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gtucker.io
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC4723B47F0
+	for <linux-kbuild@vger.kernel.org>; Mon,  7 Sep 2026 19:33:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.228.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788809599; cv=pass; b=FEWjbTfulDprVkkVryQPcXe6LlHg/JMsmXR5+xW43H3HpH9Gj4GKvVpzjJpjFa0DvK0MovhX/5dRcW2OXrNjzMbIXC1QnW0OWSUgc1KtqXPWJnV/Xn2DtlwbltMLwNpHnIyEkykYuS3rmrUYZBOJU4wELVN8GdUJR5KkJQlHLL0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788809599; c=relaxed/simple;
+	bh=LbkJYZrKBAOtEAIquwnyRiPsYzlue46mhX6agZEqU8A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BRiRLAUFsrqXaVS61oe4V0G9YvMaKDKLV/IICH8gf9pUuNme4Pp1grE+WyLXsDnrY04VhFNX96ijdbotwytFlEcPgdIjBLMb6NXGV9YHzRFqz+mBGxuaJLBqHQkiBikbwaQZ1Lr9i8vbmTTlK6UdqPzNN++zw/98dQEUOn15Ck8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iK0qYj5j; arc=pass smtp.client-ip=74.125.228.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b="T9dpmgIc"
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D9AF53E83F;
-	Mon,  7 Sep 2026 11:28:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gtucker.io; s=gm1;
-	t=1788780526;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LSrNw+Mw+QIUoy0T4F9WkDJEEONatr2//AJjEdYMWzs=;
-	b=T9dpmgIc95c2enklCsXTocH/Me69usLRfAw4bBmF9gtvq5ABKILOzgrvwAB9BNfHpG0KaA
-	HjmXwgw3zP+LGNhuKxhUtVg3La3krYkedHyaKVIPZe4dxp1SkDQXq7czfTdR3UPsBGtX84
-	RLbPONsdKm+h3UCMxet/XcBXUXh6u09aOejpAbTb0dJ8O1jcKospkMy/9AVjVHQYv92whE
-	G/gStsgPWpefxsgiiW0ADCq8JQFVsp0TJ6zi4woLfiR6XJOuBZQVqXbyiSf+L4ObHoDbIQ
-	+EnN3KbNMHslI1LXsm7YGW1g46mqWaWM9FsDs7xEqw+F7QnnHMF6cUHNXYpCcA==
-Message-ID: <f2dfede5-b54c-4bab-92d6-48249b429bc5@gtucker.io>
-Date: Mon, 7 Sep 2026 13:28:44 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iK0qYj5j"
+Received: by mail-pz2-f12.google.com with SMTP id d2e1a72fcca58-8523cc41f31so224619b3a.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 07 Sep 2026 12:33:17 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1788809597; cv=none;
+        d=google.com; s=arc-20260327;
+        b=sHTU0eOgYhuIJd3jmLcgz69lQnlWnrygWM8/UFCDd4hBtlIJCoFSrWbSbWDvbCyXuW
+         LrKYUhYP0u2tg0wL2a0XGPmAv63pjgPedv3QQgdvzprNB30rOC3VBdbV26Kt3N+grfX7
+         3NjSGEBgSaFzvoB1N7VUOZMSRQvepHNEHVl08ovD/idwbKsWD0J1YHX+mrSunuTW4qJS
+         6JE5Q4UVNFYJFnrmIJrhl59ZwEO1y3XFVZMR+sZ3PHACDzX9nig2GYpjP9MlMCK9DWCT
+         VipRULITcg8hNbayoVe+QKbJyV6QFp+5wR7XBvumXbOMiqLypBKsaDWjdLknrS+axeBC
+         zW8Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=LbkJYZrKBAOtEAIquwnyRiPsYzlue46mhX6agZEqU8A=;
+        fh=XuMNgNtoyCOQj2mf6wmOSIuve70mXvaWp9q9qFcAbjU=;
+        b=ULTVvomxLB/FEWwQydw7yWUda3uErJtfxnDcCvkcAhr+cp4B2hO2vd/oLhW12lWrRQ
+         qeiKFwx9kixbc6wVvTwiQcHLFEHHEzQHpmgZHAwDJada4m8B2UPR/NtQR1bRxxtD407l
+         PQD8P+isdy7GAF7Xvf78FhMrREtWyXf3NiHnivTGuTUgiNEWVUhdta5U8gDgFgEbwXQK
+         JlVGu/TyFqQaWUqPAK07lWIFlkQRx5wNUaBYLURlAbWx90QcJeDJ0G8uu0NXxFIC8ZYh
+         VU/3gBXTpNVlUbXwh/PGhDFqPsiL7HEUbwGmS8P837ER98xSZ1HHREbxFGjgFKhIf3/p
+         3W/A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788809597; x=1789414397; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=LbkJYZrKBAOtEAIquwnyRiPsYzlue46mhX6agZEqU8A=;
+        b=iK0qYj5js7h9LqZ16ntFi4pR+coNw+J1DIsxddLy2bybdXua8s7AhsQh5PKG4aPy8k
+         cWfcsot8Jd3QOFo9QOMLhxclr26W+2bFQXUQb/5htv9RCQ75k/nTYOvsiDpAh9ZC1h0P
+         17HYrGhBkPAcaFKfVJDBRota6XZwJTFU94U1d0QKrv1bCLj5OM6vuETU3sDAU1WcF6/P
+         XwKGZTES39HLJn7EPOvbTJ556I3rp76dCWF5AVgyuUSKXaJklfe1ypw/YLdAV2Pt4o8p
+         oIt3UyGz4+F70fE+3rhKKK66OxHCacES0jUQHDbVEe3CfUFb1qgvkTLFywu8+KyEsrhR
+         Wz6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788809597; x=1789414397;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=LbkJYZrKBAOtEAIquwnyRiPsYzlue46mhX6agZEqU8A=;
+        b=Z+cCPS/DKgehrl0vD3GrPcGMhzmB1aXwxJjNJoP63yJbCzf6VGZK5NC9tToIvKxvUO
+         QkMzL1qxz4qXYqQUSSv1J2dsJEK1dBBbsnl1hbEZGX2ukMQqUoWT6+lCSJy/6C0vX9gT
+         EWqQLagBAs5s0boVruqyAdF7EYP+RjGEG5ThzdYnrEc7GcR6xiUAMMnX16ppYJ8NUdU6
+         U9RMFw9klpNjYaEOEsiFGIn9Mp410Z7tQzbxPIdslu/CEdVLw8h5uJheyHulOFK248e3
+         aWMdW+ntD5ECDEKMmz55Y7bPD4UcQ8KS6VOZzkxaaoVo+vrX61Y+05wRLErmw/ioRh1e
+         sbUg==
+X-Forwarded-Encrypted: i=1; AKwUvBzMAounXd4TD41tkyrs608xQ/Rf9oj2dPQ5S6lSZMEzzHM8ose0DXJSoFDFVvmHa1v3/qp82heI7AMGFyw=@vger.kernel.org
+X-Gm-Message-State: AFuF++lLXbY4PdUb3tk9dkQT4AwbvefT4d6IgzoqWB268X9vzLoVniFC
+	+mkKstfvXH4DuobltdMjZTN1QGrc99e79vVZ5GDGacE14EQwByPxU5tuktmOwQuL9qQdO8c8/ss
+	8cCVN5dLGqylCj0FUCPUYLDilS1N+YYg=
+X-Gm-Gg: AYBFou2jP7VMKzRXfOsvppXHRKyxDXEzWG4EzYqnRMJGKgox3TkwQ03n1BH2ZLLV7Uy
+	J6iOO6HNi/r4L4FRaThblbHozt2gtc+AMIWWVmGMoIAOjN0DRjlsbCJPvcXt3/tMov/b8XUVJTp
+	XZwj3uSyVBnOiJ18D5h9XBciLY6NzOktpmTTVffcm0CfcZ5T9vGOrFb41XpBLFJrfVnd9H08oLP
+	QU/LAi+MVTsIKKA4BjPYCxw2zrMOU2hSxcCqenYkEfXnLrF2fhwDtruWgBKpu0klJXL7o+ggICI
+	yw64moRsE+gnoEGS7Fxp4msqozJ8Zrn62PFdBrEiCrQ1d51J5buy1Aus1/BPv8vngdusMFP/Vwx
+	rJRDYWglsfyJ5Wm7DhYjrnG1Vy9EXpKQslybZrY2YEFJJ5H4BSOEf7tSbHXVMJg==
+X-Received: by 2002:a17:90b:1e04:b0:396:463e:2eeb with SMTP id
+ 98e67ed59e1d1-39b264b24e2mr23088437a91.0.1788809597288; Mon, 07 Sep 2026
+ 12:33:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] scripts: add TOML config to container tool
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>, Miguel Ojeda <ojeda@kernel.org>,
- Nicolas Schier <nsc@kernel.org>, linux-doc@vger.kernel.org,
- workflows@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kbuild@vger.kernel.org, automated-testing@lists.yoctoproject.org,
- "kernelci@lists.linux.dev" <kernelci@lists.linux.dev>,
- Nick Desaulniers <ndesaulniers@google.com>, =?UTF-8?Q?Onur_=C3=96zkan?=
- <work@onurozkan.dev>
-References: <7d8ba914cd174d716340bb2b88723bef0f330627.1787565460.git.gtucker@gtucker.io>
- <apG3hwaPA8f7SJeI@levanger> <b45e7864-928c-4b3c-aa62-64f4f63d85c7@gtucker.io>
- <ed43b869-6fd4-4b00-8fd2-e9dd9aaf3349@gtucker.io>
- <20260903202700.GA3790602@ax162>
-Content-Language: en-GB
-From: Guillaume Tucker <gtucker@gtucker.io>
-Organization: gtucker.io
-In-Reply-To: <20260903202700.GA3790602@ax162>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: gtucker@gtucker.io
-X-GND-Cause: dmFkZTGYZ0xusX7B3vtGEumXHWWs3taCaC0TRLuhSk1Xjf6hEIZALIUlCCS0I/nesxusF2897jbZGrlgFwkxPfIiN3hbvJorR29XIS+H4S+El4YU2yG+9hRWyTJ+3pK9GRyXCTnlmK/7IQ2Y48I43N1/ICy8CyHR2XQkI6fp2D5byzkek+kpmgXBPdlv29U1JGPVdwEUqukJ91D74TnOjoF95aSNSQ/x7z4KCVMXIHc8VtWSQaSURAEdU7c7bnS2aHvRKPKuSXPZvH7iJTIhUQsPRN/xK+UNgqABMI0YfW2kQ/7yBOLh4nMOrGIDYd5/yu2lhYsLNds07CYjJ3T/eYi9XF0Bju3NMjpYn83V55GZA5a7nnkrrBG4ltTywXEZxk4ihfddli+x8QeFf6erhRQQzczPzoEa8i/pPncQY8Kznfd57KKI+Sy4yVjRDlpgePmuc7balo2/Bvq1sL5jaBblKbqHXX4WmCoekfSW0pxq8Wqb+vtC/9beenO2XlVviVUGmktVt2d0ZEss8x6dtOdDPoXu4yeLmCGjJwIEAr1uFz2gEpZT4k+sZsFTkWUyABIaW9im46pQUhv/LXgUUSSme+chk9ugJxiSrqGG9ji9Kechtq7+C7XnZZiJMNnmsOPAlp9nmr2n+7XYEBjwXQQaE8/yEMtOj9g2/W0QI7sWrnnQ+Q
-X-GND-State: clean
-X-GND-Score: -100
+References: <20260904-b4-arm64-callops-kcfi-v1-0-ce6687739b0c@linux.dev>
+ <20260904-b4-arm64-callops-kcfi-v1-8-ce6687739b0c@linux.dev>
+ <CANiq72=xOrSXBBdmrKYfX1=qgF37LRAMzMJd4GJkXaYHMVe9yQ@mail.gmail.com> <ap3Z-YDtzmdtMiMk@linux.dev>
+In-Reply-To: <ap3Z-YDtzmdtMiMk@linux.dev>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Mon, 7 Sep 2026 21:33:03 +0200
+X-Gm-Features: AcwNN1UJ5AD1nmjaRgagxZvj3fkfuD3Z7c-j0Zc231NENpcPq2HjO9j40kxIvNk
+Message-ID: <CANiq72mVXNmqh-RdOunFLBKRwMgYHFBqJOP7NbXrd8WHPb3sAw@mail.gmail.com>
+Subject: Re: [PATCH RFC 8/8] arm64: ftrace: Allow CALL_OPS on kCFI kernels
+ built with Rust
+To: "Jose Fernandez (Anthropic)" <jose.fernandez@linux.dev>
+Cc: Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, 
+	Emil Tsalapatis <emil@etsalapatis.com>, Puranjay Mohan <puranjay@kernel.org>, 
+	Xu Kuohai <xukuohai@huaweicloud.com>, Ard Biesheuvel <ardb@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Miguel Ojeda <ojeda@kernel.org>, 
+	Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
+	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
+	=?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
+	Sami Tolvanen <samitolvanen@google.com>, Kees Cook <kees@kernel.org>, 
+	Leon Hwang <leon.hwang@linux.dev>, Ihor Solodrai <ihor.solodrai@linux.dev>, 
+	Josh Poimboeuf <jpoimboe@kernel.org>, live-patching@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, llvm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org, 
+	linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	Ben Cressey <ben@cressey.dev>, "Florent Revest (Anthropic)" <florent.revest@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 03/09/2026 22:27, Nathan Chancellor wrote:
-> On Wed, Sep 02, 2026 at 12:26:29PM +0200, Guillaume Tucker wrote:
->> So to recap, here's what I would suggest:
->>
->> * keep Python 3.10 for this series, continue discussion about minimum
->>   and optional version numbers tree-wide in other threads
+On Sun, Sep 6, 2026 at 11:24=E2=80=AFPM Jose Fernandez (Anthropic)
+<jose.fernandez@linux.dev> wrote:
+>
+> # Do not pass -fpatchable-function-entry to bindgen: its libclang may not
+> # support the section argument (Clang >=3D 21), and parsing does not need=
+ it.
 
-Sorry I meant Python 3.11 as the minimum version for this series so
-we can have TOML support from the standard library.
+Thanks! Hmm... Not sure if "parsing" is the right word, i.e. a flag
+change could still make `bindgen` parse and generate code fine but not
+match the ABI of the C compiler.
 
->> * drop registry config file option in v4 then add it in a follow-up
->>   series along with image name validation and parsing using regex
+i.e. I guess I would have expected something like "...: its libclang
+may not support the section argument (Clang >=3D 21) and the removal of
+the flag does not change the ABI" or similar.
 
-Done in v4 which I just sent, will send the follow-up once this
-series is all done.
-
->> * leave TypeError exceptions as-is in this series, improve user
->>   experience and error handling altogether in another follow-up
-> 
-> Sure, I think this sounds fine. I tend to ignore existing issue comments
-> from Sashiko when it comes to accepting a series, I would always prefer
-> them to be handled in a separate series.
-
-Thanks for confirming, makes sense.
-
-Latest Sashiko review for the v4:
-
-  https://sashiko.dev/#/patchset/68b14a76a4cb2e6437c869bab948983a98acffbd.1788779245.git.gtucker%40gtucker.io
-
-The `env_file` comment is moot as the user should be able to trust
-the config file provided.  It's exactly like the classic
-docker-compose.yaml env_file use case in fact.
-
-The other comment about injecting options in the image name is also
-partly moot as the arguments passed to the subprocess wouldn't work,
-still I'm going to be addressing this by validating the image name in
-the follow-up series so that should then get resolved anyway.
-
-Best wishes,
-Guillaume
-
+Cheers,
+Miguel
