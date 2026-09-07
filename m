@@ -1,143 +1,221 @@
-Received: from mail-pz2-f12.google.com (mail-pz2-f12.google.com [74.125.228.12])
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC4723B47F0
-	for <linux-kbuild@vger.kernel.org>; Mon,  7 Sep 2026 19:33:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.228.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788809599; cv=pass; b=FEWjbTfulDprVkkVryQPcXe6LlHg/JMsmXR5+xW43H3HpH9Gj4GKvVpzjJpjFa0DvK0MovhX/5dRcW2OXrNjzMbIXC1QnW0OWSUgc1KtqXPWJnV/Xn2DtlwbltMLwNpHnIyEkykYuS3rmrUYZBOJU4wELVN8GdUJR5KkJQlHLL0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788809599; c=relaxed/simple;
-	bh=LbkJYZrKBAOtEAIquwnyRiPsYzlue46mhX6agZEqU8A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BRiRLAUFsrqXaVS61oe4V0G9YvMaKDKLV/IICH8gf9pUuNme4Pp1grE+WyLXsDnrY04VhFNX96ijdbotwytFlEcPgdIjBLMb6NXGV9YHzRFqz+mBGxuaJLBqHQkiBikbwaQZ1Lr9i8vbmTTlK6UdqPzNN++zw/98dQEUOn15Ck8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iK0qYj5j; arc=pass smtp.client-ip=74.125.228.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C5603370EC
+	for <linux-kbuild@vger.kernel.org>; Mon,  7 Sep 2026 19:45:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788810342; cv=none; b=PlxDJ0cY8VPwYCjSHTO/UCuh2q1c1H1LFnWWDLuUrOZCuW0Z90G6ck2ttXRrkHk+EGhCEnedpywldxPLWfTSFq6ahFx6CijPPBcMWRZoHpV5yMaQ/GK57cQ2mlh0wW1KTDarugAJ6ETJtgcr5KjldbHl1+qvNuN5n6hD08ph9ss=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788810342; c=relaxed/simple;
+	bh=D59uN3hb6OUrfBWQTzVc/dvluWreypRiHCj9LLgk/mk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DhnO2/1+AItjuohfBY29TRS5U5bC6d1mWes+qtrpUKHEr/3NQzZb6/dkTHNXREOK0oNMKApMSimYXFGIqusL+wNRVvAvVEpVuS9zPTVzrwRM6hphn1UIOidmwBwXVBG/ASX7EMA+g9z6okCKLva/90tH3xo7Wy/gO6EgmLkoiVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XzUFgM7l; arc=none smtp.client-ip=209.85.167.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iK0qYj5j"
-Received: by mail-pz2-f12.google.com with SMTP id d2e1a72fcca58-8523cc41f31so224619b3a.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 07 Sep 2026 12:33:17 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1788809597; cv=none;
-        d=google.com; s=arc-20260327;
-        b=sHTU0eOgYhuIJd3jmLcgz69lQnlWnrygWM8/UFCDd4hBtlIJCoFSrWbSbWDvbCyXuW
-         LrKYUhYP0u2tg0wL2a0XGPmAv63pjgPedv3QQgdvzprNB30rOC3VBdbV26Kt3N+grfX7
-         3NjSGEBgSaFzvoB1N7VUOZMSRQvepHNEHVl08ovD/idwbKsWD0J1YHX+mrSunuTW4qJS
-         6JE5Q4UVNFYJFnrmIJrhl59ZwEO1y3XFVZMR+sZ3PHACDzX9nig2GYpjP9MlMCK9DWCT
-         VipRULITcg8hNbayoVe+QKbJyV6QFp+5wR7XBvumXbOMiqLypBKsaDWjdLknrS+axeBC
-         zW8Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=LbkJYZrKBAOtEAIquwnyRiPsYzlue46mhX6agZEqU8A=;
-        fh=XuMNgNtoyCOQj2mf6wmOSIuve70mXvaWp9q9qFcAbjU=;
-        b=ULTVvomxLB/FEWwQydw7yWUda3uErJtfxnDcCvkcAhr+cp4B2hO2vd/oLhW12lWrRQ
-         qeiKFwx9kixbc6wVvTwiQcHLFEHHEzQHpmgZHAwDJada4m8B2UPR/NtQR1bRxxtD407l
-         PQD8P+isdy7GAF7Xvf78FhMrREtWyXf3NiHnivTGuTUgiNEWVUhdta5U8gDgFgEbwXQK
-         JlVGu/TyFqQaWUqPAK07lWIFlkQRx5wNUaBYLURlAbWx90QcJeDJ0G8uu0NXxFIC8ZYh
-         VU/3gBXTpNVlUbXwh/PGhDFqPsiL7HEUbwGmS8P837ER98xSZ1HHREbxFGjgFKhIf3/p
-         3W/A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XzUFgM7l"
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5b28c91fba5so4416756e87.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 07 Sep 2026 12:45:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788809597; x=1789414397; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=LbkJYZrKBAOtEAIquwnyRiPsYzlue46mhX6agZEqU8A=;
-        b=iK0qYj5js7h9LqZ16ntFi4pR+coNw+J1DIsxddLy2bybdXua8s7AhsQh5PKG4aPy8k
-         cWfcsot8Jd3QOFo9QOMLhxclr26W+2bFQXUQb/5htv9RCQ75k/nTYOvsiDpAh9ZC1h0P
-         17HYrGhBkPAcaFKfVJDBRota6XZwJTFU94U1d0QKrv1bCLj5OM6vuETU3sDAU1WcF6/P
-         XwKGZTES39HLJn7EPOvbTJ556I3rp76dCWF5AVgyuUSKXaJklfe1ypw/YLdAV2Pt4o8p
-         oIt3UyGz4+F70fE+3rhKKK66OxHCacES0jUQHDbVEe3CfUFb1qgvkTLFywu8+KyEsrhR
-         Wz6A==
+        d=gmail.com; s=20251104; t=1788810339; x=1789415139; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=Ll4ggulsNvB7I0J5QtGC1K6MCslpOv0W/EO5Nph+pQc=;
+        b=XzUFgM7l33PWVEI2ARFjbFeR6ad4w6T2eELthgMl3LhKxUZsEeC9HUWV6Bo0rQC7Lm
+         In65ITnG0p8vFwUJ6a+0ObNnFh4yHznQFgnHLdJ/DYhi3dOtP+0kWcuuwOXj8M6lDX3e
+         ZkgiZ7xo3BbNpyjSwTVqHm63218dsLwO1a8XbNxsh6RUaVfdxeO8hi5uA8VgDZKtZz2b
+         aEnnIh2r7rhlQ2Ot02LStcXGmVkQI8+7kMv5BR59U/0a0x8yyQ2nihDoo69IQl+vXxFt
+         OeuYoYLfKt7g8RJ/MezkQxoZlteKIlz4+alX7yAcieUWgUSNm/ODh7LTYgt5pjsSJEA9
+         X5RQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788809597; x=1789414397;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=LbkJYZrKBAOtEAIquwnyRiPsYzlue46mhX6agZEqU8A=;
-        b=Z+cCPS/DKgehrl0vD3GrPcGMhzmB1aXwxJjNJoP63yJbCzf6VGZK5NC9tToIvKxvUO
-         QkMzL1qxz4qXYqQUSSv1J2dsJEK1dBBbsnl1hbEZGX2ukMQqUoWT6+lCSJy/6C0vX9gT
-         EWqQLagBAs5s0boVruqyAdF7EYP+RjGEG5ThzdYnrEc7GcR6xiUAMMnX16ppYJ8NUdU6
-         U9RMFw9klpNjYaEOEsiFGIn9Mp410Z7tQzbxPIdslu/CEdVLw8h5uJheyHulOFK248e3
-         aWMdW+ntD5ECDEKMmz55Y7bPD4UcQ8KS6VOZzkxaaoVo+vrX61Y+05wRLErmw/ioRh1e
-         sbUg==
-X-Forwarded-Encrypted: i=1; AKwUvBzMAounXd4TD41tkyrs608xQ/Rf9oj2dPQ5S6lSZMEzzHM8ose0DXJSoFDFVvmHa1v3/qp82heI7AMGFyw=@vger.kernel.org
-X-Gm-Message-State: AFuF++lLXbY4PdUb3tk9dkQT4AwbvefT4d6IgzoqWB268X9vzLoVniFC
-	+mkKstfvXH4DuobltdMjZTN1QGrc99e79vVZ5GDGacE14EQwByPxU5tuktmOwQuL9qQdO8c8/ss
-	8cCVN5dLGqylCj0FUCPUYLDilS1N+YYg=
-X-Gm-Gg: AYBFou2jP7VMKzRXfOsvppXHRKyxDXEzWG4EzYqnRMJGKgox3TkwQ03n1BH2ZLLV7Uy
-	J6iOO6HNi/r4L4FRaThblbHozt2gtc+AMIWWVmGMoIAOjN0DRjlsbCJPvcXt3/tMov/b8XUVJTp
-	XZwj3uSyVBnOiJ18D5h9XBciLY6NzOktpmTTVffcm0CfcZ5T9vGOrFb41XpBLFJrfVnd9H08oLP
-	QU/LAi+MVTsIKKA4BjPYCxw2zrMOU2hSxcCqenYkEfXnLrF2fhwDtruWgBKpu0klJXL7o+ggICI
-	yw64moRsE+gnoEGS7Fxp4msqozJ8Zrn62PFdBrEiCrQ1d51J5buy1Aus1/BPv8vngdusMFP/Vwx
-	rJRDYWglsfyJ5Wm7DhYjrnG1Vy9EXpKQslybZrY2YEFJJ5H4BSOEf7tSbHXVMJg==
-X-Received: by 2002:a17:90b:1e04:b0:396:463e:2eeb with SMTP id
- 98e67ed59e1d1-39b264b24e2mr23088437a91.0.1788809597288; Mon, 07 Sep 2026
- 12:33:17 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1788810339; x=1789415139;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=Ll4ggulsNvB7I0J5QtGC1K6MCslpOv0W/EO5Nph+pQc=;
+        b=KyJ14ee6e1nTclRDKQMEpP0H8YhDTKWrpTt4eRi/Dq5kBOriKRUUEJ7ZbuicHmWtFB
+         SBTwXTTthlZLIjBIEG1UhvYNfCn45QsD5xZ4/sxt/REivxJ135CNXBFJFKrxwc4VqNF3
+         +sTTrgK5+/bImg0kw9Q5hi5tP+JNebdJwQzKl28oTFdWyQwnvlJWYhyNlhbrAQHttmIr
+         NA2NxU416Gww1g78JfdjRh9h/At5IH5XNSm4bY8NBUU73DlFKK1Ad6oDRupG4ETkJuGw
+         ha0P+3HXgiq+xyYrkQj5WVlYBFeWfORB+BW/uc7kLfFFOaIzOcnGhAXRjg9zrWz2DWap
+         VPag==
+X-Forwarded-Encrypted: i=1; AKwUvBxr8HAbiQdY2QbgLpFcvI9V529S2tpbuCC+aHroVmw5DKIXUPAVYKUOlDQ6ghXFfGVczZAbLO7QkHHzfQA=@vger.kernel.org
+X-Gm-Message-State: AFuF++miA9uHHj03LhLlqkIl4jbEcoMYv3Wkkzzw0QbULO3Ok+SeXzpF
+	eLnUhYFYG4Io5xil2qfjY4Ted7ZK+ENF/KKeVKoSyeSj/uoDfk/msNU=
+X-Gm-Gg: AYBFou38KGraoR9ATq/MfC3BiEI/wrVkKXbe9VvzsJn/DP9nAA3LJA7SvKnI6dh8QEr
+	ngztOfAcW2jotDYtKSTf+qOuhQTna2ul2s/g2b9+rw2sZU3Ma6OqgKZ2oP0q8urKgFyNXZKqiTi
+	SP4tbbE6zAJmzUiWjmlvY5J/Sce4cT+RxFdzxlhyiEGmcDpfupec5udij71ngdHlOXO1y1AHeYS
+	ZlJz+HBddaM6UymzbsExx7hh8Hnl+bxir9uu/fI4z9DclsuAcvZPQDIaLWfC2CQC+ovSQz38UNf
+	oqh3LiiEZpNznNY/mUQ+RrvGbdORNLurMn+ba1U0NvbjbGyiBp1T4pHuv4qmBYn02DpLxc01q+2
+	yri57K2O831fBWqJZzlpBJCwFrNYP8bR+SUv69o8POrOGKlxLRc5EO1IOJ5gRo7Ic8UVOW+gNLB
+	jYYZbh8mEhSiSDuKI9SlsGsShoiUHyiAyWoJsTUOFIHuKFvmWfq7OTO9LTKoYiBhmgn7Nqlc4P2
+	QtRNm/FR8A0ZY0st2pQRN5YH9bnCAp9VUT7wvLkekvAJVB/G6fWXSsl4cmjQJ7XAdvgCw==
+X-Received: by 2002:a05:6512:3c83:b0:5b6:10bc:dc42 with SMTP id 2adb3069b0e04-5b610bcdcd4mr5324008e87.25.1788810338748;
+        Mon, 07 Sep 2026 12:45:38 -0700 (PDT)
+Received: from insciwin.localdomain (224.105.88.34.bc.googleusercontent.com. [34.88.105.224])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5b74d55a4absm1946114e87.50.2026.09.07.12.45.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Sep 2026 12:45:38 -0700 (PDT)
+From: Dmitrii Tulnov <tulnov.dl@gmail.com>
+To: Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>
+Cc: Julian Braha <julianbraha@gmail.com>,
+	Peter Korsgaard <jacmet@uclibc.org>,
+	"Yann E. MORIN" <yann.morin.1998@free.fr>,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] kconfig: reject malformed KCONFIG_PROBABILITY values
+Date: Mon,  7 Sep 2026 22:45:36 +0300
+Message-ID: <20260907194536.37-1-tulnov.dl@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260904-b4-arm64-callops-kcfi-v1-0-ce6687739b0c@linux.dev>
- <20260904-b4-arm64-callops-kcfi-v1-8-ce6687739b0c@linux.dev>
- <CANiq72=xOrSXBBdmrKYfX1=qgF37LRAMzMJd4GJkXaYHMVe9yQ@mail.gmail.com> <ap3Z-YDtzmdtMiMk@linux.dev>
-In-Reply-To: <ap3Z-YDtzmdtMiMk@linux.dev>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Mon, 7 Sep 2026 21:33:03 +0200
-X-Gm-Features: AcwNN1UJ5AD1nmjaRgagxZvj3fkfuD3Z7c-j0Zc231NENpcPq2HjO9j40kxIvNk
-Message-ID: <CANiq72mVXNmqh-RdOunFLBKRwMgYHFBqJOP7NbXrd8WHPb3sAw@mail.gmail.com>
-Subject: Re: [PATCH RFC 8/8] arm64: ftrace: Allow CALL_OPS on kCFI kernels
- built with Rust
-To: "Jose Fernandez (Anthropic)" <jose.fernandez@linux.dev>
-Cc: Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, 
-	Emil Tsalapatis <emil@etsalapatis.com>, Puranjay Mohan <puranjay@kernel.org>, 
-	Xu Kuohai <xukuohai@huaweicloud.com>, Ard Biesheuvel <ardb@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Miguel Ojeda <ojeda@kernel.org>, 
-	Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
-	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
-	=?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
-	Sami Tolvanen <samitolvanen@google.com>, Kees Cook <kees@kernel.org>, 
-	Leon Hwang <leon.hwang@linux.dev>, Ihor Solodrai <ihor.solodrai@linux.dev>, 
-	Josh Poimboeuf <jpoimboe@kernel.org>, live-patching@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, llvm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org, 
-	linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	Ben Cressey <ben@cressey.dev>, "Florent Revest (Anthropic)" <florent.revest@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sun, Sep 6, 2026 at 11:24=E2=80=AFPM Jose Fernandez (Anthropic)
-<jose.fernandez@linux.dev> wrote:
->
-> # Do not pass -fpatchable-function-entry to bindgen: its libclang may not
-> # support the section argument (Clang >=3D 21), and parsing does not need=
- it.
+randconfig checks the numeric range of each probability but does not
+validate where strtol() stops. For example, KCONFIG_PROBABILITY=50% is
+accepted as 50:0:0: the '%' is parsed twice as zero. This silently sets
+both tristate y/m probabilities to zero, reducing the coverage of random
+configuration builds. Empty fields and extra fields are also accepted.
 
-Thanks! Hmm... Not sure if "parsing" is the right word, i.e. a flag
-change could still make `bindgen` parse and generate code fine but not
-match the ABI of the C compiler.
+Require each field to contain an integer followed by the end of the
+string or a colon introducing another field, with at most three fields.
+Preserve the leading whitespace and optional sign accepted by strtol().
+Keep the strtol() result as long until the range check so that narrowing
+to int cannot turn an out-of-range value into a valid probability.
 
-i.e. I guess I would have expected something like "...: its libclang
-may not support the section argument (Clang >=3D 21) and the removal of
-the flag does not change the ABI" or similar.
+Add regression tests for malformed and out-of-range values, the supported
+probability formats, and the documented empty-value default.
 
-Cheers,
-Miguel
+Fixes: e43956e60769 ("kconfig: implement KCONFIG_PROBABILITY for randconfig")
+Assisted-by: LLM
+Signed-off-by: Dmitrii Tulnov <tulnov.dl@gmail.com>
+---
+Validation on kbuild-next, x86_64, GCC 13.3.0:
+- make testconfig with HOSTCFLAGS=-Werror: 58 passed. With the original
+  conf binary: 18 failed, 40 passed; all failures are new regression tests.
+- ASan/UBSan at -O1, with leak detection disabled: the same 58 tests passed.
+- Both builds passed 1,635 input cases and 440 comparisons with the original
+  conf using valid inputs and fixed seeds. Malformed inputs preserved an
+  existing .config, including when KCONFIG_ALLCONFIG was set.
+- make defconfig, allnoconfig, allmodconfig and valid randconfig passed.
+  KCONFIG_PROBABILITY=50% changed from success to the expected error.
+- No vmlinux build or boot test; this changes the host configuration tool.
+  A 32-bit host build was unavailable because multilib headers were missing.
+
+An AI coding assistant helped find the issue, prepare the fix, description
+and tests, and run validation. The requested task was to find and fix a
+useful, reproducible Linux bug suitable for a first contribution.
+
+ scripts/kconfig/conf.c                        |  9 +++-
+ .../tests/randconfig_probability/Kconfig      | 12 +++++
+ .../tests/randconfig_probability/__init__.py  | 54 +++++++++++++++++++
+ 3 files changed, 74 insertions(+), 1 deletion(-)
+ create mode 100644 scripts/kconfig/tests/randconfig_probability/Kconfig
+ create mode 100644 scripts/kconfig/tests/randconfig_probability/__init__.py
+
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index fe8ba09b0..fa5dae74e 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -191,7 +191,14 @@ static void conf_set_all_new_symbols(enum conf_def_mode mode)
+ 		n = 0;
+ 		while (env && *env) {
+ 			char *endp;
+-			int tmp = strtol(env, &endp, 10);
++			long tmp = strtol(env, &endp, 10);
++
++			if (endp == env || (*endp && *endp != ':') ||
++			    (*endp == ':' && (!endp[1] || n == 2))) {
++				errno = EINVAL;
++				perror("KCONFIG_PROBABILITY");
++				exit(1);
++			}
+ 
+ 			if (tmp >= 0 && tmp <= 100) {
+ 				p[n++] = tmp;
+diff --git a/scripts/kconfig/tests/randconfig_probability/Kconfig b/scripts/kconfig/tests/randconfig_probability/Kconfig
+new file mode 100644
+index 000000000..84f4e5fcc
+--- /dev/null
++++ b/scripts/kconfig/tests/randconfig_probability/Kconfig
+@@ -0,0 +1,12 @@
++# SPDX-License-Identifier: GPL-2.0-only
++
++config MODULES
++	bool
++	default y
++	modules
++
++config BOOL
++	bool "Bool"
++
++config TRI
++	tristate "Tristate"
+diff --git a/scripts/kconfig/tests/randconfig_probability/__init__.py b/scripts/kconfig/tests/randconfig_probability/__init__.py
+new file mode 100644
+index 000000000..022c7eaf2
+--- /dev/null
++++ b/scripts/kconfig/tests/randconfig_probability/__init__.py
+@@ -0,0 +1,54 @@
++# SPDX-License-Identifier: GPL-2.0-only
++"""Validate KCONFIG_PROBABILITY without changing the supported distributions."""
++
++import pytest
++
++
++@pytest.mark.parametrize('probability', [
++    'invalid', ' ', '50%', '50 ', '0x32', '10 20', '10:20x',
++    '10:20:invalid', '10:20:30x',
++    ':50', '50:', '10::20', '10:20:', '10:20:30:', '10:20:30:40',
++    '-1', '101', '0:101', '0:0:101', '60:41', '0:60:41',
++    '4294967296', '-4294967296',
++    '999999999999999999999999', '-999999999999999999999999',
++])
++def test_invalid(conf, monkeypatch, probability):
++    monkeypatch.setenv('KCONFIG_PROBABILITY', probability)
++
++    assert conf.randconfig(seed=0) == 1
++    assert 'KCONFIG_PROBABILITY:' in conf.stderr
++
++
++@pytest.mark.parametrize('probability, boolean, tristate', [
++    ('0', 'n', 'n'),
++    ('0:0', 'n', 'n'),
++    ('100:0', 'y', 'y'),
++    ('0:100', 'y', 'm'),
++    ('100:0:0', 'y', 'n'),
++    ('0:100:0', 'n', 'y'),
++    ('0:0:100', 'n', 'm'),
++    ('000:000:100', 'n', 'm'),
++    ('+100:0', 'y', 'y'),
++    (' \t100:0', 'y', 'y'),
++    ('0: \t100:0', 'n', 'y'),
++])
++def test_valid(conf, monkeypatch, probability, boolean, tristate):
++    monkeypatch.setenv('KCONFIG_PROBABILITY', probability)
++
++    assert conf.randconfig(seed=0) == 0
++    for symbol, value in [('BOOL', boolean), ('TRI', tristate)]:
++        if value == 'n':
++            expected = '# CONFIG_{} is not set'.format(symbol)
++        else:
++            expected = 'CONFIG_{}={}'.format(symbol, value)
++        assert expected in conf.config.splitlines()
++
++
++def test_empty(conf, monkeypatch):
++    monkeypatch.delenv('KCONFIG_PROBABILITY', raising=False)
++    assert conf.randconfig(seed=0) == 0
++    default_config = conf.config
++
++    monkeypatch.setenv('KCONFIG_PROBABILITY', '')
++    assert conf.randconfig(seed=0) == 0
++    assert conf.config == default_config
+
+base-commit: cee9395acd8043be0644b25c34bfa86623f2b935
