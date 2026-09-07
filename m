@@ -1,62 +1,62 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5654466AE1
-	for <linux-kbuild@vger.kernel.org>; Mon,  7 Sep 2026 10:38:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE51463B87
+	for <linux-kbuild@vger.kernel.org>; Mon,  7 Sep 2026 10:38:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788777486; cv=none; b=sBB3ux+iBO4coG3cxUvrv4Q46vPJLKPA30U1Nxe8IP9lK+fNCQ8Pu+rsRPjYl9wuOiSc8v0S82nfz3D1ZQVDqRszeqXnZog1ghzeaVLb+vQyb+1XVMC439jJZy0NRb2FoMBvLbpstPgOzetAJzZlBKL2u/Rn8LJjb6I2sQlV9hA=
+	t=1788777488; cv=none; b=jQRhJwbc5EyeumliD0WWqhr9oND4+I1WHWg9ql+NzOHc1asowvUNSx17K1Wm70aRoBWfPhkHHgnJ+lS5iMkiYzJnrHXNrULOMwiBfM4MgPleqMRh3wFel1WoDuo8pUseZWO4yQPoezFV58VnbWNPlrJgVNvWE+ihyvV96MebasE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788777486; c=relaxed/simple;
-	bh=ZP0v0FbC59/0C24ZWn/MoBhMdBld/zG+x2hSIlkc6M0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gcVl0gG8Ie2GQog6n7WnvslQf60w+xv8GYmG/pqUmbKE7k5pqNApkKduoKG+MUrProBfDbVbPwvclblEOvXCukTFPGf8Bqj9nE76hVrvqWL7bikfaZ3sask8ydD07ax7f9Ix5INv9sVREUYTORY44kJqXplhVlt3FDT/CS6iJl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YeRxMWsK; arc=none smtp.client-ip=209.85.128.46
+	s=arc-20240116; t=1788777488; c=relaxed/simple;
+	bh=EXwlhkDOlgB8hEwY0nwbSEzsp6JcpizZji2VCQUb/6M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=doHzIU+pEY1N/EP4eIdbETNBtz75Fuigtx0A8XZN0k/KwfawHx6oJLrsFyzbydtc+EJaAFJqxDcQ8Oy8kjQG9u8GZ8BMBFqfvgT2o3Lqj5GuXTCqWcetWar8jrkuhSMKUYHipIUDK5C63hcjtrRUlkzkJT3Nd2rhYJczPsXSEe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UWUi49/S; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YeRxMWsK"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-49954b88fffso25470005e9.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 07 Sep 2026 03:38:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UWUi49/S"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-495590dde14so48661965e9.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 07 Sep 2026 03:38:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788777483; x=1789382283; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1788777485; x=1789382285; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=LfFVHzcpV0I36UPxeD3SH8L9Tgicjr0WOI5DBup3i1c=;
-        b=YeRxMWsKlyhDC0i464VVvJZnatrt3H+V9dIe3s1UAF4WG0dSvMORcoxJ4QOdm89lBj
-         TZai8Pix7AbnUPHxfB+Nfk4gFVZTN0mef3jR0340BMIgLyB/8llyuPgeljp+Iimy2EOJ
-         tmbum3O4ubQG729dDzM3U0A7gcLAwlVUDlkygTNdjnepzrc0iwXLQn0pyRCF47Un+to8
-         2KM43EHm0jUeB+z58DW6iJVrBliV0mCCMnvtvOZgEGSLdODPIpgZVXcaiapoqLNOqU+M
-         x6+fFIWmXZDNKrgOXNSz0bmIeptjSPLpt2jk8rXmJIdiGWRIG317BlTxXOv1SBZOb4Rc
-         etkA==
+        bh=WVAzxcdWiFmNG9B2ynD1XwXk5KOxa+JBkIusJfeUZEU=;
+        b=UWUi49/SAEX49+5UoKqFSgY31G2KXcWF+XowkcHjnL6eDqBFoWbomTaUrYwT0JOQMd
+         5cxjjVoOF49A6F1vIdWpq+EXTuQv6XcvlLthdfGaTQUzxL7Vkkzn7UNfs5gG+zVF85pT
+         p4FjJL9fLFY/sBu1XfhKkYV8o5wAeYXeOBerEWZuHUmvrscekMWeLAt/oXFXRltZyuOZ
+         WhoXelUr68rXmkSonAm21WumfhgCMahLNy13b+hBuiiaKCNBArppZE0oU5jBOSZEdAa3
+         iGYVPutuiCaxHrZbkaikmEChJPvNF0Kl0VJYXld+RKSzynsVfTGa+ccUh0LzycVx7NZC
+         yQXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788777483; x=1789382283;
+        d=1e100.net; s=20251104; t=1788777485; x=1789382285;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=LfFVHzcpV0I36UPxeD3SH8L9Tgicjr0WOI5DBup3i1c=;
-        b=hZIDBFEeemAfVepHWhigBTVbcObQ0RxM7jsOjNJP+qQJ+Q13E53D9FsK0bmdto0XL3
-         gDGL2XXwRsvEnkj++kG3nWX76qWnEwmTUu4FcQFnuot3KKQocL6SmLVxtwQCuNxIUcgP
-         059n4/CfB/8HUd9IGN3iLwZURNDwErq4IxfKvsKkdMyMPn8xzwD+L9G38U1FoB2PRCLX
-         Uhc2k9nNM6Lu5bxnmIQfaQwPZrf/N2niYkr9yybzCc6fMkuXuXL2hXvmDlw7GG1bRuuk
-         TxTyX7faPqNPXpN8Fs3HgG1Eea5du2K58/iAPGhtqPm2TmCqQuskNNO2zKQSfwKLuxvV
-         /0FA==
-X-Forwarded-Encrypted: i=1; AKwUvBzgZsSoHvBTL/Kp74tow0NEmLWPK9ZbnJyU4Lp4YosSvljJ0JYxDel965KULGOtk6Miyi2gbPvtT/t4cr0=@vger.kernel.org
-X-Gm-Message-State: AFuF++mMcSMACEXQOdqvQqG4tkIGsryNVAeM9JDF9QIkOI7w4uClvuZ4
-	flNKBSoG1Oz9hJmRhuRoO24ZoBq3qchwm8EQ5Q76G4dJjgXv+W0UZp25
-X-Gm-Gg: AYBFou3bsvoUbTTxzI5N6YxXhhgWj2a1V1XY54bhYr0u4q/t9qPT51RMkiYtVQTvz7B
-	YEJPckdvmPXsUXakYp1G3PY4q/G09/KfUOGkKoBSirH0bvAa4O3Q0vYRFCLDWJTrNCkbjWm2/wW
-	mDd0QD9Li4Rcr3vp2+Hk49d0qhLbvPQdYmsa5cq2hs/zAnqFcpg29cV4lK3wfP9WUbXlSua9T9d
-	wZ4ONxdn7xi6PlYzD6ig5H8p96GYSRBPXdtXBjLvwalCuWMbtbHABd0TgQtCzBF4JcUq1J3vaqU
-	8mSoLZjmBRG3OWE2mQpjpu8i8l9Z7JjOKuIOHYqrbDzXyGzEfN/fXPAlItobsNB8eHoTw1Pzrcg
-	KhGlZA5TrZUYXmWfuC4QG6P8XCv/F0FhPbzemlTIg+p2c513fkns9jBjnmouKn+iNrBUBcS4MV8
-	wr5GdQqwErlC/RUFs/Jz/tIeLyGa7D33sDDKkW9XVKKpbm0YEB0X004TRbUeMUQIUb4rQK7Akw4
-	mVWhfhYBuH94gfo56jo73g+ZY5OpDeT45SqZdAwpPtoSPG/VhojMwXbxKqSYw==
-X-Received: by 2002:a05:600c:3e1a:b0:49c:fc6c:bdff with SMTP id 5b1f17b1804b1-49cfc6cc078mr168749475e9.22.1788777482725;
-        Mon, 07 Sep 2026 03:38:02 -0700 (PDT)
+        bh=WVAzxcdWiFmNG9B2ynD1XwXk5KOxa+JBkIusJfeUZEU=;
+        b=NzshhPBxGbrUrWM5etOgoKrkLb/xME/+4EywK2G/6B6o4llo2br01oaOVdf043AQNo
+         gNMi632Z7V1mvfd+LF7Qy+R2xHhf1JH0mZGAebN6RLMJ4/ITHAuHVe40WmXRHxtTzFi9
+         FOck5GXscNiBsq4xwdAj5ZXQtpjKzPvVviQaEFvrGbr9wHGX662ER1IEHTCCRJ7sFsl3
+         XuPdfkUmEDwazG6ShZFeaBnWDVt+o5gnarP3kG6dUG0fKKxKLS9HKGdVdQN0+Mh7ABia
+         7X46fS5MKhtrydX79cOuFy+iYW5vKCRphnJ0iqSOCofsuMF+dKaY87o1kC2fY5ZsxdIO
+         SORA==
+X-Forwarded-Encrypted: i=1; AKwUvBxLbAbKzHdbU7W9VfpIt9pb/POw/MkVUftvBJQbDaLiDxXX6WPFOhTH5tWELeynvZ6NiPXtHkB26f1cq4k=@vger.kernel.org
+X-Gm-Message-State: AFuF++nyz+d72RH7BuVroRFIMYItPhEZsT0jWhNSK6OdW8WAEhuICRSM
+	v8mXFraQxUcLVddl80Zzp8fmiogbNbRu278Sx5Kc8w9VvUP6FClcybDvuaOo3x9Fo1U=
+X-Gm-Gg: AYBFou2++ghlC3zRW25cONIoFf+Rk8oXkhk0rTwus1Kpm9aIu8wnY6vJ6j6et6X+725
+	T9usSLHQIKXDxGUc8qIELG8Q4FFaCtRwYxEb/hvHmZvW5opEEZ9a3wMTFLsAyhyha5RYJxYyGmK
+	qR1EQA4pvMcG0qJYPrmk6nhLNp3KdRg3AludCRkpUUaoL/5webPfRGare2FlzrHBWXrIhRt25HO
+	IettQOONabjFNDJfex7l/FqgSq0HexosPUde+F1JySShy6FoIg1CFtJYC/GV/4rHfT+RnNxtl6L
+	ioLtD7p4lR51EmeMAPSeGztAseX/mqrNLWiRBuMlm5oZwa6AezdsFptS3R19GDeWvXOOYuwX0me
+	A6YJC/hKYK61ig1Y4JxvsrNxobWmccDsVAScPqznVMy9NaLrdo6qgKIzF6xo3gLl5QtKETya62C
+	lrhzTVP++5wdaJuSHmbuDaSbmYFXMIFFrzNeDPiwk8+hdxtFGUkVBPP+7QSWAi0bqNGkdlUzrTg
+	FF55efJsxxZ+ELQOqWmGquS+QFeNfYMC94DD5wTw5o/9g1pi4gAKwxqZXrv/g==
+X-Received: by 2002:a05:600c:3d92:b0:49d:726:cc9f with SMTP id 5b1f17b1804b1-49d0726cd2emr249448785e9.5.1788777485104;
+        Mon, 07 Sep 2026 03:38:05 -0700 (PDT)
 Received: from localhost.localdomain ([95.3.12.38])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49ce5533ffbsm311944285e9.3.2026.09.07.03.38.01
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49ce5533ffbsm311944285e9.3.2026.09.07.03.38.02
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 07 Sep 2026 03:38:02 -0700 (PDT)
+        Mon, 07 Sep 2026 03:38:03 -0700 (PDT)
 From: Erkan Erdem <hexvalid@gmail.com>
 To: Nathan Chancellor <nathan@kernel.org>,
 	Nicolas Schier <nsc@kernel.org>
@@ -64,13 +64,13 @@ Cc: Erkan Erdem <hexvalid@gmail.com>,
 	Julian Braha <julianbraha@gmail.com>,
 	linux-kbuild@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	llvm@lists.linux.dev
-Subject: [PATCH v2] kconfig: preserve the final answer when input has no newline
-Date: Mon,  7 Sep 2026 13:37:38 +0300
-Message-ID: <20260907103739.23212-2-hexvalid@gmail.com>
+	Ariel Marcovitch <arielmarcovitch@gmail.com>,
+	Valentin Rothberg <valentinrothberg@gmail.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [PATCH v2] checkkconfigsymbols: resolve revisions before resetting the tree
+Date: Mon,  7 Sep 2026 13:37:39 +0300
+Message-ID: <20260907103739.23212-3-hexvalid@gmail.com>
 X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
@@ -80,104 +80,82 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-conf_string() unconditionally removes the last character returned by
-fgets(), assuming that it is a newline. When redirected input ends
-without a newline, the last character is part of the answer instead.
-For example, feeding 42 to an integer prompt stores 4, and feeding
-0xff to a hexadecimal prompt stores 0xf. Both commands succeed despite
-silently changing the supplied value.
+The commit comparison resets the current branch to commit_a before
+resolving commit_b. If the second revision is HEAD or the current branch
+name, it then resolves to the first revision. For example, --diff
+HEAD^..HEAD compares the parent with itself and silently misses newly
+undefined symbols. The same problem affects --commit with the current
+branch name.
 
-Strip the newline with strcspn() so that a complete answer at EOF is
-preserved. Keep the existing handling of newline-terminated and empty
-answers unchanged.
+Resolve and verify both revisions as commits before the first reset.
+This keeps their meaning stable throughout the comparison and rejects
+invalid endpoints before changing the working tree.
 
-Add regression tests for string, int and hex answers, with and without
-a final newline, in oldaskconfig and oldconfig.
+Keep lookup diagnostics separate from the resolved hashes. Use the
+resolved range for --find too, since resetting also updates ORIG_HEAD.
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Fixes: b1a3f243485f ("checkkconfigsymbols.py: make it Git aware")
+Link: https://lore.kernel.org/20210901145212.478066-1-arielmarcovitch@gmail.com/
 Assisted-by: LLM
 Signed-off-by: Erkan Erdem <hexvalid@gmail.com>
 ---
 
 Changes in v2, addressing Julian Braha's review:
-- Add an in-tree regression test under scripts/kconfig/tests for string,
-  int and hex answers, with and without a final newline, in oldconfig
-  and oldaskconfig. The shared test harness is unchanged.
-- Submit this fix independently of the checkkconfigsymbols.py change.
-- Refresh Cc from scripts/get_maintainer.pl, including the LLVM contacts.
+- Submit this fix independently of the unrelated Kconfig input fix.
+- No code changes from v1.
+- Include the original Git-awareness author and contributors to the
+  previous HEAD-reference fix in Cc.
 
-v1: https://lore.kernel.org/all/20260905123237.40670-1-hexvalid@gmail.com/
+v1: https://lore.kernel.org/all/20260905123237.40670-2-hexvalid@gmail.com/
 
 An AI coding assistant found the issue, prepared the fix and changelog,
-and ran the original verification. The assistant also prepared the new
-regression test and this v2 revision.
+and ran the original verification. The same assistant prepared this
+standalone v2 submission.
 
 Validation:
-- Built original and fixed conf with Clang on macOS and GCC in an
-  x86_64 Linux container, using -Wall -Wmissing-prototypes
-  -Wstrict-prototypes -Werror.
-- On both platforms, the original conf fails all six unterminated-input
-  cases and passes all six newline-terminated controls.
-- The fixed conf passes the complete 33-test Kconfig suite on both
-  platforms, including all 12 new cases.
-- This tests the host configuration tool; a complete kernel was not built.
+- The code is unchanged from v1, which passed 15 actual-CLI cases in
+  disposable Git repositories, including HEAD-relative ranges, branch
+  names, hashes, tags, annotated tags, ambiguous names, --commit,
+  --find, ORIG_HEAD and invalid or non-commit endpoints.
+- Those checks verified HEAD, current branch, index and tracked file
+  contents after every invocation.
+- The script in mainline df2908090cda368b01ff43709f51890076c56157 still
+  matches the original pre-fix file; this patch applies independently.
 
- scripts/kconfig/conf.c                        |  2 +-
- .../kconfig/tests/conf_no_newline/__init__.py | 32 +++++++++++++++++++
- 2 files changed, 33 insertions(+), 1 deletion(-)
- create mode 100644 scripts/kconfig/tests/conf_no_newline/__init__.py
+ scripts/checkkconfigsymbols.py | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index fe8ba09b0..46c9ca646 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -343,7 +343,7 @@ static int conf_string(struct menu *menu)
- 			}
- 			/* fall through */
- 		default:
--			line[strlen(line)-1] = 0;
-+			line[strcspn(line, "\n")] = 0;
- 			def = line;
- 		}
- 		if (def && sym_set_string_value(sym, def))
-diff --git a/scripts/kconfig/tests/conf_no_newline/__init__.py b/scripts/kconfig/tests/conf_no_newline/__init__.py
-new file mode 100644
-index 000000000..0fca696d2
---- /dev/null
-+++ b/scripts/kconfig/tests/conf_no_newline/__init__.py
-@@ -0,0 +1,32 @@
-+# SPDX-License-Identifier: GPL-2.0
-+"""
-+Preserve complete string, int and hex answers at end of input.
-+"""
+diff --git a/scripts/checkkconfigsymbols.py b/scripts/checkkconfigsymbols.py
+index 36c920e71..e0a1a631b 100755
+--- a/scripts/checkkconfigsymbols.py
++++ b/scripts/checkkconfigsymbols.py
+@@ -150,6 +150,13 @@ def print_undefined_symbols():
+             undefined_a = {}
+             undefined_b = {}
+ 
++        commit_a = execute(["git", "rev-parse", "--verify", commit_a + "^{commit}"],
++                           stderr=None).strip()
++        commit_b = execute(["git", "rev-parse", "--verify", commit_b + "^{commit}"],
++                           stderr=None).strip()
++        if args.diff:
++            args.diff = commit_a + ".." + commit_b
 +
-+import subprocess
-+
-+import pytest
-+
-+from conftest import CONF_PATH
-+
-+
-+@pytest.mark.parametrize('mode', ['--oldaskconfig', '--oldconfig'])
-+@pytest.mark.parametrize('newline', ['', '\n'], ids=['eof', 'newline'])
-+@pytest.mark.parametrize('symbol_type, value, expected', [
-+    ('string', 'abcdef', '"abcdef"'),
-+    ('int', '42', '42'),
-+    ('hex', '0xff', '0xff'),
-+])
-+def test(mode, newline, symbol_type, value, expected, tmp_path, monkeypatch):
-+    (tmp_path / 'Kconfig').write_text(
-+        'config TEST\n\t{} "Test value"\n'.format(symbol_type))
-+    monkeypatch.setenv('srctree', str(tmp_path))
-+    monkeypatch.setenv('KCONFIG_DEFCONFIG_LIST', '')
-+
-+    result = subprocess.run([CONF_PATH, mode, 'Kconfig'],
-+                            input=value + newline, text=True,
-+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-+                            cwd=tmp_path, timeout=10)
-+
-+    assert result.returncode == 0, result.stderr
-+    assert 'CONFIG_TEST={}\n'.format(expected) in (tmp_path / '.config').read_text()
+         # get undefined items before the commit
+         reset(commit_a)
+         undefined_a, _ = check_symbols(args.ignore)
+@@ -223,10 +230,10 @@ def red(string):
+     return "\033[31m%s\033[0m" % string if COLOR else string
+ 
+ 
+-def execute(cmd):
++def execute(cmd, stderr=subprocess.STDOUT):
+     """Execute %cmd and return stdout.  Exit in case of error."""
+     try:
+-        stdout = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=False)
++        stdout = subprocess.check_output(cmd, stderr=stderr, shell=False)
+         stdout = stdout.decode(errors='replace')
+     except subprocess.CalledProcessError as fail:
+         exit(fail)
 
 base-commit: 4d7d9486c04d917265f64c55bd23b2cc4fe7749c
 -- 
