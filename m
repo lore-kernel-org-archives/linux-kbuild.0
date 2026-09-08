@@ -1,213 +1,355 @@
-Received: from CWXP265CU008.outbound.protection.outlook.com (mail-ukwestazon11020106.outbound.protection.outlook.com [52.101.195.106])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F2263B6347;
-	Tue,  8 Sep 2026 20:54:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.195.106
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788900858; cv=fail; b=Sg7ZPkp7J6xs/rfRq9sAtRAxF1GKVv3hEFCQLTSd+RaEG46NoS78ZijVfxqDl0XqXjpRr+f9MK+PF36oRFD9P2IeczxpuhwDqtvmnz8rqtTt6JJtrJU2UkzmAyuVAMTTomnyNnhdWwD1kC0Wvdk/DaG04YtoAjHnsFY39e5MhYQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788900858; c=relaxed/simple;
-	bh=zeloaV7mDFuyS5xk6FEwQMBMaGxW7TsTvtjhDjNtCp0=;
-	h=Content-Type:Date:Message-Id:Subject:From:To:Cc:References:
-	 In-Reply-To:MIME-Version; b=WPwcBG0AiHB4fXHK8iBbiYq0unHW9gS2N3Kp9Alni0TQ4irrNDBaZKwe//b3pUoJonHyUGWy0beVwBFNr3vKQTCXU5vdjPecSgcU1aZGhoJyjPUMgSAJ1tyge/hf2LEaZuIwV8q8QB2JkylerL6DQsi6Z70Z3x1YulCHKeulDxE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=CMh6rO1b; arc=fail smtp.client-ip=52.101.195.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garyguo.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37FFA3BF69E;
+	Tue,  8 Sep 2026 20:55:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788900934; cv=none; b=JABB2ssBNgCe3hr56v3Tin5xpH2Bb6mYjFI4wY5IVOn5Zeblytn+hSsNKPMhe8JInFGy/XpVDQj7OsC2M+IlSJJGkWjyRNNZJHcyVHiYOdGqa/DIahR2XpQO9b4k5CT2gcX94FB5U/pNhIDMox6bB5VRHoWlzLtp7NsX2n38+50=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788900934; c=relaxed/simple;
+	bh=r4zxWZsjLq+o+qJdnXb/cjOXHX0h7zTZcMS+AZOh2Tk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=js0MosJs3xzLDha8JKeV5y4rorv09L0phR5S1L4HSMQd1UF3D3dpHeKaypHjPy2w5PC7GKoHR7YQLkSlpvEK5ba8Db2Dv5mQOSngh5LxA9f9obuRYcsSY4RNA2Kn9so72riNrO05jvVYt4+Q/jeiaqLq//zskkXmV/FmDHKLkoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a/BqhTCR; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="CMh6rO1b"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YeF45zA3Bc3H2+7QYBCKk4yHo4/ZUTIWb0NvNbaXZVgj+6M5SLh3qDzZg8PmtjMxv0zpBvthJAPpE/pq96B1B/nYVReDTGLCrDXrAZZwSP72LMlyfak9gEj7iosoTc0X1nahU66aeWkAbFrYELQUWTudqwH8GNkC5n5vJGjZDicroWXGMZSpJmTqQtwmQXyjUlXEIAJ+ibNAt0/7GHV2SsxZD1kbOGN33io85g7vmDkT9gvVX2XkEpNlYYdANXXL0okvUDwfh3b3FRrY+Yq77KtVW+mwG0SkdI+b6O8gT/kLXKgYrw4wXP4hf5XfK0rAQbdar10L0RCJr7HSD0Hq5Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GiQ0ANC3i1Hg61e5gSaFpFcV+U5SVXE7NPbosieutsg=;
- b=ZwX+rL1axRmO0dv7Cjmh90oSgMcRUtxBnV0zwsFlXxhYf6MFYTlbfKlmj6YMWLOe/yPo15ovGXKLSCw/66oX+jQLpfPb9mjlfYzVmjMM3vBZGjMPlkChg+0v2NJjY9fnMrXpByMR1hJEx1PRAx//6jK4UZOF2Qd5u/eYUYc2gZMm6K5mLroNUFqgxs0fTmirXV/Qeh2lG8sQvgnr09irkxu9CwUp4hU0eo04RMN0JrQ4mm+Fgl0WBNMhhSuO3i1o3aB7khDdsEiSLB29QnsmgzA9Vkyx0mjkf8CMtoxewlMzec/IhJgUxyVQpCYL6rzORZHz+8cabMVdoRaAS7lk0w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
- dkim=pass header.d=garyguo.net; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GiQ0ANC3i1Hg61e5gSaFpFcV+U5SVXE7NPbosieutsg=;
- b=CMh6rO1b5DpGlFxnmkAr9GvwNcs2oJl3a/SfAuVZZUDJ3yT8szU1j4yg3zvHJXkZUGKjZn8WsnNutFBvsh0u5/iQB1ba5gbVIwaKM7uiKbO0aFsoRsgG/u/Og7tX5bJ4HGWRucP2ApqZ/baPsfIywfIqXO/c9FgZK8pw+umbJDc=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=garyguo.net;
-Received: from LOAP265MB8560.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:4ab::19)
- by CWLP265MB5185.GBRP265.PROD.OUTLOOK.COM (2603:10a6:400:15e::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.406.7; Tue, 8 Sep 2026
- 20:54:12 +0000
-Received: from LOAP265MB8560.GBRP265.PROD.OUTLOOK.COM
- ([fe80::f60b:1537:68d7:4fc1]) by LOAP265MB8560.GBRP265.PROD.OUTLOOK.COM
- ([fe80::f60b:1537:68d7:4fc1%4]) with mapi id 15.21.0406.005; Tue, 8 Sep 2026
- 20:54:12 +0000
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 08 Sep 2026 21:54:11 +0100
-Message-Id: <DLA8FDX8R5V0.7L5PQVACRZ75@garyguo.net>
-Subject: Re: [PATCH] rust: allow `unknown_lints` in generated bindings for
- Rust < 1.88
-From: "Gary Guo" <gary@garyguo.net>
-To: "Miguel Ojeda" <ojeda@kernel.org>, "Nathan Chancellor"
- <nathan@kernel.org>, "Nicolas Schier" <nsc@kernel.org>
-Cc: "Boqun Feng" <boqun@kernel.org>, "Gary Guo" <gary@garyguo.net>,
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Benno Lossin"
- <lossin@kernel.org>, "Andreas Hindborg" <a.hindborg@kernel.org>, "Alice
- Ryhl" <aliceryhl@google.com>, "Trevor Gross" <tmgross@umich.edu>, "Danilo
- Krummrich" <dakr@kernel.org>, "Daniel Almeida"
- <daniel.almeida@collabora.com>, "Tamir Duberstein" <tamird@kernel.org>,
- "Alexandre Courbot" <acourbot@nvidia.com>, =?utf-8?q?Onur_=C3=96zkan?=
- <work@onurozkan.dev>, <rust-for-linux@vger.kernel.org>,
- <linux-kbuild@vger.kernel.org>, <stable@vger.kernel.org>,
- =?utf-8?q?Emilio_Cobos_=C3=81lvarez?= <emilio@crisal.io>
-X-Mailer: aerc 0.22.0
-References: <20260908170539.345207-1-ojeda@kernel.org>
-In-Reply-To: <20260908170539.345207-1-ojeda@kernel.org>
-X-ClientProxiedBy: PAYP264CA0033.FRAP264.PROD.OUTLOOK.COM
- (2603:10a6:102:11f::20) To LOAP265MB8560.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:4ab::19)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a/BqhTCR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0A871F00A3A;
+	Tue,  8 Sep 2026 20:55:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788900932;
+	bh=Z6TT9h2uKDtEtXIE4l9d0BFbIHokBD+KKytpOJVveCc=;
+	h=From:Subject:Date:To:Cc;
+	b=a/BqhTCRMBH0KeWJYnRy7w1fkn/s863I1L51dbSgriOFlxPSRJTy2/WN0L+jMICVz
+	 IsdWZvZ0Z0Y9ELHrBG8wYeF9Le4JKEqUhDTPUnw+Y7wgb3atyJD7fpCIg/iD/sUKa3
+	 XWgjIZ9O/nCi7kHaZRLvQcL0kDjsewi7pBi/oxinfHbypkTQW8WvMtKzF2cInGNrCU
+	 mPK4arybamW5Pp8VtL7+8gaU1AXjrQlEbqDf6yQ6SCnhtzDi0J77mmDHYO2g221b06
+	 JvlTq8QdlwOHgyv4eeBGuJwDFXo5AlLfK45cTg8keJlqfnEC4JuqI07JTB3csrHInN
+	 uWptR9RVl1guA==
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Subject: [PATCH 00/23] kbuild: significantly speed up kernel builds
+Date: Tue, 08 Sep 2026 21:55:00 +0100
+Message-Id: <20260908-build-speedup-v1-0-5dc1ac01672d@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LOAP265MB8560:EE_|CWLP265MB5185:EE_
-X-MS-Office365-Filtering-Correlation-Id: 49993475-b317-49c6-8ca6-08df0deb5639
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|10070799003|23010399003|376014|7416014|18002099003|22082099003|3023799007|56012099006|10067099003;
-X-Microsoft-Antispam-Message-Info:
-	T1SZURHtjRBZgT5yel6OXSrD1tQ5Eb4uJGkEmJ0Mwili76fYp4Q1OnXkzfIxtJbvgg5zoZgEAZWkDS+gwrdnyguwTh7aLDcKesESt/oF88LYjZYTrLZU5M1xAi78hPTeDdcehWTwY/kHfcbdcRonhlrl5+u9hiIRylYfyYahyDEEaTe73DwUIkcneka8YoCIvDi+o0MfE0vZpZrzLnylXQO322+OTtV6ISatJ2Lxd0lZmS9w/CiLocVucqBDwBlgONsRb34ENWXKl2+rEhmrVUEDPMZEyIqZa4IQgIrSs6U9qABHMoSIJ5vJtLqyQsgHtKqCKsV7/W2WEUqfdVoQHYCQ2d5K1cNetKaNS1tSalXjhLUzKKw/y9SuG09Es78G8AVU5WBzB98q+4Fmz+P3Opw6t7bLmTI51znTgWiJbpUi7iSvX9ACCyHzGhcy6wsQA9MBvKOQdWvbNlZ/IP2vuP/Vgpbd3oZFMwzEe3jtEPYnReX09pGF03EAFuOb8dF+ycP1LxDaf3qAzRcv2NzYZxK0jLQptdn6cJ5YluUMQVftLH8gsIFsNyk9QA2gxhG76UB/DD4E/Poktd4fLZRD/VJwvAgv33MUufIVqFyek9CQ4cV/m+ZHl/5kf6T4/Rt9y6BgYlbdNi7MSYgj4Nx44dPOPcvtMQKK00hE8HZcAA4=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOAP265MB8560.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(10070799003)(23010399003)(376014)(7416014)(18002099003)(22082099003)(3023799007)(56012099006)(10067099003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?MzVpRDV5bTVwR3J6OUNhUngxenBESDJYTVNUQ1g0Vk4xL3BEWWlicGJZMHFG?=
- =?utf-8?B?NUUzT0NZY3pOS29SV243T3FrbEZlcVZNd2o0Y3F5TExXeHlXT0JEL1dzWFAr?=
- =?utf-8?B?ZXZsS090VEhUNW1vbUlzVFV5aWtSNUlOOWhhQUNsQ0htVUhZWlB1cEtMZXgr?=
- =?utf-8?B?aXE4Y0ttazBCTzhtNytMTyszQXBjTmZlVXdKTUFiby9oWjBQS0hVZXB3dk56?=
- =?utf-8?B?RjRRSVNOc010eXJxdXJsSTNnN0pkaUttSnhiNGRjcDR0ekRnMVFobUNIQXFa?=
- =?utf-8?B?QmdhR2J4bmNTT3JrTWo5TWFRV1E1Z3l0MkkxWXJDd2ZHRG5JdmhkVUI0TFNS?=
- =?utf-8?B?NW93VG90dHRlRE9DdUtxWGIwZ25sNGRScVFVcnIzMmZ0VUNCYkVla1JWL0x0?=
- =?utf-8?B?K0N4RjhiVmZhYkFXKzRUeFphN2xBek43cVVwMGdTUkJkM2xrcDdUUytGZWc1?=
- =?utf-8?B?ZGs1RDQzeVByM1VVc1BLb0dENkk3RmJOWWpTMEVra3dMYkRDRlI3dk92VHBs?=
- =?utf-8?B?YXY3NFBjenJjbXVUTEdrVnVTTzZjNnNlZHNuYVVvSzJZMGlQMms0RWw3OUN4?=
- =?utf-8?B?TmZhcEdBbUp1am5WM0FJSHh1QnRua1I0ZFRmcW4yVVRHZ2tNeENOS3E2ZmFW?=
- =?utf-8?B?My9IcDd3TDU0amdZTTJBMjJIeHRscjBXWHphUWJJMi9EaFRhYnFlQThjOWFP?=
- =?utf-8?B?YTZkUHdma2taV1M1RTVDN1JYUzlNNWRMQlFNeEdITVdvUnpRS3BaV05vNHBT?=
- =?utf-8?B?SklackVVdi8vM2JHck1GYkNPYkRDRS96MHNsY3pQT2lUUGl6dTZ3SkU1TlAx?=
- =?utf-8?B?dEk1enZRRkVGeWxaQVFSeEJmeEc5NGFkRXBQQ2pvMjYycHBEZWl1TXBZY0dM?=
- =?utf-8?B?bWlzeXNqMG1YcFM1Y0R6V0d4dGtBZWpCclh4SVRSaS9xTlVZbmc1akhpZUx4?=
- =?utf-8?B?OFNIbkxrb0hmamN1SkJSRkVINVVGaWUwMVowUnY4RDRjWkVLeE5NUGFud05D?=
- =?utf-8?B?S1UxK3ZYbVI0V09aRFErSzF2T1V6R0hBT1NGZXNHM0sxM2dqTzZNQjdCN1Vr?=
- =?utf-8?B?aUkvQW1WMzlYanc3QkYxdkFjZyt1LzY4QW5tek1hU3hRdldMWkk4QnNQQ2ha?=
- =?utf-8?B?TW9rNHRmbUU5MWZkbGFJWVB0MTFjWHZkTUVXTnJMeFZxU0dYazdsazI5QjhU?=
- =?utf-8?B?dmkzWDdwS3dubmMweXB6cUc5WkUveklHYnZxTDBraWpaK1pIa2VVUlpxNm1U?=
- =?utf-8?B?TGlKQXRuSTlzOEM5d1RzU1hualoxZHZBNVpXZ3VvVWFjdjJkeWV2YmozcFBO?=
- =?utf-8?B?YW05K3RSN0NhMXBuTDg0eldVUVRFSVJOZ3k5WGlMK2dmbGpJTkcxbHhuVGk0?=
- =?utf-8?B?RFhJbWNkSklxRllwRTh0NDNKUjZjZFZmVEVwSzZsVGxVcjdmaTRicFU4QnBx?=
- =?utf-8?B?ZlIvNDNGSWswaisyek5Mb1R3L3JsVHFiRTgyUVduQ1AybWE5V29vamVhZEZT?=
- =?utf-8?B?UC9lbzVVVnZyUXN4Q2Raa0g3RXNEWFBHanJVZFZ3b3BWb25KR2xrSTNUeU1v?=
- =?utf-8?B?SStPbXZIVjZHcGEzazVrVmNFUDMyNEc1RDEzeFFoR0MxbFJoU0hYbzBSTUpO?=
- =?utf-8?B?dGh1YlBGL2EvL1kzbkY0cW9LVTdySnJZb1E1Z2o3bWo3dzBzcnMyZ2hRbmxh?=
- =?utf-8?B?SjNDamwvUkRmM0RDT1B5dW5KTHhvYlloT04vQXFEcXd6cmNoc1JsZmUvQytG?=
- =?utf-8?B?dEJ1YytEWGJqdzk1SjdOQyt2bkFFbE5ISHE3OHo1MXJvZ1VvalAzVE9PSjhq?=
- =?utf-8?B?a3hBT3NHRldIbXlrNVFsTi83ZTNwcTVFandMNmN0RzA1akVLcEZVc3UySS93?=
- =?utf-8?B?alRlbUQ0akF5UURKZDgzdkpoYjUxLzk1NXh1RWFXVkNTQ052Y1JTTmtabDVF?=
- =?utf-8?B?RzdvOG00NDN1T1hkMTJnaHQxSmFHNEhxOTVmb3lQdTFtOFF4RDF4MEh0VGxx?=
- =?utf-8?B?RjFKZktON1NZU3pBc0xDUktiSWhOanFPU2VrejJoOEdOUHdWSWRDTFMxNlFR?=
- =?utf-8?B?M2JSQTVEV3dNdTRJTll2azM3enNCVXM0Y2N1Q3JSNkNGNUxlOFRvcUJlUVVB?=
- =?utf-8?B?MVJZSWU1dWk0ZkY3MldiMTU0L2hUZEROdmhUK0F4YWdBVEs3VDd6NFBBT2V4?=
- =?utf-8?B?NVR3dnplblhvdWNlZk1oZG84WHJ1WUw3VHE0bjlmeG1nZ01VMTJ3RDFEV0tC?=
- =?utf-8?B?YXQxVm4wTmFYbU4yeE1lZXFSL2NkMUJOSkdGVHBLSGlkY2t6ZUVkbzFqZHQw?=
- =?utf-8?B?d3IvZ1EwQTU3ellqMVZjQ1VmeVJzZ1JnRkE4M1BFVEdmZk5VN1hGQT09?=
-X-OriginatorOrg: garyguo.net
-X-MS-Exchange-CrossTenant-Network-Message-Id: 49993475-b317-49c6-8ca6-08df0deb5639
-X-MS-Exchange-CrossTenant-AuthSource: LOAP265MB8560.GBRP265.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Sep 2026 20:54:12.5740
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8e+EvyBJlHabIyhfInFVlRPXio79LhY/LnjQ3nxTBxNoqivW0YvdbA4XuB3QGPfTXSB3VYCS/4bwZJ6FtYcYxQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CWLP265MB5185
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXMQQqDMBBG4avIrBuYRFuwVyldGPPbjhQNmaYI4
+ t2Ndvkt3ltJkQRK92qlhJ+ozFOBvVTUv7vpBSOhmBy7G7fcGJ/lE4xGIORo3BXWdsy+DkyliQm
+ DLOfv8fxbsx/Rf48JbdsOAJX9MHEAAAA=
+X-Change-ID: 20260904-build-speedup-25e11a00b3d0
+To: Linus Torvalds <torvalds@linux-foundation.org>, 
+ Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+ Nick Desaulniers <ndesaulniers@google.com>, 
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+ Masahiro Yamada <masahiroy@kernel.org>, Alexey Gladkov <legion@kernel.org>, 
+ Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
+ x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
+ Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
+ Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, 
+ Arnd Bergmann <arnd@arndb.de>, Catalin Marinas <catalin.marinas@arm.com>, 
+ Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+ Ard Biesheuvel <ardb@kernel.org>, 
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+ Josh Poimboeuf <jpoimboe@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
+ Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
+ Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+ Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+ Danilo Krummrich <dakr@kernel.org>, 
+ Daniel Almeida <daniel.almeida@collabora.com>, 
+ Tamir Duberstein <tamird@kernel.org>, 
+ Alexandre Courbot <acourbot@nvidia.com>, 
+ =?utf-8?q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
+ Jonathan Corbet <corbet@lwn.net>, Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ llvm@lists.linux.dev, linux-riscv@lists.infradead.org, 
+ linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+ linux-doc@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, 
+ "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=12226; i=ljs@kernel.org;
+ h=from:subject:message-id; bh=r4zxWZsjLq+o+qJdnXb/cjOXHX0h7zTZcMS+AZOh2Tk=;
+ b=owGbwMvMwCV2fu7ZrsZH9SKMp9WSGLIWlBntUPt6u8LBJW4V48k865+zckxe2Px/9usW94RjR
+ 3xMLqef6yhlYRDjYpAVU2R5/kV8f5BI2LzOC/5uMHNYmUCGMHBxCsBE/qcy/LM8Uv9mseEbOcF9
+ MnMDdyjOP/pnKlOPU/KksMe/Gpbfj4pkZNjqvvW0Ul6lak2G1Cl+teWmVW7tBUbbN5mmTW74GFw
+ jzQwA
+X-Developer-Key: i=ljs@kernel.org; a=openpgp;
+ fpr=E7F417BF5214569E89D04F46CF9DCD8A81E27F14
 
-On Tue Sep 8, 2026 at 6:05 PM BST, Miguel Ojeda wrote:
-> Starting with bindgen 0.73.2 [1], `#[allow(unnecessary_transmutes)]`
-> are used, even when `--rust-target 1.85` is passed.
->
-> However, the lint was introduced in Rust 1.88.0. Thus building with
-> older Rust versions warns like:
->
->     error: unknown lint: `unnecessary_transmutes`
->          --> rust/uapi/uapi_generated.rs:26294:13
->           |
->     26294 |     #[allow(unnecessary_transmutes)]
->           |             ^^^^^^^^^^^^^^^^^^^^^^
->           |
->           =3D note: `-D unknown-lints` implied by `-D warnings`
->           =3D help: to override `-D warnings` add `#[allow(unknown_lints)=
-]`
->
-> Thus allow `unknown_lints` in the generated bindings -- only when buildin=
-g
-> with older Rust versions.
->
-> I have asked upstream if this is intentional [1], i.e. if we are supposed
-> to always allow unknown lints in case `bindgen` uses such attributes,
-> or whether it is an oversight.
->
-> Cc: stable@vger.kernel.org # Needed in 6.12.y and later (Rust is pinned i=
-n older LTSs).
-> Cc: Emilio Cobos =C3=81lvarez <emilio@crisal.io>
-> Link: https://github.com/rust-lang/rust-bindgen/pull/3455 [1]
-> Assisted-by: LLM
-> Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
-> ---
->  rust/bindings/lib.rs | 1 +
->  rust/uapi/lib.rs     | 1 +
->  2 files changed, 2 insertions(+)
->
-> diff --git a/rust/bindings/lib.rs b/rust/bindings/lib.rs
-> index ad24c920b919..9e2c9a8e7e6c 100644
-> --- a/rust/bindings/lib.rs
-> +++ b/rust/bindings/lib.rs
-> @@ -27,6 +27,7 @@
->  #[allow(clippy::ptr_as_ptr)]
->  #[allow(clippy::ref_as_ptr)]
->  #[allow(clippy::undocumented_unsafe_blocks)]
-> +#[cfg_attr(not(CONFIG_RUSTC_HAS_UNNECESSARY_TRANSMUTES), allow(unknown_l=
-ints))]
->  #[cfg_attr(CONFIG_RUSTC_HAS_UNNECESSARY_TRANSMUTES, allow(unnecessary_tr=
-ansmutes))]
+A typical kernel build consists of a frustratingly large amount of time
+spent stuck in single-threaded bottlenecks.
 
-I think we can drop the cfg on the `allow(unnecessary_transmutes)`.
+It turns out that there's a lot we can do about this and doing so
+significantly impacts kernel build times.
 
-Best,
-Gary
+This series makes allmodconfig builds up to 36% faster, incremental builds
+up to ~70% faster, and noop builds up to ~90% faster.
 
->  #[cfg_attr(
->      CONFIG_RUSTC_HAS_SUSPICIOUS_RUNTIME_SYMBOL_DEFINITIONS,
-> diff --git a/rust/uapi/lib.rs b/rust/uapi/lib.rs
-> index 2df0340e63d1..c1e27192ecce 100644
-> --- a/rust/uapi/lib.rs
-> +++ b/rust/uapi/lib.rs
-> @@ -24,6 +24,7 @@
->      unreachable_pub,
->      unsafe_op_in_unsafe_fn
->  )]
-> +#![cfg_attr(not(CONFIG_RUSTC_HAS_UNNECESSARY_TRANSMUTES), allow(unknown_=
-lints))]
->  #![cfg_attr(CONFIG_RUSTC_HAS_UNNECESSARY_TRANSMUTES, allow(unnecessary_t=
-ransmutes))]
->  #![cfg_attr(
->      CONFIG_RUSTC_HAS_SUSPICIOUS_RUNTIME_SYMBOL_DEFINITIONS,
->
-> base-commit: 2ac74c6db40adaa29c50cbb281ae9a6f63de18e1
+Builds are faster across the board on every device I tested.
 
+Machines used for perf testing:
+
+* Threadripper -   x86, AMD Threadripper 9980X, 64 cores, 128 threads
+* EPYC         -   x86, 2 socket EPYC 9754, 256 cores, 512 threads
+* M2           - arm64, 2022 M2 macbook pro, 8 cores, 8 threads
+                        (4 perf, 4 efficiency)
+
+Cutting to the chase:
+
+		== allmodconfig FULL build ==
+
+                        before    after     delta
+                      ----------------------------------
+Threadripper, gcc       345.3s   275.2s    -70.1s (-20%)
+Threadripper, clang     345.5s   265.7s    -79.8s (-23%)
+EPYC, gcc               188.6s   121.1s    -67.5s (-36%)
+EPYC, clang             261.7s   184.6s    -77.1s (-29%)
+
+		== allmodconfig INCREMENTAL build ==
+
+                        before    after     delta
+                      ----------------------------------
+Threadripper, gcc        46.4s    15.3s    -31.1s (-67%)
+Threadripper, clang      44.4s    15.2s    -29.1s (-66%)
+EPYC, gcc                82.0s    24.3s    -57.7s (-70%)
+EPYC, clang              77.6s    24.3s    -53.3s (-69%)
+
+		== allmodconfig NO-OP build ==
+
+                        before    after     delta
+                      ----------------------------------
+Threadripper, gcc       12.97s    1.18s   -11.79s (-91%)
+Threadripper, clang     13.84s    1.64s   -12.20s (-88%)
+EPYC, gcc               25.92s    1.52s   -24.40s (-94%)
+EPYC, clang             27.58s    2.17s   -25.41s (-92%)
+
+		== defconfig FULL build ==
+
+                        before    after     delta
+                      ----------------------------------
+Threadripper, gcc        35.3s    28.6s     -6.7s (-19%)
+Threadripper, clang      33.5s    26.1s     -7.4s (-22%)
+EPYC, gcc                31.2s    20.6s    -10.6s (-34%)
+EPYC, clang              38.6s    32.2s     -6.4s (-17%)
+M2, gcc                 564.0s   512.4s    -51.6s (-9%)
+M2, clang               616.1s   569.4s    -46.7s (-8%)
+
+		== defconfig INCREMENTAL build ==
+
+                        before    after     delta
+                      ----------------------------------
+Threadripper, gcc        11.6s     5.5s     -6.1s (-53%)
+Threadripper, clang      11.6s     5.0s     -6.6s (-57%)
+EPYC, gcc                19.3s     9.2s    -10.1s (-52%)
+EPYC, clang              20.1s     8.6s    -11.5s (-57%)
+M2, gcc                  18.6s     9.9s     -8.7s (-47%)
+M2, clang                18.6s     8.2s    -10.4s (-56%)
+
+		== defconfig NO-OP build ==
+
+                        before    after     delta
+                      ----------------------------------
+Threadripper, gcc        0.96s    0.47s    -0.49s (-51%)
+Threadripper, clang      1.21s    0.55s    -0.66s (-55%)
+EPYC, gcc                1.47s    0.66s    -0.81s (-55%)
+EPYC, clang              1.87s    0.80s    -1.07s (-57%)
+M2, gcc                  5.59s    1.69s    -3.90s (-70%)
+M2, clang                6.62s    1.74s    -4.88s (-74%)
+
+Further performance numbers are provided for each commit giving a sense of
+what each contributes to the final result.
+
+			== Testing ==
+
+Beyond x86, allmodconfig was built with the series for arm64, arm, riscv,
+powerpc64, s390 and loongarch, and for arm64, arm, s390 and loongarch the
+System.map is identical to what the previous shell mksysmap produces for
+the same vmlinux.
+
+Also tested were parisc64 and m68k build as far as mainline lets them
+(a driver's static assertion and an undefined-symbol check on parisc, gcc
+16 internal compiler errors on m68k, none of it from this series).
+
+Kernels for x86, arm64, arm, riscv, loongarch, powerpc64, s390, m68k and
+parisc64 all boot under qemu, every text symbol of System.map is in
+/proc/kallsyms at the relocated address, and a module loads and unloads.
+The s390, arm and loongarch kernels also pass the kallsyms selftest.
+
+An x86 kernel with CONFIG_MODVERSIONS, CONFIG_EXTENDED_MODVERSIONS and
+CONFIG_MODULE_SRCVERSION_ALL boots, loads and unloads modules. External
+modules build against both in-tree and O= builds, and every commit builds
+on x86 defconfig.
+
+Build times are the best of several runs, no unexpected errors or
+warnings were seen.
+
+While some aspects of the build process have been changed, all tooling
+should function identically to before.
+
+			== LLM usage ==
+
+An LLM was used to first determine where the bottlenecks were then to
+figure out how to improve them.
+
+It generated a lot of code, much of it hideous.
+
+I extensively audited and rewrote a lot of it, and heavily edited commit
+messages, the cover letter and comments.x
+
+The LLM has also orchestrated build runs, testing, debugging and analysis.
+
+I have manually checked for correctness in both build and running kernels
+generated with this series applied.
+
+Performance improvements were also verified manually.
+
+Since an LLM was used extensively, each commit carries an Assisted-by tag.
+
+			== What was changed? ==
+
+Fundamentally the series improves build times by parallelising
+single-threaded tasks as much as possible and improving the efficiency of
+code used in the build process.
+
+kbuild, kallsyms, modpost, objtool, mksysmap and the rust build system were
+all updated as part of this change.
+
+Nothing too controversial was included. There are further improvements that
+could be made, but they would either by very invasive (large scale C header
+changes) or generate diminishing returns.
+
+			== Patches ==
+
+   mksysmap (1, 2):  A couple of bugfixes the rest of the series relies
+                     upon.
+
+   kallsyms (3, 4):  Some efficiency improvements through use of a cache.
+
+   kbuild (5, 6):    Don't sort nm output unnecessarily, do not include
+                     relocations in the kallsyms trial links.
+
+   elf-parse (7):    Section flags, symbol binding and a read-only mapping,
+                     for the next patch.
+
+   kallsyms (8):     Don't use nm, read the ELF symbol table directly.
+
+   kbuild (9):       Make .modinfo an INFO section.
+
+   kbuild (10, 11):  Implement a cache to track objects, check dependency
+                     timestamps more efficiently.
+
+   kbuild (12):      Probe compiler, linker flags once at top of build.
+
+   modpost (13, 14): Hash module sources a file at a time not a byte at a
+                     time,  also improve performance through use of a
+		     cache.
+
+   modules (15, 16): Emit module descriptors as assembly (*.mod.S) rather
+                     than C (*.mod.c), reducing CPU seconds taken by 10x to
+                     perform the task. Also shard module finalisation
+                     rather than running 10's of thousands of tiny runs.
+
+   modpost (17):     Compute srcversions in parallel using a thread pool.
+
+   objtool (18, 19): Avoid polluting the reloc hash with millions of DWARF
+                     relocations. Remember dead-ends and decode large
+		     objects over multiple threads. Size instruction hash
+		     to the code rather than hard-code it.
+
+   rust (20-22):     Parallelise the frontend, set correct dependencies and
+                     build crates in parallel with C code, retaining the
+		     requirement that rust/ crates are built first.
+
+   kbuild (23):      Default to using a parallel implementation of gzip
+                     (pigz) if available on the system.
+
+Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+---
+Lorenzo Stoakes (ARM) (23):
+      scripts/mksysmap: drop the MODULE_INFO() symbols from kallsyms
+      scripts/mksysmap: fix escape of '$' in the __pi_ pattern
+      kallsyms: index symbols by token to speed up table compression
+      kallsyms: output binary data to speed output and kallsyms assembly
+      kbuild: do not sort nm output where the order is irrelevant
+      kbuild: only emit vmlinux relocations when required
+      elf-parse: add section flags, symbol binding and a read-only mapping
+      kallsyms: reimplement mksysmap in C
+      kbuild: do not allocate .modinfo in vmlinux
+      kbuild: cache list, composite object state per object
+      kbuild: implement and use depcheck to check dependency timestamps
+      kbuild: avoid re-running compiler and linker probes
+      modpost: hash module source per-file, not per-byte
+      modpost: cache section relocation mismatch state
+      modpost: emit module descriptors as assembly
+      kbuild: batch module finalisation
+      modpost: perform srcversion hashing in parallel
+      objtool: cache relocations and function dead end state, do less work
+      objtool: decode instructions and resolve branch targets in parallel
+      kbuild: rust: parallelise rustc front end
+      rust: make exports.o depend on the headers generated for it
+      kbuild: build rust crates in parallel with the rest of the build
+      kbuild: use pigz for gzip compression if available
+
+ .gitignore                                   |   1 +
+ Documentation/kbuild/kbuild.rst              |  13 +
+ Documentation/kbuild/reproducible-builds.rst |  16 +
+ Kbuild                                       |   5 +
+ Makefile                                     |  49 +-
+ arch/arm64/kernel/pi/Makefile                |   2 +-
+ arch/riscv/kernel/pi/Makefile                |   2 +-
+ arch/x86/Kconfig                             |  17 +
+ arch/x86/Makefile                            |  12 +-
+ arch/x86/boot/Makefile                       |   2 +-
+ arch/x86/boot/compressed/Makefile            |   2 +-
+ drivers/firmware/efi/libstub/Makefile        |   2 +-
+ include/asm-generic/vmlinux.lds.h            |   2 +-
+ include/linux/vermagic.h                     |   2 +-
+ init/Kconfig                                 |  84 +++
+ rust/Makefile                                |   5 +
+ scripts/Makefile                             |   4 +-
+ scripts/Makefile.build                       |  27 +-
+ scripts/Makefile.lib                         |   7 +-
+ scripts/Makefile.modfinal                    |  36 +-
+ scripts/Makefile.modpost                     |   2 +-
+ scripts/Makefile.vmlinux                     |  27 +-
+ scripts/Makefile.warn                        |  28 +-
+ scripts/basic/.gitignore                     |   1 +
+ scripts/basic/Makefile                       |   2 +-
+ scripts/basic/depcheck.c                     | 442 +++++++++++++++
+ scripts/check-function-names.sh              |   3 +-
+ scripts/elf-parse.c                          |  48 +-
+ scripts/elf-parse.h                          |  19 +
+ scripts/kallsyms-sysmap.c                    | 269 ++++++++++
+ scripts/kallsyms.c                           | 387 ++++++++++----
+ scripts/kallsyms.h                           |  44 ++
+ scripts/link-vmlinux.sh                      |  25 +-
+ scripts/mksysmap                             |  94 ----
+ scripts/mod/.gitignore                       |   1 +
+ scripts/mod/Makefile                         |   9 +
+ scripts/mod/modpost.c                        | 757 ++++++++++++++++++++------
+ scripts/mod/modpost.h                        |   2 +
+ scripts/mod/module-offsets.c                 |  35 ++
+ scripts/mod/sumversion.c                     |  57 +-
+ scripts/tags.sh                              |   5 +-
+ tools/objtool/Makefile                       |   2 +-
+ tools/objtool/check.c                        | 767 ++++++++++++++++++++-------
+ tools/objtool/elf.c                          | 242 ++++++++-
+ tools/objtool/include/objtool/elf.h          |   4 +
+ tools/objtool/include/objtool/objtool.h      |   3 +-
+ tools/objtool/objtool.c                      |   1 -
+ 47 files changed, 2884 insertions(+), 682 deletions(-)
+---
+base-commit: 28924df2a08f440c73991b83028032c901de2ae4
+change-id: 20260904-build-speedup-25e11a00b3d0
+
+Best regards,
+-- 
+Lorenzo Stoakes (ARM) <ljs@kernel.org>
 
