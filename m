@@ -1,117 +1,100 @@
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC0B84A3411
-	for <linux-kbuild@vger.kernel.org>; Tue,  8 Sep 2026 22:34:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18F8B3B3BFE;
+	Tue,  8 Sep 2026 23:37:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788906881; cv=none; b=jEPW7nBd5aduSKd2tacVPmdw9PU/znK6VZHtIEClxTDI9GHkhTuenu/m2trC8d3owVa0/XlLFlDjJeC9Udr4Yak91u4gluT+nXDCXA7J/XgtqizqeGklNhXi/FvAxXjB/asdS+CetPI+zhdWzOd6GBMi6dDXAY91hGFUbiuP43o=
+	t=1788910627; cv=none; b=Xj/W3m0ZQBUGto48ickVTUwWWyLS/XghjymZW5NCpDLT6TtyWNaxShYXILWXSSOetfZvkZaSR2U7IhsHXoEIxkqlfdg1JUfAazDyfnTe1pDB9n9o986kEaV/6teZLOW9pOpoM8+L/dAvzXdjruAArSqddIUREJQ/uHzXKsRaAUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788906881; c=relaxed/simple;
-	bh=htNILk9Kpq12336HFpWbDN67/SR46TQMYtfCjV9wRxY=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=WrfrnungjJIq7CbIoDxcBeZlnFcGxpWwaBFU/waJ/BnmC2GTYd90W5b7oPalm9dUwHBMvHIkBQ5gMRCiXCEYo+nvyyVdLKM1ydEECGmb2ZFkOAVvqjFcUwuzLDoZ0GDGPJbuZa17oWOrDdNtU4ZrxcRV4DgWpT2Klq58Fl02P5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--justinstitt.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uaYTHfPu; arc=none smtp.client-ip=209.85.161.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--justinstitt.bounces.google.com
+	s=arc-20240116; t=1788910627; c=relaxed/simple;
+	bh=PmI5JYqDAr6kqZUNDONtc9Bkd3a2Pp+lpXvkLMJQeKc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o93vmKjP4EN27u5n7BPb2xhFa7j6TlboVIllD1XsPf5OScfflUyM5DS+O3Ffnrm7pVqc3hzz7LM+PsYOXzt8ZBAV6gD0pmZcaRu56wX+/NtSgJ6ZzOrI3ZctABXJTyebNa2AXlos3sapmWLIJZJh1nYz10ncKhZex7PyStb2tIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oN2w7uZ4; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uaYTHfPu"
-Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-6b1281dd14aso5016650eaf.2
-        for <linux-kbuild@vger.kernel.org>; Tue, 08 Sep 2026 15:34:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1788906878; x=1789511678; darn=vger.kernel.org;
-        h=content-type:cc:to:from:subject:message-id:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Y6DHdss8MRJ7r65GA41ught1FKJ932kAtSg2l2oUqQc=;
-        b=uaYTHfPueU0TDrIv7KfTmvg3C6htsYvnOGJ3Qni25YFImkYLkV92Wh/3Nz4Oq2/CKl
-         RPPNGU417AnV7rHYhfb6+9CGAUxH3qKjPJ/zZt7Imwkr6AJwZ94eOudhGpHCCDrBR+A4
-         cstus1mk+P7bbepGyatAXAOmVVFrPFNGOx7ZbhCVXZBpEpoygqjRHqAe1ssYn/72ItzA
-         u5GLCMjx7HcsmJamW6aKZkPpk5ZIwfFyfVC/0A03jh+RLXmbRDiUC/l7kFc0sYvgQ4mZ
-         HQETneyJDLiJCe+L1xN6IIxELlBKPd325sE8ZsVwKKzWTGUun6yJv87MUQBZNkUy/pVJ
-         oN+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788906878; x=1789511678;
-        h=content-type:cc:to:from:subject:message-id:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Y6DHdss8MRJ7r65GA41ught1FKJ932kAtSg2l2oUqQc=;
-        b=AgZXAkDfLBEoTWBBhYqYsktVeV6pSC1wdumWSIl7tM4VnRdG0HKD65RlCu65Ji15Fq
-         zZbwf8DCoRYE1kDPGCC90DRqA1TT4QA6sNr6FfVxOzD7dMqsj8voFupdB/SUfxS7q4lz
-         Ty3d96+2EJI/7aahJFQDPMBZibctnamN2nT+tapslf3JL3ZrwN/TML36qKbjiDOIuZRh
-         T4KwF6F/o3wTPoUpaDswSfHnFIBbRE7b0WJly7o1YGPUxDz6cEEx95eluZz5D7i9AtAg
-         K+lsnXtITWduziNJL29h/sruyKPvZ9ax+muZfY9C2yhBHN2QZFELYOC4BLrcstgFp3SQ
-         uuEg==
-X-Forwarded-Encrypted: i=1; AKwUvBwM+YwwZF3+Z3smM23pcM+sFnOOzoWO0Tw+SHCTsC4euqWBhLGtRaC4/sNav7dKv9O4omy5flictK2Xm0w=@vger.kernel.org
-X-Gm-Message-State: AFuF++mbBCyJsLsgD1JOqwhzW0xLu+TO9gdxqN5nZkaicBdaqESrZGk0
-	1F6TB3rRVjZMzhiMf4G4u52yTpY/lnen2t7Qtx65Mx2ODczUVJjtUKJAyQDriitj8clj4ZgLNep
-	lZ1bDHtwkpsvUvykx1xHzNlfAjw==
-X-Received: from japm26.prod.google.com ([2002:a02:cdda:0:b0:5f1:325b:8e4c])
- (user=justinstitt job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6820:179b:b0:6b6:c0bc:365c with SMTP id 006d021491bc7-6b6fcbdc9dfmr18638803eaf.22.1788906877369;
- Tue, 08 Sep 2026 15:34:37 -0700 (PDT)
-Date: Tue, 8 Sep 2026 15:34:35 -0700
-In-Reply-To: <20260401092027.GW3738786@noisy.programming.kicks-ass.net>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oN2w7uZ4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D06201F00A3A;
+	Tue,  8 Sep 2026 23:37:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788910625;
+	bh=NIND0ZuAk7r7GYUUeAEPwFBj/DONkZ4qN7mVygC9p7k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=oN2w7uZ4bZ9BL+HKcS8ScXRPFPke59x+bPP21lyXGXJgpoCJlkSUYGVvBg61tPu9z
+	 /RSjkJNaOd5JMApP2UHiF5OgeiLu/zBTKzA9JEqJq2+B2iTo9/An4bIBtcckJ6PBqS
+	 aCEzbTXofkCOfM5tfIInbL+/8xEmQBohzfXM4YHiVc6lpk7S9s+CKrDyKRZQskyO8M
+	 7xJ+7pwDaWDe4qCCZGzDPtLx1Qk0DlH92TuIJTFLmtC1YjF6Mvujr9dDcND9qPUIi/
+	 GrdfH0nvhsaMTXQAkZulIhvVfWOcDumNOXV3yR0yvr31trK4g6ZyhPEoC5ofNK3IaX
+	 7EKbSn3HAHVhQ==
+Date: Tue, 8 Sep 2026 16:37:01 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Nicolas Schier <n.schier@fritz.com>
+Cc: Steven Rostedt <rostedt@goodmis.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>, linux-kernel@vger.kernel.org,
+	linux-kbuild@vger.kernel.org, llvm@lists.linux.dev,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] scripts/sorttable: Mark long_size as __maybe_unused
+Message-ID: <20260908233701.GA2981326@ax162>
+References: <20260831-sorttable-long_size-unused-but-set-global-v1-1-8a96b88697e5@kernel.org>
+ <20260904-dancing-cobalt-ibex-8a039c@l-nschier-aarch64>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-ID: <aqCMIFRHEQ3H9qad@google.com>
-Subject: Re: [PATCH 3/5] compiler_attributes: Add overflow_behavior macros
- __ob_trap and __ob_wrap
-From: Justin Stitt <justinstitt@google.com>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Vincent Mailhol <mailhol@kernel.org>, Kees Cook <kees@kernel.org>, Marco Elver <elver@google.com>, 
-	Andrey Konovalov <andreyknvl@gmail.com>, Andrey Ryabinin <ryabinin.a.a@gmail.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, 
-	Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, kasan-dev@googlegroups.com, 
-	linux-doc@vger.kernel.org, llvm@lists.linux.dev, 
-	Linus Torvalds <torvalds@linux-foundation.org>, Nicolas Schier <nsc@kernel.org>, 
-	Arnd Bergmann <arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, 
-	linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260904-dancing-cobalt-ibex-8a039c@l-nschier-aarch64>
 
-Hi,
+On Fri, Sep 04, 2026 at 09:34:10PM +0200, Nicolas Schier wrote:
+> On Mon, Aug 31, 2026 at 06:46:31PM -0700, Nathan Chancellor wrote:
+> > When building in a kernel tree prior to commit b055f4c431e3 ("sorttable:
+> > Move ELF parsing into scripts/elf-parse.[ch]") with clang-23 or newer,
+> > which implements a new warning under -Wunused-but-set-variable for
+> > static global variable, there is a warning from sorttable because
+> > long_size is unused when MCOUNT_SORT_ENABLED is not set:
+> > 
+> >   scripts/sorttable.c:452:12: error: variable 'long_size' set but not used [-Werror,-Wunused-but-set-global]
+> >     452 | static int long_size;
+> >         |            ^
+> > 
+> > Mark long_size as __maybe_unused to avoid inserting more ugly #ifdef
+> > directives while insuring the warning does not reappear, as the
+> > aforementioned change does not alter the uses of long_size, so it
+> > appears to be coincidence that the warning disappears after this
+> > refactoring.
+> > 
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+> > ---
+> > This is breaking our builds on stable:
+> > 
+> >   https://github.com/ClangBuiltLinux/continuous-integration2/actions/runs/33143924291
+> > 
+> > There was a previous patch sent for this issue
+> > 
+> >   https://lore.kernel.org/20260603191708.27241-1-beakthoven@gmail.com/
+> > 
+> > but it was marked as stable only. I think this should be taken via
+> > mainline and backported the normal way, as it appears to be coincidence
+> > that the warning is not present in mainline. It does not look like
+> > scripts/sorttable.c has a formal owner according to MAINTAINERS so this
+> > could either go through one of Steve's trees or the kbuild tree.
+> > ---
+> >  scripts/sorttable.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> 
+> Thanks!
+> 
+> Tested-by: Nicolas Schier <n.schier@fritz.com>
 
-On Wed, Apr 01, 2026 at 11:20:27AM +0200, Peter Zijlstra wrote:
-...
-> 
-> So I would like to second this option as being interesting.
-> 
-> But while pondering it, I did want to note that all of the options, with
-> the exception of __ob_wrap (which is effectively what we have today for
-> *everything*), will be 'interesting' to compose with _Atomic, another
-> one of these qualifiers.
-> 
-> Now, in the kernel we don't use _Atomic, so strictly speaking I don't
-> care ;-) But here goes...
-> 
-> Something like _Atomic int __ob_wrap, is trivial and good.
-> 
-> _Atomic int __ob_trap is either doable or impossible depending on how
-> you define the result to be on 'trap'. Specifically, the semantics
-> proposed where it keeps the old value makes it impossible.
-> 
-> And _Atomic int __ob_saturate is equally 'challenging', since the
-> fundamental thing of 'reset to min/max on under/over-flow' is rather
-> a non-atomic kind of thing. Look at the trouble we went through with
-> refcount_t to sort of make this work.
-> 
+Thanks. Given how trivial this is and since it needs to go to stable,
+could you take this via kbuild-fixes?
 
-FWIW, I've moved to simply disallow OBT+Atomic. We've got this under
--fexperimental so I'm well within my right :). The idea being: __ob_trap
-isn't workable with Atomic (depending on storage semantics) and
-__ob_wrap isn't very useful there either, plus I had some parsing bugs
-where specific ordering of things could result in OBT being silently
-dropped with _Atomic and those magically go away by disallowing this
-pairing all together.
-
-I just opened the PR over at [1] and it is still pending but this is
-probably where I'll go with _Atomic and OBT :)
-
-Link: https://github.com/llvm/llvm-project/pull/222179
-
-Thanks
-Justin
+-- 
+Cheers,
+Nathan
