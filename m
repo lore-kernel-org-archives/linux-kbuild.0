@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD1E53B47E2;
-	Tue,  8 Sep 2026 20:34:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A5123B777F;
+	Tue,  8 Sep 2026 20:34:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788899671; cv=none; b=Tu7pZP5zWJp5GT+EX0WYawBrkWNl24SMbceB4uyirAruMkOxG04erZLGpjmOlYzNEGJvCW8dZXY6ve+cwUuqW2ohTCYM7GC5FXD2j/4w7cEhntt7/cwUoTflq3HncbVZV2KjhK42X3maRP/v+m1C0B0Hgb+ASWQrC3feds4NHQk=
+	t=1788899672; cv=none; b=oKlzMth38oBabO9zl1GFqDNkJDdAq1uZZVY41FvaPEFTIJwnUqwoRz/9iiqrS4tP2Jc5ctsCicvsJ8YUTUQrenqkCwjiubtgweVXOjBtH+DMF4FaxJzk6mARYkf7mflFqdA2HR6FcC0asSYnXLgTyWDf9J7KobQF/mlOUknV4Pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788899671; c=relaxed/simple;
-	bh=4CKqe5bulR3/t+Lr0C7yq2h0HqdDXT++ou//1kp5oDA=;
+	s=arc-20240116; t=1788899672; c=relaxed/simple;
+	bh=aj/ip20n8sCr0nYkSnByns9Tm7iVGZdyMePVQA1eGrw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gFGh9qAbafZ3tITDJDQavssGNpI/mpAM8bw50t5nFvqD6KfNLkF8UHBwSBNgZ1hZepZmnwXGJE2vxULMX6jpkJ8ZDWgPdQBytg4w4Lft3117E5LULuhzwf52/v+rx2Oxqo9iaxnG/c8M/Hs8uQVakRnj2rEALObf6qBRZBTmTYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AAdhQg9i; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=Thma/7reHNPXz8wjl2W8Hkt3pmD0IU2tC69LfmBinCl4vq3EKOSxTUMY7eg0jWlDPLHELciSuMYNNQt8z6ABFSMQiobiVlDJSw9ehRx1t5+437P8iLZbp+r2oIHRoXvd9excxosvO6RB54J2XMJjtmncX4IvogfgU2awenm85EQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HIPcMbbY; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AAdhQg9i"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D5CE1F00A3D;
-	Tue,  8 Sep 2026 20:34:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HIPcMbbY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 186991F00A3E;
+	Tue,  8 Sep 2026 20:34:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788899668;
-	bh=3uMvaqDxEu/G3RxxQQr4zGEreMztJxU15yGPikD0/F8=;
+	s=k20260515; t=1788899670;
+	bh=gpZkeU1ez/jJdds8D5Mf1lVFeLdql8geXuOpgaKy+VU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=AAdhQg9iq/n/jt0/vfMUaJySAWUBkRVRQ+nnpMW3uKkyeUbGQfCWRoX+woW4RbB/m
-	 Gr0ORxJIMvQlnmTAD3ysYFKp2IN3GxlmirJyJzHJXWv44sbi0sTO7iQxUHZ5Z9fhak
-	 caOSRqKLHjnFFzPYm2lxKoZlHI9QEyhdIIuwhcGnOv4BQs29PFkOj7FycMNycGD57v
-	 afhfn5etJxDmVmfUyDalXfUvr+nYCX5za0pOxLi5Ld2R4E43G88AwI2d14rzA9govy
-	 aEO9+jl5P3kscivogg+Bm+ztVNGq5RQVulldi4Xax5Hr+uAGHFd+aE879egVy1brgE
-	 oSI0o4AHWvIBw==
+	b=HIPcMbbYtLoGC6koF7fIgFIW0rPVp020jvyitla47A9qZlqLvA2zrUMYuXkLrlAge
+	 8174tDptkXeICsFSO9uyNyz1F5UpscHqxQpQ4pzahZbxxrfLYu5TOmpyWJMNhcOe1g
+	 bjZswnCdyGTvP7wzeCzynSpXsEToMocsR+5nO/ZUr1JLljtDvuWvtFBOkxlXSOAiAp
+	 l1cNzLt0GkobglBK/4gsagcgu19bb4DkQA45WdU1F75uEoRckoUb6zpfbCyDEhMczu
+	 +3/VooH/54M0VnBt4GTJFf3gYfPWOmScyl5CbUcMc5xDo68aKmtG+FMdzhKAnjIW3l
+	 pHmQpSigqjixQ==
 From: Josh Poimboeuf <jpoimboe@kernel.org>
 To: x86@kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Nicolas Schier <nsc@kernel.org>,
 	linux-kbuild@vger.kernel.org,
 	Huacai Chen <chenhuacai@kernel.org>
-Subject: [PATCH v2 02/27] kbuild: Add CONFIG_OBJTOOL_DEFERRED
-Date: Tue,  8 Sep 2026 13:33:14 -0700
-Message-ID: <166ab4ef8f062db45d5e4ab928f940d08dc465d5.1788899473.git.jpoimboe@kernel.org>
+Subject: [PATCH v2 05/27] objtool: Refactor the noreturn/dead-end detection
+Date: Tue,  8 Sep 2026 13:33:17 -0700
+Message-ID: <9d4b8ccfed745ac47a954aa2e1de62a85197122d.1788899473.git.jpoimboe@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <cover.1788899473.git.jpoimboe@kernel.org>
 References: <cover.1788899473.git.jpoimboe@kernel.org>
@@ -52,133 +52,248 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-For LTO, IBT, and KLP builds, the running of objtool is deferred to
-vmlinux.o rather than individual translation units.  In preparation for
-deferring it in more cases, add a new config option.
+The dead end detection (basically "is this a call to a noreturn?") is
+currently derived on demand, at each call site.  Also, the answer
+isn't saved anywhere, so it's redetermined each time.  It also has an
+ugly recursion check.
 
-No functional change.
+Clean that up by just detecting all the noreturns at the beginning.
 
 Signed-off-by: Josh Poimboeuf <jpoimboe@kernel.org>
 ---
- arch/x86/boot/startup/Makefile |  2 +-
- lib/Kconfig.debug              |  7 +++++++
- scripts/Makefile.build         |  4 ++--
- scripts/Makefile.lib           |  4 +---
- scripts/Makefile.vmlinux_o     | 13 +++++++------
- scripts/link-vmlinux.sh        |  3 +--
- 6 files changed, 19 insertions(+), 14 deletions(-)
+ tools/objtool/check.c               | 159 ++++++++++++++++------------
+ tools/objtool/include/objtool/elf.h |   1 +
+ 2 files changed, 93 insertions(+), 67 deletions(-)
 
-diff --git a/arch/x86/boot/startup/Makefile b/arch/x86/boot/startup/Makefile
-index 5e499cfb29b5c..ab6e9970d4f4e 100644
---- a/arch/x86/boot/startup/Makefile
-+++ b/arch/x86/boot/startup/Makefile
-@@ -36,7 +36,7 @@ $(patsubst %.o,$(obj)/%.o,$(lib-y)): OBJECT_FILES_NON_STANDARD := y
- # relocations, even if other objtool actions are being deferred.
- #
- $(pi-objs): objtool-enabled	= 1
--$(pi-objs): objtool-args	= $(if $(delay-objtool),--dry-run,$(objtool-args-y)) --noabs
-+$(pi-objs): objtool-args	= $(if $(CONFIG_OBJTOOL_DEFERRED),--dry-run,$(objtool-args-y)) --noabs
+diff --git a/tools/objtool/check.c b/tools/objtool/check.c
+index 1fe7efa934ebf..83b4e748d33ba 100644
+--- a/tools/objtool/check.c
++++ b/tools/objtool/check.c
+@@ -219,94 +219,112 @@ static bool is_rust_noreturn(const struct symbol *func)
+ 		str_ends_with(func->name, "_fail"));
+ }
  
- #
- # Confine the startup code by prefixing all symbols with __pi_ (for position
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 134b15a44625e..566e5be4c3f57 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -588,6 +588,13 @@ config NOINSTR_VALIDATION
- 	select OBJTOOL
- 	default y
- 
-+# For when objtool defers its work to the linked image (vmlinux.o or module.o)
-+# rather than running on individual translation units.
-+config OBJTOOL_DEFERRED
-+	def_bool y
-+	depends on OBJTOOL
-+	depends on LTO_CLANG || X86_KERNEL_IBT || KLP_BUILD
-+
- config VMLINUX_MAP
- 	bool "Generate vmlinux.map file when linking"
- 	depends on EXPERT
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 4349108e75e1f..87993362595ce 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -278,7 +278,7 @@ endif # CONFIG_FTRACE_MCOUNT_USE_RECORDMCOUNT
- is-standard-object = $(if $(filter-out y%, $(OBJECT_FILES_NON_STANDARD_$(target-stem).o)$(OBJECT_FILES_NON_STANDARD)n),$(is-kernel-object))
- 
- ifdef CONFIG_OBJTOOL
--$(obj)/%.o: private objtool-enabled = $(if $(is-standard-object),$(if $(delay-objtool),$(is-single-obj-m),y))
-+$(obj)/%.o: private objtool-enabled = $(if $(is-standard-object),$(if $(CONFIG_OBJTOOL_DEFERRED),$(is-single-obj-m),y))
- endif
- 
- ifneq ($(findstring 1, $(KBUILD_EXTRA_WARN)),)
-@@ -504,7 +504,7 @@ define rule_ld_multi_m
- 	$(call cmd,gen_objtooldep)
- endef
- 
--$(multi-obj-m): private objtool-enabled := $(delay-objtool)
-+$(multi-obj-m): private objtool-enabled := $(CONFIG_OBJTOOL_DEFERRED)
- $(multi-obj-m): private part-of-module := y
- $(multi-obj-m): %.o: %.mod FORCE
- 	$(call if_changed_rule,ld_multi_m)
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 0a4fdd8bd975d..3622237e41d2e 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -210,11 +210,9 @@ objtool-args-$(or $(CONFIG_GCOV_KERNEL),$(CONFIG_KCOV))	+= --no-unreachable
- objtool-args-$(CONFIG_OBJTOOL_WERROR)			+= --werror
- 
- objtool-args = $(objtool-args-y)					\
--	$(if $(delay-objtool), --link)					\
-+	$(if $(CONFIG_OBJTOOL_DEFERRED), --link)			\
- 	$(if $(part-of-module), --module)
- 
--delay-objtool := $(or $(CONFIG_LTO_CLANG),$(CONFIG_X86_KERNEL_IBT),$(CONFIG_KLP_BUILD))
+-/*
+- * This checks to see if the given function is a "noreturn" function.
+- *
+- * For global functions which are outside the scope of this object file, we
+- * have to keep a manual list of them.
+- *
+- * For local functions, we have to detect them manually by simply looking for
+- * the lack of a return instruction.
+- */
+-static bool __dead_end_function(struct objtool_file *file, struct symbol *func,
+-				int recursion)
++static bool is_listed_noreturn(struct symbol *func)
+ {
+-	int i;
+-	struct instruction *insn;
+-	bool empty = true;
 -
- cmd_objtool = $(if $(objtool-enabled), ; $(objtool) $(objtool-args) $@)
- cmd_gen_objtooldep = $(if $(objtool-enabled), { echo ; echo '$@: $$(wildcard $(objtool))' ; } >> $(dot-target).cmd)
+ #define NORETURN(func) __stringify(func),
+ 	static const char * const global_noreturns[] = {
+ #include "noreturns.h"
+ 	};
+ #undef NORETURN
  
-diff --git a/scripts/Makefile.vmlinux_o b/scripts/Makefile.vmlinux_o
-index 24a3a4fd271c2..9bac917e8b819 100644
---- a/scripts/Makefile.vmlinux_o
-+++ b/scripts/Makefile.vmlinux_o
-@@ -30,15 +30,16 @@ endif
- # objtool for vmlinux.o
- # ---------------------------------------------------------------------------
- #
--# For delay-objtool (IBT or LTO), objtool doesn't run on individual translation
--# units.  Instead it runs on vmlinux.o.
-+# For CONFIG_OBJTOOL_DEFERRED (IBT or LTO), objtool doesn't run on individual
-+# translation units.  Instead it runs on vmlinux.o.
- #
--# For !delay-objtool + CONFIG_NOINSTR_VALIDATION, it runs on both translation
--# units and vmlinux.o, with the latter only used for noinstr/unret validation.
-+# For !CONFIG_OBJTOOL_DEFERRED + CONFIG_NOINSTR_VALIDATION, it runs on both
-+# translation units and vmlinux.o, with the latter only used for noinstr/unret
-+# validation.
+-	if (!func)
++	if (is_local_sym(func))
+ 		return false;
  
--objtool-enabled := $(or $(delay-objtool),$(CONFIG_NOINSTR_VALIDATION))
-+objtool-enabled := $(or $(CONFIG_OBJTOOL_DEFERRED),$(CONFIG_NOINSTR_VALIDATION))
+-	if (!is_local_sym(func)) {
+-		if (is_rust_noreturn(func))
++	if (is_rust_noreturn(func))
++		return true;
++
++	for (int i = 0; i < ARRAY_SIZE(global_noreturns); i++)
++		if (!strcmp(func->name, global_noreturns[i]))
+ 			return true;
  
--ifeq ($(delay-objtool),y)
-+ifeq ($(CONFIG_OBJTOOL_DEFERRED),y)
- vmlinux-objtool-args-y					+= $(objtool-args-y)
- else
- vmlinux-objtool-args-$(CONFIG_OBJTOOL_WERROR)		+= --werror
-diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-index ab0b8125c8cbc..07ba4360b2c89 100755
---- a/scripts/link-vmlinux.sh
-+++ b/scripts/link-vmlinux.sh
-@@ -60,8 +60,7 @@ vmlinux_link()
- 	# skip output file argument
- 	shift
+-		for (i = 0; i < ARRAY_SIZE(global_noreturns); i++)
+-			if (!strcmp(func->name, global_noreturns[i]))
+-				return true;
+-	}
++	return false;
++}
++
++/*
++ * Use this rather than reading sym->_noreturn directly: the noreturn status
++ * lives on the primary alias, and ANNOTATE_IGNORE_NORETURN() overrides it.
++ */
++static bool is_noreturn(struct symbol *func)
++{
++	func = func->alias->pfunc;
++
++	if (is_listed_noreturn(func))
++		return true;
++
++	return func->_noreturn;
++}
++
++static bool might_return(struct objtool_file *file, struct symbol *func)
++{
++	struct instruction *insn;
++	struct symbol *dest;
  
--	if is_enabled CONFIG_LTO_CLANG || is_enabled CONFIG_X86_KERNEL_IBT ||
--	   is_enabled CONFIG_KLP_BUILD; then
-+	if is_enabled CONFIG_OBJTOOL_DEFERRED || is_enabled CONFIG_LTO_CLANG; then
- 		# Use vmlinux.o instead of performing the slow LTO link again.
- 		objs=vmlinux.o
- 		libs=
+ 	if (is_weak_sym(func))
+-		return false;
+-
+-	if (!func->len)
+-		return false;
+-
+-	insn = find_insn(file, func->sec, func->offset);
+-	if (!insn || !insn_func(insn))
+-		return false;
++		return true;
+ 
+ 	func_for_each_insn(file, func, insn) {
+-		empty = false;
+-
+ 		if (insn->type == INSN_RETURN)
+-			return false;
+-	}
+-
+-	if (empty)
+-		return false;
+-
+-	/*
+-	 * A function can have sibling calls instead of a return.  It's only a
+-	 * dead end if *all* the sibling call targets are dead ends.
+-	 */
+-	func_for_each_insn(file, func, insn) {
+-		struct symbol *dest;
++			return true;
+ 
+ 		if (!is_sibling_call(insn))
+ 			continue;
+ 
+ 		dest = insn_call_dest(insn);
+-		if (!dest)
+-			/* call to another file */
+-			return false;
+-
+-		if (recursion == 5) {
+-			/*
+-			 * Infinite recursion: two functions have sibling
+-			 * calls to each other.  This is a very rare case.
+-			 * It means they aren't dead ends.
+-			 */
+-			return false;
+-		}
+-
+-		if (!__dead_end_function(file, dest, recursion+1))
+-			return false;
++		if (!dest || !is_noreturn(dest))
++			return true;
+ 	}
+ 
+-	return true;
++	return false;
+ }
+ 
+-static bool dead_end_function(struct objtool_file *file, struct symbol *func)
++static void detect_noreturns(struct objtool_file *file)
+ {
+-	return __dead_end_function(file, func, 0);
++	struct symbol *func, *dest;
++	struct instruction *insn;
++	bool changed;
++
++	/* Mark all functions guilty until proven innocent */
++	for_each_sym(file->elf, func) {
++
++		/* Aliases and cold subfunctions inherit the parent's verdict */
++		if (!is_func_sym(func) || is_undef_sym(func) ||
++		    is_prefix_func(func) || func->embedded_insn ||
++		    func != func->alias->pfunc)
++			continue;
++
++		insn = find_insn(file, func->sec, func->offset);
++		if (!insn || insn_func(insn) != func)
++			continue;
++
++		func->_noreturn = 1;
++	}
++
++	/*
++	 * A function's noreturn status depends on those of its sibling call
++	 * destinations, which may not be settled yet.  Keep clearing the
++	 * noreturn bit for known cases until it stops spreading.
++	 */
++	do {
++		changed = false;
++
++		for_each_sym(file->elf, func) {
++			if (!func->_noreturn || !might_return(file, func))
++				continue;
++
++			func->_noreturn = 0;
++			changed = true;
++		}
++	} while (changed);
++
++	/* Now mark the dead end call sites */
++	for_each_insn(file, insn) {
++		if (insn->type != INSN_CALL)
++			continue;
++
++		dest = insn_call_dest(insn);
++		if (dest && is_noreturn(dest))
++			insn->dead_end = true;
++	}
+ }
+ 
+ static void init_cfi_state(struct cfi_state *cfi)
+@@ -1422,9 +1440,6 @@ static int annotate_call_site(struct objtool_file *file,
+ 	    !insn->_call_dest->embedded_insn)
+ 		list_add_tail(&insn->call_node, &file->call_list);
+ 
+-	if (!sibling && dead_end_function(file, sym))
+-		insn->dead_end = true;
+-
+ 	return 0;
+ }
+ 
+@@ -2669,6 +2684,17 @@ int decode_file(struct objtool_file *file)
+ 	if (add_jump_table_alts(file))
+ 		return -1;
+ 
++	/*
++	 * Must be after add_jump_table_alts(), which affects sibling call
++	 * detection (jump table branches vs indirect sibling calls).
++	 *
++	 * The dead end marks are read by validate_branch() -- reached from
++	 * both validate_functions() and validate_noinstr_sections() -- and by
++	 * validate_unret().
++	 */
++	if (validate_branch_enabled() || opts.noinstr || opts.unret)
++		detect_noreturns(file);
++
+ 	if (read_unwind_hints(file))
+ 		return -1;
+ 
+@@ -2676,8 +2702,7 @@ int decode_file(struct objtool_file *file)
+ 	mark_holes(file);
+ 
+ 	/*
+-	 * Must be after add_call_destinations() such that it can override
+-	 * dead_end_function() marks.
++	 * Must be after detect_noreturns() so it can override dead_end marks.
+ 	 */
+ 	if (read_annotate(file, __annotate_late))
+ 		return -1;
+diff --git a/tools/objtool/include/objtool/elf.h b/tools/objtool/include/objtool/elf.h
+index a82517a76a0f6..46fb2230ca743 100644
+--- a/tools/objtool/include/objtool/elf.h
++++ b/tools/objtool/include/objtool/elf.h
+@@ -98,6 +98,7 @@ struct symbol {
+ 	u8 klp		     : 1;
+ 	u8 dont_correlate    : 1;
+ 	u8 fake		     : 1;
++	u8 _noreturn         : 1;
+ 	struct list_head pv_target;
+ 	struct reloc *relocs;
+ 	struct section *group_sec;
 -- 
 2.55.0
 
