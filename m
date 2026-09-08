@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDD983B6363;
-	Tue,  8 Sep 2026 20:34:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B31E3B71D2;
+	Tue,  8 Sep 2026 20:34:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788899673; cv=none; b=OOrncezCJvifnGQWwNKWftOqUSKpOBO543b2DvL9IbndFn8m+iIAWa2TXrtQoD8LPkNWdiOOTG5WNlU9r20V1aZ98rzkeGb+YZlj8wgEbK4vyvxZrivook9DhxylauopN+jmDWtMQ2XdPXnaA+qMkBmALuPx6s8Uy/7fCo7L5zg=
+	t=1788899673; cv=none; b=l/OPA3E5LxAdSrIDeA7/Xzc96RZZOZPcIUvVj4g3SHMdewnMN2k3dYFqzAvWV8li9TxcPY0n45Q642sLTre1dr55A1ucdq8MFLDp9OMTsP/V3z7lmkRGoXzmTiFJ3P8H0o/7YBddvZm8ObCOt2C4mTzID7uC337joe43z3qnFSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1788899673; c=relaxed/simple;
-	bh=a5y1EEkZOPnedpEWtUdzuXTqnsPBymub40I1Wh60MPI=;
+	bh=e6KyJKvQKFiNsK0tdk2JX64adzD69+Bkaek7Wzd0ogw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qUA4u0nYaqzTNfHpbacY5NvOyew/T6t5k4iwVSGhwkbtBBpHbDhCrMBNGIfwjxMmrcuXzgjaAZwzYcGusvpXEtQVUoFid06BLT03V/kiQaEMbWIyS82zEXNXp0QieQ6ikZeek6zjiTSjNnzfAoAmxRne38zQlqQL2MtcIAXTBiI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N8jDouDG; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=I6WrKPC42X08zs0zaarFs7LokJz2ukEOKAWb2KPW74fc5pcftc0EQjxOrjbHDgvT4MUMR6xXi4XErwh2FJ7zjvrhW/Il/SOChq52dopsrVdjIKtaElwDDbE45TDqTEpCQZ+80u+KwkOl2lIxKNYolYgbQJN8DfhACzlItBO0YKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nSeXbv7H; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N8jDouDG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CB861F00A3A;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nSeXbv7H"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C58681F00ACA;
 	Tue,  8 Sep 2026 20:34:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788899671;
-	bh=SxeKWlCwxhAr4gBBKtFFL+Dx5orsIMBJtg6I3hC4V0Y=;
+	s=k20260515; t=1788899672;
+	bh=fdTvcze5X7ZfgZodtkOyMQipZQ892On/LSssO1gYaqQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=N8jDouDGZnd+3OA/4XPlij22xKvpotyG4Q6RXkHoTfm31yDQ8QbwU1SpiHanSrIO2
-	 cuTHMswe3A7bCp8vYKBLWL2fg7myh5hEQsfrOBBQJ2j0sAiG0j+tpMde5x1/chYrRt
-	 7pbqvPdfyENr6YwjlPnb/wLSn+g2h3oaw9XNeb28N0HQPnCSjF9Rqto23iItez0G5P
-	 2p7oM5OS+SRXqmgFsPU1oJsESOAnx0YRn1KrNvKGLzb0L9vSbaSFl+vi6y8+58t1mX
-	 TxQeLuyTZohm0AfYP4N3W464KQ/aUCLkE1d5isSfhV/FechOQ4sFBGfdDjMwoWmMso
-	 E+0sU62Ca7bDw==
+	b=nSeXbv7Hm86jWgW4t5Fq36kiYBRB5IF8dstyqJWPT+XVW5zcjuQijd5TJK4UCOwzH
+	 eezBBUuBfHfFHh5hUS4/ZEuD7MzvZTXHuFm/lULkd0YLGc0jZs4WVDd6RwxOGyPU8B
+	 Z8PvVTDchyBuE1i7vVjlj/KPRBZlYD4vVevM5fu6ia6N2oy/HVdhFa/jS+GvfBfPxk
+	 m6lBdkGB7xSS3aACLtgTA8TbE9KS+kG72bU/mTzITui8sZTckeZMprxyiy0mdHe/7Q
+	 MH1loRMOXEIPTbLSp0haAySZH5+3ejVYHvtO77A2wiCaYJWEBK37iTIt32LW+39/K4
+	 /RhL8UXURki6A==
 From: Josh Poimboeuf <jpoimboe@kernel.org>
 To: x86@kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Nicolas Schier <nsc@kernel.org>,
 	linux-kbuild@vger.kernel.org,
 	Huacai Chen <chenhuacai@kernel.org>
-Subject: [PATCH v2 07/27] objtool: Make .discard.stack_frame_non_standard non-allocatable
-Date: Tue,  8 Sep 2026 13:33:19 -0700
-Message-ID: <35e2d86e4ea5614b3888954b5a8e2b792eabca4b.1788899473.git.jpoimboe@kernel.org>
+Subject: [PATCH v2 08/27] efi/libstub: Drop .discard.addressable from the stub objects
+Date: Tue,  8 Sep 2026 13:33:20 -0700
+Message-ID: <7523022447bd218c6ab556308eb4b03a74528033.1788899473.git.jpoimboe@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <cover.1788899473.git.jpoimboe@kernel.org>
 References: <cover.1788899473.git.jpoimboe@kernel.org>
@@ -52,54 +52,37 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Convert STACK_FRAME_NON_STANDARD() to an asm macro to prevent it section
-from being allocatable.
+On arm64, riscv and loongarch, the EFI stub objects are objcopy'd with
+--prefix-alloc-sections=.init, which renames every allocatable section.
 
-This will help it survive being used in libstub, which renames all
-allocatable sections.
+The .discard.addressable section is allocatable, so if
+STACK_FRAME_NON_STANDARD() and __ADDRESSABLE() are used, the section
+gets renamed and never discarded:
+
+  ld: warning: orphan section `.init.discard.addressable' from `vmlinux.o' being placed in section `.init.discard.addressable'
+
+In preparation for using STACK_FRAME_NON_STANDARD() in libstub code,
+remove the section during objcopy.
 
 Signed-off-by: Josh Poimboeuf <jpoimboe@kernel.org>
 ---
- include/linux/objtool.h | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ drivers/firmware/efi/libstub/Makefile | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/include/linux/objtool.h b/include/linux/objtool.h
-index af2e68e496e5d..e9c78e026c7a3 100644
---- a/include/linux/objtool.h
-+++ b/include/linux/objtool.h
-@@ -4,6 +4,7 @@
+diff --git a/drivers/firmware/efi/libstub/Makefile b/drivers/firmware/efi/libstub/Makefile
+index 77a2b2d74f3f6..1344d08b420a2 100644
+--- a/drivers/firmware/efi/libstub/Makefile
++++ b/drivers/firmware/efi/libstub/Makefile
+@@ -155,6 +155,10 @@ STUBCOPY_FLAGS-$(CONFIG_LOONGARCH)	+= --prefix-alloc-sections=.init \
+ 					   --prefix-symbols=__efistub_
+ STUBCOPY_RELOC-$(CONFIG_LOONGARCH)	:= R_LARCH_MARK_LA
  
- #include <linux/objtool_types.h>
- #include <linux/annotate.h>
-+#include <linux/compiler.h>
- 
- #ifdef CONFIG_OBJTOOL
- 
-@@ -30,9 +31,11 @@
-  *
-  * For more information, see tools/objtool/Documentation/objtool.txt.
-  */
--#define STACK_FRAME_NON_STANDARD(func) \
--	static void __used __section(".discard.func_stack_frame_non_standard") \
--		*__func_stack_frame_non_standard_##func = func
-+#define STACK_FRAME_NON_STANDARD(func)					\
-+	__ADDRESSABLE(func);						\
-+	asm(".pushsection .discard.func_stack_frame_non_standard\n\t"	\
-+	    ".long " #func " - .\n\t"					\
-+	    ".popsection")
- 
- /*
-  * STACK_FRAME_NON_STANDARD_FP() is a frame-pointer-specific function ignore
-@@ -91,8 +94,8 @@
- .endm
- 
- .macro STACK_FRAME_NON_STANDARD func:req
--	.pushsection .discard.func_stack_frame_non_standard, "aw"
--	.quad \func
-+	.pushsection .discard.func_stack_frame_non_standard, ""
-+	.long \func - .
- 	.popsection
- .endm
++# Drop the section created by __ADDRESSABLE() so it doesn't get prefixed.
++# Its job is already done.
++STUBCOPY_FLAGS-y			+= --remove-section=.discard.addressable
++
+ $(obj)/%.stub.o: $(obj)/%.o FORCE
+ 	$(call if_changed,stubcopy)
  
 -- 
 2.55.0
