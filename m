@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D23733AD51C;
-	Tue,  8 Sep 2026 20:34:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E6D73BCD14;
+	Tue,  8 Sep 2026 20:34:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788899674; cv=none; b=nwk+wOTDsXRwKPjrvSAM22mSfbBNHT5JP5zvIDWWIhVUPyeHRdq82u0YdAEykKdqRujf7osV5zSEIviEjyLhvDGEG+F50gRM+loupxb+uhNo7IRrCw+poHpArpBL0x/UZsjsQG+JFwry7ZZDO657DZospHbCM2OrPC+vqWsUueU=
+	t=1788899675; cv=none; b=MqMcFF2Qtp6u2p+lOQ/vBb4UjevblwQcClmb3fQFGdlWXcsD5JBcGQ5Esr0Fre125iams3kp99waVP2Zb1fZmanXA1La+sAFIQ0Oy3BiC3bjqlve9vnH6QRIbi6r8ieqDBVGduSnvNNAVaFgZwPp9dug1pv1H/BGLIj+3D99mxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788899674; c=relaxed/simple;
-	bh=FBkhZIHsOVOAFGLvGjoaJHbxp5/Ieql+9q6x8eCPjYA=;
+	s=arc-20240116; t=1788899675; c=relaxed/simple;
+	bh=arz7Z99v5DH5MJW76D5py8+52dz5qdc8kjnhb04V490=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Zgkfo5SGmBC8NLKotQTlrsyhlPjuKa/awvHIzdnmOuOP5DK1fnTJMVHP+t095n3+0U6wx5ITdsZCAmvjIUzp4ZBlcaKoAbe+0e4j+TwzeF7/U94+7s0z2/Na9r6nmVhto6oyEe5ah4ZjzIQ4GeG/1+VyWboAy8yTUpRv49Q8TR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OJAmf9xq; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=ucI+IbepHyHfdKO1XjMMWjyOJyJJsXtsW1QwyPUaFcj75hX4YdBQ7P//2C7qfvnFrL6Px8QmJE1TKpzXrVqXsOTRCxEthsvHWQsa9tWWvPuJQh5OMaeTWy/0enPJGjHiXALydMvCVzA48GcdNMtksZ8Rw0i+ufSxGpVJpoRbJDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AKho3uem; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OJAmf9xq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B04C1F00A3E;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AKho3uem"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5B4F1F00A3F;
 	Tue,  8 Sep 2026 20:34:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788899672;
-	bh=xeZZ3CRnRZyMKMMDVT6aWXfxyAdK+QQqPR0MFpev8r0=;
+	s=k20260515; t=1788899673;
+	bh=yeoYxTwkYVyKLW23eiw0I1lEKmI+ZjiGRpK7f9g5Xjc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=OJAmf9xqAb4WZtd3cY1npLEnaTmqyOu7XhswZT5YV8eayxzd2xYHfj7WSBd/GEaUP
-	 YUo9m/UhWdLLcSBuEhkjIGQQeqneWsY8sYVlgYjeZR3j7JFP7bma+MiBuYamSvyHiz
-	 r9mFmSkgWf+b1atMJww7AVOOAoIs9RIr4CMGhZkk4Olk3aMXZFbbIG8eEqv4U94rLu
-	 zJ5Kjq/wB54f6et+8jT5vn1w1KKnBCaAIgRS5O9K5kKOxSX0NeRfplZVdJ4ralvX4Z
-	 E5mzaVWPttIArFCRmwHl8ctdyL1EyXowcRSHebPdi5Tp66hzjA55gK2u02Dmfh56zA
-	 Jb/vZW/O+4O4w==
+	b=AKho3uemSqRR4hoFfmMa+y0+cwbSGll/98BY/Cru5K2gBMmlBPVxnJwss+HrJpjLC
+	 Gzjj3AWuWpMaqy2v/WLvvLkjHtTfAATG4e+7WUcQSyAw16tZi9hApqlKLxIth/KGqM
+	 u9+mWVRI5FVTzPgMbnz6+58er397VZxfy5A/gXw+6ZoIlZLFAtxcLSwcFYb+zbdlav
+	 8mokBui9+CG0QJbQEwu+Gd0hU+gks0D/zH0OXilKexOrphUYU7ad1T8jB4iMhKM1Iy
+	 iIdfC/CKWzjAKUt+9T4GGhdToxi3G7Lr5RX/sSZXCBSxIxtJl4G4Jc/dZVCIS/MnOU
+	 /7NfUaAemHkow==
 From: Josh Poimboeuf <jpoimboe@kernel.org>
 To: x86@kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Nicolas Schier <nsc@kernel.org>,
 	linux-kbuild@vger.kernel.org,
 	Huacai Chen <chenhuacai@kernel.org>
-Subject: [PATCH v2 09/27] efi/loongarch: Mark loongarch efi_boot_kernel() non-standard for objtool
-Date: Tue,  8 Sep 2026 13:33:21 -0700
-Message-ID: <29c1a22167eb7537d92e71da8788dd4e121f2366.1788899473.git.jpoimboe@kernel.org>
+Subject: [PATCH v2 10/27] objtool: Add ANNOTATE_IGNORE_NORETURN()
+Date: Tue,  8 Sep 2026 13:33:22 -0700
+Message-ID: <4e85afe32c6e7b68f6b6a77cf25e6a29981a23cb.1788899473.git.jpoimboe@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <cover.1788899473.git.jpoimboe@kernel.org>
 References: <cover.1788899473.git.jpoimboe@kernel.org>
@@ -52,44 +52,130 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-efi_boot_kernel() ends with a tail call through a __noreturn function
-pointer, so the compiler emits nothing after it.  Objtool can't tell that
-in indirect call doesn't return, so it sees execution fall off the end
-of the function:
+A generic interface may be noreturn in one arch and returnable in
+another, in which case its common declaration can't say __noreturn.
 
-  vmlinux.o: warning: objtool: __efistub_efi_boot_kernel() falls through to next function __efistub_efi_get_memory_map()
+Rust has a similar issue where a few core library calls to returnable
+functions are replaced after compilation with calls to a noreturn panic
+function.
 
-This is boot code for which objtool/ORC coverage doesn't matter, so tell
-objtool to ignore it.
+Add an annotation which tells objtool to ignore the noreturn status of a
+given function.
 
 Signed-off-by: Josh Poimboeuf <jpoimboe@kernel.org>
 ---
- drivers/firmware/efi/libstub/loongarch.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ include/linux/annotate.h            |  7 +++++++
+ include/linux/objtool_types.h       |  1 +
+ tools/include/linux/objtool_types.h |  1 +
+ tools/objtool/check.c               | 19 +++++++++++++++++++
+ tools/objtool/include/objtool/elf.h |  1 +
+ 5 files changed, 29 insertions(+)
 
-diff --git a/drivers/firmware/efi/libstub/loongarch.c b/drivers/firmware/efi/libstub/loongarch.c
-index 2b0c87dc99088..737de9afd6a40 100644
---- a/drivers/firmware/efi/libstub/loongarch.c
-+++ b/drivers/firmware/efi/libstub/loongarch.c
-@@ -5,6 +5,7 @@
-  * Copyright (C) 2020-2022 Loongson Technology Corporation Limited
-  */
+diff --git a/include/linux/annotate.h b/include/linux/annotate.h
+index 2f1599c9e5732..a81ca04b4c501 100644
+--- a/include/linux/annotate.h
++++ b/include/linux/annotate.h
+@@ -3,6 +3,7 @@
+ #define _LINUX_ANNOTATE_H
  
-+#include <linux/objtool.h>
- #include <asm/efi.h>
- #include <asm/addrspace.h>
- #include "efistub.h"
-@@ -103,3 +104,10 @@ efi_status_t efi_boot_kernel(void *handle, efi_loaded_image_t *image,
- 	real_kernel_entry(true, (unsigned long)cmdline_ptr,
- 			  (unsigned long)efi_system_table);
- }
-+
+ #include <linux/objtool_types.h>
++#include <linux/stringify.h>
+ 
+ #ifdef CONFIG_OBJTOOL
+ 
+@@ -105,6 +106,12 @@
+  */
+ #define ANNOTATE_NOCFI_SYM(sym)		asm(ASM_ANNOTATE_LABEL(sym, ANNOTYPE_NOCFI))
+ 
 +/*
-+ * Objtool has no way of knowing the real_kernel_entry() indirect call is
-+ * noreturn. Just tell it to ignore this function: it's boot code anyway, so
-+ * ORC coverage isn't needed.
++ * Treat a function as returnable by its callers despite objtool classifying it
++ * as noreturn.
 + */
-+STACK_FRAME_NON_STANDARD(efi_boot_kernel);
++#define ANNOTATE_IGNORE_NORETURN(sym)	asm(ASM_ANNOTATE_LABEL(sym, ANNOTYPE_IGNORE_NORETURN))
++
+ /*
+  * Annotate a special section entry.  This emables livepatch module generation
+  * to find and extract individual special section entries as needed.
+diff --git a/include/linux/objtool_types.h b/include/linux/objtool_types.h
+index c24e9ea392696..ce08ecc808c67 100644
+--- a/include/linux/objtool_types.h
++++ b/include/linux/objtool_types.h
+@@ -66,6 +66,7 @@ struct unwind_hint {
+ #define ANNOTYPE_INTRA_FUNCTION_CALL	7
+ #define ANNOTYPE_REACHABLE		8
+ #define ANNOTYPE_NOCFI			9
++#define ANNOTYPE_IGNORE_NORETURN	10
+ 
+ #define ANNOTYPE_DATA_SPECIAL		1
+ 
+diff --git a/tools/include/linux/objtool_types.h b/tools/include/linux/objtool_types.h
+index c24e9ea392696..ce08ecc808c67 100644
+--- a/tools/include/linux/objtool_types.h
++++ b/tools/include/linux/objtool_types.h
+@@ -66,6 +66,7 @@ struct unwind_hint {
+ #define ANNOTYPE_INTRA_FUNCTION_CALL	7
+ #define ANNOTYPE_REACHABLE		8
+ #define ANNOTYPE_NOCFI			9
++#define ANNOTYPE_IGNORE_NORETURN	10
+ 
+ #define ANNOTYPE_DATA_SPECIAL		1
+ 
+diff --git a/tools/objtool/check.c b/tools/objtool/check.c
+index f65b1b01b4fe9..d3b5c372cba4a 100644
+--- a/tools/objtool/check.c
++++ b/tools/objtool/check.c
+@@ -248,6 +248,9 @@ static bool is_noreturn(struct symbol *func)
+ {
+ 	func = func->alias->pfunc;
+ 
++	if (func->ignore_noreturn)
++		return false;
++
+ 	if (is_listed_noreturn(func))
+ 		return true;
+ 
+@@ -2391,6 +2394,18 @@ static int __annotate_early(struct objtool_file *file, int type, struct instruct
+ 		insn->noendbr = 1;
+ 		break;
+ 
++	/* Must be before detect_noreturns() */
++	case ANNOTYPE_IGNORE_NORETURN: {
++		struct symbol *sym = insn_sym(insn);
++
++		if (!sym) {
++			ERROR_INSN(insn, "dodgy IGNORE_NORETURN annotation");
++			return -1;
++		}
++		sym->ignore_noreturn = 1;
++		break;
++	}
++
+ 	default:
+ 		break;
+ 	}
+@@ -2437,6 +2452,10 @@ static int __annotate_late(struct objtool_file *file, int type, struct instructi
+ 		/* early */
+ 		break;
+ 
++	case ANNOTYPE_IGNORE_NORETURN:
++		/* early */
++		break;
++
+ 	case ANNOTYPE_RETPOLINE_SAFE:
+ 		if (insn->type != INSN_JUMP_DYNAMIC &&
+ 		    insn->type != INSN_CALL_DYNAMIC &&
+diff --git a/tools/objtool/include/objtool/elf.h b/tools/objtool/include/objtool/elf.h
+index 46fb2230ca743..0e3593d993ac8 100644
+--- a/tools/objtool/include/objtool/elf.h
++++ b/tools/objtool/include/objtool/elf.h
+@@ -99,6 +99,7 @@ struct symbol {
+ 	u8 dont_correlate    : 1;
+ 	u8 fake		     : 1;
+ 	u8 _noreturn         : 1;
++	u8 ignore_noreturn   : 1;
+ 	struct list_head pv_target;
+ 	struct reloc *relocs;
+ 	struct section *group_sec;
 -- 
 2.55.0
 
