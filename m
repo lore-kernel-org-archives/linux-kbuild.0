@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194C849AA2E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2F0449AA4E;
 	Tue,  8 Sep 2026 20:34:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788899683; cv=none; b=CWNp6/5PHcfUfSaW1ws+cJ6sfUQ6xGPFVmClBn1Muh/rMIkkYBd0hl97ytmYbniTPbd1+xweuLyzL3LpvVqiJz5PhDDhDnUryG78pOHhAK+lLhnr50O27vqP4jzVsOCvy2ReXkBzeVRzQBAs8yxDaVc5C5cjpcwFAz0buHj1TTc=
+	t=1788899684; cv=none; b=Ei5M20cR4QLxS3e0yCZbqjDMsnQfrbf/yxGhyyuUgPyf3hhV/5x+90FvKZkXM2CIEoIuxD8awreI0x4/rE1LS1DFV5uuyMSIcg8QNaw5zOWBr6F2Ok/PQ3cVz1KellT/wtt29j+QuQRjm++IWr9aui8DGC9NEUpQlFI9NPbEymY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788899683; c=relaxed/simple;
-	bh=2MurTWYJOeRuSg+sc2N7GcoYpRtU/hGgZsMNWSfNpdY=;
+	s=arc-20240116; t=1788899684; c=relaxed/simple;
+	bh=xOYB8xLIPdDX+iWXkXaxmeoECe3D61B81XNBv9a4IcQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=guWVt7T+0XnxUi2K7cWdss8U97c+WawOjb7IffjKJU9m7LA4ZsY144xDYjH9OUn0m+5udT84zxg9WILo5c2kmOAhxagXrs6aBzmIKBAmY8EDW7jktbDkgHMYSGCiKkyGOlTJmzHlglJEm5SxTdD8WgJUN8GSk30CSHK7ABEwMR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U1eCXP5b; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=U60f5JWQq2OVBNtn/klRQ/zRUpIBU+IPYbWoRMHV9bqUVxeaISleQWLD7PilKSxWxJzalZUGQVbHzA4pIPxSPKVi41oB3bYiyCDRf0NZgWNL9HOvSn01B1iqjF/GkTHn6I+G2A+Lpbmg3BkarLmkgUNlf/Zp1diRSqPf7o1cD7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i/dbPmkr; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U1eCXP5b"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EF791F00AC4;
-	Tue,  8 Sep 2026 20:34:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i/dbPmkr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28F111F00A3A;
+	Tue,  8 Sep 2026 20:34:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1788899682;
-	bh=f3A5JUSw2D9vEf1PMY00Hj+JmsX5sxeGo18IIUxbC8o=;
+	bh=gqdq0pCabuiCdqmtff2BCCEhLZdJ6HEnMGsMgUVbUes=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=U1eCXP5b5KqZAJsJ1fxBWLI4j3gnjawpK7z9oLWHNBDxo4evNFwkytwW+P7XAX6wW
-	 DLcS/9UqPgnQjuo1rNLVANf3FNREoxdYhBkV+zq2yhSa4FN3bXJ05+3pbRofRuWAZI
-	 uOwZQnfI6aviAuZDk/BiXbiZIGtZCyUzxA/whV6zx8HA9Vkxrx+FTzbOUjX0NQ6O5V
-	 SL84bHnewTR3PsZgsXRK1cx/anhbJI5arieugjpIDr8WcRG8+deay4w4ElsGlf9Z8z
-	 VeJz++Q+GKn6M+7+0BQFY6c3ltvccOORX+mhVQT+FPNyUaCadg0aWC3gudjOJuT5C0
-	 4c0FUILJjXVcQ==
+	b=i/dbPmkrZxwQXeAq4cgObdPSyb3/vhkOSpe6Xg2xUqBiZyi9RAFL54GW5vH/6OJtq
+	 89yOIM8Y4/Z5ExFbhtFNMxk52eD8IzmWzYp+rnpPz32RA3vw/i8v9ylzmrRq8HHCK2
+	 N6M4tYKjvt3R+l/OFI6OOPR2veYKEtYt4pa0RPS4RLg5Dvh1FS76BudLI7AJ1mjH+u
+	 rKEIK+a0oaXBh6XUS8f+iIxqcet+xQLgY989k2NCaAYOdrdGyShtoT+xMplGqsQriC
+	 k5CHNdWCcCFmU3C7GgED8a2i73a5SawqRocgQN+LkPfG8+0UtW7CvVfptUfMHSGz2z
+	 xOIoAjRpk3Eyg==
 From: Josh Poimboeuf <jpoimboe@kernel.org>
 To: x86@kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Nicolas Schier <nsc@kernel.org>,
 	linux-kbuild@vger.kernel.org,
 	Huacai Chen <chenhuacai@kernel.org>
-Subject: [PATCH v2 25/27] objtool: Add ANNOTATE_EXPORTED_NORETURN()
-Date: Tue,  8 Sep 2026 13:33:37 -0700
-Message-ID: <17cf5f7262da604ea54f2a68a9567c9beaa0d8f9.1788899473.git.jpoimboe@kernel.org>
+Subject: [PATCH v2 26/27] objtool: Annotate all module-exported noreturns and remove noreturns.h
+Date: Tue,  8 Sep 2026 13:33:38 -0700
+Message-ID: <0b7523a52a4d2d437f8201c2da8762c5e43c8df4.1788899473.git.jpoimboe@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <cover.1788899473.git.jpoimboe@kernel.org>
 References: <cover.1788899473.git.jpoimboe@kernel.org>
@@ -52,160 +52,177 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add ANNOTATE_EXPORTED_NORETURN() for the rare case where a module
-exports a noreturn function.
+The vmlinux.o objtool pass detects its exported noreturns and writes
+them to scripts/noreturns.builtins to avoid needing to keep them
+hard-coded in noreturns.h.
+
+However, due to the parallel nature of module linking, module-exported
+noreturns are detected too late to be included in the generated file, so
+they still need noreturns.h entries.
+
+Instead of hard-coding them in noreturns.h, annotate the functions next
+to their declaration sites with ANNOTATE_EXPORTED_NORETURN(), which is a
+more robust annotation, and allows us to finally be rid of noreturns.h.
 
 Signed-off-by: Josh Poimboeuf <jpoimboe@kernel.org>
 ---
- include/linux/annotate.h | 17 +++++++++++++++++
- tools/objtool/check.c    | 27 +++++++++++++++++++++++++++
- tools/objtool/klp-diff.c | 32 ++++++++++++++++++++++++++++++++
- 3 files changed, 76 insertions(+)
+ drivers/message/fusion/mptbase.h        |  2 ++
+ include/kunit/test.h                    |  1 +
+ include/kunit/try-catch.h               |  2 ++
+ include/linux/rtc/ds1685.h              |  2 ++
+ tools/objtool/Documentation/objtool.txt |  2 +-
+ tools/objtool/check.c                   | 23 +----------------------
+ tools/objtool/noreturns.h               |  9 ---------
+ 7 files changed, 9 insertions(+), 32 deletions(-)
+ delete mode 100644 tools/objtool/noreturns.h
 
-diff --git a/include/linux/annotate.h b/include/linux/annotate.h
-index a81ca04b4c501..70450eeec3186 100644
---- a/include/linux/annotate.h
-+++ b/include/linux/annotate.h
-@@ -25,6 +25,15 @@
- 	"912: "								\
- 	__stringify(__ASM_ANNOTATE(.discard.annotate_data, 912b, type))
+diff --git a/drivers/message/fusion/mptbase.h b/drivers/message/fusion/mptbase.h
+index b406fd676da09..387b707a66742 100644
+--- a/drivers/message/fusion/mptbase.h
++++ b/drivers/message/fusion/mptbase.h
+@@ -49,6 +49,7 @@
+ #define MPTBASE_H_INCLUDED
+ /*{-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
  
-+/*
-+ * Annotate a symbol by name rather than by relocation, so it can optionally be
-+ * used in a header file.
-+ */
-+#define ASM_ANNOTATE_NAME(section, sym)					\
-+	".pushsection " section ", \"MS\", @progbits, 1\n\t"		\
-+	".asciz \"" __stringify(sym) "\"\n\t"				\
-+	".popsection"
-+
- #else /* __ASSEMBLY__ */
++#include <linux/annotate.h>
+ #include <linux/kernel.h>
+ #include <linux/pci.h>
+ #include <linux/mutex.h>
+@@ -942,6 +943,7 @@ extern int	mpt_raid_phys_disk_get_num_paths(MPT_ADAPTER *ioc,
+ extern int	 mpt_set_taskmgmt_in_progress_flag(MPT_ADAPTER *ioc);
+ extern void	 mpt_clear_taskmgmt_in_progress_flag(MPT_ADAPTER *ioc);
+ extern void __noreturn mpt_halt_firmware(MPT_ADAPTER *ioc);
++ANNOTATE_EXPORTED_NORETURN(mpt_halt_firmware);
  
- .macro ANNOTATE type
-@@ -44,6 +53,7 @@
- #define ASM_ANNOTATE_LABEL(label, type) ""
- #define ASM_ANNOTATE(type)
- #define ASM_ANNOTATE_DATA(type)
-+#define ASM_ANNOTATE_NAME(section, sym) ""
- #else /* __ASSEMBLY__ */
- .macro ANNOTATE type
- .endm
-@@ -112,6 +122,13 @@
-  */
- #define ANNOTATE_IGNORE_NORETURN(sym)	asm(ASM_ANNOTATE_LABEL(sym, ANNOTYPE_IGNORE_NORETURN))
  
-+/*
-+ * Tell objtool running on a module that a function exported by another module
-+ * is __noreturn.  Objtool has no way of communicating that between modules due
-+ * to the parallel nature of module linking in kbuild.
-+ */
-+#define ANNOTATE_EXPORTED_NORETURN(sym)	asm(ASM_ANNOTATE_NAME(".discard.annotate_noreturn", sym))
-+
  /*
-  * Annotate a special section entry.  This emables livepatch module generation
-  * to find and extract individual special section entries as needed.
+diff --git a/include/kunit/test.h b/include/kunit/test.h
+index da5312e0dfa57..9aa4c1d3a9821 100644
+--- a/include/kunit/test.h
++++ b/include/kunit/test.h
+@@ -723,6 +723,7 @@ void __printf(2, 3) kunit_log_append(struct string_stream *log, const char *fmt,
+ #define KUNIT_SUCCEED(test) _KUNIT_SAVE_LOC(test)
+ 
+ void __noreturn __kunit_abort(struct kunit *test);
++ANNOTATE_EXPORTED_NORETURN(__kunit_abort);
+ 
+ void __printf(6, 7) __kunit_do_failed_assertion(struct kunit *test,
+ 						const struct kunit_loc *loc,
+diff --git a/include/kunit/try-catch.h b/include/kunit/try-catch.h
+index d4e1a5b98ed67..f3c0af4650080 100644
+--- a/include/kunit/try-catch.h
++++ b/include/kunit/try-catch.h
+@@ -10,6 +10,7 @@
+ #ifndef _KUNIT_TRY_CATCH_H
+ #define _KUNIT_TRY_CATCH_H
+ 
++#include <linux/annotate.h>
+ #include <linux/types.h>
+ 
+ typedef void (*kunit_try_catch_func_t)(void *);
+@@ -54,6 +55,7 @@ struct kunit_try_catch {
+ void kunit_try_catch_run(struct kunit_try_catch *try_catch, void *context);
+ 
+ void __noreturn kunit_try_catch_throw(struct kunit_try_catch *try_catch);
++ANNOTATE_EXPORTED_NORETURN(kunit_try_catch_throw);
+ 
+ static inline int kunit_try_catch_get_result(struct kunit_try_catch *try_catch)
+ {
+diff --git a/include/linux/rtc/ds1685.h b/include/linux/rtc/ds1685.h
+index 8ec0ebfaef04f..a0e1bf99407b7 100644
+--- a/include/linux/rtc/ds1685.h
++++ b/include/linux/rtc/ds1685.h
+@@ -21,6 +21,7 @@
+ #ifndef _LINUX_RTC_DS1685_H_
+ #define _LINUX_RTC_DS1685_H_
+ 
++#include <linux/annotate.h>
+ #include <linux/rtc.h>
+ #include <linux/platform_device.h>
+ #include <linux/workqueue.h>
+@@ -362,5 +363,6 @@ struct ds1685_rtc_platform_data {
+  */
+ extern void __noreturn
+ ds1685_rtc_poweroff(struct platform_device *pdev);
++ANNOTATE_EXPORTED_NORETURN(ds1685_rtc_poweroff);
+ 
+ #endif /* _LINUX_RTC_DS1685_H_ */
+diff --git a/tools/objtool/Documentation/objtool.txt b/tools/objtool/Documentation/objtool.txt
+index c7ebfb9a8ca6b..d5ac48bc203ec 100644
+--- a/tools/objtool/Documentation/objtool.txt
++++ b/tools/objtool/Documentation/objtool.txt
+@@ -330,7 +330,7 @@ the objtool maintainers.
+    traces and want objtool to ignore it, see "Adding exceptions" below.
+ 
+ 
+-3. file.o: warning: objtool: foo+0x48c: bar() missing __noreturn in .c/.h or NORETURN() in noreturns.h
++3. file.o: warning: objtool: foo+0x48c: bar() is missing __noreturn in .c/.h
+ 
+    The call from foo() to bar() doesn't return, but bar() is incorrectly
+    annotated.  A noreturn function must be marked __noreturn in both its
 diff --git a/tools/objtool/check.c b/tools/objtool/check.c
-index 52630519bdbf2..94beedcdb49bb 100644
+index 94beedcdb49bb..e6d33e57b7b33 100644
 --- a/tools/objtool/check.c
 +++ b/tools/objtool/check.c
-@@ -409,6 +409,31 @@ static int read_noreturns(struct objtool_file *file)
- 	return 0;
+@@ -176,24 +176,6 @@ static bool is_sibling_call(struct instruction *insn)
+ 	return (is_static_jump(insn) && insn_call_dest(insn));
  }
  
-+static void read_annotate_noreturn(struct objtool_file *file)
-+{
-+	struct section *sec;
-+	struct symbol *func;
-+	unsigned long off;
-+	const char *name;
-+
-+	sec = find_section_by_name(file->elf, ".discard.annotate_noreturn");
-+	if (!sec || !sec->data)
-+		return;
-+
-+	for (off = 0; off < sec_size(sec); off += strlen(name) + 1) {
-+		name = sec->data->d_buf + off;
-+		if (!*name)
-+			continue;
-+
-+		func = find_global_symbol_by_name(file->elf, name);
-+		if (!func)
-+			continue;
-+
-+		if (is_undef_sym(func))
-+			func->_noreturn = 1;
-+	}
-+}
-+
- static void init_cfi_state(struct cfi_state *cfi)
- {
- 	int i;
-@@ -4983,6 +5008,8 @@ int check(struct objtool_file *file)
- 			goto out;
- 	}
+-static bool is_listed_noreturn(struct symbol *func)
+-{
+-#define NORETURN(func) __stringify(func),
+-	static const char * const global_noreturns[] = {
+-#include "noreturns.h"
+-	};
+-#undef NORETURN
+-
+-	if (is_local_sym(func))
+-		return false;
+-
+-	for (int i = 0; i < ARRAY_SIZE(global_noreturns); i++)
+-		if (!strcmp(func->name, global_noreturns[i]))
+-			return true;
+-
+-	return false;
+-}
+-
+ /*
+  * Use this rather than reading sym->_noreturn directly: the noreturn status
+  * lives on the primary alias, and ANNOTATE_IGNORE_NORETURN() overrides it.
+@@ -205,9 +187,6 @@ static bool is_noreturn(struct symbol *func)
+ 	if (func->ignore_noreturn)
+ 		return false;
  
-+	read_annotate_noreturn(file);
-+
- 	ret = decode_file(file);
- 	if (ret)
- 		goto out;
-diff --git a/tools/objtool/klp-diff.c b/tools/objtool/klp-diff.c
-index 34da55e456097..8a30bf7d1eaf9 100644
---- a/tools/objtool/klp-diff.c
-+++ b/tools/objtool/klp-diff.c
-@@ -360,6 +360,7 @@ static bool is_special_section(struct section *sec)
- 
- 	static const char * const non_special_discards[] = {
- 		".discard.addressable",
-+		".discard.annotate_noreturn",
- 		".discard.sym_checksum",
- 	};
- 
-@@ -2216,6 +2217,34 @@ static int copy_import_ns(struct elfs *e)
- 	return 0;
+-	if (is_listed_noreturn(func))
+-		return true;
+-
+ 	return func->_noreturn;
  }
  
-+/*
-+ * ANNOTATE_EXPORTED_NORETURN() annotations reference their functions by name
-+ * rather than by relocation, so individual entries can't be extracted.  Copy
-+ * the (tiny) section as-is.
-+ */
-+static int copy_annotate_noreturn(struct elfs *e)
-+{
-+	struct section *patched_sec, *out_sec;
-+
-+	patched_sec = find_section_by_name(e->patched, ".discard.annotate_noreturn");
-+	if (!patched_sec || !patched_sec->data || !sec_size(patched_sec))
-+		return 0;
-+
-+	out_sec = elf_create_section(e->out, patched_sec->name, 0,
-+				     patched_sec->sh.sh_entsize,
-+				     patched_sec->sh.sh_type,
-+				     patched_sec->sh.sh_addralign,
-+				     patched_sec->sh.sh_flags);
-+	if (!out_sec)
-+		return -1;
-+
-+	if (!elf_add_data(e->out, out_sec, patched_sec->data->d_buf,
-+			  sec_size(patched_sec)))
-+		return -1;
-+
-+	return 0;
-+}
-+
- int cmd_klp_diff(int argc, const char **argv)
- {
- 	struct elfs e = {0};
-@@ -2287,6 +2316,9 @@ int cmd_klp_diff(int argc, const char **argv)
- 	if (copy_import_ns(&e))
- 		return -1;
- 
-+	if (copy_annotate_noreturn(&e))
-+		return -1;
-+
- 	if  (elf_write(e.out))
- 		return -1;
- 
+@@ -4890,7 +4869,7 @@ static int validate_reachable_instructions(struct objtool_file *file)
+ 		if (prev_insn && prev_insn->dead_end) {
+ 			call_dest = insn_call_dest(prev_insn);
+ 			if (call_dest) {
+-				WARN_INSN(insn, "%s() missing __noreturn in .c/.h or NORETURN() in noreturns.h",
++				WARN_INSN(insn, "%s() is missing __noreturn in .c/.h",
+ 					  call_dest->name);
+ 				warnings++;
+ 				continue;
+diff --git a/tools/objtool/noreturns.h b/tools/objtool/noreturns.h
+deleted file mode 100644
+index 4e8007a8c2584..0000000000000
+--- a/tools/objtool/noreturns.h
++++ /dev/null
+@@ -1,9 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-
+-/*
+- * This is a list of noreturn functions which are exported *by modules*.
+- * No other noreturns need to be listed here.
+- */
+-NORETURN(__kunit_abort)
+-NORETURN(kunit_try_catch_throw)
+-NORETURN(mpt_halt_firmware)
 -- 
 2.55.0
 
