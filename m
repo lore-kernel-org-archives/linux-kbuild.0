@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CDCD5A986F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97EF13B442B;
 	Tue,  8 Sep 2026 20:34:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788899679; cv=none; b=t3y/HtJPq/U+TrrT2NH96yZ+PnlwXUUftCZ5C+oY/pP7lAY22/T6BoRrLogznUVfdC/7XTJwOZEGtvcuLERA0unPQO858rWyNM6oaEFP44DrLATw3gm5BitMUBqXLGkOnS/EzKQ0Fl4m+jN4gr7xy8I3dVyPo8lJtdbj2Az8Cck=
+	t=1788899680; cv=none; b=FjEpUrQDZqCYzrpNVHJTqd5CbxJ/GlNj/MoofHEYlhV2OPk8dzkE4cxHCCNMX1REHe7WuHOD/R3Suv7/49s1UPEHDzF9Ysc4nrBE6a4gnrFnHjl5lPRvpP6Mtm71x5NExO8vmo23UemZH0SGuHfUoFVDoAtO8JC/uHrt3lTjHqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788899679; c=relaxed/simple;
-	bh=/Fh6ECh5PUipY2MuOCfqQU9wpCqGcFXXSLNL3uT0NYc=;
+	s=arc-20240116; t=1788899680; c=relaxed/simple;
+	bh=/7jIcjgOxFNGI7ubXzY3AcMW0+R1rsx2kBOe6fYE6Aw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fXDG+5jUcjRKKmobMcgGdZLSTHW2FfY3siRlHuTgcNtKRKJFk3Ou0rLxuUEG/O4pD9dotqknGr1Ph9KnQdWqgRfPuanmVoXeHWooU6vjvfG3xV8oNbHa2LJfWTj8L9KEKyLOd9zOVMG5xAthFGFCYWPX3J2l7WCRHWZbMb/59rM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wh9urBUq; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=NiZernqjUw+5+QEFRe3J7DLxbJM5sldU0BO0s/uZtAKYs3eYg1BBbhW+wy4GVOHsVXw998ziByRwLuYK/qLbUAIe/EaFZUUTHQPAkls8J46Id80VdMczZ6iZLRfcg5gc1bePFLc24FY1fWQI2JtsxnUuIyz6AMpurhTYgHv8ajw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TJvoNrUT; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wh9urBUq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 853EA1F00AC4;
-	Tue,  8 Sep 2026 20:34:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TJvoNrUT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1ECB31F00A3E;
+	Tue,  8 Sep 2026 20:34:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1788899678;
-	bh=yxTbQgBZYQugQzsbsUlaD2OTcmFXado/QiZ/FDE5CKc=;
+	bh=LpssU78NKD8pmI7WdfWJNnR20LDRSOoXQsuYdchzvVU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Wh9urBUqkmK9U//pFmvBi+mSZvhUTtqntZAiKKhqdoCDap/R4D0BYfwzkgdLdh3Um
-	 dMbXL1hVreCMmsv6iHvcDATdQZd8VDIqjgtoUI9gAmszydcakRDKz7n/pQ0e2S+Xw0
-	 +t2f3j1vYLUQTacY/65zuNZZazzBqaG7BPIWCb5MhvrqRcB4AVfMyDIou+KrXVI2+M
-	 vkzT65KT0zYBwBtsdHyDPyitgl6nB6vY7DR9YDN+y/DRD+qlFTePVKrMky5F3KWA98
-	 7RtHxibyizGaBM6ESsttwQIFDLMyGRwkj4g9nNhjp24l4/4aJqC7oXO3SjsShRVnGJ
-	 zJW7xHcjzJn9A==
+	b=TJvoNrUTksWoiuke0M219zJ8JdNvDqX19lG8mUOObA6EOjXtgZZYvA3uTJkL8TuSu
+	 j3500BEWIfeRupA42m6RkRlDYxABZbBG63/haVJsX+DDZuwcIU421qY5GxT4uMRjuD
+	 coVfRsX9MYTVS/Y4WWpIHzL65ZATgfajqGFvgX0JRrQ8pMwsKp0yw/Rut+SbyBz5yh
+	 szIjA5Q2ybZXKyP36P0frCQwMIkaJJb5GcXuWqty+Qo7GsxbJwyu4Zh43RDplNDmnW
+	 HlilPqg25eNYatwt9tcERQAtogYz8fRDlrbN5P2qRbMqVcdCP/KoGVkvA85zUAAJjq
+	 uDs26sycQO36A==
 From: Josh Poimboeuf <jpoimboe@kernel.org>
 To: x86@kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Nicolas Schier <nsc@kernel.org>,
 	linux-kbuild@vger.kernel.org,
 	Huacai Chen <chenhuacai@kernel.org>
-Subject: [PATCH v2 18/27] x86/xen: Make xen_cpu_bringup_again() a real function
-Date: Tue,  8 Sep 2026 13:33:30 -0700
-Message-ID: <56458958b221feef309c1b5edf78cddb07e734ff.1788899473.git.jpoimboe@kernel.org>
+Subject: [PATCH v2 19/27] x86/xen: Make xen_start_kernel() noreturn
+Date: Tue,  8 Sep 2026 13:33:31 -0700
+Message-ID: <d2781cfce26aeb7136acf3af75d51bf299cf294a.1788899473.git.jpoimboe@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <cover.1788899473.git.jpoimboe@kernel.org>
 References: <cover.1788899473.git.jpoimboe@kernel.org>
@@ -52,48 +52,70 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-xen_cpu_bringup_again() is SYM_CODE because it switches stacks, but it's
-otherwise a callable function from C.
+startup_xen() calls xen_start_kernel() with the assumption that it never
+returns, otherwise it would fall off the end of SYM_CODE_END(),
+triggering undefined behavior.
 
-Convert it to STT_FUNC so objtool can detect that it's noreturn and its
-entry can be removed from the hard-coded global noreturns list.
+But startup_xen() actually can return if 'si' is NULL.  That doesn't
+seem to be possible, so drop the check and mark xen_start_kernel()
+__noreturn.
+
+A NULL 'si' would now fault on the first xen_start_info dereference,
+which is at least a more deterministic way to crash.
+
+Now that the function can no longer return, objtool can derive its
+noreturn attribute directly and the noreturns.h entry can be removed.
 
 Signed-off-by: Josh Poimboeuf <jpoimboe@kernel.org>
 ---
- arch/x86/xen/xen-head.S   | 5 +++--
- tools/objtool/noreturns.h | 1 -
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ arch/x86/xen/enlighten_pv.c | 5 +----
+ arch/x86/xen/xen-ops.h      | 2 +-
+ tools/objtool/noreturns.h   | 1 -
+ 3 files changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/xen/xen-head.S b/arch/x86/xen/xen-head.S
-index 5dad6c51cdc34..68d769772f309 100644
---- a/arch/x86/xen/xen-head.S
-+++ b/arch/x86/xen/xen-head.S
-@@ -55,12 +55,13 @@ SYM_CODE_START(asm_cpu_bringup_and_idle)
- 	call cpu_bringup_and_idle
- SYM_CODE_END(asm_cpu_bringup_and_idle)
+diff --git a/arch/x86/xen/enlighten_pv.c b/arch/x86/xen/enlighten_pv.c
+index 2c64b388f6164..8ec78df9d1d5b 100644
+--- a/arch/x86/xen/enlighten_pv.c
++++ b/arch/x86/xen/enlighten_pv.c
+@@ -1325,15 +1325,12 @@ static void __init xen_domu_set_legacy_features(void)
+ extern void early_xen_iret_patch(void);
  
--SYM_CODE_START(xen_cpu_bringup_again)
-+SYM_FUNC_START(xen_cpu_bringup_again)
- 	UNWIND_HINT_FUNC
- 	mov	%rdi, %rsp
- 	UNWIND_HINT_REGS
- 	call	cpu_bringup_and_idle
--SYM_CODE_END(xen_cpu_bringup_again)
-+SYM_FUNC_END(xen_cpu_bringup_again)
-+STACK_FRAME_NON_STANDARD_FP(xen_cpu_bringup_again)
- .popsection
- #endif
- #endif
+ /* First C function to be called on Xen boot */
+-asmlinkage __visible void __init xen_start_kernel(struct start_info *si)
++asmlinkage __visible void __init __noreturn xen_start_kernel(struct start_info *si)
+ {
+ 	struct physdev_set_iopl set_iopl;
+ 	unsigned long initrd_start = 0;
+ 	int rc;
+ 
+-	if (!si)
+-		return;
+-
+ 	clear_bss();
+ 
+ 	xen_start_info = si;
+diff --git a/arch/x86/xen/xen-ops.h b/arch/x86/xen/xen-ops.h
+index 47eebbb3684ab..d830807cfffca 100644
+--- a/arch/x86/xen/xen-ops.h
++++ b/arch/x86/xen/xen-ops.h
+@@ -73,7 +73,7 @@ void xen_force_evtchn_callback(void);
+ 
+ void xen_pv_pre_suspend(void);
+ void xen_pv_post_suspend(int suspend_cancelled);
+-void xen_start_kernel(struct start_info *si);
++void __noreturn xen_start_kernel(struct start_info *si);
+ 
+ void set_pte_mfn(unsigned long vaddr, unsigned long pfn, pgprot_t flags);
+ void xen_init_mmu_ops(void);
 diff --git a/tools/objtool/noreturns.h b/tools/objtool/noreturns.h
-index ff93e94ee09a0..01c94f20d1818 100644
+index 01c94f20d1818..c4b93fc6e6299 100644
 --- a/tools/objtool/noreturns.h
 +++ b/tools/objtool/noreturns.h
-@@ -21,5 +21,4 @@ NORETURN(panic)
+@@ -21,4 +21,3 @@ NORETURN(panic)
  NORETURN(vpanic)
  NORETURN(rust_helper_BUG)
  NORETURN(sev_es_terminate)
--NORETURN(xen_cpu_bringup_again)
- NORETURN(xen_start_kernel)
+-NORETURN(xen_start_kernel)
 -- 
 2.55.0
 
