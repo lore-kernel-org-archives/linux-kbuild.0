@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 308CD5AA696;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C82CD5A986A;
 	Tue,  8 Sep 2026 20:34:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788899681; cv=none; b=ZTe15HhqMDzOayOoXHFs+YeBmMFj8HPFv17v6s9j4JuFPJ/wjyrut4jUI1rN1hZpl12/+TJ+TgXoYCBXJ7ZUvPT3e/aqpl+r+z4aT+r9o21qJsyZ27KYOTf+sTz41/btoUz3fE+aMrmuVlhD/f8p8U/sJrAMBEXM0/Z7bBfUL2o=
+	t=1788899681; cv=none; b=t0fbuO3u709t/knBaJL4MairYlQVy7m1LTSn2PgMgkIH98B3kpTJA5X+UwmPzdO9tN+XUOQvvmrUZvZmmshWyCvaPXFALQiccfNKpSzrtAcLkDwCN6PLjYZKkmaJhpfKxVRptBJAo9GdLukXSpAfsR1GGZ+rQ1HSTHBuePyr5u8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1788899681; c=relaxed/simple;
-	bh=6EzeVIiFFyaHeY7UvH2CuYeg5GC9vafeZlgVyc6Aifo=;
+	bh=VFz8lBru3Qms0pxRnA63kuF2S4xr2Wi8VDOhngblftM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qWPKojnQjmrArzGs6MxZplD4z+lh6QkU1xA873LIbhZeTsvPJbBpIuJbM+i1IZydmS6eDwo4W1EOafiohl5f8o1DWLr3B4rmMSM/DHWwk8a23RGwQMHCkvYMZPO18lqYYqxO7l1qda+XS+w0RIqsXX/7Npi1mgT035QafLCDNHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EkM5Xxah; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=AWQCT2ARJv8JK2vlhZdsescmjV1Y34IsJlTw82WUEXNCwTrBa+DBgytOLNpwRSe9/jKZYsiywS507JBYzDc9u8m+ZT+mGLcp14XksU3n+c6d7gNGBsIJ/kSzlNrbwa20mQobwZG6bWvQm/xcyrICq6yXqFg6ePt0z+mnbWParB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dfdEB1Li; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EkM5Xxah"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9B921F00A3F;
-	Tue,  8 Sep 2026 20:34:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dfdEB1Li"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EA341F00A3A;
+	Tue,  8 Sep 2026 20:34:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1788899679;
-	bh=LLPJxak0RGU/miOhGCQc5ox8yGM1mMBos5nm6pY2Xj4=;
+	bh=SasHm0H1uD9YNErhrHb6nEh7430J9yuNnou+/rYTmZU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=EkM5Xxahvm7wBurC2uNcJ5zlIxFYA6v3sFQppl54T61uV6KD6j5K9KM9i6z0iMb1E
-	 Vvmp577EH7YsPc5/Y+7GnJP76hJH+bA7IkxpX4/D9/v3IahTSgQdxGvN1CaM3JGn93
-	 RDi4crcxf+1ekLuuQSTNTR2LvQFdibk27PXJeYU2yGuYcZr6i1ROyhvyLniJhgKB2x
-	 Uyr144edICVNyj88+xIIcu0NZ2ZZBaPPxU0KKei7G5aP/Exr4OOdnqvkvdn7/zFDi2
-	 vpIgCNwiCnzYfX1LtVMZ7I/tKXHzjCELu28HpvCwOmGPonKqkqZGnyVNuuK5fOxlBq
-	 35IC9HlhIJyEg==
+	b=dfdEB1LiHZq3kvB4p5BIb9bbkQjUdVJ/15D7GdlhvRDcsiBvaTpiC2hjNf6d4LR3A
+	 kjdAufuMJLwWByQTW8g7+9Ap3p/ei5vfRK9gZopGwW0Rk1DOZVGuxv880ptjC+fc7z
+	 0wvzsDrpms/H4R1mDrwGghppzziEi/qwB8XycArWt4ZZY1CHygxwOYFhwcMubfIPak
+	 fd8+c61spup+2O9g2vqBpvIhjP2ugMRLU4gQcUCSVyJuvjk/O2wyn0RjQhFPzzSQyp
+	 LnT8zLRkSMGxiCdtxGjOMPlM9RJLBoR0C3sW8QpReja98mnzpPJyVBX7msCFfFpn3Y
+	 U9MyCKNtYDtmg==
 From: Josh Poimboeuf <jpoimboe@kernel.org>
 To: x86@kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Nicolas Schier <nsc@kernel.org>,
 	linux-kbuild@vger.kernel.org,
 	Huacai Chen <chenhuacai@kernel.org>
-Subject: [PATCH v2 20/27] x86/boot: Rework how pi startup symbols get exposed to vmlinux
-Date: Tue,  8 Sep 2026 13:33:32 -0700
-Message-ID: <f7f24b28e1bb170916128172af1ff6f1ee467df8.1788899473.git.jpoimboe@kernel.org>
+Subject: [PATCH v2 21/27] objtool: Fix noreturn detection for non-sibling jumps to SYM_CODE
+Date: Tue,  8 Sep 2026 13:33:33 -0700
+Message-ID: <8a2e4b91bc77da223068b1da6366360c3973aed5.1788899473.git.jpoimboe@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <cover.1788899473.git.jpoimboe@kernel.org>
 References: <cover.1788899473.git.jpoimboe@kernel.org>
@@ -52,119 +52,55 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-objcopy prefixes every symbol in arch/x86/boot/startup/ with __pi_,
-which confines the startup code so that it can only reach other startup
-code or symbols deliberately exposed to it with SYM_PIC_ALIAS().
+Objtool doesn't consider a jump to be a sibling call if the destination
+isn't a function, so srso_alias_untrain_ret()'s jump to
+srso_alias_return_thunk() is ignored by objtool and the former is
+falsely classified as noreturn.
 
-Nine of its functions are called by the core kernel at runtime.  They
-are made accessible to the kernel by exports.h, which is included by
-vmlinux.lds.S to create aliases for each one.
+Change the noreturn detection to consider such cases as effectively
+sibling calls, except for one known exception: jumping to .altinstr_aux.
 
-That's problematic for objtool running on vmlinux.o, which is built
-before the linker script runs, so the call sites to the startup symbols
-are undefined, so objtool can't see their actual destinations functions.
+Currently the misclassification is harmless: dead ends aren't marked
+when calling a noreturn from an alternative replacement
+(CALL_UNTRAIN_RET), they're ignored by rethunk validation, and ORC
+generation relies on unwind hints in the SRSO code regardless.
 
-Instead of making aliases at link time, rename the needed symbols using
-a second objcopy pass so they're visible in vmlinux.o.  That also means
-objtool can now detect that sev_es_terminate() is noreturn, so it can be
-removed from noreturns.h.
+Fix it in the name of robustness and in preparation for a subsequent
+patch which generates a list of exported noreturns.
 
 Signed-off-by: Josh Poimboeuf <jpoimboe@kernel.org>
 ---
- arch/x86/boot/startup/Makefile      | 14 ++++++++++----
- arch/x86/boot/startup/exports.h     | 14 --------------
- arch/x86/boot/startup/unprefix.syms | 13 +++++++++++++
- arch/x86/kernel/vmlinux.lds.S       |  2 --
- tools/objtool/noreturns.h           |  1 -
- 5 files changed, 23 insertions(+), 21 deletions(-)
- delete mode 100644 arch/x86/boot/startup/exports.h
- create mode 100644 arch/x86/boot/startup/unprefix.syms
+ tools/objtool/check.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/boot/startup/Makefile b/arch/x86/boot/startup/Makefile
-index ab6e9970d4f4e..5255abe2bd77f 100644
---- a/arch/x86/boot/startup/Makefile
-+++ b/arch/x86/boot/startup/Makefile
-@@ -41,12 +41,18 @@ $(pi-objs): objtool-args	= $(if $(CONFIG_OBJTOOL_DEFERRED),--dry-run,$(objtool-a
- #
- # Confine the startup code by prefixing all symbols with __pi_ (for position
- # independent). This ensures that startup code can only call other startup
--# code, or code that has explicitly been made accessible to it via a symbol
--# alias.
-+# code.
- #
-+# The few pi symbols which are allowed to be called by the core kernel are then
-+# un-prefixed back to their original name using a second objcopy.
-+#
-+quiet_cmd_pi_objcopy = $(quiet_cmd_objcopy)
-+      cmd_pi_objcopy = $(cmd_objcopy) && \
-+		       $(OBJCOPY) --redefine-syms=$(src)/unprefix.syms $@
-+
- $(obj)/%.pi.o: OBJCOPYFLAGS := --prefix-symbols=__pi_
--$(obj)/%.pi.o: $(obj)/%.o FORCE
--	$(call if_changed,objcopy)
-+$(obj)/%.pi.o: $(obj)/%.o $(src)/unprefix.syms FORCE
-+	$(call if_changed,pi_objcopy)
+diff --git a/tools/objtool/check.c b/tools/objtool/check.c
+index 35e24151f5785..41df5f608535f 100644
+--- a/tools/objtool/check.c
++++ b/tools/objtool/check.c
+@@ -266,8 +266,22 @@ static bool might_return(struct objtool_file *file, struct symbol *func)
+ 		if (insn->type == INSN_RETURN)
+ 			return true;
  
- targets	+= $(obj-y)
- obj-y	:= $(patsubst %.o,%.pi.o,$(obj-y))
-diff --git a/arch/x86/boot/startup/exports.h b/arch/x86/boot/startup/exports.h
-deleted file mode 100644
-index 01d2363dc445f..0000000000000
---- a/arch/x86/boot/startup/exports.h
-+++ /dev/null
-@@ -1,14 +0,0 @@
--
--/*
-- * The symbols below are functions that are implemented by the startup code,
-- * but called at runtime by the SEV code residing in the core kernel.
-- */
--PROVIDE(early_set_pages_state		= __pi_early_set_pages_state);
--PROVIDE(early_snp_set_memory_private	= __pi_early_snp_set_memory_private);
--PROVIDE(early_snp_set_memory_shared	= __pi_early_snp_set_memory_shared);
--PROVIDE(get_hv_features			= __pi_get_hv_features);
--PROVIDE(sev_es_terminate		= __pi_sev_es_terminate);
--PROVIDE(snp_cpuid			= __pi_snp_cpuid);
--PROVIDE(snp_cpuid_get_table		= __pi_snp_cpuid_get_table);
--PROVIDE(svsm_issue_call			= __pi_svsm_issue_call);
--PROVIDE(svsm_process_result_codes	= __pi_svsm_process_result_codes);
-diff --git a/arch/x86/boot/startup/unprefix.syms b/arch/x86/boot/startup/unprefix.syms
-new file mode 100644
-index 0000000000000..fd80adf558a51
---- /dev/null
-+++ b/arch/x86/boot/startup/unprefix.syms
-@@ -0,0 +1,13 @@
-+# SPDX-License-Identifier: GPL-2.0
-+# The symbols below are functions that are implemented by the startup code,
-+# but called at runtime by the SEV code residing in the core kernel.  Undo the
-+# __pi_ prefixing so the core kernel can call them.
-+__pi_early_set_pages_state           early_set_pages_state
-+__pi_early_snp_set_memory_private    early_snp_set_memory_private
-+__pi_early_snp_set_memory_shared     early_snp_set_memory_shared
-+__pi_get_hv_features                 get_hv_features
-+__pi_sev_es_terminate                sev_es_terminate
-+__pi_snp_cpuid                       snp_cpuid
-+__pi_snp_cpuid_get_table             snp_cpuid_get_table
-+__pi_svsm_issue_call                 svsm_issue_call
-+__pi_svsm_process_result_codes       svsm_process_result_codes
-diff --git a/arch/x86/kernel/vmlinux.lds.S b/arch/x86/kernel/vmlinux.lds.S
-index 2438b89a4620a..4394ee6bd288f 100644
---- a/arch/x86/kernel/vmlinux.lds.S
-+++ b/arch/x86/kernel/vmlinux.lds.S
-@@ -527,5 +527,3 @@ xen_elfnote_entry_value =
- xen_elfnote_phys32_entry_value =
- 	ABSOLUTE(xen_elfnote_phys32_entry) + ABSOLUTE(pvh_start_xen - LOAD_OFFSET);
- #endif
--
--#include "../boot/startup/exports.h"
-diff --git a/tools/objtool/noreturns.h b/tools/objtool/noreturns.h
-index c4b93fc6e6299..2dce56030b980 100644
---- a/tools/objtool/noreturns.h
-+++ b/tools/objtool/noreturns.h
-@@ -20,4 +20,3 @@ NORETURN(mpt_halt_firmware)
- NORETURN(panic)
- NORETURN(vpanic)
- NORETURN(rust_helper_BUG)
--NORETURN(sev_es_terminate)
+-		if (!is_sibling_call(insn))
++		if (!is_sibling_call(insn)) {
++			/*
++			 * Assume a jump into a non-function eventually returns
++			 * to the original caller one way or another, e.g., the
++			 * jump in srso_alias_untrain_ret().
++			 *
++			 * .altinstr_aux is an exception, cpu_feature_enabled()
++			 * jumps there and then right back.
++			 */
++			if (is_static_jump(insn) && insn->jump_dest &&
++			    !insn_func(insn->jump_dest) &&
++			    strcmp(insn->jump_dest->sec->name, ".altinstr_aux"))
++				return true;
++
+ 			continue;
++		}
+ 
+ 		dest = insn_call_dest(insn);
+ 		if (!dest || !is_noreturn(dest))
 -- 
 2.55.0
 
