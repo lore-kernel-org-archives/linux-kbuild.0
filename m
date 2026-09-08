@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFCFC48E0FD;
-	Tue,  8 Sep 2026 20:34:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54645583AC6;
+	Tue,  8 Sep 2026 20:34:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788899677; cv=none; b=JLYOCxCyPyH45A62HB4BdI/+P7GUni/DLt2+GOsDgcBrZNJbKPd97GztTVFfZyIKG2+rohq4QyTABcZ3njd4p80J6BGVtayYvEli1gZZc6WqvWiHKe2cGRC5CmZ+z3aHZNJDLXmkn6LD3/21NzS1eIGlqVeNE7ge9hMiA4fWrXc=
+	t=1788899677; cv=none; b=cMnMV5FMQPyrS12dQS0UGvMGhcnmPLdq+mkjQHMkSQHjmXNSpSILB1sH4bw3IWDkDX9gJphZelLQVMS1T6nXmbWPg3zHXWhiM4r1t9WEHFfnOdw4VowieX8DMNx/M54IhR1x3OC6WhTSKzZZYZJJlwPyRMAUF4ZRIMvJ0jZwAQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1788899677; c=relaxed/simple;
-	bh=HZZXwEkleiVSAM0IKgm7GJd24kfINQw22waIRIyHS7w=;
+	bh=MoxkdQ1PZtbscQc+lhfZEsLtnTOuV5Kr1isBaLFfg/8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fvIegBp820B51JLokOFBVknDyQn6qh/wh+a01ghryLLmItgr2o4cuv1X/Q6fskQdBEXvamDTLe+ao1RAi7R/LjGowj9fsUBtnUsv3uI58t0cCKACaKgmVifEHXntBPwe/6JbJqSYs8u2dFXaNCGZQIH9aBB9CX4MsaC4QkwZnt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jm6jwj0u; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=Ovdp8thz60H6aCLKM4IIemXkRv97IsYgaQ8ZnpIpMQWXNMx/z0dQNBb6LZXKq0NOaSU5I0xVV2C1XFvu4pJ0M84CZ+5uwXj4nZh6qbBfjMMeMG1T2Jd33ZiO0MDsawzVGyzzRRUn1EdnqGgvKM/4DUU4nVblusFV9KXwczi+Oyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ixOWwXE/; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jm6jwj0u"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D3221F00ACA;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ixOWwXE/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC7B51F00A3E;
 	Tue,  8 Sep 2026 20:34:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788899675;
-	bh=arj2thDRFBkD3kr+abuMnCd3fOit+GURx5K2xxfGwUc=;
+	s=k20260515; t=1788899676;
+	bh=oMAVVsJ+ySiw/1VP59+j9m215Ku23i+uiwwAe+dcMn8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=jm6jwj0upEb4ddGoBUVBLJBgjOGpkxiRt9zxiLTMZqEP2kqT7/FgDFXLqAGuSTXk8
-	 YRpES9OCnSn+u0M2x7y3zmkB9OzYjMe7lEUbjI32qTthT7+YCMkoS3EUrztc1EvlNb
-	 VDmfpgqu5QmTBrXrALSn14OgevYbEIWh4YHp3vm7b5ptGEZvdJvFEOP7SWznxLy/kI
-	 /Wy+jRGL87mxk/HEUyYxn30qCb9Qksjm90pXl+IuGeHUSdKrmDT8Cw1Pnq/nZTnVI5
-	 /5mJxl6IzV3lK7PKVfyKSflNlC7TlVTtzB3NnyNlmDn6rypZfc5bqrM/d3NlCjKo+2
-	 Ht68fXoGJ82hA==
+	b=ixOWwXE/raQf8YJQF8qzjRzz4yZ+nnWs+/eNKosvDLYBD0s/gM/+ymaHI0LcIi3pO
+	 cp3Xu+TiIGoi0JpUWQ2KogZ6CAZqhf9Es1PJyNw3G0JgMiI7anoxqx6CHUCzyaHoAP
+	 ABxJ0H4NU3vDGiPvMjfEWLqSLPnK7SWmxUvdEs7BAD3TnOL1DVJ045FH0mjXkClkBU
+	 3UFcIsqxQJorNSstWhSbFMv9s9lawWti4K54RlOE4JECtnxzccl6z42qekykJ1NoTN
+	 TENVB7H2DHk3ncSx3+S2NuKP2H1tdCicGq6KVNb1KyvvTAf8aPIklWXpK0Iz+6VWD/
+	 qRbW6qKbEPSFQ==
 From: Josh Poimboeuf <jpoimboe@kernel.org>
 To: x86@kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -37,10 +37,11 @@ Cc: linux-kernel@vger.kernel.org,
 	Nathan Chancellor <nathan@kernel.org>,
 	Nicolas Schier <nsc@kernel.org>,
 	linux-kbuild@vger.kernel.org,
-	Huacai Chen <chenhuacai@kernel.org>
-Subject: [PATCH v2 14/27] panic: Mark abort() __noreturn
-Date: Tue,  8 Sep 2026 13:33:26 -0700
-Message-ID: <29af916d71bb27e4f0defa3b8b211db0174269c8.1788899473.git.jpoimboe@kernel.org>
+	Huacai Chen <chenhuacai@kernel.org>,
+	kernel test robot <lkp@intel.com>
+Subject: [PATCH v2 15/27] x86/xen: Ignore noreturn status of weak mem_map_via_hcall()
+Date: Tue,  8 Sep 2026 13:33:27 -0700
+Message-ID: <238f5da77d70fb2ae6428c201be9b547479f798d.1788899473.git.jpoimboe@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <cover.1788899473.git.jpoimboe@kernel.org>
 References: <cover.1788899473.git.jpoimboe@kernel.org>
@@ -52,72 +53,29 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-abort() is a C compiler builtin interface, so compilers already know it
-doesn't return, but mark it as such explicitly for documentation
-purposes.
+Unlike the non-weak version, the weak version of mem_map_via_hcall()
+doesn't return.  Tell objtool to ignore that, as the protoype (and the
+non-weak version) aren't noreturn so its callers can't assume it.
 
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202608280214.c28GlIx6-lkp@intel.com/
 Signed-off-by: Josh Poimboeuf <jpoimboe@kernel.org>
 ---
- arch/arc/kernel/traps.c | 4 +++-
- arch/arm/kernel/traps.c | 2 +-
- include/linux/panic.h   | 2 +-
- kernel/exit.c           | 2 +-
- 4 files changed, 6 insertions(+), 4 deletions(-)
+ arch/x86/platform/pvh/enlighten.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/arc/kernel/traps.c b/arch/arc/kernel/traps.c
-index 8d2ea2cbd98b0..803c131c6aa78 100644
---- a/arch/arc/kernel/traps.c
-+++ b/arch/arc/kernel/traps.c
-@@ -153,7 +153,9 @@ void do_insterror_or_kprobe(unsigned long address, struct pt_regs *regs)
- /*
-  * abort() call generated by older gcc for __builtin_trap()
-  */
--void abort(void)
-+void __noreturn abort(void)
- {
- 	__asm__ __volatile__("trap_s  5\n");
-+
-+	unreachable();
- }
-diff --git a/arch/arm/kernel/traps.c b/arch/arm/kernel/traps.c
-index afbd2ebe5c39d..a3bd26d41612f 100644
---- a/arch/arm/kernel/traps.c
-+++ b/arch/arm/kernel/traps.c
-@@ -777,7 +777,7 @@ asmlinkage void __div0(void)
- }
- EXPORT_SYMBOL(__div0);
- 
--void abort(void)
-+void __noreturn abort(void)
- {
+diff --git a/arch/x86/platform/pvh/enlighten.c b/arch/x86/platform/pvh/enlighten.c
+index f2053cbe9b0ce..9f227f06cbaf5 100644
+--- a/arch/x86/platform/pvh/enlighten.c
++++ b/arch/x86/platform/pvh/enlighten.c
+@@ -37,6 +37,7 @@ void __init __weak mem_map_via_hcall(struct boot_params *ptr __maybe_unused)
+ 	xen_raw_printk("Error: Could not find memory map\n");
  	BUG();
+ }
++ANNOTATE_IGNORE_NORETURN(mem_map_via_hcall);
  
-diff --git a/include/linux/panic.h b/include/linux/panic.h
-index f1dd417e54b29..da8778360dadf 100644
---- a/include/linux/panic.h
-+++ b/include/linux/panic.h
-@@ -33,7 +33,7 @@ extern int sysctl_panic_on_stackoverflow;
- extern bool crash_kexec_post_notifiers;
- 
- extern void __stack_chk_fail(void);
--void abort(void);
-+void abort(void) __noreturn;
- 
- /*
-  * panic_cpu is used for synchronizing panic() and crash_kexec() execution. It
-diff --git a/kernel/exit.c b/kernel/exit.c
-index 97686af895013..e541e61945f9a 100644
---- a/kernel/exit.c
-+++ b/kernel/exit.c
-@@ -2027,7 +2027,7 @@ COMPAT_SYSCALL_DEFINE5(waitid,
-  *
-  * See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=88345#c11
-  */
--__weak __function_aligned void abort(void)
-+__weak __function_aligned void __noreturn abort(void)
+ static void __init init_pvh_bootparams(bool xen_guest)
  {
- 	BUG();
- 
 -- 
 2.55.0
 
