@@ -1,176 +1,156 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F87649159B
-	for <linux-kbuild@vger.kernel.org>; Tue,  8 Sep 2026 19:24:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E8753AD51C;
+	Tue,  8 Sep 2026 20:34:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788895480; cv=none; b=fHUXaADafIp/Fu1azMQSTz3Vch1Tn5xZc9jqxI944iB/Ztl0mGuMCtkUatWi2V96tMwDJ+qVhJIE5/E3U7v6FEDAIx40SScKzEp5jfCtQZP35MQsChqEMiSmMqL/Hw8IkuVTNIeOoyMcmZARPmVk4AB7RcJyHeYZesCXC1Yj7G8=
+	t=1788899669; cv=none; b=Ki4BoIp/MOvPw5owyFZJeqzQRYRAXJgty5pvcEdVxoHJManXUtgTy6ucNmOK9J2kzLFKnSJ9jnp3ZliCLsvmSfa7rFhnf8+v99iupqrclsBQtGR7U5V+9e7M6ZSHBJacHYScPonu8EwiqAaodlS71gqhUxDOkUbR+xjYlZepVv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788895480; c=relaxed/simple;
-	bh=IJo4RpE0CGM0swZSY+NEpI+fOTRQ0NURBOLjSAwlAS4=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=nAX8FC015dNgxbz9jErZyYx5Hn0ggWJrVhudonww0XaD5ed6f8P0I1Q+62crL+W1Cfnf2v8r5ox6m0WAvvf8VpgGZpwHTaU74ZfgI/vvuDjZobJYF7tWYk4wTo/jPHvIRP6aUjpZbns0XWLacRe0dMpRsglUYQQAEssd9IK69J8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W261d9vk; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1788899669; c=relaxed/simple;
+	bh=i2WUqestzEV+CQZTM2vaVu6zEsLumMc9aLqWUXeG64o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VL/FWoEjmQEMgKxrrbDjqoI3fWT6Eygs6dPBNSKOGvuv94oUD5kGiWmIXu/qARLfxdqNdZRuFIl33dtmvB/2JNIkE6aQhHzx8EUTUI1nulSVD/VoYH+SDG9hsWKCIAbYi9zqiu0WkDw5LLTIR9JAdrAjkejNRg93yiMXn7KHiFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PkqiX6n2; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W261d9vk"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-49954b88fffso37493605e9.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 08 Sep 2026 12:24:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788895476; x=1789500276; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :references:cc:to:subject:from:user-agent:mime-version:date
-         :message-id:sender:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=CjUx5jDKzwh60+DV4HlvInbhvI+U7rjo3NlQfXuuqmY=;
-        b=W261d9vkwbnpSsmVt26deZOGNMKKjjYIiFO1SPKsqSEtvaiioQKkOzRSMVbUo1lFMP
-         ZHhfFnPlf3W7+rc37a3pdt7WKo1OI2F1gTfZ2YvLLLOgE97jcdFoLVvk8xmLBv3kCYNX
-         5+Y/619MxEKfziZwWeMfcJw9uQEReMRAb+pkEiAfQw7rL8P9MyU9m9FT1w9mLuTEl3o/
-         Holr7K1qPROQ3r3yMDBlsuRgJSGWIR+kRnmWeLD2kqd4PLV6UUFj4XOvshce7uy34uA+
-         NdTT2TCxsRjRvZKFUwAG0zhQIY+x7Op7or2KQDGAEtSbYCM70HXBhLeSY0pgGSIsPUdM
-         W2ew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788895476; x=1789500276;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :references:cc:to:subject:from:user-agent:mime-version:date
-         :message-id:sender:x-gm-gg:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=CjUx5jDKzwh60+DV4HlvInbhvI+U7rjo3NlQfXuuqmY=;
-        b=CN54z+RJraipR2CuTNZnJKGVzCR4Gd6aw23aQrrQrcgS2zBoYR9n0y6cB6kjjwforp
-         N+F/sdy811HYvecKa5b2qbvwgHPrH2QKtnbx9Zzl+TkZfYrBBgHIwl7R3jZPpEhfuZw6
-         outOfSWNe5Wz4kJ5k4qVn9LkV2xXLQApYnDQoaeQXLvPW14Z/aVjE/doyXdqCgxl7K37
-         zeFfEQcfTV7Ehetw8hYSuucKhJZXSaUFLyQnMBCI8jh11g1NAh1LNuyY4pTI21Row3AD
-         HleuI/3mKtP5IvxsvB83OfGghDtEF0Wziy6eG+a9wWuygKXq0422tS37BPj9ycp0HkEj
-         s5Tg==
-X-Forwarded-Encrypted: i=1; AKwUvBwEC3C9/NE9xODtkiyLz70fBRFAoHpBHcyCT/aU919+WpXymGAXIePXNYo2ySC1qC+gD3OXLL2tZZJyNh8=@vger.kernel.org
-X-Gm-Message-State: AFuF++naDKzmiFPhwH6z1pRPFxHnPe+zqywpP1SxvmcIPrP/D+WY3TyW
-	quqfhSwKjAxBTwghc3EljBoGZmvUGMi9SAlDHffCwk2XEKKQ/ijSJ3zRFUlgIVoz
-X-Gm-Gg: AYBFou1lcEKCGPLR1+MjnpbslXE3eTeQOknmoHKRAJyIIs2aUVcx/71T72jVOZd5R4G
-	N2i0aClg5BHMyptmMf2K+QG39SdOSFv8lxJo0V3Q6CFpANJ+XP5FCzkJ261d1t018QlJx2d0Nwz
-	PxWwxnT3TWS4oJVrWb3yrfqtllu4mO/FxNLSulsQoxpQgT8AMBB2AuZwPg3Sxs0ROv3RMa2w9wY
-	s2YcqkKUn8XDtBSnpGQvx9pmHKYbYSsoLzUr9VSpJ9+FSLYw/r+Q/iujcy3dD//3UVtubJZ48MT
-	eiMcs47n3bm4Ey/fFv0D0CJW1/14HofFIBRxXGci26GIwzzQmA5tuvMm1tqwXY2LESTvovm9rcW
-	B9ZRZf2WDG/VxGykxBSW163oZKiwVntPZ/HucBZOD4Ge7xyZ8US1QEs0eaZ4DG1riQEjBacHd1T
-	Ds9VHNb7n33wxMUZtWjkt/0tWIsiuMu1mKnHJbDDWIn9+fxqXEEL7ey1fN0F6C2ATAgMAGwSL5A
-	T6xvVutIzwy9t2kPXMua1lFLi8v1QXJCeCXRWBrCbOwdFKPddo5AQ3E
-X-Received: by 2002:a05:600c:b93:b0:49d:17c5:8f7a with SMTP id 5b1f17b1804b1-49d17c58fa8mr84811735e9.18.1788895476203;
-        Tue, 08 Sep 2026 12:24:36 -0700 (PDT)
-Received: from [10.128.10.232] (195-23-151-163.net.novis.pt. [195.23.151.163])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49d1fb058c8sm3866445e9.0.2026.09.08.12.24.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Sep 2026 12:24:35 -0700 (PDT)
-Sender: Julian Braha <julian.braha@gmail.com>
-Message-ID: <ce0786a7-e48d-4d7b-b601-86a598bb03d1@gmail.com>
-Date: Tue, 8 Sep 2026 20:24:34 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PkqiX6n2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FC321F00A3A;
+	Tue,  8 Sep 2026 20:34:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788899667;
+	bh=P0t5klcuGPOZqVzgT74rAAnNeq5d/EWeiRAWMV72lLE=;
+	h=From:To:Cc:Subject:Date;
+	b=PkqiX6n2s04YkmZZLUAVi3EvVcneX6hGlDBvg8iOxLhyJueFIotihcsr1+2o/VuwN
+	 fYBc3MLazF/MAoE+8rLPs88F8cbCAxbDkxfArI29YFIUEP1oxf+cdUpa0sAkqACf32
+	 7d7TboIlCOC7hLOx81yLlinvXe5WYHzcyO01KAuT6NRH2BLgWlp8FYbnjfM7Bxaj6G
+	 PLAQcXv2hWrPmqUw1ZlmIyGGBhgbtnNQkkWifKP5jSIbubZt2+y9vdlbS21LobG3rH
+	 Kg9Z2SElkWLR0ks2bx4G3CfSjmjnmfMh0O/sehUSmROfTw7yJtfOIIgefmdrnilqBT
+	 vMrkblB3swoNA==
+From: Josh Poimboeuf <jpoimboe@kernel.org>
+To: x86@kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Peter Zijlstra <peterz@infradead.org>,
+	Gary Guo <gary@garyguo.net>,
+	rust-for-linux@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>,
+	linux-kbuild@vger.kernel.org,
+	Huacai Chen <chenhuacai@kernel.org>
+Subject: [PATCH v2 00/27] objtool: dynamically detect noreturns
+Date: Tue,  8 Sep 2026 13:33:12 -0700
+Message-ID: <cover.1788899473.git.jpoimboe@kernel.org>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Julian Braha <julianbraha@gmail.com>
-Subject: Re: [PATCH] kconfig: reject malformed KCONFIG_PROBABILITY values
-To: Dmitrii Tulnov <tulnov.dl@gmail.com>,
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
-Cc: Peter Korsgaard <jacmet@uclibc.org>,
- "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260907194536.37-1-tulnov.dl@gmail.com>
-Content-Language: en-US
-In-Reply-To: <20260907194536.37-1-tulnov.dl@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Dmitrii,
+changes since v1 (https://lore.kernel.org/cover.1787890035.git.jpoimboe@kernel.org):
+- improve commit log for "kbuild: Defer running objtool to link time for all CFG features"
+- rebase on v7.3-rc2 to get a proper Sashiko review
 
-I see that this is your first patch submission. Welcome!
-And thank you for reporting this.
+The C and rust manual noreturn lists are a maintenance nightmare.  Get
+rid of them by taking advantage of the fact that objtool can run on
+linked objects (vmlinux.o and modules) and can thus detect noreturns
+dynamically:
 
-On 9/7/26 20:45, Dmitrii Tulnov wrote:
-> randconfig checks the numeric range of each probability but does not
-> validate where strtol() stops. For example, KCONFIG_PROBABILITY=50% is
-> accepted as 50:0:0: the '%' is parsed twice as zero. This silently sets
-> both tristate y/m probabilities to zero, reducing the coverage of random
-> configuration builds. 
+  1) When features are enabled which require the noreturn knowledge
+     (i.e., control flow analysis) always defer objtool to run on linked
+     objects.  That obsoletes most of noreturns.h. (patch 12)
 
-It would be good to note here that 'KCONFIG_PROBABILITY=50' (without the
-'%') should be 25:25:50 instead.
+  2) For noreturn functions which are exported by vmlinux, dynamically
+     write their names to a file which is then read by objtool running
+     on modules.  That obsoletes most of the remaining noreturns.h
+     entries and the entirety of is_rust_noreturn(). (patch 24)
 
-> Empty fields and extra fields are also accepted.
+  3) For the (four) noreturn functions which are exported by modules,
+     manually annotate them at their declaration sites with a new
+     ANNOTATE_EXPORTED_NORETURN().  That removes the last few stragglers
+     in noreturns.h. (patch 26)
 
-Right, in these cases, I think it's reasonable to assume the user made a
-typo or other oversight.
+Josh Poimboeuf (27):
+  objtool: Remove obsolete noreturns.h entries
+  kbuild: Add CONFIG_OBJTOOL_DEFERRED
+  kbuild: Add CONFIG_OBJTOOL_CONTROL_FLOW
+  objtool: Fix dead end detection for sibling calls
+  objtool: Refactor the noreturn/dead-end detection
+  objtool: Ignore traps after noreturn calls in STT_CODE
+  objtool: Make .discard.stack_frame_non_standard non-allocatable
+  efi/libstub: Drop .discard.addressable from the stub objects
+  efi/loongarch: Mark loongarch efi_boot_kernel() non-standard for
+    objtool
+  objtool: Add ANNOTATE_IGNORE_NORETURN()
+  LoongArch: Annotate reboot and kexec paths as returnable
+  kbuild: Defer running objtool to link time for all CFG features
+  rust: Annotate the intrinsic stubs as returnable
+  panic: Mark abort() __noreturn
+  x86/xen: Ignore noreturn status of weak mem_map_via_hcall()
+  objtool: Detect noreturns in weak functions
+  x86/entry: Make rewind_stack_and_make_dead() a real function
+  x86/xen: Make xen_cpu_bringup_again() a real function
+  x86/xen: Make xen_start_kernel() noreturn
+  x86/boot: Rework how pi startup symbols get exposed to vmlinux
+  objtool: Fix noreturn detection for non-sibling jumps to SYM_CODE
+  objtool: Add options to write/read exported noreturns to/from a file
+  kbuild: Do the per-module objtool pass right before linking
+  kbuild: Generate the noreturn list and validate modules against it
+  objtool: Add ANNOTATE_EXPORTED_NORETURN()
+  objtool: Annotate all module-exported noreturns and remove noreturns.h
+  objtool: Warn about missing/stale ANNOTATE_EXPORTED_NORETURN() usage
 
-> 
-> Require each field to contain an integer followed by the end of the
-> string or a colon introducing another field, with at most three fields.
-> Preserve the leading whitespace and optional sign accepted by strtol().
+ Makefile                                 |   8 +
+ arch/arc/kernel/traps.c                  |   4 +-
+ arch/arm/kernel/traps.c                  |   2 +-
+ arch/loongarch/kernel/machine_kexec.c    |   2 +
+ arch/loongarch/kernel/reset.c            |   4 +
+ arch/x86/boot/startup/Makefile           |  16 +-
+ arch/x86/boot/startup/exports.h          |  14 -
+ arch/x86/boot/startup/unprefix.syms      |  13 +
+ arch/x86/entry/entry_64.S                |   7 +-
+ arch/x86/kernel/vmlinux.lds.S            |   2 -
+ arch/x86/platform/pvh/enlighten.c        |   1 +
+ arch/x86/xen/enlighten_pv.c              |   5 +-
+ arch/x86/xen/xen-head.S                  |   5 +-
+ arch/x86/xen/xen-ops.h                   |   2 +-
+ drivers/firmware/efi/libstub/Makefile    |   4 +
+ drivers/firmware/efi/libstub/loongarch.c |   8 +
+ drivers/message/fusion/mptbase.h         |   2 +
+ include/kunit/test.h                     |   1 +
+ include/kunit/try-catch.h                |   2 +
+ include/linux/annotate.h                 |  24 ++
+ include/linux/objtool.h                  |  13 +-
+ include/linux/objtool_types.h            |   1 +
+ include/linux/panic.h                    |   2 +-
+ include/linux/rtc/ds1685.h               |   2 +
+ kernel/exit.c                            |   2 +-
+ lib/Kconfig.debug                        |  14 +
+ lib/Kconfig.ubsan                        |   2 +-
+ rust/.gitignore                          |   1 +
+ rust/Makefile                            |  17 +
+ scripts/.gitignore                       |   1 +
+ scripts/Makefile.build                   |  31 +-
+ scripts/Makefile.lib                     |   4 +-
+ scripts/Makefile.modfinal                |  35 +-
+ scripts/Makefile.vmlinux_o               |  13 +-
+ scripts/link-vmlinux.sh                  |   3 +-
+ scripts/livepatch/klp-build              |   4 +-
+ tools/include/linux/objtool_types.h      |   1 +
+ tools/objtool/Documentation/objtool.txt  |  30 +-
+ tools/objtool/builtin-check.c            |  12 +
+ tools/objtool/check.c                    | 437 +++++++++++++++++------
+ tools/objtool/include/objtool/builtin.h  |   2 +
+ tools/objtool/include/objtool/elf.h      |   4 +
+ tools/objtool/klp-diff.c                 |  32 ++
+ tools/objtool/noreturns.h                |  56 ---
+ 44 files changed, 584 insertions(+), 261 deletions(-)
+ delete mode 100644 arch/x86/boot/startup/exports.h
+ create mode 100644 arch/x86/boot/startup/unprefix.syms
+ delete mode 100644 tools/objtool/noreturns.h
 
-I disagree with allowing the leading whitespace and sign. The fact that
-it's allowed input for strtol() is incidental to us. The intended input
-format for Kconfig is:
+-- 
+2.55.0
 
-XX:XX:XX
-
-not:
-
-  XX: +XX:    -XX
-
-> Keep the strtol() result as long until the range check so that narrowing
-> to int cannot turn an out-of-range value into a valid probability.
-> 
-> Add regression tests for malformed and out-of-range values, the supported
-> probability formats, and the documented empty-value default.
-> 
-> Fixes: e43956e60769 ("kconfig: implement KCONFIG_PROBABILITY for randconfig")
-> Assisted-by: LLM
-> Signed-off-by: Dmitrii Tulnov <tulnov.dl@gmail.com>
-> ---
-> Validation on kbuild-next, x86_64, GCC 13.3.0:
-> - make testconfig with HOSTCFLAGS=-Werror: 58 passed. With the original
->   conf binary: 18 failed, 40 passed; all failures are new regression tests.
-> - ASan/UBSan at -O1, with leak detection disabled: the same 58 tests passed.
-> - Both builds passed 1,635 input cases and 440 comparisons with the original
->   conf using valid inputs and fixed seeds. Malformed inputs preserved an
->   existing .config, including when KCONFIG_ALLCONFIG was set.
-> - make defconfig, allnoconfig, allmodconfig and valid randconfig passed.
->   KCONFIG_PROBABILITY=50% changed from success to the expected error.
-> - No vmlinux build or boot test; this changes the host configuration tool.
->   A 32-bit host build was unavailable because multilib headers were missing.
-> 
-> An AI coding assistant helped find the issue, prepare the fix, description
-> and tests, and run validation. The requested task was to find and fix a
-> useful, reproducible Linux bug suitable for a first contribution.
-> 
->  scripts/kconfig/conf.c                        |  9 +++-
->  .../tests/randconfig_probability/Kconfig      | 12 +++++
->  .../tests/randconfig_probability/__init__.py  | 54 +++++++++++++++++++
->  3 files changed, 74 insertions(+), 1 deletion(-)
->  create mode 100644 scripts/kconfig/tests/randconfig_probability/Kconfig
->  create mode 100644 scripts/kconfig/tests/randconfig_probability/__init__.py
-> 
-> diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-> index fe8ba09b0..fa5dae74e 100644
-> --- a/scripts/kconfig/conf.c
-> +++ b/scripts/kconfig/conf.c
-> @@ -191,7 +191,14 @@ static void conf_set_all_new_symbols(enum conf_def_mode mode)
->  		n = 0;
->  		while (env && *env) {
->  			char *endp;
-> -			int tmp = strtol(env, &endp, 10);
-> +			long tmp = strtol(env, &endp, 10);
-> +
-> +			if (endp == env || (*endp && *endp != ':') ||
-> +			    (*endp == ':' && (!endp[1] || n == 2))) {
-> +				errno = EINVAL;
-> +				perror("KCONFIG_PROBABILITY");
-> +				exit(1);
-
-Unfortunately, sometimes users depend on unintended behavior. So I would
-prefer to make this a warning for now, and then promote this to an error
-later assuming nobody complains.
-
-- Julian Braha
