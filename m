@@ -1,120 +1,89 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D0D0376A06;
-	Wed,  9 Sep 2026 06:09:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E1C43A257E;
+	Wed,  9 Sep 2026 06:14:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788934151; cv=none; b=r5KdPHwDx6n9fYFf+7UfCpTx4hzhvhBtd0Var1UJsJlNBt48dnkFWb/kvMx+CBixnA1dsYqPJWDuCzpdXq5/EnnJpy/mafAsokcipBKsw2JgHH354m4rvQpWDnsEDix1ASSBl7mypSXsZXDLWmnDEI4qKux/xz0iHLAQhvCSq8o=
+	t=1788934449; cv=none; b=BRa9kdKeBX0Ra+Pf2AHUPGTVxjESJK/BGPLcyjdqiZYeO4qfY8jFaPiwsFThnZFgQYoTlDX7XF1Hp9QB9NVCgu+QmbBJ7yCuKZ+zVnAmum9HFJZp//hxO8i+1G3nrX5LJHIQ/tN4IToWCkec7s//zL8si08GrQSv1lLbe41I5wk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788934151; c=relaxed/simple;
-	bh=IaaIy/FKa/Hz2wFkSnOmx5bytb1F6djSGe73ztPyNI0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=npcR8cjlj20veGGtn4uGJQqQ/13T0Xyir6fQHDkBpa7uwZ1ElZVp/qYbAlqeaDUmqH0fBNjINdhFU4Q26VHR+BCaTwSHDUR2cr2/9eAcWd4/KyEijVP0GrhdfCu9UzuhCKBiI+BR2dT2HUS+e59F7m9l/udm5acFpIm6KdfiLVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Ba8CFyue; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=fAJ6G75L; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	s=arc-20240116; t=1788934449; c=relaxed/simple;
+	bh=Wahhu7gCCnibQMn/M729SHAGIeAyGgwCdg48WYJrjSM=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=JOmGih/Jzj1bOxjYJJgyh76HU5arttRZUXXSli16E5U69zY9RKSNmulQqXhXPF/FmdGsa2OrdW2nAEv9UeggC38Tr5h4eG3MY+HVwmNCxi1fou1lX2bAIefCY+h2CIto4sjA2hz3CXD5uhRThwe7FMm2AmEBnygrV+To/BnsQp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X1jyrlnR; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Ba8CFyue";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="fAJ6G75L"
-Date: Wed, 9 Sep 2026 08:09:07 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1788934147;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Fsx+E+IxhTgqrNd5fDNEdWA4P4WjUu/zI9gxcY2gf1k=;
-	b=Ba8CFyueZIBv0OelbgTnQd8Liev5J1UqmQNZMlTvb9O8KcOJJTdoaB2ThyVqE1f8eVdkpB
-	wTE4Lfz5SmplS9gum8fRJfjedlxYamdPBHVJ2zN0PmVQ/fAuza+eRyHTaqNl21luZW5FSV
-	7mSECa3gWtr+fP2KkXm6iC1JdfB5MAxu3Qk/bZ7DsXkgsNE6bOUj/o8lxR1BIYweICcdVu
-	Fm6yt/eraobBg9c2pGNyeS88edKZbZQw3VCce9fTmXPsolJkOwKGjp5YqUwJX6x49ccs+s
-	3BERlZcIkDcJWAolf/r7TyPPNGX94YB/SldI2jSo7Dc4KeV5buIEb4c2Lh26vA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1788934147;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Fsx+E+IxhTgqrNd5fDNEdWA4P4WjUu/zI9gxcY2gf1k=;
-	b=fAJ6G75LaW8nnqqa43BRDYqlP7QW6Q+nfq2qssYjtogHzBntGBNA7rR18bMVBCUfwB7vq4
-	TycChAiSqeQsMbBw==
-From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-To: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
-Cc: Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Alexandre Ghiti <alex@ghiti.fr>, Nathan Chancellor <nathan@kernel.org>, 
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Andy Lutomirski <luto@kernel.org>, 
-	Vincenzo Frascino <vincenzo.frascino@arm.com>, Kees Cook <kees@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Richard Weinberger <richard@nod.at>, 
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg <johannes@sipsolutions.net>, 
-	Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
-	Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>, 
-	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
-	Thomas Gleixner <tglx@kernel.org>, Boqun Feng <boqun@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
-	linux-mm@kvack.org, linux-um@lists.infradead.org, 
-	linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev, 
-	linux-s390@vger.kernel.org, linux-mips@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, Jan Stancek <jstancek@redhat.com>, 
-	Arnaldo Carvalho de Melo <acme@redhat.com>, Alexandre Ghiti <alexghiti@rivosinc.com>
-Subject: Re: [PATCH v5 17/24] powerpc/vdso: Enable the vdsocheck tool
-Message-ID: <20260909080124-ef171c1a-83ff-486b-b632-8613011a5a97@linutronix.de>
-References: <20260908-vdso-absolute-reloc-v5-0-3a93791af1cf@linutronix.de>
- <20260908-vdso-absolute-reloc-v5-17-3a93791af1cf@linutronix.de>
- <7c9f6ec3-5886-41ea-8803-d81019321d29@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X1jyrlnR"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 61C401F00A3A;
+	Wed,  9 Sep 2026 06:14:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788934447;
+	bh=IfCJaxQ5jkSfE7niHc5TDkGLC+xox/FNfSKEsiO34mA=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date;
+	b=X1jyrlnRNJ7qeBuQhSJkjrHKVPm8eMRKv83MKYP9a1caaMx/ED/qlZYAyrzf9ZUXK
+	 bH5fagy3u/Mpl5B0+o4Brjk6YIWEVAFxwNVazRTL16RRuZ3CHHKpac1Jin8M1VyUsK
+	 DvvJvBRqkaL6qgtshZuy2j02QJXyaUyCPVEcC0iEHIUidnmgwMQD37nKBA7n3qVGdN
+	 JiMrIOdp1nHtOUPphSvYk54weEKKlSleTLAFqo6AEmA5Hxeu+EfEsxUdfhKEm4IcMn
+	 SpsjPimKT3ea/Iml61iZsgxU/SbYjcjZda0cLjLm7smYhectoTIAQa4pGFXdBR2dk8
+	 aTyFxxvH2N1dA==
+From: Nicolas Schier <nsc@kernel.org>
+To: Steven Rostedt <rostedt@goodmis.org>, 
+ Nathan Chancellor <nathan@kernel.org>
+Cc: Nick Desaulniers <ndesaulniers@google.com>, 
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+ linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+ llvm@lists.linux.dev, stable@vger.kernel.org
+In-Reply-To: <20260831-sorttable-long_size-unused-but-set-global-v1-1-8a96b88697e5@kernel.org>
+References: <20260831-sorttable-long_size-unused-but-set-global-v1-1-8a96b88697e5@kernel.org>
+Subject: Re: [PATCH] scripts/sorttable: Mark long_size as __maybe_unused
+Message-Id: <178893427036.356946.766876199335071623.b4-ty@b4>
+Date: Wed, 09 Sep 2026 08:11:10 +0200
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7c9f6ec3-5886-41ea-8803-d81019321d29@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.17-dev-1f2f7
+X-Developer-Signature: v=1; a=openpgp-sha256; l=732; i=nsc@kernel.org;
+ s=20250924; h=from:subject:message-id;
+ bh=Wahhu7gCCnibQMn/M729SHAGIeAyGgwCdg48WYJrjSM=;
+ b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBqoPiFVATJmEA033ik7sZ8/YrMthm6KNT5Sl6mH
+ zcw42CRy6KJAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCaqD4hQAKCRAHUgpwFiYS
+ aTm0EADkFUFT9cQdd9XFvB+Gr35i1nolRwWkftjTC0IbQxVAXqBg61NDz29ELexvNYRCFuhDefP
+ QXbXqI5ZlP0Dp/XwkvblrQTS9wAMa5EWkPOf5HiOK5WMjyXu1WRbHon7xeWHN2VXOvZ2IKAKLT/
+ X+CibMMZQonxRaq5zLNj/E5Qbt9ia75fPi/7SKF+ljO92d47Qf9i959CNcRpznvuSXejOcWY1RR
+ /dCchfNOzYzjidV+qui7G/LolbhDaUPCp+AFv/zSfqKytwqod5mnd/BkNJmiQID9/pNLgRQ+tFa
+ YVUBPWzFtEYIqQQljj/2W5NdvEZqwogE7nO0vazJK50SOO6I7FeeCm5Zl7W2fV7z+UywvRHE1Fs
+ ZJKLmZ4OB+iySt5JfweF8okAF9CGnjcp9B5Z8JhXohEpFRS+hk1orGtFN4apThihqavYle5zBV3
+ 4Uyj3Cek/cgcEZtxQ/jnoP0CFa08pFzpU0fXoJj51JwwI3xh6i+OXOeUrQE9/x/U8PeoQUpFV0z
+ HPkYPdIYrWvJ9Yd6Hia76L4C0e0a91x2JaX4alNfddcAlyxCDIUdgM9TCG0dloD4EUX/borMmtv
+ knWnY/k7zYUgEGTsN7LG54RwpD7x0frQWOEL3KWkXb8jhgAc5+73nEE7TommlYrzO7qrhdpQZ8x
+ CSdcgGZP8RXeX8A==
+X-Developer-Key: i=nsc@kernel.org; a=openpgp;
+ fpr=18ED52DBE34F860EE9FBC82B7D97093255A0CE7F
 
-On Tue, Sep 08, 2026 at 04:41:09PM +0200, Christophe Leroy (CS GROUP) wrote:
-(...)
+On Mon, 31 Aug 2026 18:46:31 -0700, Nathan Chancellor wrote:
+> scripts/sorttable: Mark long_size as __maybe_unused
 
-> > diff --git a/arch/powerpc/kernel/vdso/Makefile b/arch/powerpc/kernel/vdso/Makefile
-> > index 368759f81708..ca20b91b4373 100644
-> > --- a/arch/powerpc/kernel/vdso/Makefile
-> > +++ b/arch/powerpc/kernel/vdso/Makefile
-> > @@ -81,9 +81,9 @@ targets += vdso64.lds
-> >   CPPFLAGS_vdso64.lds += -P -C
-> >   # link rule for the .so file, .lds has to be first
-> > -$(obj)/vdso32.so.dbg: $(obj)/vdso32.lds $(obj-vdso32) $(obj)/vgettimeofday-32.o $(obj)/vgetrandom-32.o $(obj)/crtsavres-32.o FORCE
-> > +$(obj)/vdso32.so.dbg: $(obj)/vdso32.lds $(obj-vdso32) $(obj)/vgettimeofday-32.o $(obj)/vgetrandom-32.o $(obj)/crtsavres-32.o $(vdsocheck) FORCE
-> >   	$(call if_changed,vdso32ld_and_check)
-> > -$(obj)/vdso64.so.dbg: $(obj)/vdso64.lds $(obj-vdso64) $(obj)/vgettimeofday-64.o $(obj)/vgetrandom-64.o FORCE
-> > +$(obj)/vdso64.so.dbg: $(obj)/vdso64.lds $(obj-vdso64) $(obj)/vgettimeofday-64.o $(obj)/vgetrandom-64.o $(vdsocheck) FORCE
-> >   	$(call if_changed,vdso64ld_and_check)
-> >   # assembly rules for the .S files
-> > diff --git a/lib/vdso/check/vdsocheck.rs b/lib/vdso/check/vdsocheck.rs
-> > index e45a1fbc6829..429bdcd65818 100644
-> > --- a/lib/vdso/check/vdsocheck.rs
-> > +++ b/lib/vdso/check/vdsocheck.rs
-> > @@ -69,6 +69,33 @@ fn allowed_relocations_for_machine(machine: u16) -> Option<AllowedRelocations<'s
-> >               ..Default::default()
-> >           }
-> >           .into(),
-> > +        bindings::EM_PPC => AllowedRelocations {
-> > +            in_object_file: &[
-> > +                bindings::R_PPC_REL24,
-> 
-> Not sure this is correct, see commit 42ed6d56ade2 ("powerpc/vdso: Block
-> R_PPC_REL24 relocations")
+Applied to kbuild/linux.git (kbuild-fixes-unstable), thanks!
 
-(...)
+[1/1] scripts/sorttable: Mark long_size as __maybe_unused
+      https://git.kernel.org/kbuild/c/d9e2ba9f
 
-The mentioned commit prevents the relocation in the final vDSO,
-while my patch allows it in the intermediate object files.
-In the final vDSO no relocations are accepted whatsovever.
+Please look out for regression or issue reports or other follow up
+comments, as they may result in the patch/series getting dropped,
+reverted or modified (e.g. trailers).
+
+Patches applied to the kbuild-fixes-unstable branch are accepted pending
+wider testing in linux-next and any post-commit review; they will
+generally be moved to the kbuild-fixes branch within about a week if
+no issues are found.
+
+Best regards,
+-- 
+Nicolas
+
+
