@@ -1,89 +1,93 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mail-43167.protonmail.ch (mail-43167.protonmail.ch [185.70.43.167])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E1C43A257E;
-	Wed,  9 Sep 2026 06:14:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A97683D410E;
+	Wed,  9 Sep 2026 10:22:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.167
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788934449; cv=none; b=BRa9kdKeBX0Ra+Pf2AHUPGTVxjESJK/BGPLcyjdqiZYeO4qfY8jFaPiwsFThnZFgQYoTlDX7XF1Hp9QB9NVCgu+QmbBJ7yCuKZ+zVnAmum9HFJZp//hxO8i+1G3nrX5LJHIQ/tN4IToWCkec7s//zL8si08GrQSv1lLbe41I5wk=
+	t=1788949365; cv=none; b=e2I+0zclZCed4wI2wzD4HGFGcKrO7Qc+2lrrcvKFFwp1daEosGIaITB+vsw27tboIXp/lRFrFxTuJgHkX/HmVIa91efwUi/tuW3kjtApWaqlhGZj6bcMOouKrcUZfln0rIfyjAOnsL3x23AhNZOF/Yyo71wJ7q5+pjSLyR86m0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788934449; c=relaxed/simple;
-	bh=Wahhu7gCCnibQMn/M729SHAGIeAyGgwCdg48WYJrjSM=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=JOmGih/Jzj1bOxjYJJgyh76HU5arttRZUXXSli16E5U69zY9RKSNmulQqXhXPF/FmdGsa2OrdW2nAEv9UeggC38Tr5h4eG3MY+HVwmNCxi1fou1lX2bAIefCY+h2CIto4sjA2hz3CXD5uhRThwe7FMm2AmEBnygrV+To/BnsQp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X1jyrlnR; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788949365; c=relaxed/simple;
+	bh=cErN04XR2kGv1i2GRA/Gp+JKA/qXMFpcoKDT3eXGf48=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lcrEHJMFfmALV6WLqJ9Q35evSSSjVYNuM1diBAOoBs8HU+CrUMJVHRQ9tIFFqJ+aUVaCh4S6wetTBmbTxLqIS52qo5x8+Nzqbj980C0n/7Zw86YANcNvPM5IY1vTnVSjVhBFtgYWXuim0qyhWCSLlmKVzx2h7hvK3rfgQnHQO+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=FyZ5TvMu; arc=none smtp.client-ip=185.70.43.167
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X1jyrlnR"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 61C401F00A3A;
-	Wed,  9 Sep 2026 06:14:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788934447;
-	bh=IfCJaxQ5jkSfE7niHc5TDkGLC+xox/FNfSKEsiO34mA=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date;
-	b=X1jyrlnRNJ7qeBuQhSJkjrHKVPm8eMRKv83MKYP9a1caaMx/ED/qlZYAyrzf9ZUXK
-	 bH5fagy3u/Mpl5B0+o4Brjk6YIWEVAFxwNVazRTL16RRuZ3CHHKpac1Jin8M1VyUsK
-	 DvvJvBRqkaL6qgtshZuy2j02QJXyaUyCPVEcC0iEHIUidnmgwMQD37nKBA7n3qVGdN
-	 JiMrIOdp1nHtOUPphSvYk54weEKKlSleTLAFqo6AEmA5Hxeu+EfEsxUdfhKEm4IcMn
-	 SpsjPimKT3ea/Iml61iZsgxU/SbYjcjZda0cLjLm7smYhectoTIAQa4pGFXdBR2dk8
-	 aTyFxxvH2N1dA==
-From: Nicolas Schier <nsc@kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>, 
- Nathan Chancellor <nathan@kernel.org>
-Cc: Nick Desaulniers <ndesaulniers@google.com>, 
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
- linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
- llvm@lists.linux.dev, stable@vger.kernel.org
-In-Reply-To: <20260831-sorttable-long_size-unused-but-set-global-v1-1-8a96b88697e5@kernel.org>
-References: <20260831-sorttable-long_size-unused-but-set-global-v1-1-8a96b88697e5@kernel.org>
-Subject: Re: [PATCH] scripts/sorttable: Mark long_size as __maybe_unused
-Message-Id: <178893427036.356946.766876199335071623.b4-ty@b4>
-Date: Wed, 09 Sep 2026 08:11:10 +0200
+	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="FyZ5TvMu"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+	s=protonmail3; t=1788949360; x=1789208560;
+	bh=cErN04XR2kGv1i2GRA/Gp+JKA/qXMFpcoKDT3eXGf48=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=FyZ5TvMuM3Xxv5Uzhar57D+/F/CzbQI9Nc7boZjPQ6zKjeTnMXkpNyBP7JbAk+bz/
+	 q87GN3qkrPsh1ksLlzQBUNR1zoF7toF94y+UZQcH7gkMNVfAx7WuX2WqtjsyXoUnPw
+	 eSLBsKpAMAWXivq0KUr3IsQdh8ETLkW8Y8JqBFnLmNtmmWuuApOv6Vr/Xvk255Wh7u
+	 NqrFComiGwqy/7YMvXKEfuvq+yDiVGQmWKKbv1wX9fnHmUoYeZrm4v7Ig+C9PdRmfI
+	 yYIR7L8jXMECk5SfckftB0rSpEtgOduxZPyUm+yeG06lBUgdWoT6jAthkIQOmPoYMh
+	 qC+n7EC8R2fEw==
+Date: Wed, 09 Sep 2026 10:22:33 +0000
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+From: =?utf-8?Q?Bj=C3=B6rn_Baron?= <bjorn3_gh@protonmail.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, Masahiro Yamada <masahiroy@kernel.org>, Alexey Gladkov <legion@kernel.org>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, Arnd Bergmann <arnd@arndb.de>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Ard Biesheuvel <ardb@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Josh Poimboeuf <jpoimboe@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Boqun Feng
+	<boqun@kernel.org>, Gary Guo <gary@garyguo.net>, Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, =?utf-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, Jonathan Corbet <corbet@lwn.net>, Randy Dunlap <rdunlap@infradead.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, llvm@lists.linux.dev, linux-riscv@lists.infradead.org, linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-doc@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH 20/23] kbuild: rust: parallelise rustc front end
+Message-ID: <t8iID_-Rgtrxxg-f1ZfdOg1xmm7YedvOT4pgDFEXKxoIeu29-JooZ3SSlbze088O0kLSOdgP7xN_Bo9Xm_lO1x51Gd-gIgT-tFPfwM_gCEw=@protonmail.com>
+In-Reply-To: <20260908-build-speedup-v1-20-5dc1ac01672d@kernel.org>
+References: <20260908-build-speedup-v1-0-5dc1ac01672d@kernel.org> <20260908-build-speedup-v1-20-5dc1ac01672d@kernel.org>
+Feedback-ID: 27884398:user:proton
+X-Pm-Message-ID: 6e566d54cdb8b110ebbfb62f2bd2ea449ab508ec
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.17-dev-1f2f7
-X-Developer-Signature: v=1; a=openpgp-sha256; l=732; i=nsc@kernel.org;
- s=20250924; h=from:subject:message-id;
- bh=Wahhu7gCCnibQMn/M729SHAGIeAyGgwCdg48WYJrjSM=;
- b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBqoPiFVATJmEA033ik7sZ8/YrMthm6KNT5Sl6mH
- zcw42CRy6KJAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCaqD4hQAKCRAHUgpwFiYS
- aTm0EADkFUFT9cQdd9XFvB+Gr35i1nolRwWkftjTC0IbQxVAXqBg61NDz29ELexvNYRCFuhDefP
- QXbXqI5ZlP0Dp/XwkvblrQTS9wAMa5EWkPOf5HiOK5WMjyXu1WRbHon7xeWHN2VXOvZ2IKAKLT/
- X+CibMMZQonxRaq5zLNj/E5Qbt9ia75fPi/7SKF+ljO92d47Qf9i959CNcRpznvuSXejOcWY1RR
- /dCchfNOzYzjidV+qui7G/LolbhDaUPCp+AFv/zSfqKytwqod5mnd/BkNJmiQID9/pNLgRQ+tFa
- YVUBPWzFtEYIqQQljj/2W5NdvEZqwogE7nO0vazJK50SOO6I7FeeCm5Zl7W2fV7z+UywvRHE1Fs
- ZJKLmZ4OB+iySt5JfweF8okAF9CGnjcp9B5Z8JhXohEpFRS+hk1orGtFN4apThihqavYle5zBV3
- 4Uyj3Cek/cgcEZtxQ/jnoP0CFa08pFzpU0fXoJj51JwwI3xh6i+OXOeUrQE9/x/U8PeoQUpFV0z
- HPkYPdIYrWvJ9Yd6Hia76L4C0e0a91x2JaX4alNfddcAlyxCDIUdgM9TCG0dloD4EUX/borMmtv
- knWnY/k7zYUgEGTsN7LG54RwpD7x0frQWOEL3KWkXb8jhgAc5+73nEE7TommlYrzO7qrhdpQZ8x
- CSdcgGZP8RXeX8A==
-X-Developer-Key: i=nsc@kernel.org; a=openpgp;
- fpr=18ED52DBE34F860EE9FBC82B7D97093255A0CE7F
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 31 Aug 2026 18:46:31 -0700, Nathan Chancellor wrote:
-> scripts/sorttable: Mark long_size as __maybe_unused
+On Tuesday, September 8th, 2026 at 22:59, Lorenzo Stoakes (ARM) <ljs@kernel=
+.org> wrote:
 
-Applied to kbuild/linux.git (kbuild-fixes-unstable), thanks!
+> Use the -Zthreads option to have rustc perform builds in parallel. This h=
+as
+> been available since rust 1.84 (rust-lang/rust#132282), and the kernel
+> requires rust 1.85 or above.
+>=20
+> [..]
+>=20
+> Generated output was confirmed byte-for-byte identical.
 
-[1/1] scripts/sorttable: Mark long_size as __maybe_unused
-      https://git.kernel.org/kbuild/c/d9e2ba9f
+There are still several known reproducibility issues for the parallel
+frontend[1] and at least until fairly recently there were also deadlock
+issues and incorrect errors[2], so I would not recommend enabling it withou=
+t
+an explicit request from the user. Perhaps even only allow it on nightly
+rustc for now, then you don't need to check which of the two spellings of
+the flag is supported.
 
-Please look out for regression or issue reports or other follow up
-comments, as they may result in the patch/series getting dropped,
-reverted or modified (e.g. trailers).
+By the way, currently backend parallelism is entirely disabled due to the
+usage of --emit obj (which forces -Ccodegen-units=3D1). For -O2/3 builds
+enabling backend parallelism may have a bigger impact than frontend
+parallelism. And it would make incremental compilation for rustc a lot more
+effective as editing a single function would no longer need to codegen all
+functions in a crate again, only those inside the same codegen unit.
+Getting it working would require using --emit link to produce rlibs and
+then linking those rlibs in the place of the raw object files. Rlibs are
+just static libraries containing some extra rustc specific info that will
+be ignored by the linker (no guarantees about this, but there are no
+guarantees --emit obj can be linked without missing symbols either and I
+don't know of any reason why we would change it right now. It would hurt
+compile times due to needing to repackage all rlibs before rustc runs
+linking.). I tried implementing this a couple of years ago, but back then
+if I recall correctly either binutils ar or llvm-ar was unable to produce a
+thin archive referencing members of another archive like Kbuild expects to
+do. I'm not familiar enough with Kbuild to know how to skip the thin
+archive production.
 
-Patches applied to the kbuild-fixes-unstable branch are accepted pending
-wider testing in linux-next and any post-commit review; they will
-generally be moved to the kbuild-fixes branch within about a week if
-no issues are found.
-
-Best regards,
--- 
-Nicolas
-
-
+Link: https://github.com/rust-lang/rust/issues/?q=3Dis%3Aissue%20state%3Aop=
+en%20label%3AA-parallel-compiler [1]
+Link: https://github.com/rust-lang/rust/issues/?q=3Dis%3Aissue%20state%3Acl=
+osed%20label%3AA-parallel-compiler [2]
