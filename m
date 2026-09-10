@@ -1,110 +1,212 @@
-Received: from mail-lf2-f12.google.com (mail-lf2-f12.google.com [74.125.229.204])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 349C83DB63F
-	for <linux-kbuild@vger.kernel.org>; Thu, 10 Sep 2026 09:13:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 507463E120C
+	for <linux-kbuild@vger.kernel.org>; Thu, 10 Sep 2026 09:29:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789031612; cv=none; b=bsspbD86trXwc7OkmIHScELjrp7lfYYkb3Uv4xY5+QBe8IGv27N7qgBFEyAOdwBILAPsm82zsC5u6mC8aqpF/XUDOBdZDDJE6BPWrHf4rfH+n9/4ByZ1FpYzEiofylHc2yLpNVVge7Ub+Fkwx/E81rHIvfqyxVm26kvvQjMWbgc=
+	t=1789032550; cv=none; b=Pm2XCadn8twI/5Z0ePh/3SS9bLJlz8ormEZ9glSZgPmvCeXYhO+KifoX9XtlVImUvunK79ym80uurw/yS4de5ETnwdKnYqvn/jP4rR8WiOj35BK0J6dGfyTsBnTBfBUOV9l1O2n+bGYhCmce+8hBJVPmentsjXxaDsSdq1m00PY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789031612; c=relaxed/simple;
-	bh=v7N4avloEV/i/FflLURJ0xPpIvTNdN0tBiLjvOagGJg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Fx1tfu0DydwM8M+PqVRsOnQMSs5HBMUnCDsqbCjOqPU3LNl1GIiKoq/DDXHIXoNNrU+62Av6fjiBz3/MlkVslItBtSriCZitBih9zEA2S1WT8EK15AEyNuKBg+2SbwSkncbWQfKgtHZiZxE+XkPKDKZCPMjeujcCwQNB2P7i5do=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BduoaHX/; arc=none smtp.client-ip=74.125.229.204
+	s=arc-20240116; t=1789032550; c=relaxed/simple;
+	bh=YmZhILYI1Ap/QhHEbws/tgVKUcLX7+iRsfdsJ1tAFSs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hbMmciJ+pEPUPjQGlbgq2ykHuJi8IhvmanFJGDzn5LclsXnrs/5BJ+XV88mFMt1R673ekuqUt1TVjI/yeosp0g3HK7UYIusAYlfU7I5v4DyKhXIV6dWbGA3Sn1wL0J4ME3Ek39OB7BKQ4RnL9/yfBIxNrBiMKU2At/jifdFRRiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fl7rpEKW; arc=none smtp.client-ip=209.85.128.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BduoaHX/"
-Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b74e0c2e4dso1477172e87.0
-        for <linux-kbuild@vger.kernel.org>; Thu, 10 Sep 2026 02:13:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fl7rpEKW"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-49b0d78a801so67379385e9.2
+        for <linux-kbuild@vger.kernel.org>; Thu, 10 Sep 2026 02:29:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789031605; x=1789636405; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1789032546; x=1789637346; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
+         :in-reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=v7N4avloEV/i/FflLURJ0xPpIvTNdN0tBiLjvOagGJg=;
-        b=BduoaHX/PusC1HRDOaQrhddVJE8+ccMGCIQHdeB2eEiGTY8m22TillXLgt6/e+Gqn6
-         CNrOd10e6zd2lUJY4knpDyGypLCRjWWTDurunMVcJ28qXF17wnQfAD4L5md6LxxkeZ+W
-         Ua8uPZW/UMbWmQBrgtrITifDZJ7hWT8rapray9lfvN6i3he/WXQ33ResCTlPtpdoTmtW
-         /D8h/eJTHm41oCfp3Ba4nMjkgSA9N5Q184MDfBDcBG5saDFP/Tx1Mu+eaQayqvW51sJP
-         rGL/BO0pL1yPS1GPjCiT6rDSO/cIQU9VbgEnLBPCmsSKJ+WugSgNxbW4ZCdnNoYU5nHr
-         ZS8Q==
+        bh=xKhavT2ReA2W483I2xKkmSEJ1FM7bdVhooTyy/B0hnc=;
+        b=fl7rpEKWOGJGTfMOVeV9QpCGl2mMK4Vehvs3dY8Rm+didzRH0gtOfiyzeoU8ALNMoM
+         cT2BPMjJbXV5gQ6sliYvSB0QZIjgDx8/CdX1PBfpXHGSWrpCsIwYqoddBYs/UedP0HG3
+         17GV1ku/mwl67dARTOxQ1Kpd06hZJ0r/c10p5zF0ehwV5FtS0mZnrdm99rFVd8Xtpjiz
+         6VD6yvQSxr2ssCUsOX9CqQ8e534WuIcxyEfYFBisMF9gWWhB//9kRq84KgudvGXGGI2G
+         7qfV7g8OkDajr/59MwtxDvgu3IQT3JAm7g/o50sPZ2s+6GE9ZKKNDlMGj5vUjZoPBa88
+         3WPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789031605; x=1789636405;
+        d=1e100.net; s=20251104; t=1789032546; x=1789637346;
         h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=v7N4avloEV/i/FflLURJ0xPpIvTNdN0tBiLjvOagGJg=;
-        b=FEjA+RAUC1dWBAY0pndb1mCsDZ/jEDqZw0lup2EIxTznD88RH0ig0Ld4X17YFMNNWI
-         LsJnFWxwMbL0TzD7VL/Uhk5ecTj9bAy8xO7NwcP5zDdxgWX45UdSj7Wj2fRRBptKOWY+
-         FTm82S4Q3W0itLkivh6Mptbx6W6idcjUKvOVRxwUbC4xK1/DvUCnXrQ1XaXr1NT1vBsR
-         M7McCmS/SHpqwu+KNCL/hzKyobhUecgVMTQrHbdxwjvjkMCdOAYvShxi3WFk8rd9Dksr
-         P4uAn7Kjzhl9BPR547P8WqxRzYZoYaGKCNQL7Jtye/8NWS6ySjpJo6KVEK7KyuNTY2Pb
-         YviQ==
-X-Forwarded-Encrypted: i=1; AKwUvByGlbdCHY1JRTUBTngdfoYtzcsS208qN6lyK/zLYbhTscbuSAXqBAQV9wSr/47sZAqnGxHIjUGjc+eWLXk=@vger.kernel.org
-X-Gm-Message-State: AFuF++kmcewnJBfiIR8G1mcwNB8/3jDAQ2n7EPPbJJc2iTdbR6Q7rVP6
-	V4msRF7Ct08BmYkqahfRIkTtrCRDyT4AWkJTsNx0fGFn0Y7FFkX8naM=
-X-Gm-Gg: AYBFou1LU3ytgFGYgxMlB59T1vcYRML8EJnAI987isQHvbRz5fWBGUl7J8i3OhaZ42j
-	D5XBNskgo5aEg9nHB3aX9x8jhWhrUPJvP1KaK/lZ5BwyCp8oQOJAmZuCUCBvjK/KCByU/QSRSKM
-	nQL8w/GsxzkCPtkIsIzmOZ57cFCoqgXiHNxBCEeTMXsVEC0Vls5hLgQyD4Q8Y6igebu66Ps+Ro8
-	AU/PKk4FZzIk2Qa0hlh/3Tnu9LV+rFhm37wDommqHdHofJ6rTkFJtpq+iilXzf9z47xQEdsunH8
-	tO0Te3R4V4yjNES83TuNQUf0FXeW945UieaWy15orWCc4wpK84xQ4TxymG6qJK9jrwVNCwuu5wM
-	8VU4VpKnZIM+VpvQC/6U68W599PYRRKKXbG77DVEXW3XJSeftd1R8bwGJfWRdOykHVBUGNldXST
-	yA+xOs1Y15D545Ackli5u9uJe6gzyb1seKse82FQQ0CNVwgdkwJf5BocTMTs2L2aKcAMXHQ8N9U
-	kDUOfnXDoFA1oejIzOq+rUA/apc08Xq36bSQ3U8ljTuWQiR7zRK6UOOemwTL5AUAZcmv1vvMbTk
-	QI3X75MCKOIQ12Yr
-X-Received: by 2002:a05:6512:b9c:b0:5b4:3ddd:8996 with SMTP id 2adb3069b0e04-5b8986d1bbemr1928844e87.15.1789031604614;
-        Thu, 10 Sep 2026 02:13:24 -0700 (PDT)
-Received: from insciwin.localdomain (224.105.88.34.bc.googleusercontent.com. [34.88.105.224])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5b6166ed2b7sm4336333e87.14.2026.09.10.02.13.22
+        bh=xKhavT2ReA2W483I2xKkmSEJ1FM7bdVhooTyy/B0hnc=;
+        b=epNxKSMnrv+BR0vOQ2WYGhkaWdcwrQ8u54SBWpIWdfIW4NOracXZSC1Y2gmRD6UnEB
+         4ils0kbSrEerZLqmN3R2kkALDjUvqJq7x8gM12+0p1DgNfABn2evol6WE6+2uhq/ayh2
+         akhGRcmyOrF4OmpPi8fkN65Wla73fd/cTWGQqiM1wv2rccUBMEF29tyPD6grtYwUiEEL
+         pnYNCyiaFkAE8DXEvFQPrgylJki3cEEZ+Tw5NaWhgabTqDP1ApubzcTJ1qEDq5mZn1jV
+         u69ywSB+lLQYtt9uFlo71C/qZyA5y7w9qaqSMZL33QKk1eA6a37HJyfDwHdStv2nYQxx
+         +GNQ==
+X-Forwarded-Encrypted: i=1; AKwUvBw35IPI/ZFDiTXfSjOV1sI+v/rkVSKUlGZ3LsfrHx73uGmaVQwETy1cr8DoT0B6a9Utw+wPz9KX4ndQrH0=@vger.kernel.org
+X-Gm-Message-State: AFuF++kqKOBcf10rd3KPwHXEE1uWW+0XCSolZDZN7LFd20RgZUpZgzLF
+	NpnUrPswEd0+MPPakBiTOx2E6keD7Hu2+JfvIu2iIUcW7D24/hSIZSnS
+X-Gm-Gg: AYBFou1HMCJoGRZ+x7MOMMAMo5WjNtd13gIXZFEc29JBtQMrlU+Vow9GPAmPy4/0VPd
+	3V9fQY3ZY33MTc7oJuPbONsVdM0zX+1S3kpS5vSpy4cCHqNPI9SYmTSikj6foTY6UetNiBsuDBH
+	o3oWfgyRHSR7AB4GcZd41kid6CLRV63nMWuiupkqHeM6klGUOGDzoABXw+UHX5awe1RdgmFhre5
+	+tAsSjF8qv8dKJ6VGHMwMmId/489EwSxD0GGzLd4xg4eEsGHEvlV4kTHEuxrVO/jNQaGmUoaqsc
+	6Hs6CDmbKdphEqI16jO6I6CB49OLr2coDhE5wrGUouW6UItNPi/ZyOMBLacKLWaows2qkP4gfqR
+	41n7rktHZnhKYmFOb35ZnawuaDq7hEqMbBtKWIK2yEo0M/qeNUPUzkO8TkdttaRG8Lae6QyjhUJ
+	eofdbQc18yjmQinwJ2tA57RrObxzjDbPKMp/20fvw6MqmipP2QQEBAfkqvZ9EAPIpFCPKngUYK2
+	vXWoN55ba5QCepthz5z9Nocq2TTm8z2xuQX
+X-Received: by 2002:a05:600c:138b:b0:49e:2a61:a17b with SMTP id 5b1f17b1804b1-49e2a61a41emr9166915e9.5.1789032546119;
+        Thu, 10 Sep 2026 02:29:06 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49d20fc23fcsm106027125e9.3.2026.09.10.02.29.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Sep 2026 02:13:23 -0700 (PDT)
-From: Dmitrii Tulnov <tulnov.dl@gmail.com>
-To: julianbraha@gmail.com
-Cc: nathan@kernel.org,
-	nsc@kernel.org,
-	jacmet@uclibc.org,
-	yann.morin.1998@free.fr,
-	linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] kconfig: warn about malformed KCONFIG_PROBABILITY values
-Date: Thu, 10 Sep 2026 12:13:22 +0300
-Message-ID: <20260910091322.4-1-tulnov.dl@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <a6171a9b-de34-45c2-90a3-4e5bc185e700@gmail.com>
-References: <a6171a9b-de34-45c2-90a3-4e5bc185e700@gmail.com>
+        Thu, 10 Sep 2026 02:29:05 -0700 (PDT)
+Date: Thu, 10 Sep 2026 10:29:03 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Nathan Chancellor
+ <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, Nick Desaulniers
+ <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, Justin Stitt
+ <justinstitt@google.com>, Masahiro Yamada <masahiroy@kernel.org>, Alexey
+ Gladkov <legion@kernel.org>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar
+ <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+ <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
+ <hpa@zytor.com>, Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti
+ <alex@ghiti.fr>, Arnd Bergmann <arnd@arndb.de>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Mark Rutland
+ <mark.rutland@arm.com>, Ard Biesheuvel <ardb@kernel.org>, Ilias Apalodimas
+ <ilias.apalodimas@linaro.org>, Josh Poimboeuf <jpoimboe@kernel.org>, Peter
+ Zijlstra <peterz@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Boqun
+ Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, =?UTF-8?B?QmrDtnJu?=
+ Roy Baron <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>,
+ Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl
+ <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich
+ <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, Tamir
+ Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>,
+ Onur =?UTF-8?B?w5Z6a2Fu?= <work@onurozkan.dev>, Jonathan Corbet
+ <corbet@lwn.net>, Randy Dunlap <rdunlap@infradead.org>,
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+ llvm@lists.linux.dev, linux-riscv@lists.infradead.org,
+ linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ linux-doc@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH 04/23] kallsyms: output binary data to speed output and
+ kallsyms assembly
+Message-ID: <20260910102903.1b211f6b@pumpkin>
+In-Reply-To: <20260908-build-speedup-v1-4-5dc1ac01672d@kernel.org>
+References: <20260908-build-speedup-v1-0-5dc1ac01672d@kernel.org>
+	<20260908-build-speedup-v1-4-5dc1ac01672d@kernel.org>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Julian,
+On Tue, 08 Sep 2026 21:55:04 +0100
+"Lorenzo Stoakes (ARM)" <ljs@kernel.org> wrote:
 
-Thanks for the review. I've addressed your comments locally for v3.
-Before sending it, I'd like to clarify how the new warning should
-interact with KCONFIG_WERROR.
+> kallsyms generates an assembly file that consists mostly of .byte entries
+> containing compressed names, token strings and name-sorted sequence
+> numbers.
+> 
+> For an x86-64 build with 158k symbols that is a 37 MiB .S file which takes
+> 0.57s to assemble each of the two to three times it is built over a kernel
+> build.
+> 
+> Each time it is generated it also takes kallsyms a similar amount of time
+> to output it.
+> 
+> Avoid this overhead by instead outputting this data as binary and importing
+> it into the assembly using the .incbin directive.
+> 
+> Tables that are wider than a byte remain part of the assembly to ensure
+> endianness and relative relocations are performed correctly.
+> 
+> With this change, the output assembly file shrinks from 37 MiB to 9.8 MiB,
+> with a 2.6 MiB binary data file alongside it, and the object remains
+> identical.
+> 
+> The generated binary file is deleted correctly on build clean along with
+> all other ephemeral data.
+> 
+> On an x86-64 system with CONFIG_KALLSYMS_ALL set:
+> 
+>                        before   after    delta
+>   scripts/kallsyms     0.24s    0.18s    0.06s
+>   assemble             0.57s    0.16s    0.41s
+> 
+> Per kallsyms invocation/assembly, for a total of 0.47s time saving upon
+> invocation.
+> 
+> An incremental build on the same system was reduced from 11.15s to 9.65s,
+> indicating a total of 1.5 seconds saved over the build.
+> 
+> The kallsyms runs and their assembly are on the serial tail of every build
+> that links vmlinux, no-op builds are unchanged.
+> 
+> Whole build, 128-thread Threadripper 9980X, best of N runs:
+> 
+>                                          before   after     delta
+>                                          -------------------------------
+>   x86 defconfig, touch mm/vma.c, gcc       10.8s     9.9s    -0.92s (-8%)
+>   x86 defconfig, touch mm/vma.c, clang     10.7s     9.5s     -1.2s (-11%)
+>   x86 defconfig, clean, gcc                29.5s    28.7s    -0.81s (-3%)
+>   x86 defconfig, clean, clang              29.7s    28.6s     -1.1s (-4%)
+>   x86 allmodconfig, touch mm/vma.c, gcc    45.3s    44.0s     -1.3s (-3%)
+>   x86 allmodconfig, touch mm/vma.c, clang  42.9s    40.2s     -2.7s (-6%)
+> 
+> Assisted-by: LLM
+> Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+> ---
+>  scripts/kallsyms.c      | 97 ++++++++++++++++++++++++++++++++++++++-----------
+>  scripts/link-vmlinux.sh |  2 +-
+>  2 files changed, 77 insertions(+), 22 deletions(-)
+> 
+> diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+> index 350d118c3b9e..61c5eb537ed4 100644
+> --- a/scripts/kallsyms.c
+> +++ b/scripts/kallsyms.c
+> @@ -5,7 +5,10 @@
+>   * This software may be used and distributed according to the terms
+>   * of the GNU General Public License, incorporated herein by reference.
+>   *
+> - * Usage: kallsyms [--all-symbols] in.map > out.S
+> + * Usage: kallsyms [--all-symbols] [--pc-relative] in.map out.bin > out.S
+> + *
+> + *      The byte tables go to out.bin and are pulled into out.S with .incbin;
+> + *  wider tables stay assembler source for endianness and relocations.
+>   *
+>   *      Table compression uses all the unused char codes on the symbols and
+>   *  maps these to the most used substrings (tokens). For instance, it might
+> @@ -102,7 +105,7 @@ static void sym_arr_free(struct sym_arr *arr)
+>  
+>  static void usage(void)
+>  {
+> -	fprintf(stderr, "Usage: kallsyms [--all-symbols] in.map > out.S\n");
+> +	fprintf(stderr, "Usage: kallsyms [--all-symbols] [--pc-relative] in.map out.bin > out.S\n");
+>  	exit(1);
+>  }
+>  
+> @@ -319,6 +322,40 @@ static void output_label(const char *label)
+>  	printf("%s:\n", label);
+>  }
+>  
+> +static void write_bin(FILE *file, const void *data, size_t len)
+> +{
+> +	if (fwrite(data, 1, len, file) == len)
+> +		return;
+> +
+> +	perror("kallsyms: write");
+> +	exit(EXIT_FAILURE);
+> +}
 
-With KCONFIG_PROBABILITY=50% and KCONFIG_WERROR=1, v2 and my current
-v3 still exit successfully and write .config. The warning is printed
-directly and does not go through the existing warning/error handling.
+It is pretty pointless checking the return value from fwrite().
+Most of the time it is just doing a memcpy().
+Instead call fflush() and the ferror() prior to the fclose().
+(Or just rely on fclose() giving you that error status.)
 
-Would you prefer it to become an error when KCONFIG_WERROR is set,
-while remaining a warning otherwise, or to stay non-fatal even in
-that mode during the compatibility period? I'd lean toward honoring
-the explicit strict mode.
-
-For the compatibility tests, I propose comparing the generated
-configurations for 50% versus 50:0:0 and -0 versus 0 with the same
-seed, and checking that the malformed input produces exactly one
-warning. That would put checks for the preserved interpretation in
-the submitted tests, in addition to the local comparisons I've run.
-Does that sound appropriate for this patch?
-
-Best regards,
-Dmitrii
+David
