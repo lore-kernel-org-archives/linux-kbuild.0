@@ -1,69 +1,70 @@
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E94F583AA8
-	for <linux-kbuild@vger.kernel.org>; Thu, 10 Sep 2026 19:22:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19C1643DECD
+	for <linux-kbuild@vger.kernel.org>; Thu, 10 Sep 2026 21:18:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789068164; cv=none; b=GKXXGx4tVsEQV/oHPJk4XCdw9rdOOGs/PEx9924toTK1wqdbqSplja5j5H826gafc4Pe32KCTLG5Se8BBwy0AlpExyVXeEhsq9CtImhRbUGJk06atYllh9HLcLSStM0+jdh6cdChLDXbBtrcMgM2FdXFU94Jj0nUXI7LLNNsDLI=
+	t=1789075088; cv=none; b=Y910749a1W3HEZZ3qWAhwGC2SZJmenkkAoPKWnx1l9kG8YfT4gcLcVetg6EGZYmpAmcxNvGWvmt2k0xfHwL0Re39IH+Ok5DvEqFoVB+1TB4iG3EL0/oqZ6ttpd+U0IJg6hZudTa6fimNiPLS0e7uH4A0nBpnIUVYc5Recb6kk8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789068164; c=relaxed/simple;
-	bh=PQ7ZF7tbCdfpJdm1QzKqAujOYElxa1wi4iIn5WHbJZM=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Xno2dv4orkHzCoIaFJpjKBely3HdgyoD8PYafhKMgaj8HKQ258ESaCieRGLJeKTokOLVMf64PVRGUTe7atpKhBGJ+f36y+ujcKRo5gNfOVQvH87vbPF3HMc+LjosR00aVYi+k7EdefZGLyCG+d1UMM3pqHl+wRO+IIOD3BIvRuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hDpzPQX8; arc=none smtp.client-ip=209.85.221.45
+	s=arc-20240116; t=1789075088; c=relaxed/simple;
+	bh=F9HgVcWPXpU8hJ9oNZYqhSMCDj8N62eZk5P035qTYQA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ayy7nwV2/NJrqXx2aPgucaSxkG/MIkdpX+oO30HKkOPNDhpxf3uDkWmR8OZENcRHwVl2QZRCNyzkq6hHwwfh4s0V47qrMyfwMl6kwONNwY9JdQ5tyLX87eS0nOOy9/UTFh6G1yur3uN+n4xaaQiOwZChotdBagxzRKXTNRZomJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lb3K4ynJ; arc=none smtp.client-ip=209.85.221.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hDpzPQX8"
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-4858303de5dso100385f8f.2
-        for <linux-kbuild@vger.kernel.org>; Thu, 10 Sep 2026 12:22:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lb3K4ynJ"
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-48589798dbbso161548f8f.3
+        for <linux-kbuild@vger.kernel.org>; Thu, 10 Sep 2026 14:18:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789068159; x=1789672959; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :references:cc:to:subject:from:user-agent:mime-version:date
-         :message-id:sender:from:to:cc:subject:date:message-id:reply-to
+        d=gmail.com; s=20251104; t=1789075079; x=1789679879; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:sender:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=STtSOXgwYAOvGJIuaHYNYi0eV6MrslGFexph89oXLmw=;
-        b=hDpzPQX8t7KrWSTwafXDYXis4e5C/y+oKRIhW+8B5izsciQQ4uEnr8Y50NCGluVRk4
-         GoAdO3p2RxcVU13EMWNGGmfMGUbluXfAQNmwp3gXFtJXTsne0sdpEjPUfpPSqWgddfyE
-         DwQxJc8GBp68qvsB8eyUZ38fOBnIG6BYanHjqteCvIaSLqhyWzbVrkaDkRHfHrgPvr6b
-         c+kvhQvbcC+xeDWXrXEfNmXf2kCSptnoNNnAB64ify64MuRgqqcjdfEKpkEmddH37tHz
-         r1V/HRil1TH0l283RXn69KWn09r3MR6EiqFFhVXHr247D3MNrjsfkCtlTMya/rxsGU8z
-         gGEg==
+        bh=5aCQnhClDl9eNpW8F+cN6KkIYA0TsSlZlvTBInA/6z0=;
+        b=Lb3K4ynJNVElpJ39InDMIJ5MPmOErz8P5gGHc/P7yDveW8t1MBr8LGQ0TVmswVRUn9
+         kh0lZjvIHPtGKsEmxMt2YVTB1/e0W0j2JT27xtQXfB8vjLzJVO+yAO0TDDj1YzpTsQ81
+         KB2GGQK+iqOvE8uv/ORla2V/JBorE4pfHNB5FHEu61rux1yRVMDkx3Q27eH9BvCGtJNe
+         aLvOJGX82fYex/RNyYWv/yBVSRAiONrlf/4dlJd3/vApU2lUyK65uTZ5kO1c+VrszTCf
+         eJprpDWPpWd7+OVnGkogfO9CUw2PkrXQM6WBtHJAKLs/xeHlrI57bjTPAHHMzS6L0SPA
+         M3Bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789068159; x=1789672959;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :references:cc:to:subject:from:user-agent:mime-version:date
-         :message-id:sender:x-gm-gg:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=STtSOXgwYAOvGJIuaHYNYi0eV6MrslGFexph89oXLmw=;
-        b=nfV60/6eDWwK5QoWxiN85qK9j8J9mpRB8bfI9MiHlzu1jlo9mxnpSb1XpnL/vYyLBl
-         jdtmvfZoha8u7nP8iu2yJMTyLDe8i6ts53ByxU0qVZZ2XABU3v5Fw19JXM2ukoIQM39S
-         lbtPQUsc2501WEgtluFuYL7Bn2o2MkZM56Qqrhza6ndBFbqgBW6NPO87ap/faZSVyX7A
-         jF+l3kfrbGjKom3rtk21QaVh35wfg+FvI7VzwlXkVklqtnofMeB2ytesgD8HT0mWuSne
-         p5Fj+qC35uo/Jl0rDSvPKYg+iS+MZnaMqqiFmiSoC3HLTZ6dU7jnFqVkqwPj0b0AVi9X
-         mpww==
-X-Forwarded-Encrypted: i=1; AKwUvBztaIBto42Ug76Cjn1rL6FI1zDhZlx6xJGeCownpIS1Tnir4wmcul24wOTmDb6DSIqN1Kj8O85CtbAOVAM=@vger.kernel.org
-X-Gm-Message-State: AFuF++k8Qbcvql6aI1JLr7y+2vprCisNd7NKyINYZOL9qDo7T811dSGT
-	zot+by+d2ojr+8aOZd/28nQlM5TaTy6f4wgmSKSYgdmUgKkfZ8VuTDi/
-X-Gm-Gg: AYBFou1TodlzeNJVQU+5qVDT9PG6z9BLSeEkDWObESDHUKW3fJQdoppK97xPHYai+T+
-	OZgvT6cdj8Nx1xkUu/Z7sftEOtz4R+/updAEjB0fma4dnGodWGpAhXM+YJbzifr5lNCruwmVkZ/
-	Ae4yg+KAgd4zOU5qx4CLd7PsIDLKl7gFWxfEbBI6GyroedO6mou5qtTC9j8VgSY3FKqIw/vtcOY
-	pHc7s5PJW4bGZbwagnA5wOI9BofUnttOTpOfkrNIIIH/W791r2EcuK1pDvVXIFNG979Qh7jUdwW
-	9ab+vchx8yAS44jnw8/9m9zfAAg9avdwhhK/WMT8NmjZF4TfC3nikqhwOJzioWTx8JhYNIbaRcc
-	WueCpRFTGQin7xNfe9HHUF0H7okB4IST8O/wLT0F3HyH3hbBX4DyxpxMYVHr1Xh1q8YXzv7+1O7
-	wV9CqcHo29HOsYro1pPUTqvAA2XDzuHu9mD61TMm/F8eRdbLpCPpZj3LMMGaAd6McrlP08ZdlWp
-	nRVUCa0p12npurYNeQ6IwhdIRNrHYtpomajRh4G7wxh0wP5IxxWI9UVdLVPMt0qCdM=
-X-Received: by 2002:adf:ed8d:0:b0:484:41cb:d5f0 with SMTP id ffacd0b85a97d-486eb2f0554mr408036f8f.17.1789068158634;
-        Thu, 10 Sep 2026 12:22:38 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1789075079; x=1789679879;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:sender:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=5aCQnhClDl9eNpW8F+cN6KkIYA0TsSlZlvTBInA/6z0=;
+        b=J6S+5Caa8uq/yjl5VN80pAiu729+umxHzA8rGk26XsCNQvSth+GHODRHk69FCaEw4+
+         z09umr+UF4Qee3WcdOWapLe0FSYfRUkR16daOEMCes6ofrOyvY24lVc4D7YCMJqj/KFv
+         R0fP/dIAkKdf7b94BcT0GnYMUg8bltOAaV6uQQvU+4WO27lfnutn5W65fH0xAlxpKa+s
+         T2/NC//KCzjaOT0OVZrIQ0Oat+ytbU7PMAUILuo70n+RTuX61T11PZMGtUJW3QwxxDul
+         4XykjMpbYkdV2+JM8/bg6hwSDh12/kWSByK/RmxjAX4HUaHGTaa9dpsLtVNnXU1N8ITy
+         Z0jQ==
+X-Forwarded-Encrypted: i=1; AKwUvByZWyOCvKHIb8aTl14oyumctiZp0Uw9M2rVqQofptDTLE4Nsavo8D6xBjpg4kS0vCahKUS2h2EVFrbjMO4=@vger.kernel.org
+X-Gm-Message-State: AFuF++k/QcB7ufHhTBetdVhziQYAXo1ZafON0hrk0S7S0yJcsm9X4Q20
+	pT3tYy7CfhTP8Sw1HIkwkQFrbL9Ort/Khl4uCA/7ndagmWINVkknGxYO
+X-Gm-Gg: AYBFou0mCfHOKrLqjsySRxKNGR1P9ODxl9D8FZWEsQVb1Oxgz7hpCNvGh+Z/mCNZ2TM
+	yRcI63rS2XX6lXBqQkPfEd+gj1ympEFAtDFazEaguON/UMCIhkIbtaLxsRnzFTvBcrCM77AdF9Z
+	uPYE1DBq4hKUjg74Yot6gpAaaoiqGIITROf/Pi6PcMsIpPeCrSGm+/PWMCofXH7/ZgMf22b/gs3
+	7xd4DoJmQiwt18M1zPO9ADMaJsXNf075FIfiFdZemQDhAmY9jYn507vQQ3DHBmHFt+B6VCTy2M5
+	3naqadMoNR4P1a7C96eoj/bXCy6zkQ2vC6BVzo5ZRkUsetf5kx+g7U9XFAPaYTHnLXZvg6NSM9D
+	6+XIPqUtpRrmxzpdM3QVGW4zgT1XircaUZQDEvRFXl+W5YSE8xNXCG0Zkr/N8PNggd3bPoYZ3W0
+	lhxtTfFaF3MaQd4wt8CuB+xWAlYamXmrZGNmCT+z9FvmFRVuzYU9Y5uBCKESEC+vcJrOKE7nxg7
+	ZKQ/wo9DoXj089Vcl51JWbyXM571dbWSt76jKDj4pSaVgF2KAyfBDdfrzMzEp4DQfDLdIUeWrzd
+	jw==
+X-Received: by 2002:a5d:648f:0:b0:484:3310:f395 with SMTP id ffacd0b85a97d-486eb308d7bmr760212f8f.24.1789075078967;
+        Thu, 10 Sep 2026 14:17:58 -0700 (PDT)
 Received: from [10.128.10.232] (195-23-151-163.net.novis.pt. [195.23.151.163])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-486eaccaa1asm861074f8f.0.2026.09.10.12.22.37
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-486eb2ecf23sm1112262f8f.5.2026.09.10.14.17.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Sep 2026 12:22:38 -0700 (PDT)
+        Thu, 10 Sep 2026 14:17:58 -0700 (PDT)
 Sender: Julian Braha <julian.braha@gmail.com>
-Message-ID: <1506b117-6e79-4740-8e31-ce0d7a9c0d1b@gmail.com>
-Date: Thu, 10 Sep 2026 20:22:37 +0100
+Message-ID: <55e18f27-0ba1-433e-b4dc-a7db70172f7a@gmail.com>
+Date: Thu, 10 Sep 2026 22:17:57 +0100
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -71,85 +72,171 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: Julian Braha <julianbraha@gmail.com>
-Subject: Re: [PATCH v2 02/27] kbuild: Add CONFIG_OBJTOOL_DEFERRED
-To: Josh Poimboeuf <jpoimboe@kernel.org>, x86@kernel.org
-Cc: linux-kernel@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>,
- Gary Guo <gary@garyguo.net>, rust-for-linux@vger.kernel.org,
- Ard Biesheuvel <ardb@kernel.org>, Miguel Ojeda <ojeda@kernel.org>,
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
- linux-kbuild@vger.kernel.org, Huacai Chen <chenhuacai@kernel.org>
-References: <cover.1788899473.git.jpoimboe@kernel.org>
- <166ab4ef8f062db45d5e4ab928f940d08dc465d5.1788899473.git.jpoimboe@kernel.org>
+Subject: Re: [PATCH v3] kconfig: warn about malformed KCONFIG_PROBABILITY
+ values
+To: Dmitrii Tulnov <tulnov.dl@gmail.com>, nathan@kernel.org, nsc@kernel.org
+Cc: jacmet@uclibc.org, yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <71d40a5d-21a7-47ae-aa18-34f640a08779@gmail.com>
+ <20260910120442.26-1-tulnov.dl@gmail.com>
 Content-Language: en-US
-In-Reply-To: <166ab4ef8f062db45d5e4ab928f940d08dc465d5.1788899473.git.jpoimboe@kernel.org>
+From: Julian Braha <julianbraha@gmail.com>
+In-Reply-To: <20260910120442.26-1-tulnov.dl@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi Josh,
-
-On 9/8/26 21:33, Josh Poimboeuf wrote:
-> For LTO, IBT, and KLP builds, the running of objtool is deferred to
-> vmlinux.o rather than individual translation units.  In preparation for
-> deferring it in more cases, add a new config option.
+On 9/10/26 13:04, Dmitrii Tulnov wrote:
+> randconfig checks the numeric range of each probability but does not
+> validate where strtol() stops. For example, KCONFIG_PROBABILITY=50% is
+> accepted as 50:0:0: the '%' is parsed repeatedly as zero. For the
+> documented value 50, tristate y/m/n probabilities are 25%/25%/50%.
+> With 50%, both y/m probabilities silently become zero, reducing the
+> coverage of random configuration builds. Empty fields and extra fields
+> are also accepted.
 > 
-> No functional change.
+> Warn when the value does not follow the documented decimal format. For
+> malformed inputs whose parsed probabilities are in range, preserve the
+> existing interpretation unless KCONFIG_WERROR is set. In that case, exit
+> with an error before writing the configuration. Leading whitespace and
+> signs are accepted by strtol(), but also trigger the warning because they
+> are outside the documented format.
 > 
-> Signed-off-by: Josh Poimboeuf <jpoimboe@kernel.org>
+> Keep the strtol() result as long until the range check. This rejects
+> out-of-range values that narrowing to int previously made valid, such as
+> 4294967296 becoming zero on a 64-bit host, regardless of KCONFIG_WERROR.
+> 
+> Add regression tests for one warning per malformed input, preserved
+> configurations, KCONFIG_WERROR, out-of-range values, the supported
+> probability formats, and the documented empty-value default.
+> 
+> Fixes: e43956e60769 ("kconfig: implement KCONFIG_PROBABILITY for randconfig")
+> Assisted-by: LLM
+> Signed-off-by: Dmitrii Tulnov <tulnov.dl@gmail.com>
 > ---
->  arch/x86/boot/startup/Makefile |  2 +-
->  lib/Kconfig.debug              |  7 +++++++
->  scripts/Makefile.build         |  4 ++--
->  scripts/Makefile.lib           |  4 +---
->  scripts/Makefile.vmlinux_o     | 13 +++++++------
->  scripts/link-vmlinux.sh        |  3 +--
->  6 files changed, 19 insertions(+), 14 deletions(-)
+> Changes since v2:
+> - Move the expected tristate distribution into the problem description.
+> - Simplify the initial format check to !isdigit((unsigned char)*env).
+> - Pass probability values and seeds through conf._run_conf(extra_env=...).
+>   Use monkeypatch.delenv only to remove inherited variables.
+> - Add -0, +0, bare + and - warning cases, and the +101 range-error case.
+> - Honor KCONFIG_WERROR for malformed format warnings, as discussed with
+>   Julian. Check unset, empty, 0 and 1 flag behavior.
+> - Compare 50% with 50:0:0 and -0 with 0 across 20 fixed seeds and check
+>   that each malformed input produces exactly one warning.
+> - Clarify that compatibility applies to malformed in-range inputs with
+>   KCONFIG_WERROR unset; values previously accepted by narrowing now fail.
 > 
-> diff --git a/arch/x86/boot/startup/Makefile b/arch/x86/boot/startup/Makefile
-> index 5e499cfb29b5c..ab6e9970d4f4e 100644
-> --- a/arch/x86/boot/startup/Makefile
-> +++ b/arch/x86/boot/startup/Makefile
-> @@ -36,7 +36,7 @@ $(patsubst %.o,$(obj)/%.o,$(lib-y)): OBJECT_FILES_NON_STANDARD := y
->  # relocations, even if other objtool actions are being deferred.
->  #
->  $(pi-objs): objtool-enabled	= 1
-> -$(pi-objs): objtool-args	= $(if $(delay-objtool),--dry-run,$(objtool-args-y)) --noabs
-> +$(pi-objs): objtool-args	= $(if $(CONFIG_OBJTOOL_DEFERRED),--dry-run,$(objtool-args-y)) --noabs
+> Changes since v1:
+> - Warn about malformed in-range values while retaining their previous
+>   interpretation by default.
+> - Warn about leading whitespace and signs as undocumented input.
+> - Clarify that 50 gives tristate y/m/n probabilities of 25%/25%/50%, and
+>   compare it with the equivalent input 50:25:25 across 20 fixed seeds.
+> 
+> Validation on kbuild-next, x86_64, GCC 13.3.0:
+> - make testconfig with HOSTCFLAGS=-Werror: 138 passed. With the unpatched
+>   conf: 74 failed, 64 passed; failures cover missing format warnings,
+>   unchecked narrowing and ignored KCONFIG_WERROR. The previous v3 draft
+>   fails only the nine strict-mode regression cases; 129 tests pass.
+> - ASan/UBSan at -O1, with leak detection disabled: the same 138 tests passed.
+> - Both v3 builds matched the submitted v2 on 1,635 inputs: 916 accepted
+>   values and 719 range errors, with KCONFIG_WERROR unset. Each also matched
+>   the original on 380 documented-input comparisons with fixed seeds.
+> - Each build passed 120 strict format-error checks: no output created in
+>   a fresh directory; existing .config, .config.old and input files stayed
+>   unchanged, including with KCONFIG_ALLCONFIG and KCONFIG_OVERWRITECONFIG.
+>   Valid inputs, range diagnostics and other configuration modes were also
+>   checked with KCONFIG_WERROR set.
+> - The probability tests also passed with conflicting probability and seed
+>   values and KCONFIG_WERROR=1 inherited from the test runner's environment.
+> - make defconfig, allnoconfig, allmodconfig and valid randconfig passed.
+>   KCONFIG_PROBABILITY=50% now produces a warning and remains compatible.
+> - No vmlinux build or boot test; this changes the host configuration tool.
+>   32-bit hosts and other libc implementations were not tested.
+> 
+>  scripts/kconfig/conf.c                        |  16 +-
+>  .../tests/randconfig_probability/Kconfig      |  12 ++
+>  .../tests/randconfig_probability/__init__.py  | 137 ++++++++++++++++++
+>  3 files changed, 164 insertions(+), 1 deletion(-)
+>  create mode 100644 scripts/kconfig/tests/randconfig_probability/Kconfig
+>  create mode 100644 scripts/kconfig/tests/randconfig_probability/__init__.py
+> 
+> diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+> index fe8ba09b0..ca6d9d735 100644
+> --- a/scripts/kconfig/conf.c
+> +++ b/scripts/kconfig/conf.c
+> @@ -186,12 +186,23 @@ static void conf_set_all_new_symbols(enum conf_def_mode mode)
 >  
->  #
->  # Confine the startup code by prefixing all symbols with __pi_ (for position
-> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-> index 134b15a44625e..566e5be4c3f57 100644
-> --- a/lib/Kconfig.debug
-> +++ b/lib/Kconfig.debug
-> @@ -588,6 +588,13 @@ config NOINSTR_VALIDATION
->  	select OBJTOOL
->  	default y
+>  	if (mode == def_random) {
+>  		int n, p[3];
+> +		bool warned = false;
+>  		char *env = getenv("KCONFIG_PROBABILITY");
 >  
-> +# For when objtool defers its work to the linked image (vmlinux.o or module.o)
-> +# rather than running on individual translation units.
-> +config OBJTOOL_DEFERRED
-> +	def_bool y
-> +	depends on OBJTOOL
-> +	depends on LTO_CLANG || X86_KERNEL_IBT || KLP_BUILD
+>  		n = 0;
+>  		while (env && *env) {
+>  			char *endp;
+> -			int tmp = strtol(env, &endp, 10);
+> +			long tmp = strtol(env, &endp, 10);
 > +
+> +			if (!isdigit((unsigned char)*env) ||
+> +			    (*endp && *endp != ':') ||
+> +			    (*endp == ':' && (!endp[1] || n == 2))) {
+> +				if (!warned) {
+> +					fprintf(stderr,
+> +						"warning: KCONFIG_PROBABILITY has malformed format\n");
+> +					warned = true;
+> +				}
+> +			}
+>  
+>  			if (tmp >= 0 && tmp <= 100) {
+>  				p[n++] = tmp;
+> @@ -227,6 +238,9 @@ static void conf_set_all_new_symbols(enum conf_def_mode mode)
+>  			perror("KCONFIG_PROBABILITY");
+>  			exit(1);
+>  		}
+> +
+> +		if (warned && getenv("KCONFIG_WERROR"))
+> +			exit(1);
+>  	}
+>  
+>  	menu_for_each_entry(menu) {
+> diff --git a/scripts/kconfig/tests/randconfig_probability/Kconfig b/scripts/kconfig/tests/randconfig_probability/Kconfig
+> new file mode 100644
+> index 000000000..84f4e5fcc
+> --- /dev/null
+> +++ b/scripts/kconfig/tests/randconfig_probability/Kconfig
+> @@ -0,0 +1,12 @@
+> +# SPDX-License-Identifier: GPL-2.0-only
+> +
+> +config MODULES
+> +	bool
+> +	default y
+> +	modules
+> +
+> +config BOOL
+> +	bool "Bool"
+> +
+> +config TRI
+> +	tristate "Tristate"
+> diff --git a/scripts/kconfig/tests/randconfig_probability/__init__.py b/scripts/kconfig/tests/randconfig_probability/__init__.py
+> new file mode 100644
+> index 000000000..76fc39c94
+> --- /dev/null
+> +++ b/scripts/kconfig/tests/randconfig_probability/__init__.py
+> @@ -0,0 +1,137 @@
+> +# SPDX-License-Identifier: GPL-2.0-only
+> +"""Validate KCONFIG_PROBABILITY without changing the supported distributions."""
+> +
+> +import pytest
+> +
+> +
+> +@pytest.fixture(autouse=True)
+> +def clear_werror(monkeypatch):
+> +    # extra_env can set strict mode, but cannot remove an inherited flag.
+> +    monkeypatch.delenv('KCONFIG_WERROR', raising=False)
 
-Just commenting: if you move this option OBJTOOL_DEFERRED (and
-OBJTOOL_CONTROL_FLOW in the next patch) a few entries up in this Kconfig
-file, menuconfig will render them as part of the OBJTOOL submenu because
-of the dependency on OBJTOOL.
-
-E.g. this ordering:
-
-OBJTOOL
-OBJTOOL_WERROR
-OBJTOOL_DEFERRED
-OBJTOOL_CONTROL_FLOW
-STACK_VALIDATION
-NOINSTR_VALIDATION
-
-would render better.
-
-But this is minor, I don't think it necessitates a v3 on its own.
+Clearing this environment variable doesn't belong here, it should be
+part of scripts/kconfig/tests/conftest.py.
 
 - Julian Braha
+
