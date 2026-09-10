@@ -1,155 +1,166 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC5373ACEE2;
-	Thu, 10 Sep 2026 07:29:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A98D3A782D;
+	Thu, 10 Sep 2026 08:33:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789025361; cv=none; b=rUO1sQycoKLkbggS8bViJ0LydPdWXaQMvUYKuS7Ugf62YM2hlQaeIS0r6i7Mq4RsT/PTk1YGW704s0It72/+RXWcz55gNZDndKrOYnN7B0ywYampJtTMRMzzVXvFk/gjnJK7o5CC04R3TzGcMxW55L+CuSGt3N/tn3QjFn4u4uU=
+	t=1789029192; cv=none; b=g9YEK8PFuWiayArAknVFsET+yuRWfURNlk9jmPOeTu76akvj+NslZiRqrzio1qNkfAtjGE2s0wNZ2xxx9WNornpHcun5dNDDHliwzMyKtmXePPeUVjacPNUyYpKY0loSxjhrfGYvlZAz1anRmXQ6bP8mkbDoh2lWTkOWJ/mVvnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789025361; c=relaxed/simple;
-	bh=SDMg6oyZQw6A03eQKQ3Uptuv442Scy0myCx4pmCTZ2Y=;
+	s=arc-20240116; t=1789029192; c=relaxed/simple;
+	bh=cT3gEwCENyvltQvdtkD7ViWmkEsUqe2m+2Mwtbh6C6I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FHQz6scCWV33MkIR946szX9zjH0u7lV9vCWs1XGSf+MwewJQ2+lwTvHvcjy54nNBUGWh+FgOhgvS46fSujU5m7guQMTpMa9KkMvP/tWCxIWQysMQCEL5mfbYFsPKEZ/UQ1W0gzce9ntQMpDOvf9JvApGqT0DyADNmn132ATMePU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MY03GOet; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=GRVwPosHJ3WmZtoa+81A46+/0KGJk6FAQKO1hKClvLlqx7vnQZtPJ25ep34CImNROoKtGJpUI1k11A0R5jDJPg41mXHMrtZDDIGmccxZn1Pd+MoYEWEE9rDgp0rYlS1L3mJ+bF6KOw3dsoOCv5sRTkVns0L5xsGK2WJpPcOBK64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=nq0t+a13; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=5bolpWR6; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MY03GOet"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9E611F0089E;
-	Thu, 10 Sep 2026 07:29:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789025359;
-	bh=u3R7KOyofrS0wRSjak8aNV75X2Czsw9QjnW4+38O/ZQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=MY03GOetu5SKBp9nkWTrxqdG7Jl6/NG2Hl+PUb+xVMhfRY77IW+ocH4B48v9OlZH+
-	 2jNjsuE5l7TpMAH4tErFkuASZJQp1s4gqxabcfqFAipFRFLnJoAF9of4isP7Umzi7X
-	 Br84MtRcqTzhRIQx94sSrFT2GUsb/WfFTvrliT9WRrtFns/42kuCEHMX+eQj6SGnZj
-	 6SKyKJyXMZFLIO/MXaq1HQg5I1fUaIXvYvH2imSIKOP1ZdPpYtxN5Nzhby8vBAnpSq
-	 IKWJdVIggpp6it5npUAN6DPsZWIKMJdRJSMqtDQcP+//G3+4DT/6tHCVZ5uOWCi/vM
-	 lQfu9E+dLqOeg==
-Date: Thu, 10 Sep 2026 09:29:14 +0200
-From: Joel Granados <joel.granados@kernel.org>
-To: Mauricio Faria de Oliveira <mfo@igalia.com>
-Cc: Kees Cook <kees@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nsc@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, kernel-dev@igalia.com, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, fsverity@lists.linux.dev, 
-	keyrings@vger.kernel.org, bpf@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, netdev@vger.kernel.org, linux-wpan@vger.kernel.org, 
-	lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-	linux-sctp@vger.kernel.org, linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org, 
-	bridge@lists.linux.dev, mptcp@lists.linux.dev, rds-devel@oss.oracle.com, 
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH RFC v3 00/13] sysctl: add module aliases
-Message-ID: <uufwu7rqyxf7h55lgavcwrnylnq5gdbd7o5d7mfugrxpblds2d@adra5c2z22gg>
-References: <20260819-sysctl-module-aliases-v3-0-aab90569365d@igalia.com>
- <bpnqwggtidgiec5akns3fa5edbsvl7xf55dxabtwng2xspy4pn@ue554aii2ngk>
- <53155340c897560bfc67e61ba9568fd6@igalia.com>
- <mokz5pdtwswkyab4byfq7q7m6ac2g6ceoi6jflyxmaszaibzqa@su6m4kamtdpy>
- <b1a6cec17e7c828fcebe310ca2a0d25b@igalia.com>
- <rywhz6soawf5dzyui5g7dnbufsgpxr7ma7honuhejwgncemzrm@f32at7hl6ugm>
- <6e93af907298022f077126f1be7bd386@igalia.com>
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="nq0t+a13";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="5bolpWR6"
+Date: Thu, 10 Sep 2026 10:33:01 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1789029186;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PgYnxH7H+tx7By2AM1sGAFXZm+b1KJf3JRXo/DozlYY=;
+	b=nq0t+a13NaTSuYF4CeenzbMGkxy4JvQOZ0gqaRRD4cV9bqclklB2nkc3jSKVIovWerzMBz
+	LqWRF9Z/Wq6H9Z9U5z8AE+VQpRnpoU7JLulnrl5INZdb1CMxTMPnV05lqmLTS9b7bcJFm5
+	+Jtv/C4gZ+T4oI66pMCTl5u5+NHtvOkMZSIlvstSVWgfAMfF9Uop+cNAY9pJ1wnhDHX3xt
+	0EaSx9l4i8NZrU/FDddnLlVafk+g+pAz5r8kkTP/k3bKjkb7OYFvZ0hMvCNLC7AHSIlTma
+	Sl6zOqwKm4Xb6YskdZMSeNDBr8w0HvolM2Ie/L+Q4FlwBs5LfCMZSPSM6ejB+A==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1789029186;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PgYnxH7H+tx7By2AM1sGAFXZm+b1KJf3JRXo/DozlYY=;
+	b=5bolpWR6VEOPOQDk4aOdzzFsCMnIuSs3+o1Bx7da9a/VgRkSmhJ5Iff3Ie4w9HH2UtpfSb
+	Me4QoEKEhv6cUqDA==
+From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+To: Borislav Petkov <bp@alien8.de>
+Cc: Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Alexandre Ghiti <alex@ghiti.fr>, Nathan Chancellor <nathan@kernel.org>, 
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, Andy Lutomirski <luto@kernel.org>, 
+	Vincenzo Frascino <vincenzo.frascino@arm.com>, Kees Cook <kees@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
+	Richard Weinberger <richard@nod.at>, Anton Ivanov <anton.ivanov@cambridgegreys.com>, 
+	Johannes Berg <johannes@sipsolutions.net>, Russell King <linux@armlinux.org.uk>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Madhavan Srinivasan <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Nicholas Piggin <npiggin@gmail.com>, Huacai Chen <chenhuacai@kernel.org>, 
+	WANG Xuerui <kernel@xen0n.name>, Heiko Carstens <hca@linux.ibm.com>, 
+	Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, 
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
+	Thomas Gleixner <tglx@kernel.org>, Christophe Leroy <chleroy@kernel.org>, 
+	Boqun Feng <boqun@kernel.org>, Nicolas Schier <nsc@kernel.org>, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev, linux-mm@kvack.org, 
+	linux-um@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
+	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev, linux-s390@vger.kernel.org, 
+	linux-mips@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	Jan Stancek <jstancek@redhat.com>, Arnaldo Carvalho de Melo <acme@redhat.com>, 
+	Alexandre Ghiti <alexghiti@rivosinc.com>
+Subject: Re: [PATCH v5 02/24] x86/elf, um/x86/elf: Move relocation constants
+ to UAPI
+Message-ID: <20260910095003-d751da0d-37d1-4b14-9941-e3c388c94733@linutronix.de>
+References: <20260908-vdso-absolute-reloc-v5-0-3a93791af1cf@linutronix.de>
+ <20260908-vdso-absolute-reloc-v5-2-3a93791af1cf@linutronix.de>
+ <20260908135513.GAaqATwXHcQD7plnH-@fat_crate.local>
+ <20260908161740-0d79e592-87a6-43c5-9174-84ce1904e639@linutronix.de>
+ <20260908151238.GBaqAl5iKb64meuPJl@fat_crate.local>
+ <20260909075156-06ff671c-ab7b-47d8-aaa3-588b570888bc@linutronix.de>
+ <20260909144930.GAaqFx-mjH3-u6jLjw@fat_crate.local>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="fccfp65dlmdatj3e"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <6e93af907298022f077126f1be7bd386@igalia.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260909144930.GAaqFx-mjH3-u6jLjw@fat_crate.local>
+
+On Wed, Sep 09, 2026 at 07:49:30AM -0700, Borislav Petkov wrote:
+> On Wed, Sep 09, 2026 at 07:59:51AM +0200, Thomas Weiﬂschuh wrote:
+> > These names and numbers are defined by the architectures' ELF specifications.
+> > They are already cast in stone. For example see Table 4.9 of [0].
+> > Changing them would break compilers, linkers, loaders and more or less every
+> > existing ELF binary.
+> 
+> So?
+
+This was a direct response to your "And putting them in UAPI casts them in
+stone". With the idea that we can't possibly cast them more into stone
+than they already are.
+
+> Your goal is to provide them to tools/. You want to provide them to
+> *everything*. See the discrepance here?
+
+My goal is to make my tool work. For that I can just as well add ad-hoc
+relocation constants definitions in my own code. Just as everybody else
+has done, in what seems like a well-honed tradition.
+Unifying the constant definitions was a preparatory cleanup step I put
+in my series.
+
+Some architectures (like x86) define the relocation constants in internal
+kernel headers, but others do so in their UAPI headers, so we can't have it
+in include/linux/.
+As the UAPI is the common superset, and given that we already have quite some
+ELF definitions in the UAPI I this is where I put the relocation constants.
+We can add a tools/-specific header which is not shared with include/linux/
+but then we still have duplication with the regular kernel code.
+
+As a coincidence, these definitions in the UAPI would also be useful
+for nolibc static PIE support, but that is more of a weird curiousity
+and not something I want to bring up as reason here.
+
+(...)
+
+> > Also we already have other, closely related, ELF constants in the UAPI,
+> > see {,tools/}include/uapi/linux/elf{,-em}.h.
+>
+> Srsly?!?
+> 
+> You moved them there:
+> 
+> commit 626fd35278295fbb21f2da331cd8028e9738d965
+> Author: Thomas Weiﬂschuh <thomas.weissschuh@linutronix.de>
+> Date:   Wed Feb 26 12:44:46 2025 +0100
+> 
+>     tools/include: Add uapi/linux/elf.h
+>     
+>     It will be used by the vDSO selftests.
+
+I think we are talking past each other. To me the act of "exposing
+something to UAPI" is adding it to include/uapi/ (or the arch/ variants).
+That is an actual change worthy of discussion, which I am happy to have.
+Copying headers (UAPI or not) to tools/include/ is a rote administrative task.
+
+The commit above is the latter.
+elf.h has been part of the UAPI for as long as the UAPI exists.
+
+> Looking at the rest, it looks like some elf bits got exported, you added some
+> more and that ship has sailed.
+
+"some elf bits got exported" undersells it a bit. There are 14 years of dozens
+of people adding constants to include/uapi/linux/elf.h. So far it doesn't seem
+to have been a problem.
+
+> I still think us providing headers is completely unnecessary and it will come
+> to cause conflicts eventually but hey, not my problem.
+
+As there is pushback, I'll just drop all of the header changes.
+Maybe somebody else wants to deal with it at some point. Not my problem either.
 
 
---fccfp65dlmdatj3e
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Sep 09, 2026 at 02:29:30PM -0300, Mauricio Faria de Oliveira wrote:
-> On 2026-09-09 11:07, Joel Granados wrote:
-> > On Fri, Sep 04, 2026 at 02:45:23PM -0300, Mauricio Faria de Oliveira wr=
-ote:
-> >> On 2026-09-04 10:41, Joel Granados wrote:
-> >> > On Thu, Aug 20, 2026 at 06:22:13PM -0300, Mauricio Faria de Oliveira=
- wrote:
-> >> >> On 2026-08-20 09:51, Joel Granados wrote:
-> >> >> > On Wed, Aug 19, 2026 at 03:16:13PM -0300, Mauricio Faria de Olive=
-ira wrote:
-> >> >> >> This series adds 'sysctl:' aliases to modules that register sysc=
-tl tables; e.g.:
-> > <... snip ...>
-> >> > use the correct call moving forward?
-> >>=20
-> >> This scheme currently covers all modules, AFAIK, as it is wrapped in t=
-he
-> >> functions that register sysctl tables.
-> >>=20
-> >> On moving forward: usage of such functions in a way that breaks a
-> >> requirement of this series (e.g., failing to specify the template
-> >> table/path parameter(s), or not having constant initializers) hits a
-> >> build error, as the requirements are actually from the compiler.
-> >>=20
-> >> >> I guess that a different design could use MODULE_SYSCTL_TABLE() as
-> >> >> MODULE_DEVICE_TABLE(), declared per table instead of wrapped into
-> >> >> register sysctl functions.
-> >> >> However, it seems to require moving the value of the path argument =
-(or
-> >> >> its template) into the macro and still referencing it in the functi=
-on
-> >> >> (or its instantiation of the template), which adds obfuscation, to =
-all
-> >> >> callers.=20
-> >> >>=20
-> >> >> What do you think?
-> >> > It might be that having it inside the module subsys is more work, bu=
-t I
-> >> > believe that there is the right place to have it. I still don't see =
-that
-> >> > adding a module specific arg to the sysctl register is a good thing.
-> >>=20
-> >> Ok, cool. I can work on a different design.
-> >>=20
-> >> Please just let me know whether you are OK with the remaining (above),
-> >> and I'll be happy to tackle this.
-> >=20
-> > What is "the remaining"?
->=20
-> I meant the rest of the email, addressing the points/questions you
-> raised.
-
-* The dependency on a sysctl path to load a module still is
-  backwards to me. It should be: I need feature A, I load modules
-  M{1,2,3} for A and I set sysctl S{1,2,3...}. Not sure why sysctl tools
-  do it the other way around.
-
-* The fact that the invariance is in the sysctl path and not the module
-  identifier maybe points to a deeper issue.=20
-
-* I still believe that this is better placed outside the sysctl
-  subsys as it does not cater solely to module loading.
-
-Best
-
-
-
-
---fccfp65dlmdatj3e
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQGzBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmqiXEIACgkQupfNUreW
-QU+Jpgv/QNMzfwgyYS5bGcjcIdeGmbwPVB4niFRMrcLkDpeUPt2bAuU2q0Si+c2j
-8ZRwIaAx22BLUNWWDpobcza7W5C1A17rIR76XCMUnFSb0n/IWP5htK0UHazibk/r
-s8lxhIQXP5lQAHUSyOaKXEqmO60aWL/VkIxb+qJe3ThcHSESPRVQxL56e054d/fG
-0Hh+/ckA3Yy8AAKkaF1Q52F6thgEqtHKMSNZkdp+XN3Q+IQHRUGULXvXeTgvp4QY
-u5WK/w8RJz5+KQwW6//kpXBCY9uVado45tRrFS/H0fClXF6ovdXuTK169krtJi92
-qouie+C4qFsAjPRGPOQjOYXmCIa8/sKwsArW4CmTg0J9WN3BwQxJksy0jWqaxULM
-xRPx9OxYsSrYZGglZitaJMnNQnc+X20/vQ4lBotfmrMPdUgSrMAzOHO0AcFXBUs9
-s1DSQoFZe+/Kg4RCkGzgk55VbnT0V81UPFbcYx6yuyjb+yZWoTMUpHy8Q47//r54
-Y5lWmFsv
-=Y70+
------END PGP SIGNATURE-----
-
---fccfp65dlmdatj3e--
+Thomas
