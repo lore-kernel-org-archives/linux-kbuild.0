@@ -1,146 +1,167 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.avm.de (mail.avm.de [212.42.244.94])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D24F8489FAA
-	for <linux-kbuild@vger.kernel.org>; Thu, 10 Sep 2026 12:52:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7F9D47C0E6;
+	Thu, 10 Sep 2026 15:42:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.94
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789044778; cv=none; b=GyTUSPnW6pDetmlhVpkUSmAMDXQ+MKjASSkp8YikxptryiscUVoSJ/F9/XBRsXst0KoIe8n+298UCsJwtFCAHOGPQTrtiSNR0YlZ2AMsrvVw93jKVb/8BySGuG0AoVwrxX7t6EpJGKBtb0Uz1/8ZP8UM7VxiZcChdKHrtpatg7Y=
+	t=1789054965; cv=none; b=uqZpHhWW4VhWb3IYUuUn0vlNNivFRNnFgYtKLdVf+qlml2jIDTPAS/tqp805UoR9gyXwDah9y62aBfUCPjFM1JTI6uTSgv32DbvidOvzz0QKq+qhkIck+okeqxtbyJV1lzQgTyCPCjC1MvWKQFV3hMy3q9QZIGq1tVKi2fZ5R9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789044778; c=relaxed/simple;
-	bh=aV14/F8DsF3P9FHVwJuzeIJuUW3zK2f3SCDMKZGJuA4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aNH8rG0h9uBL2AqH8xJiG4C5BGSnzIFA8Dr18FwbT9WL2tOSBWQoSHVHY+wNjJKJTZy0b1UgVpXBnWWHO39UhBJJ8iuUaBbup65jV6WiZDfXOY24BqrOZQdyzOvA2D2h3A9uaHeOapIC7U86sAJwY3HbjwPSvRSGhKOluUTbv3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=SmOKr973; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1789054965; c=relaxed/simple;
+	bh=LK8bkV1Vz0floem0tDs4fowSkN+VH/bI8JorqlPfxFI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=vEhI2adnYKEjFaB2+xveoEcnm1S+SPsbE1Uz9LCU86YqeHWXdnnTHw21RWTjXLKf1N5Y8vJuBOuJjYv6HhJjzDQLqleeHV6ioNF47LrlwLAPTvUIWxJ4UlRqZPeVL81F9unhRwSSjy4rQdcpyB9WRSVG3eRdwXDjVwb4Kh3i6S0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com; spf=pass smtp.mailfrom=fritz.com; dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b=m2t/gCBQ; arc=none smtp.client-ip=212.42.244.94
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fritz.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="SmOKr973"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4957eefd361so55447325e9.1
-        for <linux-kbuild@vger.kernel.org>; Thu, 10 Sep 2026 05:52:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1789044773; x=1789649573; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=ei/562soKHFJqkSdXuQm6X1dYNc/yFpT8LphVTPsPBs=;
-        b=SmOKr973K1dGCdZNSvV0lZ/+KT9BbRIbD3GOIAibUNJ0qhDjKzaJljF4LSPNkW8bB2
-         HuTx1PLTDPwTxnXLhGLdkAB+yvGjx19FpTMhto8pdD8XeVAybuZ6v45GmuegsUQbFv0A
-         r5tsiGJMyJ+CTV4L29p8/OHBuCB/Jv4TyJDThI2FdXmhKsIpiLaS2/EUJrwO93TPodLM
-         CS3eFxLcUy270ZtNSYfcBV/5plhB6VvhVqoXJOjiOa42xr9jJXMrxMP9H279UkBdc0Z/
-         dKrfOKBdlY7oe1AphxeGiXttM62BubLUX+lzyjnDKsH9lJcugdc7BQzMz+jFCDx1qj7d
-         IryA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789044773; x=1789649573;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=ei/562soKHFJqkSdXuQm6X1dYNc/yFpT8LphVTPsPBs=;
-        b=pwyv/+4Vdru4syoNNKSLEHZdfl476vHFlY5bXhBD7fo+k4+CzZ9FdnnSMDuK8QEXbG
-         uBStop1y5K8xY6Ue/O9lu9yBDPLb0NSqVdxwhuyKz1CAJouSsQpgcCC0t/y/JyW1Pdtu
-         EcP8RajsCJv04Pa4/z4WTaTp3m4ao4IAFqNkrLuACQ3HNGdtU2W5tqHBL55GFof+D9R8
-         NIOU5irC9q3Vseze/Ym++YVqBJon20YP5/r7yMcfuCkthQ5NOhR6Eu4n/Ol8qPpkr+sS
-         Cs2Gm/3x1Gj09eZxWTE4O7MUP3IpvT73ANfEh3++/IGw/dBl7YYMG3KrnNTO5j9qVOcX
-         HP8Q==
-X-Forwarded-Encrypted: i=1; AKwUvBxl76PCqmJqXUc22QWtwfXirheuHV/QP7/6bmoaPQxA/02JSzIAYpQJEVvHhBmhRa4Cc2PruDNt3el0hHQ=@vger.kernel.org
-X-Gm-Message-State: AFuF++nt0X9phWQN0R1q/8DW6arpicLGVlPyON7gY7/AAmwVFZb2lLCb
-	ib8UCUzXozRe5q7iSGNEuuHOCDWHYQhu1G/Ju0GYBW7y/KOttED0f2Hx/VXTQq0SxXo=
-X-Gm-Gg: AYBFou3Z5ou5o7oE803laAuVGpPT4TGYeToox2ppfjzVHLaVHniR84j2zbxwkVjir/a
-	qNObZnfCdEdm50HID3/N0e8yN2IhHNJY16sWWyqXSSjLvtGSx9ZZMjTvgwNv1oOoTITOOhxprv5
-	70JOjLKI/V26fTnBPUK+jpRh9ZMdcHbylGVo893qoDH0hKe3ZNWa37R6u1Pr1TVFICcUGM3PQhR
-	9vytj+4P060E5gzWXu1n/DG+yc11aVHmnjEMG2squXFHEKeYSmaXCH5iggd02wfuvz6s+SoxAQO
-	4nhY2VmXuspd/YqPRi9fQ++fBsm+eJas8jw8anBpDq++TL2o6yLBP1SHPp5OgFI1wl3PK4B3p4U
-	yqT/TeGLb684mlZBEcggUUvFpsNdHCdRIdHxVjptTPSDOWbneJYv5q2EMPQTPpRgn4UElwaS/Um
-	X0mrVD5JvYMkmJPd90rYRmdeD6uioNMPZ564uxaFjfETDgEsyBzUa9YuSnHXBtV7mkjmS/MKkv3
-	v3sH4rV6IZgphVz/BGhA3tmhGpN71VlxVI=
-X-Received: by 2002:a05:600c:620d:b0:49c:fc6e:a3d6 with SMTP id 5b1f17b1804b1-49cfc6ea731mr404244015e9.21.1789044772934;
-        Thu, 10 Sep 2026 05:52:52 -0700 (PDT)
-Received: from ?IPV6:2a07:de40:8100:0:89a9:fd0e:583d:4a53? ([2001:af0:8000:1409:193:86:92:181])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49d20fce7a7sm286173185e9.4.2026.09.10.05.52.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Sep 2026 05:52:52 -0700 (PDT)
-Message-ID: <434a7a10-d83e-4402-be91-816bbbc15bb7@suse.com>
-Date: Thu, 10 Sep 2026 14:52:50 +0200
+	dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b="m2t/gCBQ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fritz.com; s=mail;
+	t=1789054956; bh=LK8bkV1Vz0floem0tDs4fowSkN+VH/bI8JorqlPfxFI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=m2t/gCBQ5Ji+klRB77okzADkIBpOjucABpFdn1joI6CGFroNQ2dok89iTW7zlsgDJ
+	 OhupApf9LKIRvcGE2XGbdgRc1L/Cyu778E8qiCt5Mx3N/HSwPKfTDWrLuQBULuYETh
+	 DEpZTMKIWNIB95kcOEYyM+KTdXBA1kly0af9dVc2J1yCQpvugpbSIq04iHmdW/EGZ3
+	 Y4A/qaU5/ks6TeFtBhGFS/mS3OdzSq+oJRGgjHfaRsaS82LquTqTSeUDZk3Yd/dQog
+	 lg48YsTm0IrzSWtTPbK8Ble4vH9U4bTyk8isOlH6ribTe1cTR6+aKHV2VGyYR9cK7K
+	 zTVgF+ct8Jfhw==
+Received: from [212.42.244.78] (helo=mail.avm.de)
+	by mail.avm.de with ESMTP (eXpurgate 4.57.1)
+	(envelope-from <n.schier@fritz.com>)
+	id 6aa2cfec-6dc7-7f0000032729-7f000001a7b2-1
+	for <multiple-recipients>; Thu, 10 Sep 2026 17:42:36 +0200
+Received: from mail-auth.fritz.com (unknown [212.42.244.78])
+	by mail.avm.de (Postfix) with ESMTPS;
+	Thu, 10 Sep 2026 17:42:36 +0200 (CEST)
+Date: Thu, 10 Sep 2026 17:42:35 +0200
+From: Nicolas Schier <n.schier@fritz.com>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Alexey Gladkov <legion@kernel.org>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>, Paul Walmsley <pjw@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
+	Gary Guo <gary@garyguo.net>,
+	=?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Daniel Almeida <daniel.almeida@collabora.com>,
+	Tamir Duberstein <tamird@kernel.org>,
+	Alexandre Courbot <acourbot@nvidia.com>,
+	Onur =?utf-8?B?w5Z6a2Fu?= <work@onurozkan.dev>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Randy Dunlap <rdunlap@infradead.org>, linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
+	linux-riscv@lists.infradead.org, linux-arch@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-efi@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, linux-doc@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH 12/23] kbuild: avoid re-running compiler and linker probes
+Message-ID: <20260910-translucent-sweet-sidewinder-7acacb@l-nschier-aarch64>
+References: <20260908-build-speedup-v1-0-5dc1ac01672d@kernel.org>
+ <20260908-build-speedup-v1-12-5dc1ac01672d@kernel.org>
+ <178901395292.3971858.13236774094648272066.b4-review@b4>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 13/23] modpost: hash module source per-file, not per-byte
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
- Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling
- <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
- Masahiro Yamada <masahiroy@kernel.org>, Alexey Gladkov <legion@kernel.org>,
- Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
- Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
- Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
- Arnd Bergmann <arnd@arndb.de>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Ard Biesheuvel <ardb@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Josh Poimboeuf <jpoimboe@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
- Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
- Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?=
- <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>,
- Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
- Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>,
- Daniel Almeida <daniel.almeida@collabora.com>,
- Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot
- <acourbot@nvidia.com>, =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>,
- Jonathan Corbet <corbet@lwn.net>, Randy Dunlap <rdunlap@infradead.org>,
- linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
- llvm@lists.linux.dev, linux-riscv@lists.infradead.org,
- linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org,
- linux-doc@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-References: <20260908-build-speedup-v1-0-5dc1ac01672d@kernel.org>
- <20260908-build-speedup-v1-13-5dc1ac01672d@kernel.org>
-Content-Language: en-US
-From: Petr Pavlu <petr.pavlu@suse.com>
-In-Reply-To: <20260908-build-speedup-v1-13-5dc1ac01672d@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="6NJv2EjhorC/TYUZ"
+Content-Disposition: inline
+In-Reply-To: <178901395292.3971858.13236774094648272066.b4-review@b4>
+Organization: FRITZ! Technology GmbH
+x-ms-reactions: disallow
+X-purgate-ID: 149429::1789054956-F1CDF0BC-4895A414/0/0
+X-purgate-type: clean
+X-purgate-size: 2705
+X-Notice: Whitelisted
+X-purgate: This mail is considered clean (visit https://www.eleven.de for further information)
+X-purgate: clean
+X-pfmilter: host: postfix-mx-03  mail-id: 9AB3CA045E  external: no
 
-On 9/8/26 10:55 PM, Lorenzo Stoakes (ARM) wrote:
-> modpost spends a long time md4 hashing module source at a per-byte
-> granularity.
-> 
-> Fix this by doing this hashing per-file instead by accumulating a per-file
-> buffer in parse_file().
-> 
-> All 11,189 .mod.c files and Module.symvers were confirmed to be identical
-> with this change applied.
-> 
-> This is especially impactful for allmodconfig incremental builds (where
-> CONFIG_MODULE_SRCVERSION_ALL is set).
-> 
-> Whole build, 128-thread Threadripper 9980X, best of N runs:
-> 
->                                          before   after     delta
->                                          -------------------------------
->   x86 allmodconfig, touch mm/vma.c, gcc    40.6s    38.2s     -2.4s (-6%)
->   x86 allmodconfig, touch mm/vma.c, clang  36.2s    35.0s     -1.2s (-3%)
-> 
-> Assisted-by: LLM
-> Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-> ---
->  scripts/mod/sumversion.c | 56 +++++++++++++++++++++++++++++++++++++-----------
->  1 file changed, 44 insertions(+), 12 deletions(-)
 
-Support for the module srcversion is being removed in "module: remove
-MODULE_VERSION() and srcversion" [1] and scripts/mod/sumversion.c should
-be gone completely.
+--6NJv2EjhorC/TYUZ
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-[1] https://lore.kernel.org/linux-modules/20260731-module_ver_remove-v2-0-c9163858f382@linuxfoundation.org/
+On Wed, Sep 09, 2026 at 09:19:12PM -0700, Nathan Chancellor wrote:
+> > diff --git a/init/Kconfig b/init/Kconfig
+> > index 8583d9f06c52..3c92c87254a3 100644
+> > --- a/init/Kconfig
+> > +++ b/init/Kconfig
+> > @@ -144,6 +144,44 @@ config CC_HAS_ASSUME
+> >  config CC_HAS_NO_PROFILE_FN_ATTR
+> >  	def_bool $(success,echo '__attribute__((no_profile_instrument_functio=
+n)) int x();' | $(CC) -x c - -c -o /dev/null -Werror)
+> > =20
+> > +config CC_HAS_ZERO_INIT_PADDING_BITS
+> > +	def_bool $(cc-option,-fzero-init-padding-bits=3Dall)
+> > +
+> > +config CC_HAS_NO_STACK_CLASH_PROTECTION
+> > +	def_bool $(cc-option,-fno-stack-clash-protection)
+> > +
+> > +config CC_HAS_NO_ADDRSIG
+> > +	def_bool $(cc-option,-fno-addrsig)
+>=20
+> I am generally in favor of this proposal since I think these checks
+> should be cached by Kconfig where possible to clear up running them
+> twice. That said, I wonder if we should pick a better dumping ground for
+> these checks other than init/Kconfig. Maybe init/Kconfig.tools or
+> scripts/Kconfig.tools or something?
 
--- 
-Thanks,
-Petr
+Yes, skimming through the patch, I thought about that, too.  Moving more=20
+cc option checks to Kconfig will make building out-of-tree kmods with a=20
+different compiler more dangerous.  Maybe we will have to make the=20
+warning in Makefile's prepare (external kmods) target a bit louder.
+
+> I also worry about backsliding and growing cc-option checks. Should we
+> update the documentation to state that it is preferrable for these
+> checks to live in Kconfig so that they can be properly cached?
+
+Sounds good, yes.
+
+--=20
+Nicolas
+
+--6NJv2EjhorC/TYUZ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEDv+Fiet06YHnC6RpiMa8nIiabbgFAmqiz+cACgkQiMa8nIia
+bbgNERAAgCLMWkWnCF5POqjQiZGkZbm/i9SwwH2BVVg0H8Bf+O6WGCZ4YiM0NOu7
+6d9EZV95NkDD36Y3vCEaq1/GclFeUn2ET6HEprS7tQsmYbcofxLYoQuMV/5Si/18
+jJBz3eksIZYRAnSFGG6K1+Hq3u63l3cV5TmRaquZg76LwJkTjCNsFmfT2wxHP40y
+LmkyOsw9NiHo2Bm75Bz8ds7EVqHU/wPxCAWBuiw6ervOrw4RR7PURz61DaBGIuOc
+9B/HnhACn44debha9z9dUTsDIsPsK2sftFLfgJvD8c1V8vj6D1uhX7Fx/hXRElRA
+srsyf2q67EuQ8hKIU8sch6rKkD9slQJd0/w2XNQsONffnO9RghF+Qu8dzo9mUusZ
+l1vYg30SglV5c7m1FlgCvvmvJSppryu6zZw4FgzOUTfcxt6l+VXTm9jaigCWPXbT
+KAYgvQqNVVgkIAg2WDqyiVTeWQxrxo9ctf3m/6srxI4/AkuGZV/XU2m1QiQJxQ5/
+rdm3WGYjD/gVrLPBr6oIoPWDSgP7C4U4kSuZGq1jWAhPeqaa691z+Z5WbRVoVDO/
+SEc1cIdDE88/z8QwIEsgmaXaVhnaCiW66Npfh9zP1J+/pQV3kvU4kf9CIEQ6QMDf
+MPfl1Si0rJA9thzauvNi6Mu6JsUi9FPz7+Oen1Y22eMfv2st6Sc=
+=TUj9
+-----END PGP SIGNATURE-----
+
+--6NJv2EjhorC/TYUZ--
