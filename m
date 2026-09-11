@@ -1,244 +1,159 @@
-Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7F6337FF54
-	for <linux-kbuild@vger.kernel.org>; Thu, 10 Sep 2026 22:19:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10D1225776;
+	Fri, 11 Sep 2026 10:23:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789078775; cv=none; b=UVDXjhUvzk5UauHkNYcCn4FHqGlP1XZ0chPUSGbNPTmvKMZjQta1+4lW5qZXbR5e58A4ZrouEdz/vZ6e6dw2yQAJriexmqpVC0OyZQFTDGyy7BcIO49q5zdag5KLwMrnqPB5/OLALnnjK+ibWdL2NCVVvXpvmSvxxufRR4HBnuk=
+	t=1789122200; cv=none; b=ACIfmTGYrrtk0hcEzmRraUgDP2IFuxD/3RprG1OiN8N+EKpRE7U9ucT1CZbX/yLXEEVApro+VamNLjLB2xteacd7VKTw0VzJ6ht8JzOiTeHXxAjohiMxBo22St4I3WpMkEFFyVYLa0jGgQG+fobpi136QUEabLp/ZZH0PMcNcto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789078775; c=relaxed/simple;
-	bh=e26TYNe2QL8d0T7JPZwSv9gfQXW/AkTljomMDCzK/C0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FsXYf4q+lbLMHpVvOHFiOtqtrV1McBoRY2ehMHKrasB9Dl3hZlyNwaEvp8OB0WRL+IuhXKhQdAiZ6FIvpz1tGGfeLca0EjQ/TT1avTMptMeHQokzdbCMdG1xmw4uaId9+F9JZcbyNymEvWn+bVcW0xOrlbF1UlaePImGcMsEfh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M7jLS46+; arc=none smtp.client-ip=74.125.225.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789122200; c=relaxed/simple;
+	bh=HIFlS1LY1mC5BFrUNBFgOTON86ZtDR4pEglNBgmIAog=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TUVd8NSxXKPr2hc3w+njRaTvSCY48YzIVpr1vL31JtKvPz01ytxy6uGrQgmdRQGEhhuaFSiHY93oT66hmVozPy+wq0PqKEnZGVghsXjlrU7ohO05DM2swI+ceOG8kQQh4cctNDQEkt+5VJjz94woXVM5N5QcFuQOdKx1He03//Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YHie+TAs; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M7jLS46+"
-Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49cd38e0f79so1763505e9.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 10 Sep 2026 15:19:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789078772; x=1789683572; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=0I3M3rAR5bHQYaKtviGaKS9FP0lfKdn84QYzscvg5IA=;
-        b=M7jLS46+2AgDx5UjgJoVwt87sdFHptFkS2LT6DRjl9wOdCi20yudfx/lIlmzRCg8t4
-         +twO1/lbPelD0r1qjfjnoj6AuO42n+HolkTqZp2wpGZzt2Vtr3Yyf0CU004uDjIvvFC3
-         YSvXXmXpTs8BjH2hPvpwu7Yh6wilhJ3B268B4c9I2cmCJ6dwO8t86++j6t/bZlVAZaqI
-         sM+jwos7TkGacvSU1yiJ49czA3WPM3ntgciKWZ4RLK4mrKLF26sVVWUGV+GgVbOw+7i4
-         bxAG+KbbLDKZBtXo4b1XDaiJHm66TVqeOh0nfA0gl9MyAJhGCfIsC8TzsMUTFCqd5/aJ
-         pGkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789078772; x=1789683572;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=0I3M3rAR5bHQYaKtviGaKS9FP0lfKdn84QYzscvg5IA=;
-        b=WcvGio1ErY+THU0iisNxiJ1zz48QYxlECw6qpGHEaSJwW7T2NsjAEM0WXK5aLgE27Y
-         J+ZNjNCdZvo1qoDTd0VEXqTJoPzdMkjj4lWbisQIyINI6B1X3rHoZTKMraY23bK53iMs
-         lPPzxpuhMy5a/ZP7XnUrjEbogjvUQYm1PwTQ+fHdZS+h8ArW7O7XsecPxxr3zobKpEfi
-         ZKs9wxvwLQMclDbEiDZ6YB7cT4G1FBor5pzVoXhY6rN/fIl999Crq95FxSZeBQapZ8qT
-         4cq/2g1eprN1x8Ir3s2pUbrC5/NZZT8a5NF0B1bJVYkAtR5hlkby3AyJuK+cZKUvYiTq
-         +XtQ==
-X-Forwarded-Encrypted: i=1; AKwUvByTYvPU6E9c5h7dIwuoMZKs8OiNdDlCOCvmZYOgD1qKrHxjoBPdETHW0vM5BEc9iPlgJjdMOKncB1Gx3yU=@vger.kernel.org
-X-Gm-Message-State: AFuF++nQ9lG3tWfUO6kbnWFNRGV8UMgnWu/YUTuyfaM8UALZwvyvY8LH
-	tZrrPwwbGTh89OWXJBt0wKEsH20bGeIanp3VjALDgH0xeaLTY+YGJAfU
-X-Gm-Gg: AYBFou2DFc3f/gmgR2mh59fsoyeZWNXsJmRk+RDNkOY72MFXhmUGFuszW/Kpit8qOCR
-	G5tXIFDE3XV/6uL1Z4bbQjsyybm/GDXnPokbHXbP5CyGX77TDA0RHyalMS+n1Loir8k64En+5ff
-	eOiZ1M8KXGe9Z6cJQegjBVakgUt0w7rsf61PQXXIKqMhqix6MprMmkQSdaXOw/YAX9ggAKrKM3E
-	q/f2iV3rsf8tAXosQ4LPmXFHHeHt6Z4uZAqfHdYyU+SWfz+9BQnDOjQ4VuceN4Njb+IGuGiX9hA
-	GxIgLBxyocpAe+gNrPtvsTpmrMUpItIylB7K0EqHO+UZsaXlfH8v1kFxklJ69E48IPXWIWyjRMG
-	XxvQjA6ZHcbMZ9gbKbgBiNKabEMjKEnVfPiw34QtvJ3ogzGpenDTpQkfMAzp3j03XVPy2mp6knR
-	xKsTtUghOsyZCSUCo6/t1RAe81zoz8pyAij+GD+bWlCYS6cB7JztABb5m62rEav+wzYoVFK42ee
-	waDmU9Z4jHjYe6m58FNjLHmZ0PsNSLs+xNZAArnzOC8c7ap8+mvAa0HXlGNyldnrpA=
-X-Received: by 2002:a05:600c:c493:b0:49d:2607:4ada with SMTP id 5b1f17b1804b1-49e619bf31cmr22607875e9.14.1789078771691;
-        Thu, 10 Sep 2026 15:19:31 -0700 (PDT)
-Received: from [10.128.10.232] (195-23-151-163.net.novis.pt. [195.23.151.163])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49d26c1bfc1sm123524145e9.4.2026.09.10.15.19.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Sep 2026 15:19:31 -0700 (PDT)
-Sender: Julian Braha <julian.braha@gmail.com>
-Message-ID: <e21cf89d-6fb0-40a3-85b0-76bcf1cba9b9@gmail.com>
-Date: Thu, 10 Sep 2026 23:19:30 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YHie+TAs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 821D71F000FF;
+	Fri, 11 Sep 2026 10:23:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789122198;
+	bh=8ECrevmQ6/PJeWeSr3u1OcXApUW19sxOeBWTobGlU0Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=YHie+TAswX/1aTgWgK4V8FqGIGQyk2pjS1A1OkW+sR0kayG1RAqxnwsXqUbCxOAQO
+	 2dCSLuBLe93EhOuUc1H6hVk8Q7GPwn2vEnK7YUsPr3zY3BNR7W6PoedUmczYZgRt9z
+	 Kon71kSs6gBnP6mZcl5cYeaKUE5eIx3Yr2SpiPUx88wPRcRPwK8EI4sBinltZjzYl8
+	 7Grhprcd+aZsmUWiFAZysee/k9upqETMTRXWHXu5Q4rnmHbelj8dby6YhhkhhRA9Oj
+	 3XTQgtbwjesb4obq4GOE9nLymizEPZc7kSxnFGKA/fGWycbu/zhjw8uC2ClK7m1O77
+	 PF0cGOECPDBGw==
+Date: Fri, 11 Sep 2026 11:23:04 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Nicolas Schier <n.schier@fritz.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
+	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+	Masahiro Yamada <masahiroy@kernel.org>, Alexey Gladkov <legion@kernel.org>, 
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, Arnd Bergmann <arnd@arndb.de>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Ard Biesheuvel <ardb@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Josh Poimboeuf <jpoimboe@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
+	Gary Guo <gary@garyguo.net>, =?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
+	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
+	Onur =?utf-8?B?w5Z6a2Fu?= <work@onurozkan.dev>, Jonathan Corbet <corbet@lwn.net>, 
+	Randy Dunlap <rdunlap@infradead.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	llvm@lists.linux.dev, linux-riscv@lists.infradead.org, linux-arch@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	linux-doc@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH 16/23] kbuild: batch module finalisation
+Message-ID: <aqPWcnRVABgH0V8t@gremlin>
+References: <20260908-build-speedup-v1-0-5dc1ac01672d@kernel.org>
+ <20260908-build-speedup-v1-16-5dc1ac01672d@kernel.org>
+ <20260910-nondescript-fierce-wapiti-de1cea@l-nschier-aarch64>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/4] kconfig: prevent out-of-bounds user input for numeric
- options
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: nsc@kernel.org, nico@fluxnic.net, rdunlap@infradead.org,
- grahamr@qti.qualcomm.com, kees@kernel.org, pengpeng@iscas.ac.cn,
- vegard.nossum@oracle.com, linux-kernel@vger.kernel.org,
- linux-kbuild@vger.kernel.org
-References: <20260829171902.1510587-1-julianbraha@gmail.com>
- <20260829171902.1510587-5-julianbraha@gmail.com>
- <178856431424.3782172.2818215537125415152.b4-review@b4>
-Content-Language: en-US
-From: Julian Braha <julianbraha@gmail.com>
-In-Reply-To: <178856431424.3782172.2818215537125415152.b4-review@b4>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260910-nondescript-fierce-wapiti-de1cea@l-nschier-aarch64>
 
-On 9/5/26 00:25, Nathan Chancellor wrote:
->> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
->> index 4234a51d16fd..2227d89d6328 100644
->> --- a/scripts/kconfig/confdata.c
->> +++ b/scripts/kconfig/confdata.c
->> @@ -354,6 +354,12 @@ static int conf_set_sym_val(struct symbol *sym, int def, int def_flags, char *p)
->>  	case S_INT:
->>  	case S_HEX:
->>  		if (sym_string_valid(sym, p)) {
->> +			if (def != S_DEF_AUTO &&
->> +			    !sym_string_check_bounds(sym, p))
->> +				/* hex uses 64-bit unsigned integer */
->> +				conf_warning("value '%s' for %s is outside the 64-bit %s integer bounds",
->> +					     p, sym->name,
->> +					     sym->type == S_INT ? "signed" : "unsigned");
->>  			sym->def[def].val = xstrdup(p);
->>  			sym->flags |= def_flags;
->>  		} else {
-> ...
->> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
->> index 2d8b0c65ce1e..6f99216ee76d 100644
->> --- a/scripts/kconfig/menu.c
->> +++ b/scripts/kconfig/menu.c
->> @@ -4,7 +4,6 @@
->>   */
->>  
->>  #include <ctype.h>
->> -#include <errno.h>
->>  #include <stdarg.h>
->>  #include <stdlib.h>
->>  #include <string.h>
->> @@ -255,17 +254,13 @@ static int menu_validate_number(struct symbol *sym, struct symbol *sym2,
->>  		return 1;
->>  	}
->>  
->> -	errno = 0;
->> -	if (sym->type == S_INT) {
->> +	if (sym->type == S_INT)
->>  		type_bounds = "64-bit signed integer";
->> -		strtoll(sym2->name, NULL, 10);
->> -	} else {
->> +	else
->>  		/* hex */
->>  		type_bounds = "64-bit unsigned integer";
->> -		strtoull(sym2->name, NULL, 16);
->> -	}
->>  
->> -	if (errno == ERANGE) {
->> +	if (!sym_string_check_bounds(sym, sym2->name)) {
->>  		fprintf(stderr,
->>  			"%s:%d: error: %s constant '%s' is outside the %s bounds\n",
->>  			prop->filename, prop->lineno, sym_type_name(sym->type),
-> 
-> With this, you could inline the type bounds string like you did above:
-> 
-> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-> index 6f99216ee76d..f4b5b11991b4 100644
-> --- a/scripts/kconfig/menu.c
-> +++ b/scripts/kconfig/menu.c
-> @@ -238,8 +238,6 @@ void menu_add_symbol(enum prop_type type, struct symbol *sym, struct expr *dep)
->  static int menu_validate_number(struct symbol *sym, struct symbol *sym2,
->  				const struct property *prop)
->  {
-> -	const char *type_bounds;
-> -
->  	if (sym->type != S_INT && sym->type != S_HEX)
->  		return 0;
->  
-> @@ -254,17 +252,11 @@ static int menu_validate_number(struct symbol *sym, struct symbol *sym2,
->  		return 1;
->  	}
->  
-> -	if (sym->type == S_INT)
-> -		type_bounds = "64-bit signed integer";
-> -	else
-> -		/* hex */
-> -		type_bounds = "64-bit unsigned integer";
-> -
->  	if (!sym_string_check_bounds(sym, sym2->name)) {
->  		fprintf(stderr,
-> -			"%s:%d: error: %s constant '%s' is outside the %s bounds\n",
-> +			"%s:%d: error: %s constant '%s' is outside the 64-bit %s integer bounds\n",
->  			prop->filename, prop->lineno, sym_type_name(sym->type),
-> -			sym2->name, type_bounds);
-> +			sym2->name, sym->type == S_INT ? "signed" : "unsigned");
->  
->  		return 1;
->  	}
-> 
->> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
->> index 7e81b3676ee9..2d1c021fa395 100644
->> --- a/scripts/kconfig/symbol.c
->> +++ b/scripts/kconfig/symbol.c
->> @@ -5,6 +5,7 @@
->>  
->>  #include <sys/types.h>
->>  #include <ctype.h>
->> +#include <errno.h>
->>  #include <stdlib.h>
->>  #include <string.h>
->>  #include <regex.h>
->> @@ -711,6 +712,21 @@ bool sym_string_valid(struct symbol *sym, const char *str)
->>  	}
->>  }
->>  
->> +bool sym_string_check_bounds(struct symbol *sym, const char *str)
->> +{
->> +	errno = 0;
->> +
->> +	if (sym->type == S_INT)
->> +		strtoll(str, NULL, 10);
->> +	else if (sym->type == S_HEX)
->> +		strtoull(str, NULL, 16);
->> +	else
->> +		/* string */
->> +		return true;
->> +
->> +	return errno != ERANGE;
->> +}
->> +
->>  bool sym_string_within_range(struct symbol *sym, const char *str)
->>  {
->>  	struct property *prop;
->> @@ -722,6 +738,8 @@ bool sym_string_within_range(struct symbol *sym, const char *str)
->>  	case S_INT:
->>  		if (!sym_string_valid(sym, str))
->>  			return false;
->> +		if (!sym_string_check_bounds(sym, str))
->> +			return false;
->>  		prop = sym_get_range_prop(sym);
->>  		if (!prop)
->>  			return true;
->> @@ -731,6 +749,8 @@ bool sym_string_within_range(struct symbol *sym, const char *str)
->>  	case S_HEX:
->>  		if (!sym_string_valid(sym, str))
->>  			return false;
->> +		if (!sym_string_check_bounds(sym, str))
->> +			return false;
->>  		prop = sym_get_range_prop(sym);
->>  		if (!prop)
->>  			return true;
-> 
-> Sashiko has a comment that seems to be relevant here unless I
-> misunderstand what it is complaining about:
-> 
-> https://sashiko.dev/#/patchset/64934
-> 
-> Otherwise, I like the direction here.
-> 
+On Thu, Sep 10, 2026 at 05:48:53PM +0200, Nicolas Schier wrote:
+> On Tue, Sep 08, 2026 at 09:55:16PM +0100, Lorenzo Stoakes (ARM) wrote:
+> > Module finalisation on allmodconfig builds consists of a large number of
+> > very short-lived jobs, and the make job dispatcher cannot possibly dispatch
+> > jobs fast enough.
+> >
+> > For allmodconfig x86-64 this can be on the order of ~22,000 jobs of a few
+> > milliseconds in duration each.
+> >
+> > However per-job cost grows with the variables the instance holds, here the
+> > savedcmd_* of every .mod.o and .ko read back from the .cmd files, since it
+> > walks them all to build each child's environment.
+> >
+> > This makes module finalisation very inefficient when large numbers of
+> > modules are being built.
+> >
+> > Fix this by splitting modules.order into chunks of 128 at a time, run in
+> > parallel.
+> >
+> > Each instance holds only its own modules' variables and the top-level one
+> > reads no per-module .cmd files at all, the same rules serve both levels,
+> > and an instance is told its chunk with modfinal-first=<index>.
+> >
+> > "make modules" with every *.mod.o and *.ko deleted goes from 28.9s to 15.9s
+> > with clang 22. No-op "make modules" goes from 5.6s to 4.8s, as checking the
+> > 22,000 targets is spread over the chunks too.
+> >
+> > Whole build, 128-thread Threadripper 9980X, best of N runs:
+> >
+> >                                          before   after     delta
+> >                                          -------------------------------
+> >   x86 allmodconfig, no-op make, gcc         1.9s     1.2s    -0.74s (-39%)
+> >   x86 allmodconfig, no-op make, clang       2.4s     1.6s    -0.77s (-32%)
+> >   x86 allmodconfig, clean, gcc            304.5s   291.4s     -13.1s (-4%)
+> >   x86 allmodconfig, clean, clang          301.7s   297.0s     -4.7s (-2%)
+> >
+> > Assisted-by: LLM
+> > Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+> > ---
+> >  scripts/Makefile.modfinal | 26 +++++++++++++++++++++++++-
+> >  scripts/mod/sumversion.c  |  4 ++--
+> >  2 files changed, 27 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/scripts/Makefile.modfinal b/scripts/Makefile.modfinal
+> > index 75e9effdf02c..858fa798090b 100644
+> > --- a/scripts/Makefile.modfinal
+> > +++ b/scripts/Makefile.modfinal
+>
+> [...]
+> > diff --git a/scripts/mod/sumversion.c b/scripts/mod/sumversion.c
+> > index 2cbadd3cd97d..5501d6aa0bea 100644
+> > --- a/scripts/mod/sumversion.c
+> > +++ b/scripts/mod/sumversion.c
+> > @@ -249,7 +249,7 @@ static int parse_comment(const char *file, unsigned long len)
+> >  /* FIXME: Handle .s files differently (eg. # starts comments) --RR */
+> >  static bool stop_char[256];
+> >
+> > -static void init_stop_chars(void)
+> > +static void sumversion_init(void)
+> >  {
+> >  	static bool done;
+> >  	int chr;
+> > @@ -274,7 +274,7 @@ static int parse_file(const char *fname, struct md4_ctx *md)
+> >  	len = strlen(file);
+> >  	if (!len)
+> >  		goto out_file;
+> > -	init_stop_chars();
+> > +	sumversion_init();
+> >  	buf = xmalloc(len); /* File output buffer. */
+> >
+> >  	for (i = 0; i < len; i++) {
+> >
+> > --
+> > 2.55.0
+> >
+>
+> (I have only skimmed through, not yet reviewed this patch.)
+>
+> The change in sumversion.c seems to be wrong here.
 
-Thanks, yeah it seems Sashiko found yet another instance where the
-numeric bounds checks could be improved. Including this in v2.
+Ugh yeah this is a merge conflict artifact that I thought I had fixed but
+clearly not :) Will fix up on respin.
 
-- Julian Braha
+>
+> --
+> Nicolas
 
+
+
+--
+Cheers, Lorenzo
