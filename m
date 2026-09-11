@@ -1,113 +1,112 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83F5C42EEC4;
-	Fri, 11 Sep 2026 10:41:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EC2B43DECF;
+	Fri, 11 Sep 2026 10:42:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789123318; cv=none; b=ENoSwDTm2el1VqvxfbfPctRUEcC2QMj8EPkohd8GfiSeC0uEM8evenaRImOJ/LjvWPnjH+QG9PVF+nCQiJcNZe1oj71CisjwqixwLooQADMcs63DhwJmH+RMPDheXsE70s71ZSD9D16ZUm6sjDxeevxSWLtThBLzcwMxjUmq8Z0=
+	t=1789123375; cv=none; b=FuDeyZVEWBMz1R7NFMpoza/69ltSDQcI6GS45KF8cdU/n7DxL4v5miGzEKwfDWiIeY/zs0gtuvuZPaQyZMfy9/ZVlrbp+h26hSkUAq4/vj1xwZhD3ExCLK2lZvhAA+wdgT6JJtXTUOyLK5aNYwl3aTA+LgNkS5IB0y5SgPkJN5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789123318; c=relaxed/simple;
-	bh=5YCaSg6B8lnKNS5mnwM54lBHOHshfmcrbaZ2cubXQ4k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JX2H7kzq6nu6BHrEn9IC5RMfJyAuoHN6sqgRcNhttkz5QPXPuzSFdJ/fQJxBOVXM48yJ4hJqpbtFWarJ9NVKm0YFsMahFZZriumXOyUPhjDfI4DpDXZBOeIPsfQeDgtTc3/dRMnNN1eoy68NxTbE1Hr4sGUvazymPAJI56XrdvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hcs4lsBd; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789123375; c=relaxed/simple;
+	bh=4nVA4SAKjBOLpO7ge2wl4wOd7oOi00DVj8Gl0oC1Amo=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ICwHOix8RHHiGTzP6/0pmk/TOhuOkBDZe7zS3+4oL2Ww8Ugv3/xuc4DHwHOHI2Oc1RKzezrasRT874YWDSEIPfj8pBW1zA8cGxgZ0UePsV+VGUUuqWclVy7A7dYuUN6j8Ve0cFcsgsdAwZfFpITvlJo5BOoloCc2Xn99MeyveXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=uqIErwTC; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hcs4lsBd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E852A1F00893;
-	Fri, 11 Sep 2026 10:41:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789123317;
-	bh=MMJozD+RewnE2WYnIY4zmGHYgUsIL3AEVPRTDj0LFp8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=hcs4lsBdMwnW3lvB6exZIai5ol6Yll7bG/D1+ACDRwDpO3fOZPtNZtrr/wRrMfVnF
-	 2j60pbtJ6hWpfKQa7KB2OZKJ6MVp/0vCxO6uHD6KrHWQqBZ6kEPkhf7pZQJr/102YE
-	 T1jWWci85XBcjR4t7bz+BKek9UUwRB2J3+EJ11gmbc4zCByQt1yfpJBpmjxqNfMqkG
-	 3ToKl+ijDkkohsVu6wnXupOLnIvcJUBY0ztyBT2+7I01TALqv+YgH4HIxdTJWXPF21
-	 OCt+c8Um107UgPvZi5Npr/ihPA+ggNXAevh4vJJClnZvexnYba42/50f1AwJmO7j+o
-	 2kw3fJzuWq5fA==
-Date: Fri, 11 Sep 2026 11:41:43 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Petr Pavlu <petr.pavlu@suse.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Masahiro Yamada <masahiroy@kernel.org>, 
-	Alexey Gladkov <legion@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
-	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, Arnd Bergmann <arnd@arndb.de>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Ard Biesheuvel <ardb@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Josh Poimboeuf <jpoimboe@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
-	Gary Guo <gary@garyguo.net>, =?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
-	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
-	Onur =?utf-8?B?w5Z6a2Fu?= <work@onurozkan.dev>, Jonathan Corbet <corbet@lwn.net>, 
-	Randy Dunlap <rdunlap@infradead.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	llvm@lists.linux.dev, linux-riscv@lists.infradead.org, linux-arch@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-doc@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH 13/23] modpost: hash module source per-file, not per-byte
-Message-ID: <aqPYvKR_eRsFlEd-@gremlin>
-References: <20260908-build-speedup-v1-0-5dc1ac01672d@kernel.org>
- <20260908-build-speedup-v1-13-5dc1ac01672d@kernel.org>
- <434a7a10-d83e-4402-be91-816bbbc15bb7@suse.com>
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="uqIErwTC"
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id CA9BE1A01B2;
+	Fri, 11 Sep 2026 10:42:49 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 97069601DE;
+	Fri, 11 Sep 2026 10:42:49 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 8654911C7AFA8;
+	Fri, 11 Sep 2026 12:42:47 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1789123368; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=HBvc3mFZJ9sFbHfrO7MHgqSVuCslWxTn7cxWKQ2gLck=;
+	b=uqIErwTC2aelOjApGjFPN8Wh0r4SJp3m0Nf3WUy3Ogy23qLcr7rWM4uCi/ZsFBP4/V+Ef5
+	DS0YrY9DjxI9hPTVwct+EV22eh+OpiObtUgnu8646Eoev2QVdp0ObQXIxc7sv6luOdkc/T
+	SJp1vUkIZjFxmKohLWCojciz3f8il2aUJsXnzXmQ4yW7OztZ3Ym7lJ6W8KiwkOGu0Va8ot
+	SiEMPHRspw9+0xx5jEzOr6+0By4efsUC67qRiDPFZd76/QgmmDuRuRspXRPoIzhmm4ECfE
+	FmjiJDPgwJo0A8sz8x20CqcXVqMyhw+qN41/UDKnCCTH2WTZ7i9CB/zqhd3ISA==
+From: =?utf-8?q?Alexis_Lothor=C3=A9_=28eBPF_Foundation=29?= <alexis.lothore@bootlin.com>
+Date: Fri, 11 Sep 2026 12:42:33 +0200
+Subject: [PATCH] kbuild: drop dependency on .config for tools/
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <434a7a10-d83e-4402-be91-816bbbc15bb7@suse.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20260911-tools-build-output-v1-1-4f9938a4f83c@bootlin.com>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXMywqEMAxA0V+RrCdgiq+ZXxlc+IiaQaw0rQjiv
+ 1vH5Vnce4CyE1b4JAc43kTFLhH0SqCbmmVklD4aTGqK9E2E3tpZsQ0y92iDX4NHqigvOTcZUQY
+ xXB0Psv+n3/qxhvbHnb9PcJ4XY+RbfXYAAAA=
+X-Change-ID: 20260911-tools-build-output-18157e524114
+To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
+Cc: ebpf@linuxfoundation.org, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Bastien Curutchet <bastien.curutchet@bootlin.com>, 
+ =?utf-8?q?Alexis_Lothor=C3=A9_=28eBPF_Foundation=29?= <alexis.lothore@bootlin.com>
+X-Mailer: b4 0.15.2
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Thu, Sep 10, 2026 at 02:52:50PM +0200, Petr Pavlu wrote:
-> On 9/8/26 10:55 PM, Lorenzo Stoakes (ARM) wrote:
-> > modpost spends a long time md4 hashing module source at a per-byte
-> > granularity.
-> >
-> > Fix this by doing this hashing per-file instead by accumulating a per-file
-> > buffer in parse_file().
-> >
-> > All 11,189 .mod.c files and Module.symvers were confirmed to be identical
-> > with this change applied.
-> >
-> > This is especially impactful for allmodconfig incremental builds (where
-> > CONFIG_MODULE_SRCVERSION_ALL is set).
-> >
-> > Whole build, 128-thread Threadripper 9980X, best of N runs:
-> >
-> >                                          before   after     delta
-> >                                          -------------------------------
-> >   x86 allmodconfig, touch mm/vma.c, gcc    40.6s    38.2s     -2.4s (-6%)
-> >   x86 allmodconfig, touch mm/vma.c, clang  36.2s    35.0s     -1.2s (-3%)
-> >
-> > Assisted-by: LLM
-> > Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-> > ---
-> >  scripts/mod/sumversion.c | 56 +++++++++++++++++++++++++++++++++++++-----------
-> >  1 file changed, 44 insertions(+), 12 deletions(-)
->
-> Support for the module srcversion is being removed in "module: remove
-> MODULE_VERSION() and srcversion" [1] and scripts/mod/sumversion.c should
-> be gone completely.
+When trying to build some tooling from tools/ in an unconfigured kernel
+tree, the build fails to start because of missing .config:
 
-Hmm, that series doesn't remove the script though, is that planned as a follow up?
+  $ make tools/bpf
+  ***
+  *** Configuration file ".config" not found!
+  ***
+  *** Please run some configurator (e.g. "make oldconfig" or
+  *** "make menuconfig" or "make xconfig").
+  ***
+  /home/alexis/src/linux/Makefile:810: include/config/auto.conf: No such file or directory
+  make[1]: *** [/home/alexis/src/linux/Makefile:892: .config] Error 1
+  make: *** [Makefile:248: __sub-make] Error 2
 
-I guess I can drop this patch from the series then :) Also patch 17 I think?
+The failure is due to the tools/<foo> targets having need-config=1 set.
+With a proper .config present, a standard `make tools/bpf` works, but:
+  - those tools don't need a .config to build and run, they are built
+    independently of the kernel configuration
+  - when trying to build some tools in a specific output directory
+    (O=foo), we still end up having to configure a kernel first in this
+    directory
 
->
-> [1] https://lore.kernel.org/linux-modules/20260731-module_ver_remove-v2-0-c9163858f382@linuxfoundation.org/
->
-> --
-> Thanks,
-> Petr
+Rather than having to systematically configure the kernel to only build
+those tools, add the tools/% pattern to the no-dot-config-targets listing.
 
---
-Cheers, Lorenzo
+Signed-off-by: Alexis Lothoré (eBPF Foundation) <alexis.lothore@bootlin.com>
+---
+ Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 570f0c68aadd..eb4bdf4a52cc 100644
+--- a/Makefile
++++ b/Makefile
+@@ -298,7 +298,8 @@ no-dot-config-targets := $(clean-targets) \
+ 			 %asm-generic kernelversion %src-pkg dt_binding_check \
+ 			 dt_style_selftest \
+ 			 outputmakefile rustavailable rustfmt rustfmtcheck \
+-			 run-command
++			 run-command \
++			 tools/%
+ no-sync-config-targets := $(no-dot-config-targets) %install modules_sign kernelrelease \
+ 			  image_name
+ single-targets := %.a %.i %.ko %.lds %.ll %.lst %.mod %.o %.rsi %.s %/
+
+---
+base-commit: 51794b107d54b3c9a8ebbe12a3b81d8495bd482c
+change-id: 20260911-tools-build-output-18157e524114
+
+Best regards,
+--  
+Alexis Lothoré (eBPF Foundation) <alexis.lothore@bootlin.com>
+
