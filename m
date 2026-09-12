@@ -1,127 +1,154 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr2-f12.google.com (mail-wr2-f12.google.com [74.125.225.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 028E637204A;
-	Sat, 12 Sep 2026 07:11:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 333DE415F0E
+	for <linux-kbuild@vger.kernel.org>; Sat, 12 Sep 2026 10:03:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789197101; cv=none; b=MXMzX/ttIah7wdSp9F+CSPQUCGd4VB93rvJMrFogLQg6BAt0pJO5uAIGp913hSXQLuJ93oMPhVvlf1EaivkQrmwDNX/FNf7sv/fXdWMuOmGfV2+sqgeapLVev1gpitxrTnaKYtmDCVwyH5RfeHPe8juDA333DvO5i0+7UFTMl2Y=
+	t=1789207404; cv=none; b=QjRoowUtXVWaohvBFtgP4LY8y6n6K2+js2X5nfI2PEZ+EYVeVFRx693UUD/4zel+JPAI8wM/kMuNhlYJtPNCt0rt6XSHeUg/gr0DmNxvazx715OoZJSvK9MtY4p0koRlJ90x0NCl0WY7JGyhiDxh0qW1PMqqOwwUkaV0seNxuzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789197101; c=relaxed/simple;
-	bh=Mw/2FuMBzyRbpnBdDwqyc0WoQo+XQ75T+sKeuIrxxWI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VI9IScGGtikWtgv0awfbG+L/7Go7baQAr5O6U3lojL2uzbdM1ru3wc6EXxrGFx41RDELiFe+hxvS8n4PS8aIpx+XVNa1vAukvH1nQUOE2/Lc4e9lKx/UxGoUuG5R/sKSJSPsCryrZIcopyAKRqRqSLDrb9uMQcxiXcnbdMVwM1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eFWkhuVd; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789207404; c=relaxed/simple;
+	bh=8sojs+se8QPBJyJ3S7gUk1OtieiG2IMnEQyGHnpeALo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=f+6QAbwH4QZzuQqnTHntITk1+JhuM3UoS0etas8biKP8eyQlD0ibOBHIQEDuyl2BLYDObGOVzivDZix695inDQelpMldp+KQx8RTH1wds9e28/a+Glwx/5cpND9z+mdDsKKna+IIDbDDGnrLIA5q1QaMdjipuPv1B04gAKXtcgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fe+AZyiP; arc=none smtp.client-ip=74.125.225.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eFWkhuVd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 744F31F00893;
-	Sat, 12 Sep 2026 07:11:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789197099;
-	bh=4/WwgIbj2JMFSxLBJaTQNiKL//gze4K2SPN+E9vGKnc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=eFWkhuVdsLkYkirfy95jHDEmcj/iqcwLeOP2AYho268voIwJ7tppVk54oT9Pqaw7/
-	 UbBk+Y5+6aO4UN8SVP5qsv+q9Oc8y4oxgCWc9xe9hOKC6TDKfGnf8Z95DLdbu/SMvg
-	 pD1N5hre4CopVGJaKrTfyHoPMiS27zD9jBfCjawuTS8HCCS7y4Av0jQpUwNvp/86Vy
-	 eHcMQbOwt2VuTSGRTCOvMZx6PbSNAUjNo3ckHBRAivHVzuTmgvftg5LZVSgfeTfVfC
-	 +raEmQN52zFlbmq/l9cIs3x5uorPACERQ0byHB6VSAgijLL7sRQpxk+VUBVhtH9gON
-	 EKnbCFfiMLxcg==
-Date: Sat, 12 Sep 2026 00:11:28 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Nicolas Schier <n.schier@fritz.com>,
-	David Laight <david.laight.linux@gmail.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Alexey Gladkov <legion@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>, Paul Walmsley <pjw@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
-	Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <lossin@kernel.org>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Daniel Almeida <daniel.almeida@collabora.com>,
-	Tamir Duberstein <tamird@kernel.org>,
-	Alexandre Courbot <acourbot@nvidia.com>,
-	Onur =?iso-8859-1?Q?=D6zkan?= <work@onurozkan.dev>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Randy Dunlap <rdunlap@infradead.org>, linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
-	linux-riscv@lists.infradead.org, linux-arch@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-efi@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, linux-doc@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH 12/23] kbuild: avoid re-running compiler and linker probes
-Message-ID: <20260912071128.GD2002951@ax162>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fe+AZyiP"
+Received: by mail-wr2-f12.google.com with SMTP id ffacd0b85a97d-482f635552aso323392f8f.2
+        for <linux-kbuild@vger.kernel.org>; Sat, 12 Sep 2026 03:03:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789207400; x=1789812200; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=78QJrighesf7VQwGx1w3HgeMelr4wZOukxrUbALylpM=;
+        b=Fe+AZyiPJOfMvfVWNuDtyAcWTVKbBm96f/FC3Afm6JLZBHlBx4RDyqfVRdhFrVnLcu
+         n4w48wdDXiNehawYgSXj6RD10qznhIwlXp2oOKq81tWWQcrvxbZzbDpLoCKjGmThvW5n
+         kuCdUk/zDHrjp2P8fcKrJCIIptcNIR9aAVXgQITG7+l0EDdMQJzK1hv9Fhm1dzDDpJjr
+         sX/pIp21teXMpdb2inVRL30AHaleM1Yuo4FVYGmeaLlbXvYBIVwd30kdVsV6ZMYtdNk5
+         RJUK/36fQ0Yjypq3Y2OzYHXDnBliRbq6ba9NaXMK89x1NGAILWj+/oOeA3oS/cZnbvOW
+         QfHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789207400; x=1789812200;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=78QJrighesf7VQwGx1w3HgeMelr4wZOukxrUbALylpM=;
+        b=j2rtF5ykye8QwnsL/+Gu+mC2EX+YNvFOSKQlPwa06VehPxBFJMOWQLFkbVypGjQNqv
+         74wtMwV7UqGXjQzDqyPDEJg2BzoI1AaJ6UEh4iLYW0Mer04c7BI3Rr4C6B3u9G+pq6Vw
+         VdPtGB9/1TULa/O3fgEnw0ZHeWMLZLrW/bqEZh1e/qXazOhec+1Puk9+nff3ju923ACf
+         VWDnPbEshCI6i4Qzy0rkQIoPNPhoG9ThojfQdsgjcUMTjsjr0v22DA1Z402HgyOemRHY
+         iNCUdqlOf1xEIteh49EaHqM6X7YP5M3MKrOJmH0E0x5cf0gajX9M4ygrHaS97Hxw4mbq
+         jzhA==
+X-Forwarded-Encrypted: i=1; AKwUvBzNM92awlUTK0crcW5rLoGNCVSfDYXrzd0l3/AGVOM81zYZXP5sQI8FzPJlQyyjjjmPuOe8wt4Gb5y28eI=@vger.kernel.org
+X-Gm-Message-State: AFuF++mEIe3nvHmlqYM/P+/ROigCXtDKT00SFU2SAoPMcIJrerIVIbLS
+	IuC6XOXcF8ia3iIaLCQKw75JLgPsPd9kwJ7xn1ONiPjMoJWWFQuLw6Wo
+X-Gm-Gg: AYBFou0WwZVT83361KYCPqOorPA4jh2sMgKx4QedM2mt0GyqJjmU+r8eBDdd01rv/5H
+	yGYYLj/7gepRUHBYK7bx1iDg2n78ySq5IC9oRZahH7wZQUAOm34jXpsEMbYnBuH46855XpiB0vz
+	V046N9gCiEBqVCo1NdyU8W4vN+XTqBF62PIbKEM71q+oMCLZpS5wyA5tEqV/H/QH0UXCBj8lFrp
+	rrtU74DbbGCVlmrJKuPW7mTwF5HLsUaM+upV7r5t3OpG+4bDbTPVMGrsGRAeK8gwzgXVJZZvocU
+	C/IR/Z8me0Z1U+1Gwetj4jHX43/wWlBkN34hSW0TisEuSSySwrpAwzNtFmw0uJE/HjlHN2vZlXP
+	8XSAU1w8ciVoEbNc6uutR71HoE8vk01Z8ifyrphHof3h+YKQBxINvZxPb1BzMsfbCHM9kjhlyFq
+	fsMmZ15Odag8N5ZJ4PHfbqPINEB4fz+kTbPMgAzpxAGGjBBw8mND7VbO++PfYMz/81zHtjh+Sr0
+	BrFLnU2XgHTL2GpkpHLKlJyv9QdjqmrL9hzIwAkly/ToXQ=
+X-Received: by 2002:a5d:5848:0:b0:481:512b:f0e7 with SMTP id ffacd0b85a97d-486f6c0a974mr2053384f8f.17.1789207400506;
+        Sat, 12 Sep 2026 03:03:20 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-486f301121asm7428212f8f.0.2026.09.12.03.03.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 12 Sep 2026 03:03:20 -0700 (PDT)
+Date: Sat, 12 Sep 2026 11:03:18 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>, Linus Torvalds
+ <torvalds@linux-foundation.org>, Nicolas Schier <nsc@kernel.org>, Nick
+ Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>,
+ Justin Stitt <justinstitt@google.com>, Masahiro Yamada
+ <masahiroy@kernel.org>, Alexey Gladkov <legion@kernel.org>, Thomas Gleixner
+ <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
+ <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>, Paul Walmsley <pjw@kernel.org>, Palmer
+ Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Alexandre
+ Ghiti <alex@ghiti.fr>, Arnd Bergmann <arnd@arndb.de>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Mark Rutland
+ <mark.rutland@arm.com>, Ard Biesheuvel <ardb@kernel.org>, Ilias Apalodimas
+ <ilias.apalodimas@linaro.org>, Josh Poimboeuf <jpoimboe@kernel.org>, Peter
+ Zijlstra <peterz@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Boqun
+ Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, =?UTF-8?B?QmrDtnJu?=
+ Roy Baron <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>,
+ Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl
+ <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich
+ <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, Tamir
+ Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>,
+ Onur =?UTF-8?B?w5Z6a2Fu?= <work@onurozkan.dev>, Jonathan Corbet
+ <corbet@lwn.net>, Randy Dunlap <rdunlap@infradead.org>,
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+ llvm@lists.linux.dev, linux-riscv@lists.infradead.org,
+ linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ linux-doc@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH 12/23] kbuild: avoid re-running compiler and linker
+ probes
+Message-ID: <20260912110318.23bb6619@pumpkin>
+In-Reply-To: <178901395292.3971858.13236774094648272066.b4-review@b4>
 References: <20260908-build-speedup-v1-0-5dc1ac01672d@kernel.org>
- <20260908-build-speedup-v1-12-5dc1ac01672d@kernel.org>
- <178901395292.3971858.13236774094648272066.b4-review@b4>
- <20260910-translucent-sweet-sidewinder-7acacb@l-nschier-aarch64>
- <20260911183333.1df0f2e2@pumpkin>
- <20260911-invaluable-indigo-seal-e31aec@l-nschier-aarch64>
- <aqRGYXKDzXZMXmmp@gremlin>
+	<20260908-build-speedup-v1-12-5dc1ac01672d@kernel.org>
+	<178901395292.3971858.13236774094648272066.b4-review@b4>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aqRGYXKDzXZMXmmp@gremlin>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Sep 11, 2026 at 07:24:50PM +0100, Lorenzo Stoakes (ARM) wrote:
-> I mean this is a problem that already exists for any flags already specified in
-> Kconfig.
+On Wed, 09 Sep 2026 21:19:12 -0700
+Nathan Chancellor <nathan@kernel.org> wrote:
+
+> > diff --git a/init/Kconfig b/init/Kconfig
+> > index 8583d9f06c52..3c92c87254a3 100644
+> > --- a/init/Kconfig
+> > +++ b/init/Kconfig
+> > @@ -144,6 +144,44 @@ config CC_HAS_ASSUME
+> >  config CC_HAS_NO_PROFILE_FN_ATTR
+> >  	def_bool $(success,echo '__attribute__((no_profile_instrument_function)) int x();' | $(CC) -x c - -c -o /dev/null -Werror)
+> >  
+> > +config CC_HAS_ZERO_INIT_PADDING_BITS
+> > +	def_bool $(cc-option,-fzero-init-padding-bits=all)
+> > +
+> > +config CC_HAS_NO_STACK_CLASH_PROTECTION
+> > +	def_bool $(cc-option,-fno-stack-clash-protection)
+> > +
+> > +config CC_HAS_NO_ADDRSIG
+> > +	def_bool $(cc-option,-fno-addrsig)  
 > 
-> Out-of-tree modules are historically something that we don't go to great lengths
-> to support and haven't historically worried about breaking, either.
+> I am generally in favor of this proposal since I think these checks
+> should be cached by Kconfig where possible to clear up running them
+> twice. That said, I wonder if we should pick a better dumping ground for
+> these checks other than init/Kconfig. Maybe init/Kconfig.tools or
+> scripts/Kconfig.tools or something?
 > 
-> I'm sure distros can find ways around this if a problem were to arise. But I
-> don't think it's something to worry about all that much.
+> I also worry about backsliding and growing cc-option checks. Should we
+> update the documentation to state that it is preferrable for these
+> checks to live in Kconfig so that they can be properly cached?
 > 
-> I expect a _lot_ of these, in any case, would only require the compilers to be
-> within a fair few major versions of one another anyway.
 
-Yeah, while I know distributions will try to maintain a stable kernel
-ABI to allow updating modules without updating the main kernel, I would
-be very very surprised if they guaranteed compatability when building
-external modules with a compiler different from the main kernel. If so,
-I think they get to pick up the pieces :)
+Thought...
+Can some/all of the checks be done by running 'cc --help=xxx' once and
+parsing the result?
 
-One issue that I found with my test matrix building with LLVM is that
-cc-option in Kconfig does not guarantee use of either '-m32' / '-m64' or
-'-mbig-endian' / '-mlittle-endian' to properly flip these options, which
-could result in a flag being set (or not set) when it should be. For
-example, building ARCH=powerpc pmac32_defconfig results in
+Although I'm not really sure that shaving off 0.2 seconds really matters.
+(I know the little bits add up, but there are much bigger delays.)
 
-  clang: error: argument unused during compilation: '-fno-stack-clash-protection' [-Werror,-Wunused-command-line-argument]
-  make[4]: *** [scripts/Makefile.build:193: kernel/bounds.s] Error 1
+One thing that does annoy me is the delay before the first compile when
+you do a -j1 build. I've not looked at what is being run.
+This is all made worse because gmake doesn't stop on errors very well.
+I fixed that in NetBSD's make about 25 years ago.
+(IIRC it mostly required always getting a new token from the pipe.)
 
-because the 64-bit PowerPC little endian target supports this flag in
-the PowerPC LLVM backend but the 32-bit big endian target does not.
-
-I am not really sure what the best way to avoid this would be off the
-top of my head... it might be safer to start with moving only the
-warning flags to Kconfig since that is a truly frontend query.
-
--- 
-Cheers,
-Nathan
+David
