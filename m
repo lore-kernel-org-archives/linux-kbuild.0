@@ -1,133 +1,116 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mo4-p00-ob.smtp.rzone.de (mo4-p00-ob.smtp.rzone.de [81.169.146.221])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2102E35A3BF;
-	Sun, 13 Sep 2026 20:02:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789329780; cv=none; b=DF8ptgcIGPp4JEIz6pM3QT2yr0lPcWTHsE5nmQIPpWXNUZxK6jO7mzfavGpfmU0AKKh3+2iz94p3jZSGA2XZ/wZOzokP7L4YNOG9pZGdDDoEOjvZPZ8Vn5Yrov6yh0gJaV9VBFbvj5i+Ks2+H0T7vJOIV4tZ7O+iv1RBFhBazm8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789329780; c=relaxed/simple;
-	bh=+lVv1ffdcE8MPPnIU0GPodu3dsa72DF3Oy1AUF3Zyu8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tvu2XABTFy0rmDkj72dfqg2MhIFWOJElc5VydSiZdmb3p75uiHmz4lrXZwLB6MGnvDwItMxRa4iFNY9vKEKpJt7HkMFZkNJqoEg+UDyRsRstlkPoBkXlR1pWFM12dGxxSaReP74BrwbO+saaZ1fHCEiR4g8uw/siVJtPTt5YNsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HlDGsq4/; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58811386C3E;
+	Sun, 13 Sep 2026 20:11:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.221
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789330265; cv=pass; b=nueFRLHZ0OA9RFfS6j1DjxHnwdVCuTUH2Vmu89AQ0N4XLl1zVpdbI+8y7z4VSkpkGhcLJSg8KkXRlXKnoSM60HhSeKyy7u8ZKCs8Z85UUvxeWo6ChPJZH5qQIvoo3YQGF4AhcJySCXIPIhRHqgRGMRyzhuA9XeBQFI4xXzg0pnI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789330265; c=relaxed/simple;
+	bh=1Q+GQq+uMcPO7YhrthJksF1q4vmvqcLVl4wMNW5wi6c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NEvTpZYpr9DwdP5hx4386/AtLOiD4BWhnPS9l0zpfEfWy1qgImw6L1XavCs477t/ImrUInY85jMO+n7TdP142RcPz5qyEiIg3PDxV9U5kydAfCEMnpNKW8UrrZJPTLddPywKB0Xz8GMJjJwfXh2RuS2wubHIiLCOY3Ln9HejdNU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=goldelico.com; spf=pass smtp.mailfrom=goldelico.com; dkim=pass (2048-bit key) header.d=goldelico.com header.i=@goldelico.com header.b=O9UJ3trI; dkim=permerror (0-bit key) header.d=goldelico.com header.i=@goldelico.com header.b=whQ+MuQ+; arc=pass smtp.client-ip=81.169.146.221
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=goldelico.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goldelico.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HlDGsq4/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9299F1F000FF;
-	Sun, 13 Sep 2026 20:02:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789329778;
-	bh=FIkAWUWlN6IulmoamTUqkqG8+2dVERWLnANwGikeBxI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=HlDGsq4/UmYfY5watxSUp7cF5BqBu/g1fAq4lP+77QRdJlpCZqGH4mQ52EiBUPykr
-	 Cd0+VHZFXQUlRaRYDhuLoSpQ6FEq0qzmKfJBGEVC9mszdpLneVm8nzdWMjqYWt+YJs
-	 jWXqr77zpV3n3Eg0kcjyUT2JBjO+NPlDBxPLNxWlRmlG2ft3w25fXSmaWC6wnopsJU
-	 XXVX1gLesBdp5t4hb9bolEagqKfVnSVlUcSLdX9Bw7PA4bFOXWSYqSKsNLE0uRQDfM
-	 Tm+p4o7rMkUbztOOJig9dDty0W0F+k/TWF4/7FArPHjjsrjsRaye8GzyFHaa+x3sQv
-	 isR4zk4sqpvIg==
-Date: Sun, 13 Sep 2026 21:02:47 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Nicolas Schier <n.schier@fritz.com>, 
-	David Laight <david.laight.linux@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Masahiro Yamada <masahiroy@kernel.org>, 
-	Alexey Gladkov <legion@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
-	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, Arnd Bergmann <arnd@arndb.de>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Ard Biesheuvel <ardb@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Josh Poimboeuf <jpoimboe@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
-	Gary Guo <gary@garyguo.net>, =?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
-	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
-	Onur =?utf-8?B?w5Z6a2Fu?= <work@onurozkan.dev>, Jonathan Corbet <corbet@lwn.net>, 
-	Randy Dunlap <rdunlap@infradead.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	llvm@lists.linux.dev, linux-riscv@lists.infradead.org, linux-arch@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-doc@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH 12/23] kbuild: avoid re-running compiler and linker probes
-Message-ID: <aqcAqth2Bhx7J9BT@gremlin>
-References: <20260908-build-speedup-v1-0-5dc1ac01672d@kernel.org>
- <20260908-build-speedup-v1-12-5dc1ac01672d@kernel.org>
- <178901395292.3971858.13236774094648272066.b4-review@b4>
- <20260910-translucent-sweet-sidewinder-7acacb@l-nschier-aarch64>
- <20260911183333.1df0f2e2@pumpkin>
- <20260911-invaluable-indigo-seal-e31aec@l-nschier-aarch64>
- <aqRGYXKDzXZMXmmp@gremlin>
- <20260912071128.GD2002951@ax162>
+	dkim=pass (2048-bit key) header.d=goldelico.com header.i=@goldelico.com header.b="O9UJ3trI";
+	dkim=permerror (0-bit key) header.d=goldelico.com header.i=@goldelico.com header.b="whQ+MuQ+"
+ARC-Seal: i=1; a=rsa-sha256; t=1789330070; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=aFC4tolnAZq9ej4ZYSWKNw1FaCOfDwtp9t5gBojOEyQSvBxrXGz6BkkycPKPgGzflO
+    /lSIC4NwO+bm6j1z2G5h9jY6JTgW3TsLhSqQEX+K+I7c2LQzrfF8BPjzjHBOaxWrBfs/
+    wtH01A5ibTmP66CeGPj506IEMo3jNSTukiXnj+p1xCkoScqbSyaDUJrFleAUyOf8pj6v
+    ew0QNxeVwWjfkdAknqhWZZHHj4mmwJtdy2uq1RcYlC2QUbrm/VXij8X8NvvfITkxHh2X
+    pwskKFEPraNWRufB3tNsDgefKLr/OzRT17XcZjABRbn47mJbob7r3szxenB5+hvraoMm
+    K2LQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1789330070;
+    s=strato-dkim-0002; d=strato.com;
+    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=qd1BBf8NmsBZ4nI1PuXbOCWs5aWpybFN8MP7hg3NeR4=;
+    b=OQcy+RT0J+q4qQL8lHBEVPn8eTkbdK9CqfQJ177ZkU5kQ4q/yNGFV/lQxqL+EOSpWL
+    BBUbnsS7DaY8S8uvit/6CSdGGghXQZCK5fM+9dnJ8JUZR8Y9wqXOKXjbUkH9tFSTrjz0
+    ujy1kHJScUK2CtFSgZyw5EmVxktK2uZi8V+DR/Y91ti1rf82QvrveQNd0Dq29w7O/ofg
+    60AP6wZYmRWprdBtIHGEGTlFwHBin/kbheHp/OUDrAf0Z1PIKWN3pL55bV/UJ7hfVgik
+    SRAju9OLg+5+Mc/PO+2EXLhNlDGvywKzn4+o0CbBu5ZeGBj1FrE0cnZ+cKL09wdPkJR6
+    i6zQ==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo00
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1789330070;
+    s=strato-dkim-0002; d=goldelico.com;
+    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=qd1BBf8NmsBZ4nI1PuXbOCWs5aWpybFN8MP7hg3NeR4=;
+    b=O9UJ3trIISE8oVt2cWNVCTcBmbC9qVaGKGoh0aMwNpKWpqFQlkrjoMtDeSQNc5TJc0
+    5UaWvFdanTWTwXGzVNfUf36Gbqj36y9yyjtkE20hRMOAbM/CP8MvQw+eAOvHbts7t7/y
+    1nn8ojgt1pvIbR7OVf65r3xINYXnnnDgCY4l0r67OAj7hKtRk22Rz0MxIzVQl8Iu9TKB
+    02PTBzjOx9EMFYpXNoLlX31GjBBj2H906FwR4BskmeQqR0nWsoYqIHfS4d3b5txT3Aha
+    aduX6eX5OSzCMhGAfA9YEsPsTaEUP0mMZQHnkLRscSHZ8PI+eL4xTgIGW3w4p5I67UkF
+    /26g==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1789330070;
+    s=strato-dkim-0003; d=goldelico.com;
+    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=qd1BBf8NmsBZ4nI1PuXbOCWs5aWpybFN8MP7hg3NeR4=;
+    b=whQ+MuQ+hieTE3/djHlZfYDfkEPWcYMvArCTiMz8ZrK8klO2kAcGgOrQuT/34+/ghP
+    3wAZKXptcO94iFJMrjCA==
+X-RZG-AUTH: ":JGIXVUS7cutRB/49FwqZ7WcJeFKiMhflhwDubTJ9qVpwcQVkPW4I1HrV0ZpclciN8saFYq97YBFyveGds+G7JwsV8A=="
+Received: from iMac.fritz.box
+    by smtp.strato.de (RZmta 55.6.2 AUTH)
+    with ESMTPSA id Q0498328DK7oAqn
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Sun, 13 Sep 2026 22:07:50 +0200 (CEST)
+From: "H. Nikolaus Schaller" <hns@goldelico.com>
+To: Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>,
+	"H. Nikolaus Schaller" <hns@goldelico.com>,
+	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
+	Thomas Gleixner <tglx@kernel.org>
+Cc: linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	letux-kernel@openphoenux.org
+Subject: [PATCH] kbuild: fix spurious error from find when generating asm-headers
+Date: Sun, 13 Sep 2026 22:07:49 +0200
+Message-ID: <6e2a2c0cb5d7885ae0dc146025d21c23904d7b70.1789330068.git.hns@goldelico.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260912071128.GD2002951@ax162>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
 
-On Sat, Sep 12, 2026 at 12:11:28AM -0700, Nathan Chancellor wrote:
-> On Fri, Sep 11, 2026 at 07:24:50PM +0100, Lorenzo Stoakes (ARM) wrote:
-> > I mean this is a problem that already exists for any flags already specified in
-> > Kconfig.
-> >
-> > Out-of-tree modules are historically something that we don't go to great lengths
-> > to support and haven't historically worried about breaking, either.
-> >
-> > I'm sure distros can find ways around this if a problem were to arise. But I
-> > don't think it's something to worry about all that much.
-> >
-> > I expect a _lot_ of these, in any case, would only require the compilers to be
-> > within a fair few major versions of one another anyway.
->
-> Yeah, while I know distributions will try to maintain a stable kernel
-> ABI to allow updating modules without updating the main kernel, I would
-> be very very surprised if they guaranteed compatability when building
-> external modules with a compiler different from the main kernel. If so,
-> I think they get to pick up the pieces :)
->
-> One issue that I found with my test matrix building with LLVM is that
-> cc-option in Kconfig does not guarantee use of either '-m32' / '-m64' or
-> '-mbig-endian' / '-mlittle-endian' to properly flip these options, which
-> could result in a flag being set (or not set) when it should be. For
-> example, building ARCH=powerpc pmac32_defconfig results in
->
->   clang: error: argument unused during compilation: '-fno-stack-clash-protection' [-Werror,-Wunused-command-line-argument]
->   make[4]: *** [scripts/Makefile.build:193: kernel/bounds.s] Error 1
->
-> because the 64-bit PowerPC little endian target supports this flag in
-> the PowerPC LLVM backend but the 32-bit big endian target does not.
+The *.h pattern should be quoted or we may see errors like
 
-Ack, reproduced locally thanks!
+  find: paths must precede expression: elf.h
+  Usage: find [-H] [-L] [-P] [-Olevel] [-D help|tree|search|stat|rates|opt|exec] [path...] [expression]
 
-I had the LLM probe every flag the patch moves in both directions with
-clang across ppc32/64 BE and LE, x86 -m32, mips 32/64, rv32, s390x, arm and
-arm64 BE and with gcc -m32.
+if the working directory contains some *.h files.
 
-(We really have to stop supporting some of this stuff...!)
+This was found in a cross-compilation environment.
 
-It seems that only -fno-stack-clash-protection is problematic for
-ppc32/clang.
+Fixes: 2d69b891e6461 ("kbuild: Support generated asm-headers in subdirectories")
+Signed-off-by: H. Nikolaus Schaller <hns@goldelico.com>
+---
+ scripts/Makefile.asm-headers | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-So in v2 I'll keep that probe in the Makefile and move the rest, have
-confirmed that fixes the problem.
->
-> I am not really sure what the best way to avoid this would be off the
-> top of my head... it might be safer to start with moving only the
-> warning flags to Kconfig since that is a truly frontend query.
+diff --git a/scripts/Makefile.asm-headers b/scripts/Makefile.asm-headers
+index b38931314ad7c..9db8ab0145a44 100644
+--- a/scripts/Makefile.asm-headers
++++ b/scripts/Makefile.asm-headers
+@@ -48,7 +48,7 @@ syscall-y   := $(addprefix $(obj)/, $(syscall-y))
+ generated-y := $(addprefix $(obj)/, $(generated-y))
+ 
+ # Remove stale wrappers when the corresponding files are removed from generic-y
+-old-headers := $(shell test -d $(obj) && find $(obj) -name *.h)
++old-headers := $(shell test -d $(obj) && find $(obj) -name '*.h')
+ unwanted    := $(filter-out $(generic-y) $(generated-y) $(syscall-y),$(old-headers))
+ 
+ filechk_wrap = echo "\#include <asm-generic/$*.h>"
+-- 
+2.55.0
 
-Given the testing above I think we _should_ be OK :)
-
->
-> --
-> Cheers,
-> Nathan
-
---
-Cheers, Lorenzo
