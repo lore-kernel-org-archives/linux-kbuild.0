@@ -1,116 +1,172 @@
-Received: from mo4-p00-ob.smtp.rzone.de (mo4-p00-ob.smtp.rzone.de [81.169.146.221])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58811386C3E;
-	Sun, 13 Sep 2026 20:11:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.221
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789330265; cv=pass; b=nueFRLHZ0OA9RFfS6j1DjxHnwdVCuTUH2Vmu89AQ0N4XLl1zVpdbI+8y7z4VSkpkGhcLJSg8KkXRlXKnoSM60HhSeKyy7u8ZKCs8Z85UUvxeWo6ChPJZH5qQIvoo3YQGF4AhcJySCXIPIhRHqgRGMRyzhuA9XeBQFI4xXzg0pnI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789330265; c=relaxed/simple;
-	bh=1Q+GQq+uMcPO7YhrthJksF1q4vmvqcLVl4wMNW5wi6c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NEvTpZYpr9DwdP5hx4386/AtLOiD4BWhnPS9l0zpfEfWy1qgImw6L1XavCs477t/ImrUInY85jMO+n7TdP142RcPz5qyEiIg3PDxV9U5kydAfCEMnpNKW8UrrZJPTLddPywKB0Xz8GMJjJwfXh2RuS2wubHIiLCOY3Ln9HejdNU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=goldelico.com; spf=pass smtp.mailfrom=goldelico.com; dkim=pass (2048-bit key) header.d=goldelico.com header.i=@goldelico.com header.b=O9UJ3trI; dkim=permerror (0-bit key) header.d=goldelico.com header.i=@goldelico.com header.b=whQ+MuQ+; arc=pass smtp.client-ip=81.169.146.221
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=goldelico.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goldelico.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 368AB33BBAF;
+	Sun, 13 Sep 2026 20:28:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789331340; cv=none; b=SJxpK4pK6BRU1vLcM6Wzyo07+F7MbUzC8trDDAIoh8Yu1583cJnC9FmPJyntoDdHQLblA+OPm4aJ/U77UDOmotcPT7Rg2yaNXajFLqgvJ1Dej6Dmprz3xUA9fWVI9GIGCJkGfoGB790/exrywk5jqELa9MM4SX2DlgmtqxRl2/I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789331340; c=relaxed/simple;
+	bh=l2mySYUZ2bDnO/iGgv2uGFdFT2j6OD6SRY1Ji2QN6Yo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qB2IYEqKF6GpETorR8e2Bd2OpfCLCXwOGhBQ7+o8BB8eN1sejEVLbj7tDZy39rbge7od4sIGZhLHTWD9AWSmGBNJie8Xktvfj0HdNLHOLqNHlQj2FbZTYfk8AEh9pdyAV15ldrN6XDcIqcvVT2Vm4puwJ1lpmrNjqxzVzjc/p/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e0ZhGK8I; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=goldelico.com header.i=@goldelico.com header.b="O9UJ3trI";
-	dkim=permerror (0-bit key) header.d=goldelico.com header.i=@goldelico.com header.b="whQ+MuQ+"
-ARC-Seal: i=1; a=rsa-sha256; t=1789330070; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=aFC4tolnAZq9ej4ZYSWKNw1FaCOfDwtp9t5gBojOEyQSvBxrXGz6BkkycPKPgGzflO
-    /lSIC4NwO+bm6j1z2G5h9jY6JTgW3TsLhSqQEX+K+I7c2LQzrfF8BPjzjHBOaxWrBfs/
-    wtH01A5ibTmP66CeGPj506IEMo3jNSTukiXnj+p1xCkoScqbSyaDUJrFleAUyOf8pj6v
-    ew0QNxeVwWjfkdAknqhWZZHHj4mmwJtdy2uq1RcYlC2QUbrm/VXij8X8NvvfITkxHh2X
-    pwskKFEPraNWRufB3tNsDgefKLr/OzRT17XcZjABRbn47mJbob7r3szxenB5+hvraoMm
-    K2LQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1789330070;
-    s=strato-dkim-0002; d=strato.com;
-    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
-    bh=qd1BBf8NmsBZ4nI1PuXbOCWs5aWpybFN8MP7hg3NeR4=;
-    b=OQcy+RT0J+q4qQL8lHBEVPn8eTkbdK9CqfQJ177ZkU5kQ4q/yNGFV/lQxqL+EOSpWL
-    BBUbnsS7DaY8S8uvit/6CSdGGghXQZCK5fM+9dnJ8JUZR8Y9wqXOKXjbUkH9tFSTrjz0
-    ujy1kHJScUK2CtFSgZyw5EmVxktK2uZi8V+DR/Y91ti1rf82QvrveQNd0Dq29w7O/ofg
-    60AP6wZYmRWprdBtIHGEGTlFwHBin/kbheHp/OUDrAf0Z1PIKWN3pL55bV/UJ7hfVgik
-    SRAju9OLg+5+Mc/PO+2EXLhNlDGvywKzn4+o0CbBu5ZeGBj1FrE0cnZ+cKL09wdPkJR6
-    i6zQ==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo00
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1789330070;
-    s=strato-dkim-0002; d=goldelico.com;
-    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
-    bh=qd1BBf8NmsBZ4nI1PuXbOCWs5aWpybFN8MP7hg3NeR4=;
-    b=O9UJ3trIISE8oVt2cWNVCTcBmbC9qVaGKGoh0aMwNpKWpqFQlkrjoMtDeSQNc5TJc0
-    5UaWvFdanTWTwXGzVNfUf36Gbqj36y9yyjtkE20hRMOAbM/CP8MvQw+eAOvHbts7t7/y
-    1nn8ojgt1pvIbR7OVf65r3xINYXnnnDgCY4l0r67OAj7hKtRk22Rz0MxIzVQl8Iu9TKB
-    02PTBzjOx9EMFYpXNoLlX31GjBBj2H906FwR4BskmeQqR0nWsoYqIHfS4d3b5txT3Aha
-    aduX6eX5OSzCMhGAfA9YEsPsTaEUP0mMZQHnkLRscSHZ8PI+eL4xTgIGW3w4p5I67UkF
-    /26g==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1789330070;
-    s=strato-dkim-0003; d=goldelico.com;
-    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
-    bh=qd1BBf8NmsBZ4nI1PuXbOCWs5aWpybFN8MP7hg3NeR4=;
-    b=whQ+MuQ+hieTE3/djHlZfYDfkEPWcYMvArCTiMz8ZrK8klO2kAcGgOrQuT/34+/ghP
-    3wAZKXptcO94iFJMrjCA==
-X-RZG-AUTH: ":JGIXVUS7cutRB/49FwqZ7WcJeFKiMhflhwDubTJ9qVpwcQVkPW4I1HrV0ZpclciN8saFYq97YBFyveGds+G7JwsV8A=="
-Received: from iMac.fritz.box
-    by smtp.strato.de (RZmta 55.6.2 AUTH)
-    with ESMTPSA id Q0498328DK7oAqn
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Sun, 13 Sep 2026 22:07:50 +0200 (CEST)
-From: "H. Nikolaus Schaller" <hns@goldelico.com>
-To: Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>,
-	"H. Nikolaus Schaller" <hns@goldelico.com>,
-	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
-	Thomas Gleixner <tglx@kernel.org>
-Cc: linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	letux-kernel@openphoenux.org
-Subject: [PATCH] kbuild: fix spurious error from find when generating asm-headers
-Date: Sun, 13 Sep 2026 22:07:49 +0200
-Message-ID: <6e2a2c0cb5d7885ae0dc146025d21c23904d7b70.1789330068.git.hns@goldelico.com>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e0ZhGK8I"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8FA71F000FF;
+	Sun, 13 Sep 2026 20:28:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789331338;
+	bh=aOuVJZFYo0EDnLKzsfleMThuTLbpPfRT1aSflxZmaT8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=e0ZhGK8IM4pIb1CdketDYt0edlRhvhAJcYPbTotFxrv2kw0TO70plhK5M8Ow4nV2Y
+	 mwMDowI3NHyoBWV011IY2wWsKAKGOGixpCreQgvVUT8twOX4rpEdIR2R6pSU2G9cgK
+	 xLls4fh66gx+pevVkNSnHxgSeeATqKD58Y1wwNy2bsCKZfSRn7EVljxkzQd1Adjxg5
+	 A2iv7O9vUu9qd0iw0fOkZhS+rxtfbCfGQLPN1oobjnRl3APaZENDbJCNztY8EkulbF
+	 5GsMUdC4Rzpaaick9NOgUDWw4DUkDASFngKX/AxtrH+14+4CDDqGNsqS8be0SY+/X4
+	 H26ZtERmdMyng==
+Date: Sun, 13 Sep 2026 21:28:48 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Josh Poimboeuf <jpoimboe@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, Masahiro Yamada <masahiroy@kernel.org>, 
+	Alexey Gladkov <legion@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, Arnd Bergmann <arnd@arndb.de>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Ard Biesheuvel <ardb@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Peter Zijlstra <peterz@infradead.org>, 
+	Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
+	=?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
+	Daniel Almeida <daniel.almeida@collabora.com>, Tamir Duberstein <tamird@kernel.org>, 
+	Alexandre Courbot <acourbot@nvidia.com>, Onur =?utf-8?B?w5Z6a2Fu?= <work@onurozkan.dev>, 
+	Jonathan Corbet <corbet@lwn.net>, Randy Dunlap <rdunlap@infradead.org>, 
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
+	linux-riscv@lists.infradead.org, linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-doc@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH 18/23] objtool: cache relocations and function dead end
+ state, do less work
+Message-ID: <aqcGKhbNOPZvmOL4@gremlin>
+References: <20260908-build-speedup-v1-0-5dc1ac01672d@kernel.org>
+ <20260908-build-speedup-v1-18-5dc1ac01672d@kernel.org>
+ <aqW4klkDI2P0aUn5@jpoimboe>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aqW4klkDI2P0aUn5@jpoimboe>
 
-The *.h pattern should be quoted or we may see errors like
+On Sat, Sep 12, 2026 at 03:47:33PM -0700, Josh Poimboeuf wrote:
+> On Tue, Sep 08, 2026 at 09:55:18PM +0100, Lorenzo Stoakes (ARM) wrote:
+> > Whole build, 128-thread Threadripper 9980X, best of N runs:
+> >
+> >                                          before   after     delta
+> >                                          -------------------------------
+> >   x86 defconfig, touch mm/vma.c, gcc        8.4s     8.1s    -0.28s (-3%)
+> >   x86 defconfig, touch mm/vma.c, clang      7.5s     7.1s    -0.41s (-5%)
+> >   x86 defconfig, clean, gcc                27.1s    26.8s    -0.34s (-1%)
+> >   x86 defconfig, clean, clang              26.6s    26.2s    -0.40s (-1%)
+> >   x86 allmodconfig, touch mm/vma.c, gcc    30.2s    28.4s     -1.8s (-6%)
+> >   x86 allmodconfig, touch mm/vma.c, clang  28.1s    26.0s     -2.1s (-7%)
+>
+> Nice!
+>
+> > @@ -305,7 +305,15 @@ static bool __dead_end_function(struct objtool_file *file, struct symbol *func,
+> >
+> >  static bool dead_end_function(struct objtool_file *file, struct symbol *func)
+> >  {
+> > -	return __dead_end_function(file, func, 0);
+> > +	if (!func)
+> > +		return false;
+> > +
+> > +	if (!func->dead_end_known) {
+> > +		func->dead_end = __dead_end_function(file, func, 0);
+> > +		func->dead_end_known = 1;
+> > +	}
+> > +
+> > +	return func->dead_end;
+> >  }
+>
+> This bit seems like it should be a separate patch.  Though actually, it
+> can just be dropped as I have something similar brewing:
+>
+>   https://lore.kernel.org/9d4b8ccfed745ac47a954aa2e1de62a85197122d.1788899473.git.jpoimboe@kernel.org
+>
 
-  find: paths must precede expression: elf.h
-  Usage: find [-H] [-L] [-P] [-Olevel] [-D help|tree|search|stat|rates|opt|exec] [path...] [expression]
+Ack, dropped for v2, will reference that seris in the cover.
 
-if the working directory contains some *.h files.
+> > -struct reloc *find_reloc_by_dest(const struct elf *elf, struct section *sec, unsigned long offset)
+> > +/* Should never be invoked, provided as a backstop. */
+> > +static struct reloc *find_reloc_linear(struct section *rsec,
+> > +				       unsigned long offset, unsigned int len)
+> >  {
+> > -	return find_reloc_by_dest_range(elf, sec, offset, 1);
+> > +	struct reloc *reloc, *first = NULL;
+> > +
+> > +	WARN("%s: linear scan for sec %s with %u relocs at offset %lu len %u",
+> > +	     __func__, rsec->name, sec_num_entries(rsec), offset, len);
+>
+> Won't this be triggered for sections created with
+> elf_create_rela_section()?  I don't see where they set rsec->hashed.
 
-This was found in a cross-compilation environment.
+Good catch thanks, it was triggering for those, e.g. CONFIG_LIVEPATCH, repro'd
+locally.
 
-Fixes: 2d69b891e6461 ("kbuild: Support generated asm-headers in subdirectories")
-Signed-off-by: H. Nikolaus Schaller <hns@goldelico.com>
----
- scripts/Makefile.asm-headers | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Updated the code to hash these too correctly for v3.
 
-diff --git a/scripts/Makefile.asm-headers b/scripts/Makefile.asm-headers
-index b38931314ad7c..9db8ab0145a44 100644
---- a/scripts/Makefile.asm-headers
-+++ b/scripts/Makefile.asm-headers
-@@ -48,7 +48,7 @@ syscall-y   := $(addprefix $(obj)/, $(syscall-y))
- generated-y := $(addprefix $(obj)/, $(generated-y))
- 
- # Remove stale wrappers when the corresponding files are removed from generic-y
--old-headers := $(shell test -d $(obj) && find $(obj) -name *.h)
-+old-headers := $(shell test -d $(obj) && find $(obj) -name '*.h')
- unwanted    := $(filter-out $(generic-y) $(generated-y) $(syscall-y),$(old-headers))
- 
- filechk_wrap = echo "\#include <asm-generic/$*.h>"
--- 
-2.55.0
+>
+> > @@ -1147,6 +1307,28 @@ static int read_relocs(struct elf *elf)
+> >
+> >  		rsec->base->rsec = rsec;
+> >
+> > +		/* DWARF relocs are never looked up. */
+> > +		if (is_dwarf_section(rsec->base))
+> > +			continue;
+> > +		if (reloc_sec_in_order(rsec)) {
+> > +			rsec->sorted = true;
+> > +			continue;
+> > +		}
+> > +
+> > +		rsec->hashed = true;
+> > +		nr_hashed += sec_num_entries(rsec);
+> > +	}
+>
+> Hm, I'm not sure whether hashing is even still needed, as compilers
+> generally emit sorted relocs.
 
+They do, and anything read from the file in the build does, but this is a
+fallback for sections that objtool grows or creates itself which needs the
+duplicate check + can be appended out of order.
+
+>
+> > @@ -1592,6 +1799,7 @@ static int elf_alloc_reloc(struct elf *elf, struct section *rsec)
+> >  	}
+> >
+> >  	rsec->nr_alloc_relocs = nr_alloc;
+> > +	copy_reloc_cache_to_hash(elf, rsec, nr_relocs_old);
+>
+> Not all relocation appends go through this allocation code path.
+> It can return earlier in this function if the space has already been
+> allocated previously.  So this call probably belongs in
+> elf_create_reloc().
+
+Ack thanks, fixed for v2.
+
+>
+> --
+> Josh
+
+--
+Cheers, Lorenzo
