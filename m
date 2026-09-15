@@ -1,159 +1,204 @@
-Received: from fhigh-a4-smtp.messagingengine.com (fhigh-a4-smtp.messagingengine.com [103.168.172.155])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37E20471D0C;
-	Tue, 15 Sep 2026 08:54:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3245E412294;
+	Tue, 15 Sep 2026 10:09:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789462469; cv=none; b=gkRiNq/yGZJH6vI+hQRZUCAQs9b5hg7p8SRK3qEV9tgNMVa79NRi5h2hdN3J7/hkuyvb2u0p6M9+uHbZJ0c2DwzfVPmjAcSma8xdainwJ7lA7W/0k/OCdazJZuop0W5XXayFz3/7WKIYXu0kqVqx/uljkfnC3BY812cP3ph+XEw=
+	t=1789466981; cv=none; b=OEZbQzWfjPx5Em6125ARuMPBdibxw+Fqj7CJLwNwdP99V+VkQYwEosQSkEpAbcp2MpTSTe4mjlPbctdJfrIkdZZ5a/inU3j1xCeqUnr+Uqej0x2u0AuUc+5aW6L9NNHEWYLOCU5Na5HIGO59EM3JDPjnRid1jjhaK8GsrNBEkzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789462469; c=relaxed/simple;
-	bh=TrFy84WFLihamQ2UtPEIp9cWrnbixhLsx/cx/JOsURw=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=tK9j1ZqMGZLqTppcGNNMHYC+GEyfuWsFrlo8IHPBqM0dgKkekX4hV7kmlB8t67CW5YF7iLH54FDYxHv+fl3ObS1hrtZJrVc0RDgaTPCBG6xOKeeh0WeVf5ckdtKxooL4cX3L8badtgq+CM2ncgHCImlgeR2EEgSndY7RE2gKfCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=B4js3Hku; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=rqq6TufP; arc=none smtp.client-ip=103.168.172.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1789466981; c=relaxed/simple;
+	bh=sU13gsIPUMKUUtL+qE3bab68IEWBsOM0qs/yA9Hs9x0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cnIPh522vrTCUiO9Lo5JJIcyVSCnXTQQ2hkpSiDbW7lAKomqn7vpsVK4jUITRPbLNvbYy/d5m3UWN9kO+xApMS7X5d3r8jGxQzbgojtQ1sruvT1MI9LHrDhk+9MaNVviZy804pZnhrLwtTHTIrnWZq0qt0F8gItipxuEwPYdzng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B494kHSs; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="B4js3Hku";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="rqq6TufP"
-Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 2A14514000B8;
-	Tue, 15 Sep 2026 04:54:25 -0400 (EDT)
-Received: from ams-imap-03 ([10.64.2.23])
-  by ams-compute-02.internal (MEProxy); Tue, 15 Sep 2026 04:54:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1789462464;
-	 x=1789548864; bh=l+Dca6AU7f0s7A11m75QKiePhth6dKEUN646ZUyOcxw=; b=
-	B4js3HkurMcjrD15QoLpxP9Izw+a0J+045jNlya+vsO+95WeBQL1fNx/gv3H1D7K
-	hxkadaMiyKhro+swwkPcN1YS0uYXOSLVBXOtPLXRTlnJmZV/AR0b1m99NL0u9ODj
-	1cgIK5fxz1k+aSyS7qFDZY6BmSAywWMF4uNr4WZfAJwjjQ7txOCzif/YFSFd7DW+
-	Qreot+xLqAeO6zioJbeNMVQ6RyK8Ry4J6vk12VSZWNDpjCWpkc3KaX2/lDS1z/c6
-	5/FXmzlOdjR+0f5GayGR26Yc6HPdFo6gCUiUM+sBTvfFqaSTrAM4DfXOAOkQlcjU
-	ad+BRAd/MLuDV6lqZ8Q2WA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1789462464; x=
-	1789548864; bh=l+Dca6AU7f0s7A11m75QKiePhth6dKEUN646ZUyOcxw=; b=r
-	qq6TufPoUIIuHcmsX7aVe9rzHQZRHBxGupo9objyRo0+XC3ikxeBM0Lcr9zpl32D
-	cv0t55sm7qfS338Arbieyc7fRqfEVBvfemqYwLRV66yxHRS4D3IHnZsp9nGIRV+j
-	x36Ev2kX2jjr8cAp5H2yPSFC7xksz/HhU7tR4OowE+NBfrUlW6vCYQ+xBjNrKw4P
-	4zm+WBp3H23K0/SNB+QOLgqsKKDF11N+8o/DxiohqYtbypEv+TKY0yh0QiP4Yt6I
-	FdyyVDlnhYvp/szNCcxyX5k0BARgketiwNCzFGUy/34mf9Z6CpUIEJuuC2wzuaS6
-	frsCfEznq81YG0oXNr2rg==
-X-ME-Sender: <xms:vgepaqzeg64cmmemSKaxQz9rnHZKsUyEL31h1eHIIn8ssri5JUwu1w>
-    <xme:vgepahErUxLO-YzklAOx8jr3iVnktubA6trM7JY3QYonHXjl24WwKuxwQMI1QH5-b
-    OtPZZDq6kCpXF971wkvINaUhwNSkW8NxiVJvKiGV8JosTU6zVr5aaOi>
-X-ME-Proxy-Cause: dmFkZTEM1a2UcAhXVAnqAiYsoLYvUmMbm3oKeLzqzU27v1LolMVltFpdkPXIAGpYET3aMq
-    e/mezrvvuN6yFzn2xUZeCr+P5O4KK4LO5fWCnz8zDMbiPtdpc6CeI0P9rWe1zHc6yduqyu
-    6EHuk3EMQpfeExDSBuwV5sp/AUNxp9areRa5+0HlaGu1a4Gxa61ykRHooEzI/RsA8oujQ3
-    soJcTW3fybToBsw9p3eyo+obxO7vaTJVWGhirArFyxjRMa9zEFAIoZym/Qb3t13xYKlqlj
-    IIO7Lw0XbgJ7VXfd8bZ0NJZwUpMjeYy9w4WmzuWuDpTkkLZn15PCouHIjti9Z5FlAsk+eW
-    0Df0liZt0TK8KAUh2G/16mx0db+WU4osmsi31TwApJmKX3nBUFSdNqtU8xLCJRQN6ge618
-    cUMQDRblYOceUFLIYEYr1AXMbGy7rJ4a4q3+MH87Hu2aoZIOhM37GUJSeCQv8+5pcJdOL6
-    QO5kRU/DkQVdJVOi6OGN6+CGdwpr4WgXynF6L1eDrMuXo7uqUWq2UVrZ4N5Lzd3Zbi66Dy
-    q/cliTRITTXkh/y1UQYStGzs/HcsdWrS3Zv5KircaQDvV0D5PNWk9q7cnsLOAue3LzFO65
-    N7rFnO/JpW3vaPTsy6Gk+nBYWhX8fPfSTZ/+7QVxe0/vV4MaxzuZ2NT+Mn5Q
-X-ME-Proxy: <xmx:vwepake_XBqqsiICtHm_CdVKovj1z196lUy87fv0LmoFA-dml9zeEQ>
-    <xmx:vwepatEh-I_ujuAOe7kwLpXSjWgzJ5Y0CNPoaU8zAN599HihlD4ffA>
-    <xmx:vwepat2-xkj_SVtYCfCQEPYLap7TtzJdgHNgPlS6P1RTaiHWv5RXNA>
-    <xmx:vwepaln8dqt0-c--zPm3rtS2dwauNp4UGSeGvBuNggE8FnMYb3iU3Q>
-    <xmx:wAepakkhiEke_PLtrSIwhL1QL1uakU1QQicYb9JQjkkwnVAjWq71GSmi>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.ams.internal (Postfix, from userid 501)
-	id 268F432A0081; Tue, 15 Sep 2026 04:54:22 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B494kHSs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 449E81F0089B;
+	Tue, 15 Sep 2026 10:09:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789466979;
+	bh=qEaRhFWvrYZ8Js/oY4HcGJ8ME90lEWxqY3aLTqH5KyM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=B494kHSs2gB2n5O4XU5l5u4V/Q/sS++B6kGyBZOR535KU1TWDZmwMMYCGp5O+FFLE
+	 xxT0t0QsTYnsS3G12slf9EspLZLdWzI+D1IKJNiA5Ok00xFOxdhbVZLW89Y2V4ayrC
+	 s6LOyYyFWPV1X0R6ewuA/oDLo2FfJdbws9raBUSysfLvEaus/W7wtlk2a0FesZFRN6
+	 kOBAVKiwCZY3+W0BAdIR/QQna09maOGiFxgH8LqpSIgkIglLfQPn0ntPnjejywJycD
+	 DaZ9+wwtk+XVvb6Ck559Q41rkc81kQE6wUEUTlTFiotHQyZSReT61+ZA3L/k3pLVDm
+	 1FxU7Bt0z8Jqg==
+Date: Tue, 15 Sep 2026 11:09:25 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Kees Cook <kees@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, Masahiro Yamada <masahiroy@kernel.org>, 
+	Alexey Gladkov <legion@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, Arnd Bergmann <arnd@arndb.de>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Ard Biesheuvel <ardb@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Josh Poimboeuf <jpoimboe@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
+	Gary Guo <gary@garyguo.net>, =?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
+	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
+	Onur =?utf-8?B?w5Z6a2Fu?= <work@onurozkan.dev>, Jonathan Corbet <corbet@lwn.net>, 
+	Randy Dunlap <rdunlap@infradead.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>, 
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
+	linux-riscv@lists.infradead.org, linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-doc@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v2 17/21] objtool: decode instructions and resolve branch
+ targets in parallel
+Message-ID: <aqkR9Xqu-0Tem1zm@gremlin>
+References: <20260914-build-speedup-v2-0-39817ec5db23@kernel.org>
+ <20260914-build-speedup-v2-17-39817ec5db23@kernel.org>
+ <202609141112.F8983EE9C@keescook>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AGrkui6Nx9zw
-Date: Tue, 15 Sep 2026 10:53:51 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Linus Torvalds" <torvalds@linux-foundation.org>,
- "Kees Cook" <kees@kernel.org>
-Cc: "Lorenzo Stoakes" <ljs@kernel.org>,
- "Nathan Chancellor" <nathan@kernel.org>,
- "Nicolas Schier" <nsc@kernel.org>,
- "Nick Desaulniers" <ndesaulniers@google.com>,
- "Bill Wendling" <morbo@google.com>,
- "Justin Stitt" <justinstitt@google.com>,
- "Masahiro Yamada" <masahiroy@kernel.org>,
- "Alexey Gladkov" <legion@kernel.org>,
- "Thomas Gleixner" <tglx@kernel.org>, "Ingo Molnar" <mingo@redhat.com>,
- "Borislav Petkov" <bp@alien8.de>,
- "Dave Hansen" <dave.hansen@linux.intel.com>, x86@kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>, "Paul Walmsley" <pjw@kernel.org>,
- "Palmer Dabbelt" <palmer@dabbelt.com>,
- "Albert Ou" <aou@eecs.berkeley.edu>, "Alexandre Ghiti" <alex@ghiti.fr>,
- "Catalin Marinas" <catalin.marinas@arm.com>,
- "Will Deacon" <will@kernel.org>, "Mark Rutland" <mark.rutland@arm.com>,
- "Ard Biesheuvel" <ardb@kernel.org>,
- "Ilias Apalodimas" <ilias.apalodimas@linaro.org>,
- "Josh Poimboeuf" <jpoimboe@kernel.org>,
- "Peter Zijlstra" <peterz@infradead.org>,
- "Miguel Ojeda" <ojeda@kernel.org>, "Boqun Feng" <boqun@kernel.org>,
- "Gary Guo" <gary@garyguo.net>,
- =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
- "Benno Lossin" <lossin@kernel.org>,
- "Andreas Hindborg" <a.hindborg@kernel.org>,
- "Alice Ryhl" <aliceryhl@google.com>, "Trevor Gross" <tmgross@umich.edu>,
- "Danilo Krummrich" <dakr@kernel.org>,
- "Daniel Almeida" <daniel.almeida@collabora.com>,
- "Tamir Duberstein" <tamird@kernel.org>,
- "Alexandre Courbot" <acourbot@nvidia.com>,
- =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>,
- "Jonathan Corbet" <corbet@lwn.net>,
- "Randy Dunlap" <rdunlap@infradead.org>,
- "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
- llvm@lists.linux.dev, linux-riscv@lists.infradead.org,
- Linux-Arch <linux-arch@vger.kernel.org>,
- linux-arm-kernel@lists.infradead.org, linux-efi@vger.kernel.org,
- rust-for-linux@vger.kernel.org, linux-doc@vger.kernel.org,
- "Jens Axboe" <axboe@kernel.dk>, linux-hardening@vger.kernel.org
-Message-Id: <7646eb0c-7c4a-4ec2-9562-66a74c4d9858@app.fastmail.com>
-In-Reply-To: 
- <CAHk-=whB0X28MNAg71it=1SfFyV7rB+PK3qajpRyWoxXHW81fw@mail.gmail.com>
-References: <20260914-build-speedup-v2-0-39817ec5db23@kernel.org>
- <202609140833.88C0E16E50@keescook>
- <CAHk-=whB0X28MNAg71it=1SfFyV7rB+PK3qajpRyWoxXHW81fw@mail.gmail.com>
-Subject: Re: [PATCH v2 00/21] kbuild: significantly speed up kernel builds
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202609141112.F8983EE9C@keescook>
 
-On Mon, Sep 14, 2026, at 17:53, Linus Torvalds wrote:
-> On Mon, 14 Sept 2026 at 08:41, Kees Cook <kees@kernel.org> wrote:
->>
->> One area I think might solved via an LLM is the 3-pass kallsyms stuff.
->> If we could get a deterministic kallsyms build in 1 pass, that would be
->> very nice. A lot of people have tried, but it has eluded upstreaming.
+On Mon, Sep 14, 2026 at 11:20:37AM -0700, Kees Cook wrote:
+> On Mon, Sep 14, 2026 at 10:22:16AM +0100, Lorenzo Stoakes (ARM) wrote:
+> > Threads are only created for objects with 8 MiB or more of text, meaning
+> > that runs involving smaller objects remain unaffected.
+> > [...]
+> > objtool on vmlinux.o is on the serial tail of every build that links
+> > vmlinux, no-op builds are unchanged.
 >
-> Even the three-pass one hasn't apparently always been entirely
-> deterministic. We've had random reports over the years of it failing
-> in some circumstances.
+> This isn't limited to vmlinux.o, though? With CONFIG_X86_KERNEL_IBT
+> (default y on x86_64), delay-objtool is set in scripts/Makefile.lib, and
+> objtool then runs on every multi-object module, in the middle of the
+> parallel part of the build. In an x86_64 allmodconfig build here,
+> amdgpu.o has 46.2 MiB of executable text and i915.o has 10.2 MiB, so
+> each of those objtool runs gets 16 threads on top of the -jN jobs that
+> are already running.
 
-This tends to break whenever a linker (rather than the compiler) starts
-creating a new type of symbols that show up in pass 2.
+Ack, will fix in v3 to limit to only the --link run without --module, which
+is how vmlinux.o is processed, leaves modules as they are.
 
-> Maybe we've fixed it all, or maybe the failures just go imperceptibly
-> rare. Regardless, it has definitely been fragile.
+>
+> Any parallelism added need to be handled by the make jobserver, not
+> hard-coded anyway.
 
-The rate seems to be once every few years, looking at the list
-of exceptions added to scripts/kallsyms.c (now scripts/mksysmap):
+I'm not sure that really gains us anything - at the point of doing the
+vmlinux.o processing (which with the above change is all that is being done
+now) everything's idle so the jobserver would just hand over the same 16
+threads.
 
-efe6e3068067 ("kallsyms: fix nonconverging kallsyms table with lld")
-516d980f8541 ("scripts/kallsyms: skip ppc compiler stub *.long_branch.* / *.plt_branch.*")
-b9b74be163a2 ("ARM: 8555/1: kallsyms: ignore ARM mode switching veneers")
+It'd need quite a bit of work to interact with it too with added complexity
++ some overhead so would have to check impact on perf here.
 
-I'm sure there are other instances on architectures that get less
-build coverage.
+You did complain about added complexity also ;) if you insist I can try.
 
-     Arnd
+>
+> > [...]
+> > +/* Only an object this large, e.g. vmlinux.o, is decoded on several threads. */
+> > +#define DECODE_THREADED_MIN_TEXT	SZ_8M
+> > +/* Only decoding and the branch passes are threaded, so more gains nothing. */
+> > +#define DECODE_MAX_THREADS		16
+> > +#define DECODE_RANGES_PER_THREAD	4
+>
+> I just don't think a size-based approach is going to work. And any max
+> parallelism needs a rationale.
+
+A rationale was provided:
+
+	Threading is limited to decoding and the jump pass, so the gain
+	flattens out at 16 threads and any further threads were found to
+	only add overhead.
+
+	When performing an allmodconfig build, the clang invocation of
+	objtool when processing vmlinux.o took 5.93s on 1 thread, 4.56s on
+	8, 4.51s on 16 and 4.63s on 128.
+
+Let me know what you feel was missing there? These things inevitably have
+to be somewhat heuristic.
+
+The size threshold is about paying for too many threads for no real gain,
+and now (for v3) the code is limited to a --link operation only, that'll
+only really stop a tinyconfig vmlinux.o :)
+
+>
+> > +static unsigned int decode_threads(unsigned long text_size)
+> > +{
+> > +	const long nr_cpus = sysconf(_SC_NPROCESSORS_ONLN);
+> > +
+> > +	if (text_size < DECODE_THREADED_MIN_TEXT || nr_cpus < 2)
+> > +		return 1;
+> > +
+> > +	return min_t(unsigned int, nr_cpus, DECODE_MAX_THREADS);
+> > +}
+>
+> No, anything using _SC_NPROCESSORS_ONLN internally is wrong, whether its
+> pigz or objtool.
+
+Why? We shouldn't cap a 4 CPU box to 4 CPUs?
+
+The idea is that the empirically obtained 16 core limit should naturally be
+capped to the number of CPUs.
+
+I guess in a world where make hands jobs off this could be dropped, though,
+if the complexity there seems worthwhile.
+
+>
+> > [...]
+> > +static int add_jump_destinations(struct objtool_file *file)
+> > +{
+> > +	return run_insn_ranges(file, add_jump_destinations_range);
+> > +}
+>
+> I haven't examined this myself yet, but my LLM doesn't like this,
+> saying:
+>
+>   For an internal sibling call, add_jump_destination() calls
+>   add_call_dest(file, insn, dest_sym, true), and add_call_dest() calls
+>   annotate_call_site(), which for --hack-noinstr profiling calls, and for
+>   __fentry__ calls with --mcount --mnop, does set_reloc_type() and
+>   elf_write_insn() on file->elf. The per-range shadow gives each thread
+>   its own lists, but the struct elf is shared, and both helpers write to
+>   the section and mark it changed without any locking.
+>   add_call_destinations() is kept serial because "annotating a call site
+>   rewrites instructions the dead end walks read", so it looks like this
+>   path needs the same care: a lock, or deferring those writes until the
+>   threads have been joined. This is from reading the code; I haven't hit
+>   a failure. Was the thread sanitizer run mentioned in the cover letter
+>   done with those objtool options enabled?
+>
+> So, take it with a grain of salt. ;)
+
+I mean sashiko is hallucinating at a rate >50% on this series, so pinches
+of salt all round :) I do think frontier models with a good amount of
+checking + e.g. Chris Mason's review-prompts are helpful to rein in stuff.
+
+Anyway I had mine check it ;) and I also have a beefy threadripper sitting
+around for bounding reality on this stuff and it all came back clean:
+
+	Those writes go to the thread's own instruction bytes and its own
+	relocation, the only shared state touched is the section and elf
+	"changed" flags, which every writer sets to true, and the mcount
+	case for a sibling call is a warning path. The v2 sanitizer run
+	used the gcc allmodconfig options, which lack
+	--mcount/--mnop/--cfi/--fineibt, so I reran it on the clang
+	allmodconfig vmlinux.o with its full option set: zero reports, the
+	jump pass included.
+
+>
+> -Kees
+>
+> --
+> Kees Cook
+
+--
+Cheers, Lorenzo
