@@ -1,65 +1,65 @@
 Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD6674AA3F6
-	for <linux-kbuild@vger.kernel.org>; Tue, 15 Sep 2026 21:15:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F29EB4A43EC
+	for <linux-kbuild@vger.kernel.org>; Tue, 15 Sep 2026 21:15:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789506920; cv=none; b=En9HsaOLOxiC4kP3g/+w5u9DpV/Xq0DKua+2iGAOUJ7bIB+GYzeISZGuodUKHejlNkbQYHzWrKKlmOTGwTV3imACZyGxxiUWajytD42G3LiZuDjz9ujyNXzaI2O92K0rxiQCVReoryM+IGTXF9LgLzw+m70Z3WO0NTMeFtoCjhA=
+	t=1789506921; cv=none; b=IbToyzfl8Le1QOImWeTd6952vK3GvcyTrGYLSW/tGW0Uyv0suzppi9hkQEdU4wZ464sENx6thTY+yZ4471gRGaF/UCRSGbt3ffH1Op2xPNiU1n1kOHjPS3AkXZIWc4akegNMmvfomVQINdgwkP8Ozcmc6rgz3UFdr4PRA0ZHNd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789506920; c=relaxed/simple;
-	bh=3psxrsfWdIlR+uDQcWe+rgSTzb3QV8s1q2v5Lu0dofk=;
+	s=arc-20240116; t=1789506921; c=relaxed/simple;
+	bh=R9MpoArkbHIg3SaeDJtk9ZD6FPf22CQrSgvl16eoetE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ty7h9L8tc5VqwBHQBWJ4ah0UkCHY14U8smnrUTd2nJ5wV2SpMq4+EpPP4d4X2lWNUoejNeZQDPmr7W2Jb9hT5jGgtnCuDAxhVmYxPtT4atILFmqHBgqYjjASSQv/SMqvJtAvg0q9+TIOXgMe0NCXTwV/N5L7uhxSqWQUwalYFRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NkVpcoMT; arc=none smtp.client-ip=74.125.225.140
+	 MIME-Version; b=sK2R7d99BhmcP+d12rOOwZaobwc8C7Lghb9euJexa+tFdnldY40cWFlG9U+MoEwZNza7nlT6LJJnOGfDm4uWqy3abLSVCtdekUbwT2jg6qxbSzmamG++46uj0rg5ARFVBQtf7ccKE3DWBdZj3RXc3M3Ij5CuXDd2I45IhbkenAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PJJG6y4f; arc=none smtp.client-ip=74.125.225.140
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NkVpcoMT"
-Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49d1ca5b0d6so1912475e9.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 15 Sep 2026 14:15:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PJJG6y4f"
+Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49ce364488dso738915e9.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 15 Sep 2026 14:15:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789506916; x=1790111716; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1789506918; x=1790111718; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=emUgjgJBLOzRZSL8qI4Q3Z9mtgFScVqVYtdaLTRXLjA=;
-        b=NkVpcoMT+N5HyQ6biBkQcKc+aoYIOrVs0FI6mpfG0vUVoNrVbex1ERvKFpMaGH8o22
-         qxSdUUC1QenvGvCufQLqt5DTA4G4KF3JKi+XkX043NOCmBgnnUkX3UkQHec+08aeg6j4
-         /Zba6bxNyLbwJwT1BHFBF7geX1l4+5+eSjFIPO5DeDtwvBwl16rV3JIYtrx1dg0JVAfX
-         Qo7m//VYVXLtSwnixEMrizfMa5iulA/IujVQbyFo20aFpxGi7ePZDv2sb6kDh1T7Wyj5
-         tIEh7Pk5jB4RmNjYk5jpAMJpN/8lz4zHWtYdQOETfn5Q6vpJ2rR0C5aFB60We/PprmoP
-         5/QQ==
+        bh=7p1LDWrlveId4m1yDuiZZyPI5rbWZo/B9PJF7MZPH1U=;
+        b=PJJG6y4fB8XLSEZtepYT+qMXiC+5qehbjZskCsb/DaNZVGbSlXBN4rT6AoZ39Fyy+F
+         ro1vw9vDw/iHWcIt8FEF3qYAwP/lEPGxfUQjVkC8Cx7PKVqDx/jKpJkzwW3pl6CgPkBZ
+         ZO/smA/DH39qJRpxeDWCdnd6jMeSPeYuafXCi8fj2mNXdufcOj4cM3llgDm82XoXjM39
+         KhDx7gF+dPXsJUd/8XOWsAQjK7UIMmOnZbX5EABKKUPYppOSK6Pr5D1itXU/lD0T1wU0
+         /iGfFZRP+PYElhU+u/zd4QW+E8L3tW1PABiK+/GVqFlnkosaDO4nutn+FdnzKsUpzHwC
+         TIvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789506916; x=1790111716;
+        d=1e100.net; s=20260707; t=1789506918; x=1790111718;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:sender:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=emUgjgJBLOzRZSL8qI4Q3Z9mtgFScVqVYtdaLTRXLjA=;
-        b=1vkNUhKHKjUe8LcLv2xesWGtKB8tn5DE/jA1cvaF6L3BRGDI87+F2+Mk7SYDceS2js
-         f9c8Gof84wIaHqJLyg9jk/R1GuqvWwRACabjECCML6HErXuUHb6upwQUcNHZ0XiwLhbw
-         3Ipq6+Owo02f4B3G5xw4sGQqHWK7WG+0BBcveRSSDCdyVcxm6u2DviZoklRAKrz5WcGj
-         kk6oHx+ClcbxB4ZSyxCz+mD0u4xNVAFnloozjuXN8vnL7VHH/wwREMCeLsDy7WTZtG1r
-         m41VJU67tj7iKOPuyAL2ycfl76a9qN4qOU4Ei0yV6RMFlVoiV7OpmXr2BcdSjKW+iN3N
-         6H6g==
-X-Forwarded-Encrypted: i=1; AKwUvByriPkcpsrNuDjp4kYRUDS+ZZo/ldooGGIL795EImqTqstWFAqoAfZcNIqUal/o90qBSAsXZMyEEdrkwqk=@vger.kernel.org
-X-Gm-Message-State: AFuF++lKqG+jhoEbI8mSnhQgqxfsAaMcywPxjWWFAts+HJFUQoFfgsH8
-	QCbNS9kZ4vKAA1nenRLf5HYFdISzUd5+heoc+0aSZBYbD4dUMZZt78u5
-X-Gm-Gg: AYBFou0GTi0cm2DJqojEDKB4tnkwnYYhHOdnNWc/5vKcHicvBrH1wAPEEg+wsuKtstL
-	eGPR7dqrmcQvdJn73MffrGXYWMGXikLipREtYbSTfTF38auebFuKfPrOdUQJS97yoPoqJFwO7qh
-	7MqLw3VRWVeS7XjnkiXZGBhVWIIhdLILnF6klmob8FdRIjRr6DYxNDOWYg20+upIqqc4drQneNC
-	HLrlRN9ispTnwANqJbQOIuJ7yWY6cvahlnP1jvfpRTb3fBy6fFgRecKIX59oIlV8tc+t/0waSsw
-	ijo1uHik59WLoB2HDgShOPmb1KlngPIg01Q1Z25gYyAP+5saKiGa3Zy0nFd3ly+piAuQmtnifVH
-	4181I693DzLhXDdJ2koKfGyGDJVsYIq7AQ5C9QvYeBui41cssXedTJ4HUZwI2IlvSJqhLHKDrZt
-	0B1jNyN1pReAr1F52HPp9wGgGKMScoaixYeXqTQS/kIX8ExpFAL1WC8yEKjGSqOiJCRfBvh+ByE
-	PG53jSsFu5nPV4VLXMXr98Pbe9glUpG9lkz
-X-Received: by 2002:a05:600c:c4a2:b0:49d:1842:f001 with SMTP id 5b1f17b1804b1-49e8224ff79mr37273785e9.14.1789506915874;
-        Tue, 15 Sep 2026 14:15:15 -0700 (PDT)
+        bh=7p1LDWrlveId4m1yDuiZZyPI5rbWZo/B9PJF7MZPH1U=;
+        b=DiSpVwIDnfqO2etuhN2lzDXZQXAzB0dF066n/3mBnfq1+ONKWIod149EuHq/kziJ2F
+         PeC96nQa/3g/xuDuz1EEusww4sADTDoWMmvR/0i9c+sJbX/aMc4Dr3A4bC2cb9SQjeJH
+         YSgpdmdhRh9qPFMVRaz824SIuUdMHqe72511/eKecFafcg98/ArSqQwEcvSDLJUd32jT
+         OaLUCJhnuATnqQPZ0bHqxGgwBtuIqX8TP5mYHLQP7OQfEWfIRZYNyBRJUSng8a4nXysO
+         AmJm4YOP97JaDZQIv+jL/f10l3YUm17su2RqOQ5XannbymQwwWKnfryNscey0sTFFJbG
+         FFaA==
+X-Forwarded-Encrypted: i=1; AKwUvBwpkw/1wXkjgcjPcSjfNCyj7K20/R9w+yfm5CkjhcK1oqml1fBaCxO2HrGRbtLmvUMqtXRc+XNzmgPMAKA=@vger.kernel.org
+X-Gm-Message-State: AFuF++lX/1TLK/VkFZRKx4q7jWkOTVbcJLg3jWut7PuHiTNRvpqLp6Wc
+	9oazsC0T0DIvrqjrmQS1KfxYJQxNpb6SGcN7w+yUEUGIC/fQRA1Zx42V
+X-Gm-Gg: AYBFou23rTroGP4QSXM+b9I/kXpHOLQAG1u7lEeEzbmK+Jbh2IhOQa6NII6a0S6EqwR
+	qpcTgVLABnl0DhjJydR+23pwwxkf09saudYx8O1CDJl7XdUdT8n5dGV3IG6cMmeGtZxn7p5l5LH
+	e3/TmIUcoU+SYJMGjJ6/uMr+H19GTr2h2BCLxJ98hBC+S0psHZgtLlYC5NCjmZIlQFnmo/s02oU
+	PADPCcSKJu4h/u26BxmANgmTBdoiA2ciP0VKkwFDThPaTBpPckykHhGKVqNzPwCqPIVw51h7vQV
+	KWp2o0Vn4fRzDbUh34Jw5zhcwKGlb62eoknj3Encs31Db2LTl9lJARP3rOuHCJnqZwLKDHQDZ7p
+	Db3oQuFF7TUqaB9y6ngoBwEUy3hxHLaXdspfZ8B1w9rLck4C59qmgUvLeaUc0PwFwdvqNteeBYg
+	4kq1boSM+6fbzBQfVBdSCJ+xyK9lmSEjoI+yg5exM5B6M0tYe29jpeVZxlzVoMFIZKM552FLVvO
+	0vOPUmv73g1O3wxhNFg9qSIRVfyEtDAg7JU
+X-Received: by 2002:a05:600c:4f08:b0:49e:63cc:6324 with SMTP id 5b1f17b1804b1-49e9666ba5emr59375e9.6.1789506917972;
+        Tue, 15 Sep 2026 14:15:17 -0700 (PDT)
 Received: from nixos-office ([2001:8a0:e962:d100:b3c:e4b2:2d5f:e949])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49e83b1ba9bsm24804695e9.15.2026.09.15.14.15.14
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49e83b1ba9bsm24804695e9.15.2026.09.15.14.15.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Sep 2026 14:15:15 -0700 (PDT)
+        Tue, 15 Sep 2026 14:15:17 -0700 (PDT)
 Sender: Julian Braha <julian.braha@gmail.com>
 From: Julian Braha <julianbraha@gmail.com>
 To: nathan@kernel.org,
@@ -73,9 +73,9 @@ Cc: nico@fluxnic.net,
 	linux-kernel@vger.kernel.org,
 	linux-kbuild@vger.kernel.org,
 	Julian Braha <julianbraha@gmail.com>
-Subject: [PATCH v2 2/5] kconfig: check for out-of-bounds numeric constants
-Date: Tue, 15 Sep 2026 22:15:05 +0100
-Message-ID: <20260915211508.291790-3-julianbraha@gmail.com>
+Subject: [PATCH v2 3/5] kconfig: check for hex and int mismatches
+Date: Tue, 15 Sep 2026 22:15:06 +0100
+Message-ID: <20260915211508.291790-4-julianbraha@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260915211508.291790-1-julianbraha@gmail.com>
 References: <20260915211508.291790-1-julianbraha@gmail.com>
@@ -87,143 +87,75 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The Kconfig interpreter internally represents constants as strings, then
-attempts to parse them as 64-bit signed integers for 'int' options, and
-64-bit unsigned integers for 'hex' options.
+Using a numeric option of one type (e.g. 'int') to determine the value of
+a different numeric type (e.g. 'hex') currently fails silently in various
+ways if attempted, because the underlying string representation is naively
+reused.
 
-However, there is currently no check that the conversion succeeds, leading
-to failures when the values are actually used. For example:
+Example 1:
 
-  config LARGE_INT
+  config I
     int
-    default 10000000000000000000
+    default -1
 
-  config BUGGED_INT_COMPARISON
-    bool
-    default y if LARGE_INT < 2
+  config HEX_DEFAULT_INT
+    hex
+    default I
 
-Obviously 10000000000000000000 is larger than 2, but the Kconfig
-interpreter will fallback to comparing the two values with strcmp() after
-the numeric conversion fails, causing the first character, '1', to be
-compared with '2', and giving the wrong result.
+Here, HEX_DEFAULT_INT actually gets set to '0x-1', which is of course not
+a valid hex value.
 
-Since none of these out-of-bounds values are used as constants anywhere in
-the tree, we can already make these error out.
+Example 2:
+
+  config H
+    hex
+    default A
+
+  config INT_DEFAULT_HEX
+    int
+    default H
+
+Here, INT_DEFAULT_HEX actually gets set to 'A', without even converting
+into the base-10 equivalent of 10. This value, 'A', is otherwise a
+rejected int value if entered in the frontend, or read in from an existing
+.config file.
+
+These int-hex mismatches currently do not appear anywhere in the tree, so
+it is already safe to make these error out.
 
 Assisted-by: LLM
 Signed-off-by: Julian Braha <julianbraha@gmail.com>
 ---
- scripts/kconfig/menu.c                        | 60 ++++++++++----
- scripts/kconfig/tests/err_num_bounds/Kconfig  | 79 +++++++++++++++++++
- .../kconfig/tests/err_num_bounds/__init__.py  | 12 +++
- .../tests/err_num_bounds/expected_stderr      | 10 +++
- .../err_num_non_numeric_ref/expected_stderr   | 30 +++----
- 5 files changed, 160 insertions(+), 31 deletions(-)
- create mode 100644 scripts/kconfig/tests/err_num_bounds/Kconfig
- create mode 100644 scripts/kconfig/tests/err_num_bounds/__init__.py
- create mode 100644 scripts/kconfig/tests/err_num_bounds/expected_stderr
+ scripts/kconfig/menu.c                        |  2 +-
+ .../kconfig/tests/err_num_mismatch/Kconfig    | 38 +++++++++++++++++++
+ .../tests/err_num_mismatch/__init__.py        |  9 +++++
+ .../tests/err_num_mismatch/expected_stderr    |  4 ++
+ 4 files changed, 52 insertions(+), 1 deletion(-)
+ create mode 100644 scripts/kconfig/tests/err_num_mismatch/Kconfig
+ create mode 100644 scripts/kconfig/tests/err_num_mismatch/__init__.py
+ create mode 100644 scripts/kconfig/tests/err_num_mismatch/expected_stderr
 
 diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-index 99a57ce0fdc9..ede791a2fe1b 100644
+index ede791a2fe1b..2d8b0c65ce1e 100644
 --- a/scripts/kconfig/menu.c
 +++ b/scripts/kconfig/menu.c
-@@ -4,6 +4,7 @@
-  */
+@@ -244,7 +244,7 @@ static int menu_validate_number(struct symbol *sym, struct symbol *sym2,
+ 	if (sym->type != S_INT && sym->type != S_HEX)
+ 		return 0;
  
- #include <ctype.h>
-+#include <errno.h>
- #include <stdarg.h>
- #include <stdlib.h>
- #include <string.h>
-@@ -234,10 +235,46 @@ void menu_add_symbol(enum prop_type type, struct symbol *sym, struct expr *dep)
- 	menu_add_prop(type, expr_alloc_symbol(sym), dep);
- }
+-	if (sym2->type == S_INT || sym2->type == S_HEX)
++	if (sym2->type == sym->type)
+ 		return 0;
  
--static int menu_validate_number(struct symbol *sym, struct symbol *sym2)
-+/* Validate the sym2 value for numeric sym. */
-+static int menu_validate_number(struct symbol *sym, struct symbol *sym2,
-+				const struct property *prop)
- {
--	return sym2->type == S_INT || sym2->type == S_HEX ||
--	       (sym2->type == S_UNKNOWN && sym_string_valid(sym, sym2->name));
-+	const char *type_bounds;
-+
-+	if (sym->type != S_INT && sym->type != S_HEX)
-+		return 0;
-+
-+	if (sym2->type == S_INT || sym2->type == S_HEX)
-+		return 0;
-+
-+	if (sym2->type != S_UNKNOWN ||
-+		!sym_string_valid(sym, sym2->name)) {
-+		fprintf(stderr, "%s:%d: error: '%s' is an invalid value for '%s'\n",
-+			prop->filename, prop->lineno, sym2->name,
-+			sym_type_name(sym->type));
-+		return 1;
-+	}
-+
-+	errno = 0;
-+	if (sym->type == S_INT) {
-+		type_bounds = "64-bit signed integer";
-+		strtoll(sym2->name, NULL, 10);
-+	} else {
-+		/* hex */
-+		type_bounds = "64-bit unsigned integer";
-+		strtoull(sym2->name, NULL, 16);
-+	}
-+
-+	if (errno == ERANGE) {
-+		fprintf(stderr,
-+			"%s:%d: error: %s constant '%s' is outside the %s bounds\n",
-+			prop->filename, prop->lineno, sym_type_name(sym->type),
-+			sym2->name, type_bounds);
-+
-+		return 1;
-+	}
-+
-+	return 0;
- }
- 
- static int sym_check_prop(struct symbol *sym)
-@@ -259,13 +296,7 @@ static int sym_check_prop(struct symbol *sym)
- 				break;
- 			sym2 = prop_get_symbol(prop);
- 			if (sym->type == S_HEX || sym->type == S_INT) {
--				if (!menu_validate_number(sym, sym2)) {
--					fprintf(stderr,
--						"%s:%d: error: '%s': number is invalid\n",
--						prop->filename, prop->lineno,
--						sym->name);
--					errors++;
--				}
-+				errors += menu_validate_number(sym, sym2, prop);
- 			}
- 			if (sym_is_choice(sym)) {
- 				struct menu *choice = sym_get_choice_menu(sym2);
-@@ -296,13 +327,8 @@ static int sym_check_prop(struct symbol *sym)
- 			if (sym->type != S_INT && sym->type != S_HEX)
- 				prop_warn(prop, "range is only allowed "
- 						"for int or hex symbols");
--			if (!menu_validate_number(sym, prop->expr->left.sym) ||
--			    !menu_validate_number(sym, prop->expr->right.sym)) {
--				fprintf(stderr,
--					"%s:%d: error: range is invalid\n",
--					prop->filename, prop->lineno);
--				errors++;
--			}
-+			errors += menu_validate_number(sym, prop->expr->left.sym, prop);
-+			errors += menu_validate_number(sym, prop->expr->right.sym, prop);
- 			break;
- 		default:
- 			;
-diff --git a/scripts/kconfig/tests/err_num_bounds/Kconfig b/scripts/kconfig/tests/err_num_bounds/Kconfig
+ 	if (sym2->type != S_UNKNOWN ||
+diff --git a/scripts/kconfig/tests/err_num_mismatch/Kconfig b/scripts/kconfig/tests/err_num_mismatch/Kconfig
 new file mode 100644
-index 000000000000..c439366c03b6
+index 000000000000..8406f3bb6419
 --- /dev/null
-+++ b/scripts/kconfig/tests/err_num_bounds/Kconfig
-@@ -0,0 +1,79 @@
++++ b/scripts/kconfig/tests/err_num_mismatch/Kconfig
+@@ -0,0 +1,38 @@
 +# SPDX-License-Identifier: GPL-2.0
-+# Test bounds checks for 'int' and 'hex' constants
++# Test 'int' and 'hex' symbols that reference each other
 +
 +config INT_SOURCE
 +	int
@@ -231,34 +163,27 @@ index 000000000000..c439366c03b6
 +config HEX_SOURCE
 +	hex
 +
-+config BOOL_SOURCE
-+	bool
++# 'hex' reference from 'int'
 +
-+# Valid values at the limits of the type
-+
-+config INT_MIN
++config INT_DEFAULT_HEX
 +	int
-+	default -9223372036854775808
++	default HEX_SOURCE
 +
-+config INT_MAX
++config INT_RANGE_HEX
 +	int
-+	default 9223372036854775807
++	range HEX_SOURCE 1
 +
-+config HEX_MIN
++# A hex symbol must not reference an int symbol
++
++config HEX_DEFAULT_INT
 +	hex
-+	default 0x0
++	default INT_SOURCE
 +
-+config HEX_MAX
++config HEX_RANGE_INT
 +	hex
-+	default 0xffffffffffffffff
++	range INT_SOURCE 0x1
 +
-+config INT_RANGE_LIMITS
-+	int
-+	range -9223372036854775808 9223372036854775807
-+
-+config HEX_RANGE_LIMITS
-+	hex
-+	range 0 0xffffffffffffffff
++# Referencing the same type is valid
 +
 +config INT_FROM_INT
 +	int
@@ -266,110 +191,32 @@ index 000000000000..c439366c03b6
 +
 +config HEX_FROM_HEX
 +	hex
-+	default HEX_SOURCE
-+
-+# Constants outside the bounds
-+
-+config INT_DEFAULT_TOO_HIGH
-+	int
-+	default 10000000000000000000
-+
-+config INT_DEFAULT_TOO_LOW
-+	int
-+	default -9223372036854775809
-+
-+config INT_RANGE_TOO_HIGH
-+	int
-+	range 0 10000000000000000000
-+
-+config INT_RANGE_TOO_LOW
-+	int
-+	range -10000000000000000000 0
-+
-+config INT_RANGE_BOTH_OUTSIDE
-+	int
-+	range -9223372036854775809 10000000000000000000
-+
-+config HEX_DEFAULT_TOO_HIGH
-+	hex
-+	default 0x10000000000000000
-+
-+config HEX_RANGE_TOO_HIGH
-+	hex
-+	range 0 0x10000000000000000
-+
-+config HEX_RANGE_BOTH_TOO_HIGH
-+	hex
-+	range 0x10000000000000000 0x20000000000000000
-diff --git a/scripts/kconfig/tests/err_num_bounds/__init__.py b/scripts/kconfig/tests/err_num_bounds/__init__.py
++	range 0 HEX_SOURCE
+diff --git a/scripts/kconfig/tests/err_num_mismatch/__init__.py b/scripts/kconfig/tests/err_num_mismatch/__init__.py
 new file mode 100644
-index 000000000000..72ac6aa24491
+index 000000000000..275f2a6e9a5b
 --- /dev/null
-+++ b/scripts/kconfig/tests/err_num_bounds/__init__.py
-@@ -0,0 +1,12 @@
++++ b/scripts/kconfig/tests/err_num_mismatch/__init__.py
+@@ -0,0 +1,9 @@
 +# SPDX-License-Identifier: GPL-2.0
 +"""
-+Detect constants outside the 'int' and 'hex' bounds.
-+
-+An int constant must fit in a signed 64-bit integer, and a hex constant must
-+fit in an unsigned 64-bit integer.
++Reject direct references ('default' or 'range') between int and hex options.
 +"""
 +
 +
 +def test(conf):
 +    assert conf.olddefconfig() == 1
 +    assert conf.stderr_matches('expected_stderr')
-diff --git a/scripts/kconfig/tests/err_num_bounds/expected_stderr b/scripts/kconfig/tests/err_num_bounds/expected_stderr
+diff --git a/scripts/kconfig/tests/err_num_mismatch/expected_stderr b/scripts/kconfig/tests/err_num_mismatch/expected_stderr
 new file mode 100644
-index 000000000000..3f06e13359ef
+index 000000000000..587c34467ae6
 --- /dev/null
-+++ b/scripts/kconfig/tests/err_num_bounds/expected_stderr
-@@ -0,0 +1,10 @@
-+Kconfig:51: error: integer constant '10000000000000000000' is outside the 64-bit signed integer bounds
-+Kconfig:55: error: integer constant '-9223372036854775809' is outside the 64-bit signed integer bounds
-+Kconfig:59: error: integer constant '10000000000000000000' is outside the 64-bit signed integer bounds
-+Kconfig:63: error: integer constant '-10000000000000000000' is outside the 64-bit signed integer bounds
-+Kconfig:67: error: integer constant '-9223372036854775809' is outside the 64-bit signed integer bounds
-+Kconfig:67: error: integer constant '10000000000000000000' is outside the 64-bit signed integer bounds
-+Kconfig:71: error: hex constant '0x10000000000000000' is outside the 64-bit unsigned integer bounds
-+Kconfig:75: error: hex constant '0x10000000000000000' is outside the 64-bit unsigned integer bounds
-+Kconfig:79: error: hex constant '0x10000000000000000' is outside the 64-bit unsigned integer bounds
-+Kconfig:79: error: hex constant '0x20000000000000000' is outside the 64-bit unsigned integer bounds
-diff --git a/scripts/kconfig/tests/err_num_non_numeric_ref/expected_stderr b/scripts/kconfig/tests/err_num_non_numeric_ref/expected_stderr
-index 4974ba2fcd9c..005f855ecbdd 100644
---- a/scripts/kconfig/tests/err_num_non_numeric_ref/expected_stderr
-+++ b/scripts/kconfig/tests/err_num_non_numeric_ref/expected_stderr
-@@ -1,14 +1,16 @@
--Kconfig:17: error: 'INT_DEFAULT_BOOL': number is invalid
--Kconfig:21: error: 'INT_DEFAULT_TRISTATE': number is invalid
--Kconfig:25: error: 'INT_DEFAULT_STRING': number is invalid
--Kconfig:31: error: 'HEX_DEFAULT_BOOL': number is invalid
--Kconfig:35: error: 'HEX_DEFAULT_TRISTATE': number is invalid
--Kconfig:39: error: 'HEX_DEFAULT_STRING': number is invalid
--Kconfig:45: error: range is invalid
--Kconfig:49: error: range is invalid
--Kconfig:53: error: range is invalid
--Kconfig:57: error: range is invalid
--Kconfig:63: error: range is invalid
--Kconfig:67: error: range is invalid
--Kconfig:71: error: range is invalid
--Kconfig:75: error: range is invalid
-+Kconfig:17: error: 'BOOL_SOURCE' is an invalid value for 'integer'
-+Kconfig:21: error: 'TRISTATE_SOURCE' is an invalid value for 'integer'
-+Kconfig:25: error: 'STRING_SOURCE' is an invalid value for 'integer'
-+Kconfig:31: error: 'BOOL_SOURCE' is an invalid value for 'hex'
-+Kconfig:35: error: 'TRISTATE_SOURCE' is an invalid value for 'hex'
-+Kconfig:39: error: 'STRING_SOURCE' is an invalid value for 'hex'
-+Kconfig:45: error: 'BOOL_SOURCE' is an invalid value for 'integer'
-+Kconfig:49: error: 'TRISTATE_SOURCE' is an invalid value for 'integer'
-+Kconfig:53: error: 'STRING_SOURCE' is an invalid value for 'integer'
-+Kconfig:57: error: 'BOOL_SOURCE' is an invalid value for 'integer'
-+Kconfig:57: error: 'TRISTATE_SOURCE' is an invalid value for 'integer'
-+Kconfig:63: error: 'BOOL_SOURCE' is an invalid value for 'hex'
-+Kconfig:67: error: 'TRISTATE_SOURCE' is an invalid value for 'hex'
-+Kconfig:71: error: 'STRING_SOURCE' is an invalid value for 'hex'
-+Kconfig:75: error: 'BOOL_SOURCE' is an invalid value for 'hex'
-+Kconfig:75: error: 'TRISTATE_SOURCE' is an invalid value for 'hex'
++++ b/scripts/kconfig/tests/err_num_mismatch/expected_stderr
+@@ -0,0 +1,4 @@
++Kconfig:14: error: 'HEX_SOURCE' is an invalid value for 'integer'
++Kconfig:18: error: 'HEX_SOURCE' is an invalid value for 'integer'
++Kconfig:24: error: 'INT_SOURCE' is an invalid value for 'hex'
++Kconfig:28: error: 'INT_SOURCE' is an invalid value for 'hex'
 -- 
 2.55.0
 
