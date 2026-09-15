@@ -1,166 +1,174 @@
-Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm2-f13.google.com (mail-wm2-f13.google.com [74.125.225.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C08E3BBFB9;
-	Tue, 15 Sep 2026 18:03:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 036BC4A3F10
+	for <linux-kbuild@vger.kernel.org>; Tue, 15 Sep 2026 21:15:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789495416; cv=none; b=bf96vjaKA5lFwSz8Cfq/IPk+2pUIl9Kg0nELMnQTUoGstI0n2AaeBYjoTi+vnmfSVx80l+rcazafBgVU49jk+CDhCSY7LC0XbA7HXXWwUg5Or66OeQoFLPrM2cHAimZXi7YzsXBIpd79l/HgbC/Wr3GnyurLL9EOkF//0zERMjY=
+	t=1789506915; cv=none; b=ASRaVejnmx2u7ox+SUjarK89hNdEoR6LfBp4a/5ojg++snMigb0bXBhnHLBF0JTVP3YTvSgLZm1PPcGG9VtTDVVtlVZ8Q4VnfbpH4DDcnJbfhAlcZro3iir/6rVO07hWq5j5yL6ylSsfHKc3vi6epijHGduNq03Xg7eaGFnGUAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789495416; c=relaxed/simple;
-	bh=acA8Pl0ra8uGRhaY3yUxU7JeUeRVK1VSh+mJtBE56Dw=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=ZdhWVAeTmgXJaVzuBy3taytPjhZuR6CNWa0xOArT6gbV4GkQnegx3TGoye28qio4OTKAwcqcChEO9OSHl3AZp/T1Wf3BTfUEEZ1j/a3qTEDhD1nSkJUGL8Ic5xPbHGg8rvNaq4h7+g9GojidXb53wGGeRM4hCAmNDqrLie8yFWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=bfzeMig/; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=oZOUFFuD; arc=none smtp.client-ip=202.12.124.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1789506915; c=relaxed/simple;
+	bh=ALhkxPO+fNFOoRpay0MJRDbiqxW9v4c+hhntR24pFbI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aSa0LIV63Fl3kunVAP7yR3yK12o+p8629nt8KZR348NKC40pRKxyTByXlZz7LbFz0jFM4bQM9BtYatOT9pUihXlwi6DflsMP7kCB0OXjL8lyOiJUiqcK4fhN7QMe7xNZ4MihDkpNf18xWVgEDAY/hcMj4NOwgv1pBLWAULP6ZOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RXARi+p9; arc=none smtp.client-ip=74.125.225.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="bfzeMig/";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="oZOUFFuD"
-Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
-	by mailfout.stl.internal (Postfix) with ESMTP id ACCCF1D0021E;
-	Tue, 15 Sep 2026 14:03:32 -0400 (EDT)
-Received: from ams-imap-03 ([10.64.2.23])
-  by ams-compute-02.internal (MEProxy); Tue, 15 Sep 2026 14:03:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1789495412;
-	 x=1789581812; bh=M+18z9TRevaxtOpUOsKP4yasoi0N4a+EiZHqRi1jYdY=; b=
-	bfzeMig/Y+tGM1+bYmo0BbhIVS0y9dIGMrA4LwRTf2Lpje/Kfm8S570bfH/QjUqL
-	6/a3eiCelvTXGqhVquzIsr4cr0lUv3ospVpRgXtP4LZbhaVeTzfcbSaGwHa3vtxs
-	BcqqDiGb2M6gEjECAzLQuPz0yP99Kk1u011d5pP+gbGS0GiMHg4PRfXQDFoacDOz
-	mUF3+J6mkqpifQzxfE5vToAQ+ss3hXjYEHX/9CCuXLtEPcvajpXjy5o6HO5hC5+F
-	SRPnzQnKKQAFxx2KqQsMFLmwjSHntR0zRO7nbwOKsRHGNJZYVXFl6AbfAkK1wvXY
-	tWR6d95RnBDQpPokvuZ/FA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1789495412; x=
-	1789581812; bh=M+18z9TRevaxtOpUOsKP4yasoi0N4a+EiZHqRi1jYdY=; b=o
-	ZOUFFuD6XnpqFUSEJsY2ku4+E5wCoyzzuuGjDK3VOLtNoMZpIRvRxVprQ9i/22II
-	jG1jG15qMEzvpaLpECfgkboC8JdgLp9Q39mqgTcR8lYXn/d83bLIcQ5dXDL+TemW
-	klIRqMV8FflS6YTNzEQwkIfn2xX1LkA7dmLFMj4E00Q1CW0JkSLBLf2Zk1/g8U4A
-	ejyIqZLoetKA/i/YaBFIiwJjewrsmt2inIMSFgG6e+QsHc3VL/1ujnHfQDpawgEm
-	I0nYSDFstqFLf3IPHvTqv/TfrIzepp3oweewt4zuJrTzNSjkToeN7dZvBMpDoMyQ
-	3pfG1/3YATpk1jIhSkoew==
-X-ME-Sender: <xms:cYipaqE_AZTIyS7ZUScZTZ4wde-IC-i3ZyB5ji0kH44t1e0B3LSclg>
-    <xme:cYipamKRrUVZH90_QVcnKEsG_cZ2n0jvO7k-iE1vh3ku8J-yTzn_jXbvbJU5AFnEV
-    JytVsriQCYwRwPPY87Xo4C9mG4acZP8NtAqXcTtz16YbQpFQW1ivg>
-X-ME-Proxy-Cause: dmFkZTEqhHjzH1soeTRI55HShuI0NwF6ztlzSeEa6rdk6X/pP/Jtsnp/rah2tHi5jjcKB2
-    lusLwR9l1hsFDHtzVzUwOj5TctfcRlmmLokL8SZY0QOvkDneEL8NNm5kzUhlGtnnIOSY+k
-    QYkqiKZp2SLcPCb3DscDI2fJXz78s3/4Ckjem3nv0+Ua+COftzMGlwTptdt88qWV3osb7T
-    T5ye+RBTmyxZgFvcLaWtdcO7CFvSIKyHLXrBshilUZxavJSyPA7zRqFPUfEURGFWUZJwOc
-    cWn5hWkzyz2adzsNIlzBWhO/OFUO8SAd3243e1XMNMZRUA2r3QWhWls6hiFMwBaPqqSRSe
-    dt0T6ZGZOm8+lgAsiZUthxmJtKEmZLaACB/aj4Zn0jPxFJskSxiS/dKB0+K99b18stM6E/
-    MGYZZD4Dbbl6ZPwnUdzZbbxWoRg1HxbTeB9DH1iSzXuIw6R3mn9qYrAHsC28FsDlXckeL8
-    r0g684T9Dc21Nc1FenOYOwWBi9QUvertwK2jfjyZXgANc9pSFa8KxijA9exEgC/NQSabNT
-    N1yuOPdlP61ofVBk3S/9gx/HFxtGHAvc0zRoG7U84I8l0OAHiBmxyobTjsVL3y5sCwVQlM
-    pKS/rS0rLj0nsA6qufToAQrMqBJeRG3FxWPhepx4hFOQeYS2c1YC0XYKUYcQ
-X-ME-Proxy: <xmx:coipary-7p7j1Kt0qU7OG_-8DDJhBtgPod0au9RKw52o1qZnSESppw>
-    <xmx:coipaqIEgSO4ryECQ4vjQQxF3TkIFmqQ9ZxieSNK2v8s1f25VovtPQ>
-    <xmx:coipatoXg2wUi6tLNO5bNikhZjmnI5yJjun9dPQztNmowsDc-CeI6Q>
-    <xmx:coipahIu2IlxV-XBevCCTOyDFXx89QoUF0csr5hA57H2JIoH8rSBww>
-    <xmx:dIipanoLEVa1nmatRE4Cfwr0jAv58eY7-FZDBV9fHKFGa4SlCFozRXvG>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.ams.internal (Postfix, from userid 501)
-	id 2D5C132A0081; Tue, 15 Sep 2026 14:03:29 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RXARi+p9"
+Received: by mail-wm2-f13.google.com with SMTP id 5b1f17b1804b1-49e6c0fce17so1448225e9.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 15 Sep 2026 14:15:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789506912; x=1790111712; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=fh5M+SOXGFOo0fE5dDk6nfH861G3XeTauBS+ExEQBqw=;
+        b=RXARi+p9Xb/ZFzb8B0LTJreAiBpb9iQmvRUPxQndqwEjYEYuz65BMRwSlQM/3VGm1j
+         BH2mpLeDI4ZRhn5fTuAfg3Z7GWbLB4GRRfrd94QQHwc/yfnCmv5QW70KhZwnlV7+LdAJ
+         0k9mf98hafdr6K9ynb1pmxyRWv9tTbQVAuOHtweiD51SNA9h6toqoAISFpS+kdHWHmlo
+         A2IGM40CgBEq73fT4y+4Zc2RD+XVRmopbegBgs94dURXTO2dBirAaB2YMsQEopjzErbN
+         yEsNDIeiuZ1JL6EzGuaY4cQkD5BIm40OvC4gYvEaijm6Cn295CHETRaYhaKELCTZAV80
+         NLDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789506912; x=1790111712;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=fh5M+SOXGFOo0fE5dDk6nfH861G3XeTauBS+ExEQBqw=;
+        b=QBQG/P+La0ol9NpZrOUqmHcirhPrrT0a6xhQGZYN1upB9lRZvbuMzLnsJi3p14D0bF
+         RC0iaWaKrIwi4e1m084BKRa/DFE6pr3QnhOYrRpDjtbxm+zILg7qW0IQOthFWqaB4c/s
+         HJxgoxCo0bnJwBtDdsdL0LvresPH4gFJV6ACgcYbFKjsk/OwTcXJ3UH1KJXLL2nxRMKc
+         96Q+cFGMl+cnmP7nNki3PWY4Py6SH32gxgCIEKtWsvnO9S2cODDMqhCSHc073aZd9mkV
+         yD1Kwaf/fnz2HBpZaRxSwYAPVLE9BA6a1nOrlJXo8m3CZ3w0Q3vnWk3CeA51cI7q6s4Z
+         N0rw==
+X-Forwarded-Encrypted: i=1; AKwUvBxvw27SgiraecKv7gW+XiWA9TW1xnWw6KF8mGctoXXt2rmphk+T/gaq2ofbldenORN+lHFO5oZr2fn9VVg=@vger.kernel.org
+X-Gm-Message-State: AFuF++n2vOfu/P2ZVnUyvccmNC0ClwG10QCbI3vos+QuWFdsJWUFuTQZ
+	GMWChp0/xmqJQZVKISpiQTqSxwjQoyJjuR2Am7oeec4fxOdI6jCkFuPm
+X-Gm-Gg: AYBFou2OtXiSBhWZFJZjkqhHJ0SJahOthG8OBOoK/qf8OerLzLJTOwb/Btf+d0FdHuI
+	b9bDZwpBzzV7AqowOE9O5MQrs0jr8Fn39AiwBlSZdr4CeIoiRJYLs+x+6uFmk5SaAEIBnCdGW1K
+	XoROTA5QFGJDTNr9LlIyNWT8ahBJcibU/EvFRTXtEM9gbzh0bI9xcfRUf0BsuzNWq7O+HegN8Si
+	HjgWiU5NQc0wVdXq3RTMR/54vfgxnIjnO5G33PzBdCnwDnmt3Elg0o3ZKgEnacgQmDkgrre4CKV
+	NAmdkDWtiCUcxEFHrFwXj/zCAlsu8IAqRV/epZ948au995PPa2JhyP4iP21R3b6CmKtmwBivz38
+	TXKZi372ckRlH5ZEubF91iVYDjCriXO+D94jStjMD7r17aM6EQZqdykA11X6YoYKg5tiEp58D4S
+	PzQFMOrSjupiqONGJPzLrN0puVbaj6LapJjz8JhVk4/bndRtgK3d1/h7eYbwTvugV0OHd6NsK6M
+	0v1TCGGGZSKNs1Q/9tRHa/H6kJuEdM3PzpT
+X-Received: by 2002:a05:600c:3548:b0:49e:6e7c:d895 with SMTP id 5b1f17b1804b1-49e822a8fccmr30161045e9.26.1789506912023;
+        Tue, 15 Sep 2026 14:15:12 -0700 (PDT)
+Received: from nixos-office ([2001:8a0:e962:d100:b3c:e4b2:2d5f:e949])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49e83b1ba9bsm24804695e9.15.2026.09.15.14.15.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Sep 2026 14:15:11 -0700 (PDT)
+Sender: Julian Braha <julian.braha@gmail.com>
+From: Julian Braha <julianbraha@gmail.com>
+To: nathan@kernel.org,
+	nsc@kernel.org
+Cc: nico@fluxnic.net,
+	rdunlap@infradead.org,
+	grahamr@qti.qualcomm.com,
+	kees@kernel.org,
+	pengpeng@iscas.ac.cn,
+	vegard.nossum@oracle.com,
+	linux-kernel@vger.kernel.org,
+	linux-kbuild@vger.kernel.org,
+	Julian Braha <julianbraha@gmail.com>
+Subject: [PATCH v2 0/5] kconfig: improve input validation for numeric options
+Date: Tue, 15 Sep 2026 22:15:03 +0100
+Message-ID: <20260915211508.291790-1-julianbraha@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: ArHA-gVR6p-N
-Date: Tue, 15 Sep 2026 20:02:38 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Nick Desaulniers" <ndesaulniers@google.com>,
- "Kees Cook" <kees@kernel.org>
-Cc: "Lorenzo Stoakes" <ljs@kernel.org>,
- "Linus Torvalds" <torvalds@linux-foundation.org>,
- "Nathan Chancellor" <nathan@kernel.org>,
- "Nicolas Schier" <nsc@kernel.org>, "Bill Wendling" <morbo@google.com>,
- "Justin Stitt" <justinstitt@google.com>,
- "Masahiro Yamada" <masahiroy@kernel.org>,
- "Alexey Gladkov" <legion@kernel.org>,
- "Thomas Gleixner" <tglx@kernel.org>, "Ingo Molnar" <mingo@redhat.com>,
- "Borislav Petkov" <bp@alien8.de>,
- "Dave Hansen" <dave.hansen@linux.intel.com>, x86@kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>, "Paul Walmsley" <pjw@kernel.org>,
- "Palmer Dabbelt" <palmer@dabbelt.com>,
- "Albert Ou" <aou@eecs.berkeley.edu>, "Alexandre Ghiti" <alex@ghiti.fr>,
- "Catalin Marinas" <catalin.marinas@arm.com>,
- "Will Deacon" <will@kernel.org>, "Mark Rutland" <mark.rutland@arm.com>,
- "Ard Biesheuvel" <ardb@kernel.org>,
- "Ilias Apalodimas" <ilias.apalodimas@linaro.org>,
- "Josh Poimboeuf" <jpoimboe@kernel.org>,
- "Peter Zijlstra" <peterz@infradead.org>,
- "Miguel Ojeda" <ojeda@kernel.org>, "Boqun Feng" <boqun@kernel.org>,
- "Gary Guo" <gary@garyguo.net>,
- =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
- "Benno Lossin" <lossin@kernel.org>,
- "Andreas Hindborg" <a.hindborg@kernel.org>,
- "Alice Ryhl" <aliceryhl@google.com>, "Trevor Gross" <tmgross@umich.edu>,
- "Danilo Krummrich" <dakr@kernel.org>,
- "Daniel Almeida" <daniel.almeida@collabora.com>,
- "Tamir Duberstein" <tamird@kernel.org>,
- "Alexandre Courbot" <acourbot@nvidia.com>,
- =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>,
- "Jonathan Corbet" <corbet@lwn.net>,
- "Randy Dunlap" <rdunlap@infradead.org>,
- "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
- llvm@lists.linux.dev, linux-riscv@lists.infradead.org,
- Linux-Arch <linux-arch@vger.kernel.org>,
- linux-arm-kernel@lists.infradead.org, linux-efi@vger.kernel.org,
- rust-for-linux@vger.kernel.org, linux-doc@vger.kernel.org,
- "Jens Axboe" <axboe@kernel.dk>, linux-hardening@vger.kernel.org
-Message-Id: <90006ad1-73df-4bd0-a434-61875edd5bb9@app.fastmail.com>
-In-Reply-To: 
- <CAKwvOdmgeyqivO4pVa=30XDWpXvdRzBR8f13rfuPzDx=LJ1Tsw@mail.gmail.com>
-References: <20260914-build-speedup-v2-0-39817ec5db23@kernel.org>
- <20260914-build-speedup-v2-21-39817ec5db23@kernel.org>
- <202609140844.FA7E848A@keescook> <aqk9gakQhxToLnDI@gremlin>
- <202609150955.A51C9F7A20@keescook>
- <CAKwvOdmgeyqivO4pVa=30XDWpXvdRzBR8f13rfuPzDx=LJ1Tsw@mail.gmail.com>
-Subject: Re: [PATCH v2 21/21] kbuild: use pigz for gzip compression if available
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Sep 15, 2026, at 19:47, Nick Desaulniers wrote:
-> On Tue, Sep 15, 2026 at 10:31=E2=80=AFAM Kees Cook <kees@kernel.org> w=
-rote:
->> On Tue, Sep 15, 2026 at 03:30:43PM +0100, Lorenzo Stoakes (ARM) wrote:
->> a)
->> My main concern is the lack of respecting the -j make argument. In my
->> mind, this is a blocker, because it means a build will now _always_ s=
-pin
->> up max CPUs (not what -j has limited it to), and for CIs, shared comp=
-ute
->> systems, or whatever, this violates the requested parallelism level. =
-For
->> example, if I'm doing a long-running Coccinelle replacement in one tr=
-ee
->> (which uses half the CPUs), any builds I launch I'm asking for the ot=
-her
->> half of my CPUs to be used so they don't thrash my cache.
->>
->> This is the kind of "why are all the CPUs spinning up?" question I
->> helped track down with commit 51e46c7a4007 ("docs, parallelism: Rearr=
-ange
->> how jobserver reservations are made") forever ago.
->
-> Parse -j from MAKEFLAGS (https://stackoverflow.com/a/76517886),
-> forward it to pigz?
+This series improves checks for invalid values of 'int' and 'hex' config
+options in the Kconfig interpreter.
 
-That still has a potential O(n=C2=B2) problem: if one builds N kernels
-with a top-level jobserver on N CPUs, and they all take the same
-amount of time, you end up with N pigz processes each trying to use
-N cpus at the same time. Ideally we'd use the equivalent of
--flto=3Dauto in the compiler, which respects jobserver settings,
-but I don't think pigz supports this at the moment.
+Tests are added for all new warnings and errors.
 
-      Arnd
+Patch 1/5 promotes an existing warning to an error, for attempting to use
+a non-numeric option to set a numeric option's value. This warning did not
+have a test, but one is added with the promotion to error.
+
+Patch 2/5 adds a check that the constant values for numerics are within
+the bounds of the type (64-bit signed integer for 'int', and 64-bit
+unsigned integer for 'hex'). This prevents silent failures, for example in
+comparisons.
+
+Patch 3/5 adds a check that 'int' and 'hex' options aren't used to set
+each other's values. Since the values are naively reused from their
+internal string representations, this currently also leads to later silent
+failures.
+
+Patch 4/5 rejects out-of-bounds numeric values from the Kconfig
+frontends and adds a warning upon reading in an existing .config file
+with one of these values. In the future, this warning should be promoted
+to an error.
+
+Finally, patch 5/5 fixes an existing issue where checks on 'range' values
+for hex options parsed them as signed integers using 'strtoll' instead of
+'strtoull'.
+
+Signed-off-by: Julian Braha <julianbraha@gmail.com>
+---
+Changes since v1:
+- unified formatting of int/hex messages in patch 4 (Nathan)
+- added a 5th patch for the hex range issue (Nathan/Sashiko)
+
+Link to v1:
+https://lore.kernel.org/all/20260829171902.1510587-1-julianbraha@gmail.com/
+---
+Julian Braha (5):
+  kconfig: promote invalid numeric reference from warning to error
+  kconfig: check for out-of-bounds numeric constants
+  kconfig: check for hex and int mismatches
+  kconfig: prevent out-of-bounds user input for numeric options
+  kconfig: use unsigned integers for hex range checks
+
+ scripts/kconfig/confdata.c                    |  6 ++
+ scripts/kconfig/lkc.h                         |  2 +-
+ scripts/kconfig/lkc_proto.h                   |  1 +
+ scripts/kconfig/menu.c                        | 62 ++++++++++-----
+ scripts/kconfig/parser.y                      |  2 +-
+ scripts/kconfig/symbol.c                      | 61 +++++++++++---
+ scripts/kconfig/tests/err_num_bounds/Kconfig  | 79 +++++++++++++++++++
+ .../kconfig/tests/err_num_bounds/__init__.py  | 12 +++
+ .../tests/err_num_bounds/expected_stderr      | 10 +++
+ .../kconfig/tests/err_num_mismatch/Kconfig    | 38 +++++++++
+ .../tests/err_num_mismatch/__init__.py        |  9 +++
+ .../tests/err_num_mismatch/expected_stderr    |  4 +
+ .../tests/err_num_non_numeric_ref/Kconfig     | 75 ++++++++++++++++++
+ .../tests/err_num_non_numeric_ref/__init__.py |  9 +++
+ .../err_num_non_numeric_ref/expected_stderr   | 16 ++++
+ .../kconfig/tests/warn_changed_input/Kconfig  |  5 ++
+ .../tests/warn_changed_input/expected_config  |  1 +
+ scripts/kconfig/tests/warn_num_bounds/Kconfig | 24 ++++++
+ .../kconfig/tests/warn_num_bounds/__init__.py | 25 ++++++
+ scripts/kconfig/tests/warn_num_bounds/config  |  7 ++
+ .../tests/warn_num_bounds/expected_config     | 11 +++
+ .../warn_num_bounds/expected_config_stderr    |  3 +
+ .../warn_num_bounds/expected_frontend_config  | 11 +++
+ .../warn_num_bounds/expected_frontend_stderr  |  0
+ 24 files changed, 442 insertions(+), 31 deletions(-)
+ create mode 100644 scripts/kconfig/tests/err_num_bounds/Kconfig
+ create mode 100644 scripts/kconfig/tests/err_num_bounds/__init__.py
+ create mode 100644 scripts/kconfig/tests/err_num_bounds/expected_stderr
+ create mode 100644 scripts/kconfig/tests/err_num_mismatch/Kconfig
+ create mode 100644 scripts/kconfig/tests/err_num_mismatch/__init__.py
+ create mode 100644 scripts/kconfig/tests/err_num_mismatch/expected_stderr
+ create mode 100644 scripts/kconfig/tests/err_num_non_numeric_ref/Kconfig
+ create mode 100644 scripts/kconfig/tests/err_num_non_numeric_ref/__init__.py
+ create mode 100644 scripts/kconfig/tests/err_num_non_numeric_ref/expected_stderr
+ create mode 100644 scripts/kconfig/tests/warn_num_bounds/Kconfig
+ create mode 100644 scripts/kconfig/tests/warn_num_bounds/__init__.py
+ create mode 100644 scripts/kconfig/tests/warn_num_bounds/config
+ create mode 100644 scripts/kconfig/tests/warn_num_bounds/expected_config
+ create mode 100644 scripts/kconfig/tests/warn_num_bounds/expected_config_stderr
+ create mode 100644 scripts/kconfig/tests/warn_num_bounds/expected_frontend_config
+ create mode 100644 scripts/kconfig/tests/warn_num_bounds/expected_frontend_stderr
+
+-- 
+2.55.0
+
