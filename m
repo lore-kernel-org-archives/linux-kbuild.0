@@ -1,124 +1,163 @@
-Received: from mail-ej2-f12.google.com (mail-ej2-f12.google.com [74.125.228.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2BF348124F
-	for <linux-kbuild@vger.kernel.org>; Tue, 15 Sep 2026 11:43:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E196495048;
+	Tue, 15 Sep 2026 11:58:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789472615; cv=none; b=Np4CQKwpyKdvIz2zDMoL1Jhf5tSu/PPH8BePzixRvoOQZfpNN5jzMN5vYD5dHIy02QEhNlIIXl4no5/LPLqpgB7G37KyqESWp2Oo4ki0EkwcnhF3enlikr0uiALLk5GGwPwHmf7trVtx6/mb+6rj8aQvaFxhdCQbM8sM4ie2HtI=
+	t=1789473502; cv=none; b=re0guxtOKnUFDBiPYJBALjLn1ZVdv8VSyKU8OSqS0hubUn6KO0Vw6hFdyWb3PnDDeHq4ut6Tetpm48FUmmMXhJoBgp0PtK2RtAkXy3FOa/h0ysYrf6lgH91G8yVgTpBqdxV5JZch12IHxHea0qZksSus/3HGXKjZsGAknMGQQnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789472615; c=relaxed/simple;
-	bh=d+l9UVQI3i5rHbtsDNkrGOpDndS/w35Wcb1tA6n8BlY=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=LUnnlTzxrWShW9eRa9IGHP7Lzwo5EPv6+QnHeHtlnrTN/U1T11wpGbH6EQ34woBYUOsEBSxqmIFfIPp2AaGQMkMx8XdtN4Mv2gHuKqBy1Qb/HVV8XQJbNw8NuglCu7mW5BjSOqaKs8qFPtJ7Q2JskO+DSojd8IVcukXn2udhR9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V1U8M0uh; arc=none smtp.client-ip=74.125.228.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789473502; c=relaxed/simple;
+	bh=QA8zwAoolKTPM25sBgdo58tGELS5tC+ij7uhJxavzjk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DrPQSaLm7fLg8z9MB6vOzGQha4UOLg7urPs6MJtKkCdFZtTPh3oWjcgcxnj0h47Ka+0+yO9+RPibKZ5UvWaxSmWFUgG45obMWPL0oXER/Tk8eCYw4uLcTrJLmc24P0qRnDWARCIehNTr1siQ+0qKEPOionDS/nYzDazZ9wkNhp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IrCTlWuj; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V1U8M0uh"
-Received: by mail-ej2-f12.google.com with SMTP id a640c23a62f3a-c254f9c60b9so230972966b.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 15 Sep 2026 04:43:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789472612; x=1790077412; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :references:cc:to:subject:from:user-agent:mime-version:date
-         :message-id:sender:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=CuI5nT9rHviKP5lpNiMgIdO01jVs2umzh0m7BqRu3zA=;
-        b=V1U8M0uhSmD+JGP/OdGGi1q75AoaDQmXcIMeeLhq5sMs5U02Ug1HkgQexKCHBK53V/
-         0fMmyY0HP5pvQUQUnU0ZgDuL3h6zgV6m2GWlYnMGhjLROKw6/p7w66FT96uu1Nx12LGy
-         8AgBasSoPhb9kOvdBI5EjcMAxJlECr4PA+wtF+y99s6o5jyJER/lEorsJVK03zI3AXnW
-         UZa0OSbaNgh4dhlrsZvXxCTc3Y0QO6SRCPGZ9ezHKampagawfD1k5XFTtvyGtnmK9RRQ
-         OT/c+fqeFNZjoK/7LSBGYfv3WR+Hbc834iPs7na2PVPh9QS5XCCSRNTL5IozgACjaiNW
-         j3ew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789472612; x=1790077412;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :references:cc:to:subject:from:user-agent:mime-version:date
-         :message-id:sender:x-gm-gg:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=CuI5nT9rHviKP5lpNiMgIdO01jVs2umzh0m7BqRu3zA=;
-        b=QDIaJXwzYKD1Suob4rWvQGZsOYCZrP4AXSk4mI49Ph+m07ZZxjjr2Vi/LQT9kc8Or2
-         MTCGDIfMGbXPEI7WcbkFAGyT5BlnOTaT7JdjsLRM2LIBQWjTxq/Leg8r9j45kUAeBNvl
-         QYt+hIAindbJnqC/CtgWJc+RcJv5lXmrzyHqzNJnaHJkdBP4IgXyd7wvCCWihkgWDnyq
-         qNKbljqEIe5Cg1eOSjyFj3R17Yv4z9xvouFbMtRg/C34rNCYZJtHC1BU0ObF7PJZ5NDa
-         XkWfS6mxms34ijMLCj2M0bg5KiDSLA+8fcB/Pk4VLvHYPdJuGsXrZ0wq3yxVy69fvTn3
-         7yzA==
-X-Gm-Message-State: AFuF++mvAsaD8GzulPNSp7k/rZwY5+G7SnQyBE3PX1tGCejXfRQEDK7O
-	M7npIrDPhzMk3Tg+qQWnLepZFEl1ziR0c4wcNBK0j1tcFAcPJNw/dKme
-X-Gm-Gg: AYBFou3jd7k0UwXdhSMpnYCKXL/UOHa89+bHsCungRF1jK5SaNqE1qrZ6NBAj7tAdVF
-	7DnjOMQKu4JJtH63yk1e6T3P1jnSsbPXP6utWnK4h/zl93izVOFZnLIs+S3QIMXPQF03EFQXEXP
-	AJxZgeW1NP2gzD+G+p6ysOO/MoK661Ic73AvprN6uUV8Jc7sdBDnWQmf0lJNuUWyHAcMOgc5DRO
-	riztyU4pYlmrwwKpDSZCmgdrGdNuLfo7VNpWiJ6rheqRSJzJz0DB9nEQX6PPDph8hMXvLaz5EoW
-	+sfhE7SE5indTLdYr/IuMDhrVHYcd0dQ/WyzYIe84wd3RDd9q4gS7a0Eyypd4KvfUAVFRLXwl+X
-	T2qpcax4HHSgjW+Le15QT5VvOdAhY4WNvg0wU40NnMhkeHlu+zBRNANhQJM/lzc6VZLPbOWlmOl
-	4YRKn0tbEmzmTnWGgR2lYhY5sq6cKH1Ek2oYl0h++szZDilWFNMo1XxNJzFHRgdSXjLi6iaQrL3
-	h0THRi5JQ3BvPJdhTwZEiWF/uEJ3MXwiVxkbhuJhWK4kUjOZAYac/lVv7yjJXanjJTDPATb0zTA
-	uf4=
-X-Received: by 2002:a17:907:3e02:b0:c24:d6f0:aa0 with SMTP id a640c23a62f3a-c29c89d1344mr292904166b.11.1789472611631;
-        Tue, 15 Sep 2026 04:43:31 -0700 (PDT)
-Received: from ?IPV6:2001:8a0:e962:d100:4d53:b3b:9260:9351? ([2001:8a0:e962:d100:4d53:b3b:9260:9351])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c296608480esm599053166b.36.2026.09.15.04.43.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Sep 2026 04:43:31 -0700 (PDT)
-Sender: Julian Braha <julian.braha@gmail.com>
-Message-ID: <0122859e-028d-4860-b2ea-dcd709e4c505@gmail.com>
-Date: Tue, 15 Sep 2026 12:43:29 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IrCTlWuj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11EBA1F000FF;
+	Tue, 15 Sep 2026 11:58:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789473501;
+	bh=jlX8Yrsnfl7deC4qnmmV5NCpDXqR14GNWi2FZvg8+jE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=IrCTlWujJ6nrzWR+kPElXgrplKR56V6WHeWWuPOUliQNc2EyivO33TLnPPz8rfLyd
+	 k88kypZAu/qjMeNrQ811FOAXJBmQDSOix2pyOY/x4jM4YumgSk11AyXYI3nb1GaMb/
+	 cKV4ELQNL9Hc5yAAA9nrg40m1XlqvJTZymo8EyPnbEC7HDmNCGf9nS/jE4eGBEHGNH
+	 OASPNxuETHcj7kQOGDaogiKcS/n2iRUy/nYmg6ZAQyWKNgAx9toAxZWJasN3L/YRTP
+	 tOgxJoqOAtmjQdN0oSUwjzjs66GznaaahuRcshoM7dapuGX/OrmyTJbin2BisCJOR1
+	 BPf8ccBp31CiA==
+Date: Tue, 15 Sep 2026 12:58:10 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Kees Cook <kees@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, Masahiro Yamada <masahiroy@kernel.org>, 
+	Alexey Gladkov <legion@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, Arnd Bergmann <arnd@arndb.de>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Ard Biesheuvel <ardb@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Josh Poimboeuf <jpoimboe@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
+	Gary Guo <gary@garyguo.net>, =?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
+	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
+	Onur =?utf-8?B?w5Z6a2Fu?= <work@onurozkan.dev>, Jonathan Corbet <corbet@lwn.net>, 
+	Randy Dunlap <rdunlap@infradead.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>, 
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
+	linux-riscv@lists.infradead.org, linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-doc@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v2 20/21] kbuild: build rust crates in parallel with the
+ rest of the build
+Message-ID: <aqkv9SqIdh0qKPFc@gremlin>
+References: <20260914-build-speedup-v2-0-39817ec5db23@kernel.org>
+ <20260914-build-speedup-v2-20-39817ec5db23@kernel.org>
+ <202609141133.7CA979C89@keescook>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Julian Braha <julianbraha@gmail.com>
-Subject: Re: [PATCH v2] checkkconfigsymbols: resolve revisions before
- resetting the tree
-To: Erkan Erdem <hexvalid@gmail.com>, Nathan Chancellor <nathan@kernel.org>,
- Nicolas Schier <nsc@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
- Ariel Marcovitch <arielmarcovitch@gmail.com>,
- Valentin Rothberg <valentinrothberg@gmail.com>,
- Masahiro Yamada <masahiroy@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-References: <20260907103739.23212-3-hexvalid@gmail.com>
-Content-Language: en-US
-In-Reply-To: <20260907103739.23212-3-hexvalid@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202609141133.7CA979C89@keescook>
 
-On 9/7/26 11:37, Erkan Erdem wrote:
-> The commit comparison resets the current branch to commit_a before
-> resolving commit_b. If the second revision is HEAD or the current branch
-> name, it then resolves to the first revision. For example, --diff
-> HEAD^..HEAD compares the parent with itself and silently misses newly
-> undefined symbols. The same problem affects --commit with the current
-> branch name.
-> 
-> Resolve and verify both revisions as commits before the first reset.
-> This keeps their meaning stable throughout the comparison and rejects
-> invalid endpoints before changing the working tree.
-> 
-> Keep lookup diagnostics separate from the resolved hashes. Use the
-> resolved range for --find too, since resetting also updates ORIG_HEAD.
-> 
-> Fixes: b1a3f243485f ("checkkconfigsymbols.py: make it Git aware")
+On Mon, Sep 14, 2026 at 11:37:54AM -0700, Kees Cook wrote:
+> On Mon, Sep 14, 2026 at 10:22:19AM +0100, Lorenzo Stoakes (ARM) wrote:
+> > Care is taken to ensure that external rust modules can still be built
+> > against the tree - make modules_prepare ... (where ... are other goals)
+> > will build rust/ first.
+> > [...]
+> >  prepare: prepare0
+> >  ifdef CONFIG_RUST
+> >  	+$(Q)$(CONFIG_SHELL) $(srctree)/scripts/rust_is_available.sh
+> > -	$(Q)$(MAKE) $(build)=rust
+> >  endif
+> >
+> >  PHONY += remove-stale-files
+> > @@ -1760,6 +1763,12 @@ modules: modules_prepare
+> >  # Target to prepare building external modules
+> >  modules_prepare: prepare
+> >  	$(Q)$(MAKE) $(build)=scripts scripts/module.lds
+> > +ifdef CONFIG_RUST
+> > +# Ensure rust/ is built before any external rust module which will rely upon it.
+> > +ifneq ($(filter modules_prepare,$(MAKECMDGOALS)),)
+> > +	$(Q)$(MAKE) $(build)=rust
+> > +endif
+> > +endif
+>
+> As far as I can see, nothing orders this recipe against the tree build,
+> which also descends into rust/ through "obj-$(CONFIG_RUST) += rust/"
+> in Kbuild, while $(build-dir) only depends on prepare. Before this
+> patch that was fine, because prepare had already built rust/ by the
+> time either of them ran. Now "make -jN modules_prepare all" can have
+> two make processes building rust/ at the same time, and so can
+> "make -jN rustdoc all" or "make -jN rusttest all", whose recipes also
+> run "$(MAKE) $(build)=rust". That means two rustc runs writing the same
+> objects in rust/ ...
 
-While it's good to support this, I don't think the Fixes tag is
-appropriate here, because this wasn't really a bug... it was just
-unsupported functionality.
+Ack.
 
-> Link: https://lore.kernel.org/20210901145212.478066-1-arielmarcovitch@gmail.com/
+It seems make can't order two independent sub-makes, so will change the patch so
+it skips the modules_prepare rust build when a goal that builds the tree* is
+present, as they all descend into rust/ themselves.
 
-This commit added a check that will cause the script to exit if
-'HEAD...' is passed to --commit. So it seems like this patch should also
-remove those lines now.
+I checked the change against:
 
-Note that doing so would also effectively revert that commit, so in v3
-it would be good to add:
+	$ make modules_prepare
+	$ make modules_prepare scripts
+	$ make -j128 modules_prepare all
 
-'This reverts commit ...'
++ confirmed they all built rust/ once only for each.
 
-to your commit message.
+* LLM says: all, vmlinux, modules, image targets, dtbs, rustdoc, rusttest
 
-- Julian Braha
+So, fixed in v3 :)
+
+>
+> > +# Rust code elsewhere in the tree depends upon rust/.
+> > +ifdef CONFIG_RUST
+> > +$(KBUILD_RUST_DIRS): | rust
+> > +endif
+> > [...]
+> > +export KBUILD_RUST_DIRS := drivers lib mm samples
+>
+> Doesn't this make all of drivers/, lib/, mm/ and samples/ wait for rust/?
+> That's a lot of stall: drivers/ is most of the tree. I think then a
+> CONFIG_RUST build has most of its C work waiting on the rust chain;
+> only the other top-level directories start early? This didn't create new
+> build delays for those configurations?
+
+Yeah good point.
+
+For a defconfig+rust clean build on 128 threads the other top-level directories
+were done at ~14s while rust ran to ~18.6s, so there was 4-5 of idle.
+
+However the patch improves things by net -3.9s regardless.
+
+This is really only a big box issue though. With fewer threads the rest of the
+tree takes longer so it has no impact on the build.
+
+(An aside - this kind of trade-off is what the series is all about really - the
+ 'serial tail' - i.e. the single threaded stuff that _overlaps_ the end of the
+ build is what slows you down.)
+
+Since this _still_ gives you a significant speed up on bigger boxes, I think
+it's fine as-is.
+
+The LLM says a fix for this would need significant work - a cross-instance lock
+and an on-demand rust/ build. So I think best as a follow-up?
+
+>
+> --
+> Kees Cook
+
+--
+Cheers, Lorenzo
