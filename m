@@ -1,204 +1,232 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3245E412294;
-	Tue, 15 Sep 2026 10:09:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3127A47FB03;
+	Tue, 15 Sep 2026 10:43:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789466981; cv=none; b=OEZbQzWfjPx5Em6125ARuMPBdibxw+Fqj7CJLwNwdP99V+VkQYwEosQSkEpAbcp2MpTSTe4mjlPbctdJfrIkdZZ5a/inU3j1xCeqUnr+Uqej0x2u0AuUc+5aW6L9NNHEWYLOCU5Na5HIGO59EM3JDPjnRid1jjhaK8GsrNBEkzU=
+	t=1789469032; cv=none; b=RHr2zgxJaikWFfqWcTBwwihOHYp+5m3hXeq9qQLA3qAi+9L7SRKGMoNOJOd8qT+FTRlt7U1AFnpI5DtEKr0FniJuDqQ5yiGj9eqgs+inRcH8+nrd0kwAxuLz1eGoVAY2dxvzrdTmEhQnOqMSCz6/ErGk4eq543s65V4mO+ylVBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789466981; c=relaxed/simple;
-	bh=sU13gsIPUMKUUtL+qE3bab68IEWBsOM0qs/yA9Hs9x0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cnIPh522vrTCUiO9Lo5JJIcyVSCnXTQQ2hkpSiDbW7lAKomqn7vpsVK4jUITRPbLNvbYy/d5m3UWN9kO+xApMS7X5d3r8jGxQzbgojtQ1sruvT1MI9LHrDhk+9MaNVviZy804pZnhrLwtTHTIrnWZq0qt0F8gItipxuEwPYdzng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B494kHSs; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789469032; c=relaxed/simple;
+	bh=RTO+ZRUSTSxYZptT6zYs9DP4cLEcTmRd2c9SBuISSEM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hjqKmLW6/xfGdYEMaEYV5slxM8RCbSWvxcr+L/j5qZ+ufuDTJDXrE13Lw9euektYKRayxg9uki1mOrzgYKyEx/UmC8kfVrdPNrqjMa0kG72/vFTgcxdsLGOtfx2ReAdyVZshKc/jJKMNF+qHah6NAg1z+nU3A1lN442rP7QbCjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aI8dP7rk; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B494kHSs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 449E81F0089B;
-	Tue, 15 Sep 2026 10:09:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789466979;
-	bh=qEaRhFWvrYZ8Js/oY4HcGJ8ME90lEWxqY3aLTqH5KyM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=B494kHSs2gB2n5O4XU5l5u4V/Q/sS++B6kGyBZOR535KU1TWDZmwMMYCGp5O+FFLE
-	 xxT0t0QsTYnsS3G12slf9EspLZLdWzI+D1IKJNiA5Ok00xFOxdhbVZLW89Y2V4ayrC
-	 s6LOyYyFWPV1X0R6ewuA/oDLo2FfJdbws9raBUSysfLvEaus/W7wtlk2a0FesZFRN6
-	 kOBAVKiwCZY3+W0BAdIR/QQna09maOGiFxgH8LqpSIgkIglLfQPn0ntPnjejywJycD
-	 DaZ9+wwtk+XVvb6Ck559Q41rkc81kQE6wUEUTlTFiotHQyZSReT61+ZA3L/k3pLVDm
-	 1FxU7Bt0z8Jqg==
-Date: Tue, 15 Sep 2026 11:09:25 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Kees Cook <kees@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Masahiro Yamada <masahiroy@kernel.org>, 
-	Alexey Gladkov <legion@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
-	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, Arnd Bergmann <arnd@arndb.de>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Ard Biesheuvel <ardb@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Josh Poimboeuf <jpoimboe@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
-	Gary Guo <gary@garyguo.net>, =?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
-	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
-	Onur =?utf-8?B?w5Z6a2Fu?= <work@onurozkan.dev>, Jonathan Corbet <corbet@lwn.net>, 
-	Randy Dunlap <rdunlap@infradead.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>, 
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
-	linux-riscv@lists.infradead.org, linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-doc@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v2 17/21] objtool: decode instructions and resolve branch
- targets in parallel
-Message-ID: <aqkR9Xqu-0Tem1zm@gremlin>
-References: <20260914-build-speedup-v2-0-39817ec5db23@kernel.org>
- <20260914-build-speedup-v2-17-39817ec5db23@kernel.org>
- <202609141112.F8983EE9C@keescook>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aI8dP7rk"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1789469030; x=1821005030;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=RTO+ZRUSTSxYZptT6zYs9DP4cLEcTmRd2c9SBuISSEM=;
+  b=aI8dP7rkA2N9IYnNSC4AchSxNfNJbt+OGs7gjzd/6qVIkslxQicrelKQ
+   DXQvoGIQOqZl+xYgHyZe3qJjvRQdjUiowqFGC5aE5WYwg42/UVu4ekfwm
+   7/0Td2d66Se8F+kWMu5Hg++vWzQZ0oRKKkUDzjWy93XyaebA8QmaG2Kpp
+   wFi5E80E2MAVV/kQrGxgHhngTvh7mdfglIliYmYIU2A2wdb+nskWAbyB4
+   VSMKzA7wL5f1SnwzLFKs2HSB6PDvirC4yIfKLddte9o7Rq4SfjAch6WhI
+   YnowMVq7CEMN3lBeJ6WmNo/0ktm06fl5kJvc0OMqlHAEtUCTm8TNEycF+
+   g==;
+X-CSE-ConnectionGUID: BYp+Ez4tQ0yl4tKSWMDolQ==
+X-CSE-MsgGUID: mjghpOHSReWMp+02pjlsSw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11905"; a="100492062"
+X-IronPort-AV: E=Sophos;i="6.27,103,1787036400"; 
+   d="scan'208";a="100492062"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2026 03:43:49 -0700
+X-CSE-ConnectionGUID: FxPs6fUzRMGAG1+Pq6qU0Q==
+X-CSE-MsgGUID: CUoVoLDcRtKXEMKhJq+u8g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,103,1787036400"; 
+   d="scan'208";a="272942728"
+Received: from abityuts-desk1.ger.corp.intel.com (HELO localhost) ([10.245.245.243])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2026 03:43:47 -0700
+From: Jani Nikula <jani.nikula@intel.com>
+To: linux-kernel@vger.kernel.org
+Cc: jani.nikula@intel.com,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>,
+	Jason Gunthorpe <jgg@nvidia.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	linux-kbuild@vger.kernel.org
+Subject: [PATCH] kbuild: add header check facility as a manually run static analyzer
+Date: Tue, 15 Sep 2026 13:43:31 +0300
+Message-ID: <20260915104331.255636-1-jani.nikula@intel.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202609141112.F8983EE9C@keescook>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6 krs Bertel Jungin Aukio 5, 02600 Espoo, Finland
+Content-Transfer-Encoding: 8bit
 
-On Mon, Sep 14, 2026 at 11:20:37AM -0700, Kees Cook wrote:
-> On Mon, Sep 14, 2026 at 10:22:16AM +0100, Lorenzo Stoakes (ARM) wrote:
-> > Threads are only created for objects with 8 MiB or more of text, meaning
-> > that runs involving smaller objects remain unaffected.
-> > [...]
-> > objtool on vmlinux.o is on the serial tail of every build that links
-> > vmlinux, no-op builds are unchanged.
->
-> This isn't limited to vmlinux.o, though? With CONFIG_X86_KERNEL_IBT
-> (default y on x86_64), delay-objtool is set in scripts/Makefile.lib, and
-> objtool then runs on every multi-object module, in the middle of the
-> parallel part of the build. In an x86_64 allmodconfig build here,
-> amdgpu.o has 46.2 MiB of executable text and i915.o has 10.2 MiB, so
-> each of those objtool runs gets 16 threads on top of the -jN jobs that
-> are already running.
+There have been various attempts at adding a header test or check
+mechanism in the kernel build system. The header check primarily
+consists of ensuring headers are self-contained, have include guards,
+and, in some cases, pass kernel-doc.
 
-Ack, will fix in v3 to limit to only the --link run without --module, which
-is how vmlinux.o is processed, leaves modules as they are.
+The main problems have been:
 
->
-> Any parallelism added need to be handled by the make jobserver, not
-> hard-coded anyway.
+- The dependency tracking creates undesirable artefacts (infamously also
+  known as disgusting turds) in the build directory.
 
-I'm not sure that really gains us anything - at the point of doing the
-vmlinux.o processing (which with the above change is all that is being done
-now) everything's idle so the jobserver would just hand over the same 16
-threads.
+- Gating the feature behind a kconfig option is complicated due to
+  allyesconfig builds. It's possible, but requires a verbose and
+  confusing negative proxy config option.
 
-It'd need quite a bit of work to interact with it too with added complexity
-+ some overhead so would have to check impact on perf here.
+- Naming the dependency tracking files with a dot prefix or placing them
+  in a dot prefixed subdirectory in the build directory to hide them has
+  been exceedingly difficult to achieve. (In part due to some Makefiles
+  building files in subdirectory hierarchies.)
 
-You did complain about added complexity also ;) if you insist I can try.
+- The debate which headers, if any, should really be self-contained is
+  virtually open-ended.
 
->
-> > [...]
-> > +/* Only an object this large, e.g. vmlinux.o, is decoded on several threads. */
-> > +#define DECODE_THREADED_MIN_TEXT	SZ_8M
-> > +/* Only decoding and the branch passes are threaded, so more gains nothing. */
-> > +#define DECODE_MAX_THREADS		16
-> > +#define DECODE_RANGES_PER_THREAD	4
->
-> I just don't think a size-based approach is going to work. And any max
-> parallelism needs a rationale.
+Approach the problem from a slightly different angle. Add a top level
+"headercheck" static analysis target which you have to explicitly run,
+and where you have to explicitly state which headers to check:
 
-A rationale was provided:
+$ make HEADER_CHECK="(headers|dirs)" headercheck
 
-	Threading is limited to decoding and the jump pass, so the gain
-	flattens out at 16 threads and any further threads were found to
-	only add overhead.
+For example:
 
-	When performing an allmodconfig build, the clang invocation of
-	objtool when processing vmlinux.o took 5.93s on 1 thread, 4.56s on
-	8, 4.51s on 16 and 4.63s on 128.
+$ make HEADER_CHECK="include/drm drivers/gpu/drm/drm_draw_internal.h" headercheck
 
-Let me know what you feel was missing there? These things inevitably have
-to be somewhat heuristic.
+You can specify multiple path/to/header.h or path/to/dir, relative to
+$(srctree), where path/to/dir is recursively scanned for any .h files.
 
-The size threshold is about paying for too many threads for no real gain,
-and now (for v3) the code is limited to a --link operation only, that'll
-only really stop a tinyconfig vmlinux.o :)
+Add a generic %.header-check rule in scripts/Makefile.build to support
+this. Note that this rule should *not* be used in, say, driver or
+subsystem makefile targets, precisely because of the problems listed
+above.
 
->
-> > +static unsigned int decode_threads(unsigned long text_size)
-> > +{
-> > +	const long nr_cpus = sysconf(_SC_NPROCESSORS_ONLN);
-> > +
-> > +	if (text_size < DECODE_THREADED_MIN_TEXT || nr_cpus < 2)
-> > +		return 1;
-> > +
-> > +	return min_t(unsigned int, nr_cpus, DECODE_MAX_THREADS);
-> > +}
->
-> No, anything using _SC_NPROCESSORS_ONLN internally is wrong, whether its
-> pigz or objtool.
+While this still generates the .header-check dependency tracking
+artefacts in the build directory, you will only get them as a result of
+manually running 'make headercheck', not as part of the regular build.
 
-Why? We shouldn't cap a 4 CPU box to 4 CPUs?
+This approach also allows anyone to check any headers in the tree, with
+no makefile modification or kconfig changes required. What you do with
+the results is up to you, and the header check facility does not enforce
+anything like it would as part of the regular build.
 
-The idea is that the empirically obtained 16 core limit should naturally be
-capped to the number of CPUs.
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Nathan Chancellor <nathan@kernel.org>
+Cc: Nicolas Schier <nsc@kernel.org>
+Cc: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>
+Cc: linux-kbuild@vger.kernel.org
+Signed-off-by: Jani Nikula <jani.nikula@intel.com>
+---
+ .gitignore             |  1 +
+ Makefile               | 25 ++++++++++++++++++++++++-
+ scripts/Makefile.build | 21 +++++++++++++++++++++
+ 3 files changed, 46 insertions(+), 1 deletion(-)
 
-I guess in a world where make hands jobs off this could be dropped, though,
-if the complexity there seems worthwhile.
+diff --git a/.gitignore b/.gitignore
+index 9875120ea7bd..948c760b2704 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -28,6 +28,7 @@
+ *.gcno
+ *.gcda
+ *.gz
++*.header-check
+ *.i
+ *.ko
+ *.lex.c
+diff --git a/Makefile b/Makefile
+index 0f1b80100b47..4851a4407149 100644
+--- a/Makefile
++++ b/Makefile
+@@ -301,7 +301,7 @@ no-dot-config-targets := $(clean-targets) \
+ 			 run-command
+ no-sync-config-targets := $(no-dot-config-targets) %install modules_sign kernelrelease \
+ 			  image_name
+-single-targets := %.a %.i %.ko %.lds %.ll %.lst %.mod %.o %.rsi %.s %/
++single-targets := %.a %.i %.ko %.lds %.ll %.lst %.mod %.o %.rsi %.s %.header-check %/
+ 
+ config-build	:=
+ mixed-build	:=
+@@ -1540,6 +1540,26 @@ PHONY += scripts_gen_packed_field_checks
+ scripts_gen_packed_field_checks: scripts_basic
+ 	$(Q)$(MAKE) $(build)=scripts scripts/gen_packed_field_checks
+ 
++# ---------------------------------------------------------------------------
++# Header check
++
++# Check the headers in HEADER_CHECK=(headers|dirs)
++PHONY += headercheck
++
++ifneq ($(HEADER_CHECK),)
++
++header-check-dirs := $(filter-out %.h,$(HEADER_CHECK))
++header-check-files := $(filter %.h,$(HEADER_CHECK)) $(if $(header-check-dirs),$(shell cd $(srctree) && find $(header-check-dirs) -name '*.h' 2>/dev/null))
++header-check-targets := $(patsubst %.h,%.header-check,$(sort $(header-check-files)))
++
++headercheck:
++	$(if $(header-check-targets),,$(error $@ found no headers in HEADER_CHECK="$(HEADER_CHECK)"))
++	$(Q)$(MAKE) $(header-check-targets)
++else
++headercheck:
++	$(error $@ requires HEADER_CHECK=(headers|dirs))
++endif
++
+ # ---------------------------------------------------------------------------
+ # Install
+ 
+@@ -1886,6 +1906,8 @@ help:
+ 	@echo  '  versioncheck      - Sanity check on version.h usage'
+ 	@echo  '  includecheck      - Check for duplicate included header files'
+ 	@echo  '  headerdep         - Detect inclusion cycles in headers'
++	@echo  '  headercheck       - Check headers in HEADER_CHECK=(headers|dirs) are'
++	@echo  '                      self-contained, have header guards, and pass kernel-doc.'
+ 	@echo  '  coccicheck        - Check with Coccinelle'
+ 	@echo  '  kconfig-sym-check - Check for dangling Kconfig symbol references'
+ 	@echo  '  clang-analyzer    - Check with clang static analyzer'
+@@ -2251,6 +2273,7 @@ clean: $(clean-dirs)
+ 		-o -name '*.ll' \
+ 		-o -name '*.gcno' \
+ 		-o -name '*.long-type-*.txt' \
++		-o -name '*.header-check' \
+ 		\) -type f -print \
+ 		-o -name '.tmp_*' -print \
+ 		| xargs rm -rf
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 4349108e75e1..6127feb970c6 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -306,6 +306,27 @@ quiet_cmd_cc_lst_c = MKLST   $@
+ $(obj)/%.lst: $(obj)/%.c FORCE
+ 	$(call if_changed_dep,cc_lst_c)
+ 
++# Compile C headers (.h) for header check
++# ---------------------------------------------------------------------------
++
++# Check a header is self-contained, has header guards, and passes kernel-doc.
++#
++# This is for 'make HEADER_CHECK=(headers|dirs) headercheck'. Not to be confused
++# with CONFIG_UAPI_HEADER_TEST.
++#
++# Please do *not* plug %.header-check into any configurable targets, unless you
++# also figure out a way to completely hide the %.header-check artefacts.
++
++quiet_cmd_header_check = HDRCHK  $(patsubst %.header-check,%.h,$@)
++      cmd_header_check = \
++		$(CC) $(c_flags) -fsyntax-only -x c /dev/null -include $< -include $<; \
++		PYTHONDONTWRITEBYTECODE=1 $(PYTHON3) $(KERNELDOC) -none $(KDOCFLAGS) \
++			$(if $(findstring e, $(KBUILD_EXTRA_WARN))$(CONFIG_WERROR),-Werror) $<; \
++		touch $@
++
++$(obj)/%.header-check: $(obj)/%.h FORCE
++	$(call if_changed_dep,header_check)
++
+ # Compile Rust sources (.rs)
+ # ---------------------------------------------------------------------------
+ 
+-- 
+2.47.3
 
->
-> > [...]
-> > +static int add_jump_destinations(struct objtool_file *file)
-> > +{
-> > +	return run_insn_ranges(file, add_jump_destinations_range);
-> > +}
->
-> I haven't examined this myself yet, but my LLM doesn't like this,
-> saying:
->
->   For an internal sibling call, add_jump_destination() calls
->   add_call_dest(file, insn, dest_sym, true), and add_call_dest() calls
->   annotate_call_site(), which for --hack-noinstr profiling calls, and for
->   __fentry__ calls with --mcount --mnop, does set_reloc_type() and
->   elf_write_insn() on file->elf. The per-range shadow gives each thread
->   its own lists, but the struct elf is shared, and both helpers write to
->   the section and mark it changed without any locking.
->   add_call_destinations() is kept serial because "annotating a call site
->   rewrites instructions the dead end walks read", so it looks like this
->   path needs the same care: a lock, or deferring those writes until the
->   threads have been joined. This is from reading the code; I haven't hit
->   a failure. Was the thread sanitizer run mentioned in the cover letter
->   done with those objtool options enabled?
->
-> So, take it with a grain of salt. ;)
-
-I mean sashiko is hallucinating at a rate >50% on this series, so pinches
-of salt all round :) I do think frontier models with a good amount of
-checking + e.g. Chris Mason's review-prompts are helpful to rein in stuff.
-
-Anyway I had mine check it ;) and I also have a beefy threadripper sitting
-around for bounding reality on this stuff and it all came back clean:
-
-	Those writes go to the thread's own instruction bytes and its own
-	relocation, the only shared state touched is the section and elf
-	"changed" flags, which every writer sets to true, and the mcount
-	case for a sibling call is a warning path. The v2 sanitizer run
-	used the gcc allmodconfig options, which lack
-	--mcount/--mnop/--cfi/--fineibt, so I reran it on the clang
-	allmodconfig vmlinux.o with its full option set: zero reports, the
-	jump pass included.
-
->
-> -Kees
->
-> --
-> Kees Cook
-
---
-Cheers, Lorenzo
