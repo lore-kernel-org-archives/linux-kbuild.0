@@ -1,47 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 474BA35839C;
-	Tue, 15 Sep 2026 22:02:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB2AC4A263D;
+	Tue, 15 Sep 2026 23:36:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789509731; cv=none; b=AN3bClEtWc5uIs/TVYEYN/c1wIPrgs8Kpm1XoBUp/L5Fypk/AQi+d3N4/MPPy3+hcllTH1AnMKGVHkcgnPKW7SvIJkJzOykILfU0S93LlPNrbkKa3us0xUsdm/rZLr6DgLTkQ4e2BuSe4buHc0HHzcKg2yawhyj3dS1q2G9AOgQ=
+	t=1789515372; cv=none; b=NKsCFq8mh56y4qbDcDgJJ46mkz4AyflhLs7FHVgz44TZkEbng0MOwLjEU3nkyIWCgVoFyLUdBG7UZyj3oaMQk2DKgnqX81otvG6MBPNjkBKb1bexqixYhs/avtAkDfMwZHQo4R1dwvCi5VOjDGRHrlwqjqOXa2uPqdWBl0fSoCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789509731; c=relaxed/simple;
-	bh=GLZJu+ZNY9Xk/LATlKZ6lQE23AXTXhfnz25McRPlX8c=;
+	s=arc-20240116; t=1789515372; c=relaxed/simple;
+	bh=FkRN2jawdYwKATblpAyNJWwSu9H7DD7f8FFPlu0YGkE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E/f5zeZaDoxk+QXAU6IvOLzW62HZ3E+yHy0NGND6whjZyRoYl4kYa6NF/afBPBjTvisaAy3fAFLoAT3HrBY9EG+jsMrmyCzHva0yGPUUIbtn9Fhd2jF4mY2mcxPSJlj2E2scnJ3s3WlCnOiSPr5Gsnsx6lldaD+utqVzQTdZ9g0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NhjFqyCu; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=ooqXq6e0DE9bKz8Q8rNbC/cOR7dQwy3mjHAybqF0d+yRRxs0L/xwvQlGaQWglm8tIVhoI6vx4+16+Vk37xZzN0hKEQr/x91RgcmTlkuOm1stf4YlgsC821EyzaczBhuhGQl37EjUtyOvHiD6T9HB0l7a0JKWYf+MuG2hr6Vufng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jr00ImAX; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NhjFqyCu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B2071F000FF;
-	Tue, 15 Sep 2026 22:02:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jr00ImAX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AE221F000FF;
+	Tue, 15 Sep 2026 23:36:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789509730;
-	bh=MYpcvYi0IhmOHWDTtKoEKyqBM/oTdTRBAh47Pzw1eLM=;
+	s=k20260515; t=1789515371;
+	bh=Ap01zyCMjD8ZanzGzZL1XJVEy0iBaTJoQEUJTBau1OI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=NhjFqyCuf8kyiZrL8wY656bZcNEMfDONA7ohqItUHpNPPG3RszZNsFe41LjXRURME
-	 +Brcrgy3eDk7P+9HGc7hlLmQLDyVCZxm/ZfOiNjxYdojZGbHPo6VC4dvsNy/jQhp7S
-	 4lRuGandHFa8e6bwRcRg8mt63DY7D/CByAtl8ts/+TTpqupT9obT+FWTWzs3EyXxLA
-	 1q0NUyi8fe0j3UcQbLwqsGtRg0rS8wPA2VTTT05j4pQ0qScvUD3mVhM615/f3tAGUb
-	 4uKhgbMFUacif9I6QmFR9+s5WA6WBmhGNWcj8przi9Qggqhx5QGvhJNwSESCb1R/WM
-	 GicpUqzdPobjw==
-Date: Tue, 15 Sep 2026 15:02:04 -0700
+	b=Jr00ImAXCtVgkm2snvvAMscp4pu2FydPj39Ai4N6inRBx8IMN1NHZz6JFCpTGbTyX
+	 QFwiT1LfZx8ZhePsjKijICXxhYLk7n2782e8jCRp54DecYLzK7xuoCC7Uf3auYSuUQ
+	 CU5lkHrYHbMNR/MGa2ZLb6zflNXaVAETw2kY47gtnQjMEfpdljeHPmv/MKCEsy/SLH
+	 m/HL55NkgFUAviWyKL6Xb2bwyaslTVnggPD4FFNMnOfUeaNqq5iRYEXfwdnZWVcBj4
+	 rwA3lynaKv8QlW9r7Lhf3VqTWqGMqA2F7VpoNuSsIkmx8W1nXGhk8URaRCRanNbv5p
+	 Ip9U/1waqJbFQ==
+Date: Tue, 15 Sep 2026 16:36:06 -0700
 From: Nathan Chancellor <nathan@kernel.org>
-To: Nicolas Schier <n.schier@fritz.com>
-Cc: Erkan Erdem <hexvalid@gmail.com>, Julian Braha <julianbraha@gmail.com>,
+To: Julian Braha <julianbraha@gmail.com>
+Cc: Erkan Erdem <hexvalid@gmail.com>, Nicolas Schier <nsc@kernel.org>,
 	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>, linux-doc@vger.kernel.org,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
-	Masahiro Yamada <masahiroy@kernel.org>, llvm@lists.linux.dev
-Subject: Re: [PATCH v2] docs: kconfig: fix shell function syntax in caveats
-Message-ID: <20260915220204.GA1534234@ax162>
-References: <20260907103739.23212-1-hexvalid@gmail.com>
- <20260915-pastel-industrious-rhino-8bddce@l-nschier-aarch64>
+	Ariel Marcovitch <arielmarcovitch@gmail.com>,
+	Valentin Rothberg <valentinrothberg@gmail.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH v2] checkkconfigsymbols: resolve revisions before
+ resetting the tree
+Message-ID: <20260915233606.GA863881@ax162>
+References: <20260907103739.23212-3-hexvalid@gmail.com>
+ <0122859e-028d-4860-b2ea-dcd709e4c505@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -50,52 +48,36 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260915-pastel-industrious-rhino-8bddce@l-nschier-aarch64>
+In-Reply-To: <0122859e-028d-4860-b2ea-dcd709e4c505@gmail.com>
 
-On Tue, Sep 15, 2026 at 12:59:40PM +0200, Nicolas Schier wrote:
-> On Mon, Sep 07, 2026 at 01:37:37PM +0300, Erkan Erdem wrote:
-> > Kconfig separates a function name from its arguments with a comma, but
-> > the caveats section uses Make-style whitespace in its shell calls.
-> > These expressions expand as undefined variables rather than invoking
-> > the shell function, so the supposedly working CC_HAS_ENDIAN_FLAG
-> > example fails to parse.
+On Tue, Sep 15, 2026 at 12:43:29PM +0100, Julian Braha wrote:
+> On 9/7/26 11:37, Erkan Erdem wrote:
+> > The same problem affects --commit with the current branch name.
 > > 
-> > Add the missing commas to the shell calls in this section. Keep the
-> > Make examples unchanged.
-> > 
-> > Fixes: 316d55d55f49 ("Documentation: kconfig: document a new Kconfig macro language")
-> > Assisted-by: LLM
-> > Signed-off-by: Erkan Erdem <hexvalid@gmail.com>
-> > ---
-> > 
-> > Changes in v2, addressing Julian Braha's review:
-> > - Remove whitespace after the comma in the three remaining shell calls.
-> > 
-> > v1: https://lore.kernel.org/all/20260905124045.42713-1-hexvalid@gmail.com/
-> > 
-> > The issue, patch and changelog were prepared with an AI coding assistant.
-> > The assistant also prepared the v2 revision and ran the checks below.
-> > 
-> > Validation:
-> > - Re-ran the documented working CC_HAS_ENDIAN_FLAG example using the
-> >   Kconfig conf tool built with Clang on macOS. With a test helper returning
-> >   y for either endian flag, the original example fails to parse; v2
-> >   executes both probes and sets CC_HAS_ENDIAN_FLAG=y for both endiannesses.
-> > - Rebuilt the changed page alone with Sphinx, treating warnings as errors.
-> > - The complete kernel documentation set and kernel were not built.
-> > 
-> >  Documentation/kbuild/kconfig-macro-language.rst | 8 ++++----
-> >  1 file changed, 4 insertions(+), 4 deletions(-)
-> > 
+> > Fixes: b1a3f243485f ("checkkconfigsymbols.py: make it Git aware")
 > 
-> Thanks!  I'll queue it for kbuild-fixes, but it might be defered to v7.4 
-> if no other build relevant fix will pop-up.
+> While it's good to support this, I don't think the Fixes tag is
+> appropriate here, because this wasn't really a bug... it was just
+> unsupported functionality.
 
-I am not opposed to this going via -fixes but given that it is just
-documentation examples and there do not appear to be any problematic
-instances in tree, I feel like this could very reasonably go through
--next. 316d55d55f49 is from 4.18, so the examples have been wrong for a
-long time. With that, I would probably not classify it as urgent.
+I guess it is because neither this change nor the below change did not
+take care of disallowing the branch name with '--commit'. That said, I
+do agree that I think a Fixes is a little superfluous here, I would
+leave it off of future revisions.
+
+> > Link: https://lore.kernel.org/20210901145212.478066-1-arielmarcovitch@gmail.com/
+> 
+> This commit added a check that will cause the script to exit if
+> 'HEAD...' is passed to --commit. So it seems like this patch should also
+> remove those lines now.
+
+While I do agree that we should revert this change, which is
+
+  d62d5aed3354 ("checkkconfigsymbols.py: Forbid passing 'HEAD' to --commit")
+
+in the tree, I think it would be better done as a separate commit, whose
+justification is that HEAD is now properly resolved as a result of this
+change.
 
 -- 
 Cheers,
