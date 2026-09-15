@@ -1,63 +1,65 @@
-Received: from mail-wm2-f13.google.com (mail-wm2-f13.google.com [74.125.225.141])
+Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 036BC4A3F10
-	for <linux-kbuild@vger.kernel.org>; Tue, 15 Sep 2026 21:15:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D39E84A3F10
+	for <linux-kbuild@vger.kernel.org>; Tue, 15 Sep 2026 21:15:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789506915; cv=none; b=ASRaVejnmx2u7ox+SUjarK89hNdEoR6LfBp4a/5ojg++snMigb0bXBhnHLBF0JTVP3YTvSgLZm1PPcGG9VtTDVVtlVZ8Q4VnfbpH4DDcnJbfhAlcZro3iir/6rVO07hWq5j5yL6ylSsfHKc3vi6epijHGduNq03Xg7eaGFnGUAc=
+	t=1789506917; cv=none; b=kxyrSSIz9R7DIkuRxafp+oUzExjSj6vjWFHlwdM8PFMRgEyHw1YQAfRB5APlSNYiib6KJuwtVqeguAnEqynUUlb47vzx/TjF+DpXK/cslOaqmTaCjxLbheri374+CqPZ0mIcKWSts++wFbW+04ZysxwvPVSnDCX7G1P7kfVhPhg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789506915; c=relaxed/simple;
-	bh=ALhkxPO+fNFOoRpay0MJRDbiqxW9v4c+hhntR24pFbI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aSa0LIV63Fl3kunVAP7yR3yK12o+p8629nt8KZR348NKC40pRKxyTByXlZz7LbFz0jFM4bQM9BtYatOT9pUihXlwi6DflsMP7kCB0OXjL8lyOiJUiqcK4fhN7QMe7xNZ4MihDkpNf18xWVgEDAY/hcMj4NOwgv1pBLWAULP6ZOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RXARi+p9; arc=none smtp.client-ip=74.125.225.141
+	s=arc-20240116; t=1789506917; c=relaxed/simple;
+	bh=P4GnjYvjDdXvVLPEMZ2Mvy6/y1ufQV2xiluJDL+kMZ8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=a8c+Z+1VO31j5xF5v+pVTL3DyLcXhNmchVWAslHizwJmA6LS/e1DjYAxGYfMOY2oKGg6RoDZxdIWmuzJ/ICIljzbRx4S+5DHzxPLpamzGzUL5bgPZFFne8F3AKRwqkw4nxdhehBp0cfqej2SHcIA/1NStNu14SXqBm42fWr6vCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OLFnO8DN; arc=none smtp.client-ip=74.125.225.140
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RXARi+p9"
-Received: by mail-wm2-f13.google.com with SMTP id 5b1f17b1804b1-49e6c0fce17so1448225e9.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 15 Sep 2026 14:15:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OLFnO8DN"
+Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49cd38e0f79so1308195e9.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 15 Sep 2026 14:15:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789506912; x=1790111712; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=fh5M+SOXGFOo0fE5dDk6nfH861G3XeTauBS+ExEQBqw=;
-        b=RXARi+p9Xb/ZFzb8B0LTJreAiBpb9iQmvRUPxQndqwEjYEYuz65BMRwSlQM/3VGm1j
-         BH2mpLeDI4ZRhn5fTuAfg3Z7GWbLB4GRRfrd94QQHwc/yfnCmv5QW70KhZwnlV7+LdAJ
-         0k9mf98hafdr6K9ynb1pmxyRWv9tTbQVAuOHtweiD51SNA9h6toqoAISFpS+kdHWHmlo
-         A2IGM40CgBEq73fT4y+4Zc2RD+XVRmopbegBgs94dURXTO2dBirAaB2YMsQEopjzErbN
-         yEsNDIeiuZ1JL6EzGuaY4cQkD5BIm40OvC4gYvEaijm6Cn295CHETRaYhaKELCTZAV80
-         NLDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789506912; x=1790111712;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1789506914; x=1790111714; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=fh5M+SOXGFOo0fE5dDk6nfH861G3XeTauBS+ExEQBqw=;
-        b=QBQG/P+La0ol9NpZrOUqmHcirhPrrT0a6xhQGZYN1upB9lRZvbuMzLnsJi3p14D0bF
-         RC0iaWaKrIwi4e1m084BKRa/DFE6pr3QnhOYrRpDjtbxm+zILg7qW0IQOthFWqaB4c/s
-         HJxgoxCo0bnJwBtDdsdL0LvresPH4gFJV6ACgcYbFKjsk/OwTcXJ3UH1KJXLL2nxRMKc
-         96Q+cFGMl+cnmP7nNki3PWY4Py6SH32gxgCIEKtWsvnO9S2cODDMqhCSHc073aZd9mkV
-         yD1Kwaf/fnz2HBpZaRxSwYAPVLE9BA6a1nOrlJXo8m3CZ3w0Q3vnWk3CeA51cI7q6s4Z
-         N0rw==
-X-Forwarded-Encrypted: i=1; AKwUvBxvw27SgiraecKv7gW+XiWA9TW1xnWw6KF8mGctoXXt2rmphk+T/gaq2ofbldenORN+lHFO5oZr2fn9VVg=@vger.kernel.org
-X-Gm-Message-State: AFuF++n2vOfu/P2ZVnUyvccmNC0ClwG10QCbI3vos+QuWFdsJWUFuTQZ
-	GMWChp0/xmqJQZVKISpiQTqSxwjQoyJjuR2Am7oeec4fxOdI6jCkFuPm
-X-Gm-Gg: AYBFou2OtXiSBhWZFJZjkqhHJ0SJahOthG8OBOoK/qf8OerLzLJTOwb/Btf+d0FdHuI
-	b9bDZwpBzzV7AqowOE9O5MQrs0jr8Fn39AiwBlSZdr4CeIoiRJYLs+x+6uFmk5SaAEIBnCdGW1K
-	XoROTA5QFGJDTNr9LlIyNWT8ahBJcibU/EvFRTXtEM9gbzh0bI9xcfRUf0BsuzNWq7O+HegN8Si
-	HjgWiU5NQc0wVdXq3RTMR/54vfgxnIjnO5G33PzBdCnwDnmt3Elg0o3ZKgEnacgQmDkgrre4CKV
-	NAmdkDWtiCUcxEFHrFwXj/zCAlsu8IAqRV/epZ948au995PPa2JhyP4iP21R3b6CmKtmwBivz38
-	TXKZi372ckRlH5ZEubF91iVYDjCriXO+D94jStjMD7r17aM6EQZqdykA11X6YoYKg5tiEp58D4S
-	PzQFMOrSjupiqONGJPzLrN0puVbaj6LapJjz8JhVk4/bndRtgK3d1/h7eYbwTvugV0OHd6NsK6M
-	0v1TCGGGZSKNs1Q/9tRHa/H6kJuEdM3PzpT
-X-Received: by 2002:a05:600c:3548:b0:49e:6e7c:d895 with SMTP id 5b1f17b1804b1-49e822a8fccmr30161045e9.26.1789506912023;
-        Tue, 15 Sep 2026 14:15:12 -0700 (PDT)
+        bh=Pp18lNSpLvIszH6E7VlmBrpqKQlpHF+L0iP+RB9/Ozo=;
+        b=OLFnO8DN88YVgI/pcWelaTakmEZ7LvizgCHvnEZ7wx3Pju5TQW6f5zSP3+/iVlm65F
+         1Udplu4vA9UkhaUG2Q8Bm6Km8ecanss3I5PKAGZKBlxeFl1az3b22Qw+o+PYzeiRsZK3
+         5kDQSGB2bbKPri2S0TiNRMgIJMkzSVgEjinnQNP7mF2xKLu9f1C3ZhdIEIyYCbNDD9qc
+         sYgYs4C7S+quced2SdX3ErW7uZNz19UAZO739ne0bNL3EHlipjzMSQ5idW2iKIrXUsQ+
+         1r9PjE9vsTiZ9TM9aevkR1ghOPmpjnWhZchEMJjndzd04Z2BxUSZWEQ5waD6o5dQ5wdr
+         jSNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789506914; x=1790111714;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:sender:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Pp18lNSpLvIszH6E7VlmBrpqKQlpHF+L0iP+RB9/Ozo=;
+        b=DQtnYHmBIbgzyTX9PxhXlKhSWEWlKMaBqpwMSX4n7ge2VNv4/EIFjTk0goOMBdJ0oe
+         TknrXD0yhq1bfCkZlV65C/DeOmjoeQQqa/TW5gXNw8N35F4XdIlSgovCqIMvXz8HIxqt
+         6x3e2RJjgY/P+p+ehepTQ4jaWuvcO+nj8vpo47t5Paw4tiYo2z4hFUYPkzGeBoIOcA00
+         7I6KNG0bafP0GI89CxI9bEpoL6NLRgcKv+vJax86NXc4JT7RJSREkrzBbrFFXQrMLFs7
+         VB7UFiuLe+0hBG99mIgABVBCoD9K+uLxDqPcSmJJkq0vdAf8l+kg9IrRBUUGzJC93KY1
+         JG3A==
+X-Forwarded-Encrypted: i=1; AKwUvBwYHUw6woimDrY+keGjwyZGNskNg4YWhvKW0JmnBplE9FccwlgQyy3xreNNmnMb1uNSlFVYRTViMkquf/M=@vger.kernel.org
+X-Gm-Message-State: AFuF++lzBwXVXEB6Wi25oSe4KZlDdVqOn0/IuPLrWMQGJ92DA5AKZDRR
+	3xw2aF1ymPOHxznCtxKc3A9Yxmkw9AiSdFn1iOi9mfzgt7dUmvBqvtxm
+X-Gm-Gg: AYBFou3LSERJevZiIVw+PEdnKjSi8FK9qmMrhYKvTi07wDyMsMfBd8xQ4EwEK4wFSEx
+	vMhfGkri593AEYsGRNt7Diqn9jaSIrTXk+1uo8d4jlVq5DbMvS56887Msbt+M2UvtZ65gYAn/ki
+	fU6ECy1Xhapa/1a/IVfAtSz5zZn8F33pj5mDoIb8TNH0r+BC3IgpRQgUhKkC3YPjeZhw+7Pfdfu
+	rAxp/iBvBFmvXRfE5vcudPRfFPVeSaFNP5qR/8JseGQLCmFZih3hGutWKztai+P1n+9vZX/WKLX
+	1i/kfxsJkgRlBcM6Q8UzIFO7KD1wFLzFyYDgZAn71sL+RS4z0cu3SbeJCKyVaY5EAkywK+gQyfq
+	osOrUoKisI3mNqtHlhfy1RTTnpS09R9UL5pBmT6tK5i8QenykRI8dsaaNsgm+GiAF7s7zoIIX1t
+	VQ6s0+qxnamEh18j+y/8heFY+FbreILOaRxN46WRxmD+Bz13tB425xwcYYGoylVOm54Utj4iB7j
+	/6YsGz16/IpDhZDVVJw9VrW8vcfDB4qCBsC
+X-Received: by 2002:a05:600c:34c1:b0:49c:e3c3:5efd with SMTP id 5b1f17b1804b1-49e7a67e4d5mr228611075e9.9.1789506914033;
+        Tue, 15 Sep 2026 14:15:14 -0700 (PDT)
 Received: from nixos-office ([2001:8a0:e962:d100:b3c:e4b2:2d5f:e949])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49e83b1ba9bsm24804695e9.15.2026.09.15.14.15.10
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49e83b1ba9bsm24804695e9.15.2026.09.15.14.15.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Sep 2026 14:15:11 -0700 (PDT)
+        Tue, 15 Sep 2026 14:15:13 -0700 (PDT)
 Sender: Julian Braha <julian.braha@gmail.com>
 From: Julian Braha <julianbraha@gmail.com>
 To: nathan@kernel.org,
@@ -71,10 +73,12 @@ Cc: nico@fluxnic.net,
 	linux-kernel@vger.kernel.org,
 	linux-kbuild@vger.kernel.org,
 	Julian Braha <julianbraha@gmail.com>
-Subject: [PATCH v2 0/5] kconfig: improve input validation for numeric options
-Date: Tue, 15 Sep 2026 22:15:03 +0100
-Message-ID: <20260915211508.291790-1-julianbraha@gmail.com>
+Subject: [PATCH v2 1/5] kconfig: promote invalid numeric reference from warning to error
+Date: Tue, 15 Sep 2026 22:15:04 +0100
+Message-ID: <20260915211508.291790-2-julianbraha@gmail.com>
 X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260915211508.291790-1-julianbraha@gmail.com>
+References: <20260915211508.291790-1-julianbraha@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -83,92 +87,275 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series improves checks for invalid values of 'int' and 'hex' config
-options in the Kconfig interpreter.
+The Kconfig interpreter already warns if a numeric option attempts to use
+a non-numeric option (bool, tristate, or string) to set its value (for
+example, with a 'default' or 'range').
 
-Tests are added for all new warnings and errors.
+Since there is nowhere in the tree that attempts this, we can safely
+promote this check from warning to error.
 
-Patch 1/5 promotes an existing warning to an error, for attempting to use
-a non-numeric option to set a numeric option's value. This warning did not
-have a test, but one is added with the promotion to error.
-
-Patch 2/5 adds a check that the constant values for numerics are within
-the bounds of the type (64-bit signed integer for 'int', and 64-bit
-unsigned integer for 'hex'). This prevents silent failures, for example in
-comparisons.
-
-Patch 3/5 adds a check that 'int' and 'hex' options aren't used to set
-each other's values. Since the values are naively reused from their
-internal string representations, this currently also leads to later silent
-failures.
-
-Patch 4/5 rejects out-of-bounds numeric values from the Kconfig
-frontends and adds a warning upon reading in an existing .config file
-with one of these values. In the future, this warning should be promoted
-to an error.
-
-Finally, patch 5/5 fixes an existing issue where checks on 'range' values
-for hex options parsed them as signed integers using 'strtoll' instead of
-'strtoull'.
-
+Assisted-by: LLM
 Signed-off-by: Julian Braha <julianbraha@gmail.com>
 ---
-Changes since v1:
-- unified formatting of int/hex messages in patch 4 (Nathan)
-- added a 5th patch for the hex range issue (Nathan/Sashiko)
-
-Link to v1:
-https://lore.kernel.org/all/20260829171902.1510587-1-julianbraha@gmail.com/
----
-Julian Braha (5):
-  kconfig: promote invalid numeric reference from warning to error
-  kconfig: check for out-of-bounds numeric constants
-  kconfig: check for hex and int mismatches
-  kconfig: prevent out-of-bounds user input for numeric options
-  kconfig: use unsigned integers for hex range checks
-
- scripts/kconfig/confdata.c                    |  6 ++
  scripts/kconfig/lkc.h                         |  2 +-
- scripts/kconfig/lkc_proto.h                   |  1 +
- scripts/kconfig/menu.c                        | 62 ++++++++++-----
+ scripts/kconfig/menu.c                        | 39 ++++++----
  scripts/kconfig/parser.y                      |  2 +-
- scripts/kconfig/symbol.c                      | 61 +++++++++++---
- scripts/kconfig/tests/err_num_bounds/Kconfig  | 79 +++++++++++++++++++
- .../kconfig/tests/err_num_bounds/__init__.py  | 12 +++
- .../tests/err_num_bounds/expected_stderr      | 10 +++
- .../kconfig/tests/err_num_mismatch/Kconfig    | 38 +++++++++
- .../tests/err_num_mismatch/__init__.py        |  9 +++
- .../tests/err_num_mismatch/expected_stderr    |  4 +
- .../tests/err_num_non_numeric_ref/Kconfig     | 75 ++++++++++++++++++
+ .../tests/err_num_non_numeric_ref/Kconfig     | 75 +++++++++++++++++++
  .../tests/err_num_non_numeric_ref/__init__.py |  9 +++
- .../err_num_non_numeric_ref/expected_stderr   | 16 ++++
- .../kconfig/tests/warn_changed_input/Kconfig  |  5 ++
- .../tests/warn_changed_input/expected_config  |  1 +
- scripts/kconfig/tests/warn_num_bounds/Kconfig | 24 ++++++
- .../kconfig/tests/warn_num_bounds/__init__.py | 25 ++++++
- scripts/kconfig/tests/warn_num_bounds/config  |  7 ++
- .../tests/warn_num_bounds/expected_config     | 11 +++
- .../warn_num_bounds/expected_config_stderr    |  3 +
- .../warn_num_bounds/expected_frontend_config  | 11 +++
- .../warn_num_bounds/expected_frontend_stderr  |  0
- 24 files changed, 442 insertions(+), 31 deletions(-)
- create mode 100644 scripts/kconfig/tests/err_num_bounds/Kconfig
- create mode 100644 scripts/kconfig/tests/err_num_bounds/__init__.py
- create mode 100644 scripts/kconfig/tests/err_num_bounds/expected_stderr
- create mode 100644 scripts/kconfig/tests/err_num_mismatch/Kconfig
- create mode 100644 scripts/kconfig/tests/err_num_mismatch/__init__.py
- create mode 100644 scripts/kconfig/tests/err_num_mismatch/expected_stderr
+ .../err_num_non_numeric_ref/expected_stderr   | 14 ++++
+ 6 files changed, 126 insertions(+), 15 deletions(-)
  create mode 100644 scripts/kconfig/tests/err_num_non_numeric_ref/Kconfig
  create mode 100644 scripts/kconfig/tests/err_num_non_numeric_ref/__init__.py
  create mode 100644 scripts/kconfig/tests/err_num_non_numeric_ref/expected_stderr
- create mode 100644 scripts/kconfig/tests/warn_num_bounds/Kconfig
- create mode 100644 scripts/kconfig/tests/warn_num_bounds/__init__.py
- create mode 100644 scripts/kconfig/tests/warn_num_bounds/config
- create mode 100644 scripts/kconfig/tests/warn_num_bounds/expected_config
- create mode 100644 scripts/kconfig/tests/warn_num_bounds/expected_config_stderr
- create mode 100644 scripts/kconfig/tests/warn_num_bounds/expected_frontend_config
- create mode 100644 scripts/kconfig/tests/warn_num_bounds/expected_frontend_stderr
 
+diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
+index 7e6f6ca299cf..bbc99f75b416 100644
+--- a/scripts/kconfig/lkc.h
++++ b/scripts/kconfig/lkc.h
+@@ -89,7 +89,7 @@ struct property *menu_add_prompt(enum prop_type type, const char *prompt,
+ 				 struct expr *dep);
+ void menu_add_expr(enum prop_type type, struct expr *expr, struct expr *dep);
+ void menu_add_symbol(enum prop_type type, struct symbol *sym, struct expr *dep);
+-void menu_finalize(void);
++int menu_finalize(void);
+ void menu_set_type(int type);
+ 
+ extern struct menu rootmenu;
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index 9c079e92a9ed..99a57ce0fdc9 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -240,11 +240,12 @@ static int menu_validate_number(struct symbol *sym, struct symbol *sym2)
+ 	       (sym2->type == S_UNKNOWN && sym_string_valid(sym, sym2->name));
+ }
+ 
+-static void sym_check_prop(struct symbol *sym)
++static int sym_check_prop(struct symbol *sym)
+ {
+ 	struct property *prop;
+ 	struct symbol *sym2;
+ 	char *use;
++	int errors = 0;
+ 
+ 	for (prop = sym->prop; prop; prop = prop->next) {
+ 		switch (prop->type) {
+@@ -258,10 +259,13 @@ static void sym_check_prop(struct symbol *sym)
+ 				break;
+ 			sym2 = prop_get_symbol(prop);
+ 			if (sym->type == S_HEX || sym->type == S_INT) {
+-				if (!menu_validate_number(sym, sym2))
+-					prop_warn(prop,
+-					    "'%s': number is invalid",
+-					    sym->name);
++				if (!menu_validate_number(sym, sym2)) {
++					fprintf(stderr,
++						"%s:%d: error: '%s': number is invalid\n",
++						prop->filename, prop->lineno,
++						sym->name);
++					errors++;
++				}
+ 			}
+ 			if (sym_is_choice(sym)) {
+ 				struct menu *choice = sym_get_choice_menu(sym2);
+@@ -293,21 +297,28 @@ static void sym_check_prop(struct symbol *sym)
+ 				prop_warn(prop, "range is only allowed "
+ 						"for int or hex symbols");
+ 			if (!menu_validate_number(sym, prop->expr->left.sym) ||
+-			    !menu_validate_number(sym, prop->expr->right.sym))
+-				prop_warn(prop, "range is invalid");
++			    !menu_validate_number(sym, prop->expr->right.sym)) {
++				fprintf(stderr,
++					"%s:%d: error: range is invalid\n",
++					prop->filename, prop->lineno);
++				errors++;
++			}
+ 			break;
+ 		default:
+ 			;
+ 		}
+ 	}
++
++	return errors;
+ }
+ 
+-static void _menu_finalize(struct menu *parent, bool inside_choice)
++static int _menu_finalize(struct menu *parent, bool inside_choice)
+ {
+ 	struct menu *menu, *last_menu;
+ 	struct symbol *sym;
+ 	struct property *prop;
+ 	struct expr *basedep, *dep, *dep2;
++	int errors = 0;
+ 
+ 	sym = parent->sym;
+ 	if (parent->list) {
+@@ -393,7 +404,7 @@ static void _menu_finalize(struct menu *parent, bool inside_choice)
+ 		 * moving on
+ 		 */
+ 		for (menu = parent->list; menu; menu = menu->next)
+-			_menu_finalize(menu, sym && sym_is_choice(sym));
++			errors += _menu_finalize(menu, sym && sym_is_choice(sym));
+ 	} else if (!inside_choice && sym) {
+ 		/*
+ 		 * Automatic submenu creation. If sym is a symbol and A, B, C,
+@@ -461,7 +472,7 @@ static void _menu_finalize(struct menu *parent, bool inside_choice)
+ 			}
+ 			/* Superset, put in submenu */
+ 		next:
+-			_menu_finalize(menu, false);
++			errors += _menu_finalize(menu, false);
+ 			menu->parent = parent;
+ 			last_menu = menu;
+ 		}
+@@ -519,14 +530,16 @@ static void _menu_finalize(struct menu *parent, bool inside_choice)
+ 			menu_warn(parent, "config symbol defined without type");
+ 
+ 		/* Check properties connected to this symbol */
+-		sym_check_prop(sym);
++		errors += sym_check_prop(sym);
+ 		sym->flags |= SYMBOL_WARNED;
+ 	}
++
++	return errors;
+ }
+ 
+-void menu_finalize(void)
++int menu_finalize(void)
+ {
+-	_menu_finalize(&rootmenu, false);
++	return _menu_finalize(&rootmenu, false);
+ }
+ 
+ bool menu_has_prompt(const struct menu *menu)
+diff --git a/scripts/kconfig/parser.y b/scripts/kconfig/parser.y
+index 5fb6f07b6ad2..40ceb9908c6f 100644
+--- a/scripts/kconfig/parser.y
++++ b/scripts/kconfig/parser.y
+@@ -587,7 +587,7 @@ void conf_parse(const char *name)
+ 		menu_add_prompt(P_MENU, "Main menu", NULL);
+ 	}
+ 
+-	menu_finalize();
++	yynerrs += menu_finalize();
+ 
+ 	menu_for_each_entry(menu) {
+ 		struct menu *child;
+diff --git a/scripts/kconfig/tests/err_num_non_numeric_ref/Kconfig b/scripts/kconfig/tests/err_num_non_numeric_ref/Kconfig
+new file mode 100644
+index 000000000000..0ca7a4a460f6
+--- /dev/null
++++ b/scripts/kconfig/tests/err_num_non_numeric_ref/Kconfig
+@@ -0,0 +1,75 @@
++# SPDX-License-Identifier: GPL-2.0
++# Test non-numeric symbol references from numeric symbols
++
++config BOOL_SOURCE
++	bool
++
++config TRISTATE_SOURCE
++	tristate
++
++config STRING_SOURCE
++	string
++
++# Invalid int defaults
++
++config INT_DEFAULT_BOOL
++	int
++	default BOOL_SOURCE
++
++config INT_DEFAULT_TRISTATE
++	int
++	default TRISTATE_SOURCE
++
++config INT_DEFAULT_STRING
++	int
++	default STRING_SOURCE
++
++# Invalid hex defaults
++
++config HEX_DEFAULT_BOOL
++	hex
++	default BOOL_SOURCE
++
++config HEX_DEFAULT_TRISTATE
++	hex
++	default TRISTATE_SOURCE
++
++config HEX_DEFAULT_STRING
++	hex
++	default STRING_SOURCE
++
++# Invalid int ranges
++
++config INT_RANGE_BOOL
++	int
++	range BOOL_SOURCE 1
++
++config INT_RANGE_TRISTATE
++	int
++	range TRISTATE_SOURCE 1
++
++config INT_RANGE_STRING
++	int
++	range STRING_SOURCE 1
++
++config INT_RANGE_MULTIPLE
++	int
++	range BOOL_SOURCE TRISTATE_SOURCE
++
++# Invalid hex ranges
++
++config HEX_RANGE_BOOL
++	hex
++	range BOOL_SOURCE 0x1
++
++config HEX_RANGE_TRISTATE
++	hex
++	range TRISTATE_SOURCE 0x1
++
++config HEX_RANGE_STRING
++	hex
++	range STRING_SOURCE 0x1
++
++config HEX_RANGE_MULTIPLE
++	hex
++	range BOOL_SOURCE TRISTATE_SOURCE
+diff --git a/scripts/kconfig/tests/err_num_non_numeric_ref/__init__.py b/scripts/kconfig/tests/err_num_non_numeric_ref/__init__.py
+new file mode 100644
+index 000000000000..9632907abead
+--- /dev/null
++++ b/scripts/kconfig/tests/err_num_non_numeric_ref/__init__.py
+@@ -0,0 +1,9 @@
++# SPDX-License-Identifier: GPL-2.0
++"""
++Reject nonnumeric symbol references from int and hex properties.
++"""
++
++
++def test(conf):
++    assert conf.olddefconfig() == 1
++    assert conf.stderr_matches('expected_stderr')
+diff --git a/scripts/kconfig/tests/err_num_non_numeric_ref/expected_stderr b/scripts/kconfig/tests/err_num_non_numeric_ref/expected_stderr
+new file mode 100644
+index 000000000000..4974ba2fcd9c
+--- /dev/null
++++ b/scripts/kconfig/tests/err_num_non_numeric_ref/expected_stderr
+@@ -0,0 +1,14 @@
++Kconfig:17: error: 'INT_DEFAULT_BOOL': number is invalid
++Kconfig:21: error: 'INT_DEFAULT_TRISTATE': number is invalid
++Kconfig:25: error: 'INT_DEFAULT_STRING': number is invalid
++Kconfig:31: error: 'HEX_DEFAULT_BOOL': number is invalid
++Kconfig:35: error: 'HEX_DEFAULT_TRISTATE': number is invalid
++Kconfig:39: error: 'HEX_DEFAULT_STRING': number is invalid
++Kconfig:45: error: range is invalid
++Kconfig:49: error: range is invalid
++Kconfig:53: error: range is invalid
++Kconfig:57: error: range is invalid
++Kconfig:63: error: range is invalid
++Kconfig:67: error: range is invalid
++Kconfig:71: error: range is invalid
++Kconfig:75: error: range is invalid
 -- 
 2.55.0
 
