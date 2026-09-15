@@ -1,232 +1,170 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3127A47FB03;
-	Tue, 15 Sep 2026 10:43:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFFBF48125C;
+	Tue, 15 Sep 2026 10:44:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789469032; cv=none; b=RHr2zgxJaikWFfqWcTBwwihOHYp+5m3hXeq9qQLA3qAi+9L7SRKGMoNOJOd8qT+FTRlt7U1AFnpI5DtEKr0FniJuDqQ5yiGj9eqgs+inRcH8+nrd0kwAxuLz1eGoVAY2dxvzrdTmEhQnOqMSCz6/ErGk4eq543s65V4mO+ylVBc=
+	t=1789469057; cv=none; b=B18uUeWYu/Af7jyJuJwgiE3g8tInNXwf3eNF50nYtf1y2+ZdOgFHAl6QDqz5bKw0sME09JXAIn9xtM6IZntP9ATd6Y43CzhqHdi69AUZfzn9DjlqJtn9KTuKMUaPV4VaJ8zszKhUEuiUnqMEL+m7ewfoFepuK81MEa2kdxZCl5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789469032; c=relaxed/simple;
-	bh=RTO+ZRUSTSxYZptT6zYs9DP4cLEcTmRd2c9SBuISSEM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hjqKmLW6/xfGdYEMaEYV5slxM8RCbSWvxcr+L/j5qZ+ufuDTJDXrE13Lw9euektYKRayxg9uki1mOrzgYKyEx/UmC8kfVrdPNrqjMa0kG72/vFTgcxdsLGOtfx2ReAdyVZshKc/jJKMNF+qHah6NAg1z+nU3A1lN442rP7QbCjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aI8dP7rk; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1789469057; c=relaxed/simple;
+	bh=b6c3JYoc+w5EEpNyoNB9KUGB91ElnPEyAcmxG0RJU58=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DDF8vXLEXgmSX2Dheh4LqlFp7lYecqAmqtK3Bqd6joZYm1spTErmsCm6afjpyFt7TLnuoWN7/I6DMADq0UvlXf0M23osJnCFkEbbGO680NCz11KmJsOJ74paWOHJtIL2ZUPHz65I+nP42Y+Qzqo2k6LuVrrmT8Kwr9pvZnBylbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mUToMrdF; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aI8dP7rk"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1789469030; x=1821005030;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=RTO+ZRUSTSxYZptT6zYs9DP4cLEcTmRd2c9SBuISSEM=;
-  b=aI8dP7rkA2N9IYnNSC4AchSxNfNJbt+OGs7gjzd/6qVIkslxQicrelKQ
-   DXQvoGIQOqZl+xYgHyZe3qJjvRQdjUiowqFGC5aE5WYwg42/UVu4ekfwm
-   7/0Td2d66Se8F+kWMu5Hg++vWzQZ0oRKKkUDzjWy93XyaebA8QmaG2Kpp
-   wFi5E80E2MAVV/kQrGxgHhngTvh7mdfglIliYmYIU2A2wdb+nskWAbyB4
-   VSMKzA7wL5f1SnwzLFKs2HSB6PDvirC4yIfKLddte9o7Rq4SfjAch6WhI
-   YnowMVq7CEMN3lBeJ6WmNo/0ktm06fl5kJvc0OMqlHAEtUCTm8TNEycF+
-   g==;
-X-CSE-ConnectionGUID: BYp+Ez4tQ0yl4tKSWMDolQ==
-X-CSE-MsgGUID: mjghpOHSReWMp+02pjlsSw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11905"; a="100492062"
-X-IronPort-AV: E=Sophos;i="6.27,103,1787036400"; 
-   d="scan'208";a="100492062"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2026 03:43:49 -0700
-X-CSE-ConnectionGUID: FxPs6fUzRMGAG1+Pq6qU0Q==
-X-CSE-MsgGUID: CUoVoLDcRtKXEMKhJq+u8g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,103,1787036400"; 
-   d="scan'208";a="272942728"
-Received: from abityuts-desk1.ger.corp.intel.com (HELO localhost) ([10.245.245.243])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2026 03:43:47 -0700
-From: Jani Nikula <jani.nikula@intel.com>
-To: linux-kernel@vger.kernel.org
-Cc: jani.nikula@intel.com,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	linux-kbuild@vger.kernel.org
-Subject: [PATCH] kbuild: add header check facility as a manually run static analyzer
-Date: Tue, 15 Sep 2026 13:43:31 +0300
-Message-ID: <20260915104331.255636-1-jani.nikula@intel.com>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mUToMrdF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B602B1F000FF;
+	Tue, 15 Sep 2026 10:44:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789469055;
+	bh=TX67wToN/vV4eRD0qfWhTbazK7mBj1488P8wyNJ2Z0M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=mUToMrdFqpeuheHAXi+Pj/C8B/wZ416xsc1z+zaIAr2kYrfLWdLP9vYofremSY/hL
+	 b/Zvg44C1l7bbJ1HRRxXPUwmtSGgW4OV0+wNhOY3eqwgUkqxgAAk1tFhJJW+v+L8m1
+	 lwj57hY24E7NydH0vUQZp9n1HYwfzif+2V7uCr4No8tdoVJKJZeqULh8GS5e50N+Ec
+	 4vpem0My//+hAumuuN7z6e17rNWHOuvkI0nbsIqVFmAq420l7jNd8vFnbh8BtrPWr9
+	 qmhteJUsi0b0VFt189BXSM2Ge6jlRDfpRVdDjKIoUBcqwlhsXJoKgBW4Vyno6cw3fQ
+	 ga53PG7fyFWcQ==
+Date: Tue, 15 Sep 2026 11:44:01 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Kees Cook <kees@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, Masahiro Yamada <masahiroy@kernel.org>, 
+	Alexey Gladkov <legion@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, Arnd Bergmann <arnd@arndb.de>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Ard Biesheuvel <ardb@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Josh Poimboeuf <jpoimboe@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
+	Gary Guo <gary@garyguo.net>, =?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
+	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
+	Onur =?utf-8?B?w5Z6a2Fu?= <work@onurozkan.dev>, Jonathan Corbet <corbet@lwn.net>, 
+	Randy Dunlap <rdunlap@infradead.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>, 
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
+	linux-riscv@lists.infradead.org, linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-doc@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v2 14/21] kbuild: batch module finalisation
+Message-ID: <aqkZvtAKWYf9-1ZW@gremlin>
+References: <20260914-build-speedup-v2-0-39817ec5db23@kernel.org>
+ <20260914-build-speedup-v2-14-39817ec5db23@kernel.org>
+ <202609141056.6AE2C82E@keescook>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6 krs Bertel Jungin Aukio 5, 02600 Espoo, Finland
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202609141056.6AE2C82E@keescook>
 
-There have been various attempts at adding a header test or check
-mechanism in the kernel build system. The header check primarily
-consists of ensuring headers are self-contained, have include guards,
-and, in some cases, pass kernel-doc.
+On Mon, Sep 14, 2026 at 11:00:27AM -0700, Kees Cook wrote:
+> On Mon, Sep 14, 2026 at 10:22:13AM +0100, Lorenzo Stoakes (ARM) wrote:
+> > Module finalisation on allmodconfig builds consists of a large number of
+> > very short-lived jobs, and the make job dispatcher cannot possibly dispatch
+> > jobs fast enough.
+>
+> This "cannot possibly" sounds like a weird LLM language intensifier. I'd
 
-The main problems have been:
+Again that's my writing actually, probably best to stop assuming LLM now ;)
 
-- The dependency tracking creates undesirable artefacts (infamously also
-  known as disgusting turds) in the build directory.
+> rather a concrete description of the problem, not this kind of
+> (redundant?) vagueness.
 
-- Gating the feature behind a kconfig option is complicated due to
-  allyesconfig builds. It's possible, but requires a verbose and
-  confusing negative proxy config option.
+In the very next paragraph I say:
 
-- Naming the dependency tracking files with a dot prefix or placing them
-  in a dot prefixed subdirectory in the build directory to hide them has
-  been exceedingly difficult to achieve. (In part due to some Makefiles
-  building files in subdirectory hierarchies.)
+	For allmodconfig x86-64 this can be on the order of ~22,000 jobs of
+	a few milliseconds in duration each.
 
-- The debate which headers, if any, should really be self-contained is
-  virtually open-ended.
+You did also say that the commit messages were over-long, so there's a
+trade-off here :)
 
-Approach the problem from a slightly different angle. Add a top level
-"headercheck" static analysis target which you have to explicitly run,
-and where you have to explicitly state which headers to check:
+But I think best to expand it a bit if it's not clear.
 
-$ make HEADER_CHECK="(headers|dirs)" headercheck
+The general idea is that each job is so short (ms) that the work of
+dispatching them exceeds the time doing the work, so you need to shard
+things.
 
-For example:
+And the work of dispatching is heavy - each modfinal instance means it has
+to process ~22k .cmd files of every .mod.o and .ko.
 
-$ make HEADER_CHECK="include/drm drivers/gpu/drm/drm_draw_internal.h" headercheck
+I will update the commit message to reflect this.
 
-You can specify multiple path/to/header.h or path/to/dir, relative to
-$(srctree), where path/to/dir is recursively scanned for any .h files.
+As a result, we need to batch these (see below).
 
-Add a generic %.header-check rule in scripts/Makefile.build to support
-this. Note that this rule should *not* be used in, say, driver or
-subsystem makefile targets, precisely because of the problems listed
-above.
+>
+> > [...]
+> > Fix this by splitting modules.order into chunks of 128 at a time, run in
+> > parallel.
+>
+> Why "128"? This seems tied to the 128-thread test machine, but ends up
 
-While this still generates the .header-check dependency tracking
-artefacts in the build directory, you will only get them as a result of
-manually running 'make headercheck', not as part of the regular build.
+Honestly Kees :) you really think I'd let a hardcoded-to-my-machine
+variable through to the point of being called out in the commit msg? :P
 
-This approach also allows anyone to check any headers in the tree, with
-no makefile modification or kconfig changes required. What you do with
-the results is up to you, and the header check facility does not enforce
-anything like it would as part of the regular build.
+No, that's not what this is.
 
-Cc: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Nathan Chancellor <nathan@kernel.org>
-Cc: Nicolas Schier <nsc@kernel.org>
-Cc: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>
-Cc: linux-kbuild@vger.kernel.org
-Signed-off-by: Jani Nikula <jani.nikula@intel.com>
----
- .gitignore             |  1 +
- Makefile               | 25 ++++++++++++++++++++++++-
- scripts/Makefile.build | 21 +++++++++++++++++++++
- 3 files changed, 46 insertions(+), 1 deletion(-)
+> getting hard-coded, but this choice of value needs some rationale, IMO.
 
-diff --git a/.gitignore b/.gitignore
-index 9875120ea7bd..948c760b2704 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -28,6 +28,7 @@
- *.gcno
- *.gcda
- *.gz
-+*.header-check
- *.i
- *.ko
- *.lex.c
-diff --git a/Makefile b/Makefile
-index 0f1b80100b47..4851a4407149 100644
---- a/Makefile
-+++ b/Makefile
-@@ -301,7 +301,7 @@ no-dot-config-targets := $(clean-targets) \
- 			 run-command
- no-sync-config-targets := $(no-dot-config-targets) %install modules_sign kernelrelease \
- 			  image_name
--single-targets := %.a %.i %.ko %.lds %.ll %.lst %.mod %.o %.rsi %.s %/
-+single-targets := %.a %.i %.ko %.lds %.ll %.lst %.mod %.o %.rsi %.s %.header-check %/
- 
- config-build	:=
- mixed-build	:=
-@@ -1540,6 +1540,26 @@ PHONY += scripts_gen_packed_field_checks
- scripts_gen_packed_field_checks: scripts_basic
- 	$(Q)$(MAKE) $(build)=scripts scripts/gen_packed_field_checks
- 
-+# ---------------------------------------------------------------------------
-+# Header check
-+
-+# Check the headers in HEADER_CHECK=(headers|dirs)
-+PHONY += headercheck
-+
-+ifneq ($(HEADER_CHECK),)
-+
-+header-check-dirs := $(filter-out %.h,$(HEADER_CHECK))
-+header-check-files := $(filter %.h,$(HEADER_CHECK)) $(if $(header-check-dirs),$(shell cd $(srctree) && find $(header-check-dirs) -name '*.h' 2>/dev/null))
-+header-check-targets := $(patsubst %.h,%.header-check,$(sort $(header-check-files)))
-+
-+headercheck:
-+	$(if $(header-check-targets),,$(error $@ found no headers in HEADER_CHECK="$(HEADER_CHECK)"))
-+	$(Q)$(MAKE) $(header-check-targets)
-+else
-+headercheck:
-+	$(error $@ requires HEADER_CHECK=(headers|dirs))
-+endif
-+
- # ---------------------------------------------------------------------------
- # Install
- 
-@@ -1886,6 +1906,8 @@ help:
- 	@echo  '  versioncheck      - Sanity check on version.h usage'
- 	@echo  '  includecheck      - Check for duplicate included header files'
- 	@echo  '  headerdep         - Detect inclusion cycles in headers'
-+	@echo  '  headercheck       - Check headers in HEADER_CHECK=(headers|dirs) are'
-+	@echo  '                      self-contained, have header guards, and pass kernel-doc.'
- 	@echo  '  coccicheck        - Check with Coccinelle'
- 	@echo  '  kconfig-sym-check - Check for dangling Kconfig symbol references'
- 	@echo  '  clang-analyzer    - Check with clang static analyzer'
-@@ -2251,6 +2273,7 @@ clean: $(clean-dirs)
- 		-o -name '*.ll' \
- 		-o -name '*.gcno' \
- 		-o -name '*.long-type-*.txt' \
-+		-o -name '*.header-check' \
- 		\) -type f -print \
- 		-o -name '.tmp_*' -print \
- 		| xargs rm -rf
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 4349108e75e1..6127feb970c6 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -306,6 +306,27 @@ quiet_cmd_cc_lst_c = MKLST   $@
- $(obj)/%.lst: $(obj)/%.c FORCE
- 	$(call if_changed_dep,cc_lst_c)
- 
-+# Compile C headers (.h) for header check
-+# ---------------------------------------------------------------------------
-+
-+# Check a header is self-contained, has header guards, and passes kernel-doc.
-+#
-+# This is for 'make HEADER_CHECK=(headers|dirs) headercheck'. Not to be confused
-+# with CONFIG_UAPI_HEADER_TEST.
-+#
-+# Please do *not* plug %.header-check into any configurable targets, unless you
-+# also figure out a way to completely hide the %.header-check artefacts.
-+
-+quiet_cmd_header_check = HDRCHK  $(patsubst %.header-check,%.h,$@)
-+      cmd_header_check = \
-+		$(CC) $(c_flags) -fsyntax-only -x c /dev/null -include $< -include $<; \
-+		PYTHONDONTWRITEBYTECODE=1 $(PYTHON3) $(KERNELDOC) -none $(KDOCFLAGS) \
-+			$(if $(findstring e, $(KBUILD_EXTRA_WARN))$(CONFIG_WERROR),-Werror) $<; \
-+		touch $@
-+
-+$(obj)/%.header-check: $(obj)/%.h FORCE
-+	$(call if_changed_dep,header_check)
-+
- # Compile Rust sources (.rs)
- # ---------------------------------------------------------------------------
- 
--- 
-2.47.3
+The rationale bit is fair enough, I thought it was somewhat implied but
+it's a heuristically-determined value which determines how best to shard
+the jobs.
 
+So, it's about both getting parallelism and batching up to offset this job
+dispatch overhead, there's naturally an equilibrium.
+
+Emperically:
+
+  modules per chunk   32     64    128    256    512
+  wall time         4.05s  4.07s  4.05s  4.03s  4.18s
+
+But in more detail, allmodconfig tree (~11k modules on x86-64), best of 2,
+make modules with *.ko *.mod.o deleted:
+
+    modules per chunk    instances    wall
+    -----------------    ---------    ------
+                    1        11171    10.22s
+                    2         5586     6.72s
+                    4         2793     4.97s
+                    8         1397     4.26s
+                   16          699     4.05s
+                   32          350     4.05s
+                   64          175     4.07s
+                  128           88     4.05s
+                  256           44     4.03s
+                  512           22     4.18s
+
+which I think makes things clearer.
+
+So realistically 32 - 256 is the right sort of range. You also have to take
+into account the fact that you might be building fewer modules.
+
+The argument for 128 is that this is the mid-point of where the graph
+flattens off for a larger number of modules.
+
+For a smaller number, you're going to have a single dispatch or less and
+the delta won't be that much anyway.
+
+So it's very much a sensibly derived empirical value.
+
+I'll update the commit message to give this rationale there.
+
+>
+> --
+> Kees Cook
+
+And for avoidance of doubt, it's ME replying to things :P I deal with a LOT
+of AI slop in mm so am quite sensitive to doing things right here (TM).
+
+--
+Cheers, Lorenzo
