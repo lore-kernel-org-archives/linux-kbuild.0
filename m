@@ -1,342 +1,260 @@
-Received: from mail-ej2-f12.google.com (mail-ej2-f12.google.com [74.125.228.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4C063C0633
-	for <linux-kbuild@vger.kernel.org>; Tue, 15 Sep 2026 13:13:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 337283C1090;
+	Tue, 15 Sep 2026 14:30:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789478009; cv=none; b=KMaF0dzkyN5Bn87EEleDFbrn5a/6IHU33p2UHT0zV+LPrbEZCVou5Y0rcMcRrIum+/sBXu1M5kRU+QEJ4WqKwwJOhVFCjVuYXAXifmyK7LiwMqLb0vbSlCpxcWAEg+VQewSt3ShOSMAkwxNFGBNDw4tyZnTUOb4EGFFKyGtl568=
+	t=1789482656; cv=none; b=ErHIs0fpctOCYER1tEyoG9bOckpgLeTK1OuDHR3QXonGCMEIc5flL24PiE/WFTG9BDstLxw3N3FCxFAR0C0TndbHlVtMkt4T5tV4A0nO2XmDlmfUPyAE2gpNYMHM6MiW5JgYZql9I+cPLNgTaEf2faGgiup2Kw5zk0mVXzrby6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789478009; c=relaxed/simple;
-	bh=2qZOTgApo+urlVkwDJfR03ySBnHo7d7qJlq0MTLAgT0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SZL8cMguFW+nvl0BfYvPbNfwUiOmqiiq0wCGD143B7cLLLN28ZugLnk8x4hC6qA4PkauPQRULWHjpj3+Pp2TP0IpucJXqoMB1k1gBa/duVTeWfAnp2Hu0xGcLzHFXzFGAa9Fva2Gw3QdUoesYs6DHGL+d4R5Ct40lA8u8Xjqyrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c+4v3h+d; arc=none smtp.client-ip=74.125.228.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789482656; c=relaxed/simple;
+	bh=moIPUmoig2JAgKqAA6UrukBxyXWK3E849Xq6gng+scw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lVv8ze4yORKlGr1hj9mmYZqa2lg4UN0zSEqf71uOdyRlidz7HOntZYie7JC60DmS6rON/XQJhzk+vsmJvFeBFHPc3myDhPn0MLw5yYuC0JgsWs37K0UDxt0QRECTvcsC5yEMm9Ty+2JprnSeCIqnKD54YDcm+I8afJm7EzM3498=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ExS+veNg; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c+4v3h+d"
-Received: by mail-ej2-f12.google.com with SMTP id a640c23a62f3a-c254f705536so749954266b.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 15 Sep 2026 06:13:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789478005; x=1790082805; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=mgnuiebg13Nmlc9SkFBtnZR2vUiE46R6S1Zezq82mgc=;
-        b=c+4v3h+d9YdhQn3BJ9syY+/RfhivgjrU69kct3JzMCi9POxL5X+DEaWkU37nuc59sV
-         zl7OEIRGrUQcmahF/r+hewZCmuNzMWmDM5SAFUmlYm4MSSpI21e0NixueEDKWqNab4sx
-         0GWnkJReA9xl+Gvoks4RfY45yBujEaHcfJhcfcUpYqeNX1ey084sNHzHzS5qNzDy5ABm
-         A57aINOvHYJ2c+a8VTm3hzN8gKxS2GTuoLUUp12qdaXS5ambhSDl/Ay0oeiUMaJ6Ppt6
-         ZkkZB5af46KNtCJmdO8IMkNIt5ZE+/BkKyWAON7QiMJvXZ++4JcMJ3h8kjjVuQ+1J13Q
-         bVBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789478005; x=1790082805;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=mgnuiebg13Nmlc9SkFBtnZR2vUiE46R6S1Zezq82mgc=;
-        b=UZDYIRIxhq/zdjEuxoNeaaLqa1B6fzWxl3ubU3BV85rYwWkWVwW+UjaXM/5Xmgkl1F
-         8u9VlC3KFLr2odx9YB7yzhUdUovtk94vIfFL67F/a+Jkb4eV8vFLjnOm35pVVhe0mIX/
-         iLQ0RH6rlfSg18I6q2GAQ3Mp4N3E/PaoHAY4gkaueb1Ihyz0RNIAvaAXr/w+jTl16liV
-         hz2Wo5mrtNNHAuNXG/EFAOyjXaKx9oB7M9/VM4LB7kfoPCYfS08s2EBZdrtY/WTiwHAW
-         hGyEAdG5nXvZEiiP6pHlySKnNW1wO/7Uzpa5+2TXQSzFcrQJ8Um7csjOOS+p7VMimXEz
-         vauw==
-X-Forwarded-Encrypted: i=1; AKwUvBz8IgNYf9vHpVnHFsiFu6FTmEyvjcnejThSjCZtdzx6bsvZpp1rSL+2PUAZua4yArxOZ8jpwdSwixv5mos=@vger.kernel.org
-X-Gm-Message-State: AFuF++nZf3y6EHHtrHJsjBqF0kxnC6ST/Wx+5RuL57hEjDmxqwbYkVv+
-	GqFN5CNONEs1oby7I7znRuAxE7arILJO11AUXYfKOPXNxvdjeDjtYPaS
-X-Gm-Gg: AYBFou0t0NUkyskqWc5iHvXQw8Jx0uZz/C6k+/ylRaT+c5GKg/QgMJJrjWC8RrmteQb
-	pQZqsWOUN402LsTxz+kKWNqM2vu7iBnTVeo+r5hoFwUbfYkoiOkFb31Gs6piJWx72Xg/WqKyI3D
-	ZDLx87na5Fkl2HHr7FLF7PdEdYrEp5LXizwZFlDGfMkpxt1/jaTUV1G8aty7ympk7XBpg5ZH2xh
-	vFovGf2JeoQbjheS22TA6N8o2z1nowEnmHfqjglQG+ocmSEGo4TsU9Q5v1QWL2haAgwo34RtI2D
-	pLDZkuYw5zQbJ1apLQ4QhObSGhp1UrlowOx2YatsiIamErgAX0BX1fheLqh6cCuo4KQoaiksBSN
-	RI0QcD2OE+h8dUSeaIEluEukAeCvsFhqgh/dczi6+eMf485pSSohAFMAY6UyFMdNmiduBqZkICF
-	vQZbqJMob2bckV4u1UBSOvaAwfw5w/ENWXHIOAp9edLTOcRhUO9gf+73DcH81ztt3Mv9ODE1AiQ
-	gy0zLWKqWOOxnxXiw8iF4QfbsqXK23SpUfVQZqc5XGOD1TB3vgT3yCGBkpfbkinB0a9qrkPUfXs
-	zKU=
-X-Received: by 2002:a17:907:1ca4:b0:c28:599b:7782 with SMTP id a640c23a62f3a-c29b8672548mr503726766b.21.1789478004635;
-        Tue, 15 Sep 2026 06:13:24 -0700 (PDT)
-Received: from ?IPV6:2001:8a0:e962:d100:4d53:b3b:9260:9351? ([2001:8a0:e962:d100:4d53:b3b:9260:9351])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c2965c4e8a1sm598251066b.6.2026.09.15.06.13.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Sep 2026 06:13:24 -0700 (PDT)
-Sender: Julian Braha <julian.braha@gmail.com>
-Message-ID: <08755883-4332-4892-98d1-92e530bfa8bd@gmail.com>
-Date: Tue, 15 Sep 2026 14:13:22 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ExS+veNg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E75D01F000FF;
+	Tue, 15 Sep 2026 14:30:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789482654;
+	bh=C8lwuOuhj9txlc80fCv3H4oifLhv4WSxNGb/qOtVudM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=ExS+veNgBdz30FclQpYaSCTexz90mRkZ4TxP0L0gy1RFIR6zbpI4Dikj4vA4P/AXO
+	 t/OeNJSnMmU40l2yi2IYcES7gZP7EQSHLVgAVDU85kj/8mL+llrLyBIfZS0WEp98qz
+	 I4U7fawy4JaSj9S5OnGVb+wb//Agn/A0wpOa6phj0QtDBo5ywXKqv9zqMTN6TWNR4U
+	 rsAfoE3JGOXAg1scCoJgia/HWwS8t8a+WJLjyr+sCr0S5GULThAMjvcA3cOsfFH0co
+	 87e14KinXUO7LY8fcGAkmTAPBtlSakU1p1pRIwGhCIC38zvMGAqMmENgla+q9vrc7S
+	 Fu6OaBPBfXB7g==
+Date: Tue, 15 Sep 2026 15:30:43 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Kees Cook <kees@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, Masahiro Yamada <masahiroy@kernel.org>, 
+	Alexey Gladkov <legion@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, Arnd Bergmann <arnd@arndb.de>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Ard Biesheuvel <ardb@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Josh Poimboeuf <jpoimboe@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
+	Gary Guo <gary@garyguo.net>, =?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
+	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
+	Onur =?utf-8?B?w5Z6a2Fu?= <work@onurozkan.dev>, Jonathan Corbet <corbet@lwn.net>, 
+	Randy Dunlap <rdunlap@infradead.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>, 
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
+	linux-riscv@lists.infradead.org, linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-doc@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v2 21/21] kbuild: use pigz for gzip compression if
+ available
+Message-ID: <aqk9gakQhxToLnDI@gremlin>
+References: <20260914-build-speedup-v2-0-39817ec5db23@kernel.org>
+ <20260914-build-speedup-v2-21-39817ec5db23@kernel.org>
+ <202609140844.FA7E848A@keescook>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4] kconfig: warn about malformed KCONFIG_PROBABILITY
- values
-To: Dmitrii Tulnov <tulnov.dl@gmail.com>, nathan@kernel.org, nsc@kernel.org
-Cc: jacmet@uclibc.org, yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <55e18f27-0ba1-433e-b4dc-a7db70172f7a@gmail.com>
- <20260910215224.26-1-tulnov.dl@gmail.com>
-Content-Language: en-US
-From: Julian Braha <julianbraha@gmail.com>
-In-Reply-To: <20260910215224.26-1-tulnov.dl@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <202609140844.FA7E848A@keescook>
 
-Hi Dmitrii,
+On Mon, Sep 14, 2026 at 09:39:07AM -0700, Kees Cook wrote:
+> On Mon, Sep 14, 2026 at 10:22:20AM +0100, Lorenzo Stoakes (ARM) wrote:
+> > On a 128-core Threadripper, gzip -9 of a 36 MiB x86-64 vmlinux.bin takes
+> > 1.6s, and with pigz it takes 0.09s, so the performance increase is
+> > significant.
+>
+> Neat! I wanna go learn how pigz accomplishes this -- I thought the
+> problem with gzip was a common lookup table. Anyway...
 
-On 9/10/26 22:52, Dmitrii Tulnov wrote:
-> randconfig checks the numeric range of each probability but does not
-> validate where strtol() stops. For example, KCONFIG_PROBABILITY=50% is
-> accepted as 50:0:0: the '%' is parsed repeatedly as zero. For the
-> documented value 50, tristate y/m/n probabilities are 25%/25%/50%.
-> With 50%, both y/m probabilities silently become zero, reducing the
-> coverage of random configuration builds. Empty fields and extra fields
-> are also accepted.
-> 
-> Warn when the value does not follow the documented decimal format. For
-> malformed inputs whose parsed probabilities are in range, preserve the
-> existing interpretation unless KCONFIG_WERROR is set. In that case, exit
-> with an error before writing the configuration. Leading whitespace and
-> signs are accepted by strtol(), but also trigger the warning because they
-> are outside the documented format.
-> 
-> Keep the strtol() result as long until the range check. This rejects
-> out-of-range values that narrowing to int previously made valid, such as
-> 4294967296 becoming zero on a 64-bit host, regardless of KCONFIG_WERROR.
-> 
-> Add regression tests for one warning per malformed input, preserved
-> configurations, KCONFIG_WERROR, out-of-range values, the supported
-> probability formats, and the documented empty-value default.
-> 
-> Fixes: e43956e60769 ("kconfig: implement KCONFIG_PROBABILITY for randconfig")
-> Assisted-by: LLM
-> Signed-off-by: Dmitrii Tulnov <tulnov.dl@gmail.com>
-> ---
-> Thanks, Julian. I've moved the KCONFIG_WERROR cleanup fixture to
-> scripts/kconfig/tests/conftest.py.
-> 
-> Changes since v3:
-> - Move the KCONFIG_WERROR cleanup fixture to the shared conftest.py,
->   as requested by Julian. Explicit extra_env settings still enable WERROR.
-> 
-> Changes since v2:
-> - Move the expected tristate distribution into the problem description.
-> - Simplify the initial format check to !isdigit((unsigned char)*env).
-> - Pass probability values and seeds through conf._run_conf(extra_env=...).
->   Use monkeypatch.delenv only to remove inherited variables.
-> - Add -0, +0, bare + and - warning cases, and the +101 range-error case.
-> - Honor KCONFIG_WERROR for malformed format warnings, as discussed with
->   Julian. Check unset, empty, 0 and 1 flag behavior.
-> - Compare 50% with 50:0:0 and -0 with 0 across 20 fixed seeds and check
->   that each malformed input produces exactly one warning.
-> - Clarify that compatibility applies to malformed in-range inputs with
->   KCONFIG_WERROR unset; values previously accepted by narrowing now fail.
-> 
-> Changes since v1:
-> - Warn about malformed in-range values while retaining their previous
->   interpretation by default.
-> - Warn about leading whitespace and signs as undocumented input.
-> - Clarify that 50 gives tristate y/m/n probabilities of 25%/25%/50%, and
->   compare it with the equivalent input 50:25:25 across 20 fixed seeds.
-> 
-> Validation on kbuild-next, x86_64, GCC 13.3.0:
-> - make testconfig with HOSTCFLAGS=-Werror: 138 passed. The same 138 tests
->   passed with KCONFIG_WERROR=1 inherited from the test runner, including
->   the explicit strict-mode cases for empty, 0 and 1 flag values.
-> - The same two runs passed on the existing ASan/UBSan build at -O1, with
->   leak detection disabled: 138 passed in each run.
-> - C code, test inputs and assertions are unchanged from the submitted v3.
->   Its earlier checks remain applicable: 74 regression failures on the
->   original; 1,635 comparisons with v2 and 380 documented-input comparisons
->   with the original per build; 120 strict error file-preservation checks
->   per build, including ALLCONFIG and OVERWRITECONFIG. These broader C
->   checks were not rerun for the fixture move.
-> - No vmlinux build or boot test; this changes the host configuration tool.
->   32-bit hosts and other libc implementations were not tested.
-> 
->  scripts/kconfig/conf.c                        |  16 ++-
->  scripts/kconfig/tests/conftest.py             |   6 +
->  .../tests/randconfig_probability/Kconfig      |  12 ++
->  .../tests/randconfig_probability/__init__.py  | 131 ++++++++++++++++++
->  4 files changed, 164 insertions(+), 1 deletion(-)
->  create mode 100644 scripts/kconfig/tests/randconfig_probability/Kconfig
->  create mode 100644 scripts/kconfig/tests/randconfig_probability/__init__.py
-> 
-> diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-> index fe8ba09b0..ca6d9d735 100644
-> --- a/scripts/kconfig/conf.c
-> +++ b/scripts/kconfig/conf.c
-> @@ -186,12 +186,23 @@ static void conf_set_all_new_symbols(enum conf_def_mode mode)
->  
->  	if (mode == def_random) {
->  		int n, p[3];
-> +		bool warned = false;
->  		char *env = getenv("KCONFIG_PROBABILITY");
->  
->  		n = 0;
->  		while (env && *env) {
->  			char *endp;
-> -			int tmp = strtol(env, &endp, 10);
-> +			long tmp = strtol(env, &endp, 10);
-> +
-> +			if (!isdigit((unsigned char)*env) ||
-> +			    (*endp && *endp != ':') ||
-> +			    (*endp == ':' && (!endp[1] || n == 2))) {
-> +				if (!warned) {
-> +					fprintf(stderr,
-> +						"warning: KCONFIG_PROBABILITY has malformed format\n");
-> +					warned = true;
-> +				}
-> +			}
->  
->  			if (tmp >= 0 && tmp <= 100) {
->  				p[n++] = tmp;
-> @@ -227,6 +238,9 @@ static void conf_set_all_new_symbols(enum conf_def_mode mode)
->  			perror("KCONFIG_PROBABILITY");
->  			exit(1);
->  		}
-> +
-> +		if (warned && getenv("KCONFIG_WERROR"))
-> +			exit(1);
->  	}
->  
->  	menu_for_each_entry(menu) {
-> diff --git a/scripts/kconfig/tests/conftest.py b/scripts/kconfig/tests/conftest.py
-> index 66f95e4ed..2263bd2a3 100644
-> --- a/scripts/kconfig/tests/conftest.py
-> +++ b/scripts/kconfig/tests/conftest.py
-> @@ -312,6 +312,12 @@ class Conf:
->          return self._matches('stderr', expected)
->  
->  
-> +@pytest.fixture(autouse=True)
-> +def clear_werror(monkeypatch):
-> +    # extra_env can set strict mode, but cannot remove an inherited flag.
-> +    monkeypatch.delenv('KCONFIG_WERROR', raising=False)
-> +
-> +
->  @pytest.fixture(scope="module")
->  def conf(request):
->      """Create a Conf instance and provide it to test functions."""
-> diff --git a/scripts/kconfig/tests/randconfig_probability/Kconfig b/scripts/kconfig/tests/randconfig_probability/Kconfig
-> new file mode 100644
-> index 000000000..84f4e5fcc
-> --- /dev/null
-> +++ b/scripts/kconfig/tests/randconfig_probability/Kconfig
-> @@ -0,0 +1,12 @@
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +
-> +config MODULES
-> +	bool
-> +	default y
-> +	modules
-> +
-> +config BOOL
-> +	bool "Bool"
-> +
-> +config TRI
-> +	tristate "Tristate"
-> diff --git a/scripts/kconfig/tests/randconfig_probability/__init__.py b/scripts/kconfig/tests/randconfig_probability/__init__.py
-> new file mode 100644
-> index 000000000..78d367a9c
-> --- /dev/null
-> +++ b/scripts/kconfig/tests/randconfig_probability/__init__.py
-> @@ -0,0 +1,131 @@
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +"""Validate KCONFIG_PROBABILITY without changing the supported distributions."""
-> +
-> +import pytest
-> +
-> +
-> +@pytest.mark.parametrize('probability', [
-> +    'invalid', ' ', '50%', '50 ', '0x32', '10 20', '10:20x',
-> +    '10:20:invalid', '10:20:30x',
-> +    ':50', '50:', '10::20', '10:20:', '10:20:30:', '10:20:30:40',
-> +    '-0', '+0', '+', '-', '+100:0', ' \t100:0', '0: \t100:0',
-> +])
-> +def test_malformed_warns(conf, probability):
-> +    assert conf._run_conf('--randconfig', extra_env={
-> +        'KCONFIG_PROBABILITY': probability,
-> +        'KCONFIG_SEED': '0',
-> +    }) == 0
-> +    assert 'warning: KCONFIG_PROBABILITY has malformed format' in conf.stderr
-> +    assert conf.stderr.count('warning:') == 1
-> +    assert conf.config is not None
-> +
-> +
-> +@pytest.mark.parametrize('probability, equivalent', [
-> +    ('50%', '50:0:0'),
-> +    ('-0', '0'),
-> +])
-> +@pytest.mark.parametrize('seed', range(20))
-> +def test_malformed_preserves_config(conf, probability, equivalent, seed):
-> +    assert conf._run_conf('--randconfig', extra_env={
-> +        'KCONFIG_PROBABILITY': probability,
-> +        'KCONFIG_SEED': hex(seed),
-> +    }) == 0
-> +    assert 'warning: KCONFIG_PROBABILITY has malformed format' in conf.stderr
-> +    assert conf.stderr.count('warning:') == 1
-> +    malformed = conf.config
-> +
-> +    assert conf._run_conf('--randconfig', extra_env={
-> +        'KCONFIG_PROBABILITY': equivalent,
-> +        'KCONFIG_SEED': hex(seed),
-> +    }) == 0
-> +    assert 'warning:' not in conf.stderr
-> +    assert conf.config == malformed
-> +
-> +
-> +@pytest.mark.parametrize('werror', ['', '0', '1'])
-> +@pytest.mark.parametrize('probability, status', [
-> +    ('', 0), ('50', 0), ('50%', 1), ('-0', 1), ('10:20:30:40', 1),
-> +])
-> +def test_werror(conf, probability, status, werror):
-> +    assert conf._run_conf('--randconfig', extra_env={
-> +        'KCONFIG_PROBABILITY': probability,
-> +        'KCONFIG_SEED': '0',
-> +        'KCONFIG_WERROR': werror,
-> +    }) == status
-> +    if status:
-> +        assert 'warning: KCONFIG_PROBABILITY has malformed format' in conf.stderr
-> +        assert conf.stderr.count('warning:') == 1
-> +    else:
-> +        assert 'warning:' not in conf.stderr
-> +
-> +
-> +@pytest.mark.parametrize('probability', [
-> +    '-1', '101', '+101', '0:101', '0:0:101', '60:41', '0:60:41',
-> +    '4294967296', '-4294967296',
-> +    '999999999999999999999999', '-999999999999999999999999',
-> +])
-> +def test_out_of_range(conf, probability):
-> +    assert conf._run_conf('--randconfig', extra_env={
-> +        'KCONFIG_PROBABILITY': probability,
-> +        'KCONFIG_SEED': '0',
-> +    }) == 1
-> +    assert 'KCONFIG_PROBABILITY:' in conf.stderr
+Yeah not sure on the details :)
 
-So I've finally had some time to test this, and I found that all of
-these pytest.mark.parametrize() calls are causing the number of test
-results to skyrocket. As in, this one test would actually make up the
-absolute majority of results.
+>
+> > --- a/Documentation/kbuild/reproducible-builds.rst
+> > +++ b/Documentation/kbuild/reproducible-builds.rst
+> > @@ -76,6 +76,22 @@ include generated files.  You should ensure the source tree is
+> >  pristine by running ``make mrproper`` or ``git clean -d -f -x`` before
+> >  building a source package.
+> >
+> > +Compression tools
+> > +-----------------
+> > +
+> > +The compressed kernel image, compressed modules and packages are produced
+> > +using the program named by the make variable ``KGZIP`` (described in
+> > +Documentation/kbuild/kbuild.rst).
+> > +
+> > +It defaults to ``pigz`` if installed (a parallel implementation of gzip),
+> > +or ``gzip`` otherwise.
+> > +
+> > +The generated output between two invocations of identical builds with
+> > +either of the default tools will be byte-for-byte equivalent.
+> > +
+> > +However, for reproducible builds, ensure the same tool is used on all build
+> > +hosts, as different tools may generate different output from one another.
+> > +
+> >  Module signing
+> >  --------------
+> >
+>
+> This doc update seems totally unneeded? Having the same build tools for RB
+> is already a known requirement. I don't think anything new is added here?
 
-Could you remove them (and then the 'import pytest') and simply loop
-over the values in a list? For example, something like this:
+Ack that's fair enough, will drop the doc update.
 
-  def test_out_of_range(conf):
-    probabilities = [
-      '-1', '101', '+101', '0:101', '0:0:101', '60:41', '0:60:41',
-      '4294967296', '-4294967296',
-      '999999999999999999999999', '-999999999999999999999999',
-    ]
-    for probability in probabilities:
-      assert conf._run_conf('--randconfig', extra_env={
-        'KCONFIG_PROBABILITY': probability,
-        'KCONFIG_SEED': '0',
-      }) == 1, repr(probability)
-      assert 'KCONFIG_PROBABILITY:' in conf.stderr, repr(probability)
+>
+> > diff --git a/Makefile b/Makefile
+> > index 790ef23c5e8a..38c0cdc9f591 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -561,7 +561,7 @@ PERL		= perl
+> >  PYTHON3		= python3
+> >  CHECK		= sparse
+> >  BASH		= bash
+> > -KGZIP		= gzip
+> > +KGZIP		:= $(if $(shell command -v pigz 2>/dev/null),pigz,gzip)
+>
+> I think the more idiomatic way to do this is:
+>
+> KGZIP := $(call try-run,command -v pigz,pigz,gzip)
 
-- Julian Braha
+try-run is defined in scripts/Makefile.compiler which is only included ~200
+lines after KGZIP is set.
+
+That'll also set up and tear down a temp dir for a probe that doesn't need
+that, so I think it's fine as it is.
+
+>
+> However, parallelism needs to be set. We can't let it eat all CPUs: it
+> needs to respect the -j make option (and make its CPU reservation known
+> to "make"), which we already have a solution for in
+> scripts/jobserver-exec.
+
+The only place where it's invoked is vmlinux.bin at the end of the serial
+tail, where all the tokens would be free anyway.
+
+So I don't think it really buys anything at all?
+
+Using jobserver-exec would also put python3 and two wrapper scripts in
+front of every gzip in the build including tar -I "$(KGZIP)" when packaging
+and some arm and m68k scripts too.
+
+(For the module zips it's already constrained to a single process.)
+
+Overall I think it's less complexity and really no delta to just invoke it
+as normal.
+
+It's designed as drop-in so it makes sense to use it as that.
+
+>
+> However, I would actually argue that given such an improvement we should just
+> make pigz explicitly required and not optional. It is packaged everywhere:
+>
+>   │ Debian / Ubuntu              │ ✅          │ pigz (main)
+>   │ Fedora                       │ ✅          │ pigz 2.8 (current)
+>   │ RHEL / CentOS / Rocky / Alma │ ✅ via EPEL │ pigz — not in base/AppStream
+>   │ openSUSE / SLE               │ ✅          │ pigz
+>   │ Arch Linux                   │ ✅          │ pigz (extra)
+>   │ Alpine                       │ ✅          │ pigz
+>   │ Gentoo                       │ ✅          │ app-arch/pigz 2.8
+>
+> Only RHEL appears a little glitchy, but likely they would trivially move
+> it to base since it's already packaged, but off in EPEL.
+
+Definitely not something for this series, the fallback is one invocation of
+command -v and I don't really want to break RHEL either :)
+
+If, once this has landed, we want to go that way then it's simple enough
+for us to change it.
+
+>
+> So, I would say that pigz would be best run as something like:
+>
+>   KGZIP := $(PYTHON3) $(abs_srctree)/scripts/jobserver-exec $(abs_srctree)/scripts/parallel-pigz
+>
+> with scripts/parallel-pigz being something like:
+>
+> 	#!/bin/sh
+> 	exec pigz -p ${PARALLELISM:-1} "$@"
+>
+> > --- a/scripts/Makefile.modinst
+> > +++ b/scripts/Makefile.modinst
+> > @@ -145,8 +145,10 @@ endif
+> >  #
+> >  # Compression
+> >  #
+> > +# Modules are compressed in parallel by make itself, so keep the compressor
+> > +# single-threaded when it is pigz.
+> >  quiet_cmd_gzip = GZIP    $@
+> > -      cmd_gzip = $(KGZIP) -n -f $<
+> > +      cmd_gzip = $(KGZIP) $(if $(filter pigz,$(notdir $(firstword $(KGZIP)))),-p 1) -n -f $<
+> >  quiet_cmd_xz = XZ      $@
+>
+> Then this could be:
+>
+> 	cmd_gzip = SINGLE_THREADED=1 $(KGZIP) -n -f $<
+
+This is already achieved for the modinst case with a one-liner in any case.
+
+>
+> and we patch scripts/jobserver-exec:
+>
+> diff --git a/scripts/jobserver-exec b/scripts/jobserver-exec
+> index 21b319e6c9a5..8b953148ee9f 100755
+> --- a/scripts/jobserver-exec
+> +++ b/scripts/jobserver-exec
+> @@ -5,6 +5,7 @@
+>  Determines how many parallel tasks "make" is expecting, as it is
+>  not exposed via any special variables, reserves them all, runs a subprocess
+>  with PARALLELISM environment variable set, and releases the jobs back again.
+> +If SINGLE_THREADED is set, nothing is reserved and PARALLELISM is 1.
+>
+>  See:
+>      https://www.gnu.org/software/make/manual/html_node/POSIX-Jobserver.html#POSIX-Jobserver
+> diff --git a/tools/lib/python/jobserver.py b/tools/lib/python/jobserver.py
+> index 0b1ffdf9f7a3..fc38c5020b22 100755
+> --- a/tools/lib/python/jobserver.py
+> +++ b/tools/lib/python/jobserver.py
+> @@ -29,6 +29,11 @@ $claim child to do the actual work.
+>  The end goal here is to keep the total number of build tasks under the
+>  limit established by the initial ``make -j$n_proc`` call.
+>
+> +Setting the ``SINGLE_THREADED`` environment variable skips the reservation
+> +entirely and runs the command with ``PARALLELISM=1``. This is meant for callers
+> +that run many short commands in parallel themselves, where each one should use
+> +only the job slot it already holds.
+> +
+>  See:
+>      https://www.gnu.org/software/make/manual/html_node/POSIX-Jobserver.html#POSIX-Jobserver
+>  """
+> @@ -68,6 +73,13 @@ class JobserverExec:
+>          self.is_open = True  # We only try once
+>          self.claim = None
+>          #
+> +        # SINGLE_THREADED asks for no reservation at all: the command runs
+> +        # with PARALLELISM=1, using only the slot its caller already holds.
+> +        #
+> +        if os.environ.get('SINGLE_THREADED'):
+> +            self.claim = 1
+> +            return
+> +        #
+>          # Check the make flags for "--jobserver=R,W"
+>          # Note that GNU Make has used --jobserver-fds and --jobserver-auth
+>          # so this handles all of them.
+>
+> --
+> Kees Cook
+
+--
+Cheers, Lorenzo
