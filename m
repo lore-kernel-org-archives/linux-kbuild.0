@@ -1,36 +1,37 @@
-Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B82574A49B3;
-	Wed, 16 Sep 2026 22:19:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DDAC48BD5B;
+	Wed, 16 Sep 2026 22:24:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789597197; cv=none; b=WozMF5NyCK9+jGNW3Qot3gt+mzrGWFi6IjeGqRwHaJHvNkkRHF+bE2NetHSpiZ8Y5X+5NjLHzViKhYSW5x9t/6yNKULP+JBpmZMCf/inih6iQsxI3+QOqx2XHcp7IecFz/RohmLvOemK31Ik0S9ZW23naafYZJWQ4AUphqgHPPw=
+	t=1789597464; cv=none; b=tLXTd43SkYXqe29S/azjod4/e0Yl7/eBUpQosIpeKb6ZnbQjWMkU9mdYbf0HT6DzchinvhNDXqJDK2Af4SNj5sNNt2TymA18ABKwU4LxFjcur/9nqzP/K5QS02YsSajOQ/0P/SNcj2tNMeQsvkrmtKsWmTEFhGnU6w3J++ByVr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789597197; c=relaxed/simple;
-	bh=PgYamMXCdi4VRyBf5DPb5l7tFDhJvPaxGoqF/5mIgS8=;
+	s=arc-20240116; t=1789597464; c=relaxed/simple;
+	bh=QXdQHNb1TukjMgCPdvAcejVlJtM4M3QphZ/sjJ7AhrM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tDhpMCp1CnXxoRLuHEWZY6UE2/mTB+65yL71c+Bo/DrvsFMnr4wu49lKfMtcTLsf3iaTAlzlnsotJYtl9R0PeRS/0lh6sgNCTSYNS8npejHZIbSMhbbVenso/Nq2ej55r1ZCczVKcZjSBMU8h7etA0bVNel51ZzN4mecDWMnvfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=FJ1GGUUq; arc=none smtp.client-ip=213.97.179.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
+	 In-Reply-To:Content-Type; b=LE8AUufO1g48g1jY3I8ByoFBMuac5mP5VIaLg0PZkA68hy+u2F5zmNIfec9n/C4om6GmTjta6r+clq4BlGOwy4/9pJVIzpjc7OOH8sNPIJVR3zAHz4QN1XTSGPvloZ473IBPKt/pTEVQz9OocmmKAiTOgcDTr5gARXlvsmPDXpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ZlwfIkQB; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="FJ1GGUUq"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; h=Content-Transfer-Encoding:Content-Type:From:Cc:To:Subject:
-	MIME-Version:Date:Message-ID:From:Reply-To;
-	bh=0jjaJqT+4yE26s3Gd2hr+zhg3vtd5fJJJh6Wg8rfPjg=; b=FJ1GGUUqC8SfggqGAFpM/dbaxC
-	/6H9VEZaA7bVJZaF6Sg2vwo3NrVxh/g1JW0sKYJhxcuTnL/RXl43YgNKSRU/Jv12SMgzzJSKtji/p
-	6E4O7hjbQPZ5Z/N3+N8dm/KYVyniukxbdWoj5z1gxViAVdzFiARjH0cDQ+XJ1mpYL/BOp3p0oiFMt
-	v0bo5+CTx4t3QxIf+MCt1cGnhjPfYAf7SA9kuKysxpkdk9vIHJvhl6mFUmTIwgDsh9O511Wuh50cq
-	vIG7Th5Vb/AeoCHTywm65bN4JdacomMltdgJfEpPL4xKm8tigNPoevpDdSQ/ypuIo3q79vjqvZYpF
-	Bls852nQ==;
-Received: from [177.172.123.214] (helo=[192.168.15.100])
-	by fanzine2.igalia.com with esmtpsa 
-	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128) (Exim)
-	id 1x6xyb-0039Hm-2L; Thu, 17 Sep 2026 00:19:37 +0200
-Message-ID: <6fa4e1e3-c023-465c-9490-ce2f18ffaa91@igalia.com>
-Date: Wed, 16 Sep 2026 19:19:36 -0300
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ZlwfIkQB"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=1NGrDf2rk+nOG1UnigdB8hAXztoK/GtPlDhkg8GS5n8=; b=ZlwfIkQBQQ5/Z89HM749uKCDpV
+	H32bmK0XPU84WZ59DFsvyIo1sLpM0NGPmAm7dnPXsg6QaRx1/yXfGQYm9QA+KvfCXrr4RKSRr+MQQ
+	0IKCoDt0flYXuPXu6GlWwznolsyVJD33OZtBLz6TmV2JUPC6QjwbbntjdtpEkK05xPAUFjovMXl7a
+	ciQH9L1+wxx/ElUWthi343fKmDRwvkCUbQTfz9RSbm1GUJ7RWeC8W7mZHD2IZ88QJD7WD/MnQdHHP
+	tnN2ZQ+b3h+CNw/aoY6567LmR1rm2fVz4StngvQzSPAFWMTPOOph+gfR1yIoGf/o398lVdrSI1flf
+	qQSWbMuA==;
+Received: from [50.53.43.113] (helo=[192.168.254.34])
+	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1x6y30-0000000ACNT-1V9S;
+	Wed, 16 Sep 2026 22:24:10 +0000
+Message-ID: <211fcac1-d85d-4680-8e55-598b2064a002@infradead.org>
+Date: Wed, 16 Sep 2026 15:24:09 -0700
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -38,149 +39,130 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 00/13] syscalls: Add a shared table for all archs
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Christian Brauner <brauner@kernel.org>, linux-kernel@vger.kernel.org,
- linux-kbuild@vger.kernel.org, kernel-dev@igalia.com,
- Masami Hiramatsu <mhiramat@kernel.org>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- linux-alpha@vger.kernel.org, linux-s390@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, soc@lists.linux.dev,
- linux-mips@vger.kernel.org, sparclinux@vger.kernel.org
-References: <20260828-tonyk-syscall_table-v6-0-fdd358456cf1@igalia.com>
- <95b693c0-ca51-4355-99ba-2b37a1ab2169@app.fastmail.com>
+Subject: Re: [PATCH] kbuild: add header check facility as a manually run
+ static analyzer
+To: Jani Nikula <jani.nikula@intel.com>, linux-kernel@vger.kernel.org
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+ Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
+ Jason Gunthorpe <jgg@nvidia.com>, Masahiro Yamada <masahiroy@kernel.org>,
+ linux-kbuild@vger.kernel.org
+References: <20260915104331.255636-1-jani.nikula@intel.com>
 Content-Language: en-US
-From: =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
-In-Reply-To: <95b693c0-ca51-4355-99ba-2b37a1ab2169@app.fastmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20260915104331.255636-1-jani.nikula@intel.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Em 15/09/2026 04:45, Arnd Bergmann escreveu:
-> On Sat, Aug 29, 2026, at 01:19, André Almeida wrote:
->> While implementing a new syscall, we need to wire up it's number to the arch
->> table. Since syscall number 403, all architectures are on sync regarding the
->> number (except alpha), which make things a lot easier but more repetitive as
->> well. Have a look at commit b36d4b6aa88 ("arch: hookup listns() system call"),
->> with 15 lines of mostly:
->>
->>    +470    common  listns                          sys_listns
->>
->> There's already a "common" table shared with a bunch of archs at
->> `scripts/syscall.tbl`, but due to historical reasons some archs will never be
->> able to move to this table and share all the numbers.
->>
->> The generic table starts from 403 (clock_gettime64), the first common syscall.
->>
->> I've compile tested for arm32, arm64, s390, mips, sparc and alpha by comparing
->> the syscalls_*.h and unistd_*.h files generated before and after this patchset.
->> For most of cases the files are identical, for the few cases that they are not,
->> there's a note in the commit explaining why they are equivalent.
+Hi Jani,
+
+On 9/15/26 3:43 AM, Jani Nikula wrote:
+> There have been various attempts at adding a header test or check
+> mechanism in the kernel build system. The header check primarily
+> consists of ensuring headers are self-contained, have include guards,
+> and, in some cases, pass kernel-doc.
 > 
-> I've tried merging these for the asm-generic tree now, and would like to
-> send them for 7.4.
+> The main problems have been:
 > 
-> Unfortunately, the build bot flagged problems on mips, see the patch below
-> for my workarounds=, but I think we have to improve that still and didn't
-> just fold it into your patch.
+> - The dependency tracking creates undesirable artefacts (infamously also
+>   known as disgusting turds) in the build directory.
 > 
-> As you took out the dependencies on the syscall_*.tbl files, the
-> output does not get rebuilt if changes are made to the table, and I
-> have not come up with a good solution for mips. My hack just adds both
-> input files to all outputs, which works but is not technically correct.
+> - Gating the feature behind a kconfig option is complicated due to
+>   allyesconfig builds. It's possible, but requires a verbose and
+>   confusing negative proxy config option.
 > 
-
-Thanks for testing! I believe I found a simple solution for this. I 
-modified syscall_o32.tbl and can confirm it triggers a rebuild now:
-
-diff --git a/arch/mips/kernel/syscalls/Makefile 
-b/arch/mips/kernel/syscalls/Makefile
-index aaa5443ea906..9e31d1ce5015 100644
---- a/arch/mips/kernel/syscalls/Makefile
-+++ b/arch/mips/kernel/syscalls/Makefile
-@@ -40,10 +40,10 @@ src_n32 := $(src)/syscall_n.tbl
-  src_n64 := $(src)/syscall_n.tbl
-  src_o32 := $(src)/syscall_o32.tbl
-
--$(kapi)/unistd_nr_%.h: $(systbl_common) $(sysnr) FORCE
-+$(kapi)/unistd_nr_%.h: $(systbl_common) $(src_%) $(sysnr) FORCE
-         $(call if_changed,sysnr)
-
--$(kapi)/syscall_table_%.h: $(systbl) $(systbl_common) FORCE
-+$(kapi)/syscall_table_%.h: $(systbl) $(systbl_common) $(src_%) FORCE
-         $(call if_changed,systbl)
-
-  uapisyshdr-y           += unistd_n32.h                 \
-
-> The rt_sigtimedwait and ustat entries had a typo that caused a link
-> error, but I did not check if there were any additional mistakes that
-> caused incorrect output data without causing a link failure.
+> - Naming the dependency tracking files with a dot prefix or placing them
+>   in a dot prefixed subdirectory in the build directory to hide them has
+>   been exceedingly difficult to achieve. (In part due to some Makefiles
+>   building files in subdirectory hierarchies.)
 > 
+> - The debate which headers, if any, should really be self-contained is
+>   virtually open-ended.
 
-Ops, my bad. I had another round comparing the tables, and I found 
-another case that needed a fix:
+I would expect that headers in include/uapi/*.h should be self-contained,
+but apparently that's just a pipe dream on my part, or maybe it's just
+a maintainer option.
 
-diff --git a/arch/mips/kernel/syscalls/syscall_n.tbl 
-b/arch/mips/kernel/syscalls/syscall_n.tbl
-index e3d278f715b7..1882527053af 100644
---- a/arch/mips/kernel/syscalls/syscall_n.tbl
-+++ b/arch/mips/kernel/syscalls/syscall_n.tbl
-@@ -43,7 +43,7 @@
-  33     common  pause                           sys_pause
-  34     common  nanosleep                       sys_nanosleep 
-sys_nanosleep_time32
-  35     common  getitimer                       sys_getitimer 
-compat_sys_getitimer
--36     common  setitimer                       sys_setitimer 
-compat_setitimer
-+36     common  setitimer                       sys_setitimer 
-compat_sys_setitimer
-  37     common  alarm                           sys_alarm
-  38     common  getpid                          sys_getpid
-  39     common  sendfile                        sys_sendfile64 
-compat_sys_sendfile
 
-Let me know if both diffs look good to you, and then I can send a v7.
+With 'make HEADER_CHECK="include/uapi/" headercheck'
+I see over 70 errors (mostly typedefs or defined constants, but not only
+those), such as:
 
-Thanks!
+In file included from <command-line>:
+./../include/uapi/linux/hdlc/ioctl.h:74:21: error: ‘IFNAMSIZ’ undeclared here (not in a function)
+   74 |         char master[IFNAMSIZ];  /* Name of master FRAD device */
+      |                     ^~~~~~~~
+In file included from <command-line>:
+./../include/uapi/linux/input.h:29:6: warning: ‘__BITS_PER_LONG’ is not defined, evaluates to ‘0’ [-Wundef]
+   29 | #if (__BITS_PER_LONG != 32 || !defined(__USE_TIME_BITS64)) && !defined(__KERNEL__)
+      |      ^~~~~~~~~~~~~~~
+./../include/uapi/linux/input.h:34:9: error: unknown type name ‘__kernel_ulong_t’
+   34 |         __kernel_ulong_t __sec;
+      |         ^~~~~~~~~~~~~~~~
+In file included from ./../include/uapi/linux/papr_pdsm.h:14,
+                 from <command-line>:
+../include/linux/ndctl.h:19:33: error: ‘PAGE_SIZE’ undeclared here (not in a function)
+   19 |         ND_MIN_NAMESPACE_SIZE = PAGE_SIZE,
+      |                                 ^~~~~~~~~
+In file included from <command-line>:
+./../include/uapi/linux/patchkey.h:15:2: error: #error "patchkey.h included directly"
+   15 | #error "patchkey.h included directly"
+      |  ^~~~~
+In file included from <command-line>:
+include/uapi/xen/gntdev.h:159:25: error: unknown type name ‘grant_ref_t’
+  159 |                         grant_ref_t ref;
+      |                         ^~~~~~~~~~~
+include/uapi/xen/gntdev.h:161:25: error: unknown type name ‘domid_t’
+  161 |                         domid_t domid;
+      |                         ^~~~~~~
 
->         Arnd
+
+
+I like it; I think it's useful.
+
+Tested-by: Randy Dunlap <rdunlap@infradead.org>
+Acked-by: Randy Dunlap <rdunlap@infradead.org>
+
+> Approach the problem from a slightly different angle. Add a top level
+> "headercheck" static analysis target which you have to explicitly run,
+> and where you have to explicitly state which headers to check:
 > 
-> diff --git a/arch/mips/kernel/syscalls/Makefile b/arch/mips/kernel/syscalls/Makefile
-> index aaa5443ea906..51b9939ecff0 100644
-> --- a/arch/mips/kernel/syscalls/Makefile
-> +++ b/arch/mips/kernel/syscalls/Makefile
-> @@ -40,10 +40,10 @@ src_n32 := $(src)/syscall_n.tbl
->   src_n64 := $(src)/syscall_n.tbl
->   src_o32 := $(src)/syscall_o32.tbl
->   
-> -$(kapi)/unistd_nr_%.h: $(systbl_common) $(sysnr) FORCE
-> +$(kapi)/unistd_nr_%.h: $(src_o32) $(src_n64) $(systbl_common) $(sysnr) FORCE
->          $(call if_changed,sysnr)
->   
-> -$(kapi)/syscall_table_%.h: $(systbl) $(systbl_common) FORCE
-> +$(kapi)/syscall_table_%.h: $(src_o32) $(src_n64) $(systbl) $(systbl_common) FORCE
->          $(call if_changed,systbl)
->   
->   uapisyshdr-y           += unistd_n32.h                 \
-> diff --git a/arch/mips/kernel/syscalls/syscall_n.tbl b/arch/mips/kernel/syscalls/syscall_n.tbl
-> index e3d278f715b7..84c35c1f0c3e 100644
-> --- a/arch/mips/kernel/syscalls/syscall_n.tbl
-> +++ b/arch/mips/kernel/syscalls/syscall_n.tbl
-> @@ -133,14 +133,14 @@
->   123    common  capget                          sys_capget
->   124    common  capset                          sys_capset
->   125    common  rt_sigpending                   sys_rt_sigpending       compat_sys_rt_sigpending
-> -126    common  rt_sigtimedwait                 sys_rt_sigtimedwait_time        compat_sys_rt_sigtimedwait_time32
-> +126    common  rt_sigtimedwait                 sys_rt_sigtimedwait     compat_sys_rt_sigtimedwait_time32
->   127    common  rt_sigqueueinfo                 sys_rt_sigqueueinfo     compat_sys_rt_sigqueueinfo
->   128    common  rt_sigsuspend                   sys_rt_sigsuspend       compat_sys_rt_sigsuspend
->   129    common  sigaltstack                     sys_sigaltstack         compat_sys_sigaltstack
->   130    common  utime                           sys_utime               sys_utime32
->   131    common  mknod                           sys_mknod
->   132    common  personality                     sys_personality         sys_32_personality
-> -133    common  ustat                           sys_usta                compat_sys_usta
-> +133    common  ustat                           sys_ustat               compat_sys_ustat
->   134    common  statfs                          sys_statfs              compat_sys_statfs
->   135    common  fstatfs                         sys_fstatfs             compat_sys_fstatfs
->   136    common  sysfs                           sys_sysfs
+> $ make HEADER_CHECK="(headers|dirs)" headercheck
+> 
+> For example:
+> 
+> $ make HEADER_CHECK="include/drm drivers/gpu/drm/drm_draw_internal.h" headercheck
+> 
+> You can specify multiple path/to/header.h or path/to/dir, relative to
+> $(srctree), where path/to/dir is recursively scanned for any .h files.
+> 
+> Add a generic %.header-check rule in scripts/Makefile.build to support
+> this. Note that this rule should *not* be used in, say, driver or
+> subsystem makefile targets, precisely because of the problems listed
+> above.
+> 
+> While this still generates the .header-check dependency tracking
+> artefacts in the build directory, you will only get them as a result of
+> manually running 'make headercheck', not as part of the regular build.
+> 
+> This approach also allows anyone to check any headers in the tree, with
+> no makefile modification or kconfig changes required. What you do with
+> the results is up to you, and the header check facility does not enforce
+> anything like it would as part of the regular build.
+> 
+> Cc: Linus Torvalds <torvalds@linux-foundation.org>
+> Cc: Nathan Chancellor <nathan@kernel.org>
+> Cc: Nicolas Schier <nsc@kernel.org>
+> Cc: Jason Gunthorpe <jgg@nvidia.com>
+> Cc: Masahiro Yamada <masahiroy@kernel.org>
+> Cc: linux-kbuild@vger.kernel.org
+> Signed-off-by: Jani Nikula <jani.nikula@intel.com>
+> ---
+>  .gitignore             |  1 +
+>  Makefile               | 25 ++++++++++++++++++++++++-
+>  scripts/Makefile.build | 21 +++++++++++++++++++++
+>  3 files changed, 46 insertions(+), 1 deletion(-)
 
+
+thanks.
+-- 
+~Randy
