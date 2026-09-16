@@ -1,117 +1,145 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C33C54399F8;
-	Wed, 16 Sep 2026 19:36:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34BBA4E1C8A;
+	Wed, 16 Sep 2026 20:53:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789587381; cv=none; b=M4imxS86sG9nqmO6ohr4HFWOxI2r4xzef1tsNLy6pxfXbJ4mR2XvFVWV3L9Ip/OQAIcKSJC4358j/tCDrWAVXzF6IcmqCGE5rseBT8sictgTznTKtp6L65YmKZQ783CSV5UnjhQgld02/qpfWRzME+REpLxoZc2E8jF2R1JZQLI=
+	t=1789592038; cv=none; b=F2fEe7hJCN7mwMpNbwqqhEXb1qKXqRJeHoiRldQLMCUWaFBEhnuxG2e4k/ibmk1CIC3RL/pXoJl/6PfctvA5edm5M8eCME4G+vL45GAyZLndwTu3R+YloxRPOoTn9vCl+1fJ4QvuJcJFe7ecr4Gfd1cnq+WhQBxMAbdwObaqnEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789587381; c=relaxed/simple;
-	bh=Z+/v5ZvQxTAIhTm5UnkTj1pc64mja/Nm31YHHxX/MoI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rdpKcRd578ySICMIXGCUAqZ9T84/sWTAOBiTGEoZEwjOsHOqmxHYy9bc24RhCbxbmGJ6UCa3c6P3NQRBOnSQjfCy0uW0FTLPIf0DXmRwOWYFSDMaw861wBRM/AV6VeS38sM9izi0tj8KaKqLz8bS9FVqmqorb9dKumv3bFyIEEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OriqFoPi; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789592038; c=relaxed/simple;
+	bh=ybr8EEfRYKagfEoXfgFJtfStYX/0J85WMZhTatFAnKQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ItR91HkmbV3Te42svwquU4EyquX0NvsP3SFVusSl4dIwpjoW7ny+98tRhLIpLQdPNmFeG/cvReAjtvmw+0ObANnAb/cOFuz43tMtrWtML0nA8h2wPeq/KvnKchI3aCXOX1WFmlLSe0K4itgr5iAv5aKOLgFEtfMgIECWkhaDzZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=tHz2bB7k; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OriqFoPi"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id D54D51F000FF;
-	Wed, 16 Sep 2026 19:36:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789587377;
-	bh=sEcF2cWTN4Jv3NbQK8dlJ8vphUjD9iBgPDLykWsl6B0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=OriqFoPikw3LHat0jwRVwGEDdwcxBp3iWcpigdy2uvaFfYcMRgQM4sVLrWvg5/gbH
-	 b4d8ldp8PI+hd+yefLZlE+nA5bF3pVOmJQgUyscKScxcxBTe2GIqA6HykXTHGb05Pc
-	 euKV5A+i3pZk31axUJfOrDqP1YcFK+FOYnnONuKAVB2MwxZEx3MSbXdht1YCFHrEv9
-	 meoLaGDriNO60qSInyNcBCQB5XcZKaTvH5qKwZ+nDgCRSP6pwO5uN4weuL+cEiMcq2
-	 nR6gb3BgUyIK7fUf4Lz5tJEwSKstXqvMsGNSh/tEivwga9P9HH7lC1Q+/ZRbvJxXcg
-	 qtVZPxY9LURBw==
-Date: Wed, 16 Sep 2026 21:35:51 +0200
-From: Nicolas Schier <nsc@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Erkan Erdem <hexvalid@gmail.com>, Julian Braha <julianbraha@gmail.com>,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>, linux-doc@vger.kernel.org,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
-	Masahiro Yamada <masahiroy@kernel.org>, llvm@lists.linux.dev
-Subject: Re: [PATCH v2] docs: kconfig: fix shell function syntax in caveats
-Message-ID: <aqrvl49cvt0ReUKa@levanger>
-Mail-Followup-To: Nicolas Schier <nsc@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Erkan Erdem <hexvalid@gmail.com>,
-	Julian Braha <julianbraha@gmail.com>, linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>, linux-doc@vger.kernel.org,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
-	Masahiro Yamada <masahiroy@kernel.org>, llvm@lists.linux.dev
-References: <20260907103739.23212-1-hexvalid@gmail.com>
- <20260915-pastel-industrious-rhino-8bddce@l-nschier-aarch64>
- <20260915220204.GA1534234@ax162>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="tHz2bB7k"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=AgevcG6q8F+yBhZ/WwdhBjLXSIrE5M1kcR17kIsM+hI=; b=tHz2bB7k6RYhleCE/sDzPG+yy4
+	W7nsA4nwMWasHYpLmbunCVydmLwaItGqcnWmfb5x4J/DMuzPjLN8gNuqWHOyXnGdntv4Fq41PEXsX
+	nEUeGE8gCbvCml54ra3rSiZ3NCP5jHAFnfg738wFe5rttd3V0RqVTa3cXcsc+pbX+Pawb/Z++JPZL
+	e5n1hglsryn6zGe5hiahpOwowpY6DepDZxlphAJcn0kAYtZOs8hxIQoqU/igjzfyHRDkIeg7HucL6
+	hPpICeZk4Q9unF5ZZLdsH5vpXHYuUKT43D1xPUqmvtJLZhy1QRIU02tBI2VNbuIOo5vHrkdcnXtlj
+	4llwLkSA==;
+Received: from [50.53.43.113] (helo=[192.168.254.34])
+	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1x6wdL-0000000A6Z4-1fxe;
+	Wed, 16 Sep 2026 20:53:35 +0000
+Message-ID: <c4eeba54-e5bf-43e8-8974-dc9552ac6347@infradead.org>
+Date: Wed, 16 Sep 2026 13:53:34 -0700
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260915220204.GA1534234@ax162>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] docs: Makefile: Add a testdocs target for the
+ documentation unit tests
+To: Kees Cook <kees@kernel.org>, Mauro Carvalho Chehab <mchehab@kernel.org>
+Cc: Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
+ Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
+ Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>,
+ Maximilian Huber <maximilian.huber@tngtech.com>,
+ =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
+ Luis Augenstein <luis.augenstein@tngtech.com>,
+ Breno Leitao <leitao@debian.org>, Masahiro Yamada <masahiroy@kernel.org>,
+ Andrew Jones <andrew.jones@linux.dev>, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org,
+ linux-hardening@vger.kernel.org
+References: <20260916184107.i.183-kees@kernel.org>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20260916184107.i.183-kees@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 15, 2026 at 03:02:04PM -0700, Nathan Chancellor wrote:
-> On Tue, Sep 15, 2026 at 12:59:40PM +0200, Nicolas Schier wrote:
-> > On Mon, Sep 07, 2026 at 01:37:37PM +0300, Erkan Erdem wrote:
-> > > Kconfig separates a function name from its arguments with a comma, but
-> > > the caveats section uses Make-style whitespace in its shell calls.
-> > > These expressions expand as undefined variables rather than invoking
-> > > the shell function, so the supposedly working CC_HAS_ENDIAN_FLAG
-> > > example fails to parse.
-> > > 
-> > > Add the missing commas to the shell calls in this section. Keep the
-> > > Make examples unchanged.
-> > > 
-> > > Fixes: 316d55d55f49 ("Documentation: kconfig: document a new Kconfig macro language")
-> > > Assisted-by: LLM
-> > > Signed-off-by: Erkan Erdem <hexvalid@gmail.com>
-> > > ---
-> > > 
-> > > Changes in v2, addressing Julian Braha's review:
-> > > - Remove whitespace after the comma in the three remaining shell calls.
-> > > 
-> > > v1: https://lore.kernel.org/all/20260905124045.42713-1-hexvalid@gmail.com/
-> > > 
-> > > The issue, patch and changelog were prepared with an AI coding assistant.
-> > > The assistant also prepared the v2 revision and ran the checks below.
-> > > 
-> > > Validation:
-> > > - Re-ran the documented working CC_HAS_ENDIAN_FLAG example using the
-> > >   Kconfig conf tool built with Clang on macOS. With a test helper returning
-> > >   y for either endian flag, the original example fails to parse; v2
-> > >   executes both probes and sets CC_HAS_ENDIAN_FLAG=y for both endiannesses.
-> > > - Rebuilt the changed page alone with Sphinx, treating warnings as errors.
-> > > - The complete kernel documentation set and kernel were not built.
-> > > 
-> > >  Documentation/kbuild/kconfig-macro-language.rst | 8 ++++----
-> > >  1 file changed, 4 insertions(+), 4 deletions(-)
-> > > 
-> > 
-> > Thanks!  I'll queue it for kbuild-fixes, but it might be defered to v7.4 
-> > if no other build relevant fix will pop-up.
+
+
+On 9/16/26 11:41 AM, Kees Cook wrote:
+> tools/unittests/run.py discovers and runs the unit tests there (which
+> are primarily documentation tools), but nothing in the build calls it,
+> so the tests are only run by whoever remembers that the script is there.
+
+Now if we can just remember that this target is present/available ;)
+
+> Give it a target, next to the other checks that need no Sphinx. The name
+> ends in "docs", so it matches the "%docs" pattern already in
+> no-dot-config-targets and runs without a configured tree, and it sets
+> PYTHONPYCACHEPREFIX as the other Python targets here do, to keep
+> __pycache__ directories out of the source tree.
 > 
-> I am not opposed to this going via -fixes but given that it is just
-> documentation examples and there do not appear to be any problematic
-> instances in tree, I feel like this could very reasonably go through
-> -next. 316d55d55f49 is from 4.18, so the examples have been wrong for a
-> long time. With that, I would probably not classify it as urgent.
+>   $ make testdocs
+>   ...
+>   Ran 121 tests
+> 
+> with "make dochelp" listing it between refcheckdocs and cleandocs.
+> 
+> Tested with GNU Make 4.4.1 and Python 3.14.7, on a tree with no .config,
+> where it ran 121 tests and left no __pycache__ behind.
+> 
+> Assisted-by: LLM
+> Signed-off-by: Kees Cook <kees@kernel.org>
+> ---
+> I debated the naming here, since "tools/unittests/" is such a general
+> directory location, but figured I'd start with a target that made the most
+> logical sense given what is actually being tested there? I dunno. Maybe
+> "make testtools"? But that reads weird.
 
-Ack.  I remove the patch from kbuild-fixes-unstable again, thanks.
+I'm happy with "make testdocs".
 
+Ran 122 tests in 0.241s
 
+Tested-by: Randy Dunlap <rdunlap@infradead.org>
+Acked-by: Randy Dunlap <rdunlap@infradead.org>
+
+> ---
+>  Makefile               | 2 +-
+>  Documentation/Makefile | 5 +++++
+>  2 files changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index 66654fa71655..88557288163d 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -2002,7 +2002,7 @@ $(help-board-dirs): help-%:
+>  # ---------------------------------------------------------------------------
+>  DOC_TARGETS := xmldocs latexdocs pdfdocs htmldocs epubdocs cleandocs \
+>  	       linkcheckdocs dochelp refcheckdocs texinfodocs infodocs mandocs \
+> -	       htmldocs-redirects
+> +	       htmldocs-redirects testdocs
+>  
+>  PHONY += $(DOC_TARGETS)
+>  $(DOC_TARGETS):
+> diff --git a/Documentation/Makefile b/Documentation/Makefile
+> index 377a449656c8..ee852afe9bb9 100644
+> --- a/Documentation/Makefile
+> +++ b/Documentation/Makefile
+> @@ -74,6 +74,10 @@ htmldocs-redirects: $(srctree)/Documentation/.renames.txt
+>  refcheckdocs:
+>  	$(Q)cd $(srctree); tools/docs/documentation-file-ref-check
+>  
+> +testdocs:
+> +	$(Q)PYTHONPYCACHEPREFIX="$(PYTHONPYCACHEPREFIX)" \
+> +		$(PYTHON3) $(srctree)/tools/unittests/run.py
+> +
+>  cleandocs:
+>  	$(Q)rm -rf $(BUILDDIR)
+>  
+> @@ -95,6 +99,7 @@ dochelp:
+>  	@echo  '                    (will connect to external hosts)'
+>  	@echo  '  refcheckdocs    - check for references to non-existing files under'
+>  	@echo  '                    Documentation'
+> +	@echo  '  testdocs        - run the unit tests of the documentation tools'
+>  	@echo  '  cleandocs       - clean all generated files'
+>  	@echo
+>  	@echo  '  make SPHINXDIRS="s1 s2" [target] Generate only docs of folder s1, s2'
+
+thanks.
 -- 
-Nicolas
+~Randy
