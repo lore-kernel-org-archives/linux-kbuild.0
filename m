@@ -1,160 +1,284 @@
-Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010023.outbound.protection.outlook.com [40.93.198.23])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 041AB4DD3DB;
-	Thu, 17 Sep 2026 11:58:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.23
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789646338; cv=fail; b=JKritWwlKzjdWU1YoO9jn7utzl3LGv4aCZ1hLsBzQrkbFmWipdNI32uR9i8yuKGYYVDJlXHYrpYB43xysvg9gaca+1TWbl63eLIRKP0bA3TLU3dDipJxCzt2JGmFs3HqqmeY6woPVUO56uaUU1F/yRjw3D8BIlMQEbQFO9Hcui4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789646338; c=relaxed/simple;
-	bh=TEgDgCeAap3XVZYMyTNA0+ON8CWCOfG2d56OaRdbyHI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=ZTgXj9cgSFcIHgWMVkGVAn1cY9gfPIWm6TSRwK7+iuniit3PPGCFGA8jsGYy6FM4e5/ktvNxZ0tNflo8wIATe/Jsp53GF2anOxyMUSYzIAcWurtCy1S3a+R1N5OPgjXpYn/oFdktxipjpdTeHBHek/6eC0ewrwrFofWDinvueDE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=YVH6sHO3; arc=fail smtp.client-ip=40.93.198.23
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 390C352B1C2;
+	Thu, 17 Sep 2026 13:37:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789652263; cv=none; b=Xd4wO+8fxuvaczEOutEEm85/oi3aE+X87npda03hIrDU2OB74q4AI9m1s4mNk9OS1WAq+EzZqJA0vq4Lhx6MCGkpojfq5eFxOo5eUaFVdZrzBE1KVT0QQU49+8mma1GXgvWjX3GEqsZUpkQledlG+lFw6rXgaH8u0isQeZM9brg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789652263; c=relaxed/simple;
+	bh=i2e28DSY9OJFMn+Yei5UTwRLlFG6pUChC039RIqj300=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DTQbp34nZDubp2DMe6R5ar8P8OZrcFNdvQnVNRvsoOWYbGGJt8L4UxyOJEmJFU4pT+o5eTi2tUNmOsoDPsreHH61aVOKrkhXxJwbAqKV7EgrfxkZSq2GFWQeB6DyqSNA070+hr6Oi1Zv0OoF+Hhl8RXM3CKYf8BDYYj3PXvR2zg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CkdauEtU; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="YVH6sHO3"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Cw4Gxxj8am18bifF7WzRpc/MQFkocHWO3SiMbydDGiiRKLM82c6+14cLLQXukA9wF3yd5II059MWsh8tz/uL2V8pYj93Aq8wdEwgeUrVvcXYR+rI4vMyzBuyI8JktzYj9GuZdF+LzX4vfnFN6RAN4CyGk7APUzEx9yKeodbJgBr48u5kEe/FCSZNBJep2kC6OHP+A0CrVhLKQmUoeek3aIGCXV2+WWtXhikNvoft38gNGN2xeRCNvd0jNtCNoI+v8SQPZHgw6NWLz8N2Yy91TYT3e5mfN6jI+p0u9inyOOQrtE01qi5QBccxhoe6T3D2CsucEzhJtLLYP7+pZoHptg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vuKSgja1eQ9iPTlTZbxOxlbQm9wGkwMeOV7fyz4gbY8=;
- b=byGeCC0D0OBEidpYifCyM2Hgy7bPjY5aWGWqu/xHCSfICAK68ofV35tmmEwy1MGPySuVzYL0EQuuoMVc83hc2CiLHZV/Gn+15hBkecrTqacjw+jbYNCMVTk1ZMsyQ8SjDgC0bNklogd6mAQHtKqJ672WZr6mzMeqwAHtgQ2jstmkYyS4K/J4PMZb3yf8RiJTmh0MMiU1lbRS4J4/+ZcW1PxYTwvX2UnZ5z+AMzVasA1j9jmaIXod8n4t4Ispes6rQxZeQ10aCePl0CmVI0SBgF+JEKihjoCS/Vk66Dj/3WYy6p+w2fVapIv1crpuVW4q6vi5HbhwPOi+9pc5EjAyPg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vuKSgja1eQ9iPTlTZbxOxlbQm9wGkwMeOV7fyz4gbY8=;
- b=YVH6sHO3NFSW7Jdwweet/T0gz4L0+OAC4b3o/340Rk2YP7c8xZYTeeBVnmEKPGlvzUiV9qj66sJ/nviiAp02434BnLlOw3uLYpR5UbXXXGRsNoWNVo9L8DGCFbk+7ZW3wboS8yJCoWuDLpxBOFNpKuIfoa5JrECJAQ+15gAnMOREy0Yagalom0zHV77YH7kmEGuTjkeyHl0Up8FJ7K6dSOQqGfBvtv5iADFWGjIse3+LQrCFL6TjyS2pqzJ2oL8BC+CnNvJeWw/hxOOhgbPlVydcUj9swSIgcnTno9tDLDVi49XTqOcFZCVBpmemAWSExcU7VnOrHvDq9yEzOpwnVw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CHBPR12MB731189.namprd12.prod.outlook.com
- (2603:10b6:610:33d::12) by LV2PR12MB5895.namprd12.prod.outlook.com
- (2603:10b6:408:173::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.406.12; Thu, 17 Sep
- 2026 11:58:44 +0000
-Received: from CHBPR12MB731189.namprd12.prod.outlook.com
- ([fe80::b0e5:123d:fe06:e10d]) by CHBPR12MB731189.namprd12.prod.outlook.com
- ([fe80::b0e5:123d:fe06:e10d%6]) with mapi id 15.21.0428.011; Thu, 17 Sep 2026
- 11:58:43 +0000
-Date: Thu, 17 Sep 2026 08:58:43 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Cc: Nathan Chancellor <nathan@kernel.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Jani Nikula <jani.nikula@intel.com>, linux-kernel@vger.kernel.org,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Nicolas Schier <nsc@kernel.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CkdauEtU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 446B01F000FF;
+	Thu, 17 Sep 2026 13:37:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789652252;
+	bh=lg/US5lY1LsQarxH6D624+fOci1ZXIwXzP/RrKKTJiE=;
+	h=From:To:Cc:Subject:Date;
+	b=CkdauEtUcuQfeCy7WW0kbl27qF96vhyPoFdaDVAo+mxfulMmOjH1zvV0/0GFY2iWI
+	 7e7gjqXqmSJr2Is6n/mAGW8EqmDWVkDtgn4Tl8bDgYF8hTpv04QRuHI9dDMLxvG3Kx
+	 qqCDYU3k3KIq64l6r+aeYJ8pU3Q2RNbwiF1BrmB0aYCGfeS9FvDsPyTM4PiLX5QL+Z
+	 B+mKCu/ILHdSa7TOXOADcfx7u3/clEXcAqxgwFgbkDzR/N78O7Uaqy2g44DA8JL8Ri
+	 mgvgoxBZML1nc6y8s4qbFKDdQWOoX0bWiytfudnh1cFE+mZHJne7pMCbm0Rw5vQdb1
+	 8jco0V6N8T4KA==
+From: Sasha Levin <sashal@kernel.org>
+To: Andrew Morton <akpm@linux-foundation.org>,
 	Masahiro Yamada <masahiroy@kernel.org>,
-	linux-kbuild@vger.kernel.org
-Subject: Re: [PATCH] kbuild: add header check facility as a manually run
- static analyzer
-Message-ID: <20260917115843.GX3968357@nvidia.com>
-References: <20260915104331.255636-1-jani.nikula@intel.com>
- <211fcac1-d85d-4680-8e55-598b2064a002@infradead.org>
- <20260916231319.GA550816@ax162>
- <71a8b988-3977-44e4-93d6-782e4447f160@t-8ch.de>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <71a8b988-3977-44e4-93d6-782e4447f160@t-8ch.de>
-X-ClientProxiedBy: YT3PR01CA0029.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:86::35) To CHBPR12MB731189.namprd12.prod.outlook.com
- (2603:10b6:610:33d::12)
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Richard Weinberger <richard@nod.at>,
+	Juergen Gross <jgross@suse.com>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: Sasha Levin <sashal@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>,
+	Petr Pavlu <petr.pavlu@suse.com>,
+	Daniel Gomez <da.gomez@kernel.org>,
+	Greg KH <gregkh@linuxfoundation.org>,
+	Petr Mladek <pmladek@suse.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Kees Cook <kees@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Thorsten Leemhuis <linux@leemhuis.info>,
+	Vlastimil Babka <vbabka@kernel.org>,
+	Helge Deller <deller@gmx.de>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+	Vivian Wang <wangruikang@iscas.ac.cn>,
+	Zhen Lei <thunder.leizhen@huawei.com>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	linux-kernel@vger.kernel.org,
+	linux-kbuild@vger.kernel.org,
+	linux-modules@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: [PATCH v9 0/4] kallsyms: embed source file:line info in kernel stack traces
+Date: Thu, 17 Sep 2026 09:37:21 -0400
+Message-ID: <20260917133727.428546-1-sashal@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CHBPR12MB731189:EE_|LV2PR12MB5895:EE_
-X-MS-Office365-Filtering-Correlation-Id: d9ec9b3b-0f6e-4d99-20af-08df14b305ba
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|23010399003|376014|56012099006|11063799006|4143699003|10067099003|22082099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	45BNuMz2cBFhWDNr5kgT7Gq8WrajjbT2rlndc2wnzB3kp79nl9r9uMiBp+B2DEhcNhEEvjWHNcb3SjZnudcPDDWHhxMYDVz0GSRZcKGyAIstuxjEuJ00fQJQNqN2r0rVJEGUGtgNr+eM8qk3qGP9yIpe1TpfKA+sTpOgDhO61qimXZk5OTquwW4eoikrOZ38gvUP6/KvPCa387eWzNleEdrphi4kNUAugX+vSggM2n5Gc9fyXGJZ2j/UF6SwnPWE5OvL/blbEOh1xdsibIVGdWTGlCdcqBEwLQzCsaBeITAoX5av4KEHef1+FXRKc2sLCqdZB18nRlZS4NhAIY32jlw6ZuactfAHQSj1A64jEtukgyAHTk5kYPr5ooH55N2SNm2fCfRHHmdGSczUNBi96kJVC8KHcB1mX3Rpzdp8XrfmrFXYnEa5ong0mzHU8OqKUeFelWat1pyFWvkpORHCSphe/HnUqOyLbzAqDJ/2xRzY7LF8aDI2fBCcd7Ez3G11wSZPpRtkk6XoyK4sXr2yQdIAr3s2p0Gh6A5mEkBztmxa79s5kQMZHTCmPbcoQZUT+oOdXLD3O1zkSB6Ky/ButWIMpGXcWOH0BIJEIs2G4rKZyj4FUx6uhOW9ULppDhxZjQVwQyC7CTCpu+A/BVqmBXJTWcARVYCf555spwVP1Ek=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CHBPR12MB731189.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(23010399003)(376014)(56012099006)(11063799006)(4143699003)(10067099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Um14WlFIdlpsVGhKMjd2WmovRTFTdmYvMWJ5V2d5citqT2M2bnc2MWdyU0Z5?=
- =?utf-8?B?VEQyc2NPaC9mYW1IUGdlK29ZeEUraU9MVzdqWUR3SU91bTl2N1U0VWNvWjZu?=
- =?utf-8?B?OUxqa0lOVk5Ta2VDUnJjWHRTVit0blVLT1c0YkpQSGdzRUdkRUVzS2J3OStu?=
- =?utf-8?B?L1RzYTVRakdUcXZheUxaVndtNFFNWldZcXYxbWFhZUNVbGdxZ1NvQ0Q1VUQ1?=
- =?utf-8?B?V0hzUEQxc1pyd3I1WWplbnFablN4emNSYVpFNWx1ekJ5a1Btbm8yZyt0a2tG?=
- =?utf-8?B?UWlIdlljU3RseFpuSm54bEdVNDBuTzBxcjlRaW5PbTBZaDRjZy94MzVsUEdO?=
- =?utf-8?B?eTBFSFMwV1NZYUJJa3hZb1I1bXRNVXhOVzRPbW1PSWdqOE5sM05DNWY2bFQx?=
- =?utf-8?B?TWJmV012RHR1Qmk1VmR3bHZSb1VJcTZuNnZQWjA2dkNqZWNsbjhROGhZK0xi?=
- =?utf-8?B?ajByVE9pVkYzdVY4SHEzd25OV3hndHNvK0d1ZC9NVlo1a1NOTnRMREZwYTVE?=
- =?utf-8?B?ZmVKSTI2V1RyRkY2RlBwMmxydVVzSmk2azlheXdGWHkxTnByb2ZjRmszTmlR?=
- =?utf-8?B?RHZLZTk5YUdoRW9oRkhQd01iZjhEekhqd29PdEwyRUphUTd0UGFyY1hWaHI3?=
- =?utf-8?B?M0FmM1dHbnB6bG1FSHNwSzlNdTZjQXFKSUFaOG9JU3hOQ2lUcjUybEs1cWpo?=
- =?utf-8?B?QldEWm5hc3dvMUY1K2RiSnVZcTRhNklIUWF4azY3QlVqS2YySW53V1hDanFr?=
- =?utf-8?B?YkcvWVpab0thQ3EzdzluTEo5aFlPSTZ3NmRJNFBNSjcxNENQbDBQUnJYbXUw?=
- =?utf-8?B?K1ZsNmVodHhZN1VmcWNvOUpxQUlFNVcyTVZDQnZFZVdzMnl0K3NvaStVOUVp?=
- =?utf-8?B?cTUyd3ZvM3JqVjFYV0YvNkJEakVzR25GMTU4M2Y3aVhwSmlKTUlBOS9RQTlS?=
- =?utf-8?B?eXYwWHdFN29vTG94UHY2K2RZSTEzWGg4QXBISDhqd2M2Qi9SZy90SURnRUlL?=
- =?utf-8?B?aE9rTDZPVU12US8wWEVvOVIrVWNyUzJyTDJ3MjJBTVpGMEVURmpVWVBxNzd1?=
- =?utf-8?B?aURjSTZOa0E0Y2NRZSthbFpycXdHL3kzQUptL05FQ0xORFJJMG51YnF5SUxO?=
- =?utf-8?B?ajRRZVUrYXBpUVF2SUs5M3lGbXVzNWl0Q3g1RXg3TEpVcEFmRzJPcTNYdTJz?=
- =?utf-8?B?bUN3Z2tyT0w2RU1FZ3YzRkNPc2pXMWNyZlpQZ0toSjhDOGo1QzBVK2d5Qk5h?=
- =?utf-8?B?dVdVclZ5ZjMxQ3V6R1k1ZExMdlpUU0tFUjlvRW0yRmtiTG9WRnMxMHdiWWFY?=
- =?utf-8?B?amY1Y0k0QTdIMXpoTW9kUmxvVGRSZ0JEN0tmb3duWW9VMXNrU0VmK2pBSmZk?=
- =?utf-8?B?SmdORFVQbFZINHIyWldzNzVJYUFYRzhtTUdzcmxya3d1cGkvQnBwSWtTUDBF?=
- =?utf-8?B?b2JwQ1ltSG9CTnpWZkFZcWNxbUU5aXJDbjVxNHFscGxXdzFPLzU5UmF0SGN1?=
- =?utf-8?B?eDRNWU9za0c0dGcrdVAxTFA0bmlpcnJOeHJsdVJEdGhLb1NOV1J4RVZ0YUlG?=
- =?utf-8?B?cEgwN01OdTMrbzNSelBKaW1FdFR2RlNSYWxnMDVrT21EbWc5VDF2dC9CaDVj?=
- =?utf-8?B?WElVWjNEV2hLbTVvbWhtK2hScGhDUTNOcjlEd3ArVUZPUzdkUjNUQ0d5MnJX?=
- =?utf-8?B?Z2lUSDQrdGpqNityT0hRSFNmRU9wRkRsR3VWM2hrcjJveHc1SmlMVkRKTnI2?=
- =?utf-8?B?ek1mYUE3Zmp2eGNpT2ladHg1bC9kQ0lzanlyUW1oMkhTa0FNS3pNaXRuWDN3?=
- =?utf-8?B?UEJNUHBKMDI1Z2UyY1MrSm8yR1llYVpSb3pIb012TERUMlA5U2FHVllZTmZ0?=
- =?utf-8?B?YllRWFpqaUFSL3RmUVE5bUJFSnJ1bjgvMS9IQ1BYeGZjQWpsMitIbkhtdk0w?=
- =?utf-8?B?MHpjT1AycWs3V1BzbEs1dFFHWUM3MWwwa2IwSXluZHFVZjVpbHk4a3g4SjJT?=
- =?utf-8?B?R2Q4anRiNUE4VTltU0YyTHRqZlUwVXEyRzB2WlR4V25IZzRNZ3NpRU9KdHRO?=
- =?utf-8?B?aVY0WEZzN3l2UFI0QnQrOWt5MFhITjdnWmNMTWl3TUhwRDB4VHk3bzVrZW54?=
- =?utf-8?B?bEdxcVlMczlXR2NxYzVHYkhHVVZkUVlxUGxaSitaQVYwQS82Z0o5c0llSVhF?=
- =?utf-8?B?SzVsMVQxWnRCTmpHb3hpRTJzaXZHWWRTNWdPT1RVbGlaVWNJK3RPQzh6UkNL?=
- =?utf-8?B?OHRoZkthOTFBR1NxOVVwUENUY1RDVEdjb0R2Uk9CMWpucU5GWG0zVi9yTDFV?=
- =?utf-8?Q?PA6NoQ2PL67jWgtAKJ?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d9ec9b3b-0f6e-4d99-20af-08df14b305ba
-X-MS-Exchange-CrossTenant-AuthSource: CHBPR12MB731189.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Sep 2026 11:58:43.8581
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1EjehAJ+SOMt60a/wQY315R2UIJE8LfLrkfozNTWo1RLX/Px8OWrlN7yDTHx53Ok
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5895
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Sep 17, 2026 at 11:05:32AM +0200, Thomas Weißschuh wrote:
-> For instance the example from above:
-> 
-> ./../include/uapi/linux/input.h:29:6: warning: ‘__BITS_PER_LONG’ is not defined, evaluates to ‘0’ [-Wundef]
->    29 | #if (__BITS_PER_LONG != 32 || !defined(__USE_TIME_BITS64)) && !defined(__KERNEL__)
->       |      ^~~~~~~~~~~~~~~
-> ./../include/uapi/linux/input.h:34:9: error: unknown type name ‘__kernel_ulong_t’
->    34 |         __kernel_ulong_t __sec;
->       |         ^~~~~~~~~~~~~~~~
-> 
-> These are legitimate issues, the inclusion of the necessary header is
-> gated behind #ifndef __KERNEL__ although it should not be.
+CONFIG_KALLSYMS_LINEINFO embeds a compact address-to-line lookup table in
+the kernel image so stack traces print source locations directly, without
+decode_stacktrace.sh or a vmlinux with debug info at runtime:
 
-Yeah, if the header is included by a kernel file then this makefile
-test should evaluate it under those conditions, and it should still be
-self-contained within the kernel environment.. Wasn't that one of the
-problems with earlier draft that it did not figure out the right
-compilation options for the context the header is included in?
+  default_idle+0x9/0x10 (arch/x86/kernel/process.c:768)
+  default_idle_call+0x6e/0xb0 (kernel/sched/idle.c:122)
+  do_idle+0x38f/0x660 (kernel/sched/idle.c:199)
+  cpu_startup_entry+0x4e/0x60 (kernel/sched/idle.c:453)
+  rest_init+0x277/0x280 (init/main.c:732)
+  common_startup_64+0x13e/0x158 (arch/x86/kernel/head_64.S:418)
 
-FWIW I think this is a reasonable compromise too
+Patch 2 extends this to loadable modules, patch 3 delta-compresses the
+tables, patch 4 adds KUnit coverage.
 
-Jason
+Why this is useful
+==================
+
+A stack trace in a bug report is usually all you get.  The reporter has
+already rebooted, the machine belongs to a customer, or the failure came
+out of an automated run that tore its environment down an hour ago.  What
+lands in the report is a list of symbol+offset frames:
+
+  ext4_do_update_inode+0x2a1/0x4c0
+  ext4_mark_iloc_dirty+0x5f/0x210
+  __ext4_mark_inode_dirty+0x9c/0x330
+
+Turning that into source locations requires the exact vmlinux that
+produced it, with debug info, fed to decode_stacktrace.sh or addr2line.
+In practice that artifact is the thing that is missing:
+
+- Distributions strip the shipped kernel and put debug info in a separate
+  package of a few hundred megabytes that is not installed by default.
+  Fetching it after the fact only helps if it still matches the build that
+  crashed, and on a machine that has been updated since, it does not.
+
+- A reporter who rebuilds "the same" kernel to decode the trace does not
+  get the same offsets.  A different compiler version, one changed config
+  option, or a different link order moves symbols around.  The decode then
+  yields plausible but wrong line numbers, which is worse than yielding
+  none, because nothing flags it as wrong.
+
+- Panics captured through pstore/ramoops, a serial console, a photograph
+  of a screen, or a customer's ticket system arrive as text.  There is no
+  binary left to go back to.
+
+The usual answer, "please rebuild with CONFIG_DEBUG_INFO and reproduce",
+quietly ends a good share of investigations: the reproducer is rare, the
+machine is in production, or the reporter has moved on.  With the table
+embedded, the trace above decodes itself at the point it is printed, on
+the machine that crashed, with no second artifact to find.
+
+Two cases go beyond convenience, because symbol+offset cannot express
+them at all:
+
+- Inlining.  A frame names the outermost function that survived inlining,
+  so an oops inside a static helper or a header inline reports the caller.
+  The offset is the only clue about which inlined body faulted, and it is
+  not a clue anyone can follow without the binary.  A file:line points
+  into the header the code actually came from.
+
+- Assembly.  Frames in .S files have no useful decode in a plain trace;
+  here they resolve like any other, for instance
+  arch/x86/entry/entry_64.S:121.
+
+Module frames are the worst case today, since decoding them needs the
+matching .ko, built with debug info and kept from the build that ran.
+Patch 2 makes them self-annotating, which matters most for out-of-tree and
+vendor modules, where the person reading the trace rarely has that.
+
+For anyone triaging at scale, syzbot-style pipelines, distribution crash
+aggregation, kdump fleets, traces that carry file:line can be clustered by
+source location instead of by symbol+offset, which changes from build to
+build.  The same trace text stays comparable across kernel versions for
+far longer.
+
+The feature is opt-in and bounded.  On x86_64 defconfig + CONFIG_DEBUG_INFO
+the stripped image grows 8.0 MiB (52.2 -> 60.2 MiB, +15.3%) with the
+compression in 3/4.  There is no cost on any hot path: the tables are
+read-only data, consulted when formatting offset-bearing symbols, with no
+locks and no allocations, so the lookup is safe from NMI and panic
+context.  Lookups use offsets from _text, so KASLR does not disturb them,
+and nothing is needed at runtime: no debuginfod, no symbol server, no
+network.
+
+The information all of this rests on already exists at build time.  Today
+it is discarded at the end of the build and asked for again, months later,
+from whoever hit the bug.  This series keeps 8 MiB of it instead.
+
+Changes since v8
+================
+
+- Rebase on v7.3-rc3; size and entry-count figures re-measured.
+- Keep the last line-program row at an address rather than the first, so an
+  inlined call resolves to the inlined body and not to the call site.
+- Annotate %pS and %pSb as well, not only the sprint_backtrace*() forms.
+- Expand SHF_COMPRESSED debug sections before applying relocations to them.
+- Apply RISC-V and LoongArch ADD/SUB relocation pairs, and refuse an object
+  that leaves any relocation in a patched debug section unapplied.
+- Emit line-0 and end_sequence rows as "no annotation" markers instead of
+  dropping them, so an address DWARF leaves unattributed reports nothing.
+- Resolve rows sharing an address: a line-0 row wins where the line program
+  puts it last, a sequence end yields to a sequence beginning there, and
+  across compile units coverage is the union.
+- Give a function an entry at its own first byte where one row covers
+  several, which is an assembly macro; in C such a row is padding or a
+  split-out fragment, so the unit's language decides.
+- CONFIG_CPU_ENDIAN_BE8: build the table from an unconverted partial link and
+  hold back only --be8 and --build-id for the link that produces the module.
+- Guard EM_LOONGARCH and R_LARCH_*, which glibc gained only in 2.36.
+- Regenerate lineinfo when the final vmlinux link moves text.
+- Decode MIPS n64 r_info by its own layout rather than with GELF_R_*.
+- Refuse architectures with no known absolute relocation type, instead of
+  generating a table from unrelocated DWARF.
+- Fold module table generation into the link command, so a relink caused by a
+  command-line change alone cannot drop the table.
+- Relocate every debug section libdw reads: a module built from several
+  objects carried line info for the first one only.
+- Pass KBUILD_LDFLAGS to the module ld -r, without which ARCH=i386 fails at
+  its first module and 32-bit ARM warns on every one.
+- Check the actual bounds in the init-text KUnit case, which UML fails.
+- 4/4 builds the KUnit module from two objects and covers the inline-site and
+  second-object paths, neither of which a single-object module can reach.
+- From the sashiko.dev review of v8: scnprintf() in __sprint_symbol(), u64
+  sums in the blob offset helpers, and an alignment check on blocks_offset
+  and files_offset.
+
+v8: https://lore.kernel.org/all/20260801143219.3975824-1-sashal@kernel.org/
+
+Testing
+=======
+
+A distribution-style config with CONFIG_DEBUG_INFO, booted under
+QEMU/KVM:
+
+- KUnit, CONFIG_LINEINFO_KUNIT_TEST=y builtin:
+  33 passed, 0 failed, 1 skipped
+- KUnit, =m with CONFIG_KALLSYMS_LINEINFO_MODULES=y:
+  32 passed, 0 failed, 2 skipped
+- KUnit, =m with CONFIG_KALLSYMS_LINEINFO_MODULES=n:
+  8 passed, 0 failed, 26 skipped (skips rather than fails, as intended)
+- Every entry of four built modules diffed against addr2line: 100,725
+  entries agree.  16,098 addresses probed across them in the other two
+  directions: none annotated where DWARF has no location, none left
+  unannotated where it has one
+- The vmlinux table checked the same three ways: 4,000 sampled entries
+  agree with addr2line, and of 4,001 probed addresses none is wrong in
+  either direction.  Repeated on a build with -ffunction-sections, where
+  one compile unit's sequences do end up adjacent, which is the case the
+  rule above turns on
+- SysRq-l backtraces annotated, including .S frames and header inlines
+- Every .ko sub-table header 4-byte aligned, 14 modules with a blob, 9 of
+  them with two or more section descriptors
+- Multi-object coverage checked by dumping the blobs: kvm.ko now names
+  all 30 of its source files, where before it named one
+- Compressed debug info: -gz=zlib and -gz=zstd objects give tables
+  identical to an uncompressed build
+- Relinking a module with only LDFLAGS_MODULE changed keeps its table
+- A module relinked with a stale table object planted in the build tree
+  ignores it and emits the same section, byte for byte
+- MIPS64, SPARC64 and Hexagon objects checked directly: MIPS64 matches
+  llvm-addr2line, the other two are refused rather than mis-generated
+
+Builds:
+
+- Each of the four patches builds standalone on x86_64 defconfig +
+  CONFIG_DEBUG_INFO, 0 objtool warnings at every point
+- arm64 defconfig, ARCH=arm multi_v7_defconfig (943 modules), ARCH=i386
+  defconfig, and x86_64 with LLVM=1: all clean, no warnings
+
+Sasha Levin (4):
+  kallsyms: embed source file:line info in kernel stack traces
+  kallsyms: extend lineinfo to loadable modules
+  kallsyms: delta-compress lineinfo tables for ~2.7x size reduction
+  kallsyms: add KUnit tests for lineinfo feature
+
+ Documentation/admin-guide/index.rst           |    1 +
+ .../admin-guide/kallsyms-lineinfo.rst         |   99 +
+ MAINTAINERS                                   |    9 +
+ include/linux/kallsyms.h                      |   18 +-
+ include/linux/mod_lineinfo.h                  |  319 +++
+ include/linux/module.h                        |   40 +
+ init/Kconfig                                  |   35 +
+ kernel/kallsyms.c                             |  108 +-
+ kernel/kallsyms_internal.h                    |   11 +
+ kernel/module/kallsyms.c                      |  200 ++
+ kernel/module/main.c                          |   26 +
+ lib/Kconfig.debug                             |   10 +
+ lib/tests/Makefile                            |    4 +
+ lib/tests/lineinfo_kunit.c                    | 1109 ++++++++
+ lib/tests/lineinfo_kunit.h                    |   21 +
+ lib/tests/lineinfo_kunit_second.c             |   21 +
+ scripts/.gitignore                            |    1 +
+ scripts/Makefile                              |    3 +
+ scripts/Makefile.modfinal                     |   41 +-
+ scripts/empty_lineinfo.S                      |   38 +
+ scripts/gen-mod-lineinfo.sh                   |   45 +
+ scripts/gen_lineinfo.c                        | 2534 +++++++++++++++++
+ scripts/kallsyms.c                            |   11 +
+ scripts/link-vmlinux.sh                       |   88 +-
+ 24 files changed, 4780 insertions(+), 12 deletions(-)
+ create mode 100644 Documentation/admin-guide/kallsyms-lineinfo.rst
+ create mode 100644 include/linux/mod_lineinfo.h
+ create mode 100644 lib/tests/lineinfo_kunit.c
+ create mode 100644 lib/tests/lineinfo_kunit.h
+ create mode 100644 lib/tests/lineinfo_kunit_second.c
+ create mode 100644 scripts/empty_lineinfo.S
+ create mode 100755 scripts/gen-mod-lineinfo.sh
+ create mode 100644 scripts/gen_lineinfo.c
+
+-- 
+2.53.0
+
