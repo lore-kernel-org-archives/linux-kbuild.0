@@ -1,273 +1,156 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2D8941687C;
-	Thu, 17 Sep 2026 20:59:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B8B34ED18E;
+	Thu, 17 Sep 2026 21:24:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789678768; cv=none; b=m/jipdN84NmnIh6q8GmUM2VdnJgR2KDobZg61JCrU7Eyg72mTAIhDcq++8hYYOvJt+OULkRok7UvyP8y5DchEIzX4pxqoWBF7Vrv+sXYsgWLliT5DJVRcIp7S1Ge8A+VEqrk+7qJHUvXPF1WhhE+moTGyP41IjqgF7DYSgOiGc0=
+	t=1789680258; cv=none; b=sdlTcSkxnB8eeHFAGnUDpA+uAP8YF2d/6bvhVOij32EWgtjC8nfr7gkAPGw/5yyWS+SDFUHc74iikhpYiXiaOdviuGo/RNML398T2V5a+TKf3BOIZYdXolbVFk1Z53LORWhp1x5eWSufVzfwF4qeDShLCBEet27eAzAaik8b3aQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789678768; c=relaxed/simple;
-	bh=s16KJQRcC14LLQy4pTYvXckO3rme4Dl2pTMLZe1/3VM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t3jY10Cnq4WLiR3iqaeGmY2ik3muaVokB2S/dRfnQwU7ALDlL8j5VnEdYggbROQpBIFvDD/g0GzL2UEhsGJTTcIII6Bbj1O213ORATqGhncyk6+2M18+yuyeQJQwSCgmCo5Sox6txBSJDMpx05iyxqBQzLmcUDv/EyuyP2vnikw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K1iJnrT5; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789680258; c=relaxed/simple;
+	bh=sSbcXjG5M7vBTEb7+nYI+22U+3VbmgzgG4sDQ38deqs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=R4Gq/+BHm0/XuqDxPEwvQpjXPKDquRwvvfLzg1pAVfhjahhhM1780DtHFwkp8FMELLbjCQXwyrXJSfy/Ab0n4JWAHFn2w7RP+5Ww1te1tqtFNkaI1tqA9x6H43+mg7bhHaERB4vpWQxb1nWd/BNZsDgnCaQFiVfoLEamVztGOrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=QuaBpeD6; arc=none smtp.client-ip=213.97.179.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K1iJnrT5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 620661F000FF;
-	Thu, 17 Sep 2026 20:59:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789678766;
-	bh=jCN23Z098/jrBfz0bmrygNbGxnLmKn6q7+PuR1I0LGk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=K1iJnrT5zwIrpIGfCXw3tperSIg5wg+ccx1MerSVNbZKcKAO2Wen+D59D8D5DLJnc
-	 iF217QvkXDUQ+4iHuY8eEUZ7yL8xlYISWkK8SQeYTnqwssMCw1OEbjQgFp9u0lgKvJ
-	 pqHbYnMRym6T6Hhf9CzyK6P9da+oWQN2sQ93SDO+FC20DvtsVGBsMi2ArzaNwg5bVk
-	 UJIdWn+vHQPYc8juD9NnTa5TnDl/Bw97Dt4DPOYHw8xO/jPT0st5vqM2dTssTOnZXI
-	 gyAXZsmWH+tHCCKaZqYgmKl++M7jkh48ll258Xjdsminj3GIfk0yO8jAHheJBA5Nip
-	 ltqEn+yZO5xpw==
-Date: Thu, 17 Sep 2026 13:59:26 -0700
-From: Kees Cook <kees@kernel.org>
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Alexey Gladkov <legion@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>, Paul Walmsley <pjw@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
-	Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <lossin@kernel.org>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Daniel Almeida <daniel.almeida@collabora.com>,
-	Tamir Duberstein <tamird@kernel.org>,
-	Alexandre Courbot <acourbot@nvidia.com>,
-	Onur =?iso-8859-1?Q?=D6zkan?= <work@onurozkan.dev>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, linux-riscv@lists.infradead.org,
-	linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	linux-doc@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v3 09/20] kbuild: implement and use depcheck to check
- dependency timestamps
-Message-ID: <202609171229.31BB336E1@keescook>
-References: <20260917-build-speedup-v3-0-9ecf4163ff36@kernel.org>
- <20260917-build-speedup-v3-9-9ecf4163ff36@kernel.org>
- <202609171117.35BFDCC13@keescook>
+	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="QuaBpeD6"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; h=Content-Transfer-Encoding:Content-Type:From:Cc:To:Subject:
+	MIME-Version:Date:Message-ID:From:Reply-To;
+	bh=RpWZdNHGYoV/6JCrVSKz8y6ytrZaFDnDxpAF1ip5BB0=; b=QuaBpeD6kNNs0NDL9br7Pv641+
+	S1LZkytpjjX4zFGy6uQJmiFf53WqKEvJggJM9Fz0Vq+36RY9zXW2NWJYzHj9ZsLpqrZzVsDpXSdH1
+	M+Towaj8mtbiLL0+vdO+FPmik3ZcIlfAnZgL7q5EH6726fbDQzmwrXoqMVI74blt8dUCv+Q57ZrPu
+	4rcOwFBifSgHEfGQBKnGUDoZkjRL+BzXacQkSVMcZt0c+NBXHDgc8ssJdA/fkQk8/Il9NawvtfShs
+	skfT8YFqmyOHLPBUHWRjguGnj7o8mYbFPSgnxL/4n0D9BFLG0mqU22x9Wb05mUh/0j21YtbvNsIRH
+	J3LnpKUg==;
+Received: from [177.172.123.214] (helo=[192.168.15.100])
+	by fanzine2.igalia.com with esmtpsa 
+	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128) (Exim)
+	id 1x7JaO-003erL-DT; Thu, 17 Sep 2026 23:24:04 +0200
+Message-ID: <e553953e-d784-4eb5-b3fc-6e847b2dfcd1@igalia.com>
+Date: Thu, 17 Sep 2026 18:24:02 -0300
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202609171117.35BFDCC13@keescook>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 00/13] syscalls: Add a shared table for all archs
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Christian Brauner <brauner@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kbuild@vger.kernel.org, kernel-dev@igalia.com,
+ Masami Hiramatsu <mhiramat@kernel.org>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ linux-alpha@vger.kernel.org, linux-s390@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, soc@lists.linux.dev,
+ linux-mips@vger.kernel.org, sparclinux@vger.kernel.org
+References: <20260828-tonyk-syscall_table-v6-0-fdd358456cf1@igalia.com>
+ <95b693c0-ca51-4355-99ba-2b37a1ab2169@app.fastmail.com>
+ <6fa4e1e3-c023-465c-9490-ce2f18ffaa91@igalia.com>
+ <5aedf90f-d30d-4f55-b066-dd8fdf3ff8f9@app.fastmail.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
+In-Reply-To: <5aedf90f-d30d-4f55-b066-dd8fdf3ff8f9@app.fastmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, Sep 17, 2026 at 11:42:50AM -0700, Kees Cook wrote:
-> On Thu, Sep 17, 2026 at 05:06:19PM +0100, Lorenzo Stoakes (ARM) wrote:
-> > This can be done faster in C, so implement scripts/basic/depcheck to do so.
-> >
-> > It does as little work as possible, reading the .cmd files from a
-> > directory's targets and running stat on each dependency only a single time.
+Em 17/09/2026 02:55, Arnd Bergmann escreveu:
+> On Thu, Sep 17, 2026, at 00:19, André Almeida wrote:
+>> Em 15/09/2026 04:45, Arnd Bergmann escreveu:
+>>> On Sat, Aug 29, 2026, at 01:19, André Almeida wrote:
+>>
+>> Thanks for testing! I believe I found a simple solution for this. I
+>> modified syscall_o32.tbl and can confirm it triggers a rebuild now:
+>>
+>> diff --git a/arch/mips/kernel/syscalls/Makefile
+>> b/arch/mips/kernel/syscalls/Makefile
+>> index aaa5443ea906..9e31d1ce5015 100644
+>> --- a/arch/mips/kernel/syscalls/Makefile
+>> +++ b/arch/mips/kernel/syscalls/Makefile
+>> @@ -40,10 +40,10 @@ src_n32 := $(src)/syscall_n.tbl
+>>    src_n64 := $(src)/syscall_n.tbl
+>>    src_o32 := $(src)/syscall_o32.tbl
+>>
+>> -$(kapi)/unistd_nr_%.h: $(systbl_common) $(sysnr) FORCE
+>> +$(kapi)/unistd_nr_%.h: $(systbl_common) $(src_%) $(sysnr) FORCE
+>>           $(call if_changed,sysnr)
+>>
+>> -$(kapi)/syscall_table_%.h: $(systbl) $(systbl_common) FORCE
+>> +$(kapi)/syscall_table_%.h: $(systbl) $(systbl_common) $(src_%) FORCE
+>>           $(call if_changed,systbl)
+> 
+> I had tried the same thing already, but in my testing, it did
+> not rebuild after changing the syscall_n.tbl file, only the
+> syscall_o32.tbl file. Can you verify that your change rebuilds
+> all nine files in the correct cases?
 >
-> Doesn't this run the risk of missing transitive deps?
->
-> C.cmd:	C.o depends on A.c and B.c and B.h
-> B.cmd:	B.h depends on B.data and B.script
->
-> depcheck looks at C.o and B.h's times and is happy so it drops C.cmd file,
-> but then see B.script has changed compared to B.h, so it keeps B.cmd,
-> and then the build runs and doesn't have the C.o dep list any more,
-> and C.o goes unbuilt?
->
-> Also, I don't think this handles if_changed commands at all? The kbuild
-> rebuild condition is timestamps plus if_changed's command-line check.
+After a more careful look, I have found out a couple of issues:
 
-tl;dr: I spent way too long looking at this. I think my conclusion is
-"Hm, this makes some cases of missed Makefile deps on generated files
-harder to find, but there don't *appear* to be any obviously wrong
-instances of this in the tree."
+- The first one, the one that the build bot originally warned as about 
+this outdated rule:
 
-Long version:
+  $(uapi)/unistd_%.h: $(src)/syscall_%.tbl $(syshdr) FORCE
+  	$(call if_changed,syshdr)
 
-There does appear to be a problem in the case of generated targets where
-the Makefile deps are build-order correct but lack explicit deps. As
-in, a clean build generates the needed dependencies due to some prior
-explicit Makefile rule dependency, and a later source-level "#include"
-for the generated file exists (and the build doesn't fail since the
-included file got generated before the source that "#include"d it got
-built), and then the normal dep tracking (-Wp,-MMD,... -> .cmd) catches
-it and any direct changes to that dep would normally get noticed going
-forward on incremental builds.
+$(src)/syscall_%.tbl doesn't make anymore for n32 and n64, and needed to 
+be updated.
 
-However, with the depcheck .cmd pruning, changes to transitive deps
-(either via file contents or Kconfig options) will go unnoticed during
-incremental builds without that explicit dep (but stock doesn't miss
-it). Though actually it's kind of worse because it'll get noticed on
-rebuild #N+1 for N level of transitive depth, so something will break,
-and then you build again, and the changes from 2 builds ago suddenly
-get rebuilt...
+- Secondly, $(src_%) doesn't work as I expected. % only works like this 
+for files (like syscall_%.tbl). For variables, the correct form is 
+$(src_$*). Now the pattern matching started working and generating 
+$(src_n32), $(src_n64), ...
 
-I think you maybe encountered an instance of this in your series, too,
-but it got exposed due to a clean build no longer having the ordering
-correct:
-https://lore.kernel.org/lkml/20260917-build-speedup-v3-18-9ecf4163ff36@kernel.org/
+- Finally, this wasn't enough either. Due to how make works[1], the 
+variable was being generated but it wasn't being evaluated. So I had to 
+add the .SECONDEXPANSION target to finally make it work, resulting on 
+those rules:
 
-See the trailing diff for a demo:
+.SECONDEXPANSION:
 
+$(uapi)/unistd_%.h: $(systbl_common) $$(src_$$*) $(syshdr) FORCE
+	$(call if_changed,syshdr)
 
-  git apply demo.diff
-  make O=b defconfig
-  # simulate a earlier-stage header generation...
-  make O=b lib/byfile_anchor.o lib/byconf_anchor.o
-  make O=b lib/
+$(kapi)/unistd_nr_%.h: $(systbl_common) $$(src_$$*) $(sysnr) FORCE
+	$(call if_changed,sysnr)
 
-  # trigger 1: the header's input file changes
-  echo FROMFILE-two > lib/byfile_gen.in
-  make O=b lib/
+$(kapi)/syscall_table_%.h: $(systbl) $(systbl_common) $$(src_$$*) FORCE
+	$(call if_changed,systbl)
 
-  # trigger 2: a Kconfig value changes; no file is touched
-  ./scripts/config --file b/.config --set-str LOCALVERSION -demo2
-  make O=b lib/
+And now, testing updating the tables:
 
-  # what each object ended up holding
-  strings b/lib/byfile_anchor.o | grep FROMFILE-    # FROMFILE-two   both trees
-  strings b/lib/byfile_victim.o | grep FROMFILE-    # FROMFILE-two   stock
-                                                    # FROMFILE-one   patched  <-- stale
+$ touch arch/mips/kernel/syscalls/syscall_o32.tbl
+$ make -j31 W=1 O=mips ARCH=mips LLVM=1 prepare | grep SYS
+   SYSHDR  arch/mips/include/generated/uapi/asm/unistd_o32.h
+   SYSTBL  arch/mips/include/generated/asm/syscall_table_o32.h
+   SYSNR   arch/mips/include/generated/asm/unistd_nr_o32.h
 
-  strings b/lib/byconf_anchor.o | grep CONF-        # CONF--demo2    both trees
-  strings b/lib/byconf_victim.o | grep CONF-        # CONF--demo2    stock
-                                                    # CONF-          patched  <-- stale
+$ touch arch/mips/kernel/syscalls/syscall_n.tb
+$ make -j31 W=1 O=mips ARCH=mips LLVM=1 prepare | grep SYS
+   SYSHDR  arch/mips/include/generated/uapi/asm/unistd_n32.h
+   SYSHDR  arch/mips/include/generated/uapi/asm/unistd_n64.h
+   SYSTBL  arch/mips/include/generated/asm/syscall_table_n32.h
+   SYSTBL  arch/mips/include/generated/asm/syscall_table_n64.h
+   SYSNR   arch/mips/include/generated/asm/unistd_nr_n32.h
+   SYSNR   arch/mips/include/generated/asm/unistd_nr_n64.h
 
+$ touch scripts/syscall_common.tbl
+$ make -j31 W=1 O=mips ARCH=mips LLVM=1 prepare | grep SYS
+   SYSHDR  arch/mips/include/generated/uapi/asm/unistd_n32.h
+   SYSHDR  arch/mips/include/generated/uapi/asm/unistd_n64.h
+   SYSHDR  arch/mips/include/generated/uapi/asm/unistd_o32.h
+   SYSTBL  arch/mips/include/generated/asm/syscall_table_n32.h
+   SYSTBL  arch/mips/include/generated/asm/syscall_table_n64.h
+   SYSTBL  arch/mips/include/generated/asm/syscall_table_o32.h
+   SYSNR   arch/mips/include/generated/asm/unistd_nr_n32.h
+   SYSNR   arch/mips/include/generated/asm/unistd_nr_n64.h
+   SYSNR   arch/mips/include/generated/asm/unistd_nr_o32.h
 
-This means adding depcheck would silently expose any current (and future)
-missing explicit deps on generated files where those files get generated
-by either an earlier build stage or an earlier rule. :(
+I will send a v7 with this changes for mips.
 
-I went looking for the kind of missed Makefile dep for a generated file,
-and while it's not a very grep-able condition, I did look at stuff that
-fell into include/generated/, but it's safe due to the prepare/archprepare
-ordering AFAICT. So then I looked at places where -I had $(obj) added to
-it, and all of those seemed to have explicit Makefile deps too. Well, all
-except for arch/x86/boot/compressed/sev-handle-vc.c which includes
-"../../lib/inat.c" but that seems safe today due to ordering from
-arch/x86/lib/ being needed before arch/x86/boot/compressed/.
+Thanks!
 
-So, yeah, it makes me nervous, and it may make incremental builds less
-idempotent. But I can't really find extant problems and the demo is
-slightly contrived, but not exactly an impossible situation.
-
--Kees
-
-
-diff --git a/lib/Makefile b/lib/Makefile
-index dfab958327c5c..aed0bd9eb7d6a 100644
---- a/lib/Makefile
-+++ b/lib/Makefile
-@@ -350,3 +350,36 @@ CONTEXT_ANALYSIS_test_context-analysis.o := y
- obj-$(CONFIG_CONTEXT_ANALYSIS_TEST) += test_context-analysis.o
- 
- subdir-$(CONFIG_FORTIFY_SOURCE) += test_fortify
-+
-+# --- depcheck demo ---
-+obj-y += byfile_anchor.o byfile_victim.o byconf_anchor.o byconf_victim.o
-+
-+quiet_cmd_byfile = GENFILE $@
-+      cmd_byfile = printf '\#define BYFILE_STR "%s"\n' "$$(cat $<)" > $@
-+
-+quiet_cmd_byconf = GENCONF $@
-+      cmd_byconf = printf '\#define BYCONF_STR "CONF-%s"\n' '$(CONFIG_LOCALVERSION)' > $@
-+
-+# Regenerated when its input file changes.
-+$(obj)/byfile_gen.h: $(src)/byfile_gen.in FORCE
-+	$(call if_changed,byfile)
-+
-+# No input file: regenerated only when its command line changes, which here
-+# means when CONFIG_LOCALVERSION changes. No file is touched.
-+$(obj)/byconf_gen.h: FORCE
-+	$(call if_changed,byconf)
-+
-+targets += byfile_gen.h byconf_gen.h
-+
-+# The anchors declare the dependency. That is what generates the headers on
-+# a clean build: fixdep only records a header once the object has compiled
-+# successfully, so on a first build there is no .cmd file to rely on. The
-+# victims include the same headers without declaring them, so the only
-+# record of that edge is the deps_ list in their .cmd files.
-+$(obj)/byfile_anchor.o: $(obj)/byfile_gen.h
-+$(obj)/byconf_anchor.o: $(obj)/byconf_gen.h
-+
-+CFLAGS_byfile_anchor.o += -I$(obj)
-+CFLAGS_byfile_victim.o += -I$(obj)
-+CFLAGS_byconf_anchor.o += -I$(obj)
-+CFLAGS_byconf_victim.o += -I$(obj)
-diff --git a/lib/byconf_anchor.c b/lib/byconf_anchor.c
-new file mode 100644
-index 0000000000000..8035eaa352a3b
---- /dev/null
-+++ b/lib/byconf_anchor.c
-@@ -0,0 +1,3 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include "byconf_gen.h"
-+const char byconf_anchor_marker[] = BYCONF_STR;
-diff --git a/lib/byconf_victim.c b/lib/byconf_victim.c
-new file mode 100644
-index 0000000000000..285a8de8bdf6e
---- /dev/null
-+++ b/lib/byconf_victim.c
-@@ -0,0 +1,3 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include "byconf_gen.h"
-+const char byconf_victim_marker[] = BYCONF_STR;
-diff --git a/lib/byfile_anchor.c b/lib/byfile_anchor.c
-new file mode 100644
-index 0000000000000..9ea0b8ad55963
---- /dev/null
-+++ b/lib/byfile_anchor.c
-@@ -0,0 +1,3 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include "byfile_gen.h"
-+const char byfile_anchor_marker[] = BYFILE_STR;
-diff --git a/lib/byfile_gen.in b/lib/byfile_gen.in
-new file mode 100644
-index 0000000000000..7da9e5e0cd83c
---- /dev/null
-+++ b/lib/byfile_gen.in
-@@ -0,0 +1 @@
-+FROMFILE-one
-diff --git a/lib/byfile_victim.c b/lib/byfile_victim.c
-new file mode 100644
-index 0000000000000..763c5ef8f1514
---- /dev/null
-+++ b/lib/byfile_victim.c
-@@ -0,0 +1,3 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include "byfile_gen.h"
-+const char byfile_victim_marker[] = BYFILE_STR;
-
-
--- 
-Kees Cook
+[1] 
+https://www.gnu.org/software/make/manual/html_node/Secondary-Expansion.html
