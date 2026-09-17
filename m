@@ -1,42 +1,50 @@
-Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.avm.de (mail.avm.de [212.42.244.120])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1DCC477995;
-	Thu, 17 Sep 2026 09:05:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCBA94D09FF;
+	Thu, 17 Sep 2026 10:54:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789635939; cv=none; b=FEsXa9+0pDWQN6eS+MlIUhHZ2b39rnA0KnmdTgecqAKITZ+8UqXorD4u0xXAuun7LlEwD6XK6sgHjye/bk3OqyZnVaGQT9bMXalEfkpdU5v6t+tIOD6DA6SJA/XXHAgdKvr8mADLur5sD6QZCxqKUhPHwvHE6XbEQzuG+1uAsAg=
+	t=1789642479; cv=none; b=a+zY8L9k/tCoCCQmvRCE6sUlGZVf4dVoUDlTM+kWrxNCnmupboysbRgRrdUd3JTvrWtJP1mbLuj+UK40b4rMkDzxtrchetr3sl3Jjtg+/RQyzdkGSFLd73/uzl+Unn19lBoff5WPYOrJ/0qXr1xqFC5lbDVeErKle4zJ5CYswEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789635939; c=relaxed/simple;
-	bh=GsZPMKs8GBT4W2PsqKyej5smhTaCdg5BURTN9kF97gc=;
+	s=arc-20240116; t=1789642479; c=relaxed/simple;
+	bh=rG1ZzCQXpx4b8hj/Kqe4tHrseuayAXL0p9ByZXOgmFQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F9bH6kHCTDqtqDw0iOcYHd1Lh+iE5js8yZZ2gNFWdHVd7ZyuN17MdRTbBaifghaozJQWImibod212PeUPeKSC55g4vEc/piJu4b5xuPUBvDYUYu2SyUa5nG7rW5+43GfStu5tr7+hpXUlcycrpfCtu5cEjtLSWR+ICBSlYTzZhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=T8I9EG4I; arc=none smtp.client-ip=159.69.126.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
+	 Content-Type:Content-Disposition:In-Reply-To; b=rcWPqMBzkuP0mtkQXqFqqA9439end+3t8gk5dtnSWu7ngzTIheezVsH8z6p0Wq2Z+UJZqezZvbafdyNIW7tkf+TCj9l6WrIxWF+SwYO1HMjwAHhHVL63J/1h3w1HaT65JwFUOFV2yoiKRYsIDmc1kk2wlUnRXVe36fuYlcVQNlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com; spf=pass smtp.mailfrom=fritz.com; dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b=Mnn8+OoB; arc=none smtp.client-ip=212.42.244.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fritz.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="T8I9EG4I"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-	s=mail; t=1789635933;
-	bh=GsZPMKs8GBT4W2PsqKyej5smhTaCdg5BURTN9kF97gc=;
+	dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b="Mnn8+OoB"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fritz.com; s=mail;
+	t=1789642448; bh=rG1ZzCQXpx4b8hj/Kqe4tHrseuayAXL0p9ByZXOgmFQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=T8I9EG4IZaakZ1Z12F7CG+97kxpVOHLPIKd4sX0HUMmWwH8rONj/4G8KH+svFwR4i
-	 lQqIZYGwz/eghMd00Ai+RMQ6SsPfdSxtMkAvJrLFaDETcV09izinKueRWLhd9/d0oB
-	 l6h29bWfejLsYScD7MpIZ9qDxrHbQrVXBcv93wn4=
-Date: Thu, 17 Sep 2026 11:05:32 +0200
-From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Randy Dunlap <rdunlap@infradead.org>, 
-	Jani Nikula <jani.nikula@intel.com>, linux-kernel@vger.kernel.org, 
-	Linus Torvalds <torvalds@linux-foundation.org>, Nicolas Schier <nsc@kernel.org>, 
-	Jason Gunthorpe <jgg@nvidia.com>, Masahiro Yamada <masahiroy@kernel.org>, 
+	b=Mnn8+OoB2dxJ6zQ+ECtRl7Lszj1/yg7RPlu3RdeooNAMdJDRvjaOwjCaeIe47tWsW
+	 kdo3+q61plhMx7FLd5OYc9WXFiNw8el86v489dlICP8Uf37wgRqSIDEljxfNyamBJe
+	 jU111wCg+gjx4pnrhokctcNLtjSoLvt7JvG0x2auugf3/xJ9ssMvnwqFujCTaqlAys
+	 R9iN2rV12ZwvVOHF0fwRiy6gA2+qXg5gaT8klwH1Ar6mDytGQ+NTrDdSnHZ7M/13KL
+	 1iittE4/OcqM6qO6u1pgEYhQk0/uUAuhGEAs5dHL4jhfan04f3VoeNe23VjH71ZWWo
+	 goLPQ88CRil3g==
+Received: from [212.42.244.78] (helo=mail.avm.de)
+	by mail.avm.de with ESMTP (eXpurgate 4.57.1)
+	(envelope-from <n.schier@fritz.com>)
+	id 6aabc6d0-0449-7f0000032729-7f000001ea08-1
+	for <multiple-recipients>; Thu, 17 Sep 2026 12:54:08 +0200
+Received: from mail-auth.fritz.com (unknown [212.42.244.78])
+	by mail.avm.de (Postfix) with ESMTPS;
+	Thu, 17 Sep 2026 12:54:08 +0200 (CEST)
+Date: Thu, 17 Sep 2026 12:54:07 +0200
+From: Nicolas Schier <n.schier@fritz.com>
+To: Julian Braha <julianbraha@gmail.com>
+Cc: nathan@kernel.org, nico@fluxnic.net, rdunlap@infradead.org,
+	grahamr@qti.qualcomm.com, kees@kernel.org, pengpeng@iscas.ac.cn,
+	vegard.nossum@oracle.com, linux-kernel@vger.kernel.org,
 	linux-kbuild@vger.kernel.org
-Subject: Re: [PATCH] kbuild: add header check facility as a manually run
- static analyzer
-Message-ID: <71a8b988-3977-44e4-93d6-782e4447f160@t-8ch.de>
-References: <20260915104331.255636-1-jani.nikula@intel.com>
- <211fcac1-d85d-4680-8e55-598b2064a002@infradead.org>
- <20260916231319.GA550816@ax162>
+Subject: Re: [PATCH v2 1/5] kconfig: promote invalid numeric reference from
+ warning to error
+Message-ID: <20260917-proficient-swift-of-masquerade-0ff7ce@l-nschier-aarch64>
+References: <20260915211508.291790-1-julianbraha@gmail.com>
+ <20260915211508.291790-2-julianbraha@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -45,97 +53,88 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260916231319.GA550816@ax162>
+In-Reply-To: <20260915211508.291790-2-julianbraha@gmail.com>
+Organization: FRITZ! Technology GmbH
+x-ms-reactions: disallow
+X-purgate-ID: 149429::1789642448-407E6965-D671F190/0/0
+X-purgate-type: clean
+X-purgate-size: 3052
+X-Notice: Whitelisted
+X-purgate: This mail is considered clean (visit https://www.eleven.de for further information)
+X-purgate: clean
+X-pfmilter: host: postfix-mx-01  mail-id: 0D27BA07DC  external: no
 
-On 2026-09-16 16:13:19-0700, Nathan Chancellor wrote:
-> On Wed, Sep 16, 2026 at 03:24:09PM -0700, Randy Dunlap wrote:
-> > On 9/15/26 3:43 AM, Jani Nikula wrote:
-> > > There have been various attempts at adding a header test or check
-> > > mechanism in the kernel build system. The header check primarily
-> > > consists of ensuring headers are self-contained, have include guards,
-> > > and, in some cases, pass kernel-doc.
-> > > 
-> > > The main problems have been:
-> > > 
-> > > - The dependency tracking creates undesirable artefacts (infamously also
-> > >   known as disgusting turds) in the build directory.
-> > > 
-> > > - Gating the feature behind a kconfig option is complicated due to
-> > >   allyesconfig builds. It's possible, but requires a verbose and
-> > >   confusing negative proxy config option.
-> > > 
-> > > - Naming the dependency tracking files with a dot prefix or placing them
-> > >   in a dot prefixed subdirectory in the build directory to hide them has
-> > >   been exceedingly difficult to achieve. (In part due to some Makefiles
-> > >   building files in subdirectory hierarchies.)
-> > > 
-> > > - The debate which headers, if any, should really be self-contained is
-> > >   virtually open-ended.
-> > 
-> > I would expect that headers in include/uapi/*.h should be self-contained,
-> > but apparently that's just a pipe dream on my part, or maybe it's just
-> > a maintainer option.
-> > 
-> > With 'make HEADER_CHECK="include/uapi/" headercheck'
-> > I see over 70 errors (mostly typedefs or defined constants, but not only
-> > those), such as:
-> > 
-> > In file included from <command-line>:
-> > ./../include/uapi/linux/hdlc/ioctl.h:74:21: error: ‘IFNAMSIZ’ undeclared here (not in a function)
-> >    74 |         char master[IFNAMSIZ];  /* Name of master FRAD device */
-> >       |                     ^~~~~~~~
-> > In file included from <command-line>:
-> > ./../include/uapi/linux/input.h:29:6: warning: ‘__BITS_PER_LONG’ is not defined, evaluates to ‘0’ [-Wundef]
-> >    29 | #if (__BITS_PER_LONG != 32 || !defined(__USE_TIME_BITS64)) && !defined(__KERNEL__)
-> >       |      ^~~~~~~~~~~~~~~
-> > ./../include/uapi/linux/input.h:34:9: error: unknown type name ‘__kernel_ulong_t’
-> >    34 |         __kernel_ulong_t __sec;
-> >       |         ^~~~~~~~~~~~~~~~
-> > In file included from ./../include/uapi/linux/papr_pdsm.h:14,
-> >                  from <command-line>:
-> > ../include/linux/ndctl.h:19:33: error: ‘PAGE_SIZE’ undeclared here (not in a function)
-> >    19 |         ND_MIN_NAMESPACE_SIZE = PAGE_SIZE,
-> >       |                                 ^~~~~~~~~
-> > In file included from <command-line>:
-> > ./../include/uapi/linux/patchkey.h:15:2: error: #error "patchkey.h included directly"
-> >    15 | #error "patchkey.h included directly"
-> >       |  ^~~~~
-> > In file included from <command-line>:
-> > include/uapi/xen/gntdev.h:159:25: error: unknown type name ‘grant_ref_t’
-> >   159 |                         grant_ref_t ref;
-> >       |                         ^~~~~~~~~~~
-> > include/uapi/xen/gntdev.h:161:25: error: unknown type name ‘domid_t’
-> >   161 |                         domid_t domid;
-> >       |                         ^~~~~~~
+On Tue, Sep 15, 2026 at 10:15:04PM +0100, Julian Braha wrote:
+> The Kconfig interpreter already warns if a numeric option attempts to use
+> a non-numeric option (bool, tristate, or string) to set its value (for
+> example, with a 'default' or 'range').
 > 
-> include/uapi already has its own header checking infrastructure under
-> CONFIG_UAPI_HEADER_TEST and usr/include/Makefile, which avoids this with
-> a no-header-test list that includes many of the files listed in these
-> messages. To be honest, we should probably forbid HEADER_CHECK from
-> including 'include/uapi' and refer people to use CONFIG_UAPI_HEADER_TEST
-> instead, as there are other differences like being built under a
-> different C standard or C++ and such that the existing infrastructure
-> handles.
+> Since there is nowhere in the tree that attempts this, we can safely
+> promote this check from warning to error.
+> 
+> Assisted-by: LLM
+> Signed-off-by: Julian Braha <julianbraha@gmail.com>
+> ---
+>  scripts/kconfig/lkc.h                         |  2 +-
+>  scripts/kconfig/menu.c                        | 39 ++++++----
+>  scripts/kconfig/parser.y                      |  2 +-
+>  .../tests/err_num_non_numeric_ref/Kconfig     | 75 +++++++++++++++++++
+>  .../tests/err_num_non_numeric_ref/__init__.py |  9 +++
+>  .../err_num_non_numeric_ref/expected_stderr   | 14 ++++
+>  6 files changed, 126 insertions(+), 15 deletions(-)
+>  create mode 100644 scripts/kconfig/tests/err_num_non_numeric_ref/Kconfig
+>  create mode 100644 scripts/kconfig/tests/err_num_non_numeric_ref/__init__.py
+>  create mode 100644 scripts/kconfig/tests/err_num_non_numeric_ref/expected_stderr
+> 
+> diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
+> index 7e6f6ca299cf..bbc99f75b416 100644
+> --- a/scripts/kconfig/lkc.h
+> +++ b/scripts/kconfig/lkc.h
+> @@ -89,7 +89,7 @@ struct property *menu_add_prompt(enum prop_type type, const char *prompt,
+>  				 struct expr *dep);
+>  void menu_add_expr(enum prop_type type, struct expr *expr, struct expr *dep);
+>  void menu_add_symbol(enum prop_type type, struct symbol *sym, struct expr *dep);
+> -void menu_finalize(void);
+> +int menu_finalize(void);
+>  void menu_set_type(int type);
+>  
+>  extern struct menu rootmenu;
+> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+> index 9c079e92a9ed..99a57ce0fdc9 100644
+> --- a/scripts/kconfig/menu.c
+> +++ b/scripts/kconfig/menu.c
+> @@ -240,11 +240,12 @@ static int menu_validate_number(struct symbol *sym, struct symbol *sym2)
+>  	       (sym2->type == S_UNKNOWN && sym_string_valid(sym, sym2->name));
+>  }
+>  
+> -static void sym_check_prop(struct symbol *sym)
+> +static int sym_check_prop(struct symbol *sym)
+>  {
+>  	struct property *prop;
+>  	struct symbol *sym2;
+>  	char *use;
+> +	int errors = 0;
+>  
+>  	for (prop = sym->prop; prop; prop = prop->next) {
+>  		switch (prop->type) {
+> @@ -258,10 +259,13 @@ static void sym_check_prop(struct symbol *sym)
+>  				break;
+>  			sym2 = prop_get_symbol(prop);
+>  			if (sym->type == S_HEX || sym->type == S_INT) {
+> -				if (!menu_validate_number(sym, sym2))
+> -					prop_warn(prop,
+> -					    "'%s': number is invalid",
+> -					    sym->name);
+> +				if (!menu_validate_number(sym, sym2)) {
+> +					fprintf(stderr,
+> +						"%s:%d: error: '%s': number is invalid\n",
+> +						prop->filename, prop->lineno,
+> +						sym->name);
 
-Testing the UAPI headers here too would still be valuable.
-CONFIG_UAPI_HEADER_TEST tests the headers from the perspective of
-userspace after they have undergone processing. The kernel build
-might see the same headers quite differently.
+I think it would be reasonable to add a prop_err() function for that.  
+But that's a possible follow-up.
 
-For instance the example from above:
+Reviewed-by: Nicolas Schier <n.schier@fritz.com>
 
-./../include/uapi/linux/input.h:29:6: warning: ‘__BITS_PER_LONG’ is not defined, evaluates to ‘0’ [-Wundef]
-   29 | #if (__BITS_PER_LONG != 32 || !defined(__USE_TIME_BITS64)) && !defined(__KERNEL__)
-      |      ^~~~~~~~~~~~~~~
-./../include/uapi/linux/input.h:34:9: error: unknown type name ‘__kernel_ulong_t’
-   34 |         __kernel_ulong_t __sec;
-      |         ^~~~~~~~~~~~~~~~
-
-These are legitimate issues, the inclusion of the necessary header is
-gated behind #ifndef __KERNEL__ although it should not be.
-
-(...)
-
-
-Thomas
+-- 
+Nicolas
