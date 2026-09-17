@@ -1,102 +1,119 @@
-Received: from mail.avm.de (mail.avm.de [212.42.244.94])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E6C24DE702;
-	Thu, 17 Sep 2026 16:37:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.94
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DD0D4F68BF;
+	Thu, 17 Sep 2026 16:52:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789663023; cv=none; b=Hr5NonPwDGLivmMhEkpLZQfDrSeM9hW+19B41W44MnIC9BrBCyPr72Y+54SPHCn9KgrCRkaHAreTtUorD6DDY6bhh2PioFz/NAmvytWJMJdINJTNGc1WqxDKUYdS0l8rrRHpIP3unTxm1IdSevOJWsan1Uf1a7rz/NihifhEk7c=
+	t=1789663954; cv=none; b=BePlOYkIpSGpD+I7Pgh9ROfA9o+jIio9RTUjVT8IRUeCTULXb1w3ollrIL2sKJri8RZK1YqCNI6W9lahJ+YXA5zKBeothxhHrL5UkirYM5Cr+qAFlS4GMutAS8F62yvCIUemkvOGOOG7mw03zZ1bwNilwsmanI43LWuaJkM3lwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789663023; c=relaxed/simple;
-	bh=efcdlNaQan0hBB/M7eIj7YYFKXbfh006qzGcRCypXVE=;
+	s=arc-20240116; t=1789663954; c=relaxed/simple;
+	bh=7X4pBO5Gfn34VCD0w+WxEYTb4YRWIG1+GLdVToPUjuE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MvGDT4/+/VcA3mvbvVRqRglL9GAa6xLg99OGRoekYqousFoBcYvojHk5k78Sz8iUXHhmd6GmAW0ppkvNWq8OIeNVoHrk3LEnAIlC9sHkIjo+T0G5NRCYZPyrGmxFQpcjNbsPe3ZTqAhTHksFlAjjz8D/flL3eisal8zx+MjTduM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com; spf=pass smtp.mailfrom=fritz.com; dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b=MeGoYymD; arc=none smtp.client-ip=212.42.244.94
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fritz.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=t7dr0WG+0E/F/06MrUfeky4KBv0w+r13prrosoQZLrZY1WKSPwfm4a5YOhzmmng+Y0coUXf//rQztJ5gAm+2IJpKANJ+9oKBxt1JZuBC2BeDiru1VM5ZOzaNog7jUdsdJMXailUlL7pdH0mxAaTgSVgFUusIcNEj9gHvcJfEIa0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ijR8wbuK; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b="MeGoYymD"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fritz.com; s=mail;
-	t=1789663017; bh=efcdlNaQan0hBB/M7eIj7YYFKXbfh006qzGcRCypXVE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MeGoYymD8X1NQHcTEqzCjiefQkxKn/ZyoX2I/pDdXxyi47s1q4HbgI8r2b7SALi0N
-	 C/0EUjW30XlLxtkq1MQfl8C8kjyAq0UAIGCe7myvJqQxdRAeVnpG0/pjZvOdxKbC/g
-	 J8V9TMdOMKOoBe07/PBKdnO2+w+2b1V9n+mgTrH7F05uyPd1jl6nEIIXd6rl/VvHn7
-	 0SB6o26mKueSbIuBPHMl4iSu+2OdyfceNiG2TOoFsoV1BWer3meiFnIGHBt/iHdnlS
-	 AphwVEMbrvLiqZLpW/wN9Cp3+8bEfPHJnsKKiLBc6U2DvllMWSoaShKIcxRwdLwVU6
-	 PjGeaFQZNlsGA==
-Received: from [2001:bf0:244:244::78] (helo=mail.avm.de)
-	by mail.avm.de with ESMTP (eXpurgate 4.57.1)
-	(envelope-from <n.schier@fritz.com>)
-	id 6aac1729-6dc7-7f0000032729-7f000001d008-1
-	for <multiple-recipients>; Thu, 17 Sep 2026 18:36:57 +0200
-Received: from mail-auth.fritz.com (unknown [IPv6:2001:bf0:244:244::78])
-	by mail.avm.de (Postfix) with ESMTPS;
-	Thu, 17 Sep 2026 18:36:57 +0200 (CEST)
-Date: Thu, 17 Sep 2026 18:36:56 +0200
-From: Nicolas Schier <n.schier@fritz.com>
-To: Julian Braha <julianbraha@gmail.com>
-Cc: nathan@kernel.org, nico@fluxnic.net, rdunlap@infradead.org,
-	grahamr@qti.qualcomm.com, kees@kernel.org, pengpeng@iscas.ac.cn,
-	vegard.nossum@oracle.com, linux-kernel@vger.kernel.org,
-	linux-kbuild@vger.kernel.org
-Subject: Re: [PATCH v2 5/5] kconfig: use unsigned integers for hex range
- checks
-Message-ID: <20260917-nocturnal-dramatic-donkey-e1f8e1@l-nschier-aarch64>
-References: <20260915211508.291790-1-julianbraha@gmail.com>
- <20260915211508.291790-6-julianbraha@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ijR8wbuK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB1FE1F00898;
+	Thu, 17 Sep 2026 16:52:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789663952;
+	bh=6HEIePW/GlQEOC8t0u6x4RNSCvywoj94H5Dv9GmwVto=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=ijR8wbuK+jfGWDzkXgnzvZ2zbZocAjn+YYg2G2izTt209ujOut6uhGYc+G6GX5lg/
+	 Gsx7nEaWC8+EQEKcPf1WJmXyVbPnBLAl8/kbkIWc1ooxh/XzVfvd6j+MKv0rcsIFWt
+	 XuLgs4GNdDKtxqsYTGzyNKMi+OoU5PuCMoK9PvI3mSPATlCkOAyuYNZSl+bntxvupf
+	 9zaaJXZp7TakObvOzc7p4Uuk8jmTwCG6/Hb9i36amD6PLyhqI7RK6+RPeweQi0O37V
+	 N185d8gTHUhEV7vlo36kgNPaz6aVZKuH3qa7AIrFO0Q/lOZq7CZxkaCdoYttrF8ICb
+	 n6NPpwAvriCEA==
+Date: Thu, 17 Sep 2026 09:52:32 -0700
+From: Kees Cook <kees@kernel.org>
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Alexey Gladkov <legion@kernel.org>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>, Paul Walmsley <pjw@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
+	Gary Guo <gary@garyguo.net>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Daniel Almeida <daniel.almeida@collabora.com>,
+	Tamir Duberstein <tamird@kernel.org>,
+	Alexandre Courbot <acourbot@nvidia.com>,
+	Onur =?iso-8859-1?Q?=D6zkan?= <work@onurozkan.dev>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev, linux-riscv@lists.infradead.org,
+	linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org,
+	linux-doc@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v3 01/20] kbuild: do not allocate .modinfo in vmlinux
+Message-ID: <202609170950.480F90A28@keescook>
+References: <20260917-build-speedup-v3-0-9ecf4163ff36@kernel.org>
+ <20260917-build-speedup-v3-1-9ecf4163ff36@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20260915211508.291790-6-julianbraha@gmail.com>
-Organization: FRITZ! Technology GmbH
-x-ms-reactions: disallow
-X-purgate-ID: 149429::1789663017-10C910BC-33EAC6D4/0/0
-X-purgate-type: clean
-X-purgate-size: 1245
-X-purgate: This mail is considered clean (visit https://www.eleven.de for further information)
-X-purgate: clean
-X-pfmilter: host: postfix-mx-03  mail-id: 9A0C2A0816  external: no
+In-Reply-To: <20260917-build-speedup-v3-1-9ecf4163ff36@kernel.org>
 
-On Tue, Sep 15, 2026 at 10:15:08PM +0100, Julian Braha wrote:
-> While 'hex' values should use the bounds of 64-bit unsigned integers, the
-> range values are treated as signed (checks use strtoll).
->=20
-> For example:
->=20
->   config HEX_RANGE
->     hex
->     range 0 0xfffffffffffffffe
->     default 0xffffffffffffffff
->=20
-> the default value should adjust down to the upper bound of
-> 0xfffffffffffffffe, but since the check incorrectly parses both as
-> LLONG_MAX, the value stays at the out-of-range default of
-> 0xffffffffffffffff.
->=20
-> To fix this, let's use a union of signed and unsigned integers to
-> represent both 'int' and 'hex' range values, then use both strtoll and
-> strtoull where appropriate.
->=20
-> Assisted-by: LLM
-> Signed-off-by: Julian Braha <julianbraha@gmail.com>
-> ---
->  scripts/kconfig/symbol.c                      | 41 ++++++++++++++-----
->  .../kconfig/tests/warn_changed_input/Kconfig  |  5 +++
->  .../tests/warn_changed_input/expected_config  |  1 +
->  3 files changed, 36 insertions(+), 11 deletions(-)
->=20
+On Thu, Sep 17, 2026 at 05:06:11PM +0100, Lorenzo Stoakes (ARM) wrote:
+> -# .modinfo in vmlinux.unstripped is aligned to 8 bytes for compatibility with
+> -# tools that expect vmlinux to have sufficiently aligned sections but the
+> -# additional bytes used for padding .modinfo to satisfy this requirement break
+> -# certain versions of kmod with
+> -#
+> -#   depmod: ERROR: kmod_builtin_iter_next: unexpected string without modname prefix
+> -#
+> -# Strip the trailing padding bytes after extracting .modinfo to comply with
+> -# what kmod expects to parse.
 
-Thanks for the whole patch-set, I appreciate your clean-up and=20
-strengthening of kconfig!
+This comment still seems useful here (afaict the stripping is still
+happening with the "sed"). Maybe better to leave it, or future readers
+are left wondering what the sed is for?
 
-Reviewed-by: Nicolas Schier <n.schier@fritz.com>
+>  quiet_cmd_modules_builtin_modinfo = GEN     $@
+> -      cmd_modules_builtin_modinfo = $(cmd_objcopy); \
+> -                                    sed -i 's/\x00\+$$/\x00/g' $@; \
+> -                                    chmod -x $@
+> -
+> -OBJCOPYFLAGS_modules.builtin.modinfo := -j .modinfo -O binary
+> +      cmd_modules_builtin_modinfo = $(OBJCOPY) -O binary -j .modinfo --dump-section .modinfo=$@ $< $@.tmp; \
+> +                                    rm -f $@.tmp; \
+> +                                    sed -i 's/\x00\+$$/\x00/g' $@
 
-Kind regards,
-Nicolas
+Otherwise, looks good. With the comment back (or rewritten):
+
+Reviewed-by: Kees Cook <kees@kernel.org>
+
+-Kees
+
+-- 
+Kees Cook
