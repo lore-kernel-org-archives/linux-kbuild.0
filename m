@@ -1,46 +1,46 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B36A03CD8BF;
-	Thu, 17 Sep 2026 23:48:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 321EC4A2054;
+	Thu, 17 Sep 2026 23:48:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789688909; cv=none; b=XB/3pGM1WIrOloE6zLmdhUVmYlpQUXNxrIqzhdUFbdUZPj3uGor3MznOkPs72Vgog6EH2EQ3/J3nhATpBO0nh9HEG/1of2wW0i6A6qNaJfCAUzkmyrEHH4xQgmoQGahBc/quOFZ7oIfRBMbolH4FcIpKdULiQDNSZK/YGf508E8=
+	t=1789688933; cv=none; b=Ucxwt3f2EH6FGdkQioef6c4Y+eroYE+J6czs98OtWCtRyCd8opp8HF8Srta7fs3voE0Di/Jpi723iae7meV5fNWkmrO+9dOiXZvM5G4jjN/B3DMElTlLNsY6SxBgjXmh3Ipy1067M7KJ27+pFamUqoDF8ucQvDcfHDqZsHQrnBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789688909; c=relaxed/simple;
-	bh=QRhXDSaBqfV0oceWIDO7Is5TLCHIQ0bU9pysuDl02fM=;
+	s=arc-20240116; t=1789688933; c=relaxed/simple;
+	bh=2QI5XfqW3Fdp9U3D1RQKsGKRIOfv+kF48RCvh2y/Rkw=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=LHfPZwPgmDKhofcZK/xwo9G0714mpXcuPDQe712jbZsthrS8an2rMT/8QAg9KWSwj9pNvME8nb+4vgsQ8phUvGCWfcGoCvGcg0NKFg3RxqZ9QGpOjSuYkkbjYMOz39FSxAa5DNZgOd3wHgOX0WFno33OXkG5gH5c9Pi4OpB27vo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hTw9RAZf; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=p5uJZ2mL/bdWdhcplOJkz7xpoJeJmrU9JT8Wp+u2jRoKTU8Tei2rYexf/CpCx7eesdNEggVHGa1sRhjMHyXrs8coQyaF0qZwQqTgJtbq2Kkmh34snYIjdD1MKlHLf3pcodN2GNkk81XM+N0QqVLL6C4+f9dYv4LMMicQOqsZ/go=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IXBuxdF+; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hTw9RAZf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F8301F000FF;
-	Thu, 17 Sep 2026 23:48:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IXBuxdF+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D54EB1F000FF;
+	Thu, 17 Sep 2026 23:48:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789688908;
-	bh=zx67adVBf1rFq0xsxVJ0wMcoaNl0Tl+zmzbVIpQdypY=;
+	s=k20260515; t=1789688931;
+	bh=IPD5K715vR2628pQ37HVcpNaeB/Rh+milt/XThMp+S8=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Date;
-	b=hTw9RAZflubB3YLnVKuq/zh5Yp4Sv9avT5DkZnTIR2l7263jionh6wuPu4VffGZ3Q
-	 dH/H1nGAXlRrymcM4wtsTiDBiWTa9DpvkW+dSAoo76yD6LCNrs55S5zC4qm/Xx/NeS
-	 Sh2g/YucNpmUJFBHcEEdbAmf+HOYNI5AH09XppEi8IfksAfk9CGX+7iyNZNYZcPCkC
-	 1VSgvxfOxQD9hcYzKPvR3fOnhyFjM982BCtHQWDbczu1qOaxJmzzknWNUznWdT4BUt
-	 s+chQ+ArcnVRdkMhDhI+DjKMv/BBGfLui73UWoxorxSrhFtyB1dtTuLQjq/z+ySXCx
-	 GzTvZDnk6z9fQ==
+	b=IXBuxdF+SjzNY3dq9+IwbTiaKzhmGpJ3gI6JnU8WALS41i7ULFjs92fdgbxb/D+Cr
+	 fSmdIBRZcldp6wJYEMyZOpGWFjvVCby+y2H0rbJYRX5+uiRgnLZfEMWvgfIeYk8PjK
+	 +9TXMXvyN/+ASN6VJ9Dk+f8iT3c0+VSSowPLy0FlzOdzJVZolhzqE5aZcoLqCHVqnx
+	 GYSq4f9LS3c7ZX0xENlLKRM1C/E8v+DmwAi/j6sgQ+dvrpBDYVJzvBlhcDL8khe5wu
+	 IAOIzUv/i1kzkBCyYXiVRNIhOc4pqHUfGW4n7ttWGZIdPlVwI1G89luDhcyyVQwxHZ
+	 E9Wa2LwpBHZNQ==
 From: Nathan Chancellor <nathan@kernel.org>
-To: nsc@kernel.org, Julian Braha <julianbraha@gmail.com>
-Cc: geert@linux-m68k.org, xiang@kernel.org, chao@kernel.org, 
- zbestahu@gmail.com, jefflexu@linux.alibaba.com, dhavale@google.com, 
- hongbohbli@tencent.com, guochunhai@vivo.com, michael.bommarito@gmail.com, 
- kees@kernel.org, vegard.nossum@oracle.com, sam@ravnborg.org, 
- u.kleine-koenig@pengutronix.de, mmarek@suse.cz, 
- linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
- Geert Uytterhoeven <geert+renesas@glider.be>
-In-Reply-To: <20260830221129.2668354-1-julianbraha@gmail.com>
-References: <20260830221129.2668354-1-julianbraha@gmail.com>
-Subject: Re: [PATCH] kconfig: fix extra output from savedefconfig on
- out-of-range defaults
-Message-Id: <178968877258.1576026.7591164133280208240.b4-ty@b4>
-Date: Thu, 17 Sep 2026 16:46:12 -0700
+To: Nicolas Schier <nsc@kernel.org>, Erkan Erdem <hexvalid@gmail.com>
+Cc: Julian Braha <julianbraha@gmail.com>, linux-kbuild@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, 
+ Shuah Khan <skhan@linuxfoundation.org>, 
+ Randy Dunlap <rdunlap@infradead.org>, linux-doc@vger.kernel.org, 
+ Nick Desaulniers <ndesaulniers@google.com>, 
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+ Kees Cook <kees@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, 
+ llvm@lists.linux.dev
+In-Reply-To: <20260907103739.23212-1-hexvalid@gmail.com>
+References: <20260907103739.23212-1-hexvalid@gmail.com>
+Subject: Re: [PATCH v2] docs: kconfig: fix shell function syntax in caveats
+Message-Id: <178968892166.1576026.5095321500689226365.b4-ty@b4>
+Date: Thu, 17 Sep 2026 16:48:41 -0700
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -50,17 +50,17 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=906; i=nathan@kernel.org;
- h=from:subject:message-id; bh=QRhXDSaBqfV0oceWIDO7Is5TLCHIQ0bU9pysuDl02fM=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDFlrapxjtOxyHJ5ZiWzkkl7+d1eXUbZkYmlb98OCVcelF
- tfP+nq5o5SFQYyLQVZMkaX6sepxQ8M5ZxlvnJoEM4eVCWQIAxenAEzkxGSG//F+9p4Z78pnJgca
- 7xN0rBVZ0/c5fF7Zs3NeCzwF6vleOzAyLDtwZTn/lRu3d5y8t+7eHU2pqUv/zt0/8brOsmO5k3N
- nB3ADAA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=726; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=2QI5XfqW3Fdp9U3D1RQKsGKRIOfv+kF48RCvh2y/Rkw=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDFlramIMC7sqXa6XH6yT7AhTe7trile1mWpG8KTaf7dqw
+ iM3dgl1lLIwiHExyIopslQ/Vj1uaDjnLOONU5Ng5rAygQxh4OIUgIkcfMTw30Nhc1DypWAOraVr
+ d7L+/Hyz6DHTDK99hSfLfhuvOVsgV83IcDzkb9Zi/mXcuyWvPlD4sfV4Z2HIWdavYgsn+G6bqeg
+ mxQsA
 X-Developer-Key: i=nathan@kernel.org; a=openpgp;
  fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-On Sun, 30 Aug 2026 23:11:29 +0100, Julian Braha wrote:
-> kconfig: fix extra output from savedefconfig on out-of-range defaults
+On Mon, 07 Sep 2026 13:37:37 +0300, Erkan Erdem wrote:
+> docs: kconfig: fix shell function syntax in caveats
 
 Applied to
 
@@ -68,12 +68,8 @@ Applied to
 
 Thanks!
 
-[1/1] kconfig: fix extra output from savedefconfig on out-of-range defaults
-      https://git.kernel.org/kbuild/c/dbe1ae2304a3b
-
-I also reverted the workaround that necessitated this change:
-
-  https://git.kernel.org/kbuild/c/a2a402bd5e5a4fa466d6034e70b18b6ac22f873d
+[1/1] docs: kconfig: fix shell function syntax in caveats
+      https://git.kernel.org/kbuild/c/ff87968e4e564
 
 Please look out for regression or issue reports or other follow up
 comments, as they may result in the patch/series getting dropped or
