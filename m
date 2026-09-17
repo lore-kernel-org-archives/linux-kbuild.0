@@ -1,37 +1,46 @@
-Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C37A49EC6E;
-	Thu, 17 Sep 2026 23:47:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B36A03CD8BF;
+	Thu, 17 Sep 2026 23:48:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789688826; cv=none; b=EfC5WvrTs7o0OCcRa6bagqyx2BIi8YamC2rvk2YmfWvtYsCKxFyCJ0x6FLeCkv0hpuNQN1GTbBuQa6JizLE2FUzqxPuyMuv/3blbYq9zUsAidWSwUOpbpn9qEnH7LyGsaHejF23vZEQU78Yc29y+c6+L8GWSehN+ztr94ANEGf0=
+	t=1789688909; cv=none; b=XB/3pGM1WIrOloE6zLmdhUVmYlpQUXNxrIqzhdUFbdUZPj3uGor3MznOkPs72Vgog6EH2EQ3/J3nhATpBO0nh9HEG/1of2wW0i6A6qNaJfCAUzkmyrEHH4xQgmoQGahBc/quOFZ7oIfRBMbolH4FcIpKdULiQDNSZK/YGf508E8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789688826; c=relaxed/simple;
-	bh=eYxNeCvy4p71IloUWnXnyvA9fBmKrgyjMUcMHXcwN74=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=TxcPeLk5pG68vAHw6rbs3982Wc5lW17c9XBrym6pQrXcXw3x1twfmi5sTST/74F3Chdm+yHaNfJUVSQdkInEAvFJKATphZu4cKclM7QB0TUfot9EQeItnyutBwyRTCGfCZpwnoZAN1avJX+/qvLUShM5B3fWWm+gBBkw+3nmSOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=gheur/nM; arc=none smtp.client-ip=213.97.179.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
+	s=arc-20240116; t=1789688909; c=relaxed/simple;
+	bh=QRhXDSaBqfV0oceWIDO7Is5TLCHIQ0bU9pysuDl02fM=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=LHfPZwPgmDKhofcZK/xwo9G0714mpXcuPDQe712jbZsthrS8an2rMT/8QAg9KWSwj9pNvME8nb+4vgsQ8phUvGCWfcGoCvGcg0NKFg3RxqZ9QGpOjSuYkkbjYMOz39FSxAa5DNZgOd3wHgOX0WFno33OXkG5gH5c9Pi4OpB27vo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hTw9RAZf; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="gheur/nM"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; h=Cc:To:Message-Id:Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Subject:Date:From:From:Reply-To;
-	bh=VjIF0aVYBJ9Ga527Xyl4l3TJ4nkphldiKj6rE37lIV8=; b=gheur/nMPek+i8kLFpvkVHAyoA
-	Y0UoRtj/Js9lo8iylHZauNc3biC/m4IyBCeZEFc0TJNs86xnVEiv1xxx/bmPZIwVZkjhVVq9C9MF1
-	pbg7g2wIOx332nHBJBAB8ZoQrKBpmRV5ZPHuylh8FaLMmjUKT2dzCXSkyY+hhN59WnerlyOQDz8TR
-	Btr3f8CZqUaq6tuAbgrCVtEcxJa8UMOGtvu6K5MyauhJ0lWKBXcc6ZnuSa00FBvVWU2OIbZvV7qM0
-	N1JfphDPeC86odzDoCB/qCIydFWOm3ohvNynmbd5R+hMouNOyjGgVqi+Vq3MMVDOy6WsAmW8/eJ1E
-	d19sqt7A==;
-Received: from [177.172.123.214] (helo=[192.168.15.100])
-	by fanzine2.igalia.com with esmtpsa 
-	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
-	id 1x7Loh-003hU7-Ow; Fri, 18 Sep 2026 01:46:59 +0200
-From: =?utf-8?q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
-Date: Thu, 17 Sep 2026 20:46:16 -0300
-Subject: [PATCH v7 13/13] alpha: Use the common syscall table
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hTw9RAZf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F8301F000FF;
+	Thu, 17 Sep 2026 23:48:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789688908;
+	bh=zx67adVBf1rFq0xsxVJ0wMcoaNl0Tl+zmzbVIpQdypY=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date;
+	b=hTw9RAZflubB3YLnVKuq/zh5Yp4Sv9avT5DkZnTIR2l7263jionh6wuPu4VffGZ3Q
+	 dH/H1nGAXlRrymcM4wtsTiDBiWTa9DpvkW+dSAoo76yD6LCNrs55S5zC4qm/Xx/NeS
+	 Sh2g/YucNpmUJFBHcEEdbAmf+HOYNI5AH09XppEi8IfksAfk9CGX+7iyNZNYZcPCkC
+	 1VSgvxfOxQD9hcYzKPvR3fOnhyFjM982BCtHQWDbczu1qOaxJmzzknWNUznWdT4BUt
+	 s+chQ+ArcnVRdkMhDhI+DjKMv/BBGfLui73UWoxorxSrhFtyB1dtTuLQjq/z+ySXCx
+	 GzTvZDnk6z9fQ==
+From: Nathan Chancellor <nathan@kernel.org>
+To: nsc@kernel.org, Julian Braha <julianbraha@gmail.com>
+Cc: geert@linux-m68k.org, xiang@kernel.org, chao@kernel.org, 
+ zbestahu@gmail.com, jefflexu@linux.alibaba.com, dhavale@google.com, 
+ hongbohbli@tencent.com, guochunhai@vivo.com, michael.bommarito@gmail.com, 
+ kees@kernel.org, vegard.nossum@oracle.com, sam@ravnborg.org, 
+ u.kleine-koenig@pengutronix.de, mmarek@suse.cz, 
+ linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+ Geert Uytterhoeven <geert+renesas@glider.be>
+In-Reply-To: <20260830221129.2668354-1-julianbraha@gmail.com>
+References: <20260830221129.2668354-1-julianbraha@gmail.com>
+Subject: Re: [PATCH] kconfig: fix extra output from savedefconfig on
+ out-of-range defaults
+Message-Id: <178968877258.1576026.7591164133280208240.b4-ty@b4>
+Date: Thu, 17 Sep 2026 16:46:12 -0700
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -39,132 +48,42 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20260917-tonyk-syscall_table-v7-13-f4cd8f8e3265@igalia.com>
-References: <20260917-tonyk-syscall_table-v7-0-f4cd8f8e3265@igalia.com>
-In-Reply-To: <20260917-tonyk-syscall_table-v7-0-f4cd8f8e3265@igalia.com>
-To: Masami Hiramatsu <mhiramat@kernel.org>, Arnd Bergmanon <arnd@arndb.de>
-Cc: Christian Brauner <brauner@kernel.org>, linux-kernel@vger.kernel.org, 
- linux-kbuild@vger.kernel.org, kernel-dev@igalia.com, 
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
- linux-alpha@vger.kernel.org, linux-s390@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, soc@lists.linux.dev, 
- linux-mips@vger.kernel.org, sparclinux@vger.kernel.org, 
- =?utf-8?q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
-X-Mailer: b4 0.15.2
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.17-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=906; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=QRhXDSaBqfV0oceWIDO7Is5TLCHIQ0bU9pysuDl02fM=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDFlrapxjtOxyHJ5ZiWzkkl7+d1eXUbZkYmlb98OCVcelF
+ tfP+nq5o5SFQYyLQVZMkaX6sepxQ8M5ZxlvnJoEM4eVCWQIAxenAEzkxGSG//F+9p4Z78pnJgca
+ 7xN0rBVZ0/c5fF7Zs3NeCzwF6vleOzAyLDtwZTn/lRu3d5y8t+7eHU2pqUv/zt0/8brOsmO5k3N
+ nB3ADAA==
+X-Developer-Key: i=nathan@kernel.org; a=openpgp;
+ fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-Remove some of the duplicated code by using the common syscall number
-table.
+On Sun, 30 Aug 2026 23:11:29 +0100, Julian Braha wrote:
+> kconfig: fix extra output from savedefconfig on out-of-range defaults
 
-Signed-off-by: André Almeida <andrealmeid@igalia.com>
----
- arch/alpha/kernel/syscalls/Makefile    | 14 +++++++---
- arch/alpha/kernel/syscalls/syscall.tbl | 49 ----------------------------------
- arch/alpha/kernel/systbls.S            |  1 +
- 3 files changed, 11 insertions(+), 53 deletions(-)
+Applied to
 
-diff --git a/arch/alpha/kernel/syscalls/Makefile b/arch/alpha/kernel/syscalls/Makefile
-index b265e4bc16c2..03099daff6b9 100644
---- a/arch/alpha/kernel/syscalls/Makefile
-+++ b/arch/alpha/kernel/syscalls/Makefile
-@@ -7,17 +7,23 @@ $(shell mkdir -p $(uapi) $(kapi))
- syscall := $(src)/syscall.tbl
- syshdr := $(srctree)/scripts/syscallhdr.sh
- systbl := $(srctree)/scripts/syscalltbl.sh
-+systbl_common := $(srctree)/scripts/syscall_common.tbl
-+abis := common,__clone3
- 
- quiet_cmd_syshdr = SYSHDR  $@
--      cmd_syshdr = $(CONFIG_SHELL) $(syshdr) --emit-nr $< $@
-+      cmd_syshdr = $(CONFIG_SHELL) $(syshdr) --emit-nr \
-+		   --common-tbl $(systbl_common) --common-offset 110 \
-+		   --abis $(abis) $< $@
- 
- quiet_cmd_systbl = SYSTBL  $@
--      cmd_systbl = $(CONFIG_SHELL) $(systbl) $< $@
-+      cmd_systbl = $(CONFIG_SHELL) $(systbl) \
-+		   --common-tbl $(systbl_common) --common-offset 110 \
-+		   --abis $(abis) $< $@
- 
--$(uapi)/unistd_32.h: $(syscall) $(syshdr) FORCE
-+$(uapi)/unistd_32.h: $(syscall) $(systbl_common) $(syshdr) FORCE
- 	$(call if_changed,syshdr)
- 
--$(kapi)/syscall_table.h: $(syscall) $(systbl) FORCE
-+$(kapi)/syscall_table.h: $(syscall) $(systbl_common) $(systbl) FORCE
- 	$(call if_changed,systbl)
- 
- uapisyshdr-y		+= unistd_32.h
-diff --git a/arch/alpha/kernel/syscalls/syscall.tbl b/arch/alpha/kernel/syscalls/syscall.tbl
-index a41276634923..7066a3920899 100644
---- a/arch/alpha/kernel/syscalls/syscall.tbl
-+++ b/arch/alpha/kernel/syscalls/syscall.tbl
-@@ -463,52 +463,3 @@
- 532	common	getppid				sys_getppid
- # all other architectures have common numbers for new syscall, alpha
- # is the exception.
--534	common	pidfd_send_signal		sys_pidfd_send_signal
--535	common	io_uring_setup			sys_io_uring_setup
--536	common	io_uring_enter			sys_io_uring_enter
--537	common	io_uring_register		sys_io_uring_register
--538	common	open_tree			sys_open_tree
--539	common	move_mount			sys_move_mount
--540	common	fsopen				sys_fsopen
--541	common	fsconfig			sys_fsconfig
--542	common	fsmount				sys_fsmount
--543	common	fspick				sys_fspick
--544	common	pidfd_open			sys_pidfd_open
--545	common	clone3				__clone3
--546	common	close_range			sys_close_range
--547	common	openat2				sys_openat2
--548	common	pidfd_getfd			sys_pidfd_getfd
--549	common	faccessat2			sys_faccessat2
--550	common	process_madvise			sys_process_madvise
--551	common	epoll_pwait2			sys_epoll_pwait2
--552	common	mount_setattr			sys_mount_setattr
--553	common	quotactl_fd			sys_quotactl_fd
--554	common	landlock_create_ruleset		sys_landlock_create_ruleset
--555	common	landlock_add_rule		sys_landlock_add_rule
--556	common	landlock_restrict_self		sys_landlock_restrict_self
--# 557 reserved for memfd_secret
--558	common	process_mrelease		sys_process_mrelease
--559	common  futex_waitv                     sys_futex_waitv
--560	common	set_mempolicy_home_node		sys_set_mempolicy_home_node
--561	common	cachestat			sys_cachestat
--562	common	fchmodat2			sys_fchmodat2
--563	common	map_shadow_stack		sys_map_shadow_stack
--564	common	futex_wake			sys_futex_wake
--565	common	futex_wait			sys_futex_wait
--566	common	futex_requeue			sys_futex_requeue
--567	common	statmount			sys_statmount
--568	common	listmount			sys_listmount
--569	common	lsm_get_self_attr		sys_lsm_get_self_attr
--570	common	lsm_set_self_attr		sys_lsm_set_self_attr
--571	common	lsm_list_modules		sys_lsm_list_modules
--572	common  mseal				sys_mseal
--573	common	setxattrat			sys_setxattrat
--574	common	getxattrat			sys_getxattrat
--575	common	listxattrat			sys_listxattrat
--576	common	removexattrat			sys_removexattrat
--577	common	open_tree_attr			sys_open_tree_attr
--578	common	file_getattr			sys_file_getattr
--579	common	file_setattr			sys_file_setattr
--580	common	listns				sys_listns
--581	common	rseq_slice_yield		sys_rseq_slice_yield
--582	common	fchroot				sys_fchroot
-diff --git a/arch/alpha/kernel/systbls.S b/arch/alpha/kernel/systbls.S
-index 68f3e4f329eb..9a67d29f7818 100644
---- a/arch/alpha/kernel/systbls.S
-+++ b/arch/alpha/kernel/systbls.S
-@@ -7,6 +7,7 @@
- 
- #include <asm/unistd.h>
- 
-+#define __SYSCALL_WITH_COMPAT(nr, native, compat)        __SYSCALL(nr, native)
- #define __SYSCALL(nr, entry) .quad entry
- 	.data
- 	.align 3
+  https://git.kernel.org/pub/scm/linux/kernel/git/kbuild/linux.git kbuild-next-unstable
 
+Thanks!
+
+[1/1] kconfig: fix extra output from savedefconfig on out-of-range defaults
+      https://git.kernel.org/kbuild/c/dbe1ae2304a3b
+
+I also reverted the workaround that necessitated this change:
+
+  https://git.kernel.org/kbuild/c/a2a402bd5e5a4fa466d6034e70b18b6ac22f873d
+
+Please look out for regression or issue reports or other follow up
+comments, as they may result in the patch/series getting dropped or
+reverted. Patches applied to an "unstable" branch are accepted pending
+wider testing in -next and any post-commit review; they will generally
+be moved to the main branch in a week if no issues are found.
+
+Best regards,
 -- 
-2.55.0
+Cheers,
+Nathan
+
 
