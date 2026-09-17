@@ -1,97 +1,93 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E39C4F96BA;
-	Thu, 17 Sep 2026 17:05:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EA3F4E73B4;
+	Thu, 17 Sep 2026 17:17:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789664736; cv=none; b=mdsFYxx+a1nbKMBDg9RhU08Gfbtp2nDFCVkQhmF950I3wiz+KJinAQcAiMGmWpXTZqTV1I5+doqhL3GkJDRlclAFEUqJhEQDKSWpr9u3Mpv+a6MQSdCQ5SlVH/YHQ3wvpo3IDiBnqbvcErcNPs0jjKqrsMnSajiwAXEyYROr1tQ=
+	t=1789665448; cv=none; b=CwvBQA+ml0XUWQBo3pZgPoeGq7dOVx0t5ZJMbq722T399E8OpZXEKAyKCB4vjBC8K2YmyHjP5CIdtlqZeULGgFT9WHibxYezlO4vvDOGN1p2yxqK/yIerLY/wQHVXBla8ho6DGEJBD5LWfKjgoVp1uau9eHdit6k2t/HPAWcW9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789664736; c=relaxed/simple;
-	bh=UfjtGGVZB8Zjt9N1LslczdhI/ntAStI5UUlb12rDfAo=;
+	s=arc-20240116; t=1789665448; c=relaxed/simple;
+	bh=GWp8O5r4DCIIANlxRbbS/fi3T5bn614j4bSW3qUETXs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i8RKsszx5qUWsFP4WA9ZPt6ftyQZUVFDU1vSSF4Rb8Rg7K3CFMABlrkTf2mNq/tmkKjFw1ZEi5jZQ0fGgv3syOTNkBrYstJEmWoywvLyG0MmMm6xQ/PjWXr7dRb1BhprnIPBgDGl9huTSut97X7ubCE44Ao3UHCOowSXk1j1GUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a1oY5QbB; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=nidL9U4xMhTm6V+XT9pB4e/5+MxVI09MRSUQUP7SD+5fKx5dcPP9j2zXT8y6IwBoLWEindWRDpoKbY8vr/8Mb0GKWyFXaxpD5UYpzBMFbvkSMkfcQjv6ivdfyZtaYYVqIyopZmcFtgiX/RDkN33m5NM7vT78jBdKj5o27fXY4qk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IAT+XIos; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a1oY5QbB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF5991F000FF;
-	Thu, 17 Sep 2026 17:05:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IAT+XIos"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC5801F000FF;
+	Thu, 17 Sep 2026 17:17:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789664735;
-	bh=9T6Ai0DaSY41m9xsiEy+SvRmsf3fqO2EjjY5HGGOdHY=;
+	s=k20260515; t=1789665446;
+	bh=vmvHzDWg6YMgBhgGgqWjXs2Rz4Hi0WH1lg4V2JgejHE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=a1oY5QbBgj0PgVTxIAleOAevncrWdI0JjDRKRIjUk+L7L0Qclrqrv/W6tH1fiTwbn
-	 jcLKeMW+4oZiygidx8l8R1v9pjrdcr2hgTaP4n61WG3Jjoiyn1z8s1izXab8yOTxSx
-	 rZj6mayKixcNOV1Q1vLTDtSa1iiLwGhudrq1Jj1HJGFGF6LPjeLei7ldBzZZlateWj
-	 XYA33AViCuP9r6hvgJjnNStdeSBGzmCJzcD39hRRcu+RkgR28pi1TEFEoen/Bj8J0w
-	 MCd1iy582tIarlE019Chz91CYupTlf7jXjPVYiBjYrBPmrVjc+STbQYOjEkXJpI0Lz
-	 0BMVtVLMfj2zQ==
-Date: Thu, 17 Sep 2026 10:05:34 -0700
-From: Kees Cook <kees@kernel.org>
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
+	b=IAT+XIosSA/W61Gj+JEXkZ246t/BFU/hPA9re9ZPSnyOeW7r8JJ5HSUPykqZlKTBc
+	 QIRO5z8D+E58dqbHcYzDctH+uCpNz9pT/AflCNQ5nZlEmcMXm/klNIpoEeQUjWx9kT
+	 6TrsI5EwztHz5gbWoH4/pc1vAcIGOk7soZYhv97yPS9LR+/MhkJAsGjTDu6/VFrToY
+	 zufdTbfq42FG+yqMnpThoFAGUHkXzU6iVWCUGZH8CFvj+H1if3N220ne8ALm5d8buj
+	 987lTOBhOAh1BMbj/qodKEppUTNVjuo3TOWlF33uC/x6Q1rjnWpbFmLkFhxgEpRzTg
+	 p1gCGXcjzSU2g==
+Date: Thu, 17 Sep 2026 10:17:22 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>
+Cc: Randy Dunlap <rdunlap@infradead.org>,
+	Jani Nikula <jani.nikula@intel.com>, linux-kernel@vger.kernel.org,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Nicolas Schier <nsc@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>,
 	Masahiro Yamada <masahiroy@kernel.org>,
-	Alexey Gladkov <legion@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>, Paul Walmsley <pjw@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
-	Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <lossin@kernel.org>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Daniel Almeida <daniel.almeida@collabora.com>,
-	Tamir Duberstein <tamird@kernel.org>,
-	Alexandre Courbot <acourbot@nvidia.com>,
-	Onur =?iso-8859-1?Q?=D6zkan?= <work@onurozkan.dev>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, linux-riscv@lists.infradead.org,
-	linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	linux-doc@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v3 01/20] kbuild: do not allocate .modinfo in vmlinux
-Message-ID: <202609171002.8C0C739@keescook>
-References: <20260917-build-speedup-v3-0-9ecf4163ff36@kernel.org>
- <20260917-build-speedup-v3-1-9ecf4163ff36@kernel.org>
+	linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH] kbuild: add header check facility as a manually run
+ static analyzer
+Message-ID: <20260917171722.GA356152@ax162>
+References: <20260915104331.255636-1-jani.nikula@intel.com>
+ <211fcac1-d85d-4680-8e55-598b2064a002@infradead.org>
+ <20260916231319.GA550816@ax162>
+ <71a8b988-3977-44e4-93d6-782e4447f160@t-8ch.de>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260917-build-speedup-v3-1-9ecf4163ff36@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <71a8b988-3977-44e4-93d6-782e4447f160@t-8ch.de>
 
-On Thu, Sep 17, 2026 at 05:06:11PM +0100, Lorenzo Stoakes (ARM) wrote:
-> +      cmd_modules_builtin_modinfo = $(OBJCOPY) -O binary -j .modinfo --dump-section .modinfo=$@ $< $@.tmp; \
-> +                                    rm -f $@.tmp; \
-> +                                    sed -i 's/\x00\+$$/\x00/g' $@
+On Thu, Sep 17, 2026 at 11:05:32AM +0200, Thomas Weißschuh wrote:
+> On 2026-09-16 16:13:19-0700, Nathan Chancellor wrote:
+> > include/uapi already has its own header checking infrastructure under
+> > CONFIG_UAPI_HEADER_TEST and usr/include/Makefile, which avoids this with
+> > a no-header-test list that includes many of the files listed in these
+> > messages. To be honest, we should probably forbid HEADER_CHECK from
+> > including 'include/uapi' and refer people to use CONFIG_UAPI_HEADER_TEST
+> > instead, as there are other differences like being built under a
+> > different C standard or C++ and such that the existing infrastructure
+> > handles.
+> 
+> Testing the UAPI headers here too would still be valuable.
+> CONFIG_UAPI_HEADER_TEST tests the headers from the perspective of
+> userspace after they have undergone processing. The kernel build
+> might see the same headers quite differently.
+> 
+> For instance the example from above:
+> 
+> ./../include/uapi/linux/input.h:29:6: warning: ‘__BITS_PER_LONG’ is not defined, evaluates to ‘0’ [-Wundef]
+>    29 | #if (__BITS_PER_LONG != 32 || !defined(__USE_TIME_BITS64)) && !defined(__KERNEL__)
+>       |      ^~~~~~~~~~~~~~~
+> ./../include/uapi/linux/input.h:34:9: error: unknown type name ‘__kernel_ulong_t’
+>    34 |         __kernel_ulong_t __sec;
+>       |         ^~~~~~~~~~~~~~~~
+> 
+> These are legitimate issues, the inclusion of the necessary header is
+> gated behind #ifndef __KERNEL__ although it should not be.
 
-Oh, I just noticed this. I don't think the .tmp is needed. You can just
-use /dev/null for the outfile here: no need to write anything unused to
-disk; seems to work for binutils and llvm's objcopy.
+Hmmm, fair enough. I guess we can leave this functionality in place for
+UAPI headers then but I just worry about people doing what Randy did and
+reporting these issues when they are already known and handled in some
+other way. Maybe the UAPI header test could grow an "internal kernel
+usage" check similar to the other checks that it has at some point then
+we could forbid HEADER_CHECK=include/uapi but it is fine for now.
 
 -- 
-Kees Cook
+Cheers,
+Nathan
