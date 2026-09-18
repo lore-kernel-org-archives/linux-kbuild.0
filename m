@@ -1,135 +1,109 @@
-Received: from fout-b1-smtp.messagingengine.com (fout-b1-smtp.messagingengine.com [202.12.124.144])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14FAC3A6B66;
-	Fri, 18 Sep 2026 06:56:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69F354718C8;
+	Fri, 18 Sep 2026 10:04:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789714604; cv=none; b=FsXaF0atQ+if8ssf0TBNqMLX02rNqvq1rKBXscARJIluqxjO87QDtLVyFAPnSuRvMZLUpQKD+kChvE8/s2QcuqS7cEPiiQqfC3Rk/LwKJuk60ooieKIUkPtZEXm7v7Pwnu0PJIUnzdgmdkwAR0LE6K1IR7cfvw3QSIygxq5SlkQ=
+	t=1789725857; cv=none; b=PdoREKkAj3eneq27GCFlrsI9xulOn3mQoX790jV226GBvKldR/aJonfn4eXILO5rRHe6M/M3v2lpBf2rWFcJ9xu+PRIARByL9Gx0SFopq++Ga0bIVhJsFNSj12m3vNYHz9Zud8ut+J7dA5t6wNaknrDhft0dRIMm87+7Z4N6kts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789714604; c=relaxed/simple;
-	bh=Eql6S6hQXWeH0N4kCka61rLc8c51ongE29CL/iVEhZA=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=OiyCaopcfq1q0+hF+O2DIr0M/weV+5WZhQWbnou6d36vJc1wpPstZCssxT7JAXCkg1+P+7QgsEsyc4C77eVPSCyibCJsCzEYDfC4vW9u/JzfQC4z/10WPvh9z8C9zk8XI5qoTd9eB//Fz6AEq4S2/xnCre01L1ckOTMsTfSLqss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=IIQG6gVl; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Aun6ov5A; arc=none smtp.client-ip=202.12.124.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1789725857; c=relaxed/simple;
+	bh=Ysypt3jaDk9LX7+TGymG8tHempYw1fVXIlZASODTJug=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tLeYuBV7OHTJGofzwRndkjd7UrCZz+M5wat/77vbKEUpOcHJD1d/MOGz7LliE2NlEbVB4bmJjWj/4tBd39OsiGMkbj+21nsmp+8PlWtT0ctAFruIqQCsvBPxpgs9zOkQou8Sk7ewcsnDw8pNhSZacyLWO6nY2CpECgRCJsnJnF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io; spf=pass smtp.mailfrom=gtucker.io; dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b=JIHeV+9/; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gtucker.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="IIQG6gVl";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Aun6ov5A"
-Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
-	by mailfout.stl.internal (Postfix) with ESMTP id E59B21D000D1;
-	Fri, 18 Sep 2026 02:56:40 -0400 (EDT)
-Received: from ams-imap-03 ([10.64.2.23])
-  by ams-compute-02.internal (MEProxy); Fri, 18 Sep 2026 02:56:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1789714600;
-	 x=1789801000; bh=r0DMlHDuV2LFIDoZEFEovDOSN4mbDMuTeZ8dyf8LL5E=; b=
-	IIQG6gVlwyxnfndRAOQF8DPr3eBvygmerR9HX3Oji7Q7NGUw4Dt0JtZRHMbRnta0
-	V80YTxJisJyPw0B0KeLvc8fhYZ9decGe62XP5QNmcbqttuv8TtFG79IfU0aemYi4
-	uiEuZZb1ozW0tBn3HorBYNYyJirlSe0YEIiOGm4WtPsWxMBcic3I8MBEaVwUIB53
-	O6yqA+aBYMve0jUXckC/vuLQMCnPXPDyyABB/sKT/GmER1hez66cimoKbVQ+zXiO
-	RXXVnnQcdqd1pbI1j1q9K7g4rweyfHXnq+FRmpVMlWAAWv9MwE9VVaHLfTD5J2jY
-	+6qu/hzvAezLr/4ZD5xFZQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1789714600; x=
-	1789801000; bh=r0DMlHDuV2LFIDoZEFEovDOSN4mbDMuTeZ8dyf8LL5E=; b=A
-	un6ov5AyafMFDReHcxlqnbIvzm5Y30awBH8QlPD3wG5JnjypDCimPS/USVE3wq3q
-	YJWDInr8ToPbJTpXlrl+9Od+A0AlTYNFMqsS/3tlqdxd9zYVgwnzkr8UYFI9fTMH
-	DpT05u3F8wMtFqK+GOFph+r2xvR8/fErHwFvCy0EWpWUrtTYGEacY3NQPmMYHDkx
-	WkpppmNtRU5aliQ8Op2iXvONOYwkwQXXsQOVrluwrs/DvNDvVG2pbpEoGfNRoI6z
-	mXPTgp1q7tAivKcgOsSWGHgqJgNiK8Urg7pJ0zgCAYxNonLZcgLI0d19+Bly+RsZ
-	bpdvxUvUUNyk2+eotnEkA==
-X-ME-Sender: <xms:o-CsajFMjXBHK0crUge2XUaK2TNXE-RUYAlBczbg3g3ZCPsFg3GBeQ>
-    <xme:o-CsarJKWHWLG0uRXtna6zQxxl86JsbkYVoqbljcwJd46nj2cG2OkJyMmyAT6CHMt
-    hTlIoBOQD1e7PFj2I_YQzuILUybBJ75pDmeQGylXXiT4KQLbPW0eY9o>
-X-ME-Proxy-Cause: dmFkZTE51d9azPAy3ibgXqxIXNxqm9lJw06wJQTHmRm8LbSiKF8Xd7g8qBGhORcyEHzQ/1
-    0DlqsN+aXKv5vz1vSZ7AZAg5II1V2VVdx9CydhKGL0xtVYzUmWP7ID29eUPxi8x+1smOpa
-    rKrSvlCwSQyRFZXYCQlObz7bsCd3B03+ZYsA1IK5u4M7TzcL4La1jMvSsDiLl4WWVU5Rdm
-    Xyc9Yv33Wmp84TQcyYjsModn+ZUEs6WCXbyOI3q3qcWLIKXQ4QUortHdB4OQF8Xj3BpZBe
-    6WwBIG5S4vWLPoHQ/AKujLQeE3W48W9bxCEuIu6XBoB+YUYgTmwV7XqCjooXciDC4E3ip1
-    sc36EVWpP5l38nvEnQO23IZLUnaCD6L+jkg51GP9h4lyS4a7+LB2VhN20oe1jDGhLwthpF
-    11TxFT6LnC5znRnCc5mzQKHnJIjWlL1lwjWdUfSkn/VMwTFAkkYzim06996E60GjghK3Z6
-    QR+QaMsxDSrTftli7qiYJlCDdUz00v05LlqpXI8JYuUuchjhNFX9A/8s4O/MGFea5ihmXi
-    02SUuppX9nV+9clOVZXtgSUCbuSyh/sBW5OOhhtk1/rlLeEngR9BYvzHJHKz/5tiOTSMyn
-    I+TlWyxAqJW+3RklCko3m4md0A54Bl0rpnRYScEsTLFTHDfgm7FCJAPdc/oQ
-X-ME-Proxy: <xmx:peCsajoasIFWDIfYN0Z5BvnoiRwLeQ1SsVNAe20SYsPe0fPLfT4_mg>
-    <xmx:peCsauG5rRzL-MrGt2xYGh4WUsBai_iocFMRwsfTraB7qUaQyOdG8A>
-    <xmx:peCsav-6RyWXfDW6GLs8yHTNJWI083jbsHWVsj-g-p5SqEvjOHQaBQ>
-    <xmx:peCsajSIMS0v_VPXpFQi9IMbYJ_8IakqvpeCSO5eNOFC7S34_WNpeA>
-    <xmx:qOCsapSQj-4EJquIFoeo8pK6xMvtP3o2VkG57_DRjjxLl4vQ4ZJiqObj>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.ams.internal (Postfix, from userid 501)
-	id 1D2CC32A0084; Fri, 18 Sep 2026 02:56:35 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b="JIHeV+9/"
+Received: by mail.gandi.net (Postfix) with ESMTPSA id CB9D31F416;
+	Fri, 18 Sep 2026 10:04:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gtucker.io; s=gm1;
+	t=1789725851;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3+gDfmq7h3XDTeTaV1GQcAeaaLYfq4gZqiyPpz3v3UQ=;
+	b=JIHeV+9/N02rYia1t1EvGJLRUi0ZbHU4t5xlCuq92pB5vEbVOXOKzzOTqjHeOwgEkIAFzb
+	pzZemjNFBUtvvTcNgcqlAW2mOP+mF8bdY3N+t/KlUlBK2msbtyL3J68+uQz76x0TU5ZQb0
+	SsAEB7RZc0HqLqxp0J3aXcxXEu8b8DTlCs+uMvjkD8TIl6+CyV4UFl9B2eZiDpr8sH9SiR
+	3bSitj0RwBrHeqiS1cIYxH583+qXmwtUph7ETUyEl7jNcTSwmNwLdJqxznngb+LthOgT7H
+	TpvQxFxtgYI3CdhdOOMkgcRSKtQ1CuxiYuNOAa/tB2RAxupOeOPcz4i2BAuFRA==
+Message-ID: <03e8513a-3480-42a5-9d1b-fad6c36ed07a@gtucker.io>
+Date: Fri, 18 Sep 2026 12:04:09 +0200
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AytAa-GFwSww
-Date: Fri, 18 Sep 2026 08:56:14 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>,
- "Masami Hiramatsu" <mhiramat@kernel.org>
-Cc: "Christian Brauner" <brauner@kernel.org>, linux-kernel@vger.kernel.org,
- linux-kbuild@vger.kernel.org, kernel-dev@igalia.com,
- "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>,
- linux-alpha@vger.kernel.org, linux-s390@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, soc@lists.linux.dev,
- linux-mips@vger.kernel.org, sparclinux@vger.kernel.org
-Message-Id: <6e91a8c6-c078-4b42-92b6-9902e6d0d270@app.fastmail.com>
-In-Reply-To: <20260917-tonyk-syscall_table-v7-9-f4cd8f8e3265@igalia.com>
-References: <20260917-tonyk-syscall_table-v7-0-f4cd8f8e3265@igalia.com>
- <20260917-tonyk-syscall_table-v7-9-f4cd8f8e3265@igalia.com>
-Subject: Re: [PATCH v7 09/13] mips: Use the common syscall table
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/3] scripts: add TOML config to container tool
+To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Miguel Ojeda <ojeda@kernel.org>
+Cc: =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>,
+ Nick Desaulniers <ndesaulniers@google.com>, linux-doc@vger.kernel.org,
+ workflows@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kbuild@vger.kernel.org, kernelci@lists.linux.dev,
+ automated-testing@lists.yoctoproject.org
+References: <68b14a76a4cb2e6437c869bab948983a98acffbd.1788779245.git.gtucker@gtucker.io>
+Content-Language: en-GB
+From: Guillaume Tucker <gtucker@gtucker.io>
+Organization: gtucker.io
+In-Reply-To: <68b14a76a4cb2e6437c869bab948983a98acffbd.1788779245.git.gtucker@gtucker.io>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: gtucker@gtucker.io
+X-GND-Score: -100
+X-GND-Cause: dmFkZTFxUUHp53EL18Bb9M/JQza76+h26K4mGaSDc5K9XDme86qqMnFHH+rvynti1TbPuqrrc9xboTwjPdi2J4SEX38+db+SG75sK8c0TN5ScJZdIEvWoliaOA6h+tXUsq6PuPZUTut0MpLdmT94mvohnuNIeUeqE9wphUH5ZXd2szVUawzg1njiRkG8qir4EZeQlk7z1QcBzQ+30iYBH/C8NsuUotOoHF7iiC/2UQ/J0o0ofVsvYMZKf24ygtJVS3l+fLrX4UM1AM1QDtFBGi36R2qgWziM4q5xodfyHG2jeoHE+Zt3X+iutDD1qMe8xrm5y+znxfhDaAF1ioC9Dt5ZamwKDM48/ZW/e22b1PmbGReFQ9/YuLqjPmy06OwntVGS8G0ysfcgFlE2m3qHEcdkOI/MGu2V7VgawQG9WZ+4uw6QcoPrr0y2uqXLT4QP578jK0Z7v6i97udmAXuRAGSKkzxJlKtDqNKqQljfiIKiran5vR2waJgxNl99K5tVlb4VWGAQ2qd4aK7Wa4IYki278qTrGgGY3fe7eg6hd6FKVmwS9OyWfhuCy0W1DM8YS9boqZO5VPIEFyK1GGyBp5mUJCPYpJjpE5oD3Su/cZPbf6oKxm0Y9P+QGcXClTdiO3Y1wU+8Ofiwe5UQQX6v745qVzGRPHM/U0rQ2rzMCgALytE5Cw
+X-GND-State: clean
 
-On Fri, Sep 18, 2026, at 01:46, Andr=C3=A9 Almeida wrote:
+Hello,
 
-> +
-> +src_n32 :=3D $(src)/syscall_n.tbl
-> +src_n64 :=3D $(src)/syscall_n.tbl
-> +src_o32 :=3D $(src)/syscall_o32.tbl
-> +
-> +.SECONDEXPANSION:
-> +
-> +$(uapi)/unistd_%.h: $(systbl_common) $$(src_$$*) $(syshdr) FORCE
-> +	$(call if_changed,syshdr)
-> +
-> +$(kapi)/unistd_nr_%.h: $(systbl_common) $$(src_$$*) $(sysnr) FORCE
->  	$(call if_changed,sysnr)
->=20
-> -$(kapi)/syscall_table_%.h: $(src)/syscall_%.tbl $(systbl) FORCE
-> +$(kapi)/syscall_table_%.h: $(systbl) $(systbl_common) $$(src_$$*) FOR=
-CE
->  	$(call if_changed,systbl)
+On 07/09/2026 13:10, Guillaume Tucker wrote:
+> Add support for a TOML configuration file to the scripts/container
+> tool.  This improves user experience by not having to keep passing the
+> same command line options all the time or overly relying on built-in
+> default values.  Include the concept of 'profiles' with different
+> named sections in the file to cover various use cases.
+> 
+> Command line options take precedence over the config file, and values
+> defined in profile sections take precedence over the default one.
+> 
+> Add a -c option to override the location of the .container.toml config
+> file which should otherwise be located in the current working
+> directory.  If not found, the file is silently ignored as it is not
+> strictly required unless the -c option is used.
+> 
+> Add a -p option to choose a particular profile section in the config
+> file rather than the default.
+> 
+> Signed-off-by: Guillaume Tucker <gtucker@gtucker.io>
+> Acked-by: Nicolas Schier <n.schier@fritz.com>
+> ---
+> 
+> Notes:
+>     Changes in v2:
+>     - fix uid / gid handling when set to 0 (root)
+>     
+>     Changes in v3:
+>     - fix logic when loading config profiles using None
+>     - fix typo with missing whitespace in help message
+>     - clarify how UID gets used as default value for GID
+>     
+>     Changes in v4:
+>     - drop registry option from TOML config
+> 
+>  scripts/container | 86 ++++++++++++++++++++++++++++++++++++++++-------
+>  1 file changed, 74 insertions(+), 12 deletions(-)
+Thanks for the reviews so far.
 
-I can see how this will work, but I'm not sure we want to keep
-maintaining it like this, if anybody wanting to use the syscall
-table input files now has to use and understand .SECONDEXPANSION.
+Do you guys need anything else regarding this series?
 
-For instance, we will already have to duplicate this for the
-./tools/perf/arch/powerpc/entry/syscalls/syscall.tbl
-directory in the kernel, but I assume that others already have
-something like this in userspace.
+There's no rush of course and we're all busy, just making sure I
+didn't miss anything.
 
-I really liked the idea of combining the n32/n64 tables into one
-file, but the added complexity of using two input files for three
-ABIs here makes this much less appealing. The easiest way would
-be to give up here and revert back to three input files.
+Thanks,
+Guillaume
 
-A possible alternative may be to go all the way and only have
-one syscall.tbl file per architecture to simplify the scripts,
-and then combine mips o32/n32/n64 into one file and do the
-same thing for arm oabi/eabi/aarch64 and x86 i386/x86-64/x32.
-
-      Arnd
