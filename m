@@ -1,168 +1,123 @@
-Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 161363AE6E6;
-	Fri, 18 Sep 2026 20:11:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA0063A48C5;
+	Fri, 18 Sep 2026 21:13:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789762278; cv=none; b=r6RmRBF2IdrRuizvzc3IaDvjdTPu9+1W+Bt7GhjXMJRk1kL5A9fUUbqUAsjveDo8noMkYq7tc7FE0Hs3UoCYVXhTgtrXJR/cSe3/kBCBd/DzDx9XNUCpwNcKq7eyBNkxFOY8ue3sw8jALng3H6r+RONy1TWe0Uf3EW34c/CfVDQ=
+	t=1789765983; cv=none; b=rRQkxkG1yerbtp1sxVyj8ILpXIu+Q5lxT4TxsMlAJbU0Brhhv8ZrBSKdLFJeIvYVSH6tc7CmBpPLvjBE2NoO2R2gjMQKYhpASnuNiA3Zu+MwuK+S1up1TL+sPMjHhPRUZlw6kT/HFabbVG0IG2x3rCuJ5n40Q2ZyPuVDjUhyaYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789762278; c=relaxed/simple;
-	bh=A74UHZ/H680cd+7x9l+p9oF2r9lADuMuT5YtM1Klt4w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CfYy+PRJt+oVVDJKXdURneCb4YAg30z07r5oTXlvG0bOuMqF/1tQW2ZPSxNlGG+wFW+oql1aUfTtHNkHUwdxvFqzg/kNqP/xny945EO6izenkvbWJskiVvXRdEe8BVG/vVrUfiv+RuGjVC1NUAXL8hLaNuczf1ZPXkLV44C8wz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=XyQWnNp/; arc=none smtp.client-ip=213.97.179.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
+	s=arc-20240116; t=1789765983; c=relaxed/simple;
+	bh=hcxaFczrVEQ8ayTOiOQuTrm7eYLoHpDzZG0CttnLiSE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bLKZ0jbFGmBCpT7OLRlrkyEGcy1zc3XYDF5jc4MlTjVAxz0OSTrIakFBtOi8srqks2q49z3Ru6ap/qrV3tNfWwNsyhjY2841elln80o6/KQb6PloTxvBIlqXtla1jPxCPPqB5iwF/oGsyfuTs+AFz8G4GFnJ1jpTrA1fXMUbO4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QnEBlLRx; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="XyQWnNp/"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; h=Content-Transfer-Encoding:Content-Type:From:Cc:To:Subject:
-	MIME-Version:Date:Message-ID:From:Reply-To;
-	bh=KndHA8Fg8PGGhxgGB/nvI09JTenc+zETXOyEGocxMv8=; b=XyQWnNp/GpmK3Gevj1BLk6XeOD
-	q6WiVOnxx+QG61IA8LQBELDkks4zJkuioqrdBaX/yddr7NF6HYTkHLBfuxZcz90FcSfa/Xd0NYfJj
-	FQJoFaYxhWz7sbLGJwVBmWdL94thDKPNWPSp72nqgJICAMJnP5kHfsLbqFU+eBE2n+O+g5lBNuJjI
-	P/CAZUjIW0f2c9W9F1OUjLzQmkASjmKjgvt1lLPs/0GkTaBdx71wVyV+8EiHwuXFqkOWWEg5SLKdp
-	rOUyi5JEkurTLT2P+K3Twir0wmqc0wCvzfN18L9fIRa75+9NIVf2388nG4yYL31WNUnF4qzC5a5XB
-	RfsGXJMQ==;
-Received: from [177.172.123.214] (helo=[192.168.15.100])
-	by fanzine2.igalia.com with esmtpsa 
-	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128) (Exim)
-	id 1x7evL-0046up-OM; Fri, 18 Sep 2026 22:11:07 +0200
-Message-ID: <a2627927-7526-40b7-8464-fecb0e04ecad@igalia.com>
-Date: Fri, 18 Sep 2026 17:11:06 -0300
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QnEBlLRx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD1671F000FF;
+	Fri, 18 Sep 2026 21:12:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789765981;
+	bh=6c/6Gbzu0QafG2PGiTmgDgiVijnAAiazNGXxKOPq+eM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=QnEBlLRxxVZclXDxEqcd7TZb9Rck7tFuArt1fESypBLN3Shpq0J3GrJczzjqtBya+
+	 k+QVWcZ9DM87K3TtdZyievVgppQjBBkrEcHCYUSUnvMjJauVJiRld8WH9t4626IEYT
+	 JW+cFhYsJI8GdTCCcgLJGL47S4vppJekH44o4DM9qUOmAfw6L4p6hgGy2iP68nrBEp
+	 71EeyLbJZ/HHcZH2XC7eQu83TeyUcUslnWjGGnKhfdEoZQtvHE5ljWkbRbWoQFDmVW
+	 5HkXeH5vto0/fysXrXdsfrSAABnRjbLTU6NM5cbUJDMjRtDA75UD+36pS54v9e8Z3Q
+	 ZNypsY6t7jWpw==
+Date: Fri, 18 Sep 2026 14:12:48 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Nicolas Schier <n.schier@fritz.com>
+Cc: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>, Kees Cook <kees@kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Alexey Gladkov <legion@kernel.org>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>, Paul Walmsley <pjw@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
+	Gary Guo <gary@garyguo.net>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Daniel Almeida <daniel.almeida@collabora.com>,
+	Tamir Duberstein <tamird@kernel.org>,
+	Alexandre Courbot <acourbot@nvidia.com>,
+	Onur =?iso-8859-1?Q?=D6zkan?= <work@onurozkan.dev>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev, linux-riscv@lists.infradead.org,
+	linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org,
+	linux-doc@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v3 10/20] kbuild: move the toolchain checks into
+ init/Kconfig.toolchain
+Message-ID: <20260918211248.GB235304@ax162>
+References: <20260917-build-speedup-v3-0-9ecf4163ff36@kernel.org>
+ <20260917-build-speedup-v3-10-9ecf4163ff36@kernel.org>
+ <202609171149.6454DC6@keescook>
+ <20260918010729.GB1585590@ax162>
+ <aq1MG8I1BsUUDFkx@gremlin>
+ <20260918-athletic-agile-echidna-114f16@l-nschier-aarch64>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 12/13] alpha: Remove alpha_ prefix from custom syscall
- entries
-To: Magnus Lindholm <linmag7@gmail.com>
-Cc: Masami Hiramatsu <mhiramat@kernel.org>, Arnd Bergmanon <arnd@arndb.de>,
- Christian Brauner <brauner@kernel.org>, linux-kernel@vger.kernel.org,
- linux-kbuild@vger.kernel.org, kernel-dev@igalia.com,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- linux-alpha@vger.kernel.org, linux-s390@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, soc@lists.linux.dev,
- linux-mips@vger.kernel.org, sparclinux@vger.kernel.org
-References: <20260917-tonyk-syscall_table-v7-0-f4cd8f8e3265@igalia.com>
- <20260917-tonyk-syscall_table-v7-12-f4cd8f8e3265@igalia.com>
- <CA+=Fv5Q+sOLmT0Wf3OGdKw=mBt_EoS8ZQDF3wwGrm2-2vnOYgg@mail.gmail.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
-In-Reply-To: <CA+=Fv5Q+sOLmT0Wf3OGdKw=mBt_EoS8ZQDF3wwGrm2-2vnOYgg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260918-athletic-agile-echidna-114f16@l-nschier-aarch64>
 
-Em 18/09/2026 07:54, Magnus Lindholm escreveu:
-> Hi André,
+On Fri, Sep 18, 2026 at 09:54:27PM +0200, Nicolas Schier wrote:
+> On Fri, Sep 18, 2026 at 03:35:57PM +0100, Lorenzo Stoakes (ARM) wrote:
+> > On Thu, Sep 17, 2026 at 06:07:29PM -0700, Nathan Chancellor wrote:
+> > > On Thu, Sep 17, 2026 at 11:53:13AM -0700, Kees Cook wrote:
+> > > > Yeah, totally right to move to a separate file. I think, however, I
+> > > > would prefer this wasn't in init/ though. Kbuild uses scripts/ as its
+> > > > Makefile.$topic dumping ground, and Kconfig.include also lives there. To
+> > > > me, this new file should be scripts/Kconfig.toolchain instead. And
+> > > > arguably, this should be included by the top-level Kconfig rather than
+> > > > init/Kconfig...
+> > >
+> > > I do feel like scripts/ is a better location given that these are really
+> > > things internal to Kbuild but I also see where Lorenzo is coming from
+> > > that scripts/ is a little weird for this to live for discoverability,
+> > > especially if we want people to put checks here instead of in a Makefile
+> > > directly. To be honest, it would be kind of nice to separate the Kbuild
+> > > parts of scripts into their own directory to make it clear what Kbuild
+> > > uses versus what users/contributors should use but that is obviously too
+> > > big of a project to tackle as a prerequisite for this.
+> > 
+> > Yeah it just seemed really weird/surprising to me (in the sense of
+> > 'principle of least surprise') to put that in scripts/ and it doesn't seem
+> > that traditionally anything else like this lives there.
+> > 
+> > But if you guys feel strongly enough I can put it there.
 > 
-> On Fri, Sep 18, 2026 at 1:48 AM André Almeida <andrealmeid@igalia.com> wrote:
->>
->> Some architectures need special entry points for some syscalls (like
->> clone3). The current approach is, instead of having a special name like
->> arch_syscall, to name if as __syscall. This is enough to different the
->> common entry point to the architecture specific entry point.
->>
->> Change alpha special syscall entries to do the same. This makes easier to
->> join the syscall tables. Leave alpha_syscall_zero because this syscall only
->> exists in alpha anyway.
->>
->> Signed-off-by: André Almeida <andrealmeid@igalia.com>
->> ---
->>   arch/alpha/kernel/entry.S              | 8 ++++----
->>   arch/alpha/kernel/syscalls/syscall.tbl | 8 ++++----
->>   2 files changed, 8 insertions(+), 8 deletions(-)
->>
->> diff --git a/arch/alpha/kernel/entry.S b/arch/alpha/kernel/entry.S
->> index 9f2608de2544..8a85fcf117cb 100644
->> --- a/arch/alpha/kernel/entry.S
->> +++ b/arch/alpha/kernel/entry.S
->> @@ -879,9 +879,9 @@ ret_from_kernel_thread:
->>
->>   .macro fork_like name
->>          .align  4
->> -       .globl  alpha_\name
->> -       .ent    alpha_\name
->> -alpha_\name:
->> +       .globl  __sys_\name
->> +       .ent    __sys_\name
->> +__sys_\name:
->>          .prologue 0
->>          bsr     $1, do_switch_stack
->>          // NB: if anyone adds preemption, this block will need to be protected
->> @@ -896,7 +896,7 @@ alpha_\name:
->>          ldq     $26, 56($sp)
->>          lda     $sp, SWITCH_STACK_SIZE($sp)
->>          ret
->> -.end   alpha_\name
->> +.end   __sys_\name
->>   .endm
->>
->>   fork_like fork
->> diff --git a/arch/alpha/kernel/syscalls/syscall.tbl b/arch/alpha/kernel/syscalls/syscall.tbl
->> index 8fc4701a6328..a41276634923 100644
->> --- a/arch/alpha/kernel/syscalls/syscall.tbl
->> +++ b/arch/alpha/kernel/syscalls/syscall.tbl
->> @@ -9,7 +9,7 @@
->>   #
->>   0      common  osf_syscall                     alpha_syscall_zero
->>   1      common  exit                            sys_exit
->> -2      common  fork                            alpha_fork
->> +2      common  fork                            __sys_fork
->>   3      common  read                            sys_read
->>   4      common  write                           sys_write
->>   5      common  osf_old_open                    sys_ni_syscall
->> @@ -72,7 +72,7 @@
->>   63     common  getpgrp                         sys_getpgrp
->>   64     common  getpagesize                     sys_getpagesize
->>   65     common  osf_mremap                      sys_ni_syscall
->> -66     common  vfork                           alpha_vfork
->> +66     common  vfork                           __sys_vfork
->>   67     common  stat                            sys_newstat
->>   68     common  lstat                           sys_newlstat
->>   69     common  osf_sbrk                        sys_ni_syscall
->> @@ -242,7 +242,7 @@
->>   309    common  get_kernel_syms                 sys_ni_syscall
->>   310    common  syslog                          sys_syslog
->>   311    common  reboot                          sys_reboot
->> -312    common  clone                           alpha_clone
->> +312    common  clone                           __sys_clone
->>   313    common  uselib                          sys_uselib
->>   314    common  mlock                           sys_mlock
->>   315    common  munlock                         sys_munlock
->> @@ -474,7 +474,7 @@
->>   542    common  fsmount                         sys_fsmount
->>   543    common  fspick                          sys_fspick
->>   544    common  pidfd_open                      sys_pidfd_open
->> -545    common  clone3                          alpha_clone3
->> +545    common  clone3                          __clone3
->>   546    common  close_range                     sys_close_range
->>   547    common  openat2                         sys_openat2
->>   548    common  pidfd_getfd                     sys_pidfd_getfd
->>
->> --
->> 2.55.0
->>
->>
-> 
-> The fork_like macro now defines __sys_clone3, but the syscall table
-> entry is changed from alpha_clone3 to __clone3.
-> 
-> This should be __sys_clone3, like the other custom entry points.
-> 
-> I also confirmed this by building the tree at this patch, before applying
-> patch 13:
-> 
-> LD      .tmp_vmlinux1
-> alpha-unknown-linux-gnu-ld: arch/alpha/kernel/systbls.o:
-> in function `sys_call_table':
-> (.data+0x1108): undefined reference to `__clone3'
-> 
-> Patch 13 hides the issue because the common table uses __clone3 as the
-> ABI tag but correctly selects __sys_clone3 as the syscall entry point.
-Thank you very much for testing this work! I've applied a fix for this 
-for the next version.
+> yeah, then I'd also slightly favor scripts/ for now.
+
+Alright, I think scripts/Kconfig.toolchain wins then :)
+
+-- 
+Cheers,
+Nathan
