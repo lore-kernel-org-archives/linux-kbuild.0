@@ -1,161 +1,99 @@
-Received: from mail.avm.de (mail.avm.de [212.42.244.94])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CED902E5B2A;
-	Fri, 18 Sep 2026 19:54:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.94
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9871466B17;
+	Fri, 18 Sep 2026 19:59:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789761273; cv=none; b=bkGTMBWAouCCLDaCOYTRZ5IvJteZqo4+gOl4hXDWYvtzeBEHYIA+w7+mGgMhhQ56q1Sea2GQJD6BL2sQyxjpw4Do7x9T2g5kavVVtwtQI8KrCQOR3hNjyxIAVwSqgDllLF2bAmc74PRnlUB4d/ZVGbwapJyvOpaLX7RNHOvcPe8=
+	t=1789761547; cv=none; b=HpBZ4UQlCT8ADuDd4K3yT929e8zF3ScotXzU6xnqkltRPSxQ4f7SbZoA7kQRUssnHDPNMwuZjrmysjfO5o7JXlDkbr8Ruxq0RotlfaBdmoszUVNthPbN3J4NC4XjupTseSFmXlUpK7w1w6qxwl6Yh3WGlagqtoYrnn3aeGkflck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789761273; c=relaxed/simple;
-	bh=JKkgIua3kpizh32NNqU1zVU4J9KvaFpPPrVmLN48emc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lqs3kEQl4VGtM5iuh0z7t1EGY9lfOGVbBzEULQctsb/C5NdBBP57MPALwdqLEhftrMr14MZyRpKgYV9hXYQVNoS1+4HxnY/ALQULAiE0BZ+dPB1s9UvRcXDqfTy8tP1xQ8choNjyXTNZcmnujb9O376H/F2yYCRsbNsp0VoohNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com; spf=pass smtp.mailfrom=fritz.com; dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b=iaQFrJrl; arc=none smtp.client-ip=212.42.244.94
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fritz.com
+	s=arc-20240116; t=1789761547; c=relaxed/simple;
+	bh=/4f16jk0w1SZlOazZG/EvX8VDTn9PFtJwde9AsBZ1oE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aGAvfo8V+rjYcrJGfv0pq8g3ogUiEJY3FD1p/XxdVsJIBY3HUoaFSItFouKXMmi/DPzy4RRlqJwc6OkM/54PrBqdVVE4E0oqItgCyaAeGtABPV7/SNTBNsH9+uJVVAZA0ARzLIuif17wopfvYfZq2i/vlG04ZlPo7Ga/GCzta98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=enFP9GrW; arc=none smtp.client-ip=213.97.179.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b="iaQFrJrl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fritz.com; s=mail;
-	t=1789761268; bh=JKkgIua3kpizh32NNqU1zVU4J9KvaFpPPrVmLN48emc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iaQFrJrlsMqTRNC5rIts3moSzTq8GPNOJzCxPcOUf+K3thbq9j+rmyIAizWs7/yz7
-	 lWBhKJPeLxgpT1FPLMWvu762h8K54ilw+7bLwGayViD8+w7RNu7C58yIahXELSFT9u
-	 s/sNXUHTuDVbxMZ7WQnx5csJo2GOHhHUuXkByLPNOJsyO5ClcSI8HydaCveAhI244X
-	 sw7rIV0mCiEW5s7dCrGRFhqT7JrdX5DxqODXWt3k9InFafVrPPM8TvHM+xNMPxxaYD
-	 9cFigSX74ORxf2dFTC+rIkbjEmvC8AzHdcGd83vTDgYJd006hFhUW0OGO1uIO6gCEK
-	 j3LRSu/nQT/sw==
-Received: from [2001:bf0:244:244::78] (helo=mail.avm.de)
-	by mail.avm.de with ESMTP (eXpurgate 4.57.1)
-	(envelope-from <n.schier@fritz.com>)
-	id 6aad96f4-03cd-7f0000032729-7f000001ad0a-1
-	for <multiple-recipients>; Fri, 18 Sep 2026 21:54:28 +0200
-Received: from mail-auth.fritz.com (unknown [IPv6:2001:bf0:244:244::78])
-	by mail.avm.de (Postfix) with ESMTPS;
-	Fri, 18 Sep 2026 21:54:28 +0200 (CEST)
-Date: Fri, 18 Sep 2026 21:54:27 +0200
-From: Nicolas Schier <n.schier@fritz.com>
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Nathan Chancellor <nathan@kernel.org>, Kees Cook <kees@kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Alexey Gladkov <legion@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>, Paul Walmsley <pjw@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
-	Gary Guo <gary@garyguo.net>,
-	=?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <lossin@kernel.org>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Daniel Almeida <daniel.almeida@collabora.com>,
-	Tamir Duberstein <tamird@kernel.org>,
-	Alexandre Courbot <acourbot@nvidia.com>,
-	Onur =?utf-8?B?w5Z6a2Fu?= <work@onurozkan.dev>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, linux-riscv@lists.infradead.org,
-	linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	linux-doc@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v3 10/20] kbuild: move the toolchain checks into
- init/Kconfig.toolchain
-Message-ID: <20260918-athletic-agile-echidna-114f16@l-nschier-aarch64>
-References: <20260917-build-speedup-v3-0-9ecf4163ff36@kernel.org>
- <20260917-build-speedup-v3-10-9ecf4163ff36@kernel.org>
- <202609171149.6454DC6@keescook>
- <20260918010729.GB1585590@ax162>
- <aq1MG8I1BsUUDFkx@gremlin>
+	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="enFP9GrW"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; h=Content-Transfer-Encoding:Content-Type:From:Cc:To:Subject:
+	MIME-Version:Date:Message-ID:From:Reply-To;
+	bh=k+xIqsm9yQ1hNrqrX4cwXF5kuEUp8+h4riZn/pmeeOU=; b=enFP9GrW0aNsR1AnDePgll6kXa
+	vIUTHl3x2i7bi0JOHfQhu/GOcv4bXVvs7H5FJfUcCgjOyeKGTjts+iY1Zvkws7+bj7Qysy9o3dwQp
+	xRnQUwJYGvxW7K6ziJ/X2c4IGHstnPwpuLIWaPspZ6i2NvsdSv/1rckyjGt70edc8ML4QTeCAiLcl
+	QTj7TgByRBDVHi0zdfzfoH8zLfAzXgfzAiiGDCO9uNWclsaKQAzFS3Q5hVrC+7tWPJz33DZbFXBjA
+	5QKIVmcofx7BtJd1lIuoonuJ29TYG0eaWljjEEWJh0M7olZde1T4okg1Fc4blXbk4fy64HDParCMP
+	bQHv07LQ==;
+Received: from [177.172.123.214] (helo=[192.168.15.100])
+	by fanzine2.igalia.com with esmtpsa 
+	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128) (Exim)
+	id 1x7ejU-0046be-TI; Fri, 18 Sep 2026 21:58:52 +0200
+Message-ID: <77321b17-c533-4287-9b05-98003959da70@igalia.com>
+Date: Fri, 18 Sep 2026 16:58:50 -0300
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <aq1MG8I1BsUUDFkx@gremlin>
-Organization: FRITZ! Technology GmbH
-x-ms-reactions: disallow
-X-purgate-ID: 149429::1789761268-1AFB3EE1-5F293279/0/0
-X-purgate-type: clean
-X-purgate-size: 2499
-X-purgate: This mail is considered clean (visit https://www.eleven.de for further information)
-X-purgate: clean
-X-pfmilter: host: postfix-mx-03  mail-id: D5F39A017D  external: no
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 03/13] scripts/syscall.tbl: Use the common table
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Christian Brauner <brauner@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kbuild@vger.kernel.org, kernel-dev@igalia.com,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ linux-alpha@vger.kernel.org, linux-s390@vger.kernel.org,
+ Masami Hiramatsu <mhiramat@kernel.org>,
+ linux-arm-kernel@lists.infradead.org, soc@lists.linux.dev,
+ linux-mips@vger.kernel.org, sparclinux@vger.kernel.org
+References: <20260917-tonyk-syscall_table-v7-0-f4cd8f8e3265@igalia.com>
+ <20260917-tonyk-syscall_table-v7-3-f4cd8f8e3265@igalia.com>
+ <6cd76fb4-0834-457c-8188-c68a507b6a6f@app.fastmail.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
+In-Reply-To: <6cd76fb4-0834-457c-8188-c68a507b6a6f@app.fastmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, Sep 18, 2026 at 03:35:57PM +0100, Lorenzo Stoakes (ARM) wrote:
-> On Thu, Sep 17, 2026 at 06:07:29PM -0700, Nathan Chancellor wrote:
-> > On Thu, Sep 17, 2026 at 11:53:13AM -0700, Kees Cook wrote:
-> > > On Thu, Sep 17, 2026 at 05:06:20PM +0100, Lorenzo Stoakes (ARM) wrote:
-> > > > Move them into their own file, sourced from the top of init/Kconfig=
-, so
-> > > > that the next commit can add to them without growing init/Kconfig f=
-urther.
-> > > >
-> > > > No functional change.
-> > > >
-> > > > Assisted-by: LLM
-> > > > Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-> > > > ---
-> > > >  init/Kconfig           | 197 +------------------------------------=
------------
-> > > >  init/Kconfig.toolchain | 198 +++++++++++++++++++++++++++++++++++++=
-++++++++++++
-> > > >  2 files changed, 199 insertions(+), 196 deletions(-)
-> > >
-> > > Yeah, totally right to move to a separate file. I think, however, I
-> > > would prefer this wasn't in init/ though. Kbuild uses scripts/ as its
-> > > Makefile.$topic dumping ground, and Kconfig.include also lives there.=
- To
-> > > me, this new file should be scripts/Kconfig.toolchain instead. And
-> > > arguably, this should be included by the top-level Kconfig rather than
-> > > init/Kconfig...
-> > >
-> > > I defer to kbuild folks, though.
-> >
-> > We talked about this previously:
-> >
-> >   https://lore.kernel.org/aqPW1FsBVYHSWl1r@gremlin/
-> >
-> > I do feel like scripts/ is a better location given that these are really
-> > things internal to Kbuild but I also see where Lorenzo is coming from
-> > that scripts/ is a little weird for this to live for discoverability,
-> > especially if we want people to put checks here instead of in a Makefile
-> > directly. To be honest, it would be kind of nice to separate the Kbuild
-> > parts of scripts into their own directory to make it clear what Kbuild
-> > uses versus what users/contributors should use but that is obviously too
-> > big of a project to tackle as a prerequisite for this.
->=20
-> Yeah it just seemed really weird/surprising to me (in the sense of
-> 'principle of least surprise') to put that in scripts/ and it doesn't seem
-> that traditionally anything else like this lives there.
->=20
-> But if you guys feel strongly enough I can put it there.
->=20
-> And agreed probably a 'third place' is the right way, but probably not
-> right as part of this series :)
-
-yeah, then I'd also slightly favor scripts/ for now.
-
-Kind regards,
-Nicolas
+Em 18/09/2026 03:34, Arnd Bergmann escreveu:
+> On Fri, Sep 18, 2026, at 01:46, André Almeida wrote:
+>> Remove some of the duplicated code by using the common syscall number
+>> table.
+>>
+>> Signed-off-by: André Almeida <andrealmeid@igalia.com>
+>> ---
+>>   arch/arm64/tools/syscall_32.tbl | 69 -----------------------------------------
+>>   scripts/Makefile.asm-headers    | 15 ++++-----
+>>   scripts/syscall.tbl             | 69 -----------------------------------------
+>>   3 files changed, 8 insertions(+), 145 deletions(-)
+> 
+> This somewhat desyncs the two copies of the arm32 table, which
+> isn't great.
+> 
+>> diff --git a/scripts/Makefile.asm-headers b/scripts/Makefile.asm-headers
+>> index f1c3d287c14b..b09dbc8992c3 100644
+>> --- a/scripts/Makefile.asm-headers
+>> +++ b/scripts/Makefile.asm-headers
+>> @@ -15,9 +15,10 @@ all:
+>>
+>>   src := $(srctree)/$(subst /generated,,$(obj))
+>>
+>> -syscall_abis_32  += common,32
+>> -syscall_abis_64  += common,64
+>> +syscall_abis_32  += clone3,common,32
+>> +syscall_abis_64  += clone3,common,64
+> 
+> The clone3 variant is wrong on nios2 and openrisc, as they need the
+> __clone3 version. These currently redirect it using a macro from
+> syscall_table.c doing
+> 
+> #define sys_clone3 __sys_clone3
+> 
+> which will continue to work here, but I don't like how this is
+> inconsistent between the architectures. Let's use either
+> syscall_abis_* or a macro to pick the clone3 variant on
+> all architectures, but not both.
+> 
+Ok, I have dropped the sys_clone3 macro and added clone3/__clone3 for 
+the all archs that uses scripts/syscall.tbl for the next patch revision.
