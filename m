@@ -1,144 +1,194 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F6B545D908;
-	Fri, 18 Sep 2026 05:41:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 723B3471CE8;
+	Fri, 18 Sep 2026 06:22:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789710074; cv=none; b=GBV96ukPQaQ532ioWlYAtOAw2Mmg7g7p6zVrFGIoFf453s9vgKt+IwtHAQFMJ37NqnL53gnIP2gZhFTtHyRmzjW3dOUI4zSA/3vgP9nX4GGs6iorIaXaKPE3fTPgV+eO0sKI56dDx3swfaoOVL8zU3F/xtRjg6Qe1wEzaoQJlbM=
+	t=1789712574; cv=none; b=ZMZ3Qx72/BuiSGUpEwRhIQDYaewHM2N9K1VH+6XY1UTPnFGIBJg75HDUUtM8uy7JzwOV8IqMU193wnUrl6mysZk7PopgAXozs6OgfyKeZ8mk45+grUmO8Kraz3TQyFI8Qrf2X9W3lQPPLG3VimRze2syalHEX744yFcN1quEaSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789710074; c=relaxed/simple;
-	bh=q81s4VRJ10fHWXZi7mqz8BJjAODdW6bRd9tOdGWEU3k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qFKx73Uk0Ct8yuow5xNB8V8bfxsWBmMIXhxIdjZfbWprXjiyMGmfkyo2Vkf1rMlDiV5EfmQjCRE2PLD6FyU/ASkaSZo1xKC3NiQVoEEXstOQQg0gmSS5UsE+1ZBrqMiDiFd5k2hYJGzH/smQFU6ITd/A69VoBdxuwUrpx7Lz2Bw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mm2MU//K; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789712574; c=relaxed/simple;
+	bh=YMJr4VfHhly8SRzg4wWsaS0kIroHolXeWhClT2U0qm8=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=k3eOVpViBn0/3YxGQjT7FbNay/r0nPUbM9MRSwFhIvIlms2aa6UWHXCWASVa8taXwuOusT9PxJUBo4WJ0dKyCbkU0z8NLGXwQwxMPhtAOqd/tBhheCvY81pzL+G/lb+W1N6PSCVt/wRI9i6piIDV9QbJreg5JTSl7b/t9y3TbEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=KuGsUWhF; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=hecKULoF; arc=none smtp.client-ip=202.12.124.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mm2MU//K"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20B0C1F000FF;
-	Fri, 18 Sep 2026 05:41:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789710071;
-	bh=nHd6+0HC/1nPCk+6Tm6Uyj6WwdTzSmqKCRyfLZwz4Js=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Mm2MU//KnClCqSqTzNYerNrxjAq+FvG29dS83BnDmwvFqi3DX6rp174BcDccwAzMy
-	 CnDZJF5NO67EZaqviRLLQizWwNt++tMwZVUv6rve6qhUHE5KkbcL7yoUn4QMwtcMb+
-	 J7/I7DzTEVhddYQS1Hf8p5zoYucUAfWC6iMMd2cy6jJCHzuhcBimIpmeEeeEDGZ/aI
-	 PaAGna5sA0SeZs/ylvheVEeDvmDFnUgqPDcFN5VSGJlo2kXwXfR3QccNRJvloa7vW2
-	 xbeQjifYIbf4BE3igjVi0tGeJsmSDJeZdq55shnuTsF5lSqMT3vJqwEtY1mLnH5c51
-	 AI80yPMRfMhAQ==
-Date: Thu, 17 Sep 2026 22:40:58 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Kees Cook <kees@kernel.org>
-Cc: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Nicolas Schier <nsc@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Alexey Gladkov <legion@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>, Paul Walmsley <pjw@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
-	Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <lossin@kernel.org>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Daniel Almeida <daniel.almeida@collabora.com>,
-	Tamir Duberstein <tamird@kernel.org>,
-	Alexandre Courbot <acourbot@nvidia.com>,
-	Onur =?iso-8859-1?Q?=D6zkan?= <work@onurozkan.dev>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, linux-riscv@lists.infradead.org,
-	linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	linux-doc@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v3 11/20] kbuild: avoid re-running compiler and linker
- probes
-Message-ID: <20260918054058.GA384222@ax162>
-References: <20260917-build-speedup-v3-0-9ecf4163ff36@kernel.org>
- <20260917-build-speedup-v3-11-9ecf4163ff36@kernel.org>
- <202609171154.BEA5134F7@keescook>
- <20260918012119.GC1585590@ax162>
- <202609172130.3DF0D66@keescook>
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="KuGsUWhF";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="hecKULoF"
+Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 52E757A00E8;
+	Fri, 18 Sep 2026 02:22:50 -0400 (EDT)
+Received: from ams-imap-03 ([10.64.2.23])
+  by ams-compute-02.internal (MEProxy); Fri, 18 Sep 2026 02:22:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1789712569;
+	 x=1789798969; bh=kJRkH9y0iL21fiS3CIdzGL0TrDMTu7cAWMx2Tblk4Mw=; b=
+	KuGsUWhFMeuW9g6yJPio9dJtFDd53WJUVuKXzHni9ASZoEBa7w3UdegqQavBrzSp
+	FHhj1ntJTHJLf5kFeGch8P4TeIQHBqu8VXqMXvjP8OjY4zybZ3Rg/hkGwhBaijRj
+	3CbHE7QjSuwIT/mKVRriIlAthkrkozi7xn+sHSC8SGMt6xzBnjMJiDxJgFpWrcRK
+	XVAbZfNGnxV6W7bE9IRXOICx71YRbdHI19vs/ERn2RcgpSNXH3+hthBHDn84INzV
+	wPXobz+8VSzg8YnmYDj7xK8QGTz18Ztcy8Iovqhhk7pp1exXFyQ9YnvHd3+vV44G
+	/uB+WGD70lbUHPOQQzLAzw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1789712569; x=
+	1789798969; bh=kJRkH9y0iL21fiS3CIdzGL0TrDMTu7cAWMx2Tblk4Mw=; b=h
+	ecKULoFxbDXvLtzDUdWJZ4klvoKWbD0XRBPSqkAD2+8L0Y58nNL4zKDQF8+3/NfQ
+	upT2/YeMW6yxggKS3IGmqBMh5WyyD5qi2hK+xLGk17GfY8+91mEPS0813mh34cKn
+	zBM1Ku16Dgdg1dViUKrTCYcjJiT0y+U31ir0UxvC/Jzt3wg4Lfow/JZQQPbeIm//
+	yD+kKxmQKj9SQirA2NBYbBH48rf4LpeXZd9f+aeHtP2PNpWsj5laM3tDFmz5GeRO
+	X91RttRw7UE1lsUJSoQ7YzXG96g0yFEGu3Sa0VbpKIvCaM53Wu0m7JPgur7um33T
+	t5iPrl3KPc7Hv6YaPHx+w==
+X-ME-Sender: <xms:tdisarwmHHpdu8i3t4TkiPBBuLGV-drSoZa96TGnoF9z5ZVE-y9CwQ>
+    <xme:tdisauE5qOH2Qyq5uiANm5XN7rQWI5-VO9ThNUnYicybMde8Nv1QN5_SD7zX6kmHM
+    cz-05IUXenzxQtEfqbf4bKdicGRwI6lCN4KqNPc_kddwjQj0hmkqI8>
+X-ME-Proxy-Cause: dmFkZTFEqTwzIprk1GtZpod+3Rl4MAua1izFjbVrb8H3Skw9dkRhugzxqCpAiUunM7SAJ1
+    tzH+jABzo6ntMxneef+S1CTmpsAYV0v65Wd6jfWLEyz2Slhom95w2Rdk3fxJra7Mo/o4//
+    bsG2AyDb/o92QNVOY1wHK2KdHaOXRlyq5ZayGSDksln3KeZ8XY4o43NOox8Ic2rB7qJ+dO
+    TCcLbWjJwxEoHuNjaJkB5cr5Lx53s7OuYayv8/wGahLEx1b83hmoz1KreHBN/GcZUHiwAx
+    Whr4/NoHuti+JIo673LXPUzJ8g4o+an8tlfo3jVblOp8K3Wp0873pDx3kIlB/PvO0BQdqv
+    MhY5+Zio7jMkON6Dc4962pLR4jfgPcPlhrISNdKQ5rNMakuREPTq+44jdawHrsXnRn4y61
+    0niKreB7mJV6p4gcFKBx/Q3f0QMSBU0NW5h3p+vWufkUuo9JRK2BgeyXULa14U07mKXMSV
+    Bor+oAnAMkq9EJ7VUMMA0fqHjXQBDn3wlJIYjcYSLH9d5yMuBnYCedzXkl7VkJNC5FI+94
+    tSoYV0RbgrH5uJ/Ya/wsrfzYc4hb/jwCGiNR7HYsNz2dKOwxBpTW31qXxZKsrLFZWsSPap
+    cYCObrGDVDP6HwaGZPHjsSZ4tOZEjDUGEA+NHd614qsY5PSnB+NkmyOu8XvQ
+X-ME-Proxy: <xmx:t9isar2jwiZMxB-smgPoh66sJGOMJEjtanEKsscpOSVx2qNqcqLNgA>
+    <xmx:t9isaqj44Wtn_bxQumxtokd4ObqSfW6xjRAXndfpogwwqOWZpKOUyw>
+    <xmx:t9isaro_YUBrFWR1Ia7BmHXoEYf4ZOPCptMHSu_bQ6VkjCrHNRwkDg>
+    <xmx:t9isatMNsypAxfiPU-KUMbtELH-qgANjXD42PQijVhkNxqAhRQY67g>
+    <xmx:udisah909h-WXrwp5hXuF3jPfIRYCd59Fj8tcjOp91qea-A4DVa-q6mX>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.ams.internal (Postfix, from userid 501)
+	id F17DB32A0084; Fri, 18 Sep 2026 02:22:44 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202609172130.3DF0D66@keescook>
+X-ThreadId: AytAa-GFwSww
+Date: Fri, 18 Sep 2026 08:22:24 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>,
+ "Masami Hiramatsu" <mhiramat@kernel.org>
+Cc: "Christian Brauner" <brauner@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kbuild@vger.kernel.org, kernel-dev@igalia.com,
+ "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>,
+ linux-alpha@vger.kernel.org, linux-s390@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, soc@lists.linux.dev,
+ linux-mips@vger.kernel.org, sparclinux@vger.kernel.org
+Message-Id: <4fa47186-08b3-4b2a-bbcc-16b14a50ee21@app.fastmail.com>
+In-Reply-To: <20260917-tonyk-syscall_table-v7-4-f4cd8f8e3265@igalia.com>
+References: <20260917-tonyk-syscall_table-v7-0-f4cd8f8e3265@igalia.com>
+ <20260917-tonyk-syscall_table-v7-4-f4cd8f8e3265@igalia.com>
+Subject: Re: [PATCH v7 04/13] arm: Use the common syscall table
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 17, 2026 at 09:44:24PM -0700, Kees Cook wrote:
-> On Thu, Sep 17, 2026 at 06:21:19PM -0700, Nathan Chancellor wrote:
-> > While we could certainly try to cook something like this up, we could
-> > also avoid the split across two files by just defining the flags in
-> > Kconfig directly and using them in the Makefile through their symbol,
-> > like we already do for -Wimplicit-fallthrough. For example, instead of
-> > 
-> >   config CC_HAS_STRICT_FLEX_ARRAYS
-> >       def_bool $(cc-option,-fstrict-flex-arrays=3)
-> > 
-> >   KBUILD_CFLAGS += $(if $(CONFIG_CC_HAS_STRICT_FLEX_ARRAYS),-fstrict-flex-arrays=3)
-> > 
-> > We would just do
-> > 
-> >   config CC_STRICT_FLEX_ARRAYS
-> >       string
-> >       default "-fstrict-flex-arrays=3" if $(cc-option,-fstrict-flex-arrays=3)
-> > 
-> >   KBUILD_CFLAGS += $(CONFIG_CC_STRICT_FLEX_ARRAYS)
-> > 
-> > While we still get the duplication (and we could look at getting rid of
-> > it with your cc-option-str idea or whatever), it is at least contained
-> > to the same location, so out of sync issues should be much rarer. I do
-> > diff Kconfigs so this might make certain issues with checks a little bit
-> > more obvious if something changes on the compiler side.
-> 
-> Yeah, and note that cc-option-bit already exists. It's just a weird name
-> is all and there isn't an ld-option-bit.
+On Fri, Sep 18, 2026, at 01:46, Andr=C3=A9 Almeida wrote:
+> Remove some of the duplicated code by using the common syscall number
+> table.
+>
+> Signed-off-by: Andr=C3=A9 Almeida <andrealmeid@igalia.com>
+> ---
+> Changes from v6:
+> - Added back syscalls from 403 to 423 to local table. arm32 can't use =
+the
+> common table for those syscalls, because arm doesn't implements compat_
+> entry points for syscalls like pselect6, ppoll, etc., and OABI uses co=
+mpat_
+> entry points when it's available, so this would cause a build error.
 
-Ah, I see. I worry that the current cc-option-bit is not sufficient for
-all options that we may want to test because it uses '-E' to stop after
-preprocessing (whereas some options may need to get to code generation
-to be validated properly) and it does not use $(CLANG_FLAGS) to properly
-set the target (so we might not get consistent results). I wonder if we
-would be better off refactoring cc-option-bit into cc-option-str that
-shares most of the machinery of cc-option. Then we could just add
-ld-option-str.
+That's too bad, especially if this is only needed for OABI, which
+nobody should be using any more. I had hoped we could kill off OABI
+soonish, but that is currently blocked on the discussion about keeping
+RiscPC alive.
 
-> As for naming conventions, I think "CC_OPT_" would be a good prefix. And
-> this works today with no change:
-> 
-> config CC_OPT_STRICT_FLEX_ARRAYS
-> 	string
-> 	default "$(cc-option-bit,-fstrict-flex-arrays=3)"
+One possible idea would be to rework the table to differentiate
+the cases using separate ABI tags for the three cases (EABI native,
+OABI native, OABI on EABI), instead of using the compat column:
 
-This does look pretty nice.
+--- a/arch/arm/tools/syscall.tbl
++++ b/arch/arm/tools/syscall.tbl
+@@ -115,7 +115,8 @@
+ 99     common  statfs                  sys_statfs
+ 100    common  fstatfs                 sys_fstatfs
+ # 101 was sys_ioperm
+-102    oabi    socketcall              sys_socketcall          sys_oabi=
+_socketcall
++102    oabi    socketcall              sys_socketcall
++102    oabic   socketcall              sys_oabi_socketcall
+ 103    common  syslog                  sys_syslog
+ 104    common  setitimer               sys_setitimer
+ 105    common  getitimer               sys_getitimer
+@@ -131,7 +132,8 @@
+ 114    common  wait4                   sys_wait4
+ 115    common  swapoff                 sys_swapoff
+ 116    common  sysinfo                 sys_sysinfo
+-117    oabi    ipc                     sys_ipc                 sys_oabi=
+_ipc
++117    oabi    ipc                     sys_ipc
++117    oabic   ipc                     sys_oabi_ipc
+ 118    common  fsync                   sys_fsync
+ 119    common  sigreturn               sys_sigreturn_wrapper
+ 120    common  clone                   sys_clone
+@@ -194,8 +196,12 @@
+ 177    common  rt_sigtimedwait         sys_rt_sigtimedwait_time32
+ 178    common  rt_sigqueueinfo         sys_rt_sigqueueinfo
+ 179    common  rt_sigsuspend           sys_rt_sigsuspend
+-180    common  pread64                 sys_pread64             sys_oabi=
+_pread64
+-181    common  pwrite64                sys_pwrite64            sys_oabi=
+_pwrite64
++180    eabi    pread64                 sys_pread64
++180    oabi    pread64                 sys_pread64
++180    oabic   pread64                 sys_oabi_pread64
++181    eabi    pwrite64                sys_pwrite64
++181    oabi    pwrite64                sys_pwrite64
++181    oabic   pwrite64                sys_oabi_pwrite64
+ 182    common  chown                   sys_chown16
+ 183    common  getcwd                  sys_getcwd
+ 184    common  capget                  sys_capget
+...
 
-> (do we need "def_string" now?)
 
-def_string would certainly make these even nicer.
+Not great, but it has the additional advantage of finally being able
+to share the table file with the arm64 copy.
 
--- 
-Cheers,
-Nathan
+Another idea would be to actually add the six compat_sys_
+entry points for OABI from the common table, or redirect
+them like
+
+diff --git a/arch/arm/include/asm/unistd.h b/arch/arm/include/asm/unistd=
+.h
+index 9fb00973c608..1ff4b6579ba1 100644
+--- a/arch/arm/include/asm/unistd.h
++++ b/arch/arm/include/asm/unistd.h
+@@ -33,6 +33,15 @@
+ #define __ARCH_WANT_SYS_OLD_GETRLIMIT
+ #define __ARCH_WANT_OLD_READDIR
+ #define __ARCH_WANT_SYS_SOCKETCALL
++
++/* allow using compat column from shared syscall table */
++#define compat_sys_pselect6_time64 sys_pselect6_time64
++#define compat_sys_ppoll_time64 sys_ppoll_time64
++#define compat_sys_io_pgetevents_time64 sys_io_pgetevents_time64
++#define compat_sys_recvmmsg_time64 sys_recvmmsg_time64
++#define compat_sys_rt_sigtimedwait_time64 sys_rt_sigtimedwait_time64
++#define compat_sys_epoll_pwait2 sys_epoll_pwait2
++
+ #endif
+ #define __ARCH_WANT_SYS_FORK
+ #define __ARCH_WANT_SYS_VFORK
+
+This would be the least invasive here, but also the least intuitive.
+
+        Arnd
