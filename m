@@ -1,50 +1,65 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1DD72F691D;
-	Sat, 19 Sep 2026 13:31:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 546593101C2;
+	Sat, 19 Sep 2026 14:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789824698; cv=none; b=ZMg5nGvYAeUljODDPXcXwBpKpHtPVWQsfcPqsdbZIJHISjWgVDie2JeQ1yuMjoOQaDBkJaUHgogqofnJ+hAwSwtQ93J6edcFY7HirY5VQmRlN9c4CjU2Wp4TvMdP1VG8F9GQjtq/v2TaFmkS1PFgUdjj9z/5Febz8i23j5OWkPY=
+	t=1789828810; cv=none; b=N87aYBb3ifDKnMtSBQkPj8C4kCTxymw9H1WnubGdnthMrp4y78rHmhXE8tclfp3/94jtTB9slg2xmT7M7HrmyDjS6+ZR+T3+orX1GtkiY78B/B2NPgnID1IyhjlNPhIYi88mekOQ9rYYCkUIauGXEmv9CPozSME3PKM4/4UdJns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789824698; c=relaxed/simple;
-	bh=uiuuTERZGcy4ko3mNXucZBk1RKFtye2kgYm6hagJsng=;
+	s=arc-20240116; t=1789828810; c=relaxed/simple;
+	bh=5+wsLqNiz1ftRnY/1v6UHJknDM2g9naN/MHmlwTljBQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qRosL8MjMC6JnqqlykKShizTz0Dmmjfj18wkTFWXmFCbWEJkF+WcmlZi1FfaF0eQQQSPmF+PirbmZD/H6Spufr2QxViEQwcaF0MXsqDla63ET+8ytl9UjM3pojoBqqUr4yI34/PvLXrTt3d1tXSD74ty6LTgaRj06bRuz1osMQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QO3Y2XsE; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=eZOKpz8QVv/zTgMT+O+t7jT3zAxjUrLcBhCwL20gFwlMUf7oNpXyyS43VSQB1Gt7XSIkcT9Z3X9Cz0IQ3uFyepGXqD5bdZCrikOuE21sc57SoXcd/SHWRPs1K5qs/CH38n+NY9FOr9b8KhlXfJsL/yvVO30vET2B98smRJzkSd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bmle4uSt; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QO3Y2XsE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46CF41F000FF;
-	Sat, 19 Sep 2026 13:31:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bmle4uSt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9816A1F000FF;
+	Sat, 19 Sep 2026 14:39:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789824697;
-	bh=LRxkL+FNxgiZNVxZ1edJUWhUkP0aSqg5kr3XlruhiC8=;
+	s=k20260515; t=1789828808;
+	bh=wjlxL5aZkP+VxdLu3dOkGnCdnF8bXwL4sZrwxhwgEoI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=QO3Y2XsEPGiSzCvLFdPBPK4Z3MfogKpXSSlnRO/Y7+i4SIEzJAhRAK1FEt8aS4wuW
-	 NVcbTYOmIxXOPI09HqJiLNEjwv1U362YGxd+T0qDY30SYcNfjz7rN3r/O1bvNtNfAh
-	 49ebuXswm4/ol9whV47iYP+7DPtAmDX2MIRPaDjhC+5Xva64V57DKQf6IRoQka0Rh6
-	 QibKjBxAkVoX90Am6LsWqxITR1nzhv7V5KAEjfLkAT+sPVPZXftHkAoKEojaYaMNHr
-	 nOKorKOhVpPBljLVdYLIQrY08YumNrqRnpSbxGNay9ZsBWK/jOEmIglNsqBFxFu+xs
-	 3EeTtBNRaHaxg==
-Date: Sat, 19 Sep 2026 14:31:28 +0100
+	b=bmle4uStbjC80tnxl/vjfpvmYYVkjjgMRY8+5/8q3PJtzA+t0bmdendomXHO0ws9H
+	 U7AkZ01hXjF9UNEcQJjw7O9/G4ZVuIuTmE9nQZ3vbmzWCvaO165TT83I/rtJG67Uk8
+	 ZFOFQWbnJPaWf/uRXVtzgN/37w3mP1J0r/35iCXOcKYjsonGbQyJWBByqZl7EDsn8A
+	 AoQzM7VokTP4qPCH98a+dd0vu239lXSc8hrSG3iX73m64ZC18rGxk7qnPGd28l/Jyx
+	 Wc2TmR6JoQ+w2Nml9DQH/pX6LYALY6ZyyxX+/DvfhQiCD1q+q2+EZx1en4Sr/c+Iwd
+	 Sv6mRmehV0F6A==
+Date: Sat, 19 Sep 2026 15:39:53 +0100
 From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
 To: Nathan Chancellor <nathan@kernel.org>
-Cc: Kees Cook <kees@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
-	Julian Braha <julianbraha@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Shuah Khan <skhan@linuxfoundation.org>, Randy Dunlap <rdunlap@infradead.org>, 
-	Vegard Nossum <vegard.nossum@oracle.com>, Nauman Sabir <officialnaumansabir@gmail.com>, 
-	Tejun Heo <tj@kernel.org>, Nicolas Pitre <nico@fluxnic.net>, 
-	Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, Matthew Maurer <mmaurer@google.com>, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Andrew Jones <andrew.jones@linux.dev>, 
-	Graham Roff <grahamr@qti.qualcomm.com>, Masahiro Yamada <masahiroy@kernel.org>, 
-	Arnd Bergmann <arnd@arndb.de>, Krzysztof Kozlowski <krzk@kernel.org>, 
-	Miguel Ojeda <ojeda@kernel.org>, "Borislav Petkov (AMD)" <bp@alien8.de>, 
-	Gary Guo <gary@garyguo.net>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH 0/3] kconfig: Introduce cc-option-str
-Message-ID: <aq6OPchSSrgXhicS@gremlin>
-References: <20260919005923.i.879-kees@kernel.org>
- <20260919012508.GA3573999@ax162>
+Cc: Nicolas Schier <n.schier@fritz.com>, Kees Cook <kees@kernel.org>, 
+	Linus Torvalds <torvalds@linux-foundation.org>, Nick Desaulniers <ndesaulniers@google.com>, 
+	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+	Masahiro Yamada <masahiroy@kernel.org>, Alexey Gladkov <legion@kernel.org>, 
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, Arnd Bergmann <arnd@arndb.de>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Ard Biesheuvel <ardb@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Josh Poimboeuf <jpoimboe@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
+	Gary Guo <gary@garyguo.net>, =?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
+	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
+	Onur =?utf-8?B?w5Z6a2Fu?= <work@onurozkan.dev>, Jonathan Corbet <corbet@lwn.net>, 
+	Randy Dunlap <rdunlap@infradead.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>, 
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
+	linux-riscv@lists.infradead.org, linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-doc@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v3 01/20] kbuild: do not allocate .modinfo in vmlinux
+Message-ID: <aq6QwzcyvKp3CB0F@gremlin>
+References: <20260917-build-speedup-v3-0-9ecf4163ff36@kernel.org>
+ <20260917-build-speedup-v3-1-9ecf4163ff36@kernel.org>
+ <202609170950.480F90A28@keescook>
+ <20260918005142.GA1585590@ax162>
+ <20260918-meek-spectral-nightingale-53d88d@l-nschier-aarch64>
+ <20260918214445.GA3589065@ax162>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -53,37 +68,84 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260919012508.GA3573999@ax162>
+In-Reply-To: <20260918214445.GA3589065@ax162>
 
-On Fri, Sep 18, 2026 at 06:25:08PM -0700, Nathan Chancellor wrote:
-> On Fri, Sep 18, 2026 at 05:59:24PM -0700, Kees Cook wrote:
-> > Hi,
+On Fri, Sep 18, 2026 at 02:44:45PM -0700, Nathan Chancellor wrote:
+> On Fri, Sep 18, 2026 at 07:09:30PM +0200, Nicolas Schier wrote:
+> > Yes, thanks.  Looks good to me and I think it's a good idea to apply
+> > that patch first.
 > >
-> > While reviewing the recent build speedup series[1], it became clear
-> > that we needed a general solution in kconfig to avoid repeating detected
-> > toolchain options. Implement cc-option-str and ld-option-str, and while
-> > at it, create "def_string" and friends to match "def_bool".
-> >
-> > -Kees
-> >
-> > [1] https://lore.kernel.org/all/20260918054058.GA384222@ax162/
-> >
-> > Kees Cook (3):
-> >   kconfig: Add "def_string", "def_int" and "def_hex"
-> >   kconfig: Replace "cc-option-bit" with "cc-option-str"
-> >   kconfig: Add "ld-option-str"
+> > for Nathans patch:  Reviewed-by: Nicolas Schier <n.schier@fritz.com>
 >
-> Thanks, exactly what I had in mind. This seems reasonable to me and
-> passes my basic testing. I will let folks chime in for a few days then
-> apply this to kbuild-next so that Lorenzo can use it as part of the
-> speed up series.
+> Thanks, I have pushed this to kbuild-next-speedups as
+>
+>   36d4a11b56aa ("kbuild: Remove alignment on .modinfo section")
+>
+> which Lorenzo can base on. I have also tentatively included the patches
 
-Agreed, I will base my local v4 on it and send that (obviously once I've
-gone through review commentary etc.) once things have settled and rebase
-the series on kbuild-next!
+Ack, will rebase future revisions on this patch.
 
-since I sent v3 on thurs I'll likely aim for weds/thurs next week for v4
-but I'll wait until this series is in place before I do it obviously! :)
+> that are basically ready in my eyes based on consensus and review so far
+> for initial build testing. I do see some comments on some of those
+> patches though, so I will hold off on fully applying them until the next
+> revision. If there are any other changes that we should consider taking
+> quickly on the next revision, please feel free to point them out, it is
+> a bit hard to follow these threads sometimes :)
+
+Thanks :)
+
+>
+> [1]: https://git.kernel.org/kbuild/l/kbuild-next-speedups
+>
+> > [ Lorenzo's patch, updated by Nathan ]
+> > [...]
+> > > diff --git a/scripts/Makefile.vmlinux b/scripts/Makefile.vmlinux
+> > > index 6833b517cacb..95b523fe4f9e 100644
+> > > --- a/scripts/Makefile.vmlinux
+> > > +++ b/scripts/Makefile.vmlinux
+> >
+> > [...]
+> > > @@ -103,10 +100,7 @@ vmlinux: vmlinux.unstripped FORCE
+> > >  # ---------------------------------------------------------------------------
+> > >
+> > >  quiet_cmd_modules_builtin_modinfo = GEN     $@
+> > > -      cmd_modules_builtin_modinfo = $(cmd_objcopy); \
+> > > -                                    chmod -x $@
+> > > -
+> > > -OBJCOPYFLAGS_modules.builtin.modinfo := -j .modinfo -O binary
+> > > +      cmd_modules_builtin_modinfo = $(OBJCOPY) -O binary -j .modinfo --dump-section .modinfo=$@ $< /dev/null
+> >
+> > By shifting from "$(cmd_objcopy)" to "$(OBJCOPY) + args",
+> > $(OBJCOPYFLAGS) is dropped.  It this by intention?
+>
+> I am not sure it matters in this case since I don't think there are
+> global OBJCOPYFLAGS, I only see instances that come from specific rules
+> but I might be missing something.
+
+OBJCOPYFLAGS is exported from the top level Makefile:
+
+655:export KBUILD_CPPFLAGS NOSTDINC_FLAGS LINUXINCLUDE OBJCOPYFLAGS KBUILD_LDFLAGS
+
+And is set by various arches e.g.:
+
+arch/csky/Makefile
+2:OBJCOPYFLAGS		:=-O binary
+
+arch/mips/Makefile
+348:OBJCOPYFLAGS		+= --remove-section=.reginfo
+
+arch/openrisc/Makefile
+20:OBJCOPYFLAGS    := -O binary -R .note -R .comment -S
+
+arch/sh/Makefile
+79:OBJCOPYFLAGS	:= -O binary -R .note -R .note.gnu.build-id -R .comment \
+		   -R .stab -R .stabstr -S
+
+arch/s390/Makefile
+123:OBJCOPYFLAGS	:= -O binary
+
+And none of this should impact .modinfo, and if it did it'd be broken as then
+.modinfo would be different for one arch and not the others.
 
 >
 > --
