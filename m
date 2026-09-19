@@ -1,104 +1,105 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6020348C5D;
-	Fri, 18 Sep 2026 21:48:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA2130F540;
+	Sat, 19 Sep 2026 00:31:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789768091; cv=none; b=ZVZzWRG5+p4yD6XjpY9bjwCtajNgWxm2pttJpIvAvUo9o8AE1VoENTLzZQR2zyKcNFrv+1MjJTi1GjlI25aU8psR48okQ/MY2FMtTaHwDtzE+7yvviL800g11Qt0u3hNzXl4W0Ohv/19SJ+cLTyO/fcgIrJkqdZvkBpho3UYxBk=
+	t=1789777888; cv=none; b=gH0aujAzTCydqpqELQqSFuvQwOoWKOq24vg+zjRfH8VDPsVh/dmn0mdry7SCPgqrnbKQNhyiDvrsZ/fBhass5TIDZs6+cqP8v17JpvUOpjzllF/qCFEpCQyB1Di10yb6Jz194CyGdYRMPs2xk9AtBZvfxwnk6sGUzsBstkfHCXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789768091; c=relaxed/simple;
-	bh=O2hlwkAufNrMR+uFIlmrSAkYpcLS6FYqXxT24W1gzcs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n6Gpy4i/+OzROHtoVpHnOgV0UNnnKog/w6A7P5pCQ2Mpa2wbDe2HlLGU5G5tgkDEVJ5QQccnEOGrMMoE7WEKI8IoXaaEcM12+r32vwZ58LU/BJRVb2KhmS5tx5JCF3o2MeEc5eHPxbfQtc+H2rsXES5cy8+lSW11AzEko9jnIcI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n/u4V9d4; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789777888; c=relaxed/simple;
+	bh=voYeUFRGxJF51AdGg0Ie0IWOP6zIt8JXqOyKZWKsO3I=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=roXChn2VVBB1ezaX26pE/3erWZu0DB0je4m1lRborVJHlONXi27k2by7w21qb3U4pWCd0AxlyBYqmFD1Jxgo3RKBEQRrCULeUKJkmzh4cKn7+kzSPOH5wcjVsRi3U4QdgvTT4i3Wxi2KPZI9qfo2t5lsujL0g6yVfDIwuOP+A0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=V5bA52/5; arc=none smtp.client-ip=213.97.179.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n/u4V9d4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E24FC1F000FF;
-	Fri, 18 Sep 2026 21:48:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789768089;
-	bh=Yd9AmOgN/Q25cum2jEcCgRSfXf6tk/+UUdM0ddYKZT4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=n/u4V9d41fCbxrKHbJcFkaCej72wTGtwCsP+FFelG4SvHzdPTSFMe7uQoZNpsqbnJ
-	 VtEf8qPnBU1zNLj7VkIfSoj4AbFjnkHgLBn4eMptjiG2LCftGVlo09DMBJ290glWQC
-	 uhh3MQf6MIL9CFMa+Z5Gpy0DS3GdR2jvNdcKJLMvTWjbY2X4tr7O7/cb/oxW/TGGl+
-	 Rzdqu317bhJ05nGzdY3JcTyZm6FN3FeEXgQ5Mey1keyY7jzbwST/qPLbn0YmyYCq8f
-	 aeJcw3RtulfpKJY9GsoNj4J0HMbU48yINYR2HvD8CU3J2gazYJrJGeoTdLC4gL0Cf1
-	 xb93S3J7ZP2wA==
-Date: Fri, 18 Sep 2026 14:48:04 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Guillaume Tucker <gtucker@gtucker.io>
-Cc: Nicolas Schier <nsc@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Onur =?iso-8859-1?Q?=D6zkan?= <work@onurozkan.dev>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	linux-doc@vger.kernel.org, workflows@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-	kernelci@lists.linux.dev, automated-testing@lists.yoctoproject.org
-Subject: Re: [PATCH v4 1/3] scripts: add TOML config to container tool
-Message-ID: <20260918214804.GA1849926@ax162>
-References: <68b14a76a4cb2e6437c869bab948983a98acffbd.1788779245.git.gtucker@gtucker.io>
- <03e8513a-3480-42a5-9d1b-fad6c36ed07a@gtucker.io>
+	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="V5bA52/5"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; h=Cc:To:Message-Id:Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Subject:Date:From:From:Reply-To;
+	bh=1Mqf8IivruERMP6fZwT8V4CKtJjvaF7LKzl37WPzoRE=; b=V5bA52/5f49aYc2wfJiWNjECNw
+	B5sDME9+xcxRopAUcb1VJsj/aWSFvtND3Pdwsxi95Um/XbJYBTlHkThG8ta1uit1cemKqYQEM3wRI
+	nQRQjN4YXzNk/PYFFhCH+wW3r9Gqx9JKFOdWJ9i38hgq5ATS1bhXgT4WqLiVmsKvJmD0uz0FrmXbh
+	KkEUrFeq7QRX2c1/ynsaOhNEUq4Gk5S0oG4T1luFqw1hWvCrwfzNWeQ2RYi+j/U8P7PYs0JMgO/bZ
+	rFbe/H9MFYodcA39OHTR2K34aRwkbAG4CTZd/itW6AeBuaTfTD4T0JpaiydmEK6hbut8llSaGUrWH
+	uaTxF6PA==;
+Received: from [177.172.123.214] (helo=[192.168.15.100])
+	by fanzine2.igalia.com with esmtpsa 
+	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
+	id 1x7iz5-004Bwz-Hg; Sat, 19 Sep 2026 02:31:15 +0200
+From: =?utf-8?q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
+Date: Fri, 18 Sep 2026 21:31:08 -0300
+Subject: [PATCH v8 01/12] syscalls: Make --abis parsing more robust
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <03e8513a-3480-42a5-9d1b-fad6c36ed07a@gtucker.io>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20260918-tonyk-syscall_table-v8-1-0e2d60cad13e@igalia.com>
+References: <20260918-tonyk-syscall_table-v8-0-0e2d60cad13e@igalia.com>
+In-Reply-To: <20260918-tonyk-syscall_table-v8-0-0e2d60cad13e@igalia.com>
+To: Masami Hiramatsu <mhiramat@kernel.org>, Arnd Bergmanon <arnd@arndb.de>
+Cc: Christian Brauner <brauner@kernel.org>, linux-kernel@vger.kernel.org, 
+ linux-kbuild@vger.kernel.org, kernel-dev@igalia.com, 
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+ linux-alpha@vger.kernel.org, linux-s390@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, soc@lists.linux.dev, 
+ linux-mips@vger.kernel.org, sparclinux@vger.kernel.org, 
+ =?utf-8?q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
+X-Mailer: b4 0.15.2
 
-Hi Guillaume,
+Some archs Makefile have something like this as the rule for making the
+syscall files:
 
-On Fri, Sep 18, 2026 at 12:04:09PM +0200, Guillaume Tucker wrote:
-> On 07/09/2026 13:10, Guillaume Tucker wrote:
-> > Add support for a TOML configuration file to the scripts/container
-> > tool.  This improves user experience by not having to keep passing the
-> > same command line options all the time or overly relying on built-in
-> > default values.  Include the concept of 'profiles' with different
-> > named sections in the file to cover various use cases.
-> > 
-> > Command line options take precedence over the config file, and values
-> > defined in profile sections take precedence over the default one.
-> > 
-> > Add a -c option to override the location of the .container.toml config
-> > file which should otherwise be located in the current working
-> > directory.  If not found, the file is silently ignored as it is not
-> > strictly required unless the -c option is used.
-> > 
-> > Add a -p option to choose a particular profile section in the config
-> > file rather than the default.
-> > 
-> > Signed-off-by: Guillaume Tucker <gtucker@gtucker.io>
-> > Acked-by: Nicolas Schier <n.schier@fritz.com>
-> > ---
-> > 
-> > Notes:
-> >     Changes in v2:
-> >     - fix uid / gid handling when set to 0 (root)
-> >     
-> >     Changes in v3:
-> >     - fix logic when loading config profiles using None
-> >     - fix typo with missing whitespace in help message
-> >     - clarify how UID gets used as default value for GID
-> >     
-> >     Changes in v4:
-> >     - drop registry option from TOML config
-> > 
-> >  scripts/container | 86 ++++++++++++++++++++++++++++++++++++++++-------
-> >  1 file changed, 74 insertions(+), 12 deletions(-)
-> Thanks for the reviews so far.
-> 
-> Do you guys need anything else regarding this series?
-> 
-> There's no rush of course and we're all busy, just making sure I
-> didn't miss anything.
+  cmd_systbl = $(CONFIG_SHELL) $(systbl) --abis common,$* $< $@
 
-No, my apologies for not responding to this sooner. I plan to take a
-look soon, I just keep getting preeempted by other stuff.
+The $* symbol is evaluated to the variable found at $(uapi)/unistd-%.h,
+where % is 32 or 64, resulting in e.g. `--abis common,32`. Sometimes the
+rule for the file won't have a %, resulting in a trailing comma e.g.
+`--abis common,`.
+
+Currently this input is transformed into (common|). This is problematic
+because grep will then match any ABI because of the trailing `|`. Make the
+syscalls scripts more robust by removing any trailing comma.
+
+Signed-off-by: André Almeida <andrealmeid@igalia.com>
+---
+ scripts/syscallhdr.sh | 2 +-
+ scripts/syscalltbl.sh | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/syscallhdr.sh b/scripts/syscallhdr.sh
+index 22e34cd46b9b..bad1ab606a0f 100755
+--- a/scripts/syscallhdr.sh
++++ b/scripts/syscallhdr.sh
+@@ -39,7 +39,7 @@ while [ $# -gt 0 ]
+ do
+ 	case $1 in
+ 	--abis)
+-		abis=$(echo "($2)" | tr ',' '|')
++		abis="($(echo "${2%,}" | tr ',' '|'))"
+ 		shift 2;;
+ 	--emit-nr)
+ 		emit_nr=1
+diff --git a/scripts/syscalltbl.sh b/scripts/syscalltbl.sh
+index 6a903b87a7c2..c4b1f85c2dd6 100755
+--- a/scripts/syscalltbl.sh
++++ b/scripts/syscalltbl.sh
+@@ -33,7 +33,7 @@ while [ $# -gt 0 ]
+ do
+ 	case $1 in
+ 	--abis)
+-		abis=$(echo "($2)" | tr ',' '|')
++		abis="($(echo "${2%,}" | tr ',' '|'))"
+ 		shift 2;;
+ 	-*)
+ 		echo "$1: unknown option" >&2
 
 -- 
-Cheers,
-Nathan
+2.55.0
+
