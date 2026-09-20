@@ -1,62 +1,65 @@
-Received: from mail-wm2-f13.google.com (mail-wm2-f13.google.com [74.125.225.141])
+Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 075C93D9520
-	for <linux-kbuild@vger.kernel.org>; Sun, 20 Sep 2026 06:47:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40CEF3B71AE
+	for <linux-kbuild@vger.kernel.org>; Sun, 20 Sep 2026 07:42:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789886865; cv=none; b=Wi7PaNDyRrvGFYO5wb0V9rnAuaen2OEpnGQQr8m/L+37biiNW6lOYairmaNGL4+Ud4ZJ0ZPPKRbAhv4MRKroH7CD5GNjcP4JLvfxlWGqSpdA37ousMz188l+Jhao0jZfn4Wxx+q3CxF8S7NIIvdkf/rY6lgqZt7BWYIRyoB0+eg=
+	t=1789890127; cv=none; b=k2O5l/IwjXiXQ4OghRdlZFry7xVwlYCgdg7xWLFZ2kzwiItnxCW3l4Ya9VM2arYck/lHQMMe6RT1BhhKwij0svhCr+iwnPk2DW67bTSNHQAFdwXFTHfr94h0P0dNZnBdsPYaCyQKlZ08gF4H9DMMFfYUhnAAP3Zd6uKOfYwhgxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789886865; c=relaxed/simple;
-	bh=gTmgzrtRTNi0pnoGcGCYY2OCjhKa0mHfPxUgmpCGYoE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AVMTdkduEsfnTl1emE0tu8vXbraxuDGWlZ/5N0ggX9IUQ3pujEqu1TS3lk20z1L9uZcQOXMGIqxl03WVxc6Hp42l7FsVT9RKR0btaPsVWv3uqQ/EI68aStzX/Ltaufbkoym7yIcITA7riVYmsR3v8Ch0wiCZK1ySMwvi1vMmqI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OfFE2SU+; arc=none smtp.client-ip=74.125.225.141
+	s=arc-20240116; t=1789890127; c=relaxed/simple;
+	bh=rR8igBMAONQFWgxQpNWCSbKEmSHIFF7JAQyn8OzbeWU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Iii0K7gnd2rClXsSaXajy2MhAsuTygY6FXViyYJCw9RgieDONOXx3Pdk5CH5w4h+AE61660AfS+UOIhnxluBuc6psoeDe9I11afj+C+/QQ6nHOQS2Y/9VVULGhydrnQTDr91CpCH3hbUfBXYuLILYWynIkn65o6BFDXDuHaHFgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gMGEWhou; arc=none smtp.client-ip=74.125.225.140
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OfFE2SU+"
-Received: by mail-wm2-f13.google.com with SMTP id 5b1f17b1804b1-49e6598dd44so9936935e9.1
-        for <linux-kbuild@vger.kernel.org>; Sat, 19 Sep 2026 23:47:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gMGEWhou"
+Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49b912d391aso13386655e9.2
+        for <linux-kbuild@vger.kernel.org>; Sun, 20 Sep 2026 00:42:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789886862; x=1790491662; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=mUx2kd5N+hlzcFFuusyp2pQWQI+Tq5GjSNNKvVMy28w=;
-        b=OfFE2SU+SLj4d3hv89jWrTN5o1kT1PEGR7GXY0X86n+d8IE+voYQdZgNAsAZmCJZGh
-         BHRuXQeziHlZvZ5snDnNqrPuCg8Sg/+TlCGjwt2x0ewmthEv7E8uzKwwajyDJAjfI247
-         re8zONmxfEoequSfBI1WQjnWThsVbcnhJa944babLZRBD/1A6EdAJO9+RMoN96H1WSoo
-         Cne1zw1w1bKS/grVwyXnhTYZcsArP5Py1BzJ/nA+WYmjVwmjb8CYxlmFnDD62kCPmvui
-         HvmrWXEBsAHao8OUp8gKN8NOTkybgun+MoQExeZIyWu9oe7kxqeboK09MeTe+GRc5Ktx
-         Jf+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789886862; x=1790491662;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1789890122; x=1790494922; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=mUx2kd5N+hlzcFFuusyp2pQWQI+Tq5GjSNNKvVMy28w=;
-        b=teh0a/hKZ3wK9vnAPOyg5mlSW5S+f6HqQAlAeO4BK3kBsvCxBNJkSAn6U1CsHB+u+m
-         oigTY22/mx2F2Aww1A2DsRkif2PuhNxq4QxRljEZrb3LtEvdpw3UAqu9BbTKEzUj9ZNk
-         yg+7cYX0aow3d74+fIJuWSb0T9/WSJyee7apFnTOR35cZ68hPwlCWcX3THkx1ROia8Zo
-         eZraclw2EHfHo/nqk8en+LEyjKMQl6gg9I4lwPJfMi5LDK1DGDK+T6kegDENIavlospr
-         b2EN2GsXfwi3DbjUm3KDJ8FSssx9rn7BuAXA3J3jijj/VHyFhUV7bL0vYdJeHwYntlfD
-         186Q==
-X-Forwarded-Encrypted: i=1; AKwUvBxjBf2WM0fQuE8FOqs74Y5u8wsWsgnEtH0fwvJZGJ5ygi03Te88N2AjEqXXtLU6fAPEhnkIVMRgOcCJso0=@vger.kernel.org
-X-Gm-Message-State: AFuF++mUC3Jt0KWlu0mIE99tOVjGIIPd4N0/pmAQt0sqkW//obiKzgQY
-	aazhcRkTHspYjODTBZseqO/4Di2kiw+wlixKyFqgc/MFWNAM1I/paESV
-X-Gm-Gg: AYBFou00AYh9DRp+ya3EhyKFGY///SuCarCsD2/yU56cOrGDSY7Zj5f9PFhtAYVj8rk
-	emzZUO6ZpLIcMUyycmwQh6+9VHjZd0o2//9gPu0tDqBawf9JFjbbF6xa5R/xtpreY7YzVUEYqHH
-	3W+UkolI3YR5fXT7zz7kA3A4iqOk/6iLGw3goWX0aXiw/h0rs742A/maqM6sfWNmnJSGIjbiDeH
-	6uc2zeZH0a2iX6vYK+fjINoDrN7M+Nn36mlXoE3VPAiSyPSJcq0bzFCJg9uSTArAbuJZbqhmmlf
-	HiV9EH3Ap4zjYxzQnQus5mox9ePl1QsBa1yL5YVuymbgccLBdvDzoHzM8HiJWc0UCTHAxsanbJY
-	V77OBL+k0yoqwJMru7k1BwltLYInnJmE7uOrnI5ZRGEJE+cVUdVLDlI7DEQajA0r9hQswFOCHIz
-	D55Rl/SNEX6d0pcxA7ipP0jMwi2fk3ZRjNb5edJFC/S1nx+zYJQmtGcCREHmfWhnqtHhR9JIjI6
-	xbcJjd5rjrIqKbUnN2wkE/5zYEk+jJMXxsqMcRs/1crhNJs5FQCx5YB
-X-Received: by 2002:a05:600c:35c9:b0:49f:bcce:13f5 with SMTP id 5b1f17b1804b1-49fc5736229mr113604215e9.24.1789886862139;
-        Sat, 19 Sep 2026 23:47:42 -0700 (PDT)
+        bh=/80n/32ltdJ41KKMohbSQctzxjiK+R/dgCUJ2IHiZLA=;
+        b=gMGEWhouKOE8UhwGLxCX1Ke5iCvNgFTz+rApskftLbzIZO4g0DZJUo5vIsI1tC9Xk+
+         aU3kT2QYexzX325H5kNb3BVNDDmBcFATw5+It3rJQAcv3KjoEYXussBCHDiEUYXE1Jhr
+         yInQPWZDBGS08YcrpIw8sAvm/Fv8ckMrVcT1SBpGUE/n7F3XKh5c++rYchrhYTh3isAL
+         LJOQ0aRrSa651o27PHCEvPVcY4Vt36lUHEt+t1kw/hf0dvkaZmYXS7NEKCIuOvsHpnMH
+         /IFS9jWadFgtD33EIpk2Boy/pmkrauqyXWJg9NIj68PiZi9LttH8B3cyQUcDSKMIqCsO
+         A0Nw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789890122; x=1790494922;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=/80n/32ltdJ41KKMohbSQctzxjiK+R/dgCUJ2IHiZLA=;
+        b=V2DsXnpgmdoxs4+TWw41lugDRuIiNS5CK1nQ2+/hbVnq+sGUTNZC4G/VOcT3N3CIuN
+         x7E23drUX/d4Ump809YeTKaGGWgntwru4zWqhRprAnkZpYFFt3PM7QXm6nUeBAXF080U
+         gl5BSotqCT19em9mve2l6nSovTM7NIioKAnUv5im8/pKALnaua1lA9R4lsxQoxYFZSVv
+         HilSDSYfiVfX9lLjqvBi7DFovlX+ODPR0yNM+KluMnEmnx9BjRWqyhQhIPtLbc2vgk8R
+         THh0oSm0C4vB+3+G/Och+hl/lXLd+XbisIEavpdqJ6YrGDaDvH63ycLosHomqt0Ze2RA
+         2BtA==
+X-Forwarded-Encrypted: i=1; AKwUvBxVsnpLtOHDMgo944xNOMGoY+s5F+2eRr9BGy9tSXtQxyYPrhuTH8GyhSOqitmLPrp9udPYaUpD2edDdk4=@vger.kernel.org
+X-Gm-Message-State: AFuF++nYbNRf7KoRmGlD/aNR69mHhClSswiCFqyH6E9SoYWCiW6qtOO9
+	7UObSsCVTnWvr6VEdi0E97VDfMzzqFgQYsUN5z1ftG9LxckdEogSoACaAla/V5kwmy3lOLZ63pY
+	=
+X-Gm-Gg: AYBFou3QJSlLWafJG9e51ciZFmpsHbc22oVfCMe2XTNGiKnqfs7X7gTkibXFxJDYmZm
+	Za7h8+TlsePKyWaUgQgUf0Kx5gUteykQCJW7YJZL11YiXNlK0PfFwPjVDv91ZaBmRBLEyKgQ75O
+	8D8oR6mAD8AXz5JmnJJ0/GVcW/UsFz8jPqsPkisZNCB6L6sfMvsbker111HYYzMJlJL6ja14d/G
+	yuUxMazjQAHwQgPqS1asNA57czb7WCEbDmLNUd6Ucqq0eyxeU0hHdLED1Iu6AOJJYwCyKBrR9Nr
+	QJj/uxUWjqr59l7KSjWc4VPFQfjaEdFIoG3s1GWPav2YwyDc0BS9G2n/qq6Du9/PvqNmJ8F6B4a
+	RivdwFn9Wi2mh/BJc1DFPyK4L+i/4lh6P6EpmS4OQjgnKpAdcWaUqZ+1nXtkehEKi8PRCoCkqKT
+	SoNH7XnC6k9yz/A0aWEioebVlLHWjiWeEUzghWLEwQVrAC08VZ98yeeoKZ83tkbh2Ic9Dp7uj1O
+	SupRNB1rhJ5xSDfyz3A4Il9/heZVxz3uynH5e8aNRN4mWX/z/N07ZrP
+X-Received: by 2002:a05:600c:3b29:b0:499:79b9:e220 with SMTP id 5b1f17b1804b1-49fc56aab12mr100245185e9.10.1789890122462;
+        Sun, 20 Sep 2026 00:42:02 -0700 (PDT)
 Received: from voyt-laptop-dell ([92.115.55.221])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49fc58a1176sm141442235e9.2.2026.09.19.23.47.41
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49fc5748e56sm185405135e9.2.2026.09.20.00.42.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 19 Sep 2026 23:47:41 -0700 (PDT)
+        Sun, 20 Sep 2026 00:42:01 -0700 (PDT)
 From: Dmitry Voytik <voytikd@gmail.com>
 To: Nicolas Schier <nsc@kernel.org>,
 	Nathan Chancellor <nathan@kernel.org>
@@ -64,10 +67,12 @@ Cc: Rong Zhang <i@rong.moe>,
 	linux-kernel@vger.kernel.org,
 	linux-kbuild@vger.kernel.org,
 	Dmitry Voytik <voytikd@gmail.com>
-Subject: [PATCH] scripts/config: honor $KBUILD_OUTPUT by default
-Date: Sun, 20 Sep 2026 08:43:50 +0200
-Message-ID: <20260920064350.17999-1-voytikd@gmail.com>
+Subject: [PATCH v2] scripts/config: honor $KBUILD_OUTPUT by default
+Date: Sun, 20 Sep 2026 09:41:16 +0200
+Message-ID: <20260920074116.71926-1-voytikd@gmail.com>
 X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260920064350.17999-1-voytikd@gmail.com>
+References: <20260920064350.17999-1-voytikd@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -87,25 +92,41 @@ and is inconsistent with how the Makefile and other tools work
 
 Signed-off-by: Dmitry Voytik <voytikd@gmail.com>
 ---
- scripts/config | 5 +++++
- 1 file changed, 5 insertions(+)
+v2:
+ - Addressed comments by sashiko:
+   - https://sashiko.dev/#/patchset/20260920064350.17999-1-voytikd%40gmail.com
+   - use basename when --refresh is used
+   - remove echo which can be misleading when --file is passed
+v1:
+ - https://lore.kernel.org/all/20260920064350.17999-1-voytikd@gmail.com/
+---
+ scripts/config | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/scripts/config b/scripts/config
-index 32428ea909c2..f52ba5e6e27e 100755
+index 32428ea909c2..cdee67157fe1 100755
 --- a/scripts/config
 +++ b/scripts/config
-@@ -130,6 +130,11 @@ on_exit() {
+@@ -130,6 +130,10 @@ on_exit() {
  trap on_exit EXIT
  
  FN=.config
 +if [ -n "${KBUILD_OUTPUT}" ]; then
 +	FN=${KBUILD_OUTPUT}/${FN}
-+	echo "Using ${FN}"
 +fi
 +
  CMDS=()
  while [[ $# -gt 0 ]]; do
  	if [ "$1" = "--file" ]; then
+@@ -229,7 +233,7 @@ while [ "$1" != "" ] ; do
+ 		;;
+ 
+ 	--refresh)
+-		yes "" | make oldconfig KCONFIG_CONFIG=$FN
++		yes "" | make oldconfig KCONFIG_CONFIG=$(basename $FN)
+ 		;;
+ 
+ 	*)
 -- 
 2.55.0
 
