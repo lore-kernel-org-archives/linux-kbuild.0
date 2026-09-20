@@ -1,70 +1,70 @@
 Received: from mail-oa2-f12.google.com (mail-oa2-f12.google.com [74.125.231.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C17403438BC
-	for <linux-kbuild@vger.kernel.org>; Sun, 20 Sep 2026 03:59:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A2E43CF201
+	for <linux-kbuild@vger.kernel.org>; Sun, 20 Sep 2026 03:59:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789876748; cv=none; b=DxbU9GhtuuK7WrNK7vASxVYUUTIw87nOHXkiZX4Ggw7ZjjI0Cl8//3UFmzypFEayJUxVjeBxSmYKY8qKd/2hUp6kJvRbRC3QQGCnCaEdKFXu8W8G31q9ud6wUugF0X+rSmlse7nE8a4gMAOMJhjonqF7XeyMSoZggW7H0LgXpU4=
+	t=1789876749; cv=none; b=FvPECw9AT3aVwOlrzgyP+LyySqT5Mzh/0MRweG9inuW2fu1AmYQOdobGNICG0HFY4IAA+jsnPs6PvNrVN8z5zRq7roRWoe1TuNhctUAk7IXUuy6b2Hk2VYhbkpJoUP336kIKkQCvYTQSqwwSAO4sr/Yyq3d1CUFtSaJR/nzykoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789876748; c=relaxed/simple;
-	bh=nSVguYsya202ycWnyh7LvZPegeG4xaW8+imMMxZ/vE0=;
+	s=arc-20240116; t=1789876749; c=relaxed/simple;
+	bh=LumYwkTWkCz84GQ68MaksoLHoAbrKV8RYga/OmBRWWs=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=sBf4MPWUuKAC4I7+ti+UNksNc+zLpl+809Zj59zFCqAXj1w2vi8XxltsA06dVvj6yy5IIrtqgDahMwQG5SVxO9dqFF5DVaUXIPh+TZqpkJg9LDCnp1Uu6YG3/lWwmxo75eeeJ7r6Su8yJV1agVchHm9P4cHAKIqSQvkuTLVRtSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hqwa5UZL; arc=none smtp.client-ip=74.125.231.76
+	 In-Reply-To:To:Cc; b=YXCWk4+SJN714tV6lE+3ztODddVpgOVDKzSNRegQSg1hq4j4R4XYV5WPMXmQ2AlY7h9Ka/uecZ/sFUa7Zd3A/1c66kgEQtTJpi2J6MEpvIkx9cwRk9OrrCTGQSiwneMUVa5goJ1RVXoaTmskDOJdHx3JqZG8aa0tB/FkcolsfYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wffv17K4; arc=none smtp.client-ip=74.125.231.76
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hqwa5UZL"
-Received: by mail-oa2-f12.google.com with SMTP id 586e51a60fabf-466ccdd76a9so1724640fac.0
-        for <linux-kbuild@vger.kernel.org>; Sat, 19 Sep 2026 20:59:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wffv17K4"
+Received: by mail-oa2-f12.google.com with SMTP id 586e51a60fabf-466ccdd76a9so1724662fac.0
+        for <linux-kbuild@vger.kernel.org>; Sat, 19 Sep 2026 20:59:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789876743; x=1790481543; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1789876746; x=1790481546; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=bmJ/GHOMUIczVGv6/n/Tv9sle3osoP7bDLoj2krszHI=;
-        b=hqwa5UZLRCNHzZPVYLStvFu8dHDLkRsCWq65YsbiqxXREAZjGmYK+gz9pMIQLyPwc0
-         8NEXtSWWYhCZdPG3H2cct89bsGH16hAzGntucqMXA9mckqDgUUZV42M5yU74bqjA/bd0
-         4NqfxVGZAOnkqTbduKuwL5BuxsQyKzidznAY/ai1ktiutvsknwOfribdjh9amVno8Rsv
-         zjbE2trv82OdWpVvzYjjy0FmGZGfCLj2IC0RmibxXY7kOR4Y6Kli1YeuIF111Ujr+V22
-         oBopSQFuxZXzPzTQUjFlZRAgFEZs+wiN5bO2qVKTXS0KlgitNQDIvY5ybT6to0fnB0Zi
-         rDzQ==
+        bh=SpHEPLob7KaPi++v6k6BcQW51q0CtS8LphwQtLRxilE=;
+        b=Wffv17K4gh6S7m20WqfeJcK5j9YLtH873wwPf9IdQ8kxflCt/hQFfBXEM8Qa5DzNT9
+         7DZy4njZFVsTh6ABwBhYmdxh4qLPKVGJFhEWvHHOicO/559z63STggAXcj3PE6xr3yu5
+         2+SbmI8DJx+1AhQ1JFB0g5XbtwEz6OWoMgiuWHFcSm+cbb+ITmx9L2720gf2IN6y3G3/
+         AVYELfmWZj8okdMbqEcFxv7bgnfx2je8Y+enzBvX1n7wfvukEFJkqbjEn2dZaxziissW
+         CwtefMluFof67/40pOtcQWB/QhjTBapuTr78qHGX2iAPCQs9TJEN/E+7akSwZMxx3Ng/
+         QNnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789876743; x=1790481543;
+        d=1e100.net; s=20260707; t=1789876746; x=1790481546;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=bmJ/GHOMUIczVGv6/n/Tv9sle3osoP7bDLoj2krszHI=;
-        b=JO57EG5HvDWbr57AmlNBCn7Zg0d3scwt6zo5EwDbL/mzPMPd88V4Wo5JFqcCWBuegm
-         OsMO441dJo2n3X3stKliYhqlFJ5yVkhcEB1ANuyl2qa7J7zDR8CENnd6e+f4AYTK49nb
-         zsx2eHOM0EsplRclJ3vHWYznA4qDuyS99cFgPU2gPc5BRLOp5ecf8bvpOf1AeDl3LvHu
-         n1LRx1gzPJ+AJJCV6VnBGxoM0Vbp1IOn/Jo0EHXJu4Z28fuQYUqgKerSKSOhXyy1zC/u
-         jSZyJEexkMDTTv/qosSYOs3cI+zhw6ZMJZdWn/rlhRtfpWkA+/NWZn7E77MaZ0dixRQn
-         3QTw==
-X-Forwarded-Encrypted: i=1; AKwUvBz9M9ANQt2uE00ZbprB/HpofuvnjyjMJL9tL2h6tu3QtcJlEedtKCWxv7dxnONJqav1foqbvgx29eI4vcE=@vger.kernel.org
-X-Gm-Message-State: AFuF++mblQ4vpJJcy9eAlRSSwR0aNjkeLSuzAwGqBECib/ekjyKeErMx
-	/yIt5U4lq5hPhyEcSWaNYnZ3Z5QIXXrDT+4vIKQv8qCTURhdM8Hk+je416iEog==
-X-Gm-Gg: AYBFou2sjSwmyiTxtGrKXsZnbHAocwPzvYc5Rhyf1b4BfWJnNMuUxu4Lf3nicUV+pxY
-	6UixTYyHiIRZjOAqk9FFth4tZlHVAroYa+FkByHInDTI6nZYyZcZPJPCuMi6pAnL74EJSBdsYJA
-	VeoOs2OpdHQs4KjfFSO7crbOfceg3fOfjyHJpcjTykq+UamQ4vKxIETyYhTqoxnfZfaQhs/KGqn
-	D2fiI+u+GLYWNiiTHgW2Z8oFhmgs9TrLq90Hvkxds4jgRwhLAf97dF/06sbo6l7HU5Q+1SUTxW1
-	5X2Sw3CEGrYvyNR/yFi3Jk21qscfLKPskJkQ1/S49of/77oWIWvAxifcgNp/kxM7+git16Ax8KR
-	/JhPAD2/nQcfYAQy40QC03ijukNJO+Ta21TXwftH6ah1wmxUUkE/j83A8kzQauUrXvADXa5E8f5
-	hW9vvFRHIbzsnnwmmrmnJW0WNCiqAfQcRE2hWx08NqPEO5uBn36Cq4h4FbJ++ygzTl09wiwvlD/
-	sLj03p1PYBfaPnmwo1kX8TXuxJNd97HTZ46A/wetv/ZLt+fY5UdSb7OGXR/lb0E18RQ3mX15zMH
-	SleJXvCABjnA9/TfTRSC
-X-Received: by 2002:a05:6820:1c9a:b0:6cd:3fdc:a933 with SMTP id 006d021491bc7-6cd3fecc3e5mr3449090eaf.80.1789876743558;
-        Sat, 19 Sep 2026 20:59:03 -0700 (PDT)
+        bh=SpHEPLob7KaPi++v6k6BcQW51q0CtS8LphwQtLRxilE=;
+        b=YOHJpxZNfKMD2zg+FyuWaKKd34RbW83M1qeX2nfQPnADc6g2VyM06AZWt//Lpf7qIr
+         TKoilldCyImnDm2VAXOXCr+GxK03le3rBWpG/5FzMo+v/78wHOltPe75nqqaa8WcjKA3
+         asa/NTYbzRjyxSc3h4sgEuPHXqw6OOmugYJl2YKErQjO4mejOoFarTmVZ4kKSDUCiJBg
+         GjFl/ZzzItlb/6MwQzhyjjsIs2hJTBSTIwjYTJymWxJhvQ1rfQW+76+ZzMw6bnADWbFH
+         kNC0umpSH7p4aWtpldLn6Vh3bI4o7NaajQchdz4/qOh2jvEYgIUZO3ZeJ7w67PRaWsvR
+         5HeQ==
+X-Forwarded-Encrypted: i=1; AKwUvByyeUpJKWrGRN7obYSHVkw1p8z391TsToxdWqCE8dTCjJ+xSHSAP612LpAwzqIaIwX/MQqu8qL6t3TosEI=@vger.kernel.org
+X-Gm-Message-State: AFuF++n+dyFohf2A1IG5DIPCAqfj4PSJs5G5WG0lv5aQjq/SZwdZj+UV
+	0Vdq7mowaA2z+nIHLt9ejP8WEiqnmGTWJd/i+XXjDHj9dWgrhY0soiFahYg9eg==
+X-Gm-Gg: AYBFou0ubn1s05bisVakDzy9lhBhLLVyImCnXHBAvj4pto6YrXSTrJW/8mLJyQtKxKj
+	rWZu0W8983FWtzmgZBLfTGJJ5olxyeVJFD4kU5uSOmd/i30h648MADpIdraClD7iZA0HjI7Lm3m
+	GGg40GVcEbVGJ7vFW6d/GXe7JmPmIYAAqEXcPQLF+4elAnZ4sjwHos8lhaRdhrqGnJD1CqJbO3n
+	uOZXhzs10eiMNe+QBu+ATGsV3wnm98mY1G1UG2Hppf6fV1w8zTzWMEXopWHQ6fdurcyk22BlWy9
+	A2xN2NbIAtMzCoGL8a33jatc91TvrxUhN/Dutm1TiVFyL61m47eEfOsjMOUbUWOez0nM5PnhjQk
+	MoGmI1Sf0DLvYppIJTRFpT637rkxROeLXm6HWU2tO1JTlFIy72b63FXKsH5AsFjKcKX83v1wITE
+	vtk1CE3J2X3ZVvZjyOXDieHfsoCpAQfrXXOYWGsKnx4iqX8LPrbvowL17504lRRsQ3oef/UEULs
+	wbNtC+I+n2SWwG0oCNRtkWgHtU/bBAXrPoKJL5eJlHbdh28qffwu9Lhz21bKvMcAbFXt4Bin8ZS
+	QUqDW/khSb/MAZuVwuP7
+X-Received: by 2002:a05:6820:4b18:b0:6cd:3fdc:a935 with SMTP id 006d021491bc7-6cd3fecc3c1mr3196386eaf.82.1789876746486;
+        Sat, 19 Sep 2026 20:59:06 -0700 (PDT)
 Received: from [192.168.0.197] (c-98-38-17-99.hsd1.co.comcast.net. [98.38.17.99])
-        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-4881f4d7861sm4146915fac.1.2026.09.19.20.59.02
+        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-4881f4d7861sm4146915fac.1.2026.09.19.20.59.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 19 Sep 2026 20:59:02 -0700 (PDT)
+        Sat, 19 Sep 2026 20:59:05 -0700 (PDT)
 From: Jim Cromie <jim.cromie@gmail.com>
-Date: Sat, 19 Sep 2026 21:58:55 -0600
-Subject: [PATCH 1/3] kallsyms: Add test_kallsyms_perf module to benchmark
- lookup latency
+Date: Sat, 19 Sep 2026 21:58:57 -0600
+Subject: [PATCH 3/3] kallsyms: Match compressed tokens on the fly during
+ binary search
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -73,7 +73,7 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260919-ksyms-tune-v1-1-d85c97da1a32@gmail.com>
+Message-Id: <20260919-ksyms-tune-v1-3-d85c97da1a32@gmail.com>
 References: <20260919-ksyms-tune-v1-0-d85c97da1a32@gmail.com>
 In-Reply-To: <20260919-ksyms-tune-v1-0-d85c97da1a32@gmail.com>
 To: Andrew Morton <akpm@linux-foundation.org>
@@ -82,326 +82,211 @@ Cc: Lorenzo Stoakes <ljs@kernel.org>, Kees Cook <kees@kernel.org>,
  linux-kbuild@vger.kernel.org, bpf@vger.kernel.org, 
  Jim Cromie <jim.cromie@gmail.com>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1789876740; l=9420;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1789876740; l=6186;
  i=jim.cromie@gmail.com; s=20260203; h=from:subject:message-id;
- bh=nSVguYsya202ycWnyh7LvZPegeG4xaW8+imMMxZ/vE0=;
- b=a7B9miUPH8gTO/u2Uk31hK0exxzWkLBwVe5iAlQATS4u4hLAGfj1phiyt7a60rP7m6PxAYp+R
- GLR8d9sBTB+ANEnD36U56DdWK3Ujl/PicYimkjnIEGlfpuf5uQhievV
+ bh=LumYwkTWkCz84GQ68MaksoLHoAbrKV8RYga/OmBRWWs=;
+ b=oS3hBEoeOTkeYDkz1jG8Ny3J/8fwD+3PwYvYnH6Ac/Mpbw5Lm1Ne4swRspc9e85QONQzuKzMD
+ VLchWBUNSXtDQZUCborGNhn92k+CKydkQQ3Pfws1HSTfIh43VLgd4Ds
 X-Developer-Key: i=jim.cromie@gmail.com; a=ed25519;
  pk=C6E5ODlPQo7ZBynATXH9wg7K6HxP0pIXyf4s38Qw0XE=
 
-To evaluate optimizations and measure performance regressions across
-kallsyms lookups, add a lightweight microbenchmark module in lib/.
+kallsyms_lookup_names() runs a binary search across kallsyms_names[],
+a packed array of ~130k encoded kernel symbols.  For each of the ~17
+comparisons in the search, it currently decompresses the candidate
+symbol into a temporary buffer on the stack before calling strcmp().
 
-The module exercises the primary kallsyms resolution paths:
-0. Name-to-Address binary search: Benchmarks lookups across common
-   kernel functions (hits) and non-existent symbol strings (misses,
-   exercising the full binary search tree depth).
+Comparing raw tokens directly in compressed space is impossible.  The
+BPE token table assigns values by frequency, not alphabetical order
+(e.g. token 0x05 might expand to "zebra" while 0x42 expands to "apple"),
+so comparing raw token values scrambles lexicographical order.
 
-1. Address-to-Name resolution: Benchmarks address decoding latency
-   via sprint_symbol() and sprint_symbol_no_offset().
+However, full string expansion is equally wasteful: roughly 16 of the
+17 binary search steps fail within the first two characters.
 
-2. Sequential table scan: Measures complete table iteration latency
-   via kallsyms_on_each_symbol().
+Introduce kallsyms_strcmp_symbol() to compare ASCII queries against
+compressed tokens on the fly.  It walks kallsyms_token_index and
+kallsyms_token_table incrementally, matching characters directly and
+bailing out on the first character mismatch without expanding subsequent
+tokens.
 
-The module exposes a num_iters parameter (default: 100,000) and a
-sysfs trigger to repeat benchmark runs on demand.
+This optimization:
+
+0. Avoids decompressing non-matching tokens, short-circuiting ~94% of
+   binary search character expansions without adding any tables in
+   .rodata.
+
+1. Drops the 512-byte namebuf buffer from the kernel stack in
+   kallsyms_lookup_names().
+
+2. Leaves sequential address ordering and kallsyms_expand_symbol()
+   streaming invariants intact for /proc/kallsyms and table walks.
 
 Signed-off-by: Jim Cromie <jim.cromie@gmail.com>
 ---
- kernel/kallsyms.c        |   2 +
- lib/Kconfig.debug        |  10 +++
- lib/Makefile             |   1 +
- lib/test_kallsyms_perf.c | 228 +++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 241 insertions(+)
+ kernel/kallsyms.c | 97 ++++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 61 insertions(+), 36 deletions(-)
 
 diff --git a/kernel/kallsyms.c b/kernel/kallsyms.c
-index aec2f06858af..b9e573e9a10b 100644
+index 21adc5b74ec5..3be2b4e74057 100644
 --- a/kernel/kallsyms.c
 +++ b/kernel/kallsyms.c
-@@ -261,6 +261,7 @@ int kallsyms_on_each_symbol(int (*fn)(void *, const char *, unsigned long),
- 	}
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(kallsyms_on_each_symbol);
+@@ -34,6 +34,21 @@
  
- int kallsyms_on_each_match_symbol(int (*fn)(void *, unsigned long),
- 				  const char *name, void *data)
-@@ -279,6 +280,7 @@ int kallsyms_on_each_match_symbol(int (*fn)(void *, unsigned long),
+ #include "kallsyms_internal.h"
  
- 	return ret;
- }
-+EXPORT_SYMBOL_GPL(kallsyms_on_each_match_symbol);
- 
- static unsigned long get_symbol_pos(unsigned long addr,
- 				    unsigned long *symbolsize,
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 134b15a44625..2a8b1aaee23b 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -3122,6 +3122,16 @@ config TEST_STATIC_KEYS
- 
- 	  If unsure, say N.
- 
-+config TEST_KALLSYMS_PERF
-+	tristate "kallsyms performance benchmark test module"
-+	default m
-+	help
-+	  This builds the test_kallsyms_perf module to benchmark latency
-+	  across Name-to-Address binary search, Address-to-Name resolution,
-+	  and full table walks.
-+
-+	  If unsure, say N.
-+
- config TEST_DYNAMIC_DEBUG
- 	tristate "Test DYNAMIC_DEBUG"
- 	depends on DYNAMIC_DEBUG
-diff --git a/lib/Makefile b/lib/Makefile
-index dfab958327c5..149968ff3f6b 100644
---- a/lib/Makefile
-+++ b/lib/Makefile
-@@ -85,6 +85,7 @@ obj-$(CONFIG_TEST_RHASHTABLE) += test_rhashtable.o
- obj-$(CONFIG_TEST_STATIC_KEYS) += test_static_keys.o
- obj-$(CONFIG_TEST_STATIC_KEYS) += test_static_key_base.o
- obj-$(CONFIG_TEST_DYNAMIC_DEBUG) += test_dynamic_debug.o
-+obj-$(CONFIG_TEST_KALLSYMS_PERF) += test_kallsyms_perf.o
- 
- obj-$(CONFIG_TEST_BITMAP) += test_bitmap.o
- ifeq ($(CONFIG_CC_IS_CLANG)$(CONFIG_KASAN),yy)
-diff --git a/lib/test_kallsyms_perf.c b/lib/test_kallsyms_perf.c
-new file mode 100644
-index 000000000000..c649e55dae3b
---- /dev/null
-+++ b/lib/test_kallsyms_perf.c
-@@ -0,0 +1,228 @@
-+// SPDX-License-Identifier: GPL-2.0-only
 +/*
-+ * Microbenchmark and correctness test module for kallsyms subsystem
-+ *
-+ * Measures CPU latency across:
-+ *  - Name-to-Address binary search (hits & misses)
-+ *  - Address-to-Name symbol resolution (sprint_symbol, buildid)
-+ *  - Full kernel symbol iteration (kallsyms_on_each_symbol)
++ * Get the compressed symbol length and data pointer.
 + */
-+
-+#define pr_fmt(fmt) "test_kallsyms: " fmt
-+
-+#include <linux/init.h>
-+#include <linux/module.h>
-+#include <linux/kernel.h>
-+#include <linux/kallsyms.h>
-+#include <linux/ktime.h>
-+#include <linux/compiler.h>
-+
-+static unsigned int num_iters = 100000;
-+module_param(num_iters, uint, 0644);
-+MODULE_PARM_DESC(num_iters, "Number of iterations per microbenchmark");
-+
-+static const char * const hit_symbols[] = {
-+	"_printk",
-+	"schedule",
-+	"vfs_read",
-+	"do_sys_openat2",
-+	"kernel_clone",
-+	"tcp_v4_rcv",
-+	"kallsyms_lookup_names",
-+	"vm_area_alloc",
-+};
-+
-+static const char * const miss_symbols[] = {
-+	"nonexistent_symbol_0001",
-+	"xyz_dummy_missing_symbol",
-+	"__never_compiled_in_kernel",
-+	"ext4_nonexistent_func_xyz",
-+	"bpf_not_real_helper_stub",
-+	"vfs_missing_handler_probe",
-+	"tcp_v4_unimplemented_path",
-+	"driver_fake_init_routine",
-+};
-+
-+static int match_cb(void *data, unsigned long addr)
++static inline const u8 *get_symbol_data(unsigned int off, unsigned int *len)
 +{
-+	unsigned long *out = data;
++	const u8 *p = &kallsyms_names[off];
++	unsigned int l = *p++;
 +
-+	*out = addr;
-+	return 1;
++	if (unlikely(l & 0x80))
++		l = (l & 0x7F) | (*p++ << 7);
++	*len = l;
++
++	return p;
 +}
 +
-+static int count_cb(void *data, const char *name, unsigned long addr)
+ /*
+  * Expand a compressed symbol data into the resulting uncompressed string,
+  * if uncompressed string is too long (>= maxlen), it will be truncated,
+@@ -42,28 +57,12 @@
+ static unsigned int kallsyms_expand_symbol(unsigned int off,
+ 					   char *result, size_t maxlen)
+ {
+-	int len, skipped_first = 0;
++	int skipped_first = 0;
+ 	const char *tptr;
+-	const u8 *data;
++	unsigned int len;
++	const u8 *data = get_symbol_data(off, &len);
+ 
+-	/* Get the compressed symbol length from the first symbol byte. */
+-	data = &kallsyms_names[off];
+-	len = *data;
+-	data++;
+-	off++;
+-
+-	/* If MSB is 1, it is a "big" symbol, so needs an additional byte. */
+-	if ((len & 0x80) != 0) {
+-		len = (len & 0x7F) | (*data << 7);
+-		data++;
+-		off++;
+-	}
+-
+-	/*
+-	 * Update the offset to return the offset for the next symbol on
+-	 * the compressed stream.
+-	 */
+-	off += len;
++	off = (data - kallsyms_names) + len;
+ 
+ 	/*
+ 	 * For every byte on the compressed symbol data, copy the table
+@@ -91,7 +90,7 @@ static unsigned int kallsyms_expand_symbol(unsigned int off,
+ 	if (maxlen)
+ 		*result = '\0';
+ 
+-	/* Return to offset to the next symbol. */
++	/* Return offset to the next symbol. */
+ 	return off;
+ }
+ 
+@@ -101,16 +100,46 @@ static unsigned int kallsyms_expand_symbol(unsigned int off,
+  */
+ static char kallsyms_get_symbol_type(unsigned int off)
+ {
+-	/*
+-	 * Get just the first code, look it up in the token table,
+-	 * and return the first char from this token. If MSB of length
+-	 * is 1, it is a "big" symbol, so needs an additional byte.
+-	 */
+-	if (kallsyms_names[off] & 0x80)
+-		off++;
+-	return kallsyms_token_table[kallsyms_token_index[kallsyms_names[off + 1]]];
++	unsigned int len;
++	const u8 *data = get_symbol_data(off, &len);
++
++	return kallsyms_token_table[kallsyms_token_index[*data]];
+ }
+ 
++/*
++ * Compare an uncompressed ASCII string against a compressed symbol table entry.
++ * Returns negative if name < sym, positive if name > sym, 0 if equal.
++ * Exits immediately on the first mismatched character without decompressing
++ * the rest of the symbol name.
++ */
++static int kallsyms_strcmp_symbol(unsigned int off, const char *name)
 +{
-+	unsigned long *cnt = data;
++	int skipped_first = 0;
++	const char *tptr;
++	unsigned int len;
++	const u8 *data = get_symbol_data(off, &len);
 +
-+	(*cnt)++;
-+	return 0;
++	while (len) {
++		tptr = &kallsyms_token_table[kallsyms_token_index[*data]];
++		data++;
++		len--;
++
++		while (*tptr) {
++			if (skipped_first) {
++				int diff = (unsigned char)*name - (unsigned char)*tptr;
++
++				if (diff != 0)
++					return diff;
++				name++;
++			} else {
++				skipped_first = 1;
++			}
++			tptr++;
++		}
++	}
++
++	return (unsigned char)*name - '\0';
 +}
-+
-+static void run_name_lookup_bench(void)
-+{
-+	u64 t0, t1, dt_hit, dt_miss;
-+	unsigned long addr = 0;
-+	unsigned int i, nr_hits, nr_misses;
-+
-+	nr_hits = ARRAY_SIZE(hit_symbols);
-+	nr_misses = ARRAY_SIZE(miss_symbols);
-+
-+	/* 0. Correctness validation */
-+	for (i = 0; i < nr_hits; i++) {
-+		const char *sym = hit_symbols[i];
-+		unsigned long a1 = 0;
-+
-+		kallsyms_on_each_match_symbol(match_cb, sym, &a1);
-+		if (!a1)
-+			pr_err("CORRECTNESS FAILURE: hit sym '%s' not found\n", sym);
-+	}
-+	for (i = 0; i < nr_misses; i++) {
-+		const char *sym = miss_symbols[i];
-+		unsigned long a1 = 0;
-+
-+		kallsyms_on_each_match_symbol(match_cb, sym, &a1);
-+		if (a1)
-+			pr_err("CORRECTNESS FAILURE: miss sym '%s' unexpectedly found a1=%lx\n",
-+			       sym, a1);
-+	}
-+
-+	/* 1. Name search: Existing symbols (Hits) */
-+	t0 = ktime_get_ns();
-+	for (i = 0; i < num_iters; i++) {
-+		const char *sym = hit_symbols[i % nr_hits];
-+
-+		kallsyms_on_each_match_symbol(match_cb, sym, &addr);
-+		OPTIMIZER_HIDE_VAR(addr);
-+	}
-+	t1 = ktime_get_ns();
-+	dt_hit = t1 - t0;
-+
-+	/* 2. Name search: Non-existent symbols (Misses - 17 bsearch probes) */
-+	t0 = ktime_get_ns();
-+	for (i = 0; i < num_iters; i++) {
-+		const char *sym = miss_symbols[i % nr_misses];
-+
-+		kallsyms_on_each_match_symbol(match_cb, sym, &addr);
-+		OPTIMIZER_HIDE_VAR(addr);
-+	}
-+	t1 = ktime_get_ns();
-+	dt_miss = t1 - t0;
-+
-+	pr_info("Name Search Hit:  %llu ns/lookup (%llu ms total, %u iters)\n",
-+		dt_hit / num_iters, dt_hit / 1000000, num_iters);
-+	pr_info("Name Search Miss: %llu ns/lookup (%llu ms total, %u iters)\n",
-+		dt_miss / num_iters, dt_miss / 1000000, num_iters);
-+}
-+
-+static void run_address_lookup_bench(void)
-+{
-+	u64 t0, t1, dt_sprint, dt_bldid;
-+	char symname[KSYM_SYMBOL_LEN];
-+	unsigned long addrs[ARRAY_SIZE(hit_symbols)];
-+	unsigned int i, nr_addrs = 0;
-+
-+	for (i = 0; i < ARRAY_SIZE(hit_symbols); i++) {
-+		unsigned long addr = 0;
-+
-+		kallsyms_on_each_match_symbol(match_cb, hit_symbols[i], &addr);
-+		if (addr)
-+			addrs[nr_addrs++] = addr;
-+	}
-+
-+	if (!nr_addrs) {
-+		pr_warn("Address benchmark skipped: no test addresses resolved\n");
-+		return;
-+	}
-+
-+	/* 1. Address-to-name resolution (sprint_symbol) */
-+	t0 = ktime_get_ns();
-+	for (i = 0; i < num_iters; i++) {
-+		unsigned long addr = addrs[i % nr_addrs];
-+
-+		sprint_symbol(symname, addr);
-+		barrier_data(symname);
-+	}
-+	t1 = ktime_get_ns();
-+	dt_sprint = t1 - t0;
-+
-+	/* 2. Address without offset (sprint_symbol_no_offset) */
-+	t0 = ktime_get_ns();
-+	for (i = 0; i < num_iters; i++) {
-+		unsigned long addr = addrs[i % nr_addrs];
-+
-+		sprint_symbol_no_offset(symname, addr);
-+		barrier_data(symname);
-+	}
-+	t1 = ktime_get_ns();
-+	dt_bldid = t1 - t0;
-+
-+	pr_info("sprint_symbol:           %llu ns/lookup (%llu ms total, %u iters)\n",
-+		dt_sprint / num_iters, dt_sprint / 1000000, num_iters);
-+	pr_info("sprint_symbol_no_offset: %llu ns/lookup (%llu ms total, %u iters)\n",
-+		dt_bldid / num_iters, dt_bldid / 1000000, num_iters);
-+}
-+
-+static void run_table_walk_bench(void)
-+{
-+	u64 t0, t1, dt_walk;
-+	unsigned long total_symbols = 0;
-+	int iter = 50;
-+	int i;
-+
-+	t0 = ktime_get_ns();
-+	for (i = 0; i < iter; i++) {
-+		total_symbols = 0;
-+		kallsyms_on_each_symbol(count_cb, &total_symbols);
-+	}
-+	t1 = ktime_get_ns();
-+	dt_walk = t1 - t0;
-+
-+	pr_info("Table Full Walk:  %llu us/pass (%lu symbols scanned, %d passes)\n",
-+		(dt_walk / iter) / 1000, total_symbols, iter);
-+}
-+
-+static int run_kallsyms_benchmark(void)
-+{
-+	pr_info("==================================================\n");
-+	pr_info("Starting kallsyms performance benchmark (iters=%u)\n", num_iters);
-+	pr_info("==================================================\n");
-+
-+	run_name_lookup_bench();
-+	run_address_lookup_bench();
-+	run_table_walk_bench();
-+
-+	pr_info("==================================================\n");
-+	pr_info("kallsyms benchmark complete\n");
-+	pr_info("==================================================\n");
-+
-+	return 0;
-+}
-+
-+static int param_set_trigger(const char *val, const struct kernel_param *kp)
-+{
-+	return run_kallsyms_benchmark();
-+}
-+
-+static const struct kernel_param_ops param_ops_trigger = {
-+	.set = param_set_trigger,
-+};
-+module_param_cb(run_test, &param_ops_trigger, NULL, 0200);
-+MODULE_PARM_DESC(run_test, "Write 1 to trigger kallsyms benchmark run");
-+
-+static int __init test_kallsyms_init(void)
-+{
-+	return run_kallsyms_benchmark();
-+}
-+
-+static void __exit test_kallsyms_exit(void)
-+{
-+	pr_info("test_kallsyms module unloaded\n");
-+}
-+
-+module_init(test_kallsyms_init);
-+module_exit(test_kallsyms_exit);
-+
-+MODULE_DESCRIPTION("Microbenchmark test module for kallsyms subsystem");
-+MODULE_AUTHOR("Jim Cromie <jim.cromie@gmail.com>");
-+MODULE_LICENSE("GPL");
+ 
+ /*
+  * Find the offset on the compressed table given an index in the
+@@ -145,7 +174,6 @@ static int kallsyms_lookup_names(const char *name,
+ 	int ret;
+ 	int low, mid, high;
+ 	unsigned int seq, off;
+-	char namebuf[KSYM_NAME_LEN];
+ 
+ 	low = 0;
+ 	high = kallsyms_num_syms - 1;
+@@ -154,8 +182,7 @@ static int kallsyms_lookup_names(const char *name,
+ 		mid = low + (high - low) / 2;
+ 		seq = get_symbol_seq(mid);
+ 		off = get_symbol_offset(seq);
+-		kallsyms_expand_symbol(off, namebuf, ARRAY_SIZE(namebuf));
+-		ret = strcmp(name, namebuf);
++		ret = kallsyms_strcmp_symbol(off, name);
+ 		if (ret > 0)
+ 			low = mid + 1;
+ 		else if (ret < 0)
+@@ -171,8 +198,7 @@ static int kallsyms_lookup_names(const char *name,
+ 	while (low) {
+ 		seq = get_symbol_seq(low - 1);
+ 		off = get_symbol_offset(seq);
+-		kallsyms_expand_symbol(off, namebuf, ARRAY_SIZE(namebuf));
+-		if (strcmp(name, namebuf))
++		if (kallsyms_strcmp_symbol(off, name) != 0)
+ 			break;
+ 		low--;
+ 	}
+@@ -183,8 +209,7 @@ static int kallsyms_lookup_names(const char *name,
+ 		while (high < kallsyms_num_syms - 1) {
+ 			seq = get_symbol_seq(high + 1);
+ 			off = get_symbol_offset(seq);
+-			kallsyms_expand_symbol(off, namebuf, ARRAY_SIZE(namebuf));
+-			if (strcmp(name, namebuf))
++			if (kallsyms_strcmp_symbol(off, name) != 0)
+ 				break;
+ 			high++;
+ 		}
 
 -- 
 2.55.0
