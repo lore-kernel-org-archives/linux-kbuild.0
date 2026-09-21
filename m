@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72DBE52ED5B;
-	Mon, 21 Sep 2026 22:31:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 082FF52F294;
+	Mon, 21 Sep 2026 22:31:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790029911; cv=none; b=qGBhzVk7VeF+zVSz+bmkDhddYbZFi/UAYVMaCczXgKiuBL3+VLjBKrePKbEgLeDL26CIquybyEAFxpc+vW1sq23lE8aJzdVZAXiZp8sQymnb+4Utl7lqO3H0QMPd24IuYmT9cJB2sthK25N/qIIGspl0FFelr70ZDX+YiLIADGQ=
+	t=1790029911; cv=none; b=ddkYUX07X1dqPwVnv9SfB0tnktMV6ZfkL1mfVeN1QJtiGOxeP4+mJJPPGThxzoeh+mtMewbKBOMJk4T6DuFR58y8s10V2aHc5vb11GlhyFgKnlv8YPjaotyTw3v3wvwrsIFO9k8DFH1cqOdU2jl21X6NPCLyFo2I9FTSzfAMWbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1790029911; c=relaxed/simple;
-	bh=TdVCUqyinINerC/w92CWPYR+FKlQORAiJSqM2nlGQ9g=;
+	bh=W5ZGjoRtOHzL10mPGubdyYDAsNVKwK39YvCj5IHnINg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=L1BIRrmhf7bxMjLknlAH2c0NNL7bk6xqqpHdkFJwR2PXC2/lzh3eL4tu9qewEnp6SCgEVpug4APJu8SsPJ0nqpMjGbV1cUbPhtRm40Udq2V55FacJXRoEbc7pCkvSY650kuHl9xQECAtGzXsWZ1NOJlePV5i862Ra5L6fEc0Ec0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B8vGoTGv; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=K3VhoefFREWbBqY1THKQZSo7pDZx0bfZxlVMW4fgkYd58jLGqyTBL5cN8HJhlxy9kCbNB0kJthu8hmM1kL7sAir7KZvPiko96I9jRPXOhsZJ/idRcyzKw+Tk44bpQLgCxzYJwfpD+gkFtrfc06VujpFenI2Bl8+RsC8wh/KEJek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qb0PlBGl; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B8vGoTGv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA2601F00898;
-	Mon, 21 Sep 2026 22:31:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qb0PlBGl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8249A1F0089B;
+	Mon, 21 Sep 2026 22:31:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1790029909;
-	bh=qa9+08QLfw1v9XrtSyOcFjJO1tnt+M+hWXxgBwEsj9k=;
+	bh=kumwho1XMMoQdxXDVJggSKIbpIDf5SWangEdIvPvT9Y=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=B8vGoTGvSKQGaBWIty2WpKlC2Fh6JxkJOHCs8MuuuKwerfylLW1DtypV5L6Z0S3dk
-	 j1mc5G5QEN4vQJkCChptD1gTOe36iyu1/uXJkoeRrtai8x8dDuLOtMncgQ+anOwC/v
-	 nJW8Z2vLcPZgJ04mxmweKfzjg6tpL6rE/Q5mtiTs47UbjViC39YzT0gpkigwbcwQtA
-	 Eqfif9k9aaN5CwxJzXiYfOPsZ71Yc7Y4QykEzARAqjPL+SLU+ZVSr/LiaUWXiB73mP
-	 vGREON+Z8kR3K1aqRtoa5OFOpX1KX2+2gbc2TuSl6p0svYYvnRsQQ8xYqa1KI595kp
-	 JfsNPXFl+Arhg==
+	b=Qb0PlBGlHuePTl8trPyc6KUriD39eSb9kQCuy4MK63eTR55mbShW8AMjQSx2ogEbd
+	 iTCClgDuyBpN+Exo5NzKwJi4chQrWjcQqGkpa1Ozm7sxQiGc6y29poEfQrm1h1G54L
+	 j+75jXqzM1I+VWxfIFevLDwtBvUjVTWOKGaq5gV9kEoifm1I/iRTU+l3A6M+xinbgi
+	 F5s1BeLEQYe9JPjWyNl2+knXCmMSJ+rYBvGlhYEbGKiag9rF/aiONVQmN/jxrABPDZ
+	 MnglZA1wkVweCJPPdoDRRGSHrdiGU5FgBsg/uu0SV++0+Nd1Bf3QihUNponkFT2gHV
+	 hOu1j28gKKjIQ==
 From: Josh Poimboeuf <jpoimboe@kernel.org>
 To: x86@kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Nicolas Schier <nsc@kernel.org>,
 	linux-kbuild@vger.kernel.org,
 	Huacai Chen <chenhuacai@kernel.org>
-Subject: [PATCH v3 22/28] objtool: Add options to write/read exported noreturns to/from a file
-Date: Mon, 21 Sep 2026 15:31:23 -0700
-Message-ID: <ee9a89f3c8990d2af8f5f8345680a1223e1639f0.1790028654.git.jpoimboe@kernel.org>
+Subject: [PATCH v3 23/28] kbuild: Do the per-module objtool pass right before linking
+Date: Mon, 21 Sep 2026 15:31:24 -0700
+Message-ID: <0ed8faeff899d3e9f101b6b6cddec0bf89735669.1790028654.git.jpoimboe@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <cover.1790028654.git.jpoimboe@kernel.org>
 References: <cover.1790028654.git.jpoimboe@kernel.org>
@@ -52,256 +52,161 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add --noreturns-write which can be used to write vmlinux's exported
-noreturns to a file, and --noreturn-read which can be used to read them
-when running objtool on a module.
+With CONFIG_OBJTOOL_CONTROL_FLOW, the objtool pass on vmlinux.o is going
+to be generating a list of its exported noreturns which will then be
+read by the modules' objtool pass, so there will need to be a build
+dependency between them.
+
+In preparation for that, run objtool right before the module link so its
+no longer done on the descend in the deferred case.
 
 Signed-off-by: Josh Poimboeuf <jpoimboe@kernel.org>
 ---
- tools/objtool/builtin-check.c           |  12 ++
- tools/objtool/check.c                   | 143 +++++++++++++++++++++++-
- tools/objtool/include/objtool/builtin.h |   2 +
- tools/objtool/include/objtool/elf.h     |   1 +
- 4 files changed, 157 insertions(+), 1 deletion(-)
+ scripts/Makefile.build      | 31 +++++++++++++++----------------
+ scripts/Makefile.modfinal   | 20 +++++++++++++++-----
+ scripts/livepatch/klp-build | 12 ++++++------
+ 3 files changed, 36 insertions(+), 27 deletions(-)
 
-diff --git a/tools/objtool/builtin-check.c b/tools/objtool/builtin-check.c
-index 75b11dc85010e..c4c4210f84662 100644
---- a/tools/objtool/builtin-check.c
-+++ b/tools/objtool/builtin-check.c
-@@ -101,6 +101,8 @@ static const struct option check_options[] = {
- 	OPT_BOOLEAN(0,		 "module", &opts.module, "object is part of a kernel module"),
- 	OPT_BOOLEAN(0,		 "mnop", &opts.mnop, "nop out mcount call sites"),
- 	OPT_BOOLEAN(0,		 "no-unreachable", &opts.no_unreachable, "skip 'unreachable instruction' warnings"),
-+	OPT_STRING(0,		 "noreturns-read", &opts.noreturns_read, "file", "read exported noreturns from a file"),
-+	OPT_STRING(0,		 "noreturns-write", &opts.noreturns_write, "file", "write exported noreturns to a file"),
- 	OPT_STRING('o',		 "output", &opts.output, "file", "output file name"),
- 	OPT_BOOLEAN(0,		 "sec-address", &opts.sec_address, "print section addresses in warnings"),
- 	OPT_BOOLEAN(0,		 "stats", &opts.stats, "print statistics"),
-@@ -180,6 +182,16 @@ static bool opts_valid(void)
- 		return false;
- 	}
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 87993362595ce..c1b22b4a4e217 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -271,15 +271,21 @@ cmd_record_mcount = $(if $(findstring $(strip $(CC_FLAGS_FTRACE)),$(_c_flags)),
+ 	$(sub_cmd_record_mcount))
+ endif # CONFIG_FTRACE_MCOUNT_USE_RECORDMCOUNT
  
-+	if (opts.noreturns_write && !opts.link) {
-+		ERROR("--noreturns-write requires --link");
-+		return false;
-+	}
-+
-+	if (opts.noreturns_write && !opts.stackval && !opts.orc && !opts.uaccess) {
-+		ERROR("--noreturns-write requires --stackval, --orc, or --uaccess");
-+		return false;
-+	}
-+
- 	if (opts.disas			||
- 	    opts.hack_jump_label	||
- 	    opts.hack_noinstr		||
-diff --git a/tools/objtool/check.c b/tools/objtool/check.c
-index 41df5f608535f..29ef2dc678833 100644
---- a/tools/objtool/check.c
-+++ b/tools/objtool/check.c
-@@ -341,6 +341,120 @@ static void detect_noreturns(struct objtool_file *file)
- 	}
- }
+-# 'OBJECT_FILES_NON_STANDARD := y': skip objtool checking for a directory
+-# 'OBJECT_FILES_NON_STANDARD_foo.o := 'y': skip objtool checking for a file
+-# 'OBJECT_FILES_NON_STANDARD_foo.o := 'n': override directory skip for a file
+-
++ifdef CONFIG_OBJTOOL
++#
++# NOTE: these variables are deprecated, and have no effect when
++# CONFIG_OBJTOOL_DEFERRED is enabled.  Objtool-allergic code can instead be
++# marked with STACK_FRAME_NON_STANDARD() or ANNOTATE_*().
++#
++#   'OBJECT_FILES_NON_STANDARD := y': skip objtool checking for a directory
++#   'OBJECT_FILES_NON_STANDARD_foo.o := 'y': skip objtool checking for a file
++#   'OBJECT_FILES_NON_STANDARD_foo.o := 'n': override directory skip for a file
++#
+ is-standard-object = $(if $(filter-out y%, $(OBJECT_FILES_NON_STANDARD_$(target-stem).o)$(OBJECT_FILES_NON_STANDARD)n),$(is-kernel-object))
  
-+static bool noreturns_changed(const char *buf, size_t len)
-+{
-+	bool changed = true;
-+	char *old = NULL;
-+	FILE *fp;
-+
-+	fp = fopen(opts.noreturns_write, "r");
-+	if (!fp)
-+		return true;
-+
-+	old = malloc(len + 1);
-+	if (!old)
-+		goto out;
-+
-+	if (fread(old, 1, len + 1, fp) != len)
-+		goto out;
-+
-+	if (memcmp(old, buf, len))
-+		goto out;
-+
-+	changed = false;
-+
-+out:
-+	free(old);
-+	fclose(fp);
-+	return changed;
-+}
-+
-+/*
-+ * This is called for vmlinux.o.  Write the vmlinux.o noreturn list to a file
-+ * so it can be read in module objtool runs by read_noreturns().
-+ */
-+static int write_noreturns(struct objtool_file *file)
-+{
-+	struct symbol *func;
-+	char *buf, *pos;
-+	size_t len = 0;
-+	FILE *fp;
-+
-+	for_each_sym(file->elf, func) {
-+		if (is_noreturn(func) && func->exported)
-+			len += strlen(func->name) + 1;
-+	}
-+
-+	buf = malloc(len + 1);
-+	if (!buf) {
-+		ERROR_GLIBC("malloc");
-+		return -1;
-+	}
-+
-+	pos = buf;
-+	for_each_sym(file->elf, func) {
-+		if (is_noreturn(func) && func->exported)
-+			pos += sprintf(pos, "%s\n", func->name);
-+	}
-+
-+	/*
-+	 * Only write the file when the contents have change to avoid relinking
-+	 * all the modules unnecessarily.
-+	 */
-+	if (!noreturns_changed(buf, len)) {
-+		free(buf);
-+		return 0;
-+	}
-+
-+	fp = fopen(opts.noreturns_write, "w");
-+	if (!fp) {
-+		ERROR_GLIBC("fopen");
-+		return -1;
-+	}
-+
-+	if (fwrite(buf, 1, len, fp) != len) {
-+		ERROR_GLIBC("fwrite");
-+		return -1;
-+	}
-+
-+	free(buf);
-+
-+	if (fclose(fp)) {
-+		ERROR_GLIBC("fclose");
-+		return -1;
-+	}
-+
-+	return 0;
-+}
-+
-+/*
-+ * This is called for modules.  Read the noreturn list generated by the
-+ * vmlinux.o pass and mark the corresponding undefined symbols noreturn.
-+ */
-+static int read_noreturns(struct objtool_file *file)
-+{
-+	char line[SYM_NAME_LEN];
-+	struct symbol *func;
-+	FILE *fp;
-+
-+	fp = fopen(opts.noreturns_read, "r");
-+	if (!fp) {
-+		ERROR("can't open '%s'", opts.noreturns_read);
-+		return -1;
-+	}
-+
-+	while (fgets(line, sizeof(line), fp)) {
-+		line[strcspn(line, "\n")] = '\0';
-+
-+		func = find_global_symbol_by_name(file->elf, line);
-+		if (func && is_undef_sym(func))
-+			func->_noreturn = 1;
-+	}
-+
-+	fclose(fp);
-+	return 0;
-+}
-+
- static void init_cfi_state(struct cfi_state *cfi)
- {
- 	int i;
-@@ -2238,6 +2352,19 @@ static int add_jump_table_alts(struct objtool_file *file)
- 	return 0;
- }
+-ifdef CONFIG_OBJTOOL
+-$(obj)/%.o: private objtool-enabled = $(if $(is-standard-object),$(if $(CONFIG_OBJTOOL_DEFERRED),$(is-single-obj-m),y))
+-endif
++# Enable per-TU objtool for !CONFIG_OBJTOOL_DEFERRED
++$(obj)/%.o: private objtool-enabled = $(if $(CONFIG_OBJTOOL_DEFERRED),,$(if $(is-standard-object),y))
++endif # CONFIG_OBJTOOL
  
-+static void read_exports(struct objtool_file *file)
-+{
-+	struct section *sec;
-+	struct reloc *reloc;
-+
-+	sec = find_section_by_name(file->elf, ".export_symbol");
-+	if (!sec || !sec->rsec)
-+		return;
-+
-+	for_each_reloc(sec->rsec, reloc)
-+		reloc->sym->exported = 1;
-+}
-+
- static void set_func_state(struct cfi_state *state)
- {
- 	state->cfa = initial_func_cfi.cfa;
-@@ -2722,8 +2849,10 @@ int decode_file(struct objtool_file *file)
- 	 * both validate_functions() and validate_noinstr_sections() -- and by
- 	 * validate_unret().
- 	 */
--	if (validate_branch_enabled() || opts.noinstr || opts.unret)
-+	if (validate_branch_enabled() || opts.noinstr || opts.unret) {
-+		read_exports(file);
- 		detect_noreturns(file);
-+	}
+ ifneq ($(findstring 1, $(KBUILD_EXTRA_WARN)),)
+ cmd_warn_shared_object = $(if $(word 2, $(modname-multi)),$(warning $(kbuild-file): $*.o is added to multiple modules: $(modname-multi)))
+@@ -497,17 +503,10 @@ $(obj)/lib.a: $(lib-y) FORCE
+ 	$(call if_changed,ar)
  
- 	if (read_unwind_hints(file))
- 		return -1;
-@@ -4889,6 +5018,12 @@ int check(struct objtool_file *file)
- 		objtool_disas_ctx = disas_ctx;
- 	}
+ quiet_cmd_ld_multi_m = LD [M]  $@
+-      cmd_ld_multi_m = $(LD) $(ld_flags) -r -o $@ @$< $(cmd_objtool)
++      cmd_ld_multi_m = $(LD) $(ld_flags) -r -o $@ @$<
  
-+	if (opts.noreturns_read) {
-+		ret = read_noreturns(file);
-+		if (ret)
-+			goto out;
-+	}
-+
- 	ret = decode_file(file);
- 	if (ret)
- 		goto out;
-@@ -4996,6 +5131,12 @@ int check(struct objtool_file *file)
- 			goto out;
- 	}
+-define rule_ld_multi_m
+-	$(call cmd_and_savecmd,ld_multi_m)
+-	$(call cmd,gen_objtooldep)
+-endef
+-
+-$(multi-obj-m): private objtool-enabled := $(CONFIG_OBJTOOL_DEFERRED)
+-$(multi-obj-m): private part-of-module := y
+ $(multi-obj-m): %.o: %.mod FORCE
+-	$(call if_changed_rule,ld_multi_m)
++	$(call if_changed,ld_multi_m)
+ $(call multi_depend, $(multi-obj-m), .o, -objs -y -m)
  
-+	if (opts.noreturns_write && !opts.dryrun) {
-+		ret = write_noreturns(file);
-+		if (ret)
-+			goto out;
-+	}
+ # Add intermediate targets:
+diff --git a/scripts/Makefile.modfinal b/scripts/Makefile.modfinal
+index 01a37ec872b90..56b4227cc6863 100644
+--- a/scripts/Makefile.modfinal
++++ b/scripts/Makefile.modfinal
+@@ -32,11 +32,18 @@ ifneq ($(WARN_ON_UNUSED_TRACEPOINTS),)
+ cmd_check_tracepoint = $(objtree)/scripts/tracepoint-update --module $<;
+ endif
+ 
++$(modules:%.o=%.ko): private objtool-enabled = $(CONFIG_OBJTOOL_DEFERRED)
 +
- 	if (opts.stats) {
- 		printf("nr_insns_visited: %ld\n", nr_insns_visited);
- 		printf("nr_cfi: %ld\n", nr_cfi);
-diff --git a/tools/objtool/include/objtool/builtin.h b/tools/objtool/include/objtool/builtin.h
-index 349690bb1c50e..fb33d57a54c95 100644
---- a/tools/objtool/include/objtool/builtin.h
-+++ b/tools/objtool/include/objtool/builtin.h
-@@ -41,6 +41,8 @@ struct opts {
- 	bool mnop;
- 	bool module;
- 	bool no_unreachable;
-+	const char *noreturns_read;
-+	const char *noreturns_write;
- 	const char *output;
- 	bool sec_address;
- 	bool stats;
-diff --git a/tools/objtool/include/objtool/elf.h b/tools/objtool/include/objtool/elf.h
-index 0e3593d993ac8..adf6e1322c6df 100644
---- a/tools/objtool/include/objtool/elf.h
-+++ b/tools/objtool/include/objtool/elf.h
-@@ -100,6 +100,7 @@ struct symbol {
- 	u8 fake		     : 1;
- 	u8 _noreturn         : 1;
- 	u8 ignore_noreturn   : 1;
-+	u8 exported          : 1;
- 	struct list_head pv_target;
- 	struct reloc *relocs;
- 	struct section *group_sec;
++mod-objtool = $(if $(objtool-enabled),$(objtool) $(objtool-args) -o $@.o $< ;)
++mod-obj = $(if $(objtool-enabled),$@.o,$<)
++
+ quiet_cmd_ld_ko_o = LD [M]  $@
+       cmd_ld_ko_o =							\
++	$(mod-objtool)							\
+ 	$(LD) -r $(KBUILD_LDFLAGS)					\
+ 		$(KBUILD_LDFLAGS_MODULE) $(LDFLAGS_MODULE)		\
+-		-T $(objtree)/scripts/module.lds -o $@ $(filter %.o, $^)
++		-T $(objtree)/scripts/module.lds -o $@			\
++		$(mod-obj) $(filter-out $<, $(filter %.o, $^))
+ 
+ quiet_cmd_btf_ko = BTF [M] $@
+       cmd_btf_ko = 							\
+@@ -46,12 +53,15 @@ quiet_cmd_btf_ko = BTF [M] $@
+ 		$(CONFIG_SHELL) $(srctree)/scripts/gen-btf.sh --btf_base $(objtree)/vmlinux $@; \
+ 	fi;
+ 
++define rule_ld_ko_o
++	+$(call cmd_and_savecmd,ld_ko_o)
++	+$(call cmd,gen_objtooldep)
++	+$(if $(CONFIG_DEBUG_INFO_BTF_MODULES),$(if $(newer-prereqs),$(call cmd,btf_ko)))
++endef
++
+ # Re-generate module BTFs if either module's .ko or vmlinux changed
+ %.ko: %.o %.mod.o .module-common.o $(objtree)/scripts/module.lds $(and $(CONFIG_DEBUG_INFO_BTF_MODULES),$(KBUILD_BUILTIN),$(objtree)/vmlinux) FORCE
+-	+$(call if_changed,ld_ko_o)
+-ifdef CONFIG_DEBUG_INFO_BTF_MODULES
+-	+$(if $(newer-prereqs),$(call cmd,btf_ko))
+-endif
++	$(call if_changed_rule,ld_ko_o)
+ 	+$(call cmd,check_tracepoint)
+ 
+ targets += $(modules:%.o=%.ko) $(modules:%.o=%.mod.o) .module-common.o
+diff --git a/scripts/livepatch/klp-build b/scripts/livepatch/klp-build
+index b52a8489d9f67..82a74de11d0df 100755
+--- a/scripts/livepatch/klp-build
++++ b/scripts/livepatch/klp-build
+@@ -599,15 +599,15 @@ copy_orig_objects() {
+ 
+ 	xtrace_save "copying original objects"
+ 	for _file in "${files[@]}"; do
+-		local rel_file="${_file/.ko/.o}"
+-		local file="$PWD/$rel_file"
++		local rel_file="${_file/%.ko/.o}"
++		local file="$PWD/${_file/%.ko/.ko.o}"
+ 		local orig_file="$ORIG_DIR/$rel_file"
+ 		local orig_dir="$(dirname "$orig_file")"
+ 
+ 		[[ ! -f "$file" ]] && die "missing $(basename "$file") for $_file"
+ 
+ 		mkdir -p "$orig_dir"
+-		cp -f "$file" "$orig_dir"
++		cp -f "$file" "$orig_file"
+ 	done
+ 	xtrace_restore
+ 
+@@ -635,8 +635,8 @@ copy_patched_objects() {
+ 
+ 	xtrace_save "copying changed objects"
+ 	for _file in "${files[@]}"; do
+-		local rel_file="${_file/.ko/.o}"
+-		local file="$PWD/$rel_file"
++		local rel_file="${_file/%.ko/.o}"
++		local file="$PWD/${_file/%.ko/.ko.o}"
+ 		local orig_file="$ORIG_DIR/$rel_file"
+ 		local patched_file="$PATCHED_DIR/$rel_file"
+ 		local patched_dir="$(dirname "$patched_file")"
+@@ -646,7 +646,7 @@ copy_patched_objects() {
+ 		cmp -s "$orig_file" "$file" && continue
+ 
+ 		mkdir -p "$patched_dir"
+-		cp -f "$file" "$patched_dir"
++		cp -f "$file" "$patched_file"
+ 		found=1
+ 	done
+ 	xtrace_restore
 -- 
 2.55.0
 
