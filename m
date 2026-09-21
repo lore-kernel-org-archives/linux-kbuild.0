@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E32C5208B4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F382D5208D6;
 	Mon, 21 Sep 2026 22:31:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790029900; cv=none; b=S3kmy5NsejtYhUi2DkPXJpXh2MidHJPoQiFb3K7gNVz1ThQnRHkkCTtAmWXZtDI3EFzGslf4joOxRIByJgP/qf/IoYKOAjFeYouu+G0jfNTUXe88V0tLd3yLTe2kjMsZ26FBvaHakL4PFGGpfgKjjK+cDG+/Yq9NFubTl72mlPE=
+	t=1790029901; cv=none; b=Q2rYH8RYlB1mrXJUl7JFDmbhsjJpitW0iM4Y9ZobNDLBymKtIdQPRWxA+kxKjTokyy3qtGVY9QCz3xr+cYgOPeR3ECuR/SCTDhNgeCjjWcj/D/6cNFg9N462NhIbzVN27LLtaVc1ls3RCFSupGrMswNHDzU/NJxZ5uAKUbOZxQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790029900; c=relaxed/simple;
-	bh=aj/ip20n8sCr0nYkSnByns9Tm7iVGZdyMePVQA1eGrw=;
+	s=arc-20240116; t=1790029901; c=relaxed/simple;
+	bh=zQdpkRB1raAu9El8Gr7JSqs4nWRjQtN49/wJdCaCzHY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QBzvjTNzpZki6wd/iDyctsGlVKaRoICQ2eDxJk/U0Te8Qrzi9LP24G8qQdSp7abFV49RRYweWA62uQIv99Yc87bvGYd7D4Q1MGRTc4+62uB0uToevkBcw5iUx+Ob9q8DBKElYmH4XGVZq/pFeIrJr3535S+rzYGoToa6YhmPPdY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QZU/+74G; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=eZ7MOTZz01WpcXjIXTdiG/lbj5HBTw07S1riBqN/5NnEdYiqB2wN7TwnrwQbR31nVslnSNAp6o9AO9dTB+yFO5iJReU2KjIXunBDGAtx+47laHPXSD8jQDUaurOK5pds/dvMsEyf8AwAFleh/rxxtTSuleK1bNiQFQfAWoH+vzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ATN/W+B0; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QZU/+74G"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECEEF1F00898;
-	Mon, 21 Sep 2026 22:31:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ATN/W+B0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F5951F000FF;
+	Mon, 21 Sep 2026 22:31:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1790029899;
-	bh=gpZkeU1ez/jJdds8D5Mf1lVFeLdql8geXuOpgaKy+VU=;
+	bh=NJgNfalgH9SR174GVDquiTtpvJhDQQUnFJHEnW+s0ho=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=QZU/+74GvZodFAur2y3qO//8jjfH0svV4YRdnGUs9k7/sg+Wvxqr+kWeSpFLKgpmb
-	 koAG9EewTZjHxAH1NKlZm1wxZe1tXQmMBRlwcX8PkgpYDUpbdvoKKDzHHcugB7aNz1
-	 0cGeyagIYQKr0LX2Ov67xGPH5IBt8qhtVCLm5OFxsOb7OeXeD2hw6o/6iynfRkEkoi
-	 e+g+Z4LQGV3tSBYHBQGXabMTHxKOkFv6cWwTd/XXsksX9twUc5QMzNdhsUfWj1hXf5
-	 Bqfx9jrUIQ+sUyYO0DMam1pxsorBT5msYNRuAxnyPhMWu6jrw+XlgTlSRjLo16sXYr
-	 M4RZ+FGEggamA==
+	b=ATN/W+B0hnnslgfh8kDm21HTQAzkbmppGldmNUN3PhH2hpormE2Pmrn7Hj3kZ/Vru
+	 ryo2yG9iiXBzm1I1a7YVYSoYuPN1TUvblur9s8g/Ksll8BI0IqzI+Gw+uBOzwJy9YP
+	 KnMQ70w+9qREMimi3f39Sr501sX3Easor3gvQdIsNCag0ltBpkDfEMFI2ce4yJqGM7
+	 1Orhhe+Bfu59zuVjwQALYMLUu4rvT0/X3igeXZkWPHvT6LY+g/rA5tW5zXM0+gHPNf
+	 gl9InxzU3IxMoLwCoHDurucepRUL262hHs63RXDlMe2QMHXPMkWIEFTtBCnhdAAXcx
+	 lW8GyGV7orrXA==
 From: Josh Poimboeuf <jpoimboe@kernel.org>
 To: x86@kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Nicolas Schier <nsc@kernel.org>,
 	linux-kbuild@vger.kernel.org,
 	Huacai Chen <chenhuacai@kernel.org>
-Subject: [PATCH v3 05/28] objtool: Refactor the noreturn/dead-end detection
-Date: Mon, 21 Sep 2026 15:31:06 -0700
-Message-ID: <2fe49f30f46d5c9230bffeadd9a2baecd7327247.1790028654.git.jpoimboe@kernel.org>
+Subject: [PATCH v3 06/28] objtool: Ignore traps after noreturn calls in STT_CODE
+Date: Mon, 21 Sep 2026 15:31:07 -0700
+Message-ID: <ca409e47fdb00307578abccb77a841b421592273.1790028654.git.jpoimboe@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <cover.1790028654.git.jpoimboe@kernel.org>
 References: <cover.1790028654.git.jpoimboe@kernel.org>
@@ -52,248 +52,50 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The dead end detection (basically "is this a call to a noreturn?") is
-currently derived on demand, at each call site.  Also, the answer
-isn't saved anywhere, so it's redetermined each time.  It also has an
-ugly recursion check.
+Objtool doesn't do unreachable warnings for traps after noreturn calls,
+but only in functions.  Loongarch assembly STT_CODE can have the same
+pattern:
 
-Clean that up by just detecting all the noreturns at the beginning.
+  bl	start_kernel
+  	ASM_BUG()
+
+Ignore those as well.
 
 Signed-off-by: Josh Poimboeuf <jpoimboe@kernel.org>
 ---
- tools/objtool/check.c               | 159 ++++++++++++++++------------
- tools/objtool/include/objtool/elf.h |   1 +
- 2 files changed, 93 insertions(+), 67 deletions(-)
+ tools/objtool/check.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/tools/objtool/check.c b/tools/objtool/check.c
-index 1fe7efa934ebf..83b4e748d33ba 100644
+index 83b4e748d33ba..f65b1b01b4fe9 100644
 --- a/tools/objtool/check.c
 +++ b/tools/objtool/check.c
-@@ -219,94 +219,112 @@ static bool is_rust_noreturn(const struct symbol *func)
- 		str_ends_with(func->name, "_fail"));
- }
- 
--/*
-- * This checks to see if the given function is a "noreturn" function.
-- *
-- * For global functions which are outside the scope of this object file, we
-- * have to keep a manual list of them.
-- *
-- * For local functions, we have to detect them manually by simply looking for
-- * the lack of a return instruction.
-- */
--static bool __dead_end_function(struct objtool_file *file, struct symbol *func,
--				int recursion)
-+static bool is_listed_noreturn(struct symbol *func)
- {
--	int i;
--	struct instruction *insn;
--	bool empty = true;
--
- #define NORETURN(func) __stringify(func),
- 	static const char * const global_noreturns[] = {
- #include "noreturns.h"
- 	};
- #undef NORETURN
+@@ -4271,12 +4271,6 @@ static bool ignore_unreachable_insn(struct objtool_file *file, struct instructio
+ 	    !strcmp(insn->sec->name, ".altinstr_aux"))
+ 		return true;
  
 -	if (!func)
-+	if (is_local_sym(func))
- 		return false;
- 
--	if (!is_local_sym(func)) {
--		if (is_rust_noreturn(func))
-+	if (is_rust_noreturn(func))
-+		return true;
-+
-+	for (int i = 0; i < ARRAY_SIZE(global_noreturns); i++)
-+		if (!strcmp(func->name, global_noreturns[i]))
- 			return true;
- 
--		for (i = 0; i < ARRAY_SIZE(global_noreturns); i++)
--			if (!strcmp(func->name, global_noreturns[i]))
--				return true;
--	}
-+	return false;
-+}
-+
-+/*
-+ * Use this rather than reading sym->_noreturn directly: the noreturn status
-+ * lives on the primary alias, and ANNOTATE_IGNORE_NORETURN() overrides it.
-+ */
-+static bool is_noreturn(struct symbol *func)
-+{
-+	func = func->alias->pfunc;
-+
-+	if (is_listed_noreturn(func))
-+		return true;
-+
-+	return func->_noreturn;
-+}
-+
-+static bool might_return(struct objtool_file *file, struct symbol *func)
-+{
-+	struct instruction *insn;
-+	struct symbol *dest;
- 
- 	if (is_weak_sym(func))
 -		return false;
 -
--	if (!func->len)
--		return false;
+-	if (func->static_call_tramp)
+-		return true;
 -
--	insn = find_insn(file, func->sec, func->offset);
--	if (!insn || !insn_func(insn))
--		return false;
-+		return true;
- 
- 	func_for_each_insn(file, func, insn) {
--		empty = false;
--
- 		if (insn->type == INSN_RETURN)
--			return false;
--	}
--
--	if (empty)
--		return false;
--
--	/*
--	 * A function can have sibling calls instead of a return.  It's only a
--	 * dead end if *all* the sibling call targets are dead ends.
--	 */
--	func_for_each_insn(file, func, insn) {
--		struct symbol *dest;
-+			return true;
- 
- 		if (!is_sibling_call(insn))
- 			continue;
- 
- 		dest = insn_call_dest(insn);
--		if (!dest)
--			/* call to another file */
--			return false;
--
--		if (recursion == 5) {
--			/*
--			 * Infinite recursion: two functions have sibling
--			 * calls to each other.  This is a very rare case.
--			 * It means they aren't dead ends.
--			 */
--			return false;
--		}
--
--		if (!__dead_end_function(file, dest, recursion+1))
--			return false;
-+		if (!dest || !is_noreturn(dest))
-+			return true;
- 	}
- 
--	return true;
-+	return false;
- }
- 
--static bool dead_end_function(struct objtool_file *file, struct symbol *func)
-+static void detect_noreturns(struct objtool_file *file)
- {
--	return __dead_end_function(file, func, 0);
-+	struct symbol *func, *dest;
-+	struct instruction *insn;
-+	bool changed;
-+
-+	/* Mark all functions guilty until proven innocent */
-+	for_each_sym(file->elf, func) {
-+
-+		/* Aliases and cold subfunctions inherit the parent's verdict */
-+		if (!is_func_sym(func) || is_undef_sym(func) ||
-+		    is_prefix_func(func) || func->embedded_insn ||
-+		    func != func->alias->pfunc)
-+			continue;
-+
-+		insn = find_insn(file, func->sec, func->offset);
-+		if (!insn || insn_func(insn) != func)
-+			continue;
-+
-+		func->_noreturn = 1;
-+	}
-+
-+	/*
-+	 * A function's noreturn status depends on those of its sibling call
-+	 * destinations, which may not be settled yet.  Keep clearing the
-+	 * noreturn bit for known cases until it stops spreading.
-+	 */
-+	do {
-+		changed = false;
-+
-+		for_each_sym(file->elf, func) {
-+			if (!func->_noreturn || !might_return(file, func))
-+				continue;
-+
-+			func->_noreturn = 0;
-+			changed = true;
-+		}
-+	} while (changed);
-+
-+	/* Now mark the dead end call sites */
-+	for_each_insn(file, insn) {
-+		if (insn->type != INSN_CALL)
-+			continue;
-+
-+		dest = insn_call_dest(insn);
-+		if (dest && is_noreturn(dest))
-+			insn->dead_end = true;
-+	}
- }
- 
- static void init_cfi_state(struct cfi_state *cfi)
-@@ -1422,9 +1440,6 @@ static int annotate_call_site(struct objtool_file *file,
- 	    !insn->_call_dest->embedded_insn)
- 		list_add_tail(&insn->call_node, &file->call_list);
- 
--	if (!sibling && dead_end_function(file, sym))
--		insn->dead_end = true;
--
- 	return 0;
- }
- 
-@@ -2669,6 +2684,17 @@ int decode_file(struct objtool_file *file)
- 	if (add_jump_table_alts(file))
- 		return -1;
- 
-+	/*
-+	 * Must be after add_jump_table_alts(), which affects sibling call
-+	 * detection (jump table branches vs indirect sibling calls).
-+	 *
-+	 * The dead end marks are read by validate_branch() -- reached from
-+	 * both validate_functions() and validate_noinstr_sections() -- and by
-+	 * validate_unret().
-+	 */
-+	if (validate_branch_enabled() || opts.noinstr || opts.unret)
-+		detect_noreturns(file);
-+
- 	if (read_unwind_hints(file))
- 		return -1;
- 
-@@ -2676,8 +2702,7 @@ int decode_file(struct objtool_file *file)
- 	mark_holes(file);
- 
  	/*
--	 * Must be after add_call_destinations() such that it can override
--	 * dead_end_function() marks.
-+	 * Must be after detect_noreturns() so it can override dead_end marks.
- 	 */
- 	if (read_annotate(file, __annotate_late))
- 		return -1;
-diff --git a/tools/objtool/include/objtool/elf.h b/tools/objtool/include/objtool/elf.h
-index a82517a76a0f6..46fb2230ca743 100644
---- a/tools/objtool/include/objtool/elf.h
-+++ b/tools/objtool/include/objtool/elf.h
-@@ -98,6 +98,7 @@ struct symbol {
- 	u8 klp		     : 1;
- 	u8 dont_correlate    : 1;
- 	u8 fake		     : 1;
-+	u8 _noreturn         : 1;
- 	struct list_head pv_target;
- 	struct reloc *relocs;
- 	struct section *group_sec;
+ 	 * CONFIG_UBSAN_TRAP inserts a UD2 when it sees
+ 	 * __builtin_unreachable().  The BUG() macro has an unreachable() after
+@@ -4292,6 +4286,12 @@ static bool ignore_unreachable_insn(struct objtool_file *file, struct instructio
+ 	      insn->jump_dest && insn->jump_dest->type == INSN_BUG)))
+ 		return true;
+ 
++	if (!func)
++		return false;
++
++	if (func->static_call_tramp)
++		return true;
++
+ 	/*
+ 	 * Check if this (or a subsequent) instruction is related to
+ 	 * CONFIG_UBSAN or CONFIG_KASAN.
 -- 
 2.55.0
 
