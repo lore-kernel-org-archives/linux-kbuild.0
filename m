@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93C0751E43E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9FB151FCA1;
 	Mon, 21 Sep 2026 22:31:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790029899; cv=none; b=mE2OxnAM9cMrn9nOCfLiapomuZzps1ZRULFnt+EKfAxdXp1KRmq828fKk/RkQeNNAaqGtyBp5BOldkWN/SR9XeksDSLn6cc4Awk3FjxbB9KuRxezdIfLa3w34xfjv3Dj0xpqo6ITr41+V9Ih3/hlk2IetEuuTKk3qljIgdgzdnw=
+	t=1790029900; cv=none; b=eo2rE/0itLBhyobBuZzqygYv+Cdhb8LD8VdR/3/GiisLUg3YFUVfQX/6qHs9CuRHQd1kVB3TxJhQrZIB3rYnMcUc+GzYHgCrazq5xzxR+5+hRenb8yPJR3npkII61G5ebExLgLedfCzQ8e28S9sD5S3IClqEJHW763qDURG7wwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790029899; c=relaxed/simple;
-	bh=I3cUPEoJDwNZGAbTCXbq7O0NgC68s7dJu3xEODW1JNg=;
+	s=arc-20240116; t=1790029900; c=relaxed/simple;
+	bh=RqP/t3s2/zIrSrTTD49ejM+aVVU3EBIBfm/FS0sYOgE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sl8VL/I+2QR+okv74uhVO4p8bnpmzgkW3zpJwpaQC0LzhIxHZc6HV/NlAcnjrXDFoHBsYqWlM8o5+OGzEnYWRoJjkKdquuQGMJJacrg3Y4wVP4FdG7zoLzvs2rXj0cePVSrMTppeRFAwlF8fKh0CHzLRAJiB5SA2kVgAPoYRsZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W4gUeOLG; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=ZoeZAOQ6ojEyZCIy2LK49FX2b4E3gLsK08zBFeJtBcZH+G8EHQf2Ed5xsuAzjd24kzuJh5Dalt19Sn259g4nhr0aMLtXWSO7JuKLpXG4Hin0cTZ5dwBYR/rf2nwiLS6wMewmxsOKNRJt0V2y79Ywl8kW6j+hPGMFudQ6Lc0CLUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fQHxutsR; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W4gUeOLG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFCFA1F00893;
-	Mon, 21 Sep 2026 22:31:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fQHxutsR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56CE81F0089B;
+	Mon, 21 Sep 2026 22:31:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1790029898;
-	bh=U0yU5rw0NziWIOJnMbl/NvSbyXFcGJvjYEnN57Vp/0A=;
+	bh=uQigbxSbB36jbuuLbsBr4mlC7PBHgUWmA8HWqG/3ibE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=W4gUeOLGFAjpF9c00FQ0CZ6EJ5FIL/eS83IOKEq0aHfRZQWLG7HcrpgIZ7HGChPd3
-	 XoilUwlvqhcC26zu6CJfZYr7pce7FLCdAGOMgpC/mE4UeC9H28QAKiob9U0AHAZWlg
-	 N1+FSLMVUdrz2ijP48i1Fk0rOlyXhDrjieywQRg1tlGtldRbbOAK7YZMKz2w9arko/
-	 L5WOXoWC6csAxvfEUvUh30wUHbGoGPUGvZd8N5R3GbS+3Lcybavl7VI5yO7mSU2Dag
-	 d/XAy2aWBqtjAgYMYHzUcszn1WP6PNevR/oebzglrjWKq9vy7WK+4TtXeOsKu3UV9g
-	 HGSgmgl6PfECQ==
+	b=fQHxutsRcCush+U9pyYPWIJt3lDwX2jM0NEY5urFaNzZd7O9sdDdT53G0qNtpiaty
+	 wDL2qTp1VNCvWm75VClsHfIit7+a484iDturh+J5OJuqXu79z9JxkiFhh/DGEYIvAD
+	 8daHQ+hkg3LqRDpcryWT3kXY2XGCKlCL4QaSNnlLnDds23JmcZlIXnvRqbDDr4Oqlj
+	 YWrOhrRkx7KwnmjgjwsLUcvnlTzn9hGOPV5xR2tSJLGLseekzhMkjV1iCDhKwNhFO1
+	 CO2yI/fukzfDLgRhT2yHrow/Ag/6F/9ACsQ93gyA1qwL4MD6CJtfMH68ykswKCZnKn
+	 axgxrLKiqkkaQ==
 From: Josh Poimboeuf <jpoimboe@kernel.org>
 To: x86@kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Nicolas Schier <nsc@kernel.org>,
 	linux-kbuild@vger.kernel.org,
 	Huacai Chen <chenhuacai@kernel.org>
-Subject: [PATCH v3 03/28] kbuild: Add CONFIG_OBJTOOL_CONTROL_FLOW
-Date: Mon, 21 Sep 2026 15:31:04 -0700
-Message-ID: <a80f670beb8272e9d78700530fd064fd839493db.1790028654.git.jpoimboe@kernel.org>
+Subject: [PATCH v3 04/28] objtool: Fix dead end detection for sibling calls
+Date: Mon, 21 Sep 2026 15:31:05 -0700
+Message-ID: <e48a2a11efa839d4460e5678254ce89b04931a2b.1790028654.git.jpoimboe@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <cover.1790028654.git.jpoimboe@kernel.org>
 References: <cover.1790028654.git.jpoimboe@kernel.org>
@@ -52,47 +52,72 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a config option for when objtool reverse engineers the control flow
-graph of every function.
+The dead end detection for sibling calls has apparently always been
+broken.  There are two issues: it checks jump_dest instead of call_dest,
+and it only checks the first sibling call instead of all of them.  Fix
+both issues.
 
-No functional change.
+No warnings were seen, this was only found by code inspection.
 
 Signed-off-by: Josh Poimboeuf <jpoimboe@kernel.org>
 ---
- lib/Kconfig.debug | 6 ++++++
- lib/Kconfig.ubsan | 2 +-
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ tools/objtool/check.c | 37 +++++++++++++++++++------------------
+ 1 file changed, 19 insertions(+), 18 deletions(-)
 
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 55732323dc16e..798a10ded19fd 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -577,6 +577,12 @@ config OBJTOOL_DEFERRED
- 	depends on OBJTOOL
- 	depends on LTO_CLANG || X86_KERNEL_IBT || KLP_BUILD
+diff --git a/tools/objtool/check.c b/tools/objtool/check.c
+index 464f6c9d9ff0b..1fe7efa934ebf 100644
+--- a/tools/objtool/check.c
++++ b/tools/objtool/check.c
+@@ -274,30 +274,31 @@ static bool __dead_end_function(struct objtool_file *file, struct symbol *func,
+ 		return false;
  
-+# Objtool reverse-engineers the control flow graph
-+config OBJTOOL_CONTROL_FLOW
-+	def_bool y
-+	depends on OBJTOOL
-+	depends on UNWINDER_ORC || STACK_VALIDATION || HAVE_UACCESS_VALIDATION
+ 	/*
+-	 * A function can have a sibling call instead of a return.  In that
+-	 * case, the function's dead-end status depends on whether the target
+-	 * of the sibling call returns.
++	 * A function can have sibling calls instead of a return.  It's only a
++	 * dead end if *all* the sibling call targets are dead ends.
+ 	 */
+ 	func_for_each_insn(file, func, insn) {
+-		if (is_sibling_call(insn)) {
+-			struct instruction *dest = insn->jump_dest;
++		struct symbol *dest;
+ 
+-			if (!dest)
+-				/* sibling call to another file */
+-				return false;
++		if (!is_sibling_call(insn))
++			continue;
+ 
+-			/* local sibling call */
+-			if (recursion == 5) {
+-				/*
+-				 * Infinite recursion: two functions have
+-				 * sibling calls to each other.  This is a very
+-				 * rare case.  It means they aren't dead ends.
+-				 */
+-				return false;
+-			}
++		dest = insn_call_dest(insn);
++		if (!dest)
++			/* call to another file */
++			return false;
+ 
+-			return __dead_end_function(file, insn_func(dest), recursion+1);
++		if (recursion == 5) {
++			/*
++			 * Infinite recursion: two functions have sibling
++			 * calls to each other.  This is a very rare case.
++			 * It means they aren't dead ends.
++			 */
++			return false;
+ 		}
 +
- config STACK_VALIDATION
- 	bool "Compile-time stack metadata validation"
- 	depends on HAVE_STACK_VALIDATION && UNWINDER_FRAME_POINTER
-diff --git a/lib/Kconfig.ubsan b/lib/Kconfig.ubsan
-index 1ecaae7064d2a..61e8c86ef63be 100644
---- a/lib/Kconfig.ubsan
-+++ b/lib/Kconfig.ubsan
-@@ -110,7 +110,7 @@ config UBSAN_UNREACHABLE
- 	bool "Perform checking for unreachable code"
- 	# objtool already handles unreachable checking and gets angry about
- 	# seeing UBSan instrumentation located in unreachable places.
--	depends on !(OBJTOOL && (STACK_VALIDATION || UNWINDER_ORC || HAVE_UACCESS_VALIDATION))
-+	depends on !OBJTOOL_CONTROL_FLOW
- 	depends on $(cc-option,-fsanitize=unreachable)
- 	help
- 	  This option enables -fsanitize=unreachable which checks for control
++		if (!__dead_end_function(file, dest, recursion+1))
++			return false;
+ 	}
+ 
+ 	return true;
 -- 
 2.55.0
 
