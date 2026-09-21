@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89FBC52FE29;
-	Mon, 21 Sep 2026 22:31:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21B365304A1;
+	Mon, 21 Sep 2026 22:31:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790029912; cv=none; b=ImfedtsRjr/eu15k8ZpPalYbVLJLFQmNtiJc8KfnKyjV0Tr7XCbYuuiNiicVoCmv4NlvptX11xg/K5RtK26eVlhyH1BJEj6/DQNnnllCvSWWtROYW6AFsbnyKJQY09BTv4FU6D/1fGSbYKs2/JOR8Wt5baeOUxfoq0lVA573/Zg=
+	t=1790029912; cv=none; b=HEyZfumjUZ4/cgdjzAMyzY3MTRumyy+r4d7BrDe1o9LchfRdelLJZrqDleWYUkq3ts6cA2sFu3V6Komd/jGoqIyB00kv267tetB+UcLOiaFSnN4GhuJtekF23DzEW7PxZf8E63E/p7RktJG6Y1yZm24fLbKmvwNJPbabh2MH9GQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1790029912; c=relaxed/simple;
-	bh=lPvOIFM8MH7QtPLweSigI+KHrf2Q16BYYbv0/S1hXew=;
+	bh=dsgOnfDAX5cJwX1hU0Wk12p5knwAGAE3pXL5laTYyqg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=c1eGt7FbdttDyg/7lu5H8q2Az6QR822Vn9DvKQtz8JG5bI/uRgmL5AAlnjnK8nE3FT74ruSeGvGaOr0Ueai9ilXPaNQFhbGaZKPaecEcJzFEiEJyEsOJOkizte4v0EPVUlRpoHjvFtfoJCEw9pf7LuwB6aEVyuYxQcIkbI/yKEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AjiZuLh/; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=ILR7sO09ucpsefhrrhiWIV0D35it04jFFERv4pVSY3DZhMYPpDOO1nKHY5edWNFCrJGlY8eyebVdp66bvKfb5CVMyts4QAhnD0w8m+mas/c/V1SPUhS1x/RD+XfSrcungvibCSzdRqe0k5uJ5B0sQY2t4DUSU1SoHb5pg3oMAcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o2EdFPn1; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AjiZuLh/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 185051F00899;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o2EdFPn1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A8AB1F000FF;
 	Mon, 21 Sep 2026 22:31:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790029910;
-	bh=uuTzoy5vQkppDlztLfs+qfex64mMeCrjWRuQWpKGuI4=;
+	s=k20260515; t=1790029911;
+	bh=tXKsr38W0Hp9RYIwyVzbjbHByCfkbgvG32ZvcJyTzxA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=AjiZuLh/QxHdgfjG7aqenbUWFhALEKREU7iCqrsRfV0AL4XIqpA091/vKxENpfqhE
-	 PHheISiLc9MRTZr1cZk7qg6Vvu7oz+pm0l6eJlvQhuxjS5YsMoUxS6mfO72N4Y+1RH
-	 bM6Wie9bHXtuLcB18d6UL13N1C38aNA4Oeoq5uXPCQUBMGeTmKYHneUzf9kZnKb/kv
-	 BaeMeMIXhCkLAk5DGIcLhDahMgMMVQBmvtQ+h0E9wQC7Gnx4ZjC9BdEPLP9gy/R/Z1
-	 k+jn2F6X3GjT7477mSD3anvEt+BfOr50WihG0JA0DuYOiYHk6AF6XqoOjtUrIRvrUz
-	 J7gAtF08Gc73w==
+	b=o2EdFPn1NSj68WRSpe8orqlScp8xHl6kKTbafHgTF8XYuGiQG6XZRYGEGO+NPLYWu
+	 vRbj+dTVSmXe9GjGKO9duBprn4M2Vm7eLNqiYX8DRAknruoW7dZ6y6J3K59Vm36Jcl
+	 F4JiifJEJmX14myMI6BP6C3OG/iBUIzYPFl8jxvz/SiI+P9A3VU/+4exFIG3/f3IBF
+	 79FgCnPo55wOnGH6AMGiH2uxaEHmL9J7Z+Sn3e3cgjTvBOmXswCooFUgZNzyXcjRE3
+	 6WUfHHGSyEsKT8LArPpJFt4UknvW1xBZ/yeNJ8pvZxBi3tV3QTvIJVM0X0XoXl7NlO
+	 7GxSKJb1LOTyA==
 From: Josh Poimboeuf <jpoimboe@kernel.org>
 To: x86@kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Nicolas Schier <nsc@kernel.org>,
 	linux-kbuild@vger.kernel.org,
 	Huacai Chen <chenhuacai@kernel.org>
-Subject: [PATCH v3 24/28] kbuild: Generate the noreturn list and validate modules against it
-Date: Mon, 21 Sep 2026 15:31:25 -0700
-Message-ID: <ed33f66332772d5156dc91513d00e19218e5e68b.1790028654.git.jpoimboe@kernel.org>
+Subject: [PATCH v3 25/28] objtool: Add ANNOTATE_EXPORTED_NORETURN()
+Date: Mon, 21 Sep 2026 15:31:26 -0700
+Message-ID: <9c3f5d7259afaf5612fdadb7f70aabd2e0e0f790.1790028654.git.jpoimboe@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <cover.1790028654.git.jpoimboe@kernel.org>
 References: <cover.1790028654.git.jpoimboe@kernel.org>
@@ -52,235 +52,160 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Most of the remaining hard-coded noreturn functions are exported symbols
-which live in vmlinux.o.  The objtool vmlinux.o pass can detect them
-automatically, but modules can't.
-
-Instead of hard-coding them in noreturns.h, dynamically generate the
-list in a new scripts/noreturns.builtin file, which objtool on modules
-can then read.  That allows most of the remaining hard-coded noreturn
-entries to go away, including the Rust ones.  Note this means that
-modules need to be linked after vmlinux.o has been built and analyzed by
-objtool.
-
-Objtool running on OOT modules will also need to read the generated
-file.  Its location in scripts/ should ensure it gets installed with
-kernel build files automatically.
+Add ANNOTATE_EXPORTED_NORETURN() for the rare case where a module
+exports a noreturn function.
 
 Signed-off-by: Josh Poimboeuf <jpoimboe@kernel.org>
 ---
- Makefile                                |  8 +++++
- scripts/.gitignore                      |  1 +
- scripts/Makefile.modfinal               | 15 ++++++--
- scripts/Makefile.vmlinux_o              |  2 ++
- tools/objtool/Documentation/objtool.txt |  8 ++---
- tools/objtool/check.c                   | 46 -------------------------
- tools/objtool/noreturns.h               | 17 ++-------
- 7 files changed, 29 insertions(+), 68 deletions(-)
+ include/linux/annotate.h | 17 +++++++++++++++++
+ tools/objtool/check.c    | 27 +++++++++++++++++++++++++++
+ tools/objtool/klp-diff.c | 32 ++++++++++++++++++++++++++++++++
+ 3 files changed, 76 insertions(+)
 
-diff --git a/Makefile b/Makefile
-index 751a08643bf85..53796b151b4eb 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1750,6 +1750,13 @@ KBUILD_BUILTIN := y
- modules: vmlinux
- endif
+diff --git a/include/linux/annotate.h b/include/linux/annotate.h
+index a81ca04b4c501..70450eeec3186 100644
+--- a/include/linux/annotate.h
++++ b/include/linux/annotate.h
+@@ -25,6 +25,15 @@
+ 	"912: "								\
+ 	__stringify(__ASM_ANNOTATE(.discard.annotate_data, 912b, type))
  
-+# Objtool for modules (run before module link) needs to come after objtool for
-+# vmlinux.o so it can read the generated exported noreturns file.
-+ifdef CONFIG_OBJTOOL_CONTROL_FLOW
-+KBUILD_BUILTIN := y
-+modules: vmlinux.o
-+endif
++/*
++ * Annotate a symbol by name rather than by relocation, so it can optionally be
++ * used in a header file.
++ */
++#define ASM_ANNOTATE_NAME(section, sym)					\
++	".pushsection " section ", \"MS\", @progbits, 1\n\t"		\
++	".asciz \"" __stringify(sym) "\"\n\t"				\
++	".popsection"
 +
- modules: modules_prepare
+ #else /* __ASSEMBLY__ */
  
- # Target to prepare building external modules
-@@ -1780,6 +1787,7 @@ MRPROPER_FILES += include/config include/generated          \
- 		  debian snap tar-install PKGBUILD pacman \
- 		  .config .config.old .version \
- 		  Module.symvers \
-+		  scripts/noreturns.builtin \
- 		  certs/signing_key.pem \
- 		  certs/x509.genkey \
- 		  vmlinux-gdb.py \
-diff --git a/scripts/.gitignore b/scripts/.gitignore
-index 4215c2208f7e4..15d99dfd7c936 100644
---- a/scripts/.gitignore
-+++ b/scripts/.gitignore
-@@ -5,6 +5,7 @@
- /insert-sys-cert
- /kallsyms
- /module.lds
-+/noreturns.builtin
- /recordmcount
- /rustdoc_test_builder
- /rustdoc_test_gen
-diff --git a/scripts/Makefile.modfinal b/scripts/Makefile.modfinal
-index 56b4227cc6863..23b07ad7eb9bd 100644
---- a/scripts/Makefile.modfinal
-+++ b/scripts/Makefile.modfinal
-@@ -32,6 +32,15 @@ ifneq ($(WARN_ON_UNUSED_TRACEPOINTS),)
- cmd_check_tracepoint = $(objtree)/scripts/tracepoint-update --module $<;
- endif
+ .macro ANNOTATE type
+@@ -44,6 +53,7 @@
+ #define ASM_ANNOTATE_LABEL(label, type) ""
+ #define ASM_ANNOTATE(type)
+ #define ASM_ANNOTATE_DATA(type)
++#define ASM_ANNOTATE_NAME(section, sym) ""
+ #else /* __ASSEMBLY__ */
+ .macro ANNOTATE type
+ .endm
+@@ -112,6 +122,13 @@
+  */
+ #define ANNOTATE_IGNORE_NORETURN(sym)	asm(ASM_ANNOTATE_LABEL(sym, ANNOTYPE_IGNORE_NORETURN))
  
-+ifdef CONFIG_OBJTOOL_CONTROL_FLOW
-+noreturns-builtin := $(wildcard $(objtree)/scripts/noreturns.builtin)
-+ifeq ($(noreturns-builtin),)
-+$(warning scripts/noreturns.builtin is missing)
-+else
-+objtool-args += --noreturns-read=$(noreturns-builtin)
-+endif
-+endif
++/*
++ * Tell objtool running on a module that a function exported by another module
++ * is __noreturn.  Objtool has no way of communicating that between modules due
++ * to the parallel nature of module linking in kbuild.
++ */
++#define ANNOTATE_EXPORTED_NORETURN(sym)	asm(ASM_ANNOTATE_NAME(".discard.annotate_noreturn", sym))
 +
- $(modules:%.o=%.ko): private objtool-enabled = $(CONFIG_OBJTOOL_DEFERRED)
- 
- mod-objtool = $(if $(objtool-enabled),$(objtool) $(objtool-args) -o $@.o $< ;)
-@@ -59,8 +68,10 @@ define rule_ld_ko_o
- 	+$(if $(CONFIG_DEBUG_INFO_BTF_MODULES),$(if $(newer-prereqs),$(call cmd,btf_ko)))
- endef
- 
--# Re-generate module BTFs if either module's .ko or vmlinux changed
--%.ko: %.o %.mod.o .module-common.o $(objtree)/scripts/module.lds $(and $(CONFIG_DEBUG_INFO_BTF_MODULES),$(KBUILD_BUILTIN),$(objtree)/vmlinux) FORCE
-+# Re-generate module BTFs if either module's .ko or vmlinux changed.
-+# Re-run module objtool if the generated noreturn list changed.
-+%.ko: %.o %.mod.o .module-common.o $(objtree)/scripts/module.lds $(noreturns-builtin) \
-+      $(and $(CONFIG_DEBUG_INFO_BTF_MODULES),$(KBUILD_BUILTIN),$(objtree)/vmlinux) FORCE
- 	$(call if_changed_rule,ld_ko_o)
- 	+$(call cmd,check_tracepoint)
- 
-diff --git a/scripts/Makefile.vmlinux_o b/scripts/Makefile.vmlinux_o
-index df1e3584883e6..9c60a4918a756 100644
---- a/scripts/Makefile.vmlinux_o
-+++ b/scripts/Makefile.vmlinux_o
-@@ -37,6 +37,8 @@ objtool-enabled := $(CONFIG_OBJTOOL_DEFERRED)
- 
- vmlinux-objtool-args-y					+= $(objtool-args-y)
- 
-+vmlinux-objtool-args-$(CONFIG_OBJTOOL_CONTROL_FLOW)	+= --noreturns-write=scripts/noreturns.builtin
-+
- vmlinux-objtool-args-$(CONFIG_NOINSTR_VALIDATION)	+= --noinstr \
- 							   $(if $(or $(CONFIG_MITIGATION_UNRET_ENTRY),$(CONFIG_MITIGATION_SRSO)), --unret)
- 
-diff --git a/tools/objtool/Documentation/objtool.txt b/tools/objtool/Documentation/objtool.txt
-index 9e97fc25b2d8a..c7ebfb9a8ca6b 100644
---- a/tools/objtool/Documentation/objtool.txt
-+++ b/tools/objtool/Documentation/objtool.txt
-@@ -334,8 +334,7 @@ the objtool maintainers.
- 
-    The call from foo() to bar() doesn't return, but bar() is incorrectly
-    annotated.  A noreturn function must be marked __noreturn in both its
--   declaration and its definition, and must have a NORETURN() annotation
--   in tools/objtool/noreturns.h.
-+   declaration and its definition.
- 
- 
- 4. file.o: warning: objtool: func(): can't find starting instruction
-@@ -393,9 +392,8 @@ the objtool maintainers.
-    reasons for this:
- 
-    a) funcA()'s last instruction is a call to a "noreturn" function like
--      panic().  In this case the noreturn function needs to be added to
--      objtool's hard-coded global_noreturns array.  Feel free to bug the
--      objtool maintainer, or you can submit a patch.
-+      panic(), and objtool doesn't know that function never returns.  See
-+      warning 3 above.
- 
-    b) funcA() uses the unreachable() annotation in a section of code
-       that is actually reachable.
+ /*
+  * Annotate a special section entry.  This emables livepatch module generation
+  * to find and extract individual special section entries as needed.
 diff --git a/tools/objtool/check.c b/tools/objtool/check.c
-index 29ef2dc678833..1ac4da1eaab75 100644
+index 1ac4da1eaab75..de05789b42ff5 100644
 --- a/tools/objtool/check.c
 +++ b/tools/objtool/check.c
-@@ -176,49 +176,6 @@ static bool is_sibling_call(struct instruction *insn)
- 	return (is_static_jump(insn) && insn_call_dest(insn));
+@@ -409,6 +409,31 @@ static int read_noreturns(struct objtool_file *file)
+ 	return 0;
  }
  
--/*
-- * Checks if a function is a Rust "noreturn" one.
-- */
--static bool is_rust_noreturn(const struct symbol *func)
--{
--	/*
--	 * If it does not start with "_R", then it is not a Rust symbol.
--	 */
--	if (strncmp(func->name, "_R", 2))
--		return false;
--
--	/*
--	 * These are just heuristics -- we do not control the precise symbol
--	 * name, due to the crate disambiguators (which depend on the compiler)
--	 * as well as changes to the source code itself between versions (since
--	 * these come from the Rust standard library).
--	 */
--	return str_ends_with(func->name, "_4core3num20from_str_radix_panic")				||
--	       str_ends_with(func->name, "_4core3num22from_ascii_radix_panic")				||
--	       str_ends_with(func->name, "_4core3num28from_ascii_bytes_radix_panic")			||
--	       str_ends_with(func->name, "_4core3str16slice_error_fail")				||
--	       str_ends_with(func->name, "_4core5sliceSp15copy_from_slice17len_mismatch_fail")		||
--	       str_ends_with(func->name, "_4core6option13expect_failed")				||
--	       str_ends_with(func->name, "_4core6option13unwrap_failed")				||
--	       str_ends_with(func->name, "_4core6result13unwrap_failed")				||
--	       str_ends_with(func->name, "_4core9panicking5panic")					||
--	       str_ends_with(func->name, "_4core9panicking9panic_fmt")					||
--	       str_ends_with(func->name, "_4core9panicking14panic_explicit")				||
--	       str_ends_with(func->name, "_4core9panicking14panic_nounwind")				||
--	       str_ends_with(func->name, "_4core9panicking18panic_bounds_check")			||
--	       str_ends_with(func->name, "_4core9panicking18panic_nounwind_fmt")			||
--	       str_ends_with(func->name, "_4core9panicking19assert_failed_inner")			||
--	       str_ends_with(func->name, "_4core9panicking30panic_null_pointer_dereference")		||
--	       str_ends_with(func->name, "_4core9panicking32panic_null_reference_constructed")		||
--	       str_ends_with(func->name, "_4core9panicking36panic_misaligned_pointer_dereference")	||
--	       str_ends_with(func->name, "_7___rustc17rust_begin_unwind")				||
--	       strstr(func->name, "_4core9panicking13assert_failed")					||
--	       strstr(func->name, "_4core9panicking11panic_const24panic_const_")			||
--	       (strstr(func->name, "_4core5slice5index") &&
--		strstr(func->name, "slice_") &&
--		str_ends_with(func->name, "_fail"));
--}
--
- static bool is_listed_noreturn(struct symbol *func)
++static void read_annotate_noreturn(struct objtool_file *file)
++{
++	struct section *sec;
++	struct symbol *func;
++	unsigned long off;
++	const char *name;
++
++	sec = find_section_by_name(file->elf, ".discard.annotate_noreturn");
++	if (!sec || !sec->data)
++		return;
++
++	for (off = 0; off < sec_size(sec); off += strlen(name) + 1) {
++		name = sec->data->d_buf + off;
++		if (!*name)
++			continue;
++
++		func = find_global_symbol_by_name(file->elf, name);
++		if (!func)
++			continue;
++
++		if (is_undef_sym(func))
++			func->_noreturn = 1;
++	}
++}
++
+ static void init_cfi_state(struct cfi_state *cfi)
  {
- #define NORETURN(func) __stringify(func),
-@@ -230,9 +187,6 @@ static bool is_listed_noreturn(struct symbol *func)
- 	if (is_local_sym(func))
- 		return false;
+ 	int i;
+@@ -4978,6 +5003,8 @@ int check(struct objtool_file *file)
+ 			goto out;
+ 	}
  
--	if (is_rust_noreturn(func))
--		return true;
--
- 	for (int i = 0; i < ARRAY_SIZE(global_noreturns); i++)
- 		if (!strcmp(func->name, global_noreturns[i]))
- 			return true;
-diff --git a/tools/objtool/noreturns.h b/tools/objtool/noreturns.h
-index 2dce56030b980..4e8007a8c2584 100644
---- a/tools/objtool/noreturns.h
-+++ b/tools/objtool/noreturns.h
-@@ -1,22 +1,9 @@
- /* SPDX-License-Identifier: GPL-2.0 */
++	read_annotate_noreturn(file);
++
+ 	ret = decode_file(file);
+ 	if (ret)
+ 		goto out;
+diff --git a/tools/objtool/klp-diff.c b/tools/objtool/klp-diff.c
+index 34da55e456097..8a30bf7d1eaf9 100644
+--- a/tools/objtool/klp-diff.c
++++ b/tools/objtool/klp-diff.c
+@@ -360,6 +360,7 @@ static bool is_special_section(struct section *sec)
  
- /*
-- * This is a (sorted!) list of all known __noreturn functions in the kernel.
-- * It's needed for objtool to properly reverse-engineer the control flow graph.
-- *
-- * Yes, this is unfortunate.  A better solution is in the works.
-+ * This is a list of noreturn functions which are exported *by modules*.
-+ * No other noreturns need to be listed here.
-  */
--NORETURN(__fortify_panic)
- NORETURN(__kunit_abort)
--NORETURN(__module_put_and_kthread_exit)
--NORETURN(__stack_chk_fail)
--NORETURN(__ubsan_handle_builtin_unreachable)
--NORETURN(abort)
--NORETURN(acpi_processor_ffh_play_dead)
--NORETURN(do_exit)
--NORETURN(kthread_complete_and_exit)
- NORETURN(kunit_try_catch_throw)
- NORETURN(mpt_halt_firmware)
--NORETURN(panic)
--NORETURN(vpanic)
--NORETURN(rust_helper_BUG)
+ 	static const char * const non_special_discards[] = {
+ 		".discard.addressable",
++		".discard.annotate_noreturn",
+ 		".discard.sym_checksum",
+ 	};
+ 
+@@ -2216,6 +2217,34 @@ static int copy_import_ns(struct elfs *e)
+ 	return 0;
+ }
+ 
++/*
++ * ANNOTATE_EXPORTED_NORETURN() annotations reference their functions by name
++ * rather than by relocation, so individual entries can't be extracted.  Copy
++ * the (tiny) section as-is.
++ */
++static int copy_annotate_noreturn(struct elfs *e)
++{
++	struct section *patched_sec, *out_sec;
++
++	patched_sec = find_section_by_name(e->patched, ".discard.annotate_noreturn");
++	if (!patched_sec || !patched_sec->data || !sec_size(patched_sec))
++		return 0;
++
++	out_sec = elf_create_section(e->out, patched_sec->name, 0,
++				     patched_sec->sh.sh_entsize,
++				     patched_sec->sh.sh_type,
++				     patched_sec->sh.sh_addralign,
++				     patched_sec->sh.sh_flags);
++	if (!out_sec)
++		return -1;
++
++	if (!elf_add_data(e->out, out_sec, patched_sec->data->d_buf,
++			  sec_size(patched_sec)))
++		return -1;
++
++	return 0;
++}
++
+ int cmd_klp_diff(int argc, const char **argv)
+ {
+ 	struct elfs e = {0};
+@@ -2287,6 +2316,9 @@ int cmd_klp_diff(int argc, const char **argv)
+ 	if (copy_import_ns(&e))
+ 		return -1;
+ 
++	if (copy_annotate_noreturn(&e))
++		return -1;
++
+ 	if  (elf_write(e.out))
+ 		return -1;
+ 
 -- 
 2.55.0
 
