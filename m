@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7B8F522F18;
-	Mon, 21 Sep 2026 22:31:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C401524B11;
+	Mon, 21 Sep 2026 22:31:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790029904; cv=none; b=lHybC4YmQAIErcE14/XsN4mjrLo9Nzt0r8TfM4obFi7C8yLwDTuCqlM6z0pMqcwVtRjJa4kp3kpIH1O5brhBt7TK3hl0zNA+gO2FctDlWstC1P2C/+plY/PI/bI9F/s9lNSjgv89W5rc3ywymeAObodaAgFCgh5CNxgHyyNdo00=
+	t=1790029904; cv=none; b=BBPkPObdT8jL5eG4iC37iGGFNM+cgo9OMpxJUYyv/eHr6YUorkdQPeLSurBBOWv+9B2r+LApnQZJbTqhLruRyLbZkzNXwyE5w652ihTLt8QHzmivbJa6/0MQpSQHH3vMJf1vnx9S+7d6rtKg7vyYsiXyus9b+Qvy52lQ4Fm6ynE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1790029904; c=relaxed/simple;
-	bh=qWztlRwzMp0eC2vV1a7ZtSRKJ/oNH+JGaEQpizwVGGM=;
+	bh=ATUDpzmwEqITnzTj/+yDlh3bOFQzajwdJfy9nkU1ehg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FtuUhXg5mkk/YUiGay0rNv1h5KKV+FCxont4EsC3UKNYc/ufi9boeLoGLXzmYOkQjdRN7DdRKrk5IogSmrK82RqSBnHdqRm1SAJO3ofPSxs10MZtDBp5iDGTFIHi32X9wOPaFWE3XZ416zEYh1Y4Ja6PJxpiVDZMGR1+UKY9gQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lLPzrkID; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=hCu2oyFP1PeAP8GnNopLR4+z0DA1Jf8gsUmIjsbxkquMmsec9T5wx5b6AKGzXQ3bVZspfs6bF/S41Jr9+L560ACYbi04JoYBwLJcl0uUwH8xNDWj9GY5eWbP3sQQDfLAGMZlNEMrANiyMMde+BZ4d+u9MZ0Zvz+g7e5m6yGUTDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tupt4LYK; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lLPzrkID"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43AD71F00898;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tupt4LYK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD5631F00893;
 	Mon, 21 Sep 2026 22:31:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790029902;
-	bh=vNjsHB30KZpNjM4w2L4yDqFztf6tF3EEy9YfZGXC5gU=;
+	s=k20260515; t=1790029903;
+	bh=hJ9l7SzbIzjpalUfArVzpNzAzu0RxaIBA7baZFcCDIw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=lLPzrkIDVy6wOojemL2trLkqY7YJFs4LCojDskXqd4KaML++0Lgh2Hm6xDCaJrFao
-	 jwvYYmhcvAI8N8BexStXgHXdNb1Ep5DMrKyuz+ynVeWybih3N7zacRF1UHv2tziJBa
-	 TQaUdAQdnwibk3bQK7boEBAho39fnu81jB7Y7qFQZq7sNqiLnyn/e5D+CjBS/gQ7iS
-	 5mYWWCnbR6KuSLbdSJn3sfkntQ6dE2n+4E71F4G0Z6iAA6nKQtNlB6PcZ6hy6nyccL
-	 GdV0q94kGDliYL/mb3cSoIw5PD6n+CisWhuf2Pw0oLvKOBgJyOmeE3wSP+GeCCPyf5
-	 LAYSuylzqazvA==
+	b=Tupt4LYKLn1lK5ta/3JSSqjxrlGoaQZ8nsPPI1vU8Gpq6FzTY7lzew0MsNxQU8hz1
+	 AqyyGA+AL+aMh/TIyJYBsFaxH7OgVjs0rMFzvqU3TIfkIyDNGReUFbjklhWB2tr5HO
+	 laUEOVgfuWf1F2g4g8SW6SdlVvrNMv6qeCvb1bXWh1UQ+tmCQzbq615hUKvbNjVQ4u
+	 9lakTyqqJc/cHDlAgOItMb7OcnCPzbsj2v9ZsYhNRrXldWsXDpaw0iqam0Bj2kE6mt
+	 tbG69WymN2bfu3b0vzzARvKvnSqtF9tanghI9RGXu+GrVTUPyQ23PDEFUH5Jliz8lz
+	 25H7ju4i6tMIQ==
 From: Josh Poimboeuf <jpoimboe@kernel.org>
 To: x86@kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Nicolas Schier <nsc@kernel.org>,
 	linux-kbuild@vger.kernel.org,
 	Huacai Chen <chenhuacai@kernel.org>
-Subject: [PATCH v3 11/28] LoongArch: Annotate reboot and kexec paths as returnable
-Date: Mon, 21 Sep 2026 15:31:12 -0700
-Message-ID: <c31f0eea2dbaa1a4031f87fbf186f771905183f8.1790028654.git.jpoimboe@kernel.org>
+Subject: [PATCH v3 12/28] kbuild: Defer running objtool to link time for all CFG features
+Date: Mon, 21 Sep 2026 15:31:13 -0700
+Message-ID: <989e3baa55cfb395d5dbcc4223816dbbd4dc45b1.1790028654.git.jpoimboe@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <cover.1790028654.git.jpoimboe@kernel.org>
 References: <cover.1790028654.git.jpoimboe@kernel.org>
@@ -52,88 +52,128 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Running objtool on LoongArch vmlinux.o shows the following warnings:
+noreturns.h file is hand-maintained file which hard codes all the known
+__noreturn functions in the kernel.  It's fragile, often missing
+entries, and keeping it up to date is a maintenance burden.
 
-  vmlinux.o: warning: objtool: __do_sys_reboot+0x188: kernel_restart() is missing __noreturn in .c/.h
-  vmlinux.o: warning: objtool: hw_failure_emergency_action_func+0x74: kernel_restart() is missing __noreturn in .c/.h
-  vmlinux.o: warning: objtool: hibernate+0x3cc: kernel_halt() is missing __noreturn in .c/.h
-  vmlinux.o: warning: objtool: kernel_kexec+0xbc: machine_kexec() is missing __noreturn in .c/.h
-  vmlinux.o: warning: objtool: restart_poweroff_do_poweroff+0x1c: machine_restart() is missing __noreturn in .c/.h
+For LTO, IBT, and klp-build configs, the majority of those entries
+aren't needed, because objtool runs on vmlinux.o, so it already has
+visibility into whether a given function returns (with its dead end
+detection).
 
-The problem is that the generic declarations of the above functions are
-not declared noreturn.
+Remove the need for many of the noreturns.h entries by just always
+deferring objtool for all features which rely on having the noreturn
+information: namely the ones which rely on the reverse-engineered
+control flow graph (CFG).
 
-But marking them __noreturn wouldn't be straightforward given the
-inconsistent behaviors they have across the arches:
+Note that NOINSTR_VALIDATION is a special case, where objtool runs on
+individual TUs (with all the objtool-args-y), and then again on
+vmlinux.o (without objtool-args-y except for --werror).
 
-  - In many cases they don't return, but the compiler doesn't have
-    visibility to that for various reasons including inline asm and
-    indirect calls to noreturn functions (which objtool is currently not
-    equipped to deal with).
-
-  - In some cases they even *do* return, e.g. x86 machine_exec(), arm64
-    machine_power_off(), and hexagon machine_restart().
-
-In lieu of undertaking such a large cleanup, fix the above warnings with
-a few annotations so objtool doesn't consider them noreturn, consistent
-with their call sites.
+This change makes NOINSTR_VALIDATION just another OBJTOOL_DEFERRED
+feature which runs deferred, and *not* on TUs, so now it gets all the
+args like the others, and the special case for adding --werror on
+!OBJTOOL_DEFERRED is no longer needed.
 
 Signed-off-by: Josh Poimboeuf <jpoimboe@kernel.org>
 ---
- arch/loongarch/kernel/machine_kexec.c | 2 ++
- arch/loongarch/kernel/reset.c         | 4 ++++
- 2 files changed, 6 insertions(+)
+ lib/Kconfig.debug          |  3 ++-
+ scripts/Makefile.vmlinux_o | 14 +++-----------
+ tools/objtool/noreturns.h  | 24 ------------------------
+ 3 files changed, 5 insertions(+), 36 deletions(-)
 
-diff --git a/arch/loongarch/kernel/machine_kexec.c b/arch/loongarch/kernel/machine_kexec.c
-index 1883cae93bc31..e40b6767df24e 100644
---- a/arch/loongarch/kernel/machine_kexec.c
-+++ b/arch/loongarch/kernel/machine_kexec.c
-@@ -16,6 +16,7 @@
- #include <linux/reboot.h>
- #include <linux/sched.h>
- #include <linux/sched/task_stack.h>
-+#include <linux/annotate.h>
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index 798a10ded19fd..e5aea1c0e54a2 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -575,7 +575,8 @@ config OBJTOOL_WERROR
+ config OBJTOOL_DEFERRED
+ 	def_bool y
+ 	depends on OBJTOOL
+-	depends on LTO_CLANG || X86_KERNEL_IBT || KLP_BUILD
++	depends on OBJTOOL_CONTROL_FLOW || NOINSTR_VALIDATION || LTO_CLANG || \
++		   X86_KERNEL_IBT || KLP_BUILD
  
- #include <asm/bootinfo.h>
- #include <asm/cacheflush.h>
-@@ -296,3 +297,4 @@ void machine_kexec(struct kimage *image)
+ # Objtool reverse-engineers the control flow graph
+ config OBJTOOL_CONTROL_FLOW
+diff --git a/scripts/Makefile.vmlinux_o b/scripts/Makefile.vmlinux_o
+index 9bac917e8b819..df1e3584883e6 100644
+--- a/scripts/Makefile.vmlinux_o
++++ b/scripts/Makefile.vmlinux_o
+@@ -30,20 +30,12 @@ endif
+ # objtool for vmlinux.o
+ # ---------------------------------------------------------------------------
+ #
+-# For CONFIG_OBJTOOL_DEFERRED (IBT or LTO), objtool doesn't run on individual
+-# translation units.  Instead it runs on vmlinux.o.
+-#
+-# For !CONFIG_OBJTOOL_DEFERRED + CONFIG_NOINSTR_VALIDATION, it runs on both
+-# translation units and vmlinux.o, with the latter only used for noinstr/unret
+-# validation.
++# For CONFIG_OBJTOOL_DEFERRED, objtool doesn't run on individual translation
++# units.  Instead it runs on vmlinux.o.
  
- 	kexec_reboot();
- }
-+ANNOTATE_IGNORE_NORETURN(machine_kexec);
-diff --git a/arch/loongarch/kernel/reset.c b/arch/loongarch/kernel/reset.c
-index de8fa5a8a825c..89ee0edcf58d2 100644
---- a/arch/loongarch/kernel/reset.c
-+++ b/arch/loongarch/kernel/reset.c
-@@ -11,6 +11,7 @@
- #include <linux/reboot.h>
- #include <linux/delay.h>
- #include <linux/console.h>
-+#include <linux/annotate.h>
+-objtool-enabled := $(or $(CONFIG_OBJTOOL_DEFERRED),$(CONFIG_NOINSTR_VALIDATION))
++objtool-enabled := $(CONFIG_OBJTOOL_DEFERRED)
  
- #include <acpi/reboot.h>
- #include <asm/idle.h>
-@@ -36,6 +37,7 @@ void machine_halt(void)
- 		__asm__ __volatile__("idle 0" : : : "memory");
- 	}
- }
-+ANNOTATE_IGNORE_NORETURN(machine_halt);
+-ifeq ($(CONFIG_OBJTOOL_DEFERRED),y)
+ vmlinux-objtool-args-y					+= $(objtool-args-y)
+-else
+-vmlinux-objtool-args-$(CONFIG_OBJTOOL_WERROR)		+= --werror
+-endif
  
- void machine_power_off(void)
- {
-@@ -56,6 +58,7 @@ void machine_power_off(void)
- 		__asm__ __volatile__("idle 0" : : : "memory");
- 	}
- }
-+ANNOTATE_IGNORE_NORETURN(machine_power_off);
- 
- void machine_restart(char *command)
- {
-@@ -77,3 +80,4 @@ void machine_restart(char *command)
- 		__asm__ __volatile__("idle 0" : : : "memory");
- 	}
- }
-+ANNOTATE_IGNORE_NORETURN(machine_restart);
+ vmlinux-objtool-args-$(CONFIG_NOINSTR_VALIDATION)	+= --noinstr \
+ 							   $(if $(or $(CONFIG_MITIGATION_UNRET_ENTRY),$(CONFIG_MITIGATION_SRSO)), --unret)
+diff --git a/tools/objtool/noreturns.h b/tools/objtool/noreturns.h
+index 72ffa71aa19b8..cd41f580ccb72 100644
+--- a/tools/objtool/noreturns.h
++++ b/tools/objtool/noreturns.h
+@@ -7,45 +7,21 @@
+  * Yes, this is unfortunate.  A better solution is in the works.
+  */
+ NORETURN(__fortify_panic)
+-NORETURN(__ia32_sys_exit)
+-NORETURN(__ia32_sys_exit_group)
+ NORETURN(__kunit_abort)
+ NORETURN(__module_put_and_kthread_exit)
+ NORETURN(__stack_chk_fail)
+-NORETURN(__tdx_hypercall_failed)
+ NORETURN(__ubsan_handle_builtin_unreachable)
+-NORETURN(__x64_sys_exit)
+-NORETURN(__x64_sys_exit_group)
+ NORETURN(acpi_processor_ffh_play_dead)
+-NORETURN(arch_cpu_idle_dead)
+-NORETURN(cpu_bringup_and_idle)
+-NORETURN(cpu_startup_entry)
+ NORETURN(do_exit)
+-NORETURN(do_group_exit)
+-NORETURN(do_task_dead)
+-NORETURN(efi_rts_park_worker)
+-NORETURN(ex_handler_msr_mce)
+-NORETURN(hlt_play_dead)
+-NORETURN(hv_ghcb_terminate)
+ NORETURN(kthread_complete_and_exit)
+ NORETURN(kunit_try_catch_throw)
+-NORETURN(machine_real_restart)
+-NORETURN(make_task_dead)
+ NORETURN(mpt_halt_firmware)
+-NORETURN(mwait_play_dead)
+-NORETURN(native_play_dead)
+ NORETURN(nmi_panic_self_stop)
+ NORETURN(panic)
+ NORETURN(vpanic)
+ NORETURN(panic_smp_self_stop)
+-NORETURN(rest_init)
+ NORETURN(rewind_stack_and_make_dead)
+ NORETURN(rust_helper_BUG)
+ NORETURN(sev_es_terminate)
+-NORETURN(start_kernel)
+-NORETURN(stop_this_cpu)
+-NORETURN(usercopy_abort)
+-NORETURN(x86_64_start_kernel)
+-NORETURN(x86_64_start_reservations)
+ NORETURN(xen_cpu_bringup_again)
+ NORETURN(xen_start_kernel)
 -- 
 2.55.0
 
