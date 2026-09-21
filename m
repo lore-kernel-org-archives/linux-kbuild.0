@@ -1,63 +1,76 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr2-f12.google.com (mail-wr2-f12.google.com [74.125.225.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FAD73C4B64;
-	Mon, 21 Sep 2026 11:58:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E37F9493651
+	for <linux-kbuild@vger.kernel.org>; Mon, 21 Sep 2026 12:00:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789991895; cv=none; b=tAd6RItlGNDMhkbdeMoxOnwJT+4rCzXgLXuD4Ruu7/tl3jcAdUC5Om+adEkF8LkM4gyH+X8x7hbu0LlUZfACQd3i5Deb+ZkVZjRjS8LtQqsC9Y6lzDYy48X2wEzF4j/qd0fzAORYptBc8NMknYsaEibIYVqTDPoYm2qI7a3I/tA=
+	t=1789992021; cv=none; b=Ys8lpBp5xwdCcQ4OVg2hH8mka2wrdiwhoBrujGMfoopG3T4lyyT5obypKwKXGmAPI6q0Xyxqu63lBVXEzbTBNPsEer/NrbniZKX2mAb84Dt4xlpT38FHeOD7vS9pkx9I08frfI5vCY2urILw+DIs9b3Ow2zrfdBhe/mmMM+Yw8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789991895; c=relaxed/simple;
-	bh=YeR0oH/K6W3qJ+ku3GbPZCfi82Qn+f1izUuUaI+tICc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=btu5l1ROxL2LyWMvSy3lJ2dPCLCDlXan1t0M4rTSJQaMzeEV4qWgxagtDx2rcILXF2gPQMF0wbuGFyZvY+W4Ft8j09z/ySBcaXlivtH2qUBVBx80O2/z0t6gBcK0waoPmzCKOeO97Gppocf3g1LIuLzmPIsRwcLoFuFpYPb2f/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hXLY9zYy; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789992021; c=relaxed/simple;
+	bh=HgscCTdIhqbObj5IdkVWP+i1xbMxe2IH9fAHraLgLyM=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VOSzo7s0guwfEI3qSIf4tXjwB5btCwySNxSTepDnhMKAB2QaGeKMhC5zR3rxP+gjBEp1lvDmy9CmKctfM3ccw1fvLBOpy75uZ6aKG5Sq/u/Re43VzZvbw3wC0ikhUvAq+xQRDJJFupuCQyU/egQLTpK1FnaNIwCkIEv3qV3suk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aCLcEXhc; arc=none smtp.client-ip=74.125.225.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hXLY9zYy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9AFF1F000FF;
-	Mon, 21 Sep 2026 11:58:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789991893;
-	bh=zm7kQAj2ajeUjZ4eEBpJ2NJBCR+RfdDLO/kZiokS7W4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=hXLY9zYytm0MT5EYDO9r/a0lGNzvqxIJn9Vs3ZczdXEXSJK/0KPcMlsSS0uOl44mA
-	 PFHS/FOFGiqqbPpF60IhngmJvR5wfG+hL9kF3Fn1ALz6uU2JB6cmNGHtENJauOIVmv
-	 attRlrsBhn/0Wp2c0jzLggXzla2b0VtH9R5uhViiL+ZAHVClq548kMhrGbyHMytwTQ
-	 IOIv4T5NHqK47ki182Fm/9FLBl60IkNSSsbINgMnuC4WtQWa/BFcidxN2paM1CrfSM
-	 BEgaQNnr3rMPLs4aliSXt4F6xdb4QYNGOUsrLhQtm6m/hzWL3Yta089jDhOVgFgtfY
-	 87N6FkBEY1tig==
-Date: Mon, 21 Sep 2026 12:57:57 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Petr Pavlu <petr.pavlu@suse.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Masahiro Yamada <masahiroy@kernel.org>, 
-	Alexey Gladkov <legion@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
-	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, Arnd Bergmann <arnd@arndb.de>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Ard Biesheuvel <ardb@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Josh Poimboeuf <jpoimboe@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
-	Gary Guo <gary@garyguo.net>, =?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
-	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
-	Onur =?utf-8?B?w5Z6a2Fu?= <work@onurozkan.dev>, Jonathan Corbet <corbet@lwn.net>, 
-	Randy Dunlap <rdunlap@infradead.org>, Kees Cook <kees@kernel.org>, 
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	llvm@lists.linux.dev, linux-riscv@lists.infradead.org, linux-arch@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-doc@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v2 13/21] modpost: emit module descriptors as assembly
-Message-ID: <arEZrFmXeCO4hZpP@gremlin>
-References: <20260914-build-speedup-v2-0-39817ec5db23@kernel.org>
- <20260914-build-speedup-v2-13-39817ec5db23@kernel.org>
- <95baacfb-d8d9-4d2f-bc89-592df6f6f8e3@suse.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aCLcEXhc"
+Received: by mail-wr2-f12.google.com with SMTP id ffacd0b85a97d-485984ebf5cso2270727f8f.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 21 Sep 2026 05:00:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789992018; x=1790596818; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:date:from:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=QA57d0MWfONjf/OW7F8GGaeRDnISGbQSvosg5yrwN8E=;
+        b=aCLcEXhcAcbruGw8fngH97iYAZg4T/nAdF6IhqfxlkoUZFCgLUMZL6FZL2CQDxD3p5
+         +d1s0Rt0Q4+SujN76o8o74w1oCyA7y1WFwY77LkyB417b4Y+lpTMBNBnXs5LWveJTP+U
+         Yb4r93f3aJHuqi8xtHFcNmzcMfX00ieRXSHaCg5aBTO+Hzy1HCFpU+P0NPLYZ/CBuG13
+         tfdVQX+Zy52TI36f20hVDPctyfHG7NoDwU/1A/AbuNniPzHPEqguKCvbKEb4HPElzWwo
+         F9uQ7PBfe6qI0xaWFD74tAutuJ00cbXyKqTqwZcziq9603v6nzthLOsWmfQ4LBz1riDw
+         PgOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789992018; x=1790596818;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:date:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=QA57d0MWfONjf/OW7F8GGaeRDnISGbQSvosg5yrwN8E=;
+        b=QF0kCnNv0221ztEWg3B1OjU/DtgI+awlJAfykuxjyKzpC68btWyTFTHTSh6d9XlX9D
+         WCnHeck3+TkorhJ0EvlFMtwQT532wyHRMWgKwWyF9GvJ1FGPjAanQbdxYcCyv310xH7e
+         vEkQhvEqOGuQndCYB8juK0nW96EOaEaWzW2Z4dnjjGc2oduNxx7ujcHionX+pt6cjHKB
+         C1bVhjXIBMF4EuO35D4xxBXMFAcnyTip1cGFDmGfEFizlNV4AkC+iH7eWF8wiZLDQIRH
+         72sgM6iq9orDgB1OeYYnoMOl13HuENO5/tviOG2sky1LiKaK32JX3PbUx/tc+h8w0Cdm
+         Q1Nw==
+X-Forwarded-Encrypted: i=1; AKwUvBzaxqqwLNIsGFiDA5TBZS9vyf2L68BFDelShy4PRMKQtgrwYlSAIPI0Cgh//sliCqh4x8eHxb35sEhZ7H4=@vger.kernel.org
+X-Gm-Message-State: AFuF++kqkMBrM7XJf5C9q+jRDERNo5he/27rCUn7DRDKGwkuqKFlVjff
+	LkDCB6ViBqSMgZIz6vtCIJuaRW89HUHNdArnfgd877bKO7cnPp1vo8Zl
+X-Gm-Gg: AYBFou0IPb5uZBN0NOSPC6ytqCyNoDh126lsgsNXWgBEd6u9iFQM0TzKMbtIJ9zumn9
+	6c0PCbRAS7BSTmnr2b88zkcG4gSiCdRl7tRFG3/AHnPfjjxRoa6L46Ri8FmTL8zNTZFqZR3mnX2
+	oMR0Kh6Pv3X0XeMjJl47GoQBgey1hL7Jdqrq4FsJ04HfeQ7PEnQrSw6CTzQCZNSZVtsQGwPUyg1
+	s4HLTNnU6Zdli7qisgNWWLLv5wCfxef4YHq3QHL5JI19KSt1Rui66BgpIFtR/fEas7kP7q70X6y
+	hABsv8PRQCOIhkCVzZJ7CQN2rMwyVuv9XeJoN5y+jEkU910KdtLG2schjjFglP3PZJ9TwzrmXRs
+	xphPGc4okE1dAqh4I/karB8jv5SxANZ4gLs76fhpVGRsDJrzLjDM7WR7z1exb8z+fp085epeQKd
+	O6lFtyh2jjWX8eex39bnbLSflBjK+lCkuMLYPsF1jajch23ltkSZZfhZ9tuq0WL5+elo5S
+X-Received: by 2002:a05:6000:18a9:b0:486:fe41:804d with SMTP id ffacd0b85a97d-4871e3b6a68mr15005637f8f.47.1789992018016;
+        Mon, 21 Sep 2026 05:00:18 -0700 (PDT)
+Received: from krava ([176.74.159.170])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-487245a58a0sm20252895f8f.36.2026.09.21.05.00.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Sep 2026 05:00:17 -0700 (PDT)
+From: Jiri Olsa <olsajiri@gmail.com>
+X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
+Date: Mon, 21 Sep 2026 14:00:15 +0200
+To: Jim Cromie <jim.cromie@gmail.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Lorenzo Stoakes <ljs@kernel.org>, Kees Cook <kees@kernel.org>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH 0/3] kallsyms: Accelerate symbol name lookups by ~19x
+Message-ID: <arEcT1iyMl0tFiIJ@krava>
+References: <20260919-ksyms-tune-v1-0-d85c97da1a32@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -66,503 +79,142 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <95baacfb-d8d9-4d2f-bc89-592df6f6f8e3@suse.com>
+In-Reply-To: <20260919-ksyms-tune-v1-0-d85c97da1a32@gmail.com>
 
-(note there's a v3 see [0])
+On Sat, Sep 19, 2026 at 09:58:54PM -0600, Jim Cromie wrote:
+> kallsyms_lookup_names() resolves symbol names to addresses using a
+> 17-step binary search over kallsyms_names[] (~191k symbols on x86_64).
+> At each step of the search, two bottlenecks compound to create
+> substantial lookup latency:
+> 
+> 0. Marker scanning: get_symbol_offset() scans sequentially from the
+>    nearest 256-symbol marker, decoding an average of ~128 ULEB128 record
+>    headers per probe (~2,176 header decodes per lookup).
+> 
+> 1. Redundant string expansion: kallsyms_expand_symbol() decompresses
+>    the entire candidate symbol into a 512-byte stack buffer (namebuf)
+>    before calling strcmp(), even though ~94% of binary search probes
+>    mismatch on the first 1-2 characters.
+> 
+> Together, these bottlenecks impose a ~4.3 us latency penalty per hit and
+> ~3.8 us per miss.
+> 
+> This 3-patch series eliminates both overheads while keeping the symbol
+> table strictly in sequential address order:
+> 
+> 0. Patch 1 adds lib/test_kallsyms_perf.ko, a microbenchmark module to
+>    measure name hits, name misses, sprint_symbol(), and table iteration
+>    latency, with built-in correctness validation and a sysfs trigger.
+> 
+> 1. Patch 2 introduces kallsyms_names_offsets, a build-time 3-byte direct
+>    index into kallsyms_names[].  This turns get_symbol_offset() into an
+>    O(1) table lookup, dropping the ~2,176 marker hops per lookup and
+>    eliminating the legacy kallsyms_markers[] table.
+> 
+> 2. Patch 3 introduces kallsyms_strcmp_symbol() to compare ASCII queries
+>    against compressed tokens incrementally on the fly, bailing out on
+>    the first mismatched character without expanding subsequent tokens.
+>    This drops the 512-byte namebuf buffer from the kernel stack.
+> 
+> Context & Lineage:
+> 
+> This series was originally developed and benchmarked on mainline (v7.3-rc3).
+> To ensure compatibility with Lorenzo Stoakes' kbuild speedup series (v3),
+> it has been rebased on top of commit c1c0fd58e281 ("kbuild: compress the
+> kernel with pigz if available").
+> 
+> Rebasing required only a trivial mechanical fix in scripts/kallsyms.c to
+> align Patch 2 ("Add 3-byte index into compressed symbols") with Lorenzo's
+> direct binary streaming path (write_incbin).
+> 
+> Glomming onto Lorenzo's build-time acceleration push extends the speedup
+> theme into runtime: his series speeds up the compile and link, and this
+> series speeds up runtime symbol lookups by ~18x.
+> 
+> Live Microbenchmark Results (via test_kallsyms_perf, 100k iters):
+> 
+> Metric                    Baseline      Patched       Speedup
+> -----------------------------------------------------------------
+> Name Search Hit           4,370 ns      247 ns        17.7x
+> Name Search Miss          3,860 ns      195 ns        19.8x
+> sprint_symbol               440 ns      441 ns        parity
+> sprint_symbol_no_offset     315 ns      307 ns        parity
+> Table Full Walk           14,500 us   14,437 us       parity
+> 
+> Address-to-name resolution (sprint_symbol) and sequential table walks
+> (/proc/kallsyms) remain completely unaffected, maintaining full L1/L2
+> hardware prefetching.
+> 
+> Hardware PMU Event Counters (perf stat via sysfs run_test trigger):
+> 
+> $ perf stat -e cycles,instructions,branches,branch-misses,cache-misses \
+>     sh -c 'echo 1 > /sys/module/test_kallsyms_perf/parameters/run_test'
+> 
+> Counter                 Baseline          Patched           Delta
+> ------------------------------------------------------------------------
+> Wall-clock elapsed      1.746 s           0.852 s           -51.2%
+> CPU cycles              7,320,048,030     3,628,523,081     -50.4%
+> Instructions            9,943,172,792     5,034,260,318     -49.4%
+> Branches                2,391,663,821     1,173,258,010     -51.0%
+> Branch-misses             117,241,513        99,805,938     -14.9%
+> Cache-misses               84,996,149           731,025     -99.1%
+> 
+> Dropping marker scans and avoiding redundant string expansions cuts
+> 4.91 billion instructions (-49.4%) and drops 84.2 million cache misses
+> (-99.1%) across the test workload.
+> 
+> Memory footprint: +573 KiB .rodata for kallsyms_names_offsets (191k
+> symbols * 3 bytes on x86_64 defconfig), minus ~2 KiB from dropping
+> kallsyms_markers[].
+> 
+> Signed-off-by: Jim Cromie <jim.cromie@gmail.com>
 
-[0]: https://lore.kernel.org/linux-kbuild/20260917-build-speedup-v3-0-9ecf4163ff36@kernel.org/
+nice, fyi I checked on tracing_multi benchmark and got bit of
+speedup as well
 
-On Mon, Sep 21, 2026 at 01:25:09PM +0200, Petr Pavlu wrote:
-> On 9/14/26 11:22 AM, Lorenzo Stoakes (ARM) wrote:
-> > modpost generates a descriptor for every module in the form of a
-> > <module>.mod.c file with .modinfo strings, the __this_module descriptor,
-> > exported symbol tables and (with CONFIG_MODVERSIONS set), the CRC of
-> > imported symbols.
-> >
-> > These files are compiled like any other kernel C file with all of the
-> > -include preamble, as well as including linux/module.h, header dependencies
-> > generated by fixdep of a few hundred headers, an objtool run and if LTO is
-> > being performed, a link is performed to generate native code.
->
-> As a side note, I'm currently working on cleaning up what linux/module.h
-> includes. This was also originally motivated by an effort to reduce the
-> compilation time of .mod.c files, though cleaning up that header makes
-> sense in general, since it is the most explicitly included file in the
-> kernel.
+before:
 
-Nice :) and yeah it seems like that would be useful more generally.
+serial_test_tracing_multi_bench_attach: found 64021 functions
+serial_test_tracing_multi_bench_attach: attached in   2.884s
+serial_test_tracing_multi_bench_attach: detached in   1.149s
 
->
-> >
-> > On an x86-64 allmodconfig build 11,189 *.mod.c files are built, each
-> > taking ~0.24s of CPU time to compile, and module finalisation as a whole
-> > 6,300 CPU seconds, or 64 seconds of wall time when run over 128 threads.
-> >
-> > It also generates ~1.3 GiB of *.mod.o.cmd files that every subsequent build
-> > has to read back.
-> >
-> > Avoid all this by emitting the descriptors as assembly instead.
-> >
-> > The layout required (size and alignment of struct module, struct
-> > modversion_info, the module's name offsets, init, and exit fields and
-> > whether the architecture uses PREL32 ksymtab references) can all be derived
-> > from scripts/mod/module-offsets.h.
-> >
-> > The fields of __this_module are emitted in offset order rather than
-> > declaration order, as CONFIG_RANDSTRUCT shuffles struct module so the name,
-> > init and exit fields can land anywhere.
-> >
-> > An assembly file avoids all of the issues previously mentioned so this
-> > conversion results in a very significant performance win on kernel build.
-> >
-> > As a consequence of this change, since module-offsets.c includes
-> > linux/module.h, scripts/mod is now built after the generated headers in
-> > prepare0, rather than before.
-> >
-> > Also update .gitignore and make clean to handle .mod.S files, but keep
-> > .mod.c files there to ensure that users do not end up with untracked
-> > changes/dirty trees after the change takes effect.
-> >
-> > The sections were confirmed to be byte-for-byte identical to the C version
-> > produced - each of .modinfo, .gnu.linkonce.this_module, __ksymtab*,
-> > __ksymtab_strings, __kcrctab*, __kflagstab*, __versions,
-> > __version_ext_crcs, __version_ext_names and their relocations - for all
-> > 8,135 modules of a clang allmodconfig build with CONFIG_COMPILE_TEST off
-> > and CONFIG_MODVERSIONS, CONFIG_EXTENDED_MODVERSIONS and
-> > CONFIG_MODULE_SRCVERSION_ALL on, and for a sample built with gcc.
->
-> Lowering the data to assembly loses debug information for __this_module,
-> specifically that it has type `struct module`. It might be worth
+    16,515,655,329      cycles:k
+    41,935,382,635      instructions:k
 
-No, it keeps it - every module includes linux/module.h, and the extern
-declaration of __this_module carries the type, so all of the stuff gdb
-needs (e.g. ptype, p & field access), DWARF etc. is all there in the same
-way as with .mod.c.
+after:
 
-Have confirmed locally.
+serial_test_tracing_multi_bench_attach: found 64021 functions
+serial_test_tracing_multi_bench_attach: attached in   2.633s
+serial_test_tracing_multi_bench_attach: detached in   1.159s
+#558     tracing_multi_bench_attach:OK
 
-> restoring that information in same way. A small hack would be to add
-> something like the following to scripts/module-common.c:
->
-> __weak __section(".discard.this_module") struct module __this_module;
+    15,880,929,751      cycles:k
+    40,444,002,354      instructions:k
 
-That isn't necessary it turns out given the above.
+we call kallsyms_lookup_name for each attached symbol
 
->
-> > diff --git a/scripts/Makefile.modfinal b/scripts/Makefile.modfinal
-> > index 01a37ec872b9..75e9effdf02c 100644
-> > --- a/scripts/Makefile.modfinal
-> > +++ b/scripts/Makefile.modfinal
-> > @@ -20,10 +20,14 @@ __modfinal: $(modules:%.o=%.ko)
-> >  modname = $(notdir $(@:.mod.o=))
-> >  part-of-module = y
-> >  GCOV_PROFILE := n
-> > -ccflags-remove-y := $(CC_FLAGS_CFI)
-> >
-> > -%.mod.o: %.mod.c FORCE
-> > -	$(call if_changed_rule,cc_o_c)
-> > +# modpost lays the <module>.mod.S out completely (write_mod_S_file()), so it
-> > +# needs only the assembler and no dependency tracking.
-> > +quiet_cmd_as_mod_o = AS [M]  $@
-> > +      cmd_as_mod_o = $(CC) $(_a_flags) $(modkern_aflags) -c -o $@ $<
-> > +
-> > +%.mod.o: %.mod.S FORCE
-> > +	$(call if_changed,as_mod_o)
-> >
-> >  .module-common.o: $(srctree)/scripts/module-common.c FORCE
-> >  	$(call if_changed_rule,cc_o_c)
->
-> If the <module>.mod.S files are fully self-contained and do not even use
-> something like KBUILD_MODNAME, would it be possible to name them
-> <module>.mod.s and skip the C preprocessor as well?
+jirka
 
-Ack will do for v4!
 
->
-> > diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-> > index 0fd43c8a89ea..b4550b545330 100644
-> > --- a/scripts/mod/modpost.c
-> > +++ b/scripts/mod/modpost.c
-> > @@ -2191,30 +2042,483 @@ static void write_vmlinux_export_c_file(struct module *mod)
-> >  	free(buf.p);
-> >  }
-> >
-> > -/* do sanity checks, and generate *.mod.c file */
-> > -static void write_mod_c_file(struct module *mod)
-> > +#if MOD_SIZEOF_LONG == 8
-> > +#define MOD_PTR_DIRECTIVE	".quad"
-> > +#else
-> > +#define MOD_PTR_DIRECTIVE	".long"
-> > +#endif
-> > +
-> > +/* See KSYM_FUNC() in include/linux/export-internal.h. */
-> > +#if MOD_FUNC_PLABEL
-> > +#define MOD_FUNC_PREFIX		"P%"
-> > +#else
-> > +#define MOD_FUNC_PREFIX		""
-> > +#endif
-> > +
-> > +/* See __KSYM_ALIGN in include/linux/export-internal.h. */
-> > +#if MOD_PREL32_RELOCATIONS || MOD_SIZEOF_LONG == 4
-> > +#define KSYM_ALIGN		4
-> > +#else
-> > +#define KSYM_ALIGN		8
-> > +#endif
-> > +
-> > +/* Append the body of an assembler string literal, escaped as needed. */
-> > +static void buf_escaped(struct buffer *buf, const char *str)
-> > +{
-> > +	unsigned char chr;
-> > +
-> > +	while ((chr = *str++)) {
-> > +		if (chr == '"' || chr == '\\')
-> > +			buf_printf(buf, "\\%c", chr);
-> > +		else if (isprint(chr))
-> > +			buf_printf(buf, "%c", chr);
-> > +		else
-> > +			buf_printf(buf, "\\%03o", chr);
-> > +	}
-> > +}
-> > +
-> > +static void buf_asciz(struct buffer *buf, const char *str)
-> >  {
-> > -	struct buffer buf = { };
-> > -	struct module_alias *alias, *next;
-> > -	char fname[PATH_MAX];
-> > -	int ret;
-> > +	buf_printf(buf, "\t.asciz \"");
-> > +	buf_escaped(buf, str);
-> > +	buf_printf(buf, "\"\n");
-> > +}
-> >
-> > -	add_header(&buf, mod);
-> > -	add_exported_symbols(&buf, mod);
-> > -	add_versions(&buf, mod);
-> > -	add_extended_versions(&buf, mod);
-> > -	add_depends(&buf, mod);
-> > +/* The equivalent of MODULE_INFO(tag, info). */
-> > +static void add_asm_modinfo(struct buffer *buf, const char *tag,
-> > +			    const char *info)
-> > +{
-> > +	buf_printf(buf, "\t.section .modinfo,\"a\",%%progbits\n");
-> > +	buf_printf(buf, "\t.asciz \"%s=", tag);
-> > +	buf_escaped(buf, info);
-> > +	buf_printf(buf, "\"\n");
-> > +}
-> >
-> > -	buf_printf(&buf, "\n");
-> > +/* See __KSYM_REF() in include/linux/export-internal.h. */
-> > +static void add_asm_ksym_ref(struct buffer *buf, const char *prefix,
-> > +			     const char *sym)
-> > +{
-> > +#if MOD_PREL32_RELOCATIONS
-> > +	buf_printf(buf, "\t.long %s%s - .\n", prefix, sym);
-> > +#else
-> > +	buf_printf(buf, "\t" MOD_PTR_DIRECTIVE " %s%s\n", prefix, sym);
-> > +#endif
-> > +}
-> > +
-> > +/* The name and namespace strings a ksymtab entry refers to. */
-> > +static void add_asm_kstrtab(struct buffer *buf, const struct symbol *sym)
-> > +{
-> > +	buf_printf(buf, "\t.section \"__ksymtab_strings\",\"aMS\",%%progbits,1\n");
-> > +	buf_printf(buf, "__kstrtab_%s:\n", sym->name);
-> > +	buf_asciz(buf, sym->name);
-> > +	buf_printf(buf, "__kstrtabns_%s:\n", sym->name);
-> > +	buf_asciz(buf, sym->namespace);
-> > +	buf_printf(buf, "\t.previous\n");
-> > +}
-> > +
-> > +/* The equivalent of SYMBOL_FLAGS(). */
-> > +static void add_asm_kflagstab(struct buffer *buf, const struct symbol *sym)
-> > +{
-> > +	buf_printf(buf, "\t.section \"___kflagstab+%s\", \"a\"\n", sym->name);
-> > +	buf_printf(buf, "__flags_%s:\n", sym->name);
-> > +	buf_printf(buf, "\t.byte 0x%02x\n", get_symbol_flags(sym));
-> > +	buf_printf(buf, "\t.previous\n");
-> > +}
-> > +
-> > +/* The equivalent of KSYMTAB_FUNC()/KSYMTAB_DATA(). */
-> > +static void add_asm_ksymtab(struct buffer *buf, const struct symbol *sym)
-> > +{
-> > +	const char *name = sym->name;
-> > +
-> > +	add_asm_kstrtab(buf, sym);
-> > +
-> > +	buf_printf(buf, "\t.section \"___ksymtab+%s\", \"a\"\n", name);
-> > +	buf_printf(buf, "\t.balign %d\n", KSYM_ALIGN);
-> > +	buf_printf(buf, "__ksymtab_%s:\n", name);
-> > +	add_asm_ksym_ref(buf, sym->is_func ? MOD_FUNC_PREFIX : "", name);
-> > +	add_asm_ksym_ref(buf, "__kstrtab_", name);
-> > +	add_asm_ksym_ref(buf, "__kstrtabns_", name);
-> > +	buf_printf(buf, "\t.previous\n");
-> > +
-> > +	add_asm_kflagstab(buf, sym);
-> > +}
-> > +
-> > +/* The equivalent of SYMBOL_CRC(). */
-> > +static void add_asm_crc(struct buffer *buf, const struct symbol *sym)
-> > +{
-> > +	buf_printf(buf, "\t.section \"___kcrctab+%s\",\"a\"\n", sym->name);
-> > +	buf_printf(buf, "\t.balign 4\n");
-> > +	buf_printf(buf, "__crc_%s:\n", sym->name);
-> > +	buf_printf(buf, "\t.long 0x%08x\n", sym->crc);
-> > +	buf_printf(buf, "\t.previous\n");
-> > +}
->
-> It would be good to avoid duplicating these symbol-related
-> implementations in include/linux/export-internal.h and
-> scripts/mod/modpost.c. Perhaps .vmlinux.export.c could also be lowered
-> to assembly, so the implementation in include/linux/export-internal.h
-> can be removed and scripts/mod/modpost.c becomes the only source of
-> truth.
-
-Ack, sounds reasonable, but seems sensible as a follow-up I think?
-
->
-> > +
-> > +static bool export_is_kept(const struct symbol *sym)
-> > +{
-> > +	return !trim_unused_exports || sym->used;
-> > +}
-> > +
-> > +/* Record the CRCs of the exported symbols. */
-> > +static void add_asm_crcs(struct buffer *buf, struct module *mod)
-> > +{
-> > +	struct symbol *sym;
-> > +
-> > +	list_for_each_entry(sym, &mod->exported_symbols, list) {
-> > +		if (!export_is_kept(sym))
-> > +			continue;
-> > +
-> > +		if (!sym->crc_valid)
-> > +			mod_warn(mod, "EXPORT symbol '%s' version generation failed, symbol will not be versioned.\n"
-> > +				 "Is '%s' prototyped in <asm/asm-prototypes.h>?\n",
-> > +				 sym->name, sym->name);
-> > +		add_asm_crc(buf, sym);
-> > +	}
-> > +}
-> > +
-> > +static void add_asm_exported_symbols(struct buffer *buf, struct module *mod)
-> > +{
-> > +	struct symbol *sym;
-> > +
-> > +	list_for_each_entry(sym, &mod->exported_symbols, list) {
-> > +		if (export_is_kept(sym))
-> > +			add_asm_ksymtab(buf, sym);
-> > +	}
-> > +
-> > +	if (modversions)
-> > +		add_asm_crcs(buf, mod);
-> > +}
->
-> Nit: This could be kept shorter as a single function, similarly to how
-> the original C version was implemented solely as add_exported_symbols().
->
-> static void add_asm_exported_symbols(struct buffer *buf, struct module *mod)
-> {
-> 	struct symbol *sym;
->
-> 	list_for_each_entry(sym, &mod->exported_symbols, list) {
-> 		if (trim_unused_exports && !sym->used)
-> 			continue;
->
-> 		add_asm_ksymtab(buf, sym);
->
-> 		if (!modversions)
-> 			continue;
->
-> 		if (!sym->crc_valid)
-> 			mod_warn(mod, "EXPORT symbol '%s' version generation failed, symbol will not be versioned.\n"
-> 				 "Is '%s' prototyped in <asm/asm-prototypes.h>?\n",
-> 				 sym->name, sym->name);
-> 		add_asm_crc(buf, sym);
-> 	}
-> }
-
-Ack will do for v4.
-
->
-> > +/*
-> > + * An unresolved symbol without a module is not versioned; one without a CRC
-> > + * cannot be, so warn about it.
-> > + */
-> > +static bool skip_unversioned(struct module *mod, const struct symbol *sym)
-> > +{
-> > +	if (!sym->module)
-> > +		return true;
-> > +	if (sym->crc_valid)
-> > +		return false;
-> > +
-> > +	mod_warn(mod, "symbol '%s' has no CRC!\n", sym->name);
-> > +	return true;
-> > +}
-> > +
-> > +/* One struct modversion_info: the CRC, then the name padded to the end. */
-> > +static void add_asm_version(struct buffer *buf, const struct symbol *sym)
-> > +{
-> > +	buf_printf(buf, "\t" MOD_PTR_DIRECTIVE " 0x%08x\n", sym->crc);
-> > +	buf_printf(buf, "\t.ascii \"%s\"\n", sym->name);
-> > +	buf_printf(buf, "\t.skip %zu\n", MOD_SIZEOF_struct_modversion_info -
-> > +		   MOD_OFF_modversion_info_name - strlen(sym->name));
-> > +}
-> > +
-> > +/*
-> > + * The equivalent of:
-> > + *
-> > + *	static const struct modversion_info ____versions[]
-> > + *	__used __section("__versions") = { { crc, "name" }, ... };
-> > + *
-> > + * for unresolved symbols.
-> > + */
-> > +static void add_asm_versions(struct buffer *buf, struct module *mod)
-> > +{
-> > +	struct symbol *sym;
-> > +
-> > +	if (!basic_modversions)
-> > +		return;
-> > +
-> > +	buf_printf(buf, "\n\t.section __versions,\"a\",%%progbits\n");
-> > +	buf_printf(buf, "\t.balign %d\n", MOD_ALIGNOF_struct_modversion_info);
-> > +	list_for_each_entry(sym, &mod->unresolved_symbols, list) {
-> > +		if (skip_unversioned(mod, sym))
-> > +			continue;
-> > +
-> > +		if (strlen(sym->name) >= MOD_NAME_LEN) {
-> > +			/* Only the extended table can hold it. */
-> > +			if (extended_modversions)
-> > +				continue;
-> > +
-> > +			mod_error(mod, "too long symbol '%s'\n", sym->name);
-> > +			break;
-> > +		}
-> > +
-> > +		add_asm_version(buf, sym);
-> > +	}
-> > +}
-> > +
-> > +static void add_asm_version_ext_crcs(struct buffer *buf, struct module *mod)
-> > +{
-> > +	struct symbol *sym;
-> > +
-> > +	buf_printf(buf, "\n\t.section __version_ext_crcs,\"a\",%%progbits\n");
-> > +	buf_printf(buf, "\t.balign 4\n");
-> > +	list_for_each_entry(sym, &mod->unresolved_symbols, list) {
-> > +		if (skip_unversioned(mod, sym))
-> > +			continue;
-> > +
-> > +		buf_printf(buf, "\t.long 0x%08x\n", sym->crc);
-> > +	}
-> > +}
-> > +
-> > +/*
-> > + * A symbol without a CRC was warned about with the CRCs, and is skipped here
-> > + * too so that the names line up with them.
-> > + */
-> > +static void add_asm_version_ext_names(struct buffer *buf, struct module *mod)
-> > +{
-> > +	struct symbol *sym;
-> > +
-> > +	buf_printf(buf, "\t.section __version_ext_names,\"a\",%%progbits\n");
-> > +	list_for_each_entry(sym, &mod->unresolved_symbols, list) {
-> > +		if (!sym->module || !sym->crc_valid)
-> > +			continue;
-> > +
-> > +		buf_asciz(buf, sym->name);
-> > +	}
-> > +	/* The terminator of the string literal this used to be. */
-> > +	buf_printf(buf, "\t.byte 0\n");
->
-> This is ok since the conversion aims to be byte-identical. In the
-> future, I believe the extra NUL byte should be removed and
-> elf_validity_cache_index_versions() also be updated to report when
-> __version_ext_names contains more names than there are CRCs in
-> __version_ext_crcs.
-
-Ack, I agree one for a follow up!
-
->
-> > +}
-> > +
-> > +/*
-> > + * The equivalent of:
-> > + *	static const u32 ____version_ext_crcs[] __section("__version_ext_crcs") = { crc, ... };
-> > + *	static const char ____version_ext_names[] __section("__version_ext_names") = "name\0" ...;
-> > + *
-> > + * for unresolved symbols.
-> > + */
-> > +static void add_asm_extended_versions(struct buffer *buf, struct module *mod)
-> > +{
-> > +	if (!extended_modversions)
-> > +		return;
-> > +
-> > +	add_asm_version_ext_crcs(buf, mod);
-> > +	add_asm_version_ext_names(buf, mod);
-> > +}
->
-> Nit: add_asm_version_ext_crcs() and add_asm_version_ext_names() are both
-> fairly short and are called only from add_asm_extended_versions(), so
-> I think they could be inlined into that function. This would be similar
-> to the original implementation, which does all the work in
-> add_extended_versions().
-
-Ack will do for v4!
-
->
-> > +
-> > +/* Clear ->seen of the modules that own symbols this one needs. */
-> > +static void clear_seen_dependencies(struct module *mod)
-> > +{
-> > +	struct symbol *sym;
-> > +
-> > +	list_for_each_entry(sym, &mod->unresolved_symbols, list) {
-> > +		if (sym->module)
-> > +			sym->module->seen = sym->module->is_vmlinux;
-> > +	}
-> > +}
-> > +
-> > +/* The modules this one depends on, each once, comma separated. */
-> > +static void collect_dependencies(struct module *mod, struct buffer *deps)
-> > +{
-> > +	struct symbol *sym;
-> > +	bool first = true;
-> > +
-> > +	clear_seen_dependencies(mod);
-> > +
-> > +	list_for_each_entry(sym, &mod->unresolved_symbols, list) {
-> > +		struct module *owner = sym->module;
-> > +
-> > +		if (!owner || owner->seen)
-> > +			continue;
-> > +
-> > +		owner->seen = true;
-> > +		buf_printf(deps, "%s%s", first ? "" : ",",
-> > +			   get_basename(owner->name));
-> > +		first = false;
-> > +	}
-> > +	buf_write(deps, "", 1);
-> > +}
-> > +
-> > +static void add_asm_depends(struct buffer *buf, struct module *mod)
-> > +{
-> > +	struct buffer deps = { };
-> > +
-> > +	collect_dependencies(mod, &deps);
-> > +	buf_printf(buf, "\n");
-> > +	add_asm_modinfo(buf, "depends", deps.p);
-> > +	free(deps.p);
-> > +}
->
-> Nit: Same here. I think this would be more straightforward if
-> collect_dependencies() and clear_seen_dependencies() were inlined into
-> add_asm_depends(), matching the original add_depends().
-
-Ack one for v4 too! :)
-
->
-> --
-> Thanks,
-> Petr
-
---
-Cheers, Lorenzo
+> ---
+> Jim Cromie (3):
+>       kallsyms: Add test_kallsyms_perf module to benchmark lookup latency
+>       kallsyms: Add 3-byte index into compressed symbols to replace marker scans
+>       kallsyms: Match compressed tokens on the fly during binary search
+> 
+>  kernel/kallsyms.c          | 138 ++++++++++++++-------------
+>  kernel/kallsyms_internal.h |   2 +-
+>  lib/Kconfig.debug          |  10 ++
+>  lib/Makefile               |   1 +
+>  lib/test_kallsyms_perf.c   | 228 +++++++++++++++++++++++++++++++++++++++++++++
+>  scripts/kallsyms.c         |  30 +++---
+>  6 files changed, 322 insertions(+), 87 deletions(-)
+> ---
+> base-commit: c1c0fd58e28143fd10071f51f4dcc8249a331513
+> change-id: 20260919-ksyms-tune-e22a42d8a31a
+> 
+> Best regards,
+> -- 
+> Jim Cromie <jim.cromie@gmail.com>
+> 
+> 
