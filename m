@@ -1,220 +1,121 @@
-Received: from mail-wr2-f12.google.com (mail-wr2-f12.google.com [74.125.225.76])
+Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E37F9493651
-	for <linux-kbuild@vger.kernel.org>; Mon, 21 Sep 2026 12:00:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EFE4494811
+	for <linux-kbuild@vger.kernel.org>; Mon, 21 Sep 2026 12:09:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789992021; cv=none; b=Ys8lpBp5xwdCcQ4OVg2hH8mka2wrdiwhoBrujGMfoopG3T4lyyT5obypKwKXGmAPI6q0Xyxqu63lBVXEzbTBNPsEer/NrbniZKX2mAb84Dt4xlpT38FHeOD7vS9pkx9I08frfI5vCY2urILw+DIs9b3Ow2zrfdBhe/mmMM+Yw8E=
+	t=1789992552; cv=none; b=W2+4Tmhp1jgTtythl/5WdWSVMSO5jIUJF3DxlGGK8mpsXIgJYm4u8lqIZjpnWK7OKjcZR3jK28CmlhkFjvHsmGwpopfU0y3TDK52WmxtM9a6lB43D9FOVkdoE1+YZK5iZLvb4jkIL7qLDwtbScxz5sr5HA33P7tRvJNZ68KcNqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789992021; c=relaxed/simple;
-	bh=HgscCTdIhqbObj5IdkVWP+i1xbMxe2IH9fAHraLgLyM=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VOSzo7s0guwfEI3qSIf4tXjwB5btCwySNxSTepDnhMKAB2QaGeKMhC5zR3rxP+gjBEp1lvDmy9CmKctfM3ccw1fvLBOpy75uZ6aKG5Sq/u/Re43VzZvbw3wC0ikhUvAq+xQRDJJFupuCQyU/egQLTpK1FnaNIwCkIEv3qV3suk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aCLcEXhc; arc=none smtp.client-ip=74.125.225.76
+	s=arc-20240116; t=1789992552; c=relaxed/simple;
+	bh=YBV2qFNBiBDxmwMg4/gYVlQdwkVLa6/Ny/umX+th+a4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SYc16x0jre9V8soqd90SJ4zHnDXN4X1k5BfRyyRPFZ4EV5rZL7Jg8wcgUWKMCvt1A6dB2botT86h1+FrhWyrRFBm2kOeD9uKCqO/SE6dFz3lBZwG7qrr9peR6++AiUOX+1S3T83GZEKqh1ABK6s7cx1HSNNFtx0Wq75iidKF/8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GYkLfITr; arc=none smtp.client-ip=74.125.225.140
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aCLcEXhc"
-Received: by mail-wr2-f12.google.com with SMTP id ffacd0b85a97d-485984ebf5cso2270727f8f.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 21 Sep 2026 05:00:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GYkLfITr"
+Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49b91369d18so21430855e9.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 21 Sep 2026 05:09:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789992018; x=1790596818; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:date:from:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=QA57d0MWfONjf/OW7F8GGaeRDnISGbQSvosg5yrwN8E=;
-        b=aCLcEXhcAcbruGw8fngH97iYAZg4T/nAdF6IhqfxlkoUZFCgLUMZL6FZL2CQDxD3p5
-         +d1s0Rt0Q4+SujN76o8o74w1oCyA7y1WFwY77LkyB417b4Y+lpTMBNBnXs5LWveJTP+U
-         Yb4r93f3aJHuqi8xtHFcNmzcMfX00ieRXSHaCg5aBTO+Hzy1HCFpU+P0NPLYZ/CBuG13
-         tfdVQX+Zy52TI36f20hVDPctyfHG7NoDwU/1A/AbuNniPzHPEqguKCvbKEb4HPElzWwo
-         F9uQ7PBfe6qI0xaWFD74tAutuJ00cbXyKqTqwZcziq9603v6nzthLOsWmfQ4LBz1riDw
-         PgOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789992018; x=1790596818;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:date:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=gmail.com; s=20251104; t=1789992548; x=1790597348; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:sender:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=QA57d0MWfONjf/OW7F8GGaeRDnISGbQSvosg5yrwN8E=;
-        b=QF0kCnNv0221ztEWg3B1OjU/DtgI+awlJAfykuxjyKzpC68btWyTFTHTSh6d9XlX9D
-         WCnHeck3+TkorhJ0EvlFMtwQT532wyHRMWgKwWyF9GvJ1FGPjAanQbdxYcCyv310xH7e
-         vEkQhvEqOGuQndCYB8juK0nW96EOaEaWzW2Z4dnjjGc2oduNxx7ujcHionX+pt6cjHKB
-         C1bVhjXIBMF4EuO35D4xxBXMFAcnyTip1cGFDmGfEFizlNV4AkC+iH7eWF8wiZLDQIRH
-         72sgM6iq9orDgB1OeYYnoMOl13HuENO5/tviOG2sky1LiKaK32JX3PbUx/tc+h8w0Cdm
-         Q1Nw==
-X-Forwarded-Encrypted: i=1; AKwUvBzaxqqwLNIsGFiDA5TBZS9vyf2L68BFDelShy4PRMKQtgrwYlSAIPI0Cgh//sliCqh4x8eHxb35sEhZ7H4=@vger.kernel.org
-X-Gm-Message-State: AFuF++kqkMBrM7XJf5C9q+jRDERNo5he/27rCUn7DRDKGwkuqKFlVjff
-	LkDCB6ViBqSMgZIz6vtCIJuaRW89HUHNdArnfgd877bKO7cnPp1vo8Zl
-X-Gm-Gg: AYBFou0IPb5uZBN0NOSPC6ytqCyNoDh126lsgsNXWgBEd6u9iFQM0TzKMbtIJ9zumn9
-	6c0PCbRAS7BSTmnr2b88zkcG4gSiCdRl7tRFG3/AHnPfjjxRoa6L46Ri8FmTL8zNTZFqZR3mnX2
-	oMR0Kh6Pv3X0XeMjJl47GoQBgey1hL7Jdqrq4FsJ04HfeQ7PEnQrSw6CTzQCZNSZVtsQGwPUyg1
-	s4HLTNnU6Zdli7qisgNWWLLv5wCfxef4YHq3QHL5JI19KSt1Rui66BgpIFtR/fEas7kP7q70X6y
-	hABsv8PRQCOIhkCVzZJ7CQN2rMwyVuv9XeJoN5y+jEkU910KdtLG2schjjFglP3PZJ9TwzrmXRs
-	xphPGc4okE1dAqh4I/karB8jv5SxANZ4gLs76fhpVGRsDJrzLjDM7WR7z1exb8z+fp085epeQKd
-	O6lFtyh2jjWX8eex39bnbLSflBjK+lCkuMLYPsF1jajch23ltkSZZfhZ9tuq0WL5+elo5S
-X-Received: by 2002:a05:6000:18a9:b0:486:fe41:804d with SMTP id ffacd0b85a97d-4871e3b6a68mr15005637f8f.47.1789992018016;
-        Mon, 21 Sep 2026 05:00:18 -0700 (PDT)
-Received: from krava ([176.74.159.170])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-487245a58a0sm20252895f8f.36.2026.09.21.05.00.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Sep 2026 05:00:17 -0700 (PDT)
-From: Jiri Olsa <olsajiri@gmail.com>
-X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
-Date: Mon, 21 Sep 2026 14:00:15 +0200
-To: Jim Cromie <jim.cromie@gmail.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Lorenzo Stoakes <ljs@kernel.org>, Kees Cook <kees@kernel.org>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH 0/3] kallsyms: Accelerate symbol name lookups by ~19x
-Message-ID: <arEcT1iyMl0tFiIJ@krava>
-References: <20260919-ksyms-tune-v1-0-d85c97da1a32@gmail.com>
+        bh=P/1AK9R3z2kttD4zy0NklD51ewJDy0/li8YyGBaTfLw=;
+        b=GYkLfITrdAUgP+k2PZQaJ3xuVXjhg1TCqeH9r7FvsSMfhJ0XWdj6L28rJSBTeU1tas
+         Kfa84zyYoSdtGL3zYB9ZrwaYxhu0oMaPPzdhJ//URpBWj9sydFy8CHgaRwMESG9DGX0E
+         pNZEU8XDR7Xjl/ZE9w1zkIoI/VRUXd226DWsc2bAb4zdwCUYN7aMFf125HYRq9B50qH0
+         D9NVS9I4vsc9kJ37RSS73h+wLU142gChpqqpzbOQwVC61eRwUToiUR+tnG3keiqmuuCc
+         KGW2AgGJ2HcTB9yWqlAd37DeLTzR2QEZ1DZ85icA5Qz0iL+9XEkpw/RKKObEsct9JwbU
+         xlDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789992548; x=1790597348;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:sender:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=P/1AK9R3z2kttD4zy0NklD51ewJDy0/li8YyGBaTfLw=;
+        b=KZtP/PILEYSC3QZ7p/1wwcwQ+dDB1uwHFpfZ7UUINcr3qdFI3B0jvj8CZ1gaRWrDab
+         KBUjJtCeVAX4v4xnc6h6vGM+B1MpLG4RdFW86odGGLMQfJ1ZN2bx1yzvuSbquZFX0gsC
+         Llg8xPLxAETRRj74KycYiSQEvuW93xChDJZ9Atpm4Ujt/fmLN3O/mH7hgr4QsuVcbxMn
+         aZ78WqDc6v0xpNja1kKcIn1/UQxPwrxsrxMuoEPSrOeQ+Mmh6Z1uC4tydh6w+/6O/Dc7
+         9ll3nOEUdyCqDUhdZPej/0yc8AnoeYdV4JBW9uUhbm1VXVhRgjqdj6nNg3DBR3swuub/
+         kQhA==
+X-Forwarded-Encrypted: i=1; AKwUvBzYeDGqJoWb1dnqsK+M8BgoKNcwrpAhOLOGkT20Nqd8dNbXbufgPV7/1RfIotKpKv/8kQ+N7Qu+6FVjMKE=@vger.kernel.org
+X-Gm-Message-State: AFuF++kY3sjZlXk56mK5jNT6NYN05Cn/AJu9GYfEPn+dWHyggxAuXdJ/
+	wsU7osozUT1wpkkPNwBkkj+VHEhf4Ej3oCUbE7llnWUEVTl3URablyp5
+X-Gm-Gg: AYBFou0kOFPpmn2DtYfFekXKtVq3m+eCsr7kc8QAxAVamyIDB5ax9Sk67ul6P01e+ww
+	wCmHPlpcv6DnqZ1YyA8G+aLHbnSNGtIym1BsBNd99/BMXTsykKKzwu+QRVAsFN8UTdO2G+1AY4j
+	tkci0azNffw0XGA2XX0hT2chmm6txAVOxry+zhdTRsZQV3+YTg29ya7Cp7N5pgrqJbxo56yE4pk
+	2HYmtqto5qOc8pw6ibOhdpyPI+2cTbN8yrzQ8VuQ1emFS1ItGwnmSLLk8z7OztdFTztWPpXwM1/
+	Wb0WVD1d4EmxtSR8F8E1Zp7IBW/erucq3jmv4W4yE8zcWbNfEIB4X/lofX4MO1pbzQrPA5rYsjE
+	CGrNx253S2wNM0onUQKZzZRSw0bAhb73nF+7h4pbDEff0R+xOX0/0PLiJqMkRStCc1d9acKwTVj
+	dl7hOlRgx1I76EAEMBptCk1PgOubAmjaL/sx/y0T0s6JR9799C4+r6Lxa7ZgQQ+gBXs9wb998q+
+	3EXeoh8Ao8UdVblGF0GImSAqsUe0c84mAJ0Hvb9YWD/ua4qJ1QiLLrZkqmQCdBqm2cF9VCkxHxg
+	HA==
+X-Received: by 2002:a05:600c:1c01:b0:49c:fc6e:a3d7 with SMTP id 5b1f17b1804b1-49fc5753eb2mr184542645e9.22.1789992547781;
+        Mon, 21 Sep 2026 05:09:07 -0700 (PDT)
+Received: from [10.128.10.232] (195-23-151-163.net.novis.pt. [195.23.151.163])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49fcd10273fsm229284935e9.7.2026.09.21.05.09.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Sep 2026 05:09:07 -0700 (PDT)
+Sender: Julian Braha <julian.braha@gmail.com>
+Message-ID: <350cc022-2769-4052-93f4-029ef93fa41c@gmail.com>
+Date: Mon, 21 Sep 2026 13:09:05 +0100
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260919-ksyms-tune-v1-0-d85c97da1a32@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/3] kconfig: Replace "cc-option-bit" with "cc-option-str"
+To: Kees Cook <kees@kernel.org>, Nathan Chancellor <nathan@kernel.org>
+Cc: Nicolas Schier <nsc@kernel.org>, Matthew Maurer <mmaurer@google.com>,
+ Miguel Ojeda <ojeda@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>,
+ "Borislav Petkov (AMD)" <bp@alien8.de>, Gary Guo <gary@garyguo.net>,
+ =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
+ linux-kbuild@vger.kernel.org, "Lorenzo Stoakes (ARM)" <ljs@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
+ Randy Dunlap <rdunlap@infradead.org>,
+ Vegard Nossum <vegard.nossum@oracle.com>,
+ Nauman Sabir <officialnaumansabir@gmail.com>, Tejun Heo <tj@kernel.org>,
+ Nicolas Pitre <nico@fluxnic.net>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Andrew Jones <andrew.jones@linux.dev>, Graham Roff
+ <grahamr@qti.qualcomm.com>, Arnd Bergmann <arnd@arndb.de>,
+ Krzysztof Kozlowski <krzk@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-hardening@vger.kernel.org
+References: <20260919005923.i.879-kees@kernel.org>
+ <20260919005929.4077729-2-kees@kernel.org>
+Content-Language: en-US
+From: Julian Braha <julianbraha@gmail.com>
+In-Reply-To: <20260919005929.4077729-2-kees@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sat, Sep 19, 2026 at 09:58:54PM -0600, Jim Cromie wrote:
-> kallsyms_lookup_names() resolves symbol names to addresses using a
-> 17-step binary search over kallsyms_names[] (~191k symbols on x86_64).
-> At each step of the search, two bottlenecks compound to create
-> substantial lookup latency:
+On 9/19/26 01:59, Kees Cook wrote:
+> $(cc-option-bit) returns the flag it was given when the compiler accepts
+> it, and an empty string otherwise. It was originally only used
+> internally for machine bit flags, but it is generally useful[1].
 > 
-> 0. Marker scanning: get_symbol_offset() scans sequentially from the
->    nearest 256-symbol marker, decoding an average of ~128 ULEB128 record
->    headers per probe (~2,176 header decodes per lookup).
+> Rename it to $(cc-option-str), which says what it returns rather than
+> what it was first used for, and extract the probe logic from the existing
+> $(cc-option) macro to reuse it. Additionally add support for an optional
+> fallback, much like the Kbuild cc-option macro. This can be used as:
 > 
-> 1. Redundant string expansion: kallsyms_expand_symbol() decompresses
->    the entire candidate symbol into a 512-byte stack buffer (namebuf)
->    before calling strcmp(), even though ~94% of binary search probes
->    mismatch on the first 1-2 characters.
+> 	config CC_OPT_FOO
+> 		def_string "$(cc-option-str,-fnew-option,-fold-option)"
 > 
-> Together, these bottlenecks impose a ~4.3 us latency penalty per hit and
-> ~3.8 us per miss.
+> If the fallback is omitted, it is just an empty string.
 > 
-> This 3-patch series eliminates both overheads while keeping the symbol
-> table strictly in sequential address order:
+> Build tested ARCH=x86_64 defconfig with GCC 16.2.0.
 > 
-> 0. Patch 1 adds lib/test_kallsyms_perf.ko, a microbenchmark module to
->    measure name hits, name misses, sprint_symbol(), and table iteration
->    latency, with built-in correctness validation and a sysfs trigger.
-> 
-> 1. Patch 2 introduces kallsyms_names_offsets, a build-time 3-byte direct
->    index into kallsyms_names[].  This turns get_symbol_offset() into an
->    O(1) table lookup, dropping the ~2,176 marker hops per lookup and
->    eliminating the legacy kallsyms_markers[] table.
-> 
-> 2. Patch 3 introduces kallsyms_strcmp_symbol() to compare ASCII queries
->    against compressed tokens incrementally on the fly, bailing out on
->    the first mismatched character without expanding subsequent tokens.
->    This drops the 512-byte namebuf buffer from the kernel stack.
-> 
-> Context & Lineage:
-> 
-> This series was originally developed and benchmarked on mainline (v7.3-rc3).
-> To ensure compatibility with Lorenzo Stoakes' kbuild speedup series (v3),
-> it has been rebased on top of commit c1c0fd58e281 ("kbuild: compress the
-> kernel with pigz if available").
-> 
-> Rebasing required only a trivial mechanical fix in scripts/kallsyms.c to
-> align Patch 2 ("Add 3-byte index into compressed symbols") with Lorenzo's
-> direct binary streaming path (write_incbin).
-> 
-> Glomming onto Lorenzo's build-time acceleration push extends the speedup
-> theme into runtime: his series speeds up the compile and link, and this
-> series speeds up runtime symbol lookups by ~18x.
-> 
-> Live Microbenchmark Results (via test_kallsyms_perf, 100k iters):
-> 
-> Metric                    Baseline      Patched       Speedup
-> -----------------------------------------------------------------
-> Name Search Hit           4,370 ns      247 ns        17.7x
-> Name Search Miss          3,860 ns      195 ns        19.8x
-> sprint_symbol               440 ns      441 ns        parity
-> sprint_symbol_no_offset     315 ns      307 ns        parity
-> Table Full Walk           14,500 us   14,437 us       parity
-> 
-> Address-to-name resolution (sprint_symbol) and sequential table walks
-> (/proc/kallsyms) remain completely unaffected, maintaining full L1/L2
-> hardware prefetching.
-> 
-> Hardware PMU Event Counters (perf stat via sysfs run_test trigger):
-> 
-> $ perf stat -e cycles,instructions,branches,branch-misses,cache-misses \
->     sh -c 'echo 1 > /sys/module/test_kallsyms_perf/parameters/run_test'
-> 
-> Counter                 Baseline          Patched           Delta
-> ------------------------------------------------------------------------
-> Wall-clock elapsed      1.746 s           0.852 s           -51.2%
-> CPU cycles              7,320,048,030     3,628,523,081     -50.4%
-> Instructions            9,943,172,792     5,034,260,318     -49.4%
-> Branches                2,391,663,821     1,173,258,010     -51.0%
-> Branch-misses             117,241,513        99,805,938     -14.9%
-> Cache-misses               84,996,149           731,025     -99.1%
-> 
-> Dropping marker scans and avoiding redundant string expansions cuts
-> 4.91 billion instructions (-49.4%) and drops 84.2 million cache misses
-> (-99.1%) across the test workload.
-> 
-> Memory footprint: +573 KiB .rodata for kallsyms_names_offsets (191k
-> symbols * 3 bytes on x86_64 defconfig), minus ~2 KiB from dropping
-> kallsyms_markers[].
-> 
-> Signed-off-by: Jim Cromie <jim.cromie@gmail.com>
+> Assisted-by: LLM
+> Signed-off-by: Kees Cook <kees@kernel.org>
 
-nice, fyi I checked on tracing_multi benchmark and got bit of
-speedup as well
-
-before:
-
-serial_test_tracing_multi_bench_attach: found 64021 functions
-serial_test_tracing_multi_bench_attach: attached in   2.884s
-serial_test_tracing_multi_bench_attach: detached in   1.149s
-
-    16,515,655,329      cycles:k
-    41,935,382,635      instructions:k
-
-after:
-
-serial_test_tracing_multi_bench_attach: found 64021 functions
-serial_test_tracing_multi_bench_attach: attached in   2.633s
-serial_test_tracing_multi_bench_attach: detached in   1.159s
-#558     tracing_multi_bench_attach:OK
-
-    15,880,929,751      cycles:k
-    40,444,002,354      instructions:k
-
-we call kallsyms_lookup_name for each attached symbol
-
-jirka
-
-
-> ---
-> Jim Cromie (3):
->       kallsyms: Add test_kallsyms_perf module to benchmark lookup latency
->       kallsyms: Add 3-byte index into compressed symbols to replace marker scans
->       kallsyms: Match compressed tokens on the fly during binary search
-> 
->  kernel/kallsyms.c          | 138 ++++++++++++++-------------
->  kernel/kallsyms_internal.h |   2 +-
->  lib/Kconfig.debug          |  10 ++
->  lib/Makefile               |   1 +
->  lib/test_kallsyms_perf.c   | 228 +++++++++++++++++++++++++++++++++++++++++++++
->  scripts/kallsyms.c         |  30 +++---
->  6 files changed, 322 insertions(+), 87 deletions(-)
-> ---
-> base-commit: c1c0fd58e28143fd10071f51f4dcc8249a331513
-> change-id: 20260919-ksyms-tune-e22a42d8a31a
-> 
-> Best regards,
-> -- 
-> Jim Cromie <jim.cromie@gmail.com>
-> 
-> 
+Tested-by: Julian Braha <julianbraha@gmail.com>
+Reviewed-by: Julian Braha <julianbraha@gmail.com>
