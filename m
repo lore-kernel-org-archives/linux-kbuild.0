@@ -1,211 +1,230 @@
-Received: from mail-pz2-f12.google.com (mail-pz2-f12.google.com [74.125.228.12])
+Received: from mail-wr2-f12.google.com (mail-wr2-f12.google.com [74.125.225.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCBFA550DC2
-	for <linux-kbuild@vger.kernel.org>; Tue, 22 Sep 2026 14:58:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36CD35616C2
+	for <linux-kbuild@vger.kernel.org>; Tue, 22 Sep 2026 16:37:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790089140; cv=none; b=FglvRouAIygtAQVWW/71Vmb5HAs6W14j8o+opXJSdatVWXSDGn9wAwoofzsngq7C5ImVgMX9RkQLtcaJE2kTqx+x6K5a8/AbI6jQBooWeO7zlM2y8EYbhtLRhLo2feS4eQ67KK019ZF201Ui0ehQ+tPvyMQau2C2wvmIkRPzjkw=
+	t=1790095083; cv=none; b=Xu9uiGzjdibDGkPpxocc/9DkX69oL/HAoXUtoMqTlvLMBQHpVMphVJiP0nmamRb1pWhIHSsD3fTk/sRDDBsM7OR9md71kSnHZ9F+/LSdhm38NGCwmp11Bt9BolpNEFA5BE8PY2NLn8QcyOFV/Hz1XBIz6BE3JgkKZn/KFx7ZpKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790089140; c=relaxed/simple;
-	bh=Xcv6XqGr8GRDrZTYE+bcfGYsESnoIwDYOn1wqnCy4NA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kEaQrTCHC/zDNUOSMmSkYBG8woxtPSLKJQxWYyZPT8V20mnzWhjQxZcHPMrOZNzo2RY3b3jDJDKxTBc0qJFWncwTTP/O0/xbP4syYlhKDH1d+iZzDjHLI8494L8FcxioTichHPJQGI2wiuOABkVTuHTGqdXDQkZI+Fx0ye8er4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P9vpbU/G; arc=none smtp.client-ip=74.125.228.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	s=arc-20240116; t=1790095083; c=relaxed/simple;
+	bh=1MrC8er/0A3gcbeDls5lmci8wsbLhS0/K5KeXigJ2kk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=eH9Tt0IuEsAGTI29XcBILeD61ZPQ1IF6ZACOtuK6wSj1p32oSTgIuk5jcQKhNLm52tZsSbEkGy++PArYKQyAV2A2p1utkfzG35OcjOhiB8i4kFCFeEgG3VkPu5qP7PLcwEv7+NrfACCLkm9PFnzmzdL3oV1sLtgyaoRR6WaOE4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=p5Z/7suf; arc=none smtp.client-ip=74.125.225.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P9vpbU/G"
-Received: by mail-pz2-f12.google.com with SMTP id d2e1a72fcca58-85469f20513so402b3a.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 22 Sep 2026 07:58:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p5Z/7suf"
+Received: by mail-wr2-f12.google.com with SMTP id ffacd0b85a97d-485ac898fa4so137180f8f.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 22 Sep 2026 09:37:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790089138; x=1790693938; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:sender:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=GBsYZYC2tty9xsMubEGxI75zG2Y/0N6IAo5rsTEyC18=;
-        b=P9vpbU/GKY22GSz+f0k3PPTLbtIEa1DRbrDXoeJrdM4jONBG2jsqCMs+6DtAQ6bzS+
-         uktvirJHaQKj9zrUgPwYJkJICqlWWTsFXlvQHpByKLnKZtL2eIoAEQWEWxstultGQfOd
-         eXf4DZyXrXwDK3PbO3iu936rnFq4pjkyuiTXDA19gz/iK7qLP+cOLx6d+QeP7DgpZnMS
-         gz0YDKLTfGq8oLtscpfbnvn6HU84bsFr82Wf2TVvcFvgtcfpK2d359LJEf9XyQNXplkU
-         FSP3W/HQ2bTH21U8ytVcHY2ZBJLnrr/I9CJWFP3GdRqag++3uPSZybjN0A33mRu0nAQB
-         sDPg==
+        d=gmail.com; s=20251104; t=1790095077; x=1790699877; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=sVuL86sa5yiPerOonHoY8IR8lf3tP+mQ9Erkrp58H/A=;
+        b=p5Z/7sufstVxL59wS96AGBgmqYg/KmrBuZh1IITOE4XfZhq/47JyGGZcaWgSdehLJ0
+         Uk4wMCf/o29D/OnIkyE0//jLVfBFO6BdPx+/Mb/GvXA18/lk0OfXv3kreWSXQedc1BAF
+         taRQ9mS70hnQ0El4f9bt9h3nB7qkmo8X5YRLPAL56H/KfluVSlqd588Fn1VYJj24ZBEd
+         T0FCYe1Ccoejs+SfXKST7yw1jX/hcJCEMnwzmWG7hZIJdu0fxVopIbJv4mn2cASE2/XV
+         +a3ktz2z+drSdaQiKU91I8ZNYw0DbcAvpCN1AdzWj1rQKahnKei5TOVL3LPHZe3zpiCQ
+         g/Ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790089138; x=1790693938;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:sender:x-gm-gg
+        d=1e100.net; s=20260707; t=1790095077; x=1790699877;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:sender:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=GBsYZYC2tty9xsMubEGxI75zG2Y/0N6IAo5rsTEyC18=;
-        b=Kda0qB2mDsCtPWLguhozeRQSi8ke/CqB55Mlriwvyf1jwuTmY+cV4zE11147WT3pRS
-         y4gGEwQUm0o1L9QgzJ/V+PxQ3umNwwlhEGroRMDhJMC9v6TdfVxLGI1RWcAeUS2dD9GA
-         rdgTeETxrkZWFWCGLwlFbK06AcwEIXjDECB1fqP0UZflALi1sVdlA35FX3yIPjoGMle/
-         HUpVk/TtATYWCTnmCVP06iyilVa26xq0Pmi3SQnf1vPDFVadQcowZRU+2yh6n9qvQfK6
-         kkRCqSoH/eqxhYVLe2E1gDaeY9ybqRDFUYE9lyv6/Q1CLuSh6lWesKtZGk4abiEUsI/Z
-         cC0g==
-X-Forwarded-Encrypted: i=1; AKwUvByDCQ68raTJxg6Bg8ZooAj8d91S+1OFCaqQawAHV5McVpHyN5hza474zdo2ss4MH48zRXIkRh/JLQobKIo=@vger.kernel.org
-X-Gm-Message-State: AFuF++knNIZYNTxUh0mkHTfNEFphRDZ0H54dplTpTsWj2KDNxMOIOX/u
-	LvGfX+psBfUGa9wkK1svPb4cVb2Zr6UKnONiVZNCGSAIoGanMuT27hyb
-X-Gm-Gg: AYBFou0C0RitNc5edZvxHs2KtFqTfPsHnaJnhIZxyheoTvq1EsNWtRIIUKMtBxkAIPc
-	8/IP0IZnKju74EGLIpOYXfqdUIlvig75WGnFY61jucEIjgHTqBvEO5BbYYDI9rp7JSRmHoobBiD
-	w+Q889tlXUamf+9D8YX2CQm/wsdZ7ccng3BGmEx1EwkustCLNwCH5ftR1vIa2H8uWLEHfBVBHho
-	pk5OgN81GQkp1fMVQgzDINQhH8BdWzs4fZUEvXVzFAaTcl4kVfXzKOvXRAGcy6ViI6M0Mu6oCN6
-	dA8wVsEFLT9UNYOmQEbg2w3JEKpDXa/KIsT0x/VCgkyzMxcsWTLweFugT+h5BbQsta7z23+LSfw
-	g27wf4Srm8fbPFhUBmAyBQv+89rj7+PADFzHMQa72I/OTSgHcYF8ZGoRESPNzY92xrEglt54sXy
-	1CtE37TvuPnFexPY3oP/vWnkqmQ36IyDRJ9UcIipzaGomnwnUQqJeD8qO/3CPc+CX9kcltgxk+M
-	Wa+Cynm+xF3
-X-Received: by 2002:a05:6a00:8085:b0:874:708d:b620 with SMTP id d2e1a72fcca58-87c8403d93amr1485976b3a.30.1790089137920;
-        Tue, 22 Sep 2026 07:58:57 -0700 (PDT)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:da43:aeff:fecc:bfd5])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-87c31ee8fb4sm1046216b3a.12.2026.09.22.07.58.56
+        bh=sVuL86sa5yiPerOonHoY8IR8lf3tP+mQ9Erkrp58H/A=;
+        b=rO5xF8NocfDQV41bsr42NFGalZJXj6mb4epX0+ypsNJQN0DjM16hk6d/9uURb1a+N+
+         CdAntfdY7j8B9LI+wfNJdUu02rZquoSUCg/jhOH44/OjI2pFI7eJacobR/AFMKREv3hb
+         y0hVtIEVLngw3svAS7FwZb0mEk+E/X6kLpVqXdcjQiSLeQo8bbxXMOpK4kEGynRTK/Zj
+         tzlgc6QzcMA456QZqYnZ/904IUWjBMptJckfVxe1PH4nkg2fytC2WSEt2F6gjooRfp2g
+         1PqGrSxWhQ0qcBTY28oOfrXhiJL5417dnCYvP1NKd57jFCqFANukHZnOVatlsR2jNNH2
+         Dhvw==
+X-Forwarded-Encrypted: i=1; AKwUvBxdFAH0oo/EvymIngIPLRzKKYAevSbqc8yOLo2SjaWpUczbXovTRpmvXf51Di7b+f584QVQUZk/HOqPsgQ=@vger.kernel.org
+X-Gm-Message-State: AFuF++kCul30PIjeDUsygh6V2FGngG3OAT37jrV9ULOiq+XmBHktJVme
+	2jPJaPJWC+F4wEdf6SJ94O0WyWzSI503nFJyCjZjIelWUkowKUglO6Mh
+X-Gm-Gg: AYBFou0iDrYz/ODPkY5sQQLrxD7lFkmqM3POOb40NJuxaqYjz6Xk3btbrImohRCT+YI
+	F38tSfv9z0Itp/SLis2QXo3WHce4Dzr/1NL8K1Rvc7VyMyhY4RbwTrWIn+Aw3v7A+Y5iMyWk/xr
+	HOqjuy3c8xU5U6qN2t9hqSiON2NAVwjpqkrSEfNj9M4M3sn4jT0hmg35V1G7zZdiUkRaZpSB59v
+	LPgXfzXNGvK9sStxh55XOVSv5p9q1hIgL+h8Ow3/nxErHxxuTAVYuX356vL9yCU4bX5BLBwAjCK
+	rFkkdZTjw5gKdFti4vNJ20Tp/s//qI+ugLKedOBRECh6TXJ2uWIP+S9Fk7TcgWMW/6IpFiLUEUb
+	hUBq4ni2urSUuT1E2Kl8hQa77soLbv8QH9vnbV/Nzd04567WU6ojkI02nU8QBRa1aguail5YDXO
+	CS3GEcaX5VxuZDqLIvwUsvQN+j+GHhjNuGQgv6rkt8uyWzPiqazw8TZmr9EWsbHP68lQoUpGNhe
+	UWTY9DH6dMEm7Q29SaHz/s51Bb6vWT9hpClcbMxlvS66oSUTYeOeAc1Ph3aH/k=
+X-Received: by 2002:a05:6000:387:b0:486:e949:532c with SMTP id ffacd0b85a97d-488670985edmr231416f8f.43.1790095077026;
+        Tue, 22 Sep 2026 09:37:57 -0700 (PDT)
+Received: from nixos-office (195-23-151-163.net.novis.pt. [195.23.151.163])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48862773ee0sm6162192f8f.6.2026.09.22.09.37.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Sep 2026 07:58:57 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Date: Tue, 22 Sep 2026 07:58:56 -0700
-From: Guenter Roeck <linux@roeck-us.net>
-To: Marco Elver <elver@google.com>
-Cc: Vlastimil Babka <vbabka@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Andrey Konovalov <andreyknvl@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	David Hildenbrand <david@kernel.org>,
-	David Rientjes <rientjes@google.com>,
-	Dmitry Vyukov <dvyukov@google.com>, Jann Horn <jannh@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	KP Singh <kpsingh@kernel.org>, Kees Cook <kees@kernel.org>,
-	Lorenzo Stoakes <ljs@kernel.org>,
-	Matteo Rizzo <matteorizzo@google.com>,
-	Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Suren Baghdasaryan <surenb@google.com>,
-	linux-hardening@vger.kernel.org, Nicolas Schier <nsc@kernel.org>,
-	Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Christoph Lameter <cl@gentwo.org>, Harry Yoo <harry@kernel.org>,
-	Hao Li <hao.li@linux.dev>, "Liam R. Howlett" <liam@infradead.org>,
-	Alexander Potapenko <glider@google.com>,
-	Miguel Ojeda <ojeda@kernel.org>, linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	kasan-dev@googlegroups.com, llvm@lists.linux.dev,
-	Guo Ren <guoren@kernel.org>, linux-csky@vger.kernel.org
-Subject: csky ICe (was: Re: [PATCH v4 2/3] slab: improve
- KMALLOC_PARTITION_RANDOM randomness)
-Message-ID: <6106aefa-47c7-4bda-a51f-8a2fba3bf715@roeck-us.net>
-References: <20260511200136.3201646-1-elver@google.com>
- <20260511200136.3201646-2-elver@google.com>
+        Tue, 22 Sep 2026 09:37:56 -0700 (PDT)
+Sender: Julian Braha <julian.braha@gmail.com>
+From: Julian Braha <julianbraha@gmail.com>
+To: nathan@kernel.org,
+	nsc@kernel.org
+Cc: n.schier@fritz.com,
+	grahamr@qti.qualcomm.com,
+	rdunlap@infradead.org,
+	nico@fluxnic.net,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Julian Braha <julianbraha@gmail.com>
+Subject: [PATCH 1/2] kconfig: add prop_err function to simplify property error handling
+Date: Tue, 22 Sep 2026 17:37:48 +0100
+Message-ID: <20260922163749.2031594-2-julianbraha@gmail.com>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260922163749.2031594-1-julianbraha@gmail.com>
+References: <20260922163749.2031594-1-julianbraha@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260511200136.3201646-2-elver@google.com>
+Content-Transfer-Encoding: 8bit
 
-Hi,
+As suggested by Nicolas while reviewing another Kconfig property error [1],
+we can add a prop_err() function to simplify the tracking and display of
+Kconfig property errors.
 
-On Mon, May 11, 2026 at 10:00:49PM +0200, Marco Elver wrote:
-> When using CONFIG_KMALLOC_PARTITION_RANDOM, _RET_IP_ was previously used
-> to identify the allocation site. _RET_IP_, however, evaluates to the
-> caller's parent's instruction pointer rather than the actual allocation
-> site; this would lead to collisions where a function performs multiple
-> allocations.
-> 
-> With the generalization to kmalloc_token_t, we now generate the token at
-> the outermost macro, and using _THIS_IP_ would fix this for all cases.
-> 
-> Unfortunately, the generic implementation of _THIS_IP_ relies on taking
-> the address of a local label, which is considered broken by both GCC [1]
-> and Clang [2] because label addresses are only expected to be used with
-> computed gotos. While the generic version more or less works today, it
-> is known to be brittle. For example, Clang -O2 always returns 1 when
-> this function is inlined:
-> 
->         static inline unsigned long get_ip(void)
->         { return ({ __label__ __here; __here: (unsigned long)&&__here; }); }
-> 
-> To provide a reliable unique identifier without breaking architectures
-> relying on the generic _THIS_IP_, introduce _CODE_LOCATION_: it resolves
-> to _THIS_IP_ where architectures provide a safe implementation, and
-> falls back to a zero-cost static marker where _THIS_IP_ is broken.
-> 
-> Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=120071 [1]
-> Link: https://github.com/llvm/llvm-project/issues/138272 [2]
-> Signed-off-by: Marco Elver <elver@google.com>
+Note that the formatting of the error printing is changed slightly
+(removing a space) to better match the formatting of warnings. This causes
+a change to the expected test output for the existing errors that now call
+prop_err().
 
-With this patch in the tree, I get ICE erors when trying to build
-csky:allmodconfig.
-
-Example:
-
-Error log:
-sound/core/oss/mixer_oss.c: In function 'snd_mixer_oss_proc_write':
-sound/core/oss/mixer_oss.c:1202:1: error: could not split insn
- 1202 | }
-      | ^
-(insn 183 400 184 (set (reg:SI 0 a0 [orig:307 _55 ] [307])
-        (xor:SI (reg:SI 3 a3 [orig:308 random_kmalloc_seed ] [308])
-            (const:SI (plus:SI (symbol_ref:SI ("*.LANCHOR0") [flags 0x182])
-                    (const_int 132 [0x84]))))) "include/linux/slab.h":759:52 288 {cskyv2_xorsi3}
-     (expr_list:REG_DEAD (reg:SI 3 a3 [orig:308 random_kmalloc_seed ] [308])
-        (nil)))
-during RTL pass: final
-sound/core/oss/mixer_oss.c:1202:1: internal compiler error: in final_scan_insn_1, at final.cc:2813
-0x779b51e2a1c9 __libc_start_call_main
-	../sysdeps/nptl/libc_start_call_main.h:58
-0x779b51e2a28a __libc_start_main_impl
-	../csu/libc-start.c:360
-
-This happens with lots of files, not just this one. It is seen with all
-versions of gcc starting with at least v13.x. Reverting this patch fixes
-the problem. Bisect log is attached for reference.
-
-Any idea what I could do to avoid the problem other than stopping to build
-csky:allmodconfig ?
-
-Thanks,
-Guenter
-
+Link: https://lore.kernel.org/all/20260917-proficient-swift-of-masquerade-0ff7ce@l-nschier-aarch64/ [1]
+Assisted-by: LLM
+Suggested-by: Nicolas Schier <n.schier@fritz.com>
+Signed-off-by: Julian Braha <julianbraha@gmail.com>
 ---
-# bad: [93f51579e7df248780214094418f205253383cc5] Linux 7.3-rc4
-# good: [7d0a66e4bb9081d75c82ec4957c50034cb0ea449] Linux 6.18
-git bisect start 'HEAD' 'v6.18'
-# good: [df8f6181ab57d65a99e61fcfc5be22a42df58642] Merge tag 'perf-tools-for-v7.1-2026-04-17' of git://git.kernel.org/pub/scm/linux/kernel/git/perf/perf-tools
-git bisect good df8f6181ab57d65a99e61fcfc5be22a42df58642
-# bad: [093239070573637ad2b4cb56abc9c4c7ee109294] Merge tag 'v7.2-rc2' into togreg
-git bisect bad 093239070573637ad2b4cb56abc9c4c7ee109294
-# bad: [b85966adbf5de0668a815c6e3527f87e0c387fb4] Merge tag 'net-next-7.2' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next
-git bisect bad b85966adbf5de0668a815c6e3527f87e0c387fb4
-# good: [25447851777a53bd4b501e7f2cb418332ad584cc] Merge tag 'char-misc-7.1-rc6' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/char-misc
-git bisect good 25447851777a53bd4b501e7f2cb418332ad584cc
-# good: [bd77e50c9a70f844d6073499f3d1a6fd193eae73] Merge tag 'fbdev-for-7.2-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/deller/linux-fbdev
-git bisect good bd77e50c9a70f844d6073499f3d1a6fd193eae73
-# good: [972c4dd19cb92e03d75b66c426cfade07582a1ba] Merge tag 'wireless-next-2026-06-10' of https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next
-git bisect good 972c4dd19cb92e03d75b66c426cfade07582a1ba
-# bad: [9b40ba14edcdf70240af8114092a76f75f070774] Merge tag 'for-7.2/io_uring-20260615' of git://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux
-git bisect bad 9b40ba14edcdf70240af8114092a76f75f070774
-# bad: [0d8c1134936f1fb6678156ab4248ac740d274525] Merge tag 'v7.2-p1' of git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6
-git bisect bad 0d8c1134936f1fb6678156ab4248ac740d274525
-# good: [42a58f08b70a7a320c168a1ce15e3fcfc8568708] crypto: atmel-sha204a - Use named initializers for struct i2c_device_id
-git bisect good 42a58f08b70a7a320c168a1ce15e3fcfc8568708
-# good: [2c1ccd9a1d786503086e83fe83e5c3b3c953b70e] docs: changes.rst: restore pahole 1.26 minimum (regressed by sort)
-git bisect good 2c1ccd9a1d786503086e83fe83e5c3b3c953b70e
-# bad: [f8115f0e8a0585ef1c03d07a68b989023097d16c] Merge tag 'slab-for-7.2' of git://git.kernel.org/pub/scm/linux/kernel/git/vbabka/slab
-git bisect bad f8115f0e8a0585ef1c03d07a68b989023097d16c
-# bad: [dfdfd58cce1c3f5df8733b64595448996c08e424] Merge branch 'slab/for-7.2/alloc_token' into slab/for-next
-git bisect bad dfdfd58cce1c3f5df8733b64595448996c08e424
-# good: [648927ceb84021a25a0fbd5673740956f318d534] mm/slab: do not limit zeroing to orig_size when only red zoning is enabled
-git bisect good 648927ceb84021a25a0fbd5673740956f318d534
-# good: [d196ea36a2f2118833ca648af53654553a4a1e7b] Merge branch 'slab/for-7.2/tools' into slab/for-next
-git bisect good d196ea36a2f2118833ca648af53654553a4a1e7b
-# bad: [e0f54249a491c62ef8196b9f13bd7d95dba47c6f] slab: fix kernel-docs for mm-api
-git bisect bad e0f54249a491c62ef8196b9f13bd7d95dba47c6f
-# bad: [0fc1bd38a19c108395d8338fb034f90c2d3fbe55] slab: improve KMALLOC_PARTITION_RANDOM randomness
-git bisect bad 0fc1bd38a19c108395d8338fb034f90c2d3fbe55
-# good: [feb662d9168b63e1d4c02671ec96005410c6f3ce] slab: support for compiler-assisted type-based slab cache partitioning
-git bisect good feb662d9168b63e1d4c02671ec96005410c6f3ce
-# first bad commit: [0fc1bd38a19c108395d8338fb034f90c2d3fbe55] slab: improve KMALLOC_PARTITION_RANDOM randomness
+ scripts/kconfig/menu.c                        | 23 ++++++++-----
+ .../tests/err_num_bounds/expected_stderr      | 20 ++++++------
+ .../tests/err_num_mismatch/expected_stderr    |  8 ++---
+ .../err_num_non_numeric_ref/expected_stderr   | 32 +++++++++----------
+ 4 files changed, 45 insertions(+), 38 deletions(-)
+
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index bda3e2650216..118af2dde722 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -59,6 +59,16 @@ static void prop_warn(const struct property *prop, const char *fmt, ...)
+ 	va_end(ap);
+ }
+ 
++static void prop_err(const struct property *prop, const char *fmt, ...)
++{
++	va_list ap;
++	va_start(ap, fmt);
++	fprintf(stderr, "%s:%d:error: ", prop->filename, prop->lineno);
++	vfprintf(stderr, fmt, ap);
++	fprintf(stderr, "\n");
++	va_end(ap);
++}
++
+ void _menu_init(void)
+ {
+ 	current_entry = current_menu = &rootmenu;
+@@ -246,18 +256,15 @@ static int menu_validate_number(struct symbol *sym, struct symbol *sym2,
+ 
+ 	if (sym2->type != S_UNKNOWN ||
+ 		!sym_string_valid(sym, sym2->name)) {
+-		fprintf(stderr, "%s:%d: error: '%s' is an invalid value for '%s'\n",
+-			prop->filename, prop->lineno, sym2->name,
+-			sym_type_name(sym->type));
++		prop_err(prop, "'%s' is an invalid value for '%s'",
++			 sym2->name, sym_type_name(sym->type));
+ 		return 1;
+ 	}
+ 
+ 	if (!sym_string_check_bounds(sym, sym2->name)) {
+-		fprintf(stderr,
+-			"%s:%d: error: %s constant '%s' is outside the 64-bit %s bounds\n",
+-			prop->filename, prop->lineno, sym_type_name(sym->type),
+-			sym2->name, sym->type == S_INT ? "signed" : "unsigned");
+-
++		prop_err(prop, "%s constant '%s' is outside the 64-bit %s bounds",
++			 sym_type_name(sym->type), sym2->name,
++			 sym->type == S_INT ? "signed" : "unsigned");
+ 		return 1;
+ 	}
+ 
+diff --git a/scripts/kconfig/tests/err_num_bounds/expected_stderr b/scripts/kconfig/tests/err_num_bounds/expected_stderr
+index 5f89cf4afff8..c012b10bae25 100644
+--- a/scripts/kconfig/tests/err_num_bounds/expected_stderr
++++ b/scripts/kconfig/tests/err_num_bounds/expected_stderr
+@@ -1,10 +1,10 @@
+-Kconfig:51: error: integer constant '10000000000000000000' is outside the 64-bit signed bounds
+-Kconfig:55: error: integer constant '-9223372036854775809' is outside the 64-bit signed bounds
+-Kconfig:59: error: integer constant '10000000000000000000' is outside the 64-bit signed bounds
+-Kconfig:63: error: integer constant '-10000000000000000000' is outside the 64-bit signed bounds
+-Kconfig:67: error: integer constant '-9223372036854775809' is outside the 64-bit signed bounds
+-Kconfig:67: error: integer constant '10000000000000000000' is outside the 64-bit signed bounds
+-Kconfig:71: error: hex constant '0x10000000000000000' is outside the 64-bit unsigned bounds
+-Kconfig:75: error: hex constant '0x10000000000000000' is outside the 64-bit unsigned bounds
+-Kconfig:79: error: hex constant '0x10000000000000000' is outside the 64-bit unsigned bounds
+-Kconfig:79: error: hex constant '0x20000000000000000' is outside the 64-bit unsigned bounds
++Kconfig:51:error: integer constant '10000000000000000000' is outside the 64-bit signed bounds
++Kconfig:55:error: integer constant '-9223372036854775809' is outside the 64-bit signed bounds
++Kconfig:59:error: integer constant '10000000000000000000' is outside the 64-bit signed bounds
++Kconfig:63:error: integer constant '-10000000000000000000' is outside the 64-bit signed bounds
++Kconfig:67:error: integer constant '-9223372036854775809' is outside the 64-bit signed bounds
++Kconfig:67:error: integer constant '10000000000000000000' is outside the 64-bit signed bounds
++Kconfig:71:error: hex constant '0x10000000000000000' is outside the 64-bit unsigned bounds
++Kconfig:75:error: hex constant '0x10000000000000000' is outside the 64-bit unsigned bounds
++Kconfig:79:error: hex constant '0x10000000000000000' is outside the 64-bit unsigned bounds
++Kconfig:79:error: hex constant '0x20000000000000000' is outside the 64-bit unsigned bounds
+diff --git a/scripts/kconfig/tests/err_num_mismatch/expected_stderr b/scripts/kconfig/tests/err_num_mismatch/expected_stderr
+index 587c34467ae6..058b507396f4 100644
+--- a/scripts/kconfig/tests/err_num_mismatch/expected_stderr
++++ b/scripts/kconfig/tests/err_num_mismatch/expected_stderr
+@@ -1,4 +1,4 @@
+-Kconfig:14: error: 'HEX_SOURCE' is an invalid value for 'integer'
+-Kconfig:18: error: 'HEX_SOURCE' is an invalid value for 'integer'
+-Kconfig:24: error: 'INT_SOURCE' is an invalid value for 'hex'
+-Kconfig:28: error: 'INT_SOURCE' is an invalid value for 'hex'
++Kconfig:14:error: 'HEX_SOURCE' is an invalid value for 'integer'
++Kconfig:18:error: 'HEX_SOURCE' is an invalid value for 'integer'
++Kconfig:24:error: 'INT_SOURCE' is an invalid value for 'hex'
++Kconfig:28:error: 'INT_SOURCE' is an invalid value for 'hex'
+diff --git a/scripts/kconfig/tests/err_num_non_numeric_ref/expected_stderr b/scripts/kconfig/tests/err_num_non_numeric_ref/expected_stderr
+index 005f855ecbdd..48d78b5c18b1 100644
+--- a/scripts/kconfig/tests/err_num_non_numeric_ref/expected_stderr
++++ b/scripts/kconfig/tests/err_num_non_numeric_ref/expected_stderr
+@@ -1,16 +1,16 @@
+-Kconfig:17: error: 'BOOL_SOURCE' is an invalid value for 'integer'
+-Kconfig:21: error: 'TRISTATE_SOURCE' is an invalid value for 'integer'
+-Kconfig:25: error: 'STRING_SOURCE' is an invalid value for 'integer'
+-Kconfig:31: error: 'BOOL_SOURCE' is an invalid value for 'hex'
+-Kconfig:35: error: 'TRISTATE_SOURCE' is an invalid value for 'hex'
+-Kconfig:39: error: 'STRING_SOURCE' is an invalid value for 'hex'
+-Kconfig:45: error: 'BOOL_SOURCE' is an invalid value for 'integer'
+-Kconfig:49: error: 'TRISTATE_SOURCE' is an invalid value for 'integer'
+-Kconfig:53: error: 'STRING_SOURCE' is an invalid value for 'integer'
+-Kconfig:57: error: 'BOOL_SOURCE' is an invalid value for 'integer'
+-Kconfig:57: error: 'TRISTATE_SOURCE' is an invalid value for 'integer'
+-Kconfig:63: error: 'BOOL_SOURCE' is an invalid value for 'hex'
+-Kconfig:67: error: 'TRISTATE_SOURCE' is an invalid value for 'hex'
+-Kconfig:71: error: 'STRING_SOURCE' is an invalid value for 'hex'
+-Kconfig:75: error: 'BOOL_SOURCE' is an invalid value for 'hex'
+-Kconfig:75: error: 'TRISTATE_SOURCE' is an invalid value for 'hex'
++Kconfig:17:error: 'BOOL_SOURCE' is an invalid value for 'integer'
++Kconfig:21:error: 'TRISTATE_SOURCE' is an invalid value for 'integer'
++Kconfig:25:error: 'STRING_SOURCE' is an invalid value for 'integer'
++Kconfig:31:error: 'BOOL_SOURCE' is an invalid value for 'hex'
++Kconfig:35:error: 'TRISTATE_SOURCE' is an invalid value for 'hex'
++Kconfig:39:error: 'STRING_SOURCE' is an invalid value for 'hex'
++Kconfig:45:error: 'BOOL_SOURCE' is an invalid value for 'integer'
++Kconfig:49:error: 'TRISTATE_SOURCE' is an invalid value for 'integer'
++Kconfig:53:error: 'STRING_SOURCE' is an invalid value for 'integer'
++Kconfig:57:error: 'BOOL_SOURCE' is an invalid value for 'integer'
++Kconfig:57:error: 'TRISTATE_SOURCE' is an invalid value for 'integer'
++Kconfig:63:error: 'BOOL_SOURCE' is an invalid value for 'hex'
++Kconfig:67:error: 'TRISTATE_SOURCE' is an invalid value for 'hex'
++Kconfig:71:error: 'STRING_SOURCE' is an invalid value for 'hex'
++Kconfig:75:error: 'BOOL_SOURCE' is an invalid value for 'hex'
++Kconfig:75:error: 'TRISTATE_SOURCE' is an invalid value for 'hex'
+-- 
+2.55.0
+
