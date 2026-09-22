@@ -1,201 +1,278 @@
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa2-f35.google.com (mail-oa2-f35.google.com [74.125.231.99])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 100A94A5EA4;
-	Tue, 22 Sep 2026 19:43:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 935A53A168C
+	for <linux-kbuild@vger.kernel.org>; Tue, 22 Sep 2026 20:08:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790106234; cv=none; b=DtU3kGIfqnvoPnTZkQrvVMCPfswqZCoIDIt2mve+X64nyQo0MXcgktykALmUB3/5ZuiD/4/nH58Zve79s8LIdl6NLj+3vkmdCcJ6+Ep1Cf3yXzG2GfBrkrGpPNFH8mOLJ8Z6pBFYMulBQ4MrtWPv2DQYgUJx+p2py1hEJ44tJrA=
+	t=1790107721; cv=none; b=f8MO9NC6UvIJ/mCiOzLLOly7UeoNjsPIsnDcN0pmo7OV7jftsMRF3M/j264QTIlgiOqADlYEUI+DwdFwB7+HyFZGKtp1HYY4X40rNve5Ck8Mo4oLLXRMutaxNiZTdfFdYRxwwHOzy6Mgg6amsakeLDPdD02t+/N6qg53O203oL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790106234; c=relaxed/simple;
-	bh=uCvZ7bTAg8w9npwX9WKlBmfs1GlyOLwQZiJI/14kD1A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o3xPRbmqL+s3uSU8zKDm91F2MN6L9P3rOt6xH4DOS3au36vSwWzDLQIhtB3Rx4qSk+AW9vu/Kh5QM6IJ037F9qyoyT6aFHRQ3zd4WHKGucpzJzj9U1oJcUkuBD7RBjTLNuBPrBJqBKXOHb89ZLtJKNRTIm7nJ6zHs3NK1L8Z8Zs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=w_armin@gmx.de header.b=rqKUhMJ2; arc=none smtp.client-ip=212.227.15.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
+	s=arc-20240116; t=1790107721; c=relaxed/simple;
+	bh=EmIrsvdA2/afewICbt1xJBP5YiPJowaDXlzSyPgLuSI=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=dpNqspCsTurB45MI3pfFjYsAJ4PVy/sVHerp6GIpXtL2aPyguwPFXlh0bIb3ikCRdVtM5ZsK5fZ27n5cJQP46NrBBZ12r60L96na7nYmB8UoUI7WOA5jyTAGs7GaX3O+i52FzMaRPWJIUngEWsAdUnnelbU+d1bcInwClXIP7Lg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ov0P/E5Q; arc=none smtp.client-ip=74.125.231.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.de header.i=w_armin@gmx.de header.b="rqKUhMJ2"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
-	s=s31663417; t=1790106214; x=1790711014; i=w_armin@gmx.de;
-	bh=wYj1hrPTkXIpz4QxokI/qN+ZMgqPLqvdISQ6aFZFcM8=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=rqKUhMJ2OQTdldrDOcTaaUypRtgM71XCW8x1z4xzq/bN9zHi/adeKGWPQMfzXpnw
-	 ckWaaBB6K2uhMASRdT8SHE1mZa7amDY60m8bi3iOEmxMD/gWhDQKElYoiXoaeTzgo
-	 V7gAKyGnF0oEmMUMR9Ugc3YcK69JOJ7Z1CXcLDKhkZfaf9g0az4rz6J7+GnGrQfFJ
-	 JBYYKrmBHGYKqZ4Wut1QP24bVp4Q65uGC9TwyvFWV3mehCbv9Ac9PhLtNq0aML5pj
-	 Rjsjl8KUU3UMXY0diq7pehWKjShEaprKMqtohbGvLyznY+UKhglcIl5AQB2fSJ1Oh
-	 FAjbfN5R5PPiNBcycQ==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from client.hidden.invalid by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1M26rD-1xBZNM2nkn-000NKN; Tue, 22
- Sep 2026 21:43:34 +0200
-Message-ID: <4e7fa4ba-56fd-4d47-ad1d-78cef70f24fd@gmx.de>
-Date: Tue, 22 Sep 2026 21:43:12 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ov0P/E5Q"
+Received: by mail-oa2-f35.google.com with SMTP id 586e51a60fabf-48f2b0b12d4so259476fac.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 22 Sep 2026 13:08:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1790107706; x=1790712506; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=4YttVmVDe7kPYmwTqqpDR7TPp37/yKqeznmiNNuOCoA=;
+        b=Ov0P/E5Q6C6mhaeJy7BfqpTHmHAj7eE/lXouSnvQjsQz1QgY6Ytw+LAEi7fGaTRSTS
+         pT74d18BuYYp1tCTTCqS1wCXNi5TeJXc/FWlZmU8wIbq8/aFAJt52pBQ5Qya7bsAvD1F
+         fvZr11FhUc/7WeiMdBL+XSuL6tF8VypsEOntuY3+PcCaO3/W8NpZ+ciRdJAUNgPd8u5u
+         rqPsXdGnOzPE5oCPq720ix/V0+3rrbekFPSKjslUI2aylOAUymibvzEMkJ6ZF2gjOTjD
+         Xf5c1lRMamBj+30zB+xi9ChTq5PB4iONCaDzeRghAO3hj3Pf06uezeYDgjFrUAubM09Y
+         KFSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790107706; x=1790712506;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=4YttVmVDe7kPYmwTqqpDR7TPp37/yKqeznmiNNuOCoA=;
+        b=TG/eJBq1sG+7uGhQbanlmjjWZkZF9xCIW+C1R9G5bd3JdWcvVCNh0QzxRr22IOkxBz
+         DJ1npS0iBQscWSRxE90gmEFzK7VzQe64ro19PJf8pDWdHeo5Fy6Vf0Z4L/4E0tasx3G5
+         mQhfb20Y3aSZArxE3+LfIdKZZnAqumgfH2Y8zzRr7Or5bL9Tve5Nm7qej6TwwXI3U5Vr
+         Mu+r7h3IS+lgciw2Bg5C2SId7i9tXy8sIcKjG+Afti9/hBQ5LBFbV3VQh514OQj5HbwR
+         /DnRO8U3oRuU1belCSh8Tav+moe2KVcLSE4KGLKqnKA4RPkNYGujjiCFke8xqw/ThI6/
+         iYYw==
+X-Forwarded-Encrypted: i=1; AKwUvBw3XZAt0r3bpLTfPDWf7QtMJSisUAZd1n05HyZjy352w0O95F+EjkfwgmU0EyoUrSPwcfuVyiYJV1f3yzY=@vger.kernel.org
+X-Gm-Message-State: AFuF++kEDn4T1PnmoIr5imgLlvlQPNM8RyQ2CwUfdf+w/Yx8rXvSxAxk
+	G7vZooJQwQk8OacWQH08bxUsJjOvJx8geVA/wt7MQgoAv5ezs7RMqY1J
+X-Gm-Gg: AYBFou07IXZBHsqWRKl1SZfUro7QRQ0WoTiwwYTSvDBF6UB0Wl5KU7P5jF++ZscxrED
+	mzJJooX0TF+hqcPn8bxyfWCI3TibL3DLuhIVM4rKk/oItPAkTsiwqRSpn6Q05Cv3M+xxYOC5dex
+	PE7apJ/mjpaXDKvkmFgODht5vOPxyHs9zaybDXfjz5/h5GYFlOLwVNOjh4aKfEbkorq0oAhJr2z
+	Zi2BA6q+3X0Djp6cDTqMywXqeMoSMxN/aFo9JYEIqFhEhDpDTIHFK+DBVc8AsIB5dcbeRw87v3q
+	2RQTI82nui/etLpXpK2iaJqQ6E5+dTLc67ZgPC7qezq3KPC0tZeYFtn3xf9gfS8zMHU3ULztQDx
+	I7VZ627dlEWkDNZICI3JfcQh2HARf65NL5PbmsyavFSuSldfv6DyPQ8rO2B7rN98M2ZhvfN2AGw
+	I/uW16ATSeU/1mNejD7fb8KDUZZB22BoboekfsUa+1d070NOE5O5MxxfjMbTL3gx6LfxHkWz9WS
+	7CTGgPCC65DcbnRZjybvgjqPl8Pycg+WbvNy/URZVXsWo/HWVYz+FZXZ9zM3/SFTWgZdrXh3ByJ
+	UQ8EYANt6upzMSIJwN4=
+X-Received: by 2002:a05:6870:5b8c:b0:475:a1ec:9621 with SMTP id 586e51a60fabf-4908b1b4127mr680375fac.35.1790107706068;
+        Tue, 22 Sep 2026 13:08:26 -0700 (PDT)
+Received: from [100.82.231.29] (c-98-38-17-99.hsd1.co.comcast.net. [98.38.17.99])
+        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-4908eb9237asm564087fac.12.2026.09.22.13.08.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Sep 2026 13:08:25 -0700 (PDT)
+From: Jim Cromie <jim.cromie@gmail.com>
+Subject: [PATCH v4 0/4] kallsyms: Accelerate symbol name lookups by ~19x
+Date: Tue, 22 Sep 2026 14:08:17 -0600
+Message-Id: <20260922-ksyms-tune-v4-0-92acea84b911@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 0/3] <linux/mod_devicetable.h> deprecation continues
-To: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig_=28The_Capable_Hub=29?=
- <u.kleine-koenig@baylibre.com>, Tianrui Zhao <zhaotianrui@loongson.cn>,
- Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
- Geert Uytterhoeven <geert@linux-m68k.org>,
- Takashi Sakamoto <o-takashi@sakamocchi.jp>, Raag Jadav
- <raag.jadav@intel.com>, "Martin K. Petersen" <mkp@kernel.org>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- Dave Hansen <dave.hansen@linux.intel.com>, Ingo Molnar <mingo@kernel.org>,
- Josh Poimboeuf <jpoimboe@kernel.org>,
- Jorge Sanjuan Garcia <dev-jorge.sanjuangarcia@duagon.com>,
- Jose Javier Rodriguez Barbarin <dev-josejavier.rodriguez@duagon.com>,
- =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Alexey Gladkov <legion@kernel.org>, Hasan Basbunar
- <basbunarhasan@gmail.com>, Hugh Dickins <hughd@google.com>
-Cc: WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org,
- loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
- linux-kbuild@vger.kernel.org, Sudeep Holla <sudeep.holla@kernel.org>
-References: <cover.1789988540.git.u.kleine-koenig@baylibre.com>
-Content-Language: en-US
-From: Armin Wolf <W_Armin@gmx.de>
-In-Reply-To: <cover.1789988540.git.u.kleine-koenig@baylibre.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:/CEsBNx/OWulGQSIUfR7s2WNR1rhcGITTcqHvPwYg+K5U1GPQ9R
- seedvLJFrQB7ZHsu2H5WYk3assehUn/pWM0jzEMpLE3DYqehWV54TMJO3Ln9LRJtxE5uRA6
- E6AnisFfeTImsyrxeccRJZGmG6dzTnf+KCSM1K+vMUgZQew0pYUXMHR/hezLuWr88kBZvx6
- R7AD4OCbLcGRIylkE22kg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:T7iizWULDaY=;aHonCGMLb6xLndCuhjkPFepMC21
- 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
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/3XNTQ6CMBCG4auYrq1pp/zVlfcwLibtCI0CpsVGQ
+ ri7hRUaXX6TPO9MLJB3FNhxNzFP0QXXd2lk+x0zDXY1cWfTZiCgEFpqfgtjG/jw7IgTAGZgK1Q
+ SWQIPT1f3WmPnS9qNC0Pvx7Ud5XL9mYmSC26r3OjSokQFp7pFdz+YvmVLJsKGAnxQSBSVUkRKE
+ prym6r/VCVaVOlfRihyq7d0nuc3NOACMhoBAAA=
+X-Change-ID: 20260919-ksyms-tune-e22a42d8a31a
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Lorenzo Stoakes <ljs@kernel.org>, Kees Cook <kees@kernel.org>, 
+ David Laight <david.laight.linux@gmail.com>, 
+ Masahiro Yamada <masahiroy@kernel.org>, linux-kernel@vger.kernel.org, 
+ linux-kbuild@vger.kernel.org, bpf@vger.kernel.org, 
+ Jim Cromie <jim.cromie@gmail.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1790107704; l=9959;
+ i=jim.cromie@gmail.com; s=20260203; h=from:subject:message-id;
+ bh=EmIrsvdA2/afewICbt1xJBP5YiPJowaDXlzSyPgLuSI=;
+ b=QG9iUt8ol0ODMV+6EPhUfMcEzZZitr16xLAQeQvGlz6snwqCzYf2GvWZUZokkRlRjDSKzB6p2
+ IgcL9iAfg0rD6r2PWKIeL5A/i0n6mCKJHjRA9ckhlIV5BEFJEDIbMD4
+X-Developer-Key: i=jim.cromie@gmail.com; a=ed25519;
+ pk=C6E5ODlPQo7ZBynATXH9wg7K6HxP0pIXyf4s38Qw0XE=
 
-Am 21.09.26 um 16:18 schrieb Uwe Kleine-K=C3=B6nig (The Capable Hub):
+kallsyms_lookup_names() resolves symbol names to addresses using a
+17-step binary search over kallsyms_names[] (~184k symbols on x86_64).
+At each step of the search, two bottlenecks compound to create
+substantial lookup latency:
 
-> Hello,
->
-> this is a next step in the deprecation of <linux/mod_devicetable.h>.
-> scripts/mod/devicetable-offsets.c and scripts/mod/file2alias.c are the
-> only users of that header that use more than a few device-id structs. So
-> their number of lines actually grows when unfolding the needed includes
-> into them. Still it is a reduction in build dependencies.
->
-> I suggest to take this via kbuild during the merge window. Would be grea=
-t to
-> cook in next for a while before.
->
-> Best regards
-> Uwe
+0. Redundant string expansion: kallsyms_expand_symbol() decompresses
+   the entire candidate symbol into a 512-byte stack buffer (namebuf)
+   before calling strcmp(), even though ~94% of binary search probes
+   mismatch on the first 1-2 characters (~580 ns per lookup).
 
-Acked-by: Armin Wolf <W_Armin@gmx.de>
+1. Marker scanning: get_symbol_offset() scans sequentially from the
+   nearest 256-symbol marker in kallsyms_names[], decoding an average
+   of ~128 ULEB128 record headers per probe (~2,176 header decodes,
+   consuming ~3,230 ns per lookup).
 
->
-> Uwe Kleine-K=C3=B6nig (The Capable Hub) (3):
->    Move struct cpu_feature to <linux/cpufeature.h>
->    devicetable-offsets: Include the needed device-id headers instead of
->      the catch-all
->    file2alias: Include the needed device-id headers instead of the
->      catch-all
->
->   arch/loongarch/kvm/main.c         |  2 +-
->   include/linux/cpufeature.h        | 12 ++++++-
->   include/linux/mod_devicetable.h   | 13 -------
->   scripts/mod/devicetable-offsets.c | 57 ++++++++++++++++++++++++++++++-
->   scripts/mod/file2alias.c          | 56 +++++++++++++++++++++++++++++-
->   5 files changed, 123 insertions(+), 17 deletions(-)
->
->
-> base-commit: 93f51579e7df248780214094418f205253383cc5
+Together, these bottlenecks impose a ~3.8 us latency penalty per hit and
+~3.6 us per miss.
+
+This 4-patch series eliminates both overheads in a structured
+progression while keeping the symbol table strictly in sequential
+address order and adding 0 bytes to .rodata:
+
+0. Patch 1 adds lib/test_kallsyms_perf, a microbenchmark module built
+   directly into vmlinux (CONFIG_TEST_KALLSYMS_PERF=bool) to benchmark
+   unindexed vs dynamic indexed name searches, address resolution, and
+   table iteration latency without exporting internal kallsyms iterators
+   to loadable modules.
+
+1. Patch 2 introduces kallsyms_strcmp_symbol() to compare ASCII queries
+   against compressed tokens on the fly, bailing out on the first
+   mismatched character without expanding subsequent tokens.  This drops
+   the 512-byte namebuf buffer from the kernel stack and saves ~530 ns
+   per lookup on unmodified marker infrastructure.
+
+2. Patch 3 introduces a dynamic u32 lookup index bracketed by
+   kallsyms_lookup_batch_start() and kallsyms_lookup_batch_end().
+   It allocates ~736 KiB in transient RAM via kvmalloc_array() only
+   while bulk workloads (BPF attach, module loading) run, resolves
+   each probe in O(1) with 0 hops, and leaves .rodata bloat at exactly
+   0 bytes while retaining kallsyms_markers[] as fallback.  Both
+   test_kallsyms_perf and kallsyms_selftest are updated to benchmark
+   batch resolution side-by-side.
+
+3. Patch 4 inlines and unrolls get_symbol_seq() 24-bit sequence index
+   reconstruction into direct byte shifts, eliminating loop overhead
+   on inner binary search probes.
+
+Live Microbenchmark Progression (via test_kallsyms_perf, 100k iters):
+
+Metric                    Baseline (1)   Token Match (2)   Batch Index (3)   Total Speedup
+------------------------------------------------------------------------------------------
+Name Search Hit           3,811 ns       3,280 ns          246 ns            15.5x
+Name Search Miss          3,625 ns       3,095 ns          196 ns            18.5x
+sprint_symbol               412 ns         412 ns          412 ns            parity
+sprint_symbol_no_offset     300 ns         300 ns          300 ns            parity
+Table Full Walk           13,626 us      13,626 us       13,626 us           parity
+Kernel stack buffer        512 B            0 B             0 B              -512 B
+
+In-Tree Selftest Verification (CONFIG_KALLSYMS_SELFTEST, 184k symbols):
+
+In addition to test_kallsyms_perf, the existing upstream selftest in
+kernel/kallsyms_selftest.c was run across all 183,990 symbols on boot,
+repeating all tests inside an active batch window:
+
+Metric                          Unindexed (markers)    Batch Index (active)   Delta
+-----------------------------------------------------------------------------------
+kallsyms_lookup_name() (avg)    3,926 ns               675 ns                 5.8x faster
+kallsyms_lookup_name() (min)      311 ns               171 ns                 1.8x faster
+on_each_match_symbol()          3,507 ns             1,142 ns                 3.1x faster
+kallsyms_on_each_symbol()       14.7 ms               15.5 ms                 parity
+Basic function validation       PASS                  PASS                    100% correct
+Batch setup (184k entries)       N/A                 1,037 us                 ~1.0 ms
+Batch teardown (sync RCU)        N/A                 3,440 us                 ~3.4 ms
+
+Address-to-name resolution (sprint_symbol) and sequential table walks
+(/proc/kallsyms) remain completely unaffected, maintaining full L1/L2
+hardware prefetching.
+
+Memory footprint: +0 KiB .rodata added to kernel image.  Transient RAM
+is ~736 KiB (184k * 4 bytes) allocated only during active batch
+lookup sessions.
+
+Signed-off-by: Jim Cromie <jim.cromie@gmail.com>
+---
+Changes in v4:
+- In patch 1, ignore early boot invocations in param_set_trigger() when
+  system_state < SYSTEM_RUNNING to prevent NULL pointer dereference in
+  ktime_get_ns() prior to timekeeping_init() (addresses Sashiko AI review).
+- In patch 1, prevent sysfs TOCTOU divide-by-zero panic: reject num_iters
+  == 0 in param setter, snapshot iters locally via READ_ONCE, and serialize
+  runs with bench_lock mutex (addresses Sashiko AI review).
+- In patch 1, eliminate multi-second boot stall: add run_on_boot parameter
+  (default false) so late_initcall only runs benchmark when explicitly
+  requested (addresses Sashiko AI review).
+- In patch 1, chunk lookup loops in 4096-iter batches with cond_resched()
+  outside the timing bracket to prevent preemption sleep time from
+  inflating reported latency (addresses Sashiko AI review).
+- In patch 3, annotate dyn_kallsyms_offsets declaration with __rcu to
+  satisfy sparse type checking and prevent address-space warnings across
+  rcu_assign_pointer() and rcu_dereference() (addresses Sashiko AI review).
+- In patch 3, use rcu_replace_pointer() with lockdep_is_held() during
+  batch teardown to atomically read and clear the pointer while satisfying
+  sparse address-space constraints (addresses Sashiko AI review).
+- Link to v3: https://lore.kernel.org/r/20260922-ksyms-tune-v3-0-681a34ea05d9@gmail.com
+
+Changes in v3:
+- Reorder series: place on-the-fly token matching (patch 2) ahead of
+  dynamic batch lookup index (patch 3), establishing an active proof of
+  incremental performance deltas across all steps (addresses David
+  Laight review).
+- Add patch 4: inline and unroll get_symbol_seq() 24-bit sequence index
+  reconstruction into direct byte shifts (addresses David Laight
+  review).
+- In patch 1, configure CONFIG_TEST_KALLSYMS_PERF as a built-in test
+  (bool) rather than a module (tristate) and drop kallsyms iterator
+  EXPORT_SYMBOL_GPL exports to avoid exposing internal kernel symbol
+  data (addresses Sashiko AI review).
+- In patch 2, optimize kallsyms_strcmp_symbol() by dropping
+  skipped_first tracking and checking len at the bottom of the token
+  loop (addresses David Laight review).
+- In patch 3, rely on get_symbol_data() helper introduced in patch 2 to
+  preserve bisectability (addresses Sashiko AI review).
+- In patch 3, fix use-after-free race on dyn_kallsyms_offsets: bracket
+  table dereference and array read with rcu_read_lock() and replace
+  rcu_dereference_raw() with rcu_dereference() inside
+  get_symbol_offset() to protect external readers (lookup_symbol_name,
+  kallsyms_lookup_buildid, reset_iter) against concurrent batch
+  teardown (addresses Sashiko AI review).
+- In patch 3, update kallsyms_selftest to add a second lookup pass
+  bracketed by batch start/end to report batch latency in the in-tree
+  selftest.
+- Drop 'default m' from lib/Kconfig.debug.
+- Fix soft lockup risks by adding cond_resched() every 16k iterations in
+  test_kallsyms_perf loops.
+- Replace direct 64-bit integer divisions with div_u64() to fix 32-bit
+  builds.
+- Guard against divide-by-zero when num_iters=0.
+- Replace tcp_v4_rcv with panic in hit_symbols to prevent failures wo
+  CONFIG_INET.
+- Add batch lookup setup/teardown timing and query amortization
+  break-even logging to test_kallsyms_perf.
+- Move David Laight to series-wide Cc on cover letter, dropping trailer
+  from patch 3.
+- Link to v2: https://lore.kernel.org/r/20260922-ksyms-tune-v2-0-a333ee31eac7@gmail.com
+
+Changes in v2:
+- Replaced static build-time 3-byte offset table with a dynamic u32
+  index bracketed by kallsyms_lookup_batch_start() and
+  kallsyms_lookup_batch_end().
+- Dropped .rodata image footprint addition from +573 KiB to 0 KiB,
+  addressing Kees Cook's memory footprint objection.
+- Native u32 loads in transient RAM eliminate 24-bit big-endian shifts
+  and unaligned loads, addressing David Laight's endianness critique.
+- Direct O(1) table indexing provides 0 hops for all symbol lookups
+  without remainder logic or odd/even branching.
+- Restored scripts/kallsyms.c and kernel/kallsyms_internal.h to pristine
+  state, leaving legacy kallsyms_markers[] as safety fallback.
+- Rebased out Lorenzo Stoakes' kbuild series; this series is now
+  completely decoupled and applies cleanly directly onto mainline.
+- Updated test_kallsyms_perf to benchmark unindexed marker scans and
+  dynamic index side by side in a single run.
+- Link to v1: https://lore.kernel.org/r/20260919-ksyms-tune-v1-0-d85c97da1a32@gmail.com
+
+---
+Jim Cromie (4):
+      kallsyms: Add test_kallsyms_perf module to benchmark lookup latency
+      kallsyms: Match compressed tokens on the fly during binary search
+      kallsyms: Add dynamic lookup index for batch resolution
+      kallsyms: Unroll 24-bit sequence reconstruction in get_symbol_seq()
+
+ include/linux/kallsyms.h   |  13 ++
+ kernel/kallsyms.c          | 212 ++++++++++++++++++++++------
+ kernel/kallsyms_selftest.c |  16 +++
+ lib/Kconfig.debug          |  10 ++
+ lib/Makefile               |   1 +
+ lib/test_kallsyms_perf.c   | 341 +++++++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 547 insertions(+), 46 deletions(-)
+---
+base-commit: 93f51579e7df248780214094418f205253383cc5
+change-id: 20260919-ksyms-tune-e22a42d8a31a
+
+Best regards,
+-- 
+Jim Cromie <jim.cromie@gmail.com>
+
