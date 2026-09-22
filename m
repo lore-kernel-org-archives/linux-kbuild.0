@@ -1,294 +1,120 @@
-Received: from mail-oi2-f43.google.com (mail-oi2-f43.google.com [74.125.231.235])
+Received: from mail-wr2-f35.google.com (mail-wr2-f35.google.com [74.125.225.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 234D5235045
-	for <linux-kbuild@vger.kernel.org>; Tue, 22 Sep 2026 07:19:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.235
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE2E6530E0A
+	for <linux-kbuild@vger.kernel.org>; Tue, 22 Sep 2026 08:41:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790061582; cv=none; b=E26ntUFtLoNAeFqSnndRxQIIlLYIHhrLmTWwG4sUXvw3Sy5+p9bg24cehP/5MfkfIHjTBsxx4xRatL6UH72dq6CSr0O/QLFQ4FOaIP6l+alZl22+e3T/sf1akyyE/B+SlsSHn3Cg8tK0YkvdScSCGqmHNmqCXJ/lmmirMNUheZY=
+	t=1790066492; cv=none; b=cSnA92PjSWd1K20zRNO3zMt/r3+rkEF2HBM0unPyR9pZjpgOwE0x7z7LJ3qgt3q1UhPBGyfr/wIN0TFovbe5/JAns1TxDHouDbeKT9zKjuq3bMLgG6dr9HMYWLal8s6tdF1u54r+E27uZuBWNSgLC5NytE30b0U4x3ah3Uf/7fc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790061582; c=relaxed/simple;
-	bh=9+xXUpbmhRcfphY9oEfLvGM9tZCICquHCMD3yOi8tIk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=muDAVfSNHbw17Etby0x2Kzw9j95dv0GxkFSAOX/dQ++CEq0WRSNxteUfokyxgRgVqHP8fWt5YH8FzWWcz+9nBtEdKucWCku6ABv6O5jgUQ2Le4+YrYDgRCVzesKStK2k941MRPcN6TQpH3xQSR1fsWIQtq44ZryPhvWL3VXwbqQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BAtIGZnG; arc=none smtp.client-ip=74.125.231.235
+	s=arc-20240116; t=1790066492; c=relaxed/simple;
+	bh=kOlxOzHhVvQ0sv7Ka/MactNXSbragQda2YaQkUVz2ZU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gKW+NRxVOhA2sJFqCssVEB45i1gH9/UVyJB79nUIgWSgFQhN9fEVpBNFP09KwUexXJa+I2C3V10DaS0ZAB7Op3ApDgOJWvjwkRz3Q07Fbl3/iN/tzE3ofJ7N12rEr+7HQ7Yxxy9GXjv2v3mqMqEq27Od32FRcK4gh57kAM5iiYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ImcOj2QM; arc=none smtp.client-ip=74.125.225.99
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BAtIGZnG"
-Received: by mail-oi2-f43.google.com with SMTP id 46e09a7af769-7f4f0d1779dso3330111a34.2
-        for <linux-kbuild@vger.kernel.org>; Tue, 22 Sep 2026 00:19:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ImcOj2QM"
+Received: by mail-wr2-f35.google.com with SMTP id ffacd0b85a97d-4885a1480a2so1035456f8f.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 22 Sep 2026 01:41:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790061569; x=1790666369; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=U9x3FI5E4GbuVg0Jfsu35zQ33gdkfajY2nImRMYOyJE=;
-        b=BAtIGZnGN6Wph4it868B9tZapl14iGOUMvokwOo3HUHwT4wBh/0wqCDN8VV/kI6bPK
-         DzfcvFygSfaz9YbbYH0pOWrIvPh8NfHafL5MezzROsNErXMN9xxYqjqF5POSS4aqWoMd
-         5NX8vRqcQqBi//89WI/xuhMd72OWGnPT5/mZVGMvvMzoDcCCbBJzEWsA1POyk5Rk85pi
-         YCMreAOmt3wb42nGGI5PXoDeuXhAHfzAKPk7zogVCxYaD35JqyB3nGzSM92ZwY3rskGi
-         Y/RMUH64uQH1ip/sFLfgG/DtyWHXRuVJYWDmIXG5e6iAsg2niKOaqh5cPekv5j/jWrCq
-         cihQ==
+        d=gmail.com; s=20251104; t=1790066488; x=1790671288; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=nbg33pT6Fj2JHlCGEBzVZXSsW4USfoXndE7ADPxXyBU=;
+        b=ImcOj2QMGpUz+C5+gC2ReEPGiUIn18wXse9HbltG6mDd3sIgsBz3uUZsTruvWi9RQx
+         hfnMKR2SyGaApfOZ9mJuyTWyeNvIin/hO9iqaAmi9TqAZxkVJ1QsDT/6SubDurBeqMEt
+         RutKbJuWooVwABlXVzTJgeiaVyjsK/eORpLr3KXaNkDO7OT5Qd80m2IGXg1pkLXmdsu6
+         OdhnB70VNneNtZyX2Yq9RMzoxDuCCMj3U5U/fJDSluzVrydwThqigBqbfnAMQcjVgjvr
+         QWQwbGp39kGTFuuMiYtoHbnqLlbgb+HPe8DBfH5EeuxneZJ53y96iLks1Olzgwk3r5yj
+         yb1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790061569; x=1790666369;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:x-gm-gg
+        d=1e100.net; s=20260707; t=1790066488; x=1790671288;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=U9x3FI5E4GbuVg0Jfsu35zQ33gdkfajY2nImRMYOyJE=;
-        b=CjuJZ4CPNuoAlaFZbGIdqJg1pgpgtQRG89eTQhiOPItgPSvJ12Wyve4uOviOpqTf+n
-         Jfiv5oWntNyMaxz1gjnCodYlE0g/XankUZqJdJQs0yGPKcch0p5yxIu8OR2hmN26E4G6
-         u/1L9YwgrS8ymD6xrLVS2KLH37xjxkBtpqmMpIKkgcvfLAjh4bweR9N5Hb0z4Cx4KOtI
-         17MkRryA92/+FT/6J6t2Iqh5QrXuvUanpFuEF3+S2ReOAqUO3DWV9GzjnxTTKNQEG9NR
-         MkRCKE+HK4XTjy34AJBwb21Fz58xQmFrrR2/37H7wkTQ5rbuOgHaPzXOzwTW+SKxIbUx
-         64ew==
-X-Forwarded-Encrypted: i=1; AKwUvBzywUxh6eDOAXCddN9mzIi3KumYT3yEMpsULWX48+BJkeJgRw5tRJQTpVJfTLZW7+KEi60bsHn7q0my4tI=@vger.kernel.org
-X-Gm-Message-State: AFuF++lq2kcWjMKHjuz+wI7D0JT5ZeU/n5hatkGYu1uL4qVW0TdUVtai
-	d1IF/s0M75mEKC5atc5+INkmGZqJg7HRNhKqeyW9LNDw6Ai+iXmleO47
-X-Gm-Gg: AYBFou0MXovf59PpqvKeHg3/MoLzdFnAtavQsn3LMDS6mALYEjoYaWTXwdFZ0fmKql2
-	z2cjXv5vtK4jOx4tJ+2YNldfcJZLxG6Tmd4hc799l4QfRJVX+Wp061u8cg12Bl2MGkq6s95V40O
-	+VHYxFjdQ66q0+eagjRvJPle0gcsdgfyBGOaHBsHihF50keUIFZXMU/K8BNb8H2DCWovwLSQ0AY
-	PpibpBvtLTI71jNvGmN20deW6HwrC8kDClPQkBaQwGhtfnxBmp50a9WqSKTrZUvBLjTTDNu9svC
-	2Ysg7lr3rPzZnO/UHRAicrs0vu0r3e6Ibot8H1/AQq3qK5J+F/XIv9REy0WDba1ZdH71VZMkfoC
-	WbapdIab+n/81eBZA5/dnlS8KK7h70VDWypEkGKsD25jyHfLkyXBgFQxA1SwwF+XvQGeo+xkDKz
-	cCmgYMRwkcV4a5zFy5rZNJA0HlkmFW7nrh5Z7X8SIcDk1UrX/8ij8lQ+HptZN+k8PrgZQg344i/
-	GrGPUNQmZnySWK/GCWZFJ5ZS+kL5FF0xJHiI6qIJhrAY8qHNuXhKoyAd2ZMrBzEgyyfFD5urEUG
-	+yGKkEaIrnCOxsCvs2s=
-X-Received: by 2002:a05:6830:81ca:b0:80b:6c70:94b9 with SMTP id 46e09a7af769-80de27dc7cfmr15537606a34.19.1790061569165;
-        Tue, 22 Sep 2026 00:19:29 -0700 (PDT)
-Received: from [100.82.231.29] (c-98-38-17-99.hsd1.co.comcast.net. [98.38.17.99])
-        by smtp.googlemail.com with ESMTPSA id 46e09a7af769-814e598483esm1116801a34.5.2026.09.22.00.19.27
+        bh=nbg33pT6Fj2JHlCGEBzVZXSsW4USfoXndE7ADPxXyBU=;
+        b=ccNVutJXfhHYU5RUtTz/ayddcT5lFxP1ieWRkH7YFVELC3c0YJGIRNXeVekkSdwphv
+         Uv+mMBY7tiNQ0oXW6h17J5388peeTDYMh8VAhxDnA3UbMRrdOu899zKXh/nPi147w3RF
+         KUXkrjEl4So2DSfbNFOayK0OnGVbDNZX09ft2TIQ1s8cDgz+5mb+RFIdoiifDArAu3Ro
+         l7pFI5bJ2hakn3MVv6ESYl4um5nR62MvRH8kzWK6vxYSEOMSsJiQE+3PFRkA0rA2EU9U
+         rLjVdut5mQxdZ2rWWqcrJRrwxlJMpduplaK8OkFIoOZvyUMgj6RjCo0RtIHn3RxdSfA6
+         BYdA==
+X-Forwarded-Encrypted: i=1; AKwUvBzmk5ySwBWWZNnY2kW+XHZ6bVBgusfNG0qPulSbJxDRdqk4k6Jia7OLXH5gHGJLeKM56Ou9whT7NGzBoCA=@vger.kernel.org
+X-Gm-Message-State: AFuF++lhNpksy2CF1pfQsERZxLMhHa5DFlGsZVMVVS1mOj/GyT28ZN35
+	xcNUSGS6niHg/0NtMANQOVe04mhCBdhg5CsFDTrmlR5udpOdchDoFKXV
+X-Gm-Gg: AYBFou3o7njt5jUTWoZvp3Au/FDPXh2WCiaf6kx+ORLw4SMg8csE35esvj7YtNHfbgK
+	OkIsXoLuYDbXRowX7FGthAd2NQDTuA50FmTb51OvUPcMp/Vp3dBOMBQxcxhcM6ixF4q7E5lfmyX
+	zdt0VJNWrqfctnI1jqxf5wtmsueV0xCdeyF5ojCsIHhOwJHPRl64FlThUxJ3yjGo+9/wPAZUzYx
+	JZOJ0QydREoHZZ2Dw1f6Lpx5MZpuW4ePxwlCS8spsfnNWcckEU7NofQLG26ayb3C4GPqr8mc5l5
+	FgdIWA2pAqIXOclDc7wYrq7M7B5+atfGfP9HU96PeKQDNnFAjO23byBxCNh8EKXsOcPZmUhcilU
+	h68mZJQaKZFkA7i6tOHZTOUfkLZ/zeLC8ypufUUD+AJ2WdDmcTrBvX/RhjFI8utWWZR7EW5LTpE
+	ZorgPucu6KR2Fp0Nwsz/KSfyxz7jUwVBpCh5aBxmZkY9yDcHdWSgMBN2MnUYUQvKyRoEsOn5dr5
+	IXT4QWLKtk0ve9uPNg17g1gv7nSUt2c1zQ=
+X-Received: by 2002:a05:6000:1861:b0:488:5852:6ee3 with SMTP id ffacd0b85a97d-48858527005mr10835062f8f.34.1790066487965;
+        Tue, 22 Sep 2026 01:41:27 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4886277e841sm3674945f8f.19.2026.09.22.01.41.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Sep 2026 00:19:28 -0700 (PDT)
-From: Jim Cromie <jim.cromie@gmail.com>
-Date: Tue, 22 Sep 2026 01:19:21 -0600
-Subject: [PATCH v2 3/3] kallsyms: Match compressed tokens on the fly during
- binary search
+        Tue, 22 Sep 2026 01:41:27 -0700 (PDT)
+Date: Tue, 22 Sep 2026 09:41:26 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Jim Cromie <jim.cromie@gmail.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Lorenzo Stoakes
+ <ljs@kernel.org>, Kees Cook <kees@kernel.org>, Masahiro Yamada
+ <masahiroy@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kbuild@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH v2 0/3] kallsyms: Accelerate symbol name lookups by ~19x
+Message-ID: <20260922094126.05bdc42a@pumpkin>
+In-Reply-To: <20260922-ksyms-tune-v2-0-a333ee31eac7@gmail.com>
+References: <20260922-ksyms-tune-v2-0-a333ee31eac7@gmail.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260922-ksyms-tune-v2-3-a333ee31eac7@gmail.com>
-References: <20260922-ksyms-tune-v2-0-a333ee31eac7@gmail.com>
-In-Reply-To: <20260922-ksyms-tune-v2-0-a333ee31eac7@gmail.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Lorenzo Stoakes <ljs@kernel.org>, Kees Cook <kees@kernel.org>, 
- David Laight <david.laight.linux@gmail.com>, 
- Masahiro Yamada <masahiroy@kernel.org>, linux-kernel@vger.kernel.org, 
- linux-kbuild@vger.kernel.org, bpf@vger.kernel.org, 
- Jim Cromie <jim.cromie@gmail.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1790061561; l=6187;
- i=jim.cromie@gmail.com; s=20260203; h=from:subject:message-id;
- bh=9+xXUpbmhRcfphY9oEfLvGM9tZCICquHCMD3yOi8tIk=;
- b=zvOk3ZkgBsIKOndl6sO4Rqw248xKhWqXl2uhZas4Z5pbHJ3c+gNrOlSTb0rUNyBL4je9U9P4V
- sF+gitZnIB5CO1l8uvrKFK/4s0k6FN9UBAVmfs1iON3kx3I1T7uaQ5A
-X-Developer-Key: i=jim.cromie@gmail.com; a=ed25519;
- pk=C6E5ODlPQo7ZBynATXH9wg7K6HxP0pIXyf4s38Qw0XE=
 
-kallsyms_lookup_names() runs a binary search across kallsyms_names[],
-a packed array of ~130k encoded kernel symbols.  For each of the ~17
-comparisons in the search, it currently decompresses the candidate
-symbol into a temporary buffer on the stack before calling strcmp().
+On Tue, 22 Sep 2026 01:19:18 -0600
+Jim Cromie <jim.cromie@gmail.com> wrote:
 
-Comparing raw tokens directly in compressed space is impossible.  The
-BPE token table assigns values by frequency, not alphabetical order
-(e.g. token 0x05 might expand to "zebra" while 0x42 expands to "apple"),
-so comparing raw token values scrambles lexicographical order.
+> kallsyms_lookup_names() resolves symbol names to addresses using a
+> 17-step binary search over kallsyms_names[] (~184k symbols on x86_64).
+> At each step of the search, two bottlenecks compound to create
+> substantial lookup latency:
+> 
+> 0. Marker scanning: get_symbol_offset() scans sequentially from the
+>    nearest 256-symbol marker, decoding an average of ~128 ULEB128 record
+>    headers per probe (~2,176 header decodes per lookup).
+> 
+> 1. Redundant string expansion: kallsyms_expand_symbol() decompresses
+>    the entire candidate symbol into a 512-byte stack buffer (namebuf)
+>    before calling strcmp(), even though ~94% of binary search probes
+>    mismatch on the first 1-2 characters.
+> 
+> Together, these bottlenecks impose a ~3.8 us latency penalty per hit and
+> ~3.6 us per miss.
 
-However, full string expansion is equally wasteful: roughly 16 of the
-17 binary search steps fail within the first two characters.
+How much does just doing change 1 give you?
+Might be worth putting that patch first.
 
-Introduce kallsyms_strcmp_symbol() to compare ASCII queries against
-compressed tokens on the fly.  It walks kallsyms_token_index and
-kallsyms_token_table incrementally, matching characters directly and
-bailing out on the first character mismatch without expanding subsequent
-tokens.
+If you do the binary chop using only 256 aligned symbols it won't add
+any more stages but means you don't need to scan until the 256 symbol
+block has been identified.
+At that point there are two options:
+B: A linear scan - average 128 compare per lookup.
+A: Generate a table of the offsets for the next 128 symbols and do
+   a binary scan (only read the second 128 if in the second half).
 
-This optimization:
+The linear scan may not be too bad.
+You can get the first data byte while sorting out the length and then
+to an initial check that the first few characters match before adding
+in the complexity of the loop along the compressed data.
 
-0. Avoids decompressing non-matching tokens, short-circuiting ~94% of
-   binary search character expansions without adding any tables in
-   .rodata.
-
-1. Drops the 512-byte namebuf buffer from the kernel stack in
-   kallsyms_lookup_names().
-
-2. Leaves sequential address ordering and kallsyms_expand_symbol()
-   streaming invariants intact for /proc/kallsyms and table walks.
-
-Signed-off-by: Jim Cromie <jim.cromie@gmail.com>
----
- kernel/kallsyms.c | 97 ++++++++++++++++++++++++++++++++++---------------------
- 1 file changed, 61 insertions(+), 36 deletions(-)
-
-diff --git a/kernel/kallsyms.c b/kernel/kallsyms.c
-index 862a6b773ac5..4a04d63e4b7d 100644
---- a/kernel/kallsyms.c
-+++ b/kernel/kallsyms.c
-@@ -37,6 +37,21 @@
- 
- #include "kallsyms_internal.h"
- 
-+/*
-+ * Get the compressed symbol length and data pointer.
-+ */
-+static inline const u8 *get_symbol_data(unsigned int off, unsigned int *len)
-+{
-+	const u8 *p = &kallsyms_names[off];
-+	unsigned int l = *p++;
-+
-+	if (unlikely(l & 0x80))
-+		l = (l & 0x7F) | (*p++ << 7);
-+	*len = l;
-+
-+	return p;
-+}
-+
- /*
-  * Expand a compressed symbol data into the resulting uncompressed string,
-  * if uncompressed string is too long (>= maxlen), it will be truncated,
-@@ -45,28 +60,12 @@
- static unsigned int kallsyms_expand_symbol(unsigned int off,
- 					   char *result, size_t maxlen)
- {
--	int len, skipped_first = 0;
-+	int skipped_first = 0;
- 	const char *tptr;
--	const u8 *data;
-+	unsigned int len;
-+	const u8 *data = get_symbol_data(off, &len);
- 
--	/* Get the compressed symbol length from the first symbol byte. */
--	data = &kallsyms_names[off];
--	len = *data;
--	data++;
--	off++;
--
--	/* If MSB is 1, it is a "big" symbol, so needs an additional byte. */
--	if ((len & 0x80) != 0) {
--		len = (len & 0x7F) | (*data << 7);
--		data++;
--		off++;
--	}
--
--	/*
--	 * Update the offset to return the offset for the next symbol on
--	 * the compressed stream.
--	 */
--	off += len;
-+	off = (data - kallsyms_names) + len;
- 
- 	/*
- 	 * For every byte on the compressed symbol data, copy the table
-@@ -94,7 +93,7 @@ static unsigned int kallsyms_expand_symbol(unsigned int off,
- 	if (maxlen)
- 		*result = '\0';
- 
--	/* Return to offset to the next symbol. */
-+	/* Return offset to the next symbol. */
- 	return off;
- }
- 
-@@ -104,16 +103,46 @@ static unsigned int kallsyms_expand_symbol(unsigned int off,
-  */
- static char kallsyms_get_symbol_type(unsigned int off)
- {
--	/*
--	 * Get just the first code, look it up in the token table,
--	 * and return the first char from this token. If MSB of length
--	 * is 1, it is a "big" symbol, so needs an additional byte.
--	 */
--	if (kallsyms_names[off] & 0x80)
--		off++;
--	return kallsyms_token_table[kallsyms_token_index[kallsyms_names[off + 1]]];
-+	unsigned int len;
-+	const u8 *data = get_symbol_data(off, &len);
-+
-+	return kallsyms_token_table[kallsyms_token_index[*data]];
- }
- 
-+/*
-+ * Compare an uncompressed ASCII string against a compressed symbol table entry.
-+ * Returns negative if name < sym, positive if name > sym, 0 if equal.
-+ * Exits immediately on the first mismatched character without decompressing
-+ * the rest of the symbol name.
-+ */
-+static int kallsyms_strcmp_symbol(unsigned int off, const char *name)
-+{
-+	int skipped_first = 0;
-+	const char *tptr;
-+	unsigned int len;
-+	const u8 *data = get_symbol_data(off, &len);
-+
-+	while (len) {
-+		tptr = &kallsyms_token_table[kallsyms_token_index[*data]];
-+		data++;
-+		len--;
-+
-+		while (*tptr) {
-+			if (skipped_first) {
-+				int diff = (unsigned char)*name - (unsigned char)*tptr;
-+
-+				if (diff != 0)
-+					return diff;
-+				name++;
-+			} else {
-+				skipped_first = 1;
-+			}
-+			tptr++;
-+		}
-+	}
-+
-+	return (unsigned char)*name - '\0';
-+}
- 
- /*
-  * Find the offset on the compressed stream given an index in the
-@@ -261,7 +290,6 @@ static int kallsyms_lookup_names(const char *name,
- 	int ret;
- 	int low, mid, high;
- 	unsigned int seq, off;
--	char namebuf[KSYM_NAME_LEN];
- 
- 	low = 0;
- 	high = kallsyms_num_syms - 1;
-@@ -271,8 +299,7 @@ static int kallsyms_lookup_names(const char *name,
- 		mid = low + (high - low) / 2;
- 		seq = get_symbol_seq(mid);
- 		off = get_symbol_offset(seq);
--		kallsyms_expand_symbol(off, namebuf, ARRAY_SIZE(namebuf));
--		ret = strcmp(name, namebuf);
-+		ret = kallsyms_strcmp_symbol(off, name);
- 		if (ret > 0)
- 			low = mid + 1;
- 		else if (ret < 0)
-@@ -290,8 +317,7 @@ static int kallsyms_lookup_names(const char *name,
- 	while (low) {
- 		seq = get_symbol_seq(low - 1);
- 		off = get_symbol_offset(seq);
--		kallsyms_expand_symbol(off, namebuf, ARRAY_SIZE(namebuf));
--		if (strcmp(name, namebuf))
-+		if (kallsyms_strcmp_symbol(off, name) != 0)
- 			break;
- 		low--;
- 	}
-@@ -302,8 +328,7 @@ static int kallsyms_lookup_names(const char *name,
- 		while (high < kallsyms_num_syms - 1) {
- 			seq = get_symbol_seq(high + 1);
- 			off = get_symbol_offset(seq);
--			kallsyms_expand_symbol(off, namebuf, ARRAY_SIZE(namebuf));
--			if (strcmp(name, namebuf))
-+			if (kallsyms_strcmp_symbol(off, name) != 0)
- 				break;
- 			high++;
- 		}
-
--- 
-2.55.0
-
+David
