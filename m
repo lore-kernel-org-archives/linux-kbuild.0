@@ -1,68 +1,70 @@
-Received: from mail-oa2-f35.google.com (mail-oa2-f35.google.com [74.125.231.99])
+Received: from mail-oa2-f12.google.com (mail-oa2-f12.google.com [74.125.231.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 935A53A168C
-	for <linux-kbuild@vger.kernel.org>; Tue, 22 Sep 2026 20:08:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B33DF3B71D3
+	for <linux-kbuild@vger.kernel.org>; Tue, 22 Sep 2026 20:08:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790107721; cv=none; b=f8MO9NC6UvIJ/mCiOzLLOly7UeoNjsPIsnDcN0pmo7OV7jftsMRF3M/j264QTIlgiOqADlYEUI+DwdFwB7+HyFZGKtp1HYY4X40rNve5Ck8Mo4oLLXRMutaxNiZTdfFdYRxwwHOzy6Mgg6amsakeLDPdD02t+/N6qg53O203oL4=
+	t=1790107722; cv=none; b=O8T/nOXHv+9aRo975bMMK8AE9sCexcc4BVGEFPIsM7iLnSuLVEh43Dlp6j+tEZdCNgyv23lO5+N+gvXhDPdO0axKbT9xWzI1a+ASmpPYxUjitJBVZtJVN89NLToHwkg+K3IBKIme4Sto+3jHE1gSTspduWm79aw+/E3CoU4pJVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790107721; c=relaxed/simple;
-	bh=EmIrsvdA2/afewICbt1xJBP5YiPJowaDXlzSyPgLuSI=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=dpNqspCsTurB45MI3pfFjYsAJ4PVy/sVHerp6GIpXtL2aPyguwPFXlh0bIb3ikCRdVtM5ZsK5fZ27n5cJQP46NrBBZ12r60L96na7nYmB8UoUI7WOA5jyTAGs7GaX3O+i52FzMaRPWJIUngEWsAdUnnelbU+d1bcInwClXIP7Lg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ov0P/E5Q; arc=none smtp.client-ip=74.125.231.99
+	s=arc-20240116; t=1790107722; c=relaxed/simple;
+	bh=oV2R0UvbYfIVB77jCAXauJRFelOAEdJiPFl6JJAX4x8=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=W52rw/4Zmna2APg+2YXS8qXzFpf/mqqukI3cQUDpdHzgzCXpcNX6jsWFz4V3v0b7NVyVb8z4UOGVl/don5z/kDoovRp4yCbooUaPrF1U8LS8SktCp4mhp/B8ZRY6XIXsUtvUjMi9Yi/WJYa1fJQLz0mbiEQ+PnbXhmQsoYHlQK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pCRgEqE4; arc=none smtp.client-ip=74.125.231.76
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ov0P/E5Q"
-Received: by mail-oa2-f35.google.com with SMTP id 586e51a60fabf-48f2b0b12d4so259476fac.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 22 Sep 2026 13:08:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pCRgEqE4"
+Received: by mail-oa2-f12.google.com with SMTP id 586e51a60fabf-466ccde2a99so225439fac.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 22 Sep 2026 13:08:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790107706; x=1790712506; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:content-type:mime-version
-         :message-id:date:subject:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=4YttVmVDe7kPYmwTqqpDR7TPp37/yKqeznmiNNuOCoA=;
-        b=Ov0P/E5Q6C6mhaeJy7BfqpTHmHAj7eE/lXouSnvQjsQz1QgY6Ytw+LAEi7fGaTRSTS
-         pT74d18BuYYp1tCTTCqS1wCXNi5TeJXc/FWlZmU8wIbq8/aFAJt52pBQ5Qya7bsAvD1F
-         fvZr11FhUc/7WeiMdBL+XSuL6tF8VypsEOntuY3+PcCaO3/W8NpZ+ciRdJAUNgPd8u5u
-         rqPsXdGnOzPE5oCPq720ix/V0+3rrbekFPSKjslUI2aylOAUymibvzEMkJ6ZF2gjOTjD
-         Xf5c1lRMamBj+30zB+xi9ChTq5PB4iONCaDzeRghAO3hj3Pf06uezeYDgjFrUAubM09Y
-         KFSA==
+        d=gmail.com; s=20251104; t=1790107707; x=1790712507; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :content-type:mime-version:subject:date:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=LBg7HSnbebtbldS1DMZtF5kZINYwBocaor4sCHxt5Tc=;
+        b=pCRgEqE4khEDpdPRa3ou3l33bl7/a+DblSU+2/H144HfKfaOlc3cPdpzVaXtD8IZfp
+         tVhJ/j+UfkjmLUiCtEC9C6GwKMkEZtxhV39AW583WJQLim/fdgeTWCinUEXgBpOw5FJ/
+         j0C0QXFIr2djUyp3zr64Fu0dzOESwKhp9Q8Mgml3jnbbVXBER6mYfbz9HJ9kvVvouJOc
+         pUgXTRqTNy9O4uNFlg1hPhvvYTZcuWc1q9s67sldmbC0osoVi7FgDUzVKuqJvGaIrLeW
+         hQC+azg+v3pgmoyvd+1LU0vw86b+rzZUhZyr2tM6liH/w1FxlT1OaEclEbAW2DMyp5Ej
+         ft9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790107706; x=1790712506;
-        h=cc:to:content-transfer-encoding:content-type:mime-version
-         :message-id:date:subject:from:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=4YttVmVDe7kPYmwTqqpDR7TPp37/yKqeznmiNNuOCoA=;
-        b=TG/eJBq1sG+7uGhQbanlmjjWZkZF9xCIW+C1R9G5bd3JdWcvVCNh0QzxRr22IOkxBz
-         DJ1npS0iBQscWSRxE90gmEFzK7VzQe64ro19PJf8pDWdHeo5Fy6Vf0Z4L/4E0tasx3G5
-         mQhfb20Y3aSZArxE3+LfIdKZZnAqumgfH2Y8zzRr7Or5bL9Tve5Nm7qej6TwwXI3U5Vr
-         Mu+r7h3IS+lgciw2Bg5C2SId7i9tXy8sIcKjG+Afti9/hBQ5LBFbV3VQh514OQj5HbwR
-         /DnRO8U3oRuU1belCSh8Tav+moe2KVcLSE4KGLKqnKA4RPkNYGujjiCFke8xqw/ThI6/
-         iYYw==
-X-Forwarded-Encrypted: i=1; AKwUvBw3XZAt0r3bpLTfPDWf7QtMJSisUAZd1n05HyZjy352w0O95F+EjkfwgmU0EyoUrSPwcfuVyiYJV1f3yzY=@vger.kernel.org
-X-Gm-Message-State: AFuF++kEDn4T1PnmoIr5imgLlvlQPNM8RyQ2CwUfdf+w/Yx8rXvSxAxk
-	G7vZooJQwQk8OacWQH08bxUsJjOvJx8geVA/wt7MQgoAv5ezs7RMqY1J
-X-Gm-Gg: AYBFou07IXZBHsqWRKl1SZfUro7QRQ0WoTiwwYTSvDBF6UB0Wl5KU7P5jF++ZscxrED
-	mzJJooX0TF+hqcPn8bxyfWCI3TibL3DLuhIVM4rKk/oItPAkTsiwqRSpn6Q05Cv3M+xxYOC5dex
-	PE7apJ/mjpaXDKvkmFgODht5vOPxyHs9zaybDXfjz5/h5GYFlOLwVNOjh4aKfEbkorq0oAhJr2z
-	Zi2BA6q+3X0Djp6cDTqMywXqeMoSMxN/aFo9JYEIqFhEhDpDTIHFK+DBVc8AsIB5dcbeRw87v3q
-	2RQTI82nui/etLpXpK2iaJqQ6E5+dTLc67ZgPC7qezq3KPC0tZeYFtn3xf9gfS8zMHU3ULztQDx
-	I7VZ627dlEWkDNZICI3JfcQh2HARf65NL5PbmsyavFSuSldfv6DyPQ8rO2B7rN98M2ZhvfN2AGw
-	I/uW16ATSeU/1mNejD7fb8KDUZZB22BoboekfsUa+1d070NOE5O5MxxfjMbTL3gx6LfxHkWz9WS
-	7CTGgPCC65DcbnRZjybvgjqPl8Pycg+WbvNy/URZVXsWo/HWVYz+FZXZ9zM3/SFTWgZdrXh3ByJ
-	UQ8EYANt6upzMSIJwN4=
-X-Received: by 2002:a05:6870:5b8c:b0:475:a1ec:9621 with SMTP id 586e51a60fabf-4908b1b4127mr680375fac.35.1790107706068;
-        Tue, 22 Sep 2026 13:08:26 -0700 (PDT)
+        d=1e100.net; s=20260707; t=1790107707; x=1790712507;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :content-type:mime-version:subject:date:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=LBg7HSnbebtbldS1DMZtF5kZINYwBocaor4sCHxt5Tc=;
+        b=D/Al1Cx6XXz61P3FfWj/mUjjerzx0AoQQKardcNtS3WxhB5rYHjp3+FyDvCWA70Pt3
+         aL+tyaL1o5hBCrpTs95H/6aR5qv03ruTY7EndyEBVlm+whUg/crRBIxy4odS4n2tenHP
+         CXx/hkK9z7GyHLFmGRJwqpOfw3PcWZNvM7X+XWhG5c2eE6fTMj5XrWWdGqD6iQM4DyRb
+         LCivn4QycZcIcWhJTh62HjlKr96ry4HI3A2fTp7ml23T1hvfgLRiT4T7AmK6hPlJLbfn
+         rnlHinGrl45jtOMtr3mo+rhEC02yOhEg3S77QBev4Kzj0pQ7CB1SQB3A/MgYkIBkXWVf
+         0EPA==
+X-Forwarded-Encrypted: i=1; AKwUvBx7eKuWjxkVcCSGZsZdj9i8WJGLqJYrxSsCwYQKvwh3TbnsD8X07V7sTMabfNNavnl14uSmkUeQkrMmE5U=@vger.kernel.org
+X-Gm-Message-State: AFuF++krsvJ/69pXcrZTIFKEgu3+Ob1fQ3HrzM8PgYg4HLmLd5qbr/ma
+	SL4CGJhSoTOQ+tOFi/O21KCmPzBURD6pnkomlM3JcS0Z9Qyn/yj+Q+OU
+X-Gm-Gg: AYBFou0znuJbLRDNt34r+gS+c4olQ0ddXlxnbyoldBJ45aVIiULLpLU8OGcs8NMHpUA
+	69YzQUL+4vgQYb7StirArjIuqvP54R55Q6fZChHmouqT4ieJD3PyZgU41HY3k8XXEizanmrzNNJ
+	ZnJ2+Z/ABtGYU4v9yjVqw0V1bvNGsRu0Fmp+gXzqo6OGGbsSWsw5ZgrTWX62oX7X7rZTH8wsgdR
+	11L4JKpkqCu9ZioX6gl4PAt0c0OoDGOJgF+aBNB8eaUGI6DNe/7zH93wT6PR5St+aGSrdjDvjY4
+	5KxLkwWyefVVBetVmmHx9meQ1r4mAExn8WmfCOifq11+i9BHah6a1fhMlvkKcDVxtW9rQWtMoSQ
+	Uh4auPMMxtBxgOMb36AbGfeX/Nn2seWjqYIJpHAxZpPB/X8MCYiPgWwQp/3DRPxa7zIlZma2QUg
+	CdhRZAYEg0Yj5LSF5M0CCY+tCVVhc+eUU4PX0mxHVryWVKBEBNcBaeik726l8mzE+Zqqo0OgO7e
+	OTsyoqrcUQ3ho/4N9BInmKMyU5pJwiAPo3yPS1lfIu9VjsNzpspZAkdd2SG95Ecz8FLE1zLjTrK
+	w8FYcnxGwEZ4ER5G5xatLMPBBv/6JQ==
+X-Received: by 2002:a05:6870:239b:b0:485:d31b:775f with SMTP id 586e51a60fabf-4908ab4a750mr780817fac.29.1790107707408;
+        Tue, 22 Sep 2026 13:08:27 -0700 (PDT)
 Received: from [100.82.231.29] (c-98-38-17-99.hsd1.co.comcast.net. [98.38.17.99])
-        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-4908eb9237asm564087fac.12.2026.09.22.13.08.24
+        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-4908eb9237asm564087fac.12.2026.09.22.13.08.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Sep 2026 13:08:25 -0700 (PDT)
+        Tue, 22 Sep 2026 13:08:26 -0700 (PDT)
 From: Jim Cromie <jim.cromie@gmail.com>
-Subject: [PATCH v4 0/4] kallsyms: Accelerate symbol name lookups by ~19x
-Date: Tue, 22 Sep 2026 14:08:17 -0600
-Message-Id: <20260922-ksyms-tune-v4-0-92acea84b911@gmail.com>
+Date: Tue, 22 Sep 2026 14:08:18 -0600
+Subject: [PATCH v4 1/4] kallsyms: Add test_kallsyms_perf module to
+ benchmark lookup latency
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -71,11 +73,9 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/3XNTQ6CMBCG4auYrq1pp/zVlfcwLibtCI0CpsVGQ
- ri7hRUaXX6TPO9MLJB3FNhxNzFP0QXXd2lk+x0zDXY1cWfTZiCgEFpqfgtjG/jw7IgTAGZgK1Q
- SWQIPT1f3WmPnS9qNC0Pvx7Ud5XL9mYmSC26r3OjSokQFp7pFdz+YvmVLJsKGAnxQSBSVUkRKE
- prym6r/VCVaVOlfRihyq7d0nuc3NOACMhoBAAA=
-X-Change-ID: 20260919-ksyms-tune-e22a42d8a31a
+Message-Id: <20260922-ksyms-tune-v4-1-92acea84b911@gmail.com>
+References: <20260922-ksyms-tune-v4-0-92acea84b911@gmail.com>
+In-Reply-To: <20260922-ksyms-tune-v4-0-92acea84b911@gmail.com>
 To: Andrew Morton <akpm@linux-foundation.org>
 Cc: Lorenzo Stoakes <ljs@kernel.org>, Kees Cook <kees@kernel.org>, 
  David Laight <david.laight.linux@gmail.com>, 
@@ -83,196 +83,412 @@ Cc: Lorenzo Stoakes <ljs@kernel.org>, Kees Cook <kees@kernel.org>,
  linux-kbuild@vger.kernel.org, bpf@vger.kernel.org, 
  Jim Cromie <jim.cromie@gmail.com>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1790107704; l=9959;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1790107704; l=12494;
  i=jim.cromie@gmail.com; s=20260203; h=from:subject:message-id;
- bh=EmIrsvdA2/afewICbt1xJBP5YiPJowaDXlzSyPgLuSI=;
- b=QG9iUt8ol0ODMV+6EPhUfMcEzZZitr16xLAQeQvGlz6snwqCzYf2GvWZUZokkRlRjDSKzB6p2
- IgcL9iAfg0rD6r2PWKIeL5A/i0n6mCKJHjRA9ckhlIV5BEFJEDIbMD4
+ bh=oV2R0UvbYfIVB77jCAXauJRFelOAEdJiPFl6JJAX4x8=;
+ b=4RC9VqdWCoHfhnvqxQjqjGuKtFE8tpMesrUk8A7+J44QEhTnOF5OBqOU8fJOYC7+dIna2lG1N
+ ZoOQW0suFA+BWYKk4EhY44KSQ0Za8f9KWsWJtmaG2uND9w5tKqmshhW
 X-Developer-Key: i=jim.cromie@gmail.com; a=ed25519;
  pk=C6E5ODlPQo7ZBynATXH9wg7K6HxP0pIXyf4s38Qw0XE=
 
-kallsyms_lookup_names() resolves symbol names to addresses using a
-17-step binary search over kallsyms_names[] (~184k symbols on x86_64).
-At each step of the search, two bottlenecks compound to create
-substantial lookup latency:
+To evaluate optimizations and measure performance regressions across
+kallsyms lookups, add a lightweight microbenchmark module in lib/.
 
-0. Redundant string expansion: kallsyms_expand_symbol() decompresses
-   the entire candidate symbol into a 512-byte stack buffer (namebuf)
-   before calling strcmp(), even though ~94% of binary search probes
-   mismatch on the first 1-2 characters (~580 ns per lookup).
+Configure CONFIG_TEST_KALLSYMS_PERF as a built-in test (bool) rather
+than a loadable module (tristate). Building the test directly into
+vmlinux allows exercising internal kallsyms traversal APIs without
+exporting internal symbol iterators (EXPORT_SYMBOL_GPL) to modules,
+preserving kernel symbol table encapsulation.
 
-1. Marker scanning: get_symbol_offset() scans sequentially from the
-   nearest 256-symbol marker in kallsyms_names[], decoding an average
-   of ~128 ULEB128 record headers per probe (~2,176 header decodes,
-   consuming ~3,230 ns per lookup).
+The module exercises the primary kallsyms resolution paths:
+0. Name-to-Address binary search: Benchmarks lookups across common
+   kernel functions (hits) and non-existent symbol strings (misses,
+   exercising the full binary search tree depth).
 
-Together, these bottlenecks impose a ~3.8 us latency penalty per hit and
-~3.6 us per miss.
+1. Address-to-Name resolution: Benchmarks address decoding latency
+   via sprint_symbol() and sprint_symbol_no_offset().
 
-This 4-patch series eliminates both overheads in a structured
-progression while keeping the symbol table strictly in sequential
-address order and adding 0 bytes to .rodata:
+2. Sequential table scan: Measures complete table iteration latency
+   via kallsyms_on_each_symbol().
 
-0. Patch 1 adds lib/test_kallsyms_perf, a microbenchmark module built
-   directly into vmlinux (CONFIG_TEST_KALLSYMS_PERF=bool) to benchmark
-   unindexed vs dynamic indexed name searches, address resolution, and
-   table iteration latency without exporting internal kallsyms iterators
-   to loadable modules.
-
-1. Patch 2 introduces kallsyms_strcmp_symbol() to compare ASCII queries
-   against compressed tokens on the fly, bailing out on the first
-   mismatched character without expanding subsequent tokens.  This drops
-   the 512-byte namebuf buffer from the kernel stack and saves ~530 ns
-   per lookup on unmodified marker infrastructure.
-
-2. Patch 3 introduces a dynamic u32 lookup index bracketed by
-   kallsyms_lookup_batch_start() and kallsyms_lookup_batch_end().
-   It allocates ~736 KiB in transient RAM via kvmalloc_array() only
-   while bulk workloads (BPF attach, module loading) run, resolves
-   each probe in O(1) with 0 hops, and leaves .rodata bloat at exactly
-   0 bytes while retaining kallsyms_markers[] as fallback.  Both
-   test_kallsyms_perf and kallsyms_selftest are updated to benchmark
-   batch resolution side-by-side.
-
-3. Patch 4 inlines and unrolls get_symbol_seq() 24-bit sequence index
-   reconstruction into direct byte shifts, eliminating loop overhead
-   on inner binary search probes.
-
-Live Microbenchmark Progression (via test_kallsyms_perf, 100k iters):
-
-Metric                    Baseline (1)   Token Match (2)   Batch Index (3)   Total Speedup
-------------------------------------------------------------------------------------------
-Name Search Hit           3,811 ns       3,280 ns          246 ns            15.5x
-Name Search Miss          3,625 ns       3,095 ns          196 ns            18.5x
-sprint_symbol               412 ns         412 ns          412 ns            parity
-sprint_symbol_no_offset     300 ns         300 ns          300 ns            parity
-Table Full Walk           13,626 us      13,626 us       13,626 us           parity
-Kernel stack buffer        512 B            0 B             0 B              -512 B
-
-In-Tree Selftest Verification (CONFIG_KALLSYMS_SELFTEST, 184k symbols):
-
-In addition to test_kallsyms_perf, the existing upstream selftest in
-kernel/kallsyms_selftest.c was run across all 183,990 symbols on boot,
-repeating all tests inside an active batch window:
-
-Metric                          Unindexed (markers)    Batch Index (active)   Delta
------------------------------------------------------------------------------------
-kallsyms_lookup_name() (avg)    3,926 ns               675 ns                 5.8x faster
-kallsyms_lookup_name() (min)      311 ns               171 ns                 1.8x faster
-on_each_match_symbol()          3,507 ns             1,142 ns                 3.1x faster
-kallsyms_on_each_symbol()       14.7 ms               15.5 ms                 parity
-Basic function validation       PASS                  PASS                    100% correct
-Batch setup (184k entries)       N/A                 1,037 us                 ~1.0 ms
-Batch teardown (sync RCU)        N/A                 3,440 us                 ~3.4 ms
-
-Address-to-name resolution (sprint_symbol) and sequential table walks
-(/proc/kallsyms) remain completely unaffected, maintaining full L1/L2
-hardware prefetching.
-
-Memory footprint: +0 KiB .rodata added to kernel image.  Transient RAM
-is ~736 KiB (184k * 4 bytes) allocated only during active batch
-lookup sessions.
+The module exposes a num_iters parameter (default: 100,000) and a
+sysfs trigger to repeat benchmark runs on demand.
 
 Signed-off-by: Jim Cromie <jim.cromie@gmail.com>
 ---
 Changes in v4:
-- In patch 1, ignore early boot invocations in param_set_trigger() when
-  system_state < SYSTEM_RUNNING to prevent NULL pointer dereference in
-  ktime_get_ns() prior to timekeeping_init() (addresses Sashiko AI review).
-- In patch 1, prevent sysfs TOCTOU divide-by-zero panic: reject num_iters
-  == 0 in param setter, snapshot iters locally via READ_ONCE, and serialize
-  runs with bench_lock mutex (addresses Sashiko AI review).
-- In patch 1, eliminate multi-second boot stall: add run_on_boot parameter
-  (default false) so late_initcall only runs benchmark when explicitly
-  requested (addresses Sashiko AI review).
-- In patch 1, chunk lookup loops in 4096-iter batches with cond_resched()
-  outside the timing bracket to prevent preemption sleep time from
-  inflating reported latency (addresses Sashiko AI review).
-- In patch 3, annotate dyn_kallsyms_offsets declaration with __rcu to
-  satisfy sparse type checking and prevent address-space warnings across
-  rcu_assign_pointer() and rcu_dereference() (addresses Sashiko AI review).
-- In patch 3, use rcu_replace_pointer() with lockdep_is_held() during
-  batch teardown to atomically read and clear the pointer while satisfying
-  sparse address-space constraints (addresses Sashiko AI review).
-- Link to v3: https://lore.kernel.org/r/20260922-ksyms-tune-v3-0-681a34ea05d9@gmail.com
+- Ignore early boot invocations in param_set_trigger() when system_state
+  < SYSTEM_RUNNING to prevent NULL pointer dereference in ktime_get_ns()
+  prior to timekeeping_init() (addresses Sashiko AI review).
+- Prevent sysfs TOCTOU divide-by-zero panic: reject num_iters == 0 in
+  param setter, snapshot iters locally via READ_ONCE, and serialize runs
+  with bench_lock mutex (addresses Sashiko AI review).
+- Eliminate multi-second boot stall: add run_on_boot parameter (default
+  false) so late_initcall only runs benchmark when explicitly requested
+  (addresses Sashiko AI review).
+- Chunk lookup loops in 4096-iter batches with cond_resched() outside
+  the timing bracket to prevent preemption sleep time from inflating
+  reported latency (addresses Sashiko AI review).
 
 Changes in v3:
-- Reorder series: place on-the-fly token matching (patch 2) ahead of
-  dynamic batch lookup index (patch 3), establishing an active proof of
-  incremental performance deltas across all steps (addresses David
-  Laight review).
-- Add patch 4: inline and unroll get_symbol_seq() 24-bit sequence index
-  reconstruction into direct byte shifts (addresses David Laight
-  review).
-- In patch 1, configure CONFIG_TEST_KALLSYMS_PERF as a built-in test
-  (bool) rather than a module (tristate) and drop kallsyms iterator
-  EXPORT_SYMBOL_GPL exports to avoid exposing internal kernel symbol
-  data (addresses Sashiko AI review).
-- In patch 2, optimize kallsyms_strcmp_symbol() by dropping
-  skipped_first tracking and checking len at the bottom of the token
-  loop (addresses David Laight review).
-- In patch 3, rely on get_symbol_data() helper introduced in patch 2 to
-  preserve bisectability (addresses Sashiko AI review).
-- In patch 3, fix use-after-free race on dyn_kallsyms_offsets: bracket
-  table dereference and array read with rcu_read_lock() and replace
-  rcu_dereference_raw() with rcu_dereference() inside
-  get_symbol_offset() to protect external readers (lookup_symbol_name,
-  kallsyms_lookup_buildid, reset_iter) against concurrent batch
-  teardown (addresses Sashiko AI review).
-- In patch 3, update kallsyms_selftest to add a second lookup pass
-  bracketed by batch start/end to report batch latency in the in-tree
-  selftest.
+- Convert CONFIG_TEST_KALLSYMS_PERF from tristate to bool and drop
+  kallsyms iterator EXPORT_SYMBOL_GPL exports to preserve security
+  encapsulation (addresses Sashiko AI review).
 - Drop 'default m' from lib/Kconfig.debug.
-- Fix soft lockup risks by adding cond_resched() every 16k iterations in
-  test_kallsyms_perf loops.
-- Replace direct 64-bit integer divisions with div_u64() to fix 32-bit
-  builds.
+- Add cond_resched() every 16k iterations to avoid soft lockups.
+- Replace direct 64-bit division with div_u64() to fix 32-bit builds.
 - Guard against divide-by-zero when num_iters=0.
 - Replace tcp_v4_rcv with panic in hit_symbols to prevent failures wo
   CONFIG_INET.
-- Add batch lookup setup/teardown timing and query amortization
-  break-even logging to test_kallsyms_perf.
-- Move David Laight to series-wide Cc on cover letter, dropping trailer
-  from patch 3.
-- Link to v2: https://lore.kernel.org/r/20260922-ksyms-tune-v2-0-a333ee31eac7@gmail.com
-
-Changes in v2:
-- Replaced static build-time 3-byte offset table with a dynamic u32
-  index bracketed by kallsyms_lookup_batch_start() and
-  kallsyms_lookup_batch_end().
-- Dropped .rodata image footprint addition from +573 KiB to 0 KiB,
-  addressing Kees Cook's memory footprint objection.
-- Native u32 loads in transient RAM eliminate 24-bit big-endian shifts
-  and unaligned loads, addressing David Laight's endianness critique.
-- Direct O(1) table indexing provides 0 hops for all symbol lookups
-  without remainder logic or odd/even branching.
-- Restored scripts/kallsyms.c and kernel/kallsyms_internal.h to pristine
-  state, leaving legacy kallsyms_markers[] as safety fallback.
-- Rebased out Lorenzo Stoakes' kbuild series; this series is now
-  completely decoupled and applies cleanly directly onto mainline.
-- Updated test_kallsyms_perf to benchmark unindexed marker scans and
-  dynamic index side by side in a single run.
-- Link to v1: https://lore.kernel.org/r/20260919-ksyms-tune-v1-0-d85c97da1a32@gmail.com
-
+- Switch to late_initcall for built-in invocation.
 ---
-Jim Cromie (4):
-      kallsyms: Add test_kallsyms_perf module to benchmark lookup latency
-      kallsyms: Match compressed tokens on the fly during binary search
-      kallsyms: Add dynamic lookup index for batch resolution
-      kallsyms: Unroll 24-bit sequence reconstruction in get_symbol_seq()
+ lib/Kconfig.debug        |  10 ++
+ lib/Makefile             |   1 +
+ lib/test_kallsyms_perf.c | 302 +++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 313 insertions(+)
 
- include/linux/kallsyms.h   |  13 ++
- kernel/kallsyms.c          | 212 ++++++++++++++++++++++------
- kernel/kallsyms_selftest.c |  16 +++
- lib/Kconfig.debug          |  10 ++
- lib/Makefile               |   1 +
- lib/test_kallsyms_perf.c   | 341 +++++++++++++++++++++++++++++++++++++++++++++
- 6 files changed, 547 insertions(+), 46 deletions(-)
----
-base-commit: 93f51579e7df248780214094418f205253383cc5
-change-id: 20260919-ksyms-tune-e22a42d8a31a
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index 134b15a44625..4b9669e64db9 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -3122,6 +3122,16 @@ config TEST_STATIC_KEYS
+ 
+ 	  If unsure, say N.
+ 
++config TEST_KALLSYMS_PERF
++	bool "kallsyms performance benchmark test module"
++	depends on KALLSYMS
++	help
++	  This builds test_kallsyms_perf to benchmark latency across
++	  Name-to-Address binary search, Address-to-Name resolution,
++	  and full table walks.
++
++	  If unsure, say N.
++
+ config TEST_DYNAMIC_DEBUG
+ 	tristate "Test DYNAMIC_DEBUG"
+ 	depends on DYNAMIC_DEBUG
+diff --git a/lib/Makefile b/lib/Makefile
+index dfab958327c5..149968ff3f6b 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -85,6 +85,7 @@ obj-$(CONFIG_TEST_RHASHTABLE) += test_rhashtable.o
+ obj-$(CONFIG_TEST_STATIC_KEYS) += test_static_keys.o
+ obj-$(CONFIG_TEST_STATIC_KEYS) += test_static_key_base.o
+ obj-$(CONFIG_TEST_DYNAMIC_DEBUG) += test_dynamic_debug.o
++obj-$(CONFIG_TEST_KALLSYMS_PERF) += test_kallsyms_perf.o
+ 
+ obj-$(CONFIG_TEST_BITMAP) += test_bitmap.o
+ ifeq ($(CONFIG_CC_IS_CLANG)$(CONFIG_KASAN),yy)
+diff --git a/lib/test_kallsyms_perf.c b/lib/test_kallsyms_perf.c
+new file mode 100644
+index 000000000000..03ff5f1d51c5
+--- /dev/null
++++ b/lib/test_kallsyms_perf.c
+@@ -0,0 +1,302 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Microbenchmark and correctness test module for kallsyms subsystem
++ *
++ * Measures CPU latency across:
++ *  - Name-to-Address binary search (hits & misses)
++ *  - Address-to-Name symbol resolution (sprint_symbol, buildid)
++ *  - Full kernel symbol iteration (kallsyms_on_each_symbol)
++ */
++
++#define pr_fmt(fmt) "test_kallsyms: " fmt
++
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/kernel.h>
++#include <linux/kallsyms.h>
++#include <linux/ktime.h>
++#include <linux/compiler.h>
++#include <linux/sched.h>
++#include <linux/math.h>
++#include <linux/mutex.h>
++#include <linux/minmax.h>
++
++#define BENCH_CHUNK_SIZE 4096
++
++static unsigned int num_iters = 100000;
++
++static int param_set_num_iters(const char *val, const struct kernel_param *kp)
++{
++	unsigned int n;
++	int ret;
++
++	ret = kstrtouint(val, 0, &n);
++	if (ret)
++		return ret;
++	if (!n)
++		return -EINVAL;
++
++	*((unsigned int *)kp->arg) = n;
++	return 0;
++}
++
++static const struct kernel_param_ops param_ops_num_iters = {
++	.set = param_set_num_iters,
++	.get = param_get_uint,
++};
++module_param_cb(num_iters, &param_ops_num_iters, &num_iters, 0644);
++MODULE_PARM_DESC(num_iters, "Number of iterations per microbenchmark (must be > 0)");
++
++static bool run_on_boot;
++module_param(run_on_boot, bool, 0444);
++MODULE_PARM_DESC(run_on_boot, "Run benchmark during boot (default: false)");
++
++static DEFINE_MUTEX(bench_lock);
++
++static const char * const hit_symbols[] = {
++	"_printk",
++	"schedule",
++	"vfs_read",
++	"do_sys_openat2",
++	"kernel_clone",
++	"panic",
++	"kallsyms_lookup_names",
++	"vm_area_alloc",
++};
++
++static const char * const miss_symbols[] = {
++	"nonexistent_symbol_0001",
++	"xyz_dummy_missing_symbol",
++	"__never_compiled_in_kernel",
++	"ext4_nonexistent_func_xyz",
++	"bpf_not_real_helper_stub",
++	"vfs_missing_handler_probe",
++	"tcp_v4_unimplemented_path",
++	"driver_fake_init_routine",
++};
++
++static int match_cb(void *data, unsigned long addr)
++{
++	unsigned long *out = data;
++
++	*out = addr;
++	return 1;
++}
++
++static int count_cb(void *data, const char *name, unsigned long addr)
++{
++	unsigned long *cnt = data;
++
++	(*cnt)++;
++	return 0;
++}
++
++static void run_name_lookup_bench(unsigned int iters)
++{
++	u64 t0, t1, dt_hit = 0, dt_miss = 0;
++	unsigned long addr = 0;
++	unsigned int i, nr_hits, nr_misses;
++
++	nr_hits = ARRAY_SIZE(hit_symbols);
++	nr_misses = ARRAY_SIZE(miss_symbols);
++
++	/* 0. Correctness validation */
++	for (i = 0; i < nr_hits; i++) {
++		const char *sym = hit_symbols[i];
++		unsigned long a1 = 0;
++
++		kallsyms_on_each_match_symbol(match_cb, sym, &a1);
++		if (!a1)
++			pr_err("CORRECTNESS FAILURE: hit sym '%s' not found\n", sym);
++	}
++	for (i = 0; i < nr_misses; i++) {
++		const char *sym = miss_symbols[i];
++		unsigned long a1 = 0;
++
++		kallsyms_on_each_match_symbol(match_cb, sym, &a1);
++		if (a1)
++			pr_err("CORRECTNESS FAILURE: miss sym '%s' unexpectedly found a1=%lx\n",
++			       sym, a1);
++	}
++
++	/* 1. Name search: Existing symbols (Hits) */
++	for (i = 0; i < iters; i += BENCH_CHUNK_SIZE) {
++		unsigned int chunk = min_t(unsigned int, BENCH_CHUNK_SIZE, iters - i);
++		unsigned int j;
++
++		cond_resched();
++		t0 = ktime_get_ns();
++		for (j = 0; j < chunk; j++) {
++			const char *sym = hit_symbols[(i + j) % nr_hits];
++
++			kallsyms_on_each_match_symbol(match_cb, sym, &addr);
++			OPTIMIZER_HIDE_VAR(addr);
++		}
++		t1 = ktime_get_ns();
++		dt_hit += t1 - t0;
++	}
++
++	/* 2. Name search: Non-existent symbols (Misses - 17 bsearch probes) */
++	for (i = 0; i < iters; i += BENCH_CHUNK_SIZE) {
++		unsigned int chunk = min_t(unsigned int, BENCH_CHUNK_SIZE, iters - i);
++		unsigned int j;
++
++		cond_resched();
++		t0 = ktime_get_ns();
++		for (j = 0; j < chunk; j++) {
++			const char *sym = miss_symbols[(i + j) % nr_misses];
++
++			kallsyms_on_each_match_symbol(match_cb, sym, &addr);
++			OPTIMIZER_HIDE_VAR(addr);
++		}
++		t1 = ktime_get_ns();
++		dt_miss += t1 - t0;
++	}
++
++	pr_info("Name Search Hit:  %llu ns/lookup (%llu ms total, %u iters)\n",
++		div_u64(dt_hit, iters), div_u64(dt_hit, 1000000), iters);
++	pr_info("Name Search Miss: %llu ns/lookup (%llu ms total, %u iters)\n",
++		div_u64(dt_miss, iters), div_u64(dt_miss, 1000000), iters);
++}
++
++static void run_address_lookup_bench(unsigned int iters)
++{
++	u64 t0, t1, dt_sprint = 0, dt_bldid = 0;
++	char symname[KSYM_SYMBOL_LEN];
++	unsigned long addrs[ARRAY_SIZE(hit_symbols)];
++	unsigned int i, nr_addrs = 0;
++
++	for (i = 0; i < ARRAY_SIZE(hit_symbols); i++) {
++		unsigned long addr = 0;
++
++		kallsyms_on_each_match_symbol(match_cb, hit_symbols[i], &addr);
++		if (addr)
++			addrs[nr_addrs++] = addr;
++	}
++
++	if (!nr_addrs) {
++		pr_warn("Address benchmark skipped: no test addresses resolved\n");
++		return;
++	}
++
++	/* 1. Address-to-name resolution (sprint_symbol) */
++	for (i = 0; i < iters; i += BENCH_CHUNK_SIZE) {
++		unsigned int chunk = min_t(unsigned int, BENCH_CHUNK_SIZE, iters - i);
++		unsigned int j;
++
++		cond_resched();
++		t0 = ktime_get_ns();
++		for (j = 0; j < chunk; j++) {
++			unsigned long addr = addrs[(i + j) % nr_addrs];
++
++			sprint_symbol(symname, addr);
++			barrier_data(symname);
++		}
++		t1 = ktime_get_ns();
++		dt_sprint += t1 - t0;
++	}
++
++	/* 2. Address without offset (sprint_symbol_no_offset) */
++	for (i = 0; i < iters; i += BENCH_CHUNK_SIZE) {
++		unsigned int chunk = min_t(unsigned int, BENCH_CHUNK_SIZE, iters - i);
++		unsigned int j;
++
++		cond_resched();
++		t0 = ktime_get_ns();
++		for (j = 0; j < chunk; j++) {
++			unsigned long addr = addrs[(i + j) % nr_addrs];
++
++			sprint_symbol_no_offset(symname, addr);
++			barrier_data(symname);
++		}
++		t1 = ktime_get_ns();
++		dt_bldid += t1 - t0;
++	}
++
++	pr_info("sprint_symbol:           %llu ns/lookup (%llu ms total, %u iters)\n",
++		div_u64(dt_sprint, iters), div_u64(dt_sprint, 1000000), iters);
++	pr_info("sprint_symbol_no_offset: %llu ns/lookup (%llu ms total, %u iters)\n",
++		div_u64(dt_bldid, iters), div_u64(dt_bldid, 1000000), iters);
++}
++
++static void run_table_walk_bench(void)
++{
++	u64 t0, t1, dt_walk = 0;
++	unsigned long total_symbols = 0;
++	int iter = 50;
++	int i;
++
++	for (i = 0; i < iter; i++) {
++		total_symbols = 0;
++		cond_resched();
++		t0 = ktime_get_ns();
++		kallsyms_on_each_symbol(count_cb, &total_symbols);
++		t1 = ktime_get_ns();
++		dt_walk += t1 - t0;
++	}
++
++	pr_info("Table Full Walk:  %llu ns/sym (%llu us/pass, %lu symbols scanned, %d passes)\n",
++		div_u64(div_u64(dt_walk, iter), total_symbols ? total_symbols : 1),
++		div_u64(div_u64(dt_walk, iter), 1000), total_symbols, iter);
++}
++
++static int run_kallsyms_benchmark(void)
++{
++	unsigned int iters;
++	int ret = 0;
++
++	if (!mutex_trylock(&bench_lock)) {
++		pr_warn("Benchmark already running\n");
++		return -EBUSY;
++	}
++
++	iters = READ_ONCE(num_iters);
++	if (!iters) {
++		pr_err("num_iters must be non-zero\n");
++		ret = -EINVAL;
++		goto out;
++	}
++
++	pr_info("==================================================\n");
++	pr_info("Starting kallsyms performance benchmark (iters=%u)\n", iters);
++	pr_info("==================================================\n");
++
++	run_name_lookup_bench(iters);
++	run_address_lookup_bench(iters);
++	run_table_walk_bench();
++
++	pr_info("==================================================\n");
++	pr_info("kallsyms benchmark complete\n");
++	pr_info("==================================================\n");
++
++out:
++	mutex_unlock(&bench_lock);
++	return ret;
++}
++
++static int param_set_trigger(const char *val, const struct kernel_param *kp)
++{
++	if (system_state < SYSTEM_RUNNING) {
++		pr_warn("Early boot run ignored; use test_kallsyms_perf.run_on_boot=1 or trigger via sysfs\n");
++		return 0;
++	}
++	return run_kallsyms_benchmark();
++}
++
++static const struct kernel_param_ops param_ops_trigger = {
++	.set = param_set_trigger,
++};
++module_param_cb(run_test, &param_ops_trigger, NULL, 0200);
++MODULE_PARM_DESC(run_test, "Write 1 to trigger kallsyms benchmark run");
++
++static int __init test_kallsyms_init(void)
++{
++	if (run_on_boot)
++		return run_kallsyms_benchmark();
++	return 0;
++}
++late_initcall(test_kallsyms_init);
++
++MODULE_DESCRIPTION("Microbenchmark test module for kallsyms subsystem");
++MODULE_AUTHOR("Jim Cromie <jim.cromie@gmail.com>");
++MODULE_LICENSE("GPL");
 
-Best regards,
 -- 
-Jim Cromie <jim.cromie@gmail.com>
+2.55.0
 
