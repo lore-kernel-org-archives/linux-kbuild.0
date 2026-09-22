@@ -1,282 +1,257 @@
-Received: from mail-wm2-f13.google.com (mail-wm2-f13.google.com [74.125.225.141])
+Received: from mail-oi2-f13.google.com (mail-oi2-f13.google.com [74.125.231.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2762D568FD1
-	for <linux-kbuild@vger.kernel.org>; Tue, 22 Sep 2026 16:38:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD48047427E
+	for <linux-kbuild@vger.kernel.org>; Tue, 22 Sep 2026 18:46:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790095093; cv=none; b=ZXFDt6FlGEXv9TE8a6DJqArFlq62WkklUOj4rZEX7SzMNLfeMBmN2v1fpU6Xmp5rAod116KA0DklcLC9PdynjbbDCossBPRAYamoCSvOQXrTHDYIXh+/wPfiV6mggLSZSw2njTs9/n0XzbJK+x8Yr26eaidK2kz77VCa3iJkDDg=
+	t=1790102775; cv=none; b=jsYCYzq1RKljdzBxEsNIO5l3Y+HzvGIyuoLFp/GhAe2GIMgn3NNa5BmqP1yDyRo6jJ9oTNMOmQCDXBgVIXf9+Hu1H5F6uFAvqM3/QSLnKsonNOQKgYJl7LBdivWPKwBHvY0izMUSH2XI79gQCM1oVFiVXfiwCFWsVsZFhxwisTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790095093; c=relaxed/simple;
-	bh=+vdQOYNoT2/4AybnkPVeBNE954BroQC709/zWsUcbhE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XZ4/2b3S3hGk/134t0Gtxbg2ntO+IK/6ueh12A5arRB0vfG2LvDv5rQLikrd3+zokh7NNajTP9BNmRoN7Q86J9JTBWarQlzSwOOvQmXbw+jb5Na5A+qHz5c7LbWSnCva7jvGB8TBKJWkeA4BNCX6KtCpd+Wvd29v7OpWqfae+GM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ODOySnok; arc=none smtp.client-ip=74.125.225.141
+	s=arc-20240116; t=1790102775; c=relaxed/simple;
+	bh=oAENUtHNZGzOjoVpDfIN16vMYj0LR5VAUfLomF6ACKo=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=hx0xyh8p7VUL/aTKhZI4zqIuUAWz4uX+LvMWxKmyZBsPToIYjxd1hObBg7DaxXroKfCvDOPLyXRm7+IcUTl/JX+v/s01Xc0ntdaHl7EStumr8//gIOQHtnwH3xsn6GCbGpqah1PoK0bEEuMRm5aa1VjwQ+Ir07azjOLS5jhsutY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MdQx9Jmt; arc=none smtp.client-ip=74.125.231.205
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ODOySnok"
-Received: by mail-wm2-f13.google.com with SMTP id 5b1f17b1804b1-49b912e2406so22892565e9.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 22 Sep 2026 09:38:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MdQx9Jmt"
+Received: by mail-oi2-f13.google.com with SMTP id 5614622812f47-4c2c368cb3bso134875b6e.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 22 Sep 2026 11:46:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790095080; x=1790699880; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=9hUAfprr9v8IFH2x2CAQd6Eglv3s0TfIGiBIbKZDYSs=;
-        b=ODOySnokcg7GJx8GXSViqwspSW9WzERKxzb9UG2BHz2LXoh6FUESgaBBUghoFJtbfN
-         Z/hYlHl47aPcGkcwxUkpmOGn9/jYJxNB6oUVAoaxDbtnrQEnX7K9Imx2fI2suaxltou7
-         IKR8pWlAviiACk18mlYePkhgjhTdPkn0j7VEuYOf29vdhdzQp+vL0T3ZKV0xjasfeH5V
-         Ijeca9+aX1JV3sQP/mCofZPL6H23W44y/Wxc/je4aeGLH3kqKeZihRNfE4UYKYTKQmHs
-         py/JQRJzA3YTjJ9rF2rPbm0AddqmzJWobEj7xTl4d5ubmSnOcdeDJsQrGazYR9OAVDDR
-         0Mqw==
+        d=gmail.com; s=20251104; t=1790102763; x=1790707563; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=gB5tOgoEaFDK8N9Ks2VO0xH4kl9YCg+Zqnb1wxNdK4o=;
+        b=MdQx9Jmt6IN3CMBqSdoSxdlZWxuyZqSbMSC7x33fdBCxb8QzzS++u8jOpr+IV926IS
+         0l3QIAy9JH7HFhRk1Ksz0q4BpLSf1ASL4wwocAhZQx10u83H1Qr4l6waIGTARglyMfHB
+         WZlqmv8XaoPhnuuJ2V2SjXzf2Xqvj+W1u/p23QrlcXCh8Ea83Z7LBNRxgH+9dAUXpCeU
+         RWkoy62Gr6io8Az9Hi9obgeS6T4AJDyzwBCYKWbQ89XKoKeoH69kQC02oMaTm2eXKYJm
+         rwmA4lX9p/ekog/D0SVsbr233GZ6YYKIXxiB2I0zCfufO5+eaxJ3PScjnvSSUd/rXhIM
+         mFZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790095080; x=1790699880;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:sender:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=9hUAfprr9v8IFH2x2CAQd6Eglv3s0TfIGiBIbKZDYSs=;
-        b=a4E7eUXxAlT/2ZMP0uaXjjryQ3xysNGkUqZ3d/Z0hvBlvo0X8GVapDJ1nmk5AE5Ctf
-         QRHKkQlWVNGOclsX6J6KU+3XW9MXX9DfOrO6JlWxUrG1ypeP69cAZzhgBJsNcRpClvLI
-         C4SqxynGqAZki2lzXrInTEPgFJN5VyPnu/BvieU1jP2c0NL4dCdWdOnYJ5YkoHX4HJZi
-         LOLbvpsh4zWD+6WLOGXToCxcwdt1AEb7wW0fuowKIgIkh8KNgMbOBnK2zQYeCBDCuPR6
-         ZJC/4Mwnm+YmEQV8cn015snVdPqOLoJUr63rayP3ORTgBloxqWK9hq9u1U5UShsg5o9O
-         qWVw==
-X-Forwarded-Encrypted: i=1; AKwUvBwLOcSv7MEEu3eM3Tga9tfCquwXpSYdsERNNuNJUfzrPULqYOzg/SKewvQE8cRDVCGISxt3JT/qkezP008=@vger.kernel.org
-X-Gm-Message-State: AFuF++kT6lg28uPEqAmoKXwpmGyI6PR+5libEXMQGz7hHRvSK3DsGI1a
-	lY9F/qaadqAPcF6FBQtFJzdlAVOuMRGk2ezGfXfj2XKwcn79B8NOCGZt
-X-Gm-Gg: AYBFou1GHr6WSb1g0E+s+F3j/3c7SlVzk0ew4T9nlN35WPTLKxg7X2Yh+dA1ESPA38v
-	+npadhQ1QUxkSNbOHMbsOJM9aTG26M0FtMHlcCQ+RNysdbLhjPb7kmmu4TulSXkJgBxYTEJ82ht
-	Fd3xqKlBXnXpILoWv9P8B596nJir+EqCTVDZjRfkzHMZs9VZFxcwTPsM7tem3xXgYlDtmLWIwwF
-	HapDoFHFTrbjXv+mXZI2smQEFc8mfnrJ9N/eNBPdEzPzYaTAnPGs8DjYfJ//4HAlWbfS2VsYlhH
-	s2YwqErtRmLcNh7ygIrk7qkv50UsHtWvFCdqYM6tMer8CkVkENIvIwNQTO2pN9uaoCpdxVoATAw
-	DnVvI3q4KsbzG0wMEHB0wxOK0S43y5yWQiwUg04mnL+bESEviNn3mc888psra4yEIKDJQHTA4s6
-	x67a8WooeGENcMUFak4wi8VDaaUEcpBTWUNhD+JI/Snuiouz15YtVyPN49MtnfCN2aJuUdYVuDZ
-	PsQqxVxWdim2rmdnBwO/fvyqrQSTBt3oPVsVE3sn3yE9M7pDnJpG1J7EJ5wIeS3fMkrOqh6Ow==
-X-Received: by 2002:a05:600c:34c1:b0:49f:ddbd:1f51 with SMTP id 5b1f17b1804b1-49fde4a12dcmr404345e9.15.1790095080158;
-        Tue, 22 Sep 2026 09:38:00 -0700 (PDT)
-Received: from nixos-office (195-23-151-163.net.novis.pt. [195.23.151.163])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48862773ee0sm6162192f8f.6.2026.09.22.09.37.59
+        d=1e100.net; s=20260707; t=1790102763; x=1790707563;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=gB5tOgoEaFDK8N9Ks2VO0xH4kl9YCg+Zqnb1wxNdK4o=;
+        b=jDSsdjTpXGXyBg4lrDv23NAj9ilkPdh3ru0p/sNFfTQLoXezNfbjuuwwP+jzSeZ2Ui
+         ZmC+yx6D/G7lJnCir+iorxG2tnvGon0Odk2sTPSIhneGFDHIcJrSwf2iYVPt1a7B8Uz/
+         5i29gulc5ci75t8nFq3pHGgJHKCEebZYNlg+vlZajExrNcxyKkfWAmGiPF5fqRjAzbJs
+         WbO7kg592IpIzfNiwbES5GnJBowKqOEqzym4yF976cb2ewFu1jHrhNCExmOOqyMuF4qt
+         YSAf9EfLFf9ipUtT1tsDxqV/IGn7B55dURcXi8+bXRVf1kWz15eLZcsKmem24BcUIvGa
+         GbdQ==
+X-Forwarded-Encrypted: i=1; AKwUvBxFfCeY10SZNE5cWB9Th4SkidmKn6u6mtxsbuFA+aCxULYlYke0GWDQpisCvt3iVx9iWSg77FS3fpIqsvc=@vger.kernel.org
+X-Gm-Message-State: AFuF++mUhd9YoqdLTmcwEer1TCTgAY7x893ntP0z5TusAiPwNCfaV3EI
+	NVsSiu0Kywg2eghNh9ilNcV/XuMX/J7ISehYkYxTJmno+fXqUcv/M8iD
+X-Gm-Gg: AYBFou3cKRKQO6x3/d/mR3EbYZtU/dXA7DfyVFZOeAokT5bUHxamF5QghzAfP/zA1dF
+	1WaxIlHMs0+lOK0eLB/vsU9YQWF8dCIbKkfZOeAIgC1y7hXCQybPWvEA54rlFoiH5Cnyawv+UC+
+	VO3EML82drwWFzQG+MeOdOR20g5R9cj2b1heO8NjLmMK+Wf975RqcrkXdVRc6VlZVLXeaxKQHLl
+	AsB9mSrRQYA8DS43gxRUE2QH4BXXiV3/Ps7duBVDnxOEUUzp19dcEpomhMHVFYrDJJi5jMXPLQC
+	TeRHp9ujnLF9y9SeU5awBiXpe7ZToKarhQbN+t0Yqs5h9jMRPl7hkpYutlDf5BgWgVHoAdHcxRE
+	o2KQekPEVjXTuDw3b4hTDvWOQwuuindmblhKwmaQEaVGktM7f9xASsnhQGurmTWDIXkBE5GU1ti
+	0fUYNZeIq1zpfWxj16pMtmC7sUx8jH0peMES5a4olhSZYlmoQag1vTmlmZFNsOfOfryYSKhMI24
+	jTxGPeJZF0WfqppKmgHkp1ILVXz+xL15DVQabgakHyj72nbPsgY4CwIYCIbUh0EHEH8VfJ8eOPB
+	2DwXbIAljkGY2q4PVM96sIXBU4KnYA==
+X-Received: by 2002:a05:6808:3503:b0:4cb:f21b:6f88 with SMTP id 5614622812f47-4d5b8abd1e2mr295561b6e.27.1790102763080;
+        Tue, 22 Sep 2026 11:46:03 -0700 (PDT)
+Received: from [100.82.231.29] (c-98-38-17-99.hsd1.co.comcast.net. [98.38.17.99])
+        by smtp.googlemail.com with ESMTPSA id 5614622812f47-4d5c43a24bbsm147545b6e.7.2026.09.22.11.46.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Sep 2026 09:37:59 -0700 (PDT)
-Sender: Julian Braha <julian.braha@gmail.com>
-From: Julian Braha <julianbraha@gmail.com>
-To: nathan@kernel.org,
-	nsc@kernel.org
-Cc: n.schier@fritz.com,
-	grahamr@qti.qualcomm.com,
-	rdunlap@infradead.org,
-	nico@fluxnic.net,
-	linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Julian Braha <julianbraha@gmail.com>
-Subject: [PATCH 2/2] kconfig: error on reverse range
-Date: Tue, 22 Sep 2026 17:37:49 +0100
-Message-ID: <20260922163749.2031594-3-julianbraha@gmail.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260922163749.2031594-1-julianbraha@gmail.com>
-References: <20260922163749.2031594-1-julianbraha@gmail.com>
+        Tue, 22 Sep 2026 11:46:02 -0700 (PDT)
+From: Jim Cromie <jim.cromie@gmail.com>
+Subject: [PATCH v3 0/4] kallsyms: Accelerate symbol name lookups by ~19x
+Date: Tue, 22 Sep 2026 12:45:54 -0600
+Message-Id: <20260922-ksyms-tune-v3-0-681a34ea05d9@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/23MQQ6CMBCF4auQWVtDpyrgynsYF5N2hIkCpsVGQ
+ ri7hRUmLt9Lvn+CwF44wDmbwHOUIH2XhtllYBvqalbi0gbM8ZRXulKPMLZBDe+OFSPSAV1JRhM
+ k8PJ8l88au97SbiQMvR/XdtTL+zcTtcqVK4+2KhxpMnipW5Ln3vYtLJmIG4r4QzFRMsYwG81ki
+ y2d5/kL3lDdG98AAAA=
+X-Change-ID: 20260919-ksyms-tune-e22a42d8a31a
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Lorenzo Stoakes <ljs@kernel.org>, Kees Cook <kees@kernel.org>, 
+ David Laight <david.laight.linux@gmail.com>, 
+ Masahiro Yamada <masahiroy@kernel.org>, linux-kernel@vger.kernel.org, 
+ linux-kbuild@vger.kernel.org, bpf@vger.kernel.org, 
+ Jim Cromie <jim.cromie@gmail.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1790102761; l=8592;
+ i=jim.cromie@gmail.com; s=20260203; h=from:subject:message-id;
+ bh=oAENUtHNZGzOjoVpDfIN16vMYj0LR5VAUfLomF6ACKo=;
+ b=555/26vJQV0yHRiU1ZShyhlhooWSumRIT1vA0/yV9IKqp8/9Z4TH7YvoTNSb82vZ4vVeyZOBN
+ EO6/WVaR3NqCfLNWXCwX6gI7T2AroXUwA9tow/HEVyP+PMZBHW4oIZO
+X-Developer-Key: i=jim.cromie@gmail.com; a=ed25519;
+ pk=C6E5ODlPQo7ZBynATXH9wg7K6HxP0pIXyf4s38Qw0XE=
 
-As discussed on kconfirm v4 [1], it was decided to move checks directly
-into the kconfig interpreter once where are no findings from kconfirm.
-This "reverse range" currently has no findings across the tree, so let's
-add the check.
+kallsyms_lookup_names() resolves symbol names to addresses using a
+17-step binary search over kallsyms_names[] (~184k symbols on x86_64).
+At each step of the search, two bottlenecks compound to create
+substantial lookup latency:
 
-Currently, if a reverse range is attempted, such as:
+0. Redundant string expansion: kallsyms_expand_symbol() decompresses
+   the entire candidate symbol into a 512-byte stack buffer (namebuf)
+   before calling strcmp(), even though ~94% of binary search probes
+   mismatch on the first 1-2 characters (~580 ns per lookup).
 
-    config EXAMPLE
-        int "Reverse range example"
-        range 2 1
+1. Marker scanning: get_symbol_offset() scans sequentially from the
+   nearest 256-symbol marker in kallsyms_names[], decoding an average
+   of ~128 ULEB128 record headers per probe (~2,176 header decodes,
+   consuming ~3,230 ns per lookup).
 
-then the value of the option defaults to its "lower" limit of 2. If the
-option is visible in the frontend, then the user gets trapped in the value
-selection interface, since there is no value that is actually valid for
-the user to set.
+Together, these bottlenecks impose a ~3.8 us latency penalty per hit and
+~3.6 us per miss.
 
-Note that this only checks ranges that use constant values. Statically
-checking ranges using symbols would require SAT solving, or similar.
+This 4-patch series eliminates both overheads in a structured
+progression while keeping the symbol table strictly in sequential
+address order and adding 0 bytes to .rodata:
 
-Link: https://lore.kernel.org/all/20260904220559.GB2787252@ax162/ [1]
-Assisted-by: LLM
-Signed-off-by: Julian Braha <julianbraha@gmail.com>
+0. Patch 1 adds lib/test_kallsyms_perf, a microbenchmark module built
+   directly into vmlinux (CONFIG_TEST_KALLSYMS_PERF=bool) to benchmark
+   unindexed vs dynamic indexed name searches, address resolution, and
+   table iteration latency without exporting internal kallsyms iterators
+   to loadable modules.
+
+1. Patch 2 introduces kallsyms_strcmp_symbol() to compare ASCII queries
+   against compressed tokens on the fly, bailing out on the first
+   mismatched character without expanding subsequent tokens.  This drops
+   the 512-byte namebuf buffer from the kernel stack and saves ~530 ns
+   per lookup on unmodified marker infrastructure.
+
+2. Patch 3 introduces a dynamic u32 lookup index bracketed by
+   kallsyms_lookup_batch_start() and kallsyms_lookup_batch_end().
+   It allocates ~736 KiB in transient RAM via kvmalloc_array() only
+   while bulk workloads (BPF attach, module loading) run, resolves
+   each probe in O(1) with 0 hops, and leaves .rodata bloat at exactly
+   0 bytes while retaining kallsyms_markers[] as fallback.  Both
+   test_kallsyms_perf and kallsyms_selftest are updated to benchmark
+   batch resolution side-by-side.
+
+3. Patch 4 inlines and unrolls get_symbol_seq() 24-bit sequence index
+   reconstruction into direct byte shifts, eliminating loop overhead
+   on inner binary search probes.
+
+Live Microbenchmark Progression (via test_kallsyms_perf, 100k iters):
+
+Metric                    Baseline (1)   Token Match (2)   Batch Index (3)   Total Speedup
+------------------------------------------------------------------------------------------
+Name Search Hit           3,811 ns       3,280 ns          246 ns            15.5x
+Name Search Miss          3,625 ns       3,095 ns          196 ns            18.5x
+sprint_symbol               412 ns         412 ns          412 ns            parity
+sprint_symbol_no_offset     300 ns         300 ns          300 ns            parity
+Table Full Walk           13,626 us      13,626 us       13,626 us           parity
+Kernel stack buffer        512 B            0 B             0 B              -512 B
+
+In-Tree Selftest Verification (CONFIG_KALLSYMS_SELFTEST, 184k symbols):
+
+In addition to test_kallsyms_perf, the existing upstream selftest in
+kernel/kallsyms_selftest.c was run across all 183,990 symbols on boot,
+repeating all tests inside an active batch window:
+
+Metric                          Unindexed (markers)    Batch Index (active)   Delta
+-----------------------------------------------------------------------------------
+kallsyms_lookup_name() (avg)    3,926 ns               675 ns                 5.8x faster
+kallsyms_lookup_name() (min)      311 ns               171 ns                 1.8x faster
+on_each_match_symbol()          3,507 ns             1,142 ns                 3.1x faster
+kallsyms_on_each_symbol()       14.7 ms               15.5 ms                 parity
+Basic function validation       PASS                  PASS                    100% correct
+Batch setup (184k entries)       N/A                 1,037 us                 ~1.0 ms
+Batch teardown (sync RCU)        N/A                 3,440 us                 ~3.4 ms
+
+Address-to-name resolution (sprint_symbol) and sequential table walks
+(/proc/kallsyms) remain completely unaffected, maintaining full L1/L2
+hardware prefetching.
+
+Memory footprint: +0 KiB .rodata added to kernel image.  Transient RAM
+is ~736 KiB (184k * 4 bytes) allocated only during active batch
+lookup sessions.
+
+Signed-off-by: Jim Cromie <jim.cromie@gmail.com>
 ---
- scripts/kconfig/menu.c                        | 22 ++++-
- .../tests/err_num_reverse_range/Kconfig       | 86 +++++++++++++++++++
- .../tests/err_num_reverse_range/__init__.py   |  8 ++
- .../err_num_reverse_range/expected_stderr     |  7 ++
- 4 files changed, 119 insertions(+), 4 deletions(-)
- create mode 100644 scripts/kconfig/tests/err_num_reverse_range/Kconfig
- create mode 100644 scripts/kconfig/tests/err_num_reverse_range/__init__.py
- create mode 100644 scripts/kconfig/tests/err_num_reverse_range/expected_stderr
+Changes in v3:
+- Reorder series: place on-the-fly token matching (patch 2) ahead of
+  dynamic batch lookup index (patch 3), establishing an active proof of
+  incremental performance deltas across all steps (addresses David
+  Laight review).
+- Add patch 4: inline and unroll get_symbol_seq() 24-bit sequence index
+  reconstruction into direct byte shifts (addresses David Laight
+  review).
+- In patch 1, configure CONFIG_TEST_KALLSYMS_PERF as a built-in test
+  (bool) rather than a module (tristate) and drop kallsyms iterator
+  EXPORT_SYMBOL_GPL exports to avoid exposing internal kernel symbol
+  data (addresses Sashiko AI review).
+- In patch 2, optimize kallsyms_strcmp_symbol() by dropping
+  skipped_first tracking and checking len at the bottom of the token
+  loop (addresses David Laight review).
+- In patch 3, rely on get_symbol_data() helper introduced in patch 2 to
+  preserve bisectability (addresses Sashiko AI review).
+- In patch 3, fix use-after-free race on dyn_kallsyms_offsets: bracket
+  table dereference and array read with rcu_read_lock() and replace
+  rcu_dereference_raw() with rcu_dereference() inside
+  get_symbol_offset() to protect external readers (lookup_symbol_name,
+  kallsyms_lookup_buildid, reset_iter) against concurrent batch
+  teardown (addresses Sashiko AI review).
+- In patch 3, update kallsyms_selftest to add a second lookup pass
+  bracketed by batch start/end to report batch latency in the in-tree
+  selftest.
+- Drop 'default m' from lib/Kconfig.debug.
+- Fix soft lockup risks by adding cond_resched() every 16k iterations in
+  test_kallsyms_perf loops.
+- Replace direct 64-bit integer divisions with div_u64() to fix 32-bit
+  builds.
+- Guard against divide-by-zero when num_iters=0.
+- Replace tcp_v4_rcv with panic in hit_symbols to prevent failures wo
+  CONFIG_INET.
+- Add batch lookup setup/teardown timing and query amortization
+  break-even logging to test_kallsyms_perf.
+- Move David Laight to series-wide Cc on cover letter, dropping trailer
+  from patch 3.
+- Link to v2: https://lore.kernel.org/r/20260922-ksyms-tune-v2-0-a333ee31eac7@gmail.com
 
-diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-index 118af2dde722..cc335f6db257 100644
---- a/scripts/kconfig/menu.c
-+++ b/scripts/kconfig/menu.c
-@@ -274,9 +274,9 @@ static int menu_validate_number(struct symbol *sym, struct symbol *sym2,
- static int sym_check_prop(struct symbol *sym)
- {
- 	struct property *prop;
--	struct symbol *sym2;
-+	struct symbol *sym2, *lower, *upper;
- 	char *use;
--	int errors = 0;
-+	int errors = 0, numeric_errors = 0;
- 
- 	for (prop = sym->prop; prop; prop = prop->next) {
- 		switch (prop->type) {
-@@ -325,8 +325,22 @@ static int sym_check_prop(struct symbol *sym)
- 			if (sym->type != S_INT && sym->type != S_HEX)
- 				prop_warn(prop, "range is only allowed "
- 						"for int or hex symbols");
--			errors += menu_validate_number(sym, prop->expr->left.sym, prop);
--			errors += menu_validate_number(sym, prop->expr->right.sym, prop);
-+			lower = prop->expr->left.sym;
-+			upper = prop->expr->right.sym;
-+			numeric_errors += menu_validate_number(sym, lower, prop);
-+			numeric_errors += menu_validate_number(sym, upper, prop);
-+			errors += numeric_errors;
-+			if (numeric_errors || lower->type != S_UNKNOWN || upper->type != S_UNKNOWN)
-+				break;
-+
-+			if ((sym->type == S_INT &&
-+				strtoll(lower->name, NULL, 10) > strtoll(upper->name, NULL, 10)) ||
-+				(sym->type == S_HEX &&
-+				strtoull(lower->name, NULL, 16) > strtoull(upper->name, NULL, 16))) {
-+				prop_err(prop, "range lower limit '%s' is greater than upper limit '%s'",
-+					lower->name, upper->name);
-+				errors++;
-+			}
- 			break;
- 		default:
- 			;
-diff --git a/scripts/kconfig/tests/err_num_reverse_range/Kconfig b/scripts/kconfig/tests/err_num_reverse_range/Kconfig
-new file mode 100644
-index 000000000000..064586597e50
---- /dev/null
-+++ b/scripts/kconfig/tests/err_num_reverse_range/Kconfig
-@@ -0,0 +1,86 @@
-+# SPDX-License-Identifier: GPL-2.0
-+# Check constant range bounds.
-+
-+config INT_ORDERED
-+	int
-+	range -10 10
-+
-+config INT_EQUAL
-+	int
-+	range 5 5
-+
-+config HEX_ORDERED
-+	hex
-+	range 0x7fffffffffffffff 0xffffffffffffffff
-+
-+config HEX_EQUAL
-+	hex
-+	range 0xffffffffffffffff 0xffffffffffffffff
-+
-+# Skip ranges with symbolic bounds.
-+
-+config INT_LOWER
-+	int
-+
-+config INT_UPPER
-+	int
-+
-+config INT_SYMBOL_LOWER
-+	int
-+	range INT_LOWER 0
-+
-+config INT_SYMBOL_UPPER
-+	int
-+	range 0 INT_UPPER
-+
-+config INT_SYMBOL_BOTH
-+	int
-+	range INT_LOWER INT_UPPER
-+
-+config HEX_LOWER
-+	hex
-+
-+config HEX_UPPER
-+	hex
-+
-+config HEX_SYMBOL_LOWER
-+	hex
-+	range HEX_LOWER 0x0
-+
-+config HEX_SYMBOL_UPPER
-+	hex
-+	range 0x0 HEX_UPPER
-+
-+config HEX_SYMBOL_BOTH
-+	hex
-+	range HEX_LOWER HEX_UPPER
-+
-+# Reject reversed constant bounds.
-+
-+config INT_REVERSED
-+	int
-+	range 10 2
-+
-+config INT_REVERSED_NEGATIVE
-+	int
-+	range -1 -10
-+
-+config INT_REVERSED_SIGNED
-+	int
-+	range 1 -1
-+
-+config INT_REVERSED_QUOTED
-+	int
-+	range "8" "2"
-+
-+config HEX_REVERSED
-+	hex
-+	range 0x10 0xf
-+
-+config HEX_REVERSED_HIGH
-+	hex
-+	range 0xffffffffffffffff 0x8000000000000000
-+
-+config HEX_REVERSED_UNPREFIXED
-+	hex
-+	range f a
-diff --git a/scripts/kconfig/tests/err_num_reverse_range/__init__.py b/scripts/kconfig/tests/err_num_reverse_range/__init__.py
-new file mode 100644
-index 000000000000..4a7219bbe49e
---- /dev/null
-+++ b/scripts/kconfig/tests/err_num_reverse_range/__init__.py
-@@ -0,0 +1,8 @@
-+# SPDX-License-Identifier: GPL-2.0
-+"""
-+Reject constant range bounds when the lower bound is greater than the upper.
-+"""
-+
-+def test(conf):
-+    assert conf.olddefconfig() == 1
-+    assert conf.stderr_matches('expected_stderr')
-diff --git a/scripts/kconfig/tests/err_num_reverse_range/expected_stderr b/scripts/kconfig/tests/err_num_reverse_range/expected_stderr
-new file mode 100644
-index 000000000000..c06edc48547d
---- /dev/null
-+++ b/scripts/kconfig/tests/err_num_reverse_range/expected_stderr
-@@ -0,0 +1,7 @@
-+Kconfig:62:error: range lower limit '10' is greater than upper limit '2'
-+Kconfig:66:error: range lower limit '-1' is greater than upper limit '-10'
-+Kconfig:70:error: range lower limit '1' is greater than upper limit '-1'
-+Kconfig:74:error: range lower limit '8' is greater than upper limit '2'
-+Kconfig:78:error: range lower limit '0x10' is greater than upper limit '0xf'
-+Kconfig:82:error: range lower limit '0xffffffffffffffff' is greater than upper limit '0x8000000000000000'
-+Kconfig:86:error: range lower limit 'f' is greater than upper limit 'a'
+Changes in v2:
+- Replaced static build-time 3-byte offset table with a dynamic u32
+  index bracketed by kallsyms_lookup_batch_start() and
+  kallsyms_lookup_batch_end().
+- Dropped .rodata image footprint addition from +573 KiB to 0 KiB,
+  addressing Kees Cook's memory footprint objection.
+- Native u32 loads in transient RAM eliminate 24-bit big-endian shifts
+  and unaligned loads, addressing David Laight's endianness critique.
+- Direct O(1) table indexing provides 0 hops for all symbol lookups
+  without remainder logic or odd/even branching.
+- Restored scripts/kallsyms.c and kernel/kallsyms_internal.h to pristine
+  state, leaving legacy kallsyms_markers[] as safety fallback.
+- Rebased out Lorenzo Stoakes' kbuild series; this series is now
+  completely decoupled and applies cleanly directly onto mainline.
+- Updated test_kallsyms_perf to benchmark unindexed marker scans and
+  dynamic index side by side in a single run.
+- Link to v1: https://lore.kernel.org/r/20260919-ksyms-tune-v1-0-d85c97da1a32@gmail.com
+
+---
+Jim Cromie (4):
+      kallsyms: Add test_kallsyms_perf module to benchmark lookup latency
+      kallsyms: Match compressed tokens on the fly during binary search
+      kallsyms: Add dynamic lookup index for batch resolution
+      kallsyms: Unroll 24-bit sequence reconstruction in get_symbol_seq()
+
+ include/linux/kallsyms.h   |  13 +++
+ kernel/kallsyms.c          | 213 ++++++++++++++++++++++++++--------
+ kernel/kallsyms_selftest.c |  16 +++
+ lib/Kconfig.debug          |  10 ++
+ lib/Makefile               |   1 +
+ lib/test_kallsyms_perf.c   | 281 +++++++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 488 insertions(+), 46 deletions(-)
+---
+base-commit: 93f51579e7df248780214094418f205253383cc5
+change-id: 20260919-ksyms-tune-e22a42d8a31a
+
+Best regards,
 -- 
-2.55.0
+Jim Cromie <jim.cromie@gmail.com>
 
