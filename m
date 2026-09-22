@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9115478859;
-	Tue, 22 Sep 2026 09:06:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4C6E4E7816;
+	Tue, 22 Sep 2026 09:44:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790067976; cv=none; b=jR7aQk2jrCWJa0+lYQY/Zm12J53fxWgf6QM/bXOXMGCPNWcO6F+yhEYIKP0ZVsBwnbKK1UgajBnVyVyVihuMr/hiTabMIIwifPY0LZlkhDmDvBeAK9oLLH9Q3bpSC6XdPTdfu4PqyCWWgREPxvsdP3GZfDWsje6kY5VfBxFnmAE=
+	t=1790070243; cv=none; b=Y+LXhBg9aQZ2jMGOME4FCy4wLcQXRor/OAopbrPRf7bGn8gdbYPn0BkVAOJ7CKyoFHbgt74w2Slt4CKQREmRL9RnwQDVIg9ArkekAX4yQS+Yuuamc+dcPOVUJxohPx18Lmb7smwjY5nNUALnz3xKgW9fKYkxfk4CYz2G1G11PXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790067976; c=relaxed/simple;
-	bh=EioVh31ovcIoXKm70lu2jzPBUC1Ew7mE2jaz8o7SFLg=;
+	s=arc-20240116; t=1790070243; c=relaxed/simple;
+	bh=crbT9+5MObVWuFXEa9N+TkXuUnbKPdLY1NFH+JJ4wGI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ABShdFIzavEkLw0cWsL2gDNwdIV3T9SghMAsLr8avWVIcvsP90nCS0hkJdD5I30jdLfv36EjqSHX86PFhxBo4RjyyIw6yD0bM6HH3pD/CM6Ho8b9DUkvKkCMu5R2mHJ1VnuNsPEH+b48vbk11FiUfza6KX7FOlO1au3KwAs/lgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FGdwsJa8; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=FiJaH39KMXbxO1e7IJvZVdzY8PxMqnKXNbNMwI5eaZx0Ts1DXCm22aWkzoIc0E6Rz174mwmoesdsNtgqXfXmE4dQzPzGaTTjRh2yvhFRO0ofY1dHX5O/BEd5cw/RXmjrlJ6mn1XPVIyvadJZ+RcoTNYxXDsGkeSM6Y6Df332nl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jy3U+Jxc; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FGdwsJa8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 069B31F000FF;
-	Tue, 22 Sep 2026 09:06:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jy3U+Jxc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 113741F0089A;
+	Tue, 22 Sep 2026 09:43:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790067974;
-	bh=CL9p8oAwo1crfQMWT3WgokRQnTrKkgMRfNiucR/BKyc=;
+	s=k20260515; t=1790070240;
+	bh=YTT+dkVu7tWPKjS3DFi060r/rlKRC0HzmitVIec+iIU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=FGdwsJa8/IRiDiXqu5im9UYEKsBW8xKPj8UeyC1zG50ICzIqoaS4sBV5uWR6ySljY
-	 Wz1QwM7ElBxL98PaNnSCTjPhanEq8KXo+IkM7KxVyNgGKUB1r0GFZvHtEhtSofBU5c
-	 4VTIrdtA6vzaIUg8etnNBBES2NLReY7mu8Xdo3wUU039vDzRbQBsxcv06PHQfhmuUd
-	 Gz1UmGbN9kIDO7bpH2UzpB2zlu20T3+GJqJbBP4ibpnSmxA97SOaRunJBW3uINc6Ts
-	 ajL0SgRxi2ONttf0op7dKynauL25bY890dZT7JNNwz06ehY0EDaZ+7z7MlqJ/FhK1i
-	 VoPZDvngT8CnQ==
-Date: Tue, 22 Sep 2026 10:05:59 +0100
+	b=jy3U+JxcId7zmfYkIr1r7u3noV5oRtTv3+3FbbQxFWzLtL+STTIwAbXmdb0Ene9HI
+	 1+a7y9W33iqDoUkRTyaFkdEdhyxU4mtChStxqOWiYEMJ8Jqg7m0YmoABhfoSe9DgVF
+	 pi4hN43C7Rs7zg5iDpGuqFUPaDmHfpRsFefjZ/gma6zPCY0usIXBeI1wBK+qR6PYJH
+	 iesQMJwGVINhl3cSO+pgnPecINN1L34B75FLiqqDn/ulF582FizRK6GnDfJw2+2hPD
+	 rsneXl39GgR4xuDRTGTeKge+B4Zs7cN7OXc3v+uw4jHCi4Yw/YppZ87MJ321hS8QYh
+	 xNfZ0IyAbqvAw==
+Date: Tue, 22 Sep 2026 10:43:45 +0100
 From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
 To: Josh Poimboeuf <jpoimboe@kernel.org>
 Cc: Linus Torvalds <torvalds@linux-foundation.org>, 
@@ -53,12 +53,12 @@ Cc: Linus Torvalds <torvalds@linux-foundation.org>,
 	linux-riscv@lists.infradead.org, linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
 	linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-doc@vger.kernel.org, 
 	Jens Axboe <axboe@kernel.dk>, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v3 15/20] objtool: cache relocations, do less work,
- eliminate relocation hash
-Message-ID: <arI0sqCSIJKjbu0C@gremlin>
+Subject: Re: [PATCH v3 17/20] objtool: decode instructions and resolve branch
+ targets in parallel
+Message-ID: <arJFPXN5SsrkUyJY@gremlin>
 References: <20260917-build-speedup-v3-0-9ecf4163ff36@kernel.org>
- <20260917-build-speedup-v3-15-9ecf4163ff36@kernel.org>
- <arG07kfxJCmnVPY4@jpoimboe>
+ <20260917-build-speedup-v3-17-9ecf4163ff36@kernel.org>
+ <arICcrXVFLVzO-Jx@jpoimboe>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -67,80 +67,95 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <arG07kfxJCmnVPY4@jpoimboe>
+In-Reply-To: <arICcrXVFLVzO-Jx@jpoimboe>
 
-On Mon, Sep 21, 2026 at 09:16:21PM -0700, Josh Poimboeuf wrote:
-> On Thu, Sep 17, 2026 at 05:06:25PM +0100, Lorenzo Stoakes (ARM) wrote:
-> > This relies upon the entries within a section being sorted, which is the
-> > case for all sections supplied to objtool by the link step during the
-> > kernel build.
->
-> This is wrong (or at least actively misleading).  Objtool doesn't *only*
-> run on linked objects.  In some configs it runs on individual .o files.
-> And GCC doesn't sort relocs:
->
->   Relocation section '.rela.text' at offset 0xc0d0 contains 724 entries:
->       Offset             Info             Type               Symbol's Value  Symbol's Name + Addend
->       ...
->   0000000000005c50  0000009000000004 R_X86_64_PLT32         0000000000000000 _raw_spin_lock - 4
->   0000000000005c65  0000009100000004 R_X86_64_PLT32         0000000000000000 _raw_spin_unlock - 4
->   0000000000005c6d  0000019f00000004 R_X86_64_PLT32         0000000000000000 put_files_struct - 4
->   000000000000004d  0000008f00000004 R_X86_64_PLT32         0000000000000000 __x86_return_thunk - 4
->   0000000000000075  0000008f00000004 R_X86_64_PLT32         0000000000000000 __x86_return_thunk - 4
->   00000000000000cd  0000008f00000004 R_X86_64_PLT32         0000000000000000 __x86_return_thunk - 4
->
-> (JMP target relocations are emitted in a second pass, for whatever
-> reason)
->
-> So the hash may actually be needed as a fallback after all.  Or some
-> other scheme.
-
-Ack, that's fair enough.
-
-Definitely need something that isn't the linear scan as a truly worst case can
-be horrible.
-
-I think the hash can be avoided though, Do the read_relocs() without ordering,
-track whether things are in order, on decode if sorted then just read from
-relocs[], if not can allocate an order[] array and qsort() and build the index
-over that.
-
-So O(n lg n) at that point, but avoids bothering to sort for anything not looked
-up, works similarly for added sections.
-
-So still avoids all of the hash stuff, but efficient when things are actually
-out of order.
-
->
-> Either way it's overkill to have more than a single fallback.  No second
-> fallback for "just in case".  Attempting to search an unhashed section
-> (DWARF) can just be a fatal error instead of the "just in case"
-> WARN+linear fallback thing.
-
-Honestly this is what I instinctively preferred, but objtool is not my realm so
-I worried there'd be some odd outlier thing that it'd somehow break!
-
->
-> > @@ -1168,19 +1286,26 @@ static int read_relocs(struct elf *elf)
-> >  				return -1;
-> >  			}
+On Mon, Sep 21, 2026 at 09:27:33PM -0700, Josh Poimboeuf wrote:
+> On Thu, Sep 17, 2026 at 05:06:27PM +0100, Lorenzo Stoakes (ARM) wrote:
+> > During a kernel build objtool is used to decode vmlinux.o's instructions
+> > and resolve every jump and call destination.
 > >
-> > -			elf_hash_add(reloc, &reloc->hash, reloc_hash(reloc));
-> >  			set_sym_next_reloc(reloc, sym->relocs);
-> >  			sym->relocs = reloc;
+> > This forms a large part of the work objtool does during the build process,
+> > and it is all done in serial.
 > >
-> >  			nr_reloc++;
-> >  		}
-> >  		max_reloc = max(max_reloc, nr_reloc);
-> > +
-> > +		/* DWARF relocs are never looked up, so are not worth indexing. */
-> > +		if (is_dwarf_section(rsec->base))
-> > +			continue;
+> > Decode these in parallel at a function granularity to speed things up, but
+> > limit this to invocations that pass --link, and only where the there is 8
+> > MiB or more text to justify it.
+> >
+> > In practice this limits this to processing vmlinux.o in the kernel build
+> > and modules are processed as they were before.
+> >
+> > Only the instruction hash is shared between the threads and nothing is ever
+> > removed from it, so an insertion is a compare-and-swap on the bucket head.
+> >
+> > Threading is limited to decoding and the jump pass, so the gain flattens
+> > out at 16 threads and any further threads were found to only add overhead.
+> >
+> > When performing an allmodconfig build, the clang invocation of objtool when
+> > processing vmlinux.o took 5.93s on 1 thread, 4.56s on 8, 4.51s on
+> > 16 and 4.63s on 128.
+> >
+> > Therefore cap the thread count at 16 or the number of CPUs, whichever is
+> > fewer.
+> >
+> > The output of objtool before and after this change was confirmed to be
+> > byte-for-byte identical for x86_64 defconfig and allmodconfig with gcc and
+> > clang, and for a loongarch defconfig, where objtool runs on every object.
+> >
+> > On a 128-thread machine, objtool on the clang allmodconfig vmlinux.o goes
+> > from 5.2s to 4.4s (6.5s to 4.4s together with the previous two patches),
+> > and on defconfig from 1.99s to 1.38s.
+> >
+> > objtool on vmlinux.o is on the serial tail of every build that links
+> > vmlinux, no-op builds are unchanged.
+> >
+> > Whole build, 128-thread Threadripper 9980X, best of N runs:
+> >
+> >                                          before   after     delta
+> >                                          -------------------------------
+> >   x86 defconfig, touch mm/vma.c, gcc        8.2s     7.7s    -0.55s (-7%)
+> >   x86 defconfig, touch mm/vma.c, clang      7.3s     6.9s    -0.44s (-6%)
+> >   x86 defconfig, clean, gcc                28.6s    28.2s    -0.47s (-2%)
+> >   x86 defconfig, clean, clang              29.1s    28.7s    -0.45s (-2%)
+> >   x86 allmodconfig, touch mm/vma.c, gcc    25.7s    23.7s     -2.0s (-8%)
+> >   x86 allmodconfig, touch mm/vma.c, clang  24.1s    22.5s     -1.6s (-7%)
+> >
+> > Assisted-by: LLM
+> > Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+> > ---
+> >  tools/objtool/Makefile  |   2 +-
+> >  tools/objtool/check.c   | 717 ++++++++++++++++++++++++++++++++++++------------
+> >  tools/objtool/objtool.c |  14 +-
+> >  3 files changed, 546 insertions(+), 187 deletions(-)
 >
-> This DWARF reloc skipping is a standalone improvement, can you split
-> this out to another patch?
+> This is an interesting patch, but I'm not really convinced it's worth
+> the pain.
 
-Ack will do!
+Obviously I defer to you as the maintainer :)
+
+But I think the numbers are pretty significant, certainly for allmodconfig
+incremental it's a fairly significant chunk of the improvement.
+
+Yes it's a relatively large-ish change but it's sensible and
+straight-forward one and certainly in the direction you'd expect to see
+changes in (parallelise things we can do less work where possible).
+
+And note that the work is limited only to those tasks which have
+singificant data to process and only if --link is specified, so the scope
+is relatively small.
+
+We could add a flag for this also potentially?
+
+Obviously if you feel firmly that this isn't something you want I can also
+drop it but I think it is worth having.
+
+One thing to note is that I went through a (bloody painful :) process of
+dropping everything that felt like bad RoI which the LLM came up with, it
+started at something crazy like 30-35 patches :)
+
+(This was prior to reworking code, checking everything, etc. - gawd the
+schloppers have it easy not doing all that! :)
+
+Anyway let me know what makes sense.
 
 >
 > --
