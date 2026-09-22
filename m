@@ -1,183 +1,150 @@
-Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B04F852F28A
-	for <linux-kbuild@vger.kernel.org>; Tue, 22 Sep 2026 09:03:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9115478859;
+	Tue, 22 Sep 2026 09:06:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790067836; cv=none; b=QC26oVoDZPqQPdVS6SYOwV4/aWKJ11I+Xnisyp89Auunzr3qOD9i4qKuaA6KudUe5EcWRWAp5FEERYbb4t8/TzHTjaapO0fZcDbudvp6B79wnMmbPajG6xkm5StqAiHU9oTq1ivhD9b5z7JCaPeFMx3Z87OwTB6vVu5Q8c68NQc=
+	t=1790067976; cv=none; b=jR7aQk2jrCWJa0+lYQY/Zm12J53fxWgf6QM/bXOXMGCPNWcO6F+yhEYIKP0ZVsBwnbKK1UgajBnVyVyVihuMr/hiTabMIIwifPY0LZlkhDmDvBeAK9oLLH9Q3bpSC6XdPTdfu4PqyCWWgREPxvsdP3GZfDWsje6kY5VfBxFnmAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790067836; c=relaxed/simple;
-	bh=VTfd+kx4IzMN4HwWKAFk70C0fOTr88FdJxqeHWCpGr0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gyYtt8ql2sbDhDXMh6xREkyLDeIkgpTs7cee6fT43VJjR2HViTmCUUkrSSYkavQbaKPNoYqD1t+yf+lZF64ckNjMYs53t/zJM8hCCZvDCWAqGpSlL9K0+/IP9CSmTyLhGVF2De9Fn7GIDWeARwonZeww/Y12lGnkE9kD8GkzCjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jm1bRRHs; arc=none smtp.client-ip=74.125.225.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1790067976; c=relaxed/simple;
+	bh=EioVh31ovcIoXKm70lu2jzPBUC1Ew7mE2jaz8o7SFLg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ABShdFIzavEkLw0cWsL2gDNwdIV3T9SghMAsLr8avWVIcvsP90nCS0hkJdD5I30jdLfv36EjqSHX86PFhxBo4RjyyIw6yD0bM6HH3pD/CM6Ho8b9DUkvKkCMu5R2mHJ1VnuNsPEH+b48vbk11FiUfza6KX7FOlO1au3KwAs/lgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FGdwsJa8; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jm1bRRHs"
-Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49b912e4b11so20998955e9.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 22 Sep 2026 02:03:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790067833; x=1790672633; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=hBmqSfthoDkMfU3pfMgMsdFTjh/btwHVLwZmR3sypjM=;
-        b=jm1bRRHsT98+lIiHTAmpF08989N4++WC+xUV1gRF28bGPVJ8MW6u7k9GqKizMK4utI
-         OtRt339ZNJdyhBR6mwWhDpJFJpT2BOlbiXWxqjPvi4hkvOgf0h4Zowi/UyhoQt3/zRQc
-         kvCVLazwg9/m4lcx71bK6aJJTxg8z9SYj4UJzXIoFycQMOwRytFZd1CWgAqCcFPkQedk
-         hQaKq580USnnBWlba0Z989PefR+/SPPvxu8i5v6q8zDjAfwVsNgdtMmNbJZLW/EBXiws
-         vvbDNUpVaLD5mGKuu6TdUw3If5PaQdDSmr9sgyLC9MpDXhCERPN98lRNk3Iao8s04AKH
-         Tubw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790067833; x=1790672633;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=hBmqSfthoDkMfU3pfMgMsdFTjh/btwHVLwZmR3sypjM=;
-        b=hckiFIIY+MYY5OTJ72e6tBHueTVeS9AdxajofRemjnLeABcBdtwxu/BAIiZXYuBph6
-         TAnGwyoSVoihSLxtmBRYrMe72wPrdUlsX3Limi548WO67XYExwQg05MKBUNJvAdgSW5m
-         MckThYG87hASBu/49KKJ1EoElCYR5OKKuCQdt67TOKgsclErrgpHABNBIXvbf1rNbcmD
-         eCq8n88liXywC2Li/I7rDxB+GGYP05Okr2W6AbOeGBgPjkkCaoEzEzP/nwHJ+00Ovth8
-         Wu+oOdh/iX3oKSdeXchN+L7YW3/xQcIwPmusU/PCd96W7SfSIu0DflKjXP/FKVyry16p
-         IwUw==
-X-Forwarded-Encrypted: i=1; AKwUvBwWvIT9K8O9wthReFkh3A5AllM3xOBRCh7cHd88pYQuEmLH/9SZBIi5fEb0/CSMizzAoLJy1/pjZgJo4gA=@vger.kernel.org
-X-Gm-Message-State: AFuF++kxMZz0ILHHiXB+8xqduyAbO6y+SB8YsGPPo9TBIuneBaS1JfeU
-	qsy6GnLAU1uOmSHAwJ8O8/1HQAH0uccV67iSm0Ch+rPTH+RbdRhoVlhx
-X-Gm-Gg: AYBFou2kkvvDpdjGAPqUxlPo3wpcWyHwMFBTxzTlKWGbGaW9ORjp9UAocvaCkrbKqQy
-	v1jEWpIzbDBnSuTi0fEW6i6+kXXQMvI+YiCQ8fEa50QGhToAuIqCLKedkAstueKGvqErmplWt0G
-	uu7BO4EhO0VC7xNS33Ogt+G1D4KGmfjMNimFY3GFgqztouSbITXZrtshIsM1rauBW/GbctSrOkY
-	K7VF1D5lUv/JdFHDcffouSwnDXret3dqYK40p28/NPma9RyXAQp1GcH45qgpaq0jwGhDF31wPtE
-	jnAAqpVbYVCsn1RsdsE9uISAMuHqV3jgxtK69+Y02H0VBcaA6zsrAVCXc/kp+ar6s5r32YQyi0X
-	T9moHfhCvX4e3nBfb2zyyTj6Vo+CkUciDjek+BmCknXri6sa2MWSoz9OZAHZX4qvVQhc9hqA7PL
-	pzR0VSX86u5S+s4kIvdGG7PE4FVDb0q62bXsSZE3Grz86YJmVfY05h/kF5dP+YfroT66rB+b5t8
-	60eWOaHF9Zvj7jjbP3PGKL4QJOiDJkfXgE=
-X-Received: by 2002:a05:600c:310d:b0:49d:15b9:2a2a with SMTP id 5b1f17b1804b1-49fc5721b9dmr200390075e9.10.1790067832375;
-        Tue, 22 Sep 2026 02:03:52 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49fdaaf0074sm34525095e9.3.2026.09.22.02.03.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Sep 2026 02:03:52 -0700 (PDT)
-Date: Tue, 22 Sep 2026 10:03:51 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Jim Cromie <jim.cromie@gmail.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Lorenzo Stoakes
- <ljs@kernel.org>, Kees Cook <kees@kernel.org>, Masahiro Yamada
- <masahiroy@kernel.org>, linux-kernel@vger.kernel.org,
- linux-kbuild@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH v2 3/3] kallsyms: Match compressed tokens on the fly
- during binary search
-Message-ID: <20260922100351.04555f43@pumpkin>
-In-Reply-To: <20260922-ksyms-tune-v2-3-a333ee31eac7@gmail.com>
-References: <20260922-ksyms-tune-v2-0-a333ee31eac7@gmail.com>
-	<20260922-ksyms-tune-v2-3-a333ee31eac7@gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FGdwsJa8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 069B31F000FF;
+	Tue, 22 Sep 2026 09:06:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790067974;
+	bh=CL9p8oAwo1crfQMWT3WgokRQnTrKkgMRfNiucR/BKyc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=FGdwsJa8/IRiDiXqu5im9UYEKsBW8xKPj8UeyC1zG50ICzIqoaS4sBV5uWR6ySljY
+	 Wz1QwM7ElBxL98PaNnSCTjPhanEq8KXo+IkM7KxVyNgGKUB1r0GFZvHtEhtSofBU5c
+	 4VTIrdtA6vzaIUg8etnNBBES2NLReY7mu8Xdo3wUU039vDzRbQBsxcv06PHQfhmuUd
+	 Gz1UmGbN9kIDO7bpH2UzpB2zlu20T3+GJqJbBP4ibpnSmxA97SOaRunJBW3uINc6Ts
+	 ajL0SgRxi2ONttf0op7dKynauL25bY890dZT7JNNwz06ehY0EDaZ+7z7MlqJ/FhK1i
+	 VoPZDvngT8CnQ==
+Date: Tue, 22 Sep 2026 10:05:59 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Josh Poimboeuf <jpoimboe@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, Masahiro Yamada <masahiroy@kernel.org>, 
+	Alexey Gladkov <legion@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, Arnd Bergmann <arnd@arndb.de>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Ard Biesheuvel <ardb@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Peter Zijlstra <peterz@infradead.org>, 
+	Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
+	=?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
+	Daniel Almeida <daniel.almeida@collabora.com>, Tamir Duberstein <tamird@kernel.org>, 
+	Alexandre Courbot <acourbot@nvidia.com>, Onur =?utf-8?B?w5Z6a2Fu?= <work@onurozkan.dev>, 
+	Jonathan Corbet <corbet@lwn.net>, Randy Dunlap <rdunlap@infradead.org>, 
+	Kees Cook <kees@kernel.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>, 
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
+	linux-riscv@lists.infradead.org, linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-doc@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v3 15/20] objtool: cache relocations, do less work,
+ eliminate relocation hash
+Message-ID: <arI0sqCSIJKjbu0C@gremlin>
+References: <20260917-build-speedup-v3-0-9ecf4163ff36@kernel.org>
+ <20260917-build-speedup-v3-15-9ecf4163ff36@kernel.org>
+ <arG07kfxJCmnVPY4@jpoimboe>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <arG07kfxJCmnVPY4@jpoimboe>
 
-On Tue, 22 Sep 2026 01:19:21 -0600
-Jim Cromie <jim.cromie@gmail.com> wrote:
+On Mon, Sep 21, 2026 at 09:16:21PM -0700, Josh Poimboeuf wrote:
+> On Thu, Sep 17, 2026 at 05:06:25PM +0100, Lorenzo Stoakes (ARM) wrote:
+> > This relies upon the entries within a section being sorted, which is the
+> > case for all sections supplied to objtool by the link step during the
+> > kernel build.
+>
+> This is wrong (or at least actively misleading).  Objtool doesn't *only*
+> run on linked objects.  In some configs it runs on individual .o files.
+> And GCC doesn't sort relocs:
+>
+>   Relocation section '.rela.text' at offset 0xc0d0 contains 724 entries:
+>       Offset             Info             Type               Symbol's Value  Symbol's Name + Addend
+>       ...
+>   0000000000005c50  0000009000000004 R_X86_64_PLT32         0000000000000000 _raw_spin_lock - 4
+>   0000000000005c65  0000009100000004 R_X86_64_PLT32         0000000000000000 _raw_spin_unlock - 4
+>   0000000000005c6d  0000019f00000004 R_X86_64_PLT32         0000000000000000 put_files_struct - 4
+>   000000000000004d  0000008f00000004 R_X86_64_PLT32         0000000000000000 __x86_return_thunk - 4
+>   0000000000000075  0000008f00000004 R_X86_64_PLT32         0000000000000000 __x86_return_thunk - 4
+>   00000000000000cd  0000008f00000004 R_X86_64_PLT32         0000000000000000 __x86_return_thunk - 4
+>
+> (JMP target relocations are emitted in a second pass, for whatever
+> reason)
+>
+> So the hash may actually be needed as a fallback after all.  Or some
+> other scheme.
 
-> kallsyms_lookup_names() runs a binary search across kallsyms_names[],
-> a packed array of ~130k encoded kernel symbols.  For each of the ~17
-> comparisons in the search, it currently decompresses the candidate
-> symbol into a temporary buffer on the stack before calling strcmp().
-> 
-> Comparing raw tokens directly in compressed space is impossible.  The
-> BPE token table assigns values by frequency, not alphabetical order
-> (e.g. token 0x05 might expand to "zebra" while 0x42 expands to "apple"),
-> so comparing raw token values scrambles lexicographical order.
-> 
-> However, full string expansion is equally wasteful: roughly 16 of the
-> 17 binary search steps fail within the first two characters.
-> 
-> Introduce kallsyms_strcmp_symbol() to compare ASCII queries against
-> compressed tokens on the fly.  It walks kallsyms_token_index and
-> kallsyms_token_table incrementally, matching characters directly and
-> bailing out on the first character mismatch without expanding subsequent
-> tokens.
-> 
-> This optimization:
-> 
-> 0. Avoids decompressing non-matching tokens, short-circuiting ~94% of
->    binary search character expansions without adding any tables in
->    .rodata.
-> 
-> 1. Drops the 512-byte namebuf buffer from the kernel stack in
->    kallsyms_lookup_names().
-> 
-> 2. Leaves sequential address ordering and kallsyms_expand_symbol()
->    streaming invariants intact for /proc/kallsyms and table walks.
-> 
-> Signed-off-by: Jim Cromie <jim.cromie@gmail.com>
-...
-> +/*
-> + * Compare an uncompressed ASCII string against a compressed symbol table entry.
-> + * Returns negative if name < sym, positive if name > sym, 0 if equal.
-> + * Exits immediately on the first mismatched character without decompressing
-> + * the rest of the symbol name.
-> + */
-> +static int kallsyms_strcmp_symbol(unsigned int off, const char *name)
-> +{
-> +	int skipped_first = 0;
-> +	const char *tptr;
-> +	unsigned int len;
-> +	const u8 *data = get_symbol_data(off, &len);
-> +
-> +	while (len) {
-> +		tptr = &kallsyms_token_table[kallsyms_token_index[*data]];
-> +		data++;
-> +		len--;
-> +
-> +		while (*tptr) {
-> +			if (skipped_first) {
-> +				int diff = (unsigned char)*name - (unsigned char)*tptr;
-> +
-> +				if (diff != 0)
-> +					return diff;
-> +				name++;
-> +			} else {
-> +				skipped_first = 1;
-> +			}
-> +			tptr++;
-> +		}
-> +	}
-> +
-> +	return (unsigned char)*name - '\0';
-> +}
+Ack, that's fair enough.
 
-Since len can't be zero you can move the test to the bottom and remove the
-skipped_first test completely. Something like:
+Definitely need something that isn't the linear scan as a truly worst case can
+be horrible.
 
-	tptr = &kallsyms_token_table[kallsyms_token_index[*data++]] + 1;
-	for (;;) {
-		do {
-			int diff = (unsigned char)*name++ - (unsigned char)*tptr++;
-			if (diff)
-				return diff;
-		} while (*tptr);
-		if (!--len)
-			break;
-		tptr = &kallsyms_token_table[kallsyms_token_index[*data++]];
-	}
-	return (unsigned char)*name;
+I think the hash can be avoided though, Do the read_relocs() without ordering,
+track whether things are in order, on decode if sorted then just read from
+relocs[], if not can allocate an order[] array and qsort() and build the index
+over that.
 
-Also 'char' is now 'unsigned char' in all kernel builds you don't
-need the casts.
-But I'd make the types explicitly 'unsigned char' just in case.
+So O(n lg n) at that point, but avoids bothering to sort for anything not looked
+up, works similarly for added sections.
 
-David 
-		
+So still avoids all of the hash stuff, but efficient when things are actually
+out of order.
 
->  
->  /*
->   * Find the offset on the compressed stream given an index in the
-...
+>
+> Either way it's overkill to have more than a single fallback.  No second
+> fallback for "just in case".  Attempting to search an unhashed section
+> (DWARF) can just be a fatal error instead of the "just in case"
+> WARN+linear fallback thing.
+
+Honestly this is what I instinctively preferred, but objtool is not my realm so
+I worried there'd be some odd outlier thing that it'd somehow break!
+
+>
+> > @@ -1168,19 +1286,26 @@ static int read_relocs(struct elf *elf)
+> >  				return -1;
+> >  			}
+> >
+> > -			elf_hash_add(reloc, &reloc->hash, reloc_hash(reloc));
+> >  			set_sym_next_reloc(reloc, sym->relocs);
+> >  			sym->relocs = reloc;
+> >
+> >  			nr_reloc++;
+> >  		}
+> >  		max_reloc = max(max_reloc, nr_reloc);
+> > +
+> > +		/* DWARF relocs are never looked up, so are not worth indexing. */
+> > +		if (is_dwarf_section(rsec->base))
+> > +			continue;
+>
+> This DWARF reloc skipping is a standalone improvement, can you split
+> this out to another patch?
+
+Ack will do!
+
+>
+> --
+> Josh
+
+--
+Cheers, Lorenzo
