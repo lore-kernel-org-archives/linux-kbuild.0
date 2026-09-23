@@ -1,70 +1,70 @@
-Received: from mail-oa2-f35.google.com (mail-oa2-f35.google.com [74.125.231.99])
+Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CE1C56E041
-	for <linux-kbuild@vger.kernel.org>; Wed, 23 Sep 2026 22:34:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A8E7582B97
+	for <linux-kbuild@vger.kernel.org>; Wed, 23 Sep 2026 22:34:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790202899; cv=none; b=dEGqT1dK7v1ieM7UtyDJ/JT18LKVhNET0TuRDoPTEU0RyIAunjkqMHdUGU0owdLLO5BoGSL3dguA5dnjyDe7MsWExvQCzzxDMEgndjtJ05qA0Qj+4NNRU5KCGi1sp0VE5aN1gfH3146rpJz6zsSL413ZlqXY1DrmM1/vnHq4lsU=
+	t=1790202901; cv=none; b=qP8SqcSfbFNdpne9WCX8v6qc8LeL8p2UaUAKpGrOB5lgQtXg08IFpRNc+hZfnJEoYjxo5CrnAnrCy11Zu6uTlNPNjH17cPbhf6o37gXXEezrKOMT78+vOBXplHWjUvEKw/1UWh9sOFBK1NLCDDm35OaPuUmkkN5z6Zg/Ayy+9b4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790202899; c=relaxed/simple;
-	bh=Ea2Lf2NOIb4xfOxyj7JKgPRMz10QHHz8z+1IIkR3nVY=;
+	s=arc-20240116; t=1790202901; c=relaxed/simple;
+	bh=ZuzqA3zGt/j9kYmFGfFlaL94NbjSKGlzcBcWBUqAWbM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ZhWP54tjufXO6r2tKfYEQqIzOFmPM1AJbbY1LcNmWlPSDqzywU/lx0HCmQkErUcazKeIdCQYzlyyHCIdp1iMCbvxZNRXTZopIJ593fJJWic5ZULrg+z4ApsOQO+AZylIIdncknzNzWvW8+lK1ah2Ds39SKF0eewE96vTfnadOws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e2mDLzjP; arc=none smtp.client-ip=74.125.231.99
+	 In-Reply-To:To:Cc; b=PPNHHJuSSA7S+jhsATUVd+CNsvAhRfB5sWbtrW0YXR0leTnYkuOlAzljg+Okif3coeiGvDYnlOn5khRWMH8hq348qAmmztqYqSvJWU/nhzXplP1QON8FI2+MJwj1q7z1aYnozY+9SIb2WFZKiO7/bpWn0DjYEhcIYw1J6PZz1E4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sr+yYhzo; arc=none smtp.client-ip=209.85.161.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e2mDLzjP"
-Received: by mail-oa2-f35.google.com with SMTP id 586e51a60fabf-491c13d63d9so284293fac.0
-        for <linux-kbuild@vger.kernel.org>; Wed, 23 Sep 2026 15:34:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sr+yYhzo"
+Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-6b1b1d128a0so224694eaf.0
+        for <linux-kbuild@vger.kernel.org>; Wed, 23 Sep 2026 15:34:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790202894; x=1790807694; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1790202896; x=1790807696; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=pY/j1ww3Y8UnMsGPx7zQGy6NPa6GEKgP8JCREIbwugg=;
-        b=e2mDLzjPO4nfot00leAVLmf+ToxEEEPQ0fCS3eS5UVbxgLzr6fOFhwBYy60qsclKd9
-         305pKhgv/WXwkwI9BdWbQfXBOqm+PqRzJ1m0SaK7DkIAkiZgqKF5pv3sjDzmOVcIVwQT
-         V/pCjgKEIvhjIj+/MVLncff+FqwxdWnyJOgToHYI9C1cAey3KmftM0i4awpqq6vMaw3D
-         aborQi79n6YHb/8K8e+Q/DVtSRs61jNAlR0hK7XGVK5vl9GFkHolldq48PpoB5AjDeH8
-         wnOslq3tIUIYKcUzhH1DQGwB+vr71CJN1y5F4tjjKA8i/T5yqxN79Zpnywozbm7yHMI6
-         +Jew==
+        bh=z8dUvDJ5uj/iqj7Hr1Y3Cg7XHwt3DLPAXGIUQMEXgMI=;
+        b=sr+yYhzocGGPN7Pn/NjiVs0BbQqzzkVrYAaUei/t3AG56zITF8gpmgLKCIYN0c8jY7
+         0ucB6t4lz3b42eWBIsWsHj4kndnNwu+qlG0TqO66Yig1bYWMVs9BD6p0Vo63wdUWsdbh
+         TOlAN2E3deqsZ0/C9Gy0CAuyvksxx8WWBO9APo5YLgDugjZNe4O2b2eZaKfysjLoOLdX
+         V+SaGkJ67rEZ/HINNl7xmppV6JhgljAT+ESCY706nrpXZdOB62hwCs1Y4DB4LKlOYAww
+         S9WP8gi1lWkLNGMM43pHhsJJlBijG5F9us+MaKpUL+TDMl/bm6ifBs4LnBm5w30CB9H9
+         iygw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790202894; x=1790807694;
+        d=1e100.net; s=20260707; t=1790202896; x=1790807696;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=pY/j1ww3Y8UnMsGPx7zQGy6NPa6GEKgP8JCREIbwugg=;
-        b=KP7hKOAxCiDuLdl/iQ6Wd++XPEQfUE/0Aq9VhzG/vL/WGAuTyewkLDlkVEYcXzbBtG
-         538pzAqbpM3NV+lSGoyg1HMOvszzZ9+3wXpfvv9fNexY+CHMUmdGHMe+Q2RbGRMc76IV
-         8ihq7s3GtyoafEVq5gbOxiVQRBJNYcfWFxhhS2KdfJc/oJMQKOTDuNUcn8KMpVT/YGAP
-         HbK0UhGBfypv1coaewAy2DXS65ev7+46RxbAsZVR+XBwLyQcLefomQj0axV2bk9y5jgP
-         EzxA7vggxwBmjN+rlb+nnd0JnbzH90vIC6jqA5o8Ej5CfzB+RKxH2Ts8Jznrv8mmh7ZU
-         4o/w==
-X-Forwarded-Encrypted: i=1; AKwUvByh2v1L8X9IAoklfLWmjDwouJRwyP+VBL9AUOuDSgDBmh48q+GBVoQvrruvnva8PXUXOLdnNQZ+fASmoeA=@vger.kernel.org
-X-Gm-Message-State: AFuF++k7doqpVWwlsD8FNTYleUOnsstHfCL0hG03UF8s8QeJYTUDRoKQ
-	pPaQQgRT+cRMjIm+rOQ1ZubRdkMjxnrGbjhcuTGm3bAtRjHOVJrEqKMM
-X-Gm-Gg: AYBFou1th24QIQub/k5PDFX4y1uJ8mOYP7sj90+qEq1EkLNdoNAYk+xkNS4dOs76l/X
-	ZiWO8LW30uNn192x5ksJZ5COhksxj9zr745/DV3Du42lnlkczJFZWvrygtRQ/PaLeNRub7ssHHq
-	6kJGbxQN6fLJL3sUcHw/nPkxgyoz+lPo/A0m1TH7mIduDg2D7SB1aCq5AKwectvDBWicFqNc6ye
-	DIwQ8fppAs9Q28LtucIShsIH0KH8Mz7HRmv40pxTU/L+zPLE1GFuqZGBoUiV79V5Bvai6Qg1p7C
-	HMkVLh43f4yN4uCO/1L/R/OybY5VvCoByESoPsE0QZfiuVtcSmJ7v7ey9crxL6zOIs5TW6H15fS
-	fxp1Z07rH4mnsvyEancMxiEUX14iN365qy3hWAUg9S0emuU0AFC114+Eml4RxeSyIUAVkKuiGZx
-	eYHBVknqVpDufMwCfjzzazDesp2Fpaeh/Ci+EJEUCtQDHQWwq9qIZqiwIkd7X5YnoLwWyBlVYy6
-	46d9iWx0q/Q2P4X1up4NJzdjsPA051igiMcbNu754AnB58zW2UyKZwhUIQu6jT2mpwTxLAE5aOd
-	knYFZsJQcKzHGwyhWMc=
-X-Received: by 2002:a05:6870:6783:b0:487:31c8:f341 with SMTP id 586e51a60fabf-491e549eaecmr721076fac.19.1790202893734;
-        Wed, 23 Sep 2026 15:34:53 -0700 (PDT)
+        bh=z8dUvDJ5uj/iqj7Hr1Y3Cg7XHwt3DLPAXGIUQMEXgMI=;
+        b=YUIBmE80HQCn6OowpiLygia4GHtBsEyncT72GVKlf1f/ZP+hf8nGdkbyrbz5Culc/F
+         tF/NKx6JYSLp33yFDqIqD6LGCS2G4R5jPHNC8zv2JY2PXZXq2//kY6y9yDVPJVXfjt4+
+         6BH8Rx87tETkZsfuXJ4H6odjL4y5bbhKXwJ7sSY7suqsgBNiUyBkeLxgZJU9G2aLoDXC
+         tp/yEKxw0YCwb9cc7hQyyFDshHRZZ+GkK7YpJUBj9m8etVns5BdfwXeOfSJ+uMx/Mu1E
+         4TpLehhI0ajcI1QbMpPHILcMPYZ8nE5r1LPO7V4OMX/grAo4KwTyB1icCBS7dneTLt+2
+         Td6g==
+X-Forwarded-Encrypted: i=1; AKwUvBxiLRopzuONnpnZMZ9v9ZJNbnzPJz7Rx2r1A6LryHQV0YOdDv0iCric5gA9yr05QIAGxf16hZTz92BhAtE=@vger.kernel.org
+X-Gm-Message-State: AFuF++n2YZoA+/lT5itBTuKgUSctvb5gSShGjNKN2tS7woLOWnk98UM3
+	5sulWjD3eJNcJiq3XS5Cep/AX2n+Je9WMFiHzPYJGfEkhCHgYGEd1ZjP
+X-Gm-Gg: AYBFou3h8NibLe2QP1PbX3+dRxTCPCDBKPZziAzgc4DCRFcsG0t502iWbOKmqvvRVOa
+	JAxrRxTvC+TOi1ftvPRqdwFdDaWL18kv9jRG3Ty3DZvFlv1N+QhDtKHFnQeWxCHEfGAZBFQTBpM
+	tC6wyePMD9YJzIRQyzoMceT/AzaoaKxk7HnhHhQyCgHbVzzcuAFUkgNXIOmdCxxbwssuYYXzFQ8
+	RCUX9AtILJkfIxFKXQcqyoYZFx8ZNww9ogXgFONzKo5iSbA822iy0ucgweJqeCEXkvdnNvv/+/v
+	hq9UV2dNcsbRgiCulm3ljqUmgZcboFUQgIgdhQucxH2hhAt+2J/yfnmFv/eHh1JRm0Z06gSR5MX
+	Lm/OJ9zPRmwdqtWd9YVN3ywQ6vks26RZIuMug1fub/mfqts0QSHKJ7ZWYaczP5+fgjzfZbcCjcz
+	oRkwohtbjUhJQg25bv5XTFCd8e99Pm+r3ktqw3nwdEz2mJ1JMoXaDkfdcILc3FnC7zm8LHdjRyn
+	8QkLn03tp9QAThGHlJKZphMMJ6H/jWpP8nyovSKKTXbaoDWM5ysGN3Okjv1NOdq3sQ44jUYqEoy
+	PDwHNkiiL/kmlBwCi3s=
+X-Received: by 2002:a05:6820:184b:b0:6d3:abd1:9b92 with SMTP id 006d021491bc7-6d4417a0305mr572343eaf.56.1790202896410;
+        Wed, 23 Sep 2026 15:34:56 -0700 (PDT)
 Received: from [100.82.231.29] (c-98-38-17-99.hsd1.co.comcast.net. [98.38.17.99])
-        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-491ee1ac486sm559401fac.16.2026.09.23.15.34.51
+        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-491ee1ac486sm559401fac.16.2026.09.23.15.34.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Sep 2026 15:34:53 -0700 (PDT)
+        Wed, 23 Sep 2026 15:34:55 -0700 (PDT)
 From: Jim Cromie <jim.cromie@gmail.com>
-Date: Wed, 23 Sep 2026 16:34:31 -0600
-Subject: [PATCH v11 07/38] dyndbg: factor ddebug_match_desc out from
- ddebug_change
+Date: Wed, 23 Sep 2026 16:34:32 -0600
+Subject: [PATCH v11 08/38] dyndbg: add stub macro for
+ DECLARE_DYNDBG_CLASSMAP
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -73,7 +73,7 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260923-dd-cmap-part2-clean-v11-7-9b6c217fdf2f@gmail.com>
+Message-Id: <20260923-dd-cmap-part2-clean-v11-8-9b6c217fdf2f@gmail.com>
 References: <20260923-dd-cmap-part2-clean-v11-0-9b6c217fdf2f@gmail.com>
 In-Reply-To: <20260923-dd-cmap-part2-clean-v11-0-9b6c217fdf2f@gmail.com>
 To: Jason Baron <jbaron@akamai.com>, Shuah Khan <shuah@kernel.org>, 
@@ -98,168 +98,93 @@ Cc: linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
  dri-devel@lists.freedesktop.org, linux-arch@vger.kernel.org, 
  linux-modules@vger.kernel.org, linux-doc@vger.kernel.org, 
  linux-kbuild@vger.kernel.org, linux-pm@vger.kernel.org, 
- Jim Cromie <jim.cromie@gmail.com>, 
- Louis Chauvet <louis.chauvet@bootlin.com>
+ Jim Cromie <jim.cromie@gmail.com>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1790202874; l=5231;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1790202874; l=3163;
  i=jim.cromie@gmail.com; s=20260203; h=from:subject:message-id;
- bh=Ea2Lf2NOIb4xfOxyj7JKgPRMz10QHHz8z+1IIkR3nVY=;
- b=Wq1j33LYlnk4/v38X95dwW7rLmRMFQGkcjeMowlE5C9vXaIuKAiQNHIStsK0SHxoEw2YOGQ1U
- kgs4mu9en9+D9zx428a2j2DNgycLXIGQgxm08Up1gD3jLuugn9wl68e
+ bh=ZuzqA3zGt/j9kYmFGfFlaL94NbjSKGlzcBcWBUqAWbM=;
+ b=cFiUQCHIl8Z4t48oIQu3yHhG2L5LBXo/MO7Iuhjmrd9SbV9RgD25fkw2PoMOxn1mE+8jp8rxK
+ 3fgXCxDoibsBwlH58Y6vngo+1u7JVHUnrHhDnEm91pon7izPcbgrnXy
 X-Developer-Key: i=jim.cromie@gmail.com; a=ed25519;
  pk=C6E5ODlPQo7ZBynATXH9wg7K6HxP0pIXyf4s38Qw0XE=
 
-ddebug_change() is a big (~100 lines) function with a nested for loop.
-
-The outer loop walks the per-module ddebug_tables list, and does
-module stuff: it filters on a query's "module FOO*" and "class BAR",
-failures here skip the entire inner loop.
-
-The inner loop (60 lines) scans a module's descriptors.  It starts
-with a long block of filters on function, line, format, and the
-validated "BAR" class (or the legacy/_DPRINTK_CLASS_DFLT).
-
-These filters "continue" past pr_debugs that don't match the query
-criteria, before it falls through the code below that counts matches,
-then adjusts the flags and static-keys.  This is unnecessarily hard to
-think about.
-
-So move the per-descriptor filter-block into a boolean function:
-ddebug_match_desc(desc), and change each "continue" to "return false".
-This puts a clear interface in place, so any future changes are either
-inside, outside, or across this interface.
-
-also fix checkpatch complaints about spaces and braces.
+Add the stub macro for !DYNAMIC_DEBUG builds, after moving the
+original macro-defn down under the big ifdef.  Do it now so future
+changes have a cleaner starting point.
 
 Signed-off-by: Jim Cromie <jim.cromie@gmail.com>
-Reviewed-by: Louis Chauvet <louis.chauvet@bootlin.com>
 ---
-v11:
-. move doc comment block down to precede ddebug_change().
-  Sashiko review complaint (patch 7):
-  "Does this placement separate the block comment from its intended
-  target? The comment describes a function that returns the number of
-  matching callsites and takes ddebug_lock, which accurately describes
-  ddebug_change(). However, by inserting ddebug_match_desc()
-  immediately after this comment, does it leave ddebug_change()
-  undocumented and make the comment falsely apply to
-  ddebug_match_desc()..."
+ include/linux/dynamic_debug.h | 43 ++++++++++++++++++++++---------------------
+ 1 file changed, 22 insertions(+), 21 deletions(-)
 
-v5: check for null format in callsite. shouldnt happen, but pr_debug() isnt illegal
-v7: elevate null format to pr_err adding filename, function, lineno.
----
- lib/dynamic_debug.c | 91 ++++++++++++++++++++++++++++++++---------------------
- 1 file changed, 55 insertions(+), 36 deletions(-)
-
-diff --git a/lib/dynamic_debug.c b/lib/dynamic_debug.c
-index 49334d1aa4b3..8682c23b5fe7 100644
---- a/lib/dynamic_debug.c
-+++ b/lib/dynamic_debug.c
-@@ -166,6 +166,60 @@ static struct ddebug_class_map *ddebug_find_valid_class(struct ddebug_table cons
- }
+diff --git a/include/linux/dynamic_debug.h b/include/linux/dynamic_debug.h
+index 05743900a116..a10adac8e8f0 100644
+--- a/include/linux/dynamic_debug.h
++++ b/include/linux/dynamic_debug.h
+@@ -93,27 +93,6 @@ struct ddebug_class_map {
+ 	enum class_map_type map_type;
+ };
  
- #define __outvar /* filled by callee */
-+static bool ddebug_match_desc(const struct ddebug_query *query,
-+			      struct _ddebug *dp,
-+			      int valid_class)
-+{
-+	/* match site against query-class */
-+	if (dp->class_id != valid_class)
-+		return false;
-+
-+	if (!dp->format) {
-+		pr_err_ratelimited("ddebug: NULL format string at %s:%s:%u\n",
-+				   dp->filename ? dp->filename : "?",
-+				   dp->function ? dp->function : "?",
-+				   dp->lineno);
-+		return false;
+-/**
+- * DECLARE_DYNDBG_CLASSMAP - declare classnames known by a module
+- * @_var:   a struct ddebug_class_map, passed to module_param_cb
+- * @_type:  enum class_map_type, chooses bits/verbose, numeric/symbolic
+- * @_base:  offset of 1st class-name. splits .class_id space
+- * @classes: class-names used to control class'd prdbgs
+- */
+-#define DECLARE_DYNDBG_CLASSMAP(_var, _maptype, _base, ...)		\
+-	static const char *_var##_classnames[] = { __VA_ARGS__ };	\
+-	static struct ddebug_class_map __aligned(8) __used		\
+-		__section("__dyndbg_classes") _var = {			\
+-		.mod = THIS_MODULE,					\
+-		.mod_name = KBUILD_MODNAME,				\
+-		.base = _base,						\
+-		.map_type = _maptype,					\
+-		.length = NUM_TYPE_ARGS(char*, __VA_ARGS__),		\
+-		.class_names = _var##_classnames,			\
+-	}
+-#define NUM_TYPE_ARGS(eltype, ...)				\
+-        (sizeof((eltype[]){__VA_ARGS__}) / sizeof(eltype))
+-
+ /* encapsulate linker provided built-in (or module) dyndbg data */
+ struct _ddebug_info {
+ 	struct _ddebug *descs;
+@@ -138,6 +117,27 @@ struct ddebug_class_param {
+ #if defined(CONFIG_DYNAMIC_DEBUG) || \
+ 	(defined(CONFIG_DYNAMIC_DEBUG_CORE) && defined(DYNAMIC_DEBUG_MODULE))
+ 
++/**
++ * DECLARE_DYNDBG_CLASSMAP - declare classnames known by a module
++ * @_var:   a struct ddebug_class_map, passed to module_param_cb
++ * @_type:  enum class_map_type, chooses bits/verbose, numeric/symbolic
++ * @_base:  offset of 1st class-name. splits .class_id space
++ * @classes: class-names used to control class'd prdbgs
++ */
++#define DECLARE_DYNDBG_CLASSMAP(_var, _maptype, _base, ...)		\
++	static const char *_var##_classnames[] = { __VA_ARGS__ };	\
++	static struct ddebug_class_map __aligned(8) __used		\
++		__section("__dyndbg_classes") _var = {			\
++		.mod = THIS_MODULE,					\
++		.mod_name = KBUILD_MODNAME,				\
++		.base = _base,						\
++		.map_type = _maptype,					\
++		.length = NUM_TYPE_ARGS(char*, __VA_ARGS__),		\
++		.class_names = _var##_classnames,			\
 +	}
++#define NUM_TYPE_ARGS(eltype, ...)				\
++	(sizeof((eltype[]) {__VA_ARGS__}) / sizeof(eltype))
 +
-+	/* match against the source filename */
-+	if (query->filename &&
-+	    !match_wildcard(query->filename, dp->filename) &&
-+	    !match_wildcard(query->filename,
-+			    kbasename(dp->filename)) &&
-+	    !match_wildcard(query->filename,
-+			    trim_prefix(dp->filename)))
-+		return false;
-+
-+	/* match against the function */
-+	if (query->function &&
-+	    !match_wildcard(query->function, dp->function))
-+		return false;
-+
-+	/* match against the format */
-+	if (query->format) {
-+		if (*query->format == '^') {
-+			char *p;
-+			/* anchored search. match must be at beginning */
-+			p = strstr(dp->format, query->format + 1);
-+			if (p != dp->format)
-+				return false;
-+		} else if (!strstr(dp->format, query->format)) {
-+			return false;
-+		}
-+	}
-+
-+	/* match against the line number range */
-+	if (query->first_lineno &&
-+	    dp->lineno < query->first_lineno)
-+		return false;
-+	if (query->last_lineno &&
-+	    dp->lineno > query->last_lineno)
-+		return false;
-+
-+	return true;
-+}
-+
- /*
-  * Search the tables for _ddebug's which match the given `query' and
-  * apply the `flags' and `mask' to them.  Returns number of matching
-@@ -204,42 +258,7 @@ static int ddebug_change(const struct ddebug_query *query,
- 		for (i = 0; i < dt->num_ddebugs; i++) {
- 			struct _ddebug *dp = &dt->ddebugs[i];
+ extern __printf(2, 3)
+ void __dynamic_pr_debug(struct _ddebug *descriptor, const char *fmt, ...);
  
--			/* match site against query-class */
--			if (dp->class_id != valid_class)
--				continue;
--
--			/* match against the source filename */
--			if (query->filename &&
--			    !match_wildcard(query->filename, dp->filename) &&
--			    !match_wildcard(query->filename,
--					   kbasename(dp->filename)) &&
--			    !match_wildcard(query->filename,
--					   trim_prefix(dp->filename)))
--				continue;
--
--			/* match against the function */
--			if (query->function &&
--			    !match_wildcard(query->function, dp->function))
--				continue;
--
--			/* match against the format */
--			if (query->format) {
--				if (*query->format == '^') {
--					char *p;
--					/* anchored search. match must be at beginning */
--					p = strstr(dp->format, query->format+1);
--					if (p != dp->format)
--						continue;
--				} else if (!strstr(dp->format, query->format))
--					continue;
--			}
--
--			/* match against the line number range */
--			if (query->first_lineno &&
--			    dp->lineno < query->first_lineno)
--				continue;
--			if (query->last_lineno &&
--			    dp->lineno > query->last_lineno)
-+			if (!ddebug_match_desc(query, dp, valid_class))
- 				continue;
+@@ -314,6 +314,7 @@ void __dynamic_ibdev_dbg(struct _ddebug *descriptor,
  
- 			nfound++;
+ #define DEFINE_DYNAMIC_DEBUG_METADATA(name, fmt)
+ #define DYNAMIC_DEBUG_BRANCH(descriptor) false
++#define DECLARE_DYNDBG_CLASSMAP(...)
+ 
+ #define dynamic_pr_debug(fmt, ...)					\
+ 	no_printk(KERN_DEBUG pr_fmt(fmt), ##__VA_ARGS__)
 
 -- 
 2.55.0
