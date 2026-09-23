@@ -1,495 +1,333 @@
-Received: from mail-oa2-f39.google.com (mail-oa2-f39.google.com [74.125.231.103])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pdx-out-006.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-006.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.26.1.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB56B346E6D
-	for <linux-kbuild@vger.kernel.org>; Tue, 22 Sep 2026 20:08:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.103
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C26E3A3E91;
+	Wed, 23 Sep 2026 05:39:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.26.1.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790107737; cv=none; b=ZMwSnIJbC3xCQQkeCjqsQTrjUu/o2ormnqBiTTKGcfC0lNqi6LJzM/AbhHtKxH0d693QgAY2bGN6vbJoYRSOQX2nmPzqZlqAl5T9JrRolhUZXcxCeWPd8RuabvhCkaKtie64wa69fhjPQFBYIQ/sBb1byVKLnaBI6j6O0nK6cEY=
+	t=1790141991; cv=none; b=f34FFIWa+ePHr9nD/7UAwOIb5Y3Jj6YBh8HfzHHhHIF8xYbAu2e4Z3MqiiJ0+hMbWaRQzBs1LddXFmPPsdMWjc8eBjszMxYvRceRl9TG7BsHmSHRI7WIT8MWVSr6BIlVMOnRskgtMr8lK/DYY8hD2cKeYMpuQl+E1vNZO+X7K/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790107737; c=relaxed/simple;
-	bh=GAU8soK/soIgxIPJa40VL+WIbNoKOxxllpQZSMNrvVo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Nrm1EVbhtFDfCtnDeB0p2Jja/YhJlIXfgFOx9zlttn6rv0XjtW62B0nsUraitiVnDBKKw4zYOmcBRdvnao+CjnD1khW5SHV9KN8NFgAIzqNejSFWnRYC2estovzE67qmJAMmDPReq0abFq42n+bagfVN/jv8iMU4+clr17v7BXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AileT8pK; arc=none smtp.client-ip=74.125.231.103
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1790141991; c=relaxed/simple;
+	bh=Mtoh5rWBAWMUE94pxCfuPwjbds9keS2vlWFyCYC854o=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SRSZ4EgdK22we4POLkp9O8+hNMqIi2n49ziLZIem6qQodQdxuTrNhfPJunVWTnnaMSNz7N9ZUYCkZ6qD3y8EUbQqjQi5DKS35s/8qJoeG4R/fIZfg4zoDvnhenHFjEi2hLYB/vKpCPt6C19t8HF2MNyFfZ5eVzr+STPBewTan/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=tMxFc5mJ; arc=none smtp.client-ip=52.26.1.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AileT8pK"
-Received: by mail-oa2-f39.google.com with SMTP id 586e51a60fabf-47b5043f191so168192fac.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 22 Sep 2026 13:08:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="tMxFc5mJ"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790107711; x=1790712511; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=sbNl4k+W1q7yiAA0aGRbWPBqZ/1TEL1hl7cPMNaYBEs=;
-        b=AileT8pKyvMXhY/8nsz6ACGn5o0cwbihSHu8M5o6JwcyW2yuu06K3+C8SKA5rRqLeO
-         Rzv1Xysp4Vb9rNBRNwt6w2qf9pdnEyveQ/Oqotx1wKKcDHnNnbmO14Fo+RkoWoEeoB/c
-         ENcfw5UarsBOje5tx82MJ0bdvjTiaVvPPnhOUxxg11GWuCCfWx1Hddm8JtftdiONgokb
-         3MFX1tYLneu8IrixlUla3V1BU9otaEnWVItlCIqNaEH4WAEtSBnVcmfpfdIGZfubmyot
-         8V/iFZnZTrdjqAQA9sCsJcSLhyuCscQSHF/iUBxNIfRh7fqVDHLy3iA8qTOOuh9eXKw8
-         33Xg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790107711; x=1790712511;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=sbNl4k+W1q7yiAA0aGRbWPBqZ/1TEL1hl7cPMNaYBEs=;
-        b=uAt22xKiN+uS7zgp4s+KnX0WMeRvdNsS1Q6oISWmyAhAa3KQUKLnIFd3QXhLpIGOGE
-         /nLsy7uGojauDGMYMHjai+DGR7OTBHtIu5WkzN94fzHQyk0eO1bO60jU8nLdcvKaSSu2
-         elGkLq/n+tUwKrO7fTVGo2EMIe15VToj8HClCPpnK8CPEPcz6POFHdIWQhSFptZWRr7l
-         5wnFBg5X1epg8BW2Xsn55wMnlI5XqatKH+kx6F15fh9YnO+vMfaGrnl6oO170z0fX7ux
-         L0K+wFiC0wOWx1E9NtiKUirh8ixXCimmq577NBVNKYa75cQV43eo9slgsFncg0J66Ubv
-         RWNg==
-X-Forwarded-Encrypted: i=1; AKwUvByykZU7zMu121XwsHzpfCJ4braed5qrcSyey9mBFfciVX8GmVeqq+lVmzXur1iV0bAmpiQ7/YLEBc92DGY=@vger.kernel.org
-X-Gm-Message-State: AFuF++nTBq+dYrQdCTS+9sIEOh5W8rl4eAzHwDZOORWlJ4YzCz+uEhcO
-	B7GQpeqJGUfqNcZWuJ7X47v/NOE7h5bViNCe1KISiekGOWJLIfigZy/Q
-X-Gm-Gg: AYBFou0xYv7ZlMVbcnMPA30FRIf4n88LCM726eS6bmH+4oQn4hSiuWOBbyUJjhfNClF
-	UekLKAOr2Bw9IcY4AW2tT0ST9qnLFrvO6Bw0pf/pXcJJ5vZqqny+1i3p4BEPqkbaCbGVZt1ZFvj
-	PysKwhkQ6k+zmNPyp5ySSClLgdy4SIWvKB3bqVyUGTmNVFcAqeH/edWm6B34/IB9lD1b5Nx+8Dj
-	DZlVLznkLDG70FsYSRBd6MoGRknd61729EYF3567FetnA6HolnFuLWk/IAijsKrtdGmqLzXeQGV
-	8NEVg9Y+wkdcJg90hq7B7KMcPkF4EVRJZrAcadmuBEbjGt98tvO+V7PFIBwXf4OJ4fsDqfDyfTp
-	zVcswgMvsB0Uxe77i+JZkRB+Nwgqhjlj0nbcIP3x5rsd6iJCCp+/x57r2AbYJoKsW0LCQ3g9X//
-	BQMEXKLQXQnHR1Y0ZaKsmSQSg7pp2Mun8LUZSQMBUOa0c2fD4D+qqqtTjm9K5CLxu2HaUgqtKAC
-	WY/Z90CXrsHcwtIKyHZppO9dGCdmojyr8ZIQfDvY0zGERtmpkXNAgXFBsehKi0RG4QahaIdm5H1
-	nJIkxMKvDOfLW9YEdRgkvOgaG9v7gw==
-X-Received: by 2002:a05:6871:340c:b0:48f:e363:5cc9 with SMTP id 586e51a60fabf-4908c5fc720mr685685fac.55.1790107710505;
-        Tue, 22 Sep 2026 13:08:30 -0700 (PDT)
-Received: from [100.82.231.29] (c-98-38-17-99.hsd1.co.comcast.net. [98.38.17.99])
-        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-4908eb9237asm564087fac.12.2026.09.22.13.08.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Sep 2026 13:08:29 -0700 (PDT)
-From: Jim Cromie <jim.cromie@gmail.com>
-Date: Tue, 22 Sep 2026 14:08:20 -0600
-Subject: [PATCH v4 3/4] kallsyms: Add dynamic lookup index for batch
- resolution
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1790141990; x=1821677990;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=T2ByyH/wtJCx7Na+D5rTx7i6cKCUqqPLbl+qGy+Y66g=;
+  b=tMxFc5mJ3Wj15njit4bwpyydmBbRmZo5xEplZmLgXHucVg7otbKON7Nk
+   lEjMu28pXMV9eu5y3fKS+7U7JtCRGfbt/tgY0eXmtPyyxYZ2akoPgbw1l
+   SbhdJDwksuzis7mLQpLlVrR+EwclQ0S6nf3+FhsJ4nIkrrYtJ4CRxsf7r
+   ci8W/tjfom1cjlPPNJOJ8OkQ1oqP1tCCaYpBh1NjtVqoouUcTKD37mGmT
+   sv5zlcu1N1hBrJdo01uD2XM1E9UPR9JtEp1HdgkE8hGUCjgECn9TnJhYq
+   bdaltGqY4/O/9/8OKKMafdxOo2b9cixOGcPZaoMGcKTCfAd6HA+3VNdaY
+   w==;
+X-CSE-ConnectionGUID: BiFj28b/Th6wdsPGNRketw==
+X-CSE-MsgGUID: 2EpWwkE0TQualvsqjrNWXQ==
+X-IronPort-AV: E=Sophos;i="6.27,117,1787011200"; 
+   d="scan'208";a="29444457"
+Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
+  by internal-pdx-out-006.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2026 05:39:49 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.111:20984]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.23.40:2525] with esmtp (Farcaster)
+ id 7e661d76-f78a-483a-942f-de0a7336d079; Wed, 23 Sep 2026 05:39:49 +0000 (UTC)
+X-Farcaster-Flow-ID: 7e661d76-f78a-483a-942f-de0a7336d079
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.49;
+ Wed, 23 Sep 2026 05:39:49 +0000
+Received: from dev-dsk-wanjay-2c-d25651b4.us-west-2.amazon.com (172.19.198.4)
+ by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.49;
+ Wed, 23 Sep 2026 05:39:48 +0000
+From: Jay Wang <wanjay@amazon.com>
+To: <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, "Daniel
+ Borkmann" <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+	"Eduard Zingerman" <eddyz87@gmail.com>, Kumar Kartikeya Dwivedi
+	<memxor@gmail.com>
+CC: Alan Maguire <alan.maguire@oracle.com>, Martin KaFai Lau
+	<martin.lau@linux.dev>, Yonghong Song <yonghong.song@linux.dev>, "Nathan
+ Chancellor" <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
+	<linux-kbuild@vger.kernel.org>, Luis Chamberlain <mcgrof@kernel.org>, "Petr
+ Pavlu" <petr.pavlu@suse.com>, <linux-modules@vger.kernel.org>, Arnd Bergmann
+	<arnd@arndb.de>, <linux-kernel@vger.kernel.org>, Hazem Mohamed Abuelfotoh
+	<abuehaze@amazon.com>, Bjoern Doebel <doebel@amazon.de>,
+	<jay.wang.upstream@gmail.com>
+Subject: [PATCH bpf-next 0/6] bpf: make the vmlinux BTF an on-demand loadable module (CONFIG_DEBUG_INFO_BTF=m) to save ~5.4 MB memory
+Date: Wed, 23 Sep 2026 05:39:42 +0000
+Message-ID: <20260923053948.30617-1-wanjay@amazon.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260922-ksyms-tune-v4-3-92acea84b911@gmail.com>
-References: <20260922-ksyms-tune-v4-0-92acea84b911@gmail.com>
-In-Reply-To: <20260922-ksyms-tune-v4-0-92acea84b911@gmail.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Lorenzo Stoakes <ljs@kernel.org>, Kees Cook <kees@kernel.org>, 
- David Laight <david.laight.linux@gmail.com>, 
- Masahiro Yamada <masahiroy@kernel.org>, linux-kernel@vger.kernel.org, 
- linux-kbuild@vger.kernel.org, bpf@vger.kernel.org, 
- Jim Cromie <jim.cromie@gmail.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1790107704; l=13772;
- i=jim.cromie@gmail.com; s=20260203; h=from:subject:message-id;
- bh=GAU8soK/soIgxIPJa40VL+WIbNoKOxxllpQZSMNrvVo=;
- b=fTsqZWFey3zeLGk8mlnrfpOeY4sMTsFvBW4VUCETSnZEzwPTWrX9UXMVYOpDOqd9cwXnciyPD
- tWdDJI6RBSgA59X376C7eN2KRgTvK8tWzCl6XbVVu8LEzkfziycyfwV
-X-Developer-Key: i=jim.cromie@gmail.com; a=ed25519;
- pk=C6E5ODlPQo7ZBynATXH9wg7K6HxP0pIXyf4s38Qw0XE=
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D035UWB001.ant.amazon.com (10.13.138.33) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-kallsyms_lookup_names() resolves symbol names to addresses using a
-binary search over kallsyms_seqs_of_names[].  In baseline, each step
-invokes get_symbol_offset(), which scans sequentially from the nearest
-256-symbol marker in kallsyms_names[] (averaging ~128 ULEB128 header
-decodes per probe, ~2,176 decodes per lookup).
+Based on and tested against bpf-next commit 91f8613d95ad ("bpf: Drop
+duplicate check_app_limited in tcp_bpf_push").
 
-During bulk symbol resolution workloads (e.g. BPF multi-kprobe / fprobe
-tracing attaching across tens of thousands of functions), this linear
-scan compounds into substantial kernel attach latency (~3.3 us per
-lookup).  Baking a permanent direct index into .rodata accelerates
-lookups but consumes hundreds of KiB of unswappable kernel image memory,
-which is unjustified when bulk lookups are infrequent.
+This series makes CONFIG_DEBUG_INFO_BTF a tristate, so that it can be
+set to =m.  With =m the vmlinux BTF is carried by a module, btf_vmlinux,
+that the kernel loads the first time anything needs the BTF.  On a
+system where nothing does, that saves ~5.4 MB of RAM with a distribution
+config; on a system that uses BTF, nothing differs from =y.  =y itself
+is untouched.
 
-Introduce a dynamic u32 lookup index populated on demand in transient
-RAM and discarded when the batch workload completes:
+Problem
+-------
 
-0. Expose kallsyms_lookup_batch_start() and kallsyms_lookup_batch_end()
-   bracketed by a mutex and refcount.  On the first caller, allocate a
-   flat u32 table spanning all kallsyms_num_syms entries (~736 KiB in
-   transient RAM for ~184k symbols) via kvmalloc_array() and populate
-   the symbol offsets via a single sequential scan in ~150 us.
+The vmlinux BTF that CONFIG_DEBUG_INFO_BTF=y builds into the kernel
+image takes ~5.4 MB of memory, resident from boot whether anything uses
+it or not.  On small instances that is not negligible.
 
-1. In get_symbol_offset(), when the dynamic table is active, return
-   offsets[pos] directly as an O(1) array access with 0 hops, bracketed
-   by rcu_read_lock() and rcu_read_unlock().
+A distribution cannot simply turn it off for the users who do not need
+it: it ships one kernel build for all its users, and BTF is not debug
+info anymore.  CO-RE, fentry/fexit, kfuncs, struct_ops, sched_ext and
+bpf-lsm all depend on it, so =n takes those away from everyone who does
+use them. 
 
-2. If the dynamic table is unallocated (refcount 0), fall back to the
-   legacy kallsyms_markers[] scan, preserving 100% safety for oops,
-   panic, NMI, and low-memory environments without any .rodata bloat.
+Hence this series adds CONFIG_DEBUG_INFO_BTF=m: the BTF becomes an
+on-demand module.
+Users who never use BTF get the memory back; for users who do, the first
+use loads it automatically and everything works as with =y.
 
-3. Wrap kallsyms_lookup_names() in rcu_read_lock() / rcu_read_unlock()
-   to ensure lockless lifetime safety across multi-probe searches.
+Approach
+--------
 
-4. Update test_kallsyms_perf and kallsyms_selftest to benchmark both
-   unindexed marker scans and the dynamic batch index side by side,
-   reporting batch lookup performance alongside query amortization
-   break-even points.
+Do not remove anything, defer it.  The BTF is generated exactly as
+before, but with =m it is not part of the kernel image: it is packed
+into a module, btf_vmlinux.ko, which the kernel loads itself the first
+time anything needs the BTF.  Once loaded, the BTF stays, and nothing
+differs from =y.
 
-Signed-off-by: Jim Cromie <jim.cromie@gmail.com>
----
-Changes in v4:
-- Annotate dyn_kallsyms_offsets declaration with __rcu to satisfy sparse
-  type checking and prevent address-space warnings across
-  rcu_assign_pointer() and rcu_dereference() (addresses Sashiko AI review).
-- Use rcu_replace_pointer() with lockdep_is_held(&dyn_kallsyms_mutex)
-  during batch teardown to atomically read and clear the pointer while
-  satisfying sparse address-space constraints (addresses Sashiko AI review).
+Making that work ran into five problems.  The first three are existing
+components that rely on the vmlinux BTF being present from boot, which
+a loadable module cannot provide; the last two follow from the BTF no
+longer being part of the image.
 
-Changes in v3:
-- Reorder patch after on-the-fly token matching (patch 2) to cleanly
-  isolate and measure the impact of the O(1) dynamic table on top of
-  fast string matching (addresses David Laight review).
-- Consume get_symbol_data() helper introduced in patch 2 to preserve
-  clean git bisectability (addresses Sashiko AI review).
-- Fix use-after-free race on dyn_kallsyms_offsets: bracket table
-  dereference and array read with rcu_read_lock() and replace
-  rcu_dereference_raw() with rcu_dereference() inside
-  get_symbol_offset() to protect external readers (lookup_symbol_name,
-  kallsyms_lookup_buildid, reset_iter) against concurrent batch
-  teardown (addresses Sashiko AI review).
-- In kallsyms_selftest, add a second lookup pass bracketed by
-  kallsyms_lookup_batch_start() and kallsyms_lookup_batch_end() to
-  validate batch resolution in the in-tree selftest.
-- Move 24-bit loop unrolling in get_symbol_seq() to standalone patch 4
-  (addresses David Laight review).
-- Move David Laight to series-wide Cc on cover letter, dropping trailer
-  from this patch.
+1. Verifier.  Problem: bpf_check() fetched the vmlinux BTF for every
+   program, so the first socket filter at boot would have loaded the
+   module on every system.  Solution: fetch the BTF only where kernel
+   types enter a program (attach_btf, kfunc calls, ksyms, map pointer
+   access, helpers that take or return kernel pointers).  A program
+   using none of these never touches it.
 
-Changes in v2:
-- Rework from static build-time 3-byte table to dynamic u32 index
-  allocated in transient RAM during batch sessions, dropping +573 KiB
-  from .rodata to 0 bytes (addresses Kees Cook review).
-- Use native u32 indexing to eliminate 24-bit big-endian shifts and
-  unaligned loads (addresses David Laight review).
-- Revert changes to scripts/kallsyms.c and kernel/kallsyms_internal.h,
-  retaining legacy kallsyms_markers[] as fallback.
----
- include/linux/kallsyms.h   |  13 ++++++
- kernel/kallsyms.c          | 111 ++++++++++++++++++++++++++++++++++++++++++---
- kernel/kallsyms_selftest.c |  16 +++++++
- lib/test_kallsyms_perf.c   |  51 ++++++++++++++++++---
- 4 files changed, 179 insertions(+), 12 deletions(-)
+2. Initcall registrations.  Problem: kfunc, dtor kfunc and struct_ops
+   registrations run from initcalls and need the parsed BTF, which
+   would again pull it in at boot.  Solution: queue them and apply the
+   queue when the BTF is parsed, before it is published, so no program
+   can ever see a vmlinux BTF that lacks its kfuncs or struct_ops.
 
-diff --git a/include/linux/kallsyms.h b/include/linux/kallsyms.h
-index d5dd54c53ace..6e39795ac509 100644
---- a/include/linux/kallsyms.h
-+++ b/include/linux/kallsyms.h
-@@ -74,6 +74,10 @@ int kallsyms_on_each_symbol(int (*fn)(void *, const char *, unsigned long),
- int kallsyms_on_each_match_symbol(int (*fn)(void *, unsigned long),
- 				  const char *name, void *data);
- 
-+/* Transient dynamic lookup index bracketing */
-+int kallsyms_lookup_batch_start(void);
-+void kallsyms_lookup_batch_end(void);
-+
- /* Lookup the address for a symbol. Returns 0 if not found. */
- unsigned long kallsyms_lookup_name(const char *name);
- 
-@@ -164,6 +168,15 @@ static inline int kallsyms_on_each_match_symbol(int (*fn)(void *, unsigned long)
- {
- 	return -EOPNOTSUPP;
- }
-+
-+static inline int kallsyms_lookup_batch_start(void)
-+{
-+	return 0;
-+}
-+
-+static inline void kallsyms_lookup_batch_end(void)
-+{
-+}
- #endif /*CONFIG_KALLSYMS*/
- 
- static inline void print_ip_sym(const char *loglvl, unsigned long ip)
-diff --git a/kernel/kallsyms.c b/kernel/kallsyms.c
-index d18d78e626db..bb34b4c0f690 100644
---- a/kernel/kallsyms.c
-+++ b/kernel/kallsyms.c
-@@ -22,6 +22,9 @@
- #include <linux/sched.h>	/* for cond_resched */
- #include <linux/ctype.h>
- #include <linux/slab.h>
-+#include <linux/vmalloc.h>
-+#include <linux/mutex.h>
-+#include <linux/rcupdate.h>
- #include <linux/filter.h>
- #include <linux/ftrace.h>
- #include <linux/kprobes.h>
-@@ -90,7 +93,7 @@ static unsigned int kallsyms_expand_symbol(unsigned int off,
- 	if (maxlen)
- 		*result = '\0';
- 
--	/* Return to offset to the next symbol. */
-+	/* Return offset to the next symbol. */
- 	return off;
- }
- 
-@@ -139,12 +142,11 @@ static int kallsyms_strcmp_symbol(unsigned int off, const char *name)
- 	return (unsigned char)*name;
- }
- 
--
- /*
-- * Find the offset on the compressed stream given and index in the
-- * kallsyms array.
-+ * Find the offset on the compressed stream given an index in the
-+ * kallsyms array using legacy markers.
-  */
--static unsigned int get_symbol_offset(unsigned long pos)
-+static unsigned int get_symbol_offset_marker(unsigned long pos)
- {
- 	const u8 *name;
- 	int i, len;
-@@ -177,6 +179,99 @@ static unsigned int get_symbol_offset(unsigned long pos)
- 	return name - kallsyms_names;
- }
- 
-+/*
-+ * Dynamic symbol offset table.
-+ * Allocated on demand during high-volume lookup batches and reclaimed after.
-+ */
-+static u32 __rcu *dyn_kallsyms_offsets __read_mostly;
-+static DEFINE_MUTEX(dyn_kallsyms_mutex);
-+static unsigned int dyn_kallsyms_refcnt;
-+
-+static u32 *kallsyms_build_offsets(void)
-+{
-+	const u8 *name = kallsyms_names;
-+	u32 *offsets;
-+	unsigned int i;
-+
-+	offsets = kvmalloc_array(kallsyms_num_syms, sizeof(u32), GFP_KERNEL);
-+	if (!offsets)
-+		return NULL;
-+
-+	for (i = 0; i < kallsyms_num_syms; i++) {
-+		unsigned int len;
-+		const u8 *data;
-+
-+		offsets[i] = name - kallsyms_names;
-+		data = get_symbol_data(offsets[i], &len);
-+		name = data + len;
-+	}
-+
-+	return offsets;
-+}
-+
-+int kallsyms_lookup_batch_start(void)
-+{
-+	int ret = 0;
-+
-+	mutex_lock(&dyn_kallsyms_mutex);
-+	if (!dyn_kallsyms_refcnt) {
-+		u32 *offsets = kallsyms_build_offsets();
-+
-+		if (!offsets) {
-+			ret = -ENOMEM;
-+			goto out;
-+		}
-+		rcu_assign_pointer(dyn_kallsyms_offsets, offsets);
-+	}
-+	dyn_kallsyms_refcnt++;
-+out:
-+	mutex_unlock(&dyn_kallsyms_mutex);
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(kallsyms_lookup_batch_start);
-+
-+void kallsyms_lookup_batch_end(void)
-+{
-+	u32 *offsets = NULL;
-+
-+	mutex_lock(&dyn_kallsyms_mutex);
-+	if (WARN_ON(!dyn_kallsyms_refcnt))
-+		goto out;
-+
-+	if (--dyn_kallsyms_refcnt == 0)
-+		offsets = rcu_replace_pointer(dyn_kallsyms_offsets, NULL,
-+					      lockdep_is_held(&dyn_kallsyms_mutex));
-+out:
-+	mutex_unlock(&dyn_kallsyms_mutex);
-+
-+	if (offsets) {
-+		synchronize_rcu();
-+		kvfree(offsets);
-+	}
-+}
-+EXPORT_SYMBOL_GPL(kallsyms_lookup_batch_end);
-+
-+/*
-+ * Find the offset on the compressed table given an index in the
-+ * kallsyms array.
-+ */
-+static inline unsigned int get_symbol_offset(unsigned long pos)
-+{
-+	unsigned int off;
-+	u32 *offsets;
-+
-+	rcu_read_lock();
-+	offsets = rcu_dereference(dyn_kallsyms_offsets);
-+	if (offsets) {
-+		off = offsets[pos];
-+		rcu_read_unlock();
-+		return off;
-+	}
-+	rcu_read_unlock();
-+
-+	return get_symbol_offset_marker(pos);
-+}
-+
- unsigned long kallsyms_sym_address(int idx)
- {
- 	/* non-relocatable 32-bit kernels just embed the value directly */
-@@ -206,6 +301,7 @@ static int kallsyms_lookup_names(const char *name,
- 	low = 0;
- 	high = kallsyms_num_syms - 1;
- 
-+	rcu_read_lock();
- 	while (low <= high) {
- 		mid = low + (high - low) / 2;
- 		seq = get_symbol_seq(mid);
-@@ -219,8 +315,10 @@ static int kallsyms_lookup_names(const char *name,
- 			break;
- 	}
- 
--	if (low > high)
-+	if (low > high) {
-+		rcu_read_unlock();
- 		return -ESRCH;
-+	}
- 
- 	low = mid;
- 	while (low) {
-@@ -243,6 +341,7 @@ static int kallsyms_lookup_names(const char *name,
- 		}
- 		*end = high;
- 	}
-+	rcu_read_unlock();
- 
- 	return 0;
- }
-diff --git a/kernel/kallsyms_selftest.c b/kernel/kallsyms_selftest.c
-index 8f6c4e9b3a1c..aedffc058c0e 100644
---- a/kernel/kallsyms_selftest.c
-+++ b/kernel/kallsyms_selftest.c
-@@ -178,6 +178,7 @@ static int lookup_name(void *data, const char *name, unsigned long addr)
- static void test_perf_kallsyms_lookup_name(void)
- {
- 	struct test_stat stat;
-+	int ret;
- 
- 	memset(&stat, 0, sizeof(stat));
- 	stat.min = INT_MAX;
-@@ -185,6 +186,21 @@ static void test_perf_kallsyms_lookup_name(void)
- 	pr_info("kallsyms_lookup_name() looked up %d symbols\n", stat.real_cnt);
- 	pr_info("The time spent on each symbol is (ns): min=%d, max=%d, avg=%lld\n",
- 		stat.min, stat.max, div_u64(stat.sum, stat.real_cnt));
-+
-+	ret = kallsyms_lookup_batch_start();
-+	if (ret) {
-+		pr_err("kallsyms_lookup_batch_start() failed: %d\n", ret);
-+		return;
-+	}
-+
-+	memset(&stat, 0, sizeof(stat));
-+	stat.min = INT_MAX;
-+	kallsyms_on_each_symbol(lookup_name, &stat);
-+	kallsyms_lookup_batch_end();
-+
-+	pr_info("kallsyms_lookup_name() (batch) looked up %d symbols\n", stat.real_cnt);
-+	pr_info("The time spent on each symbol is (ns): min=%d, max=%d, avg=%lld\n",
-+		stat.min, stat.max, div_u64(stat.sum, stat.real_cnt));
- }
- 
- static int find_symbol(void *data, const char *name, unsigned long addr)
-diff --git a/lib/test_kallsyms_perf.c b/lib/test_kallsyms_perf.c
-index 03ff5f1d51c5..f6c3d5d82e5d 100644
---- a/lib/test_kallsyms_perf.c
-+++ b/lib/test_kallsyms_perf.c
-@@ -91,7 +91,8 @@ static int count_cb(void *data, const char *name, unsigned long addr)
- 	return 0;
- }
- 
--static void run_name_lookup_bench(unsigned int iters)
-+static void run_name_lookup_bench(const char *mode, unsigned int iters,
-+				  u64 *avg_hit_ns, u64 *avg_miss_ns)
- {
- 	u64 t0, t1, dt_hit = 0, dt_miss = 0;
- 	unsigned long addr = 0;
-@@ -153,10 +154,15 @@ static void run_name_lookup_bench(unsigned int iters)
- 		dt_miss += t1 - t0;
- 	}
- 
--	pr_info("Name Search Hit:  %llu ns/lookup (%llu ms total, %u iters)\n",
--		div_u64(dt_hit, iters), div_u64(dt_hit, 1000000), iters);
--	pr_info("Name Search Miss: %llu ns/lookup (%llu ms total, %u iters)\n",
--		div_u64(dt_miss, iters), div_u64(dt_miss, 1000000), iters);
-+	if (avg_hit_ns)
-+		*avg_hit_ns = div_u64(dt_hit, iters);
-+	if (avg_miss_ns)
-+		*avg_miss_ns = div_u64(dt_miss, iters);
-+
-+	pr_info("[%s] Name Search Hit:  %llu ns/lookup (%llu ms total, %u iters)\n",
-+		mode, div_u64(dt_hit, iters), div_u64(dt_hit, 1000000), iters);
-+	pr_info("[%s] Name Search Miss: %llu ns/lookup (%llu ms total, %u iters)\n",
-+		mode, div_u64(dt_miss, iters), div_u64(dt_miss, 1000000), iters);
- }
- 
- static void run_address_lookup_bench(unsigned int iters)
-@@ -243,6 +249,9 @@ static void run_table_walk_bench(void)
- static int run_kallsyms_benchmark(void)
- {
- 	unsigned int iters;
-+	u64 unindexed_hit = 0, unindexed_miss = 0;
-+	u64 dyn_hit = 0, dyn_miss = 0;
-+	u64 t0, t1, dt_start = 0, dt_end = 0;
- 	int ret = 0;
- 
- 	if (!mutex_trylock(&bench_lock)) {
-@@ -261,7 +270,37 @@ static int run_kallsyms_benchmark(void)
- 	pr_info("Starting kallsyms performance benchmark (iters=%u)\n", iters);
- 	pr_info("==================================================\n");
- 
--	run_name_lookup_bench(iters);
-+	/* 1. Benchmark baseline unindexed marker scan */
-+	run_name_lookup_bench("Unindexed (markers)", iters, &unindexed_hit, &unindexed_miss);
-+
-+	/* 2. Benchmark dynamic lookup index */
-+	t0 = ktime_get_ns();
-+	ret = kallsyms_lookup_batch_start();
-+	t1 = ktime_get_ns();
-+	dt_start = t1 - t0;
-+
-+	if (ret) {
-+		pr_err("Failed to start kallsyms lookup batch: %d\n", ret);
-+	} else {
-+		run_name_lookup_bench("Dynamic Index", iters, &dyn_hit, &dyn_miss);
-+
-+		t0 = ktime_get_ns();
-+		kallsyms_lookup_batch_end();
-+		t1 = ktime_get_ns();
-+		dt_end = t1 - t0;
-+
-+		pr_info("[Dynamic Index] Batch setup: %llu us, teardown: %llu us\n",
-+			div_u64(dt_start, 1000), div_u64(dt_end, 1000));
-+
-+		if (unindexed_hit > dyn_hit) {
-+			u64 saved = unindexed_hit - dyn_hit;
-+
-+			pr_info("[Dynamic Index] Amortization break-even: %llu queries (setup), %llu queries (total)\n",
-+				DIV_ROUND_UP_ULL(dt_start, saved),
-+				DIV_ROUND_UP_ULL(dt_start + dt_end, saved));
-+		}
-+	}
-+
- 	run_address_lookup_bench(iters);
- 	run_table_walk_bench();
- 
+3. Module BTF.  Problem: module BTF is split BTF against the vmlinux
+   BTF and was parsed at module load.  A module loaded before the
+   vmlinux BTF cannot be parsed yet, and the module notifier cannot
+   load btf_vmlinux (that would nest a module load inside a module
+   load).  Solution: keep the module's BTF aside, expose it in
+   /sys/kernel/btf right away, and parse and register it, together
+   with the module's own kfuncs and struct_ops, once the vmlinux BTF
+   arrives.  Module BTF thus works regardless of load order.
 
+4. Trust.  Problem: the verifier treats the BTF as the description of
+   the kernel's types, so a carrier from a different build must be
+   refused even if vermagic lets it load.  Solution: link the size and
+   SHA-256 of the BTF into the image and check them when the module
+   loads.  The linked-in size also lets /sys/kernel/btf/vmlinux report
+   its final size before the load, which tooling expects.
+
+5. Tooling.  Problem: pahole --btf_base for module BTF, bpftool and
+   external module builds read .BTF from the vmlinux ELF.  Solution:
+   keep .BTF in the ELF as a non-loadable section, so it is in the file
+   but not in the image.
+
+CONFIG_BPF_PRELOAD is made unavailable with =m: its preloaded programs
+attach through the vmlinux BTF, so every bpffs mount, which systemd does
+at boot, would load it and defeat the point.
+
+Relation to the inline BTF series
+---------------------------------
+
+Alan's inline BTF series [2] adds inline function information to BTF,
+which is even larger than the BTF itself, and its cover letter leaves
+delivering that information on demand, through a module and sysfs, to a
+follow-up.  When Alexei suggested taking the same route for the vmlinux
+BTF, Alan pointed out where the difficulty would lie [3].
+
+However, that approach cannot be used directly for the vmlinux BTF,
+because of what depends on the data:
+
+1. Boot-time consumers.  Nothing needs inline information at boot, so
+   loading it late only concerns the sysfs file.  The core vmlinux BTF
+   is needed at boot by the verifier, by kfunc and struct_ops
+   registrations, and by every module's BTF.  Therefore we need to make
+   each of those wait for the BTF instead of expecting it at boot: the
+   verifier fetches it only when a program brings kernel types in, and
+   the registrations are queued and replayed once it is parsed.  That
+   is most of this series.
+
+2. Module BTF.  Module BTF is split against the vmlinux BTF, so a module
+   loaded before it has nothing to be parsed against, and the module
+   notifier cannot load btf_vmlinux itself.  Therefore we need to keep
+   the module's BTF aside, expose it in sysfs as raw bytes right away,
+   and parse and register it once the vmlinux BTF arrives.  Alan named
+   this as the hard part; it works here regardless of whether the module
+   loads before or after the vmlinux BTF.
+
+The btf_vmlinux module added here could carry the inline information as
+well when that follow-up comes, so both would share one mechanism.
+
+Patches Structure
+-----------------
+
+Patch 1 (refactor, no functional change): btf_parse_module() takes the
+vmlinux BTF as an argument and can adopt an existing copy of the module
+BTF data instead of duplicating it.  Needed so that module BTF kept
+aside at load time can be parsed later without moving the buffer the
+sysfs file points at.
+
+Patch 2 (refactor, no functional change): splits the kfunc, dtor kfunc
+and struct_ops registration functions into "find the BTF for the owner"
+and "add the registration to this BTF", so the second half can be
+replayed on a queued registration.
+
+Patch 3 (verifier): stops fetching the vmlinux BTF up front in
+bpf_check() and fetches it where kernel types enter a program instead.
+Adds bpf_peek_btf_vmlinux() for the helpers that run in program
+context and cannot load anything.  With =y the BTF is parsed at boot
+anyway, so this is invisible there.
+
+Patch 4 (carrier): the runtime side of taking the vmlinux BTF from the
+btf_vmlinux module: request it on first use, copy it out of the module
+in the BTF module notifier after checking size and SHA-256 against
+.BTF.meta, and serve /sys/kernel/btf/vmlinux from the copy with its
+size known from boot.  All under IS_MODULE(CONFIG_DEBUG_INFO_BTF), so
+unreachable until patch 6.
+
+Patch 5 (deferrals): queues kfunc, dtor kfunc and struct_ops
+registrations made before their BTF is available and applies them when
+it is; keeps the BTF of modules loaded before the vmlinux BTF and parses
+and registers it when the vmlinux BTF arrives.  Also unreachable until
+patch 6.
+
+Patch 6 (kbuild and Kconfig): makes CONFIG_DEBUG_INFO_BTF a tristate;
+with =m links .BTF into vmlinux as a non-loadable section, emits
+.BTF.meta, builds btf_vmlinux.ko with the vmlinux .BTF as its payload,
+makes the Makefile and #ifdef sites that must hold for both =y and =m
+do so, excludes CONFIG_BPF_PRELOAD, and documents the option.
+
+Patches 1-3 are independently useful cleanups; 4 and 5 are dead code
+until 6 flips the switch, which keeps each bisect step building and
+behaving as before.
+
+Testing
+-------
+
+Tested with 1 GiB of memory, same tree, =y against =m, both with
+CONFIG_DEBUG_INFO_BTF_MODULES=y.  The on-demand behaviour is easy to
+see by hand on an =m kernel:
+
+  # lsmod | grep btf_vmlinux
+      -> nothing: the BTF is not loaded at boot.
+  # ls -la /sys/kernel/btf/vmlinux
+      -> the file exists with its final size (from .BTF.meta), although
+         the BTF behind it is not loaded yet.
+  # modprobe ext4 nf_conntrack
+  # ls /sys/kernel/btf/
+      -> ext4, nf_conntrack, ... appear immediately, although their
+         BTF is only kept aside, not parsed: there is no vmlinux BTF to
+         parse it against yet.
+  # lsmod | grep btf_vmlinux
+      -> still nothing: loading modules does not load the vmlinux BTF.
+  # cat /sys/kernel/btf/ext4 > /dev/null
+  # lsmod | grep btf_vmlinux
+      -> still nothing: a module's BTF file is served from the raw copy,
+         reading it does not need the vmlinux BTF.
+  # grep VmallocUsed /proc/meminfo
+      -> baseline.
+  # cat /sys/kernel/btf/vmlinux > /dev/null
+  # lsmod | grep btf_vmlinux
+      -> btf_vmlinux ... [permanent]: the first use loaded it, and it
+         cannot be unloaded.
+  # grep VmallocUsed /proc/meminfo
+      -> up by ~5.5 MB: the BTF copy, allocated only now.
+  # bpftool btf list
+      -> vmlinux and every loaded module now have BTF ids; the modules
+         loaded before were parsed and registered on the way.
+
+Any BPF program that uses kernel types (kprobe with
+bpf_get_current_task_btf(), a kfunc call, fentry, ...) triggers the
+same load; a plain socket filter does not.
+
+Results:
+
+ - MemTotal is ~5.4 MB higher with =m while the BTF is unused, which is
+   the size of the .BTF section.  Once the BTF is in use, MemFree is the
+   same within run-to-run noise.
+ - Modules loaded before the trigger (ext4, nf_conntrack, which
+   registers kfuncs from its init, xfrm_interface) get BTF ids once the
+   BTF is loaded; a struct_ops map for tcp_congestion_ops and a syscall
+   program calling bpf_task_from_pid() work; nf_nat loaded afterwards
+   takes the usual path.
+ - stat() of /sys/kernel/btf/vmlinux reports the final size before the
+   load; fstat/read/mmap agree afterwards.
+ - A carrier with one byte of .BTF changed is refused with -EINVAL.
+ - lockdep and kmemleak kernels are clean in all trigger orders.
+ - =y and =n build and behave as before; =m without module BTF works.
+
+[1] https://lore.kernel.org/all/20260917000201.25581-2-wanjay@amazon.com/
+[2] https://lore.kernel.org/bpf/20260916074118.1007116-1-alan.maguire@oracle.com/
+[3] https://lore.kernel.org/all/33592fca-88a8-44aa-8d94-40e1e604554e@oracle.com/
+
+Jay Wang (6):
+  bpf: pass the vmlinux BTF to btf_parse_module() and let it adopt the
+    data
+  bpf: split the kfunc, dtor kfunc and struct_ops registration bodies
+  bpf: fetch the vmlinux BTF where kernel types enter a program
+  bpf: take the vmlinux BTF from the btf_vmlinux module
+  bpf: defer registrations until the vmlinux BTF is available
+  kbuild, bpf: allow building the vmlinux BTF as a module
+
+ Documentation/bpf/btf.rst         |  35 ++
+ Makefile                          |   8 +-
+ include/asm-generic/vmlinux.lds.h |  30 +-
+ include/linux/bpf.h               |   1 +
+ include/linux/btf.h               |   7 +
+ include/linux/btf_ids.h           |   2 +-
+ include/linux/compiler_types.h    |   2 +-
+ include/linux/module.h            |   2 +-
+ include/trace/trace_events.h      |   2 +-
+ kernel/bpf/Makefile               |   6 +-
+ kernel/bpf/bpf_struct_ops.c       |   3 +-
+ kernel/bpf/btf.c                  | 782 ++++++++++++++++++++++++++----
+ kernel/bpf/btf_vmlinux.c          |  23 +
+ kernel/bpf/preload/Kconfig        |   4 +
+ kernel/bpf/syscall.c              |   6 +
+ kernel/bpf/sysfs_btf.c            |  80 ++-
+ kernel/bpf/verifier.c             | 104 +++-
+ kernel/module/main.c              |   4 +-
+ kernel/trace/bpf_trace.c          |   3 +-
+ kernel/trace/trace_syscalls.c     |   6 +-
+ lib/Kconfig.debug                 |  13 +-
+ net/netfilter/Makefile            |   6 +-
+ net/xfrm/Makefile                 |   4 +-
+ scripts/Makefile.modfinal         |  14 +-
+ scripts/gen-btf.sh                |  93 +++-
+ scripts/link-vmlinux.sh           |  25 +-
+ 26 files changed, 1121 insertions(+), 144 deletions(-)
+ create mode 100644 kernel/bpf/btf_vmlinux.c
+
+
+base-commit: 91f8613d95ad8cd99d8baf094806d1ef98bc6380
 -- 
-2.55.0
+2.47.3
 
