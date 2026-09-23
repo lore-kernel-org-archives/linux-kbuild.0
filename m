@@ -1,145 +1,161 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm2-f13.google.com (mail-wm2-f13.google.com [74.125.225.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CFF843B3EF;
-	Wed, 23 Sep 2026 09:19:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 283C8414414
+	for <linux-kbuild@vger.kernel.org>; Wed, 23 Sep 2026 10:00:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790155191; cv=none; b=Tsz6Tz7mi6XP8KC2396rYbV5IVrbV7t3P97Ot0siaxauzt6z13twdxuecEVWuIMGgOv0dyUcYnLoNUwnTwNp15/Xnmbvc7XDCTW2vGNsx/MnprHlw0YoJNezIdQp7ul9MGx0Qnsl9bEziOnwOLb5xRSiWjLYTMe4V3tbaXXeI4I=
+	t=1790157660; cv=none; b=tIsIfXphl22E+VGOkNie117iLlsjqq5xOEnil3sw6Xq7SPPI+MRNJYJwHj5ekR+NnHoAjK/GHe+jZZqCBrNaZb2NCJsk0l7HnEBpGdTniQI3JaoIyoLvOydh+MWLnb1iz6mXf4jRDn8QZVEbrCPB5hv+uk+gNS4y+MDDuVSqMx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790155191; c=relaxed/simple;
-	bh=QoOgO/A2U5dtm7QoQT4ErByB/CY9vpIhJBSi3Us/+JE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f88xMqq3cjWElRLMXj/7zkUanEwLNUL/uZBFqrcQSmWL+G99azVuDPFcBZLJOG5nMlHgAUDo3bTkV+N6zZyDy4f9nWGuV/BEW6QNu4RARBIooi0bK/DdMEjH8zspJwrRZlFyc0idKA6/1jcsoe9J4EUmWVIzMPBanNuBVmqdvqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i935KHZ0; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790157660; c=relaxed/simple;
+	bh=oTk8GgJpcL7X2Re/WTHsnTdZbBvC9y1AJTi7eZ9DNRE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ul02Tbi5aZbBGBDxwiwo1Jn6stT6ak/uEtz7b6CMZelHSo9jcP+t6pg2BpSmhgDyy2RGPKdQqc23Dkbti116evcx9Y3VUQRKflVtqy9LlALZ0wfnmTX6stXsYbtH35mFJMGh+jiMXDN7ff8OiP72gi5M55d9f73Dg2mP6I7p81M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zf8F2THf; arc=none smtp.client-ip=74.125.225.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i935KHZ0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 465CD1F000FF;
-	Wed, 23 Sep 2026 09:19:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790155189;
-	bh=szozd7BSlCRG6SBcZcvnaC59iOuE2gZVQMEdYxaAPfg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=i935KHZ03UQCOH4iIXqvpXzISRCnQkyg/7sekoDfNzFScbwNm9ckk0hABoKJ4MivO
-	 4PVX5vSdjD8HGmskfgBtcNDkI8qvRU8v5/w3PkwoUvgmZ17uCo75xWaxQaK9Mleuhh
-	 78BPW4fvbSD9Fzat6DcWvAb4K7OFR3z+TnYuIFxAI7BLwiiLTnLA+fvF/Xxogg9kWu
-	 ojjUK6uDDp1zJyv/DcHgGv0bvoIqwp9lKyFkmCn8PCT4za8eUYdsIcaxYcgADguYMm
-	 F6cIZ8f+dI4Uyue/PLV1oc1e2KAMFSYI+UoZCHFacoLvBgH9vLGXzpBDyqachCkMFz
-	 wvxTQ0rPS6eag==
-Date: Wed, 23 Sep 2026 12:19:34 +0300
-From: Mike Rapoport <rppt@kernel.org>
-To: Guenter Roeck <linux@roeck-us.net>
-Cc: Marco Elver <elver@google.com>, Vlastimil Babka <vbabka@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Andrey Konovalov <andreyknvl@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	David Hildenbrand <david@kernel.org>,
-	David Rientjes <rientjes@google.com>,
-	Dmitry Vyukov <dvyukov@google.com>, Jann Horn <jannh@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	KP Singh <kpsingh@kernel.org>, Kees Cook <kees@kernel.org>,
-	Lorenzo Stoakes <ljs@kernel.org>,
-	Matteo Rizzo <matteorizzo@google.com>,
-	Michal Hocko <mhocko@suse.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Suren Baghdasaryan <surenb@google.com>,
-	linux-hardening@vger.kernel.org, Nicolas Schier <nsc@kernel.org>,
-	Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Christoph Lameter <cl@gentwo.org>, Harry Yoo <harry@kernel.org>,
-	Hao Li <hao.li@linux.dev>, "Liam R. Howlett" <liam@infradead.org>,
-	Alexander Potapenko <glider@google.com>,
-	Miguel Ojeda <ojeda@kernel.org>, linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	kasan-dev@googlegroups.com, llvm@lists.linux.dev,
-	Guo Ren <guoren@kernel.org>, linux-csky@vger.kernel.org,
-	Arnd Bergmann <arnd@arndb.de>
-Subject: Re: csky ICe (was: Re: [PATCH v4 2/3] slab: improve
- KMALLOC_PARTITION_RANDOM randomness)
-Message-ID: <arOZpqat_rT6rExk@kernel.org>
-References: <20260511200136.3201646-1-elver@google.com>
- <20260511200136.3201646-2-elver@google.com>
- <6106aefa-47c7-4bda-a51f-8a2fba3bf715@roeck-us.net>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zf8F2THf"
+Received: by mail-wm2-f13.google.com with SMTP id 5b1f17b1804b1-49cd4ba9f68so8031905e9.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 23 Sep 2026 03:00:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1790157657; x=1790762457; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=NHDUEFfxohimVHdfCFbRXJJKOl1Ph3G5rHaAn0HkVG4=;
+        b=Zf8F2THfX9Mz8A37HLhhIAV/StcamcTnkMz0RkS9uw3F8RgroZuUSjLd2yeWSG/9ej
+         xOfvM34WIAeLrvBeGBmTr/I3NAvCBLkUgjhHu+OPS9qUw8/tZRrqabSQOeb5m8WgBjSg
+         xG8Bk76D1L1Nz+4aol6WVCuy9t1lePugVw4j1a/GqwqhuJ7Cfuxb5kGZlI7izs4NbF/v
+         Ct5E3xxx3NPbh0mDU0odmOuS0PICI/3w+91LU6e3wigvLfUTjRUsDePddAwrppiQ0/qW
+         CTXQwht0OcsLQjf21Xi1WXx1oLJ7r1PUPTwp0KeVct7jnGx9i1zw2WQ64tV/kYvQWmcd
+         RJ7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790157657; x=1790762457;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=NHDUEFfxohimVHdfCFbRXJJKOl1Ph3G5rHaAn0HkVG4=;
+        b=RelAkt1yKfMCdlwJzIZC0Rkn1lOhD17ZepiXCZlvMmHqCVNdlLeGXOqkDMZVpZZQO9
+         bijXyJiPOmf4v36w9wmAlDkH1pj84qGF71WjpW/pFM43i7BXpSQw/r7UdW1OgPG+z6N5
+         um15+/aJRhjxWpPjosYYDXkmZVgvMKx3LehnD9Ofa98Llx7nn4gCAvLQlnrRh/64Vfge
+         gEwRRrQDoNUIK9A2LXjGRTaCpAs8hYm1Tid38ohmcKYRyWa29I17uES3auCPGkuYaX8o
+         wqO0jS3R5ZmQwE6YSVGOcz+jRQoIZaOqcUwQPrSWW6MMBE6+0vKrxH0ZjB84Q4XxKW5z
+         lC1g==
+X-Forwarded-Encrypted: i=1; AKwUvBwAk1dZC55daLo9mGUa4PKJiwYecvhQAajkZKzzrDgtYsmgoWl6vCsYgM9RkWAUukXm+X9URhLP20/jldg=@vger.kernel.org
+X-Gm-Message-State: AFuF++kveJgHfjmTR5/C5Mvf5c056HdAp8WKvzFATNRq8F7lYuSGzLHJ
+	+jVIMBarg79rIFXJS1idMqkm0rxmZvS2y+TYOv/Be97jgNhZXFskU6aJ
+X-Gm-Gg: AYBFou3rVJwt4AdyomPVkbv+ic8rIv33IAkJBNaXM7GbOhHLYM/HLNt1isEYPHLTY8j
+	j27oEyCLdWkCTgzuy1iOSjleTy6vvy+WHHa0OgIeZdB4MwJtpT/aoIRlVMZXZhQCFawEQ0K/UBy
+	y3W7czwdl3labUZXK6461INNJea4qdH4dsIONdl8NuS5z9ODJCT3Ef13eqqiBT4M41ZupHlew27
+	jdxCIeG3P6/plxv9wwGrSFrdCDz8Y4uMGzCqRfh3yivQ2poaGFWV20DefHJlssYgvemNzrJbzEh
+	1Q7F3ognRilW9O/QJ8Bi4F/30lUuWBsGIaGoTful9Q0rLOD1NtFO6moKDsbgal1KUMUuiAMiwmE
+	RNdxMdA0WluaGJYR1VoB1AYcGAAw17ayH0y8ECYZeTqeRa/B9447DHiPz3fItRvL3bN/4jCTArV
+	uA/pPdC7EJEU/wa6mHjsL6YbNQliIUpeTMIaYk3KKf0ttBsMcx5P//n4BqBDiIekyuR06/96ok0
+	ZvZZHaV8Oqo9Q91ajc4k+Hq9U0YlqDlvCAyBlCbxWxxYg==
+X-Received: by 2002:a05:600c:354e:b0:49e:6bc7:4e1b with SMTP id 5b1f17b1804b1-49fdf0ffe67mr26722025e9.15.1790157657142;
+        Wed, 23 Sep 2026 03:00:57 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49fde1d978fsm58369565e9.9.2026.09.23.03.00.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Sep 2026 03:00:55 -0700 (PDT)
+Date: Wed, 23 Sep 2026 11:00:54 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Kees Cook <kees@kernel.org>
+Cc: Jim Cromie <jim.cromie@gmail.com>, Andrew Morton
+ <akpm@linux-foundation.org>, Lorenzo Stoakes <ljs@kernel.org>, Masahiro
+ Yamada <masahiroy@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kbuild@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH v4 0/4] kallsyms: Accelerate symbol name lookups by ~19x
+Message-ID: <20260923110054.1fc07e18@pumpkin>
+In-Reply-To: <202609221705.FE257DCFE7@keescook>
+References: <20260922-ksyms-tune-v4-0-92acea84b911@gmail.com>
+	<202609221705.FE257DCFE7@keescook>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6106aefa-47c7-4bda-a51f-8a2fba3bf715@roeck-us.net>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 22, 2026 at 07:58:56AM -0700, Guenter Roeck wrote:
-> Hi,
-> 
-> On Mon, May 11, 2026 at 10:00:49PM +0200, Marco Elver wrote:
-> > When using CONFIG_KMALLOC_PARTITION_RANDOM, _RET_IP_ was previously used
-> > to identify the allocation site. _RET_IP_, however, evaluates to the
-> > caller's parent's instruction pointer rather than the actual allocation
-> > site; this would lead to collisions where a function performs multiple
-> > allocations.
-> > 
-> > With the generalization to kmalloc_token_t, we now generate the token at
-> > the outermost macro, and using _THIS_IP_ would fix this for all cases.
-> > 
-> > Unfortunately, the generic implementation of _THIS_IP_ relies on taking
-> > the address of a local label, which is considered broken by both GCC [1]
-> > and Clang [2] because label addresses are only expected to be used with
-> > computed gotos. While the generic version more or less works today, it
-> > is known to be brittle. For example, Clang -O2 always returns 1 when
-> > this function is inlined:
-> > 
-> >         static inline unsigned long get_ip(void)
-> >         { return ({ __label__ __here; __here: (unsigned long)&&__here; }); }
-> > 
-> > To provide a reliable unique identifier without breaking architectures
-> > relying on the generic _THIS_IP_, introduce _CODE_LOCATION_: it resolves
-> > to _THIS_IP_ where architectures provide a safe implementation, and
-> > falls back to a zero-cost static marker where _THIS_IP_ is broken.
-> > 
-> > Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=120071 [1]
-> > Link: https://github.com/llvm/llvm-project/issues/138272 [2]
-> > Signed-off-by: Marco Elver <elver@google.com>
-> 
-> With this patch in the tree, I get ICE erors when trying to build
-> csky:allmodconfig.
-> 
-> Example:
-> 
-> Error log:
-> sound/core/oss/mixer_oss.c: In function 'snd_mixer_oss_proc_write':
-> sound/core/oss/mixer_oss.c:1202:1: error: could not split insn
->  1202 | }
->       | ^
-> (insn 183 400 184 (set (reg:SI 0 a0 [orig:307 _55 ] [307])
->         (xor:SI (reg:SI 3 a3 [orig:308 random_kmalloc_seed ] [308])
->             (const:SI (plus:SI (symbol_ref:SI ("*.LANCHOR0") [flags 0x182])
->                     (const_int 132 [0x84]))))) "include/linux/slab.h":759:52 288 {cskyv2_xorsi3}
->      (expr_list:REG_DEAD (reg:SI 3 a3 [orig:308 random_kmalloc_seed ] [308])
->         (nil)))
-> during RTL pass: final
-> sound/core/oss/mixer_oss.c:1202:1: internal compiler error: in final_scan_insn_1, at final.cc:2813
-> 0x779b51e2a1c9 __libc_start_call_main
-> 	../sysdeps/nptl/libc_start_call_main.h:58
-> 0x779b51e2a28a __libc_start_main_impl
-> 	../csu/libc-start.c:360
-> 
-> This happens with lots of files, not just this one. It is seen with all
-> versions of gcc starting with at least v13.x. Reverting this patch fixes
-> the problem. Bisect log is attached for reference.
-> 
-> Any idea what I could do to avoid the problem other than stopping to build
-> csky:allmodconfig ?
+On Wed, 23 Sep 2026 00:12:29 -0700
+Kees Cook <kees@kernel.org> wrote:
 
-Maybe it's time to say goodbye to csky? ;-)
- 
-> Thanks,
-> Guenter
+I think you are at ~15x now.
 
--- 
-Sincerely yours,
-Mike.
+> On Tue, Sep 22, 2026 at 02:08:17PM -0600, Jim Cromie wrote:
+> > 2. Patch 3 introduces a dynamic u32 lookup index bracketed by
+> >    kallsyms_lookup_batch_start() and kallsyms_lookup_batch_end().
+> >    It allocates ~736 KiB in transient RAM via kvmalloc_array() only
+> >    while bulk workloads (BPF attach, module loading) run, resolves
+> >    each probe in O(1) with 0 hops, and leaves .rodata bloat at exactly
+> >    0 bytes while retaining kallsyms_markers[] as fallback.  Both
+> >    test_kallsyms_perf and kallsyms_selftest are updated to benchmark
+> >    batch resolution side-by-side.
+> > [...]
+> > - Dropped .rodata image footprint addition from +573 KiB to 0 KiB,
+> >   addressing Kees Cook's memory footprint objection.  
+> 
+> Ah, very cool; thanks for giving the dynamic route a try! (Also, please
+> wait a few days between versions and give humans some time to reply.)
+> 
+> I spent some time trying to understand all the timings here, and with
+> a problem statement of "tens of thousands of functions", I'd want
+> to understand how common that workload is. Even module loading isn't
+> anywhere near that high, and AIUI, most kprobe loads of that size are
+> roughly one-offs, and what Jiri measured was the most extreme possible
+> attach we could see, and that is a synthetic workload. (And kallsyms
+> was ~7% of the attach.) I struggle to see a problem that needs solving.
+> 
+> What we have today is a 1:256 mapping, so the walk penalty in ~128 steps
+> per symbol lookup.
+
+According the the commit message(s) the existing code does a full binary
+chop so gets the ~128 step walk penalty for every stage.
+If the new index were rounded down to a multiple of 256 (the algorithm
+works with any index between the existing high and low ones) then the
+walk penalty would only be needed to find the last item in the 256 entry
+block.
+
+I can think of a variety of schemes for scanning the last 256 entries.
+A simple (optimised) linear scan may not be too bad.
+Or save some offsets in a small on-stack u16[] array as you scan for
+an item to compare against - allowing a binary chop through the scanned
+items (may need a final linear scan).
+
+David
+
+> With your proposed 1:1 there's no walk penalty, but
+> we either pay a lifetime .rodata cost or a startup/teardown cost and
+> temporary dynamic allocation cost.
+> 
+> Right now the startup time for the dynamic table appears to need ~1500
+> symbol look-ups to break even compared to today's 1:256 mapping.
+> 
+> How would a 1:8 table in .rodata compare, for example? It's not 1:1 but
+> it should get you something like 95% of the speed (84ns) for a 8x less
+> .rodata memory compared to the 1:1 in .rodata. And the table might be
+> small enough that cache locality helps more?
+> 
+> Anyway, I'd be curious to see the benchmarks at alternative densities as
+> there is a clear space vs time trade-off here, and moving into dynamic
+> allocation changes the measurements again.
+> 
+> But dominating all of this is the question of how common it is to do
+> tens of thousands of symbol lookups with a fast path need. As a 1-time
+> cost or even every few hours, it's hard to justify either size (1:1 in
+> .rodata for all Linux systems) or complexity (RCU-locked 1:1 allocation
+> built on the fly).
+
+Also how may lookups do you need in a batch to break even?
+
+David
+
+> 
+> -Kees
+> 
+
