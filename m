@@ -1,159 +1,168 @@
-Received: from mail-wm2-f13.google.com (mail-wm2-f13.google.com [74.125.225.141])
+Received: from mail-pz2-f12.google.com (mail-pz2-f12.google.com [74.125.228.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50B1D4921B7
-	for <linux-kbuild@vger.kernel.org>; Wed, 23 Sep 2026 12:39:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1239D52188F
+	for <linux-kbuild@vger.kernel.org>; Wed, 23 Sep 2026 14:23:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790167185; cv=none; b=ijGdx1VMOwNz98IH5ukhjHbjFznELocCrTpgR9+k9GxKctkOZ1PdxbrcC/8QYi7lpA6r2x7YqVQl6SjP3wTidAq56NnjjQUR3CYC5+xV5akP5MVgMQLJMK2XYMAOoAn1aGpouGt/EpdeYQ/WbpktWYdmSJeIdFlZUr7MnZQ20Ns=
+	t=1790173389; cv=none; b=qGP0epn5mZUu+AnnQdNwzZMjl4XMKgK1Tn4kl862Guz3W6qTc18dqvoV6adr0smVEAZMmYTum2ysfBh0iKvmVxa1Wyotj4KHIzEiIK89OCbByqRYD0Sdd7ZOfOy6F+CO22YWv/Tm5Og0AJ2s0j7aZvXj7RJea0cFhYoOOihyVtk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790167185; c=relaxed/simple;
-	bh=YidEQowooWHa3mm+kpWQyPIQRH2lWXzKIXAARyNbJ44=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LejDV725/Walqmyy268Z2HBdxTBX4CSPX4i0PEmlotpdhd1VT7aXehZ0bJTbOzT8C82x2nu6xTafiqMPDGeMuwGwuwkK0ywp2eJK8kWl9Ldl5QBYDQMVl2qnZv2pR56mDXzF6U0cQbYN02x44kUC+LdCaUCu3bQ2/k4L6DtrpU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=lzWNw41D; arc=none smtp.client-ip=74.125.225.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
+	s=arc-20240116; t=1790173389; c=relaxed/simple;
+	bh=vHF/4Rebpf1RbmlVp0v2ZLMX/ypaFMtdvlrlz1+PRak=;
+	h=From:Date:Subject:To:Cc:Message-ID:MIME-Version:Content-Type; b=WFNj8g/iUf4WgM3IpGwDU8XzmtkYTVz+fJMAy6bm/EE41tEAHVD6opoN7dhz5WLtiU/pvuh3cv4d3m6czNJ0BAvsxottcPLMruPRyIv/NxlPpW1p5eDSeLhMbaRPvfxZHTV2YGbHsEwOnRFFUDvpeh4W+noRJWUQ3TAltPMA53U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HhANkH8E; arc=none smtp.client-ip=74.125.228.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="lzWNw41D"
-Received: by mail-wm2-f13.google.com with SMTP id 5b1f17b1804b1-49e8185e037so4550355e9.3
-        for <linux-kbuild@vger.kernel.org>; Wed, 23 Sep 2026 05:39:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HhANkH8E"
+Received: by mail-pz2-f12.google.com with SMTP id d2e1a72fcca58-86b90133ae8so559532b3a.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 23 Sep 2026 07:23:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1790167181; x=1790771981; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=yMau+1eDaLmwPgFmVMPFBVSRhhy4HyZpMjQg3C90W5Q=;
-        b=lzWNw41D08BtcV3JpjQs2OgVaF8eRPqeML1Vb0qhE5tzVdjRHLL0Bdf8HiIo/6xjfD
-         yXqul1x6NP04kTRZjP6DFGxImRSUvzbSmoNnOOzs3JY0Gn7ZPnyZIMtMi/GJYP7rxuS/
-         uXgJR2wtsSTxMFSkhNq7Ej71qIsoVoevPGUgMxZewg4c4su5fg3kJwYm5kQGTyH9CYfX
-         +m6+4bRbk7pKBeEQuc94Wrk43Gd0+cpdjlo6U/qo96nrLeK8Onxj1ilV2lmTk43dDYoG
-         O0A9ZUjKKioN24NQHkJvfO8GH90WIzn+PfngbeMseq8Lepwo4ZD0gAFINZ7QfK2j3yt9
-         sApA==
+        d=gmail.com; s=20251104; t=1790173387; x=1790778187; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:message-id:cc
+         :to:subject:date:from:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=hOAfnEJCG2dfje1lhj2D/yy4s3DfFqXgRx5oeJiylnY=;
+        b=HhANkH8ExC9SpT5qyZKbCVFKMQTPmeA6RwWOndDgqRo2FdugEAaaH4db14sRmuknPG
+         WolZLi7LchG9y+mJqxX2EUD8GsxA1MP0fUEHwezmMczkhEh3XCMaRPvrpLy/h/m1Fs/Q
+         8mokFu/0Y5dcRrorrRhBCrAVhqJlxxjabNJnI/YBQvwDV7Yi+7I5h+xG8Wh/R2Fky0Mg
+         CJkly68JyDdxmO2HDalF9Pv7inCLm7tXuxjw0TIzkqUjVcq6eK19Bj5y33DNskuTjIn3
+         n7OT+Lxtzn2nuECnkf1WlJgKBMl99MYTkhI8Ug9x3uLuYxyMR/sgS2KkstnbNsuTJs6u
+         P9xQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790167181; x=1790771981;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=yMau+1eDaLmwPgFmVMPFBVSRhhy4HyZpMjQg3C90W5Q=;
-        b=SII+HP9tRJ44+TosFJ/RNkAZ0AJL4Ps8dCsDEljlhR67ZwDSaBRgchnv4+Cith+GD1
-         WxeQbIwv75A3NKkrLaefT7kibpz86FoiTiVSU9LxgwvPM+XyMnSZA5lDjf3r7N8O+v/4
-         hyYqw/UJ9Jm9U1wv5A9DYWq3Iv160eS6Vn92LSYmjcOOjS554XdnSrYsKTVVa2o01EBj
-         nAkohytP7W+xVH0mi7UYrev+HsLL7RZWipeX5nTddh0msuhtlPZXJ/tNfVH1LAQiK/zy
-         czYkmtlyk2KBnnl5rxqmp0XI9oVCHA92s+mPXyQP3NbYtsMspc4UhZp2pqaFaaw4E4b/
-         HW8g==
-X-Forwarded-Encrypted: i=1; AKwUvBy6dmn3QtK/V6t9hVWHc333aj+Z3Z+0gentd2mfFLhpET1nej1WkoQI7ksh9NqC+9q0R/njLnBXy6SWGxI=@vger.kernel.org
-X-Gm-Message-State: AFuF++kDg46pLErYKxF0frHrWc4DJ8DqKtTxVtJgHWtq8PXHDELAB5PZ
-	nwnAQzEzwh2935S+gbLpllhWVxYgF9LfBfBjkQkn6mg2/zNynOJLecFZMcGKhaIgR2U=
-X-Gm-Gg: AYBFou3zqXiCO80Dz11oIgXNNTDz1VJrHHsO2dE1f/IHRBM7IHy3Lpl8Romd2y+tRCy
-	BEvQ63CLbnu99k9xh0DzpM4Y1gJ/hwt+T67VtUEDjvs/SATeM0DPdLpFJKk3FfqluHqMV5lZRe0
-	M+T//l3egyM8+11rQTCS/B7mRsX0SfzCZkjuOT4cT/dfewSPQbu525WjE4oH6dcrjcjOuboecuI
-	33v3sKEjoU3RGrE0KevmzgOWzmb15Ffg6KWPHFgk5G9uFEknHkiM9biT8kOUqY/8ZJwFUXznm3X
-	jyLHJTge9+Z12WCL8Kxsk+hrIRaPJ00a2dNncIvOIbKTX81GStsu+wzHcRKeFYn2SXqF4A/I6q6
-	XcEeNYTWe2JEciHTYJYFb4kLAGQF6B9pUCdUSUIIYAomPm55U0FgSR5E6D3Q1LDIhw/qQAZ8FRv
-	hX9t5bkXmmbxZFSjdSQ7PSKOfxWE8t3IlL3Vdy141u0Feml8Nvkj84NKDc1YCeTsjfs7kinuDFy
-	1YAn59uLxo8OX5AP7InB7NFThiJNtXmYR/WWGqHKucTUHKfpxqFgyFzslvM4v1UrGB+
-X-Received: by 2002:a05:600c:4ecd:b0:49c:fc6c:be00 with SMTP id 5b1f17b1804b1-49fdf1454admr31393695e9.23.1790167181460;
-        Wed, 23 Sep 2026 05:39:41 -0700 (PDT)
-Received: from bell.fritz.box (p200300faaf11b90088550f04e79781cf.dip0.t-ipconnect.de. [2003:fa:af11:b900:8855:f04:e797:81cf])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49fde1e045dsm80011925e9.11.2026.09.23.05.39.40
+        d=1e100.net; s=20260707; t=1790173387; x=1790778187;
+        h=content-transfer-encoding:content-type:mime-version:message-id:cc
+         :to:subject:date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=hOAfnEJCG2dfje1lhj2D/yy4s3DfFqXgRx5oeJiylnY=;
+        b=a8MsouNugSr9O55006EQME/8xAVQ/YoF0wrBLNZKcxrsQliN8SEfEkV8qR+Wrsz+l2
+         UhpgeyI6FdNq6fGkvmxXIIyoFF6k4TLd6hxNB+xmkEdQH27yXKgu+b6BFFR9F1Wo5wCz
+         PyVv2P5blHLLwL2/Y0Gd9mwvu88Z1kV0IHc+8kOIgTWA0krZ1pyj1sZHOHH8Y9AjQAqm
+         Xx3ZNNIhDbO5ZoNYNhqfJ2k6VCiKWH7LC+dUnuqi4QrFLXLH6xN5bJGJX0yDLgMntDdb
+         ugmgCUjOeF1ShdG66ltQe2GFpBbAB2x3GROKnYe37bYGc5abOmpfSCeI8xzWlHpuZalV
+         U2Bg==
+X-Forwarded-Encrypted: i=1; AKwUvBwCcn34GX9GZxz4QF2w4U7UDUcBLHjP7qvjRED5kSqF1yEW6/WAnAeuPUW+JpVQg8qGqxY26tBE+A/oKfE=@vger.kernel.org
+X-Gm-Message-State: AFuF++mYOQN/jOB6AbQVP6BvbTE7t965p1yQ0BJ3WFAzfle8fCvxBot3
+	/4hzzZSUlkI18sCWg5V0rO5MZ0NwSdgh2zr25pQhVozb9EBfX8TsszDp
+X-Gm-Gg: AYBFou3sBjILkn8NedzqgUPelRZVImZ7+TjgOX1jrOoRA6zu4ICjATKd42OEdvHjGu/
+	DqDo/mg3Ww1Gb/phSzglPIg4MaaktAR5yxKWNKsIJ06dYvjxCAoJ5QEtO4CESESKwB2Z7IFe3Zc
+	cAtTAjnYKeC0BNn79bC6Wr1wE0km3Qqe7etvLoZbxvkGFWx3O658Ev6+NnAmnUOx/1l30az41pU
+	KwmFFkqC8E42w7D17kG5ZdSVz1EtGeg6l3jAl/3NQDrRwC4CXExzJCTxFZe88aI8JeINvLiD6gc
+	U4Pg01OJDs1W/U+4gxEFu4u1iCOaqxfeFaYB03EojUIoNlbLMzsO6Rb8Gxaek80tsQEUjX6vtEK
+	hTRWmffNQ100elz9duE6idNE2xp1/uLkEs73/C0/USpHUSY0AlscdRzfnesoZGeY2jw3lmTM4W4
+	RWA7kS7fDn6bDOuq1X5zm9eaYsbKeR7Yo1eJc6LTENMutgIblRgIxkODEdOmeKwBuYi/xqnYhR5
+	FWth6DbyERG3gM5D/xPAsIcfqTUZs1mI5/xTkKqehwjLMovadfMRD9XbG5CsYJ3/lGl4Yvdgveb
+	FhEdh09wqpRpvmvm2B8edvXGD36yw/kqFsE/W20ZPf98hw==
+X-Received: by 2002:a05:6a00:3912:b0:874:705d:f63b with SMTP id d2e1a72fcca58-87d1c1c833dmr2392179b3a.29.1790173387247;
+        Wed, 23 Sep 2026 07:23:07 -0700 (PDT)
+Received: from [172.16.0.2] ([2a09:bac5:d58e:323::50:1d4])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-87d1e0f4fbbsm1403313b3a.52.2026.09.23.07.23.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Sep 2026 05:39:41 -0700 (PDT)
-From: Mathias Krause <minipli@grsecurity.net>
-To: Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>,
-	linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Mathias Krause <minipli@grsecurity.net>
-Subject: [PATCH] kbuild: prevent building single targets twice
-Date: Wed, 23 Sep 2026 14:39:36 +0200
-Message-ID: <20260923123936.2227924-1-minipli@grsecurity.net>
-X-Mailer: git-send-email 2.47.3
+        Wed, 23 Sep 2026 07:23:06 -0700 (PDT)
+From: houtinghang <ue081723@gmail.com>
+Date: Wed, 23 Sep 2026 22:22:59 +0800
+Subject: [PATCH] clang-tools: Import os for broken pipe handling
+To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
+Cc: llvm@lists.linux.dev, linux-kbuild@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Nick Desaulniers <ndesaulniers@google.com>,
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>
+Message-ID: <179017337986.52388.7943687183785012868@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 
-When building individual targets via 'make path/to/target.o', target.o
-may be build multiple times concurrently, leading to build errors like
-below:
+The BrokenPipeError handler in run-clang-tools.py calls os.open() and
+os.dup2() without importing os. When the analysis pool raises this
+exception, the handler raises NameError instead of redirecting stdout
+and exiting with status 1.
 
-$ make O=~/O/vanilla-7.1/ -j$(nproc) arch/x86/pci/intel_mid.o
-make[1]: Entering directory '/scratch/minipli/obj/vanilla-7.1'
-  DESCEND objtool
-  DESCEND bpf/resolve_btfids
-  CC      arch/x86/pci/intel_mid.o
-  CC      arch/x86/pci/intel_mid.o
-fixdep: error opening file: arch/x86/pci/.intel_mid.o.d: No such file or directory
-make[4]: *** [/scratch/minipli/src/linux/scripts/Makefile.build:290: arch/x86/pci/intel_mid.o] Error 2
-make[4]: *** Deleting file 'arch/x86/pci/intel_mid.o'
-make[3]: *** [/scratch/minipli/src/linux/scripts/Makefile.build:551: arch/x86] Error 2
-make[3]: *** Waiting for unfinished jobs....
-make[2]: *** [/scratch/minipli/src/linux/Makefile:2229: .] Error 2
-make[1]: *** [/scratch/minipli/src/linux/Makefile:248: __sub-make] Error 2
-make[1]: Leaving directory '/scratch/minipli/obj/vanilla-7.1'
-make: *** [Makefile:248: __sub-make] Error 2
+Import os and add a regression test that injects BrokenPipeError from
+Pool.map(), then checks the redirection and exit status.
 
-Please note that arch/x86/pci/intel_mid.o gets output twice and, in
-fact, tried to get built twice, causing the two parallel builds to
-interfere with each other.
-
-The reason for the double build attempt is that the target can be
-reached twice, via arch/x86/'s Makefile and via arch/x86/pci/'s which
-both end up in '$(single-subdirs)' as both fit the prefix match.
-
-Only the latter should be used as it contains a cflags override for
-CONFIG_PCI_DEBUG=y which would be skipped when using arch/x86/Makefile
-to build arch/x86/pci/intel_mid.o.
-
-Fix the multi-match issue by using only the deepest match instead of all
-possible ones, which requires two changes:
-1. Limiting 'single-subdirs' to a single match per target and
-2. filtering out deeper targets in the recursive make invocation.
-
-Also de-duplicate the list of target subdirectories to simplify the
-use of '$(single-subdirs)' in filter expressions for multiple targets in
-the same directory.
-
-Fixes: cc306abd19e8 ("kbuild: fix and refactor single target build")
+Fixes: 87c7ee67deb7 ("scripts: handle BrokenPipeError for python scripts")
 Assisted-by: LLM
-Signed-off-by: Mathias Krause <minipli@grsecurity.net>
+Signed-off-by: houtinghang <ue081723@gmail.com>
 ---
-I ran into this quite a few times in the past and only now gave the LLM
-a try to dig into it. The bug only affects certain targets and only when
-mentioned on the command line, so regular 'make -j$(nproc)' isn't
-affected.
+Testing: python scripts/clang-tools/run-clang-tools_test.py -v
+The test fails before the import with NameError and passes after it.
+Tested with Python 3.13 on Windows using exception injection; no complete
+kernel build or real clang-tidy pipeline test was performed.
 
- scripts/Makefile.build | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+AI disclosure: Codex found the missing import, wrote the fix and test,
+ran the test, reviewed the diff, and drafted this message in response to
+a request to find, fix, review and submit a Linux kernel bug.
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 0f4fdc119e58..d5f58513d02a 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -534,7 +534,10 @@ endif
- # Single targets
- # ---------------------------------------------------------------------------
+ scripts/clang-tools/run-clang-tools.py      |  1 +
+ scripts/clang-tools/run-clang-tools_test.py | 41 +++++++++++++++++++++
+ 2 files changed, 42 insertions(+)
+ create mode 100644 scripts/clang-tools/run-clang-tools_test.py
+
+diff --git a/scripts/clang-tools/run-clang-tools.py b/scripts/clang-tools/run-clang-tools.py
+index e78be82..79d58b3 100755
+--- a/scripts/clang-tools/run-clang-tools.py
++++ b/scripts/clang-tools/run-clang-tools.py
+@@ -12,6 +12,7 @@ compile_commands.json.
+ import argparse
+ import json
+ import multiprocessing
++import os
+ import subprocess
+ import sys
  
--single-subdirs := $(foreach d, $(subdir-ym), $(if $(filter $d/%, $(MAKECMDGOALS)), $d))
-+# A single target may match nested entries in subdir-ym.  Descend through only
-+# the deepest match so that two recursive makes do not build the same target.
-+single-subdir = $(lastword $(sort $(foreach d, $(subdir-ym), $(if $(filter $d/%, $(1)), $d))))
-+single-subdirs := $(sort $(foreach g, $(MAKECMDGOALS), $(call single-subdir, $g)))
- single-subdir-goals := $(filter $(addsuffix /%, $(single-subdirs)), $(MAKECMDGOALS))
- 
- $(single-subdir-goals): $(single-subdirs)
-@@ -548,7 +551,8 @@ $(subdir-ym):
- 	$(Q)$(MAKE) $(build)=$@ \
- 	need-builtin=$(if $(filter $@/built-in.a, $(subdir-builtin)),1) \
- 	need-modorder=$(if $(filter $@/modules.order, $(subdir-modorder)),1) \
--	$(filter $@/%, $(single-subdir-goals))
-+	$(filter-out $(addsuffix /%, $(filter $@/%, $(single-subdirs))), \
-+		$(filter $@/%, $(single-subdir-goals)))
- 
- # Add FORCE to the prerequisites of a target to force it to be always rebuilt.
- # ---------------------------------------------------------------------------
+diff --git a/scripts/clang-tools/run-clang-tools_test.py b/scripts/clang-tools/run-clang-tools_test.py
+new file mode 100644
+index 0000000..207b866
+--- /dev/null
++++ b/scripts/clang-tools/run-clang-tools_test.py
+@@ -0,0 +1,41 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: GPL-2.0
++
++"""Tests for run-clang-tools.py."""
++
++import importlib.util
++import os
++from pathlib import Path
++import unittest
++from unittest import mock
++
++
++spec = importlib.util.spec_from_file_location(
++    "run_clang_tools", Path(__file__).with_name("run-clang-tools.py"))
++run_clang_tools = importlib.util.module_from_spec(spec)
++spec.loader.exec_module(run_clang_tools)
++
++
++class TestRunClangTools(unittest.TestCase):
++    def test_broken_pipe_redirects_stdout_and_exits(self):
++        args = mock.Mock(path="compile_commands.json")
++        with mock.patch.object(run_clang_tools, "parse_arguments", return_value=args), \
++             mock.patch("builtins.open", mock.mock_open(read_data="[]")), \
++             mock.patch.object(run_clang_tools.multiprocessing, "Lock"), \
++             mock.patch.object(run_clang_tools.multiprocessing, "Pool") as pool, \
++             mock.patch("os.open", return_value=42) as open_devnull, \
++             mock.patch("os.dup2") as dup2, \
++             mock.patch.object(run_clang_tools.sys, "stdout") as stdout:
++            pool.return_value.__enter__.return_value.map.side_effect = BrokenPipeError
++            stdout.fileno.return_value = 1
++
++            with self.assertRaises(SystemExit) as raised:
++                run_clang_tools.main()
++
++            self.assertEqual(raised.exception.code, 1)
++            open_devnull.assert_called_once_with(os.devnull, os.O_WRONLY)
++            dup2.assert_called_once_with(42, 1)
++
++
++if __name__ == "__main__":
++    unittest.main()
+
+base-commit: fe2ec83746e501645709761605c2464a44fd2929
 -- 
-2.47.3
+2.52.0.windows.1
 
