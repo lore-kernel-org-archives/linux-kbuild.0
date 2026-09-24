@@ -1,108 +1,123 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.avm.de (mail.avm.de [212.42.244.94])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B093382FC;
-	Thu, 24 Sep 2026 07:35:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6914142981E;
+	Thu, 24 Sep 2026 08:32:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.94
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790235346; cv=none; b=OU4ZFmnvzays1pturjGDIHQgZZ1bqhaATDXivPKtltjbpCbhwIM/582KVF366VM0ZhRJd9M9B4SLJ08gCr++XjwPFGk//RJiaydkP+F7KbeLh23Cd80yUxO93QwP8dswTH26Ntsbn9SMmDHGtq+uxwfbsVcIyH/ytG3OgSxPwOQ=
+	t=1790238734; cv=none; b=bRmxN1skLLHg4J5jwakg9zLyr+daGB/1eIs+BmWjDQ3PULFziO5UoWjxTxJjtn8X/PrF2u8yUAB5V398H51kas4p7LpRUZzeAm7sSqdlkz6dFJ8dj8+6ZrN4JE66RcJxEoMDtbZka09IxOHSKdvZNeUzsB5ttFUbvlwDrFJmm54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790235346; c=relaxed/simple;
-	bh=l0a1ZOrqXaZBb2gpDB/NaEJiiaa3JIe6r7e0fcOIHm8=;
+	s=arc-20240116; t=1790238734; c=relaxed/simple;
+	bh=Z3w08f8Z2mDt9tb5wx7ZjGKpoBslSL4wZDJkvLJPoto=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l8bkg2haoMU6rz8DOXK2+qUsLHk1CUYpSzFZkO6xXP9ADmdL5Tjz4hnZXzzWjGurrNnRHHfRnlR3UfgeG1emc4S9OtTbrt7Q9dejsTJai8eXFZ0WfcZg4E5g8YJnQDlA0kJV+4auBlm75OLeGaERjjem0fERb7hPdw07zAdnGk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RCNbWmjq; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=dhslR3g483NSPTZzH1J9z8LACWY4+z71yY/gS2wLLyKC6lNBhPb9UbZQCxuvWgoPs/0XY1UVK0Lht10mx+MqbFZdmXCjX1lbciPUEmdos1hcGCKlDSpt6Jy3wFHuuQW/qAsnYgvzxAIaQ0pSTCzMb7HAUmUYdLpChlHJGQL2dlU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com; spf=pass smtp.mailfrom=fritz.com; dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b=h7YxJaJ1; arc=none smtp.client-ip=212.42.244.94
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fritz.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RCNbWmjq"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id C90F01F000FF;
-	Thu, 24 Sep 2026 07:35:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790235343;
-	bh=1DjE0br+Zpw8GpmXTJxpWJ7DiUr3l3oC8QPxkD5V81w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=RCNbWmjqW6gGvO/y4IO9lJOwe8Wzt/OcNzq3yzJHIPn/H+9P5+6/uYcbZ7EIIdrW/
-	 C+//oRCCly/4Ek28rsapIaE9rD9JQxBQhbpvp1lXOxAyDkgBGDR8RGce3lYnNX0Ihn
-	 43j9SZd7DppizuVTNdiCrfcP62nKHORPD9tD0JgpnhPppEQDEuwmc3gi6r3SCJIX1z
-	 89Ri4yH5XgG5agTYIgpB7WCw/vHwlc5dbv/dHf0DSQsBzt9/RKWT5zxGHqVIa2GmbN
-	 9yVL5dePMy83j7XLY5kExYYmd09/fDV4Z6fQKhO2HC6+YilvCvPHGFPUJ2Sw47C+kv
-	 cOBZ9FEi1tc7w==
-Date: Thu, 24 Sep 2026 09:35:25 +0200
-From: Nicolas Schier <nsc@kernel.org>
+	dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b="h7YxJaJ1"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fritz.com; s=mail;
+	t=1790238714; bh=Z3w08f8Z2mDt9tb5wx7ZjGKpoBslSL4wZDJkvLJPoto=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=h7YxJaJ1vBCRKBKegBy39h+ktsqSDoKB+FSeSyrgYBotAt95Hfn1M6BOZ6GnSyzn/
+	 VeZ9NzMxt7c3DAQUdYhm98HwMqeZOEZsV+4/3H5V3AtIHx4apJeG5fvrrc3O/qW7Hy
+	 qhlJthF/0g6ARmd0jS9fuVkgjDsi8dYxqEdKGOhpoWzfZZOu2QCNV8hRkrz7h221M8
+	 9GNn8ea2Lza1eqB8GGSwqcDMv62zXB4+yLKcZam2r2NDsQdmljxFPOjXBU8ueeWvax
+	 0pnX8TIZ9VTFo57TNOMoJB0D7xh1berky/eDPNrb92SUINGOqNOWzZNnE7QQjqHNpl
+	 sSeo99X1mvPpg==
+Received: from [212.42.244.78] (helo=mail.avm.de)
+	by mail.avm.de with ESMTP (eXpurgate 4.57.1)
+	(envelope-from <n.schier@fritz.com>)
+	id 6ab4dffa-03cd-7f0000032729-7f000001cfdc-1
+	for <multiple-recipients>; Thu, 24 Sep 2026 10:31:54 +0200
+Received: from mail-auth.fritz.com (unknown [212.42.244.78])
+	by mail.avm.de (Postfix) with ESMTPS;
+	Thu, 24 Sep 2026 10:31:54 +0200 (CEST)
+Date: Thu, 24 Sep 2026 10:31:44 +0200
+From: Nicolas Schier <n.schier@fritz.com>
 To: Julian Braha <julianbraha@gmail.com>
 Cc: Nathan Chancellor <nathan@kernel.org>,
 	Pengpeng Hou <pengpeng@iscas.ac.cn>,
 	Ulf Magnusson <ulfalizer@gmail.com>,
 	Masahiro Yamada <yamada.masahiro@socionext.com>,
 	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/4] kconfig: tests: Reset KCONFIG_WARN_CHANGED_INPUT by
- default
-Message-ID: <arTSvcwLenaZwKm7@levanger>
-Mail-Followup-To: Nicolas Schier <nsc@kernel.org>,
-	Julian Braha <julianbraha@gmail.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Pengpeng Hou <pengpeng@iscas.ac.cn>,
-	Ulf Magnusson <ulfalizer@gmail.com>,
-	Masahiro Yamada <yamada.masahiro@socionext.com>,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/4] kconfig: tests: Provide defconfig outfile for
+ savedefconfig
+Message-ID: <20260924-unselfish-loose-skylark-a7fdbf@l-nschier-z2>
 References: <20260917-kconfig-tests-minor-updates-v1-0-286e5c985244@fritz.com>
- <20260917-kconfig-tests-minor-updates-v1-1-286e5c985244@fritz.com>
- <a1efc002-c34b-43a4-be02-ff4746d13241@gmail.com>
+ <20260917-kconfig-tests-minor-updates-v1-2-286e5c985244@fritz.com>
+ <ef365f19-afd2-4704-b900-847b24540a30@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <a1efc002-c34b-43a4-be02-ff4746d13241@gmail.com>
+In-Reply-To: <ef365f19-afd2-4704-b900-847b24540a30@gmail.com>
+Organization: FRITZ! Technology GmbH
+x-ms-reactions: disallow
+X-purgate-ID: 149429::1790238714-1E7BAEE1-8FEC6898/0/0
+X-purgate-type: clean
+X-purgate-size: 2026
+X-Notice: Whitelisted
+X-purgate: This mail is considered clean (visit https://www.eleven.de for further information)
+X-purgate: clean
+X-pfmilter: host: postfix-mx-03  mail-id: 2D756A0168  external: no
 
-On Sat, Sep 19, 2026 at 06:29:39PM +0100, Julian Braha wrote:
+On Sat, Sep 19, 2026 at 06:45:33PM +0100, Julian Braha wrote:
 > On 9/17/26 14:38, Nicolas Schier wrote:
-> > Reset KCONFIG_WARN_CHANGED_INPUT by default for all kconfig tests but
-> > those which set it explicitly.
+> > Let kconfig test framework's 'savedefconfig' forward the requested
+> > output 'defconfig' filename to 'conf'.
 > > 
-> > This fixes the 'warn_changed_input' test on systems with
-> > KCONFIG_WARN_CHANGED_INPUT=1 and ensures a cleaner test environment.
+> > The original implementation was calling 'conf' with '--savedefconfig'
+> > but missed the mandatory filename for the defconfig output file.
 > > 
-> > Fixes: 645323a7f4e5 ("kconfig: add optional warnings for changed input values")
+> > While at it, honour the 'dot_config' argument which points to the input
+> > config file.
+> > 
+> > Fixes: 022a4bf6b59d ("kconfig: tests: add framework for Kconfig unit testing")
 > > Signed-off-by: Nicolas Schier <n.schier@fritz.com>
+> 
+> Reviewed-by: Julian Braha <julianbraha@gmail.com>
+
+thanks.
+
+> 
 > > ---
-> >  scripts/kconfig/tests/conftest.py | 8 ++++++++
-> >  1 file changed, 8 insertions(+)
+> >  scripts/kconfig/tests/conftest.py | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
 > > 
 > > diff --git a/scripts/kconfig/tests/conftest.py b/scripts/kconfig/tests/conftest.py
-> > index 66f95e4ed58c..e92f0cf1421a 100644
+> > index e92f0cf1421a..f2ad2ac2a661 100644
 > > --- a/scripts/kconfig/tests/conftest.py
 > > +++ b/scripts/kconfig/tests/conftest.py
-> > @@ -34,6 +34,9 @@ class Conf:
+> > @@ -240,7 +240,8 @@ class Conf:
+> >          dot_config: .config file for input
+> >          returncode: exit status of the Kconfig executable
 > >          """
-> >          # the directory of the test being run
-> >          self._test_dir = os.path.dirname(str(request.fspath))
-> > +        self.default_env = {
-> > +            "KCONFIG_WARN_CHANGED_INPUT": "",
-> > +        }
+> > -        return self._run_conf('--savedefconfig', out_file='defconfig')
+> > +        return self._run_conf('--savedefconfig={}'.format(out_file),
+> > +                              dot_config=dot_config, out_file='defconfig')
 > >  
-> >      # runners
-> >      def _run_conf(self, mode, dot_config=None, out_file='.config',
-> > @@ -57,6 +60,11 @@ class Conf:
-> >          # Override 'srctree' environment to make the test as the top directory
-> >          extra_env['srctree'] = self._test_dir
-> >  
-> > +        # Set default environment variables, if not set by caller
-> > +        for var in self.default_env:
-> > +            if not var in extra_env:
-> > +                extra_env[var] = self.default_env[var]
+> >      def listnewconfig(self, dot_config=None):
+> >          """Run listnewconfig.
+> > 
 > 
-> Maybe it makes more sense to have the tests ignore users' env vars if
-> they would cause tests to fail? For example, this recent patch
-> explicitly unsets the KCONFIG_WERROR flag:
-> https://lore.kernel.org/linux-kbuild/4d1eee3a-a5f9-467e-880e-4f2815851b09@gmail.com/T/#m25be9ad4d5e62956c5f98759398f91a555afb4df
+> Nice catch!
+> 
+> <nitpick> out_file here isn't actually defined until later, in patch 4.
+> But it seems this won't actually break anything if applied alone since
+> this savedefconfig function currently isn't called anywhere (until your
+> patch 4).
 
-Good point, but I am not sure, if we really should ignore all of the
-user's environment.  Maybe it's better for now, to just reset all
-environment variables that start with KCONFIG_ and KBUILD_ ?
+Ah, yes.  I'll update the argument of 'savedefconfig':
 
+-    def savedefconfig(self, dot_config):
++    def savedefconfig(self, dot_config, out_file='defconfig'):
+
+Then out_file is properly defined.  Thanks!
 
 -- 
 Nicolas
