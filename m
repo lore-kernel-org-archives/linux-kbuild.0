@@ -1,151 +1,159 @@
-Received: from mail.avm.de (mail.avm.de [212.42.244.119])
+Received: from mail.avm.de (mail.avm.de [212.42.244.120])
 	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9595B3E51D2;
-	Thu, 24 Sep 2026 10:57:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 225D2476CCE;
+	Thu, 24 Sep 2026 11:22:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790247447; cv=none; b=b/ESpPPD4p4aVh3obybnc3hU0JxBXsRROSaR8WyRHfwBvhy/vmFfGBLU/Mq9tUQGUpMEihtWn3TL7aDKRFZ4DpdDPC/QF+RhsHmD96G4bqTJs3rg/AwJ6lFBKcCiom5dm0FujQ3ewrDt4n8cUS3+ay30vipdEnoNrRu9Rvfi9bc=
+	t=1790248962; cv=none; b=FDmRoMetVuqmhe+8wqT1MhbMt6jalstaesHVRvW9lndpMf6krXQKWwf3VTuO/33qvyTNpSRD6zqi7ZfXdtE7QAjlIp3ynRi4lcUFND6oatzvGMNcKKDq8RTwGsHtNiOXVnEnbJ32a7Z9RCJLDmv75yk+4g11x1HFfjzKBGxUTzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790247447; c=relaxed/simple;
-	bh=TedKenYBLBIChQl/W9Dc29bs904Civh+Evv8ETUl2Yo=;
-	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
-	 References:Date:Message-Id; b=bcmu8aKcgT0bem7IF3+c7YSNVyEOn4kYlPczRvallOuh9FfdBd6p2fisJO5Q/4uMQ5sGmARtUtytnfxbS3/ntDUlEFQ9Q/ZRnTamvQ61g0Q3qyvBD1AEgbmbFUhc0+6jncDbmNJbiK9rghDfFgElLzQPP+z8ojb8gQFqxOT8VFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com; spf=pass smtp.mailfrom=fritz.com; dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b=h7iD0psN; arc=none smtp.client-ip=212.42.244.119
+	s=arc-20240116; t=1790248962; c=relaxed/simple;
+	bh=6hH7Wlf+AspOG8Y2qep5h3rbS8Qq94M7b1LYOTXo3vI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rnvbY0PHtaxfEYkuzvuy3L8Ju5DgWPgk1wDNCSRLAxWvXPxi6sM+S8iRF4X1INaz+oK21AaLl+SGUdjOye6Kxkz/Dl0PeV3ALIqagMduPG5hg2JvSrr6De7Qs7M4++TIQVaeMen6z7xVqOSiOiXr8lraENePxDi0XESpydUN6LY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com; spf=pass smtp.mailfrom=fritz.com; dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b=BtkQaYxw; arc=none smtp.client-ip=212.42.244.120
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fritz.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b="h7iD0psN"
+	dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b="BtkQaYxw"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fritz.com; s=mail;
-	t=1790247434; bh=TedKenYBLBIChQl/W9Dc29bs904Civh+Evv8ETUl2Yo=;
-	h=Subject:From:To:Cc:In-Reply-To:References:Date:From;
-	b=h7iD0psNBFaAhRTF7DezTTvWqO86PTsr/aKQhQiBEhCQmbzuK5euLOv5Y56RUF3C1
-	 YHm3XWH7Er9uVtdkWHzuxtstds3cjts3wyaEVshiABXS8ebPpiiarzq3EPwfeOEX9L
-	 Uw4dsbmFQLFGmx+oKsn80wXfhpV4MIGtUZuTAlxVgKJNZPCnaujKzam2khBP/7mAJ5
-	 2DkNORM9wDqn9jm8XVKAzNRBUb6ReWNAaLXFKpcfYQ+ZTI8WtaOXr7p7iQ6LamamNJ
-	 0x8oi3lTBxTYaVmayP9iZ5Jj7Y6fjK/JyeFiV0NJBwWgNy/puuca+TO3wjgh96Nl64
-	 UbnLfIpInQTVQ==
-Received: from [2001:bf0:244:244::78] (helo=mail.avm.de)
+	t=1790248949; bh=6hH7Wlf+AspOG8Y2qep5h3rbS8Qq94M7b1LYOTXo3vI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BtkQaYxwuIEBqbzYntct9uEX2y1p+3aq9aux/qXoGGHAbwZNdXGBQK3wwl2qr4NBh
+	 FO9hczByL9tCVtLiyvuwzjBuDexw5crLejWezuolU6EiYdJJrpfhKMSpMxgizaLZwr
+	 8evAj8Mzj70s5igPhT+GOIMAV/GrbPVTq4Nfj2n1QzFlKDIPqVRh0aYVD9Y97vHxr8
+	 fm55fGCQCcEhZy26KhJoNryxUFMYH6N53870NOjPcHoNyr5yYiVbG2nr7kjU6hsQTE
+	 Pzrfdf+NT+x/4urgM7jWv0XQd+rvGOQmUIaeLTS5TgUkE5x1eYLRPTDaJBVRVCwg0K
+	 /aZPoqkbCVX9w==
+Received: from [212.42.244.78] (helo=mail.avm.de)
 	by mail.avm.de with ESMTP (eXpurgate 4.57.1)
 	(envelope-from <n.schier@fritz.com>)
-	id 6ab5020a-03d5-7f0000032729-7f000001ca02-1
-	for <multiple-recipients>; Thu, 24 Sep 2026 12:57:14 +0200
-Received: from mail-auth.fritz.com (unknown [IPv6:2001:bf0:244:244::78])
+	id 6ab507f5-0449-7f0000032729-7f0000018db8-1
+	for <multiple-recipients>; Thu, 24 Sep 2026 13:22:29 +0200
+Received: from mail-auth.fritz.com (unknown [212.42.244.78])
 	by mail.avm.de (Postfix) with ESMTPS;
-	Thu, 24 Sep 2026 12:57:14 +0200 (CEST)
+	Thu, 24 Sep 2026 13:22:29 +0200 (CEST)
+Date: Thu, 24 Sep 2026 13:22:29 +0200
+From: Nicolas Schier <n.schier@fritz.com>
+To: Josh Poimboeuf <jpoimboe@kernel.org>
+Cc: x86@kernel.org, linux-kernel@vger.kernel.org,
+	Peter Zijlstra <peterz@infradead.org>, Gary Guo <gary@garyguo.net>,
+	rust-for-linux@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>, linux-kbuild@vger.kernel.org,
+	Huacai Chen <chenhuacai@kernel.org>
+Subject: Re: [PATCH v3 23/28] kbuild: Do the per-module objtool pass right
+ before linking
+Message-ID: <20260924-industrious-guan-of-expertise-d7caad@l-nschier-z2>
+References: <cover.1790028654.git.jpoimboe@kernel.org>
+ <0ed8faeff899d3e9f101b6b6cddec0bf89735669.1790028654.git.jpoimboe@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH 2/2] kconfig: error on reverse range
-From: Nicolas Schier <n.schier@fritz.com>
-To: Julian Braha <julianbraha@gmail.com>
-Cc: nathan@kernel.org, nsc@kernel.org, n.schier@fritz.com, 
- grahamr@qti.qualcomm.com, rdunlap@infradead.org, nico@fluxnic.net, 
- linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20260922163749.2031594-3-julianbraha@gmail.com>
-References: <20260922163749.2031594-1-julianbraha@gmail.com>
- <20260922163749.2031594-3-julianbraha@gmail.com>
-Date: Thu, 24 Sep 2026 12:57:06 +0200
-Message-Id: <179024742687.3875862.11053097465052610200.b4-review@b4>
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2864; i=n.schier@fritz.com;
- h=from:subject:message-id; bh=TedKenYBLBIChQl/W9Dc29bs904Civh+Evv8ETUl2Yo=;
- b=owEBbQKS/ZANAwAIAYjGvJyImm24AcsmYgBqtQIJQK3vLPV17JCodxHxYpuYABe4DvWZnqxZO
- xU6AkRaZneJAjMEAAEIAB0WIQQO/4WJ63TpgecLpGmIxryciJptuAUCarUCCQAKCRCIxryciJpt
- uOKBD/wNJfWGdrdapYBhMXafYUUPST1aWReCOdMaoDrbGQgfegbg5aXqCWS0gCW14DkP5SDhRsE
- MNcySar/g2T8i4CynfGZ20RxZ/W5sAwguo7VwYwJI1shQQR5nyllZVN+2LbOj9p74G3mEJL7t/K
- EoQpkvI2iWnT8V09t8SswPrK8lGNzgZtw12zWYgj+0jlTbhWZNUn5vaUDg+lkQbjqFuOitNY3xM
- zCCQ19uluDdXnFPp+pLW7xTYFhwiazLzGYBhoKVpLyuc79thv97hJfrEhKXL2Z79MuGIiLotujV
- mU8nckuNlEzXa5sVSk4GV0/33GdacqaH71iWBKG5bHPtdcCUU0MWUB3AvMq2Kv3moUoJMrD3WCa
- AQoaTzDScXk0o+/byU7FjVsQ/jfPWVhBZBWZlwWaZquIuNn08Al2/PAeq0yF9kidSSWpaLXmyat
- WMxU0UnCma8v4hE0HNkGL5SkZu3nnJ3K+oRdWB1TPw2g2SAza86nMdrn2A+W0xTbE/RYOCps1nw
- XSCvoRgScAEN2eoxBn1oyZKC0ekPHd0tKqfBotpCpeegNzNWq7EgKhQmhcKjOkSQ2KzhrlXl2Ul
- P5x9tMXtFW/bz4wSvKRHkmre0kVMughZ4tu8aAV7FC4tJEtMLU02Q4LAxM4sNMje9T5CEw+KzVB
- tSCEOqYSuwdAI6A==
-X-Developer-Key: i=n.schier@fritz.com; a=openpgp;
- fpr=7CF67EF8868721AFE53D73FDBDE3A6CC4E333CC8
-X-purgate-ID: 149429::1790247434-7FFD5EF9-2CF265FE/0/0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <0ed8faeff899d3e9f101b6b6cddec0bf89735669.1790028654.git.jpoimboe@kernel.org>
+Organization: FRITZ! Technology GmbH
+x-ms-reactions: disallow
+X-purgate-ID: 149429::1790248949-43FED965-7FAD8FFE/0/0
 X-purgate-type: clean
-X-purgate-size: 2866
+X-purgate-size: 4080
+X-Notice: Whitelisted
 X-purgate: This mail is considered clean (visit https://www.eleven.de for further information)
 X-purgate: clean
-X-pfmilter: host: postfix-mx-02  mail-id: 4ECE7A086F  external: no
+X-pfmilter: host: postfix-mx-01  mail-id: D8313A07EA  external: no
 
-> As discussed on kconfirm v4 [1], it was decided to move checks directly
-> into the kconfig interpreter once where are no findings from kconfirm.
-
-s/where/there/
-
-> This "reverse range" currently has no findings across the tree, so let's
-> add the check.
+On Mon, Sep 21, 2026 at 03:31:24PM -0700, Josh Poimboeuf wrote:
+> With CONFIG_OBJTOOL_CONTROL_FLOW, the objtool pass on vmlinux.o is going
+> to be generating a list of its exported noreturns which will then be
+> read by the modules' objtool pass, so there will need to be a build
+> dependency between them.
 > 
-> Currently, if a reverse range is attempted, such as:
+> In preparation for that, run objtool right before the module link so its
+> no longer done on the descend in the deferred case.
 > 
->     config EXAMPLE
->         int "Reverse range example"
->         range 2 1
+> Signed-off-by: Josh Poimboeuf <jpoimboe@kernel.org>
+> ---
+>  scripts/Makefile.build      | 31 +++++++++++++++----------------
+>  scripts/Makefile.modfinal   | 20 +++++++++++++++-----
+>  scripts/livepatch/klp-build | 12 ++++++------
+>  3 files changed, 36 insertions(+), 27 deletions(-)
 > 
-> then the value of the option defaults to its "lower" limit of 2. If the
-> option is visible in the frontend, then the user gets trapped in the value
-> selection interface, since there is no value that is actually valid for
-> the user to set.
-> 
-> Note that this only checks ranges that use constant values. Statically
-> checking ranges using symbols would require SAT solving, or similar.
-> 
-> Link: https://lore.kernel.org/all/20260904220559.GB2787252@ax162/ [1]
-> Assisted-by: LLM
-> Signed-off-by: Julian Braha <julianbraha@gmail.com>
->
-> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-> index 118af2dde722..cc335f6db257 100644
-> --- a/scripts/kconfig/menu.c
-> +++ b/scripts/kconfig/menu.c
-> @@ -274,9 +274,9 @@ static int menu_validate_number(struct symbol *sym, struct symbol *sym2,
->  static int sym_check_prop(struct symbol *sym)
->  {
->  	struct property *prop;
-> -	struct symbol *sym2;
-> +	struct symbol *sym2, *lower, *upper;
->  	char *use;
-> -	int errors = 0;
-> +	int errors = 0, numeric_errors = 0;
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index 87993362595ce..c1b22b4a4e217 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -271,15 +271,21 @@ cmd_record_mcount = $(if $(findstring $(strip $(CC_FLAGS_FTRACE)),$(_c_flags)),
+>  	$(sub_cmd_record_mcount))
+>  endif # CONFIG_FTRACE_MCOUNT_USE_RECORDMCOUNT
 >  
->  	for (prop = sym->prop; prop; prop = prop->next) {
->  		switch (prop->type) {
-> @@ -325,8 +325,22 @@ static int sym_check_prop(struct symbol *sym)
->  			if (sym->type != S_INT && sym->type != S_HEX)
->  				prop_warn(prop, "range is only allowed "
->  						"for int or hex symbols");
-> -			errors += menu_validate_number(sym, prop->expr->left.sym, prop);
-> -			errors += menu_validate_number(sym, prop->expr->right.sym, prop);
-> +			lower = prop->expr->left.sym;
-> +			upper = prop->expr->right.sym;
-> +			numeric_errors += menu_validate_number(sym, lower, prop);
-> +			numeric_errors += menu_validate_number(sym, upper, prop);
-> +			errors += numeric_errors;
-> +			if (numeric_errors || lower->type != S_UNKNOWN || upper->type != S_UNKNOWN)
-> +				break;
-> +
-> +			if ((sym->type == S_INT &&
-> +				strtoll(lower->name, NULL, 10) > strtoll(upper->name, NULL, 10)) ||
-> +				(sym->type == S_HEX &&
-> +				strtoull(lower->name, NULL, 16) > strtoull(upper->name, NULL, 16))) {
-> +				prop_err(prop, "range lower limit '%s' is greater than upper limit '%s'",
-> +					lower->name, upper->name);
-> +				errors++;
-> +			}
+> -# 'OBJECT_FILES_NON_STANDARD := y': skip objtool checking for a directory
+> -# 'OBJECT_FILES_NON_STANDARD_foo.o := 'y': skip objtool checking for a file
+> -# 'OBJECT_FILES_NON_STANDARD_foo.o := 'n': override directory skip for a file
+> -
+> +ifdef CONFIG_OBJTOOL
+> +#
+> +# NOTE: these variables are deprecated, and have no effect when
+> +# CONFIG_OBJTOOL_DEFERRED is enabled.  Objtool-allergic code can instead be
+> +# marked with STACK_FRAME_NON_STANDARD() or ANNOTATE_*().
+> +#
+> +#   'OBJECT_FILES_NON_STANDARD := y': skip objtool checking for a directory
+> +#   'OBJECT_FILES_NON_STANDARD_foo.o := 'y': skip objtool checking for a file
+> +#   'OBJECT_FILES_NON_STANDARD_foo.o := 'n': override directory skip for a file
+> +#
+>  is-standard-object = $(if $(filter-out y%, $(OBJECT_FILES_NON_STANDARD_$(target-stem).o)$(OBJECT_FILES_NON_STANDARD)n),$(is-kernel-object))
+>  
+> -ifdef CONFIG_OBJTOOL
+> -$(obj)/%.o: private objtool-enabled = $(if $(is-standard-object),$(if $(CONFIG_OBJTOOL_DEFERRED),$(is-single-obj-m),y))
+> -endif
+> +# Enable per-TU objtool for !CONFIG_OBJTOOL_DEFERRED
+> +$(obj)/%.o: private objtool-enabled = $(if $(CONFIG_OBJTOOL_DEFERRED),,$(if $(is-standard-object),y))
+> +endif # CONFIG_OBJTOOL
+>  
+>  ifneq ($(findstring 1, $(KBUILD_EXTRA_WARN)),)
+>  cmd_warn_shared_object = $(if $(word 2, $(modname-multi)),$(warning $(kbuild-file): $*.o is added to multiple modules: $(modname-multi)))
+> @@ -497,17 +503,10 @@ $(obj)/lib.a: $(lib-y) FORCE
+>  	$(call if_changed,ar)
+>  
+>  quiet_cmd_ld_multi_m = LD [M]  $@
+> -      cmd_ld_multi_m = $(LD) $(ld_flags) -r -o $@ @$< $(cmd_objtool)
+> +      cmd_ld_multi_m = $(LD) $(ld_flags) -r -o $@ @$<
+>  
+> -define rule_ld_multi_m
+> -	$(call cmd_and_savecmd,ld_multi_m)
+> -	$(call cmd,gen_objtooldep)
+> -endef
+> -
+> -$(multi-obj-m): private objtool-enabled := $(CONFIG_OBJTOOL_DEFERRED)
+> -$(multi-obj-m): private part-of-module := y
+>  $(multi-obj-m): %.o: %.mod FORCE
+> -	$(call if_changed_rule,ld_multi_m)
+> +	$(call if_changed,ld_multi_m)
+>  $(call multi_depend, $(multi-obj-m), .o, -objs -y -m)
+>  
+>  # Add intermediate targets:
+> diff --git a/scripts/Makefile.modfinal b/scripts/Makefile.modfinal
+> index 01a37ec872b90..56b4227cc6863 100644
+> --- a/scripts/Makefile.modfinal
+> +++ b/scripts/Makefile.modfinal
+> @@ -32,11 +32,18 @@ ifneq ($(WARN_ON_UNUSED_TRACEPOINTS),)
+>  cmd_check_tracepoint = $(objtree)/scripts/tracepoint-update --module $<;
+>  endif
+>  
+> +$(modules:%.o=%.ko): private objtool-enabled = $(CONFIG_OBJTOOL_DEFERRED)
 
-Thanks, looks good to me.  I don't like that we do these strto{u,}ll()
-conversions everywhere repeated.  But I think it's ok for now.
-
-Tested-by: Nicolas Schier <n.schier@fritz.com>
 Reviewed-by: Nicolas Schier <n.schier@fritz.com>
+
+I understand that the variable name objtool-enabled is used across 
+Makefiles and that it makes sense to have it here, too, for consistency 
+and better spotting.
+
+So, just for my understanding: in Makefile.modfinal it is not strictly 
+necessary but could be replaced by direct use of 
+$(CONFIG_OBJTOOL_DEFERRED); is that correct?
 
 -- 
 Nicolas
-
