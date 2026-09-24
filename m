@@ -1,123 +1,104 @@
-Received: from mail.avm.de (mail.avm.de [212.42.244.94])
+Received: from mail.avm.de (mail.avm.de [212.42.244.119])
 	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6914142981E;
-	Thu, 24 Sep 2026 08:32:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.94
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95EE840BCDB;
+	Thu, 24 Sep 2026 10:57:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790238734; cv=none; b=bRmxN1skLLHg4J5jwakg9zLyr+daGB/1eIs+BmWjDQ3PULFziO5UoWjxTxJjtn8X/PrF2u8yUAB5V398H51kas4p7LpRUZzeAm7sSqdlkz6dFJ8dj8+6ZrN4JE66RcJxEoMDtbZka09IxOHSKdvZNeUzsB5ttFUbvlwDrFJmm54=
+	t=1790247446; cv=none; b=SzHBdL2cv9yRN0NmPMCBfYXnVGSNWy+AkLsqCbBMkdG8JC2uoT1ctKEbzTl+1JSo6pZDp0PQ9+yepMUQvvxWicGXSqmkcSVY6l1vq5IgN1/jlLx05mOR25hvOXApp+BSsBuD0vSaba6TerOnWotWnWFGG6gpkmr+LKmV1FLL8fo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790238734; c=relaxed/simple;
-	bh=Z3w08f8Z2mDt9tb5wx7ZjGKpoBslSL4wZDJkvLJPoto=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dhslR3g483NSPTZzH1J9z8LACWY4+z71yY/gS2wLLyKC6lNBhPb9UbZQCxuvWgoPs/0XY1UVK0Lht10mx+MqbFZdmXCjX1lbciPUEmdos1hcGCKlDSpt6Jy3wFHuuQW/qAsnYgvzxAIaQ0pSTCzMb7HAUmUYdLpChlHJGQL2dlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com; spf=pass smtp.mailfrom=fritz.com; dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b=h7YxJaJ1; arc=none smtp.client-ip=212.42.244.94
+	s=arc-20240116; t=1790247446; c=relaxed/simple;
+	bh=Qox9v8unrwTbF+4YIdkCSGD88B0vaoJpOJUYA8G7PUE=;
+	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
+	 References:Date:Message-Id; b=QSKI016sTDDqz+i7oGR0md+vVv4lh2k6A4nsbO9/IJhkWxXtdi7J5yWovga6lOV5LFX0GqNuJUHz8gytlHQ9RLJZ5I+lCm781Y6QPjQ6Ts7hBBozRouzmD+YzwXCJNVpbgjbYN5i+fasu3FpcodjW8vg2A67/XcMXkiDvbr0v84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com; spf=pass smtp.mailfrom=fritz.com; dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b=LGkXD9vS; arc=none smtp.client-ip=212.42.244.119
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fritz.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b="h7YxJaJ1"
+	dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b="LGkXD9vS"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fritz.com; s=mail;
-	t=1790238714; bh=Z3w08f8Z2mDt9tb5wx7ZjGKpoBslSL4wZDJkvLJPoto=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=h7YxJaJ1vBCRKBKegBy39h+ktsqSDoKB+FSeSyrgYBotAt95Hfn1M6BOZ6GnSyzn/
-	 VeZ9NzMxt7c3DAQUdYhm98HwMqeZOEZsV+4/3H5V3AtIHx4apJeG5fvrrc3O/qW7Hy
-	 qhlJthF/0g6ARmd0jS9fuVkgjDsi8dYxqEdKGOhpoWzfZZOu2QCNV8hRkrz7h221M8
-	 9GNn8ea2Lza1eqB8GGSwqcDMv62zXB4+yLKcZam2r2NDsQdmljxFPOjXBU8ueeWvax
-	 0pnX8TIZ9VTFo57TNOMoJB0D7xh1berky/eDPNrb92SUINGOqNOWzZNnE7QQjqHNpl
-	 sSeo99X1mvPpg==
+	t=1790247434; bh=Qox9v8unrwTbF+4YIdkCSGD88B0vaoJpOJUYA8G7PUE=;
+	h=Subject:From:To:Cc:In-Reply-To:References:Date:From;
+	b=LGkXD9vSY4iBxBSYMe0Jb3tKD+/KDeklWJegRvUOLGgGJ1EVn4dORRKZlAYgdghdD
+	 5uR0BrD65bn1t3wEfQKAXke89NDy8DI4MuiBEZ6+PUusMfveXXD84joVhOlBhFNEj3
+	 WdHCVNrTCF92xw/zl4ehoZpwbR9rMQ0JXGpLCIygHnwuJPeo3M8j8ftqeDuQjpj1WB
+	 lK8ip/LeBq3CYqXRR4dFZOqMG0RsnXb0XjS4ZZU1QI90TUmcU/RmMrFGYcpZ4YLyjO
+	 bbsYk/RsfQByLM8aOYP3wl21TVtNuoXSVi1N2gdY3Az7nA9lspyl8kqAErwR2ytvUi
+	 HkSYv7FD+dIcA==
 Received: from [212.42.244.78] (helo=mail.avm.de)
 	by mail.avm.de with ESMTP (eXpurgate 4.57.1)
 	(envelope-from <n.schier@fritz.com>)
-	id 6ab4dffa-03cd-7f0000032729-7f000001cfdc-1
-	for <multiple-recipients>; Thu, 24 Sep 2026 10:31:54 +0200
+	id 6ab5020a-03d5-7f0000032729-7f000001c9f4-1
+	for <multiple-recipients>; Thu, 24 Sep 2026 12:57:14 +0200
 Received: from mail-auth.fritz.com (unknown [212.42.244.78])
 	by mail.avm.de (Postfix) with ESMTPS;
-	Thu, 24 Sep 2026 10:31:54 +0200 (CEST)
-Date: Thu, 24 Sep 2026 10:31:44 +0200
-From: Nicolas Schier <n.schier@fritz.com>
-To: Julian Braha <julianbraha@gmail.com>
-Cc: Nathan Chancellor <nathan@kernel.org>,
-	Pengpeng Hou <pengpeng@iscas.ac.cn>,
-	Ulf Magnusson <ulfalizer@gmail.com>,
-	Masahiro Yamada <yamada.masahiro@socionext.com>,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/4] kconfig: tests: Provide defconfig outfile for
- savedefconfig
-Message-ID: <20260924-unselfish-loose-skylark-a7fdbf@l-nschier-z2>
-References: <20260917-kconfig-tests-minor-updates-v1-0-286e5c985244@fritz.com>
- <20260917-kconfig-tests-minor-updates-v1-2-286e5c985244@fritz.com>
- <ef365f19-afd2-4704-b900-847b24540a30@gmail.com>
+	Thu, 24 Sep 2026 12:57:14 +0200 (CEST)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ef365f19-afd2-4704-b900-847b24540a30@gmail.com>
-Organization: FRITZ! Technology GmbH
-x-ms-reactions: disallow
-X-purgate-ID: 149429::1790238714-1E7BAEE1-8FEC6898/0/0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 1/2] kconfig: add prop_err function to simplify
+ property error handling
+From: Nicolas Schier <n.schier@fritz.com>
+To: Julian Braha <julianbraha@gmail.com>
+Cc: nathan@kernel.org, nsc@kernel.org, n.schier@fritz.com, 
+ grahamr@qti.qualcomm.com, rdunlap@infradead.org, nico@fluxnic.net, 
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20260922163749.2031594-2-julianbraha@gmail.com>
+References: <20260922163749.2031594-1-julianbraha@gmail.com>
+ <20260922163749.2031594-2-julianbraha@gmail.com>
+Date: Thu, 24 Sep 2026 12:57:06 +0200
+Message-Id: <179024742686.3875862.8878765161331000985.b4-review@b4>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=876; i=n.schier@fritz.com;
+ h=from:subject:message-id; bh=Qox9v8unrwTbF+4YIdkCSGD88B0vaoJpOJUYA8G7PUE=;
+ b=owEBbQKS/ZANAwAIAYjGvJyImm24AcsmYgBqtQIFAD05hoAzmdXzmTmBmsfNmtx+9QgiiiP7q
+ 6YnOMQvqjCJAjMEAAEIAB0WIQQO/4WJ63TpgecLpGmIxryciJptuAUCarUCBQAKCRCIxryciJpt
+ uK0JEACUKzy3nfSXeDRj2lUDT9wyhTeRPDAC3IeuYyoYxle3TADZzR0SwDzE83/JNHJucN+Ijq3
+ GGaMtBMAq388WQPxKdJU6d2x2Xw1sRwNz3ANPp6cS4JuE0VbYJUwO4A7y8IS5anknyShb3Cr14B
+ ZNslduntxcFomY5d1pDOwExRpy9Xb40PQeCoUvlRH3rvAJ9lMZj+uay4g7oU+XkMKAAnqjJJosQ
+ ChFDi13+AJO+zQiLMblnSxSPOPNdfoqX6FJsaHJYCqhACKNsv+/yM8Hy4xPJ+dzELaw3K8mxgD+
+ J19xQhVG2haPhrfwou4/29Ar1zL9aZSKMvDWwEpbewyP05gBfJXuK7YFpw1J5F907yx2A3Fh0y0
+ 8WiVkxkQ4jf+Lo0xHBiavRmorA1bz7pLM9mCY4ThtHYQNfJsnNSDTmKIr3izt+uSU7Rg1Owyo3+
+ xvPnc3uF4DN8k2UWyoVWFT/e1g1wWkHOpBLjoKeVpxvtvKKRHagiZczUgW1OZhelURBxF24PyME
+ 57xJ90PjBPUSMf3hmDmCWQAUIsLQEcDLoMz1yeGpfIAtTF/DS6c8Mgle0iEGTI487xFfFw1Wz+O
+ awvSINAx+J7nerw7O02jP3F3+LVK2tQmCtovftypV8ol4jdwXFy8hxjkgzczCvOn80y6Csdr0b9
+ uGCpZypR+EEuMiQ==
+X-Developer-Key: i=n.schier@fritz.com; a=openpgp;
+ fpr=7CF67EF8868721AFE53D73FDBDE3A6CC4E333CC8
+X-purgate-ID: 149429::1790247434-ED7F8EF9-556F56F2/0/0
 X-purgate-type: clean
-X-purgate-size: 2026
+X-purgate-size: 878
 X-Notice: Whitelisted
 X-purgate: This mail is considered clean (visit https://www.eleven.de for further information)
 X-purgate: clean
-X-pfmilter: host: postfix-mx-03  mail-id: 2D756A0168  external: no
+X-pfmilter: host: postfix-mx-02  mail-id: 67992A0885  external: no
 
-On Sat, Sep 19, 2026 at 06:45:33PM +0100, Julian Braha wrote:
-> On 9/17/26 14:38, Nicolas Schier wrote:
-> > Let kconfig test framework's 'savedefconfig' forward the requested
-> > output 'defconfig' filename to 'conf'.
-> > 
-> > The original implementation was calling 'conf' with '--savedefconfig'
-> > but missed the mandatory filename for the defconfig output file.
-> > 
-> > While at it, honour the 'dot_config' argument which points to the input
-> > config file.
-> > 
-> > Fixes: 022a4bf6b59d ("kconfig: tests: add framework for Kconfig unit testing")
-> > Signed-off-by: Nicolas Schier <n.schier@fritz.com>
+> As suggested by Nicolas while reviewing another Kconfig property error [1],
+> we can add a prop_err() function to simplify the tracking and display of
+> Kconfig property errors.
 > 
-> Reviewed-by: Julian Braha <julianbraha@gmail.com>
+> Note that the formatting of the error printing is changed slightly
+> (removing a space) to better match the formatting of warnings. This causes
+> a change to the expected test output for the existing errors that now call
+> prop_err().
 
-thanks.
+I think it would be better to keep the space here and add it to
+menu_warn() and prop_warn() output instead.  Then the format matches the
+warning/error format of gcc:
 
-> 
-> > ---
-> >  scripts/kconfig/tests/conftest.py | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/scripts/kconfig/tests/conftest.py b/scripts/kconfig/tests/conftest.py
-> > index e92f0cf1421a..f2ad2ac2a661 100644
-> > --- a/scripts/kconfig/tests/conftest.py
-> > +++ b/scripts/kconfig/tests/conftest.py
-> > @@ -240,7 +240,8 @@ class Conf:
-> >          dot_config: .config file for input
-> >          returncode: exit status of the Kconfig executable
-> >          """
-> > -        return self._run_conf('--savedefconfig', out_file='defconfig')
-> > +        return self._run_conf('--savedefconfig={}'.format(out_file),
-> > +                              dot_config=dot_config, out_file='defconfig')
-> >  
-> >      def listnewconfig(self, dot_config=None):
-> >          """Run listnewconfig.
-> > 
-> 
-> Nice catch!
-> 
-> <nitpick> out_file here isn't actually defined until later, in patch 4.
-> But it seems this won't actually break anything if applied alone since
-> this savedefconfig function currently isn't called anywhere (until your
-> patch 4).
+$ gcc -x c - <<<"main() { return 0; }"
+<stdin>:1:1: error: return type defaults to ‘int’ [-Wimplicit-int]
 
-Ah, yes.  I'll update the argument of 'savedefconfig':
 
--    def savedefconfig(self, dot_config):
-+    def savedefconfig(self, dot_config, out_file='defconfig'):
+Otherwise, this looks good to me, thanks!
 
-Then out_file is properly defined.  Thanks!
+Tested-by: Nicolas Schier <n.schier@fritz.com>
+Reviewed-by: Nicolas Schier <n.schier@fritz.com>
 
 -- 
 Nicolas
+
