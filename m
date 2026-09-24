@@ -1,137 +1,108 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88B0E414DDB;
-	Wed, 23 Sep 2026 22:53:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B093382FC;
+	Thu, 24 Sep 2026 07:35:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790204022; cv=none; b=LH+Y4xcmW+y2Yw0bpVln596s3+WuPJe20pvPjRRZ5aaf6NByRcMvsa+axMApsc1sahI/tCM5sm36p22dwCX5fItbAdK6N9/Tb1sCVbPQGmk+gj+yF2K2wnZ8vDrU/gTwHTsUZoTfLn6Si7lHmUecHYCP+peLKZpb9XoZ7m+Vbyo=
+	t=1790235346; cv=none; b=OU4ZFmnvzays1pturjGDIHQgZZ1bqhaATDXivPKtltjbpCbhwIM/582KVF366VM0ZhRJd9M9B4SLJ08gCr++XjwPFGk//RJiaydkP+F7KbeLh23Cd80yUxO93QwP8dswTH26Ntsbn9SMmDHGtq+uxwfbsVcIyH/ytG3OgSxPwOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790204022; c=relaxed/simple;
-	bh=fwZSaqpmByB20i96UeW2mqdIG75USPYigGVMnEnWY2g=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=OzSZqg27PtUb7A3AptNI8YPe+kHIl+BjSCt3uN2/1v8nQivHoLCQXYpMxJf7JvSxm5y2BI/a2PMlELB7I6TeSwVQD+/5q8PLZ0DJrR1iWgXbNyXaHFuZeYNM0tXTWLqGUFoSMOwRw5ykBfGgHpjlDue3S+P9Ayv6TY8GCpwa/yU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=scGfOW6F; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790235346; c=relaxed/simple;
+	bh=l0a1ZOrqXaZBb2gpDB/NaEJiiaa3JIe6r7e0fcOIHm8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l8bkg2haoMU6rz8DOXK2+qUsLHk1CUYpSzFZkO6xXP9ADmdL5Tjz4hnZXzzWjGurrNnRHHfRnlR3UfgeG1emc4S9OtTbrt7Q9dejsTJai8eXFZ0WfcZg4E5g8YJnQDlA0kJV+4auBlm75OLeGaERjjem0fERb7hPdw07zAdnGk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RCNbWmjq; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="scGfOW6F"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03D461F000FF;
-	Wed, 23 Sep 2026 22:53:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux-foundation.org; s=korg; t=1790204021;
-	bh=ep7wns9wPyTqnmGHhjmbGEV+muuH/iLwEmgevdLFK+Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=scGfOW6FNrNiqxjD54xQajwaC+4WYqC6RG/88f1T+E4tqhorzFVBYXL1q9XvKZq/L
-	 EBTL5TAFO+L4muscbIneqi/sYK9xm73Aa56lde4wfrllpbydBzL/wWnM9xNyKrubd9
-	 sbmpz652ub/EEGRm8Lp6Vjcgd5QxMI1CtuS4ssq4=
-Date: Wed, 23 Sep 2026 15:53:39 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-To: Jim Cromie <jim.cromie@gmail.com>
-Cc: Jason Baron <jbaron@akamai.com>, Shuah Khan <shuah@kernel.org>, Maarten
- Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard
- <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David Airlie
- <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Arnd Bergmann
- <arnd@arndb.de>, Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu
- <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen
- <samitolvanen@google.com>, Aaron Tomlin <atomlin@atomlin.com>, Jonathan
- Corbet <corbet@net.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
- Shuah Khan <skhan@linuxfoundation.org>, Randy Dunlap
- <rdunlap@infradead.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Pavel
- Machek <pavel@kernel.org>, Len Brown <lenb@kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, Petr Mladek <pmladek@suse.com>, Steven Rostedt
- <rostedt@goodmis.org>, John Ogness <john.ogness@linutronix.de>, Sergey
- Senozhatsky <senozhatsky@chromium.org>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linux-arch@vger.kernel.org, linux-modules@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org,
- linux-pm@vger.kernel.org, Louis Chauvet <louis.chauvet@bootlin.com>,
- Philipp Hahn <phahn-oss@avm.de>, kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH v11 00/38] dyndbg: Fix classmaps API for subsystems,
- query extensions, selftests
-Message-Id: <20260923155339.bdc677e8e688611bcf190ad9@linux-foundation.org>
-In-Reply-To: <20260923-dd-cmap-part2-clean-v11-0-9b6c217fdf2f@gmail.com>
-References: <20260923-dd-cmap-part2-clean-v11-0-9b6c217fdf2f@gmail.com>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RCNbWmjq"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id C90F01F000FF;
+	Thu, 24 Sep 2026 07:35:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790235343;
+	bh=1DjE0br+Zpw8GpmXTJxpWJ7DiUr3l3oC8QPxkD5V81w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=RCNbWmjqW6gGvO/y4IO9lJOwe8Wzt/OcNzq3yzJHIPn/H+9P5+6/uYcbZ7EIIdrW/
+	 C+//oRCCly/4Ek28rsapIaE9rD9JQxBQhbpvp1lXOxAyDkgBGDR8RGce3lYnNX0Ihn
+	 43j9SZd7DppizuVTNdiCrfcP62nKHORPD9tD0JgpnhPppEQDEuwmc3gi6r3SCJIX1z
+	 89Ri4yH5XgG5agTYIgpB7WCw/vHwlc5dbv/dHf0DSQsBzt9/RKWT5zxGHqVIa2GmbN
+	 9yVL5dePMy83j7XLY5kExYYmd09/fDV4Z6fQKhO2HC6+YilvCvPHGFPUJ2Sw47C+kv
+	 cOBZ9FEi1tc7w==
+Date: Thu, 24 Sep 2026 09:35:25 +0200
+From: Nicolas Schier <nsc@kernel.org>
+To: Julian Braha <julianbraha@gmail.com>
+Cc: Nathan Chancellor <nathan@kernel.org>,
+	Pengpeng Hou <pengpeng@iscas.ac.cn>,
+	Ulf Magnusson <ulfalizer@gmail.com>,
+	Masahiro Yamada <yamada.masahiro@socionext.com>,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/4] kconfig: tests: Reset KCONFIG_WARN_CHANGED_INPUT by
+ default
+Message-ID: <arTSvcwLenaZwKm7@levanger>
+Mail-Followup-To: Nicolas Schier <nsc@kernel.org>,
+	Julian Braha <julianbraha@gmail.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Pengpeng Hou <pengpeng@iscas.ac.cn>,
+	Ulf Magnusson <ulfalizer@gmail.com>,
+	Masahiro Yamada <yamada.masahiro@socionext.com>,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260917-kconfig-tests-minor-updates-v1-0-286e5c985244@fritz.com>
+ <20260917-kconfig-tests-minor-updates-v1-1-286e5c985244@fritz.com>
+ <a1efc002-c34b-43a4-be02-ff4746d13241@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a1efc002-c34b-43a4-be02-ff4746d13241@gmail.com>
 
-On Wed, 23 Sep 2026 16:34:24 -0600 Jim Cromie <jim.cromie@gmail.com> wrote:
+On Sat, Sep 19, 2026 at 06:29:39PM +0100, Julian Braha wrote:
+> On 9/17/26 14:38, Nicolas Schier wrote:
+> > Reset KCONFIG_WARN_CHANGED_INPUT by default for all kconfig tests but
+> > those which set it explicitly.
+> > 
+> > This fixes the 'warn_changed_input' test on systems with
+> > KCONFIG_WARN_CHANGED_INPUT=1 and ensures a cleaner test environment.
+> > 
+> > Fixes: 645323a7f4e5 ("kconfig: add optional warnings for changed input values")
+> > Signed-off-by: Nicolas Schier <n.schier@fritz.com>
+> > ---
+> >  scripts/kconfig/tests/conftest.py | 8 ++++++++
+> >  1 file changed, 8 insertions(+)
+> > 
+> > diff --git a/scripts/kconfig/tests/conftest.py b/scripts/kconfig/tests/conftest.py
+> > index 66f95e4ed58c..e92f0cf1421a 100644
+> > --- a/scripts/kconfig/tests/conftest.py
+> > +++ b/scripts/kconfig/tests/conftest.py
+> > @@ -34,6 +34,9 @@ class Conf:
+> >          """
+> >          # the directory of the test being run
+> >          self._test_dir = os.path.dirname(str(request.fspath))
+> > +        self.default_env = {
+> > +            "KCONFIG_WARN_CHANGED_INPUT": "",
+> > +        }
+> >  
+> >      # runners
+> >      def _run_conf(self, mode, dot_config=None, out_file='.config',
+> > @@ -57,6 +60,11 @@ class Conf:
+> >          # Override 'srctree' environment to make the test as the top directory
+> >          extra_env['srctree'] = self._test_dir
+> >  
+> > +        # Set default environment variables, if not set by caller
+> > +        for var in self.default_env:
+> > +            if not var in extra_env:
+> > +                extra_env[var] = self.default_env[var]
+> 
+> Maybe it makes more sense to have the tests ignore users' env vars if
+> they would cause tests to fail? For example, this recent patch
+> explicitly unsets the KCONFIG_WERROR flag:
+> https://lore.kernel.org/linux-kbuild/4d1eee3a-a5f9-467e-880e-4f2815851b09@gmail.com/T/#m25be9ad4d5e62956c5f98759398f91a555afb4df
 
-> The drm subsystem has *lots* of debug statements, in 11 categories:
-> 
->  $> git grep '\w*_dbg' drivers/gpu/drm/ | wc
->    5663   30159  542864
+Good point, but I am not sure, if we really should ignore all of the
+user's environment.  Maybe it's better for now, to just reset all
+environment variables that start with KCONFIG_ and KBUILD_ ?
 
-Methinks this regexp was overly promiscuous, but point taken.
 
->  $> git grep 'DRM_DEBUG\w*' drivers/gpu/drm/ | wc
->    2206   12834  202332
-> 
-> All of these are bit-tests on __drm_debug, exposed to users as
-> /sys/module/drm/parameters/debug. Many of these are done often;
-> vblank is done ~100/sec for some displays. Over the uptime of many
-> boxes, this is a lot of cpu cycles on bits that are almost always off.
-
-A __test_bit (or |) every 10ms sounds quite negligible?
-
-Especially if __drm_debug is __read_mostly.  Which it isn't, afaict. 
-Um, low-hanging fruit?
-
-> Dynamic-debug excels at replacing such tests with NOOPs (via static
-> keys). Classmaps was devised to bring that 0-off-cost to drm's
-> categories.
-> 
-> Classmaps-v1 went into the kernel in Sept 2022, in 2 chunks:
->   b7b4eebdba7b..6ea3bf466ac6    # core dyndbg changes
->   0406faf25fb1..ee7d633f2dfb    # drm adoption
-> 
-> Sadly DRM-CI found a regression during init with drm.debug=<initval>;
-> the static-keys underneath the drm-dbgs in drm.ko got enabled, but
-> those in drivers & helpers did not.
-> 
-> So in Feb 2023, it got pulled:
-> commit bb2ff6c27bc9 ("drm: Disable dynamic debug as broken")
-> 
-> Root Problem:
-> 
-> DECLARE_DYNDBG_CLASSMAP defined the classmap, but its repeated use in
-> both core and drivers violated a K&R rule "define once, refer
-> afterwards". This flaw resulted in a regression; with drm.debug=0xFF
-> boot arg, drm-core got enabled, but drivers/helpers did not.
-> 
-> This patchset replaces DECLARE_DYNDBG_CLASSMAP with:
-> - DYNAMIC_DEBUG_CLASSMAP_DEFINE (invoked once in the exporting module)
-> - DYNAMIC_DEBUG_CLASSMAP_USE (invoked repeatedly in drivers & helpers)
-> 
-> _DEFINE exports the classmap it creates (in drm.ko), and other modules
-> _USE the classmap. The _USE adds a record referencing the _DEFINEd (&
-> exported) classmap in a 2nd __dyndbg_class_users section.
-> 
-> At modprobe, dyndbg scans the new section after __dyndbg_class_maps,
-> follows the linkage to the _DEFINEr module, finds the (optional)
-> kernel-param controlling the classmap, examines its drm.debug=<initval>,
-> and applies it to the module being initialized.
-> 
-> To recapitulate the multi-module problem wo DRM involvement, we add:
-> 
-> - tools/testing/selftests/dynamic_debug/dyndbg_selftest.sh:
->   Alters pr_debugs in builtins and test modules,
->   checks results against checksums of expected results
-> 
-> - lib/test_dynamic_debug.c & test_dynamic_debug_submod.c:
->   Builds parent & _submod modules with _DEFINE and _USE inside #if/#else
->   blocks, reproducing the 2-module scenario under selftests.
-
-So what I'm understanding is that this series presently has no effect
-upon DRM?
-
-What subsystems *does* it affect?
-
-Sashiko had quite a bit to say.  It hasn't quite completed at present.
-	https://sashiko.dev/#/patchset/20260923-dd-cmap-part2-clean-v11-0-9b6c217fdf2f@gmail.com
+-- 
+Nicolas
