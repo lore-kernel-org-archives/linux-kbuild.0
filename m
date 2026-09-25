@@ -1,176 +1,156 @@
-Received: from pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com [35.155.198.111])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBF51456296;
-	Fri, 25 Sep 2026 21:23:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.155.198.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3542C486E62
+	for <linux-kbuild@vger.kernel.org>; Fri, 25 Sep 2026 22:19:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790371403; cv=none; b=OU0F1nu2RGk9AgiMkvOfAWIbGM6gEM8u+1VqEWPlOlL6HbtuZpzPWfbHtDWyg5vhLeeAU3AeY4r5qRlkqbj/HWPPYf5i0W56U5EIeVwprYRL29Uu8fuB3oFsSKm0ZAZZxGamUy0geaikgkm8JNOcIwOJsoeh7c50oVt5NKWCZtM=
+	t=1790374765; cv=none; b=kklhaQugA9OaZNTLQyxK02bhFgw588W3qMqs0kDpvu07eRJZzQA5Zifq2ogBD7hI3kE0XtTwUTxm/LMvb/Iw8tj+jegOhkOlyWODi8b6VvgKVafJKVEQPpKLRe3ZfaruH2FH8Vp0x2PMTxUdFVgoPA9cD66JhpgzLyKSqbwbAJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790371403; c=relaxed/simple;
-	bh=HerTneftuhQfAknI9R2FicxbJNpDAGXWHHvZw49HstY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=a5P1N3iRzb8VxuMQekfV0Rzd+0xutV4ZJi9dO9CqTMoJgkPxCYA+hpiE08kEIe6GIw8ADVfnCPGOq+bnxBg0f0GxpElcQFt9C/jZPbMl+aBahNhRBQnxNlh9GpU9qyRgVVv0w36g/3igCOza0/5e5hk8wY9UaOqJ1rbknT1O5y4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=ZMfZCLmV; arc=none smtp.client-ip=35.155.198.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1790374765; c=relaxed/simple;
+	bh=152hnQ82QfJ0LW+Dm6mPNkhaiXoMmZUG70QpGAGRnCo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pvDdIsRiwHB4nMCC6DFo7psZGXtCPxASOOsAXc8xun3pFmWEWmNqv2LjpFSMIfi2WKbrJZWRNK8oMHNeYHhdv1kHNDO9eJDg/PedRaZ5PpRz6XLWlGoNLjHnkPYY07/loz6YjQ9Lt2224RkotSv6jWsIQqCj3xKMYdzIerErBKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xf4uHEk4; arc=none smtp.client-ip=74.125.225.140
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="ZMfZCLmV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xf4uHEk4"
+Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49ccff31419so12420825e9.3
+        for <linux-kbuild@vger.kernel.org>; Fri, 25 Sep 2026 15:19:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1790371401; x=1821907401;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=DMNrHieUH4/OcqJVLdfiVHAW2UU4cQkS2bASkWEaKxY=;
-  b=ZMfZCLmVKZFbthA0aR9kpOc6xCIq+0jpiRBLC8fVeuDsMzB9W1iyNPqD
-   cGfIZ/LqPldNczzz11PNY6pW7Wpf1Q0Pk0YCJDglNz1ZRy8t/HoIq2jMx
-   P4Gv9ff/1msCnGJJevOTnLJS5/+3m59d9pE+38xFxyHBD72iWS2iFCs85
-   maPI5L4UGYJVVrjdhKJxKp4ALowQaTwmwdl9m72ShxZ/t3W5L3qDxv5qf
-   OB7BmV7OUBcJOdAGoxRaDlvDkyQYqLskGBbH2fd1LWBTqq0kPWMxZE8LM
-   GGqBYVEU32VqB0TN7gMxguwWrdyu9zrM1ZWfOMYEOTWBT/f++nJezS1oR
-   Q==;
-X-CSE-ConnectionGUID: CY6CyhnDSwC+dDMmh9ZlrQ==
-X-CSE-MsgGUID: pfrxjD44RRigskAFze2eqw==
-X-IronPort-AV: E=Sophos;i="6.27,123,1787011200"; 
-   d="scan'208";a="29577426"
-Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
-  by internal-pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2026 21:23:21 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [205.251.233.182:18344]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.33.144:2525] with esmtp (Farcaster)
- id da323cf6-d9e1-457c-95b6-0d78905d856b; Fri, 25 Sep 2026 21:23:21 +0000 (UTC)
-X-Farcaster-Flow-ID: da323cf6-d9e1-457c-95b6-0d78905d856b
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.49;
- Fri, 25 Sep 2026 21:23:20 +0000
-Received: from dev-dsk-wanjay-2c-d25651b4.us-west-2.amazon.com (172.19.198.4)
- by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.49;
- Fri, 25 Sep 2026 21:23:20 +0000
-From: Jay Wang <wanjay@amazon.com>
-To: Alan Maguire <alan.maguire@oracle.com>, <bpf@vger.kernel.org>, "Alexei
- Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
-	"Andrii Nakryiko" <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
-	"Kumar Kartikeya Dwivedi" <memxor@gmail.com>
-CC: Martin KaFai Lau <martin.lau@linux.dev>, Yonghong Song
-	<yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, Nathan Chancellor
-	<nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
-	<linux-kbuild@vger.kernel.org>, Luis Chamberlain <mcgrof@kernel.org>, "Petr
- Pavlu" <petr.pavlu@suse.com>, <linux-modules@vger.kernel.org>, Arnd Bergmann
-	<arnd@arndb.de>, <linux-kernel@vger.kernel.org>, Hazem Mohamed Abuelfotoh
-	<abuehaze@amazon.com>, Bjoern Doebel <doebel@amazon.de>,
-	<jay.wang.upstream@gmail.com>
-Subject: Re: [PATCH bpf-next 0/6] bpf: make the vmlinux BTF an on-demand loadable module (CONFIG_DEBUG_INFO_BTF=m) to save ~5.4 MB memory
-Date: Fri, 25 Sep 2026 21:23:19 +0000
-Message-ID: <20260925212319.25401-1-wanjay@amazon.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <9cf62f86-0b7d-4175-8334-74493ea3b04c@oracle.com>
-References: <9cf62f86-0b7d-4175-8334-74493ea3b04c@oracle.com>
+        d=gmail.com; s=20251104; t=1790374761; x=1790979561; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:sender:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=wZ13srzmxe7uWv22g+0yXS08pgsXrImaRy4OqvYDzm0=;
+        b=Xf4uHEk4NuRUeWii1BKdAA2xpt/Auoam8PYnvyllKTcG6OipsHyIZG2v60/IN+pLlo
+         PorljFt2s1kvWCH/KaW/HSlgClT1rP/8QCuNBwZn52QGqYZ4Lmqd8zM3xT80x1Iypl+R
+         iJkF/oMxE+4SGlF2twZn8Inm3p6HeJr3uL8y+bctYp3ZscOJMfUoT6Mzq+XoCT0RUim8
+         9FSjAgKHdErgVqi/FjOs1zY1AdFxXwaLN06VJuy8f025CapQ9BwZuLH8HanK51yEldvB
+         Ut2TWs/NOKdsEoQXcTxUw8q9vdUjRRfi1gcD/BPPiX9AZTRXrXe83IFfZdRidv8Y+Hn6
+         jObQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790374761; x=1790979561;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:sender:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=wZ13srzmxe7uWv22g+0yXS08pgsXrImaRy4OqvYDzm0=;
+        b=MzxUiv511d22VVw/SlQG41CTPFjFQcUnjuDyjLgQviemj551TNA8GrajPewhmG86iZ
+         Itijar//spSXeFxVgfNfIps9rrfy2TkyPHVEVRbcObjx0IuP+9mNGcG2UJwCZWWEOXwn
+         wn85R+2X4Lp6gkvxv26aZjUQt4w94lldKcMnoiLk/m66j9mq1NqSsdoowOWvTSORbnM2
+         R01dz+Z+uvrLJbA64lAW7yMIj3mmxb8ac5aKZWCXJlZl1RDmhQV70vDfujzlxlo7DSCH
+         s12+zbhS0vZUWfOA+co9FZkXarfkOIcVBqUxkqYkQXcKBxwkTkuNRuDrztxrtPwzqj4G
+         OBYA==
+X-Forwarded-Encrypted: i=1; AKwUvBxBtAjbZLOwJsawKENdH3RR0bdCDy32NCwnTLsX7JhEQS/wdRPN2uicdvSSxAfHas5ORR9dS8XZUnArvLU=@vger.kernel.org
+X-Gm-Message-State: AFuF++lIg4WjRiJRRznqyZeVWyiMYEqKL9A7Jmdto+ipmjE6ReFL4ogg
+	l46NpNozTmuzMvcK+/QMe4mr4PoXKCrXm5EmKDgr1hDUfVcsxcfBw5Yz
+X-Gm-Gg: AYBFou3kr6QwfBVpiAy+sadkJjvN2e3BDQ2hvmHz1drGiWvqDiF4LpV2B+qmxka+ePJ
+	H5jBMH9BnDFiAd/Pn/u6MWd56Y8GrUpXJLuxvJK+90HJShV1al4ezZmHtMT2L1mPdquh5bnxc3t
+	KENeC2xlwIvkO8HP5cux5aWdmpQVLfTRnME04+ver8nL5nZ37fP4hcqwuOathpFnVg3H/E5n4OD
+	4yZDct88CFF16OqgNgO84l8b9ugeHjRQ9sQV3xn7cPkDsA0u8c0NOe8nCRhHBtVs28uG87eruoe
+	R0ovbRuNmMi4Os1QuGT7v9YlU2HvghVXfVZ7nfwCG7jDkTN7Q38bUAjudeMaFiQSxYxIagUqrUY
+	hvsY8LQ/CC7Fiuxgqnhk2V/uOxa/zY0biCKNNuKAx9kDlE2Q0K1fzcr9kPnDsKUh3Nl4Yqxlmj9
+	XDL38bxqbD0ik1LOmWeQSkDAnrF6ntEj9jyjnG+Zc2bgGlX8d9AnLXNREeWOX/OkrzD7aGzwupq
+	Z299G7r3sm5Mm8SDlGk/IWbzl1iHuWMcdBfVoYRF9lwzN2EhALbpivOyMcOtjCpq4D4C/J6+foo
+	XQU=
+X-Received: by 2002:a05:600c:6287:b0:49d:827:e5b6 with SMTP id 5b1f17b1804b1-49fe7babaadmr113896275e9.20.1790374760917;
+        Fri, 25 Sep 2026 15:19:20 -0700 (PDT)
+Received: from ?IPV6:2a02:2149:8bb5:f00:90c3:8a8a:2e7b:7fa0? ([2a02:2149:8bb5:f00:90c3:8a8a:2e7b:7fa0])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4887a354c47sm10464218f8f.15.2026.09.25.15.19.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Sep 2026 15:19:20 -0700 (PDT)
+Sender: Julian Braha <julian.braha@gmail.com>
+Message-ID: <9f0af6b6-bf78-4f4f-96c1-7e08d574b905@gmail.com>
+Date: Fri, 25 Sep 2026 23:19:19 +0100
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D032UWB002.ant.amazon.com (10.13.139.190) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/4] kconfig: tests: Reset KCONFIG_WARN_CHANGED_INPUT by
+ default
+To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
+Cc: Pengpeng Hou <pengpeng@iscas.ac.cn>, Ulf Magnusson <ulfalizer@gmail.com>,
+ Masahiro Yamada <yamada.masahiro@socionext.com>,
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260917-kconfig-tests-minor-updates-v1-0-286e5c985244@fritz.com>
+ <20260917-kconfig-tests-minor-updates-v1-1-286e5c985244@fritz.com>
+ <a1efc002-c34b-43a4-be02-ff4746d13241@gmail.com> <arTSvcwLenaZwKm7@levanger>
+ <179036642082.3653489.376583884931759728.b4-reply@b4>
+Content-Language: en-US
+From: Julian Braha <julianbraha@gmail.com>
+In-Reply-To: <179036642082.3653489.376583884931759728.b4-reply@b4>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Thanks for the review, Alan.  v2 is out and addresses these:
-https://lore.kernel.org/bpf/20260925211314.5118-1-wanjay@amazon.com/
+On 9/25/26 21:00, Nathan Chancellor wrote:
+> On 2026-09-24 09:35 +0200, Nicolas Schier wrote:
+>> On Sat, Sep 19, 2026 at 06:29:39PM +0100, Julian Braha wrote:
+>>> On 9/17/26 14:38, Nicolas Schier wrote:
+>>>> Reset KCONFIG_WARN_CHANGED_INPUT by default for all kconfig tests but
+>>>> those which set it explicitly.
+>>>>
+>>>> This fixes the 'warn_changed_input' test on systems with
+>>>> KCONFIG_WARN_CHANGED_INPUT=1 and ensures a cleaner test environment.
+>>>>
+>>>> Fixes: 645323a7f4e5 ("kconfig: add optional warnings for changed input values")
+>>>> Signed-off-by: Nicolas Schier <n.schier@fritz.com>
+>>>> ---
+>>>>  scripts/kconfig/tests/conftest.py | 8 ++++++++
+>>>>  1 file changed, 8 insertions(+)
+>>>>
+>>>> diff --git a/scripts/kconfig/tests/conftest.py b/scripts/kconfig/tests/conftest.py
+>>>> index 66f95e4ed58c..e92f0cf1421a 100644
+>>>> --- a/scripts/kconfig/tests/conftest.py
+>>>> +++ b/scripts/kconfig/tests/conftest.py
+>>>> @@ -34,6 +34,9 @@ class Conf:
+>>>>          """
+>>>>          # the directory of the test being run
+>>>>          self._test_dir = os.path.dirname(str(request.fspath))
+>>>> +        self.default_env = {
+>>>> +            "KCONFIG_WARN_CHANGED_INPUT": "",
+>>>> +        }
+>>>>
+>>>>      # runners
+>>>>      def _run_conf(self, mode, dot_config=None, out_file='.config',
+>>>> @@ -57,6 +60,11 @@ class Conf:
+>>>>          # Override 'srctree' environment to make the test as the top directory
+>>>>          extra_env['srctree'] = self._test_dir
+>>>>
+>>>> +        # Set default environment variables, if not set by caller
+>>>> +        for var in self.default_env:
+>>>> +            if not var in extra_env:
+>>>> +                extra_env[var] = self.default_env[var]
+>>> Maybe it makes more sense to have the tests ignore users' env vars if
+>>> they would cause tests to fail? For example, this recent patch
+>>> explicitly unsets the KCONFIG_WERROR flag:
+>>> https://lore.kernel.org/linux-kbuild/4d1eee3a-
+>>> a5f9-467e-880e-4f2815851b09@gmail.com/T/
+>>> #m25be9ad4d5e62956c5f98759398f91a555afb4df
+>> Good point, but I am not sure, if we really should ignore all of the
+>> user's environment.  Maybe it's better for now, to just reset all
+>> environment variables that start with KCONFIG_ and KBUILD_ ?
+> Given these are Kconfig tests, we could probaby just ignore KCONFIG_, I
+> don't see any instances of KBUILD_ within scripts/kconfig outside of the
+> Makefile. We could do both anyways and just adapt based on reports
+> though, I don't really have a strong opinion on that though.
 
-Answers inline.
+Yeah I agree with this, since I would expect only KCONFIG_* to have an
+effect on the Kconfig tests.
 
-> I have a question about the approach here; my experience with using sysfs
-> with a dummy placeholder file which triggered on-demand module load when
-> accessed was it didn't work with sysfs interfaces because the file size needed
-> to be refreshed, and the reader would usually error out since it saw an
-> empty file and gave up reading. I wound up having to switch to using
-> kernfs to update size attributes on open such that the caller would see the
-> size change synchronously once the load completed. See patch 15 in the above
-> series for the details.
->
-> It seems like you used a different approach here, and by storing the size
-> in the BTF metadata this problem was avoided. From the below it seems like
-> there are no first-caller issues from userspace (like if the first caller
-> does "bpftool btf dump file /sys/kernel/btf/vmlinux")?
+And after digging into this, it seems KBUILD_EXTRA_WARN does set
+KCONFIG_WERROR=1, but as long as we're clearing KCONFIG_WERROR, it won't
+matter.
 
-Right, that is the reason for .BTF.meta: the size is known at build time,
-so the file is created with its final size at boot and the load happens
-in read()/mmap().  No kernfs internals, no i_size update.
+Kconfig also has the 'CONFIG_' flag, which (if set) would break
+several tests, but the makefile is already clearing it for the
+testconfig target anyway.
 
-I have now tested exactly that with the in-tree bpftool (libbpf 1.8) as
-the first user on a fresh boot, nothing else having touched the BTF:
+- Julian Braha
 
-  bpftool btf dump file /sys/kernel/btf/vmlinux
-  bpftool btf list
 
-Both work and lsmod shows btf_vmlinux afterwards.  Same for libbpf-loaded
-programs as the first user: a global subprogram taking the context,
-bpf_snprintf_btf(), a CO-RE field read, and a kfunc of an out-of-tree
-module (below).
-
-> Another issue; during boot, request_module can call back out to modprobe
-> and depending on where you are in the boot process, the module may not be
-> available due to filesystem not mounted yet etc. Maybe this just means that
-> btf_vmlinux.ko needs to be in the initramfs image? If that's the case, I
-> would suggest highlighting that in the CONFIG_DEBUG_INFO_BTF Kconfig description,
-
-Yes.  If request_module() fails the caller gets NULL, i.e. behaves as on a
-kernel without BTF, and the next user retries; nothing is cached.  So a
-program that needs kernel types before the root fs is mounted fails
-unless btf_vmlinux.ko is in the initramfs.  I have added a paragraph
-along the lines you suggest to the Kconfig help in v2.
-
-> Another concern to balance; embedded folks were interested in vmlinux
-> BTF as a module to limit on-disk footprint rather than (or likely as
-> well as) runtime memory; [...] If I'm following, the final vmlinux image that winds
-> up on disk doesn't contain the BTF section, right? If so that's great
-> news for them.
-
-Right.  With =m v2 strips the BTF from vmlinux, so no boot image carries
-it; it only lives in btf_vmlinux.ko, which a system can also choose not
-to install.
-
-> And another thing I was wondering about - did you test with modules
-> containing a .BTF.base (built standalone via "make -C path2module")?
-
-Not in v1, thanks for asking.  Looking at that case showed a problem,
-fixed in v2: for a module with .BTF.base the raw .BTF is only valid
-against the distilled base and is rewritten in place when it is
-relocated, so it must not be served before that.  In v2 the sysfs file
-of such a module is still created at load time with its final size (the
-relocation only rewrites ids and string offsets), but its reader loads
-the vmlinux BTF and waits until this module's BTF is relocated and
-published before serving it; modules without .BTF.base, whose data is
-final, are served as before.
-
-Tested with an out-of-tree module that has a .BTF.base and registers a
-kfunc from its init, loaded before the vmlinux BTF: once the BTF is
-loaded it gets its id, relocated types and its kfunc, and a program
-calling that kfunc works.
-
-> What I meant by the hard part (aside from deferred handling which is hard
-> enough!) is that there is a conflict between the goal of saving memory and being
-> forced to allocate memory for module BTF for a deferred-load scheme like this.
-> [...]
-> CONFIG_DEBUG_INFO_BTF=y results in upfront allocation of memory for kernel and module BTF
-> CONFIG_DEBUG_INFO_BTF=m results in upfront allocation of memory for module BTF only
-
-Agreed, and v2 says so explicitly in the Kconfig help and the cover
-letter: the copy kept for a deferred module is the same copy
-btf_parse_module() makes with =y, so module BTF costs the same at the same
-time in both; the saving is the vmlinux BTF only.
-
-> It might be worth thinking about providing a means to control whether such
-> module allocations happen prior to vmlinux BTF loading for highly memory-constrained
-> systems. Anything delivering kfuncs etc should probably always allocate since it
-> constitutes core BPF infrastructure.
-
-Makes sense as a follow-up; I would rather not grow this series with it.
-The distinction you draw (keep it for modules that register kfuncs or
-struct_ops, make it optional otherwise) is what I would start from.
-
-Thanks,
-Jay
