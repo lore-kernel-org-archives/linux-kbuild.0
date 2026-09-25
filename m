@@ -1,235 +1,162 @@
-Received: from mail-pz2-f12.google.com (mail-pz2-f12.google.com [74.125.228.12])
+Received: from mail-wm2-f13.google.com (mail-wm2-f13.google.com [74.125.225.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28611372B50
-	for <linux-kbuild@vger.kernel.org>; Fri, 25 Sep 2026 04:40:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6E52484234
+	for <linux-kbuild@vger.kernel.org>; Fri, 25 Sep 2026 09:28:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790311250; cv=none; b=n/74kycw52QP6FWdncMBYJGqR7w4RPIgTjrYZ/skxoJwgK3F/UHe30+DrAHn6jk8+xw6Z+0uZIYItQFjXardx2w2toA4mefoHcmuiDEQWG62qv7JSCZItL+wvHl4Y+/tZq7RCZKr65x/KkrZz3Thcgilmk7y5Pt6K9JCiitWlCw=
+	t=1790328492; cv=none; b=rC84yULbcY7QJ+giy4a6tEA/l2U865YYSwZxaLxh2PwyybKmU5bEVG3ub979HYsxDMEOPa8Nc2I1KXdDis0gn2HTFjas9U3h9uDlhyt5Ede75J9Q2D2YcSRXUzRPgI7AfQwe1wqzYhXFa1wel4QMwkVi6c0if1lY5UKGyYGxoPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790311250; c=relaxed/simple;
-	bh=nc//00UX5nLrzlcPRwZdsOCugNvIuS44f43pgVSjYZ8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DIDQkbXelAFBvoOSLXf9VITBtlBxTkOKYddTXs//k8lKSTnDYlPO5zSUrr54UfNoFjzISutJElt1Jvm0LP7wmIKQJKkXiPDhVctOwCwaOWqHqS7w+3i7A3zwTEJVMJrvgTPwb5ynTb7Yn/e/6y8Wd/xFtL/Xt2XBWZ5Kd0ildfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WlkhyOUO; arc=none smtp.client-ip=74.125.228.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1790328492; c=relaxed/simple;
+	bh=RyhPOU+vvqd3rl1UlRjckMuKAfbjLaCIW52sS+yfk0s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ag7AHQe9+M25v6N0Y1ieoP5mLNz+iDaJuaN3bfdZynyXFKzDfSB/ZDO+pOcZ+ALI8YFSsJlppN11QORTTbpojVnmPPky/5KkB+GZtda5ZLgWeIt2tBKBFAnAiSMt3hMWeFIv+Qwo6T6UDYSVSXDe3tWQIh6hpeHSncBkJGpUMvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=YCaa5B8/; arc=none smtp.client-ip=74.125.225.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WlkhyOUO"
-Received: by mail-pz2-f12.google.com with SMTP id 41be03b00d2f7-cc1cea50dc3so153743a12.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 24 Sep 2026 21:40:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="YCaa5B8/"
+Received: by mail-wm2-f13.google.com with SMTP id 5b1f17b1804b1-49e8185e037so3706915e9.3
+        for <linux-kbuild@vger.kernel.org>; Fri, 25 Sep 2026 02:28:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790311248; x=1790916048; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:sender:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=14MXQzJGNSJiHny7BrCIDsUY2XvMualsJzu7fkY6FZ8=;
-        b=WlkhyOUODXsmoAlqPjcu0D+3IEj4ZvbVeM3IuBlcvX8M8iOHgF5lAFnFCU178fWrjx
-         zZY06EDi/4ky8K5NpTv6fbBu2j8A0Kc9gQrn7c4s9JFq457JiBbJBf/6ajVLQ0d7BK5U
-         X1zy1OtTBozw5ExM/yl92J5tH1lYmHwNI5vvSln4NVUfBAEMXifbZ8o4ZtVDzO+0Aagr
-         qsvAFGDixtD+px6WwTR4dUoT7C+DaVRmarl9vFCJ3cmM8oqUbnw6XQjOY/sDrgO8GjLR
-         Sf1rUZL3UOi5MVpMixGfdZYSML/FTq8Qxj21nJPemc+7hVRVqox6HG4O1CV5SLI+SDsP
-         m7lw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790311248; x=1790916048;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:sender:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=suse.com; s=google; t=1790328488; x=1790933288; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=14MXQzJGNSJiHny7BrCIDsUY2XvMualsJzu7fkY6FZ8=;
-        b=BoP744Lmh2U7f+j8DiBMzHxc1p08k2B03NLtnG/XvBX9PGPXIFWGm1UMVcji2jdxAi
-         Z0mjE1Opqu8B4R9jiJXn069x1jWdXarqVX9Bmg04g33dv6XPw1rtJp8b35QuusUTl9ii
-         EPS7ZFsWwP91qGr48fz1HJt5kSK6beQ9EkQyg/bBCC3yG81HKRAIot6ojm9YCJYx1h5v
-         HEolBVGvDMMHZphll/KSVB/Ov8zNgH41GeHGyWKPfTjPgr+uTW8l9Y7np/bVeM/npHu4
-         HC/E87E9KOhjJzDSGIRbLJ2lLBrEel3TIIVxvYVE2zYXzcv0yP88LgLQG1RWJXBXBICf
-         cTJA==
-X-Forwarded-Encrypted: i=1; AKwUvBwLlvUVfOPGx/zvBPxwBLZZSmVyUsgVqYA/WxR6/aS8rsfQfFMwtSEsx3TwDzoCPlSQHHkv3Rq/8r7ttOY=@vger.kernel.org
-X-Gm-Message-State: AFuF++mr7tDsqNHJETNAsw7/RTC1ACKYqlrMc1MPDkABqhBN6PW6wTpV
-	xBn9SfADkdPT6tPufgc0QGZ2Rb5jYQvXlhLA8T+t1mn2YsKLo53sz2Mj
-X-Gm-Gg: AYBFou2X+4kSlAhKriTGZdm7RCkQCO4vB0sB2EkYlcjVgBBMg5xWofZBJmXyM9W7lN9
-	wGT3zTdC4anfwQvvgyF0KYRbp7VGhbGSTE4J5Rtd2xTZmC5PPl2feS/OWPEZKKgiskX04TuI9Nq
-	PAjyGAqCbUysGAvtORVAbSAlwIURcqZgA9sqIGsugN8Yd4RKbo3A9i/OK+8+66vFYYsmaPtJeIb
-	f8BTuvvyAMaelzCgi7K26HNJD4eZKy+ojcrC8kW4C/d6QOJ8MsfWmy337E0EPxEO8yd8B7A2RkR
-	0/yg/f0kzaguod+rebXGN0ZinL2DphsxTL8xMIT8dFctp6bsfyQ4RJJsoUvaM0Ou1y+1YQLzuM+
-	ussGiAaO7GTWK4SdrROz85e8AgGeRfX6EkOG2gIV3NUPNeAFUoPZ8uIZCwMAzlp39Aj5t1Ke9kn
-	75XLDxraATqSc4/mO1cAiDlE88FhdfJw4lAhhFQY94CdQvWNTuCKQwdXjKiE/hfGZDpeCjRxRnn
-	5TU9yBYAMsZ
-X-Received: by 2002:a17:90b:2745:b0:39e:5c75:acbb with SMTP id 98e67ed59e1d1-3a098ad3c68mr3886722a91.11.1790311248198;
-        Thu, 24 Sep 2026 21:40:48 -0700 (PDT)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:da43:aeff:fecc:bfd5])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a0c3f74e5bsm192594a91.5.2026.09.24.21.40.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Sep 2026 21:40:47 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Date: Thu, 24 Sep 2026 21:40:46 -0700
-From: Guenter Roeck <linux@roeck-us.net>
-To: Marco Elver <elver@google.com>
-Cc: Vlastimil Babka <vbabka@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Andrey Konovalov <andreyknvl@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	David Hildenbrand <david@kernel.org>,
-	David Rientjes <rientjes@google.com>,
-	Dmitry Vyukov <dvyukov@google.com>, Jann Horn <jannh@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	KP Singh <kpsingh@kernel.org>, Kees Cook <kees@kernel.org>,
-	Lorenzo Stoakes <ljs@kernel.org>,
-	Matteo Rizzo <matteorizzo@google.com>,
-	Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Suren Baghdasaryan <surenb@google.com>,
-	linux-hardening@vger.kernel.org, Nicolas Schier <nsc@kernel.org>,
-	Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Christoph Lameter <cl@gentwo.org>, Harry Yoo <harry@kernel.org>,
-	Hao Li <hao.li@linux.dev>, "Liam R. Howlett" <liam@infradead.org>,
-	Alexander Potapenko <glider@google.com>,
-	Miguel Ojeda <ojeda@kernel.org>, linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	kasan-dev@googlegroups.com, llvm@lists.linux.dev,
-	Guo Ren <guoren@kernel.org>, linux-csky@vger.kernel.org
-Subject: Re: csky ICe (was: Re: [PATCH v4 2/3] slab: improve
- KMALLOC_PARTITION_RANDOM randomness)
-Message-ID: <4e2ea11c-7227-4790-af7c-67ffc86a12b1@roeck-us.net>
-References: <20260511200136.3201646-1-elver@google.com>
- <20260511200136.3201646-2-elver@google.com>
- <6106aefa-47c7-4bda-a51f-8a2fba3bf715@roeck-us.net>
- <arUZWKjKr5I5tlOj@elver.google.com>
+        bh=GuAasn6M17RraKJz85D0VGepUYYLmKKd6LjzFHjVWiA=;
+        b=YCaa5B8/bbraaj9MXbfcKga+R1L3Oy53Dlm+QLJ9PluOw2HJuSZ4RD0OUgpEKjEDys
+         1iIjGIzlaLXJl+fJzhD4jsJKpX5ftjb/LWFjKjNSvN0uwzojBFSmYZYw1vDOyCInGbUe
+         d5kHIKVqyg3wLnQ6C0VSNz7g/+iaP/c5K3E5bSPY0TEFeHNVg4IhHe4Q2p8E6MzsC8dT
+         n8na7+M39OVdS6Nak1AG1EpnfI6rPQBVhwmwML6M8v349eGyR3HHS2N8OshqSNp6V+WE
+         IUEAemD4YTNyORvF5Su0LA+6HBShR5Rw8n06UjjwBYuJSJyZ6FP2VmqYggRcG9WSYKNN
+         nCKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790328488; x=1790933288;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=GuAasn6M17RraKJz85D0VGepUYYLmKKd6LjzFHjVWiA=;
+        b=YSh4P5LTdcr7Q7/YFN1ACfXdz65z5kdi4UyMb42LNI07ck1BLSQ7syqfUyaOKumdKz
+         Mbxcumis0OF8CABEZxz6t9xOdGIdz6etCWNKVnzEwjmkyK44vRwpAzTzKysRi+L17w9i
+         9vvBrqL8upqecCwPyjEwhxEVM+4wg0njWjp3D8wFYcyB7y/mSEAA0JyHLSPRyKenXLNK
+         NyUAfPnjyoYroZXKxJVrHT40d/gJSzAFswKNtQfLJX/oR+R71jVsKXDzc9+/vqamEBkF
+         pryeeMWTCeNmb9YjAjLENJx79FVAHV7gLwRclOJNnkIPyYQZBVfnY94AtfZg3m5vQGJ4
+         qXXA==
+X-Forwarded-Encrypted: i=1; AKwUvBych1ODoW40A1uDHRVPhowy0sMyR59pZYjGPTIpbZrBJVD2R4p0UcQg4LXtBWgEPARx3cpbb8Je072IGJQ=@vger.kernel.org
+X-Gm-Message-State: AFuF++nJuK0fQ5I3OHj4MmzjKKXB6y1EpMzNxsUM3ndXRStjWQWZokYr
+	vQgD4BRCqF3n4F9z+YsFpW7sYuIxNVU+BvpgH1iUM2sfKaYO/M8eyLu6seOHFyIhKe0=
+X-Gm-Gg: AYBFou3R/RlMpCgkwWUHmV2aGG3tksQTpXNo0Ms13OW7lMjoRImcYLqsZAehpoxp/ch
+	wY9h+xN1PWSNTPiAfr4TezCUwJr6UYBgbWmlw2MF7T/8l9GO5m9SzOQbv6meSU0wbVj4QgIxjmV
+	rzNk8NSkY/qjhOn/lDjlN3GNxJ6iugp/uh/qX4zNLBPMTDwlL52pQ8Q8yrM3LzvTxKN/meEhR73
+	TLbBB2EPifIa9XjVXNTCGxyjooVcZKgLTvGoLr3RLrkqN06op6VYk+nU0PGiQPhu+Kd7DHHVU2X
+	wK1VuOJx1juFCbqb757gmGgixRnY6Uix4WjnHbrxw881OLdaGXWmRaKyrl4U5Ru/SWc9EKlxOUm
+	yH5/zoRnrtPeZ3hx6qK7DjR6k7+5Q7oixJNoickuq6JZPnvWM3PZOPX7Bt3ZsLcK7qMcrPUcGpE
+	uaqQRfFOrwBmgFDC27nT/sNVCxcgqiNnrawRthUszpuRnrxCM61LYTDj6Df2UbkldkvJECiYVgK
+	u1b+5r4ERDQJI5TsEkJn6kj9rpmU61VGFaeuSC/jRbDAg==
+X-Received: by 2002:a05:600c:19cd:b0:49d:2536:402e with SMTP id 5b1f17b1804b1-49ff06f7a45mr28683465e9.30.1790328488006;
+        Fri, 25 Sep 2026 02:28:08 -0700 (PDT)
+Received: from ?IPV6:2a07:de40:8100:0:89a9:fd0e:583d:4a53? ([2001:af0:8000:1409:193:86:92:181])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49fee6ced69sm37140085e9.0.2026.09.25.02.28.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Sep 2026 02:28:07 -0700 (PDT)
+Message-ID: <f1d25d13-4adb-428a-805d-d3e19cf1013b@suse.com>
+Date: Fri, 25 Sep 2026 11:28:06 +0200
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <arUZWKjKr5I5tlOj@elver.google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v11 20/38] dyndbg,module: make proper substructs in
+ _ddebug_info
+To: Jim Cromie <jim.cromie@gmail.com>
+Cc: Jason Baron <jbaron@akamai.com>, Shuah Khan <shuah@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Arnd Bergmann <arnd@arndb.de>, Luis Chamberlain <mcgrof@kernel.org>,
+ Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>,
+ Aaron Tomlin <atomlin@atomlin.com>, Jonathan Corbet <corbet@net.net>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
+ Shuah Khan <skhan@linuxfoundation.org>, Randy Dunlap
+ <rdunlap@infradead.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
+ Pavel Machek <pavel@kernel.org>, Len Brown <lenb@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Petr Mladek <pmladek@suse.com>,
+ Steven Rostedt <rostedt@goodmis.org>, John Ogness
+ <john.ogness@linutronix.de>, Sergey Senozhatsky <senozhatsky@chromium.org>,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-arch@vger.kernel.org,
+ linux-modules@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kbuild@vger.kernel.org, linux-pm@vger.kernel.org,
+ Louis Chauvet <louis.chauvet@bootlin.com>
+References: <20260923-dd-cmap-part2-clean-v11-0-9b6c217fdf2f@gmail.com>
+ <20260923-dd-cmap-part2-clean-v11-20-9b6c217fdf2f@gmail.com>
+Content-Language: en-US
+From: Petr Pavlu <petr.pavlu@suse.com>
+In-Reply-To: <20260923-dd-cmap-part2-clean-v11-20-9b6c217fdf2f@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Sep 24, 2026 at 12:36:40PM +0000, Marco Elver wrote:
-> On Tue, Sep 22, 2026 at 07:58AM -0700, Guenter Roeck wrote:
-> > Hi,
-> > 
-> > On Mon, May 11, 2026 at 10:00:49PM +0200, Marco Elver wrote:
-> > > When using CONFIG_KMALLOC_PARTITION_RANDOM, _RET_IP_ was previously used
-> > > to identify the allocation site. _RET_IP_, however, evaluates to the
-> > > caller's parent's instruction pointer rather than the actual allocation
-> > > site; this would lead to collisions where a function performs multiple
-> > > allocations.
-> > > 
-> > > With the generalization to kmalloc_token_t, we now generate the token at
-> > > the outermost macro, and using _THIS_IP_ would fix this for all cases.
-> > > 
-> > > Unfortunately, the generic implementation of _THIS_IP_ relies on taking
-> > > the address of a local label, which is considered broken by both GCC [1]
-> > > and Clang [2] because label addresses are only expected to be used with
-> > > computed gotos. While the generic version more or less works today, it
-> > > is known to be brittle. For example, Clang -O2 always returns 1 when
-> > > this function is inlined:
-> > > 
-> > >         static inline unsigned long get_ip(void)
-> > >         { return ({ __label__ __here; __here: (unsigned long)&&__here; }); }
-> > > 
-> > > To provide a reliable unique identifier without breaking architectures
-> > > relying on the generic _THIS_IP_, introduce _CODE_LOCATION_: it resolves
-> > > to _THIS_IP_ where architectures provide a safe implementation, and
-> > > falls back to a zero-cost static marker where _THIS_IP_ is broken.
-> > > 
-> > > Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=120071 [1]
-> > > Link: https://github.com/llvm/llvm-project/issues/138272 [2]
-> > > Signed-off-by: Marco Elver <elver@google.com>
-> > 
-> > With this patch in the tree, I get ICE erors when trying to build
-> > csky:allmodconfig.
-> > 
-> > Example:
-> > 
-> > Error log:
-> > sound/core/oss/mixer_oss.c: In function 'snd_mixer_oss_proc_write':
-> > sound/core/oss/mixer_oss.c:1202:1: error: could not split insn
-> >  1202 | }
-> >       | ^
-> > (insn 183 400 184 (set (reg:SI 0 a0 [orig:307 _55 ] [307])
-> >         (xor:SI (reg:SI 3 a3 [orig:308 random_kmalloc_seed ] [308])
-> >             (const:SI (plus:SI (symbol_ref:SI ("*.LANCHOR0") [flags 0x182])
-> >                     (const_int 132 [0x84]))))) "include/linux/slab.h":759:52 288 {cskyv2_xorsi3}
-> >      (expr_list:REG_DEAD (reg:SI 3 a3 [orig:308 random_kmalloc_seed ] [308])
-> >         (nil)))
-> > during RTL pass: final
-> > sound/core/oss/mixer_oss.c:1202:1: internal compiler error: in final_scan_insn_1, at final.cc:2813
-> > 0x779b51e2a1c9 __libc_start_call_main
-> > 	../sysdeps/nptl/libc_start_call_main.h:58
-> > 0x779b51e2a28a __libc_start_main_impl
-> > 	../csu/libc-start.c:360
-> > 
-> > This happens with lots of files, not just this one. It is seen with all
-> > versions of gcc starting with at least v13.x. Reverting this patch fixes
-> > the problem. Bisect log is attached for reference.
-> > 
-> > Any idea what I could do to avoid the problem other than stopping to build
-> > csky:allmodconfig ?
+On 9/24/26 12:34 AM, Jim Cromie wrote:
+> recompose struct _ddebug_info, inserting proper sub-structs.
 > 
-> No idea what gcc is falling over here, but the below patch could be a
-> workaround/fix. Does that work better?
+> The struct _ddebug_info has 2 pairs of _vec, num_##_vec fields, for
+> descs and classes respectively.  for_subvec() makes walking these
+> vectors less cumbersome, now lets move those field pairs into their
+> own "vec" structs: _ddebug_descs & _ddebug_class_maps, and re-compose
+> struct _ddebug_info to contain them cleanly.  This also lets us get
+> rid of for_subvec()'s num_##_vec paste-up.
 > 
-
-Yes, it does.
-
-Tested-by: Guenter Roeck <linux@roeck-us.net>
-
-Thanks,
-Guenter
-
-> ------ >8 ------
+> Also recompose struct ddebug_table to contain a _ddebug_info.  This
+> reinforces _ddebug_info's use as a cursor into relevant data for a
+> builtin module, and access to the full _ddebug state for modules.
 > 
-> From: Marco Elver <elver@google.com>
-> Date: Fri, 8 May 2026 14:51:45 +0200
-> Subject: [PATCH] csky: Implement _THIS_IP_ using inline asm
+> NOTES:
 > 
-> Both GCC [1] and Clang [2] consider the generic version of _THIS_IP_ to
-> be broken:
+> rename section:__dyndbg_classes to _class_maps, to better align with
+> struct _ddebug_class_maps.
 > 
->         #define _THIS_IP_  ({ __label__ __here; __here: (unsigned long)&&__here; })
+> names together, for more obvious name pairing.
 > 
-> In particular, the address of a label is only expected to be used with a
-> computed goto.
+> Invariant: These vectors ref a contiguous subrange of __section memory
+> in builtin/DATA or in loadable modules via mod->dyndbg_info; with
+> guaranteed life-time for us.
 > 
-> While the generic version more or less works today, it is known to be
-> brittle and may break with current and future optimizations. For
-> example, Clang -O2 always returns 1 when this function is inlined:
+> struct module contains a _ddebug_info field and module/main.c sets it
+> up, so that gets adjusted rather obviously.
 > 
->         static inline unsigned long get_ip(void)
->         { return ({ __label__ __here; __here: (unsigned long)&&__here; }); }
-> 
-> Fix it by overriding _THIS_IP_ in <asm/linkage.h> (which is included by
-> <linux/instruction_pointer.h>) using an architecture-specific inline asm
-> version. Additionally, avoiding taking the address of a label prevents
-> compilers from emitting spurious indirect branch targets (e.g. ENDBR or
-> BTI) under control-flow integrity schemes.
-> 
-> Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=120071 [1]
-> Link: https://github.com/llvm/llvm-project/issues/138272 [2]
-> Signed-off-by: Marco Elver <elver@google.com>
+> Signed-off-by: Jim Cromie <jim.cromie@gmail.com>
+> Reviewed-by: Louis Chauvet <louis.chauvet@bootlin.com>
 > ---
->  arch/csky/include/asm/linkage.h | 7 +++++++
->  1 file changed, 7 insertions(+)
->  create mode 100644 arch/csky/include/asm/linkage.h
+> v8: set maps.len = nc unconditionally
+> v3: squash in section name changes.
 > 
-> diff --git a/arch/csky/include/asm/linkage.h b/arch/csky/include/asm/linkage.h
-> new file mode 100644
-> index 000000000000..04afd3583e25
-> --- /dev/null
-> +++ b/arch/csky/include/asm/linkage.h
-> @@ -0,0 +1,7 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef __ASM_CSKY_LINKAGE_H
-> +#define __ASM_CSKY_LINKAGE_H
-> +
-> +#define _THIS_IP_ ({ unsigned long __ip; asm volatile("grs %0, ." : "=r" (__ip)); __ip; })
-> +
-> +#endif /* __ASM_CSKY_LINKAGE_H */
-> -- 
-> 2.56.0.rc1.315.gc6ed9934b7-goog
+> v2:
 > 
+> Move RvB after SoB
+> In structs _ddebug_descs & _ddebug_class_maps, change int length to unsigned int
+> No use of <0 vals is contemplated.
+> 
+> dyndbg: improve section names
+> 
+> change __dyndbg to __dyndbg_descs
+> change __dyndbg_classes to __dyndbg_class_maps
+> 
+> this sets up for adding __dyndbg_class_users
+> 
+> fixup-drmprint
+> ---
+>  include/asm-generic/dyndbg.lds.h |  14 +++---
+>  include/linux/dynamic_debug.h    |  34 ++++++++-----
+>  kernel/module/main.c             |  12 ++---
+>  lib/dynamic_debug.c              | 101 +++++++++++++++++++--------------------
+>  4 files changed, 86 insertions(+), 75 deletions(-)
+
+Acked-by: Petr Pavlu <petr.pavlu@suse.com> # modules
+
+-- Petr
