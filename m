@@ -1,135 +1,103 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B587E4E1C87;
-	Fri, 25 Sep 2026 19:38:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2EB143BDA3;
+	Fri, 25 Sep 2026 19:44:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790365089; cv=none; b=EgSzsLUVwf1JvCpPGLdmCc/pNKdjGU0im7yItIogmnE+gQZLyubssVXuYNrbMEbpfHh1gGX1OyqRfLe0u40YEi3mx4o5wqFCdIDRUVPScC011c4p4qpmpTTPR7RTP6dvLmsTZ7o8s5n6O6Znw/iJhPmd56603CRTsLQjDolFELs=
+	t=1790365464; cv=none; b=NJV612+Y6TSHxMg2OpNEC8uttAgunzy1qEAzX8KA4kD6KumCQfC93QZYRJQQjPL3yjvjuwFLg+5VEN1nwgTopezw0kv36BOD6vo15armrqfIIIsQoTjlOYi52AB7TmGhF56ZOpuowMJac3Nc3SVTAlw51r6mDBFr5DG/w/411JA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790365089; c=relaxed/simple;
-	bh=dstBTE3lWCMn9EudZcftluRV7vRDMp0MnFzhpgOlsz0=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=koiWIMG3NVDl/+d/3lPd8SDGZZo21Zssq4Tj5SKazV4zBoOdqgjF1u9+Z4mLxjr/RkMVJW9M1lpzQ2x+MwEpaD+Hf4C1WWs6YchmiYmfnqcnC0C0BfD1jbqZBSfQ1mUg0lXvAyJUvwTUKqbonYX+cVswYAoJNC2Eb81h1kc8E6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DxbIi28P; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790365464; c=relaxed/simple;
+	bh=3Xb0oGhzLfYczPGuE2/pQo/PBUev7kNI3+4C2KVWQio=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ol6nQpem3PdDauG2kiulmQnPTM7dR5Fyh1/it14PbOY2bnZOTqcrzuAx0CFmRVUC27Mf2z3yKdzNPXnPZBfWamNaP0Fhws3S49Vv+1RMLPrdPwHuXEYJoyNJJm5fpQGcp7vg+r14dHH6AO+rU/L622SS72iZWrwKLl1dNkgjZNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=edVBNN9Z; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DxbIi28P"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70F401F000FF;
-	Fri, 25 Sep 2026 19:38:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="edVBNN9Z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 603E91F000FF;
+	Fri, 25 Sep 2026 19:44:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790365088;
-	bh=0LEsbhIDjBe66cbu0GZSdPhdvVGyJ9cnICBeyy6iWkk=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=DxbIi28P95AzIzpsaRJqifwhTdKpAAPYMwT4+wQMpyTkmjQuoUxKrj2UjvZ1CzDD5
-	 2dz5GyyZf+UVrlZzUi7246Dh6pWzJ9W7Wngn2hPuK1aiFavZpjeydxRVuDNMIUxFq7
-	 X17bAkTBN1fMC2PylaMk7Rvp4/A6m8r52ETGTJMC4t6XJXPofRdG3WdbI8bKjXZK7g
-	 G1JU9ZU6xnROvYjqRsDVA3WL2Wh4bkp3mkF7Lz4mpmR+9iPkg7uMvQ8cnOVC11EsoI
-	 5m7BmFWf1IT7ed9EuauM/1lhewkRONS0osKU8zKGAvl585hEth7Rs4equHnAMtEzz1
-	 wUQlc7U9HlCJQ==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 2/2] kbuild: Move gen_init_cpio and gen_initramfs.sh
- to scripts/
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Shuah Khan" <skhan@linuxfoundation.org>, "Jonathan Corbet" <corbet@lwn.net>, "Pasha
- Tatashin" <pasha.tatashin@soleen.com>, "Mike Rapoport" <rppt@kernel.org>, "Pratyush
- Yadav" <pratyush@kernel.org>, "Alexander Graf" <graf@amazon.com>, "Nicolas
- Schier" <nsc@kernel.org>, =?utf-8?b?VGhvbWFzIFdlacOfc2NodWg=?= <linux@weissschuh.net>, "Maximilian
- Huber" <maximilian.huber@tngtech.com>, "Nathan Chancellor" <nathan@kernel.org>, "Willy
- Tarreau" <w@1wt.eu>, "Randy Dunlap" <rdunlap@infradead.org>, "Luis
- Augenstein" <luis.augenstein@tngtech.com>
-Cc: linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, kexec@lists.infradead.org, linux-doc@vger.kernel.org, linux-mm@kvack.org, "Askar
- Safin" <safinaskar@gmail.com>, linux-kbuild@vger.kernel.org,
- =?utf-8?b?VGhvbWFzIFdlacOfc2NodWg=?= <thomas.weissschuh@linutronix.de>
-In-Reply-To: <20260925-move-gen_init_cpio-to-scripts-v3-2-99c493f76722@kernel.org>
-References: <20260925-move-gen_init_cpio-to-scripts-v3-0-99c493f76722@kernel.org>
- <20260925-move-gen_init_cpio-to-scripts-v3-2-99c493f76722@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 25 Sep 2026 19:38:07 +0000
-Message-Id: <20260925193807.70F401F000FF@smtp.kernel.org>
+	s=k20260515; t=1790365463;
+	bh=3B8UaLQAJccxK3dSqs8InHQL9/S4ix3IsZ9bb0Uj2Ao=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=edVBNN9ZRY1ru4c6XE1Kig1Te25JnVJC9L9gnjSOXBz/74U/D3TiM+uSCN3qhFr8L
+	 0KwvcALYoH+oj76ZslsqAdlQJi0Fz+9syvsjQRHeTUEBrCUca8sPIXZD0TVQTGlN4R
+	 asE5hIf9T8oV8s8ol26p7zOUK+s6lSGrh/wHR8Wpxm7NsKqq+2vl76wMKVvOMrj8Xp
+	 zy6hXtAPnOOf14LnrdTDkk/aVNd/xOkXszH92C0/MRDfS8HRCk6SUpmru2U807MJR0
+	 BJLb56i5ghpqf58hfo5E3pPtWvFlcgIqLUBd+ouAdazWHzvXD+jvfTAmvfDtJWdoo3
+	 W+AkOv780Ny0Q==
+Date: Fri, 25 Sep 2026 20:44:18 +0100
+From: Nathan Chancellor <nathan@kernel.org>
+To: Jani Nikula <jani.nikula@intel.com>
+Cc: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+	Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Nicolas Schier <nsc@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH] kbuild: add header check facility as a manually run
+ static analyzer
+Message-ID: <20260925194418.GA3652012@ax162>
+References: <20260915104331.255636-1-jani.nikula@intel.com>
+ <211fcac1-d85d-4680-8e55-598b2064a002@infradead.org>
+ <20260916231319.GA550816@ax162>
+ <71a8b988-3977-44e4-93d6-782e4447f160@t-8ch.de>
+ <20260917171722.GA356152@ax162>
+ <80690e33ca5d2eb3cdbe5b84f75b2af39e3b8423@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <80690e33ca5d2eb3cdbe5b84f75b2af39e3b8423@intel.com>
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
-s) to consider:
-- [Medium] selftests/liveupdate: vmtest.sh mkinitrd fails due to missing ge=
-n_init_cpio
-- [Low] kbuild: stale comment in gen_initramfs.sh assumes old usr/ location
---
+On Wed, Sep 23, 2026 at 01:40:57PM +0300, Jani Nikula wrote:
+> On Thu, 17 Sep 2026, Nathan Chancellor <nathan@kernel.org> wrote:
+> > On Thu, Sep 17, 2026 at 11:05:32AM +0200, Thomas Weißschuh wrote:
+> >> On 2026-09-16 16:13:19-0700, Nathan Chancellor wrote:
+> >> > include/uapi already has its own header checking infrastructure under
+> >> > CONFIG_UAPI_HEADER_TEST and usr/include/Makefile, which avoids this with
+> >> > a no-header-test list that includes many of the files listed in these
+> >> > messages. To be honest, we should probably forbid HEADER_CHECK from
+> >> > including 'include/uapi' and refer people to use CONFIG_UAPI_HEADER_TEST
+> >> > instead, as there are other differences like being built under a
+> >> > different C standard or C++ and such that the existing infrastructure
+> >> > handles.
+> >> 
+> >> Testing the UAPI headers here too would still be valuable.
+> >> CONFIG_UAPI_HEADER_TEST tests the headers from the perspective of
+> >> userspace after they have undergone processing. The kernel build
+> >> might see the same headers quite differently.
+> >> 
+> >> For instance the example from above:
+> >> 
+> >> ./../include/uapi/linux/input.h:29:6: warning: ‘__BITS_PER_LONG’ is not defined, evaluates to ‘0’ [-Wundef]
+> >>    29 | #if (__BITS_PER_LONG != 32 || !defined(__USE_TIME_BITS64)) && !defined(__KERNEL__)
+> >>       |      ^~~~~~~~~~~~~~~
+> >> ./../include/uapi/linux/input.h:34:9: error: unknown type name ‘__kernel_ulong_t’
+> >>    34 |         __kernel_ulong_t __sec;
+> >>       |         ^~~~~~~~~~~~~~~~
+> >> 
+> >> These are legitimate issues, the inclusion of the necessary header is
+> >> gated behind #ifndef __KERNEL__ although it should not be.
+> >
+> > Hmmm, fair enough. I guess we can leave this functionality in place for
+> > UAPI headers then but I just worry about people doing what Randy did and
+> > reporting these issues when they are already known and handled in some
+> > other way. Maybe the UAPI header test could grow an "internal kernel
+> > usage" check similar to the other checks that it has at some point then
+> > we could forbid HEADER_CHECK=include/uapi but it is fine for now.
+> 
+> Do you think the patch at hand is good to go, then? Anything further you
+> need from me?
 
-commit 97c7fb8e47f1b247f157846cfecd29ff5f239ed1
-Author: Nicolas Schier <nsc@kernel.org>
+I don't have any other comments or objections. I will give a few days
+for other folks to comment on it before I apply it to the kbuild tree.
 
-kbuild: Move gen_init_cpio and gen_initramfs.sh to scripts/
-
-gen_init_cpio and gen_initramfs.sh are part of kbuild and required for
-all kernel builds w/ CONFIG_BLK_DEV_INITRD.  Move both to scripts/ to be
-more clear about their importance.
-
-Link: https://lore.kernel.org/all/aSdrCFkUQup3qb-q@derry.ads.avm.de/
-
-> diff --git a/tools/testing/selftests/kho/vmtest.sh b/tools/testing/selfte=
-sts/kho/vmtest.sh
-> index 0014bd76e88de..1e86ffcc3a79e 100755
-> --- a/tools/testing/selftests/kho/vmtest.sh
-> +++ b/tools/testing/selftests/kho/vmtest.sh
-> @@ -100,7 +100,7 @@ file /init $tmp_dir/init 0755 0 0
->  file /kernel $kernel 0644 0 0
->  EOF
-> =20
-> -	"$build_dir/usr/gen_init_cpio" "$tmp_dir/cpio_list" > "$initrd"
-> +	"$build_dir/scripts/gen_init_cpio" "$tmp_dir/cpio_list" > "$initrd"
->  }
-
-[Severity: Medium]
-The path for the kho selftest was updated, but it looks like=20
-tools/testing/selftests/liveupdate/vmtest.sh also still calls the old path.
-
-For example, in its mkinitrd():
-
-	# Generate inner_initrd.cpio
-	"$build_dir/usr/gen_init_cpio" "$workspace_dir/cpio_list_inner" > "$worksp=
-ace_dir/inner_initrd.cpio"
-
-and again later in the same function:
-
-	# Generate the final initrd
-	"$build_dir/usr/gen_init_cpio" "$workspace_dir/cpio_list" > "$initrd"
-
-Since this patch ensures the old artifact is removed via
-scripts/remove-stale-files, will the liveupdate selftest unconditionally
-fail because it cannot find gen_init_cpio?=20
-
-Should liveupdate/vmtest.sh be updated to use scripts/gen_init_cpio as well?
-
-> diff --git a/usr/gen_initramfs.sh b/scripts/gen_initramfs.sh
-> similarity index 99%
-> rename from usr/gen_initramfs.sh
-> rename to scripts/gen_initramfs.sh
-> index 7eba2fddf0ef2..27ac1fd48001a 100755
-> --- a/usr/gen_initramfs.sh
-> +++ b/scripts/gen_initramfs.sh
-> @@ -247,4 +247,4 @@ done
-> =20
->  # If output_file is set we will generate cpio archive
->  # we are careful to delete tmp files
-> -usr/gen_init_cpio $output $timestamp $cpio_list
-> +scripts/gen_init_cpio $output $timestamp $cpio_list
-
-[Severity: Low]
-Is the script header comment now out of date?
-
-At the top of the renamed scripts/gen_initramfs.sh it still states:
-
-# Generate a cpio packed initramfs. It uses gen_init_cpio to generate
-# the cpio archive.
-# This script assumes that gen_init_cpio is located in usr/ directory
-
-Should this comment be updated to reflect the new scripts/ location?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260925-move-gen_i=
-nit_cpio-to-scripts-v3-1-99c493f76722@kernel.org?part=3D2
+-- 
+Cheers,
+Nathan
