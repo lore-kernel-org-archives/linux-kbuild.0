@@ -1,92 +1,128 @@
-Received: from pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com [35.155.198.111])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C023250C286;
-	Fri, 25 Sep 2026 23:02:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.155.198.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0211943BDCF;
+	Fri, 25 Sep 2026 23:23:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790377373; cv=none; b=Nomx1L5xYYWXxhw/lm8hq84ercIaIbyx3Ir3mBGrVEeubxAlNGDw5usm7TboLI6Og/c8uxyWzsauureljHnD4dK6FfcwswlMbNEdpfYLmwsCBqfZg46EpTuIWByWghEy5GQ8FjlO/rxzYfMVoDZw7HfqsUw+/RUqJdiHOHWlPyU=
+	t=1790378608; cv=none; b=tfQSlhVPIHE6LTm1F5b3GYpl4kPyZSj/QGC7fFzk6xtAqOoEhf8XeZCdcHyWDFJTpaBaLYh8SbgxTtiu1ErChy6XwT0smNjoA4emPimvMB6mU/nnTV3kL9L2GucDuFcmrSaN0lHp8qKaXSa3bbztW/Agc6oSISgzbLgB1IrwjBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790377373; c=relaxed/simple;
-	bh=npqPsx71c3A0lHOniUX7D7FN1GXlUvIoGBCJSOsBsC8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=R1uuFnn2U50IjN736lWJXX1tU4uEi/sPyEesIBEU1AnM4Ra9NbMqUlkzgZKH+tHVyTjlLYMW4mHxkitQy5Y3LSMiDnEAbI1E0+4+8oZUwfYxpSANX0903m4heWTMU5UeVbIuV+kZD+lmkyrdaUiNYKFLLqzMuePe6JX+tSZiUUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=MNUJ0s6V; arc=none smtp.client-ip=35.155.198.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1790378608; c=relaxed/simple;
+	bh=kJTBGXn2n9s4+UU2B+dVVbXHfyqDDh8sTBkcF8KCZHM=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=q6UJ4BWT9Y6RNYBjW2jJQqLGvaZBQ0Ck5jKuMLFn5u3swzwdt592vJBpDhqeHkF7GIg8xvBm+ReY9cVXrzMuF1X5OTGkbJ50Xr8qyOfBR5G+yQmKk5Lgb4sEGFMwWSouf2Wpls17ezqBbPzMMUypXeujOYEX8aOf/d6hCrh/wqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a5Mjr2sw; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="MNUJ0s6V"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1790377371; x=1821913371;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=X4gLqE0UPSSjstr5S5r2WPwxuCXJWHs/Q+tdJoXNSzM=;
-  b=MNUJ0s6VhPfbMjOlfQ+lX9HK9Qt4aedAGR3B2sMhzMyz2ukyq1innKTW
-   tf4CXaRMk6Q66ST/tIl8JwfAQFDgNxXONcnkLLZx1QUQ9RCZ4n4itu2X5
-   SJXdDBupntybUyAaqQi5pyuY2scdHWLeE8/4ObBzHFNM+N7hCmfDI1KaJ
-   tWPMLKiqK/4W8lHylE4/C+vvsOme/Gcagv12/QJ/Tpf8PFINLXgJYokjT
-   y0hxpTIJPmC97MpCszZFIfP0FsNok90oJxbxuDOJWiEzQqwptmRiZvHWh
-   BzwwyEEpM2RTi3HDowJgvnzCpqAsC9KRyL96CBFKMTCtb/bqQ4uZVilVj
-   A==;
-X-CSE-ConnectionGUID: 9kyTpTh1RnGZNdonue5hIw==
-X-CSE-MsgGUID: Oz26GpIUSJGspVFK+agedA==
-X-IronPort-AV: E=Sophos;i="6.27,123,1787011200"; 
-   d="scan'208";a="29582880"
-Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
-  by internal-pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2026 23:02:51 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.111:3346]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.53.187:2525] with esmtp (Farcaster)
- id dd8dc2cd-dd59-493b-ae58-6fe81df24e22; Fri, 25 Sep 2026 23:02:51 +0000 (UTC)
-X-Farcaster-Flow-ID: dd8dc2cd-dd59-493b-ae58-6fe81df24e22
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.49;
- Fri, 25 Sep 2026 23:02:50 +0000
-Received: from dev-dsk-wanjay-2c-d25651b4.us-west-2.amazon.com (172.19.198.4)
- by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.49;
- Fri, 25 Sep 2026 23:02:50 +0000
-From: Jay Wang <wanjay@amazon.com>
-To: <olsajiri@gmail.com>, <bpf@vger.kernel.org>, <ast@kernel.org>,
-	<daniel@iogearbox.net>, <andrii@kernel.org>, <eddyz87@gmail.com>,
-	<memxor@gmail.com>
-CC: <bot+bpf-ci@kernel.org>, <alan.maguire@oracle.com>,
-	<martin.lau@linux.dev>, <yonghong.song@linux.dev>, <nathan@kernel.org>,
-	<nsc@kernel.org>, <linux-kbuild@vger.kernel.org>, <mcgrof@kernel.org>,
-	<petr.pavlu@suse.com>, <linux-modules@vger.kernel.org>, <arnd@arndb.de>,
-	<linux-kernel@vger.kernel.org>, <abuehaze@amazon.com>, <doebel@amazon.de>,
-	<jay.wang.upstream@gmail.com>, <martin.lau@kernel.org>, <mason@kernel.org>,
-	<ihor.solodrai@linux.dev>
-Subject: Re: [PATCH bpf-next 3/6] bpf: fetch the vmlinux BTF where kernel types enter a program
-Date: Fri, 25 Sep 2026 23:02:50 +0000
-Message-ID: <20260925230250.34076-1-wanjay@amazon.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <arUI7ORFZCegI5ep@krava>
-References: <arUI7ORFZCegI5ep@krava>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a5Mjr2sw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 443221F000FF;
+	Fri, 25 Sep 2026 23:23:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790378606;
+	bh=uV8cuBJOC+LcX62tWc3kCcI/UQQR3hOIpfwdkUPiceE=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date;
+	b=a5Mjr2swo65sPP309YrObWfp9L8nDJ7T9zcmBnkxqdysDEQ8EUu6WZ3N1e04zWoN4
+	 NR0va9j5bMHBeDFMKU8e2SjAA9MN0re2+fqzieyfjZTuO5m3l+4H2FSuPR+Gqa51oh
+	 IYEUzoRezw/LdUKn3hZ4hwiJ7FUrYS1BD8FPoe5eeFHV2DeIJs489joVfWAnGDwArh
+	 /h0vr0ClwLKA0ebgnA/fS76Z5RkILFcROijswiOLSa8NSOmnX7n+lEBcOMmJZIboFj
+	 Zg514AGYDvE8eHxIh6kYhVRD2ncrtKyf8Q9Y6heQA/pXxXWVMqgbJpytF0lIlHW18l
+	 m31YO450SDoAg==
+Content-Type: multipart/mixed; boundary="===============5203265522271237676=="
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D031UWC001.ant.amazon.com (10.13.139.241) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Message-Id: <973216fc6e2c9c225b847f0f82941b5e1e2d49944c2b16ff5cbcdcdf2910e8d6@mail.kernel.org>
+In-Reply-To: <20260925224229.1850-9-wanjay@amazon.com>
+References: <20260925224229.1850-9-wanjay@amazon.com>
+Subject: Re: [PATCH bpf-next v3 8/9] bpf, trace, net: prepare CONFIG_DEBUG_INFO_BTF checks for a tristate
+From: bot+bpf-ci@kernel.org
+To: wanjay@amazon.com,bpf@vger.kernel.org,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,eddyz87@gmail.com,memxor@gmail.com
+Cc: alan.maguire@oracle.com,martin.lau@linux.dev,yonghong.song@linux.dev,jolsa@kernel.org,nathan@kernel.org,nsc@kernel.org,linux-kbuild@vger.kernel.org,mcgrof@kernel.org,petr.pavlu@suse.com,samitolvanen@google.com,linux-modules@vger.kernel.org,ojeda@kernel.org,rust-for-linux@vger.kernel.org,arnd@arndb.de,linux-kernel@vger.kernel.org,abuehaze@amazon.com,doebel@amazon.de,mpohlack@amazon.de,jay.wang.upstream@gmail.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,mason@kernel.org,ihor.solodrai@linux.dev
+Date: Fri, 25 Sep 2026 23:23:25 +0000 (UTC)
 
-On Thu, Sep 24, 2026 at 01:26:36PM +0200, Jiri Olsa wrote:
-> seems valid to me, could we just check for these two print helpers in
-> helper_uses_vmlinux_btf ?
+--===============5203265522271237676==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Yes, that is what the series does since v2 (now v3, patch 3/9):
-https://lore.kernel.org/bpf/20260925224229.1850-1-wanjay@amazon.com/
+> diff --git a/Makefile b/Makefile
+> index 751a08643bf8..f561516e1735 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1208,7 +1208,8 @@ endif
+>  # include additional Makefiles when needed
+>  include-y			:= scripts/Makefile.warn
+>  include-$(CONFIG_DEBUG_INFO)	+= scripts/Makefile.debug
+> -include-$(CONFIG_DEBUG_INFO_BTF)+= scripts/Makefile.btf
+> +# CONFIG_DEBUG_INFO_BTF is a tristate; BTF is generated for both y and m
+> +include-$(subst m,y,$(CONFIG_DEBUG_INFO_BTF)) += scripts/Makefile.btf
+>  include-$(CONFIG_KASAN)		+= scripts/Makefile.kasan
+>  include-$(CONFIG_KCSAN)		+= scripts/Makefile.kcsan
+>  include-$(CONFIG_KMSAN)		+= scripts/Makefile.kmsan
 
-helper_uses_vmlinux_btf() also matches BPF_FUNC_snprintf_btf and
-BPF_FUNC_seq_printf_btf, so the verifier loads the vmlinux BTF when a
-program calls either of them, and the runtime peek in
-bpf_btf_printf_prepare() then always finds it.  Tested with a raw_tp
-program calling bpf_snprintf_btf() as the first BTF user after boot.
+[ ... ]
 
-Thanks,
-Jay
+> diff --git a/include/trace/trace_events.h b/include/trace/trace_events.h
+> index 93011f800d0f..2a0098929771 100644
+> --- a/include/trace/trace_events.h
+> +++ b/include/trace/trace_events.h
+> @@ -398,7 +398,7 @@ static inline notrace int trace_event_get_offsets_##call(		\
+>  #define _TRACE_PERF_INIT(call)
+>  #endif /* CONFIG_PERF_EVENTS */
+>
+> -#if defined(CONFIG_BPF_EVENTS) && defined(CONFIG_DEBUG_INFO_BTF)
+> +#if defined(CONFIG_BPF_EVENTS) && IS_ENABLED(CONFIG_DEBUG_INFO_BTF)
+
+Can this change introduce a deadlock when DEBUG_INFO_BTF=m and the
+btf_vmlinux module is not yet loaded?
+
+Before this change, with =m the preprocessor guard was false, so
+_TRACE_BTF_IDS_INIT() expanded to nothing and trace_event_class.btf_ids
+stayed NULL. With IS_ENABLED() the guard is now true for both =y and =m,
+so built-in tracepoint classes initialize .btf_ids and create
+events/<sys>/<event>/btf_ids tracefs files.
+
+Reading that file for a built-in event goes through event_btf_ids_read()
+in kernel/trace/trace_events.c:
+
+    scoped_guard(mutex, &event_mutex) {
+        ...
+        ids = call->class->btf_ids;
+        ...
+        btf = btf_get_module_btf(mod);   /* mod == NULL for built-in */
+
+btf_get_module_btf(NULL) calls bpf_get_btf_vmlinux(), which in the
+IS_MODULE(CONFIG_DEBUG_INFO_BTF) case calls request_module("btf_vmlinux")
+when the vmlinux BTF has not been loaded yet.
+
+request_module() waits for modprobe to exit (UMH_WAIT_PROC) while
+event_mutex is still held. Meanwhile, modprobe does finit_module() ->
+load_module() -> prepare_coming_module(), which calls
+trace_module_notify():
+
+    mutex_lock(&event_mutex);
+    mutex_lock(&trace_types_lock);
+
+so the btf_vmlinux module load blocks on event_mutex held by the reader,
+and the reader blocks waiting for modprobe.
+
+The reader hangs until SIGKILLed, and every other module load and
+event_mutex user (enabling/disabling events, kprobe/uprobe creation, etc.)
+is stuck. Trigger: with DEBUG_INFO_BTF=m and btf_vmlinux not yet loaded,
+`cat /sys/kernel/tracing/events/sched/sched_switch/btf_ids` (or any
+syscall event's btf_ids).
+
+Should the BTF be resolved before taking event_mutex, or should this path
+return -ENOENT when the vmlinux BTF is not yet present?
+
+[ ... ]
+
+
+---
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/36198628965
+--===============5203265522271237676==--
