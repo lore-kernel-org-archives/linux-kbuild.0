@@ -1,660 +1,272 @@
-Received: from pdx-out-005.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-005.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.13.214.179])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 309523BA22C;
-	Fri, 25 Sep 2026 21:15:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.13.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B324FB9B5;
+	Fri, 25 Sep 2026 21:16:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790370945; cv=none; b=m7/OyRrb34x0MXE58fkAf+vD/USRpLjX/H27tr3iqH5FnbgP6+yTCklcXZC77NYd17Uqx5xZFvlvy34rWsqlSRzi/+fXRI+ecgKlE+YSzrY05ZATr1bv3trFj4RFwfZ6W6qQ7KXX+y7EGl7Hdg8uhlHLeXrAEV8NnzczmQEsy8M=
+	t=1790370997; cv=none; b=oZuIjusOEA0oFH5OfBnxG/i130oorWD4/gU2pRfJ2vhDFvSn1YwM6O7Wf+gnjLRsPaAQvIQf6C7qL0MM3xqvkEW2BionpTOa0HCBU5u7ggB+T56x29+iNxowOrFrUGWBMUoY33Z0lbdXNnrT7B2GL7h5YBZNGnXEblekqqakfOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790370945; c=relaxed/simple;
-	bh=ebGCTk9lTS6T86T0PbzLmWEw6nc4VuqD4YibS3s6W90=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=V0eP9duy3CASCQsoy0y95sQirYV0v/1x626vJuCeI3mhtLVmipQlbptUYivlFMDUnzcLDsE1wmRxydlAytr93btJYxh7k5SvvC7Zl+06Rd14J+XkXC3Aam+puW/W45dZZpZNjxAcldRmBAEj+RBqx1mZWuoLHVhlvkR1Me1G+T0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=oJNA0xNm; arc=none smtp.client-ip=52.13.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1790370997; c=relaxed/simple;
+	bh=xtxIxnV/mPIbRLB9tScLxhf/ADpj0+JwqUTJDbm5rq0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=uPi/UDjI9+JSPc5mcy6dUazzzm67WVjdtcePppJRdStLVqy052r4akjXfhHf8eBlK4aiZEiWHC1/889hZjjwkdaDkcuQkDVm6/oucSppY/ebVI30HTMAXqqzTfMthJ3JCzGKPRGj3DBNjoQQt6pMoz2tTr2WuNbvbl5BLOWQyFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bL+4of9n; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="oJNA0xNm"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1790370943; x=1821906943;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Pim3NEWoMsKZg4Qr00MRouTvMURm8XDEd8HG0+lvg9o=;
-  b=oJNA0xNmamLiNvxCC8wfrp3icX1HNll7rPCwP7zgLfgn2eMafgmwceeX
-   RhqPAHG7CAmUvN9Z/F5OvRaMz9pfJ36nuNIFldNvsi6/5FpvLhvpXUIU+
-   vZzW222vS2aHoyuO8fwUGcnrapQuNvBXEqri4yxXt1nIWE+szAZ8veQbP
-   buw/4W6RlIGz+FOpdzKnAG7Kdt9ZGXRxamFmsWXZgkPIslw6phgj4Ih8c
-   VHel5Dr7MUNd+ps4LlMe+MHwjVM8ieBwI/k3Z780/Se3yFhcy3GL9pXHE
-   At1taVrPqvkbFfPGSqQw/odiWFHxLToPYrdLsxnsj0fjp4+RNvM9PFtj0
-   w==;
-X-CSE-ConnectionGUID: /XvS90BmSGGxz3nxmKv7Fg==
-X-CSE-MsgGUID: 9vWRS3mVQPqDSeRNbRBZTg==
-X-IronPort-AV: E=Sophos;i="6.27,123,1787011200"; 
-   d="scan'208";a="29648070"
-Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
-  by internal-pdx-out-005.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2026 21:15:42 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [205.251.233.104:14584]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.45.34:2525] with esmtp (Farcaster)
- id 4899c22d-ed10-4243-9735-9652d07a5603; Fri, 25 Sep 2026 21:15:42 +0000 (UTC)
-X-Farcaster-Flow-ID: 4899c22d-ed10-4243-9735-9652d07a5603
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.49;
- Fri, 25 Sep 2026 21:15:42 +0000
-Received: from dev-dsk-wanjay-2c-d25651b4.us-west-2.amazon.com (172.19.198.4)
- by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.49;
- Fri, 25 Sep 2026 21:15:42 +0000
-From: Jay Wang <wanjay@amazon.com>
-To: <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, "Daniel
- Borkmann" <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
-	"Eduard Zingerman" <eddyz87@gmail.com>, Kumar Kartikeya Dwivedi
-	<memxor@gmail.com>
-CC: Alan Maguire <alan.maguire@oracle.com>, Martin KaFai Lau
-	<martin.lau@linux.dev>, Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa
-	<jolsa@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier
-	<nsc@kernel.org>, <linux-kbuild@vger.kernel.org>, Luis Chamberlain
-	<mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>,
-	<linux-modules@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	<linux-kernel@vger.kernel.org>, Hazem Mohamed Abuelfotoh
-	<abuehaze@amazon.com>, Bjoern Doebel <doebel@amazon.de>, Martin Pohlack
-	<mpohlack@amazon.de>, <jay.wang.upstream@gmail.com>
-Subject: [PATCH bpf-next v2 9/9] kbuild, bpf: allow building the vmlinux BTF as a module
-Date: Fri, 25 Sep 2026 21:13:14 +0000
-Message-ID: <20260925211314.5118-10-wanjay@amazon.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260925211314.5118-1-wanjay@amazon.com>
-References: <20260925211314.5118-1-wanjay@amazon.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bL+4of9n"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2D295C2BCF5;
+	Fri, 25 Sep 2026 21:16:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1790370997;
+	bh=xtxIxnV/mPIbRLB9tScLxhf/ADpj0+JwqUTJDbm5rq0=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=bL+4of9nl0YVsiIsvwJJvOlZvVJi0713ti0+zhPjq268D7ZOcvAJfBZy8N/kd1u6v
+	 ccoD1bYwTyLym20heL42JAZ5wmZ6srRGv7gReiwBElcs9QjP0+a+mR8AMoZnjLCfHI
+	 Uh30j4G7CED7nTIIv5zKtYKJHB6u+eV3gyNpLeFmSqNB3fZ7eZ0aK6UACQT5iA7HNu
+	 c2KcxmdEWVU4R3bXPIZkSFdFz0H+cy0IVXykfQtwX0I/KLlHCL+VAUMRf1qY2gsbwc
+	 7Jqq2/nlBgm3LnDGVpr1tCMsUUGpnSiOcb34qnPmNm2y8AGV+90YuAAasUnl0SA9eO
+	 /iSET4SYmqRMg==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04F37C98321;
+	Fri, 25 Sep 2026 21:16:37 +0000 (UTC)
+From: Jim Cromie via B4 Relay <devnull+jim.cromie.gmail.com@kernel.org>
+Date: Fri, 25 Sep 2026 15:16:36 -0600
+Subject: [PATCH v5 1/3] kallsyms: Match compressed tokens on the fly during
+ binary search
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D040UWB001.ant.amazon.com (10.13.138.82) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260925-ksyms-tune-v5-1-1f75ad0c321c@gmail.com>
+References: <20260925-ksyms-tune-v5-0-1f75ad0c321c@gmail.com>
+In-Reply-To: <20260925-ksyms-tune-v5-0-1f75ad0c321c@gmail.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Lorenzo Stoakes <ljs@kernel.org>, Kees Cook <kees@kernel.org>, 
+ David Laight <david.laight.linux@gmail.com>, 
+ Masahiro Yamada <masahiroy@kernel.org>, Jiri Olsa <olsajiri@gmail.com>, 
+ linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+ bpf@vger.kernel.org, Jim Cromie <jim.cromie@gmail.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1790370996; l=6596;
+ i=jim.cromie@gmail.com; s=20260203; h=from:subject:message-id;
+ bh=uSwF8oSlv0A6TNXHp0b7ZlXImXaVRQqeD6cloMWgLIg=;
+ b=VnXboYnWLe5gA0KHhcZAMLqPbG/1fXCAWADkauYx5FRtgv8Po1NVIHSOJwu54jhPx4wyj0NEU
+ nSRSlekQL/eAATEBAd1DdkU4j+rqiMZWmObGVLqyx/Q6xSBLplwmFVS
+X-Developer-Key: i=jim.cromie@gmail.com; a=ed25519;
+ pk=C6E5ODlPQo7ZBynATXH9wg7K6HxP0pIXyf4s38Qw0XE=
+X-Endpoint-Received: by B4 Relay for jim.cromie@gmail.com/20260203 with
+ auth_id=958
+X-Original-From: Jim Cromie <jim.cromie@gmail.com>
+Reply-To: jim.cromie@gmail.com
 
-Make CONFIG_DEBUG_INFO_BTF a tristate.  With =m the vmlinux BTF is not
-part of the kernel image: it is carried by a new module, btf_vmlinux, and
-loaded the first time something needs it.  Nothing that works with =y
-stops working; the 5.4 MiB of read-only data (distribution config) is
-simply not there on systems where nothing uses it.
+From: Jim Cromie <jim.cromie@gmail.com>
 
-The only way to save that memory today is CONFIG_DEBUG_INFO_BTF=n, which
-a distribution cannot ship: one binary goes to every user, and off takes
-BTF away from the users of CO-RE, fentry/fexit, kfuncs, struct_ops,
-sched_ext or bpf-lsm.  Whether BTF is used is a property of the
-workload, not of the build, so let the first user decide.
+kallsyms_lookup_names() runs a binary search across kallsyms_names[],
+a packed array of ~130k encoded kernel symbols.  For each of the ~17
+comparisons in the search, it currently decompresses the candidate
+symbol into a temporary buffer on the stack before calling strcmp().
 
-The BTF is generated as before, but with =m the .BTF section is linked
-as a non-loadable section (like .comment), so the kernel image does not
-load it, and the final step that makes vmlinux from vmlinux.unstripped
-strips it: every boot image made from vmlinux, whether a raw binary or
-an ELF copy, is without it.  Module BTF is generated against
-vmlinux.unstripped, which keeps it.  .BTF_ids stays loadable, the
-verifier needs it once the BTF is loaded.  The object that carries .BTF
-also carries .BTF.meta, the size and SHA-256 of the BTF (struct
-btf_vmlinux_meta, checked by the module notifier); the first link, which
-the BTF is generated from, gets a zeroed .BTF.meta of the same size.
-kernel/bpf/btf_vmlinux.c is an empty carrier module; scripts/gen-btf.sh
-gives it the vmlinux .BTF as its own .BTF section instead of generating
-split BTF for it, so that one module depends on vmlinux with =m; with
-CONFIG_DEBUG_INFO_BTF_MODULES all of them do, as before.
+Comparing raw tokens directly in compressed space is impossible.  The
+BPE token table assigns values by frequency, not alphabetical order
+(e.g. token 0x05 might expand to "zebra" while 0x42 expands to "apple"),
+so comparing raw token values scrambles lexicographical order.
 
-CONFIG_BPF_PRELOAD is not selectable with =m: its iterator programs
-attach through the vmlinux BTF, so every bpffs mount (systemd does one
-at boot) would load it and defeat the point.  Module BTF is still kept
-when a module loads, as with =y; the saving is the vmlinux BTF only.
-Programs that need kernel types before the root file system is mounted
-need btf_vmlinux.ko in the initramfs; the Kconfig help says so.
+However, full string expansion is equally wasteful: roughly 16 of the
+17 binary search steps fail within the first two characters.
 
-The module has no exit: once loaded the BTF stays, as with =y.  The
-runtime side -- loading the module on first use, checking it against
-.BTF.meta, deferring kfunc and struct_ops registrations and module BTF
-until it arrives -- and the IS_ENABLED()/$(subst m,y,...) preparation of
-the existing checks are in the preceding patches; this one makes it
-selectable.
+Introduce kallsyms_strcmp_symbol() to compare ASCII queries against
+compressed tokens on the fly.  It walks kallsyms_token_index and
+kallsyms_token_table incrementally, matching characters directly and
+bailing out on the first character mismatch without expanding subsequent
+tokens.
 
-Tested with 1 GiB of memory, same tree, =y vs =m, both with
-CONFIG_DEBUG_INFO_BTF_MODULES=y:
+This optimization:
 
- - MemTotal is ~5.4 MB higher with =m while the BTF is unused: the size
-   of the .BTF section.
- - stat() of /sys/kernel/btf/vmlinux reports the BTF size before it is
-   loaded, as the btf_sysfs selftest expects.
- - With BTF in use, MemFree is the same within run-to-run noise.
- - Modules loaded before the trigger (ext4, nf_conntrack and its kfuncs,
-   xfrm_interface) appear in /sys/kernel/btf immediately and get BTF ids
-   once the BTF is loaded; a socket filter loads without loading the
-   module; a kprobe program calling bpf_get_current_task_btf(), opening
-   /sys/kernel/btf/vmlinux or BPF_BTF_GET_NEXT_ID each load it.
- - A carrier module with one byte of its .BTF changed is refused with
-   "BTF does not match this kernel" and leaves no state behind.
- - After the load: fstat/read/mmap of /sys/kernel/btf/vmlinux, a
-   struct_ops map for tcp_congestion_ops, a syscall program calling the
-   bpf_task_from_pid()/bpf_task_release() kfuncs, and modules loaded
-   afterwards (nf_nat) all work as with =y.
- - =m without DEBUG_INFO_BTF_MODULES, and =y, build and pass the same
-   tests.
+0. Avoids decompressing non-matching tokens, short-circuiting ~94% of
+   binary search character expansions without adding any tables in
+   .rodata.
 
-Signed-off-by: Jay Wang <wanjay@amazon.com>
+1. Drops the 512-byte namebuf buffer from the kernel stack in
+   kallsyms_lookup_names().
+
+2. Cuts unindexed lookup latency by ~530 ns (~14% faster) while leaving
+   sequential address ordering and kallsyms_expand_symbol() streaming
+   invariants intact for /proc/kallsyms and table walks.
+
+Signed-off-by: Jim Cromie <jim.cromie@gmail.com>
 ---
- Documentation/bpf/btf.rst         | 35 ++++++++++++
- Makefile                          |  5 +-
- include/asm-generic/vmlinux.lds.h | 31 +++++++++-
- kernel/bpf/Makefile               |  4 ++
- kernel/bpf/btf_vmlinux.c          | 23 ++++++++
- kernel/bpf/preload/Kconfig        |  4 ++
- lib/Kconfig.debug                 | 22 ++++++-
- scripts/Makefile.modfinal         | 26 +++++++--
- scripts/Makefile.vmlinux          |  5 ++
- scripts/gen-btf.sh                | 95 +++++++++++++++++++++++++++++--
- scripts/link-vmlinux.sh           | 25 ++++++--
- 11 files changed, 257 insertions(+), 18 deletions(-)
- create mode 100644 kernel/bpf/btf_vmlinux.c
+Changes in v3:
+- Reorder patch ahead of dynamic batch index in series, establishing an
+  active proof of string matching savings on unindexed baseline
+  (addresses David Laight review).
+- Optimize kallsyms_strcmp_symbol(): drop skipped_first tracking and
+  test len at loop bottom (addresses David Laight review).
+- Guard first token with while (*tptr) to handle 1-byte type tokens.
+- Introduce get_symbol_data() helper in this patch for reuse in later
+  subsystems.
 
-diff --git a/Documentation/bpf/btf.rst b/Documentation/bpf/btf.rst
-index 004aa1058d85..b637f83c85c4 100644
---- a/Documentation/bpf/btf.rst
-+++ b/Documentation/bpf/btf.rst
-@@ -1197,6 +1197,41 @@ format.::
-             .long   58
-             .long   8206                    # Line 8 Col 14
+Changes in v2:
+- Rebase onto mainline v7.3-rc4, removing external dependencies on
+  Lorenzo Stoakes' kbuild series.
+---
+ kernel/kallsyms.c | 94 ++++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 59 insertions(+), 35 deletions(-)
+
+diff --git a/kernel/kallsyms.c b/kernel/kallsyms.c
+index aec2f06858af..d18d78e626db 100644
+--- a/kernel/kallsyms.c
++++ b/kernel/kallsyms.c
+@@ -34,6 +34,21 @@
  
-+6.1 Kernel BTF
-+--------------
-+
-+With CONFIG_DEBUG_INFO_BTF=y the BTF of the kernel is generated at link time
-+from its DWARF and placed in the .BTF section of vmlinux, which is read-only
-+data of the kernel image. It is available as /sys/kernel/btf/vmlinux and, if
-+CONFIG_DEBUG_INFO_BTF_MODULES is set, module BTF is generated as split BTF
-+against it and available as /sys/kernel/btf/<module>.
-+
-+With CONFIG_DEBUG_INFO_BTF=m the same BTF is generated, but it is not part of
-+the kernel image or of the vmlinux ELF file (vmlinux.unstripped in the build
-+tree keeps it, for module BTF generation). It is delivered by the
-+btf_vmlinux module, which the kernel loads on demand the first time the BTF is
-+needed: when /sys/kernel/btf/vmlinux is read or mmap()ed, when kernel BTF
-+objects are enumerated (BPF_BTF_GET_NEXT_ID), or when a BPF program needs
-+kernel type information (an attach_btf_id, a kfunc call, a ksym, a map pointer
-+or a helper that takes or returns a kernel BTF pointer). Until then no memory
-+is used for it, and afterwards nothing differs from =y. In particular:
-+
-+  * /sys/kernel/btf/vmlinux exists from boot with its final size.
-+  * Modules loaded before the vmlinux BTF are exposed in /sys/kernel/btf right
-+    away, their BTF is parsed and gets a BTF id once the vmlinux BTF is
-+    loaded, together with their kfunc and struct_ops registrations.
-+  * kfunc, dtor kfunc and struct_ops registrations of the kernel itself are
-+    applied before the BTF becomes visible.
-+  * The kernel only accepts the BTF it was built with: the size and SHA-256 of
-+    the BTF are linked into the kernel and checked against the module.
-+  * Once loaded the BTF stays; the module cannot be unloaded.
-+
-+If the module is not available (not installed, or the root file system is not
-+mounted yet), the kernel behaves as one built without BTF and retries next
-+time. CONFIG_BPF_PRELOAD is not available with =m: its iterators attach through
-+the vmlinux BTF, so mounting bpffs would load it. bpf_snprintf_btf() and bpf_seq_printf_btf() only use the BTF if it has
-+already been parsed, as they run in program context.
-+
- 7. Testing
- ==========
+ #include "kallsyms_internal.h"
  
-diff --git a/Makefile b/Makefile
-index 3a1b4a8fb424..0a37decd9d01 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1745,8 +1745,9 @@ endif
- #
- 
- # *.ko are usually independent of vmlinux, but CONFIG_DEBUG_INFO_BTF_MODULES
--# is an exception.
--ifdef CONFIG_DEBUG_INFO_BTF_MODULES
-+# is an exception, and so is the btf_vmlinux module with CONFIG_DEBUG_INFO_BTF=m,
-+# which carries the vmlinux BTF.
-+ifneq ($(CONFIG_DEBUG_INFO_BTF_MODULES)$(filter m,$(CONFIG_DEBUG_INFO_BTF)),)
- KBUILD_BUILTIN := y
- modules: vmlinux
- endif
-diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
-index b2988aa12f66..204a9ee171c6 100644
---- a/include/asm-generic/vmlinux.lds.h
-+++ b/include/asm-generic/vmlinux.lds.h
-@@ -674,8 +674,18 @@
- 
- /*
-  * .BTF
-+ *
-+ * With CONFIG_DEBUG_INFO_BTF=y the vmlinux BTF is loaded as read-only data and
-+ * bounded by __start_BTF/__stop_BTF.  With CONFIG_DEBUG_INFO_BTF=m it is
-+ * linked as a non-loadable section (see BTF_NOLOAD in ELF_DETAILS), so that
-+ * module BTF generation can read it from vmlinux.unstripped; it is stripped
-+ * from vmlinux (scripts/Makefile.vmlinux), and the btf_vmlinux module carries
-+ * a copy and provides it on demand at runtime.
-+ * What is loaded instead is .BTF.meta, the size and hash of that BTF (see
-+ * scripts/gen-btf.sh), empty in the first link that the BTF is generated
-+ * from.  .BTF_ids is needed by the kernel in both cases.
-  */
--#ifdef CONFIG_DEBUG_INFO_BTF
-+#if IS_BUILTIN(CONFIG_DEBUG_INFO_BTF)
- #define BTF								\
- 	. = ALIGN(PAGE_SIZE);						\
- 	.BTF : AT(ADDR(.BTF) - LOAD_OFFSET) {				\
-@@ -685,10 +695,28 @@
- 	.BTF_ids : AT(ADDR(.BTF_ids) - LOAD_OFFSET) {			\
- 		*(.BTF_ids)						\
- 	}
-+#elif IS_MODULE(CONFIG_DEBUG_INFO_BTF)
-+#define BTF								\
-+	. = ALIGN(8);							\
-+	.BTF.meta : AT(ADDR(.BTF.meta) - LOAD_OFFSET) {			\
-+		BOUNDED_SECTION_BY(.BTF.meta, _BTF_meta)		\
-+	}								\
-+	. = ALIGN(PAGE_SIZE);						\
-+	.BTF_ids : AT(ADDR(.BTF_ids) - LOAD_OFFSET) {			\
-+		*(.BTF_ids)						\
-+	}
- #else
- #define BTF
- #endif
- 
-+#if IS_MODULE(CONFIG_DEBUG_INFO_BTF)
-+/* quoted: BTF is a macro, an unquoted .BTF here would expand it */
-+#define BTF_NOLOAD							\
-+		".BTF" 0 : { *(".BTF") }
-+#else
-+#define BTF_NOLOAD
-+#endif
-+
- /*
-  * Init task
-  */
-@@ -849,6 +877,7 @@
- /* Required sections not related to debugging. */
- #define ELF_DETAILS							\
- 		.comment 0 : { *(.comment) }				\
-+		BTF_NOLOAD						\
- 		.symtab 0 : { *(.symtab) }				\
- 		.strtab 0 : { *(.strtab) }				\
- 		.shstrtab 0 : { *(.shstrtab) }				\
-diff --git a/kernel/bpf/Makefile b/kernel/bpf/Makefile
-index 7d745b602b80..8ab46f496fa4 100644
---- a/kernel/bpf/Makefile
-+++ b/kernel/bpf/Makefile
-@@ -43,6 +43,10 @@ endif
- ifeq ($(CONFIG_SYSFS),y)
- obj-$(subst m,y,$(CONFIG_DEBUG_INFO_BTF)) += sysfs_btf.o
- endif
-+# With CONFIG_DEBUG_INFO_BTF=m the vmlinux BTF is carried by this module
-+ifeq ($(CONFIG_DEBUG_INFO_BTF),m)
-+obj-m += btf_vmlinux.o
-+endif
- ifeq ($(CONFIG_BPF_JIT),y)
- obj-$(CONFIG_BPF_SYSCALL) += bpf_struct_ops.o
- obj-$(CONFIG_BPF_SYSCALL) += cpumask.o
-diff --git a/kernel/bpf/btf_vmlinux.c b/kernel/bpf/btf_vmlinux.c
-new file mode 100644
-index 000000000000..8d89b4bb3c43
---- /dev/null
-+++ b/kernel/bpf/btf_vmlinux.c
-@@ -0,0 +1,23 @@
-+// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * Carrier module for the vmlinux BTF when CONFIG_DEBUG_INFO_BTF=m.
-+ *
-+ * This module has no code of its own.  Its .BTF section is a copy of the
-+ * vmlinux BTF (see scripts/gen-btf.sh), which the BTF module notifier in
-+ * kernel/bpf/btf.c recognizes by module name and installs as the vmlinux BTF.
-+ * The kernel loads it on demand, the first time the vmlinux BTF is needed.
-+ *
-+ * There is deliberately no module_exit(): once the BTF is in use it cannot
-+ * be taken away again, exactly as with CONFIG_DEBUG_INFO_BTF=y.
++ * Get the compressed symbol length and data pointer.
 + */
-+#include <linux/init.h>
-+#include <linux/module.h>
-+
-+static int __init btf_vmlinux_init(void)
++static inline const u8 *get_symbol_data(unsigned int off, unsigned int *len)
 +{
-+	return 0;
++	const u8 *p = &kallsyms_names[off];
++	unsigned int l = *p++;
++
++	if (unlikely(l & 0x80))
++		l = (l & 0x7F) | (*p++ << 7);
++	*len = l;
++
++	return p;
 +}
-+module_init(btf_vmlinux_init);
 +
-+MODULE_DESCRIPTION("BTF type information for vmlinux");
-+MODULE_LICENSE("GPL");
-diff --git a/kernel/bpf/preload/Kconfig b/kernel/bpf/preload/Kconfig
-index aef7b0bc96d6..b1600bdce7a0 100644
---- a/kernel/bpf/preload/Kconfig
-+++ b/kernel/bpf/preload/Kconfig
-@@ -6,6 +6,10 @@ menuconfig BPF_PRELOAD
- 	# The dependency on !COMPILE_TEST prevents it from being enabled
- 	# in allmodconfig or allyesconfig configurations
- 	depends on !COMPILE_TEST
-+	# The preloaded iterators attach through the vmlinux BTF, so with
-+	# CONFIG_DEBUG_INFO_BTF=m every bpffs mount would load the BTF, which
-+	# defeats the point of =m on any system that mounts bpffs at boot.
-+	depends on DEBUG_INFO_BTF!=m
- 	help
- 	  This builds kernel module with several embedded BPF programs that are
- 	  pinned into BPF FS mount point as human readable files that are
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 134b15a44625..418025c5e657 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -396,7 +396,7 @@ config DEBUG_INFO_SPLIT
- 	  Incompatible with older versions of ccache.
- 
- config DEBUG_INFO_BTF
--	bool "Generate BTF type information"
-+	tristate "Generate BTF type information"
- 	depends on !DEBUG_INFO_SPLIT && !DEBUG_INFO_REDUCED
- 	depends on !GCC_PLUGIN_RANDSTRUCT || COMPILE_TEST
- 	depends on BPF_SYSCALL
-@@ -408,6 +408,26 @@ config DEBUG_INFO_BTF
- 	  Turning this on requires pahole v1.22 or later, which will convert
- 	  DWARF type info into equivalent deduplicated BTF type info.
- 
-+	  If built as a module (=m), the vmlinux BTF is not part of the
-+	  kernel image.  It is carried by the btf_vmlinux module, which is
-+	  loaded on demand the first time the BTF is needed: when a BPF
-+	  program requires kernel type information, or when
-+	  /sys/kernel/btf/vmlinux is opened.  Until then, no memory is
-+	  spent on it.  The vmlinux ELF file does not carry the BTF
-+	  either; module BTF is generated against vmlinux.unstripped, and
-+	  tools that read the BTF from a file can use that or
-+	  /sys/kernel/btf/vmlinux.
-+
-+	  Module BTF (DEBUG_INFO_BTF_MODULES) is kept when a module loads,
-+	  as with =y, and registered once the vmlinux BTF is available; the
-+	  saving is the vmlinux BTF only.
-+
-+	  If BPF programs that use kernel types run before the root file
-+	  system is mounted, put btf_vmlinux.ko into the initramfs: until
-+	  the module can be loaded, such programs fail as on a kernel
-+	  without BTF.  Not compatible with BPF_PRELOAD, whose iterators
-+	  would load the BTF at every bpffs mount.
-+
- config PAHOLE_HAS_BTF_TAG
- 	def_bool PAHOLE_VERSION >= 123
- 	depends on CC_IS_CLANG
-diff --git a/scripts/Makefile.modfinal b/scripts/Makefile.modfinal
-index 01a37ec872b9..6a0958cf0e6f 100644
---- a/scripts/Makefile.modfinal
-+++ b/scripts/Makefile.modfinal
-@@ -38,20 +38,34 @@ quiet_cmd_ld_ko_o = LD [M]  $@
- 		$(KBUILD_LDFLAGS_MODULE) $(LDFLAGS_MODULE)		\
- 		-T $(objtree)/scripts/module.lds -o $@ $(filter %.o, $^)
- 
-+# The ELF file with the vmlinux BTF: with CONFIG_DEBUG_INFO_BTF=m the BTF is
-+# stripped from vmlinux (scripts/Makefile.vmlinux), vmlinux.unstripped keeps it.
-+btf-vmlinux := $(objtree)/vmlinux$(if $(filter m,$(CONFIG_DEBUG_INFO_BTF)),.unstripped)
-+
- quiet_cmd_btf_ko = BTF [M] $@
-       cmd_btf_ko = 							\
--	if [ ! -f $(objtree)/vmlinux ]; then				\
-+	if [ ! -f $(btf-vmlinux) ]; then				\
- 		printf "Skipping BTF generation for %s due to unavailability of vmlinux\n" $@ 1>&2; \
- 	else	\
--		$(CONFIG_SHELL) $(srctree)/scripts/gen-btf.sh --btf_base $(objtree)/vmlinux $@; \
-+		$(CONFIG_SHELL) $(srctree)/scripts/gen-btf.sh --btf_base $(btf-vmlinux) $@; \
- 	fi;
- 
--# Re-generate module BTFs if either module's .ko or vmlinux changed
--%.ko: %.o %.mod.o .module-common.o $(objtree)/scripts/module.lds $(and $(CONFIG_DEBUG_INFO_BTF_MODULES),$(KBUILD_BUILTIN),$(objtree)/vmlinux) FORCE
--	+$(call if_changed,ld_ko_o)
-+# Modules that get a .BTF section: all of them with CONFIG_DEBUG_INFO_BTF_MODULES,
-+# otherwise only the vmlinux BTF carrier module with CONFIG_DEBUG_INFO_BTF=m.
- ifdef CONFIG_DEBUG_INFO_BTF_MODULES
--	+$(if $(newer-prereqs),$(call cmd,btf_ko))
-+btf-modules := $(modules:%.o=%.ko)
-+else ifeq ($(CONFIG_DEBUG_INFO_BTF),m)
-+btf-modules := $(filter %/btf_vmlinux.ko,$(modules:%.o=%.ko))
-+# Only the carrier depends on vmlinux, not every module
-+ifdef KBUILD_BUILTIN
-+$(btf-modules): $(btf-vmlinux)
-+endif
- endif
-+
-+# Re-generate module BTFs if either module's .ko or vmlinux changed
-+%.ko: %.o %.mod.o .module-common.o $(objtree)/scripts/module.lds $(and $(CONFIG_DEBUG_INFO_BTF_MODULES),$(KBUILD_BUILTIN),$(btf-vmlinux)) FORCE
-+	+$(call if_changed,ld_ko_o)
-+	+$(if $(and $(filter $@,$(btf-modules)),$(newer-prereqs)),$(call cmd,btf_ko))
- 	+$(call cmd,check_tracepoint)
- 
- targets += $(modules:%.o=%.ko) $(modules:%.o=%.mod.o) .module-common.o
-diff --git a/scripts/Makefile.vmlinux b/scripts/Makefile.vmlinux
-index fcae1e432d9a..557db1ee1f3b 100644
---- a/scripts/Makefile.vmlinux
-+++ b/scripts/Makefile.vmlinux
-@@ -86,6 +86,11 @@ remove-section-$(CONFIG_ARCH_VMLINUX_NEEDS_RELOCS) += '.rel*' '!.rel*.dyn'
- # for compatibility with binutils < 2.32
- # https://sourceware.org/git/?p=binutils-gdb.git;a=commit;h=c12d9fa2afe7abcbe407a00e15719e1a1350c2a7
- remove-section-$(CONFIG_ARCH_VMLINUX_NEEDS_RELOCS) += '.rel.*'
-+# With CONFIG_DEBUG_INFO_BTF=m the btf_vmlinux module carries the vmlinux BTF;
-+# only vmlinux.unstripped keeps it, for module BTF generation.
-+ifeq ($(CONFIG_DEBUG_INFO_BTF),m)
-+remove-section-y += .BTF
-+endif
- 
- remove-symbols := -w --strip-unneeded-symbol='__mod_device_table__*'
- 
-diff --git a/scripts/gen-btf.sh b/scripts/gen-btf.sh
-index 8ca96eb10a69..d808d0006d32 100755
---- a/scripts/gen-btf.sh
-+++ b/scripts/gen-btf.sh
-@@ -22,16 +22,27 @@
- #   - ${1}.btf.o ready for linking into vmlinux
- #   - ${1}.BTF_ids with .BTF_ids data blob
- # This output is consumed by scripts/link-vmlinux.sh
-+#
-+# With CONFIG_DEBUG_INFO_BTF=m the .BTF section in ${1}.btf.o is not
-+# allocatable, so the kernel image does not carry the BTF; vmlinux.unstripped
-+# does, for module BTF generation, and scripts/Makefile.vmlinux strips it from
-+# vmlinux.  ${1}.btf.o then also carries .BTF.meta, the size and SHA-256 of
-+# the BTF for the kernel (struct btf_vmlinux_meta); "--placeholder ${1}"
-+# produces a ${1}.btf.o with a zeroed .BTF.meta and no .BTF for the first
-+# vmlinux link, which the BTF is generated from.  The btf_vmlinux module gets
-+# no BTF of its own; its .BTF section is a copy of the vmlinux BTF, extracted
-+# from --btf_base.
- 
- set -e
- 
- usage()
+ /*
+  * Expand a compressed symbol data into the resulting uncompressed string,
+  * if uncompressed string is too long (>= maxlen), it will be truncated,
+@@ -42,28 +57,12 @@
+ static unsigned int kallsyms_expand_symbol(unsigned int off,
+ 					   char *result, size_t maxlen)
  {
--	echo "Usage: $0 [--btf_base <file>] <target ELF file>"
-+	echo "Usage: $0 [--btf_base <file>] [--placeholder] <target ELF file>"
- 	exit 1
- }
+-	int len, skipped_first = 0;
++	int skipped_first = 0;
+ 	const char *tptr;
+-	const u8 *data;
++	unsigned int len;
++	const u8 *data = get_symbol_data(off, &len);
  
- BTF_BASE=""
-+PLACEHOLDER=""
+-	/* Get the compressed symbol length from the first symbol byte. */
+-	data = &kallsyms_names[off];
+-	len = *data;
+-	data++;
+-	off++;
+-
+-	/* If MSB is 1, it is a "big" symbol, so needs an additional byte. */
+-	if ((len & 0x80) != 0) {
+-		len = (len & 0x7F) | (*data << 7);
+-		data++;
+-		off++;
+-	}
+-
+-	/*
+-	 * Update the offset to return the offset for the next symbol on
+-	 * the compressed stream.
+-	 */
+-	off += len;
++	off = (data - kallsyms_names) + len;
  
- while [ $# -gt 0 ]; do
- 	case "$1" in
-@@ -39,6 +50,10 @@ while [ $# -gt 0 ]; do
- 		BTF_BASE="$2"
- 		shift 2
- 		;;
-+	--placeholder)
-+		PLACEHOLDER=1
-+		shift
-+		;;
- 	-*)
- 		echo "Unknown option: $1" >&2
- 		usage
-@@ -60,6 +75,10 @@ is_enabled() {
- 	grep -q "^$1=y" ${objtree}/include/config/auto.conf
- }
- 
-+is_module() {
-+	grep -q "^$1=m" ${objtree}/include/config/auto.conf
+ 	/*
+ 	 * For every byte on the compressed symbol data, copy the table
+@@ -101,14 +100,43 @@ static unsigned int kallsyms_expand_symbol(unsigned int off,
+  */
+ static char kallsyms_get_symbol_type(unsigned int off)
+ {
+-	/*
+-	 * Get just the first code, look it up in the token table,
+-	 * and return the first char from this token. If MSB of length
+-	 * is 1, it is a "big" symbol, so needs an additional byte.
+-	 */
+-	if (kallsyms_names[off] & 0x80)
+-		off++;
+-	return kallsyms_token_table[kallsyms_token_index[kallsyms_names[off + 1]]];
++	unsigned int len;
++	const u8 *data = get_symbol_data(off, &len);
++
++	return kallsyms_token_table[kallsyms_token_index[*data]];
 +}
 +
- case "${KBUILD_VERBOSE}" in
- *1*)
- 	set -x
-@@ -79,6 +98,30 @@ gen_btf_data()
- 		--btf ${btf1} "${ELF_FILE}"
- }
- 
-+# Write one byte with value $1 (0..255)
-+put_byte()
++/*
++ * Compare an uncompressed ASCII string against a compressed symbol table entry.
++ * Returns negative if name < sym, positive if name > sym, 0 if equal.
++ * Exits immediately on the first mismatched character without decompressing
++ * the rest of the symbol name.
++ */
++static int kallsyms_strcmp_symbol(unsigned int off, const char *name)
 +{
-+	printf "\\$(printf '%03o' "$1")"
-+}
++	const char *tptr;
++	unsigned int len;
++	const u8 *data = get_symbol_data(off, &len);
 +
-+# CONFIG_DEBUG_INFO_BTF=m: write struct btf_vmlinux_meta { u32 size; u8
-+# sha256[32]; } for the BTF in $1 to $2, in the target's byte order.
-+gen_btf_meta()
-+{
-+	size=$(${CONFIG_SHELL} "${srctree}/scripts/file-size.sh" "$1")
-+	sha256=$(sha256sum < "$1" | cut -d' ' -f1)
-+	{
-+		if is_enabled CONFIG_CPU_BIG_ENDIAN; then
-+			for shift in 24 16 8 0; do put_byte $(( (size >> shift) & 255 )); done
-+		else
-+			for shift in 0 8 16 24; do put_byte $(( (size >> shift) & 255 )); done
-+		fi
-+		for byte in $(echo "${sha256}" | sed 's/../& /g'); do
-+			put_byte $(( 0x${byte} ))
-+		done
-+	} > "$2"
-+}
++	tptr = &kallsyms_token_table[kallsyms_token_index[*data++]] + 1;
++	while (*tptr) {
++		int diff = (unsigned char)*name++ - (unsigned char)*tptr++;
 +
- gen_btf_o()
- {
- 	btf_data=${ELF_FILE}.btf.o
-@@ -88,9 +131,23 @@ gen_btf_o()
- 	# deletes all symbols including __start_BTF and __stop_BTF, which will
- 	# be redefined in the linker script.
- 	echo "" | ${CC} ${CLANG_FLAGS} ${KBUILD_CPPFLAGS} ${KBUILD_CFLAGS} -fno-lto -c -x c -o ${btf_data} -
--	${OBJCOPY} --add-section .BTF=${ELF_FILE}.BTF \
--		--set-section-flags .BTF=alloc,readonly ${btf_data}
--	${OBJCOPY} --only-section=.BTF --strip-all ${btf_data}
-+	if is_module CONFIG_DEBUG_INFO_BTF; then
-+		# CONFIG_DEBUG_INFO_BTF=m: .BTF stays non-allocatable, kept in
-+		# vmlinux.unstripped for module BTF but not loaded; the btf_vmlinux
-+		# module provides it at runtime.  What is loaded is .BTF.meta,
-+		# its size and hash, so that /sys/kernel/btf/vmlinux has the right
-+		# size from boot and only the matching BTF is accepted.
-+		gen_btf_meta ${ELF_FILE}.BTF ${ELF_FILE}.BTF.meta
-+		${OBJCOPY} --add-section .BTF=${ELF_FILE}.BTF \
-+			--set-section-flags .BTF=readonly \
-+			--add-section .BTF.meta=${ELF_FILE}.BTF.meta \
-+			--set-section-flags .BTF.meta=alloc,readonly ${btf_data}
-+		${OBJCOPY} --only-section=.BTF --only-section=.BTF.meta --strip-all ${btf_data}
-+	else
-+		${OBJCOPY} --add-section .BTF=${ELF_FILE}.BTF \
-+			--set-section-flags .BTF=alloc,readonly ${btf_data}
-+		${OBJCOPY} --only-section=.BTF --strip-all ${btf_data}
-+	fi
- 
- 	# Change e_type to ET_REL so that it can be used to link final vmlinux.
- 	# GNU ld 2.35+ and lld do not allow an ET_EXEC input.
-@@ -121,6 +178,7 @@ cleanup()
- {
- 	rm -f "${ELF_FILE}.BTF.1"
- 	rm -f "${ELF_FILE}.BTF"
-+	rm -f "${ELF_FILE}.BTF.meta"
- 	if [ "${BTFGEN_MODE}" = "module" ]; then
- 		rm -f "${ELF_FILE}.BTF.base"
- 		rm -f "${ELF_FILE}.BTF_ids"
-@@ -133,6 +191,35 @@ if [ -n "${BTF_BASE}" ]; then
- 	BTFGEN_MODE="module"
- fi
- 
-+if [ -n "${PLACEHOLDER}" ]; then
-+	btf_data=${ELF_FILE}.btf.o
-+	echo "" | ${CC} ${CLANG_FLAGS} ${KBUILD_CPPFLAGS} ${KBUILD_CFLAGS} -fno-lto -c -x c -o ${btf_data} -
-+	dd if=/dev/zero of=${ELF_FILE}.BTF.meta bs=36 count=1 2>/dev/null
-+	${OBJCOPY} --add-section .BTF.meta=${ELF_FILE}.BTF.meta \
-+		--set-section-flags .BTF.meta=alloc,readonly ${btf_data}
-+	${OBJCOPY} --only-section=.BTF.meta --strip-all ${btf_data}
-+	exit 0
-+fi
++		if (diff)
++			return diff;
++	}
 +
-+# CONFIG_DEBUG_INFO_BTF=m: the btf_vmlinux module carries the vmlinux BTF
-+# itself.  Its own types are of no interest, so instead of generating split
-+# BTF for it, copy the (non-loadable) .BTF section of --btf_base
-+# (vmlinux.unstripped) into the module.
-+# The kernel recognizes the module by name and treats its .BTF as base BTF.
-+case "${BTFGEN_MODE}:${ELF_FILE}" in
-+module:*/btf_vmlinux.ko)
-+	if is_module CONFIG_DEBUG_INFO_BTF; then
-+		# -O binary only emits allocatable sections; make .BTF one for
-+		# the extraction.  ${BTF_BASE} itself is not modified.
-+		${OBJCOPY} -O binary --only-section=.BTF			\
-+			--set-section-flags .BTF=alloc,load,readonly	\
-+			"${BTF_BASE}" "${ELF_FILE}.BTF"
-+		${OBJCOPY} --add-section .BTF="${ELF_FILE}.BTF" "${ELF_FILE}"
-+		exit 0
-+	fi
-+	;;
-+esac
++	while (--len) {
++		tptr = &kallsyms_token_table[kallsyms_token_index[*data++]];
++		do {
++			int diff = (unsigned char)*name++ - (unsigned char)*tptr++;
 +
- gen_btf_data
- 
- case "${BTFGEN_MODE}" in
-diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-index ab0b8125c8cb..a9a066267ef6 100755
---- a/scripts/link-vmlinux.sh
-+++ b/scripts/link-vmlinux.sh
-@@ -37,6 +37,15 @@ is_enabled() {
- 	grep -q "^$1=y" include/config/auto.conf
++			if (diff)
++				return diff;
++		} while (*tptr);
++	}
++
++	return (unsigned char)*name;
  }
  
-+is_module() {
-+	grep -q "^$1=m" include/config/auto.conf
-+}
-+
-+# =y or =m
-+is_set() {
-+	grep -q "^$1=[ym]" include/config/auto.conf
-+}
-+
- # Nice output in kbuild format
- # Will be suppressed by "make -s"
- info()
-@@ -211,17 +220,25 @@ if is_enabled CONFIG_KALLSYMS; then
- 	kallsyms .tmp_vmlinux0.syms .tmp_vmlinux0.kallsyms
- fi
  
--if is_enabled CONFIG_KALLSYMS || is_enabled CONFIG_DEBUG_INFO_BTF; then
-+if is_module CONFIG_DEBUG_INFO_BTF; then
-+	# The kernel refers to the size and hash of its BTF, which only the
-+	# BTF generated from the first link can provide; link a placeholder
-+	# of the same layout until then.
-+	${CONFIG_SHELL} ${srctree}/scripts/gen-btf.sh --placeholder .tmp_vmlinux0
-+	btf_vmlinux_bin_o=.tmp_vmlinux0.btf.o
-+fi
-+
-+if is_enabled CONFIG_KALLSYMS || is_set CONFIG_DEBUG_INFO_BTF; then
+@@ -174,7 +202,6 @@ static int kallsyms_lookup_names(const char *name,
+ 	int ret;
+ 	int low, mid, high;
+ 	unsigned int seq, off;
+-	char namebuf[KSYM_NAME_LEN];
  
- 	# The kallsyms linking does not need debug symbols, but the BTF does.
--	if ! is_enabled CONFIG_DEBUG_INFO_BTF; then
-+	if ! is_set CONFIG_DEBUG_INFO_BTF; then
- 		strip_debug=1
- 	fi
- 
- 	vmlinux_link .tmp_vmlinux1
- fi
- 
--if is_enabled CONFIG_DEBUG_INFO_BTF; then
-+if is_set CONFIG_DEBUG_INFO_BTF; then
- 	info BTF .tmp_vmlinux1
- 	if ! ${CONFIG_SHELL} ${srctree}/scripts/gen-btf.sh .tmp_vmlinux1; then
- 		echo >&2 "Failed to generate BTF for vmlinux"
-@@ -287,7 +304,7 @@ fi
- 
- vmlinux_link "${VMLINUX}"
- 
--if is_enabled CONFIG_DEBUG_INFO_BTF; then
-+if is_set CONFIG_DEBUG_INFO_BTF; then
- 	info BTFIDS ${VMLINUX}
- 	${RESOLVE_BTFIDS} --patch_btfids ${btfids_vmlinux} ${VMLINUX}
- fi
+ 	low = 0;
+ 	high = kallsyms_num_syms - 1;
+@@ -183,8 +210,7 @@ static int kallsyms_lookup_names(const char *name,
+ 		mid = low + (high - low) / 2;
+ 		seq = get_symbol_seq(mid);
+ 		off = get_symbol_offset(seq);
+-		kallsyms_expand_symbol(off, namebuf, ARRAY_SIZE(namebuf));
+-		ret = strcmp(name, namebuf);
++		ret = kallsyms_strcmp_symbol(off, name);
+ 		if (ret > 0)
+ 			low = mid + 1;
+ 		else if (ret < 0)
+@@ -200,8 +226,7 @@ static int kallsyms_lookup_names(const char *name,
+ 	while (low) {
+ 		seq = get_symbol_seq(low - 1);
+ 		off = get_symbol_offset(seq);
+-		kallsyms_expand_symbol(off, namebuf, ARRAY_SIZE(namebuf));
+-		if (strcmp(name, namebuf))
++		if (kallsyms_strcmp_symbol(off, name) != 0)
+ 			break;
+ 		low--;
+ 	}
+@@ -212,8 +237,7 @@ static int kallsyms_lookup_names(const char *name,
+ 		while (high < kallsyms_num_syms - 1) {
+ 			seq = get_symbol_seq(high + 1);
+ 			off = get_symbol_offset(seq);
+-			kallsyms_expand_symbol(off, namebuf, ARRAY_SIZE(namebuf));
+-			if (strcmp(name, namebuf))
++			if (kallsyms_strcmp_symbol(off, name) != 0)
+ 				break;
+ 			high++;
+ 		}
+
 -- 
-2.47.3
+2.55.0
+
 
