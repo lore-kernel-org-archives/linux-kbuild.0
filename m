@@ -1,212 +1,176 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com [35.155.198.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86BF24FB9B8;
-	Fri, 25 Sep 2026 21:16:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBF51456296;
+	Fri, 25 Sep 2026 21:23:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.155.198.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790370997; cv=none; b=XEAChRGOCuOLHUudbSQP6y3dubMfAFsMeK8V0wpCpi8ayBG19VIhl6W+A0FcDNP45kMzZyRdUPpvmc5EKHVfViNSAvk8mbQDA/T0IxJMhvxuxxaQpCNWg3ETEjtBkD3W2C1VA2LbA70/b72kewQi/3L8vmAgXEQTi0yB/ByQYLE=
+	t=1790371403; cv=none; b=OU0F1nu2RGk9AgiMkvOfAWIbGM6gEM8u+1VqEWPlOlL6HbtuZpzPWfbHtDWyg5vhLeeAU3AeY4r5qRlkqbj/HWPPYf5i0W56U5EIeVwprYRL29Uu8fuB3oFsSKm0ZAZZxGamUy0geaikgkm8JNOcIwOJsoeh7c50oVt5NKWCZtM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790370997; c=relaxed/simple;
-	bh=aU6+EgNd4vX7eJncL5B6FdzvW20hpwnW2sLy4zQw98E=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=jbR2JF24jXm4VLu8N8B591C5YRU7pRYr97aCcJCtqyyvKtuBXnIT5M9Vyz0ZzeZXbOaL3fgx4GQVDJhBTnUHZUvbY1iq7FiEdqfQ3gkyrQbCaMd4qKbbLYl66qXmmbvVuDJUiCX82PFWDnyK5Jbmg02s1R/RKebXXGzYOG+kCtc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DwygNDzo; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1790371403; c=relaxed/simple;
+	bh=HerTneftuhQfAknI9R2FicxbJNpDAGXWHHvZw49HstY=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=a5P1N3iRzb8VxuMQekfV0Rzd+0xutV4ZJi9dO9CqTMoJgkPxCYA+hpiE08kEIe6GIw8ADVfnCPGOq+bnxBg0f0GxpElcQFt9C/jZPbMl+aBahNhRBQnxNlh9GpU9qyRgVVv0w36g/3igCOza0/5e5hk8wY9UaOqJ1rbknT1O5y4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=ZMfZCLmV; arc=none smtp.client-ip=35.155.198.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DwygNDzo"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3DB9BC2BCF4;
-	Fri, 25 Sep 2026 21:16:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1790370997;
-	bh=aU6+EgNd4vX7eJncL5B6FdzvW20hpwnW2sLy4zQw98E=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=DwygNDzoZmPRNHk36wgFZBSzl/6MJVEYcH7he2BvN6kHC8rY4sclLhS/uEEXlZViL
-	 1WeD9xlK/XjU/qMLzRSsTxoRZon3biQRbg1FU5c2pw/LF+ln3GkISrmoUiHyuwHT5H
-	 UBhKfOy40v6nS1QhK9MwtvAAtI0wrH0rBVEl70j1/Swm47m73mqcuVdRMnbf1Ky6Le
-	 rdQi4DIpKZYznEHCyjcJ29Ul1mUSuS1unzsRBTeo97YLxDPL/W2MFQFKBkNxU39aJY
-	 f3tuoIYomZI6MR6UAN/QetsTkyPkVmCWtdexVX4T91TzNeERDsaTUkrWbmTDHGGF//
-	 /eBzLXg3KBZ9w==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E168C9830E;
-	Fri, 25 Sep 2026 21:16:37 +0000 (UTC)
-From: Jim Cromie via B4 Relay <devnull+jim.cromie.gmail.com@kernel.org>
-Date: Fri, 25 Sep 2026 15:16:37 -0600
-Subject: [PATCH v5 2/3] kallsyms: Increase marker density to 16:1 to
- accelerate lookups
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="ZMfZCLmV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1790371401; x=1821907401;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=DMNrHieUH4/OcqJVLdfiVHAW2UU4cQkS2bASkWEaKxY=;
+  b=ZMfZCLmVKZFbthA0aR9kpOc6xCIq+0jpiRBLC8fVeuDsMzB9W1iyNPqD
+   cGfIZ/LqPldNczzz11PNY6pW7Wpf1Q0Pk0YCJDglNz1ZRy8t/HoIq2jMx
+   P4Gv9ff/1msCnGJJevOTnLJS5/+3m59d9pE+38xFxyHBD72iWS2iFCs85
+   maPI5L4UGYJVVrjdhKJxKp4ALowQaTwmwdl9m72ShxZ/t3W5L3qDxv5qf
+   OB7BmV7OUBcJOdAGoxRaDlvDkyQYqLskGBbH2fd1LWBTqq0kPWMxZE8LM
+   GGqBYVEU32VqB0TN7gMxguwWrdyu9zrM1ZWfOMYEOTWBT/f++nJezS1oR
+   Q==;
+X-CSE-ConnectionGUID: CY6CyhnDSwC+dDMmh9ZlrQ==
+X-CSE-MsgGUID: pfrxjD44RRigskAFze2eqw==
+X-IronPort-AV: E=Sophos;i="6.27,123,1787011200"; 
+   d="scan'208";a="29577426"
+Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
+  by internal-pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2026 21:23:21 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [205.251.233.182:18344]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.33.144:2525] with esmtp (Farcaster)
+ id da323cf6-d9e1-457c-95b6-0d78905d856b; Fri, 25 Sep 2026 21:23:21 +0000 (UTC)
+X-Farcaster-Flow-ID: da323cf6-d9e1-457c-95b6-0d78905d856b
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.49;
+ Fri, 25 Sep 2026 21:23:20 +0000
+Received: from dev-dsk-wanjay-2c-d25651b4.us-west-2.amazon.com (172.19.198.4)
+ by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.49;
+ Fri, 25 Sep 2026 21:23:20 +0000
+From: Jay Wang <wanjay@amazon.com>
+To: Alan Maguire <alan.maguire@oracle.com>, <bpf@vger.kernel.org>, "Alexei
+ Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+	"Andrii Nakryiko" <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+	"Kumar Kartikeya Dwivedi" <memxor@gmail.com>
+CC: Martin KaFai Lau <martin.lau@linux.dev>, Yonghong Song
+	<yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, Nathan Chancellor
+	<nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
+	<linux-kbuild@vger.kernel.org>, Luis Chamberlain <mcgrof@kernel.org>, "Petr
+ Pavlu" <petr.pavlu@suse.com>, <linux-modules@vger.kernel.org>, Arnd Bergmann
+	<arnd@arndb.de>, <linux-kernel@vger.kernel.org>, Hazem Mohamed Abuelfotoh
+	<abuehaze@amazon.com>, Bjoern Doebel <doebel@amazon.de>,
+	<jay.wang.upstream@gmail.com>
+Subject: Re: [PATCH bpf-next 0/6] bpf: make the vmlinux BTF an on-demand loadable module (CONFIG_DEBUG_INFO_BTF=m) to save ~5.4 MB memory
+Date: Fri, 25 Sep 2026 21:23:19 +0000
+Message-ID: <20260925212319.25401-1-wanjay@amazon.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <9cf62f86-0b7d-4175-8334-74493ea3b04c@oracle.com>
+References: <9cf62f86-0b7d-4175-8334-74493ea3b04c@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260925-ksyms-tune-v5-2-1f75ad0c321c@gmail.com>
-References: <20260925-ksyms-tune-v5-0-1f75ad0c321c@gmail.com>
-In-Reply-To: <20260925-ksyms-tune-v5-0-1f75ad0c321c@gmail.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Lorenzo Stoakes <ljs@kernel.org>, Kees Cook <kees@kernel.org>, 
- David Laight <david.laight.linux@gmail.com>, 
- Masahiro Yamada <masahiroy@kernel.org>, Jiri Olsa <olsajiri@gmail.com>, 
- linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
- bpf@vger.kernel.org, Jim Cromie <jim.cromie@gmail.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1790370996; l=5598;
- i=jim.cromie@gmail.com; s=20260203; h=from:subject:message-id;
- bh=I5eAsIUxlAO2WTgi4bmGLPeCWEGaAl1zgyePZxGBQ0U=;
- b=ALxz2R5w89spC2a8/SE0eZBjI/rejwJkvJSAPFiQ4rxotstp18KpHBZTDfKA9Zy6c3Gku0tEv
- ARbSV5kqLr0AsTY7h9VZGxXOZ8OrHI+KyJU6YEpqvKpJde0l9EYux0O
-X-Developer-Key: i=jim.cromie@gmail.com; a=ed25519;
- pk=C6E5ODlPQo7ZBynATXH9wg7K6HxP0pIXyf4s38Qw0XE=
-X-Endpoint-Received: by B4 Relay for jim.cromie@gmail.com/20260203 with
- auth_id=958
-X-Original-From: Jim Cromie <jim.cromie@gmail.com>
-Reply-To: jim.cromie@gmail.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D032UWB002.ant.amazon.com (10.13.139.190) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-From: Jim Cromie <jim.cromie@gmail.com>
+Thanks for the review, Alan.  v2 is out and addresses these:
+https://lore.kernel.org/bpf/20260925211314.5118-1-wanjay@amazon.com/
 
-kallsyms_lookup_names() resolves symbol names to addresses using a
-binary search over kallsyms_seqs_of_names[].  In baseline, each probe
-invokes get_symbol_offset() to find the symbol in kallsyms_names[].
-Because markers in kallsyms_markers[] are spaced every 256 symbols in
-address order, each probe must sequentially scan and decode ULEB128
-lengths across an average of 127.5 symbols from the nearest marker
-(~2,176 hops across a 17-step binary search).
+Answers inline.
 
-During bulk symbol resolution (e.g. BPF multi-kprobe and tracing-multi
-attach across tens of thousands of functions), this linear scan penalty
-compounds into substantial latency (~4.7 us to ~6.1 us per lookup).
+> I have a question about the approach here; my experience with using sysfs
+> with a dummy placeholder file which triggered on-demand module load when
+> accessed was it didn't work with sysfs interfaces because the file size needed
+> to be refreshed, and the reader would usually error out since it saw an
+> empty file and gave up reading. I wound up having to switch to using
+> kernfs to update size attributes on open such that the caller would see the
+> size change synchronously once the load completed. See patch 15 in the above
+> series for the details.
+>
+> It seems like you used a different approach here, and by storing the size
+> in the BTF metadata this problem was avoided. From the below it seems like
+> there are no first-caller issues from userspace (like if the first caller
+> does "bpftool btf dump file /sys/kernel/btf/vmlinux")?
 
-Increase the static marker density from 256:1 down to 16:1 (1 marker
-every 1 << 4 symbols):
+Right, that is the reason for .BTF.meta: the size is known at build time,
+so the file is created with its final size at boot and the load happens
+in read()/mmap().  No kernfs internals, no i_size update.
 
-0. Define KALLSYMS_MARKER_SHIFT as 4 in kernel/kallsyms_internal.h, with
-   a matching KALLSYMS_MARKER_MASK of 0x0F.  Guard kernel types so host
-   scripts/kallsyms.c can include this header directly as the single
-   symbolic source of truth.
+I have now tested exactly that with the in-tree bpftool (libbpf 1.8) as
+the first user on a fresh boot, nothing else having touched the BTF:
 
-1. In scripts/kallsyms.c, emit markers every
-   (1 << KALLSYMS_MARKER_SHIFT) symbols into kallsyms_markers[].  For a
-   typical kernel with ~184,000 symbols, this increases marker count
-   from 719 to 11,501 entries, adding only +42.2 KiB to write-protected
-   .rodata (0.002% of vmlinux).
+  bpftool btf dump file /sys/kernel/btf/vmlinux
+  bpftool btf list
 
-2. In kernel/kallsyms.c:get_symbol_offset(), compute marker offset via
-   pos >> KALLSYMS_MARKER_SHIFT and step through
-   pos & KALLSYMS_MARKER_MASK.  Because both are compile-time
-   constants, GCC emits single bit-shift and AND instructions with zero
-   division overhead.
+Both work and lsmod shows btf_vmlinux afterwards.  Same for libbpf-loaded
+programs as the first user: a global subprogram taking the context,
+bpf_snprintf_btf(), a CO-RE field read, and a kfunc of an out-of-tree
+module (below).
 
-This reduces the maximum sequential scan from 255 down to 15 symbols,
-and cuts the average scan from 127.5 down to 7.5 hops (a 17x reduction
-in sequential loop hops).  In-tree selftest measurements across all
-184,008 symbols show lookup latency dropping from 6,102 ns down to
-866 ns (a 7.0x speedup) with zero runtime memory allocation, zero RCU
-synchronization, and zero new user-facing APIs or Kconfig options.
+> Another issue; during boot, request_module can call back out to modprobe
+> and depending on where you are in the boot process, the module may not be
+> available due to filesystem not mounted yet etc. Maybe this just means that
+> btf_vmlinux.ko needs to be in the initramfs image? If that's the case, I
+> would suggest highlighting that in the CONFIG_DEBUG_INFO_BTF Kconfig description,
 
-Signed-off-by: Jim Cromie <jim.cromie@gmail.com>
----
-Changes in v5:
-- Replace dynamic 1:1 batch lookup index (kvmalloc, mutexes, RCU) with
-  static 16:1 marker density (KALLSYMS_MARKER_SHIFT 4) in .rodata
-  (addresses Kees Cook review).
-- Eliminate all dynamic RAM allocations, setup/teardown costs, and
-  external batch APIs.
----
- kernel/kallsyms.c          |  8 ++++----
- kernel/kallsyms_internal.h |  5 +++++
- scripts/kallsyms.c         | 14 +++++++++-----
- 3 files changed, 18 insertions(+), 9 deletions(-)
+Yes.  If request_module() fails the caller gets NULL, i.e. behaves as on a
+kernel without BTF, and the next user retries; nothing is cached.  So a
+program that needs kernel types before the root fs is mounted fails
+unless btf_vmlinux.ko is in the initramfs.  I have added a paragraph
+along the lines you suggest to the Kconfig help in v2.
 
-diff --git a/kernel/kallsyms.c b/kernel/kallsyms.c
-index d18d78e626db..91ced7aa797e 100644
---- a/kernel/kallsyms.c
-+++ b/kernel/kallsyms.c
-@@ -150,10 +150,10 @@ static unsigned int get_symbol_offset(unsigned long pos)
- 	int i, len;
- 
- 	/*
--	 * Use the closest marker we have. We have markers every 256 positions,
--	 * so that should be close enough.
-+	 * Use the closest marker we have. We have markers every
-+	 * (1 << KALLSYMS_MARKER_SHIFT) positions, so that should be close enough.
- 	 */
--	name = &kallsyms_names[kallsyms_markers[pos >> 8]];
-+	name = &kallsyms_names[kallsyms_markers[pos >> KALLSYMS_MARKER_SHIFT]];
- 
- 	/*
- 	 * Sequentially scan all the symbols up to the point we're searching
-@@ -161,7 +161,7 @@ static unsigned int get_symbol_offset(unsigned long pos)
- 	 * so we just need to add the len to the current pointer for every
- 	 * symbol we wish to skip.
- 	 */
--	for (i = 0; i < (pos & 0xFF); i++) {
-+	for (i = 0; i < (pos & KALLSYMS_MARKER_MASK); i++) {
- 		len = *name;
- 
- 		/*
-diff --git a/kernel/kallsyms_internal.h b/kernel/kallsyms_internal.h
-index 81a867dbe57d..3e6494b7dfc4 100644
---- a/kernel/kallsyms_internal.h
-+++ b/kernel/kallsyms_internal.h
-@@ -1,7 +1,11 @@
- /* SPDX-License-Identifier: GPL-2.0-only */
- #ifndef LINUX_KALLSYMS_INTERNAL_H_
- #define LINUX_KALLSYMS_INTERNAL_H_
-+#define KALLSYMS_MARKER_SHIFT 4  /* 16:1 sweet spot: +42 KiB .rodata, 17x fewer hops */
-+#define KALLSYMS_MARKER_SIZE  (1U << KALLSYMS_MARKER_SHIFT)
-+#define KALLSYMS_MARKER_MASK  (KALLSYMS_MARKER_SIZE - 1U)
- 
-+#ifdef __KERNEL__
- #include <linux/types.h>
- 
- extern const int kallsyms_offsets[];
-@@ -14,5 +18,6 @@ extern const u16 kallsyms_token_index[];
- 
- extern const unsigned int kallsyms_markers[];
- extern const u8 kallsyms_seqs_of_names[];
-+#endif /* __KERNEL__ */
- 
- #endif // LINUX_KALLSYMS_INTERNAL_H_
-diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-index 494852ade6d8..be42a9111350 100644
---- a/scripts/kallsyms.c
-+++ b/scripts/kallsyms.c
-@@ -29,6 +29,8 @@
- 
- #include <xalloc.h>
- 
-+#include "../kernel/kallsyms_internal.h"
-+
- #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
- 
- #define KSYM_NAME_LEN		512
-@@ -349,16 +351,18 @@ static void write_src(void)
- 	printf("\t.long\t%u\n", table_cnt);
- 	printf("\n");
- 
--	/* table of offset markers, that give the offset in the compressed stream
--	 * every 256 symbols */
--	markers_cnt = (table_cnt + 255) / 256;
-+	/*
-+	 * Table of offset markers, giving the offset in the compressed stream
-+	 * every (1 << KALLSYMS_MARKER_SHIFT) symbols.
-+	 */
-+	markers_cnt = (table_cnt + KALLSYMS_MARKER_MASK) >> KALLSYMS_MARKER_SHIFT;
- 	markers = xmalloc(sizeof(*markers) * markers_cnt);
- 
- 	output_label("kallsyms_names");
- 	off = 0;
- 	for (i = 0; i < table_cnt; i++) {
--		if ((i & 0xFF) == 0)
--			markers[i >> 8] = off;
-+		if ((i & KALLSYMS_MARKER_MASK) == 0)
-+			markers[i >> KALLSYMS_MARKER_SHIFT] = off;
- 		table[i]->seq = i;
- 
- 		/* There cannot be any symbol of length zero. */
+> Another concern to balance; embedded folks were interested in vmlinux
+> BTF as a module to limit on-disk footprint rather than (or likely as
+> well as) runtime memory; [...] If I'm following, the final vmlinux image that winds
+> up on disk doesn't contain the BTF section, right? If so that's great
+> news for them.
 
--- 
-2.55.0
+Right.  With =m v2 strips the BTF from vmlinux, so no boot image carries
+it; it only lives in btf_vmlinux.ko, which a system can also choose not
+to install.
 
+> And another thing I was wondering about - did you test with modules
+> containing a .BTF.base (built standalone via "make -C path2module")?
 
+Not in v1, thanks for asking.  Looking at that case showed a problem,
+fixed in v2: for a module with .BTF.base the raw .BTF is only valid
+against the distilled base and is rewritten in place when it is
+relocated, so it must not be served before that.  In v2 the sysfs file
+of such a module is still created at load time with its final size (the
+relocation only rewrites ids and string offsets), but its reader loads
+the vmlinux BTF and waits until this module's BTF is relocated and
+published before serving it; modules without .BTF.base, whose data is
+final, are served as before.
+
+Tested with an out-of-tree module that has a .BTF.base and registers a
+kfunc from its init, loaded before the vmlinux BTF: once the BTF is
+loaded it gets its id, relocated types and its kfunc, and a program
+calling that kfunc works.
+
+> What I meant by the hard part (aside from deferred handling which is hard
+> enough!) is that there is a conflict between the goal of saving memory and being
+> forced to allocate memory for module BTF for a deferred-load scheme like this.
+> [...]
+> CONFIG_DEBUG_INFO_BTF=y results in upfront allocation of memory for kernel and module BTF
+> CONFIG_DEBUG_INFO_BTF=m results in upfront allocation of memory for module BTF only
+
+Agreed, and v2 says so explicitly in the Kconfig help and the cover
+letter: the copy kept for a deferred module is the same copy
+btf_parse_module() makes with =y, so module BTF costs the same at the same
+time in both; the saving is the vmlinux BTF only.
+
+> It might be worth thinking about providing a means to control whether such
+> module allocations happen prior to vmlinux BTF loading for highly memory-constrained
+> systems. Anything delivering kfuncs etc should probably always allocate since it
+> constitutes core BPF infrastructure.
+
+Makes sense as a follow-up; I would rather not grow this series with it.
+The distinction you draw (keep it for modules that register kfuncs or
+struct_ops, make it optional otherwise) is what I would start from.
+
+Thanks,
+Jay
