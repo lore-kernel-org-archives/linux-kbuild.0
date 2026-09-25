@@ -1,152 +1,118 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from pdx-out-012.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-012.esa.us-west-2.outbound.mail-perimeter.amazon.com [35.162.73.231])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F9E74746A5;
-	Fri, 25 Sep 2026 22:55:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03F5F47A87A;
+	Fri, 25 Sep 2026 23:02:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.162.73.231
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790376931; cv=none; b=huRi7wuogRdVfPh4aZssihr+YsWAoLqwjsMYUU/bbRU5VX+bfzkmsHl3NYCEJqTxQiZozyVimCf0Rld1arKZR2j866maQk8zmSjLmiPyWlASEw3PNGvw2Miau1PDljon+XN24V+oOo54A29ZzIkLejEUxnMhCD7g66cPwPY0B/8=
+	t=1790377370; cv=none; b=aebwFObxV8ehSBnR3/H/7fzaqhTpGjMJTvZdXzK8kDWMDMwxF6FaA+T9P1i3WOVHmWHJ24PEmOXhSLc8DPRpvxSXow6XumGoQxPyOPvfrGuB0MiX3RCH9n+u+yprgsfjkJdbG1ZgztLSkC3lwZlGhlbO3l1hlMNstYKfr3mJldM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790376931; c=relaxed/simple;
-	bh=rNZqlsUwu5AcDqGGw2x6D5/p2VA46CHjbMEGjcmXtTQ=;
-	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
-	 References:Date:Message-Id; b=gFizgCmur5zN0z/qOKz+yrt/LEb9VSql0oLehzXJXhDOqYMvhFN5GNA2YNbQdMJ5nYBy/VeF5H33hwhdn+1rxt47oEySPgm3kg/LKupt7b/jnqYIz3fCaCS6p17hjj6yKL17Q9XZ96O8SaVAQ0kmez5wCq7BSAqphXFeDQfAAGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZXxJMxk6; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790377370; c=relaxed/simple;
+	bh=pdCv4UcozVHgKk7UfV9mEseJYHtwD2DHpqfJ6KA5iAA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HtgqpswV4ZpwGvtqP06MdM+8vxoZij2bXjK0+gy5bd+GuHoZF43njWNi81o9nldrg0y1DYrtukhCHRxT24z0cC5BgAielVCaxnyp9LxKA3unCTz/uFMrBuEUU1KzrGBKdXVF53kdIHyRBnP/Tw3VXJhcdJl8VCgWU9l08Wr59sM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=T4GZ8SF/; arc=none smtp.client-ip=35.162.73.231
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZXxJMxk6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D7681F000FF;
-	Fri, 25 Sep 2026 22:55:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790376930;
-	bh=ngLQQ0LePKEjAb+Y09tpTefMp22UVAjBFdJzUuRKoWg=;
-	h=Subject:From:To:Cc:In-Reply-To:References:Date;
-	b=ZXxJMxk6trS8DhqrV1VW1yHsBK2RGVCDOGwL4c/xCjjBEqxxIDicmlcW1ryfbVu2I
-	 y+xkcuVreApO/j4jOzDIpAmUxTOmpcGV8nvGgC2uxQfrjTdQiBg/sp+ylthYa5NAMQ
-	 efNbZ5OwWJzm5uHC/H7g/PQIrcylQqQJkyAXq+gsy/+DtgQxuboKOlIsLyQnpzRDxQ
-	 SqTMK3mlxr9u+lIq13Te+kkfmI+kgMVhwxPltvRtDU4P5hemyOtrfC5P4UAUqS8ixI
-	 XKso1KU6iNJ4GsVSbKcALYFk50CxzdiYcsbKYUYKlGwHm8bZgiazScNwmBhYii0gWi
-	 CR5FrBEaw6wQA==
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="T4GZ8SF/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1790377369; x=1821913369;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=JQe85Z5Rbqw6JLCH1J2snkDs7p4I536/WA8nqd/VrHE=;
+  b=T4GZ8SF/gXk2RAyzQYCar3tus70nIz2Br7YgLw4qvNnnOC6SUWAYJSt7
+   AxzA0ju3ggzi4B+zmKYW7wIXnwAJBk23kIxOhsNstVLpncGXn/rIjQD1D
+   bpMLb4ikJ6CxKXFWm8VpkRZ3jxmAzJsgC1aQFm5EPfUJuaN5qdK9FOGUZ
+   tQUREFI96NtH88cVdaaLp4c8z2zw49h2+/QVsnLj/hfBWrl8NynsnodBL
+   ysarWgbhLn0q/hDRpzedfNDQUqQlbsdAR8MbtV4vVawkk/LW2T5FETh9b
+   BW5u64r6+ArNoMJfNfsBLvbe0U/+Tjvb9fxllBWAQkrVi8+wcoBE4aqVS
+   g==;
+X-CSE-ConnectionGUID: 9BWfvgFKSs6c4sx0qwaFNA==
+X-CSE-MsgGUID: JIKwq5U2TnaeDi40RDQ9gw==
+X-IronPort-AV: E=Sophos;i="6.27,123,1787011200"; 
+   d="scan'208";a="29482109"
+Received: from ip-10-5-12-219.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.12.219])
+  by internal-pdx-out-012.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2026 23:02:48 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [205.251.233.178:8699]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.15.186:2525] with esmtp (Farcaster)
+ id 389bb488-efa7-4648-96b3-49db0e908d31; Fri, 25 Sep 2026 23:02:47 +0000 (UTC)
+X-Farcaster-Flow-ID: 389bb488-efa7-4648-96b3-49db0e908d31
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.49;
+ Fri, 25 Sep 2026 23:02:47 +0000
+Received: from dev-dsk-wanjay-2c-d25651b4.us-west-2.amazon.com (172.19.198.4)
+ by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.49;
+ Fri, 25 Sep 2026 23:02:47 +0000
+From: Jay Wang <wanjay@amazon.com>
+To: <bot+bpf-ci@kernel.org>, <bpf@vger.kernel.org>, <ast@kernel.org>,
+	<daniel@iogearbox.net>, <andrii@kernel.org>, <eddyz87@gmail.com>,
+	<memxor@gmail.com>
+CC: <alan.maguire@oracle.com>, <martin.lau@linux.dev>,
+	<yonghong.song@linux.dev>, <nathan@kernel.org>, <nsc@kernel.org>,
+	<linux-kbuild@vger.kernel.org>, <mcgrof@kernel.org>, <petr.pavlu@suse.com>,
+	<linux-modules@vger.kernel.org>, <arnd@arndb.de>,
+	<linux-kernel@vger.kernel.org>, <abuehaze@amazon.com>, <doebel@amazon.de>,
+	<jay.wang.upstream@gmail.com>, <martin.lau@kernel.org>, <mason@kernel.org>,
+	<ihor.solodrai@linux.dev>
+Subject: Re: [PATCH bpf-next 3/6] bpf: fetch the vmlinux BTF where kernel types enter a program
+Date: Fri, 25 Sep 2026 23:02:46 +0000
+Message-ID: <20260925230246.33537-1-wanjay@amazon.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <39f6151d364d966f70b7802cfd4bbca15734a7945478265ecc681f1779e50abb@mail.kernel.org>
+References: <39f6151d364d966f70b7802cfd4bbca15734a7945478265ecc681f1779e50abb@mail.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH] clang-tools: Decode dollar escaping in compile
- commands
-From: Nathan Chancellor <nathan@kernel.org>
-To: houtinghang <ue081723@gmail.com>
-Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
- llvm@lists.linux.dev, linux-kbuild@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Nick Desaulniers <ndesaulniers@google.com>, 
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>
-In-Reply-To: <179017625539.54044.4066773916071097354@gmail.com>
-References: <179017625539.54044.4066773916071097354@gmail.com>
-Date: Fri, 25 Sep 2026 23:55:24 +0100
-Message-Id: <179037692488.3985470.2852393421034692930.b4-reply@b4>
-X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4655; i=nathan@kernel.org;
- h=from:subject:message-id; bh=rNZqlsUwu5AcDqGGw2x6D5/p2VA46CHjbMEGjcmXtTQ=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDFnbft91fxGucV39XkgHC0ub5xsznWBTznctRrY+mY7SY
- nO9xI07SlkYxLgYZMUUWaofqx43NJxzlvHGqUkwc1iZQIYwcHEKwEQWvmP47xiuqdrwe6//Bq7T
- i+7+Lf5V/iYxzDhmn4j8xp+9hWufOzH809gmqWwv2nw4e90dDfeS5u3aP2wT+mfcOBaT+WXSnN9
- h/AA=
-X-Developer-Key: i=nathan@kernel.org; a=openpgp;
- fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D038UWC001.ant.amazon.com (10.13.139.213) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-On 2026-09-23 23:10 +0800, houtinghang wrote:
-> Kbuild doubles dollar signs when saving commands in .cmd files, but
-> process_line() only decodes $(pound). Consequently, the compilation
-> database retains doubled dollar signs in compiler arguments. It also
+Addressed since v2; the current version is v3 (patch 3/9):
+https://lore.kernel.org/bpf/20260925224229.1850-1-wanjay@amazon.com/
 
-While I agree that '$$' should be handled like '$(pound)', I suspect it
-is likely not a problem in practice since most commands that appear to
-use '$$' are for generated files, which should not matter for
-compile_commands.json but I might be mistaken.
+Two of these are real gaps in the set of fetch sites and are
+fixed:
 
-> corrupts a literal $(pound), saved as $$(pound), into $#.
+- bpf_ctx_convert.t: the program context types are kernel types too, and
+  btf_prepare_func_args() (global subprogs taking the context) and
+  btf_translate_to_vmlinux() (ctx access of tracing/EXT programs) read
+  the table without anything having fetched the BTF.  It is now fetched
+  in the table's readers.  Tested with a socket filter whose global
+  subprogram takes struct __sk_buff * as the first user on a fresh boot.
 
-How would this happen, aside from the contrived test?
+- bpf_snprintf_btf()/bpf_seq_printf_btf(): the type id travels inside
+  struct btf_ptr, so the arg/ret type check does not see it.  The two
+  helpers are now named explicitly.  Tested with a raw_tp program
+  calling bpf_snprintf_btf() as the first user.
 
-> Decode $$ and $(pound) in a single pass, matching how Make reads the
-> saved command. A single pass avoids interpreting a decoded dollar sign
-> as the start of another escape.
-> 
-> Add CLI regression coverage for ordinary text, dollar signs, hash signs
-> and adjacent escapes. Four of the six cases fail before this change;
-> all six pass after it. The expected values were also checked against
-> GNU Make using scripts/Kbuild.include.
-> 
-> Fixes: b30204640192 ("scripts: add a tool to produce a compile_commands.json file")
-> Assisted-by: LLM
-> Signed-off-by: houtinghang <ue081723@gmail.com>
-> ---
-> Testing on Ubuntu with GCC 13.3.0, Clang/clangd 18.1.3 and Make 4.3:
-> - x86-64 GCC, x86-64 Clang and ARM64 Clang defconfig builds of the kernel
->   image and configured modules passed without compiler warnings.
-> - All three native make compile_commands.json targets passed.
-> - 17,084 ordinary compilation database entries match the original tool.
-> - 432 Kbuild/CLI/shell/compiler cases produced identical objects.
-> - 259 mixed escape cases agree with Make for each compiler test run.
-> - 22 clangd macro checks and real x86/ARM64 kernel checks passed.
-> - The original tool fails the integration and clangd negative controls.
-> - Six CLI cases pass on Linux/Python 3.12.3 and Windows/Python 3.13.
-> 
-> AI disclosure: Codex identified the issue, wrote the fix and regression
-> test, verified CLI output and Make semantics, reviewed the diff, and
-> drafted this patch after a request to find another Linux kernel bug.
-> 
->  scripts/clang-tools/gen_compile_commands.py   | 10 ++--
->  .../clang-tools/gen_compile_commands_test.py  | 47 +++++++++++++++++++
->  2 files changed, 52 insertions(+), 5 deletions(-)
->  create mode 100644 scripts/clang-tools/gen_compile_commands_test.py
-> 
-> diff --git a/scripts/clang-tools/gen_compile_commands.py b/scripts/clang-tools/gen_compile_commands.py
-> index 8d14b81..d11d15b 100755
-> --- a/scripts/clang-tools/gen_compile_commands.py
-> +++ b/scripts/clang-tools/gen_compile_commands.py
-> @@ -166,11 +166,11 @@ def process_line(root_directory, command_prefix, file_path):
->          ValueError: Could not find the extracted file based on file_path and
->              root_directory or file_directory.
->      """
-> -    # The .cmd files are intended to be included directly by Make, so they
-> -    # escape the pound sign '#' as '$(pound)'. The compile_commands.json file
-> -    # is not interepreted by Make, so this code replaces the escaped version
-> -    # with '#'.
-> -    prefix = command_prefix.replace('$(pound)', '#')
-> +    # Undo the escaping performed by make-cmd in scripts/Kbuild.include.
-> +    # Decode both escapes in one pass to preserve a literal '$(pound)'.
+Also addressed:
 
-I think the original comment is more informative. Please just extend it.
+- The IS_ERR(btf_vmlinux) check in bpf_check() now reads through
+  bpf_peek_btf_vmlinux().  With =m a failed parse is not stored (below),
+  so it only fires for =y, where the BTF is parsed at boot as before;
+  with =m each fetch site reports the failure itself.
+- btf_prepare_func_args() and btf_check_kfunc_name() check the result
+  of bpf_get_btf_vmlinux() (pre-existing, but cheap).
+- A failed parse is no longer cached with =m; the payload was verified
+  against the kernel when the module loaded, so a failure there is a
+  resource problem and the next caller retries.  =y keeps caching, as
+  before: a parse failure there means the build is broken.
 
-  # The .cmd files are intended to be included directly by Make, so they
-  # escape the literal '#' as '$(pound)' and the literal '$' as '$$'. The
-  # compile_commands.json file is not interepreted by Make, so undo this
-  # transformation.
+Not a bug:
 
-> +    prefix = re.sub(r'\$\$|\$\(pound\)',
-> +                    lambda match: '$' if match.group() == '$$' else '#',
-> +                    command_prefix)
+- bpf_verifier_lock vs request_module(): the lock is only taken for
+  unprivileged programs, and none of the fetch sites is reachable from
+  one: kfuncs, ksyms, map pointer access and the BTF helpers all need
+  privileged program types, and the context-type path needs a global
+  subprogram, i.e. program BTF, which BPF_BTF_LOAD only accepts with
+  CAP_BPF.  modprobe does not load BPF programs.
 
-I think it would be more efficient and readable to just use a double
-.replace() over re.sub() here, these strings are not that long.
-
-  prefix = command_prefix.replace('$(pound)', '#').replace('$$', '$')
-
->      # Return the canonical path, eliminating any symbolic links encountered in the path.
->      abs_path = os.path.realpath(os.path.join(root_directory, file_path))
-> diff --git a/scripts/clang-tools/gen_compile_commands_test.py b/scripts/clang-tools/gen_compile_commands_test.py
-> new file mode 100644
-> index 0000000..fe259af
-> --- /dev/null
-> +++ b/scripts/clang-tools/gen_compile_commands_test.py
-
-Same comment on an earlier change, I don't think this test adds much to
-belong in the tree so please drop it.
-
--- 
-Cheers,
-Nathan
-
+Jay
