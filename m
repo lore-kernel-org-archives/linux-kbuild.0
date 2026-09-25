@@ -1,156 +1,107 @@
-Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3542C486E62
-	for <linux-kbuild@vger.kernel.org>; Fri, 25 Sep 2026 22:19:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE8A3F8EB7;
+	Fri, 25 Sep 2026 22:34:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790374765; cv=none; b=kklhaQugA9OaZNTLQyxK02bhFgw588W3qMqs0kDpvu07eRJZzQA5Zifq2ogBD7hI3kE0XtTwUTxm/LMvb/Iw8tj+jegOhkOlyWODi8b6VvgKVafJKVEQPpKLRe3ZfaruH2FH8Vp0x2PMTxUdFVgoPA9cD66JhpgzLyKSqbwbAJI=
+	t=1790375662; cv=none; b=bZo0tFI6U8K2NyqICSXIUSzWYi2VzyDP/gnCJqttZBeOwlMmc94I0SdCRdUKGaq6Ksu9+PJBrwFfDAqgkqLooNFVxKe9YSRt5igK0/zTzSv5O1aTRKZkeV3EFRug6qwWeoewZqK+Ya8wrfBOJI9PMPgTNxrQkY59Ios0LcX8bWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790374765; c=relaxed/simple;
-	bh=152hnQ82QfJ0LW+Dm6mPNkhaiXoMmZUG70QpGAGRnCo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pvDdIsRiwHB4nMCC6DFo7psZGXtCPxASOOsAXc8xun3pFmWEWmNqv2LjpFSMIfi2WKbrJZWRNK8oMHNeYHhdv1kHNDO9eJDg/PedRaZ5PpRz6XLWlGoNLjHnkPYY07/loz6YjQ9Lt2224RkotSv6jWsIQqCj3xKMYdzIerErBKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xf4uHEk4; arc=none smtp.client-ip=74.125.225.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1790375662; c=relaxed/simple;
+	bh=tX1ZUsz/e3rGKGnfkJVQfG1XgBOccNslQa8RBduFZ2A=;
+	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
+	 References:Date:Message-Id; b=U3i01fPN+0ekbjRf4f2cCjDFRCprpk+yCexEE8YSFLGYp9bRlx5yPaqdmcbaHbJ0lHfFpU6oawwUDF6BDd2qorzIYENh7qwJUPb9y4FUBGB3HeNn8q2qWP2JG8avGhElSznVo5rkkIz23sCB+5loDtTeFsZMV6IYjGsRxC/IFCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S07rFfqi; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xf4uHEk4"
-Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49ccff31419so12420825e9.3
-        for <linux-kbuild@vger.kernel.org>; Fri, 25 Sep 2026 15:19:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790374761; x=1790979561; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=wZ13srzmxe7uWv22g+0yXS08pgsXrImaRy4OqvYDzm0=;
-        b=Xf4uHEk4NuRUeWii1BKdAA2xpt/Auoam8PYnvyllKTcG6OipsHyIZG2v60/IN+pLlo
-         PorljFt2s1kvWCH/KaW/HSlgClT1rP/8QCuNBwZn52QGqYZ4Lmqd8zM3xT80x1Iypl+R
-         iJkF/oMxE+4SGlF2twZn8Inm3p6HeJr3uL8y+bctYp3ZscOJMfUoT6Mzq+XoCT0RUim8
-         9FSjAgKHdErgVqi/FjOs1zY1AdFxXwaLN06VJuy8f025CapQ9BwZuLH8HanK51yEldvB
-         Ut2TWs/NOKdsEoQXcTxUw8q9vdUjRRfi1gcD/BPPiX9AZTRXrXe83IFfZdRidv8Y+Hn6
-         jObQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790374761; x=1790979561;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=wZ13srzmxe7uWv22g+0yXS08pgsXrImaRy4OqvYDzm0=;
-        b=MzxUiv511d22VVw/SlQG41CTPFjFQcUnjuDyjLgQviemj551TNA8GrajPewhmG86iZ
-         Itijar//spSXeFxVgfNfIps9rrfy2TkyPHVEVRbcObjx0IuP+9mNGcG2UJwCZWWEOXwn
-         wn85R+2X4Lp6gkvxv26aZjUQt4w94lldKcMnoiLk/m66j9mq1NqSsdoowOWvTSORbnM2
-         R01dz+Z+uvrLJbA64lAW7yMIj3mmxb8ac5aKZWCXJlZl1RDmhQV70vDfujzlxlo7DSCH
-         s12+zbhS0vZUWfOA+co9FZkXarfkOIcVBqUxkqYkQXcKBxwkTkuNRuDrztxrtPwzqj4G
-         OBYA==
-X-Forwarded-Encrypted: i=1; AKwUvBxBtAjbZLOwJsawKENdH3RR0bdCDy32NCwnTLsX7JhEQS/wdRPN2uicdvSSxAfHas5ORR9dS8XZUnArvLU=@vger.kernel.org
-X-Gm-Message-State: AFuF++lIg4WjRiJRRznqyZeVWyiMYEqKL9A7Jmdto+ipmjE6ReFL4ogg
-	l46NpNozTmuzMvcK+/QMe4mr4PoXKCrXm5EmKDgr1hDUfVcsxcfBw5Yz
-X-Gm-Gg: AYBFou3kr6QwfBVpiAy+sadkJjvN2e3BDQ2hvmHz1drGiWvqDiF4LpV2B+qmxka+ePJ
-	H5jBMH9BnDFiAd/Pn/u6MWd56Y8GrUpXJLuxvJK+90HJShV1al4ezZmHtMT2L1mPdquh5bnxc3t
-	KENeC2xlwIvkO8HP5cux5aWdmpQVLfTRnME04+ver8nL5nZ37fP4hcqwuOathpFnVg3H/E5n4OD
-	4yZDct88CFF16OqgNgO84l8b9ugeHjRQ9sQV3xn7cPkDsA0u8c0NOe8nCRhHBtVs28uG87eruoe
-	R0ovbRuNmMi4Os1QuGT7v9YlU2HvghVXfVZ7nfwCG7jDkTN7Q38bUAjudeMaFiQSxYxIagUqrUY
-	hvsY8LQ/CC7Fiuxgqnhk2V/uOxa/zY0biCKNNuKAx9kDlE2Q0K1fzcr9kPnDsKUh3Nl4Yqxlmj9
-	XDL38bxqbD0ik1LOmWeQSkDAnrF6ntEj9jyjnG+Zc2bgGlX8d9AnLXNREeWOX/OkrzD7aGzwupq
-	Z299G7r3sm5Mm8SDlGk/IWbzl1iHuWMcdBfVoYRF9lwzN2EhALbpivOyMcOtjCpq4D4C/J6+foo
-	XQU=
-X-Received: by 2002:a05:600c:6287:b0:49d:827:e5b6 with SMTP id 5b1f17b1804b1-49fe7babaadmr113896275e9.20.1790374760917;
-        Fri, 25 Sep 2026 15:19:20 -0700 (PDT)
-Received: from ?IPV6:2a02:2149:8bb5:f00:90c3:8a8a:2e7b:7fa0? ([2a02:2149:8bb5:f00:90c3:8a8a:2e7b:7fa0])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4887a354c47sm10464218f8f.15.2026.09.25.15.19.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Sep 2026 15:19:20 -0700 (PDT)
-Sender: Julian Braha <julian.braha@gmail.com>
-Message-ID: <9f0af6b6-bf78-4f4f-96c1-7e08d574b905@gmail.com>
-Date: Fri, 25 Sep 2026 23:19:19 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S07rFfqi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD8531F000FF;
+	Fri, 25 Sep 2026 22:34:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790375661;
+	bh=aITeuYia8itF4SMTQUZnXmogWzeqC/Cn61W96CfNPLs=;
+	h=Subject:From:To:Cc:In-Reply-To:References:Date;
+	b=S07rFfqi+H+8UNNSCOjpX0krnknUgrcRQGjE4D1LGyV1XWXKQjDQwe+MY2KN+cfUw
+	 ZRwvDbwvE8lSobwoDwRWk6XB2q9S/9LbXaDhf+lccJp2Tzt0UGD+gaxEWKl2uh8RqA
+	 NlcmJT0p8g4+g7ZICepgQ4zrm2cKRMo/Yxw4mHmR6mPB4Cc76ZzDGqZXiQKYFUpI/g
+	 NAJS8iQQTCoqban+Wrur77C0vShFn/29hG4C/TF1QLlK7OL9PAby9HiT+aePd95k2R
+	 xkD4Yz/mDHGwFPQtTTcTykgdmj/CoQqIYHRoJ5OhXyon3PYvNCPOc+ZhrdWdXRvCuZ
+	 a2h+jpvhv1xqA==
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/4] kconfig: tests: Reset KCONFIG_WARN_CHANGED_INPUT by
- default
-To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
-Cc: Pengpeng Hou <pengpeng@iscas.ac.cn>, Ulf Magnusson <ulfalizer@gmail.com>,
- Masahiro Yamada <yamada.masahiro@socionext.com>,
- linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260917-kconfig-tests-minor-updates-v1-0-286e5c985244@fritz.com>
- <20260917-kconfig-tests-minor-updates-v1-1-286e5c985244@fritz.com>
- <a1efc002-c34b-43a4-be02-ff4746d13241@gmail.com> <arTSvcwLenaZwKm7@levanger>
- <179036642082.3653489.376583884931759728.b4-reply@b4>
-Content-Language: en-US
-From: Julian Braha <julianbraha@gmail.com>
-In-Reply-To: <179036642082.3653489.376583884931759728.b4-reply@b4>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH] clang-tools: Import os for broken pipe handling
+From: Nathan Chancellor <nathan@kernel.org>
+To: houtinghang <ue081723@gmail.com>
+Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+ llvm@lists.linux.dev, linux-kbuild@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Nick Desaulniers <ndesaulniers@google.com>, 
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>
+In-Reply-To: <179017337986.52388.7943687183785012868@gmail.com>
+References: <179017337986.52388.7943687183785012868@gmail.com>
+Date: Fri, 25 Sep 2026 23:34:15 +0100
+Message-Id: <179037565553.3985470.12035061965740287126.b4-reply@b4>
+X-Mailer: b4 0.17-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2132; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=tX1ZUsz/e3rGKGnfkJVQfG1XgBOccNslQa8RBduFZ2A=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDFnbvj0vfRZrfvFE58VpKz/OOVEm92/xwUWmZW9mbv1Tv
+ it94dfuHR2lLAxiXAyyYoos1Y9VjxsazjnLeOPUJJg5rEwgQxi4OAVgIodlGP7HSLx/37XY5/q1
+ Ywd0Xugxvri0rW/y/BMrOQ7JCT4OXLfNiuE3q6q0cJbuHcODM9/XBf8KZK78kPaBk9d+6cPvR5b
+ PlNrGCwA=
+X-Developer-Key: i=nathan@kernel.org; a=openpgp;
+ fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-On 9/25/26 21:00, Nathan Chancellor wrote:
-> On 2026-09-24 09:35 +0200, Nicolas Schier wrote:
->> On Sat, Sep 19, 2026 at 06:29:39PM +0100, Julian Braha wrote:
->>> On 9/17/26 14:38, Nicolas Schier wrote:
->>>> Reset KCONFIG_WARN_CHANGED_INPUT by default for all kconfig tests but
->>>> those which set it explicitly.
->>>>
->>>> This fixes the 'warn_changed_input' test on systems with
->>>> KCONFIG_WARN_CHANGED_INPUT=1 and ensures a cleaner test environment.
->>>>
->>>> Fixes: 645323a7f4e5 ("kconfig: add optional warnings for changed input values")
->>>> Signed-off-by: Nicolas Schier <n.schier@fritz.com>
->>>> ---
->>>>  scripts/kconfig/tests/conftest.py | 8 ++++++++
->>>>  1 file changed, 8 insertions(+)
->>>>
->>>> diff --git a/scripts/kconfig/tests/conftest.py b/scripts/kconfig/tests/conftest.py
->>>> index 66f95e4ed58c..e92f0cf1421a 100644
->>>> --- a/scripts/kconfig/tests/conftest.py
->>>> +++ b/scripts/kconfig/tests/conftest.py
->>>> @@ -34,6 +34,9 @@ class Conf:
->>>>          """
->>>>          # the directory of the test being run
->>>>          self._test_dir = os.path.dirname(str(request.fspath))
->>>> +        self.default_env = {
->>>> +            "KCONFIG_WARN_CHANGED_INPUT": "",
->>>> +        }
->>>>
->>>>      # runners
->>>>      def _run_conf(self, mode, dot_config=None, out_file='.config',
->>>> @@ -57,6 +60,11 @@ class Conf:
->>>>          # Override 'srctree' environment to make the test as the top directory
->>>>          extra_env['srctree'] = self._test_dir
->>>>
->>>> +        # Set default environment variables, if not set by caller
->>>> +        for var in self.default_env:
->>>> +            if not var in extra_env:
->>>> +                extra_env[var] = self.default_env[var]
->>> Maybe it makes more sense to have the tests ignore users' env vars if
->>> they would cause tests to fail? For example, this recent patch
->>> explicitly unsets the KCONFIG_WERROR flag:
->>> https://lore.kernel.org/linux-kbuild/4d1eee3a-
->>> a5f9-467e-880e-4f2815851b09@gmail.com/T/
->>> #m25be9ad4d5e62956c5f98759398f91a555afb4df
->> Good point, but I am not sure, if we really should ignore all of the
->> user's environment.  Maybe it's better for now, to just reset all
->> environment variables that start with KCONFIG_ and KBUILD_ ?
-> Given these are Kconfig tests, we could probaby just ignore KCONFIG_, I
-> don't see any instances of KBUILD_ within scripts/kconfig outside of the
-> Makefile. We could do both anyways and just adapt based on reports
-> though, I don't really have a strong opinion on that though.
+On 2026-09-23 22:22 +0800, houtinghang wrote:
+> The BrokenPipeError handler in run-clang-tools.py calls os.open() and
+> os.dup2() without importing os. When the analysis pool raises this
+> exception, the handler raises NameError instead of redirecting stdout
+> and exiting with status 1.
+> 
+> Import os and add a regression test that injects BrokenPipeError from
+> Pool.map(), then checks the redirection and exit status.
+> 
+> Fixes: 87c7ee67deb7 ("scripts: handle BrokenPipeError for python scripts")
+> Assisted-by: LLM
+> Signed-off-by: houtinghang <ue081723@gmail.com>
+> ---
+> Testing: python scripts/clang-tools/run-clang-tools_test.py -v
+> The test fails before the import with NameError and passes after it.
+> Tested with Python 3.13 on Windows using exception injection; no complete
+> kernel build or real clang-tidy pipeline test was performed.
+> 
+> AI disclosure: Codex found the missing import, wrote the fix and test,
+> ran the test, reviewed the diff, and drafted this message in response to
+> a request to find, fix, review and submit a Linux kernel bug.
+> 
+>  scripts/clang-tools/run-clang-tools.py      |  1 +
+>  scripts/clang-tools/run-clang-tools_test.py | 41 +++++++++++++++++++++
+>  2 files changed, 42 insertions(+)
+>  create mode 100644 scripts/clang-tools/run-clang-tools_test.py
+> 
+> diff --git a/scripts/clang-tools/run-clang-tools.py b/scripts/clang-tools/run-clang-tools.py
+> index e78be82..79d58b3 100755
+> --- a/scripts/clang-tools/run-clang-tools.py
+> +++ b/scripts/clang-tools/run-clang-tools.py
+> @@ -12,6 +12,7 @@ compile_commands.json.
+>  import argparse
+>  import json
+>  import multiprocessing
+> +import os
+>  import subprocess
+>  import sys
+>  
+> diff --git a/scripts/clang-tools/run-clang-tools_test.py b/scripts/clang-tools/run-clang-tools_test.py
 
-Yeah I agree with this, since I would expect only KCONFIG_* to have an
-effect on the Kconfig tests.
+The change to run-clang-tools.py is obviously correct but I am not sure
+this test really adds much other than noise. Please drop it and resend
+with an adjusted commit message. Additionally, please adjust your name
+in the signoff to be a "known identity" per the Documentation.
 
-And after digging into this, it seems KBUILD_EXTRA_WARN does set
-KCONFIG_WERROR=1, but as long as we're clearing KCONFIG_WERROR, it won't
-matter.
-
-Kconfig also has the 'CONFIG_' flag, which (if set) would break
-several tests, but the makefile is already clearing it for the
-testconfig target anyway.
-
-- Julian Braha
-
+-- 
+Cheers,
+Nathan
 
