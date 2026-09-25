@@ -1,118 +1,218 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx2-f41.google.com (mail-yx2-f41.google.com [74.125.224.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EC8630EF6C;
-	Fri, 25 Sep 2026 20:00:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790366433; cv=none; b=UpBKe9+a6D1g3QVfyMuLL7lfoSFcj139HKyKlud73195zmCZijRvQYdbTel/Rm1FvGuQumL+yfs4Z4PH9ZdLnJaby3DEYnR67F0BToWnUXZdpmoLd7SCNy61IP0XBMsc21KvsAJiB03lgZdq7BcRmSlcDr/ImPclCV6GRrUVJzg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790366433; c=relaxed/simple;
-	bh=TZ/jYkQEQkYrb4voHmctluCqEH+VoM9eratR6lsHly8=;
-	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
-	 References:Date:Message-Id; b=HwSI6ucQL0jdYQo5SjLtL7gFmTxjYMm7ynOX6i1ykqIkJR9onkejjvyyHCnaHljhC6fZ+eBjihF5LGTQrbiwPUciqgEln1zMSI523Ps1VhKwOI9LWMVWw3ElhL4LZZMsQiDkMElB5UihYZ2QrLnXGtYKxDazc3UzxoTxxVhTnyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E0R04JBl; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D88E44F55AF
+	for <linux-kbuild@vger.kernel.org>; Fri, 25 Sep 2026 20:31:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.169
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790368287; cv=pass; b=EzA1MJTZtP1b62jTiGM3QiqMZ9WGYqKXmXRBySm4IhIi/lArtSWNyrzycEijCNm4O7/dNR1ZZsOrFw/QaAkchbC6pIexO8TaL52s/MwUgFY/S2AwOMXXf5VzD++hn17YYHmE0wp9QfHiNy+o1LtSRcp2mkz4f5XxhJ2MuFi4znY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790368287; c=relaxed/simple;
+	bh=i8K2V7iauqRYBnywpRsfGwdqYCZfWv4UWx7sJDax4N8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=B2XnTbfLaiKR/uuFOuDbOP47kuk5HE42GoVaR3XFZHbXimS2lqaE3MSCOFgGWH+Hk5ZwjZgzhjHw2EuSMFkfcLYoCmV7K8V5UMpfj5tF7BdWLKjh6bGiPpYnB3ycUJ5vB8sZFl2ACaQmzuVhSfsKXi//bVOKLNSpTaEdOk7WUMw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TjpNXmLz; arc=pass smtp.client-ip=74.125.224.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E0R04JBl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C62DF1F000FF;
-	Fri, 25 Sep 2026 20:00:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790366431;
-	bh=Bq/9Sjwl3fVjCD+ItDEtDoElofLtRAAjBrLkJknNdFQ=;
-	h=Subject:From:To:Cc:In-Reply-To:References:Date;
-	b=E0R04JBlyqh3KtOFH7YC7oJxFvyA4FzxHpr6BW2dkrfFmEYaSxNiu7lEuy3vXrfzi
-	 f9tumIAdUJX4lH3fSjPfFK8qodZ67xKuA5Y6S9tuYtfREVX0aOXwwsEpIlzGPzUdIS
-	 9tICWRxb91nS3P0+1OjYb/HQ3z5OfUtBIVEXQ2GdmgirOjG4GIQ5hhuMDJDT85al5X
-	 lWCybM722YU4Yy8fC0e0BXTLUCWVDdHogrY9GtdxfHUa/QYRZfZNyBUShLnwN4D8WU
-	 9ylxNlHvVW/+eMOiMjD5VxV2vQBZBEXg+zQHNDHMGvbaXAhhs0aYF2Pj91dxKvK3AO
-	 PhvgDIUs2UPag==
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TjpNXmLz"
+Received: by mail-yx2-f41.google.com with SMTP id 956f58d0204a3-67409747ac3so1172361d50.3
+        for <linux-kbuild@vger.kernel.org>; Fri, 25 Sep 2026 13:31:23 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1790368282; cv=none;
+        d=google.com; s=arc-20260327;
+        b=Ggrhbf7YklGEnsLT2MiNP9FGgqoBivpNYd5BdoUDWLewRWt4YQRaVcOLbbjefGYTOA
+         BprA/q6bzVCswVvTK2sMOwUKboqXKqsKbf+by2P7LIsv84IjH8A1YAVT994TDDF6ealM
+         yTK1Znfzxu7vXquv8a2PqgqbO6NksMzxB0H8tYD/whg1winl86tzN3pqrGl2JnjNwy7s
+         6asVkpbMtBAOCbKWiPyVWr2E9eRgULizJ2DWVPEDA3Ur5G27uSaikSjskf5HJJ6PVEzT
+         ZdmcGaBXLJWaZj94gaROLnleIbV5v/M0MfigqRMsFHL5w1xSvbWHEtP1taSmpAJVrOVx
+         jKMw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=noxPgsc3ymzPUXdD7j20u0RQJiwVbYzVMSbEnyT4ByQ=;
+        fh=MCL8pzP8ckjic7vQ4dDMLoZiZskda7RrZWarZeJ8vYE=;
+        b=ch2q+qSLGYjTCCW1AEylITVL8yTkGm2bmnVCCwX/fD176wG24ZXdWIU68X+mplg3uC
+         jnTwIeIOek3VTsYWV8UEVk8ggvr2VyRuItA4M2g12yq0MDEUtfeppqaRZhAW1LtH5h/Y
+         fbAAQ/1ob60DNDerV3Fo4pXCC1CAb6fZMjrSin5mfeikliZvsxcjjkeWLuxQcZoV4J/5
+         y59anrz3YRzcVArXVvnhhUbMt1KWRK6fPSF5fjv6HRZb3fMyFca2XFhPT+8mXpENPGTQ
+         jTUMZiEKbXKF+0YtWDhTxnhCTOkT6N1UbsUrKWVGlH/3VxG5OwEmbRits2oLTJDRdfzn
+         EQTg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1790368282; x=1790973082; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=noxPgsc3ymzPUXdD7j20u0RQJiwVbYzVMSbEnyT4ByQ=;
+        b=TjpNXmLzBaIdJEpWXZQ+rE33LSI7Ijg4oqvYvQ8zcO1X4TIybbM9R7tW+Rx6PJ94e6
+         VL9xrMXYP5AoQ+b2+Lvexr8ZUqvzm5VAO32nn5LsfFgf7KyxWMiL3fwwKV2VAF44BJ25
+         /3ZuVluFlCo490TVbBuLDq0x7fEwGBek7zym35Z9sHhXJ9/aIGj0NNK5WaxUMLABOtuy
+         PaTWKoHMvq8svAdwg2t14P+TNeADlcXCbREq4dN0mDj/eq7kE8QdAwzMSbdAT13vDivf
+         VrMILSLZSdZiBeMumuRGXPqK2VGB8kzp4kE3GIGtqSkT407KGvLiHAm/oVl/92qqPuzP
+         cVww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790368282; x=1790973082;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=noxPgsc3ymzPUXdD7j20u0RQJiwVbYzVMSbEnyT4ByQ=;
+        b=RLOFTFIviBWDhudORZzShQ5gfFcMjMeMIMG7jv44SxvLAiBUbRbQeuJ2PQxVoNQczc
+         ZDCffPiYKUrYErIvagpcr+FyzqkqcryEJZAkI+EeOrl0iQIvP3Dncb21qf/dmjs4U7gB
+         OHqpvFyAgtuBjdiZeLi+UxYvkyIDN0HfSXQBzbMXpelDgirA+YqnWWcO17lQHLfBWquJ
+         E1AQ41rCAbr3m4xF5gN64EV+TYrN2rkBDIVgf0eBqLlP+1npwc32vdxPNxrg/Z0MDUlU
+         DnQ4JQbIdTt7MdNpAYLFJNz667xpNchPs2IOAxRFiYhjdrJGhEsNxtxvytojKJNWbl6I
+         oUOg==
+X-Forwarded-Encrypted: i=1; AKwUvByaDg8kOnqYWc8fhsqGpXMHYHZTirQfcDNXqIf0knBUl+jDEFwvsR8eTTZWKXjVowwtJa1gjVrfoSUEvvk=@vger.kernel.org
+X-Gm-Message-State: AFuF++nb3f8zrXDY04SeZHEJprm/4Py9yNvijX9e9xmejlAwmkVR0Efh
+	WDov+Mc4DmZOZKTlPMAoTVDI4OHRwtdzpdWUc1p5VxgMBefoXFxrUuwujkZ/yrv2E5W/MufGrX/
+	tNj0uf2ni36DC1lQjl65s8STSQUWfYTc=
+X-Gm-Gg: AYBFou3mm/GRBCvs7wQPPLcwDYksI7fVR7Feno2j2ZAFziF31wNRQeHgA33OcVBkaSp
+	WSl3KZbLJXugQq52Bgtmh+F6az4eke57gjvHX9nEymNu3URZiBgBQZd0F5dC0l9t+ENspIltK3N
+	NCTvU/RzI6ts8L+ZAKLYWqWRQbstKGW0+57rUUo/K4NdYUDHiQvNIRv4qN8WOEIyDO3az0j60/v
+	6zuNVIPzM5PtDOjcO1zaf0hmvkHd6DFOdRaUmZ5KiSaj6qAEHisI4QRtMfw8mCeQ82FUjXYC9p8
+	SyFC+kdKC/R4W+SWBcHtq8NXCMRoQLd++vPPORYoBdRAzEh4f9EuhfnACoc+LMDTylw5rIdqBtf
+	YCTE+ywSn6IxzCofhCuTihphjkCtGdndwMg==
+X-Received: by 2002:a05:690e:1382:b0:672:a289:7b0 with SMTP id
+ 956f58d0204a3-672ed93a88emr3463724d50.76.1790368282266; Fri, 25 Sep 2026
+ 13:31:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH 1/4] kconfig: tests: Reset KCONFIG_WARN_CHANGED_INPUT
- by default
-From: Nathan Chancellor <nathan@kernel.org>
-To: Nicolas Schier <nsc@kernel.org>
-Cc: Julian Braha <julianbraha@gmail.com>, 
- Nathan Chancellor <nathan@kernel.org>, Pengpeng Hou <pengpeng@iscas.ac.cn>, 
- Ulf Magnusson <ulfalizer@gmail.com>, 
- Masahiro Yamada <yamada.masahiro@socionext.com>, 
- linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <arTSvcwLenaZwKm7@levanger>
-References: <20260917-kconfig-tests-minor-updates-v1-0-286e5c985244@fritz.com>
- <20260917-kconfig-tests-minor-updates-v1-1-286e5c985244@fritz.com>
- <a1efc002-c34b-43a4-be02-ff4746d13241@gmail.com>
- <arTSvcwLenaZwKm7@levanger>
-Date: Fri, 25 Sep 2026 21:00:20 +0100
-Message-Id: <179036642082.3653489.376583884931759728.b4-reply@b4>
-X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2566; i=nathan@kernel.org;
- h=from:subject:message-id; bh=TZ/jYkQEQkYrb4voHmctluCqEH+VoM9eratR6lsHly8=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDFnbLl0NvCz3l2H/Nc9nrIprGHJ1pj9KdN8d7HlvdtOdD
- I8dWyft7ChlYRDjYpAVU2Spfqx63NBwzlnGG6cmwcxhZQIZwsDFKQAT2ZnO8L/sWt0OtdBZzE/a
- OgROHLtR5XEwzPD8dz7+eLOfFooRE8MY/so828+lyPF2Y0P3unkNezjez06/aKM2q01uzor9iQv
- tH3AAAA==
-X-Developer-Key: i=nathan@kernel.org; a=openpgp;
- fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
+References: <20260923-dd-cmap-part2-clean-v11-0-9b6c217fdf2f@gmail.com> <20260923155339.bdc677e8e688611bcf190ad9@linux-foundation.org>
+In-Reply-To: <20260923155339.bdc677e8e688611bcf190ad9@linux-foundation.org>
+From: jim.cromie@gmail.com
+Date: Fri, 25 Sep 2026 14:30:54 -0600
+X-Gm-Features: AclHuK81aQy7pcphOyoCN0Cv4efDR1k93Uxkj909m52hc-_PgnQGdKhUE2sknH8
+Message-ID: <CAJfuBxxd8hMf0OcnOK+w-QyizaKY=WA4VL+fyoD3y6EsHW1+og@mail.gmail.com>
+Subject: Re: [PATCH v11 00/38] dyndbg: Fix classmaps API for subsystems, query
+ extensions, selftests
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Jason Baron <jbaron@akamai.com>, Shuah Khan <shuah@kernel.org>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Arnd Bergmann <arnd@arndb.de>, Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>, 
+	Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, 
+	Aaron Tomlin <atomlin@atomlin.com>, Jonathan Corbet <corbet@net.net>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nicolas Schier <nsc@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>, 
+	Randy Dunlap <rdunlap@infradead.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Pavel Machek <pavel@kernel.org>, Len Brown <lenb@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Petr Mladek <pmladek@suse.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	John Ogness <john.ogness@linutronix.de>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linux-arch@vger.kernel.org, 
+	linux-modules@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, linux-pm@vger.kernel.org, 
+	Louis Chauvet <louis.chauvet@bootlin.com>, Philipp Hahn <phahn-oss@avm.de>, 
+	kernel test robot <lkp@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2026-09-24 09:35 +0200, Nicolas Schier wrote:
-> On Sat, Sep 19, 2026 at 06:29:39PM +0100, Julian Braha wrote:
-> > On 9/17/26 14:38, Nicolas Schier wrote:
-> > > Reset KCONFIG_WARN_CHANGED_INPUT by default for all kconfig tests but
-> > > those which set it explicitly.
-> > >
-> > > This fixes the 'warn_changed_input' test on systems with
-> > > KCONFIG_WARN_CHANGED_INPUT=1 and ensures a cleaner test environment.
-> > >
-> > > Fixes: 645323a7f4e5 ("kconfig: add optional warnings for changed input values")
-> > > Signed-off-by: Nicolas Schier <n.schier@fritz.com>
-> > > ---
-> > >  scripts/kconfig/tests/conftest.py | 8 ++++++++
-> > >  1 file changed, 8 insertions(+)
-> > >
-> > > diff --git a/scripts/kconfig/tests/conftest.py b/scripts/kconfig/tests/conftest.py
-> > > index 66f95e4ed58c..e92f0cf1421a 100644
-> > > --- a/scripts/kconfig/tests/conftest.py
-> > > +++ b/scripts/kconfig/tests/conftest.py
-> > > @@ -34,6 +34,9 @@ class Conf:
-> > >          """
-> > >          # the directory of the test being run
-> > >          self._test_dir = os.path.dirname(str(request.fspath))
-> > > +        self.default_env = {
-> > > +            "KCONFIG_WARN_CHANGED_INPUT": "",
-> > > +        }
-> > >
-> > >      # runners
-> > >      def _run_conf(self, mode, dot_config=None, out_file='.config',
-> > > @@ -57,6 +60,11 @@ class Conf:
-> > >          # Override 'srctree' environment to make the test as the top directory
-> > >          extra_env['srctree'] = self._test_dir
-> > >
-> > > +        # Set default environment variables, if not set by caller
-> > > +        for var in self.default_env:
-> > > +            if not var in extra_env:
-> > > +                extra_env[var] = self.default_env[var]
-> >
-> > Maybe it makes more sense to have the tests ignore users' env vars if
-> > they would cause tests to fail? For example, this recent patch
-> > explicitly unsets the KCONFIG_WERROR flag:
-> > https://lore.kernel.org/linux-kbuild/4d1eee3a-a5f9-467e-880e-4f2815851b09@gmail.com/T/#m25be9ad4d5e62956c5f98759398f91a555afb4df
+On Wed, Sep 23, 2026 at 4:53=E2=80=AFPM Andrew Morton <akpm@linux-foundatio=
+n.org> wrote:
 >
-> Good point, but I am not sure, if we really should ignore all of the
-> user's environment.  Maybe it's better for now, to just reset all
-> environment variables that start with KCONFIG_ and KBUILD_ ?
+> On Wed, 23 Sep 2026 16:34:24 -0600 Jim Cromie <jim.cromie@gmail.com> wrot=
+e:
+>
+> > The drm subsystem has *lots* of debug statements, in 11 categories:
+> >
+> >  $> git grep '\w*_dbg' drivers/gpu/drm/ | wc
+> >    5663   30159  542864
+>
+> Methinks this regexp was overly promiscuous, but point taken.
+>
+> >  $> git grep 'DRM_DEBUG\w*' drivers/gpu/drm/ | wc
+> >    2206   12834  202332
+> >
+> > All of these are bit-tests on __drm_debug, exposed to users as
+> > /sys/module/drm/parameters/debug. Many of these are done often;
+> > vblank is done ~100/sec for some displays. Over the uptime of many
+> > boxes, this is a lot of cpu cycles on bits that are almost always off.
+>
+> A __test_bit (or |) every 10ms sounds quite negligible?
+>
+> Especially if __drm_debug is __read_mostly.  Which it isn't, afaict.
+> Um, low-hanging fruit?
+>
 
-Given these are Kconfig tests, we could probaby just ignore KCONFIG_, I
-don't see any instances of KBUILD_ within scripts/kconfig outside of the
-Makefile. We could do both anyways and just adapt based on reports
-though, I don't really have a strong opinion on that though.
+__drm_debug certainly qualifies.
+I will send the patch, separately.
 
--- 
-Cheers,
-Nathan
+patch 37 adds a +c flag, to count invocations of flagged callsites
+it counted 5M calls in 60 sec.  or 83 KHz.
+That seems "fast-ish" at least,
+perhaps worthy of a static-key over a __read_mostly
 
+
+
+> > Dynamic-debug excels at replacing such tests with NOOPs (via static
+> > keys). Classmaps was devised to bring that 0-off-cost to drm's
+> > categories.
+> >
+> > Classmaps-v1 went into the kernel in Sept 2022, in 2 chunks:
+> >   b7b4eebdba7b..6ea3bf466ac6    # core dyndbg changes
+> >   0406faf25fb1..ee7d633f2dfb    # drm adoption
+> >
+> > Sadly DRM-CI found a regression during init with drm.debug=3D<initval>;
+> > the static-keys underneath the drm-dbgs in drm.ko got enabled, but
+> > those in drivers & helpers did not.
+> >
+> > So in Feb 2023, it got pulled:
+> > commit bb2ff6c27bc9 ("drm: Disable dynamic debug as broken")
+> >
+> > Root Problem:
+> >
+> > DECLARE_DYNDBG_CLASSMAP defined the classmap, but its repeated use in
+> > both core and drivers violated a K&R rule "define once, refer
+> > afterwards". This flaw resulted in a regression; with drm.debug=3D0xFF
+> > boot arg, drm-core got enabled, but drivers/helpers did not.
+> >
+> > This patchset replaces DECLARE_DYNDBG_CLASSMAP with:
+> > - DYNAMIC_DEBUG_CLASSMAP_DEFINE (invoked once in the exporting module)
+> > - DYNAMIC_DEBUG_CLASSMAP_USE (invoked repeatedly in drivers & helpers)
+> >
+> > _DEFINE exports the classmap it creates (in drm.ko), and other modules
+> > _USE the classmap. The _USE adds a record referencing the _DEFINEd (&
+> > exported) classmap in a 2nd __dyndbg_class_users section.
+> >
+> > At modprobe, dyndbg scans the new section after __dyndbg_class_maps,
+> > follows the linkage to the _DEFINEr module, finds the (optional)
+> > kernel-param controlling the classmap, examines its drm.debug=3D<initva=
+l>,
+> > and applies it to the module being initialized.
+> >
+> > To recapitulate the multi-module problem wo DRM involvement, we add:
+> >
+> > - tools/testing/selftests/dynamic_debug/dyndbg_selftest.sh:
+> >   Alters pr_debugs in builtins and test modules,
+> >   checks results against checksums of expected results
+> >
+> > - lib/test_dynamic_debug.c & test_dynamic_debug_submod.c:
+> >   Builds parent & _submod modules with _DEFINE and _USE inside #if/#els=
+e
+> >   blocks, reproducing the 2-module scenario under selftests.
+>
+> So what I'm understanding is that this series presently has no effect
+> upon DRM?
+
+I have 2-3 DRM adaptation patches,
+then a single 1-liner patch per driver,
+to get DRM using the new API.
+
+39 patches seemed big enough for now,
+if you'd like the rest tacked on, Im happy to do so.
+
+
+> What subsystems *does* it affect?
+
+
+
+>
+> Sashiko had quite a bit to say.  It hasn't quite completed at present.
+>         https://sashiko.dev/#/patchset/20260923-dd-cmap-part2-clean-v11-0=
+-9b6c217fdf2f@gmail.com
