@@ -1,138 +1,131 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk2-f13.google.com (mail-qk2-f13.google.com [74.125.230.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 331C22F8EAA;
-	Sat, 26 Sep 2026 00:48:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790383718; cv=none; b=RbZW2UAZtMTkfG8Ph+xr0IsfyRl5DggqCVY8g4hihJN6OiV81CmsbIdX+3cKizSzdvGAslsp49Tpbzt7I6sl95qTSEoci5XJFnxaXFk+QKrd4g0oHlHNUsYWAbK8e8e/EsMcFO/efhrEVFW5eWCkFzomFAEILq3+n7SiQ3GgfFI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790383718; c=relaxed/simple;
-	bh=Z7XCeoSHKKt9WBQu7ZD63KQ+fEc+1rxwtMoSoG94pEU=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=kmiWCjFJnW1KyHO7iMfKDd5NFSlV9NE+dKDPAci5W6qbR8YWKmAgD8KbLleeimdyso1yG58SPAMTfW8UxgEOO9JknK1KPgK7HZFEuXyEVbBATU1yEANw8yCtta5a1E8npDE1EmHycSzX0BG0U4LdAr2yFWshVb/4ypyTyDq5tRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bd8DygpQ; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7792C2652A2
+	for <linux-kbuild@vger.kernel.org>; Sat, 26 Sep 2026 00:52:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.230.205
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790383955; cv=pass; b=qH/GCKV6Zu64bc8H+gUW995R6CAIjgAuq844rNGGTFtjjTLZMaVMLV0dBOTubmM7pATwbBP6Yx2MwH6fqpy7How8pENTEGI+rzTO6FXWGoc/7l+XABMNgm+rLvsQ9Ps/6foElAwMhOa6S6J3WLYggfu5o8BaJHWa/AjOEUjJiHA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790383955; c=relaxed/simple;
+	bh=cxL8RY8wdmdsnxOD6Ni6qWQL/8tWTp4bkAuJvPRW6kg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kr0aPt1laCK+eI9oCAQdC4TkZJctWxLXJw9GbJfo42iHpGMnUYacO2kuj5Oz/jvbJAAheaIVUjJan8lv7kW18UE+yeKHAAn+3Pym5XGirH6WBiSeZdweZR8S9a4CcOCoo8eseMnB2/CssNAsL96cg40ERoOHoMe6q1HDXYjEYCM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SyHT+b62; arc=pass smtp.client-ip=74.125.230.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bd8DygpQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 277A11F00893;
-	Sat, 26 Sep 2026 00:48:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790383716;
-	bh=iOwdJEwTgWoc/NuLEQrScb9TaxVUu4KCZ070iq0PUMs=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date;
-	b=bd8DygpQ5MDVbD/dqPPV5jdv8OC+vpxadxLVizg0Rydng4DkeOp1UB9M59UccLk1b
-	 1CmxMnQTX0hdsrrTfgCi7Ka/OdDS5hi8Mwok5laCH56okGVs1ZRGsArzJ1Tr9OSzIF
-	 JAqYinzcvI9uhw4ZWPy4I6SZ7r37JJfbTtoXG7sJ/nyzTe2FJrcH1lvPbE7NEFpzWF
-	 AEy1wa5ZbcenEA2TqOs7xFzAEptwKii3fdf+VDdpHy4tKEW8zsxON11/Ix0c/Nomn+
-	 3UK80gOL7V57UDVPzyAQB0qktknnweXDEp6J0z5/tdTSWex5uGrMHb3ONb9DCI6rTR
-	 1JOQZpMFcb2bA==
-Content-Type: multipart/mixed; boundary="===============1926093681046393851=="
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SyHT+b62"
+Received: by mail-qk2-f13.google.com with SMTP id d75a77b69052e-52fb769ca17so12901481cf.2
+        for <linux-kbuild@vger.kernel.org>; Fri, 25 Sep 2026 17:52:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1790383953; cv=none;
+        d=google.com; s=arc-20260327;
+        b=JjDiTgm+JyzB1/XutWk1J5ai5F5hUquI7pNN3R54fEMbPXT6YKsFMCuWd9Lh+0lvF8
+         vhG1wu9AsbM67AViE2wj20+iSipHgL2VKXTRboVa8Pqu5BZZKWk5maPnsynsdCm996f4
+         YRD1j5G1zRZxO+kVpogHaRgKIzP066089Xt+jvmeivfWB/BOrL4KSAQMtW8fLgRLpi7M
+         wCAht11+vl5eLbTyMN8nR1nmnCz+0mT1WzTTt+vC1eNQjv3LEzF06lIJRpgZkmsFpTgI
+         7tYS2xy3HMstZncldFSU5yGOR002OovH/PMp9eUacn1D5ZKwvjClcBKn9VqeD4QuXoJw
+         IaBA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=CSw04M5idaSqtHaCGqtANMLgl+u3nq3EJIWnJJPoynw=;
+        fh=JMGVOwUo9gRkmW59ld4y9o03XDddgvg41bIECJt6JNo=;
+        b=qF4Ty/ncJUMde8nunge1ATAyz4yTlW9r0tfbJlCDqu9IPcIDuELvvVvE5iqvl5fcJa
+         VB8vpzTM6jvf/q4IEro50r8IohFSVr36YWOV+ktuvUIiX2+v0T4hl2DHv1Nt705EjB/K
+         96xu0VJr5PEnQTc7VzBUoIf7ugakVjbDVjosck8iQU1Ho6NrK2laNCeQQn08mo0Ce4ln
+         ETn2pWsAfubTNCaGNeJfY10ljfISL+A5MM9szCR5FFQJiX0HEs/cug9DCHGd+7ylZ3SO
+         hSvyhn1lp3FLu3+5hblBR8i5yEZfYBFzesLZmEEPhyqSip0QS9KOqkJO5vkozQ/1y5sN
+         hegw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1790383953; x=1790988753; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=CSw04M5idaSqtHaCGqtANMLgl+u3nq3EJIWnJJPoynw=;
+        b=SyHT+b62yEl5GBC7zQ8CeA3RKlLUvz6rNoSx0R5fXC0fi+KQgVpgqmZCHXQfNpprIU
+         LAn8zFD76t71h4G9vu6BiFr5uq/8y5SJ9SVrQOi+6XRf9eKJ3KFg/c7E6jPrK/sULkgf
+         IoEZav2HnGXatHzyXEmDD8VHnukJsXRoh24GwyzPhaW3JWXGwlBJ2ktOK5UsBmTaZehe
+         tWuSW82rFpKamQsUIh7VNlB+aqXJ0ecnayEMxhNiRxsOkSrEwkTbDFBpJFwYcwbc9kBl
+         UH2WWoaf3nA+GdBQeYRsoCROI5S66E8b03Ymi1Xxh5Z6bWneN77562MfluCAh4zIpJ0D
+         /aYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790383953; x=1790988753;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=CSw04M5idaSqtHaCGqtANMLgl+u3nq3EJIWnJJPoynw=;
+        b=dohhr0itWRbA90QH7tQAIErIZMUBmcqHH1GvjTqevKtSTWKdWrecRt/Ur2VwWF9CeN
+         hnicQZJh9CzBS5fhrdutUmkJ8rJ68QiIhwVov/FS8Qnn5YQrHi0gUTrd1B9VSc5iqkH+
+         jpMBSBX8y4Ls5cv16cS5a8S5m0seIVzrIfhOPN4Lw4s4xpI10ieRfE02+sUo4T5qmu8o
+         rUxMvdMaDToOid1PQPk7FCS8zNMK6fNQIOh4D2o0X6OS3PF4qYM7zsncIJNJQuDLYDAH
+         IG5Y3v7ipBl3RYBEKsq3xiaeukmPXpiGySuIaS0HWIpxD1mJtAqbAFHzVyjLNL2sUZQV
+         HMDA==
+X-Forwarded-Encrypted: i=1; AKwUvBx2n2of93iio8Sr8hLQAX9DDnxwuZPUEnEAiOI8idjX2KbdTUobLVIPqTsqcrvfX3Cnf87pzY4Hl+xm3NY=@vger.kernel.org
+X-Gm-Message-State: AFuF++mC5dzALtHJDlxtqlfJUQOn5zWuJzpEbG287JJejuC+6XnNZJmr
+	6WLwN+XOmHl6ZzFyQs3yvO9LStYZNNcYzUw3iE9HpPWyrgDdljiep7EYc+zo0roryso+DAtn1l1
+	4aD2gV7yOwODhPmKLxUNdaKTmUft1p24=
+X-Gm-Gg: AYBFou3YG3oSarYMxEsNprxKmHg5WKn/FcGxF/iGriurVFYHfsQ4I15DSLRMs07pci1
+	V290zxzqlSH/EUlmKtBT+Rt8pfIj3RgEAy4n4ZHzbRVqEWew7KB8xofmpUe1z64EFDowYrt052M
+	g7MXom/07METR4ybTNFpG0WmixCTdDtbb8u0iAsPOp5AoMImF9WLu4Zea88XhU5DJaENgVq/3Vh
+	e7lT5zmCkJSigRBvpfxsXxvifxD/USVQsDs58Qj0PbXRjn44yyQJoePZJ4z6iU7/PgfRBN6zmGH
+	uNvKqp2pizo42TWq60u+jRPX4DBi+oTiDtxC3eb6/VV5l9R/iQXnfvyT3iJHaM/sbSZRXCrYQqa
+	iw9NuhPh+wBh5v7vL9gZ2dQ0sgckw1+Gy7+8RQup1AB8gb/2w9aSuz4sYP9j+z3t9UqxOc0zA8B
+	Fk7Sb63ZTX72ZnVnq3YADh6OYF4NA37oudeQVRuerhpjda/FMqHW45Db/4deuTHq88zbBpEYEOV
+	v84jT0jusOb5X7mfzaZBYM=
+X-Received: by 2002:a05:622a:1818:b0:533:a4a:8826 with SMTP id
+ d75a77b69052e-5330b5eed0emr80806541cf.19.1790383953335; Fri, 25 Sep 2026
+ 17:52:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <194f91dc0b4dcbfff03d079c616a00316f4faaad234fe2f13f156eb301cab163@mail.kernel.org>
-In-Reply-To: <20260925-ksyms-tune-v5-2-1f75ad0c321c@gmail.com>
-References: <20260925-ksyms-tune-v5-2-1f75ad0c321c@gmail.com>
-Subject: Re: [PATCH v5 2/3] kallsyms: Increase marker density to 16:1 to accelerate lookups
-From: bot+bpf-ci@kernel.org
-To: jim.cromie@gmail.com,akpm@linux-foundation.org
-Cc: ljs@kernel.org,kees@kernel.org,david.laight.linux@gmail.com,masahiroy@kernel.org,olsajiri@gmail.com,linux-kernel@vger.kernel.org,linux-kbuild@vger.kernel.org,bpf@vger.kernel.org,jim.cromie@gmail.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,mason@kernel.org,ihor.solodrai@linux.dev
-Date: Sat, 26 Sep 2026 00:48:36 +0000 (UTC)
+References: <179017337986.52388.7943687183785012868@gmail.com> <179037565553.3985470.12035061965740287126.b4-reply@b4>
+In-Reply-To: <179037565553.3985470.12035061965740287126.b4-reply@b4>
+From: =?UTF-8?B?MTTkvq/lu7fnv7A=?= <ue081723@gmail.com>
+Date: Sat, 26 Sep 2026 08:52:24 +0800
+X-Gm-Features: AclHuK9Ua7kqnIr5kUYr-Cnfwv_MkcNfJmZDDmk3ND4mcEnL1T_GfZSWuwa6lP0
+Message-ID: <CA+NtrhRdnuZOOFpBXvnfOXFs-HA8q+2sLvR0BxH=BjzVAEZBzw@mail.gmail.com>
+Subject: [PATCH] clang-tools: Import os for broken pipe handling
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Nicolas Schier <nsc@kernel.org>, llvm@lists.linux.dev, linux-kbuild@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Nick Desaulniers <ndesaulniers@google.com>, 
+	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
---===============1926093681046393851==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Ting-Han Hou <ue081723@gmail.com>
 
-> kallsyms: Increase marker density to 16:1 to accelerate lookups
->
-> kallsyms_lookup_names() resolves symbol names to addresses using a
-> binary search over kallsyms_seqs_of_names[].  In baseline, each probe
-> invokes get_symbol_offset() to find the symbol in kallsyms_names[].
-> Because markers in kallsyms_markers[] are spaced every 256 symbols in
-> address order, each probe must sequentially scan and decode ULEB128
-> lengths across an average of 127.5 symbols from the nearest marker
-> (~2,176 hops across a 17-step binary search).
->
-> During bulk symbol resolution (e.g. BPF multi-kprobe and tracing-multi
-> attach across tens of thousands of functions), this linear scan penalty
-> compounds into substantial latency (~4.7 us to ~6.1 us per lookup).
->
-> Increase the static marker density from 256:1 down to 16:1 (1 marker
-> every 1 << 4 symbols):
->
-> 0. Define KALLSYMS_MARKER_SHIFT as 4 in kernel/kallsyms_internal.h, with
->    a matching KALLSYMS_MARKER_MASK of 0x0F.  Guard kernel types so host
->    scripts/kallsyms.c can include this header directly as the single
->    symbolic source of truth.
->
-> 1. In scripts/kallsyms.c, emit markers every
->    (1 << KALLSYMS_MARKER_SHIFT) symbols into kallsyms_markers[].  For a
->    typical kernel with ~184,000 symbols, this increases marker count
->    from 719 to 11,501 entries, adding only +42.2 KiB to write-protected
->    .rodata (0.002% of vmlinux).
->
-> 2. In kernel/kallsyms.c:get_symbol_offset(), compute marker offset via
->    pos >> KALLSYMS_MARKER_SHIFT and step through
->    pos & KALLSYMS_MARKER_MASK.  Because both are compile-time
->    constants, GCC emits single bit-shift and AND instructions with zero
->    division overhead.
->
-> This reduces the maximum sequential scan from 255 down to 15 symbols,
-> and cuts the average scan from 127.5 down to 7.5 hops (a 17x reduction
-> in sequential loop hops).  In-tree selftest measurements across all
-> 184,008 symbols show lookup latency dropping from 6,102 ns down to
-> 866 ns (a 7.0x speedup) with zero runtime memory allocation, zero RCU
-> synchronization, and zero new user-facing APIs or Kconfig options.
+The BrokenPipeError handler in run-clang-tools.py calls os.open() and
+os.dup2() without importing os. If this handler is reached, it raises
+NameError instead of redirecting stdout and exiting with status 1.
 
-This isn't a bug, but could the numbered list be simplified? The items
-0-2 restate the diff hunk by hunk, and some of the remarks describe
-things the patch doesn't change.
+Import os so the handler can work as intended.
 
-The old code already used 'pos >> 8' and 'pos & 0xFF', so 'zero
-division overhead' isn't new to this patch. Similarly, 'zero RCU
-synchronization' and 'zero new user-facing APIs' describe things the
-patch never touches.
-
-Also, is 0.002% the intended percentage for the extra .rodata? That
-would imply a vmlinux of about 2 GiB, but a typical loaded image is
-tens of MiB, making the actual percentage closer to 0.1-0.2%.
-
-The useful parts are the lookup-latency motivation and the
-memory-versus-speed trade-off. Would dropping the numbered list in
-favour of just the rationale make the description clearer?
-
-> diff --git a/kernel/kallsyms_internal.h b/kernel/kallsyms_internal.h
-> index 81a867dbe57d..3e6494b7dfc4 100644
-> --- a/kernel/kallsyms_internal.h
-> +++ b/kernel/kallsyms_internal.h
-> @@ -1,7 +1,11 @@
->  /* SPDX-License-Identifier: GPL-2.0-only */
->  #ifndef LINUX_KALLSYMS_INTERNAL_H_
->  #define LINUX_KALLSYMS_INTERNAL_H_
-> +#define KALLSYMS_MARKER_SHIFT 4  /* 16:1 sweet spot: +42 KiB .rodata, 17x fewer hops */
-> +#define KALLSYMS_MARKER_SIZE  (1U << KALLSYMS_MARKER_SHIFT)
-> +#define KALLSYMS_MARKER_MASK  (KALLSYMS_MARKER_SIZE - 1U)
->
-> +#ifdef __KERNEL__
->  #include <linux/types.h>
-
-This isn't a bug, but would a short comment explaining the trade-off be
-enough here, without the specific measurements? The trailing comment
-hard-codes benchmark figures from one configuration (about 184k
-symbols). The .rodata cost grows with the symbol count, so '+42 KiB'
-will be wrong for other configs and will go stale as the kernel grows.
-
-The same measurements are already in the commit message, where they
-usually go. Nothing else in this header has comments like this.
-
-
+Fixes: 87c7ee67deb7 ("scripts: handle BrokenPipeError for python scripts")
+Assisted-by: LLM
+Signed-off-by: Ting-Han Hou <ue081723@gmail.com>
 ---
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+ scripts/clang-tools/run-clang-tools.py | 1 +
+ 1 file changed, 1 insertion(+)
 
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/36204745600
---===============1926093681046393851==--
+diff --git a/scripts/clang-tools/run-clang-tools.py
+b/scripts/clang-tools/run-clang-tools.py
+index e78be82..79d58b3 100755
+--- a/scripts/clang-tools/run-clang-tools.py
++++ b/scripts/clang-tools/run-clang-tools.py
+@@ -12,6 +12,7 @@ compile_commands.json.
+ import argparse
+ import json
+ import multiprocessing
++import os
+ import subprocess
+ import sys
+
+
+base-commit: fe2ec83746e501645709761605c2464a44fd2929
+-- 
+2.52.0.windows.1
