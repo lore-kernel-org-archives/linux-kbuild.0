@@ -1,120 +1,119 @@
-Received: from mail-pj2-f40.google.com (mail-pj2-f40.google.com [74.125.227.168])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB8E839D6FA
-	for <linux-kbuild@vger.kernel.org>; Sat, 26 Sep 2026 08:29:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.168
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9675725B091;
+	Sat, 26 Sep 2026 08:35:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790411357; cv=none; b=VD2u1FtN/JaPYUcLZgSQmdwJSiBAZy8cyu9fPQ38+IsU/0Q4z6X+cRd9fW07Xk0jgg1ChSSF9ZP1RcrsWL2Lnnh+5oPrkyFg3rkq0ocL3O2+r4eEF+X/gXEIdRtkFuFB3o5Wuf0cHS7VVLtSVGVy9v2ycBOsQqINY7dBEgrR2a8=
+	t=1790411702; cv=none; b=YVCAv4n5+1GvQMBZfFNZd6C+wDUz11M2xMbi4VRerAAbh66HMyl1y3NjOqq+PwpkkW9Dx0V3/QervxaGC9pQ6coqOGgKS/26QVAn17WoBRIghVRnU493IJKceH6laPRGNwr5YgB8HvPfmih6C4uoebpZpKT2MNp6CcGJshyq3bQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790411357; c=relaxed/simple;
-	bh=iXM6dXLVZyc4/2LLEhMvfVIyG+SHsbmujZvmS7fw1aA=;
-	h=Content-Type:Date:Message-Id:From:To:Cc:Subject:In-Reply-To:
-	 References:MIME-Version; b=Imp5tjLc+w27YzvUUurFqeiQhVNxN8hnpMbJMaiRrnRn2ddABh9GlFk84aUpO45NoMUFbziI0pgnoY2jUu08KwT1k8E1M630K50cJErKqc+jUlvg6ko6Ar+Ciq8tRCu2qWLbt1ipe9zgFaHqVNULPFuMuejpDFuAnrPZob8pUv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L1tf1epb; arc=none smtp.client-ip=74.125.227.168
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1790411702; c=relaxed/simple;
+	bh=NzEIaAozYlSXXvCSG8F3Q9Lfk3SbQy+S17/CybfVKd4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X8ZLmI2lTv8RzENc7pHhVafTqtD9i6bGRy3vxI8/Rbs8jUP9439ydF7hwVkNBco/lTaYryFt4HL4vfn7dxnNjrbdFhWAqnQj0QziQx1hJyzisa8yPGE4IQapIjhu++/YH+sObBzPIY5PjmokhNpfdRotgqdSmB08PL7Bh0iaRFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EKI4YSoI; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L1tf1epb"
-Received: by mail-pj2-f40.google.com with SMTP id 98e67ed59e1d1-3a0d31bda43so544397a91.1
-        for <linux-kbuild@vger.kernel.org>; Sat, 26 Sep 2026 01:29:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790411355; x=1791016155; darn=vger.kernel.org;
-        h=mime-version:content-transfer-encoding:references:in-reply-to
-         :subject:cc:to:from:message-id:date:content-type:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=vsTzuV1eSC7imODMsDAQHQQbWFGBD/RBt6ggI0+EwhA=;
-        b=L1tf1epbkhLphZ2Julis/OkRu7jj8hETfwJ/ktaJBK1t/FnSaBM+B/Cvk8BtSprulN
-         LiTnhae7M11zRQ6WNQLA4WD/vdDuj9nRTm6pOICKA34Y+2mvG7lEMPdf/57cRfUjmJX6
-         P2rasuRcLzwNc44BxJt5lq3cNRMHqcft+eB5yHVdTfE7PNWyZGhs+3HMjk3kIg6caRpT
-         TGpyYMVH9ya+B8q+vDF7MM77tQM3OGKVyRiQA+4au42hbq6b0SM1/zlrAQ79jDv9k19r
-         Vbp/FjUWRznjhLnpVPM25BQ9x8aTAA+8zE8wL6H5I/RceUNK4KJzisdkbOMQL49P0+7b
-         o8tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790411355; x=1791016155;
-        h=mime-version:content-transfer-encoding:references:in-reply-to
-         :subject:cc:to:from:message-id:date:content-type:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=vsTzuV1eSC7imODMsDAQHQQbWFGBD/RBt6ggI0+EwhA=;
-        b=VbUplyHbqsv/Vmm6rF2PDRMQHlS7oMX4jO18e/5LuyJNp29A7f2aHQFcmPFHiQLzVr
-         pYsgJF91q6+ENGTdeocEHqfnkXJ0k/KFw76ovFW4K48fQCLDfomTptuDVEpr/7iYzoSz
-         WBGaPaWSDJD4Tjixe07MOlh7RS4XdBoH5oe4CBJniNR47oVYso7Of/HvyR7fXaJ24nNg
-         wcXeajaP/4Ce8PKQxeGxvFj82DrJkqK5H/VM277iteQGg8qj1uxUT1trOBcRzdC20lcb
-         5cyR4ukTvjB3n3SiPvlNH7Tl9rxeS1nlrJaQMrJKhHiu4Z0it6vnHIEXoUcO8ntNsnQj
-         Rzaw==
-X-Forwarded-Encrypted: i=1; AKwUvBx6qHFVWamz5x5Q+VVMS7VyQlsCKfsxYKG5oy87RedciRfSb+9g3Ee4yoc98Q7YKkWl3sFUrjyV6NArZqA=@vger.kernel.org
-X-Gm-Message-State: AFq9FYJXoltPQEKjcH6hKHF4c9YH+kgU/QXp5s/Zr/6N68s6hoeHk2op
-	Ih2PagLtU2WwklHYc18o6cQksitePyUQdVCWECRjBVGQBaFTovg8DzxJ
-X-Gm-Gg: AYBFou1/zaTnYlaCPhJwq1KLfwEOPdQAD+Ci2siF1fgrIogYn306jyY3YnVJWIZa5SU
-	sL7LL+F0+uu7+qKzHTcenqEX/EPJorWrRbv10aO33aqvIaN8aIf6iVqJxa6egW3NQUL3270Sfl9
-	3pHiVQMbt5FPc0/PAGZZt+AxFTwvhot+uZV9WT5AYtPssQdsiOtTZGIEmcRmKMhj0YZMY9le2JK
-	vIHN2CsQ301xX1nvs6YPBNIB00hod+KgW5IWlMm/GC+QIPEEBf8NcsPf6SWmqOjlXUVUzznQqaA
-	8TCFMeLOaK4BYLfepWBvoAzXyfKNoezawtR1FmCTf8biHCbfm/szBZP+StNMQZzq6jjeQbtaXq4
-	oF1R4mJy3ZfFoqUPxVmVSS568RDKZy0Aws+klCidyDZ2LQaAFMN6rVr9jNBsRuSHu89rF1b8Dnj
-	oyfaBFeTJQHUXgqmN06UViCJr+6n8P4/H3h5fPNkGvDo6E1Da5eiheY57sm8pkDEKaRVr6/0LjC
-	ZN/40O7rKo0Z1XatETtcCPbvGzBkMiutwc35z6W/MUC/6OGhAi4WEbnXZegXAbukUxsHiXTL6aw
-	MDe1
-X-Received: by 2002:a17:90b:51c1:b0:39e:1692:34bc with SMTP id 98e67ed59e1d1-3a098ad4cd1mr6277315a91.1.1790411355026;
-        Sat, 26 Sep 2026 01:29:15 -0700 (PDT)
-Received: from localhost ([153.61.198.251])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a0b99e5220sm8692077a91.16.2026.09.26.01.29.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 26 Sep 2026 01:29:13 -0700 (PDT)
-Content-Type: text/plain; charset=UTF-8
-Date: Sat, 26 Sep 2026 08:29:12 +0000
-Message-Id: <DLP3USQDIMJG.1FUZXEXOX38TR@gmail.com>
-From: "Alexei Starovoitov" <alexei.starovoitov@gmail.com>
-To: "Jay Wang" <wanjay@amazon.com>, <bpf@vger.kernel.org>, "Daniel Borkmann"
- <daniel@iogearbox.net>, "Andrii Nakryiko" <andrii@kernel.org>, "Eduard
- Zingerman" <eddyz87@gmail.com>, "Kumar Kartikeya Dwivedi"
- <memxor@gmail.com>
-Cc: "Alan Maguire" <alan.maguire@oracle.com>, "Martin KaFai Lau"
- <martin.lau@linux.dev>, "Yonghong Song" <yonghong.song@linux.dev>, "Jiri
- Olsa" <jolsa@kernel.org>, "Nathan Chancellor" <nathan@kernel.org>, "Nicolas
- Schier" <nsc@kernel.org>, <linux-kbuild@vger.kernel.org>, "Luis
- Chamberlain" <mcgrof@kernel.org>, "Petr Pavlu" <petr.pavlu@suse.com>, "Sami
- Tolvanen" <samitolvanen@google.com>, <linux-modules@vger.kernel.org>,
- "Miguel Ojeda" <ojeda@kernel.org>, <rust-for-linux@vger.kernel.org>, "Arnd
- Bergmann" <arnd@arndb.de>, <linux-kernel@vger.kernel.org>, "Hazem Mohamed
- Abuelfotoh" <abuehaze@amazon.com>, "Bjoern Doebel" <doebel@amazon.de>,
- "Martin Pohlack" <mpohlack@amazon.de>, <jay.wang.upstream@gmail.com>
-Subject: Re: [PATCH bpf-next v3 4/9] bpf: take the vmlinux BTF from the
- btf_vmlinux module
-In-Reply-To: <20260925224229.1850-5-wanjay@amazon.com>
-References: <20260925224229.1850-1-wanjay@amazon.com> <20260925224229.1850-5-wanjay@amazon.com>
-X-Mailer: mkdraft (claude review draft; edit before sending)
-Content-Transfer-Encoding: 8bit
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EKI4YSoI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1282F1F000FF;
+	Sat, 26 Sep 2026 08:34:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790411701;
+	bh=/oS5cGci8QiKs9/+vr+9VzvkfNfCYGybORMZp8o7zYk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=EKI4YSoIet132l4ifkQSXpJ5S/HAo847RXSPWXlIA//sS1T6DGjDQTSrpmN9w+Kk8
+	 js4BixlSkmCw0FEiWLxPcvGxE+3BW6mUpaVXp7XnIRL7QdFfavBtgd1//5Iee5neNs
+	 RbienQhHQWLrliSen8LuKxiRtjLuTujrUWtILEs7n/v8uXZzy1skEP7wNx/NpddT7Z
+	 GKDAu4WaRdM8Gb/v3pq+XXSFKIL8eKYWfrSN8F+Oz6PgY1dZcpz94w2o4EId72TGE1
+	 eqRFZeQmkE1AufPSMNNHLAa7nmcdoN/3AKwfCX7m1232ogKRodq5xYHa7hRr5g9vD9
+	 B4sDgFN4Tljag==
+Date: Sat, 26 Sep 2026 11:34:51 +0300
+From: Mike Rapoport <rppt@kernel.org>
+To: Nicolas Schier <nsc@kernel.org>
+Cc: Nathan Chancellor <nathan@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Luis Augenstein <luis.augenstein@tngtech.com>,
+	Maximilian Huber <maximilian.huber@tngtech.com>,
+	Pasha Tatashin <pasha.tatashin@soleen.com>,
+	Pratyush Yadav <pratyush@kernel.org>,
+	Alexander Graf <graf@amazon.com>, Willy Tarreau <w@1wt.eu>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Askar Safin <safinaskar@gmail.com>, linux-doc@vger.kernel.org,
+	kexec@lists.infradead.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>
+Subject: Re: [PATCH v3 0/2] Move tool for generating initramfs cpio to
+ scripts/
+Message-ID: <areDq-1iFZUViDgS@kernel.org>
+References: <20260925-move-gen_init_cpio-to-scripts-v3-0-99c493f76722@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260925-move-gen_init_cpio-to-scripts-v3-0-99c493f76722@kernel.org>
 
-On Fri, Sep 25, 2026 at 10:42 PM Jay Wang <wanjay@amazon.com> wrote:
-> +	if (!data && load) {
-> +		/*
-> +		 * The module notifier installs the BTF before init_module()
-> +		 * returns, so it is either there after this or the module is
-> +		 * not available (yet).  Not cached: a later call retries,
-> +		 * e.g. once the module becomes reachable on the root fs.
-> +		 */
-> +		request_module("btf_vmlinux");
+Hi Nicolas,
 
-This will deadlock.
-event_btf_ids_read() calls btf_get_module_btf(NULL) with event_mutex
-held. With =m and BTF not loaded yet
-  cat /sys/kernel/tracing/events/sched/sched_switch/btf_ids
-gets here and waits for modprobe. modprobe gets to
-trace_module_notify() which takes event_mutex.
-lockdep doesn't see it.
+On Fri, Sep 25, 2026 at 09:29:29PM +0200, Nicolas Schier wrote:
+> initramfs cpio tools had been subject of several recent discussions on
+> linux-kbuild.  Let's get two minor steps forward by enabling a
+> top-level target for building gen_init_cpio w/o the need of a valid
+> kbuild configuration [1] and move the tools for generating the built-in
+> initramfs from usr/ to scripts/ [2].
+> 
+> Link: https://lore.kernel.org/all/20260220191150.244006-1-safinaskar@gmail.com # [1]
+> Link: https://lore.kernel.org/all/aSdrCFkUQup3qb-q@derry.ads.avm.de/ # [2]
+> ---
+> Changes in v3:
+>   * Update various remaining usr/gen_init* references treewide (Nathan)
+>   * Link to v2: https://patch.msgid.link/20260720-move-gen_init_cpio-to-scripts-v2-0-26b7e15c7133@kernel.org
+> 
+> Changes in v2:
+>   * Build gen_init_cpio only if CONFIG_BLK_DEV_INITRD (Thomas)
+>   * Keep underscore top-level target name (scripts_gen_init_cpio)
+>     (Thomas)
+>   * Link to v1: https://patch.msgid.link/20260309-move-gen_init_cpio-to-scripts-v1-0-0c5059b1ec5b@kernel.org
+> 
+> ---
+> Nicolas Schier (2):
+>       kbuild: Mark usr_gen_init_cpio as no-dot-config-target
+>       kbuild: Move gen_init_cpio and gen_initramfs.sh to scripts/
+> 
+>  .../early-userspace/early_userspace_support.rst          | 16 ++++++++--------
+>  Documentation/filesystems/ramfs-rootfs-initramfs.rst     | 10 +++++-----
+>  MAINTAINERS                                              |  1 +
+>  Makefile                                                 |  9 +++++----
+>  scripts/.gitignore                                       |  1 +
+>  scripts/Makefile                                         |  3 +++
+>  scripts/Makefile.package                                 |  2 +-
+>  {usr => scripts}/gen_init_cpio.c                         |  0
+>  {usr => scripts}/gen_initramfs.sh                        |  2 +-
+>  scripts/remove-stale-files                               |  2 ++
+>  scripts/sbom/tests/cmd_graph/test_savedcmd_parser.py     |  2 +-
+>  tools/testing/selftests/kho/vmtest.sh                    |  2 +-
 
-print_function_args() gets here for every line of the trace,
-from ftrace_dump() with irqs off too. When the module is not
-installed that is one modprobe per line.
+There's also tools/testing/selftests/liveupdate/vmtest.sh I know of, didn't
+check for other users in tools/testing
 
-Every caller of bpf_get_btf_vmlinux() and bpf_find_btf_id() was
-written for a function that doesn't wait for user space.
+>  tools/testing/selftests/nolibc/Makefile.nolibc           |  2 +-
+>  usr/.gitignore                                           |  4 +++-
+>  usr/Kconfig                                              |  2 +-
+>  usr/Makefile                                             |  4 +---
+>  16 files changed, 35 insertions(+), 27 deletions(-)
+> ---
+> base-commit: 93f51579e7df248780214094418f205253383cc5
+> change-id: 20260225-move-gen_init_cpio-to-scripts-9e89ef99e51a
+> 
+> Best regards,
+> --  
+> Nicolas
+> 
 
-pw-bot: cr
+-- 
+Sincerely yours,
+Mike.
