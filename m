@@ -1,131 +1,120 @@
-Received: from mail-qk2-f13.google.com (mail-qk2-f13.google.com [74.125.230.205])
+Received: from mail-pj2-f40.google.com (mail-pj2-f40.google.com [74.125.227.168])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7792C2652A2
-	for <linux-kbuild@vger.kernel.org>; Sat, 26 Sep 2026 00:52:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.230.205
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790383955; cv=pass; b=qH/GCKV6Zu64bc8H+gUW995R6CAIjgAuq844rNGGTFtjjTLZMaVMLV0dBOTubmM7pATwbBP6Yx2MwH6fqpy7How8pENTEGI+rzTO6FXWGoc/7l+XABMNgm+rLvsQ9Ps/6foElAwMhOa6S6J3WLYggfu5o8BaJHWa/AjOEUjJiHA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790383955; c=relaxed/simple;
-	bh=cxL8RY8wdmdsnxOD6Ni6qWQL/8tWTp4bkAuJvPRW6kg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kr0aPt1laCK+eI9oCAQdC4TkZJctWxLXJw9GbJfo42iHpGMnUYacO2kuj5Oz/jvbJAAheaIVUjJan8lv7kW18UE+yeKHAAn+3Pym5XGirH6WBiSeZdweZR8S9a4CcOCoo8eseMnB2/CssNAsL96cg40ERoOHoMe6q1HDXYjEYCM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SyHT+b62; arc=pass smtp.client-ip=74.125.230.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB8E839D6FA
+	for <linux-kbuild@vger.kernel.org>; Sat, 26 Sep 2026 08:29:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.168
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790411357; cv=none; b=VD2u1FtN/JaPYUcLZgSQmdwJSiBAZy8cyu9fPQ38+IsU/0Q4z6X+cRd9fW07Xk0jgg1ChSSF9ZP1RcrsWL2Lnnh+5oPrkyFg3rkq0ocL3O2+r4eEF+X/gXEIdRtkFuFB3o5Wuf0cHS7VVLtSVGVy9v2ycBOsQqINY7dBEgrR2a8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790411357; c=relaxed/simple;
+	bh=iXM6dXLVZyc4/2LLEhMvfVIyG+SHsbmujZvmS7fw1aA=;
+	h=Content-Type:Date:Message-Id:From:To:Cc:Subject:In-Reply-To:
+	 References:MIME-Version; b=Imp5tjLc+w27YzvUUurFqeiQhVNxN8hnpMbJMaiRrnRn2ddABh9GlFk84aUpO45NoMUFbziI0pgnoY2jUu08KwT1k8E1M630K50cJErKqc+jUlvg6ko6Ar+Ciq8tRCu2qWLbt1ipe9zgFaHqVNULPFuMuejpDFuAnrPZob8pUv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L1tf1epb; arc=none smtp.client-ip=74.125.227.168
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SyHT+b62"
-Received: by mail-qk2-f13.google.com with SMTP id d75a77b69052e-52fb769ca17so12901481cf.2
-        for <linux-kbuild@vger.kernel.org>; Fri, 25 Sep 2026 17:52:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1790383953; cv=none;
-        d=google.com; s=arc-20260327;
-        b=JjDiTgm+JyzB1/XutWk1J5ai5F5hUquI7pNN3R54fEMbPXT6YKsFMCuWd9Lh+0lvF8
-         vhG1wu9AsbM67AViE2wj20+iSipHgL2VKXTRboVa8Pqu5BZZKWk5maPnsynsdCm996f4
-         YRD1j5G1zRZxO+kVpogHaRgKIzP066089Xt+jvmeivfWB/BOrL4KSAQMtW8fLgRLpi7M
-         wCAht11+vl5eLbTyMN8nR1nmnCz+0mT1WzTTt+vC1eNQjv3LEzF06lIJRpgZkmsFpTgI
-         7tYS2xy3HMstZncldFSU5yGOR002OovH/PMp9eUacn1D5ZKwvjClcBKn9VqeD4QuXoJw
-         IaBA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=CSw04M5idaSqtHaCGqtANMLgl+u3nq3EJIWnJJPoynw=;
-        fh=JMGVOwUo9gRkmW59ld4y9o03XDddgvg41bIECJt6JNo=;
-        b=qF4Ty/ncJUMde8nunge1ATAyz4yTlW9r0tfbJlCDqu9IPcIDuELvvVvE5iqvl5fcJa
-         VB8vpzTM6jvf/q4IEro50r8IohFSVr36YWOV+ktuvUIiX2+v0T4hl2DHv1Nt705EjB/K
-         96xu0VJr5PEnQTc7VzBUoIf7ugakVjbDVjosck8iQU1Ho6NrK2laNCeQQn08mo0Ce4ln
-         ETn2pWsAfubTNCaGNeJfY10ljfISL+A5MM9szCR5FFQJiX0HEs/cug9DCHGd+7ylZ3SO
-         hSvyhn1lp3FLu3+5hblBR8i5yEZfYBFzesLZmEEPhyqSip0QS9KOqkJO5vkozQ/1y5sN
-         hegw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L1tf1epb"
+Received: by mail-pj2-f40.google.com with SMTP id 98e67ed59e1d1-3a0d31bda43so544397a91.1
+        for <linux-kbuild@vger.kernel.org>; Sat, 26 Sep 2026 01:29:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790383953; x=1790988753; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=CSw04M5idaSqtHaCGqtANMLgl+u3nq3EJIWnJJPoynw=;
-        b=SyHT+b62yEl5GBC7zQ8CeA3RKlLUvz6rNoSx0R5fXC0fi+KQgVpgqmZCHXQfNpprIU
-         LAn8zFD76t71h4G9vu6BiFr5uq/8y5SJ9SVrQOi+6XRf9eKJ3KFg/c7E6jPrK/sULkgf
-         IoEZav2HnGXatHzyXEmDD8VHnukJsXRoh24GwyzPhaW3JWXGwlBJ2ktOK5UsBmTaZehe
-         tWuSW82rFpKamQsUIh7VNlB+aqXJ0ecnayEMxhNiRxsOkSrEwkTbDFBpJFwYcwbc9kBl
-         UH2WWoaf3nA+GdBQeYRsoCROI5S66E8b03Ymi1Xxh5Z6bWneN77562MfluCAh4zIpJ0D
-         /aYA==
+        d=gmail.com; s=20251104; t=1790411355; x=1791016155; darn=vger.kernel.org;
+        h=mime-version:content-transfer-encoding:references:in-reply-to
+         :subject:cc:to:from:message-id:date:content-type:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=vsTzuV1eSC7imODMsDAQHQQbWFGBD/RBt6ggI0+EwhA=;
+        b=L1tf1epbkhLphZ2Julis/OkRu7jj8hETfwJ/ktaJBK1t/FnSaBM+B/Cvk8BtSprulN
+         LiTnhae7M11zRQ6WNQLA4WD/vdDuj9nRTm6pOICKA34Y+2mvG7lEMPdf/57cRfUjmJX6
+         P2rasuRcLzwNc44BxJt5lq3cNRMHqcft+eB5yHVdTfE7PNWyZGhs+3HMjk3kIg6caRpT
+         TGpyYMVH9ya+B8q+vDF7MM77tQM3OGKVyRiQA+4au42hbq6b0SM1/zlrAQ79jDv9k19r
+         Vbp/FjUWRznjhLnpVPM25BQ9x8aTAA+8zE8wL6H5I/RceUNK4KJzisdkbOMQL49P0+7b
+         o8tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790383953; x=1790988753;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=CSw04M5idaSqtHaCGqtANMLgl+u3nq3EJIWnJJPoynw=;
-        b=dohhr0itWRbA90QH7tQAIErIZMUBmcqHH1GvjTqevKtSTWKdWrecRt/Ur2VwWF9CeN
-         hnicQZJh9CzBS5fhrdutUmkJ8rJ68QiIhwVov/FS8Qnn5YQrHi0gUTrd1B9VSc5iqkH+
-         jpMBSBX8y4Ls5cv16cS5a8S5m0seIVzrIfhOPN4Lw4s4xpI10ieRfE02+sUo4T5qmu8o
-         rUxMvdMaDToOid1PQPk7FCS8zNMK6fNQIOh4D2o0X6OS3PF4qYM7zsncIJNJQuDLYDAH
-         IG5Y3v7ipBl3RYBEKsq3xiaeukmPXpiGySuIaS0HWIpxD1mJtAqbAFHzVyjLNL2sUZQV
-         HMDA==
-X-Forwarded-Encrypted: i=1; AKwUvBx2n2of93iio8Sr8hLQAX9DDnxwuZPUEnEAiOI8idjX2KbdTUobLVIPqTsqcrvfX3Cnf87pzY4Hl+xm3NY=@vger.kernel.org
-X-Gm-Message-State: AFuF++mC5dzALtHJDlxtqlfJUQOn5zWuJzpEbG287JJejuC+6XnNZJmr
-	6WLwN+XOmHl6ZzFyQs3yvO9LStYZNNcYzUw3iE9HpPWyrgDdljiep7EYc+zo0roryso+DAtn1l1
-	4aD2gV7yOwODhPmKLxUNdaKTmUft1p24=
-X-Gm-Gg: AYBFou3YG3oSarYMxEsNprxKmHg5WKn/FcGxF/iGriurVFYHfsQ4I15DSLRMs07pci1
-	V290zxzqlSH/EUlmKtBT+Rt8pfIj3RgEAy4n4ZHzbRVqEWew7KB8xofmpUe1z64EFDowYrt052M
-	g7MXom/07METR4ybTNFpG0WmixCTdDtbb8u0iAsPOp5AoMImF9WLu4Zea88XhU5DJaENgVq/3Vh
-	e7lT5zmCkJSigRBvpfxsXxvifxD/USVQsDs58Qj0PbXRjn44yyQJoePZJ4z6iU7/PgfRBN6zmGH
-	uNvKqp2pizo42TWq60u+jRPX4DBi+oTiDtxC3eb6/VV5l9R/iQXnfvyT3iJHaM/sbSZRXCrYQqa
-	iw9NuhPh+wBh5v7vL9gZ2dQ0sgckw1+Gy7+8RQup1AB8gb/2w9aSuz4sYP9j+z3t9UqxOc0zA8B
-	Fk7Sb63ZTX72ZnVnq3YADh6OYF4NA37oudeQVRuerhpjda/FMqHW45Db/4deuTHq88zbBpEYEOV
-	v84jT0jusOb5X7mfzaZBYM=
-X-Received: by 2002:a05:622a:1818:b0:533:a4a:8826 with SMTP id
- d75a77b69052e-5330b5eed0emr80806541cf.19.1790383953335; Fri, 25 Sep 2026
- 17:52:33 -0700 (PDT)
+        d=1e100.net; s=20260707; t=1790411355; x=1791016155;
+        h=mime-version:content-transfer-encoding:references:in-reply-to
+         :subject:cc:to:from:message-id:date:content-type:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=vsTzuV1eSC7imODMsDAQHQQbWFGBD/RBt6ggI0+EwhA=;
+        b=VbUplyHbqsv/Vmm6rF2PDRMQHlS7oMX4jO18e/5LuyJNp29A7f2aHQFcmPFHiQLzVr
+         pYsgJF91q6+ENGTdeocEHqfnkXJ0k/KFw76ovFW4K48fQCLDfomTptuDVEpr/7iYzoSz
+         WBGaPaWSDJD4Tjixe07MOlh7RS4XdBoH5oe4CBJniNR47oVYso7Of/HvyR7fXaJ24nNg
+         wcXeajaP/4Ce8PKQxeGxvFj82DrJkqK5H/VM277iteQGg8qj1uxUT1trOBcRzdC20lcb
+         5cyR4ukTvjB3n3SiPvlNH7Tl9rxeS1nlrJaQMrJKhHiu4Z0it6vnHIEXoUcO8ntNsnQj
+         Rzaw==
+X-Forwarded-Encrypted: i=1; AKwUvBx6qHFVWamz5x5Q+VVMS7VyQlsCKfsxYKG5oy87RedciRfSb+9g3Ee4yoc98Q7YKkWl3sFUrjyV6NArZqA=@vger.kernel.org
+X-Gm-Message-State: AFq9FYJXoltPQEKjcH6hKHF4c9YH+kgU/QXp5s/Zr/6N68s6hoeHk2op
+	Ih2PagLtU2WwklHYc18o6cQksitePyUQdVCWECRjBVGQBaFTovg8DzxJ
+X-Gm-Gg: AYBFou1/zaTnYlaCPhJwq1KLfwEOPdQAD+Ci2siF1fgrIogYn306jyY3YnVJWIZa5SU
+	sL7LL+F0+uu7+qKzHTcenqEX/EPJorWrRbv10aO33aqvIaN8aIf6iVqJxa6egW3NQUL3270Sfl9
+	3pHiVQMbt5FPc0/PAGZZt+AxFTwvhot+uZV9WT5AYtPssQdsiOtTZGIEmcRmKMhj0YZMY9le2JK
+	vIHN2CsQ301xX1nvs6YPBNIB00hod+KgW5IWlMm/GC+QIPEEBf8NcsPf6SWmqOjlXUVUzznQqaA
+	8TCFMeLOaK4BYLfepWBvoAzXyfKNoezawtR1FmCTf8biHCbfm/szBZP+StNMQZzq6jjeQbtaXq4
+	oF1R4mJy3ZfFoqUPxVmVSS568RDKZy0Aws+klCidyDZ2LQaAFMN6rVr9jNBsRuSHu89rF1b8Dnj
+	oyfaBFeTJQHUXgqmN06UViCJr+6n8P4/H3h5fPNkGvDo6E1Da5eiheY57sm8pkDEKaRVr6/0LjC
+	ZN/40O7rKo0Z1XatETtcCPbvGzBkMiutwc35z6W/MUC/6OGhAi4WEbnXZegXAbukUxsHiXTL6aw
+	MDe1
+X-Received: by 2002:a17:90b:51c1:b0:39e:1692:34bc with SMTP id 98e67ed59e1d1-3a098ad4cd1mr6277315a91.1.1790411355026;
+        Sat, 26 Sep 2026 01:29:15 -0700 (PDT)
+Received: from localhost ([153.61.198.251])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a0b99e5220sm8692077a91.16.2026.09.26.01.29.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 26 Sep 2026 01:29:13 -0700 (PDT)
+Content-Type: text/plain; charset=UTF-8
+Date: Sat, 26 Sep 2026 08:29:12 +0000
+Message-Id: <DLP3USQDIMJG.1FUZXEXOX38TR@gmail.com>
+From: "Alexei Starovoitov" <alexei.starovoitov@gmail.com>
+To: "Jay Wang" <wanjay@amazon.com>, <bpf@vger.kernel.org>, "Daniel Borkmann"
+ <daniel@iogearbox.net>, "Andrii Nakryiko" <andrii@kernel.org>, "Eduard
+ Zingerman" <eddyz87@gmail.com>, "Kumar Kartikeya Dwivedi"
+ <memxor@gmail.com>
+Cc: "Alan Maguire" <alan.maguire@oracle.com>, "Martin KaFai Lau"
+ <martin.lau@linux.dev>, "Yonghong Song" <yonghong.song@linux.dev>, "Jiri
+ Olsa" <jolsa@kernel.org>, "Nathan Chancellor" <nathan@kernel.org>, "Nicolas
+ Schier" <nsc@kernel.org>, <linux-kbuild@vger.kernel.org>, "Luis
+ Chamberlain" <mcgrof@kernel.org>, "Petr Pavlu" <petr.pavlu@suse.com>, "Sami
+ Tolvanen" <samitolvanen@google.com>, <linux-modules@vger.kernel.org>,
+ "Miguel Ojeda" <ojeda@kernel.org>, <rust-for-linux@vger.kernel.org>, "Arnd
+ Bergmann" <arnd@arndb.de>, <linux-kernel@vger.kernel.org>, "Hazem Mohamed
+ Abuelfotoh" <abuehaze@amazon.com>, "Bjoern Doebel" <doebel@amazon.de>,
+ "Martin Pohlack" <mpohlack@amazon.de>, <jay.wang.upstream@gmail.com>
+Subject: Re: [PATCH bpf-next v3 4/9] bpf: take the vmlinux BTF from the
+ btf_vmlinux module
+In-Reply-To: <20260925224229.1850-5-wanjay@amazon.com>
+References: <20260925224229.1850-1-wanjay@amazon.com> <20260925224229.1850-5-wanjay@amazon.com>
+X-Mailer: mkdraft (claude review draft; edit before sending)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <179017337986.52388.7943687183785012868@gmail.com> <179037565553.3985470.12035061965740287126.b4-reply@b4>
-In-Reply-To: <179037565553.3985470.12035061965740287126.b4-reply@b4>
-From: =?UTF-8?B?MTTkvq/lu7fnv7A=?= <ue081723@gmail.com>
-Date: Sat, 26 Sep 2026 08:52:24 +0800
-X-Gm-Features: AclHuK9Ua7kqnIr5kUYr-Cnfwv_MkcNfJmZDDmk3ND4mcEnL1T_GfZSWuwa6lP0
-Message-ID: <CA+NtrhRdnuZOOFpBXvnfOXFs-HA8q+2sLvR0BxH=BjzVAEZBzw@mail.gmail.com>
-Subject: [PATCH] clang-tools: Import os for broken pipe handling
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Nicolas Schier <nsc@kernel.org>, llvm@lists.linux.dev, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Nick Desaulniers <ndesaulniers@google.com>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>
-Content-Type: text/plain; charset="UTF-8"
 
-From: Ting-Han Hou <ue081723@gmail.com>
+On Fri, Sep 25, 2026 at 10:42 PM Jay Wang <wanjay@amazon.com> wrote:
+> +	if (!data && load) {
+> +		/*
+> +		 * The module notifier installs the BTF before init_module()
+> +		 * returns, so it is either there after this or the module is
+> +		 * not available (yet).  Not cached: a later call retries,
+> +		 * e.g. once the module becomes reachable on the root fs.
+> +		 */
+> +		request_module("btf_vmlinux");
 
-The BrokenPipeError handler in run-clang-tools.py calls os.open() and
-os.dup2() without importing os. If this handler is reached, it raises
-NameError instead of redirecting stdout and exiting with status 1.
+This will deadlock.
+event_btf_ids_read() calls btf_get_module_btf(NULL) with event_mutex
+held. With =m and BTF not loaded yet
+  cat /sys/kernel/tracing/events/sched/sched_switch/btf_ids
+gets here and waits for modprobe. modprobe gets to
+trace_module_notify() which takes event_mutex.
+lockdep doesn't see it.
 
-Import os so the handler can work as intended.
+print_function_args() gets here for every line of the trace,
+from ftrace_dump() with irqs off too. When the module is not
+installed that is one modprobe per line.
 
-Fixes: 87c7ee67deb7 ("scripts: handle BrokenPipeError for python scripts")
-Assisted-by: LLM
-Signed-off-by: Ting-Han Hou <ue081723@gmail.com>
----
- scripts/clang-tools/run-clang-tools.py | 1 +
- 1 file changed, 1 insertion(+)
+Every caller of bpf_get_btf_vmlinux() and bpf_find_btf_id() was
+written for a function that doesn't wait for user space.
 
-diff --git a/scripts/clang-tools/run-clang-tools.py
-b/scripts/clang-tools/run-clang-tools.py
-index e78be82..79d58b3 100755
---- a/scripts/clang-tools/run-clang-tools.py
-+++ b/scripts/clang-tools/run-clang-tools.py
-@@ -12,6 +12,7 @@ compile_commands.json.
- import argparse
- import json
- import multiprocessing
-+import os
- import subprocess
- import sys
-
-
-base-commit: fe2ec83746e501645709761605c2464a44fd2929
--- 
-2.52.0.windows.1
+pw-bot: cr
