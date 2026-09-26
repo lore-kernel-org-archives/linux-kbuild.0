@@ -1,70 +1,70 @@
-Received: from mail-oa2-f35.google.com (mail-oa2-f35.google.com [74.125.231.99])
+Received: from mail-oa2-f23.google.com (mail-oa2-f23.google.com [74.125.231.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92FCA383C92
-	for <linux-kbuild@vger.kernel.org>; Sat, 26 Sep 2026 19:40:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B47A239280C
+	for <linux-kbuild@vger.kernel.org>; Sat, 26 Sep 2026 19:40:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790451624; cv=none; b=kICZauif4aDl9Ux0JsxGTOzaRaQDbeaqR61/uyPQkQ09v6XA0F6w0J3ThNLZHg5aZQ6tP0ysKBcDfdMFPFmOFTj2HkOCt8d6XfuTj/m4rCDn4IpdN+8RxZRfKzq8VN/BNvjQ4VDjBw0oYtAQiD0rSfM2xWlpkXoRMvotvOq/A5M=
+	t=1790451635; cv=none; b=JdFAcBE3coRZjx4hMg+n0ybTGUCAaT1sAd7/T5VGIOdJQCSzmxoPM5TMMZ8XSZY+aPvPwuKufrGknKKIdv5s2dFZ+PN2G0lIOtHpOzhsAAyV/CPxWFLDVfqUyjFHDyL6/9JEIgOo9RAByyYAXVxj1o820/fmRQkZ0kXRwCFOnB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790451624; c=relaxed/simple;
-	bh=L4+N7wtX63R4ON7KHqWeibK8O6baOU4ILoweuWjUQVg=;
+	s=arc-20240116; t=1790451635; c=relaxed/simple;
+	bh=LVYPylbZu3M6VrXkQZcoyGu2621tAs/rWNxgexduWm0=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=J2/epbvND14m+95XzwaiwM4TE6K4eZVKj2cb2vi+oUtnrjzPRXCB9x2g5CyFG2gUffQKP7rTWMZYlqDiiLqdBhwRBq6Mctcwlpdyun3oGHHKwZDqcfCflDVYfV0VZy4EVOR6j9OCItzbW3aa//QfdEhUF5NYgiF5OCZ0ffDTn2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H+UjYwgs; arc=none smtp.client-ip=74.125.231.99
+	 In-Reply-To:To:Cc; b=dQ4gjl6rU7wraIqLyHiCkX8PVNYi/iKGMdDQjtCjPu/Tv87o2haXrMX5C+GLkVTexWrU9bUp1mlkRGi2jmhePwbohCMjx9MN2EqR4CBf16hrkte4LcTJmMJsUu+Ep77kjC44qTmwoH5CoM216uMNMp/mN8EdvH54cSHrUs21PBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pq1Vd1xr; arc=none smtp.client-ip=74.125.231.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H+UjYwgs"
-Received: by mail-oa2-f35.google.com with SMTP id 586e51a60fabf-492d8c4add0so1023617fac.0
-        for <linux-kbuild@vger.kernel.org>; Sat, 26 Sep 2026 12:40:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pq1Vd1xr"
+Received: by mail-oa2-f23.google.com with SMTP id 586e51a60fabf-47b8afe046dso1095521fac.2
+        for <linux-kbuild@vger.kernel.org>; Sat, 26 Sep 2026 12:40:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790451620; x=1791056420; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1790451622; x=1791056422; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=FDnXU1aO4Q0AX1bN544mobwJFKMRqwp3H787nn3otho=;
-        b=H+UjYwgs+ZyH6L6DYyvI3YKrOUci3x4rWsH0I9Sg9LoW3nKDMAsa0hVPdUWJ1uxkP0
-         yeUBPfAPTvWVbd8fI58tJ5AkDwxzEti0OjmWuA2uCnmRdHHEsputyvWVJ9YCOUBP3s4m
-         0NiYkgBZ3lACHzQrNrrzlx9M9olIFcc3YTgBK1MYMwHCueQzJRr4y55Zi1L6XtsIQXE/
-         2jf8Hb/XkE+n2zpY2h3iSJ0wb+uUxic8nYQRNNkZzAkkbh2YHhZMzXLDCxrX++Dhrxy4
-         HaQS6xty8QzSJGSyNBeAYsbjLoaik/xjJfQbL1OOnjVbr90oNrx1rRZI5rg3pPkgCrFQ
-         UUYA==
+        bh=YKtZQLrJoNL1FhGmGKsD48Cotqxaqos8u7jP6s8F5bk=;
+        b=Pq1Vd1xrlDVKr9Yn1Up9HGTyGRvbsWvMRw9jhJlv8NQw/PaNDhs2NIuSSYi0G4h2bU
+         vocK3hlTkLVsq/Xpk/Fgltk4MGjDTlzBz4DCduXIyfdIoZYho1liY0oENr53wSksf9Gl
+         auh6aPisnXLVsuTNzv/wIpSVFhDaLBfQZYmsV98YbW3mKncFwmiPSxIUzJLlzmYaFkcd
+         BpdvvdxBlT1PkSIbhyj42/L281Q7+9bTRW7+51dZPsw80IbSQqvYyrO0NTmXFzofPxn7
+         dpeGcCLC7Gno+LcYIaqM6Ba21u2auck1wCGK6BC5Z+sAJOJNug5ZE8ezhiO8l5uiKDHM
+         b+gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790451620; x=1791056420;
+        d=1e100.net; s=20260707; t=1790451622; x=1791056422;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=FDnXU1aO4Q0AX1bN544mobwJFKMRqwp3H787nn3otho=;
-        b=L77ZpDdPdhY8/VXn9igPMEImBxU8C+DlQfwir3VPYeVahdDJCfuAyG6FyjvaB9yP0U
-         I+9QXBWUJXb5VK5RTqw1c84NLfNw+mGYIEKjCxpQiwLZDUX+WkSMnw0xgRFDJP7gf7vS
-         FZdhYKi17OZVeEeqlJol1QZR3gJ+1o7X6fH4N5hF0Nck81eYrdUADBk0AXd9F3w8sn2n
-         exoRRs+uLa8pevvoN3vFE6kZ6PXjwxC+4Lao4HMUVOtOzA7ufc7qprCCaB/+8e6csyjE
-         dE+D8BkPcv8YhaYBvFkRSyu4zFn6EYW/RXJ923V4KXobH6mWh3hUknLQT7jE77+BSsHh
-         cbvw==
-X-Forwarded-Encrypted: i=1; AKwUvByPIvyUrVtfmPhiJ+epLvK0qYpxi6wNCFDV/Jutngxz3Q8Hioj1sT5pUidtXdJvu8fHNNCIBYkDGf9VbHY=@vger.kernel.org
-X-Gm-Message-State: AFq9FYKtLRyIyI5h8VjE13z1h9fv1VUF5gx+iEA9VpmAYCpEqk76St6S
-	LjFIEVxtTYWnijKokLSITRawDitKc8fBT4745ywL/dNa6pX0It9AeHXj
-X-Gm-Gg: AYBFou0RpPzIArx4cHHxqW8dTosPcOQDPOc5Hg9Nxa3h4i0N4QCD/+SGbxO7HCHznyi
-	ynSiepB50aYnKzhQjZ8YepBJ7LSQdZ+fSR1WttxIqfXNQgSMLQTNwAkttcSPtOma63Xg3rbCwDy
-	+5ObPVxYv7Pv2uLvQ9XKy6AQmFhOOESfsTzOKFHxhUMB8m0WJE26uPtbE/ujg2a/7etg9aKZ0y3
-	tiRW3JdJfYwiCKqSmI2fRucib4M3Ooor7mmqcnSeVrQkYyZNUZAkofxWrMJCMXQHennnHwF/GuL
-	WW1i4IrUgbKPpCMzqO8kxtCvGQEYbhSCoAPv9gNkAJOsYq9COId4TDCPsHYrS2nM15crpOXtubO
-	U6KZhUXgdeyb4ASSYtnS3Y5+zrw+Ijwn9wW2cuvBGT4HBwquK+xWzA4HO1HUkQqDzWW0EjwBD6o
-	+xP3kIHGSa9dkJHOM6brXWpWkGkEGqsCC68yCWBQe3qyOyUmdQLf4J2mjiurcXJTxqiG3br5xzU
-	4eTeINhfkldZ5iP/u5piKzGaG8955uZ055QmK/6pDMQnuj6+axIDgA+jumF0aMShD1Lvxezqh+r
-	11XvEmjdWQ1w4QGmYA/fLrX1zPB+Qg==
-X-Received: by 2002:a05:6870:e456:20b0:493:bd68:526b with SMTP id 586e51a60fabf-493bd68551cmr3085177fac.51.1790451620516;
-        Sat, 26 Sep 2026 12:40:20 -0700 (PDT)
+        bh=YKtZQLrJoNL1FhGmGKsD48Cotqxaqos8u7jP6s8F5bk=;
+        b=VDDRAUyHiU/vxeDpoz5nlllRwGPBUTE9v6N1tSgjW/z7xhyv/WzB3k2EepRKZRdANW
+         GlsasAH//rJ/bMyGCeJWzOpKkHUSQa7M6iVWFqRDkB0pvpqXsvISB0PAFQDF/P33Es3s
+         Mi1NtbQg8lkzkQAY4VU1oN4OsDH+YJu8V15LYGBxtRpxxMvm2PFiWTKgq49Cx/kBmiwK
+         6p8GEvDKRhRuMBp8Swvv9MjsPhGsKefkAEgbYLGzN4Y7cx1wI7/0h4KyaWjQhUZUgG8o
+         6uaRWjyKTLTB3Egyc+A+WCd4tpcO5lXae8f7wz3fA08ebOxKwnkEhSQbEG5cxYyAVIDb
+         Ovtg==
+X-Forwarded-Encrypted: i=1; AKwUvBw30v4GIop7db5EHfyCCDJUOxZslL7/bEzK6wmWMiqRl5fZcwzyL7OTx0Pn9NqHGxifwU5FgArwjmkcp1k=@vger.kernel.org
+X-Gm-Message-State: AFuF++lJI/l/c9x1VowF7ZIMuVR2EW/OzMMjnIrfSwDfnWN54Ed+jsTd
+	gO2x5SR30ZvkXW+DwbBY8prv4Ma/0JV+PFMSVd8EuFlNOKQxjGffl2ohnoIrRA==
+X-Gm-Gg: AYBFou1RTCFqzfR9wNg17dS+FeN1709YItZLmBKxe3AqdpcMDsyjHO7s1IlKHe0Hb1f
+	nheyGphGKBlUCXreyilrzlR+ATwIK2yLjIVQcQfgCx9HFIX31IUxntGyqdashEvOetE9/wW+la4
+	YNR2Xz0TPtzhKH6b4zeUImryljLFSXjNpoaI8Vip1QQgr8lgnh+DfixB9e73dAWhv5NAWrEqCbD
+	p5GeeuOEA9p2csuC1+DLZGaNW/srhKRjrrDPSQzvSb4+DFH2xtyNqO2/yi/u3VJ/3pvh7OWkw1A
+	y+LKKjA79YF+uP50Ro1SNW+Kc/Htgy2e+9G/QMWcoc1SW/p/Qg5PXBWkhzLyPxl0/+CkRQo1TSt
+	Qsu2AggoFsMu7ElD4OkI0OZuXYcXH+6oAddcwhbEIt5LDtZ0m+WVR5vPe65Z68SG9HqlF+3GDwk
+	QNGwXLDJltLWPZRq40+7QbRh3smwvXP48PCF/C8MfJ4TLJpZFyX96q8IYTdZBnKlyLxCQ+FWFil
+	8GoO8Tg7a9rz86nsfXRYbPXdCMpZbcgpgZTP1fyKseroSJmQL0rNT5qDgDWvEMNxcyzAENhdRJu
+	0FJOJ0m1T3hEZYmicpI=
+X-Received: by 2002:a05:6808:f03:b0:4d6:9222:99f9 with SMTP id 5614622812f47-4d72ea5f257mr10775845b6e.57.1790451622482;
+        Sat, 26 Sep 2026 12:40:22 -0700 (PDT)
 Received: from [192.168.0.245] (c-98-38-17-99.hsd1.co.comcast.net. [98.38.17.99])
-        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-49335011458sm5955595fac.4.2026.09.26.12.40.18
+        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-49335011458sm5955595fac.4.2026.09.26.12.40.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 26 Sep 2026 12:40:19 -0700 (PDT)
+        Sat, 26 Sep 2026 12:40:21 -0700 (PDT)
 From: Jim Cromie <jim.cromie@gmail.com>
-Date: Sat, 26 Sep 2026 13:40:13 -0600
-Subject: [PATCH v6 2/3] kallsyms: Increase marker density to 16:1 to
- accelerate lookups
+Date: Sat, 26 Sep 2026 13:40:14 -0600
+Subject: [PATCH v6 3/3] kallsyms: Unroll 24-bit sequence reconstruction in
+ get_symbol_seq()
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -73,7 +73,7 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260926-ksyms-tune-v6-2-236620c65e98@gmail.com>
+Message-Id: <20260926-ksyms-tune-v6-3-236620c65e98@gmail.com>
 References: <20260926-ksyms-tune-v6-0-236620c65e98@gmail.com>
 In-Reply-To: <20260926-ksyms-tune-v6-0-236620c65e98@gmail.com>
 To: Andrew Morton <akpm@linux-foundation.org>
@@ -83,162 +83,58 @@ Cc: Lorenzo Stoakes <ljs@kernel.org>, Kees Cook <kees@kernel.org>,
  linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
  bpf@vger.kernel.org, Jim Cromie <jim.cromie@gmail.com>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1790451613; l=5688;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1790451613; l=1647;
  i=jim.cromie@gmail.com; s=20260203; h=from:subject:message-id;
- bh=L4+N7wtX63R4ON7KHqWeibK8O6baOU4ILoweuWjUQVg=;
- b=paFwGAOnmyEIWfsGb5cmDfw+Xn8Ec9XFPWYmC6peeoMl1lUrvQLMv/c7llRNPmqMxxGGCI2Lv
- xUIoavikWQ4DzH8K3lUnj950UGG4wdv5HFgDU7KSCUovVz3LCAgvvHH
+ bh=LVYPylbZu3M6VrXkQZcoyGu2621tAs/rWNxgexduWm0=;
+ b=dNUj7m5vUOsr5ayzqUGXa8mCtan7WqpvOb8CSFdlf7x9KECVTvRON81QIFDLKFz2EcF6imX17
+ u3cQQFthy5FAaXBk1SogPOhRT8cnneAmJILB8JSWnHkrLe97OdyfQm5
 X-Developer-Key: i=jim.cromie@gmail.com; a=ed25519;
  pk=C6E5ODlPQo7ZBynATXH9wg7K6HxP0pIXyf4s38Qw0XE=
 
-kallsyms stores symbols with remarkably efficient packing, and simple
-streaming unpacking, laid out sequentially in address order.  That said,
-variable-length records make arbitrary access inherently linear.
-kallsyms_markers[] addressed this by marking stream offsets every 256
-symbols, reducing the scan distance by 256x down to an average of
-127.5 sequential steps.
+kallsyms_seqs_of_names[] stores 3-byte big-endian sequence indices that
+map alphabetical symbol positions to address-ordered symbol records.
+Currently, get_symbol_seq() reconstructs each 24-bit integer using a
+3-iteration for-loop that shifts and bitwise-ORs each byte sequentially.
+During binary search in kallsyms_lookup_names() and duplicate boundary
+scans, this loop introduces branch and loop overhead on the hot lookup
+path.
 
-While 127.5 hops was negligible for rare, single-shot oops backtraces,
-both table size (~184k symbols) and lookup traffic have expanded
-substantially.  In alphabetical binary search (kallsyms_lookup_names),
-each of the ~17 comparison probes must locate candidate symbols via
-get_symbol_offset(), compounding into ~2,170 sequential symbol hops
-per lookup.  In bulk tracing workloads (such as BPF multi-kprobe
-attach), this penalty compounds into multi-second latency.
-
-Without altering the underlying storage layout, we can retune this
-trade-off directly by increasing marker density from 256:1 down to
-16:1 (KALLSYMS_MARKER_SHIFT 4) in kernel/kallsyms_internal.h, shared
-between scripts/kallsyms.c and kernel/kallsyms.c.
-
-This caps the remainder scan at 15 symbols and cuts average scan distance
-from 127.5 down to 7.5 hops (a 17x reduction).  Across a 17-step binary
-search, total hops collapse from ~2,170 down to ~127.  For a kernel with
-~184,000 symbols, this adds ~10,800 u32 marker entries (+42 KiB) to
-write-protected .rodata.
-
-In-tree CONFIG_KALLSYMS_SELFTEST measurements across all ~184k symbols
-show average lookup latency dropping from 6,102 ns down to 866 ns (a
-7.0x speedup).
+Mark get_symbol_seq() as static inline and unroll the 3-byte extraction
+into direct byte shifts: (p[0] << 16) | (p[1] << 8) | p[2]. This
+eliminates loop induction variable maintenance and allows the compiler
+to generate direct loads and constant shifts.
 
 Signed-off-by: Jim Cromie <jim.cromie@gmail.com>
 ---
-Changes in v6:
-- Recast intro around the kallsyms storage/marker trade-off (efficient
-  address packing vs linear search hops).
-- Drop hunk-by-hunk numbered list from commit body (addresses BPF CI
-  review).
-- Drop 0.002% percentage claim and state absolute .rodata cost (+42 KiB
-  for ~184k symbols).
-- Drop ephemeral benchmark comment from kernel/kallsyms_internal.h.
-  replace with scripts/kallsyms.c include ref and __KERNEL__ wrap
-
-Changes in v5:
-- Replace dynamic 1:1 batch lookup index (kvmalloc, mutexes, RCU) with
-  static 16:1 marker density (KALLSYMS_MARKER_SHIFT 4) in .rodata
-  (addresses Kees Cook review).
-- Eliminate all dynamic RAM allocations, setup/teardown costs, and
-  external batch APIs.
-
-fx2
+Changes in v3:
+- Added as a standalone micro-optimization patch (addresses David
+  Laight review).
 ---
- kernel/kallsyms.c          |  8 ++++----
- kernel/kallsyms_internal.h | 11 +++++++++++
- scripts/kallsyms.c         | 14 +++++++++-----
- 3 files changed, 24 insertions(+), 9 deletions(-)
+ kernel/kallsyms.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
 diff --git a/kernel/kallsyms.c b/kernel/kallsyms.c
-index d18d78e626db..91ced7aa797e 100644
+index 91ced7aa797e..52e41879c24b 100644
 --- a/kernel/kallsyms.c
 +++ b/kernel/kallsyms.c
-@@ -150,10 +150,10 @@ static unsigned int get_symbol_offset(unsigned long pos)
- 	int i, len;
+@@ -185,14 +185,11 @@ unsigned long kallsyms_sym_address(int idx)
+ 	return (unsigned long)offset_to_ptr(kallsyms_offsets + idx);
+ }
  
- 	/*
--	 * Use the closest marker we have. We have markers every 256 positions,
--	 * so that should be close enough.
-+	 * Use the closest marker we have. We have markers every
-+	 * (1 << KALLSYMS_MARKER_SHIFT) positions, so that should be close enough.
- 	 */
--	name = &kallsyms_names[kallsyms_markers[pos >> 8]];
-+	name = &kallsyms_names[kallsyms_markers[pos >> KALLSYMS_MARKER_SHIFT]];
+-static unsigned int get_symbol_seq(int index)
++static inline unsigned int get_symbol_seq(int index)
+ {
+-	unsigned int i, seq = 0;
++	const u8 *p = &kallsyms_seqs_of_names[3 * index];
  
- 	/*
- 	 * Sequentially scan all the symbols up to the point we're searching
-@@ -161,7 +161,7 @@ static unsigned int get_symbol_offset(unsigned long pos)
- 	 * so we just need to add the len to the current pointer for every
- 	 * symbol we wish to skip.
- 	 */
--	for (i = 0; i < (pos & 0xFF); i++) {
-+	for (i = 0; i < (pos & KALLSYMS_MARKER_MASK); i++) {
- 		len = *name;
+-	for (i = 0; i < 3; i++)
+-		seq = (seq << 8) | kallsyms_seqs_of_names[3 * index + i];
+-
+-	return seq;
++	return (p[0] << 16) | (p[1] << 8) | p[2];
+ }
  
- 		/*
-diff --git a/kernel/kallsyms_internal.h b/kernel/kallsyms_internal.h
-index 81a867dbe57d..6a781e4cc77f 100644
---- a/kernel/kallsyms_internal.h
-+++ b/kernel/kallsyms_internal.h
-@@ -2,6 +2,16 @@
- #ifndef LINUX_KALLSYMS_INTERNAL_H_
- #define LINUX_KALLSYMS_INTERNAL_H_
- 
-+/*
-+ * Provide compile-constants for scripts/kallsyms.c
-+ * so it can build the corresponding kallsyms_marker[] table.
-+ * and wrap the rest in __KERNEL__
-+ */
-+#define KALLSYMS_MARKER_SHIFT 4
-+#define KALLSYMS_MARKER_SIZE  (1U << KALLSYMS_MARKER_SHIFT)
-+#define KALLSYMS_MARKER_MASK  (KALLSYMS_MARKER_SIZE - 1U)
-+
-+#ifdef __KERNEL__
- #include <linux/types.h>
- 
- extern const int kallsyms_offsets[];
-@@ -14,5 +24,6 @@ extern const u16 kallsyms_token_index[];
- 
- extern const unsigned int kallsyms_markers[];
- extern const u8 kallsyms_seqs_of_names[];
-+#endif /* __KERNEL__ */
- 
- #endif // LINUX_KALLSYMS_INTERNAL_H_
-diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-index 494852ade6d8..be42a9111350 100644
---- a/scripts/kallsyms.c
-+++ b/scripts/kallsyms.c
-@@ -29,6 +29,8 @@
- 
- #include <xalloc.h>
- 
-+#include "../kernel/kallsyms_internal.h"
-+
- #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
- 
- #define KSYM_NAME_LEN		512
-@@ -349,16 +351,18 @@ static void write_src(void)
- 	printf("\t.long\t%u\n", table_cnt);
- 	printf("\n");
- 
--	/* table of offset markers, that give the offset in the compressed stream
--	 * every 256 symbols */
--	markers_cnt = (table_cnt + 255) / 256;
-+	/*
-+	 * Table of offset markers, giving the offset in the compressed stream
-+	 * every (1 << KALLSYMS_MARKER_SHIFT) symbols.
-+	 */
-+	markers_cnt = (table_cnt + KALLSYMS_MARKER_MASK) >> KALLSYMS_MARKER_SHIFT;
- 	markers = xmalloc(sizeof(*markers) * markers_cnt);
- 
- 	output_label("kallsyms_names");
- 	off = 0;
- 	for (i = 0; i < table_cnt; i++) {
--		if ((i & 0xFF) == 0)
--			markers[i >> 8] = off;
-+		if ((i & KALLSYMS_MARKER_MASK) == 0)
-+			markers[i >> KALLSYMS_MARKER_SHIFT] = off;
- 		table[i]->seq = i;
- 
- 		/* There cannot be any symbol of length zero. */
+ static int kallsyms_lookup_names(const char *name,
 
 -- 
 2.55.0
