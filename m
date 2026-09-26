@@ -1,125 +1,252 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo2-f36.google.com (mail-oo2-f36.google.com [74.125.231.164])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E4C7376A0D;
-	Sat, 26 Sep 2026 17:51:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B99E383C92
+	for <linux-kbuild@vger.kernel.org>; Sat, 26 Sep 2026 19:40:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.164
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790445085; cv=none; b=XQb4FBLIREtqEEMxphESzASqjiPpbrIq/JT0cnn/JAH2qTVPJmVVfUfAVR2pJgsGYO93D5LFMLkCWu3W0DlAyRhIrOecwCvakq7odE0+iBc6bR67z40Mka1rac8k9PQVa3SSaOyNd7ylmfBQZJOX8Zl4jSSJbNkAt3EybKeQiSQ=
+	t=1790451620; cv=none; b=IoDa2ezcPo6OFbEQW+rzE07Z9CVdvBbTUwC9Hd/L+80LBOgMcCqZKpWP57Nxns+v5dwFZuhoLE8Yl3eyJOE8jalBGZZEVwDDUmAZY9V9E5FkW6i6quapBFBFpjB2gEh+RUS3caTJ7KY8XU7XndkfB5FmETIwEMR0uCfj1vLsFNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790445085; c=relaxed/simple;
-	bh=dJkwSRcEIBWdPO5DP6xDMu0eTRcPeYjoIpVQnE38tvA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Co6raVDtdVFmdLMZNUNorzWcsgAV8jjK2urgazAX2IpbqH2w1XVHocFGHSOJFDk+jP0naOyyASY21kg7a+x5fG3+4oFstK0RSpNybAN4Vg4UNEQ7WkgUaR533MCXljdVgaKY96jUqnCQ9nnRBtd+X6XSgtOYhN+7C6eAkGUwoP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DD1lP/Qm; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790451620; c=relaxed/simple;
+	bh=OSINSMyFOeedO6ZrqROTPkBKxmtb5CoHcUyLQkCdwJM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=T3SSsXu+mcp5aitBLLdW5LVsR1wji1xjcurJ84hLtGQE0FdGPQs9NNjajnjuiMTdIs9EDyPQnwcfCdtXEdnsem11JC5K7aS3vBkz9fgVOvCQxQlJ2OVwz6dKOZuAMX3G5riNwYLdeeUnYv9SLik8IYph/EziFqFRwNpgBilgMew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kH9+40YD; arc=none smtp.client-ip=74.125.231.164
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DD1lP/Qm"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 197DC1F000FF;
-	Sat, 26 Sep 2026 17:51:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790445083;
-	bh=+l/+xlFQ9oYX3AqDOoZ5UJ8jLQiMbyYFqszTxwXHlbY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=DD1lP/QmC7LYXQVPac1ZErbOX+o9gC185enlv/A+acy3P/pDC5ujo9X8rUfjkldPJ
-	 pHSHH1d+F9mBnfgX1o5XEdguQtswWEoO3h1vMpYyye82Pzp81Ofebc9rm0+H2/yEAj
-	 ZUmV1JJTvoVd3YYUEgqmzt2MnYZi+AqKPTZgSG0MNZ+f37aK6ZQ4DGXqbfndr5bsto
-	 d/BlkNHkO3ehaXRHohpz/SPENa/i18vrn2bs2CQiK8THJZPujfZ4zC2LJYm7dD3Qnq
-	 v75aEO7w1UjPmERPWOFujS6zGWAaO6BkF6QCOFcgPbGzKAKKMFZgqeLYHF87qLF4CM
-	 NF+O3+M9SQfjw==
-Date: Sat, 26 Sep 2026 19:48:16 +0200
-From: Nicolas Schier <nsc@kernel.org>
-To: Mike Rapoport <rppt@kernel.org>
-Cc: Nathan Chancellor <nathan@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Luis Augenstein <luis.augenstein@tngtech.com>,
-	Maximilian Huber <maximilian.huber@tngtech.com>,
-	Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Pratyush Yadav <pratyush@kernel.org>,
-	Alexander Graf <graf@amazon.com>, Willy Tarreau <w@1wt.eu>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Askar Safin <safinaskar@gmail.com>, linux-doc@vger.kernel.org,
-	kexec@lists.infradead.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>
-Subject: Re: [PATCH v3 0/2] Move tool for generating initramfs cpio to
- scripts/
-Message-ID: <argFYF12qS0REcAP@levanger>
-Mail-Followup-To: Mike Rapoport <rppt@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Luis Augenstein <luis.augenstein@tngtech.com>,
-	Maximilian Huber <maximilian.huber@tngtech.com>,
-	Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Pratyush Yadav <pratyush@kernel.org>,
-	Alexander Graf <graf@amazon.com>, Willy Tarreau <w@1wt.eu>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Askar Safin <safinaskar@gmail.com>, linux-doc@vger.kernel.org,
-	kexec@lists.infradead.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>
-References: <20260925-move-gen_init_cpio-to-scripts-v3-0-99c493f76722@kernel.org>
- <areDq-1iFZUViDgS@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kH9+40YD"
+Received: by mail-oo2-f36.google.com with SMTP id 006d021491bc7-6d77b3455bbso265027eaf.0
+        for <linux-kbuild@vger.kernel.org>; Sat, 26 Sep 2026 12:40:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1790451616; x=1791056416; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=CAdE4jpwNTj11WAhE2pjyq7b0zOjoxgSwK0L+TfYZpE=;
+        b=kH9+40YDiCpwUfH0VMZuR/gWefOpy6hW61y7F7Tk/pSnZWY9fhAf6a7GiNpmj/kawb
+         ZhM3DNfwW6TfjaXkecSpdWnxdUY9ab5Yv3X8azCIpsl9F9axvTEGrWx6WKE7hSHIiSdB
+         uI6cBk3Kd+i7gIm7Uuw/p9bJTr9AEjiOveNRPg7tRZ/OM/bck0cImurZlyGe0IQYrMHF
+         xLwbveuJwvbQHusyAFkjjNvy0ftlH2JVUJCJoQBtxmQH+JDwISj/fU9d1Sjo+J/vsB/r
+         tUWLYwXq9WD80nRWYe6HrhAneE075jDfY64RVImISMPr6leOzPx2aPNAkVdDrlxYqT+L
+         LKvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790451616; x=1791056416;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=CAdE4jpwNTj11WAhE2pjyq7b0zOjoxgSwK0L+TfYZpE=;
+        b=yXOKyVqBmvHF/Xf+OCnWJa0QSD2d2RZwv/FlTwAI7fLTKN5h3tE+tLKJIgSNnJ+OzV
+         Ltt9iLHyQ17xUQazkmtx+Pqv/GAwyJirrHBclE6veN/9WjPVrKlkaEkdUKulyXOJNhNb
+         MtSB9VGxrHiARS0BjO0dIkFvxnVTIbO+jSJKpF4ewGtLA4VI0oWB+i0mciEIb30wBLRy
+         +p9fbzK38Ier8OgIr37kM6lAjb4rNVijvslfBgF6ZTrvZFnELqH1vEuEP/kJK3I2HUaJ
+         28mA27rDw4cPXb1Qs+hjcupNEGHGp02ZyDCDjNZunO+w0H8xdEGZBLWZT3tIGJvFHEMs
+         BbMw==
+X-Forwarded-Encrypted: i=1; AKwUvBy0h++TX/2RfDqVUpwKBezVgSkgiAKgq68ewNUYYXAQEUkqNSw5vQKX9wknVw4k6ywIGxAFp20ej0pWkok=@vger.kernel.org
+X-Gm-Message-State: AFuF++nGc+IEVh/lW8mqopsvHuONImdRSMHPQCLwIkobnjnmLwZM+vWr
+	tSHQ6Znr2sB/fYG+i2maS/iClnuFHWCpxKknk5eYeXSitGpZrBpOeyy9
+X-Gm-Gg: AYBFou1N+jAjkPkyypc/zRdGJYQZUdUudPdvZ3JeI13vIazGeqvfoypPWKG9VPjeme3
+	GPrKnKqHUdjW7+0ETrcs+2j7yF+q6mmUoqUl/CIxZSrfhLvipFHh8qA/Avw0FljYeqQOeesQ2Qn
+	VMeGRub7E8ghBZPPqI4Ry/2XX3ShmXuilJcWmKyUkStiKVc1az41LVxu7InfvfDrsZn16GimIn9
+	U56MRInaTc+hSeX7orPXMl2CyyxCe5Sg7ekycV2CWpq3IKkZPC4t6aLneb9CYKjACFGkMAm7ZHJ
+	UtyAXdf2/eUQcg8zBqA2vgh4mMGZ7QiftjSZOYH1EzwZnViNPllNjJP+SC9lozQwTA7NmomVBMC
+	2Tsm81hM8ZSBc0f5RiQ7mFC0js1H3BB7E06bNVORf6w0APOz0AUk7ZZgVhgJZCR3bn1nQf5Vo3J
+	Mszd4ITySy4OCPSwsBym0qu3Q1VKOKFJet4DojxYjy8uUTYD8C0Egzzw2SNQKryfGIxxsSzZxa9
+	beZzAWLVlFO++WbSiedL9Bkk18lxrfAvyosiTek2iWm56KNhH/xOanCo6K9b6Ix24X+tv/Lwi2k
+	w0r6f4z2fg3S4VNO7ov5OP4Sf+Ok8g==
+X-Received: by 2002:a05:6820:625:b0:6d8:5491:3752 with SMTP id 006d021491bc7-6d854913f2bmr298494eaf.46.1790451615962;
+        Sat, 26 Sep 2026 12:40:15 -0700 (PDT)
+Received: from [192.168.0.245] (c-98-38-17-99.hsd1.co.comcast.net. [98.38.17.99])
+        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-49335011458sm5955595fac.4.2026.09.26.12.40.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 26 Sep 2026 12:40:14 -0700 (PDT)
+From: Jim Cromie <jim.cromie@gmail.com>
+Subject: [PATCH v6 0/3] kallsyms: Accelerate symbol name lookups by ~7x
+Date: Sat, 26 Sep 2026 13:40:11 -0600
+Message-Id: <20260926-ksyms-tune-v6-0-236620c65e98@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <areDq-1iFZUViDgS@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/3XNwU7DMAzG8VeZciYotpO24cR7IA4m8bYI2qJmV
+ ExT3x1vp65ix8/S7++LqTIVqeZldzGTzKWWcdDRPO1MOvJwEFuyboMOGxch2s967qs9/QxiBZE
+ 95o4J2Cj4nmRffm+xt3fdx1JP43S+tWe4Xv/NzGCdzV1Isc0MTPh66Ll8PaexN9fMjCuKeEdRK
+ RORCIFwareUHlNS2nT6zwu7kOOW+sfUK43ISbjzHxFgS8OahjsalMK+DZxdIoS0psuy/AF0BsG
+ HkAEAAA==
+X-Change-ID: 20260919-ksyms-tune-e22a42d8a31a
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Lorenzo Stoakes <ljs@kernel.org>, Kees Cook <kees@kernel.org>, 
+ David Laight <david.laight.linux@gmail.com>, 
+ Masahiro Yamada <masahiroy@kernel.org>, Jiri Olsa <olsajiri@gmail.com>, 
+ linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+ bpf@vger.kernel.org, Jim Cromie <jim.cromie@gmail.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1790451613; l=7906;
+ i=jim.cromie@gmail.com; s=20260203; h=from:subject:message-id;
+ bh=OSINSMyFOeedO6ZrqROTPkBKxmtb5CoHcUyLQkCdwJM=;
+ b=80JfYp39IgvK2tSs0oLXyMGtssDmLgEUSDKDIpWZ4X4SB1y5aaBbeB9n+QU5l4we0EtLgnaO9
+ WaV/h3wcKwjCbKWjvg9NX0q8mSmyB8DI7Rs7PenTCF/uJ3wOGZiF7QV
+X-Developer-Key: i=jim.cromie@gmail.com; a=ed25519;
+ pk=C6E5ODlPQo7ZBynATXH9wg7K6HxP0pIXyf4s38Qw0XE=
 
-On Sat, Sep 26, 2026 at 11:34:51AM +0300, Mike Rapoport wrote:
-> Hi Nicolas,
-> 
-> On Fri, Sep 25, 2026 at 09:29:29PM +0200, Nicolas Schier wrote:
-> > initramfs cpio tools had been subject of several recent discussions on
-> > linux-kbuild.  Let's get two minor steps forward by enabling a
-> > top-level target for building gen_init_cpio w/o the need of a valid
-> > kbuild configuration [1] and move the tools for generating the built-in
-> > initramfs from usr/ to scripts/ [2].
-> > 
-> > Link: https://lore.kernel.org/all/20260220191150.244006-1-safinaskar@gmail.com # [1]
-> > Link: https://lore.kernel.org/all/aSdrCFkUQup3qb-q@derry.ads.avm.de/ # [2]
-> > ---
-> > Changes in v3:
-> >   * Update various remaining usr/gen_init* references treewide (Nathan)
-> >   * Link to v2: https://patch.msgid.link/20260720-move-gen_init_cpio-to-scripts-v2-0-26b7e15c7133@kernel.org
-> > 
-> > Changes in v2:
-> >   * Build gen_init_cpio only if CONFIG_BLK_DEV_INITRD (Thomas)
-> >   * Keep underscore top-level target name (scripts_gen_init_cpio)
-> >     (Thomas)
-> >   * Link to v1: https://patch.msgid.link/20260309-move-gen_init_cpio-to-scripts-v1-0-0c5059b1ec5b@kernel.org
-> > 
-> > ---
-> > Nicolas Schier (2):
-> >       kbuild: Mark usr_gen_init_cpio as no-dot-config-target
-> >       kbuild: Move gen_init_cpio and gen_initramfs.sh to scripts/
-> > 
-> >  .../early-userspace/early_userspace_support.rst          | 16 ++++++++--------
-> >  Documentation/filesystems/ramfs-rootfs-initramfs.rst     | 10 +++++-----
-> >  MAINTAINERS                                              |  1 +
-> >  Makefile                                                 |  9 +++++----
-> >  scripts/.gitignore                                       |  1 +
-> >  scripts/Makefile                                         |  3 +++
-> >  scripts/Makefile.package                                 |  2 +-
-> >  {usr => scripts}/gen_init_cpio.c                         |  0
-> >  {usr => scripts}/gen_initramfs.sh                        |  2 +-
-> >  scripts/remove-stale-files                               |  2 ++
-> >  scripts/sbom/tests/cmd_graph/test_savedcmd_parser.py     |  2 +-
-> >  tools/testing/selftests/kho/vmtest.sh                    |  2 +-
-> 
-> There's also tools/testing/selftests/liveupdate/vmtest.sh I know of, didn't
-> check for other users in tools/testing
-> 
+As measured by kernel/kallsyms_selftest across ~184k symbols,
+kallsyms_lookup_names() binary search takes ~6.1 us per lookup due to
+two inner-loop costs:
 
-No idea how I missed that again; will be adjusted in v4.  Thanks a lot!
+0. Candidate symbols are fully decompressed into a 512-byte stack buffer
+   before calling strcmp(), even though non-matching steps could choose on the
+   first differing character (0..N-1).
 
+1. Probes scan sequentially from 256:1 markers in kallsyms_names[],
+   decoding an average of 127.5 symbols per probe (~2,170 hops across a
+   17-step search).
+
+This 3-patch series addresses both:
+
+0. Patch 1 introduces kallsyms_strcmp_symbol() to compare ASCII queries
+   against compressed tokens on the fly, bailing out on first mismatch.
+   Drops the 512-byte stack buffer and saves ~530 ns.
+
+1. Patch 2 increases marker density from 256:1 to 16:1, cutting average
+   scan distance from 127.5 to 7.5 hops and dropping lookup latency from
+   6,102 ns to 866 ns for +42.2 KiB of .rodata.
+
+2. Patch 3 inlines and unrolls get_symbol_seq() 24-bit reconstruction.
+
+Results (kernel/kallsyms_selftest across ~184k symbols):
+- Baseline (256:1):  6,102 ns
+- Patch 1 (strcmp):  5,572 ns (-530 ns)
+- Patch 2 (16:1):      866 ns (7.0x faster)
+- Memory: +42.2 KiB .rodata, 0 bytes dynamic RAM
+
+What's Unchanged:
+- Symbol table layout in address order remains identical.
+- Streaming decompression for /proc/kallsyms and sprint_symbol() is
+  untouched.
+
+Signed-off-by: Jim Cromie <jim.cromie@gmail.com>
+---
+Changes in v6:
+- In patch 1, clarify token matching mechanics and early exit on char
+  0..N-1; cite CONFIG_KALLSYMS_SELFTEST across all ~184k symbols for the
+  ~530 ns measurement (addresses BPF CI review).
+- In patch 1, drop 0-2 list and fix repeated word typo ("the the").
+- In patch 2, recast commit body around kallsyms storage trade-offs and
+  drop hunk-by-hunk numbered list (addresses BPF CI review).
+- In patch 2, drop 0.002% percentage claim and state absolute .rodata
+  cost (+42 KiB for ~184k symbols).
+- In patch 2, drop ephemeral benchmark comment from
+  kernel/kallsyms_internal.h (addresses BPF CI review).
+- Link to v5: https://lore.kernel.org/r/20260925-ksyms-tune-v5-0-1f75ad0c321c@gmail.com
+
+Changes in v5:
+- Dismiss dynamic 1:1 batch table as unnecessary:
+  In v2-v4, a dynamic u32 lookup index allocated in transient RAM was
+  explored.  While dynamic 1:1 breaks even against baseline 256:1 after
+  ~1,200 queries, comparing dynamic 1:1 against static 16:1 markers
+  dismisses the dynamic approach entirely:
+  * Static 16:1 markers achieve 866 ns, capturing 97.4% of the maximum
+    latency savings of a 1:1 table (an 85.8% reduction from baseline).
+  * Dynamic 1:1 gains only an incremental 138 ns (the remaining 2.6%),
+    while paying ~6,419 us in allocation setup and synchronize_rcu()
+    teardown.
+  * Amortizing 6,419 us at 138 ns saved requires 46,514 queries just to
+    break even against 16:1 markers.  For any workload under 46k
+    queries, dynamic allocation is slower overall.
+  * Drop kallsyms_lookup_batch_start/end APIs, mutexes, refcounts,
+    transient kvmalloc RAM allocations, and RCU synchronization.
+- Drop lib/test_kallsyms_perf benchmark module and
+  CONFIG_TEST_KALLSYMS_PERF; existing in-tree CONFIG_KALLSYMS_SELFTEST
+  already benchmarks standard kallsyms_lookup_name() without adding
+  unmaintained test files in lib/.
+- In patch 2, increase marker density to 16:1 via
+  KALLSYMS_MARKER_SHIFT 4 shared between scripts/kallsyms.c and
+  kernel/kallsyms_internal.h, and drop all references to dynamic tables
+  from the patch body.
+- Link to v4: https://lore.kernel.org/r/20260922-ksyms-tune-v4-0-92acea84b911@gmail.com
+
+Changes in v4:
+- In patch 1, ignore early boot invocations in param_set_trigger() when
+  system_state < SYSTEM_RUNNING to prevent NULL pointer dereference in
+  ktime_get_ns() prior to timekeeping_init() (addresses Sashiko review).
+- In patch 1, prevent sysfs TOCTOU divide-by-zero panic: reject
+  num_iters == 0 in param setter, snapshot iters locally via READ_ONCE,
+  and serialize runs with bench_lock mutex (addresses Sashiko review).
+- In patch 1, eliminate multi-second boot stall: add run_on_boot
+  parameter (default false) so late_initcall only runs benchmark when
+  explicitly requested (addresses Sashiko review).
+- In patch 1, chunk lookup loops in 4096-iter batches with
+  cond_resched() outside the timing bracket to prevent preemption sleep
+  time from inflating reported latency (addresses Sashiko review).
+- In patch 3, annotate dyn_kallsyms_offsets declaration with __rcu to
+  satisfy sparse type checking and prevent address-space warnings across
+  rcu_assign_pointer() and rcu_dereference() (addresses Sashiko review).
+- In patch 3, use rcu_replace_pointer() with lockdep_is_held() during
+  batch teardown to atomically read and clear the pointer while
+  satisfying sparse address-space constraints (addresses Sashiko
+  review).
+- Link to v3: https://lore.kernel.org/r/20260922-ksyms-tune-v3-0-681a34ea05d9@gmail.com
+
+Changes in v3:
+- Reorder series: place on-the-fly token matching ahead of marker
+  density optimization, establishing an active proof of incremental
+  performance deltas across all steps (addresses David Laight review).
+- Add inlined and unrolled get_symbol_seq() 24-bit sequence index
+  reconstruction into direct byte shifts (addresses David Laight
+  review).
+- In test_kallsyms_perf, configure as a built-in test (bool) rather
+  than a module (tristate) and drop kallsyms iterator EXPORT_SYMBOL_GPL
+  exports to avoid exposing internal kernel symbol data (addresses
+  Sashiko review).
+- In patch 1, optimize kallsyms_strcmp_symbol() by dropping
+  skipped_first tracking and checking len at the bottom of the token
+  loop (addresses David Laight review).
+- Drop 'default m' from lib/Kconfig.debug.
+- Fix soft lockup risks by adding cond_resched() every 16k iterations in
+  test_kallsyms_perf loops.
+- Replace direct 64-bit integer divisions with div_u64() to fix 32-bit
+  builds.
+- Guard against divide-by-zero when num_iters=0.
+- Replace tcp_v4_rcv with panic in hit_symbols to prevent failures wo
+  CONFIG_INET.
+- Move David Laight to series-wide Cc on cover letter, dropping trailer
+  from patch 3.
+- Link to v2: https://lore.kernel.org/r/20260922-ksyms-tune-v2-0-a333ee31eac7@gmail.com
+
+Changes in v2:
+- Replaced static build-time 3-byte offset table with a dynamic u32
+  index bracketed by kallsyms_lookup_batch_start() and
+  kallsyms_lookup_batch_end().
+- Dropped .rodata image footprint addition from +573 KiB to 0 KiB,
+  addressing Kees Cook's memory footprint objection.
+- Native u32 loads in transient RAM eliminate 24-bit big-endian shifts
+  and unaligned loads, addressing David Laight's endianness critique.
+- Direct O(1) table indexing provides 0 hops for all symbol lookups
+  without remainder logic or odd/even branching.
+- Restored scripts/kallsyms.c and kernel/kallsyms_internal.h to pristine
+  state, leaving legacy kallsyms_markers[] as safety fallback.
+- Rebased out Lorenzo Stoakes' kbuild series; this series is now
+  completely decoupled and applies cleanly directly onto mainline.
+- Link to v1: https://lore.kernel.org/r/20260919-ksyms-tune-v1-0-d85c97da1a32@gmail.com
+
+---
+Jim Cromie (3):
+      kallsyms: Match compressed tokens on the fly during binary search
+      kallsyms: Increase marker density to 16:1 to accelerate lookups
+      kallsyms: Unroll 24-bit sequence reconstruction in get_symbol_seq()
+
+ kernel/kallsyms.c          | 111 +++++++++++++++++++++++++++------------------
+ kernel/kallsyms_internal.h |  11 +++++
+ scripts/kallsyms.c         |  14 ++++--
+ 3 files changed, 86 insertions(+), 50 deletions(-)
+---
+base-commit: 93f51579e7df248780214094418f205253383cc5
+change-id: 20260919-ksyms-tune-e22a42d8a31a
+
+Best regards,
 -- 
-Nicolas
+Jim Cromie <jim.cromie@gmail.com>
+
