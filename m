@@ -1,89 +1,139 @@
-Received: from mta0.migadu.com (out-167.mta0.migadu.com [91.218.175.167])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5858E3F5BE5
-	for <linux-kbuild@vger.kernel.org>; Sun, 27 Sep 2026 14:06:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.167
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 775BD20C029
+	for <linux-kbuild@vger.kernel.org>; Sun, 27 Sep 2026 15:41:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790517965; cv=none; b=b5X+gibPctGUFBGWXMSnbILZwYpl0POGtEpg9HM1E7jzwVZWE1Lf9tpA5SeiuotYNYDYVRqHSY76mcSSZJmYQUZZ8V5PRKdkRbXsUuu2XlxgjF1ryawFA/L3oYaSh0ZAMwH1vEBQfrOor+lh+aUJQXAKPN4oDh5hesUTsXRbcus=
+	t=1790523690; cv=none; b=rsFDlxX/3J5Pv8ttu1yd3BnEMr7UKIYeBk/fyUJOZJIBMJnGbJ1p7UAUU2ezmtxRJfNSsL/+qTOoP9xLgPp8luZboxRk3iQP2qes7PVz/gARBGPnZrW32/7UaPvw3HuikfOLbMC9P9uPlXv5ShIvBZFtJwYk/xFzLX8420UQnpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790517965; c=relaxed/simple;
-	bh=JE5rHMFVp1ASSitG2+LEzV8irkI3ba+nPxRmpmzRXKs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Esgb03OFk9iRaTjNsF+UbPjnG9BZK/QsyTCNmk6ffQZZgT5mSdWrMyhwn6uS/+TJ9mxk2+815qU2GwNtZ5WC48tTMri+DVwR65yWJK2hi7fNu1yC86n9M/3mX7HIg8PJ5r8J224WfReI1tdSaFa6/4v2L3OPVCHvAIhHZKrWyWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uzI0Cl/R; arc=none smtp.client-ip=91.218.175.167
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1790523690; c=relaxed/simple;
+	bh=Ug0lsmzx8JosCF3uQ74JaK5eJJUKJx9gIV6G8vs0Wi4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vi8kRk8gbqdPfJHdz8Uf/lGof6q75qbZV6fh/oYxfdVwCwsS30o71OixDGiI+FU78zLJRyNt43byw+6/2gWztKN0C1nlSoXKC6iEEmsBK5wGzpg8R1lpdPmOMsrS8purY983KOODp2cZuFk/fZbWA8oV9d2tavPOf3rYUcE1a7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GfZdZ4SM; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uzI0Cl/R"
-X-Envelope-To: linux-kbuild@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=JE5rHMFVp1ASSitG2+LEzV8irkI3ba+nPxRmpmzRXKs=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790517961; v=1; x=1791122761;
- b=uzI0Cl/RyPSp9DtXGDQtJb0EsKwZiygL70woO0KClZPbNgzOd7KoYzXh90i5veAqBFlMsVac
- dKpybu3tc1uHncsMPfXrVsuHh6MtpvAT1G5sh8beLUAt+Pq9y769HnxORE/y2DAKzr3vWv7NX26
- 6TxKJ1XA9960gwu8uaPtFcDM=
-X-Envelope-To: linux-kbuild@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 9e0e383a7683fddd;
-	Sun, 27 Sep 2026 14:05:50 +0000
-X-Mizu-Trace-ID: 9e0e383a7683fddd
-X-Migadu-Flow: FLOW_OUT
-Date: Sun, 27 Sep 2026 14:05:38 +0000
-From: "Jose Fernandez (Anthropic)" <jose.fernandez@linux.dev>
-To: Bill Wendling <morbo@google.com>
-Cc: Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nsc@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Kumar Kartikeya Dwivedi <memxor@gmail.com>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, 
-	Emil Tsalapatis <emil@etsalapatis.com>, Puranjay Mohan <puranjay@kernel.org>, 
-	Xu Kuohai <xukuohai@huaweicloud.com>, Ard Biesheuvel <ardb@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
-	Gary Guo <gary@garyguo.net>, =?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
-	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
-	Onur =?utf-8?B?w5Z6a2Fu?= <work@onurozkan.dev>, Sami Tolvanen <samitolvanen@google.com>, 
-	Kees Cook <kees@kernel.org>, Leon Hwang <leon.hwang@linux.dev>, 
-	Ihor Solodrai <ihor.solodrai@linux.dev>, Josh Poimboeuf <jpoimboe@kernel.org>, 
-	live-patching@vger.kernel.org, linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, llvm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	bpf@vger.kernel.org, linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	Ben Cressey <ben@cressey.dev>, "Florent Revest (Anthropic)" <florent.revest@linux.dev>
-Subject: Re: [PATCH v2 6/9] arm64: cfi: Use CONFIG_ARM64_FUNCTION_PREFIX_NOPS
- for the type hash offset
-Message-ID: <arkimpxRmauCfcn8@linux.dev>
-References: <20260924-b4-arm64-callops-kcfi-v2-0-587865b6d991@linux.dev>
- <20260924-b4-arm64-callops-kcfi-v2-6-587865b6d991@linux.dev>
- <CAGG=3QVs=e5JtAs-D98vDsj2ax9H0gH-_rPc0oKhx-vNpq_RyQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GfZdZ4SM"
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-488885c3844so673135f8f.0
+        for <linux-kbuild@vger.kernel.org>; Sun, 27 Sep 2026 08:41:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1790523688; x=1791128488; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=LuIBHu0Q/3cU7Cn5h1eukGyE0nOVMByA1RWbGWMchB0=;
+        b=GfZdZ4SMpRmd1QtQpVOsTJSjXHeDgBOtF0/mgHvuEHq9cQZGar1ccTCx4nHhclp6Rp
+         jocO3bH2t3W8bapxS5jUZVmdWKDWJdtcqCR2ZvZ0aELVnpdkwmFbuhIoB/+ImvLi9mQS
+         hBjoo0Y687S9mIOuAfkE/eizzyEv79X5E7f7F3N/T+AbDCmq5XfDb5e/8HTv2SE5ZxEZ
+         7SCRHhi6IeAclKxqiRG4yOH69lIKYbGmS5i2DdDFODFtFR9ziS9pQovMYWUreO8iLXtU
+         AOgdkxVh7ETQ6KuxKoW9pX4FYI7X92bjb8mvqcFiph1jdYJp1NOdyICjyiwU+nTDumM/
+         uovQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790523688; x=1791128488;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=LuIBHu0Q/3cU7Cn5h1eukGyE0nOVMByA1RWbGWMchB0=;
+        b=HsiTaF59NobrcY5EqxHCwh+k09YZDBeocW4fyKkuldD8wqJnKnxBVxDdJkd7FJ1n06
+         rPrYT0y75X8orLVIupt5E4rBhNhRc/Xt6gZGvgozJcmgCxyFJvbFYViEUqlmktmnmx9r
+         YBiXl82NlszLMF90yt4ar00MGASy+dSfCs+mYNyohFEFb538/xbUSKmZoro3Ur6LAe+s
+         S8ttTC3ZYrHx0p27vHaIvA9mqo0g7j4NYQYnioq8EZBx18ciz/uiWDeCHjsL7vQHd0ZY
+         m7S5FHk8j6JbQhn8axGt4u9i44Fh+KZeCjmcVYIDUfRF9H7G6i6psvZxUYiShzLv9A76
+         UdAg==
+X-Forwarded-Encrypted: i=1; AKwUvBxivHvkoE9WgIaI4r6B5n88sgW9YnI81Wcmt6u6V2+bqvG03NsDTee68FuSkMfUlxgX+re8w3K0OOFHUqg=@vger.kernel.org
+X-Gm-Message-State: AFq9FYLr3CSrQwMUtaNT9VRs2OtzUft7BQPKdQBuS4tr8LaSlugGIFto
+	Z1sLBqvw6iDAVz27mtuppWSF9M0milz62ZCKomJqxwrtYsywSyArrLmO
+X-Gm-Gg: AYBFou3lbFyYxnVqW0t470cVkXWxeXN67+oS0M2jvZ7TLpk7kEC2l74o6TydSJLI449
+	cNJ1A9do8MB0jmJEWIj5Hvk1l0dS9z3RKr6Kh0MqyVYrR43m596Uv8IMU2BDdkQlIjKKiYNcstL
+	CW9URKdC8tjvbBrdgq+icQU8G5+DDz+4r2j2g0+p/+AWwJwhekrr71EfnU61Fp9p7N68e1PLHU3
+	gliwCywYpz7gC/R4RGKSwnLepikcDq/TecAw3q7v1C3QJHSKGHBQpFjtxRKcNa2EEF+Gcu3Qk6G
+	vnehR4nMe33/Hc8zuzJX5IgtpD19jEu1fZklJQfrS23YHrWpsJJPmJMZpZhFfzTjzT3zgHBFmYi
+	4CxIN7lBhKgjINagQ7tr8Q3cYBqm24zA6P136bHrotlQABl8PsPk9ZZubKqpCRGvWRm6/mvMVqE
+	3qUBD4XM+LHHuOQ2Np2BstgzHEosrxm1GLp1E6A4ZWgQ7OOn3pNcBFA9thlPUk97Wq4Vxf1gJXN
+	teDNpBOiH9MsWCNQdDQg/2a/TgPJwkoELUOb1NjVz5iKZQ+k2//KEXyszhdRiqpWlzMonvhxkh5
+	4G1mLdQ=
+X-Received: by 2002:a05:6000:3c9:b0:487:fb2:1a0f with SMTP id ffacd0b85a97d-488716a2f18mr23612038f8f.6.1790523687585;
+        Sun, 27 Sep 2026 08:41:27 -0700 (PDT)
+Received: from voyt-laptop-dell.fritz.box ([2001:9e8:bd4a:1d00:5bb0:3aaa:2b21:4603])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4887a640df9sm20340566f8f.24.2026.09.27.08.41.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 27 Sep 2026 08:41:26 -0700 (PDT)
+From: Dmitry Voytik <voytikd@gmail.com>
+To: Nicolas Schier <n.schier@fritz.com>,
+	Nathan Chancellor <nathan@kernel.org>
+Cc: Nicolas Schier <nsc@kernel.org>,
+	Rong Zhang <i@rong.moe>,
+	linux-kernel@vger.kernel.org,
+	linux-kbuild@vger.kernel.org,
+	Dmitry Voytik <voytikd@gmail.com>
+Subject: [PATCH v3] scripts/config: honor $KBUILD_OUTPUT by default
+Date: Sun, 27 Sep 2026 17:41:01 +0200
+Message-ID: <20260927154101.122633-1-voytikd@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAGG=3QVs=e5JtAs-D98vDsj2ax9H0gH-_rPc0oKhx-vNpq_RyQ@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Sep 25, 2026 at 12:17 PM Bill Wendling wrote:
-> > +       return 4 + 4 * CONFIG_ARM64_FUNCTION_PREFIX_NOPS;
->
-> *drive by review* Could you explain the two fours in this equation
-> with a comment? (Feel free to ignore this if it's obvious to
-> developers.)
+If $KBUILD_OUTPUT is set, use it by default if --file is not passed.
 
-The first is the type hash and the second is the size of a NOP. For v3
-I'll spell the second one out and add a comment for the first.
+Fix the issue when the script silently updates a stale .config in
+the root directory, while the user expects ${KBUILD_OUTPUT}/.config
+to be updated.
+The problem can be worked around with --file, but this is easy to miss,
+and is inconsistent with how the Makefile and other tools work
+(e.g., scripts/diffconfig).
 
-	/* The 4-byte type hash sits before the prefix NOPs. */
-	return 4 + CONFIG_ARM64_FUNCTION_PREFIX_NOPS * AARCH64_INSN_SIZE;
+How to reproduce the issue:
+	rm .config
+	export KBUILD_OUTPUT=.out
+	make defconfig
+	./scripts/config \
+	       -e CONFIG_UBSAN
+	grep: .config: No such file or directory
 
-- Jose
+Signed-off-by: Dmitry Voytik <voytikd@gmail.com>
+---
+v3:
+ - Added an example in the commit message how to reproduce the issue
+v2:
+ - Addressed comments by sashiko:
+   - https://sashiko.dev/#/patchset/20260920064350.17999-1-voytikd%40gmail.com
+   - use basename when --refresh is used
+   - remove echo which can be misleading when --file is passed
+v1:
+ - https://lore.kernel.org/all/20260920064350.17999-1-voytikd@gmail.com/
+---
+ scripts/config | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/config b/scripts/config
+index 32428ea909c2..cdee67157fe1 100755
+--- a/scripts/config
++++ b/scripts/config
+@@ -130,6 +130,10 @@ on_exit() {
+ trap on_exit EXIT
+ 
+ FN=.config
++if [ -n "${KBUILD_OUTPUT}" ]; then
++	FN=${KBUILD_OUTPUT}/${FN}
++fi
++
+ CMDS=()
+ while [[ $# -gt 0 ]]; do
+ 	if [ "$1" = "--file" ]; then
+@@ -229,7 +233,7 @@ while [ "$1" != "" ] ; do
+ 		;;
+ 
+ 	--refresh)
+-		yes "" | make oldconfig KCONFIG_CONFIG=$FN
++		yes "" | make oldconfig KCONFIG_CONFIG=$(basename $FN)
+ 		;;
+ 
+ 	*)
+-- 
+2.55.0
+
