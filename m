@@ -1,159 +1,104 @@
-Received: from mail-wr2-f35.google.com (mail-wr2-f35.google.com [74.125.225.99])
+Received: from mail-oo2-f42.google.com (mail-oo2-f42.google.com [74.125.231.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E86837EFFD
-	for <linux-kbuild@vger.kernel.org>; Sun, 27 Sep 2026 05:57:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 705803FF884
+	for <linux-kbuild@vger.kernel.org>; Sun, 27 Sep 2026 14:00:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790488653; cv=none; b=cBbzbeUVhgQv98XR8wOq3TgSIyStpiWg6L6Rb1n3dr7L/BET83ENGFn+3nrl5vtvchdylyz37CGqmXp7YTKu29QJAj7y2Y5azatau4TgDakT2UDLtY0Ll2Jyn98IFz5ieOZYF0Df0P9iPqnxMR4SfRdultr/fnpGzbOCPg9Zoy0=
+	t=1790517610; cv=none; b=dQsrB9gZSaXe+b+LyeX63m9SwyARelqpRMjtSauyHXx2BdYaNJm7PefCP+t+C4x5AunbukvDPpFrt4vUXjxCa/I1m0zrKusHH47oT3pl9hhUzby6TYmQUOh1F/gRTqN3RVW1ERBJ2e83FrCU2xmVekyQVl92al2+BeOstD7U7DE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790488653; c=relaxed/simple;
-	bh=ECdwrOZLPkUOYEi3CxYF+G8aKAMwCDUFpNPHlXQV3q4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kvtNz1XXCzly7stRfKcea84mvNbGBRLN2wGdDesKxv17JqXuIezSO+AWmKh/+PrTyUSIyltMI5yhMyxTtEmCbJIXKfXgQZ/7bn2CWS7AG95WhL1yZfoI9IS4VT5fsdrGcRToFK+MzhFnVtQqTLkWp71VfB/Goad3KfkLFDozK24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yl/qUxFa; arc=none smtp.client-ip=74.125.225.99
+	s=arc-20240116; t=1790517610; c=relaxed/simple;
+	bh=zXU+tYHOl/YHGHGbII3AHvP4lVS+bS8CAqVO6nFSJhA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jczJ5ep1dq7z1oTyfLS81lZejHEH8EpglXttG7Yye1jlzovwCB2uekQnlzaB+14PJj+2T+i0kXSGxVb7sZ24ctYtz/S+JGH08ffMlBLf9GMbRfCxoIhm45GnZheTtcEr9brafHUZDHz1UINZz2cQHr6OGpouPgCTT5HvQn3f0kI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=apYkh3iN; arc=none smtp.client-ip=74.125.231.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yl/qUxFa"
-Received: by mail-wr2-f35.google.com with SMTP id ffacd0b85a97d-4887635e952so849658f8f.1
-        for <linux-kbuild@vger.kernel.org>; Sat, 26 Sep 2026 22:57:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="apYkh3iN"
+Received: by mail-oo2-f42.google.com with SMTP id 46e09a7af769-81b8e8e9cb0so382926a34.3
+        for <linux-kbuild@vger.kernel.org>; Sun, 27 Sep 2026 07:00:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790488650; x=1791093450; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1790517608; x=1791122408; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=1/dti4dnFF8A+Oe+aVgDqPONYPNqgjuPnqR3/MJboFA=;
-        b=Yl/qUxFa7Tx2nQP2me8C5oI47YhyRa7p5f5n0MpjoEcZ4ynyJt/Jj63B9Jn1QkkPhm
-         HBlSqt24fA57tV8i+/3zidKiOVfaWYHqQhK4vkbsaucscn7UTrQMs5yOZd9UvYL0x5g8
-         uqaKawPj/dohUmnjv9cmaOCY1kdKlDNAgWFpcbt7nYh5RdCUJETb1sAiAFvPFKoWcQyz
-         cLBtkrxPa6kJVpf89GSAlkGLqvCNpZzbLLOMMqBZAC4h9vM/53WaMGoejUuZz6UqrcaH
-         y21IE6L6Ho2KUG42Q5C9P6OlroZHI7QXrHBu9VBUSyNO5bf4JJE+aFJL75Znoulk3hd9
-         yL4g==
+        bh=zXU+tYHOl/YHGHGbII3AHvP4lVS+bS8CAqVO6nFSJhA=;
+        b=apYkh3iN+/RIGSioMpWjLsBsH+OZ5/iuJ2zz0uOGhjw/6ZYa1VExZTIkJ1WXFGTaWm
+         xT8PdBQt6UuYT/XI6OUKY1fsxaX1E2RyKzCwDRCKRPuaJ4iete97p4UEbROKDjwa976X
+         Pk8bagEd3Md6KYr0gDgIGHehGTzdoPL4vCpkTCup0YcZrXb/yPkz2zoJgKq9TVu53x6T
+         cXdbPRRxCXDsh9F8P0NBSCmN1GtIGhp4JPOr0+Jw6TlsHT+2hgDZj7tLYwHJI88/v25x
+         P2sfCR33IOiqSc5wI7o32TDyoywIqq6juM8EdgeY3jiyv3oUdV5RpinOjWquCUQgHcya
+         Hdug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790488650; x=1791093450;
+        d=1e100.net; s=20260707; t=1790517608; x=1791122408;
         h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=1/dti4dnFF8A+Oe+aVgDqPONYPNqgjuPnqR3/MJboFA=;
-        b=MN8HBVlzB/xVlv10A4SlykXJ3VBOrqqZX96SojH7WK1UUhbGttFROcVjBmiX8Yd+NB
-         7I8kAqKnBu1+MJLB8do0tBILnlAIlboCBnqqBvrK50SDq+HCGZfykVN8tQ0Q8P2eR7he
-         P7g3IOpnWE81uF3tU1zkRULg94isFBSWNv5iCBhrLluLpYfwM1pDjcPVE25fDOGnKFrI
-         KdtM/0i/+6uuiiiQiYPOU4PZBk1r4w6PXMOc460bwAGYnKZBi3DeawZd+B5Fj7tOdTzG
-         tL+n2kambjWgw4lkivr6FrtQDIGVyPlmdXEaeHij/+lwdbuPb2I5D2/iLucMarz6I5LJ
-         gBIw==
-X-Forwarded-Encrypted: i=1; AKwUvBwHbFKaOlpIt7omBGYbMZpDgs3Ayq4UhN9Or833AOVjoT7MTbr+9wllyhbJEOGZVjW9SHRKly7Iy8HkLOY=@vger.kernel.org
-X-Gm-Message-State: AFq9FYK5EZAnUwHCN8y3efwi7v+9S4NlBDyu04LF7K7BnfsIq6BRy/pL
-	b/NmNOB4PefhBFp5l2ZBx7PmMzzaqwGsoyMBhKPVs3yluGz9ZdVCPTyo
-X-Gm-Gg: AYBFou3Y/JpjjYuxdNxpVo+Lm6YXHkfWuaSDvZg6FHxfjDtjZiMTw9cxTBcA6gVIw6b
-	kxOLkPEoSHZrpXYOSqIdbLd5LxRwo0L4vs/zn6xNbcPDyVA2r6Zl0nb6T4MBGFuFXBo0pc4NzIJ
-	gedQo9fQXslQ6G7dQhGmD5jd7vfH451jBmVw7jf2Suql5T5KYSBkHGypnmNy/6GocXbth2UVcFI
-	imublyxGJGQPzCakeKGpVXQzkj1U5Vu2wEoVa7I/Q1SymWsJuREd/L4quGoKfo6WAyCtRMjjXQd
-	YzNsw94sDzOO7ET/PAG5HiNVME1Izxi3J59LeCEMAfl6Lnvo3aaZuZNK56ydMAVfM2QFrhjZqVI
-	oHJFEL0XbVKqI3ylSfH7J6OHa1ZbmsIb1JjxtC//s5eanYQbqwBOIEWIjk6YGtSTG5L+VZB4fUx
-	IXnKiG/7S9dVsNhg95fmndDJJrxJoNs1RObOdLfDov4OawyzR+XUMWF4DQ31xMXSnMAVWGLbtbN
-	1eeOc/TimmwFGErCzQLyxhmSQJaAN3JXv+M3dyXdWqvSA==
-X-Received: by 2002:adf:e198:0:b0:487:146f:7c88 with SMTP id ffacd0b85a97d-4887168d970mr16805103f8f.4.1790488650200;
-        Sat, 26 Sep 2026 22:57:30 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4887a30bcdbsm17997084f8f.2.2026.09.26.22.57.29
+        bh=zXU+tYHOl/YHGHGbII3AHvP4lVS+bS8CAqVO6nFSJhA=;
+        b=exxniUugpFo0m+KclnR97joDDrQyDNfOmE7NOD+tK3Lg7MII7iylcwfUn2TE+8qtCJ
+         2VpcEoDQZwcUWCXqwmquiDOS5VISuuLy+0gEj6be0IMDxjf+f8bxhKQxkZqZGDHLg8IU
+         diQ30ulpsLtcWy38hPTzCc2+xe0B4sruH7K3RiuVuNQRHMcr0Lx27YPMB2f5G4U8v9iA
+         jaUqpR44Jr4wyyCyybTRFA08ClwFn9lPK8rKbaDvFl5JfCLr0vgPi78gzsHV+dKteD4l
+         KxFxDnz8267HYqjjAO6gboJ7QwpDl/Ul/Iu/USO/cISeYajuBrOVGwIwTRoqRnDL0Ktg
+         4DCQ==
+X-Forwarded-Encrypted: i=1; AKwUvBwzO/m+dSVI9nIf0yB9bW83fIv//EuF60sgonjNcEXxQ0WpNxLjrQS8M779ME4CMwHWMKGEEBUEnNIg8BU=@vger.kernel.org
+X-Gm-Message-State: AFuF++kBHZDwuBCgVtypCfAjwad958Pmxytib1Yh1OEOW2WVamCp30Eg
+	hiJP/mbhrKvADxYxpzY0I7P2bFbE1ihnq2jdxfCz3EVjRB7QDgq/YH80
+X-Gm-Gg: AYBFou1J1K/wyLj3gWJ2NQMHdFctyFJ6+WByXi2zNUD+F3+9fXC8EdbmMT8TKtDHmIT
+	FqALAZSms8W5dUuUKy8z6LWceQtXmrCEMLR42iQBJnZQ2acQKhApGO+/oJu4ZwRjJEArer1HGAU
+	O1nabRFo+Ht10sbElJoeKfTxVC74+6D1UqpsL/SEYg20HoUrRTo5v5BN8Bk3t8zCjCqpeeVfftz
+	IIZKzwIbzUXlSunSha6QB9LIZXh6YmvvDS2MwhESVjPo9lsCgtyPaSohwjVGoPY11DcpMTEoaFb
+	4rf8rsU8uTM9YclNckrxy1Uh7YZSal8MFA2M/cqwYVRIocrU7jZA0cz3CqWe9HB9Mh10Lc1tv55
+	q4ZpOcn9yb5GBGw8O3n16MgsadF1K3O4pqAGP3xkiecAyUe1HsDRqURbDcR1kk5OnaN3XTJa4nN
+	KIvYVbLQlTfUF8G6rDloI4Prwsfl2ZgYK8O8jTy4kYB/qwFRUS9JAo429cOBrF54VIKIGYXDIgi
+	875o5Y+T/QcKPaImhtiyC+hpw94TV3dRzbct+bC
+X-Received: by 2002:a05:6820:1f05:b0:6bd:850:7634 with SMTP id 006d021491bc7-6d43f89b4e9mr11060817eaf.26.1790517608344;
+        Sun, 27 Sep 2026 07:00:08 -0700 (PDT)
+Received: from archlinux.lan ([136.34.156.120])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6d882dc49dbsm2210058eaf.9.2026.09.27.07.00.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 26 Sep 2026 22:57:29 -0700 (PDT)
-Date: Sun, 27 Sep 2026 06:57:28 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Jim Cromie <jim.cromie@gmail.com>, Lorenzo Stoakes <ljs@kernel.org>,
- Kees Cook <kees@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Jiri
- Olsa <olsajiri@gmail.com>, linux-kernel@vger.kernel.org,
- linux-kbuild@vger.kernel.org, bpf@vger.kernel.org, Petr Mladek
- <pmladek@suse.com>
-Subject: Re: [PATCH v6 0/3] kallsyms: Accelerate symbol name lookups by ~7x
-Message-ID: <20260927065728.7f159234@pumpkin>
-In-Reply-To: <20260926133859.c8232c439184dfa17472b020@linux-foundation.org>
-References: <20260926-ksyms-tune-v6-0-236620c65e98@gmail.com>
-	<20260926133859.c8232c439184dfa17472b020@linux-foundation.org>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        Sun, 27 Sep 2026 07:00:06 -0700 (PDT)
+From: Danish Khateeb <danishkhateeb03@gmail.com>
+To: u.kleine-koenig@baylibre.com
+Cc: Danish Khateeb <danishkhateeb03@gmail.com>,
+	gregkh@linuxfoundation.org,
+	jirislaby@kernel.org,
+	andriy.shevchenko@linux.intel.com,
+	linux-serial@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH] serial: 8250: Fix section mismatch with CONFIG_MODULES=n
+Date: Sun, 27 Sep 2026 09:00:05 -0500
+Message-ID: <20260927140005.28291-1-danishkhateeb03@gmail.com>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <argClwhgQyMkeq29@monoceros>
+References: <20260926163506.487201-1-danishkhateeb03@gmail.com> <argClwhgQyMkeq29@monoceros>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Sat, 26 Sep 2026 13:38:59 -0700
-Andrew Morton <akpm@linux-foundation.org> wrote:
+Hello Uwe,
 
-> On Sat, 26 Sep 2026 13:40:11 -0600 Jim Cromie <jim.cromie@gmail.com> wrote:
-> 
-> > As measured by kernel/kallsyms_selftest across ~184k symbols,
-> > kallsyms_lookup_names() binary search takes ~6.1 us per lookup due to
-> > two inner-loop costs:  
-> 
-> We don't have a kallsyms maintainer afaik.  Petr is pretty active in
-> there so let's give him a hopeful cc.
-> 
-> > 0. Candidate symbols are fully decompressed into a 512-byte stack buffer
-> >    before calling strcmp(), even though non-matching steps could choose on the
-> >    first differing character (0..N-1).
-> > 
-> > 1. Probes scan sequentially from 256:1 markers in kallsyms_names[],
-> >    decoding an average of 127.5 symbols per probe (~2,170 hops across a
-> >    17-step search).
-> > 
-> > This 3-patch series addresses both:
-> > 
-> > 0. Patch 1 introduces kallsyms_strcmp_symbol() to compare ASCII queries
-> >    against compressed tokens on the fly, bailing out on first mismatch.
-> >    Drops the 512-byte stack buffer and saves ~530 ns.
-> > 
-> > 1. Patch 2 increases marker density from 256:1 to 16:1, cutting average
-> >    scan distance from 127.5 to 7.5 hops and dropping lookup latency from
-> >    6,102 ns to 866 ns for +42.2 KiB of .rodata.
-> > 
-> > 2. Patch 3 inlines and unrolls get_symbol_seq() 24-bit reconstruction.
-> > 
-> > Results (kernel/kallsyms_selftest across ~184k symbols):
-> > - Baseline (256:1):  6,102 ns
-> > - Patch 1 (strcmp):  5,572 ns (-530 ns)
-> > - Patch 2 (16:1):      866 ns (7.0x faster)
-> > - Memory: +42.2 KiB .rodata, 0 bytes dynamic RAM  
-> 
-> Can you better explain the tradeoffs here?  Increased memory use?  If
-> so how much?  Is any change in build time expected?
+On Sat, Sep 26, 2026 at 07:40:03PM +0200, Uwe Kleine-König wrote:
+> Isn't that a false positive because with CONFIG_MODULES=n .exit is
+> discarded and so the section mismatch doesn't matter?
 
-I've had a thought of a scheme that should give most of the ~19x
-improvement of the original patch without increasing the data size and
-with only a small increase in code size.
-The downside is a slight slow down for sequential access.
+Yes, it's harmless at runtime, but modpost still warns on every
+CONFIG_MODULES=n build with SERIAL_8250_PNP (e.g. kunit.py --alltests),
+and the build fails with CONFIG_SECTION_MISMATCH_WARN_ONLY=n.
 
-The thing to do is replace the 24bit 'symbol number' in the 'sorted by name'
-list with the offset of the beginning of the name.
-(For very large kernels it may need to be 32bit.)
-The binary search for the symbol name then doesn't need a linear scan
-and also loses one level of indirection.
-You then need to do another binary search over the 'offset of every 256th
-entry' table, followed by a linear search to find the correct address.
+> I thought __init_or_module was the right annotation ...
 
-For sequential access there is a reasonable chance the next symbol is in
-the same 256 symbol block (in address order), that can be quickly checked.
+It is, modpost just doesn't know that. Without it the two helpers stay in
+memory after boot, 16 bytes each on x86_64. The alternative is teaching
+modpost to skip exit -> init references in vmlinux when CONFIG_MODULES=n.
 
-I got the code to run in userspace yesterday (with a real kernel symbol
-table), I might look at some changes later today.
-
-David
-
-> 
-> 
-> What isn't addressed in here (afaict) is "who cares".  Is there some
-> workload which is kallsyms-intensive?
-> 
-> This info really should be right in the first para of the [0/N], and in
-> detail.  What benefit does this work offer to our users?  Use cases,
-> example scenarios, etc.
-> 
-> Apologies if I missed this in earlier discussions, but if it was in the
-> [0/N] this wouldn't matter!
-
+Thanks
+Danish
