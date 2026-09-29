@@ -1,43 +1,57 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2FFD51DDFB;
-	Tue, 29 Sep 2026 12:11:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8185552CCE5;
+	Tue, 29 Sep 2026 14:13:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790683881; cv=none; b=inMdoE/cm+K2+SM4sNl7UmLNyvqWejSPsTd+memfHw0aqVO1Dz2remgKcmWYvJJ0e2ZkRLuRjhvJgrE8wJYzvzvrgxdZkReLTYvU/3QynoXiACThIHL/w5MAf6dVy2RFeYAuji47qeKOzrYCR3MPKYVWSugQpa2j6MFRJ0LAQgo=
+	t=1790691202; cv=none; b=Dz9fFsG5lS2DqblEhfBFquDvXLfoJ8JSSjd/ywQfTM+iMG06wJcw0REKqjCvmsi8UbFSOadVorVoVNaph2y/mtXow1SqHYU8Px4ShyDzvyzHMu7XLBcAXNl0hqXHufEJNEDmhTBFwqPWbazbmxQXgveUC4I/qSl1IpoQ/ioN6zQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790683881; c=relaxed/simple;
-	bh=aJs6InMOjAJ8hrSrvg9tSxpTEaTjKPdFsobdkWQahPk=;
+	s=arc-20240116; t=1790691202; c=relaxed/simple;
+	bh=cOZLqYVdqh5xtDe0mhhkYGF6lUySS9B6d2Ci3uEIV7Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Nt1RizxIfbQ9WR5bkyvnh4eBsiXAw77Tj1LXR1VFfGpVzA7TLP3jZcUBZ5H6BQBwjCd86B6MNARrySxIdJuewxYDdbQPRvxFicXXYdT209d8NFA6KzvplMeTk4o04YaezN31wX7vB/fMZOHZPeA9g6jTqKpox4uMSw4IZdQ7zHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rz8fyWyi; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=NaUWqSd70dVeSBRuMk5WbFOmI8OGNmC8cGrAdwVMA9CcAN1187Pv6iV4iXGNFNgMsg+9zXveXUUmk36M9IrOzZa9RwUK9O2Uffi9B1bAWGrHl/op1RC1fCvX86KqiMzdx0LT/dDEldNhHlt7Cdnp1D9dbIOIqpEGAfU+bh+t+UM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Y0zYeXNw; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rz8fyWyi"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 0E68B1F000FF;
-	Tue, 29 Sep 2026 12:11:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790683878;
-	bh=AWkymJQyJ/uFUerg5PWmzlppdMRAJIa/vuVE9EYM3Xk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Rz8fyWyiHtk8piNl6XYaHxIQ2ZEC0vxoTooIdd9n9+uvnDY87nkd0dZbStVakMZ4g
-	 dJ8tKTtt84mWcg80ePX5K7qKcvnzMSv9AGsUlr58Ohm4vr9uOjqCwE030OPWfUGyNi
-	 Tlz5y/eh3dyprLqdB44NGqAGNc9pDNWqh2zxdj47OReU/L0/eYtkAlGJYRvll7gmLD
-	 bH3G+Sp1T7jqaONHYnya4UPmkoOXA3GmxV1/eEEp+FqMXSlsZ/wlYatJo6hv84Uagi
-	 EWMDfEk/aDd2qZdyu7+f7+mfMJinU2X0E+6kqyMpsffOK0/ITz0xq4IGDSwsulvN2P
-	 2ssqxt0puzXbw==
-Date: Tue, 29 Sep 2026 14:10:16 +0200
-From: Nicolas Schier <nsc@kernel.org>
-To: omer zalman <omerzalman42@gmail.com>
-Cc: Nathan Chancellor <nathan@kernel.org>, linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] kconfig: keep builtin precedence with duplicate fragment
- entries
-Message-ID: <aruqqBsCXEhO1pTN@levanger>
-Mail-Followup-To: omer zalman <omerzalman42@gmail.com>,
-	Nathan Chancellor <nathan@kernel.org>, linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-References: <CAGLNFZcFDMD7P3rwueV4eRQ4qvDU4ekyzLmYTFq==5fUZxMBmw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Y0zYeXNw"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=vmN2npans1p2hiojZm1+Q8GxyaP/JELuYTlJ/y3BRQY=; b=Y0zYeXNwr7kdWeSbBogWYUob6o
+	9cgz39NZAJ3Ym9ac2DoumN9NiQS9Qc66DShV8kFzHupTsNsh/oi79uHfX9AyP7dwYG/2t0CgW88/9
+	rR6PFkRO9N5jB5CGBxftCd0CZJuKhIzKVcQhghVenshrM1kG962ygGG/J4QEq+wLotuKJx/5ZPmgW
+	oAxx0CeooAVBT8LnXo1/DDhWRAm7RCsP2yF4btfDeNNA0jEQZ24jd4GF61M/1tDKtLmd6is9bcR0E
+	GK2/o13vz65TlGlLOjV8z2CNacHPx3QOVDX2C5doxYZO4iAMi8nC1jWQIkk37E5CeCJNkSs/4n16Z
+	oEVNU/kA==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1xBYZb-0000000Dmfz-1vmf;
+	Tue, 29 Sep 2026 14:12:47 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 19C9A300446; Tue, 29 Sep 2026 16:12:44 +0200 (CEST)
+Date: Tue, 29 Sep 2026 16:12:43 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Shivang Upadhyay <shivangu@linux.ibm.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, sv@linux.ibm.com,
+	alexandre.chartre@oracle.com, alexghiti@rivosinc.com,
+	aliceryhl@google.com, ardb@kernel.org, bp@alien8.de,
+	chleroy@kernel.org, elver@google.com, ihor.solodrai@linux.dev,
+	jpoimboe@kernel.org, kees@kernel.org, legion@kernel.org,
+	lossin@kernel.org, maddy@linux.ibm.com, masahiroy@kernel.org,
+	mpe@ellerman.id.au, nathan@kernel.org, npiggin@gmail.com,
+	nsc@kernel.org, ojeda@kernel.org, pmladek@suse.com,
+	rostedt@goodmis.org, tamird@kernel.org,
+	thomas.weissschuh@linutronix.de, thuth@redhat.com,
+	yuxuan.zuo@outlook.com, sourabhjain@linux.ibm.com
+Subject: Re: [PATCH v2 3/6] objtool: Fix "can't find starting instruction"
+ warnings on vmlinux
+Message-ID: <20260929141243.GA88198@noisy.programming.kicks-ass.net>
+References: <20260929055138.43489-1-shivangu@linux.ibm.com>
+ <20260929055138.43489-4-shivangu@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -46,27 +60,12 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAGLNFZcFDMD7P3rwueV4eRQ4qvDU4ekyzLmYTFq==5fUZxMBmw@mail.gmail.com>
+In-Reply-To: <20260929055138.43489-4-shivangu@linux.ibm.com>
 
-On Mon, Sep 28, 2026 at 07:45:22PM -0400, omer zalman wrote:
-> The -y option is meant to preserve a builtin value when a fragment
-> requests a module. With duplicate CONFIG_FOO=m lines, only the last
-> fragment line is skipped; an earlier one remains after CONFIG_FOO=y.
-> Kconfig reads the later assignment and can demote the symbol. Track
-> the symbol instead of one line, and skip all of its assignments
-> when builtin precedence applies.
-> 
-> Signed-off-by: Omer Zalman <omerzalman42@gmail.com>
-> 
-> The exact git-format-patch file is attached because Gmail's web
-> composer removes tabs from inline diffs.
+On Tue, Sep 29, 2026 at 11:21:34AM +0530, Shivang Upadhyay wrote:
 
-I did not have time for review, yet; just a heads-up:  Sending patches
-via attachments is incompatible to standard tooling (b4, etc.) and thus
-requires more manual work.  One way to work-around gmails restrictions
-might be the use of b4's web-submission endpoint:
+> find_insn() is also looking for symbols of size 0. But, objtool does
+> not store empty STT_NOTYPE symbols in the rbtree. 
 
-https://b4.docs.kernel.org/en/latest/contributor/send.html#authenticating-with-the-web-submission-endpoint
+81cf39be3559 ("objtool: Add empty symbols to the symbol tree again")
 
--- 
-Nicolas
