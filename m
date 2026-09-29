@@ -1,92 +1,281 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1F573CB2F8;
-	Tue, 29 Sep 2026 14:26:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C60D4322B9F;
+	Tue, 29 Sep 2026 18:07:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790691979; cv=none; b=TdiuTG1c2mHmo1uKlq2nu+qbphEtqYNjwFUCmuHYach0Rd66eKvR1JbLvLgewQ8/Eqn0Q11nbpk0N1Oa4xf2+pWWV0UKZTzP559Foz0vqEHsxkmKd7wGtJqSDbN+eSNnuryWiMZm3N4DlG1082zQQL1Ef9PEJy0Y45nqihLW8Uk=
+	t=1790705251; cv=none; b=Yb9EaR9louBZsfq6jx93w91vRQqLjFPIJ9PET8pbDYegL2PXVIdMPYIXaAbs/vKwEmbkPs4n9EmzY1QUvBt/X4Wh4Ml5pL9PwF03PVmn1rb0IjWaAnkBMaUb7Xumy5P2VjC/zOAlnoQtbpwquUhpSPvyRhj3Hmcj6macNX50OhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790691979; c=relaxed/simple;
-	bh=AI/78WJhD4CPIbJy+nlJpnGWgauJNLp0Y3rc2dalCGU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lSvJ/izxswyb0DkF6edbutoOY/mYTMV4MF6adY7JyuiIMvmsyiyx6NWrflIVvdsXdVQlDpn0+RHsCCcNhfNX01mCj+TaYxYwDSoBUG5yPXmPwZ2Zi2AIUQiJgjslj/LlERsDq7tOXyNkpQ0q+jJ8TLfcyT05s6nnPPJzZw35gtQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ErCl8NV5; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1790705251; c=relaxed/simple;
+	bh=HedXA29bP2AYga35+FP735wrhCFsjEPZwKzF7UPRSqs=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=pOXPqxUjLn+Ng6KI3nzKQx7G+PloXIkayqpwEfVsj7qZfVMorztW+jxmNvPm/Na0057+b/41B9U44EAFyHgegBWZ+d/3yI9q9fZ6Q3ul4M4PO3yBpFbBp2BfpLEcU0RWzDi1JgSTMyCQWitjSmJWVMITBxYBtK2kEaLx2l6Qgv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=egPIya6h; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ErCl8NV5"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=8DMiTrHEuHAfAfHczM3479xqIi6gNKMUHt0Q9Yhupb0=; b=ErCl8NV51ZUSe5AJcfBmq4kN8P
-	2TLVoAo84HDsopf6r7NEQlOe3C7Ftiy7oukl5U6W+9fgjL5LUeJHnCopcsfjOkQjv/jDlVCv/glIf
-	zzwEMZsQV+VhHepotwgXSgbQmidrYM8GJVI6NcTln5piQvcQB87+OFq8Kve0FvVHAp61r4RGLqyiS
-	NrHJS9JuMKRMVwiHaSJ0rgKKVkmp05nkJ6E30/FzcBdxkybvkpPlgh4bLNChB0Bo4b05rSMhBb9nH
-	PTjWHeBqf4Ed0IsZeNByfu/OkyrsspUCx93ZO5w3XL4pWaTC9LyhBdNR5c6+nDd5hplWza8tCb8F9
-	HTPRZVbQ==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1xBYmN-0000000E8Bs-340X;
-	Tue, 29 Sep 2026 14:25:59 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 48ABF3006DD; Tue, 29 Sep 2026 16:25:59 +0200 (CEST)
-Date: Tue, 29 Sep 2026 16:25:59 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Shivang Upadhyay <shivangu@linux.ibm.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, sv@linux.ibm.com,
-	alexandre.chartre@oracle.com, alexghiti@rivosinc.com,
-	aliceryhl@google.com, ardb@kernel.org, bp@alien8.de,
-	chleroy@kernel.org, elver@google.com, ihor.solodrai@linux.dev,
-	jpoimboe@kernel.org, kees@kernel.org, legion@kernel.org,
-	lossin@kernel.org, maddy@linux.ibm.com, masahiroy@kernel.org,
-	mpe@ellerman.id.au, nathan@kernel.org, npiggin@gmail.com,
-	nsc@kernel.org, ojeda@kernel.org, pmladek@suse.com,
-	rostedt@goodmis.org, tamird@kernel.org,
-	thomas.weissschuh@linutronix.de, thuth@redhat.com,
-	yuxuan.zuo@outlook.com, sourabhjain@linux.ibm.com
-Subject: Re: [PATCH v2 4/6] objtool/powerpc: Skip jump destination analysis
- and unnanotated intra-function call warnings for --ftr-fixup
-Message-ID: <20260929142559.GC88198@noisy.programming.kicks-ass.net>
-References: <20260929055138.43489-1-shivangu@linux.ibm.com>
- <20260929055138.43489-5-shivangu@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="egPIya6h"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 638D6C4AF0B;
+	Tue, 29 Sep 2026 18:07:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1790705251;
+	bh=HedXA29bP2AYga35+FP735wrhCFsjEPZwKzF7UPRSqs=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=egPIya6hO0qD84jl3l6phUzqNKajQWYKKFlxstWRFyT+XstgLuyHk4IkCcU2tEzx1
+	 dXYZ1aVu8ranfxxyEOyoeHUuuv9vf7em7oKMGfkQuL0YcMCdyS9GxxRtlc0YY0QcP1
+	 T8E28kDtZ0PFE6eefHfxv7kf7SrgYqepvJrZPTff18tb+5NYoFeWWR9jf06CPe1ZyH
+	 zsemc/29RrVD4eEz/W6+vvEZk5wYjCNvuEFuYIhkIS91jilIVfWScfDPKQ7zACCiIj
+	 JqjciY3qhgWhW0w9mEiZwdLAkMV6QojV/DQ2ky6NKxjtfm7vkh+Z5zd+zsy5NITeUw
+	 1q6iFvB9k3EgA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E498CA5FA7;
+	Tue, 29 Sep 2026 18:07:31 +0000 (UTC)
+From: Jim Cromie via B4 Relay <devnull+jim.cromie.gmail.com@kernel.org>
+Subject: [PATCH v7 0/3] kallsyms: Accelerate symbol name lookups by ~7x
+Date: Tue, 29 Sep 2026 12:07:29 -0600
+Message-Id: <20260929-ksyms-tune-v7-0-be568ceef41e@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260929055138.43489-5-shivangu@linux.ibm.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/3XNwW7CMAzG8VdBOS9TYidps9PeY+LgJQaire3UQ
+ DWE+u4znNpqHD9Lv79vqvJYuKq33U2NPJVahl5G87JT6UT9kXXJshUYCCbaqL/qtav6fOlZMwA
+ 5yC2hJSXgZ+RD+X3EPvayT6Weh/H6aE/2fv03M1ltdG59ik0mSwjvx47K92saOnXPTLCgACsKQ
+ gkRmdEypWZL8TlFoaGVf47J+By31D2nTmgESkyt+4zWbqlfUr+iXqg9NJ6ySQg2bWlY0rCiQSh
+ gCGBS8BzbJZ3n+Q+NlOQ0ywEAAA==
+X-Change-ID: 20260919-ksyms-tune-e22a42d8a31a
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Petr Mladek <pmladek@suse.com>, Zhen Lei <thunder.leizhen@huawei.com>, 
+ Luis Chamberlain <mcgrof@kernel.org>, 
+ Andrey Grodzovsky <andrey.grodzovsky@crowdstrike.com>, 
+ Steven Rostedt <rostedt@goodmis.org>, Lorenzo Stoakes <ljs@kernel.org>, 
+ Kees Cook <kees@kernel.org>, David Laight <david.laight.linux@gmail.com>, 
+ Masahiro Yamada <masahiroy@kernel.org>, Jiri Olsa <olsajiri@gmail.com>, 
+ linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+ bpf@vger.kernel.org, Jim Cromie <jim.cromie@gmail.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1790705250; l=10591;
+ i=jim.cromie@gmail.com; s=20260203; h=from:subject:message-id;
+ bh=HedXA29bP2AYga35+FP735wrhCFsjEPZwKzF7UPRSqs=;
+ b=Mv/rpPgdR/0VpIzwGFWoQbsQv8QxW98ufFmXosfOyf0Cpmy3i7E8xS9kk4S6Bs+9oQ/Fph7GE
+ 7I+JIKeR3XSDlquZrCiJVg/l7V26hSsYx/IPlkYVnzaMpUdRgwhEr6B
+X-Developer-Key: i=jim.cromie@gmail.com; a=ed25519;
+ pk=C6E5ODlPQo7ZBynATXH9wg7K6HxP0pIXyf4s38Qw0XE=
+X-Endpoint-Received: by B4 Relay for jim.cromie@gmail.com/20260203 with
+ auth_id=958
+X-Original-From: Jim Cromie <jim.cromie@gmail.com>
+Reply-To: jim.cromie@gmail.com
 
-On Tue, Sep 29, 2026 at 11:21:35AM +0530, Shivang Upadhyay wrote:
-> From: Sathvika Vasireddy <sv@linux.ibm.com>
-> 
-> Objtool is throwing unannotated intra-function call warnings
-> when run on vmlinux with --ftr-fixup option.
-> 
-> One such example:
-> 
-> vmlinux: warning: objtool: .text+0x3d94:
->                         unannotated intra-function call
-> 
-> .text + 0x3d94 = c000000000008000 + 3d94 = c0000000000081d4
-> 
-> c0000000000081d4: 45 24 02 48  bl c00000000002a618
-> <system_reset_exception+0x8>
-> 
-> c00000000002a610 <system_reset_exception>:
-> c00000000002a610:       0e 01 4c 3c     addis   r2,r12,270
->                         c00000000002a610: R_PPC64_REL16_HA    .TOC.
-> c00000000002a614:       f0 6c 42 38     addi    r2,r2,27888
->                         c00000000002a614: R_PPC64_REL16_LO    .TOC.+0x4
-> c00000000002a618:       a6 02 08 7c     mflr    r0
-> 
-> This is happening because we should be looking for destination
-> symbols that are at absolute offsets instead of relative offsets.
+In 2022, commit 60443c88f3a8 ("kallsyms: Improve the performance of
+kallsyms_lookup_name()") introduced kallsyms_seqs_of_names[] (+550 KiB
+.rodata), transforming an O(N) linear scan into an O(log N) binary
+search (5.2 ms -> ~7.2 us).  While this was a major step forward,
+the binary search inner loop was left decompressing full candidate
+names and scanning across sparse 256:1 markers on every probe.
 
-Again, confused. We run objtool on objects, this is pre-linking, there
-are no absolute offsets.
+Modern fleet observability, security daemons (e.g. CrowdStrike Falcon,
+Cilium, Datadog, Falco), and tracing tools resolve thousands of kernel
+functions by name at boot or service start.
+
+CrowdStrike recently hit this in production:
+
+commit 93e8fd1a565e ("ftrace: Use kallsyms binary search for single-symbol lookup")
+
+Attaching just 50 kprobe.session programs caused an 858 ms attach
+stall with 25% CPU burned in kallsyms.  That commit routed single-symbol
+libbpf attach directly to kallsyms_lookup_name().  In larger workloads
+(such as the BPF selftest serial_test_kprobe_multi_bench_attach across
+64,000 symbols), kallsyms_lookup_names() spends ~390 ms in raw CPU spin.
+
+This series accelerates kallsyms_lookup_names() by 7.0x (from 6,102 ns
+down to 866 ns per lookup), cutting 64k-symbol attach from ~390 ms to
+~55 ms, by fixing two inner-loop bottlenecks:
+
+0. Candidate symbols are fully decompressed into a 512-byte stack buffer
+   before calling strcmp(), even though ~16 of the 17 search steps
+   mismatch at the first differing character (0..N-1, heavily
+   front-loaded toward 0-2).
+
+1. Probes scan sequentially from 256:1 markers in kallsyms_names[],
+   decoding an average of 127.5 symbols per probe (~2,170 hops across a
+   17-step search).
+
+The 3-patch progression:
+
+0. Patch 1 introduces kallsyms_strcmp_symbol() to compare ASCII queries
+   against compressed tokens on the fly, bailing out on first mismatch.
+   Drops the 512-byte stack buffer and saves ~530 ns.
+
+1. Patch 2 increases marker density from 256:1 to 16:1, cutting average
+   scan distance from 127.5 to 7.5 hops and dropping lookup latency from
+   6,102 ns to 866 ns for +42.2 KiB of .rodata.
+
+2. Patch 3 inlines and unrolls get_symbol_seq() 24-bit reconstruction.
+
+Results (CONFIG_KALLSYMS_SELFTEST across ~184k symbols):
+- Baseline (256:1):  6,102 ns
+- Patch 1 (strcmp):  5,572 ns (-530 ns)
+- Patch 2 (16:1):      866 ns (7.0x faster)
+
+Trade-offs:
+- .rodata footprint: +42.2 KiB (+10,782 u32 entries for ~184k symbols,
+  ~0.1% of loaded kernel image).
+- Runtime overhead: 0 bytes dynamic RAM (no kmalloc/kvmalloc), 0 RCU,
+  0 new locks, and 0 new algorithms.
+- Kernel stack: -512 bytes freed in kallsyms_lookup_names().
+- Build tooling: scripts/kallsyms.c includes
+  ../kernel/kallsyms_internal.h (guarded by #ifdef __KERNEL__) so host
+  build and kernel runtime share KALLSYMS_MARKER_SHIFT 4 as a single
+  source of truth.
+- Build time: Unmeasurable delta (< 1 ms in scripts/kallsyms.c).
+
+What's Unchanged:
+- Symbol table layout in address order remains identical.
+- Streaming decompression for /proc/kallsyms and sprint_symbol() is
+  untouched.
+- 0 new user-facing APIs, 0 new locking primitives, 0 Kconfig options.
+
+Signed-off-by: Jim Cromie <jim.cromie@gmail.com>
+---
+Changes in v7:
+- Lead cover letter with concrete workloads and "who cares" (citing
+  CrowdStrike commit 93e8fd1a565e and 64k BPF selftest attach times)
+  (addresses Andrew Morton review).
+- Document lineage from Zhen Lei's 2022 binary search work in commit
+  60443c88f3a8 (+550 KiB .rodata) and frame this series as completing
+  that optimization (+42 KiB .rodata for 7x faster lookups).
+- Explicitly detail memory (+42.2 KiB .rodata, 0 B RAM, -512 B stack)
+  and build-time (<1 ms) trade-offs in cover letter (addresses Andrew
+  Morton review).
+- Detail lack of runtime complexity (0 kmalloc, 0 RCU, 0 locks, 0 new
+  algos).
+- Note scripts/kallsyms.c reading KALLSYMS_MARKER_SHIFT from kernel/
+  header as single source of truth.
+- Add Petr Mladek, Zhen Lei, Luis Chamberlain, Andrey Grodzovsky, and
+  Steven Rostedt to Cc list.
+- Link to v6: https://lore.kernel.org/r/20260926-ksyms-tune-v6-0-236620c65e98@gmail.com
+
+Changes in v6:
+- In patch 1, clarify token matching mechanics and early exit on char
+  0..N-1; cite CONFIG_KALLSYMS_SELFTEST across all ~184k symbols for the
+  ~530 ns measurement (addresses BPF CI review).
+- In patch 1, drop 0-2 list and fix repeated word typo ("the the").
+- In patch 2, recast commit body around kallsyms storage trade-offs and
+  drop hunk-by-hunk numbered list (addresses BPF CI review).
+- In patch 2, drop 0.002% percentage claim and state absolute .rodata
+  cost (+42 KiB for ~184k symbols).
+- In patch 2, drop ephemeral benchmark comment from
+  kernel/kallsyms_internal.h (addresses BPF CI review).
+- Link to v5: https://lore.kernel.org/r/20260925-ksyms-tune-v5-0-1f75ad0c321c@gmail.com
+
+Changes in v5:
+- Dismiss dynamic 1:1 batch table as unnecessary:
+  In v2-v4, a dynamic u32 lookup index allocated in transient RAM was
+  explored.  While dynamic 1:1 breaks even against baseline 256:1 after
+  ~1,200 queries, comparing dynamic 1:1 against static 16:1 markers
+  dismisses the dynamic approach entirely:
+  * Static 16:1 markers achieve 866 ns, capturing 97.4% of the maximum
+    latency savings of a 1:1 table (an 85.8% reduction from baseline).
+  * Dynamic 1:1 gains only an incremental 138 ns (the remaining 2.6%),
+    while paying ~6,419 us in allocation setup and synchronize_rcu()
+    teardown.
+  * Amortizing 6,419 us at 138 ns saved requires 46,514 queries just to
+    break even against 16:1 markers.  For any workload under 46k
+    queries, dynamic allocation is slower overall.
+  * Drop kallsyms_lookup_batch_start/end APIs, mutexes, refcounts,
+    transient kvmalloc RAM allocations, and RCU synchronization.
+- Drop lib/test_kallsyms_perf benchmark module and
+  CONFIG_TEST_KALLSYMS_PERF; existing in-tree CONFIG_KALLSYMS_SELFTEST
+  already benchmarks standard kallsyms_lookup_name() without adding
+  unmaintained test files in lib/.
+- In patch 2, increase marker density to 16:1 via
+  KALLSYMS_MARKER_SHIFT 4 shared between scripts/kallsyms.c and
+  kernel/kallsyms_internal.h, and drop all references to dynamic tables
+  from the patch body.
+- Link to v4: https://lore.kernel.org/r/20260922-ksyms-tune-v4-0-92acea84b911@gmail.com
+
+Changes in v4:
+- In patch 1, ignore early boot invocations in param_set_trigger() when
+  system_state < SYSTEM_RUNNING to prevent NULL pointer dereference in
+  ktime_get_ns() prior to timekeeping_init() (addresses Sashiko review).
+- In patch 1, prevent sysfs TOCTOU divide-by-zero panic: reject
+  num_iters == 0 in param setter, snapshot iters locally via READ_ONCE,
+  and serialize runs with bench_lock mutex (addresses Sashiko review).
+- In patch 1, eliminate multi-second boot stall: add run_on_boot
+  parameter (default false) so late_initcall only runs benchmark when
+  explicitly requested (addresses Sashiko review).
+- In patch 1, chunk lookup loops in 4096-iter batches with
+  cond_resched() outside the timing bracket to prevent preemption sleep
+  time from inflating reported latency (addresses Sashiko review).
+- In patch 3, annotate dyn_kallsyms_offsets declaration with __rcu to
+  satisfy sparse type checking and prevent address-space warnings across
+  rcu_assign_pointer() and rcu_dereference() (addresses Sashiko review).
+- In patch 3, use rcu_replace_pointer() with lockdep_is_held() during
+  batch teardown to atomically read and clear the pointer while
+  satisfying sparse address-space constraints (addresses Sashiko
+  review).
+- Link to v3: https://lore.kernel.org/r/20260922-ksyms-tune-v3-0-681a34ea05d9@gmail.com
+
+Changes in v3:
+- Reorder series: place on-the-fly token matching ahead of marker
+  density optimization, establishing an active proof of incremental
+  performance deltas across all steps (addresses David Laight review).
+- Add inlined and unrolled get_symbol_seq() 24-bit sequence index
+  reconstruction into direct byte shifts (addresses David Laight
+  review).
+- In test_kallsyms_perf, configure as a built-in test (bool) rather
+  than a module (tristate) and drop kallsyms iterator EXPORT_SYMBOL_GPL
+  exports to avoid exposing internal kernel symbol data (addresses
+  Sashiko review).
+- In patch 1, optimize kallsyms_strcmp_symbol() by dropping
+  skipped_first tracking and checking len at the bottom of the token
+  loop (addresses David Laight review).
+- Drop 'default m' from lib/Kconfig.debug.
+- Fix soft lockup risks by adding cond_resched() every 16k iterations in
+  test_kallsyms_perf loops.
+- Replace direct 64-bit integer divisions with div_u64() to fix 32-bit
+  builds.
+- Guard against divide-by-zero when num_iters=0.
+- Replace tcp_v4_rcv with panic in hit_symbols to prevent failures wo
+  CONFIG_INET.
+- Move David Laight to series-wide Cc on cover letter, dropping trailer
+  from patch 3.
+- Link to v2: https://lore.kernel.org/r/20260922-ksyms-tune-v2-0-a333ee31eac7@gmail.com
+
+Changes in v2:
+- Replaced static build-time 3-byte offset table with a dynamic u32
+  index bracketed by kallsyms_lookup_batch_start() and
+  kallsyms_lookup_batch_end().
+- Dropped .rodata image footprint addition from +573 KiB to 0 KiB,
+  addressing Kees Cook's memory footprint objection.
+- Native u32 loads in transient RAM eliminate 24-bit big-endian shifts
+  and unaligned loads, addressing David Laight's endianness critique.
+- Direct O(1) table indexing provides 0 hops for all symbol lookups
+  without remainder logic or odd/even branching.
+- Restored scripts/kallsyms.c and kernel/kallsyms_internal.h to pristine
+  state, leaving legacy kallsyms_markers[] as safety fallback.
+- Rebased out Lorenzo Stoakes' kbuild series; this series is now
+  completely decoupled and applies cleanly directly onto mainline.
+- Link to v1: https://lore.kernel.org/r/20260919-ksyms-tune-v1-0-d85c97da1a32@gmail.com
+
+---
+Jim Cromie (3):
+      kallsyms: Match compressed tokens on the fly during binary search
+      kallsyms: Increase marker density to 16:1 to accelerate lookups
+      kallsyms: Unroll 24-bit sequence reconstruction in get_symbol_seq()
+
+ kernel/kallsyms.c          | 111 +++++++++++++++++++++++++++------------------
+ kernel/kallsyms_internal.h |  11 +++++
+ scripts/kallsyms.c         |  14 ++++--
+ 3 files changed, 86 insertions(+), 50 deletions(-)
+---
+base-commit: 93f51579e7df248780214094418f205253383cc5
+change-id: 20260919-ksyms-tune-e22a42d8a31a
+
+Best regards,
+-- 
+Jim Cromie <jim.cromie@gmail.com>
+
+
