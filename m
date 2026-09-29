@@ -1,38 +1,38 @@
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8185552CCE5;
-	Tue, 29 Sep 2026 14:13:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 347AF2F7EE9;
+	Tue, 29 Sep 2026 14:24:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790691202; cv=none; b=Dz9fFsG5lS2DqblEhfBFquDvXLfoJ8JSSjd/ywQfTM+iMG06wJcw0REKqjCvmsi8UbFSOadVorVoVNaph2y/mtXow1SqHYU8Px4ShyDzvyzHMu7XLBcAXNl0hqXHufEJNEDmhTBFwqPWbazbmxQXgveUC4I/qSl1IpoQ/ioN6zQ=
+	t=1790691894; cv=none; b=thBVnqp19AUQe57+uKPMuxfHTfEIh+5mA3AtUgZjEj/BSV/H25IqWHHU5UMzwrGEn7LnnAcF3qmDYrRfFWw5r1049zdu/lJsMLUcAdX524uFqE9xvo7on4uIEPjv/LMVZplfR0KdQXdYLYBo3E3wD41icx0BZ4eNT+apWi75uuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790691202; c=relaxed/simple;
-	bh=cOZLqYVdqh5xtDe0mhhkYGF6lUySS9B6d2Ci3uEIV7Q=;
+	s=arc-20240116; t=1790691894; c=relaxed/simple;
+	bh=2LyAf1a8toXZQ9cCJbGTwyXsOwJuoiFPfdbF4u5/Ir0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NaUWqSd70dVeSBRuMk5WbFOmI8OGNmC8cGrAdwVMA9CcAN1187Pv6iV4iXGNFNgMsg+9zXveXUUmk36M9IrOzZa9RwUK9O2Uffi9B1bAWGrHl/op1RC1fCvX86KqiMzdx0LT/dDEldNhHlt7Cdnp1D9dbIOIqpEGAfU+bh+t+UM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Y0zYeXNw; arc=none smtp.client-ip=90.155.50.34
+	 Content-Type:Content-Disposition:In-Reply-To; b=KJTwI1z0vxDkHIxSmZ3U2Dc6uSwEXlJY5Sj4BSjXzFLsSFbsXJ0JvmgxJ6d4tWOk0H3NyBds3NadJ7DiAUwGYMtavNd1QLbUWLhh7sX821u/Tva30zj3LYpctJpB/nZaZlo+IF8hrf83LjmUNHgGa0EtZHGLxlmTESqIAKxs21c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=FpGia1pU; arc=none smtp.client-ip=90.155.50.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Y0zYeXNw"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="FpGia1pU"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=vmN2npans1p2hiojZm1+Q8GxyaP/JELuYTlJ/y3BRQY=; b=Y0zYeXNwr7kdWeSbBogWYUob6o
-	9cgz39NZAJ3Ym9ac2DoumN9NiQS9Qc66DShV8kFzHupTsNsh/oi79uHfX9AyP7dwYG/2t0CgW88/9
-	rR6PFkRO9N5jB5CGBxftCd0CZJuKhIzKVcQhghVenshrM1kG962ygGG/J4QEq+wLotuKJx/5ZPmgW
-	oAxx0CeooAVBT8LnXo1/DDhWRAm7RCsP2yF4btfDeNNA0jEQZ24jd4GF61M/1tDKtLmd6is9bcR0E
-	GK2/o13vz65TlGlLOjV8z2CNacHPx3QOVDX2C5doxYZO4iAMi8nC1jWQIkk37E5CeCJNkSs/4n16Z
-	oEVNU/kA==;
+	bh=S108zhyFgrWupBnxwjXeQHMSDadfxPXX2/f8wZjphW0=; b=FpGia1pUEKUyyLiJ/s77zVQByE
+	R2djtHe+L/OTqu+78ZMdMtGmyIsy+yF9m038TMkyVLXn3JdK6CNZGYTduvreLZfONkv0HVnaiXlYy
+	zphDLBzKbnF5kMyDV+voJnOSa5e0jLcPS8060S+BETsPDBGnBZEUtvEfPyMpxxRVSvcZtwi7uQT41
+	MeSeHUSurfKJHxl5ozVP+e/VKm5F1P05DsEHu3xDrklm7XlUxi9nQLYSIldqG8PbvnRsXoYFsi93f
+	h5+uGYBakygOCU0VOTcvd61E+kAGkuPWpJqwDBLmjY8mR294N7SuUq6CnqcirZ+pVcRo5vK5BRrF/
+	rP36JT0A==;
 Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
 	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1xBYZb-0000000Dmfz-1vmf;
-	Tue, 29 Sep 2026 14:12:47 +0000
+	id 1xBYl4-0000000E75a-3YGc;
+	Tue, 29 Sep 2026 14:24:38 +0000
 Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 19C9A300446; Tue, 29 Sep 2026 16:12:44 +0200 (CEST)
-Date: Tue, 29 Sep 2026 16:12:43 +0200
+	id B830C3006DD; Tue, 29 Sep 2026 16:24:36 +0200 (CEST)
+Date: Tue, 29 Sep 2026 16:24:36 +0200
 From: Peter Zijlstra <peterz@infradead.org>
 To: Shivang Upadhyay <shivangu@linux.ibm.com>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -49,7 +49,7 @@ Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
 	yuxuan.zuo@outlook.com, sourabhjain@linux.ibm.com
 Subject: Re: [PATCH v2 3/6] objtool: Fix "can't find starting instruction"
  warnings on vmlinux
-Message-ID: <20260929141243.GA88198@noisy.programming.kicks-ass.net>
+Message-ID: <20260929142436.GB88198@noisy.programming.kicks-ass.net>
 References: <20260929055138.43489-1-shivangu@linux.ibm.com>
  <20260929055138.43489-4-shivangu@linux.ibm.com>
 Precedence: bulk
@@ -63,9 +63,36 @@ Content-Disposition: inline
 In-Reply-To: <20260929055138.43489-4-shivangu@linux.ibm.com>
 
 On Tue, Sep 29, 2026 at 11:21:34AM +0530, Shivang Upadhyay wrote:
+> From: Sathvika Vasireddy <sv@linux.ibm.com>
+> 
+> Objtool throws a lot of can't find starting instruction warnings
+> when run on vmlinux with --ftr-fixup option.
+> 
+> These warnings are seen because find_insn() function looks for
+> instructions at offsets that are relative to the start of the section.
+> In case of individual object files (.o), there are no can't find
+> starting instruction warnings seen because the actual offset
+> associated with an instruction is itself a relative offset since the
+> sections start at offset 0x0.
+> 
+> However, in case of vmlinux, find_insn() function fails to find
+> instructions at the actual offset associated with an instruction
+> since the sections in vmlinux do not start at offset 0x0. Due to
+> this, find_insn() will look for absolute offset and not the relative
+> offset. This is resulting in a lot of can't find starting instruction
+> warnings when objtool is run on vmlinux.
 
-> find_insn() is also looking for symbols of size 0. But, objtool does
-> not store empty STT_NOTYPE symbols in the rbtree. 
+I'm confused; decode_instructions() iterates the section and inserts the
+instructions at the exact offset it finds them at. Therefore it should
+be able to find them again at that same offset, irrespective of the
+actual start, no?
 
-81cf39be3559 ("objtool: Add empty symbols to the symbol tree again")
+> +			if (func->len == 0 && is_notype_sym(func))
+> +				continue;
+> +
+> +			func_off = opts.ftr_fixup ?
+> +				func->offset - sec->sh.sh_addr : func->offset;
+
+function offset really should not depend on opts. It should work
+irrespective of any option, no?
 
