@@ -1,42 +1,42 @@
-Received: from mail.avm.de (mail.avm.de [212.42.244.119])
+Received: from mail.avm.de (mail.avm.de [212.42.244.94])
 	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8E533AFAE3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778193AA50B;
 	Tue, 29 Sep 2026 08:00:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.119
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.94
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790668808; cv=none; b=gxbCnrQ8T66pR68pZhA/gOBB9eEekI76pS2h6j/fXoGolVwMfKEvBdF5/C0MIAXR67CDdgHJ8RJz/ihKLKQELoCgusW0Z5VHFs2EtBTwbRAPsgJsIHJZ/fqQXy/Xs3gK9+baR3S/nGqUl1DNykeJxM5OOEezNabR/0/FyjHuGfw=
+	t=1790668808; cv=none; b=hl3k1vf0kydRhfHvaN3n+pQmV+bn60CK8g8xBUUD9pOWHnHhuu00trw00p6WqHwaMC81EsL5VwSuygd8U7SMe/pKHimxAxrh2zPfnEy8icXj+HSQr/atKdd7U69pgwaFPN30KItx/v6sJInN0qtwEKyr/QQTMOrRwk7c7fur47w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1790668808; c=relaxed/simple;
-	bh=mJxfmuntrS6Lc1ef/BTMcihmrHnPcFu0Ms2DI2wlof0=;
+	bh=Qi2U/Wv31URWTyz29QDUAuNGOMbiXTRnpP6Yksp1fRE=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=mmYbLFOFB5e3bkajP4ecBEkulrpWpAQoerPtaim4k3i44dx/FiAYjNqQ19+jwS3unK4WEvysscVqepBTJBlPchSMd17StY6i30mV6fkNCAtsFVQEnGXnBc1N/Awlth3zrEQuhmbF4ZvOrGTabQK5P8vFM6GOvRUbIgmAOsaESDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com; spf=pass smtp.mailfrom=fritz.com; dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b=eEkWiXRA; arc=none smtp.client-ip=212.42.244.119
+	 In-Reply-To:To:Cc; b=PLq6CJ3RJ+mwuui202CcKFhgIuq8kj5eqUGApcKgIqJgAdfgOVZ7MJ/JJzgxEj2qBW2z2AZRpesFPd9SQObdUbLaUKAiPn/w703t+8rDxiaH+4NYRx+MCBYib9+sqLWibG8pBS19htV3bZPesYwX+/R+7DWbMYmwH0pImA7Khi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com; spf=pass smtp.mailfrom=fritz.com; dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b=Hvy30Gc1; arc=none smtp.client-ip=212.42.244.94
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fritz.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b="eEkWiXRA"
+	dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.b="Hvy30Gc1"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fritz.com; s=mail;
-	t=1790668794; bh=mJxfmuntrS6Lc1ef/BTMcihmrHnPcFu0Ms2DI2wlof0=;
+	t=1790668793; bh=Qi2U/Wv31URWTyz29QDUAuNGOMbiXTRnpP6Yksp1fRE=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=eEkWiXRA1ZRyZeLsVeKxHi4n3WFGZ8ALPOfw8dUn+P64XpG+o9AM4qdvxV9tz4MLZ
-	 jVdBhT4C010GQZOyJ3dCzRDA8HK0nZ/u2G5zquqqkClywfxChjO5E0X6GUCXtoSq+O
-	 ynG81xKVHgnd981iKbrEhisTUwkdHsgDqEDLEBZJO5cjSV0JEwCWGXbEzXWS1iXJgg
-	 cQrN8ie2sczjeTkqsUDvHKVV/Wsqf3gtkD5n/Ee4IZBpC5IIWbQHxeM+TpL8rgBm7N
-	 SBADCIzT6YmIau513x72frHTiYxHbFJRxSw2FSQuLmbgTe3yMndSjBHjAKWy6xfVGJ
-	 1m7aK47qO26oQ==
-Received: from [212.42.244.78] (helo=mail.avm.de)
+	b=Hvy30Gc1qZmsEx9ptR5TCUotlKYcAaw37KAv5OGfLIX6Iia4fS+cf6dIZpAZzIeO7
+	 FXviWjCiuijnpd3U5vKLAtmZCNSZqI0ecZ3Ylb6i30/bNCGlUPuKZKUZwvB6XVCpeM
+	 KBVyCgUQwMwJWE2lgOpjU1Z5yJYyBUIL5N8xlQNAam4UfHFNZW3Fbs3qhonBSO1v29
+	 Pt/q46tkhAci9aUdXpSsqRLJvaiSpTyDIsrdT0tTd6VhyNE0AkHkeaOkA1yuO9e1ol
+	 RHCLxlpa2tLvszFWIDFSrPEEqRDiP6VOLnrB+aZgcZYEmDPOtMJ3mbV4ygIRHyWikE
+	 W9rDd2unk74tA==
+Received: from [2001:bf0:244:244::78] (helo=mail.avm.de)
 	by mail.avm.de with ESMTP (eXpurgate 4.57.1)
 	(envelope-from <n.schier@fritz.com>)
-	id 6abb6ff9-03d5-7f0000032729-7f0000018808-1
+	id 6abb6ff9-03cd-7f0000032729-7f000001c75c-1
 	for <multiple-recipients>; Tue, 29 Sep 2026 09:59:53 +0200
-Received: from mail-auth.fritz.com (unknown [212.42.244.78])
+Received: from mail-auth.fritz.com (unknown [IPv6:2001:bf0:244:244::78])
 	by mail.avm.de (Postfix) with ESMTPS;
 	Tue, 29 Sep 2026 09:59:53 +0200 (CEST)
 From: Nicolas Schier <n.schier@fritz.com>
-Date: Tue, 29 Sep 2026 09:59:47 +0200
-Subject: [PATCH v2 4/4] kconfig: tests: {old,save}defconfig: Forward
- dynamic keyword arguments
+Date: Tue, 29 Sep 2026 09:59:44 +0200
+Subject: [PATCH v2 1/4] kconfig: tests: Reset all KCONFIG_* env variables
+ by default
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -45,7 +45,7 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260929-kconfig-tests-minor-updates-v2-4-c5902bee1d0c@fritz.com>
+Message-Id: <20260929-kconfig-tests-minor-updates-v2-1-c5902bee1d0c@fritz.com>
 References: <20260929-kconfig-tests-minor-updates-v2-0-c5902bee1d0c@fritz.com>
 In-Reply-To: <20260929-kconfig-tests-minor-updates-v2-0-c5902bee1d0c@fritz.com>
 To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
@@ -54,110 +54,75 @@ To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
  Masahiro Yamada <yamada.masahiro@socionext.com>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
  Nicolas Schier <n.schier@fritz.com>
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3857; i=n.schier@fritz.com;
- h=from:subject:message-id; bh=mJxfmuntrS6Lc1ef/BTMcihmrHnPcFu0Ms2DI2wlof0=;
- b=owEBbQKS/ZANAwAIAYjGvJyImm24AcsmYgBqu2/4kBtZYEHaNjRInHj7JXKTZgTjUo5f6qWZs
- TDZ1Y+8e+GJAjMEAAEIAB0WIQQO/4WJ63TpgecLpGmIxryciJptuAUCartv+AAKCRCIxryciJpt
- uNkuD/0XJr2d5PwAKvvFB7BOfx0X8FZsx+eWgvZImEejF6kjaGA5Ge8lSNtCVPIfucfG9HzSDEi
- +5ZkQ7bVQFCg5kNq06HnBIyW4CxmOIF+Xz+LYQ37Whi11ctTATWJYWWVk/p8AquUA9LuPAUwuL8
- ZDP34f4pnlmK8jQBBxA3+/Hxj4NWc+bm2pha/61gvry1Xie6vo0KB+SGiJw5ITQBoigI739Ej92
- qryATsU3jRjXM6WeGA5zy8i4df4TDNGlnLaPmXECQJN4RnKSJcfqZHnbRyLL4crMgxP3f+UH3eM
- 2Npxop+029KULitEbnAbJ2f0QjWROW7+lQaLmWylHGPJO3QFRLbSBGhT2Ui2hiWSpbwHexRwEzP
- kebUIAT8wsQKl7/CasEtSoh2i1KAWxFyvzfiSdlLklYmWHvKnQP8gz80wgOEKCYV2SK3SLE98ob
- AHe+h04BTtUrhdkeW2+kSZnmmqcSlPx7r/D/p7cUenw3nZwK2jhxOQoRVJ9jVFIncJAcxMumusQ
- VBkbzGVgQXbYYhCXpq0JI/S1jifbIL7ZR05MCj0ofXT4v9U1MjHcX0lW6AlnxQnCcsTgdnfvHFZ
- vNm2iwZ/mI2B4FsGSQ1wCGWron/o+1/t4VmGpyxbAI4YxWYdv8T/8jwZ3vmV+AcayB9FJtgKdZ3
- ItapESMN26UXBog==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1931; i=n.schier@fritz.com;
+ h=from:subject:message-id; bh=Qi2U/Wv31URWTyz29QDUAuNGOMbiXTRnpP6Yksp1fRE=;
+ b=owEBbQKS/ZANAwAIAYjGvJyImm24AcsmYgBqu2/3k9lSb6Csxf2jGjstWcUrfPSqqyPSeqKfw
+ PMANxRTFO6JAjMEAAEIAB0WIQQO/4WJ63TpgecLpGmIxryciJptuAUCartv9wAKCRCIxryciJpt
+ uFQBD/4s798x+6vCBUFskwj0artDXEiWTGH/D5ZUyVU+wKGIvrjgRIdqq6iKfD5JTS8X6WNqBwG
+ T+gt8ZQBTjRBXGW/ToFH7EJG6T4px0FFfu2yVbe8uSuZCdjZCntWUHWJKuCfLj9AT6fIl2efzU3
+ 08dRROjv2kmw321HZ00hHio21yiSDngDPy58IjCRym2vVJnMKdYo3KbwdAXhoXjFKH/nTB836Gb
+ cRL5fEzcX3ogl1uvJOh20ltpL8xA7ktY49Cz+dQsF+kg/S/4hJ/p35LwirzHsfo+uczqSkYer6e
+ txvxphVo+a5EWTIuwYzbxUjHYPhJpwEzYv6yWb/nOzaqe1HMbajMRn1ZgmadDODMEIM4zqHz2PA
+ pB0lA8hexInHMthDSohYWxm5iS4NzzjeS4FTwiG3Icr9ppoONJnuSFwcDF0vYIkqV3/boWSdx0Q
+ L64YkW6O8Y47YTm6ztrUmmaFv0eKFQ7x/n+UX94DuxUurr1jqqdYRgqVlwjLFi8xVTfHUWJsa0q
+ xrcSKYStJK4dJcouzAaPKZsILKUkABJk4EzCwEB7LVoTgRwgzooOFY2PJ8FEzW3bKJqr6fz+y36
+ 3CFErz1IAQSoaf12Neiq6oj4eEeoAju0gBzgnIO11vTMq8uohCAUAk14dDS/lQSRgcCMl86ETzk
+ i28n8dL8Hsbp2Cw==
 X-Developer-Key: i=n.schier@fritz.com; a=openpgp;
  fpr=7CF67EF8868721AFE53D73FDBDE3A6CC4E333CC8
-X-purgate-ID: 149429::1790668793-82FDBEF9-BFB7AAE7/0/0
+X-purgate-ID: 149429::1790668793-2F7DCEE1-AAE96C99/0/0
 X-purgate-type: clean
-X-purgate-size: 3859
-X-Notice: Whitelisted
+X-purgate-size: 1933
 X-purgate: This mail is considered clean (visit https://www.eleven.de for further information)
 X-purgate: clean
-X-pfmilter: host: postfix-mx-02  mail-id: 0C3A8A0434  external: no
+X-pfmilter: host: postfix-mx-03  mail-id: E00CCA0816  external: no
 
-Let kconfig test framework forward dynamic keyword arguments for
-'olddefconfig' and 'savedefconfig' and update the _run_conf() calls in
-warn_changed_input to use the corrsponding wrappers instead.
+Reset all environment variables with names starting with 'KCONFIG_' from
+the user-provided environment.
 
-The warn_changed_input test needed to use _run_conf() as the
-{old,save}defconfig wrapper did not provide the necessary flexibility
-for common calls.  With dynamic keyword arguments, there is no need to
-use the framework-internal _run_conf() any more.
+This fixes the 'warn_changed_input' test on systems with
+KCONFIG_WARN_CHANGED_INPUT=1 and ensures a cleaner test environment.
 
-Reviewed-by: Julian Braha <julianbraha@gmail.com>
+Fixes: 645323a7f4e5 ("kconfig: add optional warnings for changed input values")
 Signed-off-by: Nicolas Schier <n.schier@fritz.com>
 ---
- scripts/kconfig/tests/conftest.py                    |  9 +++++----
- scripts/kconfig/tests/warn_changed_input/__init__.py | 11 ++++-------
- 2 files changed, 9 insertions(+), 11 deletions(-)
+
+Changes in v2:
+  * Reset all KCONFIG_* env variables, not just
+    KCONFIG_WARN_CHANGED_INPUT (Julian, Nathan)
+---
+ scripts/kconfig/tests/conftest.py | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
 diff --git a/scripts/kconfig/tests/conftest.py b/scripts/kconfig/tests/conftest.py
-index b2539e51e2a6..97ae0f79d03d 100644
+index 66f95e4ed58c..de8e555cd951 100644
 --- a/scripts/kconfig/tests/conftest.py
 +++ b/scripts/kconfig/tests/conftest.py
-@@ -159,13 +159,13 @@ class Conf:
-         return self._run_conf('--oldconfig', dot_config=dot_config,
-                               interactive=True, in_keys=in_keys)
+@@ -57,9 +57,12 @@ class Conf:
+         # Override 'srctree' environment to make the test as the top directory
+         extra_env['srctree'] = self._test_dir
  
--    def olddefconfig(self, dot_config=None):
-+    def olddefconfig(self, dot_config=None, **kw):
-         """Run olddefconfig.
+-        # Clear KCONFIG_DEFCONFIG_LIST to keep unit tests from being affected
+-        # by the user's environment.
+-        extra_env['KCONFIG_DEFCONFIG_LIST'] = ''
++        # Clear all KCONFIG_* environment variables
++        env = {
++            varname: os.environ[varname]
++            for varname in os.environ.keys()
++            if not varname.startswith("KCONFIG_")
++        }
  
-         dot_config: .config file to use for configuration base (optional)
-         returncode: exit status of the Kconfig executable
-         """
--        return self._run_conf('--olddefconfig', dot_config=dot_config)
-+        return self._run_conf('--olddefconfig', dot_config=dot_config, **kw)
+         # Run Kconfig in a temporary directory.
+         # This directory is automatically removed when done.
+@@ -75,7 +78,7 @@ class Conf:
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE,
+                                   cwd=temp_dir,
+-                                  env=dict(os.environ, **extra_env))
++                                  env=dict(env, **extra_env))
  
-     def defconfig(self, defconfig):
-         """Run defconfig.
-@@ -229,14 +229,15 @@ class Conf:
- 
-         return self._allconfig('rand', all_config, extra_env=extra_env)
- 
--    def savedefconfig(self, dot_config):
-+    def savedefconfig(self, dot_config, out_file='defconfig', **kw):
-         """Run savedefconfig.
- 
-         dot_config: .config file for input
-+        out_file: defconfig file for output
-         returncode: exit status of the Kconfig executable
-         """
-         return self._run_conf('--savedefconfig={}'.format(out_file),
--                              dot_config=dot_config, out_file='defconfig')
-+                              dot_config=dot_config, out_file=out_file, **kw)
- 
-     def listnewconfig(self, dot_config=None):
-         """Run listnewconfig.
-diff --git a/scripts/kconfig/tests/warn_changed_input/__init__.py b/scripts/kconfig/tests/warn_changed_input/__init__.py
-index a5f07d4a882c..17b602dd280e 100644
---- a/scripts/kconfig/tests/warn_changed_input/__init__.py
-+++ b/scripts/kconfig/tests/warn_changed_input/__init__.py
-@@ -15,17 +15,14 @@ def test(conf):
-     assert conf.olddefconfig('config') == 0
-     assert 'user-provided values changed by Kconfig' not in conf.stderr
- 
--    assert conf._run_conf('--olddefconfig', dot_config='config',
--                          extra_env=warn_changed_input) == 0
-+    assert conf.olddefconfig('config', extra_env=warn_changed_input) == 0
-     assert conf.stderr_contains('expected_stderr')
-     assert conf.config_matches('expected_config')
- 
--    assert conf._run_conf('--olddefconfig', dot_config='config',
--                          extra_env=warn_changed_input, silent=True) == 0
-+    assert conf.olddefconfig('config', extra_env=warn_changed_input,
-+                             silent=True) == 0
-     assert conf.stderr_contains('expected_stderr')
- 
--    assert conf._run_conf('--savedefconfig=defconfig', dot_config='config',
--                          out_file='defconfig',
--                          extra_env=warn_changed_input) == 0
-+    assert conf.savedefconfig('config', extra_env=warn_changed_input) == 0
-     assert conf.stderr_contains('expected_stderr')
-     assert conf.config_matches('expected_defconfig')
+             # If input key sequence is given, feed it to stdin.
+             if in_keys:
 
 -- 
 2.55.0
