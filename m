@@ -1,42 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 114A1391828;
-	Tue, 29 Sep 2026 12:05:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2FFD51DDFB;
+	Tue, 29 Sep 2026 12:11:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790683525; cv=none; b=gjYC5XUIUjH0CruLbxctQcUJh4hMNP3Lr3EsoiaNWGEwbO6Y3CZrGSWEnhcz3ZqLEVIgtrIjlWcGleSgdp0ri4z0KtdYxwT6mV9zGU8RUJlZfPtDLo0KGW+UYkBzfQWyke9bfwZbi1uIU0qZUHFfVJAv9D0ApscAkRnFzulHPjk=
+	t=1790683881; cv=none; b=inMdoE/cm+K2+SM4sNl7UmLNyvqWejSPsTd+memfHw0aqVO1Dz2remgKcmWYvJJ0e2ZkRLuRjhvJgrE8wJYzvzvrgxdZkReLTYvU/3QynoXiACThIHL/w5MAf6dVy2RFeYAuji47qeKOzrYCR3MPKYVWSugQpa2j6MFRJ0LAQgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790683525; c=relaxed/simple;
-	bh=Gv3iMuSmU+Xp2uinMCZchVZhap3jjvIIJWZf7M8cIO8=;
+	s=arc-20240116; t=1790683881; c=relaxed/simple;
+	bh=aJs6InMOjAJ8hrSrvg9tSxpTEaTjKPdFsobdkWQahPk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QxpMvnz0skgrf3NZ1MdnkGwT7NEY62Th7Q/ui2+uLb17hjm6bmtbCWoqi2ou+ge3T1tP7HOg2hktutLHNCKTtLaVt8fDdE6Hn0FIh20t+I4Dx9VonjEjO5XTm8BQEzeV3ol+r6iXOyC5rg9cWTjlPPtw+LU5GBf+AiEr8qCE1+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JGEcMqt9; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nt1RizxIfbQ9WR5bkyvnh4eBsiXAw77Tj1LXR1VFfGpVzA7TLP3jZcUBZ5H6BQBwjCd86B6MNARrySxIdJuewxYDdbQPRvxFicXXYdT209d8NFA6KzvplMeTk4o04YaezN31wX7vB/fMZOHZPeA9g6jTqKpox4uMSw4IZdQ7zHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rz8fyWyi; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JGEcMqt9"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 382E21F000FF;
-	Tue, 29 Sep 2026 12:05:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rz8fyWyi"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 0E68B1F000FF;
+	Tue, 29 Sep 2026 12:11:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790683523;
-	bh=oj7thmJKcsZbHswn4eWFZG8u2Hhc7HXygNSaG0G1cmM=;
+	s=k20260515; t=1790683878;
+	bh=AWkymJQyJ/uFUerg5PWmzlppdMRAJIa/vuVE9EYM3Xk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=JGEcMqt9dnSO8XCYce1Md+Pdk/sC2uTiGYCALci5Am25HNvUNpEFvfoYT071Flq0Y
-	 ujgT/yMHWK0Ok9gRS3ltf1aZfMMKfXuFMG4GF4mvVIemRUqSaRPR+pTjvzt+HDC2QG
-	 zytHQTXQHKcCVqoUjD64gvfKMDFADcfrNprVJJ91v1atOTV+GszRMV/2zMEQCZhZs5
-	 FjeoyCyPMSRG24neWHFja7lvqsLniTqhrJaXDfQGiGrr6W6VEqOPyTKEtY+PcqAkDr
-	 sfPikAGW9hLi+QIN9em4Vu/QiEeFsTA6YcJ3xHQxU0C9KiCQ2rMopLziqV5QPHt5oD
-	 u2hCpAOWJNMLw==
-Date: Tue, 29 Sep 2026 10:45:08 +0200
+	b=Rz8fyWyiHtk8piNl6XYaHxIQ2ZEC0vxoTooIdd9n9+uvnDY87nkd0dZbStVakMZ4g
+	 dJ8tKTtt84mWcg80ePX5K7qKcvnzMSv9AGsUlr58Ohm4vr9uOjqCwE030OPWfUGyNi
+	 Tlz5y/eh3dyprLqdB44NGqAGNc9pDNWqh2zxdj47OReU/L0/eYtkAlGJYRvll7gmLD
+	 bH3G+Sp1T7jqaONHYnya4UPmkoOXA3GmxV1/eEEp+FqMXSlsZ/wlYatJo6hv84Uagi
+	 EWMDfEk/aDd2qZdyu7+f7+mfMJinU2X0E+6kqyMpsffOK0/ITz0xq4IGDSwsulvN2P
+	 2ssqxt0puzXbw==
+Date: Tue, 29 Sep 2026 14:10:16 +0200
 From: Nicolas Schier <nsc@kernel.org>
-To: Dmitry Voytik <voytikd@gmail.com>
-Cc: Nathan Chancellor <nathan@kernel.org>, Rong Zhang <i@rong.moe>,
-	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
-Subject: Re: [PATCH v3] scripts/config: honor $KBUILD_OUTPUT by default
-Message-ID: <art6lF6jcHBNHCi3@levanger>
-Mail-Followup-To: Dmitry Voytik <voytikd@gmail.com>,
-	Nathan Chancellor <nathan@kernel.org>, Rong Zhang <i@rong.moe>,
-	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
-References: <20260927154101.122633-1-voytikd@gmail.com>
+To: omer zalman <omerzalman42@gmail.com>
+Cc: Nathan Chancellor <nathan@kernel.org>, linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] kconfig: keep builtin precedence with duplicate fragment
+ entries
+Message-ID: <aruqqBsCXEhO1pTN@levanger>
+Mail-Followup-To: omer zalman <omerzalman42@gmail.com>,
+	Nathan Chancellor <nathan@kernel.org>, linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+References: <CAGLNFZcFDMD7P3rwueV4eRQ4qvDU4ekyzLmYTFq==5fUZxMBmw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -45,76 +46,27 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260927154101.122633-1-voytikd@gmail.com>
+In-Reply-To: <CAGLNFZcFDMD7P3rwueV4eRQ4qvDU4ekyzLmYTFq==5fUZxMBmw@mail.gmail.com>
 
-On Sun, Sep 27, 2026 at 05:41:01PM +0200, Dmitry Voytik wrote:
-> If $KBUILD_OUTPUT is set, use it by default if --file is not passed.
+On Mon, Sep 28, 2026 at 07:45:22PM -0400, omer zalman wrote:
+> The -y option is meant to preserve a builtin value when a fragment
+> requests a module. With duplicate CONFIG_FOO=m lines, only the last
+> fragment line is skipped; an earlier one remains after CONFIG_FOO=y.
+> Kconfig reads the later assignment and can demote the symbol. Track
+> the symbol instead of one line, and skip all of its assignments
+> when builtin precedence applies.
 > 
-> Fix the issue when the script silently updates a stale .config in
-> the root directory, while the user expects ${KBUILD_OUTPUT}/.config
-> to be updated.
-> The problem can be worked around with --file, but this is easy to miss,
-> and is inconsistent with how the Makefile and other tools work
-> (e.g., scripts/diffconfig).
+> Signed-off-by: Omer Zalman <omerzalman42@gmail.com>
 > 
-> How to reproduce the issue:
-> 	rm .config
-> 	export KBUILD_OUTPUT=.out
-> 	make defconfig
-> 	./scripts/config \
-> 	       -e CONFIG_UBSAN
-> 	grep: .config: No such file or directory
-> 
-> Signed-off-by: Dmitry Voytik <voytikd@gmail.com>
-> ---
-> v3:
->  - Added an example in the commit message how to reproduce the issue
-> v2:
->  - Addressed comments by sashiko:
->    - https://sashiko.dev/#/patchset/20260920064350.17999-1-voytikd%40gmail.com
->    - use basename when --refresh is used
->    - remove echo which can be misleading when --file is passed
-> v1:
->  - https://lore.kernel.org/all/20260920064350.17999-1-voytikd@gmail.com/
-> ---
->  scripts/config | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/scripts/config b/scripts/config
-> index 32428ea909c2..cdee67157fe1 100755
-> --- a/scripts/config
-> +++ b/scripts/config
-> @@ -130,6 +130,10 @@ on_exit() {
->  trap on_exit EXIT
->  
->  FN=.config
-> +if [ -n "${KBUILD_OUTPUT}" ]; then
-> +	FN=${KBUILD_OUTPUT}/${FN}
-> +fi
-> +
->  CMDS=()
->  while [[ $# -gt 0 ]]; do
->  	if [ "$1" = "--file" ]; then
-> @@ -229,7 +233,7 @@ while [ "$1" != "" ] ; do
->  		;;
->  
->  	--refresh)
-> -		yes "" | make oldconfig KCONFIG_CONFIG=$FN
-> +		yes "" | make oldconfig KCONFIG_CONFIG=$(basename $FN)
+> The exact git-format-patch file is attached because Gmail's web
+> composer removes tabs from inline diffs.
 
-Thanks for attempting to fix the '--refresh' option.  But this way,
-this may lead to very unexpected behaviour, as it regardlessly modifies
-the path to the config file, even if it was specified via --file.
+I did not have time for review, yet; just a heads-up:  Sending patches
+via attachments is incompatible to standard tooling (b4, etc.) and thus
+requires more manual work.  One way to work-around gmails restrictions
+might be the use of b4's web-submission endpoint:
 
-If --file is given, it should take precedence over any KBUILD_OUTPUT
-(or KCONFIG_CONFIG) from the environment and not be changed unrequested.
-
-It would be a tiny bit nicer to just strip the KBUILD_OUTPUT path from
-FN, e.g. (untested):
-
-		yes "" | make oldconfig KCONFIG_CONFIG="${FN#${KBUILD_OUTPUT}/}"
-
-But I am still not feeling happy with that.
+https://b4.docs.kernel.org/en/latest/contributor/send.html#authenticating-with-the-web-submission-endpoint
 
 -- 
 Nicolas
