@@ -1,122 +1,197 @@
-Received: from mail-wr2-f12.google.com (mail-wr2-f12.google.com [74.125.225.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D40383984
-	for <linux-kbuild@vger.kernel.org>; Tue, 29 Sep 2026 05:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.225.76
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790658378; cv=pass; b=e4g5Uyfg+/wrXWT12LiRmXhL2UMUjcCEtev30zdDiPvWC5YriNSFUJuBljZ56ppWq3Ln2n7y+5BbEQLHW3nx+TJL0Q9jPQJi16TMGIElmu5cWU/6gWnTt3L/bIQJyNrLRm2OB/+Hz3x7KxacfmmOzq+aXCNq3uaT/NN9RraumqI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790658378; c=relaxed/simple;
-	bh=lQceDshmIcxnm5pr2ANM4Bj9m14zZHt/Rqa4vniZwo4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Xhj+917yWddunmtIi5K2SVJ98StoZgdZ7iEyziVY221fiH/q72qRoCje0iyVDFMOBymVJeALEkCBbLZiO0eEocTpnBTB2DzBBUpvBKb32SI8Uy1OEkrjrrXYcUA0cYjNu0StJT1fWqkbWTc7oLvMpoch0t8lrj/dOvr0X/MPbFg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dH8X+HqO; arc=pass smtp.client-ip=74.125.225.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DDD633987E;
+	Tue, 29 Sep 2026 05:52:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790661170; cv=none; b=rT8T286S4o3eqyk7yPDVvvXJvOsx6XubGFIo3XiVm6AwUL50fzbFGpdq4iDuCo1Gh/OUxGu6FKLCBL/M0Ese+zyYePS+j3bNU5uuFKSbdyoMBn9r8/zOjDHxLXN4Vg+4Dic7s+9WZAODjgRAcV5INx27y8Z5EfAICkRqk2BwkzM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790661170; c=relaxed/simple;
+	bh=Mf3QocMFU88bVIvW9mb5/fmuwoPCN0VBXgmi4+IiOuc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pS7P0cfLwCYQUDBQugVmQ18PLRBob7/ifIoFXzCzYwVZzgBDxKaEO6mfgwdUNesbWihR3Tm+5YcN1o/p/4iKl+91Tpp1RFGDQJKS2p9Pc781p/1E8mFx2mxqhey+vqd5woTA9387pbjWcdN91abiKfrPKLBSP3yCphOJdPXOjSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=LwPenIhO; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dH8X+HqO"
-Received: by mail-wr2-f12.google.com with SMTP id ffacd0b85a97d-482f635552aso2924020f8f.2
-        for <linux-kbuild@vger.kernel.org>; Mon, 28 Sep 2026 22:06:15 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1790658374; cv=none;
-        d=google.com; s=arc-20260327;
-        b=GFqBMeBipJhgPZUKVi8DlIk/kogMZpy8J1Aebxu/r1NC2KHJV98Tb/B7iaENlGj5XR
-         Byb1IUd4+WctGIjxdRE3PC7PEn7YRVNlIfAe9jneLWnIvywjtxl6UKjOSfTeDGXxlgwJ
-         OqPRtsTekoli57HrIXc5K3Osrvt6TR+E9ED847tYGANZDmpfc/5Szfz3dHjawwQ2+p4u
-         YDrdz6DhxnvVy1TNdXZHoVbtG9sUE4e1nOb2NVqVswnMl45cAEXL+J9h4ZaaMUaQwY0d
-         VJyCRt7Bd7kpdKgiZQ6lqO3+kGPgklGPA9qYmyXNoGfuf2JaEjJgQpYGtRWbSKbCeDX5
-         eNuQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=lQceDshmIcxnm5pr2ANM4Bj9m14zZHt/Rqa4vniZwo4=;
-        fh=qlPzKJSt8cGZ1tz4VxgDj95KTp6z8VzJvGUba9d2Fbg=;
-        b=Bzx/h9PmuKaAxqtVm5vhmmt57j8gVCkf4SkTNF+La+Lv6jGytlCrJ4tkrscayXlDbH
-         +09vPLWM/GhyXC8LP07FuyNRfQEHPtALJ2zBmZlDZxzza3b1GqsYXgeVdYle37gbu4ZP
-         kJFy6+OPe83kmSJuAHic8k/yfTFTlvoJCYDNX/pmm4eJmFWXxq/QUXmZ1jadt3rRDXdO
-         fEKwtMemXo0E6J9FsBCjPV16W+T8tC7XBQaQUf7STmDbuTGCDlhgTQQAJ7VoUTvwsqYe
-         MoYIqBsA1tCAlH5DvC/PYnlaD7JZwdoTnvsluv02gtEFQGAjmnIzqTecA/Ng2RjupLrQ
-         bUaQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1790658374; x=1791263174; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=lQceDshmIcxnm5pr2ANM4Bj9m14zZHt/Rqa4vniZwo4=;
-        b=dH8X+HqOmR0IvbDT3tIprREFfd7UakbWfvHedWGe9PpLIqTg5vckNEEePwwCGcPD0M
-         ygfw5qglrqFmQiO4hTm+lUolpPQBmyFHjAjIbjlvLh1rx5RIQfSl4q9rhCzKLoC2ZcNt
-         4sr/sw4ez/5wgkK30tpb39a3Ud9AOHp1pmQPUeSZW9bMXWDKWUaif9orpQe1WWH4An/U
-         4Dxg5f9cwNgb1tWK3Nn2PrP2TbcbQMl5qwZ+tuuJvvm5XO2uTEM/OGa6fng5cMSFy+aN
-         Dvcr7fdW/e3lkO58SZ8UyErX9caXOYtmWQvfFrto7R+uiUnIx1WyAxWF4ZnGYD9DeeMM
-         KUFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790658374; x=1791263174;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=lQceDshmIcxnm5pr2ANM4Bj9m14zZHt/Rqa4vniZwo4=;
-        b=txh3MTc9RUjdhsQxVwkxvk7npCEmJsI1a31SIpvyZiNrTEvauyX/yA2yHYLVwA7DVG
-         U4b8taPZHyfikH55ih3WahrP9xn3cYM6YxKuAKS9qh+UxWW/gI1G7kF/VFNpQqwveLQg
-         V39zcaPzNtoDDRE50QYI/I/bivbG70akFfXKXfljCcF8A7xUpIriCaygNVv4bY87Vocu
-         5W6wExn2Jowu4JAPxOk7kt3r4sRWUtuOmS1YTS6fFmmgksELB8+pp6Ad64VO/hGFo860
-         rJN60fU2UN1+xYek7ALMaA5S651BktOUChsAyZWBgd1JCMxCZiAdp+2Y6aKpxnQIss/S
-         aNyQ==
-X-Forwarded-Encrypted: i=1; AKwUvBwAnHal64PpblBywwrGJXHeQStksCYj3DQn3Ymbw8mAoT0SoEwI36NI9b/avSO5+vr+gNYlNR/2W2SeMOg=@vger.kernel.org
-X-Gm-Message-State: AFq9FYKCzQagBeBB/RbfS5qG9N42MXBWwc8yUH0CEc8XYDMN9PKSlReX
-	Vxczoa91RG94GWtsyjcb6I4FZTu/sHPX/7aCIpXf6IHPpAtltGizKo4RcXQjaLlKTH13Oqet5Aq
-	78CyP86pLEdYFFCEjsBaSml548NLdVV+WFW4AiBxp
-X-Gm-Gg: AYBFou2fvJS3reNGrJCdotTYXUhTwhaeNYnNUUHxIUm43UXhF5tgCvuQHreeaZoAr6/
-	LcEx8S1uBy6LbYh82HHu+mac3onVqO/fvEiM3ws3j4Sx0DK57HmiUypk8MlUyr8NDjij5cNlpJ0
-	w9VSOmU8mEOAatvVpkZMpmxh4aQcTV6NVRkfJ4JtMImf9m40pW55BUDQTBrTG4TEgZZIA4Kxgjj
-	/mCURbkk7db/Dkm1bAenwvgcB3rC97TFSHmPZBdNtOiV62MvyMDn2tgqMyVTrCGGRhJfRUl74mi
-	JO/qQDTuzHZZ5dRf1KgIPJRxchiDcl1Ca1jh7U+WCLqAO+o5lS4O3GyT/KnIBfxyv6zY+mOOc3a
-	qjPwaePuSjrtdOrUAJ48cR0LGRZ9jZZwdV+xKlBB+TYnQ8QBnchmddQ2SW6PQ62GV+qW1Hg==
-X-Received: by 2002:a05:6000:400f:b0:486:f856:1975 with SMTP id
- ffacd0b85a97d-48872a7ed6emr28989136f8f.22.1790658373306; Mon, 28 Sep 2026
- 22:06:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="LwPenIhO"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68T46GN71209874;
+	Tue, 29 Sep 2026 05:51:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=pe0XGgQPH2TCUWy6EpgQ8V8mBs24kQE8Z25hfhfzc
+	ak=; b=LwPenIhOBK2aZrRGPP6THX9ygEynagMiCopl9cF8mr52pVMZlKVoqmd00
+	EtlxBQWJPpyQ72FYACEdn0pSqC9jzzrZvTulNe+OF8WtxOBm0Ms+VVDh0zOffcKb
+	8Jj2ZtnBUpyOzuAN978AMjbnmFOG6xwvUtKp0TrnJZMUk9tTkgyMd9lYff1uYBIG
+	wWAQwvDSIxJvVZh1qz6sYm/pwHmgi+58dI15geJ6klGI90KYNArY2WeZkFzKNaDi
+	akn21jGufuO730qZCCA1tLAR/mjOMSxTQD9Ru2GRrqp7I/HL2LrphB4RndhrVagh
+	J75l8o6LBG2dzGkuTmKo3wdlr/1Qw==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gx5qr5cqx-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 29 Sep 2026 05:51:55 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 68T4HeOm1184333;
+	Tue, 29 Sep 2026 05:51:54 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4gxrcprk56-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 29 Sep 2026 05:51:54 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 68T5pmAJ50266582
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 29 Sep 2026 05:51:48 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 31FDB20040;
+	Tue, 29 Sep 2026 05:51:48 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2014520043;
+	Tue, 29 Sep 2026 05:51:41 +0000 (GMT)
+Received: from shivang.bl1-in.ibm.com (unknown [9.123.12.247])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 29 Sep 2026 05:51:40 +0000 (GMT)
+From: Shivang Upadhyay <shivangu@linux.ibm.com>
+To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+Cc: sv@linux.ibm.com, alexandre.chartre@oracle.com, alexghiti@rivosinc.com,
+        aliceryhl@google.com, ardb@kernel.org, bp@alien8.de,
+        chleroy@kernel.org, elver@google.com, ihor.solodrai@linux.dev,
+        jpoimboe@kernel.org, kees@kernel.org, legion@kernel.org,
+        lossin@kernel.org, maddy@linux.ibm.com, masahiroy@kernel.org,
+        mpe@ellerman.id.au, nathan@kernel.org, npiggin@gmail.com,
+        nsc@kernel.org, ojeda@kernel.org, peterz@infradead.org,
+        pmladek@suse.com, rostedt@goodmis.org, tamird@kernel.org,
+        thomas.weissschuh@linutronix.de, thuth@redhat.com,
+        yuxuan.zuo@outlook.com, sourabhjain@linux.ibm.com,
+        Shivang Upadhyay <shivangu@linux.ibm.com>
+Subject: [PATCH v2 0/6] objtool: Fixup alternate feature relative addresses
+Date: Tue, 29 Sep 2026 11:21:31 +0530
+Message-ID: <20260929055138.43489-1-shivangu@linux.ibm.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAGLNFZfd65P3C7wd=ShsG3BwVqx56-3FTXRARvFXVoXEJmj6Lg@mail.gmail.com>
-In-Reply-To: <CAGLNFZfd65P3C7wd=ShsG3BwVqx56-3FTXRARvFXVoXEJmj6Lg@mail.gmail.com>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Mon, 28 Sep 2026 22:06:01 -0700
-X-Gm-Features: AclHuK-G3nC4fZFb5XTwTm_Ndg0dN9k5HC4ZdnEzBSe__7iBSOMXfWozEdeSNPY
-Message-ID: <CAKwvOdnmU0qt1--_1pO=8F=D39W-EEPHojc544APimtartFo+w@mail.gmail.com>
-Subject: Re: [PATCH] scripts: gen_compile_commands: accept object file paths
-To: omer zalman <omerzalman42@gmail.com>
-Cc: Nathan Chancellor <nathan@kernel.org>, nsc@kernel.org, llvm@lists.linux.dev, 
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTI5MDAyMiBTYWx0ZWRfX+nYf47CARK/c
+ ymXPKD4poCVbwQ80zZzWG/0d5KO9uTi3th8SweXahuJDZLyna6Pm81Kh93aSiBZ6oN5myccePx6
+ yRhiki4b5f/w3qX/n2kSvS1Y+JRxUr82shrl6/f4dmc2Po3WsUc1kVXJ1P3cC0bnwUSQT1/HWH7
+ 1oSi35IUzQGKulmnOz/BIjuSK9R0yY6NgBsKK7bbbLp2hkUJqeH83PX1tOPd8YSOoTZ65dg8M2e
+ hMzjxmAyc5iCNVj6n1LWPRKKUDU0U8l8ccT5YfRWBSnsl/BKJmFZxbQp5wifomrEylwx6WEtIxJ
+ iF4TpgnBQqVLr162PDpL6jooExZKmURp1d7j14WQ/+YTFsBcwyZQvXk5KBpcmfHrFDfP5o6JaoN
+ HHqF/mlqz4BblfZ32SWykTNHkA70vGiijXhc7Uvmcq17twNTd42GMSqyoBW0CI6gbBEzXc/PR8e
+ 4sOUq0AcMqJfMlrmgAg==
+X-Authority-Analysis: v=2.4 cv=SPbXx+vH c=1 sm=1 tr=0 ts=6abb51fb cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
+ a=uAbxVGIbfxUO_5tXvNgY:22 a=voM4FWlXAAAA:8 a=pGLkceISAAAA:8 a=VwQbUJbxAAAA:8
+ a=VnNF1IyMAAAA:8 a=IU41D-RyQVv7tfW9ZU8A:9 a=IC2XNlieTeVoXbcui8wp:22
+X-Proofpoint-ORIG-GUID: dhCZPIIybb4UzADOrbAVduzRf7RkoPXn
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTI5MDAyMiBTYWx0ZWRfX8Z8SmxgUrjpd
+ dya/fmRc9BnXt3ls+UzaFwv60pjvLXq/T02gO1xVf2atWLwiR01XzwDjbxnYWHcQsEzCf2mVSRx
+ WDo3zdPIM/5n27gQ2PNX2JfW1AzF/tE=
+X-Proofpoint-GUID: HtSyefSDlVC23X3uppAzHDijw2-OkAo8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-29_02,2026-09-21_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 suspectscore=0 clxscore=1011 spamscore=0
+ lowpriorityscore=0 malwarescore=0 adultscore=0 bulkscore=0 impostorscore=0
+ phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2609040000
+ definitions=main-2609290022
 
-On Mon, Sep 28, 2026 at 4:46=E2=80=AFPM omer zalman <omerzalman42@gmail.com=
-> wrote:
->
-> The command-line help lists *.o among supported path arguments,
-> but main() rejects every object path as an unknown file type. Map
-> an object path to its matching .cmd file so the documented input
-> produces a compile database entry.
->
-> Signed-off-by: Omer Zalman <omerzalman42@gmail.com>
->
-> The exact git-format-patch file is attached because Gmail's web
-> composer removes tabs from inline diffs.
+This patch series implements build-time fixup of alternate feature
+relative addresses for powerpc.
 
-Do the instructions at
-https://nickdesaulniers.github.io/blog/2017/05/16/submitting-your-first-pat=
-ch-to-the-linux-kernel-and-responding-to-feedback/
-still work?
+Previously, Nicholas Piggin proposed a build-time solution using a
+custom PowerPC tool [1], which provided the foundation for this approach.
+The current implementation leverages objtool's existing ELF parsing
+infrastructure to do the same.
 
-Otherwise please checkout `b4`.
-https://b4.docs.kernel.org/en/latest/
+This patchset applies atop powerpc/merge branch.
 
---=20
-Thanks,
-~Nick Desaulniers
+[1] Original PowerPC tool approach:
+    http://patchwork.ozlabs.org/project/linuxppc-dev/patch/20170521010130.13552-1-npiggin@gmail.com/
+
+Testing:
+Build and Boot tested on ppc64le, ppc64be, and ppc32be configs.
+
+Sathvika Vasireddy (6):
+  objtool/powerpc: Add build-time fixup of alternate feature branch
+    targets
+  objtool: Set ELF_F_LAYOUT flag to preserve vmlinux segment layout
+  objtool: Fix "can't find starting instruction" warnings on vmlinux
+  objtool/powerpc: Skip jump destination analysis and unnanotated
+    intra-function call warnings for --ftr-fixup
+  kbuild: Add objtool integration for PowerPC feature fixups
+  powerpc: Enable build-time feature fixup processing by default
+
+--
+Changes since v1: https://lore.kernel.org/all/20260505084628.17940-1-sv@linux.ibm.com/
+- rebase to upstream master
+- 1/6: in arch_decode_instruction() added comment describing opcode 16.
+- 1/6: in arch_decode_instruction() added missing logic to add AA flag to offset.
+
+Changes since RFC-v4: https://lore.kernel.org/all/20260316062237.30948-1-sv@linux.ibm.com/
+- 4/6: In the instruction validation logic, update insn_call_dest() handling
+  to allow unannotated intra-function calls when opts.ftr_fixup is enabled,
+  and continue processing the instruction.
+- 3/6: In the function processing logic, skip zero-length symbols before
+  performing function boundary validation, as suggested by Sashiko.
+- 3/6: In the function processing loop, add func_off to track the
+  absolute/local offset and replace sym_for_each_insn() with an explicit
+  loop.
+- 1/6: In process_alt_data(), skip files that do not use opt.link.
+- 1/6: In process_fixup_entries(), handle realloc() failure and return
+  -1` when allocation fails.
+- 1/6: In check_and_flatten_fixup_entries(), remove dead code that
+  redundantly resets the fixup entry parent.
+- 1/6: In is_local_symbol(), fix the local-symbol detection logic and add
+  a comment explaining the new check.
+- 1/6: In process_alt_relocations(), check that ftr_alt->data and
+  ftr->data->d_buf are initialized before accessing them.
+- 1/6: Remove redundant line deletions and perform minor cleanup.
+
+Changes in V4:
+- consolidate emit-relocs remove-section logic for
+  CONFIG_ARCH_VMLINUX_NEEDS_RELOCS and CONFIG_HAVE_OBJTOOL_FTR_FIXUP
+  configs as suggested by Nathan Chancellor.
+
+Changes in V3:
+- Split code into individual patches
+- Put objtool call into cmd_link_vmlinux
+- Move HAVE_OBJTOOL_FEATURE_FIXUP from arch/Kconfig to 
+  arch/powerpc/Kconfig 
+
+Changes in V2:
+- Added implementation support for ppc64 LE, BE, ppc32 BE.
+
+---
+
+ Makefile                                  |   7 +
+ arch/powerpc/Kconfig                      |   3 +
+ arch/powerpc/Makefile                     |   5 +
+ arch/powerpc/include/asm/feature-fixups.h |   2 +-
+ arch/powerpc/kernel/vmlinux.lds.S         |   8 +-
+ arch/powerpc/lib/feature-fixups.c         |  12 -
+ scripts/Makefile.lib                      |   4 +-
+ scripts/Makefile.vmlinux                  |  11 +-
+ tools/objtool/arch/powerpc/decode.c       |  11 +
+ tools/objtool/arch/powerpc/special.c      | 451 ++++++++++++++++++++++
+ tools/objtool/builtin-check.c             |   2 +
+ tools/objtool/check.c                     |  55 ++-
+ tools/objtool/elf.c                       |   3 +
+ tools/objtool/include/objtool/builtin.h   |   1 +
+ tools/objtool/include/objtool/special.h   |  56 +++
+ tools/objtool/special.c                   |  29 ++
+ 16 files changed, 632 insertions(+), 28 deletions(-)
+
+-- 
+2.54.0
+
