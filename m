@@ -1,255 +1,125 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B74E3E49E4;
-	Tue, 29 Sep 2026 05:53:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 756D0395ADA;
+	Tue, 29 Sep 2026 07:09:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790661194; cv=none; b=pv/SEdPsVh/qVWyBwPVivk0U46dH0hi4PRYU9K791r6mfIm3Uy7Fu0A4K4I8RDyt5mwpyiljVE628pq2PnIZD6a8N+15ykKrzOR7sbYI5P7SlVUvR4pTMBD5F9DP7FTxVUTuTPDbVgVWwiimw81UFrYg1unde1wRPSc7ypNb+vE=
+	t=1790665748; cv=none; b=aS+6sA3m3Y9X/DTaOm5NqTWqb15AqkWWgjWJ6kjEY5ALms3umaRKCDVVA/Z5bgZCzGo5MRxKI5pNw26yCJEzvWbkZ19GoGhvpOIoEYIEIRBbMuOsBf3xY+8X6u1AJ8QRp+weoZhhoor4XrjWYDBZCvYuTIBvEeetl48vKhUVFnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790661194; c=relaxed/simple;
-	bh=ExtC/0tEmSsXFsjBkqSj0oQscSOR/OT3OckwCkg7mHw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RyuwxeJwdXVZKOZiAiCxJ8KazDlmGnPbCSL81KMn0zVJSP8F6nlCy4lDZVXtG6O9aAyKnEek3oOBbYZo+SEGNWDY7YtH4sMggAEPJq0qtKTyut9J6/TQOlq29A0K0YfNHs2hD2E+oE9ZphHcsobaT1wRainv7HE9QYOxzeTC3rk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Cn7GVd3Y; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1790665748; c=relaxed/simple;
+	bh=opN0ophgBAoWkcRmCvvxHECSx0MgTmTQLigDgTZpwWM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fVHKmZF/u+LxJ+4pg7KF/U8RDM/P85M8dRVHtvMeCAdBxyoaIym8q8lKJsvLRq60ZC4Z38mXZlpG1FmFHkVv4LEvIlNnvs9UZRHLG43TtpwFzmOGXZCoxi8IvaL2An+sYgRR8Uti3ZaDRPWspXVeGLziE0iYi5EjjzdnpoDXrY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io; spf=pass smtp.mailfrom=gtucker.io; dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b=iO7DkInj; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gtucker.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Cn7GVd3Y"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68T46XTv2858633;
-	Tue, 29 Sep 2026 05:52:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=vXAEujULcXSrso+Mm
-	qr4Sti2CkmXH7iL9ksjqXQ56Kg=; b=Cn7GVd3YlOhgbhL3eS/QXv89k1ar+uf1P
-	F9smv/hT+jnsJODfX0r+Xatwkg8fXjjVtm4t+pcqaczvG5oyg40u/wLB/CrlYf6r
-	sE9BfQAvdzgbIaJRDDSuvC/yip8NXAL6vgLgW74c3Gy0yRb0wnDh+8LNeeSdxe2V
-	e/rPsIEKgEPZFqAS0J28M3/PFjYxpOU98RVYts4WlGFP2TglmuCy7mCBVi+BLD+p
-	/VAgaSZJOOklSiFsCBAtMIaz71Pby00UtiaM4W8qk7F2rn9TkeTdrdYwanKha0+4
-	f0LUruKvDv7jRiCxmtWs0SMYVNSS9INJQatQGd/6kTSLKemyenHEA==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gx3fk534b-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 29 Sep 2026 05:52:39 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 68T4Hpwd1134506;
-	Tue, 29 Sep 2026 05:52:39 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4gxsck8d97-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 29 Sep 2026 05:52:39 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 68T5qXFj37290384
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 29 Sep 2026 05:52:33 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5F3D420043;
-	Tue, 29 Sep 2026 05:52:33 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5F18020040;
-	Tue, 29 Sep 2026 05:52:26 +0000 (GMT)
-Received: from shivang.bl1-in.ibm.com (unknown [9.123.12.247])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 29 Sep 2026 05:52:26 +0000 (GMT)
-From: Shivang Upadhyay <shivangu@linux.ibm.com>
-To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Cc: sv@linux.ibm.com, alexandre.chartre@oracle.com, alexghiti@rivosinc.com,
-        aliceryhl@google.com, ardb@kernel.org, bp@alien8.de,
-        chleroy@kernel.org, elver@google.com, ihor.solodrai@linux.dev,
-        jpoimboe@kernel.org, kees@kernel.org, legion@kernel.org,
-        lossin@kernel.org, maddy@linux.ibm.com, masahiroy@kernel.org,
-        mpe@ellerman.id.au, nathan@kernel.org, npiggin@gmail.com,
-        nsc@kernel.org, ojeda@kernel.org, peterz@infradead.org,
-        pmladek@suse.com, rostedt@goodmis.org, tamird@kernel.org,
-        thomas.weissschuh@linutronix.de, thuth@redhat.com,
-        yuxuan.zuo@outlook.com, sourabhjain@linux.ibm.com,
-        Shivang Upadhyay <shivangu@linux.ibm.com>
-Subject: [PATCH v2 6/6] powerpc: Enable build-time feature fixup processing by default
-Date: Tue, 29 Sep 2026 11:21:37 +0530
-Message-ID: <20260929055138.43489-7-shivangu@linux.ibm.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260929055138.43489-1-shivangu@linux.ibm.com>
-References: <20260929055138.43489-1-shivangu@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b="iO7DkInj"
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 616053ED03;
+	Tue, 29 Sep 2026 07:09:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gtucker.io; s=gm1;
+	t=1790665744;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w9D2kUR7R279hz9z6RiS1dtj9gZjtDtF0tTMRuWfTyk=;
+	b=iO7DkInjaUo2llNTS9reSVo6dbxpIc0X6qLzRs9G4epQNB8Sjk18yz+OWdKKyiaGsOg5RJ
+	cj3KtRmYYefl2DubL0511BRAqLskrI9mdpFksWXBAmTREjveix48qkqQoLXvAVRCbXMW0n
+	tdeYQQ7Y+qP5M4gr9stxopqlUyEck6icZ8jly15eTggFP9s1VaNcCbFe0mG0wwbsERztQ3
+	RqeLxYRApvaysuIiJs/wlmepw48kXgUQPM2TScrt5o4TnhqgibT4obDxahBJE5ltZlDgz2
+	l7uFxi1/dg/JoyBq5OdbdQz6wVw1p7BDRG+kX+jgRAhj9AdXJI+Rmf3T8FujZQ==
+Message-ID: <72690a8d-40b6-4109-8211-32e1dcdb8a39@gtucker.io>
+Date: Tue, 29 Sep 2026 09:09:01 +0200
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-ORIG-GUID: nEdsJhTlIB48tk-3kiMd4GaLuc0rbpqt
-X-Proofpoint-GUID: x171eeEOn6-s6QQxNcfTfv_00wBiAbfN
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTI5MDAyMiBTYWx0ZWRfXzwU9cXW/GPyR
- jQao1HxUtv5wgAkM1BPLscYo9M0nSmTmOy/OJOGTZm9jWdsiZ6D6HRlPODV9y4DmIOGUpJJTCpP
- GaS3tuQkEJxarUuoHV9HFOKJCkyyzrg=
-X-Authority-Analysis: v=2.4 cv=Vv62kO2n c=1 sm=1 tr=0 ts=6abb5228 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=Y2IxJ9c9Rs8Kov3niI8_:22 a=CCpqsmhAAAAA:8 a=VnNF1IyMAAAA:8 a=pGLkceISAAAA:8
- a=J1YRHh2PESAzyqZr0scA:9 a=O8hF6Hzn-FEA:10 a=ul9cdbp4aOFLsgKbc677:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTI5MDAyMiBTYWx0ZWRfXyWjmhUJtffwV
- Z9n79v5K0DvC16YQ3GldMAf45+lVtexlBCu1LVyDPCzDfOmoay8FZ86tKzVGWIEf9T+jmKSv7Gy
- Drd1CYaSQwfFlPef/hQMFtOCofdWMDvuKlTg2LndfEnbfnL53dCWcjeZE9ACbBSXZF4oodKvGuw
- UbXmVZbp3L0eSeWPDUq2SRd0Q6c9bUteMaT4X7jlidvtibZp7L6DRht85/kA4r/IeCWwH6+Ug6y
- NVPDg5aPLFFo/AAcvHAWNi2+aUXKwxLI+xG0wFYSbU90fdEu09GyRrOtAm8cbq4tTyK0yJBIaCX
- H7u/DZ/keFObI61IDNp5zxtYewdT59mIjjQV4DDbGlPrOfd06OUS/NBGh7HCizuVOe5VTPARiuz
- N3bh3WQDwWw1xOQq3o9DKSW7O/DMENhQ2aIl8ZRo7b8s4cUaJGU3nQMZMHu7Y4WQfxmjmzqC9Yo
- qr1ftPP2PVaRFYK/dYg==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-09-29_02,2026-09-21_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 spamscore=0 phishscore=0 bulkscore=0 adultscore=0
- priorityscore=1501 malwarescore=0 clxscore=1015 lowpriorityscore=0
- impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2609040000
- definitions=main-2609290022
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/3] scripts: add TOML config to container tool
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Nicolas Schier <nsc@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Miguel Ojeda <ojeda@kernel.org>, =?UTF-8?Q?Onur_=C3=96zkan?=
+ <work@onurozkan.dev>, Nick Desaulniers <ndesaulniers@google.com>,
+ linux-doc@vger.kernel.org, workflows@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+ kernelci@lists.linux.dev, automated-testing@lists.yoctoproject.org
+References: <68b14a76a4cb2e6437c869bab948983a98acffbd.1788779245.git.gtucker@gtucker.io>
+ <03e8513a-3480-42a5-9d1b-fad6c36ed07a@gtucker.io>
+ <20260918214804.GA1849926@ax162>
+Content-Language: en-US
+From: Guillaume Tucker <gtucker@gtucker.io>
+In-Reply-To: <20260918214804.GA1849926@ax162>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: gtucker@gtucker.io
+X-GND-Cause: dmFkZTFenxi55h2HBRShrkenX+7C3lnxqudytjtg3MfMLMOvzVQksYNZDyiz06KgEyx/pFrpwWWrCdcxrYqmCYdyzMLl4Mhahq0XMT37B0AYGHfNy6TT1dsdE93geegPHS58w2IdjuPf3RhlHtJiGrTalRzyveMs0c35rKwcEY9+mzchD9kzOikL8J629xh0Szp6bhqvwWMSnP9RYXS67YaJCOs6UlcPvGoCUVJET/zanBS0DiEgPh22+YQn/yP/ql/46RNRD7bMTCZydJ40Esu5MoiUAt6yO+qtqQSAbMkTwLhJ1+umiafwjTbo3thmLsb6MzVozx5F1W/QFpUNZA1u11/dgZc2g2SiUOnGqiVDezAUcu9to6nkoflz40Vh/tNsjW7SV9LQgfgkgtcsLXDjUZAybO/8t37QZznPIG1d7w1p2z8e8Mc9+EhaoenLnKhPyTYPElAifxkGCjtlrlrDHzRqP3xF2/j4TVMLfK95WFKhm4JYteKSdnNmg0M7Mz0YCDb/CuMliTn+ZkBdb1jSh56IHpUvOGaPaE8zlu5N7Sp1NH8NQrnhj0fhdon4E85UfqkEuZB9qj4/9PBzp874fvYxO8f3USY0UTx62SXfxnuky+JKO4O0v11jIg5hSLJLSK66s+FxT064EG9Ba83Yd9ld6BKUPFQLT2H27Pfgd2VRRw
+X-GND-State: clean
+X-GND-Score: -100
 
-From: Sathvika Vasireddy <sv@linux.ibm.com>
+Hi Nathan,
 
-Enable HAVE_OBJTOOL_FTR_FIXUP by default on PowerPC architecture.
+On 18/09/2026 11:48 pm, Nathan Chancellor wrote:
+> Hi Guillaume,
+> 
+> On Fri, Sep 18, 2026 at 12:04:09PM +0200, Guillaume Tucker wrote:
+>> On 07/09/2026 13:10, Guillaume Tucker wrote:
+>>> Add support for a TOML configuration file to the scripts/container
+>>> tool.  This improves user experience by not having to keep passing the
+>>> same command line options all the time or overly relying on built-in
+>>> default values.  Include the concept of 'profiles' with different
+>>> named sections in the file to cover various use cases.
+>>>
+>>> Command line options take precedence over the config file, and values
+>>> defined in profile sections take precedence over the default one.
+>>>
+>>> Add a -c option to override the location of the .container.toml config
+>>> file which should otherwise be located in the current working
+>>> directory.  If not found, the file is silently ignored as it is not
+>>> strictly required unless the -c option is used.
+>>>
+>>> Add a -p option to choose a particular profile section in the config
+>>> file rather than the default.
+>>>
+>>> Signed-off-by: Guillaume Tucker <gtucker@gtucker.io>
+>>> Acked-by: Nicolas Schier <n.schier@fritz.com>
+>>> ---
+>>>
+>>> Notes:
+>>>      Changes in v2:
+>>>      - fix uid / gid handling when set to 0 (root)
+>>>      
+>>>      Changes in v3:
+>>>      - fix logic when loading config profiles using None
+>>>      - fix typo with missing whitespace in help message
+>>>      - clarify how UID gets used as default value for GID
+>>>      
+>>>      Changes in v4:
+>>>      - drop registry option from TOML config
+>>>
+>>>   scripts/container | 86 ++++++++++++++++++++++++++++++++++++++++-------
+>>>   1 file changed, 74 insertions(+), 12 deletions(-)
+>> Thanks for the reviews so far.
+>>
+>> Do you guys need anything else regarding this series?
+>>
+>> There's no rush of course and we're all busy, just making sure I
+>> didn't miss anything.
+> 
+> No, my apologies for not responding to this sooner. I plan to take a
+> look soon, I just keep getting preeempted by other stuff.
+> 
 
-- Remove runtime branch translation logic from patch_alt_instruction()
-- Add --emit-relocs linker flags for post-link fixup processing
-- Update ftr_alt section attributes to include executable flag
-- Strip the --emit-relocs relocation sections (.rel*) from the final
-  vmlinux after processing
+Sure, no worries.  On a related topic, I also just started a new
+thread about hosting container images[1].  And I'll be at Plumbers
+next week so we may also catch up there and discuss next steps etc.
 
-Co-developed-by: Nicholas Piggin <npiggin@gmail.com>
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-Signed-off-by: Sathvika Vasireddy <sv@linux.ibm.com>
-Signed-off-by: Shivang Upadhyay <shivangu@linux.ibm.com>
----
- arch/powerpc/Kconfig                      |  3 +++
- arch/powerpc/Makefile                     |  5 +++++
- arch/powerpc/include/asm/feature-fixups.h |  2 +-
- arch/powerpc/kernel/vmlinux.lds.S         |  8 ++++++--
- arch/powerpc/lib/feature-fixups.c         | 12 ------------
- scripts/Makefile.vmlinux                  |  8 ++++++--
- 6 files changed, 21 insertions(+), 17 deletions(-)
+Best wishes,
+Guillaume
 
-diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
-index 2580e27e4328..d9056f35da9f 100644
---- a/arch/powerpc/Kconfig
-+++ b/arch/powerpc/Kconfig
-@@ -23,6 +23,9 @@ config 64BIT
- 	bool
- 	default y if PPC64
- 
-+config HAVE_OBJTOOL_FTR_FIXUP
-+        def_bool y
-+
- config LIVEPATCH_64
- 	def_bool PPC64
- 	depends on LIVEPATCH
-diff --git a/arch/powerpc/Makefile b/arch/powerpc/Makefile
-index 9385db478c59..269ed76a40c6 100644
---- a/arch/powerpc/Makefile
-+++ b/arch/powerpc/Makefile
-@@ -112,6 +112,11 @@ LDFLAGS_vmlinux-$(CONFIG_RELOCATABLE) := -pie --no-dynamic-linker
- LDFLAGS_vmlinux-$(CONFIG_RELOCATABLE) += -z notext
- LDFLAGS_vmlinux	:= $(LDFLAGS_vmlinux-y)
- 
-+# --emit-relocs required for post-link fixup of alternate feature
-+# text section relocations.
-+LDFLAGS_vmlinux        += --emit-relocs
-+KBUILD_LDFLAGS_MODULE += --emit-relocs
-+
- ifdef CONFIG_PPC64
- ifndef CONFIG_PPC_KERNEL_PCREL
- 	# -mcmodel=medium breaks modules because it uses 32bit offsets from
-diff --git a/arch/powerpc/include/asm/feature-fixups.h b/arch/powerpc/include/asm/feature-fixups.h
-index 756a6c694018..d6ae92a292ec 100644
---- a/arch/powerpc/include/asm/feature-fixups.h
-+++ b/arch/powerpc/include/asm/feature-fixups.h
-@@ -32,7 +32,7 @@
- 
- #define FTR_SECTION_ELSE_NESTED(label)			\
- label##2:						\
--	.pushsection __ftr_alt_##label,"a";		\
-+	.pushsection __ftr_alt_##label, "ax";		\
- 	.align 2;					\
- label##3:
- 
-diff --git a/arch/powerpc/kernel/vmlinux.lds.S b/arch/powerpc/kernel/vmlinux.lds.S
-index 8fc11d6565bf..1a2d7c2d32f1 100644
---- a/arch/powerpc/kernel/vmlinux.lds.S
-+++ b/arch/powerpc/kernel/vmlinux.lds.S
-@@ -99,8 +99,8 @@ SECTIONS
- 	.text : AT(ADDR(.text) - LOAD_OFFSET) {
- 		ALIGN_FUNCTION();
- #endif
--		/* careful! __ftr_alt_* sections need to be close to .text */
--		*(.text.hot .text.hot.* TEXT_MAIN .text.fixup .text.unlikely .text.unlikely.* .fixup __ftr_alt_* .ref.text);
-+		*(.text.hot .text.hot.* TEXT_MAIN .text.fixup .text.unlikely
-+			.text.unlikely.* .fixup .ref.text);
- 		*(.tramp.ftrace.text);
- 		NOINSTR_TEXT
- 		SCHED_TEXT
-@@ -267,6 +267,10 @@ SECTIONS
- 		_einittext = .;
- 	} :text
- 
-+	.__ftr_alternates.text : AT(ADDR(.__ftr_alternates.text) - LOAD_OFFSET) {
-+		*(__ftr_alt*);
-+	}
-+
- 	/* .exit.text is discarded at runtime, not link time,
- 	 * to deal with references from __bug_table
- 	 */
-diff --git a/arch/powerpc/lib/feature-fixups.c b/arch/powerpc/lib/feature-fixups.c
-index 587c8cf1230f..269e992b1631 100644
---- a/arch/powerpc/lib/feature-fixups.c
-+++ b/arch/powerpc/lib/feature-fixups.c
-@@ -53,22 +53,10 @@ static u32 *calc_addr(struct fixup_entry *fcur, long offset)
- 
- static int patch_alt_instruction(u32 *src, u32 *dest, u32 *alt_start, u32 *alt_end)
- {
--	int err;
- 	ppc_inst_t instr;
- 
- 	instr = ppc_inst_read(src);
- 
--	if (instr_is_relative_branch(ppc_inst_read(src))) {
--		u32 *target = (u32 *)branch_target(src);
--
--		/* Branch within the section doesn't need translating */
--		if (target < alt_start || target > alt_end) {
--			err = translate_branch(&instr, dest, src);
--			if (err)
--				return 1;
--		}
--	}
--
- 	raw_patch_instruction(dest, instr);
- 
- 	return 0;
-diff --git a/scripts/Makefile.vmlinux b/scripts/Makefile.vmlinux
-index a1bef0638ecb..66e5d58a6ce8 100644
---- a/scripts/Makefile.vmlinux
-+++ b/scripts/Makefile.vmlinux
-@@ -82,11 +82,15 @@ endif
- # vmlinux
- # ---------------------------------------------------------------------------
- 
-+# These configurations require vmlinux.unstripped to be linked with
-+# '--emit-relocs', which need to be stripped from the final vmlinux.
-+uses-emit-relocs := $(or $(CONFIG_ARCH_VMLINUX_NEEDS_RELOCS),$(CONFIG_HAVE_OBJTOOL_FTR_FIXUP))
-+
- remove-section-y                                   := .modinfo
--remove-section-$(CONFIG_ARCH_VMLINUX_NEEDS_RELOCS) += '.rel*' '!.rel*.dyn'
-+remove-section-$(uses-emit-relocs)                 += '.rel*' '!.rel*.dyn'
- # for compatibility with binutils < 2.32
- # https://sourceware.org/git/?p=binutils-gdb.git;a=commit;h=c12d9fa2afe7abcbe407a00e15719e1a1350c2a7
--remove-section-$(CONFIG_ARCH_VMLINUX_NEEDS_RELOCS) += '.rel.*'
-+remove-section-$(uses-emit-relocs)                 += '.rel.*'
- 
- remove-symbols := -w --strip-unneeded-symbol='__mod_device_table__*'
- 
--- 
-2.54.0
+[1] 
+https://lore.kernel.org/all/01a87de4-8de5-4ff0-941b-2e5932a3a19c@gtucker.io/
 
