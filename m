@@ -1,98 +1,94 @@
-Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EA8E3BF692
-	for <linux-kbuild@vger.kernel.org>; Tue, 29 Sep 2026 21:14:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77D5E24293C;
+	Wed, 30 Sep 2026 01:17:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790716472; cv=none; b=M+qArfKxCRDRU0JuwY9Xs1vthyxX0n3D67PxmJ8J3HNKC9Oc+gG7vLXe7PrMjH6LG+cv0JjJLgWfma3ISaeG3GkAdRYKL5fTDud42/MRf/CNRBxyZakcSmDp08zFRPA3ecnM6BUnIxaxwAOrDAj2+w5XfM13sh9MFB71Nya2KDs=
+	t=1790731054; cv=none; b=sC6SAMOo4ddjDAgFR9qQ/ZSQnDz3FC3aimSG6oHA4wzwgwV4PLxh7dhq1vKDp3EfbO8YvBTydb8UJWqM5jqgitsHZjm4tZpCdUdI3ByV8xGYe+MWsi3jPp+w51+oGsyZZSg5sBN3wLNblBZTuPyoxN0NFN3TZbuFHOa4XX/G1e0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790716472; c=relaxed/simple;
-	bh=5/togg/DPk0r7Ug8UPLdLx052cH0w1RAr3Q+/KhfwSI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gIqGSauZYkpIUEb2R4DQoWRG+Dt4BLKwhOcvl47ThCGMeZGjTtj3K3HvA8+g5UPpqwAlSoY01TkgD59U+LQDxrz/IboSeb6i2ur+ajXixmsQCZFzosPhk70ruIBMdhzFt7CGlDY+KFIAjYgWrXD01RSU27EsEvti7wpHY8ZszRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KhkW4pZg; arc=none smtp.client-ip=74.125.225.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1790731054; c=relaxed/simple;
+	bh=VdI2m/a8nuHDN7n4LYA/dPiHQE5Jww7D4ImLctaE8mQ=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=qorZU07/A4p0LMpsSZ9n736hDTpbs8XIrmUnw2gBiyBr9yWqQNrp1CSUYEImOdssKvfWTEZKz7yMBW5cb1OkKTkQRR/e8dpfazO+38E2Yybkx1+bl/P4jUNZNg1wni3KaJCI9R6vWD+88R3Jq9/dEmAjh3Zuy6p4IG+vxZTuQXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MwETFjAg; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KhkW4pZg"
-Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49e66390995so26328345e9.2
-        for <linux-kbuild@vger.kernel.org>; Tue, 29 Sep 2026 14:14:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790716468; x=1791321268; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=sHIA1C0brtLm631UlMCeHLnUCZCnWiJvHiU+FJfuc6o=;
-        b=KhkW4pZgUg6TiFYMOVKH+LthuvHRINrTWEQwsyA37RNaAvEVTjs6YgRMTQ5xDmuUPp
-         G4MaJ7+43FSbqeYQ/hkNFJGTlHNv4Y8KYpK3cUYPgHQuu5S7tDptdVQHCCwPPYV2CjdE
-         zPkVFJIe3B41jUSKab7YWnNldj3VS/a2ELXPY365Uvm/Ur9AOSZyxE2/fDNv9ChpFiK1
-         jPSMJourB6EJWIKVsdqj6E/mFwCCm/0Cj9zKDC4oXY1HUKo9bE5TyxfKwRyNbZrjoKxy
-         o7VJYkHTCbZr7IWS11MMHLGbhGvwqs0MFJObrzarJ8Nh9ct6hIaNUsWx5K1OTv8oDF+a
-         GwQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790716468; x=1791321268;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=sHIA1C0brtLm631UlMCeHLnUCZCnWiJvHiU+FJfuc6o=;
-        b=LCDCcexQv1QGqbdHUSp7pm5zAEnFIatREAaR2wcgX0sGXJyDM8laG/ZViwYAFScDBt
-         qDtxep+I75Q77t4uTZrcDnXuBPmQCn14Y4GDv+DiJB9ajYmLYP6v1bUdW1WhD1gs66Mo
-         2i80Xg+X6MA+4WxH/hzaLZKNLDfsFbfx1UQdp9JXTEVTBLUSzsIbACuud30wgv+IiWsx
-         KaAWekOeuU1A2eypGw2zHf58YW6r2QMU3uCfHBcDlHOJ3sAyzTknQc9M2KRdC4JgM/T2
-         k7rnrkns40uwp3u0NGR/FE4imCrxBCtY4h3LVbfOC5oG+LkASLlFOzznA0GeFBpitUCJ
-         UlHw==
-X-Gm-Message-State: AFuF++mrTlhPUVr2yFZ8otZSinDQ+39YwdKM2vwqG0lY0reAuAv2ZXkj
-	6i+p6r4CcUrf2Cfk0FjBlAeXgqi5ZV+DA9WGqxZLyDDFy+NSWpPY9e92
-X-Gm-Gg: AYBFou1SSnRf9UnmDGTWn7ZZuEJyyHOxj9hQLJsOYMmcPVf7xPdlHzUak5s0G4xCoys
-	aWQQxCuFRT30KWCmrWAbn0SvE9WRnYHK4+iAgRqN93R/NSsieeUizc16nJkUl5L8rxsptzNaC2l
-	kHcBhNsNyw2CWwVcYnsMU9zWHC/Hp1GLroHoeX6wCTiij+ajKvEEtMOD6nVK+F1DtWC8oczP4IQ
-	rqcp+5yHOsCd4CoDVJArrBpTPo2LjQSotZjw9Kbd6HcLmBfx2gGF3LUea+ytleBM6Sttq2T8IDZ
-	O7J6v/gxeWjybUjE4GjYx8roWHx2pSEUxoXUTRuJ3OdYuWeQzQmmW0/T00OxtkphD7qPpJ/4mT4
-	G6wTGraVyKxcB4wimEon4RESQwZn8Li96LKZaYnavd3dNUWl2cRGYgIIxTKadVvnNvN1Dz6dFn8
-	sDxuQE5WYZkekVqXxzEvy217HK78KenY5pOjry22oAhtZWOdAnf2rnEHpF8nJ3dS/kClmC4C3J5
-	uySrNAWV7gZE1INhHi410B34+o9XdUPrCs71I7r2i1DDRGJLrkfvSyQ0M009aSgdCqULAJ6ezDp
-	Dpjx42qTnaDT+5h3
-X-Received: by 2002:a05:600d:444c:20b0:4a0:151e:f72b with SMTP id 5b1f17b1804b1-4a0151efbb4mr3025585e9.12.1790716468039;
-        Tue, 29 Sep 2026 14:14:28 -0700 (PDT)
-Received: from ?IPV6:2a00:1358:e0fb:c500:351f:e304:7fce:781b? ([2a00:1358:e0fb:c500:351f:e304:7fce:781b])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a015cbc3basm366305e9.2.2026.09.29.14.14.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Sep 2026 14:14:27 -0700 (PDT)
-Sender: Julian Braha <julian.braha@gmail.com>
-Message-ID: <f3a26a6d-e2ea-4d84-9e3f-fa8e0d891728@gmail.com>
-Date: Tue, 29 Sep 2026 22:14:25 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MwETFjAg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A75E1F000FF;
+	Wed, 30 Sep 2026 01:17:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790731053;
+	bh=72UX9q+LRjrcmPYDrUvgInI9Dx8b61MvNOcSSkNVxqA=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date;
+	b=MwETFjAgegF3B3DrnRWbVfYktQYvT3p8TOsnvsemm2n8pVP9BYOIpqqRpFGw2+ZdN
+	 Y2jVLkD+4cjVQ0lqZMSQTwUKAcerUNeW6p0JPYHMbwPvE5GY6qFH2MnUQ/scGRg4sp
+	 YaJKx7ysaPchx/WrSR/n2DFkNxThyDloh5NmvKx5mjyBx8/8asVQclb49ujcmKA2jm
+	 oOj4/dMQ59SxcHCR2pg0IFBdeex0ygkmBqjSoXQj3FmO2/kBd3j29JctmFBaW+yKg9
+	 Medibl5pAFZ1TbWi+zlZFQtJF4+hyOyyyjF1djs7zYi8EA8LCaBN0yOrjMp1N6XLGH
+	 TRP92RJGE7T1g==
+Content-Type: multipart/mixed; boundary="===============7906105332123239923=="
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/4] kconfig: tests: Reset all KCONFIG_* env variables
- by default
-To: Nicolas Schier <n.schier@fritz.com>, Nathan Chancellor
- <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
- Pengpeng Hou <pengpeng@iscas.ac.cn>, Ulf Magnusson <ulfalizer@gmail.com>,
- Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260929-kconfig-tests-minor-updates-v2-0-c5902bee1d0c@fritz.com>
- <20260929-kconfig-tests-minor-updates-v2-1-c5902bee1d0c@fritz.com>
-Content-Language: en-US
-From: Julian Braha <julianbraha@gmail.com>
-In-Reply-To: <20260929-kconfig-tests-minor-updates-v2-1-c5902bee1d0c@fritz.com>
-Content-Type: text/plain; charset=UTF-8
+Message-Id: <d3222c97d0d5e3892be54f09427ee273d31f567fcd7f09274abd39d36be115d4@mail.kernel.org>
+In-Reply-To: <20260929-ksyms-tune-v7-1-be568ceef41e@gmail.com>
+References: <20260929-ksyms-tune-v7-1-be568ceef41e@gmail.com>
+Subject: Re: [PATCH v7 1/3] kallsyms: Match compressed tokens on the fly during binary search
+From: bot+bpf-ci@kernel.org
+To: jim.cromie@gmail.com,akpm@linux-foundation.org
+Cc: pmladek@suse.com,thunder.leizhen@huawei.com,mcgrof@kernel.org,andrey.grodzovsky@crowdstrike.com,rostedt@goodmis.org,ljs@kernel.org,kees@kernel.org,david.laight.linux@gmail.com,masahiroy@kernel.org,olsajiri@gmail.com,linux-kernel@vger.kernel.org,linux-kbuild@vger.kernel.org,bpf@vger.kernel.org,jim.cromie@gmail.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,mason@kernel.org,ihor.solodrai@linux.dev
+Date: Wed, 30 Sep 2026 01:17:32 +0000 (UTC)
+
+--===============7906105332123239923==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-On 9/29/26 08:59, Nicolas Schier wrote:
-> Reset all environment variables with names starting with 'KCONFIG_' from
-> the user-provided environment.
-> 
-> This fixes the 'warn_changed_input' test on systems with
-> KCONFIG_WARN_CHANGED_INPUT=1 and ensures a cleaner test environment.
-> 
-> Fixes: 645323a7f4e5 ("kconfig: add optional warnings for changed input values")
-> Signed-off-by: Nicolas Schier <n.schier@fritz.com>
-Reviewed-by: Julian Braha <julianbraha@gmail.com>
+> kallsyms: Match compressed tokens on the fly during binary search
+>
+> kallsyms_lookup_names() runs a binary search across ~184k tokenized
+> (compressed) symbols.  For each of the ~17 comparisons in the search, it
+> currently decompresses the candidate symbol into a temporary buffer on
+> the stack before calling strcmp().
+>
+> Comparing tokenized symbols directly in compressed space is
+> impossible.  The BPE token table assigns values by frequency, not
+> alphabetical order (e.g. token 0x05 might expand to "zebra" while 0x42
+> expands to "apple"), so comparing raw token values scrambles
+> lexicographical order.  Even sorting the token table alphabetically
+> wouldn't help; "bpf_" and "bpf_foo_" do not *have* a determinative
+> sorting order, because the suffixes following those tokens would
+> matter.
+>
+> However, full string expansion at every step is equally wasteful: of
+> the ~17 strcmps in the binary search, only the last needs to check
+> all N chars in both strings, earlier steps will know +/- outcome at
+> char 0,1,2..N-1.
+>
+> However, full string expansion at every step is equally wasteful: of
+> the ~17 strcmp()s in the binary search, only the final matching step
+> needs to test all characters.  Earlier non-matching steps diverge at
+> the first differing character (0..N-1), but the baseline expands every
+> candidate symbol to the stack unconditionally, before comparing.
+
+Does the commit message have the same paragraph twice?  Both start with
+"However, full string expansion at every step is equally wasteful" and
+make the same point about wasteful expansion. The first version uses
+rough phrasing ("strcmps", "+/- outcome at char 0,1,2..N-1"), while the
+second version is more polished ("strcmp()s", "diverge at the first
+differing character"). Having two paragraphs in a row starting with
+"However," also makes the rationale harder to follow.
+
+Should one of the paragraphs be removed, probably the first one since the
+second is clearer?
+
+
+---
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/36651779347
+--===============7906105332123239923==--
