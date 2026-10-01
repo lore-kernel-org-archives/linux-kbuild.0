@@ -1,179 +1,342 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69BC33A4513;
-	Thu,  1 Oct 2026 15:06:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7F6452CCC2;
+	Thu,  1 Oct 2026 15:40:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790867187; cv=none; b=Mgeeokhy5cZCVV0P3j55RIewbW+nGEeO9FxZJMG2vMUGXjUDzCtR2fKGuGVieprSs/zPpMWIT3Sxpt37LCIR/8RRCAeEDgKuDfydHqndCb4UgnFSBShNhiiE7JknLY9otSIz+HHpzORDr+xhR3VGjNNyuTu+ns2appGVs8vYFjQ=
+	t=1790869225; cv=none; b=pOJOYsp9dN9jqLQqkIUEFkvZH0AioaeKztm+ngZ2G7d476ihyV/yKsliPWLapE/m/VoKf9SvtFLULVm1Rp4twcZO7eOrUL4FyIJ1DpQFWbJpNh8gwDxhMHNxyOgppJhx6gtJbZ+BVN5+DZ/w39iHnE13BHXz31BkGsHOaOr7U9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790867187; c=relaxed/simple;
-	bh=WC5DToNAwuDkSZ3DUESV/uejr3zazobHOeacmQlJuJg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZBfOpfMB4bxEVQZ51WvyAdecbn3DcagEBnOIZhBepQATY394SmZmMa8ahILW2snHImA2rG/nLbI3E+7nWZvTmGgtTgfL9n6MCXk60BeC+7lAxTxwLIawqRQPz5zhvzmAqDmKXZg44Gho8esLhmp78EDa7IKSQEOCMllycRAJyIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AfHkhrsS; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790869225; c=relaxed/simple;
+	bh=QuoJax5A+PjEoV5CCOwWtFeDZ6PUE7N0i0r/KKPBHt0=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Hf8l9LExDhcSKRo2+nIXkGeTw8TXdnJkDlBo7ZArnIZZoZVYolpGXMo4biDxfTQANWuOxgmp3udv82KjwF/nYdPNhjQju/5kmYzeLOzjSVK/aeBxMAZrGbVGyfzeFCf/w4bxNAcR95UQ16fMBktmhmt1u/V/rEdvcvEdoFhXuZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JakBQBfp; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AfHkhrsS"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 97E6F1F000FF;
-	Thu,  1 Oct 2026 15:06:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JakBQBfp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53E0E1F000FF;
+	Thu,  1 Oct 2026 15:40:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790867186;
-	bh=xJUcV/Qd/GMbx19FV6jDy34AUKZXpazdy8hkip3kD58=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=AfHkhrsSMfL13Z56l8L9RiYTdWwxHkcXP6Kl5FM08A9osT/Tzu4fhy/ZepCH33Va9
-	 eEwjTA2xlwBsyuOsnsLFYFSHXLX8rU4GHNlX+XYpdnA/MQwkEWvHHSC+aQOuLFmK9g
-	 eIlXWAfj6I1XafXXYqgqUs4Zk5qkOznLXCyiHgoPHUgcUYPYpFngF1hdj6KCWuqGfR
-	 g2bnH1RNflmFE0ezDxGAlLaDmNNcaCl84oF/XqZUvvq/zn8VCPW/25hXxad2/JsCaD
-	 YpVG8W76qnxxMzjeNg040N0ztdP83kBV2z/Zuwpgf767mg+v6GT5Rzcax6MEvs5YmM
-	 fcOVzkPZCMaRQ==
-Date: Thu, 1 Oct 2026 17:06:14 +0200
-From: Nicolas Schier <nsc@kernel.org>
-To: Dmitry Voytik <voytikd@gmail.com>
-Cc: Nathan Chancellor <nathan@kernel.org>, Rong Zhang <i@rong.moe>,
-	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
-Subject: Re: [PATCH v3] scripts/config: honor $KBUILD_OUTPUT by default
-Message-ID: <ar525jXEMt3ZecH_@levanger>
-Mail-Followup-To: Dmitry Voytik <voytikd@gmail.com>,
-	Nathan Chancellor <nathan@kernel.org>, Rong Zhang <i@rong.moe>,
-	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
-References: <20260927154101.122633-1-voytikd@gmail.com>
- <art6lF6jcHBNHCi3@levanger>
- <CAAX90H1Ma5TkiSSg0CB-Tb__G++h-_P=+kiJbaQ4DtS0c+kVRw@mail.gmail.com>
+	s=k20260515; t=1790869222;
+	bh=OgLQnoVapnhYGzvIwOI2fHQPN9V/E4aO85CkyM8PNCU=;
+	h=Date:From:To:Cc:Subject;
+	b=JakBQBfpJA+qpeD6aoi1UgJOBPB7HEawBod2lUuPKbgcnAW9y23sSqZ6379Y2L6JT
+	 td+1OuFFCgF2olxjuthk7GzhzCFwK7q0Yu1HCK3tAGbD9Q4ewmrN23+NmGxh1cn0fB
+	 9fEJoT6t4W547ZjPz7jvLaZicAXk1biRubyMk2pO0EttcT3yn3m0d9YtujCPx3ZF8f
+	 Y6Dv2XNqgIpym8+Hak5MGddSIkZl0p1d3VTYbmCz+To4AcQGdA9eXM5YYRVOwPr5Wv
+	 YPwc2Tu6YizRSozkkRJJBHVS/WTflJfuFr9DOkQOZtNLo1cXqr8DtWbG9aND7IzUXZ
+	 XqmSJ0WUgzzcw==
+Date: Thu, 1 Oct 2026 16:40:17 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Theodore Ts'o <tytso@mit.edu>, "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: KBuild Mailing List <linux-kbuild@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Next Mailing List <linux-next@vger.kernel.org>,
+	Lorenzo Stoakes <ljs@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>
+Subject: linux-next: manual merge of the random tree with the kbuild tree
+Message-ID: <ar5-4Yq3wtmXTWnD@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="kNtu/F1wljpzNUVX"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAX90H1Ma5TkiSSg0CB-Tb__G++h-_P=+kiJbaQ4DtS0c+kVRw@mail.gmail.com>
 
-On Tue, Sep 29, 2026 at 09:15:28PM +0200, Dmitry Voytik wrote:
-> Hi Nicolas,
-> 
-> Thank you for taking your time and reviewing the patch.
-> 
-> On Tue, Sep 29, 2026 at 2:05 PM Nicolas Schier <nsc@kernel.org> wrote:
-> >
-> > On Sun, Sep 27, 2026 at 05:41:01PM +0200, Dmitry Voytik wrote:
-> > > If $KBUILD_OUTPUT is set, use it by default if --file is not passed.
-> > >
-> > > Fix the issue when the script silently updates a stale .config in
-> > > the root directory, while the user expects ${KBUILD_OUTPUT}/.config
-> > > to be updated.
-> > > The problem can be worked around with --file, but this is easy to miss,
-> > > and is inconsistent with how the Makefile and other tools work
-> > > (e.g., scripts/diffconfig).
-> > >
-> > > How to reproduce the issue:
-> > >       rm .config
-> > >       export KBUILD_OUTPUT=.out
-> > >       make defconfig
-> > >       ./scripts/config \
-> > >              -e CONFIG_UBSAN
-> > >       grep: .config: No such file or directory
-> > >
-> > > Signed-off-by: Dmitry Voytik <voytikd@gmail.com>
-> > > ---
-> > > v3:
-> > >  - Added an example in the commit message how to reproduce the issue
-> > > v2:
-> > >  - Addressed comments by sashiko:
-> > >    - https://sashiko.dev/#/patchset/20260920064350.17999-1-voytikd%40gmail.com
-> > >    - use basename when --refresh is used
-> > >    - remove echo which can be misleading when --file is passed
-> > > v1:
-> > >  - https://lore.kernel.org/all/20260920064350.17999-1-voytikd@gmail.com/
-> > > ---
-> > >  scripts/config | 6 +++++-
-> > >  1 file changed, 5 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/scripts/config b/scripts/config
-> > > index 32428ea909c2..cdee67157fe1 100755
-> > > --- a/scripts/config
-> > > +++ b/scripts/config
-> > > @@ -130,6 +130,10 @@ on_exit() {
-> > >  trap on_exit EXIT
-> > >
-> > >  FN=.config
-> > > +if [ -n "${KBUILD_OUTPUT}" ]; then
-> > > +     FN=${KBUILD_OUTPUT}/${FN}
-> > > +fi
-> > > +
-> > >  CMDS=()
-> > >  while [[ $# -gt 0 ]]; do
-> > >       if [ "$1" = "--file" ]; then
-> > > @@ -229,7 +233,7 @@ while [ "$1" != "" ] ; do
-> > >               ;;
-> > >
-> > >       --refresh)
-> > > -             yes "" | make oldconfig KCONFIG_CONFIG=$FN
-> > > +             yes "" | make oldconfig KCONFIG_CONFIG=$(basename $FN)
-> >
-> > Thanks for attempting to fix the '--refresh' option.  But this way,
-> > this may lead to very unexpected behaviour, as it regardlessly modifies
-> > the path to the config file, even if it was specified via --file.
-> >
-> > If --file is given, it should take precedence over any KBUILD_OUTPUT
-> > (or KCONFIG_CONFIG) from the environment and not be changed unrequested.
-> 
-> Thanks. I misunderstood what KBUILD_OUTPUT really means. For some reason,
-> I thought it should be a filename and not a full path. The
-> documentation entry is a bit vague on it.
-> 
-> > It would be a tiny bit nicer to just strip the KBUILD_OUTPUT path from
-> > FN, e.g. (untested):
-> >
-> >                 yes "" | make oldconfig KCONFIG_CONFIG="${FN#${KBUILD_OUTPUT}/}"
-> >
-> > But I am still not feeling happy with that.
-> 
-> Thanks for the suggestion! So, what I did - I just completely dropped
-> the second change hunk, i.e. kept it as is:
->       yes "" | make oldconfig KCONFIG_CONFIG=$FN
-> 
-> I tested the following three scenarios and it looks like it works as expected:
-> 
-> make mrproper
-> export KBUILD_OUTPUT=.out
-> make defconfig
-> grep "CONFIG_UBSAN=y" $KBUILD_OUTPUT/.config
-> 
-> # test basic use case:
-> ./scripts/config \
->        -e CONFIG_UBSAN
-> grep "CONFIG_UBSAN=y" $KBUILD_OUTPUT/.config
-> ./scripts/config -d CONFIG_UBSAN
-> 
-> # test --refresh picks up correct config file by using $KBUILD_OUTPUT
-> ./scripts/config --refresh \
->        -e CONFIG_UBSAN
-> grep "CONFIG_UBSAN=y" $KBUILD_OUTPUT/.config
-> ./scripts/config -d CONFIG_UBSAN
-> 
-> # test --file takes precedence over $KBUILD_OUTPUT
-> cp .out/.config .my_config
-> grep "CONFIG_UBSAN=y" .my_config
-> ./scripts/config --file $(pwd)/.my_config --refresh \
->        -e CONFIG_UBSAN
-> grep "CONFIG_UBSAN=y" .my_config
 
-This one shows one of the problems with scripts/config: while the script
-itself handles relative paths to --file FILE from the current working
-directory, a call of Kbuild changes the working directory to
-$(KBUILD_OUTOUT) and realtive paths in KCONFIG_CONFIG are resolved from
-there.
+--kNtu/F1wljpzNUVX
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I don't have a solution in mind, that fits it all.  But I think it's
-important to not make things worse (or more unexpected) than before, by
-accident.
+Hi all,
 
-> If you are fine with the above, I can send v4 with adding the above
-> testing steps into the commit message.
+Today's linux-next merge of the random tree got a conflict in:
 
-yeah, please send a v4 and then let's see what we'll do with it, ok?
+  init/Kconfig
 
-Thanks and kind regards,
-Nicolas
+between commit:
+
+  f85147b291e35 ("kbuild: move the toolchain checks into scripts/Kconfig.to=
+olchain")
+
+=66rom the kbuild tree and commit:
+
+  56ff95ee85715 ("random: vDSO: avoid call to memset() when zeroing reserve=
+d parameter")
+
+=66rom the random tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+diff --cc init/Kconfig
+index ecd71b38fc560,98d8d7fa64c5c..0000000000000
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@@ -1,7 -1,207 +1,5 @@@
+  # SPDX-License-Identifier: GPL-2.0-only
+ -config CC_VERSION_TEXT
+ -	string
+ -	default "$(CC_VERSION_TEXT)"
+ -	help
+ -	  This is used in unclear ways:
+ -
+ -	  - Re-run Kconfig when the compiler is updated
+ -	    The 'default' property references the environment variable,
+ -	    CC_VERSION_TEXT so it is recorded in include/config/auto.conf.cmd.
+ -	    When the compiler is updated, Kconfig will be invoked.
+ -
+ -	  - Ensure full rebuild when the compiler is updated
+ -	    include/linux/compiler-version.h contains this option in the comment
+ -	    line so fixdep adds include/config/CC_VERSION_TEXT into the
+ -	    auto-generated dependency. When the compiler is updated, syncconfig
+ -	    will touch it and then every file will be rebuilt.
+ -
+ -config CC_IS_GCC
+ -	def_bool $(success,test "$(cc-name)" =3D GCC)
+ -
+ -config GCC_VERSION
+ -	int
+ -	default $(cc-version) if CC_IS_GCC
+ -	default 0
+ -
+ -config CC_IS_CLANG
+ -	def_bool $(success,test "$(cc-name)" =3D Clang)
+ -
+ -config CLANG_VERSION
+ -	int
+ -	default $(cc-version) if CC_IS_CLANG
+ -	default 0
+ -
+ -config AS_IS_GNU
+ -	def_bool $(success,test "$(as-name)" =3D GNU)
+ -
+ -config AS_IS_LLVM
+ -	def_bool $(success,test "$(as-name)" =3D LLVM)
+ -
+ -config AS_VERSION
+ -	int
+ -	# Use clang version if this is the integrated assembler
+ -	default CLANG_VERSION if AS_IS_LLVM
+ -	default $(as-version)
+ -
+ -config LD_IS_BFD
+ -	def_bool $(success,test "$(ld-name)" =3D BFD)
+ -
+ -config LD_VERSION
+ -	int
+ -	default $(ld-version) if LD_IS_BFD
+ -	default 0
+ -
+ -config LD_IS_LLD
+ -	def_bool $(success,test "$(ld-name)" =3D LLD)
+ -
+ -config LLD_VERSION
+ -	int
+ -	default $(ld-version) if LD_IS_LLD
+ -	default 0
+ -
+ -config RUSTC_VERSION
+ -	int
+ -	default $(rustc-version)
+ -	help
+ -	  It does not depend on `RUST` since that one may need to use the version
+ -	  in a `depends on`.
+ -
+ -config RUST_IS_AVAILABLE
+ -	def_bool $(success,$(srctree)/scripts/rust_is_available.sh)
+ -	help
+ -	  This shows whether a suitable Rust toolchain is available (found).
+ -
+ -	  Please see Documentation/rust/quick-start.rst for instructions on how
+ -	  to satisfy the build requirements of Rust support.
+ -
+ -	  In particular, the Makefile target 'rustavailable' is useful to check
+ -	  why the Rust toolchain is not being detected.
+ -
+ -config RUSTC_LLVM_VERSION
+ -	int
+ -	default $(rustc-llvm-version)
+ -
+ -config RUSTC_LLVM_MAJOR_VERSION
+ -	int
+ -	default $(shell,expr $(rustc-llvm-version) / 10000)
+ -
+ -config RUSTC_CLANG_LLVM_COMPATIBLE
+ -	bool
+ -	default y if CC_IS_CLANG && RUSTC_LLVM_MAJOR_VERSION =3D $(shell,expr $(=
+cc-version) / 10000)
+ -	help
+ -	  This indicates whether Rust and Clang use LLVM of the same major
+ -	  version.
+ -
+ -	  Operations involving handling LLVM IR or bitcode (e.g. cross-language
+ -	  LTO) require the same LLVM major version to work properly. For best
+ -	  compatibility it is recommended that the exact same LLVM is used.
+ -
+ -config ARCH_HAS_CC_CAN_LINK
+ -	bool
+ -
+ -config CC_CAN_LINK
+ -	bool
+ -	default ARCH_CC_CAN_LINK if ARCH_HAS_CC_CAN_LINK
+ -	default $(cc_can_link_user,$(m64-flag)) if 64BIT
+ -	default $(cc_can_link_user,$(m32-flag))
+ -
+ -# Fixed in GCC 14, 13.3, 12.4 and 11.5
+ -# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D113921
+ -config GCC_ASM_GOTO_OUTPUT_BROKEN
+ -	bool
+ -	depends on CC_IS_GCC
+ -	default y if GCC_VERSION < 110500
+ -	default y if GCC_VERSION >=3D 120000 && GCC_VERSION < 120400
+ -	default y if GCC_VERSION >=3D 130000 && GCC_VERSION < 130300
+ -
+ -config CC_HAS_ASM_GOTO_OUTPUT
+ -	def_bool y
+ -	depends on !GCC_ASM_GOTO_OUTPUT_BROKEN
+ -	depends on $(success,echo 'int foo(int x) { asm goto ("": "=3Dr"(x) ::: =
+bar); return x; bar: return 0; }' | $(CC) -x c - -c -o /dev/null)
+ -
+ -config CC_HAS_ASM_GOTO_TIED_OUTPUT
+ -	depends on CC_HAS_ASM_GOTO_OUTPUT
+ -	# Detect buggy gcc and clang, fixed in gcc-11 clang-14.
+ -	def_bool $(success,echo 'int foo(int *x) { asm goto (".long (%l[bar]) - =
+=2E": "+m"(*x) ::: bar); return *x; bar: return 0; }' | $CC -x c - -c -o /d=
+ev/null)
+ -
+ -config TOOLS_SUPPORT_RELR
+ -	def_bool $(success,env "CC=3D$(CC)" "LD=3D$(LD)" "NM=3D$(NM)" "OBJCOPY=
+=3D$(OBJCOPY)" $(srctree)/scripts/tools-support-relr.sh)
+ -
+ -config CC_HAS_ASM_INLINE
+ -	def_bool $(success,echo 'void foo(void) { asm inline (""); }' | $(CC) -x=
+ c - -c -o /dev/null)
+ -
+ -config CC_HAS_ASSUME
+ -	bool
+ -	# clang needs to be at least 19.1.0 since the meaning of the assume
+ -	# attribute changed:
+ -	# https://github.com/llvm/llvm-project/commit/c44fa3e8a9a44c2e9a575768a3=
+c185354b9f6c17
+ -	default y if CC_IS_CLANG && CLANG_VERSION >=3D 190100
+ -	# supported since gcc 13.1.0
+ -	# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D106654
+ -	default y if CC_IS_GCC && GCC_VERSION >=3D 130100
+ -
+ -config CC_HAS_NO_PROFILE_FN_ATTR
+ -	def_bool $(success,echo '__attribute__((no_profile_instrument_function))=
+ int x();' | $(CC) -x c - -c -o /dev/null -Werror)
+ -
+ -config CC_HAS_COUNTED_BY
+ -	bool
+ -	# clang needs to be at least 20.1.0 to avoid potential crashes
+ -	# when building structures that contain __counted_by
+ -	# https://github.com/ClangBuiltLinux/linux/issues/2114
+ -	# https://github.com/llvm/llvm-project/commit/160fb1121cdf703c3ef5e61fb2=
+6c5659eb581489
+ -	default y if CC_IS_CLANG && CLANG_VERSION >=3D 200100
+ -	# supported since gcc 15.1.0
+ -	# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D108896
+ -	default y if CC_IS_GCC && GCC_VERSION >=3D 150100
+ -
+ -config CC_HAS_COUNTED_BY_PTR
+ -	bool
+ -	# supported since clang 22
+ -	default y if CC_IS_CLANG && CLANG_VERSION >=3D 220100
+ -	# supported since gcc 16.0.0
+ -	default y if CC_IS_GCC && GCC_VERSION >=3D 160000
+ -
+ -config CC_HAS_BROKEN_COUNTED_BY_REF
+ -	bool
+ -	# https://github.com/llvm/llvm-project/issues/182575
+ -	default y if CC_IS_CLANG && CLANG_VERSION < 220100
+ -
+ -config CC_HAS_ALLOC_TOKEN
+ -	def_bool $(cc-option,-falloc-token-max=3D123)
+ -
+ -config CC_HAS_MULTIDIMENSIONAL_NONSTRING
+ -	def_bool $(success,echo 'char tag[][4] __attribute__((__nonstring__)) =
+=3D { };' | $(CC) $(CLANG_FLAGS) -x c - -c -o /dev/null -Werror)
+ -
+ -config CC_OPT_INLINE_MEMSET
+ -	string
+ -	default "-finline-stringops=3Dmemset" if $(cc-option,-finline-stringops=
+=3Dmemset)
+ -	default "-mllvm -max-store-memset=3D4294967295" if $(cc-option,-mllvm -m=
+ax-store-memset=3D4294967295)
+ -
+ -config LD_CAN_USE_KEEP_IN_OVERLAY
+ -	# ld.lld prior to 21.0.0 did not support KEEP within an overlay descript=
+ion
+ -	# https://github.com/llvm/llvm-project/pull/130661
+ -	def_bool LD_IS_BFD || LLD_VERSION >=3D 210000
+ -
+ -config RUSTC_HAS_SPAN_FILE
+ -	def_bool RUSTC_VERSION >=3D 108800
+ -
+ -config RUSTC_HAS_UNNECESSARY_TRANSMUTES
+ -	def_bool RUSTC_VERSION >=3D 108800
+ -
+ -config RUSTC_HAS_FILE_WITH_NUL
+ -	def_bool RUSTC_VERSION >=3D 108900
+ -
+ -config RUSTC_HAS_FILE_AS_C_STR
+ -	def_bool RUSTC_VERSION >=3D 109100
+ -
+ -config RUSTC_HAS_SUSPICIOUS_RUNTIME_SYMBOL_DEFINITIONS
+ -	def_bool RUSTC_VERSION >=3D 109800
+ -
+ -config PAHOLE_VERSION
+ -	int
+ -	default "$(PAHOLE_VERSION)"
+ =20
+- source "scripts/Kconfig.toolchain"
+-=20
+  config CONSTRUCTORS
+  	bool
+ =20
+diff --git a/scripts/Kconfig.toolchain b/scripts/Kconfig.toolchain
+index d708a175fe486..28bf11fe7bee7 100644
+--- a/scripts/Kconfig.toolchain
++++ b/scripts/Kconfig.toolchain
+@@ -166,6 +166,11 @@ config CC_OPT_ALLOW_STORE_DATA_RACES_PARAM
+ config CC_OPT_NO_ALLOW_STORE_DATA_RACES
+ 	def_string "$(cc-option-str,-fno-allow-store-data-races)" if CC_IS_GCC
+=20
++config CC_OPT_INLINE_MEMSET
++        string
++        default "-finline-stringops=3Dmemset" if $(cc-option,-finline-stri=
+ngops=3Dmemset)
++        default "-mllvm -max-store-memset=3D4294967295" if $(cc-option,-ml=
+lvm -max-store-memset=3D4294967295)
++
+ config CC_HAS_MNOP_MCOUNT
+ 	def_bool $(cc-option,-mnop-mcount)
+=20
+
+--kNtu/F1wljpzNUVX
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmq+fuAACgkQJNaLcl1U
+h9Bihgf9GTO/qvB7zqn81YPYeZJxUI53yetsRsydR4xeGJGKMoULeNijJU5r809E
+Lc9jcPy3XUmerKls/jFdZ1aP5aL4TQkIOYVmNynrBon1X4QSBINhLtphx4gAoLNx
+s7pybBgRcWRrRAclAqT5fwQSUWLXHZ/lq9hSZUtah7VOuXnO666mgo2ZQHkOh9FB
+r3dOCvIPs+W9M8HGWIge31ZaV5Jp75aHKtqK3W03rZWzNGFnFXb04UXtfPpS7KuF
+OpmW0cYo1Wlmgqq0SzNiZoy2Nz3rCBX/V2m967vH2OvflejEBhYqFKHE9I6yG+KU
+VMrl9U6qAbChjd98bowf3OXrWZu+Hw==
+=LGGE
+-----END PGP SIGNATURE-----
+
+--kNtu/F1wljpzNUVX--
