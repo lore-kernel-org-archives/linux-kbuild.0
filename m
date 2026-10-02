@@ -1,237 +1,231 @@
-Received: from mta1.migadu.com (out-85.mta1.migadu.com [95.215.58.85])
+Received: from mail-ej2-f43.google.com (mail-ej2-f43.google.com [74.125.228.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA4323A9635
-	for <linux-kbuild@vger.kernel.org>; Fri,  2 Oct 2026 20:58:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.85
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790974708; cv=none; b=q+aPvASZcYtmx8ru+V9DZqZ2tkZXQOv6IJu9vapCD/QVeJIWLMnnmodAmZkfE0vEVIuYpQe/XHbyhSN9XpYPZw6YKX2PZHNitNCE2AbrXSWHiwvdOTO8jpqBC1MQ7UC9f4f3fp4TC+QrjQ83UXJvInBGk9I6Of05t+0jHo0s2FM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790974708; c=relaxed/simple;
-	bh=cyE7xCmOBBATCOr27hlaYfNiIVy0ZG/W7o34fqS3PW0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=D1xUuSeFJYz7NqeRzpcwC1HjzdJoBTyKcrIA3oMBCordSf//gWQAg9cZcHnPRUW6H7BjqDJS91jEOxoijJq2xlH+WBId2kb1dfSe322fC80CRmbXiHHpqND7iFF76YKHJ6AIPFpajZ2g6AUb8SaegYNBOwzlHP9e3fGjtTdJPFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ax+vZviq; arc=none smtp.client-ip=95.215.58.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1520B3F1077
+	for <linux-kbuild@vger.kernel.org>; Fri,  2 Oct 2026 22:01:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.228.171
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790978512; cv=pass; b=SZWnZb5blkwX2TCGpdbTC5uSnTBGO76kuLzUp9F2BkIIRlJSoBWT0TZlG5KDO6afNm5ZGSPBoc3mdeW4PJjXqf4jhSg2p29jSlQYnQOrIEh81t/+bHvEmPSR2/dZzVacCovZxKHQKc7+8TKZSeBuJis0Zylqkv1xWAlRsbPwKDY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790978512; c=relaxed/simple;
+	bh=bYUnQNVoZT74HkMEplvStg9Znck+l3ddzA9A14qbmdo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Q9YwiNz1ubCoTIcL2rnCzt/1zaHxB6+kbZXna2dG/Rc49dm6dbBY7q4qiZkvDPq3OHP+5B/iKuwW6jkxretZm/oW6x25vHvQThN/BjLJM3wRgroBh7ce6ITuvXzrvroAA7F5/JdtZqRqf5IJ7WOSzPfCiIVOSqKOmi7iAd64cwk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mrQJzspy; arc=pass smtp.client-ip=74.125.228.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ax+vZviq"
-X-Envelope-To: linux-kbuild@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=cyE7xCmOBBATCOr27hlaYfNiIVy0ZG/W7o34fqS3PW0=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790974701; v=1; x=1791579501;
- b=ax+vZviqSRu1XPDQEGrAVT+HGPvUUq/pOwLuAN59kN0XrzQ0GMdPmtqRWmTKqVzKLzBFj5Ar
- VG1+QumlCqDH0np/SydZbLM0hXAuBSkFKaLCyQbsm1jdTGV5zx+j/MyZ/bTFOv3Nuf3mCl8oU/r
- diH3WnacJGosTjeavKbQZdXQ=
-X-Envelope-To: linux-kbuild@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 16a5b7b703a7aea2;
-	Fri, 02 Oct 2026 20:58:20 +0000
-X-Mizu-Trace-ID: 16a5b7b703a7aea2
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <44315425-c505-46fe-8379-f19d78ff3abb@linux.dev>
-Date: Fri, 2 Oct 2026 13:58:06 -0700
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mrQJzspy"
+Received: by mail-ej2-f43.google.com with SMTP id a640c23a62f3a-c2a4fbc5586so54292466b.2
+        for <linux-kbuild@vger.kernel.org>; Fri, 02 Oct 2026 15:01:50 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1790978509; cv=none;
+        d=google.com; s=arc-20260327;
+        b=cI/xMdTghYVu/FZMFRKATIJvR1POBCAEtqgt0nXrVuk/iGESQMK04iBL8NcgDDfZCm
+         v1dcUqKvKcahIiC1lOFJd91Bv2onD0o/Twaw68jCkz9Xlq432xb+ixo0XtzM0IXwEBnH
+         xXUlb1ManLzuqX+WW9HkCW3onSk8j7ydT63IcRWzV3HIebmUnyPJ9f7SXY3asaIhUek3
+         px6APEKilCGoLZ1aEYpdJ13K61X2WzH5tIhq5Lswb0SUVkhJSIiP3qWQvuuk88X8OBKe
+         nSU0iJN6feCIQ/6myTqeZs+XpF+iZT/FqBeiJxV3mael8OKRNaOsJWqCdkawVZUrhARL
+         cuVA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=YmhklB8KISFEh7LPCSj61sCuwipkxzM488oBjgYMua8=;
+        fh=EClSwOv55HZPh5WovP9jCU/CF9uVYBgxUEjfa6GdOOg=;
+        b=LswGAH5Al+XpSvkRa0Jh4qXyzloCldg8HlhmUiecpvfQwiq17yMYc5/kQxjEQHnBV4
+         j68QJwrpAM6kF1fzmsfo0+mxXxPOKluNE8W7I/rvd+OdrIzWyI7VZFofqae2+6+ayscg
+         bZoogKq6N0c+ekD6OHz3Z9tzVwOKEVUlbswYs74u/2wGFtinZGwXXOHETjel3uZQKffi
+         t7Wg62jYFoO5bgoMRzDMMOQyLiW/mGAJ44C+//oLl8MYbMpk+LCWfgzvvlXUGZkr92N5
+         fAWnR4WF84W3RW+/Vl4y/K0Ue95Z9XzNLF33NIPQx4K8oZEjQVCR3eraLKlxj+61Te6i
+         7CYw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1790978509; x=1791583309; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=YmhklB8KISFEh7LPCSj61sCuwipkxzM488oBjgYMua8=;
+        b=mrQJzspyBDSUVXOIGs4bHh2WyB8vq0iFUXh0tnIBUY/vFVoPIfOMmynzUN9bKwkUNv
+         XOrpn6DWTjVYNQ6Xyv1L4wZwOyPdWc7xaqQ554ZNpd8B1o8Am3qFmAFwuW775MbI3rlZ
+         fx+i2XnvLxnx0u2qR/J6STOgOTmClrgstMnM36HD4b2bGaOBCYV6ho5IQVQLeCDPx2fo
+         PgDZJeJoyogByxi0U+GNIBM/+xFeT+SXKwmu6l++QvFH42YAAESvZ3BF86f73QmrirGc
+         Tr7L+TNIxXvrtuMpQUELt9XgSKEN8ocrpN6dfnJaknpmkLPrEGHA0O23V6FtsU1lxOQH
+         v5qA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790978509; x=1791583309;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=YmhklB8KISFEh7LPCSj61sCuwipkxzM488oBjgYMua8=;
+        b=xO0A5zjaTwES9+Typvkkd7s7WcSHLUw7++TptHte/+UUdJCeG9UglCT8nd4Koe6ST5
+         niYTGFPQzun5IBrBX1WEMEb7w6mFThmZPiTqOjE/six7kRLBo4KyW0LRZ7VmxLGACxcS
+         UllV3FVTniH3gZoE9jLFxhtL3rMK1qMm4fvsXBAFNfutXj66Qclk/upFL5SDPxKXWzMm
+         xnGgdZ1sQkmOOZYq8YGfz3dL0CZw9DDoQUId1lpPGRtoK9wZhZphlOjaXvglYrt/uQRg
+         DywjzMeR4p7aOL+dXI/OZ56vUiJewoHdF4Skel0CU8ECtUbH3DKojE31EO0IF1wTaOOK
+         WJRg==
+X-Forwarded-Encrypted: i=1; AKwUvBzpuR5/LSX6b/uOFOrhmjZF+3NSBV5QhK0qOBcQiDgIK07UPi8a/44g/Bbfh6AEfEPZ+zuDZt0lZHgbDr4=@vger.kernel.org
+X-Gm-Message-State: AFuF++lKwDTBwratjgrzpz6/0LdEEar09d3cBju/OjQXyVvJht3Krk/N
+	o25CBQsrmKX0XSTXof5s61MrkE7O9OtoVb7AvpjXD2lyFQ4DeSCEgCAbdIOlk1QScZfJLb187F1
+	mCUO7iGq/7k9nmUkVe8gvHrTsDksdNYc=
+X-Gm-Gg: AYBFou1yKEmLAbQOTyero9dGgHXO4h+D62HeYFjWepyx/sycyZBuVo06MqsAKOe2RSo
+	T5+sTFHYGArqjW77g4CxWnvw4Xhk32cSaJ84BTMJ3nz30CnWYujFh1pqND6traY0D3rkX9DHSw9
+	afeGR9C4cniLAdsQZ/kQZIQ2fJ9OtDdxkqz3sP7IXH5J0zBjptF/hCAioH2WvLBKpsam4x9gvby
+	w0FEUb5Auz2oREwUm+IN5QSTv8VxSLbxd/YJBUWqnoU75cqdxdXZfElivP5q950ZtU2JnT9d+1S
+	TfWZ6hTn7xmfAM8iCBX3WLNJoxoHlORk8t8zkWrFXVqI1JVgo5EyJ8w0i2Z6qnvDCyOwlPNOlX5
+	pZBnE7yvto9EN5D6h80LSslOA32FUAISCt4bySKes4fERKS/81JGeHdx+rciX5dGlzbuM0g==
+X-Received: by 2002:a17:907:94cd:b0:c29:f5d8:9c7c with SMTP id
+ a640c23a62f3a-c2e4af89b5cmr340576266b.43.1790978509156; Fri, 02 Oct 2026
+ 15:01:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v4 00/12] bpf: make the vmlinux BTF an on-demand
- loadable module (CONFIG_DEBUG_INFO_BTF=m) to save ~5.4 MB memory
-To: Jay Wang <wanjay@amazon.com>, bpf@vger.kernel.org, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, memxor@gmail.com
-Cc: alan.maguire@oracle.com, martin.lau@linux.dev, yonghong.song@linux.dev,
- jolsa@kernel.org, qmo@kernel.org, nathan@kernel.org, nsc@kernel.org,
- linux-kbuild@vger.kernel.org, linux@weissschuh.net, christian@heusel.eu,
- mcgrof@kernel.org, petr.pavlu@suse.com, samitolvanen@google.com,
- linux-modules@vger.kernel.org, rostedt@goodmis.org, mhiramat@kernel.org,
- mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org,
- acme@kernel.org, namhyung@kernel.org, irogers@google.com,
- linux-perf-users@vger.kernel.org, jikos@kernel.org, bentiss@kernel.org,
- linux-input@vger.kernel.org, tj@kernel.org, void@manifault.com,
- arighi@nvidia.com, changwoo@igalia.com, sched-ext@lists.linux.dev,
- shuah@kernel.org, linux-kselftest@vger.kernel.org, ojeda@kernel.org,
- rust-for-linux@vger.kernel.org, arnd@arndb.de, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, abuehaze@amazon.com, doebel@amazon.de,
- mpohlack@amazon.de, jay.wang.upstream@gmail.com
-References: <596bfb65-db2d-413b-8039-c921031b50fd@linux.dev>
- <20261002073422.14253-1-wanjay@amazon.com>
-Content-Language: en-US
-From: Ihor Solodrai <ihor.solodrai@linux.dev>
-In-Reply-To: <20261002073422.14253-1-wanjay@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20261001214618.283635-1-voytikd@gmail.com> <179097210878.309835.10523307262544578337.b4-review@b4>
+In-Reply-To: <179097210878.309835.10523307262544578337.b4-review@b4>
+From: Dmitry Voytik <voytikd@gmail.com>
+Date: Sat, 3 Oct 2026 00:01:22 +0200
+X-Gm-Features: AclHuK9Ast4lVnU0ZQbxkOGMKrl8yU_T_0si3PVA45mLNds5iM4UieKb5yD5CfY
+Message-ID: <CAAX90H0W-2j2zK2smw7KuJQzOUMj6yRbSVDbeTHyiLU=nV1+hg@mail.gmail.com>
+Subject: Re: [PATCH v4] scripts/config: honor $KBUILD_OUTPUT by default
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Nicolas Schier <nsc@kernel.org>, Nicolas Schier <n.schier@fritz.com>, Rong Zhang <i@rong.moe>, 
+	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Jay, thank you for taking the time to reply.
+Hi Nathan,
 
-On 2026-10-02 12:34 a.m., Jay Wang wrote:
->> A question I had: is it really worth 2k of complicated kernel code to
->> *maybe sometimes* save <10Mb of memory?
-> 
-> There are many reasons this is worth it.  The main ones:
-> 
-> 1. This did not start from a number we picked, but from a real use
->     case: users who run large fleets of small instances, 1 GiB of
->     memory or less, with their workloads sized to fit.  We are not able
->     to disclose more detail, but for them 5.4 MB on every instance is
->     real money, and it can be exactly what pushes a workload over its
->     memory budget and onto the next instance size.  That is why we took
->     this on, even though we knew it would not be a small change.
+Thanks for taking time for the review and suggestions!
 
-Ok, good to know there is a real customer for this.
+On Fri, Oct 2, 2026 at 10:15=E2=80=AFPM Nathan Chancellor <nathan@kernel.or=
+g> wrote:
+>
+> Hi Dmitry,
+>
+> > If $KBUILD_OUTPUT is set, use it by default if --file is not passed.
+> >
+> > Fix the issue when the script silently updates a stale .config in
+> > the root directory, while the user expects ${KBUILD_OUTPUT}/.config
+> > to be updated.
+> > Handle properly if the config file is a relative path.
+> >
+> > The problem can be worked around with --file, but this is easy to miss,
+> > and is inconsistent with how the Makefile and other tools work
+> > (e.g., scripts/diffconfig).
+> >
+> > How to reproduce the issue:
+> >       rm .config
+> >       export KBUILD_OUTPUT=3D.out
+> >       make defconfig
+> >       ./scripts/config \
+> >              -e CONFIG_UBSAN
+> >       grep: .config: No such file or directory
+> >
+> > How the patch was tested:
+> >       make mrproper
+> >       export KBUILD_OUTPUT=3D.out
+> >       make defconfig
+> >       grep "CONFIG_UBSAN=3Dy" $KBUILD_OUTPUT/.config || echo "OK"
+> >
+> > Test the basic usage:
+> >       ./scripts/config -e CONFIG_UBSAN
+> >       grep "CONFIG_UBSAN=3Dy" $KBUILD_OUTPUT/.config && echo "OK"
+> >
+> > Test --refresh picks up correct config file by using $KBUILD_OUTPUT
+> >       ./scripts/config -d CONFIG_UBSAN
+> >       ./scripts/config --refresh -e CONFIG_UBSAN
+> >       grep "CONFIG_UBSAN=3Dy" $KBUILD_OUTPUT/.config && echo "OK"
+> >
+> > Test --file takes precedence over $KBUILD_OUTPUT and
+> > a relative path is handled properly
+> >       ./scripts/config -d CONFIG_UBSAN
+> >       mkdir .out2
+> >       cp .out/.config .out2/.my_config
+> >       grep "CONFIG_UBSAN=3Dy" .out2/.my_config
+> >       ./scripts/config --file .out2/.my_config --refresh \
+> >              -e CONFIG_UBSAN
+> >       grep "CONFIG_UBSAN=3Dy" .out2/.my_config && echo "OK"
+> >       ls .out/.out2 || echo "OK"
+> >       ls .out/.out || echo "OK"
+> >
+> > Signed-off-by: Dmitry Voytik <voytikd@gmail.com>
+> > ---
+> > v4:
+> >  - Addressed Nicolas Schier's comments - dropped the change how '--refr=
+esh'
+> >    is handled
+> >  - Implemented conversion of $FN to the absolute path which helps with
+> >    '--refresh' and relative paths
+> >  - Documented testing steps in the commit message
+> > v3:
+> >  - Added an example in the commit message how to reproduce the issue
+> > v2:
+> >  - Addressed comments by sashiko:
+> >    - https://sashiko.dev/#/patchset/20260920064350.17999-1-voytikd%40gm=
+ail.com
+> >    - use basename when --refresh is used
+> >    - remove echo which can be misleading when --file is passed
+> > v1:
+> >  - https://lore.kernel.org/all/20260920064350.17999-1-voytikd@gmail.com=
+/
+> > ---
+> >  scripts/config | 5 +++++
+> >  1 file changed, 5 insertions(+)
+> >
+> > diff --git a/scripts/config b/scripts/config
+> > index 32428ea909c2..0b28fc498195 100755
+> > --- a/scripts/config
+> > +++ b/scripts/config
+> > @@ -130,6 +130,10 @@ on_exit() {
+> >  trap on_exit EXIT
+> >
+> >  FN=3D.config
+> > +if [ -n "${KBUILD_OUTPUT}" ]; then
+> > +     FN=3D${KBUILD_OUTPUT}/${FN}
+> > +fi
+> > +
+> >  CMDS=3D()
+> >  while [[ $# -gt 0 ]]; do
+> >       if [ "$1" =3D "--file" ]; then
+> > @@ -143,6 +147,7 @@ while [[ $# -gt 0 ]]; do
+> >               shift
+> >       fi
+> >  done
+> > +FN=3D$(realpath "$FN")
+>
+> Sashiko has a couple of comments here:
+>
+>   https://sashiko.dev/#/patchset/20261001214618.283635-1-voytikd%40gmail.=
+com
+>
+> The second comment around KBUILD_OUTPUT / '--file' beginning with '-' is
+> a fairly contrived example but sticking '--' in there does not seem like
+> an unreasonable hardening move.
 
-Obviously I don't know any details of the use-case apart from what
-you've shared. But bear with me trying the customer's hat on:
+That's an interesting finding.
+I tested the patch with a hyphen in the filename, and it indeed wreaks havo=
+c.
+Thanks for the pointer!
 
-   - I am running a workload on a legion of 1GiB instances
-   - I care about memory footprint a lot, because it directly
-     translates into the amount of compute I pay for
-   - If I know I don't need BPF on the workload, and these 5.4 MB
-     bite me, I can just turn off BPF
-   - If I know I need BPF, then those 5.4 MB must be loaded anyways, so
-     I have to look for savings elsewhere
+> As for the first comment, I am not sure I want to rely on 'realpath -m'
+> since that is a coreutils-ism and up until now, this could work on any
+> operating system (as least as far as I can tell). Maybe we could do
+> something like
+>
+>   FN=3D$(realpath -q -- "$FN" || echo "$FN")
 
-What I find strange is for a user of this scale *to not know* whether
-BPF will be used in the workload or not, which is what lazy load may
-solve.
+Sure, let me reuse your suggestion in the next patch (v5).
+Thanks!
 
-One thing I can imagine is an opaque workload: untrusted (AI agents
-etc), end-user-defined (including BPF usage), or confidential.  But in
-these cases, what are the chances that BPF is used there? They are
-high, BPF is very widespread.
+> to just try and hobble along if we cannot resolve $FN properly but maybe
+> there is a better solution that I am just not seeing at the moment.
+>
+> --
+> Cheers,
+> Nathan
 
-I can also imagine normal workload not needing BPF, but when something
-goes wrong an observability or security thing turning on that loads
-BPF programs. But this contradicts the "5.4 MB may push workload over
-1GiB" premise: you still need to reserve/swap memory for just-in-time
-BPF-based tools, otherwise you OOM.
-
-I of course may be missing something, happy to be corrected.
-
-> 
-> 2. Loading code and data only when a system needs them is what kernel
->     modules exist for.  And most of them take well under ~1 MB once
->     loaded (nf_conntrack, overlay, vfat); even big ones like ext4, kvm
->     and btrfs stay around 1-2.5 MB.  The vmlinux BTF is 5.4 MB.
-
-True. At the same time BPF without vmlinux BTF is barely useful. And
-it is trusted by the verifier. Both are addressed by BTF being
-built-in in the kernel image.
-
-> 
-> 3. We are not alone in trying to keep BTF out of memory until it is
->     needed.  The inline BTF work [1] plans to deliver its data, which
->     is even larger, through a module too.  The .BTF.link record and the
->     resolve_btfids option that serve both are already part of this
->     series (patch 10), so this is not machinery for the vmlinux BTF
->     alone.
-
-The inline data is different. It's bigger by it's nature, and it has
-more specific users: tracing tools. The userspace tools are able to
-themselves decide whether to use that data. The kernel only needs to
-make it available.
-
-In comparison, as you yourself noted in the cover:
-
-     CO-RE, fentry/fexit, kfuncs, struct_ops, sched_ext and bpf-lsm
-     all depend on vmlinux BTF
-
-> 
->> Do those tiny VMs that you target run systemd with BPF LSM?
-> 
-> Not necessarily, and that is the image's choice.  Even with BPF LSM
-> built in and bpf in CONFIG_LSM, memory-conscious users can turn it off
-> at boot with an lsm= list that leaves it out, and then systemd does not
-> load restrict_fs at all.
-> 
-> And even where user space is in the way, which as above it does not
-> have to be, the answer is to fix user space so it gets this win too,
-> not to give up on it.
-> 
->> If the answer is "yes" for the majority of them,
-> 
-> "The majority" is also hard to pin down here: what runs at boot
-> depends on the user space packages built into each image, and on the
-> workload.
-
-Yes, it is hard to pin down. Which is why we first need to figure out
-whether the alleged memory savings actually help anyone.
-
-Adding code to the kernel is not free. More complexity means bigger
-bug surface: more opportunities for concurrency bugs, security bugs
-etc. Especially runtime loads with retries and stuff. I'm sure you
-understand the future cost of all that.
-
-So the bias shouldn't be "let's implement a big thing that might
-hypothetically help someone". It's backwards IMO.
-
-> 
-> So the question should be what it takes to make this work, not whether
-> to drop it because it is complicated.  If there are ways to cut it
-> down, or issues found in the implementation, we would be happy to take
-> them and go through every one.
-
-The question is in the trade-off.
-
-Would you run a million line python program to search for a string in
-a text file? No, that's absurd. But you could.
-
-I'm not saying 2k line patch series is unacceptable in principle. It
-may be justified. But I am not convinced it is justified in this case.
-
-Let's say we (as in kernel devs) decided that we want to reduce
-vmlinux BTF size, and only load it when necessary. Here are a couple
-of alternatives, simpler in comparison to CONFIG_DEBUG_INFO_BTF=m,
-although still a bit complex:
-
-   * Compress it.
-
-     $ ls -lah /sys/kernel/btf/vmlinux
-     -r--r--r-- 1 root root 6.7M Jul 18 01:54 /sys/kernel/btf/vmlinux
-     $ tar --zstd -cf /tmp/vmlinux.btf.zstd -C /sys/kernel/btf vmlinux
-     $ ls -lah /tmp/vmlinux.btf.zstd
-     -rw-r--r-- 1 isolodrai users 2.2M Oct  2 10:11 /tmp/vmlinux.btf.zstd
-
-     3x win right there.
-
-     Keep zstd-compressed blob in the kernel image and decompress and
-     parse it synchronously on first use.
-
-     Here is a prototype (vibe-coded, obviously):
-  
-https://github.com/kernel-patches/bpf/compare/bpf-next_base...theihor:bpf:vmlinux.btf.zstd-20261002
-
-   * Use an external blob.
-
-     Ship /lib/modules/$r/vmlinux.btf, checked against a SHA-256
-     recorded in the image. The catch is a synchronous file I/O under
-     caller locks, so this is less straightforward.
-     But this should cover embedded case that Alan has mentioned.
-
-     Here is a prototype:
-  
-https://github.com/kernel-patches/bpf/compare/bpf-next_base...theihor:bpf:vmlinux.btf.external-20261002
-
-Both alternatives avoid kernel-module loading machine. If we think
-harder, we may come up with something even more clever.
-
-I don't particularly prefer one approach over the other, including the
-module one. Maintainers probably have a better intuition on that.
-
-The point I'm trying to make is that if you could achieve similar
-memory savings with say 500-line well encapsulated diff (or even
-better: by refactoring, simplifying, deleting code) it would have
-already landed.
-
-And if it was a 50-line patch, the discussion on whether anyone cares
-wouldn't be relevant, because it's so cheap.
-
-As it stands, it's not clear (to me at least) in what circumstances
-we'll get the promised memory savings at all.
-
-> 
-> 
-> [1] https://lore.kernel.org/bpf/20260916074118.1007116-1-alan.maguire@oracle.com/
-
+Best Regards,
+Dmitry Voytik.
