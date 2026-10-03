@@ -1,106 +1,131 @@
-Received: from mail-pz2-f39.google.com (mail-pz2-f39.google.com [74.125.228.39])
+Received: from mail-pj2-f43.google.com (mail-pj2-f43.google.com [74.125.227.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DF423769EC
-	for <linux-kbuild@vger.kernel.org>; Sat,  3 Oct 2026 06:38:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FE37378D8B
+	for <linux-kbuild@vger.kernel.org>; Sat,  3 Oct 2026 06:43:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791009487; cv=none; b=on7t890lggmNxHijx5VUtFxOL+FGoUTgi+vQCCCZn+SvREYYayTwhEmrg5jmP6KuTJtBJDkuDxn1OFo4vCq3dcZEQxdKbWNMhgsoVkQj2veRCLWGj1lmKbOb1RrvYFeoGxq/D52XBSnhC52/fFWpyQyhMMvE3mPWVlV600E1qU4=
+	t=1791009816; cv=none; b=ffrNjtc/Nnc0NaSqcKr+d/1y5xc/37T27E7iD8agm6dklCfGA23E5aWVOUD6eqrzICzbp3+f+kmr9vDR6UIdQtMXjGqleJpQkFIRAHV2uTL5XFWNnuv/pEasL2LTFZQ1wxLkpbmh8nYHMxqn/JQHVDxcatoOhkqMl5ToreJkovo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791009487; c=relaxed/simple;
-	bh=w2CHf/Ruyl0ieMWiVy7QleNiafjxfD+l+EFZ1XXXNB8=;
-	h=Content-Type:Date:Message-Id:Cc:Subject:From:To:In-Reply-To:
-	 References:MIME-Version; b=RTBVv+RrZEcVhXjDctZgewopeJLXj5kWV5rP2HNyrpNB97xNshmtgJSt5pDM4SS/Vch1MGkCneu/TA2uRpMoRW4fqDzgBtHBUukSytfWvIYLA6zXXESPY/wo1zBpzzfkQv8enXlmGZojdgvdhrO7lhkiz1HylcAjwoOjmOywEXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ir4gbnxE; arc=none smtp.client-ip=74.125.228.39
+	s=arc-20240116; t=1791009816; c=relaxed/simple;
+	bh=ryisnPL+d2gzMUjUclobqs/GmZtuvA4REd2ag8z+s6o=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=GTY9DI4YNhUBZ9DD1ncfpzXN0FANcxMJRZJv8XopSYY5g/O8a3S7L26LO2TRtgfQY1i/j4tBTln5iX7F37GQc7Z5i631uZMvOXfYWFbrpWep6wqIZgd+159RQ2cnKTRvboxx4ProhJKLBk6kY9uhG1NxtPWkqpHuMQ9u2PeEZNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nfQ13+5B; arc=none smtp.client-ip=74.125.227.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ir4gbnxE"
-Received: by mail-pz2-f39.google.com with SMTP id 41be03b00d2f7-cc78dd412cfso49909a12.0
-        for <linux-kbuild@vger.kernel.org>; Fri, 02 Oct 2026 23:38:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nfQ13+5B"
+Received: by mail-pj2-f43.google.com with SMTP id 98e67ed59e1d1-3a49573b8bdso131477a91.2
+        for <linux-kbuild@vger.kernel.org>; Fri, 02 Oct 2026 23:43:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791009484; x=1791614284; darn=vger.kernel.org;
-        h=mime-version:content-transfer-encoding:references:in-reply-to:to
-         :from:subject:cc:message-id:date:content-type:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=rn5qy1uct3HxkhX0TLP/tcAeQOQET/L/4W2RbNiSgQ4=;
-        b=ir4gbnxEYnj8MisDdoh2wYz7JDHlJTCmhf8medao28SMIzq4NAWkf0ReXrErcyRePu
-         KYL62hbQCDuBRabP53yqOzo21q9Z1Qu3JS02vsmrsF8lbmufMc4VpPVBKi79MTCXIo33
-         8wUcc7BS5tppb1lzOCyUW7Pbd4tZpmLBF0s9MhdUEdgZxxOIoFlh8nRqh77cIJ+d1Kom
-         XVc+9Py5vO/ZY7NNBhTjHYlKbzBd2zgUgxGmrTTjIPGnpaerNNgFmzGLOupGDtJvz9op
-         e7c8gqGeTkF4yGlIJr6T4txba4hezFKH+14YeDOtMxg+o3hzr8eeMmp1c+W9zjWzOzVO
-         MJ1A==
+        d=gmail.com; s=20251104; t=1791009814; x=1791614614; darn=vger.kernel.org;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-type:content-transfer-encoding:mime-version:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=5hea1toWUP43MAmLnSW9JW60/RDmL9+JiV8rQiXNzb0=;
+        b=nfQ13+5B0HEgftrFp+nSVcNUgiZjLXoZD3urM0fouRlujxwYCCbV4l4uozll38Gwx/
+         oIUO7JPcQ7T7RUcgiNI/EZgj6ud67A461F77g6JcVFjjvdAq3kuScF34Cbj45oKOXM3Y
+         nVw8R1OPlYXCunhugielUpz07o8DNZHPIWjO9u5xDJ+3OddzidBXbdKY56NfV5e73UJq
+         Nai+IyrZDyhzFx6pOqCNUDDQ7ECw1KGJl8OjTT6drMIXi8N4eTh+PWBDAONhca/Iut47
+         O4xtlNCCWxPf+h3ZaZnwxKjEuGEv2AQjue6CA2USh1D3LH6UMtLOrvr3JJ5Km494M5kX
+         FoNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791009484; x=1791614284;
-        h=mime-version:content-transfer-encoding:references:in-reply-to:to
-         :from:subject:cc:message-id:date:content-type:x-gm-gg
+        d=1e100.net; s=20260707; t=1791009814; x=1791614614;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-type:content-transfer-encoding:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=rn5qy1uct3HxkhX0TLP/tcAeQOQET/L/4W2RbNiSgQ4=;
-        b=BjpTazMk2NWDfPZYzR3iIRYxB/iM6icJUv7f11Ah7CebDlcAyMMBQBxXP6ZBALMsS2
-         D7Gx59lDEU9bl4T3zQnU4Pg9IeTbTq1kILI0uIaWIhyCb4650n59CQQN+GP1tJpejwy6
-         2r6d2hsVCP0QUI6betaTlvg9Vx24qHaEHaWfDks2tUoQB9V4UgoQSsrkqVCIhH/L2Jb0
-         W3PdaOAxa/1TLssokXwl2stmNTKwAS8OBbAZUWWxex13rL38EtXBRSd45KgnmJ2knSwG
-         5FGhg5RGSPTCJV9QcokiHWuvFgCzGuGBsmg/UFXF+PVgLhe23Wqq1wRXzld+634EFczV
-         yAug==
-X-Forwarded-Encrypted: i=1; AKwUvBxCfEre1dvaDp2a3QVclXE3ltCcrMndIiaXa/m5th+Yh22UHZiGNMS1oUylf+iMWgnUD5ovbLgE5p7qEyI=@vger.kernel.org
-X-Gm-Message-State: AFuF++l+D3i+TueK/l9wWmzztD3ApalG7oU5TEueiAe0QnQNEgca8nOn
-	FWXsnIKKyNTb0s+IyfHF95BY6vhYU+V0uemMHMsVueCDExdhfhof22BZ
-X-Gm-Gg: AYBFou22eHHPVxoSa7/LVaCdn9yz7Rzk0nXrc0mtX5unmjM5trasF67yaal0gDn65lP
-	chay7a3B5BVnYxrxFsdimdDkUSjYREtU9Nw/DL19E65UMaDLj7m8v6IXONBa2SRKCNlE2jv6K9s
-	gOjiFW4BG7LwfKlxx+MNMnhFZQxwXw3hht77Gu9hNHYCXf4hbn8J+BSIs/Vb1iAeT3t+PjOURbb
-	LSi0pEuMK8Zch8+WWxEc/xGEACdwaZRMo/NHO+eS3WZkhqdoaISadEc1FQgId0H66zjnUi+RmwN
-	lk250HnVDOqwalvZNFdrfg5BcsUuv12ghvtpZEBAeuJibgDWiTP4/zBncrEkte85Mj6thshzuWa
-	2Ud2LEb7xVqHzxOSjHAI0dM2ie5kWLvl69tgEXA5hl705J+LbuQxFKPII1YkUHPPGr5f9nnwEFn
-	jGvtFzJeNFUmG23cIvr9ORmhlZf3g146sPQV8Bp7MDwO2Z4M8KWaHz46imM+3wgFqd6WoFC+gSS
-	WfnrYYn37Upi9Drco0One0zdNOIOLBLcE+ogYm7VZJb2L4xWh/ShQgUDBb2/L41+EJ3TJ8jHqg6
-	Owk=
-X-Received: by 2002:a05:6a20:7495:b0:3e0:b778:d988 with SMTP id adf61e73a8af0-3e0bd4bff2bmr4998287637.83.1791009484332;
-        Fri, 02 Oct 2026 23:38:04 -0700 (PDT)
-Received: from localhost ([153.61.198.249])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cc9f7370db1sm1809155a12.17.2026.10.02.23.38.02
+        bh=5hea1toWUP43MAmLnSW9JW60/RDmL9+JiV8rQiXNzb0=;
+        b=UsAnmhPt5BM1XX6LDuAVxTm6fcOoJkw3BIyrC4Ab9QWPitgsJXwMRfqMQZM0RaCkti
+         I60INrxedhOPyQZPp1HgkrfcMC9zAJE/rPCpNu9XSFb2jU10lvlzEJ4Wd+Q6++y0tzc7
+         E+xvZFknlOEsB/6tYZMk2PCRVUTyW/freAZOaMzFHUpR/m05sGAocjjj4iA5yeXYFMyM
+         UIf6F+ljs4nQAnnRFkG8RM2V8Dl3ziXWCMuh84gP2OwF5u0XW7I/JokF0FTHsxJ/crrE
+         9PzjiLLaTVqSM+ZsEYwHpTKHmJVjs9va0Fyz8f2Fq/lI0gnppFQmQBp+VGps9537m/EN
+         yLJA==
+X-Forwarded-Encrypted: i=1; AKwUvBxjkJbi7t0V+3WkHD90wEZHXTchsZESeAhxfE8NkUwT0QekG8Xk+HaqJSyvNKB7saplD6JOzme2849IhD8=@vger.kernel.org
+X-Gm-Message-State: AFq9FYKkOHMXx6n318ft8mmDXcVZM1AjjCUArLTjWHKMr0kuQ66bJfK/
+	tZELuJrHbrRfzsUkFygR59DiPjlith1d16RjxYk893hYUcBdFAoshzBk
+X-Gm-Gg: AYBFou02Duez3Rg0RjB4Lre2FgwfgeY2E0UQWyCxkfDvmIw31gDps0Q9mQkAb7CwgQq
+	a6PE5i19eAiSGFpzNuBUNp3pPejHQSQVzokmICnxb8KDW343tzeltGCbqmZhray8yP/9itY4Meh
+	CrZymbw2oZ/6TMucEs9r8p39OCkZOcY23hJB5y8Hps80LefSfWrDnt02BACPRNqtQMW6KH5997C
+	k4utpkF8BkofjCN5ufGUzN7yoqyq9Jaiuqj5OGP7mT0Kwe3y9ER1AqStzHWwBPpNFBHOPhOaAco
+	SigoTUI34Ni1OATmRUH1nl8wLxEONbPr69AyK3Mfn9U0fiHsoZVLkATGmSlw5kyuq0H1ePRkrGU
+	NYxTFblt5VbqJHvzTafnRNiCPwH81QxFS/IvExdxk0jjFmuQ5whfkbuWWm3PLA4RgAZE26jzih3
+	mrmIymOYcJ/8GBa/hbxjR3HEKto+AbaM65S56SeiXl7alTTLM7OoHisvNqUkx3ZfsZD0UqjVInH
+	uaRRgSuFvEUpT2QutckZD3pE9WMoUwPSvoYY+8HrYoTQ2mUMemLUejWRBl5zlleRGa3iuViTUHT
+	EC8=
+X-Received: by 2002:a17:90b:1c10:b0:3a0:3673:dbc0 with SMTP id 98e67ed59e1d1-3a6ced24dffmr4975882a91.49.1791009813693;
+        Fri, 02 Oct 2026 23:43:33 -0700 (PDT)
+Received: from localhost ([153.61.198.255])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cc9f73557f2sm1830292a12.8.2026.10.02.23.43.32
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Oct 2026 23:38:03 -0700 (PDT)
-Content-Type: text/plain; charset=UTF-8
-Date: Sat, 03 Oct 2026 06:38:02 +0000
-Message-Id: <DLUZVHOLSN1B.115EUX4KJBEA3@gmail.com>
-Cc: <alan.maguire@oracle.com>, <martin.lau@linux.dev>,
- <yonghong.song@linux.dev>, <jolsa@kernel.org>, <qmo@kernel.org>,
- <nathan@kernel.org>, <nsc@kernel.org>, <linux-kbuild@vger.kernel.org>,
- <linux@weissschuh.net>, <christian@heusel.eu>, <mcgrof@kernel.org>,
- <petr.pavlu@suse.com>, <samitolvanen@google.com>,
- <linux-modules@vger.kernel.org>, <rostedt@goodmis.org>,
- <mhiramat@kernel.org>, <mathieu.desnoyers@efficios.com>,
- <linux-trace-kernel@vger.kernel.org>, <acme@kernel.org>,
- <namhyung@kernel.org>, <irogers@google.com>,
- <linux-perf-users@vger.kernel.org>, <jikos@kernel.org>,
- <bentiss@kernel.org>, <linux-input@vger.kernel.org>, <tj@kernel.org>,
- <void@manifault.com>, <arighi@nvidia.com>, <changwoo@igalia.com>,
- <sched-ext@lists.linux.dev>, <shuah@kernel.org>,
- <linux-kselftest@vger.kernel.org>, <ojeda@kernel.org>,
- <rust-for-linux@vger.kernel.org>, <arnd@arndb.de>,
- <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <abuehaze@amazon.com>, <doebel@amazon.de>, <mpohlack@amazon.de>,
- <jay.wang.upstream@gmail.com>
-Subject: Re: [PATCH bpf-next v4 00/12] bpf: make the vmlinux BTF an
- on-demand loadable module (CONFIG_DEBUG_INFO_BTF=m) to save ~5.4 MB memory
-From: "Alexei Starovoitov" <alexei.starovoitov@gmail.com>
-To: "Ihor Solodrai" <ihor.solodrai@linux.dev>, "Jay Wang"
- <wanjay@amazon.com>, <bpf@vger.kernel.org>, <daniel@iogearbox.net>,
- <andrii@kernel.org>, <eddyz87@gmail.com>, <memxor@gmail.com>
-In-Reply-To: <44315425-c505-46fe-8379-f19d78ff3abb@linux.dev>
-References: <596bfb65-db2d-413b-8039-c921031b50fd@linux.dev> <20261002073422.14253-1-wanjay@amazon.com> <44315425-c505-46fe-8379-f19d78ff3abb@linux.dev>
-X-Mailer: mkdraft (claude review draft; edit before sending)
-Content-Transfer-Encoding: 8bit
+        Fri, 02 Oct 2026 23:43:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Sat, 03 Oct 2026 06:43:32 +0000
+Message-Id: <DLUZZPCXSPYF.1PKXK3MYR3TIU@gmail.com>
+Cc: "Kumar Kartikeya Dwivedi" <memxor@gmail.com>, "Eduard Zingerman"
+ <eddyz87@gmail.com>, "Daniel Borkmann" <daniel@iogearbox.net>, "Alexei
+ Starovoitov" <ast@kernel.org>, "Andrii Nakryiko" <andrii@kernel.org>, "bpf"
+ <bpf@vger.kernel.org>, "Networking" <netdev@vger.kernel.org>, "Jason A.
+ Donenfeld" <Jason@zx2c4.com>, "KBuild Mailing List"
+ <linux-kbuild@vger.kernel.org>, "Linux Kernel Mailing List"
+ <linux-kernel@vger.kernel.org>, "Linux Next Mailing List"
+ <linux-next@vger.kernel.org>, "Lorenzo Stoakes" <ljs@kernel.org>, "Nicolas
+ Schier" <nsc@kernel.org>
+Subject: Re: linux-next: manual merge of the bpf-next tree with the kbuild
+ tree
+From: "Alexei Starovoitov" <alexei.starovoitov@gmail.com>
+To: "Nathan Chancellor" <nathan@kernel.org>, "Mark Brown"
+ <broonie@kernel.org>
+X-Mailer: aerc 0.20.1-349-gb940a4174a3e-dirty
+References: <asAzcgDsbNEFIfKV@sirena.co.uk> <20261002230632.GA314599@ax162>
+In-Reply-To: <20261002230632.GA314599@ax162>
 
-On Fri, Oct 02, 2026 at 01:58 PM Ihor Solodrai <ihor.solodrai@linux.dev> wrote:
->      Keep zstd-compressed blob in the kernel image and decompress and
->      parse it synchronously on first use.
+On Fri Oct 2, 2026 at 11:06 PM UTC, Nathan Chancellor wrote:
+> Hi Mark,
+>
+> On Sat, Oct 03, 2026 at 12:42:58AM +0200, Mark Brown wrote:
+>> Today's linux-next merge of the bpf-next tree got a conflict in:
+>>=20
+>>   init/Kconfig
+>>=20
+>> between commit:
+>>=20
+>>   f85147b291e35 ("kbuild: move the toolchain checks into scripts/Kconfig=
+.toolchain")
+>>=20
+>> from the kbuild tree and commit:
+>>=20
+>>   eb13a1ff271b0 ("random: vDSO: avoid call to memset() when zeroing rese=
+rved parameter")
+>>=20
+>> from the bpf-next tree.
+>
+> For the record, this change is from Linus's tree, as it was merged in
+>
+>   ac7445c28e7a ("Merge tag 'random-7.3-rc6-for-linus' of git://git.kernel=
+.org/pub/scm/linux/kernel/git/crng/random")
+>
+> but presumably your stable base does not have that merge depending on
+> whan you started -next so it comes in from the bpf-next merge of Linus's
+> tree in
+>
+>   2b5440b31caf ("Merge git://git.kernel.org/pub/scm/linux/kernel/git/bpf/=
+bpf 7.3-rc5")
+>
+> I just wanted to make sure the bpf folks didn't think they were on the
+> hook for this conflict, it is only on me with the Kbuild tree now.
 
-imo this is the only one of the three worth considering.
+Thanks for the clarification.
+
+The other reported conflict with pci-current is in the same category.
+2b5440b31caf is what Linus's tree has. it's not bpf-next specific.
+
