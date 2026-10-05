@@ -1,73 +1,73 @@
-Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
+Received: from mail-oa2-f35.google.com (mail-oa2-f35.google.com [74.125.231.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75C7647B41C
-	for <linux-kbuild@vger.kernel.org>; Mon,  5 Oct 2026 10:41:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 100D647AF5C
+	for <linux-kbuild@vger.kernel.org>; Mon,  5 Oct 2026 10:41:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791196881; cv=none; b=tzbo5Wob386QzVRsSdN6YvVAldMnhWk7GQoj3X7fRBuH2+UAGOj5SZfXcy6iCmL17XIO0vGUUywNR3eet3x69yNPDMARFVQKvrrBpCzENWX7OdBvmAGmE1Y2fP59Nup2Dtv3ibAXx0T/yhh3Hvx2ZGS9nCbUAV0MqbXqGy/MDO8=
+	t=1791196884; cv=none; b=lw00DfjfmRimRyC+Nv0LLI+o5Jv5YfL/a6xmnM5b6GfnntxNoY9bNawEcUCXnAnT7HGk5vuAorgScPlDMk5LLBrHAZkamY1lJruPWz0dtyrLmUDOMgw5nSXSDHRgMqcY7pvr0UYiMEDxSv/ga52re0KJ7WtIeOUhHNTBGOybz78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791196881; c=relaxed/simple;
-	bh=lxTV8zb+/ah+Q+pD5ZPJo6Fkfw+aRQuqeJEmjUazSpE=;
+	s=arc-20240116; t=1791196884; c=relaxed/simple;
+	bh=4XPT2N01JF/a8I8uCkZqD/PggQiktCdJnKLr2SOgQWs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XC33KWQS0GaV2dP45oIwD2HBhgXYF6jjy5moShOitQbvx/qN+kOltyS+Bo3otGwkrVO4ijddG6R34POaWeTSRnl9AH0Lvy144hwc0KDCUc6tdoQTbl+8yoJLzilUfYxFXH/rIZ1XBV6MFuLh9/mwxF0/wJ5hRTJIJOnrIg43ERg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IdNkHIKb; arc=none smtp.client-ip=209.85.161.47
+	 MIME-Version; b=OTmKHzuChOuFDLrMaGOtyMgQTuU4NnhsxEgtZM1j8LmPRMw3dcx59IWmcH1RI+LCI0umNxe63g/+q5uEfEqMm+IfiYZUxbWYPWFazmppRF4WoyAeY+ECajDAC1EOdf2CAwDVg9EUuA8VCOpCVLRx4TBD36U2xeyY6fwo25B1Xjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MHXLB1Zt; arc=none smtp.client-ip=74.125.231.99
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IdNkHIKb"
-Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-6dd7070699eso1340108eaf.3
-        for <linux-kbuild@vger.kernel.org>; Mon, 05 Oct 2026 03:41:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MHXLB1Zt"
+Received: by mail-oa2-f35.google.com with SMTP id 586e51a60fabf-49e4ffa5a7fso641220fac.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 05 Oct 2026 03:41:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791196878; x=1791801678; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1791196881; x=1791801681; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=/1qzV/hN8nZ4Hd9bI8LartapyGj4b5NFK++8dr498H8=;
-        b=IdNkHIKbPE5nDR1pUz4bk9/1RNrLyLvEefiYjTYsib385TLBZkBYkH6RbIVBx92gzL
-         lbOxIRfyyL8wMnOW29TT3auwHLkSCKKc5zkWN65mdT5v1pRKYUYjTN9N++zxbGj4j1IA
-         vtZtymhLCRnqSwIPIw7Kl1Vk+9N3qoQMmVWAzL13WH3/DyrNMoBj+n/B7joLMa+ts+WC
-         h87yVGp7GD26W1kNElHfbfYvrnTlQToJq3zGWTmL1tQG+80Hw/ldiBRZQgly5CNxN2/R
-         FMxiv+EPr69g3c61XOm/uwNA+nJ8hv8ITdTur/0N4G2IxZmL3uFzBT29O5pMx0LelY3u
-         XUpw==
+        bh=FJDzU01PRMGfsOq91vpjrIzA8vEoMao+CRPEWuyQBK8=;
+        b=MHXLB1Zt9KOUM6mCubT6hs0gBt7gNBOeqK4KhGHLDlosfkulaUX5tUrLaOdHPo4I5R
+         1hHYMhDUheKKDsowKDVw7CCRQxJDlNI9aaNaoHUs0ZsWvauq1V5YgdpJIC+cv+hJRmQO
+         RfK1FQ/ym3hGkSY3u3dsHaBSiix3M1sbYe4ob9Wn9ZvBP1Ht5s4kmC/e3pdPbFZlzjha
+         Q+exr0UGuYFAcvUh8NYf7oY/IuvboUptNJDNSiwMmtB/PXtol7suLLjXYcYe5z1Fe0Gw
+         2we4Md5XHRar86DvHsub2LPDPLhiDH8/rkYE6yRVUJvwn2qH23DOgvg7SiCI4QxTmXQi
+         Vgig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791196878; x=1791801678;
+        d=1e100.net; s=20260707; t=1791196881; x=1791801681;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=/1qzV/hN8nZ4Hd9bI8LartapyGj4b5NFK++8dr498H8=;
-        b=rVDPj6B0ca1Pw+VrdHkOgwx1IuFFn2UkbKuOyjXNECLUNAptq6tB/zD+lqQbknrM2S
-         2qYujIX+vomWtwb24HAB84I7GvEslXt9RbtuWFibQUVPxTgPp/exhdGe2fBPkNRtQFdX
-         6ivpQ4HqgJGqUqDtecPVsygRw9YpPunVvQ3kIxXOfamdEjaNppVFYnJfIMtiMHh2nLYF
-         tZI1ndYvoPv9e8X8qnBxJ7j5/PRG+SnhSEDtdsh6ypAYgNCZsj3CZRWFd28bA1MwEdIT
-         1xEly/9uQ9JRJa9zIR4Ah+eArcQQS6XVC7OXvOiQSI6jhupIGbYJ1f/wD9FyBMV6WCmt
-         ZLfA==
-X-Forwarded-Encrypted: i=1; AKwUvBwPDkXmdcqeXPrJNMKoEjZNEcMVSISND+oc5Yt3wc2UECmAgv2tCDBbuC8+cj14ZQoxndCXrqYcoFFaZig=@vger.kernel.org
-X-Gm-Message-State: AFuF++lGVmxvMt+791k0mJc/jWIZe+bMIXExK1RcLZBAM8sPqQ6ASMWz
-	ANxYsFf2WekPFHlcbMiRdX2NWazhcM76xcNELFwLSgzDQ7meRQC18AjS
-X-Gm-Gg: AYBFou3pVAL0CS/bZXwoqXO06tVc3QBxJfV3dfcDbZJ88FksLa2Perhvnah/KZKp3i8
-	JyMa3u3PXj4RgMiN2/bher23OIHy1/LGAisp5tDybo0nQ1drYPNL1BCrfSPg8d9nRWrLwOOmt6k
-	Pnw9YWjX9EfOScJdadtdF4nyUikMi3oWozeEJsVpyMSWR/3yRWmdZqhTJ3NYdLnGH5hi8g3KeY0
-	mdKgbnEF6VvpG8O2ikA5I7x4b1693N+hfuAstoEzQmX0G14y1j1uI6ac0nwVdkwG1t1GsW7QAxg
-	cD5+xr+f30TJy6oLim7DkFnY7sTmIHXYPfapcQRWjQHFnKu8xDTLvGLNqF1PNvw5KsIkRTw+u2u
-	qBNXeY6maGiMfIg1kd6iGQv12Mx3XUmSEw7tjP1WODVPKVgHiKudzqWzS0XW/xt+bbu9ulGfBcV
-	8vjgABMvnwffU4MePgx0XkFbKsMDnEtAdBOcRsqekfdzeMTNSP4pr0rtVaH1WoAlU6rGFd8e0Qh
-	lDuICqzVi8l
-X-Received: by 2002:a05:6820:184c:b0:6df:4bc0:384f with SMTP id 006d021491bc7-6e09e18382amr6405291eaf.50.1791196878033;
-        Mon, 05 Oct 2026 03:41:18 -0700 (PDT)
+        bh=FJDzU01PRMGfsOq91vpjrIzA8vEoMao+CRPEWuyQBK8=;
+        b=u65WYWLvSQjjQNKc6+2TaTUL7quFhZ0e4ZLtdfy3e8gWPlXcoDheTsf8JUmtbvimDt
+         TIL/Zx+mhXKfZZcBbNJ75I/UmPaLOf/otzVK87mq+GUEHqmF8BrCiUvFGfFQ+08EI3J5
+         daNF+esZN7fKfa+2X/sKo8oBak9wn5XYxIDQScLa1DyHMSxSJc0v7KFeeW4U9hGjXffi
+         QCg/GaG1UZBT2DkAnuHV0M8MNI5TYpe3LScjc12tXcssEJhGK+zz0MK4Im4Kq2/V0PQC
+         UhHfW46BM8EbXaXEI1e4qBEWr4smx7NAFHRkiOKIHr6hJCj8t/sn1xi7Ld43CHeJJ5Im
+         J3Hg==
+X-Forwarded-Encrypted: i=1; AKwUvBxLSR5levbqqr6IimSeyfpAJwDTAnZMn4L3SykejMd9WH7uIq9hadfX0uyvJO/T88B2i630SKGhadGY9KE=@vger.kernel.org
+X-Gm-Message-State: AFuF++kO/keL19MCpIpswWPOnaUPcBxoegHnmB+uQE9jwTzGTbODAllh
+	ixBT8FxU4jtj7mXDbYeU9oCgLaC6pd0qlQvAmusMgMKsCMbk6YBRU55MJMqO2DQo
+X-Gm-Gg: AYBFou0FTnd6RBlRGmJ7G0lJVukdq1mZerx29emIJ44xE+0V7Ruo793+adgnFr9ozuF
+	Ss9LxEzYYdb0vbogMp/+V0GzuTrc15U+ITzCogw0bNTorTMt7C39KS81gLA3mNias8jgzBoBT5L
+	tH2azAJarmARx68vqnm1RdKv+zHg2VICIxGS1OlPWYtPOmM3vyiyCCbDgoqlzVEHKp9/XA4uJjx
+	2M7NLaryfZqnvSoG5s3usZc7JDF576mWOdjsoPU1bEJWFsa5qgKpbhcKhUiVGpncJUgBeC9AERl
+	DNlaivToXMCyspng39QV53ENX2KosKqWUIX7ikow0R7N9GphOITxHxOJrjxVHdVH0ak8ce4bgoa
+	fb8jENGCm+1Cp5Gpn+zEgvLJ3ekNSJn16ZLny4/NE4oa2Aby7z9DyzBdXDN2TKqi2K6jnv3NY/7
+	AM8FRrK9mHyfF1W1EsQx+CeQovDVzlAhDhpfSS2hWPqCtjp/7nFg7PioomxmcHYUZyNxFOL/vbV
+	/OKbx43OlMz
+X-Received: by 2002:a05:6870:c1cb:b0:486:8f66:d389 with SMTP id 586e51a60fabf-49e15c54c1cmr9259624fac.10.1791196880739;
+        Mon, 05 Oct 2026 03:41:20 -0700 (PDT)
 Received: from sheng2080.cmix.louisiana.edu ([130.70.15.5])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-49e16ebfef1sm7881883fac.13.2026.10.05.03.41.15
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-49e16ebfef1sm7881883fac.13.2026.10.05.03.41.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Oct 2026 03:41:16 -0700 (PDT)
+        Mon, 05 Oct 2026 03:41:19 -0700 (PDT)
 From: lzhan011 <lzsx618@gmail.com>
 To: nathan@kernel.org,
 	nsc@kernel.org
 Cc: rostedt@goodmis.org,
 	linux-kbuild@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 7/9] modpost: fix pointer arithmetic on NULL in parse_source_files()
-Date: Mon,  5 Oct 2026 05:40:48 -0500
-Message-Id: <20261005104050.1786222-8-lzsx618@gmail.com>
+Subject: [PATCH 8/9] sorttable: avoid pointer arithmetic overflow when locating sort_needed
+Date: Mon,  5 Oct 2026 05:40:49 -0500
+Message-Id: <20261005104050.1786222-9-lzsx618@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20261005104050.1786222-1-lzsx618@gmail.com>
 References: <20261005104050.1786222-1-lzsx618@gmail.com>
@@ -81,42 +81,37 @@ Content-Transfer-Encoding: 8bit
 
 From: lzhan011 <zhangleizhen645@gmail.com>
 
-parse_source_files() checks whether a dependency is in the same directory
-as the object file with
+The location of the main_extable_sort_needed variable is computed as
 
-  (strstr(line, dir) + strlen(dir) - 1) == strrchr(line, '/')
+  (void *)ehdr + shdr_offset(sec) + sym_value(sym) - shdr_addr(sec)
 
-When the dependency is not below dir, strstr() returns NULL and the
-pointer arithmetic on NULL is undefined behaviour. This happens for
-every module with dependencies outside its own directory, and UBSan
-reports:
+which first adds the symbol's virtual address (e.g. 0xffffffff8...) to
+the pointer and only then subtracts the section address. The
+intermediate pointer overflows, which is undefined behaviour and is
+reported by UBSan.
 
-  scripts/mod/sumversion.c: runtime error: applying non-zero offset
-  to null pointer
+Subtract the section address from the symbol value first.
 
-Check the result of strstr() before using it.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Fixes: a79f248b9b30 ("scripts: Add sortextable to sort the kernel's exception table.")
 Assisted-by: Claude:claude-opus-5-5 UBSan
 Signed-off-by: lzhan011 <zhangleizhen645@gmail.com>
 ---
- scripts/mod/sumversion.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ scripts/sorttable.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/mod/sumversion.c b/scripts/mod/sumversion.c
-index 3dd28b4d0..4c59e7cfb 100644
---- a/scripts/mod/sumversion.c
-+++ b/scripts/mod/sumversion.c
-@@ -364,7 +364,8 @@ static int parse_source_files(const char *objfile, struct md4_ctx *md)
- 		}
+diff --git a/scripts/sorttable.c b/scripts/sorttable.c
+index 88e49a5c4..0425e00c4 100644
+--- a/scripts/sorttable.c
++++ b/scripts/sorttable.c
+@@ -788,7 +788,7 @@ static int do_sort(Elf_Ehdr *ehdr,
+ 	sort_needed_sec = get_index(shdr_start, shentsize, sort_need_index);
+ 	sort_needed_loc = (void *)ehdr +
+ 		shdr_offset(sort_needed_sec) +
+-		sym_value(sort_needed_sym) - shdr_addr(sort_needed_sec);
++		(sym_value(sort_needed_sym) - shdr_addr(sort_needed_sec));
  
- 		/* Check if this file is in same dir as objfile */
--		if ((strstr(line, dir)+strlen(dir)-1) == strrchr(line, '/')) {
-+		p = strstr(line, dir);
-+		if (p && p + dirlen - 1 == strrchr(line, '/')) {
- 			if (!parse_file(line, md)) {
- 				warn("could not open %s: %s\n",
- 				     line, strerror(errno));
+ 	/* extable has been sorted, clear the flag */
+ 	elf_parser.w(0, sort_needed_loc);
 -- 
 2.34.1
 
