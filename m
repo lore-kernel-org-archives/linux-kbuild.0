@@ -1,35 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22D2F480DDB;
-	Mon,  5 Oct 2026 13:14:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E46B8486404;
+	Mon,  5 Oct 2026 13:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791206063; cv=none; b=mneWeTnUpikwHwh6Jepw2jUw+BXeZStXNj7Rew3vls3gWv+OUpJRUQfdhMepRtHLkZrKpz93asqqgmg409COpJX7DFnkaIQ8okI9k7145WhXoeBaUs0Ro0WxvkKpUcQufBNwpnWxGSV6eKPy9fjTUyJPpIVkUEHuNy0jlMdCFbA=
+	t=1791206423; cv=none; b=uCqtVTBW+CExYIy7OUMf0endl/nsyyOIpd6/x92YCpVLB5LgXyBuwjjRKt0lvbrAywJhjkoba6kCDAwY70RQpZCwtN5mWf8reRY5omXscjZALigvu9/6AHHeki3AJUk9kIMxQpsh0wb1Jw8PufvbTovxt4+MBcf7mRnQgo/jcnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791206063; c=relaxed/simple;
-	bh=fQawUH8hbyVpnUwWmOcVqTrwEEXo93CPJjDB0oqOgtk=;
+	s=arc-20240116; t=1791206423; c=relaxed/simple;
+	bh=5DwqDwXIiSWLHvgF7F2iphKrSj/lwK4eJF+zfDfdelw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OlB5c4dbgAPjYDZhwIsasYM0xblQfS+sD3RUSOmNkd0fuOQ3dYo+DeMuGBFtPBJ7MwD+sD6/XuLvog0Sc0AYwEZDRaIwLdUWMWpYgksPNypN9UpK+j5eBpcJRWXehVztwmBvCp6iXhqW4NB44DOzmbW84lM1bXkTIRgnR7CMksQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gYZYcEHy; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=UwbFUcRL6AJavJDxXqxcICDiNC9zy3Q9pNFloxu10PoIm2lcHtmIez1NVavD0ci1QtravxRBaE5iz54SCYKd0yBSc9kOdGqk/iii/eL0LVSi6x49J8HVIxuJjU+8iFoopqcvviiFR3ES1tUkeH2+FEgFOQ98W9OLMDbzr1T27wQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YhLXFRsv; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gYZYcEHy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A89801F000FF;
-	Mon,  5 Oct 2026 13:14:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YhLXFRsv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F3901F000FF;
+	Mon,  5 Oct 2026 13:19:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791206061;
-	bh=S7OLgiDXmXYVLCGYMMvYHH5jexIOHRzBB7fVyc9tpB8=;
+	s=k20260515; t=1791206399;
+	bh=5DwqDwXIiSWLHvgF7F2iphKrSj/lwK4eJF+zfDfdelw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=gYZYcEHyRLxkX1fBkMYLHlNzVcOUJooTFgFVF57IUb+RYdXV+DmT8LgFq4aHtW2/S
-	 LvXUUR4HvR1gSm0gHo2NLf0Y/ViqoKKpSOmN1Llod/tg1wiim67bIjoIJPl4Ypmh8R
-	 4dZl7JIf7Spx1D3LkZqgblDOzk3HKetsen9xm9Jt8F7pgruwm7hIWCHIqvOWcoupQL
-	 VLhgf1CwPrtUdWUpcrBypQsSBPJ6wr6m/Jr/RdXy8W62E7bFmT7ABWUXet39d2pz0r
-	 Yzht3mz1wP+ZGKNmQEqlMid4VO2w8qHqqCI+JCgP80x08RZDpvOy0kQg/onpiqoI1r
-	 IMNUJytf/E+1w==
-Date: Mon, 5 Oct 2026 15:14:17 +0200
-From: Nathan Chancellor <nathan@kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Mark Brown <broonie@kernel.org>, Nicolas Schier <nsc@kernel.org>,
+	b=YhLXFRsv2UluxEgaCUBBxV60KvQS5EvNBbG81/s/HOLvmRPKm2LdeZAGGFXTUe1bg
+	 vsFjP8RBY7xeBY4gJwEnbJyS6YkE0R62d7DzHsbuWPiEntPciOeQZN6QE5OSYEkeXH
+	 egrjVHdWdIJNVcHRNI5iW7c6Anhqm2vM22Ta14AnLZ4IMQ56tIEOaIb3QfLrC1q858
+	 e9xA60ZdxEkQQKMs/fFMGkyjGyGQAvA0s4iFg+kvoNSj+DwpoFShwtd6xT7s7O139W
+	 KloFl4cKdRZ3eraRIn2piktlmCYxCaJtpbcCulo5oKgUYRNFfj13QEDIswc9fzMRjy
+	 LVFX504IdpkYQ==
+Received: by traversing.sirena.org.uk (Postfix, from userid 1000)
+	id 2D41E1613A5E; Mon, 05 Oct 2026 14:19:56 +0100 (BST)
+Date: Mon, 5 Oct 2026 15:19:56 +0200
+From: Mark Brown <broonie@kernel.org>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Nicolas Schier <nsc@kernel.org>,
 	KBuild Mailing List <linux-kbuild@vger.kernel.org>,
 	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
 	Linux Next Mailing List <linux-next@vger.kernel.org>,
@@ -38,69 +41,51 @@ Cc: Mark Brown <broonie@kernel.org>, Nicolas Schier <nsc@kernel.org>,
 	Wilson Felipe Pereira <wfelipe@google.com>
 Subject: Re: linux-next: manual merge of the kbuild tree with the
  mm-nonmm-unstable tree
-Message-ID: <20261005131417.GA1097851@ax162>
+Message-ID: <asOj_J9GELQiip9b@sirena.org.uk>
 References: <asN8duP-cEdNqP5I@sirena.co.uk>
  <20261005060713.afde74805e607478d6bda2ea@linux-foundation.org>
+ <20261005131417.GA1097851@ax162>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="VxenrHt5dJuGmhp/"
+Content-Disposition: inline
+In-Reply-To: <20261005131417.GA1097851@ax162>
+X-Cookie: Use the Force, Luke.
+
+
+--VxenrHt5dJuGmhp/
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261005060713.afde74805e607478d6bda2ea@linux-foundation.org>
 
-On Mon, Oct 05, 2026 at 06:07:13AM -0700, Andrew Morton wrote:
-> On Mon, 5 Oct 2026 12:31:18 +0200 Mark Brown <broonie@kernel.org> wrote:
-> 
-> > Hi all,
-> > 
-> > Today's linux-next merge of the kbuild tree got a conflict in:
-> > 
-> >   init/Kconfig
-> > 
-> > between commits:
-> > 
-> >   d514d23689356 ("init/Kconfig: make config INIT_ENV_ARG_LIMIT user-configurable")
-> >   9998f5eea1407 ("init, arch: make CONFIG_COMMAND_LINE_SIZE globally configurable")
-> > 
-> > from the mm-nonmm-unstable tree and commit:
-> > 
-> >   f85147b291e35 ("kbuild: move the toolchain checks into scripts/Kconfig.toolchain")
-> > 
-> > from the kbuild tree.
-> > 
-> > I fixed it up (see below) and can carry the fix as necessary. This
-> > is now fixed as far as linux-next is concerned, but any non trivial
-> > conflicts should be mentioned to your upstream maintainer when your tree
-> > is submitted for merging.  You may also want to consider cooperating
-> 
-> Thanks.
-> 
-> > diff --combined init/Kconfig
-> > index 914c4c3ed7ee4,352601b44b5ca..0000000000000
-> > ...
-> > [250+ lines of diff]
-> >
-> 
-> yikes.  I think I'll disable Wilson's command-line patches until after
-> kbuild has merged up.
-> 
-> After kbuild is upstream I'll take a look at resurrecting command-line
-> patches for a late merge-window thing or I'll bump them into 7.4-rcX. 
-> Probably the former.
-> 
-> kbuilders: please try to merge early!
+On Mon, Oct 05, 2026 at 03:14:17PM +0200, Nathan Chancellor wrote:
 
-I plan to submit my pull request for 7.4 between 7.3-rc7 and 7.3 final.
+> That said, I fail to see where the conflict comes from between these
+> changes. They don't touch the same area in init/Kconfig. If I pull
+> mm-nonmm-unstable into kbuild-for-next, I don't get a conflict in
+> init/Kconfig at all, I only get the one in scripts/kallsyms.c that was
+> mentioned in another thread. Is something else going on here?
 
-That said, I fail to see where the conflict comes from between these
-changes. They don't touch the same area in init/Kconfig. If I pull
-mm-nonmm-unstable into kbuild-for-next, I don't get a conflict in
-init/Kconfig at all, I only get the one in scripts/kallsyms.c that was
-mentioned in another thread. Is something else going on here?
+Yeah, I was confused about what git was complaining about with this one
+too.
 
--- 
-Cheers,
-Nathan
+--VxenrHt5dJuGmhp/
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmrDo/sACgkQJNaLcl1U
+h9BTHwf+MXBjh07LUzmBwAbcYJbdQEw54qdIPo/lFiXUjBOdwj+5igyNdXjKV/XL
+8N6G/y3cWTgILDTtOJ3P8jFsmusNkai1UawDjFYRXa6UYBqQ25zTM8+l9OaqCtuS
+y0r+dzsTiXehpI48Q1UlSneVDDx6w7kXoee4FHROyzgnhRUc9uB99mQtSWYVH8KH
++8SKchzJMNzJxIxbRAA5EAWfIcEcrzCEY7tK1/UW055BhHFzIJKOm4A2QGUECNk2
++x9Wnz61J+4q8DKfwTdwzGKR8MFtnZXbxiy5B8skokzsJV+UA4m/lhzIsIp7OT+B
+7bOGJXDWW53l6VWhcVB8IHDbn9/Qbw==
+=/rfz
+-----END PGP SIGNATURE-----
+
+--VxenrHt5dJuGmhp/--
