@@ -1,69 +1,69 @@
-Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53])
+Received: from mail-oo2-f43.google.com (mail-oo2-f43.google.com [74.125.231.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7EBA43F8CB
-	for <linux-kbuild@vger.kernel.org>; Mon,  5 Oct 2026 20:24:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C5904DDB5C
+	for <linux-kbuild@vger.kernel.org>; Mon,  5 Oct 2026 20:25:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791231887; cv=none; b=CSQ6G5KIsfl/Fnmna6E84CykC9Mq9wYHrJiOoZhnc5WOjp9q0bArbHhqEzw6DEkHtffkOBvThGxYKWWjBpvcJd3FZbp2e8QIxdeAsMD6SQENau9DaZioTdoW+z0LVOr6CGq3EXZVNFV+ApLU/I7NdhdZA6dCKwVS9kKwkP2DFKk=
+	t=1791231905; cv=none; b=tW2NkWgkmeMHCDHK2sTDljS7oTCcKJ7u7vch3YXykM+6r64Ap1h4Rgr6T/271MrGVW92wc4u7a1x78/E/zn7xGdZVE7q6WhCSGDEvTjxrJ2OBZ59PYZ6ddQ9v1dAmrCkmjC5zlodR5DYnTqg4t0IbMmSoNSolTTXEHMv87U3ykI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791231887; c=relaxed/simple;
-	bh=jmTMucWYGQFKnMjqnlPVCplSDTU2Veuev6wShH0XE/k=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=llgN0IFzrS6h/Yi31izbsYzemGenmNpM9VhXCE8A65G7moIwxACgan1umDdFPrZ+2zpaarvwsfuszXudGMu2eenDft6wR+dTmVm5VI1qHzlqOrqaazlt+0OtlBdQqydtFpaaY+TOcM6ecZ2JDXDygRunjMmrYJwUEoDYmzjDBeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KdCq9H6T; arc=none smtp.client-ip=209.85.160.53
+	s=arc-20240116; t=1791231905; c=relaxed/simple;
+	bh=Ato9zk31HKdJV/Amow1IntJf8hff2tqic020xwxddww=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=E/EonLj6svYuxcEKCPO0yryZVhmlOTOZwA1slDgHMHGVMvV75xHel/oo8ts8SKuVktv+Omx+g3EA1dsi/exAP8zMFppkaTdv4UB9Oj/l0AlG2S3TyKVnmrqSFSp1+npcKfsf1EkNYarELn/FxnWP7WjnaDWfmyMMelnXt2MbpMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VtQNmDc8; arc=none smtp.client-ip=74.125.231.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KdCq9H6T"
-Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-48ed460be50so1257533fac.2
-        for <linux-kbuild@vger.kernel.org>; Mon, 05 Oct 2026 13:24:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VtQNmDc8"
+Received: by mail-oo2-f43.google.com with SMTP id 46e09a7af769-8226a912bc9so2718642a34.2
+        for <linux-kbuild@vger.kernel.org>; Mon, 05 Oct 2026 13:25:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791231884; x=1791836684; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1791231900; x=1791836700; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=1qqRgcO/AZeDpuarAytPRHqtFdoLEfnXj6tihzK2Sew=;
-        b=KdCq9H6TfyL6QPCeIjl64s3dDMl22T7GIsnuUzG8XNndds2LLgVzbPpJO1V2y0Nxzv
-         kCIuS7OaFVsi3wp96L7nxUV3BLXVjLnj12VjBl+Mm9N7JGwrRIwUctyiC6ACf1L7CWhT
-         Bo1hR+HrejgR9jX6AlMSkBB3i82GmHVyiLvmh04Yb7DXb/nRgQm6gVxkKAXswh16f+H2
-         qjQAreAxaMVg0FlyfYIgFckK+KyaIKBcYBGdyHFk1+cCB4UbZ6Lt6kdle5+d/NG0pXO5
-         6b5ImZg2IsJieqVGZxb4JkA1ruShxl3TjSNfycBwxk2je8nJbxZyqvKvuknuluWHTp6J
-         4d6Q==
+        bh=ls3CBVIE383Zf0UiuPGgAzT1wZIZYrRMGVg+IGaAqgo=;
+        b=VtQNmDc8plFA6b7Nhy0zH3iGKcmoXBq7Wn89uMr4I7nNB/25Ixs92q90cY/+uJaLIC
+         tEsTNEmu8jX/SooSpDF/ZX27AwBNoe99VH37cOL0rvGR4B3uLJmwOohc9jMffs+ozEIJ
+         FvqMpXbUfN+7YzkSGY2YwpcQ9gDOrt+rYAW1HIIK2aQ68A2XXsIp3wHf86zW871f3ht5
+         4MnodD10S8hUQr+/rQRgAT6hOCmZH0WaQyFt0315pvfr0u1Vyvg0KNhZS8ZY24t3wh4/
+         Ot4j3qBXtUiOGddq8zt1o3iUATdmWgItjqUnEmqHGC7R6n8uScH9ErcRloytOyLmh5b/
+         Cw9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791231884; x=1791836684;
+        d=1e100.net; s=20260707; t=1791231900; x=1791836700;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=1qqRgcO/AZeDpuarAytPRHqtFdoLEfnXj6tihzK2Sew=;
-        b=lBKKPxST39k3dRASqbfqMGlvvoWhJllQlTkL2GZ5CBBRdSTTPVsFOWQb6CcEM6eRxz
-         0D2xeC8Fqpjt3kQy73VymOFyiBPAAP+zOwiFxpvFfsa2jz8VqnEuI2vLT/re16CQ1fCo
-         E9HDxM+xjNF3Tc0zpuoPJrkLwrKBVnSJqpOb7UbNCJoNcaWvovufGNCMAfKPFtYwTk6S
-         W1IhmIK6uWLDs7CBjziea1RiWWGdwsNfo/kYIiNd4n3vvQNeDGO4VmpP2SLRxFodAMs6
-         /zgNnhg7tCstLkSILGll2AKOBGQdn5brf2JKMGbiz+rEs9/wfn+J1j9BAzUMyRy9PvMe
-         c62g==
-X-Gm-Message-State: AFuF++klrxX90ZkzvNzKQ2Y9J1/oGY2JFV+VAmEzAQb4oKMbzArfie0k
-	HsOyDiOxYuziz+2EAcvu0bEFJYZhix84Nhd2zDUzK7vI7OS/I963zA8ii0mtT5pu
-X-Gm-Gg: AYBFou2MXlEORLqzDdEoy/uAYqSbacwz14HzlisufurQNBWQMVmMWRUtpm9f1wE0m4W
-	BEPqyWWO3lIdogGlYSUAbvoM93jf98DYQv+lxfkVV3mP/JJWesrBXMn99WnMK6gq4EDHD/ju93c
-	pO9f80epcbgtldc1IgWLl30qKKIxkROsXkwo2NkVomEmbtb0mVLRsjmZ5Elau2ioo1lxJ0suQii
-	WoCeWFsGifhhAmQRU2OgjjODBBaJJjwU6qBxu5L59+WiFaoajD3yf6Z8+nou2QQrjEkzPoQYf6k
-	OGSYn+iZWFqPVnxZQvcv1uMwJrrut2J/52oPvhjshfQI8eb4elMzzN9gEjK1XCe44AhFYtbPpCa
-	sfSiqYnSWEOeYhknRQY+SebEWGsRuNSFauzl6yLQuNkFzD8u6irvrQtdlLZwQT+fmSo/rxZ6Zrw
-	rsS1BrDU4+yG1ua3EVyb0u4AlxwONNjGLp8Um5xjIzJsO1LcfH74Y8aEs/NWWmCmYfshGH8etXf
-	0mOowHNWncKIA==
-X-Received: by 2002:a05:6871:3415:b0:47d:2b69:8d11 with SMTP id 586e51a60fabf-49e3a891f1amr6657581fac.31.1791231884430;
-        Mon, 05 Oct 2026 13:24:44 -0700 (PDT)
+        bh=ls3CBVIE383Zf0UiuPGgAzT1wZIZYrRMGVg+IGaAqgo=;
+        b=b8EUhQFQfJHoDuPC8tnufCH4ya5t+7c1wBuY1rSqHGDzAdZ4nk39VkCM+eERtxERGN
+         Byp46qcQ8k8fUB/weQzgDkjYvCUgrVhWrnbLzyGdMj4RFjGZ5R5abEs+Ydc9Xyid3iRX
+         Ruj+i+QefuQifQSBdp1q0r+jMKcVZIdzUFKAV+ExmVukSCI2vbsXznBn5cioZ0SeS+OV
+         YzWLlhSEqiaO/IsxzdOpNbh/ighhKrn8V7ZHeW5OQd95fXTEySV2yNKNXM7MuiO8k+c5
+         2LE8rxJDZ03k5Zhc1iQi/gmDq2F+AVNk3r78i6sM7yVBzhlCSH6iWshyIhtmifg6/gf0
+         HM2A==
+X-Gm-Message-State: AFuF++lP/i932QcVYGt9bOhfd/YTkV1tdzZQbXtWnE/jN2dNSeWPerK1
+	RqE3rKlfRwvGpQfJAMYnfna5SBbsBNXZTPhOWU929e6GWvWRp3DmJlRSFbNjkyZp
+X-Gm-Gg: AYBFou0QAmcVG3FxArmKCwa+8SmPZVoexW+SAWaOMKpQ7lIefJqxln2MmHktgjIV8JV
+	QNuLYXbpaWUsCacnlDUwZ6ncQPjT1LF19V9x6AhuxpsIqUnUvzatPARiTCvllogg6+Z0VGbftCb
+	TdTiX6aye2GESt4Kgo8lGwrcUzh3rBbFoXs3N2ZdH4Ljrl0TxzbiST11hV5p3puKaCFMIlLCA17
+	FzumsjpDNfZQmelMBmdumgz7uOUvzZ7/t+pb4H8tpmhbQE4EdNQnUt5WULRr6e0ooz5QMdgnlje
+	pVG8SbKp7Q/ifz43ruEt/O1xr6wxlLLjc/kM2qDzRqS/rNkvi1t8wbCMpGcAdVYGdp5oq7j4SrB
+	mjE7RpAOIFuv3W11uOsHHjEluvAZGUzzQEWAaLUoYcrYvuMGrV5p8MlvEW9SbRvO5CXkUjAX1tw
+	jEove5cqXj82MhyOnKX50+7+ffwDLxG1VKjBI1hwUxyVyAfLEi4Cc1PD7xIX6BolbP4k2oLzH/9
+	p44vm76dpC2
+X-Received: by 2002:a05:6820:200e:b0:6b7:46fa:169a with SMTP id 006d021491bc7-6df34c6fc30mr9544328eaf.47.1791231899934;
+        Mon, 05 Oct 2026 13:24:59 -0700 (PDT)
 Received: from sheng2080.cmix.louisiana.edu ([130.70.15.5])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-49e98e47b7bsm1040760fac.15.2026.10.05.13.24.41
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6e4c404e317sm321754eaf.13.2026.10.05.13.24.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Oct 2026 13:24:43 -0700 (PDT)
+        Mon, 05 Oct 2026 13:24:58 -0700 (PDT)
 From: lzhan011 <lzsx618@gmail.com>
 To: nathan@kernel.org,
 	nsc@kernel.org
 Cc: linux-kbuild@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] kconfig: fix use-after-free when a variable refers to itself
-Date: Mon,  5 Oct 2026 15:24:33 -0500
-Message-Id: <20261005202433.3460844-1-lzsx618@gmail.com>
+Subject: [PATCH] kconfig: fix infinite loop in conf_choice() when no choice value is visible
+Date: Mon,  5 Oct 2026 15:24:51 -0500
+Message-Id: <20261005202451.3461265-1-lzsx618@gmail.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
@@ -75,109 +75,47 @@ Content-Transfer-Encoding: 8bit
 
 From: lzhan011 <zhangleizhen645@gmail.com>
 
-For a simply expanded variable, variable_add() frees the old value of an
-existing variable (or allocates a new variable with an uninitialized
-value) before expanding the right-hand side. If the right-hand side
-refers to the variable itself, which is a common idiom in Makefiles,
-e.g.
+If a choice is visible but none of its choice values is, conf_choice()
+counts cnt == 0 visible values and finds no default. When the choice has
+to be asked, e.g. because a new symbol was added to the same menu
+(oldconfig, syncconfig) or because stdin is at EOF (oldaskconfig), the
+loop that maps the answer to a menu entry never finds one and the
+while (1) loop repeats forever, printing "choice[1-0?]: 0" each time.
 
-  X := 1
-  X := $(X) 2
+This happens in the tree for s390 when the compiler supports none of the
+-march=z* options (e.g. a non-s390 host compiler), so that all values of
+the "Processor type" choice are invisible:
 
-the expansion reads the freed (or uninitialized) value. With ASan this
-is reported as a heap-use-after-free, or a SEGV if X was undefined.
-Without ASan, X silently ends up as " 2" instead of "1 2".
+  $ make ARCH=s390 defconfig
+  $ sed -i '/^CONFIG_NR_CPUS=/d' .config
+  $ make ARCH=s390 oldconfig     # hangs
 
-Expand the right-hand side before updating the variable, initialize the
-value of a newly created variable, and only free the old value when it
-is actually replaced. Add a test case for this.
+Before the removal of tristate choice support, conf_choice() returned
+early in this case. Do the same when there is no visible choice value.
 
 Found by fuzzing Kconfig input with ASan/UBSan.
 
-Fixes: 1175c02506ff ("kconfig: support simply expanded variable")
-Assisted-by: Claude:claude-opus-5-5 ASan UBSan libFuzzer
+Fixes: fde192511bdb ("kconfig: remove tristate choice support")
+Assisted-by: Claude:claude-opus-5-5 libFuzzer
 Signed-off-by: lzhan011 <zhangleizhen645@gmail.com>
 ---
- scripts/kconfig/preprocess.c                  | 21 ++++++++++++-------
- .../kconfig/tests/preprocess/variable/Kconfig |  5 +++++
- .../tests/preprocess/variable/expected_stderr |  1 +
- 3 files changed, 20 insertions(+), 7 deletions(-)
+ scripts/kconfig/conf.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/scripts/kconfig/preprocess.c b/scripts/kconfig/preprocess.c
-index 783abcaa5..db226898c 100644
---- a/scripts/kconfig/preprocess.c
-+++ b/scripts/kconfig/preprocess.c
-@@ -293,27 +293,33 @@ void variable_add(const char *name, const char *value,
- 		if (flavor == VAR_APPEND) {
- 			flavor = v->flavor;
- 			append = true;
--		} else {
--			free(v->value);
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index ca6d9d735..31c6fd25e 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -483,6 +483,9 @@ static void conf_choice(struct menu *menu)
+ 			}
+ 			printf("\n");
  		}
- 	} else {
- 		/* For undefined variables, += assumes the recursive flavor */
- 		if (flavor == VAR_APPEND)
- 			flavor = VAR_RECURSIVE;
-+	}
- 
-+	/*
-+	 * Expand the value before touching the variable because the
-+	 * right-hand side may refer to the variable itself, like
-+	 * "X := $(X) foo".
-+	 */
-+	if (flavor == VAR_SIMPLE)
-+		new_value = expand_string(value);
-+	else
-+		new_value = xstrdup(value);
-+
-+	if (!v) {
- 		v = xmalloc(sizeof(*v));
- 		v->name = xstrdup(name);
-+		v->value = NULL;
- 		v->exp_count = 0;
- 		list_add_tail(&v->node, &variable_list);
- 	}
- 
- 	v->flavor = flavor;
- 
--	if (flavor == VAR_SIMPLE)
--		new_value = expand_string(value);
--	else
--		new_value = xstrdup(value);
--
- 	if (append) {
- 		v->value = xrealloc(v->value,
- 				    strlen(v->value) + strlen(new_value) + 2);
-@@ -321,6 +327,7 @@ void variable_add(const char *name, const char *value,
- 		strcat(v->value, new_value);
- 		free(new_value);
- 	} else {
-+		free(v->value);
- 		v->value = new_value;
- 	}
- }
-diff --git a/scripts/kconfig/tests/preprocess/variable/Kconfig b/scripts/kconfig/tests/preprocess/variable/Kconfig
-index 9ce2f95cb..226114e86 100644
---- a/scripts/kconfig/tests/preprocess/variable/Kconfig
-+++ b/scripts/kconfig/tests/preprocess/variable/Kconfig
-@@ -51,3 +51,8 @@ $(warning,$(greeting,Hello))
- 
- # Unreferenced parameters are just ignored.
- $(warning,$(greeting,Hello,John,ignored,ignored))
-+
-+# Simply expanded variable referring to itself.
-+X := 1
-+X := $(X) 2
-+$(warning,X = $(X))
-diff --git a/scripts/kconfig/tests/preprocess/variable/expected_stderr b/scripts/kconfig/tests/preprocess/variable/expected_stderr
-index a4841c3fd..7008e3b17 100644
---- a/scripts/kconfig/tests/preprocess/variable/expected_stderr
-+++ b/scripts/kconfig/tests/preprocess/variable/expected_stderr
-@@ -7,3 +7,4 @@ Kconfig:41: AB = 5
- Kconfig:45: Hello, my name is John.
- Kconfig:50: Hello, my name is .
- Kconfig:53: Hello, my name is John.
-+Kconfig:58: X = 1 2
++		/* Nothing to ask if none of the choice values is visible. */
++		if (!cnt)
++			return;
+ 		printf("%*schoice", indent - 1, "");
+ 		if (cnt == 1) {
+ 			printf("[1]: 1\n");
 -- 
 2.34.1
 
