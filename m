@@ -1,91 +1,102 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E46B8486404;
-	Mon,  5 Oct 2026 13:20:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C32654705B;
+	Mon,  5 Oct 2026 13:32:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791206423; cv=none; b=uCqtVTBW+CExYIy7OUMf0endl/nsyyOIpd6/x92YCpVLB5LgXyBuwjjRKt0lvbrAywJhjkoba6kCDAwY70RQpZCwtN5mWf8reRY5omXscjZALigvu9/6AHHeki3AJUk9kIMxQpsh0wb1Jw8PufvbTovxt4+MBcf7mRnQgo/jcnw=
+	t=1791207152; cv=none; b=HWGppssMkxNsPcGr4Clesp16JMTt5uiBBFT0e/XvvtpcJwVvPrAXka7/kvJ9GVOw5Cs04cV3PCTzxpGOYPskwuONRnvBoDGccFsOFZjjhoZOM1PV82Z3rakuUHUIOpkEPXVebiN7G90Y7lqOmYF7qKfZFHJa8kMMD1SHN7X5eDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791206423; c=relaxed/simple;
-	bh=5DwqDwXIiSWLHvgF7F2iphKrSj/lwK4eJF+zfDfdelw=;
+	s=arc-20240116; t=1791207152; c=relaxed/simple;
+	bh=KfbZgw+MbnLMNDvDtxjij1k4+Qvjn0s0K1i/l50Ut2A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UwbFUcRL6AJavJDxXqxcICDiNC9zy3Q9pNFloxu10PoIm2lcHtmIez1NVavD0ci1QtravxRBaE5iz54SCYKd0yBSc9kOdGqk/iii/eL0LVSi6x49J8HVIxuJjU+8iFoopqcvviiFR3ES1tUkeH2+FEgFOQ98W9OLMDbzr1T27wQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YhLXFRsv; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=cgqmZ+h5ZdKBS93w5fZVSNWhXv7t2KQC8vTtRCS50lCA7OIVlm8FzardSb3JnhO+8ke1NrZviLn6AcDFFkPfw7Fu8RN+jFyHDsp3FmRBdyLYZ6MSiADnPWRtLKc6mfWOEatUKGlY/pUZdwe18TJgtv8TKeJ92DzhWENt2hDgONc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iaCTm2my; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YhLXFRsv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F3901F000FF;
-	Mon,  5 Oct 2026 13:19:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iaCTm2my"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A2CA1F000FF;
+	Mon,  5 Oct 2026 13:32:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791206399;
-	bh=5DwqDwXIiSWLHvgF7F2iphKrSj/lwK4eJF+zfDfdelw=;
+	s=k20260515; t=1791207150;
+	bh=HwhbK90GfJPHbz/p1SAwjEYSFhNOACJ0jZSx9FAlqjc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=YhLXFRsv2UluxEgaCUBBxV60KvQS5EvNBbG81/s/HOLvmRPKm2LdeZAGGFXTUe1bg
-	 vsFjP8RBY7xeBY4gJwEnbJyS6YkE0R62d7DzHsbuWPiEntPciOeQZN6QE5OSYEkeXH
-	 egrjVHdWdIJNVcHRNI5iW7c6Anhqm2vM22Ta14AnLZ4IMQ56tIEOaIb3QfLrC1q858
-	 e9xA60ZdxEkQQKMs/fFMGkyjGyGQAvA0s4iFg+kvoNSj+DwpoFShwtd6xT7s7O139W
-	 KloFl4cKdRZ3eraRIn2piktlmCYxCaJtpbcCulo5oKgUYRNFfj13QEDIswc9fzMRjy
-	 LVFX504IdpkYQ==
-Received: by traversing.sirena.org.uk (Postfix, from userid 1000)
-	id 2D41E1613A5E; Mon, 05 Oct 2026 14:19:56 +0100 (BST)
-Date: Mon, 5 Oct 2026 15:19:56 +0200
-From: Mark Brown <broonie@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Nicolas Schier <nsc@kernel.org>,
+	b=iaCTm2mylRf5L2yDz25np2hXPnS7juatpYG6j/X7rUruFK3ban4Xcuvj8VABTFoj4
+	 QC0BBWG/oxfaegPx3vGBGtF/2Vb/SboCt/3YizkrFtnkfxsBB0cWTqhb4YVuXmI5NY
+	 P0A6rqw2HkohdJBxTCeEuzmHkR1cz552XBqXAE/wpdYOmVhC4fobs+djNp5rMVxBzo
+	 MiQzYxtdVqVsoPQyUbNqIypR3BvbmywlGuSIjSorf16Qkcsp3qDHXfqvJK17cY+Pjw
+	 O3YAQKKrbFuRWLrufzuSZzCXbDUyCJHPR1cJJZJuQB422jep2NQPCxwzOzfF2SMvs5
+	 1GVnv1oTqr0Dw==
+Date: Mon, 5 Oct 2026 15:32:24 +0200
+From: Nathan Chancellor <nathan@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Kumar Kartikeya Dwivedi <memxor@gmail.com>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>,
+	Networking <netdev@vger.kernel.org>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
 	KBuild Mailing List <linux-kbuild@vger.kernel.org>,
 	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
 	Linux Next Mailing List <linux-next@vger.kernel.org>,
-	Lorenzo Stoakes <ljs@kernel.org>,
-	Maciej =?utf-8?Q?=C5=BBenczykowski?= <maze@google.com>,
-	Wilson Felipe Pereira <wfelipe@google.com>
-Subject: Re: linux-next: manual merge of the kbuild tree with the
- mm-nonmm-unstable tree
-Message-ID: <asOj_J9GELQiip9b@sirena.org.uk>
-References: <asN8duP-cEdNqP5I@sirena.co.uk>
- <20261005060713.afde74805e607478d6bda2ea@linux-foundation.org>
- <20261005131417.GA1097851@ax162>
+	Lorenzo Stoakes <ljs@kernel.org>, Nicolas Schier <nsc@kernel.org>
+Subject: Re: linux-next: manual merge of the bpf-next tree with the kbuild
+ tree
+Message-ID: <20261005133224.GA1108555@ax162>
+References: <asAzcgDsbNEFIfKV@sirena.co.uk>
+ <20261002230632.GA314599@ax162>
+ <asA6NZ4QKp4k4nGD@sirena.co.uk>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="VxenrHt5dJuGmhp/"
-Content-Disposition: inline
-In-Reply-To: <20261005131417.GA1097851@ax162>
-X-Cookie: Use the Force, Luke.
-
-
---VxenrHt5dJuGmhp/
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <asA6NZ4QKp4k4nGD@sirena.co.uk>
 
-On Mon, Oct 05, 2026 at 03:14:17PM +0200, Nathan Chancellor wrote:
+Hi Mark,
 
-> That said, I fail to see where the conflict comes from between these
-> changes. They don't touch the same area in init/Kconfig. If I pull
-> mm-nonmm-unstable into kbuild-for-next, I don't get a conflict in
-> init/Kconfig at all, I only get the one in scripts/kallsyms.c that was
-> mentioned in another thread. Is something else going on here?
+On Sat, Oct 03, 2026 at 01:11:49AM +0200, Mark Brown wrote:
+> On Sat, Oct 03, 2026 at 01:06:32AM +0200, Nathan Chancellor wrote:
+> > On Sat, Oct 03, 2026 at 12:42:58AM +0200, Mark Brown wrote:
+> 
+> > > I fixed it up (see below) and can carry the fix as necessary. This
+> > > is now fixed as far as linux-next is concerned, but any non trivial
+> > > conflicts should be mentioned to your upstream maintainer when your tree
+> > > is submitted for merging.  You may also want to consider cooperating
+> > > with the maintainer of the conflicting tree to minimise any particularly
+> > > complex conflicts.
+> 
+> > Thanks, the 'source' line looks correct to me now. Did you also shuffle
+> > CC_OPT_INLINE_MEMSET into scripts/Kconfig.toolchain like below? You had
+> > it right in
+> 
+> >   https://lore.kernel.org/ar5-4Yq3wtmXTWnD@sirena.org.uk/
+> 
+> > but the patch changed slightly since that resolution ('4294967295' to
+> > '4294967294') due to a problem I reported
+> 
+> That will be delayed for today since the scripting has got confused by
+> me moving machines in the middle of running the merge but it has gone in
+> later in the merge so it should be there in the final tree, and
+> hopefully in the right place next time I run -next (due to LPC/MS it'll
+> be spotty at best this week, I and everyone likely to provide backup are
+> all in Prauge).
 
-Yeah, I was confused about what git was complaining about with this one
-too.
+Can you drop the fix up to scripts/Kconfig.toolchain that you added in
 
---VxenrHt5dJuGmhp/
-Content-Type: application/pgp-signature; name="signature.asc"
+  855c706f2179 ("Merge branch 'for-next' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git")
 
------BEGIN PGP SIGNATURE-----
+? I have temporarily handled this conflict in kbuild-for-next to make
+life easier for you in
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmrDo/sACgkQJNaLcl1U
-h9BTHwf+MXBjh07LUzmBwAbcYJbdQEw54qdIPo/lFiXUjBOdwj+5igyNdXjKV/XL
-8N6G/y3cWTgILDTtOJ3P8jFsmusNkai1UawDjFYRXa6UYBqQ25zTM8+l9OaqCtuS
-y0r+dzsTiXehpI48Q1UlSneVDDx6w7kXoee4FHROyzgnhRUc9uB99mQtSWYVH8KH
-+8SKchzJMNzJxIxbRAA5EAWfIcEcrzCEY7tK1/UW055BhHFzIJKOm4A2QGUECNk2
-+x9Wnz61J+4q8DKfwTdwzGKR8MFtnZXbxiy5B8skokzsJV+UA4m/lhzIsIp7OT+B
-7bOGJXDWW53l6VWhcVB8IHDbn9/Qbw==
-=/rfz
------END PGP SIGNATURE-----
+  fd79efef14d9 ("Merge commit 'ac7445c28e7a' into kbuild-for-next")
 
---VxenrHt5dJuGmhp/--
+and your fix up conflicts with it, as CC_OPT_INLINE_MEMSET is defined
+twice.
+
+-- 
+Cheers,
+Nathan
