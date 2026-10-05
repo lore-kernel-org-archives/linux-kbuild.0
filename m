@@ -1,189 +1,117 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-237.mta1.migadu.com [95.215.58.237])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9AE24A49AC;
-	Mon,  5 Oct 2026 15:56:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2546820E023
+	for <linux-kbuild@vger.kernel.org>; Mon,  5 Oct 2026 19:01:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.237
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791215820; cv=none; b=MFBjcZlBwlms/fcz/t7njeHQDTgMmLona+Rfe/aflWaH9ApQyurEOWWLyTEYQlqLWQqsERG7/QfORXOFUJx9FcWzroq5UeBMxGsOtMiiaLEWIMBvCp0Rzrrkl6pcxOEyi/lQb5WxbBNQ7J96q8nWgWrIkYnaDn7v0orSZeB1T5k=
+	t=1791226895; cv=none; b=mNhJNECHIQ6kGiEfgqk3l6gSx6WCTD6EvhwisHey+41MFKJApwvmRvrfhqQx7fMNICF68k7vH8+RVwdY2XRr8dtYwDg6/QKuq5L0wc7Ggku9UvFLMOk6Oa6BCAka0ni09UzD3NLRbmA7JcbH31vQrz06ftiqW8s5+S1F0Od2Roc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791215820; c=relaxed/simple;
-	bh=dYo2kAPf9NEmY/28ppm4ruNY+cwOypZRmKOtEoPJxYE=;
-	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
-	 References:Date:Message-Id; b=tWh4Wo+L9liYpYi1PzZK7d4kGA+CQnNVv9s8kh13EO+ixG+3Pe3jCUpPm6btf61arXNX3E4K4Cbp1lT16JTFTDS7Zai4VuZiW0mLyC1W5hHbWPFYo+PgcOBPA94GUaihq3L7abGrmL/h6EC6DY5mYiL+Tvv5ULC2k9P0aO76TZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ll6HwW8T; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791226895; c=relaxed/simple;
+	bh=rJT8G0sgga4UeEHY50WFHahh2k7AQRpW/V4C83LPcM4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=T++hxqVn/V8H76KlBdRyIxV0VGTzLhNgZRbvHyDElImvve90Wpl2vQD1/LpMHIRlRsZh/4n1ARWt/rXwEWrZp2EOQfhkP3lpwK5FDGvXiZ2dXQyJ57m0cbBWbkib9sLdz4B+/hZjxB81xq1CL9kBoPB6CmZjYhokc62ucKeXtxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ex3YDKto; arc=none smtp.client-ip=95.215.58.237
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ll6HwW8T"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 081391F000FF;
-	Mon,  5 Oct 2026 15:56:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791215818;
-	bh=kjgAz0qkfM8efwXACO7HAMNw5vpK3e6UvJXcySC2o4w=;
-	h=Subject:From:To:Cc:In-Reply-To:References:Date;
-	b=Ll6HwW8TIPiiJdluj+FtZdiAVuUPL3PBUCrGjw7qL3/3/8RG1F+s2lwRa0eLg3wOY
-	 4ozloST2gsvQI0TzjohJ2VyUtuo2x3QY3AYnACMBZz5yWu6wof5z5+1oMcubWEmhf9
-	 0XHScL7hQ3VWbeCzAiEv3MycQw90VE4dRUwjgfbejCtp5lyuZUwef8CTJ++0aBTGws
-	 Ce8PnB2Q6BlB9RtCrmOdZ2LylZRBm8FHSdDv/BfsdN2HWaU5j5KfNq4GRcC3laVjq3
-	 91tpSWOcoi96H/36wKAKMeOYxexrN4o3xKenTwqTLbYf2sdgd1uPNVF+FBdo3PcXSl
-	 CV33CYsR0FAeg==
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ex3YDKto"
+X-Envelope-To: linux-kbuild@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=rJT8G0sgga4UeEHY50WFHahh2k7AQRpW/V4C83LPcM4=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1791226890; v=1; x=1791831690;
+ b=ex3YDKtoy+UcA12btXhmpgb1+JvsoviBSb32MqtmQ5VVSUWt2GyznKgvm6UZIV5jx7Wk5S+K
+ IUPKqINgHB6DAQ5kzC5JVlIKM/9AABURZ+bfM2mqkw2PGFDrOz+vzlvH/V4QAd9zlSe2tIcIKNE
+ k5niESfFq5dn+QZyLQCQPk/c=
+X-Envelope-To: linux-kbuild@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 3eee9485e3972e9f;
+	Mon, 05 Oct 2026 19:01:30 +0000
+X-Mizu-Trace-ID: 3eee9485e3972e9f
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <7844ef03-d9b2-4a10-8f14-1b498ada9043@linux.dev>
+Date: Mon, 5 Oct 2026 12:01:17 -0700
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next v4 00/12] bpf: make the vmlinux BTF an on-demand
+ loadable module (CONFIG_DEBUG_INFO_BTF=m) to save ~5.4 MB memory
+To: Jay Wang <wanjay@amazon.com>, bpf@vger.kernel.org, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, memxor@gmail.com
+Cc: alan.maguire@oracle.com, martin.lau@linux.dev, yonghong.song@linux.dev,
+ jolsa@kernel.org, qmo@kernel.org, nathan@kernel.org, nsc@kernel.org,
+ linux-kbuild@vger.kernel.org, linux@weissschuh.net, christian@heusel.eu,
+ mcgrof@kernel.org, petr.pavlu@suse.com, samitolvanen@google.com,
+ linux-modules@vger.kernel.org, rostedt@goodmis.org, mhiramat@kernel.org,
+ mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org,
+ acme@kernel.org, namhyung@kernel.org, irogers@google.com,
+ linux-perf-users@vger.kernel.org, jikos@kernel.org, bentiss@kernel.org,
+ linux-input@vger.kernel.org, tj@kernel.org, void@manifault.com,
+ arighi@nvidia.com, changwoo@igalia.com, sched-ext@lists.linux.dev,
+ shuah@kernel.org, linux-kselftest@vger.kernel.org, ojeda@kernel.org,
+ rust-for-linux@vger.kernel.org, arnd@arndb.de, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, abuehaze@amazon.com, doebel@amazon.de,
+ mpohlack@amazon.de, jay.wang.upstream@gmail.com
+References: <44315425-c505-46fe-8379-f19d78ff3abb@linux.dev>
+ <20261004222127.31128-1-wanjay@amazon.com>
+Content-Language: en-US
+From: Ihor Solodrai <ihor.solodrai@linux.dev>
+In-Reply-To: <20261004222127.31128-1-wanjay@amazon.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH v5] scripts/config: honor $KBUILD_OUTPUT by default
-From: Nathan Chancellor <nathan@kernel.org>
-To: Dmitry Voytik <voytikd@gmail.com>
-Cc: Nicolas Schier <nsc@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
- Nicolas Schier <n.schier@fritz.com>, Rong Zhang <i@rong.moe>, 
- linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
-In-Reply-To: <20261002222119.393508-1-voytikd@gmail.com>
-References: <20261002222119.393508-1-voytikd@gmail.com>
-Date: Mon, 05 Oct 2026 17:56:52 +0200
-Message-Id: <179121581235.2275809.12565811683284940522.b4-review@b4>
-X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4756; i=nathan@kernel.org;
- h=from:subject:message-id; bh=dYo2kAPf9NEmY/28ppm4ruNY+cwOypZRmKOtEoPJxYE=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDFmHTxxd/oj7xLw5+xO8QyfdrbxtrhbC6XlFvqR7qZHBn
- 8wqX/7bHaUsDGJcDLJiiizVj1WPGxrOOct449QkmDmsTCBDGLg4BWAi80oZ/gqXvdvifP1feN/8
- MvmgngnRbsk/PYU4u7eufaZ9LlTG8BMjw5GLbS78B2KtjrhP8rrJeaMmdvnpXxOmcb1sMWc0+XG
- vngsA
-X-Developer-Key: i=nathan@kernel.org; a=openpgp;
- fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-Hi Dmitry,
+On 10/4/26 3:21 PM, Jay Wang wrote:
+>>    - If I know I don't need BPF on the workload, and these 5.4 MB
+>>      bite me, I can just turn off BPF
+> 
+> They cannot, even when they know they do not need it.  As the cover
+> letter says, the cloud provider usually ships one kernel build to all of
+> its customers. [...]
 
-> If $KBUILD_OUTPUT is set, use it by default if --file is not passed.
-> 
-> Fix the issue when the script silently updates a stale .config in
-> the root directory, while the user expects ${KBUILD_OUTPUT}/.config
-> to be updated.
-> Handle properly if the config file is a relative path.
-> 
-> The problem can be worked around with --file, but this is easy to miss,
-> and is inconsistent with how the Makefile and other tools work
-> (e.g., scripts/diffconfig).
-> 
-> How to reproduce the issue:
-> 	rm .config
-> 	export KBUILD_OUTPUT=.out
-> 	make defconfig
-> 	./scripts/config \
-> 	       -e CONFIG_UBSAN
-> 	grep: .config: No such file or directory
-> 
-> How the patch was tested:
-> 	make mrproper
-> 	export KBUILD_OUTPUT=.out
-> 	make defconfig
-> 	grep "CONFIG_UBSAN=y" $KBUILD_OUTPUT/.config || echo "OK"
-> 
-> Test the basic usage:
-> 	./scripts/config -e CONFIG_UBSAN
-> 	grep "CONFIG_UBSAN=y" $KBUILD_OUTPUT/.config && echo "OK"
-> 
-> Test --refresh picks up correct config file by using $KBUILD_OUTPUT:
-> 	./scripts/config -d CONFIG_UBSAN
-> 	./scripts/config --refresh -e CONFIG_UBSAN
-> 	grep "CONFIG_UBSAN=y" $KBUILD_OUTPUT/.config && echo "OK"
-> 
-> Test --file takes precedence over $KBUILD_OUTPUT and a relative
-> path is handled properly:
-> 	./scripts/config -d CONFIG_UBSAN
-> 	mkdir .out2
-> 	cp .out/.config .out2/.my_config
-> 	grep "CONFIG_UBSAN=y" .out2/.my_config
-> 	./scripts/config --file .out2/.my_config --refresh \
-> 	       -e CONFIG_UBSAN
-> 	grep "CONFIG_UBSAN=y" .out2/.my_config && echo "OK"
-> 	ls .out/.out2 || echo "OK"
-> 	ls .out/.out || echo "OK"
-> 
-> Test --file can accept files with hyphen:
-> 	./scripts/config -d CONFIG_UBSAN
-> 	cp .out/.config -- -my_config
-> 	grep "CONFIG_UBSAN=y" -- -my_config || echo "OK"
-> 	./scripts/config  --refresh \
-> 	       -e CONFIG_UBSAN --file -my_config
-> 	grep "CONFIG_UBSAN=y" -- -my_config && echo "OK"
-> 
-> Signed-off-by: Dmitry Voytik <voytikd@gmail.com>
-> ---
-> v5:
->  - Per Nathan Chancellor's suggestion, improved handling $FN path by
->    realpath
->  - https://lore.kernel.org/lkml/179097210878.309835.10523307262544578337.b4-review@b4/
->  - Documented the new test scenario in the git commit message
-> v4:
->  - Addressed Nicolas Schier's comments - dropped the change how '--refresh'
->    is handled
->  - Implemented conversion of $FN to the absolute path which helps with
->    '--refresh' and relative paths
->  - Documented testing steps in the commit message
-> v3:
->  - Added an example in the commit message how to reproduce the issue
-> v2:
->  - Addressed comments by sashiko:
->    - https://sashiko.dev/#/patchset/20260920064350.17999-1-voytikd%40gmail.com
->    - use basename when --refresh is used
->    - remove echo which can be misleading when --file is passed
-> v1:
->  - https://lore.kernel.org/all/20260920064350.17999-1-voytikd@gmail.com/
-> ---
->  scripts/config | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/scripts/config b/scripts/config
-> index 32428ea909c2..7e84c3d4e621 100755
-> --- a/scripts/config
-> +++ b/scripts/config
-> @@ -130,6 +130,10 @@ on_exit() {
->  trap on_exit EXIT
->  
->  FN=.config
-> +if [ -n "${KBUILD_OUTPUT}" ]; then
-> +	FN=${KBUILD_OUTPUT}/${FN}
-> +fi
-> +
->  CMDS=()
->  while [[ $# -gt 0 ]]; do
->  	if [ "$1" = "--file" ]; then
-> @@ -143,6 +147,7 @@ while [[ $# -gt 0 ]]; do
->  		shift
->  	fi
->  done
-> +FN=$(realpath -q -- "$FN" || echo "$FN")
+Ah, I get it now. Thanks.
 
-Sashiko has some further complaints about this:
+So the constraint is that the cloud provider ships a single kernel
+revision to all users, and there is currently no mechanism to on/off
+BPF other than a kernel build flag.
 
-  https://sashiko.dev/#/patchset/20261002222119.393508-1-voytikd@gmail.com
+I'd be tempted to say "just ship two kernels", it's simpler than the
+upstream change. But I understand the downsides of that as well.
 
-Due to travel and Linux Plumbers, I am not sure I will be able to think
-about the best way to resolve this before I finalize the Kbuild tree for
-7.4, so this may need to be deferred until after 7.4-rc1 is released
-(i.e., it will target 7.5). One option that immediately comes to mind is
-requiring $KBUILD_OUTPUT to exist already and only running realpath on
-$KBUILD_OUTPUT, which would leave the script unchanged for the case of
-$KBUILD_OUTPUT being unset, which seems safer to me:
+And obviously a good upstream feature may benefit many more users.
 
-  if [ -n "$KBUILD_OUTPUT" ]; then
-      if [ ! -d "$KBUILD_OUTPUT" ]; then
-          echo "KBUILD_OUTPUT is set but does not exist or is not a directory, create it before running $myname" >&2
-          exit 1
-      fi
-      FN=$(realpath "$KBUILD_OUTPUT")/$FN
-  fi
+> [...]
+>>      Keep zstd-compressed blob in the kernel image and decompress and
+>>      parse it synchronously on first use.
+> 
+> Thanks for putting this forward.  This compression approach is simpler 
+> than loading a module.  I expect the overall code complexity to stay similar
+> to v3, since both need to find the first user and defer the module BTF parsing
+> until then, but it should be easier to merge into mainline because it avoids
+> the request_module() deadlocks.
+> 
+> Would you like to prepare it for a formal submission, or would you
+> like me to do so?  Either works for me.  Ideally it lands in time for
+> the next LTS kernel, so that we can adopt it there.
 
-This would leave a relative '--file' value + KBUILD_OUTPUT + '--refresh'
-in a weird state still but it appears that commit f757f6011c92 ("kbuild:
-fix argument parsing in scripts/config") got that wrong almost two years
-ago so it doesn't feel like it is worth caring about that until someone
-actually complains about it (but I might be missing something).
+Please go ahead and submit the compression approach. Looks like we are
+converging on that. Feel free to use the prototype code if it's
+useful, it uses parts of your series anyway.
 
--- 
-Cheers,
-Nathan
+> 
+> From what I can see, most of the work left is in that deferral.
+> Whoever needs the BTF first also parses the waiting module BTFs and
+> replays the queued registrations, struct_ops ->init() included, under
+> whatever locks it holds at that point, e.g. event_mutex or
+> bpf_verifier_lock, or inside the module notifier.  So the
+> cand_cache_mutex ABBA you found may not be the only deadlock.  Besides
+> that, only x86_64 was touched so far, so it needs extending to the
+> other architectures as well.
+
+Yes, I think you are right that the hard part here is the deferral,
+because everything expects vmlinux BTF to just be there.  I don't
+think this is avoidable whatever memory saving approach we choose.
 
