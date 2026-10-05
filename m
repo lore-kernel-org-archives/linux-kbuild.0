@@ -1,182 +1,89 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B95E47DFB9;
-	Mon,  5 Oct 2026 11:33:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74D844825B2;
+	Mon,  5 Oct 2026 13:07:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791200016; cv=none; b=OA6b1DOp5X+myjozcRP3MVPfqEHdbuPDuxbFrqguE8AsjXMXP0N09p6x8lfV3zJwoudtm4ZXu6DG/XjdWzvaEMHX4zCkv5uHBrtYyA/N9zJ08C84MLjCAP/aScpo0kEpIW9Z9AUgUtjBKsffwqzR9NyD53KycH3H6AQYUC95XpQ=
+	t=1791205635; cv=none; b=JDn+o4D1OjfgLRVkv+Q4BksVr4Bk2FQYI6rgx/58kmwsGRrtwrdUZMxmSit9qJOSRgOVim3kuf9z1c1diG4kZRY+OTjMjWoQQu32WWUY+pnWgh5Wk4WY6xRIGeXLXwRRTXOasIKSyRh7R4USuxZjyea6MwLlapBX6CWQhbkW5zo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791200016; c=relaxed/simple;
-	bh=ahBIlnJEjw2sBwQJf8wwHpcKkVLVi+ixJDkQPGiwDsI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TK1thZL7s2A078pDYRxN+aKOO6rZV3pE3Yd2gZ4qXvqfYbd3qLC9/rgPnqSKBNR2Z0iGljhKpz2bTyMK6cqdVU/xmPsxKRoGO08QOUFmRAHpD7OTjw235fg5vccvTvM5Cfbu2mPPO3gxbdiqyaK3j3aZQcmIpH4LYe5lYBFNdM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=daXvwKBf; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791205635; c=relaxed/simple;
+	bh=jitezfqwji1pZx3701XLy05q7t2U4eoFU1bJbjXRNCw=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=GfPKX/fcsTzGQl9/s/VarpmN3BztuXJqWtNrccblPnAMZPdAlC9P1JaxmzrxuZbB/CS7LCGPFp4YYrl1Ntx3MDVPwCLNvvLFbgeDo/sKIYeaZCilBj8huTEa3IfIvrMOpzAjQAQd6eVagSRfRcJ1m5aWdXKkB+C0oh57Bsu9D8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=e3OeAfC7; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="daXvwKBf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9607C1F000FF;
-	Mon,  5 Oct 2026 11:33:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791200015;
-	bh=44k8QmXo0RbzfFYGwBkCWl1z3Rv7AbzCxmoTN/2j7jE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=daXvwKBfn45TTkPjYEogaW/8bzC7dWExtHjFuOSW+CTnZI8UZJqisOLHtEWUxdmjS
-	 WfR76xQK5ZicHJnvrYGEoLXulXVsrCIzmDyJ9lsvn8Rzme4/ipxNWMP0d8csQdQyTH
-	 qW0Up9Ia05nx3LwvkJ5rKWOUxTVuME3Q7ijIutS1DFPEMA2qqB/G/NducNpTv5StJI
-	 EuTNz1S1c7ZbizJub5Xe5DXhXe87wAdSVK6m/xr550MJVVsJXo+zptvU1KjUHk/VFy
-	 Ep4ud9da7IQSmdxwQ57Hqx3JmE1yzEUstTeqq86eR2N+WPAHxLwii/mxOSjLUaxaYk
-	 r6mFtzcpuM+QA==
-Date: Mon, 5 Oct 2026 13:32:52 +0200
-From: Nicolas Schier <nsc@kernel.org>
-To: Jay Wang <wanjay@amazon.com>
-Cc: bpf@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
-	Alan Maguire <alan.maguire@oracle.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Ihor Solodrai <ihor.solodrai@linux.dev>,
-	Quentin Monnet <qmo@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>, linux-kbuild@vger.kernel.org,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-	Christian Heusel <christian@heusel.eu>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Petr Pavlu <petr.pavlu@suse.com>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	linux-modules@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	linux-trace-kernel@vger.kernel.org,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>, Ian Rogers <irogers@google.com>,
-	linux-perf-users@vger.kernel.org, Jiri Kosina <jikos@kernel.org>,
-	Benjamin Tissoires <bentiss@kernel.org>,
-	linux-input@vger.kernel.org, Tejun Heo <tj@kernel.org>,
-	David Vernet <void@manifault.com>, Andrea Righi <arighi@nvidia.com>,
-	Changwoo Min <changwoo@igalia.com>, sched-ext@lists.linux.dev,
-	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-	Miguel Ojeda <ojeda@kernel.org>, rust-for-linux@vger.kernel.org,
-	Arnd Bergmann <arnd@arndb.de>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Hazem Mohamed Abuelfotoh <abuehaze@amazon.com>,
-	Bjoern Doebel <doebel@amazon.de>,
-	Martin Pohlack <mpohlack@amazon.de>, jay.wang.upstream@gmail.com
-Subject: Re: [PATCH bpf-next v4 09/12] bpf, trace, net: prepare
- CONFIG_DEBUG_INFO_BTF checks for a tristate
-Message-ID: <asOK5Gl1Oe9d5bwr@derry.ads.avm.de>
-Mail-Followup-To: Nicolas Schier <nsc@kernel.org>,
-	Jay Wang <wanjay@amazon.com>, bpf@vger.kernel.org,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
-	Alan Maguire <alan.maguire@oracle.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Ihor Solodrai <ihor.solodrai@linux.dev>,
-	Quentin Monnet <qmo@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>, linux-kbuild@vger.kernel.org,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-	Christian Heusel <christian@heusel.eu>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Petr Pavlu <petr.pavlu@suse.com>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	linux-modules@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	linux-trace-kernel@vger.kernel.org,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>, Ian Rogers <irogers@google.com>,
-	linux-perf-users@vger.kernel.org, Jiri Kosina <jikos@kernel.org>,
-	Benjamin Tissoires <bentiss@kernel.org>,
-	linux-input@vger.kernel.org, Tejun Heo <tj@kernel.org>,
-	David Vernet <void@manifault.com>, Andrea Righi <arighi@nvidia.com>,
-	Changwoo Min <changwoo@igalia.com>, sched-ext@lists.linux.dev,
-	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-	Miguel Ojeda <ojeda@kernel.org>, rust-for-linux@vger.kernel.org,
-	Arnd Bergmann <arnd@arndb.de>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Hazem Mohamed Abuelfotoh <abuehaze@amazon.com>,
-	Bjoern Doebel <doebel@amazon.de>,
-	Martin Pohlack <mpohlack@amazon.de>, jay.wang.upstream@gmail.com
-References: <20261001225214.12351-1-wanjay@amazon.com>
- <20261001225214.12351-10-wanjay@amazon.com>
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="e3OeAfC7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9ED181F000FF;
+	Mon,  5 Oct 2026 13:07:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux-foundation.org; s=korg; t=1791205633;
+	bh=Ym8fD57TQaFfPwXHnEQHQ0jtTOHEhACYrmL2ZU06asU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=e3OeAfC74li1mJtHeZR88UojvHL0s0g4rgajUh8l/WNSHpEAhA/Kwf000Ab3UmTma
+	 kVg4cWtdmFsLc39aNL6kWZvVR4WGFCC50nmhnKb2chpA0tZ99qKSAG1QF6fb6cMwAb
+	 Y5ngqRZ4052EsI6I9sb2TchAy/kkrxM5iHEsf5wk=
+Date: Mon, 5 Oct 2026 06:07:13 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
+ KBuild Mailing List <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing
+ List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Lorenzo Stoakes <ljs@kernel.org>, Maciej
+ =?UTF-8?Q?=C5=BBenczykowski?= <maze@google.com>, Wilson Felipe Pereira
+ <wfelipe@google.com>, Wilson Felipe Pereira <wfelipe@google.com>
+Subject: Re: linux-next: manual merge of the kbuild tree with the
+ mm-nonmm-unstable tree
+Message-Id: <20261005060713.afde74805e607478d6bda2ea@linux-foundation.org>
+In-Reply-To: <asN8duP-cEdNqP5I@sirena.co.uk>
+References: <asN8duP-cEdNqP5I@sirena.co.uk>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261001225214.12351-10-wanjay@amazon.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 01, 2026 at 10:52:11PM +0000, Jay Wang wrote:
-> The next patch makes CONFIG_DEBUG_INFO_BTF a tristate.  With =m, Kconfig
-> defines CONFIG_DEBUG_INFO_BTF_MODULE instead of CONFIG_DEBUG_INFO_BTF,
-> so every check that must hold for both =y and =m has to be written for
-> it:
+On Mon, 5 Oct 2026 12:31:18 +0200 Mark Brown <broonie@kernel.org> wrote:
+
+> Hi all,
 > 
->  - #ifdef CONFIG_DEBUG_INFO_BTF becomes #if IS_ENABLED(...) where the
->    generated BTF and its id tables must be the same for =y and =m: the
->    .BTF_ids tables (btf_ids.h), the BTF type tags (compiler_types.h), and
->    the tracepoint and syscall BTF ids (trace_events.h, trace_syscalls.c).
->    Leaving them would silently produce empty id sets with =m.
+> Today's linux-next merge of the kbuild tree got a conflict in:
 > 
->  - obj-$(CONFIG_DEBUG_INFO_BTF) and include-$(CONFIG_DEBUG_INFO_BTF)
->    become $(subst m,y,...) where the object is built into the kernel
->    regardless: sysfs_btf.o, the netfilter and xfrm kfunc objects, and
->    scripts/Makefile.btf.  Otherwise =m would try to build them as
->    modules (xfrm_state_bpf.o fails modpost for lack of MODULE_LICENSE)
->    or skip the BTF generation flags.
+>   init/Kconfig
 > 
->  - "depends on !DEBUG_INFO_BTF" becomes "depends on DEBUG_INFO_BTF=n"
->    for RUST and GENDWARFKSYMS: with =m the BTF is generated as with =y,
->    so the pahole restrictions they express still apply, but !m is m,
->    which a bool option takes as y.
+> between commits:
 > 
-> No functional change: CONFIG_DEBUG_INFO_BTF is still a bool, for which
-> IS_ENABLED() and #ifdef agree, $(subst m,y,y) is y and "=n" is "!".
+>   d514d23689356 ("init/Kconfig: make config INIT_ENV_ARG_LIMIT user-configurable")
+>   9998f5eea1407 ("init, arch: make CONFIG_COMMAND_LINE_SIZE globally configurable")
 > 
-> Signed-off-by: Jay Wang <wanjay@amazon.com>
-> ---
->  Makefile                       | 3 ++-
->  include/linux/btf_ids.h        | 2 +-
->  include/linux/compiler_types.h | 2 +-
->  include/trace/trace_events.h   | 2 +-
->  init/Kconfig                   | 2 +-
->  kernel/bpf/Makefile            | 2 +-
->  kernel/module/Kconfig          | 2 +-
->  kernel/trace/trace_syscalls.c  | 6 +++---
->  net/netfilter/Makefile         | 6 +++---
->  net/xfrm/Makefile              | 4 ++--
->  10 files changed, 16 insertions(+), 15 deletions(-)
+> from the mm-nonmm-unstable tree and commit:
 > 
-> diff --git a/Makefile b/Makefile
-> index 751a08643bf8..f561516e1735 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1208,7 +1208,8 @@ endif
->  # include additional Makefiles when needed
->  include-y			:= scripts/Makefile.warn
->  include-$(CONFIG_DEBUG_INFO)	+= scripts/Makefile.debug
-> -include-$(CONFIG_DEBUG_INFO_BTF)+= scripts/Makefile.btf
-> +# CONFIG_DEBUG_INFO_BTF is a tristate; BTF is generated for both y and m
-> +include-$(subst m,y,$(CONFIG_DEBUG_INFO_BTF)) += scripts/Makefile.btf
+>   f85147b291e35 ("kbuild: move the toolchain checks into scripts/Kconfig.toolchain")
+> 
+> from the kbuild tree.
+> 
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
 
-Please drop the comment and use the shorter 'm' to 'y' conversion:
+Thanks.
 
-include-$(CONFIG_DEBUG_INFO_BTF:m=y)	+= scripts/Makefile.btf
+> diff --combined init/Kconfig
+> index 914c4c3ed7ee4,352601b44b5ca..0000000000000
+> ...
+> [250+ lines of diff]
+>
 
-and possibly also for kernel/bpf/Makefile and net/netfilter/Makefile.
+yikes.  I think I'll disable Wilson's command-line patches until after
+kbuild has merged up.
 
-Thanks
+After kbuild is upstream I'll take a look at resurrecting command-line
+patches for a late merge-window thing or I'll bump them into 7.4-rcX. 
+Probably the former.
 
-
--- 
-Nicolas
+kbuilders: please try to merge early!
