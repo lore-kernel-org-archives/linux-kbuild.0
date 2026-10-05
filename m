@@ -1,151 +1,189 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD6DA2D249B;
-	Mon,  5 Oct 2026 15:30:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9AE24A49AC;
+	Mon,  5 Oct 2026 15:56:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791214257; cv=none; b=Hqv70KqVbdK2ib4gkyuFZQm9rqVR/TOZVnTecj4uhpm2s/qAVxuxPS1NOaiJnwqtcCgW6BTI5bhhzOm0VtuJQnbqpVzZIvyz1WrUP8pOZGObzO+INptKb7Ene1JDIbzK1+fdlKVZJgUjfsTLelN96tmcEjmzLYImdOxwz3BW8Nw=
+	t=1791215820; cv=none; b=MFBjcZlBwlms/fcz/t7njeHQDTgMmLona+Rfe/aflWaH9ApQyurEOWWLyTEYQlqLWQqsERG7/QfORXOFUJx9FcWzroq5UeBMxGsOtMiiaLEWIMBvCp0Rzrrkl6pcxOEyi/lQb5WxbBNQ7J96q8nWgWrIkYnaDn7v0orSZeB1T5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791214257; c=relaxed/simple;
-	bh=X6nLDttfxdsAcVhT7coDh+6wfCWnYIcEbY55a9HRL4Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KxBo+mJdvdq7A8oCTqzCu1N8+ofxlExgh/2irFlmmR3FdhCO+YcW0N538RbGPeoSp39yEVwpnRqDbgzk11bic08JRM3nwWTT3ejbdHZzuyYfGsFySOkxfuTVc+W3b6PU89TyfO/t5Kc219bBtjbc0AXCSM9ifCACeGlaosgmbaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ifu7KvfQ; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791215820; c=relaxed/simple;
+	bh=dYo2kAPf9NEmY/28ppm4ruNY+cwOypZRmKOtEoPJxYE=;
+	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
+	 References:Date:Message-Id; b=tWh4Wo+L9liYpYi1PzZK7d4kGA+CQnNVv9s8kh13EO+ixG+3Pe3jCUpPm6btf61arXNX3E4K4Cbp1lT16JTFTDS7Zai4VuZiW0mLyC1W5hHbWPFYo+PgcOBPA94GUaihq3L7abGrmL/h6EC6DY5mYiL+Tvv5ULC2k9P0aO76TZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ll6HwW8T; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ifu7KvfQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5EB41F000FF;
-	Mon,  5 Oct 2026 15:30:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ll6HwW8T"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 081391F000FF;
+	Mon,  5 Oct 2026 15:56:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791214256;
-	bh=x7kHCI/Oi3qjwgCINk1s5Ev19iGxrv4eQUNBFls+4pM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Ifu7KvfQfk0qp6OpvyHAk/Gy1XuJipIAcYsAubvFyujcCmW3hQ/B8FpUEEL3WYnRx
-	 R6wQXk5aOwHGiU8qtjVNyqBaM9l65npTRUgw0Zf4HmPvxNh2BsfBC0gdOMyEANmw/2
-	 0gxATULKprVSeaJLlOMHKlX2nv8nZvFxRZrpHQhqlhprBzFHOXXUuiroCpZKXF1kx8
-	 7NSjNh256R6pElGDe3aERe7bmIYwWR4ci/VBFpH7oIh9kV5Yc7fTR+IvaZOle1Tg0X
-	 HeqIEQbico/3z2W9VAUN/POuRKf5MB2D3iO5NvA94wuZh33N0uG23oxGmzliZhyfEX
-	 /PMFCTxLvsMxg==
-Date: Mon, 5 Oct 2026 17:30:52 +0200
-From: Nathan Chancellor <nathan@kernel.org>
-To: Aaron Tomlin <atomlin@atomlin.com>,
-	Steven Rostedt <rostedt@goodmis.org>
-Cc: nsc@kernel.org, julianbraha@gmail.com, linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] localmodconfig: Explicitly report boolean configs during
- integrity check
-Message-ID: <20261005153052.GA2537651@ax162>
-References: <20260925181230.130525-1-atomlin@atomlin.com>
+	s=k20260515; t=1791215818;
+	bh=kjgAz0qkfM8efwXACO7HAMNw5vpK3e6UvJXcySC2o4w=;
+	h=Subject:From:To:Cc:In-Reply-To:References:Date;
+	b=Ll6HwW8TIPiiJdluj+FtZdiAVuUPL3PBUCrGjw7qL3/3/8RG1F+s2lwRa0eLg3wOY
+	 4ozloST2gsvQI0TzjohJ2VyUtuo2x3QY3AYnACMBZz5yWu6wof5z5+1oMcubWEmhf9
+	 0XHScL7hQ3VWbeCzAiEv3MycQw90VE4dRUwjgfbejCtp5lyuZUwef8CTJ++0aBTGws
+	 Ce8PnB2Q6BlB9RtCrmOdZ2LylZRBm8FHSdDv/BfsdN2HWaU5j5KfNq4GRcC3laVjq3
+	 91tpSWOcoi96H/36wKAKMeOYxexrN4o3xKenTwqTLbYf2sdgd1uPNVF+FBdo3PcXSl
+	 CV33CYsR0FAeg==
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260925181230.130525-1-atomlin@atomlin.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH v5] scripts/config: honor $KBUILD_OUTPUT by default
+From: Nathan Chancellor <nathan@kernel.org>
+To: Dmitry Voytik <voytikd@gmail.com>
+Cc: Nicolas Schier <nsc@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+ Nicolas Schier <n.schier@fritz.com>, Rong Zhang <i@rong.moe>, 
+ linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+In-Reply-To: <20261002222119.393508-1-voytikd@gmail.com>
+References: <20261002222119.393508-1-voytikd@gmail.com>
+Date: Mon, 05 Oct 2026 17:56:52 +0200
+Message-Id: <179121581235.2275809.12565811683284940522.b4-review@b4>
+X-Mailer: b4 0.17-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4756; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=dYo2kAPf9NEmY/28ppm4ruNY+cwOypZRmKOtEoPJxYE=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDFmHTxxd/oj7xLw5+xO8QyfdrbxtrhbC6XlFvqR7qZHBn
+ 8wqX/7bHaUsDGJcDLJiiizVj1WPGxrOOct449QkmDmsTCBDGLg4BWAi80oZ/gqXvdvifP1feN/8
+ MvmgngnRbsk/PYU4u7eufaZ9LlTG8BMjw5GLbS78B2KtjrhP8rrJeaMmdvnpXxOmcb1sMWc0+XG
+ vngsA
+X-Developer-Key: i=nathan@kernel.org; a=openpgp;
+ fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-Hi Aaron,
+Hi Dmitry,
 
-+ Steven
-
-On Fri, Sep 25, 2026 at 02:12:30PM -0400, Aaron Tomlin wrote:
-> When running make localmodconfig, streamline_config.pl reads loaded
-> modules and maps each module object to its corresponding Kconfig
-> symbol(s) using repository Makefiles.
+> If $KBUILD_OUTPUT is set, use it by default if --file is not passed.
 > 
-> In several instances, a loaded module corresponds to an object
-> controlled by a boolean symbol (e.g. config FOO declared as bool), or is
-> a composite module that depends on a boolean configuration. Because
-> boolean options only accept "=y" or disabled, they cannot be configured
-> as loadable modules ("=m").
+> Fix the issue when the script silently updates a stale .config in
+> the root directory, while the user expects ${KBUILD_OUTPUT}/.config
+> to be updated.
+> Handle properly if the config file is a relative path.
 > 
-> Previously, if such a symbol was not already built-in ("=y") in the
-> baseline configuration, the final integrity check emitted an ambiguous
-> diagnostic. For example
+> The problem can be worked around with --file, but this is easy to miss,
+> and is inconsistent with how the Makefile and other tools work
+> (e.g., scripts/diffconfig).
 > 
->     foo did not have configs CONFIG_FOO
+> How to reproduce the issue:
+> 	rm .config
+> 	export KBUILD_OUTPUT=.out
+> 	make defconfig
+> 	./scripts/config \
+> 	       -e CONFIG_UBSAN
+> 	grep: .config: No such file or directory
 > 
-> Further investigation is required by developers to determine whether the
-> module was out-of-tree, its dependencies were unmet, or it failed due to
-> a type constraint. Address this by:
->     1.  Tracking symbol types in a %types hash during Kconfig parsing.
+> How the patch was tested:
+> 	make mrproper
+> 	export KBUILD_OUTPUT=.out
+> 	make defconfig
+> 	grep "CONFIG_UBSAN=y" $KBUILD_OUTPUT/.config || echo "OK"
 > 
->     2.  Enhancing the final integrity check when running localmodconfig
->         (!$localyesconfig) to explicitly annotate boolean symbols.
+> Test the basic usage:
+> 	./scripts/config -e CONFIG_UBSAN
+> 	grep "CONFIG_UBSAN=y" $KBUILD_OUTPUT/.config && echo "OK"
 > 
-> For example:
+> Test --refresh picks up correct config file by using $KBUILD_OUTPUT:
+> 	./scripts/config -d CONFIG_UBSAN
+> 	./scripts/config --refresh -e CONFIG_UBSAN
+> 	grep "CONFIG_UBSAN=y" $KBUILD_OUTPUT/.config && echo "OK"
 > 
->     module cec did not have configs CONFIG_CEC_CORE (tristate) CONFIG_RAS_CEC (boolean, not supported with =m)
+> Test --file takes precedence over $KBUILD_OUTPUT and a relative
+> path is handled properly:
+> 	./scripts/config -d CONFIG_UBSAN
+> 	mkdir .out2
+> 	cp .out/.config .out2/.my_config
+> 	grep "CONFIG_UBSAN=y" .out2/.my_config
+> 	./scripts/config --file .out2/.my_config --refresh \
+> 	       -e CONFIG_UBSAN
+> 	grep "CONFIG_UBSAN=y" .out2/.my_config && echo "OK"
+> 	ls .out/.out2 || echo "OK"
+> 	ls .out/.out || echo "OK"
 > 
-> Signed-off-by: Aaron Tomlin <atomlin@atomlin.com>
-
-My Perl is quite weak, so I would love Steven's ack or review before
-taking this since he is the original author/maintainer. I've left the
-full patch for context.
-
+> Test --file can accept files with hyphen:
+> 	./scripts/config -d CONFIG_UBSAN
+> 	cp .out/.config -- -my_config
+> 	grep "CONFIG_UBSAN=y" -- -my_config || echo "OK"
+> 	./scripts/config  --refresh \
+> 	       -e CONFIG_UBSAN --file -my_config
+> 	grep "CONFIG_UBSAN=y" -- -my_config && echo "OK"
+> 
+> Signed-off-by: Dmitry Voytik <voytikd@gmail.com>
 > ---
->  scripts/kconfig/streamline_config.pl | 20 ++++++++++++++++++--
->  1 file changed, 18 insertions(+), 2 deletions(-)
-> 
-> diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-> index 8677d1ca06a7..6a52a98eb40e 100755
-> --- a/scripts/kconfig/streamline_config.pl
-> +++ b/scripts/kconfig/streamline_config.pl
-> @@ -145,6 +145,7 @@ my %prompts;
->  my %objects;
->  my %config2kfile;
->  my %defaults;
-> +my %types;
->  my $var;
->  my $iflevel = 0;
->  my @ifdeps;
-> @@ -224,6 +225,7 @@ sub read_kconfig {
->  	} elsif ($state ne "NONE" && /^\s*def(_(bool|tristate)|ault)\s+(\S.*)$/) {
->  	    my $dep = $3;
->              $defaults{$config} = 1;
-> +	    $types{$config} = $2 if (defined($2));
->  	    if ($dep !~ /^\s*(y|m|n)\s*$/) {
->  		$dep =~ s/.*\sif\s+//;
->  		$depends{$config} .= " " . $dep;
-> @@ -240,7 +242,13 @@ sub read_kconfig {
->  	    }
+> v5:
+>  - Per Nathan Chancellor's suggestion, improved handling $FN path by
+>    realpath
+>  - https://lore.kernel.org/lkml/179097210878.309835.10523307262544578337.b4-review@b4/
+>  - Documented the new test scenario in the git commit message
+> v4:
+>  - Addressed Nicolas Schier's comments - dropped the change how '--refresh'
+>    is handled
+>  - Implemented conversion of $FN to the absolute path which helps with
+>    '--refresh' and relative paths
+>  - Documented testing steps in the commit message
+> v3:
+>  - Added an example in the commit message how to reproduce the issue
+> v2:
+>  - Addressed comments by sashiko:
+>    - https://sashiko.dev/#/patchset/20260920064350.17999-1-voytikd%40gmail.com
+>    - use basename when --refresh is used
+>    - remove echo which can be misleading when --file is passed
+> v1:
+>  - https://lore.kernel.org/all/20260920064350.17999-1-voytikd@gmail.com/
+> ---
+>  scripts/config | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/scripts/config b/scripts/config
+> index 32428ea909c2..7e84c3d4e621 100755
+> --- a/scripts/config
+> +++ b/scripts/config
+> @@ -130,6 +130,10 @@ on_exit() {
+>  trap on_exit EXIT
 >  
->  	# configs without prompts must be selected
-> -	} elsif ($state ne "NONE" && /^\s*(tristate\s+\S|prompt\b)/) {
-> +	} elsif ($state ne "NONE" && /^\s*(bool|boolean)(\s+\S.*)?$/) {
-> +	    $types{$config} = "bool";
-> +	    $prompts{$config} = 1 if (defined($2));
-> +	} elsif ($state ne "NONE" && /^\s*tristate(\s+\S.*)?$/) {
-> +	    $types{$config} = "tristate";
-> +	    $prompts{$config} = 1 if (defined($1));
-> +	} elsif ($state ne "NONE" && /^\s*prompt\b/) {
->  	    # note if the config has a prompt
->  	    $prompts{$config} = 1;
->  
-> @@ -707,7 +715,15 @@ foreach my $module (keys(%modules)) {
->  	}
->  	print STDERR "module $module did not have configs";
->  	foreach my $conf (@arr) {
-> -	    print STDERR " " , $conf;
-> +	    my $c = $conf;
-> +	    $c =~ s/^CONFIG_//;
-> +	    if (!$localyesconfig && defined($types{$c}) && $types{$c} eq "bool") {
-> +		print STDERR " $conf (boolean, not supported with =m)";
-> +	    } elsif (defined($types{$c})) {
-> +		print STDERR " $conf ($types{$c})";
-> +	    } else {
-> +		print STDERR " " , $conf;
-> +	    }
->  	}
->  	print STDERR "\n";
->      }
-> -- 
-> 2.55.0
-> 
-> 
+>  FN=.config
+> +if [ -n "${KBUILD_OUTPUT}" ]; then
+> +	FN=${KBUILD_OUTPUT}/${FN}
+> +fi
+> +
+>  CMDS=()
+>  while [[ $# -gt 0 ]]; do
+>  	if [ "$1" = "--file" ]; then
+> @@ -143,6 +147,7 @@ while [[ $# -gt 0 ]]; do
+>  		shift
+>  	fi
+>  done
+> +FN=$(realpath -q -- "$FN" || echo "$FN")
+
+Sashiko has some further complaints about this:
+
+  https://sashiko.dev/#/patchset/20261002222119.393508-1-voytikd@gmail.com
+
+Due to travel and Linux Plumbers, I am not sure I will be able to think
+about the best way to resolve this before I finalize the Kbuild tree for
+7.4, so this may need to be deferred until after 7.4-rc1 is released
+(i.e., it will target 7.5). One option that immediately comes to mind is
+requiring $KBUILD_OUTPUT to exist already and only running realpath on
+$KBUILD_OUTPUT, which would leave the script unchanged for the case of
+$KBUILD_OUTPUT being unset, which seems safer to me:
+
+  if [ -n "$KBUILD_OUTPUT" ]; then
+      if [ ! -d "$KBUILD_OUTPUT" ]; then
+          echo "KBUILD_OUTPUT is set but does not exist or is not a directory, create it before running $myname" >&2
+          exit 1
+      fi
+      FN=$(realpath "$KBUILD_OUTPUT")/$FN
+  fi
+
+This would leave a relative '--file' value + KBUILD_OUTPUT + '--refresh'
+in a weird state still but it appears that commit f757f6011c92 ("kbuild:
+fix argument parsing in scripts/config") got that wrong almost two years
+ago so it doesn't feel like it is worth caring about that until someone
+actually complains about it (but I might be missing something).
 
 -- 
 Cheers,
 Nathan
+
