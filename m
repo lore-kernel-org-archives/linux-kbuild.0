@@ -1,263 +1,284 @@
-Received: from mail-ej2-f19.google.com (mail-ej2-f19.google.com [74.125.228.147])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E539730C158
-	for <linux-kbuild@vger.kernel.org>; Mon,  5 Oct 2026 20:46:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.228.147
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791233199; cv=pass; b=EFgBgL5floKEvjEn+Y5rtoXYczpV5GWVRSq5N0AwyUQWJ6iwmMWjqtCylKkBZCJ+dO3Xw2g1m7Ryom4oFQHfLxmgroDsRk0LmENzvEnEcFBmf2WNfoJ7AyEfPYN0OtulbJp0OQHVPgyk8hwKx8114mCMaHg5PAxhgqiLkpzXB0Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791233199; c=relaxed/simple;
-	bh=DEruL27+IFVtkLRaDJJMO0Xo1R0/Z2wePzZBeSosWXg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XIVvpQcgeIv0ZcCg1TrZiAdyaIop7087LnHMPDlEmHhztvs0K4hbPHSkOTOZuFHV+p7OlsjpkcLdLROpTuCpBD2CB3H57wH5cB4UIXtwSdiODxjvkLGcSuBw/JRW2Lm2hmtrqM/SFX//QSPivWVHxZFT6zf5Zr8uLrUV+0hl/HU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IaicVK6Z; arc=pass smtp.client-ip=74.125.228.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B05F0260580;
+	Tue,  6 Oct 2026 06:15:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791267349; cv=none; b=PK66FILUY5jy7zMOwDV7oZJsiD5SBbFOfhNhCEt/XT8zueeukYhB99ZbAqVyO607GkISB2VpspLSnvGM74q0vZZN3/2Edrnk2XpsbS2VbuSziat2SGfqOcBj82d5OIHcYKDag3epbaLwKXT6/JPKRmC8ypR5K0DQDY6oMX6xqV4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791267349; c=relaxed/simple;
+	bh=rCqwZ2IjgmH5Im+4R8OwXzGglNEF337ZZbfKCwd83Ac=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=gGRa+wv0nSb+HR/BM4I6AzS82hliKd4CGdBz+jJWcrrkA27uiznmC2xuYCpy/q2+afp5PrxXxs2fs2/4OPPCjf+2oEmlD9R9IobQU+Bo0bYxwWJ/5PI7DMAyvRYcevNCu8ezHp7jDwZmWsSkV00o7U19etDKh7BheK5NCKTxeI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qkNQ8z/p; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IaicVK6Z"
-Received: by mail-ej2-f19.google.com with SMTP id a640c23a62f3a-c2940ff2313so157416666b.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 05 Oct 2026 13:46:37 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1791233196; cv=none;
-        d=google.com; s=arc-20260327;
-        b=BBd3Uq5Z+SUOADiGvVqNl6/ktSMHFqTSo7nUwBoBh3GtJnGTro8fcB/reoBcl4OST1
-         R1VyYAcG1UZiF3CLNdpCnj0xqxMu6x5MCZs5GL7hEbkyoWneBN8qmu2ratQs6a0ZIoUb
-         1uNgF2SLSlEWESxx5dR2YS7mqXeBeX+JJOhVIh318eXjJCDbDnfX6gHgDzfkcbvGkNWK
-         h/v7uWQUFcAYVdjwYDNUeGYZlVirIOqs4ZU9xX+gP6A20Nwuf0uqRufv+kJiT8tVJeE8
-         FbMf9tvZgN7uF9mO7WuJOsJHsQMs+RvAZUHZHFfcH8vYRM7YQBEiLoxK5WFaR5/aMALX
-         1vjQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=FCIv6GW2p9XGUpbYf2mTV5AV2WWUQdSBwQvErpGpC3Y=;
-        fh=kRyyfZKr4ITm8IXTyH5H4xaAzKjM4qWODbqqF3ajbXA=;
-        b=SzfY62cQ14NS+Gp47IejzQo5lfPxi6la+HsyVE201YL8ApwFXX6W4nGZxydl2yvddh
-         a5D4NiF1CuDOmo+HhM75C9wdoGvKJ3mxGcTNF/zUmtRuJzShyGB3JgUbVj5W98mIg2pj
-         9SAtFMbEupOtTDHtGpClAz0H2XZksBgcBX0t90IwV90XayuPfkvhsgj/Td/4uDb+iYHp
-         Hrc1kL+vcuWwznWcqqTH5SMFaiODkLgqjXa0rVF0xSmchUtPvDt8znXceIdUcNmFaYka
-         O7PSIQyX5wSNfkrdFe1D9YkQvukh8+uZgYuXe9sxRv64a3/9w+J5NXoFzEH7XmR81yVj
-         k5gg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791233196; x=1791837996; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=FCIv6GW2p9XGUpbYf2mTV5AV2WWUQdSBwQvErpGpC3Y=;
-        b=IaicVK6ZPhWMjoyWmY7L/klbnTeLyAKW/FFPiA7PzSORs5xJJeshRuncRS5dWbYrxs
-         F6W+Ttbee+GJx+l81O/8IYqpluU3vb7FQVtV9Hw/k5zRWXlm0OlyYZbolmHlk0WXqoXp
-         tiQB/pNhSN6555Dr0YigQD+OV4DLnj1Jwc3jsJykqzeGKgmBCXHheIX9JuPstqVJxZ90
-         FoPXBK0QH2MTUBO2m6bGsUXIozBhcFYRRlMCEbQwfFlzEhbXN4bfTzV4mdQcv0t4N/tk
-         HWXeMhrB3GNOaHj4uigjcBPdFaNb051MTC2YnFhlOLMw7uGjwtYKAXza2e1Dkb92FU3B
-         dnaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791233196; x=1791837996;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=FCIv6GW2p9XGUpbYf2mTV5AV2WWUQdSBwQvErpGpC3Y=;
-        b=PH2YZ7X1LEagIuWnZHekQYc1oQEEa03yGRPt3C5e8nAzr1T9P4r9cbc7tM4VrfkqDm
-         fL1nhOdpprrtkY7LdtvfRSVR5CY/lQQd2fGutN224MTQfLsaONe7Xd9G3A+2pMHb8ElB
-         Nk7fwIctUsRDpqHU7R4ox6QtPeA2AdkylhZED1V579DEDJAdg+vqSzmWGoLyTxmpR/CZ
-         KdGhJBFTDOJ2Ss3Bcn+X+hRa2giR24s6jedMuOBQKk6qAvqSQpn5bviPOZcyA+7m4xK9
-         k3RGHpJnbXcjf/GOashMTipJzO2K4cI37PKcqLm8zTxqLgOnX6Kry2qXKBtA7F4q8tjU
-         ip1A==
-X-Forwarded-Encrypted: i=1; AKwUvBxKG6FmxJ2SZKpzx9Rx8L2Y6i8givLcjd20/lRZatGCxF7gCcJQt68z67foLRDpOgV09x1yXJ7+pNV4oIc=@vger.kernel.org
-X-Gm-Message-State: AFuF++kCdG5cYlDZi/yHBWVpiKrzqUmoan1NO3PR9zrnvcMvR/ttDCfp
-	lF+LRrxKkDoDA7A3cID7UQBjuroapAdbnEGAadPzTLgKx0Fs18lBoB5MdFdEF7BzLZy0Ow+bdEZ
-	hDveEudJFzL/cHvCuv3wrs+5MR5knlPw=
-X-Gm-Gg: AYBFou0YE/T57izsXFHNpp4i1d/x+LP9R+Wzm5h6ErH7mIn9Du3DoiBPhji0zpuF7cX
-	p5fiPPNxZYaMj8QE6ua9WXXN88Qo11oz/Bs0sRgzDL0qSO8llmvde1O8wdNW6jdOlmAm+yLLKsa
-	nLtD4Hrzq282Y5D+8Yk0OiPNJIq/q8NeP4CgsHjsmwlLW4pirE+7bCkSAr3JGNbpjyz4wSeZiUL
-	fa3AZg9yH2KDUxZQnWC0q7FyZ6+Ojj3rJwWdyx81T9iYuNyJcbKW07b13WbBp+HAyXmUiYiAG49
-	aOK2mtWyMnwxQ+yWNNEmL1l6ct8lbQjEFJDlO40CFj2VQlrqxo0mEOag5R3YA1NQHhByDbL8CWq
-	nLgozmx+Y6X2tzVeqFxj1w0+DvsIufdNzMxuNqgQ6qxIUbLqMhKZ2DZ2rrZf8H4ElFw==
-X-Received: by 2002:a17:907:ea93:b0:c2b:ca98:872c with SMTP id
- a640c23a62f3a-c316107a120mr81401066b.20.1791233195884; Mon, 05 Oct 2026
- 13:46:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qkNQ8z/p"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6963ZdQG695812;
+	Tue, 6 Oct 2026 06:14:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=+rXo/9
+	HsyVW3aJ8rwfYpaCgSZGYXBJigBbvc+8XFoRg=; b=qkNQ8z/pgO8CESdAoHTYTS
+	wTTpI5ZKwsYHoo0xrYLm+pQ+0Se50pZaLYDSQjXy4FE+6nJWanCIcGtWtmLDFEox
+	WvajW8y32zRCNq0mErRo53TUNzCNum1SlsNOtLC+qLhJ4bEuJUMaDH8STeVbqZZQ
+	OA0OQFzFsxjZNQushE7TsXxpfLVcyymrKh8dl8D9X4ogc4OzyX2LAXisy6B5aoXU
+	fDRqkxfbHe/Wk0XOrZbeO9RuCzTUy6NV6PYk4TBB7RFY5pSsrhy5Dm1YFVx7O02B
+	W4WKs+V0b5NpXsjysy/10ZfllFfi5/X1YKnOvwJrAi/Fb6w91BdEVYcQja5Rb+XQ
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4h2screajw-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 06 Oct 2026 06:14:42 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 6963HdaR3925182;
+	Tue, 6 Oct 2026 06:14:41 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4h3dhgrmj7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 06 Oct 2026 06:14:41 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6966EZKP9240912
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 6 Oct 2026 06:14:35 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8649A2004E;
+	Tue,  6 Oct 2026 06:14:35 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 81DE42004B;
+	Tue,  6 Oct 2026 06:14:26 +0000 (GMT)
+Received: from shivang.upadyay (unknown [9.39.25.101])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  6 Oct 2026 06:14:26 +0000 (GMT)
+Message-ID: <3297b07cf058b29251063e5e7dc61bf047c5148f.camel@linux.ibm.com>
+Subject: Re: [PATCH v2 4/6] objtool/powerpc: Skip jump destination analysis
+ and unnanotated intra-function call warnings for --ftr-fixup
+From: Shivang Upadhyay <shivangu@linux.ibm.com>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, sv@linux.ibm.com,
+        alexandre.chartre@oracle.com, alexghiti@rivosinc.com,
+        aliceryhl@google.com, ardb@kernel.org, bp@alien8.de,
+        chleroy@kernel.org, elver@google.com, ihor.solodrai@linux.dev,
+        jpoimboe@kernel.org, kees@kernel.org, legion@kernel.org,
+        lossin@kernel.org, maddy@linux.ibm.com, masahiroy@kernel.org,
+        mpe@ellerman.id.au, nathan@kernel.org, npiggin@gmail.com,
+        nsc@kernel.org, ojeda@kernel.org, pmladek@suse.com,
+        rostedt@goodmis.org, tamird@kernel.org,
+        thomas.weissschuh@linutronix.de, thuth@redhat.com,
+        yuxuan.zuo@outlook.com, sourabhjain@linux.ibm.com
+Date: Tue, 06 Oct 2026 11:44:25 +0530
+In-Reply-To: <20260930094449.GJ88198@noisy.programming.kicks-ass.net>
+References: <20260929055138.43489-1-shivangu@linux.ibm.com>
+	 <20260929055138.43489-5-shivangu@linux.ibm.com>
+	 <20260929142559.GC88198@noisy.programming.kicks-ass.net>
+	 <05e06ab0d9fc8810fc50e888e9e0f55b2ec9b77f.camel@linux.ibm.com>
+	 <20260930094449.GJ88198@noisy.programming.kicks-ass.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20261002222119.393508-1-voytikd@gmail.com> <179121581235.2275809.12565811683284940522.b4-review@b4>
-In-Reply-To: <179121581235.2275809.12565811683284940522.b4-review@b4>
-From: Dmitry Voytik <voytikd@gmail.com>
-Date: Mon, 5 Oct 2026 22:46:09 +0200
-X-Gm-Features: AclHuK9czbOG0vx54pwTE8cJeUjoUsIT1EZ3k56Y7E4gkp574ps6cHTUTHUObns
-Message-ID: <CAAX90H3KQzPk2L5VX0evJVtpjtpzi+58mAqnpdiqfAh++mD1+Q@mail.gmail.com>
-Subject: Re: [PATCH v5] scripts/config: honor $KBUILD_OUTPUT by default
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Nicolas Schier <nsc@kernel.org>, Nicolas Schier <n.schier@fritz.com>, Rong Zhang <i@rong.moe>, 
-	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMDA2MDAyNCBTYWx0ZWRfXzRroh2hxk3ho
+ /WMxD9GPhvrQGDKuB6JREuWbCxxFi7nBfjphufwdC0fDpAlZIoBCcscZOoVSVUj96K+uOXXqa67
+ 8rssQfEvhqQs1nbuE/qIBiZ934KkRY8=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDA2MDAyNCBTYWx0ZWRfX7kWSQavWXc7v
+ mZS8AON7SxP7qJGQ5awJIPp1WWPFAnMslr69FD7TLG/fzs7rdUH2iaoVcIucgP7NBIMYWQrYnJk
+ sQ0APpK+wS2dp1z3LOZERYwtCvqRgG0QeDWu9740wvu7NuxEFuGbgALGESjcHd+Pc3E5CC+DZnE
+ dydYWdgEkJZiC4pj6V+CDy36HhDTCFeLQdlfLxrDJdO8DBMU07ZTPsWmjZ5RdhwCzlV+R0RV35S
+ j1XZ0Pgu0bxhCianQyVKfENbWtWMeP2+QZcRlf3h/SUL5yL2i98SwVwzeDKucAy8/3DHJgpn00/
+ ZeLH1QYy4DrqvSHJ3yNHvQJVk4ZIe+mlSW3BVA9eIZA1aDfU5bu73S2dLxo7LCUEXZPlbXh7Dm6
+ JdPpsQZMlysHoZvitEFkI/nVesCzKeWWH4cgRO19Z/j/0MQ2UqSFa5lzglVd6DX0pmCi4mpG1E/
+ U/HBhFpA8I4iRIXRPPw==
+X-Proofpoint-GUID: N0UneCwz4OyrvdRWQDFs2ZF7DNe1FElD
+X-Proofpoint-ORIG-GUID: a1oYyYKwK2rz2UngSXjTTmc1BQoEmsdp
+X-Authority-Analysis: v=2.4 cv=B7osQ+tM c=1 sm=1 tr=0 ts=6ac491d3 cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=IkcTkHD0fZMA:10 a=660iZSQnnn4A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=_kaDUDulWroBixN9eW0A:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-10-06_01,2026-10-05_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 bulkscore=0 malwarescore=0 impostorscore=0 phishscore=0
+ clxscore=1015 spamscore=0 adultscore=0 lowpriorityscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2610060024
 
-Hi Nathan,
+On Wed, 2026-09-30 at 11:44 +0200, Peter Zijlstra wrote:
+> On Wed, Sep 30, 2026 at 11:43:10AM +0530, Shivang Upadhyay wrote:
+> > On Tue, 2026-09-29 at 16:25 +0200, Peter Zijlstra wrote:
+> > > > c00000000002a610 <system_reset_exception>:
+> > > > c00000000002a610:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0e 01 4c 3c=
+=C2=A0=C2=A0=C2=A0=C2=A0 addis=C2=A0=C2=A0 r2,r12,270
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 c00000000002a610: R_PPC64_REL16_HA=C2=A0=C2=A0=C2=A0
+> > > > .TOC.
+> > > > c00000000002a614:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 f0 6c 42 38=
+=C2=A0=C2=A0=C2=A0=C2=A0 addi=C2=A0=C2=A0=C2=A0 r2,r2,27888
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 c00000000002a614: R_PPC64_REL16_LO=C2=A0=C2=A0=C2=A0
+> > > > .TOC.+0x4
+> > > > c00000000002a618:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 a6 02 08 7c=
+=C2=A0=C2=A0=C2=A0=C2=A0 mflr=C2=A0=C2=A0=C2=A0 r0
+> > > >=20
+> > > > This is happening because we should be looking for destination
+> > > > symbols that are at absolute offsets instead of relative
+> > > > offsets.
+> > >=20
+> > > Again, confused. We run objtool on objects, this is pre-linking,
+> > > there
+> > > are no absolute offsets.
+> > Hi Peter,
+> >=20
+> > This is the special requirement of patching jump assembly
+> > instructions
+> > that we need to know where the jump is performed from/to. As per
+> > 5/6
+> > objtool is run post link on vmlinux. If handling post-link
+> > information
+> > is outside the scope of objtool, please let me know.
+>=20
+> I think we can make it work; but this wasn't immediately obvious.
+> Also
+> I'm still struggling to understand what exactly you're doing -- I'm
+> not
+> well versed in the PPC details and have no idea what this ftr thing
+> really is and your patches don't really explain anything much at all.
+>=20
+> (Gemini is suggesting this is all somewhat similar to the x86 RIP
+> relative fixup we do for alternatives, but your case is more 'fun').
+>=20
 
-Thanks again for looking into this.
+Hi Peter,
+Sorry for the delayed response.
 
-On Mon, Oct 5, 2026 at 5:56=E2=80=AFPM Nathan Chancellor <nathan@kernel.org=
-> wrote:
->
-> Hi Dmitry,
->
-> > If $KBUILD_OUTPUT is set, use it by default if --file is not passed.
-> >
-> > Fix the issue when the script silently updates a stale .config in
-> > the root directory, while the user expects ${KBUILD_OUTPUT}/.config
-> > to be updated.
-> > Handle properly if the config file is a relative path.
-> >
-> > The problem can be worked around with --file, but this is easy to miss,
-> > and is inconsistent with how the Makefile and other tools work
-> > (e.g., scripts/diffconfig).
-> >
-> > How to reproduce the issue:
-> >       rm .config
-> >       export KBUILD_OUTPUT=3D.out
-> >       make defconfig
-> >       ./scripts/config \
-> >              -e CONFIG_UBSAN
-> >       grep: .config: No such file or directory
-> >
-> > How the patch was tested:
-> >       make mrproper
-> >       export KBUILD_OUTPUT=3D.out
-> >       make defconfig
-> >       grep "CONFIG_UBSAN=3Dy" $KBUILD_OUTPUT/.config || echo "OK"
-> >
-> > Test the basic usage:
-> >       ./scripts/config -e CONFIG_UBSAN
-> >       grep "CONFIG_UBSAN=3Dy" $KBUILD_OUTPUT/.config && echo "OK"
-> >
-> > Test --refresh picks up correct config file by using $KBUILD_OUTPUT:
-> >       ./scripts/config -d CONFIG_UBSAN
-> >       ./scripts/config --refresh -e CONFIG_UBSAN
-> >       grep "CONFIG_UBSAN=3Dy" $KBUILD_OUTPUT/.config && echo "OK"
-> >
-> > Test --file takes precedence over $KBUILD_OUTPUT and a relative
-> > path is handled properly:
-> >       ./scripts/config -d CONFIG_UBSAN
-> >       mkdir .out2
-> >       cp .out/.config .out2/.my_config
-> >       grep "CONFIG_UBSAN=3Dy" .out2/.my_config
-> >       ./scripts/config --file .out2/.my_config --refresh \
-> >              -e CONFIG_UBSAN
-> >       grep "CONFIG_UBSAN=3Dy" .out2/.my_config && echo "OK"
-> >       ls .out/.out2 || echo "OK"
-> >       ls .out/.out || echo "OK"
-> >
-> > Test --file can accept files with hyphen:
-> >       ./scripts/config -d CONFIG_UBSAN
-> >       cp .out/.config -- -my_config
-> >       grep "CONFIG_UBSAN=3Dy" -- -my_config || echo "OK"
-> >       ./scripts/config  --refresh \
-> >              -e CONFIG_UBSAN --file -my_config
-> >       grep "CONFIG_UBSAN=3Dy" -- -my_config && echo "OK"
-> >
-> > Signed-off-by: Dmitry Voytik <voytikd@gmail.com>
-> > ---
-> > v5:
-> >  - Per Nathan Chancellor's suggestion, improved handling $FN path by
-> >    realpath
-> >  - https://lore.kernel.org/lkml/179097210878.309835.1052330726254457833=
-7.b4-review@b4/
-> >  - Documented the new test scenario in the git commit message
-> > v4:
-> >  - Addressed Nicolas Schier's comments - dropped the change how '--refr=
-esh'
-> >    is handled
-> >  - Implemented conversion of $FN to the absolute path which helps with
-> >    '--refresh' and relative paths
-> >  - Documented testing steps in the commit message
-> > v3:
-> >  - Added an example in the commit message how to reproduce the issue
-> > v2:
-> >  - Addressed comments by sashiko:
-> >    - https://sashiko.dev/#/patchset/20260920064350.17999-1-voytikd%40gm=
-ail.com
-> >    - use basename when --refresh is used
-> >    - remove echo which can be misleading when --file is passed
-> > v1:
-> >  - https://lore.kernel.org/all/20260920064350.17999-1-voytikd@gmail.com=
-/
-> > ---
-> >  scripts/config | 5 +++++
-> >  1 file changed, 5 insertions(+)
-> >
-> > diff --git a/scripts/config b/scripts/config
-> > index 32428ea909c2..7e84c3d4e621 100755
-> > --- a/scripts/config
-> > +++ b/scripts/config
-> > @@ -130,6 +130,10 @@ on_exit() {
-> >  trap on_exit EXIT
-> >
-> >  FN=3D.config
-> > +if [ -n "${KBUILD_OUTPUT}" ]; then
-> > +     FN=3D${KBUILD_OUTPUT}/${FN}
-> > +fi
-> > +
-> >  CMDS=3D()
-> >  while [[ $# -gt 0 ]]; do
-> >       if [ "$1" =3D "--file" ]; then
-> > @@ -143,6 +147,7 @@ while [[ $# -gt 0 ]]; do
-> >               shift
-> >       fi
-> >  done
-> > +FN=3D$(realpath -q -- "$FN" || echo "$FN")
->
-> Sashiko has some further complaints about this:
->
->   https://sashiko.dev/#/patchset/20261002222119.393508-1-voytikd@gmail.co=
-m
+I think I can explain the feature fixup mechanism and the problem we're
+trying to solve more clearly in the cover letter.
 
-I saw this, but I thought other *NIX environments were not supported
--- only those based on GNU coreutils.
-Sashiko's comment on filename that can break echo was a bit contrived IMHO.
-Anyhow, lesson learned, next time I'll make sure there is zero
-sashiko's complaints :)
+Here is a basic example of what we're trying to achieve.
 
-> Due to travel and Linux Plumbers,
+        GEN_COMMON data_access
 
-Have fun!
+            ld      r4,_DSISR(r1)
+            addi    r3,r1,STACK_INT_FRAME_REGS
+            andis.  r0,r4,DSISR_DABRMATCH@h
+            bne-    1f
 
-> I am not sure I will be able to think
-> about the best way to resolve this before I finalize the Kbuild tree for
-> 7.4, so this may need to be deferred until after 7.4-rc1 is released
-> (i.e., it will target 7.5).
+        #ifdef CONFIG_PPC_64S_HASH_MMU
+        BEGIN_MMU_FTR_SECTION
+            bl      CFUNC(do_hash_fault)
+        MMU_FTR_SECTION_ELSE
+            bl      CFUNC(do_page_fault)
+        ALT_MMU_FTR_SECTION_END_IFCLR(MMU_FTR_TYPE_RADIX)
+        #else
+            bl      CFUNC(do_page_fault)
+        #endif
 
-I understand. Thank you for your work!
+            b       interrupt_return_srr
 
-> One option that immediately comes to mind is
-> requiring $KBUILD_OUTPUT to exist already and only running realpath on
-> $KBUILD_OUTPUT, which would leave the script unchanged for the case of
-> $KBUILD_OUTPUT being unset, which seems safer to me:
->
->   if [ -n "$KBUILD_OUTPUT" ]; then
->       if [ ! -d "$KBUILD_OUTPUT" ]; then
->           echo "KBUILD_OUTPUT is set but does not exist or is not a direc=
-tory, create it before running $myname" >&2
->           exit 1
->       fi
->       FN=3D$(realpath "$KBUILD_OUTPUT")/$FN
->   fi
+This is the implementation of the data_access exception handler on
+ppc64le. Depending on whether the machine is using the hash or radix
+MMU, we need to execute a different fault handler. The choice is made
+at runtime based on the CPU's feature bits.
 
-I like this approach. Let me try that. If sashiko doesn't complain,
-I'll post a v6 patch.
+The assembly macros therefore generate code for both possible cases at
+build time, and the feature-fixup mechanism later patches the code so
+that only the appropriate path is executed.
 
-> This would leave a relative '--file' value + KBUILD_OUTPUT + '--refresh'
-> in a weird state still but it appears that commit f757f6011c92 ("kbuild:
-> fix argument parsing in scripts/config") got that wrong almost two years
-> ago so it doesn't feel like it is worth caring about that until someone
-> actually complains about it (but I might be missing something).
->
-> --
-> Cheers,
-> Nathan
+The problem is that the linker does not know about this later patching
+when it resolves branch relocations.
+For example, consider:
 
-Thanks and best regards,
-Dmitry Voytik.
+feat_loc:
+    ...
+
+BEGIN_MMU_FTR_SECTION
+
+    ...
+loc_a:
+    bl      CFUNC(main_feature)
+    ...
+
+MMU_FTR_SECTION_ELSE
+
+    ...
+loc_b:
+    bl      CFUNC(alt_feature)
+    ...
+
+When linking this code, the linker will encode=20
+main_feature - loc_a at loc_a and alt_feature - loc_b at loc_b at two
+bl instructions ablove.
+
+
+However, alt_feature - loc_b is not the offset that we ultimately need
+from the alt branch. When the feature fixup is applied, the instruction
+at loc_a is replaced with the alternative instruction, so the branch
+needs to encode (alt_feature - loc_a) jump.
+
+This distinction matters because the branch displacement has to fit in
+the range representable by the 32-bit PowerPC branch instruction.
+Depending on where feat_loc, main_feature, and alt_feature end up after
+linking, the linker-generated displacement can therefore be different
+from the displacement that is actually needed after the feature fixup.
+In some layouts this can result in either a build-time failure or, more
+importantly, an invalid branch at runtime.
+
+What we're trying to do with the build-time pass is detect these cases
+and prepare the branch relocations for the code as it will actually
+exist after feature patching. At minimum, it should allow us to detect
+an impossible branch offset at build time rather than discovering it
+only after the feature fixup is applied at runtime.
+
+
+> Anyway, I would much rather objtool learns how to deal with absolute
+> sections rather than making things depend on a 'random' ftr option.
+> That
+> is, if we need conditional code, have it be because the secion has
+> non-zero address, not because ftr option or somesuch.
+>=20
+> But noting that, can't we simply change:
+>=20
+> =C2=A0 decode_instructions()
+> =C2=A0=C2=A0=C2=A0 hash_add(file->insn_hash, &insn->hash, sec_offset_hash=
+(sec, insn-
+> >offset));
+>=20
+> to take sh_addr into account? I mean, when unlinked, it'll be 0 so
+> nothing changes, but when already linked, it'll get you the absolute
+> value and then you don't need that fixup later on, or am I missing
+> some
+> details?
+>=20
+> So from where I'm at, please:
+>=20
+> =C2=A0- teach objtool about absolute sections, not ftr specials
+Sure I will try to rework these patches towards that.
+
+>=20
+> =C2=A0- expand changelog to actually explain what these ftr things are an=
+d
+> =C2=A0=C2=A0 how they work and what the actual problem is we're solving, =
+so we
+> =C2=A0=C2=A0 don't need to employ LLMs to understand patches and all that=
+ :-)
+>=20
+> Does that sound reasonable?
+
+Yes.
+
+Thanks
+~Shivang.
