@@ -1,284 +1,106 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B05F0260580;
-	Tue,  6 Oct 2026 06:15:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 752571D54FA;
+	Tue,  6 Oct 2026 08:11:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791267349; cv=none; b=PK66FILUY5jy7zMOwDV7oZJsiD5SBbFOfhNhCEt/XT8zueeukYhB99ZbAqVyO607GkISB2VpspLSnvGM74q0vZZN3/2Edrnk2XpsbS2VbuSziat2SGfqOcBj82d5OIHcYKDag3epbaLwKXT6/JPKRmC8ypR5K0DQDY6oMX6xqV4=
+	t=1791274282; cv=none; b=qN/6oMkYBL9VHaUsrPULw0wzK9wQu6hGXeVJxi9rmtVIICtYwAmnl4gI1uiKaJtyLTJLMRD0bIXRpwBcVU9VzvFzxzJ2LxAhzDgNuZubRTyMPS2Oc4eO0Fq+2vFq2sFR8LiUKQ8S9gJl0NFBDpIN1omqlhzTqmtc6Y6eXavnWOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791267349; c=relaxed/simple;
-	bh=rCqwZ2IjgmH5Im+4R8OwXzGglNEF337ZZbfKCwd83Ac=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=gGRa+wv0nSb+HR/BM4I6AzS82hliKd4CGdBz+jJWcrrkA27uiznmC2xuYCpy/q2+afp5PrxXxs2fs2/4OPPCjf+2oEmlD9R9IobQU+Bo0bYxwWJ/5PI7DMAyvRYcevNCu8ezHp7jDwZmWsSkV00o7U19etDKh7BheK5NCKTxeI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qkNQ8z/p; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1791274282; c=relaxed/simple;
+	bh=ymAudHdAiT2usM8bzD+En9ax5jW+AnNTUw7C/PvsE7M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ePKhcjhNC/+6wYRpEOTURWpP+Un9MJDT3LNrBc711j98SK2I3QI70VqOmZiIIDic3BoEBX3lvS0a8VrWBua+EYwMPQH2i2+udiHRYwm6T6OFZRMw2W2H/IIkdp9BnOlPN6qHCbZ9tf8mIqd3s9jPa7B/lKeSCYgT8Y76AxWVbO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P3T5jfbZ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qkNQ8z/p"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6963ZdQG695812;
-	Tue, 6 Oct 2026 06:14:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=+rXo/9
-	HsyVW3aJ8rwfYpaCgSZGYXBJigBbvc+8XFoRg=; b=qkNQ8z/pgO8CESdAoHTYTS
-	wTTpI5ZKwsYHoo0xrYLm+pQ+0Se50pZaLYDSQjXy4FE+6nJWanCIcGtWtmLDFEox
-	WvajW8y32zRCNq0mErRo53TUNzCNum1SlsNOtLC+qLhJ4bEuJUMaDH8STeVbqZZQ
-	OA0OQFzFsxjZNQushE7TsXxpfLVcyymrKh8dl8D9X4ogc4OzyX2LAXisy6B5aoXU
-	fDRqkxfbHe/Wk0XOrZbeO9RuCzTUy6NV6PYk4TBB7RFY5pSsrhy5Dm1YFVx7O02B
-	W4WKs+V0b5NpXsjysy/10ZfllFfi5/X1YKnOvwJrAi/Fb6w91BdEVYcQja5Rb+XQ
-	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4h2screajw-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 06 Oct 2026 06:14:42 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 6963HdaR3925182;
-	Tue, 6 Oct 2026 06:14:41 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4h3dhgrmj7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 06 Oct 2026 06:14:41 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6966EZKP9240912
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 6 Oct 2026 06:14:35 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8649A2004E;
-	Tue,  6 Oct 2026 06:14:35 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 81DE42004B;
-	Tue,  6 Oct 2026 06:14:26 +0000 (GMT)
-Received: from shivang.upadyay (unknown [9.39.25.101])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  6 Oct 2026 06:14:26 +0000 (GMT)
-Message-ID: <3297b07cf058b29251063e5e7dc61bf047c5148f.camel@linux.ibm.com>
-Subject: Re: [PATCH v2 4/6] objtool/powerpc: Skip jump destination analysis
- and unnanotated intra-function call warnings for --ftr-fixup
-From: Shivang Upadhyay <shivangu@linux.ibm.com>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, sv@linux.ibm.com,
-        alexandre.chartre@oracle.com, alexghiti@rivosinc.com,
-        aliceryhl@google.com, ardb@kernel.org, bp@alien8.de,
-        chleroy@kernel.org, elver@google.com, ihor.solodrai@linux.dev,
-        jpoimboe@kernel.org, kees@kernel.org, legion@kernel.org,
-        lossin@kernel.org, maddy@linux.ibm.com, masahiroy@kernel.org,
-        mpe@ellerman.id.au, nathan@kernel.org, npiggin@gmail.com,
-        nsc@kernel.org, ojeda@kernel.org, pmladek@suse.com,
-        rostedt@goodmis.org, tamird@kernel.org,
-        thomas.weissschuh@linutronix.de, thuth@redhat.com,
-        yuxuan.zuo@outlook.com, sourabhjain@linux.ibm.com
-Date: Tue, 06 Oct 2026 11:44:25 +0530
-In-Reply-To: <20260930094449.GJ88198@noisy.programming.kicks-ass.net>
-References: <20260929055138.43489-1-shivangu@linux.ibm.com>
-	 <20260929055138.43489-5-shivangu@linux.ibm.com>
-	 <20260929142559.GC88198@noisy.programming.kicks-ass.net>
-	 <05e06ab0d9fc8810fc50e888e9e0f55b2ec9b77f.camel@linux.ibm.com>
-	 <20260930094449.GJ88198@noisy.programming.kicks-ass.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P3T5jfbZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 127BD1F000FF;
+	Tue,  6 Oct 2026 08:11:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791274281;
+	bh=slwXC1hdG5VUEikD62TjJ3zlUcocHL1wSfrBV9dr1Y0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=P3T5jfbZYCl/nN9japeFJMHzln7SBz0m5KIQWvzvjQw81BIPzD8Lu4SyDKhY6Iix1
+	 /Inj813rMfUzvIKhxyU7hAVuLvWYVUiNoWYdBUG4PkvsjG/iZT9jjO/ERwBJpJYf6Z
+	 rsB/CD6qbyS0rcWFcKwZ4PVGgIaIn5J6I7DJNeu3e5yXQYC6d3H90h5GNlTnouLrCs
+	 iI9PxsOEp4TM1EFJCGM1M+IPIdVnmTked5hT72as3SFTEKcSD3UbGT22na1sVKOzr0
+	 epu2VMMeqwjpwuREsCTiBNrBM1UQVoRAz5RMgCnuwF0m+/tNGNoA3Xyq0+BvlJ3dXc
+	 pW9LZKXZ45VlQ==
+Date: Tue, 6 Oct 2026 10:11:16 +0200
+From: Nathan Chancellor <nathan@kernel.org>
+To: Denis Benato <denis.benato@linux.dev>,
+	Jim Cromie <jim.cromie@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-kbuild@vger.kernel.org, nsc@kernel.org,
+	thomas.weissschuh@linutronix.de, chewi@gentoo.org,
+	abelvesa@kernel.org, linux-kernel@vger.kernel.org,
+	Kees Cook <kees@kernel.org>
+Subject: Re: [PATCH] kbuild: install-extmod-build: install
+ kernel/kallsyms_internal.h
+Message-ID: <20261006081116.GA830598@ax162>
+References: <20261005200123.146822-1-denis.benato@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMDA2MDAyNCBTYWx0ZWRfXzRroh2hxk3ho
- /WMxD9GPhvrQGDKuB6JREuWbCxxFi7nBfjphufwdC0fDpAlZIoBCcscZOoVSVUj96K+uOXXqa67
- 8rssQfEvhqQs1nbuE/qIBiZ934KkRY8=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDA2MDAyNCBTYWx0ZWRfX7kWSQavWXc7v
- mZS8AON7SxP7qJGQ5awJIPp1WWPFAnMslr69FD7TLG/fzs7rdUH2iaoVcIucgP7NBIMYWQrYnJk
- sQ0APpK+wS2dp1z3LOZERYwtCvqRgG0QeDWu9740wvu7NuxEFuGbgALGESjcHd+Pc3E5CC+DZnE
- dydYWdgEkJZiC4pj6V+CDy36HhDTCFeLQdlfLxrDJdO8DBMU07ZTPsWmjZ5RdhwCzlV+R0RV35S
- j1XZ0Pgu0bxhCianQyVKfENbWtWMeP2+QZcRlf3h/SUL5yL2i98SwVwzeDKucAy8/3DHJgpn00/
- ZeLH1QYy4DrqvSHJ3yNHvQJVk4ZIe+mlSW3BVA9eIZA1aDfU5bu73S2dLxo7LCUEXZPlbXh7Dm6
- JdPpsQZMlysHoZvitEFkI/nVesCzKeWWH4cgRO19Z/j/0MQ2UqSFa5lzglVd6DX0pmCi4mpG1E/
- U/HBhFpA8I4iRIXRPPw==
-X-Proofpoint-GUID: N0UneCwz4OyrvdRWQDFs2ZF7DNe1FElD
-X-Proofpoint-ORIG-GUID: a1oYyYKwK2rz2UngSXjTTmc1BQoEmsdp
-X-Authority-Analysis: v=2.4 cv=B7osQ+tM c=1 sm=1 tr=0 ts=6ac491d3 cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=IkcTkHD0fZMA:10 a=660iZSQnnn4A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=_kaDUDulWroBixN9eW0A:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-10-06_01,2026-10-05_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 bulkscore=0 malwarescore=0 impostorscore=0 phishscore=0
- clxscore=1015 spamscore=0 adultscore=0 lowpriorityscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2610060024
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261005200123.146822-1-denis.benato@linux.dev>
 
-On Wed, 2026-09-30 at 11:44 +0200, Peter Zijlstra wrote:
-> On Wed, Sep 30, 2026 at 11:43:10AM +0530, Shivang Upadhyay wrote:
-> > On Tue, 2026-09-29 at 16:25 +0200, Peter Zijlstra wrote:
-> > > > c00000000002a610 <system_reset_exception>:
-> > > > c00000000002a610:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0e 01 4c 3c=
-=C2=A0=C2=A0=C2=A0=C2=A0 addis=C2=A0=C2=A0 r2,r12,270
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 c00000000002a610: R_PPC64_REL16_HA=C2=A0=C2=A0=C2=A0
-> > > > .TOC.
-> > > > c00000000002a614:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 f0 6c 42 38=
-=C2=A0=C2=A0=C2=A0=C2=A0 addi=C2=A0=C2=A0=C2=A0 r2,r2,27888
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 c00000000002a614: R_PPC64_REL16_LO=C2=A0=C2=A0=C2=A0
-> > > > .TOC.+0x4
-> > > > c00000000002a618:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 a6 02 08 7c=
-=C2=A0=C2=A0=C2=A0=C2=A0 mflr=C2=A0=C2=A0=C2=A0 r0
-> > > >=20
-> > > > This is happening because we should be looking for destination
-> > > > symbols that are at absolute offsets instead of relative
-> > > > offsets.
-> > >=20
-> > > Again, confused. We run objtool on objects, this is pre-linking,
-> > > there
-> > > are no absolute offsets.
-> > Hi Peter,
-> >=20
-> > This is the special requirement of patching jump assembly
-> > instructions
-> > that we need to know where the jump is performed from/to. As per
-> > 5/6
-> > objtool is run post link on vmlinux. If handling post-link
-> > information
-> > is outside the scope of objtool, please let me know.
->=20
-> I think we can make it work; but this wasn't immediately obvious.
-> Also
-> I'm still struggling to understand what exactly you're doing -- I'm
-> not
-> well versed in the PPC details and have no idea what this ftr thing
-> really is and your patches don't really explain anything much at all.
->=20
-> (Gemini is suggesting this is all somewhat similar to the x86 RIP
-> relative fixup we do for alternatives, but your case is more 'fun').
->=20
+Hi Denis,
 
-Hi Peter,
-Sorry for the delayed response.
+On Mon, Oct 05, 2026 at 08:01:23PM +0000, Denis Benato wrote:
+> The tree staged by install-extmod-build contains no kernel/ files, but
+> since commit 4fafd1165b33 ("kallsyms: increase marker density to 16:1
+> to accelerate lookups") scripts/kallsyms.c includes
+> ../kernel/kallsyms_internal.h.
 
-I think I can explain the feature fixup mechanism and the problem we're
-trying to solve more clearly in the cover letter.
+You did not add either the author or the committer of 4fafd1165b33, I
+have done so now. This would need to be handled by them. However...
 
-Here is a basic example of what we're trying to achieve.
+> install-extmod-build rebuilds the host programs inside the staged tree
+> whenever CC differs from HOSTCC (cross builds, or a ccache-wrapped CC).
+> scripts/kallsyms is hostprogs-always-y, so that rebuild fails with:
+> 
+>   scripts/kallsyms.c:39:10: fatal error: '../kernel/kallsyms_internal.h' file not found
+>      39 | #include "../kernel/kallsyms_internal.h"
+>         |          ^~~~~~~
 
-        GEN_COMMON data_access
+I would rather not ship an internal kernel header in the external module
+build. If these defines are needed to build scripts/kallsyms.c, they
+should live in a separate header that is included in
+{kernel,scripts}/kallsyms.c that is safe to expose to the external
+module build but I defer to the 4fafd1165b33 folks.
 
-            ld      r4,_DSISR(r1)
-            addi    r3,r1,STACK_INT_FRAME_REGS
-            andis.  r0,r4,DSISR_DABRMATCH@h
-            bne-    1f
+> Stage the header so the linux-headers-* and kernel-devel style packages
+> can rebuild scripts/kallsyms.
+> 
+> Fixes: 4fafd1165b33 ("kallsyms: increase marker density to 16:1 to accelerate lookups")
+> Assisted-by: ZCode:glm-5.3
+> Signed-off-by: Denis Benato <denis.benato@linux.dev>
+> ---
+>  scripts/package/install-extmod-build | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/scripts/package/install-extmod-build b/scripts/package/install-extmod-build
+> index f12e1ffe409eb..aad2cd59a37ba 100755
+> --- a/scripts/package/install-extmod-build
+> +++ b/scripts/package/install-extmod-build
+> @@ -20,6 +20,8 @@ mkdir -p "${destdir}"
+>  (
+>  	cd "${srctree}"
+>  	echo Makefile
+> +	# scripts/kallsyms.c includes this header
+> +	echo kernel/kallsyms_internal.h
+>  	find "arch/${SRCARCH}" -maxdepth 1 -name 'Makefile*'
+>  	find "arch/${SRCARCH}" -name generated -prune -o -name include -type d -print
+>  	find "arch/${SRCARCH}" -name Kbuild.platforms -o -name Platform
+> -- 
+> 2.47.3
+> 
 
-        #ifdef CONFIG_PPC_64S_HASH_MMU
-        BEGIN_MMU_FTR_SECTION
-            bl      CFUNC(do_hash_fault)
-        MMU_FTR_SECTION_ELSE
-            bl      CFUNC(do_page_fault)
-        ALT_MMU_FTR_SECTION_END_IFCLR(MMU_FTR_TYPE_RADIX)
-        #else
-            bl      CFUNC(do_page_fault)
-        #endif
-
-            b       interrupt_return_srr
-
-This is the implementation of the data_access exception handler on
-ppc64le. Depending on whether the machine is using the hash or radix
-MMU, we need to execute a different fault handler. The choice is made
-at runtime based on the CPU's feature bits.
-
-The assembly macros therefore generate code for both possible cases at
-build time, and the feature-fixup mechanism later patches the code so
-that only the appropriate path is executed.
-
-The problem is that the linker does not know about this later patching
-when it resolves branch relocations.
-For example, consider:
-
-feat_loc:
-    ...
-
-BEGIN_MMU_FTR_SECTION
-
-    ...
-loc_a:
-    bl      CFUNC(main_feature)
-    ...
-
-MMU_FTR_SECTION_ELSE
-
-    ...
-loc_b:
-    bl      CFUNC(alt_feature)
-    ...
-
-When linking this code, the linker will encode=20
-main_feature - loc_a at loc_a and alt_feature - loc_b at loc_b at two
-bl instructions ablove.
-
-
-However, alt_feature - loc_b is not the offset that we ultimately need
-from the alt branch. When the feature fixup is applied, the instruction
-at loc_a is replaced with the alternative instruction, so the branch
-needs to encode (alt_feature - loc_a) jump.
-
-This distinction matters because the branch displacement has to fit in
-the range representable by the 32-bit PowerPC branch instruction.
-Depending on where feat_loc, main_feature, and alt_feature end up after
-linking, the linker-generated displacement can therefore be different
-from the displacement that is actually needed after the feature fixup.
-In some layouts this can result in either a build-time failure or, more
-importantly, an invalid branch at runtime.
-
-What we're trying to do with the build-time pass is detect these cases
-and prepare the branch relocations for the code as it will actually
-exist after feature patching. At minimum, it should allow us to detect
-an impossible branch offset at build time rather than discovering it
-only after the feature fixup is applied at runtime.
-
-
-> Anyway, I would much rather objtool learns how to deal with absolute
-> sections rather than making things depend on a 'random' ftr option.
-> That
-> is, if we need conditional code, have it be because the secion has
-> non-zero address, not because ftr option or somesuch.
->=20
-> But noting that, can't we simply change:
->=20
-> =C2=A0 decode_instructions()
-> =C2=A0=C2=A0=C2=A0 hash_add(file->insn_hash, &insn->hash, sec_offset_hash=
-(sec, insn-
-> >offset));
->=20
-> to take sh_addr into account? I mean, when unlinked, it'll be 0 so
-> nothing changes, but when already linked, it'll get you the absolute
-> value and then you don't need that fixup later on, or am I missing
-> some
-> details?
->=20
-> So from where I'm at, please:
->=20
-> =C2=A0- teach objtool about absolute sections, not ftr specials
-Sure I will try to rework these patches towards that.
-
->=20
-> =C2=A0- expand changelog to actually explain what these ftr things are an=
-d
-> =C2=A0=C2=A0 how they work and what the actual problem is we're solving, =
-so we
-> =C2=A0=C2=A0 don't need to employ LLMs to understand patches and all that=
- :-)
->=20
-> Does that sound reasonable?
-
-Yes.
-
-Thanks
-~Shivang.
+-- 
+Cheers,
+Nathan
