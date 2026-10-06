@@ -1,173 +1,225 @@
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3EDB49E5C2
-	for <linux-kbuild@vger.kernel.org>; Tue,  6 Oct 2026 16:10:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.169
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791303065; cv=pass; b=W01qkWDR9X6IbG4up8xCWdDKBkC5Ut2MmsOukYkzwjx7oanKFX7mheKt1YwXoOC3Xz5QMt3+v07JxZC3vFcPA/Dz4QKXFY6g4M8yD3nBmCc1rNAPmjRIp/+TyoxWiHtRbbok8xZgpdAv/UD21GiV81M7+7gTk+YLQrQp2+oj9qA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791303065; c=relaxed/simple;
-	bh=9WCkiE19cbtAuYYQ4uqsh1anpnBBbEDR9fWCfux10TA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bIYtqQRWUy55qIqhUfZi4k6f1VeTHMmd7UxrKMm+X1zYc9vTpyROScNfwGc0rZz1LQ167+gYyutUk1S7yarGunfpjb4MhiYFB1zYDRGANcyt8Cs8VUvQFwCZ2+HaRyuLnjmmV9+6SPYd1sZ1Z1rMnEkSAU5t5AjiuQn92Yro3Uc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KAol/EVW; arc=pass smtp.client-ip=209.85.128.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27C76286A4
+	for <linux-kbuild@vger.kernel.org>; Tue,  6 Oct 2026 16:12:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791303154; cv=none; b=ppo8DAtad/593bxLYYGF/UAZX5lCPv6/BUyDR357VdZ9oRLqlhTaX4fAhPbi3l3rvcxmrnFm+QuB6suCUPrLkdqFbmovRbcL6oUbbveA4GQOvg+NsYI1etByfnilU/HIzdAjBLdegvNV3uLrzHbFu/M9D73uqbDK4PT/ZQZ4rK8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791303154; c=relaxed/simple;
+	bh=pzKjQW/5wv5ZV9V2mhGX3XNvxdEG4JnLPbjh3QDWwuY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y0Y8eFLsHBE1Gakm3z6UFhPwzQnqI7t8kbdKblSK3LApw2Zuq+I7lgPzRNeiUm1m3rbl2b0Dk/JjCBGZIpA06R9+om3UvOT5Rz4GBdGTC1AOXznCg5Q78aS4KWbOY2LoIsN/m2m9TMaBjPqLr1cQn5vgeJS3scudMsreISJBzVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=tMte3Lvf; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KAol/EVW"
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-885cf67963eso9928917b3.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 06 Oct 2026 09:10:58 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1791303056; cv=none;
-        d=google.com; s=arc-20260327;
-        b=crr34RP3/C5fAfv5Awe3gBaT0PWFyinNXy89hTdPYTaymt8+RxodskWDw/Zta9Aj9G
-         3l2NguUzvjQE9g+50b/mxT+nmO2srCGxXdzk+TNieavdzTsuuIqiw+xWFhUTsDszK9ES
-         ikU7wQz9hjDjBuBHg9tTD4VPtcMko7sjW8QJYFWMt+WjnkOH41wHnfid+R+HTxwc5uhQ
-         M1nslK7PVvxy6wY2TAIxpPjcCPvJdNaSjAIOVjZr4tx56YPBqkkJDDIBPn44rO2Vd8Ei
-         9EJwG4vjYhVL1qfCnnMPFaHaBexebp6O8SbyNdPnUdzhyofW2Y126O+zGcF1oAWuQ4me
-         goFw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=bfR6JmlAO4hB3DVN/nKPNuuxv4ZNwhQvNLDvwEb4/Vk=;
-        fh=KYTw0o2BH849XkroIn39s7LGAWxBd0EGKeRQuVtK36k=;
-        b=aQZHIiCdZkEpR76kOugRKNIVn1vwRQ2fA0hAyj3N3vtnZ/+rdchEcmDCgGPLt3A1Ei
-         rsz7jrL0+ukelEeb5YFtwxyz+KQTDk734dGxfjWXvWRCuu5hYY+q56cfpfOUgHID/bhs
-         HKIS9c1lfEYLwr4Vwz693jGjVxj976uFJBD0o2o+9H74t0KKPggNrt256gKRjDce5fVs
-         cWTRvO+Xb812cbYf/is+At4auSRSKnvro6gPnmphHyN7+Z9MEVgfWtoFLt2fZ7cQHzaw
-         R/84RfuH/XrpOkJDA1hm5GrP8+0LyiI0JtbyDOnteef3odeEr9+w3d7ruqah2dQoHzDi
-         9skg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tMte3Lvf"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4a02753c04fso5438365e9.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 06 Oct 2026 09:12:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1791303056; x=1791907856; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=bfR6JmlAO4hB3DVN/nKPNuuxv4ZNwhQvNLDvwEb4/Vk=;
-        b=KAol/EVWndwCAAefTkH6Xt23lTKfF8bg89lV6Q/YwYVIALOx+VT+A3ReJEZd7mhVHY
-         u5uAwWXDtUNCGzoumqWqKUFMxCuWAqWc8E48Bs4q8GQJ5DV/MYyK5FkbCaVdzSvlgJAj
-         WpVwnmuRWxclQi+qIP4Q+Q8r08cIMnguge2IESogruJD5JBKihZ7itYtdLHX42G+43CT
-         9v30tzlxMY8Uz6u7pbHeR+g580BmjbeMFh+TLSDfjduVagvTeg3hroCyqU1v5CFFmeXh
-         hlI6dVwjfm6h1J5fH+akAR/gBAnRkbR9KhvIjbt91Gqw4uC9O8uVloodiFrKHYVwC7xk
-         cjRg==
+        d=gmail.com; s=20251104; t=1791303151; x=1791907951; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=YK1JCuzca0AjqMNfZi2xFLLH8cZvTcTPq46uhTC4eYw=;
+        b=tMte3LvfXkONe7Dlmj11co8kzKVEOBEqgw0gR6Jo/EQJ6Gow9gUuwAMTk0Lj/a+juW
+         e3EBNNibrYX68bJYsBEcOgiFTnxoEBy5jjpCdfzgnohdZS1FLscwQAhi4lSAFBZBU2Fc
+         oAodKGiJaKmvIlMvh/yTs7XOkoSa0Hyse2waC/xEzyecx2LD7/a8t+LkVU93MxEdHE5a
+         YG/qw2669HWuUIrcwRYPSSqbcTMZFIsV7GaCFjCKrkUnkKbQqK5R+j79+H6MdStY2v8d
+         SRQwbgVafnZrNoURlD5zTE8YyoHs/kAJY2R+4CatUEzbZza3o24w98hVmWrwrk1P5kgf
+         CO6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791303056; x=1791907856;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=bfR6JmlAO4hB3DVN/nKPNuuxv4ZNwhQvNLDvwEb4/Vk=;
-        b=eJNSjZ80kyoqAzhX/BSRzZmplmZbw3hKZ4k7sjWuf0mgBvOJZonsDuy3XyIVzbXYXV
-         Dba1L6XXu5BqktKezXIQItFKme46w1Cz4WPR3oD+MdfiDfh1FxHEl30mIQQ6ZKNdxp+a
-         RA7SxsevXLeFsoW4eyIKRGEmWh/eU7qfO3KXVjfeVSxt81jvWIk7UTVFYaYYolticN2I
-         I09fsu7OnImaj1mJWKVcmFHHkSrXKhKENM5iXKF+5QYJU2lAgomjHF2zC1WpS5abwoeM
-         TYgxVFWvT88+ejPdjlC8mQ+uOBxN9j59DR7yAv6lwRtQIegMO1oMdyGYRMKeJyraJvkp
-         a3UQ==
-X-Forwarded-Encrypted: i=1; AKwUvByZ0UjTQyniAjbTdqmUy3JkXaoc7A2JRZ0vbAc9707WX2aBF+Nf5xWqnn4w6Tw/S2OWkuIWXgjLZsSatHQ=@vger.kernel.org
-X-Gm-Message-State: AFq9FYJA8jCDwPAKO4BixWz0iMZUmZlC4mot52Wn3jv/1HE1p0O6oJ3e
-	app6/9npRogMYyEs97Vhf3Ipzgdn8TbBrrOCrTllgTdnv0GmFhqoHf1JYbFghVGDs7BBT4FsoKp
-	Sy42VACR+1zO5q50KFSKc3RV8QfTRIArCDSwNfwZh
-X-Gm-Gg: AYBFou3yUhtB8xbo6yA5qvug2C8ZR1oPVscyJogz5tVuc8e8lffM5nzb4JxH/aNpFlO
-	LiuCkpcvJgnwCQAOZxaktqWPrFHJp0M2n/l+14BLroLISTUlzmO1Cr1bl5gE3ofj7VPxc+NqnjP
-	Pd+8vTa8tMbzp+ACjlPHo7O99aFNzVaYP70rXqWE39Gr3+PYQoSFUahwXe0YRbJmGIRSGKvyWvq
-	XCA10voW3Rb1mfCgWHO3lurUD5L68qp5RB5u35tQZIdVmigg99/jAGdNCAL9I2ipVSTXhjoWw7k
-	StEPmVoL8qcFVk6lhSi7NTj3XRSTShhaxhb3wWzWzR8iF7WkeTwbgA==
-X-Received: by 2002:a05:690c:5302:b0:8a8:7e5a:dc2f with SMTP id
- 00721157ae682-8b04f40f097mr9171807b3.12.1791303054779; Tue, 06 Oct 2026
- 09:10:54 -0700 (PDT)
+        d=1e100.net; s=20260707; t=1791303151; x=1791907951;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=YK1JCuzca0AjqMNfZi2xFLLH8cZvTcTPq46uhTC4eYw=;
+        b=cjmILQv6i1qE1m4LTcSB2sDqURVytolwWmKUxVCqtUQrMppbmE6QYWFwz5e621tOHE
+         0S1r8rILYG/UGxw3rqDlPCMW26Jn9KqX8sKXINR9bXEo9tZvtSQvh5Nq/4Sw/jslJdLM
+         EdwggOiC61OWelaVEmflMHtFnoTSukzVA2iF9U4ksEshfE6oNN++kjQme95V4/TRqi/6
+         rpdoHuc03UtzvnaZs3oHQLUfQQBVFsf1I/UtxtOXFtOX/dspuYcJ/Wr6CogSs+vhjWg6
+         C9QYDYYnfJqdrw/Pvt/6VN2F9UIYs9v2ceW3lYLkETOTUhjRFV64ywIdXgvi8C1/EoBg
+         9jfw==
+X-Forwarded-Encrypted: i=1; AKwUvBxtWNTY1ZmigLDz8b1vaq3c5sCMZ2POYzBtAtZcjxOnwwY18opK8sF10Z4J+N/InZD1hdMtaRSYfyjg1Ig=@vger.kernel.org
+X-Gm-Message-State: AFuF++l5OZtPAGw3ZXCMTmB933O2UFYw+Whp0PiRS9/gsv4lHer41pQ/
+	AsgUtpofqPAy0wfb3xWwbPwLUejjg9SwpTgYj9h5SPuwQdvvL7bWZdKr
+X-Gm-Gg: AYBFou3odezy7yF9Znp7PP3oACAaao+pSffXQ72i4KwjCIszsSe9oG61S7LTf0jsNzd
+	bZMApimW9bM8B0D8b3ifRshCYIgCiE5nm0zzyHJ2I40dQDEXSfl4PGogpkVgHzKQbuKeE8DkHzJ
+	xpKAIQBDk0R16AFhQvkp3HxaPa8vGLf6WxUTapaPDHWmx3ESEhcIfdTCkwy7IJM89QtG/VOPufU
+	2nr/dx2uWtdK8WutC7Uty5O89XxIhSGa9WZHKUyjV+qxyin5w3j1S9BkZQNB9/CAP44cuGdXV7X
+	BGMYqBzz1UKc7IlCZU+CoUiSVUooYtDYnSMoWPXQE+MGPugkZNC5EsBojjSj0gDyFgB4VGL+S5d
+	8HqiG/QEz38uXNXSa8dJe0r4I+vwGf8CFGlxTw9Fe67XyQIodJVc2N4lc0jznSdcfq0lndbU36z
+	eW9/cEVhyusBOFTcZ7jm6WcXkRTxAZZ/ohAtKS/LC3Wn3+ygHnPdgfoPy0Gaxk/SoM3GxGkPPRj
+	4sX32/lsFaPqyvI7nmb4wNrIvB3a5WTanis/leCExn8GsYRybbwYwyIOBuRIL534Zs4EPJ0hUwY
+	ATqZpQ==
+X-Received: by 2002:a05:600c:468d:b0:49e:7a10:1b71 with SMTP id 5b1f17b1804b1-4a17b52d29fmr33481165e9.11.1791303151037;
+        Tue, 06 Oct 2026 09:12:31 -0700 (PDT)
+Received: from voyt-laptop-dell.fritz.box ([2001:9e8:bd51:6800:c199:bb10:b06d:d65])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a178c49c35sm89242555e9.9.2026.10.06.09.12.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Oct 2026 09:12:29 -0700 (PDT)
+From: Dmitry Voytik <voytikd@gmail.com>
+To: Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>
+Cc: Nicolas Schier <n.schier@fritz.com>,
+	linux-kernel@vger.kernel.org,
+	linux-kbuild@vger.kernel.org,
+	Dmitry Voytik <voytikd@gmail.com>
+Subject: [PATCH v7] scripts/config: honor $KBUILD_OUTPUT by default
+Date: Tue,  6 Oct 2026 18:11:55 +0200
+Message-ID: <20261006161155.862736-1-voytikd@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <00ed0b57-ad05-4c5d-b152-7c81df94b23a@app.fastmail.com>
-In-Reply-To: <00ed0b57-ad05-4c5d-b152-7c81df94b23a@app.fastmail.com>
-From: Marco Elver <elver@google.com>
-Date: Tue, 6 Oct 2026 18:10:17 +0200
-X-Gm-Features: AclHuK_OeB6Z7-eCIUVq_1RabrgIKOGeEVPLb2q2UdMqE46rpsfhYWgMuA5UU2w
-Message-ID: <CANpmjNOaykC4McAj=gZghqPSQc9aGBP_CjgKmp3n2yjeJTxDSA@mail.gmail.com>
-Subject: Re: [PROPOSAL] Replace gcov and kcov with llvm-cov
-To: chuck@wolber.net
-Cc: kasan-dev@googlegroups.com, nathan@kernel.org, akpm@linux-foundation.org, 
-	anton.ivanov@cambridgegreys.com, oberpar@linux.ibm.com, ardb@kernel.org, 
-	arnd@arndb.de, bhelgaas@google.com, bp@alien8.de, dave.hansen@linux.intel.com, 
-	dvyukov@google.com, hpa@zytor.com, jinghao7@illinois.edu, 
-	johannes@sipsolutions.net, jpoimboe@kernel.org, justinstitt@google.com, 
-	kees@kernel.org, kent.overstreet@linux.dev, linux-arch@vger.kernel.org, 
-	linux-efi@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-um@lists.infradead.org, llvm@lists.linux.dev, luto@kernel.org, 
-	marinov@illinois.edu, masahiroy@kernel.org, maskray@google.com, 
-	mathieu.desnoyers@efficios.com, mhiramat@kernel.org, mingo@redhat.com, 
-	morbo@google.com, ndesaulniers@google.com, paulmck@kernel.org, richard@nod.at, 
-	rostedt@goodmis.org, samitolvanen@google.com, tglx@linutronix.de, 
-	tingxur@illinois.edu, tyxu@illinois.edu, wentaoz5@illinois.edu, 
-	x86@kernel.org, peterz@infradead.org, sashal@kernel.org, 
-	Aleksandr Nogikh <nogikh@google.com>, Taras Madan <tarasmadan@google.com>, 
-	Alexander Potapenko <glider@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Tue, 6 Oct 2026 at 17:14, Chuck Wolber <chuck@wolber.net> wrote:
->
-> Stemming from some hallway track conversations with maintainers at LPC
-> 2026, I propose replacing gcov and kcov in the kernel with llvm-cov.
+If $KBUILD_OUTPUT is set, use it by default if --file is not passed.
 
-I know the origin of the discussion, and wanted to chat, but I guess
-that didn't happen and instead we get this proposal. It would have
-been good to understand the requirements of users of gcov and kcov
-(more below).
+Fix the issue when the script silently updates a stale .config in
+the root directory, while the user expects ${KBUILD_OUTPUT}/.config
+to be updated.
+Handle properly if the config file is a relative path.
 
-> llvm-cov instruments at the AST which enables precise mapping back to
-> source code regardless of optimization level.
->
-> We have a set of patches [1] that implements kernel based llvm-cov. They
-> need to be updated and some additional patches are required to address
-> some stubs that are missing noinstr annotation. But otherwise I should
-> be able to send a full set of patches (including taking on the
-> maintainer role) to remove gcov and kcov and replace it with llvm-cov in
-> fairly short order.
+The problem can be worked around with --file, but this is easy to miss,
+and is inconsistent with how the Makefile and other tools work
+(e.g., scripts/diffconfig).
 
-The hallway chat was supposed to figure out if there's a way to bridge
-some of the gaps, but jumping the gun like this without having
-addressed the requirements of kcov users does not make any sense at
-all.  As for gcov, llvm-cov was designed as a better replacement for
-gcov, so that makes more sense.
+How to reproduce the issue:
+	make mrproper
+	export KBUILD_OUTPUT=.out
+	make defconfig
+	./scripts/config \
+	       -e CONFIG_UBSAN
+Error reported:
+	grep: .config: No such file or directory
 
-Ok, well you made me untangle the most important differences between
-kcov vs. gcov/llvm-cov below so we have it for the record.
+How the patch was tested:
+	make mrproper
+	export KBUILD_OUTPUT=.out
+	make defconfig
+	grep "CONFIG_UBSAN=y" $KBUILD_OUTPUT/.config || echo "OK"
 
-> If there is a desire to take this in pieces or implement other
-> intermediate steps, let me know. Otherwise I can generate a monolithic
-> set all at once.
->
-> [1] https://lore.kernel.org/lkml/20240905043245.1389509-1-wentaoz5@illinois.edu/
+Test the basic usage:
+	./scripts/config -e CONFIG_UBSAN
+	grep "CONFIG_UBSAN=y" $KBUILD_OUTPUT/.config && echo "OK"
 
-llvm-cov is generally useful to have; llvm-cov is closest to gcov, so
-that might make sense to replace.
+Test --refresh picks up correct config file by using $KBUILD_OUTPUT:
+	./scripts/config -d CONFIG_UBSAN
+	grep "CONFIG_UBSAN=y" $KBUILD_OUTPUT/.config && echo "FAIL"
+	./scripts/config --refresh -e CONFIG_UBSAN
+	grep "CONFIG_UBSAN=y" $KBUILD_OUTPUT/.config && echo "OK"
 
-KCOV, however, cannot be replaced by llvm-cov. KCOV isn't a coverage
-reporting tool for users, it's a low-overhead interface for fuzzers
-(syzkaller/syzbot and many others). llvm-cov has no equivalent of:
+Test --file takes precedence over $KBUILD_OUTPUT and a relative
+path is handled properly:
+	./scripts/config -d CONFIG_UBSAN
+	mkdir .out2
+	cp .out/.config .out2/.my_config
+	grep "CONFIG_UBSAN=y" .out2/.my_config  && echo "FAIL"
+	./scripts/config --file .out2/.my_config --refresh \
+	       -e CONFIG_UBSAN
+	grep "CONFIG_UBSAN=y" .out2/.my_config && echo "OK"
+	ls .out/.out2 && echo "FAIL"
+	ls .out/.out && echo "FAIL"
 
-- per-task and remote (kthread/softirq/USB/vhost) coverage collection
-(to avoid polluting coverage with concurrent tasks);
-llvm-cov counters are global and polluted by everything else running;
+Test --file can accept files with hyphen:
+	./scripts/config -d CONFIG_UBSAN
+	cp .out/.config -- -my_config
+	grep "CONFIG_UBSAN=y" -- -my_config && echo "FAIL"
+	./scripts/config  --refresh \
+	       -e CONFIG_UBSAN --file -my_config
+	grep "CONFIG_UBSAN=y" -- -my_config && echo "OK"
 
-- ordered PC traces (edge signal) and comparison operands (TRACE_CMP);
+Signed-off-by: Dmitry Voytik <voytikd@gmail.com>
+---
+v7:
+ * Adressed https://sashiko.dev/#/patchset/20261006142337.821859-1-voytikd%40gmail.com
+v6:
+ * Per Nathan Chancellor's suggestions, simplified
+ * https://lore.kernel.org/lkml/179121581235.2275809.12565811683284940522.b4-review@b4/
+v5:
+ * Per Nathan Chancellor's suggestion, improved handling $FN path by
+   realpath
+ * https://lore.kernel.org/lkml/179097210878.309835.10523307262544578337.b4-review@b4/
+ * Documented the new test scenario in the git commit message
+v4:
+ * Addressed Nicolas Schier's comments - dropped the change how '--refresh'
+   is handled
+ * Implemented conversion of $FN to the absolute path which helps with
+   '--refresh' and relative paths
+ * Documented testing steps in the commit message
+v3:
+ * Added an example in the commit message how to reproduce the issue
+v2:
+ * Addressed comments by sashiko:
+   * https://sashiko.dev/#/patchset/20260920064350.17999-1-voytikd%40gmail.com
+   * use basename when --refresh is used
+   * remove echo which can be misleading when --file is passed
+v1:
+ * https://lore.kernel.org/all/20260920064350.17999-1-voytikd@gmail.com/
+---
+ scripts/config | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
 
-- performance: a per-task mmap'd buffer reset with one store, vs.
-reading/resetting
-megabytes of global counters after every program;
+diff --git a/scripts/config b/scripts/config
+index 32428ea909c2..1e29e449077c 100755
+--- a/scripts/config
++++ b/scripts/config
+@@ -130,13 +130,15 @@ on_exit() {
+ trap on_exit EXIT
+ 
+ FN=.config
++
++
+ CMDS=()
+ while [[ $# -gt 0 ]]; do
+ 	if [ "$1" = "--file" ]; then
+ 		if [ "$2" = "" ]; then
+ 			usage
+ 		fi
+-		FN="$2"
++		FN=$(realpath -q -- "$2" || printf -- "%s\n" "$2")
+ 		shift 2
+ 	else
+ 		CMDS+=("$1")
+@@ -144,6 +146,16 @@ while [[ $# -gt 0 ]]; do
+ 	fi
+ done
+ 
++# ignore $KBUILD_OUTPUT if "--file" option is present
++if [[ "$FN" == ".config" && -n "$KBUILD_OUTPUT" ]]; then
++	if [[ ! -d "$KBUILD_OUTPUT" ]]; then
++		echo "KBUILD_OUTPUT is set but does not exist or is not a " >&2
++		echo "directory. Create it before running $myname." >&2
++		exit 1
++	fi
++	FN=$(realpath -- "$KBUILD_OUTPUT")/"$FN"
++fi
++
+ set -- "${CMDS[@]}"
+ if [ "$1" = "" ] ; then
+ 	usage
+@@ -200,7 +212,7 @@ while [ "$1" != "" ] ; do
+ 		;;
+ 
+ 	--state|-s)
+-		if grep -q "# ${CONFIG_}$ARG is not set" $FN ; then
++		if grep -q "# ${CONFIG_}$ARG is not set" "$FN" ; then
+ 			echo n
+ 		else
+ 			V="$(grep "^${CONFIG_}$ARG=" $FN)"
+@@ -229,7 +241,7 @@ while [ "$1" != "" ] ; do
+ 		;;
+ 
+ 	--refresh)
+-		yes "" | make oldconfig KCONFIG_CONFIG=$FN
++		yes "" | make oldconfig KCONFIG_CONFIG="$FN"
+ 		;;
+ 
+ 	*)
+-- 
+2.55.0
 
-- GCC support (we may want to keep at least one GCC-supported coverage tool).
-
-It's also UAPI (include/uapi/linux/kcov.h), with existing users.
-syzkaller heavily relies on KCOV's features above to achieve good
-performance and coverage; there's no reasonable way today to migrate
-to anything else.
-
-As-is, NAK on removing KCOV. Consider replacing gcov with it.
-
-Thanks,
--- Marco
