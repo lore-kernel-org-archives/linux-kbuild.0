@@ -1,128 +1,89 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68161360EDE
-	for <linux-kbuild@vger.kernel.org>; Tue,  6 Oct 2026 22:39:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C143360EF2;
+	Wed,  7 Oct 2026 02:30:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791326397; cv=none; b=cVY4VnSCcrwxe4pb/rXeX5WhW0/QyOefCHmgp+tsOtjguKJYX6DiQVhTHzulme6cfXsm0AaWvflK38T1Ra8elGY7nSWGr8nQJAYiMqkPVBd6yM5fne440bB2VVo2V0dhOp54n0Ya0cNoof7wGIpmNDThp94kfigetKupKoSCdgI=
+	t=1791340257; cv=none; b=A5L8l5fjQ4SrDCYojLmxUlPXxQ/IqZhdEJjh8pLNRxiJ+fbl2DPMFFNp13FWgw7E+uTuBT0hlyKPQLrLANJ+XBSq7GjEUcpj62QBdsDkcuy6K0GHNIro3fEkH2H8RcNL9iLkaUindZcehenNvP2avVJVV86UXLgG6Nf4rys2cOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791326397; c=relaxed/simple;
-	bh=AdxL2XdONYmbRXYyv/1A1S77fovnRsIOafIkjtja1Ys=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KJVZsCqN+/9Is/iUrFGJnrrN/bpNfHxNq/hnpuk0Zwty8h1O0cqoxl4QMo2L3sjcvm5GeUW+znw16nMMKtROAbAq6Leb5Vj9OSKk3e+wGAmtDdKmjykBigSwKm4Xhj+/pw/c/gmNxk+sZssI53N678FGwU5L0pi1lhuOaiGij/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b=n5OmXMUO; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+	s=arc-20240116; t=1791340257; c=relaxed/simple;
+	bh=8tVV+/gTeRhfiqd4sBW3kFM6n9rW/QNFT1XXavd2IfQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-Id; b=ror171Ca+MQLf3IjEdxApymB0IQ3bMvx54mFwN/00eEHrzUTVgT9fwd9jfW7Zje52c4MMzeMcRngxiip5WmRdS9a6M+DMsHzXTPJgZai/SlfzBVYkjNVoZJ3vL42aoVM/bNhh5MYEz+wTLxEvEyLrGkV2FXgL0GDCQd9riXYoPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J9Fpa3Lc; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b="n5OmXMUO"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4a1688d7769so21479395e9.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 06 Oct 2026 15:39:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre.com; s=google; t=1791326393; x=1791931193; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=AdxL2XdONYmbRXYyv/1A1S77fovnRsIOafIkjtja1Ys=;
-        b=n5OmXMUOpMTFQlR8q3KqD9qIFriQA1h9DTmkOzzYO7hQmcJYog+2Xz/YLh/lMD0U7I
-         8JA/WkVRDtvn7j3YrkXhNXdbTuMpFWQEyC9SoP0pmw8jVM0wKZ10YoIqcN5d6WCL0VVA
-         Ua4qV/9qTdMGcI9Y0t3MZzQv3sbAe4n+rifzmbMvoPNqdLAbobzkQfeQoBhUPZqBlnJ/
-         lFK30J+C99o+NF5rPyGven1uzQWyNd5YNaXWGHPTzmAnVkjYqLLs1lHn7P4+/iN86eHW
-         I4NmQenpYW7RRgAc0ywyKXE0dDCtvPGjjoQfJCMefpwPu1BfBDaf6tJMyAnJac3DLQ2+
-         utvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791326393; x=1791931193;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=AdxL2XdONYmbRXYyv/1A1S77fovnRsIOafIkjtja1Ys=;
-        b=2oMfg2pDdKZ5GvXbWg0NxJ+3nkrg8m9+u5JQqlUxipFVTXclgPfqNpqhOyIMUXrv7e
-         orOGBJAEEgi9v+2GaPreA+iDldoSMDpxo2pUQMiOQV6kT1MAe6E7Uuc8UiN92IFZTy9S
-         wqrfCvwG9zPHtvXm23nwJ44FIVTpNR21p+SAInnGSqcV6LFrTENSwI8IwiTXfY89JzJv
-         8xAaVmKTbOx/oYCaTuYpE+gC+Z0G9DdYTS5Ys29HyE1tUyNwSizEFyvzXXiazlci9t0v
-         tKS7ur2VUgMFEOB9P1ooYjnEu3T1M59wQCZdTDdK0tQcl4hCkiZ+EksFBsWz2ArKpdPP
-         8g8w==
-X-Forwarded-Encrypted: i=1; AKwUvBwAx7dEFZ/4yjv3pVokvvE2Az/Z1jQLUoCxamj1jnI2TeIANb5p91rjllKcwu1l8U6GOW9mI9CLdT86SsU=@vger.kernel.org
-X-Gm-Message-State: AFuF++mLC9agscEYyWcgyP4Nlfo53mnjMdWzr7TW06N44GLgeL8FRIl6
-	8tPVUC959/aiJfW8hoSXWqyEYENhFGPpm7xSCwnIt7EY+4yI2p3G2D/7ekqAvSb4Hb4=
-X-Gm-Gg: AYBFou019ePfMOaJ30CKNfdOYLb3iWarZeDHfhE75jJjqaW96wtskRergvsjFltAccJ
-	z3uIj/9wLXKiTFv39GWYTCyenIUqaZqhNXhWFMxthHkqEyPEAYuKm7EDJa1k7zwzUvnBqvkUZ9C
-	P/TIcnmaESnzUwIWOxuCHX42mMNuNrpX3JZB1FehX+G5wBIOjkUGzS/PG38lAH8lt0zaJFXyS5c
-	yVwqS+aps6+qaxsEANiVRxu2CmXkeQAtRw2ndHhHav+1tTm7kEoDiDcue/9rzKaVXLIhATqOPca
-	LPliNrhA9ZqREGcpEtGVMwDjbCcwS2VSyV7PbkrtwtoqIeQ2cnGj/zd2PcKrLP51li2IgqSBfSG
-	tv6KjF2gOuchyksdIaUNor5+MLD02fmOoE2UMrsBdRPtsx3ftse4FtoyJIqFFVN7gwMa4ponwhO
-	VKsfVB1ZcNohCrR55pLyGLyqmUbu3FgN5SxNnMSheBL2bbsWIieBUKWQoXLASJdXEAFzw77A==
-X-Received: by 2002:a05:600c:3b9e:b0:4a1:742e:3 with SMTP id 5b1f17b1804b1-4a180660fd4mr3921435e9.27.1791326393614;
-        Tue, 06 Oct 2026 15:39:53 -0700 (PDT)
-Received: from localhost ([213.151.81.74])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-4a18044c970sm4177245e9.4.2026.10.06.15.39.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Oct 2026 15:39:52 -0700 (PDT)
-Date: Wed, 7 Oct 2026 00:39:49 +0200
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig_=28The_Capable_Hub=29?= <u.kleine-koenig@baylibre.com>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
-	Huacai Chen <chenhuacai@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
-	Geert Uytterhoeven <geert@linux-m68k.org>, Takashi Sakamoto <o-takashi@sakamocchi.jp>, 
-	Raag Jadav <raag.jadav@intel.com>, "Martin K. Petersen" <mkp@kernel.org>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	Ingo Molnar <mingo@kernel.org>, Josh Poimboeuf <jpoimboe@kernel.org>, 
-	Jorge Sanjuan Garcia <dev-jorge.sanjuangarcia@duagon.com>, 
-	Jose Javier Rodriguez Barbarin <dev-josejavier.rodriguez@duagon.com>, Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>, 
-	Alexey Gladkov <legion@kernel.org>, Hasan Basbunar <basbunarhasan@gmail.com>, 
-	Hugh Dickins <hughd@google.com>, Armin Wolf <W_Armin@gmx.de>, WANG Xuerui <kernel@xen0n.name>, 
-	kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, Sudeep Holla <sudeep.holla@kernel.org>
-Subject: Re: [PATCH v1 0/3] <linux/mod_devicetable.h> deprecation continues
-Message-ID: <asV4UKTFRPv4gCUx@monoceros>
-References: <cover.1789988540.git.u.kleine-koenig@baylibre.com>
- <179121379654.1159753.4410832336442519712.b4-review@b4>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J9Fpa3Lc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04BD71F0089B;
+	Wed,  7 Oct 2026 02:30:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791340255;
+	bh=u9Jzggo5Sk1RIZ8WfB+NnbFsVZN8V/kovGtc4d+jfE4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=J9Fpa3LcaeRJJ0NN9pOs90uK8L5DfSIm6mAjBw3gmroRxWWWbxFb2QBY7xicSVbTY
+	 kbT+6EbbrPeXqPTzIZSl5/gq1BAb/eOayV7XE6ey3RwmBfWTB/v8VEyyTyoAPPCrA0
+	 cri8dcOXQ4A0qnYtSKy+NgeB4uPoFvN8orlfSO6E0eSFWRtrdwF2a402XVtWbKvh06
+	 lRSjh3VEzncBxVqPnfDnS6lW0nafLoHm9hnGRK/TzY+qZEDFBRoQzJvP8LcOcuGEQ4
+	 hQFNwpwttAKu5D3ATtRtUDpP6pXX3rhBtplR2oet7NU6iXQYKvGbkYwoqZeZiWZCOd
+	 Nvx4c87Puw11A==
+From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
+To: chuck@wolber.net
+Cc: Marco Elver <elver@google.com>, kasan-dev@googlegroups.com,
+ nathan@kernel.org, akpm@linux-foundation.org, anton.ivanov@cambridgegreys.com,
+ oberpar@linux.ibm.com, ardb@kernel.org, arnd@arndb.de, bhelgaas@google.com,
+ bp@alien8.de, dave.hansen@linux.intel.com, dvyukov@google.com, hpa@zytor.com,
+ jinghao7@illinois.edu, johannes@sipsolutions.net, jpoimboe@kernel.org,
+ justinstitt@google.com, kees@kernel.org, kent.overstreet@linux.dev,
+ linux-arch@vger.kernel.org, linux-efi@vger.kernel.org,
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, linux-um@lists.infradead.org,
+ llvm@lists.linux.dev, luto@kernel.org, marinov@illinois.edu,
+ masahiroy@kernel.org, maskray@google.com, mathieu.desnoyers@efficios.com,
+ mhiramat@kernel.org, mingo@redhat.com, morbo@google.com,
+ Nick Desaulniers <ndesaulniers@google.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>, richard@nod.at,
+ Steven Rostedt <rostedt@goodmis.org>, samitolvanen@google.com,
+ tglx@linutronix.de, tingxur@illinois.edu, tyxu@illinois.edu,
+ wentaoz5@illinois.edu, x86@kernel.org, peterz@infradead.org,
+ Sasha Levin <sashal@kernel.org>, Aleksandr Nogikh <nogikh@google.com>,
+ Taras Madan <tarasmadan@google.com>, Alexander Potapenko <glider@google.com>
+Subject: Re: [PROPOSAL] Replace gcov and kcov with llvm-cov
+Date: Wed, 07 Oct 2026 02:30:42 +0000
+In-Reply-To: <41913a77-5c57-4967-8166-765dd5dde1bf@app.fastmail.com>
+References: 00ed0b57-ad05-4c5d-b152-7c81df94b23a@app.fastmail.com
+ CANpmjNOaykC4McAj=gZghqPSQc9aGBP_CjgKmp3n2yjeJTxDSA@mail.gmail.com
+ <41913a77-5c57-4967-8166-765dd5dde1bf@app.fastmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="c7j23svchiupmb33"
-Content-Disposition: inline
-In-Reply-To: <179121379654.1159753.4410832336442519712.b4-review@b4>
+Message-Id: <20261007023045.04BD71F0089B@smtp.kernel.org>
 
+On Tue, 06 Oct 2026 16:27:11 +0000, Chuck Wolber <chuck@wolber.net> wrote:
+> On Tue, Oct 6, 2026, at 4:10 PM, Marco Elver wrote:
+> > On Tue, 6 Oct 2026 at 17:14, Chuck Wolber <chuck@wolber.net> wrote:
 
---c7j23svchiupmb33
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Subject: Re: [PATCH v1 0/3] <linux/mod_devicetable.h> deprecation continues
-MIME-Version: 1.0
+> >> If there is a desire to take this in pieces or implement other
+> >> intermediate steps, let me know. Otherwise I can generate a
+> >> monolithic set all at once.
+> >>
+> >> [1] https://lore.kernel.org/lkml/20240905043245.1389509-1-wentaoz5@illinois.edu/
+> >
+> > llvm-cov is generally useful to have; llvm-cov is closest to gcov, so
+> > that might make sense to replace.
+>
+> Swapping llvm-cov for gcov to start with is pretty straightforward, so I
+> can aim my initial patch set there.
 
-Hello Nathan,
+Hmm, is it necessary to remove gcov? Would it be difficult to simply add
+support for llvm-cov and enable (make kconfig selectable) one or the other
+depending on the compiler?
 
-On Mon, Oct 05, 2026 at 05:23:16PM +0200, Nathan Chancellor wrote:
-> If you would like this in 7.4-rc1, I am not opposed to sticking your v2
-> into -next now but I plan to finalize the Kbuild tree for 7.4 around
-> October 15, so we'd only get a week or so of build coverage. If that
-> feels like too little, we should defer this until after 7.4-rc1 is out.
+Thanks,
 
-I'll look into your build regressions and then I'm happy to get it into
-next for 7.5-rc1.
-
-Thanks
-Uwe
-
---c7j23svchiupmb33
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmrFeLMACgkQj4D7WH0S
-/k75zQf/Z9M3Qv+MzXCE+/ArZCIjcf7D1SB/7qYHmlMpHOhpIQCpv43i8PqY8WOv
-ulcwbwStLe9f4pjnBVM0/Rm9nby9VZo3bK79LWBMwnwkZORonA2EqgQdsoZdfRp+
-rAETMDcFUQ9GUGhN7DAcWMA4xZhjUtso0mWGwtF7ExTFgEpE33GWQUBdTInG2TNI
-0u2gVDxfb010LE6jzbHBJLoFNE/8LEPyCVyCCWsoCz+xslpavz8+KA5j3Frpl3Iz
-ier5fkw0XOws8piZfouheZOaXqDZ/HcdrhFTBW9mXVnvMLiUaiH05aCOv9h33Etu
-n9pm75LVifFbz4hIGjjZonFwBzkLug==
-=5U0C
------END PGP SIGNATURE-----
-
---c7j23svchiupmb33--
+-- 
+Masami Hiramatsu (Google) <mhiramat@kernel.org>
