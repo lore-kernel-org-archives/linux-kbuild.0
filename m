@@ -1,147 +1,136 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1739F4DEC3B;
-	Wed,  7 Oct 2026 18:39:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDD972D2381;
+	Wed,  7 Oct 2026 20:07:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791398396; cv=none; b=dxZMSd+7sk6FB5TrQ6j8DeufFAjPtZt9IoxOwg+VLkVWi2hwsEl7ve3xa/+6jBBdRWPtT3DleKbU1JY4k5gVHzucIW0u/o+WWzWI+7Zj06mf2CRI5Qpcm2PdKazyPfmOLdCpIr8Dy4aQZqQNNHP2ioMO3YrNWVDnlhqJETk43bg=
+	t=1791403667; cv=none; b=cwE/7Ep4FKRBETvlgFD6yEm5LxFy+LvvmiLBrHYblFiDONkUdJ+Z8KP91Z+OgQb77n05aRu9DdmplWNppSLdLWGKTu4KT0Xfy5M+P6deie0MNZBajXySIjFri7c6eeb0aOhLRx+tQN77dP4jNbbthcIAfIsI3rgmSMuQ8EemDj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791398396; c=relaxed/simple;
-	bh=yEzeEqRyzkeNneE75WHmeQNkwdywPpw0kTdt/SFmhjo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=dvhsc9Ly1fqMrNPmzk5iYmmSlPCA58IDsPKg/6TMqU9NpcP+LkJNuQFCc3hsjOaMiXOcRpXdjoTszSgXIDPZWmEm3RXVJarafwz1BRonq0LSFwS3X4tiI01qqK2fh1j/DBDtStFdobujxdubTYWEJU7WGxWkIAxlc30dUIuOMug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C87mh4D3; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791403667; c=relaxed/simple;
+	bh=bH3NpiRHLy6ZimCTfeOj7af4gdBlLoeTC/rXJhX10ho=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=gkmwkYNNq24jWkO7L/DhAeuY8E4dj83sCgq/d4phdc2e7zovfuWxulII4OltnobI1XDQxp45NANaOqoUPQI1lWfiyIUvhAWZotZRnPRuMNu62x3wCNzV7I5/gilibiZN/C8shB6bsahAa5cYvceqRpD0xuz82wa9exr5if7GrGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QY7bxkR4; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C87mh4D3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B0641F000FF;
-	Wed,  7 Oct 2026 18:39:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QY7bxkR4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A9941F000FF;
+	Wed,  7 Oct 2026 20:07:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791398394;
-	bh=MCv2C8fY4xu/QhMyWNKnDvP7nn6RLVcj+W4fGSSQzxs=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=C87mh4D3PuE9JqnkDteZuVBp4Thf5qSVhMmXT9EErkLFZC79D+3bQfdDEAQi3P64l
-	 NnBkANyX52HKjFTYGRiNCOm8peEaM3bljXkJ/k/VZ6N4POZTZJEnrm/Ky0mRvlyICp
-	 vnC8rrMt0WADxRwijkljVbCCPJZ/56P7zqzB90ajjDBWijBWu0ITUBO/od7xZ7Ui+0
-	 6a1uREhmegJU0QP9w9d6FejXrdulI73V0xenF119lM0LfrkwjqmMzmHMIWmQmr2Z5/
-	 kElSJJIjwKMVySn6CLyPlF3yvxIDWzdn0Ilql+xF8fD6wU2rMZc4IsfYEszG1J48lY
-	 lQDgGxQrY2YkQ==
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Date: Wed, 07 Oct 2026 13:39:41 -0500
-Subject: [PATCH v3 2/2] kbuild: Support directory targets for building DTBs
+	s=k20260515; t=1791403666;
+	bh=uIfV0utYMy6w3AWAoewRUL2FEQ26Nt1akZVRYxWqn0g=;
+	h=Date:From:To:Cc:Subject;
+	b=QY7bxkR4KI7K2QB8yDwGe7bjNFoU+P7CzEDiehJsDnv+2ydI4gcfErA7+icmAnlGZ
+	 NL37G1Mh00XP1+hcK3x0cemuwFAlH7KFD9mPYPIE1JQ1fT4c3tSK/dBSSK/dvOyNPu
+	 Zj5WVzBfPAwHm/Ly988nw3898QZvQYpIeVPayF173l0Wd4+Za3SM8DbVaytMWWuiui
+	 lIdYYYfnlc3lU+ApPw6c3LKHCm0jXQDlZ8Tmkjh+JAVDnokmP6AhBwpoqgR5+UQ2n9
+	 v8bqim9horutZhw2Z8b8avgVuSjEnAm1MzXUArotZ5igEj7RTymnJEIxiH8kwT0a4n
+	 XH5JFvlp9Rymg==
+Date: Wed, 7 Oct 2026 22:07:41 +0200
+From: Alejandro Colomar <alx@kernel.org>
+To: Miguel Ojeda <ojeda@kernel.org>
+Cc: linux-man@vger.kernel.org, Nathan Chancellor <nathan@kernel.org>, 
+	Nicolas Schier <nsc@kernel.org>, linux-kbuild@vger.kernel.org
+Subject: Non-recursive makefiles, and static pattern rules
+Message-ID: <asai2yXbMC1KJ-ty@debian>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261007-dtb-dirs-v3-v3-2-b3ab32b64fa6@kernel.org>
-References: <20261007-dtb-dirs-v3-v3-0-b3ab32b64fa6@kernel.org>
-In-Reply-To: <20261007-dtb-dirs-v3-v3-0-b3ab32b64fa6@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
- Saravana Kannan <saravanak@kernel.org>
-Cc: David Heidelberg <david@ixit.cz>, Arnd Bergmann <arnd@arndb.de>, 
- linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
- devicetree@vger.kernel.org
-X-Mailer: b4 0.16-dev
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="wtmlllfu3w7appgt"
+Content-Disposition: inline
 
-It is useful to be able to build all the DTBs for a vendor. One can list
-all the .dts files in a directory and convert those to %.dtb targets,
-but that doesn't work for base+overlay DTB targets.
 
-The 'dtbs' and 'dtbs_check' targets can use the directory rule targets
-as well which avoids different make paths for building DTBs.
+--wtmlllfu3w7appgt
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+From: Alejandro Colomar <alx@kernel.org>
+To: Miguel Ojeda <ojeda@kernel.org>
+Cc: linux-man@vger.kernel.org, Nathan Chancellor <nathan@kernel.org>, 
+	Nicolas Schier <nsc@kernel.org>, linux-kbuild@vger.kernel.org
+Subject: Non-recursive makefiles, and static pattern rules
+Message-ID: <asai2yXbMC1KJ-ty@debian>
+MIME-Version: 1.0
 
-Assisted-by: LLM
-Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
----
-v3:
- - Reworked on top of single target rule for %.dtb
- - Make dtbs target use directory rule.
- - Move adding boot/dts subdir out of the arch code. Now supported on
-   every arch (not that useful without vendor dirs).
- - Removed the need to look at MAKECMDGOALS
- - Fixed unnecessary rebuilding DT base+overlay targets
- - Link to v2: https://lore.kernel.org/all/20251120204812.1983452-4-robh@kernel.org/
+Hi Miguel,
 
-v2:
- - Convert arm, mips and riscv. The other DT enabled arches don't have
-   vendor directories.
- - Link to v1: https://lore.kernel.org/all/20251113225952.867138-1-robh@kernel.org/
----
- Makefile               | 8 ++++----
- scripts/Makefile.build | 7 +++++++
- scripts/Makefile.dtbs  | 2 ++
- 3 files changed, 13 insertions(+), 4 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index c307ee9293bc..75d290c2b7d8 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1664,8 +1664,8 @@ dtbindingtree := Documentation/devicetree/bindings
- ifneq ($(dtstree),)
- 
- PHONY += dtbs dtbs_prepare dtbs_install dtbs_check
--dtbs: dtbs_prepare
--	$(Q)$(MAKE) $(build)=$(dtstree) need-dtbslist=1
-+dtbs:
-+	$(Q)$(MAKE) $(dtstree)/
- 
- # include/config/kernel.release is actually needed when installing DTBs because
- # INSTALL_DTBS_PATH contains $(KERNELRELEASE). However, we do not want to make
-@@ -2216,7 +2216,7 @@ single-goals := $(addprefix $(build-dir)/, $(single-no-ko))
- 
- # DT-only targets need host tools, but no architecture-specific preparation.
- ifneq ($(dtstree),)
--single-dt-patterns := $(addprefix $(dtstree)/,%.dtb %.dtbo)
-+single-dt-patterns := $(dtstree)/ $(addprefix $(dtstree)/,%.dtb %.dtbo %/)
- ifeq ($(filter-out $(single-dt-patterns),$(single-no-ko)),)
- single-build-prep := dtbs_prepare
- endif
-@@ -2234,7 +2234,7 @@ prepare: outputmakefile
- # Error messages still appears in the original language
- PHONY += $(build-dir)
- $(build-dir): $(single-build-prep)
--	$(Q)$(MAKE) $(build)=$@ need-builtin=1 need-modorder=1 $(single-goals)
-+	$(Q)$(MAKE) $(build)=$@ need-builtin=1 need-modorder=1 need-dtbslist=1 $(single-goals)
- 
- clean-dirs := $(addprefix _clean_, $(clean-dirs))
- PHONY += $(clean-dirs) clean
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 4349108e75e1..d22b3b2d43b3 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -38,6 +38,13 @@ include $(srctree)/scripts/Makefile.compiler
- include $(kbuild-file)
- include $(srctree)/scripts/Makefile.lib
- 
-+# Make DT directory targets reachable for architectures with a DTS tree.
-+ifeq ($(obj),arch/$(SRCARCH))
-+ifneq ($(wildcard $(src)/boot/dts/),)
-+subdir-y += boot/dts
-+endif
-+endif
-+
- # flags that take effect in current and sub directories
- KBUILD_AFLAGS += $(subdir-asflags-y)
- KBUILD_CFLAGS += $(subdir-ccflags-y)
-diff --git a/scripts/Makefile.dtbs b/scripts/Makefile.dtbs
-index c4e466390284..c7ec2a2a308e 100644
---- a/scripts/Makefile.dtbs
-+++ b/scripts/Makefile.dtbs
-@@ -23,7 +23,9 @@ dtb-y           := $(addprefix $(obj)/, $(dtb-y))
- multi-dtb-y     := $(addprefix $(obj)/, $(multi-dtb-y))
- real-dtb-y      := $(addprefix $(obj)/, $(real-dtb-y))
- 
-+ifdef need-dtbslist
- always-y        += $(dtb-y)
-+endif
- targets         += $(real-dtb-y)
- 
- # dtbs-list
+As we talked earlier today, if you're trying to improve performance of
+the kernel makefiles, I recommend checking a few things we've done in
+the man-pages.git repo.
 
--- 
-2.53.0
+In the man-pages, we have a huge set of makefiles (not as large as the
+kernel, but 120k is already huge for the scale of this project).  The
+performance seems nice, and it's a non-recursive set of makefiles.
 
+(If you're curious, the reason we have so much makefile code is that
+ I set up a large number of linters to run in the build system, with
+ 'make -R lint'.  See 'make -R help' and 'make -R help-targets' if you
+ want to look at what we have available there.)
+
+We use static pattern rules:
+<https://www.gnu.org/software/make/manual/html_node/Static-Pattern.html>
+
+That is:
+
+	targets =E2=80=A6: target-pattern: prereq-patterns =E2=80=A6
+		recipe
+		=E2=80=A6
+
+This results in a huge database when make(1) runs, being 10x larger than
+what we would get with regular pattern rules.
+
+However, recently I tried moving to pattern rules, since I thought the
+smaller database could improve performace, but the experience was
+surprising: the run time degraded by several orders of magnitude.
+I don't remember the exact numbers, but a full
+	'make -R -j24 build-all lint check'
+(which is building almost everything that the build system can build)
+would take a few minutes with the huge database, and several hours with
+the size-optimized database using regular pattern rules.
+
+I suspect it's because by having to guess for each file which rule to
+apply (and being non-recursive, it has the whole list of thousands of
+files, and around a hundred different patterns, so the combination is
+explosive) is too expensive.  By using pattern rules, make(1) doens't
+have to guess, and thus goes directly to the rule that applies to each
+file.
+
+I think this might solve the issues you were seeing in your experiment.
+(Or it might not.)  :-)
+
+Please let me know if this changes anything in your experiments!
+
+
+Have a lovely night!
+Alex
+
+
+--=20
+<https://www.alejandro-colomar.es>
+
+--wtmlllfu3w7appgt
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEES7Jt9u9GbmlWADAi64mZXMKQwqkFAmrGpoIACgkQ64mZXMKQ
+wqlI1A//Xo09dUc8tNuerWPsvzfRZ2E+x0TVX49ai/TjknlZD0SYi6fDuO4lzQPU
+opeC1y+OiVhdSKtZuu4E3XYyX3m7TU5Y79pfdF4qgG9Sw/F40GKcjrDRBBJOc5JU
+kd15zKgJLyYlsCZ6ioXAVHutuZbHMqzlIWloDgBiZJT6cIPYeaCnAEa8Mph2uxXd
+D51+TXy0b14AKGNkHaBDbZOBY4FMbcxHrTArTbxlpa8c62hyGqcj9w4Oen+fSNMT
+v7n4Hd8z5zBfq90VWwHepEN5eyA/h8C0I8SKjOcgzqB+7n9YA8VrHVi02zp6lr1N
+rDAjNAfZ2wfiGoFZ1t87K4l39ahHEmF3drWdZTwOHXKebNjvZtI6GtUkcXI0tH1J
+hECjhbfiEwcPsv0qJIYijlEsl+BI0WlmxMeySoFv0SFp0kZioFzVq8cAIIu6IszX
+lu5C51OU+H2mBS/bTo9LEQeTepFbMxSXUCKBidOP7TvBjMUNceYNci8VnKwoQH75
+WJ1SwCa+pzDMbMyH1CJBz+xCqGFDZXfc9TQtKz4svU+TBtUHa0NTJlnoYE9thxvC
+1ahrVPE5ZD09KFAAcvxW6VIv8BaTaVro22fKXtvpCr0XWpljHM0lEDvkAvGEotVl
+gWuEbNgOGixq8xbqXhFZG05LvUQ/DpS3MVXRD/kAJuQfu1ho0iI=
+=/GK6
+-----END PGP SIGNATURE-----
+
+--wtmlllfu3w7appgt--
