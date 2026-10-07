@@ -1,34 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13B383F9278;
-	Wed,  7 Oct 2026 18:39:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA0A48F026;
+	Wed,  7 Oct 2026 18:39:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791398394; cv=none; b=OoZgiYQPQKpDczOcb9QTVJ3cbNGe9hnB9SnAIVTObKittZxemTJ3btkhyTiKyxfIKG2ryFwPLON5JzkKmLXyPAUuEw6zz/+eTlE4WmO75EKfHIxz48y6MK2PTbqPHn/kKfn1w9RNCbe8LAeqFN/6QDUr1aDL50I2pENorp4EYTI=
+	t=1791398395; cv=none; b=PkCiw7t5h7Nq6d9tImm+MKj0Lo+WWmF61xK0tr+HW7kpA5uZfwvwX/MevdLoifGN3rQx8bJWYlavinLc6tFA2l4gKJZ2IA4+Tr24QJWyaSfGfUyIawPWgxZEcE5M9cAIZXO4EolLzOccp9Au0jVuePRjN9igYcZXRweoA4L6Anc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791398394; c=relaxed/simple;
-	bh=UORl/uNa3wGti+ue7KW8x7N+YScZXQNc5JRZ9kK0OaE=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=TwiTLD7cL/FxueDPGzf7PHZSDc2B6KDArxjhLllIAfrPuI1OgUMEoYadsaImcnGEfUZAikwGeszkXvPbWCwOsy5osOHqgQ0whAVZir07rGFk7axRtwUYL4X0ZCnLQ0W/3/rLU2xx78wooQgQ/5YAlTmttMpmzNpLNEo3gPHSoEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uu9wNbuh; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791398395; c=relaxed/simple;
+	bh=QpR/+p4shYH6IPSpl9TwA6tHi7LJ+UOqgGubad3Y0JE=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=LLgGTWjNH0EFkOJFAUeFfa6h29DASEOgS34DbNoLArHu3/fy8Pvm1lCbaHumMqVLkzAHoRjH9BfTjDWs1MFQk1fkuJUU4AKqRPsVdaw758OPx0pPd0lgVOwUBWKKOKXlHpMl5SInEjo84sP0lQXp5X1EL850T4i57hhhSTVMmUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gSEVSF1P; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uu9wNbuh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 721A71F000FF;
-	Wed,  7 Oct 2026 18:39:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gSEVSF1P"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EFE71F00893;
+	Wed,  7 Oct 2026 18:39:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791398392;
-	bh=MtYGr0EkWaUSjq2uuv4mKWSPQibpHHkHm8hrxLVGzos=;
-	h=From:Subject:Date:To:Cc;
-	b=Uu9wNbuhGewDapTD+rpmrFOmx3NeJO897BNNLi/XyZtoBrcT8YRl/Q2vPXgrwK2h+
-	 P/JzA3Q2BjliFE+nq/fznQ9Bgu2eE6KeBIuBrUYjH33pyLOSBWfQwesjOFugV/SyBD
-	 w29fbUg5sY11AzzYhsnmwafz49E4RVsK/ZisFJMGTRp91/ZYADUlyN20Yx/L7B1Vpx
-	 ChIGByXnHt/9Wc9pTURSp19kJCL1IhVhAQ1cKatn0xUmtohOipmdHxB4LJ29hUeyu6
-	 cjPcKt/Q9vMD0j7dvkeU7PpwVib4t1KoBuRy5+uHrgljNkSpkuHg1XVeGjsm/b5I10
-	 3rmotbujlnBrw==
+	s=k20260515; t=1791398393;
+	bh=iXhTo5GsUVensTg07JpCi6r4Zmzr7mztwPkHp0oBui8=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc;
+	b=gSEVSF1PxEUY0EkdYgi+TvtpDjpxr9EAFrlDDNwpbty5fwf7MsgnCoCNk2HsBtZSa
+	 rOQZSQXJUOr7jkRyDD/VX3vYRNKR5Px2eJ9fBZ8Qxam7FCpxneClghjX4fkU+32oVe
+	 7LOiYnwvGvRfwyMs3subtgCkAeOMblsyJ+PIEIsLNlkJnG6MPZv6/kDziEsJbwGmos
+	 lVpbUSigt7/1xO4rzRlzqtYRFXj2Eu01SwLNND1sMmM22+kiEF8EJyqZ6Qwk6l2F5+
+	 o1pKb69MxDdx0x+P2KJR7jYYI7ze6dWcxS6u7RPlh7yVSwVGSDZRruSAV9bSxJNcDz
+	 lsw48+8/uGSyw==
 From: "Rob Herring (Arm)" <robh@kernel.org>
-Subject: [PATCH v3 0/2] kbuild: Support directory targets for DTBs
-Date: Wed, 07 Oct 2026 13:39:39 -0500
-Message-Id: <20261007-dtb-dirs-v3-v3-0-b3ab32b64fa6@kernel.org>
+Date: Wed, 07 Oct 2026 13:39:40 -0500
+Subject: [PATCH v3 1/2] kbuild: Convert %.dtb(o) targets to single target
+ rules
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -37,10 +38,9 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXMTQ5EQBBA4atIrVVSfgZxFbHQ3dWUBdKFTCLuP
- s0sv8V7FygHYYU2uSDwKSrrElGkCdhpWEZGcdGQU15lRDW63aCToHgWSNT44eO9sXUJsdgCe/m
- +t67/Ww8zs92fBdz3D2+YDrtvAAAA
-X-Change-ID: 20261007-dtb-dirs-v3-008fa5ffbc74
+Message-Id: <20261007-dtb-dirs-v3-v3-1-b3ab32b64fa6@kernel.org>
+References: <20261007-dtb-dirs-v3-v3-0-b3ab32b64fa6@kernel.org>
+In-Reply-To: <20261007-dtb-dirs-v3-v3-0-b3ab32b64fa6@kernel.org>
 To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
  Saravana Kannan <saravanak@kernel.org>
 Cc: David Heidelberg <david@ixit.cz>, Arnd Bergmann <arnd@arndb.de>, 
@@ -48,42 +48,105 @@ Cc: David Heidelberg <david@ixit.cz>, Arnd Bergmann <arnd@arndb.de>,
  devicetree@vger.kernel.org
 X-Mailer: b4 0.16-dev
 
-This series adds support for using directory targets to build DTBs. This 
-is primarily useful for architectures with lots of vendor DTS 
-subdirectories.
+Single .dtb and .dtbo targets can be built using the existing kbuild
+single target infrastructure. The only difference is the custom rules
+work on a relative path under the arch dts directory, so we have to
+fixup the path for the single targets.
 
-v2 had some issues reported after I applied. In fixing David's issue,
-that introduced random parallel build issues Arnd reported. I didn't get
-it figured out quickly, so I ended up dropping it. I finally got
-around to revisiting it with some LLM help this time. Having multiple 
-paths in the build system to building DTBs complicates things, so I've 
-reworked things to always use the single target and directory targets 
-for building.
+With this both relative and full paths work:
 
-Arnd, can you give this a spin on your randconfig builds?
-    
-Please ack and I'll take this in the DT tree.
+make arch/arm64/boot/dts/arm/juno.dtb
+make arm/juno.dtb
 
-v3:
- - Convert %.dtbo? rules to single target
- - Convert dtbs rule to use directory target
- - Link to v2: https://lore.kernel.org/all/20251120204812.1983452-4-robh@kernel.org/
+Complicating matters is building DTBs works without $ARCH compiler as
+only the host preprocessor is used. This is useful for building all the
+DTBs in the tree without installing a bunch of cross-compilers. The
+single target rule needs to depend on 'dtbs_prepare' rather the
+'prepare' to maintain support for that.
 
 Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
 ---
-Rob Herring (Arm) (2):
-      kbuild: Convert %.dtb(o) targets to single target rules
-      kbuild: Support directory targets for building DTBs
-
- Makefile               | 32 ++++++++++++++++++++------------
- scripts/Makefile.build |  7 +++++++
- scripts/Makefile.dtbs  |  2 ++
- 3 files changed, 29 insertions(+), 12 deletions(-)
+v3:
+ - New patch
 ---
-base-commit: cee9395acd8043be0644b25c34bfa86623f2b935
-change-id: 20261007-dtb-dirs-v3-008fa5ffbc74
+ Makefile | 26 +++++++++++++++++---------
+ 1 file changed, 17 insertions(+), 9 deletions(-)
 
-Best regards,
---  
-Rob Herring (Arm) <robh@kernel.org>
+diff --git a/Makefile b/Makefile
+index 4ad67b737af7..c307ee9293bc 100644
+--- a/Makefile
++++ b/Makefile
+@@ -301,7 +301,7 @@ no-dot-config-targets := $(clean-targets) \
+ 			 run-command
+ no-sync-config-targets := $(no-dot-config-targets) %install modules_sign kernelrelease \
+ 			  image_name
+-single-targets := %.a %.i %.ko %.lds %.ll %.lst %.mod %.o %.rsi %.s %/
++single-targets := %.a %.i %.ko %.lds %.ll %.lst %.mod %.o %.rsi %.s %.dtb %.dtbo %/
+ 
+ config-build	:=
+ mixed-build	:=
+@@ -1663,12 +1663,6 @@ dtbindingtree := Documentation/devicetree/bindings
+ 
+ ifneq ($(dtstree),)
+ 
+-%.dtb: dtbs_prepare
+-	$(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
+-
+-%.dtbo: dtbs_prepare
+-	$(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
+-
+ PHONY += dtbs dtbs_prepare dtbs_install dtbs_check
+ dtbs: dtbs_prepare
+ 	$(Q)$(MAKE) $(build)=$(dtstree) need-dtbslist=1
+@@ -1683,7 +1677,7 @@ export CHECK_DTBS=y
+ endif
+ 
+ ifneq ($(CHECK_DTBS),)
+-dtbs_prepare: dt_binding_schemas
++scripts_dtc: dt_binding_schemas
+ endif
+ 
+ dtbs_check: dtbs
+@@ -2190,6 +2184,8 @@ modpost: $(if $(single-build),, $(if $(KBUILD_BUILTIN), vmlinux.o)) \
+ #
+ #   make foo/bar/baz/
+ 
++single-build-prep := prepare
++
+ ifdef single-build
+ 
+ # .ko is special because modpost is needed
+@@ -2212,8 +2208,20 @@ ifneq ($(KBUILD_MODPOST_NOFINAL),1)
+ endif
+ 	$(Q)rm -f modules.order
+ 
++# For compatibility with existing %.dtb targets without full path
++single-dtb := $(filter-out $(dtstree)/%, $(filter %.dtb %.dtbo, $(single-no-ko)))
++single-no-ko := $(filter-out $(single-dtb), $(single-no-ko)) $(addprefix $(dtstree)/, $(single-dtb))
++
+ single-goals := $(addprefix $(build-dir)/, $(single-no-ko))
+ 
++# DT-only targets need host tools, but no architecture-specific preparation.
++ifneq ($(dtstree),)
++single-dt-patterns := $(addprefix $(dtstree)/,%.dtb %.dtbo)
++ifeq ($(filter-out $(single-dt-patterns),$(single-no-ko)),)
++single-build-prep := dtbs_prepare
++endif
++endif
++
+ KBUILD_MODULES := y
+ 
+ endif
+@@ -2225,7 +2233,7 @@ prepare: outputmakefile
+ # make menuconfig etc.
+ # Error messages still appears in the original language
+ PHONY += $(build-dir)
+-$(build-dir): prepare
++$(build-dir): $(single-build-prep)
+ 	$(Q)$(MAKE) $(build)=$@ need-builtin=1 need-modorder=1 $(single-goals)
+ 
+ clean-dirs := $(addprefix _clean_, $(clean-dirs))
+
+-- 
+2.53.0
 
