@@ -1,210 +1,108 @@
-Received: from mout-p-103.mailbox.org (mout-p-103.mailbox.org [80.241.56.161])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B874839E6FD;
-	Wed,  7 Oct 2026 16:38:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.161
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C1FE3D6494;
+	Wed,  7 Oct 2026 16:48:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791391103; cv=none; b=ZVczPKHW5bsnlK+dbkjxlfTbddkijAtRrWOvqag5uu1qLPaNuGExY1vrva7QrNf+6CULEOpWPXjAXQ4IrNeiW+DqLJ5HFU0zPGUDz+LKvbEXBSTVC0qnd745//u4E7BxGEH3yqJvGg+d1AlQ7kgzNXIcuu2yI9EqaoIcQgcwVKw=
+	t=1791391740; cv=none; b=NESli1VRpqv0v8vfS216+50twcWgbAh2iH/4CFScLrIq/DIGEmCzAcCPq+FZljuEuSw2SfAPrpV++iTl3bzTeW1+YKsyYINnjib8dR+f1E5SMnK6quKi/weAMckW9tsNM2Gzfi2aHiJEzw9oni3pMgE3vFIlvKdRPYYK67+G4sw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791391103; c=relaxed/simple;
-	bh=rt+DI0Zaj7t1gLzFkXpDITiac40k4MGIO8meOBYmFCU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FkP7yUos9Fhl6rmiMQMHaAu9wUfnZqHJuKYFkZUbOE2liiYghr9Wki0SIwx0jqQCJFUMwdjivS8uOzCMQGm7q4ct/XmJKkZftYRB4hkqPNMY3Kn4rMmsJu2PEEz0LjY1iqBBgUfDrEiLkCTT2xUNL1U5GUcLUyvm/e0ji6o3DGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=UkFfAXte; arc=none smtp.client-ip=80.241.56.161
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+	s=arc-20240116; t=1791391740; c=relaxed/simple;
+	bh=63DBgPC5fWRWOiBsqLD2nxkypDionXxCDanuUsEwW6w=;
+	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
+	 References:Date:Message-Id; b=ivcivZPdtYpo6ILBVTW3NTxYS2KxbkI4ly53n2nOiE+vsYfW7sqFKMpU8tqqOvkTy1qwB1P1ok/5SBeoP0/ia7tRflpTr8TVvXmj+h+Uiyvn3w5Vl0hFnUw0T5Ix6w4UbTvP18GfCMa99CGSzemr0Ruf5Jx3Y2/4DuKruOajezw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OOZYnquD; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="UkFfAXte"
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [IPv6:2001:67c:2050:b231:465::2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519MLKEM768 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-103.mailbox.org (Postfix) with ESMTPS id 4j0Jhn135gzKnYC;
-	Wed, 07 Oct 2026 18:38:17 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1791391097;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=2Ezflyex2QCq4IDhV46iLXvD5SXyLtu7Un9mXAhjKQE=;
-	b=UkFfAXtexXMe4siEWkyoHJ7MLt9nnrmneb00G00NlXzSKyG2mdf+UNnktckKGk2nPnUkki
-	ueDkpfo5Yq1KIJJq7XvES43wbpRTJOFu57yqBFD4LUn3Uofvxo/kEj3P07j9/axs+NKdwv
-	CxUfTARcVHCHVOMSj7gnaFOEWz+UOxUlgM0ZTBjbV59KzB1vG1UVFJkvjVf8FIte5lgjYd
-	jRVVoTd2irs6lA9k09ObJEmN8vp9J5joXIGZmHwK8MG3tuzF2dzXF0tnpXF37HRDV2SWZ2
-	KqH91ITWRUWJvrK0lSp9YBxYVeHbhsx5vUzZzElveAvuHNYEMjjg/0dVg7AsDQ==
-From: Manuel Ebner <manuelebnerli@mailbox.org>
-To: Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	linux-kbuild@vger.kernel.org,
-	oe-kbuild-all@lists.linux.dev,
-	linux-debuggers@vger.kernel.org,
-	tools@linux.kernel.org,
-	workflows@vger.kernel.org (open list:DOCUMENTATION PROCESS),
-	linux-doc@vger.kernel.org (open list:DOCUMENTATION),
-	linux-kernel@vger.kernel.org (open list)
-Cc: Manuel Ebner <manuelebnerli@mailbox.org>,
-	Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-	Nicolas Schier <n.schier@fritz.com>
-Subject: [PATCH RFC] changes.rst: introduce 'Required for'-column
-Date: Wed,  7 Oct 2026 18:37:37 +0200
-Message-ID: <20261007163736.3942745-2-manuelebnerli@mailbox.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OOZYnquD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DB151F000FF;
+	Wed,  7 Oct 2026 16:48:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791391737;
+	bh=TI8viKS7UbOM7Mw5YCQrqv/rB/kvhX2cfMuh/KBFRos=;
+	h=Subject:From:To:Cc:In-Reply-To:References:Date;
+	b=OOZYnquDByH2uDabUmrDgA+tTKw0dM/VrReZl4FuVyVXIJA8rTEtHnfiebjI/T0Jj
+	 EuYch1QEufNJuRn3UAk86Rk0aJhOweQaoIvirU2z6OYbD2UXDFlbOK3xqd7NXcUMMM
+	 6iUsSq1w5FNe4C4nZeptrv5Xt580ju2JvvPmJ+kx9tJ2jG7auigjTU0g0WOhlg8n5k
+	 tD9vGDx7QiGm8jA4nVuRnRoipFCLvSCI66DkruL/QNpolBIZtFUzatEQ8q7fr4/qcz
+	 yYKRMMidE7b3o7IEhyxbqhwLtxHwvxE9WU0XmB4UGC3FLnPYJ2yjvktqQZzxIuLkbI
+	 R/o5gxLoNJt5Q==
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-MBO-RS-ID: dddea4e6f5fbbada107
-X-MBO-RS-META: rx4z7z4tgdgubcmsyy11wmkig53ae4fe
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH 0/2] Initial ergonomic improvements to
+ scripts/Kconfig.toolchain
+From: Nicolas Schier <nsc@kernel.org>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Nicolas Schier <nsc@kernel.org>, Julian Braha <julianbraha@gmail.com>, 
+ Lorenzo Stoakes <ljs@kernel.org>, Kees Cook <kees@kernel.org>, 
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20261007-scripts-kconfig-toolchain-improvements-v1-0-1e524178da11@kernel.org>
+References: <20261007-scripts-kconfig-toolchain-improvements-v1-0-1e524178da11@kernel.org>
+Date: Wed, 07 Oct 2026 18:48:40 +0200
+Message-Id: <179139172076.154975.7876331914722818497.b4-review@b4>
+X-Mailer: b4 0.17-dev-fde28
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1511; i=nsc@kernel.org;
+ s=20250924; h=from:subject:message-id;
+ bh=63DBgPC5fWRWOiBsqLD2nxkypDionXxCDanuUsEwW6w=;
+ b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBqxnfuepnT+4vHpKWtv1Q6lkhfXEUF6lkj+6VcB
+ wMSLNZldNuJAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCasZ37gAKCRAHUgpwFiYS
+ aXlwD/0TS+yeVVAZHlcOCoO+yTZokUN7/wSpwna3nHHc47TBkb8iAlMDA2xmKdWv8NtUn5OWgPI
+ ZyTRb2soeKWbhcpiWGOvqmzeHiXdKcd14Jsz2/ChQAv1CmC+ksRVt2yxr8AoOV39xfyEFs0lWCw
+ xroeK1zwHMtR68WLcJakwHE84HKKg2QEAJ3494WLXTBV8kqGkKvKfS9fCtadBCP8dIF5jbMXB3M
+ ZeDt5DgOzCKTXkXxaTsu+ALhgJbs91vH1e0+ANuccLGTl5e9p9jy10Fk08crlmShoCrdjJKAfaI
+ DYVAZr5SD0cP02oeNWFPd30aMnjBFJ4YzR8FFZC6CNHQmRpl01D4K5pzlTPr7q9RvNV5uZ5NaIP
+ ZYJOIT6gx5FE48F45XOsU7B2QbEk6kxEQCwnfEMGjDLHfHm2rQ/F4lvYll2tz0QitBj9XPFsHbm
+ sHGYUT3j/UOnRZz3VijCP6hwpEY0A3qAAzi63wGPvCg6Vr0yBfMgHp9yV8l31hsdxEu6HwdcQTZ
+ FQcElryEasp5depYR1hsMq1HCvdLOh5DG0bR9oapjpHBETiBMOGS84+St1GHRItTPYWDdj/+vp2
+ oEyu6jB9S4lQY0hGLri0Q9qkpsnUfWoL+OzfQBCgRWdPVugrLMSi4eiMo/K8Q1IB3HAsEQ7zobY
+ V10xvCHK68s6GdA==
+X-Developer-Key: i=nsc@kernel.org; a=openpgp;
+ fpr=18ED52DBE34F860EE9FBC82B7D97093255A0CE7F
 
-The optional tag isn't obvious nor defined. Therefore remove the tag and
-add column 'Required for' to make it easier to define the need for the tools.
+> Hi all,
+> 
+> This series includes a cleanup to scripts/Kconfig.toolchain around
+> dependencies (the first patch) and improves the ergonomics of using
+> cc-option and cc-option-str in Kconfig to disable warnings, making
+> Kconfig and Kbuild more unified in their behavior (the second patch).
+> 
+> ---
+> Nathan Chancellor (2):
+>       scripts/Kconfig.toolchain: Drop compiler symbols from dependencies
+>       kconfig: Improve ergonomics around disabling warnings with cc-option
+> 
+>  scripts/Kconfig.include   |  2 +-
+>  scripts/Kconfig.toolchain | 22 +++++++++++-----------
+>  2 files changed, 12 insertions(+), 12 deletions(-)
 
-CC: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-CC: Nicolas Schier <n.schier@fritz.com>
----
-If anybody has info to add to or refine the new column I would appreciate it a lot.
-Please forward this to list or people which can contribute to this patch.
+Thanks, straight-forward!
 
-There's also the option to remove the 'Command to check the version'-column
-and refer to scripts/ver_linux - and with this also removing the duplicated
-information-issue.
+When I look into the resulting .config, I'd wish, these empty string
+kconfig symbols could be unset, e.g.
 
-[v3]
- Rearange column space of the table in order to add column instead of replacing column
- add some requirements to the table
+    # CONFIG_CC_OPT_WNO_FORMAT_TRUNCATION_NON_KPRINTF is not set
+    # CONFIG_CC_OPT_WNO_DEFAULT_CONST_INIT_UNSAFE is not set
+    CONFIG_CC_OPT_WNO_DANGLING_POINTER="-Wno-dangling-pointer"
+    CONFIG_CC_OPT_WVLA_LARGER_THAN="-Wvla-larger-than=1"
+    CONFIG_CC_HAS_WSTRINGOP_OVERFLOW=y
 
-[v2]
- Ditch footnotes in favor of a column
- Replace 'Check Version Command'-column with optional-column
- https://lore.kernel.org/all/20260831152523.638881-1-manuelebnerli@mailbox.org/
+instead of the current:
 
-[v1]
- https://lore.kernel.org/all/20260812122426.1636227-2-manuelebnerli@mailbox.org/
----
- Documentation/process/changes.rst | 97 ++++++++++++++++---------------
- 1 file changed, 51 insertions(+), 46 deletions(-)
+    CONFIG_CC_OPT_WNO_FORMAT_TRUNCATION_NON_KPRINTF=""
+    CONFIG_CC_OPT_WNO_DEFAULT_CONST_INIT_UNSAFE=""
+    CONFIG_CC_OPT_WNO_DANGLING_POINTER="-Wno-dangling-pointer"
+    CONFIG_CC_OPT_WVLA_LARGER_THAN="-Wvla-larger-than=1"
+    CONFIG_CC_HAS_WSTRINGOP_OVERFLOW=y
 
-diff --git a/Documentation/process/changes.rst b/Documentation/process/changes.rst
-index 28f2ca633..dafe0530f 100644
---- a/Documentation/process/changes.rst
-+++ b/Documentation/process/changes.rst
-@@ -1,13 +1,14 @@
- .. _changes:
- 
--Minimal requirements to compile the Kernel
--++++++++++++++++++++++++++++++++++++++++++
-+Minimal requirements to interact with the Kernel
-+++++++++++++++++++++++++++++++++++++++++++++++++
- 
- Intro
- =====
- 
--This document is designed to provide a list of the minimum levels of
--software necessary to run the current kernel version.
-+This document is designed to provide a list of the minimum versions of
-+software necessary to change code, compile, install and boot the current
-+kernel version.
- 
- This document is originally based on my "Changes" file for 2.0.x kernels
- and therefore owes credit to the same people as that file (Jared Mauch,
-@@ -27,48 +28,52 @@ running a Linux kernel.  Also, not all tools are necessary on all
- systems; obviously, if you don't have any PC Card hardware, for example,
- you probably do not need to concern yourself with pcmciautils.
- 
--====================== ===============  ========================================
--        Program        Minimal version       Command to check the version
--====================== ===============  ========================================
--bash                   4.2              bash --version
--bc                     1.06.95          bc --version
--bindgen (optional)     0.71.1           bindgen --version
--binutils               2.30             ld -v
--bison                  2.0              bison --version
--btrfs-progs            0.18             btrfs --version
--Clang/LLVM (optional)  17.0.1           clang --version
--e2fsprogs              1.41.4           e2fsck -V
--flex                   2.5.35           flex --version
--gdb                    7.2              gdb --version
--GNU awk (optional)     5.1.0            gawk --version
--GNU C                  8.1              gcc --version
--GNU make               4.0              make --version
--GNU tar                1.28             tar --version
--GRUB                   0.93             grub --version || grub-install --version
--gtags (optional)       6.6.5            gtags --version
--iptables               1.4.2            iptables -V
--jfsutils               1.1.3            fsck.jfs -V
--kmod                   13               kmod -V
--mcelog                 0.6              mcelog --version
--mkimage (optional)     2017.01          mkimage --version
--nfs-utils              1.0.5            showmount --version
--openssl & libcrypto    1.0.0            openssl version
--pahole                 1.26             pahole --version
--pcmciautils            004              pccardctl -V
--pigz (optional)        2.4              pigz --version
--PPP                    2.4.0            pppd --version
--procps                 3.2.0            ps --version
--Python                 3.9.x            python3 --version
--quota-tools            3.09             quota -V
--Rust (optional)        1.85.0           rustc --version
--Sphinx\ [#f1]_         3.4.3            sphinx-build --version
--squashfs-tools         4.0              mksquashfs -version
--udev                   081              udevadm --version
--util-linux             2.10o            mount --version
--xfsprogs               2.6.0            xfs_db -V
--====================== ===============  ========================================
--
--.. [#f1] Sphinx is needed only to build the Kernel documentation
-+==============  ========  =======================  ========================================
-+    Program     Minimal      Command to check                  Required for
-+                version         the version
-+==============  ========  =======================  ========================================
-+bash            4.2       bash --version           general requirement
-+bc              1.06.95   bc --version             Kbuild (
-+bindgen         0.71.1    bindgen --version        CONFIG_RUST=y
-+binutils        2.30      ld -v
-+bison           2.0       bison --version          Kbuild (.config)
-+btrfs-progs     0.18      btrfs --version
-+Clang/LLVM      17.0.1    clang --version          alternative to GNU C (gcc)
-+e2fsprogs       1.41.4    e2fsck -V                ext4
-+flex            2.5.35    flex --version           Kbuild (.config)
-+gdb             7.2       gdb --version            Debugging
-+GNU awk         5.1.0     gawk --version           objtool, CONFIG_SYSTEM_BLACKLIST_HASH_LIST=y
-+GNU C           8.1       gcc --version            alternative to Clang/LLVM (clang)
-+GNU make        4.0       make --version
-+GNU tar         1.28      tar --version
-+GRUB            0.93      grub --version ||
-+                          grub-install --version
-+gtags           6.6.5     gtags --version          to generate tag files through ``make gtags``
-+iptables        1.4.2     iptables -V
-+jfsutils        1.1.3     fsck.jfs -V
-+kmod            13        kmod -V
-+mcelog          0.6       mcelog --version
-+mkimage         2017.01   mkimage --version        Flat Image Tree (FIT) or ARCH=arc, arm or powerpc
-+nfs-utils       1.0.5     showmount --version
-+openssl         1.0.0     openssl version
-+pahole          1.26      pahole --version
-+pcmciautils     004       pccardctl -V
-+pigz            2.4       pigz --version           Compile and boot with KPGZIP=y
-+PPP             2.4.0     pppd --version
-+procps          3.2.0     ps --version
-+Python          3.9.x     python3 --version
-+quota-tools     3.09      quota -V
-+Rust            1.85.0    rustc --version          CONFIG_RUST=y
-+Sphinx          3.4.3     sphinx-build --version   build kernel documentation
-+squashfs-tools  4.0       mksquashfs -version
-+udev            081       udevadm --version
-+util-linux      2.10o     mount --version
-+xfsprogs        2.6.0     xfs_db -V
-+==============  ========  =======================  ========================================
-+    Program     Minimal      Command to check                  Required for
-+                version      check the version
-+==============  ========  =======================  ========================================
-+
- 
- Kernel compilation
- ******************
+but that would make things unneccessary more complicated, right now.
+
+Reviewed-by: Nicolas Schier <nsc@kernel.org>
+
 -- 
-2.55.0
+Nicolas
 
