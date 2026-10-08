@@ -1,155 +1,98 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from freefriends.org (frenzy.freefriends.org [198.99.81.75])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0C2041A547;
-	Wed,  7 Oct 2026 20:11:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0786A3D75AA
+	for <linux-kbuild@vger.kernel.org>; Thu,  8 Oct 2026 07:29:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.99.81.75
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791403901; cv=none; b=namRUXaMD5aLQtSIR8EQnBpWWwmOfX9BA4fIQmQzZ8+dTgGgvlg9MwpFpYMJUm8QaDufEO/h++Bcc9VWi6IQ/NXRw1Hzyqh3CP4PobE0kegMuc6dgXA8WlmdBuG0hD4Om4P4dE9CtAz1oid6KM5mwgfK/F8DJZ+2SXEYoD7WOLo=
+	t=1791444587; cv=none; b=m6PeIY6+6UcBnMUG7hUkqdeXEkHEFVFBkhrueMC8X2gAmpdoIoKz5tFJEWkcPjzW+jyIRUnI3DPUiZm4bsyEbzy97dGDwrezkzlxFo3Gt/8WuHwyk6+2pk+FFl58zXcx3Enrbnk5IGSfWfXK6yS2anauoxmt0n6l08PEGxRt79A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791403901; c=relaxed/simple;
-	bh=2HdBqTIIiRmazvG8IU9zmyB8Qea8b/5qKc/ZCkhf+hs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WFJuHo71h2jnc13V5Cp5aMRTMqyqDPJ5dbT1I5G1xOmfrvn5JzKGp5yzZf16YdPYzRZBNLScqyJmQH8A9wY0WgO5ylWXMQJeUZ0DXTM+2wpJMdTAo4tDu2nLIWa+iSXG3vcOQ3ZOueIudzTMvjWHvbMuRSAjMrpXJcCGA8AFKv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MJHorX/b; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MJHorX/b"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E35F1F000FF;
-	Wed,  7 Oct 2026 20:11:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791403900;
-	bh=admbv9hI6fEwHAPfn4g8Yc6IVV8f4vTKqVk+7c6kAPw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=MJHorX/bvDKNu15Ix11PB6OQ30RlHtGoQ8u4P/mKfE7yvpDo0xHy0OBerUid1M3f9
-	 976WgSx3xNNtVNxOpxS9vT4gVTzqEMf6LLVTfm+Aas1Ui2YsEIpIRliBbXt+8LGDAS
-	 yRYzahhmIxDbHYbxEPea1xK65jg7k0UhzI2wi4eVnvGh/sioUlR11qlPlJyTb4JNFr
-	 d9ziMX3Jye1165eRnOy5Z4fNsxE+UBU3yXGy5hl54HYKUjfckU+YFx3oHpevIrX5Pa
-	 MioI8ql/UtYy+hXwNd/ojltF4hBwv3yd/89L8a7lik34ta24y9zHhXdV6If5ItMzTB
-	 ZRdLFW5wHdiDA==
-Date: Wed, 7 Oct 2026 22:11:35 +0200
-From: Alejandro Colomar <alx@kernel.org>
-To: Miguel Ojeda <ojeda@kernel.org>
-Cc: linux-man@vger.kernel.org, Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nsc@kernel.org>, linux-kbuild@vger.kernel.org
-Subject: Re: Non-recursive makefiles, and static pattern rules
-Message-ID: <asanWpr8jKGW8x1E@debian>
-References: <asai2yXbMC1KJ-ty@debian>
+	s=arc-20240116; t=1791444587; c=relaxed/simple;
+	bh=wbrCbcnBkvMLRpdHSFLp19vOu6ij1+YlH7Fqm0kkh64=;
+	h=From:Message-Id:Date:To:Subject:Cc:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=Mj1pZXS5COTgRKdh1Fvp7KbIKOoX1iAp9zwEtNvh8GZ++u3rXXqOPg9TPAkOvgndGo6Hv4WpmbswXVCNEuHvc5aRQuuKn5fPbrrpUhYTjiw1Mt3ggR+stHXfjarqF/eR4708JHHpHdtC0PgM1Xb1mbq+5Iypj05tFyd61DB8z7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=skeeve.com; spf=pass smtp.mailfrom=skeeve.com; arc=none smtp.client-ip=198.99.81.75
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=skeeve.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=skeeve.com
+X-Envelope-From: arnold@skeeve.com
+Received: from freefriends.org (localhost [127.0.0.1])
+	by freefriends.org (8.16.1/8.16.1) with ESMTPS id 6987TLum032856
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Thu, 8 Oct 2026 01:29:21 -0600
+Received: (from arnold@localhost)
+	by freefriends.org (8.16.1/8.14.7/Submit) id 6987TKQT032852;
+	Thu, 8 Oct 2026 01:29:20 -0600
+From: arnold@skeeve.com
+Message-Id: <202610080729.6987TKQT032852@freefriends.org>
+X-Authentication-Warning: frenzy.freefriends.org: arnold set sender to arnold@skeeve.com using -f
+Date: Thu, 08 Oct 2026 01:29:20 -0600
+To: nathan@kernel.org, arnold@skeeve.com
+Subject: Re: Use of `gawk -M' in kernel build scripts
+Cc: peterz@infradead.org, linux-kbuild@vger.kernel.org, jpoimboe@kernel.org
+References: <E1xDQvK-00000000Kvi-2PZ4@gleep.local>
+ <20261005085332.GA2094974@ax162>
+ <202610050902.69592lvj021580@freefriends.org>
+In-Reply-To: <202610050902.69592lvj021580@freefriends.org>
+User-Agent: Heirloom mailx 12.5 7/5/10
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="htqwiuri3m3q5vh3"
-Content-Disposition: inline
-In-Reply-To: <asai2yXbMC1KJ-ty@debian>
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
+Josh, Peter,
 
---htqwiuri3m3q5vh3
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-From: Alejandro Colomar <alx@kernel.org>
-To: Miguel Ojeda <ojeda@kernel.org>
-Cc: linux-man@vger.kernel.org, Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nsc@kernel.org>, linux-kbuild@vger.kernel.org
-Subject: Re: Non-recursive makefiles, and static pattern rules
-Message-ID: <asanWpr8jKGW8x1E@debian>
-References: <asai2yXbMC1KJ-ty@debian>
-MIME-Version: 1.0
-In-Reply-To: <asai2yXbMC1KJ-ty@debian>
+Anything to add?
 
-> Date: 2026-10-07 22:07:46+0200
-> From: Alejandro Colomar <alx@kernel.org>
+Thanks,
+
+Arnold
+
+arnold@skeeve.com wrote:
+
+> Hi Nathan.
 >
-> Hi Miguel,
->=20
->=20
-> As we talked earlier today, if you're trying to improve performance of
-> the kernel makefiles, I recommend checking a few things we've done in
-> the man-pages.git repo.
->=20
-> In the man-pages, we have a huge set of makefiles (not as large as the
-> kernel, but 120k is already huge for the scale of this project).  The
-> performance seems nice, and it's a non-recursive set of makefiles.
->=20
-> (If you're curious, the reason we have so much makefile code is that
->  I set up a large number of linters to run in the build system, with
->  'make -R lint'.  See 'make -R help' and 'make -R help-targets' if you
-
-Oops, it's s/help-targets/help-list-targets/
-
-
-Cheers,
-Alex
-
->  want to look at what we have available there.)
->=20
-> We use static pattern rules:
-> <https://www.gnu.org/software/make/manual/html_node/Static-Pattern.html>
->=20
-> That is:
->=20
-> 	targets =E2=80=A6: target-pattern: prereq-patterns =E2=80=A6
-> 		recipe
-> 		=E2=80=A6
->=20
-> This results in a huge database when make(1) runs, being 10x larger than
-> what we would get with regular pattern rules.
->=20
-> However, recently I tried moving to pattern rules, since I thought the
-> smaller database could improve performace, but the experience was
-> surprising: the run time degraded by several orders of magnitude.
-> I don't remember the exact numbers, but a full
-> 	'make -R -j24 build-all lint check'
-> (which is building almost everything that the build system can build)
-> would take a few minutes with the huge database, and several hours with
-> the size-optimized database using regular pattern rules.
->=20
-> I suspect it's because by having to guess for each file which rule to
-> apply (and being non-recursive, it has the whole list of thousands of
-> files, and around a hundred different patterns, so the combination is
-> explosive) is too expensive.  By using pattern rules, make(1) doens't
-> have to guess, and thus goes directly to the rule that applies to each
-> file.
->=20
-> I think this might solve the issues you were seeing in your experiment.
-> (Or it might not.)  :-)
->=20
-> Please let me know if this changes anything in your experiments!
->=20
->=20
-> Have a lovely night!
-> Alex
->=20
->=20
-> --=20
-> <https://www.alejandro-colomar.es>
-
-
-
---=20
-<https://www.alejandro-colomar.es>
-
---htqwiuri3m3q5vh3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEES7Jt9u9GbmlWADAi64mZXMKQwqkFAmrGp3cACgkQ64mZXMKQ
-wql5Tw//V6CMjcKa0Q7lNjmLxOKP5dkojg2iU03qF91w0W6aTOV3BgexjAylW30g
-TuweGgONEPsFmxdpHcZ5sZ1Q9T8iEwtLGTfd8XCPtgRdlpY5T5lIYDo9oIYfjkZ1
-kqwxusV61AsyLw8MLdKyO0jj0PJweFJ9x6ucNndRq9CwDYQQedfLHxwagI9T6apL
-tZXhcLYELVoYlK6ih7JSE5DuCE3wsT4JR3lKkopSP2j4th5rRKle+T/l/HsE7a9C
-XqvGy5vfiCbodwHm7/gOq2dcIAidS0DIuPM7Sb/dO0+euL7NJFLBk7OHaVf/VP8h
-IvcmtiATrZKLZz/T1nPAKXblggF4W7wcdfKUX065j3kGhjIR91bEeYWUb1OYkRbW
-ZipeRV0gql/PtjGZgrowU/EzwUImq9p8WT0AFSXmyB9XPAMKLLVg34nRNlPm9iWw
-T4VnoGTTrVIAZmOH+3OgUhYd7pkLaPBHjLKdApTssXHm8Tvh/0ma5/OgGnRAE/0W
-rrSnerq3+mvXFIpCv0q3V86KUnJ9fQ4aQL7j0pCsLc1aCkePdnUasuKm2Wm5VETj
-9jpBGkWzvLEEZ1oFPBWdNzYUY0hF+OisXHeDqbcbqJqBjZYpmXKhLb639GhGB8V0
-9rfhxvKPmjHiKwmx8E1wC2Gwe5xtcZCs8Wk9OOZ3EG5gYV32fdA=
-=bM5N
------END PGP SIGNATURE-----
-
---htqwiuri3m3q5vh3--
+> Thanks for the note. gawk -M is also used in a file named check.c (I didn't
+> save the full path, sorry), which has the objdump-func script embedded
+> in it for calling via system(3).
+>
+> Josh and Peter, looking forward to hearing more.
+>
+> Thanks,
+>
+> Arnold
+>
+> Nathan Chancellor <nathan@kernel.org> wrote:
+>
+> > Hi Aharon,
+> >
+> > On Sun, Oct 04, 2026 at 09:26:58PM +0300, Aharon Robbins wrote:
+> > > I'm the maintainer for gawk. I see that it's used in the kernel build
+> > > scripts in combination with objdump.
+> >
+> > For the record, the only place where I see '-M' used with gawk is in
+> > scripts/objdump-func, which is not called during the kernel build
+> > thankfully.
+> >
+> > > In particular, I note that gawk is invoked with the -M option, which
+> > > uses MPFR for arithmetic (although the precision isn't changed beyond
+> > > the default which is the same as for IEEE hardware floating point).
+> > > 
+> > > I am wondering if the -M option is really needed here?  The reason I
+> > > ask is that I plan to deprecate MPFR support. The upcoming 6.0 release
+> > > (I hope in Q2 2027) will issue a deprecation warning when -M is used,
+> > > and 6.1 (late 2027 or early 2028, I hope) will have MPFR support removed
+> > > entirely.
+> > > 
+> > > So, I wanted to give you folks a heads-up. If -M isn't needed, now's a good
+> > > time to remove its use from the kernel build.
+> >
+> > Adding Josh and Peter for the rest of this since they have
+> > added/supported this script.
+> >
+> > -- 
+> > Cheers,
+> > Nathan
