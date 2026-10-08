@@ -1,160 +1,104 @@
-Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 549783955C1
-	for <linux-kbuild@vger.kernel.org>; Thu,  8 Oct 2026 16:45:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D116F3AC0F6;
+	Thu,  8 Oct 2026 16:47:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791477947; cv=none; b=X1sLAp7weFBmI67TxKcj0Txnx2BBR9gt5nsBYscoxWLGAO+pt89MEHEYK/2C4UhuITrBegM1VSnKCycRPTe/hMt/p9rvP/iKXSg5u9KHefuVv9/iy3bWZN9phTPO5o5tE07pdTlEu1j30/CfnDjMWezjkk292rob4btTq1z9O2g=
+	t=1791478063; cv=none; b=mchcKVaJzNvhR/2RxOK+rDf9AD5+DgKf3YNGXSkvapVBvx4ygcIWYcCLyA4kF87/M3Io6pRLJV0bLmEPY1YUfU2Q9Mjdv3a92Scid/m/GCr0MBRW2SckdYuk3CRyv2qNPqBTVwro6JHCV0paQoXklrWA/1kzl5lPIdOulNmi6k4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791477947; c=relaxed/simple;
-	bh=2Gm3oCZAH5xEPW2gFonKXTzdW+Tu4iKs/jZ3IkMSoYA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iQGV6a646ncqPKexcOWgwkv9aTQqWS225Qv1wzybQugKzAkQ8rBIzzD4HXXGFOCxJZlGbxLNwcGXDTGrHIYTyMuYQxvWVo6Q7jzNWT7IK5TNl53aEm8/n7/Rf701BqAirOoEbnIWPSahW7QhdZm5MqYU4XgBy31eq+fZXPPSkBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aWq+cAzP; arc=none smtp.client-ip=209.85.210.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791478063; c=relaxed/simple;
+	bh=lfi62Wq4KPAm0onZOFBMdVRcXq1i6ZdsCCMqpM8htjU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uDqaVMOzQF0x5m+x8JRB7rOaomV9pebS7aLZd9f4BzeKTDdb1MZPDABwYhB1pgmv6Qn1ybQeOwNLIM5g2qCKNwFbFkwsbIGc2LLTnz2AE4HZBYoTl1kAb/yMycCTQdC3t7HoWCmeFNy5JReEVpMAdkFGtWWGzQb/PGab2xxrwCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yv6L+Luw; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aWq+cAzP"
-Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-82503732024so1459930a34.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 08 Oct 2026 09:45:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791477945; x=1792082745; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=UCfPp+7/JHVdolqbV5gJwvu/HMj/BA+RBUV+QQaMos4=;
-        b=aWq+cAzPzQDEKT0AWeYSRGgYpaHhM2pf4VJNP5O5ggrzd5ialMgjxR6LMMu0AnyzP4
-         08DHTEz5WqGbMOuObg/jUZ+s9G/BeSCdVakLN8SEZgEP9seX3bIeB7MM/4d/tnmz2NSx
-         AgLRRi5t4L/68AW+qQzGm6ARg8zjIqJ3EjmklBUm+SJt27BfvBs6d/cAaJICYLY6JT5M
-         X3FqjZJmwrVHU4wX+3hRUVVf5zq8oruTjNWLvZ1fWzQ03LyUP5uVFHc2mGY2lYI6MPn0
-         wtfxAMZbME/rFW9Qze6Fc9kLz02ywrT/5thz+C0oXKbXhIoP5PxPIjZP679vDjeewkEG
-         5GaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791477945; x=1792082745;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=UCfPp+7/JHVdolqbV5gJwvu/HMj/BA+RBUV+QQaMos4=;
-        b=NyJExXQ0kx7BU5dyvfl8iYRGwCIzEivmgK5460b7RdOjJVPgP3622dECkayESJIFyy
-         Sd3mgvEr8vpDhp73NM4xVr4uqBshS0sMp7hepEh5Uc6nqybxr6ZFY5j3NoryIqeacht+
-         tJel7OGRciltR150Y/SGlSogWTWqrVyioFd+8fa8VPaTOHLqlVK+D9p0P+oVc9fFSkdq
-         nIhxH+rdPRWOnf1q8WsLNzLbGaSgx/i2kWre6TZQCq7F38zD9GwzO5J5h70sKiRyGX/I
-         HyqAQG5DLBl6b/1FhVeG9K4P2WQGvfXFd0tGncL4VsbyWkCDlUABN5m2AGT43J5OuMtP
-         wbVA==
-X-Forwarded-Encrypted: i=1; AKwUvBw9zfqakJ+QL2nCyW+S/P9tr559uFTqWWpB0l9wEiw4tlz8A0VudEDFk0XNfjOX2lIPU1qj3/3LJig0v28=@vger.kernel.org
-X-Gm-Message-State: AFuF++l16vqQdxYbVbnKRVSqFXUwnW76Pmo3fJ7gPmuHxSbMIYRmzn5L
-	djJnZoCnLSq4/lBJzy+Fl0OGrKSmPbtQINXjCUcG7KIyVdLaVf6lwWF31KGs4w==
-X-Gm-Gg: AYBFou3TCHBLJ3M/3oCyh7oEjLypzY74NhmY1Mvsl/fm5ueikHoS8kJy8xw8MiOP55J
-	fHdKouziD5InNxCSi/6b01+KCdizx8+aFQnFkTA51TgefRUvTOe+0knzvacRyK26+lweAVLsl9k
-	3Eu2WRJbp23p0WnMznU4zDZWIRP+QAlxC/FLWbcyyXyArb7ty5a1/AUZzuMlB8HiBK5BzYmf1B9
-	Evb8Kec5AZID11Thx0YRRZctNdhv+sGRTi3Mr9u7k3q75NY6scxHGzIe0WbRgzdyyw8X3f3vsKq
-	XNollYQIE0Drds1MixWh1lynV5+aijDTIJmN4/yeAIS6znzwdZUke9AZMhMjHw16YYPN/Of1/PM
-	rs8n3CIyAhCzvxyEOoXgExbMGj1hONA1DIPiHGnBdUrVaplqFBFWqnNGY5vHesnBbTtaLl4WnU2
-	F2cNHOQHYHYyRNNOWDzY1RjMJWQ+0JmmlIzjNH1lz0uqwSCwUPp5AGK/xYd63PQoQiNn0zSntcX
-	2g65q9N2C1p
-X-Received: by 2002:a05:6830:6f41:b0:81f:138e:77a0 with SMTP id 46e09a7af769-82ad02b6843mr5713484a34.24.1791477945061;
-        Thu, 08 Oct 2026 09:45:45 -0700 (PDT)
-Received: from sheng2080.cmix.louisiana.edu ([130.70.15.5])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-82fc9430991sm64416a34.17.2026.10.08.09.45.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Oct 2026 09:45:42 -0700 (PDT)
-From: Leizhen Zhang <lzsx618@gmail.com>
-To: nathan@kernel.org,
-	nsc@kernel.org
-Cc: julianbraha@gmail.com,
-	linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] kconfig: use the value argument in sym_get_near_range_bound()
-Date: Thu,  8 Oct 2026 11:45:40 -0500
-Message-Id: <20261008164540.3686383-1-lzsx618@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yv6L+Luw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B5EA1F00893;
+	Thu,  8 Oct 2026 16:47:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791478061;
+	bh=hllApcy/IlPy1HyPhy+oUxqSwH0G/YI4bva0BhyB9uo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Yv6L+Luw53id5zVnxBMMWJvMzrQd3K7+g3yMjZrz82A+n9Ki3q6CUzUEFLxekqSUB
+	 sEOaJkiVwe4pMT40dgXBokZ4qBl5tiJPdghfQL1sVM3vD6VVo8AceSEitWzNLMALEM
+	 ez3HoF+0Hgx4ZqmEtMrkA1Wmpg5398x/AXbHFwvSKbi/aFYaL0G5hvzkXMile83s/B
+	 mdq3UvlO4HjOZuVaZIbPJ7v3AeWYxG7yjAQ2cg1tR8mBaZLab7Uhuc8eGeOGkkIC87
+	 L0+jnZgU9+L5/LOSowJDjka/Ei2HTnjc0HayZXgpUaTIcZFBIosTs134UEvcY+hoTT
+	 yRDCcAcVwKdTg==
+Date: Thu, 8 Oct 2026 18:47:36 +0200
+From: Nathan Chancellor <nathan@kernel.org>
+To: Denis Benato <denis.benato@linux.dev>
+Cc: Jim Cromie <jim.cromie@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-kbuild@vger.kernel.org, nsc@kernel.org,
+	thomas.weissschuh@linutronix.de, chewi@gentoo.org,
+	abelvesa@kernel.org, linux-kernel@vger.kernel.org,
+	Kees Cook <kees@kernel.org>
+Subject: Re: [PATCH] kbuild: install-extmod-build: install
+ kernel/kallsyms_internal.h
+Message-ID: <20261008164736.GA3975095@ax162>
+References: <20261005200123.146822-1-denis.benato@linux.dev>
+ <20261006081116.GA830598@ax162>
+ <0cbe9bb2-69b5-4d6c-a780-07a55d40a63d@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0cbe9bb2-69b5-4d6c-a780-07a55d40a63d@linux.dev>
 
-sym_get_near_range_bound() is meant to check whether the given value is
-outside of the active range of an int/hex symbol, and is called with the
-symbol's current value from sym_calc_value() and with the default value
-from sym_get_string_default().
+Hi Denis,
 
-Since commit 9b8719973ee2 ("kconfig: use unsigned integers for hex range
-checks") it ignores its value argument and uses the current value of the
-symbol (via sym_get_range_val()) instead. As a result, an out-of-range
-default is no longer clamped in sym_get_string_default(), and
-savedefconfig writes out values that are equal to the effective default
-again, for example CONFIG_A=4 for:
+On Tue, Oct 06, 2026 at 09:39:51PM +0200, Denis Benato wrote:
+> On 10/6/26 10:11, Nathan Chancellor wrote:
+> > On Mon, Oct 05, 2026 at 08:01:23PM +0000, Denis Benato wrote:
+> >> The tree staged by install-extmod-build contains no kernel/ files, but
+> >> since commit 4fafd1165b33 ("kallsyms: increase marker density to 16:1
+> >> to accelerate lookups") scripts/kallsyms.c includes
+> >> ../kernel/kallsyms_internal.h.
+> > You did not add either the author or the committer of 4fafd1165b33, I
+> > have done so now. This would need to be handled by them. However...
+> 
+> Apologies. I used whatever came back from get_maintainers.pl without
+> much thinking given this is not the area of kernel I lurk in, but thanks
+> for taking care of that.
 
-  config A
-  	int "a"
-  	range 1 4
-  	default 8
+No worries, that was a little unfair of me to put on you since this is a
+bit of a weird situation that most contributors won't run into (a patch
+living in one maintainer's tree that needs a follow up in code
+maintained by another). A good rule of thumb is if you have bisected to
+a particular change, always include the author and committer of said
+change in the report, in addition to whatever get_maintainers.pl spits
+out :)
 
-The existing savedefconfig_range test did not catch this because it only
-covers symbols without a prompt.
+> >> install-extmod-build rebuilds the host programs inside the staged tree
+> >> whenever CC differs from HOSTCC (cross builds, or a ccache-wrapped CC).
+> >> scripts/kallsyms is hostprogs-always-y, so that rebuild fails with:
+> >>
+> >>   scripts/kallsyms.c:39:10: fatal error: '../kernel/kallsyms_internal.h' file not found
+> >>      39 | #include "../kernel/kallsyms_internal.h"
+> >>         |          ^~~~~~~
+> > I would rather not ship an internal kernel header in the external module
+> > build. If these defines are needed to build scripts/kallsyms.c, they
+> > should live in a separate header that is included in
+> > {kernel,scripts}/kallsyms.c that is safe to expose to the external
+> > module build but I defer to the 4fafd1165b33 folks.
+> 
+> Fair. This is something I spotted compiling our training/testing kernel
+> at OGC using the github CI and my main goal was raising awareness
+> on this issue so I simply started that by sending whatever glm did
+> to make it build ahah.
+> 
+> Please when something better comes up CC me as well so I can use
+> the proper fix rather than this llm-cooked thing :)
 
-Parse the value argument again, and add a test case for a symbol with a
-prompt.
+Indeed, thanks for the report raising the issue, I hope Andrew and/or
+Jim can comment on it soon.
 
-Found while fuzzing Kconfig input with ASan/UBSan.
-
-Fixes: 9b8719973ee2 ("kconfig: use unsigned integers for hex range checks")
-Assisted-by: Claude:claude-opus-5-5
-Signed-off-by: Leizhen Zhang <lzsx618@gmail.com>
----
-v2:
- - Use my real name in the From and Signed-off-by lines. No code
-   changes.
-
-v1: https://lore.kernel.org/r/20261005202524.3461824-1-lzsx618@gmail.com
-
- scripts/kconfig/symbol.c                          | 5 ++++-
- scripts/kconfig/tests/savedefconfig_range/Kconfig | 7 +++++++
- scripts/kconfig/tests/savedefconfig_range/config  | 1 +
- 3 files changed, 12 insertions(+), 1 deletion(-)
-
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index 2e87af0985..11302faa28 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -195,7 +195,10 @@ static struct symbol *sym_get_near_range_bound(struct symbol *sym,
- 	prop = sym_get_range_prop(sym);
- 	if (!prop)
- 		return NULL;
--	val = sym_get_range_val(sym, base);
-+	if (base == 10)
-+		val.s = strtoll(value, NULL, base);
-+	else
-+		val.u = strtoull(value, NULL, base);
- 	range_sym = prop->expr->left.sym;
- 	val2 = sym_get_range_val(range_sym, base);
- 
-diff --git a/scripts/kconfig/tests/savedefconfig_range/Kconfig b/scripts/kconfig/tests/savedefconfig_range/Kconfig
-index fd59d9082e..d879870a52 100644
---- a/scripts/kconfig/tests/savedefconfig_range/Kconfig
-+++ b/scripts/kconfig/tests/savedefconfig_range/Kconfig
-@@ -58,3 +58,10 @@ config INT_CONDITIONAL_DEFAULT
- 	int
- 	range 1 2
- 	default 3 if USE_DEFAULT
-+
-+# Default outside of the range of a symbol with a prompt
-+
-+config INT_PROMPT_DEFAULT_ABOVE_RANGE
-+	int "int with prompt"
-+	range 1 4
-+	default 8
-diff --git a/scripts/kconfig/tests/savedefconfig_range/config b/scripts/kconfig/tests/savedefconfig_range/config
-index d939cfe5fd..079a3107a0 100644
---- a/scripts/kconfig/tests/savedefconfig_range/config
-+++ b/scripts/kconfig/tests/savedefconfig_range/config
-@@ -5,3 +5,4 @@ CONFIG_HEX_DEFAULT_ABOVE_RANGE=0x20
- CONFIG_INT_IMPLICIT_DEFAULT_ZERO=1
- CONFIG_INT_CONDITIONAL_RANGE=2
- CONFIG_INT_CONDITIONAL_DEFAULT=2
-+CONFIG_INT_PROMPT_DEFAULT_ABOVE_RANGE=4
 -- 
-2.34.1
-
+Cheers,
+Nathan
