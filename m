@@ -1,182 +1,126 @@
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD1C5377563
-	for <linux-kbuild@vger.kernel.org>; Thu,  8 Oct 2026 16:04:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1466238911B
+	for <linux-kbuild@vger.kernel.org>; Thu,  8 Oct 2026 16:12:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791475492; cv=none; b=o1ZcDQK/4iupKxSrni17Bk+WBXNJoMxJ7LgYylJJTt6dvTUlZs7YM5VNgVMIMGAZ03WpJXGhpAk8wi3QZo3rr0N+Jkx7J5DIJwvQL/KvyFrAUK9FmBXYOj5XCda22KfLxjBKUfV9AcyL6klP8wcQxxpOhpugUwIroVOEGF9Mnno=
+	t=1791475932; cv=none; b=RrZ9J7kdrvJMuN3HX1oKoeKYHJBo8KnkD2HC6nKTMLfSbDmmSfZ9wkaw+qQgnLjEL5x3pbm6z7hEvx44R36o6S6Yb9dgueJ8ik5ztwLdioeMZn1iMVG4bIunpH8+kQjjRa9HHvU2T8R714OuOCfez2+xPhsQcknkBlc7thYvdu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791475492; c=relaxed/simple;
-	bh=PZLapiFzm0NcKyZHGfePaz58sTxZ17Geu1LSk0IN3To=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VK8frPCOFJjJbJ+Ok0uHbjIaPX4gszZscKAVXQlT3WRVhWyLeifLwLTbHwDhRdElc2EmhQ3G25SiVfu8YY7zW/4GPnP2aOTjYbaZtS9Q/hIF2bwaCpK4d8/11OqlhUHJXrOLG+BcnehZxSIca7Gk/GEVnToD7AmNLO5uiBjRpfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gy31wmTA; arc=none smtp.client-ip=209.85.221.49
+	s=arc-20240116; t=1791475932; c=relaxed/simple;
+	bh=BI0G7qBpI/7KwQFAhmOUXBzLsg9VZTTr2gCpFXZLAhc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nnqNu1a81jgtOz1MV9+GuxeYMfMBjYXWVHiFguFnVp6fHWSYioSDZ3EztENVjVFA2O7rg9+0evGFeCrUTvmuZG0HyrlZbk+ty5MKyE0O0gBEzdm8tOUv1l2g+2LC5GrnYXWHheB9GA/B04racuZCMD8s6loYAfOmMXYJ0IqtaGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cBV3HFqz; arc=none smtp.client-ip=209.85.221.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gy31wmTA"
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-48c14a06c95so2575344f8f.1
-        for <linux-kbuild@vger.kernel.org>; Thu, 08 Oct 2026 09:04:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cBV3HFqz"
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-486e8faff03so1772493f8f.1
+        for <linux-kbuild@vger.kernel.org>; Thu, 08 Oct 2026 09:12:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791475489; x=1792080289; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=dxSk4bR/3bxIlso1kRXhasH7VwB1p6Z/eeK3zml07R4=;
-        b=gy31wmTAKMoGsQZ9G7Iy0VBmyQUKX5YFaal6o8LtNG0Y1FygRRvzyera/xpvGfVSbB
-         4gljX58hppnRny6+0+uOI+vxK8BKoZHH8NZLONEFPKrbyrkKkfasSSbCO4RpHam+/tA7
-         PO6X5B9oA58jErB77BEBrSdAT6EDejbXTaqxwghv1h3z/7YxFFwjswMeb3Td/u48h+p3
-         c3+0TF8kBGFR4c6zRSM+IcwvCXVF2DfuwseH901QROS0cvhZhjV6DmRjVo0A1Io2Ug0+
-         hj1iz8AFUpJemdUfo9Y3V/jThuD2WxM3SwHs/eE3u65AyMNvIxa2WFCV2xYCZ6eiwMtW
-         iIYw==
+        d=gmail.com; s=20251104; t=1791475929; x=1792080729; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=IGTDk2M1CVr9/HPRZF14PhrI+tmF1KcbANTHbSO6d8s=;
+        b=cBV3HFqzzOWW6/3mIA5IUdq0aM9r9hZqea0qp+sbS+quwYPN03Xl2tEzFF1fM72QhI
+         /MZxGKXKbaBRh7XSSAEQfpK/r4I6uy2cIeljH9/LKXLwHoT+AvHZLRE4uvH4TSA70Df1
+         xMa4MTwSXFIG6huQ31xlXGdhSIItoM1l9uQ+LTTqybNAURHWE7gP72MfEQXopxrCXrA/
+         L9gjISpur6L/aZR2K/SIiuuWCC1YMR/J/aaQ5lkVlLZBUTCBfNJGMCzIZwaoA2MbFHa9
+         sAWSyoUQbs1dkFjbDjGrlKLdI8gKE+FCl1emLGi4fG7+MByYp3V8EXvQ1nnU8PsYIcHZ
+         6vww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791475489; x=1792080289;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=dxSk4bR/3bxIlso1kRXhasH7VwB1p6Z/eeK3zml07R4=;
-        b=rNOQYU9aWrOwb3fd2FlcNAoT3EvB0LePC9Lnl/iSEm+0Ag7qApObieixIzn9+CSrGN
-         FHgWbtcvUXYTJrQXrzrYtlt02L+n9yp3l6jPZ2f4AeR+vXE+i3OC8dFj882+JDm7+NzR
-         hzp1al8ZZXSqqFYgKwTD08DGoiz29W/j1UKP7AC5H/caP/ip3jIexCUHagGRET6LDOK4
-         IQ0IUoVV19R+fUQolbd3THlQp/0n5LOHnJW3PlsLyKwm5k6BQvTnX+uuTnYxg6umBHGq
-         MP3K4MK5Q2HvX2OpjwIyqA8kpXzT4gtkN3jNSRgyzoTHiB5cIEpArcuyzTzCljagQQBS
-         dbsw==
-X-Forwarded-Encrypted: i=1; AKwUvBz82O9x4I8egBS3mFhb4V9J4nXpl/539V5o3FvvB9t/6wG/Th+WadVkUJUz98fZHrf2ZdiTHkVe0LnbH98=@vger.kernel.org
-X-Gm-Message-State: AFq9FYIDwy9LHtQvPoBUHRoQWO4TKQqkYOno91PGWf6HkE0Q1s9IgePy
-	TPK7cBQgjTM66g+bDmdNQheMJiFo/W+hQzdlFKON4lifPspeKkMHyPgV0C+VXmoc
-X-Gm-Gg: AYBFou0PTi44XSawoeOkBF/FurCeT0enU54hP/CO/SAa6GUmSXQdD1EPlHmGEdwC3iC
-	990RXeqn6pz6GNQmRPiee2xu86Z/1AZ2lJ8/32X50lj+qdP/bZ527VHNpgXPY7neWw5pb/Lv8DY
-	pBi00XGAD0hkiim03pXzX4hSDyY/2uiO7s3IbxtpLn5DAonAqq/MLhB5rE/I2kz5tvbdQEpkfVv
-	mE83sGF72DBtTCjjx2wPBgmGMIngBVDd7UpOQICFYrZo6iLd09saxiO9t4ZJisFzg29aD9F01At
-	tLnR1uUiwnitzusLBUD1bcnjrC+pCW1rYGpFOjJMNNw6g/Ejg7hh9cyXNy5OqQD4BmYhZqnrOw/
-	ZqO+XuURWnvfl2feYAW1s0EpGgqruRRlWghldCOcKjl3EnC4u3Y3SfoQ+l6MPSQ0mwbMHDVKWM2
-	qI+3KNLj6g4rNIC5kCqNMtTl2u4Fk247QRt46I6jKZl2O99bmYuWfBmmZ1J8nIXmnQ9JUFSTAMS
-	Eu2egSuvtOEVbWt5mFlNUHZsTu7xh+q5xsGEaE9fRO6wlAWQ/QyzrtDkXdm
-X-Received: by 2002:a05:6000:4541:b0:487:799:c04a with SMTP id ffacd0b85a97d-48c726fafc4mr6925318f8f.3.1791475488786;
-        Thu, 08 Oct 2026 09:04:48 -0700 (PDT)
-Received: from [192.168.151.120] (90-182-211-1.rcp.o2.cz. [90.182.211.1])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48db653d44bsm335441f8f.52.2026.10.08.09.04.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Oct 2026 09:04:48 -0700 (PDT)
-Sender: Julian Braha <julian.braha@gmail.com>
-Message-ID: <080e1a54-f27b-49c2-a8c8-d680cbcef05e@gmail.com>
-Date: Thu, 8 Oct 2026 17:04:46 +0100
+        d=1e100.net; s=20260707; t=1791475929; x=1792080729;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=IGTDk2M1CVr9/HPRZF14PhrI+tmF1KcbANTHbSO6d8s=;
+        b=focleYCU3H7ngzrc+hsRSLOOGygGIiM2XYDRPiov3K4cqFhP4g5P8SS9UC5RLnB0ac
+         63PTMxzluAx3SwImSYivV91C8rtkYDLO1u3jHj4lJkvF5k+bL2IPhl5J1tmMixGbTTac
+         QzFmIXURZsb89ZrAfgu8maM2jLh+HilAjQ0GEBvrWRCS4N2NR8ulS0W1DxwtKbgh7Usm
+         U0AFuToGGg4u30r2M2DrqLjfKS3FGzoYxltb+MdlTp+W1KKMyQUgoGsa9Nb+1fSsTfkH
+         XpNiChlIjt/ItRN6k7rJRmr6tDwmpsBSmTGr3bmj/aOtmDbBNigzwbegP5tMeD4T+uO9
+         T/HQ==
+X-Forwarded-Encrypted: i=1; AKwUvBxYqQhiDu+xudn2tHYARUFykvfZQyzy4KcK5RUVzfJWxmwbkBA/uiVkFv5y7txkNNY09D5x1oIseVA0gJA=@vger.kernel.org
+X-Gm-Message-State: AFq9FYIDc9B2xzEGR2KAbqG6WVZ1RJymO7Bvn4hJE4PWokpSqq8xb4Vc
+	ifCVtFRGHPim3WjLXGLRHyhGAsk7MVzJIyiKEVDaq57gg4u1J8TjgPlD
+X-Gm-Gg: AYBFou3MbMefERbtdKV5bs5VlGqDamOmHDHv/xCkfMZyYn0eIGr7Pa6MVYz7CjAvqYs
+	idEz7lSuQ702uakgRqDvFmLHToVMeQxZELWijLovdMBKslW4Z8y63KKQBav5aBJFjzboTKTowcZ
+	0x6bnTzz3d3XZze/EpyugYNbSiHpew0YPgcQLgRh//pcJOIk2bhVerMz0nXlp5jFatV9jjTtZm4
+	Vx/hBYsm1KWh7qQ0GIAsSLtrdY2eApfqjM5+g1F9b7jjRzEjwjeN2zH1+J6qTtQmotJQrGKE8LX
+	4fmgaZ8GPom3Y+LWs6fjQgYU+2hFIv6mkzSWWEvFnVKjHqmcdHW5yag6BjHIeWTYRrSyMPhWI1Z
+	7N+68YAqRcDATwskujEln36yCZ15vxO+0XWvQfzYPzRb7AQO6yz6rdtQg4KZTnvTP5n/8x20QXs
+	rTF8BkqXjjDPaJNEpHm6KCdv3GvhwoGvLomMNJZajcLZf0t/ndLO0ESOJWDue/26FjW3JrcBi21
+	FKuvlXolVzcJ8wbOHI1OCZnKpaRLdExGNefrBqrt9R4MQ==
+X-Received: by 2002:a05:6000:25fb:b0:48c:77ad:d52d with SMTP id ffacd0b85a97d-48c77add59dmr9194549f8f.43.1791475929174;
+        Thu, 08 Oct 2026 09:12:09 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48db650fd4bsm478599f8f.11.2026.10.08.09.12.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Oct 2026 09:12:07 -0700 (PDT)
+Date: Thu, 8 Oct 2026 17:12:05 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: "Serge E. Hallyn" <serge@hallyn.com>
+Cc: Gregory Price <gourry@gourry.net>, Sasha Levin <sashal@kernel.org>,
+ linux-api@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-kbuild@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ workflows@vger.kernel.org, tools@kernel.org, x86@kernel.org, Thomas
+ Gleixner <tglx@kernel.org>, "Paul E . McKenney" <paulmck@kernel.org>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Jonathan Corbet
+ <corbet@lwn.net>, Dmitry Vyukov <dvyukov@google.com>, Randy Dunlap
+ <rdunlap@infradead.org>, Cyril Hrubis <chrubis@suse.cz>, Kees Cook
+ <kees@kernel.org>, Jake Edge <jake@lwn.net>, Gabriele Paoloni
+ <gpaoloni@redhat.com>, Mauro Carvalho Chehab <mchehab@kernel.org>,
+ Christian Brauner <brauner@kernel.org>, Alexander Viro
+ <viro@zeniv.linux.org.uk>, Andrew Morton <akpm@linux-foundation.org>,
+ Masahiro Yamada <masahiroy@kernel.org>, Shuah Khan
+ <skhan@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Nathan
+ Chancellor <nathan@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
+ Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers
+ <mathieu.desnoyers@efficios.com>
+Subject: Re: [PATCH v5 05/11] kernel/api: add API specification for sys_open
+Message-ID: <20261008171205.7239c463@pumpkin>
+In-Reply-To: <asemkQ2v0di0Eea3@hallyn.com>
+References: <20261008084956.2911790-1-sashal@kernel.org>
+	<20261008084956.2911790-6-sashal@kernel.org>
+	<aseRXi7hMWBBc0tB@hallyn.com>
+	<aseWPV6ZRQM3JOMN@gourry-fedora-PF4VCD3F>
+	<asemkQ2v0di0Eea3@hallyn.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/9] kconfig: fix NULL pointer dereference for defaults
- taken from choice members
-To: lzhan011 <lzsx618@gmail.com>, nathan@kernel.org, nsc@kernel.org
-Cc: rostedt@goodmis.org, linux-kbuild@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20261005104050.1786222-1-lzsx618@gmail.com>
- <20261005104050.1786222-2-lzsx618@gmail.com>
-Content-Language: en-US
-From: Julian Braha <julianbraha@gmail.com>
-In-Reply-To: <20261005104050.1786222-2-lzsx618@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-Hi anonymous,
+On Thu, 8 Oct 2026 09:20:01 -0500
+"Serge E. Hallyn" <serge@hallyn.com> wrote:
 
-It looks this is your first time contributing to the linux kernel.
-Welcome!
-
-First, make sure that you run ./scripts/get_maintainer.pl on your
-patches. There should be a few more people to CC on these emails,
-like me.
-
-On 10/5/26 11:40, lzhan011 wrote:
-> From: lzhan011 <zhangleizhen645@gmail.com>
+...
 > 
-> Since commit f79dc03fe68c ("kconfig: refactor choice value calculation"),
-> sym_calc_choice() marks the members of a choice SYMBOL_VALID but only
-> sets their curr.tri; curr.val is left NULL. If a string, int or hex
-> symbol takes its default from such a choice member, sym_calc_value() and
-> sym_get_string_default() copy ds->curr.val, so the symbol ends up with a
-> NULL string value. Depending on symbol order this crashes in conf_read()
-> (strcmp), sym_get_string_default() (str[0]) or ends up writing
-> CONFIG_X=(null).
+> Even if there's just a three line comment above a fn, history proves
+> that it will not reliably stay in sync as the fn changes.  An automation
+> step/check is needed.
 
-Thanks for reporting this issue. But after careful consideration, I
-think we'd like to resolve this issue a different way. In a v2 of this
-series, you can simply drop this patch, and I will handle it.
+The only way it can possibly stay in step is to have the compiler process
+the same source text.
+Then, if you add/change a function parameter you'd be pretty much forced
+to add/change the comment.
+Return values would have to be documented at the C return statement and
+really as an extra parameter to the return.
+
+But, IMHO, the whole thing adds too much bloat to the source files.
+When you 'grep' a source file, you don't really want another match in
+a big comment at the top of every function.
+
+David
 
 > 
-> Reproducer:
-> 
->   choice
->           prompt "choice"
->   config C1
->           bool "c1"
->   config C2
->           bool "c2"
->   endchoice
-> 
->   config FOO
->           bool
->           default C2
-> 
->   config BAR
->           string
->           default C1
-> 
->   $ touch .config
->   $ KCONFIG_CONFIG=.config scripts/kconfig/conf --olddefconfig Kconfig
->   Segmentation fault
-> 
-> Use sym_get_string_value() instead of reading curr.val directly. It
-> handles all symbol types and returns "y"/"m"/"n" for tristate and bool
-> symbols.
-> 
-> The resulting .config and savedefconfig output for defconfig,
-> allyesconfig, allnoconfig, allmodconfig and randconfig on x86_64, arm64,
-> riscv, powerpc, s390, arm and mips is unchanged.
-> 
-> Found by fuzzing Kconfig input with ASan/UBSan.
-> 
-> Fixes: f79dc03fe68c ("kconfig: refactor choice value calculation")
-> Assisted-by: Claude:claude-opus-5-5 ASan UBSan libFuzzer
-> Signed-off-by: lzhan011 <zhangleizhen645@gmail.com>
+> > ~Gregory  
 
-Please make sure to use your real name when signing off on your commits,
-see also:
-https://www.kernel.org/doc/html/latest/process/1.Intro.html
-
-> ---
->  scripts/kconfig/symbol.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-> index dcb4b45e6..de88b13f5 100644
-> --- a/scripts/kconfig/symbol.c
-> +++ b/scripts/kconfig/symbol.c
-> @@ -546,7 +546,7 @@ void sym_calc_value(struct symbol *sym)
->  			if (ds) {
->  				sym->flags |= SYMBOL_WRITE;
->  				sym_calc_value(ds);
-> -				newval.val = ds->curr.val;
-> +				newval.val = (char *)sym_get_string_value(ds);
->  			}
->  		}
->  		break;
-> @@ -887,7 +887,7 @@ const char *sym_get_string_default(struct symbol *sym)
->  			ds = prop_get_symbol(prop);
->  			if (ds != NULL) {
->  				sym_calc_value(ds);
-> -				str = (const char *)ds->curr.val;
-> +				str = sym_get_string_value(ds);
->  			}
->  		}
->  	}
-> -- 2.34.1
-> 
-
-- Julian Braha
