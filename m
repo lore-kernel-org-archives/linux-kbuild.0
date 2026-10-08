@@ -1,106 +1,152 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF2673E40F5;
-	Thu,  8 Oct 2026 22:47:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEE703CF1FD;
+	Thu,  8 Oct 2026 23:19:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791499625; cv=none; b=KJjdF1LwVFjGAObmEVweW6HntCBPO7CvAdCvobtjSw3M/lUl5cVaYpPWWgrpUa93T2VconfZ/Z9H/0MuEdXp6G22nzy8uS7C72xiEgqgleJ5qzI7znFVjUdfndaCTC4g2SfcolVXxb1zKJkrqHGKsZqdKepPQ28fGu/HjdmIN5Q=
+	t=1791501554; cv=none; b=u5ZdOo/Wlr7Wuf9m7xp0H26XPeMPglBKk88rUkSxc6NCu3fuvivX9mxvKq1K2zi43/heSgodzEScvMflnZYJIpeQT465Bu8txSXEdJ/Jrk9B1Ea4MPnN5R5zF1sen1t+4KNW2O4O/cH+5IUasmBi1Dz+NwlOCKMEMa+v8ZQjesg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791499625; c=relaxed/simple;
-	bh=1xff5OP4JTlo3Wsm/jooTd+9avb5DjpWuRtnCb8Vg7w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iBm9dOzJYMYCfOJNZp4nxSSTAcJ1GoVYIZNwLGVuPOQQeqcHVtWcRU4uo+PKA5SWC0P06R95Cma4t0d+K2mzUWQF3oA6Eb7v1WW40rq94Pn2E3BB9xak+XVNMzwDjjZTadb6YKUDxbytezy53MAgtMBKZKsJ1uBdtL/8oKxrG5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YiWatklT; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791501554; c=relaxed/simple;
+	bh=sJZ9iI2OBVMZQ6uas4qKKHLaJ2Mw87YO8PArfwZrhho=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=A7PnO/iz/L3bei7NUwlwKZjWjscldALyT/jg5/vlrZRyKM4nIX24OR+c0/Wa+54CgDJforxo8aO+QFE7pRFU3P57T2e/17ha8BiAt+GEmlvVqasE242l6TPbeVf5YIyLrdA/2VyQ7k6nIjxTQrEepknzdttT2XyFAuHFUQ6tZqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bYuibeKK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YiWatklT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0578B1F000FF;
-	Thu,  8 Oct 2026 22:47:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791499624;
-	bh=pCfJKPsNaF/SxbFsWfcA1FHSBJHgg6l/3ARJ3G8D/iE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=YiWatklTha/8mDOvNOV4ymEYyqODHFwSzx3UXwKSES/mokMZYcEdudNXmJwRXrIgp
-	 6A9mrj9RUzb/nIujVnVifEXe0So7H23ze7t4egFVedFW8PnEw+9+QHzUCKsQkTz7un
-	 49AP0BiFCrDG1YPEOlqzrM61dqiynA7v4xubPo6CDj7kIxQ3QmSAtrShOAJa5JqOXC
-	 lDrLy3BXBIOC9Bju+9E42B6lrAMwQcJhhvVTZOPLaoiAVt3ANPKzlcBS5KOnVldcYD
-	 /AhFqUoAuKhZ0iqXDFAFLAq8Ow653o5CiXNcZmXm9u1K81AsiQaLBfx8tgPH9XeZJh
-	 9ius3rVPTxQ5A==
-Date: Thu, 8 Oct 2026 18:47:01 -0400
-From: Sasha Levin <sashal@kernel.org>
-To: "Serge E. Hallyn" <serge@hallyn.com>
-Cc: David Laight <david.laight.linux@gmail.com>,
-	Gregory Price <gourry@gourry.net>, linux-api@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, workflows@vger.kernel.org,
-	tools@kernel.org, x86@kernel.org, Thomas Gleixner <tglx@kernel.org>,
-	"Paul E . McKenney" <paulmck@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Cyril Hrubis <chrubis@suse.cz>, Kees Cook <kees@kernel.org>,
-	Jake Edge <jake@lwn.net>, Gabriele Paoloni <gpaoloni@redhat.com>,
-	Mauro Carvalho Chehab <mchehab@kernel.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-Subject: Re: [PATCH v5 05/11] kernel/api: add API specification for sys_open
-Message-ID: <asgdZfjXmX3gnkfQ@laps>
-References: <20261008084956.2911790-1-sashal@kernel.org>
- <20261008084956.2911790-6-sashal@kernel.org>
- <aseRXi7hMWBBc0tB@hallyn.com>
- <aseWPV6ZRQM3JOMN@gourry-fedora-PF4VCD3F>
- <asemkQ2v0di0Eea3@hallyn.com>
- <20261008171205.7239c463@pumpkin>
- <asfB7tHWs420QkWL@hallyn.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bYuibeKK"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3B234C2BCC7;
+	Thu,  8 Oct 2026 23:19:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1791501554;
+	bh=sJZ9iI2OBVMZQ6uas4qKKHLaJ2Mw87YO8PArfwZrhho=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=bYuibeKKrN61mIhefVBiQiBh6p4LeQqFGoeLCWQROc41szOx/vFw5RDNPvh0NoV9K
+	 pBDCZ/8Kx4k9JuEhR/7q2xU/MP52wjdHY0TFDP4bIOkOZIy8jWjDoZvGiXE6X0SzAM
+	 TQt00TkK5xOaFRfJ27FIrT5/5fhhltJ1neeJuNhQp2Jl7pNId5y5cdkJhDZQKkcsal
+	 bL1THCDQGEhbwhaw3DJb2Er1bUvYt3tmP1DObOJjFgsWABayfejxkK+wAmDU/Y7TPM
+	 szRvLXroO3Cmzg8CSfbfgk5fE/qLAa3TAVXmVkrHjfekdIxk707NB+K5/NIpafQJ4S
+	 vMr6FKoK2yhIA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 146EBCA6015;
+	Thu,  8 Oct 2026 23:19:14 +0000 (UTC)
+From: Jim Cromie via B4 Relay <devnull+jim.cromie.gmail.com@kernel.org>
+Date: Thu, 08 Oct 2026 17:19:12 -0600
+Subject: [PATCH] kallsyms: copy constants from __KERNEL__ to user, drop the
+ inclusion
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <asfB7tHWs420QkWL@hallyn.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20261008-fix-kallsyms-v1-1-3339fdac2ab3@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIzNDAwML3bTMCt3sxJyc4srcYl1Di1TTRPO0FINUQ0sloJaColSgPNi46Nj
+ aWgDLftQFXgAAAA==
+X-Change-ID: 20261008-fix-kallsyms-18e5a7fd0e19
+To: Nathan Chancellor <nathan@kernel.org>, 
+ Denis Benato <denis.benato@linux.dev>, 
+ Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, 
+ nsc@kernel.org, thomas.weissschuh@linutronix.de, chewi@gentoo.org, 
+ abelvesa@kernel.org, linux-kernel@vger.kernel.org, 
+ Kees Cook <kees@kernel.org>
+Cc: Jim Cromie <jim.cromie@gmail.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1791501553; l=2787;
+ i=jim.cromie@gmail.com; s=20260203; h=from:subject:message-id;
+ bh=z/zMb6gglj4i+RtKQgtFQzYsPU9iLgw6hWdsZL1e5CU=;
+ b=3rQyAReRHr4iktxRBcBRvu5BizvjCeAWGLqZJ9wA4TRcvlI0ImgnY2xQtump+TtLidfYDSkVr
+ 665vA50YLZoBKntKjdPfhSgDoj7T2PRAGX3QjmaVbT/T9a4iVjfWoJU
+X-Developer-Key: i=jim.cromie@gmail.com; a=ed25519;
+ pk=C6E5ODlPQo7ZBynATXH9wg7K6HxP0pIXyf4s38Qw0XE=
+X-Endpoint-Received: by B4 Relay for jim.cromie@gmail.com/20260203 with
+ auth_id=958
+X-Original-From: Jim Cromie <jim.cromie@gmail.com>
+Reply-To: jim.cromie@gmail.com
 
-On Thu, Oct 08, 2026 at 11:16:46AM -0500, Serge E. Hallyn wrote:
->On Thu, Oct 08, 2026 at 05:12:05PM +0100, David Laight wrote:
->> On Thu, 8 Oct 2026 09:20:01 -0500
->> "Serge E. Hallyn" <serge@hallyn.com> wrote:
->>
->> ...
->> >
->> > Even if there's just a three line comment above a fn, history proves
->> > that it will not reliably stay in sync as the fn changes.  An automation
->> > step/check is needed.
->>
->> The only way it can possibly stay in step is to have the compiler process
->> the same source text.
->> Then, if you add/change a function parameter you'd be pretty much forced
->> to add/change the comment.
->> Return values would have to be documented at the C return statement and
->> really as an extra parameter to the return.
->>
->> But, IMHO, the whole thing adds too much bloat to the source files.
->> When you 'grep' a source file, you don't really want another match in
->> a big comment at the top of every function.
+From: Jim Cromie <jim.cromie@gmail.com>
 
-I guess I don't mind either way: I heard both sides of this argument, and the
-spec workflow is okay with either, so if the relevant maintainer asks for
-changes here I'm more than happy to reformat this.
+commit 4fafd1165b33 replaced hardcoded values which determine marker
+array size, with new values that accelerate symbol-name lookups.
+These symbols are needed in user-space to generate the lookup tables,
+and in kernel to read the generated table.
 
-Which is, I think, the advantage here: it works just fine for the various
-"kingdoms" we have in kernel-land.
+To avoid 2-defns problem, they were added to a kernel header (with
+ifdef guards) and included by scripts/kallsyms.c.  But that creates
+packaging problems elsewhere, so just add the 2nd defns, with an
+explicit comment about the user-kernel coupling.
 
+Fixes: 4fafd1165b33 ("kallsyms: increase marker density to 16:1 to accelerate lookups")
+
+Signed-off-by: Jim Cromie <jim.cromie@gmail.com>
+---
+ kernel/kallsyms_internal.h | 12 +++++-------
+ scripts/kallsyms.c         |  9 ++++++++-
+ 2 files changed, 13 insertions(+), 8 deletions(-)
+
+diff --git a/kernel/kallsyms_internal.h b/kernel/kallsyms_internal.h
+index 6a781e4cc77f..8311cce21128 100644
+--- a/kernel/kallsyms_internal.h
++++ b/kernel/kallsyms_internal.h
+@@ -2,18 +2,17 @@
+ #ifndef LINUX_KALLSYMS_INTERNAL_H_
+ #define LINUX_KALLSYMS_INTERNAL_H_
+ 
++#include <linux/types.h>
++
+ /*
+- * Provide compile-constants for scripts/kallsyms.c
+- * so it can build the corresponding kallsyms_marker[] table.
+- * and wrap the rest in __KERNEL__
++ * These constants determine the size of the kallsyms_markers array
++ * written by scripts/kallsyms.c during the build.  The symbol values
++ * must be kept in sync.
+  */
+ #define KALLSYMS_MARKER_SHIFT 4
+ #define KALLSYMS_MARKER_SIZE  (1U << KALLSYMS_MARKER_SHIFT)
+ #define KALLSYMS_MARKER_MASK  (KALLSYMS_MARKER_SIZE - 1U)
+ 
+-#ifdef __KERNEL__
+-#include <linux/types.h>
+-
+ extern const int kallsyms_offsets[];
+ extern const u8 kallsyms_names[];
+ 
+@@ -24,6 +23,5 @@ extern const u16 kallsyms_token_index[];
+ 
+ extern const unsigned int kallsyms_markers[];
+ extern const u8 kallsyms_seqs_of_names[];
+-#endif /* __KERNEL__ */
+ 
+ #endif // LINUX_KALLSYMS_INTERNAL_H_
+diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+index be42a9111350..d142f040ad92 100644
+--- a/scripts/kallsyms.c
++++ b/scripts/kallsyms.c
+@@ -29,7 +29,14 @@
+ 
+ #include <xalloc.h>
+ 
+-#include "../kernel/kallsyms_internal.h"
++/*
++ * These constants determine the size of the marker array filled here,
++ * and they're duplicated in kernel/kallsyms.c, where they're used in
++ * get_symbol_offset().  They must be kept in agreement.
++ */
++#define KALLSYMS_MARKER_SHIFT 4
++#define KALLSYMS_MARKER_SIZE  (1U << KALLSYMS_MARKER_SHIFT)
++#define KALLSYMS_MARKER_MASK  (KALLSYMS_MARKER_SIZE - 1U)
+ 
+ #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
+ 
+
+---
+base-commit: b9c9b9eb732aefcd02bbc211b2570a2315a889da
+change-id: 20261008-fix-kallsyms-18e5a7fd0e19
+
+Best regards,
 -- 
-Thanks,
-Sasha
+Jim Cromie <jim.cromie@gmail.com>
+
+
