@@ -1,73 +1,73 @@
-Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
+Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D01513AE184
-	for <linux-kbuild@vger.kernel.org>; Thu,  8 Oct 2026 16:40:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1653AEF3E
+	for <linux-kbuild@vger.kernel.org>; Thu,  8 Oct 2026 16:40:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791477662; cv=none; b=KLS9aJW2VjCPLUullPLEMFXWKYnDZT9e4dB6as/H/hCrcuRA2D7GSSTu5c9otQgDrkow15WSNFf8PjwTmSuSx41m76eRa2RoWmlkznvJESa8b08+Ezv5W7KDoqnsRZL9BYZzNm00k3wFx5YA93zL2usix+9i9amHrcHOWuMIZTE=
+	t=1791477662; cv=none; b=qaIuo9yc2/Mqxi4ekJX3WXgOrOzCXNNbiOhLOOgGEm5wJEu1Nh+k0Wu3gMetO8peiydQTHP4fBsmhFx1mXAuTvAqGMlz2FInR3ocC7lK31I6wXIZgCADt2lJpWTLFOwxknL+xe1EackrEIuiFCXy8biPR6vtT3fCVefc6dK0RSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1791477662; c=relaxed/simple;
-	bh=a0Q5F0AmXKiNzoBKS3lSnAUeaKLJcNU3lOveVRrVoyU=;
+	bh=oyynTkKGGfztLCMBCVphxnjC+mB7kXtAI1n/IIGHN74=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=IFPeoBwSN9DZrVtV1YJyfJ+x1a9qMyz9hVc3EWc229576JYXwkWUftorPIN20UDRjsTZsG03G5J6ApG2kW0yQJ65NtPQHSLEv87qPGQW9K8kps2Y9ctM7e3SXtdgYV1e6RzfoIe4DzEI/WOnjurspkvRSpg7AedFuVEGS0tzQS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iuJv5BdF; arc=none smtp.client-ip=209.85.161.52
+	 MIME-Version; b=QpGb4yR1TpOVOMevEiv/f0m5TnIpNkb46ZHzV4U98kaEWwJ0InIBvqVi/7/II4V8Jq18iIMAZTj3jZSFBa3jc4bIx95OqGJyN0bwLcphZ4shtfb7enMjnxGZHds+Bzx3+GjfdNeSteRo3jKW5X2ctFjMT8MpkWYBWFlV9LcnCjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N95EiCjs; arc=none smtp.client-ip=209.85.161.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iuJv5BdF"
-Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-6dd7070699eso3993833eaf.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 08 Oct 2026 09:40:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N95EiCjs"
+Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-6c1983dfaffso4468694eaf.2
+        for <linux-kbuild@vger.kernel.org>; Thu, 08 Oct 2026 09:40:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791477655; x=1792082455; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1791477656; x=1792082456; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=WpFBb8SAxU073g9j+68SAmlLBQHqt4SI1RVx+GlxzvU=;
-        b=iuJv5BdFGtAcMy1DAMKvhDxV874XGdPRw9FBV9XsH6cwNmazEqq07YobtgFCK8fr/w
-         GcER/boMS+6yjVsMB5EcN4R6+qCit9t1JqBxRNMtNnBrJRax2uIZvL0h74mhQbTQZgsX
-         4EnKRHeZnLQF9g+v33ehRtK5cq9fUXeP6G9aHtksSeEAZhjHifwgyD0mWbpeUiWRq+Ol
-         PIc/tuqC6dl9EHPTuMLx83Ot7754/usl8UQfdSc3a3XSBU6xOKzeOCLAddCkx1Z3KOjp
-         iOKBCrzxRlJAO8LHCr+eIl/qs6hhKGAHpAGPsFg0nZSXEPEIR41I5Ub5X3GnHBdBiyCH
-         bB3w==
+        bh=wVgGWa7vQ+w9ty39UYmv4KKUyLnAT3ReRFp2PoOTaIw=;
+        b=N95EiCjs6cq4TPgBY55ERiOXnQJaiQxUaA6VbXhOTK6s6Q2wdEd6grHE4Eo+mW+++I
+         zP/weO8UpaD+Bzt3crlEDFlzGP2K79pdUtwnpmZHwVGCEK3UoT5TUXqXME0iQZSaPnPZ
+         jFodMa4n5U5xe8V/sIqoUgHyFqDB/3PXXp81Auny+Xs8Eh7a2Rg945hqWqDcsZkxXrey
+         HJX+w1tRuVm+GR2SDZ9UIHJCgPsp7hhU4nx8wHiDDLqT6j1SWFCMs25W34ipXQYuth7S
+         5Ch/oObFy/AYsucqLF8BQaobnqvTK1EWQiTzANgfTthFLbeilrgm6gAgpe0+iTcZB5hS
+         28CA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791477655; x=1792082455;
+        d=1e100.net; s=20260707; t=1791477656; x=1792082456;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=WpFBb8SAxU073g9j+68SAmlLBQHqt4SI1RVx+GlxzvU=;
-        b=AERlO1NHvUtjBG5ZZiIOmKmCxLL/H07wPDtUfiS8FKsSUb1oIFodKOSJ5cnnVkenYA
-         q/PBr/mmUxmBObhnxvovYst14Ih+t5x7pzNjA4yM9odQhDTfPiknk9f7Rnq+ZbFPIzR2
-         KhXFWSPl8nRdcCsr9VWznAVsPG2zDeSgrjwHYIlvuqGiUVKGcrjLchA4fkXYaI/9vkhD
-         8LCRk22CU3ZQMKjOdwzHL2tR6sTh5G1Ig2hQkxH6Z2m/v4FTHX+Yuj9elCElocJN/Z39
-         nc4A6fgMhwZRmq/pzdg8DURiBUkyDBog0hLSZmNCJJscEmEQK5O4rG7NNHk15BwYRYWt
-         OqeA==
-X-Forwarded-Encrypted: i=1; AKwUvBzzwJTTYZaQQXUv9twafi5m+JRswco5D8B3OQcF1L7zJBDeTLXt/9nPcOrydOnaNT3HosPQDiZq2n01nHE=@vger.kernel.org
-X-Gm-Message-State: AFuF++mJC80tccfi0e9B2wEO9suwbgflIMnowRpeM96HoalSd9MXMvSB
-	cs6aOAx49geikdEd8ZmpUuTR90Ip3Hozq6ggsMKOC23R9X9n2/Gj15nQ
-X-Gm-Gg: AYBFou0dEGRF5he4KQmr7H05To8tCULwblXqY1WxHFT7ccdEL9lBIZmLKYZL2iFZxAL
-	mpzIoHsfWKi0lypmLzHLXWQF7ZP8c0SGR2JATgZA3j8G8Tm+3a6C3c4M9tUCKq2H8OYayyzEe7X
-	ezmLaY7I2RFo1/bot0zC+vQYgj/7oxbtpxXr2GHHczk0uEpiRZpXCIj6jUHVI5wOaQ23Bh4iTHl
-	wgokmkIyTcqgIAruOnYRlZ9G4DNHbRXXbgRbFGNR6O0Exz5M4ab9rGpHlKAtmAqfLtD2V2F9udo
-	drhsPL13uWxPAMvUu0NxZsazrJrhiwpBRe14f9lr+YAviaDfx8ApYxPJ5FmodSAqp0tvGliVav0
-	Me5kSy+BEAeb1HQr6myLYni7Wm7sKEQztHn8pgn+PXtVo3SHJAoEZnaeH6ZhhaN94kp4x0QDznb
-	29Vo8p8VzyWWVFld88fqMHQCoqcfAeuCUKOUbNG5X6x9pXLSLteA2SMFXy4KsTwVV286ez4jWeT
-	BabwfTqdCffhtYoT998r+I=
-X-Received: by 2002:a05:6820:1887:b0:6e0:e81:e5f5 with SMTP id 006d021491bc7-6e7a6c5ece7mr5641831eaf.47.1791477654868;
-        Thu, 08 Oct 2026 09:40:54 -0700 (PDT)
+        bh=wVgGWa7vQ+w9ty39UYmv4KKUyLnAT3ReRFp2PoOTaIw=;
+        b=22KArQ/hCSQIawsnS3JqqVmLgas2PHfIAGbmEL9lIElNq85IBFPYNXWMMUUKZlXrXo
+         LZJZmqHZOfDjcTMlok39zPmT7ys5Ix30I78KqAC4hqGtJm64/N72966+yp5xSDYe4xAL
+         pQ6A1xoYKIgIL9+UtnWRU58oEFEzTHordnWYA9JoTIk1UOLS9sRb4XI24lkLjiMrL92y
+         jZnchzHekAeKl4LwELFjSfF+knHTkuy7UlbxEc7l4VAo05lnruvG2ielPXg4ksxPFegd
+         6KABvdJ9bCju7ZcAazfB4a8zxn9kF5Eph9A3Lg/Ok594hbmZB+xgMW1D1r76YFOCkBg/
+         NRUw==
+X-Forwarded-Encrypted: i=1; AKwUvByMafYq2IAcLONribVzRcbZsjLt17I63jT+fXEydmyyWLD3YQlvlE8/S67RPHaNkLk25ZpuaT7DJrYWKCQ=@vger.kernel.org
+X-Gm-Message-State: AFuF++nZP6zy10yA9OQ4gJVmUtWyQ0XYfRE/5P/BDuoJvJP1GYBb1/Xw
+	cQBGUgvokf5JfllpdAjWj7WvVSXRss0TE/LUWY5N0lH7EiB14ddPY42T
+X-Gm-Gg: AYBFou06tOjaNDb0wD0BmiSjXmQmpbhk/DePGRJMfTW9oOm7BvJP+l37AJKVvDdnRNf
+	6ix5AXeWr5y3iI3SJHzdc94xdhdHeOATmRTnFCTXdaAfC6GJvhkQO8FarzFxoiws+5aV63geYZ/
+	24xjKbC26CG+IqGYbXSMzcPqq31EclwTG87oDIO0Gcimen5rPeRim5VIxzxlJyFdybp/NQ+1MKw
+	4+KOLdWYxDqrOhQwqdRyAErOikP/dSWnbjDSi8aGQDPHfPboh1Ql+aoNOkHEPG5s0WzERH0sW4L
+	u3Ko1/zdmAA0MPgylAABc5kDvJPJhQSYyzhNgODAJdRDL82LaR3oRS75NV1RIXCX1KasI6SpuIZ
+	KuENrlkIUd35y9/ZHQhG97S5KrNL0UZaQ4tIGy+2hBl+h/7jQSl1YfMQsqBd8KLEFo/wS61qH7v
+	zawLvs98XdlxGm7eMO4RjKYQBYJIp/iXYsJqpg3o71HBPVHUnC2gkzsZQny/cCBTxIVk9tlw8Ie
+	aePCAp42XKV
+X-Received: by 2002:a05:6820:201c:b0:6e0:39ad:4c75 with SMTP id 006d021491bc7-6e7a65d548dmr5573097eaf.15.1791477656508;
+        Thu, 08 Oct 2026 09:40:56 -0700 (PDT)
 Received: from sheng2080.cmix.louisiana.edu ([130.70.15.5])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6ee7a7d8f63sm45928eaf.9.2026.10.08.09.40.52
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6ee7a7d8f63sm45928eaf.9.2026.10.08.09.40.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Oct 2026 09:40:53 -0700 (PDT)
+        Thu, 08 Oct 2026 09:40:56 -0700 (PDT)
 From: Leizhen Zhang <lzsx618@gmail.com>
 To: nathan@kernel.org,
 	nsc@kernel.org
 Cc: rostedt@goodmis.org,
 	linux-kbuild@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 4/8] modpost: fix stack out-of-bounds read for unterminated PNP ids
-Date: Thu,  8 Oct 2026 11:40:31 -0500
-Message-Id: <20261008164035.3668885-5-lzsx618@gmail.com>
+Subject: [PATCH v2 5/8] modpost: fix handling of short reads in read_text_file()
+Date: Thu,  8 Oct 2026 11:40:32 -0500
+Message-Id: <20261008164035.3668885-6-lzsx618@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20261008164035.3668885-1-lzsx618@gmail.com>
 References: <20261008164035.3668885-1-lzsx618@gmail.com>
@@ -79,61 +79,53 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-do_pnp_device_entry() and do_pnp_card_entry() copy the PNP id into a
-local acpi_id[PNP_ID_LEN] buffer to upper-case it, and then print it with
-"%s". A PNP id that uses all PNP_ID_LEN characters, e.g. "PNP0C0F1", is
-accepted by the compiler without a terminating NUL (the kernel is built
-with -Wno-unterminated-string-initialization), so the local copy is not
-NUL-terminated and printing it reads past the end of the stack buffer:
+read_text_file() loops until the whole file has been read, but every
+read() call writes to the start of the buffer, so after a short read the
+data already read is overwritten and the end of the buffer is left
+uninitialized. If read() returns 0 before the expected size has been
+read, the loop never terminates.
 
-  AddressSanitizer: stack-buffer-overflow ... in printf_common
-    ... do_pnp_device_entry scripts/mod/file2alias.c
+Read into the correct offset of the buffer, and treat an unexpected end
+of file as an error.
 
-Limit the printed length to the size of the id buffers.
+This was confirmed by limiting read() to 64 bytes per call with an
+LD_PRELOAD shim, which makes modpost fail with a parse error on a valid
+Module.symvers.
 
-Found by fuzzing modpost with ASan/UBSan.
-
-Fixes: 72638f598ec9 ("PNP: fix broken pnp lowercasing for acpi module aliases")
-Assisted-by: Claude:claude-opus-5-5 ASan UBSan
+Fixes: ac5100f54329 ("modpost: add read_text_file() and get_line() helpers")
+Assisted-by: Claude:claude-opus-5-5
 Signed-off-by: Leizhen Zhang <lzsx618@gmail.com>
 ---
 v2:
  - Use my real name in the From and Signed-off-by lines. No code
    changes.
 
-v1: https://lore.kernel.org/r/20261005104050.1786222-6-lzsx618@gmail.com
+v1: https://lore.kernel.org/r/20261005104050.1786222-7-lzsx618@gmail.com
 
- scripts/mod/file2alias.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ scripts/mod/modpost.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
-index 61a831c187..7685fb5135 100644
---- a/scripts/mod/file2alias.c
-+++ b/scripts/mod/file2alias.c
-@@ -573,8 +573,9 @@ static void do_pnp_device_entry(struct module *mod, void *symval)
- 	/* fix broken pnp bus lowercasing */
- 	for (unsigned int i = 0; i < sizeof(acpi_id); i++)
- 		acpi_id[i] = toupper((*id)[i]);
--	module_alias_printf(mod, false, "pnp:d%s*", *id);
--	module_alias_printf(mod, false, "acpi*:%s:*", acpi_id);
-+	module_alias_printf(mod, false, "pnp:d%.*s*", (int)sizeof(*id), *id);
-+	module_alias_printf(mod, false, "acpi*:%.*s:*",
-+			    (int)sizeof(acpi_id), acpi_id);
- }
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 75374c64b8..1772068dc6 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -143,11 +143,15 @@ char *read_text_file(const char *filename)
+ 	while (nbytes) {
+ 		ssize_t bytes_read;
  
- /* looks like: "pnp:dD" for every device of the card */
-@@ -594,8 +595,9 @@ static void do_pnp_card_entry(struct module *mod, void *symval)
- 			acpi_id[j] = toupper(id[j]);
+-		bytes_read = read(fd, buf, nbytes);
++		bytes_read = read(fd, buf + st.st_size - nbytes, nbytes);
+ 		if (bytes_read < 0) {
+ 			perror(filename);
+ 			exit(1);
+ 		}
++		if (bytes_read == 0) {
++			fprintf(stderr, "%s: unexpected end of file\n", filename);
++			exit(1);
++		}
  
- 		/* add an individual alias for every device entry */
--		module_alias_printf(mod, false, "pnp:d%s*", id);
--		module_alias_printf(mod, false, "acpi*:%s:*", acpi_id);
-+		module_alias_printf(mod, false, "pnp:d%.*s*", PNP_ID_LEN, id);
-+		module_alias_printf(mod, false, "acpi*:%.*s:*",
-+				    PNP_ID_LEN, acpi_id);
+ 		nbytes -= bytes_read;
  	}
- }
- 
 -- 
 2.34.1
 
