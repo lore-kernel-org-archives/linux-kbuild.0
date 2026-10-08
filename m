@@ -1,73 +1,73 @@
-Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
+Received: from mail-oo1-f54.google.com (mail-oo1-f54.google.com [209.85.161.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 527AE3AF64D
-	for <linux-kbuild@vger.kernel.org>; Thu,  8 Oct 2026 16:40:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D83FB3ADBA4
+	for <linux-kbuild@vger.kernel.org>; Thu,  8 Oct 2026 16:40:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791477653; cv=none; b=BKaaS1fGBt6WsrBoXEZhydaLJjvwZwnaIqNzpe0HqeWQvfs45bh8G8yCN89f2030ABGOn+x7hA6/J62dklJ8YxpP8XowxepB+F0SV8H7pnmsKoXDgHhGBvQL/OIVfraAcApZtxOJ7YbDnuePnlZl+Q9/PpQfdiaaa4Zy+V9bvc0=
+	t=1791477655; cv=none; b=iPwaNx1ze/v2wJ6ONZoqYCyHj512HGASuXoUukhN9iEgQtl02kj8qq4ogx3DEYMPgvzGoFHnQuQZawc0cV/SJFN9ITGsLXnPV7Bqje17s7Wnx/+6pu9AhvbMllaS2+9gh+rl2V8TqM9SgM7EB4fsOnFLccSVbr5n/2RpPWqflIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791477653; c=relaxed/simple;
-	bh=Pa8rCN/ylvIhfOP3MUtjtxQn4ZgMu6lbTjYns755EKU=;
+	s=arc-20240116; t=1791477655; c=relaxed/simple;
+	bh=TbHXL5XflxbSzilJyxaLHrSNth6sSZOOxsGKAQPnCLw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=J+Xs87urU9TRDzqtYZ65YlseNz82UiONacuas2DuauYBBSKmqtVZkDQcHuTLyiybsoFYu2ZGvVxc/jZjExrW0tB2jcBjE3xp6DXG03bMN0l/VpLT/97bRZ9bkoGJrrWwyI++biXrvszkZTTsOlTN/M/p5/RO2BeUk1nxadI9JmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SWYQ6hmz; arc=none smtp.client-ip=209.85.161.43
+	 MIME-Version; b=EF4faSYMcBOba3JkPqRALiQr99a1B+CXmotiF+DLpMZUccbPGY85YO9aoJlcCHrIjQGt4f0XqhCutrairoukCeth+eTFOMohl/2VoFvyo0eH64DtepYbpuc53L8lLSeEUi0U1VBbEXwxw7aBi1elYdnIw6hLusAl/u63WnYeGso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qYLfoAI/; arc=none smtp.client-ip=209.85.161.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SWYQ6hmz"
-Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-6d7a9e2eb24so3056960eaf.1
-        for <linux-kbuild@vger.kernel.org>; Thu, 08 Oct 2026 09:40:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qYLfoAI/"
+Received: by mail-oo1-f54.google.com with SMTP id 006d021491bc7-6de1fd5f572so1434599eaf.3
+        for <linux-kbuild@vger.kernel.org>; Thu, 08 Oct 2026 09:40:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791477651; x=1792082451; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1791477653; x=1792082453; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=+zsCIkE01nFQonqFuKVR3/gHQNrFrhYBKFETrHyf3kw=;
-        b=SWYQ6hmzecxf/aO6XuQD75GiZGij6IkBml5qhTAo1qfiV6PaI6r18KzYOubFTgAoJ/
-         f8rNazZPfvgejxr3LcW2ETIXcJCX5mLR3U7kbzjze11qeHf879pnombKssYJfuTLMS+q
-         cFBhmiu42PMVuVRdLzGWq8llZWivta0K/uDtbjAL+TJHZaDcdjRaVQ/aAXseqeEgOA3k
-         uhX8gJ4yITpNI4dH+ounx1UKTg9MoOI11sGS94lbPFPvqLpFHlWhfW7YtQxyd5GjdMRi
-         jLPaFuCzEH42Lxad4dJFKk/trqBTnF4ZGCkd4BaJbbOeTkyWQlklZVjPReeA2pdGz4CJ
-         VVEA==
+        bh=9MC7qaWcROmES00Hk96fpRE/Vor1YORtZHWPl0gQA1w=;
+        b=qYLfoAI/bXau7CJkOLKtgdo9ltU52ALqhUve/qGCzHpUHhBV1jMcrmmk6JmO98nlqR
+         kDBhYXsvE8VP9ngigT4JdtQlB18GAn+nkvuf9P9zRqICGjMXBCI4rSTlX2/cCMe3jYVH
+         FYeHwXOJEOqzsmHB14KBI6PXcunS6ZeC3EacNBbKvMa0iJJOhE2uQ3OurkjcrjMbNEFv
+         7une0vAdhLcLpR6UWfGEABdlE7nOLpc5uNglq7fvhj+77aTfNPejZ/b7oO0vvBDCY6md
+         KcPQjtKBHYRFpzeoTxoH4Jd+0wAanih9IDPlzZqJ6HZBGbHxjlyn1Lj/KpVljeVTbQYk
+         mRDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791477651; x=1792082451;
+        d=1e100.net; s=20260707; t=1791477653; x=1792082453;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=+zsCIkE01nFQonqFuKVR3/gHQNrFrhYBKFETrHyf3kw=;
-        b=LXOOd7MJ91vj+D4QxS2yjNvs4rsiBrW9Neh08Vvwm1FG2djueg04Q8XoZvgyIe2CXu
-         B/cfJNkbGChkBJCpbqs7l57RySQulzfEh7yAcrl/Cai81cF79Xi6JD06lgW85EdLFrjR
-         q3WzXjX+rR8izUomj3JWBnvab2s40Q2wzTZ9v6A/MwQE3tw/Dyi7Yk5SvCMUtoAmIbi8
-         Y6NZznEbAi2rJtQgPAcTwkFG1GvxzqC3uprqaV4VvJ066bUl3NaWU97ZaAaF9b9oDPL4
-         kBmRw8t0M87R1l4t2f1Bzi+PjRyI6s91Fc+dDPyUuA5CuLal2bkFRWwPw+rI8DmhHZ9M
-         XrVA==
-X-Forwarded-Encrypted: i=1; AKwUvBzT0586pdgfsnugt2TDC/7uTTvJ0gNhQE68n7R6wc6FOpAzHEEdYEjlmmqBoNx8FOoqJhwG0AW0Wn1jJe4=@vger.kernel.org
-X-Gm-Message-State: AFuF++nVbPpoB6j+evN6tuKwj7aeUzRhRq1XyZDzZoT7vV9W63FC/twv
-	NULeS6tVU7w51dToS+gvMZauCOLbgN1T8sly9+vn6XS1KXBKmtYkXmsDOlvF1w==
-X-Gm-Gg: AYBFou3P3cU6mhJIWPOkQ2YV+Mb91MzEaX6APN4pkiWGyAQtoM5eWvWZaO1Y420Ty/w
-	tJWjI+H+QTselBpL9P25LcPpcD0HLd8/YwhWCSRN13Y7a/fMNdrvkkYSj5IFiTm2ibhAiirQroX
-	S+/1QMlK3BdzdADjaAKs6v2qa4bg9RzE/2m+vmw2jx5T+LCUhk6/x1rJyPIY53EAPnv/j/q3TvG
-	TO/7m9p3/B+QW+8WFNH9zGSF999XO3ENbsQeKIY9n6AKyiu5Sxbhso8PMBAjxBhbJLFMQhE0RtY
-	fASZzK2TM3l0RN8mEtX2jW/Ud125kcKQfRIohIp/d+0/wHSuqMmd+XQ0KGVz1KNMWhY2Jod8Eg9
-	1jyELrbjszUN0LX1mGJKs5AQvXzVUs3Ln4OJX7uHxDMe6aqHDsvwrOoiWBU1jTuYGWNqa6hGCis
-	I5fXyIyLxCNuXaEu3VJYBmLNCnMR/HCfN+QccBVF2nrW1+7EWaCERQsI5tUZJBYePbSUj4QMlJf
-	Myj6+Dlus9D
-X-Received: by 2002:a05:6820:4dec:b0:6d8:b1c9:6c9b with SMTP id 006d021491bc7-6e7a65db9e7mr4805418eaf.21.1791477650971;
-        Thu, 08 Oct 2026 09:40:50 -0700 (PDT)
+        bh=9MC7qaWcROmES00Hk96fpRE/Vor1YORtZHWPl0gQA1w=;
+        b=WOjv4HizXQXMlzJxNHeTR28dlWVj3LWba1sFGbbiJv7q/T2imoMLPKBUa1QMyAVUE3
+         NZSjLILTeYpdFgbpv7pny2frh5VjaI8FmohF1EPScIXsIol9xR0facxOMZ2+YFonzdj1
+         pdz1ygXBw4IE+zKxnyLmb92DgnK32D7UwhLUOYCHxwKAC5eNaIzuQjz40MWJJLrbEEob
+         AybqKGLpLp7lbY4Q29U1raiG1EvMg1lMNm/cedgC7skcCcHmbU1wv5ZIbIDiEU0/4WsS
+         GW2oZBqvaAqjx9SswcUAsvc4T6E/rsA453JzzgsH5X9q3zotrtowmxAJFcwZnmezqqJK
+         VEyA==
+X-Forwarded-Encrypted: i=1; AKwUvByNZ+l4uovFMAS+jFOotiswGi4pwWw6EcFMoKBwnh9wTNm6UVgUYpCBTy0skTUUiKGyRVRrxec2VZFfYF8=@vger.kernel.org
+X-Gm-Message-State: AFuF++lr0LEt+rAx8x9hWb1EuAau672LygvGwg3sfOP8Kfk8Nt8oJFfp
+	YkrDmScjrvVtjeFUEZPcGmqwGSi9OA0vz1ktAxMPeYa9TmgSu/Pav5+S
+X-Gm-Gg: AYBFou0QNIriqWHD53J2GbdPR4ykXX1HkMtKewgZDzhDNTefjh07I3lyQ8JHO0XjqYP
+	KSZg1zP4Pb53OS6dYUxKidrFcIEywbB4kaByOuCyfWqEYYs2ow8/8stiKC+lRD/z03kWsvxzyJg
+	tTb2z68GAprYXdBVVz4mp5AEnwoa+yA04E7qkkSlh7wzhN8QJWUSCfZ9QUA/FlHeCo0WeBbEIC2
+	pGCt0SblXpSSyKWa6Bq0m4+yk887w1NmwarucDYYVSBxzmIjC7+HPrJJ8S5J/9+b1Bf8dmC4S2D
+	D5XJIoFEULuVIlJEnHZXD5AU9dsFs1yMlDtfsdgFgcQNgTwPgiwyZNlMhCBVqJMZbb+9h9piGO8
+	SXqBQhUWsJTsSI2W2kO45KxF2qkigUSmNkDqtTKLDjeGkLIEJ12v2s8FA4VktLdX6+4A7ZxEFDs
+	9hk7C8P3z7WSAP8CvLoN0ImwZLykmCciyaRlOV5ThtnF8Omoh8kL6ryv3EKCPnp3Ntv2iJbkFpW
+	qCbeKT5jYWA
+X-Received: by 2002:a05:6820:7089:20b0:6df:ac2e:85b7 with SMTP id 006d021491bc7-6e7a8996551mr3648031eaf.15.1791477652571;
+        Thu, 08 Oct 2026 09:40:52 -0700 (PDT)
 Received: from sheng2080.cmix.louisiana.edu ([130.70.15.5])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6ee7a7d8f63sm45928eaf.9.2026.10.08.09.40.47
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6ee7a7d8f63sm45928eaf.9.2026.10.08.09.40.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Oct 2026 09:40:48 -0700 (PDT)
+        Thu, 08 Oct 2026 09:40:51 -0700 (PDT)
 From: Leizhen Zhang <lzsx618@gmail.com>
 To: nathan@kernel.org,
 	nsc@kernel.org
 Cc: rostedt@goodmis.org,
 	linux-kbuild@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/8] fixdep: fix out-of-bounds read on a comment ending with a backslash
-Date: Thu,  8 Oct 2026 11:40:29 -0500
-Message-Id: <20261008164035.3668885-3-lzsx618@gmail.com>
+Subject: [PATCH v2 3/8] kallsyms: do not call qsort() with a NULL table
+Date: Thu,  8 Oct 2026 11:40:30 -0500
+Message-Id: <20261008164035.3668885-4-lzsx618@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20261008164035.3668885-1-lzsx618@gmail.com>
 References: <20261008164035.3668885-1-lzsx618@gmail.com>
@@ -79,47 +79,52 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When skipping a comment, parse_dep_file() treats a backslash as escaping
-the next character and skips it unconditionally. If the backslash is the
-last character of the file, this steps over the terminating NUL and the
-loop keeps reading beyond the end of the buffer:
+link-vmlinux.sh runs kallsyms on an empty input for the first link, in
+which case table is NULL and table_cnt is 0. Passing NULL to qsort() is
+undefined behaviour even for zero elements, and UBSan reports:
 
-  $ printf 'foo.o: foo.c\n# x\\' > foo.d
-  $ touch foo.c
-  $ scripts/basic/fixdep foo.d foo.o cc
-  AddressSanitizer: heap-buffer-overflow ... in parse_dep_file
+  scripts/kallsyms.c: runtime error: null pointer passed as argument 1,
+  which is declared to never be null
 
-Only skip the character after the backslash if it is not the terminating
-NUL.
+Skip the sort when there are no symbols.
 
-Found by fuzzing fixdep with ASan/UBSan.
-
-Fixes: bc6df812a152 ("fixdep: parse Makefile more correctly to handle comments etc.")
-Assisted-by: Claude:claude-opus-5-5 ASan UBSan
+Fixes: c442db3f49f2 ("kbuild: remove PROVIDE() for kallsyms symbols")
+Assisted-by: Claude:claude-opus-5-5 UBSan
 Signed-off-by: Leizhen Zhang <lzsx618@gmail.com>
 ---
 v2:
  - Use my real name in the From and Signed-off-by lines. No code
    changes.
 
-v1: https://lore.kernel.org/r/20261005104050.1786222-4-lzsx618@gmail.com
+v1: https://lore.kernel.org/r/20261005104050.1786222-5-lzsx618@gmail.com
 
- scripts/basic/fixdep.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/kallsyms.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-index 54063d9804..9b57fe5554 100644
---- a/scripts/basic/fixdep.c
-+++ b/scripts/basic/fixdep.c
-@@ -280,7 +280,7 @@ static void parse_dep_file(char *p, const char *target)
- 				 * escaped newlines continue the comment across
- 				 * multiple lines.
- 				 */
--				if (*p == '\\')
-+				if (*p == '\\' && *(p + 1) != '\0')
- 					p++;
- 				p++;
- 			}
+diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+index bd9e9ce20e..9300e10ad6 100644
+--- a/scripts/kallsyms.c
++++ b/scripts/kallsyms.c
+@@ -390,7 +390,8 @@ static int compare_names(const void *a, const void *b)
+ 
+ static void sort_symbols_by_name(void)
+ {
+-	qsort(table, table_cnt, sizeof(table[0]), compare_names);
++	if (table_cnt)
++		qsort(table, table_cnt, sizeof(table[0]), compare_names);
+ }
+ 
+ static void write_src(FILE *out_bin_file, const char *out_bin_name)
+@@ -822,7 +823,8 @@ static int compare_symbols(const void *a, const void *b)
+ 
+ static void sort_symbols(void)
+ {
+-	qsort(table, table_cnt, sizeof(table[0]), compare_symbols);
++	if (table_cnt)
++		qsort(table, table_cnt, sizeof(table[0]), compare_symbols);
+ }
+ 
+ int main(int argc, char **argv)
 -- 
 2.34.1
 
