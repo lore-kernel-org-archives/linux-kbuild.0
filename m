@@ -1,102 +1,127 @@
-Received: from mail.hallyn.com (mail.hallyn.com [178.63.66.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D26388E76;
-	Thu,  8 Oct 2026 16:16:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.63.66.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1791D3A3E78
+	for <linux-kbuild@vger.kernel.org>; Thu,  8 Oct 2026 16:40:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791476221; cv=none; b=VVYtU+kcfaK4Agzzg61zgJdRxiG3p9loox3as3YqP6+a8BUp5uw3qZQV1IhGS8Wd2yX8+s4gbUi3jlH9mHmnAfSUwdITLZlZdNkGgS0x+DOTz/QwH1CiMl5ahCifF4p+pX3c810Zgpiqazybojgyob0WnSumgiCUdxkN8NVr2UY=
+	t=1791477648; cv=none; b=lPNkIjg690BnUwjOGtVbUXiAjIsd9oqrk0dykbi/AiOMU9Sq79Cm+RoHFNjsJhZUgk1pDAiNj2ZCWwNWhrpJ2NBEJ7Gu0rndmRlvLnzy5senmRTLT2XR4lc2sy2/4w56CZaRFNwUy0Wn6gqlGTAXMpYiG0AQPRsIgGKOJQAieco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791476221; c=relaxed/simple;
-	bh=ONUAXTXET2uph2ufarl0JR+mBNLNazRrkGyxBpG9j4Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lHR1USf1ZyBXEyuIVaGnhPU7frEkyUjC8MDk4TcdXMZsxi4rRZog9D5M+Tuxwkcn65Xl6V5G83KR78FtUNjumMn+5pcZiI6wwAr2ynhOtaufW0k28SWVkI5ckoFgA/6V2pQKui5jnD6xu2kwSmHe0OeFR2jSrg3aRSGwzWUy+dY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hallyn.com; spf=pass smtp.mailfrom=hallyn.com; dkim=pass (2048-bit key) header.d=hallyn.com header.i=@hallyn.com header.b=Yc2Uacvw; arc=none smtp.client-ip=178.63.66.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hallyn.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hallyn.com
+	s=arc-20240116; t=1791477648; c=relaxed/simple;
+	bh=Wry/tfYuTC7rWptBdzvZECOOBl9/wiK4tYyVY5TUF7M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FW0PU5OP3nlZX/VcY9GuBeYAW6Hc3DpjbBM/UDebrv0BkKdkVkD008I406DKJlekiRHoUaMA489U7mI42fKsIG8TP8RheUpqbsfdQu3KnhsQGI91NtW3v5DPWe3nHi0F28alDIX10DiZ62fPADW/JX/HNloOHGduuxyUXiMU4aQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l0DkkHOe; arc=none smtp.client-ip=209.85.161.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hallyn.com header.i=@hallyn.com header.b="Yc2Uacvw"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=hallyn.com; s=mail;
-	t=1791476206; bh=ONUAXTXET2uph2ufarl0JR+mBNLNazRrkGyxBpG9j4Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Yc2Uacvw/E8IC28sxXYwsgrwszsBc78gC0v31tgczm3TUURjBC6dT9qzn0ggd64gq
-	 QjPyeWKyeoRQwZpk4C/p3XxjygiZXH51hK465fbWOKEpvamDUDqilUeF1enE3vwsS1
-	 Sb3ubVNpFDt7bIpFLiuX9kowTVZBYkLd8cmikJkEdmVmY8QY8B6sjBeBaLw91GCKAd
-	 /xvJW7ygChmDOhJcjpWbQhdJwFHlyx86JWpoebmCL/3z2VPphM3ZcSwh8pPlQzWLNK
-	 sLD/G6HPsB6z9aAZSDnHT8qc+Tj2DioSedN97XYBXA76y/VFIhwxD8J09ObjieTlrP
-	 MBNbaoIsETP9w==
-Received: by mail.hallyn.com (Postfix, from userid 1001)
-	id B5C69E7D; Thu,  8 Oct 2026 11:16:46 -0500 (CDT)
-Date: Thu, 8 Oct 2026 11:16:46 -0500
-From: "Serge E. Hallyn" <serge@hallyn.com>
-To: David Laight <david.laight.linux@gmail.com>
-Cc: Gregory Price <gourry@gourry.net>, Sasha Levin <sashal@kernel.org>,
-	linux-api@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kbuild@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	workflows@vger.kernel.org, tools@kernel.org, x86@kernel.org,
-	Thomas Gleixner <tglx@kernel.org>,
-	"Paul E . McKenney" <paulmck@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Cyril Hrubis <chrubis@suse.cz>, Kees Cook <kees@kernel.org>,
-	Jake Edge <jake@lwn.net>, Gabriele Paoloni <gpaoloni@redhat.com>,
-	Mauro Carvalho Chehab <mchehab@kernel.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-Subject: Re: [PATCH v5 05/11] kernel/api: add API specification for sys_open
-Message-ID: <asfB7tHWs420QkWL@hallyn.com>
-References: <20261008084956.2911790-1-sashal@kernel.org>
- <20261008084956.2911790-6-sashal@kernel.org>
- <aseRXi7hMWBBc0tB@hallyn.com>
- <aseWPV6ZRQM3JOMN@gourry-fedora-PF4VCD3F>
- <asemkQ2v0di0Eea3@hallyn.com>
- <20261008171205.7239c463@pumpkin>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l0DkkHOe"
+Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-6c1983dfaffso4468555eaf.2
+        for <linux-kbuild@vger.kernel.org>; Thu, 08 Oct 2026 09:40:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1791477646; x=1792082446; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=DQBUbTgzsBd0hnhaOE1QOAQqui1J5m3YnzwTsujlUWI=;
+        b=l0DkkHOershgQ9qVF2QPqH2ggvR64hFRYyPml0MAb6M6kIlRGAoQ8s5vaa2F7rJcbH
+         2LB3ttpVPVniDf+8W5vVde3CzSdhig5iHj5Q1E4p1lt/snUgw9xNhEiC7RxMjfvUqERC
+         9QHJ1r3ye5vEEuwdtS57fbHnr9uU073HljgbPch7vc1pEw+Fn5BDG8aKF6c0BSa4EufP
+         wRr+6xTwOFIBKH/2fmghToLmEBj6RKc8HNY5c+kGkMJ1Ee+YcTruinzHcsA+JsqBs9hu
+         KwcPLaVtS5n639BWAVEMC5WI3nmzBjufC/DnsJgFGnyyoTuwZQFrpTBFukTPBJkKFzdf
+         SsjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791477646; x=1792082446;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=DQBUbTgzsBd0hnhaOE1QOAQqui1J5m3YnzwTsujlUWI=;
+        b=0wZ2dLgfHgtNiSuBDVSkiA79/e5RZyplthjEA486VAlVq1+7CY/c9iPuAluBtwEZ1e
+         rBeQl3ZIBmFTcT68A8pqI0xz2tPsl/bHVQSLWHMEirJOM2SI6KvPc0yu0LchB5bbSW3L
+         I8dkQIqpfeQNJOIiBbYE915GNe2mrREtgYZJ7UkunnhNEtkaIqxNPwdM+/uH/fnFxURf
+         qRVesaK2ycBt9xKkoP1E5XnELHXVHzThwtMvjvcLHbaf2A70eYVqtvDeobrVvmAwnpZB
+         lUmu0oqPAY8mR3SH9TMjmddSlxPa46PjwARwyfts4akxluXzGkdYsFKLm7Evg9rmlGRg
+         pNJw==
+X-Forwarded-Encrypted: i=1; AKwUvBwspLC8MXbAqStt+IZMNg1CxkIUBcSujjVZZQnKDUI5+ewfTnfjaqnwOhuJGM2hs6/c/XLKd4szq8DlyYM=@vger.kernel.org
+X-Gm-Message-State: AFuF++kqVawAQQprMPr+sM0XWAli/K1453eo1DHQw+BwRrPTeDz4ffNO
+	aCKj1k8MWbRvpuGfUJJevDvONFV+DN7tZsYIMAhnm2lPAxwvemJSkims
+X-Gm-Gg: AYBFou2oPI+MOZunkN1lguzNl1ASfKZ+G/484CAHW6HbjvqknE7WBC3K+243WwTmK6y
+	fByx23iWBVOJmWhM7DN9Z0z5MZLXNDbtdN54xNymuChTJL0ideyvmMtLKh6WqF/87EYiQGlEuYz
+	nBy2Q4f7vhfnhWXIux6/8LhvWIkd1SmhyjERIRpZ0d7wvPyUNV2nxuJZcyERQtXhWGGmVsU4mtX
+	41UJoWaLLNhevSrBde4beE9UFyHZkf1Oig9dO1B6O4/Ya8/RvAT7B5FZpPn05OKrX2r4q1rhYj+
+	kUa1qkv/rhITta0AprcU8eUjt9lDSFuhZ2hS5arEkRpM/JnUQzXD1xbzOGy9l2CbfdwddXSzyOI
+	zBlzswBA7xQShKk40KtKLRYUbUiCgazbJGfrGImdVTrCnNEKS5ooud+evJOY/xaOhqDw48zhCx0
+	TmI5Kqndx+ictk7i0nmTAZ/8hMDnaB1q3QZTKk+iYhSjSgw04VkjsDhhq+GnLyUukmguDPZJdMg
+	gZe2935TY1k
+X-Received: by 2002:a05:6820:c44c:20b0:6dd:9790:7dd9 with SMTP id 006d021491bc7-6e7a8050f53mr3686761eaf.80.1791477645795;
+        Thu, 08 Oct 2026 09:40:45 -0700 (PDT)
+Received: from sheng2080.cmix.louisiana.edu ([130.70.15.5])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6ee7a7d8f63sm45928eaf.9.2026.10.08.09.40.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Oct 2026 09:40:45 -0700 (PDT)
+From: Leizhen Zhang <lzsx618@gmail.com>
+To: nathan@kernel.org,
+	nsc@kernel.org
+Cc: rostedt@goodmis.org,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/8] kbuild: fix memory safety and UB bugs in host tools found by fuzzing
+Date: Thu,  8 Oct 2026 11:40:27 -0500
+Message-Id: <20261008164035.3668885-1-lzsx618@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261008171205.7239c463@pumpkin>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Oct 08, 2026 at 05:12:05PM +0100, David Laight wrote:
-> On Thu, 8 Oct 2026 09:20:01 -0500
-> "Serge E. Hallyn" <serge@hallyn.com> wrote:
-> 
-> ...
-> > 
-> > Even if there's just a three line comment above a fn, history proves
-> > that it will not reliably stay in sync as the fn changes.  An automation
-> > step/check is needed.
-> 
-> The only way it can possibly stay in step is to have the compiler process
-> the same source text.
-> Then, if you add/change a function parameter you'd be pretty much forced
-> to add/change the comment.
-> Return values would have to be documented at the C return statement and
-> really as an extra parameter to the return.
-> 
-> But, IMHO, the whole thing adds too much bloat to the source files.
-> When you 'grep' a source file, you don't really want another match in
-> a big comment at the top of every function.
-> 
-> David
+This series fixes bugs in kbuild host programs found by building them
+with AddressSanitizer and UndefinedBehaviorSanitizer and fuzzing their
+inputs. Most patches include a reproducer.
 
-That's why I feel all this info that Sasha has added should go into a
-Documentation/uapi/ autogenerated directory.  Auto-updated on every build,
-with warnings if the result has changed.
+Patch 1 fixes a bug that also triggers without sanitizers: a declaration
+such as "int a, f(int);" makes genksyms loop forever while allocating
+memory (since v6.14; earlier versions silently recorded wrong types for
+such declarations).
 
--serge
+Patches 2-8 fix out-of-bounds reads (fixdep, modpost) and undefined
+behaviour reported by UBSan (kallsyms, modpost, sorttable,
+tools/include byteshift helpers), several of which trigger on every
+normal x86_64 build when the host tools are built with UBSan.
+
+The series is based on next-20261002. With it applied, a defconfig +
+MODULES + MODVERSIONS x86_64 build succeeds, and for genksyms, the
+symtypes/CRCs of 149 preprocessed kernel sources are unchanged.
+
+Changes in v2:
+ - Use my real name in the From and Signed-off-by lines. No code
+   changes.
+ - Drop "kconfig: fix NULL pointer dereference for defaults taken from
+   choice members"; Julian Braha will fix that issue differently.
+
+v1: https://lore.kernel.org/r/20261005104050.1786222-1-lzsx618@gmail.com
+
+Leizhen Zhang (8):
+  genksyms: fix infinite loop on declarations with parameter lists
+  fixdep: fix out-of-bounds read on a comment ending with a backslash
+  kallsyms: do not call qsort() with a NULL table
+  modpost: fix stack out-of-bounds read for unterminated PNP ids
+  modpost: fix handling of short reads in read_text_file()
+  modpost: fix pointer arithmetic on NULL in parse_source_files()
+  sorttable: avoid pointer arithmetic overflow when locating sort_needed
+  tools/include: fix signed shift overflow in 32-bit unaligned accessors
+
+ scripts/basic/fixdep.c             |  2 +-
+ scripts/genksyms/parse.y           | 23 +++++++++++++++++++----
+ scripts/kallsyms.c                 |  6 ++++--
+ scripts/mod/file2alias.c           | 10 ++++++----
+ scripts/mod/modpost.c              |  6 +++++-
+ scripts/mod/sumversion.c           |  3 ++-
+ scripts/sorttable.c                |  2 +-
+ tools/include/tools/be_byteshift.h |  2 +-
+ tools/include/tools/le_byteshift.h |  2 +-
+ 9 files changed, 40 insertions(+), 16 deletions(-)
+
+-- 
+2.34.1
+
