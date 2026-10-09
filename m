@@ -1,140 +1,105 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C29B47F797;
-	Fri,  9 Oct 2026 09:08:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3E6149A3CD
+	for <linux-kbuild@vger.kernel.org>; Fri,  9 Oct 2026 09:46:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791536910; cv=none; b=e1EXJehjbSKKopEy51/OQLKY9KIA/YHVDJD8Ao34SNL8aAK2rXwbpexZ2dChSmfgBXsCnYHkK2mE6kIFlHDRXzExS4x3ftcbLbX4yWRNO0XJSQEtLdvYLwJYVnlJ1kSb/C8YVdqmdhwLHP45wTnA6v0fh+3z14xdM6S1n71KD0A=
+	t=1791539188; cv=none; b=AyHgjNlblRT/HlfJLSitm/UjPat5yp85UGyHnOjv8ZvSKP/4HmzTNppc7E7cZBH+hCHo/gJSZtRr5bIgQ7ecDjvsxw3INic5dwcFZgDp8hdkPzQj1RBwgwYSfB5uTdZ5yUd87QpLue7whY+qItbKTZ0Nw61sCYLFHL+pymQ4+BU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791536910; c=relaxed/simple;
-	bh=fnscWvrcAZlzdhwB+Ig824lWGG3qVF7OpaC0fCP4Tks=;
-	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
-	 References:Date:Message-Id; b=V7q8SkNW9xSF4tfw4WdY6j70CPDbyfyqJ4bTHJorAhZrkT+PcMiAOJs2rZdlepAsTVDjjzrGze6te354AUKcTuG1cyTHTk/nvEXygvQxia+yrvZCvopApZuvzbVYEciOr7IYOYIbup9/yloLyF/8XkyAiGWdvfQC0ByPXW6AFhA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IQaq2RW1; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791539188; c=relaxed/simple;
+	bh=RAJQnKkDBXdd5vQ/P+np194z6Ot3PXYd2Bw3RnHlVSU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=W17365Iv1XuH/8Ld3Auyc7/NGis9vBueUPf0GF+fyKjLxj1v1LDW2yLN8kzc+JHOXCK2ovW3KH5JTbXwFik1elrOLYLHupLjNDzSMWCZUl0SBjqMN8fTbV6ATW3kh3rFgBsMmBhAqouHEM93XZ1ye0hxCLv5YxzljTFP9GKkJ+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OfpnW1d1; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IQaq2RW1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A24F1F000FF;
-	Fri,  9 Oct 2026 09:08:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791536908;
-	bh=lfXpsKS9uzWoEofxIKT6Rircy9hnzSKGV+lLHjdsjRg=;
-	h=Subject:From:To:Cc:In-Reply-To:References:Date;
-	b=IQaq2RW1qKYYtY9VevG9B698NIuKq/vjzpqqLujFAmcJpgwikxpruycLT3RwoC93M
-	 0JSrFCnAdszgGyitl677OOOEjpWAERPkagBvoRQArnz3DmQdqnNomAS48xiLvI3V39
-	 esdVsRZklliAemDKCXPGg4HSFQF3XJB7i8LmON5XFS/utgkg2EqtMyo9l5Gk06VQzQ
-	 Hf+qV8/3XENaB45w5AVDjDY/68SF4HOrVKqfuC+kEqInBxJropL5Fbb8qAri7+OPRE
-	 EX2wN5UXqITtoTKHdF6dzJzCV2zngs5o1Dfkz+cFeU8vP1Jq+Ol5UW7AD8Htc+/uTn
-	 rygKooeyrOEVg==
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OfpnW1d1"
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-48af27fe287so2920474f8f.0
+        for <linux-kbuild@vger.kernel.org>; Fri, 09 Oct 2026 02:46:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1791539181; x=1792143981; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=sdjcKesxfT3Y1JRnD0eSSSUTshq47A90dMPNUITOibc=;
+        b=OfpnW1d1makdUJB4XeJQfm7B+XJknyWmFqynfa6dtaiH1xURMxMxWXENP8548ANVdm
+         7kkdBhqHRqOTkmPtKTUbixXEQkMGZ6fjxaZO3exJiF9JHOPJPMeeHJIXxwRjcG06Erkh
+         wYKibK54hN1kbJCqx1xTFDRf/o3BbstNERrJYUMs9dM9lfw3LzXrbjd2YkXeqR4AnMOf
+         7XBMPx7XAONsTTnCWaZ/Bmz90yzKNRb4GBuLighXt+YdB3PW3fv0N6NzqlT/RMim00fD
+         Kvqca1xtXhVHVpjlXAeP1Gbxp9TfrA0/5MCCBhCX4Bh3rqhPPXv8UsrauM7+WXeBQRCs
+         6ijQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791539181; x=1792143981;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=sdjcKesxfT3Y1JRnD0eSSSUTshq47A90dMPNUITOibc=;
+        b=tWsm37ierP4Fit6lD3Uf8EueL5gBF14rBI9iWiowH114gi8GOje+nHXjLsnpHyS7Om
+         xcW6BlqcralZEQyvgoRnQZnvXAzxtj8UHmyJF7xHybt00vn6SX0llbJr8PxWZlJmNWVo
+         kyO5pOJxdK+ziPC3WOG9cEnI2Di+9xq8YVc4JVdActHwyyx+5vSVMaiqGA/VajpXzXne
+         qRzg5E/6fNKMfvJi+kXO85Wr09ua3vI5xXGCfHwS3fXp83RGyC+8wH1Hi2Gp0bxpwFzd
+         LZ92n3i6811Mp+/BsIDWTxYDJXws0bRH19lhfzVC7FwHeHao+c0JVIaiCorfRPI/Q7Mt
+         0vQg==
+X-Gm-Message-State: AFq9FYLzha5UNwOnVJ1kq/Eaj+QGHd7vjRKK0+eoELSx7at6fFszE2oZ
+	jfO+5me69Zn0y/EzCC5hsyPl/RDLZ6WkLunqePYsgeExTCfMfQIwqccX
+X-Gm-Gg: AYBFou3vJrq1WN9NcyLoJEzVIedoTkHk3y8WaeDeavjgN5nWzZqIPFTBbzSZa5aRN3K
+	i1KJ6vq+QrMZ6JGOe1YVPj4cjmcca3xNUs3hM8sl0eID0Jo3Eq4TgfbE+LVmFnBkFuF85UY0aE8
+	P0Wfb4aN5eTgsLcNUXo14M4Z2f26jth/riY0xvrR3MEILExtQXfwRu+Xh/O6Dq9OS/J7iH62zaH
+	OY89XwKXBp+IDU4yh/Hf81MqNcbsP88OjNGo/ZFoHEIqoWgKBj4IfR0hssOxYkzyv+rr1WqyV8W
+	8zXz6JdgaUYJ8RoiADoPLacgujx1iBNsZm1dpblhODdnoAAfkdvjDr9ng3Zwx5LSnKdFqgrGi4i
+	Zaf5ainTTRNmwPkObuFtgzhKWUeA3ShuK/aOgqmh/OgYb2dKjf/zbTLKf5ogsFmOGt7qqHez+/Y
+	50MBI4S+lFSCAqbBk3goy7QnDlu0DLznjQeM06SeE06D8PDlIr0pOP+gjiLauhhCUghF6mQJdM4
+	+xG60xHZVpmc14JQd733kGU1/ufkH3GBvoF2zQgyEhIYMUdLokoBg==
+X-Received: by 2002:a05:6000:1ace:b0:48c:571a:a1aa with SMTP id ffacd0b85a97d-48dba9dacf6mr2801939f8f.19.1791539180541;
+        Fri, 09 Oct 2026 02:46:20 -0700 (PDT)
+Received: from nixos-office (90-182-211-1.rcp.o2.cz. [90.182.211.1])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48db9adeacdsm3051833f8f.55.2026.10.09.02.46.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Oct 2026 02:46:20 -0700 (PDT)
+Sender: Julian Braha <julian.braha@gmail.com>
+From: Julian Braha <julianbraha@gmail.com>
+To: nathan@kernel.org,
+	nsc@kernel.org
+Cc: linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Julian Braha <julianbraha@gmail.com>
+Subject: kconfig: cleanup stale comment about 'keys' array
+Date: Fri,  9 Oct 2026 10:46:17 +0100
+Message-ID: <20261009094617.17322-1-julianbraha@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH v1 1/2] kbuild: Mark the kernel image gzip recipes as
- recursive
-From: Nicolas Schier <nsc@kernel.org>
-To: Kees Cook <kees@kernel.org>
-Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
- Lorenzo Stoakes <ljs@kernel.org>, Manuel Ebner <manuelebnerli@mailbox.org>, 
- linux-kbuild@vger.kernel.org, "Paul E. McKenney" <paulmck@kernel.org>, 
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-In-Reply-To: <20261009062733.3119731-1-kees@kernel.org>
-References: <20261009062722.i.253-kees@kernel.org>
- <20261009062733.3119731-1-kees@kernel.org>
-Date: Fri, 09 Oct 2026 11:08:14 +0200
-Message-Id: <179153689449.290498.7901907548551466768.b4-review@b4>
-X-Mailer: b4 0.17-dev-fde28
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3111; i=nsc@kernel.org;
- s=20250924; h=from:subject:message-id;
- bh=fnscWvrcAZlzdhwB+Ig824lWGG3qVF7OpaC0fCP4Tks=;
- b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBqyK8BV8SjyVMgQNOjZzXnnYT1FuXeJNlsZSuYq
- 1pZ8OUZI5yJAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCasivAQAKCRAHUgpwFiYS
- acmZD/9cTo1J4ou4BJpYyqZKe/LSFarwwKRq3lzsa7lQQN/+1s/jPyauCNrIR1MhTF3lpSCFmF9
- j2TPSFh9XY5b5+XwTnIDIaJvXTb8Yo25HCBgdhMDqJ6xQbuDrun//SuARfZOLsnvo7TtND0m+Sg
- H2PfT+Dd2EBfNwdJMYj/zjgtTA3sZjrVHv4du1EeHVMWkQsmNmVllRYpG6pCYWVDAkzcqcuf1BB
- vbEuqMoHbcFvakoZSUdy7FUlq/sGMY/P5qtTkTtYqpKEsFtLqVw3+KF4p+LF0Sb0gZY6FJKLzTG
- 0ZCwj94xhkTYNES/baPZj4hSCeXlbexfRW4OnRRAC9DgG7U5zYZaIrhYkdIDIqgQq2dymdvmTkN
- yreGdaggUyoDs+v826zDE+POVHo/hFPhEwAJQuoUpewfCQgQpTvYGJVmje/uT+75EqY87yq+IJj
- CDZlm5qjGEd5inlNLeTqOPqlVD6Caov7PVViRHg/fI7dvci//9M+MyECQftONlHihV9g+WOc3t5
- EiWd1FaBoKYEdcoRA4nfy6pzVNyX8UDkEgfLU8zFGuJZE00GN50rpmZwy7+/oZ72ZmDOihF2/8l
- bdul5Vdlm0RYqNp4yPcWd+JvKzuw9RVAeDAMfhXWa45eb4LVz13PX2WdFdVgF4ctlGsa5+V/erT
- T8mj25nF45PmzqA==
-X-Developer-Key: i=nsc@kernel.org; a=openpgp;
- fpr=18ED52DBE34F860EE9FBC82B7D97093255A0CE7F
+Content-Transfer-Encoding: 8bit
 
-> Since commit 48ebe1cbbeb51 ("kbuild: compress the kernel with pigz if
-> available"), cmd_gzip runs pigz through scripts/jobserver-exec, which
-> takes the job slots make has free. GNU Make passes the jobserver pipe
-> only to recipes it treats as recursive, but leaves --jobserver-auth in
-> MAKEFLAGS for all of them. The make 4.3 in CentOS Stream 9 also hides
-> the pipe in sub-makes (a backport of the fix for GNU Make bug 58232), so
-> jobserver-exec cannot open it, runs pigz on one thread, and prints:
-> 
->   WARNING: Unable to reopen jobserver read-side pipe: FileNotFoundError(2, 'No such file or directory')
-> 
-> Mark the gzip recipes as recursive with "+", as commit ecab4115c44cc
-> ("kbuild: mark `rustc` (and others) invocations as recursive") did for
-> rustc. As with those, "make -n" now runs them.
-> 
-> Tested ARCH=x86_64 and ARCH=arm64 defconfig with GNU Make 4.3 plus
-> CentOS Stream 9's make-4.3-cloexec.patch, GCC 16.2.0, and -j64: without
-> this change the warning appears and pigz runs with "-p 1"; with it there
-> is no warning, and pigz runs with "-p 54" and "-p 64".
-> 
-> Reported-by: Paul E. McKenney <paulmck@kernel.org>
-> Closes: https://lore.kernel.org/all/0ddb5e5e-f801-444c-aa98-0cfe814a3026@paulmck-laptop/
-> Fixes: 48ebe1cbbeb51 ("kbuild: compress the kernel with pigz if available")
-> Assisted-by: LLM
-> Signed-off-by: Kees Cook <kees@kernel.org>
-> ---
->  arch/alpha/boot/Makefile             | 4 ++--
->  arch/arc/boot/Makefile               | 2 +-
->  arch/arm64/boot/Makefile             | 2 +-
->  arch/microblaze/boot/Makefile        | 2 +-
->  arch/mips/boot/Makefile              | 2 +-
->  arch/nios2/boot/Makefile             | 2 +-
->  arch/parisc/boot/compressed/Makefile | 2 +-
->  arch/riscv/boot/Makefile             | 2 +-
->  arch/s390/boot/Makefile              | 2 +-
->  arch/sh/boot/Makefile                | 2 +-
->  arch/sh/boot/compressed/Makefile     | 2 +-
->  arch/sparc/boot/Makefile             | 4 ++--
->  arch/x86/boot/compressed/Makefile    | 2 +-
->  arch/xtensa/boot/Makefile            | 2 +-
->  14 files changed, 16 insertions(+), 16 deletions(-)
+'keys' was removed from 'dialog_textbox' in:
+commit e14f1242a8be ("kconfig: menuconfig: simplify global jump key assignment")
+but the comment referencing it was never removed.
 
-Reviewed-by: Nicolas Schier <n.schier@fritz.com>
+Let's cleanup this stale comment.
 
+Signed-off-by: Julian Braha <julianbraha@gmail.com>
+---
+ scripts/kconfig/lxdialog/textbox.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-Before it gets lost, we should also update the documentation bit that
-references $(if_changed,gzip):
-
-diff --git a/Documentation/kbuild/makefiles.rst b/Documentation/kbuild/makefiles.rst
-index 7521cae7d56f..2760717ab7b7 100644
---- a/Documentation/kbuild/makefiles.rst
-+++ b/Documentation/kbuild/makefiles.rst
-@@ -1452,13 +1452,14 @@ objcopy
-   OBJCOPYFLAGS_$@ may be used to set additional options.
+diff --git a/scripts/kconfig/lxdialog/textbox.c b/scripts/kconfig/lxdialog/textbox.c
+index 0abaf635978f..3fe7682fc8a8 100644
+--- a/scripts/kconfig/lxdialog/textbox.c
++++ b/scripts/kconfig/lxdialog/textbox.c
+@@ -145,8 +145,6 @@ static void refresh_text_box(WINDOW *dialog, WINDOW *box, int boxh, int boxw,
  
- gzip
--  Compress target. Use maximum compression to compress target.
-+  Compress target. Use maximum compression to compress target. Add '+' prefix
-+  to allow parallel gzip compression via pigz (if available).
- 
-   Example::
- 
-     #arch/x86/boot/compressed/Makefile
-     $(obj)/vmlinux.bin.gz: $(vmlinux.bin.all-y) FORCE
--            $(call if_changed,gzip)
-+            +$(call if_changed,gzip)
- 
- dtc
-   Create flattened device tree blob object suitable for linking
-
-
+ /*
+  * Display text from a file in a dialog box.
+- *
+- * keys is a null-terminated array
+  */
+ int dialog_textbox(const char *title, const char *tbuf, int initial_height,
+ 		   int initial_width, int *_vscroll, int *_hscroll,
 -- 
-Nicolas
+2.55.0
+
