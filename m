@@ -1,37 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B74173EEAF4;
-	Fri,  9 Oct 2026 21:45:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A797C3F1056;
+	Fri,  9 Oct 2026 21:52:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791582305; cv=none; b=AZ7F26Jp13+GqTI+bLMOdaJTYkQnjwNMnR6HxMuKvGVQWpg5FPKf6QdQqNLtzzBNkTKjYPGvGRN4vdJs7ERiRtysEfVPfx4kNiBoHJ1EuEorrQYGm0YyDAV9fPe8LsMNdk+RGQIbDAhFIQaowGhBdQ9E3fUqLM5kFGRGt63i544=
+	t=1791582740; cv=none; b=tJYnMaIJhg6r7IgYv9cNV8AoN+osDk470PkxiDEtUedimM0p4ccFLWWqFcQKll536a+EmVGvHRj3+3OGapmkoChPSSeQ26k2QMZqlOvgX3qMyIc5JTPZKKYkXHqEhuySYrDD7DL3B2hkh+jOYjdMeWQqXqEc+JYvDsUoxwMnOhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791582305; c=relaxed/simple;
-	bh=Mx+Fa3qwtiruTRAvxKYDaJtw/h36DYYsB+OVvBpksoM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=SthEbBwi6/hdISXuNpqiQxwi1vruQDsbNNkDFUq7B6yhHohJDxrismeyO6iey+7b8ttL98CQW+hgVjZ7owk7ahkRsaaXvWsA3Tszviwo/4+jkxXb44lnOlMLEd+u90kczmWI7EJlZIj8/M1NDQ5t/56t/85EpkVdC+keXKStnXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kgOFAEQ8; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791582740; c=relaxed/simple;
+	bh=ZSTrHJZrtm8743xpxAcmv74rmSpzC4fLWqMcOLhtqZ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e4CcSKlTJebs8w10TJhOZHILJFDmYUzZtmNMrE8YPBXgGeyrKMLRbMBBC/TZkQxtwLzKFARxqxgxy9WBSQJQDSJslAxsJGAETKw7NVsaHmulBazpmPfZndsHchZ6zPFmqOQ5C1qwbAE+K2X1Z/GMbu3GZkHC0qGALuK1GkUAF38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QtAAQiHk; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kgOFAEQ8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 630E51F000FF;
-	Fri,  9 Oct 2026 21:45:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QtAAQiHk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2D8D1F000FF;
+	Fri,  9 Oct 2026 21:52:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791582304;
-	bh=+y+EbJegof4frOO48AQVjywih4C5zhgf/nF5m6CeXSs=;
-	h=Date:From:To:Cc:Subject;
-	b=kgOFAEQ8iV0QomKkcqjDKPJde3Ih42AbStErVhUAS4C0/efh4w4CWATRUgk1SMu6N
-	 FfVu3Qq+BOhVDxJgysPfxKwUamojbrUOVNKTtRs8oRbuUqgLsDsYZJt+Adhr9/iFq6
-	 ME0JHml+esVCzDhuVjCdPS1gjI5LdMY/4TLrFx31zz3D/lmqI1b5QF5U5Re6ptCFgd
-	 BvRvL/ZHYlvXq/dd1ECthcsnYTVxO+Y0zgNl5Ew3yuakw37VN5k8Z87XkXJN125LnM
-	 wrWwR1KDBQprvx1OxyLmnuYqUv/PvYo/vCLFu42gfwaLcpq/Ue9KIjrr1yj3gdtJyh
-	 Py58K/RaT2vRA==
-Date: Fri, 9 Oct 2026 22:45:01 +0100
+	s=k20260515; t=1791582739;
+	bh=yEJReIk1XnAoec4hlvkbX98P7QVUi514eQ0qkoXjGUM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=QtAAQiHkqTNWbmlDBsI6uZursnhFLwCD/AAKIANieMez/N5t7gZcYaxP3CWDzv/Td
+	 7dK8jZOfsPWZKQ2QP/xVaflRv6eoNH5g6eiAaLJDf3iZBkV/Mo0QoM2Jb6JTvonnMr
+	 m6x2ysZvVT8n48yIzgg6glZ+uN8sFvh+KdrS4ac19JkRK+GmJCoSlgTqKfb0ygoPfm
+	 NHT68OxJ5Yg4jNysmitBrgvsh6zAGLn9ZRaLt42yuSzRHhTLkwegLU8hqCWcPG92bA
+	 Iq5AZuz4fIk6Ep7nSkFsfgI1KMfmc4tXyFPSR+ChyFQYSxDUaRnQh6gx/iB/46u3W1
+	 K2jWfjqhBYqnQ==
+Date: Fri, 9 Oct 2026 22:52:15 +0100
 From: Nathan Chancellor <nathan@kernel.org>
-To: Rong Xu <xur@google.com>, Han Shen <shenhan@google.com>
-Cc: llvm@lists.linux.dev, linux-kbuild@vger.kernel.org
-Subject: Build breakage from renamed '-split-machine-functions' plugin option
-Message-ID: <20261009214501.GA905361@ax162>
+To: Mark Brown <broonie@kernel.org>
+Cc: Ard Biesheuvel <ardb@kernel.org>,
+	KBuild Mailing List <linux-kbuild@vger.kernel.org>,
+	Kees Cook <kees@kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Next Mailing List <linux-next@vger.kernel.org>,
+	Lorenzo Stoakes <ljs@kernel.org>, Nicolas Schier <nsc@kernel.org>
+Subject: Re: linux-next: manual merge of the efi tree with the kbuild tree
+Message-ID: <20261009215215.GA981232@ax162>
+References: <aslflbcgByI1rH2_@sirena.co.uk>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -40,30 +46,48 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <aslflbcgByI1rH2_@sirena.co.uk>
 
-Hi Rong and Han,
+On Fri, Oct 09, 2026 at 11:41:41PM +0200, Mark Brown wrote:
+> Hi all,
+> 
+> Today's linux-next merge of the efi tree got a conflict in:
+> 
+>   drivers/firmware/efi/libstub/Makefile
+> 
+> between commit:
+> 
+>   454e00cf8ee5a ("kbuild: avoid re-running compiler and linker probes")
+> 
+> from the kbuild tree and commit:
+> 
+>   aa712d73350dc ("efi/libstub: Disable kernel stack erasing in the common flags")
+> 
+> from the efi tree.
+> 
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
+> 
+> diff --cc drivers/firmware/efi/libstub/Makefile
+> index 415f63105b481,7bb5e5066c732..0000000000000
+> --- a/drivers/firmware/efi/libstub/Makefile
+> +++ b/drivers/firmware/efi/libstub/Makefile
+> @@@ -40,7 -40,8 +40,8 @@@ KBUILD_CFLAGS			:= $(subst $(CC_FLAGS_F
+>   				   -D__NO_FORTIFY \
+>   				   -ffreestanding \
+>   				   -fno-stack-protector \
+>  +				   $(CONFIG_CC_OPT_NO_ADDRSIG) \
+> + 				   $(DISABLE_KSTACK_ERASE) \
+>  -				   $(call cc-option,-fno-addrsig) \
+>   				   -D__DISABLE_EXPORTS
+>   
+>   #
 
-LLVM recently landed a commit renaming the '-split-machine-functions'
-plugin option to '-function-splitting=all':
-
-  https://github.com/llvm/llvm-project/commit/3e6acc87c58843e551d6e8e4bf06c26712b04622
-
-This breaks builds with CONFIG_AUTOFDO and CONFIG_LTO_CLANG_THIN with:
-
-  ld.lld: error: -plugin-opt=-: ld.lld: Unknown command line argument '-split-machine-functions'.  Try: 'ld.lld --help'
-
-Obviously, we can handle this rename but I noticed that the combination
-of '-flto -fsplit-machine-functions' should add the corresponding
-'-plugin-opt=' since LLVM 15:
-
-  https://github.com/llvm/llvm-project/commit/72acd042bad35f78232f17addc02196a7af1a6e9
-
-So is this even necessary? Should we just remove
-
-  KBUILD_LDFLAGS += -plugin-opt=-split-machine-functions
-
-from scripts/Makefile.autofdo and rely on '-fsplit-machine-functions' to
-do the right thing or am I missing something here?
+Thanks, looks good to me.
 
 -- 
 Cheers,
