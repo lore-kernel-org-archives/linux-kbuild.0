@@ -1,42 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11D284FDA60;
-	Fri,  9 Oct 2026 20:27:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCAF45012B5;
+	Fri,  9 Oct 2026 20:30:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791577634; cv=none; b=iKm0ZDCmyFBXlU1K/vfaZaN3yB3T+aJeRs49TIDmmIVhkPWIjmyWxVwctMTgoS2cbhlDBnO9zNMT7DWCWNE0KnyyoJxGI/mijwQA+hf52hiFkHKRVvQfrZAjzPLCwfiA/dZTFThTLUw95PN5UnBZmWaSPKFk4o6cG6uYM5GTQ84=
+	t=1791577808; cv=none; b=ukWs7No5mY52KrOEIOcx2oSkHpgg66NV4wvGLUnctQdKl5N05TR4CqzSgZz2S5xcUkDXvd9zM/yhIoFgJi3MZ6s8zmCIk0jnBoksY1z4Jw2Smf7MLl90JWoDotuQQT9lSL5suJV/2BQqLyn1fziwTkEt/QOW8TnlXUTeL3+V8Y0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791577634; c=relaxed/simple;
-	bh=gl3BoHbabYB73phCiRs2xUGs44/d0Bt9GSYlWT3fXIo=;
+	s=arc-20240116; t=1791577808; c=relaxed/simple;
+	bh=ZCo79MmkHvTFcX4WG2PhGvEyS/mzmk0jHNesZg4W7jk=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=YVhiZ3B8yVzd0MlN7ymLcSP6XKC3UsciwAFPnxrYFIHHJ6AGsqI8dARc+IXZkK9rc5Ws2oQvxS8NlMkOsx2FEST6iGt/mPhQgJVyDsilMPIyIR/Twakbc0Dg4HBwPuG5z4EwWGkXxWP8TncmwAhcw2mHMa5/vx0gdYCMrNHHxv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Npur2j63; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=pwf2lCX6cm3IZ4VkRhQQ3K5M73TfN84aI3WPIwM2MswQb2Zznin9I/SzRCByGq2xp4OjF95UiVtw6HZo+Fta1V9Y3Uf9/qWSZBRMnZttlZJGO4xvLswy93cxAyjtfKbRwqGkRu1amYPIDw9Avq7UoroeF+2jf64rY0Y3rfWT0hU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NtDxBXMf; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Npur2j63"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 211E91F000FF;
-	Fri,  9 Oct 2026 20:27:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NtDxBXMf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96E3E1F000FF;
+	Fri,  9 Oct 2026 20:30:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791577632;
-	bh=12mjNF9n0R8cCzNOOrubBApcGk1pCG7If7+j3H0jr6A=;
+	s=k20260515; t=1791577806;
+	bh=3qIlc6o9p4799Ngk5cCt7uX/+W8cGIRC5gP5FgwHgYo=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Date;
-	b=Npur2j63AFgtL5sn4ZUAOoTJuuaeq1/1l3w09diGZ0lX1K+6lfqNWmlrCwid6UIrt
-	 i5EA/iqHcZgTn6n/eMXXNzCTqL0whfFyGEMP8l6jz96sUfE4EQxhT+tY4SJzAppJ4i
-	 saxjsYmHbcR3wJGWVt/L079zD1+41DmHPmCIMICbqTbGG0+usnySqmFx8gYTGIM90U
-	 6biejNpV0WhRZVZAjfQxMGaxMzFYWfnpNk0IddrnLWAaUI1wN0oWes9yvLG0CbdPD1
-	 2bF49ggxsFn+aH0dcOBq9GXtQD8NRpxnVyOg3oFOjH1j1eV7e9dJS+8Hfk8F6fYRUN
-	 WzqsCow9AgCwg==
+	b=NtDxBXMfSPHbP2I+rzaTFYAldd4mVNBqfvEPn3yl/nNmOSEHZZs69dgOYK9QcoOrW
+	 hE5emFVR7PfPMCzCN27GMMj1BukpBF2apWT+7dXEmrvH2vCDu+bZqpxOuZZ3XgCvh2
+	 mNPQN5LjZ6XJVvmPb4UJu/JRBkuvkOAXnNfyI2TEWqzzxK7vEaaS2FOpoqQcuJfimv
+	 qMdDhq5WE/X6qlWNOF3z0y1RRyhBbfWy+zabzrnAnNVxqwVGWMhDE1YQ3NeJyhn9Ut
+	 OM7qiuJjqNPqKDWybH1T3k89BnMDXEFrms3+CtM/mCH59bsJU6t1F8RxwOfHaoVjXD
+	 WmRqC/W5eSjqw==
 From: Nathan Chancellor <nathan@kernel.org>
-To: Nicolas Schier <nsc@kernel.org>, Julian Braha <julianbraha@gmail.com>, 
- Nathan Chancellor <nathan@kernel.org>
-Cc: Lorenzo Stoakes <ljs@kernel.org>, Kees Cook <kees@kernel.org>, 
- linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20261007-scripts-kconfig-toolchain-improvements-v1-0-1e524178da11@kernel.org>
-References: <20261007-scripts-kconfig-toolchain-improvements-v1-0-1e524178da11@kernel.org>
-Subject: Re: [PATCH 0/2] Initial ergonomic improvements to
- scripts/Kconfig.toolchain
-Message-Id: <179157762044.770731.11190028488014391920.b4-ty@b4>
-Date: Fri, 09 Oct 2026 22:27:00 +0200
+To: nsc@kernel.org, Julian Braha <julianbraha@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20261009094617.17322-1-julianbraha@gmail.com>
+References: <20261009094617.17322-1-julianbraha@gmail.com>
+Subject: Re: kconfig: cleanup stale comment about 'keys' array
+Message-Id: <179157780046.772474.17247617840025551450.b4-ty@b4>
+Date: Fri, 09 Oct 2026 22:30:00 +0200
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -46,37 +43,26 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1200; i=nathan@kernel.org;
- h=from:subject:message-id; bh=gl3BoHbabYB73phCiRs2xUGs44/d0Bt9GSYlWT3fXIo=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDFkn/aS/Lql6sa/53g/7+F3azjsa32ycrdvY9Lvef3l9x
- fObx5+/6ShlYRDjYpAVU2Spfqx63NBwzlnGG6cmwcxhZQIZwsDFKQATMY1kZFi4wXF9bqHuz9jC
- 9IaE4OO6YprL/WbxdRR7LI+we/XuxxlGhsakS7NOCoYdVM+6971w5Rm7zvQ3Tj+PbgrhqnC6fJO
- 9iQsA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=723; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=ZCo79MmkHvTFcX4WG2PhGvEyS/mzmk0jHNesZg4W7jk=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDFkn/U5t78qKZuN4o7cvxkRZZfGnUu8VKVvV/xZGaix+2
+ yK3rnBTRykLgxgXg6yYIkv1Y9XjhoZzzjLeODUJZg4rE8gQBi5OAZjIk3KG/7lr9S/cPtt2VZ0p
+ eb3s4/ZJfLee13vtXfOt+FC9yL1lbZyMDPvEN1SaynK5MIXL65rrGF1p5D75/XhuasyD67OD1/n
+ v4gQA
 X-Developer-Key: i=nathan@kernel.org; a=openpgp;
  fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-On Wed, 07 Oct 2026 17:22:20 +0200, Nathan Chancellor wrote:
-> Initial ergonomic improvements to scripts/Kconfig.toolchain
-> 
-> Hi all,
-> 
-> This series includes a cleanup to scripts/Kconfig.toolchain around
-> dependencies (the first patch) and improves the ergonomics of using
-> cc-option and cc-option-str in Kconfig to disable warnings, making
-> Kconfig and Kbuild more unified in their behavior (the second patch).
-> 
-> [...]
+On Fri, 09 Oct 2026 10:46:17 +0100, Julian Braha wrote:
+> kconfig: cleanup stale comment about 'keys' array
 
 Applied to
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/kbuild/linux.git kbuild-next-speedups
+  https://git.kernel.org/pub/scm/linux/kernel/git/kbuild/linux.git kbuild-next-unstable
 
 Thanks!
 
-[1/2] scripts/Kconfig.toolchain: Drop compiler symbols from dependencies
-      https://git.kernel.org/kbuild/c/c4c24fd63a8d5
-[2/2] kconfig: Improve ergonomics around disabling warnings with cc-option
-      https://git.kernel.org/kbuild/c/7202c08793a24
+[1/1] kconfig: cleanup stale comment about 'keys' array
+      https://git.kernel.org/kbuild/c/2160297cabd4b
 
 Please look out for regression or issue reports or other follow up
 comments, as they may result in the patch/series getting dropped or
