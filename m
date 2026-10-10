@@ -1,160 +1,208 @@
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80A9B4B1B42
-	for <linux-kbuild@vger.kernel.org>; Sat, 10 Oct 2026 18:50:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791658227; cv=pass; b=nfa6tzeLBDaAwGEtDG52Zmb873EVwL0APAT1wdKsvZSZUo5LRaPTN7cn028EMef+hbIHI5TnCMhrwPKpqF+cStH0CoEPULHj8HHfFmRBRmLXhWo2TFvKzxspRZNuxT9fIo7xzOgksg9e6XBlPp7MlpYh0qQzIEq3leaClOtApDs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791658227; c=relaxed/simple;
-	bh=qr18RvOXBpCqRo15c2cqUJX8bvTpVRYiKMUfReneauE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FhhQYTTgcMejFLmQBolEcoHDiqLIkCfLVfgAJO55tXXD4+ExhKe8VeI33oxG/YjGAfun9R5Popak5Qnu6zwn5gboFf1fbWt1yxOnOrxkWTo/4wmnyIIt8Z62FAMxN0HuukbnXZeTt9O3F9b1xjUClTWXPtpZwjVw8pgWtGaLm8g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m6jFkgKF; arc=pass smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BC5D2E03EA;
+	Sat, 10 Oct 2026 20:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791665866; cv=none; b=jlJadIpbnZKU1x0tYbOqO1saFFG0IjMg1YRqfEeCoW/Yc0ufiK3XaxiDUvhhnFP7qCVM3p7PgYck0xWdfQjh3mjJ6w5YEqQz0vDyDb38IiQSShbX5AgeDBjJ5nCngzgRYVOe21me3KVyTxbu8QEiMF0CqGxvc1GOxBRjmyDVFQM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791665866; c=relaxed/simple;
+	bh=G0vp48e779nuh57IGbn1SLkyUvc9BPz/5Zj+FYlzcEk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SS2XE2q+aO+9Q+TIGWqKUdH4k4Lwj+DOOwQw2Gmw9KUE5tlYx/alxDwYjL/42BNOstlS1ISHL4FciwjCfqeGJTK7XDY6zzfzNrb5wKahiLf9PHF8a0Pj76gqG5nzpxzNwH6ZdF0ErazIoJzwmth0wiNXzQWmb+R2u6cYW1BePTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=YEFbbcwZ; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m6jFkgKF"
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-6afac79b3a3so2369a12.1
-        for <linux-kbuild@vger.kernel.org>; Sat, 10 Oct 2026 11:50:25 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1791658224; cv=none;
-        d=google.com; s=arc-20260327;
-        b=V+Qnk+0Oq2l8b8CZ7fOXFf2kUI4fGgN4RWzUtdlqb3JKumZI3XEytgMInfZcjNPMbm
-         TUF3vfYPuGOdfHL43LnuMiEHPr2Nc/Jcj+zSFwsUGWvsMawBUScEh+U8gI3dUN94rq0s
-         iOp4DIt0yJyDFTEzdGbL/iHWOoY66WDYhDSjaRDFD8phjQAPb55mfbLlA7Xu6hRzEfAG
-         w2Snzv9Ahgp6szNlydKVFZw4xXwiH9xuqUcXIVLRrpu7AzoKva1eKm1sAh23w4rTatIT
-         V8F+DtIXAQz+ziB/bb00Br0aLQUQ/zHUxNxxUQvPtTdzRn8ylF6oYqbU41CM5K61g//Y
-         6N7w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=RCAct7EWAduPCLZ2QGVMtJLjx5OgSp/kpcoOzmSgPLs=;
-        fh=juWrg/Q3MRiIBIm3qSPYKgFSsvorGP3qZmyNrnJhXzs=;
-        b=Qk7IvXHifwd2La6lf/w9gOn1KYn0K5hlNHrXJHEWj6tvfa2HRiZbife06RveFvne8x
-         c3+vWp7AauN/D47pnxTpj9zvfJxSLv1jCHgSQDh45w0wQ8fnJdJLOrRJTP4UTb3yarif
-         SL2P0qbyoLfmqLcMu0c0zwSwGqOBO3wpv/ORT1I9X/GYQI959TkEAsSLMBKOm7blIBt2
-         lsV07zZsPt09RQSdYu72DFzTC8b5zi2kqpT6SLQLur05M3E+Yae6WZzI98oW0VB3C+n1
-         GlIEkkbSdeXb9Amoa8hXzwguaEVu90voU9EqkuselG6GkOZMKH11ufA98S614tPCaCpl
-         TR8A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1791658224; x=1792263024; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=RCAct7EWAduPCLZ2QGVMtJLjx5OgSp/kpcoOzmSgPLs=;
-        b=m6jFkgKFJOEIhF3SpRZZRr386KTp8TN7hL9rYZo1IFAK5SABrlic+ZgeqogaDb06Jl
-         09zjfB1y/oTF7+EWsUBihB301qdQeTlgcgmewrB3EIVRvylupNe7hlK6R6DlBPpX9B3b
-         joYMLAWIrSoJD+/6Ha1kan24hdp4XMANJjV5CTYZx4vAF9CLzo3c2+rGzGsliK6RnyC8
-         +bVapBXGDnISbgvIQiCfXyCshUSNEHcpDpfh9NsU9KybczHK3o4qSwsCbE/b6SnkVXOd
-         OjeSsoKhRNXUn08KY/ztxMgqBWcZWynOf/AGVxh2PYoIZSQKQqILWuOz9lxw4EP0FRMb
-         kaOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791658224; x=1792263024;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=RCAct7EWAduPCLZ2QGVMtJLjx5OgSp/kpcoOzmSgPLs=;
-        b=FqA8F93ZSet2ZSOUVrHbuuXArQG3U7qGi8ceCBBgdV1+8w+ZmE7LTJJXw5F5spiO+C
-         I33CX4PUa8lZW1Ir52sKwlOtMBknWatD6p0IJ8F2bOvpYIAfra9Rdz7v6VaMX2TnB+p/
-         9o/A553tI/36LQ/7Zkoy1It8u0NrR710jWPBeRd7uerppqfgYKrd5w4e7HfmeUM8lgtr
-         rQ/P/cML5u8nc5c0ndy/hwRAq9IOy2yNNHar99G7ugejMy8v0WGYAldvkLfqr07xIv35
-         VFmvzxbkOgG3JECPnEMRGAvjvmAN0mtL0DctIcM5a4VQ2xWLlrUbIhzrDsMgI4hxsm03
-         rqgQ==
-X-Forwarded-Encrypted: i=1; AKwUvBwhxstiq1u2a8wGFFzNy5fb+qyOvufgaIyYTTPTFRnf/v2tGAQFqQu+DWNzoPEwv0kAT4wrwBv836fD9yg=@vger.kernel.org
-X-Gm-Message-State: AFq9FYKiAQurKtWkc/BfCeQHLmRRS9bF2Dn5jURC3DANizGxuasI3gU+
-	5OG5IU034jgpNKaSs8gILFsd/ZbDorbJMB2wFASL6ydnuPBb2xwHCg195/1sWb3c9nC4EAm1ocq
-	bhQtXqgd+CNLWRTrq1srKB6PH5Wtx51YUcgtqat6g
-X-Gm-Gg: AYBFou2OPGLV7vjfsfuUD1fqYwW4Pn0NDxYsvXkBufsGH5kE/20G8mjb47htw7Qx1SC
-	VG4FKjPCy0q8cRKdC/i3k6L+eL8smlFuKRO3vBPEeObMkQaVrgpeVyntzzerg2i7zCjJ9Bdl4sa
-	K5My6YkyxNxp26ALOJCOWswBfTmUt0rj1oC9xYbNtmOE1XovyHFlVWLwGkfiMEjOmHJKPlYo9yf
-	xvKx9EOKsyxhlX29Fx4KeKU7kpcVoTMsRRImSbobCGcwowCuUaue0HTPFxfK7yVm6K+XTj1wBQ+
-	YkehKiArBvXyfYDiduml22sqgeUeiwcEPXfHYBTZPmQMnZopeyi0tQ==
-X-Received: by 2002:aa7:df8c:0:b0:6a6:8513:7e14 with SMTP id
- 4fb4d7f45d1cf-6b1999f0a81mr27065a12.9.1791658223134; Sat, 10 Oct 2026
- 11:50:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YEFbbcwZ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=klj1jCvG2Axc6ce2mXx7Fc9cBFIR1WVENH+HxPX3PT0=; b=YEFbbcwZglKnXhSGPgHnjCEnVI
+	gfKNlw541UP+PDboJjiAdeE+Uho1FyQWiVZN9mBBY+mBxyiDkiTyXheeyfMEejHxFmyZDmdtI2l10
+	uMFxr6qJjSJES4PStx4WNlSHifGe+hLhVUwWDTxken2WZ2JI6OHzUmzYpRfMMJHzOWE5b8da1hvzu
+	DscosaqXd44tSftnOMs6m8o2O6m02M8v4Qe8s0JliKdF5SPgk2QKS6NkKMg9059SraK/tOn3zTkH/
+	vMfYtywyADI5QuFS9jwgWmJsmPaiuJ0V6dVx/vrUpaQQLYFgMaf+YPEzV1wARFjBT9xAjPZNakOa1
+	y2kYWXUg==;
+Received: from [50.53.43.113] (helo=[192.168.254.34])
+	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1xFe8R-00000008RUF-3ZEY;
+	Sat, 10 Oct 2026 20:57:39 +0000
+Message-ID: <bd8e9af9-4e51-43d3-b62b-bd2fcc23e050@infradead.org>
+Date: Sat, 10 Oct 2026 13:57:38 -0700
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20261009214501.GA905361@ax162> <CAF1bQ=Qq66JuvYrbR-7GgegZuWPSjxDOgerUSD2NOp9W0BauZw@mail.gmail.com>
-In-Reply-To: <CAF1bQ=Qq66JuvYrbR-7GgegZuWPSjxDOgerUSD2NOp9W0BauZw@mail.gmail.com>
-From: Rong Xu <xur@google.com>
-Date: Sat, 10 Oct 2026 20:50:12 +0200
-X-Gm-Features: AclHuK9XW8_fm_qLinjw3mJ_6Xz_X6pL-OrYahnEsVuiKXgP4DpOW6u5trcIM0Y
-Message-ID: <CAF1bQ=TGW3VK7LK-d0JeYhEc3WgTjypVhQc22CxxvRq=VqS5YQ@mail.gmail.com>
-Subject: Re: Build breakage from renamed '-split-machine-functions' plugin option
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Han Shen <shenhan@google.com>, llvm@lists.linux.dev, linux-kbuild@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] kconfig: show number of search results in search UI
+To: Zuo An <zuoan.penguin@gmail.com>, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+References: <aspVmnam3QL_DRYV@gmail.com>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <aspVmnam3QL_DRYV@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Nathan,
 
-Thanks for bringing this to our attention. We will need to rename the
-option accordingly.
 
-We need this option for ThinLTO (though not distributed ThinLTO).
-During a ThinLTO build, LD is called directly when building vmlinux.o,
-so the Clang driver change will not apply in this case.
+On 10/10/26 8:11 AM, Zuo An wrote:
+> When searching for symbols in nconfig/menuconfig, the search
+> results popup will now display a count of the results
+> in the title bar, e.g. "Search Results (42)".
+> 
+> This helps the user to gauge the number of matches quickly and
+> refine their search if needed, rather than having to scroll down
+> by an indefinite amount (especially for nconfig's UI which lacks
+> a display of the scrolling progress).
+> 
+> Signed-off-by: Zuo An <zuoan.penguin@gmail.com>
 
-Please note that I am currently on vacation and may be slow to respond.
+Tested-by: Randy Dunlap <rdunlap@infradead.org>
+Acked-by: Randy Dunlap <rdunlap@infradead.org>
 
--Rong
+Looks good. Thanks.
 
-On Sat, Oct 10, 2026 at 8:46=E2=80=AFPM Rong Xu <xur@google.com> wrote:
->
-> Hi Nathan,
->
-> Thanks for bringing this to our attention. We will need to rename the opt=
-ion accordingly.
->
-> We need this option for ThinLTO (though not distributed ThinLTO). During =
-a ThinLTO build, LD is called directly when building vmlinux.o, so the Clan=
-g driver change will not apply in this case.
->
-> Please note that I am currently on vacation and may be slow to respond.
->
-> Thanks,
->
-> -Rong
->
->
-> On Fri, Oct 9, 2026 at 11:45=E2=80=AFPM Nathan Chancellor <nathan@kernel.=
-org> wrote:
->>
->> Hi Rong and Han,
->>
->> LLVM recently landed a commit renaming the '-split-machine-functions'
->> plugin option to '-function-splitting=3Dall':
->>
->>   https://github.com/llvm/llvm-project/commit/3e6acc87c58843e551d6e8e4bf=
-06c26712b04622
->>
->> This breaks builds with CONFIG_AUTOFDO and CONFIG_LTO_CLANG_THIN with:
->>
->>   ld.lld: error: -plugin-opt=3D-: ld.lld: Unknown command line argument =
-'-split-machine-functions'.  Try: 'ld.lld --help'
->>
->> Obviously, we can handle this rename but I noticed that the combination
->> of '-flto -fsplit-machine-functions' should add the corresponding
->> '-plugin-opt=3D' since LLVM 15:
->>
->>   https://github.com/llvm/llvm-project/commit/72acd042bad35f78232f17addc=
-02196a7af1a6e9
->>
->> So is this even necessary? Should we just remove
->>
->>   KBUILD_LDFLAGS +=3D -plugin-opt=3D-split-machine-functions
->>
->> from scripts/Makefile.autofdo and rely on '-fsplit-machine-functions' to
->> do the right thing or am I missing something here?
->>
->> --
->> Cheers,
->> Nathan
+> ---
+>  scripts/kconfig/lkc_proto.h |  2 +-
+>  scripts/kconfig/mconf.c     | 10 ++++++++--
+>  scripts/kconfig/nconf.c     | 10 ++++++++--
+>  scripts/kconfig/qconf.cc    |  2 +-
+>  scripts/kconfig/symbol.c    |  4 +++-
+>  5 files changed, 21 insertions(+), 7 deletions(-)
+> 
+> diff --git a/scripts/kconfig/lkc_proto.h b/scripts/kconfig/lkc_proto.h
+> index 8914b4e8f2a8..224acc142769 100644
+> --- a/scripts/kconfig/lkc_proto.h
+> +++ b/scripts/kconfig/lkc_proto.h
+> @@ -21,7 +21,7 @@ bool conf_errors(void);
+>  struct symbol * sym_lookup(const char *name, int flags);
+>  struct symbol * sym_find(const char *name);
+>  void print_symbol_for_listconfig(struct symbol *sym);
+> -struct symbol ** sym_re_search(const char *pattern);
+> +struct symbol ** sym_re_search(const char *pattern, int *sym_cnt);
+>  const char * sym_type_name(enum symbol_type type);
+>  void sym_calc_value(struct symbol *sym);
+>  bool sym_dep_errors(void);
+> diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+> index b8b7bba84a65..f37c3f8e1f4d 100644
+> --- a/scripts/kconfig/mconf.c
+> +++ b/scripts/kconfig/mconf.c
+> @@ -384,8 +384,10 @@ static void show_help(struct menu *menu)
+>  static void search_conf(void)
+>  {
+>  	struct symbol **sym_arr;
+> +	int sym_cnt;
+>  	struct gstr res;
+>  	struct gstr title;
+> +	struct gstr res_title;
+>  	char *dialog_input;
+>  	int dres, vscroll = 0, hscroll = 0;
+>  	bool again;
+> @@ -422,7 +424,7 @@ static void search_conf(void)
+>  	stpart.text = str_get(&sttext);
+>  	list_add_tail(&stpart.entries, &trail);
+>  
+> -	sym_arr = sym_re_search(dialog_input);
+> +	sym_arr = sym_re_search(dialog_input, &sym_cnt);
+>  	do {
+>  		LIST_HEAD(head);
+>  		struct search_data data = {
+> @@ -433,9 +435,13 @@ static void search_conf(void)
+>  		jump_key_char = 0;
+>  		res = get_relations_str(sym_arr, &head);
+>  		set_subtitle();
+> -		dres = show_textbox_ext("Search Results", str_get(&res), 0, 0,
+> +
+> +		res_title = str_new();
+> +		str_printf(&res_title, "Search Results (%d)", sym_cnt);
+> +		dres = show_textbox_ext(str_get(&res_title), str_get(&res), 0, 0,
+>  					&vscroll, &hscroll,
+>  					handle_search_keys, &data);
+> +
+>  		again = false;
+>  		if (dres >= '1' && dres <= '9') {
+>  			assert(data.target != NULL);
+> diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
+> index 521700ed7152..e3b25940b931 100644
+> --- a/scripts/kconfig/nconf.c
+> +++ b/scripts/kconfig/nconf.c
+> @@ -700,8 +700,10 @@ static int do_exit(void)
+>  static void search_conf(void)
+>  {
+>  	struct symbol **sym_arr;
+> +	int sym_cnt;
+>  	struct gstr res;
+>  	struct gstr title;
+> +	struct gstr res_title;
+>  	char *dialog_input;
+>  	int dres, vscroll = 0, hscroll = 0;
+>  	bool again;
+> @@ -732,7 +734,7 @@ static void search_conf(void)
+>  	if (strncasecmp(dialog_input_result, CONFIG_, strlen(CONFIG_)) == 0)
+>  		dialog_input += strlen(CONFIG_);
+>  
+> -	sym_arr = sym_re_search(dialog_input);
+> +	sym_arr = sym_re_search(dialog_input, &sym_cnt);
+>  
+>  	do {
+>  		LIST_HEAD(head);
+> @@ -742,10 +744,14 @@ static void search_conf(void)
+>  		};
+>  		jump_key_char = 0;
+>  		res = get_relations_str(sym_arr, &head);
+> +
+> +		res_title = str_new();
+> +		str_printf(&res_title, "Search Results (%d)", sym_cnt);
+>  		dres = show_scroll_win_ext(main_window,
+> -				"Search Results", str_get(&res),
+> +				str_get(&res_title), str_get(&res),
+>  				&vscroll, &hscroll,
+>  				handle_search_keys, &data);
+> +
+>  		again = false;
+>  		if (dres >= '1' && dres <= '9') {
+>  			assert(data.target != NULL);
+> diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
+> index b02ead7a3f98..8f51dc55226d 100644
+> --- a/scripts/kconfig/qconf.cc
+> +++ b/scripts/kconfig/qconf.cc
+> @@ -1245,7 +1245,7 @@ void ConfigSearchWindow::search(void)
+>  	list->clear();
+>  	info->clear();
+>  
+> -	result = sym_re_search(editField->text().toLatin1());
+> +	result = sym_re_search(editField->text().toLatin1(), nullptr);
+>  	if (!result)
+>  		return;
+>  	for (p = result; *p; p++) {
+> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+> index 7e81b3676ee9..31f927bd563a 100644
+> --- a/scripts/kconfig/symbol.c
+> +++ b/scripts/kconfig/symbol.c
+> @@ -1020,7 +1020,7 @@ static int sym_rel_comp(const void *sym1, const void *sym2)
+>  	return strcmp(s1->sym->name, s2->sym->name);
+>  }
+>  
+> -struct symbol **sym_re_search(const char *pattern)
+> +struct symbol **sym_re_search(const char *pattern, int *sym_cnt)
+>  {
+>  	struct symbol *sym, **sym_arr = NULL;
+>  	struct sym_match *sym_match_arr = NULL;
+> @@ -1065,6 +1065,8 @@ struct symbol **sym_re_search(const char *pattern)
+>  			sym_arr[i] = sym_match_arr[i].sym;
+>  		sym_arr[cnt] = NULL;
+>  	}
+> +	if (sym_cnt)
+> +		*sym_cnt = cnt;
+>  sym_re_search_free:
+>  	/* sym_match_arr can be NULL if no match, but free(NULL) is OK */
+>  	free(sym_match_arr);
+
+-- 
+~Randy
