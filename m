@@ -1,85 +1,91 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 067CE2AEF5;
-	Sat, 10 Oct 2026 21:08:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB9629A309;
+	Sat, 10 Oct 2026 23:34:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791666528; cv=none; b=DmqyjiD8kY8IwVz+Plr/JiS6UD1jFdEkmFXAPrqWsj0FQza/m1SdQ2ealV/vJM00JMVLR1f85ZfMwV2PwgH5jZpOOeQfCZQHfl/DuOG5iTNj96wLRD3ZYm21mNxXV17V997mc7qTs/yTf0wSDpXOCUp52hybDOpzrnQI9bueN3o=
+	t=1791675268; cv=none; b=R4s+HKN9ezYfTXM8f9PBYFiG8OsElyTqQlOUN9nV6BZbRUYF6HvkohUqBNrzO5s3tQTf/YuqCB0RNlcTgiRKjXoqcPLncZ92EOmIT/fDShhFlCncFV6Db7DgZ2jE3Ts7YzNa5tmLuU/MZqRDtg0bZoavADe8XtE8KmIx2QPjzk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791666528; c=relaxed/simple;
-	bh=zR0MYiMtWR4J634UzrSDQI+HARueQIp2D1/bgzkzGqQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lkuaXILxw+r4csLrzMTabLhJ9IFHYgeEl4m+JN2AdjiKMUXHe4ZYyjqbwIa+M3haDERTuzZzQ08woXOjzP7alHpFA7oLtmOIFV+0kakG5e/+1PH1jxTmc1AhxmXulr5OKvoxI1Daan400dsiOCxq6srBhbQyDf4gawJDIjSwXyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xkci/2C0; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791675268; c=relaxed/simple;
+	bh=mqr2DucTjbu0bs7sbqDpdV7OH22B3xf1jCn2d9tBbh4=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=DdW60NqZmXXxc/Yo/cE9bTs9rzBzSxGJsWk84XgcDa/9jLIm8fArFZEq/THl11F2F+jvTGiYTqhbtSKU1lBs3WP/nPZIV6tymteyrYzpsote0XDU+iaDOBOTHUCoprS3Y3y6AnBubiLzh97Jyz48ygXo34ySX0ZfCnZBAwK/JIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=zwWGGp2k; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xkci/2C0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85C841F000FF;
-	Sat, 10 Oct 2026 21:08:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791666527;
-	bh=fq7htODWvxFwI100NAeKvMIRizcluxexsgRn9rBQlIo=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To;
-	b=Xkci/2C0ILcP8o4Lctbpf0DHnhR6I9TMXrcFT6kpMmjc7hkH/NHCXkYVJomQf28MI
-	 1xjDSzoGh2+u/JubTW/bE8IE8T9FnXK3Jk3wd/49gldwPhs7LRLoJBR2n0T6wR9uJv
-	 kl6fh9bKjKpAJhk5wfZXrIRoKObucR5xDG1vMAqTIj9/kz5+OgdJUbesrUYLvEvcxp
-	 5DuQPoZ4geW+NFv1v9+iL39df/nUCf3aQrJj2rZJ1i30hMLaD5vWx9Dyy97HndSZfI
-	 O9C3IXWLIhZskFazXbIN1ZQHagxr7CjeVj17EXwRVWqK4ctIatiYBBacnodZhz0r1q
-	 zYby9v131yQKg==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id 46C83CE397D; Sat, 10 Oct 2026 14:08:47 -0700 (PDT)
-Date: Sat, 10 Oct 2026 14:08:47 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Kees Cook <kees@kernel.org>
-Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
-	Lorenzo Stoakes <ljs@kernel.org>,
-	Manuel Ebner <manuelebnerli@mailbox.org>,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v1 1/2] kbuild: Mark the kernel image gzip recipes as
- recursive
-Message-ID: <757de98f-2c40-44d2-ba1a-80507c1807d8@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <20261009062722.i.253-kees@kernel.org>
- <20261009062733.3119731-1-kees@kernel.org>
- <7fa8e996-d015-4f8d-a197-3f8901e0b31a@paulmck-laptop>
- <202610091923.FE842614D4@keescook>
- <7109f423-7249-49fb-a923-2824711fe197@paulmck-laptop>
- <20261010082817.eddb2f-kees@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="zwWGGp2k"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 361F71F000FF;
+	Sat, 10 Oct 2026 23:34:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux-foundation.org; s=korg; t=1791675266;
+	bh=9iwVIi3c0U4zKOpJ4o30r2BRWj2wDRlxr8fMDYx77J4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=zwWGGp2kK0YOnhzmyLuH3f4IiXgcpl+jaXWjRByBb/EfkueQ/QL7t0AZL2Fin9Qd+
+	 I/WIrpgkwSreowYqJK2gW4UWlg+wrT2hLF5sbxQvOll68GPlAt28+Ell8K9iNWrBXS
+	 fkRgwwvCmKqJu6sfup5xPj5/lkXIH30O2/7DrL9M=
+Date: Sat, 10 Oct 2026 16:34:25 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Nicolas Schier <nsc@kernel.org>
+Cc: Jim Cromie <jim.cromie@gmail.com>, Nathan Chancellor
+ <nathan@kernel.org>, Denis Benato <denis.benato@linux.dev>,
+ linux-kbuild@vger.kernel.org, thomas.weissschuh@linutronix.de,
+ chewi@gentoo.org, abelvesa@kernel.org, linux-kernel@vger.kernel.org, Kees
+ Cook <kees@kernel.org>
+Subject: Re: [PATCH] kallsyms: copy constants from __KERNEL__ to user, drop
+ the inclusion
+Message-Id: <20261010163425.b291248543a3423e2a445e14@linux-foundation.org>
+In-Reply-To: <179157208243.362135.3553274020133646760.b4-review@b4>
+References: <20261008-fix-kallsyms-v1-1-3339fdac2ab3@gmail.com>
+	<179157208243.362135.3553274020133646760.b4-review@b4>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261010082817.eddb2f-kees@kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Sat, Oct 10, 2026 at 01:28:50AM -0700, Kees Cook wrote:
-> On Fri, Oct 09, 2026 at 09:27:57PM -0700, Paul E. McKenney wrote:
-> > 			foreground	background
-> > 			-next	Fix	-next	Fix
-> >
-> > 	make -jN	Bug	Good	Bug	Good
-> >
-> > 	kvm.sh [1]	Bug	Bug	Bug	Bug
-> >
-> > [1] tools/testing/selftests/rcutorture/bin/kvm.sh --build-only --allcpus --configs TREE02 --trust-make
+On Fri, 09 Oct 2026 20:54:42 +0200 Nicolas Schier <nsc@kernel.org> wrote:
+
+> > commit 4fafd1165b33 replaced hardcoded values which determine marker
+> > array size, with new values that accelerate symbol-name lookups.
+> > These symbols are needed in user-space to generate the lookup tables,
+> > and in kernel to read the generated table.
+> > 
+> > To avoid 2-defns problem, they were added to a kernel header (with
+> > ifdef guards) and included by scripts/kallsyms.c.  But that creates
+> > packaging problems elsewhere, so just add the 2nd defns, with an
+> > explicit comment about the user-kernel coupling.
+> > 
+> > Fixes: 4fafd1165b33 ("kallsyms: increase marker density to 16:1 to accelerate lookups")
+> > 
+> > Signed-off-by: Jim Cromie <jim.cromie@gmail.com>
+> > ---
+
+Thanks, I added this as a to-be-squashed-later fix against "kallsyms:
+increase marker density to 16:1 to accelerate lookups".
+
+btw, I have recorded some question marks about this series:
+
+https://lore.kernel.org/20260929221330.72cd1de4@pumpkin
+https://lore.kernel.org/20260930132109.260597-1-david.laight.linux@gmail.com
+https://lore.kernel.org/20260930101307.4477e264@pumpkin
+
+and I'd like to get those crossed off before proceeding.
+
+> FTR: Please keep trailers in a single trailer block, otherwise that will
+> probably break some common tooling (cp. e.g. git-interpret-trailers).
 > 
-> Thanks for the details! IIUC, the difference is the config, not
-> foreground vs background. kvm-build.sh adds CONFIG_INITRAMFS_SOURCE,
-> which is compressed with gzip by default. The usr/Makefile target picks
-> that compressor through a variable, so v1 missed it. Your plain "make
-> -jN" builds probably had no built-in initramfs, so the kernel image was
-> the only place where pigz ran, which v1 did cover.
+> Is the commit ID correct?  In mm-nonmm-unstable I find
+> e2c2904abf71d0144f37844fde7dffe8b814a44f instead.
 
-I don't feel quite so bad for not having any idea why running "make"
-from kvm.sh would make a difference.  ;-)
+mm-unstable is "unstable".  It rebases more than once per day so lookup
+by hash doesn't work.
 
-> Hopefully v2 has all the missed targets fixed now:
-> https://lore.kernel.org/lkml/20261010081910.stay.092-kees@kernel.org/T/#m3b466b33f835119bfbd0c1b3c48d2a8a87f31691
+	git log --oneline | grep "kallsyms increase marker density to 16:1 to accelerate lookups"
 
-It does work for me, thank you very much!!!
+works for me.
 
-							Thanx, Paul
+
