@@ -1,147 +1,249 @@
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2CF744F555
-	for <linux-kbuild@vger.kernel.org>; Sun, 11 Oct 2026 18:23:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A17C9349CE7;
+	Sun, 11 Oct 2026 20:54:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791743040; cv=none; b=SvAQ0wRscPIk9dapjtsS1+tXpvraGgJ0GAl/Q+E7vgz6wjFWJCsLWJnPL2dOdIVGX35uCkcxSswxYLzdLoALtdrFTgHoyWUfF4fcUJSzMhZDZLtW44/B3eQdMR5yU1++/scLLPsWMla4IvJO5r8NCkUm2N4HLlCZ2N0tAyleNAM=
+	t=1791752065; cv=none; b=oCpUfWJMxYUrQIYAp1lS8hp0BEoSaw5E6rrcY3qF6RqkHk6Ey5Peqy5l4pWSzUsxLdX4bgCbJhHBpqWx3/uNSc6hknk5oH606xxNM4Ngp9IDOcXOcVzdNIEnLD1pKdRGWb0ORNRwMENyYGFDme9UNsVN9nbFRowhlCrrOvXMPBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791743040; c=relaxed/simple;
-	bh=nqyL9JemtS0GhZQq2YJVUbzEc1H+DENczqh4twt/OpA=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ZcdOOqaVExeFlQH0B+pa3XFzeQubT8tkKwYnHPF3wOsmtUr6QSCJui5OikAbp/1HFidelHkAOGm5MImbyYB6PUA+UwpfyYOZ+s7p+JlW6ThQ9MIu251X1tEzpeqoCobchHOgjUBIWEaGMK0ZVR0b4WoxMOkwKe57vFZQl79V2d8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SgCY0dAN; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791752065; c=relaxed/simple;
+	bh=JTIcU554OR2ESVPmXHlt2oedY/y/CaYJliMg28t46YE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KiZAdmYev1OqKb/mmxLhsZwl0KBx4lE7fVU770IiJ/eMaONiyhxHyY8GtbydVMZOyGZSan/6Gp1yBnGNwhiESyOK3qLbFK34Ub7ZTEekHwAvFf0t4A+AjIus5+VJ+5AIIYd2JOriTfg0nA0OXer23nr72lArHBULT9gclHbGMiA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io; spf=pass smtp.mailfrom=gtucker.io; dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b=JGfKh4zg; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gtucker.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SgCY0dAN"
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-48b0946c2c2so610736f8f.3
-        for <linux-kbuild@vger.kernel.org>; Sun, 11 Oct 2026 11:23:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791743036; x=1792347836; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :references:cc:to:subject:from:user-agent:mime-version:date
-         :message-id:sender:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=KGzliFeDcoWv7bGRwRrYy+3M5x902wezSQDQF9PoOoY=;
-        b=SgCY0dANr1IL2MrdK1XyQKyAxWzf+Nv3QwSJg7tTvVdCL8LTEhy/MLBVaeQWTn5NVB
-         Nr5vVueMZ+7zEP211y4NmVDDNXmd6fVyOQzcI5mhHggoYuyv88YDYbgd30k1sWKeTmgN
-         uDjzHbcd3nLGNKsI0BTlLPcDHlAwy+VmC7T4OQy5lIqKTd/Z0cXPZfQwi1DHpJC0KmMN
-         B4wL4cEf2iuFexHg2tp+dgmhVI7thUJiENH/bOrCMCN1nD3q5a1J1nZidaMrHkipWAip
-         haR2z5D5an3lRMQpKQv49cIjRPIDk5QlFM1P7Ds/IuW34tPBf4WsBA1M+t/ooCUuKqvF
-         zlKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791743036; x=1792347836;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :references:cc:to:subject:from:user-agent:mime-version:date
-         :message-id:sender:x-gm-gg:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=KGzliFeDcoWv7bGRwRrYy+3M5x902wezSQDQF9PoOoY=;
-        b=kYRA/jHLvU0yYCvJT8+Mk9rrKtHLIFNjCu3w/UD+xAmlJ0XBsbSXnnGzhpeRxLf6SY
-         pIxJmYfZC+wXEt45BEqdnjmTyiYYtbKpnrXMIA18L8a785/UU3qKPLhmr9FhlO1oS+vz
-         3F2UEbgSsuxR4aSzLt94USifpVELRJT47HNhSPySgqU49FWO/xDZqgWxXvwJsrTj2doF
-         EbPfgccuV/bf0AU7kvxfHI6PMJggGCpyKCWwRzNWi464H7dVeUSmdRZre+VGSDX7HVg3
-         kZMZhe0vgaxW4Dio3NL9RAv+CodltwouFSiU+vrBVXfgvcf78p6TB6qtwCKO6Kuw1fgy
-         T6AA==
-X-Forwarded-Encrypted: i=1; AKwUvBwggJDcvUkgFpuVZLzJZ2+8+DbqYuVVKcpPtYK44eEx1epmHtRO6m2/S8LACwFq66t1CKUR9OXxRjxnq/c=@vger.kernel.org
-X-Gm-Message-State: AFq9FYLOFbtnxDgu03fYZbZtKyJ3Z/dO+b0sEsPIfdQR2WYYleo7Hi59
-	F7KAVNTVyvUo9LhuRLtYm62u+FW99EvG9bEbcR0tQ0afUTa4A/e18jnp
-X-Gm-Gg: AYBFou2TQ0fz8UPtp6zuJ4ar6UI6T2GegIvNnR0CWUGcyIqlQ0iS8h9EBG17aUyFZKW
-	Dg6JTYkw9ESn0fVg5jdMrsUrU4jemuqHJErKqVKYqd7DmoFhL49sCmsbYzGO9Q7Wtl8gr0zVtWF
-	AzfhFP6M2f4xXlHWGV0jxzw/eDfDIwKA7AnLpWYUpp0fG0EdyelpsQPiCwXSHPFI91zymN7r5++
-	Z01tUrxewq+CK92kMauBjeBrohVlSPfD2cb9NiSP7t0DqH+ihrlfHlygThuT3ZzhV4mt+QSgdKm
-	2cjoz39TLqT9m5GEkExtVqCLJICsclfFc8u58U6OVvDKDTALD9pMrfKAYeJ0lImjFYbrDG36wLa
-	90jdTiij24ikYokoE4YYxaOxFrHcXqOynv4LgGl8SLnG/Pr8ZY7e+SDhYmIosgEYY0R7qsOOpbP
-	5soKhboeAu/y5JFOiotpPLJ5MBVl5w/C3gTn+cbXm2QIr5jl7elx28R54EeKUYDMFoscreIN9Li
-	XDAppHbwcAdjWwFUp118DO/7kPmB2kI
-X-Received: by 2002:a05:6000:1861:b0:48c:50db:30e3 with SMTP id ffacd0b85a97d-48dbaadeaf3mr13502413f8f.19.1791743035466;
-        Sun, 11 Oct 2026 11:23:55 -0700 (PDT)
-Received: from [10.0.10.92] ([81.0.251.149])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48db93d6069sm14495126f8f.0.2026.10.11.11.23.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 11 Oct 2026 11:23:55 -0700 (PDT)
-Sender: Julian Braha <julian.braha@gmail.com>
-Message-ID: <f2e28f7c-2b36-4dd9-b91b-81740b8ca5ff@gmail.com>
-Date: Sun, 11 Oct 2026 19:22:35 +0100
+	dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b="JGfKh4zg"
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 69CA83F0B4;
+	Sun, 11 Oct 2026 20:54:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gtucker.io; s=gm1;
+	t=1791752060;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=zoPRzStHoOVfmuxoHzCsy1sYSZjHrN4+MQLYC4TTUuc=;
+	b=JGfKh4zgwlhfsUU79+2V92o6DWm1Rnn5HlwaNMUEn+xj3sQrRTj4uPZtHmhrjk4KFcogSC
+	9SziAYUx7MqjkwNBN3G8sinc/YIg4mH6VukzbfMLXWIaPsPHNc10m500a/0vExaAQwCHuK
+	4eryi/M1eRoMIRJpDhQ0illRCCbZBo2oZGJuRi3ZneDFEP++UY82bfrSc+ovQ431p/RVW0
+	U4XvFHlATs3Yk0cgnIjobEUeq7fn392gNDDlt+LDZXmSAHmdK64ZBtb+OCCQPCMzuNZUTw
+	lcVJbNf1QqRiDwrpuQejxwhUmqxS28UHd5VLlNYOchWvFG3KDSHSeY7j7wZwWQ==
+From: Guillaume Tucker <gtucker@gtucker.io>
+To: Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Miguel Ojeda <ojeda@kernel.org>
+Cc: Guillaume Tucker <gtucker@gtucker.io>,
+	=?UTF-8?q?Onur=20=C3=96zkan?= <work@onurozkan.dev>,
+	linux-doc@vger.kernel.org,
+	workflows@vger.kernel.org,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 1/2] scripts: add --registry option to container tool
+Date: Sun, 11 Oct 2026 22:54:10 +0200
+Message-ID: <06ee7c694c3e9716bff5c9b1b8e9dc95cc0b38d3.1791751900.git.gtucker@gtucker.io>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Julian Braha <julianbraha@gmail.com>
-Subject: Re: [PATCH] kconfig: wrap long expressions in menuconfig
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: nathan@kernel.org, nsc@kernel.org, ojeda@kernel.org,
- a.hindborg@kernel.org, nico@fluxnic.net, rdunlap@infradead.org,
- grahamr@qti.qualcomm.com, jakub.git@horky.net, linux-kbuild@vger.kernel.org,
- linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org
-References: <20261010095001.265759-1-julianbraha@gmail.com>
- <CANiq72kyZpDa1YfLjPYQbatogvMONM0SOww1iQDQaZ4atcu+9g@mail.gmail.com>
-Content-Language: en-US
-In-Reply-To: <CANiq72kyZpDa1YfLjPYQbatogvMONM0SOww1iQDQaZ4atcu+9g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-GND-Sasl: gtucker@gtucker.io
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: dmFkZTEvQfLfg9bCPT8Uzu+T8gnbhWeH/iUDCI+WTkJyvTcK50ICjWN2StOt0OezRpsfclNB93NiXBTJoKquPIsg+0CG0e12hMp8TssYiDuaWABloDbbzbUF14AJe9GDxxf22VuTtnaqss2ATjVAdsCCCGQ6pApDxDPeo3TcOjKBzooJt1/aS0Cotx2xn7XnxUUrBMwj8kHBK7eOvf/9ljoq67+Pq/Cx59PInVLBbDsmeQOtrCNNdLLTrgPORY3O/REObUjHI5UKC4VWlZpf/99PpiUm87WbfrgD320+qLHCKxRandBFXdLhbPpdNYOAKUHf3NHQJGolyVsGSY8U3mwz2tYwEx3DM5Ot6ekXR904afZE8Ylgu5Hvjw/RD3DSzLnnBmF8piea9Gu1N470IyTp7MfNhGf+ZKnYAYSAnDsReCv8bGpX/yT99HsUEVRQjBtQu57rik32AJx+ot78TadFXA9FZIgVeFfhHIDIv3vj9til9Yj7Hj5t7tPZdaIPVa/PH9oYZ6w/XaqXfHSfg9qNw1cHTwWap2XiYgOX9Cc+kftmnoBaP6450FH5NUPYngZo2K9Q+oy5hvxkV5KJL+DEcDuipfq54NErBsn1BSXtllysq5w498DIQI0y6RMlj6DtBmAjfTi4izpEtM+e4qUNc2kYWuAKzTrgzflOIbiVSbn2QA
 
-On 10/11/26 17:20, Miguel Ojeda wrote:
-> On Sat, Oct 10, 2026 at 11:50 AM Julian Braha <julianbraha@gmail.com> wrote:
->> In an offline conversation, Miguel Ojeda reported that scrolling
->> horizontally in menuconfig's search to read RUST's dependencies has been
->> slowing down debugging.
-> Thanks for working on this!
-> 
-> This is definitely useful, because users (and ourselves) have had to
-> scroll horizontally too much for `CONFIG_RUST` 🙂
+Add a --registry / -R command line argument to the container tool to
+specify an altnerative image registry and support it in the TOML
+configuration file accordingly.
 
-Yeah the feedback I got from everyone I showed this to at LPC was, "any
-form of wrapping is better than horizontal scrolling."
-> Maybe it could help to clarify here that "debugging" above means
-> understanding by users (i.e. not developers) why the dependencies are
-> not satisfied. `menuconfig`'s search is uniquely useful because it
-> shows the expressions with the current values; i.e. this is useful for
-> most users dealing with long configs like `RUST`'s.
-> 
-> Is this patch the live one you showed me back in the conference?
+This uses a mechanism based on regular expressions to parse the
+container registry and image names and construct the final one based
+on a set of priority rules.  A registry can be included directly in an
+image name; an empty string means a local image.  It can then be
+overridden by explicitly specifying a registry name via the CLI option
+or the TOML file, with the CLI option taking precedence as always.
 
-Sort of, the version I showed at LPC was completely vibe-coded, so I
-could quickly get feedback on the visuals.
+Signed-off-by: Guillaume Tucker <gtucker@gtucker.io>
+---
+ scripts/container | 126 ++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 117 insertions(+), 9 deletions(-)
 
-This patch still creates that same visual look, but I've cleaned up the
-code.
-
-> 
-> By the way, for context and future reference before I forget, I
-> suggested a few other bits:
-> 
->   - Wrapping on the top-level `&&` operators.
-
-I personally liked this style when I tried it, but another maintainer at
-LPC didn't: "I want menuconfig to take advantage of the full size of my
-screen."
-
-> 
->   - Even better, wrapping on the actual `depends on` lines, rather
-> than every top-level `&&`, because sometimes they are logically
-> grouped, even if they may use themselves `&&` for the condition. But
-> IIRC we discussed that this would require tracking more state and/or
-> reworking part of the parser.
-
-Right, that would be a much larger change. I do intend to iterate on
-this in the future, but wanted to start with something minimal.
-
-> 
->   - For completeness, I also mentioned potentially considering to show
-> (a subset of) attached comments, but that is not really needed and it
-> is really low hanging fruit that is most likely not worth its
-> complexity: we already have descriptions and most options are not as
-> complex as `RUST`'s.
-
-This idea turned out to be controversial. Another maintainer pointed out
-that you don't always know exactly which lines the comment refers to.
-
-Anyway, thanks for your feedback!
-
-- Julian Braha
+diff --git a/scripts/container b/scripts/container
+index a3a55180d6ed..de72725656a8 100755
+--- a/scripts/container
++++ b/scripts/container
+@@ -10,6 +10,7 @@ import dataclasses
+ import logging
+ import os
+ import pathlib
++import re
+ import shutil
+ import subprocess
+ import sys
+@@ -17,6 +18,89 @@ import tomllib
+ import uuid
+ 
+ 
++def _init_registry_regex():
++    domain = r'[{anum}][{anum}-]*\.[{anum}\.-]*[{anum}]'.format(anum=r'a-z0-9')
++    ipv6 = r'\[[a-fA-F0-9\:]+\]'
++    port = r'[\d]{1,5}'
++    return rf'((?P<domain>{domain})|(?P<ipv6>{ipv6}))(\:(?P<port>{port}))?'
++
++
++def _init_image_regex():
++    step = r'([{anum}]|[{anum}][a-z0-9_\.\-]*[{anum}])'.format(anum=r'a-z0-9')
++    tag = r'[a-zA-Z0-9_][a-zA-Z0-9_\.\-\/]{0,127}'
++    return rf'(?P<path>{step}(\/{step})*)(\:(?P<tag>{tag}))?'
++
++
++REGISTRY_REGEX = _init_registry_regex()
++IMAGE_REGEX = _init_image_regex()
++
++
++class ImageParserMixin:
++    """Helper mixin to parse container image names"""
++
++    @classmethod
++    def from_fields(cls, fields):
++        """Get an object using a valid subset of fields or None"""
++        kwargs = {}
++        for field in dataclasses.fields(cls):
++            if value := fields.get(field.name):
++                kwargs[field.name] = value
++        return cls(**kwargs) if kwargs else None
++
++    @classmethod
++    def from_name(cls, name):
++        """Get an object using fields in the name matching ._regex or None"""
++        re_match = cls._regex.match(name)
++        return cls.from_fields(re_match.groupdict()) if re_match else None
++
++
++@dataclasses.dataclass
++class RegistryName(ImageParserMixin):
++    """Parsed container registry name with no image"""
++    registry: str = None
++    domain: str = None
++    ipv6: str = None
++    port: str = None
++    _regex = re.compile(rf'^(?P<registry>{REGISTRY_REGEX})$')
++
++
++@dataclasses.dataclass
++class ImageName(ImageParserMixin):
++    """Parsed container image name with no registry"""
++    image: str = None
++    path: str = None
++    tag: str = None
++    _regex = re.compile(rf'^(?P<image>{IMAGE_REGEX})$')
++
++
++@dataclasses.dataclass
++class FullImageName(ImageParserMixin):
++    """Parsed image name including an optional registry"""
++    image: ImageName
++    registry: RegistryName = None
++    _regex = re.compile(
++        rf'^((?P<registry>{REGISTRY_REGEX})\/)?(?P<image>{IMAGE_REGEX})?$'
++    )
++
++    @property
++    def name(self):
++        """Full name in registry/image:tag format with optional registry"""
++        return (
++            '/'.join((self.registry.registry, self.image.image))
++            if self.registry else self.image.image
++        )
++
++    @classmethod
++    def from_name(cls, name):
++        if re_match := cls._regex.match(name):
++            fields = re_match.groupdict()
++            return FullImageName(
++                registry=RegistryName.from_fields(fields),
++                image=ImageName.from_fields(fields),
++            )
++        return None
++
++
+ class ContainerRuntime(abc.ABC):
+     """Base class for a container runtime implementation"""
+ 
+@@ -145,6 +229,7 @@ class Config:
+     """Container configuration"""
+     image: str = None
+     runtime: str = None
++    registry: str = None
+     env_file: str = None
+     uid: int = None
+     gid: int = None
+@@ -188,23 +273,40 @@ def _get_logger(verbose):
+     return logger
+ 
+ 
++def _get_image(args, config):
++    image_name = args.image or config.image
++    if not image_name:
++        raise ValueError("no image specified")
++    image = FullImageName.from_name(image_name)
++    if image is None:
++        raise ValueError(f"invalid image name: {image_name}")
++    if args.registry == '':
++        image.registry = None
++    elif args.registry is not None:
++        image.registry = RegistryName.from_name(args.registry)
++        if image.registry is None:
++            raise ValueError(f"invalid registry name: {args.registry}")
++    elif config.registry is not None and image.registry is None:
++        image.registry = RegistryName.from_name(config.registry)
++        if image.registry is None:
++            raise ValueError(f"invalid registry name: {config.registry}")
++    return image
++
++
+ def main(args):
+     """Main entry point for the container tool"""
+     logger = _get_logger(args.verbose)
+     try:
+         config = Config.from_toml(args.config_file, args.config_profile)
+-        runtime = args.runtime or config.runtime
+-        cls = Runtimes.get(runtime) if runtime else Runtimes.find()
++        runtime_name = args.runtime or config.runtime
++        cls = Runtimes.get(runtime_name) if runtime_name else Runtimes.find()
++        logger.debug("runtime: %s", cls.name)
++        image = _get_image(args, config)
++        logger.debug("image: %s", image.name)
+     except ValueError as ex:
+         logger.error(ex)
+         return 1
+-    logger.debug("runtime: %s", cls.name)
+-    image = args.image or config.image
+-    if not image:
+-        logger.error("no image specified")
+-        return 1
+-    logger.debug("image: %s", image)
+-    return cls(args, config, logger).run(image, args.cmd)
++    return cls(args, config, logger).run(image.name, args.cmd)
+ 
+ 
+ if __name__ == '__main__':
+@@ -235,6 +337,12 @@ if __name__ == '__main__':
+         help="Profile section to use in the config file.  This will override "
+         "any values defined in the DEFAULT section."
+     )
++    parser.add_argument(
++        '-R', '--registry', nargs='?', const='',
++        help="Container registry name.  Any registry already included in the "
++        "image name will be replaced or removed when using this option with "
++        "no value."
++    )
+     parser.add_argument(
+         '-r', '--runtime', choices=Runtimes.get_names(),
+         help="Container runtime name.  If not specified, the first one found "
+-- 
+2.47.3
 
