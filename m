@@ -1,126 +1,131 @@
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 881E6387566;
-	Sun, 11 Oct 2026 21:13:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB86623817E;
+	Sun, 11 Oct 2026 23:36:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791753204; cv=none; b=BRPrlD2YfoswiL9XnkT2iYNFXsZJRcPsn+7gI1N6G745wJ9atsZsCromElKFz4vJXOheBsx6o9lD5xe7SynzMZp635oS+h77bmW4beyot7S5jGJoF11d1h5ryKOoTCOfaxhOEcT/RcFMylfyXsYMN4+A8cWuzGCg8QS6Ry9oMNo=
+	t=1791761810; cv=none; b=sWpef3LyEO9EYskVsBZFu8xv1TBdPGaosWaj3YMQRKyR8P0RY6TClzLR0bNOp+4LbJwQCL48l4Enf5odEqxGiqSYdu1a0cf7o6N9A/EbCaxXepH2t6YB11+wOmba5Huldj9vjvJ78nt22/jC2l+xO7IEap6iE0O560ZUg7tcE1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791753204; c=relaxed/simple;
-	bh=kNxwqKFDuH+f7OaoWDpdCM8r8zO93pvAKJYGlvtXcrU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o2xvyF1ICl4ajyrpDDZpNUV2Fk3QdzLDxM3uFoyYcv4YjfXnBUn+ZjZxa6j/5VIiuLpwfepCVCrtH4Cf1kdI7OIHrBLHt6vAEOfRxoS4g803eXn6xn1nZj/ApnWIu9S+EPOaW9vV2QIMbqmYAcSq/OQ5gdBKYKf+xIXVeiQDZng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io; spf=pass smtp.mailfrom=gtucker.io; dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b=TxNN9sTU; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gtucker.io
+	s=arc-20240116; t=1791761810; c=relaxed/simple;
+	bh=27GIcmxdEnb0vepu7ukk7BD5+WBojxM6q3nRXJtR9yo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nI3cWzAG2QL68GkNCVw726zs767tO5sgK9frQlMRqHpUIr3yD5il7RPzB+V50Pn37NP8OJIaRGcSy32BVNa5XZ4kJ6euG5laLwo6LGrHtk7oNV/pX/FXcHtrCFrvV9aTOIU6uqjzS8p/Vkc0h9ucCdTRp4tarBXD0zl1Dr6OdvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VDMvyo0Y; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b="TxNN9sTU"
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 12D7841C44;
-	Sun, 11 Oct 2026 21:13:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gtucker.io; s=gm1;
-	t=1791753194;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Nng+Q5MP6DyoM47RuivMXig2ptT0CD9F1lZB9fWGajk=;
-	b=TxNN9sTUpDjgLwYj5KdgUP/y+VtCCvFZ6rJNFNsoYxTBgSXPVk3Mlj/nvhtgPlL9YSWRnf
-	ehx/5XPnXZrY7CuAPtWBVTD5vPUehfhG8WBD5KcruVNjGBleObSm1S03EtGfZugNOPiB+J
-	tjdUc8Eub+5mz/dP0qZJezvDmBbOpO/O5e3s/9juNewYN1pcLUBefT+W81n8Hkl/mD/+uK
-	u35Dbdauk1csXeQWcVq/qYH8R4JH4SM7rd4oJfgIFz82DOcajL80bU27jwwrvwjaLCtCGZ
-	pRSR/Zfm2TexDOuetDNUJiyBngU64WMbxjGnnONOLebqPOtn3R5/yqvqd3XFVw==
-Message-ID: <b72d17f6-653d-4e11-ad07-b532bb83b20a@gtucker.io>
-Date: Sun, 11 Oct 2026 23:13:12 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VDMvyo0Y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3ABAA1F0089B;
+	Sun, 11 Oct 2026 23:36:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791761809;
+	bh=GTQoJF77ZZyL5Isged6CeeOoQpGQXCdc3xg6ntjU7wo=;
+	h=From:To:Cc:Subject:Date;
+	b=VDMvyo0YaXtdQSGmIeqc0LtNswo+NKROnDg8cZEv+aH07QJHTZ5o/jzmotezb6tM/
+	 XJ3xfe+PR9U5CX/pPIIXS/OhvSXtqwNjEoWiGnSuSxe2qttzt+TWEgmEk3QFSPf2ux
+	 eKrR+/+klyfrMhFpsfNGSHXS+FbG/pMg9utYTYVgJu32hap9qHUVz0pBfHT7f+e0GH
+	 2Sz0kiOU8FCaIjtfmSCqtGu5/dW3NmlYuZVFadGKA35tYf0UxbXJK7Ld4DB0pscv+Q
+	 uoHJ3yTpzczHexlo9pkfL2J2jsgIS4HsJ+E0KK1upf5v3eTDliQTgskicQWpur+mqr
+	 mGXmJKlEwwjiQ==
+From: Sasha Levin <sashal@kernel.org>
+To: Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>,
+	linux-kbuild@vger.kernel.org
+Cc: Shuah Khan <shuah@kernel.org>,
+	linux-kselftest@vger.kernel.org,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Ian Rogers <irogers@google.com>,
+	linux-perf-users@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Sasha Levin <sashal@kernel.org>
+Subject: [RFC PATCH 0/6] kbuild: build the userspace tools in tools/ with the kernel
+Date: Sun, 11 Oct 2026 19:36:39 -0400
+Message-ID: <20261011233647.2454648-1-sashal@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] scripts: add --registry option to container tool
-To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Miguel Ojeda <ojeda@kernel.org>
-Cc: =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>,
- linux-doc@vger.kernel.org, workflows@vger.kernel.org,
- linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <06ee7c694c3e9716bff5c9b1b8e9dc95cc0b38d3.1791751900.git.gtucker@gtucker.io>
-Content-Language: en-US
-From: Guillaume Tucker <gtucker@gtucker.io>
-In-Reply-To: <06ee7c694c3e9716bff5c9b1b8e9dc95cc0b38d3.1791751900.git.gtucker@gtucker.io>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: gtucker@gtucker.io
-X-GND-Score: -100
-X-GND-Cause: dmFkZTEai0oaN25vAZ/XFY5KQr9Ly0AX9XOERQJHNbqIePbXfeMdal6GwMNJ9RzLWkFDg49WY+gpwLJdLa+Dm3LxKn4RX16eYF6BC4pgQ89mYG5L7YoY24ENNc94YvzCt2VsVg1kQn9DPCqk03svQ8cgLntfoSRYBmYJ+k5EWgOQxwsG3i+ygx794In5brWuOv2/8H8KBHojk3xRuUmb63MiROAGhVSn9Kp4zET8fbky35yKDtIvfaBFIGFKF/By5zOpyH7qgntIhO6nfTS5HN0IMdFVU1ed+M7iNMH0xfGFwm3Pq73H0mvviTnTExGGmY2qsb/oiUyL47xwcIkCF+zO7OECPpQTVNrd/VvIqPISOM36V8DvUg1XlFzi7uv6K491oWYCaASC+hUXsc0vAOcU0NGbQOycx4U0G3B62f77gp+ORcejK3ioT05pfTB0pWBHKk0LMufNxObZ5E6TwLnKGqjrkWyp1yTqVGtfo8DzVDoOBrxtBpnZBXJOAujf7tqdYcCQVTGCt3+cgdocqAMrQEZK7gwzVjvNxmb+P0MRff4cpqcCY20hZ/fNUSaF0kVBwaQln51SdMsndDEKhaSiq5X1LpUltMJUKs3A9j728jUcrsAB+on6m8irIdmeKKQL7V+AsxsLn7e7YKSzL9y5SPQB70w4MEzZ3puLgLYhMXVnBg
-X-GND-State: clean
+Content-Transfer-Encoding: 8bit
 
-On 11/10/2026 10:54 pm, Guillaume Tucker wrote:
-> Add a --registry / -R command line argument to the container tool to
-> specify an altnerative image registry and support it in the TOML
-> configuration file accordingly.
-> 
-> This uses a mechanism based on regular expressions to parse the
-> container registry and image names and construct the final one based
-> on a set of priority rules.  A registry can be included directly in an
-> image name; an empty string means a local image.  It can then be
-> overridden by explicitly specifying a registry name via the CLI option
-> or the TOML file, with the CLI option taking precedence as always.
-> 
-> Signed-off-by: Guillaume Tucker <gtucker@gtucker.io>
-> ---
->   scripts/container | 126 ++++++++++++++++++++++++++++++++++++++++++----
->   1 file changed, 117 insertions(+), 9 deletions(-)
-> 
-> diff --git a/scripts/container b/scripts/container
-> index a3a55180d6ed..de72725656a8 100755
-> --- a/scripts/container
-> +++ b/scripts/container
+The userspace programs under tools/ are disconnected from the rest of the
+kernel's build system. Each has its own makefiles and build framework, and
+"make" never builds them: apart from the few host tools the build itself needs,
+such as objtool and resolve_btfids, nothing under tools/ is compiled as part of
+a kernel build.
 
-[...]
+That makes them easy to break. Most people, and most of the build bots, check a
+change with "make allmodconfig && make", which doesn't cover tools/ at all. A
+change that breaks a tool passes every build check and is only noticed when
+someone happens to build that tool by hand, often much later.
 
-> +@dataclasses.dataclass
-> +class FullImageName(ImageParserMixin):
-> +    """Parsed image name including an optional registry"""
-> +    image: ImageName
-> +    registry: RegistryName = None
-> +    _regex = re.compile(
-> +        rf'^((?P<registry>{REGISTRY_REGEX})\/)?(?P<image>{IMAGE_REGEX})?$'
-> +    )
-> +
-> +    @property
-> +    def name(self):
-> +        """Full name in registry/image:tag format with optional registry"""
-> +        return (
-> +            '/'.join((self.registry.registry, self.image.image))
-> +            if self.registry else self.image.image
-> +        )
-> +
-> +    @classmethod
-> +    def from_name(cls, name):
-> +        if re_match := cls._regex.match(name):
-> +            fields = re_match.groupdict()
-> +            return FullImageName(
-> +                registry=RegistryName.from_fields(fields),
-> +                image=ImageName.from_fields(fields),
-> +            )
-> +        return None
-> +
-> +
+We keep seeing this in tools/testing/: selftests that stop building after a
+change elsewhere in the tree, or after a backport to a stable tree, and stay
+broken until someone tries to build them. Others brought up the same concern at
+LPC.
 
-As one would expect, Sashiko has some opinions about this:
+This series lets the kernel build also build the tools it is configured for:
 
-  
-https://sashiko.dev/#/patchset/06ee7c694c3e9716bff5c9b1b8e9dc95cc0b38d3.1791751900.git.gtucker%40gtucker.io
+- tools/Kconfig adds a "Build userspace tools from tools/" menu
+  (CONFIG_TOOLS_BUILD) with one entry per tool and per selftests
+  directory, so .config records what gets built, and a tool that breaks
+  can be turned off on its own.
 
-I would say that at least half of it is slightly bogus but I'll
-address them in detail in due time.  Also I've prepared some unit
-tests to cover this logic and will send them as an RFC separately.
+- "make tools_build" builds the selected tools for the target, each with
+  its own build system as it is built standalone, into tools-build/ in
+  the object tree.
 
-In the meantime, I'd be interested to know if anyone has some
-feedback on the features themselves from a developer point of view.
+- With CONFIG_TOOLS_BUILD=y, "make all" builds them too. allmodconfig
+  and allyesconfig enable every entry when the compiler can link
+  userspace programs, so the usual build test catches tools breakage.
+  Toolchains without a C library are unaffected, as are "make vmlinux",
+  "make modules" and external module builds.
 
-Best wishes,
-Guillaume
+This is useful beyond build testing: the tools are built for the same
+target, from the same tree, as the kernel they go with.
+
+Sasha Levin (6):
+  kbuild: factor the userspace ABI flags out into KBUILD_USERABI
+  kbuild: add "make tools_build" to build userspace tools from tools/
+  tools: build perf in tools_build
+  tools: build kernel selftests in tools_build
+  kbuild: build the tools selected in tools/Kconfig as part of "make
+    all"
+  Documentation: describe building tools with the kernel
+
+ .gitignore                                 |   5 +
+ Documentation/dev-tools/kselftest.rst      |   4 +
+ Documentation/kbuild/kbuild.rst            |   5 +-
+ Documentation/process/submit-checklist.rst |   5 +
+ Makefile                                   |  24 +-
+ lib/Kconfig.debug                          |   2 +
+ tools/Kconfig                              | 326 +++++++++++++++++++++
+ tools/Makefile.kbuild                      | 198 +++++++++++++
+ 8 files changed, 562 insertions(+), 7 deletions(-)
+ create mode 100644 tools/Kconfig
+ create mode 100644 tools/Makefile.kbuild
+
+
+base-commit: a5ebb76233b79db01e82e061173cb73c6d2b5c6b
+prerequisite-patch-id: 68eb8785244b88ec7e696e716420e2d9b1367dbc
+prerequisite-patch-id: 37c57cf4c2a9700788cd1755912753f363cbb3f9
+prerequisite-patch-id: 7772557d5d842a42f1bbb3ee18d41f337db9783a
+prerequisite-patch-id: 75abf8d47ec8093740c215e9eebe7bbb5846ddd6
+prerequisite-patch-id: de33c5273a0f7619a54dc6d1fd9c47383b7dd60e
+prerequisite-patch-id: 5243b7b03f2c12a6e66c353b0c083f7f21fd7ba2
+prerequisite-patch-id: 7153a847ba7b05e49a670caba5d5b8fa2508eff1
+prerequisite-patch-id: 67a995618952454c30eb77960a5bf6f897d22547
+prerequisite-patch-id: f0580be789bfbd90c903bfef8cf6099609e63347
+prerequisite-patch-id: 975b27a83085ae7532771fbd7bb17b779ea2c254
+prerequisite-patch-id: fa973600f98f37417659bbe282f76d7cbdfd84ff
+prerequisite-patch-id: 333bf51a132f726bf970b5963017bdc607c0e315
+prerequisite-patch-id: 7853ec5197ec9b9322a102a6b02dd62bba4df102
+prerequisite-patch-id: 70780a52552f78b640178774bce254616b06f831
+prerequisite-patch-id: 7a28872d234cdfa7bd5ec851e9dde01a65e91130
+prerequisite-patch-id: f75a478f103e8707f7ce1ebb136e3a605f026cae
+prerequisite-patch-id: c6aacf3772c239df0224afb7e4bb661fb9b81c63
+prerequisite-patch-id: a71f47de3fd339d680c9f18e80f5bcde7eae0abf
+-- 
+2.53.0
 
