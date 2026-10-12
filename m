@@ -1,129 +1,274 @@
-Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout.tng.vnc.biz (mailout.tng.vnc.biz [34.107.87.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A01BE49B457
-	for <linux-kbuild@vger.kernel.org>; Mon, 12 Oct 2026 15:21:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.169
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791818488; cv=pass; b=Af8tl8DqWwvskmrZfow5n74iqpUTQEgVJIO3TF0MVRffMsxytfvzbjjiexRsisQwND4o0vfuWJux/5rY66riVcEIL3IvNf1NRFqc5uOB5FPVziCkjuhprOSj5KzxO/H9SurSV5U2ncRzBZ9LbGTceyvBvfhqGP/LwtiAq4V6by8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791818488; c=relaxed/simple;
-	bh=acXxdYNI6vj4GN6tEYHBYlbXzhzxGLnqPGYWn+EXNdM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PsEteM8OV/mjYEAmFKJl9/beSMtwifypBlOQtIAJmCnSHPNGoGXuLonW4Z4tNhjIEgM6+aswEHFUoF34UZbJ54lCmcDXYRU8YIxyC5aPD6jFlyXS6Z/ly5Sds+BohCQK3xTLbU0PkYduyxvck3KgQHz0Wrk//M3AWCK1K/f8IAI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V9UVbICO; arc=pass smtp.client-ip=74.125.82.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E0283CB55E;
+	Mon, 12 Oct 2026 21:33:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=34.107.87.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791840833; cv=none; b=PnLVpAZl2XJ3yMYo6KRJKcJprzA71d2shMsyiTLrhtuQ/OEPqw4AGdxalrMOhdOwWg2HSLRdbMiFqLqzApHpS8O5/Vn1z7Xqp56NOZFAD9Mqx0GKRZDhxRwyZm9ddYCeKvqDFXAdqWErQUSjChURIqCYHYjLnOaoBHhuX2XAxAA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791840833; c=relaxed/simple;
+	bh=zdptokPnMaFS0DhpIA3loNPgzbCyYzUqkKRdm+hg3/Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kgoHDmOLQvEQOHwHCqrQ72gJLO5qNvFC3fCNtqYvMZyFRnvI4LtDdqgIdjfRlXSf+iwb0MLM2Jk14dt2gEF9vAUYGqshLdyYFqmO9CKdHL2T8hSa0m8vyjJiB5bri8oIT+99QBgpTXXnYQInGWl94Kj2/CGpZnTxo09/wTJ+MFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com; spf=pass smtp.mailfrom=tngtech.com; dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b=HMR/ngtG; arc=none smtp.client-ip=34.107.87.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tngtech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V9UVbICO"
-Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-313bab9cfe7so207692eec.3
-        for <linux-kbuild@vger.kernel.org>; Mon, 12 Oct 2026 08:21:27 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1791818487; cv=none;
-        d=google.com; s=arc-20260327;
-        b=RZ3yPzkCgUV8Id42VwqiSXeJ2MvQbCf0yBNAsXuAMwZAMYvzfIMaFG5rffSiPi4Q24
-         LhaE5dbY/Us3OH5R5Xn8CPkIMhKEGJVLaANQfdNDvnbTwI1E4+vJtOdqi4nXpRpxTEoo
-         nSWsNTd6i5FTXyi3JGl17RxvjWbzCpZcycVIOs2QTRzl738dIr1VqSyFgqCBvfyELdq5
-         IA8aT5rz54hSloLoRcxNuAXiMYPNSLGWWWcxIN2Jrqeb/3ObF/G/CEaj+VRfkKwb1mDX
-         S7Dk89x9Trf77246B/HAiui76iXw+sGrnR657dcLMVh4cMtUbgFgN7e6JvBv5vTcoX0Q
-         +c+w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=iLgJ65oJxZVZBoTJpBXKaV00tw4eO5li3Mv5JTtGud0=;
-        fh=GKc1WnqncOy2HR0QEEjtxCJ7vKHCLvQVP+fTq+6Du28=;
-        b=a4KTcq5ql9aCN9udFsMRHohZcSndPqIpaZiQdUeeC/e3shl0aAwH6xS/omlAvmzq4K
-         9UVO5lKZdmY7xNlPWlWG3IiWWSSv5HHSyL6icnP20SpgdBk2CujG6/iPOOK/C8CDme5k
-         xMdRCsdGXo+UrB0JxkPvoCU8UEEvreOXQQZubdu3GKV4WNMheXx0+DQTJ7D5p9hjYY8E
-         kgCnHIZL+iEexAao4UQcNCsY1442KpO56vwatOhzB2PcWTJ68SaQg1uidEB6PwH1xobz
-         gByKiOlkV3U89u13aMlBSd0/KwpIRKdC349DHN6S6EJeRGjvmvpURlRkZ8JrsD4UFt+F
-         w5OA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791818487; x=1792423287; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=iLgJ65oJxZVZBoTJpBXKaV00tw4eO5li3Mv5JTtGud0=;
-        b=V9UVbICO9Vb3G0dHVTiGb8S4WVniQxs6wmTmPNcXznYmsWz8kd1y+k31MFrHAf8vSr
-         F/xu3g2v5JkYjvBeTbKIBSPdbOMtozVeZwNJe/sneeG+41EP6qmE4OlR8ZAft5Aw3GY8
-         5QKTN1uz326YnQuvFOv/Dh4E5k3sn+Hyqa94/cPE5CWDlxlTTKSV8V6mLrRTozIwWcOH
-         sqHovpjY6+6o70mawD+5zf6vV7GcNVQJpS1asU3zptVn8fG5vEtRCymo5tXcTJVdT/dg
-         aOQpLbB7ySZzkjVQwzGgtzrtANP0OAgkCKgoS8RaZIK8+EPmpQgit/8WHVOlQr2kiIk8
-         S0Tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791818487; x=1792423287;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=iLgJ65oJxZVZBoTJpBXKaV00tw4eO5li3Mv5JTtGud0=;
-        b=JOlbdL1wZQXaU5tnWaa3B7l3bc7ZE6oI53w7Vqv+RZ4oCmROi1u2MOnGalGI8HT02E
-         +DvoBjDSwka1iTn/3FxSzymvCqcg8VB+nB+Lo5rfXSALLbn5u8HSui1IEp6FqjcAfKh0
-         8bnUV6OiIOkHAAAib6tEoMjLZOfGaUkGBenRZEZAzgPXX/yiaHjvL/FdLq9iMp5qPYeY
-         PIleUnmO/PfMMcLoF6MuuWSnIyN2Fb5DgTVnNvVntztxvGbITlUzCW7XijgLPfzFYDYX
-         Vtt3XPS5iTh399TO0a8GMjiJorA9mlEKAba5Gdj7Dsa1W1YB/FOlwAtJPU/x8cEJPiAQ
-         dCDA==
-X-Forwarded-Encrypted: i=1; AKwUvByL9blnQaxC15vqI6A5joDku/ymfyGLlF+zhZiZ+s/MktGJcmQ/a2Yfn7a8tfF3COnzii/vjXleBnppB0Q=@vger.kernel.org
-X-Gm-Message-State: AFq9FYJY/Qz586EE02EBvSFwGGSi2KQrcCySFwXxYLFK1WY8nGnjkQpm
-	8bBnFucodwKVaeeWk+UOFMYjU661BZ59kPdBpkAL8zxhSFuyTXVDxznraW5YC2VHUfPkdL/p/zM
-	PmFubA986sLhL61+5qoqQaYpmVmU/uMU=
-X-Gm-Gg: AYBFou2TSOuRMA2T/f8iGxhUFOLUpuER4vm0mrB4pW1M3on0uvlAQhirk4GZlfufswZ
-	PWcBNpG8w+26GnJOMsFyOFF9Etu2NBm92wWWZd7wPqzUqXjmrL/dtjiIxcrBsZKi9pthwQthbnE
-	JvaobJ7VDXv+r4YU3Wv8Kck+ODPjaWnR+bUi5j78fln53lLFbuDCAr6hvY23c9i9JE6wydIM/mp
-	Ptbz+yXBcgsU5+dCKjZkPX0yDAOlM3RHeKZ9z5b19yAsHKaX3kucDRN84Lr5jX/NLLENE8PbC6+
-	cdXXRMGZ4mo601O37hiXYQTgTwGxqSg4aeQP4GtRCm2JoSl93miNMIIaHgzdIOD48Y43r6rXksn
-	nSqlvOoyVeLEK9/isLrqC1LlXPSFHdNIyu+1lxhKzsM2mbdCt+z8vxgltu/MUEXqq3TgI/WWdP4
-	kPr5TRkyuu2BkqKVIQIrpnuyAcgluArEtDOjNbsbJt8LIuekIsyqY=
-X-Received: by 2002:a05:7300:f3c8:b0:351:7883:bf47 with SMTP id
- 5a478bee46e88-3537dc8e9c0mr22095379eec.0.1791818486595; Mon, 12 Oct 2026
- 08:21:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b="HMR/ngtG"
+Received: from zmproxy.tng.vnc.biz (zmproxy.tng.vnc.biz [172.16.1.23])
+	by mailout.tng.vnc.biz (Postfix) with ESMTPS id B798F40872;
+	Mon, 12 Oct 2026 23:33:50 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id ADC781F8B42;
+	Mon, 12 Oct 2026 23:33:50 +0200 (CEST)
+Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
+ by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10032)
+ with ESMTP id ZxVqMZRGNeCU; Mon, 12 Oct 2026 23:33:49 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id D386D1F8B81;
+	Mon, 12 Oct 2026 23:33:49 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz D386D1F8B81
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tngtech.com;
+	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1791840829;
+	bh=lJ1s2HBxU8LX7MJZeySZ1Y8ezSSD7jpXj+BDmxI3rNc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=HMR/ngtGOmblmfzBjl9YyxPR4wt0QJh3xfuKNqL1LNvu1V89TA61k7Asv5mUrxQDs
+	 3Ys34DcDgds7BaOiOwIxDfmePBV64HwpY/agZGrIYTvwFVlkgjOZxXzC/uqDKZoUE+
+	 8392E+KHYgdp+msfMfZY301iHSnpXWe8LSvogrmlGtGQbWexvyu4cluDht2KBa7l85
+	 SoUJJPZA8glmtbNxKblrdaqyM+WhBC4+wQRpoUT6PbI5Hk3P/WX671rSZJ3tP0vO86
+	 tdS6eDEsCDt3Zqoe3NxgWjVwhbovm0587tF+Zr3Z/HVPGXmJ7gNIrqMQ7y6YZ9wjgU
+	 fyCG7OQrFjbTA==
+X-Virus-Scanned: amavis at zmproxy.tng.vnc.biz
+Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
+ by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id MoeRt94eWR6b; Mon, 12 Oct 2026 23:33:49 +0200 (CEST)
+Received: from luis-Precision-5480.. (ipservice-092-209-236-032.092.209.pools.vodafone-ip.de [92.209.236.32])
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id 60BFB1F8B42;
+	Mon, 12 Oct 2026 23:33:49 +0200 (CEST)
+From: Luis Augenstein <luis.augenstein@tngtech.com>
+To: nathan@kernel.org,
+	nsc@kernel.org
+Cc: linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	akpm@linux-foundation.org,
+	gregkh@linuxfoundation.org,
+	kstewart@linuxfoundation.org,
+	maximilian.huber@tngtech.com,
+	Luis Augenstein <luis.augenstein@tngtech.com>
+Subject: [PATCH v3 0/7] kbuild: record cmd-prereqs in .cmd files
+Date: Mon, 12 Oct 2026 23:33:15 +0200
+Message-ID: <20261012213337.2466524-1-luis.augenstein@tngtech.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20261012134159.912183-1-elver@google.com> <20261012134159.912183-2-elver@google.com>
- <CAG_fn=Umb8c1yjp-wEPPFSNXfNdr5UHb5BBd4tV=iwNSehCxxQ@mail.gmail.com> <CANpmjNPBoS7SUTMVboZPGdgXbhY_sz2LhzZqEU=EPojVWkqWHA@mail.gmail.com>
-In-Reply-To: <CANpmjNPBoS7SUTMVboZPGdgXbhY_sz2LhzZqEU=EPojVWkqWHA@mail.gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Mon, 12 Oct 2026 17:21:12 +0200
-X-Gm-Features: AclHuK8qicd0EkbAG2tR809BSGa88U6FRkGTx1gJTbJF14aEuOf_oW-ieXqq320
-Message-ID: <CANiq72=p6a=4K+8jhbm8=y8i_4yMszacK-fu91s3-Eg69ACejg@mail.gmail.com>
-Subject: Re: [PATCH 2/2] rust: kcsan: add KUnit test for data race detection
-To: Marco Elver <elver@google.com>
-Cc: Alexander Potapenko <glider@google.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, kasan-dev@googlegroups.com, 
-	linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, 
-	Shuah Khan <skhan@linuxfoundation.org>, Randy Dunlap <rdunlap@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Boqun Feng <boqun@kernel.org>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
-	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
-	=?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Asahi Lina <lina+kernel@asahilina.net>, 
-	Yury Norov <ynorov@nvidia.com>, Eliot Courtney <ecourtney@nvidia.com>, 
-	Joel Fernandes <joelagnelf@nvidia.com>, workflows@vger.kernel.org, 
-	linux-doc@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 12, 2026 at 5:16=E2=80=AFPM Marco Elver <elver@google.com> wrot=
-e:
->
-> Oops. I guess we'll make a v2.
+KernelSbom (scripts/sbom/sbom.py) reconstructs the kernel build graph
+from the .cmd files written by Kbuild. For most build outputs,
+KernelSbom must infer the build inputs from the shell command stored in
+savedcmd_*. This requires command-specific parsers, which add
+unnecessary complexity and are difficult to maintain.
 
-Please also take the chance to use the kernel vertical imports style:
+Kbuild already knows these inputs as $(real-prereqs), the non-phony
+prerequisites of the Make rule. This series records them in .cmd files
+using a new metadata field:
 
-  https://docs.kernel.org/rust/coding-guidelines.html#imports
+    make_prereqs_<target> :=3D <prerequisites>
 
-Thanks!
+KernelSbom is updated to read the new field instead of parsing the
+shell command, and the obsolete command-specific parsers are removed.
 
-Cheers,
-Miguel
+The issue of manually parsing shell commands was originally mentioned
+in https://lore.kernel.org/r/a01233b9-23a2-4666-91ed-f1cf030dcb9f@tngtech=
+.com.
+This series is a proposal to address that.
+
+Cmd writers and consumers
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+The new field should not affect existing behavior.
+Below is a summary of what I checked.
+
+.cmd files are primarily written by cmd_and_savecmd and cmd_and_fixdep.
+Both writers add make_prereqs.
+
+The following rules append information to existing .cmd files.
+None of these is affected by the new field:
+
+- scripts/Makefile.lib: cmd_gen_objtooldep only appends new rule
+  target: $(wildcard ./tools/objtool/objtool)
+- scripts/Makefile.build: gen_symversions only appends comments
+  #SYMVER <name> <crc>
+- scripts/Makefile.lib: cmd_save_c_flags only appends a variable
+  saved_c_flags_<target> :=3D <flags>
+- rust/Makefile: cmd_gendwarfksyms only appends comments
+  #SYMVER <name> <crc>
+- kernel/Makefile: kheaders_data_dep appends a deps_* block
+  deps_<target> :=3D <headers>.
+
+This series updates the following .cmd file consumers:
+
+- scripts/sbom/sbom/cmd_graph/cmd_file.py: CmdFile.create() is
+  rewritten to parse the fields by name, including the new
+  make_prereqs field.
+- scripts/make_fit.py: process_dtb() previously read and split the
+  complete .cmd file to find the fdtoverlay command. It is changed to
+  read only the first line, so it keeps working once the new field is
+  introduced.
+
+The remaining consumers are not affected:
+
+- Kbuild Makefiles: -include reads .cmd files as Makefile fragments. The
+  new field is an ordinary variable assignment not used in any dependency
+  rule.
+- scripts/Makefile.thinlto: the saved_c_flags_* lookup only reads
+  saved_c_flags_<target> :=3D <flags>.
+- scripts/mod/modpost.c: extract_crcs_for_object() only reads comments
+  #SYMVER <name> <crc>.
+- scripts/mod/sumversion.c: parse_source_files() only reads
+  source_<target> :=3D <source> and deps_<target> :=3D <dependencies>.
+- scripts/clang-tools/gen_compile_commands.py: main() only reads the
+  first line containing savedcmd_<target> :=3D <command>.
+- scripts/generate_builtin_ranges.awk and
+  scripts/verify_builtin_ranges.awk: get_module_info() only reads the
+  first line and searches the saved command for DKBUILD_MODFILE or
+  RUST_MODFILE.
+
+Alternative: extending the deps_* field
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+An alternative to the new make_prereqs field is to merge $(real-prereqs)
+into the existing deps_* field for both cmd_and_savecmd and cmd_and_fixde=
+p.
+This would avoid a new field and provide one dependency list. However, it
+would broaden the meaning of deps_* from dependencies discovered through
+generated .d files to include prerequisites already declared to Make.
+This increases the risk of undesired side effects.
+
+The writers listed above would need to ensure that each .cmd file
+contains only one deps_* block. In particular, kheaders_data_dep would
+need to merge its header dependencies into the block written by
+cmd_and_savecmd instead of appending a second deps_* block.
+cmd_and_fixdep, or fixdep.c depending on the implementation, would
+likewise need to merge $(real-prereqs) with the generated dependencies.
+
+Apart from KernelSbom, scripts/mod/sumversion.c is the only consumer
+that explicitly reads deps_*. It uses selected dependency files to
+calculate a module's srcversion. Extending deps_* could change this
+module metadata. Such an unrelated change should probably be avoided.
+
+Kbuild Makefiles also consume deps_* by including .cmd files. This
+should not be an issue though, because $(real-prereqs) are already
+present on the original target rule, so repeating them through deps_*
+should not change rebuild behavior.
+
+SBOM comparison
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+I compared the SBOMs before and after the series for the same kernel
+builds on x86 and arm64 allmodconfig. They are ~99% the same. The
+following files are newly included in the SBOM because the manual
+parsers did not cover them.
+
+- Linker scripts: *.lds.S sources and the generated *.lds scripts.
+  The old tool never extracted -T arguments, so the whole
+  linker-script chain was missing.
+
+- The intermediate vmlinux link steps: vmlinux.o,
+  .vmlinux.export.c/.o, the realmode pasyms.h. Previously vmlinux.a
+  was hardcoded as an input of scripts/link-vmlinux.sh. Now the real
+  chain vmlinux link -> vmlinux.o -> vmlinux.a is included.
+
+- Per-module .mod object lists: the old tool expanded the .mod file
+  contents in place and recorded the objects directly as link inputs,
+  without explicitly including the .mod file in the SBOM.
+
+- Generated headers: the drm/xe and msm register tables, the aic7xxx
+  sequence tables, the x32 syscall header, and module.lds.h. The old
+  tool found a header only where a .c file actually includes it via
+  the dep file; the new tool records the full make view, including
+  headers that are never included at all.
+
+- Config and header archives: kernel/config_data.gz and
+  kernel/kheaders_data.tar.xz. The old tool missed them because their
+  generation commands had no matching parser.
+
+- Devicetree overlay sources: the .dtso files are now recorded as
+  inputs of the dtb/dtbo build steps. The old tool saw only the
+  temporary files those steps produce, never the sources themselves.
+
+The following files are removed:
+
+- dtc preprocessing scratch files: .dts.tmp, .d.pre.tmp,
+  .d.dtc.tmp. The old tool recorded these temporary build by-products
+  as inputs; the new tool records the real .dtso source instead. This
+  is a cleanup, not a loss.
+
+- Host tooling: the rust toolchain .md docs, the gen_smb1/2_mapping
+  perl generators, and the dtc host tool's libfdt headers.
+  Deliberately excluded. The SBOM should track what ends up in the image =
+or
+  modules, not the tooling that produces it.
+
+Changes in v3:
+- split the changes into individual patches
+- include the sbom changes directly in this series instead of deferring i=
+t
+- add the SBOM comparison section to the cover letter
+- Assisted-by trailer follows
+  Documentation/process/coding-assistants.rst
+
+Changes in v2:
+- filter depfile entries from make_prereqs in fixdep.c to ensure
+  make_prereqs is consistent between clean and incremental builds.
+  Filtering $(deps_$@) from previous builds is still required to not
+  include deps that got removed in the current depfile.
+---
+
+Luis Augenstein (7):
+  scripts/make_fit: limit .cmd file parsing to the savedcmd_ line
+  kbuild: refactor fixdep to collect dependencies before printing
+  scripts/sbom: skip make_prereqs lines when parsing .cmd files
+  kbuild: record cmd-prereqs in .cmd files
+  scripts/sbom: parse make_prereqs from .cmd files
+  scripts/sbom: use make_prereqs to determine build inputs
+  scripts/sbom: remove the command-specific parsers
+
+ Documentation/tools/sbom/sbom.rst             |  22 +-
+ scripts/Kbuild.include                        |  10 +-
+ scripts/basic/fixdep.c                        | 163 +++++-
+ scripts/make_fit.py                           |   2 +-
+ scripts/sbom/sbom/cmd_graph/cmd_file.py       | 152 ++----
+ scripts/sbom/sbom/cmd_graph/cmd_graph_node.py |   5 +-
+ .../sbom/sbom/cmd_graph/dependency_filter.py  |  59 ++
+ .../sbom/cmd_graph/hardcoded_dependencies.py  |   1 -
+ .../cmd_graph/savedcmd_parser/__init__.py     |   6 -
+ .../command_parser_registry.py                | 516 ------------------
+ .../savedcmd_parser/command_splitter.py       | 128 -----
+ .../savedcmd_parser/savedcmd_parser.py        |  67 ---
+ .../cmd_graph/savedcmd_parser/tokenizer.py    |  92 ----
+ scripts/sbom/sbom/config.py                   |  14 -
+ scripts/sbom/sbom/spdx_graph/kernel_file.py   |  64 ++-
+ .../tests/cmd_graph/test_savedcmd_parser.py   | 468 ----------------
+ 16 files changed, 296 insertions(+), 1473 deletions(-)
+ create mode 100644 scripts/sbom/sbom/cmd_graph/dependency_filter.py
+ delete mode 100644 scripts/sbom/sbom/cmd_graph/savedcmd_parser/__init__.=
+py
+ delete mode 100644 scripts/sbom/sbom/cmd_graph/savedcmd_parser/command_p=
+arser_registry.py
+ delete mode 100644 scripts/sbom/sbom/cmd_graph/savedcmd_parser/command_s=
+plitter.py
+ delete mode 100644 scripts/sbom/sbom/cmd_graph/savedcmd_parser/savedcmd_=
+parser.py
+ delete mode 100644 scripts/sbom/sbom/cmd_graph/savedcmd_parser/tokenizer=
+.py
+ delete mode 100644 scripts/sbom/tests/cmd_graph/test_savedcmd_parser.py
+
+--=20
+2.43.0
+
