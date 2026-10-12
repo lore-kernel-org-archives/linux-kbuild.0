@@ -1,37 +1,40 @@
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6146B3A6B66;
-	Mon, 12 Oct 2026 21:49:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E336B446052;
+	Mon, 12 Oct 2026 21:49:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791841745; cv=none; b=MCR50mYXC2g+3Ss+OA+tPJOYVJDZKgtr/J14HOVJFm5Kk/LcpUyGjdREm/ry3ARjGGjcvvIhMiDivuXN9uR6cosjWezzKCgDBrhgm1pgzgRHRDGorCCVLbhVjLVuTK8aa5U6RGlNfjoj5IbvspZ6YpL5e7PLq08v9Y+Kva+J3aE=
+	t=1791841791; cv=none; b=GSyM8GPzRGrwa3AwpVjwjkaphc863X09RGEw6Usi0++pwYT1nZ0dPRgQNYUFF6a1zQVX/Rj9YjHTb5JDZG1IImZgNAiZ5JoOCKlQVCHogVfdkWE7L4cacmKVd2En9BzbTk5BF7caso9VYNWqoOTE33hucbwQSB3CR3oa2oa0Wvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791841745; c=relaxed/simple;
-	bh=9O+S18ohAa+SRT4nMaiVCkc2ADc0xfm/vCDAJ+1cTq4=;
+	s=arc-20240116; t=1791841791; c=relaxed/simple;
+	bh=hnVhe38CDSCQMuLaq+rOuhHGr1S9wuqf0QoqPhGkhaY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YH22WY3oeoThtfKM+nhztHZP3m9n4vXHQB/ZUUA9Lnt1XgwKIyfcti6rw6kgfQhmNr30pFHmN5ASUYQ/tnlZskBq0UhwVmx/e7en75HHtzkB//lgZx4rwJjhHnpSz1cB2oaprqpE1nQpYfeTwRlSbdYFlDs5wpMbJGT0I2B3Hdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io; spf=pass smtp.mailfrom=gtucker.io; dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b=gLUx9aJu; arc=none smtp.client-ip=217.70.183.201
+	 In-Reply-To:Content-Type; b=L9JPuwtOqAM5KCj+m9NeWJFXBoSLOXf3L15V4hK8cUnyTlnz66ftUGegjNf8PduoaEgfPqHOeUWVc5ZZJKnbDzTNWtfP12NMVnb9y2kSN95ygd+E0XqIy8J8RimIY78xK+ACHW4E6AR+PNKeWpU88RomttNCbhHJ1MplBdO9sYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io; spf=pass smtp.mailfrom=gtucker.io; dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b=anZ0d/wb; arc=none smtp.client-ip=217.70.178.249
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gtucker.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b="gLUx9aJu"
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 3B0C93E999;
-	Mon, 12 Oct 2026 21:48:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b="anZ0d/wb"
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+	by mslow3.mail.gandi.net (Postfix) with ESMTP id F00FE5801DC;
+	Mon, 12 Oct 2026 21:31:31 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id A14183F64A;
+	Mon, 12 Oct 2026 21:31:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gtucker.io; s=gm1;
-	t=1791841740;
+	t=1791840684;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=FfsCaxlmAmcvq19B1+qtzJN0P3yMbGAFyPsksLli2yQ=;
-	b=gLUx9aJuNgxFyIUIbnYuPTldKuqQCfbTPojdP3mwZ93EriGQcTnFMRp+zPDsFxQgCrfe+U
-	U2rHqdcwbDnAg70FOfjfgH3LD0z+4blCpeSwllqODTv7wbXAxMY7f+iMf/0kl9KvwINhiB
-	71jEQN5B9P7w12Gb1NKVQuNuGUHcYX8MTIjLvJ2NvQIZ69WEuRFQRiAmnn9RVeNM3ZIGCc
-	whm/68RVLbrGmLHZawkt1m+5dj1z2fGQYsTONafbeyrYmIuP4xOaCGhjjiJLTbUaiIUWN/
-	SiVEYsvAezZ/Fnqppa7ljaTtW+p+CmQC01ghcV3djHkrw+qGfNtkVz2mx2Q3zQ==
-Message-ID: <d3237240-0de8-46d4-b58b-5a3a12fe4840@gtucker.io>
-Date: Mon, 12 Oct 2026 23:48:57 +0200
+	bh=vkr5kUgTqT/tfVa4kWKs3sHgq0KJ6SU6vOlkZ6GvZK8=;
+	b=anZ0d/wbm9+uU4SLYlG5Bd0WuY5gTZ4kUNpRefQDCmdQiO/1R5tVwBqmxkiLIPeKqXJZAu
+	aa0mCIb6X1RSZpz0RuVom+Flfm/GuIjeN48tCBAtvsdlSnbaltLWJ1VG2EAtX6ea8TAXk7
+	ija9XYiDeYKzu7nSt+CPU4kaf4owGbDf4MBeq9vl5WbGcXe0Q4evji66I8y04YM4SZDgDD
+	/X7Ijb6+aBdRDFjRV4fTNbxYQBE8xXv5aZg9fT7hJCYNHFFNCktVjB35DcxkNm9idwSjRA
+	TnoWH6uprRL3PXsliNy7E9FmCR+VtC/Nc89PojV7rscA0aJESzw+tjcqxBeKKA==
+Message-ID: <d8a73b5f-ef08-479e-8c72-d8d81e680280@gtucker.io>
+Date: Mon, 12 Oct 2026 23:31:21 +0200
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -39,152 +42,248 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] Documentation: dev-tools: cover registry option in
- container.rst
+Subject: Re: [PATCH 1/2] scripts: add --registry option to container tool
 To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
  Jonathan Corbet <corbet@lwn.net>, Miguel Ojeda <ojeda@kernel.org>
 Cc: =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>,
  linux-doc@vger.kernel.org, workflows@vger.kernel.org,
  linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <06ee7c694c3e9716bff5c9b1b8e9dc95cc0b38d3.1791751900.git.gtucker@gtucker.io>
- <d7d6735e4b287ae0cb6f873ee8763820cb6e1d7e.1791751900.git.gtucker@gtucker.io>
 Content-Language: en-US
 From: Guillaume Tucker <gtucker@gtucker.io>
-In-Reply-To: <d7d6735e4b287ae0cb6f873ee8763820cb6e1d7e.1791751900.git.gtucker@gtucker.io>
+In-Reply-To: <06ee7c694c3e9716bff5c9b1b8e9dc95cc0b38d3.1791751900.git.gtucker@gtucker.io>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-GND-Sasl: gtucker@gtucker.io
-X-GND-Cause: dmFkZTE0jojyXgEUHXX0d8eRXkelO3JGbn4IXQXnMYmpdj9XbD/qUxwqWX2CDnIQN6FbJQVWtTd5mStCLbA8n5c1DZ4t+eaSIA1GBTKssV75K0AdeuwX+qA2VQcc8l0PeC1pYz9ofLjXNqTkiROngoLbdR5/2jAsEHYKKDqPjq6WryD7YCL+9O2Euhofp5Vk6sfe6EBXFSYXCGSdSUSfXjJaGDpL5080jPTQiQ1oBbBNJ+cRGOTT9LarMwITY5qt9LfLju6Lqx49ITD8NjllaG6p05txA9FILob9OQ9450XNJe5Fx6b4BCUFTqkbin3p1PeI0Vb3OEgk4heo98PwBCdF35GnNjGy7FQAhJOu9lwl2R5YWMZOr7oVNsynRVWZG0MRFRK77d09euIYVDBmQxX2BRBmBR1rWAQUnqcVo+8S5E/Z2Jg9kj6BiqcbHASvwZKq13foxPziMvbMsoZ5W+z2mB/7ygRwPFtFF55bChQkUV7aLI9BHQMgo0HVLnedcYywyiuRirsMEZRXKx9p2Km5UmwkLm22rwy8tMc10oW26y152FU2vJwLmFWi7rXwoaTaKHHkPTPfI8+2fksAhR3dlpVn32/AIcUQeiEOlc7cB2Ox2qPWo/iDm2WlEfZ1LzMn9KbqSki2n/wqN9cRag88eUAQy9nxeBD2XAZBkk7lRDmZwQ
+X-GND-Cause: dmFkZTEA8c7a6DjZY0mdwmyP2U31U8frA5C/TIDWZQpU0KpeyJhfOzVkLxYqVMbpwxICWmu7nXQGo+SrchSNcDhE58NYohNN59SwuFF+b6U8NrMFDsP+ZmogYWaQHvZneJcTqy24ci7oHn2S5a9/rBcmamWWpExu0hAH+KpMAiH7bFJx+XjLiMglKJ7YDeq/HQRnIEOQ6y4eDMrdrw+eNEtOX7lEHHlNxeWBF998aummeg0PG0TlqMcOJjbC21KFgbnyYFipKM4ur/xOpg3folcOnGNDl/y3U5ZiVx7599EGLHlxno/1UczTWbtyzqiSJTX8y0IATeqBdgQy3JkbS4ewf0VLIPRfrAaBQxnskyzd+/wSxSF4DXHfXPu8JnMQSf06L28DV8K0L7PnkFY6v2MmzQw27AfyE+F6OcQwMHo4cciDo/yXOnvwri6QIGXTC6/BlwsrtpfrKiphzqJ10UUukk5sw8TJjeb38gDziffgUkchs4ioObpK94LXXxqk32YoM65xRoGxDksZRMEaDenc+0L+5JPHStI+Geg6hcRai2M34zGuiwHm5f9WdkRwdZJIrPxj5LuQ6RvSVd3+a2HNPndIsz3mPVNikv0bttNg4ffdH+E28DVg0HJnejmRDewW3/wVUmVXLfau+qgPm3ddgMxbJ98HAZdYj/3q/94bshEnMw
 X-GND-State: clean
 X-GND-Score: -100
 
 On 11/10/2026 10:54 pm, Guillaume Tucker wrote:
-> Add the corresponding documentation entry for the new --registry
-> command line option and TOML configuration file.  Update the examples
-> accordingly to show how this can be used to override a registry name
-> already defined within a default image name.
-
-Sashiko wrote:
-
- > Does the patch contain these examples?
- >
- > The commit message mentions showing how to override a registry name
- > already defined within a default image name, but the examples added
- > in the patch only show overriding the registry setting in the
- > configuration file, not an embedded registry within an image
- > string.
-
-By 'default' I meant an image name that would be used without
-specifying it on the command line with the -i option.  That's not the
-same as the [DEFAULT] section in the TOML file.  But it's true it
-could be clarified by mentioning an image name from a profile section
-instead, so I'll reword this in the v2.
-
+> Add a --registry / -R command line argument to the container tool to
+> specify an altnerative image registry and support it in the TOML
+> configuration file accordingly.
+> 
+> This uses a mechanism based on regular expressions to parse the
+> container registry and image names and construct the final one based
+> on a set of priority rules.  A registry can be included directly in an
+> image name; an empty string means a local image.  It can then be
+> overridden by explicitly specifying a registry name via the CLI option
+> or the TOML file, with the CLI option taking precedence as always.
+> 
 > Signed-off-by: Guillaume Tucker <gtucker@gtucker.io>
 > ---
->   Documentation/dev-tools/container.rst | 33 +++++++++++++++++++++++----
->   1 file changed, 29 insertions(+), 4 deletions(-)
+>   scripts/container | 126 ++++++++++++++++++++++++++++++++++++++++++----
+>   1 file changed, 117 insertions(+), 9 deletions(-)
 > 
-> diff --git a/Documentation/dev-tools/container.rst b/Documentation/dev-tools/container.rst
-> index 5dde95f6b222..3f2ba1fcf3bf 100644
-> --- a/Documentation/dev-tools/container.rst
-> +++ b/Documentation/dev-tools/container.rst
-> @@ -48,6 +48,13 @@ Available options:
->       Profile section to use in the config file.  This will override any values
->       defined in the ``DEFAULT`` section.
+> diff --git a/scripts/container b/scripts/container
+> index a3a55180d6ed..de72725656a8 100755
+> --- a/scripts/container
+> +++ b/scripts/container
+> @@ -10,6 +10,7 @@ import dataclasses
+>   import logging
+>   import os
+>   import pathlib
+> +import re
+>   import shutil
+>   import subprocess
+>   import sys
+> @@ -17,6 +18,89 @@ import tomllib
+>   import uuid
 >   
-> +``-R, --registry REGISTRY``
-> +
-> +    Container registry name.
-> +
-> +    Any registry already included in the image name will be replaced or removed
-> +    when using this option with no value.
-> +
->   ``-r, --runtime RUNTIME``
 >   
->       Container runtime name.  Supported runtimes: ``podman``, ``docker``.
-> @@ -274,6 +281,15 @@ Supported options in each section are:
->       Name of the container image to use, equivalent to the ``-i`` command line
->       option.
->   
-> +``registry``
-> +
-> +    Name of the container image registry to use, equivalent to the ``-R``
-> +    command line option.  This will be used as a prefix before the image name
-> +    with a ``/`` separator.
-> +
-> +    For example, a ``docker.io`` registry and a ``myuser/myimage`` image will
-> +    result in ``docker.io/myuser/myimage`` as the full image path.
-> +
->   ``runtime``
->   
->       Name of the container runtime, equivalent to the ``-r`` command line option.
-> @@ -288,6 +304,7 @@ Here's a sample configuration with an extra ``clang`` profile::
->   
->     [DEFAULT]
->     runtime = "podman"
-> +  registry = "docker.io"
->     image = "tuxmake/korg-gcc"
->   
->     [clang]
-> @@ -306,10 +323,18 @@ Using the configuration file, it can now be simplified into this::
->   
->     scripts/container -p clang -- make defconfig
->   
-> -Then to override the default user, the ``-u`` option can still be used::
-> +Then to override the default runtime, the ``-r`` option can still be used::
-> +
-> +  scripts/container -p clang -r docker -- make defconfig
-> +
-> +Likewise, to override the registry name::
-> +
-> +  scripts/container -p clang -R my.registry.com -- make defconfig
-> +
-> +Or to not use any registry at all but only a local image::
->   
-> -  scripts/container -p clang -u0 -- make defconfig
-> +  scripts/container -p clang -R -- make defconfig
->   
-> -This also illustrates how values take precedence over each other: the runtime
-> +This also illustrates how values take precedence over each other: the registry
->   is loaded from the ``DEFAULT`` section, the image from the ``clang`` section
-> -and the user ID from the command line ``-u`` option.
-> +and the runtime from the command line ``-r`` option.
+> +def _init_registry_regex():
+> +    domain = r'[{anum}][{anum}-]*\.[{anum}\.-]*[{anum}]'.format(anum=r'a-z0-9')
 
 Sashiko wrote:
 
- > Does this explanation still match the example directly above it?
- >
- > The text explains that the registry is loaded from the DEFAULT
- > section and the runtime from the command line -r option. However,
- > the immediately preceding example is "scripts/container -p clang -R
- > -- make defconfig", where the registry is explicitly cleared and
- > there is no -r option used.
+ > Does this hardcoded requirement for a literal dot in the domain
+ > regex prevent the use of single-component hosts like localhost?
 
-I see the issue, registry and runtime were swapped in the sentence.
-This would be correct:
+That's fair enough, a plain host can be used as long as a port number
+is also provided.  So localhost/image wouldn't work as it would be
+considered part of the image path, but localhost:5000/image is valid.
+I'll fix this in a v2.
 
-     This also illustrates how values take precedence over each other:
-     the runtime is loaded from the ``DEFAULT`` section, the image
-     from the ``clang`` section and the registry removed via the
-     command line ``-R`` option.
+> +    ipv6 = r'\[[a-fA-F0-9\:]+\]'
+> +    port = r'[\d]{1,5}'
+> +    return rf'((?P<domain>{domain})|(?P<ipv6>{ipv6}))(\:(?P<port>{port}))?'
+> +
+> +
+> +def _init_image_regex():
+> +    step = r'([{anum}]|[{anum}][a-z0-9_\.\-]*[{anum}])'.format(anum=r'a-z0-9')
+> +    tag = r'[a-zA-Z0-9_][a-zA-Z0-9_\.\-\/]{0,127}'
+> +    return rf'(?P<path>{step}(\/{step})*)(\:(?P<tag>{tag}))?'
+> +
+> +
+> +REGISTRY_REGEX = _init_registry_regex()
+> +IMAGE_REGEX = _init_image_regex()
+> +
+> +
+> +class ImageParserMixin:
+> +    """Helper mixin to parse container image names"""
+> +
+> +    @classmethod
+> +    def from_fields(cls, fields):
+> +        """Get an object using a valid subset of fields or None"""
+> +        kwargs = {}
+> +        for field in dataclasses.fields(cls):
+> +            if value := fields.get(field.name):
+> +                kwargs[field.name] = value
+> +        return cls(**kwargs) if kwargs else None
+> +
+> +    @classmethod
+> +    def from_name(cls, name):
+> +        """Get an object using fields in the name matching ._regex or None"""
+> +        re_match = cls._regex.match(name)
+> +        return cls.from_fields(re_match.groupdict()) if re_match else None
+> +
+> +
+> +@dataclasses.dataclass
+> +class RegistryName(ImageParserMixin):
+> +    """Parsed container registry name with no image"""
+> +    registry: str = None
+> +    domain: str = None
+> +    ipv6: str = None
+> +    port: str = None
+> +    _regex = re.compile(rf'^(?P<registry>{REGISTRY_REGEX})$')
+> +
+> +
+> +@dataclasses.dataclass
+> +class ImageName(ImageParserMixin):
+> +    """Parsed container image name with no registry"""
+> +    image: str = None
+> +    path: str = None
+> +    tag: str = None
+> +    _regex = re.compile(rf'^(?P<image>{IMAGE_REGEX})$')
+> +
+> +
+> +@dataclasses.dataclass
+> +class FullImageName(ImageParserMixin):
+> +    """Parsed image name including an optional registry"""
+> +    image: ImageName
+> +    registry: RegistryName = None
+> +    _regex = re.compile(
+> +        rf'^((?P<registry>{REGISTRY_REGEX})\/)?(?P<image>{IMAGE_REGEX})?$'
+> +    )
+> +
+> +    @property
+> +    def name(self):
+> +        """Full name in registry/image:tag format with optional registry"""
+> +        return (
+> +            '/'.join((self.registry.registry, self.image.image))
+> +            if self.registry else self.image.image
+> +        )
 
-I'll fix this in the v2 as well.
+Sashiko wrote:
 
+ > Could this result in an AttributeError if self.image is None when
+ > accessing self.image.image?
 
-There were a couple of other comments already addressed in the first
-patch about using hostnames rather than domain names, so nothing
-further to add here about them.
+In theory that's true, but the whole point is to initialise the class
+using the regex parsing mechanism and when doing this, the field
+would never be None.  If it failed to parse the FullImageName object
+wouldn't be constructed at all when using .from_name().  So an
+exception if .image was None would seem justified - or even an
+assert.
 
-And if anyone is wondering why it's useful to be able to override the
-registry, a typical use case is when making modified images locally
-before pushing them to a registry or when pulling images from a
-development registry instead.  Say, in the TOML file a user can set
-some standard images to be pulled from a public registry.  Then when
-building a variant of an image, the user can just use the -R option
-to pick it up instead of editing the file or duplicating profile
-entries.  Validating the image names seems useful and it's a small
-extra to be able to override the registry part once it's all parsed
-into objects.  So it seems worth the extra few lines of code.
+> +    @classmethod
+> +    def from_name(cls, name):
+> +        if re_match := cls._regex.match(name):
+> +            fields = re_match.groupdict()
+> +            return FullImageName(
+> +                registry=RegistryName.from_fields(fields),
+> +                image=ImageName.from_fields(fields),
+> +            )
+> +        return None
+Sashiko wrote:
+
+ > If the user provides an image name with a trailing slash like
+ > registry.com/, does the optional image capture group match nothing?
+
+Ah yes, but that's a small bug in the regex due to the trailing '?'
+which makes the image optional when it shouldn't.  I'll fix this in a
+v2 - and I guess it might explain the previous comment as if the
+image part is not optional then .image should never be None.
+
+> +
+>   class ContainerRuntime(abc.ABC):
+>       """Base class for a container runtime implementation"""
+>   
+> @@ -145,6 +229,7 @@ class Config:
+>       """Container configuration"""
+>       image: str = None
+>       runtime: str = None
+> +    registry: str = None
+>       env_file: str = None
+>       uid: int = None
+>       gid: int = None
+> @@ -188,23 +273,40 @@ def _get_logger(verbose):
+>       return logger
+>   
+>   
+> +def _get_image(args, config):
+> +    image_name = args.image or config.image
+> +    if not image_name:
+> +        raise ValueError("no image specified")
+> +    image = FullImageName.from_name(image_name)
+> +    if image is None:
+> +        raise ValueError(f"invalid image name: {image_name}")
+> +    if args.registry == '':
+> +        image.registry = None
+> +    elif args.registry is not None:
+> +        image.registry = RegistryName.from_name(args.registry)
+> +        if image.registry is None:
+> +            raise ValueError(f"invalid registry name: {args.registry}")
+> +    elif config.registry is not None and image.registry is None:
+> +        image.registry = RegistryName.from_name(config.registry)
+> +        if image.registry is None:
+> +            raise ValueError(f"invalid registry name: {config.registry}")
+> +    return image
+> +
+> +
+>   def main(args):
+>       """Main entry point for the container tool"""
+>       logger = _get_logger(args.verbose)
+>       try:
+>           config = Config.from_toml(args.config_file, args.config_profile)
+> -        runtime = args.runtime or config.runtime
+> -        cls = Runtimes.get(runtime) if runtime else Runtimes.find()
+> +        runtime_name = args.runtime or config.runtime
+> +        cls = Runtimes.get(runtime_name) if runtime_name else Runtimes.find()
+> +        logger.debug("runtime: %s", cls.name)
+> +        image = _get_image(args, config)
+> +        logger.debug("image: %s", image.name)
+>       except ValueError as ex:
+>           logger.error(ex)
+>           return 1
+> -    logger.debug("runtime: %s", cls.name)
+> -    image = args.image or config.image
+> -    if not image:
+> -        logger.error("no image specified")
+> -        return 1
+> -    logger.debug("image: %s", image)
+> -    return cls(args, config, logger).run(image, args.cmd)
+> +    return cls(args, config, logger).run(image.name, args.cmd)
+>   
+>   
+>   if __name__ == '__main__':
+> @@ -235,6 +337,12 @@ if __name__ == '__main__':
+>           help="Profile section to use in the config file.  This will override "
+>           "any values defined in the DEFAULT section."
+>       )
+> +    parser.add_argument(
+> +        '-R', '--registry', nargs='?', const='',
+> +        help="Container registry name.  Any registry already included in the "
+> +        "image name will be replaced or removed when using this option with "
+> +        "no value."
+> +    )
+>       parser.add_argument(
+>           '-r', '--runtime', choices=Runtimes.get_names(),
+>           help="Container runtime name.  If not specified, the first one found "
+
+The rest of this patch appears to be Shashiko-friendly, at least in
+this iteration.  I'm updating the unit tests accordingly and will
+send them in an RFC alongside the v2.
 
 Guillaume
