@@ -1,289 +1,199 @@
-Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E336B446052;
-	Mon, 12 Oct 2026 21:49:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791841791; cv=none; b=GSyM8GPzRGrwa3AwpVjwjkaphc863X09RGEw6Usi0++pwYT1nZ0dPRgQNYUFF6a1zQVX/Rj9YjHTb5JDZG1IImZgNAiZ5JoOCKlQVCHogVfdkWE7L4cacmKVd2En9BzbTk5BF7caso9VYNWqoOTE33hucbwQSB3CR3oa2oa0Wvk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791841791; c=relaxed/simple;
-	bh=hnVhe38CDSCQMuLaq+rOuhHGr1S9wuqf0QoqPhGkhaY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=L9JPuwtOqAM5KCj+m9NeWJFXBoSLOXf3L15V4hK8cUnyTlnz66ftUGegjNf8PduoaEgfPqHOeUWVc5ZZJKnbDzTNWtfP12NMVnb9y2kSN95ygd+E0XqIy8J8RimIY78xK+ACHW4E6AR+PNKeWpU88RomttNCbhHJ1MplBdO9sYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io; spf=pass smtp.mailfrom=gtucker.io; dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b=anZ0d/wb; arc=none smtp.client-ip=217.70.178.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gtucker.io
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A52CA4BF92A
+	for <linux-kbuild@vger.kernel.org>; Mon, 12 Oct 2026 22:07:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.174
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791842845; cv=pass; b=sAov/MBnSpip3Ro+VVvOKSFATy4GaVaS2ZBBd6xsI8BeSJRFJYV6p7I5N01jHdTSa98+UdAVISiPF0Krrqszn1Q1W+B/E/Lftn/X4k0c/NMTKmJBxsCwoMCdkLrhmtVEZ9dncGWX2maSyTii1v012kZGO02YJtuhMDhPDv22Jtw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791842845; c=relaxed/simple;
+	bh=9Hy/4qi1pvOId1S+omXSYSIW36PU+S8k2ljSvieLxAc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=D75PeqPGMVVxkSozysj1asZP0zYrPv72n2VOEBRZQNkUYqdFe+WFdS5csQhRZPTO75zZicusLHkbWOBkdauIzpuIYgrn1PG/B/DGu4ZOYpweKHsBlSbRCrMMD3ShwFAlZ0e3nGI1r/wW3a7P3zE7sJWjSYY6268fBnCxK+zvmAI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TpnRnLml; arc=pass smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b="anZ0d/wb"
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-	by mslow3.mail.gandi.net (Postfix) with ESMTP id F00FE5801DC;
-	Mon, 12 Oct 2026 21:31:31 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A14183F64A;
-	Mon, 12 Oct 2026 21:31:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gtucker.io; s=gm1;
-	t=1791840684;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vkr5kUgTqT/tfVa4kWKs3sHgq0KJ6SU6vOlkZ6GvZK8=;
-	b=anZ0d/wbm9+uU4SLYlG5Bd0WuY5gTZ4kUNpRefQDCmdQiO/1R5tVwBqmxkiLIPeKqXJZAu
-	aa0mCIb6X1RSZpz0RuVom+Flfm/GuIjeN48tCBAtvsdlSnbaltLWJ1VG2EAtX6ea8TAXk7
-	ija9XYiDeYKzu7nSt+CPU4kaf4owGbDf4MBeq9vl5WbGcXe0Q4evji66I8y04YM4SZDgDD
-	/X7Ijb6+aBdRDFjRV4fTNbxYQBE8xXv5aZg9fT7hJCYNHFFNCktVjB35DcxkNm9idwSjRA
-	TnoWH6uprRL3PXsliNy7E9FmCR+VtC/Nc89PojV7rscA0aJESzw+tjcqxBeKKA==
-Message-ID: <d8a73b5f-ef08-479e-8c72-d8d81e680280@gtucker.io>
-Date: Mon, 12 Oct 2026 23:31:21 +0200
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TpnRnLml"
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-53584e7c349so567981cf.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 12 Oct 2026 15:07:23 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1791842842; cv=none;
+        d=google.com; s=arc-20260327;
+        b=mTk4iKaqxetK/LBfNSbs2lykMTL0KvIKZhomEeXR9UGhBwhi6sA+uxvTvY292kM1T9
+         KM8NJYd7nR1d2IU+xb+PSALsTFFn3W795+vKewphNRkLevRmr4RG8Jq4X6+0a0DlBjc6
+         f0lXLEFtNLkE+EnUF9/yc/kJJEA6mVYkXUGZtRo/kGg1m4HX26H32ScXBr7+14wjxA15
+         qkqiabbx79b1xAqOuOsnX9QRZzvYNlBIV6KnIuJojyORAT0/ir1B3AB4YWxsEOoWLclf
+         gVS+dJ4esn7fknNjQRa0u5hIGtKlrpvWCzTTbnPEu3UH1hyQhYGgUUI/+UVlTKc7A6Gc
+         7BBg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=xfJFs2TCZcZgagXkA7e7DWhX7aMQF/GsCS0/iiphVRw=;
+        fh=uxIl1hd+Xr/oO+7KQ/dsU3emD03201Rl4DUXodJtYDs=;
+        b=R8SssMpiMsSMxxaLVSAoFZVHdm23NbELluwTXuZOJN4rQ6UL3qLTYV0Dtku17Rxf+7
+         lRBeK8Jk4PcOS3CRZTXNTSdkvQQnBYVuXvZm8y+Ng/O/PJ8TSOtoaxUTTtM7j00dLuSF
+         fYnCwl8buvBh8+oPKnMdhqJ5y4JKWb5P25nVYQouuNCHhTP0qbjoR49ug9mUksxd9IGx
+         +tPeah8YG15RyaqSrr1dVf+OPeTztVXSBRq8CaogV52za3Vv4fffYOAqzTkhFJv0C/ry
+         a5w4r21nfVlXbLe7/VjlamF4Q7+NHS/GCz4pXBUbtr2LaReqCYl49IN2jMi4jWeKJ98Z
+         G+cQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1791842842; x=1792447642; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=xfJFs2TCZcZgagXkA7e7DWhX7aMQF/GsCS0/iiphVRw=;
+        b=TpnRnLmlqhaKUZfz/GJ5a3rcKXygjgsimL0KpuQx+kvhImdHv4P+dCGDftDL2pXICa
+         8pDlQpusJQ2YIU3J85m+n77r4cOHi8mcBhRR1axttPYPCtzTcteWlBJo7+reJKvfyo/o
+         dgcvRS7dofofLjh4b0uisNkDLKjHafw9faWY1LE5CNRmHiHO8q04MPuDFV8REG/Pj2I+
+         oTku59Fcq1bXvneNZq107dmU1eQfpy+f7iAFZcit7kj5xx7MG2GSXl6qX29WZyjZQH5k
+         nDY6V8+BLhG7C8EwoDpebfViwsZyvZRRLcwI1v89islnsumQ11dKn1AiA/lG8Adm9byP
+         Yv1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791842842; x=1792447642;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=xfJFs2TCZcZgagXkA7e7DWhX7aMQF/GsCS0/iiphVRw=;
+        b=esw8/sRGfz2kgZIuSQkmDF3dF0GGiu4LwUdpLXpL17VMQEj5WTuAnGd5IgHCkwUVWu
+         NKI3JIRS46LQ4wgYRmK2syIrq9+qxk+bSnmpUhV2COT5v/viiFr73e7Coi1jVEUYbVMb
+         8mExJkstqk4ENwAC48rS/e2LHSa7E+HtRrSTMiHFwIWqAY0fFTWqNTfpJAfQyIis40YX
+         RKxMZbVW9DqBpYWwS4XEtFHJAV/ib/EWOxeaGEyNZVITR4I34uKXjI37HKAfs21Dcy5P
+         MnvQ2dalr3Ljo7wtzs4wDKIAX5BBNw0vNmzKAwLzm1UzuB6gwapI8zNtEjv506oI2DeR
+         l31A==
+X-Forwarded-Encrypted: i=1; AKwUvBxd5bBK6IqUhUrD4l3whzmSvFRzEKNB9f88WSfZron3DDStCamm4x5+qW7VYCv8ZnC3CWeO+1V/ePEw+m0=@vger.kernel.org
+X-Gm-Message-State: AFq9FYLh0qnci+NCkJ/ve2nWmRU7O/CGnv1zQUVEmjKmSRhcQ0BaOp9T
+	yimy6ymQ4wx9HRBbGvW4NIRT2BOszrMlWddRRTj6he+CWzCPmdQhxzUdkNK4B4mSxuX72JjFFr2
+	VnKrhCAwHu0UED2OqgQ+6g9Oggj8/T66xxfsG88Dv
+X-Gm-Gg: AYBFou38dTKNV+jXXVTssXnF/+HyD9IiE/fJWe5N7ZnsnTMjTUYB6rlmBEx/2A4Y+N/
+	NBJxmsZy8UdckpWB7GK+TqgmobXoBDFuCE4apKuMKQfAHPdzEKkSHMCNXgnL9mvrGWMOQ1LE0Oi
+	voke3q52m9wsUR6b1WRSV4h228LJsZ4qpQknuvLTqEmQkUj7T3GzMZUTHE/EWvemnrjtOtA1LcO
+	qWHd7osu9XhcfZr3E34ah1EzI+dHT9FBD+pU9s2Qlkt2XhYwozvQ4J4fZxUOGO8aqXNTszZ+k8c
+	KLseaLhq1S9FKzs1ijz5oDqy9rFd1FkLqvt4kCJYggmordYEyiTNZEWVdjRDzZOH37QAxUlMOuc
+	C+8z+eUu34A==
+X-Received: by 2002:a05:622a:581a:b0:530:2f98:cebb with SMTP id
+ d75a77b69052e-535b4f31acfmr40093421cf.11.1791842841851; Mon, 12 Oct 2026
+ 15:07:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] scripts: add --registry option to container tool
-To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Miguel Ojeda <ojeda@kernel.org>
-Cc: =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>,
- linux-doc@vger.kernel.org, workflows@vger.kernel.org,
- linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <06ee7c694c3e9716bff5c9b1b8e9dc95cc0b38d3.1791751900.git.gtucker@gtucker.io>
-Content-Language: en-US
-From: Guillaume Tucker <gtucker@gtucker.io>
-In-Reply-To: <06ee7c694c3e9716bff5c9b1b8e9dc95cc0b38d3.1791751900.git.gtucker@gtucker.io>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: gtucker@gtucker.io
-X-GND-Cause: dmFkZTEA8c7a6DjZY0mdwmyP2U31U8frA5C/TIDWZQpU0KpeyJhfOzVkLxYqVMbpwxICWmu7nXQGo+SrchSNcDhE58NYohNN59SwuFF+b6U8NrMFDsP+ZmogYWaQHvZneJcTqy24ci7oHn2S5a9/rBcmamWWpExu0hAH+KpMAiH7bFJx+XjLiMglKJ7YDeq/HQRnIEOQ6y4eDMrdrw+eNEtOX7lEHHlNxeWBF998aummeg0PG0TlqMcOJjbC21KFgbnyYFipKM4ur/xOpg3folcOnGNDl/y3U5ZiVx7599EGLHlxno/1UczTWbtyzqiSJTX8y0IATeqBdgQy3JkbS4ewf0VLIPRfrAaBQxnskyzd+/wSxSF4DXHfXPu8JnMQSf06L28DV8K0L7PnkFY6v2MmzQw27AfyE+F6OcQwMHo4cciDo/yXOnvwri6QIGXTC6/BlwsrtpfrKiphzqJ10UUukk5sw8TJjeb38gDziffgUkchs4ioObpK94LXXxqk32YoM65xRoGxDksZRMEaDenc+0L+5JPHStI+Geg6hcRai2M34zGuiwHm5f9WdkRwdZJIrPxj5LuQ6RvSVd3+a2HNPndIsz3mPVNikv0bttNg4ffdH+E28DVg0HJnejmRDewW3/wVUmVXLfau+qgPm3ddgMxbJ98HAZdYj/3q/94bshEnMw
-X-GND-State: clean
-X-GND-Score: -100
+References: <20261011233647.2454648-1-sashal@kernel.org> <20261011233647.2454648-4-sashal@kernel.org>
+In-Reply-To: <20261011233647.2454648-4-sashal@kernel.org>
+From: Ian Rogers <irogers@google.com>
+Date: Mon, 12 Oct 2026 15:07:10 -0700
+X-Gm-Features: AclHuK8mlJBdkDo_qjZnD8vvswEhWWRcu7xDXqAmSuD53qO6NxMidI4YTyg40zw
+Message-ID: <CAP-5=fWFY-tpJz2vcBZvurwdZY5gwd8cuTemE9q1rtZ0Vi0dng@mail.gmail.com>
+Subject: Re: [RFC PATCH 3/6] tools: build perf in tools_build
+To: Sasha Levin <sashal@kernel.org>, linux-perf-users@vger.kernel.org, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>
+Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, linux-kbuild@vger.kernel.org, 
+	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/10/2026 10:54 pm, Guillaume Tucker wrote:
-> Add a --registry / -R command line argument to the container tool to
-> specify an altnerative image registry and support it in the TOML
-> configuration file accordingly.
-> 
-> This uses a mechanism based on regular expressions to parse the
-> container registry and image names and construct the final one based
-> on a set of priority rules.  A registry can be included directly in an
-> image name; an empty string means a local image.  It can then be
-> overridden by explicitly specifying a registry name via the CLI option
-> or the TOML file, with the CLI option taking precedence as always.
-> 
-> Signed-off-by: Guillaume Tucker <gtucker@gtucker.io>
+On Sun, Oct 11, 2026 at 4:36=E2=80=AFPM Sasha Levin <sashal@kernel.org> wro=
+te:
+>
+> Add CONFIG_TOOLS_BUILD_PERF. perf is built as it is built standalone,
+> with optional features enabled when their libraries are installed, and
+> with -Werror following CONFIG_WERROR. The feature table is left out of
+> the kernel build log.
+>
+> CONFIG_TOOLS_BUILD_PERF_MINIMAL turns every optional feature off
+> instead, so the result does not depend on the build machine. allmodconfig
+> and allyesconfig turn it on.
+>
+> Assisted-by: LLM
+> Signed-off-by: Sasha Levin <sashal@kernel.org>
 > ---
->   scripts/container | 126 ++++++++++++++++++++++++++++++++++++++++++----
->   1 file changed, 117 insertions(+), 9 deletions(-)
-> 
-> diff --git a/scripts/container b/scripts/container
-> index a3a55180d6ed..de72725656a8 100755
-> --- a/scripts/container
-> +++ b/scripts/container
-> @@ -10,6 +10,7 @@ import dataclasses
->   import logging
->   import os
->   import pathlib
-> +import re
->   import shutil
->   import subprocess
->   import sys
-> @@ -17,6 +18,89 @@ import tomllib
->   import uuid
->   
->   
-> +def _init_registry_regex():
-> +    domain = r'[{anum}][{anum}-]*\.[{anum}\.-]*[{anum}]'.format(anum=r'a-z0-9')
+>  tools/Kconfig         | 15 +++++++++++++++
+>  tools/Makefile.kbuild | 19 +++++++++++++++++++
+>  2 files changed, 34 insertions(+)
+>
+> diff --git a/tools/Kconfig b/tools/Kconfig
+> index bf0643b39b86e..488f439592150 100644
+> --- a/tools/Kconfig
+> +++ b/tools/Kconfig
+> @@ -59,6 +59,21 @@ config TOOLS_BUILD_IIO
+>         help
+>           Build tools/iio (lsiio, iio_event_monitor, iio_generic_buffer).
+>
+> +config TOOLS_BUILD_PERF
+> +       bool "perf"
+> +       help
+> +         Build tools/perf. As in a standalone perf build, optional
+> +         features are enabled when the libraries they need are installed=
+.
+> +
+> +config TOOLS_BUILD_PERF_MINIMAL
+> +       bool "Build perf with all optional features disabled"
+> +       depends on TOOLS_BUILD_PERF
+> +       help
+> +         Turn off every optional perf feature, so that the result does
+> +         not depend on which libraries the build machine has installed.
+> +         allmodconfig and allyesconfig turn this on, which keeps their
+> +         builds the same on every machine.
+> +
+>  config TOOLS_BUILD_SPI
+>         bool "SPI tools"
+>         help
+> diff --git a/tools/Makefile.kbuild b/tools/Makefile.kbuild
+> index 820a2d9a3893b..62fd494253eca 100644
+> --- a/tools/Makefile.kbuild
+> +++ b/tools/Makefile.kbuild
+> @@ -73,6 +73,25 @@ PHONY +=3D $(tool-targets)
+>  $(tool-targets): tool-%: FORCE
+>         $(call build,$(outdir)/$*,-C $(toolsdir)/$* O=3D$(outdir)/$* CC=
+=3D'$(call escsq,$(tools-cc))',,TOOLS_BUILD_$(shell echo $* | tr a-z A-Z))
+>
+> +# perf, without the feature table in the kernel build log
+> +perf-flags :=3D CC=3D'$(call escsq,$(tools-cc))' FEATURE_DISPLAY=3D WERR=
+OR=3D$(if $(CONFIG_WERROR),1,0)
+> +
+> +# Every optional feature off, so the result does not depend on which
+> +# libraries are installed
+> +perf-flags-$(CONFIG_TOOLS_BUILD_PERF_MINIMAL) +=3D \
+> +       NO_LIBELF=3D1 NO_LIBTRACEEVENT=3D1 NO_JEVENTS=3D1 NO_LIBPYTHON=3D=
+1 NO_LIBDW=3D1 \
+> +       NO_LIBBPF=3D1 BUILD_BPF_SKEL=3D0 NO_SLANG=3D1 NO_GTK2=3D1 NO_AIO=
+=3D1 \
+> +       NO_BACKTRACE=3D1 NO_DEMANGLE=3D1 NO_LZMA=3D1 NO_LIBZSTD=3D1 NO_ZL=
+IB=3D1 \
+> +       NO_LIBNUMA=3D1 NO_LIBUNWIND=3D1 NO_LIBLLVM=3D1 NO_CAPSTONE=3D1 NO=
+_LIBPFM4=3D1 \
+> +       NO_SDT=3D1 NO_JVMTI=3D1 NO_LIBDEBUGINFOD=3D1 NO_BABELTRACE2=3D1 N=
+O_RUST=3D1 \
+> +       NO_SHELLCHECK=3D1 NO_PERF_READ_VDSO32=3D1 NO_PERF_READ_VDSOX32=3D=
+1
 
-Sashiko wrote:
+It seems unfortunate to maintain this list here, we also have a
+minimal target as a build test here:
+https://web.git.kernel.org/pub/scm/linux/kernel/git/perf/perf-tools-next.gi=
+t/tree/tools/perf/tests/make?h=3Dperf-tools-next#n123
+I wonder we should just add support for a MINIMAL=3D1 variable in
+tools/perf/Makefile.config and have that set these other variables.
 
- > Does this hardcoded requirement for a literal dot in the domain
- > regex prevent the use of single-component hosts like localhost?
-
-That's fair enough, a plain host can be used as long as a port number
-is also provided.  So localhost/image wouldn't work as it would be
-considered part of the image path, but localhost:5000/image is valid.
-I'll fix this in a v2.
-
-> +    ipv6 = r'\[[a-fA-F0-9\:]+\]'
-> +    port = r'[\d]{1,5}'
-> +    return rf'((?P<domain>{domain})|(?P<ipv6>{ipv6}))(\:(?P<port>{port}))?'
-> +
-> +
-> +def _init_image_regex():
-> +    step = r'([{anum}]|[{anum}][a-z0-9_\.\-]*[{anum}])'.format(anum=r'a-z0-9')
-> +    tag = r'[a-zA-Z0-9_][a-zA-Z0-9_\.\-\/]{0,127}'
-> +    return rf'(?P<path>{step}(\/{step})*)(\:(?P<tag>{tag}))?'
-> +
-> +
-> +REGISTRY_REGEX = _init_registry_regex()
-> +IMAGE_REGEX = _init_image_regex()
-> +
-> +
-> +class ImageParserMixin:
-> +    """Helper mixin to parse container image names"""
-> +
-> +    @classmethod
-> +    def from_fields(cls, fields):
-> +        """Get an object using a valid subset of fields or None"""
-> +        kwargs = {}
-> +        for field in dataclasses.fields(cls):
-> +            if value := fields.get(field.name):
-> +                kwargs[field.name] = value
-> +        return cls(**kwargs) if kwargs else None
-> +
-> +    @classmethod
-> +    def from_name(cls, name):
-> +        """Get an object using fields in the name matching ._regex or None"""
-> +        re_match = cls._regex.match(name)
-> +        return cls.from_fields(re_match.groupdict()) if re_match else None
-> +
-> +
-> +@dataclasses.dataclass
-> +class RegistryName(ImageParserMixin):
-> +    """Parsed container registry name with no image"""
-> +    registry: str = None
-> +    domain: str = None
-> +    ipv6: str = None
-> +    port: str = None
-> +    _regex = re.compile(rf'^(?P<registry>{REGISTRY_REGEX})$')
-> +
-> +
-> +@dataclasses.dataclass
-> +class ImageName(ImageParserMixin):
-> +    """Parsed container image name with no registry"""
-> +    image: str = None
-> +    path: str = None
-> +    tag: str = None
-> +    _regex = re.compile(rf'^(?P<image>{IMAGE_REGEX})$')
-> +
-> +
-> +@dataclasses.dataclass
-> +class FullImageName(ImageParserMixin):
-> +    """Parsed image name including an optional registry"""
-> +    image: ImageName
-> +    registry: RegistryName = None
-> +    _regex = re.compile(
-> +        rf'^((?P<registry>{REGISTRY_REGEX})\/)?(?P<image>{IMAGE_REGEX})?$'
-> +    )
-> +
-> +    @property
-> +    def name(self):
-> +        """Full name in registry/image:tag format with optional registry"""
-> +        return (
-> +            '/'.join((self.registry.registry, self.image.image))
-> +            if self.registry else self.image.image
-> +        )
-
-Sashiko wrote:
-
- > Could this result in an AttributeError if self.image is None when
- > accessing self.image.image?
-
-In theory that's true, but the whole point is to initialise the class
-using the regex parsing mechanism and when doing this, the field
-would never be None.  If it failed to parse the FullImageName object
-wouldn't be constructed at all when using .from_name().  So an
-exception if .image was None would seem justified - or even an
-assert.
-
-> +    @classmethod
-> +    def from_name(cls, name):
-> +        if re_match := cls._regex.match(name):
-> +            fields = re_match.groupdict()
-> +            return FullImageName(
-> +                registry=RegistryName.from_fields(fields),
-> +                image=ImageName.from_fields(fields),
-> +            )
-> +        return None
-Sashiko wrote:
-
- > If the user provides an image name with a trailing slash like
- > registry.com/, does the optional image capture group match nothing?
-
-Ah yes, but that's a small bug in the regex due to the trailing '?'
-which makes the image optional when it shouldn't.  I'll fix this in a
-v2 - and I guess it might explain the previous comment as if the
-image part is not optional then .image should never be None.
+Thanks,
+Ian
 
 > +
->   class ContainerRuntime(abc.ABC):
->       """Base class for a container runtime implementation"""
->   
-> @@ -145,6 +229,7 @@ class Config:
->       """Container configuration"""
->       image: str = None
->       runtime: str = None
-> +    registry: str = None
->       env_file: str = None
->       uid: int = None
->       gid: int = None
-> @@ -188,23 +273,40 @@ def _get_logger(verbose):
->       return logger
->   
->   
-> +def _get_image(args, config):
-> +    image_name = args.image or config.image
-> +    if not image_name:
-> +        raise ValueError("no image specified")
-> +    image = FullImageName.from_name(image_name)
-> +    if image is None:
-> +        raise ValueError(f"invalid image name: {image_name}")
-> +    if args.registry == '':
-> +        image.registry = None
-> +    elif args.registry is not None:
-> +        image.registry = RegistryName.from_name(args.registry)
-> +        if image.registry is None:
-> +            raise ValueError(f"invalid registry name: {args.registry}")
-> +    elif config.registry is not None and image.registry is None:
-> +        image.registry = RegistryName.from_name(config.registry)
-> +        if image.registry is None:
-> +            raise ValueError(f"invalid registry name: {config.registry}")
-> +    return image
+> +__tools_build: $(if $(CONFIG_TOOLS_BUILD_PERF),perf)
 > +
+> +PHONY +=3D perf
+> +perf: FORCE
+> +       $(call build,$(outdir)/perf,-C $(toolsdir)/perf -f Makefile.perf =
+O=3D$(outdir)/perf $(perf-flags) $(perf-flags-y),,TOOLS_BUILD_PERF)
 > +
->   def main(args):
->       """Main entry point for the container tool"""
->       logger = _get_logger(args.verbose)
->       try:
->           config = Config.from_toml(args.config_file, args.config_profile)
-> -        runtime = args.runtime or config.runtime
-> -        cls = Runtimes.get(runtime) if runtime else Runtimes.find()
-> +        runtime_name = args.runtime or config.runtime
-> +        cls = Runtimes.get(runtime_name) if runtime_name else Runtimes.find()
-> +        logger.debug("runtime: %s", cls.name)
-> +        image = _get_image(args, config)
-> +        logger.debug("image: %s", image.name)
->       except ValueError as ex:
->           logger.error(ex)
->           return 1
-> -    logger.debug("runtime: %s", cls.name)
-> -    image = args.image or config.image
-> -    if not image:
-> -        logger.error("no image specified")
-> -        return 1
-> -    logger.debug("image: %s", image)
-> -    return cls(args, config, logger).run(image, args.cmd)
-> +    return cls(args, config, logger).run(image.name, args.cmd)
->   
->   
->   if __name__ == '__main__':
-> @@ -235,6 +337,12 @@ if __name__ == '__main__':
->           help="Profile section to use in the config file.  This will override "
->           "any values defined in the DEFAULT section."
->       )
-> +    parser.add_argument(
-> +        '-R', '--registry', nargs='?', const='',
-> +        help="Container registry name.  Any registry already included in the "
-> +        "image name will be replaced or removed when using this option with "
-> +        "no value."
-> +    )
->       parser.add_argument(
->           '-r', '--runtime', choices=Runtimes.get_names(),
->           help="Container runtime name.  If not specified, the first one found "
-
-The rest of this patch appears to be Shashiko-friendly, at least in
-this iteration.  I'm updating the unit tests accordingly and will
-send them in an RFC alongside the v2.
-
-Guillaume
+>  PHONY +=3D FORCE
+>  FORCE:
+>
+> --
+> 2.53.0
+>
