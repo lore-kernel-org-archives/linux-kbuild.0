@@ -1,51 +1,51 @@
 Received: from mailout.tng.vnc.biz (mailout.tng.vnc.biz [34.107.87.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D943A4C227A;
-	Mon, 12 Oct 2026 21:34:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 267AC3B1014;
+	Mon, 12 Oct 2026 21:34:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=34.107.87.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791840844; cv=none; b=mYyLHJvTwg6L79Dtzyyabl7pp7qvJ55UtD9LyqrVKXZAFXsTc/IQ90Bv8DSRa0N8GNG/D7e1Y7k+u8ulVZ8nRXW+XEAze4CGSCzUn/ikX759JLq5ulA82T/OKRQoRapFakVcmGvefoAcYMN28IHg7T1dxuP5ckMhFxB9oybc28I=
+	t=1791840854; cv=none; b=T72mT4L8prx1xhm76EdyRuXf5iu25ftuDUcO2TOf4i5I8Cq3tA+oXvBuggBrxS6InT9BlA1nHqQCZ5qlHo1cwdQinhpF4smu8IW4nzwUkyfZxZzMWBreTUMsXFWNRjCMsG5BIMF9wfaS7qsau9qwwn5GmvTMUBCtUuaYdAQMfHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791840844; c=relaxed/simple;
-	bh=Uv9KnZEx1gNpfLNbFHexy3CZh5XLR2mGbA5VY/z6A8o=;
+	s=arc-20240116; t=1791840854; c=relaxed/simple;
+	bh=8n3m2GaofEM751bqm8VSag2QYaeGgPRG9+4FANhM1Hg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LaejScZU9zSwvQDkzXW8Th8ZXMjQWYrulxxDmvbuvJjS4qY0T7SOg56DjdbjPInQtI+WMUTm5XfalA6iFFl9wwWzI82i0z3nvCnYleAcY55/E4Rkn9IHOKdFhTbNHAIG+cxr5Aa8kC/na2jSxluTi4ZG0iHDpm39Zhk3p4IDJqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com; spf=pass smtp.mailfrom=tngtech.com; dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b=hSdlTKyX; arc=none smtp.client-ip=34.107.87.41
+	 MIME-Version:Content-Type; b=gOxFfjFddcICakN34uorsO7VpYIzMCuOt97hokwYLw+amP+AsHAGTLmzQz4exCaCg0ibaK+5IeJVK9bAwCjEtRmita/MXGs0KcKssUJ1/+1ESsIgNw7hGRIbzHJstELx+w8IcSt9NCZX4m5/v1pIiABEqs1zoAvW+0UGDmvAc0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com; spf=pass smtp.mailfrom=tngtech.com; dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b=D3Kh1+Wg; arc=none smtp.client-ip=34.107.87.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tngtech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b="hSdlTKyX"
+	dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b="D3Kh1+Wg"
 Received: from zmproxy.tng.vnc.biz (zmproxy.tng.vnc.biz [172.16.1.23])
-	by mailout.tng.vnc.biz (Postfix) with ESMTPS id 7185B40872;
-	Mon, 12 Oct 2026 23:34:01 +0200 (CEST)
+	by mailout.tng.vnc.biz (Postfix) with ESMTPS id 5671340872;
+	Mon, 12 Oct 2026 23:34:07 +0200 (CEST)
 Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 66D4A1FBB13;
-	Mon, 12 Oct 2026 23:34:01 +0200 (CEST)
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 4947F1F9691;
+	Mon, 12 Oct 2026 23:34:07 +0200 (CEST)
 Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
  by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10032)
- with ESMTP id 1Qv9z5-zLEFU; Mon, 12 Oct 2026 23:34:00 +0200 (CEST)
+ with ESMTP id gluUomYqpNVj; Mon, 12 Oct 2026 23:34:01 +0200 (CEST)
 Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 6EECD1F926A;
-	Mon, 12 Oct 2026 23:34:00 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz 6EECD1F926A
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id CE7481F8B81;
+	Mon, 12 Oct 2026 23:34:01 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz CE7481F8B81
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tngtech.com;
-	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1791840840;
-	bh=Cp4amg3RgLgQYI5lK9GIOUW99mWFn3alw5lseBajUpo=;
+	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1791840841;
+	bh=O0HT2uO2dQUHBGtTflZIrdiSJriKh9q1D6EOZdgpEkM=;
 	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=hSdlTKyXoh+LkbIoFlMOSwj4WrZzINLtxrGSTEHifpfUYGtAvWETe5o40FsL1K5ou
-	 adI52GsbV5seJu2rIzMvFpCnetV+u7RZQBVslRI/fLSfmXSNPzqHwt+vH4g346o66j
-	 5MV+/WU+guPAIabXQbagWijagBmUy4fpgenR5aA1kdOAvOmrofViTbR4AWw01pxwxV
-	 nXBvMBo9ZMk+ZvlybFQm3hNHIETGJpuJudPWJqddZ8dCQNzHkFcAslLUhojKxkHVcb
-	 iZERl496xDGl41NkoPz4Y1NrOibGMJoTCfl3pKDQHjDKxabEjv4hiMb4IG33H3Ua1z
-	 bLukkHLH2nJ/Q==
+	b=D3Kh1+WgNVkOOFQJaEuDtXgcULTKQ7jN7tpzxB9wU4TNXgVkvQzcejvazwjaFSRa/
+	 zdUimqDwr+7O7ubl8wBHYNqFGj7uqSC6z55ViqVqzWqnUtUn1bUpH8e1oAx9xbDe0B
+	 uPa3EECuhin1onOdxdSsZYs1UVi66k12+IbIy9VAdTwLIExuJ9T/nxZvcU0e3+UJ2x
+	 NxzW0LsZoacUHibSgrxQNGsVzTv/+DZdnF9CovEzQQLhl5uQ/iJ49P/JKLQXk8wWtJ
+	 01x2b+DZQzIFS2gIrcgIR9CJL4Kg+4DeOpj6XQS/7Ge3ltCrM8YyFPuNdP3N84d2rw
+	 EPrZo/bH2EPfA==
 X-Virus-Scanned: amavis at zmproxy.tng.vnc.biz
 Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
  by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10026)
- with ESMTP id XIizdiVugK1q; Mon, 12 Oct 2026 23:34:00 +0200 (CEST)
+ with ESMTP id YcLVIhNi12WL; Mon, 12 Oct 2026 23:34:01 +0200 (CEST)
 Received: from luis-Precision-5480.. (ipservice-092-209-236-032.092.209.pools.vodafone-ip.de [92.209.236.32])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id 0D6E21F8B42;
-	Mon, 12 Oct 2026 23:34:00 +0200 (CEST)
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id 61C321F9691;
+	Mon, 12 Oct 2026 23:34:01 +0200 (CEST)
 From: Luis Augenstein <luis.augenstein@tngtech.com>
 To: nathan@kernel.org,
 	nsc@kernel.org
@@ -56,9 +56,9 @@ Cc: linux-kbuild@vger.kernel.org,
 	kstewart@linuxfoundation.org,
 	maximilian.huber@tngtech.com,
 	Luis Augenstein <luis.augenstein@tngtech.com>
-Subject: [PATCH v3 5/7] scripts/sbom: parse make_prereqs from .cmd files
-Date: Mon, 12 Oct 2026 23:33:20 +0200
-Message-ID: <20261012213337.2466524-6-luis.augenstein@tngtech.com>
+Subject: [PATCH v3 6/7] scripts/sbom: use make_prereqs to determine build inputs
+Date: Mon, 12 Oct 2026 23:33:21 +0200
+Message-ID: <20261012213337.2466524-7-luis.augenstein@tngtech.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261012213337.2466524-1-luis.augenstein@tngtech.com>
 References: <20261012213337.2466524-1-luis.augenstein@tngtech.com>
@@ -71,179 +71,295 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-Add support for parsing the make_prereqs_<target> field recorded by
-kbuild in .cmd files.
+Build the list of file dependencies of a target from the
+make_prereqs_<target> field and the deps_<target> entries of the .cmd
+file instead of parsing the shell command stored in savedcmd_.
 
-Refactor CmdFile.create() to collect the required fields by name
-instead of deriving the file structure from the number of lines and
-the position.
-
-The source_ entry is no longer parsed, because it is always also
-included in make_prereqs_<target> and therefore redundant for
-KernelSbom.
+The prerequisites include more than KernelSbom wants to track: files
+should be tracked if they end up in the kernel image or loadable
+modules, but not each and every host tool or helper script used to
+build them. Add a manually maintained exclude list for such
+dependencies. It is still manual, but much easier to maintain than
+the command-specific parsers that were needed to extract the relevant
+inputs from each individual build command.
 
 Assisted-by: LLM
 Co-developed-by: Maximilian Huber <maximilian.huber@tngtech.com>
 Signed-off-by: Maximilian Huber <maximilian.huber@tngtech.com>
 Signed-off-by: Luis Augenstein <luis.augenstein@tngtech.com>
 ---
- scripts/sbom/sbom/cmd_graph/cmd_file.py | 103 +++++++++---------------
- 1 file changed, 36 insertions(+), 67 deletions(-)
+ scripts/sbom/sbom/cmd_graph/cmd_file.py       | 46 ++-----------
+ .../sbom/sbom/cmd_graph/dependency_filter.py  | 59 +++++++++++++++++
+ scripts/sbom/sbom/spdx_graph/kernel_file.py   | 64 ++++++++++++-------
+ 3 files changed, 105 insertions(+), 64 deletions(-)
+ create mode 100644 scripts/sbom/sbom/cmd_graph/dependency_filter.py
 
 diff --git a/scripts/sbom/sbom/cmd_graph/cmd_file.py b/scripts/sbom/sbom/=
 cmd_graph/cmd_file.py
-index 08819b4d117..cc576c7c6be 100644
+index cc576c7c6be..ab4b00b252b 100644
 --- a/scripts/sbom/sbom/cmd_graph/cmd_file.py
 +++ b/scripts/sbom/sbom/cmd_graph/cmd_file.py
-@@ -10,97 +10,66 @@ import sbom.sbom_logging as sbom_logging
+@@ -5,7 +5,7 @@ import os
+ import re
+ from dataclasses import dataclass, field
+ from sbom.cmd_graph.deps_parser import parse_cmd_file_deps
+-from sbom.cmd_graph.savedcmd_parser import parse_inputs_from_commands
++from sbom.cmd_graph.dependency_filter import should_include_dependency
+ import sbom.sbom_logging as sbom_logging
  from sbom.path_utils import PathStr
 =20
- SAVEDCMD_PATTERN =3D re.compile(r"^(saved)?cmd_.*?:=3D\s*(?P<full_comman=
-d>.+)$")
--SOURCE_PATTERN =3D re.compile(r"^source.*?:=3D\s*(?P<source_file>.+)$")
-+MAKE_PREREQS_PATTERN =3D re.compile(r"^make_prereqs_.*?:=3D\s*(?P<prereq=
-s>.+)$")
-+DEPS_ASSIGNMENT_PATTERN =3D re.compile(r"^deps_.*?:=3D")
-=20
-=20
- @dataclass
- class CmdFile:
-     cmd_file_path: PathStr
-     savedcmd: str
--    source: PathStr | None =3D None
-+    make_prereqs: list[str] =3D field(default_factory=3Dlist)
-     deps: list[str] =3D field(default_factory=3Dlist)
--    make_rules: list[str] =3D field(default_factory=3Dlist)
-=20
-     @classmethod
-     def create(cls, cmd_file_path: PathStr) -> "CmdFile | None":
--        """
--        Parses a .cmd file.
--        .cmd files are assumed to have one of the following structures:
--        1. Full Cmd File
--            (saved)?cmd_<output> :=3D <command>
--            source_<output> :=3D <main_input>
--            deps_<output> :=3D \
--            <dependencies>
--            <output> :=3D $(deps_<output>)
--            $(deps_<output>):
--
--        2. Command Only Cmd File
--            (saved)?cmd_<output> :=3D <command>
--
--        3. Single Dependency Cmd File
--            (saved)?cmd_<output> :=3D <command>
--            <output> : <dependency>
-+        r"""
-+        Parse the following fields from a `.cmd` file:
-+
-+        * `(saved)?cmd_<target> :=3D <shell command>` (required) =E2=80=94
-+          the shell command Kbuild ran to produce the build target.
-+        * `make_prereqs_<target> :=3D <prerequisites>` (required but can=
- be empty) =E2=80=94
-+          the non-phony make prerequisites.
-+        * `deps_<target> :=3D \` (optional) =E2=80=94
-+          additional dependencies not covered by make prerequisites, e.g=
-., headers.
-=20
-         Args:
--            cmd_file_path (Path): absolute Path to a .cmd file
-+            cmd_file_path (Path): absolute Path to a `.cmd` file.
-=20
+@@ -85,51 +85,17 @@ class CmdFile:
          Returns:
--            cmd_file (CmdFile): Parsed cmd file.
-+            cmd_file (CmdFile): Parsed `.cmd` file or `None` if no `save=
-dcmd` line was found.
+             list[PathStr]: dependency file paths relative to `obj_tree`.
          """
-         with open(cmd_file_path, "rt", encoding=3D"utf-8") as f:
-             lines =3D [line.strip() for line in f.readlines() if line.st=
-rip() !=3D "" and not line.startswith("#")]
+-        input_files: list[PathStr] =3D [
+-            str(p) for p in parse_inputs_from_commands(self.savedcmd, fa=
+il_on_unknown_build_command)
+-        ]
++        input_files: list[PathStr] =3D list(self.make_prereqs)
++
+         if self.deps:
+             input_files +=3D [str(p) for p in parse_cmd_file_deps(self.d=
+eps)]
+-        input_files =3D _expand_resolve_files(input_files, obj_tree)
 =20
--        # make_prereqs_* is recorded for future use. Ignore it for now t=
-o
--        # preserve the existing parser behavior.
--        lines =3D [line for line in lines if not line.startswith("make_p=
-rereqs_")]
-+        savedcmd: str | None =3D None
-+        make_prereqs: list[str] =3D []
-+        deps: list[str] =3D []
-+
-+        for i, line in enumerate(lines):
-+            match =3D SAVEDCMD_PATTERN.match(line)
-+            if match is not None:
-+                savedcmd =3D match.group("full_command")
-+                continue
-+
-+            match =3D MAKE_PREREQS_PATTERN.match(line)
-+            if match is not None:
-+                make_prereqs =3D match.group("prereqs").split()
-+                continue
-=20
--        # savedcmd
--        match =3D SAVEDCMD_PATTERN.match(lines[0] if lines else "")
--        if match is None:
-+            if DEPS_ASSIGNMENT_PATTERN.match(line):
-+                j =3D i + 1
-+                while j < len(lines) and lines[j].endswith("\\"):
-+                    deps.append(lines[j].removesuffix("\\").strip())
-+                    j +=3D 1
-+
-+        if savedcmd is None:
-             sbom_logging.error(
-                 "Skip parsing '{cmd_file_path}' because no 'savedcmd_' c=
-ommand was found.", cmd_file_path=3Dcmd_file_path
-             )
-             return None
--        savedcmd =3D match.group("full_command")
+         cmd_file_dependencies: list[PathStr] =3D []
+         for input_file in input_files:
+-            # input files are either absolute or relative to the object =
+tree
++            # input files are either absolute or already relative to the=
+ object tree
+             if os.path.isabs(input_file):
+                 input_file =3D os.path.relpath(input_file, obj_tree)
+-            if input_file =3D=3D target_path:
+-                # Skip target file to prevent cycles. This is necessary =
+because some multi stage commands first create an output and then pass it=
+ as input to the next command, e.g., objcopy.
+-                continue
+-            cmd_file_dependencies.append(input_file)
++            if should_include_dependency(input_file):
++                cmd_file_dependencies.append(input_file)
+         unique_cmd_file_dependencies =3D list(dict.fromkeys(cmd_file_dep=
+endencies))
+         return unique_cmd_file_dependencies
 -
--        # Command Only Cmd File
--        if len(lines) =3D=3D 1:
--            return CmdFile(cmd_file_path, savedcmd)
 -
--        # Single Dependency Cmd File
--        if len(lines) =3D=3D 2:
--            parts =3D lines[1].split(":", 1)
--            if len(parts) !=3D 2:
--                sbom_logging.error(
--                    "Skip parsing '{cmd_file_path}'. Expected dependency=
- line '<output>: <dependency>' but got {second_line}", cmd_file_path=3Dcm=
-d_file_path, second_line=3Dlines[1]
--                )
--                return None
--            dep =3D parts[1].strip()
--            return CmdFile(cmd_file_path, savedcmd, deps=3D[dep])
+-def _expand_resolve_files(input_files: list[PathStr], obj_tree: PathStr)=
+ -> list[PathStr]:
+-    """
+-    Expands resolve files which may reference additional files via '@' n=
+otation.
 -
--        # Full Cmd File
--        # source
--        line1 =3D SOURCE_PATTERN.match(lines[1])
--        if line1 is None:
+-    Args:
+-        input_files (list[PathStr]): List of file paths relative to the =
+object tree, where paths starting with '@' refer to files
+-                                     containing further file paths, each=
+ on a separate line.
+-        obj_tree: Absolute path to the root of the object tree.
+-
+-    Returns:
+-        list[PathStr]: Flattened list of all input file paths, with any =
+nested '@' file references resolved recursively.
+-    """
+-    expanded_input_files: list[PathStr] =3D []
+-    for input_file in input_files:
+-        if not input_file.startswith("@"):
+-            expanded_input_files.append(input_file)
+-            continue
+-        resolve_file_path =3D os.path.join(obj_tree, input_file.removepr=
+efix("@"))
+-        if not os.path.exists(resolve_file_path):
 -            sbom_logging.error(
--                "Skip parsing '{cmd_file_path}' because no 'source_' ent=
-ry was found.", cmd_file_path=3Dcmd_file_path
+-                "Skip resolving '{resolve_file_path}' because the respon=
+se file does not exist.",
+-                resolve_file_path=3Dresolve_file_path,
 -            )
--            return CmdFile(cmd_file_path, savedcmd)
--        source =3D line1.group("source_file")
--
--        # deps
--        deps: list[str] =3D []
--        i =3D 3  # lines[2] includes the variable assignment but no actu=
-al dependency, so we need to start at lines[3].
--        while i < len(lines):
--            if not lines[i].endswith("\\"):
--                break
--            deps.append(lines[i][:-1].strip())
--            i +=3D 1
--
--        # make_rules
--        make_rules =3D lines[i:]
-=20
--        return CmdFile(cmd_file_path, savedcmd, source, deps, make_rules=
+-            continue
+-        with open(resolve_file_path, "rt", encoding=3D"utf-8") as f:
+-            resolve_file_content =3D [line_stripped for line in f.readli=
+nes() if (line_stripped :=3D line.strip())]
+-        expanded_input_files +=3D _expand_resolve_files(resolve_file_con=
+tent, obj_tree)
+-    return expanded_input_files
+diff --git a/scripts/sbom/sbom/cmd_graph/dependency_filter.py b/scripts/s=
+bom/sbom/cmd_graph/dependency_filter.py
+new file mode 100644
+index 00000000000..f1fdc2cb965
+--- /dev/null
++++ b/scripts/sbom/sbom/cmd_graph/dependency_filter.py
+@@ -0,0 +1,59 @@
++# SPDX-License-Identifier: GPL-2.0-only OR MIT
++# Copyright (C) 2025 TNG Technology Consulting GmbH
++
++import re
++
++from sbom.path_utils import PathStr
++
++# Regex patterns for dependencies that should not be tracked in the depe=
+ndency graph.
++_COMPILED_EXCLUDE_PATTERNS: tuple[re.Pattern[str], ...] =3D (
++    # scripts in source tree (except module-common.c, which is compiled =
+into every module)
++    re.compile(r"^\.\./scripts/(?!module-common\.c$)"),
++    # scripts and tools in obj tree
++    re.compile(r"^scripts/"),
++    re.compile(r"^tools/"),
++    re.compile(r"^arch/[^/]+/tools/"),
++    # Host helper scripts
++    re.compile(r".*\.sh$"),
++    re.compile(r".*\.py$"),
++    re.compile(r".*\.pl$"),
++    # Host-tool executables
++    re.compile(r"^certs/extract-cert$"),
++    re.compile(r"^security/selinux/genheaders$"),
++    re.compile(r"^usr/gen_init_cpio$"),
++    re.compile(r"^drivers/gpu/drm/radeon/mkregtable$"),
++    re.compile(r"^drivers/video/logo/pnmtologo$"),
++    re.compile(r"^lib/raid/raid6/mktables$"),
++    re.compile(r"^\.\./fs/smb/client/gen_smb1_mapping$"),
++    re.compile(r"^\.\./fs/smb/client/gen_smb2_mapping$"),
++    # Other
++    re.compile(r".*\.xsd$"),
++    re.compile(r".*purgatory\.chk$"),
++    re.compile(r".*\.genkey$"),
++    re.compile(r".*\.md$"),
++    re.compile(r"^include/config/"),
++    # x86
++    re.compile(r"^arch/x86/boot/compressed/mkpiggy$"),
++    re.compile(r"^arch/x86/boot/mkcpustr$"),
++    # arm
++    re.compile(r"^arch/arm/vdso/vdsomunge$"),
++    # arm64
++    re.compile(r"^arch/arm64/kvm/hyp/nvhe/gen-hyprel$"),
++    re.compile(r"^arch/arm64/kernel/pi/relacheck$"),
++)
++
++def should_include_dependency(path: PathStr) -> bool:
++    """
++    Return whether a `.cmd` dependency should appear in the tracked depe=
+ndency graph.
++
++    Track files that are inputs to compiling or linking artifacts that e=
+nd up in the
++    kernel image or loadable modules (e.g. source =E2=86=92 object =E2=86=
+=92 archive =E2=86=92 image/module).
++    Exclude host tools and helper scripts whose code is not linked into =
+the kernel.
++
++    Args:
++        path: Dependency path relative to the object tree.
++
++    Returns:
++        True if the dependency should be included in the dependency grap=
+h.
++    """
++    return not any(pattern.match(path) for pattern in _COMPILED_EXCLUDE_=
+PATTERNS)
+diff --git a/scripts/sbom/sbom/spdx_graph/kernel_file.py b/scripts/sbom/s=
+bom/spdx_graph/kernel_file.py
+index 505f25f66eb..cea14cb3538 100644
+--- a/scripts/sbom/sbom/spdx_graph/kernel_file.py
++++ b/scripts/sbom/sbom/spdx_graph/kernel_file.py
+@@ -245,7 +245,7 @@ def _get_primary_purpose(absolute_path: PathStr) -> S=
+oftwarePurpose | None:
+         return any(segment in absolute_path for segment in path_segments=
 )
-+        return CmdFile(cmd_file_path, savedcmd, make_prereqs, deps)
 =20
-     def get_dependencies(
-         self: "CmdFile", target_path: PathStr, obj_tree: PathStr, fail_o=
-n_unknown_build_command: bool
+     # Source code
+-    if ends_with([".c", ".h", ".S", ".s", ".rs", ".pl", "gen_smb1_mappin=
+g", "gen_smb2_mapping"]):
++    if ends_with([".c", ".h", ".S", ".s", ".rs"]):
+         return "source"
+=20
+     # Libraries
+@@ -271,45 +271,61 @@ def _get_primary_purpose(absolute_path: PathStr) ->=
+ SoftwarePurpose | None:
+     # Data files
+     if ends_with(
+         [
+-            ".tbl",
+-            ".relocs",
+-            ".rmeta",
+-            ".in",
++            ".awk",
+             ".dbg",
+-            ".x509",
+-            ".pbm",
+-            ".ppm",
+             ".dtb",
+-            ".uc",
+-            ".inc",
++            ".dtbo",
+             ".dts",
+             ".dtsi",
+-            ".dtbo",
+-            ".xml",
++            ".dtso",
++            ".in",
++            ".inc",
++            ".json",
++            ".ld",
++            ".lds",
++            ".mod",
++            ".order",
++            ".pbm",
++            ".ppm",
++            ".relocs",
++            ".rmeta",
+             ".ro",
+-            "initramfs_inc_data",
+-            "default_cpio_list",
+-            "x509_certificate_list",
+-            "utf8data.c_shipped",
++            ".tbl",
++            ".uc",
++            ".x509",
++            ".xml",
+             "blacklist_hash_list",
+-            "x509_revocation_list",
+             "cpucaps",
+-            "sysreg",
++            "default_cpio_list",
++            "initramfs_inc_data",
++            "kheaders.md5",
++            "kheaders-objlist",
++            "kheaders-srclist",
+             "mach-types",
++            "sysreg",
++            "utf8data.c_shipped",
++            "x509_certificate_list",
++            "x509_revocation_list",
+         ]
+     ) or includes_path_segments(["drivers/gpu/drm/radeon/reg_srcs/"]):
+         return "data"
+=20
+     # Configuration files
+-    if ends_with([".pem", ".key", ".conf", ".config", ".cfg", ".bconf"])=
+:
++    if ends_with([
++        ".pem",
++        ".key",
++        ".conf",
++        ".config",
++        ".cfg",
++        ".bconf",
++        "config_data",
++        ".genkey",
++        "bindgen_parameters",
++    ]):
+         return "configuration"
+=20
+-    # Documentation
+-    if ends_with([".md"]):
+-        return "documentation"
+-
+     # Other / miscellaneous
+-    if ends_with([".o", ".tmp"]):
++    if ends_with([".o"]):
+         return "other"
+=20
+     sbom_logging.warning("Could not infer primary purpose for {absolute_=
+path}", absolute_path=3Dabsolute_path)
 --=20
 2.43.0
 
