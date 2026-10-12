@@ -1,53 +1,37 @@
-Received: from mailout.tng.vnc.biz (mailout.tng.vnc.biz [34.107.87.41])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 273B33B1014;
-	Mon, 12 Oct 2026 21:41:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=34.107.87.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6146B3A6B66;
+	Mon, 12 Oct 2026 21:49:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791841279; cv=none; b=FuzTKsQsKLvXVHXxBKDiE/O8DLvUenaBFiTtvPhOnpcT8PWB6VpPRC+gwvRwSpnIpVu7NtRx+5EDJcMIBgTMN0L76lNzxm4p7UKef6i1UEQnYs/jiJbBdk5GiQ+qI+b2BJR4qRQ0KiX/hsJgkNUFZOJ9jZLKGr70WVwsi94Tl1Q=
+	t=1791841745; cv=none; b=MCR50mYXC2g+3Ss+OA+tPJOYVJDZKgtr/J14HOVJFm5Kk/LcpUyGjdREm/ry3ARjGGjcvvIhMiDivuXN9uR6cosjWezzKCgDBrhgm1pgzgRHRDGorCCVLbhVjLVuTK8aa5U6RGlNfjoj5IbvspZ6YpL5e7PLq08v9Y+Kva+J3aE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791841279; c=relaxed/simple;
-	bh=x4JGecdDsF/yRefqyD8CcjqO9XsCf73PS5Mec3hJkkY=;
+	s=arc-20240116; t=1791841745; c=relaxed/simple;
+	bh=9O+S18ohAa+SRT4nMaiVCkc2ADc0xfm/vCDAJ+1cTq4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iYFPir4glPEBzinfvefRzF/DsHLKFA2iuXmfLqsd9xwO/824Y5sX99hbo8WcDL9UgqNiwAEbhEr89ukXHSR4m4+DtBLUJWJpeWIrIs0oh53Yef240eF++tIqZR8w5a6u3OS+kTEEm+JGgQGOH/We7ZiyeNJI+M9GNAbdrSi3+9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com; spf=pass smtp.mailfrom=tngtech.com; dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b=I0FnHLBJ; arc=none smtp.client-ip=34.107.87.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tngtech.com
+	 In-Reply-To:Content-Type; b=YH22WY3oeoThtfKM+nhztHZP3m9n4vXHQB/ZUUA9Lnt1XgwKIyfcti6rw6kgfQhmNr30pFHmN5ASUYQ/tnlZskBq0UhwVmx/e7en75HHtzkB//lgZx4rwJjhHnpSz1cB2oaprqpE1nQpYfeTwRlSbdYFlDs5wpMbJGT0I2B3Hdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io; spf=pass smtp.mailfrom=gtucker.io; dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b=gLUx9aJu; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gtucker.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gtucker.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.b="I0FnHLBJ"
-Received: from zmproxy.tng.vnc.biz (zmproxy.tng.vnc.biz [172.16.1.23])
-	by mailout.tng.vnc.biz (Postfix) with ESMTPS id 4A60640882;
-	Mon, 12 Oct 2026 23:33:15 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 2AFF91F8B42;
-	Mon, 12 Oct 2026 23:33:15 +0200 (CEST)
-Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
- by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10032)
- with ESMTP id UxWMxzcWZyv4; Mon, 12 Oct 2026 23:33:14 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 925111F8B81;
-	Mon, 12 Oct 2026 23:33:14 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz 925111F8B81
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tngtech.com;
-	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1791840794;
-	bh=x4JGecdDsF/yRefqyD8CcjqO9XsCf73PS5Mec3hJkkY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=I0FnHLBJggEn6rM8SEnLP8RUK39kFmY7SNcpxYiqFYZ69qvsaaGXhu/srQEncMdE/
-	 44+KUHjrdhfdC6/GQ5NhRqMdEPwuzheYjsR4EKK6rT6n0n0vW7pQ3pyBQFN3q9VGKB
-	 Cy+r/P/CW0gynSgzxar9ZG5H7imd33cLOjhDpXyu02tc6mtrd8Y9L1xJK1UE0fsWMd
-	 zY1TXxl8jWrBCqjyEnkv4pUHjdHoPd0ILwvxgQdtP0h3aY8C/e5S8Mo2QNheu+FZT/
-	 x1CTnOGmBwqsY8Hgl+N/Wn93khR7hIfApdYzx7KqDs82CRBk6D6LhwluKLrdHmesQi
-	 nxCnNkJ1OorNA==
-X-Virus-Scanned: amavis at zmproxy.tng.vnc.biz
-Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
- by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10026)
- with ESMTP id UBzVyURaKXBP; Mon, 12 Oct 2026 23:33:14 +0200 (CEST)
-Received: from [192.168.0.168] (ipservice-092-209-236-032.092.209.pools.vodafone-ip.de [92.209.236.32])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id 037781F8B42;
-	Mon, 12 Oct 2026 23:33:13 +0200 (CEST)
-Message-ID: <0e867541-15f9-49e6-8753-3a9e2f2f0e55@tngtech.com>
-Date: Mon, 12 Oct 2026 23:33:13 +0200
+	dkim=pass (2048-bit key) header.d=gtucker.io header.i=@gtucker.io header.b="gLUx9aJu"
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 3B0C93E999;
+	Mon, 12 Oct 2026 21:48:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gtucker.io; s=gm1;
+	t=1791841740;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FfsCaxlmAmcvq19B1+qtzJN0P3yMbGAFyPsksLli2yQ=;
+	b=gLUx9aJuNgxFyIUIbnYuPTldKuqQCfbTPojdP3mwZ93EriGQcTnFMRp+zPDsFxQgCrfe+U
+	U2rHqdcwbDnAg70FOfjfgH3LD0z+4blCpeSwllqODTv7wbXAxMY7f+iMf/0kl9KvwINhiB
+	71jEQN5B9P7w12Gb1NKVQuNuGUHcYX8MTIjLvJ2NvQIZ69WEuRFQRiAmnn9RVeNM3ZIGCc
+	whm/68RVLbrGmLHZawkt1m+5dj1z2fGQYsTONafbeyrYmIuP4xOaCGhjjiJLTbUaiIUWN/
+	SiVEYsvAezZ/Fnqppa7ljaTtW+p+CmQC01ghcV3djHkrw+qGfNtkVz2mx2Q3zQ==
+Message-ID: <d3237240-0de8-46d4-b58b-5a3a12fe4840@gtucker.io>
+Date: Mon, 12 Oct 2026 23:48:57 +0200
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -55,103 +39,152 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/1] kbuild: record real-prereqs in .cmd files
-To: Nicolas Schier <nsc@kernel.org>
-Cc: nathan@kernel.org, linux-kbuild@vger.kernel.org,
- linux-kernel@vger.kernel.org, akpm@linux-foundation.org,
- gregkh@linuxfoundation.org, kstewart@linuxfoundation.org,
- maximilian.huber@tngtech.com
-References: <20260828085441.156386-1-luis.augenstein@tngtech.com>
- <20260828085441.156386-2-luis.augenstein@tngtech.com>
- <179138436214.145576.15291381959921627967.b4-review@b4>
+Subject: Re: [PATCH 2/2] Documentation: dev-tools: cover registry option in
+ container.rst
+To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Miguel Ojeda <ojeda@kernel.org>
+Cc: =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>,
+ linux-doc@vger.kernel.org, workflows@vger.kernel.org,
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <06ee7c694c3e9716bff5c9b1b8e9dc95cc0b38d3.1791751900.git.gtucker@gtucker.io>
+ <d7d6735e4b287ae0cb6f873ee8763820cb6e1d7e.1791751900.git.gtucker@gtucker.io>
 Content-Language: en-US
-From: Luis Augenstein <luis.augenstein@tngtech.com>
-In-Reply-To: <179138436214.145576.15291381959921627967.b4-review@b4>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------WUDau7rggS0wnMLuJQoepf6r"
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------WUDau7rggS0wnMLuJQoepf6r
-Content-Type: multipart/mixed; boundary="------------ujhBl5tJLzD6ko0SoR8CmkWF";
- protected-headers="v1"; hp="clear"
-Message-ID: <0e867541-15f9-49e6-8753-3a9e2f2f0e55@tngtech.com>
-Date: Mon, 12 Oct 2026 23:33:13 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/1] kbuild: record real-prereqs in .cmd files
-To: Nicolas Schier <nsc@kernel.org>
-Cc: nathan@kernel.org, linux-kbuild@vger.kernel.org,
- linux-kernel@vger.kernel.org, akpm@linux-foundation.org,
- gregkh@linuxfoundation.org, kstewart@linuxfoundation.org,
- maximilian.huber@tngtech.com
-References: <20260828085441.156386-1-luis.augenstein@tngtech.com>
- <20260828085441.156386-2-luis.augenstein@tngtech.com>
- <179138436214.145576.15291381959921627967.b4-review@b4>
-Content-Language: en-US
-From: Luis Augenstein <luis.augenstein@tngtech.com>
-In-Reply-To: <179138436214.145576.15291381959921627967.b4-review@b4>
-
---------------ujhBl5tJLzD6ko0SoR8CmkWF
+From: Guillaume Tucker <gtucker@gtucker.io>
+In-Reply-To: <d7d6735e4b287ae0cb6f873ee8763820cb6e1d7e.1791751900.git.gtucker@gtucker.io>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: gtucker@gtucker.io
+X-GND-Cause: dmFkZTE0jojyXgEUHXX0d8eRXkelO3JGbn4IXQXnMYmpdj9XbD/qUxwqWX2CDnIQN6FbJQVWtTd5mStCLbA8n5c1DZ4t+eaSIA1GBTKssV75K0AdeuwX+qA2VQcc8l0PeC1pYz9ofLjXNqTkiROngoLbdR5/2jAsEHYKKDqPjq6WryD7YCL+9O2Euhofp5Vk6sfe6EBXFSYXCGSdSUSfXjJaGDpL5080jPTQiQ1oBbBNJ+cRGOTT9LarMwITY5qt9LfLju6Lqx49ITD8NjllaG6p05txA9FILob9OQ9450XNJe5Fx6b4BCUFTqkbin3p1PeI0Vb3OEgk4heo98PwBCdF35GnNjGy7FQAhJOu9lwl2R5YWMZOr7oVNsynRVWZG0MRFRK77d09euIYVDBmQxX2BRBmBR1rWAQUnqcVo+8S5E/Z2Jg9kj6BiqcbHASvwZKq13foxPziMvbMsoZ5W+z2mB/7ygRwPFtFF55bChQkUV7aLI9BHQMgo0HVLnedcYywyiuRirsMEZRXKx9p2Km5UmwkLm22rwy8tMc10oW26y152FU2vJwLmFWi7rXwoaTaKHHkPTPfI8+2fksAhR3dlpVn32/AIcUQeiEOlc7cB2Ox2qPWo/iDm2WlEfZ1LzMn9KbqSki2n/wqN9cRag88eUAQy9nxeBD2XAZBkk7lRDmZwQ
+X-GND-State: clean
+X-GND-Score: -100
 
-T24gMTAvNy8yNiAxNjo0NiwgTmljb2xhcyBTY2hpZXIgd3JvdGU6DQo+PiBSZWNvcmQgJChy
-ZWFsLXByZXJlcXMpLCB0aGUgbm9uLXBob255IHByZXJlcXVpc2l0ZXMgb2YgdGhlIHRhcmdl
-dCwgaW4gYQ0KPj4gbmV3IG1ldGFkYXRhIGZpZWxkOg0KPj4NCj4+ICAgICAgbWFrZV9wcmVy
-ZXFzXzx0YXJnZXQ+IDo9IDxwcmVyZXF1aXNpdGVzPg0KPj4NCj4+IFdyaXRlIHRoZSBmaWVs
-ZCBmcm9tIGJvdGggY21kX2FuZF9zYXZlY21kIGFuZCBjbWRfYW5kX2ZpeGRlcC4NCj4+DQo+
-PiBVcGRhdGUgc2NyaXB0cy9tYWtlX2ZpdC5weSB0byByZWFkIG9ubHkgc2F2ZWRjbWRfKiBp
-bnN0ZWFkIG9mIHBhcnNpbmcgdGhlDQo+PiBjb21wbGV0ZSAuY21kIGZpbGUuDQo+IA0KPiBU
-aGlzIHNvdW5kcyBsaWtlIGEgZ29vZCB0aGluZzsgYnV0IEkgY2FuJ3QgZmluZCB0aGF0IGlu
-IHRoZSBkaWZmLg0KDQpJdCdzIHRoZSBmaXJzdCBzZWN0aW9uIGluIHRoZSBkaWZmIGluIHNj
-cmlwdHMvS2J1aWxkLmluY2x1ZGUuDQpUaGUgb3JpZ2luYWwgc2VudGVuY2UgbWlnaHQgaGF2
-ZSBiZWVuIGEgYml0IHVuY2xlYXIgdGhvdWdoLg0KJChjbWQtcHJlcmVxcykgaXMgdGhlIG5l
-dyB2YXJpYWJsZSB0aGF0IGlzIGFjdHVhbGx5IHVzZWQgYnkNCmNtZF9hbmRfc2F2ZWNtZCBh
-bmQgY21kX2FuZF9maXhkZXAuIEhvd2V2ZXIsIHNpbmNlICQoY21kLXByZXJlcXMpIGlzDQpq
-dXN0ICQocmVhbC1wcmVyZXFzKSB3aXRoICQoZGVwc18pIGZpbHRlcmVkIG91dCwgSSBvbWl0
-dGVkIHRoaXMNCmludGVybWVkaWF0ZSBzdGVwIGluIHRoZSBkZXNjcmlwdGlvbi4gSSB3aWxs
-IHJlcGhyYXNlIGl0IGluIHYzIHRvIG1ha2UNCml0IG1vcmUgY2xlYXIuDQoNCj4gV2h5IGRv
-IHlvdSBkZWZlciB0aGUgYWN0dWFsIGltcGxlbWVudGF0aW9uIGluIHRoZSBTQk9NIHNjcmlw
-dHM/ICBGcm9tIG15DQo+IHBvaW50IG9mIHZpZXcsIHRoZSBpbnRyb2R1Y3Rpb24gb2YgJ21h
-a2VfcHJlcmVxc188dGFyZ2V0PicgbG9va3MgZ29vZA0KPiBhbmQgSSBkb24ndCBzZWUgYSBy
-ZWFzb24gZm9yIHdhaXRpbmcgd2l0aCB0aGUgY29ycmVzcG9uZGluZyBTQk9NDQo+IGltcGxl
-bWVudGF0aW9uLg0KDQpJIHRob3VnaHQgaXQgd291bGQgYmUgYSBzZW5zaWJsZSBib3VuZGFy
-eSB0byBmaXJzdCBjaGFuZ2UgS2J1aWxkIGFuZA0KdGhlbiBzZXBhcmF0ZWx5IHVwZGF0ZSB0
-aGUgU0JPTSB0b29sIHRvIHVzZSB0aGUgbmV3IGluZm9ybWF0aW9uIHRoZQ0KLmNtZCBmaWxl
-cyBvZmZlci4gQWxzbywgd2hlbiBJIHBvc3RlZCB0aGlzIHNlcmllcywgSSBzaW1wbHkgZGlk
-bid0DQpoYXZlIHRoZSBTQk9NIHBhdGNoZXMgZmluaXNoZWQgeWV0LiBCeSBub3cgdGhleSBh
-cmUgcmVhZHkgZm9yIHJldmlldw0KYXMgd2VsbCwgc28gSSB3aWxsIGluY2x1ZGUgdGhlbSBp
-biB2MyBvZiB0aGlzIHNlcmllcy4NCg0KdGhhbmtzLCBMdWlzDQoNCi0tIA0KTHVpcyBBdWdl
-bnN0ZWluICogbHVpcy5hdWdlbnN0ZWluQHRuZ3RlY2guY29tICogKzQ5MTUyMjUyNzU3NjEN
-ClRORyBUZWNobm9sb2d5IENvbnN1bHRpbmcgR21iSCwgQmV0YS1TdHIuIDEzLCA4NTc3NCBV
-bnRlcmbDtmhyaW5nDQpHZXNjaMOkZnRzZsO8aHJlcjogRHIuIFJvYmVydCBEYWhsa2UsIFRo
-b21hcyBFbmRyZXMsIE1vcml0eiBQcmlueg0KQXVmc2ljaHRzcmF0c3ZvcnNpdHplbmRlcjog
-SGVucmlrIEtsYWdnZXMNClNpdHo6IFVudGVyZsO2aHJpbmcgKiBSZWdpc3RlcmdlcmljaHQ6
-IEFtdHNnZXJpY2h0IE3DvG5jaGVuICogDQpIYW5kZWxzcmVnaXN0ZXJudW1tZXI6IEhSQiAx
-MzUwODINCg0K
+On 11/10/2026 10:54 pm, Guillaume Tucker wrote:
+> Add the corresponding documentation entry for the new --registry
+> command line option and TOML configuration file.  Update the examples
+> accordingly to show how this can be used to override a registry name
+> already defined within a default image name.
 
---------------ujhBl5tJLzD6ko0SoR8CmkWF--
+Sashiko wrote:
 
---------------WUDau7rggS0wnMLuJQoepf6r
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+ > Does the patch contain these examples?
+ >
+ > The commit message mentions showing how to override a registry name
+ > already defined within a default image name, but the examples added
+ > in the patch only show overriding the registry setting in the
+ > configuration file, not an embedded registry within an image
+ > string.
 
------BEGIN PGP SIGNATURE-----
+By 'default' I meant an image name that would be used without
+specifying it on the command line with the -i option.  That's not the
+same as the [DEFAULT] section in the TOML file.  But it's true it
+could be clarified by mentioning an image name from a profile section
+instead, so I'll reword this in the v2.
 
-wsF5BAABCAAjFiEEJzBrWn4qHw5a0jAXeVyKys3c+zQFAmrNUhkFAwAAAAAACgkQeVyKys3c+zSy
-9Q/9E35JMTXA0xqvYt8X5/r+aU900h180UCOQpPHw+YG0QiVRxgwOd8VYjE8uAmnTo3H7D+76/1j
-XCWZ3POn1fIebB+IRaSYrv0gFAlErHhHZlx0qdKH7XuhoWJLSMAz+F4mAd/U4BgaSRoCxw9dId9d
-12fjWghP7Tn/MpP2CtuC977/Twgitg/A/aURMy5kzzYjFwX9DzJXNM94mXy5mwNr6p+uf20aOWT+
-bMMgd/IoMXi6K5zm0UgQ6Hs8UNunN+E8tFKXUGj9EykSkBxjzb7qaMrlcaZZoZSAtHIPCZT1avNd
-+JbljSMXIKlriFwUIDnYzUZedZ/1wJ49A2EdROlk9UR4knQzK89mgSTOqpMZVceI/FzwLpX7BE3C
-PORyJBqYoYi6UI1WB/aYnPFIvGpU9STHQZIiFUVmiz5F4d38b0+xSnDBhoNeqP+jEc0/QMZX9zzf
-w2woicCX5g0yO4E35r9o5nTYhpy6hIg+/SDeeCtfh3JwY/uhQ7GE6pbnNryDQCy6wDiMaAWDMma0
-cTrOVQnIpeX4uC6Gn2F2ZZfR0Cnd3Yfdt3DUvswlaPxKTBP0qtSBVmSPmsCFIL8QGMEJFNb8JJFI
-BS7YeN2rcEWnA6oceVT9UDKdD3cXL7VO0uAagdBjiokDbvifZBmE0GSo4AF4CQGHCx7iFhc0dA4Z
-mas=
-=s3fU
------END PGP SIGNATURE-----
+> Signed-off-by: Guillaume Tucker <gtucker@gtucker.io>
+> ---
+>   Documentation/dev-tools/container.rst | 33 +++++++++++++++++++++++----
+>   1 file changed, 29 insertions(+), 4 deletions(-)
+> 
+> diff --git a/Documentation/dev-tools/container.rst b/Documentation/dev-tools/container.rst
+> index 5dde95f6b222..3f2ba1fcf3bf 100644
+> --- a/Documentation/dev-tools/container.rst
+> +++ b/Documentation/dev-tools/container.rst
+> @@ -48,6 +48,13 @@ Available options:
+>       Profile section to use in the config file.  This will override any values
+>       defined in the ``DEFAULT`` section.
+>   
+> +``-R, --registry REGISTRY``
+> +
+> +    Container registry name.
+> +
+> +    Any registry already included in the image name will be replaced or removed
+> +    when using this option with no value.
+> +
+>   ``-r, --runtime RUNTIME``
+>   
+>       Container runtime name.  Supported runtimes: ``podman``, ``docker``.
+> @@ -274,6 +281,15 @@ Supported options in each section are:
+>       Name of the container image to use, equivalent to the ``-i`` command line
+>       option.
+>   
+> +``registry``
+> +
+> +    Name of the container image registry to use, equivalent to the ``-R``
+> +    command line option.  This will be used as a prefix before the image name
+> +    with a ``/`` separator.
+> +
+> +    For example, a ``docker.io`` registry and a ``myuser/myimage`` image will
+> +    result in ``docker.io/myuser/myimage`` as the full image path.
+> +
+>   ``runtime``
+>   
+>       Name of the container runtime, equivalent to the ``-r`` command line option.
+> @@ -288,6 +304,7 @@ Here's a sample configuration with an extra ``clang`` profile::
+>   
+>     [DEFAULT]
+>     runtime = "podman"
+> +  registry = "docker.io"
+>     image = "tuxmake/korg-gcc"
+>   
+>     [clang]
+> @@ -306,10 +323,18 @@ Using the configuration file, it can now be simplified into this::
+>   
+>     scripts/container -p clang -- make defconfig
+>   
+> -Then to override the default user, the ``-u`` option can still be used::
+> +Then to override the default runtime, the ``-r`` option can still be used::
+> +
+> +  scripts/container -p clang -r docker -- make defconfig
+> +
+> +Likewise, to override the registry name::
+> +
+> +  scripts/container -p clang -R my.registry.com -- make defconfig
+> +
+> +Or to not use any registry at all but only a local image::
+>   
+> -  scripts/container -p clang -u0 -- make defconfig
+> +  scripts/container -p clang -R -- make defconfig
+>   
+> -This also illustrates how values take precedence over each other: the runtime
+> +This also illustrates how values take precedence over each other: the registry
+>   is loaded from the ``DEFAULT`` section, the image from the ``clang`` section
+> -and the user ID from the command line ``-u`` option.
+> +and the runtime from the command line ``-r`` option.
 
---------------WUDau7rggS0wnMLuJQoepf6r--
+Sashiko wrote:
+
+ > Does this explanation still match the example directly above it?
+ >
+ > The text explains that the registry is loaded from the DEFAULT
+ > section and the runtime from the command line -r option. However,
+ > the immediately preceding example is "scripts/container -p clang -R
+ > -- make defconfig", where the registry is explicitly cleared and
+ > there is no -r option used.
+
+I see the issue, registry and runtime were swapped in the sentence.
+This would be correct:
+
+     This also illustrates how values take precedence over each other:
+     the runtime is loaded from the ``DEFAULT`` section, the image
+     from the ``clang`` section and the registry removed via the
+     command line ``-R`` option.
+
+I'll fix this in the v2 as well.
+
+
+There were a couple of other comments already addressed in the first
+patch about using hostnames rather than domain names, so nothing
+further to add here about them.
+
+And if anyone is wondering why it's useful to be able to override the
+registry, a typical use case is when making modified images locally
+before pushing them to a registry or when pulling images from a
+development registry instead.  Say, in the TOML file a user can set
+some standard images to be pulled from a public registry.  Then when
+building a variant of an image, the user can just use the -R option
+to pick it up instead of editing the file or duplicating profile
+entries.  Validating the image names seems useful and it's a small
+extra to be able to override the registry part once it's all parsed
+into objects.  So it seems worth the extra few lines of code.
+
+Guillaume
