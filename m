@@ -1,108 +1,117 @@
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EECF36B927
-	for <linux-kbuild@vger.kernel.org>; Wed, 14 Oct 2026 14:51:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E4CC1E0DE8;
+	Wed, 14 Oct 2026 21:40:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791989469; cv=none; b=R8ANHyOmpbyFv+pmjhNZohee40hO5GX86nJ6MHno/DmcgT7cbIFa6UqjUClPh7Zg/eUG1eqeHZgN0JdBZ77W1DDSKrR9FHgPg9hxxLzWn/cS655HKzkZzPh/W0ViGVmM793IAhJyKjpxmNkGiAw8KIMJskAMsHfLgvgc9pXm/2s=
+	t=1792014049; cv=none; b=io2atN7AqtXIKgO3gb4JxLU3HsA/ci2/Vfbt3xoSSnrIqvtuKmZILR6+tn6zgnDKf+GrA/EjGzhcgxtLLaZY11nxDxmlV3kvyEY8fVTLdWDLmJLqXMD7xmqVp2DMC5AZfdH7q/Ed+JPQmLKsZ+p+5n3Xd7vhBb3f6YdvQ0bh3TY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791989469; c=relaxed/simple;
-	bh=UGeCbHlWoUrPihPSuPP7/nRq3OBVNxZ/+WecCtx2m8Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q2BWZm4XTLcvYwC9Jhq19eyh18rPqU61p0TEAWBW2UNiD1kKidiR8FXPBBwhqd116f7TQqsJOHnKsRe/5WU2oow3yGPqG9toWt+8Z+iUJj6ComAI9Y9vp4QtkdwYSWcaYNwJ3+YXAE3Gj9X6DoaIzKiUR6w83YRLLA5sHF4yP0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GN1H4Sgv; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1792014049; c=relaxed/simple;
+	bh=yqU9kq1HzxGNtnMqM/SgyTSWmIe0yPibKoz4H25rPXc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qtHB59hHzSLvLHSx41uCHi7/nNUskLKy/k9Y7fRHE7yCG1IGt7j+3OcZCzNTXKbEaq45qf+cSyjLVGsrpur3aQ+hPbvPV2QMpu51aBMZvix5m5JOnLesBzW9GBewxN2OyTs5U3yhiiYmbPmm9V5zPTXnVnrqxSRJL/oiAsCXDNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gu5m99Hj; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GN1H4Sgv"
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-48c411d6615so3097003f8f.3
-        for <linux-kbuild@vger.kernel.org>; Wed, 14 Oct 2026 07:51:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791989466; x=1792594266; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=vFvjSQRh3A/XQC7Xbty1pFGQXBuDdUgjTrl6Iafg+nY=;
-        b=GN1H4Sgv9bxWMTLBm7BF4Th9vbbL/dhV3wzpmYtG6TtHuTVTKJFakwmG1tRBPeXBzZ
-         SiV7L+zIv9+zBm3VH9MsGdoxO+F0tbZtr1ALEv+Y8zKKqwUmsXraO61MtnuG90es5H/7
-         MiCwEALFLWPUErVtpdUlKeqlkZkHEMXG9DobOj5BLMGJGU3Eefwnrt8tJzIh7TkpSUjh
-         QWlJyhOH3IQG6bKNN2Fwcu5UV36M68DbeKSXG0BAZnfXMA5SY3f2+zGM/8TAaP/ctizn
-         yCtiZLTCUEuWcdevdRzLVuV4Sp7F4QfmF8vBCcSCEFCD0C7KcBy2ixrkXpqdEhXwEQF4
-         bCyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791989466; x=1792594266;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=vFvjSQRh3A/XQC7Xbty1pFGQXBuDdUgjTrl6Iafg+nY=;
-        b=2wBCyefLlu3e2hiHMpcqC1P5vSPA8eaPeDk/JIWjcqU1U3ry1VkxL/cWsJr4FkvIkU
-         an85oj+QdkPbWKZ8MEGP8fSzyxKWWXcEe0hOlpabCExlN9KDl4fdhpzOAbMQVoostGsU
-         TY1InVIlIdDFdjWQSt3PLre00oorct74fTg1xzIMajUcnN+M/uYCA5NUQiT0+O28BCA7
-         r3AQ9VzhhUWgZHEUQij4eBsBa8FsDhPS1rPM9qdEFUyKS58bdvxVS8QVk2MmfUM4zyZ1
-         zg+9wUb285LQXoS7Fru+tJkxh5QZ6ccUmNbMeefwIP6XJid/W2zuCoHOPc/GDubRNnvF
-         +OLw==
-X-Gm-Message-State: AFq9FYIOWpIa7z9Di5SRfzQ9x4EPADw8Uxah8SBmCHUdVvdpj4lT9Vrb
-	cNvZR9eVwFp7CX3pX2M9n6m6ZBj9q/YB2ybWifsd3SXBQUBB3of43mbP
-X-Gm-Gg: AYBFou1GmIeJ9xCp0+ToOZrQRconlIvCkEAs4ZhgQnOwJg3E2nyfGYQd34f3Z8l844A
-	KxpZvKfca9QP+psZIDMIG8UsJS+gymJD8/3wCpqJKq4HEXIkPR2q8xWXWtlc1NjLXJxZHB+4/NX
-	aP6zcikbkInmNNvu4008K1iFI7pCHON1BwqJyVrCmRW6SF5tlHYQDqMOntF98LKHKkWvTNHBf+W
-	IxGz2LJ73yaa41nqvpTo3q3LcPWRvVovufLuk3ewJ0a5sjXp1H2Tpn37fFwvRBLqNGckXTF2zMR
-	P7DpcqMWmXSkvMmhGQ8G6cgLNrJQzK+eASfYiSLlAjYu9/cGq2SzBhawMrHoMXADZnGE7pzUpGt
-	Kub63HWA+YVQeQCQotpwWcHm8STpMKERyJUiivdiv2pVj4tYXKKV0A9eiVp1MnTT7KS63hXzgB0
-	fiZdYk8Yn0qAsAkMb3bpLG6h6FqQbCiGocpRPq2i0ex2333P4efnwbgbqCNb22AtNffakVMpA2X
-	9xGcOnxcOv3y2Xn/DebA0/yj5NPj3ttCGxgPO0XdsYgW5iAkdi7dSEFK+G+9yzZ0A==
-X-Received: by 2002:a05:600c:46cc:b0:4a0:8b1:f5c with SMTP id 5b1f17b1804b1-4a18e4b583fmr320053565e9.22.1791989465509;
-        Wed, 14 Oct 2026 07:51:05 -0700 (PDT)
-Received: from [192.168.1.28] (29.pool92-59-2.dynamic.orange.es. [92.59.2.29])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a1bd640be0sm30545e9.1.2026.10.14.07.51.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 Oct 2026 07:51:05 -0700 (PDT)
-Sender: Julian Braha <julian.braha@gmail.com>
-Message-ID: <95cb289c-384d-495e-91d4-bd7dd4d2a12a@gmail.com>
-Date: Wed, 14 Oct 2026 15:51:03 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gu5m99Hj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B306E1F000C4;
+	Wed, 14 Oct 2026 21:40:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792014048;
+	bh=3pf8Tds7TdMOgawC5EMHd3j5MJVpojAEEXnxD5jBgFU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=gu5m99HjhsPZbZ1Om41CDxpMuZb/Su89/EEmL8VifYOn1IIOftU9Rmp6XtHlu9l5j
+	 iUVJFTGU+UbB6DdLjCIXUrpQKiOp3Ro2AA3HoyxuEO75uE7HuoFZ3X2x4l2HCYBWRX
+	 D4u+hB66Rh2GTN15V7mKAMCDQZX9lzMXMOyriQ5NY6e4MROWfVMBI7SXY5zxZHTJlO
+	 H0WWuMn6DAcmzPJxOwairX1YgG7p3f2mQEvAYfpVVFjHn44tx2bmUeMwmVWCwEohXn
+	 oQhN+FG2IjCmLK1Enfj0YE8rBaqQZ3x8MI4Odpw2jC3nwfL41y78v3k9NPej8vhwcE
+	 RhyH4OjSobgGg==
+Date: Wed, 14 Oct 2026 14:40:43 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>
+Cc: Nicolas Schier <nsc@kernel.org>, linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Nam Cao <namcao@linutronix.de>,
+	kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH RFC] kbuild: enable pipefail for commands where possible
+Message-ID: <20261014214043.GA3380464@ax162>
+References: <20261014-kbuild-error-propagation-v1-1-573adaa0a076@linutronix.de>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] kconfig: fix use-after-free when a variable refers to
- itself
-To: Leizhen Zhang <lzsx618@gmail.com>, nathan@kernel.org, nsc@kernel.org
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20261008164504.3683811-1-lzsx618@gmail.com>
-Content-Language: en-US
-From: Julian Braha <julianbraha@gmail.com>
-In-Reply-To: <20261008164504.3683811-1-lzsx618@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20261014-kbuild-error-propagation-v1-1-573adaa0a076@linutronix.de>
 
-On 10/8/26 17:45, Leizhen Zhang wrote:
-> For a simply expanded variable, variable_add() frees the old value of an
-> existing variable (or allocates a new variable with an uninitialized
-> value) before expanding the right-hand side. If the right-hand side
-> refers to the variable itself, which is a common idiom in Makefiles,
-> e.g.
+On Wed, Oct 14, 2026 at 10:30:30AM +0200, Thomas Weiﬂschuh wrote:
+> The exit status of a shell pipeline by default only depends on the exit
+> status of its last command. If an earlier command fails this is silently
+> ignored. In this case the build continues operating on intermediate
+> state, potentially leading to confusing follow-up failures.
 > 
->   X := 1
->   X := $(X) 2
+> The 'pipefail' option can be used to exit the pipeline with an error as
+> soon as a single of its command fails which 'set -e' will elevate to
+> error exit of the whole command.
 > 
-> the expansion reads the freed (or uninitialized) value. With ASan this
-> is reported as a heap-use-after-free, or a SEGV if X was undefined.
-> Without ASan, X silently ends up as " 2" instead of "1 2".
+> 'pipefail' has been only standardized in POSIX 2024, but it is supported
+> by many shells anyways, including bash and dash. To avoid issues with
+> shells not implementing it, ignore failures silently.
 > 
-> Expand the right-hand side before updating the variable, initialize the
-> value of a newly created variable, and only free the old value when it
-> is actually replaced. Add a test case for this.
+> Reported-by: kernel test robot <lkp@intel.com>
+> Link: https://lore.kernel.org/oe-kbuild-all/202610131613.BpOi6VPp-lkp@intel.com/
+> Signed-off-by: Thomas Weiﬂschuh <thomas.weissschuh@linutronix.de>
+
+This is probably the right thing to do but it makes me nervous. pipefail
+is very easy to hold wrong mainly because of SIGPIPE:
+
+  $ cat test.sh
+  set -o pipefail
+
+  yes | head -n +50
+
+  $ bash test.sh
+  ...
+
+  $ echo $?
+  141
+
+and debugging that is unlikely to be obvious (but maybe it will because
+the error would be 141).
+
+> ---
+>  scripts/Kbuild.include | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 > 
-> Found by fuzzing Kconfig input with ASan/UBSan.
+> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+> index 8c311b997e24..1975d2739cdb 100644
+> --- a/scripts/Kbuild.include
+> +++ b/scripts/Kbuild.include
+> @@ -149,8 +149,11 @@ delete-on-interrupt = \
+>  		$(foreach sig, HUP INT QUIT TERM PIPE, \
+>  			trap 'rm -f $@; trap - $(sig); kill -s $(sig) $$$$' $(sig);))
+>  
+> +# try to enable pipefail
+> +try-pipefail = set -o pipefail || true 2>/dev/null
+> +
+>  # print and execute commands
+> -cmd = @$(if $(cmd_$(1)),set -e; $($(quiet)log_print) $(delete-on-interrupt) $(cmd_$(1)),:)
+> +cmd = @$(if $(cmd_$(1)),$(try-pipefail); set -e; $($(quiet)log_print) $(delete-on-interrupt) $(cmd_$(1)),:)
+>  
+>  ###
+>  # if_changed      - execute command if any prerequisite is newer than
 > 
-> Fixes: 1175c02506ff ("kconfig: support simply expanded variable")
-> Assisted-by: Claude:claude-opus-5-5 ASan UBSan libFuzzer
-> Signed-off-by: Leizhen Zhang <lzsx618@gmail.com>
-Tested-by: Julian Braha <julianbraha@gmail.com>
-Reviewed-by: Julian Braha <julianbraha@gmail.com>
+> ---
+> base-commit: 27286bf096c51df05eec6664f18b945f8dd61c0e
+> change-id: 20261013-kbuild-error-propagation-8ab5f649ff36
+> 
+> Best regards,
+> --  
+> Thomas Weiﬂschuh <thomas.weissschuh@linutronix.de>
+> 
+
+-- 
+Cheers,
+Nathan
