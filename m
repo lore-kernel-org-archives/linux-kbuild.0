@@ -1,120 +1,111 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F4B1AA1F4;
-	Wed, 14 Oct 2026 02:37:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16F7647F786;
+	Wed, 14 Oct 2026 08:36:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791945425; cv=none; b=AMWw/BcNgye6XhkJ0kexIB7BHM4diO3/xkz2SNqE2sjxyLYnE92VjMYRO8Vw3eIiX4xRqjjIrU2Q5btYBWTSx6QR970h0nj3/kUUdLjdkCIioJKTQVx5M09G9W+KH6DMWNhjTiGZZ1LwY5SYBzqdw6pOi9BM5/pU5BWj4I85/Y8=
+	t=1791967014; cv=none; b=G+w8cwsUNLKDSDDYNB+nQ4jpdazWBB4WApqB1lk9K2P/QLr2osLqvfMhELLirr04qQDteEsIZr9Bc+7mGscmaDqZKQKwpj1jt2EoYP/lep6ziJ54zdvmGC7C5wKW0q82GAaR5xtHceCDw9e7Lpnmd6Vdvrs+bbHh/C5yzifEDTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791945425; c=relaxed/simple;
-	bh=ALvt1xHOtMcI1HndOPwxrWPc8lzPThUtnk2buTMc2wU=;
-	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
-	 Date; b=UzwoGoraOTFIWJ7BcYHHgHWOz1bkbXa9k0pJ5FQI6UG2Ovv7PDiFv6N04s2/olPe6BpC37WNFijVKEIJkGsnEy0CCW44+2vdVCu4zUE7jfTc0bdWfl5L735oO+4YQH5nEBvHhpQlplyozKTFLReb/Wd0qed8jSY0tJQHOSHQJy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N9gP/woH; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791967014; c=relaxed/simple;
+	bh=SKHhHsK5UjimsCdVlj8Lv3822tqLi/nS1N/X3ZsqCHo=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Qby88alFZF64iMxFLFn3Gzm5u8lHX0/YRh3CMqgMPqjpzlYZsnUC22HIb0CcEUoJq/LMJ56AIXl9GS998FY2ViYx7zPkYCPGKHV/x1GE1P7GMQMBK/qxSS6oaH4DrtNEBoLtZvAso7QTYrV63wMZRAu9SrXZFxVcO9dJWIkUsw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=nlETQ4Jy; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Ukg/x/eg; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N9gP/woH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC6F71F000FF;
-	Wed, 14 Oct 2026 02:37:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791945424;
-	bh=qvXUCGz/HJTAYiOJIcwOHti2jnT5T+d//JhOF/D+Pso=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=N9gP/woHuYkHkTk+j13TZBPk8Y9/2GCT30K5MJcI3cl6oiavPIqkilCY117VCrKEg
-	 9rv/G0uKFBm2HXv09wWYgDDY7OGN+497gjrk/ot1EISun/1bi6RGInUSZzsQCzaI/b
-	 ga783A4BIjdNLLoZUsdG6pgQZpFd4Nz7GqYz/rP+oRtsfH1KA5lfnJq220inm18QtL
-	 Ze89skgsfIhfEGgPg+RhHQ5xUqXdOZxyuWCvHZmEZwwiaHX5D1gJPx/g/F/LGwY07I
-	 Id21NxmfSwR+ro+/TyIiDR7sxGGGzfRWCxPtAc13iHG3Mo3sbvACXElDdAR33lHHuc
-	 Jy5v/AdqjRiZQ==
-Message-ID: <sashiko-outbox-170731@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v12 32/40] docs/dyndbg: add classmap info to howto
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Jim Cromie" <jim.cromie@gmail.com>, "Jason Baron" <jbaron@akamai.com>, "Shuah
- Khan" <shuah@kernel.org>, "Andrew Morton" <akpm@linux-foundation.org>, "Maarten
- Lankhorst" <maarten.lankhorst@linux.intel.com>, "Maxime Ripard" <mripard@kernel.org>, "Thomas
- Zimmermann" <tzimmermann@suse.de>, "David Airlie" <airlied@gmail.com>, "Simona
- Vetter" <simona@ffwll.ch>, "Arnd Bergmann" <arnd@arndb.de>, "Luis
- Chamberlain" <mcgrof@kernel.org>, "Petr Pavlu" <petr.pavlu@suse.com>, "Daniel
- Gomez" <da.gomez@kernel.org>, "Sami Tolvanen" <samitolvanen@google.com>, "Aaron
- Tomlin" <atomlin@atomlin.com>, "Jonathan Corbet" <corbet@net.net>, "Greg
- Kroah-Hartman" <gregkh@linuxfoundation.org>, "Nathan Chancellor" <nathan@kernel.org>, "Nicolas
- Schier" <nsc@kernel.org>, "Shuah Khan" <skhan@linuxfoundation.org>, "Randy
- Dunlap" <rdunlap@infradead.org>, "Rafael J. Wysocki" <rafael@kernel.org>, "Pavel
- Machek" <pavel@kernel.org>, "Len Brown" <lenb@kernel.org>, "Jonathan Corbet" <corbet@lwn.net>, "Petr
- Mladek" <pmladek@suse.com>, "Steven Rostedt" <rostedt@goodmis.org>, "John
- Ogness" <john.ogness@linutronix.de>, "Sergey Senozhatsky" <senozhatsky@chromium.org>,
- =?utf-8?b?VGhvbWFzIFdlacOfc2NodWg=?= <linux@weissschuh.net>
-Cc: dri-devel@lists.freedesktop.org, linux-modules@vger.kernel.org, linux-kbuild@vger.kernel.org, "Louis
- Chauvet" <louis.chauvet@bootlin.com>
-In-Reply-To: <20261012-dd-cmap-part2-clean-v12-32-3c8cc5725def@gmail.com>
-References: <20261012-dd-cmap-part2-clean-v12-0-3c8cc5725def@gmail.com>
- <20261012-dd-cmap-part2-clean-v12-32-3c8cc5725def@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 14 Oct 2026 02:37:02 +0000
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="nlETQ4Jy";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Ukg/x/eg"
+From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1791966635;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Vaw1ptHsHLftpWKXUcbIKliOUquNWWHWqIT8fiURSkY=;
+	b=nlETQ4JyAvu/+4BAHtVZkPx42LtEMeCzS6JgjHJKncMn5bDPDj2xB3r1ipr9xzw7oKmMDH
+	Udspe8EIwtf55UD8R+jt3aXSMhcvWYU9ye2J71UQic9exiErTGr7Yk1hqBYKHiYqEXOkP9
+	5vxqu4H8t/kl1d6syRCZkb/+ek/yuPRPurrqrCLrm6u2PLLlc2MfqPPejsXsPUqkynSEFW
+	g//LP903DK2ioCr3mjjwOmqzT5MhgqU0ANq7ee3AbszqHyNinsQgrOgEBkhYxJl+a6mcj1
+	l2pGQoYu461rrIwid7+PvuFEOLF6jzxtAl9cAVwjN5/bV7s8wo19Y+8lFhScjw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1791966635;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Vaw1ptHsHLftpWKXUcbIKliOUquNWWHWqIT8fiURSkY=;
+	b=Ukg/x/egs4PZnWdHDDgw6inmvRnhRJ7uqYoSh/43kq1eC8ODsTv6JQcXVZ5cn4vKihU4es
+	29B7EHrhLB1+9jBw==
+Date: Wed, 14 Oct 2026 10:30:30 +0200
+Subject: [PATCH RFC] kbuild: enable pipefail for commands where possible
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20261014-kbuild-error-propagation-v1-1-573adaa0a076@linutronix.de>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIzNDA0Nj3eyk0sycFN3UoqL8It2CovyCxPTEEqAmXYvEJNM0MxPLtDRjMyW
+ g9oKi1LTMCrDR0UpBbs5KsbW1AKZsp3NvAAAA
+X-Change-ID: 20261013-kbuild-error-propagation-8ab5f649ff36
+To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Nam Cao <namcao@linutronix.de>, kernel test robot <lkp@intel.com>, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1791966633; l=1868;
+ i=thomas.weissschuh@linutronix.de; s=20240209; h=from:subject:message-id;
+ bh=SKHhHsK5UjimsCdVlj8Lv3822tqLi/nS1N/X3ZsqCHo=;
+ b=oTkLBk1cMk9xJOvIljXrmOaPQ2weE4iYGwwdmD7iBix2NW7IbjOWSlnEOrH7/4gACaT5r4DOI
+ yRs8d1FhtZ0CSxdROyySTshKqE4EpOnQRHBqS6l7pdx945zSbrvTmPW
+X-Developer-Key: i=thomas.weissschuh@linutronix.de; a=ed25519;
+ pk=pfvxvpFUDJV2h2nY0FidLUml22uGLSjByFbM6aqQQws=
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
-s) to consider:
-- [Low] docs/dyndbg: incorrect signature for DYNAMIC_DEBUG_CLASSMAP_PARAM
-- [Low] docs/dyndbg: commit message count mismatch for API macros
---
+The exit status of a shell pipeline by default only depends on the exit
+status of its last command. If an earlier command fails this is silently
+ignored. In this case the build continues operating on intermediate
+state, potentially leading to confusing follow-up failures.
 
-commit 28be193f6b722396acbf0216c1b36e74ba099d0b
-Author: Jim Cromie <jim.cromie@gmail.com>
+The 'pipefail' option can be used to exit the pipeline with an error as
+soon as a single of its command fails which 'set -e' will elevate to
+error exit of the whole command.
 
-docs/dyndbg: add classmap info to howto
+'pipefail' has been only standardized in POSIX 2024, but it is supported
+by many shells anyways, including bash and dash. To avoid issues with
+shells not implementing it, ignore failures silently.
 
-Describes the dynamic debug classmaps API and macro usage in the howto
-documentation.
+Reported-by: kernel test robot <lkp@intel.com>
+Link: https://lore.kernel.org/oe-kbuild-all/202610131613.BpOi6VPp-lkp@intel.com/
+Signed-off-by: Thomas Weißschuh <thomas.weissschuh@linutronix.de>
+---
+ scripts/Kbuild.include | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-> Describe the 3 API macros providing dynamic_debug's classmaps
->=20
-> DYNAMIC_DEBUG_CLASSMAP_DEFINE - create & export a classmap
-> DYNAMIC_DEBUG_CLASSMAP_USE    - refer to exported map
-> DYNAMIC_DEBUG_CLASSMAP_PARAM  - bind control param to the classmap
-> DYNAMIC_DEBUG_CLASSMAP_PARAM_REF + use module's storage - __drm_debug
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 8c311b997e24..1975d2739cdb 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -149,8 +149,11 @@ delete-on-interrupt = \
+ 		$(foreach sig, HUP INT QUIT TERM PIPE, \
+ 			trap 'rm -f $@; trap - $(sig); kill -s $(sig) $$$$' $(sig);))
+ 
++# try to enable pipefail
++try-pipefail = set -o pipefail || true 2>/dev/null
++
+ # print and execute commands
+-cmd = @$(if $(cmd_$(1)),set -e; $($(quiet)log_print) $(delete-on-interrupt) $(cmd_$(1)),:)
++cmd = @$(if $(cmd_$(1)),$(try-pipefail); set -e; $($(quiet)log_print) $(delete-on-interrupt) $(cmd_$(1)),:)
+ 
+ ###
+ # if_changed      - execute command if any prerequisite is newer than
 
-[Severity: Low]
-This isn't a bug, but the commit message states it will describe 3 API macr=
-os
-while actually listing and describing 4 of them. Should this count be updat=
-ed
-to match the list?
+---
+base-commit: 27286bf096c51df05eec6664f18b945f8dd61c0e
+change-id: 20261013-kbuild-error-propagation-8ab5f649ff36
 
-> diff --git a/Documentation/admin-guide/dynamic-debug-howto.rst b/Document=
-ation/admin-guide/dynamic-debug-howto.rst
-> index a8962ab22aaf0..f5b1470a4b881 100644
-> --- a/Documentation/admin-guide/dynamic-debug-howto.rst
-> +++ b/Documentation/admin-guide/dynamic-debug-howto.rst
-[ ... ]
-> +Dynamic Debug Classmap API
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
-> +
-> +DYNAMIC_DEBUG_CLASSMAP_DEFINE(clname,type,_base,classnames) - this maps
-> +classnames (a list of strings) onto class-ids consecutively, starting
-> +at _base.
-> +
-> +DYNAMIC_DEBUG_CLASSMAP_USE(clname) & _USE_(clname,_base) - modules
-> +call this to refer to the var _DEFINEd elsewhere (and exported).
-> +
-> +DYNAMIC_DEBUG_CLASSMAP_PARAM(clname) - creates the sysfs/kparam,
-> +maps/exposes bits 0..N as class-names.
+Best regards,
+--  
+Thomas Weißschuh <thomas.weissschuh@linutronix.de>
 
-[Severity: Low]
-Does DYNAMIC_DEBUG_CLASSMAP_PARAM only take one argument here?
-
-The kernel macro defined in include/linux/dynamic_debug.h requires three
-arguments: _name, _var, and _flags. Could this discrepancy mislead develope=
-rs
-attempting to use the API?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261012-dd-cmap-pa=
-rt2-clean-v12-0-3c8cc5725def@gmail.com?part=3D32
