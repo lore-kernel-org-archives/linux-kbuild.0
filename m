@@ -1,111 +1,118 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16F7647F786;
-	Wed, 14 Oct 2026 08:36:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C8A52BE35
+	for <linux-kbuild@vger.kernel.org>; Wed, 14 Oct 2026 13:40:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791967014; cv=none; b=G+w8cwsUNLKDSDDYNB+nQ4jpdazWBB4WApqB1lk9K2P/QLr2osLqvfMhELLirr04qQDteEsIZr9Bc+7mGscmaDqZKQKwpj1jt2EoYP/lep6ziJ54zdvmGC7C5wKW0q82GAaR5xtHceCDw9e7Lpnmd6Vdvrs+bbHh/C5yzifEDTg=
+	t=1791985229; cv=none; b=TbBOXDclmXvFJlDW9/Fpg/SeOH8teydPatE40h5kPX1g5tx5rGh/Q4wSQyqBlMU8OAOvOnnyd1vJL4eBYMo8CS8/Uz6r/znUBRXzcCKVB3sZJ8GSxiQFxsd2NE02qzcJ6tDwFWX2QoOzdXM3to9qUxgg0H7pqsGyAggQNw65awQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791967014; c=relaxed/simple;
-	bh=SKHhHsK5UjimsCdVlj8Lv3822tqLi/nS1N/X3ZsqCHo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Qby88alFZF64iMxFLFn3Gzm5u8lHX0/YRh3CMqgMPqjpzlYZsnUC22HIb0CcEUoJq/LMJ56AIXl9GS998FY2ViYx7zPkYCPGKHV/x1GE1P7GMQMBK/qxSS6oaH4DrtNEBoLtZvAso7QTYrV63wMZRAu9SrXZFxVcO9dJWIkUsw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=nlETQ4Jy; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Ukg/x/eg; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	s=arc-20240116; t=1791985229; c=relaxed/simple;
+	bh=W5yOQ61rKBYv/RMJIq2Eh/EaYd8zAs9RxgaF3vvQVDc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bqG6sqIF2cKjgy9F2ffRlAPWI+wSqWJYOBr7DVz/7kyXnpxCNk3WXy6RpKHpwpbbO97qoCU0QCkqQB1ealOR9EDP+jBwfVV6jcFF5u0UWuGpqiZ0ZJWueYInbiegLsif23s9CSWXlsKZI2cvxJWnQdLNrtH6eJhoHho/MAJk3Y0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dzoACW4t; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="nlETQ4Jy";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Ukg/x/eg"
-From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1791966635;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Vaw1ptHsHLftpWKXUcbIKliOUquNWWHWqIT8fiURSkY=;
-	b=nlETQ4JyAvu/+4BAHtVZkPx42LtEMeCzS6JgjHJKncMn5bDPDj2xB3r1ipr9xzw7oKmMDH
-	Udspe8EIwtf55UD8R+jt3aXSMhcvWYU9ye2J71UQic9exiErTGr7Yk1hqBYKHiYqEXOkP9
-	5vxqu4H8t/kl1d6syRCZkb/+ek/yuPRPurrqrCLrm6u2PLLlc2MfqPPejsXsPUqkynSEFW
-	g//LP903DK2ioCr3mjjwOmqzT5MhgqU0ANq7ee3AbszqHyNinsQgrOgEBkhYxJl+a6mcj1
-	l2pGQoYu461rrIwid7+PvuFEOLF6jzxtAl9cAVwjN5/bV7s8wo19Y+8lFhScjw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1791966635;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Vaw1ptHsHLftpWKXUcbIKliOUquNWWHWqIT8fiURSkY=;
-	b=Ukg/x/egs4PZnWdHDDgw6inmvRnhRJ7uqYoSh/43kq1eC8ODsTv6JQcXVZ5cn4vKihU4es
-	29B7EHrhLB1+9jBw==
-Date: Wed, 14 Oct 2026 10:30:30 +0200
-Subject: [PATCH RFC] kbuild: enable pipefail for commands where possible
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dzoACW4t"
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4a1ad2e2391so13890315e9.0
+        for <linux-kbuild@vger.kernel.org>; Wed, 14 Oct 2026 06:40:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1791985221; x=1792590021; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=FtK0lRUjLXQKxpCoNzzWjfIESEFE9YW7BbkGrmVQGAQ=;
+        b=dzoACW4t3eKHXdsynsrieGvskNqqhKtjTyVSzXPkPw4xnpl3aV+oIWyFZNiWJ/TRfN
+         iONc3/Q8Eh82DkiE0+9uvfIN2OMhXXFcmcvLtyZk2xyr96x+uo740Q7ojOqSu9M7A8J/
+         08ByaO12kz3CVD332Ui6FSUYXxBcuxOwaDNIpis2uoY19iQN3VtVI0NFb+JTBLvcxqff
+         RPErLZc8aZQaaWAFVD+Ftigo2FgAv8TTZ6r5Moii8ByXCCQEgpThkNCAfl8SdLWNsVWm
+         JFwawLNpQIHY8n+SpQOXIto7vltZthoAKNMC08SMp3o9ir6ACwGLOl0hrIiCeckymQOY
+         47uQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791985221; x=1792590021;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=FtK0lRUjLXQKxpCoNzzWjfIESEFE9YW7BbkGrmVQGAQ=;
+        b=20X7YrutZ9rhuwm/2zPrxt1MmcMpa8HPKL9QsGVjf+gTwxf5Cdhfe2swB8oOzffFWK
+         KZDb1BPIt/+MHhZnCxUVZFKwekQT2Ct/Se+USlCzSsDwePht/yANhcUHGy56I8SeUZWc
+         yb0q9uRTkeiP/uwlmSNvgWG/raVgqJ3sjxN/K5w0qQyKmkiXyRW/YWDAO++DsNdKZmR6
+         LP9Dhez7KKnw4iMag5k5qdLnXqGyRXiOSQfp6I56qaPVDgUQoPcgU7K17gGo8MF7xv/T
+         W1AoRqfiErxLmOK9Pq48DcO+n9NJ7CZtFnzgXYD8/5saQ2GVxwxLdywdpmDDwIhvZu7i
+         1ToQ==
+X-Forwarded-Encrypted: i=1; AKwUvBxX+t5av+23fSSCsHLUrB8l5U0o9ijCmK0ftSwC+Kgw94/1XsRlwcvsCo7Pssu+OyjLz0I6GrV6tvNWLME=@vger.kernel.org
+X-Gm-Message-State: AFq9FYLm7nn1yoMAfAARL6pP8mCgyEHnvidvb0rWsSL+AXMHmElqNrxy
+	jfurDfphuKcMEY83fa/PKr0/hTypFS7vY5YtPX4oXD2EaxJwAvcMa7Jf
+X-Gm-Gg: AYBFou1wy5zP1eYbf8+aYwneoSfc0VXyzbU8V0G2j7IfDvKAyqg6ncJQfjwsRm4U964
+	mElBLRbuEOGC48yISMjSOecJCz9Y8ohHY3n3yGNbloBI/V86KFfxfYX2zEkI19CdlX31F8fQfDJ
+	nSSCQmpWsbWaTNeWQWkp6DQi5z8vZw29+NZIGj86KBYGnnOgWCUQt+0MpY1URI/5HtSjHB/+3S9
+	JF9tCvkUYGHzX19XGVzbnwYai4qS4nXgLWCaMoLvIxomdfpptHKm0jSGXecV0UzSanpz6HVn4a1
+	ZDsYdEEAz/u4LlXPL+bTNN+u45OCIEBpbAeebzr3+Ar0RqeP9IPdvaXyVIeu6lM7s4+PG/UpGjd
+	wsQe+zNeiVZQa/sogTyhh4MzsdhXCo/Onu/h0WRrPTlzDTiQEFaZHHz7LTMkAvsvm+spyfB34CA
+	8ip3CBOM3OVqTkcIlE/+otj83o3O4Z3fzkPww/1WOmolEoS7hNR4C4jvRNfrnSnSHJ824G1TouR
+	c4wv0SxY+unRGgJIs1Y75UDUH0L/hBwxjz00tGXmw8HZzmE18J25HmHVYc3X+Y=
+X-Received: by 2002:a05:600c:8718:b0:4a1:7259:349e with SMTP id 5b1f17b1804b1-4a18e4e0a33mr307699125e9.27.1791985220840;
+        Wed, 14 Oct 2026 06:40:20 -0700 (PDT)
+Received: from nixos-office (29.pool92-59-2.dynamic.orange.es. [92.59.2.29])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48de0ac52d3sm12036009f8f.43.2026.10.14.06.40.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Oct 2026 06:40:20 -0700 (PDT)
+Sender: Julian Braha <julian.braha@gmail.com>
+From: Julian Braha <julianbraha@gmail.com>
+To: nathan@kernel.org,
+	nsc@kernel.org
+Cc: n.schier@fritz.com,
+	grahamr@qti.qualcomm.com,
+	rdunlap@infradead.org,
+	nico@fluxnic.net,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Julian Braha <julianbraha@gmail.com>
+Subject: [PATCH v2 0/2] kconfig: error on reverse range
+Date: Wed, 14 Oct 2026 14:40:15 +0100
+Message-ID: <20261014134017.2310819-1-julianbraha@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20261014-kbuild-error-propagation-v1-1-573adaa0a076@linutronix.de>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDIzNDA0Nj3eyk0sycFN3UoqL8It2CovyCxPTEEqAmXYvEJNM0MxPLtDRjMyW
- g9oKi1LTMCrDR0UpBbs5KsbW1AKZsp3NvAAAA
-X-Change-ID: 20261013-kbuild-error-propagation-8ab5f649ff36
-To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Nam Cao <namcao@linutronix.de>, kernel test robot <lkp@intel.com>, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1791966633; l=1868;
- i=thomas.weissschuh@linutronix.de; s=20240209; h=from:subject:message-id;
- bh=SKHhHsK5UjimsCdVlj8Lv3822tqLi/nS1N/X3ZsqCHo=;
- b=oTkLBk1cMk9xJOvIljXrmOaPQ2weE4iYGwwdmD7iBix2NW7IbjOWSlnEOrH7/4gACaT5r4DOI
- yRs8d1FhtZ0CSxdROyySTshKqE4EpOnQRHBqS6l7pdx945zSbrvTmPW
-X-Developer-Key: i=thomas.weissschuh@linutronix.de; a=ed25519;
- pk=pfvxvpFUDJV2h2nY0FidLUml22uGLSjByFbM6aqQQws=
 
-The exit status of a shell pipeline by default only depends on the exit
-status of its last command. If an earlier command fails this is silently
-ignored. In this case the build continues operating on intermediate
-state, potentially leading to confusing follow-up failures.
+This series adds more input validation to Kconfig, specifically checking
+that ranges for numeric options are properly ordered. This check was
+originally introduced as part of kconfirm [1], but there are no findings
+for this across the tree, so the check can be added directly into Kconfig.
 
-The 'pipefail' option can be used to exit the pipeline with an error as
-soon as a single of its command fails which 'set -e' will elevate to
-error exit of the whole command.
+Patch 1/2 adds a prop_err() function to match the existing prop_warn(),
+which is then used in patch 2/2 where the check is introduced.
 
-'pipefail' has been only standardized in POSIX 2024, but it is supported
-by many shells anyways, including bash and dash. To avoid issues with
-shells not implementing it, ignore failures silently.
-
-Reported-by: kernel test robot <lkp@intel.com>
-Link: https://lore.kernel.org/oe-kbuild-all/202610131613.BpOi6VPp-lkp@intel.com/
-Signed-off-by: Thomas Weißschuh <thomas.weissschuh@linutronix.de>
+[1] https://lore.kernel.org/all/20260904220559.GB2787252@ax162/
 ---
- scripts/Kbuild.include | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Changes since v1:
+- fix typo in commit message: where -> there (Nicolas)
+- adjust warning and error printing to match gcc (Nicolas)
+- handle case with multiple (conditional) ranges (sashiko)
 
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 8c311b997e24..1975d2739cdb 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -149,8 +149,11 @@ delete-on-interrupt = \
- 		$(foreach sig, HUP INT QUIT TERM PIPE, \
- 			trap 'rm -f $@; trap - $(sig); kill -s $(sig) $$$$' $(sig);))
- 
-+# try to enable pipefail
-+try-pipefail = set -o pipefail || true 2>/dev/null
-+
- # print and execute commands
--cmd = @$(if $(cmd_$(1)),set -e; $($(quiet)log_print) $(delete-on-interrupt) $(cmd_$(1)),:)
-+cmd = @$(if $(cmd_$(1)),$(try-pipefail); set -e; $($(quiet)log_print) $(delete-on-interrupt) $(cmd_$(1)),:)
- 
- ###
- # if_changed      - execute command if any prerequisite is newer than
-
+Link to v1:
+https://lore.kernel.org/linux-kbuild/20260922163749.2031594-1-julianbraha@gmail.com/
 ---
-base-commit: 27286bf096c51df05eec6664f18b945f8dd61c0e
-change-id: 20261013-kbuild-error-propagation-8ab5f649ff36
+Julian Braha (2):
+  kconfig: add prop_err function to simplify property error handling
+  kconfig: error on reverse range
 
-Best regards,
---  
-Thomas Weißschuh <thomas.weissschuh@linutronix.de>
+ scripts/kconfig/menu.c                        |  49 +++++---
+ .../tests/err_num_reverse_range/Kconfig       | 111 ++++++++++++++++++
+ .../tests/err_num_reverse_range/__init__.py   |   8 ++
+ .../err_num_reverse_range/expected_stderr     |  11 ++
+ .../tests/err_transitional/expected_stderr    |   2 +-
+ 5 files changed, 166 insertions(+), 15 deletions(-)
+ create mode 100644 scripts/kconfig/tests/err_num_reverse_range/Kconfig
+ create mode 100644 scripts/kconfig/tests/err_num_reverse_range/__init__.py
+ create mode 100644 scripts/kconfig/tests/err_num_reverse_range/expected_stderr
+
+-- 
+2.55.0
 
