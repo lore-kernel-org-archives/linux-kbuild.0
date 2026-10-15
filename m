@@ -1,248 +1,166 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 765BA4C8C53
-	for <linux-kbuild@vger.kernel.org>; Thu, 15 Oct 2026 15:42:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B08E55821F;
+	Thu, 15 Oct 2026 18:52:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792078980; cv=none; b=ukXk7HBIWMP3ifUHyftyI0uWeQauCTA3vNbyGVb4HjjbbGkEF7qFYYwOzjB0VRJvBx82GGsn6gG69fB4Hgddo3pIXtbdrjQPV2jGO2DxGtjMXilqbfRB0SgTvdKiHkRleBTBTDUhJ1D6PwVu/Rt3WGgCYTi1+GBFJDUsUq0CnaM=
+	t=1792090364; cv=none; b=maG2sLVnpgr2cXe4qNRgV2oNrkZLX65d82NDqQKEDMYZM1XUN03y5qbytfP/Yq3XOJnK0rP5cgM84nttSQ3zpOaH/VJAcBa0J/v0VL6c2J12h57MIMgSDH9jEaotGgk9phCVAg0vydZCY1fhH1PqSWtcZzFf3PhIaBjJ+ImkrIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792078980; c=relaxed/simple;
-	bh=1fUOi+Usxn2LQcFzjoDicMxQvfperVSbtfIS6t3a0mM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aIIAoZvtvVq38HfWpILG9C6y5ujzeUGKAWByLITgOloslLz1kBZswzJMQxEyhj5oOwkLwiwtkRZdt6xR6aGhVgu71Hnj1z4bK0OfG/KuKBZpo2UHLHjHZtZj1KR74M0HdZJAjAE7tq6ulewnuva0timkNNkTAcnmN8iyeNRjDEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=R0UR9SXf; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1792090364; c=relaxed/simple;
+	bh=LgJdMkuY3CxbGVuvdie+11He70UGUab1eNFyeH50fm8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qoIZig0c/46iw4rB/trP6mB6vuegX7lHqk0ykPsrzeR15CUdZwrdzsX19sWE81149DBcmFlXkdaB3u2g9HpKLmjgNA8Spl/oR/8z7d1LaQmkH78cw/GAZnHYwh01cVfzHZEt0ScdF7RyOvX7QviXSUZVbjKHgm92PdKVuyTc5Bo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P1AuxVCD; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="R0UR9SXf"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4a0213948d3so34013535e9.2
-        for <linux-kbuild@vger.kernel.org>; Thu, 15 Oct 2026 08:42:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1792078967; x=1792683767; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=8EVUVXTF9B/pmjVEVo0zfJaBGiZoNVg7V5lse2RyO7M=;
-        b=R0UR9SXfSdLRKN8vgsjzhyd81oaEz7tHTwslAVD4uu2yocB8iyTzeaX91HJfAF2HSZ
-         zfyNFy9tY2rveIy5HSk4kHu6cou98Mmm65Nw/ib9mtV2wnXWSnap0yORcKiRn9+bhNLb
-         /HvkgPwk8c21B4vfdeFwnATqt/tKh7V1N6JFjc1GswxG79FMaIisTlhabNQRTkYz/AAi
-         A1KK2BSF7pJOfDu8sLbpi305mh4DqIdXIenAOtLPi3roSTwyU1GWiEULVpymwqlkfLkZ
-         ApWTy1oTpVVOcfy57kt0RsQYUZoCNCDNc0yb16GC0j95gqwCT6HKnJMFBD1/29NWON5y
-         v/Mw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792078967; x=1792683767;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=8EVUVXTF9B/pmjVEVo0zfJaBGiZoNVg7V5lse2RyO7M=;
-        b=1rmk3V6pBx+R17wlNgOI74AJpLZBfuoaK9JgVHP8JEVap4hA0Kt+bjpT0g2aKvfXLH
-         gUpcTb4gakFRUjiRAFG7vajlH3Mtmh9oarGxAv6sSrMDbztQ+Uhsd3lYRWXUFseWA6YV
-         vJyMDYdPeFbTYWZT65lGel/HXzSI6prJXAvmMasB4ul3btdxRgy0eQciGpRUASe2fo6H
-         prRiTwn47Ash+iVuI5f1vTQIs9q+lsWMT1YE5Tgb/uMMNoWqcbwkq0w3jpLIm/dNlsib
-         AaL+FUFn0ILlwMA9RTislTXjQSOwaHZ+jgjZ6cWIrLzk0IUwXEF/pMTpH4s8cRyk6iUw
-         quuw==
-X-Forwarded-Encrypted: i=1; AKwUvBymuP7NpvQidLERVrIvQMrecDcEnDCWuoiUJfHCXBSQboOPaZ7Dp/BbA3aUC/eH92L2ZBfNrA1EdHHVBns=@vger.kernel.org
-X-Gm-Message-State: AFq9FYLichuALfiblQfYK9wGhbJ4F+BJEhtSY/6LW8ybUSpx5M5T9GBn
-	tLZhR55Ca2EatffjUov8UxSg8ikb6MMO64gjpt0zdKM4wr4HF8A3YFtjPlnt5p9Dxb4=
-X-Gm-Gg: AYBFou3EFZaLD13RAQKepTQZyqxmNgkJe1s4acKJSxRZU+T3Oklj0Icv88hc4Zd6HpN
-	r28vJ3LSwAa7uSXv1AZ21FP+VqXgXcNyozahoclSaeFQyEkQnGPEmpdxpiG2x0UVKuN+lk3++7l
-	HX9rrtiVirpMB0ONFyMwSvBc0IOxEhS8O26r+lBE8FcH09C0YNaha5NcQT3YEr+K0ov8G3RzzXg
-	wUbaIDfWlg6/DjKsMcBAisi9yIGXzDuDfH0Hfbt6XtuIFYcmUW0Crs+K6vNWys6b3IoUuhSzbYm
-	nqgVyI5CxFPm1H89W6yJ4Gb7t1bVS2fxgpveIj/cZU2isf+3fWWEzYVDRiSFUHTF2rW4Mntfjjh
-	kcFMA76HJ+y49PMBOmyiWThyza8mqW3Rstpu9YPkBQUjxLPRIlC/Rcwif4itV1ic0OPP8Ulpsd0
-	LV9PzfrhZYgk7SJ1Ssgiyog46t5yKQb1mALoufLBWwmAgpHHvT+Yu3/OELl05OD7gt3f+zAJxuh
-	DqBts6blc7k3E9C1Dc5psXD0LE+XR7AxBpaXz3uJ2YW1A==
-X-Received: by 2002:a05:600c:8b82:b0:49f:fd2d:23c7 with SMTP id 5b1f17b1804b1-4a18e4b887amr354993855e9.27.1792078967287;
-        Thu, 15 Oct 2026 08:42:47 -0700 (PDT)
-Received: from ?IPV6:2a07:de40:8100:0:89a9:fd0e:583d:4a53? ([2001:af0:8000:1409:193:86:92:181])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a1bd66c5e6sm52172585e9.2.2026.10.15.08.42.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Oct 2026 08:42:46 -0700 (PDT)
-Message-ID: <d17b00f9-2a6c-425f-9697-6bc8f31f7a7a@suse.com>
-Date: Thu, 15 Oct 2026 17:42:45 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P1AuxVCD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 890EE1F000C4;
+	Thu, 15 Oct 2026 18:52:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792090361;
+	bh=Njl37LUDsIFdauFRHaWsmyFWughBb0HjtnFZLbKLBCE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=P1AuxVCDtDzaGD11WMuGAROblSXSvHwJzTIeUkyME2nRdttFU8BqQK4gd06lSoVgJ
+	 BSKir+YvMkcP3sUCmVFoWK002WP6TaGDJjYScyXJsogEjlK1GF9FbftB7jwkb+g94x
+	 J3z2GIUt3tmQNhqR8zPJBxBvlgfcxC0riohLZzywTgqR+8yKIiEOdaeb2v8XX3xulz
+	 FmD0I06pVbbShRA0qaHLoHPHaG8s80Rn4P0+g4cku4CehU1ehH0s0iwJ6gPGZOPlW8
+	 sDg0/o3II8mhfzE6WDm7efCnGeXGcpIGILczqkcB1PIVo96O9fzicYw5GsjyIikCeQ
+	 kVqqAYCLnDTgg==
+Date: Thu, 15 Oct 2026 14:52:40 -0400
+From: Sasha Levin <sashal@kernel.org>
+To: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas@t-8ch.de>
+Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
+	linux-kbuild@vger.kernel.org, Shuah Khan <shuah@kernel.org>,
+	linux-kselftest@vger.kernel.org,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>, Ian Rogers <irogers@google.com>,
+	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [RFC PATCH 2/6] kbuild: add "make tools_build" to build
+ userspace tools from tools/
+Message-ID: <atEg-E51MHBHL8Ju@laps>
+References: <20261011233647.2454648-1-sashal@kernel.org>
+ <20261011233647.2454648-3-sashal@kernel.org>
+ <b0fa30a6-9f41-4c9a-a3fb-2634322e2bd1@t-8ch.de>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 13/22] modpost: cache section relocation mismatch state
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
- Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling
- <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
- Masahiro Yamada <masahiroy@kernel.org>, Alexey Gladkov <legion@kernel.org>,
- Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
- Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
- Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
- Arnd Bergmann <arnd@arndb.de>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Ard Biesheuvel <ardb@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Josh Poimboeuf <jpoimboe@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
- Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
- Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?=
- <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>,
- Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
- Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>,
- Daniel Almeida <daniel.almeida@collabora.com>,
- Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot
- <acourbot@nvidia.com>, =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>,
- Jonathan Corbet <corbet@lwn.net>, Randy Dunlap <rdunlap@infradead.org>,
- Kees Cook <kees@kernel.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
- llvm@lists.linux.dev, linux-riscv@lists.infradead.org,
- linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org,
- linux-doc@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
- linux-hardening@vger.kernel.org
-References: <20260923-build-speedup-v4-0-73128809a4a4@kernel.org>
- <20260923-build-speedup-v4-13-73128809a4a4@kernel.org>
-Content-Language: en-US
-From: Petr Pavlu <petr.pavlu@suse.com>
-In-Reply-To: <20260923-build-speedup-v4-13-73128809a4a4@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b0fa30a6-9f41-4c9a-a3fb-2634322e2bd1@t-8ch.de>
 
-On 9/23/26 7:18 PM, Lorenzo Stoakes (ARM) wrote:
-> For every relocation modpost invokes check_section_mismatch() to determine
-> whether there is any kind of mismatch between the source and destination,
-> and if so which classification applies.
-> 
-> Each time it does this it invokes section_mismatch() which iterates
-> through the sectioncheck[] array every time it's called.
-> 
-> When walked a relocation section the source is fixed and there aren't many
-> targets, so the same names are looked up over and over again.
-> 
-> Therefore cache not only mismatch categorisation but also whether a
-> mismatch even exists for a given section and look up the sections in the
-> cache.
-> 
-> Special indices (undefined, absolute, common) take the uncached path as
-> before.
-> 
-> This results in very significant speed ups for allmodconfig incremental
-> builds.
-> 
-> modpost is on the serial tail of every build that links vmlinux.
-> 
-> Whole build, 128-thread Threadripper 9980X, best of N runs:
-> 
->                                          before   after     delta
->                                          -------------------------------
->   x86 defconfig, touch mm/vma.c, gcc        8.5s     8.3s    -0.14s (-2%)
->   x86 defconfig, touch mm/vma.c, clang      7.7s     7.6s    -0.13s (-2%)
->   x86 allmodconfig, touch mm/vma.c, gcc    33.9s    29.4s     -4.5s (-13%)
->   x86 allmodconfig, touch mm/vma.c, clang  31.9s    27.9s     -4.0s (-13%)
-> 
-> Assisted-by: LLM
-> Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+On Tue, Oct 13, 2026 at 10:38:37PM +0200, Thomas Weißschuh wrote:
+>On 2026-10-11 19:36:41-0400, Sasha Levin wrote:
+>(...)
+>
+>> Assisted-by: LLM
+>> Signed-off-by: Sasha Levin <sashal@kernel.org>
+>> ---
+>>  .gitignore            |  5 +++
+>>  Makefile              |  8 ++++-
+>>  lib/Kconfig.debug     |  2 ++
+>>  tools/Kconfig         | 72 +++++++++++++++++++++++++++++++++++++++
+>>  tools/Makefile.kbuild | 79 +++++++++++++++++++++++++++++++++++++++++++
+>>  5 files changed, 165 insertions(+), 1 deletion(-)
+>>  create mode 100644 tools/Kconfig
+>>  create mode 100644 tools/Makefile.kbuild
+>
+>(...)
+>
+>> diff --git a/tools/Kconfig b/tools/Kconfig
+>> new file mode 100644
+>> index 0000000000000..bf0643b39b86e
+>> --- /dev/null
+>> +++ b/tools/Kconfig
+>> @@ -0,0 +1,72 @@
+>> +# SPDX-License-Identifier: GPL-2.0-only
+>> +
+>> +config TOOLS_BUILD_ABI
+>> +	def_bool X86_64 || ARM64
+>> +
+>> +config TOOLS_BUILD_GLIBC
+>> +	def_bool $(success,echo '#include <features.h>' | $(CC) $(CLANG_FLAGS) $(USERCFLAGS) -E -dM -x c - | grep -q __GLIBC__)
+>> +
+>> +menuconfig TOOLS_BUILD
+>> +	bool "Build userspace tools from tools/"
+>> +	depends on CC_CAN_LINK && !UML
+>
+>Why !UML?
 
-This looks mostly ok to me. Below are some nits you might want to
-consider addressing.
+Building with ARCH=um was reaching the tools, which then set "-I
+tools/arch/um/include" but that dir doesn't exist.
 
-> ---
->  scripts/mod/modpost.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 64 insertions(+), 2 deletions(-)
-> 
-> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-> index 75374c64b8cc..0fd43c8a89ea 100644
-> --- a/scripts/mod/modpost.c
-> +++ b/scripts/mod/modpost.c
-> @@ -1155,12 +1155,67 @@ static void check_export_symbol(struct module *mod, struct elf_info *elf,
->  			 name);
->  }
->  
-> +/*
-> + * mismatch_cache[section index] ->
-> + *   0 - uncached.
-> + *  -1 - no mismatch.
-> + *  >0 - mismatch index + 1.
-> + */
-> +static int *mismatch_cache;
+I worked around this for the RFC, but I think I can address it when I resent
+the patches.
 
-It might be cleaner to maintain this cache per elf_info, since it
-logically belongs to the processing of an individual ELF file. This
-would also be consistent with the existing symsearch cache, which uses
-elf::symsearch.
+>> +	depends on TOOLS_BUILD_ABI && TOOLS_BUILD_GLIBC
+>
+>These dependencies could be on separate lines, it will reduce churn when
+>they get modified.
 
-The description could use 'to_secndx' instead of 'section index' to
-clarify whether it refers to the source or destination section of
-a relocation.
+ack
 
-> +
-> +static void init_mismatch_cache(unsigned int num_sections)
-> +{
-> +	mismatch_cache = xcalloc(num_sections, sizeof(*mismatch_cache));
-> +}
-> +
-> +static void reset_mismatch_cache(unsigned int num_sections)
-> +{
-> +	memset(mismatch_cache, 0, num_sections * sizeof(*mismatch_cache));
-> +}
-> +
-> +static void free_mismatch_cache(void)
-> +{
-> +	free(mismatch_cache);
-> +	mismatch_cache = NULL;
-> +}
-> +
-> +static const struct sectioncheck
-> +*cache_mismatch(unsigned int secndx, const struct sectioncheck *mismatch)
+>> +	help
+>> +	  Build the selected programs under tools/ for the target together
+>> +	  with the kernel, as part of "make all", or alone with
+>> +	  "make tools_build". Each program is built by its own build system
+>> +	  into tools-build/ in the object tree. The tools then always match
+>> +	  the kernel they were built with, and a change that breaks one of
+>> +	  them shows up in the same build that compiles the kernel.
+>> +
+>> +	  This needs a compiler that can link glibc programs for the target,
+>> +	  and is currently limited to x86_64 and arm64.
+>> +
+>> +	  If unsure, say N.
+>
+>(...)
+>
+>> diff --git a/tools/Makefile.kbuild b/tools/Makefile.kbuild
+>> new file mode 100644
+>> index 0000000000000..820a2d9a3893b
+>> --- /dev/null
+>> +++ b/tools/Makefile.kbuild
+>> @@ -0,0 +1,79 @@
+>> +# SPDX-License-Identifier: GPL-2.0-only
+>> +#
+>> +# Builds the userspace programs selected in tools/Kconfig for the target.
+>> +# Invoked by "make tools_build", which "make all" runs when CONFIG_TOOLS_BUILD
+>> +# is set. Each program is built by its own build system, the way it is built
+>> +# standalone, into $(objtree)/tools-build/.
+>> +
+>> +PHONY := __tools_build
+>> +__tools_build:
+>> +
+>> +include include/config/auto.conf
+>> +
+>> +abs_srctree := $(realpath $(srctree))
+>> +toolsdir := $(abs_srctree)/tools
+>> +outdir := $(CURDIR)/tools-build
+>> +
+>> +# kbuild's state and the user's compiler flags, from the environment or the
+>> +# command line, would change how these build
+>> +unexport srctree objtree srcroot VPATH building_out_of_srctree sub_make_done
+>> +unexport CLANG_FLAGS INSTALL_HDR_PATH O
+>> +unexport CFLAGS CPPFLAGS LDFLAGS EXTRA_CFLAGS EXTRA_LDFLAGS USERCFLAGS USERLDFLAGS
+>> +space := $(subst ,, )
+>> +overrides := $(subst \$(space),\@space@,$(MAKEOVERRIDES))
+>> +MAKEOVERRIDES := $(subst \@space@,\$(space),$(filter-out O=% CFLAGS=% CPPFLAGS=% \
+>> +	LDFLAGS=% EXTRA_CFLAGS=% EXTRA_LDFLAGS=% USERCFLAGS=% USERLDFLAGS=%,$(overrides)))
+>> +
+>> +# Keep Python's bytecode caches out of the source tree
+>> +export PYTHONDONTWRITEBYTECODE := 1
+>
+>This should just be done in the toplevel Makefile IMO.
 
-Similarly here, s/secndx/to_secndx/.
-
-> +{
-> +	if (!mismatch) {
-> +		mismatch_cache[secndx] = -1;
-> +		return NULL;
-> +	}
-> +
-> +	mismatch_cache[secndx] = (mismatch - sectioncheck) + 1;
-> +	return mismatch;
-> +}
-> +
-> +static const struct sectioncheck *get_section_mismatch(const char *fromsec,
-> +		const struct elf_info *elf, unsigned int secndx)
-
-s/secndx/to_secndx/, and the fromsec and elf arguments could be swapped
-for consistency with the rest of the code.
-
-> +{
-> +	int cached;
-> +
-> +	if (secndx >= elf->num_sections)
-> +		return section_mismatch(fromsec, sec_name(elf, secndx));
-> +
-> +	cached = mismatch_cache[secndx];
-> +	if (cached < 0)
-> +		return NULL;
-> +	if (cached > 0)
-> +		return &sectioncheck[cached - 1];
-> +
-> +	return cache_mismatch(secndx,
-> +			      section_mismatch(fromsec, sec_name(elf, secndx)));
-> +}
-> +
->  static void check_section_mismatch(struct module *mod, struct elf_info *elf,
->  				   Elf_Sym *sym,
->  				   unsigned int fsecndx, const char *fromsec,
->  				   Elf_Addr faddr, Elf_Addr taddr)
->  {
-> -	const char *tosec = sec_name(elf, get_secindex(elf, sym));
-> +	const unsigned int to_secndx = get_secindex(elf, sym);
-
-The const qualifier can be dropped from the to_secndx definition to
-match the usual kernel style.
+I originally added this because perf was silly, but apparently that was a bug
+instead of intended behavior, which was fixed in 5479e1a13b759 ("perf tools:
+Put Python bytecode in output directory"), so I think I can just drop this
+altogether.
 
 -- 
 Thanks,
-Petr
+Sasha
