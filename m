@@ -1,146 +1,217 @@
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A76B4A64EF
-	for <linux-kbuild@vger.kernel.org>; Thu, 15 Oct 2026 13:58:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C9625349A6
+	for <linux-kbuild@vger.kernel.org>; Thu, 15 Oct 2026 14:57:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792072705; cv=none; b=Ym2nbf8le0IdMiJp8TDzsreSZtRlaDUJs9SDCDV2g+IAoDPwX4DC45Kw1xnSDtsWP3EbCcvhQZrOajS2DLj5//HtRpAbx1X1RfWWVgWuxQyrWsQXo0qHFfggP8Ggct0sPbPmZbdtGB/MbKg6XwUuz32LK0q+ds91/cINhq4yyB0=
+	t=1792076255; cv=none; b=GGZK8t8qcTG9TWfVlG/Q72ccOrycOfqT3xqqvmRcbc2wQYm+HyuB5scssQdHmaMdoiEgLBy9qsh7ei4/0961TNqpKGplbZPOvP3jiuIoeSXJ0dxVLu2NdxA872U+T04RwCDA/vecCvi9w8/mpnhv02tNnyeNuqan2Yngl+Zbah4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792072705; c=relaxed/simple;
-	bh=Ho9YjB7reTrmZ0D9XSI3KdhGFFfKLwxERh2NVVcc4zg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bmdGcR7RaxXL8BcUD1pPdjMM5o79QUtMmQMJf2JLZqIJkN2SF2mvAAu7dKE6IBZOkyrcG0pUf1MOcwAPz2DqRPkRJIP3Pqhv0HMAoxtLNp+kcS8KSzypa71pW/Ytd1e/WnG/lKd8Rvj52Lgbq51yuyZWoHxLZdSG0jISDMrQ8Eo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j0jUX2Hy; arc=none smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1792076255; c=relaxed/simple;
+	bh=nbtf2aJFUaL/4iH/qLfpXzTeoJ6Tlhbj6DaOj27+188=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=WtYhRS/oH2sW7b4R59CEfoTPIJZ54db7ds+mj0SishWaSzxHeFu1Mg+Tdm+uzsH61lnZF9zXg7FRlEOcfxK74vmS8K6matYS7OIJ3TphVFPePUivyEgolf05+SkztTSNtERVOCQEhS+MOd0SoCu0kO09DQRaLu4Lyl8sRpIpdtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--elver.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EZasvRAj; arc=none smtp.client-ip=209.85.128.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--elver.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j0jUX2Hy"
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-cd5c9e52398so2374316a12.1
-        for <linux-kbuild@vger.kernel.org>; Thu, 15 Oct 2026 06:58:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EZasvRAj"
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4a0761224e1so19632645e9.0
+        for <linux-kbuild@vger.kernel.org>; Thu, 15 Oct 2026 07:57:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792072704; x=1792677504; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=lPZUBNn4GPGhvhNrbIpHNNxTG5Tr+rGqMQM1UOtv2Wk=;
-        b=j0jUX2Hy3BpBcSejtgENCZEtdEpYk0s0RZwqfHH5ZZKfJAt5KXfG3mVT0jRZFeHMda
-         oP7i6aWr0GN1EdJ3DIuwfB7hHbgFfI7odv6U5oKwmDZFtVjlmqzN9YH7GSZXJuSuV9bb
-         X/21zjlv6gvCGMd74brv61lH+UsquZiabZU9XQ35CIz2UwMfZMqvM+MHdUFDuQIlGxS2
-         S8ittq5h41OfqbKndRYL6ioEdk38Qe7v7SRmsCyZmbhTnQwwf4avqeZBYpaci1/9UWK9
-         wca6saN9ofRpQn/PYcpk85eecV9UvINNHbvHP8l0Z11VE0+lJIQ0fls9veO7cvV0NwkO
-         NFpQ==
+        d=google.com; s=20251104; t=1792076250; x=1792681050; darn=vger.kernel.org;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=gOPLD1Nk0xD9uDIf10OzE40FWH2sqAvdDlcLSS3lQok=;
+        b=EZasvRAjos5Z9twr/kI65YM9wdYqGfB5UoPJL2pol/ju2uoTKdBPr1nyQUP/ZLLMIH
+         MBnG3IlODF05yBX1GwZnYJyGhJrnycv6DNblJkwzq6+/QaCwQph7gA1Z1xwFj6WXVcef
+         W+raxletovlSkMJaiylCjoiSQKMYcaZ5XmQT/jk294q+1UgkPGArMzrVkyjoJec0N+tc
+         /HaDgv+NV1EuwfpLLJtOorWdwscXBr4aPN1447opaOPfFN6R51vLspa4th4Xc24J3BqZ
+         1Mjs8Rt01sA+voKP7UkAyrGoDlmYdL5WZqdP9FsFWko60LE0zw/gH0WHPloWplgHccUx
+         UI9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792072704; x=1792677504;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=lPZUBNn4GPGhvhNrbIpHNNxTG5Tr+rGqMQM1UOtv2Wk=;
-        b=vpW+jAGJfKtEMAPhCWxi99i1SUnf4G0UKAmg1jyk83vsPJlHKTPzfLBpLSaV+UgKxi
-         vTe9GtEg6t62VYD1cuC8Zkb+iuFyzL44q80r0Lsf1Vo3qofq6xntu0468VnnwZ/exikc
-         VXF4YDYz3M5AMHGrBzCt+DaMai4vMCBLPgKfRggNwVNKBaC2R81RHJ10moiZUaOptVev
-         Lpxhm1Qml8ouLb+cytBrln2x33FCTVpSha2hjO4YwUgitG5lbJnHlsEFT35fWV+7HZZ1
-         7xRH9lxkwv9M9gjbUV5f6ZtOSMJ9IKKlbzzyRLidU1J2mURgu2yJ47uebTiwxPt7pSaW
-         5nVQ==
-X-Forwarded-Encrypted: i=1; AKwUvByavjJxW6bbGx4UPMVqIxbSyGlHpXWpeAr//tbB0KbFPaLidI468QJ76id9CjmmO03wCSvj06gkkWP4Bx0=@vger.kernel.org
-X-Gm-Message-State: AFq9FYKaO00IW8dE0JO8j3RVl1SEbnonMluhgXPrK8kTVINVY1xryRRI
-	1VUSw+lt/o+NRgAEtR4DJyMcwIIqwmrb1ksMq4jjGdgtHGOHL7FNNHN8
-X-Gm-Gg: AYBFou2xJ6YiotHHR3f6ICaYwcmRR6VrhoiaChm69hNqjJYmO+vJlFP1jhcLtMobyAj
-	ZDDLRZG0qzJB/bY1ohd8H/3zbHlfmnS98BMBc+qXenlwJdUa1bbFAJBivElMo/Dv5tL0byUYE4X
-	nFXBICEw3NvgcIsmBFiuNWqjpNVkeOi74cHpvyw6O11OpGUeacDzWzeWkdlWNU30ojD0vwcgHTV
-	oN+yXAEdVe3FYY0SxM/9RkaN80QelH4AaJzOh4b0sZSahR4A+VYnAQd8gPtmFE1z0ZZnnKGPEBc
-	OsEChmzXSN+Sg9mRxq4VsKn9/UGleH2H3UPGxqQWoEVqtxTwUiNTdGIHdyVSz80T1eZAm1zA9nT
-	qhmLy3dpp7vPRJujxqVSl48+nrf/Wx/G4Q6vDFZQqNCxWxtjLCuV+2ITZVpHwf8YWzMhQH9NWC2
-	8OhLPOWFF4vVVo9elzW1jFZ56aHokKt0rshhN+y2ZJdXKgoOPd+EL9ZU29/c5MEY/+l3FAEzpa8
-	hYl7B9ttk8ISUIhX7IGlESA2A==
-X-Received: by 2002:a17:90b:4d88:b0:3ab:189b:6980 with SMTP id 98e67ed59e1d1-3ab3a79cf22mr17057046a91.39.1792072703840;
-        Thu, 15 Oct 2026 06:58:23 -0700 (PDT)
-Received: from localhost.localdomain ([113.165.144.92])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ac94794dd9sm4566857a91.12.2026.10.15.06.58.20
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 15 Oct 2026 06:58:23 -0700 (PDT)
-From: vngocvan <vngocvan@gmail.com>
-To: nathan@kernel.org,
-	nsc@kernel.org
-Cc: ndesaulniers@google.com,
-	morbo@google.com,
-	justinstitt@google.com,
-	masahiroy@kernel.org,
-	llvm@lists.linux.dev,
-	linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] gen_compile_commands: honor the build directory for modules
-Date: Thu, 15 Oct 2026 20:57:52 +0700
-Message-ID: <20261015135752.17028-1-vngocvan@gmail.com>
-X-Mailer: git-send-email 2.56.0
+        d=1e100.net; s=20260707; t=1792076250; x=1792681050;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=gOPLD1Nk0xD9uDIf10OzE40FWH2sqAvdDlcLSS3lQok=;
+        b=Acu71jpcrNsjFnnSqT4rUQqzbmEPVD1WWShUpTmF2mVCx3FfF5pf5W7EmBth9GaW/k
+         Dh4BkKe0UzV2kVZWpJtcHpg11nr/54/VO2iYBB7Jlz6UgtuTdEj6RJzcsYlRCDQ0qckC
+         1nHxnAOwcJ22cHuCwYFyMq/XfLNYVGf9wyzwO1GcoZchVbeiR6EMqhiR7tziJZyehtnw
+         ul5oXQtUlVSsoybti/eIMWFB0Jey/r5XGPOH6sLQEuTrBRMr/knIcX236tGd+hrefawq
+         7oQQ4pIAoVyFtckTaKaXPvUkJ43IbSW0HR+gobNlQ8C293q9tppAco5l2NUGLWbIOKmu
+         FtjA==
+X-Forwarded-Encrypted: i=1; AKwUvBzbQCKE10qpwnKs0wJbkFkMgQpekJ81DkJtUzSjKJUNac6qJXGKiNwHwxe/98unECJzkj5V4gbdBW/6EbM=@vger.kernel.org
+X-Gm-Message-State: AFq9FYKYs1yftIGsrPXq6e8RKQMzs8gir8h5/vwLhZXTdwCpG02aUTSQ
+	R/xropkgZ0TzKjZISwnWr1LHuFw6j0lWQn4QlsgBkk3n1zk/b+NEBlTOg2xvWVK14Mbby3ZlDhQ
+	jWw==
+X-Received: from wmbgx18.prod.google.com ([2002:a05:600c:8592:b0:4a1:7fbd:344d])
+ (user=elver job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:3f16:b0:4a0:2150:55fb
+ with SMTP id 5b1f17b1804b1-4a18e44395bmr382529505e9.4.1792076250083; Thu, 15
+ Oct 2026 07:57:30 -0700 (PDT)
+Date: Thu, 15 Oct 2026 14:56:14 +0000
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.56.0.385.gd3acb90ef8-goog
+Message-ID: <20261015145714.3327543-1-elver@google.com>
+Subject: [PATCH v2 1/2] kbuild: rust: enable KCSAN support
+From: Marco Elver <elver@google.com>
+To: elver@google.com
+Cc: Alexander Potapenko <glider@google.com>, Boqun Feng <boqun.feng@gmail.com>, kasan-dev@googlegroups.com, 
+	linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, 
+	Randy Dunlap <rdunlap@infradead.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
+	"=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?=" <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
+	Daniel Almeida <daniel.almeida@collabora.com>, Tamir Duberstein <tamird@kernel.org>, 
+	Alexandre Courbot <acourbot@nvidia.com>, "=?UTF-8?q?Onur=20=C3=96zkan?=" <work@onurozkan.dev>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, Asahi Lina <lina+kernel@asahilina.net>, 
+	Lorenzo Stoakes <ljs@kernel.org>, Yury Norov <ynorov@nvidia.com>, David Gow <david@davidgow.net>, 
+	Joel Fernandes <joelagnelf@nvidia.com>, Alvin Sun <alvin.sun@linux.dev>, 
+	Josh Poimboeuf <jpoimboe@kernel.org>, Petr Mladek <pmladek@suse.com>, workflows@vger.kernel.org, 
+	linux-doc@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-When invoked from outside the build tree with -d and a modules.order
-argument, the script opens .mod files relative to the current directory
-instead of the specified build directory. This can fail with
-FileNotFoundError or collect commands from unrelated artifacts in the
-current directory.
+Rust supports ThreadSanitizer instrumentation via LLVM, which is what
+KCSAN relies on; however, Rust code is not currently instrumented.
 
-Pass the build directory to cmdfiles_for_modorder() and resolve both
-the .mod files and their associated .cmd files relative to it. Absolute
-paths continue to work, and the output location is unchanged.
+Pass -Zsanitizer=thread and the same TSan backend options used for C
+code to rustc. Wire up KCSAN_SANITIZE in scripts/Makefile.lib for parity
+with C (though rustc currently rejects linking crates with mismatched
+instrumentation).
 
-Fixes: ecca4fea1ede ("gen_compile_commands: support *.o, *.a, modules.order in positional argument")
-Signed-off-by: vngocvan <vngocvan@gmail.com>
+rustc only accepts -Zsanitizer=thread for targets that declare support
+for it. Of the targets used by the kernel, this is only possible for the
+generated x86_64 target specification, so restrict instrumentation of
+Rust code to x86_64 for now via HAVE_KCSAN_RUSTC. On other architectures
+Rust code remains uninstrumented as before.
+
+All TSan options used are supported by the LLVM versions of the minimum
+supported rustc, so no rustc-option checks are needed (they would also
+fail, because x86_64-unknown-none used for option checks does not
+support -Zsanitizer=thread).
+
+Unlike Clang and GCC, an equivalent to -fno-optimize-sibling-calls is
+omitted for Rust because rustc provides no corresponding option. While
+disabling tail-call optimizations helps preserve complete stacks traces
+in reports, it is optional and not required for KCSAN to function.
+
+With this enabled we can detect data races in kernel Rust code and
+between Rust and C code.
+
+Acked-by: Miguel Ojeda <ojeda@kernel.org>
+Acked-by: Boqun Feng <boqun@kernel.org>
+Signed-off-by: Marco Elver <elver@google.com>
 ---
- scripts/clang-tools/gen_compile_commands.py | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+v2:
+* Add note on -fno-optimize-sibling-calls to commit message.
+---
+ Documentation/dev-tools/kcsan.rst |  7 +++++++
+ lib/Kconfig.kcsan                 |  7 +++++++
+ scripts/Makefile.kcsan            | 13 +++++++++++++
+ scripts/Makefile.lib              |  3 +++
+ scripts/generate_rust_target.rs   |  2 +-
+ 5 files changed, 31 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/clang-tools/gen_compile_commands.py b/scripts/clang-tools/gen_compile_commands.py
-index 8d14b81efd73..149135f85f19 100755
---- a/scripts/clang-tools/gen_compile_commands.py
-+++ b/scripts/clang-tools/gen_compile_commands.py
-@@ -124,7 +124,7 @@ def cmdfiles_for_a(archive, ar):
-         yield to_cmdfile(obj)
+diff --git a/Documentation/dev-tools/kcsan.rst b/Documentation/dev-tools/kcsan.rst
+index 8575178aa87f..3bb8754f844b 100644
+--- a/Documentation/dev-tools/kcsan.rst
++++ b/Documentation/dev-tools/kcsan.rst
+@@ -14,6 +14,9 @@ Usage
+ KCSAN is supported by both GCC and Clang. With GCC we require version 11 or
+ later, and with Clang also require version 11 or later.
  
++Rust code is instrumented as well on architectures whose Rust target supports
++it (currently only x86_64; see ``CONFIG_HAVE_KCSAN_RUSTC``).
++
+ To enable KCSAN configure the kernel with::
  
--def cmdfiles_for_modorder(modorder):
-+def cmdfiles_for_modorder(modorder, root_directory):
-     """Generate the iterator of .cmd files associated with the modules.order.
+     CONFIG_KCSAN = y
+@@ -121,6 +124,10 @@ the below options are available:
  
-     Parse the given modules.order, and yield every .cmd file used to build the
-@@ -132,6 +132,7 @@ def cmdfiles_for_modorder(modorder):
+     KCSAN_SANITIZE := n
  
-     Args:
-         modorder: The modules.order file to parse
-+        root_directory: The directory where the objects were built
++  Note that ``rustc`` rejects linking crates built with and without KCSAN
++  instrumentation, so ``KCSAN_SANITIZE`` and ``KCSAN_SANITIZE_<target>.o``
++  cannot currently be used for Rust code.
++
+ .. _"Marking Shared-Memory Accesses" in the LKMM: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/tools/memory-model/Documentation/access-marking.txt
  
-     Yields:
-         The path to every .cmd file found
-@@ -142,11 +143,11 @@ def cmdfiles_for_modorder(modorder):
-             base, ext = os.path.splitext(obj)
-             if ext != '.o':
-                 sys.exit('{}: module path must end with .o'.format(obj))
--            mod = base + '.mod'
-+            mod = os.path.join(root_directory, base + '.mod')
-             # Read from *.mod, to get a list of objects that compose the module.
-             with open(mod) as m:
-                 for mod_line in m:
--                    yield to_cmdfile(mod_line.rstrip())
-+                    yield os.path.join(root_directory, to_cmdfile(mod_line.rstrip()))
+ Furthermore, it is possible to tell KCSAN to show or hide entire classes of
+diff --git a/lib/Kconfig.kcsan b/lib/Kconfig.kcsan
+index 4ce4b0c0109c..f0096e1c8b61 100644
+--- a/lib/Kconfig.kcsan
++++ b/lib/Kconfig.kcsan
+@@ -10,6 +10,13 @@ config HAVE_KCSAN_COMPILER
+ 	  For the list of compilers that support KCSAN, please see
+ 	  <file:Documentation/dev-tools/kcsan.rst>.
  
++config HAVE_KCSAN_RUSTC
++	def_bool RUST && X86_64
++	help
++	  rustc only accepts -Zsanitizer=thread for targets that declare
++	  support for it; of the kernel's Rust targets, only x86_64 does.
++	  Elsewhere, Rust code is not instrumented.
++
+ menuconfig KCSAN
+ 	bool "KCSAN: dynamic data race detector"
+ 	depends on HAVE_ARCH_KCSAN && HAVE_KCSAN_COMPILER
+diff --git a/scripts/Makefile.kcsan b/scripts/Makefile.kcsan
+index 19f693b68a96..01af6fd71006 100644
+--- a/scripts/Makefile.kcsan
++++ b/scripts/Makefile.kcsan
+@@ -24,3 +24,16 @@ kcsan-cflags += $(call cc-option,$(call cc-param,tsan-instrument-func-entry-exit
+ endif
  
- def process_line(root_directory, command_prefix, file_path):
-@@ -206,7 +207,7 @@ def main():
-         elif path.endswith('.a'):
-             cmdfiles = cmdfiles_for_a(path, ar)
-         elif path.endswith('modules.order'):
--            cmdfiles = cmdfiles_for_modorder(path)
-+            cmdfiles = cmdfiles_for_modorder(path, directory)
-         else:
-             sys.exit('{}: unknown file type'.format(path))
- 
-
-base-commit: 0fcb05b72344f40806cbe810de8872f1698bf053
+ export CFLAGS_KCSAN := $(kcsan-cflags)
++
++ifdef CONFIG_HAVE_KCSAN_RUSTC
++# The minimum supported rustc's LLVM supports all of these options.
++rustc-param = -Cllvm-args=-$(1)
++kcsan-rustflags := -Zsanitizer=thread \
++	$(call rustc-param,tsan-compound-read-before-write=1) \
++	$(call rustc-param,tsan-distinguish-volatile=1)
++ifndef CONFIG_KCSAN_WEAK_MEMORY
++kcsan-rustflags += $(call rustc-param,tsan-instrument-func-entry-exit=0)
++endif
++endif
++
++export RUSTFLAGS_KCSAN := $(kcsan-rustflags)
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 0a4fdd8bd975..78f1c23e54be 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -98,6 +98,9 @@ ifeq ($(CONFIG_KCSAN),y)
+ _c_flags += $(if $(patsubst n%,, \
+ 	$(KCSAN_SANITIZE_$(target-stem).o)$(KCSAN_SANITIZE)$(is-kernel-object)), \
+ 	$(CFLAGS_KCSAN))
++_rust_flags += $(if $(patsubst n%,, \
++	$(KCSAN_SANITIZE_$(target-stem).o)$(KCSAN_SANITIZE)$(is-kernel-object)), \
++	$(RUSTFLAGS_KCSAN))
+ # Some uninstrumented files provide implied barriers required to avoid false
+ # positives: set KCSAN_INSTRUMENT_BARRIERS for barrier instrumentation only.
+ _c_flags += $(if $(patsubst n%,, \
+diff --git a/scripts/generate_rust_target.rs b/scripts/generate_rust_target.rs
+index 7687b0dd5474..4b02bffa6b46 100644
+--- a/scripts/generate_rust_target.rs
++++ b/scripts/generate_rust_target.rs
+@@ -231,7 +231,7 @@ fn main() {
+         }
+         ts.push("features", features);
+         ts.push("llvm-target", "x86_64-linux-gnu");
+-        ts.push("supported-sanitizers", ["kcfi", "kernel-address"]);
++        ts.push("supported-sanitizers", ["kcfi", "kernel-address", "thread"]);
+         if cfg.rustc_version_atleast(1, 91, 0) {
+             ts.push("target-pointer-width", 64);
+         } else {
 -- 
-2.56.0
+2.56.0.385.gd3acb90ef8-goog
 
