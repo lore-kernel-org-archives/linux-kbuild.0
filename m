@@ -1,146 +1,165 @@
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6571B59C963
-	for <linux-kbuild@vger.kernel.org>; Thu, 15 Oct 2026 21:01:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792098123; cv=none; b=G7TpijF+DHXma609VMNH51O1E6rOHHhf+V/j1cGJgG+pxn/pMjTVMb0k3YiKNAHgpMszv82reI0nKi1dynUGs8SoWpNdn082fdgq09hv0MC3wCM/T3m91wF74HdMbuCy5paEpiBHOHSL+Rs/QQn8hGwVQ45BNQvJBZJ+D2YyuAg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792098123; c=relaxed/simple;
-	bh=CrId/mzxO173Pii4jucd8wzO7SQYyYyWQ7bm2bVwkio=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Lt9mRWzSh8Kj/osyhX42Qf/hqKT2kOQDHM4pM3UykN9iJI8GZUtMOCabGOsj2LqJQhq7V4koOwBXpt3QwsqM1Lwj+/0sOBN2mjmO8qSFdf7QnNRurZ9Yd8f5SYk444yud66BM8HyLOaenpbP+xGLpO93GYK1/BxHgd7vzZ8BpbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=smQXQSlw; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E42C43CEF3
+	for <linux-kbuild@vger.kernel.org>; Thu, 15 Oct 2026 21:26:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.171
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1792099601; cv=pass; b=RggzWcGSyGWvMF8Ty61g9NQu7xn293S6vt17X3VW0i5BHKgRaitN8NldvfDCLnt4TNCUSg9GirNTn9VGFFZUNys/dg5qm56nweVpOe+Mzw7pWIpuPuR5NmR1DW10rIpQyfPYpN6v2d7NbV2foJqZJea/CIhVFcGRsgdd0nklavc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1792099601; c=relaxed/simple;
+	bh=S24dOVcDoMu01ibSOw1+bNFyN8uZ1WIV5X5lG+8sUTM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ttcNj5MKmK9ioM+ErZyGhu6/6/7pjgwvPFo3IMP+c18/j1a3Y5OO/kuzFejVG9tinsiOjx9c6lK9+f0XTwowo6kd6o7ch0l0Uidrjy6/CYpX/BW1jWY6a4lE2jqnwVkaHPjQnkKIuGoq11HS/PTYQ2d8paaWkTVEXLT+PD8Ju1g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oKrckloV; arc=pass smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="smQXQSlw"
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5ba3ec92031so5975247e87.2
-        for <linux-kbuild@vger.kernel.org>; Thu, 15 Oct 2026 14:01:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oKrckloV"
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-533202fe429so105611cf.0
+        for <linux-kbuild@vger.kernel.org>; Thu, 15 Oct 2026 14:26:39 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1792099598; cv=none;
+        d=google.com; s=arc-20260327;
+        b=UEComLVyfb7bo5+dgY31YD1kMqXkzBpPY6bde0Ew4ycCw/4ZUQG61VMJjpbVsOThgj
+         4woFMc4htnzWkbZC4uq/gkld79navFDRpnmQzyF6Or1tfGurm5D9vJihedmKFxGPWfSk
+         Va8jj9QjM+ya0gG+Mh5NEGFht+r6H+3dcsxoX8vIiK1BXVnmG3i4M2kvpnHi9OCor+U0
+         pwvDN/Mlw5h42WOCxchP8k6ZGNpODeKcu/6dTU6F3thm2uwx9d6xoEjpXFYjV7bWp951
+         PgyGk2ate8oK1AffaQByXC0fOWWl/Me7WbQQ5bhhom0cKbdGzqtSMkb8Uim7jbUg1xXV
+         t4nQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=OgcgdziUoCAQVTSOyr0xkG5j6Rc5FznnZ78bB8A0JZM=;
+        fh=7tsbkjJ7ZXRv0k0TtH+RjJe/NV6dmmsWQ0Fu33u8oKE=;
+        b=r3Pv1PxcVnbcl7PSU/VF34TO72JbSTO7xeWPzKw5FtkJeTWLivpbOT2oNXEHIXxTYz
+         xGneq6Q4095/tkTpQT81dKoAtX6O+FWJURs+iwF6zL9KAeIY28xE+thhEE+tuBT6QoR8
+         fFGCVSMaO5j7sHC0iGhEohoSbxXJjY5nwNZl4/iyloGVXscw3BHExK9mDZTFiOC+w+1X
+         YQSFJ7pZXz95Rv0mS8p5wd2yfA183L/0gBRUNT5HhFSuB/mCXQo/7vCF7faOLGWn+l1Q
+         o9DHSosURsiZYsP54zQC8p1zTJDbbBqCgue18BmmJiT8qKle+9OcEgq504pBk9v2FGZM
+         Kgtg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792098113; x=1792702913; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=ycEiSjweMphxeT+LmW+Ybd3KfInm2+XUCR6PcOqNVQI=;
-        b=smQXQSlwtFI22NhLDDLPsYXq5WyqNBAY1dwFtXXZKKVitnTjDn8s52LaC2YayRQOfE
-         sZezujv0DVwVAT7Nlhlkp0E6xRLsPqN817HYEnc/MkVMMSHAgh2DuafBtGSmTQiQifpW
-         Yfq1EkygRejqYvpkx+BH5olOtK5Ey2RYFFFU7KRVYEkwnac1E5NXeA01cAH0VKeUQ2fU
-         zabcXiihWbYMfDJN4rfJ48p/8Twj41pb4B7Tct5dWZS95LMaBMn2vG0IM3dPZX6t6hDD
-         LLz06EOOWtGkYoO5iebh2G2hdM9hQTEWSDCoXHvcySQXK5U5GofW09SScQKTg5QcU10H
-         ZMxA==
+        d=google.com; s=20251104; t=1792099598; x=1792704398; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=OgcgdziUoCAQVTSOyr0xkG5j6Rc5FznnZ78bB8A0JZM=;
+        b=oKrckloVPBkqU275fV0Dp0vswVpn9xI3pbBF0luDu5tSShg5dkG2YFZkgn8FRW6zce
+         SC6ce0/U2RwBMT7UdzqImKj7Zwk5S0nhq6OPLHt7tgXeMAaz7CD4ePFHyCr43fJxXA0Y
+         2jw5Oyrx7g+KPlc3TkA9w3oG2VFtEizziz3jHzVGNBWpDorHwNjHlbHymuYcu8CVQyzI
+         mvaz+FJ/xCsHJnZ4uSZEhOWijfOu6wwnL3wJ1s+dxyrL6peIWJod70X2U1Wzemtm1L0N
+         CFqg8wwGGvxXUvAYmKzgnxuDknpyeEjx5L1091lujDB82PDgTH1VZb4IgR3IDFsb64PI
+         K/BA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792098113; x=1792702913;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=ycEiSjweMphxeT+LmW+Ybd3KfInm2+XUCR6PcOqNVQI=;
-        b=n8Qt+qD0yHSKHwhl12+QDOIYt6HY7liIZD7Tl/1pvIeg2bJFGkkovJzoVKZp3HEofY
-         V5EleQE9Bhu5kDEuqUSk20lKLq/C+/ePTgfOTA3XGeijyYDrLrehZgWU5ZHy2JsKPDcF
-         JkkEoLTmfH1yujdGb8/7HUuJgAdrYKeczIPzWT/1+EpvpudQC3Kc7Xheo2qCemWNNTMT
-         Q1fgQvHwwYI4lEu/4EA/X2glge+uYw0ffJxZPHrAC2mofF2tkdRwKt7TgCWfwgWdaqF1
-         RcTZV4PsO7NhV/cUOgTaE3DvnLoyVtgVRFswa35d2ZRy78I19K8hnnUUkvEdWCirAvA/
-         8QGw==
-X-Forwarded-Encrypted: i=1; AKwUvBzsjzx1kO5uuGlf/iF2pmS0dK3OAvCMXg/nULlo5dSnkwrP+zaeFwHbwkSaDk3ne56NOLlonIggeANgLIQ=@vger.kernel.org
-X-Gm-Message-State: AFq9FYLof6rshT7VsdqsOXc2sxw8TBGI/yk/V+3BdMiPAl1igC2+uH8C
-	dYrSolmEvx9CCVVrGL1ypPBldDAL5HfaNh1P+TL46l7HYqZjYnBaetnx
-X-Gm-Gg: AYBFou31nhtdiK3JCMfVS3+vIqTgPC0zWYNR4VNm+vLab60XWCis1ugKHKWjD6GjwlI
-	WrTZ/M+fitT66ryv4EmqdvK88FDNy/hb9y0nJO5JnqDPc6POgOdcQSNM/jkfx3UvYADRFKnoabZ
-	7ild3tyVAzlIgM3U28q9D40hw1bM8tJW3NFE8Lsk/vMI4Qru9fWrO+Nr0VLRBx4Xx8KZSRzddl8
-	aH0ksCCqz1UZRXyydZPvDBFQgp3G7XQAw0FnySALajFI/7LbFUnCXw50ZAn1Fpy8ociEeww/25p
-	m5I1BZqp24c68ovtn9FxciFRBIdylnNN3RdHkluljvMuYEqPbEdVDo6+4wZNrDPVebdVHfmZuQi
-	AeKQgSo7M+y0gNsWUc0hVhNIb/r+al9FcC42zxNpfWmYhr5Z2mzhNV+N6vFeoM0wyVCBV3lQCqZ
-	Cg9UHrsKjg1Zg6GiT61mxLptJNcwHPfMq7cMaO+xOAywwi5iRB7IKFXUiaHuOLr30frFp3QaH3e
-	I2i+EC6+0jVZV/YDoCeTJkn+FUZnvVcl6I8Hw==
-X-Received: by 2002:a05:6512:10c3:b0:5b6:183c:5c96 with SMTP id 2adb3069b0e04-5bcde6adb31mr7892347e87.52.1792098112887;
-        Thu, 15 Oct 2026 14:01:52 -0700 (PDT)
-Received: from sc-mac-012.corp.sbercloud.ru ([188.191.29.26])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5be4a42ade9sm11127e87.14.2026.10.15.14.01.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Oct 2026 14:01:52 -0700 (PDT)
-From: Dmitry Kandybka <d.kandybka@gmail.com>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Nicolas Schier <nsc@kernel.org>,
-	linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH v2] kbuild: Makefile.lib: fix offsets generation with debug info
-Date: Fri, 16 Oct 2026 00:01:47 +0300
-Message-ID: <20261015210149.78470-1-d.kandybka@gmail.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260928105330.25427-1-d.kandybka@gmail.com>
-References: <20260928105330.25427-1-d.kandybka@gmail.com>
+        d=1e100.net; s=20260707; t=1792099598; x=1792704398;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=OgcgdziUoCAQVTSOyr0xkG5j6Rc5FznnZ78bB8A0JZM=;
+        b=nFHodOFPMeX49Y2Wu21n3i1gLTf5vpxezVvwzUqjFr9DycZFIP0/C7YF0rndX8qAHl
+         eki/j6NkrQwcwZ81WXM/Co4p0bZNg/hS5NakINagqE+Ic3TK9v6DPkrEUfLQrdvfp4Sm
+         fu7uMsTPsi3Uai+w4y+wOcTrrzELTpgn+VfySaZJosyXnmWvRWCXTdWriLLwPpxtG2FK
+         FaapuLAdqrpHvuJ9VNKlJjPMVY6SleowYFq/plxW2Ylfis60jTbNNdyVd9ub6MOyY9Qv
+         eQA/QN4jxG3Vtj17LJN58CotslDNJuvGO3iOyqWTQNfQRFgDJlki/lnSt4ZCmV8vs2jY
+         zHIg==
+X-Forwarded-Encrypted: i=1; AKwUvBzLg1MKQcIYNVDve4wOrEMhAN5he+gIj8dcOVu8cC8rSmHvJx5Jb8ceZruc7Fki4kFKIQmO5OfnT2eeWwk=@vger.kernel.org
+X-Gm-Message-State: AFq9FYJAyQdt4eNxxQBmFhYvXbFSKP/BufPqioELxmgYGIxSrCyUZDxo
+	PAO7vRogI5v6sKIpLE0HRG6r4xFGp2NI6SILhXIZE9ITYVsuw9RepF3BjrCj7eKV1eH+0zOSbum
+	4CJkUqkJkn5G4/vlaIXYsqqGkA40KLQArnlziNnCF
+X-Gm-Gg: AYBFou1h/TnOIvAsQUu76vHDgkkrGpG/yCJYInPmChCSQO6wxLxRxsLk2p4F3fSB9Qs
+	xJuqKYqcnICACaNkNkmpMsW9xuHyAFKMeAXUlU0Wp5sStWIQcUKbIx1UAS0sEjDbXTRQcukE2Ur
+	2MTPRNTDXQEWwQ0RJLFX7pUAJ1jW8lL1vdTV/uPQz8OVsPAP6OTjKS5MhY9tCDua/YCFiGInbps
+	xPIJePUt4kcOizL+HaGruE/wg3zWhjUfhIDWhY67JoQIc6DNZzNyOQ2GUgdybPnp4d2L5kBJRQh
+	NDz34R/aXTLcNh9wXyarHlR0QBumI87A1CCJUrNYkN05nIdg2Skw2V+9eUcYFKsvhvLZ85SgG6A
+	z7ZSQ9Dhcmg==
+X-Received: by 2002:a05:622a:580a:b0:535:cee9:78ee with SMTP id
+ d75a77b69052e-5362b4d91b9mr2154821cf.15.1792099597789; Thu, 15 Oct 2026
+ 14:26:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20261011233647.2454648-1-sashal@kernel.org> <20261011233647.2454648-4-sashal@kernel.org>
+ <CAP-5=fWFY-tpJz2vcBZvurwdZY5gwd8cuTemE9q1rtZ0Vi0dng@mail.gmail.com>
+ <20261013170854.647305-1-sashal@kernel.org> <as6SxXELnoIJenIX@x2> <atEo6aIQbgww4G0y@laps>
+In-Reply-To: <atEo6aIQbgww4G0y@laps>
+From: Ian Rogers <irogers@google.com>
+Date: Thu, 15 Oct 2026 14:26:26 -0700
+X-Gm-Features: AclHuK-FmTfmnNngMCTHGyBJ-W37rLbDe_VKRvUNDuHeCzq-aOwVNF9WYcEKmR8
+Message-ID: <CAP-5=fVq9rpDm2v8EjrQBVz6aV7SLaYzAwncQBwut0QDnFJ-kA@mail.gmail.com>
+Subject: Re: [RFC PATCH 3/6] tools: build perf in tools_build
+To: Sasha Levin <sashal@kernel.org>
+Cc: Arnaldo Carvalho de Melo <acme@kernel.org>, linux-perf-users@vger.kernel.org, 
+	Namhyung Kim <namhyung@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+	linux-kbuild@vger.kernel.org, Shuah Khan <shuah@kernel.org>, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-When debug information is enabled (e.g. -ggdb3), the assembler
-output file (e.g. kernel/sched/rq-offsets.s) contains additional
-directives such as .ascii with offset info and debug metadata.
+On Thu, Oct 15, 2026 at 12:26=E2=80=AFPM Sasha Levin <sashal@kernel.org> wr=
+ote:
+>
+> On Tue, Oct 13, 2026 at 05:21:25PM -0300, Arnaldo Carvalho de Melo wrote:
+> >Why is that difficult to run:
+> >
+> >make -C tools/perf install-build-deps
+> >
+> >To do a recommended perf build deps install?
+> >
+> >That would be useful as it is what we expect users to do.
+>
+> That's what users do, but it wants to install packages.
+>
+> We need a path for unprivileged builds on bots and CI machines that can't
+> install packages, and many of those builds are cross builds, where perf n=
+eeds
+> the target's libelf and libtraceevent rather than the host's.
+>
+> >If that is too difficult, for some reason, there is a minimal build in
+> >tools/perf/tests/make, that is tested since forever:
+> >
+> ># all the NO_* variable combined
+> >make_minimal        :=3D NO_PYTHON_MODULE=3D1
+> >make_minimal        +=3D NO_DEMANGLE=3D1 NO_LIBELF=3D1 NO_BACKTRACE=3D1
+> >make_minimal        +=3D NO_LIBNUMA=3D1 NO_LIBBIONIC=3D1 NO_LIBDW=3D1
+> >make_minimal        +=3D NO_LIBBPF=3D1
+> >make_minimal        +=3D NO_SDT=3D1 NO_JVMTI=3D1 NO_LIBZSTD=3D1
+> >make_minimal        +=3D NO_CAPSTONE=3D1
+>
+> I tried make_minimal on perf-tools-next. It still requires libtraceevent,=
+ so an
+> arm64 cross build without the arm64 libtraceevent installed stops at that
+> check. With NO_LIBTRACEEVENT=3D1 added, it then fails building the Rust t=
+est
+> workload. Natively it still enables aio, libLLVM, libslang, libtraceevent=
+,
+> lzma, zlib and Rust when they are installed, so the result depends on the
+> machine.
+>
+> I'd like to go with Ian's suggestion then: a MINIMAL=3D1 knob in perf tha=
+t turns
+> off every optional feature, which tests/make can use for make_minimal as =
+well.
 
-For example:
+I can put a patch together for that. Just for discussion, I did do
+some work to break perf dependencies with libraries using dlopen/dlsym
+like:
+https://lore.kernel.org/linux-perf-users/20260130233439.647447-1-irogers@go=
+ogle.com/
+An area of controbversy with this approach is that it is still nice to
+use the header files for the library as library authors are bad and
+will do things like change function APIs over time. If the build uses
+the header files, why use dlopen when you can just link against the
+library? I could imagine using dlopen/dlsym for libtraceevent, but it
+would end up repeating this header file and library argument.
 
-   .ascii "->RQ_nr_pinned $3048 offsetof(struct rq, nr_pinned)"  #
-   ...
-   .ascii "->func); __data = (it_func_ptr)->data; ((void(*)(void *, pro"
+Thanks,
+Ian
 
-The current sed-offsets macro uses [^ ]* to match constant names,
-which is too permissive and can match unexpected characters when
-debug directives are present. Additionally, the fallback command
-'s:->::; p;' strips '->' from any unmatched line and prints it,
-which causes debug metadata to leak into the generated header
-file (include/generated/rq-offsets.h), breaking the build.
-
-Replace [^ ]* with [[:alnum:]_]* to match only valid C identifiers,
-and remove the fallback 's:->::' command so that only successfully
-transformed lines are emitted into the generated header.
-
-v2:
-- Add BLANK() macro for better readability of generated headers
-(suggested by Nathan Chancellor).
-
-Fixes: 7dd47b95b0f5 ("kbuild: consolidate redundant sed script ASM offset generation")
-Signed-off-by: Dmitry Kandybka <d.kandybka@gmail.com>
----
- include/linux/kbuild.h | 2 +-
- scripts/Makefile.lib   | 6 +++---
- 2 files changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/include/linux/kbuild.h b/include/linux/kbuild.h
-index e7be517aaaf6..118568971fdf 100644
---- a/include/linux/kbuild.h
-+++ b/include/linux/kbuild.h
-@@ -5,7 +5,7 @@
- #define DEFINE(sym, val) \
- 	asm volatile("\n.ascii \"->" #sym " %0 " #val "\"" : : "i" (val))
- 
--#define BLANK() asm volatile("\n.ascii \"->\"" : : )
-+#define BLANK() do { asm volatile ("\n.ascii \"->BLANK()\"" : : ); } while (0)
- 
- #define OFFSET(sym, str, mem) \
- 	DEFINE(sym, offsetof(struct str, mem))
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 0a4fdd8bd975..96c2ec50f06e 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -493,9 +493,9 @@ quiet_cmd_zstd22_with_size = ZSTD22  $@
- # the .ascii directive whereas GCC keeps the <space> as-is.
- define sed-offsets
- 	's:^[[:space:]]*\.ascii[[:space:]]*"\(.*\)".*:\1:; \
--	/^->/{s:->#\(.*\):/* \1 */:; \
--	s:^->\([^ ]*\) [\$$#]*\([^ ]*\) \(.*\):#define \1 \2 /* \3 */:; \
--	s:->::; p;}'
-+	/^->/{s:->#\(.*\):/* \1 */:p; \
-+	s:^->\([[:alnum:]_]*\) [\$$#]*\([^ ]*\) \(.*\):#define \1 \2 /* \3 */:p; \
-+	s:->BLANK()::p;}'
- endef
- 
- # Use filechk to avoid rebuilds when a header changes, but the resulting file
--- 
-2.54.0
-
+> --
+> Thanks,
+> Sasha
