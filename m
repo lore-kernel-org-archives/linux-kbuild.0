@@ -1,122 +1,229 @@
-Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DB834E50B9
-	for <linux-kbuild@vger.kernel.org>; Fri, 16 Oct 2026 16:18:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4238A37F006;
+	Fri, 16 Oct 2026 16:44:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792167488; cv=none; b=Bo8UOVaC5WXmT2Aq9lNHO9wI9Y4e4qD+ncUx8SuVwxraRN5N1ongX9/1WsHSrIWmidTZd3zIwZ/DvvSznU1eMfexGXqS1/JKD1wj3KFTgNYVI+9B+rFR8wEWtRHkCoQmLFnuIwMs/dHjgRLNtUTxZCHPO873JjjgP2gG4HppNJs=
+	t=1792169099; cv=none; b=IqtqERFyZZTi/0MmwoCtAyyw/kSthJSDHXzLeXgAdk2dTfu9MAwKYF645zjWeRYjeOndb40+q9D15jxY+FkRxvs9QUpvzSAnHUn/j3QZGXVb/MbwRYVBiDlGV2UUDT8KofsoYrsr5afKVerRHzXN0ImHy9vyJyX6UckFUGOmtAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792167488; c=relaxed/simple;
-	bh=nZWtbApWt3kV026dkoDNspJsmQaxaHBVELtY6w2UgGg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YRlvAyAdeYdO19Hnjzt6KapCw3p4/VgP0QsIiU+RT4A3w4Vkj8ExTJcFpWK6ve04uH3HMJbCPKyJiJYLQRw6haqqaJF5++T+f+ZTdQS6hiraU1zMK8gcE0WKzThmzi7WSIbAyUiLezKjPnXm07gnXJs8mhWH/jtnptDvbHgylws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=M3CpNeiv; arc=none smtp.client-ip=209.85.210.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	s=arc-20240116; t=1792169099; c=relaxed/simple;
+	bh=VfWTephl8pf2SRTSLnrpj8mX4tB8jBBntqEfoI1/V+o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RQH3QsGttsBsP7Sw4+/wgDvQ4Pvw35HjbF945M0dj1YZiO3oDLiM5uQ++e1wgPHVvywDnVz3n2jBDHwh5YMHHCytm8IGkY864VIj2vyNJEtTJ7PBSGuXWnk9BO4dSJXbUFCoIzBEQUVOkeiSfj/Mf4GS4RCUkU28ViuSJAngyus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZHEARvLf; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="M3CpNeiv"
-Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-824e6e6ed71so2698301a34.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 16 Oct 2026 09:18:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1792167479; x=1792772279; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=/aqB/Mmx2mmYZsJMDrgp07ogosIeUVeJwoNnZHzHvsY=;
-        b=M3CpNeivZfD2Yrd3gUdREx/HDMNqlNOpX4xlFZRopPaDnqpqK9FF4rNZG9bBbxuPtx
-         rVUaIiM31BfaYxDtDVTibXZ2LufgGbCGDw0tKWMYG18+sYEZTrZDwXQW6qN8wvLackjD
-         3eA1+y1A60rnAfmqUeg3bK8FhHqvKWEQDU5u8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792167479; x=1792772279;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=/aqB/Mmx2mmYZsJMDrgp07ogosIeUVeJwoNnZHzHvsY=;
-        b=ba2DyGHJOBICGJO7vHqSvqHSW8uH4LDuL+inrnel4hBlXz00VAipbsWRl4YdqcmGFF
-         YpGb9oYJlO8K5qJINOs/vOyLSiqys6JyVvifmVAk396qlVikHkyIr10GnplMp7KG9Qw/
-         OkaR35VjDZt0aEsmkcaO6W5tviWrJI/KZukoUaMrW1FHYX1kG3N8AzLUVlHbDU4DbXiA
-         y0+fqQeD3KzqyHK/HKjKsC602I1dr7aGb0EKETn8if7WqJdLRo+JKiYMbGKW0GvLAiUY
-         xnPTZ44n3CHI0w7s9djJnKwiqq58kV/uDaH86n0SRU6MJwJ5uwUeNKpOm9tD8k+Ysrk/
-         QheQ==
-X-Forwarded-Encrypted: i=1; AKwUvBxHwX7s3UAgB4dnldEsrmNgj+6at6mgOOdmXGZPaZxcPBStz3YkoSCgJRXTYef5G20kvtHcFU9TXCxiiqw=@vger.kernel.org
-X-Gm-Message-State: AFq9FYK22/2t6FFCflstM2E3hXWqHl1rqSCL5bBdBMTPQ8AzsNrozs6y
-	p7kCi8zTIwU0bCo5QhBC0l1mVvoqEWfsKx6F/cs6gmK1hcR2j9+T7vqurEnwYT8VXvM=
-X-Gm-Gg: AYBFou0EsCp/MRVkaFYFNeijtMQimAmKThdxMNrvtCNyjPKjcK1t79pOrTOUPC44wzp
-	Qr2xPMJQvZIoHpWxa3LwDYABocT5nY4LjaTfkuskEmt1EApXDz5clCdS0kKoG1OW5MHAMTSvrr2
-	0/76p7NIF2GQiG7uFQB81chnbmqNQgM7FKva7SOhW+owb8EYhLc2nBUZduG4w2JCkca7IaICvWx
-	9Cvtoeyt0iMxzR0PxuXfGmeY36fFxcpRfQxIFYog2UTUWRuOD0eMS5/h8nuInIsAuCVJFUANGbp
-	d7cmTS17WyrlA+aptASOApp+gKn0lq4rW523WJMGxXZahXvQRR7qFWy0OXo3PdkvToqv0FZMhqU
-	J+3u8PQhcEqkI/7t8Mi6p7Is3vOEO6RDyKXJmgR0skcb4BiKZioMa7iVRe8pZfHr0TFZL6mzHq9
-	i/LFzySXGQnEt37B5O58Nab4+oAnudehkS7aMKeEPrRPGXwyZZVWv7vXLqCbZnEyv3IrBH293Rk
-	fJsa/233g7y76FtA2A=
-X-Received: by 2002:a05:6830:828f:b0:81d:c548:292f with SMTP id 46e09a7af769-830959380b5mr21128096a34.12.1792167479094;
-        Fri, 16 Oct 2026 09:17:59 -0700 (PDT)
-Received: from [192.168.1.128] ([38.15.57.99])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-842a6f0a55csm2327426a34.25.2026.10.16.09.17.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Oct 2026 09:17:58 -0700 (PDT)
-Message-ID: <93d5f73d-0126-4727-9014-836e195a3eac@linuxfoundation.org>
-Date: Fri, 16 Oct 2026 10:17:54 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZHEARvLf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49C781F000C5;
+	Fri, 16 Oct 2026 16:44:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792169097;
+	bh=k2PPYvoZtUDSB0QpI8y8nVKIfHe5I595bZB7KIFYEN0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=ZHEARvLfZu4O/g6Nyh0bXYaTzR2KpzPxcMjSlF8WaiY/AYMp8ZUEmePIH0x36U+AV
+	 dkGwRrXAcFPcowGe92stgaKYD7QbEfeew/4welqoD2TdO8E3G7pWh4Akq9DgiIX+yY
+	 y7j2qTukGvCvUuXxqMnQU8W0m4veYSXueEI9aC/y0saah/MBrQvwOds90nNz56BGRz
+	 +QdA3dTRZZDcbLU9t9fTB+48//FTEt8/i35gzhvPAtyFMgY64PRofFRMPgv6Ez/dmW
+	 OX3dQA2Arl+QnBRQMKaCABNa+ahDxt+2Czw0mPgyVccH7WW3sgmmy1U8zy7PM0Rdoo
+	 WUGmNlCnL+E9g==
+Date: Fri, 16 Oct 2026 17:44:42 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Petr Pavlu <petr.pavlu@suse.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, Masahiro Yamada <masahiroy@kernel.org>, 
+	Alexey Gladkov <legion@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, Arnd Bergmann <arnd@arndb.de>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Ard Biesheuvel <ardb@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Josh Poimboeuf <jpoimboe@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
+	Gary Guo <gary@garyguo.net>, =?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
+	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
+	Onur =?utf-8?B?w5Z6a2Fu?= <work@onurozkan.dev>, Jonathan Corbet <corbet@lwn.net>, 
+	Randy Dunlap <rdunlap@infradead.org>, Kees Cook <kees@kernel.org>, 
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	llvm@lists.linux.dev, linux-riscv@lists.infradead.org, linux-arch@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	linux-doc@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v4 13/22] modpost: cache section relocation mismatch state
+Message-ID: <atJSEhfOu-LWWHr_@gremlin>
+References: <20260923-build-speedup-v4-0-73128809a4a4@kernel.org>
+ <20260923-build-speedup-v4-13-73128809a4a4@kernel.org>
+ <d17b00f9-2a6c-425f-9697-6bc8f31f7a7a@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 5/7] tools: build kernel selftests in tools_build
-To: Sasha Levin <sashal@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
- Nicolas Schier <nsc@kernel.org>, linux-kbuild@vger.kernel.org
-Cc: Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
- Adrian Hunter <adrian.hunter@intel.com>, James Clark
- <james.clark@linaro.org>, linux-perf-users@vger.kernel.org,
- =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>,
- Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org,
- Shuah Khan <skhan@linuxfoundation.org>
-References: <20261016143143.3613501-1-sashal@kernel.org>
- <20261016143143.3613501-6-sashal@kernel.org>
-Content-Language: en-US
-From: Shuah Khan <skhan@linuxfoundation.org>
-In-Reply-To: <20261016143143.3613501-6-sashal@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d17b00f9-2a6c-425f-9697-6bc8f31f7a7a@suse.com>
 
-On 10/16/26 08:31, Sasha Levin wrote:
-> Add a "Kernel selftests" sub-menu with one entry per selftests directory
-> that builds with only a C library and does not write into the source
-> tree. Each is built as "make kselftest-all" builds it, with KHDR_INCLUDES
-> pointing at the UAPI headers installed in the object tree, but by its own
-> make, so the selected ones build in parallel. Selftests whose Makefile
-> does not use KHDR_INCLUDES still build against the C library's copy of
-> the UAPI headers.
-> 
-> As with "make kselftest-all", a selftest that fails to build does not
-> fail the build unless FORCE_TARGETS is set. kselftest_deps.sh then lists
-> the libraries the selftest needs that the compiler cannot link with.
-> 
-> The selftests do not track header dependencies, so a selftest is built
-> again from scratch when its own directory, a header or makefile any
-> selftest may share, or the kernel sources and headers it includes (the
-> vDSO test includes the architecture's vDSO code) are newer than its last
-> build.
-> 
-> Selftests that need libraries beyond the C library, a vmlinux with BTF,
-> or a sanitizer runtime are left out for now.
-> 
-> Assisted-by: LLM
-> Signed-off-by: Sasha Levin <sashal@kernel.org>
+On Thu, Oct 15, 2026 at 05:42:45PM +0200, Petr Pavlu wrote:
+> On 9/23/26 7:18 PM, Lorenzo Stoakes (ARM) wrote:
+> > For every relocation modpost invokes check_section_mismatch() to determine
+> > whether there is any kind of mismatch between the source and destination,
+> > and if so which classification applies.
+> >
+> > Each time it does this it invokes section_mismatch() which iterates
+> > through the sectioncheck[] array every time it's called.
+> >
+> > When walked a relocation section the source is fixed and there aren't many
+> > targets, so the same names are looked up over and over again.
+> >
+> > Therefore cache not only mismatch categorisation but also whether a
+> > mismatch even exists for a given section and look up the sections in the
+> > cache.
+> >
+> > Special indices (undefined, absolute, common) take the uncached path as
+> > before.
+> >
+> > This results in very significant speed ups for allmodconfig incremental
+> > builds.
+> >
+> > modpost is on the serial tail of every build that links vmlinux.
+> >
+> > Whole build, 128-thread Threadripper 9980X, best of N runs:
+> >
+> >                                          before   after     delta
+> >                                          -------------------------------
+> >   x86 defconfig, touch mm/vma.c, gcc        8.5s     8.3s    -0.14s (-2%)
+> >   x86 defconfig, touch mm/vma.c, clang      7.7s     7.6s    -0.13s (-2%)
+> >   x86 allmodconfig, touch mm/vma.c, gcc    33.9s    29.4s     -4.5s (-13%)
+> >   x86 allmodconfig, touch mm/vma.c, clang  31.9s    27.9s     -4.0s (-13%)
+> >
+> > Assisted-by: LLM
+> > Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+>
+> This looks mostly ok to me. Below are some nits you might want to
+> consider addressing.
 
-Thank you.
+Thanks! :)
 
-Reviewed-by: Shuah Khan <skhan@linuxfoundation.org>
+>
+> > ---
+> >  scripts/mod/modpost.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++++--
+> >  1 file changed, 64 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+> > index 75374c64b8cc..0fd43c8a89ea 100644
+> > --- a/scripts/mod/modpost.c
+> > +++ b/scripts/mod/modpost.c
+> > @@ -1155,12 +1155,67 @@ static void check_export_symbol(struct module *mod, struct elf_info *elf,
+> >  			 name);
+> >  }
+> >
+> > +/*
+> > + * mismatch_cache[section index] ->
+> > + *   0 - uncached.
+> > + *  -1 - no mismatch.
+> > + *  >0 - mismatch index + 1.
+> > + */
+> > +static int *mismatch_cache;
+>
+> It might be cleaner to maintain this cache per elf_info, since it
+> logically belongs to the processing of an individual ELF file. This
+> would also be consistent with the existing symsearch cache, which uses
+> elf::symsearch.
 
-thanks,
--- Shuah
+Ack, makes sense, moved the decl inside elf_info.
+
+>
+> The description could use 'to_secndx' instead of 'section index' to
+> clarify whether it refers to the source or destination section of
+> a relocation.
+
+Ack, updated for v5.
+
+>
+> > +
+> > +static void init_mismatch_cache(unsigned int num_sections)
+> > +{
+> > +	mismatch_cache = xcalloc(num_sections, sizeof(*mismatch_cache));
+> > +}
+> > +
+> > +static void reset_mismatch_cache(unsigned int num_sections)
+> > +{
+> > +	memset(mismatch_cache, 0, num_sections * sizeof(*mismatch_cache));
+> > +}
+> > +
+> > +static void free_mismatch_cache(void)
+> > +{
+> > +	free(mismatch_cache);
+> > +	mismatch_cache = NULL;
+> > +}
+> > +
+> > +static const struct sectioncheck
+> > +*cache_mismatch(unsigned int secndx, const struct sectioncheck *mismatch)
+>
+> Similarly here, s/secndx/to_secndx/.
+
+Ack, done.
+
+>
+> > +{
+> > +	if (!mismatch) {
+> > +		mismatch_cache[secndx] = -1;
+> > +		return NULL;
+> > +	}
+> > +
+> > +	mismatch_cache[secndx] = (mismatch - sectioncheck) + 1;
+> > +	return mismatch;
+> > +}
+> > +
+> > +static const struct sectioncheck *get_section_mismatch(const char *fromsec,
+> > +		const struct elf_info *elf, unsigned int secndx)
+>
+> s/secndx/to_secndx/, and the fromsec and elf arguments could be swapped
+> for consistency with the rest of the code.
+
+Ack, done.
+
+>
+> > +{
+> > +	int cached;
+> > +
+> > +	if (secndx >= elf->num_sections)
+> > +		return section_mismatch(fromsec, sec_name(elf, secndx));
+> > +
+> > +	cached = mismatch_cache[secndx];
+> > +	if (cached < 0)
+> > +		return NULL;
+> > +	if (cached > 0)
+> > +		return &sectioncheck[cached - 1];
+> > +
+> > +	return cache_mismatch(secndx,
+> > +			      section_mismatch(fromsec, sec_name(elf, secndx)));
+> > +}
+> > +
+> >  static void check_section_mismatch(struct module *mod, struct elf_info *elf,
+> >  				   Elf_Sym *sym,
+> >  				   unsigned int fsecndx, const char *fromsec,
+> >  				   Elf_Addr faddr, Elf_Addr taddr)
+> >  {
+> > -	const char *tosec = sec_name(elf, get_secindex(elf, sym));
+> > +	const unsigned int to_secndx = get_secindex(elf, sym);
+>
+> The const qualifier can be dropped from the to_secndx definition to
+> match the usual kernel style.
+
+Ack, done.
+
+>
+> --
+> Thanks,
+> Petr
+
+Thanks for the review!
+
+--
+Cheers, Lorenzo
