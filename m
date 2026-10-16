@@ -1,129 +1,107 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FE5B4F85D0;
-	Fri, 16 Oct 2026 14:32:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C21732B132;
+	Fri, 16 Oct 2026 14:40:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792161122; cv=none; b=DN4IF532GT9z4n5LmvbdWWSuW8b+d9LWj+mE7vP223o2n1fMYr+Exc3mZ4JUpMrOYxqSe4Vsn5PlBTsINzxYT0EO0YQorXZZT63Kz0D3n5tPNSW8E5JD1lUp4ksgM0VmmgIitRaf4PkpvEZmFFINjSCNh4qBwIHGZFYEAKvbwn8=
+	t=1792161607; cv=none; b=kLpV652lE0EFtx//CRL9AytvTIHgPkvD9+G95aLbCJy1AC+E24vH/CSz2QB1UV2ZgIHkIo8Aaqu3osB1mu3yS9kQ/R7ZnPWwhVbeF2W/Swddu+14znhozeEQPxsB23xXGWJOvgDCfU/2czxODWBrK/Z08hmGh8dBDXkSJHvBZWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792161122; c=relaxed/simple;
-	bh=DKg0vClEQiXw3JhhcDZ2p/iKrKj7KxrJ/WWyyMYftbk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RcuihDXMThTFpBCoEvuQpYGlEMSvZmyFigl4Kr7s9K2BuWdaDOoee2VOr6383at/V7KM+pVXWWN8kCuH6aio4LOObhPGd6G28afGux0gL56zNaVZFUSsv8cv9HJ65UcXY4IZ118aHDo1/ydV0rOwBZFUopTyk+VzpU7jckQeKLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BXJXsPip; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1792161607; c=relaxed/simple;
+	bh=5rWXlSacB3ZK6lYF8y/F6URMgitlO2bJ/xBhk7KZqnk=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=aa7tKPW3As2y5EHq2XDhbj5EXVIwAnZTO8a8H4Oqjrg+Q2IJltd8KE7sLVeSnw9kNF1ff7Yt0IWUS0U9tnoCzhw4pmmIENFPOFU5p+ZHQ78Zu98JvLwmfb+MFR1DJzgQadZt2iFedDmVvqEIiADCrr1T+IA6cSQflp0hvyGptTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W3GpZBmN; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BXJXsPip"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D2E21F000C5;
-	Fri, 16 Oct 2026 14:31:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W3GpZBmN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B7911F000C5;
+	Fri, 16 Oct 2026 14:40:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792161121;
-	bh=kd/73Q9Hgd2llB+WLK9Lex9iXlTyPC+WwzSuKxv5YwY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=BXJXsPipB61XtIRlj8v6GY/3wTjBT7VhrltR45hNLRNpErr4vmAWJzMMfwc9bvXYN
-	 15yO+oCZJxNLcRMGuqyzR93Gon9pbevS+e9oXtg3awyKLPQMK/bebi1YyvPH4e4kS5
-	 oPaI8yMGddfrNBMmrvYc4AViNC/0WNwwZNVIUxojaF8Zx35C/VZRQb5/RRPelo5nnV
-	 t+5G2ZNVZasjB5OdmG/blzLAoXH06IH03GcZ68CYIhjcu5EWBTHsChcrOpjpqxtPdO
-	 4uG7iOrLPEUBAwqGsZ/+01/mpgKzurJ2VsLR5geliOzx4AQEe2q7aXiS3nZApLN8+v
-	 9zIxdbmqvz3xA==
-From: Sasha Levin <sashal@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>,
-	linux-kbuild@vger.kernel.org
-Cc: Sasha Levin <sashal@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	James Clark <james.clark@linaro.org>,
-	linux-perf-users@vger.kernel.org,
-	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <linux@weissschuh.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org
-Subject: [RFC PATCH v2 7/7] Documentation: describe building tools with the kernel
-Date: Fri, 16 Oct 2026 10:31:43 -0400
-Message-ID: <20261016143143.3613501-8-sashal@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261016143143.3613501-1-sashal@kernel.org>
-References: <20261016143143.3613501-1-sashal@kernel.org>
+	s=k20260515; t=1792161606;
+	bh=5iR/n5TxdTxz+OUopmkuWFQB0Je/YmkpDFf1jsLtlHA=;
+	h=From:Date:Subject:To:Cc;
+	b=W3GpZBmNGxqsX8cYOIrZ/SKyhdgYcw8UGd/S0hNsR2gVBY/bkKXwDchx/ljRRy70p
+	 VrYxlx9+9Vtr3tHMJXiKDGK5deP2T4RZ3F0EIeUwB1UDSIXwJilaxLSsJ+V6yvhZPB
+	 Urd0Za7Eei8jEIkjElv5uuabZVMto91Lq2WPJv7yNGCblqEXM9Np8RUOisNv/W91gR
+	 KuyQC5OogY8JVZznKkG0FXTiUjgUMMm4Cu3SufAUBFKvAEhBoameIrKwa9tVjBgbXg
+	 Gi61c+4DMaOPTiJd/bMFWkwaHx8S2gRjhwFvLFgK2U1UNWfLnwoK0ytXCZtT6G/pei
+	 nLmFnEnEgqlYQ==
+From: Konrad Dybcio <konradybcio@kernel.org>
+Date: Fri, 16 Oct 2026 16:40:01 +0200
+Subject: [PATCH] kbuild: dtbinst: Create destination directories before
+ installing
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20261016-topic-dtbs_install_fix-v1-1-8cf50b642cba@oss.qualcomm.com>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXMQQrDIBCF4auEWVdQF4bmKqWEqGM6Iag4tgRC7
+ h7TLL8H79+BsRAyDN0OBX/ElGKDenTgPlOcUZBvBi21UVIZUVMmJ3y1PFLkOq3rGGgTvZP+GbQ
+ 0wVto51ywzf/w632bv3ZBV68aHMcJb0+2+noAAAA=
+X-Change-ID: 20261016-topic-dtbs_install_fix-7c0d9f206fdb
+To: Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@kernel.org>, 
+ Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+ Masahiro Yamada <masahiroy@kernel.org>
+Cc: linux-kbuild@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+X-Mailer: b4 0.16.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1792161603; l=1700;
+ i=konrad.dybcio@oss.qualcomm.com; s=20230215; h=from:subject:message-id;
+ bh=dBPuCTPAMlqIZYz7kulxNy3CUJrPvnUckNPDp4MTzrc=;
+ b=U84/ah1Tcd1c8PeUaJg+mUmoaomm7vc/JVLwoJaZKpHV5ooAAR/7J8s0a0TG6avbSU0VCG1uS
+ 9nLsGYFglLJDiiSWeXdRheFuQbhDDAIDquqcn/Exn08L7JmohpU7x4E
+X-Developer-Key: i=konrad.dybcio@oss.qualcomm.com; a=ed25519;
+ pk=iclgkYvtl2w05SSXO5EjjSYlhFKsJ+5OSZBjOkQuEms=
 
-Mention CONFIG_TOOLS_BUILD and "make tools_build" in the submit
-checklist, ask for libc-only selftests to be added to tools/Kconfig,
-and note that USERCFLAGS and USERLDFLAGS also apply to the tools.
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 
-Assisted-by: LLM
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+dtbs_install installs each DTB with 'install -D', which creates the
+parent directory of the destination on demand. With a parallel build,
+two DTBs that share a not yet existing directory are installed
+concurrently and both try to create it. The loser fails, which aborts
+the whole build:
+
+  install: cannot create directory 'debian/linux-image-7.1.0/usr/lib/linux-image-7.1.0/arm'
+  make[6]: *** [scripts/Makefile.dtbinst:23: .../arm/foundation-v8-gicv3.dtb] Error 1
+
+The failure depends on job scheduling, so it shows up as a build that
+fails for no apparent reason and passes when re-run.
+
+Create all destination directories up front, the same way
+scripts/Makefile.modinst does for modules, so the install rules no
+longer race.
+
+Fixes: aefd80307a05 ("kbuild: refactor Makefile.dtbinst more")
+Signed-off-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 ---
- Documentation/dev-tools/kselftest.rst      | 4 ++++
- Documentation/kbuild/kbuild.rst            | 4 +++-
- Documentation/process/submit-checklist.rst | 5 +++++
- 3 files changed, 12 insertions(+), 1 deletion(-)
+ scripts/Makefile.dtbinst | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/Documentation/dev-tools/kselftest.rst b/Documentation/dev-tools/kselftest.rst
-index 64c0ec7428a27..407d539e49b01 100644
---- a/Documentation/dev-tools/kselftest.rst
-+++ b/Documentation/dev-tools/kselftest.rst
-@@ -315,6 +315,10 @@ Contributing new tests (details)
+diff --git a/scripts/Makefile.dtbinst b/scripts/Makefile.dtbinst
+index 9d920419a62c..a55f2a7acbc2 100644
+--- a/scripts/Makefile.dtbinst
++++ b/scripts/Makefile.dtbinst
+@@ -37,6 +37,10 @@ dtbs := $(notdir $(dtbs))
  
-     TARGETS += android
+ endif # CONFIG_ARCH_WANT_FLAT_DTB_INSTALL
  
-+ * If the test builds with only a C library, add an entry for it to the
-+   "Kernel selftests" menu in tools/Kconfig and to tools/Makefile.kbuild,
-+   so that it is built together with the kernel.
++# Create destination directories up front: with parallel make, concurrent
++# 'install -D' calls race on creating the same parent directory.
++$(foreach dir, $(sort $(dir $(addprefix $(dst)/, $(dtbs)))), $(shell mkdir -p $(dir)))
 +
-  * All changes should pass::
+ __dtbs_install: $(addprefix $(dst)/, $(dtbs))
+ 	@:
  
-     kselftest-{all,install,clean,gen_tar}
-diff --git a/Documentation/kbuild/kbuild.rst b/Documentation/kbuild/kbuild.rst
-index 5a9013bacfb75..84da035fc66f6 100644
---- a/Documentation/kbuild/kbuild.rst
-+++ b/Documentation/kbuild/kbuild.rst
-@@ -114,12 +114,14 @@ Additional libraries to link against when building host programs.
- 
- USERCFLAGS
- ----------
--Additional options used for $(CC) when compiling userprogs.
-+Additional options used for $(CC) when compiling userprogs and the tools
-+selected in tools/Kconfig.
- 
- USERLDFLAGS
- -----------
- Additional options used for $(LD) when linking userprogs. userprogs are linked
- with CC, so $(USERLDFLAGS) should include "-Wl," prefix as applicable.
-+The tools selected in tools/Kconfig get these options in LDFLAGS.
- 
- KBUILD_KCONFIG
- --------------
-diff --git a/Documentation/process/submit-checklist.rst b/Documentation/process/submit-checklist.rst
-index beb7f94279fdb..9857b05824c2d 100644
---- a/Documentation/process/submit-checklist.rst
-+++ b/Documentation/process/submit-checklist.rst
-@@ -91,6 +91,11 @@ Build your code
-      Use ``make htmldocs`` or ``make pdfdocs`` to check the build and
-      fix any issues.
- 
-+  e) Changes to tools/ or to UAPI headers do not break the userspace tools
-+     selected by ``CONFIG_TOOLS_BUILD``. ``allmodconfig`` turns it on when
-+     the compiler can link glibc programs for the target (currently x86_64
-+     and arm64), and ``make tools_build`` builds only the tools.
-+
- 2) Builds on multiple CPU architectures by using local cross-compile tools
-    or some other build farm.
-    Note that testing against architectures of different word sizes
--- 
-2.53.0
+
+---
+base-commit: d419d682257d813f6cb7a28e42b35d0edf4ad038
+change-id: 20261016-topic-dtbs_install_fix-7c0d9f206fdb
+
+Best regards,
+--  
+Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 
