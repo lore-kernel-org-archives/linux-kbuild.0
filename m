@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4238A37F006;
-	Fri, 16 Oct 2026 16:44:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4021953FD51;
+	Fri, 16 Oct 2026 17:06:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792169099; cv=none; b=IqtqERFyZZTi/0MmwoCtAyyw/kSthJSDHXzLeXgAdk2dTfu9MAwKYF645zjWeRYjeOndb40+q9D15jxY+FkRxvs9QUpvzSAnHUn/j3QZGXVb/MbwRYVBiDlGV2UUDT8KofsoYrsr5afKVerRHzXN0ImHy9vyJyX6UckFUGOmtAA=
+	t=1792170397; cv=none; b=G/VRubjwY/HpHTAjO2mxmgnBtbwskRD7rSbcP0kwdGhGCpI8w2g28WsGet6NiEBsWZAgkA54oHZJcUc6SMg2JuN2VykUgg5UH58NErtM9THJ4HdSauvFAmabKybOrXonRdPUMmMR8O21JdHhOzAMNbTuY+cEXIoLtdanEzwsTek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792169099; c=relaxed/simple;
-	bh=VfWTephl8pf2SRTSLnrpj8mX4tB8jBBntqEfoI1/V+o=;
+	s=arc-20240116; t=1792170397; c=relaxed/simple;
+	bh=cq+dFtbOvjF5bRDFpILdaqjX9inVYxdxNGz98Swem/E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RQH3QsGttsBsP7Sw4+/wgDvQ4Pvw35HjbF945M0dj1YZiO3oDLiM5uQ++e1wgPHVvywDnVz3n2jBDHwh5YMHHCytm8IGkY864VIj2vyNJEtTJ7PBSGuXWnk9BO4dSJXbUFCoIzBEQUVOkeiSfj/Mf4GS4RCUkU28ViuSJAngyus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZHEARvLf; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=OVkdlXWycLamckJPKOsIdTM7qR5G3fDwaF9fwWMb4d4RoBImbbS55voBAnkgZ9uVwnlY+CrLP0o1LQqAgPDDTRm+5ibX5R8jfzaoIGpqyW097JZmCijFFsonxc2zPEczdP5sqdedWDHwG6GqbZWzeSmzFmPOzlB3B0RonwFCpLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dAEwm+Ll; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZHEARvLf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49C781F000C5;
-	Fri, 16 Oct 2026 16:44:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dAEwm+Ll"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 601221F000C5;
+	Fri, 16 Oct 2026 17:06:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792169097;
-	bh=k2PPYvoZtUDSB0QpI8y8nVKIfHe5I595bZB7KIFYEN0=;
+	s=k20260515; t=1792170396;
+	bh=BSEXDWNORjZsXLCu9GysuRDNJRkpmKxIZz1Z4Vu8yyc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=ZHEARvLfZu4O/g6Nyh0bXYaTzR2KpzPxcMjSlF8WaiY/AYMp8ZUEmePIH0x36U+AV
-	 dkGwRrXAcFPcowGe92stgaKYD7QbEfeew/4welqoD2TdO8E3G7pWh4Akq9DgiIX+yY
-	 y7j2qTukGvCvUuXxqMnQU8W0m4veYSXueEI9aC/y0saah/MBrQvwOds90nNz56BGRz
-	 +QdA3dTRZZDcbLU9t9fTB+48//FTEt8/i35gzhvPAtyFMgY64PRofFRMPgv6Ez/dmW
-	 OX3dQA2Arl+QnBRQMKaCABNa+ahDxt+2Czw0mPgyVccH7WW3sgmmy1U8zy7PM0Rdoo
-	 WUGmNlCnL+E9g==
-Date: Fri, 16 Oct 2026 17:44:42 +0100
+	b=dAEwm+Ll7zWYzg0O2/opPmRwyuEcN5vqyx3FOLNDe47i4s7xuUix1uZgX/dlo2aoM
+	 gtUuBpX6Fvsl5QjvcsgAZ5oPtoDo+OMgyE8aK8spLzAERzLCaFNIJs6/Qvzl0qnuim
+	 CshJT9OrW+ZwAkEtWFTxheF0/JtB2cxxYCtpVciK8lXHSLiNWUSX1zG+Hn6EYDT6Hz
+	 MgQ0bQbHhTXuIQ+rz+pxCsR4iOPyrfRvk0p9omqb6aOluXTdX6TMvIUYLozs+lZt/Z
+	 CMVPW48qhmbZqUwBF2LfXpAqSNHOd5zr0FRgTctbs4uLs/WeE4Pk21uIXN24Gk11u6
+	 dZVi7zkFQbQoA==
+Date: Fri, 16 Oct 2026 18:06:21 +0100
 From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
 To: Petr Pavlu <petr.pavlu@suse.com>
 Cc: Linus Torvalds <torvalds@linux-foundation.org>, 
@@ -53,11 +53,11 @@ Cc: Linus Torvalds <torvalds@linux-foundation.org>,
 	llvm@lists.linux.dev, linux-riscv@lists.infradead.org, linux-arch@vger.kernel.org, 
 	linux-arm-kernel@lists.infradead.org, linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org, 
 	linux-doc@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v4 13/22] modpost: cache section relocation mismatch state
-Message-ID: <atJSEhfOu-LWWHr_@gremlin>
+Subject: Re: [PATCH v4 14/22] modpost: emit module descriptors as assembly
+Message-ID: <atJVYDgv8ejLoIrA@gremlin>
 References: <20260923-build-speedup-v4-0-73128809a4a4@kernel.org>
- <20260923-build-speedup-v4-13-73128809a4a4@kernel.org>
- <d17b00f9-2a6c-425f-9697-6bc8f31f7a7a@suse.com>
+ <20260923-build-speedup-v4-14-73128809a4a4@kernel.org>
+ <b17e9924-ca92-4cdf-b5e6-54164039e09a@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -66,164 +66,181 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d17b00f9-2a6c-425f-9697-6bc8f31f7a7a@suse.com>
+In-Reply-To: <b17e9924-ca92-4cdf-b5e6-54164039e09a@suse.com>
 
-On Thu, Oct 15, 2026 at 05:42:45PM +0200, Petr Pavlu wrote:
-> On 9/23/26 7:18 PM, Lorenzo Stoakes (ARM) wrote:
-> > For every relocation modpost invokes check_section_mismatch() to determine
-> > whether there is any kind of mismatch between the source and destination,
-> > and if so which classification applies.
-> >
-> > Each time it does this it invokes section_mismatch() which iterates
-> > through the sectioncheck[] array every time it's called.
-> >
-> > When walked a relocation section the source is fixed and there aren't many
-> > targets, so the same names are looked up over and over again.
-> >
-> > Therefore cache not only mismatch categorisation but also whether a
-> > mismatch even exists for a given section and look up the sections in the
-> > cache.
-> >
-> > Special indices (undefined, absolute, common) take the uncached path as
-> > before.
-> >
-> > This results in very significant speed ups for allmodconfig incremental
-> > builds.
-> >
-> > modpost is on the serial tail of every build that links vmlinux.
-> >
-> > Whole build, 128-thread Threadripper 9980X, best of N runs:
-> >
-> >                                          before   after     delta
-> >                                          -------------------------------
-> >   x86 defconfig, touch mm/vma.c, gcc        8.5s     8.3s    -0.14s (-2%)
-> >   x86 defconfig, touch mm/vma.c, clang      7.7s     7.6s    -0.13s (-2%)
-> >   x86 allmodconfig, touch mm/vma.c, gcc    33.9s    29.4s     -4.5s (-13%)
-> >   x86 allmodconfig, touch mm/vma.c, clang  31.9s    27.9s     -4.0s (-13%)
-> >
-> > Assisted-by: LLM
-> > Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
->
-> This looks mostly ok to me. Below are some nits you might want to
-> consider addressing.
+On Fri, Oct 16, 2026 at 02:14:16PM +0200, Petr Pavlu wrote:
+> This version looks mostly ok to me, from a modules perspective. Below
+> are a few nits plus one more useful comment about handling
+> MODULE_ARCH_INIT.
 
-Thanks! :)
+Ack thanks :)
 
 >
-> > ---
-> >  scripts/mod/modpost.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++++--
-> >  1 file changed, 64 insertions(+), 2 deletions(-)
-> >
 > > diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-> > index 75374c64b8cc..0fd43c8a89ea 100644
+> > index 0fd43c8a89ea..9d96459e492c 100644
 > > --- a/scripts/mod/modpost.c
 > > +++ b/scripts/mod/modpost.c
-> > @@ -1155,12 +1155,67 @@ static void check_export_symbol(struct module *mod, struct elf_info *elf,
-> >  			 name);
-> >  }
-> >
+...
+> > +/* The equivalent of KSYMTAB_FUNC()/KSYMTAB_DATA(). */
+> > +static void add_asm_ksymtab(struct buffer *buf, const struct symbol *sym)
+> > +{
+> > +	const char *name = sym->name;
+> > +
+> > +	add_asm_kstrtab(buf, sym);
+> > +
+> > +	buf_printf(buf, "\t.section \"___ksymtab+%s\", \"a\"\n", name);
+> > +	buf_printf(buf, "\t.balign %d\n", KSYM_ALIGN);
+> > +	buf_printf(buf, "__ksymtab_%s:\n", name);
+> > +	add_asm_ksym_ref(buf, sym->is_func ? MOD_FUNC_PREFIX : "", name);
+> > +	add_asm_ksym_ref(buf, "__kstrtab_", name);
+> > +	add_asm_ksym_ref(buf, "__kstrtabns_", name);
+> > +	buf_printf(buf, "\t.previous\n");
+> > +
+> > +	add_asm_kflagstab(buf, sym);
+> > +}
+>
+> add_asm_kstrtab() and add_asm_kflagstab() are only called from
+> add_asm_ksymtab() and their logic is fairly short. I suggest merging
+> these functions.
+
+Ack, done for v5.
+
+>
+> > +
+> > +/* The equivalent of SYMBOL_CRC(). */
+> > +static void add_asm_crc(struct buffer *buf, const struct symbol *sym)
+> > +{
+> > +	buf_printf(buf, "\t.section \"___kcrctab+%s\",\"a\"\n", sym->name);
+> > +	buf_printf(buf, "\t.balign 4\n");
+> > +	buf_printf(buf, "__crc_%s:\n", sym->name);
+> > +	buf_printf(buf, "\t.long 0x%08x\n", sym->crc);
+> > +	buf_printf(buf, "\t.previous\n");
+> > +}
+> > +
+> > +static bool export_is_kept(const struct symbol *sym)
+> > +{
+> > +	return !trim_unused_exports || sym->used;
+> > +}
+>
+> export_is_kept() is only called once from add_asm_exported_symbols().
+> The condition can be inlined directly there.
+
+Ack done.
+
 > > +/*
-> > + * mismatch_cache[section index] ->
-> > + *   0 - uncached.
-> > + *  -1 - no mismatch.
-> > + *  >0 - mismatch index + 1.
+> > + * The equivalent of:
+> > + *
+> > + *	__visible struct module __this_module __section(".gnu.linkonce.this_module")
+> > + *		= { .name = KBUILD_MODNAME, .init = init_module, .exit = cleanup_module,
+> > + *		    .arch = MODULE_ARCH_INIT };
+> > + *
+> > + * Everything not listed is zero, MODULE_ARCH_INIT included, except on m68k.
 > > + */
-> > +static int *mismatch_cache;
->
-> It might be cleaner to maintain this cache per elf_info, since it
-> logically belongs to the processing of an individual ELF file. This
-> would also be consistent with the existing symsearch cache, which uses
-> elf::symsearch.
-
-Ack, makes sense, moved the decl inside elf_info.
-
->
-> The description could use 'to_secndx' instead of 'section index' to
-> clarify whether it refers to the source or destination section of
-> a relocation.
-
-Ack, updated for v5.
-
->
-> > +
-> > +static void init_mismatch_cache(unsigned int num_sections)
+> > +static void add_asm_this_module(struct buffer *buf, const struct module *mod,
+> > +				const char *modname)
 > > +{
-> > +	mismatch_cache = xcalloc(num_sections, sizeof(*mismatch_cache));
-> > +}
-> > +
-> > +static void reset_mismatch_cache(unsigned int num_sections)
-> > +{
-> > +	memset(mismatch_cache, 0, num_sections * sizeof(*mismatch_cache));
-> > +}
-> > +
-> > +static void free_mismatch_cache(void)
-> > +{
-> > +	free(mismatch_cache);
-> > +	mismatch_cache = NULL;
-> > +}
-> > +
-> > +static const struct sectioncheck
-> > +*cache_mismatch(unsigned int secndx, const struct sectioncheck *mismatch)
+> > +	struct this_module_field fields[THIS_MODULE_MAX_FIELDS];
+> > +	const unsigned int nr_fields = get_this_module_fields(mod, modname, fields);
 >
-> Similarly here, s/secndx/to_secndx/.
-
-Ack, done.
-
->
-> > +{
-> > +	if (!mismatch) {
-> > +		mismatch_cache[secndx] = -1;
-> > +		return NULL;
-> > +	}
-> > +
-> > +	mismatch_cache[secndx] = (mismatch - sectioncheck) + 1;
-> > +	return mismatch;
-> > +}
-> > +
-> > +static const struct sectioncheck *get_section_mismatch(const char *fromsec,
-> > +		const struct elf_info *elf, unsigned int secndx)
->
-> s/secndx/to_secndx/, and the fromsec and elf arguments could be swapped
-> for consistency with the rest of the code.
-
-Ack, done.
-
->
-> > +{
-> > +	int cached;
-> > +
-> > +	if (secndx >= elf->num_sections)
-> > +		return section_mismatch(fromsec, sec_name(elf, secndx));
-> > +
-> > +	cached = mismatch_cache[secndx];
-> > +	if (cached < 0)
-> > +		return NULL;
-> > +	if (cached > 0)
-> > +		return &sectioncheck[cached - 1];
-> > +
-> > +	return cache_mismatch(secndx,
-> > +			      section_mismatch(fromsec, sec_name(elf, secndx)));
-> > +}
-> > +
-> >  static void check_section_mismatch(struct module *mod, struct elf_info *elf,
-> >  				   Elf_Sym *sym,
-> >  				   unsigned int fsecndx, const char *fromsec,
-> >  				   Elf_Addr faddr, Elf_Addr taddr)
-> >  {
-> > -	const char *tosec = sec_name(elf, get_secindex(elf, sym));
-> > +	const unsigned int to_secndx = get_secindex(elf, sym);
->
-> The const qualifier can be dropped from the to_secndx definition to
+> The const qualifier can be removed from the nr_fields definition to
 > match the usual kernel style.
 
-Ack, done.
+Ack done.
+
+> > +/*
+> > + * The equivalent of:
+> > + *	static const u32 ____version_ext_crcs[] __section("__version_ext_crcs") = { crc, ... };
+> > + *	static const char ____version_ext_names[] __section("__version_ext_names") = "name\0" ...;
+> > + *
+> > + * for unresolved symbols.
+> > + */
+> > +static void add_asm_extended_versions(struct buffer *buf, struct module *mod)
+> > +{
+> > +	struct symbol *sym;
+> > +
+> > +	if (!extended_modversions)
+> > +		return;
+> > +
+> > +	buf_printf(buf, "\n\t.section __version_ext_crcs,\"a\",%%progbits\n");
+> > +	buf_printf(buf, "\t.balign 4\n");
+> > +	list_for_each_entry(sym, &mod->unresolved_symbols, list) {
+> > +		if (skip_unversioned(mod, sym))
+> > +			continue;
+> > +
+> > +		buf_printf(buf, "\t.long 0x%08x\n", sym->crc);
+> > +	}
+> > +
+> > +	/*
+> > +	 * A symbol without a CRC was warned about above, and is skipped here
+> > +	 * too so that the names line up with the CRCs.
+> > +	 */
+> > +	buf_printf(buf, "\t.section __version_ext_names,\"a\",%%progbits\n");
+> > +	list_for_each_entry(sym, &mod->unresolved_symbols, list) {
+> > +		if (!sym->module || !sym->crc_valid)
+> > +			continue;
+>
+> This condition must match the logic in skip_unversioned(). It would be
+> clearer to keep it only in one place by calling skip_unversioned() here
+> and adding a "silent" parameter to the function.
+
+Ack done.
 
 >
-> --
-> Thanks,
-> Petr
+> > diff --git a/scripts/mod/module-offsets.c b/scripts/mod/module-offsets.c
+> > new file mode 100644
+> > index 000000000000..a336dd47aa33
+> > --- /dev/null
+> > +++ b/scripts/mod/module-offsets.c
 
-Thanks for the review!
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * Layout of the structures modpost emits into *.mod.S, extracted from the
+> > + * target headers as devicetable-offsets.c does for the device tables.
+> > + */
+>
+> The second part of the comment, after the comma, is superfluous. It is
+> expected that the various parts of modpost use consistent mechanisms
+> where appropriate.
+
+Ack done.
+
+> > +int main(void)
+> > +{
+> > +	DEFINE(MOD_SIZEOF_LONG, sizeof(long));
+> > +	DEFINE(MOD_PREL32_RELOCATIONS, IS_ENABLED(CONFIG_HAVE_ARCH_PREL32_RELOCATIONS));
+> > +	DEFINE(MOD_FUNC_PLABEL, IS_ENABLED(CONFIG_PARISC) && IS_ENABLED(CONFIG_64BIT));
+> > +
+> > +	DEFINE(MOD_SIZEOF_struct_module, sizeof(struct module));
+> > +	DEFINE(MOD_ALIGNOF_struct_module, __alignof__(struct module));
+> > +	OFFSET(MOD_OFF_module_name, module, name);
+> > +	OFFSET(MOD_OFF_module_init, module, init);
+> > +#ifdef CONFIG_MODULE_UNLOAD
+> > +	OFFSET(MOD_OFF_module_exit, module, exit);
+> > +#endif
+> > +#if defined(CONFIG_M68K) && defined(CONFIG_MMU)
+> > +	/* MODULE_ARCH_INIT: the only architecture where it is not all zeroes. */
+> > +	OFFSET(MOD_OFF_module_arch_fixup_start, module, arch.fixup_start);
+> > +	OFFSET(MOD_OFF_module_arch_fixup_end, module, arch.fixup_end);
+> > +#endif
+>
+> I feel it is a bit of a layering violation for modpost to know how
+> individual architectures need to initialize module::arch.
+
+Yeah that is kinda gross :)
+
+>
+> For now, this is probably ok. I would just remove MODULE_ARCH_INIT from
+> include/linux/module.h and arch/m68k/include/asm/module.h, along with
+> the comment referring to it in scripts/mod/modpost.c.
+
+ack done.
+
+>
+> In the future, this could be avoided by having the m68k module support
+> look up the .m68k_fixup section at runtime, as other architectures
+> typically do for similar sections.
+
+Yes, arch stuff should live with the arch-specific stuff.
 
 --
 Cheers, Lorenzo
