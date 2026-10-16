@@ -1,178 +1,99 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A18A3BB128;
-	Fri, 16 Oct 2026 19:49:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 301543B992C
+	for <linux-kbuild@vger.kernel.org>; Fri, 16 Oct 2026 21:02:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792180188; cv=none; b=FTx5OzL27IdMjGkEX0r0ZyO72StfiZ+C2O5mRP18HFPcVG58YjtJbqc3zhlwg5DHL2+KAuUKZTmAJRjGs8tNMCHLu4WjeOa5TG7hNcDFD/7YwTNP54M1Rc4VEXs6NacDWGVv0oTRODosvbeL18OIE6LKpCNRTx7IqTEWnsSstKc=
+	t=1792184529; cv=none; b=a9wHcaKq2c2za9mo2ZJAapzrX4igafNrq5EiSUvxRbDrdAkY7DoAaQjA9n0gYr0eHyqfOJ6c7qlgcuTLUjT1fR04jhgdukuEqNCpu0MZ1da9rJxIgpnpPjy3SBmPr/WLJ0jHXgU2ugUVy3R7ztBopN5W5dGLf6dfd1Hd4Sk1IBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792180188; c=relaxed/simple;
-	bh=sADb4tx2BL0NSlaM3rZsHXHM6fFPmcpdTsPqCOR5sL0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=QZsjMvzn4wGWkv2kMEFOJcRbVh0LH2SUSiZ0me+mtkxIbTUCq2626Quf3tOACk/lUfNIwURvxv8Kyt57gg0DJwMPrURYfzC9tGjxbK6MxkdGreBAwQ7ttYKUZlQemvrIBg82U8qouM9rjZnworylWeVJ0Q7BzCbm9ak6qleXDKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bbXdpC0y; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1792184529; c=relaxed/simple;
+	bh=CFv1fOvs73bJAa5jvExEQgbyce4qAcvdUEtcjy0TJGU=;
+	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
+	 Date; b=HxXDoeOKvg7IWwgwqvu8g3ut+QZIP/48cPqpDEEfpZOaCYrSNUTe+STNWLzJr4MJmdGXPf79Mbm3PlEpynPgjYvLyKMKv1tXoYCkKy4pcZuR8CfpjgruSp6rK7KnscWhjWYVLQKd6w1heOPcbSk8MKBu0K4fbqMwe1k6jH4g1ao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lohISLeK; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bbXdpC0y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED1AE1F000C6;
-	Fri, 16 Oct 2026 19:49:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lohISLeK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB6821F000C4;
+	Fri, 16 Oct 2026 21:02:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792180186;
-	bh=BVjfNNDxnha2WcYK2YfgdKGUZO5N3o2MpeBPwszC7nY=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=bbXdpC0yti8V8aK3X77fIFGsfYhrcAk1cqwFdEt/Wm5ENggSz0tSMYpKnCN2HPmZv
-	 QpNLq7eM3JwooTzs9A2LUsJLNJ7VOdSTj8VYFWK7iJ4plnvG2RvB7AlARgzm3Yxbgv
-	 A8n0q8pSqIAp9iLYVvCJUpvQT1a7cq6dcR5qFiRLQ1ypDOfkQ6EsKCZczup2u8WcYv
-	 ViHd2hTr+zpUGooaKZyYIPBjwkPhywcjYntvXbDy7qPDkcZVTIn+yrwQqVc3Yn4RcL
-	 3PIQFs901I56ipHWyrdURC0uZey9sn4M8P34BiuqfDSUhtxueHKoyrmuDriInru3dq
-	 sdwh1vWY1YPkg==
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Date: Fri, 16 Oct 2026 14:49:20 -0500
-Subject: [PATCH v4 2/2] kbuild: Support directory targets for building DTBs
+	s=k20260515; t=1792184527;
+	bh=WFK7QM5TqP4mZ2Xhrf50mgSxbTKVOiDYXORxf1wahtE=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=lohISLeKFAEcA6YHlFvwce/gop7rcQCBMSaWurhSr1tj42zTtWQF2mj3J9XiYMSr0
+	 RDTNwc84Fiin5h7OIoCRmA1FNBF8p9jjDcUB2s7U4t6i12aXxok43OWDGTWVH5bg8J
+	 YsKamAIK1xfgZi/yDxZWxZW1DEskf7R8pzQUeEOSwHvR/eOtEAinWtgTLJy52duEVr
+	 cu7mEEUPfQhZwgUotk6BPAFGCDRDSLgBOfKSr/Sm21q0mda8roWc9iBDZxTBRRRht3
+	 aQjUmmMhPHDH/9IRhTQ35Ow4yLT6TgPQIfaDpXF8h0/D47tIOtoh7zgcgwzVNiuU/E
+	 7YgVdbNbIrOlw==
+Message-ID: <sashiko-outbox-174936@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v2] kbuild: Makefile.lib: fix offsets generation with
+ debug info
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Dmitry Kandybka" <d.kandybka@gmail.com>, "Nathan Chancellor" <nathan@kernel.org>
+Cc: "Nicolas Schier" <nsc@kernel.org>, linux-kbuild@vger.kernel.org
+In-Reply-To: <20261015210149.78470-1-d.kandybka@gmail.com>
+References: <20260928105330.25427-1-d.kandybka@gmail.com>
+ <20261015210149.78470-1-d.kandybka@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 16 Oct 2026 21:02:07 +0000
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261016-dtb-dirs-v3-v4-2-0ec42fd8ef9b@kernel.org>
-References: <20261016-dtb-dirs-v3-v4-0-0ec42fd8ef9b@kernel.org>
-In-Reply-To: <20261016-dtb-dirs-v3-v4-0-0ec42fd8ef9b@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
- Saravana Kannan <saravanak@kernel.org>
-Cc: David Heidelberg <david@ixit.cz>, Arnd Bergmann <arnd@arndb.de>, 
- linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
- devicetree@vger.kernel.org
-X-Mailer: b4 0.16-dev
 
-It is useful to be able to build all the DTBs for a vendor. One can list
-all the .dts files in a directory and convert those to %.dtb targets,
-but that doesn't work for base+overlay DTB targets.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Low] kbuild: unanchored sed substitutions in sed-offsets can break build
+--
 
-The 'dtbs' and 'dtbs_check' targets can use the directory rule targets
-as well which avoids different make paths for building DTBs.
+commit 48672ceb9d59753178f125f7c16956dd57252dcd
+Author: Dmitry Kandybka <d.kandybka@gmail.com>
 
-Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
----
-v4:
- - Don't create a dtbs-list file in every directory
+kbuild: Makefile.lib: fix offsets generation with debug info
 
-v3:
- - Reworked on top of single target rule for %.dtb
- - Make dtbs target use directory rule.
- - Move adding boot/dts subdir out of the arch code. Now supported on
-   every arch (not that useful without vendor dirs).
- - Removed the need to look at MAKECMDGOALS
- - Fixed unnecessary rebuilding DT base+overlay targets
- - Link to v2: https://lore.kernel.org/all/20251120204812.1983452-4-robh@kernel.org/
+This commit fixes offset generation when debug information is enabled by
+making the sed pattern matching stricter and adding a BLANK() macro for
+readability. It prevents debug metadata from leaking into generated header
+files and breaking the build.
 
-v2:
- - Convert arm, mips and riscv. The other DT enabled arches don't have
-   vendor directories.
- - Link to v1: https://lore.kernel.org/all/20251113225952.867138-1-robh@kernel.org/
----
- Makefile                          | 14 ++++++++++----
- drivers/of/unittest-data/Makefile |  5 +++++
- scripts/Makefile.build            |  7 +++++++
- scripts/Makefile.dtbs             |  2 ++
- 4 files changed, 24 insertions(+), 4 deletions(-)
+> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+> index 19e96b30a122f..173bc3aa4247f 100644
+> --- a/scripts/Makefile.lib
+> +++ b/scripts/Makefile.lib
+> @@ -493,9 +493,9 @@ quiet_cmd_zstd22_with_size =3D ZSTD22  $@
+>  # the .ascii directive whereas GCC keeps the <space> as-is.
+>  define sed-offsets
+>  	's:^[[:space:]]*\.ascii[[:space:]]*"\(.*\)".*:\1:; \
+> -	/^->/{s:->#\(.*\):/* \1 */:; \
+> -	s:^->\([^ ]*\) [\$$#]*\([^ ]*\) \(.*\):#define \1 \2 /* \3 */:; \
+> -	s:->::; p;}'
+> +	/^->/{s:->#\(.*\):/* \1 */:p; \
+> +	s:^->\([[:alnum:]_]*\) [\$$#]*\([^ ]*\) \(.*\):#define \1 \2 /* \3 */:p=
+; \
+> +	s:->BLANK()::p;}'
 
-diff --git a/Makefile b/Makefile
-index c307ee9293bc..6d1d1c803ee8 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1664,8 +1664,8 @@ dtbindingtree := Documentation/devicetree/bindings
- ifneq ($(dtstree),)
- 
- PHONY += dtbs dtbs_prepare dtbs_install dtbs_check
--dtbs: dtbs_prepare
--	$(Q)$(MAKE) $(build)=$(dtstree) need-dtbslist=1
-+dtbs:
-+	$(Q)$(MAKE) $(dtstree)/
- 
- # include/config/kernel.release is actually needed when installing DTBs because
- # INSTALL_DTBS_PATH contains $(KERNELRELEASE). However, we do not want to make
-@@ -2185,6 +2185,7 @@ modpost: $(if $(single-build),, $(if $(KBUILD_BUILTIN), vmlinux.o)) \
- #   make foo/bar/baz/
- 
- single-build-prep := prepare
-+single-dtbslist-arg :=
- 
- ifdef single-build
- 
-@@ -2216,9 +2217,13 @@ single-goals := $(addprefix $(build-dir)/, $(single-no-ko))
- 
- # DT-only targets need host tools, but no architecture-specific preparation.
- ifneq ($(dtstree),)
--single-dt-patterns := $(addprefix $(dtstree)/,%.dtb %.dtbo)
-+single-dt-patterns := $(dtstree)/ $(addprefix $(dtstree)/,%.dtb %.dtbo %/)
-+ifneq ($(filter $(single-dt-patterns),$(single-no-ko)),)
-+single-dtbslist-arg := need-dtbslist=1
-+endif
- ifeq ($(filter-out $(single-dt-patterns),$(single-no-ko)),)
- single-build-prep := dtbs_prepare
-+single-dtbslist-arg := need-dtbslist=1
- endif
- endif
- 
-@@ -2234,7 +2239,8 @@ prepare: outputmakefile
- # Error messages still appears in the original language
- PHONY += $(build-dir)
- $(build-dir): $(single-build-prep)
--	$(Q)$(MAKE) $(build)=$@ need-builtin=1 need-modorder=1 $(single-goals)
-+	$(Q)$(MAKE) $(build)=$@ need-builtin=1 need-modorder=1 \
-+		$(single-dtbslist-arg) $(single-goals)
- 
- clean-dirs := $(addprefix _clean_, $(clean-dirs))
- PHONY += $(clean-dirs) clean
-diff --git a/drivers/of/unittest-data/Makefile b/drivers/of/unittest-data/Makefile
-index 01a966e39f23..bac6ee9327e2 100644
---- a/drivers/of/unittest-data/Makefile
-+++ b/drivers/of/unittest-data/Makefile
-@@ -104,3 +104,8 @@ static_test_1-dtbs := static_base_1.dtb $(apply_static_overlay_1)
- static_test_2-dtbs := static_base_2.dtb $(apply_static_overlay_2)
- 
- dtb-$(CONFIG_OF_OVERLAY) += static_test_1.dtb static_test_2.dtb
-+
-+# Include the static overlay tests in normal kernel builds.
-+ifdef CONFIG_OF_OVERLAY
-+need-dtbslist := 1
-+endif
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 4349108e75e1..d22b3b2d43b3 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -38,6 +38,13 @@ include $(srctree)/scripts/Makefile.compiler
- include $(kbuild-file)
- include $(srctree)/scripts/Makefile.lib
- 
-+# Make DT directory targets reachable for architectures with a DTS tree.
-+ifeq ($(obj),arch/$(SRCARCH))
-+ifneq ($(wildcard $(src)/boot/dts/),)
-+subdir-y += boot/dts
-+endif
-+endif
-+
- # flags that take effect in current and sub directories
- KBUILD_AFLAGS += $(subdir-asflags-y)
- KBUILD_CFLAGS += $(subdir-ccflags-y)
-diff --git a/scripts/Makefile.dtbs b/scripts/Makefile.dtbs
-index c4e466390284..c7ec2a2a308e 100644
---- a/scripts/Makefile.dtbs
-+++ b/scripts/Makefile.dtbs
-@@ -23,7 +23,9 @@ dtb-y           := $(addprefix $(obj)/, $(dtb-y))
- multi-dtb-y     := $(addprefix $(obj)/, $(multi-dtb-y))
- real-dtb-y      := $(addprefix $(obj)/, $(real-dtb-y))
- 
-+ifdef need-dtbslist
- always-y        += $(dtb-y)
-+endif
- targets         += $(real-dtb-y)
- 
- # dtbs-list
+[Severity: Low]
+Could this unanchored sed substitution break the build under certain
+conditions?
 
--- 
-2.53.0
+If the kernel is built with debug info (e.g., -ggdb3), the compiler may emit
+.ascii directives containing debug strings from source code. If a string
+literal from an included header starts with -> and contains -># or ->BLANK()
+mid-string (for example, ->foo ->BLANK()), the unanchored sed substitution
+will match mid-string.
 
+Because of the :p flag, wouldn't it print the partially modified pattern sp=
+ace
+(e.g., ->foo ), resulting in invalid C code being written to
+include/generated/asm-offsets.h?
+
+Should the pattern be anchored (e.g., s:^->BLANK()$::p;) to ensure it only
+matches the intended kbuild macros?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261015210149.7847=
+0-1-d.kandybka@gmail.com?part=3D1
