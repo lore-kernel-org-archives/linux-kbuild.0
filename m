@@ -1,103 +1,556 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B27A2FD1AA
-	for <linux-kbuild@vger.kernel.org>; Fri, 16 Oct 2026 11:19:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CA30471437
+	for <linux-kbuild@vger.kernel.org>; Fri, 16 Oct 2026 12:14:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792149567; cv=none; b=GST057thnDITBhUUTgrGnItpuP0aJU1OkvGY98Zoy48J1j0FZgBC1Ih011Zy6eG9Ur0upjW916AEtDjUZlsOIyjpD425kgNO3XW7dQH/nP2wKdb2r2OKvStdV1KD3Xf3D0+aZEmp3gZ/7uRC5uFqCHeZ+zeZDFoM6UwfgVNb1ZE=
+	t=1792152862; cv=none; b=LJalwMNVHrvLThi965zp2OoNopdcytir0NNmYxrVyXJZk/pKEcGAFzVwghfFrYQfTYQkY04ghnxiYRMxUwum6bV8D3XWxWxV3pzhZm6dA6uY37LRk9MPRnaALiAVRE7N2tp+yOAIyXHW1MywAirocqx1QFBZaxKDgEIIKQfrOB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792149567; c=relaxed/simple;
-	bh=7kcP9cLCcy4OUEUkmZAtefVAsO/bxsy2QWquHTa4u/s=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KzEAoj1aowSMy/4VhtYKlTATiO5l8ptDevsaedO6BTL55GK3u7Y40b6wLRxOshm4/DEFMLVehzydnFW2/Te3EeYq2gjxf/pAThR+o3aJw/ngXr2fjh9z2KDoqHIETLmVvONCRj8IZHzvnFO+vILMaoD6YfyHdqBG914uE1rcJMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SbDsjxjE; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1792152862; c=relaxed/simple;
+	bh=N91STIRoJBKZikDLI3znzjcc/Fnu8R6YXCPQBVKhEB0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rgEYYaaaI027d5NRRJug4oRWGSqIbC1uJ+EKXPcSCnCgpgG0ov09+w2EmmLUMuGbZ6O+MPg2F2zGbEk0ShTyktUNelsieUr5hIrWzM1+Us7R4xkI4IZCdxbkrthj7yImVKEZfChumlIBqOefHqKrOLmSBeHI0O86qHO+1uNJ/JQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=DGoMVrGU; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SbDsjxjE"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4a16c399641so60760865e9.2
-        for <linux-kbuild@vger.kernel.org>; Fri, 16 Oct 2026 04:19:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="DGoMVrGU"
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-48b001cd92bso904751f8f.2
+        for <linux-kbuild@vger.kernel.org>; Fri, 16 Oct 2026 05:14:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792149561; x=1792754361; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=7OLFMGhXtb0ShwzI3FF1wI02MWCwrPh2eC1gyrGUFtw=;
-        b=SbDsjxjEcn5GIGtCXf7UlinPIncRzcVv5O0dzZxyZVoZ+KYVypt6UJAO2UWvAN9bc8
-         WGhErLNHxFsGH3+zLSt6kbxxAIBrMYshv4taKOzPjXm6E7KPRmrg2Gd5h0ZPk6yGmm7u
-         UCymjj2LjZal4ePWQVDw9islXVFNJYy1tCE8Hdu87D+KxV+rWb+d6/2RvpZwN/MyMC8Z
-         MOcH61w1QE15yo6gLG0dg4OA64tBXysJUi/wVuYGO4v9vx92RXiqypZK6QfX7/4SF2A3
-         67C0zIXxYebK8AKGRgRiC/tnFHIsYKo6Z/K0yPTP8fK1mSnXrI33M9gIzFp+tw8PMh6K
-         DfOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792149561; x=1792754361;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=suse.com; s=google; t=1792152859; x=1792757659; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=7OLFMGhXtb0ShwzI3FF1wI02MWCwrPh2eC1gyrGUFtw=;
-        b=IDozlQTdqE9n75DB3vxMsvCmvajleqrJfasDHt+1sDhYbHtJ7/LLz+0+P1B2j1GsNi
-         UBwB7e+UKNsaO00kL9EXAX8vZq2Ajz1vrUpCtJxu1l9uQkJNXGz2qzeuTDhIoGK3huNQ
-         DrnGrNovwVTR56sroxkhhU9lx4fG5yv0gTAaOP/WkzNd/077rpv32HneSRDlnyEkRghP
-         v1G/+fkMGpHUhs1ww40AQ85fC/pAmHw1iDNli/5sdPKcfhpHRnWnY7TFHUQA0DNU5bTa
-         d4rZ37xFvcbtJSJfOqwPxlS99GVKmxhRXbskTxkPU9J+MG7BC9Y4ZusflQnTnQb5QGlz
-         SLYA==
-X-Gm-Message-State: AFq9FYJuL2lUxzFlW3P7qogQ1I4+/npEtm/V7XEmABJIZU7V6heDIF4z
-	9MTdNJ+gaTRnt+kYrTy65gDHX/9h7c8EwXOoiqeOhQgjEAzQcMHye5+yL8WnDDhyEx0=
-X-Gm-Gg: AYBFou3RPKkrsCS1HnNtCCXpHLSpKr4O12JiNKxCHCkbsfRJUH321MF0eZTIUZSpC91
-	VaejqGRAOW1KBBA0u1EQORqJYg40quqWCjDRoBUm6iVQzjE+HeJMSaEzdsqNmqKpGQK5/al4yL2
-	5jzusxJ31J723bVfihJFsL6w5zA3Xi4x8J+PgYYyPC5k2qilbI2c/+t3YeYhJ2zAVjIa+d6bEq7
-	Kjlh4jbjOGU7brXTHQ5iVv9vC2lGKCyGhzllPMteUnpFV1615evzDw2v+tv7hJt/SOx/9n+i+z2
-	tJy7ct+wFZLvLyofOfcYC1kBeO7BAdKBrWmEaRAyjFOfD8ZDd0VUhxH70PRHBGZKrRclJwWk4FV
-	1KOPU10UIZhVk8nBb7jBz4FMJO5ONdCLMYf55sKumIEpeDizWMAcrevWpOwHAkyA+fNNNza/7fJ
-	/+Bk+a7b3ScWw8uwziAN0P5FqMa44nreEjTNWAoZtZ1JKZttAuPElJfExg+tFpgSVJg7GExEcF2
-	7QemGOQdMk=
-X-Received: by 2002:a05:600c:1553:b0:49f:e8bf:8f9b with SMTP id 5b1f17b1804b1-4a18e443ea6mr425675325e9.4.1792149560981;
-        Fri, 16 Oct 2026 04:19:20 -0700 (PDT)
-Received: from ADRIAN-PC.lan ([171.22.87.31])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48dfd540bc4sm4398611f8f.2.2026.10.16.04.19.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Oct 2026 04:19:20 -0700 (PDT)
-From: =?UTF-8?q?Adri=C3=A1n=20Garc=C3=ADa=20Casado?= <adriangarciacasado42@gmail.com>
-To: Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>
-Cc: linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	=?UTF-8?q?Adri=C3=A1n=20Garc=C3=ADa=20Casado?= <adriangarciacasado42@gmail.com>
-Subject: Re: [PATCH] kbuild: depmod: fallback to /boot/System.map-KERNELRELEASE
-Date: Fri, 16 Oct 2026 13:19:15 +0200
-Message-Id: <20261016111915.227860-1-adriangarciacasado42@gmail.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20261016111106.221542-1-adriangarciacasado42@gmail.com>
-References: <20261016111106.221542-1-adriangarciacasado42@gmail.com>
+        bh=O+NQOhqzv2YbuUrbjrP3YSMvBckVI+bztNOXhDG1B+k=;
+        b=DGoMVrGUSZiEQbmzuZv2c0lefpUmktzWmFxukcY/eo/C1GHsI+Eh0qFdtv14W3zkuU
+         ENoLCGpwz3pQpA3iEQwgG+QnUXGzW6SvXXnXZbDE7VVzyXq/Sy8o41EmHLVhoVuOOiqh
+         pLUwQ8ZjGt+UNNcu2L7A+t5aI30KTXval9arjwDmVwwnlcQupszacyfbHNgiuOAovgjm
+         FTC1ReFmTbA9Ow4LqQZ24y+YIGGFLXS6bGk5XTtW2wPFllVRkuTCKY1A2KbWbwQHBK3y
+         QU1XCuqd52vxFvZrNV6y5/btuYUZdfg+U7CdB0Ne2hzJVtOHaN2ld7UEvyJ42XRFWuJX
+         boAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792152859; x=1792757659;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=O+NQOhqzv2YbuUrbjrP3YSMvBckVI+bztNOXhDG1B+k=;
+        b=RLH0agxJbAnITrk/wrC0LahRhAkEK6bQYwQQ3joL6hyljmbcOYdxHwhJYUHsV6jK/F
+         HiYuS7nYxeM2Mhki1FDS1etkRMzH+PVw/CFlQeZqvOYSXSRHgueewVsZwONIugTZ+xpP
+         DFj7FJBu9hM9/Ne+o77x9sUKpWsJMA2NBoZbM6IYlFu2+6SE0EsaQw2RTotHMVkuerfd
+         mQaqLOgfgUR7cGxjhkZv90niAPq+MWJKn3iZjJ3vFaN6XzsxjWtWH7Cq+jy/ZGdgbVMO
+         Ap+e2wMOvXnmTeSHHgogxDFL/6jcd+rIJiS20bS3dqkRmiuopQ/x+mM9HBMDTfoyqzdm
+         88Hw==
+X-Forwarded-Encrypted: i=1; AKwUvBxulDbdjaEml+at6rvLet4BxBwyP/9t6Op8zo/3frycPX5CL2Udi4RVXAIGOHTXMtuCAj8BhNgJnx5KgfU=@vger.kernel.org
+X-Gm-Message-State: AFq9FYK7eHBqrKuAaIHy3qyubcLZ1UHvAxNhKLhGs9PRcLKBpPUCyBHT
+	DH+305l8aclsl3L0p0gchJuj+e4l9KBTxZ+ylHJIXd/puBIhrSJ75zXa6wboIVWNwGc=
+X-Gm-Gg: AYBFou38VgqPcP8Toy7Svx4l9G6geopex2AXe0Rnj8c8XMoVw6IKyp7dHKWoBMFtZrV
+	94s9n209955430RCQsNhBH7Uai1Szs1trOGAUHZu8uxEcKhNv8kUvYBaOOlW84kfmo0jeLSZK73
+	AF0WlwypyxZjUW3K+06Zf433b9hN7TzxYFWVkalk6I5O/6WTQmNDS/4GHKEZU7YKlMo7zOYFOup
+	czJ3CJrIGrnHl2tqJGZbOw/QygE3oPcoAY65d5wfadn1D4V2olGTV0uWXS2XmVNFSOScyJKaIeS
+	Dof34HwWU/vvElAJyXx/BjY0yVBwDFfoKm2Fhtyom93RPyDCpjzE5KXmVCz/7CCkdaeUF86hjw+
+	FQMo/essobUZG6IfkOpnTRUaq4zDHqcPB/RI9K7qLJUzp1Iz+gjFljXjBugh8Ba4VXotay23xUz
+	/SyLZG4yrZEkkpfsnNgu9F/KbxDNIAPgvTtjyfR7S21WYz+wmO2bY/8NCmO8k34ewiQ4MZopop4
+	KYqEswog4uT4mNJTxBCbTRMVoKwXZL8JIY=
+X-Received: by 2002:a05:6000:2686:b0:48d:f3a4:610b with SMTP id ffacd0b85a97d-48df3a462bcmr12096973f8f.25.1792152858574;
+        Fri, 16 Oct 2026 05:14:18 -0700 (PDT)
+Received: from ?IPV6:2a07:de40:8100:0:89a9:fd0e:583d:4a53? ([2001:af0:8000:1409:193:86:92:181])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48dfd50d080sm4940009f8f.53.2026.10.16.05.14.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Oct 2026 05:14:17 -0700 (PDT)
+Message-ID: <b17e9924-ca92-4cdf-b5e6-54164039e09a@suse.com>
+Date: Fri, 16 Oct 2026 14:14:16 +0200
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 14/22] modpost: emit module descriptors as assembly
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+ Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
+ Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling
+ <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ Masahiro Yamada <masahiroy@kernel.org>, Alexey Gladkov <legion@kernel.org>,
+ Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+ Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+ Arnd Bergmann <arnd@arndb.de>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Ard Biesheuvel <ardb@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Josh Poimboeuf <jpoimboe@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
+ Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
+ Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?=
+ <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>,
+ Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
+ Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>,
+ Daniel Almeida <daniel.almeida@collabora.com>,
+ Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot
+ <acourbot@nvidia.com>, =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>,
+ Jonathan Corbet <corbet@lwn.net>, Randy Dunlap <rdunlap@infradead.org>,
+ Kees Cook <kees@kernel.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+ llvm@lists.linux.dev, linux-riscv@lists.infradead.org,
+ linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-efi@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ linux-doc@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+ linux-hardening@vger.kernel.org
+References: <20260923-build-speedup-v4-0-73128809a4a4@kernel.org>
+ <20260923-build-speedup-v4-14-73128809a4a4@kernel.org>
+Content-Language: en-US
+From: Petr Pavlu <petr.pavlu@suse.com>
+In-Reply-To: <20260923-build-speedup-v4-14-73128809a4a4@kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Verified on Debian 12 (x86_64) with Linux 7.3.0-rc7 packaged via
-'make bindeb-pkg' while installing out-of-tree VirtualBox modules
-(vboxdrv, vboxnetflt, vboxnetadp).
+On 9/23/26 7:18 PM, Lorenzo Stoakes (ARM) wrote:
+> modpost generates a descriptor for every module in the form of a
+> <module>.mod.c file with .modinfo strings, the __this_module descriptor,
+> exported symbol tables and (with CONFIG_MODVERSIONS set), the CRC of
+> imported symbols.
+> 
+> These files are compiled like any other kernel C file with all of the
+> -include preamble, as well as including linux/module.h, header dependencies
+> generated by fixdep of a few hundred headers, an objtool run and if LTO is
+> being performed, a link is performed to generate native code.
+> 
+> On an x86-64 allmodconfig build 11,189 *.mod.c files are built, each
+> taking ~0.24s of CPU time to compile, and module finalisation as a whole
+> 6,300 CPU seconds, or 64 seconds of wall time when run over 128 threads.
+> 
+> It also generates ~1.3 GiB of *.mod.o.cmd files that every subsequent build
+> has to read back.
+> 
+> Avoid all this by emitting the descriptors as assembly instead.
+> 
+> The layout required (size and alignment of struct module, struct
+> modversion_info, the module's name offsets, init, and exit fields and
+> whether the architecture uses PREL32 ksymtab references) can all be derived
+> from scripts/mod/module-offsets.h.
+> 
+> The fields of __this_module are emitted in offset order rather than
+> declaration order, as CONFIG_RANDSTRUCT shuffles struct module so the name,
+> init and exit fields can land anywhere.
+> 
+> An assembly file avoids all of the issues previously mentioned so this
+> conversion results in a very significant performance win on kernel build.
+> 
+> As a consequence of this change, since module-offsets.c includes
+> linux/module.h, scripts/mod is now built after the generated headers in
+> prepare0, rather than before.
+> 
+> Also update .gitignore and make clean to handle .mod.S files, but keep
+> .mod.c files there to ensure that users do not end up with untracked
+> changes/dirty trees after the change takes effect.
+> 
+> The sections were confirmed to be byte-for-byte identical to the C version
+> produced - each of .modinfo, .gnu.linkonce.this_module, __ksymtab*,
+> __ksymtab_strings, __kcrctab*, __kflagstab*, __versions,
+> __version_ext_crcs, __version_ext_names and their relocations - for all
+> 8,135 modules of a clang allmodconfig build with CONFIG_COMPILE_TEST off
+> and CONFIG_MODVERSIONS, CONFIG_EXTENDED_MODVERSIONS and
+> CONFIG_MODULE_SRCVERSION_ALL on, and for a sample built with gcc.
+> 
+> What differs is what the compiler added around them: the __UNIQUE_ID_*
+> locals, the KASAN constructor for the .mod.c globals, and on x86 a
+> .note.gnu.property that the linker already drops from any module containing
+> an assembly file and the loader never reads.
+> 
+> None of these have any impact on the build, however.
+> 
+> The assembly carries no debug information, so in order to keep describing
+> __this_module in each module's debug information, define it weakly in
+> module-common.c too, in a section which the module link discards.
+> 
+> x86_64 kernels built with gcc and clang, with CONFIG_MODVERSIONS,
+> CONFIG_EXTENDED_MODVERSIONS and CONFIG_MODULE_SRCVERSION_ALL, were booted,
+> every module and an external one loaded and unloaded, and the srcversions
+> checked against modinfo, i386 and arm64 defconfigs (gcc and clang) and a
+> ThinLTO build were also built as part of testing.
+> 
+> An x86_64 CONFIG_RANDSTRUCT_FULL build with clang, which places the name
+> field after init and exit, was checked the same way and produces the same
+> .gnu.linkonce.this_module sections and relocations as the C version.
+> 
+> On the x86_64 allmodconfig with clang 22, "make modules" with every
+> *.mod.o and *.ko deleted goes from 64.5s (6,306 CPU-s) to 28.5s (518
+> CPU-s).
+> 
+> A consequence of this change is that the make jobs are now so small that
+> make cannot dispatch them quick enough, however the next commit in the
+> series addresses this issue.
+> 
+> This impacts clean and no-op builds with a large number of modules most
+> noticeably.
+> 
+> Whole build, 128-thread Threadripper 9980X, best of N runs:
+> 
+>                                          before   after     delta
+>                                          -------------------------------
+>   x86 allmodconfig, no-op make, gcc        12.7s     2.3s    -10.4s (-82%)
+>   x86 allmodconfig, no-op make, clang      13.9s     2.8s    -11.2s (-80%)
+>   x86 allmodconfig, clean, gcc            342.6s   306.6s    -36.0s (-11%)
+>   x86 allmodconfig, clean, clang          340.1s   290.2s    -49.8s (-15%)
+> 
+> Assisted-by: LLM
+> Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
 
-Before this patch:
-  INSTALL /lib/modules/7.3.0-rc7/misc/vboxdrv.ko
-  DEPMOD  /lib/modules/7.3.0-rc7
-  Warning: modules_install: missing 'System.map' file. Skipping depmod.
+This version looks mostly ok to me, from a modules perspective. Below
+are a few nits plus one more useful comment about handling
+MODULE_ARCH_INIT.
 
-With this patch applied to scripts/depmod.sh:
-  INSTALL /lib/modules/7.3.0-rc7/misc/vboxdrv.ko
-  DEPMOD  /lib/modules/7.3.0-rc7
-  (completes with 0 warnings)
+> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+> index 0fd43c8a89ea..9d96459e492c 100644
+> --- a/scripts/mod/modpost.c
+> +++ b/scripts/mod/modpost.c
+> [...]
+> +/* The name and namespace strings a ksymtab entry refers to. */
+> +static void add_asm_kstrtab(struct buffer *buf, const struct symbol *sym)
+> +{
+> +	buf_printf(buf, "\t.section \"__ksymtab_strings\",\"aMS\",%%progbits,1\n");
+> +	buf_printf(buf, "__kstrtab_%s:\n", sym->name);
+> +	buf_asciz(buf, sym->name);
+> +	buf_printf(buf, "__kstrtabns_%s:\n", sym->name);
+> +	buf_asciz(buf, sym->namespace);
+> +	buf_printf(buf, "\t.previous\n");
+> +}
+> +
+> +/* The equivalent of SYMBOL_FLAGS(). */
+> +static void add_asm_kflagstab(struct buffer *buf, const struct symbol *sym)
+> +{
+> +	buf_printf(buf, "\t.section \"___kflagstab+%s\", \"a\"\n", sym->name);
+> +	buf_printf(buf, "__flags_%s:\n", sym->name);
+> +	buf_printf(buf, "\t.byte 0x%02x\n", get_symbol_flags(sym));
+> +	buf_printf(buf, "\t.previous\n");
+> +}
+> +
+> +/* The equivalent of KSYMTAB_FUNC()/KSYMTAB_DATA(). */
+> +static void add_asm_ksymtab(struct buffer *buf, const struct symbol *sym)
+> +{
+> +	const char *name = sym->name;
+> +
+> +	add_asm_kstrtab(buf, sym);
+> +
+> +	buf_printf(buf, "\t.section \"___ksymtab+%s\", \"a\"\n", name);
+> +	buf_printf(buf, "\t.balign %d\n", KSYM_ALIGN);
+> +	buf_printf(buf, "__ksymtab_%s:\n", name);
+> +	add_asm_ksym_ref(buf, sym->is_func ? MOD_FUNC_PREFIX : "", name);
+> +	add_asm_ksym_ref(buf, "__kstrtab_", name);
+> +	add_asm_ksym_ref(buf, "__kstrtabns_", name);
+> +	buf_printf(buf, "\t.previous\n");
+> +
+> +	add_asm_kflagstab(buf, sym);
+> +}
 
-And modules.dep is properly populated:
-  $ grep vbox /lib/modules/7.3.0-rc7/modules.dep
-  misc/vboxnetflt.ko: misc/vboxdrv.ko
-  misc/vboxnetadp.ko: misc/vboxdrv.ko
-  misc/vboxdrv.ko:
+add_asm_kstrtab() and add_asm_kflagstab() are only called from
+add_asm_ksymtab() and their logic is fairly short. I suggest merging
+these functions.
 
-Tested-by: Adrián García Casado <adriangarciacasado42@gmail.com>
+> +
+> +/* The equivalent of SYMBOL_CRC(). */
+> +static void add_asm_crc(struct buffer *buf, const struct symbol *sym)
+> +{
+> +	buf_printf(buf, "\t.section \"___kcrctab+%s\",\"a\"\n", sym->name);
+> +	buf_printf(buf, "\t.balign 4\n");
+> +	buf_printf(buf, "__crc_%s:\n", sym->name);
+> +	buf_printf(buf, "\t.long 0x%08x\n", sym->crc);
+> +	buf_printf(buf, "\t.previous\n");
+> +}
+> +
+> +static bool export_is_kept(const struct symbol *sym)
+> +{
+> +	return !trim_unused_exports || sym->used;
+> +}
+
+export_is_kept() is only called once from add_asm_exported_symbols().
+The condition can be inlined directly there.
+
+> +
+> +/* The exported symbols and, with modversions, their CRCs. */
+> +static void add_asm_exported_symbols(struct buffer *buf, struct module *mod)
+> +{
+> +	struct symbol *sym;
+> +
+> +	list_for_each_entry(sym, &mod->exported_symbols, list) {
+> +		if (!export_is_kept(sym))
+> +			continue;
+> +
+> +		add_asm_ksymtab(buf, sym);
+> +
+> +		if (!modversions)
+> +			continue;
+> +
+> +		if (!sym->crc_valid)
+> +			mod_warn(mod, "EXPORT symbol '%s' version generation failed, symbol will not be versioned.\n"
+> +				 "Is '%s' prototyped in <asm/asm-prototypes.h>?\n",
+> +				 sym->name, sym->name);
+> +		add_asm_crc(buf, sym);
+> +	}
+> +}
+> +
+> +/* Zero fill up to the offset. */
+> +static void asm_skip_to(struct buffer *buf, unsigned int *pos,
+> +			unsigned int offset)
+> +{
+> +	if (offset < *pos)
+> +		fatal("__this_module field at offset %u overlaps the previous one\n",
+> +		      offset);
+> +	if (offset > *pos)
+> +		buf_printf(buf, "\t.skip %u\n", offset - *pos);
+> +
+> +	*pos = offset;
+> +}
+> +
+> +/* A non-zero field of __this_module: its offset and the name or symbol in it. */
+> +struct this_module_field {
+> +	unsigned int offset;
+> +	bool is_name;
+> +	const char *value;
+> +};
+> +
+> +#define THIS_MODULE_MAX_FIELDS	5
+> +
+> +static int compare_field_offsets(const void *ptr_a, const void *ptr_b)
+> +{
+> +	const struct this_module_field *field_a = ptr_a, *field_b = ptr_b;
+> +
+> +	if (field_a->offset != field_b->offset)
+> +		return field_a->offset < field_b->offset ? -1 : 1;
+> +
+> +	return 0;
+> +}
+> +
+> +/*
+> + * The fields of __this_module which are not zero, in offset order. The order
+> + * is only known from module-offsets.h, CONFIG_RANDSTRUCT shuffles struct module.
+> + */
+> +static unsigned int get_this_module_fields(const struct module *mod,
+> +					   const char *modname,
+> +					   struct this_module_field *fields)
+> +{
+> +	unsigned int nr_fields = 0;
+> +
+> +	fields[nr_fields++] = (struct this_module_field)
+> +		{ MOD_OFF_module_name, true, modname };
+> +	if (mod->has_init)
+> +		fields[nr_fields++] = (struct this_module_field)
+> +			{ MOD_OFF_module_init, false, MOD_FUNC_PREFIX "init_module" };
+> +#ifdef MOD_OFF_module_exit
+> +	if (mod->has_cleanup)
+> +		fields[nr_fields++] = (struct this_module_field)
+> +			{ MOD_OFF_module_exit, false, MOD_FUNC_PREFIX "cleanup_module" };
+> +#endif
+> +#ifdef MOD_OFF_module_arch_fixup_start
+> +	fields[nr_fields++] = (struct this_module_field)
+> +		{ MOD_OFF_module_arch_fixup_start, false, "__start_fixup" };
+> +	fields[nr_fields++] = (struct this_module_field)
+> +		{ MOD_OFF_module_arch_fixup_end, false, "__stop_fixup" };
+> +#endif
+> +	qsort(fields, nr_fields, sizeof(*fields), compare_field_offsets);
+> +
+> +	return nr_fields;
+> +}
+> +
+> +/* Emit one field of __this_module, returning its size. */
+> +static unsigned int add_asm_this_module_field(struct buffer *buf,
+> +					      const struct this_module_field *field)
+> +{
+> +	if (field->is_name) {
+> +		buf_printf(buf, "\t.ascii \"%s\"\n", field->value);
+> +		return strlen(field->value);
+> +	}
+> +
+> +	buf_printf(buf, "\t" MOD_PTR_DIRECTIVE " %s\n", field->value);
+> +	return MOD_SIZEOF_LONG;
+> +}
+> +
+> +/*
+> + * The equivalent of:
+> + *
+> + *	__visible struct module __this_module __section(".gnu.linkonce.this_module")
+> + *		= { .name = KBUILD_MODNAME, .init = init_module, .exit = cleanup_module,
+> + *		    .arch = MODULE_ARCH_INIT };
+> + *
+> + * Everything not listed is zero, MODULE_ARCH_INIT included, except on m68k.
+> + */
+> +static void add_asm_this_module(struct buffer *buf, const struct module *mod,
+> +				const char *modname)
+> +{
+> +	struct this_module_field fields[THIS_MODULE_MAX_FIELDS];
+> +	const unsigned int nr_fields = get_this_module_fields(mod, modname, fields);
+
+The const qualifier can be removed from the nr_fields definition to
+match the usual kernel style.
+
+> +	unsigned int pos = 0, i;
+> +
+> +	buf_printf(buf, "\n\t.section .gnu.linkonce.this_module,\"aw\",%%progbits\n");
+> +	buf_printf(buf, "\t.balign %d\n", MOD_ALIGNOF_struct_module);
+> +	buf_printf(buf, "\t.globl __this_module\n");
+> +	buf_printf(buf, "\t.type __this_module, %%object\n");
+> +	buf_printf(buf, "\t.size __this_module, %d\n", MOD_SIZEOF_struct_module);
+> +	buf_printf(buf, "__this_module:\n");
+> +
+> +	for (i = 0; i < nr_fields; i++) {
+> +		asm_skip_to(buf, &pos, fields[i].offset);
+> +		pos += add_asm_this_module_field(buf, &fields[i]);
+> +	}
+> +
+> +	asm_skip_to(buf, &pos, MOD_SIZEOF_struct_module);
+> +}
+> +
+> +/*
+> + * An unresolved symbol without a module is not versioned; one without a CRC
+> + * cannot be, so warn about it.
+> + */
+> +static bool skip_unversioned(struct module *mod, const struct symbol *sym)
+> +{
+> +	if (!sym->module)
+> +		return true;
+> +	if (sym->crc_valid)
+> +		return false;
+> +
+> +	mod_warn(mod, "symbol '%s' has no CRC!\n", sym->name);
+> +	return true;
+> +}
+> +
+> +/* One struct modversion_info: the CRC, then the name padded to the end. */
+> +static void add_asm_version(struct buffer *buf, const struct symbol *sym)
+> +{
+> +	buf_printf(buf, "\t" MOD_PTR_DIRECTIVE " 0x%08x\n", sym->crc);
+> +	buf_printf(buf, "\t.ascii \"%s\"\n", sym->name);
+> +	buf_printf(buf, "\t.skip %zu\n", MOD_SIZEOF_struct_modversion_info -
+> +		   MOD_OFF_modversion_info_name - strlen(sym->name));
+> +}
+> +
+> +/*
+> + * The equivalent of:
+> + *
+> + *	static const struct modversion_info ____versions[]
+> + *	__used __section("__versions") = { { crc, "name" }, ... };
+> + *
+> + * for unresolved symbols.
+> + */
+> +static void add_asm_versions(struct buffer *buf, struct module *mod)
+> +{
+> +	struct symbol *sym;
+> +
+> +	if (!basic_modversions)
+> +		return;
+> +
+> +	buf_printf(buf, "\n\t.section __versions,\"a\",%%progbits\n");
+> +	buf_printf(buf, "\t.balign %d\n", MOD_ALIGNOF_struct_modversion_info);
+> +	list_for_each_entry(sym, &mod->unresolved_symbols, list) {
+> +		if (skip_unversioned(mod, sym))
+> +			continue;
+> +
+> +		if (strlen(sym->name) >= MOD_NAME_LEN) {
+> +			/* Only the extended table can hold it. */
+> +			if (extended_modversions)
+> +				continue;
+> +
+> +			mod_error(mod, "too long symbol '%s'\n", sym->name);
+> +			break;
+> +		}
+> +
+> +		add_asm_version(buf, sym);
+> +	}
+> +}
+> +
+> +/*
+> + * The equivalent of:
+> + *	static const u32 ____version_ext_crcs[] __section("__version_ext_crcs") = { crc, ... };
+> + *	static const char ____version_ext_names[] __section("__version_ext_names") = "name\0" ...;
+> + *
+> + * for unresolved symbols.
+> + */
+> +static void add_asm_extended_versions(struct buffer *buf, struct module *mod)
+> +{
+> +	struct symbol *sym;
+> +
+> +	if (!extended_modversions)
+> +		return;
+> +
+> +	buf_printf(buf, "\n\t.section __version_ext_crcs,\"a\",%%progbits\n");
+> +	buf_printf(buf, "\t.balign 4\n");
+> +	list_for_each_entry(sym, &mod->unresolved_symbols, list) {
+> +		if (skip_unversioned(mod, sym))
+> +			continue;
+> +
+> +		buf_printf(buf, "\t.long 0x%08x\n", sym->crc);
+> +	}
+> +
+> +	/*
+> +	 * A symbol without a CRC was warned about above, and is skipped here
+> +	 * too so that the names line up with the CRCs.
+> +	 */
+> +	buf_printf(buf, "\t.section __version_ext_names,\"a\",%%progbits\n");
+> +	list_for_each_entry(sym, &mod->unresolved_symbols, list) {
+> +		if (!sym->module || !sym->crc_valid)
+> +			continue;
+
+This condition must match the logic in skip_unversioned(). It would be
+clearer to keep it only in one place by calling skip_unversioned() here
+and adding a "silent" parameter to the function.
+
+> diff --git a/scripts/mod/module-offsets.c b/scripts/mod/module-offsets.c
+> new file mode 100644
+> index 000000000000..a336dd47aa33
+> --- /dev/null
+> +++ b/scripts/mod/module-offsets.c
+> @@ -0,0 +1,35 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Layout of the structures modpost emits into *.mod.S, extracted from the
+> + * target headers as devicetable-offsets.c does for the device tables.
+> + */
+
+The second part of the comment, after the comma, is superfluous. It is
+expected that the various parts of modpost use consistent mechanisms
+where appropriate.
+
+> +#define COMPILE_OFFSETS
+> +#include <linux/kbuild.h>
+> +#include <linux/module.h>
+> +
+> +int main(void)
+> +{
+> +	DEFINE(MOD_SIZEOF_LONG, sizeof(long));
+> +	DEFINE(MOD_PREL32_RELOCATIONS, IS_ENABLED(CONFIG_HAVE_ARCH_PREL32_RELOCATIONS));
+> +	DEFINE(MOD_FUNC_PLABEL, IS_ENABLED(CONFIG_PARISC) && IS_ENABLED(CONFIG_64BIT));
+> +
+> +	DEFINE(MOD_SIZEOF_struct_module, sizeof(struct module));
+> +	DEFINE(MOD_ALIGNOF_struct_module, __alignof__(struct module));
+> +	OFFSET(MOD_OFF_module_name, module, name);
+> +	OFFSET(MOD_OFF_module_init, module, init);
+> +#ifdef CONFIG_MODULE_UNLOAD
+> +	OFFSET(MOD_OFF_module_exit, module, exit);
+> +#endif
+> +#if defined(CONFIG_M68K) && defined(CONFIG_MMU)
+> +	/* MODULE_ARCH_INIT: the only architecture where it is not all zeroes. */
+> +	OFFSET(MOD_OFF_module_arch_fixup_start, module, arch.fixup_start);
+> +	OFFSET(MOD_OFF_module_arch_fixup_end, module, arch.fixup_end);
+> +#endif
+
+I feel it is a bit of a layering violation for modpost to know how
+individual architectures need to initialize module::arch.
+
+For now, this is probably ok. I would just remove MODULE_ARCH_INIT from
+include/linux/module.h and arch/m68k/include/asm/module.h, along with
+the comment referring to it in scripts/mod/modpost.c.
+
+In the future, this could be avoided by having the m68k module support
+look up the .m68k_fixup section at runtime, as other architectures
+typically do for similar sections.
+
+-- 
+Thanks,
+Petr
