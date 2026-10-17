@@ -1,35 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EFEC47FAFE;
-	Sat, 17 Oct 2026 14:32:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5AF147F77F;
+	Sat, 17 Oct 2026 14:32:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792247532; cv=none; b=p0Z7osV6uFou0us11ViBHOnKky/DVKRJKGH9B+GqNMWKLml0+tkZDEfZgOOjGGPOr0P/3gkZozZGVAqAAuKtAwy9RtyEEF8mhKg3KDVGIEK+tHhK3QEExqBZFbJMJZ3VO//ZIbVGCUcTmf+fth5czoJSLeXZ2hvzThV2SiDd1D0=
+	t=1792247534; cv=none; b=p+hhroizWZ5omNhU0SPSJ+c12A9hyJeg6fnhkG2/urzjexR5SJujZErepT1+DzBosd2AvftWYk+60vU7uD3WNNTjwetrdBBUSWqMlzom4xGWZkqWjyck+xUVN7EXM9gqeWCQYfAYf7BIHiJbjsuzYEMsPL0x37n2ide6HdSkrjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792247532; c=relaxed/simple;
-	bh=kxXercG/rVlXOsA85BC8oG8l7RIloeYT/J+aIezxsxw=;
+	s=arc-20240116; t=1792247534; c=relaxed/simple;
+	bh=6xAxQCDcVYHX1OLGy8y2M3FM51A2OEf7oeCvt6EWmoY=;
 	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
-	 Date; b=QNPAjKwmqkXlFpfoQX+t1l9zVpHGf4iqRSabyv/MHSY9Y0E6Lk2Y+slaB/MVoagBVLwgy5aWP8by2DPcbLLZ7D5y2eiHtNiaD9yUnIzix3AeUKUzYUNpleBuRCNB1zNNPtlGYCUdBKAfo35KUOpCDigTg51XlrtO4jt6IAN6QxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OCNXnna6; arc=none smtp.client-ip=100.103.45.18
+	 Date; b=E91nl4E3EwXE87ZBc4V+fIy8uoheEyufnldP9nei4SFWSUMHoleMjkDFNC8OcCI3Gm2g5c7Aa1T46TQFkdicbthUdLpOvK7GQPTQSuOBpStrNj8HOnioDANWlCjqmA3hJrztzaHWD0bGsEMu1Mw9hUax9XVT75VtPzEm40vK4yM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dH/qRPll; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OCNXnna6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF0721F000C5;
-	Sat, 17 Oct 2026 14:32:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dH/qRPll"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DE6E1F000C5;
+	Sat, 17 Oct 2026 14:32:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792247530;
-	bh=PyQa/dyAL/NbyJ/JYtXuC/BhYzBqZwzWTuJaR9Pk3f0=;
+	s=k20260515; t=1792247533;
+	bh=vKuMA66jFmYv1RgHfXBuLpmnX1U5qXzIZ3cUC6H1csE=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=OCNXnna6RS4WvlCf57+sOFXMms24gaqZzzr5q6Fya5es+DIuF2Bz6HpR+xoGBHhjA
-	 hLYvBwhBtD2i7i1IhaZReoOgrZNJ9sJCwx/ObyPiaQgVf3Qn6Sh1gUV2KMkFX9fJ9k
-	 RxvkQWv/3nchnF0SJzyGCcudxFzIYVrLu9bxselcnqegBKwMQbX35TpCkVWIr4YUdC
-	 2Ur/ttbZhyBcj/kL1RGp0kmeTYzswtfuaKfQYAgx/UYZ9f54/xB4+k2TFAZsjXEIUq
-	 pWcgDhCY4dXcKJtOOizN8NwCkrM84E3Giz0DJ9PjKzP+k5u7+Yp81w0K68kuc8jAzG
-	 oOjZkgAlXmtHQ==
-Message-ID: <sashiko-outbox-175553@kernel.org>
+	b=dH/qRPllrOxMN8UJT5btNrvOaAZBiWeqSJWKYiorZHGYjD23xdeCCzpY8zbzixvhM
+	 djH4vJSX9g4HWvgPKPb+aiBW5kcOGx4ZMclo29IdTfo+Yf/6uufZ87QhbaidUzwTQW
+	 DtBPxdNklUL9ifxf3wwpg553pE3F53pKbVMMFlgODBqAaN4IqByi1aRM6JJacIq0pQ
+	 iaabksYX+9pek4X1VcpoqsBpWTW39HSc229g8jkZgHWHR4RHNk/5L7qgYwhnRWvcTL
+	 PVpaPWsclTJueX0cp0UDu3O8xSQThLDkBZsIvO3/V6wwBkiS9m/AaZZO0rjATU+OJW
+	 dWwWuYshOf0iA==
+Message-ID: <sashiko-outbox-175556@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [RFC PATCH v2 2/7] kbuild: add "make tools_build" to build
- userspace tools from tools/
+Subject: Re: [RFC PATCH v2 5/7] tools: build kernel selftests in tools_build
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sasha Levin" <sashal@kernel.org>, "Nathan Chancellor" <nathan@kernel.org>, "Nicolas
  Schier" <nsc@kernel.org>, linux-kbuild@vger.kernel.org
@@ -40,81 +39,134 @@ Cc: "Shuah Khan" <shuah@kernel.org>, "Peter Zijlstra" <peterz@infradead.org>, "I
  Rogers" <irogers@google.com>, "Adrian Hunter" <adrian.hunter@intel.com>, "James
  Clark" <james.clark@linaro.org>, linux-perf-users@vger.kernel.org,
  =?utf-8?b?VGhvbWFzIFdlacOfc2NodWg=?= <linux@weissschuh.net>, "Andrew Morton" <akpm@linux-foundation.org>
-In-Reply-To: <20261016143143.3613501-3-sashal@kernel.org>
+In-Reply-To: <20261016143143.3613501-6-sashal@kernel.org>
 References: <20261016143143.3613501-1-sashal@kernel.org>
- <20261016143143.3613501-3-sashal@kernel.org>
+ <20261016143143.3613501-6-sashal@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 17 Oct 2026 14:32:09 +0000
+Date: Sat, 17 Oct 2026 14:32:12 +0000
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+Thank you for your contribution! Sashiko AI review found 3 potential issue(=
 s) to consider:
-- [Medium] kbuild: flawed dry-run detection breaks incremental rebuilds
+- [High] build: Fatal Make syntax error on empty target variables in static=
+ pattern rules
+- [Medium] selftests: kexec Kconfig unnecessarily restricted to X86_64
+- [Medium] kbuild: missing dependencies on scripts/ Makefiles for selftests=
+ rebuilds
 --
 
-commit af4d0e2311f445e8ceb17d3fd81b05fa2c242614
+commit f8d06182dd0adbe69406863fbe53894162f78089
 Author: Sasha Levin <sashal@kernel.org>
+Subject: tools: build kernel selftests in tools_build
 
-kbuild: add "make tools_build" to build userspace tools from tools/
+This commit adds a "Kernel selftests" sub-menu to the tools build framework,
+allowing selftests to be built without writing to the source tree. Each
+selftest runs under its own make instance, enabling parallel builds using a
+pre-installed C library and UAPI headers. Rebuild dependencies are handled =
+by
+tracking timestamps of shared files and headers since selftests do not
+natively track header dependencies.
 
-This commit adds a new target to build userspace tools from the tools/
-directory as part of the kernel build process. It introduces a Kconfig
-menu and a Makefile for building the selected programs independently.
+> diff --git a/tools/Kconfig b/tools/Kconfig
+> --- a/tools/Kconfig
+> +++ b/tools/Kconfig
+
+[ ... ]
+
+> +config TOOLS_BUILD_SELFTESTS_KEXEC
+> +	bool "kexec"
+> +	depends on X86_64
+
+[Severity: Medium]
+Does this unnecessarily restrict the kexec selftest to X86_64?
+
+Looking at tools/testing/selftests/kexec/Makefile, it explicitly supports b=
+oth
+x86 (32-bit and 64-bit) and ppc64le:
+
+    ifeq ($(ARCH_PROCESSED),$(filter $(ARCH_PROCESSED),x86 ppc64le))
+    TEST_PROGS :=3D test_kexec_load.sh test_kexec_file_load.sh
+    TEST_FILES :=3D kexec_common_lib.sh
+
+Configuring the tools build on ppc64le or 32-bit x86 will not expose this
+option, silently excluding the test from being built and installed on these
+platforms.
+
+[ ... ]
 
 > diff --git a/tools/Makefile.kbuild b/tools/Makefile.kbuild
-> new file mode 100644
-> index 0000000000000..8cfa7f80039cd
-> --- /dev/null
+> --- a/tools/Makefile.kbuild
 > +++ b/tools/Makefile.kbuild
 
 [ ... ]
 
-> +# $(call build,<output directory>,<make arguments>,<files to check>,<CON=
-FIG_ symbol>)
-> +# Builds in an empty directory when the make arguments or LDFLAGS change=
-d, or
-> +# when one of the files is newer than the last build. "make -n" only sho=
-ws
-> +# the build.
-> +build-key =3D $(call escsq,$(2) LDFLAGS=3D$(USERLDFLAGS))
-> +dry-run :=3D $(findstring n,$(firstword -$(MAKEFLAGS)))
+> +$(selftest-shared): FORCE
+> +	$(Q)mkdir -p $(@D); \
+> +	newest=3D$$(find $(CURDIR)/usr/include $(toolsdir)/include $(toolsdir)/=
+arch $(toolsdir)/testing/selftests \
+> +		-type f \( -name '*.h' -o -name '*.mk' -o -name Makefile \) -printf '%=
+T@\n' | \
+> +		sort -n | tail -n 1); \
+> +	touch -d "@$${newest:-0}" $@
 
 [Severity: Medium]
-Could this dry-run detection logic produce a false positive for common make
-arguments?
+Will this miss rebuild dependencies on shared build scripts?
 
-If MAKEFLAGS starts with a long option containing 'n' (such as Kbuild's
-frequent default --no-print-directory), -$(MAKEFLAGS) evaluates to something
-like ---no-print-directory, and findstring erroneously matches the letter '=
-n'.
+The find command omits the tools/scripts/ and scripts/ directories, and its
+filters exclude files named Makefile.* or *.include.
 
-When evaluated as a dry run, the Makefile silently skips creating the
-.tools_build tracking file and refuses to clear out stale objects, which br=
-eaks
-incremental rebuilds.
-
-Is it possible to use the standard Kbuild idiom here, like
-$(findstring n,$(filter-out --%,$(MAKEFLAGS))), to properly check the flags?
+Modifying core shared files like tools/scripts/Makefile.include,
+tools/scripts/Makefile.arch, or scripts/subarch.include will not trigger a
+rebuild of selftests that include them, which can lead to stale builds.
 
 > +
-> +define build
-> +	+$(Q)$(if $(dry-run),,if [ "$$(cat $(1)/.tools_build 2>/dev/null)" !=3D=
- '$(build-key)' ] $(if $(3),|| \
-> +	   [ -n "$$(find $(3) -newer $(1)/.tools_build -print -quit 2>/dev/null=
-)" ]); then \
-> +		rm -rf $(1); \
-> +	fi;) \
-> +	mkdir -p $(1) && $(MAKE) $(2) && \
-> +	$(if $(dry-run),:,printf '%s' '$(build-key)' > $(1)/.tools_build) || \
-> +	{ echo >&2 "tools_build: $(patsubst $(outdir)/%,%,$(1)) failed to build=
-; set CONFIG_$(4)=3Dn to skip it"; false; }
-> +endef
+> +# As with "make kselftest-all", a selftest that fails to build does not =
+fail
+> +# the build unless FORCE_TARGETS is set. kselftest_deps.sh lists the lib=
+raries
+> +# it needs that the compiler cannot link with. It leaves files behind in
+> +# TMPDIR, so it gets one of its own.
+> +selftest-failed =3D (cd $(toolsdir)/testing/selftests && tmp=3D$$(mktemp=
+ -d) && \
+> +	TMPDIR=3D$$tmp ./kselftest_deps.sh '$(call escsq,$(tools-cc))' $(1) | g=
+rep '^FAIL' >&2; \
+> +	rm -rf "$$tmp"); $(if $(FORCE_TARGETS),false,:)
+> +
+> +selftest-targets :=3D $(addprefix selftest-,$(selftests-y))
+> +
+> +__tools_build: $(selftest-targets)
+> +
+> +PHONY +=3D $(selftest-targets)
+> +$(selftest-targets): selftest-%: $(selftest-shared) FORCE
+> +	$(call build,$(outdir)/selftests/$*,-C $(toolsdir)/testing/selftests/$*=
+ OUTPUT=3D$(outdir)/selftests/$* $(selftest-flags),$(selftest-shared) $(too=
+lsdir)/testing/selftests/$* $(selftest-extra-$*),TOOLS_BUILD_SELFTESTS_$(sh=
+ell echo $* | tr a-z/- A-Z__),$(call selftest-failed,$*))
+
+[Severity: High]
+Can this trigger a fatal Make syntax error if no selftests are selected?
+
+If a user enables the tools build selftests option but disables all individ=
+ual
+selftests, $(selftests-y) and $(selftest-targets) will be empty.
+
+Since this rule uses two colons, it is a static pattern rule. While GNU Make
+ignores empty targets for single-colon rules, an empty target list in a
+double-colon static pattern rule evaluates to : selftest-%: ... and
+triggers a fatal missing target pattern. Stop. build error.
+
+The same issue would apply to the $(tool-targets): tool-%: FORCE rule if
+the tools build is enabled but no individual tools are selected.
+
+Should these static pattern rules be guarded with an ifneq check
+(e.g., ifneq ($(selftest-targets),)) to prevent breaking the build on
+minimal configurations?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261016143143.3613=
-501-1-sashal@kernel.org?part=3D2
+501-1-sashal@kernel.org?part=3D5
