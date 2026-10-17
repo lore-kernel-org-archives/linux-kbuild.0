@@ -1,172 +1,184 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5AF147F77F;
-	Sat, 17 Oct 2026 14:32:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1679377A80;
+	Sat, 17 Oct 2026 19:49:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792247534; cv=none; b=p+hhroizWZ5omNhU0SPSJ+c12A9hyJeg6fnhkG2/urzjexR5SJujZErepT1+DzBosd2AvftWYk+60vU7uD3WNNTjwetrdBBUSWqMlzom4xGWZkqWjyck+xUVN7EXM9gqeWCQYfAYf7BIHiJbjsuzYEMsPL0x37n2ide6HdSkrjw=
+	t=1792266595; cv=none; b=qTdRIiA1YFHmuyA+N9+WunLgTVgtMOmCzMIGIPZ2jcDj+/eA/0pAbrOVAgG8PlZUxq9W5ojKNeYAM8k+Db/39IY+aGyevl8ZfpiLqa6oXoLlh4FKpFCi7PzKYhMQ+ZSMtGiLit9B4erpYjjNiIVYm754OeaDRqOekiyYQRLY4gg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792247534; c=relaxed/simple;
-	bh=6xAxQCDcVYHX1OLGy8y2M3FM51A2OEf7oeCvt6EWmoY=;
+	s=arc-20240116; t=1792266595; c=relaxed/simple;
+	bh=Tfwp3pB+E9EIigimP4TOoTrHManA8WO6NE56tzftGuc=;
 	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
-	 Date; b=E91nl4E3EwXE87ZBc4V+fIy8uoheEyufnldP9nei4SFWSUMHoleMjkDFNC8OcCI3Gm2g5c7Aa1T46TQFkdicbthUdLpOvK7GQPTQSuOBpStrNj8HOnioDANWlCjqmA3hJrztzaHWD0bGsEMu1Mw9hUax9XVT75VtPzEm40vK4yM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dH/qRPll; arc=none smtp.client-ip=100.103.45.18
+	 Date; b=Hm42TevjgnDv+8C1bUOjzN+GmTe2yyPYsrSGiEFTpeIxIcdhC/F4u5uRF2GbvKnlCQY0dgHWe1uTbp+dITJbGvuaQww4dWDt4bz1oY1juBCgYtgEtWxrNAX6kK7tHZa3cMFY6lqXGP751hpzNzoaBz+dwsDqUk/zXo4G3THnNGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=il00IixY; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dH/qRPll"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DE6E1F000C5;
-	Sat, 17 Oct 2026 14:32:12 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="il00IixY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 377301F000C4;
+	Sat, 17 Oct 2026 19:49:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792247533;
-	bh=vKuMA66jFmYv1RgHfXBuLpmnX1U5qXzIZ3cUC6H1csE=;
+	s=k20260515; t=1792266594;
+	bh=xROonoP9OfNRth81uZgSFQTd3QtGSaDs22N/+nVADuQ=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=dH/qRPllrOxMN8UJT5btNrvOaAZBiWeqSJWKYiorZHGYjD23xdeCCzpY8zbzixvhM
-	 djH4vJSX9g4HWvgPKPb+aiBW5kcOGx4ZMclo29IdTfo+Yf/6uufZ87QhbaidUzwTQW
-	 DtBPxdNklUL9ifxf3wwpg553pE3F53pKbVMMFlgODBqAaN4IqByi1aRM6JJacIq0pQ
-	 iaabksYX+9pek4X1VcpoqsBpWTW39HSc229g8jkZgHWHR4RHNk/5L7qgYwhnRWvcTL
-	 PVpaPWsclTJueX0cp0UDu3O8xSQThLDkBZsIvO3/V6wwBkiS9m/AaZZO0rjATU+OJW
-	 dWwWuYshOf0iA==
-Message-ID: <sashiko-outbox-175556@kernel.org>
+	b=il00IixYlJqo4I4S1d0PGEEf2u0+dsxvJwlwS0dy7zMXuS75TReIWrzQRvP8iIkp7
+	 BRqve/A0r231fz/ryWKITTOOHVNgb5IPhqwjube+21zLbvMN1EXA+qoevZ3nuB0SOp
+	 jTncCob5+Wk09V3RtBTSATv+z4MSrcwrBWYNTZOwKXIHHQn7jt6epOGC0F5iBPzT7s
+	 HxtAoptR3pqcOzFQbYkAh+FVJgU7CpQVcWP8py4mpXz763J6N/QtvTmvqgPIgqQ3Ni
+	 ScJc8uvusAN6G22x0VjbcrWD9OVd45xUsDABpEK9U13vVfPeLwntqrRXHC4jcTjyxy
+	 +520PWNUFeWMA==
+Message-ID: <sashiko-outbox-175793@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [RFC PATCH v2 5/7] tools: build kernel selftests in tools_build
+Subject: Re: [PATCH v4 2/2] kbuild: Support directory targets for building
+ DTBs
 Reply-To: sashiko-reviews@lists.linux.dev
-To: "Sasha Levin" <sashal@kernel.org>, "Nathan Chancellor" <nathan@kernel.org>, "Nicolas
- Schier" <nsc@kernel.org>, linux-kbuild@vger.kernel.org
-Cc: "Shuah Khan" <shuah@kernel.org>, "Peter Zijlstra" <peterz@infradead.org>, "Ingo
- Molnar" <mingo@redhat.com>, "Arnaldo Carvalho de Melo" <acme@kernel.org>, "Namhyung
- Kim" <namhyung@kernel.org>, "Mark Rutland" <mark.rutland@arm.com>, "Alexander
- Shishkin" <alexander.shishkin@linux.intel.com>, "Jiri Olsa" <jolsa@kernel.org>, "Ian
- Rogers" <irogers@google.com>, "Adrian Hunter" <adrian.hunter@intel.com>, "James
- Clark" <james.clark@linaro.org>, linux-perf-users@vger.kernel.org,
- =?utf-8?b?VGhvbWFzIFdlacOfc2NodWg=?= <linux@weissschuh.net>, "Andrew Morton" <akpm@linux-foundation.org>
-In-Reply-To: <20261016143143.3613501-6-sashal@kernel.org>
-References: <20261016143143.3613501-1-sashal@kernel.org>
- <20261016143143.3613501-6-sashal@kernel.org>
+To: =?utf-8?b?Um9iIEhlcnJpbmcgKEFybSk=?= <robh@kernel.org>, "Nathan
+ Chancellor" <nathan@kernel.org>, "Nicolas Schier" <nsc@kernel.org>, "Saravana
+ Kannan" <saravanak@kernel.org>
+Cc: "David Heidelberg" <david@ixit.cz>, "Arnd Bergmann" <arnd@arndb.de>, linux-kbuild@vger.kernel.org, devicetree@vger.kernel.org, conor+dt@kernel.org
+In-Reply-To: <20261016-dtb-dirs-v3-v4-2-0ec42fd8ef9b@kernel.org>
+References: <20261016-dtb-dirs-v3-v4-0-0ec42fd8ef9b@kernel.org>
+ <20261016-dtb-dirs-v3-v4-2-0ec42fd8ef9b@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 17 Oct 2026 14:32:12 +0000
+Date: Sat, 17 Oct 2026 19:49:53 +0000
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 
-Thank you for your contribution! Sashiko AI review found 3 potential issue(=
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [High] build: Fatal Make syntax error on empty target variables in static=
- pattern rules
-- [Medium] selftests: kexec Kconfig unnecessarily restricted to X86_64
-- [Medium] kbuild: missing dependencies on scripts/ Makefiles for selftests=
- rebuilds
+- [High] kbuild: parallel build race in dtbs target and extra boot/dts trav=
+ersal
 --
 
-commit f8d06182dd0adbe69406863fbe53894162f78089
-Author: Sasha Levin <sashal@kernel.org>
-Subject: tools: build kernel selftests in tools_build
+commit 3f00c18c0d96a2ac1d59c7335959fec4fa041ff7
+Author: Rob Herring (Arm) <robh@kernel.org>
 
-This commit adds a "Kernel selftests" sub-menu to the tools build framework,
-allowing selftests to be built without writing to the source tree. Each
-selftest runs under its own make instance, enabling parallel builds using a
-pre-installed C library and UAPI headers. Rebuild dependencies are handled =
-by
-tracking timestamps of shared files and headers since selftests do not
-natively track header dependencies.
+kbuild: Support directory targets for building DTBs
 
-> diff --git a/tools/Kconfig b/tools/Kconfig
-> --- a/tools/Kconfig
-> +++ b/tools/Kconfig
+This commit enables building DTBs using directory targets so that all DTBs
+for a vendor directory can be built, including base+overlay DTB targets,
+and updates the dtbs target to use the directory target rule.
 
-[ ... ]
-
-> +config TOOLS_BUILD_SELFTESTS_KEXEC
-> +	bool "kexec"
-> +	depends on X86_64
-
-[Severity: Medium]
-Does this unnecessarily restrict the kexec selftest to X86_64?
-
-Looking at tools/testing/selftests/kexec/Makefile, it explicitly supports b=
-oth
-x86 (32-bit and 64-bit) and ppc64le:
-
-    ifeq ($(ARCH_PROCESSED),$(filter $(ARCH_PROCESSED),x86 ppc64le))
-    TEST_PROGS :=3D test_kexec_load.sh test_kexec_file_load.sh
-    TEST_FILES :=3D kexec_common_lib.sh
-
-Configuring the tools build on ppc64le or 32-bit x86 will not expose this
-option, silently excluding the test from being built and installed on these
-platforms.
-
-[ ... ]
-
-> diff --git a/tools/Makefile.kbuild b/tools/Makefile.kbuild
-> --- a/tools/Makefile.kbuild
-> +++ b/tools/Makefile.kbuild
-
-[ ... ]
-
-> +$(selftest-shared): FORCE
-> +	$(Q)mkdir -p $(@D); \
-> +	newest=3D$$(find $(CURDIR)/usr/include $(toolsdir)/include $(toolsdir)/=
-arch $(toolsdir)/testing/selftests \
-> +		-type f \( -name '*.h' -o -name '*.mk' -o -name Makefile \) -printf '%=
-T@\n' | \
-> +		sort -n | tail -n 1); \
-> +	touch -d "@$${newest:-0}" $@
-
-[Severity: Medium]
-Will this miss rebuild dependencies on shared build scripts?
-
-The find command omits the tools/scripts/ and scripts/ directories, and its
-filters exclude files named Makefile.* or *.include.
-
-Modifying core shared files like tools/scripts/Makefile.include,
-tools/scripts/Makefile.arch, or scripts/subarch.include will not trigger a
-rebuild of selftests that include them, which can lead to stale builds.
-
-> +
-> +# As with "make kselftest-all", a selftest that fails to build does not =
-fail
-> +# the build unless FORCE_TARGETS is set. kselftest_deps.sh lists the lib=
-raries
-> +# it needs that the compiler cannot link with. It leaves files behind in
-> +# TMPDIR, so it gets one of its own.
-> +selftest-failed =3D (cd $(toolsdir)/testing/selftests && tmp=3D$$(mktemp=
- -d) && \
-> +	TMPDIR=3D$$tmp ./kselftest_deps.sh '$(call escsq,$(tools-cc))' $(1) | g=
-rep '^FAIL' >&2; \
-> +	rm -rf "$$tmp"); $(if $(FORCE_TARGETS),false,:)
-> +
-> +selftest-targets :=3D $(addprefix selftest-,$(selftests-y))
-> +
-> +__tools_build: $(selftest-targets)
-> +
-> +PHONY +=3D $(selftest-targets)
-> +$(selftest-targets): selftest-%: $(selftest-shared) FORCE
-> +	$(call build,$(outdir)/selftests/$*,-C $(toolsdir)/testing/selftests/$*=
- OUTPUT=3D$(outdir)/selftests/$* $(selftest-flags),$(selftest-shared) $(too=
-lsdir)/testing/selftests/$* $(selftest-extra-$*),TOOLS_BUILD_SELFTESTS_$(sh=
-ell echo $* | tr a-z/- A-Z__),$(call selftest-failed,$*))
+> diff --git a/Makefile b/Makefile
+> index c307ee9293bcd..6d1d1c803ee86 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1664,8 +1664,8 @@ dtbindingtree :=3D Documentation/devicetree/bindings
+>  ifneq ($(dtstree),)
+> =20
+>  PHONY +=3D dtbs dtbs_prepare dtbs_install dtbs_check
+> -dtbs: dtbs_prepare
+> -	$(Q)$(MAKE) $(build)=3D$(dtstree) need-dtbslist=3D1
+> +dtbs:
+> +	$(Q)$(MAKE) $(dtstree)/
 
 [Severity: High]
-Can this trigger a fatal Make syntax error if no selftests are selected?
+Does dropping dtbs_prepare from the dtbs target prerequisites and spawning a
+separate top-level make for $(dtstree)/ introduce a parallel build race when
+vmlinux and dtbs are built together (for example, during make -j all when
+CONFIG_OF_EARLY_FLATTREE=3Dy, make -j vmlinux when CONFIG_GENERIC_BUILTIN_D=
+TB=3Dy,
+or make -j image.fit on arm64)?
 
-If a user enables the tools build selftests option but disables all individ=
-ual
-selftests, $(selftests-y) and $(selftest-targets) will be empty.
+Previously, vmlinux (via . -> prepare -> prepare0 -> archprepare) and dtbs
+(via dtbs_prepare) shared the same top-level make dependency graph, which
+serialized include/config/kernel.release, scripts_basic, and scripts_dtc:
 
-Since this rule uses two colons, it is a static pattern rule. While GNU Make
-ignores empty targets for single-colon rules, an empty target list in a
-double-colon static pattern rule evaluates to : selftest-%: ... and
-triggers a fatal missing target pattern. Stop. build error.
+Makefile:
+    scripts: scripts_basic scripts_dtc
+    	$(Q)$(MAKE) $(build)=3D$(@)
+    ...
+    archprepare: outputmakefile archheaders archscripts scripts include/con=
+fig/kernel.release \
+    ...
+    dtbs_prepare: include/config/kernel.release scripts_dtc
 
-The same issue would apply to the $(tool-targets): tool-%: FORCE rule if
-the tools build is enabled but no individual tools are selected.
+With dtbs running $(MAKE) $(dtstree)/, the child make enables single-build
+and evaluates $(build-dir): $(single-build-prep) where single-build-prep is
+dtbs_prepare. In a parallel build, the parent make (building archprepare) a=
+nd
+the child make (building dtbs_prepare) have independent dependency graphs a=
+nd
+can run concurrently:
 
-Should these static pattern rules be guarded with an ifneq check
-(e.g., ifneq ($(selftest-targets),)) to prevent breaking the build on
-minimal configurations?
+1. Both make instances can run filechk for include/config/kernel.release at
+   the same time, racing on the shared include/config/.tmp_kernel.release
+   temporary file in scripts/Kbuild.include:
+
+   define filechk
+   	$(check-FORCE)
+   	$(Q)set -e;						\
+   	mkdir -p $(dir $@);					\
+   	trap "rm -f $(tmp-target)" EXIT;			\
+   	{ $(filechk_$(1)); } > $(tmp-target);			\
+   	if [ ! -r $@ ] || ! cmp -s $@ $(tmp-target); then	\
+   		$(kecho) '  UPD     $@';			\
+   		mv -f $(tmp-target) $@;				\
+   	fi
+   endef
+
+2. Both make instances can concurrently invoke $(MAKE) $(build)=3Dscripts/b=
+asic
+   and $(MAKE) $(build)=3Dscripts/dtc in the same output directory, racing =
+on
+   building the host binaries (fixdep, dtc, fdtoverlay) and their .*.cmd
+   files.
+
+[ ... ]
+
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index 4349108e75e1f..d22b3b2d43b32 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -38,6 +38,13 @@ include $(srctree)/scripts/Makefile.compiler
+>  include $(kbuild-file)
+>  include $(srctree)/scripts/Makefile.lib
+> =20
+> +# Make DT directory targets reachable for architectures with a DTS tree.
+> +ifeq ($(obj),arch/$(SRCARCH))
+> +ifneq ($(wildcard $(src)/boot/dts/),)
+> +subdir-y +=3D boot/dts
+> +endif
+> +endif
+> +
+
+[Severity: High]
+Because subdir-y +=3D boot/dts is added unconditionally whenever $(obj) is
+arch/$(SRCARCH), won't the main "." build pass (as well as non-DT builds li=
+ke
+make vmlinux or make modules) now recurse into arch/$(SRCARCH)/boot/dts and
+all vendor subdirectories even when need-dtbslist is not set?
+
+During make -j, the parent make's "." traversal will descend into
+arch/$(SRCARCH)/boot/dts in parallel with the child $(MAKE) $(dtstree)/
+spawned by the dtbs target. In every vendor directory where dtb-y or dtb- is
+non-empty, scripts/Makefile.build includes scripts/Makefile.dtbs (which adds
+$(real-dtb-y) to targets) and then includes the .cmd files for existing
+targets:
+
+scripts/Makefile.build:
+    ifneq ($(need-dtbslist)$(dtb-y)$(dtb-)$(filter %.dtb %.dtb.o %.dtbo.o,$=
+(targets)),)
+    include $(srctree)/scripts/Makefile.dtbs
+    endif
+    ...
+    existing-targets :=3D $(wildcard $(sort $(targets)))
+
+    -include $(foreach f,$(existing-targets),$(dir $(f)).$(notdir $(f)).cmd)
+
+If the parallel dtbs sub-make has just created a .dtb file and cmd_and_fixd=
+ep
+is still writing the corresponding .*.dtb.cmd file while the "." build walk
+is evaluating that directory, can the "." sub-make read a partially written
+.*.dtb.cmd file and fail with a syntax error?
+
+[ ... ]
+
+$>
 
 --=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261016143143.3613=
-501-1-sashal@kernel.org?part=3D5
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261016-dtb-dirs-v=
+3-v4-0-0ec42fd8ef9b@kernel.org?part=3D2
