@@ -1,196 +1,165 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81C4D36B907;
-	Sun, 18 Oct 2026 16:15:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CDA03A83AC
+	for <linux-kbuild@vger.kernel.org>; Sun, 18 Oct 2026 16:37:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792340158; cv=none; b=Me8XVTwSMPESA3Lxww19w8UFuK7QnEXVmOU0UOhoJGh4LuKp9euhOi1RefA3gNBWfEGo2mjJ0ayaXkIV+L7p+aAkEIpcz+x7zAURYhM9kVl/YXqei9XWgxCurjhNCOTY8BHASQOUoU8Ku5AB1CGtLHPqsmQFTWGrJLzXeCRl+MM=
+	t=1792341456; cv=none; b=pSqcI1m0kGAokOfnifyGdkHaE8XnfffRzs4IWhMtl1I36HKN4kLtyJBAKlIOxYPQCpZcEOddbbyQ9NAFfi9tRXSLqLMEzv/UfF4DVdGCPrNAPfpa7hZeKb1tnz2vOonk6kVXpzPKHXVkTwbSTgw7HscnYzKPDp9XrOZ7nxtYvzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792340158; c=relaxed/simple;
-	bh=gO8Jv3kBbkekLp0M0ToCtUaXdXIZSPp3XpJ2V7vrXaY=;
-	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
-	 Date; b=ps6l2Tfr6Iyw0Q9WMuSs4u5UNOCEQ1ZbAsbR/nJE0V99UAOJrPe/yGjXsUny+1zub3L+YD7rdaOoEUrrly5FlQRprJkEtkhaspvBNJ3PwsF912XgoVjTj/lun7+Rya4dGsr6PnwEyUpenRJ2M2CmAtCREyVJFLhjWpTQesNtUtQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iAqnKEVk; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1792341456; c=relaxed/simple;
+	bh=Dn4leQDbq1m2uRP6oBxoD4WvGafxPMKi/15ipQiHAi8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Tx+hUJu8ElE5RLX0ERTmQAE7BK+yi/GPxEqxYFoktRjaEJtCTz9tr2AYEovQW5w0bpKHyB33JuEY1bOzKdfhK/akpIfW/uoQenO8gmFp1kVHtmWleYG0KXadF06wUy7opFExsLdPJcqcHTozTiOGnQ579ha+7cniLkmO8JrPYic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mJpuPVzg; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iAqnKEVk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F94A1F000C4;
-	Sun, 18 Oct 2026 16:15:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792340157;
-	bh=RaZ7YViG/iKDytKYEsZTHi1ga7iOXJlQndUMyv3+wMs=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=iAqnKEVkG2SdAI4pTKrRiACJ9ErDgGzKowde85LNyEFcAYAZ9gRbF1BWzoMkIdU95
-	 ghBT94l7yw0gUPwTnym9XLMv4Q+90TaqIiL6wwWXUo5kp2KeKtaKMnzZ12Zje8wo1N
-	 WxpFSQ5c6k1ZJLqDHG9zuSut3JkxX35pFhON9nGH7ETZMVe9bHbhOFSRgcytV0Xyie
-	 yTE09g8EzKf38wQHwlVX0tDZ2tu0kMUvT+ppg82W4/WTwG1JYiK1VFOflAt1IyxCpk
-	 3XpgNBYgFoyKZ5xZ9H0voAJMRCvHKMTZXFBZtiTcL7vGraKF9fF8IJJXtbVOGcyHQ0
-	 PWG/an5iAzt8w==
-Message-ID: <sashiko-outbox-176273@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 next 06/15] kallsyms: Optimise symbol name search
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "David Laight" <david.laight.linux@gmail.com>, "Andrew Morton" <akpm@linux-foundation.org>, "Petr
- Mladek" <pmladek@suse.com>, "Kees Cook" <kees@kernel.org>, linux-kbuild@vger.kernel.org, bpf@vger.kernel.org, "Jim
- Cromie" <jim.cromie@gmail.com>, "Lorenzo Stoakes" <ljs@kernel.org>
-Cc: "Luis Chamberlain" <mcgrof@kernel.org>, "Andrey Grodzovsky" <andrey.grodzovsky@crowdstrike.com>, "Steven
- Rostedt" <rostedt@goodmis.org>, nathan@kernel.org, nsc@kernel.org
-In-Reply-To: <20261018155206.132411-7-david.laight.linux@gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mJpuPVzg"
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-48afcd7ba9bso678573f8f.3
+        for <linux-kbuild@vger.kernel.org>; Sun, 18 Oct 2026 09:37:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1792341442; x=1792946242; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=Ua6j+thg4pXL7S9wJjMaHKA5Xj0iNYktIJ1108GNG0g=;
+        b=mJpuPVzgqQPFcwoo1L6pEA/TslRAE2R1gmXrKcFArmF9WjqxWBdHcaYfjSm4sOAG4c
+         T4NIb5jOJX0fkepYWcGbLcqtCV7o5wq3rK81IJKQv2hvlrmGkNosv4NMB22Ld6I26e0S
+         Aa8rpFtLqOoiUQiohX/ZERFZNTO+aaut5s/2R3dgG4nWRn89JDKMaK+lGDpNk9nq81LQ
+         v+m8jirZY2ZM5DJ8YyfrFeT49l+6FcYs/NLJwzU4HHy2tc/j057LuvmuaUUGLsovHbjq
+         x+P6lO4SPtaZfwu9goSxdC27ikY7J+oCR+ucDWMMsMbj2vXVZfuFy6WOugVWfJWDOny4
+         bL9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792341442; x=1792946242;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Ua6j+thg4pXL7S9wJjMaHKA5Xj0iNYktIJ1108GNG0g=;
+        b=gupGaMy++cSHSD1iWtensVybwHBprjHfCPCkAUTjqbFVyIk/QvgoEMGS5m8xV3SzBW
+         AYGPlQdkePQdBxM5hwXZP0R5nCsMeU5Sl7xKcRf5BAQGDPDof8WP4V8r7JnU7Iel6Hh+
+         mcIev2875vcUcMMSszP+DLLTkws91MuUT3hye0w0zkSGT2BMQLF8hTFHOaHIn8e9zOJE
+         VnI9PyBIUVj3MKQB9YCVW6Sum2QKekYEjVEYzor5dG3B9s+yNSlLGn7qNifjZ/3wtX/D
+         Xxi966s3kwVOPFGFblyAvZarfR7d75PbVfERma/7DKbgNG/qKJyIJ/Es80YJeBWntL/c
+         EnDQ==
+X-Forwarded-Encrypted: i=1; AKwUvByi6Vjvh5vf8vT1k2MsmFXznG/h2f6Djt6gBaeLNozZPwqv8YO334giA+oz2xtO0WnX8c1tXsVRDn0lorU=@vger.kernel.org
+X-Gm-Message-State: AFq9FYLPUl+NVvJzzqHmUbuQGF6os2ym4KHjS+lrlrUAo813s9gsyZNa
+	GPDSqKs4njZI5ow3f1LKrIGKWufjqCE9EfWWa2XUcxjTtsLgXgpkTzzm
+X-Gm-Gg: AYBFou2ZD/k1mHInJQk3F1Bm9Dj2HG+bBvmPhcvcwE5A5jOOoIxEdnlc4MllnjQ02ih
+	5Q9APDHswvAXy+uZ5XaHw6exNKz0yLzmkuuEXW1aQZGUAKOJKEBLo0gsfq6bMFflYGt5TkLGMAN
+	V0oGNM1uYZlCHzAQxAjcELt3SfBgklGudwEF5myqN6zhGIRnV7BiAZuDMojLrmEYlLKIoMHMIVX
+	cgdMue8IaaX/6ZzoDOYyok19xuHBLWBaGcuisWFDwglvSOMwbZksoX415eRl6q3cOLODdNhiv7c
+	HqUJ7Ic0lqF9y7qX9XNsf6EcD8XBuNg3+/EhojlAP7NreHQ8E8lEnmllQNy6SfX2SmEuh6L8ohq
+	866Y4rnawq4b62lGS7hEYzJtWv9YNykmgp2mqaMN8j9DY1J6BqnJ+2ct91YZPYQoO5Erex72lwj
+	QAwbWD975eL5xloTgQOE1GJkwrhBCJapfl8NMNQpt9zcPcykBKbEs5oBdtpBukJ0WpZcE9JzRDt
+	YsKfd3JFa5ikEfX3lzc+dCTHYeuWlT7fFg=
+X-Received: by 2002:a05:6000:4382:b0:48e:932:aef5 with SMTP id ffacd0b85a97d-48e0932b0d7mr10246501f8f.21.1792341442100;
+        Sun, 18 Oct 2026 09:37:22 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48dfd5033a2sm17651691f8f.45.2026.10.18.09.37.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 18 Oct 2026 09:37:21 -0700 (PDT)
+Date: Sun, 18 Oct 2026 17:37:20 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: sashiko-bot@kernel.org
+Cc: sashiko-reviews@lists.linux.dev, "Andrew Morton"
+ <akpm@linux-foundation.org>, "Petr Mladek" <pmladek@suse.com>, "Kees Cook"
+ <kees@kernel.org>, linux-kbuild@vger.kernel.org, bpf@vger.kernel.org, "Jim
+ Cromie" <jim.cromie@gmail.com>, "Lorenzo Stoakes" <ljs@kernel.org>, "Luis
+ Chamberlain" <mcgrof@kernel.org>, "Andrey Grodzovsky"
+ <andrey.grodzovsky@crowdstrike.com>, "Steven Rostedt"
+ <rostedt@goodmis.org>, nathan@kernel.org, nsc@kernel.org
+Subject: Re: [PATCH v2 next 11/15] kallsyms: scripts/kallsyms: Keep full
+ expansion of tokens
+Message-ID: <20261018173720.142adfde@pumpkin>
+In-Reply-To: <sashiko-outbox-176255@kernel.org>
 References: <20261018155206.132411-1-david.laight.linux@gmail.com>
- <20261018155206.132411-7-david.laight.linux@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 18 Oct 2026 16:15:56 +0000
+	<20261018155206.132411-12-david.laight.linux@gmail.com>
+	<sashiko-outbox-176255@kernel.org>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
-s) to consider:
-- [High] kallsyms: race in set_kallsyms_off_size() causes NULL dereference
-- [High] kallsyms: set_kallsyms_off_size() sleeps in atomic context
---
+On Sun, 18 Oct 2026 16:00:02 +0000
+sashiko-bot@kernel.org wrote:
 
-commit d36232e927821c82911022ce5bae7cb3de465edd
-Author: David Laight <david.laight.linux@gmail.com>
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> - [High] kallsyms: NULL token_table[].str passed to printf() in write_src()
+> --
+> 
+> commit b464b94e58431a4ad1ec112c739d63f16547b8f2
+> Author: David Laight <david.laight.linux@gmail.com>
+> 
+> kallsyms: scripts/kallsyms: Keep full expansion of tokens
+> 
+> This commit stores the full NUL-terminated string expansion for each token
+> in token_table[] as tokens are allocated, avoiding recursive symbol
+> expansions later.
+> 
+> > diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+> > index 5603b2a6c77bd..9e1bc0fdaa9f2 100644
+> > --- a/scripts/kallsyms.c
+> > +++ b/scripts/kallsyms.c  
+> [ ... ]
+> > @@ -415,9 +403,8 @@ static void write_src(void)
+> >  	off = 0;
+> >  	for (i = 0; i < 256; i++) {
+> >  		best_idx[i] = off;
+> > -		expand_symbol(token_table[i].ch, token_table[i].len, buf);
+> > -		printf("\t.asciz\t\"%s\"\n", buf);
+> > -		off += strlen(buf) + 1;
+> > +		off += token_table[i].len + 1;
+> > +		printf("\t.asciz\t\"%s\"\n", token_table[i].str);
+> >  	}
+> >  	printf(".size kallsyms_token_table, . - kallsyms_token_table\n");
+> >  	printf("\n");  
+> 
+> [Severity: High]
+> Can token_table[i].str be NULL here when some token slots remain unused?
 
-kallsyms: Optimise symbol name search
+Probably :-(
 
-This commit optimizes symbol name lookups by indexing the compressed
-names table directly instead of the array of symbol values. It supports
-both 24-bit and 32-bit offset tables, selecting between them using a
-static branch initialized on the first symbol lookup.
+> In insert_real_symbols_in_table(), token_table[i].str is only allocated for
+> character codes present in the input symbols:
+> 
+> 	for (i = 0; i <= 255; i++) {
+> 		if (!token_table[i].len)
+> 			continue;
+> 		token_table[i].str = xmalloc(2);
+> 		token_table[i].str[0] = i;
+> 		token_table[i].str[1] = 0;
+> 	}
+> 
+> Then in optimize_result(), the loop stops early as soon as find_best_token()
+> finds no remaining token pairs with positive profit:
+> 
+> 		best = find_best_token();
+> 		if (best < 0)
+> 			break;
+> 
+> Any remaining unused entries in token_table[] keep len == 0 and str == NULL.
+> During pass 0 in scripts/link-vmlinux.sh, kallsyms is invoked on an empty
+> symbol file (.tmp_vmlinux0.syms), leaving all 256 token_table[i].str
+> pointers as NULL.
+> 
+> Previously, expand_symbol() wrote an empty string into buf when len was 0.
+> Passing a NULL token_table[i].str to printf("%s") in write_src() causes a
+> segmentation fault on non-glibc hosts (such as musl) or prints "(null)" on
+> glibc hosts while advancing off by only 1 byte, which corrupts
+> kallsyms_token_table and best_idx[].
 
-> diff --git a/kernel/kallsyms.c b/kernel/kallsyms.c
-> index d18d78e626db2..31451feac8221 100644
-> --- a/kernel/kallsyms.c
-> +++ b/kernel/kallsyms.c
+For glibc builds it won't really matter - that corrupt file doesn't matter
+and in reality there are always enough symbols.
 
-[ ... ]
+I'll add ?: "" to the code.
 
-> @@ -185,14 +216,19 @@ unsigned long kallsyms_sym_address(int idx)
->  	return (unsigned long)offset_to_ptr(kallsyms_offsets + idx);
->  }
-> =20
-> -static unsigned int get_symbol_seq(int index)
-> -{
-> -	unsigned int i, seq =3D 0;
-> +static DEFINE_STATIC_KEY_TRUE(kallsyms_off_size_24);
-> =20
-> -	for (i =3D 0; i < 3; i++)
-> -		seq =3D (seq << 8) | kallsyms_seqs_of_names[3 * index + i];
-> +static inline unsigned int get_symbol_name_offset(unsigned long index)
-> +{
-> +	if (static_branch_likely(&kallsyms_off_size_24))
-> +		return kallsyms_off24_of_names[index].v;
-> +	return kallsyms_off32_of_names[index];
-> +}
-> =20
-> -	return seq;
-> +static void set_kallsyms_off_size(void)
-> +{
-> +	if (kallsyms_off_size !=3D 24)
-> +		static_branch_disable(&kallsyms_off_size_24);
->  }
+David
 
-[Severity: High]
-Can calling static_branch_disable() in set_kallsyms_off_size() sleep in
-an atomic or early-boot context when kallsyms_off_size !=3D 24?
 
-static_branch_disable() calls static_key_disable() in
-kernel/jump_label.c, which acquires cpus_read_lock() and
-jump_label_mutex:
-
-kernel/jump_label.c:static_key_disable() {
-	cpus_read_lock();
-	static_key_disable_cpuslocked(key);
-	cpus_read_unlock();
-}
-
-However, kallsyms_lookup_name() -> kallsyms_lookup_names() can be called
-first from contexts where sleeping is not allowed:
-
-- lib/codetag.c:get_symbol() calls kallsyms_lookup_name() under
-  preempt_disable():
-
-	preempt_disable();
-	ret =3D mod ?
-		(void *)find_kallsyms_symbol_value(mod, buf) :
-		(void *)kallsyms_lookup_name(buf);
-	preempt_enable();
-
-- mm/alloc_tag.c:alloc_tag_sec_init() calls kallsyms_lookup_name() during
-  start_kernel() -> mm_core_init() while interrupts are disabled and
-  before poking_init().
-
-- Non-sleepable runtime or debugger callers such as
-  bpf_kallsyms_lookup_name(), kdbgetsymval(), and xmon also invoke
-  kallsyms_lookup_name().
-
-> =20
->  static int kallsyms_lookup_names(const char *name,
-> @@ -201,15 +237,16 @@ static int kallsyms_lookup_names(const char *name,
->  {
->  	int ret;
->  	int low, mid, high;
-> -	unsigned int seq, off;
-> +	unsigned int off;
-> +
-> +	DO_ONCE_LITE(set_kallsyms_off_size);
-> =20
->  	low =3D 0;
->  	high =3D kallsyms_num_syms - 1;
-> =20
->  	while (low <=3D high) {
->  		mid =3D low + (high - low) / 2;
-> -		seq =3D get_symbol_seq(mid);
-> -		off =3D get_symbol_offset(seq);
-> +		off =3D get_symbol_name_offset(mid);
-
-[Severity: High]
-Does DO_ONCE_LITE(set_kallsyms_off_size) allow a concurrent caller to
-dereference NULL in get_symbol_name_offset() when kallsyms_off_size =3D=3D =
-32?
-
-In scripts/kallsyms.c:write_src(), only kallsyms_off24_of_names or
-kallsyms_off32_of_names is emitted, and both are declared __weak in
-kernel/kallsyms_internal.h:
-
-extern struct { unsigned int v:24 __packed; } __packed kallsyms_off24_of_na=
-mes[] __weak;
-extern u32 kallsyms_off32_of_names[] __weak;
-
-When kallsyms_off_size =3D=3D 32, kallsyms_off24_of_names resolves to NULL,
-while kallsyms_off_size_24 starts enabled via
-DEFINE_STATIC_KEY_TRUE(kallsyms_off_size_24).
-
-In include/linux/once_lite.h, __ONCE_LITE_IF() sets __already_done =3D true
-before executing set_kallsyms_off_size() and does not wait for it to
-finish:
-
-		if (unlikely(__ret_cond) && unlikely(!__already_done)) {
-			__already_done =3D true;
-			__ret_once =3D true;
-		}
-
-If two CPUs call kallsyms_lookup_names() concurrently for the first time
-while the first CPU is still inside set_kallsyms_off_size() ->
-static_branch_disable(&kallsyms_off_size_24), the second CPU sees
-__already_done =3D=3D true and proceeds directly to
-get_symbol_name_offset(mid). Since kallsyms_off_size_24 has not been
-patched yet, get_symbol_name_offset() evaluates
-kallsyms_off24_of_names[index].v and dereferences NULL.
-
-[ ... ]
-
->
->
->
->
->
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261018155206.1324=
-11-1-david.laight.linux@gmail.com?part=3D6
