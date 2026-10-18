@@ -1,42 +1,42 @@
 Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FD063CF02E;
-	Sun, 18 Oct 2026 15:53:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DA013CC7D3;
+	Sun, 18 Oct 2026 15:53:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792338800; cv=none; b=h5hkzjhK2osYwdIBa2MdZqZ2CHdQhgnL9evx/STT7PlUe/9nbWJuP4fJjzexh8ydMesz5SZJmuzfVkBzbKwDTz+CJkOEW+y7xDL40fIcY2myTnSB1ZL0RV0YIiD4KMAYQVUtk5cibE3N4gdmw03eDvJk5cDuW6jXZKZJkQxmPvs=
+	t=1792338800; cv=none; b=fHYi1hGwnpyyMCnpeB3SacdDIHJaPaow2eOH43Tss89SEO+w04rx26HYkgMmuFXiL3+5f3I9IFoPCHpHE+h0UWNfjG32bPkcdiGDSnh0xv23zKkOkCTlLZ38MDIJppBD3qT24nAjUDxbldwkz3zaQcUyMYuOZgDUtxAzJCY9nQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1792338800; c=relaxed/simple;
-	bh=vdYqoZ03LJO7F1XgrVhARurZZWKCeg2jISPyZuWRJ4E=;
+	bh=bFtfrDFfJiFgzrOGha7X+aYjJEuOgNNxvP6urm8vnsc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=eLdtSO9RFPOtC8G+gTcPYNTu4qGwzThhQPCtO2CKaFFFaQOS4U09wJ/SXLsErk3HNY23CSZuJIXz1aoK4+6TXmRKewJ0WSSaWxSzz+tD/b3god8j/WFdmhxs/tPgWIMdd+t/F+QrxTUG1Na7XRiBLi0luEqzODMSxmPmkudqYvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=phhRCHBW; arc=none smtp.client-ip=185.226.149.38
+	 MIME-Version; b=mN90MlWp4QBAlIRcG8IvgcQX5q+kDZBl/Xcyh+eEN4MjRuMbeDbGUgD7ZW3PWBy5LWOjUOJ2r1EOQFt6WV6ho/M/PrlTzaqNvZdpTISdZGxcOzVkFZyIhzm+qq6Ie8oh9sX2vR09MhXJ/AGrrCG3Os9J2bqVb4kBeY16kIBrDPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=Xc1S+Jf8; arc=none smtp.client-ip=185.226.149.38
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=runbox.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b="phhRCHBW"
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b="Xc1S+Jf8"
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
 	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <david.laight.linux_spam@runbox.com>)
-	id 1xITC5-001KBn-H3; Sun, 18 Oct 2026 17:53:05 +0200
+	id 1xITC4-001KBP-Qg; Sun, 18 Oct 2026 17:53:04 +0200
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=runbox.com;
 	 s=selector1; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To
 	:Message-Id:Date:Subject:Cc:To:From;
-	bh=qIYHQGFjd83dSqjHRU58hsY4BNVUz+F0M4EHshm/Ozo=; b=phhRCHBWiVkl8z3lF3lDRVhBVM
-	mv9xjhlgdHlM7fZh13T0jfSRHvLNaAdcAgt18Fk4OAaOFncYHehLpu3/9GGI4PTV4xf9X0ZjrHQZc
-	DA74OnapajZnw9F2APgR04A3Mk8DXyO34+0dQVudCvXy1Q8Po5L6MluxLzKQAoJsHWMTFCIFuO7Aw
-	SEZKYxSPnIZkR5efzT213oRnObe5uvifrFCW1sGjRSh1yZFPMwmr3CTCaYbKi9NcN6u8a4sXXzoqS
-	49bNj4T/5hupTyeiqC++XmgrftAkAKweqRybTxX+fh9xayROj1jjI4scUe/Dovk4yKF58uV1eZMPU
-	nqBuvW3Q==;
+	bh=yXPKNCrTN84ndLWWFsp5Lhf/pJS8VAJCKJYB6ObXzLQ=; b=Xc1S+Jf8vfCRaiAKGxAg5BZUkr
+	+rmNykpMiVRy4hM7zw2uQGA81tQL4ACEEv0fEWCkHJlq+q9ROwhfVRAw9Y3t3MGvUb+Eii7OUlFbE
+	AhtDrvUI0trMu1AtUlGkO+uefAqWOIPEn3aQ8XtxUDVaAjewFT196lF1+Vc3pXKE/yVgRJPN47OFD
+	XUcvHhmJT0SJUWxQ+oEHPhJaLCIaNQ8jGjp4zEg8JhDMbDdiipqEk8E8ikreOC3QKwke+wKOjy/9E
+	tD1N53lclZJls8GjgpQGEEbQ7+mcU0gJTnrckGP6vedKLgtlBvl9Tm2UJ2lz+QBO/eoN2T4lTBMq2
+	fDcJgGJg==;
 Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <david.laight.linux_spam@runbox.com>)
-	id 1xITC0-0001pq-8m; Sun, 18 Oct 2026 17:53:00 +0200
+	id 1xITBz-0000Bb-HJ; Sun, 18 Oct 2026 17:52:59 +0200
 Received: by submission03.runbox with esmtpsa  [Authenticated ID (1493616)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.95)
-	id 1xITBk-004q3U-UU;
+	id 1xITBl-004q3U-Fh;
 	Sun, 18 Oct 2026 17:52:45 +0200
 From: David Laight <david.laight.linux@gmail.com>
 To: Andrew Morton <akpm@linux-foundation.org>,
@@ -51,9 +51,9 @@ To: Andrew Morton <akpm@linux-foundation.org>,
 Cc: Luis Chamberlain <mcgrof@kernel.org>,
 	Andrey Grodzovsky <andrey.grodzovsky@crowdstrike.com>,
 	Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 14/15] kallsyms: scripts/kallsyms: Reduce the output file size
-Date: Sun, 18 Oct 2026 16:52:05 +0100
-Message-Id: <20261018155206.132411-15-david.laight.linux@gmail.com>
+Subject: [PATCH 15/15] kallsyms: scripts/kallsyms: Improve compression by about 2%
+Date: Sun, 18 Oct 2026 16:52:06 +0100
+Message-Id: <20261018155206.132411-16-david.laight.linux@gmail.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20261018155206.132411-1-david.laight.linux@gmail.com>
 References: <20261018155206.132411-1-david.laight.linux@gmail.com>
@@ -65,182 +65,234 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The output file isn't normally looked at by anyone; so doesn't need
-redundant information or formatting.
-Reduce the size somewhat:
-- Use "%u" instead of " 0x%02x" for byte values.
-  Remove some other spaces.
-- Only include the symbol name once.
-  Put the offset into the compressed symbol names in all three per-symbol
-  tables so that the lines can be cross-referenced if necessary.
-- Output the kallsyms_token_index table and kallsyms_markers with
-  multiple values per line.
-- Add the missing .size for kallsyms_token_index.
-- Output the token table first.
-There is still enough information to help debug the code.
+If the symbols contain a lot of "abc" and "abd" and a few "abe" then
+the compression code first substitutes (say) 'x' for "ab" giving
+"xc", "xd" and "xe".
+It might later substitute 'y' for "xc" and 'z' for "xd" giving
+"y", "z" and "xe".
+The token 'x' is then hardly used, expanding "xe" back to "abe"
+costs one byte every time it is used, but frees up 'x' to be used
+for a much more common symbol pair.
 
-All the printfs are slow - but find_token() dominates everything.
+Add a check at the end of the compression that all the counts still match.
 
-Reduces the file size by about 25%.
+Increases the compression ratio by about 2% on both the 'normal'
+kernel I'm building and on the x86-64 allyesconfig kernel.
+
+For simplicity the code will only expand a token where the two tokens
+that were merged are still in the table.
+It might be possible to find some others, eg ones that are 3 characters.
 
 Signed-off-by: David Laight <david.laight.linux@gmail.com>
 ---
- scripts/kallsyms.c | 93 +++++++++++++++++++++++++++-------------------
- 1 file changed, 55 insertions(+), 38 deletions(-)
+ scripts/kallsyms.c | 137 +++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 127 insertions(+), 10 deletions(-)
 
 diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-index 189fb50ec8c5..8576fe6ad90b 100644
+index 8576fe6ad90b..9dbd7c85eec1 100644
 --- a/scripts/kallsyms.c
 +++ b/scripts/kallsyms.c
-@@ -350,6 +350,30 @@ static void write_src(void)
- 	struct sym_entry *se;
+@@ -76,6 +76,7 @@ static int token_profit[0x10000];
+ static struct token_table {
+ 	char           *str;		/* Full expansion, '\0' terminated */
+ 	unsigned short len;		/* Length of str */
++	unsigned short pair;		/* Original token pair for this token */
+ 	unsigned int   refs;		/* Number of time used in a symbol */
+ } token_table[256];
  
- 	printf("\t.section .rodata, \"a\"\n");
-+	printf("\n");
+@@ -514,6 +515,37 @@ static void build_initial_token_table(void)
+ 		learn_symbol(symbol[i]->sym, symbol[i]->len);
+ }
+ 
++/* Check that the token_profit[] matches the compressed symbols. */
++static void check_tables(void)
++{
++	unsigned int save_profit[0x10000];
++	unsigned int tok_refs[256];
++	unsigned int i, j;
 +
-+	output_label("kallsyms_token_table");
-+	off = 0;
-+	for (i = 0; i < 256; i++) {
-+		best_idx[i] = off;
-+		off += token_table[i].len + 1;
-+		printf("\t.asciz\t\"%s\"\t/* %u: %u */\n",
-+		       token_table[i].str, i, token_table[i].refs);
-+	}
-+	printf(".size kallsyms_token_table, . - kallsyms_token_table\n");
-+	printf("\n");
++	memcpy(save_profit, token_profit, sizeof(save_profit));
++	memset(token_profit, 0, sizeof(token_profit));
 +
-+	output_label("kallsyms_token_index");
-+	for (i = 0; i < 256; i++) {
-+		if (i & 15)
-+			printf(",");
-+		else
-+			printf("\n\t.short\t" + !i);
-+		printf("%u", best_idx[i]);
++	build_initial_token_table();
++
++	for (i = 0; i < 0x10000; i++) {
++		if (token_profit[i] != save_profit[i])
++			errx(1, "profit error for %u,%u (%s/%s) discrepency %u != %u\n",
++			     LEFT(i), RIGHT(i), token_table[LEFT(i)].str,
++			     token_table[RIGHT(i)].str, token_profit[i], save_profit[i]);
 +	}
-+	printf("\n");
-+	printf(".size kallsyms_token_index, . - kallsyms_token_index\n");
-+	printf("\n");
++
++	memset(tok_refs, 0, sizeof(tok_refs));
++	for (i = 0; i < symbol_cnt; i++)
++		for (j = 0; j < symbol[i]->len; j++)
++			tok_refs[symbol[i]->sym[j]]++;
++
++	for (i = 1; i < 256; i++) {
++		if (tok_refs[i] != token_table[i].refs)
++			errx(1, "token reference error for %u (%s) %u != %u\n",
++			     i, token_table[i].str, token_table[i].refs, tok_refs[i]);
++	}
++}
++
+ static unsigned char *find_token(unsigned char *str, unsigned char *end,
+ 				 unsigned int want)
+ {
+@@ -561,6 +593,47 @@ static __attribute__((noinline)) unsigned int compress_symbols(unsigned int toke
+ 	return substitutions;
+ }
  
- 	output_value("kallsyms_num_syms", symbol_cnt);
++/* Change every occurance of idx back to token_pair.
++ * This extends all the symbol table entries but frees up a token. */
++static __attribute__((noinline)) void uncompress_symbols(unsigned int token_pair, int idx)
++{
++	unsigned int i, len;
++	unsigned char *sym, *p, *end;
++	unsigned int substitutions;
++
++	for (i = 0; i < symbol_cnt; i++) {
++		sym = symbol[i]->sym;
++		len = symbol[i]->len;
++		p = memchr(sym, idx, len);
++		if (!p)
++			continue;
++		end = sym + len;
++
++		do {
++			len = end - p - 1;
++			end++;
++			if (len) {
++				adjust_profit(idx, RIGHT(token_pair), p[1], p[1]);
++				memmove(p + 2, p + 1, len);
++			}
++			p[0] = LEFT(token_pair);
++			p[1] = RIGHT(token_pair);
++			if (p != sym)
++				adjust_profit(p[-1], p[-1], idx, LEFT(token_pair));
++			p = memchr(p + 2, idx, len);
++		} while (p);
++		symbol[i]->len = end - sym;
++	}
++
++	substitutions = token_table[idx].refs;
++
++	token_profit[token_pair] += substitutions;
++
++	token_table[idx].refs = 0;
++	token_table[LEFT(token_pair)].refs += substitutions;
++	token_table[RIGHT(token_pair)].refs += substitutions;
++}
++
+ /* search the token with the maximum profit */
+ static int find_best_token(void)
+ {
+@@ -578,14 +651,47 @@ static int find_best_token(void)
+ 	return best;
+ }
  
-@@ -359,35 +383,37 @@ static void write_src(void)
- 		se = symbol[i];
- 		se->seq = off;
++static int split_token(unsigned int profit)
++{
++	struct token_table *tt, *left, *right;
++	unsigned int i;
++	int best = -1;
++
++	for (i = 0; i < 256; i++) {
++		tt = token_table + i;
++
++		if (tt->len == 1 || tt->refs >= profit)
++			continue;
++
++		/* Ignore tokens where the original parts have be reused */
++		left = &token_table[LEFT(tt->pair)];
++		right = &token_table[RIGHT(tt->pair)];
++		if (tt->len != left->len + right->len ||
++		    memcmp(tt->str, left->str, left->len) ||
++		    memcmp(tt->str + left->len, right->str, right->len))
++			continue;
++
++		best = i;
++		if (tt->refs == 2)
++			break;
++		profit = tt->refs;
++	}
++	if (best < 0)
++		return -1;
++
++	uncompress_symbols(token_table[best].pair, best);
++
++	return best;
++}
++
+ /* this is the core of the algorithm: calculate the "best" table */
+ static void optimize_result(void)
+ {
+-	unsigned int i, idx, len, refs;
+-	struct token_table *left, *right;
++	struct token_table *t, *left, *right;
+ 	unsigned char to_process[256];
++	unsigned int idx, len, refs;
++	int i, best;
+ 	char *str;
+-	int best;
  
--		/* There cannot be any symbol of length zero. */
--		if (se->len == 0)
--			errx(1, "unexpected zero symbol length");
-+		/* The length must be less than that of the original symbol. */
-+		if (!se->len || se->len > KSYM_NAME_LEN)
-+			errx(1, "symbol %d has corrupt compressed length %d\n",
-+			     i, se->len);
- 
--		/* Only lengths that fit in up-to-two-byte ULEB128 are supported. */
--		if (se->len > 0x3FFF)
--			errx(1, "unexpected huge symbol length");
-+		/*
-+		 * Output the number that identifies the symbol at the start
-+		 * of the line so that they line up nicely.
-+		 */
-+		printf("\t/* n:%u */\t.byte\t", off);
- 
- 		/* Encode length with ULEB128. */
- 		if (se->len <= 0x7F) {
- 			/* Most symbols use a single byte for the length. */
--			printf("\t.byte 0x%02x", se->len);
-+			printf("%u", se->len);
- 			off += se->len + 1;
- 		} else {
- 			/* "Big" symbols use two bytes. */
--			printf("\t.byte 0x%02x, 0x%02x",
--				(se->len & 0x7F) | 0x80, (se->len >> 7) & 0x7F);
-+			printf("%u,%u", (se->len & 0x7F) | 0x80, (se->len >> 7) & 0x7F);
- 			off += se->len + 2;
- 		}
- 		for (k = 0; k < se->len; k++)
--			printf(", 0x%02x", se->sym[k]);
-+			printf(",%u", se->sym[k]);
-+		printf("\n");
- 
- 		/*
- 		 * Now that we wrote out the compressed symbol name, restore the
--		 * original name and print it in the comment.
-+		 * original name.
- 		 */
- 		se->len = expand_symbol(se->sym, se->len, buf);
- 		memcpy(se->sym, buf, se->len + 1);
--		printf("\t/* %s */\n", se->sym);
+ 	/* Generate a list of the unused tokens. */
+ 	for (i = 0, idx = 0; i < 256; i++) {
+@@ -593,20 +699,28 @@ static void optimize_result(void)
+ 			to_process[idx++] = i;
  	}
- 	table_size = off;
- 	printf(".size kallsyms_names, . - kallsyms_names\n");
-@@ -395,25 +421,15 @@ static void write_src(void)
  
- 	output_value("kallsyms_marker_shift", marker_shift);
- 	output_label("kallsyms_markers");
--	for (i = 0; i < symbol_cnt; i += 1u << marker_shift)
--		printf("\t.long\t%u\n", symbol[i]->seq);
--	printf(".size kallsyms_markers, . - kallsyms_markers\n");
--	printf("\n");
--
--	output_label("kallsyms_token_table");
--	off = 0;
--	for (i = 0; i < 256; i++) {
--		best_idx[i] = off;
--		off += token_table[i].len + 1;
--		printf("\t.asciz\t\"%s\"\t/* %u: %u */\n",
--		       token_table[i].str, i, token_table[i].refs);
-+	for (i = 0, k = 0; i < symbol_cnt; i += 1u << marker_shift, k++) {
-+		if (k & 7)
-+			printf(",");
-+		else
-+			printf("\n\t.long\t" + !k);
-+		printf("%u", symbol[i]->seq);
- 	}
--	printf(".size kallsyms_token_table, . - kallsyms_token_table\n");
- 	printf("\n");
--
--	output_label("kallsyms_token_index");
--	for (i = 0; i < 256; i++)
--		printf("\t.short\t%d\n", best_idx[i]);
-+	printf(".size kallsyms_markers, . - kallsyms_markers\n");
- 	printf("\n");
+-	do {
++	for (;;) {
+ 		/* find the token pair with the best profit value */
+ 		best = find_best_token();
+ 		if (best < 0)
+ 			break;
+-		i = to_process[--idx];
++		if (idx) {
++			i = to_process[--idx];
++		} else {
++			/* Try to free up a little-used token. */
++			i = split_token(token_profit[best]);
++			if (i < 0)
++				break;
++		}
  
- 	output_label("kallsyms_offsets");
-@@ -424,13 +440,13 @@ static void write_src(void)
- 			long long offset = se->addr - _text;
+ 		/* replace this token pair in all the valid symbols */
+ 		refs = compress_symbols(best, i);
++		t = &token_table[i];
  
- 			if (offset < INT_MIN || offset > INT_MAX)
--				errx(1, "relative symbol value %#llx out of range",
--				     se->addr);
--			printf("\t.long\t_text - . + (%d)\t/* %s */\n",
--			       (int)offset, se->sym);
-+				errx(1, "relative symbol %s value %#llx out of range\n",
-+					se->sym + 1, se->addr);
-+			printf("\t.long\t_text-.+%d\t/* n:%u %c %s */\n",
-+			       (int)offset, se->seq, se->sym[0], se->sym + 1);
- 		} else {
--			printf("\t.long\t%#x\t/* %s */\n",
--			       (unsigned int)se->addr, se->sym);
-+			printf("\t.long\t%#x\t/* n:%u %c %s */\n",
-+			       (unsigned int)se->addr, se->seq, se->sym[0], se->sym + 1);
- 		}
- 	}
- 	printf(".size kallsyms_offsets, . - kallsyms_offsets\n");
-@@ -451,10 +467,11 @@ static void write_src(void)
- #ifdef CONFIG_CPU_BIG_ENDIAN
- 			off = __builtin_bswap32(off) >> 8;
- #endif
--			printf("\t.byte\t0x%02x, 0x%02x, 0x%02x\t/* %s */\n",
--				off & 0xff, (off >> 8) & 0xff, off >> 16, se->sym);
-+			/* The three spaces before the tab line up the comments */
-+			printf("\t.byte\t%u,%u,%u   \t/* n:%u */\n",
-+				off & 0xff, (off >> 8) & 0xff, off >> 16, se->seq);
- 		} else {
--			printf("\t.long\t%#04x\t/* %s */\n", off, se->sym);
-+			printf("\t.long\t%#04x\t/* n:%u */\n", off, se->seq);
- 		}
- 	}
- 	/* Terminator without the 'duplicate' flag. */
+ 		/* Update the number of times each token is used */
+-		token_table[i].refs += refs;
++		t->refs += refs;
++		t->pair = best;
+ 
+-		/* Generate the full name for this symbol */
+ 		left = &token_table[LEFT(best)];
+ 		right = &token_table[RIGHT(best)];
+ 		if (!(left->refs -= refs))
+@@ -621,9 +735,10 @@ static void optimize_result(void)
+ 		str[len] = 0;
+ 		memcpy(str, left->str, left->len);
+ 		memcpy(str + left->len, right->str, right->len);
+-		token_table[i].str = str;
+-		token_table[i].len = len;
+-	} while (idx);
++		free(t->str);
++		t->str = str;
++		t->len = len;
++	}
+ }
+ 
+ /* start by placing the symbols that are actually used on the table */
+@@ -654,6 +769,8 @@ static void optimize_token_table(void)
+ 	insert_real_symbols_in_table();
+ 
+ 	optimize_result();
++
++	check_tables();
+ }
+ 
+ /* guess for "linker script provide" symbol */
 -- 
 2.39.5
 
