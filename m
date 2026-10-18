@@ -1,42 +1,42 @@
 Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2781A3BB687;
-	Sun, 18 Oct 2026 15:53:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 019443B47DF;
+	Sun, 18 Oct 2026 15:53:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792338794; cv=none; b=Dynhw3/+Cm0FPefVfReK8qMvgE/NTDIypAS9icI6C5Mqd42hw90Ex7i/jB51GBaR3kq9RxQ9yloZrcNxZcl8lk98ZYdrZdqfRIBtgMiTPT01OQRN9F5LTUcbwjsQ2Od9r0i4mcVifzfDBiLErdVcfH4osoHCrxU9zWK6aCo4lkg=
+	t=1792338796; cv=none; b=D/jeiw7vrMHVsnim4SUhpsTBbGefiwcMFyNwL/AgAsOZVp5U/uaJ2e+8/I4eATdiBAFRnkTAGJPPPxfBQZwj+WehYq3tDdHiWgcWsriRwk72/h58PsgOMj2ut7RXLp9/m3SFqPrlomRw3Xirqg+5DHwPI9VDe+AdHfK/D4NZk18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792338794; c=relaxed/simple;
-	bh=zNceYR6R8GGDn+3YVEowWazLXgZtJDU4P+7MLUo4JpY=;
+	s=arc-20240116; t=1792338796; c=relaxed/simple;
+	bh=cMgcfn3oTkv/gWCcsXjtVKkuw5VWqPBnSyFIfd6VkJc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ISO9k0MLlu0Koek+Y8SphQF8IFuodqATAfhUHc7hErMxbfWuKM/2NRHxmH7aXMsZsjR4//RVGw5jGThVESW3ASi8K+ZIP024RrsV/Inww00Vs82IR1kJPvpkm513sbm1nxm/6L5Y0Qzqgo/MFz+FxqDaO4ozqwLKnAWZYGvUIPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=ifUiZXGS; arc=none smtp.client-ip=185.226.149.37
+	 MIME-Version; b=OP8PmtTsLUtjxZx9jOTuUMxjlG9JAF0AN0bgEnb0K0nLFWfT2egGfljgdDh2Y2xnmF6Cq3Yw9bd7uPJRKrmttYaTJ7N176kNeqoawSwTGjr5C/CvpQSKhrHy4gcwek/0STlFktfd6/i6/hqjedVKw5m1gVOnuwDf62aJjrEisaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=dlfEY2yN; arc=none smtp.client-ip=185.226.149.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=runbox.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b="ifUiZXGS"
+	dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b="dlfEY2yN"
 Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
 	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <david.laight.linux_spam@runbox.com>)
-	id 1xITC6-000IeB-AS; Sun, 18 Oct 2026 17:53:06 +0200
+	id 1xITC6-000Ie5-4A; Sun, 18 Oct 2026 17:53:06 +0200
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=runbox.com;
 	 s=selector1; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To
 	:Message-Id:Date:Subject:Cc:To:From;
-	bh=jRboKxvlUefbj4z2+0WRdzGhr7Fy1gLY61mf41YU3JQ=; b=ifUiZXGSn4Z8bXrY166aZq9xeV
-	WfZxUhgN7LJZ5O6oH+mQjWRJzS2sEAVW2rEx+MRz47eWS2+a3M2vZJPxbivM31DGcCHKLOTpoK9bg
-	RQvz4P28loTv7+hSWd7c+vT6mxMrbFfWGqPpk3PmbChYZ54GcMjO3Ptx17404WzE7y+dzxzE+AdqQ
-	oI57MKPLmC4h713uvP2mt9mBvtDr/TCjBUTRYp24QokUtCl3l1sOJN82S4vYQKa8D9YO7UpZoTWCf
-	5E01KXUi25w07+CVU/4gQnpx/qpV1lrY2G91qbVFJDSnrK9fj15X5zRsc8Z0+/wyDqdZ0vm7VJTky
-	TRFg54nw==;
+	bh=B9MBdm+AgkGYtGtq0kSFNXCbjbM2d9Z8MTSHpsIlcnY=; b=dlfEY2yNYR0ZJ60LmuefLyAPw0
+	Ey5frvAZTDILyoNvsjX6ulMvL9TX1xBwIPN6VUm8SaLGk2ifwN31II5Tmj304SPBQeAFyDCChSZ51
+	noHE9CJdMictDpWo/LoKXbqS70kQ+J71/aQnlZyOMRBUgovxyNCEcL4hqMB3qWt1SLlxrz4HxrMCH
+	NjHssa+Ct35C/y0h1BHfh8usWXXHz83ibblT763kisySuF6Qw9kvaF/I4iyKAMo1aUzLlvVwSMyqQ
+	o+z+b16aYjCfAdbfNcQB0mX8IA3XRnVwMFAWdk3LB1ev7netVW5VOrVBSM3Pda7n2hcFVm4Ws6nP8
+	0aSC6odA==;
 Received: from [10.9.9.74] (helo=submission03.runbox)
 	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <david.laight.linux_spam@runbox.com>)
-	id 1xITC0-0000Bx-QX; Sun, 18 Oct 2026 17:53:00 +0200
+	id 1xITC0-0000Bs-Kk; Sun, 18 Oct 2026 17:53:00 +0200
 Received: by submission03.runbox with esmtpsa  [Authenticated ID (1493616)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.95)
-	id 1xITBe-004q3U-0Y;
+	id 1xITBe-004q3U-HJ;
 	Sun, 18 Oct 2026 17:52:38 +0200
 From: David Laight <david.laight.linux@gmail.com>
 To: Andrew Morton <akpm@linux-foundation.org>,
@@ -51,9 +51,9 @@ To: Andrew Morton <akpm@linux-foundation.org>,
 Cc: Luis Chamberlain <mcgrof@kernel.org>,
 	Andrey Grodzovsky <andrey.grodzovsky@crowdstrike.com>,
 	Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH v2 next 01/15] kallsyms: scripts/kallsyms.c: Avoid overrunning on-stack buffer
-Date: Sun, 18 Oct 2026 16:51:52 +0100
-Message-Id: <20261018155206.132411-2-david.laight.linux@gmail.com>
+Subject: [PATCH v2 next 02/15] kallsyms: Fix selftest startup delay
+Date: Sun, 18 Oct 2026 16:51:53 +0100
+Message-Id: <20261018155206.132411-3-david.laight.linux@gmail.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20261018155206.132411-1-david.laight.linux@gmail.com>
 References: <20261018155206.132411-1-david.laight.linux@gmail.com>
@@ -65,38 +65,39 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-A maximum length symbol can be KSYM_NAME_LEN long (including the '\0').
-But the name being compressed contains a leading symbol type (e.g. T).
-So when the compressed name is expanded (after the hex is written out)
-the buffer needs to be KSYM_NAME_LEN+1 bytes long to allow to both the
-symbol type and the '\0'.
-But it is declared 'char buf[KSYM_NAME_LEN] so a maximal length name
-overwrites something on stack.
+The kallsym_selftest code clearly intends to sleep until initialisation
+is complete in order to get more reproducable timings.
 
-Found by code inspection, seems to have been broken before the code
-was imported into git.
+Replace the schedule_timeout() calls with schedule_timeout_idle()
+so that the thread actually sleeps.
+Poll every second (not every 5) for SYSTEM_RUNNING and then wait
+another 10 seconds before starting the tests, otherwise the tests
+start as soon an init is executed.
 
-I expect there aren't any maximal length symbols and/or the byte that
-is overwritten is something that is either zero or 'don't care'.
+This code is in the initial 2022 import of the tests.
 
 Signed-off-by: David Laight <david.laight.linux@gmail.com>
 ---
- scripts/kallsyms.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ kernel/kallsyms_selftest.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-index 494852ade6d8..bda8921c95ef 100644
---- a/scripts/kallsyms.c
-+++ b/scripts/kallsyms.c
-@@ -341,7 +341,7 @@ static void write_src(void)
- 	unsigned int i, k, off;
- 	unsigned int best_idx[256];
- 	unsigned int *markers, markers_cnt;
--	char buf[KSYM_NAME_LEN];
-+	char buf[1 + KSYM_NAME_LEN];
+diff --git a/kernel/kallsyms_selftest.c b/kernel/kallsyms_selftest.c
+index 8f6c4e9b3a1c..0db79237fe54 100644
+--- a/kernel/kallsyms_selftest.c
++++ b/kernel/kallsyms_selftest.c
+@@ -411,9 +411,11 @@ static int test_entry(void *p)
+ {
+ 	int ret;
  
- 	printf("\t.section .rodata, \"a\"\n");
++	pr_info("waiting\n");
+ 	do {
+-		schedule_timeout(5 * HZ);
++		schedule_timeout_idle(HZ);
+ 	} while (system_state != SYSTEM_RUNNING);
++	schedule_timeout_idle(10 * HZ);
  
+ 	pr_info("start\n");
+ 	ret = test_kallsyms_basic_function();
 -- 
 2.39.5
 
