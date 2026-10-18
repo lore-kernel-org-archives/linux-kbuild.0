@@ -1,66 +1,66 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E77C3DB632
-	for <linux-kbuild@vger.kernel.org>; Sun, 18 Oct 2026 17:04:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 950BB403E89
+	for <linux-kbuild@vger.kernel.org>; Sun, 18 Oct 2026 17:28:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792343063; cv=none; b=t2c0ibzJJwMfpgBwx3uTcc4Z1vqzjn8eqjy9ECqhXW+Uw2lESCGiFVBL2+vzvqkdEJUOEBvDxb6GPrVOsQkoZGkyw3prLxBWGNHjVEBQKVCN1CilMSed+RGGgFRHdP4FPUU+oN63NoIyLx1747WmYeySEF9qAv2IzX//6QAYQjw=
+	t=1792344511; cv=none; b=UjTDO0K9BoU3rRsrcA0TiOnzVu0kyTZwB/pDr1Or5I3tkMnSS1shTKNPr2M2yiBLgJ5h+aGR/AyVw5D401Ina5oOPX2Em42y86sp87OLDdQyg7UiAGNysvYT8cGEHxxp8uXk4ZBIPjIz/Bm9857ZsYPd6DxkdBy5Ex536ZFkTJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792343063; c=relaxed/simple;
-	bh=BANAP3Lc2+23fb8EhfAtZycAwPmcAdi1P+vUVcemTXk=;
+	s=arc-20240116; t=1792344511; c=relaxed/simple;
+	bh=GqnVpycvp/gSL0yInzS41OkXSX2S56Zu2D2P69MnKHo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gGrx2TImzviryINSQBbEeiFKM/fZueF5i9WIvlGxvJ5VLMpR6gfpFFmiSZ10CeR20LncECzFnOodpVIunhupbCib6ElosPn1MsCEptS+nk61XtCGmnX+135kIiZwtSCdF6OaVJ1YNge60HfqJe6pZanAFY7DT4ZWIsINf4n4XM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=da2uSpXn; arc=none smtp.client-ip=209.85.128.46
+	 MIME-Version:Content-Type; b=U5KpmGz/wcTMtaqFGw9RgMB2Ul381pX6JjrOwxbN0cUQCtS1ypnvkk91L++u94BXXmqhijvK+3aQBNefDPUyP0q8lBI8t1wkOdJA+pefnAxrm+us8/edRvche7rzgNWekVKBlYmY5yt9dVlz5/mLIzZDAzCTxMriMA379rq303E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JE9aUNhQ; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="da2uSpXn"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4a01933b584so9707075e9.0
-        for <linux-kbuild@vger.kernel.org>; Sun, 18 Oct 2026 10:04:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JE9aUNhQ"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4a1dfd49525so6124965e9.0
+        for <linux-kbuild@vger.kernel.org>; Sun, 18 Oct 2026 10:28:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792343059; x=1792947859; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1792344508; x=1792949308; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:references
          :in-reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=Wy50q/WaZjVAL/j6YEk/xR6SqWVwPpcjikDOg01mdZo=;
-        b=da2uSpXnCu1VdmX+rSWDwT45unwjuyK+lxZzcVR5PMzSPTZcyRKV4Hlndm4v8le+tU
-         nJFzAB1o+2WKP0CRbLIKcqt03pJ3cTSz9t/k9gbDXizwoI8d3k0b9O3qvr6CYf/rQY3x
-         JS+3LJQfe5Us9W8y0Cg6nkd20e81Ik4JNkXji9cJa75UtKUa8XWOyax9AZ6sxIGh6h97
-         3d3b0+V4WUQXFAgzYBbUCK1U0K/53U4xBxgp63YjruHJIon30mo2wRrYDPefqmWsPJbe
-         Kyg2hpUdkGaEv0xS/H8cfq0G9H2qzsjMBCR6G9Ill5MPPAs4cf5M8B+/WvOKmo5wno0p
-         3PBQ==
+        bh=gK+nm4guBVLWEst0QUYTIzdz/9/IYVNbhQShbRBd2MU=;
+        b=JE9aUNhQtEw/+uE/nXr20cOhX9F9SEdCCCFaCQfJzldmPr/ah2r84dGHQ4EiROr8LK
+         3JYcs//eZY5oXDYGcB9HdzQ++P6RUGsePeLXI+EW8C1FKzV8DZkr1wNzUfM6qFe7X7Ry
+         AuwYwqYi7zLvdb6JIgtzxPc3an8QI8mDOS/LVKYGOfwrFvzaEtjGAXiGRl+n9+kjLf2l
+         1iU1ZeWTmyGpfR6BY1QYSyJtCXtrNH9vqgiehOfXYiycKL4Rs8Elc+/YTecIY24FmncP
+         +tVmqrclvphGhZMF/B0XhqD+zvv4a3EWrdxJJGKNxyd3nmb0/wpLfRjSxwkzoOPRhEwC
+         wVKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792343059; x=1792947859;
+        d=1e100.net; s=20260707; t=1792344508; x=1792949308;
         h=content-transfer-encoding:content-type:mime-version:references
          :in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=Wy50q/WaZjVAL/j6YEk/xR6SqWVwPpcjikDOg01mdZo=;
-        b=FxeZ7Mt6ucAqHxLtQrsLFE6AasmvMTNO/RDFJK8R9OPxErh55JUrtDdLckPV/TcdBK
-         inHHoxaXnKFC0iLh/DRJn9fO7Hk6hpoUV07KeytFVOWqrsR2NMJJeIUgT44tf9ULyf7m
-         wHUrIgOh7515TyCUNskPG+29vhiGXG7QIjWAIRt44TnP7ja1UI3svSCNOQ6e+sMZ03t/
-         XWvFahtohAisEBUJV/UWsP/lhGlCowGqgsyt1qmumAD3RZAWWpmiFPNCLKBdlM+55f6o
-         4pPXhPFD3molWkt/FqeVKIuhrbhwihdWnq5YGI/41vy91iNWaqC0xUTfagCZVpbX3ghL
-         AeTQ==
-X-Forwarded-Encrypted: i=1; AKwUvBxQOAyi8UFvCRfeHRHb0T1IO81upc4R2FKAemjjNZeLhmUuILElB7ewLQHptsGdsDBv4iiohnxuX3pBl7U=@vger.kernel.org
-X-Gm-Message-State: AFq9FYJ1Fz91qDSgE+rDmldLYmTAP+hQLf2H7cvff1bTXvBIHNFjab8E
-	1lSAZJVZWDZ60RhOx5R0WbhYZoKrzBTHrpvecMbVGiYrVD+zSlCcAnFU
-X-Gm-Gg: AYBFou3+fo2M7rtnvmdacz+LASEd1wAt1al+VNItW3dUgi0d3T3Qg1rh3slkCpp2gdq
-	6z94bFBu5sM7iooXAZCo0GsiQHyLf+REKJTdwxi3X51lbF00+ATuYug62hbjY7RxuBRkxB3EnL2
-	1ZbB+qXEBeiI/w1EmLcevTIeADb26mIv/ZmQVEb7dbCrTTaYX+BlCAOa2ROQt/uiSvY0iEarlzI
-	i/t7JAReutzenJkti4lz5XaEeh6qF32JdUNgGgbg1VT6lChlCMzSxxqd6+I4mBNSm7bjxKlXp0T
-	9y2mK7wxKZnT+xod6kv5uvn25u9f3HqRMbf9dYUbDiPZzsdtRwcT/ynLONwJ6P8Prh+lkjssGYL
-	ADLTkP/ZQCs7cA50OxlRgmX607lmVDbxpSiy6e4P/hsKMvEF3zcy57dSNLec9VUYYzCXTFmFALr
-	AMZY3y/7UTxuTRNbC4K7IuOHuAkHZAzAO5F8OWUzQCKbu/UPXv95HI2hUQ+3ZhrOIzPvhloL50/
-	2Q/zEvBPYdKWjBSi4UMO62/DDwFwB32L0E=
-X-Received: by 2002:a05:600d:4444:20b0:4a1:b027:99dc with SMTP id 5b1f17b1804b1-4a1d760098dmr81877465e9.18.1792343059298;
-        Sun, 18 Oct 2026 10:04:19 -0700 (PDT)
+        bh=gK+nm4guBVLWEst0QUYTIzdz/9/IYVNbhQShbRBd2MU=;
+        b=HoEBMnic+MyoRF1RrSIi1vad3KCScMUK3DYKCyRoQhoakIPdkFCKteP0Qei2uFhNy1
+         sAYhchOYfn33OFWw13adP4ckn8/rIPMBXRTIKtXNsfp8SwUQkokN7+fTHeBWno7n4abd
+         Zjga9RrQS/VfiOmTHm6HzlqDTX+wIfTq3f1h5JdrNFWAp0OzgSBoAIK02Mis7XKZ/2qJ
+         JwA5idwdDrjaqeK4DYGNfgTldaymbH5M9fN+8jUqJslL9ibWDdJ/u/Vlv59GpR8bXPiR
+         pWKjqrlcNGUfYxHiOEoaX3nmm0zh7zflLVJrJI9GJfhloU6Xuk8YWhdyIYJfeTqBEA5y
+         4FwQ==
+X-Forwarded-Encrypted: i=1; AKwUvBySHHOEbtNhD8+wB7svFWIi4S+Ke8MUsRKt38bFV3P5tXJzMg33Tw4xpppUiGCqUjNwjN4sboZnE0+tdJU=@vger.kernel.org
+X-Gm-Message-State: AFq9FYKMW6t0cGgM0GvUR8bj1SjreakyzynjJ+ZBu1nrALNXvaGtUD6N
+	LL3HhqdnjnI+iIYmuM0t4DOXDETLZk1ttwoljAtSa/dTLyYG+5uI6KhV
+X-Gm-Gg: AYBFou3K9uGtHADsHl47DhPFb9b7LuSqIuzPc1sYgzgQXZ7ioMwxr13gwCkAQCq0AAi
+	tVkjpeNfuaSnv7583N2GxQVjTsfhHY9q6fdMLwwDypcmFDxOetTi0vy9IGpQUMI3gHXTgMFaX6P
+	RSSi8vnPH9KGbk9gFcGvXosOogaBW+H01+K76GIDkjmp5IMsG4PQTjXQiHBeVUhr1djjh6W35KM
+	4GH6xwhTq+FS4zIpFAOrm23k6AFL3TECUu5aZOP/4QkVZ60DmFrhP+H2kfKjHzYAtIU6ShJQLiv
+	7weJwOI2q8Tx+SD507+Q2MKdd5vzMJqC2odsx4j+rCWUMTCxKIYZiUF9CAL77AHSQvQH4Dqd+pp
+	j5LuvDpj9Ew+uu5u4lk8pC/ydiUAPXreGTCGyo4NaF8Oau5hSVvifBgAVFTzlZ7s2HA0ynHMI9Q
+	+pn/R6Xskf7pa5evAOziCqgsyGg+PC6cy1ilvoe7w/DLhtMDX3eqrKou/xFzUvrAhTbtIPUrLIh
+	AgxIRXrVc1/I6lM4TJLibI0WrpvjjfGbfs=
+X-Received: by 2002:a05:600c:4ed1:b0:4a0:2500:2cd0 with SMTP id 5b1f17b1804b1-4a1d760381fmr116248835e9.18.1792344507529;
+        Sun, 18 Oct 2026 10:28:27 -0700 (PDT)
 Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48dfd500e75sm17494036f8f.42.2026.10.18.10.04.18
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a1c8a81587sm412237035e9.1.2026.10.18.10.28.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 Oct 2026 10:04:18 -0700 (PDT)
-Date: Sun, 18 Oct 2026 18:04:17 +0100
+        Sun, 18 Oct 2026 10:28:26 -0700 (PDT)
+Date: Sun, 18 Oct 2026 18:28:25 +0100
 From: David Laight <david.laight.linux@gmail.com>
 To: sashiko-bot@kernel.org
 Cc: sashiko-reviews@lists.linux.dev, "Andrew Morton"
@@ -70,12 +70,13 @@ Cc: sashiko-reviews@lists.linux.dev, "Andrew Morton"
  Chamberlain" <mcgrof@kernel.org>, "Andrey Grodzovsky"
  <andrey.grodzovsky@crowdstrike.com>, "Steven Rostedt"
  <rostedt@goodmis.org>, nathan@kernel.org, nsc@kernel.org
-Subject: Re: [PATCH v2 next 06/15] kallsyms: Optimise symbol name search
-Message-ID: <20261018180417.5438751b@pumpkin>
-In-Reply-To: <sashiko-outbox-176273@kernel.org>
+Subject: Re: [PATCH 15/15] kallsyms: scripts/kallsyms: Improve compression
+ by about 2%
+Message-ID: <20261018182825.3e407c81@pumpkin>
+In-Reply-To: <sashiko-outbox-176259@kernel.org>
 References: <20261018155206.132411-1-david.laight.linux@gmail.com>
-	<20261018155206.132411-7-david.laight.linux@gmail.com>
-	<sashiko-outbox-176273@kernel.org>
+	<20261018155206.132411-16-david.laight.linux@gmail.com>
+	<sashiko-outbox-176259@kernel.org>
 X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
@@ -86,71 +87,94 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun, 18 Oct 2026 16:15:56 +0000
+On Sun, 18 Oct 2026 16:05:10 +0000
 sashiko-bot@kernel.org wrote:
 
-> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
-> - [High] kallsyms: race in set_kallsyms_off_size() causes NULL dereference
-> - [High] kallsyms: set_kallsyms_off_size() sleeps in atomic context
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> - [Medium] kallsyms: infinite loop in optimize_result() on self-overlapping token pairs
 > --
 > 
-> commit d36232e927821c82911022ce5bae7cb3de465edd
+> commit 36121744ef0b7fd951486247d0297f67eaca31d8
 > Author: David Laight <david.laight.linux@gmail.com>
 > 
-> kallsyms: Optimise symbol name search
+> kallsyms: scripts/kallsyms: Improve compression by about 2%
 > 
-> This commit optimizes symbol name lookups by indexing the compressed
-> names table directly instead of the array of symbol values. It supports
-> both 24-bit and 32-bit offset tables, selecting between them using a
-> static branch initialized on the first symbol lookup.
+> This commit improves kallsyms compression by expanding infrequently used
+> merged tokens back into their original constituent pairs when no unused
+> tokens remain, freeing slots for more profitable token pairs.
 > 
-> > diff --git a/kernel/kallsyms.c b/kernel/kallsyms.c
-> > index d18d78e626db2..31451feac8221 100644
-> > --- a/kernel/kallsyms.c
-> > +++ b/kernel/kallsyms.c  
-> 
-> [ ... ]
-> 
-> > @@ -185,14 +216,19 @@ unsigned long kallsyms_sym_address(int idx)
-> >  	return (unsigned long)offset_to_ptr(kallsyms_offsets + idx);
-> >  }
-> >  
-> > -static unsigned int get_symbol_seq(int index)
-> > -{
-> > -	unsigned int i, seq = 0;
-> > +static DEFINE_STATIC_KEY_TRUE(kallsyms_off_size_24);
-> >  
-> > -	for (i = 0; i < 3; i++)
-> > -		seq = (seq << 8) | kallsyms_seqs_of_names[3 * index + i];
-> > +static inline unsigned int get_symbol_name_offset(unsigned long index)
-> > +{
-> > +	if (static_branch_likely(&kallsyms_off_size_24))
-> > +		return kallsyms_off24_of_names[index].v;
-> > +	return kallsyms_off32_of_names[index];
-> > +}
-> >  
-> > -	return seq;
-> > +static void set_kallsyms_off_size(void)
-> > +{
-> > +	if (kallsyms_off_size != 24)
-> > +		static_branch_disable(&kallsyms_off_size_24);
-> >  }  
-> 
-> [Severity: High]
-> Can calling static_branch_disable() in set_kallsyms_off_size() sleep in
-> an atomic or early-boot context when kallsyms_off_size != 24?
-
-Any suggestions on how to get the static branch set early enough?
-
+> > diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+> > index 8576fe6ad90b7..9dbd7c85eec1e 100644
+> > --- a/scripts/kallsyms.c
+> > +++ b/scripts/kallsyms.c  
 ...
+> > +static int split_token(unsigned int profit)
+> > +{
+> > +	struct token_table *tt, *left, *right;
+> > +	unsigned int i;
+> > +	int best = -1;
+> > +
+> > +	for (i = 0; i < 256; i++) {
+> > +		tt = token_table + i;
+> > +
+> > +		if (tt->len == 1 || tt->refs >= profit)
+> > +			continue;
+> > +
+> > +		/* Ignore tokens where the original parts have be reused */
+> > +		left = &token_table[LEFT(tt->pair)];
+> > +		right = &token_table[RIGHT(tt->pair)];
+> > +		if (tt->len != left->len + right->len ||
+> > +		    memcmp(tt->str, left->str, left->len) ||
+> > +		    memcmp(tt->str + left->len, right->str, right->len))
+> > +			continue;
+> > +
+> > +		best = i;
+> > +		if (tt->refs == 2)
+> > +			break;
+> > +		profit = tt->refs;
+> > +	}
+> > +	if (best < 0)
+> > +		return -1;
+> > +
+> > +	uncompress_symbols(token_table[best].pair, best);
+> > +
+> > +	return best;
+> > +}
+> > +
+>...
 > 
-> [Severity: High]
-> Does DO_ONCE_LITE(set_kallsyms_off_size) allow a concurrent caller to
-> dereference NULL in get_symbol_name_offset() when kallsyms_off_size == 32?
+> [Severity: Medium]
+> Can optimize_result() enter an infinite loop when find_best_token() selects a
+> homogeneous token pair best = PAIR(x, x) that overlaps with itself in runs of
+> 3 or more identical tokens?
+> 
+> For a homogeneous pair PAIR(x, x) where LEFT(best) == RIGHT(best),
+> learn_symbol() and uncompress_symbols() count every adjacent pair, so a run
+> of [x, x, x] increments token_profit[PAIR(x, x)] by 2. However, when
+> compress_symbols(PAIR(x, x), i) replaces the first pair to form [i, x], it
+> calls:
+> 
+>     adjust_profit(RIGHT(token_pair), idx, p[2], p[2]);
+> 
+> which is adjust_profit(x, i, x, x), decrementing token_profit[PAIR(x, x)] by
+> 1 for each triple. As a result, compress_symbols() performs fewer
+> substitutions (refs) than the initial token_profit[best] passed to
+> split_token().
 
-I should have just open-code the 'do once'.
-It doesn't matter if it is called twice.
+(Well done for spotting that one - it got me confused at one point.
+It is one reason why calling it 'profit' (historical name) is wrong.)
 
-But it looks as though I can't patch the code from there anyway.
+In theory maybe, in practise no.
+There are two characters that get repeated more than twice (and I don't
+remember seeing any repeated tokens.)
+They are '_' and 'm'; "__" is by far the most common pair, "mmm" appears
+in _commmon_choices_show() in drivers/acpi/platform_profile.c
+(and looks like a typo).
+A token is allocated to "mm" but there are enough different uses that
+it isn't going to get split.
+
+I will put a check in the next version.
+(probably just avoiding splitting XX.)
 
 David
+
