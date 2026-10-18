@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8057D3A0E8D;
-	Sun, 18 Oct 2026 13:53:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8B044C33F9;
+	Sun, 18 Oct 2026 14:39:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792331616; cv=none; b=uo5pApkkLHHLNPWCj268fHmog9MVDbA1YgClqyGX3xLm0eWf4hsGKTwpN9yt8t62oTQXrLn2diQldx4gM37xmosl7ptKLvsishaQo8CUsq/xrbP5acLf3SzO4zHYtvVSdaUTztr94G21CFhPwS6YHc6IvDoyVCYocS+4TFCe0R0=
+	t=1792334383; cv=none; b=sTO9oZjNMrzJ9YDlVZL97b10aySzA9VW0osEh1X/OtytHOfi+KGq72iQqVNPH6HmFHunE2GyigLz5BOzjj+vPuAbKr8iG5iFIwwcWv39DdNocYV1RR1dRPe0qclW6wR4SiFrblhdzN5owWgZR9yK+Uw5mQMtax7ew9dvppVjtvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792331616; c=relaxed/simple;
-	bh=sgJectzh7qFFPO/UVGmk0Nh0g8lMaSPwNGmHiC1LsdU=;
+	s=arc-20240116; t=1792334383; c=relaxed/simple;
+	bh=PAfjW3xcpiCaHXV7/iUqTMYnxKrH/q5uQYs+RSCe+wQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rQXsYKMoz/Sc9vFtVfar0beemIyTYp1HenbEYuiiJUgl72sGIINJQUEA5D8zFCJEc74L7A9Aqtsk0Y85xXJrFNJIXsE9DO8cfps7rGgTPeCoA8d8NdXxsRMphNntmhift44UfWQ4aXjTOkjWYQQVcjSOcRSHbxigd0m6HYnxVjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jzZHOzqw; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=eFeFn7jMKfiBr4zlnBPbIkLN9/4RRH5t4w7qcYJnuAGSLdT5+y+ZGCeQ+nPr2QH0gud3vWaBse7PKlMTHDooqUzTaav3Aj0fg3i/QgBqFKwhnR9PtljA51BzlEeCwCsjV3DfTGCaczd7RNfmn907TpaHByfgR6gMdA1/AFR8vWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WuUYdnrR; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jzZHOzqw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68CF61F000C4;
-	Sun, 18 Oct 2026 13:53:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WuUYdnrR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 831F81F000C4;
+	Sun, 18 Oct 2026 14:39:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792331615;
-	bh=V/CwHlaGhnNmKVy9kiRkOmng0w9ivK3rMdXuyGEs5X8=;
+	s=k20260515; t=1792334382;
+	bh=ze4neFQXilKWVkV1JOWiiZvoobvoNiFOFy6OOiKZYSM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=jzZHOzqwblo+CYkH31+bAL4Hi0+BD9GHgoljQou+VuQ8QpR6HLGPEgYom2vnL9zQO
-	 61wFwZZKA5vcopJdOgQNW3cJeY3D2GTU96vjcpvoFFxhG29ULBr+1a9rCqDb4aQVzb
-	 BdVpz9yJ4eQO5MjVtqj2J+L/EBhqmjWfdC2J+T0Gl04vUZybLB9rJXqtfTdkvbw78u
-	 t2drUA9tIFcT1Dg2PkSG+TZN7rGFgp36zEyO6YbLWiFfBSZ18+msP0vIRkOHkbZ8+z
-	 sQNMVlpLJ0o3D2AtUkL0rdYqt+MTsO+CmmyKcCq7bRrknO00Pytqmw3Fvm6xObU599
-	 U2Rknkzcu/88w==
+	b=WuUYdnrRY8wDlUtF/ZoukMeg7MH/2GbG3CAffRWphV7LzsETdchMvTcDXsZ1/jOKz
+	 izgTOvJSZM+LbG5kSjv/bDi34SkqmJwGnAClR7nyWo83tPVpOSNQNUCaIeBDOjqjCV
+	 2umv9Vc7NFHK5mb7qz9SFqQ4isGQTsIVxtad9uH0BujDfQe6Gn6LTXkbiP2E8Luh2X
+	 isZv3+kKBPDGIopNm4ee7eVTkYlCfB1qQODVa/9/fRadp+ODJvKEOdI6nMt9SPhJtD
+	 bhuc7ToHbEkXgE2TTWTPKjsYibR7/Esw3GVKAvpSygWN4xmMwKuc2HHUTnS0gqmygh
+	 mOvzaALCxkm9w==
 From: Sasha Levin <sashal@kernel.org>
-To: Ian Rogers <irogers@google.com>
+To: sashiko-reviews@lists.linux.dev
 Cc: Nathan Chancellor <nathan@kernel.org>,
 	Nicolas Schier <nsc@kernel.org>,
 	linux-kbuild@vger.kernel.org,
@@ -40,18 +40,19 @@ Cc: Nathan Chancellor <nathan@kernel.org>,
 	Mark Rutland <mark.rutland@arm.com>,
 	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
 	Jiri Olsa <jolsa@kernel.org>,
+	Ian Rogers <irogers@google.com>,
 	Adrian Hunter <adrian.hunter@intel.com>,
 	James Clark <james.clark@linaro.org>,
 	linux-perf-users@vger.kernel.org,
 	=?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>,
 	Andrew Morton <akpm@linux-foundation.org>,
 	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH v2 3/7] perf build: Add MINIMAL=1 to build without optional features
-Date: Sun, 18 Oct 2026 09:53:32 -0400
-Message-ID: <20261018135332.3987231-1-sashal@kernel.org>
+Subject: Re: [RFC PATCH v2 1/7] kbuild: factor the userspace ABI flags out into KBUILD_USERABI
+Date: Sun, 18 Oct 2026 10:39:39 -0400
+Message-ID: <20261018143939.4113153-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <CAP-5=fV_A+k-_g683q7n897YMudBwwvQPkS_cKRSdOxkEYFa0Q@mail.gmail.com>
-References: <20261016143143.3613501-1-sashal@kernel.org> <20261016143143.3613501-4-sashal@kernel.org> <CAP-5=fV_A+k-_g683q7n897YMudBwwvQPkS_cKRSdOxkEYFa0Q@mail.gmail.com>
+In-Reply-To: <sashiko-outbox-175552@kernel.org>
+References: <20261016143143.3613501-1-sashal@kernel.org> <20261016143143.3613501-2-sashal@kernel.org> <sashiko-outbox-175552@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -60,21 +61,21 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-On Fri, Oct 16, 2026 at 08:41:29AM -0700, Ian Rogers wrote:
->In perf-tools-next/linux-next both LIBPYTHON and LIBPERL are gone
->(context in https://lore.kernel.org/linux-perf-users/20260926062029.800743-47-irogers@google.com/#t
->).
+On Sat, Oct 17, 2026 at 02:32:08PM +0000, sashiko-bot@kernel.org wrote:
+>[Severity: Low]
+>Does this new exported variable also need to be added to the SPDX SBOM
+>environment allowlist?
+>
+>Currently, KBUILD_USERCFLAGS and KBUILD_USERLDFLAGS are explicitly tracked
+>in KERNEL_BUILD_VARIABLES_ALLOWLIST in scripts/sbom/sbom/environment.py:
 [...]
->We should expand this with NO_MYPY and NO_PYLINT for the
->perf-tools-next version.
+>Leaving KBUILD_USERABI off this list means its value will not be captured
+>in the SPDX SBOM generated by scripts/sbom, resulting in incomplete build
+>metadata documentation for the userspace ABI configuration.
 
-The series is based on mainline, which still has NO_LIBPYTHON and runs mypy and
-pylint only when asked to, so 3/7 only covers those knobs.
-
-I sent the perf-tools-next version on its own: it uses NO_PYTHON_MODULE and
-also sets NO_MYPY and NO_PYLINT.
-
-https://lore.kernel.org/r/20261018135321.3986899-1-sashal@kernel.org
+KBUILD_USERABI is appended to both KBUILD_USERCFLAGS and
+KBUILD_USERLDFLAGS, which are on that list, so its flags are already in
+the SBOM. Listing it as well would only record the same flags again.
 
 -- 
 Thanks,
