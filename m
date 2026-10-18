@@ -1,43 +1,43 @@
 Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DA013CC7D3;
-	Sun, 18 Oct 2026 15:53:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FDAC3CF047;
+	Sun, 18 Oct 2026 15:53:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792338800; cv=none; b=fHYi1hGwnpyyMCnpeB3SacdDIHJaPaow2eOH43Tss89SEO+w04rx26HYkgMmuFXiL3+5f3I9IFoPCHpHE+h0UWNfjG32bPkcdiGDSnh0xv23zKkOkCTlLZ38MDIJppBD3qT24nAjUDxbldwkz3zaQcUyMYuOZgDUtxAzJCY9nQo=
+	t=1792338800; cv=none; b=nj0QVAKto3G67K3i/iJVB1WGjF3PmnJVMb2MXkgnOwIpABYGbABRKFDw4Z3w/RSSf+xrsHMlXtnsGjTb6kiOcOx8yvSGIB8Q1aPdXgUWpEsoviTIChB4RTUo1Oe5o7FaTdHcgsdQtCbydpPm/sPmUfoqjlBXuqs6bv7iWrh1PPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1792338800; c=relaxed/simple;
-	bh=bFtfrDFfJiFgzrOGha7X+aYjJEuOgNNxvP6urm8vnsc=;
+	bh=h48Jt4DOAyx1UsN/SeYOc9zyhdVg5SaIyCPO+fI7Atc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=mN90MlWp4QBAlIRcG8IvgcQX5q+kDZBl/Xcyh+eEN4MjRuMbeDbGUgD7ZW3PWBy5LWOjUOJ2r1EOQFt6WV6ho/M/PrlTzaqNvZdpTISdZGxcOzVkFZyIhzm+qq6Ie8oh9sX2vR09MhXJ/AGrrCG3Os9J2bqVb4kBeY16kIBrDPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=Xc1S+Jf8; arc=none smtp.client-ip=185.226.149.38
+	 MIME-Version; b=IinBza2DVAaRDM/02xtgog/QPuudKRv9QB1pe9LzLc8I+ESvKetskReiO0Ryg26yfejBJXJf+5VRXmBG3V2i2QL9FehQLzCJO7D7JfHjo37IV4J2QNg8NIXdq3MBfvbCQPhmam/RdBo0fqXk9C0srDw6ozab/JzA0f/yWobe60M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=dZF1Ry3J; arc=none smtp.client-ip=185.226.149.38
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=runbox.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b="Xc1S+Jf8"
+	dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b="dZF1Ry3J"
 Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
 	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <david.laight.linux_spam@runbox.com>)
-	id 1xITC4-001KBP-Qg; Sun, 18 Oct 2026 17:53:04 +0200
+	id 1xITC5-001KBv-P2; Sun, 18 Oct 2026 17:53:05 +0200
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=runbox.com;
 	 s=selector1; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To
 	:Message-Id:Date:Subject:Cc:To:From;
-	bh=yXPKNCrTN84ndLWWFsp5Lhf/pJS8VAJCKJYB6ObXzLQ=; b=Xc1S+Jf8vfCRaiAKGxAg5BZUkr
-	+rmNykpMiVRy4hM7zw2uQGA81tQL4ACEEv0fEWCkHJlq+q9ROwhfVRAw9Y3t3MGvUb+Eii7OUlFbE
-	AhtDrvUI0trMu1AtUlGkO+uefAqWOIPEn3aQ8XtxUDVaAjewFT196lF1+Vc3pXKE/yVgRJPN47OFD
-	XUcvHhmJT0SJUWxQ+oEHPhJaLCIaNQ8jGjp4zEg8JhDMbDdiipqEk8E8ikreOC3QKwke+wKOjy/9E
-	tD1N53lclZJls8GjgpQGEEbQ7+mcU0gJTnrckGP6vedKLgtlBvl9Tm2UJ2lz+QBO/eoN2T4lTBMq2
-	fDcJgGJg==;
+	bh=EL6NkSrwprg57F2VdDLVn9DgamauTvELvhUv6gcZ5dk=; b=dZF1Ry3J3eoaLckiS2i2rsFylN
+	Q7RZimipLRhzbf4xFJezMrAOwe1DsffrOTSWxYyk3ZjOQhHpkwbh1vmnghLlR1fHn5vrj2FNb4hHc
+	45xW2CCVvGMWadbTSsVbw84zuNWxrMygVD8sAj3B+WFHE2u9DfSkKjRLsXccKtDpfrvbR9dJQjK4j
+	BSjj0HiG1dpabNCReEqylRYw+9gFRmjstQzQXz0Fo9yF0Z2ElascKuFxT6bo+mfBU8FMjQ6AXRSse
+	myFcxrbzIxz/OY3s/dpJxV/JPpY+T5wbSAwrDD6oIZTLDx5h0/LU1WV8r4PqeFfqj6YSxpFVvr5x3
+	mA4wJ3Sw==;
 Received: from [10.9.9.74] (helo=submission03.runbox)
 	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <david.laight.linux_spam@runbox.com>)
-	id 1xITBz-0000Bb-HJ; Sun, 18 Oct 2026 17:52:59 +0200
+	id 1xITC0-0000Bo-Ek; Sun, 18 Oct 2026 17:53:00 +0200
 Received: by submission03.runbox with esmtpsa  [Authenticated ID (1493616)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.95)
-	id 1xITBl-004q3U-Fh;
-	Sun, 18 Oct 2026 17:52:45 +0200
+	id 1xITBk-004q3U-DC;
+	Sun, 18 Oct 2026 17:52:44 +0200
 From: David Laight <david.laight.linux@gmail.com>
 To: Andrew Morton <akpm@linux-foundation.org>,
 	Petr Mladek <pmladek@suse.com>,
@@ -51,9 +51,9 @@ To: Andrew Morton <akpm@linux-foundation.org>,
 Cc: Luis Chamberlain <mcgrof@kernel.org>,
 	Andrey Grodzovsky <andrey.grodzovsky@crowdstrike.com>,
 	Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 15/15] kallsyms: scripts/kallsyms: Improve compression by about 2%
-Date: Sun, 18 Oct 2026 16:52:06 +0100
-Message-Id: <20261018155206.132411-16-david.laight.linux@gmail.com>
+Subject: [PATCH v2 next 13/15] kallsyms: scripts/kallsyms: Reuse tokens that have no references
+Date: Sun, 18 Oct 2026 16:52:04 +0100
+Message-Id: <20261018155206.132411-14-david.laight.linux@gmail.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20261018155206.132411-1-david.laight.linux@gmail.com>
 References: <20261018155206.132411-1-david.laight.linux@gmail.com>
@@ -65,234 +65,143 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If the symbols contain a lot of "abc" and "abd" and a few "abe" then
-the compression code first substitutes (say) 'x' for "ab" giving
-"xc", "xd" and "xe".
-It might later substitute 'y' for "xc" and 'z' for "xd" giving
-"y", "z" and "xe".
-The token 'x' is then hardly used, expanding "xe" back to "abe"
-costs one byte every time it is used, but frees up 'x' to be used
-for a much more common symbol pair.
+Keep track of the number of times each compression token is used.
+If the count becomes zero (eg if the only x are in axb and y is
+substituted for xb giving ay) then x can be reused.
 
-Add a check at the end of the compression that all the counts still match.
+This means that a token can refer to a long string without needing
+tokens for all the shorter strings.
 
-Increases the compression ratio by about 2% on both the 'normal'
-kernel I'm building and on the x86-64 allyesconfig kernel.
-
-For simplicity the code will only expand a token where the two tokens
-that were merged are still in the table.
-It might be possible to find some others, eg ones that are 3 characters.
+For my normal kernel build four tokens get reused saving 8.5k of data.
+The savings may be greater if there are symbols with long matching prefix.
 
 Signed-off-by: David Laight <david.laight.linux@gmail.com>
 ---
- scripts/kallsyms.c | 137 +++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 127 insertions(+), 10 deletions(-)
+ scripts/kallsyms.c | 45 ++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 32 insertions(+), 13 deletions(-)
 
 diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-index 8576fe6ad90b..9dbd7c85eec1 100644
+index ee06a9c7435f..189fb50ec8c5 100644
 --- a/scripts/kallsyms.c
 +++ b/scripts/kallsyms.c
 @@ -76,6 +76,7 @@ static int token_profit[0x10000];
  static struct token_table {
  	char           *str;		/* Full expansion, '\0' terminated */
  	unsigned short len;		/* Length of str */
-+	unsigned short pair;		/* Original token pair for this token */
- 	unsigned int   refs;		/* Number of time used in a symbol */
++	unsigned int   refs;		/* Number of time used in a symbol */
  } token_table[256];
  
-@@ -514,6 +515,37 @@ static void build_initial_token_table(void)
- 		learn_symbol(symbol[i]->sym, symbol[i]->len);
- }
- 
-+/* Check that the token_profit[] matches the compressed symbols. */
-+static void check_tables(void)
-+{
-+	unsigned int save_profit[0x10000];
-+	unsigned int tok_refs[256];
-+	unsigned int i, j;
-+
-+	memcpy(save_profit, token_profit, sizeof(save_profit));
-+	memset(token_profit, 0, sizeof(token_profit));
-+
-+	build_initial_token_table();
-+
-+	for (i = 0; i < 0x10000; i++) {
-+		if (token_profit[i] != save_profit[i])
-+			errx(1, "profit error for %u,%u (%s/%s) discrepency %u != %u\n",
-+			     LEFT(i), RIGHT(i), token_table[LEFT(i)].str,
-+			     token_table[RIGHT(i)].str, token_profit[i], save_profit[i]);
-+	}
-+
-+	memset(tok_refs, 0, sizeof(tok_refs));
-+	for (i = 0; i < symbol_cnt; i++)
-+		for (j = 0; j < symbol[i]->len; j++)
-+			tok_refs[symbol[i]->sym[j]]++;
-+
-+	for (i = 1; i < 256; i++) {
-+		if (tok_refs[i] != token_table[i].refs)
-+			errx(1, "token reference error for %u (%s) %u != %u\n",
-+			     i, token_table[i].str, token_table[i].refs, tok_refs[i]);
-+	}
-+}
-+
- static unsigned char *find_token(unsigned char *str, unsigned char *end,
- 				 unsigned int want)
+ static void usage(void)
+@@ -404,7 +405,8 @@ static void write_src(void)
+ 	for (i = 0; i < 256; i++) {
+ 		best_idx[i] = off;
+ 		off += token_table[i].len + 1;
+-		printf("\t.asciz\t\"%s\"\n", token_table[i].str);
++		printf("\t.asciz\t\"%s\"\t/* %u: %u */\n",
++		       token_table[i].str, i, token_table[i].refs);
+ 	}
+ 	printf(".size kallsyms_token_table, . - kallsyms_token_table\n");
+ 	printf("\n");
+@@ -512,10 +514,11 @@ static unsigned char *find_token(unsigned char *str, unsigned char *end,
+  * to update the counts.
+  * Marked noinline to help register allocation. compress_symbols() is only called
+  * about 200 times whereas find_token() can be called well over a million times. */
+-static __attribute__((noinline)) void compress_symbols(unsigned int token_pair, int idx)
++static __attribute__((noinline)) unsigned int compress_symbols(unsigned int token_pair, int idx)
  {
-@@ -561,6 +593,47 @@ static __attribute__((noinline)) unsigned int compress_symbols(unsigned int toke
- 	return substitutions;
- }
- 
-+/* Change every occurance of idx back to token_pair.
-+ * This extends all the symbol table entries but frees up a token. */
-+static __attribute__((noinline)) void uncompress_symbols(unsigned int token_pair, int idx)
-+{
-+	unsigned int i, len;
-+	unsigned char *sym, *p, *end;
+ 	unsigned int i, len;
+ 	unsigned char *sym, *p, *end;
 +	unsigned int substitutions;
+ 
+ 	for (i = 0; i < symbol_cnt; i++) {
+ 		sym = symbol[i]->sym;
+@@ -535,7 +538,10 @@ static __attribute__((noinline)) void compress_symbols(unsigned int token_pair,
+ 		symbol[i]->len = end - sym;
+ 	}
+ 
++	substitutions = token_profit[token_pair];
+ 	token_profit[token_pair] = 0;
 +
-+	for (i = 0; i < symbol_cnt; i++) {
-+		sym = symbol[i]->sym;
-+		len = symbol[i]->len;
-+		p = memchr(sym, idx, len);
-+		if (!p)
-+			continue;
-+		end = sym + len;
-+
-+		do {
-+			len = end - p - 1;
-+			end++;
-+			if (len) {
-+				adjust_profit(idx, RIGHT(token_pair), p[1], p[1]);
-+				memmove(p + 2, p + 1, len);
-+			}
-+			p[0] = LEFT(token_pair);
-+			p[1] = RIGHT(token_pair);
-+			if (p != sym)
-+				adjust_profit(p[-1], p[-1], idx, LEFT(token_pair));
-+			p = memchr(p + 2, idx, len);
-+		} while (p);
-+		symbol[i]->len = end - sym;
-+	}
-+
-+	substitutions = token_table[idx].refs;
-+
-+	token_profit[token_pair] += substitutions;
-+
-+	token_table[idx].refs = 0;
-+	token_table[LEFT(token_pair)].refs += substitutions;
-+	token_table[RIGHT(token_pair)].refs += substitutions;
-+}
-+
- /* search the token with the maximum profit */
- static int find_best_token(void)
- {
-@@ -578,14 +651,47 @@ static int find_best_token(void)
- 	return best;
++	return substitutions;
  }
  
-+static int split_token(unsigned int profit)
-+{
-+	struct token_table *tt, *left, *right;
-+	unsigned int i;
-+	int best = -1;
-+
-+	for (i = 0; i < 256; i++) {
-+		tt = token_table + i;
-+
-+		if (tt->len == 1 || tt->refs >= profit)
-+			continue;
-+
-+		/* Ignore tokens where the original parts have be reused */
-+		left = &token_table[LEFT(tt->pair)];
-+		right = &token_table[RIGHT(tt->pair)];
-+		if (tt->len != left->len + right->len ||
-+		    memcmp(tt->str, left->str, left->len) ||
-+		    memcmp(tt->str + left->len, right->str, right->len))
-+			continue;
-+
-+		best = i;
-+		if (tt->refs == 2)
-+			break;
-+		profit = tt->refs;
-+	}
-+	if (best < 0)
-+		return -1;
-+
-+	uncompress_symbols(token_table[best].pair, best);
-+
-+	return best;
-+}
-+
+ /* search the token with the maximum profit */
+@@ -558,29 +564,41 @@ static int find_best_token(void)
  /* this is the core of the algorithm: calculate the "best" table */
  static void optimize_result(void)
  {
--	unsigned int i, idx, len, refs;
--	struct token_table *left, *right;
-+	struct token_table *t, *left, *right;
- 	unsigned char to_process[256];
-+	unsigned int idx, len, refs;
-+	int i, best;
+-	int i, best;
+-	unsigned int len;
++	unsigned int i, idx, len, refs;
+ 	struct token_table *left, *right;
++	unsigned char to_process[256];
  	char *str;
--	int best;
++	int best;
  
- 	/* Generate a list of the unused tokens. */
- 	for (i = 0, idx = 0; i < 256; i++) {
-@@ -593,20 +699,28 @@ static void optimize_result(void)
- 			to_process[idx++] = i;
- 	}
+-	/* Use the '\0' symbol last so the output is unchanged */
+-	for (i = 255; i >= 0; i--) {
+-		/* Ignore tokens used for the original character codes. */
+-		if (token_table[i].len)
+-			continue;
++	/* Generate a list of the unused tokens. */
++	for (i = 0, idx = 0; i < 256; i++) {
++		if (!token_table[i].len)
++			to_process[idx++] = i;
++	}
  
--	do {
-+	for (;;) {
++	do {
  		/* find the token pair with the best profit value */
  		best = find_best_token();
  		if (best < 0)
  			break;
--		i = to_process[--idx];
-+		if (idx) {
-+			i = to_process[--idx];
-+		} else {
-+			/* Try to free up a little-used token. */
-+			i = split_token(token_profit[best]);
-+			if (i < 0)
-+				break;
-+		}
++		i = to_process[--idx];
  
  		/* replace this token pair in all the valid symbols */
- 		refs = compress_symbols(best, i);
-+		t = &token_table[i];
+-		compress_symbols(best, i);
++		refs = compress_symbols(best, i);
++
++		/* Update the number of times each token is used */
++		token_table[i].refs += refs;
  
- 		/* Update the number of times each token is used */
--		token_table[i].refs += refs;
-+		t->refs += refs;
-+		t->pair = best;
- 
--		/* Generate the full name for this symbol */
+ 		/* Generate the full name for this symbol */
  		left = &token_table[LEFT(best)];
  		right = &token_table[RIGHT(best)];
- 		if (!(left->refs -= refs))
-@@ -621,9 +735,10 @@ static void optimize_result(void)
++		if (!(left->refs -= refs))
++			/* There are no references left, reuse the token. */
++			to_process[idx++] = LEFT(best);
++		if (!(right->refs -= refs))
++			to_process[idx++] = RIGHT(best);
+ 
++		/* Generate the full name for this symbol */
+ 		len = left->len + right->len;
+ 		str = xmalloc(len + 1);
  		str[len] = 0;
- 		memcpy(str, left->str, left->len);
+@@ -588,7 +606,7 @@ static void optimize_result(void)
  		memcpy(str + left->len, right->str, right->len);
--		token_table[i].str = str;
--		token_table[i].len = len;
--	} while (idx);
-+		free(t->str);
-+		t->str = str;
-+		t->len = len;
-+	}
+ 		token_table[i].str = str;
+ 		token_table[i].len = len;
+-	}
++	} while (idx);
  }
  
  /* start by placing the symbols that are actually used on the table */
-@@ -654,6 +769,8 @@ static void optimize_token_table(void)
- 	insert_real_symbols_in_table();
+@@ -598,13 +616,14 @@ static void insert_real_symbols_in_table(void)
  
- 	optimize_result();
-+
-+	check_tables();
- }
+ 	for (i = 0; i < symbol_cnt; i++) {
+ 		for (j = 0; j < symbol[i]->len; j++) {
+-			token_table[symbol[i]->sym[j]].len = 1;
++			token_table[symbol[i]->sym[j]].refs++;
+ 		}
+ 	}
  
- /* guess for "linker script provide" symbol */
+ 	for (i = 0; i <= 255; i++) {
+-		if (!token_table[i].len)
++		if (!token_table[i].refs)
+ 			continue;
++		token_table[i].len = 1;
+ 		token_table[i].str = xmalloc(2);
+ 		token_table[i].str[0] = i;
+ 		token_table[i].str[1] = 0;
 -- 
 2.39.5
 
