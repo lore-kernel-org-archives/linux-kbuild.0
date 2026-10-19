@@ -1,480 +1,228 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.95.139
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1792423628;
+	b=wbIOT4dCveo9JkpT5LUXuDlcZf/yiX4Jk/IJAPAj8NE7rUbeUGIIqZcdcnOs7eN/i2oO
+	 dX6paid65O/KiIxhUqjdly942k20kXJsgf5UTFULcQYGLTz4IaqyjtmLYSxKgGrQMPWt+
+	 YmMywQiADzX9Q0DjNZPgJBCHBJjgnTqycX8YefiWzscaezzgHwX2AWtdpF0raQquP9ZHZ
+	 OFpTmi5XAKfKVm1JPdik0+Z/spDN7aLp4vwWdI0Hwu9uQcMs7Exm17RDaNmFskzBwsyml
+	 M38Daux2MLTYA4Qgqp5rqlfsQTUAoAInZd8riyWavj0JAtsTbHmGVAK/0qye2KWFOyg==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792423628;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:
+	 Content-Transfer-Encoding:Content-Type:Date:Message-Id:Cc:Subject:
+	 From:To:X-Mailer:References:In-Reply-To:X-ClientProxiedBy:
+	 MIME-Version:X-MS-PublicTrafficType:X-MS-TrafficTypeDiagnostic:
+	 X-MS-Office365-Filtering-Correlation-Id:X-MS-Exchange-SenderADCheck:
+	 X-MS-Exchange-AntiSpam-Relay:X-Microsoft-Antispam:
+	 X-Microsoft-Antispam-Message-Info:X-Forefront-Antispam-Report:
+	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
+	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
+	 X-MS-Exchange-CrossTenant-Network-Message-Id:
+	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
+	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
+	 X-MS-Exchange-CrossTenant-FromEntityHeader:
+	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
+	 X-MS-Exchange-CrossTenant-UserPrincipalName:
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
+	bh=0fFKCtmcV7Z/b/qf9UFqFjiqIaTYbRmHh6zBXGUjDyE=;
+	b=yzZSTAsnZnF0yh+Fe7z0c9y10XWTa0+dzeFfAKwupmYd4Y0S6pCT+OI7ouGXLy0miYd7
+	 P6rJIdT1lk1r0lnd3it+OSFEThlnvjP+DqvUalN+IWUKam79WlgCctMyawxjZEOggJ6VP
+	 UFRJhf4MARG0XA8MDK+MFvLKNW9t26aZ7IInHmNLcQvfKXT6qjrEsQcMl/01OPWvPocuS
+	 Qm4tGLZJZakpV7+HJ0vTe6xUmWFO/4z1ulH66O5fda6ltFUERBUakLuK+Jn2S4sPkVVpw
+	 pwgXN0VzRnrFA1Zk7qrgUFsYhbpjmQgUUzDlNjM+Wu1PS+1cGm4N0h8jrrrc6gXCyaw==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=garyguo.net;
+	spf=pass smtp.mailfrom=garyguo.net;
+	dkim=pass header.d=garyguo.net header.i=@garyguo.net header.a=rsa-sha256 header.s=selector1 header.b=r5xqp0B3;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.95.139
+Received: from LO2P265CU024.outbound.protection.outlook.com (mail-uksouthazon11021139.outbound.protection.outlook.com [52.101.95.139])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5E4B573F25;
-	Mon, 19 Oct 2026 13:58:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792418305; cv=none; b=EG5P/JjwVznabuZyrTuyA7leZoRjf1jw5pYMkVr/nWAj/oEFzfn7eTnx51yOQA3QBMLja0YuMbKWWZpfNAWvv/fyerefI5riUjwwSVDWIKss0COIuMaG6OXee5c+dzEafw9GVs4F2nFlKtIepvXjHCCAxrCCxlWIS4mNp/i44io=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792418305; c=relaxed/simple;
-	bh=TcKnzKzhpo8huu/yPgAzmWU6KR+5ZU0doZWx0JTWjnA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=koypDQt5lQB1udhNBIasGuvDLprlCIXPMc9AwMXkecHF9pb+DhFIusLoJiSBlMadrr43myV96UrsMPIBeRkbvQTpsbfdc6iF37wuND3uoKiNKYwG2tktfqZGN3CvF7mmqpwhQNWUZENw7ceGA1ZLfvIdbVU9HB7NR2wUArJ3H3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hEWsS0ZZ; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B58CA60B39B6;
+	Mon, 19 Oct 2026 15:27:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B58CA60B39B6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garyguo.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hEWsS0ZZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C8DB1F000CA;
-	Mon, 19 Oct 2026 13:58:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792418302;
-	bh=DUJl/GxXz1RYTMumSslgzSZLfPGmTQQDty19QomRVDE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=hEWsS0ZZd9IbPnhFQuC/TUTHOtIAXn/H325c2NMTyC+VU0+xbmowOFa9ri6RbI8rI
-	 UFVH5pdO/PuW9SRQqJ0H3Q0AyOjBAaFDwZs+EmuoCnJuJotXJqQDbPIqz8Zxv59PDO
-	 vdJinNeC+DeTr7R1qvKpnkMxXie9Bed/rB6sSsENwFraVa7g6l43w8q9cpY6NbITxt
-	 kA9rmg4z8btSJtN0c/agEKyKdAGJiGNKIivAq2Vw1qLLsi4hSbyFgTVAEl4IobrMOy
-	 LkMORitmMt54HWG6gocUS0oF9nfZoVoaMnTRAV5cLRNYH9V5p9AGH4dm5jz4wj5wKC
-	 B/KtBa7jUlM/g==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Simon Glass <sjg@chromium.org>,
-	Nicolas Schier <nsc@kernel.org>,
-	Sasha Levin <sashal@kernel.org>,
-	nathan@kernel.org,
-	linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-5.10] kconfig: abort rather than loop for ever on EOF
-Date: Mon, 19 Oct 2026 09:47:22 -0400
-Message-ID: <20261019135441.1420968-151-sashal@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261019135441.1420968-1-sashal@kernel.org>
-References: <20261019135441.1420968-1-sashal@kernel.org>
-Precedence: bulk
+	dkim=pass (1024-bit key, unprotected) header.d=garyguo.net header.i=@garyguo.net header.a=rsa-sha256 header.s=selector1 header.b=r5xqp0B3
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qViw4gsgVKmH5PPpAVjObylhaSrUMIvyxX8TX54DAgrqerMXhfglVym/X3BD+ApMi3eVyMngPnQ4MieUubnRT/rtYMYu6JCIsIKQPVpZ6NhWHTvrcXb6uA56P51BYpx9IsELhaF1fucf0WqU2jZngl90fXITqcdSXsei/XsN+CVzNeeRMDsXdPyGYQqkp5aD0sg8gaLnzcfWF3aJAfTtBpMQkX4X/D+FFt54Lq/noXMpOVfeXQsZRvKMb9oK0eEdZtez2t891q7O2JUVoT8BT3LcmQAFC/ccNs9OnE1OHhXWfVoxU5Nm2sRsVYjr+stbdKtR8/jcHQvmDUFrrnAE4g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0fFKCtmcV7Z/b/qf9UFqFjiqIaTYbRmHh6zBXGUjDyE=;
+ b=Bu2hf23lTIkGrJP2mTACzHEWXt0ioI6nF5gJEJtm3rbvndnMVE9pFfA1Ocmlub9ZgmlhnJxnJwgka1ExBPh9ofgA/lofjBjwxS7yP+nM6Y4zYiFjPRo+FZyBUYrvhUE3VXS6ySuq5sqwHu2nFvNjhcHa66eKQAwJgW6H90OE08ZptM9smmOIgKAyzzD+g2KJa3+dqlWsIzSdb24aF0X+QGiA3damWWzZ7vRZ88stwZiCbZRxFxOKS98vl7XpvVk/Z4g33t11iH7fNLo4219DpirUOTG2rtI7HRXv+NEG6Gq+GSrwhzS1ymEdOXaZTKiapENC1mXlgE/nXzp0SoTSVQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
+ dkim=pass header.d=garyguo.net; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0fFKCtmcV7Z/b/qf9UFqFjiqIaTYbRmHh6zBXGUjDyE=;
+ b=r5xqp0B3NOhcyH9W1bfoDUCKJnulSDAvXLdzy5ko1k6tGVyp4fCUYXcMC/AE0XdfdlAY119LGj9/glijyzzRNBut83GNvZYPzNwhbtbjAiIz93vi6cRI8Edw0baEV9Zyl2/JC5HvDeO5xVF7IizzDEHNSQRt/qKSxo2JWInpQ4g=
+Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=garyguo.net;
+Received: from LOAP265MB8560.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:4ab::19)
+ by LO4P265MB6252.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:27f::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.19; Mon, 19 Oct
+ 2026 15:26:50 +0000
+Received: from LOAP265MB8560.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::f60b:1537:68d7:4fc1]) by LOAP265MB8560.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::f60b:1537:68d7:4fc1%6]) with mapi id 15.21.0522.017; Mon, 19 Oct 2026
+ 15:26:48 +0000
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Mon, 19 Oct 2026 16:26:47 +0100
+Message-Id: <DM8X51YCN6AA.1HV7J3R3PIYY9@garyguo.net>
+Cc: "Alexander Potapenko" <glider@google.com>, "Boqun Feng"
+ <boqun.feng@gmail.com>, <kasan-dev@googlegroups.com>,
+ <linux-kernel@vger.kernel.org>, "Dmitry Vyukov" <dvyukov@google.com>,
+ "Jonathan Corbet" <corbet@lwn.net>, "Shuah Khan"
+ <skhan@linuxfoundation.org>, "Randy Dunlap" <rdunlap@infradead.org>,
+ "Andrew Morton" <akpm@linux-foundation.org>, "Miguel Ojeda"
+ <ojeda@kernel.org>, "Boqun Feng" <boqun@kernel.org>, "Gary Guo"
+ <gary@garyguo.net>, =?utf-8?q?Bj=C3=B6rn_Roy_Baron?=
+ <bjorn3_gh@protonmail.com>, "Benno Lossin" <lossin@kernel.org>, "Andreas
+ Hindborg" <a.hindborg@kernel.org>, "Alice Ryhl" <aliceryhl@google.com>,
+ "Trevor Gross" <tmgross@umich.edu>, "Danilo Krummrich" <dakr@kernel.org>,
+ "Daniel Almeida" <daniel.almeida@collabora.com>, "Tamir Duberstein"
+ <tamird@kernel.org>, "Alexandre Courbot" <acourbot@nvidia.com>,
+ =?utf-8?q?Onur_=C3=96zkan?= <work@onurozkan.dev>, "Nathan Chancellor"
+ <nathan@kernel.org>, "Nicolas Schier" <nsc@kernel.org>, "Nick Desaulniers"
+ <ndesaulniers@google.com>, "Bill Wendling" <morbo@google.com>, "Justin
+ Stitt" <justinstitt@google.com>, "Asahi Lina" <lina+kernel@asahilina.net>,
+ "Lorenzo Stoakes" <ljs@kernel.org>, "Yury Norov" <ynorov@nvidia.com>,
+ "David Gow" <david@davidgow.net>, "Joel Fernandes" <joelagnelf@nvidia.com>,
+ "Alvin Sun" <alvin.sun@linux.dev>, "Josh Poimboeuf" <jpoimboe@kernel.org>,
+ "Petr Mladek" <pmladek@suse.com>, <workflows@vger.kernel.org>,
+ <linux-doc@vger.kernel.org>, <rust-for-linux@vger.kernel.org>,
+ <linux-kbuild@vger.kernel.org>, <llvm@lists.linux.dev>
+Subject: Re: [PATCH v2 1/2] kbuild: rust: enable KCSAN support
+From: "Gary Guo" <gary@garyguo.net>
+To: "Marco Elver" <elver@google.com>
+X-Mailer: aerc 0.22.0
+References: <20261015145714.3327543-1-elver@google.com>
+In-Reply-To: <20261015145714.3327543-1-elver@google.com>
+X-ClientProxiedBy: LO6P123CA0046.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:310::8) To LOAP265MB8560.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:4ab::19)
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
+List-Post: <mailto:linux-kbuild@vger.kernel.org>
+List-Help: <mailto:linux-kbuild+help@vger.kernel.org>
 List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
+List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
+Precedence: list
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.18.57
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-
-From: Simon Glass <sjg@chromium.org>
-
-[ Upstream commit f915149f5cfbd0d4406ec0b0f57b1d2c8685ae55 ]
-
-When a non-interactive 'make oldconfig' or 'syncconfig' meets a new int
-or hex symbol whose default cannot be applied, conf_string() reads a
-value from stdin. At end of file fgets() returns NULL, no value is set
-and the loop asks again. The result is an endless loop which fills the
-output until it exhausts memory, rather than a clean failure.
-
-Detect this in conf_string(): if the value cannot be set and stdin is at
-end of file, stop with an error that names the symbol.
-
-Note that a symbol with no default doesn't trigger this, since
-sym_calc_value() falls back to 0, which is accepted at end of file. The
-loop is triggered by a broken Kconfig file, with a default whose text
-fails sym_string_valid().
-
-Such mistakes do creep in from time to time and are hard to debug, since
-the build fills the log with repeated prompts instead of pointing at the
-offending symbol. Some bad defaults draw a parse-time warning, but
-menu_validate_number() accepts a reference to any int or hex symbol, so
-a cross-type reference loops with no warning at all. For example, "0xff"
-is not a valid int value:
-
-  config HEXSYM
-          hex
-          default 0xff
-
-  config VAL
-          int "Value"
-          default HEXSYM
-
-Interactive use is unaffected, since feof() only becomes true once a
-read actually hits end of file: an invalid answer at a terminal still
-re-prompts, while Ctrl-D at such a prompt exits with the error instead
-of looping. bool and tristate symbols and choices already accept the
-default on an empty line, so they still take their defaults in a
-non-interactive build.
-
-Tested with int and hex symbols carrying such defaults: with empty
-stdin, the code without this change produces around 190MB of repeated
-prompts within two seconds, while with the change it exits 1 naming the
-symbol. Piped and interactive (pty) sessions still re-prompt on an
-invalid answer and then accept a valid one. A new string symbol with no
-default still takes the empty string at end of file, since any text is
-valid for a string.
-
-Signed-off-by: Simon Glass <sjg@chromium.org>
-Link: https://patch.msgid.link/20260714133545.3294648-1-sjg@chromium.org
-Signed-off-by: Nicolas Schier <nsc@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
-
-LLM Generated explanations, may be completely bogus:
-
-## Phase 1: Commit message forensics
-
-**Step 1.1 — Subject**
-Record: **[kconfig]** **[abort]** stop `conf_string()` from looping
-forever when stdin hits EOF.
-
-**Step 1.2 — Tags**
-Record:
-- `Signed-off-by: Simon Glass <sjg@chromium.org>` (author)
-- `Link:
-  https://patch.msgid.link/20260714133545.3294648-1-sjg@chromium.org`
-- `Signed-off-by: Nicolas Schier <nsc@kernel.org>` (kbuild maintainer,
-  applied)
-- No `Fixes:`, `Cc: stable`, `Reported-by`, `Tested-by`, `Reviewed-by`,
-  or `Acked-by` (absence of `Fixes:`/`Cc: stable` is expected for this
-  review)
-- Pipeline `Signed-off-by: Sasha Levin` / `[Upstream commit …]` ignored
-  per instructions
-
-**Step 1.3 — Body**
-Record:
-- **Bug:** non-interactive `make oldconfig` / `syncconfig` on a **new
-  int or hex** symbol whose default fails `sym_string_valid()`;
-  `fgets()` returns NULL at EOF; the value is never set; `while (1)` re-
-  prompts.
-- **Symptom:** endless loop; output grows until the host OOMs (~190MB of
-  repeated prompts in two seconds without the fix).
-- **Root cause:** broken Kconfig default (e.g. `int` defaulting to a
-  `hex` symbol whose text is `0xff`). `menu_validate_number()` accepts
-  any int/hex symbol, so there is no parse-time warning for the cross-
-  type case. A symbol with **no** default does not loop:
-  `sym_calc_value()` falls back to `0`, which is valid.
-- **Failure mode:** host-side hang + unbounded memory/log growth during
-  config/build, not a runtime kernel oops.
-- **Versions:** none named; the loop is in `conf_string()`, which has
-  been in this form since the git import.
-
-**Step 1.4 — Hidden bug fix?**
-Record: **No disguise.** This is an explicit infinite-loop / OOM abort.
-Not cleanup or a feature.
-
----
-
-## Phase 2: Diff analysis
-
-**Step 2.1 — Inventory**
-Record:
-- File: `scripts/kconfig/conf.c` only (`+17` / `-0` in the committed
-  form)
-- Function: `conf_string()`
-- Scope: single-function, surgical
-
-**Step 2.2 — Flow**
-Record: After `sym_set_string_value()` fails, the loop used to retry
-forever. After the change, if `feof(stdin)` it prints `error: no value
-for new symbol '%s' at end of input` and `exit(1)`. Interactive invalid
-input still re-prompts (`feof` is false until a real EOF). Ctrl-D now
-exits instead of spinning.
-
-**Step 2.3 — Bug mechanism**
-Record: **Logic / hang.** Host `while (1)` with no EOF termination. Not
-UAF, leak, race, or kernel memory unsafety.
-
-Verified in this tree:
-
-```77:161:scripts/kconfig/conf.c
-static void xfgets(char *str, int size, FILE *in)
-{
-        if (!fgets(str, size, in))
-                fprintf(stderr, "\nError in reading or end of file.\n");
-        if (!tty_stdio)
-                printf("%s", str);
-}
-// ...
-static int conf_string(struct menu *menu)
-{
-        // ...
-        while (1) {
-                // prompt + conf_askvalue() -> xfgets(stdin)
-                if (def && sym_set_string_value(sym, def))
-                        return 0;
-                // no feof() check — loops forever
-        }
-}
-```
-
-`conf_askvalue()` pre-sets `line[0] = '\n'`. On EOF, `fgets()` fails,
-`line` stays `"\n"`, the `case '\n'` path keeps the invalid default,
-`sym_set_string_value()` fails (`sym_string_within_range()` →
-`sym_string_valid()`), and the loop repeats. `xfgets()` also reprints
-the buffer when stdin is not a tty, which is why logs explode.
-
-`menu_validate_number()` in `scripts/kconfig/menu.c` accepts any
-`S_INT`/`S_HEX` symbol, matching the commit’s “no parse-time warning”
-claim. `sym_string_valid()` for `S_INT` rejects a leading `0x` form
-(`0xff` is not a valid int).
-
-**Step 2.4 — Fix quality**
-Record: **Obviously correct and minimal.** `feof(stdin)` after a failed
-set is the right abort. `exit(1)` matches other fatal kconfig paths in
-this file. Regression risk is **low**: valid defaults still apply on
-empty/EOF input; bool/tristate/choice are unchanged; strings still
-accept any text. Remaining gap (not a regression): a non-EOF `fgets`
-error (`ferror` without `feof`) would still loop — pre-existing.
-
----
-
-## Phase 3: Git history
-
-**Step 3.1 — Blame**
-Record: The `while (1)` / `sym_set_string_value` loop in `conf_string()`
-is from **`1da177e4c3f41` (Linux-2.6.12-rc2, 2005)**. It is not new
-code. This tree already has a related robustness backport in the same
-file: `35d8e7e7da7a6` (`kconfig: fix potential NULL pointer dereference
-in conf_askvalue`).
-
-**Step 3.2 — Fixes: tag**
-Record: **None.** Bug is ancient, not tied to a later introducing
-commit.
-
-**Step 3.3 — File history**
-Record: Recent `scripts/kconfig/conf.c` work in this tree is small
-robustness/build fixes, not a refactor of `conf_string()`. No
-prerequisite series. Standalone.
-
-**Step 3.4 — Author**
-Record: Simon Glass (Chromium). No prior `scripts/kconfig/` commits in
-**this** 5.10 history. Applied by kbuild maintainer Nicolas Schier.
-
-**Step 3.5 — Dependencies**
-Record: **None.** Uses existing `feof`, `fprintf`, `exit`, `sym->name`.
-`conf_string()` already prints `sym->name` unconditionally. **Can apply
-standalone.**
-
-`git merge-base --is-ancestor f915149f5cfbd0d4406ec0b0f57b1d2c8685ae55
-HEAD` → **not an ancestor** (not in this tree yet). Object exists in the
-repo but is not on `pending-5.10`.
-
----
-
-## Phase 4: Mailing list / external
-
-**Step 4.1 — Original discussion**
-Record:
-- Lore/msgid:
-  `https://patch.msgid.link/20260714133545.3294648-1-sjg@chromium.org`
-- `b4 dig -c f915149f5cfbd0d4406ec0b0f57b1d2c8685ae55` matched by patch-
-  id
-- `b4 dig -a`: **v1 only** (no v2/v3)
-- Thread: 2 messages — patch + maintainer apply
-- Nicolas Schier: “Applied to kbuild/linux.git (kbuild-next-unstable)”
-  (`https://git.kernel.org/kbuild/c/7b406f92`)
-- **No NAK**, no requested changes, no reviewer `Cc: stable`
-
-**Step 4.2 — Recipients (`b4 dig -w`)**
-Record: Simon Glass; LKML; **Nathan Chancellor**; **Nicolas Schier**;
-Xingjing Deng; **linux-kbuild**. Right kbuild maintainers were on the
-patch.
-
-**Step 4.3 — Bug report**
-Record: No syzbot/bugzilla. Author describes a reproducible host hang
-and measured 190MB/2s growth. Chromium kconfig/oldconfig is a realistic
-LTS-style workload.
-
-**Step 4.4 — Series**
-Record: **Standalone 1/1.** No sibling patches required.
-
-**Step 4.5 — Stable list**
-Record: **No stable-list discussion found** (lore.kernel.org HTTP 403
-via WebFetch; web search of `lore.kernel.org/stable` did not hit this
-subject). Not treated as a negative.
-
-No revert/follow-up found in search after the apply note.
-
----
-
-## Phase 5: Semantic / call graph
-
-**Step 5.1 — Functions**
-Record: **`conf_string()`** only.
-
-**Step 5.2 — Callers**
-Record: In `scripts/kconfig/conf.c`, `conf()` calls `conf_string()` for
-`S_INT` / `S_HEX` / `S_STRING`. `check_conf()` (oldconfig/syncconfig
-restart loop at `conf.c:687-690`) calls `conf()`. `nconf.c`/`mconf.c`
-have **separate** `conf_string()` implementations; this patch does not
-touch those (ncurses/menuconfig UI).
-
-**Step 5.3 — Callees**
-Record: `conf_askvalue()` → `xfgets()` → `fgets(stdin)`;
-`sym_get_string_value()`; `sym_set_string_value()` →
-`sym_string_within_range()` → `sym_string_valid()`.
-
-**Step 5.4 — Reachability**
-Record: **Yes, from a normal kernel build.** `Makefile` includes
-`auto.conf.cmd` and runs **`syncconfig`** when Kconfig changes
-(`Makefile` ~706–732). `oldconfig`/`syncconfig` are everyday for CI and
-distro builds. Unprivileged userspace syscalls are irrelevant; this is
-**host kconfig**, triggered by `make`.
-
-**Step 5.5 — Similar patterns**
-Record: This tree already backported other kconfig infinite-loop fixes,
-e.g. `87ddba29e72be` (macro expand at EOF) and `cc1956f8b278d` (`nconf`
-endless search). Same class of host hang.
-
----
-
-## Phase 6: This tree (5.10.270 / `pending-5.10`)
-
-**Step 6.1 — Buggy code present?**
-Record: **Yes.** `scripts/kconfig/conf.c` `conf_string()` lines 130–161:
-same `while (1)` without `feof()`. Introduced in 2.6.12-rc2; present for
-the entire 5.10 lifetime. `feof(stdin)` is **not** in this file today.
-
-**Step 6.2 — Backport difficulty**
-Record: **Clean apply.** Context around `if (def &&
-sym_set_string_value(sym, def)) return 0;` matches; only line numbers
-differ (~158 here vs ~348 upstream).
-
-**Step 6.3 — Alternate fix already here?**
-Record: **No.** Grep for `feof(stdin)` and `no value for new symbol` in
-`scripts/kconfig` is empty. The `conf_askvalue` NULL-`def` fix is
-adjacent but does not stop the EOF loop.
-
----
-
-## Phase 7: Subsystem context
-
-**Step 7.1**
-Record: **kbuild/kconfig** (`scripts/kconfig/`). **IMPORTANT** for
-anyone who **builds** this kernel (distros, CI, ChromeOS-style LTS,
-embedded). Not a runtime CORE path (mm/net/fs).
-
-**Step 7.2**
-Record: kconfig in this tree is mature; changes are occasional
-robustness backports, not active redesign. Long-lived bug, not a last-
-month feature.
-
----
-
-## Phase 8: Impact and risk
-
-**Step 8.1 — Who**
-Record: **Config/build host users** of this 5.10 tree (oldconfig,
-syncconfig, automatic `make` syncconfig). Not running-system users.
-Distros and out-of-tree Kconfig (ChromeOS, vendor) are in the blast
-radius when they add int/hex symbols.
-
-**Step 8.2 — Trigger**
-Record: New visible int/hex symbol whose **default string fails
-validation**, plus **EOF on stdin** (non-interactive
-oldconfig/syncconfig, typical CI). Not every boot. Unprivileged kernel
-syscall: no. **Kconfig authors and kernel builders:** yes. Author: these
-mistakes “creep in from time to time.”
-
-**Step 8.3 — Severity**
-Record: Host **infinite loop + unbounded memory/log growth** (OOM of
-`conf`, hung `make`). **HIGH** for the build, not a kernel panic.
-Vanilla 5.10 Kconfig may be clean **today**; the bug is in the **tool**,
-so the next bad default in a stable/Kconfig backport turns a warning-
-shaped mistake into a CI disk/memory incident.
-
-**Step 8.4 — Risk vs benefit**
-Record: **Benefit: high for builders** (fail fast, name the symbol).
-**Risk: very low** (~8 lines of real code + comment, error path only, no
-kernel ABI). Ratio favors backport.
-
----
-
-## Phase 9: Synthesis
-
-**For**
-- Real, demonstrated infinite loop and memory blow-up in `conf_string()`
-- Triggered by `oldconfig`/`syncconfig`, including automatic build-time
-  `syncconfig`
-- Buggy loop exists in this 5.10 tree since 2.6.12
-- Tiny, obviously correct, maintainer-applied, author-tested
-- Matches the **build-fix** exception (prevents a hung/OOM configurator)
-- This tree already takes kconfig hang/crash backports, including in the
-  same file
-
-**Against**
-- Host tool, not a runtime kernel crash
-- Needs a **broken Kconfig default**, not a typical `.config`
-- No `Reported-by` / syzbot / stable nomination
-- No evidence of a currently broken in-tree 5.10 symbol (not searched
-  exhaustively across all Kconfig files)
-
-**Unresolved**
-- Could not HTTP-fetch lore.kernel.org (403); thread recovered via `b4
-  mbox`
-- Did not prove a current in-tree 5.10 Kconfig that trips
-  `sym_string_valid()`; the tool bug is still present
-
-**Stable rules**
-1. Obviously correct and tested — **PASS** (v1 applied as-is; author
-   tested empty/piped/pty)
-2. Real bug affecting users — **PASS** (build hang/OOM; Chromium author)
-3. Important (hang/OOM of configurator during `make`) — **PASS**
-4. Small and contained — **PASS** (one function, +17)
-5. No new features/APIs — **PASS**
-6. Applies to this tree — **PASS** (clean)
-
-**Exception:** build fix (stop compilation/config hang).
-
-The patch should be backported to **this** 5.10.270 tree: the loop is
-here, the fix is surgical, and a silent spin that fills logs until OOM
-is exactly what stable builders cannot afford when a later Kconfig
-default is wrong.
-
-Verification:
-- [Phase 1] Tags: Glass SOB, msgid link, Schier SOB; no Fixes/Reported-
-  by/Cc:stable
-- [Phase 2] `conf_string()` in this tree: `while (1)` with no `feof`;
-  `xfgets` prints on EOF; `sym_string_valid(S_INT)` rejects `0xff`;
-  `menu_validate_number()` accepts any int/hex
-- [Phase 3] Blame: `1da177e4c3f41`; `git merge-base --is-ancestor
-  f915149f5cfbd0d4406ec0b0f57b1d2c8685ae55 HEAD` is false
-- [Phase 3] Same-file backport already here: `35d8e7e7da7a6`
-  conf_askvalue NULL def
-- [Phase 4] `b4 dig`/`b4 mbox`: v1 only; Schier applied to kbuild-next-
-  unstable; no NAK
-- [Phase 4] Recipients: Nathan Chancellor, Nicolas Schier, linux-kbuild
-- [Phase 5] Caller: `conf()` → `conf_string()`; Makefile runs
-  `syncconfig`
-- [Phase 6] `git describe HEAD` / `make kernelversion`: **5.10.270**
-  `pending-5.10`; buggy code at `conf.c:130-161`
-- [Phase 6] Apply context matches; no existing `feof(stdin)` in kconfig
-- [Phase 8] Failure: host infinite loop + unbounded output; HIGH for
-  builds
-- UNVERIFIED: live lore.kernel.org HTML (403); whether any current 5.10
-  Kconfig default already fails `sym_string_valid()`
-
-**YES**
-
- scripts/kconfig/conf.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
-
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index c368bec5ab601..fe8ba09b00391 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -348,6 +348,23 @@ static int conf_string(struct menu *menu)
- 		}
- 		if (def && sym_set_string_value(sym, def))
- 			return 0;
-+
-+		/*
-+		 * A new int or hex symbol whose default fails validation
-+		 * cannot be set from an empty answer. When standard input is
-+		 * exhausted, as it is for a non-interactive oldconfig or
-+		 * syncconfig, re-asking would loop forever and grow the output
-+		 * until it exhausts memory. Stop with an error that names the
-+		 * symbol instead. String symbols accept any text, and bool and
-+		 * tristate symbols (conf_sym()) and choices (conf_choice())
-+		 * accept the default on an empty line, so they are unaffected.
-+		 */
-+		if (feof(stdin)) {
-+			fprintf(stderr,
-+				"\nerror: no value for new symbol '%s' at end of input\n",
-+				sym->name);
-+			exit(1);
-+		}
- 	}
- }
- 
--- 
-2.53.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LOAP265MB8560:EE_|LO4P265MB6252:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5d7b8ba0-0483-4e9f-defd-08df2df5648a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|10070799003|376014|7416014|23010399003|1800799024|366016|6133799003|22082099003|18002099003|10067099003|56012099006|261009223027099003;
+X-Microsoft-Antispam-Message-Info:
+	OYEzN7B+fIphDFuMDRvVy4BDDFyEwWoGN92tl1r5FN1z4WI69W5OTuVPy2ugogbR5c3DtFWauiiXIEtQ0C9mF2wVx8XBCrb6pjkEqEQoxJM42wymVPUsvlks1bCnR0wSwwnz4LnnWxSELYIId8rskjAz8GWPUCMLQL/R3QqG8lB6j765j8C5f/Pjr4TmcrzGvdWSEiiRDm0r6rqfMB4DI6mYJzgyUDAUw3DqwWCVszPgIGJDLnyh6eqMgFJhOLkji3CKx/2zIzXz4GciEX9U/43aJPX9miN6v2XwJTE43wlZ362lEO0FtRkBgx2hlAHhzkVNqyF8D1hIlEBb/8ot6abRNHk+fIUlWMvnwGfeCJazkv5DToppFMI46zfR00SgxOoo63aSttF3bd+5bT5a3h8S/OLT9T5uXBpJQzK0C3cDXIbgL2oVz6CM6bxKdIMJVh11RhsNQ0BttsJToPVGPdVGw4Na03Wo15tOBIZsrhpYRbprpZUwNp+n2JTLF9n5eiq8l0WJ8xDc7712FpeFpiOalrdJhCHBEae5xDlhZYjLtaYJV9i4ED06lkDUxFMxH504F7WbRzKafkXV59D+w6cULaTs2aK7k35DvJKtYTbMW91tVdLD6YWONUrhiAYL7qb2xNsWrDn7twap0Lc4fFWh0MJHHtro9B07UCpedJg=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOAP265MB8560.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(376014)(7416014)(23010399003)(1800799024)(366016)(6133799003)(22082099003)(18002099003)(10067099003)(56012099006)(261009223027099003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?MStBdm9WYVpxUVd2TDB1Vks4YitIL01vWkRLV0FmWUZraTNUSW81a01NZWNS?=
+ =?utf-8?B?Zm1mWkJPL2JZZVJYd1ArZTJKTXByUEVITXpiTUlSUDZCRXR2eEhyc0VPR0lO?=
+ =?utf-8?B?bVMvd2dvOXIwMTV0b1FNbEtxYmRWeW5uZmowak5NL3hVU1ZMV254N0FxUXpn?=
+ =?utf-8?B?N21rc1ZUaWJYeDZDa2t5eTAvMHBZSUZleWY2ZmF5RDdMRGtjdFRyL0lBMHZI?=
+ =?utf-8?B?T3BMZ2ZUbnVRNGpJUHZEdTNIbkpmakZBRkNlS0pqNytQTWpyNUdNRmtSVzZQ?=
+ =?utf-8?B?UCtuZlZPZDZMeFlMcWY5R3dCNjFLN202SG83eVkxOTVIUysvTTZYYTUwcStR?=
+ =?utf-8?B?VTZ2SjhxUlpzZkdkU2FuZGdKNVdrU0hNNjZ6RGtGOEpZSzQwd3Ntek9hdUxs?=
+ =?utf-8?B?OE1jSWVNaUJPbk0reGJJTkxLM2U1Y0YwSzNQRkV5NTVNZU9EQlFaeGZHVDln?=
+ =?utf-8?B?dVRXRnFyeC9jK3dMbW13UElRV2N0SlZIOG4xOGZUUktJU3BtSWk3V09jNXV0?=
+ =?utf-8?B?Wk1jSHRXYjFTdStJNFdJeFFMMU1hL0JRcC94eVd1SDB0SDl2OGFTTVdWeXZU?=
+ =?utf-8?B?NENIc2c3Q1BqQjlwRXFwWmRuZEYxNTNwcC84WWMwWnEvZUFFWFM3eVAwNnNW?=
+ =?utf-8?B?eldZdDB4eWhjYXlISW1NMExoSVVCa2VkYUZ1RjhUUERtWFZZZis0YkpyQlQ2?=
+ =?utf-8?B?NXhVWW1NQ3B0NFp0SGlUcTF4NFJsa2l5dmpXZ3pFWGxWY1AzOXl0WkluMzdH?=
+ =?utf-8?B?eHoxL3NNdnQ5dkV2dDBBOHQ4TFpKd3QwREF5Y3I0ek84OU1HL1NFVE95Qnpv?=
+ =?utf-8?B?NXVmUUZTV2UwSWM1SDJuSHVqa1gzWm10NDNHUHRwMUlCblZPNERtUElnY2l3?=
+ =?utf-8?B?V0g3b2FZMnhka01RZDhqYmtBM3FrenNaL055RnFydlFzMmtFcXZQdUZEM0FN?=
+ =?utf-8?B?b2lTRVQ0WllJTGFnV20yY2NMZFhrbHZjd1JnblIzV0NoV2lJNWwrOW1lNGo5?=
+ =?utf-8?B?VGNBbzRJdHYvSEpaUmRCMXZzRXpzdld4UzVaQkRuVGZ3SHBPZmNMQ3FrRzla?=
+ =?utf-8?B?a3BTRkt0ZEVvVVhSK1VDTXFXN2pZbzBVMG9NMUFzZXVDUWxJbFp6NU5ieVVN?=
+ =?utf-8?B?UEFOTkcxRkU2RW1vNER1cWczcGd0S1I3SlhmSHk5WHFESlNVd2F1VHI3d3pu?=
+ =?utf-8?B?VVNZQzFGMzl1MkVDOEVqcjJYcUZ0WXJ2M2tIS1ozdFp0d1JHd3g0K1preVJT?=
+ =?utf-8?B?Z1Q1a0JFbmVVTDBVNDN6ajZyREJtSnVCVW50ckxCdWtGNnl4VkRySU9hRWZl?=
+ =?utf-8?B?UWc4a0k4N0ZLMFBUdDVTKzNObGpuR3VwK1dSMSt1MVVERE9hUEhIVDZ0azRM?=
+ =?utf-8?B?aHBEWjdLRnM2YXJtaXFvTjZiZnZPem1TSW93aXhuSktnZGlJM0YySXg2b0o3?=
+ =?utf-8?B?cTJBcUxSMmdvaWFmekxyNFNCOE1VYUZZRXRUcGpoeFZlc0o5Wk5uTXBXNCtF?=
+ =?utf-8?B?cW9IMjJGemFKQ0wzUmpENkpkYnYrckZjdE02Qnp0NklkZkZ5SFFxMWtlMDIv?=
+ =?utf-8?B?RFlKNUVybDJHbDJyRjg5UFhsWm5FQ2ZGNHk3Y0Z5OGhyWk1DSFhWbGxkMzMy?=
+ =?utf-8?B?VU5lWmdoU2VlVTc5STVjR3VpcWl2eUFoMEFhc05WMThCenptK0U5aWhZMW5p?=
+ =?utf-8?B?bkZyNWRDOVU0Y1l2cm1qQjZwTkR3YnZiSGNYVG5wL2N2TEhOdDVKUUVpZHVX?=
+ =?utf-8?B?Y1NZMTZ2UUcrK01PMk94Q1ZCT3FES21OYm9xY3BtbGpWc3NqVzBPVW9lbTRo?=
+ =?utf-8?B?YlI3VVl5TzlZQmR5TzhUK00rNDkxYi9Tc09zbGJmTFNUQS9acnFFT3k3ZlFY?=
+ =?utf-8?B?aWFkWGFPYVZkRXdvSFAzK2xlZjRYczlmVHpZUjlma3p5WFZqM2xUY3NwakRu?=
+ =?utf-8?B?eVllL3RIL3RyM1NOSUNTOFFuVkZvUzFNVDNTRXhrMGVnSkxuUXFqdWhqOXZX?=
+ =?utf-8?B?aldIRERDSFJhZ0lsMS9JT0xNMG55S2kzcTVYcUpZK2pHVUUwTGpvRWFCdUZK?=
+ =?utf-8?B?OGVpMmEwYjFMTHZvVGpzM3dId3owakF5Q2Y4Zks1bVYxZm8yS2dXd3VJUE5h?=
+ =?utf-8?B?MTg2ZmJtcERLRy83K0U0c09wVVBFOXQ1NXQ1NU1Hd2lBbm1kR0FYbG1adzFn?=
+ =?utf-8?B?ei9MaFcvYWMwaFlGcFJVVGxIUHJVZ05vMFdMQVRhczNvWUNKcFNtY3JKa3lC?=
+ =?utf-8?B?bUYvYzRhN3JBaU5wdXZtWnI3bzEvdE14alFiWGpNcTl6SkFLTnROSVdiWjhD?=
+ =?utf-8?B?Z3Jhb2UvQXM0SXQ4KzdVVnVjUmNoMm9XUXJIRldldHZOcEpKZS9Hdz09?=
+X-OriginatorOrg: garyguo.net
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5d7b8ba0-0483-4e9f-defd-08df2df5648a
+X-MS-Exchange-CrossTenant-AuthSource: LOAP265MB8560.GBRP265.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2026 15:26:48.8171
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: YCEQnNdAW7F1WWyf8l1Uh5+HcZibVa05mQyl60zmcMYi89poGO1394GYJAwvO9UrZ+5VN5jZH7f2yqUtjBig4g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO4P265MB6252
+
+On Thu Oct 15, 2026 at 3:56 PM BST, Marco Elver wrote:
+> Rust supports ThreadSanitizer instrumentation via LLVM, which is what
+> KCSAN relies on; however, Rust code is not currently instrumented.
+>=20
+> Pass -Zsanitizer=3Dthread and the same TSan backend options used for C
+> code to rustc. Wire up KCSAN_SANITIZE in scripts/Makefile.lib for parity
+> with C (though rustc currently rejects linking crates with mismatched
+> instrumentation).
+>=20
+> rustc only accepts -Zsanitizer=3Dthread for targets that declare support
+> for it. Of the targets used by the kernel, this is only possible for the
+> generated x86_64 target specification, so restrict instrumentation of
+> Rust code to x86_64 for now via HAVE_KCSAN_RUSTC. On other architectures
+> Rust code remains uninstrumented as before.
+>=20
+> All TSan options used are supported by the LLVM versions of the minimum
+> supported rustc, so no rustc-option checks are needed (they would also
+> fail, because x86_64-unknown-none used for option checks does not
+> support -Zsanitizer=3Dthread).
+>=20
+> Unlike Clang and GCC, an equivalent to -fno-optimize-sibling-calls is
+> omitted for Rust because rustc provides no corresponding option. While
+> disabling tail-call optimizations helps preserve complete stacks traces
+> in reports, it is optional and not required for KCSAN to function.
+>=20
+> With this enabled we can detect data races in kernel Rust code and
+> between Rust and C code.
+>=20
+> Acked-by: Miguel Ojeda <ojeda@kernel.org>
+> Acked-by: Boqun Feng <boqun@kernel.org>
+> Signed-off-by: Marco Elver <elver@google.com>
+
+Acked-by: Gary Guo <gary@garyguo.net>
+
+> ---
+> v2:
+> * Add note on -fno-optimize-sibling-calls to commit message.
+> ---
+>  Documentation/dev-tools/kcsan.rst |  7 +++++++
+>  lib/Kconfig.kcsan                 |  7 +++++++
+>  scripts/Makefile.kcsan            | 13 +++++++++++++
+>  scripts/Makefile.lib              |  3 +++
+>  scripts/generate_rust_target.rs   |  2 +-
+>  5 files changed, 31 insertions(+), 1 deletion(-)
 
