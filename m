@@ -1,63 +1,63 @@
-Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
+Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 176AA1A9F83
-	for <linux-kbuild@vger.kernel.org>; Mon, 19 Oct 2026 00:03:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0F2239FCE
+	for <linux-kbuild@vger.kernel.org>; Mon, 19 Oct 2026 00:03:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792368211; cv=none; b=fgzQbcmaCukS4RMzS1w8Gb1eoh3otREFVIrIO3uXADQBKlIMLhoEAUchERWPRkiPBjxPaPRuVvdEEolnW+3dX9KL86A2bhmNPuEwU9xC9SHLaSw76+OykhkT9Me3jfu3uAwJA/Yg0uq482muDKPHTMa2NzuyD2EdTOHmOK3KeJw=
+	t=1792368218; cv=none; b=dmVN5B+k1qaVQLK8WkrJiYD5SGtU4/ScdTsw6CSaNy1UrAL8RL6Preg7PAVnpR9eqPyQE3zYbhvQdKTG8Z86B4lYcpzGsi7NCihptpKBmdv8wAFof/l/c6bHhflYKW4qxznn1RTyFTsyCArF0QicxzBMchmIVWiuoyA3V2KLzcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792368211; c=relaxed/simple;
-	bh=2JKcgyL5MZsa1atFWKqaDkgVvI6MNsCv8edchhencJw=;
+	s=arc-20240116; t=1792368218; c=relaxed/simple;
+	bh=73uWpbvEDBoACUq7Odhn9clI0Trz49FOBBXK3ymxwTw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qs7kEoa1c8LFjXq+HUEHmSc55M+npjuoHJ9ltCSRzOdb2hmoyf2Hpi5Mgmicf86yNEB5qgldN7bYVT9S7hUwxUVGNEPYIMzgz25ol+GlXSQxeIeOfC6M4lbiuS+obV9TLERxcAxT8/nr2Wa9AxH2OlgeYjQhExrHMhKHkdw7uLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GcrJ+XoV; arc=none smtp.client-ip=209.85.167.175
+	 MIME-Version; b=JjFTx06ideFlr63t9c96MgMV0Sh36SecXEbs5M22kSc8+bRGo4Tfb74cP1CxnvJV4QRmzTnhmwAHYZiiWSqWSuY56qvFlmHt8bssQPYhXxgdw4qJVgaBGyIcPY4GVLB1hsk+6hFArW87cvyOT71Gn/FMlkEf7Ic7k7tx1+NCOWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ifW7WriX; arc=none smtp.client-ip=209.85.160.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GcrJ+XoV"
-Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-4f14642adb4so662294b6e.1
-        for <linux-kbuild@vger.kernel.org>; Sun, 18 Oct 2026 17:03:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ifW7WriX"
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-48ed0b68895so1042931fac.1
+        for <linux-kbuild@vger.kernel.org>; Sun, 18 Oct 2026 17:03:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792368209; x=1792973009; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1792368215; x=1792973015; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=r1v4MX1Kl0eeFBdztaswBZeFOsomX3w44ItcTRymTJw=;
-        b=GcrJ+XoVXDBIJG6PPYXGlrjRsr1WI2ove1hzD5PJ8tUkZRFqD+9yHWHirfQAG9tYaU
-         U4lGSQ7u7eYOpolKsuL43nxKziGxvNJs29c+x+Babcu5yRCDM5RH3zCPNMIDUOK26eDS
-         FFwOgXphCCwU7vpJVuBXVo4CgZ6mPXWVyCAp868nwyou1+oMF0rCbZbYRXIKY1Rsp6YE
-         NheQ/Hq5TOP8RGHDVVXGMcmxeAiIKzp9r5KakS4NzkIqKTElYpHc2IbyUea0QWxMv0B0
-         cYMkAi5c8hArTMBWy5LizHNWTlAbI/lWoKL4MZpf8IHcVTT/2C3C96bzKWbvZa6L7VPi
-         xdOQ==
+        bh=oLbANC7yHOqWDkO1YOnNbqYc7ATTfZdChVSztjrd7+0=;
+        b=ifW7WriXNW1MOzsfsQ34482aLLw+JMTmhqHfe1P3OdP1kzAN+moFN/k+RnLtFxEqBZ
+         othkczpmDhi6w7+KqMYRnfkd0LGv7dgg48NqWN7CHq1l6NOWtAWzyBY3LO7xyvD/pBsl
+         cMh5xN2Kf2kDgtYfcmCkBGWl1yD0Gh7Dbiv075uswt3xRYi5JngR+NF9+XpOq6EpbcJe
+         tI+BJ6/X5ISL+hYXjAqR97ZMr3oNsaw7dHmG46wXzOmc4GK2lvwL8xsOz4oNDlqFhozi
+         qwYc7z18WlZsUtUVKqkHASBDNIOB7RIrKDfdo6aKJYnBUfuW6P/m4XBinR8aHG1wZTOr
+         jbRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792368209; x=1792973009;
+        d=1e100.net; s=20260707; t=1792368215; x=1792973015;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=r1v4MX1Kl0eeFBdztaswBZeFOsomX3w44ItcTRymTJw=;
-        b=hMCn33vv9NdfrzLGScfDSZ61VJVMFebYj2ZgCVz58aj8rz9ZsT2hbmm3+pfUGJ1M5w
-         Z9T2hH7jpuWwUMql4OPmKgBmdSykjpFaPeyMM5sWCnH8TvVxZw8zxlb5qhlJodFJRdYB
-         OuS3fFeDT2biBS3vMG6GeQaRokMHhDTPNgM6rRW1G/hsZp5N9q+sgX336HlKAT6aOscY
-         chAa6xmlbVsR8of4BPYOEND7zxeWVT+tokhaxBamBAzdtYAQlcng46R1Jte3fI2zd/X3
-         rQ+f+yghRI5jhJHkxYjcBmgHtZggZ4kLJcyaBke8dS2oC1Pxsa/lf2EDWvUqoxyPJ1hB
-         +MWQ==
-X-Gm-Message-State: AFq9FYLLGXzEeTdM0rPn5IsLVE1jjREFZ+51sif3MrkbI9f13W9pnX18
-	KTjRZ5woZ1yz2xpv+onfDraTlAglItUToZO7lH7zSQE1EC6DObE9avXk
-X-Gm-Gg: AYBFou3yF79hk88XFMKS+1yTKPWsMH3akLkyiymEhOWs1v7NUN0/epbr1iYwd+JeDhZ
-	vV0SyBp0ChES7lKv7n+lwm6xKtM6KI1FAmDbIi2AOZr0A/+OQUSZBPIVvTyLbN5pEy960sRW9hh
-	4+vnXnlgBXFBstVBUEb0T9T/E1rBPJearVzA2jsOwM60Y7vWF/84eddAkhwNIq63YRVzOaXs6Y2
-	EhzjeSOp0Alv0OF1kDUWIODndc/yfow6m9DdMg2ALUV8RMAXXnLoQwp2++ztsax2fS/f9JzqZiH
-	s1n1azySse2Y+uxnwCwZQKZpjR2gzQ4dxYztgGHXVNx5NJuY2fOW45VyDAiwBOV4RWiqpDSS8NN
-	jePtrBLhGdoRhA/3B5W0dXAIge2hlFfTmwHG/CL8rxOyZUSjNRDqlNApg4cTP0b3e/6l9ILb/ZV
-	e2nzsiNsRJFTSc15qugwjheOkz+j0yNHDpp8R5SEHMaxgzq9x/MomSlDhypyXNlXNqCrMfJKJI7
-	+JdwCgK3T1h
-X-Received: by 2002:a05:6808:4f6a:b0:539:4d53:170e with SMTP id 5614622812f47-53cd2592db5mr5858611b6e.43.1792368208894;
-        Sun, 18 Oct 2026 17:03:28 -0700 (PDT)
+        bh=oLbANC7yHOqWDkO1YOnNbqYc7ATTfZdChVSztjrd7+0=;
+        b=WPklcFT8Qhb7NXPcqBfEuJp0ZghPF80jprLcKVSlWus5ScFyshB3+Tq1UJhMNcGIj2
+         fyXLSUZAoL9Jwvrg/DOFcRrqN51nu8elPSx6sQXdI2NcJmUTZbUshJJsKV4xbiKrwuTw
+         GhOd8TYLzHEh4VVRGbsJUkxdrlDrWtKMRPJQyQad1K0QJyvbO58QEWb1H9Gz3ZEuTm3U
+         1P3QeHRjmDs8PyaU5sLSypMc7n+IISUJmMZTJn8EZLYqbWYbcoHuR5KNpnNJJGVIsvuU
+         RDQU1X6n8J7zLgeOGsbsCnzpuNw2T2Qnjgc+fWqIFJWhzxiRpaFtyoZ72VjCSevYWndj
+         e+0A==
+X-Gm-Message-State: AFq9FYKhb4yiJD3y5iEFdPbA48w5d+T+wdN/PO7sDeJ03nM5shNgIIpY
+	yghpFNaLs9NMZUY4aG5ZVL2nsXdHdtIaRnan+8jYkAD+XjPG4um+2QPDy7BRpQ==
+X-Gm-Gg: AYBFou3rryC1xmo6fmJQSfnWSXIyGpwhgPVyqxH8swEnplk5Cv6qWAImzNFEaEyeYcC
+	LOqc5v772Tr75irlh/HtX9wM8qc2j2PnXXv2Z5Vpt3bi4er4rcGdUf2Y9vWxZx4jVJIJ4PBrYnU
+	aV2tt/4xzChgcODA3gpQlLMGkTSGlqOGWBxZ7uqAwOKq8NPlNRBrpTJ3D8kBNNVVx8hP2MiBVOt
+	vPADu3QIz3aEuBQki9q18WiRplWMAFOtcmM6CxqGuW/5QKNb4GzuKJZynGe346GT/YbCpQ2uRvU
+	Odg8cAAJBonJtO1RToH0xXGHiFy2hxIuYsH+51p7su9nLLzkqKQViFe8TrYeOcQdxFV4vvr2r+I
+	a3uKP+/HufEVU0SZ6nMIhyWoLyk8BapF6GceKYS1F2Tms1wM+KjVzZUMJiJI3nryW6ZGx5O0uiQ
+	82p2j/1xYD3Em+7RUEPHIsN+KjKKX+u2w/3MqHK54ZY9YfqMKMbIpB4+IKK2qyr9Y8bdUCkpDx5
+	ryLarmhMDWx
+X-Received: by 2002:a05:6808:1917:b0:53a:e153:e8e6 with SMTP id 5614622812f47-53cd3bd3ff0mr4665731b6e.59.1792368214639;
+        Sun, 18 Oct 2026 17:03:34 -0700 (PDT)
 Received: from sheng2080.cmix.louisiana.edu ([130.70.15.5])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-5388d8ab165sm5811806b6e.11.2026.10.18.17.03.27
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-5388d8ab165sm5811806b6e.11.2026.10.18.17.03.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 Oct 2026 17:03:27 -0700 (PDT)
+        Sun, 18 Oct 2026 17:03:33 -0700 (PDT)
 From: Leizhen Zhang <lzsx618@gmail.com>
 To: nathan@kernel.org,
 	nsc@kernel.org
@@ -66,9 +66,9 @@ Cc: linux-kbuild@vger.kernel.org,
 	rostedt@goodmis.org,
 	ljs@kernel.org,
 	Leizhen Zhang <lzsx618@gmail.com>
-Subject: [PATCH 4/5] elf-parse: check the symbol table before walking it
-Date: Sun, 18 Oct 2026 19:02:17 -0500
-Message-Id: <20261019000218.3977398-5-lzsx618@gmail.com>
+Subject: [PATCH 5/5] elf-parse: bound symbol names by the string table
+Date: Sun, 18 Oct 2026 19:02:18 -0500
+Message-Id: <20261019000218.3977398-6-lzsx618@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20261019000218.3977398-1-lzsx618@gmail.com>
 References: <20261019000218.3977398-1-lzsx618@gmail.com>
@@ -80,43 +80,38 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-elf_open_ro() ends with
+elf_read_symbols() builds every name as
 
-	elf->nr_syms = shdr_size(elf->symtab) / shdr_entsize(elf->symtab);
+	const char *name = elf->strtab + sym_name(sym);
 
-on a section header taken from the file. A zero sh_entsize divides by
-zero, and an sh_size that runs past the end of the mapping produces a
-symbol count bounded by nothing: scripts/kallsyms-sysmap.c allocates
-nr_syms entries up front and then reads every one of them.
+st_name is a 32-bit field read from the file and nothing bounds it, so a
+single symbol can point the name anywhere, and sysmap_omits() then reads
+a string from there.
 
 Found by fuzzing the host ELF tools with mutated object files under
-ASan/UBSan. Both reproducers change one field of the symbol table's
-section header in an otherwise valid vmlinux:
+ASan/UBSan. Reproducer, setting only st_name of one object symbol in an
+otherwise valid vmlinux (symbol 2 of its symbol table here, the first
+one whose type makes the name be read):
 
-  sh_entsize = 0
-    ./kallsyms --sysmap=/dev/null t.elf
-    scripts/elf-parse.c:266:40: runtime error: division by zero
-      #0 in elf_open_ro scripts/elf-parse.c:266
+  ./kallsyms --sysmap=/dev/null t.elf
+  ERROR: AddressSanitizer: SEGV on unknown address 0x7f54e308c740
+    #0 in strncmp
+    #1 in string_starts_with scripts/kallsyms.h:15
+    #2 in sysmap_omits scripts/kallsyms-sysmap.c:104
 
-  sh_size = 0x7fffffff0000
-    ./kallsyms --sysmap=/dev/null t.elf
-    ERROR: AddressSanitizer: requested allocation size 0x7ffffffefff0
-    exceeds maximum supported size
-      #0 in malloc
-      #1 in xmalloc scripts/include/xalloc.h
-      #2 in elf_read_symbols scripts/kallsyms-sysmap.c:195
+Record the size of the string table in struct elf_file and check, in
+elf_open_ro(), that the table is inside the mapping and ends in a NUL.
+A name that starts inside such a table also ends inside it, so a single
+offset comparison is then enough, which elf_symbol_name() does; symbols
+whose name is out of range are skipped like the other uninteresting ones
+rather than failing the build, keeping the behaviour for every object a
+toolchain actually produces identical.
 
-Require an entry size that can hold a symbol of the file's class, and a
-table that lies inside the mapping. Both reproducers then print "symbol
-table out of range" and exit 1, while a vmlinux and a shared object are
-read unchanged.
-
-One UBSan report in this area is deliberately not addressed here: an
-unaligned sh_offset makes elf_symbol() form a misaligned Elf_Sym
-pointer, which the header's accessors then dereference. Rejecting it on
-alignment would also reject legitimate ELF32 objects, whose symbol
-tables need only 4-byte alignment while the Elf_Sym union requires 8, so
-that one needs the accessors to read unaligned instead of a check here.
+scripts/sorttable.c reads symbol names the same way from its own
+mapping, through elf_map() rather than elf_open_ro(). That path looks to
+have the same gap, but every input I built was rejected earlier for
+missing ORC tables, so I have no reproducer for it and have left it
+alone rather than guess.
 
 This code is only in linux-next, from the "kbuild: significantly speed
 up kernel builds" series, so there is no mainline commit to reference in
@@ -125,53 +120,97 @@ a Fixes tag.
 Assisted-by: LLM ASan UBSan
 Signed-off-by: Leizhen Zhang <lzsx618@gmail.com>
 ---
- scripts/elf-parse.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ scripts/elf-parse.c       | 21 ++++++++++++++++++---
+ scripts/elf-parse.h       | 14 ++++++++++++++
+ scripts/kallsyms-sysmap.c |  4 ++--
+ 3 files changed, 34 insertions(+), 5 deletions(-)
 
 diff --git a/scripts/elf-parse.c b/scripts/elf-parse.c
-index 39ac25ddf188..756843c433ee 100644
+index 756843c433ee..8083b9ec3477 100644
 --- a/scripts/elf-parse.c
 +++ b/scripts/elf-parse.c
-@@ -271,6 +271,26 @@ static bool elf_shnum_out_of_range(const struct elf_file *elf)
- 	return (elf->size - shoff) / elf->shentsize < elf->shnum;
- }
+@@ -300,7 +300,8 @@ static bool elf_symtab_out_of_range(const struct elf_file *elf)
+ int elf_open_ro(char const *fname, uint32_t types, struct elf_file *elf)
+ {
+ 	Elf_Ehdr *ehdr;
+-	Elf_Shdr *first;
++	Elf_Shdr *first, *strtab;
++	size_t stroff;
+ 	unsigned int shstrndx, i;
  
-+/*
-+ * True when the symbol table cannot be walked inside the mapping: an entry
-+ * size too small to hold a symbol divides by zero (or steps through the file
-+ * in the wrong units) below, and a table running past the end of the file is
-+ * read out of bounds -- its size also drives the allocation in the callers.
-+ */
-+static bool elf_symtab_out_of_range(const struct elf_file *elf)
-+{
-+	size_t offset = shdr_offset(elf->symtab);
-+	size_t size = shdr_size(elf->symtab);
-+	size_t entsize = shdr_entsize(elf->symtab);
-+	size_t minsize = elf_map_long_size(elf->base) == 4 ?
-+			 sizeof(Elf32_Sym) : sizeof(Elf64_Sym);
-+
-+	if (entsize < minsize)
-+		return true;
-+
-+	return offset > elf->size || elf->size - offset < size;
-+}
-+
- /*
-  * Open an ELF file and map it read-only, locating its section headers, section
-  * names and symbol table which are populated in the elf out parameter.
-@@ -324,6 +344,12 @@ int elf_open_ro(char const *fname, uint32_t types, struct elf_file *elf)
+ 	memset(elf, 0, sizeof(*elf));
+@@ -355,8 +356,22 @@ int elf_open_ro(char const *fname, uint32_t types, struct elf_file *elf)
+ 		elf_close(elf);
  		return -1;
  	}
- 
-+	if (elf_symtab_out_of_range(elf)) {
-+		fprintf(stderr, "%s: symbol table out of range\n", fname);
+-	elf->strtab = (const char *)elf->base +
+-		      shdr_offset(elf_section(elf, shdr_link(elf->symtab)));
++	strtab = elf_section(elf, shdr_link(elf->symtab));
++	stroff = shdr_offset(strtab);
++	elf->strtab_size = shdr_size(strtab);
++	elf->strtab = (const char *)elf->base + stroff;
++	/*
++	 * Symbol names are read by offset into this table, so it has to be
++	 * inside the mapping and has to end in a NUL for a name that starts
++	 * inside it to end inside it as well.
++	 */
++	if (stroff > elf->size || elf->size - stroff < elf->strtab_size ||
++	    !elf->strtab_size || elf->strtab[elf->strtab_size - 1]) {
++		fprintf(stderr, "%s: symbol string table out of range\n",
++			fname);
 +		elf_close(elf);
 +		return -1;
 +	}
+ 	elf->nr_syms = shdr_size(elf->symtab) / shdr_entsize(elf->symtab);
+ 
+ 	return 0;
+diff --git a/scripts/elf-parse.h b/scripts/elf-parse.h
+index c5ad754da254..548c80ead2bf 100644
+--- a/scripts/elf-parse.h
++++ b/scripts/elf-parse.h
+@@ -330,6 +330,7 @@ struct elf_file {
+ 	const char *shstrtab;
+ 	Elf_Shdr *symtab;
+ 	const char *strtab;
++	size_t strtab_size;
+ 	size_t nr_syms;
+ };
+ 
+@@ -356,4 +357,17 @@ static inline Elf_Sym *elf_symbol(const struct elf_file *elf, size_t index)
+ 			   index * shdr_entsize(elf->symtab));
+ }
+ 
++/*
++ * The name of a symbol, or NULL when st_name points outside the string table.
++ * elf_open_ro() has checked that the table is inside the mapping and ends in a
++ * NUL, so a name that starts inside it also ends inside it.
++ */
++static inline const char *elf_symbol_name(const struct elf_file *elf,
++					  Elf_Sym *sym)
++{
++	size_t offset = sym_name(sym);
 +
- 	if (shdr_link(elf->symtab) >= elf->shnum) {
- 		fprintf(stderr, "%s: symbol table has no string table\n", fname);
- 		elf_close(elf);
++	return offset < elf->strtab_size ? elf->strtab + offset : NULL;
++}
++
+ #endif /* _SCRIPTS_ELF_PARSE_H */
+diff --git a/scripts/kallsyms-sysmap.c b/scripts/kallsyms-sysmap.c
+index a482968eba51..efca13ab9dc3 100644
+--- a/scripts/kallsyms-sysmap.c
++++ b/scripts/kallsyms-sysmap.c
+@@ -198,10 +198,10 @@ static struct sysmap_symbol *elf_read_symbols(const struct elf_file *elf,
+ 
+ 	for (i = 1; i < elf->nr_syms; i++) {
+ 		Elf_Sym *sym = elf_symbol(elf, i);
+-		const char *name = elf->strtab + sym_name(sym);
++		const char *name = elf_symbol_name(elf, sym);
+ 		char type = elf_symbol_type(elf, sym);
+ 
+-		if (!type || sysmap_omits(name, type))
++		if (!name || !type || sysmap_omits(name, type))
+ 			continue;
+ 
+ 		syms[n].addr = sym_value(sym);
 -- 
 2.34.1
 
