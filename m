@@ -1,99 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.82.176
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792447154;
-	b=FRRJdzhFhDXUyaQDw9ksqOMHSogdoN0yO4xu+z9eschUcO6wQhIbFYdnbnFNUKx1UbqA
-	 nrEH4lPhS6f7HXJONNN/k5u0YVB/4smmAyFkqL8VkpM/tbwPu40X4WIx9VdCbM+cgux5q
-	 BQEyCiNyoGtkK6mrVxse6mE2FpFeDqEu1gXyWrPlGZzD5NxnedWKcPdl1zPjjxvNagX0x
-	 tifjmV7e3+wxWQTe3iuZH1Eacij8x7myHjk2iA68cHCFDHfW2ArNpHLj9W3V9Y9kt/Qg2
-	 lLpL1u2NG1d8Vkq1QySwIivaB6i2K/h0OLeDyT6SmRtllXiJFZLmqo2PuI0Ke601edg==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792447154;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type;
-	bh=jctDokCQpU+5f4McBmCcNrit0g75bLIuZ0vnR/79ocM=;
-	b=SVYgIvA2AaUaM4Qi/iagzRScyrjqGJxCyKbxE6FtP5nH3krgO81i7QUGmE8SNjVNv/YW
-	 3EmMXLfOiCmChyzlSO14WaqvkpKefvSaBo5qRgrwzTqfIfowKm3zBoIoTyhvVr78pv9l7
-	 Ccy3g/2MP4JvPe1C7LecHGZKJN8VlS5K2y+Fxe2yN6L+QyhFGfL/b0QlNAfvBs5X60chh
-	 GI50/iFkyXy2b+Zbu+gO4pKxRTxE3uraybOsUG2uJX29sVArjbb7A6m0DyvlCeuP3xlNT
-	 VvsQ0D4juPvOrR16wOb7qABnrVRAtsRXZ3WuxO3favH4xjI6HBpsGgLB1QR85/cwjjQ==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=tuJUcM+r;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.82.176
-Received: from mail-dy1-f176.google.com (mail-dy1-f176.google.com [74.125.82.176])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1792454622;
+	b=ZgSZ13AkK5CzPU/0VqWh2BOrItpL3Bm3GcfJFp6PrWQfN1rOUyafkCdA18BqmG+p3EkJ
+	 6GEzsIg3bCswD3S0e8mbJ9yb8mVub6XsIBMzv58i1jTxvPdP4JbH1ATF7jYafwyc4TkFB
+	 SIix6j6j0LhiL1K4+oP0XLQf9/tJnrNyqHVQhmYEVoe6it7iIMCQSJ/x3Ktf9+d2XTV37
+	 WbM+BbFZrtxV5ffuFuoWt95fig9aqlx4H1GmRPCj4zMb29BH41eNAel4Ayp+h0hTJWmlh
+	 TJPLExT2qB6LTkX+Jglw1xtJX6trwubmJ5CCzByzGC2M3c3as7MJ3Y4dqZ18Yqy2d7A==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792454622;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=6SsLYQjWIw+vK3TPQCCa6PglOGKXjO57kKJeDmoRvIM=;
+	b=vLoIbCCdZVMrsOUBoeXnQun5U2rnlTAsLHxBXsASlUKHyoJGFsogWLcDGw4nwW5IaL3K
+	 lzQRXdOYYw3olABSGJs/9bUtUtePYhEhTuCfEr0en2p2HaEG3CxOlzEbRp5zdBmrmw8MO
+	 jRPcYSqLa7g+Ba0y7aeUfHFvzsw9X6ufWxs5qyAKQLrrPxMNJXstIt9zUe6tmGE8St5xK
+	 Xyh1/+fv6yFY7918VTw9wyQGISRJfxijtd/ABsK9rsAOo6n3OxnUtRVKndQ5ILX+qKcv5
+	 RBAm9mT6hYdCrwzLRPTXtso6V/ONZIz8HM6wvBFJS5y5UCLW/j20NT8DRkAdlvfpYkQ==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Z1bARU2B;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABE20606A319
-	for <linux-kbuild@vger.kernel.org>; Mon, 19 Oct 2026 21:59:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org ABE20606A319
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 191B4606A31A
+	for <linux-kbuild@vger.kernel.org>; Tue, 20 Oct 2026 00:03:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=tuJUcM+r
-Received: by mail-dy1-f176.google.com with SMTP id 5a478bee46e88-3514b90bb89so6768948eec.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 19 Oct 2026 14:59:13 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1792447153; cv=none;
-        d=google.com; s=arc-20260327;
-        b=EDDPaMBQPLowbP/HmOSGaNVEuYaYa6NcDZMe12dWj4q58qd2pamrVPErKDmhd5S1SM
-         PyxnVC/vOb6A1o0HxdTIKpwdzE0BfzzlBUYfYpNzgYsm2T5tJ/VDyEDepToW024tQjEc
-         eciD27e1ZWL2cRxK9TDMzPuyVnJCjO3yKFQQg3+z3+GJXfQnWUZ/J89TqNCGg7V4iw9/
-         JWAX8QIcJX1VJ5Tqmc9XjqGz8Y29DZPm1GwRQgcwwMEJpNoJpyhv5LksJjMGGsddMAvi
-         +PJp1N2AKjAxGzNgOJuL79qopDs34U7F+fEwZbhunUFMFOSuxH8JMn86doTgmggVNWMe
-         DQqw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=jctDokCQpU+5f4McBmCcNrit0g75bLIuZ0vnR/79ocM=;
-        fh=E3KMQXevB1ss5zkrdWz85ZzZQz89HYhUJrb3OITmbN8=;
-        b=kcOvdTMn5z+JbEbBdTll9oE2L1izpDE1f7rIXmIdV0qniXugVbNa0IDW/VMVlkYyqt
-         MmcbeIlHy4ahwH5xxqITa/YS7Sg0LyEv7T3nenjoUBqEr9vtoJao5/fU4QS7xCDlOsIP
-         76ElcxHI7v0mDAmWD3nKA+WcjERI76IjjQ4XjjwVTsa6/zhm/hAW66650x94Bjl/dvkp
-         w0Vtn8ORsBHX20Ms3BK7Kak+Qsmpsz0tRHVU7Zw3s38UvxHzDBgzrj3TRh09nWiP4mg7
-         dKy0zLpMpIBRKZNPMVCFbTfyc3gNhsFdW6Bwz3Ig3WPL0dArQOJuGz1qKx9EdKY+Z7yj
-         GPYg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1792447153; x=1793051953; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=jctDokCQpU+5f4McBmCcNrit0g75bLIuZ0vnR/79ocM=;
-        b=tuJUcM+rzbY1T3hPy151XGwtTm9pe5er0cE5XFCuBgpHlWmauyO44hNPXyaOBU2k5A
-         mmnJCszVpsv0Pq9bmMtXp97kD/V8Cp+eTXquX1wdjYCLd+spKFDiaRse4g6thtSfryQ1
-         1dWDYpOJeSVm9jBtwKEOpeJxe2u9AETKpgzKcf5Pgu0AjuDvAUSl2GUhJ72CVGdWQTzW
-         5/omJaVlPyPmaUUn3+CHecWeNSW0adLhpRVsOlg1CaWGFUs1q2rqEaOvNodzMDrJHuBD
-         SyKst/DGammFWm5vbEb+djqB1R3xDPZ4GXpLWq6wyrPlCKvc++5OmGrDG/dV9HqrNCEY
-         9yGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792447153; x=1793051953;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=jctDokCQpU+5f4McBmCcNrit0g75bLIuZ0vnR/79ocM=;
-        b=JznUjuSQqSqKVv5Yhu7LJu1VUhSz/fla4mYBB47uPiI6PgazuSHVqBTmCohO5WMzrs
-         3VYXc/ZZm0QhkNCSn6th59pBdiTCHgoV6ciW8WpQ/xU8R4ziMiaoXDGBDzY6LCd5ugg4
-         9w20dofPn250rsFHN3f3fb19rYuyceB0reDOP2wVSS3pWbTs+gfB0XATfHZb42x/HUy5
-         pemUGTu6dErrOlj8p0fi4Q4/Na+BXI8f+DqBvC5jpYTs6q/GhjHqrc2IQOU6c8dmRYQI
-         EROdJ2PMvX9WrZkXDdoB2LUJXGhpd4GBTQKH4nbGJmz9FD+ErEIA5wqrtGGowA5SXREr
-         it2A==
-X-Forwarded-Encrypted: i=1; AKwUvBw3y9R95gE1ajWAlduR8M+nywJu/rYSJ/7AJ/BSQM3lPEuvo/2vZyrACS1YQaWALooFw62fGLrdiYkuAy4=@vger.kernel.org
-X-Gm-Message-State: AFq9FYLxIEY7FMFwwYFsV7K6zUYW/hypzf6x0gUccfrrYUQkCS4kpqSg
-	iUUJCVXUTx+s5OTZLJVo8prfxJqTmE9KwmpjMBngCH3MNi84aIvVE3mMW7a98iYtsIJ9WyaFdR6
-	spJBG2c4VvktnYnCXGK8N7+9rDSyXN2O8U+G3r8Lh
-X-Gm-Gg: AYBFou2mZmMO5+TCL21nCvYobM7bMW771P75pESktVbyXqxjd5ZLev4adyVty1ugw6v
-	s/qOgw3dJyPzELluxhpEhwk1eGHlrXfRGus3UIOs1AY+Na+55pjbnfKRugdIOjgGgeTbRoBIfkF
-	aSe673xk54rqAd8WV/E7lsZd2F9Ob3TJT9c9hsRRYZzEuksmk4aQOoxoHr6qnoBvKdVizHQ0Ujg
-	rivS0Bx0Oo9BwNQ6NEp/UPXUKv7HMZQWDWEgzgM9kA6sLyV4N+E+iLhEvYsxFzuPYqY/xyRjxcl
-	Mrp0fOAMCjZSLmMLlOcimaVDOfhxmQ0yVEjvveh9C802X4mOye7kOrQUZiSMq1LcjyTvnXwy4Ls
-	D74TewkooXRM=
-X-Received: by 2002:a05:701b:2207:b0:136:c443:80e5 with SMTP id
- a92af1059eb24-1876658f6c4mr9237879c88.6.1792447152061; Mon, 19 Oct 2026
- 14:59:12 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Z1bARU2B
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3FCB1F000C4;
+	Tue, 20 Oct 2026 00:03:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792454622;
+	bh=6SsLYQjWIw+vK3TPQCCa6PglOGKXjO57kKJeDmoRvIM=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=Z1bARU2BBOFaC71DayKj9ETWilvFrZXAPuVak9bUMiw12dFi0+oQ+rrgkIFTucGd9
+	 1nVNHdACToeFBLSdK+2BwaE9UcyLvcVdlANDLLgJGGCJY+apCT6saAfkMT9shDfd4I
+	 aCmnPsRZeWpqUmRzf7ViF5/3Ki1m96jDFH7KFMW8G26T6PBARQS/yuoWH1pn/E72fh
+	 WwN2Rdn1CdnEK80tqVA3NWqJeyIdzF5zkLHW56l992L9JchYz7yTfoS3muWGR6hZtR
+	 hqeXJyD46bw0cJ71KfcI/BrO+nlGr8JP0bmcmwZZYiraM+cqjQ19c9HSEmNjLRo99t
+	 a5BqipZp30kVw==
+Message-ID: <sashiko-outbox-178368@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH 2/5] elf-parse: check that the section header table is
+ inside the file
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Leizhen Zhang" <lzsx618@gmail.com>, nathan@kernel.org, nsc@kernel.org
+Cc: linux-kbuild@vger.kernel.org, rostedt@goodmis.org, ljs@kernel.org
+In-Reply-To: <20261019000218.3977398-3-lzsx618@gmail.com>
+References: <20261019000218.3977398-1-lzsx618@gmail.com>
+ <20261019000218.3977398-3-lzsx618@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 20 Oct 2026 00:03:41 +0000
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -102,73 +60,113 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-References: <20261015145714.3327543-1-elver@google.com> <DM8X51YCN6AA.1HV7J3R3PIYY9@garyguo.net>
-In-Reply-To: <DM8X51YCN6AA.1HV7J3R3PIYY9@garyguo.net>
-From: Marco Elver <elver@google.com>
-Date: Mon, 19 Oct 2026 23:58:26 +0200
-X-Gm-Features: AclHuK_qWUQb64XA37ScTQq_ZMKUMtenjdgDmPfnErmCHixLBqORRUjuSE_XZSQ
-Message-ID: <CANpmjNPALPJQDZFfNAqo8v0eu_0uNvj+rJ5xqeC3ZZSvs9zQwA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] kbuild: rust: enable KCSAN support
-To: Gary Guo <gary@garyguo.net>
-Cc: Alexander Potapenko <glider@google.com>, Boqun Feng <boqun.feng@gmail.com>, kasan-dev@googlegroups.com, 
-	linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, 
-	Randy Dunlap <rdunlap@infradead.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
-	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
-	=?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Asahi Lina <lina+kernel@asahilina.net>, 
-	Lorenzo Stoakes <ljs@kernel.org>, Yury Norov <ynorov@nvidia.com>, David Gow <david@davidgow.net>, 
-	Joel Fernandes <joelagnelf@nvidia.com>, Alvin Sun <alvin.sun@linux.dev>, 
-	Josh Poimboeuf <jpoimboe@kernel.org>, Petr Mladek <pmladek@suse.com>, workflows@vger.kernel.org, 
-	linux-doc@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 19 Oct 2026 at 17:27, Gary Guo <gary@garyguo.net> wrote:
->
-> On Thu Oct 15, 2026 at 3:56 PM BST, Marco Elver wrote:
-> > Rust supports ThreadSanitizer instrumentation via LLVM, which is what
-> > KCSAN relies on; however, Rust code is not currently instrumented.
-> >
-> > Pass -Zsanitizer=thread and the same TSan backend options used for C
-> > code to rustc. Wire up KCSAN_SANITIZE in scripts/Makefile.lib for parity
-> > with C (though rustc currently rejects linking crates with mismatched
-> > instrumentation).
-> >
-> > rustc only accepts -Zsanitizer=thread for targets that declare support
-> > for it. Of the targets used by the kernel, this is only possible for the
-> > generated x86_64 target specification, so restrict instrumentation of
-> > Rust code to x86_64 for now via HAVE_KCSAN_RUSTC. On other architectures
-> > Rust code remains uninstrumented as before.
-> >
-> > All TSan options used are supported by the LLVM versions of the minimum
-> > supported rustc, so no rustc-option checks are needed (they would also
-> > fail, because x86_64-unknown-none used for option checks does not
-> > support -Zsanitizer=thread).
-> >
-> > Unlike Clang and GCC, an equivalent to -fno-optimize-sibling-calls is
-> > omitted for Rust because rustc provides no corresponding option. While
-> > disabling tail-call optimizations helps preserve complete stacks traces
-> > in reports, it is optional and not required for KCSAN to function.
-> >
-> > With this enabled we can detect data races in kernel Rust code and
-> > between Rust and C code.
-> >
-> > Acked-by: Miguel Ojeda <ojeda@kernel.org>
-> > Acked-by: Boqun Feng <boqun@kernel.org>
-> > Signed-off-by: Marco Elver <elver@google.com>
->
-> Acked-by: Gary Guo <gary@garyguo.net>
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Medium] elf-parse: missing SHN_UNDEF and SHN_XINDEX bounds checks in elf=
+_parse()
+--
 
-Thanks!
+commit 8e951169d34059326033b08713c8c35ae69b423f
+Author: Leizhen Zhang <lzsx618@gmail.com>
 
-Which tree should this go through? The Rust tree? Probably too late
-for this cycle.
+elf-parse: check that the section header table is inside the file
+
+This commit passes the mapped file size to elf_parse() to validate that the
+ELF header fits in the mapping, the section header table lies within the
+mapping bounds, and the section name string table index is in range.
+
+> diff --git a/scripts/elf-parse.c b/scripts/elf-parse.c
+> index 9e7d1a4f263fe..0e16a9cf67f45 100644
+> --- a/scripts/elf-parse.c
+> +++ b/scripts/elf-parse.c
+
+[ ... ]
+
+> @@ -168,6 +176,34 @@ static int elf_parse(const char *fname, void *addr, =
+uint32_t types)
+>  			ehdr->e32.e_ident[EI_CLASS], fname);
+>  		return -1;
+>  	}
+> +
+> +	/*
+> +	 * Everything past here walks the section headers with offsets and
+> +	 * indices taken from the file, so the table the ELF header describes
+> +	 * has to be inside the mapping first. e_shnum =3D=3D 0 means the real
+> +	 * count lives in section 0, which must then be present to be read.
+> +	 */
+> +	shoff =3D ehdr_shoff(ehdr);
+> +	shentsize =3D ehdr_shentsize(ehdr);
+> +	shnum =3D ehdr_shnum(ehdr);
+> +	if (shnum =3D=3D SHN_UNDEF)
+> +		shnum =3D 1;
+> +	if (shoff > size || shentsize =3D=3D 0 ||
+> +	    (size - shoff) / shentsize < shnum) {
+> +		fprintf(stderr, "ELF section headers out of range: %s\n",
+> +			fname);
+> +		return -1;
+> +	}
+> +
+> +	/* SHN_XINDEX defers the index to section 0; elf_open_ro() checks it. */
+> +	shstrndx =3D ehdr_shstrndx(ehdr);
+> +	if (shstrndx !=3D SHN_XINDEX && ehdr_shnum(ehdr) !=3D SHN_UNDEF &&
+> +	    shstrndx >=3D ehdr_shnum(ehdr)) {
+> +		fprintf(stderr, "ELF section name index out of range: %s\n",
+> +			fname);
+> +		return -1;
+> +	}
+> +
+>  	return 0;
+>  }
+
+[Severity: Medium]
+Can sorttable and tracepoint-update still read past the end of the mapping
+when e_shnum is SHN_UNDEF or e_shstrndx is SHN_XINDEX?
+
+The comment and commit message note that resolving the real section count f=
+or
+SHN_UNDEF and the section name index for SHN_XINDEX stays with elf_open_ro()
+(which is updated in the follow-up commit "elf-parse: check the section
+indices that elf_open_ro() takes from the file").
+
+However, sorttable and tracepoint-update do not call elf_open_ro(). Instead,
+they call elf_map() and resolve section 0's sh_link and sh_size directly
+without bounds checks:
+
+scripts/sorttable.c:do_sort() and
+scripts/tracepoint-update.c:process_tracepoints():
+	shstrndx =3D ehdr_shstrndx(ehdr);
+	if (shstrndx =3D=3D SHN_XINDEX)
+		shstrndx =3D shdr_link(shdr_start);
+	string_sec =3D get_index(shdr_start, shentsize, shstrndx);
+	secstrings =3D (const char *)ehdr + shdr_offset(string_sec);
+
+	shnum =3D ehdr_shnum(ehdr);
+	if (shnum =3D=3D SHN_UNDEF)
+		shnum =3D shdr_size(shdr_start);
+
+If e_shnum =3D=3D SHN_UNDEF and e_shstrndx is an out-of-range index (not eq=
+ual to
+SHN_XINDEX), elf_parse() skips the shstrndx check because ehdr_shnum(ehdr) =
+=3D=3D
+SHN_UNDEF, and both tools immediately index shdr_start out of bounds via
+get_index(shdr_start, shentsize, shstrndx).
+
+Similarly, if e_shnum =3D=3D SHN_UNDEF and section 0's sh_size exceeds the =
+number
+of section headers that fit in the mapping, or if e_shstrndx =3D=3D SHN_XIN=
+DEX
+and section 0's sh_link >=3D shnum, elf_parse() succeeds and both tools read
+past the end of the mapping.
+
+Since elf_parse() already verifies that section 0 lies within the mapping w=
+hen
+shnum > 0, should elf_parse() resolve shdr_size() and shdr_link() from
+section 0 and validate the real shnum and shstrndx right here so that all
+callers of elf_map() are protected as well?
+
+[ ... ]
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261019000218.3977=
+398-1-lzsx618@gmail.com?part=3D2
