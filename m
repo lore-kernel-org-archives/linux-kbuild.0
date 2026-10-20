@@ -1,100 +1,86 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.54
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792520558;
-	b=zKOliaXbzSsQMsy3vNC9Z5EUAyEzT0ku/vBSAUa9XNth39OTjZCraa+0aWZmJ7JFUogp
-	 CFf9Filp7N6ZbYokj9ofD46/odbi/2+Dej3U65LPc9/26mbrUe+k93R0Py+cNWetPW9bT
-	 bP/AiFPqz+u7VrSh9UqC6DTMXlLeNgoa1X9lTucPjyD9JgaD6EXKMW/cdtNIoLveywdk0
-	 EnXRvJ2/OVDBg0LXiJ45x8cwRi0ELcupPz6Et6S3pcPA6DixKgm5Vr24UXM5oqTnqdjeJ
-	 msEB2b6jhP25rkLsllYNBJME11Q095uIAIVg/5dG9VX0drWFWgqjoBFstaYA7cS6O+A==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792520558;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=RHLyyCKYeuOzEypTTHpByT6eNu3x1tlDaVLz6hUSTes=;
-	b=z0WwIgcGDiVhFPkBTCcJ4mSF9efjXBSTDeFEtJDP+P1W/VqhOaBpE+jaoi9rUqDPgmkx
-	 5aoknWLm9iSsCWyR03AgdtnRfMz4u6XLiRTR//PzPgEhwkYG5xEJlQAqf46VmehnbZHsU
-	 tS2jzjT0x7I8cbWYIq5BT0GS8Gr20o7Q0MqHwaIQLVsjxDIh0NqMvi1HKyIkNSS7rImFp
-	 6/hl0TD3nKJrMkACeE42yEFvQV5fZuYk7YDmwQO7R0lzn9yxErXT+OpuwVgKCzJ7yy+yP
-	 imD6+TMgMt6lZMRyvCLTB2E2pWLBOAVa3PUCl2nRCD92RELao3Q6nd623qqHwrIIajA==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=jCpPoMO5;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.54
-Received: from mail-yx1-f54.google.com (mail-yx1-f54.google.com [74.125.224.54])
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=34.2.64.18
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1792521430;
+	b=I8LHaMV89fdFk6PmT8CJljRL6L3Y7FBwehX//VVrImgpsi43h08CH15UIHm+XMgRgeEM
+	 DgW1a0NUBrRAReCKl2YnqrhVHrr3spT87CfEr2wzsXJzosLVKWQIXT78dK4jDEH01h9eS
+	 XGq3hXIvuJQP5GUO+hvchxH0i0kC2xbpePFodMxs2qYec/lobk1vA8cx9Afvmq7pL/aVi
+	 VH86ba2OsdPwBi9CsNcKrHofUjFOzVcM5VZ32zOiHirvNEDGrY6mmPjbOCfTO2vpN16qB
+	 qURzt4zPePXyFCkpUsXX3sBJHR60ZenHnpZPKSRjS6Nkev2OQYHeTysZhXQuU/fc5Jw==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792521430;
+	h=DMARC-Filter:DKIM-Signature:X-SONIC-DKIM-SIGN:X-YMail-OSG:X-Sonic-MF:
+	 X-Sonic-ID:Received:Received:From:To:Cc:Subject:In-Reply-To:
+	 References:Date:Message-ID:Content-Type:Content-Transfer-Encoding:
+	 MIME-Version:X-Mailer;
+	bh=uKjP4PhEv6h6oryOUkaipQ7zazivOxdCQR8xjjU99uA=;
+	b=msMtAOr3QnFc4NXitm0KhRJ+4wBzUKNhbO0COyQvBzSj1ERmKazfhWxC84VQpntxAd8e
+	 Gl8JgTfbQNOUk7tDJcpMR6cEO8U8/XIQZ4d3cabIfBttH3jI0wnn9P3pj8Q+QwJaj0/rK
+	 EAJJsxQItYqGpsXwzZqcqlt+GO6Vz98AXBuoWj5WsAZy5Iwzd6s4j25ylOc+16CtwOIvK
+	 rabvA1CTFOkM+S2PPyYbqlFSBM1+N/Zwqn2si/HPfFRudYujObxPO5O13QAh6P92jjHCk
+	 ipKgD4gA+qcKzbtIhLCUmQOr0jYtGcckTQT4OybcmU0ywIm9uLtpZigUOZshief68Ng==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=yahoo.com;
+	spf=pass smtp.mailfrom=yahoo.com;
+	dkim=pass header.d=yahoo.com header.i=@yahoo.com header.a=rsa-sha256 header.s=s2048 header.b=ByuzWqlN;
+	arc=none smtp.remote-ip=34.2.64.18
+Received: from sonic.asd.mail.yahoo.com (sonic-usea1-0019.asd.mail.yahoo.com [34.2.64.18])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6207606A31C
-	for <linux-kbuild@vger.kernel.org>; Tue, 20 Oct 2026 18:22:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A6207606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADEE2606A31C
+	for <linux-kbuild@vger.kernel.org>; Tue, 20 Oct 2026 18:37:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org ADEE2606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=jCpPoMO5
-Received: by mail-yx1-f54.google.com with SMTP id 956f58d0204a3-679e6ab6471so919566d50.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 20 Oct 2026 11:22:37 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1792520557; cv=none;
-        d=google.com; s=arc-20260327;
-        b=JfsWAUe0tX0pAucn8EVlsyDW/UtwY1jIrss5tAtcfGrdKTUgV9XqYo3glTC8YdZ3FE
-         8rFphQkWTBbFCa3MMOdv7GRim3UyS/A8NS+uZ5w7qo3XMtqF2TlE0dAuNA5f5/L+tQCH
-         +03R8wo6AJW8NoynjBsLZPzQoUPU8/arZAfj/oi2PCFaf+utQOo5j2y3fidPdg9ffL8L
-         kIH5gEjphWcKHIxHDkXsen3aaczFTAHxEJpo6vx+Wwxj5KwGD4qX8R47X2odVzFxRnjS
-         RRCwXMpGyDiffnHHS1mPDBpgjaHpna8GIrYucVc3uBiurc+bnWvmgoJEqgoCRKP1ct0n
-         4HWQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=RHLyyCKYeuOzEypTTHpByT6eNu3x1tlDaVLz6hUSTes=;
-        fh=9lOZXR8/DeFY+4r8zKCA+a5gfJxXyfwz1QOdF0Szk3I=;
-        b=iU6mGbPHHiPicX/BxyvABZV84sdgZ06t//mCO360ZDKgeRk+ajyCYH0P7BNuLgyI9H
-         xOOlXqrv+KiJ4Loqj+GR3+wGJ402Xrim2Y25U89ubaJIEaL9b0wRQ06r3LWZEUSWV0B9
-         q1r8LQf1oR5ZAHpeeMOjdRSIwZ0L6CLPLde3q1ulwOoIH5hQ/nK/E3DQpom2eugvcmYd
-         qtQerZd/7JEgWp+m6ogJ8Ou0oUNj9aKW2x2e90YAOUOBn5+QEFqqr3USnH25ASZthN0B
-         m32aeSsKk8OGBZOb7FMJErBFcnY9H/BGextMGVBnRpUCJByrtEQhkB7ACByLk0onR1Ne
-         9pCw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1792520557; x=1793125357; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=RHLyyCKYeuOzEypTTHpByT6eNu3x1tlDaVLz6hUSTes=;
-        b=jCpPoMO58y6sJRNyUMWUWt3Xaw377KaYeVqrCJswRAQ7oKQE3kKZ95epr4PHsw8jDo
-         +Vymhp4pDTcYix/GYcYigVbhJ1c35neN7bD/cng2pd+6S7s+QzkwOXRmFWhmrZrBgKtS
-         uF9e/+MT5cJsEuOOvqCc7whuK+e6LEQbbFr6JTp6HpsdMQassQUMqaIylxCgHB7Nna4X
-         DLnrnpOCODqRFSx8BjU8GCmq/xzr12NndAQ9cVvg0WQ8c0FEhJ/i5779DSYCzc6Mmt29
-         TZInkgPURMOVAxBDShoWsPQiMMC6ZVT87Cq5hblK6YvF0yoLo69dvfI3KNOWArT7GB0M
-         CZrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792520557; x=1793125357;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=RHLyyCKYeuOzEypTTHpByT6eNu3x1tlDaVLz6hUSTes=;
-        b=gu/PRsfTtPVlrDXpNGO5GYLWC0sxmUCiBOAxUHxlNkKd+2TT8h7kvHnXWR3xIXQzXW
-         rG4H0KEoviBZi2yrT2v5Mp5xZqtNb2YoAtRlzhc/hVr2IT/bFUdSaFR+57a76hDbJh5Q
-         p4QPYAkIX1M6uwUD34hSr4rvWm1DRjTWz1viq/VXpEVtGhUTy28hwhObbuuqzGI7QgoA
-         vxjTA3vqSVyLjBqpyitWC09E1JnKJy6UpQu2dpt1y/kxn/ru7gW5ZbWUfm24m5y3fvuL
-         uHe4uk9jwc6Qvgi7DjWeFh2YC9cK2nTZgYAnOJJUeNKLHV6SRQTrgv3ndGwXRD7Qq0l7
-         b2sQ==
-X-Forwarded-Encrypted: i=1; AKwUvBxj33+0duzd1AP4poXI4FbIbUn2t8fPYZ2iGplYC5Tkkqgg6foyn1YLvdIMH0x+F5NyvLQCIOSyOKgNojM=@vger.kernel.org
-X-Gm-Message-State: AFq9FYLjRmfR6riPjFAmS4GwzE35HQWaLbhRZ7gYoGv7LPDAKbGrdKEP
-	+Uu/ztH/yqGNFos6IgW+3ZOOHzlL5RGMtf9kAe6j03khIy87+M4RbkD/u4JPOamZTJFSFgI5mog
-	dE0RoQJMraTllNEj5JKcRrG+LFMsAGLV/pn8LAHGH
-X-Gm-Gg: AYBFou3u2x1qRo8A9CQkd6RhoyJH8XfdqJZIDyOoC5/dEXD1Qe1I1mnibRUzMDMLtoY
-	hz6afcKU5PRUxGq8KEsoL3/TycTJ/FelnNKDPAcFyAHwCyI1z/euoUbEgdw6U+wxrotRrYFRI0h
-	hHWdrAI+jZr0VOpBSu6YZptNQkHRUpGowgv2Bj0Jl5wS1GkncJk1Bljv/xvKKNUatkED4LDTlBc
-	tWOqK8ltG76UUBkIiFhzlU07EzXR7HidQj+/q0NdqJ9+Cf33+YDNrz7yDvphRT89JqpQUZ53y/j
-	W0qss7+qxTAaLBaOYUmDhl9uifOIetUd/+I1JvO0X/CACyAXllYIc0mH8dNs0DexnrR94AXUVk7
-	V464IokCon9U=
-X-Received: by 2002:a05:690e:1508:b0:675:61ed:ae79 with SMTP id
- 956f58d0204a3-67a0e53f3camr15368d50.40.1792520555651; Tue, 20 Oct 2026
- 11:22:35 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=yahoo.com header.i=@yahoo.com header.a=rsa-sha256 header.s=s2048 header.b=ByuzWqlN
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1792521428; bh=uKjP4PhEv6h6oryOUkaipQ7zazivOxdCQR8xjjU99uA=; h=From:To:Cc:Subject:In-Reply-To:References:Date:From:Subject:Reply-To; b=ByuzWqlNLpdr1zZVVQ8kvVWDiY80UYgomU8KGPAKoXoI6MmdmjX/zp49+YO+nRrd3ipLE0jM0veVeqB2bkbX7iUVZ/XNfcQU4MDw3zgkwHUVbwgYdCp8ul5MddaLxtwIvgBYTkuG0QJa+0LAt1Rw6bnCV5wZb7+ZO+3ewVNZJ3AmasroOzCkakzahP0HOs9duV2fWmgEZPSK1Yl6ALxztRGTYmZogDfYVfD95LqQErHaQti+WLqpijIX77GjFcSQbmpMDa7Cuj+MNF15atYwZ+Kvt7/a+eLxMZPaY/Ojs/RyZnq4qGWNt7mBk18+i9d5oAR+uL8PGIeCmlTuwTkGTA==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1792521428; bh=VT1vJ2eTnBG62j+sXGyHHpF2FrfcuiSSmE375IoQ6JG=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=BmLBupnD7akZTNXXM/b6GHt2JTeDy8B0COV5JzaF3U0cjMucTJoP/HT2KL+CRZoYuEArtPXrsCHhkfoABoYHDWZ+9LWu2NDhfcqfpzB2nq90A+ItqP92Q6AmOy3TBBMRlYG+12MgygGbYNWj/vCYSBBtcVUovulKir7C0gvxoGI8ycM/mTf43FOc0AuGrhNs5w8dwTrccAmw/p2wxqpiaXqUWEs/9vAwUcPyq9WuRd9jVLW5kxWPTJULgOgsaoAXXsN6uYf8PhrQdEPyM+mP5tZM/CCwQ8FjpxbshvTI1CSosaxQt/92jPRMSsjNz74QQpUipjxJsFrumANhpUr9SA==
+X-YMail-OSG: tMmAiVQVM1nyWZpopzmNi.y0Q6ac7wMbUFCxl06PlbWehOboM4IIlcsHAtGwz9s
+ nHOSqg9YEn7oS_pAAHuRIWoAiqNCzKP1nC8yz6EeH1dGQpi06pA0ZijTd2lu37bM1n6KB5awVKbR
+ UJ_pnLhggR2l_Sleq_nfYYUIXRKeTMxVr7sKp3.iJIyPvDGtyA4MMifMx7XzhTeWYl0bhZmZP5KN
+ HPig_kaXumm9APttv4kwJXvIK2w6w0GQ48ZdYCWhP6p9Ru1DSEVPOX2tsmiv7r4IeLCXtdpP68.4
+ 4ltHAy323cep6VDMgb2uyRfuze1XZhPlK8EKQa.iycFk2KMJY1.BhuUtbcOa0hvVoWVms8lmsQ6l
+ dguoOlBSefL1vd6TlyNLrVqMzt51jd2MaBL_W2M3SgQRw8XQJyloBMWosWXFZES00UyPIukqhHdl
+ SwBa6t9MIHfeL8JefFR7FkiBgh5oK5OnWsaAfFgP8.Yf8DbzJDHHIQauPDYNCPuLr0CKsPgImgq_
+ yKTomPXucd1KH1YblXFupMp5huYcqA2GEXVdbUvF_ndo2QikUa309qhB.7fb3gMikWtVC5CUvXRk
+ Fos4pLcvN3hOVauoi_Z6D_SKuUzc0RAsfzSfpFbV9jPhtcGm1Fz0DcjXYZZxfxlhxe6mepSLblNi
+ p401sOSMxUn5kqXSCEoj_4hqviSKYW50JRQuSGB1YYT1UHx5YdvRCds1qx3lxXo9JeZfrctdoA3t
+ jmL_ONsae3HH6aGH9WaPbj2WtTzD4ULu..1nqFXzmFa1KPA1OgB6mD5OIlR3VNKbZeAJ.2RWvDi4
+ 3oHnBNbBxrdNYf_OHW_TMJq4u7ykwNVxN9NISmpLzo.pB3NXc7xY_3BX6gLvn3wvMi8aTGCK3q.a
+ 0opsAWNJK3mICOpC5KAEzEexnVGV0s7IOwaHDND8PQZkR8RJWq6anARQ7mSfQNYM6q45zEVH1r4i
+ _pdxHXmDuFlFwIJOiMR7lmTsWnzYLdyqihNBDTnkZbaW7dDj3gVkPWajKw_ZQur5nybmPMxuqa9u
+ 7NY9wAfJjdKpRS_SnBE.0J5cxNUIZ3SlcxAYvgmKLGGzBCsDvVkCQuoxuTfoyt3j4Uq7GYH0sMWp
+ 98bAAfCNKl8fcuZOSDZaEFZa4LBeh8jdNKjMXKoc6M8xxP3u1VZUBEtrlRXEYu4VSgi1N2FxDKbe
+ W4_8DtgNdwJ5MkZ8NA2cYUBcwpq7hd3yUo2GhXk2YGpFB1CdJmO50ztm7pQ2NL3msB_gtMo80Ir0
+ OJYmhJlkmsS.ha2b.1bHsYpz2ixAjnMTUbjyym.PXoFXiwUdXow6k4dZ1K5y2y1mh1grH3X4V04D
+ 6L6WFz5ReavSe0cyt0Id6vJz8Ql3cbKB7lOUdGVODyObMs_f7SjjgZPkE4un.RhOr6VFyPAiOggs
+ eJtciAiST7ze.cJ3Md3gcucQO1Xs9CNSrNMNluBaSOJ74zRoID5YCCGjHsOR1RugTMalZVQREO9f
+ AY8umjmNxGO7d_KPpMlfkna7MOS4djR1Zj12kuUPFvJmhObKAqvPrc1m7ngfJ5Ks7t0MShpxAsoO
+ cxuH89zKXL7gtj4t4PpnZ_n5ZsLcGqIhG85roW2LFmyx2J7egMIlBAYOgsHAY4i_PGZyym89S8kW
+ vKzgnCa4lugEMRKX.awRV4bwuSKZ8huBVUOz0c6.pvADYBcD2KrrfNGGx9YkzF7iGFYxD9aTQMuI
+ mCAkxRSMgDbXtBwNUOlVBrg7PKHf5sYiXMhBiw6rYn7z9opdneTiY.DlekGsaXcRJ7v0gx871awh
+ taLk37nRUWhp7GsHdhBXcMt6oJLfKWfiT946GBa1p5DZKtHqI5MWh9kPzYtx1w0fBYnsR7RPmWQG
+ JeydFKoflxyF8VfiaTDqNfVxakZU0ZNoTbgYJdhwws3dv4PT1qz31it66td_As.E7miDkvijlwwV
+ bV1GsPhI4pnmmgo09bLcOSi6H183ZgtpH6.UdOTFvKP8Bb33tXPAOuE9gWiXULn6lVTCWvM.ofHp
+ nZKiTPf9HPz3PHBwXJbo-
+X-Sonic-MF: <capitain_jack@yahoo.com>
+X-Sonic-ID: 3dbfca32-40be-4856-8db1-d8e14c9724d4
+Received: from sonic.gate.mail.ne1.yahoo.com by mail-asdoutdeli-p-cin-usea1-prod-sonicconsumer-svc-102 with HTTP; Tue, 20 Oct 2026 18:37:08 +0000
+Received: from dip109.lsn.bf1.yahoo.com ([67.195.177.118])
+          by hello (SMTP) with SMTP ID 1ef2aaac2e463c76687331ab09204a2e;
+          Tue, 20 Oct 2026 18:37:06 +0000 (UTC)
+From: Daniel Campos Ramos <capitain_jack@yahoo.com>
+To: Lorenzo Stoakes <ljs@kernel.org>,
+ Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 00/23] kbuild: significantly speed up kernel builds
+In-Reply-To: <CAHk-=wieaheq8rXSps3xRZpNNMQMEj9BH5gU+Dh4q_ZgokO51Q@mail.gmail.com>
+References: <CAHk-=wieaheq8rXSps3xRZpNNMQMEj9BH5gU+Dh4q_ZgokO51Q@mail.gmail.com>
+Date: Tue, 20 Oct 2026 15:36:39 -0300
+Message-ID: <179252139906.1666014.10596432029920554734@yahoo.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -104,61 +90,51 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261015145714.3327543-1-elver@google.com> <DM8X51YCN6AA.1HV7J3R3PIYY9@garyguo.net>
- <CANpmjNPALPJQDZFfNAqo8v0eu_0uNvj+rJ5xqeC3ZZSvs9zQwA@mail.gmail.com>
- <CANiq72mCixHhc5tU6ueiJNEfE7yHXHXekhWDcvhFdfd414Q3yw@mail.gmail.com>
- <CANpmjNNmnTMqxSJ_R+wYeAkFOxnJcUmwktNuG990GunjxhcvbQ@mail.gmail.com> <CANiq72ns9P6gxOWmwL5VMAnAA8eASUjVUdSai3_iqXvM72mF=A@mail.gmail.com>
-In-Reply-To: <CANiq72ns9P6gxOWmwL5VMAnAA8eASUjVUdSai3_iqXvM72mF=A@mail.gmail.com>
-From: Marco Elver <elver@google.com>
-Date: Tue, 20 Oct 2026 20:21:56 +0200
-X-Gm-Features: AclHuK_xIgQ2EfRpHmzLAMkZfp67LMe6ufygxtV1abJhpWdiWd3lua4TQ51kRJc
-Message-ID: <CANpmjNMNo67fgFY9u8zurGJOxOY10C1CKwb1UvUbHo01cU+_Sw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] kbuild: rust: enable KCSAN support
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Gary Guo <gary@garyguo.net>, Alexander Potapenko <glider@google.com>, 
-	Boqun Feng <boqun.feng@gmail.com>, kasan-dev@googlegroups.com, 
-	linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, 
-	Randy Dunlap <rdunlap@infradead.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
-	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
-	=?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Asahi Lina <lina+kernel@asahilina.net>, 
-	Lorenzo Stoakes <ljs@kernel.org>, Yury Norov <ynorov@nvidia.com>, David Gow <david@davidgow.net>, 
-	Joel Fernandes <joelagnelf@nvidia.com>, Alvin Sun <alvin.sun@linux.dev>, 
-	Josh Poimboeuf <jpoimboe@kernel.org>, Petr Mladek <pmladek@suse.com>, workflows@vger.kernel.org, 
-	linux-doc@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Mailer: WebService/1.1.26740 mail.core.serving.mcws.prd.acl:role.token.mcws.jsmtp.yahoo
 
-On Tue, 20 Oct 2026 at 19:09, Miguel Ojeda
-<miguel.ojeda.sandonis@gmail.com> wrote:
-> On Tue, Oct 20, 2026 at 12:34=E2=80=AFPM Marco Elver <elver@google.com> w=
-rote:
-> >
-> > Happy to take it - but in the interest of avoiding conflicts, thought
-> > it might be better suited for the Rust (or Kbuild trees).
->
-> Same -- happy to take it too next cycle, whatever you prefer.
+Hi Lorenzo, Linus,
 
-If you think there's a low risk of conflict, I'll take it.
+I maintain Sparky Stereo OS and have preliminary measurements of preparing reduced compiler inputs ahead of consumption.
+Our Lean Code pipeline retains the complete authored source and generates a representation with removable comments eliminated, preserving required directives and source locations.
+The aim is fewer bytes for repeated consumers to read and scan.
 
-> > Needs some -next time, too.
-> >
-> > If I don't hear otherwise, I'll pick it up later this week / next week.
->
-> Do you mean for this cycle? Linus may not like that, but up to you of cou=
-rse.
+On an AMD A10-9600P laptop with 12 GB RAM and SATA SSD storage, our 17 October header experiment changed 6,290 files out of 10,352 examined.
+The changed subset went from 61,154,706 to 44,167,571 bytes: 16,987,135 fewer bytes (27.8%).
+Preparing it with two workers took 258.94 seconds.
+These are file-size figures, not measured disk reads.
 
-No, next cycle. I'd pick it up next week, push it to a branch the test
-robots see, and then update my -next branch after the current cycle.
+Using the prepared headers, the elapsed-time medians were:
 
-Thanks,
--- Marco
+                             pairs   authored     lean
+Qt umbrella, syntax only       20    9,284.25 ms  9,259.50 ms
+Qt umbrella, -O2 -g            20   10,970.60 ms 11,046.45 ms
+Qt umbrella, preprocessing     20      882.45 ms    890.25 ms
+acpi_call module, -j1          10    4,672.95 ms  4,677.45 ms
+v4l2loopback module, -j1       10    6,572.40 ms  6,541.05 ms
+
+All builds exited successfully, but these measurements do not establish a compilation speedup.
+The experiment used engine 0.1.2, always ran authored before lean within each pair, and used different header paths; it does not establish binary equivalence either.
+We have not measured full-kernel builds.
+Any benefit from reuse must also repay the preparation and verification cost.
+
+Separately, with engine 0.1.3 on the same laptop, eight paired application-start rounds with variant order reversed each round gave these median paired window-time changes:
+
+                    cold       warm      cold pairs faster
+plasmashell        -159.9 ms   +43.8 ms       7/8
+Dolphin             -66.7 ms    -6.9 ms       5/8
+Discover            -70.6 ms    -1.4 ms       6/8
+System Settings     -38.1 ms   -41.9 ms       4/8
+
+Those used 95 selected runtime text files in a nested headless environment.
+CPU temperatures ranged from 63 to 91 degrees C, so these are preliminary observations, not evidence of a general speedup or a kernel-build result.
+
+The policy and implementation are public:
+Policy: https://github.com/danielcamposramos/driver_stereodisplay/blob/main/sparky-os/LEAN-CODE-POLICY.md
+Implementation: https://github.com/danielcamposramos/driver_stereodisplay/tree/main/sparky-os/lean
+
+Would a controlled kernel-build comparison, including preparation cost and repeated-use break-even, be useful to this discussion?
+I can provide the raw records behind these preliminary numbers.
+
+I develop this with Claude and Codex as AI partners and take responsibility for this report.
+
+Daniel Campos Ramos
