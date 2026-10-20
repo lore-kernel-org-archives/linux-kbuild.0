@@ -1,101 +1,56 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.82.41
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792523381;
-	b=K6E2PyrF5zayyRUjonDCmTrlYkn5iPjekltYMERBqIHxdKJontl6aBFeHMObUyeEP+0p
-	 pQZi4NuMJDK5P4AYefQHuLIEBgVZw1jdVESl+tr/dvLn7XS6TCGZNGYqmE181A6VkAg4L
-	 0eX1m7y3hYgSBmCBRpfWi0oILd2pvIKIkP7uzYoJ+mY5kg7h94zZLvJti9DzxZnniV5NU
-	 OKML3xkyqr6h0Jow5IfZ0JftfaYLNpPaP7uhuiYkARqPJTeOIToFthKmjt3met7G0qBM9
-	 snN6NwPZxmS3jUpCQbD44I1jEaip53831Jax4EyYfuSDpGjk9f6ic2PLio9EoKGIOYA==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792523381;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=ahczx5djr+c7p6mzXUGX/QvBdodUDaN77R7cgymXnO8=;
-	b=knddJO1a8PAwq6/ZIdwvssNr6tdQxvoC7YhceZ5MBqwJioysYniwfzMi34CIKpapjWcr
-	 Wu5mGmFq2MIeQe7l7M+RFJbYslXhbteOMH8KIRp/0iCQUlVTbZqUheUe0Vw99PmqfGCHT
-	 tk6gK1IyT7LI0I/BbvTR8uR5EAZfbUayC4UWdZaBYCab5MrlyXNGiTq1Zu21kVFjvPm9a
-	 hCsjmKzs9w5oT0fQx7g4/14TZMWX1psu4CNC4w4XMhJTi7Nd5nur0Mf6ZCyDD98Gxm19P
-	 yPI1DrMDSowhCffIDsEiAEL0sTpc5PeLLxc41U0R81Vzo6b3Co18FcPF02Bgx7lIhZA==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=IygMgcs6;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.82.41
-Received: from mail-dl1-f41.google.com (mail-dl1-f41.google.com [74.125.82.41])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1792523812;
+	b=VuqoyYDtYn3/uU1pBvblQvT369YS6n5t85qTaZ53Mz0Wc2fIivx7XkkgkqPyqI7wEoHt
+	 1yo5BOxhkszSvJH2f1XTUJPL0/W0qlX99ppF6/aVRrIgzp5onVCZdnpan2Z4L0WYwzbPv
+	 /G9DciWSCGRXouzv5/Llnzl+E/qOogT75vbPLr6vagpAMjN3XxBpzYL7V7bsrkLdgt8cK
+	 KDaPPtg/i5yS6nbRu1hiNJh9axsGc2EaufIJcOLnYRiK5Zr3iVVRoKe0z2NgB2/dpQ29L
+	 u/l/VyUDtyMSyo0x0A/OBLj5YxDycyptXBLyOZBmfHxQs+gbsvA5DRrtRwy6i/9m4nw==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792523812;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=2WaiC0kEUHjuiprDvwKQvuB+u4qkKbsleklFTKnfyss=;
+	b=B9lVrdvpIs0YS6OiMhFT/LQBwVyJmidmov5AwDkFTr70J72dPabCQUTQJByxVVGqwzzR
+	 fOrY2ZVXFwZZSM7NdwP+Ti+3WRTcUinXs3s0aawfCxhbVBdJRUerJaTUROa3QV8/IgbRj
+	 r0J5zBtGmbCZCR7aZ6b7tnkfLS6K8lDumgE6/SEQBTe/cGtNqIWUEMPtVbDJC1xvNHG3A
+	 epc+IA1b6ohjMGA1tLl8H1nFn4Km6DpsxNuKdni/KsXMa7wzzVkWwKShWHCjDpmjUYEd5
+	 3gS8akU2vT6TjWANWoImhKaM5giyj6gNvybSaf7C6+Zv2GTyeCT2kmsUAXwLNQ081vQ==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WjVC7bUH;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2B8D606A31C
-	for <linux-kbuild@vger.kernel.org>; Tue, 20 Oct 2026 19:09:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B2B8D606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF906606A31D
+	for <linux-kbuild@vger.kernel.org>; Tue, 20 Oct 2026 19:16:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=IygMgcs6
-Received: by mail-dl1-f41.google.com with SMTP id a92af1059eb24-15943c9be84so174903c88.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 20 Oct 2026 12:09:40 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1792523380; cv=none;
-        d=google.com; s=arc-20260327;
-        b=m9KutoQ4dq0FqaoYeKsvFGf4R6v51CmblAo2oVqiNhlILLNkMIxx38fo1GwniQ02z5
-         K4H3bPFZaSRXpGQR319PdeMXHWjhLAJ5mlr8jRmffF+KTAjFhVq4IjIJYDtCR1Y+e9ic
-         rSgWNUexiGah+f8VkUaCHSJXaaPXTX3c9HYjjalL+d0ADzeKADvyK+AxGPCDr2d62xEo
-         hf6BZaY6VzRR5W06hMrymK17U+Ahg8yU082rqJSiytxI6ZFL9TRnpd+kuwYQqnMfL+ho
-         mbs1XNqIA76DOGYWBM0lmO9By21RRX9FvJ6UFmmacvJoQUTY1+YaxeRZMlEjJf3scxyv
-         9Cmg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ahczx5djr+c7p6mzXUGX/QvBdodUDaN77R7cgymXnO8=;
-        fh=p2dLYHqmNYbyXzbe0tZnJpnKxm1mvziUVdfOruQj4RA=;
-        b=IZIMnTLqjc/ncDZ21ddlQutmxi6d3xl3FqfxRAMP0g926lwh4lXTnkzs7DBrW8abU4
-         6mC+NQQH/aWCOFyVS+lup1TkgkL3FKfiXS+A8NBRQm3YtkQJsuFgSFx/CaTTu9Wv+pt9
-         lq7HoUDQswekwrkWuRyOxp/RfMGcMYfBEBf0QLpeiUJyPXktTFI2I5hPWKPAeDK6k8Nn
-         ll34LZgIjB0Dg/JjIyAmqSZ6jqiohQaGzKPfdw8rWqHQhtsz9GdBHFc4AXF3VA8EDCxU
-         Ycamk5lqDPHc8jcTSAwKofpcFFz1Z6feBMq+Ol1J8MBTPy46zl57jdsRyqWREzKm8bce
-         coWw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792523380; x=1793128180; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=ahczx5djr+c7p6mzXUGX/QvBdodUDaN77R7cgymXnO8=;
-        b=IygMgcs6Wkd11h28ba3ojzsoJTpJa94odgDpgzrul6leMm134UWAt/R1EWFLQ7KrD7
-         cBSCFOQ7MVWcZDDh+NFWLTMz20zU5V4OtYha/Dt/ndOifBmQqWKbEPWCSAUmQUCztPrU
-         lV/rb5aZyojz0KbkWV7UxioMmIVCAOfmPB183Z6/VcaAHY/R7bG+jTfqiIfMVDC+L9J7
-         Ru+qT/CBDKbmkkQdRKoQq1VXCffrvFzcO+E4IgTEus+geEGk8m379SuKk4YQ5MAzXfhX
-         dJhCDvgLPUuAjgpRnNwG6zwIfkaC4zt+/JtE4MTaMLMyHELdf2YxSGLFrPDVCiXvHLUX
-         iOuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792523380; x=1793128180;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=ahczx5djr+c7p6mzXUGX/QvBdodUDaN77R7cgymXnO8=;
-        b=adxQtXTHIfvAVqEZv03XuNt2G0IJNTmJedzBjNUPKSQDQN5Hnl0UK5njfFJSW5xRve
-         6xugACWo7/h0vS8vESVULeXBzUTobVxTqM1pM+YPYHXVTpzWpZ/j3zlaA3GFS6C3HddU
-         7lgOoht2mb6dWmwUxI/w1Kay3PlOWPqbIprxL2BIURTBc89OQ+gwSfJB3PfuXMWL61MI
-         lqWrEV7Rxw3NgsiRGRRJ2I7qO5YTIrogDU1biFIgayaPtfQXnHrDW3sqfc6Ick4UZsfy
-         gDdcVAdznWDb3t+FmOW0vxjYs5/MFUmMmOYck+q94fLC8SfIXYe9T9yDUTAbYF/XzxA1
-         Og2g==
-X-Forwarded-Encrypted: i=1; AKwUvBzrkv5phsNgan/qXZsFDvjBfR/nrqAX5E5kqerXG68Enbk00IIhDL79cAjn4ovMe5oevF4OmyMJoayNT8c=@vger.kernel.org
-X-Gm-Message-State: AFq9FYJCBmC0pWVzy1nqpLoCVP0MUSd4vHViNSvALWY+rEMaBAwCpv+p
-	BRnU+78hmmEywaVToFB8SqRcMKu2eK7ICIjHO0RJW+jfXU8L6mDyLKLBvHoe2T1+/qGQ4SzxQwQ
-	jsZfvOLdL9OJJjRXo0oYf7DuhpR1s+1o=
-X-Gm-Gg: AYBFou1naf8K0szcP+4PmKe8VZYs/V9HrJCJFw521aXSlIABChQxp44r78StNnGeGwB
-	vo268/FbR3xZjejYC5sbk2cjS0yhaztYeoPXltMMAW8n6vMC+WHnfU3rSRtZ8Ype0gABlsAKVA+
-	ZXr5oLUj7h7MSbcFxOSt5HQw1/mxd1KNWztr5G+G9B4UjHVlN6YAHtYqUQvjjlAX4DWRq8YA44L
-	RiXiSYb+fhTwlbhGtCDIX3orKb86j4ywM935GIGeuhHo2Bn7i980IA4pXRYivltrw2d14wyXIGt
-	+/eYRAEsTBB8ORZYbUhxyz0qtARz4u3GblqaPENqyoFyDs6v98s1Qc7FlCSopte6BcYFV2Cy9Lx
-	sec4yTgdC8vpoTRlGYwupoqZEELeqkqjSUdbUvv8Yt1ZM5j9+pNuYRunW9YKKYXakE3BNhoquEu
-	t9PTSeCtG2fGzn3VRq/rhqc+YDzS5vKwFb91/qmam58eCiqwfU9Ys=
-X-Received: by 2002:a05:701b:4510:20b0:16b:4f52:a08 with SMTP id
- a92af1059eb24-18507ce1c04mr25464534c88.0.1792523379507; Tue, 20 Oct 2026
- 12:09:39 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WjVC7bUH
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AA391F000CB;
+	Tue, 20 Oct 2026 19:16:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792523811;
+	bh=2WaiC0kEUHjuiprDvwKQvuB+u4qkKbsleklFTKnfyss=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=WjVC7bUHCDYr3IXg64mrqlqePOPaxYNwcMhL18zOqNgwZ5FwtVHOdTEmD3Rl1BrJK
+	 ezokL8oLa6sKvGjSWbH0I9LQZ1OZYf62Ztx7/a83lmFWL/KJvrgu19FFgYc4ywqYA1
+	 r/UiBONJXprQVkF9stEjbasa6uZ7r/56nKuXuWZh1cJX3B0xj3srlj8jKTu5wV3fi3
+	 g+YagFBrhk4gIV0LMKXZMV/y1GqqPC5vuPOtpJXxTpWc04xm/YCMko22F2K4qI51N+
+	 rWUL2k+ovidQ/P5io1t6Z3jFXtYQOl9tOkHVMJx/mhEVmPSb2cQcMdSTZkEgxwvpon
+	 CzVkm9jFkUfEg==
+Message-ID: <sashiko-outbox-179507@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH] kbuild: deb-pkg: allow to set package name version
+Reply-To: sashiko-reviews@lists.linux.dev
+To: =?utf-8?b?R3VpZG8gR8O8bnRoZXI=?= <agx@sigxcpu.org>, "Nathan Chancellor" <nathan@kernel.org>, "Nicolas
+ Schier" <nsc@kernel.org>
+Cc: linux-kbuild@vger.kernel.org
+In-Reply-To: <20261019-deb-pkg-v1-1-7f8e60bbede5@sigxcpu.org>
+References: <20261019-deb-pkg-v1-1-7f8e60bbede5@sigxcpu.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 20 Oct 2026 19:16:51 +0000
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -104,50 +59,110 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-References: <20261015145714.3327543-1-elver@google.com> <DM8X51YCN6AA.1HV7J3R3PIYY9@garyguo.net>
- <CANpmjNPALPJQDZFfNAqo8v0eu_0uNvj+rJ5xqeC3ZZSvs9zQwA@mail.gmail.com>
- <CANiq72mCixHhc5tU6ueiJNEfE7yHXHXekhWDcvhFdfd414Q3yw@mail.gmail.com>
- <CANpmjNNmnTMqxSJ_R+wYeAkFOxnJcUmwktNuG990GunjxhcvbQ@mail.gmail.com>
- <CANiq72ns9P6gxOWmwL5VMAnAA8eASUjVUdSai3_iqXvM72mF=A@mail.gmail.com> <CANpmjNMNo67fgFY9u8zurGJOxOY10C1CKwb1UvUbHo01cU+_Sw@mail.gmail.com>
-In-Reply-To: <CANpmjNMNo67fgFY9u8zurGJOxOY10C1CKwb1UvUbHo01cU+_Sw@mail.gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Tue, 20 Oct 2026 21:09:24 +0200
-X-Gm-Features: AclHuK__St0uTCw1avvWmNXKKyd1psXINLsd-c9PUmbMZ1zOmfz4IJPwzKvtrCE
-Message-ID: <CANiq72mcCErQoK6wmtOcAZ+SOgRNZO2fPoZ1dac1Now6txy=MQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] kbuild: rust: enable KCSAN support
-To: Marco Elver <elver@google.com>
-Cc: Gary Guo <gary@garyguo.net>, Alexander Potapenko <glider@google.com>, 
-	Boqun Feng <boqun.feng@gmail.com>, kasan-dev@googlegroups.com, 
-	linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, 
-	Randy Dunlap <rdunlap@infradead.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
-	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
-	=?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Asahi Lina <lina+kernel@asahilina.net>, 
-	Lorenzo Stoakes <ljs@kernel.org>, Yury Norov <ynorov@nvidia.com>, David Gow <david@davidgow.net>, 
-	Joel Fernandes <joelagnelf@nvidia.com>, Alvin Sun <alvin.sun@linux.dev>, 
-	Josh Poimboeuf <jpoimboe@kernel.org>, Petr Mladek <pmladek@suse.com>, workflows@vger.kernel.org, 
-	linux-doc@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 20, 2026 at 8:22=E2=80=AFPM Marco Elver <elver@google.com> wrot=
-e:
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Medium] kbuild: deb-pkg: broken build symlink in install_kernel_headers()
+--
+
+commit bc8efaaf9e21748a005be3c75bb9c6c2334ac049
+Author: Guido G=C3=BCnther <agx@sigxcpu.org>
+
+kbuild: deb-pkg: allow to set package name version
+
+This commit introduces KDEB_PKGNAMEVERSION in scripts/package/mkdebian to
+allow overriding the version suffix used in the generated Debian binary
+package names instead of always using KERNELRELEASE.
+
+> diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
+> index d4b007b38a475..44ca9991fd6f4 100755
+> --- a/scripts/package/mkdebian
+> +++ b/scripts/package/mkdebian
+> @@ -172,6 +172,12 @@ else
+>  	packagename=3Dlinux-image
+>  fi
+> =20
+> +if [ "${KDEB_PKGNAMEVERSION:+set}" ]; then
+> +	packagenameversion=3D$KDEB_PKGNAMEVERSION
+> +else
+> +	packagenameversion=3D$KERNELRELEASE
+> +fi
+> +
+>  debarch=3D
+>  set_debarch
+> =20
+> @@ -215,7 +221,7 @@ Build-Depends-Arch: bc, bison, flex,
+>   python3:native, rsync
+>  Homepage: https://www.kernel.org/
+> =20
+> -Package: $packagename-${KERNELRELEASE}
+> +Package: $packagename-${packagenameversion}
+>  Architecture: $debarch
+>  Description: Linux kernel, version ${KERNELRELEASE}
+>   This package contains the Linux kernel, modules and corresponding other
+> @@ -238,7 +244,7 @@ EOF
+>  if is_enabled CONFIG_MODULES; then
+>  cat <<EOF >> debian/control
+> =20
+> -Package: linux-headers-${KERNELRELEASE}
+> +Package: linux-headers-${packagenameversion}
+
+[Severity: Medium]
+When KDEB_PKGNAMEVERSION is set to a value different from KERNELRELEASE (su=
+ch
+as 7.3 or stable) with CONFIG_MODULES enabled, does this break the
+/lib/modules/${KERNELRELEASE}/build symlink in the linux-headers package?
+
+In scripts/package/builddeb, install_linux_image() installs modules under
+/lib/modules/${KERNELRELEASE} and removes the build symlink so the headers
+package can provide it:
+
+scripts/package/builddeb:install_linux_image() {
+	...
+	${MAKE} -f ${srctree}/Makefile INSTALL_MOD_PATH=3D"${pdir}" INSTALL_MOD_ST=
+RIP=3D1 modules_install
+	rm -f "${pdir}/lib/modules/${KERNELRELEASE}/build"
+	...
+}
+
+However, install_kernel_headers() in scripts/package/builddeb derives
+$version by stripping "linux-headers-" from the package name ($1) rather th=
+an
+using ${KERNELRELEASE}:
+
+scripts/package/builddeb:install_kernel_headers() {
+	pdir=3Ddebian/$1
+	version=3D${1#linux-headers-}
+	...
+	mkdir -p $pdir/lib/modules/$version/
+	ln -s /usr/src/linux-headers-$version $pdir/lib/modules/$version/build
+}
+
+Because $1 is now linux-headers-${KDEB_PKGNAMEVERSION}, won't
+install_kernel_headers() create the symlink at
+/lib/modules/${KDEB_PKGNAMEVERSION}/build instead of
+/lib/modules/${KERNELRELEASE}/build, leaving /lib/modules/$(uname -r)/build
+missing for out-of-tree module builds and DKMS?
+
+[ ... ]
+
 >
-> If you think there's a low risk of conflict, I'll take it.
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
 
-Hard to predict everything... but conflicts are generally fine anyway.
+[]
 
-Thanks!
-
-Cheers,
-Miguel
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261019-deb-pkg-v1=
+-1-7f8e60bbede5@sigxcpu.org?part=3D1
