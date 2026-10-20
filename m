@@ -1,78 +1,78 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.177
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.179
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792510647;
-	b=Z/MvIggM+MSpox+z+SWiWUQmktnnXXL3mm50X9D/iyfmTwOikzoow2W8g2aq3K/zFtf5
-	 mLmXWJP+7pcb41MF6mQh03mGqwo2NEs3+VlUZ6qMGTsHBf5bV1XDks+QllQC3f0xQsx1o
-	 msQfIH4jUhjhJe9XZ6b99FFriBsxHNjrhs+wNMTF69WN6VVR16NuS8dQnTWQ5KrJi9j7J
-	 JrUfndtLa3LgQAyndcec8u+0IDD1ZODl/yu+hbwsRjB3slBduybsMSO8fZP9Zdkq7DZkr
-	 OCwOoWK5mosO8k3BdLNE2dMedwMpJbySi19tO6PrClmoecfQCuz2P6JkETICVMKFDzg==
+	t=1792510649;
+	b=fM8YJqoAd+gmAkkBgUleOfCSp+T4fCXUTx0lRr7OPkAu2DNQnIoRH0S4WE7PB2SmPMUG
+	 0MQnjVypxN93fCwKOjwU5XdXyVDqdCQLFTLhHQZp/JJ1fU6sEd/krwRQKBZLPucflcPsr
+	 +HbRI45ws8mKO2CtrLmM3Smz79lCiUCq8FY+KVIaOF7j7m92RMNjwq9FopkYnLI3MFD3W
+	 bM/AAlrQ7ZgEsoXAhN1TpMkRcI3U8Oyz5hcgf8FIG1NPS8qJysmJ5f4M49hPtjTzRY7/1
+	 bBY6M6sSB9xn8TxUKHpNr1PBOm2f9KORsb75xfgXjJ03Ro6tUMOgL1Htv75e4OfJcGg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792510647;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792510649;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Type:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=ldWxVHDgUgQ18jFdtDAJ8jJd2yZcZSUNdb3f55SGTX0=;
-	b=GBMmQDKeTpVfDaHgTpzNwxS99s4h+WdGvrwLAkD/a8HfpkhGGEM4cjKrrbnjEV0yjFZg
-	 qfFM4/4JqObmpq+7eBEu8aMetlQ9BTpqAV4Brq0n9fTm4PS+agcpjKbw/EoiefHXqcm9b
-	 ngQi8cU1fioGcHY2205xuj0ElqJxdYjzVOa0YyEU72oyTcPI6bkuR3utpj/OzjnF8Er2s
-	 p06izmrMfHvUo/4ubyxA9s4VrmknsZjKg22ydFDc6eC3jEkRdkJw/jpV5ppoewHFOFay6
-	 MpM2YeKLsAN+8k4aEvOzd+lOwG9Ln69GUeuYENVwQBrxM9M6VsruyBl0lKBrl0KDoMA==
+	bh=qznKbFxxt5cLWwuKS0ovtSoD1j1l73+lYRqJ0Ocaqrk=;
+	b=z5YSH6bAQzLxmYlb9dTAHonq7uSDX1+rkYockiFSHaibJz+lVqY9bgQj7DRMqsHv/FoZ
+	 mT3GSCEZKcm1rT1tsFZgpMzoZ5o3LsBaKBqJBRdTuC2hSXA0+0FWfW1Wc51ZGMmBpSCzH
+	 O3rgzGn8YwFi844RKUSWpuUylkFBxAHdU2kfjXTGXonEKvEirL1EG4KhfUCrhlHG1ohtv
+	 PKNHuosda/BB596JauLNnSpbz2qnsCXu/tcpnS48kQ78oVEGz/QY/vdEV5ClUbQOaLGqc
+	 pch3Agv68TaiF6UiiAYsv45skjA1hPy5Owm5uxhqOb5pSLA7tMcwouFgOcSynWfu6XA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=chromium.org;
 	spf=pass smtp.mailfrom=chromium.org;
-	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b="Q/M4ohUy";
-	arc=none smtp.remote-ip=74.125.82.177
-Received: from mail-dy1-f177.google.com (mail-dy1-f177.google.com [74.125.82.177])
+	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=ZB0AmpTi;
+	arc=none smtp.remote-ip=74.125.82.179
+Received: from mail-dy1-f179.google.com (mail-dy1-f179.google.com [74.125.82.179])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D9A5606A333
-	for <linux-kbuild@vger.kernel.org>; Tue, 20 Oct 2026 15:37:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3D9A5606A333
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F45E606A31E
+	for <linux-kbuild@vger.kernel.org>; Tue, 20 Oct 2026 15:37:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7F45E606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=Q/M4ohUy
-Received: by mail-dy1-f177.google.com with SMTP id 5a478bee46e88-3550c917fd3so4042687eec.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 20 Oct 2026 08:37:27 -0700 (PDT)
+	dkim=pass (1024-bit key, unprotected) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=ZB0AmpTi
+Received: by mail-dy1-f179.google.com with SMTP id 5a478bee46e88-35b2c599f43so990349eec.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 20 Oct 2026 08:37:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1792510646; x=1793115446; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:message-id:date
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=ldWxVHDgUgQ18jFdtDAJ8jJd2yZcZSUNdb3f55SGTX0=;
-        b=Q/M4ohUyAJ7ROEDRnEfif5lqm8SVj4WkJkIxKL1p4bokHsZuMxcjvvMPhVRNkEPoiR
-         j5yWwuiinUbY4oNVulXzeJxLzeXkFBbS4H4E5rlSdZ/O/Z6nTiJi5PNyn3Vb6ayxyQLe
-         DZha0CltkU3t+XeU2wkG4TuszL7LlwU10IXic=
+        d=chromium.org; s=google; t=1792510649; x=1793115449; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=qznKbFxxt5cLWwuKS0ovtSoD1j1l73+lYRqJ0Ocaqrk=;
+        b=ZB0AmpTiEFpkYXp0+xLjk4W6R0qcTahYVXSVmFDgQXTNrUa4ZAw/D78slYkOG/1pqT
+         WKBNuC9DZqypB0b8Rk2Ji9vE0p9+M71yqhsJS8VL89DlXOT/kJhPFZQebjojLdqPK6Ww
+         0H9XY3j6gr6XmSqFQ0RJQN77Gy9M93W1ltSps=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792510646; x=1793115446;
-        h=content-transfer-encoding:content-type:mime-version:message-id:date
-         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=ldWxVHDgUgQ18jFdtDAJ8jJd2yZcZSUNdb3f55SGTX0=;
-        b=WbC0s7fZPpnteZ7C8GOVeEM0nHJH2YS9JV3Zny+dW4I4sLzGude4w/LvN2kj62b+pR
-         e1OHaXyDwnIcU8/byzfWmeO/vPDpgv2dRJ6YuIKHDhVegSGC4JSKQ0EHcP1Ez/4EP3W3
-         pqQNROSpra9L6jlZVdN+bJeQlIcrRUdhjsDueBvJwmu3+ZzrJ+xpM79O5KTWMr0LxXXE
-         3ABO1x8N54SHGI1bAbpwkhnVA7r5uIpM6UuPyvHtLD+zLk1OqzcsfruKd7hgay7S6iKm
-         2zr2OQKsjWhdpJVc4MheFQ4Ox/dpOykOgvx/hipx3fCFexT0gYT93VXbRkcgo80UnSj8
-         4NjA==
-X-Gm-Message-State: AFq9FYIKoFgiIpndwZ9BHeYjTQ+8IOWd1XZ9+fLvPHywY9eJf6JUJD1t
-	AAOeR9FRTDFMxpSkMt2aO3EXb/Z4gYfHHOdPpqQYy3qOgETNrfsq3Mjw+Olth/QGZQ==
-X-Gm-Gg: AYBFou35xZwvJlINEBoFFA0viGmoJUO+QIIkrTg7yYKiTXGmSba2//NIfLCxq5vv7Xp
-	VGAUznyrFnh+7Z7nh99vHwF/VPhXK9joB2yBBP9VxgB8ATId02aob1ZPbf3A+FZ2CKa7xZw3XyD
-	f2RqJgPI3OKgGzAmnlZCAcKHiFXYcznRVsJA1ClbzeGb9I9QXOIHmzdaX4pzaafSTui0YsD0+KQ
-	oAXI1yk6YP+zJFf/k1X1l2BwjCw4osxb9MKlhXjxQVaLfELmDa5YHWKI5p1SPUR0PUW3k0EJJkn
-	oaMJipGoh1aSNoOXSN0mQ4nJmXi9yZt7lJ0vly1T45ipzB4tsElg/tpcbHUmQK1GuYmrqXRzgiU
-	aPLZ8powpZdCrHDZvQYVb82cG3+Oc1PissVoKm3WUBAWQ7OQsRp2wUyE3QnYGgy8GzAUqFdmbaQ
-	l9Mm4M+/A+AOW4CWNw/2EVO56HUiM9K8HtoqTrAq+42odK82+T2QObv2uvz1Y1VmIoL1LpjMWMu
-	36MohxrRc2DJVJ2DTEgWFk0e1S+FzofBNJYG+P937acc16MxdMYgY7RKVA=
-X-Received: by 2002:a05:7300:d409:b0:351:1e2e:da4d with SMTP id 5a478bee46e88-361a1f5019bmr16718087eec.23.1792510646054;
-        Tue, 20 Oct 2026 08:37:26 -0700 (PDT)
+        d=1e100.net; s=20260707; t=1792510649; x=1793115449;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=qznKbFxxt5cLWwuKS0ovtSoD1j1l73+lYRqJ0Ocaqrk=;
+        b=UuBLlwrMvFTd6yW+VZXZ8wvausm3pTDNwLoAtCAthnupOhdkImWc52uJ9UETss9ccV
+         NwE9HKN+nVe+hIg3WFXmEEj4X6Ac1PeZ0RgwhW+FEvtHP24lBEeNi8cmPRDCljF/m/Q2
+         VvVm+451nc6CR+HU/AaBfYyjWPI89RYUF8xl/eEXLpFjpueOGQ3lnXyLyRzQXaaFD/zR
+         Q0DTxG2GXJ4AysMBIQkbjZYK2w4KNyXTzSsv/zMpuptToLiZjhRrABFDla4/0WnMFVvX
+         aEi7vdac9b5zYlb1LKfCkOysaSco/vGJIeDcISt/uRAJuDLZXlndviwGrsUkZmJ5R991
+         2zZQ==
+X-Gm-Message-State: AFq9FYLQFij6leSNXHa0+MiBvOCt1dwX39sR7Z0p68Z4aI/HKU+T0dZe
+	xIRDgQLQAisY/Z7rV/Rm285CO+GFzLJeLwOjynFBLcuCl5Aq77Te5TTZl095lFmWhg==
+X-Gm-Gg: AYBFou1rkxJPOiZBY5hkyQ2lnT3k5WuKlFCCRNV6RbHFRPKD/YFFXvFEIrCoM7yTgpK
+	YuBv2N0A9MM5T4J4qElvWgGhVDDd8D8IOYpAArGTBsM7+mK9UjKNymqe+2mTgg7f1jRZR8xbItx
+	46FdxL5DukalU+r5KUjQRFJ38gtyUXdkNYvymWWd2WG99NLCE6+A70V0fIxzKxd/K//P6D/ETI8
+	SZJP+IxuOsRXYiUvHoN3Rq1rAxaZTY+xlZiUiM5a+zNhkS76O4UzW8YXszZKn1TII5DXcAcu+hN
+	P2Oqoh2TChrmj8/NkfLCbORvwsbZyaxWC5t57h48DOaSGa3sKkKGmRVxHeGMofH7aLQwOhLOW/V
+	H7qCX25AsCKaO0CXfTueAozIkJzv2N30yWwUg+PwF+qphEWt8Y3BCkoMIqfmG11IityQiekKgy2
+	mmjDwMMikTFoszh8AUpGAXBw9UGJaRRSUff1lQ0V/O18eycl++7pgmxlm2+hSZqCBFVu995Irm6
+	z5vnHwGKKe7amlrI1JLXe0nTFOqrIiouW/fkTG4G8lnOZhhOI3b+/Ai+OM=
+X-Received: by 2002:a05:693c:6391:20b0:366:e24d:a0f6 with SMTP id 5a478bee46e88-366e24da2d3mr927924eec.29.1792510648703;
+        Tue, 20 Oct 2026 08:37:28 -0700 (PDT)
 Received: from dianders.sjc.corp.google.com ([2a00:79e0:2e7c:8:1eb1:e432:2cc7:349c])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3607ee0cab0sm51324714eec.3.2026.10.20.08.37.23
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3607ee0cab0sm51324714eec.3.2026.10.20.08.37.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Oct 2026 08:37:25 -0700 (PDT)
+        Tue, 20 Oct 2026 08:37:27 -0700 (PDT)
 From: Douglas Anderson <dianders@chromium.org>
 To: Devicetree-compiler@vger.kernel.org,
 	Rob Herring <robh@kernel.org>,
@@ -98,29 +98,13 @@ Cc: linux-kbuild@vger.kernel.org,
 	Michal Simek <michal.simek@amd.com>,
 	=?UTF-8?q?Andr=C3=A9=20Draszik?= <andre.draszik@linaro.org>,
 	Douglas Anderson <dianders@chromium.org>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Breno Leitao <leitao@debian.org>,
-	David Sterba <dsterba@suse.com>,
-	Gary Guo <gary@garyguo.net>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Luis Augenstein <luis.augenstein@tngtech.com>,
-	Marco Elver <elver@google.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Nick Terrell <terrelln@fb.com>,
-	"Peter Zijlstra (Intel)" <peterz@infradead.org>,
-	Rong Xu <xur@google.com>,
-	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
-	cros-qcom-dts-watchers@chromium.org,
-	devicetree@vger.kernel.org,
-	linux-samsung-soc@vger.kernel.org
-Subject: [RFC PATCH 0/7] arm64: Add fit images for sc7180-trogdor and google,lga
-Date: Tue, 20 Oct 2026 08:35:18 -0700
-Message-ID: <20261020153652.2907186-1-dianders@chromium.org>
+	devicetree@vger.kernel.org
+Subject: [RFC PATCH 1/7] scripts/dtc: Add fdtget.c and fdtput.c to sync script
+Date: Tue, 20 Oct 2026 08:35:19 -0700
+Message-ID: <20261020083501.RFC.1.I7ef2211f59d5912146a6816d533638605edd0f36@changeid>
 X-Mailer: git-send-email 2.56.0.212.g129ede20d9-goog
+In-Reply-To: <20261020153652.2907186-1-dianders@chromium.org>
+References: <20261020153652.2907186-1-dianders@chromium.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -130,84 +114,43 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
+fdtget.c and fdtput.c were imported into scripts/dtc/ in commit
+cd296721a964 ("dtc: import latest upstream dtc") prior to the creation
+of update-dtc-source.sh, and were never added to the sync script.
 
-The end goal of this series is to move forward on producing a
-"universal" Pixel 10 boot image that can boot on a variety of Pixel
-10 devices (frankel, blazer, and mustang and eventually multiple
-revisions of each). At the moment, this is impossible since the Pixel
-10 bootloader:
-* Picks the base devicetree based on SoC ID information.
-* Picks an overlay devicetree based on Board ID information.
-* Needs metadata associated with each overlay to match it up.
+Add FDTGET_SOURCE and FDTPUT_SOURCE to update-dtc-source.sh so they are
+kept in sync with the rest of scripts/dtc/.
 
-Since we don't have per-board overlays and don't have per-board
-metadata, that means that today you need to pick exactly one revision
-of one board and build a boot image just for that.
+Signed-off-by: Douglas Anderson <dianders@chromium.org>
+---
 
-How does this series help us?
-1. It uses a checked-in .its script to associate metadata with each
-   board's devicetree. Other tools can parse this metadata in order to
-   craft a package that the Pixel bootloader can understand.
-2. It integrates a call to the new `fdtfactor` tool [1], which results
-   in a "base dtb + board dtbo" that looks like what the bootloader
-   needs, at least as long as all the boards have the same SoC.
+ scripts/dtc/update-dtc-source.sh | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-What happens if everyone hates this series and it gets dropped on the
-floor? Honestly, everything here could just go out of tree and it
-would be "fine". IMO it's nice to have the Board ID / SoC ID
-information for each devicetree stored in the same repository as the
-devicetrees themselves are, but if this has to live somewhere else
-then so be it.
-
-NOTE: from reading the above, you might wonder why the sc7180-trogdor
-.its script is part of this series. The answer: it's a board I was
-previously deeply involved in and it is a convenient way for me to
-prove out that the Chromebook use case works well. I did hack up some
-changes to the ChromeOS build system to use the provided FIT image and
-it worked great, but since I'm not on the ChromeOS team these days
-it's not something I personally plan to follow-up with. It sounds
-plausible that Chen-Yu may follow-up with it or post a similar change
-for some Mediatek Chromebooks.
-
-[1] http://lore.kernel.org/r/20261015182221.2931742-1-dianders@chromium.org
-
-
-Douglas Anderson (7):
-  scripts/dtc: Add fdtget.c and fdtput.c to sync script
-  scripts/dtc: Update to upstream version v1.8.1-22-gf3451d12532b
-  scripts/dtc: Build fdtget and fdtput host tools
-  arm64: boot: Support building image.fit from a specified FIT_ITS
-    script
-  kbuild: fit: Add opt-in FIT_FACTOR_DTBS support using fdtfactor
-  arm64: dts: google: lga: Add lga.its FIT image script
-  arm64: dts: qcom: sc7180: Add sc7180-trogdor.its FIT image script
-
- Makefile                                    |   2 +-
- arch/arm64/Makefile                         |   3 +
- arch/arm64/boot/Makefile                    |   9 +-
- arch/arm64/boot/dts/google/lga.its          |  68 ++
- arch/arm64/boot/dts/qcom/sc7180-trogdor.its | 728 ++++++++++++++++++++
- scripts/Makefile.dtbs                       |  51 +-
- scripts/Makefile.lib                        |  67 +-
- scripts/dtc/.gitignore                      |   2 +
- scripts/dtc/Makefile                        |   6 +-
- scripts/dtc/checks.c                        |   2 +-
- scripts/dtc/fdtget.c                        | 207 +++---
- scripts/dtc/fdtput.c                        | 280 ++++++--
- scripts/dtc/libfdt/fdt_ro.c                 |   2 +
- scripts/dtc/libfdt/fdt_rw.c                 |  41 +-
- scripts/dtc/libfdt/fdt_sw.c                 |   3 +-
- scripts/dtc/libfdt/libfdt.h                 |  70 +-
- scripts/dtc/livetree.c                      |   2 +-
- scripts/dtc/update-dtc-source.sh            |   4 +-
- scripts/dtc/version_gen.h                   |   2 +-
- 19 files changed, 1322 insertions(+), 227 deletions(-)
- create mode 100644 arch/arm64/boot/dts/google/lga.its
- create mode 100644 arch/arm64/boot/dts/qcom/sc7180-trogdor.its
-
+diff --git a/scripts/dtc/update-dtc-source.sh b/scripts/dtc/update-dtc-source.sh
+index 94627541533e..f21da460742e 100755
+--- a/scripts/dtc/update-dtc-source.sh
++++ b/scripts/dtc/update-dtc-source.sh
+@@ -38,6 +38,8 @@ LIBFDT_SOURCE="fdt.c fdt.h fdt_addresses.c fdt_empty_tree.c \
+ 		fdt_overlay.c fdt_ro.c fdt_rw.c fdt_strerror.c fdt_sw.c \
+ 		fdt_wip.c libfdt.h libfdt_env.h libfdt_internal.h"
+ FDTOVERLAY_SOURCE=fdtoverlay.c
++FDTGET_SOURCE=fdtget.c
++FDTPUT_SOURCE=fdtput.c
+ 
+ get_last_dtc_version() {
+ 	git log --oneline scripts/dtc/ | grep 'upstream' | head -1 | sed -e 's/^.* \(.*\)/\1/'
+@@ -55,7 +57,7 @@ dtc_log=$(git log --oneline ${last_dtc_ver}..)
+ 
+ # Copy the files into the Linux tree
+ cd $DTC_LINUX_PATH
+-for f in $DTC_SOURCE $FDTOVERLAY_SOURCE; do
++for f in $DTC_SOURCE $FDTOVERLAY_SOURCE $FDTGET_SOURCE $FDTPUT_SOURCE; do
+ 	cp ${DTC_UPSTREAM_PATH}/${f} ${f}
+ 	git add ${f}
+ done
 -- 
 2.56.0.212.g129ede20d9-goog
 
