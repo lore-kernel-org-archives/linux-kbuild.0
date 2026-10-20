@@ -1,61 +1,50 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=24.134.29.49
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792530995;
-	b=FZk/n3svZuAqLaGEDQmvvAIL5kdAJWNcM8yfBD2HGh/9QnwGwkfXP/0tkx/0AtHCLLU9
-	 FEK4MzSLF8Xxp4FHtyujgMf3WE/BfcxS/T/OYnQJnGCQhOt9eWKFJ/Cku8xGAREyVV+/3
-	 bdiJej5TUg6AJg5rRrbYWOpBXNtz0OQ4l4nD5wQCHuxB7DG99PfdW6f9PbpYPuQL16MUW
-	 qbPOwSr6T2b6IIK4pQN5kUbqIqCrx/KhqxglsiVJFboV14nz82WL889+hshxkE2MfzUkS
-	 lJK4X0e0I9hPNVCz/tfovj6StgJk1VZrcqHouXmEfB3gn0N+CM61qoAV7UsRokjrKRg==
+	t=1792533150;
+	b=5j5v+k4CT9KM1xlwistKD6LH+/udTNNjO6RcejHwWFJUhtUFvWcCCNnLLf7ET5QXMOzR
+	 hJw+lquObp/5ztUiraF2+ARBzZhUbPYmWYdKChdSw0Ic5ibZ7rzTzNF7hZBM5r0k21UrN
+	 8vRrBrmKLHz4bLCfWhczL0XQj1gQNVsRy4HZNbVUmTE3WJMf35sgiz85MbEy3fIaJS+5A
+	 sTiFesuEkmLUsrR8n13IzQo/t7ANFMAz2aU0+WD//ppp1XDHGl2QlK2bUnaEnDGjhka3N
+	 u5kigCSqFURMk7OOyeUUtYPhopmExlpgT+OoWci8tgu/MR0s3hMHdFCxBAIl96OYHXQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792530995;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Subject:
-	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
-	 Content-Transfer-Encoding:In-Reply-To;
-	bh=B3bLfthOSt3xqxUAUmOf2sxcjhbrnVatnteg2vCqEnE=;
-	b=hTbt3hb181Q2N1/oiHmHVtYrftTKBQ2sLRZi0p/B4mctYQwhPdnZEPA9WN+R206VP597
-	 TFRYkUYa3dpiyrTqgMQWjkDZKMCChw5J+jPDkQ6DzdCYoeieC66kJouBVHnuZwxxsh5WT
-	 FMNRsXpJVg1nX0xPm0FV0q86A3Q4DfNxHu5zycChhAEMKhYrOPvTXLKWJ4iXrFof7jESf
-	 MofRu6UP/kHGvcrWa+wo/kgiFrP6/l7S4q7GMtZzZJJkmYqcm9F6Xt8yrVz90NhlwM18I
-	 8ayu3sh/5bpiVqU7eT+Hn/zjR8/WUhlCweOxGFrjZ62A1zxqhzidcBVzLiTMoyFKlBA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792533150;
+	h=Received:DKIM-Signature:From:Subject:Date:Message-Id:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:
+	 Cc:X-Mailer:X-Developer-Signature:X-Developer-Key;
+	bh=hIZqfHvkeV48wYKVgFESXaKGPL4jCR6YGzUw6vDNOiE=;
+	b=WKTj/+o/kcPFXqwYdBeXlyWataBc8HNn5ZVpwOqTXUqjY0UPwVCHRyHkGiPfWGCbXFPl
+	 cXA05QgY4wxtr78Hj5xyKoGa8l5HlJci4i3jaGsuy9zYoL67PDDmwIv3we5NIacbTBb45
+	 yNnUXzYOKH+jqboAGo7/ZBQEvRtYy/f+KVsNDU9NsXOypBJpYOoMb6tS7G+nIGbpvAzQR
+	 9VqMNOsuL28hNOa0qkmN4S98/BP1c7llgk+1uU5irxYpaMqXyff7WN3zRggxDplXMvptK
+	 Y6ONYTDtKu7fgHDUI7flSq2aVoNlbfFrSv9qQRIB0q69nfB5QWH2yvtoTCfPJyH0SZQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=sigxcpu.org;
-	spf=pass smtp.mailfrom=sigxcpu.org;
-	dkim=pass header.d=sigxcpu.org header.i=@sigxcpu.org header.a=rsa-sha256 header.s=2024 header.b=leVLvjKi;
-	arc=none smtp.remote-ip=24.134.29.49
-Received: from honk.sigxcpu.org (honk.sigxcpu.org [24.134.29.49])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=W5CbzX8s;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 447A3606A31E;
-	Tue, 20 Oct 2026 21:16:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 447A3606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sigxcpu.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sigxcpu.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2A17606A31A;
+	Tue, 20 Oct 2026 21:52:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=sigxcpu.org header.i=@sigxcpu.org header.a=rsa-sha256 header.s=2024 header.b=leVLvjKi
-Received: from localhost (localhost [127.0.0.1])
-	by honk.sigxcpu.org (Postfix) with ESMTP id 62121FB03;
-	Tue, 20 Oct 2026 23:16:31 +0200 (CEST)
-Received: from honk.sigxcpu.org ([127.0.0.1])
- by localhost (honk.sigxcpu.org [127.0.0.1]) (amavis, port 10024) with ESMTP
- id w_BaVwh42QpA; Tue, 20 Oct 2026 23:16:30 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=sigxcpu.org; s=2024;
-	t=1792530990; bh=VyoPL1jP6f4OLw+ga/Nomuw6eRu/BLjfUuCHxxV2oSc=;
-	h=Date:From:To:Subject:References:In-Reply-To:From;
-	b=leVLvjKi2s7EsPIiqAG0GTAUm/EE6GQ8U1w+dY7+U8M8yoiQ5JD/Z5dtf6ZU6b7l7
-	 fJx/s0Jr3dKuHLVlfXR93AR7AmiWFg8RRvU/8GW9HeNudqiFmMw7ZwOpmtIxqz/Dq3
-	 vAeMrKitsRxhjuEHdmJUQFiy5a8pq9gkVUAqSLP6Ado/p2bkCCgCYozbR2VcEPWBDk
-	 RhYD0TkgsM3FkwoHaJNMdkSPVzaKR8FHrMC6/+V+ePZ+T6MuEnq+4dODhS46y7IBE7
-	 SVrgOdXv7ZRpqmK4PV4OA8U4ouo7CILn7vxu018dHTYD5Gpyp59V/ZsV5V5L/WLGS5
-	 SJstSe90H/3oQ==
-Date: Tue, 20 Oct 2026 23:16:28 +0200
-From: Guido =?iso-8859-1?Q?G=FCnther?= <agx@sigxcpu.org>
-To: Nicolas Schier <nsc@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] kbuild: deb-pkg: allow to set package name version
-Message-ID: <atfaLGt-46bVugss@quark2.heme.sigxcpu.org>
-References: <20261019-deb-pkg-v1-1-7f8e60bbede5@sigxcpu.org>
- <atfI0Uc3iWSmR49j@levanger>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=W5CbzX8s
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A0D61F000CF;
+	Tue, 20 Oct 2026 21:52:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792533149;
+	bh=hIZqfHvkeV48wYKVgFESXaKGPL4jCR6YGzUw6vDNOiE=;
+	h=From:Subject:Date:To:Cc;
+	b=W5CbzX8stvqc7tXLuLY0WiKQqgETZYSS2a2gj9p4YCZCWPk0sYqfBLaZJ/+0DWPRB
+	 MVZuyVQUY1D+I8j4+/DPWeUEwMi3gP0t74VyvL1dZBjNuL2ILfwhwwvH/Hxiu4Pd60
+	 mCPIkPaVfMaZUlsudU//4i7AcmQEwiCDthAXLjfqxMBBYHBcpEl9l+Q6Ye6hapPlOj
+	 5x96MEvgge7sZJehJz+FxAEqZL3+HtV4hbf/mwnmY8IjnIsVQHD0OHu2OoGo10X74z
+	 R6RO2YMYhFmziUitr5s7jRJ1ohOOAHcfbPYlFQ2BsndwSZey6Nkoy39EsH/CnvVUoN
+	 voDYTg/diIWbQ==
+From: Nathan Chancellor <nathan@kernel.org>
+Subject: [PATCH 0/2] kbuild: Fallout from moving '-mfentry' check into
+ Kconfig stage
+Date: Tue, 20 Oct 2026 14:52:17 -0700
+Message-Id: <20261020-kconfig-fix-mfentry-check-v1-0-428258bc0fc0@kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -65,42 +54,55 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <atfI0Uc3iWSmR49j@levanger>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXMQQqDMBCF4avIrDsQA3HhVYqLOE7MNBglsaUi3
+ t2oyw/e+3fInIQztNUOiX+SZY4F9asC8jaOjDIUg1a6qZVWGGiOTkZ08sfJcVzThuSZAhpltOn
+ J2IYslP+SuIzu9rt7nL/9h2m9gnAcJ2/ZXxZ9AAAA
+X-Change-ID: 20261020-kconfig-fix-mfentry-check-50525bc5a6ca
+To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
+Cc: Julian Braha <julianbraha@gmail.com>, 
+ "Lorenzo Stoakes (ARM)" <ljs@kernel.org>, Kees Cook <kees@kernel.org>, 
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Ricardo Ribalda <ribalda@chromium.org>, linux-s390@vger.kernel.org
+X-Mailer: b4 0.17-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1067; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=frpQhPa8vDtdOo+LjW/wRQXA5GT8qEG7+AzXAKCkRJw=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDFnXH01X+C8W8bCL5X2VY1ZBrs6+TYabzlid+x/jtPFrp
+ /CH54wlHaUsDGJcDLJiiizVj1WPGxrOOct449QkmDmsTCBDGLg4BWAiAvcZGTYsEH5z8yuzwe/k
+ E4fD2D8puB9KWBZ4USdImjn+Psvaj78YfrMcO/b9UWP44jmnL2WfLy9t/XdW9+wzN3Elzi+rXFv
+ 4GDkA
+X-Developer-Key: i=nathan@kernel.org; a=openpgp;
+ fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-Hi Nicolas,
-On Tue, Oct 20, 2026 at 10:02:25PM +0200, Nicolas Schier wrote:
-> On Mon, Oct 19, 2026 at 09:16:14PM +0200, Guido Günther wrote:
-> > Instead of hardcoding ${KERNELRELEASE} in the package name allow
-> > the user to override this.
-> > 
-> > This can be useful if one doesn't want to accumulate different packages
-> > for every commit or micro version bump by setting
-> > KDEB_PKGNAMEVERSION=7.3 or even KDEB_PKGNAMEVERSION=stable.
-> 
-> I am not yet convinced, that this is a good idea.  Do you want to
-> elaborate a bit more, why you think this is necessary?  Have you tested
-> your patch?  I don't like that source package name and binary package
-> name divert w/o good reasoning.
+Hi all,
 
-The source and the binary package names can already differ due to the
-`KDEB_SOURCENAME` variable (and we're making use of that).
+Ricardo reported an issue from moving the compiler test for '-mfentry'
+into Kconfig. In testing that patch, I noticed that the kernel.org GCC
+builds for s390 were not probing correctly for '-mfentry' support.
 
-What this patch adds is the ability to control the suffix so we can
-e.g. build a `linux-ng-foo` and a `linux-stable-bar` instead of having a
-linux-image-7.3.17, linux-image-7.3.18 (or with git versions or …). It's
-just about having a bit more control over the generated binary package
-names so we can decide what replaces what on upgrades.
+The first patch moves the check for '-mfentry' back into Kbuild where we
+have the proper information for whether this flag is actually supported.
 
-I have tested the patch with and without setting KDEB_PKGNAMEVERSION.
-Without setting this variable nothing should change for existing users.
+The second patch documents the reasons for these issues for future
+travelers to hopefully avoid these problems.
 
+I plan to take this via kbuild-fixes after sufficient review/comments.
+
+---
+Nathan Chancellor (2):
+      kbuild: Move testing of '-mfentry' back to Makefile from Kconfig
+      scripts/Kconfig.toolchain: Highlight cc-option differences between Kconfig and Kbuild
+
+ Makefile                  |  3 ++-
+ scripts/Kconfig.toolchain | 23 +++++++++++++++++++----
+ 2 files changed, 21 insertions(+), 5 deletions(-)
+---
+base-commit: 997208ce9f43f01febac956cf9aeffe89945e3c1
+change-id: 20261020-kconfig-fix-mfentry-check-50525bc5a6ca
+
+Best regards,
+--  
 Cheers,
- -- Guido
+Nathan
 
-> 
-> Kind regards
-> Nicolas
-> 
