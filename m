@@ -1,59 +1,54 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792609142;
-	b=njhMKKdLe7o2EP9gQqT47HiCcunZTtfe1J7KvLHKBDhkpq8ZGMwQ+Tb8CIn4tL8XMgUJ
-	 Z52w7w6fYFsGx0AsoClwaiYiZHF4NG/Bf+trrsnjMsrhWwlGLWne7UFCIyY5PmSk/sHk5
-	 yFmeum9s3DAIrWvVxc0UfHfNv1Og7UjRpFUVN8wDKJ5KlF/Eas9oYbq/H/yy3HIuDqfUR
-	 FPjDxT1zNnUgFgnBL/BBIuLMHKi+8coA0ajlHQ2nAfT9B+fjSHgc1LdERZ1BTf8GLqA3P
-	 IHY/N9ZltbY8e3C+eQ4vD2mIpdBE7LSFS/flYKWJnN42R5zJ1PICNDjlsX0CjpStFdQ==
+	t=1792609395;
+	b=VAOyCGlnZsR2yWm13EcU6OEBbcbMKuZK5iho2PD0jTqiugrWNj9gkHLz9XWFzvu4brA4
+	 JI8IyPYW0Wl2m4D+CqXe9tQL/G2pLyMXXYrBcodZ6bQgp14p5zo0zxgSZIM50bGbK4Plx
+	 m1aVYEHzcL0l4H05Pb602RpBr9d9e7ayKCeQw+AbAjyrkcWUJdL6HWW4gFUDhGcMZ0b9U
+	 EhjDr+Cf6LPufa6j1F6ErGY5Zc58Fm7h8wgrZ2w52eQIX/82tfj3posC3BxfHcdq1FoE5
+	 TjxnvQScixIkLsEqh/LUyF6G9SKiZvXJmAVNPV49zg35k7UGzl130qy6HZYDl9U+P+w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792609142;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:
-	 Content-Transfer-Encoding:In-Reply-To;
-	bh=IE46uUimPZ2OrMix9QdgrETw93S8Yz4lO5oDBNbPDxM=;
-	b=V3wfFI9IuvpwTreblg3/c70Rkfxv6PqgeH7H4GL5kxnmt0H4DLDzvLyWajnFzvhdw+tR
-	 I66DtHw4lHB0V9pM/U8kjXJZB6V6CVTqWuchrqpJdyygqsto7elPGj0TkUo/z3NXB82Kw
-	 pYYlpW1v37ydMZ7wcKaS/q0WHqElIlnyNXJtRQXkL5kFcOXoxFGpSZTMTNGZxRd86rPq7
-	 jk51hkkIlQKeja+5GnP8jQp5NQITrzA7Rd8PderzwNzyTTsAliruZ4sh7npYiL6KmoSpy
-	 UCESxxWCJJsQq/TBtmJj80ER0GsCF/lJ4IVTFsCQYEieHY+gbGidkdkCpPBoVd/X08g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792609395;
+	h=Received:DKIM-Signature:Date:From:To:Subject:Message-ID:References:
+	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=orXTBbf0coPXSg7bdmSFg7fWGZXhMKNKnBJ97rjbUEM=;
+	b=APzG6Cifx2fckTjcyj3QxyDkU8MKrlKDJZH3Y7BbTq8Lq7e/8lqOHNHPctyQmYo2/5aW
+	 j0OIwLaCQ+Th3UCWXhiWdN7LsThmYTCT1DyoZ+UNXlYdPLX0w/I8zAHPWHvKASZRZUeCs
+	 IVI6RBdW+P7bI8hOosDGjwQ5Sr7RkFnmscJVfWX2/oLX+Q2Veisuj12uSak83u9UrA4RI
+	 LjUcgAxrYYqmohIiHziauTg/jj79659nq/E8A1qxD8AX1ksyzot1+H5CEfMjftAY/yxMT
+	 h6wjjrtiBPeVeZoSvRKnm+hwrwVyioMnTofbfJVKvkDhluwACdQ68RrlrY6JBhVjHOA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=B2SzQHwM;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Iw9k01OE;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CC26606A319;
-	Wed, 21 Oct 2026 18:59:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BCDF606A319;
+	Wed, 21 Oct 2026 19:03:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=B2SzQHwM
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F8991F000C1;
-	Wed, 21 Oct 2026 18:59:00 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Iw9k01OE
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 258DA1F000C1;
+	Wed, 21 Oct 2026 19:03:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792609142;
-	bh=IE46uUimPZ2OrMix9QdgrETw93S8Yz4lO5oDBNbPDxM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=B2SzQHwMFu/kHIndlhBoY4fqkhEQ82z/N/IvKA74NRjlF5OEClO79qeUgsOOtGzWn
-	 jFdOlJ8fEMULZny7pDtgJloVpJfJmzvB/c+sS4Pgc9OQ3Q/k5qEww6H2uG6pCCxPLg
-	 2czxJADB8Yju5JWOHIdv8QT0UYqmgTfCbGPYQ7BqhqhQ9YE9JiPPsk/UJ3+Ya0RpCa
-	 q2nD1FdlbforpMLEIbkktkaQQIpV83pkiodsVuhnu3sL5ppAiFGS+eoWFptcoRl4PE
-	 u8mDzq2WIZTfF60IqTyXEaVhsSr+rOoZhLFa86GJWxt0G96z29qK6zQXNV5Ydsa8ZP
-	 pzqzRK1sV4OfQ==
-Date: Wed, 21 Oct 2026 11:58:57 -0700
+	s=k20260515; t=1792609395;
+	bh=orXTBbf0coPXSg7bdmSFg7fWGZXhMKNKnBJ97rjbUEM=;
+	h=Date:From:To:Subject:References:In-Reply-To;
+	b=Iw9k01OEowX+OoHwE0puHeqR7PpORtBCgZ2+SFQHfz13rpx3ZYQOmyI1Ajkgz66tV
+	 CE6caahijYs6uUFIRbMhu1DhMgQntli1WV1BZQXADPOqppNMrXj56mPZLRVrdhT6J/
+	 q5ct/ldn3OVf99ibpGUe8V3X8M63OrCtiCXcJLULxeV49RklboMkLJVkmauV6acaQC
+	 bFK6qmfvz6ApYfFLYVxZOYOx1TdCnFx4mwWx60MINWgo3OWfvbC7MInqspL9TlzoKx
+	 YN6RjDPEfPuIm4BI4jkOQmfbA59m/T62gwxlhfhMrhIVns+7CRErKP30FVWpa05BF2
+	 Pe1CA9CJL25Hw==
+Date: Wed, 21 Oct 2026 12:03:11 -0700
 From: Nathan Chancellor <nathan@kernel.org>
-To: Magnus Lindholm <linmag7@gmail.com>
-Cc: Mark Brown <broonie@kernel.org>, Nicolas Schier <nsc@kernel.org>,
-	KBuild Mailing List <linux-kbuild@vger.kernel.org>,
-	Kees Cook <kees@kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>,
-	Matt Turner <mattst88@gmail.com>
-Subject: Re: linux-next: manual merge of the kbuild-current tree with the
- origin tree
-Message-ID: <20261021185857.GB2608581@ax162>
-References: <atibhAMcgKle37-g@sirena.co.uk>
- <CA+=Fv5SUHkGtBPgzg9C1qGf6aiiFTVpStPd6Os3mTrz_+_5dKA@mail.gmail.com>
+To: Nicolas Schier <nsc@kernel.org>,
+	Mathias Krause <minipli@grsecurity.net>,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] kbuild: prevent building single targets twice
+Message-ID: <20261021190311.GB2611266@ax162>
+References: <20260923123936.2227924-1-minipli@grsecurity.net>
+ <5836ab69-cfa6-41cc-a28b-5bd3ecfaea03@grsecurity.net>
+ <atjwobCk-mdeIlkd@levanger>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -63,63 +58,21 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CA+=Fv5SUHkGtBPgzg9C1qGf6aiiFTVpStPd6Os3mTrz_+_5dKA@mail.gmail.com>
+In-Reply-To: <atjwobCk-mdeIlkd@levanger>
 
-On Wed, Oct 21, 2026 at 04:40:22PM +0200, Magnus Lindholm wrote:
-> On Wed, Oct 21, 2026 at 1:01 PM Mark Brown <broonie@kernel.org> wrote:
-> >
-> > Hi all,
-> >
-> > Today's linux-next merge of the kbuild-current tree got a conflict in:
-> >
-> >   arch/alpha/boot/Makefile
-> >
-> > between commit:
-> >
-> >   c437950dceb88 ("alpha: add self-extracting compressed kernel boot stub")
-> >
-> > from the origin tree and commit:
-> >
-> >   0d4d70da348b0 ("kbuild: Mark the gzip recipes as recursive")
-> >
-> > from the kbuild-current tree.
-
-Thank you for the heads up, I have let Linus know about this one since
-it is a little tricky.
-
-  https://lore.kernel.org/20261021184723.GA2608581@ax162/
-
-> Thanks for resolving this.
+On Wed, Oct 21, 2026 at 07:04:33PM +0200, Nicolas Schier wrote:
+> On Wed, Oct 21, 2026 at 08:53:56AM +0200, Mathias Krause wrote:
+> > Ping! I know, it's the merge window but this patch may have fallen
+> > through the cracks as there was no response so far. Just trying to take
+> > care it doesn't get lost.
 > 
-> This recipe now only copies the completed image, so I think it
-> should stay without '+'. Matt's series moved compression into
-> arch/alpha/boot/compressed/Makefile, where the change should be:
-> 
->  $(obj)/vmlinux.bin.gz: $(obj)/vmlinux.bin FORCE
-> - $(call if_changed,gzip)
-> + +$(call if_changed,gzip)
-> 
-> The existing vmlinux.nh.gz gzip recipe in arch/alpha/boot/Makefile
-> still needs the '+' from the kbuild patch.
+> thanks for the ping.  The patch is in my review queue for the upcoming
+> cycle.
 
-Correct, thank you for catching this.
-
-> Maybe adjust the resolution accordingly?
-
-Since the conflict came from Linus's tree, I have resolved this in
-kbuild-fixes-for-next so that Mark does not have to worry about this:
-
-  https://git.kernel.org/kbuild/c/83deedcf85af511dc120b3cd8ee597d211cdf2fb
-
-On a related note, is your tree flowing into -next? The recent
-pull requests for alpha have come from your lindholm/alpha tree but
-Next/Trees shows Matt's mattst88/alpha. Should that be changed? It would
-not have saved much here since I send my pull request to Linus before
-c437950dceb88 was applied in your tree as far as I can tell but it is
-always good to catch these things early.
+Same, I will try to review it this week or next once I clear my tip of
+tree clang regressions backlog and Kbuild merge window madness.
 
 -- 
 Cheers,
