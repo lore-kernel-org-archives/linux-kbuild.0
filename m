@@ -1,88 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792540138;
-	b=xP99UuNOSJEhdrwNqGoeUCZraWtd6CDV5PZvEVv5cbNgZDQ6uvQ0hiFQAV9XhxlUxmqP
-	 hvEHm+bWorE5hrXJBrb4QtdcaU2Y640p/04IYCK+0Oj8BjPdL++8A7hUg/06tU+Fws+JU
-	 eG5Pwp5Jz9wpdWAw+hhzK8fMFL4iqD7Svh6d/ZYK6bh+akTxVL+0hc7QiXTk77jKmBu+S
-	 RuaaZ9O+B3VLG1/O5QnvlqjZJDS6UOcLBcTv6JLcMQcgd/BRWPo6gjA9h/GJSYsFc1NnW
-	 DheoOOTgKRboG4eNIanJ6bRC0ew9c9G6vehhUCn0MNVilzuaUScLTkGckukLSfxFjhQ==
+	t=1792541867;
+	b=eZVifWUAcHBZPm+I+6cr84ubGm0+KTLxWAX5ki0ZwpqlkeM3bsUodo/36Ms+U4BstaM5
+	 xBXi/ETYenPjiDHCKW6oT9Ew0aOtxA+q+oD/mO8QWjLOnfnP7wptlA/x57a3+WyUv2siH
+	 dYLcPziwFVcp1JF9pzNp1Eqha94HErtyrq4gUg/B3l9pGdCreSyqvwTHmIHwH46kj3sUx
+	 jS5QToeX00rJ9wCwIbRtydvWsxAxv1d5vspia3UZ1X+Lg+HNjN89r+TuvZA+Ha+k7JYjA
+	 JUKOv8i2FS1miS/E45y4HO3CCalX82uMdxZANuDYNv1c4BMIjr9+zJTJIYcnSFZW9pQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792540138;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Received:X-Forwarded-Encrypted:X-Received:MIME-Version:References:
-	 In-Reply-To:From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type;
-	bh=D1Nuj0c85bvBmNt2X1dkz5A5qEMgMEBKUot79cJMsS8=;
-	b=BLJkZ5KmLSYC5THD8X/IhCR+DUgm/KHSlShGOaGLzgZKJYwBYwvPBFWOH+qS+oopP83I
-	 MpRmlg3Na3wQsibOXH/fFeIe81utrHN7aBJ/wZyY9gKMvl3DIZfYrydnabW2gYuRbvePK
-	 aH02J5CrV1e1oTMx7DPBVZc5Wr9nMX3bnftAtrta+5sRHusaLbtzt7U2Qtp9rL1K1DWkE
-	 7KLgilvHq02/P0/o0JYX70GoDahD7eHvFWcgEqGhOzELK1xomYaimRTPy71zhTTRkEw3u
-	 8X9aG6XTU0K+rhnh+rZFs/2gRqu50sJmVaQXlWwcOt5ZhqoRNLPiE0eMvH63Eg2VrFQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792541867;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=rmQvEL3k2iq8l9zm80u1ebYI5T5XmeTh7p6VDeNoovI=;
+	b=Wrpd6ecm0qRn+WJZjwXGES2tsBNoS9BIMoMn2NLlz+kC1TSl+fQxWCI0xIEzX/aJPpkC
+	 GEIzRzKwFzhhbE1vJ41pmg/T+Vv+TVXEp5WDRmHBZKkAzMhqcAerfurhkVoq2CAYixst0
+	 tpy6hTx49PsnhLRrxh56TUi31g+6kKzZQ4RkaYqdtRLYiCsV8PSMoJxGZTytdJI+baTBu
+	 CwYQgrIGvj7eYeoRFVEKUlSzQHFrFHxeuBpWcBI2bs8kwfQ2wEL+O9Ejbnjr+1Il1fjlV
+	 zJotYrpGPvo8Kz8LxEjH8mFiYwhSjD5p79/VNw3eK2f4eSWrFVGn4X0ovxpGA8rI0jQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=chromium.org;
-	spf=pass smtp.mailfrom=chromium.org;
-	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=V2htlUnQ;
-	arc=none smtp.remote-ip=209.85.216.50
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XP1GUhKj;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E00C1606A319
-	for <linux-kbuild@vger.kernel.org>; Tue, 20 Oct 2026 23:48:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E00C1606A319
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E8A606A31B
+	for <linux-kbuild@vger.kernel.org>; Wed, 21 Oct 2026 00:17:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=V2htlUnQ
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-3ab868eb9cfso99517a91.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 20 Oct 2026 16:48:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1792540137; x=1793144937; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=D1Nuj0c85bvBmNt2X1dkz5A5qEMgMEBKUot79cJMsS8=;
-        b=V2htlUnQI4mFScVT4WCEJvCyFfvGwJOvLHy2fV6tjXSuw7qnBh21d0hLgJHA3Mlug8
-         itnzBgB3ZrO1GN6nXoftE23GS9PvFjqP94GTJ13t2/RR1IKmva9gigwohThc2d/Wwmd9
-         Qa1qkmjK1rrM89uFvO+Vd3hKf1Ve6M81TRK8k=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792540137; x=1793144937;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=D1Nuj0c85bvBmNt2X1dkz5A5qEMgMEBKUot79cJMsS8=;
-        b=KxJJZeyffQMPtgaEH0ojeTT8rpg+kYrb+rLCh2Mm+JpCi0eV+5KAIlQbvIe55sxDJ7
-         Hu98co4AyDsC9leyQQc/j23TK6i/gIayf0dbcS+FJ6dDGezEX7sYU31FOLSBTxtvWu/R
-         9ITYXbL7qX3eZUthN0Ed15zxtDHlun5t7N8h7cGHbgTEM1wMjVtm8i77IcCJhSqd1wuA
-         ERuZl/tFC5F4lORiTsxAuzEDiQzloz3YinU/PkD+2YwjvUygCHA12H778SMKeCK8mxpV
-         TswWJbdzZ6E6M2IRjlaA+SsAFK/CYiEUamzBeP4oy6IXoTkUFY7Iy+oVtoJ/IXiL2ShS
-         rkmA==
-X-Forwarded-Encrypted: i=1; AKwUvByGTFNSgy4gtF8M6KemMUYInNBHsPlKrOHLIGvDPxZftUxhJeMRBLtv580AXczu7PlBIaJdrMSf1fX4K/Q=@vger.kernel.org
-X-Gm-Message-State: AFq9FYL+jPq4/rtGfDQ6OXxnh+ITyUVERqFgMXeFAZgIPGt8DSVoCZQX
-	79l4eKkyQeI1O40/HciL2NXrI2i1fMfTDvhP0GwJ0/hgzEXRsGgzCkW1BJQDESftQjejGLsHNjW
-	vfnkbeQ==
-X-Gm-Gg: AYBFou2kIch2DYoH0zk0TA3d8+vVPdwZk2T+6L8jNB6ibpskMVZ4wLQGMYdTQCj9DjQ
-	lU6SszGFWw6LeMViwdudYK5H4f///0qH4ckbTnNiOeFtXvnco5TZlqP+4KurgYuJX0785xy0xBZ
-	FB0sI7pXDGuMOcWCP0dCTONLfBzIu2vQaELWmn3p6kyb7SdkKaRvUwkZYjsO6EviO1AYer1l1Nq
-	a3+pik/NOt9/piB3pBCuzc+SchFy/oxCtIQB39PL/8rjR1LAAltBrKZWu+agxcE9GC01Dvl6m4c
-	r/twh9DcmMDOSQwTEyVtY+QW79G1+Y4hzP5X+IIJFB9UrrUWLduKMR7RpIckw6XJ18/dO7G8byP
-	chdadxKv5xJD5R27SG8jKwFKgS8X80JXV/yRsbl4eea9HtMdOKZ5A+5GZ7u8RYI+E0z8qK2JwLq
-	uX1INviaJdbSFt8unJIIeOfjEo81t6WGhMk2mtt18mZXdPeHIJFGIfjX3ex9kXOA0UXA1+jBHgK
-	bOTdBR9w9qNQCrPn9b3rLjeN7SuzBx1/ZVQqeE=
-X-Received: by 2002:a17:90b:4c49:b0:3a8:32f2:f4a5 with SMTP id 98e67ed59e1d1-3ad86f1c242mr330772a91.53.1792540137237;
-        Tue, 20 Oct 2026 16:48:57 -0700 (PDT)
-Received: from mail-dy1-f181.google.com (mail-dy1-f181.google.com. [74.125.82.181])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ad8029765fsm1426074a91.10.2026.10.20.16.48.56
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Oct 2026 16:48:56 -0700 (PDT)
-Received: by mail-dy1-f181.google.com with SMTP id 5a478bee46e88-3535bf8b3e0so218092eec.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 20 Oct 2026 16:48:56 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBxh60Ap6L0yo+R4U37/eO9VgTKlzdECd3RKwEmkohtnZGR4Q3oHlTzgacbM/f/Z+ebUiwq7yFrvL5jtTEs=@vger.kernel.org
-X-Received: by 2002:a05:701b:270b:b0:187:a2b1:7b3a with SMTP id
- a92af1059eb24-190a6adcc50mr423407c88.41.1792540135068; Tue, 20 Oct 2026
- 16:48:55 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XP1GUhKj
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE6731F000C9;
+	Wed, 21 Oct 2026 00:17:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792541866;
+	bh=rmQvEL3k2iq8l9zm80u1ebYI5T5XmeTh7p6VDeNoovI=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=XP1GUhKj6xYGQY7YSdAUriByTrMI6AhpGJ6Y4CToS+yFm/v2NeLeJ+SacH5/1U3A6
+	 QaKXiGKrxtUz6hVioRvZpBhuZZzMixwdh+UjK2vPEwOvpD4oQTuS/ZKCFpscdT/F9x
+	 3qxfjBsra4sR4l6/5eB/WZO5JXiFK9unsDXs1cP9oiqfnaVgjp7ZVfQG2uXZt8Sb9V
+	 mQQq1+DYQQaO6WsSvTkwiMwZVDg/0z8i/mT+QrH7SZpVwtRQnHfzf5THYeYh9htg1B
+	 hpARd4hKR0id9lN6y6vnvMeEAw0IuB3BX0geVY+xCZZ5Ez+OWCsbD+TRfoAJ6wd75F
+	 6ySojenwTyYWw==
+Message-ID: <sashiko-outbox-179629@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH] kbuild: improve sanity check for ARCH variable on x86
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Cao Jin" <pino.cao2022@gmail.com>, nathan@kernel.org, nsc@kernel.org
+Cc: linux-kbuild@vger.kernel.org
+In-Reply-To: <20261020001738.2607318-1-pino.cao2022@gmail.com>
+References: <20261020001738.2607318-1-pino.cao2022@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 21 Oct 2026 00:17:46 +0000
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -91,63 +58,82 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-References: <20261020-kconfig-fix-mfentry-check-v1-0-428258bc0fc0@kernel.org>
-In-Reply-To: <20261020-kconfig-fix-mfentry-check-v1-0-428258bc0fc0@kernel.org>
-From: Ricardo Ribalda <ribalda@chromium.org>
-Date: Wed, 21 Oct 2026 08:48:40 +0900
-X-Gmail-Original-Message-ID: <CANiDSCt=7SorMBAUXTohsSV_-6BZPrHbC9u80-P7=kYO4NiUJw@mail.gmail.com>
-X-Gm-Features: AclHuK_NFTuQpEwblXCYU1ELdfOsTXBO_zAq82tRWKGwdXrwLnDaicFsmdlXQkQ
-Message-ID: <CANiDSCt=7SorMBAUXTohsSV_-6BZPrHbC9u80-P7=kYO4NiUJw@mail.gmail.com>
-Subject: Re: [PATCH 0/2] kbuild: Fallout from moving '-mfentry' check into
- Kconfig stage
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Nicolas Schier <nsc@kernel.org>, Julian Braha <julianbraha@gmail.com>, 
-	"Lorenzo Stoakes (ARM)" <ljs@kernel.org>, Kees Cook <kees@kernel.org>, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
 
-Hi Nathan
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Medium] kbuild: unnormalized x86 ARCH variants force 64BIT and break def=
+config
+--
 
-Thanks for the series, it fixes the issue for media-ci
+commit 3a5958b43dbec65a7ac36420afb7bc18b48749a2
+Author: Cao Jin <pino.cao2022@gmail.com>
 
-Tested-by: Ricardo Ribalda <ribalda@chromium.org>
+kbuild: improve sanity check for ARCH variable on x86
 
+This commit replaces the explicit i386 and x86_64 checks in the top-level
+Makefile with a findstring check matching "86" to set SRCARCH :=3D x86 for
+additional x86 architecture name variants such as i486, i586, i686, and
+x86_32.
 
-On Wed, 21 Oct 2026 at 06:52, Nathan Chancellor <nathan@kernel.org> wrote:
->
-> Hi all,
->
-> Ricardo reported an issue from moving the compiler test for '-mfentry'
-> into Kconfig. In testing that patch, I noticed that the kernel.org GCC
-> builds for s390 were not probing correctly for '-mfentry' support.
->
-> The first patch moves the check for '-mfentry' back into Kbuild where we
-> have the proper information for whether this flag is actually supported.
->
-> The second patch documents the reasons for these issues for future
-> travelers to hopefully avoid these problems.
->
-> I plan to take this via kbuild-fixes after sufficient review/comments.
->
-> ---
-> Nathan Chancellor (2):
->       kbuild: Move testing of '-mfentry' back to Makefile from Kconfig
->       scripts/Kconfig.toolchain: Highlight cc-option differences between Kconfig and Kbuild
->
->  Makefile                  |  3 ++-
->  scripts/Kconfig.toolchain | 23 +++++++++++++++++++----
->  2 files changed, 21 insertions(+), 5 deletions(-)
-> ---
-> base-commit: 997208ce9f43f01febac956cf9aeffe89945e3c1
-> change-id: 20261020-kconfig-fix-mfentry-check-50525bc5a6ca
->
-> Best regards,
-> --
-> Cheers,
-> Nathan
->
+> diff --git a/Makefile b/Makefile
+> index 8d23af898d44d..a32e20a8d41dd 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -410,12 +410,10 @@ ARCH		?=3D $(SUBARCH)
+>  UTS_MACHINE 	:=3D $(ARCH)
+>  SRCARCH 	:=3D $(ARCH)
+> =20
+> -# Additional ARCH settings for x86
+> -ifeq ($(ARCH),i386)
+> -        SRCARCH :=3D x86
+> -endif
+> -ifeq ($(ARCH),x86_64)
+> -        SRCARCH :=3D x86
+> +# Additional sanity check for cmdline ARCH settings for x86. This catch
+> +# more name variants than "i386" and "x86_64".
+> +ifneq ($(findstring 86,$(ARCH)),)
+> +    SRCARCH :=3D x86
+>  endif
 
+[Severity: Medium]
+When make is invoked with ARCH=3Di486, ARCH=3Di586, ARCH=3Di686, or ARCH=3D=
+x86_32,
+setting SRCARCH :=3D x86 leaves $(ARCH) unnormalized for downstream x86 bui=
+ld
+files.
 
--- 
-Ricardo Ribalda
+In arch/x86/Kconfig, the 64BIT symbol checks $(ARCH) directly:
+
+config 64BIT
+	bool "64-bit kernel" if "$(ARCH)" =3D "x86"
+	default "$(ARCH)" !=3D "i386"
+
+Because $(ARCH) is neither "x86" nor "i386" for i486, i586, i686, and
+x86_32, the prompt condition evaluates to false and the default expression
+evaluates to y. Doesn't this force an unconfigurable 64-bit (CONFIG_64BIT=
+=3Dy,
+CONFIG_X86_64=3Dy) build when one of these 32-bit x86 ARCH variants is
+requested?
+
+Similarly, arch/x86/Makefile selects KBUILD_DEFCONFIG using $(ARCH):
+
+ifeq ($(ARCH),x86)
+  ifeq ($(shell uname -m | sed -e 's/i.86/i386/'),i386)
+        KBUILD_DEFCONFIG :=3D i386_defconfig
+  else
+        KBUILD_DEFCONFIG :=3D x86_64_defconfig
+  endif
+else
+        KBUILD_DEFCONFIG :=3D $(ARCH)_defconfig
+endif
+
+Since arch/x86/configs/ only provides i386_defconfig and x86_64_defconfig,
+won't running defconfig with ARCH=3Di486, ARCH=3Di586, ARCH=3Di686, or
+ARCH=3Dx86_32 still fail trying to find arch/x86/configs/$(ARCH)_defconfig?
+
+> =20
+>  # Additional ARCH settings for sparc
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261020001738.2607=
+318-1-pino.cao2022@gmail.com?part=3D1
