@@ -1,58 +1,59 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792593857;
-	b=EYbebAWjqR6qrM3MXWzxNhI7EkMx7YtcELCwEndm6j3txQjl+5eV4qrVm8AsbhHuaoaJ
-	 mUITn8yAbxfv6gbVibAiTJvpVG29xtmsaWF5i9wYd6gXXu7R5Rm1MqIwOBrcaawkvv/cE
-	 GkAMAcs2fZO4qdqyur7pRHENJz/b/B9bdE3WgZ3ebLSxZtz1vHwUROhidhdbBdC0c6KHR
-	 by5QJYOlpHv6I1I4h9mqSOVxAO0lvFn1l/5FYKw+aAqyMrFuFs9wYUNnEOABbCYo0SDI/
-	 o7hybB8Eqh1Ja/mWzjAs1oMYKKdkfPHybade8myIklRHBPlAJptMEZv1w4BdxO2aLog==
+	t=1792602335;
+	b=lVREe/m+9ra490sEVOHHysFU2xoj0bDY6kwWcxawfUOjc8sNh4boek8ufbowi8YBSKTW
+	 lFPWkZrx0GCMY0kTdNyqKWkMj3k+WqkUBJB/sakL4GY0U4ePZ+ESjIIcRbIQ7ozwgb5xx
+	 wTRJqLhUIgBDfjKLeFqLK8tCUVygdzyVIgpoFaauY8m0VobJsBdIvRKWt23hsUVChE8uR
+	 Scr/y4ImXhrTYobW5pdKnrSbzZrm8aWxJjLQj4GjDDFDBNmqGc4HSXFbB3ictBypsKR1t
+	 f0ShOZqbK4U9SnZYi+SDsHNNIXjhzlErbhI4meAPXWr44Zvr/hgGXsL9H74uuAA4yNw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792593857;
-	h=Received:DKIM-Signature:Date:From:To:CC:Subject:User-Agent:
-	 In-Reply-To:References:Message-ID:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=Y2tC8SXoBQ3oYesXX9enzJXSSVTIvRj44fi71d4FwrE=;
-	b=LMwvXdmaUkrWl5PfFM27eANAXxINmtewrYHTEC7DofOZsp5om4TfUbV31nCfw58TMviy
-	 4Zp3OdIZMpcrqLq0VHzCns5Dyo1nNsb+0qfuOX9TBIOkh3G9GxsHYLoHJ0PlztNS39ZpJ
-	 UvjYGsQrVhXPJ1TBfmn7j0X0eGgKPJmcqSvC78snTONIensekU62/0iwl0LO4jDkviR+9
-	 EkhSRQm7mtvD+VNjyAP5lc90d6fkLGxilWcQS5bELawaTsedsuAR+zP1mv+XzhZpAYbav
-	 Oo9uu293hfOYR0LxmBMvgBPGa1RtgvkE9opXJfnuTmACmV+fkmh+hqS3pLxa8gnJsbw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792602335;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 Mail-Followup-To:References:MIME-Version:Content-Type:
+	 Content-Disposition:Content-Transfer-Encoding:In-Reply-To;
+	bh=2m70qaMoVXLxe+eN5Q/od+n/UdaKlHhJXr7DkMg5Ui0=;
+	b=wu4f6mVz/b6LBYwauXHFf93WpF0VmMT5omYzqjmBCI4+1hC6ZGmcUJArM1zQWpKLeeN6
+	 DEl3rKzq/f8FPcKYFW6oAi2WD8XavLbeLXJ7lpkSqbiSkPfKQwwrgx5tAxerSvsZh8H8/
+	 0VgplKO6KBURgwji+IyxDwcSAZSOfq82OKW2BVyA7rN+Lvc+gT5kCiHw8ors+WtRcaDsY
+	 0CSkbCf8xYYgK9zgPbkkYxSzwJNaWBnmsE2/qKIqHKl7yoqvqaMUimJNcW+GDG30JD0HV
+	 QEkUkGisCgpnph7/Ay61qnhQP3ESg42yCSGI4MC2gKlvxfR+RvHO7/AXB6DtZnIHTlw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mIa++Fwv;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TiyGy8Wi;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FEDF606A319;
-	Wed, 21 Oct 2026 14:44:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id F05F1606A319;
+	Wed, 21 Oct 2026 17:05:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mIa++Fwv
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3EED1F000C1;
-	Wed, 21 Oct 2026 14:44:16 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TiyGy8Wi
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 0682F1F000C1;
+	Wed, 21 Oct 2026 17:05:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792593856;
-	bh=Y2tC8SXoBQ3oYesXX9enzJXSSVTIvRj44fi71d4FwrE=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References;
-	b=mIa++FwvTPmXGjfM82gOimKDgCaIkFs7zuS72xRTLcZA040J5hT6CDv0UGQpaIctO
-	 3VYr2B4M/x+ZVS8yxFtevloORtWaC/HA/qh79BHBLswkuh9Lj0Mk+OUSdAfhHD8MMA
-	 ph7D8CK+lQeKVzE/x4Q0SYxyq7xqxGuJ0NkidTg295rQ8J9K70/Dio4h+7NApvXoBT
-	 qBbZb24K498m2Tg/0zoSPp7+jl4ueKwcXdvuEVwH1hohRIEIs7ZskMkclEo06hA/sF
-	 hD2Ifwq6zJcJw0ecdt758RRi7YrIazjjox6p4VbQV2uNwZNYt5393qV7HjZHIanEvX
-	 BuNBnnRru6kFQ==
-Date: Wed, 21 Oct 2026 07:44:16 -0700
-From: Kees Cook <kees@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
-CC: Julian Braha <julianbraha@gmail.com>,
- "Lorenzo Stoakes (ARM)" <ljs@kernel.org>, linux-kbuild@vger.kernel.org,
- linux-kernel@vger.kernel.org, Ricardo Ribalda <ribalda@chromium.org>,
- linux-s390@vger.kernel.org
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_1/2=5D_kbuild=3A_Move_testing_of_?=
- =?US-ASCII?Q?=27-mfentry=27_back_to_Makefile_from_Kconfig?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20261020-kconfig-fix-mfentry-check-v1-1-428258bc0fc0@kernel.org>
-References: <20261020-kconfig-fix-mfentry-check-v1-0-428258bc0fc0@kernel.org> <20261020-kconfig-fix-mfentry-check-v1-1-428258bc0fc0@kernel.org>
-Message-ID: <F643B506-5031-4BEA-8279-199E7E181721@kernel.org>
+	s=k20260515; t=1792602334;
+	bh=2m70qaMoVXLxe+eN5Q/od+n/UdaKlHhJXr7DkMg5Ui0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=TiyGy8Wi3M7rdF0AEU56uX0TKFLyv8KNY5akytxGycf+Jz6YgFhLtbSEQ64a/WR0g
+	 kIYsAOFZm9UhEsL0Vr7HCSReoCJvl3D0Ll7SHpjNO0NnRVo2+weiTTo9BYakSgSf66
+	 vHSpSRHqVLwXiY8bTtgb2yofQYnd1oI/O4S6fSPWv4J5XzXMZUiIlc/2jOFShgpZLo
+	 DEJla4nfgBgW8Dg9qdJrNkwLLyJp2W+hpyB7yzMC6IvEKG85EVfsyqNf9nKKCMqDxM
+	 Wci45nLIGQQuz9QxJ3COgCNr3m41mo7nV3e7ShU2QTe4lcfdggFtTZ2PB+t6SSMYXw
+	 QL/yhLGmM6h3w==
+Date: Wed, 21 Oct 2026 19:03:05 +0200
+From: Nicolas Schier <nsc@kernel.org>
+To: Guido =?iso-8859-1?Q?G=FCnther?= <agx@sigxcpu.org>
+Cc: Nathan Chancellor <nathan@kernel.org>, linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] kbuild: deb-pkg: allow to set package name version
+Message-ID: <atjwSYKodxdVObA3@levanger>
+Mail-Followup-To: Nicolas Schier <nsc@kernel.org>,
+	Guido =?iso-8859-1?Q?G=FCnther?= <agx@sigxcpu.org>,
+	Nathan Chancellor <nathan@kernel.org>, linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+References: <20261019-deb-pkg-v1-1-7f8e60bbede5@sigxcpu.org>
+ <atfI0Uc3iWSmR49j@levanger>
+ <atfaLGt-46bVugss@quark2.heme.sigxcpu.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -62,24 +63,41 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <atfaLGt-46bVugss@quark2.heme.sigxcpu.org>
 
+On Tue, Oct 20, 2026 at 11:16:28PM +0200, Guido Günther wrote:
+> Hi Nicolas,
+> On Tue, Oct 20, 2026 at 10:02:25PM +0200, Nicolas Schier wrote:
+> > On Mon, Oct 19, 2026 at 09:16:14PM +0200, Guido Günther wrote:
+> > > Instead of hardcoding ${KERNELRELEASE} in the package name allow
+> > > the user to override this.
+> > > 
+> > > This can be useful if one doesn't want to accumulate different packages
+> > > for every commit or micro version bump by setting
+> > > KDEB_PKGNAMEVERSION=7.3 or even KDEB_PKGNAMEVERSION=stable.
+> > 
+> > I am not yet convinced, that this is a good idea.  Do you want to
+> > elaborate a bit more, why you think this is necessary?  Have you tested
+> > your patch?  I don't like that source package name and binary package
+> > name divert w/o good reasoning.
+> 
+> The source and the binary package names can already differ due to the
+> `KDEB_SOURCENAME` variable (and we're making use of that).
+> 
+> What this patch adds is the ability to control the suffix so we can
+> e.g. build a `linux-ng-foo` and a `linux-stable-bar` instead of having a
+> linux-image-7.3.17, linux-image-7.3.18 (or with git versions or …). It's
+> just about having a bit more control over the generated binary package
+> names so we can decide what replaces what on upgrades.
+> 
+> I have tested the patch with and without setting KDEB_PKGNAMEVERSION.
+> Without setting this variable nothing should change for existing users.
 
+Ack, thanks for clarification.  I'll try to review this next week.
+Thanks.
 
-On October 20, 2026 2:52:18 PM PDT, Nathan Chancellor <nathan@kernel=2Eorg=
-> wrote:
->Unlike cc-option in Kbuild, cc-option in Kconfig does not test options
->with either bit ('-m32' / '-m64') or endianness ('-mbig-endian' /
->'-mlittle-endian') flags because which flag to use may depend on the
->result of the configuration stage=2E
-
-Oooh, yeah=2E=2E=2E Do we have any silent failures due to this in other pl=
-aces? On x86 I worry we'll see similar problems=2E Stack protector arg chec=
-king comes to mind=2E I will go see if I can find anything=2E=2E=2E
-
--Kees
-
---=20
-Kees Cook
+-- 
+Nicolas
