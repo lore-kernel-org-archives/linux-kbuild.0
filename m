@@ -1,13 +1,13 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=40.107.209.11
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=40.107.209.34
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792565280;
-	b=Pd/csjuxPm6w2oL0uHKEkMgcnGVOZeGrxqIwcNyhOBGaNuzw2yi/Q7XPiz6wQYKhXHem
-	 lgtuxSvECL3vV15AFCzqv0bnQLk5G2hbn4GEX2LGybVCHZwka7OtmNsxKFuWnbLodT86i
-	 S7PZIjESzkDRiAmPUedO5wZiLtddik2/nTUOPflOir5H5lYo4Er53LSKFZdFhOmo7OwOU
-	 sRG85/ivIahKyDJm4Y4Yex0SaLI/My8YGqLCZOehV9lGXWNvo+8T9nDNOLMXGDUuwHVtY
-	 lAxW+NIBcChu6ejaJQ/a9Bi5TY4i5GNEaI7Mxsa4ar3pt+fyEpz/t6RAgL2hoNBScPQ==
+	t=1792565400;
+	b=Pa85TYjZHW0H/zRJvx705k8l2Scj4kiNTYZEx4xPz41XWiKYjiCTUXIgfqhpVdFHavAI
+	 Q/XHxJs/XXtU7c5RQPaKZPZiwa5YBKHj7YqIpJgrFNwHz3vXnqPv8f8G9paaCMLu2R7q+
+	 qcERjTrh5YPT8SUpeB37sbmmyYghTXud2SHHRwleLfVnDNcQhk8vbZl8gr/3N8OZtVFQc
+	 DVhw9UxGRB8mcM5scha72wa+PrzbSIwkg9k0N1vyv/84k86gwpu3e5ZkwyYlpw8CCYmpY
+	 UBxkEcMyiDmRw9zOYyxYsdLtnAwlV40z5fECmaOmaMSG7+ctrDmiWo1U0ZE1YcXbxig==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792565280;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792565400;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:Message-ID:Date:
 	 User-Agent:Subject:To:Cc:References:Content-Language:From:Autocrypt:
 	 In-Reply-To:Content-Type:Content-Transfer-Encoding:X-ClientProxiedBy:
@@ -24,58 +24,58 @@ ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
 	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
 	 X-MS-Exchange-CrossTenant-UserPrincipalName:
 	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=FGKPA3MkEgAGFLbRl+EjDmGWqlqn/VM25hlpMpaYNsY=;
-	b=3/f5dB9BLhLhSUt8yX1yxYK3zfD9j9Wi81vIcio7KXAQ0FmLQtbbgdDs2NwezttknsUv
-	 vG6Rf4nFvcm349x9hcKg/+6sF6S410ptDIP3/5VMFr5dmVaKy+pIjs2CMTvTBk0UeyWd6
-	 cxuTO4g/fzuFcZsvm0UQMRH/Y7fYULRGH+9ZdHPXXH8ep1P6kkHLv9RpTHTPN340zYHKn
-	 Hh1pxpc5HzlTvG/brmHE9sNn2AfYdAKTL/jcVySL4yvWEBI4JcvmNtDvORdt5j2hwJ//2
-	 oWl7qals2oZzRoZ2YQ+omgjcZgQpxZlbWBifuc2QqrUcDuih/ccmfHv5jvFW+Nt4FmQ==
+	bh=I6LOxusDsaYIfG0yOiMnOKoxplwpJrAQdxdc2tucqDA=;
+	b=sqekCZ2fKIlMjIhUdIPB9XIdts8ov3WXJALhqjhEeA4hLl5zd2S0+RnjSMuh2aIk1FRt
+	 5TTbfACHnaJhNbVAc7Hrkr3ihZLZyOEOBTJO321iTFPU6x/98M6NL2zL+i3XssSjbOlgp
+	 Xb8U38EX0T2jtXeSSLCWMiw8viCoJi7HF7szPrCDJ3OB12r+owcwg7XlnCns8Q1gi0aHY
+	 plqXhYrDIrp9ZaQE1qKttH+qiIXImM6+SGWmS4BEBY18CkApqZkUIxYOvhgHTUxAU+omR
+	 lPiAWZULomOJB29NEzMYnsvHg2cZdrvlvyRMJvNyEtEX8ee8glpBj0eJQzqhEuYrEiw==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=amd.com;
 	spf=fail smtp.mailfrom=amd.com;
-	dkim=pass header.d=amd.com header.i=@amd.com header.a=rsa-sha256 header.s=selector1 header.b=XA39V9Fh;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=40.107.209.11
-Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012011.outbound.protection.outlook.com [40.107.209.11])
+	dkim=pass header.d=amd.com header.i=@amd.com header.a=rsa-sha256 header.s=selector1 header.b=xCAU5z+E;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=40.107.209.34
+Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012034.outbound.protection.outlook.com [40.107.209.34])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E94F606A322;
-	Wed, 21 Oct 2026 06:48:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4E94F606A322
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF7F606A31B;
+	Wed, 21 Oct 2026 06:49:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7EF7F606A31B
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=amd.com header.i=@amd.com header.a=rsa-sha256 header.s=selector1 header.b=XA39V9Fh
+	dkim=pass (1024-bit key, unprotected) header.d=amd.com header.i=@amd.com header.a=rsa-sha256 header.s=selector1 header.b=xCAU5z+E
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gA/Fi+TTb7RJNzBNlIOO6S48AdemzQVP16GhkRxbqTk9Uu9EHrUYlCFy7TO1cjpSPYdvd2Lbf86emfWKOMhhMd6ijo1hQuXgHCIVQJmYphXtinD+pyvoiRLHeu11FR2vArwPBGHkgfh7vtlDb6Nh1B4Yh84zCHwwCr8+HdzPaziW6OWlVvW/FYTZg47tnzdZewCv9T/wS5J8x3CcbzkTdwHXp6MWViZXMzic7nlwohILktQuK2eBLpZaouxdc2YlM2M3Cq2437MYY9mUnRBbjvVQPoGDA83MuTLVfynyx7Fvf4pXSCs9D6AB98CAd4CykTuH4493Boi7jZK2V8uFTg==
+ b=IZ8U+v/0vm3RKYlyHyy2djsdQrApgz+rQKlWjRSA1x04KaCvpuSI3dQJD/7uoXenftiSnrC0LDROpmMs8Bd6R8/4obDsu/HlRKkQlBQwJygLxVu3YuCwaRa+R7b1S4gZGZ2eKDI1dHkD/uyLQo8E0DvP0Z9aBZeQrp4tZ0+BMHXJadc0SFBi9GlRh5nBNRf9RXP27pWdQLZffJI5PtkqeEP0VHkSJUKXj7QJvW0chdFdOVZfOIYAl0cEKbDeQT3X91Y3WjLYEd1IqTjY0Xogil3tSc4NuYW025bcdSY7qOMj416N/GBdwK+1EElLelPEaHukV38KljsQ5Jqm9jnhIg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FGKPA3MkEgAGFLbRl+EjDmGWqlqn/VM25hlpMpaYNsY=;
- b=CyhSRohyf6e6m6tXARm0DhHl8IoIrvyXKX9Jp53YTq4ZRhwMlsspRP5cKqGqSGX6soa/EvsCO5VXvehTpu6BIKzaWPIPVcwBpeMWRRyr5p9rvBGzevUju1KZtWTodbVdHuCZhbcYCvvEoSpX8OTtTB+NJHIaQa4m8ft88SbDXnm9O+MU0Dhaz4ZR1E/fuVcnEtq+8ONUivxkDmmazidWh6xv4WpIoRqFoJep0nTEU0GtWnLuBocLO4fh4Ck9/xqkPG3qkyXsH7r5XKeAfPJlndZLXBwX7a7voCRK0vx2SPh/aJyM3psFMKIQ8vzMiCh3dXLypPjoo8U6EJ4gctiXyA==
+ bh=I6LOxusDsaYIfG0yOiMnOKoxplwpJrAQdxdc2tucqDA=;
+ b=GshWn3dXmNlOkO2dcuIurkFSbSkaFTeMGHV1fFti3ap2u20MZG6HZ8XqhQ10ICzGCOygPnffLFwe1Ff7fonTzNRCxNQCQcHCvBoNt03QXbfoeTcLVLJ4gjdWWLf69BFiMUnSIs0mxf0nQT1KHIKyo0wOPS3mk96JKjC28AazRdvIhcYmDwwaobsgiZ45ROdPonh8B23jqYJIGNn/34LvkAgNiee/TqEyOdvlY9ad2RsYqcjFPVTUHTQQepruNRUcPkMVlVzQlwW5xPBjFisq4SHpqEqahTKh9ck3TaF5g7EDEyP3meLhFd0LpPq3qYXxJwM8do4rnlAhkppYunilWw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FGKPA3MkEgAGFLbRl+EjDmGWqlqn/VM25hlpMpaYNsY=;
- b=XA39V9FhzfdLuRu24weSpzq1kTUG1+db6LHdJT9Easjm31+Ygvqr+RU9EV1ZQZzJeGGpnSgJp4wP7oHZL9lshUwaywDZU0n6WJNi+m6lfpTm9IKG/Q9oO3+QzQVJthcWrQjt4LZbvLjq6ydqw/xWdFzysVB/g2PGRL5jR3IRyaY=
+ bh=I6LOxusDsaYIfG0yOiMnOKoxplwpJrAQdxdc2tucqDA=;
+ b=xCAU5z+EjjnDQaDlOVaYbm0q4F0SFB4vsQv6Iv8c1WdrAVh2E+3fpQhpCazgcwp373fpGXYKi/TZOy1+Owkw0m45ksY/J657cZkn9PkgDCN+YH6tVRsBI437XJ00cPDMI3/5QGW/BEpcMNexi74wuRFiMoMrxPoSC2L3Jr8BPHs=
 Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from LV5PR12MB9779.namprd12.prod.outlook.com (2603:10b6:408:301::14)
- by BY5PR12MB4275.namprd12.prod.outlook.com (2603:10b6:a03:20a::18) with
+ by DS7PR12MB8202.namprd12.prod.outlook.com (2603:10b6:8:e1::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.13; Wed, 21 Oct
- 2026 06:47:57 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.19; Wed, 21 Oct
+ 2026 06:49:56 +0000
 Received: from LV5PR12MB9779.namprd12.prod.outlook.com
  ([fe80::8ac8:e862:8ae9:9287]) by LV5PR12MB9779.namprd12.prod.outlook.com
  ([fe80::8ac8:e862:8ae9:9287%5]) with mapi id 15.21.0546.012; Wed, 21 Oct 2026
- 06:47:56 +0000
-Message-ID: <3142486c-9604-41bb-b7bd-d0708643d41f@amd.com>
-Date: Wed, 21 Oct 2026 08:47:46 +0200
+ 06:49:56 +0000
+Message-ID: <fed9a5f3-8da5-4755-b75f-5f9ef22b4388@amd.com>
+Date: Wed, 21 Oct 2026 08:49:46 +0200
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 6/7] arm64: dts: google: lga: Add lga.its FIT image
- script
+Subject: Re: [RFC PATCH 7/7] arm64: dts: qcom: sc7180: Add sc7180-trogdor.its
+ FIT image script
 To: Douglas Anderson <dianders@chromium.org>,
  Devicetree-compiler@vger.kernel.org, Rob Herring <robh@kernel.org>,
  Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
@@ -90,9 +90,9 @@ Cc: linux-kbuild@vger.kernel.org, Brian Norris <briannorris@chromium.org>,
  Julius Werner <jwerner@chromium.org>, Saravana Kannan
  <saravanak@kernel.org>, Will Deacon <will@kernel.org>,
  =?UTF-8?Q?Andr=C3=A9_Draszik?= <andre.draszik@linaro.org>,
- linux-samsung-soc@vger.kernel.org
+ Bjorn Andersson <andersson@kernel.org>, cros-qcom-dts-watchers@chromium.org
 References: <20261020153652.2907186-1-dianders@chromium.org>
- <20261020083501.RFC.6.Idfb669fd6c518bc86e45d8555f159c0ec611a6f9@changeid>
+ <20261020083501.RFC.7.I1683fb18dd1cb29680af5efb2c2d3c3f539af0f4@changeid>
 Content-Language: en-US
 From: Michal Simek <michal.simek@amd.com>
 Autocrypt: addr=michal.simek@amd.com; keydata=
@@ -139,11 +139,11 @@ Autocrypt: addr=michal.simek@amd.com; keydata=
  otYa9+7v0j0WOBTJaj16LFxdSRq/jZ1y/EIHs3Ysd85mUWXOB8xZ6h+WEMzqAvOt02oWJVbr
  ZLqxG/3ScDXZEUJ6EDJVoLAK50zMk87ece2+4GWGOKfFsiDfh7fnEMXQcykxuowBYUD0tMd2
  mpwx1d8=
-In-Reply-To: <20261020083501.RFC.6.Idfb669fd6c518bc86e45d8555f159c0ec611a6f9@changeid>
+In-Reply-To: <20261020083501.RFC.7.I1683fb18dd1cb29680af5efb2c2d3c3f539af0f4@changeid>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR13CA0090.namprd13.prod.outlook.com
- (2603:10b6:a03:2c4::35) To LV5PR12MB9779.namprd12.prod.outlook.com
+X-ClientProxiedBy: SJ0PR13CA0066.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c4::11) To LV5PR12MB9779.namprd12.prod.outlook.com
  (2603:10b6:408:301::14)
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -155,118 +155,105 @@ List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV5PR12MB9779:EE_|BY5PR12MB4275:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4a2cd1bf-ddf1-47b0-cd58-08df2f3f3ccf
+X-MS-TrafficTypeDiagnostic: LV5PR12MB9779:EE_|DS7PR12MB8202:EE_
+X-MS-Office365-Filtering-Correlation-Id: 11cba97e-338a-4d08-7b7f-08df2f3f846f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|376014|1800799024|7416014|366016|6133799003|22082099003|10067099003|18002099003|11063799006|261009223027099003|4143699003|56012099006;
+	BCL:0;ARA:13230040|376014|7416014|366016|23010399003|1800799024|261009223027099003|10067099003|56012099006|6133799003|22082099003|18002099003|11063799006|4143699003|5023799004;
 X-Microsoft-Antispam-Message-Info:
-	qA4VGlOMiYUKr57aHWtO9K7Mdl6rAEkiIOuw6g6WtfsP7UpcyCSymZyB7DyzIQZW+5h6ZaA+uYzmUcWCYonX3j5cshSP73ymoAOa1qBERuyowvfHi45ndZPAbwBQHB/f178MjBQ3+E/obP6RjSFon5maDN+5ImpYgJjE5a1A4xPC/vuM7GeaATuq8Rkx5EL2nGMUZPkTXLDADPexFa0OXmLaHr0SksmugeUWMnDyVnXilqUgHFAzuUsPB9BfXL2izvOnM1vbX+NMlOWwaC9PmvNjeeoeaUZs6D+NxfN+JgRQgV0iIY7aA1mw9DFIatPvSyqsgdr4oRSxT2MGBH7RlW3uJWrGWUYTbVALdDb42nya6JtK3L7JVZNqttYFFRGCjgfHkXUBz6znH+bHhZEd8KegJn8ExriDijf2aQK9p0FDXSYYWVEVM46caN9LzoXmFoTP+LC0JkXuGAP5CVldT0izn2lrz69EqaxI3RLNGiHIZXfQH1sfj09mhBdklkAdz19XS+BfCqcvfEpo77SA2WWiy8RXZZ34SmgtygzbrGyA74k4LmQjLPmGOHj5zB0rtfcklu3Bs8dtaML6dwRYC53mcpvxXxzj7BAw5t/GvHMdN2Hujgw3Vm5DHo7dW8VGd/UE0BNXt0zVJCY6zJATbfbdzzVPPI+mKp3CRme5GeY=
+	bHqzuHOzDQQBw+cuyJhfLdLPjr1xcU4OUY/MFhxcVgyc6oU2mtO6G+wgnHZQa9rf1QJrKoazInxxH2no2pk6RuBlWVIIcH5nme+u8ZasnjDxofebn/3SWCnYZaoNkJN4RDVdrrWAUnNvQkmwqEOVL3Aj9yl9wf3txTBhcwbS4rNfNpHZtG2R/aQkgqD4/0UaZDjyCX4wduUVM0Y7CNEHPvqCDCeU7f3zSLe+G9a0a3MQ85MzM1vZo4SaJetlmdejytsF/BR8NCGyYl738c2Q/DAQNcVwdpiIoVsto/k7Xh6fXC23LapdViG4AD3PqyAvDllBNW9NdKH11o17z3NY8+EkggQIuBxunDjMB1oDD4CahaTPGXf55pY6k8LjJkMWr7MTgGy481MfWVfVE8EFtjtle09ieaR06kpNAIQlxU0GYEJXWZQwknEv/Gv7psQ+VPd+A2baRMTdWW2ZaWmT/G+x/j2JZnX6HC6LtsdSsIw0eu0gR/VCpokyHcnwx2VHh6v+8slwE0+mAHolD7IjxjzSZzfwCPeb+QMGj20VzyZlY3xr0S1Zr71uQ1ahkcQdn+riy+Ou2lSRa1deEQRAuIj4iAdWYr3BpmK4e7vHy11qwqMhvYXml0XjxUaoVxl434v/8Fs9V09D49D5PhRoBzjvmsnWV6AjlBL0UeYep6Q=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV5PR12MB9779.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(376014)(1800799024)(7416014)(366016)(6133799003)(22082099003)(10067099003)(18002099003)(11063799006)(261009223027099003)(4143699003)(56012099006);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV5PR12MB9779.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(23010399003)(1800799024)(261009223027099003)(10067099003)(56012099006)(6133799003)(22082099003)(18002099003)(11063799006)(4143699003)(5023799004);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?S0VnclFoK3VQVkV1dHdaWGhzKzV0ZGpuWmlTZE9waTdSUGRXQXJvUWxKNHVt?=
- =?utf-8?B?cnQxVmoxMkhwclhvQWJQdHdaNm8wUXNTUzRnbFlNOFp0akYxOC9MZjNHbXVM?=
- =?utf-8?B?VUo3NVRlVFZWZGdwdmRDZzEvaHU0QUIvQTZBYTU0UWF1VmFnVzc3ZlFvNG5Q?=
- =?utf-8?B?SUk2VjFTbU94cks1Y25oajdibjFkd1o3MncyOGZXTzJWbURReGZLQ0dKRnFy?=
- =?utf-8?B?V1pBc21SVmQ3WEpYOWNjQS9ZcXl3NGU5VlNNVUYzTWNtK2JBcWFOeFI1NUNl?=
- =?utf-8?B?bkFOWEQxSlVSRk0rRWJsaVZYWEp4S0tUQ3YyNm85SVFZMnVKRjlmMi8wNE82?=
- =?utf-8?B?ZENCQkZqc0lTZEk4LzQwRGM5aTZCZjBVNEJkWVBJSUNmbE1RU0IzSlA1Vk1r?=
- =?utf-8?B?ems0RUY1Tm1RYUJlREwxMXhsMXd6M1R2c1dTWmJLbnhmWDVLb3RjeTJpU1V1?=
- =?utf-8?B?UWNMRThxMWIzR3ZxRjV2aUZLRWNEcTRucGdGcHBKNUsyd3p6eTJPMEpzblJG?=
- =?utf-8?B?UEtZYUU0VC9oTDRhWllWWWc2a05LRllJTGMrTjhud2xOZXppWldEa0lzUWZt?=
- =?utf-8?B?MjNIN1VmUThZenJqSllqOHdubjhxRFJqV3ZNbzlydHNLeFZkME93RDNURitj?=
- =?utf-8?B?bWNUMjYyTEVzU3ZoQTRadjYxcUpWdGw0R2ZjQ3RxRHZGQlJxdlM4a3NsMHB5?=
- =?utf-8?B?UHhVVkU3V2ZkdjduK25kUFpDcFMzV1JLd0xTWHZSdWhaa3lCbmk3c2VKQUtj?=
- =?utf-8?B?STlIc3E2ZFplUU9vREpObE8yREpsOUlFVlBVWTBEdUtLRUU4UXdLc0RJeHpy?=
- =?utf-8?B?YkV4SFpENTRQblYzNGl4M2s2Y0d2cHJ1eHd6Wm1TUGxDNFRRM2FndTZBNjhp?=
- =?utf-8?B?dFV5aDJKY2hIZXpTeDhMZkxxcSt2UlpDZ0w4V0k1Mzlma25zNDQwSkFYMEhN?=
- =?utf-8?B?MVZ6bi9LU08ySW81WHVFdXFtYk5tWTFpdTk1Nk54VzQreko4SWRpOGkxNmNu?=
- =?utf-8?B?VVdDNUNVZks1NnlkM1JkMElBOXlFallCQ2U0NGFPaUo4OXp3MWJHQWdnSWVB?=
- =?utf-8?B?dHlVUXNtZ3VqaHBKVVErUEhjZEZ3MmR0Y3E5STdIK2xKSWNYaDRmNFN0WFd2?=
- =?utf-8?B?TXBlb2dYVlhqdnQwQVBhMzNqSWdvZHJIUk1sL2VDR0hiSUFCMDBYNmlyQS93?=
- =?utf-8?B?UVlqYURvM015bVZ5OG5NNkhvMlh6NWlHeTZTclFzZjNVZ05DYldhL0pCVVFm?=
- =?utf-8?B?NWo5U08yZXB1czc3RS9SY0RjTldnWTZQNlhuK3VsdlJ2REc5UmdsWVUzZDJi?=
- =?utf-8?B?Z1IzYldDQTNhd0ZoOWpsL2tab1lQL0RkOTZiZXFVMVRyYTJTaWwvVXpNbG1z?=
- =?utf-8?B?NmdoZHc3dUZaTUdsUTZHQ3JJRGdJd2tTRUhGbythY0dFSEFYQmg3TnRmK2Vs?=
- =?utf-8?B?SEZBMWdpMzBCWHRRRTN4QXlPc2h3T0s0d05xQnNXOEFTTEhiN2pNWVROQWZv?=
- =?utf-8?B?Y0pzaWxabGRWMUpsbWxWSnBTeDdPNm5jUCtBQkdVWDRXQnBxS003dlFvM2Q2?=
- =?utf-8?B?QjA1MURqZ1lhc1MzaHRJQ0RtQ3E4SmJKcEtCVXViQTliOFNxVHhRVEdqa2E4?=
- =?utf-8?B?UXdXS1NUYnZRK0FIQUM1SGJtTlZWNnAzMHU1MHJTZWtKUGFBSm1UOVhFbkwx?=
- =?utf-8?B?VERGR0xneW5RbEhqeWE3VVRMWlBsSXZjajBCRVFqWDZTOE5zbWtvMVBXNnFF?=
- =?utf-8?B?SUNrdk8vdEwwNS9raU12MWtzbCs2aUhwRUdsRjZhOXpZaEY5RmxTQmdpUHM1?=
- =?utf-8?B?R2p4YXErb0tPOWxEY0RTTFROV1d1aTVCS3BURWJScGNRcWYyZEl2dU1vc0Rl?=
- =?utf-8?B?ZmR5T0NDK1YrejVpMnZ3VVZNcGd6Wjh5VmRTdTFoNFp0M1JUL3VLNlJTOGxT?=
- =?utf-8?B?ZHIzMU5YaVdQelppbkFGdHZZUlJBbDhXOW8rT2hRck9NL0tQNTJ2ZWN5ZHhQ?=
- =?utf-8?B?Sy80M3FXaDB0MFNuWU43VHJpTk1wQ0lXOTUxeXNHLzZKVkZ3SkNOYlJ3Rm5p?=
- =?utf-8?B?dEoxYTlYZDlKakpQT1loR3lIdUdKMytoVnU0Znhwdlg5OWt1b3R2THlMcGtO?=
- =?utf-8?B?SDdsY3NRa0lGM2xYUXlXYy9pcGxZd20zK1oxZHdYeFpkemR6WmdVM3JWSVlo?=
- =?utf-8?B?NlJLTWxXelpXdjVmZC9CaVRzREgzSUsrWEMvSkVacWt4SElCSHRRVzFkZm5U?=
- =?utf-8?B?RW15WVQrMXZSUVgyaGhsZjJDcml5RVlLQm9KVUFhNkNCVU1CYnhwVFIxTyti?=
- =?utf-8?Q?Uq1kqlYGmMNOI1lx0k?=
+	=?utf-8?B?ajRBRnZIMFBWQUxnVzhLNituT3NUdlRYUnBMa2EzUlBpMURTZjd6ZGp5MWts?=
+ =?utf-8?B?VzEvZHViWU9uZ2RQMDF6YzJjV2VLT21iYVc1d2gxSkZudklqRS9Fa2NOeE1u?=
+ =?utf-8?B?clprUitjWm5VMG5TejdrSmEzMCtXNS9xdWozS3ArNFdPZThNbTRLcnJDdzZW?=
+ =?utf-8?B?VHdlMVp3dnlrcnovNEtmMk1MbGlza1ZMN3NyUWtuUFpJUWhrUUdUOWR0a0RW?=
+ =?utf-8?B?UnBhRFZDeGtBcE5RTXZNL0hCR0FJSzU4WnRsVk5VV3lFckdNb0pkMUlnL2di?=
+ =?utf-8?B?M3YzYnpMTUxlMHlHanowbURkN0ljZ3BQRkFEZzdGZ2tqMDJkeTEzeGVScW9l?=
+ =?utf-8?B?S3ROUmxyVURXcGhDWnNDRTZJZjl2cmZwNDhDWjR6T0I1RWMxOHlVNkFiZEhU?=
+ =?utf-8?B?aERLWnYvSlQvMHpWM1NwYzNJWnV6MUZqajBXV01xandIOE9yc2wxUjNmMkN4?=
+ =?utf-8?B?OGJXaEtvbUpsSHNKYlA5YTlIYjIwdm9lQ2taczBLNkFMeGxWQlVMZENtK0dZ?=
+ =?utf-8?B?Q3ZPRENjc2c2OWZQTUxHK05wTWRZOVRuZWNDNlBzU3RJVjFOa2luQi8wcGhj?=
+ =?utf-8?B?U1RuSGJVOWpBd2R4Ujh6c3laTU82Yk9GdnFGaGdVL3ZJL3RQY3BWRU1zaFNC?=
+ =?utf-8?B?TjhoYk1RZnZVQkZsYk04UXJUc2plbUk5dzg4OE15U0FDdzE0cGlFSU1kbTZF?=
+ =?utf-8?B?algxK3REZ2ptdGtjb0szMW1NczMvd3BmWEFBcEJFSEluTlkvaTNYaXA2K0Fm?=
+ =?utf-8?B?cWVya0dUT2Izek5TT2xJTjlOWE9KRnF1WEpzNk1YaFpsM0hLMlhGbmo0OHFj?=
+ =?utf-8?B?bGhJeHNvclNtbWRGNEo0RmV6ayszWnlvUlk5dzJsZ3loQjczWnhEQm81VHJG?=
+ =?utf-8?B?RzN6Q2Y1Nk9NZlY4b1Y1UTU5ZzZqM1FOU1JnMUdtRzdvbCtGMnhUK3dDRXFs?=
+ =?utf-8?B?ZTBZVFZSNk1tc0lPM3N5MXB6WmxDR09iRE1vanl3VE4zZEdSTWNWM1NLbXBI?=
+ =?utf-8?B?U2NZQ01rMnVUenhqc1FwYnphZlRFZUtNbGdhL25kRkZ0UEs3R2oyNjlQMUNi?=
+ =?utf-8?B?R2xmRjBPdGRBdzhYeC9oaEM4V1lUVUFQOTZHcWJBRnJPUUYzWjVFb3NMME1q?=
+ =?utf-8?B?MjNPMFRIZ0dsL3BEOFVRSzFyUnB3Znh6LzZ4ell1L20zemcyU1ZkOWc0VEoy?=
+ =?utf-8?B?TVFZWW5jWHNIbkNBYm4wOGxUSHg4Mld0eklIR0NlQkRMRDc1N1R2L0I3ZmdY?=
+ =?utf-8?B?bENnOVUyUk9qSG1HY0wvUElRNXVkcFNqbEs1RUtTWHlxZi9nUm01aTNaYkJX?=
+ =?utf-8?B?NlMrUDI1UVFScDFFK3ROVmk3K0VGM2haeGVNZDNjaVllUXRJZldRWTg4ZHZ1?=
+ =?utf-8?B?T1NJcGxsWjZ6djl3RkZZa01WQkJOclFFTVgxNmdadHRFaDA0dzdzOERuWmJ6?=
+ =?utf-8?B?T082SHI4MzJoT1BGVnZmYmY1Uyt0N2d3VkZiVTRjSWV4RVMwZ21RN21LVXlC?=
+ =?utf-8?B?Q0MvMERqUHNTUU0xcnd0MDhLNURra0MvcXFrNlNCZ3o3S3ZmSWV6a3dxTkVJ?=
+ =?utf-8?B?TDQ0OGlhMUQxTDhzd3VnRnM5b0UvcUZ3YVpjWkJKWENTQnorbjZZVGZHU2xw?=
+ =?utf-8?B?bmZCcWdhbkQzTnFwRkZPTEFnZWZIM3lmVlM3eTgzZ05lSXdsOGFlNVNjdnZu?=
+ =?utf-8?B?S2JzTXVMS1BLbmF0cklXYnkxTXhvK0x2azNEalpKb05IaG5nWHIyMjdNMktC?=
+ =?utf-8?B?bDFoeWxqT1M0UU5EWjlFWG43V1JPRjhLOE1VQlk2OHdmZ0lDcCtDNHhreDVG?=
+ =?utf-8?B?SEhtV0hGVUNmR0I5UHZFSlNsR2RvdU5OaUtXVldrdU9NZ0xZanFMZXRVV3VL?=
+ =?utf-8?B?VkpwcTNjSFozVnM2T2tjZEFTWkpyYUpOU1JXbGd6VjdGUC84cUZEMC9GMnE4?=
+ =?utf-8?B?WW5pWEszLzc0UlQ3ejIxMkd5S3FpSFg0cVdnejJlMzE3aXUxZ2lyMDZBd3lL?=
+ =?utf-8?B?SVY4VHBFYThRcGwxWVRjTzVyZ0RuN2FTQjZheHYrb3diaGJsUVFRdGlzanFF?=
+ =?utf-8?B?SGt4aVl0dmNPWnY0Sk1ZWjIwazJCbUR2eU1wdEY5TDhVZ0NTVmZtbUlNMlRI?=
+ =?utf-8?B?WjdwN1pOY1BGQk9xcmJBeGptc011STFEV3B1RE1KczJYbUg3ZjUxaThaQmFx?=
+ =?utf-8?B?Q0VBellINkNLVC94WkVaaTgvdWlLSGRIQXBrV21hdWNaWjVVRzRtTWpPM0py?=
+ =?utf-8?B?alVSWWI5K3UvRzk0U1dyL2prTTFRU1dHNFVrTWV3UWZjemMxdjdxVHRVQmNs?=
+ =?utf-8?Q?28jvPk19CWLrBglaKS?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4a2cd1bf-ddf1-47b0-cd58-08df2f3f3ccf
+X-MS-Exchange-CrossTenant-Network-Message-Id: 11cba97e-338a-4d08-7b7f-08df2f3f846f
 X-MS-Exchange-CrossTenant-AuthSource: LV5PR12MB9779.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2026 06:47:56.0255
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2026 06:49:56.2467
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: tcaE3s1tKV3cMml+2Ck80G0BqZs52X6vzulxIPE3/hTHqkGOjNEFviJvazt3iWsi
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4275
+X-MS-Exchange-CrossTenant-UserPrincipalName: x++5hVjL7426e2ybORoPh087xtDV26HmZqq+BYDOujkt1ZCYu+lMKFgj5eIebvDt
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8202
 
 
 
 On 10/20/26 17:35, Douglas Anderson wrote:
-> Add an Image Tree Source (`lga.its`) describing the FIT image for Google
-> Tensor G5 (LGA) Pixel 10 family boards (`lga-blazer.dtb`,
-> `lga-frankel.dtb`, and `lga-mustang.dtb`) with board and SoC ID/revision
-> metadata in the configuration descriptions, allowing the LGA FIT image
+> Add an Image Tree Source (`sc7180-trogdor.its`) describing the FIT
+> image for SC7180 Trogdor family boards using `Image-framed.lz4` and
+> LZ4-compressed board DTBs (`*.dtb.lz4`), allowing the Trogdor FIT image
 > to be built with:
 > 
->    make \
->      FIT_ITS=google/lga.its \
->      FIT_FACTOR_DTBS=1 \
->      FDTFACTOR_ARGS="--strip-local-fixups --single-base-dtb" \
->      image.fit
-> 
-> NOTE: At the moment, Pixel 10 doesn't directly boot from a FIT
-> image. However, packaging scripts will be able to take an image as
-> built above and convert it into a format that the bootloader can
-> handle.
-> 
-> It should also be noted that the "description" of the various
-> configurations here is expected to be parsed to help figure out which
-> configuration to use on which board. This idea came out of discussions
-> at Linux Plumbers Conference 2026 and means we don't need "loader"
-> info polluting device trees. Having a structured (and upstream) place
-> to store this data is part of the motivation for landing this FIT
-> image.
-> 
-> Side note: at the moment, the Pixel bootloader can't handle picking
-> overlays based on the soc_id and soc_rev (it only uses those to pick
-> base dtb files), so for now we won't be able to support boards that
-> might have different SoCs. I've included the soc_id and soc_rev in
-> this FIT image in the hopes that we can improve the bootloader in the
-> future, though.
+>    make FIT_ITS=qcom/sc7180-trogdor.its image.fit
 > 
 > Assisted-by: Gemini:gemini-pro-prerelease
 > Signed-off-by: Douglas Anderson <dianders@chromium.org>
 > ---
-> Note that building `image.fit` with `lga.its` requires the Pixel 10
-> (`lga-blazer.dtb`, `lga-frankel.dtb`, and `lga-mustang.dtb`) device
-> trees, which are currently in linux-next and not yet in mainline.
+> As mentioned in the cover letter, there is no desperate need to land
+> this. The FIT image created here is pretty much the same as what the
+> downstream build scripts for ChromeOS programmatically
+> produce. Switching over to this would have a few benefits:
+> * It makes it easy to use fdtfactor on the trogdor kernel image.
+> * It would set the path for future Chromebooks, and on those
+>    Chromebooks maybe we could use the "description" of the
+>    configurations to help the bootloader so we didn't need the awkward
+>    piles of "compatible" strings that we have.
+> * It could potentially be useful to people in the community putting
+>    upstream kernels on sc7180-trogdor devices.
 > 
->   arch/arm64/boot/dts/google/lga.its | 68 ++++++++++++++++++++++++++++++
->   1 file changed, 68 insertions(+)
->   create mode 100644 arch/arm64/boot/dts/google/lga.its
-Looks good to me.
-
+> This all being said, there's nothing terribly critical here, so if
+> it's controversial or people hate it then it's fine not to land it.
+> 
+>   arch/arm64/boot/dts/qcom/sc7180-trogdor.its | 728 ++++++++++++++++++++
+>   1 file changed, 728 insertions(+)
+>   create mode 100644 arch/arm64/boot/dts/qcom/sc7180-trogdor.its
 Acked-by: Michal Simek <michal.simek@amd.com>
 
-Cheers,
-Michal
+I would consider in this case to put it to any folder. There are a lot of 
+dts/dtsi/dtso files in qcom folder. That having subfolder would be IMHO better 
+structure.
 
+Thanks,
+Michal
