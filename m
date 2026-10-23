@@ -1,83 +1,140 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.129.124
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792738232;
-	b=OvTTt2NSQ8don73PHjXsIWaTI+5ywjyQ5rOaasSD5mNCVkOvNizJZYKLa+gBqm/bWID4
-	 EA2MgVPsrrvvBeCCykA0ZFiy0T59OxOh2+2LD+rIvgroGl0nsb4obeFHOf2f9+FfFkWW5
-	 4TVaX9dImXucaHbBk1GrNgzjoydFn1xrAhaxuUf8dW3bp8iQQbMyCaHTxfCYbnzctL2GL
-	 fSVqCu5i9eB0ifB36NOyXSQJj7ncN69KZVpgJhORAzQ/PNRKhbzhOXebWWTZKHCnUPEEV
-	 V2cCkIyejRjHfZ3Dk519ZIH5JGj5PodkXWZ5rNNO7ECzyK8+Wy8f/3ZeBaMptZXok1A==
+	t=1792738256;
+	b=5oafCDdmbcw+IHlCDSlTcC57dZOCRy1teGvGF33B6meWx8Y8Ka5xQ6zIeVFdYql6cESx
+	 pKvI3+vmf9WL+ZrTPKGZ+RABALkjr4vthvSMgkCnU3QvQhm6BwHLF6y0GZPXJkj+qeLdB
+	 zn5WQwfRU7wMoiyYGU95fO+SYuX9DR0tyHkdVzto934ZSsz0qycZ7RHsYF/gSVlmV+Pis
+	 A1qutGfHecXP5G+f+BLgQdWEdMXCm/B5ju1NjTeu/TEUqBxnsajKhdigfJtWEVj5slvTz
+	 uCIi5uwVsiEzScKh5oU/oTTioWG2mWl/lCGXqO0eM1fldf8bprZ5AgfmwTJkQMspcSw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792738232;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792738256;
 	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
 	 X-Mimecast-MFC-AGG-ID:Received:Received:From:To:Cc:Subject:Date:
 	 Message-ID:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding:X-Scanned-By;
-	bh=ZcmG/UCEVfdbqO5wIMJXD5ZNV1GWne6PASuXh9pLInc=;
-	b=GI9pfeFXZVEvSUbU44ewRZqNlEKShiKR79U1bMb6qs2X3yXSVOGjvXC3F16EVSkoxaOe
-	 iXjweEOg1kCiRPCrCG/9cZXZOAw/8pTGal93GYTgtLKmREEBVCvqBmbKu15HZ/iM/cCgP
-	 jvnEexY9MtdpNwxmPD5aA37ihZQnQXaw683xURuIiWjDluulOvnO404ct3ZzEc+Zp8IJe
-	 5zNcmmMhGKO6jQuWt87JrF6NRGm/tIpSkerg2m799l0ScR05S6QdozxqwRjPOJJ/p3Usq
-	 iFNba3EncR6ebMgekMXbk18vWI6a88ySrMOIcpTr+XkG+8VjTy4nQyr1i+agjL4QYpQ==
+	bh=F6+noPVYF4kQP6smbqYTSV7WwZHDrBWE8Us7MYDz21A=;
+	b=Panz/uuOlf1naKW7w1OZi9OikswCwLFlqo5wujzuf1lShCAINu3eK+nuCNg4TGyAmRGR
+	 o+FNsbhcNZgb79jZ4hvXakiX4m8ar+MvNesR+xlQ7pun4cJMetjePZyU2KdR/mt1P6uJh
+	 T6WWbmXsN1wWJLwvoBhQYyiOgcGOFqF9JqdpV/o504ZvmDH/avlJo1KaR+3yUZnYlEVcD
+	 207stJPLVttrOTROpqXDo7khOgjjvMkepU9EUtJzEmhcZHMAS2fRgaAAUK5qwSWqZNS2J
+	 5oHpUjlkrIIwaxgiql1BacGD/6O5ZQmX4VlzlB2SvpNlZ23faoJaW3W62uOn6+2DtkA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=redhat.com;
 	spf=pass smtp.mailfrom=redhat.com;
-	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=Hx0or+Tk;
-	arc=none smtp.remote-ip=170.10.133.124
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=DMBYQ++E;
+	arc=none smtp.remote-ip=170.10.129.124
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6786606A32E
-	for <linux-kbuild@vger.kernel.org>; Fri, 23 Oct 2026 06:50:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B6786606A32E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DCB7606A322
+	for <linux-kbuild@vger.kernel.org>; Fri, 23 Oct 2026 06:50:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8DCB7606A322
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=Hx0or+Tk
+	dkim=pass (1024-bit key, unprotected) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=DMBYQ++E
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1792738231;
+	s=mimecast20190719; t=1792738254;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ZcmG/UCEVfdbqO5wIMJXD5ZNV1GWne6PASuXh9pLInc=;
-	b=Hx0or+TkjTRm0+1v5WLRfX1CI5Oz2CdcMljVF0pfLd/eIqVHMWWUZU6FTrejZ8RyH8MoO6
-	VKkWpWdljVX5e4ZwsI2UOwE0iSWNlNBdFcHmTP4ovNCOPz7Fs8eH/GT73h4DMpOr94Ddn+
-	aumyBAknUpNe+VGCzGAYGcHyqYbgOf8=
+	bh=F6+noPVYF4kQP6smbqYTSV7WwZHDrBWE8Us7MYDz21A=;
+	b=DMBYQ++Ec2YdNTCkGfCenFQpSeFu2lnTGzUVI+2wRts0pdYULSiNwrdY8Kj33GQOqpaqA3
+	CiTDid/SgrXVTBkuBDFAVEyuxU+aoSQSJo7fWkJqdwSOQS7A2hEtvXJ9BX5Ne6FCpsU48J
+	s3bgTCDBDtoCTPirSDIW+u21R0q8KLU=
 Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-38-v9zop0riM5q8kBQyX7ObYQ-1; Fri,
- 23 Oct 2026 02:50:26 -0400
-X-MC-Unique: v9zop0riM5q8kBQyX7ObYQ-1
-X-Mimecast-MFC-AGG-ID: v9zop0riM5q8kBQyX7ObYQ_1792738224
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-587-1BrFnSVrOACgn3OQUjDx2Q-1; Fri,
+ 23 Oct 2026 02:50:51 -0400
+X-MC-Unique: 1BrFnSVrOACgn3OQUjDx2Q-1
+X-Mimecast-MFC-AGG-ID: 1BrFnSVrOACgn3OQUjDx2Q_1792738248
 Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 34DC41955F18;
-	Fri, 23 Oct 2026 06:50:24 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BCC341955F71;
+	Fri, 23 Oct 2026 06:50:47 +0000 (UTC)
 Received: from thuth-p1g4.redhat.com (unknown [10.44.48.42])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D92611956095;
-	Fri, 23 Oct 2026 06:50:19 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7EFCD1956095;
+	Fri, 23 Oct 2026 06:50:27 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: Arnd Bergmann <arnd@arndb.de>,
 	Nathan Chancellor <nathan@kernel.org>,
 	Nicolas Schier <nsc@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Chris Li <sparse@chrisli.org>
+	Richard Henderson <richard.henderson@linaro.org>,
+	Matt Turner <mattst88@gmail.com>,
+	Magnus Lindholm <linmag7@gmail.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	Chris Zankel <chris@zankel.net>,
+	Max Filippov <jcmvbkbc@gmail.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Luis Augenstein <luis.augenstein@tngtech.com>,
+	Maximilian Huber <maximilian.huber@tngtech.com>,
+	Anup Patel <anup@brainfault.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Paul Walmsley <pjw@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Andy Lutomirski <luto@kernel.org>,
+	Vincenzo Frascino <vincenzo.frascino@arm.com>
 Cc: soc@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	linux-kbuild@vger.kernel.org,
 	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+	Mark Rutland <mark.rutland@arm.com>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+	"Ritesh Harjani (IBM)" <ritesh.list@gmail.com>,
+	Shrikanth Hegde <sshegde@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Atish Patra <atish.patra@linux.dev>,
+	Sean Christopherson <seanjc@google.com>,
+	Alexandre Ghiti <alex@ghiti.fr>,
 	Nick Desaulniers <ndesaulniers@google.com>,
 	Bill Wendling <morbo@google.com>,
 	Justin Stitt <justinstitt@google.com>,
-	linux-sparse@vger.kernel.org,
+	linux-alpha@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	loongarch@lists.linux.dev,
+	linux-mips@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-s390@vger.kernel.org,
+	linux-efi@vger.kernel.org,
+	netdev@vger.kernel.org,
+	kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	linux-kselftest@vger.kernel.org,
 	llvm@lists.linux.dev
-Subject: [PATCH v5 12/13] include: Replace __ASSEMBLY__ with __ASSEMBLER__ in non-uapi headers
-Date: Fri, 23 Oct 2026 08:48:49 +0200
-Message-ID: <20261023064908.66707-13-thuth@redhat.com>
+Subject: [PATCH v5 13/13] treewide: Stop defining __ASSEMBLY__ for assembler files
+Date: Fri, 23 Oct 2026 08:48:50 +0200
+Message-ID: <20261023064908.66707-14-thuth@redhat.com>
 In-Reply-To: <20261023064908.66707-1-thuth@redhat.com>
 References: <20261023064908.66707-1-thuth@redhat.com>
 X-Mailing-List: linux-kbuild@vger.kernel.org
@@ -92,521 +149,306 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-While the GCC and Clang compilers already define __ASSEMBLER__
-automatically when compiling assembly code, __ASSEMBLY__ is a
-macro that only gets defined by the Makefiles in the kernel.
-This can be very confusing when switching between userspace
-and kernelspace coding, or when dealing with uapi headers that
-rather should use __ASSEMBLER__ instead. So let's standardize now
-on the __ASSEMBLER__ macro that is provided by the compilers.
-
-This is a completely mechanical patch (done with a simple "sed -i"
-statement).
+All spots have been changed to __ASSEMBLER__ (i.e. the macro that
+gets defined by the compiler), so we don't have to manually define
+__ASSEMBLY__ anymore.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- include/linux/amba/serial.h             |  4 ++--
- include/linux/annotate.h                | 18 +++++++++---------
- include/linux/cfi_types.h               |  6 +++---
- include/linux/compiler.h                |  4 ++--
- include/linux/compiler_types.h          |  8 ++++----
- include/linux/edd.h                     |  4 ++--
- include/linux/err.h                     |  2 +-
- include/linux/export.h                  |  2 +-
- include/linux/init.h                    |  6 +++---
- include/linux/ioport.h                  |  4 ++--
- include/linux/linkage.h                 |  6 +++---
- include/linux/mem_encrypt.h             |  4 ++--
- include/linux/pe.h                      |  4 ++--
- include/linux/platform_data/emif_plat.h |  4 ++--
- include/linux/ti-emif-sram.h            |  2 +-
- include/linux/types.h                   |  4 ++--
- tools/include/asm-generic/barrier.h     |  4 ++--
- tools/include/asm/alternative.h         |  2 +-
- tools/include/linux/cfi_types.h         |  6 +++---
- tools/include/linux/compiler.h          |  4 ++--
- 20 files changed, 49 insertions(+), 49 deletions(-)
+ Makefile                                             | 2 +-
+ arch/alpha/boot/compressed/Makefile                  | 2 +-
+ arch/arm64/kernel/vdso32/Makefile                    | 1 -
+ arch/loongarch/vdso/Makefile                         | 2 +-
+ arch/mips/boot/compressed/Makefile                   | 2 +-
+ arch/mips/vdso/Makefile                              | 2 +-
+ arch/powerpc/boot/Makefile                           | 2 +-
+ arch/powerpc/platforms/cell/spufs/Makefile           | 2 +-
+ arch/s390/Makefile                                   | 2 +-
+ arch/x86/boot/Makefile                               | 2 +-
+ arch/x86/boot/compressed/Makefile                    | 2 +-
+ arch/x86/realmode/rm/Makefile                        | 2 +-
+ arch/xtensa/kernel/Makefile                          | 2 +-
+ drivers/firmware/efi/libstub/Makefile                | 2 +-
+ drivers/net/wan/Makefile                             | 2 +-
+ scripts/Makefile.build                               | 2 +-
+ scripts/gfp-translate                                | 2 +-
+ scripts/headers_install.sh                           | 1 -
+ scripts/sbom/tests/cmd_graph/test_savedcmd_parser.py | 2 +-
+ tools/testing/selftests/kvm/lib/riscv/handlers.S     | 4 ----
+ tools/testing/selftests/vDSO/vgetrandom-chacha.S     | 2 --
+ 21 files changed, 17 insertions(+), 25 deletions(-)
 
-diff --git a/include/linux/amba/serial.h b/include/linux/amba/serial.h
-index 9120de05ead08..b9129c0d6304f 100644
---- a/include/linux/amba/serial.h
-+++ b/include/linux/amba/serial.h
-@@ -10,7 +10,7 @@
- #ifndef ASM_ARM_HARDWARE_SERIAL_AMBA_H
- #define ASM_ARM_HARDWARE_SERIAL_AMBA_H
+diff --git a/Makefile b/Makefile
+index 0319cd716d73b..98bffdd9cf2d6 100644
+--- a/Makefile
++++ b/Makefile
+@@ -606,7 +606,7 @@ LINUXINCLUDE    := \
+ 		-I$(objtree)/include \
+ 		$(USERINCLUDE)
  
--#ifndef __ASSEMBLY__
-+#ifndef __ASSEMBLER__
- #include <linux/bitfield.h>
- #include <linux/bits.h>
- #endif
-@@ -215,7 +215,7 @@
- #define UART01x_RSR_ANY		(UART01x_RSR_OE | UART01x_RSR_BE | UART01x_RSR_PE | UART01x_RSR_FE)
- #define UART01x_FR_MODEM_ANY	(UART01x_FR_DCD | UART01x_FR_DSR | UART01x_FR_CTS)
+-KBUILD_AFLAGS   := -D__ASSEMBLY__ -fno-PIE
++KBUILD_AFLAGS   := -fno-PIE
  
--#ifndef __ASSEMBLY__
-+#ifndef __ASSEMBLER__
- struct amba_device; /* in uncompress this is included but amba/bus.h is not */
- struct amba_pl010_data {
- 	void (*set_mctrl)(struct amba_device *dev, void __iomem *base, unsigned int mctrl);
-diff --git a/include/linux/annotate.h b/include/linux/annotate.h
-index 2f1599c9e5732..de8fdcb04f44d 100644
---- a/include/linux/annotate.h
-+++ b/include/linux/annotate.h
-@@ -11,7 +11,7 @@
- 	.long label - ., type;						\
- 	.popsection
+ KBUILD_CFLAGS :=
+ KBUILD_CFLAGS += -fshort-wchar
+diff --git a/arch/alpha/boot/compressed/Makefile b/arch/alpha/boot/compressed/Makefile
+index eb930f01b4be4..16119a13e53a3 100644
+--- a/arch/alpha/boot/compressed/Makefile
++++ b/arch/alpha/boot/compressed/Makefile
+@@ -22,7 +22,7 @@ KBUILD_CFLAGS += -fno-asynchronous-unwind-tables
+ KBUILD_CFLAGS += -pipe -mcpu=ev4 -mno-fp-regs -ffixed-8
+ KBUILD_CFLAGS += -DDISABLE_BRANCH_PROFILING -D__DISABLE_EXPORTS
+ KBUILD_CFLAGS += $(CC_FLAGS_DIALECT)
+-KBUILD_AFLAGS := -D__ASSEMBLY__ $(KBUILD_CFLAGS)
++KBUILD_AFLAGS := $(KBUILD_CFLAGS)
  
--#ifndef __ASSEMBLY__
-+#ifndef __ASSEMBLER__
+ # The stub has no sanitizer or coverage runtime. arch/alpha/lib/lib.a is
+ # built with the kernel's instrumentation and -mcpu=, so build private
+diff --git a/arch/arm64/kernel/vdso32/Makefile b/arch/arm64/kernel/vdso32/Makefile
+index 00efdc5d23543..0ba0b4bb3e013 100644
+--- a/arch/arm64/kernel/vdso32/Makefile
++++ b/arch/arm64/kernel/vdso32/Makefile
+@@ -77,7 +77,6 @@ VDSO_CFLAGS += -marm
+ endif
  
- #define ASM_ANNOTATE_LABEL(label, type)					\
- 	__stringify(__ASM_ANNOTATE(.discard.annotate_insn, label, type))
-@@ -24,7 +24,7 @@
- 	"912: "								\
- 	__stringify(__ASM_ANNOTATE(.discard.annotate_data, 912b, type))
+ VDSO_AFLAGS := $(VDSO_CAFLAGS)
+-VDSO_AFLAGS += -D__ASSEMBLY__
  
--#else /* __ASSEMBLY__ */
-+#else /* __ASSEMBLER__ */
+ # From arm vDSO Makefile
+ VDSO_LDFLAGS += -Bsymbolic --no-undefined -soname=linux-vdso.so.1
+diff --git a/arch/loongarch/vdso/Makefile b/arch/loongarch/vdso/Makefile
+index 0b84892d084b6..c2b73fd3781c0 100644
+--- a/arch/loongarch/vdso/Makefile
++++ b/arch/loongarch/vdso/Makefile
+@@ -32,7 +32,7 @@ cflags-vdso := $(ccflags-vdso) \
+ 	$(call cc-option, -fasynchronous-unwind-tables) \
+ 	$(call cc-option, -fno-stack-protector)
+ aflags-vdso := $(ccflags-vdso) \
+-	-D__ASSEMBLY__ -Wa,-gdwarf-2
++	-Wa,-gdwarf-2
  
- .macro ANNOTATE type
- .Lhere_\@:
-@@ -36,22 +36,22 @@
- 	__ASM_ANNOTATE(.discard.annotate_data, .Lhere_\@, \type)
- .endm
+ ifneq ($(c-gettimeofday-y),)
+   CFLAGS_vgettimeofday.o += -include $(c-gettimeofday-y)
+diff --git a/arch/mips/boot/compressed/Makefile b/arch/mips/boot/compressed/Makefile
+index 2684540758a8d..3e3803b2db48f 100644
+--- a/arch/mips/boot/compressed/Makefile
++++ b/arch/mips/boot/compressed/Makefile
+@@ -30,7 +30,7 @@ endif
+ KBUILD_CFLAGS := $(KBUILD_CFLAGS) -D__KERNEL__ -D__DISABLE_EXPORTS \
+ 	-DBOOT_HEAP_SIZE=$(BOOT_HEAP_SIZE) -D"VMLINUX_LOAD_ADDRESS_ULL=$(VMLINUX_LOAD_ADDRESS)ull"
  
--#endif /* __ASSEMBLY__ */
-+#endif /* __ASSEMBLER__ */
+-KBUILD_AFLAGS := $(KBUILD_AFLAGS) -D__ASSEMBLY__ \
++KBUILD_AFLAGS := $(KBUILD_AFLAGS) \
+ 	-DBOOT_HEAP_SIZE=$(BOOT_HEAP_SIZE) \
+ 	-DKERNEL_ENTRY=$(VMLINUX_ENTRY_ADDRESS)
  
- #else /* !CONFIG_OBJTOOL */
--#ifndef __ASSEMBLY__
-+#ifndef __ASSEMBLER__
- #define ASM_ANNOTATE_LABEL(label, type) ""
- #define ASM_ANNOTATE(type)
- #define ASM_ANNOTATE_DATA(type)
--#else /* __ASSEMBLY__ */
-+#else /* __ASSEMBLER__ */
- .macro ANNOTATE type
- .endm
- .macro ANNOTATE_DATA type
- .endm
--#endif /* __ASSEMBLY__ */
-+#endif /* __ASSEMBLER__ */
- #endif /* !CONFIG_OBJTOOL */
+diff --git a/arch/mips/vdso/Makefile b/arch/mips/vdso/Makefile
+index 00d3ba2c482ac..4d04987e995de 100644
+--- a/arch/mips/vdso/Makefile
++++ b/arch/mips/vdso/Makefile
+@@ -33,7 +33,7 @@ cflags-vdso := $(ccflags-vdso) \
+ 	-fno-stack-protector -fno-jump-tables -DDISABLE_BRANCH_PROFILING \
+ 	$(call cc-option, -fno-asynchronous-unwind-tables)
+ aflags-vdso := $(ccflags-vdso) \
+-	-D__ASSEMBLY__ -Wa,-gdwarf-2
++	-Wa,-gdwarf-2
  
--#ifndef __ASSEMBLY__
-+#ifndef __ASSEMBLER__
+ ifneq ($(c-gettimeofday-y),)
+ obj-vdso-y += vgettimeofday.o
+diff --git a/arch/powerpc/boot/Makefile b/arch/powerpc/boot/Makefile
+index 7ee0fa2d3371e..5dca91ec9f4aa 100644
+--- a/arch/powerpc/boot/Makefile
++++ b/arch/powerpc/boot/Makefile
+@@ -80,7 +80,7 @@ BOOTCFLAGS	:= $(BOOTTARGETFLAGS) \
+ 		   $(call cc-option,-mno-spe) $(call cc-option,-mspe=no) \
+ 		   -fomit-frame-pointer -fno-builtin -fPIC
  
- /*
-  * Annotate away the various 'relocation to !ENDBR` complaints; knowing that
-@@ -111,7 +111,7 @@
+-BOOTAFLAGS	:= $(BOOTTARGETFLAGS) -D__ASSEMBLY__
++BOOTAFLAGS	:= $(BOOTTARGETFLAGS)
+ 
+ BOOTARFLAGS	:= -crD
+ 
+diff --git a/arch/powerpc/platforms/cell/spufs/Makefile b/arch/powerpc/platforms/cell/spufs/Makefile
+index 60319d4ff25a6..959617c4ee89c 100644
+--- a/arch/powerpc/platforms/cell/spufs/Makefile
++++ b/arch/powerpc/platforms/cell/spufs/Makefile
+@@ -15,7 +15,7 @@ SPU_AS		:= $(SPU_CROSS)gcc
+ SPU_LD		:= $(SPU_CROSS)ld
+ SPU_OBJCOPY	:= $(SPU_CROSS)objcopy
+ SPU_CFLAGS	:= -O2 -Wall -I$(srctree)/include -D__KERNEL__
+-SPU_AFLAGS	:= -c -D__ASSEMBLY__ -I$(srctree)/include -D__KERNEL__
++SPU_AFLAGS	:= -c -I$(srctree)/include -D__KERNEL__
+ SPU_LDFLAGS	:= -N -Ttext=0x0
+ 
+ $(obj)/switch.o: $(obj)/spu_save_dump.h $(obj)/spu_restore_dump.h
+diff --git a/arch/s390/Makefile b/arch/s390/Makefile
+index 8b712cd85fcd3..83ecc702f7146 100644
+--- a/arch/s390/Makefile
++++ b/arch/s390/Makefile
+@@ -17,7 +17,7 @@ KBUILD_CFLAGS	+= -fPIC
+ LDFLAGS_vmlinux	:= $(call ld-option,-no-pie)
+ extra_tools	:= relocs
+ aflags_dwarf	:= -Wa,-gdwarf-2
+-KBUILD_AFLAGS_DECOMPRESSOR := $(CLANG_FLAGS) -m64 -D__ASSEMBLY__
++KBUILD_AFLAGS_DECOMPRESSOR := $(CLANG_FLAGS) -m64
+ ifndef CONFIG_AS_IS_LLVM
+ KBUILD_AFLAGS_DECOMPRESSOR += $(if $(CONFIG_DEBUG_INFO),$(aflags_dwarf))
+ endif
+diff --git a/arch/x86/boot/Makefile b/arch/x86/boot/Makefile
+index 4a9bce32586d3..69d75072888d1 100644
+--- a/arch/x86/boot/Makefile
++++ b/arch/x86/boot/Makefile
+@@ -52,7 +52,7 @@ targets += cpustr.h
+ # ---------------------------------------------------------------------------
+ 
+ KBUILD_CFLAGS	:= $(REALMODE_CFLAGS) -D_SETUP
+-KBUILD_AFLAGS	:= $(KBUILD_CFLAGS) -D__ASSEMBLY__
++KBUILD_AFLAGS	:= $(KBUILD_CFLAGS)
+ KBUILD_CFLAGS	+= -fno-asynchronous-unwind-tables
+ KBUILD_CFLAGS	+= $(CONFIG_CC_IMPLICIT_FALLTHROUGH)
+ 
+diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
+index 680ad803cba7d..e73ef522496e1 100644
+--- a/arch/x86/boot/compressed/Makefile
++++ b/arch/x86/boot/compressed/Makefile
+@@ -49,7 +49,7 @@ KBUILD_CFLAGS += -include $(srctree)/include/linux/hidden.h
+ # that the compiler finds it even with out-of-tree builds (make O=/some/path).
+ CFLAGS_sev-handle-vc.o += -I$(objtree)/arch/x86/lib/
+ 
+-KBUILD_AFLAGS  := $(KBUILD_CFLAGS) -D__ASSEMBLY__
++KBUILD_AFLAGS  := $(KBUILD_CFLAGS)
+ 
+ KBUILD_LDFLAGS := -m elf_$(UTS_MACHINE)
+ KBUILD_LDFLAGS += $(call ld-option,--no-ld-generated-unwind-info)
+diff --git a/arch/x86/realmode/rm/Makefile b/arch/x86/realmode/rm/Makefile
+index a0fb39abc5c86..20bbe1af05acd 100644
+--- a/arch/x86/realmode/rm/Makefile
++++ b/arch/x86/realmode/rm/Makefile
+@@ -65,5 +65,5 @@ $(obj)/realmode.relocs: $(obj)/realmode.elf FORCE
+ 
+ KBUILD_CFLAGS	:= $(REALMODE_CFLAGS) -D_SETUP -D_WAKEUP \
+ 		   -I$(srctree)/arch/x86/boot
+-KBUILD_AFLAGS	:= $(KBUILD_CFLAGS) -D__ASSEMBLY__
++KBUILD_AFLAGS	:= $(KBUILD_CFLAGS)
+ KBUILD_CFLAGS	+= -fno-asynchronous-unwind-tables
+diff --git a/arch/xtensa/kernel/Makefile b/arch/xtensa/kernel/Makefile
+index d3ef0407401f6..ece4ae6dea97d 100644
+--- a/arch/xtensa/kernel/Makefile
++++ b/arch/xtensa/kernel/Makefile
+@@ -39,7 +39,7 @@ sed-y = -e ':a; s/\*(\([^)]*\)\.text\.unlikely/*(\1.literal.unlikely .{text}.unl
+ 	-e 's/\.{text}/.text/g'
+ 
+ quiet_cmd__cpp_lds_S = LDS     $@
+-cmd__cpp_lds_S = $(CPP) $(cpp_flags) -P -C -Uxtensa -D__ASSEMBLY__ \
++cmd__cpp_lds_S = $(CPP) $(cpp_flags) -P -C -Uxtensa \
+ 		 -DLINKER_SCRIPT $< | sed $(sed-y) >$@
+ 
+ $(obj)/vmlinux.lds: $(src)/vmlinux.lds.S FORCE
+diff --git a/drivers/firmware/efi/libstub/Makefile b/drivers/firmware/efi/libstub/Makefile
+index 415f63105b481..d4edc3c0c4556 100644
+--- a/drivers/firmware/efi/libstub/Makefile
++++ b/drivers/firmware/efi/libstub/Makefile
+@@ -61,7 +61,7 @@ KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_LTO), $(KBUILD_CFLAGS))
+ # `-fdata-sections` flag from KBUILD_CFLAGS_KERNEL
+ KBUILD_CFLAGS_KERNEL := $(filter-out -fdata-sections, $(KBUILD_CFLAGS_KERNEL))
+ 
+-KBUILD_AFLAGS			:= $(KBUILD_CFLAGS) -D__ASSEMBLY__
++KBUILD_AFLAGS			:= $(KBUILD_CFLAGS)
+ 
+ lib-y				:= efi-stub-helper.o gop.o secureboot.o tpm.o \
+ 				   file.o mem.o random.o randomalloc.o pci.o \
+diff --git a/drivers/net/wan/Makefile b/drivers/net/wan/Makefile
+index 00e9b7ee1e012..4233143534465 100644
+--- a/drivers/net/wan/Makefile
++++ b/drivers/net/wan/Makefile
+@@ -57,7 +57,7 @@ $(obj)/wanxlfw.bin: $(obj)/wanxlfw.o FORCE
+ 	$(call if_changed,m68kld_bin_o)
+ 
+ quiet_cmd_m68kas_o_S = M68KAS  $@
+-      cmd_m68kas_o_S = $(M68KCC) -D__ASSEMBLY__ -Wp,-MD,$(depfile) -I$(srctree)/include/uapi -c -o $@ $<
++      cmd_m68kas_o_S = $(M68KCC) -Wp,-MD,$(depfile) -I$(srctree)/include/uapi -c -o $@ $<
+ 
+ $(obj)/wanxlfw.o: $(src)/wanxlfw.S FORCE
+ 	$(call if_changed_dep,m68kas_o_S)
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 6127feb970c65..0b7c1e273f0cb 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -465,7 +465,7 @@ targets += $(lib-y) $(always-y)
+ # ---------------------------------------------------------------------------
+ quiet_cmd_cpp_lds_S = LDS     $@
+       cmd_cpp_lds_S = $(CPP) $(cpp_flags) -P -U$(ARCH) \
+-	                     -D__ASSEMBLY__ -DLINKER_SCRIPT -o $@ $<
++	                     -DLINKER_SCRIPT -o $@ $<
+ 
+ $(obj)/%.lds: $(src)/%.lds.S FORCE
+ 	$(call if_changed_dep,cpp_lds_S)
+diff --git a/scripts/gfp-translate b/scripts/gfp-translate
+index 8385ae0d5af93..f6353795fdca3 100755
+--- a/scripts/gfp-translate
++++ b/scripts/gfp-translate
+@@ -73,7 +73,7 @@ echo Parsing: $GFPMASK
+ #include <stdio.h>
+ 
+ // Try to fool compiler.h into not including extra stuff
+-#define __ASSEMBLY__	1
++#define __ASSEMBLER__	1
+ 
+ #include <generated/autoconf.h>
+ #include <linux/gfp_types.h>
+diff --git a/scripts/headers_install.sh b/scripts/headers_install.sh
+index 2f1d1767ca267..9c15e748761c4 100755
+--- a/scripts/headers_install.sh
++++ b/scripts/headers_install.sh
+@@ -36,7 +36,6 @@ sed -E -e '
+ 	s/(^|[^a-zA-Z0-9])__packed([^a-zA-Z0-9_]|$)/\1__attribute__((packed))\2/g
+ 	s/(^|[[:space:](])(inline|asm|volatile)([[:space:](]|$)/\1__\2__\3/g
+ 	s@#(ifndef|define|endif[[:space:]]*/[*])[[:space:]]*_UAPI@#\1 @
+-	s/__ASSEMBLY__/__ASSEMBLER__/g
+ ' $INFILE > $TMPFILE || exit 1
+ 
+ scripts/unifdef -U__KERNEL__ -D__EXPORTED_HEADERS__ $TMPFILE > $OUTFILE
+diff --git a/scripts/sbom/tests/cmd_graph/test_savedcmd_parser.py b/scripts/sbom/tests/cmd_graph/test_savedcmd_parser.py
+index 93787a1cd1566..8d9ae35764040 100644
+--- a/scripts/sbom/tests/cmd_graph/test_savedcmd_parser.py
++++ b/scripts/sbom/tests/cmd_graph/test_savedcmd_parser.py
+@@ -152,7 +152,7 @@ class TestSavedCmdParser(unittest.TestCase):
+         self._assert_parsing(cmd, expected)
+ 
+     def test_clang(self):
+-        cmd = """clang -Wp,-MMD,arch/x86/entry/.entry_64_compat.o.d -nostdinc -I../arch/x86/include -I./arch/x86/include/generated -I../include -I./include -I../arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I../include/uapi -I./include/generated/uapi -include ../include/linux/compiler-version.h -include ../include/linux/kconfig.h -D__KERNEL__ --target=x86_64-linux-gnu -fintegrated-as -Werror=unknown-warning-option -Werror=ignored-optimization-argument -Werror=option-ignored -Werror=unused-command-line-argument -fmacro-prefix-map=../= -Werror -D__ASSEMBLY__ -fno-PIE -m64 -I../arch/x86/entry -Iarch/x86/entry    -DKBUILD_MODFILE='"arch/x86/entry/entry_64_compat"' -DKBUILD_MODNAME='"entry_64_compat"' -D__KBUILD_MODNAME=kmod_entry_64_compat -c -o arch/x86/entry/entry_64_compat.o ../arch/x86/entry/entry_64_compat.S"""
++        cmd = """clang -Wp,-MMD,arch/x86/entry/.entry_64_compat.o.d -nostdinc -I../arch/x86/include -I./arch/x86/include/generated -I../include -I./include -I../arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I../include/uapi -I./include/generated/uapi -include ../include/linux/compiler-version.h -include ../include/linux/kconfig.h -D__KERNEL__ --target=x86_64-linux-gnu -fintegrated-as -Werror=unknown-warning-option -Werror=ignored-optimization-argument -Werror=option-ignored -Werror=unused-command-line-argument -fmacro-prefix-map=../= -Werror -fno-PIE -m64 -I../arch/x86/entry -Iarch/x86/entry    -DKBUILD_MODFILE='"arch/x86/entry/entry_64_compat"' -DKBUILD_MODNAME='"entry_64_compat"' -D__KBUILD_MODNAME=kmod_entry_64_compat -c -o arch/x86/entry/entry_64_compat.o ../arch/x86/entry/entry_64_compat.S"""
+         expected = "../arch/x86/entry/entry_64_compat.S"
+         self._assert_parsing(cmd, expected)
+ 
+diff --git a/tools/testing/selftests/kvm/lib/riscv/handlers.S b/tools/testing/selftests/kvm/lib/riscv/handlers.S
+index b787b982e922a..c8cc2d695f483 100644
+--- a/tools/testing/selftests/kvm/lib/riscv/handlers.S
++++ b/tools/testing/selftests/kvm/lib/riscv/handlers.S
+@@ -3,10 +3,6 @@
+  * Copyright (c) 2023 Intel Corporation
   */
- #define ANNOTATE_DATA_SPECIAL		ASM_ANNOTATE_DATA(ANNOTYPE_DATA_SPECIAL)
- 
--#else /* __ASSEMBLY__ */
-+#else /* __ASSEMBLER__ */
- #define ANNOTATE_NOENDBR		ANNOTATE type=ANNOTYPE_NOENDBR
- #define ANNOTATE_RETPOLINE_SAFE		ANNOTATE type=ANNOTYPE_RETPOLINE_SAFE
- /*	ANNOTATE_INSTR_BEGIN		ANNOTATE type=ANNOTYPE_INSTR_BEGIN */
-@@ -122,6 +122,6 @@
- #define ANNOTATE_REACHABLE		ANNOTATE type=ANNOTYPE_REACHABLE
- #define ANNOTATE_NOCFI_SYM		ANNOTATE type=ANNOTYPE_NOCFI
- #define ANNOTATE_DATA_SPECIAL		ANNOTATE_DATA type=ANNOTYPE_DATA_SPECIAL
--#endif /* __ASSEMBLY__ */
-+#endif /* __ASSEMBLER__ */
- 
- #endif /* _LINUX_ANNOTATE_H */
-diff --git a/include/linux/cfi_types.h b/include/linux/cfi_types.h
-index a86af9bc8bdc4..b17614c493e4c 100644
---- a/include/linux/cfi_types.h
-+++ b/include/linux/cfi_types.h
-@@ -5,7 +5,7 @@
- #ifndef _LINUX_CFI_TYPES_H
- #define _LINUX_CFI_TYPES_H
- 
--#ifdef __ASSEMBLY__
-+#ifdef __ASSEMBLER__
- #include <linux/linkage.h>
- 
- #ifdef CONFIG_CFI
-@@ -41,7 +41,7 @@
- 	SYM_TYPED_START(name, SYM_L_GLOBAL, SYM_A_ALIGN)
- #endif
- 
--#else /* __ASSEMBLY__ */
-+#else /* __ASSEMBLER__ */
- 
- #ifdef CONFIG_CFI
- #define DEFINE_CFI_TYPE(name, func)						\
-@@ -64,5 +64,5 @@
- 	);
- #endif
- 
--#endif /* __ASSEMBLY__ */
-+#endif /* __ASSEMBLER__ */
- #endif /* _LINUX_CFI_TYPES_H */
-diff --git a/include/linux/compiler.h b/include/linux/compiler.h
-index 70cb31d605384..bb602ab527c88 100644
---- a/include/linux/compiler.h
-+++ b/include/linux/compiler.h
-@@ -4,7 +4,7 @@
- 
- #include <linux/compiler_types.h>
  
 -#ifndef __ASSEMBLY__
-+#ifndef __ASSEMBLER__
+-#define __ASSEMBLY__
+-#endif
+-
+ #include <asm/csr.h>
  
- #ifdef __KERNEL__
- 
-@@ -277,7 +277,7 @@ static inline void *offset_to_ptr(const int *off)
- 	return (void *)((unsigned long)off + *off);
- }
- 
--#endif /* __ASSEMBLY__ */
-+#endif /* __ASSEMBLER__ */
- 
- /*
-  * Force the compiler to emit 'sym' as a symbol, so that we can reference
-diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
-index c5921f1390079..7c2432987105b 100644
---- a/include/linux/compiler_types.h
-+++ b/include/linux/compiler_types.h
-@@ -15,7 +15,7 @@
- #define ___PASTE(a, b) a##b
- #define __PASTE(a, b) ___PASTE(a, b)
- 
--#ifndef __ASSEMBLY__
-+#ifndef __ASSEMBLER__
- 
- /*
-  * C23 introduces "auto" as a standard way to define type-inferred
-@@ -454,7 +454,7 @@ struct ftrace_likely_data {
- 
- #endif /* __KERNEL__ */
- 
--#endif /* __ASSEMBLY__ */
-+#endif /* __ASSEMBLER__ */
- 
- /*
-  * The below symbols may be defined for one or more, but not ALL, of the above
-@@ -598,7 +598,7 @@ struct ftrace_likely_data {
- #define asm_inline asm
- #endif
- 
--#ifndef __ASSEMBLY__
-+#ifndef __ASSEMBLER__
- /*
-  * Use __typeof_unqual__() when available.
+ .macro save_context
+diff --git a/tools/testing/selftests/vDSO/vgetrandom-chacha.S b/tools/testing/selftests/vDSO/vgetrandom-chacha.S
+index 16f985b089d45..42839c5cf5ec4 100644
+--- a/tools/testing/selftests/vDSO/vgetrandom-chacha.S
++++ b/tools/testing/selftests/vDSO/vgetrandom-chacha.S
+@@ -3,8 +3,6 @@
+  * Copyright (C) 2024 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
   */
-@@ -637,7 +637,7 @@ struct ftrace_likely_data {
  
- #include <asm/percpu_types.h>
- 
--#endif /* !__ASSEMBLY__ */
-+#endif /* !__ASSEMBLER__ */
- 
- /*
-  * __signed_scalar_typeof(x) - Declare a signed scalar type, leaving
-diff --git a/include/linux/edd.h b/include/linux/edd.h
-index 1c16fbcb81c06..32517f283f044 100644
---- a/include/linux/edd.h
-+++ b/include/linux/edd.h
-@@ -23,7 +23,7 @@
- 
- #include <uapi/linux/edd.h>
- 
--#ifndef __ASSEMBLY__
-+#ifndef __ASSEMBLER__
- extern struct edd edd;
--#endif				/*!__ASSEMBLY__ */
-+#endif				/*!__ASSEMBLER__ */
- #endif				/* _LINUX_EDD_H */
-diff --git a/include/linux/err.h b/include/linux/err.h
-index d3e38d5b3a985..033faa80be885 100644
---- a/include/linux/err.h
-+++ b/include/linux/err.h
-@@ -17,7 +17,7 @@
-  */
- #define MAX_ERRNO	4095
- 
--#ifndef __ASSEMBLY__
-+#ifndef __ASSEMBLER__
- 
- /**
-  * IS_ERR_VALUE - Detect an error pointer.
-diff --git a/include/linux/export.h b/include/linux/export.h
-index a686fd0ba4065..432e980140f2b 100644
---- a/include/linux/export.h
-+++ b/include/linux/export.h
-@@ -51,7 +51,7 @@
- 
- #define __EXPORT_SYMBOL(sym, license, ns)	__GENKSYMS_EXPORT_SYMBOL(sym)
- 
--#elif defined(__ASSEMBLY__)
-+#elif defined(__ASSEMBLER__)
- 
- #define __EXPORT_SYMBOL(sym, license, ns) \
- 	___EXPORT_SYMBOL(sym, license, ns)
-diff --git a/include/linux/init.h b/include/linux/init.h
-index 6326c61e2332d..cf43f1765eb2e 100644
---- a/include/linux/init.h
-+++ b/include/linux/init.h
-@@ -102,7 +102,7 @@
- #define __REFDATA        .section       ".ref.data", "aw"
- #define __REFCONST       .section       ".ref.rodata", "a"
- 
--#ifndef __ASSEMBLY__
-+#ifndef __ASSEMBLER__
- /*
-  * Used for initialization calls..
-  */
-@@ -180,7 +180,7 @@ extern struct module __this_module;
-   
- #ifndef MODULE
- 
--#ifndef __ASSEMBLY__
-+#ifndef __ASSEMBLER__
- 
- /*
-  * initcalls are now grouped by functionality into separate
-@@ -375,7 +375,7 @@ extern const struct obs_kernel_param __setup_start[], __setup_end[];
- /* Relies on boot_command_line being set */
- void __init parse_early_param(void);
- void __init parse_early_options(char *cmdline);
--#endif /* __ASSEMBLY__ */
-+#endif /* __ASSEMBLER__ */
- 
- #else /* MODULE */
- 
-diff --git a/include/linux/ioport.h b/include/linux/ioport.h
-index f7930b3dfd0a5..4728386ce65ca 100644
---- a/include/linux/ioport.h
-+++ b/include/linux/ioport.h
-@@ -9,7 +9,7 @@
- #ifndef _LINUX_IOPORT_H
- #define _LINUX_IOPORT_H
- 
--#ifndef __ASSEMBLY__
-+#ifndef __ASSEMBLER__
- #include <linux/args.h>
- #include <linux/bits.h>
- #include <linux/compiler.h>
-@@ -461,5 +461,5 @@ static inline void irqresource_disabled(struct resource *res, u32 irq)
- 
- extern struct address_space *iomem_get_mapping(void);
- 
--#endif /* __ASSEMBLY__ */
-+#endif /* __ASSEMBLER__ */
- #endif	/* _LINUX_IOPORT_H */
-diff --git a/include/linux/linkage.h b/include/linux/linkage.h
-index 53fe1f48fd28d..303e74cf4ead6 100644
---- a/include/linux/linkage.h
-+++ b/include/linux/linkage.h
-@@ -66,7 +66,7 @@
-  * end up needing stack temporaries for).
-  */
- /* Assembly files may be compiled with -traditional .. */
--#ifndef __ASSEMBLY__
-+#ifndef __ASSEMBLER__
- #ifndef asmlinkage_protect
- # define asmlinkage_protect(n, ret, args...)	do { } while (0)
- #endif
-@@ -77,7 +77,7 @@
- #define __ALIGN_STR		__stringify(__ALIGN)
- #endif
- 
--#ifdef __ASSEMBLY__
-+#ifdef __ASSEMBLER__
- 
- /* SYM_T_FUNC -- type used by assembler to mark functions */
- #ifndef SYM_T_FUNC
-@@ -355,6 +355,6 @@
- 	SYM_DATA_END(name)
- #endif
- 
--#endif /* __ASSEMBLY__ */
-+#endif /* __ASSEMBLER__ */
- 
- #endif /* _LINUX_LINKAGE_H */
-diff --git a/include/linux/mem_encrypt.h b/include/linux/mem_encrypt.h
-index 07584c5e36fb4..463090c4f9517 100644
---- a/include/linux/mem_encrypt.h
-+++ b/include/linux/mem_encrypt.h
-@@ -10,7 +10,7 @@
- #ifndef __MEM_ENCRYPT_H__
- #define __MEM_ENCRYPT_H__
- 
--#ifndef __ASSEMBLY__
-+#ifndef __ASSEMBLER__
- 
- #ifdef CONFIG_ARCH_HAS_MEM_ENCRYPT
- 
-@@ -54,6 +54,6 @@
- #define dma_addr_canonical(x)		(x)
- #endif
- 
--#endif	/* __ASSEMBLY__ */
-+#endif	/* __ASSEMBLER__ */
- 
- #endif	/* __MEM_ENCRYPT_H__ */
-diff --git a/include/linux/pe.h b/include/linux/pe.h
-index cd2b7275385f3..ab45bba90ce82 100644
---- a/include/linux/pe.h
-+++ b/include/linux/pe.h
-@@ -240,7 +240,7 @@
- #define IMAGE_DEBUG_TYPE_EX_DLLCHARACTERISTICS	20 /* Extended DLL characteristics bits */
- #define IMAGE_DEBUG_TYPE_PERFMAP		21 /* Location of associated Ready To Run PerfMap file */
- 
--#ifndef __ASSEMBLY__
-+#ifndef __ASSEMBLER__
- 
- struct mz_hdr {
- 	uint16_t magic;		/* MZ_MAGIC */
-@@ -546,6 +546,6 @@ struct win_certificate {
- 	uint16_t cert_type;
- };
- 
--#endif /* !__ASSEMBLY__ */
-+#endif /* !__ASSEMBLER__ */
- 
- #endif /* __LINUX_PE_H */
-diff --git a/include/linux/platform_data/emif_plat.h b/include/linux/platform_data/emif_plat.h
-index b93feef5d586f..ad7f706c124e3 100644
---- a/include/linux/platform_data/emif_plat.h
-+++ b/include/linux/platform_data/emif_plat.h
-@@ -39,7 +39,7 @@
- #define EMIF_CUSTOM_CONFIG_TEMP_ALERT_POLL_INTERVAL	0x00000002
- #define EMIF_CUSTOM_CONFIG_EXTENDED_TEMP_PART		0x00000004
- 
--#ifndef __ASSEMBLY__
-+#ifndef __ASSEMBLER__
- /**
-  * struct ddr_device_info - All information about the DDR device except AC
-  *		timing parameters
-@@ -121,6 +121,6 @@ struct emif_platform_data {
- 	u32 ip_rev;
- 	u32 phy_type;
- };
--#endif /* __ASSEMBLY__ */
-+#endif /* __ASSEMBLER__ */
- 
- #endif /* __LINUX_EMIF_H */
-diff --git a/include/linux/ti-emif-sram.h b/include/linux/ti-emif-sram.h
-index 441b2988e66a5..b256a9b4ef053 100644
---- a/include/linux/ti-emif-sram.h
-+++ b/include/linux/ti-emif-sram.h
-@@ -10,7 +10,7 @@
- 
- #include <linux/kbuild.h>
- #include <linux/types.h>
--#ifndef __ASSEMBLY__
-+#ifndef __ASSEMBLER__
- 
- struct emif_regs_amx3 {
- 	u32 emif_sdcfg_val;
-diff --git a/include/linux/types.h b/include/linux/types.h
-index 53e0adca4b9fb..c4aa8cc4b1cd6 100644
---- a/include/linux/types.h
-+++ b/include/linux/types.h
-@@ -4,7 +4,7 @@
- 
- #include <uapi/linux/types.h>
- 
--#ifndef __ASSEMBLY__
-+#ifndef __ASSEMBLER__
- 
- #define DECLARE_BITMAP(name,bits) \
- 	unsigned long name[BITS_TO_LONGS(bits)]
-@@ -288,5 +288,5 @@ struct rcuwait {
- 	struct task_struct __rcu *task;
- };
- 
--#endif /*  __ASSEMBLY__ */
-+#endif /*  __ASSEMBLER__ */
- #endif /* _LINUX_TYPES_H */
-diff --git a/tools/include/asm-generic/barrier.h b/tools/include/asm-generic/barrier.h
-index 6ef36e920ea8a..b61c3bde0447e 100644
---- a/tools/include/asm-generic/barrier.h
-+++ b/tools/include/asm-generic/barrier.h
-@@ -13,7 +13,7 @@
- #ifndef __TOOLS_LINUX_ASM_GENERIC_BARRIER_H
- #define __TOOLS_LINUX_ASM_GENERIC_BARRIER_H
- 
--#ifndef __ASSEMBLY__
-+#ifndef __ASSEMBLER__
- 
- #include <linux/compiler.h>
- 
-@@ -36,5 +36,5 @@
- #define wmb()	mb()
- #endif
- 
--#endif /* !__ASSEMBLY__ */
-+#endif /* !__ASSEMBLER__ */
- #endif /* __TOOLS_LINUX_ASM_GENERIC_BARRIER_H */
-diff --git a/tools/include/asm/alternative.h b/tools/include/asm/alternative.h
-index 8e548ac8f740c..85db65074a714 100644
---- a/tools/include/asm/alternative.h
-+++ b/tools/include/asm/alternative.h
-@@ -3,7 +3,7 @@
- #define _TOOLS_ASM_ALTERNATIVE_ASM_H
- 
- #if defined(__s390x__)
--#ifdef __ASSEMBLY__
-+#ifdef __ASSEMBLER__
- .macro ALTERNATIVE oldinstr, newinstr, feature
- 	\oldinstr
- .endm
-diff --git a/tools/include/linux/cfi_types.h b/tools/include/linux/cfi_types.h
-index a86af9bc8bdc4..b17614c493e4c 100644
---- a/tools/include/linux/cfi_types.h
-+++ b/tools/include/linux/cfi_types.h
-@@ -5,7 +5,7 @@
- #ifndef _LINUX_CFI_TYPES_H
- #define _LINUX_CFI_TYPES_H
- 
--#ifdef __ASSEMBLY__
-+#ifdef __ASSEMBLER__
- #include <linux/linkage.h>
- 
- #ifdef CONFIG_CFI
-@@ -41,7 +41,7 @@
- 	SYM_TYPED_START(name, SYM_L_GLOBAL, SYM_A_ALIGN)
- #endif
- 
--#else /* __ASSEMBLY__ */
-+#else /* __ASSEMBLER__ */
- 
- #ifdef CONFIG_CFI
- #define DEFINE_CFI_TYPE(name, func)						\
-@@ -64,5 +64,5 @@
- 	);
- #endif
- 
--#endif /* __ASSEMBLY__ */
-+#endif /* __ASSEMBLER__ */
- #endif /* _LINUX_CFI_TYPES_H */
-diff --git a/tools/include/linux/compiler.h b/tools/include/linux/compiler.h
-index f2f54b0381680..0e08ad7e9a386 100644
---- a/tools/include/linux/compiler.h
-+++ b/tools/include/linux/compiler.h
-@@ -2,7 +2,7 @@
- #ifndef _TOOLS_LINUX_COMPILER_H_
- #define _TOOLS_LINUX_COMPILER_H_
- 
--#ifndef __ASSEMBLY__
-+#ifndef __ASSEMBLER__
- 
- #include <linux/compiler_types.h>
- 
-@@ -256,6 +256,6 @@ static __always_inline void __write_once_size(volatile void *p, void *res, int s
- #endif
- #endif
- 
--#endif /* __ASSEMBLY__ */
-+#endif /* __ASSEMBLER__ */
- 
- #endif /* _TOOLS_LINUX_COMPILER_H */
+-#define __ASSEMBLY__
+-
+ #if defined(__aarch64__)
+ #include "../../../../arch/arm64/kernel/vdso/vgetrandom-chacha.S"
+ #elif defined(__loongarch__)
 -- 
 2.56.0
 
