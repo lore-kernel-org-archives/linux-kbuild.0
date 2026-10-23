@@ -1,81 +1,81 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.129.124
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792738219;
-	b=SbArxgQwLS0y8A6gHndmOMAF57ZVR7HDQw0VbZIAfZpWMbzsVfRrpLVFk6iVLp9G3GyN
-	 RP1RxO8Xt1jHXtFCt9M/5KFWcP7+ToeMXbSd2hotkpepghueWPto9m5dHuRXW8eGIigTD
-	 ZwrLjs28kMxos/+YYOF7ujuWaS5l0N16hx7cWAKewC4SAaSF88+Il3I/V7JJ1Nd4XLTqt
-	 eOSuSy+kbhEqmVz/n/nprIdLUdtG17q+Qe4pi0XGZuZOIpFEE5ed0f5Bxa5FCiGBscYf2
-	 +Kdo/cGPFk4lV6GOmPv+9F72AtUueU1Kti/3R3CpLoHLkFTgVfeZWP2dy5xWmwFnS9w==
+	t=1792738226;
+	b=ubU7yq0pcCgv8JEnNYcOxmrBE5qkOh/ybEv9/jYs2tTn/fhwAi5TbB7twWHwHHtzX3b3
+	 YROfml9IjOeDpY39nBdACur0JFlOum1kSlSEEbfFmLQSoZsDxlIv0EMW++XI1icwfHFK2
+	 WVFuefbzKKn4cPQW1P6BQpUxJNhYhmuIJT1+U0vPhh1HEyYISMLo8gksgT2BwvtaOBX32
+	 KmKkP6nbOKBPt50UIBFq5RRi6KBWBVMgQP9Ie1gfL+BFzl68cUnX8AF2xP0zCi7kcLZmm
+	 Dv+na5vQfVDNX0yPBPx3H+yKaS1uu5Zdm5J7S1udEig32g3rOrV+5BHKx9+8RkplMrg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792738219;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792738226;
 	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
 	 X-Mimecast-MFC-AGG-ID:Received:Received:From:To:Cc:Subject:Date:
 	 Message-ID:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding:X-Scanned-By;
-	bh=g+zDfkV7W3mK9yy6qtJ/PyGkiFHI5UxGEdxpEKnA6Jo=;
-	b=nnNZ/Dcqxk1h9XF4lbrW7OUEXDudem66AiEuD+q/hfbGeTr8yvhtOMlDSkMRxZ8s7rPA
-	 qADMnVZzvLDFrz5QeJVosgAUQORR2Rdp3vqXn8Lr23v30rbX/DvCJoFpjwrtYYoIfjImk
-	 0CtAYYww7iQr8O69TkQosf6+xiVL9Ta33+FwCzFEPx6JYxJYjCgTkWFM0hrbl1edoFUcv
-	 j5+/GVcwtQT6FEB/0YmNLB/6u5+hBdLnzL11C9fzcxRechXtpUOfpK2uYjChwGu7cp4QE
-	 84D4Ll6PGB/2dU42tu0ztzv/qyF4dj+KAA32hYJkvbxzwjKjhPmpnWUNp6FoOOQD2Tg==
+	bh=zOPcyFbcw1UU/rJPmKSSRntH9qu/8Cc9l655f2GYy5w=;
+	b=GjHxwXI+hC55fRkkx47mvecnUedI+5XwOusjhs9eSvElUxr8AzZOhIaiTALKYUBTOs8j
+	 MBjKTCt/c92IUJ3PM7HC+dkCUmZDXtDmgdJ5/XF4BNtWj27rjGJDY7JDJIdUFMcUzUpNr
+	 KqpPYh3x8Fr/MstHqlOCNi8iUD4uKV7+SYVveI1VAyWfdnoFmUH8lGCLZt0thINz5/PKw
+	 O2Vx7EuZHKQ9uKNK9r5PbeIIHTApRMw3frhVVy8AX2q/S+Bi4jphCyIGEw08MZ/PeOomh
+	 4x6wqm3tI1bBtMIkGIpbifBB9b7/S4vFtgTNDT4Dkv0/3DpfNf5vYUeCef5ltiERpww==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=redhat.com;
 	spf=pass smtp.mailfrom=redhat.com;
-	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=aoA8uBEQ;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=OcodWPls;
 	arc=none smtp.remote-ip=170.10.129.124
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B56C606A328
-	for <linux-kbuild@vger.kernel.org>; Fri, 23 Oct 2026 06:50:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5B56C606A328
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09093606A338
+	for <linux-kbuild@vger.kernel.org>; Fri, 23 Oct 2026 06:50:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 09093606A338
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=aoA8uBEQ
+	dkim=pass (1024-bit key, unprotected) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=OcodWPls
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1792738217;
+	s=mimecast20190719; t=1792738225;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=g+zDfkV7W3mK9yy6qtJ/PyGkiFHI5UxGEdxpEKnA6Jo=;
-	b=aoA8uBEQHb/lafoBEO8ubDeXTFqOOD13cOsw+FSfxzMFt7nTgZFadXgvkvYUUak+RrpPOr
-	eGZGRLdRyYTd8//veRVX5kmsskF1zt+4JJ0pt65G6cPDe5MmX6PpWmrLp8q6MjsBCYoMTm
-	68hIszTwPVO7pZUqHKvydMA5teZwLr4=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+	bh=zOPcyFbcw1UU/rJPmKSSRntH9qu/8Cc9l655f2GYy5w=;
+	b=OcodWPlsqQx9yxGrRaXNTz1vAWZpy9bL5guY76wiqy6o8TwGRH5s4BOGoyeIPIPi7v6yWg
+	pHFgbH7aDLi/Sa6+B8PQJIt5gq0HzQnxPhratAoL9Wl2+Y4Yn4C0xMm2Cz1oCfJPF+/GgZ
+	CpiqTcT2tWDrIlINvFmQLWH+9SlD87Q=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-315-r-jURbIBMXG8ve_GmI9YAQ-1; Fri,
- 23 Oct 2026 02:50:13 -0400
-X-MC-Unique: r-jURbIBMXG8ve_GmI9YAQ-1
-X-Mimecast-MFC-AGG-ID: r-jURbIBMXG8ve_GmI9YAQ_1792738212
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-567-EVBzjS2wMNS-cpFfn82bVA-1; Fri,
+ 23 Oct 2026 02:50:18 -0400
+X-MC-Unique: EVBzjS2wMNS-cpFfn82bVA-1
+X-Mimecast-MFC-AGG-ID: EVBzjS2wMNS-cpFfn82bVA_1792738216
 Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BAB1D1955BC4;
-	Fri, 23 Oct 2026 06:50:11 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9BACC195609D;
+	Fri, 23 Oct 2026 06:50:16 +0000 (UTC)
 Received: from thuth-p1g4.redhat.com (unknown [10.44.48.42])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1B7A41956095;
-	Fri, 23 Oct 2026 06:50:07 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 332471956095;
+	Fri, 23 Oct 2026 06:50:12 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: Arnd Bergmann <arnd@arndb.de>,
 	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>
+	Nicolas Schier <nsc@kernel.org>
 Cc: soc@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	linux-kbuild@vger.kernel.org,
 	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <linux@weissschuh.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	workflows@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: [PATCH v5 10/13] uapi: Replace __ASSEMBLY__ with __ASSEMBLER__ in uapi headers
-Date: Fri, 23 Oct 2026 08:48:47 +0200
-Message-ID: <20261023064908.66707-11-thuth@redhat.com>
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	linux-arch@vger.kernel.org,
+	llvm@lists.linux.dev
+Subject: [PATCH v5 11/13] asm-generic: Replace __ASSEMBLY__ with __ASSEMBLER__ in non-uapi headers
+Date: Fri, 23 Oct 2026 08:48:48 +0200
+Message-ID: <20261023064908.66707-12-thuth@redhat.com>
 In-Reply-To: <20261023064908.66707-1-thuth@redhat.com>
 References: <20261023064908.66707-1-thuth@redhat.com>
 X-Mailing-List: linux-kbuild@vger.kernel.org
@@ -90,161 +90,159 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-__ASSEMBLY__ is only defined by the Makefile of the kernel, so
-this is not really useful for uapi headers (unless the userspace
-Makefile defines it, too). Let's switch to __ASSEMBLER__ which
-gets set automatically by the compiler when compiling assembly
-code.
+While the GCC and Clang compilers already define __ASSEMBLER__ auto-
+matically when compiling assembly code, __ASSEMBLY__ is a macro that
+only gets defined by the Makefiles in the kernel. This can be very
+confusing when switching between userspace and kernelspace coding, or
+when dealing with uapi headers that rather should use __ASSEMBLER__
+instead. Let's standardize now on the __ASSEMBLER__ macro to avoid
+this confusion.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- Documentation/dev-tools/checkuapi.rst | 2 +-
- include/uapi/linux/a.out.h            | 4 ++--
- include/uapi/linux/const.h            | 4 ++--
- include/uapi/linux/edd.h              | 4 ++--
- include/uapi/linux/hdlc/ioctl.h       | 4 ++--
- include/uapi/linux/types.h            | 4 ++--
- tools/include/uapi/linux/const.h      | 4 ++--
+ include/asm-generic/barrier.h         | 4 ++--
+ include/asm-generic/bug.h             | 4 ++--
+ include/asm-generic/current.h         | 2 +-
+ include/asm-generic/error-injection.h | 2 +-
+ include/asm-generic/int-ll64.h        | 6 +++---
+ include/asm-generic/rwonce.h          | 4 ++--
+ include/asm-generic/signal.h          | 4 ++--
  7 files changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/Documentation/dev-tools/checkuapi.rst b/Documentation/dev-tools/checkuapi.rst
-index 9072f21b50b0c..3c9a3a58c24da 100644
---- a/Documentation/dev-tools/checkuapi.rst
-+++ b/Documentation/dev-tools/checkuapi.rst
-@@ -273,7 +273,7 @@ Consider this change::
-     -typedef unsigned __bitwise __poll_t;
-     +typedef unsigned short __bitwise __poll_t;
- 
--     #endif /*  __ASSEMBLY__ */
-+     #endif /*  __ASSEMBLER__ */
-      #endif /* _UAPI_LINUX_TYPES_H */
-     EOF
- 
-diff --git a/include/uapi/linux/a.out.h b/include/uapi/linux/a.out.h
-index 5fafde3798e57..cbcc37674e64c 100644
---- a/include/uapi/linux/a.out.h
-+++ b/include/uapi/linux/a.out.h
-@@ -10,7 +10,7 @@
- 
- #endif /* __STRUCT_EXEC_OVERRIDE__ */
+diff --git a/include/asm-generic/barrier.h b/include/asm-generic/barrier.h
+index b99cb57dfcccc..c029b1e1854c4 100644
+--- a/include/asm-generic/barrier.h
++++ b/include/asm-generic/barrier.h
+@@ -11,7 +11,7 @@
+ #ifndef __ASM_GENERIC_BARRIER_H
+ #define __ASM_GENERIC_BARRIER_H
  
 -#ifndef __ASSEMBLY__
 +#ifndef __ASSEMBLER__
  
- /* these go in the N_MACHTYPE field */
- enum machine_type {
-@@ -247,5 +247,5 @@ struct relocation_info
- };
- #endif /* no N_RELOCATION_INFO_DECLARED.  */
+ #include <linux/compiler.h>
+ #include <linux/kcsan-checks.h>
+@@ -302,5 +302,5 @@ do {									\
+ # define smp_mb__after_switch_mm()	smp_mb()
+ #endif
  
--#endif /*__ASSEMBLY__ */
-+#endif /*__ASSEMBLER__ */
- #endif /* _UAPI__A_OUT_GNU_H__ */
-diff --git a/include/uapi/linux/const.h b/include/uapi/linux/const.h
-index 565f309b9df8b..6d89e477fc79c 100644
---- a/include/uapi/linux/const.h
-+++ b/include/uapi/linux/const.h
-@@ -13,7 +13,7 @@
-  * leave it unchanged in asm.
-  */
- 
--#ifdef __ASSEMBLY__
-+#ifdef __ASSEMBLER__
- #define _AC(X,Y)	X
- #define _AT(T,X)	X
- #else
-@@ -28,7 +28,7 @@
- #define _BITUL(x)	(_UL(1) << (x))
- #define _BITULL(x)	(_ULL(1) << (x))
- 
--#if !defined(__ASSEMBLY__)
-+#if !defined(__ASSEMBLER__)
- /*
-  * Missing asm support
-  *
-diff --git a/include/uapi/linux/edd.h b/include/uapi/linux/edd.h
-index 0fe3e02aec653..566f206964862 100644
---- a/include/uapi/linux/edd.h
-+++ b/include/uapi/linux/edd.h
-@@ -53,7 +53,7 @@
- #define EDD_MBR_SIG_NR_BUF 0x1ea  /* addr of number of MBR signtaures at EDD_MBR_SIG_BUF
- 				     in boot_params - treat this as 1 byte  */
+-#endif /* !__ASSEMBLY__ */
++#endif /* !__ASSEMBLER__ */
+ #endif /* __ASM_GENERIC_BARRIER_H */
+diff --git a/include/asm-generic/bug.h b/include/asm-generic/bug.h
+index 09e8eccee8ed9..044ebc96f373c 100644
+--- a/include/asm-generic/bug.h
++++ b/include/asm-generic/bug.h
+@@ -26,7 +26,7 @@
+ #endif
+ #endif /* WARN_CONDITION_STR */
  
 -#ifndef __ASSEMBLY__
 +#ifndef __ASSEMBLER__
+ #include <linux/panic.h>
+ #include <linux/printk.h>
  
- #define EDD_EXT_FIXED_DISK_ACCESS           (1 << 0)
- #define EDD_EXT_DEVICE_LOCKING_AND_EJECTING (1 << 1)
-@@ -187,6 +187,6 @@ struct edd {
- 	unsigned char edd_info_nr;
- };
- 
--#endif				/*!__ASSEMBLY__ */
-+#endif				/*!__ASSEMBLER__ */
- 
- #endif /* _UAPI_LINUX_EDD_H */
-diff --git a/include/uapi/linux/hdlc/ioctl.h b/include/uapi/linux/hdlc/ioctl.h
-index b06341acab5ec..0905383d72aa5 100644
---- a/include/uapi/linux/hdlc/ioctl.h
-+++ b/include/uapi/linux/hdlc/ioctl.h
-@@ -35,7 +35,7 @@
- #define LMI_CCITT		3 /* ITU-T Annex A */
- #define LMI_CISCO		4 /* The "original" LMI, aka Gang of Four */
- 
--#ifndef __ASSEMBLY__
-+#ifndef __ASSEMBLER__
- 
- typedef struct {
- 	unsigned int clock_rate; /* bits per second */
-@@ -90,5 +90,5 @@ typedef struct {
- 
- /* PPP doesn't need any info now - supply length = 0 to ioctl */
+@@ -258,6 +258,6 @@ extern __printf(1, 2) void __warn_printk(const char *fmt, ...);
+ # define WARN_ON_SMP(x)			({0;})
+ #endif
  
 -#endif /* __ASSEMBLY__ */
 +#endif /* __ASSEMBLER__ */
- #endif /* __HDLC_IOCTL_H__ */
-diff --git a/include/uapi/linux/types.h b/include/uapi/linux/types.h
-index 48b933938877d..00743f894e7e3 100644
---- a/include/uapi/linux/types.h
-+++ b/include/uapi/linux/types.h
-@@ -4,7 +4,7 @@
  
- #include <asm/types.h>
+ #endif
+diff --git a/include/asm-generic/current.h b/include/asm-generic/current.h
+index 9c2aeecbd05a6..8e7d8f019377f 100644
+--- a/include/asm-generic/current.h
++++ b/include/asm-generic/current.h
+@@ -2,7 +2,7 @@
+ #ifndef __ASM_GENERIC_CURRENT_H
+ #define __ASM_GENERIC_CURRENT_H
  
 -#ifndef __ASSEMBLY__
 +#ifndef __ASSEMBLER__
- #ifndef	__KERNEL__
- #ifndef __EXPORTED_HEADERS__
- #warning "Attempt to use kernel headers from user space, see https://kernelnewbies.org/KernelHeaders"
-@@ -59,5 +59,5 @@ typedef __u32 __bitwise __wsum;
+ #include <linux/thread_info.h>
  
- typedef unsigned __bitwise __poll_t;
+ #define get_current() (current_thread_info()->task)
+diff --git a/include/asm-generic/error-injection.h b/include/asm-generic/error-injection.h
+index b05253f68eaa5..0a9ec33fa8f20 100644
+--- a/include/asm-generic/error-injection.h
++++ b/include/asm-generic/error-injection.h
+@@ -2,7 +2,7 @@
+ #ifndef _ASM_GENERIC_ERROR_INJECTION_H
+ #define _ASM_GENERIC_ERROR_INJECTION_H
  
--#endif /*  __ASSEMBLY__ */
-+#endif /*  __ASSEMBLER__ */
- #endif /* _UAPI_LINUX_TYPES_H */
-diff --git a/tools/include/uapi/linux/const.h b/tools/include/uapi/linux/const.h
-index 565f309b9df8b..6d89e477fc79c 100644
---- a/tools/include/uapi/linux/const.h
-+++ b/tools/include/uapi/linux/const.h
-@@ -13,7 +13,7 @@
-  * leave it unchanged in asm.
-  */
+-#if defined(__KERNEL__) && !defined(__ASSEMBLY__)
++#if defined(__KERNEL__) && !defined(__ASSEMBLER__)
+ enum {
+ 	EI_ETYPE_NULL,		/* Return NULL if failure */
+ 	EI_ETYPE_ERRNO,		/* Return -ERRNO if failure */
+diff --git a/include/asm-generic/int-ll64.h b/include/asm-generic/int-ll64.h
+index a248545f1e18c..58974e8abbfae 100644
+--- a/include/asm-generic/int-ll64.h
++++ b/include/asm-generic/int-ll64.h
+@@ -11,7 +11,7 @@
+ #include <uapi/asm-generic/int-ll64.h>
  
--#ifdef __ASSEMBLY__
-+#ifdef __ASSEMBLER__
- #define _AC(X,Y)	X
- #define _AT(T,X)	X
- #else
-@@ -28,7 +28,7 @@
- #define _BITUL(x)	(_UL(1) << (x))
- #define _BITULL(x)	(_ULL(1) << (x))
  
--#if !defined(__ASSEMBLY__)
-+#if !defined(__ASSEMBLER__)
- /*
-  * Missing asm support
-  *
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ 
+ typedef __s8  s8;
+ typedef __u8  u8;
+@@ -31,7 +31,7 @@ typedef __u64 u64;
+ #define S64_C(x) x ## LL
+ #define U64_C(x) x ## ULL
+ 
+-#else /* __ASSEMBLY__ */
++#else /* __ASSEMBLER__ */
+ 
+ #define S8_C(x)  x
+ #define U8_C(x)  x
+@@ -42,6 +42,6 @@ typedef __u64 u64;
+ #define S64_C(x) x
+ #define U64_C(x) x
+ 
+-#endif /* __ASSEMBLY__ */
++#endif /* __ASSEMBLER__ */
+ 
+ #endif /* _ASM_GENERIC_INT_LL64_H */
+diff --git a/include/asm-generic/rwonce.h b/include/asm-generic/rwonce.h
+index 52b969c7cef93..c35b262ee4223 100644
+--- a/include/asm-generic/rwonce.h
++++ b/include/asm-generic/rwonce.h
+@@ -20,7 +20,7 @@
+ #ifndef __ASM_GENERIC_RWONCE_H
+ #define __ASM_GENERIC_RWONCE_H
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ 
+ #include <linux/compiler_types.h>
+ #include <linux/kasan-checks.h>
+@@ -94,5 +94,5 @@ unsigned long read_word_at_a_time(const void *addr)
+ 	return *(unsigned long *)addr;
+ }
+ 
+-#endif /* __ASSEMBLY__ */
++#endif /* __ASSEMBLER__ */
+ #endif	/* __ASM_GENERIC_RWONCE_H */
+diff --git a/include/asm-generic/signal.h b/include/asm-generic/signal.h
+index 663dd6d0795dc..392e59fd3d8b9 100644
+--- a/include/asm-generic/signal.h
++++ b/include/asm-generic/signal.h
+@@ -4,10 +4,10 @@
+ 
+ #include <uapi/asm-generic/signal.h>
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ 
+ #include <asm/sigcontext.h>
+ #undef __HAVE_ARCH_SIG_BITOPS
+ 
+-#endif /* __ASSEMBLY__ */
++#endif /* __ASSEMBLER__ */
+ #endif /* _ASM_GENERIC_SIGNAL_H */
 -- 
 2.56.0
 
