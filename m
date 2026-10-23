@@ -1,100 +1,83 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.45
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792709898;
-	b=ouZuofu+a7DH+rPj9vmg9yPAwVp5KGbBsWlq0tdUqI/jIyOfPC5z8p0JtgNUKP3L7gi+
-	 fSsWHXXe1xLKck58znOlfLsgHFgrCPJ67NqWjBHGIrG0EtonL2D0zR3OFSgCG/SGk5oP4
-	 JnVKqTCDopeZVQhLYXDiF7EBxrv1qrv/zMnU2ECQNzMKSVMFHLSy/q+LIGhHaTlYEzhkY
-	 xfDsCBp+WX7zzRLiDEtupPlR1Bk+cqoVZYPTxfVd94m0Xvy8TlWEAn2KOCWa4pO7AGk+d
-	 iqskb52BiPnFWKPjOZbKativYSlswv7wn44D/rjuevoMbeXuq0sJnVslUNRTcRiuzxg==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792709898;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=4h8EJtUuQDNTtWsFUTYQGXARXr8rvvu+aTdvO93crQM=;
-	b=zfsStlm9+PdYKne6CXSUc/n0eS+ewzXf6yonFc9vn5Tb7NrXtcJFK34NNUe80nNZAlDS
-	 jb4o7C9Cn0YH0Rn5HFWG2PhH9VN8OB1GjEU329tRhUKz39NGz16s6d5zSB4hg2TMXcRDN
-	 TNR59sC0MeE9HKf8F/GXnOUrdtCzZE2kJ347b6zd1ewvP/fLv5QHQfoSjzh3E4Pmkp3U3
-	 EXhGSODE5bs4pvGWYfYS86BkO0dCWmaeltlh3SBckfHO/httqjTMsgEVRY7ADb8nakV2A
-	 gl+4aEtCh4xr9qQm8TN/7KUnd9pNczRtvFTpSmKjlJvhRrFkXi2GEzS9Y2a+wvlVc3A==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=kAWpkhn1;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.45
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.129.124
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1792738164;
+	b=ic6P6tWGvxiyHkTkZRvHfjV8sEwt4Q4I99XbTi/pxfaTurfhWbZoq0n7b/jR5mQAyanC
+	 R5GlprJLjc8J/0zN/Vkqo6b6jdBnJZCRPtnBzHD1SX5VSkn803eGpkw+OC6kkKTpyYPdM
+	 Ucp6m1DhASYRFv4dDvJlzbtpZavV9c8TEd3jlYldE2kiNKCSJLT6YlpB4mDsOlNPUr2XE
+	 ch7dLF3+R38PD91j/KgCgsA3C+GbkloUHUxRL5nsZ/yrCEf4hgZv/5LSlxyGZhD7O0hAi
+	 rIA4+4BTj3ltR1EAxa0MqyQjcnIDd4V2bPTCUpC2yc7GB0iJFgD2oNQLPS0KeUa3M8Q==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792738164;
+	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
+	 X-Mimecast-MFC-AGG-ID:Received:Received:From:To:Cc:Subject:Date:
+	 Message-ID:MIME-Version:Content-Transfer-Encoding:X-Scanned-By;
+	bh=Te/e0WFVqv5SNjVug7VJizYyRLpsYmXm4GZX821MDrs=;
+	b=zJtPyVBaxmYl5++Zm6fScL5xWD7S8DVK9X8+G5AhVNuchRaOzGt5sjrWGtG8KJltCJCC
+	 LQn7ltdHdwveLo5fma4HxJ0s2zSLKHzM9JtZBsVbdAnZLPcxvCgqVPT3Nxwn7LFWVSMwL
+	 LceSWCpExauo7w8ouaaJKDZd6c9CF38z86qwIXRGbuN+NVepNvzN+tcgsSD3lF1nHeen4
+	 hHMtCndTuLdcNLNty4JZ14p5Kd52B4kZ2p9UmIPMrsGcCkoX+7lCleUmLPDjquTvJ3C8b
+	 LzjYg5OxXkIMJHuDQI+TqiJSTnDHFcCPvTnxpRMvDCl47fT4Xb7ipStz7UAfjoKGXwg==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=redhat.com;
+	spf=pass smtp.mailfrom=redhat.com;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=C2cXNJOF;
+	arc=none smtp.remote-ip=170.10.129.124
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28455606A31B
-	for <linux-kbuild@vger.kernel.org>; Thu, 22 Oct 2026 22:58:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 28455606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F186606A31A
+	for <linux-kbuild@vger.kernel.org>; Fri, 23 Oct 2026 06:49:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5F186606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=kAWpkhn1
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-6b1aa36fc0eso4851a12.0
-        for <linux-kbuild@vger.kernel.org>; Thu, 22 Oct 2026 15:58:17 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1792709896; cv=none;
-        d=google.com; s=arc-20260327;
-        b=IfM6jXYXjxvJay+gJ7lnSBuy8Ee2MPT8VrQ1YTrrCOKXWnUE3bzRaTcntCCOFGGM31
-         ToXPixU8n2JQM7iGaXn/KaF4tcOhWqstRG02dH0oOeos21s5mgj+EWomMQUM/T0S7YjD
-         2oozajs47lh2SChrL8Sq6fD7DaCWFJvmvT+HCX+nv4TLNy3veJA1e7f8D3R4ohkn0/Rq
-         OgD/WszMVmsTHyjGT9JHuXKudanTu3uxeCyBB9ENWWVHKIqg5+w+vwjDAmg/qZsZs1z1
-         HWZguSIhAHKSpdfDBr67ORx8ldbbGN6I0z/6/h17d+iZEgFmIrBnGshMO7G1rmYyOeWa
-         a+Sg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=4h8EJtUuQDNTtWsFUTYQGXARXr8rvvu+aTdvO93crQM=;
-        fh=3kACQs0ePPrSoexpZ4KL2fkvvoiNYODhKJb8mziFekM=;
-        b=Tu8GppSHOiVgT2eK8wS87R6fE/ZtQQI8XbN2XcJ5Fyv7KvGT7a2JlUk3xTUB/O77aU
-         3GxYuPAITAWeDIlJ2ikJDCs126kLyEMMurDueyZH6OdH3g+mufydMkPVuJFpFZrrA/uc
-         GDNNPz/em+5uhh2P6JH1M4VeGMcrDKtYtq4qVTL8x1ob3B6V5n1+M19NnXKOsoiV2O/8
-         QWVPhDOjApouFVDTD3a7GCh6GfDixKvzucFO0xH96AVOQShwSWQ/nAH04+Vt+c3cBdSG
-         opnCgTCZIlW7w4OPhMNzuD9dek+kxaqQpwO5SWKCW0sN75eOnZvZMiTbQGP3NWKPnFOf
-         +13w==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1792709896; x=1793314696; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=4h8EJtUuQDNTtWsFUTYQGXARXr8rvvu+aTdvO93crQM=;
-        b=kAWpkhn1xJIsRNb3kWf753Jo/W1Z9mqUGTtDto8RAWIddAkJgZn+T1ZScI238Xw36Q
-         qWKFhPYd264ScQPYkDRL13eNkyduAvBpqsczVv+z8utITIo9zymG135SeAU5POJKGS8M
-         MWSba+2TyycipFlrHFl1R0vsellMcEGh+TldPzF3vnmlAFVZJ2N/YpqjKn8WhPDv96F7
-         l3w6V7quxAIbR+/O3fb4BSTp69DGSEnKM8xhqiEko9P+wxOFHIeh5XOSxUob0m95Pk9F
-         NWbF9E1eyxYhOl6MSHmpr/655ZHRbGYikxJsxmxfnGr8SLx7G2GKAcaZY/9jOOVVgdpV
-         53jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792709896; x=1793314696;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=4h8EJtUuQDNTtWsFUTYQGXARXr8rvvu+aTdvO93crQM=;
-        b=o4K+7BImCZE/NhOzUQ9s+FE91Cv3nCMrxr4pEVBxlL3Gx++B0b1sh/qDlBVc04dDym
-         F5V3ydcwzWJnsL0N60wC3LgrRVekKF1+/Aw195cU+IrPDzvOYrecz3kMGvmNrblOD7gX
-         haEL8DwkCUjT0OPB47601jc6B1acGnjwO6ltRat068ZR+EewMA+trAbLPWkHv3fsVIpW
-         cSrUPDki3DQ4yo1hUB5tw9o6OSS+5Jz7zo4LjZ1xUIW3CpBgnFWgf5Mw4PCxcfpS1sOe
-         3neY2FyvauGS1XwQZlpqF2d3EIRWtmlXYaRkY+BdsgbuiNSSRu00dF2R/uyeWeTvYO+5
-         RvGw==
-X-Forwarded-Encrypted: i=1; AKwUvBxLy/U6pSj9M1cSlaw4mqLwIij6paJBKNWq8iMLgedCh2SrZkgK3BZ3twVnU7r+dGbb25G+bMnAyytxIpI=@vger.kernel.org
-X-Gm-Message-State: AFq9FYJQmApFX3Pq2N17ErYG5s62K5mTvgzoupxSILsLa1IjU4ymvaLT
-	waklcocAekCwOkz0LJaBuQOHfGC27NIuJo+oydr2spGaZs5EJzKcGAz/gtL14c2QHdM/JG7Y/14
-	i1JYD6dsGBwoBEHtg3x+3YXAyVeEYucip8ALgp8e9
-X-Gm-Gg: AYBFou0biWVHuagKtpLG057ak8oJPO8GYIYfaP+h5w3RR2MSmV2bLbgpi2W2vkWv31T
-	4RPv8DdT2SZwW1XqDNilJsFC17+cgqDYc+9yQkJbil8n424WUmyNLIVJJOzhZwt/Kqat5YBmuqa
-	NQEzKiLTh7IOW5jmYyAhaFNiGCMhFre8p6PK6QKFOTlOP5jgqPIv5bsFlCcL5DlCInGQM+7Oi63
-	E21dts1nSKauJYsFq1oiNVcqBX/f0GCoay/h///PFlsvFlEmmC+6Q1cTQvA6WZN1adw6Snhcdmf
-	YrlRQGbmrCzjsZScaDsIBU4oITBF42Mvmpb9UB9LWiEEJTKzVFdHfZyJwRCxV8G9zasx5uiOJtz
-	HZGHgNwcQRULmwRcMTPyrro9VZ+Rmz+vLC2+GMH2mf2ldWVkVisQMnqeMjzYVOAJ5
-X-Received: by 2002:a05:6402:20cc:20b0:6b1:a517:5bce with SMTP id
- 4fb4d7f45d1cf-6b43505cab5mr9309a12.16.1792709896086; Thu, 22 Oct 2026
- 15:58:16 -0700 (PDT)
+	dkim=pass (1024-bit key, unprotected) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=C2cXNJOF
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1792738162;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Te/e0WFVqv5SNjVug7VJizYyRLpsYmXm4GZX821MDrs=;
+	b=C2cXNJOFppMuYNl4khVmNdK2vx3UBu1sl6p5DJEIVmt4TVbBaQh1hDuF48FambrnOqJs3U
+	jpp3csZkVQJvT2FpUpMJ6UaUcoLekMz0zgW3hqpgL0Ba0GcP45NIvyKrug3dGhAhupKbL4
+	UjAZkhFMlnM2i3TPJB68Rhum3XzyBxQ=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-497-Gi1PK2XUM7a0J1ACcijeaQ-1; Fri,
+ 23 Oct 2026 02:49:18 -0400
+X-MC-Unique: Gi1PK2XUM7a0J1ACcijeaQ-1
+X-Mimecast-MFC-AGG-ID: Gi1PK2XUM7a0J1ACcijeaQ_1792738156
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 357A31800663;
+	Fri, 23 Oct 2026 06:49:15 +0000 (UTC)
+Received: from thuth-p1g4.redhat.com (unknown [10.44.48.42])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 212681956095;
+	Fri, 23 Oct 2026 06:49:09 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Arnd Bergmann <arnd@arndb.de>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>,
+	Paul Walmsley <pjw@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>
+Cc: soc@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	linux-kbuild@vger.kernel.org,
+	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	linux-riscv@lists.infradead.org,
+	llvm@lists.linux.dev
+Subject: [PATCH v5 00/13] treewide: Replace __ASSEMBLY__ with __ASSEMBLER__ in header files
+Date: Fri, 23 Oct 2026 08:48:37 +0200
+Message-ID: <20261023064908.66707-1-thuth@redhat.com>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -104,73 +87,182 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261014-update-autofdo-split-machine-function-option-v1-1-5c71b3005e89@kernel.org>
-In-Reply-To: <20261014-update-autofdo-split-machine-function-option-v1-1-5c71b3005e89@kernel.org>
-From: Rong Xu <xur@google.com>
-Date: Thu, 22 Oct 2026 15:58:04 -0700
-X-Gm-Features: AclHuK8dO3MsAmO6cAa68r7ozQ6JK-D1flEqoU6M1Xnqf0FQ7RSBHTS-OpOYYkM
-Message-ID: <CAF1bQ=SN8wZ1hKDTtGspBiZ8VQBoUtQP6uNioO-ZOOvS2tLZAg@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: AutoFDO: Update split machine function argument
- for upstream rename
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Nicolas Schier <nsc@kernel.org>, Han Shen <shenhan@google.com>, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-This looks good to me. Thanks for fixing this.
+The kernel Makefiles define the __ASSEMBLY__ macro to provide
+a way to use headers in both, assembly and C source code.
+However, all the supported versions of the GCC and Clang compilers (and
+also other compilers like Tiny-C or PCC) define the macro __ASSEMBLER__
+automatically already when compiling assembly code, too, so some kernel
+headers are using __ASSEMBLER__ instead. With regards to userspace code,
+this seems also to be constant source of confusion, see for example these
+links here:
 
-Reviewed-by: Rong Xu <xur@google.com>
+ https://lore.kernel.org/kvm/20250222014526.2302653-1-seanjc@google.com/
+ https://stackoverflow.com/questions/28924355/gcc-assembler-preprocessor-not-compatible-with-standard-headers
+ https://forums.raspberrypi.com/viewtopic.php?p=1652944#p1653834
+ https://github.com/riscv-software-src/opensbi/issues/199
 
--Rong
+To avoid confusion in the future, it makes sense to standardize
+on the macro that gets defined by the compiler, so this patch series
+changes all occurrences of __ASSEMBLY__ into __ASSEMBLER__ and
+finally removes the -D__ASSEMBLY__ from the Makefiles.
 
-On Wed, Oct 14, 2026 at 4:40=E2=80=AFPM Nathan Chancellor <nathan@kernel.or=
-g> wrote:
->
-> A recent LLVM commit [1] renamed the internal LLVM plugin option
-> '-split-machine-functions' to '-function-splitting=3Dall', breaking the
-> AutoFDO + ThinLTO build with:
->
->   ld.lld: error: -plugin-opt=3D-: ld.lld: Unknown command line argument '=
--split-machine-functions'.  Try: 'ld.lld --help'
->
-> The plugin option is needed for in-process ThinLTO, so handle the rename
-> accordingly using ld-option.
->
-> Cc: stable@vger.kernel.org
-> Closes: https://github.com/ClangBuiltLinux/linux/issues/2186
-> Fixes: 2fd65f7afd5a ("AutoFDO: Enable machine function split optimization=
- for AutoFDO")
-> Link: https://github.com/llvm/llvm-project/commit/3e6acc87c58843e551d6e8e=
-4bf06c26712b04622 [1]
-> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
-> ---
->  scripts/Makefile.autofdo | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/scripts/Makefile.autofdo b/scripts/Makefile.autofdo
-> index 1442043da139..57a3aba6ffc2 100644
-> --- a/scripts/Makefile.autofdo
-> +++ b/scripts/Makefile.autofdo
-> @@ -22,7 +22,7 @@ ifdef CONFIG_LTO_CLANG_THIN
->      KBUILD_LDFLAGS +=3D --lto-sample-profile=3D$(CLANG_AUTOFDO_PROFILE)
->    endif
->    KBUILD_LDFLAGS +=3D --mllvm=3D-enable-fs-discriminator=3Dtrue --mllvm=
-=3D-improved-fs-discriminator=3Dtrue -plugin-opt=3Dthinlto
-> -  KBUILD_LDFLAGS +=3D -plugin-opt=3D-split-machine-functions
-> +  KBUILD_LDFLAGS +=3D $(call ld-option,-plugin-opt=3D-function-splitting=
-=3Dall,-plugin-opt=3D-split-machine-functions)
->  endif
->
->  export CFLAGS_AUTOFDO_CLANG RUSTFLAGS_AUTOFDO_CLANG
->
-> ---
-> base-commit: 24a19b953e2a3d0ea5a8c4951a0ab8f32720c907
-> change-id: 20261014-update-autofdo-split-machine-function-option-d4edb03d=
-370c
->
-> Best regards,
-> --
-> Cheers,
-> Nathan
->
+I split the patches per architecture / maintained subsystem to ease
+the review, and I also split the uapi headers from the normal ones in
+case we ever decide that uapi needs to be treated differently from the
+normal headers here and the patches would need to get reverted.
+
+v5:
+- To ease the review, I split some huge patches into smaller patches
+  when there was a separate entry for the files in the MAINTAINERS file 
+- Dropped the patches that were already merged
+- Rebased the patches to the current master branch and fixed new
+  occurrences of __ASSEMBLY__
+
+Thomas Huth (13):
+  of: fdt: Replace __ASSEMBLY__ with __ASSEMBLER__ in of_fdt.h header
+    file
+  smccc: Replace __ASSEMBLY__ with __ASSEMBLER__
+  ARM: PXA: Replace __ASSEMBLY__ with __ASSEMBLER__
+  ARM: BCM7XXX: Replace __ASSEMBLY__ with __ASSEMBLER__
+  arm: Replace __ASSEMBLY__ with __ASSEMBLER__ in ptrace uapi header
+  arm: Replace __ASSEMBLY__ with __ASSEMBLER__ in non-uapi headers
+  hexagon: Replace __ASSEMBLY__ with __ASSEMBLER__ in uapi headers
+  hexagon: Replace __ASSEMBLY__ with __ASSEMBLER__ in non-uapi headers
+  asm-generic: Replace __ASSEMBLY__ with __ASSEMBLER__ in uapi headers
+  uapi: Replace __ASSEMBLY__ with __ASSEMBLER__ in uapi headers
+  asm-generic: Replace __ASSEMBLY__ with __ASSEMBLER__ in non-uapi
+    headers
+  include: Replace __ASSEMBLY__ with __ASSEMBLER__ in non-uapi headers
+  treewide: Stop defining __ASSEMBLY__ for assembler files
+
+ Documentation/dev-tools/checkuapi.rst          |  2 +-
+ Makefile                                       |  2 +-
+ arch/alpha/boot/compressed/Makefile            |  2 +-
+ arch/arm/include/asm/assembler.h               |  2 +-
+ arch/arm/include/asm/barrier.h                 |  4 ++--
+ arch/arm/include/asm/cache.h                   |  2 +-
+ arch/arm/include/asm/cp15.h                    |  4 ++--
+ arch/arm/include/asm/cputype.h                 |  4 ++--
+ arch/arm/include/asm/current.h                 |  4 ++--
+ arch/arm/include/asm/delay.h                   |  4 ++--
+ arch/arm/include/asm/domain.h                  |  8 ++++----
+ arch/arm/include/asm/fpstate.h                 |  2 +-
+ arch/arm/include/asm/ftrace.h                  |  6 +++---
+ arch/arm/include/asm/hardware/cache-b15-rac.h  |  2 +-
+ arch/arm/include/asm/hardware/cache-l2x0.h     |  4 ++--
+ arch/arm/include/asm/hardware/dec21285.h       |  2 +-
+ arch/arm/include/asm/hardware/ioc.h            |  2 +-
+ arch/arm/include/asm/hardware/iomd.h           |  4 ++--
+ arch/arm/include/asm/hardware/memc.h           |  2 +-
+ arch/arm/include/asm/hwcap.h                   |  2 +-
+ arch/arm/include/asm/irq.h                     |  2 +-
+ arch/arm/include/asm/kexec.h                   |  4 ++--
+ arch/arm/include/asm/kgdb.h                    |  4 ++--
+ arch/arm/include/asm/linkage.h                 |  4 ++--
+ arch/arm/include/asm/mach/arch.h               |  2 +-
+ arch/arm/include/asm/mcpm.h                    |  4 ++--
+ arch/arm/include/asm/memory.h                  |  4 ++--
+ arch/arm/include/asm/mpu.h                     |  4 ++--
+ arch/arm/include/asm/opcodes.h                 | 12 ++++++------
+ arch/arm/include/asm/page.h                    |  4 ++--
+ arch/arm/include/asm/pgtable-2level.h          |  4 ++--
+ arch/arm/include/asm/pgtable-3level.h          |  4 ++--
+ arch/arm/include/asm/pgtable-nommu.h           |  4 ++--
+ arch/arm/include/asm/pgtable.h                 |  8 ++++----
+ arch/arm/include/asm/probes.h                  |  4 ++--
+ arch/arm/include/asm/proc-fns.h                |  4 ++--
+ arch/arm/include/asm/ptrace.h                  |  4 ++--
+ arch/arm/include/asm/system_info.h             |  4 ++--
+ arch/arm/include/asm/system_misc.h             |  4 ++--
+ arch/arm/include/asm/thread_info.h             |  2 +-
+ arch/arm/include/asm/thread_notify.h           |  2 +-
+ arch/arm/include/asm/tlbflush.h                | 10 +++++-----
+ arch/arm/include/asm/tls.h                     |  4 ++--
+ arch/arm/include/asm/unified.h                 |  6 +++---
+ arch/arm/include/asm/unwind.h                  |  4 ++--
+ arch/arm/include/asm/v7m.h                     |  4 ++--
+ arch/arm/include/asm/vdso.h                    |  4 ++--
+ arch/arm/include/asm/vdso/cp15.h               |  4 ++--
+ arch/arm/include/asm/vdso/gettimeofday.h       |  4 ++--
+ arch/arm/include/asm/vdso/processor.h          |  4 ++--
+ arch/arm/include/asm/vfp.h                     |  2 +-
+ arch/arm/include/asm/virt.h                    |  4 ++--
+ arch/arm/include/uapi/asm/ptrace.h             |  4 ++--
+ .../mach-footbridge/include/mach/hardware.h    |  2 +-
+ arch/arm/mach-pxa/irqs.h                       |  2 +-
+ arch/arm/mach-pxa/pxa-regs.h                   |  2 +-
+ arch/arm/mach-sa1100/include/mach/bitfield.h   |  2 +-
+ arch/arm/mach-sa1100/include/mach/hardware.h   |  2 +-
+ arch/arm/tools/gen-mach-types                  |  2 +-
+ arch/arm64/kernel/vdso32/Makefile              |  1 -
+ arch/hexagon/include/asm/hexagon_vm.h          |  4 ++--
+ arch/hexagon/include/asm/mem-layout.h          |  6 +++---
+ arch/hexagon/include/asm/page.h                |  4 ++--
+ arch/hexagon/include/asm/processor.h           |  4 ++--
+ arch/hexagon/include/asm/thread_info.h         | 12 ++++++------
+ arch/hexagon/include/uapi/asm/registers.h      |  4 ++--
+ arch/loongarch/vdso/Makefile                   |  2 +-
+ arch/mips/boot/compressed/Makefile             |  2 +-
+ arch/mips/vdso/Makefile                        |  2 +-
+ arch/powerpc/boot/Makefile                     |  2 +-
+ arch/powerpc/platforms/cell/spufs/Makefile     |  2 +-
+ arch/s390/Makefile                             |  2 +-
+ arch/x86/boot/Makefile                         |  2 +-
+ arch/x86/boot/compressed/Makefile              |  2 +-
+ arch/x86/realmode/rm/Makefile                  |  2 +-
+ arch/xtensa/kernel/Makefile                    |  2 +-
+ drivers/firmware/efi/libstub/Makefile          |  2 +-
+ drivers/net/wan/Makefile                       |  2 +-
+ include/asm-generic/barrier.h                  |  4 ++--
+ include/asm-generic/bug.h                      |  4 ++--
+ include/asm-generic/current.h                  |  2 +-
+ include/asm-generic/error-injection.h          |  2 +-
+ include/asm-generic/int-ll64.h                 |  6 +++---
+ include/asm-generic/rwonce.h                   |  4 ++--
+ include/asm-generic/signal.h                   |  4 ++--
+ include/linux/amba/serial.h                    |  4 ++--
+ include/linux/annotate.h                       | 18 +++++++++---------
+ include/linux/arm-smccc.h                      | 10 +++++-----
+ include/linux/cfi_types.h                      |  6 +++---
+ include/linux/compiler.h                       |  4 ++--
+ include/linux/compiler_types.h                 |  8 ++++----
+ include/linux/edd.h                            |  4 ++--
+ include/linux/err.h                            |  2 +-
+ include/linux/export.h                         |  2 +-
+ include/linux/init.h                           |  6 +++---
+ include/linux/ioport.h                         |  4 ++--
+ include/linux/linkage.h                        |  6 +++---
+ include/linux/mem_encrypt.h                    |  4 ++--
+ include/linux/of_fdt.h                         |  4 ++--
+ include/linux/pe.h                             |  4 ++--
+ include/linux/platform_data/emif_plat.h        |  4 ++--
+ include/linux/ti-emif-sram.h                   |  2 +-
+ include/linux/types.h                          |  4 ++--
+ include/uapi/asm-generic/int-l64.h             |  4 ++--
+ include/uapi/asm-generic/int-ll64.h            |  4 ++--
+ include/uapi/asm-generic/signal-defs.h         |  2 +-
+ include/uapi/asm-generic/signal.h              |  4 ++--
+ include/uapi/linux/a.out.h                     |  4 ++--
+ include/uapi/linux/const.h                     |  4 ++--
+ include/uapi/linux/edd.h                       |  4 ++--
+ include/uapi/linux/hdlc/ioctl.h                |  4 ++--
+ include/uapi/linux/types.h                     |  4 ++--
+ scripts/Makefile.build                         |  2 +-
+ scripts/gfp-translate                          |  2 +-
+ scripts/headers_install.sh                     |  1 -
+ .../tests/cmd_graph/test_savedcmd_parser.py    |  2 +-
+ tools/include/asm-generic/barrier.h            |  4 ++--
+ tools/include/asm/alternative.h                |  2 +-
+ tools/include/linux/cfi_types.h                |  6 +++---
+ tools/include/linux/compiler.h                 |  4 ++--
+ tools/include/uapi/linux/const.h               |  4 ++--
+ .../testing/selftests/kvm/lib/riscv/handlers.S |  4 ----
+ .../testing/selftests/vDSO/vgetrandom-chacha.S |  2 --
+ 123 files changed, 229 insertions(+), 237 deletions(-)
+
+-- 
+2.56.0
+
