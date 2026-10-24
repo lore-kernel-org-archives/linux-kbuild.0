@@ -1,100 +1,59 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.216.45
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792829855;
-	b=cJqOftKEkn0DQjL7VfYbH9BlkkMMLjiufPQlO8Yvuakgsk6jM2IqFBP5n8BC/P15fTHf
-	 LmIMJbjsMVZCQU45Chx7FM+7FQtifM8KYJD6KJk0WiBUz11XZZdWp5t7ylSCCmtlBnGWF
-	 pTvAwnIki+y0ljOSSR1E9xOkVB7T3U3lcVTFz46MPx+KXiuL+901gCmClkC2Yf4ifciv7
-	 At56UbBXB9iMTwEQB1E77MlFvZF2AR5BRz7M4O8xQTHbP2FR0imOa/qVVkrV8GUoh79tX
-	 ndmiNlVbsOWEJPbY2bI5/tVmrnKL2+ItJh/s3lXpZ51UHRiJIM3hXgG+Vjda7D0vxBQ==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792829855;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Received:MIME-Version:In-Reply-To:References:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type;
-	bh=f/c+EwpzzrIdTL0a0bddGX7KBZ15+Zku2avwoxWG2Wk=;
-	b=jpEcLvBU/kfI1trsoxHavkMWaMYo8cJ1LJZeYeFzMZ9er1MrbG1KdzxxDnDJSywgg/zS
-	 4K61/gaLj+zsgAsVRMWvSrfjciTqdx7C/ZxBTcE6jUn95ITvTmgLED1+Wab3CWpHB1rHm
-	 4RFdrxIQC2BIpqZGfeOPWUDooGknK/L9Xap9UcqJwRoWMJ6MVG9xphI8p5fbCzzQPpdyO
-	 zN8YCGmeQ+MOTkqZOhsHJos7xsxn7GfHkveXegOlP5ckH0IdvbJE+f04EGQL1PRY8mZbT
-	 1R8co+vRLuOgGN3wK+Jz/78C7dfWkRfk1qwGyfCy59bWmILVbE4OM7SCQYN3lu/DL+A==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=chromium.org;
-	spf=pass smtp.mailfrom=chromium.org;
-	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=k059ccS5;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.216.45
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1792881200;
+	b=g+1GD1E0pY37OVsXnWQ0/6uM4emrnwULEoqDZeoXSk+pAqLbHbQyrOX+0KMEAc1BGJcK
+	 ynHJv2HEFDq4ugXCE9nli5XgVCGJRtN3OQA6kx8ArO4yS/zTB3S5Jzfhu967K55Jhk5ME
+	 7UZeC8VM3NzJLqbWePxEfNbddr8t00yxlS22ZS5nj4x8pGVVFQ4jEDzhPDVwG63OBdHdK
+	 kBAhwof4J2521MdfWNeMuTSjYFT96tZXjOi1qLVkLpw/U4b59aXsFn8CuH/i+YQZCczl8
+	 qY1jEoyTcGlMKYkUqTdGg+4NfR3UiKh2pnqoAqaASN7SlIlQd4CbWDSzswzZbs04j4g==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792881200;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=TGz7r1Aby2yZxmQUWdeEn21pWMzlGMbPc089rpZiF60=;
+	b=1iN946JnlMGq5vCIPvDUNw3Ol988IDJ7IKx6mjJDlN9MvABdb6RmZf6uTNjsuVMHhp45
+	 fwNAqL8p18IxqiPzK1+UhGDRlwYaVZ9gD3CiHa0IKdi2rydQ3PLtTpiz5AbRQGoZpwd3L
+	 dN6PaKW5sxY2xfaL0YZJMdXA/VBpbq8YpKbQ9B1G/0EcSogIAJ1ZdyTILVC4YjShtvQ4f
+	 PCgrn1UR0pK+s/o835nkLLFLUhUVo11nnFXVhfS4QxpJIz+Kc/HGi1sXUc8lvbTgvVOLt
+	 2zOAMAjTOQk6DRSQnaRnHm2Ci0EtMuKxwxryziOZlMR3Z4YhddEhCIB07F7v0Qncbtw==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="gsjvu2f/";
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE70606A320
-	for <linux-kbuild@vger.kernel.org>; Sat, 24 Oct 2026 08:17:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1CE70606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D16B606A31A;
+	Sat, 24 Oct 2026 22:33:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=k059ccS5
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-3ade49a7ebdso473060a91.3
-        for <linux-kbuild@vger.kernel.org>; Sat, 24 Oct 2026 01:17:35 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1792829854; cv=none;
-        d=google.com; s=arc-20260327;
-        b=iagKK9/KnLVoUH5xClbgCqqbDztlGwEq16A4ewpgO8HxDG4dnRQOBLtqHxSG3bV7Ko
-         EgIZX1TGrUXSLeTS7i1XqjWvhq8Qf0JZvCrbUNwMVCIlbOIPdlQ8DMk0HAwFgullIytv
-         7lJ98F8dLjSGDRi3gYCMVuEAYA1nnFtjIVVIO6Ethtm2viCcRYtg88RVjz0DNJ+5Jtv/
-         Dqp/dKwOb+PtFB2T72xb9uXcpBMZVHjm0RfD18xec+5qTZ57dmZYq/NyK+7Pi8nLBuO5
-         onjuchgWkAZbLPwidoQPgDvbIf/XyDfHDwbbx8droCSqPEGBJCniR0vLlsQPuZ/KuD8N
-         LXhw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:references:in-reply-to
-         :mime-version:dkim-signature;
-        bh=f/c+EwpzzrIdTL0a0bddGX7KBZ15+Zku2avwoxWG2Wk=;
-        fh=kfip0GYWjCQAKEDc+oDVeIMSJ4uG9sTWMcttFx2syJk=;
-        b=RRCqmDQCs2fk+LwgqvT3RksU4mvrUj11XQ9QupkMcxyXvWae3ze1CFQZWpaD67rctY
-         WLU++dn5MjZCs5np9zGhfdQNoIYhWoEWd0dywYI5G4YGrDiogG9sh/8SrvQs4hdTNyIw
-         olEg+w4x/6mEZiU8HKqbQ3HFgGQZna5TPLZ24KaNIvvc6FtFcY6iA/KzLCVUvaT5XYiZ
-         lXsiGw1eLzaqprEmPikEGItdAGNd//Kva9N495CtOKQQckTTb5tWJMm+/EqQDhHZl/WL
-         EXQtR1/hyGUtZjAkxeT1Xs383W15TtEeoPMZ+9tFnczEm++eya0iEchx7P5Aj5bQvUY2
-         H0Cw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1792829854; x=1793434654; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:references
-         :in-reply-to:mime-version:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=f/c+EwpzzrIdTL0a0bddGX7KBZ15+Zku2avwoxWG2Wk=;
-        b=k059ccS55T1YaNzStugk5ne3uFifaL4k2aSKrT12fShPJOVrNwIpZsTVvJguE9dBVX
-         ygElTWkmgtdIXDyK+7PyNXPPrJ9Md9fuHPq/S6rSCxD0nkfAZFvNflsz/tXuQHDdBLHD
-         xL65BHj8HVU1+f0FgiCizf5ZuSn5MRY7FWfjw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792829854; x=1793434654;
-        h=content-type:cc:to:subject:message-id:date:from:references
-         :in-reply-to:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=f/c+EwpzzrIdTL0a0bddGX7KBZ15+Zku2avwoxWG2Wk=;
-        b=Lai0prJkglLHnZkktrjMeTQpuNThzNKm0nVSnKLRI0GI9LEG8fJVNp4pFnHA9Pozkq
-         T+cLZYpxOf254MFA/tU3Dx2DvmGNwCZmw5O86SMFRsJXzObSIzKqR7qPpBv9D/f7vbNF
-         DDxMqGIfjjqdMPPdlK+73n2j1hbL4XtqMSnWuaNGzH1isZig9FzGQBpvBJOx4M4cfyEb
-         hC4UyENcQcGmrIKilV3Ec2nfzrb18umUN6Vvj6E6g5WSLeJs49SXKGQDurTEoFHpaGkC
-         xBGUznBq5oUYwoI8IHq5u9uUlB9oiyl2PGbVSn8I8VgLTMS0W3wmtI8ExVCdAzI4B3M9
-         Pt4g==
-X-Forwarded-Encrypted: i=1; AKwUvByni/WBmB8wVw1H301tfvASjdnXga7TN/2FS5nbeM525XooppGK929yNZp9xwYx1QEigC4txnrVhtzsRh4=@vger.kernel.org
-X-Gm-Message-State: AFq9FYLYn4sCmW/kvdZAxvy2avXoHJij1O6su1CAbNawz73koVik0Qid
-	/2UrPAVtFR3gR895/AyCfEk7rZGLVt2Lri/51jIoOUPaMxvAXCmU0bB4Jnb6joT94myNbPkifb2
-	eq5gb6TV1nvoofTAI1GDZuB6HKbQjiGz3Pe/39PXY
-X-Gm-Gg: AYBFou0Rm06qaUhYpMG8Aw2sc6e8tGeTVqRJW58h8x/PTd4y5+ktrc47tuMpXnzlT+l
-	YofYxwdWUewitCx4K+B3qXfBJ2zRYxIdKFvnEDEPd/r+iHnu8aNFdMaLU7mh6Q4bbXGWRRX5abR
-	iW2On2Z/W/Xjft08py+pciIt2Xnfav1wz9yLFlPZR+vYI/MRVkZFpql8BKnpm4y3cyaTYPSOWib
-	HXX9u+22ZDjdfEeJ9RFcn2wKPdtD8ZgtE9OIwmngIU2X6u5Vj916zMdir1OGV+3jQlBV/FbgCjP
-	i+/uErByaRdvHh33qH7KmwN1WATH2nsNEcZrz8Cno2mNoFOLBTQVtvMNVGOaWiiICeennSYo980
-	hZZuQlOfZ664pWrCj+a7IsN6SCHzXk/Sj+T0d
-X-Received: by 2002:a17:90b:1fc8:b0:3ad:c14:35ce with SMTP id
- 98e67ed59e1d1-3adeb0f4b03mr1215366a91.64.1792829854594; Sat, 24 Oct 2026
- 01:17:34 -0700 (PDT)
-Received: from 415065739583 named unknown by gmailapi.google.com with
- HTTPREST; Sat, 24 Oct 2026 01:17:32 -0700
-Received: from 415065739583 named unknown by gmailapi.google.com with
- HTTPREST; Sat, 24 Oct 2026 01:15:41 -0700
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gsjvu2f/
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F9371F01825;
+	Sat, 24 Oct 2026 22:33:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792881200;
+	bh=TGz7r1Aby2yZxmQUWdeEn21pWMzlGMbPc089rpZiF60=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=gsjvu2f/4orqpDcqlU52e59XPEzbiNQWZwmx24oDc2m4q8v/RMh4WziztpRDDZt2W
+	 xNz+BSDzwqxY2zYdOFTTOI9pwpXA9f85PDGAmayIcFuJj12Bs/CRmw6GS+BGuCdUrC
+	 jxgniBwN0BjPxPAfYSyOyPga1BAG8EpB7SiVL56cHXq/4jKgu+919p8Q/LKuc9Un1z
+	 PbpsxA1ZpTY/vCHXLp3ACN1jJuTn3mC3/S1G/fWd9t9MkWNalMPqoyGhFIA5WQLXh/
+	 goSgcTd9OOh68bUe4fqvHumpgCBe7JoCodiLLKncAlQ7NXQiBJZgnRZRm16FYepzsp
+	 BEAiWyOFXjoRQ==
+Message-ID: <sashiko-outbox-183928@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v5 1/2] kbuild: Convert %.dtb(o) targets to single
+ target rules
+Reply-To: sashiko-reviews@lists.linux.dev
+To: =?utf-8?b?Um9iIEhlcnJpbmcgKEFybSk=?= <robh@kernel.org>, "Nathan
+ Chancellor" <nathan@kernel.org>, "Nicolas Schier" <nsc@kernel.org>, "Saravana
+ Kannan" <saravanak@kernel.org>
+Cc: "David Heidelberg" <david@ixit.cz>, "Arnd Bergmann" <arnd@arndb.de>, linux-kbuild@vger.kernel.org, devicetree@vger.kernel.org, conor+dt@kernel.org
+In-Reply-To: <20261023-dtb-dirs-v3-v5-1-dfe13d47aa64@kernel.org>
+References: <20261023-dtb-dirs-v3-v5-0-dfe13d47aa64@kernel.org>
+ <20261023-dtb-dirs-v3-v5-1-dfe13d47aa64@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 24 Oct 2026 22:33:19 +0000
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -103,77 +62,145 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-In-Reply-To: <20261020083501.RFC.7.I1683fb18dd1cb29680af5efb2c2d3c3f539af0f4@changeid>
-References: <20261020153652.2907186-1-dianders@chromium.org> <20261020083501.RFC.7.I1683fb18dd1cb29680af5efb2c2d3c3f539af0f4@changeid>
-From: Simon Glass <sjg@chromium.org>
-Date: Sat, 24 Oct 2026 01:17:31 -0700
-X-Gm-Features: AclHuK_RH6hRiswn7VkHcSfsxk2rWaTJ0grpI4PKmWKFGktw6V3bTGvWs-_Kz3M
-Message-ID: <CAFLszTgz66uz4gU6deR_go028R6MhwYuB=Jb5RJ8hqtzb5j80Q@mail.gmail.com>
-Subject: Re: [RFC PATCH 7/7] arm64: dts: qcom: sc7180: Add sc7180-trogdor.its
- FIT image script
-To: dianders@chromium.org
-Cc: Devicetree-compiler@vger.kernel.org, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Konrad Dybcio <konradybcio@kernel.org>, linux-kbuild@vger.kernel.org, 
-	Brian Norris <briannorris@chromium.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	Simon Glass <sjg@chromium.org>, Chen-Yu Tsai <wenst@chromium.org>, linux-arm-msm@vger.kernel.org, 
-	Nicolas Schier <nsc@kernel.org>, Peter Griffin <peter.griffin@linaro.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Tudor Ambarus <tudor.ambarus@linaro.org>, Devicetree@vger.kernel.org, 
-	Julius Werner <jwerner@chromium.org>, Saravana Kannan <saravanak@kernel.org>, 
-	Will Deacon <will@kernel.org>, Michal Simek <michal.simek@amd.com>, 
-	=?UTF-8?Q?Andr=C3=A9_Draszik?= <andre.draszik@linaro.org>, 
-	Bjorn Andersson <andersson@kernel.org>, cros-qcom-dts-watchers@chromium.org
-Content-Type: text/plain; charset="UTF-8"
 
-Hi Doug,
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+s) to consider:
+- [High] kbuild: single-target .dtb and .dtbo rules fail to descend into bo=
+ot/dts
+- [Medium] kbuild: unconditional dtstree prefixing corrupts non-dtstree .dt=
+b targets
+--
 
-On 2026-10-20T15:35:18, Douglas Anderson <dianders@chromium.org> wrote:
-> arm64: dts: qcom: sc7180: Add sc7180-trogdor.its FIT image script
->
-> Add an Image Tree Source (`sc7180-trogdor.its`) describing the FIT
-> image for SC7180 Trogdor family boards using `Image-framed.lz4` and
-> LZ4-compressed board DTBs (`*.dtb.lz4`), allowing the Trogdor FIT image
-> to be built with:
+commit 7e93223635a0ece771bb2b9e12840b3751ca5a16
+Author: Rob Herring (Arm) <robh@kernel.org>
 
-This says what the file is but not why it is wanted. Please can you
-move a short version of your notes below the --- into the commit
-message (matching what the ChromeOS scripts produce, a model for
-future Chromebooks, helping people who run upstream kernels on
-trogdor)?
+kbuild: Convert %.dtb(o) targets to single target rules
 
->
->   make FIT_ITS=qcom/sc7180-trogdor.its image.fit
->
-> Assisted-by: Gemini:gemini-pro-prerelease
-> Signed-off-by: Douglas Anderson <dianders@chromium.org>
->
->  arch/arm64/boot/dts/qcom/sc7180-trogdor.its | 728 ++++++++++++++++++++++++++++
->  1 file changed, 728 insertions(+)
+This commit replaces the dedicated top-level %.dtb and %.dtbo rules with the
+generic kbuild single-target infrastructure, rewriting relative DTB paths to
+include $(dtstree) and using dtbs_prepare as the prerequisite for DT-only
+single builds.
 
-> diff --git a/arch/arm64/boot/dts/qcom/sc7180-trogdor.its b/arch/arm64/boot/dts/qcom/sc7180-trogdor.its
-> @@ -0,0 +1,728 @@
-> +	configurations {
-> +		conf-1 {
-> +			description = "sc7180-trogdor-coachz-r1-lte";
-> +			kernel = "kernel-1";
-> +			fdt = "fdt-1";
-> +		};
+> diff --git a/Makefile b/Makefile
+> index 4ad67b737af7a..c307ee9293bcd 100644
+> --- a/Makefile
+> +++ b/Makefile
 
-One thing I'd like to check. Patch 4 says the main reason for a
-checked-in .its is to have a hand-written description per
-configuration, but here each description is just the DTB filename, the
-compatible is filled in automatically, and patch 5 adds fdtfactor to
-cmd_fit too. So as far as I can tell, the only thing this file gives
-over 'make FIT_COMPRESSION=lz4 image.fit' is limiting the FIT to the
-trogdor DTBs. In exchange there are 47 entries which must be updated
-by hand whenever a trogdor board is added to or removed from
-qcom/Makefile, and nothing checks this. The list matches the Makefile
-today, but the two are likely to drift apart. Would a way to filter
-the dtbs-list passed to make_fit.py (e.g. by a pattern such as
-sc7180-trogdor-*) get you the same result without the duplication?
-What do you think?
+[ ... ]
 
-Regards,
-Simon
+> @@ -2212,8 +2208,20 @@ ifneq ($(KBUILD_MODPOST_NOFINAL),1)
+>  endif
+>  	$(Q)rm -f modules.order
+> =20
+> +# For compatibility with existing %.dtb targets without full path
+> +single-dtb :=3D $(filter-out $(dtstree)/%, $(filter %.dtb %.dtbo, $(sing=
+le-no-ko)))
+> +single-no-ko :=3D $(filter-out $(single-dtb), $(single-no-ko)) $(addpref=
+ix $(dtstree)/, $(single-dtb))
+
+[Severity: Medium]
+What happens here when building an in-tree .dtb or .dtbo target located
+outside $(dtstree), such as make drivers/of/empty_root.dtb or
+make drivers/of/unittest-data/testcases.dtbo, or when $(dtstree) is empty?
+
+Because single-dtb matches any %.dtb or %.dtbo target that does not begin
+with $(dtstree)/, targets under drivers/of/ or drivers/clk/ have
+$(dtstree)/ unconditionally prepended to their path, rewriting them to
+non-existent paths under arch/$(SRCARCH)/boot/dts/drivers/....
+
+In addition, unlike the single-dt-patterns check just below, this rewrite is
+not guarded by ifneq ($(dtstree),). On architectures without a boot/dts
+directory or during external module M=3D builds where $(dtstree) is empty,
+$(addprefix $(dtstree)/, $(single-dtb)) prepends a leading / to the target.
+
+Should this rewrite be guarded by ifneq ($(dtstree),) and restricted to
+paths that actually exist under $(dtstree) (or do not already exist at their
+given path)?
+
+> +
+>  single-goals :=3D $(addprefix $(build-dir)/, $(single-no-ko))
+> =20
+> +# DT-only targets need host tools, but no architecture-specific preparat=
+ion.
+> +ifneq ($(dtstree),)
+> +single-dt-patterns :=3D $(addprefix $(dtstree)/,%.dtb %.dtbo)
+> +ifeq ($(filter-out $(single-dt-patterns),$(single-no-ko)),)
+> +single-build-prep :=3D dtbs_prepare
+> +endif
+> +endif
+> +
+>  KBUILD_MODULES :=3D y
+> =20
+>  endif
+> @@ -2225,7 +2233,7 @@ prepare: outputmakefile
+>  # make menuconfig etc.
+>  # Error messages still appears in the original language
+>  PHONY +=3D $(build-dir)
+> -$(build-dir): prepare
+> +$(build-dir): $(single-build-prep)
+>  	$(Q)$(MAKE) $(build)=3D$@ need-builtin=3D1 need-modorder=3D1 $(single-g=
+oals)
+
+[Severity: High]
+Does routing single .dtb and .dtbo targets through $(build-dir) allow
+scripts/Makefile.build to descend into arch/$(SRCARCH)/boot/dts?
+
+Previously, the %.dtb and %.dtbo rules invoked
+$(MAKE) $(build)=3D$(dtstree) $(dtstree)/$@, starting scripts/Makefile.build
+directly at obj=3Darch/$(SRCARCH)/boot/dts. With this change, $(build-dir)
+starts at obj=3D. and descends into obj=3Darch/$(SRCARCH), which includes
+arch/$(SRCARCH)/Kbuild. However, in arch/$(SRCARCH)/Kbuild (for example in
+arch/arm64/Kbuild):
+
+    # for cleaning
+    subdir- +=3D boot
+
+neither boot nor boot/dts is in obj-y, obj-m, subdir-y, or subdir-m. When
+scripts/Makefile.build evaluates single-subdirs at obj=3Darch/$(SRCARCH):
+
+    single-subdirs :=3D $(foreach d, $(subdir-ym), $(if $(filter $d/%, $(MA=
+KECMDGOALS)), $d))
+    single-subdir-goals :=3D $(filter $(addsuffix /%, $(single-subdirs)), $=
+(MAKECMDGOALS))
+
+single-subdirs is empty, so Kbuild stops descending at obj=3Darch/$(SRCARCH)
+and places arch/$(SRCARCH)/boot/dts/<vendor>/<target>.dtb(o) directly into
+$(targets) at obj=3Darch/$(SRCARCH) without ever including
+arch/$(SRCARCH)/boot/dts/Makefile or the vendor subdirectory Makefile.
+
+This causes three regressions when building single targets at this commit:
+
+1. Building any single .dtbo target (e.g. make <vendor>/<overlay>.dtbo)
+   fails with "No rule to make target", because at obj=3Darch/$(SRCARCH),
+   need-dtbslist, dtb-y, and dtb- are empty, and scripts/Makefile.build:
+
+       ifneq ($(need-dtbslist)$(dtb-y)$(dtb-)$(filter %.dtb %.dtb.o %.dtbo.=
+o,$(targets)),)
+       include $(srctree)/scripts/Makefile.dtbs
+       endif
+
+   omits %.dtbo from the $(targets) filter, so scripts/Makefile.dtbs is
+   never included.
+
+2. Building any composite .dtb target defined via <name>-dtbs :=3D base.dtb
+   overlay.dtbo (such as make qcom/apq8016-sbc-usb-host.dtb) fails with
+   "No rule to make target" because the vendor Makefile is not included and
+   multi-dtb-y remains empty.
+
+3. Building simple .dtb targets matches $(obj)/%.dtb: $(obj)/%.dts at
+   obj=3Darch/$(SRCARCH) with target-stem set to boot/dts/<vendor>/<board>
+   instead of <board>, silently dropping per-directory DTC_FLAGS,
+   per-target DTC_FLAGS_<stem>, and base-dtb-y automatic -@ symbol
+   generation.
+
+Note that a subsequent commit in this series, commit 02ed329e5679 ("kbuild:
+Support directory targets for building DTBs"), partially addresses traversal
+by passing need-dtbslist=3D1 for DT builds and adding subdir-y +=3D boot/dt=
+s in
+scripts/Makefile.build when need-dtbslist is set, though this commit is
+broken on its own during bisection (and the %.dtbo filter omission in
+scripts/Makefile.build remains if need-dtbslist, dtb-y, and dtb- are empty).
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261023-dtb-dirs-v=
+3-v5-0-dfe13d47aa64@kernel.org?part=3D1
