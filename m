@@ -1,57 +1,58 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=24.134.29.49
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792946824;
-	b=GbE8wy1GIzbP04lyx9dXA+e3M4p0DkQbLM4tigFImm3WqrLHsK731RCSaCRX55i30e/q
-	 gST9BfZMyKCgG7SPEdICAJok0Sp5q9ZXdmfCa1IgVBvn56uWp3EBxpXYBk+C4WskLnUOG
-	 EIwh7qSLqkvqCPteX2kLo32ofduxH57+Bol8W7DMGWQkQPhg+7JMgIGgum2Exf3mkVxi2
-	 cqNdjQj5cZIRZxS6xZZoS/PtVzf9kjRfoOZe+49QnKZqpD0ohtP6tqbAw02eXAsJhzsIq
-	 75ujv55lgDPKboNwJ69eS25xs0kujv+4vpZvQVaf7bxwkqYhEIkqkqtdD15mufcKW8Q==
+	t=1792946825;
+	b=lMhf/bd2v1j4omUstFRiQbnKtp9DER40Tkty3tCByO3vlD0RgQv4Ta2w3s/A9FrnPm5J
+	 eyIWwPKjV41gJymK9GGlT4VcJJZoIV9BObTRWWByPp+CS+YSQiQM13I/MMfvci5RepTbg
+	 V/sNNJnGIK4i45oCLqRwdJoPEGpvdQgoCkyTCDO2wAcbI4dlXj+6sqvLFg92Ch1Yjjrix
+	 77Nr+77ECxLoS1J1+T3PISej7vI71M3FBoeu249DZjKiHdMDDlRM6FlHwdWETgIXaEflp
+	 z4yl2HaxMvXbAHsCsNOelL1VEBGhESeGKneDW0UXCNaWp8X73L4+t8VmV20FZaZu8kw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792946824;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:From:Date:Subject:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:
-	 References:In-Reply-To:To:Cc:X-Mailer:X-Developer-Signature:
+	a=rsa-sha256; c=relaxed/relaxed; t=1792946825;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:From:Subject:Date:
+	 Message-Id:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	 X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:X-Developer-Signature:
 	 X-Developer-Key;
-	bh=Cwr+o06uVLQrU5K5AOquoZRWxYkGyF++r49uKrxAF44=;
-	b=DjracjNwaKnRB4z07wQlHGuvNcjto0wUqS7vM/RsbQRe/1M27/MkFs7Kha0nxvA9wyYR
-	 K86UAHIJ9JrJqsfCZobNNB3yFeo+r6JwGpbn0B1T5sJnTokl1YBISYdNuRI25KgM89Sl5
-	 GzgZuhTDR9czG5gIgcRFGWdFxbDMWeZfEkrPJRZa4+aPhPamuADSqZu2BGYwGUTJcH3QS
-	 wsZ9NDG92pvRy4MRKFvErrqKUNjrkvPX0FHwGr+znKakbCVpB1vIjB8DNcmHq8NpM+6hS
-	 BBCqWlze9/sXdi/sKhc5+bJ33Wf9Isky6AsQ5/s1P2NFlxkawsjfFYhj3Ly+f09YY9Q==
+	bh=aRwJSWzihIVxmJq2V6ZP/pplaH9twcid3AOfCUTyQDg=;
+	b=y3lyQwJOTGQrNWEJieIk/lnO/6KH9pY1u3ruzRv5KGFTULVULeBKaxabdP17kVfEjYzB
+	 cEa4n9QKPo9twjk4u/Tz2AWdp2bpKce1YdScBWRrsnfNL9iZGFPYHp7twxFVOUJXUjR9h
+	 hHf+dBmhmwezU/TqvltDX1iCLdxaIWeTnU4kU5a584aS9hksRNdmMKQ0nPgUgyTcUHkUa
+	 Rhr8wuVYRuLiV2/8DVuWRMV2GxQ3R2anFKQMYZTjIgjNsi2Q78C8caSxfd0NixEGML5LJ
+	 snYJl98vJRTRgTXTaVgQXRnaiS1Gg84dE/EIM5klp3TOABshiNxJ8Y5hB0WYBU4hhsQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=sigxcpu.org;
 	spf=pass smtp.mailfrom=sigxcpu.org;
-	dkim=pass header.d=sigxcpu.org header.i=@sigxcpu.org header.a=rsa-sha256 header.s=2024 header.b=f7ATtU3k;
+	dkim=pass header.d=sigxcpu.org header.i=@sigxcpu.org header.a=rsa-sha256 header.s=2024 header.b=lqLFlu5V;
 	arc=none smtp.remote-ip=24.134.29.49
 Received: from honk.sigxcpu.org (honk.sigxcpu.org [24.134.29.49])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 272CC606A322;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27279606A321;
 	Sun, 25 Oct 2026 16:47:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 272CC606A322
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 27279606A321
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sigxcpu.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sigxcpu.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=sigxcpu.org header.i=@sigxcpu.org header.a=rsa-sha256 header.s=2024 header.b=f7ATtU3k
+	dkim=pass (2048-bit key, unprotected) header.d=sigxcpu.org header.i=@sigxcpu.org header.a=rsa-sha256 header.s=2024 header.b=lqLFlu5V
 Received: from localhost (localhost [127.0.0.1])
-	by honk.sigxcpu.org (Postfix) with ESMTP id DB674FB02;
+	by honk.sigxcpu.org (Postfix) with ESMTP id 262F6FB05;
 	Sun, 25 Oct 2026 17:46:54 +0100 (CET)
 Received: from honk.sigxcpu.org ([127.0.0.1])
  by localhost (honk.sigxcpu.org [127.0.0.1]) (amavis, port 10024) with ESMTP
- id do32rT8sw1Dy; Sun, 25 Oct 2026 17:46:52 +0100 (CET)
+ id HjveHT5wZB5v; Sun, 25 Oct 2026 17:46:52 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=sigxcpu.org; s=2024;
-	t=1792946812; bh=DuJRBwLNzzlV+FQsAfJ66t49B9wxZtxMoiQnSV35KIg=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=f7ATtU3kUUnV0P5kORa9OwECjM5vQ+RMkJzKMxZ7X5sml775II8Wb/al48kuoavZz
-	 3CEUN7WvGqOWvaWEWURcCc9JbKv1RIOXz6ssLBF4AQmw+9hg5z8wbZ0JkiMYz9pig/
-	 NQ33ugJgX6dJ0UtLnNSNyrI20nvccIGZ2AHAK/92GuLmxFj0HReDWN4M6NyLsL7NLv
-	 WM0WPyXaiW62GN8shJRRRJjtHCV8OE6Ss//55UVUTdp/+veaDh4WixJyIawCnHK6fO
-	 8/Uo3ZJxbSq8I2i8Ip9fXhVqgy+05UkDDCES1t3aJURNNOQeguSqQcnndVgfQvaz0q
-	 P+YP6hg3jKTAQ==
+	t=1792946812; bh=44WP28avd+3fSybiAEPgLAdgA/SAV5k4BHE39+BTC+A=;
+	h=From:Subject:Date:To:Cc:From;
+	b=lqLFlu5VcwyITVnmBlV/L2jr4dswmmk61mBfkK+K59ILmzkqLro610mC/vlMVRJWh
+	 krHtC10nDjZ2FVPl4U6aFRvg7i5hJFEH23/3uwNdJTWc096qvGz/wpXcvRmEeU329u
+	 zSkwyCs1NgdKAaHaF52YG4JoyfmAlFzgeGDoGj5dbDuMlundvXvMutevMKaCBNi8Xa
+	 LA0XYZUMFn/k6S9tuC1qP5Yc2Kjd9oWU24psNPJjII0SET1TWz9sAqyGic2i7dCvfX
+	 6VHAZpd5CCO3ntEgVjZCefjMeRtNhySwDPzZXsZRLFYDl0uEfwQdOqrvWOZtqqfIpV
+	 3G+Vd1sYJEotw==
 From: =?utf-8?q?Guido_G=C3=BCnther?= <agx@sigxcpu.org>
-Date: Sun, 25 Oct 2026 17:46:35 +0100
-Subject: [PATCH v2 1/2] kbuild: builddeb: Use ${KERNELRELEASE} consistently
+Subject: [PATCH v2 0/2] kbuild: deb-pkg: allow to set package name version
+Date: Sun, 25 Oct 2026 17:46:34 +0100
+Message-Id: <20261025-deb-pkg-v2-0-8c33a4ac18ad@sigxcpu.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -63,59 +64,70 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20261025-deb-pkg-v2-1-8c33a4ac18ad@sigxcpu.org>
-References: <20261025-deb-pkg-v2-0-8c33a4ac18ad@sigxcpu.org>
-In-Reply-To: <20261025-deb-pkg-v2-0-8c33a4ac18ad@sigxcpu.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/2WNwQ6DIBAFf8XsuTRCU6A99T8aDyILbpuoASU2h
+ n+v2GOPk8ybt0HEQBjhXm0QMFGkcdhBnCro+nbwyMjuDKIWktf8xiwaNr09ayU6oS9KaoWw21N
+ AR+tRejY/jot5YTeXeTF6ivMYPsdV4sX7rybOOFNOo6yNQYvXRyS/dtNyHoOHJuf8Bfg2f2qyA
+ AAA
+X-Change-ID: 20261019-deb-pkg-a6ef2837687e
 To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
  =?utf-8?q?Guido_G=C3=BCnther?= <agx@sigxcpu.org>
 X-Mailer: b4 0.16.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=862; i=agx@sigxcpu.org;
- h=from:subject:message-id; bh=DuJRBwLNzzlV+FQsAfJ66t49B9wxZtxMoiQnSV35KIg=;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1223; i=agx@sigxcpu.org;
+ h=from:subject:message-id; bh=44WP28avd+3fSybiAEPgLAdgA/SAV5k4BHE39+BTC+A=;
  b=LS0tLS1CRUdJTiBQR1AgTUVTU0FHRS0tLS0tCgpvd0VCYlFLUy9aQU5Bd0FJQVNXL2hsSksvT
- UhqQWNzbVlnQnEzako1aFFyRCtDTTRmeWNuOXhOMkd5c2I1eWxFCmQrc2dCbWlnODhWdzVZOEts
- ZGFKQWpNRUFBRUlBQjBXSVFSajlzemZsaUtkQ1NocktzTWx2NFpTU3Z6QjR3VUMKYXQ0eWVRQUt
- DUkFsdjRaU1N2ekI0NHVlRC93SUM5L2FNbFJnM25BelAwd2hsbEQ4ejQ0QVlmWXNRRUlrWjgzRA
- oxZ29iV3VCMjV3c0ZYRHhOSTNHYkxzMk1MQ0JzS3JHRklQNWdJN3ZWbzZTWmdSOXliS25ZdnNuV
- 1J0a3pnNkJ6Ck5kTlYxVjFFclZVYlBzbzhLTVNjNkRwYzhtU3JqdW51dFZmNDdKVlJZcUJPTE1I
- bFdvTG52V2ZRVDVLaUlWNzUKWEFmWDhTWHVyMzNGZnBMOTQ5WjNBMFdJK1BHU1kyUEJnTDZxaDg
- ydVV0UUJRNXBraWYzdTVRNnZtckZ2Vml0aApRdjVWTWxtL1Z5KzJHek5qaUdwdm9Fd0lRMStqNT
- ZvSlRPYktUTEhUVmNEN1dSNUVVaTVESys2N2ZHci9OSlpCCjRyWTI4RTZFd0RyQlA0SlV5UzVyO
- WhnYUdzK1AyRjJ2V1JaaUM4Z25kMjVrVFIvRXo2a3VrVmdmeGhTYlp2UHgKZFNDQVdPRDRKR3Ar
- OENJd2NNcmY2SDI2Wm5XejA0V3hBYkxKWEplTTV4NW80TTV6VDVYYWNFcG5CR1BZeG5JMgp4RnQ
- 2c2tYMHhOUU9jNlB6Mk9mK0VMTkZ5cytkQTVjYk9EaHA2bEhYTUFPcUtWTkFVa2JmVEtrcUtwOG
- 5TVzk1Cmdja0VoRWhxR1Bjb0J1eXNWaTVoaEtyckdqTzI5MVBYUmdtckFxcGxmV3MrVHlPL1JFb
- UFnNHJnZHZaelNWV1UKdzIvb3JLc09GYU1lYXRhUWwydm9YeU5jL0kzSU16Z2ZIeDNJUWxlcTZH
- OWt3b3dONTZHS1VYY2dSay91VXFrRApHaEo0KzFBbWg5Y2cwcThTRzlMUW9YVVczTUppY1BXbDZ
- LUDNFVGU1QTRWUU5NVW5MOUkyTGU3bzFxZWpLKzRYCjJQY0o1dz09Cj05NmlWCi0tLS0tRU5EIF
+ UhqQWNzbVlnQnEzako0YVRkQVlLYnM4YmZHTWhmYWU0WFQ0ZDdKCkM0OThvL0JHaFdreSszMVJO
+ T21KQWpNRUFBRUlBQjBXSVFSajlzemZsaUtkQ1NocktzTWx2NFpTU3Z6QjR3VUMKYXQ0eWVBQUt
+ DUkFsdjRaU1N2ekI0NFhuRC85dldMSHpySVI5WWNjUHYwZnRaRFMxWlNGVmhUeU5RUWdDZUNCcA
+ piVUovWUc3cDBXdzQySXROSWVqWjJFVVdmd0k2SSs1TTR6SGdZNHB3cXh6RzBqQ2xQNnBpNGkzb
+ jZaaXBJOWJUCjlPbzVXbzlBc0VpcUVqdGwwTmxUSml2RnQ1cWlrQzNGb3lhSnhSMm5Sdk82MFN2
+ bWpSaTJqYWZuQ3pCM0szSGwKTEJ6L2xqbVIwMEY1aVJ3N2Z3cUdQNjh4OGhIQ05DSE9mSlNpWXJ
+ JL3lhZExTcXVFOFFXeCszcGppc1hkNjY3WQpkZjRhMU16Umdnb1hmV0NhcmN6cEtIRXpDUkZaUE
+ t6LzE4MlJGVU1RMHE3d3N3eGdpck52NWhKbmJyK3dtTjB6CkZ3dkR0NW5oSUhCSzFicitFKzN0T
+ 2lZYkF4QXVYRkY2WFdYNjI5RVM5UW1pb2s2SU5PRWFvRnZoczNUc0ZEa2MKU2xOaXNwbTJxZUU1
+ VnlER3hGcW8rQytZM3RyRmhOT2hNOHdtL1NwRDZEVE12elRYU0pybGtEdDhsY1kwOG1adgo2WE8
+ 2VVdXdW5GLytZMGFiaGRPc1AwenBYK202Vm5hUDhXRUwxbGdLVU5uL0NlM3pFNnJSbXpuell3WG
+ JoZlRzClIyKzlHQVl4WFQrMVEzbFpSM3ZCRXo0a0QyOUN5T20xVGFXQkRWWG8xOTAyWFJxZlFFZ
+ Fc5L0dLNXQ0eGJnbngKL1UyVjFYdDEzRERYSVV2RExublgrT1FkblZkcXkrRDJTK1pnRDNNd3BY
+ clhBKzZ3TVBtTEpaYkt3YVUwSnB3Kwp6WWk5OStTNXNKRUhObEZuQmNjdGUxS1g0VzRoWGtFQ0d
+ sVThTYkxwZ0JIMFZvVm9yQXhnMlg3NmVJZlZHTVh1ClJkR24xZz09Cj1FazhKCi0tLS0tRU5EIF
  BHUCBNRVNTQUdFLS0tLS0K
 X-Developer-Key: i=agx@sigxcpu.org; a=openpgp;
  fpr=0DB3932762F78E592F6522AFBB5A2C77584122D3
 
-Only use $version when it affects the package name, other places
-should use ${KERNELRELEASE}.
+Instead of hardcoding ${KERNELRELEASE} in the package name allow
+the user to override this.
+    
+This can be useful if one doesn't want to accumulate different packages
+for every commit or micro version bump by setting
+KDEB_PKGNAMEVERSION=7.3 or even KDEB_PKGNAMEVERSION=stable.
 
 Signed-off-by: Guido Günther <agx@sigxcpu.org>
 ---
- scripts/package/builddeb | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Changes in v2:
+- Let "scripts/package/builddeb" use ${KERNELRELEASE} when referring to
+  the kernel release rather than using $version. Split into a separate
+  commit as this can be useful on its own.
+- Link to v1: https://patch.msgid.link/20261019-deb-pkg-v1-1-7f8e60bbede5@sigxcpu.org
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index ba1defc616524..5fdc9ea0dcca4 100755
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -147,8 +147,8 @@ install_kernel_headers () {
- 		"${srctree}/scripts/package/install-extmod-build" "${pdir}/usr/src/linux-headers-${version}"
- 	fi
- 
--	mkdir -p $pdir/lib/modules/$version/
--	ln -s /usr/src/linux-headers-$version $pdir/lib/modules/$version/build
-+	mkdir -p $pdir/lib/modules/${KERNELRELEASE}/
-+	ln -s /usr/src/linux-headers-$version $pdir/lib/modules/${KERNELRELEASE}/build
- }
- 
- install_libc_headers () {
+To: Nathan Chancellor <nathan@kernel.org>
+To: Nicolas Schier <nsc@kernel.org>
+Cc: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
--- 
-2.53.0
+---
+Guido Günther (2):
+      kbuild: builddeb: Use ${KERNELRELEASE} consistently
+      kbuild: deb-pkg: allow to set package name version
+
+ scripts/package/builddeb |  4 ++--
+ scripts/package/mkdebian | 12 +++++++++---
+ 2 files changed, 11 insertions(+), 5 deletions(-)
+---
+base-commit: c03c1a14507dfaf8b856c2608f9ac216021fc222
+change-id: 20261019-deb-pkg-a6ef2837687e
+
+Best regards,
+--  
+Guido Günther <agx@sigxcpu.org>
 
