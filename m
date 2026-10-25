@@ -1,95 +1,97 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.48
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.52
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792889120;
-	b=e0uFlr6K5ioduQlrWI8Wjrpk4FmIZFgkTyJX9ph8HCihTkVqu1qXiYLB376hA03ALQmp
-	 Sh5qlcVByaGBwDDegGWIQh3uQiufAoCiZAwO1af2yN1B3dYkvNH7UaNBQMH8SgURpFKIJ
-	 6jeA6bt5YjUWC8oHmoBbBpPbd9HKP2bhSAQ93bMSoYosfYDsHOdWq9ioW7m4+FZB60Prw
-	 XmypXUR13SbpVv1DjgUFutJSliWw9rq23DziacbAKWDxUy8Z6qEAXrSq8yQUSXh9Q116h
-	 e2yq3j4D3XRjAhLBeP2+eoQTC+Ez4PH58ExGU+U5gZlFLrjBMGrARv1/xKjLokxEM6g==
+	t=1792889261;
+	b=CkNB/kjC3DE8Dlhkdn+Nk31C7/hzn9ptcN23VtVxe8V9NCrswj7AWMIHY4YlF+WaDAMh
+	 i+iodY265hFh28CfuRyLADGo+6EaQiV3u7iNXducri5mPlH2Zq+tRj6x3ocDZGyU0Woqu
+	 KBi6TMVmY05+T7FHQv+kS3q5Dtj/F+Wu0wPC2wKs3AVG4q5cwkxk5EiMtrZyY+tRlPmRV
+	 4kKfcjsnmrRt8mX4mym+26QNGc5+67MMfNYquYH1txxeueafXMdnkdMOHmGDXfzN++OO1
+	 kARbQyv+KM3uDTCSKRuBAikct95MgcrKeP7VDBg3MJUjTwp6DzRW5BHnrQplfMY0vwg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792889120;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792889261;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 From:To:Cc:Subject:Date:Message-Id:X-Mailer:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=zG8r7n5adPzuOqWBUaQLE4ST6ZHXuDXXcUP0nYBbPM0=;
-	b=znEdPWVQ28nMMqjZ8ILdL6FZp25K5rDZlcYWKDJlr5ZLPdiMhtR8phCpTM6bZKC9kkOo
-	 alfPXaYyyas/1GMZ1/zkSImWWLzvrXJuE8foB5ygsszCMMQnEYrmm8h9Wxsfd1NPRGeoh
-	 xXLrri3KLB3lC0FHScC6lZNaZtads1hfguounrvZL6mjiOZ59XVmBj8tksEpA8RaXXnc6
-	 MIcpfWyguZ5m43nWfPATYibxF2/aN9dnkX/Dew9+jvrmcZTjWsa1DW+9QvmZH9fX16CNB
-	 KBxRlLV21GFG2QB7CtsIULaVPhiFeiv2vBDpJELxKaoiNcp38RoD+BkuOyo/sT1Xliw==
+	 MIME-Version:Content-Type:Content-Transfer-Encoding;
+	bh=nb0uRXvBK+EdWFyShmZhmAjJrdWNQ8t+bMXyHmnTsuI=;
+	b=GMhQKfv0VmoTGRfCVGgU1XIn9hfDpLKlrTENS3IDHyqGdJohk+i5y7CCrCLbSuLJTEj5
+	 pvZEc/a7mhmTSfSTHcj5Z/8aD1FMQCe9hFeAG8qW0EHCkEGBeiIrSUaMh9DzhVRuh3MWj
+	 9ZfdXWisTFnploUO8pvVtcI0ufctOsjFohjqwWvXHFcMc3o7dWnDnawL83RSBde3SVLpo
+	 SYIFnPV+sbDQiecE9Bpq23AVCSynbF80fHVwzq/bTWwhNG4Z0dnt9kbUohHMaIKV9pcU9
+	 7VI4ZG+ropcXKtZ6Km+v++KAxObO74ltstTgY8qiRjkTP/wFaNevr+cf2ESgsox3MFA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=RYDu5ad2;
-	arc=none smtp.remote-ip=209.85.160.48
-Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=Ugju8VLs;
+	arc=none smtp.remote-ip=209.85.210.52
+Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F404B606A324
-	for <linux-kbuild@vger.kernel.org>; Sun, 25 Oct 2026 00:45:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F404B606A324
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28F20606A31B
+	for <linux-kbuild@vger.kernel.org>; Sun, 25 Oct 2026 00:47:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 28F20606A31B
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=RYDu5ad2
-Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-483d290f398so1165197fac.2
-        for <linux-kbuild@vger.kernel.org>; Sat, 24 Oct 2026 17:45:19 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=Ugju8VLs
+Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-84621d8c7aaso865705a34.2
+        for <linux-kbuild@vger.kernel.org>; Sat, 24 Oct 2026 17:47:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792889119; x=1793493919; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=zG8r7n5adPzuOqWBUaQLE4ST6ZHXuDXXcUP0nYBbPM0=;
-        b=RYDu5ad27CZ/qaXiTHxKhU9GnIvlaaCG5KHSOcv0GgWGsb8l2wGJDz7fX+vwzzWd5e
-         mMskqr6niv71jVe9W37SOUGIoZd6B7JZZ7jzDn+UGj1ZgVvMUSfMVAA3nUN/uRpTIOjo
-         sEB3eb1Vms4P+eQDEocprxkAh1mwI9/3drANeyWyNN8UPfsKf4/RXuTFxFgNGXp9Y/QT
-         2l2Zw47abGDRwSzanB2sOVkoCKQro0jlGjQINhv6ZU5PpWRwzcihylJPe1tdqVaU82Eo
-         OvLNZszqxSidHfbDutJdazwyjvIjPJeoyFQeD7Lf2jn+g0Ywppjo/lt83PZpihPWT1g4
-         YLUA==
+        d=gmail.com; s=20251104; t=1792889260; x=1793494060; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=nb0uRXvBK+EdWFyShmZhmAjJrdWNQ8t+bMXyHmnTsuI=;
+        b=Ugju8VLsoghX2a0iSLRFG7uUMs4aIizMAFRcj9/S35XnhLmFHlHG1xVsTtcqXsbCAu
+         do4uWVhuYjo5Pb4U5wMy8WwqgnCF9uESVycAbbrMsh8RDJJ7rAmTXligNdu9uJAgw1xP
+         epUcCCTEFjl3NpC8dvhri9b/dQOurV0oCuY6kM2FfBo60eI7koXMjGC5n1wBat13gXL7
+         jP3vNWq0+FZiR5Yea+lYmmv7t+0N69Y1StKwBg7o1tpqP7DZz47BnCKl5yfpIw1VENjC
+         txMojVOXr8+f4ZhaEN3AMwVG4y6Qxz6En1IfuHY9zvYXC4b2AvRETv8Gb8PrNHzeNBTI
+         jR7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792889119; x=1793493919;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=zG8r7n5adPzuOqWBUaQLE4ST6ZHXuDXXcUP0nYBbPM0=;
-        b=Qt4L8ch5c5NizuOx5CYHHekYb2GUBiSKE2kbHMV3RTonNdlmwRhB0y+CHxwxEl9bHt
-         QtuW8tYT6zcD8vwk3hGChdxwnapnuJguCzY+n6L9q8VXrW5JduCrma94ubi2YNSuhpK0
-         EGVa8wzEAIkJZe88AcNPV2ksiFeY+TieQDZrPKvd03/EcYonOvZp7zNzcZ7jjXIlMnig
-         7NVlNg5xHmtPKmQOo+OmmC18yzZDwQ4UQmhCpdVcVEHx3FG1KFYiqMxt4Vfut67xwoA7
-         8ZQehbUVIuj0PqEoO3i7Z24aPPUlPJXaLEAxpQeKz7QF/qdraQCYuXO/GagWS/JDckYz
-         0YoQ==
-X-Forwarded-Encrypted: i=1; AKwUvBx6V+gA9Gwgph8pZ+xxePZ2waoFLyLCZdLUlPVw/frUQfSUgGJ/wTOcl4CwqLlaA8JhKF28JyVvVggfkkQ=@vger.kernel.org
-X-Gm-Message-State: AFq9FYKN+1cp9ruM3kchbWl4YgE22EEURV3cIXCt57BHxCkFAjIqleEU
-	A/gON+MWfUOgkPntW8cWyy5EOD4K6PauWE+5VYBtbMJiOJQZGj2LlPkFT60Jcw==
-X-Gm-Gg: AYBFou0jzMLPtA9Yh21dZ72zTjKEoYQ2YDRiYdJLr1gc6SZKw7MJ7M5fi0OKwtmETHf
-	4lfKW3fcGFcImgNZp78AmMVI13J8CE1hWJF2xvvA/+Ft+/mx0XkEiJxGTl326+FgQ6n10bl+Axy
-	0LlB3A4v2TDqZMPSl7jiACdagHg8OwN8AiaowUxiE1dXwR82NF4iyYYkj2gR2iBRp8yMpZGLOcm
-	L1KCYYF0tz2qKf6WIUZ5NiO4h3u3ERfmm3jwcK0w+PlAdUY9G70VHvVB125ZXzhO17IwUewJbLy
-	CMH/U77PpTw5WDw/ASHdVSZyo7xzjuPcPnFXvFENBwygWjM6qCNsUEq3/qNdAxovH90ztBAIAwH
-	SfL++3z6c+yxztkE6knO0OStOYF+mtA8V1CEpRMh0Ar3RGYq7qoGxUEOfIHnXXZac3J3zqBjZfR
-	2hkvH8Z4PrcapE5dzBmaEKqG3DrdvUijdynG0hxujDpiKQU6x1p5/yitSrtvdXBpJQ8V/UuP32L
-	W1MEQGPrff8Wd75k8lUMn4fjMDWQJorCXoIK+LFnK3qLiYUiHii28JL9p3Ra1olnjYP4A==
-X-Received: by 2002:a05:6870:3196:b0:4a6:f698:df8f with SMTP id 586e51a60fabf-4a83f5f099bmr2252359fac.42.1792889118900;
-        Sat, 24 Oct 2026 17:45:18 -0700 (PDT)
+        d=1e100.net; s=20260707; t=1792889260; x=1793494060;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=nb0uRXvBK+EdWFyShmZhmAjJrdWNQ8t+bMXyHmnTsuI=;
+        b=l+sKHpnWJeJWQ3w6u7mlnpnbE3vvAGy+AgwaUMeidZqOXJ1NUplQTqkud9Yxk+INV7
+         UKdLdHOkLB1GeeZhwohgyH4lKSTkeA35xXMl0t0i9ygn08rX774uJjH7Qao2OivzTOOk
+         ZJW4KhK6TSOBDgv48GN2tenalVORJGPx51cJpIH11fr0sT04P/n2rgCgZ/FVvGs+yK47
+         SOhp7MwKJN+6wBF+u5bvNL97TwyLnr8zP0zRet+xG+Us1NSbaUkzrVpOi6aI25EHJpd7
+         rGP3A0XjwT2NTZwXanoBuoUCibSDuck3H+n3pgr1100fe3VjtiU+SWYrbu7eobK4DJPz
+         /ZKw==
+X-Forwarded-Encrypted: i=1; AKwUvBw46rqw0Jv3KJOVJgoM/QyqYrNAbaY7golH3hfht/TwpZBZb8WxAFpHfr4B8GACuKa2uylML1l90//g+JM=@vger.kernel.org
+X-Gm-Message-State: AFq9FYJK0WTwbkBwyL8c4mYGDJrPnxTQ1GfZYVUcYf6WCA8huUBvlr5g
+	pYwbNYF0/njntXlCbZObe6OW4T4tuBo2ivAdPkm2vbWrGcQ5v8rheFn3
+X-Gm-Gg: AYBFou0mYAAhd96d1jR/tnha/fl4SrKd3EeHurjfEUQLzYIS6PkeOX6YBEWtbcba9vc
+	23QTMwf/4fP3WRwAqEXFTC6ZsTfK0H4k9Sji/Vnm1dp4l+OigzOd96coWYR9TlkqqMjNNsYTMuB
+	CdxOswXj+/3Oj/hyqUqPl5Yc9wGIfCg4Qzl/8LMzvpvj51i20F8087Ap9pZ3LFae3PUdo7iXjPd
+	VuUoR08tGfaHYM9/XOJLa4sxI4la2zNc9LEqOCsHPe0U7HKqcbxu62e70LX5cC+j2j+tRB2hds6
+	o9VZ6GBftPT5mYl8LgAKs7Bu7cjNNUG7Lj2aHI4SGBTIh1Km39Nv4m7IcvmjwGnU7hOID2wzySU
+	r1V0gRsuODebh9eqpd32uJ9CpRz/uv481mId8MG6evJ80umrb+hueCKh/RmAo5q7zkFucUgsPK9
+	GugzJa3HCzIWD49Xa8FxJEPl8oT8hgmEKADkNcLc60J1okWww+BRQkADNU7CJSozY4qV/DCY/nC
+	akgyk//tKj3Xu8gkfkbbLkRUk+7+ILSIw+pRZBTRUV3ydCJk0vefg4VvxdGLc6Dzz1rhQ==
+X-Received: by 2002:a05:6830:6411:b0:81c:4784:a5e2 with SMTP id 46e09a7af769-850fda4d496mr2567474a34.6.1792889260041;
+        Sat, 24 Oct 2026 17:47:40 -0700 (PDT)
 Received: from sheng2080.cmix.louisiana.edu ([130.70.15.5])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4a84322d21asm1943245fac.16.2026.10.24.17.45.16
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-850fc002444sm3536258a34.23.2026.10.24.17.47.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 24 Oct 2026 17:45:17 -0700 (PDT)
+        Sat, 24 Oct 2026 17:47:38 -0700 (PDT)
 From: Leizhen Zhang <lzsx618@gmail.com>
-To: nathan@kernel.org,
-	nsc@kernel.org
-Cc: rostedt@goodmis.org,
+To: rostedt@goodmis.org
+Cc: Leizhen Zhang <lzsx618@gmail.com>,
+	nathan@kernel.org,
+	nsc@kernel.org,
+	ljs@kernel.org,
 	linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Leizhen Zhang <lzsx618@gmail.com>
-Subject: [PATCH v2] elf-parse: avoid an undefined shift when checking the ELF type
-Date: Sat, 24 Oct 2026 19:44:40 -0500
-Message-Id: <20261025004440.432272-1-lzsx618@gmail.com>
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/5] elf-parse: validate what the host ELF tools read from the file
+Date: Sat, 24 Oct 2026 19:47:23 -0500
+Message-Id: <20261025004723.432708-1-lzsx618@gmail.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20261019084749.03c4386b@gandalf.local.home>
-References: <20261019084749.03c4386b@gandalf.local.home>
+In-Reply-To: <20261019085754.1fcadee6@gandalf.local.home>
+References: <20261019085754.1fcadee6@gandalf.local.home>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -99,77 +101,65 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-elf_parse() takes a bitmap of permitted ELF types and tests it with
+On Sun, 19 Oct 2026 08:57:54 -0400 Steven Rostedt <rostedt@goodmis.org> wrote:
+> Definitely not a security threat here. If the object files are corrupted,
+> then this is not where you should be detecting it. Unless we change the
+> purpose of this tool as a corruption detector, this code *expects* the
+> input to not be corrupt. The reasons for checking various ELF header info
+> is if someone is porting this code to a new architecture where it doesn't
+> support it yet, we want to warn.
+>
+> I'm fine with adding robustness, but not complexity for an issue that
+> should never exist.
 
-	type = elf_parser.r2(&ehdr->e32.e_type);
-	if (!((1 << type) & types)) {
+Understood, and thank you for being direct about it. You are right and I am
+dropping most of this series.
 
-e_type is a 16-bit field read straight out of the file, so a type of 32
-or more shifts by at least the width of int and the result is undefined;
-31 shifts into the sign bit. All three users of the parser -- kallsyms,
-sorttable and tracepoint-update -- reach this with e_type unvalidated.
+To be clear about what I did and did not establish: every reproducer in the
+series is a file I corrupted by hand, one field at a time. I never had a
+legitimate object that triggers any of 2/5 through 5/5, and I should have
+treated "I can only reach this by editing the file" as the answer rather
+than as something for you to rule on. The cover letter asked you to review
+the threat-model classification; your answer is that the classification is
+not the interesting question, the premise is, and that is a fair correction.
 
-Found by fuzzing the host ELF tools with mutated object files under
-ASan/UBSan. Reproducer, on any vmlinux (or any ET_REL object for
-tracepoint-update), setting only e_type:
+So:
 
-  $ python3 -c 'import struct
-  d = bytearray(open("vmlinux","rb").read())
-  struct.pack_into("<H", d, 0x10, 40)
-  open("t.elf","wb").write(bytes(d))'
+ - 2/5, 3/5, 4/5, 5/5: withdrawn. They buy nothing for a toolchain-produced
+   object and, as you say, if the object is corrupt the build has already
+   lost. I am not going to re-send them in another shape.
 
-  $ ./kallsyms --sysmap=/dev/null t.elf
-  scripts/elf-parse.c:94:11: runtime error: shift exponent 40 is too
-  large for 32-bit type 'int'
-      #0 in elf_parse scripts/elf-parse.c:94
-
-(host tools built with -fsanitize=address,undefined)
-
-This does not need a corrupt file. include/uapi/linux/elf.h itself
-declares legitimate types above 32:
+ - 1/5: I would like to keep this one, and I am sending a v2 that just
+   deletes the comment you called useless. Not because of the fuzzer -- that
+   one does not rest on a corrupt file at all. include/uapi/linux/elf.h
+   declares
 
 	#define ET_LOPROC 0xff00
 	#define ET_HIPROC 0xffff
 
-so any processor-specific object -- and the 0xfe00..0xfeff OS-specific
-range the ELF spec reserves alongside it -- shifts out of range here
-while being a perfectly well-formed file. The tools would reject such an
-object either way; the point is that they currently reach that decision
-through undefined behaviour.
+   so a well-formed processor-specific object, and anything in the
+   0xfe00..0xfeff OS-specific range the spec reserves next to it, shifts by
+   more than the width of int in
 
-Reject a type that cannot be in the bitmap, and shift an unsigned 1 so
-that a type of 31 stays defined. No valid object changes behaviour: every
-ET_* value the callers put in the bitmap is far below 32, and a file with
-a larger e_type already took the error path -- it just took it through
-undefined behaviour.
+	if (!((1 << type) & types))
 
-Fixes: b055f4c431e3 ("sorttable: Move ELF parsing into scripts/elf-parse.[ch]")
-Assisted-by: LLM ASan UBSan
-Signed-off-by: Leizhen Zhang <lzsx618@gmail.com>
----
-v2:
- - drop the inline comment (Steven Rostedt)
- - note that ET_LOPROC/ET_HIPROC make this reachable from a well-formed
-   object, so it does not rest on the fuzzer finding it
----
- scripts/elf-parse.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+   The tools should and still do reject such a file; they just currently get
+   there through undefined behaviour, and on a UBSan build that is a hard
+   error rather than a clean "Invalid ELF type". That is a one-line fix with
+   no added state and no new failure mode.
 
-diff --git a/scripts/elf-parse.c b/scripts/elf-parse.c
-index ce1c2a670244..f02dc377e841 100644
---- a/scripts/elf-parse.c
-+++ b/scripts/elf-parse.c
-@@ -91,7 +91,7 @@ static int elf_parse(const char *fname, void *addr, uint32_t types)
- 	}
- 
- 	type = elf_parser.r2(&ehdr->e32.e_type);
--	if (!((1 << type) & types)) {
-+	if (type >= 32 || !((1U << type) & types)) {
- 		fprintf(stderr, "Invalid ELF type file %s\n", fname);
- 		return -1;
- 	}
--- 
-2.34.1
+   If you would rather see even that as churn, say so and I will drop it too.
 
+ - The separate sorttable and tracepoint-update patches are the same class of
+   change as 2/5-5/5. I am withdrawing both; see the other mail for the
+   tracepoint one.
+
+On the "porting to a new architecture" purpose: that is useful to know and it
+is not what I assumed the checks were for. It also explains why 1/5 is worth
+keeping and the rest are not -- the type check is exactly the warn-on-port
+path, and it should not be the thing that trips UBSan.
+
+Sorry for the noise on the other four.
