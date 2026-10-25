@@ -1,57 +1,66 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=24.134.29.49
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792946825;
-	b=NkgBHT2+gtOestcYzdoeH1p6V3tYlv5gzoZ/dD+Dd8t8UbrAeqTIo9J+72qkxaeKV9PA
-	 9k6ykPzlrfQ4y/CVkawy2G5gB3Q1p/Dg1WxmXFscsMb6Blsu2ao6wwxC89UkO7iE7HRZP
-	 OuDZHeRbBMoXNzFo90SqJTUxkxve+Ws/e27Na/G7XXQaZcGq0q7iLHSDJA8UFirSr+lgz
-	 V2VOVi8Gs83svPNm2FUSWG6Ra53EE9AixDnATQLW+XERJqDrwrLXX5anAs9XDpM+7lWIL
-	 3Dwde0MKsK7dnsJBdPcDmfmlGmaJQpj/zEELet6BSpFhePOh5l3Z1acmyOkYBzIvqGQ==
+	t=1792946843;
+	b=M8/KRQnoQaMmT6DGVF/BH1F2SV8XzPR6s+72iWTOBsslPXcAEdFXIqlhKkbjTSVDUFhZ
+	 uWr0J5FoEyywBcSUXqPAX6uWsj8klH54bJY3Luzz9KC1ao7/IOQB0KY5yxhUCg+btCIBo
+	 jPGpoZdqX+HYDxPSlfjefmyAUjzKQTp5xOYyfMyD2EKwN3L2t2BGUfBEBrPqkcN5dxasn
+	 qedz1tNPqd9Q9/IXpBCBreyEjmy7EFZoBhQ2fPVEXVvBE8YMaz88gkGB9aQ1gNhSvysEU
+	 IXnwcDBnbbbQIUk7Pk5qZqdeqBEpELgFpBqfgS3hL/GhM9QGUmVHmSAapiJXtauadlA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792946825;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:From:Date:Subject:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:
-	 References:In-Reply-To:To:Cc:X-Mailer:X-Developer-Signature:
-	 X-Developer-Key;
-	bh=qZJpeVsoVc1R3QnR6MUnjtBvtCvjfP4BItTHungucAk=;
-	b=bTZJGUz2M8qrzlpT4OmOE1kj9SmSIK2V5i/zuRGkHBTCD8h67sRQGQT2QECGPVsZn66e
-	 Y0xeY/wQDqsMt2LZtXE6svW+J6B2WXAe2t9BvgZA6MSGfN+O+xRJMEKCjypB5cXbReRwO
-	 6jAR37pRSgCYp11s0U21w4eq00fBI1qmACkhV1UMHYXOGOD0eA6F1brJkkKx4sKTBYLjX
-	 wPywTcbA9S7nqTmFLSuoXaBiU7bzeWe78Z6EkuHcjJfWRqE8ks9rCBnBRziHOgp3V73VN
-	 LCSaqbKBnmEkczCEj73O6vex6LlQEMGBwR037vTQTmeLqkeJOxXXHh1EsurCnRwuCMw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792946843;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=VKSqiYoNV2dByJKpxVMj7QeloSi8EsWCiTvTbPWvl+0=;
+	b=0H91vtbDxBzB8szVQ5y8NAFN0FWoVS/5JnWwZm3lG6CIBtp+WcXQjwRplTn2Nh8gcKbF
+	 q+u9rZpLzGeiqugJ8jb4VnBT71ElUj7RtfbCS+XENitX0U69LQEkQc9sPL466jadmes/N
+	 SeiocFz5S60hTiHCejEbv3j/x5RYxtZ51atU7NjdZps37shaKDGToYWEQ8gOr0gCln/Ee
+	 2o7UUeQYmFoB3QiAhg0iVzXvfSj4Cpa/U/f++xosovB7x47PXyEnQX8hcZv1rgwSDoFQu
+	 QUbeWHPflfgSrCYJnImJtZ/63QmKmjiJI3bKPEOYu2Ic1syrvkwjNeX2bJ8QOBz135A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=sigxcpu.org;
-	spf=pass smtp.mailfrom=sigxcpu.org;
-	dkim=pass header.d=sigxcpu.org header.i=@sigxcpu.org header.a=rsa-sha256 header.s=2024 header.b=FWUMVz8a;
-	arc=none smtp.remote-ip=24.134.29.49
-Received: from honk.sigxcpu.org (honk.sigxcpu.org [24.134.29.49])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=f5b5Tin9;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43952606A329;
-	Sun, 25 Oct 2026 16:47:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 43952606A329
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sigxcpu.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sigxcpu.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1FFF606A31A;
+	Sun, 25 Oct 2026 16:47:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=sigxcpu.org header.i=@sigxcpu.org header.a=rsa-sha256 header.s=2024 header.b=FWUMVz8a
-Received: from localhost (localhost [127.0.0.1])
-	by honk.sigxcpu.org (Postfix) with ESMTP id 12293FB03;
-	Sun, 25 Oct 2026 17:46:57 +0100 (CET)
-Received: from honk.sigxcpu.org ([127.0.0.1])
- by localhost (honk.sigxcpu.org [127.0.0.1]) (amavis, port 10024) with ESMTP
- id QCs1BPmB2cjW; Sun, 25 Oct 2026 17:46:54 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=sigxcpu.org; s=2024;
-	t=1792946812; bh=3nDEElbWW7mRqvIraI32WiLVtOfSNyfw7kBcEtdycuI=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=FWUMVz8aOmHvfXmPT3Ivrj/qsWmFW8pyCDcM/ufCuZB/auCqVKDGBmf9QbdYsOtdn
-	 opbKwlwZoOeMzDWFf0hRx/wnru1/6vxSh/JxvA3ztDgsZ5loBzEuzw9xiMcyt+Pzve
-	 SW46TacC9Q6D3YfSzrwKnhc+ZHy1W2EoQJMI590ksfM300PDztqYMcOoIsynC9gOfH
-	 Dj7XZuSps8rVzdPlLg3BSHCWg6Hgiz1uKW9VPlPeLTTeJtdAK8WPV1UAjppetBCFwz
-	 kWxCtkdku5FL4H8yDyA7WyIQvxpGdPWT1M9jKOc3XM0UTzOP4yEnvvtZIWvqjk7qUE
-	 UjDSECxhJqf/Q==
-From: =?utf-8?q?Guido_G=C3=BCnther?= <agx@sigxcpu.org>
-Date: Sun, 25 Oct 2026 17:46:36 +0100
-Subject: [PATCH v2 2/2] kbuild: deb-pkg: allow to set package name version
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=f5b5Tin9
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F4E51F01825;
+	Sun, 25 Oct 2026 16:47:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792946842;
+	bh=VKSqiYoNV2dByJKpxVMj7QeloSi8EsWCiTvTbPWvl+0=;
+	h=From:To:Cc:Subject:Date;
+	b=f5b5Tin9u2Wpyny2CDyLlZaIlurlFe2XXMxLakNe+IPOrn4Y+19ADTdhEUpoU+LrM
+	 bIfLv+Yob6sndJJJx+MRVaZS1hhH4m3bed/pU161JpQVPldd38sAOPxnNu4MrS1JES
+	 xWRxAqIlNavZlXlmUBaPVq7FDd+A+q/nAW1js5khsevfP0zmUUX1YbP93Z+6PJfhOe
+	 nsIFcrjNt9TkGcd+bwQ54H61xakInzU2jsst8wYritKNi0RE8kmz7xYvYYOIC52zlg
+	 4HS3FX914Z+C5z89uDVOih834gZUeEtX/1I2J7nuPxxk1md7gW9gBlVmZRpd2i/IfL
+	 8cLSosHxbjNVw==
+From: Sasha Levin <sashal@kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Sasha Levin <sashal@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	linux-api@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-kbuild@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	Christian Brauner <brauner@kernel.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Mark Brown <broonie@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [GIT PULL] Kernel API specification framework for v7.4
+Date: Sun, 25 Oct 2026 12:47:19 -0400
+Message-ID: <20261025164719.1831477-1-sashal@kernel.org>
+X-Mailer: git-send-email 2.53.0
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -61,94 +70,168 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20261025-deb-pkg-v2-2-8c33a4ac18ad@sigxcpu.org>
-References: <20261025-deb-pkg-v2-0-8c33a4ac18ad@sigxcpu.org>
-In-Reply-To: <20261025-deb-pkg-v2-0-8c33a4ac18ad@sigxcpu.org>
-To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
- =?utf-8?q?Guido_G=C3=BCnther?= <agx@sigxcpu.org>
-X-Mailer: b4 0.16.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1831; i=agx@sigxcpu.org;
- h=from:subject:message-id; bh=3nDEElbWW7mRqvIraI32WiLVtOfSNyfw7kBcEtdycuI=;
- b=LS0tLS1CRUdJTiBQR1AgTUVTU0FHRS0tLS0tCgpvd0VCYlFLUy9aQU5Bd0FJQVNXL2hsSksvT
- UhqQWNzbVlnQnEzako2UUlpcmhjeExnVU0yWHhnN2hoZFU0eHI5CkxlZU1SOEtkaUw2NzhTZTJQ
- WitKQWpNRUFBRUlBQjBXSVFSajlzemZsaUtkQ1NocktzTWx2NFpTU3Z6QjR3VUMKYXQ0eWVnQUt
- DUkFsdjRaU1N2ekI0dzdqRUFDL2t1OUJVQ2kzRzVOU01hM2piZzV1aEFaZXJZajJ2UnZZZ0poRQ
- o1aUI5WTdlZzdrekVqSk8yc3FwdUVxYTFGVnl1TUZxdlkzQ1h5dzZmNkl6ZzVkWjgweHlkN1Q2N
- XlQc1A5c2VWCll6SEU2SUtvWVNzMENaZE1nR2Z3TG92c3orT28xYjFGempWd054cWtNQnRDZ2NR
- WStPTlhmZXdzY24yblJSWHAKZit6OTFJZFc1L0xnc3ZWK1VHZ3RQNkFVQ0NvSFpsTWlIbmg3OGR
- xdWRiaVJad2JsZ0hQZWtMUWtnZGtvck1lUAphZVd3MzB4dnFkeU5QR1ZtMWRPUUJ5d3VkTjFjVE
- FIR2VQZnFERXlINk9oVm5EcUZOcC9VdDlQSjlWTDhyVEUwCkhkb0Nwa0VidnZINklMSDRVQ2lPZ
- jR5TEc3ZTBQa2VMNWFrMWE4N3RSZTFITGFhSjh1STdiNUpDVkhHWmVINC8KUFBaTDR5WkdhT29V
- cGFLNVlKd1h0ZnlGVExyTWwrNys4WStWTnlzQzdFNnpxNllYZDF5VWdzNXhrSU90OTFVUgpGRHg
- yY0R6UnoxSjdXbHNET201ZXA2citqbXZYUFBwMmhlK3lDS0YrSWtYYkU1VE1JU3Uya1BJb29oeU
- d5a2taCndidDNJbHZaR3Y3bXpUVGgyVFpDMHI1bzZiSWF5UTcrS2t5WEE0RGE1SGYyTlZOcmp0d
- TV4ZEZ6NDZLekFXZ2QKWHY0Qkc4MElsZmpnMnRhMUNKSVB5dUtpRlduOHNqaXhkV3hzUmhjeHpp
- UXFIVkxVQWE2YTJaUllCVGJqbkFvRwp3V2lLKzhRVkFFVXEzNjN1QmRSajYwTThZd0haazVncm1
- GSTlsTC9TMDM3MHAwVTAxWFVJS3VXNmJTbXJBRFFkCjBnK2orZz09Cj1Ba3dtCi0tLS0tRU5EIF
- BHUCBNRVNTQUdFLS0tLS0K
-X-Developer-Key: i=agx@sigxcpu.org; a=openpgp;
- fpr=0DB3932762F78E592F6522AFBB5A2C77584122D3
 
-Instead of hardcoding ${KERNELRELEASE} in the package name allow
-the user to override this.
+Hi Linus,
 
-This can be useful if one doesn't want to accumulate different packages
-for every commit or micro version bump by setting
-KDEB_PKGNAMEVERSION=7.3 or even KDEB_PKGNAMEVERSION=stable.
+Please consider pulling the kernel API specification framework. It has
+been discussed on the lists for over a year: five RFC rounds starting in
+June 2025, then v1 through v5 this year, the last on October 8:
 
-Signed-off-by: Guido Günther <agx@sigxcpu.org>
----
- scripts/package/mkdebian | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+  https://lore.kernel.org/all/20261008084956.2911790-1-sashal@kernel.org/
 
-diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
-index d4b007b38a475..44ca9991fd6f4 100755
---- a/scripts/package/mkdebian
-+++ b/scripts/package/mkdebian
-@@ -172,6 +172,12 @@ else
- 	packagename=linux-image
- fi
- 
-+if [ "${KDEB_PKGNAMEVERSION:+set}" ]; then
-+	packagenameversion=$KDEB_PKGNAMEVERSION
-+else
-+	packagenameversion=$KERNELRELEASE
-+fi
-+
- debarch=
- set_debarch
- 
-@@ -215,7 +221,7 @@ Build-Depends-Arch: bc, bison, flex,
-  python3:native, rsync
- Homepage: https://www.kernel.org/
- 
--Package: $packagename-${KERNELRELEASE}
-+Package: $packagename-${packagenameversion}
- Architecture: $debarch
- Description: Linux kernel, version ${KERNELRELEASE}
-  This package contains the Linux kernel, modules and corresponding other
-@@ -238,7 +244,7 @@ EOF
- if is_enabled CONFIG_MODULES; then
- cat <<EOF >> debian/control
- 
--Package: linux-headers-${KERNELRELEASE}
-+Package: linux-headers-${packagenameversion}
- Architecture: $debarch
- Build-Profiles: <!pkg.${sourcename}.nokernelheaders>
- Description: Linux kernel headers for ${KERNELRELEASE} on $debarch
-@@ -252,7 +258,7 @@ fi
- if is_enabled CONFIG_DEBUG_INFO; then
- cat <<EOF >> debian/control
- 
--Package: linux-image-${KERNELRELEASE}-dbg
-+Package: linux-image-${packagenameversion}-dbg
- Section: debug
- Architecture: $debarch
- Build-Profiles: <!pkg.${sourcename}.nokerneldbg>
+The branch has been in linux-next since next-20261009. I held off on
+sending this until the first week of the merge window was over, to let
+things calm down.
+
+There are two conflicts with what you already merged. linux-next resolved
+both the same way:
+
+ - Makefile: kbuild added '*.header-check' to the clean rule at the same
+   spot where this adds '*.apispec.h'. Keep both lines.
+
+ - fs/open.c: vfs added filp_close_sync() just above sys_close(), which is
+   where this adds the sys_close() kerneldoc. Keep filp_close_sync(), then
+   the new kerneldoc, then the existing "Careful here!" comment and
+   SYSCALL_DEFINE1(close).
+
+The following changes since commit a90ee4305c4a5df72c11b31dacfdc76e00fcf78a:
+
+  Linux 7.3-rc6 (2026-10-04 13:45:25 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/sashal/kapi.git tags/kapi-7.4
+
+for you to fetch changes up to ef777ef05ebcc5ea5393b4bd5af6fc3ad1b3aec9:
+
+  kernel/api: add syscall enter/exit tracepoints (2026-10-07 18:26:44 -0400)
+
+----------------------------------------------------------------
+Kernel API specification framework for v7.4
+
+The contract of a kernel interface (which arguments are valid, which errors
+come back and why, what context it can be called from, what it locks and
+what it changes) only exists as prose in man pages and comments, which
+tools cannot check. This adds a way to write that contract down in a form
+that tools can consume, next to the code it describes.
+
+A spec is structured kerneldoc covering parameter types and constraints,
+return values and error codes, execution context, locking, signals,
+capabilities and side effects. At build time kernel-doc turns it into C
+data in a dedicated section of vmlinux. From there a spec can be:
+
+ - checked against syscall arguments and return values at runtime by
+   CONFIG_KAPI_RUNTIME_CHECKS, a DEBUG_KERNEL option for x86 and arches
+   without syscall wrappers; a call that violates its spec fails with
+   -EINVAL before the handler runs
+ - read as JSON from debugfs
+ - extracted from vmlinux, debugfs or the source with tools/kapi, which
+   emits JSON, RST or plain text
+ - followed with the kapi_syscall_enter/exit tracepoints
+
+The first specs cover open, close, read, write and madvise, with a KUnit
+suite and a selftest in tools/testing/selftests/kapi.
+
+Everything is behind CONFIG_KAPI_SPEC, which defaults to off. With it off
+the syscall definition macros expand as before, kernel-doc output is
+unchanged, and the only change to fs/ and mm/ is the kerneldoc text.
+
+----------------------------------------------------------------
+Sasha Levin (11):
+      kernel/api: introduce kernel API specification framework
+      kernel/api: enable kerneldoc-based API specifications
+      kernel/api: add debugfs interface for kernel API specifications
+      tools/kapi: add kernel API specification extraction tool
+      kernel/api: add API specification for sys_open
+      kernel/api: add API specification for sys_close
+      kernel/api: add API specification for sys_read
+      kernel/api: add API specification for sys_write
+      kernel/api: add runtime verification selftest
+      kernel/api: add API specification for sys_madvise
+      kernel/api: add syscall enter/exit tracepoints
+
+ .gitignore                                       |    1 +
+ Documentation/dev-tools/index.rst                |    1 +
+ Documentation/dev-tools/kernel-api-spec.rst      |  648 +++++
+ MAINTAINERS                                      |   13 +
+ Makefile                                         |    1 +
+ arch/x86/include/asm/syscall_wrapper.h           |    3 +-
+ fs/open.c                                        |  557 ++++
+ fs/read_write.c                                  |  710 +++++
+ include/asm-generic/vmlinux.lds.h                |   14 +
+ include/linux/kapi_syscall.h                     |   35 +
+ include/linux/kernel_api_spec.h                  | 1226 ++++++++
+ include/linux/syscalls.h                         |   42 +-
+ include/trace/events/kapi.h                      |   74 +
+ init/Kconfig                                     |    2 +
+ kernel/Makefile                                  |    1 +
+ kernel/api/Kconfig                               |   74 +
+ kernel/api/Makefile                              |   13 +
+ kernel/api/internal.h                            |   25 +
+ kernel/api/kapi_debugfs.c                        |  553 ++++
+ kernel/api/kapi_kunit.c                          |  720 +++++
+ kernel/api/kernel_api_spec.c                     | 1470 ++++++++++
+ mm/madvise.c                                     |  549 ++++
+ scripts/Makefile.build                           |   26 +
+ tools/docs/kernel-doc                            |   12 +-
+ tools/kapi/.gitignore                            |    3 +
+ tools/kapi/Cargo.lock                            |  679 +++++
+ tools/kapi/Cargo.toml                            |   20 +
+ tools/kapi/Makefile                              |   33 +
+ tools/kapi/README.md                             |   33 +
+ tools/kapi/src/extractor/debugfs.rs              | 1704 +++++++++++
+ tools/kapi/src/extractor/kerneldoc_parser.rs     | 3335 ++++++++++++++++++++++
+ tools/kapi/src/extractor/mod.rs                  |  442 +++
+ tools/kapi/src/extractor/source_parser.rs        |  531 ++++
+ tools/kapi/src/extractor/vmlinux/binary_utils.rs |  461 +++
+ tools/kapi/src/extractor/vmlinux/mod.rs          | 1160 ++++++++
+ tools/kapi/src/formatter/json.rs                 |  659 +++++
+ tools/kapi/src/formatter/mod.rs                  |  220 ++
+ tools/kapi/src/formatter/plain.rs                |  679 +++++
+ tools/kapi/src/formatter/rst.rs                  |  802 ++++++
+ tools/kapi/src/main.rs                           |  123 +
+ tools/lib/python/kdoc/kdoc_apispec.py            | 1391 +++++++++
+ tools/lib/python/kdoc/kdoc_files.py              |   12 +-
+ tools/lib/python/kdoc/kdoc_parser.py             |  101 +-
+ tools/testing/selftests/Makefile                 |    1 +
+ tools/testing/selftests/kapi/.gitignore          |    2 +
+ tools/testing/selftests/kapi/Makefile            |    7 +
+ tools/testing/selftests/kapi/kapi_test_util.h    |   31 +
+ tools/testing/selftests/kapi/test_kapi.c         | 1163 ++++++++
+ 48 files changed, 20350 insertions(+), 12 deletions(-)
+ create mode 100644 Documentation/dev-tools/kernel-api-spec.rst
+ create mode 100644 include/linux/kapi_syscall.h
+ create mode 100644 include/linux/kernel_api_spec.h
+ create mode 100644 include/trace/events/kapi.h
+ create mode 100644 kernel/api/Kconfig
+ create mode 100644 kernel/api/Makefile
+ create mode 100644 kernel/api/internal.h
+ create mode 100644 kernel/api/kapi_debugfs.c
+ create mode 100644 kernel/api/kapi_kunit.c
+ create mode 100644 kernel/api/kernel_api_spec.c
+ create mode 100644 tools/kapi/.gitignore
+ create mode 100644 tools/kapi/Cargo.lock
+ create mode 100644 tools/kapi/Cargo.toml
+ create mode 100644 tools/kapi/Makefile
+ create mode 100644 tools/kapi/README.md
+ create mode 100644 tools/kapi/src/extractor/debugfs.rs
+ create mode 100644 tools/kapi/src/extractor/kerneldoc_parser.rs
+ create mode 100644 tools/kapi/src/extractor/mod.rs
+ create mode 100644 tools/kapi/src/extractor/source_parser.rs
+ create mode 100644 tools/kapi/src/extractor/vmlinux/binary_utils.rs
+ create mode 100644 tools/kapi/src/extractor/vmlinux/mod.rs
+ create mode 100644 tools/kapi/src/formatter/json.rs
+ create mode 100644 tools/kapi/src/formatter/mod.rs
+ create mode 100644 tools/kapi/src/formatter/plain.rs
+ create mode 100644 tools/kapi/src/formatter/rst.rs
+ create mode 100644 tools/kapi/src/main.rs
+ create mode 100644 tools/lib/python/kdoc/kdoc_apispec.py
+ create mode 100644 tools/testing/selftests/kapi/.gitignore
+ create mode 100644 tools/testing/selftests/kapi/Makefile
+ create mode 100644 tools/testing/selftests/kapi/kapi_test_util.h
+ create mode 100644 tools/testing/selftests/kapi/test_kapi.c
 
 -- 
-2.53.0
-
+Thanks,
+Sasha
