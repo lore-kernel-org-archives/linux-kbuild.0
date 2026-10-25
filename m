@@ -1,59 +1,95 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.48
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792881200;
-	b=g+1GD1E0pY37OVsXnWQ0/6uM4emrnwULEoqDZeoXSk+pAqLbHbQyrOX+0KMEAc1BGJcK
-	 ynHJv2HEFDq4ugXCE9nli5XgVCGJRtN3OQA6kx8ArO4yS/zTB3S5Jzfhu967K55Jhk5ME
-	 7UZeC8VM3NzJLqbWePxEfNbddr8t00yxlS22ZS5nj4x8pGVVFQ4jEDzhPDVwG63OBdHdK
-	 kBAhwof4J2521MdfWNeMuTSjYFT96tZXjOi1qLVkLpw/U4b59aXsFn8CuH/i+YQZCczl8
-	 qY1jEoyTcGlMKYkUqTdGg+4NfR3UiKh2pnqoAqaASN7SlIlQd4CbWDSzswzZbs04j4g==
+	t=1792889120;
+	b=e0uFlr6K5ioduQlrWI8Wjrpk4FmIZFgkTyJX9ph8HCihTkVqu1qXiYLB376hA03ALQmp
+	 Sh5qlcVByaGBwDDegGWIQh3uQiufAoCiZAwO1af2yN1B3dYkvNH7UaNBQMH8SgURpFKIJ
+	 6jeA6bt5YjUWC8oHmoBbBpPbd9HKP2bhSAQ93bMSoYosfYDsHOdWq9ioW7m4+FZB60Prw
+	 XmypXUR13SbpVv1DjgUFutJSliWw9rq23DziacbAKWDxUy8Z6qEAXrSq8yQUSXh9Q116h
+	 e2yq3j4D3XRjAhLBeP2+eoQTC+Ez4PH58ExGU+U5gZlFLrjBMGrARv1/xKjLokxEM6g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792881200;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=TGz7r1Aby2yZxmQUWdeEn21pWMzlGMbPc089rpZiF60=;
-	b=1iN946JnlMGq5vCIPvDUNw3Ol988IDJ7IKx6mjJDlN9MvABdb6RmZf6uTNjsuVMHhp45
-	 fwNAqL8p18IxqiPzK1+UhGDRlwYaVZ9gD3CiHa0IKdi2rydQ3PLtTpiz5AbRQGoZpwd3L
-	 dN6PaKW5sxY2xfaL0YZJMdXA/VBpbq8YpKbQ9B1G/0EcSogIAJ1ZdyTILVC4YjShtvQ4f
-	 PCgrn1UR0pK+s/o835nkLLFLUhUVo11nnFXVhfS4QxpJIz+Kc/HGi1sXUc8lvbTgvVOLt
-	 2zOAMAjTOQk6DRSQnaRnHm2Ci0EtMuKxwxryziOZlMR3Z4YhddEhCIB07F7v0Qncbtw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792889120;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-Id:X-Mailer:In-Reply-To:References:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=zG8r7n5adPzuOqWBUaQLE4ST6ZHXuDXXcUP0nYBbPM0=;
+	b=znEdPWVQ28nMMqjZ8ILdL6FZp25K5rDZlcYWKDJlr5ZLPdiMhtR8phCpTM6bZKC9kkOo
+	 alfPXaYyyas/1GMZ1/zkSImWWLzvrXJuE8foB5ygsszCMMQnEYrmm8h9Wxsfd1NPRGeoh
+	 xXLrri3KLB3lC0FHScC6lZNaZtads1hfguounrvZL6mjiOZ59XVmBj8tksEpA8RaXXnc6
+	 MIcpfWyguZ5m43nWfPATYibxF2/aN9dnkX/Dew9+jvrmcZTjWsa1DW+9QvmZH9fX16CNB
+	 KBxRlLV21GFG2QB7CtsIULaVPhiFeiv2vBDpJELxKaoiNcp38RoD+BkuOyo/sT1Xliw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="gsjvu2f/";
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=RYDu5ad2;
+	arc=none smtp.remote-ip=209.85.160.48
+Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D16B606A31A;
-	Sat, 24 Oct 2026 22:33:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F404B606A324
+	for <linux-kbuild@vger.kernel.org>; Sun, 25 Oct 2026 00:45:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F404B606A324
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gsjvu2f/
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F9371F01825;
-	Sat, 24 Oct 2026 22:33:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792881200;
-	bh=TGz7r1Aby2yZxmQUWdeEn21pWMzlGMbPc089rpZiF60=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=gsjvu2f/4orqpDcqlU52e59XPEzbiNQWZwmx24oDc2m4q8v/RMh4WziztpRDDZt2W
-	 xNz+BSDzwqxY2zYdOFTTOI9pwpXA9f85PDGAmayIcFuJj12Bs/CRmw6GS+BGuCdUrC
-	 jxgniBwN0BjPxPAfYSyOyPga1BAG8EpB7SiVL56cHXq/4jKgu+919p8Q/LKuc9Un1z
-	 PbpsxA1ZpTY/vCHXLp3ACN1jJuTn3mC3/S1G/fWd9t9MkWNalMPqoyGhFIA5WQLXh/
-	 goSgcTd9OOh68bUe4fqvHumpgCBe7JoCodiLLKncAlQ7NXQiBJZgnRZRm16FYepzsp
-	 BEAiWyOFXjoRQ==
-Message-ID: <sashiko-outbox-183928@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v5 1/2] kbuild: Convert %.dtb(o) targets to single
- target rules
-Reply-To: sashiko-reviews@lists.linux.dev
-To: =?utf-8?b?Um9iIEhlcnJpbmcgKEFybSk=?= <robh@kernel.org>, "Nathan
- Chancellor" <nathan@kernel.org>, "Nicolas Schier" <nsc@kernel.org>, "Saravana
- Kannan" <saravanak@kernel.org>
-Cc: "David Heidelberg" <david@ixit.cz>, "Arnd Bergmann" <arnd@arndb.de>, linux-kbuild@vger.kernel.org, devicetree@vger.kernel.org, conor+dt@kernel.org
-In-Reply-To: <20261023-dtb-dirs-v3-v5-1-dfe13d47aa64@kernel.org>
-References: <20261023-dtb-dirs-v3-v5-0-dfe13d47aa64@kernel.org>
- <20261023-dtb-dirs-v3-v5-1-dfe13d47aa64@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 24 Oct 2026 22:33:19 +0000
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=RYDu5ad2
+Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-483d290f398so1165197fac.2
+        for <linux-kbuild@vger.kernel.org>; Sat, 24 Oct 2026 17:45:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1792889119; x=1793493919; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=zG8r7n5adPzuOqWBUaQLE4ST6ZHXuDXXcUP0nYBbPM0=;
+        b=RYDu5ad27CZ/qaXiTHxKhU9GnIvlaaCG5KHSOcv0GgWGsb8l2wGJDz7fX+vwzzWd5e
+         mMskqr6niv71jVe9W37SOUGIoZd6B7JZZ7jzDn+UGj1ZgVvMUSfMVAA3nUN/uRpTIOjo
+         sEB3eb1Vms4P+eQDEocprxkAh1mwI9/3drANeyWyNN8UPfsKf4/RXuTFxFgNGXp9Y/QT
+         2l2Zw47abGDRwSzanB2sOVkoCKQro0jlGjQINhv6ZU5PpWRwzcihylJPe1tdqVaU82Eo
+         OvLNZszqxSidHfbDutJdazwyjvIjPJeoyFQeD7Lf2jn+g0Ywppjo/lt83PZpihPWT1g4
+         YLUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792889119; x=1793493919;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=zG8r7n5adPzuOqWBUaQLE4ST6ZHXuDXXcUP0nYBbPM0=;
+        b=Qt4L8ch5c5NizuOx5CYHHekYb2GUBiSKE2kbHMV3RTonNdlmwRhB0y+CHxwxEl9bHt
+         QtuW8tYT6zcD8vwk3hGChdxwnapnuJguCzY+n6L9q8VXrW5JduCrma94ubi2YNSuhpK0
+         EGVa8wzEAIkJZe88AcNPV2ksiFeY+TieQDZrPKvd03/EcYonOvZp7zNzcZ7jjXIlMnig
+         7NVlNg5xHmtPKmQOo+OmmC18yzZDwQ4UQmhCpdVcVEHx3FG1KFYiqMxt4Vfut67xwoA7
+         8ZQehbUVIuj0PqEoO3i7Z24aPPUlPJXaLEAxpQeKz7QF/qdraQCYuXO/GagWS/JDckYz
+         0YoQ==
+X-Forwarded-Encrypted: i=1; AKwUvBx6V+gA9Gwgph8pZ+xxePZ2waoFLyLCZdLUlPVw/frUQfSUgGJ/wTOcl4CwqLlaA8JhKF28JyVvVggfkkQ=@vger.kernel.org
+X-Gm-Message-State: AFq9FYKN+1cp9ruM3kchbWl4YgE22EEURV3cIXCt57BHxCkFAjIqleEU
+	A/gON+MWfUOgkPntW8cWyy5EOD4K6PauWE+5VYBtbMJiOJQZGj2LlPkFT60Jcw==
+X-Gm-Gg: AYBFou0jzMLPtA9Yh21dZ72zTjKEoYQ2YDRiYdJLr1gc6SZKw7MJ7M5fi0OKwtmETHf
+	4lfKW3fcGFcImgNZp78AmMVI13J8CE1hWJF2xvvA/+Ft+/mx0XkEiJxGTl326+FgQ6n10bl+Axy
+	0LlB3A4v2TDqZMPSl7jiACdagHg8OwN8AiaowUxiE1dXwR82NF4iyYYkj2gR2iBRp8yMpZGLOcm
+	L1KCYYF0tz2qKf6WIUZ5NiO4h3u3ERfmm3jwcK0w+PlAdUY9G70VHvVB125ZXzhO17IwUewJbLy
+	CMH/U77PpTw5WDw/ASHdVSZyo7xzjuPcPnFXvFENBwygWjM6qCNsUEq3/qNdAxovH90ztBAIAwH
+	SfL++3z6c+yxztkE6knO0OStOYF+mtA8V1CEpRMh0Ar3RGYq7qoGxUEOfIHnXXZac3J3zqBjZfR
+	2hkvH8Z4PrcapE5dzBmaEKqG3DrdvUijdynG0hxujDpiKQU6x1p5/yitSrtvdXBpJQ8V/UuP32L
+	W1MEQGPrff8Wd75k8lUMn4fjMDWQJorCXoIK+LFnK3qLiYUiHii28JL9p3Ra1olnjYP4A==
+X-Received: by 2002:a05:6870:3196:b0:4a6:f698:df8f with SMTP id 586e51a60fabf-4a83f5f099bmr2252359fac.42.1792889118900;
+        Sat, 24 Oct 2026 17:45:18 -0700 (PDT)
+Received: from sheng2080.cmix.louisiana.edu ([130.70.15.5])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4a84322d21asm1943245fac.16.2026.10.24.17.45.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 24 Oct 2026 17:45:17 -0700 (PDT)
+From: Leizhen Zhang <lzsx618@gmail.com>
+To: nathan@kernel.org,
+	nsc@kernel.org
+Cc: rostedt@goodmis.org,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Leizhen Zhang <lzsx618@gmail.com>
+Subject: [PATCH v2] elf-parse: avoid an undefined shift when checking the ELF type
+Date: Sat, 24 Oct 2026 19:44:40 -0500
+Message-Id: <20261025004440.432272-1-lzsx618@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20261019084749.03c4386b@gandalf.local.home>
+References: <20261019084749.03c4386b@gandalf.local.home>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -62,145 +98,78 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
-s) to consider:
-- [High] kbuild: single-target .dtb and .dtbo rules fail to descend into bo=
-ot/dts
-- [Medium] kbuild: unconditional dtstree prefixing corrupts non-dtstree .dt=
-b targets
---
+elf_parse() takes a bitmap of permitted ELF types and tests it with
 
-commit 7e93223635a0ece771bb2b9e12840b3751ca5a16
-Author: Rob Herring (Arm) <robh@kernel.org>
+	type = elf_parser.r2(&ehdr->e32.e_type);
+	if (!((1 << type) & types)) {
 
-kbuild: Convert %.dtb(o) targets to single target rules
+e_type is a 16-bit field read straight out of the file, so a type of 32
+or more shifts by at least the width of int and the result is undefined;
+31 shifts into the sign bit. All three users of the parser -- kallsyms,
+sorttable and tracepoint-update -- reach this with e_type unvalidated.
 
-This commit replaces the dedicated top-level %.dtb and %.dtbo rules with the
-generic kbuild single-target infrastructure, rewriting relative DTB paths to
-include $(dtstree) and using dtbs_prepare as the prerequisite for DT-only
-single builds.
+Found by fuzzing the host ELF tools with mutated object files under
+ASan/UBSan. Reproducer, on any vmlinux (or any ET_REL object for
+tracepoint-update), setting only e_type:
 
-> diff --git a/Makefile b/Makefile
-> index 4ad67b737af7a..c307ee9293bcd 100644
-> --- a/Makefile
-> +++ b/Makefile
+  $ python3 -c 'import struct
+  d = bytearray(open("vmlinux","rb").read())
+  struct.pack_into("<H", d, 0x10, 40)
+  open("t.elf","wb").write(bytes(d))'
 
-[ ... ]
+  $ ./kallsyms --sysmap=/dev/null t.elf
+  scripts/elf-parse.c:94:11: runtime error: shift exponent 40 is too
+  large for 32-bit type 'int'
+      #0 in elf_parse scripts/elf-parse.c:94
 
-> @@ -2212,8 +2208,20 @@ ifneq ($(KBUILD_MODPOST_NOFINAL),1)
->  endif
->  	$(Q)rm -f modules.order
-> =20
-> +# For compatibility with existing %.dtb targets without full path
-> +single-dtb :=3D $(filter-out $(dtstree)/%, $(filter %.dtb %.dtbo, $(sing=
-le-no-ko)))
-> +single-no-ko :=3D $(filter-out $(single-dtb), $(single-no-ko)) $(addpref=
-ix $(dtstree)/, $(single-dtb))
+(host tools built with -fsanitize=address,undefined)
 
-[Severity: Medium]
-What happens here when building an in-tree .dtb or .dtbo target located
-outside $(dtstree), such as make drivers/of/empty_root.dtb or
-make drivers/of/unittest-data/testcases.dtbo, or when $(dtstree) is empty?
+This does not need a corrupt file. include/uapi/linux/elf.h itself
+declares legitimate types above 32:
 
-Because single-dtb matches any %.dtb or %.dtbo target that does not begin
-with $(dtstree)/, targets under drivers/of/ or drivers/clk/ have
-$(dtstree)/ unconditionally prepended to their path, rewriting them to
-non-existent paths under arch/$(SRCARCH)/boot/dts/drivers/....
+	#define ET_LOPROC 0xff00
+	#define ET_HIPROC 0xffff
 
-In addition, unlike the single-dt-patterns check just below, this rewrite is
-not guarded by ifneq ($(dtstree),). On architectures without a boot/dts
-directory or during external module M=3D builds where $(dtstree) is empty,
-$(addprefix $(dtstree)/, $(single-dtb)) prepends a leading / to the target.
+so any processor-specific object -- and the 0xfe00..0xfeff OS-specific
+range the ELF spec reserves alongside it -- shifts out of range here
+while being a perfectly well-formed file. The tools would reject such an
+object either way; the point is that they currently reach that decision
+through undefined behaviour.
 
-Should this rewrite be guarded by ifneq ($(dtstree),) and restricted to
-paths that actually exist under $(dtstree) (or do not already exist at their
-given path)?
+Reject a type that cannot be in the bitmap, and shift an unsigned 1 so
+that a type of 31 stays defined. No valid object changes behaviour: every
+ET_* value the callers put in the bitmap is far below 32, and a file with
+a larger e_type already took the error path -- it just took it through
+undefined behaviour.
 
-> +
->  single-goals :=3D $(addprefix $(build-dir)/, $(single-no-ko))
-> =20
-> +# DT-only targets need host tools, but no architecture-specific preparat=
-ion.
-> +ifneq ($(dtstree),)
-> +single-dt-patterns :=3D $(addprefix $(dtstree)/,%.dtb %.dtbo)
-> +ifeq ($(filter-out $(single-dt-patterns),$(single-no-ko)),)
-> +single-build-prep :=3D dtbs_prepare
-> +endif
-> +endif
-> +
->  KBUILD_MODULES :=3D y
-> =20
->  endif
-> @@ -2225,7 +2233,7 @@ prepare: outputmakefile
->  # make menuconfig etc.
->  # Error messages still appears in the original language
->  PHONY +=3D $(build-dir)
-> -$(build-dir): prepare
-> +$(build-dir): $(single-build-prep)
->  	$(Q)$(MAKE) $(build)=3D$@ need-builtin=3D1 need-modorder=3D1 $(single-g=
-oals)
+Fixes: b055f4c431e3 ("sorttable: Move ELF parsing into scripts/elf-parse.[ch]")
+Assisted-by: LLM ASan UBSan
+Signed-off-by: Leizhen Zhang <lzsx618@gmail.com>
+---
+v2:
+ - drop the inline comment (Steven Rostedt)
+ - note that ET_LOPROC/ET_HIPROC make this reachable from a well-formed
+   object, so it does not rest on the fuzzer finding it
+---
+ scripts/elf-parse.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-[Severity: High]
-Does routing single .dtb and .dtbo targets through $(build-dir) allow
-scripts/Makefile.build to descend into arch/$(SRCARCH)/boot/dts?
+diff --git a/scripts/elf-parse.c b/scripts/elf-parse.c
+index ce1c2a670244..f02dc377e841 100644
+--- a/scripts/elf-parse.c
++++ b/scripts/elf-parse.c
+@@ -91,7 +91,7 @@ static int elf_parse(const char *fname, void *addr, uint32_t types)
+ 	}
+ 
+ 	type = elf_parser.r2(&ehdr->e32.e_type);
+-	if (!((1 << type) & types)) {
++	if (type >= 32 || !((1U << type) & types)) {
+ 		fprintf(stderr, "Invalid ELF type file %s\n", fname);
+ 		return -1;
+ 	}
+-- 
+2.34.1
 
-Previously, the %.dtb and %.dtbo rules invoked
-$(MAKE) $(build)=3D$(dtstree) $(dtstree)/$@, starting scripts/Makefile.build
-directly at obj=3Darch/$(SRCARCH)/boot/dts. With this change, $(build-dir)
-starts at obj=3D. and descends into obj=3Darch/$(SRCARCH), which includes
-arch/$(SRCARCH)/Kbuild. However, in arch/$(SRCARCH)/Kbuild (for example in
-arch/arm64/Kbuild):
-
-    # for cleaning
-    subdir- +=3D boot
-
-neither boot nor boot/dts is in obj-y, obj-m, subdir-y, or subdir-m. When
-scripts/Makefile.build evaluates single-subdirs at obj=3Darch/$(SRCARCH):
-
-    single-subdirs :=3D $(foreach d, $(subdir-ym), $(if $(filter $d/%, $(MA=
-KECMDGOALS)), $d))
-    single-subdir-goals :=3D $(filter $(addsuffix /%, $(single-subdirs)), $=
-(MAKECMDGOALS))
-
-single-subdirs is empty, so Kbuild stops descending at obj=3Darch/$(SRCARCH)
-and places arch/$(SRCARCH)/boot/dts/<vendor>/<target>.dtb(o) directly into
-$(targets) at obj=3Darch/$(SRCARCH) without ever including
-arch/$(SRCARCH)/boot/dts/Makefile or the vendor subdirectory Makefile.
-
-This causes three regressions when building single targets at this commit:
-
-1. Building any single .dtbo target (e.g. make <vendor>/<overlay>.dtbo)
-   fails with "No rule to make target", because at obj=3Darch/$(SRCARCH),
-   need-dtbslist, dtb-y, and dtb- are empty, and scripts/Makefile.build:
-
-       ifneq ($(need-dtbslist)$(dtb-y)$(dtb-)$(filter %.dtb %.dtb.o %.dtbo.=
-o,$(targets)),)
-       include $(srctree)/scripts/Makefile.dtbs
-       endif
-
-   omits %.dtbo from the $(targets) filter, so scripts/Makefile.dtbs is
-   never included.
-
-2. Building any composite .dtb target defined via <name>-dtbs :=3D base.dtb
-   overlay.dtbo (such as make qcom/apq8016-sbc-usb-host.dtb) fails with
-   "No rule to make target" because the vendor Makefile is not included and
-   multi-dtb-y remains empty.
-
-3. Building simple .dtb targets matches $(obj)/%.dtb: $(obj)/%.dts at
-   obj=3Darch/$(SRCARCH) with target-stem set to boot/dts/<vendor>/<board>
-   instead of <board>, silently dropping per-directory DTC_FLAGS,
-   per-target DTC_FLAGS_<stem>, and base-dtb-y automatic -@ symbol
-   generation.
-
-Note that a subsequent commit in this series, commit 02ed329e5679 ("kbuild:
-Support directory targets for building DTBs"), partially addresses traversal
-by passing need-dtbslist=3D1 for DT builds and adding subdir-y +=3D boot/dt=
-s in
-scripts/Makefile.build when need-dtbslist is set, though this commit is
-broken on its own during bisection (and the %.dtbo filter omission in
-scripts/Makefile.build remains if need-dtbslist, dtb-y, and dtb- are empty).
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261023-dtb-dirs-v=
-3-v5-0-dfe13d47aa64@kernel.org?part=3D1
