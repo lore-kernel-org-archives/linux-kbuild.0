@@ -1,101 +1,101 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.49
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.177
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793054920;
-	b=W18XPjAaM47jvNB+ekgIVfuSAAoPelVVllzJgWV+7rqyjF2cV1TtR3l6OMy0t6q4aLvF
-	 gH6gzGaUUiX1llcbio5x2FvW4VXhVWkUKd6DAMiScZf3KJcY0OeSwi6rcswlo+y0EJd4n
-	 uVUpfu8xqE/8upiO8M7m/TqjFSn5BG1QCWY+aRQfhBV6I6hFhu6y/A8uIt6kHeodXG/fd
-	 rmLoFqGdUo/UP6CqHKjYvNOen1GA/WpYD5XVmYr2vY7uKz6+3elsWidg3Y3cwZoWWfYe+
-	 hllNC2FQvBkR93xmR/krtmD3Epce4YNfXeKPyVDviOM3DnLq4pDTm3YAtKiS/p6XYbQ==
+	t=1793060149;
+	b=Rx8/tse16dnFErhNmpwxBHCtTQRI1x7WGCUxP4QzQ1zAVrMpZX9R3dc48zqTbwP9tCoI
+	 gxUZbPi53Cj5U1x1vbo5MbvJ93G0OC+oNZ1cOXPQpN4Sc2qFobQfwCaoek0B9G6KwE5kD
+	 h+77RserouQBMAAOLofuqwH0knmLuLK3vSuny6ck9SRsG3YlkXySVGRUIqfeTXuY5HcS9
+	 cbkDc54tcmSPb25KPkpuCK51hz3WSGESxFjnv6kncdXRpXZCG/ha9OOLam0yaSY6KAFuW
+	 YGw9nRSvHooOuWIwCYhBRYr+TjqZhDrzdua4jyJvXxzJx0HCOijwM0+P4z0/qCvWiKA==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793054920;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793060149;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
 	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
 	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=mshdBP7zWJ8tsttLUx6xhnibBdLHVDUK/dBlFucrT6E=;
-	b=5blgjwsoVyYpqDUHEIlm0jzXglzZnyOD1k/h7KwrlAhpZAaqMsEfVdcP/hpU46MofUEs
-	 rAEgPcyXiFfjNb+Wxx4qFB30+urER73apApUmXDfHgvEvL3hhAKpRD9/gxtJy7kiVD01J
-	 MPgvTcrVYmw1hKU+F5hrycbMDg13QPVO7KnxGUrI4u97slPGhZ18xqI6wqY2LCq8Vtas4
-	 iAa7qmwciUbfORUo2xKWzq+USQI4KXoCBeVEOdg5zn7sxTLYgnoeh0hosAq9bPeBdwzZo
-	 /3EMiIkWea4lrvaooZru+HqomFxJbgw9U96jJO7aXFzqyMWp8e2wQHfG8R0JC3ap8Qw==
+	bh=qKeQmKdHS147YBCUhe6/TQHxqYO/kgxJinnL8fZRSJA=;
+	b=RbCfCNerg4TlS9Y9bIfYCxtXlnqw+riVSfh/Jc4W2nxIlPhk3EqTWto2M4EfEaRHIdl8
+	 cRVFrw5y7VlNXKRTX50zkjVOH+U+OVgr9Clx2YY5THa53nf4RrgVdn+lGVJkM9z6SsaRE
+	 F6vlT11yF2uPRWlKp3FHba583Pgh/oqSmCwiSiu+QCOGtuvcWjbLBSlmcE1BGw987KYuF
+	 WvgGE6Iyz1iHjmJrFlPqdJl0mIHQFFu4GwqUsy7coff+VX27Ez4XkesCSshSuNuS5vy6y
+	 ED1r4BTr/Bc5BGuHCLoSzstHpPrvxCnkLCT5ssTj3nqBqsoiyVjnzS0Bis3BuNMCRbg==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=SnF1ntF4;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.49
-Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=s0Wfg3DQ;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.177
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FFCF606A31D
-	for <linux-kbuild@vger.kernel.org>; Mon, 26 Oct 2026 22:48:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3FFCF606A31D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57FE3606A32C
+	for <linux-kbuild@vger.kernel.org>; Tue, 27 Oct 2026 00:15:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 57FE3606A32C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=SnF1ntF4
-Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-676858d42f8so3138409d50.2
-        for <linux-kbuild@vger.kernel.org>; Mon, 26 Oct 2026 15:48:40 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1793054919; cv=none;
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=s0Wfg3DQ
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-8b0db268bd8so23738717b3.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 26 Oct 2026 17:15:49 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1793060148; cv=none;
         d=google.com; s=arc-20260327;
-        b=WSex2H9QcjO+s4HGURqs462u5vAVZ0htiuycvWNk4V4XhYvZk4Bs+cMNrwfGIghBax
-         5t1JKP3FlfzmAShV3IB3Fjo1r6fUGpLmkH8mFyVyujZmn78JIoVcMGrynvePaZwO7UOI
-         c1JhzfC/+f66qcYiVaNodo67CWjwXzZZe8UcgGAs2TYuKvF0mmFiBBDo8mJk71Fwh23r
-         c5+SwaRjoN1lxVUoQqaZNZU34FPexH+df7oUvbOjuhpvEXLmYV0tIFfUR1o0PGef/YAs
-         R39M6z6sOxKm3nvCDTCJCnNQCu1s/CkTiZA/VYWGG9GKySiluYICYps8qaR8O7Xmup2/
-         JiUw==
+        b=Ppl1Fc08Ho405m9r7GI/L8glkEAeoCSSi6lVAztxJcMmVDspryaNLuYk/B5PpvfEoK
+         dbHlRbJTvtxNXl+PX3WSzEbP1Cv3DJWKSUTMVGxKstJWpAen1SHOI9nW7gO9k7vC1rAw
+         yR6fcBEaMJ16OGjA3iQIiDuGnV0qWhTS+J9aLpzow+gCyQMBANi9aF/TP4ZSLg4uAdJh
+         uGp4vaBzDIc/avmHVAZ64UTNT7JQoMkBDZUatwXE02psyEaQYSNeO4U1bXnHmkoHAZIa
+         eQOqWXRLwK9lTxUukPn5Ztaq7h6zd74CdHFyvdWmzXjcNAasTTvSJH4QBZE2yMzDRi+L
+         K3mw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=mshdBP7zWJ8tsttLUx6xhnibBdLHVDUK/dBlFucrT6E=;
-        fh=ty7SxZUrtaMpKkZFEt06AYgbKCFfqpbLqC/ToX4/JzY=;
-        b=AegSydFPZ7o0SM3xlq65Ic3ng2p4jL4if3pZdKXqoYL3pFEAKztTiaGsA8Zpobie++
-         tA3VuyaqN8H7PedseK9GCfD6SL+IkecP8l92cmb7lY1oIRUNTBbeAvitEuPqMjIGMccy
-         NzSdL2W8km9wKoih95NFQ0lG9vsT10tZrucJ/JncvhUnlgiT/HtI4N2gWYLBT89W9n/w
-         tz8XKlTQwzclkJjvYyu0JuGP2eyfvRUhF3elo0xCrkrrPdx4GaSGOyGTEhl1wEfbXo0o
-         /89g2KomANXa9fmMy8Ft8d/U3WBkue98IhMdgEymQfVEgyD7sXjxASP8vWDCa3WZNW2y
-         jYtA==;
+        bh=qKeQmKdHS147YBCUhe6/TQHxqYO/kgxJinnL8fZRSJA=;
+        fh=0Db8JbtSA2dFivuE8s/Ng7G4Q+gUzmy7h1n8TA+PiMc=;
+        b=dPrqgvQdrM0qOteUu6kbIneRUR7iTzrZY+ZcoJcsQ2rDSjWvHC23T7Er3ROt9xEz72
+         r9XtcYyapZZKyMoCPKDXmI31DhiY/EzwHRnpDnkXFxE9ovySKVD/Tl3WkSipHMpe3cZp
+         3unXRR0/ZjkH1ER5FMXkUTG/aGvGvcx1yWPYmIg2lh6iUIY7q0yhQZNDxzglYmgdiF7l
+         HoHnqHaK+xTFwHDIx2Q5WaH/8C9c3NpDkp4HIaLd5agywSPx+1RE6KzuNMz1HH3bAw4n
+         Olf/OYHVt2LW26EFtMpUikC3UkTjEjZwwh+hh+Bo65srHJQ5a7FvP/it6phKvjO8ehB5
+         EQFQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1793054919; x=1793659719; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1793060148; x=1793664948; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=mshdBP7zWJ8tsttLUx6xhnibBdLHVDUK/dBlFucrT6E=;
-        b=SnF1ntF4XuLhwTNO4r8C2ofkbyMGGoR5PdXfNN9t9VWO3yFs/8r66gFcF1pdNQXepR
-         kIJl0rsP1RI/QJNEhD6E+yBQMtCr8/NiDPP0/sPqOAEJQbcigh4QoPTtV1j4hmNIBMZE
-         JtpnOGRAz9wHIHTLgqLBwyeXq15P6A00Oo8kMOjhQ3iK2kBHSKD0rNGzA7wm0vXSVzrc
-         VADoUaE+fbMk8xm6WZNerxuTP4l2ZJEkEZgdKL2QZQ3lB/wB5ZxnsdYIu+6tsnhCmNzY
-         iO0tVHNvUNJ3n2VwO2fW8ASjzII7w2kI4NwdAg4aTjTWsotY75oYDRofd6KgyLtNuQU7
-         Y+mw==
+        bh=qKeQmKdHS147YBCUhe6/TQHxqYO/kgxJinnL8fZRSJA=;
+        b=s0Wfg3DQSfdPBtgTrPJ7hEq4HUweU0fxNhhrERYXULKUVGjvojByBZj8KKVt7nRxU+
+         qfuMSheIJo5HVMHmH35pJ0m4FosgwDQvoFqO6hWdyPRkiWPWjpgGD4+44lYarYwcj4p9
+         lwGrCp9TiIJ7Y9Q7o3VLX5IDHtJph2ZfYWK9hb7nwFZcN/EGzSOwKwJdiqW4e4tKM19a
+         TwcHswoqbtz3QUq2JqUArNS2ontBIM0U5Az1Xxt/qvNOY6jlotL5RVH54V4eQYaO9/UJ
+         cfXBJNeZLYP/7FfHZRk1FnPXiW2XAqkAAz+W61A369XeoogwEs/6FcBTuT08s5U96hTP
+         UsKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793054919; x=1793659719;
+        d=1e100.net; s=20260707; t=1793060148; x=1793664948;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=mshdBP7zWJ8tsttLUx6xhnibBdLHVDUK/dBlFucrT6E=;
-        b=H0q0MWEBU07ivD02PFoilusmxxzG0Er4mFyFR+ma5Hloc63iy5m0KOXxVka5Y4wMrZ
-         MoXcxkpBJuY6vlprcGWaJDWGPrM/GFyJ46XDPB3kWhPByatVgSAa/jTT0+ayBWI7macj
-         cut5lmiaugNBzqWaiJmN94ZTSOiJvPesO9iyHEcoVC+56FAVXhhaQoLG2Ckgvlp0r0NX
-         dHZKOuPza6Mp8bzVtFS7Xe2MTqL4e/IwAvwt5v4xjz37RFssGutrAQLZFAnrk3VHab4J
-         lnxWSID/XiKsL6o/eReYkuHmu5/l25V0K1BUz0VZUag+CMxvp2xaDYEuoZ2KaDqSX+Na
-         i5mg==
-X-Forwarded-Encrypted: i=1; AKwUvBylZG+gEcfsfxjtlLAu0hncbuedOibbiSAyAl6CeTy1lb11MJwdhKMVeGxJDBDvSldXHBTYOfBnGZ/sLak=@vger.kernel.org
-X-Gm-Message-State: AFq9FYKdGJ/WT1MNNkFBfq9r9MoVDHU+4qq3CuzmYQ/Nxm3MBbQzcX1B
-	hzBJI1UP+mbomyhZQOr9pbk9VZL4Gb1LzhbkGVCLsgWmo2/tiQ7Uyvr24mX00j0cqg+EdED52cf
-	Z6lgjZc2En1ULuj1dP6C0CpCsyQbU9/I=
-X-Gm-Gg: AYBFou0cNv2UrH2S0hCOtcSr5yejg9s+GcphwQw0daYVvKtw7ZulUUZGU/GPJjvqhrz
-	6mFFrGuu/hiySEcOVAb9MIf2bwSKvCZeCCDrwmAO6qsa8RCqd8l/4hEQ1V0RIkof2WDZWfkY5SG
-	OsiOEYJWXtWjzHNgy3jcAzsotIG+GMjQpszL9gaEtd1i7SsVN3vntLdfasLYg8RJJg8LciR0OAY
-	xKEQgp2+LwambUKP5dZx+xJuxm5baAS+RYHwVm1vBuLiIpDu+FCAbXBMLz7E27HEUCTawOiFuSW
-	eJm29Zmyd03CNQIqxnMV1ctV7GzUl9+NJL1OXqfaBWuetGQU6Afte/J4VPrl6IqXTZm6nTVGkhb
-	E6Zo8IjoJwSS8BRZbwtADgro9SzFWz85Nvor5LfBKEOOtzHhT+p9oGBOWtaZLcJ/WTrbfG1O2Wf
-	fVWDmXrPB1KRJLzWs=
-X-Received: by 2002:a53:ad85:0:b0:672:ef39:5fc6 with SMTP id
- 956f58d0204a3-67a454900ffmr2904378d50.147.1793054919173; Mon, 26 Oct 2026
- 15:48:39 -0700 (PDT)
+        bh=qKeQmKdHS147YBCUhe6/TQHxqYO/kgxJinnL8fZRSJA=;
+        b=hkFm2eFUnM4u4pARSVEGIl0c3HyZSgjUz/va9He7SD+fjnjg8uTgWkog2/a037EAOp
+         Xv+UFaY8XP2wz96L15xVSYVqsjsV3BKz6IgI20oa+zvxN6Enp5UIru1Un2S6igqI5iAX
+         i6mgClaCR/mir9jA1AkepvH1e73pJpJN3bwpO7eLOsjmwghkTkkFknNi0rxkNjOHiUmo
+         PATB2U0wXw3vF5ARQ8mvpBGei/gKeVqcvpGQDlemS1BS8kLEgKPI9QFRupWb636VY7VO
+         547femLwEs12YQqjDp2p+F3t1J/Z5BbxeX+4wXfU49JkcDQDs9B+opQlnwIXfeX9Oe0n
+         FD7Q==
+X-Forwarded-Encrypted: i=1; AKwUvBzf1F5K20EAhCZ3qI8mbvoq7sEPJdX94EfpkwrOl9T/GtYiAdgmUpCp8BzCvHTvAG6g1fiJBKICOSIqupI=@vger.kernel.org
+X-Gm-Message-State: AFq9FYLm8mxpqaZ94J7Z7lud7vCPksOPpiifpXDtidskxsQLgsb9GkOc
+	iF0FXa1pncZqSK1TTx4aFAKbBZZ2a5jzF4dljJkCeq+3SOjU3NXWWPqvzx+gUH5drZhUSTXFxEg
+	XvI/UDCo8upJFsHoe9R8LcqmvApNUHFo=
+X-Gm-Gg: AYBFou1Go2p2EZPKlkqVjieyuFeBmsL0+fMQahtGL8VtHkkhSPCBrknyiz3sQKRUe7b
+	P0dnj1SFdNNOOVr4xpAu3dK8K2uLXJH4QhFv0ltbIjWfZh6Wtip5jgQHtwoX+0h1iDFP49kI9An
+	AqqJpgdC0YuWrPXdf8v/pWqVFBVf5mmkIBc3RfJrx8fAcsjfM9DRCwN8NNZ+iiFkhLXH5cWxGwW
+	7Uk4IfjKqU9eYOKZ2/Q/0DCd8QN6qYzpyhd1cGaFvsD1ced6DS9gIBCcDkl61mRLYk0T8aexbcm
+	V9GPPbtNVHXOHyC0C57P7snvRyYsP55HvH5fJHNui9FBe0zfrKR+yzn3kyjmYeKOCuS4LEnxfKv
+	Eh+gKpTJY6/LHm57Hdsq1cVje2guDscjZmDP8/zo7JcIM1ApZMAXSd4a6iPYcOakKqs/a9rEypv
+	LzwNRNoQMPrJ5XroI=
+X-Received: by 2002:a05:690e:150f:b0:679:c803:98d1 with SMTP id
+ 956f58d0204a3-67a45496c6cmr4080476d50.152.1793060148265; Mon, 26 Oct 2026
+ 17:15:48 -0700 (PDT)
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -106,15 +106,14 @@ List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 References: <20261012-dd-cmap-part2-clean-v12-0-3c8cc5725def@gmail.com>
- <20261012-dd-cmap-part2-clean-v12-26-3c8cc5725def@gmail.com> <sashiko-outbox-170725@kernel.org>
-In-Reply-To: <sashiko-outbox-170725@kernel.org>
+ <20261012-dd-cmap-part2-clean-v12-33-3c8cc5725def@gmail.com> <as4W9hToBqAvbzJ-@pathway.suse.cz>
+In-Reply-To: <as4W9hToBqAvbzJ-@pathway.suse.cz>
 From: jim.cromie@gmail.com
-Date: Mon, 26 Oct 2026 16:48:13 -0600
-X-Gm-Features: AclHuK_U9GeBl7u0-5vmIpwTNJsdz2Sn-v3e-HGd_0bRIhFESQNIVxLVo-t00Ow
-Message-ID: <CAJfuBxxZ=znaXKhz6w3tT-qq-AKPQHWwzWr53w98k2wDAh3Ytw@mail.gmail.com>
-Subject: Re: [PATCH v12 26/40] dyndbg-test: add do_bulk testpoint, rename
- do_prints to do_classes
-To: sashiko-reviews@lists.linux.dev
+Date: Mon, 26 Oct 2026 18:15:21 -0600
+X-Gm-Features: AclHuK9LH_u23sCYiYKMz0I-9md-phfbwb6JA9KZbhXjHlVRGYmTapsg8H2JBYc
+Message-ID: <CAJfuBxw-cq3AYXKZ07Y3732tDM-NYxt+rs8Fz6S=P7+1TF5WNA@mail.gmail.com>
+Subject: Re: [PATCH v12 33/40] dyndbg: Ignore additional arguments from pr_fmt
+To: Petr Mladek <pmladek@suse.com>
 Cc: Jason Baron <jbaron@akamai.com>, Shuah Khan <shuah@kernel.org>, 
 	Andrew Morton <akpm@linux-foundation.org>, 
 	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
@@ -126,215 +125,152 @@ Cc: Jason Baron <jbaron@akamai.com>, Shuah Khan <shuah@kernel.org>,
 	Nicolas Schier <nsc@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>, 
 	Randy Dunlap <rdunlap@infradead.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
 	Pavel Machek <pavel@kernel.org>, Len Brown <lenb@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Petr Mladek <pmladek@suse.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	John Ogness <john.ogness@linutronix.de>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	=?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>, 
-	dri-devel@lists.freedesktop.org, linux-modules@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org
+	Steven Rostedt <rostedt@goodmis.org>, John Ogness <john.ogness@linutronix.de>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linux-arch@vger.kernel.org, 
+	linux-modules@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, linux-pm@vger.kernel.org, 
+	Philipp Hahn <phahn-oss@avm.de>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 13, 2026 at 8:37=E2=80=AFPM <sashiko-bot@kernel.org> wrote:
+On Tue, Oct 13, 2026 at 5:33=E2=80=AFAM Petr Mladek <pmladek@suse.com> wrot=
+e:
 >
-> Thank you for your contribution! Sashiko AI review found 2 potential issu=
-e(s) to consider:
-> - [Low] test_dynamic_debug: classmap offset mismatch for submodule classe=
-s
-> - [Low] locking: param_set_do_repeats blocks param_lock for up to 60s
-> --
->
-> commit adf504f365302c7db4e37850cebef69f82ed353f
-> Author: Jim Cromie <jim.cromie@gmail.com>
->
-> dyndbg-test: add do_bulk testpoint, rename do_prints to do_classes
->
-> This patch renames do_prints to do_classes to better align with its purpo=
-se
-> and introduces do_bulk to generate high-volume workloads. It adds support=
- for
-> executing these debug operations multiple times or over a timed duration =
-using
-> shared module parameter callbacks.
->
-> > diff --git a/lib/test_dynamic_debug.c b/lib/test_dynamic_debug.c
-> > index 01ce07001d4c7..19e27b5747ac2 100644
-> > --- a/lib/test_dynamic_debug.c
-> > +++ b/lib/test_dynamic_debug.c
->
-> [ ... ]
->
-> > @@ -28,25 +28,57 @@
-> >  #endif
+> On Mon 2026-10-12 20:37:04, Jim Cromie via B4 Relay wrote:
+> > From: Philipp Hahn <phahn-oss@avm.de>
 > >
-> >  #include <linux/module.h>
-> > +#include <linux/sched.h>
-> > +#include <linux/sched/signal.h>
-> > +#include <linux/jiffies.h>
+> > pr_fmt can be used to add a common prefix to any output from a module:
+> >       #define pr_fmt(fmt) KBUILD_MODNAME ".%s " fmt, __func__
 > >
-> > -/* re-gen output by reading or writing sysfs node: do_prints */
-> > +#define TEST_MAX_REPEATS 10000
-> > +#define TEST_MAX_SECONDS 60
+> > But adding additional arguments breaks dynamic debug:
+> > > error: macro "DEFINE_DYNAMIC_DEBUG_METADATA_CLS" passed 4 arguments, =
+but takes just 3
+> > > |         pr_debug_ratelimited("%s", "Hello world!");
+> > > |                                                  ^
+> > > note: macro "DEFINE_DYNAMIC_DEBUG_METADATA_CLS" defined here
+> > > | #define DEFINE_DYNAMIC_DEBUG_METADATA_CLS(name, cls, fmt)       \
+> > > |
+> > > error: =E2=80=98DEFINE_DYNAMIC_DEBUG_METADATA_CLS=E2=80=99 undeclared=
+ (first use in this function)
+> > > |         DEFINE_DYNAMIC_DEBUG_METADATA_CLS(name, _DPRINTK_CLASS_DFLT=
+, fmt)
+> > > |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>
+> I wonder what this error about undeclared macro means.
+>
+> > > note: in expansion of macro =E2=80=98DEFINE_DYNAMIC_DEBUG_METADATA=E2=
+=80=99
+> > > |         DEFINE_DYNAMIC_DEBUG_METADATA(descriptor, pr_fmt(fmt));    =
+     \
+> > > |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > > note: in expansion of macro =E2=80=98pr_debug_ratelimited=E2=80=99
+> > > |         pr_debug_ratelimited("%s", "Hello world!");
+> > > |         ^~~~~~~~~~~~~~~~~~~~
 > >
-> > -static void do_prints(void); /* device under test */
-> > -static int param_set_do_prints(const char *instr, const struct kernel_=
-param *kp)
-> > +/* re-trigger debug output by reading or writing sysfs nodes: do_class=
-es or do_bulk */
-> > +static void do_classes(int); /* device under test */
-> > +static void do_bulk(int);    /* device under test */
-> > +
-> > +static int param_set_do_repeats(const char *instr, const struct kernel=
-_param *kp)
-> >  {
-> > -     do_prints();
-> > +     int rc, ct;
-> > +     void (*repeat_fn)(int) =3D kp->arg;
-> > +
-> > +     rc =3D kstrtoint(instr, 0, &ct);
-> > +     if (rc) {
-> > +             pr_err("expecting numeric input, using 1 instead\n");
-> > +             ct =3D 1;
-> > +     }
-> > +     if (ct > TEST_MAX_REPEATS) {
-> > +             pr_warn("%s: clamping %d to %d\n", kp->name, ct, TEST_MAX=
-_REPEATS);
-> > +             ct =3D TEST_MAX_REPEATS;
-> > +     } else if (ct < -TEST_MAX_SECONDS) {
-> > +             pr_warn("%s: clamping %d seconds to -%d\n",
-> > +                     kp->name, ct, TEST_MAX_SECONDS);
-> > +             ct =3D -TEST_MAX_SECONDS;
-> > +     }
-> > +
-> > +     repeat_fn(ct);
->
-> [Severity: Low]
-> Does this synchronous loop execution block param_lock system-wide?
->
-> When test_dynamic_debug is built-in, writing to its module parameters via
-> sysfs triggers param_attr_store() in kernel/params.c, which acquires the
-> global param_lock mutex around the .set callback:
->
-> kernel/params.c:param_attr_store() {
->     ...
->     kernel_param_lock(mk->mod);
->     if (param_check_unsafe(attribute->param))
->         err =3D attribute->param->ops->set(buf, attribute->param);
->     ...
-> }
->
-> Because param_set_do_repeats() invokes the workload synchronously (which
-> can run for up to 60 seconds as shown in do_classes() below), this starve=
-s
-> param_lock, preventing other processes from reading or writing any
-> built-in module parameters for the duration.
-
-
-    In standard usage, test_dynamic_debug is built as a module
-(CONFIG_TEST_DYNAMIC_DEBUG=3Dm).
-    Under kernel/params.c:KPARAM_MUTEX(mod), modular parameters
-acquire the module's
-    private &(mod)->param_lock rather than the global param_lock. The
-lock-hold is
-    strictly local to test_dynamic_debug's own sysfs nodes and has
-zero impact on
-    core kernel or other module parameters.
-
-    Even in the hypothetical built-in case
-(CONFIG_TEST_DYNAMIC_DEBUG=3Dy in a test
-    kernel, which I would consider mis-configured),
-    test_dynamic_debug is exclusively a test harness whose workloads are
-    triggered on demand by explicit sysfs writes. The loops call
-cond_resched() and
-    check signal_pending(current) on every iteration, keeping the execution
-    cooperative and immediately abortable via SIGINT.
-
-
-
-
->
-> > +
-> >       return 0;
+> > Add an additional ', ...' to DEFINE_DYNAMIC_DEBUG_METADATA_CLS to slurp
+> > any additional argument, which `pr_fmt` might add.
+> >
+> > --- a/include/linux/dynamic_debug.h
+> > +++ b/include/linux/dynamic_debug.h
+> > @@ -351,7 +351,7 @@ void __dynamic_ibdev_dbg(struct _ddebug *descriptor=
+,
+> >               dump_stack();                                   \
 > >  }
->
-> [ ... ]
->
-> > @@ -103,7 +135,10 @@ enum cat_disjoint_bits {
-> >       D2_DRMRES };
 > >
-> >  /* numeric verbosity, V2 > V1 related.  V1 is > D2_DRMRES */
-> > -enum cat_level_num { V1 =3D 16, V2, V3, V4, V5, V6, V7 };
-> > +enum cat_level_num { V1 =3D 16, V2, V3, V4, V5, V6, V7, V8 };
-> > +
-> > +/* test _USE_ w offset */
-> > +enum cat_level_offset { Vu1 =3D V1 + 8, Vu2, Vu3, Vu4, Vu5, Vu6, Vu7, =
-Vu8 };
-> >
-> >  /* recapitulate DRM's multi-classmap setup */
-> >  #if !defined(TEST_DYNAMIC_DEBUG_SUBMOD)
+> > -#define DEFINE_DYNAMIC_DEBUG_METADATA_CLS(name, cls, fmt)    \
+> > +#define DEFINE_DYNAMIC_DEBUG_METADATA_CLS(name, cls, fmt, ...)       \
+> >       static struct _ddebug  __aligned(8)                     \
+> >       __section("__dyndbg_descs") name =3D {                    \
+> >               .modname =3D KBUILD_MODNAME,                      \
+> > diff --git a/include/linux/printk.h b/include/linux/printk.h
+> > index f594c1266bfd..5d701952e739 100644
+> > --- a/include/linux/printk.h
+> > +++ b/include/linux/printk.h
+> > @@ -742,7 +742,7 @@ do {                                               =
+                       \
+> >       static DEFINE_RATELIMIT_STATE(_rs,                              \
+> >                                     DEFAULT_RATELIMIT_INTERVAL,       \
+> >                                     DEFAULT_RATELIMIT_BURST);         \
+> > -     DEFINE_DYNAMIC_DEBUG_METADATA(descriptor, pr_fmt(fmt));         \
+> > +     DEFINE_DYNAMIC_DEBUG_METADATA(descriptor, fmt);         \
 >
-> [ ... ]
->
-> > @@ -160,6 +183,19 @@ DYNAMIC_DEBUG_CLASSMAP_DEFINE(fail_emptyclass, 0, =
-0 /* ,empty */);
-> >  DYNAMIC_DEBUG_CLASSMAP_DEFINE(fail_maptype, 3, 10, "no such type");
-> >  DYNAMIC_DEBUG_CLASSMAP_DEFINE(fail_base_len, 0, 60,
-> >                             "base", "plus", "classes", "length", "too-b=
-ig");
-> > +#endif
-> > +
-> > +#else /* TEST_DYNAMIC_DEBUG_SUBMOD */
-> > +
-> > +/*
-> > + * in submod/drm-drivers, use the classmaps defined in top/parent
-> > + * module above.
-> > + */
-> > +
-> > +DYNAMIC_DEBUG_CLASSMAP_USE(map_disjoint_bits);
-> > +DYNAMIC_DEBUG_CLASSMAP_USE_(map_level_num, 7);
->
-> [Severity: Low]
-> Is this registration macro passing an outdated offset?
+> IMHO, this changes the existing behavior. The prefix added by
+> pr_fmt() will no longer be stored in DEFINE_DYNAMIC_DEBUG_METADATA().
+> Is this intentional, please?
 >
 
-yes - fixed in v13 (forthcoming)
+yes, its intentional.
 
-> The patch adds V8 to map_level_num, increasing its length to 8. While
-> cat_level_offset correctly shifts the submodule's class definitions by 8
-> (Vu1 =3D V1 + 8) above, this registration macro still tells dyndbg the
-> classes start at offset 7.
+515a9adce0f0 ("include/linux/printk.h: include pr_fmt in pr_debug_ratelimit=
+ed")
+added pr-fmt to both the METADATA macro call, and to the printk() just belo=
+w it.
+The commit-msg was clearly about adding it to the __dynamic_pr_debug() itse=
+lf,
+the METADATA addition was overzealous.
+
+Removing it brings pr_debug_ratelimited() into conformance with the other
+*_pr_debug_* calls:
+    dynamic_pr_debug, dev_dbg_ratelimited, net_dbg_ratelimited.
+
+and as you noted, this makes the ... variadic unnecessary.
+
+Ive added the Fixes: tag accordingly.
+
+thanks for the review & pushback.
+and apologies for the delay, I picked up a FLU shortly after sending v12.
+
+
+
+
+> Anyway, if we do not longer pass pr_fmt(fmt) then we should not
+> need to add "..." into DEFINE_DYNAMIC_DEBUG_METADATA_CLS().
 >
-> This mismatch causes submodule debug callsites to map to the wrong class
-> IDs, leaving the last class (Vu8) completely out of bounds and
-> uncontrollable.
+> By other words, we newly pass just the format "fmt" without the parametes=
+.
+> The 4th parameter was added by pr_fmt().
 >
-> > +
-> > +#if defined(DD_MACRO_ARGCHECK)
-> >  DYNAMIC_DEBUG_CLASSMAP_USE_(fail_offset_big, 100);
-> >  #endif /* DD_MACRO_ARGCHECK */
 >
-> [ ... ]
+> IMHO, the right solution is to keep pr_fmt(fmt) here and extend both
+> BEFINE_DYNAMIC_DEBUG_METADATA() and
+> DEFINE_DYNAMIC_DEBUG_METADATA_CLS()
+> to accept var args. I would expect something like:
 >
-> > @@ -210,20 +247,85 @@ static void do_levels(void)
+> #define DEFINE_DYNAMIC_DEBUG_METADATA_CLS(name, cls, fmt, ...)  \
+> ...
 >
-> [ ... ]
+> #define DEFINE_DYNAMIC_DEBUG_METADATA(name, fmt, ...)           \
+>         DEFINE_DYNAMIC_DEBUG_METADATA_CLS(name, _DPRINTK_CLASS_DFLT, fmt,=
+ ##__VA_ARGS__)
 >
-> > -static void do_prints(void)
-> > +static void do_classes(int ct)
-> > +{
-> > +     if (ct < 0) {
-> > +             unsigned long timeout =3D jiffies + (-ct) * HZ;
-> > +
-> > +             pr_debug("%s for %d seconds:\n", __func__, -ct);
-> > +             while (time_before(jiffies, timeout)) {
-> > +                     if (signal_pending(current))
-> > +                             break;
-> > +                     do_cats();
-> > +                     do_levels();
-> > +                     cond_resched();
-> > +             }
-> > +             return;
-> > +     }
 >
-> --
-> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261012-dd-cmap-=
-part2-clean-v12-0-3c8cc5725def@gmail.com?part=3D26
+> or maybe, we could "eat" the extra parameters in
+> DEFINE_DYNAMIC_DEBUG_METADATA. It would mean to keep
+> DEFINE_DYNAMIC_DEBUG_METADATA_CLS() as is and just add the "..." into
+> DEFINE_DYNAMIC_DEBUG_METADATA(), aka
+>
+> #define DEFINE_DYNAMIC_DEBUG_METADATA(name, fmt, ...)           \
+>         DEFINE_DYNAMIC_DEBUG_METADATA_CLS(name, _DPRINTK_CLASS_DFLT, fmt)
+>
+>
+> Or do I miss something, please?
+>
+> It is possible that the macros work another way. Or this depends
+> on another change. I checked only this patch...
+>
+> Best Regards,
+> Petr
+>
+> PS: I was curious what Sashiko says about this change and it seems
+>     that it does not review this patchset from some reasons.
+
+I checked shortly after sending, it was "embargoed" for 24 hrs,
+perhaps cuz it was so soon after rc7
+
+>
+> >       if (DYNAMIC_DEBUG_BRANCH(descriptor) &&                         \
+> >           __ratelimit(&_rs))                                          \
+> >               __dynamic_pr_debug(&descriptor, pr_fmt(fmt), ##__VA_ARGS_=
+_);    \
