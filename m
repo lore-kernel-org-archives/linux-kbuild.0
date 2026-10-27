@@ -1,79 +1,78 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793132545;
-	b=ayYPwsz53ODx7rQV3DDamlEU7iUoDirVMmBsRpllA48pC3xSFcilXi9+9sLENcDzSOl8
-	 KFEZi9YsdxLnSCgENvMSgu8URAHTUX3U3293N7/0jqCgF/uIArhDzt7ZQXXwOBfnZVsPY
-	 syhbxp1OF5JJ9Wc5vNb0ygtsaTENBImypoiet0+AE4V4ZRzWz3gNyuV4ODe7yUFgs1L2u
-	 bwUqWw3fkuX7YFct4EAlR0yUO2Mx4rA98twaJ9zkEIjIudBOcDQiiEysuW5OSMkC2VuBX
-	 RVDuj+oGl4lGlUxgMq/rhqHFpe6yKam0P3tS/tZIOLO5TDFFJevquNmiRZ32aiz28eA==
+	t=1793132547;
+	b=5cRhztqaZwk0ACcYOkxmnDCR3qgvxmMmAqVK0EKsqyAAjHWq1XBZ7UydMcr3SRaxhHJN
+	 o92LjKdG+WaTexYXM2Zwbs+DvBP0T39C/aZXr6BodeRg4AElH9V7fHKG5EYvUMe2943gj
+	 LSuhlXTiB1TZURTgjdVBYmfw+n6j04osyMLAGeRGels1Ov9KA9khpFM9aMf3QL6CtAQLs
+	 SWgY8Grrj3da7qmrZJM8r4T98CTrr9EItYPSREVgNYfffvIvG3Z1+j+24PkuKmDhk8E5p
+	 0fRwwAstuDdFYOkC1WwmUFknQKlH7MBgqOz/DkvKWWwbzQwF0GNH4u4Ty9dPDnAbvLg==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793132545;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793132547;
 	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
 	 Content-Type:Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
 	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
 	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=Ux8MhwtSzPGJ/JCDUkwod0yro6f7wh+bo55Ba0zrplM=;
-	b=nBgGBayW8yBZ+NyrHqu3nYjjmCv6MCmWqLvlXHX4HybcAhdaNp+VVJSI7pUfJs5TTKtW
-	 tn9FVbsOPIeHl2JcRNCKaOVadSsWGtGT7fldMPJ+W4uOCG+6BQN7osN2VSNbkdQcZth+F
-	 JIg8rHY9h4pvOxQ/ISFl8wnmn1fS6K52ijxMmN0jeo1HotxXT5Rgm2M7misZ+GtoXNvFU
-	 ok4a7c/M2KVmf8G3RZtRl+Fvepah8jAP+s7ri/te+wiO2OD9eVajuLw8aBApfLHrvfwAc
-	 BIL6ojXZyBiXQgAmjAnSfDgTXsreGf6bkAl9wRS4cI3YnCnSM7UPgyuYkp/jfPoiEzA==
+	bh=dhXCANKHxKjHHWTmhJwJR13Dns5Ta1OGCw0lYADEimk=;
+	b=UD79OtZOft/PUEowLZbScm07FUhQUT0g0AKjGRfXhbbfhGMJ68RJoW1Tx8d8kepPef+o
+	 +US3+4RAyxD7fFujjQQy6+p5xjsU2ZIginvtadP0/MYv6j6dU/GAu4sJs1Ytv6B/NKXZH
+	 Osp87Qi+7+qBqTjTEE+LmNvrf7zeBie5fqh1l4vEH0YWAl7nZUB7AaEeJ9nKdjUUGZXI7
+	 72ZJ0eEaQH4BRX6yo795ueLJ3vSATVUVxl7EP7og0OPStQlSp3loEb4hv2m2aJBNM2t8p
+	 IeWUS1/57rinJht19Mzn/gKGGr2W1Trun/BQyiiZJifZBZaMV6gysYD0bvR+oB3sO6g==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CCicCpGc;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XiGN0ioS;
 	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0C3660A5BD0;
-	Tue, 27 Oct 2026 20:22:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A002B606A32A;
+	Tue, 27 Oct 2026 20:22:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CCicCpGc
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XiGN0ioS
 Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
 ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
-	t=1793132544;
-	b=aWLU36HhAmITd8zlE+mr4l/RqPEnzY8diGtxebN7mra2ZoG74Hq7mkoFAvstw5UD087y
-	 8rC4puhc2XY94LBubBnq6Bp1gTaJlb69iYa7aX+loBF/zMy5ttiDQgflDBGHTj3K/LjsQ
-	 wWdD5yFwxhG/FTtYHLgqyiZfiDDrUboNl9yAdpweu1WSD4J5ahH5tDDokrD7ga34c7bCz
-	 +/4xNXwp23we4PdgHKA99ZqGrBiqpYXjAUYhiuVNO/dIHlgajBrQzRYiPOBqgO/91st9v
-	 xvNsH1njCN/SowuWDWv+rZYaV2S+uvm8Ri+x4VW4wTvsAVnSL/tgh+b7k/1NCQJKbfA==
+	t=1793132546;
+	b=e9ZUALkWAmuVr1f8QPIlre91pBTASAsS1cYKajOEGSox1KgHXEuJaP26aGfN9wZ/G8tk
+	 Y7DPkK3AbHanxPq1K4S8lVWAt+13UGQK/xwatjl/RRD43ick4+LlLj37wc96PvUenZfBZ
+	 TgENaRNIuQibHTLIOdFu+hi1DydiwybwHGGaRLC+flFJpxe1NYO49PsYJ1yUdS439loUn
+	 /9vCHvA6P1vW+4coyA1bBjyyqglO6F4GrdEuyrfvGRjhsocuCuMkew100WvE1TCc2YUmo
+	 Ek2jmMcG8KBgPqpBrBcrEBAfhjWi6u9IHuebKuj1FkTHazzpdNPIZW+M/P9qV1re+qg==
 ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
-	c=relaxed/relaxed; t=1793132544;
+	c=relaxed/relaxed; t=1793132546;
 	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
 	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
 	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
 	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=Ux8MhwtSzPGJ/JCDUkwod0yro6f7wh+bo55Ba0zrplM=;
-	b=pEt8Lz9dNvWwDzIgVevAbLG6VvSVMxxM8OkTQmlPRbpk6yPCSrisaMvK4cP5V+AaIG0L
-	 hzHRd7SXlFVWmPyfbglaVPu6lZ2cfuKvd0bf8ThOk7+fYb2QUym8zXR36xCsp3rxPvOw8
-	 /7z2c9oe9RleA1I3SIxbXnAaYLkfakZR2RmiA2QMfuMloXE6/mDMhm8vxQJ/OgZehobWP
-	 BBz88Aio4l/y4WBLfIe2izJWtIEM6IUQIBnkSViw522AwIqwv7FqR3uYO9zEqEwTTUAqU
-	 FX31AwWYCh3javmI6k+E4CEB3sbakIf0fgY4V+LmFahU2F4z7M67TGVAPhp+rC5T/mw==
+	bh=dhXCANKHxKjHHWTmhJwJR13Dns5Ta1OGCw0lYADEimk=;
+	b=tO0Rn5RkvJY5+l7UNMKmdT7NyiPv45WFOpv3YJK523YT/lBonyYMflDenDpQtEGOlzt6
+	 +i277lYw0N8JCex+1JKiUy2fn8pfh74IAUNgdcAVxtmfoq664v1yeyANRrUU3UHqUblgY
+	 oz6xr9PUXS4FsbSfwBZHIjaDa8Sx7lJm/Qh4kG5HYYGvRDCREGP7P7J3P38vyrTW8IRIe
+	 /FsoMrH2qc5Rk5RX/Y6wVKoK/u6gVx6Kh5pL8F0HOd3zcWRFS7vIwAxzyASk7H+Rqc7oI
+	 rs3++eOHXKaiP8+kn6HL21tEkRO2x93V71DYQxGbvN7oGEV6HxuDeQsiinazF4Vmupw==
 ARC-Authentication-Results: i=1; smtp.kernel.org; 
 	arc=none smtp.remote-ip=100.80.115.77
 Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id 220551F01356;
-	Tue, 27 Oct 2026 20:22:18 +0000 (UTC)
+	by smtp.kernel.org (Postfix) with ESMTPS id 5F7C41F01344;
+	Tue, 27 Oct 2026 20:22:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793132544;
-	bh=Ux8MhwtSzPGJ/JCDUkwod0yro6f7wh+bo55Ba0zrplM=;
+	s=k20260515; t=1793132546;
+	bh=dhXCANKHxKjHHWTmhJwJR13Dns5Ta1OGCw0lYADEimk=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To;
-	b=CCicCpGcduhlOxEuYHxTTOHHW5vnCh0RGxPov8oAwQpg2vlPXHmxPr0u4psBAz9Ir
-	 CqEzjGiEfLINlvOzyxgs4xRgqhmd+bprvZMd23sFEcMIiDFBIeiWPPIolYaqB+RM68
-	 jVNEIQyJeK8QKDbooUrVnmroOkuQu8pEKm/a7zZOPtf3qS4yfugKDZhB+qFJ1w7X99
-	 e3iWmlmKIbI+vZtrV9tcb1R4rVpfTFNbhiYpqYBsR36jM+2vz+2FZO0w3LBlqRtnSg
-	 LDjX2olGsHAgKAQBgpH7nhBHI8r0k3TRIyY60m3rvrfp+D1dcpTWT+OAdW0r8paqo6
-	 B84dcxJmZPlxw==
+	b=XiGN0ioSdx0/3H+1NLAW/Ik2Dbo8A3GKtmFcj71VN2o8VxVhG+49uTt3zE0p+5b+W
+	 zIg2gdyQk3fI+yr+abMZ9SIuZLooZ+mwULAxmi3b2C03G60cMeZWX/FCildX+i/UBQ
+	 yVg83yTYGsneI2aliZwzJwYTRxqyOlA5fzhCPU/ImAgo+PnVT2+HbLaX5zXPLsODJC
+	 ToHqVfl4xlCudzoSgtGooKbtA8ASF2jHaszw3KAkGUl5R7rqDHgJxuqEAO5gXOBUrJ
+	 PTx8n92BBDGWP9oZz/17RaImVpqX6d+CKlDK4Hj3Ys4hAKxfln2am2ZK68f4V69B3u
+	 7jMBvYbUiUu5Q==
 Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id 044AD45260;
-	Tue, 27 Oct 2026 20:22:11 +0000 (UTC)
+	by lkml.kernel.org (Postfix) with ESMTP id C9D7B45251;
+	Tue, 27 Oct 2026 20:22:10 +0000 (UTC)
 From: Jim Cromie via B4 Relay <devnull+jim.cromie.gmail.com@kernel.org>
-Date: Tue, 27 Oct 2026 14:22:28 -0600
-Subject: [PATCH v13 28/39] dyndbg: control-parser: treat comma as a token
- separator
+Date: Tue, 27 Oct 2026 14:22:24 -0600
+Subject: [PATCH v13 24/39] dyndbg: detect class_id reservation conflicts
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -84,7 +83,7 @@ List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <20261027-dd-cmap-part2-clean-v13-28-9267923be612@gmail.com>
+Message-Id: <20261027-dd-cmap-part2-clean-v13-24-9267923be612@gmail.com>
 References: <20261027-dd-cmap-part2-clean-v13-0-9267923be612@gmail.com>
 In-Reply-To: <20261027-dd-cmap-part2-clean-v13-0-9267923be612@gmail.com>
 To: Jason Baron <jbaron@akamai.com>, Shuah Khan <shuah@kernel.org>, 
@@ -111,13 +110,14 @@ Cc: linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
  dri-devel@lists.freedesktop.org, linux-arch@vger.kernel.org, 
  linux-modules@vger.kernel.org, linux-doc@vger.kernel.org, 
  linux-kbuild@vger.kernel.org, linux-pm@vger.kernel.org, 
- Jason Baron <jbaron@redhat.com>, Jim Cromie <jim.cromie@gmail.com>
+ Jason Baron <jbaron@redhat.com>, Jim Cromie <jim.cromie@gmail.com>, 
+ Louis Chauvet <louis.chauvet@bootlin.com>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1793132527; l=4314;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1793132527; l=7918;
  i=jim.cromie@gmail.com; s=20260203; h=from:subject:message-id;
- bh=cgmecz95nRjRH5dI+HMactKHXGj1EAXtYTNIDw+k4sE=;
- b=2YcEUNC4hgUcv7yTLzItnV8c65jkmDXC3Uk4trjELbuRmg/G5HEKtvX1Wnvv/DxNHoM/sTu/t
- YxVebA5jSOJC4ZS9TKHgpG6KNRtr26y97zMHVQ94xuF8HvkktQadt7t
+ bh=WLry7UQCvu7ZolN4gquvAdDHvs5EKtG9/nec6hDMWmU=;
+ b=oIscmF6cUWrItqL0H/v+Uavlv2WakDkE/o9s+3qyRJ6kPuWJoL+1h3gLiCbeUeOoiS+nvx0F2
+ VLIUPbORlyvCwTyqdGT/EKY02i8dElieN1fDtlF0Lc+WKMjVJiiKUwf
 X-Developer-Key: i=jim.cromie@gmail.com; a=ed25519;
  pk=C6E5ODlPQo7ZBynATXH9wg7K6HxP0pIXyf4s38Qw0XE=
 X-Endpoint-Received: by B4 Relay for jim.cromie@gmail.com/20260203 with
@@ -128,112 +128,237 @@ Content-Transfer-Encoding: 7bit
 
 From: Jim Cromie <jim.cromie@gmail.com>
 
-Treat comma as a token terminator, just like a space. This allows a
-user to avoid quoting hassles when spaces are otherwise needed:
+If a module _DEFINEs 2 or more classmaps, it must devise them to share
+the per-module 0..62 class-id space; ie their respective base,+length
+reservations cannot overlap.
 
- :#> modprobe drm dyndbg=class,DRM_UT_CORE,+p\;class,DRM_UT_KMS,+p
+To detect conflicts at modprobe, add ddebug_class_range_overlap(),
+call it from ddebug_add_module(), and WARN and return -EINVAL when
+they're detected.
 
-Add corresponding Strategy 2 control-file fingerprinting checks to
-verify the exact control-file state of kernel/params callsites after
-commas-as-spaces, ignored-commas, and quoted-commas queries.
+This insures that class_id -> classname lookup has just 1 answer, so
+the 1st-found search in find-class-name works properly.
+
+test_dynamic_debug.c:
+
+If built with -DFORCE_CLASSID_CONFLICT, the test-modules invoke 2
+conflicting DYNAMIC_DEBUG_CLASSMAP_DEFINE() declarations, into parent
+and the _submod.  These conflict with one of the good ones in the
+parent (D2_CORE..etc), causing the modprobe(s) to WARN and fail.
 
 Signed-off-by: Jim Cromie <jim.cromie@gmail.com>
+Reviewed-by: Louis Chauvet <louis.chauvet@bootlin.com>
 ---
- Documentation/admin-guide/dynamic-debug-howto.rst       |  4 +++-
- lib/dynamic_debug.c                                     | 17 +++++++++++++----
- .../testing/selftests/dynamic_debug/dyndbg_selftest.sh  |  4 ++--
- 3 files changed, 18 insertions(+), 7 deletions(-)
+v11:
+. only increment mod_ct when ddebug_add_module() returns 0.
+  Sashiko review complaint (patch 25):
+  "Is it intentional to unconditionally increment mod_ct here? By
+  changing this from a fatal error to a warn-and-continue, if
+  ddebug_add_module() fails, the inflated mod_ct will cause inaccurate
+  initialization logs (vpr_info) and an incorrect calculation for memory
+  used by ddebug tables. Should the increment only happen on success?"
 
-diff --git a/Documentation/admin-guide/dynamic-debug-howto.rst b/Documentation/admin-guide/dynamic-debug-howto.rst
-index 9c2f096ed1d8..b9fbb2a12955 100644
---- a/Documentation/admin-guide/dynamic-debug-howto.rst
-+++ b/Documentation/admin-guide/dynamic-debug-howto.rst
-@@ -78,11 +78,12 @@ Command Language Reference
- ==========================
- 
- At the basic lexical level, a command is a sequence of words separated
--by spaces or tabs.  So these are all equivalent::
-+by spaces, tabs, or commas.  So these are all equivalent::
- 
-   :#> ddcmd file svcsock.c line 1603 +p
-   :#> ddcmd "file svcsock.c line 1603 +p"
-   :#> ddcmd '  file   svcsock.c     line  1603 +p  '
-+  :#> ddcmd file,svcsock.c,line,1603,+p
- 
- Command submissions are bounded by a write() system call.
- Multiple commands can be written together, separated by ``;`` or ``\n``::
-@@ -172,6 +173,7 @@ module
- 	module sunrpc
- 	module nfsd
- 	module drm*	# both drm, drm_kms_helper
-+	module,sunrpc	# with ',' as token separator
- 
- format
-     The given string is searched for in the dynamic debug format
+v9:
+. make ddebug_add_module() failure non-fatal during dynamic_debug_init(),
+  logging warning and continuing instead of tearing down all tables kernel-wide.
+v2: RvB after SoB
+
+old-v9 - fix WARN() by adding new 1st arg 1.
+old-v12 - drop maybe_unused on range-overlap fn
+---
+ lib/dynamic_debug.c      | 73 ++++++++++++++++++++++++++++--------------------
+ lib/test_dynamic_debug.c |  8 ++++++
+ 2 files changed, 50 insertions(+), 31 deletions(-)
+
 diff --git a/lib/dynamic_debug.c b/lib/dynamic_debug.c
-index 8d9eb7dc0999..5d99c3aef5a1 100644
+index ad86365f2474..1983f672dcfb 100644
 --- a/lib/dynamic_debug.c
 +++ b/lib/dynamic_debug.c
-@@ -323,6 +323,14 @@ static int ddebug_change(const struct ddebug_query *query, struct flag_settings
- 	return nfound;
+@@ -1105,18 +1105,19 @@ static void *ddebug_proc_next(struct seq_file *m, void *p, loff_t *pos)
+ 	return dp;
  }
  
-+static char *skip_spaces_and_commas(const char *str)
+-static bool ddebug_class_in_range(const int class_id, const struct ddebug_class_map *map)
++static bool ddebug_class_map_in_range(const int class_id, const struct ddebug_class_map *map)
+ {
++	if (!map)
++		return false;
+ 	return (class_id >= map->base &&
+ 		class_id < map->base + map->length);
+ }
+ 
+-static bool ddebug_user_class_in_range(const int class_id, const struct ddebug_class_user *cli)
++static bool ddebug_class_user_in_range(const int class_id, const struct ddebug_class_user *user)
+ {
+-	if (!cli || !cli->map)
++	if (!user)
+ 		return false;
+-	int base = cli->map->base + cli->offset;
+-	return (class_id >= base && class_id < base + cli->map->length);
++	return ddebug_class_map_in_range(class_id - user->offset, user->map);
+ }
+ 
+ static const char *ddebug_class_name(struct _ddebug_info *di, struct _ddebug *dp)
+@@ -1126,11 +1127,11 @@ static const char *ddebug_class_name(struct _ddebug_info *di, struct _ddebug *dp
+ 	int i;
+ 
+ 	for_subvec(i, map, di, maps)
+-		if (ddebug_class_in_range(dp->class_id, map))
++		if (ddebug_class_map_in_range(dp->class_id, map))
+ 			return map->class_names[dp->class_id - map->base];
+ 
+ 	for_subvec(i, cli, di, users)
+-		if (ddebug_user_class_in_range(dp->class_id, cli))
++		if (ddebug_class_user_in_range(dp->class_id, cli))
+ 			return cli->map->class_names[dp->class_id - cli->map->base - cli->offset];
+ 
+ 	return NULL;
+@@ -1399,6 +1400,20 @@ static void ddebug_apply_class_users(const struct _ddebug_info *di)
+ 		__di->_vec.start = __start;				\
+ })
+ 
++static int ddebug_class_range_overlap(struct ddebug_class_map *cm, u64 *reserved_ids)
 +{
-+	str = skip_spaces(str);
-+	while (*str == ',')
-+		str = skip_spaces(++str);
-+	return (char *)str;
++	u64 range = (((1ULL << cm->length) - 1) << cm->base);
++
++	if (range & *reserved_ids) {
++		pr_err("[%d..%d] on %s conflicts with %llx\n", cm->base,
++		       cm->base + cm->length - 1, cm->class_names[0],
++		       *reserved_ids);
++		return -EINVAL;
++	}
++	*reserved_ids |= range;
++	return 0;
 +}
 +
  /*
-  * Split the buffer `buf' into space-separated words.
-  * Handles simple " and ' quoting, i.e. without nested,
-@@ -336,8 +344,8 @@ static int ddebug_tokenize(char *buf, char *words[], int maxwords)
- 	while (*buf) {
- 		char *end;
+  * Allocate a new ddebug_table for the given module
+  * and add it to the global list.
+@@ -1408,6 +1423,7 @@ static int ddebug_add_module(struct _ddebug_info *di)
+ 	struct ddebug_table *dt;
+ 	struct ddebug_class_map *cm;
+ 	struct ddebug_class_user *cli;
++	u64 reserved_ids = 0;
+ 	int i;
  
--		/* Skip leading whitespace */
--		buf = skip_spaces(buf);
-+		/* Skip leading whitespace and comma */
-+		buf = skip_spaces_and_commas(buf);
- 		if (!*buf)
- 			break;	/* oh, it was trailing whitespace */
- 		if (*buf == '#')
-@@ -353,7 +361,7 @@ static int ddebug_tokenize(char *buf, char *words[], int maxwords)
- 				return -EINVAL;	/* unclosed quote */
- 			}
- 		} else {
--			for (end = buf; *end && !isspace(*end); end++)
-+			for (end = buf; *end && !isspace(*end) && *end != ','; end++)
- 				;
- 			if (end == buf) {
- 				pr_err("parse err after word:%d=%s\n", nwords,
-@@ -628,7 +636,8 @@ static int ddebug_exec_queries(char *query, const char *modname)
- 		if (split)
- 			*split++ = '\0';
+ 	if (!di->descs.len)
+@@ -1439,6 +1455,13 @@ static int ddebug_add_module(struct _ddebug_info *di)
+ 	dd_set_module_subrange(i, cm, &dt->info, maps);
+ 	dd_set_module_subrange(i, cli, &dt->info, users);
  
--		query = skip_spaces(query);
-+		query = skip_spaces_and_commas(query);
++	/* insure 2+ classmaps share the per-module 0..62 class_id space */
++	for_subvec(i, cm, &dt->info, maps)
++		if (ddebug_class_range_overlap(cm, &reserved_ids))
++			goto cleanup;
 +
- 		if (!query || !*query || *query == '#')
- 			continue;
++	/*
++	 */
+ 	mutex_lock(&ddebug_lock);
+ 	list_add_tail(&dt->link, &ddebug_tables);
+ 	mutex_unlock(&ddebug_lock);
+@@ -1456,6 +1479,10 @@ static int ddebug_add_module(struct _ddebug_info *di)
+ 	vpr_info("%3u debug prints in module %s\n",
+ 		 dt->info.descs.len, dt->info.mod_name);
+ 	return 0;
++cleanup:
++	WARN_ONCE(1, "dyndbg multi-classmap conflict in %s\n", di->mod_name);
++	kfree(dt);
++	return -EINVAL;
+ }
  
-diff --git a/tools/testing/selftests/dynamic_debug/dyndbg_selftest.sh b/tools/testing/selftests/dynamic_debug/dyndbg_selftest.sh
-index 6d8b4784880e..d7681cdcd012 100755
---- a/tools/testing/selftests/dynamic_debug/dyndbg_selftest.sh
-+++ b/tools/testing/selftests/dynamic_debug/dyndbg_selftest.sh
-@@ -537,8 +537,8 @@ function GOLDEN_RECORDS {
- #K= 02e4fd94602e108cb89bfc70d47a5dad FT_basic_queries.5
- #K= f03a7ca7316e8db4c0e16523dc41e75d FT_basic_queries.6
- #K= c518a50ba30ba8099d0dc874a27ecf16 FT_basic_queries.7
--#K= 2b4b152bdb82e6e4a5be18ca26025895 FT_test_classes.1
--#K= 5516e3d13cba7ea4197a7fb6c033887a FT_test_classes.2
-+#K= 91838b4012c50a1dc1d9e210ba8d68f8 FT_test_classes.1
-+#K= a15ec4843acd721fbdfddc0b512c8032 FT_test_classes.2
- #K= 2cee6842c9cdee5cb3bf50b2e3914813 FT_test_classes.3
- #K= 1489b3b72dbdfdb553cc0c6594c4face FT_classmap_inheritance.1
- #K= e11c22649735cedb6c30321378100e11 FT_classmap_inheritance.2
+ /* helper for ddebug_dyndbg_(boot|module)_param_cb */
+@@ -1498,14 +1525,14 @@ int ddebug_dyndbg_module_param_cb(char *param, char *val, const char *module)
+ 	return ddebug_dyndbg_param_cb(param, val, module, -ENOENT);
+ }
+ 
++#ifdef CONFIG_MODULES
++
+ static void ddebug_table_free(struct ddebug_table *dt)
+ {
+ 	list_del_init(&dt->link);
+ 	kfree(dt);
+ }
+ 
+-#ifdef CONFIG_MODULES
+-
+ /*
+  * Called in response to a module being unloaded.  Removes
+  * any ddebug_table's which point at the module.
+@@ -1557,18 +1584,6 @@ static struct notifier_block ddebug_module_nb = {
+ 
+ #endif /* CONFIG_MODULES */
+ 
+-static void ddebug_remove_all_tables(void)
+-{
+-	mutex_lock(&ddebug_lock);
+-	while (!list_empty(&ddebug_tables)) {
+-		struct ddebug_table *dt = list_entry(ddebug_tables.next,
+-						     struct ddebug_table,
+-						     link);
+-		ddebug_table_free(dt);
+-	}
+-	mutex_unlock(&ddebug_lock);
+-}
+-
+ static __initdata int ddebug_init_success;
+ 
+ static int __init dynamic_debug_init_control(void)
+@@ -1639,9 +1654,9 @@ static int __init dynamic_debug_init(void)
+ 			di.mod_name = modname;
+ 			ret = ddebug_add_module(&di);
+ 			if (ret)
+-				goto out_err;
+-
+-			mod_ct++;
++				pr_warn("failed to add built-in module %s: %d\n", modname, ret);
++			else
++				mod_ct++;
+ 
+ 			iter_mod_start = iter;
+ 			modname = iter->modname;
+@@ -1654,9 +1669,9 @@ static int __init dynamic_debug_init(void)
+ 	di.mod_name = modname;
+ 	ret = ddebug_add_module(&di);
+ 	if (ret)
+-		goto out_err;
+-
+-	mod_ct++;
++		pr_warn("failed to add built-in module %s: %d\n", modname, ret);
++	else
++		mod_ct++;
+ 
+ 	ddebug_init_success = 1;
+ 	vpr_info("%d prdebugs in %d modules, %d KiB in ddebug tables, %d kiB in __dyndbg_descs section\n",
+@@ -1679,10 +1694,6 @@ static int __init dynamic_debug_init(void)
+ 		   0, 0, 0, NULL, &ddebug_dyndbg_boot_param_cb);
+ 	kfree(cmdline);
+ 	return 0;
+-
+-out_err:
+-	ddebug_remove_all_tables();
+-	return 0;
+ }
+ /* Allow early initialization for boot messages via boot param */
+ early_initcall(dynamic_debug_init);
+diff --git a/lib/test_dynamic_debug.c b/lib/test_dynamic_debug.c
+index 34e51996aa20..3a69cc3cae6d 100644
+--- a/lib/test_dynamic_debug.c
++++ b/lib/test_dynamic_debug.c
+@@ -128,6 +128,14 @@ DYNAMIC_DEBUG_CLASSMAP_DEFINE(map_disjoint_bits, DD_CLASS_TYPE_DISJOINT_BITS,
+ DYNAMIC_DEBUG_CLASSMAP_DEFINE(map_level_num, DD_CLASS_TYPE_LEVEL_NUM,
+ 			      V1, "V1", "V2", "V3", "V4", "V5", "V6", "V7");
+ 
++#ifdef FORCE_CLASSID_CONFLICT
++/*
++ * Enable with -Dflag on compile to test overlapping class-id range
++ * detection.  This should warn on modprobes.
++ */
++DYNAMIC_DEBUG_CLASSMAP_DEFINE(classid_range_conflict, 0, D2_CORE + 1, "D3_CORE");
++#endif
++
+ #else /* TEST_DYNAMIC_DEBUG_SUBMOD */
+ 
+ /*
 
 -- 
 2.56.0
