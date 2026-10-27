@@ -1,130 +1,45 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=40.107.130.4
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793118906;
-	b=FvjoU9pkKp93Z0CUFU5EgzgGxqlS/ITEKhOn8YUJeB2r0JDY1I6n4dcoSY3HLzV+2L0h
-	 lIsMmp9rKSLTNnknGVHEHdp1XKG6WGw1ZNYf/JOSM3h5wJbKv3PhfBbCnwTVisNLoQNNA
-	 2w/3CETpDkz5fYrhufErZ8dBpKSkNjM01lFt9C4VdY8GGefs/wm0+WFQ6N7rL0KW5yQcs
-	 IciDbUK0MCRJzWkwjxfnuEXkZuxbJcuUVAQuwPym+uIc/fypVlKscDLOcpE3V+x/4F+hi
-	 LhKGEB8Q0rnR9E8Qo4W83yLVSKwDybAH6h4wsF2BcHtMwau8uhFZm5FFZrBCEHATknA==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793118906;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:From:Date:Subject:
-	 Content-Type:Content-Transfer-Encoding:Message-Id:References:
-	 In-Reply-To:To:Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:
-	 X-ClientProxiedBy:MIME-Version:X-MS-PublicTrafficType:
-	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
-	 X-MS-Exchange-SenderADCheck:X-MS-Exchange-AntiSpam-Relay:
-	 X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
-	 X-Forefront-Antispam-Report:
-	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
-	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
-	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
-	 X-MS-Exchange-CrossTenant-FromEntityHeader:
-	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
-	 X-MS-Exchange-CrossTenant-UserPrincipalName:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=jZAvvvHun6aalGq5kU3xbJGdnoWrIc1LoWTmjMlrfpA=;
-	b=QJWT2/Ea2V7D6qzJ6h0g2lZkTni5gLvTJ/PtyrqJvV3VHCeYUzDS4vSkv3nO/bPk5vaZ
-	 1CZRK06sb9pyvNsQPiz6O73nMv69X0z8pjmDOXMqjlZoc9Ywf/aQfpVo4KjzvMZvxMlZL
-	 c2p/LWAXsVOKlo1tKCnKcnyhrkLiEYwDDatXnsjv2JcRaW9IDYnBBwXkV1qx+lotogOqz
-	 poZTGrrLWmnDELbRQzgbjkVjmLxx4cp3F1v7ZRyahkNvyRPUJldaJZT7nFy1ylv+AWhZB
-	 2SP8pOZLKqNuzBeyrMFCFUJNoybIcRaZGnI0G0ta83L1Nl5xAr+Yh99MMW8c4Tp7nUA==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=none header.from=est.tech;
-	spf=pass smtp.mailfrom=est.tech;
-	dkim=pass header.d=est.tech header.i=@est.tech header.a=rsa-sha256 header.s=selector1 header.b=S78x6J7p;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=40.107.130.4
-Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011004.outbound.protection.outlook.com [40.107.130.4])
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1793131030;
+	b=VuowNnOeI6p0OicDA5Z0keEZoCkoAMfigzn//agC8faEwo/tBaRfOV7+dZcaNO5yiYIy
+	 yQPKMeqRLC+/5XIKHdZ5ip2DPXKOATzQXPHDsZAARm2ESquhD+9FdfC4Z90uDk2MIdHm8
+	 znmxEJBgaT4UImMsMNaC/vic/nusGIE8z8R72S6H1YHlbdZUlnMqEH8IzvWGRSJASI/EK
+	 +xeBV9EvZjt6c94YERJkydlUJE7q3mBWcuL+l8Dt/ULg4E2Zq9xJj4Ao57G/TPcAu5Aju
+	 Y9PotakQWaJEE15t9ejm2XBoKBfMOj1kH8YkbRV8WVS2Jc9fn8Eiqq+Q/yp72vS0H1g==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793131030;
+	h=Received:DKIM-Signature:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:Subject:From:To:Cc:In-Reply-To:References:
+	 Date:Message-Id:X-Mailer:X-Developer-Signature:X-Developer-Key;
+	bh=SMyYRELwwZeuNtf75MqiN2auLAIDD43sZyC7A/iNGsw=;
+	b=BuSD2pKycqRSOqzpR8n5lCHBjR7eHIXuIAX3Pia8EP1JLj28iOw59z67EqMAmkwQeW66
+	 //uFKejPyvyTC5GcRUIeDlt3dfGT7DFa1pATy/8xAPL0JF+IcObdydvU+GXbrX9yTLX5+
+	 WWdrG9xRzo26949IxlqNLOaP8NyC2BglnrV2MzZzuxvyDrxFUwONP86IaRa64Be7frtEJ
+	 ITOA0XDiNhLrzQ8dYid5HA1qKn4jFyQg6KhVsVmvUXNat/wQFePO4TePgOzn7xKfvnGnw
+	 MfVmt05DpuKv8vSVUoErCEw3f0a591ct+8TfWBl5dg/+36ZBy2TEnFCpI7jUEM5fJ9g==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Jg+NOm3N;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A34F606A320;
-	Tue, 27 Oct 2026 16:35:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6A34F606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=est.tech
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 6B57C606A31A;
+	Tue, 27 Oct 2026 19:57:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=est.tech header.i=@est.tech header.a=rsa-sha256 header.s=selector1 header.b=S78x6J7p
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dqq1wciStRazrrVS3ROLro2uA6yVZBlJQtVZmogVHeGWiYuPHaETSAnQn2MoFC1HmloFXEH/xX2Znn/bCK/jFFd2JdDt7uHtKIa0M+Mey13TEYbuVe/ghAkGp8Fhb9du+p4ytz6MfsFKw3XFuLzkS+oGkQCPtTEUIIHz0CEX0/qhn3r4UVN7/VE9IMHiGx4kW+sZebo9PuNBxMlxO2SFIZ6pqbmHu2qaCNZGyF6klP1d+urzQUwdUX1DfBMtNpDKBYB7IQW6IVbJQLbjISWVPBEz43EgieLyzs63I8Xgl+x2Fn+iNXHaZ5rtPPdacqqK6YE4zqM3vnjHkcb8x8vwRQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jZAvvvHun6aalGq5kU3xbJGdnoWrIc1LoWTmjMlrfpA=;
- b=EPVbDM0/WTu7nNI/0GLrxaQ1SqoZnjU/TDXYSgx4Z15oNMgp1nG/++wbGUjUACmdqF15sIMh8RSPUcN8po3Li3DmTzGAudE/epaA30JUeqCX5HsipwJMvRs4Sux1NeckY6B+fI3xfLNYTOOoUGWPV73Daao5CsqI8xU7VRWogIgU7z/hzTxCi3bc+KZ/q5izeatDSZo2vb7rO/Ch2kHHukHRUEAeerpRJHnsmVUuorHaurCKlCkKHbwVJMXp+O0JTsWQBlQyPd/bYO0V0IKbQGw/HA/uGD//lalW354hi1DiWzCyRNopeFeueAa9pVwIvLH16cEPITuYt9lWsfCtXw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
- dkim=pass header.d=est.tech; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jZAvvvHun6aalGq5kU3xbJGdnoWrIc1LoWTmjMlrfpA=;
- b=S78x6J7pzZK+Grs+p2XwhAVoM273emPqJVXRuFB+Wl8cRvW6+EuP++U15O1KuvEf10OJ1JFlq/GQufmTUKdY4srrBHoLmey4lXjxYnLTej7E2wEZJi2xQ0WVM/kknSwLihyIv3BEqYDwb2w6rpyAvmumpitNMPmMxYWVpkXW7pmACfaaPw7Mt2siKH4u15CM7KyCX/aK5F+R/v4VIr/N46aLGw2feObgBJR/U4jp+Poo+45Pvv+6//BGV2DZYqNFnRvfatnDeM9lVbNZ0pSjIrP9me63cQOvm/G9/WP59aYmqOicQb4SH9FCZN7Jfb5jVlxJd5TL4lmn83+ml49FJQ==
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=est.tech;
-Received: from FRWP189MB3398.EURP189.PROD.OUTLOOK.COM (2603:10a6:d10:1a3::22)
- by VE1P189MB1135.EURP189.PROD.OUTLOOK.COM (2603:10a6:800:148::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.546.22; Tue, 27 Oct
- 2026 16:35:02 +0000
-Received: from FRWP189MB3398.EURP189.PROD.OUTLOOK.COM
- ([fe80::4658:dbd6:d572:896a]) by FRWP189MB3398.EURP189.PROD.OUTLOOK.COM
- ([fe80::4658:dbd6:d572:896a%4]) with mapi id 15.21.0546.021; Tue, 27 Oct 2026
- 16:35:02 +0000
-From: Yunseong Kim <yunseong.kim@est.tech>
-Date: Tue, 27 Oct 2026 17:34:09 +0100
-Subject: [PATCH RFC 2/2] x86/kcov: allow instrumenting noisy objects for
- early boot coverage
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261027-early-kcov-v1-2-6f2f053255ad@est.tech>
-References: <20261027-early-kcov-v1-0-6f2f053255ad@est.tech>
-In-Reply-To: <20261027-early-kcov-v1-0-6f2f053255ad@est.tech>
-To: Jonathan Corbet <corbet@lwn.net>, 
- Shuah Khan <skhan@linuxfoundation.org>, James Morris <jmorris@namei.org>, 
- Randy Dunlap <rdunlap@infradead.org>, 
- Andrey Konovalov <andreyknvl@gmail.com>, 
- Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, 
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
- Will Deacon <will@kernel.org>, Boqun Feng <boqun@kernel.org>, 
- Waiman Long <longman@redhat.com>, Luis Chamberlain <mcgrof@kernel.org>, 
- Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>, 
- Sami Tolvanen <samitolvanen@google.com>, Aaron Tomlin <atomlin@atomlin.com>, 
- "Paul E. McKenney" <paulmck@kernel.org>, 
- Frederic Weisbecker <frederic@kernel.org>, 
- Neeraj Upadhyay <neeraj.upadhyay@kernel.org>, 
- Joel Fernandes <joelagnelf@nvidia.com>, 
- Josh Triplett <josh@joshtriplett.org>, Uladzislau Rezki <urezki@gmail.com>, 
- Steven Rostedt <rostedt@goodmis.org>, 
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
- Lai Jiangshan <jiangshanlai@gmail.com>, Zqiang <qiang.zhang@linux.dev>, 
- Juri Lelli <juri.lelli@redhat.com>, 
- Vincent Guittot <vincent.guittot@linaro.org>, 
- Dietmar Eggemann <dietmar.eggemann@arm.com>, 
- Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, 
- Valentin Schneider <vschneid@redhat.com>, 
- K Prateek Nayak <kprateek.nayak@amd.com>, 
- Andrew Morton <akpm@linux-foundation.org>, 
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
- Thomas Gleixner <tglx@kernel.org>, Borislav Petkov <bp@alien8.de>, 
- Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
- "H. Peter Anvin" <hpa@zytor.com>
-Cc: linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
- kasan-dev@googlegroups.com, workflows@vger.kernel.org, 
- linux-modules@vger.kernel.org, rcu@vger.kernel.org, linux-mm@kvack.org, 
- linux-kbuild@vger.kernel.org, Yunseong Kim <yunseong.kim@est.tech>
-X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1793118887; l=3249;
- i=yunseong.kim@est.tech; s=20260824; h=from:subject:message-id;
- bh=XFup3h7UWloVBflNudxisL9cA+gOhcl+s7k8IxtKVKQ=;
- b=21InQGEVzGa/xXsjiaQcAKIzvWuhynLYuI5/cWIYRBiNPwLmEGn/X2vBrjeMyDVkYE3/ErMMk
- OB3Wg8bZZk0D/b1kYnHii2X+SjhEDjib8INCLs9Yn6hsXkxGtJ7ZXpv
-X-Developer-Key: i=yunseong.kim@est.tech; a=ed25519;
- pk=nfdmjNawkxBHo9UNdzLNBEht8sYmXp0MYUsa/hwC7vw=
-X-ClientProxiedBy: LO4P123CA0017.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:150::22) To FRWP189MB3398.EURP189.PROD.OUTLOOK.COM
- (2603:10a6:d10:1a3::22)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Jg+NOm3N
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 79E921F01825;
+	Tue, 27 Oct 2026 19:57:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793131030;
+	bh=SMyYRELwwZeuNtf75MqiN2auLAIDD43sZyC7A/iNGsw=;
+	h=Subject:From:To:Cc:In-Reply-To:References:Date;
+	b=Jg+NOm3NonJ+1pwcdujNDEUphnXbNbeMaWqRlog3XTofahqPpgPGEzQTdY92oIFsx
+	 n2FtmqsFPsPUqChTyGD25MKZq5srkpzF3iA7UHZsyaPeXhdm4JaW9kpIHRSimRnBBq
+	 fIQfwRO7cI7hAsg1KW1ELq1k7y4MWcQQbU22P6Jx92fEJXmUEvJp7RnaaPQDqjORCM
+	 1u29st7OSVJ5Hg2b8UEdvjpZ3/6+6wgMXifrmgycmXe+KZ5ci54UVMWbSU5uGE+7Zb
+	 ZlLkAD8pUHeTq4dJTHM0mCoKYUVy57QN89VWXynLYiU+w8BjckxT8TU5Bdsi5p0bVS
+	 DcvyDQdnUxEuQ==
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -134,146 +49,84 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: FRWP189MB3398:EE_|VE1P189MB1135:EE_
-X-MS-Office365-Filtering-Correlation-Id: fd0c8e78-ddfc-4148-774b-08df34483fa4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|23010399003|921020|261026121527099003|5023799004|56012099006|11063799006|261009223027099003|261021123027099003|261022075727099003|261022105027099003|261021121427099003|22082099003|18002099003|6133799003|10067099003|261026140227099003;
-X-Microsoft-Antispam-Message-Info:
-	QTu7N3PHQb36IBbIPETx1Bfo2DSurdJHbifEnc6xTyDtDxHpAsWzVlaqs862Do/GOoti+BPm9zuCrNN8caBIEN7InRM4iDXszD7vwITPKphMq++TTTOKOrdCuegExqrP7GsGoCoo4NpQm689r2j9iHbebUNpp4MzYzQ4AzJYa+UTUBErd0jvnYTfSeteNp46iVdFqgcetx6E17uk2tGuAszQE+ciVgWLXxP/uBq3hliHLwj4Bd8zur1N/59xsZGXR8Vzs2XW0d4RqzOej7XaBUykQXMmBYjhA8PIMT3qtUyNWvMBTmAj5bDjkZcnhCNYggE/6xUG4MDSFixnif4IS2SfKTvnnkeRIH1jhNBI3gf80BglW1+9dKa0T49OLJ2C25G2/i/LAYa9CIwBfOKprzqEylXds7d+hTNKlBLw6bmd5+8STtOrxjO7cwyBXgwsGCyWQwta2v5nppYulH67HJlefvJcCoDqEkU1eXIK7+UTAjIFOkRONk05X+xwPNU+W8O7p2xprMkxhSTCWApiHd4P6ZnGk2Hm6yc5P0DepJTO222Iw90JJAT+KxOqCJ5NnMmExSEWdWVgs/pOs85JmqGAiJ/1M5HARIqq0+GYOcuba2YBw+pQ8j3R2Yvi6Rf/mdZeExFvGmeDIGp7YjuX8bSt6zY+7fuBUGJyiO3UDER3+inEeAypq2A03AgkViJ43Lvedmwn371bjjl56JuIsg==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:FRWP189MB3398.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(23010399003)(921020)(261026121527099003)(5023799004)(56012099006)(11063799006)(261009223027099003)(261021123027099003)(261022075727099003)(261022105027099003)(261021121427099003)(22082099003)(18002099003)(6133799003)(10067099003)(261026140227099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?eTNCZEo1cm9JK2ZsckVjSFV4dXNXejJTLzJ6YzFFZjRzMkIxd1JMMkdDR2ty?=
- =?utf-8?B?aXkzQ2d1WGRnb2grWlI2Nkt5Y0k0T2pvUTFiOWdPV2crOWNTc2JqeGcwSzEx?=
- =?utf-8?B?TFRjeUhjTXdLalZEL0xETitmeHUvTFZxTVp0TlAyai9tQnpVaFgvYko2M0xO?=
- =?utf-8?B?VnNwYVJLSWwvdVNrdjc1NU1VRkg0WUd6REtHZEpHQ2ZFNk9aUnpESFdpc1pU?=
- =?utf-8?B?SjBHYkJBUGZLaGM5Qy9RZnFWNnlLWUpzeTBZbjQvUklwcDlKVW9tdWxXL253?=
- =?utf-8?B?d3BjeGExeHA2YlhHenNpNWdocVMrNHdWaFZuS3Y0a3pSWE0yOTFYaXc4L0NL?=
- =?utf-8?B?bE9YQTZSbXlEd3dVbHg4ODhQYUtPTVRJbERObU9tczJPTnptV1lYU09ManJH?=
- =?utf-8?B?VE9tNFdlL2QrMUZaOHZ3c1BOR1lpTFpXU0kxUXdhSUpsZ0xibDlSWTFnSUZl?=
- =?utf-8?B?anNWck9VRWRYby9EcytIWGc2UjZNeWVyN2UxR2tBY1RJQ0Z3V2JSUlhoc3Jk?=
- =?utf-8?B?SDIzUFJyVEMrWnkvMytxUm1ySWZtckh5Tm5Hd1NFK1NFcjlUcnphZU91dzJY?=
- =?utf-8?B?SngxK3VNaGNmdGc0aHJFanpNV3FIRGEvVzlZTUF1bHdMamV3emV4RGhCT254?=
- =?utf-8?B?dlZlMlVTTVROL09wMCtlUENDZEhOWjdCREp0cGx1bWVnWTNFSldQdVdvVmVn?=
- =?utf-8?B?M2tMWU53OEpodWtrUGtNQXBxWno1N2NpMFhpSi8zNTA2SXJObE1tbHYvZVo0?=
- =?utf-8?B?bmlMeng2dmQrNklqN2FRQ05Hc240VGkxbFRqNmFXNDIxdENNMXBsc2RVVWRU?=
- =?utf-8?B?UFBhSS9hT2VYaTl5OFJzamxPSWJscG9IZkNLUDdwMmRQUmU1Uk1FdUhqTitI?=
- =?utf-8?B?V0N4Zk9RakRGdHdweGl2K3o1eFZCQlk3QVg1clZVb3QvY1RtVmRwS3RLVVZQ?=
- =?utf-8?B?VHZxUjkzK1FoVmhhNnlQNVZQVGcwWCtERldHK2pOclNRczNNNE5LRVZ5aEc2?=
- =?utf-8?B?bk1FaFFwVjk2SktWd1dwLy9EL3pDNGtkak1UZ01DNEJXZjJrc1U5SEJKbzho?=
- =?utf-8?B?ZFZTaDA0N0d2VDhLZFNQVlpQQU53WUJ4WVBHOVFUTjBFS0NSVEpuQnY3SDFF?=
- =?utf-8?B?cUFPc1ZGMjRxRytwOUlDYnFROTV5UERpVVg0U1JGRlpvcmZLMFVEWkl4aVhr?=
- =?utf-8?B?b3pVY1RSNmpMZ3VuVjZDcUYzV0czWDg0SHJqVEZJeFA1YmVteDRWekpIdEUz?=
- =?utf-8?B?TUxFNHptK3J2cGJNY0VTc1lkZU80VEQ3ZmpsOUZDN29WYXZZMXhOZDl3dUpH?=
- =?utf-8?B?TXBmT2tqdEVIZURBbTZISWlMQVFLeTlCSzNVM2wxYlZhdmd2L3p6VnhZRVZh?=
- =?utf-8?B?UjU5RW56SnlteUY2N29Rb0NUZDNoUnNZTTVVYnBZNTk3eVN1TTNwenovWms2?=
- =?utf-8?B?R2loNGZzRmpUZVF1NFpPbHZ3VlNzVDNFMExhR0pDTE9EYk95aC9pN1FVUlhV?=
- =?utf-8?B?RkFBODMvS1NWeHA4cDd0VTZTT0hYS2ZKdEsrQzFWMnFVOHFXbDJ4a25sbFBS?=
- =?utf-8?B?OUpPVUNCOFBOOUplM1VpVmlvN1gvbGNmbCtGY0EyTitMOTZ6S25xNm5DTW9V?=
- =?utf-8?B?aE81a01hc0lpZmhyMHFIcUNqZGY0RHBtSXh2L1hPVEppNnFkQkdNcmFQYjRR?=
- =?utf-8?B?c2d0UThUN3EwdVc1OE9XS1Q5REx3Tk9TRGppcUVobDFOcGpFaUg0NVY2WXpu?=
- =?utf-8?B?MFRvYUpwWnIrWVlPYm1mMjhabE9kNmV2eFVBNjU0c2VoUUhVL2VBRk9zVnlZ?=
- =?utf-8?B?UTluNFpoWHdBZVFtRzJzKzFoZmkvcHplYTRLb0ZId29LbEdiSkdqaEVCMHlq?=
- =?utf-8?B?SGtoN3NhWmdmdWQ4Y0Jzb1EwTFJVVlFSNVplYkMvWnNKSnR4d0lmcW45RmVn?=
- =?utf-8?B?RHY3NjZUUzZ0bWYrRnlSb2RHQjZaVmtSc3I1MVgwTGlEeGVaTnYwSkwrbTA0?=
- =?utf-8?B?TnQ3SEJFUlNyZTQ0dG5QRU5IaTRETElnMVNmVkphWGg5MDdJTnFpenV2WDZz?=
- =?utf-8?B?UmtHaXhRWDc2QU1sMlZ5RW5GQTAzcHdyVmdaQktCT3BYU2RpUmFMNkdsczJV?=
- =?utf-8?B?WUJESFEwYWhxTjRmL1ZkTVoxSmlJeU94VTNKejRMaTJDVHU3b0RlaElIazNa?=
- =?utf-8?B?bkhQWDE0d21PZ1lIVmUyQkhrV0kyaGNiZm1sRkhGejFZcURYZWk2bUg5UkZQ?=
- =?utf-8?B?ZWsyN042NjhqbEdmTFlvY1RFSGk4WHVGbFNXMno3QVhkR3hrTUV3WTBDeUVK?=
- =?utf-8?B?bExhclZsZ3pDNWtKZEw3RzF4SjlzSW5Rck9jdFNqZmR3S1MrckxrZz09?=
-X-OriginatorOrg: est.tech
-X-MS-Exchange-CrossTenant-Network-Message-Id: fd0c8e78-ddfc-4148-774b-08df34483fa4
-X-MS-Exchange-CrossTenant-AuthSource: FRWP189MB3398.EURP189.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Oct 2026 16:35:02.0795
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9UoDXaGbTsjbnfmeD6lNiwRCbDlR7PmmTmUWoB8oAvL47/P+Ce3r05M/oqitw3YZwj3Ncbxk/Hhp1WmYRzlIhw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1P189MB1135
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 2/2] kbuild: deb-pkg: allow to set package name
+ version
+From: Nicolas Schier <nsc@kernel.org>
+To: =?utf-8?q?Guido_G=C3=BCnther?= <agx@sigxcpu.org>
+Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20261025-deb-pkg-v2-2-8c33a4ac18ad@sigxcpu.org>
+References: <20261025-deb-pkg-v2-0-8c33a4ac18ad@sigxcpu.org>
+ <20261025-deb-pkg-v2-2-8c33a4ac18ad@sigxcpu.org>
+Date: Tue, 27 Oct 2026 20:56:46 +0100
+Message-Id: <179313100619.2748903.16873015602757150534.b4-review@b4>
+X-Mailer: b4 0.17-dev-1f2f7
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1489; i=nsc@kernel.org;
+ s=20250924; h=from:subject:message-id;
+ bh=99wo308cdK0dLGZ9mfeJZPwugDlMcpNk+LvnB8KtqVw=;
+ b=kA0DAAoBB1IKcBYmEmkByyZiAGrhAgKhV0unOAgkjQGy4O4u+Pd3Cjo3+LWyWbI/arWAionwp
+ YkCMwQAAQoAHRYhBIdBN6eHNySngb7CxgdSCnAWJhJpBQJq4QICAAoJEAdSCnAWJhJparoP+wWk
+ VGMnrFM6VIZkNFuRLZocW1ALg5mBCG8keX1JAfaLQ0d/Xm2Bi23OK9KwRjq3YqpYJyC+jTjqNaa
+ X5BjXz2oSGPGamZt3e0QLSFybGWMF3ubEmBEnQN38iVCAh1/deIHKgEDULwAYmgrBGwQ4q6X91X
+ 7pTzug5OBn+9m0k+CoJvi41XHVondCbiJTlsddouJ3cU+2b5yU2PacZrqpYjchNo1v5z/WoaeNp
+ B6v+JAcIAVjbL0GFWtEYd9+pNGH0bZ7cTPY37nvkkPFJfn8LP6PDK6dBbnQTqB1uDT1VfoR7gAO
+ 8LqzJgWjUqL4u74qWLbmCDZO4qVtvcznyGVIJ/EGTgIn8SuB18T+GvT3Z8nnqv9+9n0ri8qF5AA
+ WMiVzAJ9s+U9su56ZiFMTbtM2kc/ZB/adOsxBERb0BHNoua695bXa+XPfQJmeo8HgjXASJE4Fjc
+ 5nq725Fv683/MKnQ2peiU0MWhGKZX5PwRzCPv2bwMEijzJWo6uj/aoQ9PgnLL+73JW6EnygWDGJ
+ C1K17AH5zF+ylQZOgeOYYtq6SBUvVn6MkumxgqhCistWWF/mHuWvxuVtSYredFJVgl1AUcxLApx
+ kyLopzSMIBcaJGXMcQZTlcmCQr2RKERuy/zouQ9oMCnE0eQQP7Gjt2BeBeTwnoGe5CYRaQbRMxn
+ ck4zh
+X-Developer-Key: i=nsc@kernel.org; a=openpgp;
+ fpr=18ED52DBE34F860EE9FBC82B7D97093255A0CE7F
 
-A few x86 objects are excluded from KCOV only because their coverage
-is noise for syscall fuzzing: the APIC code (interrupts land in random
-places), delay.o, and the stack trace, dumpstack and unwinder objects.
+> Instead of hardcoding ${KERNELRELEASE} in the package name allow
+> the user to override this.
+> 
+> This can be useful if one doesn't want to accumulate different packages
+> for every commit or micro version bump by setting
+> KDEB_PKGNAMEVERSION=7.3 or even KDEB_PKGNAMEVERSION=stable.
+> 
+> Signed-off-by: Guido Günther <agx@sigxcpu.org>
+>
+> diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
+> index d4b007b38a47..44ca9991fd6f 100755
+> --- a/scripts/package/mkdebian
+> +++ b/scripts/package/mkdebian
+> @@ -172,6 +172,12 @@ else
+>  	packagename=linux-image
+>  fi
+>  
+> +if [ "${KDEB_PKGNAMEVERSION:+set}" ]; then
+> +	packagenameversion=$KDEB_PKGNAMEVERSION
+> +else
+> +	packagenameversion=$KERNELRELEASE
+> +fi
+> +
+>  debarch=
+>  set_debarch
+>  
+> @@ -215,7 +221,7 @@ Build-Depends-Arch: bc, bison, flex,
+>   python3:native, rsync
+>  Homepage: https://www.kernel.org/
+>  
+> -Package: $packagename-${KERNELRELEASE}
+> +Package: $packagename-${packagenameversion}
+>  Architecture: $debarch
+>  Description: Linux kernel, version ${KERNELRELEASE}
+>   This package contains the Linux kernel, modules and corresponding other
 
-Use $(kcov-noisy) for them, so that CONFIG_KCOV_INSTRUMENT_NOISY=y
-includes them in early boot coverage. With the option off nothing
-changes.
+For completeness, I'd like to have something like
 
-The objects excluded because the kernel does not boot or hangs when
-they are instrumented (head64.o, cpu/common.o, perf_event.o, tlb.c,
-mem_encrypt*.c, pgprot.c) stay excluded, as do machine_kexec_64.o and
-physaddr.o, which must not use KCOV during kexec once load_segments()
-has invalidated the GS base.
+    Conflicts: linux-image-${KERNELRELEASE}
+    Replaces: linux-image-${KERNELRELEASE}
 
-With FRED, the system vector wrappers in apic.c are not noinstr and run
-before the hardirq count is raised, so with this change interrupt PCs
-such as the LAPIC timer can be recorded as if init_task executed them.
-The same already happens for the wrappers in irq.c, smp.c and others.
+here (and similar below), if ${KERNELRELEASE} != ${packagenameversion};
+but probably it's not worth the effort.
 
-Signed-off-by: Yunseong Kim <yunseong.kim@est.tech>
----
- arch/x86/kernel/Makefile      | 12 ++++++------
- arch/x86/kernel/apic/Makefile |  2 +-
- arch/x86/lib/Makefile         |  2 +-
- 3 files changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
-index 31f46fd005278..44cfd3781c30a 100644
---- a/arch/x86/kernel/Makefile
-+++ b/arch/x86/kernel/Makefile
-@@ -37,12 +37,12 @@ KMSAN_SANITIZE_nmi.o					:= n
- KCOV_INSTRUMENT_head$(BITS).o				:= n
- # These are called from save_stack_trace() on debug paths,
- # and produce large amounts of uninteresting coverage.
--KCOV_INSTRUMENT_stacktrace.o				:= n
--KCOV_INSTRUMENT_dumpstack.o				:= n
--KCOV_INSTRUMENT_dumpstack_$(BITS).o			:= n
--KCOV_INSTRUMENT_unwind_orc.o				:= n
--KCOV_INSTRUMENT_unwind_frame.o				:= n
--KCOV_INSTRUMENT_unwind_guess.o				:= n
-+KCOV_INSTRUMENT_stacktrace.o				:= $(kcov-noisy)
-+KCOV_INSTRUMENT_dumpstack.o				:= $(kcov-noisy)
-+KCOV_INSTRUMENT_dumpstack_$(BITS).o			:= $(kcov-noisy)
-+KCOV_INSTRUMENT_unwind_orc.o				:= $(kcov-noisy)
-+KCOV_INSTRUMENT_unwind_frame.o				:= $(kcov-noisy)
-+KCOV_INSTRUMENT_unwind_guess.o				:= $(kcov-noisy)
- 
- # Disable KCOV to prevent crashes during kexec: load_segments() invalidates
- # the GS base, which KCOV relies on for per-CPU data.
-diff --git a/arch/x86/kernel/apic/Makefile b/arch/x86/kernel/apic/Makefile
-index 581db89477f92..146cbd766c924 100644
---- a/arch/x86/kernel/apic/Makefile
-+++ b/arch/x86/kernel/apic/Makefile
-@@ -5,7 +5,7 @@
- 
- # Leads to non-deterministic coverage that is not a function of syscall inputs.
- # In particular, smp_apic_timer_interrupt() is called in random places.
--KCOV_INSTRUMENT		:= n
-+KCOV_INSTRUMENT		:= $(kcov-noisy)
- 
- obj-$(CONFIG_X86_LOCAL_APIC)	+= apic.o apic_common.o apic_noop.o ipi.o vector.o init.o
- obj-y				+= hw_nmi.o
-diff --git a/arch/x86/lib/Makefile b/arch/x86/lib/Makefile
-index 2dba7f83ef97c..151ecee2229f3 100644
---- a/arch/x86/lib/Makefile
-+++ b/arch/x86/lib/Makefile
-@@ -4,7 +4,7 @@
- #
- 
- # Produces uninteresting flaky coverage.
--KCOV_INSTRUMENT_delay.o	:= n
-+KCOV_INSTRUMENT_delay.o	:= $(kcov-noisy)
- 
- # KCSAN uses udelay for introducing watchpoint delay; avoid recursion.
- KCSAN_SANITIZE_delay.o := n
+I'll queue this patch set for 7.5, thanks!
 
 -- 
-2.47.3
+Nicolas
 
