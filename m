@@ -1,79 +1,78 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793132533;
-	b=wRZicjBLI50lmJD+NaOGLbSaI0/Qq4MeeI+0+9R40x+VAdNln3kHqQ1mat1ksoX+rHr9
-	 vdSxgFRWGgVCMlJ8miWxh1ULzkm6O1yH8lygt9bJcZqZ5buVEWED3vi6k3D5YtJ3J3ZW1
-	 56EB6JZ6KOSJulbSxEzZEcvfrd16/EjLla0w4KL4/XWKtIIq9FRCYYLf/0o+ic4pa57E/
-	 mZiTSuMjZybmLKaJn1Abt/F85Qntb7ZPwDPGO06r8e8Je6zjFitNp272zlcqHUzItilq/
-	 Y8rRJmyeyBEVz4iMgkNZrOMvxEvkxuWzOiXmP5DcpiEYs7Bq9V4oIXCctFPBdyA1//Q==
+	t=1793132539;
+	b=Cta1Sq0KSxsIwvxOY70zLeDDTgqt+rvoRiUK15GuEsqJTej96NFy9XAD2imkXCf5taUX
+	 kSXfVEUIPhLEPfd2378clRMMfr7qpCgOqoujCiIido6dO/eumhRe+xIVPv46ePUXtqeKJ
+	 eNkJSmvYwtJZAdrUwbY6g2ivoGXnQHKoyiTXq12vrYCLcXtX6+2NETZgWnQdvb3RKm6m5
+	 gt1iB4umih5RM/3fbwjmDeAznophii4UqTkAgHBm8hg88QGfYm85wVyOpdIwgk8/j53/y
+	 5g31Ql9KC9sJHWh4GeCRYk9RH97mZbEv6beSsIKgl2LUs4pkVnwVGJxKKIfHZQ8kONA==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793132533;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793132539;
 	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
 	 Content-Type:Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
 	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
 	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=i2AYSVyMlFYHXLiJWfhVWhDsqEYA0bVupdknF/NMVN8=;
-	b=ILAVt1GnR0XWlv1BjIR0EYg9hTjpduGr1QfqvxrJuyYi8ea4zECeyHFW+e2BrYKJjKvA
-	 2LJoudSzwAAy9NA/KZLhHnqkeNim1Qmf+nn2v8L5nJDLEYo75Ezsl2/qDpVwkpM1x6VHY
-	 1978v8H7jwUGTZKM8o1QiCSbWUy90jhAeWSGg33WifriVnn0F2Sr6FRVbUQRmGvdNOIna
-	 UY0gGEFs6skJPBOVkQNjC6kYCWePRepX8xhlgmkO9fRIgR4qT/4jwgAE/M2FD5Kob7PSx
-	 q94Asp6Phw9S7tX7Rvdbia+oU1GSm1rCV4AMcsj+2ykdFMWKZB9X+tubo4Fx5s6NmqQ==
+	bh=pAbzIfs3ymgyt6UeBjNwybzpsbVvnSgiP8ksXvEvp7s=;
+	b=KPhF6U7dZV5xreEzOPBTPhA/AbYANRmw/spkQZ0UTa2PG+QaCg6tH1Q/QJG8bIqoj9nW
+	 HEuLe06o3K+ZirI82b8anlU5hfYZls312G4ncrn9M05tfW1BJzcmesal5VVQzdmgZLoY4
+	 UPRXZWiZeCJpWJ3h25tR82bpOnthLAer7qEUhiuwXyNNAFpuX5Fdy7spr7cD0CoQMSvTM
+	 BCkkaVSdgBpb+I2VYb72X/RjoMHnlbXU8nTOeOk/0RfjSMr7rSU/tepKFfDXtGNoyS4Hx
+	 jy4sCEzzX3zZtbKTOec4j0FRml6Pb3ZnzO+S/c+YR9RmY0oSmvXpa0D2vtAuZKKFsSQ==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XhPwS4ZI;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lGZZxAAX;
 	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE7B606A32C;
-	Tue, 27 Oct 2026 20:22:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A39560A3817;
+	Tue, 27 Oct 2026 20:22:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XhPwS4ZI
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lGZZxAAX
 Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
 ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
-	t=1793132533;
-	b=viEHPvugncG5d9R06IIZQ/+Tj8FSz8gwD+9mHu/Qra01VHZpCLy47xS9oo2X6NbnhVAl
-	 4LKXZpAxDoYDo+mCW3bPvX1GXuli4vUC0CVM3sPD1BFDxMAY6wgFK/UOSA24yQ4FHrFZT
-	 y9E5XbueVjD/BGHJydSnve4Tp6H1HWq7beDTQ42snCoh50uUlenbHC3gEJV90jASHGRZp
-	 8/G2GJlkUJeHIvIFbqpHQ9Ahhv3sQwb053DHdxpqT9VQPA3vLMPM8PD7AtVsBk9uxVS9O
-	 zLxGB8bBc4rgBMOn+6RpY8XbfeGs24gU97XBa2DU7w9Le7kOAbawkbpjsIDgw4tuTrg==
+	t=1793132539;
+	b=meb7mlC+tYvO+fsQnAbH4CevMrGRIltA83YAQrrlwfAPn4tmBsDXPxSWz+IdnAiYbPku
+	 XteTFMG+fWm0CCu9vV7N0Ve0lZCH4ENUqkN6WWGcphB3Eg0sCBoE8gPrJabJTjqa4BhOp
+	 Nl4XyEsKSoYRx5a8os0V2HcUPR0mTKdEUVwNkjWnQWGfgJha4CBHZjo/p5KM40BtBFtN7
+	 nkSIu6V+2K+cgMV6DLKpsUU/lDlucotuePlSdX4T3EYjVeYVCuEiwyS3gvklzP3y8Vzdu
+	 wK354G9uLhkY+e3vKywSN/zMD/p2nXbXi+E9aUcWqOSlNC2be53SvVPx9fauO+iOOzQ==
 ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
-	c=relaxed/relaxed; t=1793132533;
+	c=relaxed/relaxed; t=1793132539;
 	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
 	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
 	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
 	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=i2AYSVyMlFYHXLiJWfhVWhDsqEYA0bVupdknF/NMVN8=;
-	b=SzFGi8lNwubPfNe1zfy/E/EHw3uH//hCZd2O5j554zFayyVtiw2uMl0qFBVhellxzNEn
-	 zgW47I359LtMlLtAY9Kb7p6tUbTrcwLV59e2csCfWF9ykCoKF0PKVxqxHXux9RXe5Um6p
-	 ZcUZGmzaQOn8whZ5CQCugMfIMqnK0Ysikk6SmR0zGejHJHlS4X7G194DEAnZHnM4iHzVo
-	 YuKNMp2q94/ohpYF82IAjJmTuffZayhprp/PLeKg+LD+Ci+dUBcoQoA1LtyS54Vn/LWyt
-	 kEKgwH5sQA94KX+4oVEV9st9/aCZ3qMC1s3PhsRkXXZfuuAov1pAxLG7UK60gXo55Rw==
+	bh=pAbzIfs3ymgyt6UeBjNwybzpsbVvnSgiP8ksXvEvp7s=;
+	b=h0TxgOD3b08Wzfx572e8Tsqw5bW2w9ejwxPI2lCr8agses1hSrJf4q5eo4AxDA5YyzTp
+	 GTMizCc2FLkW9QS3hzuKj83ZMFuf/MZnzV6myofKgB9181srwIS/s/aHAOn4tWL/Gi49o
+	 5ariV3Ia0p0eDyfzX3mTOlS8FEvsL+BWJ9T649MHMYyOzPlShnJLCrR+l78ZxhDIJYYG2
+	 0aSkz1ziFPpxxSH9PGlBaVK3Fb2ogaQIkO25z1r0PkD+oaBKKJe0vPMfzy8J1qsYi0JJV
+	 uS1XVE5BidTtCASbArsE5CANN5VkSfTUP68+DoG2FX9nXemiH+ab1Z0fSJwV+36Ct7A==
 ARC-Authentication-Results: i=1; smtp.kernel.org; 
 	arc=none smtp.remote-ip=100.80.115.77
 Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id 61B751F031E2;
-	Tue, 27 Oct 2026 20:22:11 +0000 (UTC)
+	by smtp.kernel.org (Postfix) with ESMTPS id 51BDC1F031E5;
+	Tue, 27 Oct 2026 20:22:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793132533;
-	bh=i2AYSVyMlFYHXLiJWfhVWhDsqEYA0bVupdknF/NMVN8=;
+	s=k20260515; t=1793132539;
+	bh=pAbzIfs3ymgyt6UeBjNwybzpsbVvnSgiP8ksXvEvp7s=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To;
-	b=XhPwS4ZIMcYh+lNM8rKpYSfVS97U1mZ14ufRJdPJg0DG5w5Jp6eaKznSk6xRpfp/D
-	 /8c31Qxfex9utzt2i/EAc7gYhc0CQLouDGHvIbBy/mFAVGUBod4yZurVYgMyEH1GOi
-	 15SfO6jRnj1THm8V9G1SjeKz1cUVIBVenSSbr/jGhes8wcAuqiaQTf//9m72ZGo5ym
-	 oN0/jhALYLE081nHZpaxHedW6MRwKjef1bKZrepQ14sh9l5t/aAs+/NEpFLThqIb+M
-	 fMyXPKi3zEq0st0VB0sArg4VOr1Bvq8+YtKoTFL8PS1zQc8P9wxg0bIBVBqHXbcmCN
-	 95pgzHDQSpC+A==
+	b=lGZZxAAXEaSYgW1Zf+OecAfycWk7Kiz5Cc7JwBsZzAnNIVSut6Zqd+J8d7zpM91TI
+	 tj7SFc3qiTmlY5pIksxqSGG9vhhkMo3codnQe10vOsbJkEi/mclcgxhl181D1p6hbx
+	 11zMJbzi1KIca6nKF950Oya8XWvVO4SZ2O8kEuA//PYmV4vjcFLuLDVkpU22HyYEPq
+	 Q9I4TkYMQ4OKfdKxa49mZg3YJlmC9CkZQZV2ZWAVzh78NYB+FH0q5IHLLj53RXijFE
+	 QUS+hQKLzbZvA6jpCnW0RcmmecHZOHJ3Qm/P1dSH/Bk+jIi/c3gqjtAZyfuMfo3sDT
+	 n18Rj4ZXN9I+g==
 Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id C518545205;
-	Tue, 27 Oct 2026 20:22:09 +0000 (UTC)
+	by lkml.kernel.org (Postfix) with ESMTP id 1A4C24521D;
+	Tue, 27 Oct 2026 20:22:10 +0000 (UTC)
 From: Jim Cromie via B4 Relay <devnull+jim.cromie.gmail.com@kernel.org>
-Date: Tue, 27 Oct 2026 14:22:05 -0600
-Subject: [PATCH v13 05/39] vmlinux.lds.h: remove redundant ALIGN(8)
- directives
+Date: Tue, 27 Oct 2026 14:22:11 -0600
+Subject: [PATCH v13 11/39] dyndbg: drop NUM_TYPE_ARGS
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -84,7 +83,7 @@ List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <20261027-dd-cmap-part2-clean-v13-5-9267923be612@gmail.com>
+Message-Id: <20261027-dd-cmap-part2-clean-v13-11-9267923be612@gmail.com>
 References: <20261027-dd-cmap-part2-clean-v13-0-9267923be612@gmail.com>
 In-Reply-To: <20261027-dd-cmap-part2-clean-v13-0-9267923be612@gmail.com>
 To: Jason Baron <jbaron@akamai.com>, Shuah Khan <shuah@kernel.org>, 
@@ -111,13 +110,14 @@ Cc: linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
  dri-devel@lists.freedesktop.org, linux-arch@vger.kernel.org, 
  linux-modules@vger.kernel.org, linux-doc@vger.kernel.org, 
  linux-kbuild@vger.kernel.org, linux-pm@vger.kernel.org, 
- Jason Baron <jbaron@redhat.com>, Jim Cromie <jim.cromie@gmail.com>
+ Jason Baron <jbaron@redhat.com>, Jim Cromie <jim.cromie@gmail.com>, 
+ Louis Chauvet <louis.chauvet@bootlin.com>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1793132527; l=3579;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1793132527; l=1542;
  i=jim.cromie@gmail.com; s=20260203; h=from:subject:message-id;
- bh=n4fe1wSOBG2W46PqroKAGoIQamWdwgMAOSn4TJtR7Z4=;
- b=IgiHfuTiiB4dktBz6NF5RzqKAN7TCzMhOP1iAi8PKRFIzKRl7iTpb0sk8EfyjA3xiSYzHn69m
- f0K+Zf0nzbMBydk/r3giu9JUswBKc7DGT7EE38p+SkjmNgeYC5CXT2M
+ bh=4fUQ6VDuWM6S7NYu7bhh+z3cfhN2DdlYIxp8VPxliP4=;
+ b=WGx/gQ/TRPx53OR2rejypIgr1c5iw+X7Bv8tapAH0PrZsCEWZloxnH2slTGJFcWeIptJ2You6
+ FpBG8tL053xBbOSnnJ3nKlK2QKmeTLo7AlGnFP6+Ebm2jCc8jt6SpcX
 X-Developer-Key: i=jim.cromie@gmail.com; a=ed25519;
  pk=C6E5ODlPQo7ZBynATXH9wg7K6HxP0pIXyf4s38Qw0XE=
 X-Endpoint-Received: by B4 Relay for jim.cromie@gmail.com/20260203 with
@@ -128,117 +128,48 @@ Content-Transfer-Encoding: 7bit
 
 From: Jim Cromie <jim.cromie@gmail.com>
 
-The BOUNDED_SECTION_PRE_LABEL and BOUNDED_SECTION_POST_LABEL macros
-were recently updated to inherently enforce an 8-byte alignment. This
-makes the explicit '. = ALIGN(8);' statements preceding 'naked' macro
-calls in vmlinux.lds.h redundant.
+ARRAY_SIZE almost works here, since array decl is complete.
+But define it locally, named __DDEBUG_ARRAY_SIZE, to avoid
+include conflicts with  boot/<something> on some arch.
 
-Remove these redundant alignment directives to clean up the file and
-clarify that the macros handle their own alignment padding.
+no functional change
 
 Signed-off-by: Jim Cromie <jim.cromie@gmail.com>
+Reviewed-by: Louis Chauvet <louis.chauvet@bootlin.com>
 ---
- include/asm-generic/vmlinux.lds.h | 13 -------------
- 1 file changed, 13 deletions(-)
+v7: actually use macro
+v5: drop include, it causes redefined probs in /boot/* for some arch.
+v2: include linux/array_size.h, correct commit subject, review after sob
+---
+ include/linux/dynamic_debug.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
-index b1a69f8af6d2..c3376665d027 100644
---- a/include/asm-generic/vmlinux.lds.h
-+++ b/include/asm-generic/vmlinux.lds.h
-@@ -228,7 +228,6 @@
+diff --git a/include/linux/dynamic_debug.h b/include/linux/dynamic_debug.h
+index 9607121c3072..baf5c0853f45 100644
+--- a/include/linux/dynamic_debug.h
++++ b/include/linux/dynamic_debug.h
+@@ -8,6 +8,8 @@
  
- #ifdef CONFIG_KPROBES
- #define KPROBE_BLACKLIST()				\
--	. = ALIGN(8);					\
- 	BOUNDED_SECTION(_kprobe_blacklist)
- #else
- #define KPROBE_BLACKLIST()
-@@ -244,7 +243,6 @@
+ #include <linux/build_bug.h>
  
- #ifdef CONFIG_EVENT_TRACING
- #define FTRACE_EVENTS()							\
--	. = ALIGN(8);							\
- 	BOUNDED_SECTION(_ftrace_events)					\
- 	BOUNDED_SECTION_BY(_ftrace_eval_map, _ftrace_eval_maps)
- #else
-@@ -261,7 +259,6 @@
++#define __DDEBUG_ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
++
+ /*
+  * An instance of this structure is created in a special
+  * ELF section at every dynamic debug callsite.  At runtime,
+@@ -122,11 +124,9 @@ struct ddebug_class_param {
+ 		.mod_name = KBUILD_MODNAME,				\
+ 		.base = _base,						\
+ 		.map_type = _maptype,					\
+-		.length = NUM_TYPE_ARGS(char*, __VA_ARGS__),		\
+ 		.class_names = _var##_classnames,			\
++		.length = __DDEBUG_ARRAY_SIZE(_var##_classnames),	\
+ 	}
+-#define NUM_TYPE_ARGS(eltype, ...)				\
+-	(sizeof((eltype[]) {__VA_ARGS__}) / sizeof(eltype))
  
- #ifdef CONFIG_FTRACE_SYSCALLS
- #define TRACE_SYSCALLS()			\
--	. = ALIGN(8);				\
- 	BOUNDED_SECTION_BY(__syscalls_metadata, _syscalls_metadata)
- #else
- #define TRACE_SYSCALLS()
-@@ -276,7 +273,6 @@
- 
- #ifdef CONFIG_SERIAL_EARLYCON
- #define EARLYCON_TABLE()						\
--	. = ALIGN(8);							\
- 	BOUNDED_SECTION_POST_LABEL(__earlycon_table, __earlycon_table, , _end)
- #else
- #define EARLYCON_TABLE()
-@@ -284,11 +280,9 @@
- 
- #ifdef CONFIG_SECURITY
- #define LSM_TABLE()					\
--	. = ALIGN(8);					\
- 	BOUNDED_SECTION_PRE_LABEL(.lsm_info.init, _lsm_info, __start, __end)
- 
- #define EARLY_LSM_TABLE()						\
--	. = ALIGN(8);							\
- 	BOUNDED_SECTION_PRE_LABEL(.early_lsm_info.init, _early_lsm_info, __start, __end)
- #else
- #define LSM_TABLE()
-@@ -314,7 +308,6 @@
- 
- #ifdef CONFIG_ACPI
- #define ACPI_PROBE_TABLE(name)						\
--	. = ALIGN(8);							\
- 	BOUNDED_SECTION_POST_LABEL(__##name##_acpi_probe_table,		\
- 				   __##name##_acpi_probe_table,, _end)
- #else
-@@ -323,7 +316,6 @@
- 
- #ifdef CONFIG_THERMAL
- #define THERMAL_TABLE(name)						\
--	. = ALIGN(8);							\
- 	BOUNDED_SECTION_POST_LABEL(__##name##_thermal_table,		\
- 				   __##name##_thermal_table,, _end)
- #else
-@@ -403,12 +395,10 @@
- 	__end_init_stack = .;
- 
- #define JUMP_TABLE_DATA							\
--	. = ALIGN(8);							\
- 	BOUNDED_SECTION_BY(__jump_table, ___jump_table)
- 
- #ifdef CONFIG_HAVE_STATIC_CALL_INLINE
- #define STATIC_CALL_DATA						\
--	. = ALIGN(8);							\
- 	BOUNDED_SECTION_BY(.static_call_sites, _static_call_sites)	\
- 	BOUNDED_SECTION_BY(.static_call_tramp_key, _static_call_tramp_key)
- #else
-@@ -453,7 +443,6 @@
- 		*(.rodata) *(.rodata.*) *(.data.rel.ro*)		\
- 		SCHED_DATA						\
- 		RO_AFTER_INIT_DATA	/* Read only after init */	\
--		. = ALIGN(8);						\
- 		BOUNDED_SECTION_BY(__tracepoints_ptrs, ___tracepoints_ptrs) \
- 		*(__tracepoints_strings)/* Tracepoints: strings */	\
- 	}								\
-@@ -958,12 +947,10 @@
- 
- /* Alignment must be consistent with (kunit_suite *) in include/kunit/test.h */
- #define KUNIT_TABLE()							\
--		. = ALIGN(8);						\
- 		BOUNDED_SECTION_POST_LABEL(.kunit_test_suites, __kunit_suites, _start, _end)
- 
- /* Alignment must be consistent with (kunit_suite *) in include/kunit/test.h */
- #define KUNIT_INIT_TABLE()						\
--		. = ALIGN(8);						\
- 		BOUNDED_SECTION_POST_LABEL(.kunit_init_test_suites, \
- 				__kunit_init_suites, _start, _end)
- 
+ extern __printf(2, 3)
+ void __dynamic_pr_debug(struct _ddebug *descriptor, const char *fmt, ...);
 
 -- 
 2.56.0
