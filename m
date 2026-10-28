@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793219125;
-	b=XToMYohTvTTdMksqq6pH9E5gLgH4ntFPF4QdzMqx+AakM2pHcIcBgPDzjqPvNWlZHo5u
-	 74ogzxiiQTonhhqKDy2VksjBCZpMjlXkyGXqm9oMp7SFJ3R0szbjMn18c7ZAvbBtKBhu2
-	 o8gzcuqX+LLJwt37S6XuGb4IjU1CW95SQ/lioOykSnk6KeE0SsAVtG/hkZQJHpRAH3RFP
-	 hZALRzV3xshsjFarcwVe2mvfQy/d+kP9US/fms/stenY5nD6xvh1mIXzMx+pk3iJ2Sk9f
-	 xYHH4EU47imPrOFipB4avLXLal2RyQWs8Pc91qJ8wRgokcCpTjUcGEbRg6vVJj1lvxQ==
+	t=1793219127;
+	b=GrsDQ6E8KsZVfEWpxNB5vZVWLM34kNG1BEdHsnlNhn2V8HJYev612QfjOgV4y4eGLbX+
+	 Bh3h+XPHzKTx0FdEURLFPcYrlGauuniMvo9N7cX0nu/XuNr7fAaixc/70lmUdNN+ozDgo
+	 e1ChG/NngaqeU8Wc4Gbf8PHCc3YtwyA5PbelM0Ie+utaNdODq9EMbdQTvlhYuLnXKSBj6
+	 ZcxTKpQGni1LQvwh8wKrkwmaLTgpoEs3sk1ogj0zAWC1CXiNwInZK9ZH1A+/L8qCMacsL
+	 JSSndeKxk9v6kD9tu6xKrw5rgVZNDfd+MxU/BHNZZP6c1+H1nfvFVucU4zMBq72h/mA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793219125;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793219127;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=Vx4OFLZ3cUnJed2hLZJBc40d75gcy68pG+DU+7R4ubY=;
-	b=F1Mk8xPAOySNBdSw9Mun0K6oROIP/JWd7tiD40iWS53OvbmgBKlfY2Bk+uL1MMe4L67x
-	 5QZZ5FYwILSm6tI916HtlS7l8PCI/gE4rP2xh1J+IhUlZ/vBhkz+H9SXLiGpkjjbXNG7h
-	 jK3jj87/PoDEFeUqD2YQTqPfufRdoY6/CjkGkjA7pvW76AYWqq/ht8AkBbvz2YxCjNTZ/
-	 0RufMsbhBwlphWfZq8PcVismW3qzpGW+2LmggOXs7+5wi9LA5Qx+3r4y20bCRiccO99yp
-	 QjagQih8TOVCJHXgODhsMyXKzRQVzqkxi/7rW3QX4f9iMPiMq+iNyQBAJ+3P17zJUlQ==
+	bh=pXQKU9DZv7QOB+vexCN36JMnrBHhqRzYrbNC+ZXybeQ=;
+	b=aNUlv5VTpuzMXBR021AsuCXsF1SV8NElFhECSHfvPF8RAl4V8j+I8rLUNGbRPA/ZaZoA
+	 9rUUAj/crOBhnVvFSy8T21tvKEHt3KQUFQlyIgsq91vx/TaYMtAnAFcBCY3KzirgYOF5Q
+	 tV8fOcDRDoYEaGOmMBGGyNFXvtF83PmGypq8Dp7Y0j3uzsZz1e06/Yg4f2pTs8hXvub3V
+	 DpHk+pspF20WN3J20lCrdvPRAJYnZ/nHDSJuHaKQGROIhKZ6RaQa2nXqjVsGTbst/Wwkw
+	 jbcd7n8m/aURrs5VGsDJW0ejdJH8ac3PiYiW7jdtNZJrbypB22Xe8hj4CkPDC/modGg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=MkRAs3N+;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VSsaVvOf;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25011606A31A;
-	Wed, 28 Oct 2026 20:25:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1152E606A324;
+	Wed, 28 Oct 2026 20:25:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=MkRAs3N+
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 227DF1F01825;
-	Wed, 28 Oct 2026 20:25:23 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VSsaVvOf
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31F951F01828;
+	Wed, 28 Oct 2026 20:25:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793219124;
-	bh=Vx4OFLZ3cUnJed2hLZJBc40d75gcy68pG+DU+7R4ubY=;
+	s=k20260515; t=1793219126;
+	bh=pXQKU9DZv7QOB+vexCN36JMnrBHhqRzYrbNC+ZXybeQ=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=MkRAs3N+b6aKi30KqRhXhuT6HfiOXlpaDXck4iFAQyztV8bEiwTkrz2Xq+ZK6bhjs
-	 1BiCiCRoqH5/zfpRWSCRQ9uYv02gMiEZUs/wdNrOx8vylDa6WTUSZQXLJeSNG8kIgI
-	 JSYWKHin0ikXPqnHolCmLZ4MrCdG8NF4/CCRHQFNktdouJNOzFZoqAC8U7VEQ+ACsm
-	 7c6SXHBo3hqEjYyFYdTiKf0QxkA/QbfQ3byzPORasy3GT9ps5l1bIDf5XyED5fFBZM
-	 KZgZ7T8Gv2zmiH4dsUjEBIpys8+56ltXhlPrukK3kO13cOyxUemYCNXc+lXGsjxFS1
-	 6A5soN/J8YNTA==
-Message-ID: <sashiko-outbox-188411@kernel.org>
+	b=VSsaVvOfx9F+5nysS7kneG1JMC6kElFiBuVviixJCMb/Zf/w3tkXtmKVp5mlLdbJI
+	 vJ6VtpmORONZi4LmobxpsuxGLAG7xHOao1OSGfIZmXU6yWuHZbYyyrMXivWzbGBpXD
+	 azMqtBZlESDb5aK70klWrd/S594IbdX3jvmYm9V8KDi+vB8k0gw2f6WHc1zSeX96R0
+	 Qqmfkb0mfkCAoqDM6Dub4Fig09VVo2xzM8Vlo4DHI82ZJMJopIiDuf5tuo/zPt8wvv
+	 rzKMM/v65QGv0IQKQ39HGGUxZ67ES6e1RdHnSH2HHZ28hT0e9O4CXmp3tkAJu39P+s
+	 tjtYW3YWNMHnw==
+Message-ID: <sashiko-outbox-188412@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v13 35/39] dyndbg: add +c flag to count pr_debug calls
- without printing
+Subject: Re: [PATCH v13 36/39] dyndbg: add DEBUG-biased fallback stubs for
+ _dynamic_func_call_cls
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Jim Cromie" <jim.cromie@gmail.com>, "Jason Baron" <jbaron@akamai.com>, "Shuah
  Khan" <shuah@kernel.org>, "Andrew Morton" <akpm@linux-foundation.org>, "Maarten
@@ -61,13 +61,13 @@ To: "Jim Cromie" <jim.cromie@gmail.com>, "Jason Baron" <jbaron@akamai.com>, "Shu
  =?utf-8?b?VGhvbWFzIFdlacOfc2NodWg=?= <linux@weissschuh.net>, "Jason A.
  Donenfeld" <Jason@zx2c4.com>
 Cc: dri-devel@lists.freedesktop.org, linux-modules@vger.kernel.org, linux-kbuild@vger.kernel.org, "Jason
- Baron" <jbaron@redhat.com>
-In-Reply-To: <20261027-dd-cmap-part2-clean-v13-35-9267923be612@gmail.com>
+ Baron" <jbaron@redhat.com>, "kernel test robot" <lkp@intel.com>
+In-Reply-To: <20261027-dd-cmap-part2-clean-v13-36-9267923be612@gmail.com>
 References: <20261027-dd-cmap-part2-clean-v13-0-9267923be612@gmail.com>
- <20261027-dd-cmap-part2-clean-v13-35-9267923be612@gmail.com>
+ <20261027-dd-cmap-part2-clean-v13-36-9267923be612@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 28 Oct 2026 20:25:22 +0000
+Date: Wed, 28 Oct 2026 20:25:24 +0000
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -77,67 +77,229 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [Medium] dyndbg: race between reset_ddebug_call_count() and ddebug_increm=
-ent_call_count()
+- [Medium] dyndbg: unrelated runtime classmap validation squashed into head=
+er stub patch
+- [Medium] dyndbg: empty DECLARE_DYNDBG_CLASSMAP() stub breaks drm_print.c =
+build
 --
 
-commit 9bd6a53ec548939d0c4d27704bc80cf4e68b28ef
+commit 919e16985df0bc0e411e71184e2e97b087e1097c
 Author: Jim Cromie <jim.cromie@gmail.com>
 
-dyndbg: add +c flag to count pr_debug calls without printing
+dyndbg: add DEBUG-biased fallback stubs for _dynamic_func_call_cls
 
-This commit adds a +c flag to dynamic debug to count enabled pr_debug()
-invocations via a per-CPU counter without printing messages to the syslog.
-It also supports resetting the counter via the reset_stats command and
-reports the total in the /proc/dynamic_debug/control epilogue.
+This commit adds DEBUG-biased fallback stub definitions for the
+_dynamic_func_call_cls macro family when dynamic debug is disabled for a
+translation unit. It also modifies runtime classmap validation, descriptor
+checks, and warning output in lib/dynamic_debug.c.
 
-> diff --git a/lib/dynamic_debug.c b/lib/dynamic_debug.c
-> index efc7a741008ed..027f7c31fe226 100644
-> --- a/lib/dynamic_debug.c
-> +++ b/lib/dynamic_debug.c
-
-[ ... ]
-
-> @@ -71,6 +73,21 @@ struct flag_settings {
->  	unsigned int mask;
->  };
+> diff --git a/include/linux/dynamic_debug.h b/include/linux/dynamic_debug.h
+> index fb182c9030889..6a6cd45e5571c 100644
+> --- a/include/linux/dynamic_debug.h
+> +++ b/include/linux/dynamic_debug.h
+> @@ -536,6 +536,23 @@ void ddebug_increment_call_count(void);
+>  #define DYNAMIC_DEBUG_BRANCH(descriptor) false
+>  #define DECLARE_DYNDBG_CLASSMAP(...)
 > =20
-> +static DEFINE_PER_CPU(unsigned long, ddebug_call_count);
-> +void ddebug_increment_call_count(void)
-> +{
-> +	this_cpu_inc(ddebug_call_count);
-> +}
-> +EXPORT_SYMBOL(ddebug_increment_call_count);
-> +
-> +static void reset_ddebug_call_count(void)
-> +{
-> +	int cpu;
-> +
-> +	for_each_possible_cpu(cpu)
-> +		per_cpu(ddebug_call_count, cpu) =3D 0;
-> +}
+> +#if defined(DEBUG)
+> +#define _dynamic_func_call_cls(cls, fmt, func, ...)		\
+> +	do { func(NULL, ##__VA_ARGS__); } while (0)
+> +#define _dynamic_func_call_cls_no_desc(cls, fmt, func, ...)	\
+> +	do { func(__VA_ARGS__); } while (0)
+> +#else
+> +#define _dynamic_func_call_cls(cls, fmt, func, ...)		\
+> +	do { if (0) func(NULL, ##__VA_ARGS__); } while (0)
+> +#define _dynamic_func_call_cls_no_desc(cls, fmt, func, ...)	\
+> +	do { if (0) func(__VA_ARGS__); } while (0)
+> +#endif
 
 [Severity: Medium]
-Can reset_ddebug_call_count() race with concurrent calls to
-ddebug_increment_call_count() on remote CPUs and lose the reset?
+Does the DRM core build still fail under the configuration described in the
+commit message (CONFIG_DRM_USE_DYNAMIC_DEBUG=3Dy, CONFIG_DYNAMIC_DEBUG_CORE=
+=3Dy,
+and CONFIG_DYNAMIC_DEBUG=3Dn)?
 
-When userspace writes reset_stats to /proc/dynamic_debug/control,
-ddebug_proc_write() -> ddebug_exec_queries() -> reset_ddebug_call_count()
-directly stores 0 into each CPU's ddebug_call_count from the resetting
-CPU. Meanwhile, other CPUs executing +c callsites invoke
-DYNAMIC_DEBUG_BRANCH() -> DYNAMIC_DEBUG_COUNT() ->
-ddebug_increment_call_count(), which uses this_cpu_inc(ddebug_call_count).
+Because drivers/gpu/drm/Makefile uses:
 
-Because this_cpu_inc() only guarantees atomicity with respect to the local
-CPU rather than cross-CPU stores, a remote CPU performing a read-modify-wri=
-te
-can load its old counter value N just before reset_ddebug_call_count() writ=
-es
-0, and then store N + 1 afterward. That causes a data race and leaves the
-remote CPU's entire previous count intact instead of resetting it to zero.
+    CFLAGS-$(CONFIG_DRM_USE_DYNAMIC_DEBUG)	+=3D -DDYNAMIC_DEBUG_MODULE
+
+and Kbuild ignores CFLAGS-y in favor of ccflags-y, drivers/gpu/drm/drm_prin=
+t.c
+is compiled without DYNAMIC_DEBUG_MODULE defined and falls into this #else
+block in include/linux/dynamic_debug.h.
+
+In this block, DECLARE_DYNDBG_CLASSMAP(...) expands to nothing, while
+drivers/gpu/drm/drm_print.c references the declared symbol under
+CONFIG_DRM_USE_DYNAMIC_DEBUG:
+
+    DECLARE_DYNDBG_CLASSMAP(drm_debug_classes, DD_CLASS_TYPE_DISJOINT_BITS,=
+ 0,
+                            "DRM_UT_CORE",
+                            ...);
+
+    static struct ddebug_class_param drm_debug_bitmap =3D {
+            .bits =3D &__drm_debug,
+            .flags =3D "p",
+            .map =3D &drm_debug_classes,
+    };
+
+With DECLARE_DYNDBG_CLASSMAP expanding to empty, won't compiling
+drivers/gpu/drm/drm_print.c fail with an undeclared identifier error for
+drm_debug_classes?
+
+> diff --git a/lib/dynamic_debug.c b/lib/dynamic_debug.c
+> index 027f7c31fe226..8c0a67ad9c922 100644
+> --- a/lib/dynamic_debug.c
+> +++ b/lib/dynamic_debug.c
+> @@ -329,7 +329,8 @@ static bool ddebug_match_desc(const struct ddebug_que=
+ry *query,
+>  	/* site is class'd */
+>  	site_map =3D ddebug_find_map_by_class_id(di, dp->class_id);
+>  	if (!site_map) {
+> -		WARN_ONCE(1, "unknown class_id %d, check %s's CLASSMAP definitions", d=
+p->class_id, di->mod_name);
+> +		pr_warn_ratelimited("unknown class_id %d, check %s's CLASSMAP definiti=
+ons\n",
+> +				    dp->class_id, di->mod_name);
+>  		return false;
+>  	}
+>  	/* module(-param) decides protection */
+> @@ -1583,18 +1584,80 @@ static void ddebug_apply_class_users(const struct=
+ _ddebug_info *di)
+>  		__di->_vec.start =3D __start;				\
+>  })
+> =20
+> -static int ddebug_class_range_overlap(struct ddebug_class_map *cm, u64 *=
+reserved_ids)
+> +static bool ddebug_validate_class_range(const char *modname,
+> +					const char *name,
+> +					int base, int length,
+> +					u64 *reserved_ids)
+>  {
+> -	u64 range =3D (((1ULL << cm->length) - 1) << cm->base);
+> +	u64 range;
+> =20
+> +	if (base < 0 || length <=3D 0 ||
+> +	    base + length > _DPRINTK_CLASS_DFLT) {
+> +		pr_err("module %s: base:%d len:%d (from %s) exceeds class_id limit %d\=
+n",
+> +		       modname, base, length, name, _DPRINTK_CLASS_DFLT);
+> +		return false;
+> +	}
+> +	range =3D (((1ULL << length) - 1) << base);
+>  	if (range & *reserved_ids) {
+> -		pr_err("[%d..%d] on %s conflicts with %llx\n", cm->base,
+> -		       cm->base + cm->length - 1, cm->class_names[0],
+> -		       *reserved_ids);
+> -		return -EINVAL;
+> +		pr_err("module %s: [%d..%d] (from %s) conflicts with 0x%llx\n",
+> +		       modname, base, base + length - 1, name, *reserved_ids);
+> +		return false;
+>  	}
+>  	*reserved_ids |=3D range;
+> -	return 0;
+> +	return true;
+> +}
+> +
+> +static bool ddebug_validate_classmaps(struct _ddebug_info *di)
+> +{
+> +	struct ddebug_class_map *cm;
+> +	struct ddebug_class_user *cli;
+> +	u64 reserved_ids =3D 0;
+> +	bool valid =3D true;
+> +	int i;
+> +
+> +	for_subvec(i, cm, di, maps)
+> +		if (!ddebug_validate_class_range(di->mod_name,
+> +						 cm->class_names[0],
+> +						 cm->base, cm->length,
+> +						 &reserved_ids))
+> +			valid =3D false;
+> +
+> +	for_subvec(i, cli, di, users) {
+> +		if (!cli->map) {
+> +			pr_err("module %s: classmap not found for user\n",
+> +			       di->mod_name);
+> +			valid =3D false;
+> +			continue;
+> +		}
+> +		if (!ddebug_validate_class_range(di->mod_name,
+> +						 cli->map->class_names[0],
+> +						 cli->map->base + cli->offset,
+> +						 cli->map->length,
+> +						 &reserved_ids))
+> +			valid =3D false;
+> +	}
+> +	return valid;
+> +}
+> +
+> +static void ddebug_validate_descs(struct _ddebug_info *di)
+> +{
+> +	struct _ddebug *dp;
+> +	u64 bad_ids =3D 0;
+> +	int i;
+> +
+> +	for (i =3D 0; i < di->descs.len; i++) {
+> +		dp =3D &di->descs.start[i];
+> +
+> +		if (dp->class_id =3D=3D _DPRINTK_CLASS_DFLT)
+> +			continue;
+> +		if (bad_ids & (1ULL << dp->class_id))
+> +			continue;
+> +		if (!ddebug_find_map_by_class_id(di, dp->class_id)) {
+> +			pr_warn("module %s uses unknown class_id %d\n",
+> +				di->mod_name, dp->class_id);
+> +			bad_ids |=3D (1ULL << dp->class_id);
+> +		}
+> +	}
+>  }
+[ ... ]
+> @@ -1638,10 +1700,10 @@ static int ddebug_add_module(struct _ddebug_info =
+*di)
+>  	dd_set_module_subrange(i, cm, &dt->info, maps);
+>  	dd_set_module_subrange(i, cli, &dt->info, users);
+> =20
+> -	/* insure 2+ classmaps share the per-module 0..62 class_id space */
+> -	for_subvec(i, cm, &dt->info, maps)
+> -		if (ddebug_class_range_overlap(cm, &reserved_ids))
+> -			goto cleanup;
+> +	if (!ddebug_validate_classmaps(&dt->info))
+> +		goto cleanup;
+> +
+> +	ddebug_validate_descs(&dt->info);
+
+[Severity: Medium]
+Were the changes in lib/dynamic_debug.c, lib/test_dynamic_debug.c, and
+tools/testing/selftests/dynamic_debug/dyndbg_selftest.sh accidentally squas=
+hed
+into this patch?
+
+The commit description only discusses adding DEBUG-biased fallback stubs for
+_dynamic_func_call_cls in include/linux/dynamic_debug.h (and notes that the
+!DEBUG case uses an if (0) statement-expression returning 0, whereas the ma=
+cro
+uses do { if (0) ... } while (0)).
+
+However, the patch also includes runtime changes in lib/dynamic_debug.c:
+- Replacing ddebug_class_range_overlap() with ddebug_validate_class_range()
+  and ddebug_validate_classmaps() to check class_id bounds and validate
+  di->users during ddebug_add_module().
+- Adding ddebug_validate_descs() to warn on unknown descriptor class_id val=
+ues
+  in ddebug_add_module().
+- Replacing WARN_ONCE() and WARN() with pr_warn_ratelimited() and pr_err() =
+in
+  ddebug_match_desc(), ddebug_add_module(), and ddebug_module_notify().
+- Adding the DD_RUNTIME_CLASS_CHECK test block in lib/test_dynamic_debug.c =
+and
+  updating FT_test_classes.3 in dyndbg_selftest.sh.
+
+Should these runtime validation and selftest changes be folded into the
+earlier classmap validation patches in the series or split into a separate
+commit?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261027-dd-cmap-pa=
-rt2-clean-v13-0-9267923be612@gmail.com?part=3D35
+rt2-clean-v13-0-9267923be612@gmail.com?part=3D36
