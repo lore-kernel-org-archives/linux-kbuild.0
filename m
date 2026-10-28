@@ -1,55 +1,61 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793188886;
-	b=FlzS0QvAIHE1mGhx9zH7yPAY4Nym3LHEUZrdvpqg1YMviG2aGwuXdxy0/4FWJ91H75l7
-	 7JmwLl+VFrZsB0asIwggpZsVJ1LnC6CaNGCJQj9EiEfmcaxtcgYX5gCXVY4Ay/d2qfGv/
-	 772yyQUYqcXcORvWLVCxtRvYI4hVSgF14cS5EhSkfDeYQooQPQ8XYkph/XgPTr9ZtcseH
-	 9LLH88D8MFqd9VuL3799M22l1X59qDDw/fOqJJAxrrIKzvkHFbWppNjb/JIvSkhhV41Gg
-	 IQ1ZtxZDgI9jB/mWK7xox4g/83zbhDgjePwJKlHl3J95ZmtT5GfkInpof2hty4EHhvQ==
+	t=1793188893;
+	b=1lV5peNw5Cwwq4n65Zve1rlOBRxh+poKFWhuL23CxytU4dHfxnQ14gsrOZMZXnI3iq3v
+	 lRzAmLB1wraEF5gegMr63Jt5Io9XdLZFUohK72Bjs2Yu4XBnfLhyjmGbiGyyPP9uJYytE
+	 W6vAD9gTl9qTqgAkFjPXde/IpinCmYLx81W4I2CIToISNcR+/Qm+/fsfSzft6J386w94q
+	 iW/7TbsvXAZ3QfH++L8RJkTmLT/F64KqR7GqoigCY5tkHKwiuet3HMMkxsmnZtJflxpg8
+	 mezJ8hBEGmIktk6hy/kVZOTxSWsZE0rFYcAWPrwubhiSPLdFAJBuieI2VZi2VUg7p+g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793188886;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793188893;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=dxCumqUGHFQ9o9VUxW674GBbPqED8e6lG0oQ1wyKWI0=;
-	b=UBWovPwwj/s7SmZrWN51o/WkDuUNYtYnC1CaK+GT/n6M1esGsVwBUzFp5Py9SYsPnvkU
-	 RS47JyOx9W72VN11q5GpkuKG1vdqUGHPGRd5QYmnWE1TyU2fToXSLzqQiI2Fy9auYN2lE
-	 D3SL5/q95plWD5XBoEG/GuYYB8XFWl4+StjWsmDcPbLZYIufny01WxQh8MNyMUvggvL+n
-	 GWcHwKznR4CK10pO0AHUvRvmF4d/lvu4S120Zo9Rno99xO2juBzfWANNEq44YEXmcEyY+
-	 4imbir/bRJznUNTMXpC5oKSlX6FboCpyaqjELlFvULYHYvdtesrgvrnYhWaLvRFzsPQ==
+	bh=06P3NBYjMCtOrztfs1wSnGlXZi7V2R3u1OzmTPpiQ+w=;
+	b=VNBu6bfMAe1irbjCdGJg3G5fiyIpkjTa1fn8zkTuq9bGApnhHZrL44FkoD32LptJS1ZR
+	 vnNsY7KHQTdT9/V7/WxmTxlpktH/PE1NiAVDtrw0GFKoQxnqFNhsGs20jcOvSzM/ffZgs
+	 R57sY1VBryALpo3b5VBBa7BLoYrv0baEx+z6N0LBb4ZhZnShWo3LJv0ZNiUUptRFQPBd6
+	 lKi91jO8m+bOqBhZiaHlh4MJtsZfkiBUPIvRtEQl81HuuzcuRibLWFTDlhfO1b0+nptNL
+	 6eNcFGLT1czdWpP3DyJL1omm774WJ9bcsviJzXPDo0tnNZWrgv7+5jcJU1nfGqGgoRA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZSJYDM0j;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oLRqsRQc;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14E64606A31D;
-	Wed, 28 Oct 2026 12:01:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9246060A3824;
+	Wed, 28 Oct 2026 12:01:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZSJYDM0j
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BFC91F01829;
-	Wed, 28 Oct 2026 12:01:24 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oLRqsRQc
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B12C81F031E2;
+	Wed, 28 Oct 2026 12:01:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793188885;
-	bh=dxCumqUGHFQ9o9VUxW674GBbPqED8e6lG0oQ1wyKWI0=;
+	s=k20260515; t=1793188893;
+	bh=06P3NBYjMCtOrztfs1wSnGlXZi7V2R3u1OzmTPpiQ+w=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=ZSJYDM0jy+LeLoR7aR1f7MBy8Ucw/hl1iB9Kt12nFdE0A+g6QtX1j5DGZ+m7vgb/p
-	 y6+H6EgyLsIuhylF+Al2Le5DxfI/CuUjxldoZouQpD5XH69pShgsjOKFDXwIlafBrD
-	 eadVyAcAFIY2hXIRZeHpvXeiimVoxN7/5Hvy2tmF/UAFN7eWUU60RZZmnPCzpyUoGN
-	 DynMZ7b9EvbkTLIxeWkiTQ13zYYA7N6SIlnjx/iIgnL/45+7+m0Sacsjka7e2LQHhQ
-	 UDL4NEKkjNy8tyuyGwASUX4rU4EnJ8FV8BnqnyZR4kJkKw+70VZ4Hp0nVj+gOpE/1R
-	 wCi+Xfjy1A5MQ==
+	b=oLRqsRQcwlbnosapGQ949rNbWgQONbmo9cTZV4Y6jsPad+EJuOLSxE6rlyMXvrVcq
+	 lZsM0Z6XRbnyYUrxHN+JRqqhwNiGDcorB2MR9uZ47HNnn+nGfX7388O226XDWi2vY2
+	 Jrp4vePmcn6pZpspdgFmwg2tl5ypHdP8MV339iwPZ/BGemrU5Foyo2oN69Ft+COI7Z
+	 TvRhYZPlGgfWEDnI/0Rj72VMApTrnQvuBv3dpaXPeUDzhoOjc51UPQqTr1e92IkiZa
+	 Maqu0WlvgCN6f01Ylxs8RxIZDuGaBY5GTyC1gE7jB2Wb0NfYzreDNf/FDw1D+RLrcs
+	 o4lNryOnLls0w==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: Wentao Zhang <wentaoz5@illinois.edu>,
-	Alexander Potapenko <glider@google.com>,
+Cc: Alexander Potapenko <glider@google.com>,
 	Andrey Konovalov <andreyknvl@gmail.com>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
 	Bill Wendling <morbo@google.com>,
+	Borislav Petkov <bp@alien8.de>,
 	Chuck Wolber <chuck@wolber.net>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
 	Dmitry Vyukov <dvyukov@google.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
 	Justin Stitt <justinstitt@google.com>,
 	kasan-dev@googlegroups.com,
 	linux-kbuild@vger.kernel.org,
+	linux-um@lists.infradead.org,
 	llvm@lists.linux.dev,
 	Marco Elver <elver@google.com>,
 	Masami Hiramatsu <mhiramat@kernel.org>,
@@ -58,10 +64,12 @@ Cc: Wentao Zhang <wentaoz5@illinois.edu>,
 	Nicolas Schier <nsc@kernel.org>,
 	Peter Oberparleiter <oberpar@linux.ibm.com>,
 	Peter Zijlstra <peterz@infradead.org>,
-	Thomas Gleixner <tglx@kernel.org>
-Subject: [RFC PATCH 16/20] coverage: add MC/DC measurement
-Date: Wed, 28 Oct 2026 07:59:40 -0400
-Message-ID: <20261028120034.871983-17-sashal@kernel.org>
+	Richard Weinberger <richard@nod.at>,
+	Thomas Gleixner <tglx@kernel.org>,
+	x86@kernel.org
+Subject: [RFC PATCH 19/20] gcov: add MC/DC condition coverage support
+Date: Wed, 28 Oct 2026 07:59:43 -0400
+Message-ID: <20261028120034.871983-20-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261028120034.871983-1-sashal@kernel.org>
 References: <20261028120034.871983-1-sashal@kernel.org>
@@ -76,124 +84,92 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add CONFIG_COVERAGE_MCDC to measure Modified Condition/Decision
-Coverage (MC/DC) [1], which is required by several automotive and
-aviation standards for certifying safety critical software [2]. Start
-with Clang's source-based code coverage, which supports it since Clang
-18 [3].
+Support CONFIG_COVERAGE_MCDC with gcov, using GCC's MC/DC condition
+coverage instrumentation (-fcondition-coverage), which is available
+since GCC 14. The data is shown by "gcov --conditions".
 
-In the following example from arch/x86/events/probe.c, measured on
-v6.11, llvm-cov gives the MC/DC measurement for the compound logic
-decision at line 43:
+Add -fcondition-coverage and -Wno-error=coverage-too-many-conditions to
+the gcov compiler flags when enabled. Both flags are gated on the config
+option to avoid Clang warnings about unknown options.
 
-   43|     12|			if (msr[bit].test && !msr[bit].test(bit, data))
-  ------------------
-  |---> MC/DC Decision Region (43:8) to (43:50)
-  |
-  |  Number of Conditions: 2
-  |     Condition C1 --> (43:8)
-  |     Condition C2 --> (43:25)
-  |
-  |  Executed MC/DC Test Vectors:
-  |
-  |     C1, C2    Result
-  |  1 { T,  F  = F      }
-  |  2 { T,  T  = T      }
-  |
-  |  C1-Pair: not covered
-  |  C2-Pair: covered: (1,2)
-  |  MC/DC Coverage for Decision: 50.00%
-  |
-  ------------------
-   44|      5|				continue;
+Also add -fcondition-coverage to CFLAGS_REMOVE in the x86 UML vDSO
+Makefile to prevent instrumentation of userspace vDSO code.
 
-Only condition C2 was shown to independently affect the outcome of the
-decision, so the MC/DC of this decision is 1 out of 2.
-
-MC/DC uses bitmaps to track the executed test vectors, which grow
-quickly with the number of conditions. CONFIG_LLVM_COV_MCDC_MAX_CONDITIONS
-sets the largest decision to instrument, through -fmcdc-max-conditions.
-Larger decisions, and decisions the compiler can't instrument, produce
-warnings. Starting with Clang 22 they are kept from becoming errors
-with CONFIG_WERROR; older versions can't be used together with it.
-
-Link: https://en.wikipedia.org/wiki/Modified_condition%2Fdecision_coverage [1]
-Link: https://digital-library.theiet.org/content/journals/10.1049/sej.1994.0025 [2]
-Link: https://clang.llvm.org/docs/SourceBasedCodeCoverage.html#mc-dc-instrumentation [3]
-Originally-by: Wentao Zhang <wentaoz5@illinois.edu>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- kernel/coverage/Kconfig   | 26 ++++++++++++++++++++++++++
- kernel/coverage/llvm/fs.c |  5 +++--
- scripts/Makefile.llvm-cov |  5 +++++
- 3 files changed, 34 insertions(+), 2 deletions(-)
+ arch/x86/um/vdso/Makefile | 4 ++--
+ kernel/coverage/Kconfig   | 7 +++++--
+ kernel/coverage/gcov/fs.c | 5 +++--
+ scripts/Makefile.gcov     | 3 +++
+ 4 files changed, 13 insertions(+), 6 deletions(-)
 
+diff --git a/arch/x86/um/vdso/Makefile b/arch/x86/um/vdso/Makefile
+index 7664cbedbe30f..adfc57c1a726d 100644
+--- a/arch/x86/um/vdso/Makefile
++++ b/arch/x86/um/vdso/Makefile
+@@ -42,8 +42,8 @@ $(vobjs): KBUILD_CFLAGS += $(CFL)
+ #
+ # vDSO code runs in userspace and -pg doesn't help with profiling anyway.
+ #
+-CFLAGS_REMOVE_vdso-note.o = -pg -fprofile-arcs -ftest-coverage
+-CFLAGS_REMOVE_um_vdso.o = -pg -fprofile-arcs -ftest-coverage
++CFLAGS_REMOVE_vdso-note.o = -pg -fprofile-arcs -ftest-coverage -fcondition-coverage
++CFLAGS_REMOVE_um_vdso.o = -pg -fprofile-arcs -ftest-coverage -fcondition-coverage
+ 
+ #
+ # The DSO images are built using a special linker script.
 diff --git a/kernel/coverage/Kconfig b/kernel/coverage/Kconfig
-index acfcce23e4c97..fab3da51305bb 100644
+index fab3da51305bb..5990e366db994 100644
 --- a/kernel/coverage/Kconfig
 +++ b/kernel/coverage/Kconfig
-@@ -106,6 +106,32 @@ config COVERAGE_PROFILE_ALL
- 	  larger and run slower. Also be sure to exclude files from profiling
- 	  which are not linked to the kernel image to prevent linker errors.
+@@ -108,8 +108,8 @@ config COVERAGE_PROFILE_ALL
  
-+config COVERAGE_MCDC
-+	bool "Measure modified condition/decision coverage (MC/DC)"
-+	depends on LLVM_COV_KERNEL
-+	depends on CLANG_VERSION >= 220000 || !WERROR
-+	help
-+	  MC/DC verifies that each condition of a boolean decision has been
-+	  shown to independently affect the outcome of the decision. It is
-+	  required for certification by safety standards such as DO-178C
-+	  (avionics) and ISO 26262 (automotive).
+ config COVERAGE_MCDC
+ 	bool "Measure modified condition/decision coverage (MC/DC)"
+-	depends on LLVM_COV_KERNEL
+-	depends on CLANG_VERSION >= 220000 || !WERROR
++	depends on LLVM_COV_KERNEL || (GCOV_KERNEL && CC_HAS_CONDITION_COVERAGE)
++	depends on !LLVM_COV_KERNEL || CLANG_VERSION >= 220000 || !WERROR
+ 	help
+ 	  MC/DC verifies that each condition of a boolean decision has been
+ 	  shown to independently affect the outcome of the decision. It is
+@@ -119,6 +119,9 @@ config COVERAGE_MCDC
+ 	  Decisions that the compiler can't instrument produce build warnings
+ 	  and are not measured.
+ 
++	  With gcov this requires GCC 14 or later, and the data is shown by
++	  "gcov --conditions".
 +
-+	  Decisions that the compiler can't instrument produce build warnings
-+	  and are not measured.
-+
-+	  If unsure, say N.
-+
-+config LLVM_COV_MCDC_MAX_CONDITIONS
-+	int "Maximum number of conditions in a decision to instrument"
-+	range 6 32767
-+	depends on COVERAGE_MCDC && LLVM_COV_KERNEL
-+	default 6
-+	help
-+	  This value is passed to the "-fmcdc-max-conditions" option of Clang.
-+	  Decisions with more conditions produce warnings and are not
-+	  instrumented. MC/DC uses bitmaps to track the executed test vectors,
-+	  which grow quickly with the number of conditions.
-+
- # The per-subsystem COVERAGE_PROFILE_* options used to be GCOV_PROFILE_*.
- config GCOV_PROFILE_AMDGPU
- 	bool
-diff --git a/kernel/coverage/llvm/fs.c b/kernel/coverage/llvm/fs.c
-index e90c325daeba3..16ada19650d07 100644
---- a/kernel/coverage/llvm/fs.c
-+++ b/kernel/coverage/llvm/fs.c
-@@ -184,8 +184,9 @@ static void llvm_cov_reset(void)
+ 	  If unsure, say N.
+ 
+ config LLVM_COV_MCDC_MAX_CONDITIONS
+diff --git a/kernel/coverage/gcov/fs.c b/kernel/coverage/gcov/fs.c
+index 23d366dcfc2f7..dfaccc01e06f3 100644
+--- a/kernel/coverage/gcov/fs.c
++++ b/kernel/coverage/gcov/fs.c
+@@ -866,8 +866,9 @@ void gcov_event(enum gcov_action action, struct gcov_info *info)
  }
  
- static const struct coverage_backend llvm_cov_backend = {
--	.name	= "llvm",
--	.reset	= llvm_cov_reset,
-+	.name		= "llvm",
+ static const struct coverage_backend gcov_backend = {
+-	.name	= "gcov",
+-	.reset	= gcov_reset_all,
++	.name		= "gcov",
 +	.features	= IS_ENABLED(CONFIG_COVERAGE_MCDC) ? "mcdc" : NULL,
-+	.reset		= llvm_cov_reset,
++	.reset		= gcov_reset_all,
  };
  
- static int __init llvm_cov_init(void)
-diff --git a/scripts/Makefile.llvm-cov b/scripts/Makefile.llvm-cov
-index 5babb09b6d3e6..771a033a92669 100644
---- a/scripts/Makefile.llvm-cov
-+++ b/scripts/Makefile.llvm-cov
-@@ -3,4 +3,9 @@
- CFLAGS_COVERAGE	:= -fprofile-instr-generate -fcoverage-mapping \
- 		   -fprofile-update=atomic
- 
+ /* Create debugfs entries. */
+diff --git a/scripts/Makefile.gcov b/scripts/Makefile.gcov
+index 1620b81398eaa..b00dd40f2167d 100644
+--- a/scripts/Makefile.gcov
++++ b/scripts/Makefile.gcov
+@@ -19,4 +19,7 @@ CFLAGS_COVERAGE	+= $(call try-run,\
+ 	cmp -s "$$TMP.ubase" "$$TMP.utest",\
+ 	-fprofile-update=prefer-atomic)
+ endif
 +ifdef CONFIG_COVERAGE_MCDC
-+CFLAGS_COVERAGE	+= -fcoverage-mcdc $(call cc-option,-Wno-error=pgo-coverage) \
-+		   -Xclang -fmcdc-max-conditions=$(CONFIG_LLVM_COV_MCDC_MAX_CONDITIONS)
++CFLAGS_COVERAGE	+= -fcondition-coverage -Wno-error=coverage-too-many-conditions
 +endif
-+
  export CFLAGS_COVERAGE
 -- 
 2.53.0
