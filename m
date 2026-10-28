@@ -1,69 +1,69 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793188853;
-	b=y9vyAVYnWmmsivdYA79fg3gJ6klR1vvGYp0wIWx3XGrFOTmjl/2UvGO2EIlJqWGH+9fE
-	 7Gb9SWfqwfSWk3EkVYqzqDCGIGvbs5lM63D7tFH7L18BKwJvxKHP3LzRh/+wqIoB4nLCr
-	 OKI7SbsueRxJGQWtX9IefZSYtM8PN3fSBUu5xwh5HBaUbIMDVeLAT6BXUSXbAWkk29NPH
-	 dW0+O2CGJwdGAWt51bhebMulQHhqktb2kP0tt8dvzFF1oFknBC0yy84AVq4CW1pKsa1fM
-	 NRlEmSSkxiJzMdPHdFuyMOYLt18skEOdaY67dDj5rH+FaJIYf9GmGAovdYGjFT49qRg==
+	t=1793188881;
+	b=hdzj4Z1RRr0Kgf0Qim/Ve3JM50VTgDEU+Mshv8ql1Uix/GVLBfX2e+Jrj+5sENPpnCSB
+	 DJ0VFETZRb0d8mFOwmEH92Vi1B5bT5AGvKxXKN6pGR884tTFr0U+22jdyfGX2uaLUXJQM
+	 K97jrCnpi0whAYbwCd+1jCsIQFteNx53hbRCncpPH7iM59VzJWuDzGfl4U9smmHRR4mX+
+	 V9PddgnTebaVs+8hc8R/wHMbAwTeZprAkg4WkSj+zPz4DGiekptf0QwiLSzW+ZhHkOhtV
+	 neqtfxI7WhM5f3ISsyfsx8ce94mTNmPQ0GA3/sOKuTdRxBv1jtutUKu8rQXqpylF1RQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793188853;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793188881;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 In-Reply-To:References:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=DjchAORIlgS8TNBuM3Fxv0rzDizIpidzXXeKqRLMgsU=;
-	b=CV6nBOxcsH9Hc8n3iglhre7a95eRXm3fPSbYxGr3Jw9DB3DwWw7Q2UXDtjCw+JvTNztH
-	 Pp35jaGWh7y18QtFuEu7ypj6AtfuSUL+06Cg+06mcQrMo4Dv6FyRmYzP0IV2VqxKV0XuM
-	 i1BQHNcIWKOycFktTeJaVtBWJe2/S5Cg0NV0LCsIl8BJAB264V84NKI92RiUDDaYtgoHE
-	 eqZiMUGZHIP5i+1LHWJNKj6MJkH3//0/MTekZMxyO5+JQaWRAJtMAsh7tNAw5mbZMD0KB
-	 AMPT103vrRPWHbX8w4CW5ObmOTRFrcT/xtcDF3LOmUGSMOlEEXeYClPsfykhsLssmrg==
+	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
+	bh=QVjVdSdFbNyhp1BDStovaWMWKE0PVM4cKgBjAoaMF1g=;
+	b=k/e+EkQ7tlj83eor1sJSRi8EpOG7hepwT0lAVLZZx+XuN2jAmk+7plm1RiklVRr6e7/X
+	 2eWY9dpdKOT/ZLqdajI2k039S3yOLOFyvNKQTfTuTQXLjzSZFIiluzXDF1og/qHUz4RZ0
+	 fXN6LIUkCrOArGAqwOFtbRXHZJKeynW/4uAKr9ohdc59/hYUo1Qs/BpxlZfttcH0d0Mrw
+	 2GL0DUPWaZ8Ouao7+xFPwq1ctcpwbJkO7FWAuaNXePYyMFVW1+GdptzLLVAuDKdro4mln
+	 Q0qiy4BxC9i1VXuzrLUK+CIaICKYTPvAHlJEMA9zA233wyxrYB9W1Wb/5ydo78Xndrg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hHVRc+4E;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FwepM9YX;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38E52606A323;
-	Wed, 28 Oct 2026 12:00:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A19606A327;
+	Wed, 28 Oct 2026 12:01:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hHVRc+4E
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F1391F01829;
-	Wed, 28 Oct 2026 12:00:50 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FwepM9YX
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98A8A1F01829;
+	Wed, 28 Oct 2026 12:01:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793188852;
-	bh=DjchAORIlgS8TNBuM3Fxv0rzDizIpidzXXeKqRLMgsU=;
+	s=k20260515; t=1793188880;
+	bh=QVjVdSdFbNyhp1BDStovaWMWKE0PVM4cKgBjAoaMF1g=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=hHVRc+4EsyGZIAzf2c3PKf98p5f/9HcqfBI8NoumlgFwGLYLntAt/WG2/9wQafRkH
-	 NRt2knBtkpC1Bvs7LuSe08vFe20pSWPRd0mGDx1ZDAhIseBrBeWI0jnWAhD8XnW6f+
-	 OOkV3VNtNifz6Xs6FLCoiYxaiY3vh7fs2IXDIjOQsLKsY+JzFfFNSo9MNT1QSdyM3p
-	 4JUFlmDSwjzboKSeAtqURYvp5sIgagAjbGfulto51nVQGJ3E1/p3xlbHSQMnTzWRsn
-	 FsptWpS/Wc4kQgfpBGMziGnwtiqGYq/5IN2cHy46b1UykWVtFWnL51r6GV1dlR53nN
-	 d6nZTuxoQr2/w==
+	b=FwepM9YXx3IEaTCoUE7zf3pQMgY7Q+Jj+4Ao/qqEAknDmQ1rkLZ86hhC+Eej9cefr
+	 ya8wu2MeDMP1pV4Umy7OJbexN0X6PcqLxQeDSXtb69E789dmHchYnR2Op8CcBm71G1
+	 rGVTSlAclpq2kH8VpyQbRca4vklrl0AoYAs8v8J2YbWT6759ju/O0dv74bGfmZRGXo
+	 WB3qqffXABOX/RgIZf71N07Zx8W4S0W3/3u8JrUCafY7PQm7Jx9ODs8D5KIlqCbEfs
+	 GcXXSzQVlmhoYCOiYboUmGHHvdt2Jn+30bblckEwaTPFopPPwOUO54Xa0VhIRs0qMg
+	 Ri6ZZad8y+tww==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: Alexander Potapenko <glider@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
+Cc: Wentao Zhang <wentaoz5@illinois.edu>,
+	Alexander Potapenko <glider@google.com>,
 	Andrey Konovalov <andreyknvl@gmail.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Bill Wendling <morbo@google.com>,
 	Chuck Wolber <chuck@wolber.net>,
 	Dmitry Vyukov <dvyukov@google.com>,
-	Jonathan Corbet <corbet@lwn.net>,
+	Justin Stitt <justinstitt@google.com>,
 	kasan-dev@googlegroups.com,
-	linux-doc@vger.kernel.org,
+	linux-arch@vger.kernel.org,
 	linux-kbuild@vger.kernel.org,
+	llvm@lists.linux.dev,
 	Marco Elver <elver@google.com>,
 	Masami Hiramatsu <mhiramat@kernel.org>,
 	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
 	Nicolas Schier <nsc@kernel.org>,
 	Peter Oberparleiter <oberpar@linux.ibm.com>,
 	Peter Zijlstra <peterz@infradead.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Thomas Gleixner <tglx@kernel.org>,
-	workflows@vger.kernel.org
-Subject: [RFC PATCH 02/20] kbuild: unify static coverage instrumentation as COVERAGE_PROFILE
-Date: Wed, 28 Oct 2026 07:59:26 -0400
-Message-ID: <20261028120034.871983-3-sashal@kernel.org>
+	Thomas Gleixner <tglx@kernel.org>
+Subject: [RFC PATCH 14/20] coverage: add Clang's source-based code coverage
+Date: Wed, 28 Oct 2026 07:59:38 -0400
+Message-ID: <20261028120034.871983-15-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261028120034.871983-1-sashal@kernel.org>
 References: <20261028120034.871983-1-sashal@kernel.org>
@@ -76,1257 +76,614 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The gcov plumbing is written for a single coverage implementation: the
-per-object and per-directory knobs are called GCOV_PROFILE, the flags
-are CFLAGS_GCOV, and every dependency on "coverage instrumentation is
-present" spells it as GCOV_KERNEL. Make this generic so that further
-coverage implementations can share it instead of growing parallel
-copies:
+Add Clang's Source-based Code Coverage [1] as a second code coverage
+measurement implementation, next to gcov.
 
- - The coverage implementation becomes a choice ("Code coverage
-   measurement"), with gcov as its only member besides "None" for now.
-   COVERAGE_KERNEL is set whenever one is selected. allyesconfig and
-   allmodconfig keep selecting gcov through a COMPILE_TEST default.
+gcov works at the object code level, which may better reflect actual
+execution, but its measurements can lose source level precision when
+compiler optimizations are enabled, as they always are for the kernel.
+In the following example from drivers/firmware/dmi_scan.c, measured on
+v6.11, gcov reports six branch outcomes for an expression with four
+conditions:
 
- - GCOV_PROFILE_ALL becomes COVERAGE_PROFILE_ALL. The old symbol is
-   kept as a transitional one so that existing configurations keep
-   profiling the entire kernel.
+        5: 1068:	if (s == e || *e != '/' || !month || month > 12) {
+branch  0 taken 5 (fallthrough)
+branch  1 taken 0
+branch  2 taken 5 (fallthrough)
+branch  3 taken 0
+branch  4 taken 0 (fallthrough)
+branch  5 taken 5
 
- - GCOV_PROFILE[_obj.o] becomes COVERAGE_PROFILE[_obj.o] tree-wide,
-   with unchanged precedence (object, then directory, then
-   COVERAGE_PROFILE_ALL). Out-of-tree modules that use GCOV_PROFILE
-   need the same rename.
+Clang's Source-based Code Coverage instruments the code in the compiler
+front end, so the coverage data maps back to the source code exactly,
+regardless of optimizations, and reports each condition:
 
- - The compiler flags move from the top-level Makefile to
-   scripts/Makefile.gcov, which sets CFLAGS_COVERAGE and is only
-   included when gcov is enabled. This also stops running the
-   -fprofile-update=prefer-atomic probe on every GCC build.
+ 1068|      5|	if (s == e || *e != '/' || !month || month > 12) {
+  ------------------
+  |  Branch (1068:6): [True: 0, False: 5]
+  |  Branch (1068:16): [True: 0, False: 5]
+  |  Branch (1068:29): [True: 0, False: 5]
+  |  Branch (1068:39): [True: 0, False: 5]
+  ------------------
 
- - The per-subsystem opt-ins GCOV_PROFILE_{NETFILTER,IPSET,IPVS,RDS,
-   AMDGPU,URING,FTRACE} become COVERAGE_PROFILE_*, again with the old
-   names kept as transitional symbols. The rds selftest is updated.
+It is selected with CONFIG_LLVM_COV_KERNEL in the "Code coverage
+measurement" choice, uses the common COVERAGE_PROFILE annotations,
+noinstr handling and reset, and exports the raw profile of the kernel
+image in /sys/kernel/debug/coverage/llvm/profraw. The raw profile
+formats of Clang 19 to 22 (version 10) and of Clang 23 and later
+(version 11) are supported. Counters are updated atomically, like gcov
+does when the compiler allows it.
 
- - Dependencies that are about instrumented code rather than about
-   gcov (LTO, the KCFI integer normalization workaround, the longest
-   symbol KUnit test, the per-subsystem opt-ins and objtool's
-   --no-unreachable) now use COVERAGE_KERNEL.
+The data is exported from sections that the architecture's linker script
+places with LLVM_COV_DATA, so only code built into the kernel image is
+instrumented; modules are left alone.
 
+This reuses the debugfs interface and raw profile serialization of
+earlier work by Sami Tolvanen et al. [2], without the parts specific to
+profile guided optimization.
+
+Link: https://clang.llvm.org/docs/SourceBasedCodeCoverage.html [1]
+Link: https://lore.kernel.org/lkml/20210407211704.367039-1-morbo@google.com/ [2]
+Originally-by: Wentao Zhang <wentaoz5@illinois.edu>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- Documentation/dev-tools/gcov.rst              |  18 +--
- .../translations/zh_CN/dev-tools/gcov.rst     |  16 +--
- .../translations/zh_TW/dev-tools/gcov.rst     |  16 +--
- MAINTAINERS                                   |   1 +
- Makefile                                      |  22 +---
- arch/Kconfig                                  |   6 +-
- arch/alpha/boot/compressed/Makefile           |   2 +-
- arch/parisc/kernel/vdso32/Makefile            |   2 +-
- arch/parisc/kernel/vdso64/Makefile            |   2 +-
- arch/powerpc/kernel/Makefile                  |   6 +-
- arch/powerpc/kernel/trace/Makefile            |   4 +-
- arch/powerpc/kexec/Makefile                   |   2 +-
- arch/powerpc/xmon/Makefile                    |   2 +-
- arch/s390/boot/Makefile                       |   2 +-
- arch/s390/kernel/Makefile                     |   2 +-
- arch/sh/mm/Makefile                           |   2 +-
- arch/x86/coco/sev/Makefile                    |   2 +-
- arch/x86/platform/efi/Makefile                |   2 +-
- arch/xtensa/boot/lib/Makefile                 |   2 +-
- drivers/gpu/drm/amd/amdgpu/Kconfig            |  12 +-
- drivers/gpu/drm/amd/amdgpu/Makefile           |   4 +-
- .../gpu/drm/amd/display/amdgpu_dm/Makefile    |   2 +-
- drivers/gpu/drm/i915/Makefile                 |   2 +-
- drivers/gpu/drm/xe/Makefile                   |   2 +-
- drivers/s390/char/Makefile                    |   2 +-
- init/Kconfig                                  |   9 +-
- io_uring/Makefile                             |   4 +-
- kernel/coverage/Kconfig                       | 103 +++++++++++++++++-
- kernel/coverage/gcov/Kconfig                  |  55 ----------
- kernel/trace/Kconfig                          |   9 +-
- kernel/trace/Makefile                         |   4 +-
- lib/Kconfig.debug                             |   2 +-
- lib/Makefile                                  |   2 +-
- lib/crypto/Makefile                           |   2 +-
- net/bridge/Makefile                           |   8 +-
- net/bridge/netfilter/Makefile                 |   4 +-
- net/ipv4/Makefile                             |   4 +-
- net/ipv4/netfilter/Makefile                   |   4 +-
- net/ipv6/Makefile                             |   4 +-
- net/ipv6/netfilter/Makefile                   |   4 +-
- net/netfilter/Kconfig                         |   9 +-
- net/netfilter/Makefile                        |   4 +-
- net/netfilter/ipset/Kconfig                   |   9 +-
- net/netfilter/ipset/Makefile                  |   4 +-
- net/netfilter/ipvs/Kconfig                    |   9 +-
- net/netfilter/ipvs/Makefile                   |   4 +-
- net/rds/Kconfig                               |   9 +-
- net/rds/Makefile                              |   4 +-
- scripts/Makefile.gcov                         |  22 ++++
- scripts/Makefile.lib                          |  14 +--
- scripts/Makefile.modfinal                     |   2 +-
- scripts/sbom/sbom/environment.py              |   2 +-
- tools/testing/selftests/net/rds/config.sh     |   9 +-
- tools/testing/selftests/net/rds/rds_run.sh    |   8 +-
- 54 files changed, 259 insertions(+), 203 deletions(-)
- delete mode 100644 kernel/coverage/gcov/Kconfig
- create mode 100644 scripts/Makefile.gcov
+ MAINTAINERS                       |   2 +
+ Makefile                          |   1 +
+ include/asm-generic/vmlinux.lds.h |  36 ++++++
+ kernel/coverage/Kconfig           |  33 ++++-
+ kernel/coverage/Makefile          |   1 +
+ kernel/coverage/llvm/Makefile     |   4 +
+ kernel/coverage/llvm/fs.c         | 201 ++++++++++++++++++++++++++++++
+ kernel/coverage/llvm/llvm-cov.h   | 139 +++++++++++++++++++++
+ scripts/Makefile.lib              |   7 +-
+ scripts/Makefile.llvm-cov         |   6 +
+ 10 files changed, 427 insertions(+), 3 deletions(-)
+ create mode 100644 kernel/coverage/llvm/Makefile
+ create mode 100644 kernel/coverage/llvm/fs.c
+ create mode 100644 kernel/coverage/llvm/llvm-cov.h
+ create mode 100644 scripts/Makefile.llvm-cov
 
-diff --git a/Documentation/dev-tools/gcov.rst b/Documentation/dev-tools/gcov.rst
-index 075df6a4598d8..b6910c3fc00dd 100644
---- a/Documentation/dev-tools/gcov.rst
-+++ b/Documentation/dev-tools/gcov.rst
-@@ -36,10 +36,10 @@ Configure the kernel with::
- 
- and to get coverage data for the entire kernel::
- 
--        CONFIG_GCOV_PROFILE_ALL=y
-+        CONFIG_COVERAGE_PROFILE_ALL=y
- 
- Note that kernels compiled with profiling flags will be significantly
--larger and run slower. Also CONFIG_GCOV_PROFILE_ALL may not be supported
-+larger and run slower. Also CONFIG_COVERAGE_PROFILE_ALL may not be supported
- on all architectures.
- 
- Profiling data will only become accessible once debugfs has been
-@@ -56,20 +56,20 @@ similar to the following to the respective kernel Makefile:
- 
- - For a single file (e.g. main.o)::
- 
--	GCOV_PROFILE_main.o := y
-+	COVERAGE_PROFILE_main.o := y
- 
- - For all files in one directory::
- 
--	GCOV_PROFILE := y
-+	COVERAGE_PROFILE := y
- 
--To exclude files from being profiled even when CONFIG_GCOV_PROFILE_ALL
-+To exclude files from being profiled even when CONFIG_COVERAGE_PROFILE_ALL
- is specified, use::
- 
--	GCOV_PROFILE_main.o := n
-+	COVERAGE_PROFILE_main.o := n
- 
- and::
- 
--	GCOV_PROFILE := n
-+	COVERAGE_PROFILE := n
- 
- Only files which are linked to the main kernel image or are compiled as
- kernel modules are supported by this mechanism.
-@@ -80,7 +80,7 @@ Module specific configs
- 
- Gcov kernel configs for specific modules are described below:
- 
--CONFIG_GCOV_PROFILE_RDS:
-+CONFIG_COVERAGE_PROFILE_RDS:
-         Enables GCOV profiling on RDS for checking which functions or
-         lines are executed. This config is used by the rds selftest to
-         generate coverage reports. If left unset the report is omitted.
-@@ -207,7 +207,7 @@ Cause
- 
- Solution
-     Exclude affected source files from profiling by specifying
--    ``GCOV_PROFILE := n`` or ``GCOV_PROFILE_basename.o := n`` in the
-+    ``COVERAGE_PROFILE := n`` or ``COVERAGE_PROFILE_basename.o := n`` in the
-     corresponding Makefile.
- 
- Problem
-diff --git a/Documentation/translations/zh_CN/dev-tools/gcov.rst b/Documentation/translations/zh_CN/dev-tools/gcov.rst
-index ea8f94852f417..47064c4d5ff98 100644
---- a/Documentation/translations/zh_CN/dev-tools/gcov.rst
-+++ b/Documentation/translations/zh_CN/dev-tools/gcov.rst
-@@ -39,7 +39,7 @@ gcov分析核心支持在Linux内核中启用GCC的覆盖率测试工具 gcov_ 
- 
- 获取整个内核的覆盖率数据，还需要打开::
- 
--        CONFIG_GCOV_PROFILE_ALL=y
-+        CONFIG_COVERAGE_PROFILE_ALL=y
- 
- 需要注意的是，整个内核开启覆盖率统计会造成内核镜像文件尺寸的增大，
- 同时内核运行也会变慢一些。
-@@ -58,20 +58,20 @@ gcov分析核心支持在Linux内核中启用GCC的覆盖率测试工具 gcov_ 
- 
- - 单独统计单个文件（例如main.o）::
- 
--    GCOV_PROFILE_main.o := y
-+    COVERAGE_PROFILE_main.o := y
- 
- - 单独统计某一个路径::
- 
--    GCOV_PROFILE := y
-+    COVERAGE_PROFILE := y
- 
--如果要在整个内核的覆盖率统计（开启CONFIG_GCOV_PROFILE_ALL）中单独排除
-+如果要在整个内核的覆盖率统计（开启CONFIG_COVERAGE_PROFILE_ALL）中单独排除
- 某一个文件或者路径，可以使用如下的方法::
- 
--    GCOV_PROFILE_main.o := n
-+    COVERAGE_PROFILE_main.o := n
- 
- 和::
- 
--    GCOV_PROFILE := n
-+    COVERAGE_PROFILE := n
- 
- 此机制仅支持链接到内核镜像或编译为内核模块的文件。
- 
-@@ -186,8 +186,8 @@ kconfig会根据编译工具链的检查自动选择合适的gcov格式。
-     分析标志指定在了源文件但是没有链接到主内核，或者客制化了链接程序
- 
- 解决方法
--    通过在相应的Makefile中使用 ``GCOV_PROFILE := n``
--    或者 ``GCOV_PROFILE_basename.o := n`` 来将链接报错的文件排除掉
-+    通过在相应的Makefile中使用 ``COVERAGE_PROFILE := n``
-+    或者 ``COVERAGE_PROFILE_basename.o := n`` 来将链接报错的文件排除掉
- 
- 可能出现的问题2
-     从sysfs复制的文件显示为空或不完整
-diff --git a/Documentation/translations/zh_TW/dev-tools/gcov.rst b/Documentation/translations/zh_TW/dev-tools/gcov.rst
-index 39ac3fff44cdb..7d36a5460ce12 100644
---- a/Documentation/translations/zh_TW/dev-tools/gcov.rst
-+++ b/Documentation/translations/zh_TW/dev-tools/gcov.rst
-@@ -39,7 +39,7 @@ gcov分析核心支持在Linux內核中啓用GCC的覆蓋率測試工具 gcov_ 
- 
- 獲取整個內核的覆蓋率數據，還需要打開::
- 
--        CONFIG_GCOV_PROFILE_ALL=y
-+        CONFIG_COVERAGE_PROFILE_ALL=y
- 
- 需要注意的是，整個內核開啓覆蓋率統計會造成內核鏡像文件尺寸的增大，
- 同時內核運行也會變慢一些。
-@@ -58,20 +58,20 @@ gcov分析核心支持在Linux內核中啓用GCC的覆蓋率測試工具 gcov_ 
- 
- - 單獨統計單個文件（例如main.o）::
- 
--    GCOV_PROFILE_main.o := y
-+    COVERAGE_PROFILE_main.o := y
- 
- - 單獨統計某一個路徑::
- 
--    GCOV_PROFILE := y
-+    COVERAGE_PROFILE := y
- 
--如果要在整個內核的覆蓋率統計（開啓CONFIG_GCOV_PROFILE_ALL）中單獨排除
-+如果要在整個內核的覆蓋率統計（開啓CONFIG_COVERAGE_PROFILE_ALL）中單獨排除
- 某一個文件或者路徑，可以使用如下的方法::
- 
--    GCOV_PROFILE_main.o := n
-+    COVERAGE_PROFILE_main.o := n
- 
- 和::
- 
--    GCOV_PROFILE := n
-+    COVERAGE_PROFILE := n
- 
- 此機制僅支持鏈接到內核鏡像或編譯爲內核模塊的文件。
- 
-@@ -186,8 +186,8 @@ kconfig會根據編譯工具鏈的檢查自動選擇合適的gcov格式。
-     分析標誌指定在了源文件但是沒有鏈接到主內核，或者客製化了鏈接程序
- 
- 解決方法
--    通過在相應的Makefile中使用 ``GCOV_PROFILE := n``
--    或者 ``GCOV_PROFILE_basename.o := n`` 來將鏈接報錯的文件排除掉
-+    通過在相應的Makefile中使用 ``COVERAGE_PROFILE := n``
-+    或者 ``COVERAGE_PROFILE_basename.o := n`` 來將鏈接報錯的文件排除掉
- 
- 可能出現的問題2
-     從sysfs複製的文件顯示爲空或不完整
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 2e0a98ceed3e7..3cedde9ecaac3 100644
+index 573ac65304f7c..506f25cfc3e85 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -11132,6 +11132,7 @@ F:	Documentation/dev-tools/gcov.rst
- F:	kernel/coverage/Kconfig
+@@ -6596,6 +6596,8 @@ F:	kernel/coverage/Kconfig
  F:	kernel/coverage/Makefile
- F:	kernel/coverage/gcov/
-+F:	scripts/Makefile.gcov
+ F:	kernel/coverage/core.c
+ F:	kernel/coverage/coverage.h
++F:	kernel/coverage/llvm/
++F:	scripts/Makefile.llvm-cov
  
- GDB KERNEL DEBUGGING HELPER SCRIPTS
- M:	Jan Kiszka <jan.kiszka@siemens.com>
+ CODE OF CONDUCT
+ M:	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 diff --git a/Makefile b/Makefile
-index 77caa3b0e9925..cb34eb7e1b790 100644
+index cb34eb7e1b790..8f60f7b99b67a 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1183,27 +1183,6 @@ endif
- # Ensure compilers do not transform certain loops into calls to wcslen()
- KBUILD_CFLAGS += -fno-builtin-wcslen
- 
--CFLAGS_GCOV	:= -fprofile-arcs -ftest-coverage
--ifdef CONFIG_CC_IS_GCC
--CFLAGS_GCOV	+= -fno-tree-loop-im
--# Use atomic counter updates to avoid concurrent-access crashes in GCOV.
--# Only enable if -fprofile-update=prefer-atomic does not introduce new
--# undefined symbols (e.g. libatomic calls that the kernel cannot link).
--CFLAGS_GCOV	+= $(call try-run,\
--	echo 'long long x; void f(void){x++;}' | \
--	$(CC) $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) -w -fprofile-arcs \
--	-ftest-coverage -x c - -c -o "$$TMP.base" && \
--	echo 'long long x; void f(void){x++;}' | \
--	$(CC) $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) -w -fprofile-arcs \
--	-ftest-coverage -fprofile-update=prefer-atomic \
--	-x c - -c -o "$$TMP" && \
--	$(NM) "$$TMP.base" | grep ' U ' > "$$TMP.ubase" || true ; \
--	$(NM) "$$TMP" | grep ' U ' > "$$TMP.utest" || true ; \
--	cmp -s "$$TMP.ubase" "$$TMP.utest",\
--	-fprofile-update=prefer-atomic)
--endif
--export CFLAGS_GCOV
--
- # change __FILE__ to the relative path to the source directory
- ifdef building_out_of_srctree
- CFLAGS_PREFIX_MAP := -fmacro-prefix-map=$(srcroot)/=
-@@ -1223,6 +1202,7 @@ include-$(CONFIG_KASAN)		+= scripts/Makefile.kasan
- include-$(CONFIG_KCSAN)		+= scripts/Makefile.kcsan
+@@ -1203,6 +1203,7 @@ include-$(CONFIG_KCSAN)		+= scripts/Makefile.kcsan
  include-$(CONFIG_KMSAN)		+= scripts/Makefile.kmsan
  include-$(CONFIG_UBSAN)		+= scripts/Makefile.ubsan
-+include-$(CONFIG_GCOV_KERNEL)	+= scripts/Makefile.gcov
+ include-$(CONFIG_GCOV_KERNEL)	+= scripts/Makefile.gcov
++include-$(CONFIG_LLVM_COV_KERNEL) += scripts/Makefile.llvm-cov
  include-$(CONFIG_KCOV)		+= scripts/Makefile.kcov
  include-$(CONFIG_RANDSTRUCT)	+= scripts/Makefile.randstruct
  include-$(CONFIG_KSTACK_ERASE)	+= scripts/Makefile.kstack_erase
-diff --git a/arch/Kconfig b/arch/Kconfig
-index f4b24649f039c..5fc66af346eda 100644
---- a/arch/Kconfig
-+++ b/arch/Kconfig
-@@ -819,7 +819,7 @@ config HAS_LTO_CLANG
- 	depends on $(success,$(AR) --help | head -n 1 | grep -qi llvm)
- 	depends on ARCH_SUPPORTS_LTO_CLANG
- 	depends on !FTRACE_MCOUNT_USE_RECORDMCOUNT
--	depends on !GCOV_KERNEL
-+	depends on !COVERAGE_KERNEL
- 	help
- 	  The compiler and Kconfig options support building with Clang's
- 	  LTO.
-@@ -985,7 +985,7 @@ config HAVE_CFI_ICALL_NORMALIZE_INTEGERS
- 	def_bool y
- 	depends on $(cc-option,-fsanitize=kcfi -fsanitize-cfi-icall-experimental-normalize-integers)
- 	# With GCOV/KASAN we need this fix: https://github.com/llvm/llvm-project/pull/104826
--	depends on CLANG_VERSION >= 190103 || (!GCOV_KERNEL && !KASAN_GENERIC && !KASAN_SW_TAGS)
-+	depends on CLANG_VERSION >= 190103 || (!COVERAGE_KERNEL && !KASAN_GENERIC && !KASAN_SW_TAGS)
+diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
+index 3eb732942d699..840899b604336 100644
+--- a/include/asm-generic/vmlinux.lds.h
++++ b/include/asm-generic/vmlinux.lds.h
+@@ -359,6 +359,42 @@
+ #define THERMAL_TABLE(name)
+ #endif
  
- config HAVE_CFI_ICALL_NORMALIZE_INTEGERS_RUSTC
- 	def_bool y
-@@ -993,7 +993,7 @@ config HAVE_CFI_ICALL_NORMALIZE_INTEGERS_RUSTC
- 	depends on ARM64 || X86_64
- 	# With GCOV/KASAN we need this fix: https://github.com/rust-lang/rust/pull/129373
- 	depends on RUSTC_LLVM_VERSION >= 190103 || \
--		(!GCOV_KERNEL && !KASAN_GENERIC && !KASAN_SW_TAGS)
-+		(!COVERAGE_KERNEL && !KASAN_GENERIC && !KASAN_SW_TAGS)
- 
- config CFI_PERMISSIVE
- 	bool "Use CFI in permissive mode"
-diff --git a/arch/alpha/boot/compressed/Makefile b/arch/alpha/boot/compressed/Makefile
-index eb930f01b4be4..26c3f62075a90 100644
---- a/arch/alpha/boot/compressed/Makefile
-+++ b/arch/alpha/boot/compressed/Makefile
-@@ -28,7 +28,7 @@ KBUILD_AFLAGS := -D__ASSEMBLY__ $(KBUILD_CFLAGS)
- # built with the kernel's instrumentation and -mcpu=, so build private
- # copies of the library routines the stub needs instead of linking it.
- UBSAN_SANITIZE := n
--GCOV_PROFILE := n
-+COVERAGE_PROFILE := n
- 
- $(obj)/memcpy.o: $(srctree)/arch/alpha/lib/memcpy.c FORCE
- 	$(call if_changed_dep,cc_o_c)
-diff --git a/arch/parisc/kernel/vdso32/Makefile b/arch/parisc/kernel/vdso32/Makefile
-index 4ee8d17da229b..e884795da088d 100644
---- a/arch/parisc/kernel/vdso32/Makefile
-+++ b/arch/parisc/kernel/vdso32/Makefile
-@@ -4,7 +4,7 @@ include $(srctree)/lib/vdso/Makefile.include
- KCOV_INSTRUMENT := n
- 
- # Disable gcov profiling, ubsan and kasan for VDSO code
--GCOV_PROFILE := n
-+COVERAGE_PROFILE := n
- UBSAN_SANITIZE := n
- KASAN_SANITIZE := n
- KCSAN_SANITIZE := n
-diff --git a/arch/parisc/kernel/vdso64/Makefile b/arch/parisc/kernel/vdso64/Makefile
-index c63f4069170f4..42b8b0d167e1a 100644
---- a/arch/parisc/kernel/vdso64/Makefile
-+++ b/arch/parisc/kernel/vdso64/Makefile
-@@ -4,7 +4,7 @@ include $(srctree)/lib/vdso/Makefile.include
- KCOV_INSTRUMENT := n
- 
- # Disable gcov profiling, ubsan and kasan for VDSO code
--GCOV_PROFILE := n
-+COVERAGE_PROFILE := n
- UBSAN_SANITIZE := n
- KASAN_SANITIZE := n
- KCSAN_SANITIZE := n
-diff --git a/arch/powerpc/kernel/Makefile b/arch/powerpc/kernel/Makefile
-index 7bf6b16b2d93c..a38e82894130c 100644
---- a/arch/powerpc/kernel/Makefile
-+++ b/arch/powerpc/kernel/Makefile
-@@ -169,15 +169,15 @@ obj-$(CONFIG_PPC_SECURE_BOOT)	+= secure_boot.o ima_arch.o secvar-ops.o
- obj-$(CONFIG_PPC_SECVAR_SYSFS)	+= secvar-sysfs.o
- 
- # Disable GCOV, KCOV & sanitizers in odd or sensitive code
--GCOV_PROFILE_prom_init.o := n
-+COVERAGE_PROFILE_prom_init.o := n
- KCOV_INSTRUMENT_prom_init.o := n
- KCSAN_SANITIZE_prom_init.o := n
- UBSAN_SANITIZE_prom_init.o := n
--GCOV_PROFILE_kprobes.o := n
-+COVERAGE_PROFILE_kprobes.o := n
- KCOV_INSTRUMENT_kprobes.o := n
- KCSAN_SANITIZE_kprobes.o := n
- UBSAN_SANITIZE_kprobes.o := n
--GCOV_PROFILE_kprobes-ftrace.o := n
-+COVERAGE_PROFILE_kprobes-ftrace.o := n
- KCOV_INSTRUMENT_kprobes-ftrace.o := n
- KCSAN_SANITIZE_kprobes-ftrace.o := n
- UBSAN_SANITIZE_kprobes-ftrace.o := n
-diff --git a/arch/powerpc/kernel/trace/Makefile b/arch/powerpc/kernel/trace/Makefile
-index d6c3885453bda..e5d3b15f82018 100644
---- a/arch/powerpc/kernel/trace/Makefile
-+++ b/arch/powerpc/kernel/trace/Makefile
-@@ -24,11 +24,11 @@ obj-$(CONFIG_PPC64)			+= $(obj64-y)
- obj-$(CONFIG_PPC32)			+= $(obj32-y)
- 
- # Disable GCOV, KCOV & sanitizers in odd or sensitive code
--GCOV_PROFILE_ftrace.o := n
-+COVERAGE_PROFILE_ftrace.o := n
- KCOV_INSTRUMENT_ftrace.o := n
- KCSAN_SANITIZE_ftrace.o := n
- UBSAN_SANITIZE_ftrace.o := n
--GCOV_PROFILE_ftrace_64_pg.o := n
-+COVERAGE_PROFILE_ftrace_64_pg.o := n
- KCOV_INSTRUMENT_ftrace_64_pg.o := n
- KCSAN_SANITIZE_ftrace_64_pg.o := n
- UBSAN_SANITIZE_ftrace_64_pg.o := n
-diff --git a/arch/powerpc/kexec/Makefile b/arch/powerpc/kexec/Makefile
-index ec7a0eed75dc5..d9e7a387d058c 100644
---- a/arch/powerpc/kexec/Makefile
-+++ b/arch/powerpc/kexec/Makefile
-@@ -12,7 +12,7 @@ obj-$(CONFIG_VMCORE_INFO)	+= vmcore_info.o
- obj-$(CONFIG_CRASH_DUMP)	+= crash.o
- 
- # Disable GCOV, KCOV & sanitizers in odd or sensitive code
--GCOV_PROFILE_core_$(BITS).o := n
-+COVERAGE_PROFILE_core_$(BITS).o := n
- KCOV_INSTRUMENT_core_$(BITS).o := n
- UBSAN_SANITIZE_core_$(BITS).o := n
- KASAN_SANITIZE_core.o := n
-diff --git a/arch/powerpc/xmon/Makefile b/arch/powerpc/xmon/Makefile
-index d74b147126b7a..b2ad38d5ec8d8 100644
---- a/arch/powerpc/xmon/Makefile
-+++ b/arch/powerpc/xmon/Makefile
-@@ -1,7 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0
- # Makefile for xmon
- 
--GCOV_PROFILE := n
-+COVERAGE_PROFILE := n
- KCOV_INSTRUMENT := n
- UBSAN_SANITIZE := n
- KASAN_SANITIZE := n
-diff --git a/arch/s390/boot/Makefile b/arch/s390/boot/Makefile
-index e8e43ae80dd52..8dea682626462 100644
---- a/arch/s390/boot/Makefile
-+++ b/arch/s390/boot/Makefile
-@@ -5,7 +5,7 @@
- 
- # Tooling runtimes are unavailable and cannot be linked for early boot code
- KCOV_INSTRUMENT := n
--GCOV_PROFILE := n
-+COVERAGE_PROFILE := n
- UBSAN_SANITIZE := n
- KASAN_SANITIZE := n
- KCSAN_SANITIZE := n
-diff --git a/arch/s390/kernel/Makefile b/arch/s390/kernel/Makefile
-index f84b8fb41331b..8642db1c1f234 100644
---- a/arch/s390/kernel/Makefile
-+++ b/arch/s390/kernel/Makefile
-@@ -18,7 +18,7 @@ CFLAGS_REMOVE_unwind_bc.o	= $(CC_FLAGS_FTRACE)
- 
- endif
- 
--GCOV_PROFILE_early.o		:= n
-+COVERAGE_PROFILE_early.o		:= n
- KCOV_INSTRUMENT_early.o		:= n
- UBSAN_SANITIZE_early.o		:= n
- KASAN_SANITIZE_ipl.o		:= n
-diff --git a/arch/sh/mm/Makefile b/arch/sh/mm/Makefile
-index f69ddc70b1465..8752d3a0c1ea5 100644
---- a/arch/sh/mm/Makefile
-+++ b/arch/sh/mm/Makefile
-@@ -42,4 +42,4 @@ obj-$(CONFIG_IOREMAP_FIXED)	+= ioremap_fixed.o
- obj-$(CONFIG_UNCACHED_MAPPING)	+= uncached.o
- obj-$(CONFIG_HAVE_SRAM_POOL)	+= sram.o
- 
--GCOV_PROFILE_pmb.o := n
-+COVERAGE_PROFILE_pmb.o := n
-diff --git a/arch/x86/coco/sev/Makefile b/arch/x86/coco/sev/Makefile
-index 3111a2ee67221..be4785d766ec1 100644
---- a/arch/x86/coco/sev/Makefile
-+++ b/arch/x86/coco/sev/Makefile
-@@ -9,4 +9,4 @@ UBSAN_SANITIZE_noinstr.o	:= n
- KASAN_SANITIZE_noinstr.o	:= n
- KCSAN_SANITIZE_noinstr.o	:= n
- 
--GCOV_PROFILE_noinstr.o		:= n
-+COVERAGE_PROFILE_noinstr.o		:= n
-diff --git a/arch/x86/platform/efi/Makefile b/arch/x86/platform/efi/Makefile
-index 500cab4a7f7c6..b0b891f776bfb 100644
---- a/arch/x86/platform/efi/Makefile
-+++ b/arch/x86/platform/efi/Makefile
-@@ -1,6 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
- KASAN_SANITIZE := n
--GCOV_PROFILE := n
-+COVERAGE_PROFILE := n
- 
- obj-$(CONFIG_EFI) 		+= memmap.o quirks.o efi.o efi_$(BITS).o \
- 				   efi_stub_$(BITS).o
-diff --git a/arch/xtensa/boot/lib/Makefile b/arch/xtensa/boot/lib/Makefile
-index 0378a22a08e33..b42c7fab56a5e 100644
---- a/arch/xtensa/boot/lib/Makefile
-+++ b/arch/xtensa/boot/lib/Makefile
-@@ -18,7 +18,7 @@ endif
- KASAN_SANITIZE := n
- KCSAN_SANITIZE := n
- KCOV_INSTRUMENT := n
--GCOV_PROFILE := n
-+COVERAGE_PROFILE := n
- 
- CFLAGS_REMOVE_inflate.o += -fstack-protector -fstack-protector-strong
- CFLAGS_REMOVE_zmem.o += -fstack-protector -fstack-protector-strong
-diff --git a/drivers/gpu/drm/amd/amdgpu/Kconfig b/drivers/gpu/drm/amd/amdgpu/Kconfig
-index 12e4a41bf1f04..aaebfdfc31a12 100644
---- a/drivers/gpu/drm/amd/amdgpu/Kconfig
-+++ b/drivers/gpu/drm/amd/amdgpu/Kconfig
-@@ -103,16 +103,16 @@ config DRM_AMDGPU_WERROR
- 	  Only enable this if you are warning code for amdgpu.ko.
- 
- 
--config GCOV_PROFILE_AMDGPU
--	bool "Enable GCOV profiling on amdgpu"
-+config COVERAGE_PROFILE_AMDGPU
-+	bool "Enable code coverage profiling on amdgpu"
- 	depends on DRM_AMDGPU
--	depends on GCOV_KERNEL
--	default n
-+	depends on COVERAGE_KERNEL
-+	default GCOV_PROFILE_AMDGPU
- 	help
--	  Enable GCOV profiling on the amdgpu driver for checking which
-+	  Enable code coverage profiling on the amdgpu driver for checking which
- 	  functions/lines are executed during testing. This adds compiler
- 	  instrumentation flags to all amdgpu source files, producing
--	  .gcda/.gcno coverage data accessible via debugfs.
-+	  coverage data accessible via debugfs.
- 
- 	  This increases the amdgpu module size by ~50% and adds ~2-5%
- 	  runtime overhead on GPU submission paths.
-diff --git a/drivers/gpu/drm/amd/amdgpu/Makefile b/drivers/gpu/drm/amd/amdgpu/Makefile
-index 55b5d11f19382..dc408e24f5bc6 100644
---- a/drivers/gpu/drm/amd/amdgpu/Makefile
-+++ b/drivers/gpu/drm/amd/amdgpu/Makefile
-@@ -27,8 +27,8 @@ FULL_AMD_PATH=$(src)/..
- DISPLAY_FOLDER_NAME=display
- FULL_AMD_DISPLAY_PATH = $(FULL_AMD_PATH)/$(DISPLAY_FOLDER_NAME)
- 
--ifdef CONFIG_GCOV_PROFILE_AMDGPU
--GCOV_PROFILE := y
-+ifdef CONFIG_COVERAGE_PROFILE_AMDGPU
-+COVERAGE_PROFILE := y
- endif
- 
- ccflags-y := -I$(FULL_AMD_PATH)/include/asic_reg \
-diff --git a/drivers/gpu/drm/amd/display/amdgpu_dm/Makefile b/drivers/gpu/drm/amd/display/amdgpu_dm/Makefile
-index d1faf2d8370ff..3cd62d0be68e7 100644
---- a/drivers/gpu/drm/amd/display/amdgpu_dm/Makefile
-+++ b/drivers/gpu/drm/amd/display/amdgpu_dm/Makefile
-@@ -71,5 +71,5 @@ ifneq ($(CONFIG_DRM_AMD_DC_KUNIT_TEST),)
- obj-y += $(AMDDALPATH)/amdgpu_dm/tests/
- 
- # Enable gcov for amdgpu_dm KUnit builds
--GCOV_PROFILE := y
-+COVERAGE_PROFILE := y
- endif
-diff --git a/drivers/gpu/drm/i915/Makefile b/drivers/gpu/drm/i915/Makefile
-index d4e7764621e18..20675723fee4a 100644
---- a/drivers/gpu/drm/i915/Makefile
-+++ b/drivers/gpu/drm/i915/Makefile
-@@ -456,7 +456,7 @@ always-$(CONFIG_DRM_I915_WERROR) += \
- 		$(shell cd $(src) && find * -name '*.h')))
- 
- quiet_cmd_hdrtest = HDRTEST $(patsubst %.hdrtest,%.h,$@)
--      cmd_hdrtest = $(CC) $(filter-out $(CFLAGS_GCOV), $(c_flags)) -S -o /dev/null -x c /dev/null -include $<; \
-+      cmd_hdrtest = $(CC) $(filter-out $(CFLAGS_COVERAGE), $(c_flags)) -S -o /dev/null -x c /dev/null -include $<; \
- 		$(KERNELDOC) -none -Werror $<; touch $@
- 
- $(obj)/%.hdrtest: $(src)/%.h FORCE
-diff --git a/drivers/gpu/drm/xe/Makefile b/drivers/gpu/drm/xe/Makefile
-index 563c2f859361f..c0f4e684268cf 100644
---- a/drivers/gpu/drm/xe/Makefile
-+++ b/drivers/gpu/drm/xe/Makefile
-@@ -392,7 +392,7 @@ always-$(CONFIG_DRM_XE_WERROR) += \
- 	$(patsubst %.h,%.hdrtest, $(shell cd $(src) && find * -name '*.h' $(hdrtest_find_args)))
- 
- quiet_cmd_hdrtest = HDRTEST $(patsubst %.hdrtest,%.h,$@)
--      cmd_hdrtest = $(CC) $(filter-out $(CFLAGS_GCOV), $(c_flags)) -S -o /dev/null -x c /dev/null -include $< -include $<; \
-+      cmd_hdrtest = $(CC) $(filter-out $(CFLAGS_COVERAGE), $(c_flags)) -S -o /dev/null -x c /dev/null -include $< -include $<; \
- 		$(srctree)/scripts/kernel-doc -none -Werror $<; touch $@
- 
- $(obj)/%.hdrtest: $(src)/%.h FORCE
-diff --git a/drivers/s390/char/Makefile b/drivers/s390/char/Makefile
-index 0ad960d000a2f..0d4c144cbd994 100644
---- a/drivers/s390/char/Makefile
-+++ b/drivers/s390/char/Makefile
-@@ -10,7 +10,7 @@ ifdef CONFIG_FUNCTION_TRACER
- CFLAGS_REMOVE_sclp_early_core.o	= $(CC_FLAGS_FTRACE)
- endif
- 
--GCOV_PROFILE_sclp_early_core.o		:= n
-+COVERAGE_PROFILE_sclp_early_core.o		:= n
- KCOV_INSTRUMENT_sclp_early_core.o	:= n
- UBSAN_SANITIZE_sclp_early_core.o	:= n
- KASAN_SANITIZE_sclp_early_core.o	:= n
-diff --git a/init/Kconfig b/init/Kconfig
-index b31aa298c4fe5..9ec5def26d1b8 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -1780,11 +1780,12 @@ config IO_URING
- 	  applications to submit and complete IO through submission and
- 	  completion rings that are shared between the kernel and application.
- 
--config GCOV_PROFILE_URING
--	bool "Enable GCOV profiling on the io_uring subsystem"
--	depends on IO_URING && GCOV_KERNEL
-+config COVERAGE_PROFILE_URING
-+	bool "Enable code coverage profiling on the io_uring subsystem"
-+	depends on IO_URING && COVERAGE_KERNEL
-+	default GCOV_PROFILE_URING
- 	help
--	  Enable GCOV profiling on the io_uring subsystem, to facilitate
-+	  Enable code coverage profiling on the io_uring subsystem, to facilitate
- 	  code coverage testing.
- 
- 	  If unsure, say N.
-diff --git a/io_uring/Makefile b/io_uring/Makefile
-index 965bb60e9f7b1..cb27f1f8b59fb 100644
---- a/io_uring/Makefile
-+++ b/io_uring/Makefile
-@@ -2,8 +2,8 @@
- #
- # Makefile for io_uring
- 
--ifdef CONFIG_GCOV_PROFILE_URING
--GCOV_PROFILE := y
-+ifdef CONFIG_COVERAGE_PROFILE_URING
-+COVERAGE_PROFILE := y
- endif
- 
- obj-$(CONFIG_IO_URING)		+= io_uring.o opdef.o kbuf.o rsrc.o notif.o \
++#ifdef CONFIG_LLVM_COV_KERNEL
++#define LLVM_COV_DATA							\
++	__llvm_prf_data : AT(ADDR(__llvm_prf_data) - LOAD_OFFSET) {	\
++		BOUNDED_SECTION_POST_LABEL(__llvm_prf_data,		\
++					   __llvm_prf_data,		\
++					   _start, _end)		\
++	}								\
++	__llvm_prf_cnts : AT(ADDR(__llvm_prf_cnts) - LOAD_OFFSET) {	\
++		BOUNDED_SECTION_POST_LABEL(__llvm_prf_cnts,		\
++					   __llvm_prf_cnts,		\
++					   _start, _end)		\
++	}								\
++	__llvm_prf_names : AT(ADDR(__llvm_prf_names) - LOAD_OFFSET) {	\
++		BOUNDED_SECTION_POST_LABEL(__llvm_prf_names,		\
++					   __llvm_prf_names,		\
++					   _start, _end)		\
++	}								\
++	__llvm_prf_bits : AT(ADDR(__llvm_prf_bits) - LOAD_OFFSET) {	\
++		BOUNDED_SECTION_POST_LABEL(__llvm_prf_bits,		\
++					   __llvm_prf_bits,		\
++					   _start, _end)		\
++	}								\
++	__llvm_covfun : AT(ADDR(__llvm_covfun) - LOAD_OFFSET) {		\
++		BOUNDED_SECTION_POST_LABEL(__llvm_covfun,		\
++					   __llvm_covfun,		\
++					   _start, _end)		\
++	}								\
++	__llvm_covmap : AT(ADDR(__llvm_covmap) - LOAD_OFFSET) {		\
++		BOUNDED_SECTION_POST_LABEL(__llvm_covmap,		\
++					   __llvm_covmap,		\
++					   _start, _end)		\
++	}
++#else
++#define LLVM_COV_DATA
++#endif
++
+ #define KERNEL_DTB()							\
+ 	STRUCT_ALIGN();							\
+ 	__dtb_start = .;						\
 diff --git a/kernel/coverage/Kconfig b/kernel/coverage/Kconfig
-index dd90b6a61ae65..62a6fa94bd308 100644
+index 62a6fa94bd308..acfcce23e4c97 100644
 --- a/kernel/coverage/Kconfig
 +++ b/kernel/coverage/Kconfig
-@@ -1,7 +1,108 @@
- # SPDX-License-Identifier: GPL-2.0-only
- menu "Code coverage"
+@@ -4,6 +4,15 @@ menu "Code coverage"
+ config ARCH_HAS_GCOV_PROFILE_ALL
+ 	def_bool n
  
--source "kernel/coverage/gcov/Kconfig"
-+config ARCH_HAS_GCOV_PROFILE_ALL
-+	def_bool n
-+
-+choice
-+	prompt "Code coverage measurement"
-+	default GCOV_KERNEL if COMPILE_TEST
-+	default COVERAGE_NONE
++config ARCH_HAS_LLVM_COV
++	bool
 +	help
-+	  Instrument the kernel to measure which parts of it get executed.
-+	  Each mechanism produces data in the format of its toolchain, so
-+	  only one of them can be enabled at a time.
++	  An architecture should select this when its linker script places
++	  the sections of Clang's source-based code coverage (LLVM_COV_DATA).
 +
-+	  KCOV, which collects coverage for fuzzers, is configured
-+	  separately and can be combined with any of them.
++config ARCH_HAS_LLVM_COV_PROFILE_ALL
++	bool
 +
-+	  The instrumentation of a single file or of all files in a
-+	  directory can be controlled from the respective Makefile:
-+
-+	  For a single file (e.g. main.o):
-+	          COVERAGE_PROFILE_main.o := y
-+
-+	  For all files in one directory:
-+	          COVERAGE_PROFILE := y
-+
-+	  To exclude files from being profiled even when
-+	  CONFIG_COVERAGE_PROFILE_ALL is specified, use:
-+
-+	          COVERAGE_PROFILE_main.o := n
-+	  and:
-+	          COVERAGE_PROFILE := n
-+
-+	  Note that the debugfs filesystem has to be mounted to access
-+	  the coverage data.
-+
-+config COVERAGE_NONE
-+	bool "None"
-+
-+config GCOV_KERNEL
-+	bool "gcov-based kernel profiling"
+ choice
+ 	prompt "Code coverage measurement"
+ 	default GCOV_KERNEL if COMPILE_TEST
+@@ -49,9 +58,30 @@ config GCOV_KERNEL
+ 	  and its modules is exported in gcov's format in /sys/kernel/debug/gcov,
+ 	  see Documentation/dev-tools/gcov.rst.
+ 
++config LLVM_COV_KERNEL
++	bool "Clang's source-based code coverage"
++	depends on CC_IS_CLANG && CLANG_VERSION >= 190000
 +	depends on DEBUG_FS
++	depends on ARCH_HAS_LLVM_COV
 +	depends on !ARCH_WANTS_NO_INSTR || CC_HAS_NO_PROFILE_FN_ATTR
-+	select CONSTRUCTORS
 +	help
-+	  This option enables gcov-based code profiling (e.g. for code coverage
-+	  measurements), with GCC or Clang. The coverage data of the kernel
-+	  and its modules is exported in gcov's format in /sys/kernel/debug/gcov,
-+	  see Documentation/dev-tools/gcov.rst.
++	  This option enables Clang's Source-based Code Coverage. It
++	  instruments the code in the compiler's front end, so that coverage
++	  data maps back to the source code exactly, regardless of the
++	  optimizations applied.
 +
-+endchoice
++	  The raw profile is exported in /sys/kernel/debug/coverage/llvm/profraw.
++	  Convert it with "llvm-profdata merge" and analyze it with "llvm-cov"
++	  against vmlinux, using the LLVM version that built the kernel.
 +
-+config COVERAGE_KERNEL
-+	def_bool GCOV_KERNEL
++	  Only code built into the kernel image is instrumented.
 +
-+config GCOV_PROFILE_ALL
-+	bool
-+	transitional
-+	help
-+	  Transitional config for GCOV_PROFILE_ALL to COVERAGE_PROFILE_ALL
-+	  migration.
-+
-+config COVERAGE_PROFILE_ALL
-+	bool "Profile entire kernel"
-+	depends on !COMPILE_TEST
-+	depends on GCOV_KERNEL && ARCH_HAS_GCOV_PROFILE_ALL
-+	default GCOV_PROFILE_ALL
-+	help
-+	  This option activates coverage instrumentation for the entire kernel.
-+
-+	  If unsure, say N.
-+
-+	  Note that a kernel compiled with profiling flags will be significantly
-+	  larger and run slower. Also be sure to exclude files from profiling
-+	  which are not linked to the kernel image to prevent linker errors.
-+
-+# The per-subsystem COVERAGE_PROFILE_* options used to be GCOV_PROFILE_*.
-+config GCOV_PROFILE_AMDGPU
-+	bool
-+	transitional
-+
-+config GCOV_PROFILE_URING
-+	bool
-+	transitional
-+
-+config GCOV_PROFILE_FTRACE
-+	bool
-+	transitional
-+
-+config GCOV_PROFILE_NETFILTER
-+	bool
-+	transitional
-+
-+config GCOV_PROFILE_IPSET
-+	bool
-+	transitional
-+
-+config GCOV_PROFILE_IPVS
-+	bool
-+	transitional
-+
-+config GCOV_PROFILE_RDS
-+	bool
-+	transitional
+ endchoice
  
- config ARCH_HAS_KCOV
- 	bool
-diff --git a/kernel/coverage/gcov/Kconfig b/kernel/coverage/gcov/Kconfig
-deleted file mode 100644
-index 04f4ebdc3cf59..0000000000000
---- a/kernel/coverage/gcov/Kconfig
-+++ /dev/null
-@@ -1,55 +0,0 @@
--# SPDX-License-Identifier: GPL-2.0-only
--menu "GCOV-based kernel profiling"
--
--config GCOV_KERNEL
--	bool "Enable gcov-based kernel profiling"
--	depends on DEBUG_FS
--	depends on !ARCH_WANTS_NO_INSTR || CC_HAS_NO_PROFILE_FN_ATTR
--	select CONSTRUCTORS
--	default n
--	help
--	This option enables gcov-based code profiling (e.g. for code coverage
--	measurements).
--
--	If unsure, say N.
--
--	Additionally specify CONFIG_GCOV_PROFILE_ALL=y to get profiling data
--	for the entire kernel. To enable profiling for specific files or
--	directories, add a line similar to the following to the respective
--	Makefile:
--
--	For a single file (e.g. main.o):
--	        GCOV_PROFILE_main.o := y
--
--	For all files in one directory:
--	        GCOV_PROFILE := y
--
--	To exclude files from being profiled even when CONFIG_GCOV_PROFILE_ALL
--	is specified, use:
--
--	        GCOV_PROFILE_main.o := n
--	and:
--	        GCOV_PROFILE := n
--
--	Note that the debugfs filesystem has to be mounted to access
--	profiling data.
--
--config ARCH_HAS_GCOV_PROFILE_ALL
--	def_bool n
--
--config GCOV_PROFILE_ALL
--	bool "Profile entire Kernel"
--	depends on !COMPILE_TEST
--	depends on GCOV_KERNEL
--	depends on ARCH_HAS_GCOV_PROFILE_ALL
--	default n
--	help
--	This options activates profiling for the entire kernel.
--
--	If unsure, say N.
--
--	Note that a kernel compiled with profiling flags will be significantly
--	larger and run slower. Also be sure to exclude files from profiling
--	which are not linked to the kernel image to prevent linker errors.
--
--endmenu
-diff --git a/kernel/trace/Kconfig b/kernel/trace/Kconfig
-index d8faeb659cfc9..4d88deda4ef8a 100644
---- a/kernel/trace/Kconfig
-+++ b/kernel/trace/Kconfig
-@@ -1110,11 +1110,12 @@ config RING_BUFFER_RECORD_RECURSION
+ config COVERAGE_KERNEL
++	def_bool GCOV_KERNEL || LLVM_COV_KERNEL
++
++config COVERAGE_MODULES
+ 	def_bool GCOV_KERNEL
  
- 	  This will add more overhead to cases that have recursion.
- 
--config GCOV_PROFILE_FTRACE
--	bool "Enable GCOV profiling on ftrace subsystem"
--	depends on GCOV_KERNEL
-+config COVERAGE_PROFILE_FTRACE
-+	bool "Enable code coverage profiling on ftrace subsystem"
-+	depends on COVERAGE_KERNEL
-+	default GCOV_PROFILE_FTRACE
+ config GCOV_PROFILE_ALL
+@@ -64,7 +94,8 @@ config GCOV_PROFILE_ALL
+ config COVERAGE_PROFILE_ALL
+ 	bool "Profile entire kernel"
+ 	depends on !COMPILE_TEST
+-	depends on GCOV_KERNEL && ARCH_HAS_GCOV_PROFILE_ALL
++	depends on (GCOV_KERNEL && ARCH_HAS_GCOV_PROFILE_ALL) || \
++		   (LLVM_COV_KERNEL && ARCH_HAS_LLVM_COV_PROFILE_ALL)
+ 	default GCOV_PROFILE_ALL
  	help
--	  Enable GCOV profiling on ftrace subsystem for checking
-+	  Enable code coverage profiling on ftrace subsystem for checking
- 	  which functions/lines are tested.
+ 	  This option activates coverage instrumentation for the entire kernel.
+diff --git a/kernel/coverage/Makefile b/kernel/coverage/Makefile
+index 881fada442bd1..d783272d9974d 100644
+--- a/kernel/coverage/Makefile
++++ b/kernel/coverage/Makefile
+@@ -2,6 +2,7 @@
  
- 	  If unsure, say N.
-diff --git a/kernel/trace/Makefile b/kernel/trace/Makefile
-index 1f925cd1b9f89..02d57906f13f5 100644
---- a/kernel/trace/Makefile
-+++ b/kernel/trace/Makefile
-@@ -44,8 +44,8 @@ KBUILD_CFLAGS += -DDISABLE_BRANCH_PROFILING
- endif
+ obj-$(or $(CONFIG_COVERAGE_KERNEL),$(CONFIG_KCOV)) += core.o
+ obj-$(CONFIG_GCOV_KERNEL) += gcov/
++obj-$(CONFIG_LLVM_COV_KERNEL) += llvm/
+ obj-$(CONFIG_KCOV) += kcov.o
  
- # for GCOV coverage profiling
--ifdef CONFIG_GCOV_PROFILE_FTRACE
--GCOV_PROFILE := y
-+ifdef CONFIG_COVERAGE_PROFILE_FTRACE
-+COVERAGE_PROFILE := y
- endif
- 
- # Functions in these files can run from IRQ entry before hardirq context
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 41a5925e4568b..fa68fc92e543c 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -3048,7 +3048,7 @@ config FORTIFY_KUNIT_TEST
- config LONGEST_SYM_KUNIT_TEST
- 	tristate "Test the longest symbol possible" if !KUNIT_ALL_TESTS
- 	depends on KUNIT && KPROBES
--	depends on !CALL_PADDING && !CFI && !GCOV_KERNEL
-+	depends on !CALL_PADDING && !CFI && !COVERAGE_KERNEL
- 	default KUNIT_ALL_TESTS
- 	help
- 	  Tests the longest symbol possible
-diff --git a/lib/Makefile b/lib/Makefile
-index a2afe954805cb..6e80cd0023e8e 100644
---- a/lib/Makefile
-+++ b/lib/Makefile
-@@ -88,7 +88,7 @@ obj-$(CONFIG_TEST_DYNAMIC_DEBUG) += test_dynamic_debug.o
- obj-$(CONFIG_TEST_BITMAP) += test_bitmap.o
- ifeq ($(CONFIG_CC_IS_CLANG)$(CONFIG_KASAN),yy)
- # FIXME: Clang breaks test_bitmap_const_eval when KASAN and GCOV are enabled
--GCOV_PROFILE_test_bitmap.o := n
-+COVERAGE_PROFILE_test_bitmap.o := n
- endif
- 
- obj-$(CONFIG_TEST_XARRAY) += test_xarray.o
-diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
-index 832d170cab941..4d7b265c023a1 100644
---- a/lib/crypto/Makefile
-+++ b/lib/crypto/Makefile
-@@ -143,7 +143,7 @@ obj-$(CONFIG_CRYPTO_LIB_CURVE25519) += libcurve25519.o
- libcurve25519-y := curve25519.o
- 
- # Disable GCOV in odd or sensitive code
--GCOV_PROFILE_curve25519.o := n
-+COVERAGE_PROFILE_curve25519.o := n
- 
- ifeq ($(CONFIG_ARCH_SUPPORTS_INT128),y)
- libcurve25519-$(CONFIG_CRYPTO_LIB_CURVE25519_GENERIC) += curve25519-hacl64.o
-diff --git a/net/bridge/Makefile b/net/bridge/Makefile
-index 1203dc19e15c9..79e07925c9322 100644
---- a/net/bridge/Makefile
-+++ b/net/bridge/Makefile
-@@ -30,8 +30,8 @@ bridge-$(CONFIG_BRIDGE_MRP)	+= br_mrp_switchdev.o br_mrp.o br_mrp_netlink.o
- 
- bridge-$(CONFIG_BRIDGE_CFM)	+= br_cfm.o br_cfm_netlink.o
- 
--ifdef CONFIG_GCOV_PROFILE_NETFILTER
--GCOV_PROFILE_br_nf_core.o := y
--GCOV_PROFILE_br_netfilter_hooks.o := y
--GCOV_PROFILE_br_netfilter_ipv6.o := y
-+ifdef CONFIG_COVERAGE_PROFILE_NETFILTER
-+COVERAGE_PROFILE_br_nf_core.o := y
-+COVERAGE_PROFILE_br_netfilter_hooks.o := y
-+COVERAGE_PROFILE_br_netfilter_ipv6.o := y
- endif
-diff --git a/net/bridge/netfilter/Makefile b/net/bridge/netfilter/Makefile
-index af0c903aa4ace..46af78735a5c5 100644
---- a/net/bridge/netfilter/Makefile
-+++ b/net/bridge/netfilter/Makefile
-@@ -39,6 +39,6 @@ obj-$(CONFIG_BRIDGE_EBT_SNAT) += ebt_snat.o
- obj-$(CONFIG_BRIDGE_EBT_LOG) += ebt_log.o
- obj-$(CONFIG_BRIDGE_EBT_NFLOG) += ebt_nflog.o
- 
--ifdef CONFIG_GCOV_PROFILE_NETFILTER
--GCOV_PROFILE := y
-+ifdef CONFIG_COVERAGE_PROFILE_NETFILTER
-+COVERAGE_PROFILE := y
- endif
-diff --git a/net/ipv4/Makefile b/net/ipv4/Makefile
-index e8a0e9605b901..23f68b7fb3498 100644
---- a/net/ipv4/Makefile
-+++ b/net/ipv4/Makefile
-@@ -74,6 +74,6 @@ obj-$(CONFIG_BPF_SYSCALL) += bpf_tcp_ca.o
- obj-$(CONFIG_CGROUP_BPF) += bpf_tcp_ops.o
- endif
- 
--ifdef CONFIG_GCOV_PROFILE_NETFILTER
--GCOV_PROFILE_netfilter.o := y
-+ifdef CONFIG_COVERAGE_PROFILE_NETFILTER
-+COVERAGE_PROFILE_netfilter.o := y
- endif
-diff --git a/net/ipv4/netfilter/Makefile b/net/ipv4/netfilter/Makefile
-index dbfb1c4739a87..c4c0dfeef382c 100644
---- a/net/ipv4/netfilter/Makefile
-+++ b/net/ipv4/netfilter/Makefile
-@@ -52,6 +52,6 @@ obj-$(CONFIG_IP_NF_ARPFILTER) += arptable_filter.o
- 
- obj-$(CONFIG_NF_DUP_IPV4) += nf_dup_ipv4.o
- 
--ifdef CONFIG_GCOV_PROFILE_NETFILTER
--GCOV_PROFILE := y
-+ifdef CONFIG_COVERAGE_PROFILE_NETFILTER
-+COVERAGE_PROFILE := y
- endif
-diff --git a/net/ipv6/Makefile b/net/ipv6/Makefile
-index cf5e01f83ce3d..3c7e993fefcc1 100644
---- a/net/ipv6/Makefile
-+++ b/net/ipv6/Makefile
-@@ -55,6 +55,6 @@ obj-y += mcast_snoop.o ndisc_snoop.o
- obj-$(CONFIG_TCP_AO) += tcp_ao.o
- endif
- 
--ifdef CONFIG_GCOV_PROFILE_NETFILTER
--GCOV_PROFILE_netfilter.o := y
-+ifdef CONFIG_COVERAGE_PROFILE_NETFILTER
-+COVERAGE_PROFILE_netfilter.o := y
- endif
-diff --git a/net/ipv6/netfilter/Makefile b/net/ipv6/netfilter/Makefile
-index 72902d8005ad9..e49f0dd9526ac 100644
---- a/net/ipv6/netfilter/Makefile
-+++ b/net/ipv6/netfilter/Makefile
-@@ -44,6 +44,6 @@ obj-$(CONFIG_IP6_NF_TARGET_NPT) += ip6t_NPT.o
- obj-$(CONFIG_IP6_NF_TARGET_REJECT) += ip6t_REJECT.o
- obj-$(CONFIG_IP6_NF_TARGET_SYNPROXY) += ip6t_SYNPROXY.o
- 
--ifdef CONFIG_GCOV_PROFILE_NETFILTER
--GCOV_PROFILE := y
-+ifdef CONFIG_COVERAGE_PROFILE_NETFILTER
-+COVERAGE_PROFILE := y
- endif
-diff --git a/net/netfilter/Kconfig b/net/netfilter/Kconfig
-index 09874c26fd135..9470494ee760a 100644
---- a/net/netfilter/Kconfig
-+++ b/net/netfilter/Kconfig
-@@ -1649,11 +1649,12 @@ config NETFILTER_XT_MATCH_U32
- 
- endif # NETFILTER_XTABLES
- 
--config GCOV_PROFILE_NETFILTER
--	bool "Enable GCOV profiling for netfilter"
--	depends on GCOV_KERNEL
-+config COVERAGE_PROFILE_NETFILTER
-+	bool "Enable code coverage profiling for netfilter"
-+	depends on COVERAGE_KERNEL
-+	default GCOV_PROFILE_NETFILTER
- 	help
--	  Enable GCOV profiling for netfilter to check which functions/lines
-+	  Enable code coverage profiling for netfilter to check which functions/lines
- 	  are executed.
- 
- 	  If unsure, say N.
-diff --git a/net/netfilter/Makefile b/net/netfilter/Makefile
-index 6bf74d488a292..f84c622e3a70d 100644
---- a/net/netfilter/Makefile
-+++ b/net/netfilter/Makefile
-@@ -241,6 +241,6 @@ obj-$(CONFIG_IP_VS) += ipvs/
- # lwtunnel
- obj-$(CONFIG_LWTUNNEL) += nf_hooks_lwtunnel.o
- 
--ifdef CONFIG_GCOV_PROFILE_NETFILTER
--GCOV_PROFILE := y
-+ifdef CONFIG_COVERAGE_PROFILE_NETFILTER
-+COVERAGE_PROFILE := y
- endif
-diff --git a/net/netfilter/ipset/Kconfig b/net/netfilter/ipset/Kconfig
-index 6c4d547581067..e8f05c1df8e0f 100644
---- a/net/netfilter/ipset/Kconfig
-+++ b/net/netfilter/ipset/Kconfig
-@@ -175,11 +175,12 @@ config IP_SET_LIST_SET
- 
- 	  To compile it as a module, choose M here.  If unsure, say N.
- 
--config GCOV_PROFILE_IPSET
--	bool "Enable GCOV profiling for ipset"
--	depends on GCOV_KERNEL
-+config COVERAGE_PROFILE_IPSET
-+	bool "Enable code coverage profiling for ipset"
-+	depends on COVERAGE_KERNEL
-+	default GCOV_PROFILE_IPSET
- 	help
--	  Enable GCOV profiling for ipset to check which functions/lines
-+	  Enable code coverage profiling for ipset to check which functions/lines
- 	  are executed.
- 
- 	  If unsure, say N.
-diff --git a/net/netfilter/ipset/Makefile b/net/netfilter/ipset/Makefile
-index 4f48df5406cd3..b4991815f44bb 100644
---- a/net/netfilter/ipset/Makefile
-+++ b/net/netfilter/ipset/Makefile
-@@ -29,6 +29,6 @@ obj-$(CONFIG_IP_SET_HASH_NETPORTNET) += ip_set_hash_netportnet.o
- 
- # list types
- obj-$(CONFIG_IP_SET_LIST_SET) += ip_set_list_set.o
--ifdef CONFIG_GCOV_PROFILE_IPSET
--GCOV_PROFILE := y
-+ifdef CONFIG_COVERAGE_PROFILE_IPSET
-+COVERAGE_PROFILE := y
- endif
-diff --git a/net/netfilter/ipvs/Kconfig b/net/netfilter/ipvs/Kconfig
-index 7724cb44e6dea..959e5832be874 100644
---- a/net/netfilter/ipvs/Kconfig
-+++ b/net/netfilter/ipvs/Kconfig
-@@ -349,11 +349,12 @@ config	IP_VS_PE_SIP
- 	help
- 	  Allow persistence based on the SIP Call-ID
- 
--config GCOV_PROFILE_IPVS
--	bool "Enable GCOV profiling for IPVS"
--	depends on GCOV_KERNEL
-+config COVERAGE_PROFILE_IPVS
-+	bool "Enable code coverage profiling for IPVS"
-+	depends on COVERAGE_KERNEL
-+	default GCOV_PROFILE_IPVS
- 	help
--	  Enable GCOV profiling for IPVS to check which functions/lines
-+	  Enable code coverage profiling for IPVS to check which functions/lines
- 	  are executed.
- 
- 	  If unsure, say N.
-diff --git a/net/netfilter/ipvs/Makefile b/net/netfilter/ipvs/Makefile
-index 8e4cc67ad39d5..6cf42a7350904 100644
---- a/net/netfilter/ipvs/Makefile
-+++ b/net/netfilter/ipvs/Makefile
-@@ -43,6 +43,6 @@ obj-$(CONFIG_IP_VS_FTP) += ip_vs_ftp.o
- 
- # IPVS connection template retrievers
- obj-$(CONFIG_IP_VS_PE_SIP) += ip_vs_pe_sip.o
--ifdef CONFIG_GCOV_PROFILE_IPVS
--GCOV_PROFILE := y
-+ifdef CONFIG_COVERAGE_PROFILE_IPVS
-+COVERAGE_PROFILE := y
- endif
-diff --git a/net/rds/Kconfig b/net/rds/Kconfig
-index f007730aa2bb6..9c35cb18a3f93 100644
---- a/net/rds/Kconfig
-+++ b/net/rds/Kconfig
-@@ -27,11 +27,12 @@ config RDS_DEBUG
- 	depends on RDS
- 	default n
- 
--config GCOV_PROFILE_RDS
--	bool "Enable GCOV profiling on RDS"
--	depends on GCOV_KERNEL
-+config COVERAGE_PROFILE_RDS
-+	bool "Enable code coverage profiling on RDS"
-+	depends on COVERAGE_KERNEL
-+	default GCOV_PROFILE_RDS
- 	help
--	  Enable GCOV profiling on RDS for checking which functions/lines
-+	  Enable code coverage profiling on RDS for checking which functions/lines
- 	  are executed.
- 
- 	  If unsure, say N.
-diff --git a/net/rds/Makefile b/net/rds/Makefile
-index 3af1ca1d965ce..84c1eb77369f5 100644
---- a/net/rds/Makefile
-+++ b/net/rds/Makefile
-@@ -17,6 +17,6 @@ rds_tcp-y :=		tcp.o tcp_connect.o tcp_listen.o tcp_recv.o \
- ccflags-$(CONFIG_RDS_DEBUG)	:=	-DRDS_DEBUG
- 
- # for GCOV coverage profiling
--ifdef CONFIG_GCOV_PROFILE_RDS
--GCOV_PROFILE := y
-+ifdef CONFIG_COVERAGE_PROFILE_RDS
-+COVERAGE_PROFILE := y
- endif
-diff --git a/scripts/Makefile.gcov b/scripts/Makefile.gcov
+ # Don't self-instrument.
+diff --git a/kernel/coverage/llvm/Makefile b/kernel/coverage/llvm/Makefile
 new file mode 100644
-index 0000000000000..1620b81398eaa
+index 0000000000000..7090171b070eb
 --- /dev/null
-+++ b/scripts/Makefile.gcov
-@@ -0,0 +1,22 @@
++++ b/kernel/coverage/llvm/Makefile
+@@ -0,0 +1,4 @@
 +# SPDX-License-Identifier: GPL-2.0
++COVERAGE_PROFILE := n
 +
-+CFLAGS_COVERAGE	:= -fprofile-arcs -ftest-coverage
-+ifdef CONFIG_CC_IS_GCC
-+CFLAGS_COVERAGE	+= -fno-tree-loop-im
-+# Use atomic counter updates to avoid concurrent-access crashes in GCOV.
-+# Only enable if -fprofile-update=prefer-atomic does not introduce new
-+# undefined symbols (e.g. libatomic calls that the kernel cannot link).
-+CFLAGS_COVERAGE	+= $(call try-run,\
-+	echo 'long long x; void f(void){x++;}' | \
-+	$(CC) $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) -w -fprofile-arcs \
-+	-ftest-coverage -x c - -c -o "$$TMP.base" && \
-+	echo 'long long x; void f(void){x++;}' | \
-+	$(CC) $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) -w -fprofile-arcs \
-+	-ftest-coverage -fprofile-update=prefer-atomic \
-+	-x c - -c -o "$$TMP" && \
-+	$(NM) "$$TMP.base" | grep ' U ' > "$$TMP.ubase" || true ; \
-+	$(NM) "$$TMP" | grep ' U ' > "$$TMP.utest" || true ; \
-+	cmp -s "$$TMP.ubase" "$$TMP.utest",\
-+	-fprofile-update=prefer-atomic)
-+endif
-+export CFLAGS_COVERAGE
++obj-y := fs.o
+diff --git a/kernel/coverage/llvm/fs.c b/kernel/coverage/llvm/fs.c
+new file mode 100644
+index 0000000000000..e90c325daeba3
+--- /dev/null
++++ b/kernel/coverage/llvm/fs.c
+@@ -0,0 +1,201 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2019	Sami Tolvanen <samitolvanen@google.com>, Google, Inc.
++ * Copyright (C) 2024	Jinghao Jia   <jinghao7@illinois.edu>,   UIUC
++ * Copyright (C) 2024	Wentao Zhang  <wentaoz5@illinois.edu>,   UIUC
++ */
++
++#define pr_fmt(fmt)	"llvm-cov: " fmt
++
++#include <linux/debugfs.h>
++#include <linux/fs.h>
++#include <linux/init.h>
++#include <linux/mutex.h>
++#include <linux/slab.h>
++#include <linux/string.h>
++#include <linux/vmalloc.h>
++
++#include "../coverage.h"
++#include "llvm-cov.h"
++
++/*
++ * Serializes taking a snapshot of the profile data against resetting it. The
++ * instrumented code updates the counters and bitmaps without taking it, so a
++ * snapshot is not atomic with respect to code running on other CPUs.
++ */
++static DEFINE_MUTEX(llvm_cov_mutex);
++
++struct llvm_cov_private_data {
++	char *buffer;
++	unsigned long size;
++};
++
++/*
++ * Raw profile data format:
++ * https://llvm.org/docs/InstrProfileFormat.html#raw-profile-format. Only the
++ * information relevant to Source-based Code Coverage is populated. Binary IDs,
++ * continuous mode, single-byte mode, value profiling, type profiling and
++ * uniform counters are not implemented.
++ */
++
++static void llvm_cov_fill_raw_profile_header(void **buffer)
++{
++	struct __llvm_profile_header *header = *buffer;
++
++	header->magic = INSTR_PROF_RAW_MAGIC_64;
++	header->version = INSTR_PROF_RAW_VERSION;
++	header->binary_ids_size = 0;
++	header->num_data = __llvm_prf_data_count();
++	header->padding_bytes_before_counters = 0;
++	header->num_counters = __llvm_prf_cnts_count();
++	header->padding_bytes_after_counters =
++		__llvm_prf_get_padding(__llvm_prf_cnts_size());
++	header->num_bitmap_bytes = __llvm_prf_bits_size();
++	header->padding_bytes_after_bitmap_bytes =
++		__llvm_prf_get_padding(__llvm_prf_bits_size());
++#if CONFIG_CLANG_VERSION >= 230000
++	header->num_uniform_counters = 0;
++	header->padding_bytes_after_uniform_counters = 0;
++	header->uniform_counters_delta = 0;
++#endif
++	header->names_size = __llvm_prf_names_size();
++	header->counters_delta = (u64)__llvm_prf_cnts_start -
++				 (u64)__llvm_prf_data_start;
++	header->bitmap_delta   = (u64)__llvm_prf_bits_start -
++				 (u64)__llvm_prf_data_start;
++	header->names_delta    = (u64)__llvm_prf_names_start;
++	header->num_v_tables = 0;
++	header->v_names_size = 0;
++	header->value_kind_last = IPVK_LAST;
++
++	*buffer += sizeof(*header);
++}
++
++/*
++ * Copy the source into the buffer, incrementing the pointer into buffer in the
++ * process.
++ */
++static void llvm_cov_copy_section_to_buffer(void **buffer, void *src,
++					    unsigned long size)
++{
++	memcpy(*buffer, src, size);
++	*buffer += size;
++}
++
++static unsigned long llvm_cov_get_raw_profile_size(void)
++{
++	return sizeof(struct __llvm_profile_header) +
++	       __llvm_prf_data_size() +
++	       __llvm_prf_cnts_size() +
++	       __llvm_prf_get_padding(__llvm_prf_cnts_size()) +
++	       __llvm_prf_bits_size() +
++	       __llvm_prf_get_padding(__llvm_prf_bits_size()) +
++	       __llvm_prf_names_size() +
++	       __llvm_prf_get_padding(__llvm_prf_names_size());
++}
++
++/*
++ * Serialize in-memory data into a format LLVM tools can understand
++ * (https://llvm.org/docs/InstrProfileFormat.html#raw-profile-format)
++ */
++static int llvm_cov_serialize_raw_profile(struct llvm_cov_private_data *p)
++{
++	void *buffer;
++
++	p->size = llvm_cov_get_raw_profile_size();
++	p->buffer = vzalloc(p->size);
++	if (!p->buffer)
++		return -ENOMEM;
++
++	buffer = p->buffer;
++
++	llvm_cov_fill_raw_profile_header(&buffer);
++	llvm_cov_copy_section_to_buffer(&buffer, __llvm_prf_data_start,
++					__llvm_prf_data_size());
++	llvm_cov_copy_section_to_buffer(&buffer, __llvm_prf_cnts_start,
++					__llvm_prf_cnts_size());
++	buffer += __llvm_prf_get_padding(__llvm_prf_cnts_size());
++	llvm_cov_copy_section_to_buffer(&buffer, __llvm_prf_bits_start,
++					__llvm_prf_bits_size());
++	buffer += __llvm_prf_get_padding(__llvm_prf_bits_size());
++	llvm_cov_copy_section_to_buffer(&buffer, __llvm_prf_names_start,
++					__llvm_prf_names_size());
++
++	return 0;
++}
++
++/* open() implementation for llvm-cov data file. */
++static int llvm_cov_open(struct inode *inode, struct file *file)
++{
++	struct llvm_cov_private_data *data;
++	int err;
++
++	data = kzalloc_obj(*data);
++	if (!data)
++		return -ENOMEM;
++
++	mutex_lock(&llvm_cov_mutex);
++	err = llvm_cov_serialize_raw_profile(data);
++	mutex_unlock(&llvm_cov_mutex);
++
++	if (err) {
++		kfree(data);
++		return err;
++	}
++
++	file->private_data = data;
++	return 0;
++}
++
++/* read() implementation for llvm-cov data file. */
++static ssize_t llvm_cov_read(struct file *file, char __user *buf, size_t count,
++			     loff_t *ppos)
++{
++	struct llvm_cov_private_data *data = file->private_data;
++
++	return simple_read_from_buffer(buf, count, ppos, data->buffer,
++				       data->size);
++}
++
++/* release() implementation for llvm-cov data file. */
++static int llvm_cov_release(struct inode *inode, struct file *file)
++{
++	struct llvm_cov_private_data *data = file->private_data;
++
++	vfree(data->buffer);
++	kfree(data);
++	return 0;
++}
++
++static const struct file_operations llvm_cov_data_fops = {
++	.owner		= THIS_MODULE,
++	.open		= llvm_cov_open,
++	.read		= llvm_cov_read,
++	.llseek		= default_llseek,
++	.release	= llvm_cov_release,
++};
++
++static void llvm_cov_reset(void)
++{
++	mutex_lock(&llvm_cov_mutex);
++	memset(__llvm_prf_cnts_start, 0, __llvm_prf_cnts_size());
++	memset(__llvm_prf_bits_start, 0, __llvm_prf_bits_size());
++	mutex_unlock(&llvm_cov_mutex);
++}
++
++static const struct coverage_backend llvm_cov_backend = {
++	.name	= "llvm",
++	.reset	= llvm_cov_reset,
++};
++
++static int __init llvm_cov_init(void)
++{
++	struct dentry *dir;
++
++	dir = debugfs_create_dir("llvm", coverage_debugfs_root());
++	debugfs_create_file("profraw", 0400, dir, NULL, &llvm_cov_data_fops);
++	coverage_register_backend(&llvm_cov_backend);
++
++	return 0;
++}
++device_initcall(llvm_cov_init);
+diff --git a/kernel/coverage/llvm/llvm-cov.h b/kernel/coverage/llvm/llvm-cov.h
+new file mode 100644
+index 0000000000000..61c76e803f88b
+--- /dev/null
++++ b/kernel/coverage/llvm/llvm-cov.h
+@@ -0,0 +1,139 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright (C) 2019	Sami Tolvanen <samitolvanen@google.com>, Google, Inc.
++ * Copyright (C) 2024	Jinghao Jia   <jinghao7@illinois.edu>,   UIUC
++ * Copyright (C) 2024	Wentao Zhang  <wentaoz5@illinois.edu>,   UIUC
++ */
++
++#ifndef _LLVM_COV_H
++#define _LLVM_COV_H
++
++#include <linux/types.h>
++
++/*
++ * These internal LLVM definitions must match the compiler version. See
++ * llvm/include/llvm/ProfileData/InstrProfData.inc in LLVM's source code.
++ */
++
++#define INSTR_PROF_RAW_MAGIC_64		\
++		((u64)255 << 56 |	\
++		 (u64)'l' << 48 |	\
++		 (u64)'p' << 40 |	\
++		 (u64)'r' << 32 |	\
++		 (u64)'o' << 24 |	\
++		 (u64)'f' << 16 |	\
++		 (u64)'r' << 8  |	\
++		 (u64)129)
++
++#if CONFIG_CLANG_VERSION >= 230000
++#define INSTR_PROF_RAW_VERSION		11
++#else
++#define INSTR_PROF_RAW_VERSION		10
++#endif
++#define INSTR_PROF_DATA_ALIGNMENT	8
++#define IPVK_LAST			2
++
++/**
++ * struct __llvm_profile_header - represents the raw profile header data
++ * structure. Description of each member can be found here:
++ * https://llvm.org/docs/InstrProfileFormat.html#header.
++ */
++struct __llvm_profile_header {
++	u64 magic;
++	u64 version;
++	u64 binary_ids_size;
++	u64 num_data;
++	u64 padding_bytes_before_counters;
++	u64 num_counters;
++	u64 padding_bytes_after_counters;
++	u64 num_bitmap_bytes;
++	u64 padding_bytes_after_bitmap_bytes;
++#if CONFIG_CLANG_VERSION >= 230000
++	u64 num_uniform_counters;
++	u64 padding_bytes_after_uniform_counters;
++	u64 uniform_counters_delta;
++#endif
++	u64 names_size;
++	u64 counters_delta;
++	u64 bitmap_delta;
++	u64 names_delta;
++	u64 num_v_tables;
++	u64 v_names_size;
++	u64 value_kind_last;
++};
++
++/**
++ * struct __llvm_profile_data - represents the per-function control structure.
++ * Description of each member can be found here:
++ * https://llvm.org/docs/InstrProfileFormat.html#profile-metadata. To measure
++ * Source-based Code Coverage, the internals of this struct don't matter at run
++ * time. The only purpose of the definition below is to run sizeof() against it
++ * so that we can calculate the "num_data" field in header.
++ */
++struct __llvm_profile_data {
++	const u64 name_ref;
++	const u64 func_hash;
++	const void *counter_ptr;
++#if CONFIG_CLANG_VERSION >= 230000
++	const void *uniform_counter_ptr;
++#endif
++	const void *bitmap_ptr;
++	const void *function_pointer;
++	void *values;
++	const u32 num_counters;
++	const u16 num_value_sites[IPVK_LAST + 1];
++#if CONFIG_CLANG_VERSION >= 230000
++	const u16 offload_device_wave_size;
++#endif
++	const u32 num_bitmap_bytes;
++} __aligned(INSTR_PROF_DATA_ALIGNMENT);
++
++/* Payload sections */
++
++extern struct __llvm_profile_data __llvm_prf_data_start[];
++extern struct __llvm_profile_data __llvm_prf_data_end[];
++
++extern u64 __llvm_prf_cnts_start[];
++extern u64 __llvm_prf_cnts_end[];
++
++extern char __llvm_prf_names_start[];
++extern char __llvm_prf_names_end[];
++
++extern char __llvm_prf_bits_start[];
++extern char __llvm_prf_bits_end[];
++
++#define __DEFINE_SECTION_SIZE(s)					\
++	static inline unsigned long __llvm_prf_ ## s ## _size(void)	\
++	{								\
++		unsigned long start =					\
++			(unsigned long)__llvm_prf_ ## s ## _start;	\
++		unsigned long end =					\
++			(unsigned long)__llvm_prf_ ## s ## _end;	\
++		return end - start;					\
++	}
++#define __DEFINE_SECTION_COUNT(s)					\
++	static inline unsigned long __llvm_prf_ ## s ## _count(void)	\
++	{								\
++		return __llvm_prf_ ## s ## _size() /			\
++			sizeof(__llvm_prf_ ## s ## _start[0]);		\
++	}
++
++__DEFINE_SECTION_SIZE(data)
++__DEFINE_SECTION_SIZE(cnts)
++__DEFINE_SECTION_SIZE(names)
++__DEFINE_SECTION_SIZE(bits)
++
++__DEFINE_SECTION_COUNT(data)
++__DEFINE_SECTION_COUNT(cnts)
++__DEFINE_SECTION_COUNT(names)
++__DEFINE_SECTION_COUNT(bits)
++
++#undef __DEFINE_SECTION_SIZE
++#undef __DEFINE_SECTION_COUNT
++
++static inline unsigned long __llvm_prf_get_padding(unsigned long size)
++{
++	return 7 & (sizeof(u64) - size % sizeof(u64));
++}
++
++#endif /* _LLVM_COV_H */
 diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 19e96b30a122f..e0dc21e009522 100644
+index e0dc21e009522..77d1ab47125be 100644
 --- a/scripts/Makefile.lib
 +++ b/scripts/Makefile.lib
-@@ -38,14 +38,14 @@ _a_flags       = $(filter-out $(AFLAGS_REMOVE_$(target-stem).o), \
- _cpp_flags     = $(KBUILD_CPPFLAGS) $(cppflags-y) $(CPPFLAGS_$(target-stem).lds)
- 
+@@ -42,10 +42,13 @@ _cpp_flags     = $(KBUILD_CPPFLAGS) $(cppflags-y) $(CPPFLAGS_$(target-stem).lds)
+ # depending on variables COVERAGE_PROFILE_obj.o, COVERAGE_PROFILE and
+ # CONFIG_COVERAGE_PROFILE_ALL (in this order)
  #
--# Enable gcov profiling flags for a file, directory or for all files depending
--# on variables GCOV_PROFILE_obj.o, GCOV_PROFILE and CONFIG_GCOV_PROFILE_ALL
--# (in this order)
-+# Enable code coverage instrumentation for a file, directory or for all files
-+# depending on variables COVERAGE_PROFILE_obj.o, COVERAGE_PROFILE and
-+# CONFIG_COVERAGE_PROFILE_ALL (in this order)
- #
--ifeq ($(CONFIG_GCOV_KERNEL),y)
-+ifeq ($(CONFIG_COVERAGE_KERNEL),y)
- _c_flags += $(if $(patsubst n%,, \
--		$(GCOV_PROFILE_$(target-stem).o)$(GCOV_PROFILE)$(if $(is-kernel-object),$(CONFIG_GCOV_PROFILE_ALL))), \
--		$(CFLAGS_GCOV))
-+		$(COVERAGE_PROFILE_$(target-stem).o)$(COVERAGE_PROFILE)$(if $(is-kernel-object),$(CONFIG_COVERAGE_PROFILE_ALL))), \
-+		$(CFLAGS_COVERAGE))
++# Modules are only instrumented if the coverage implementation supports them.
++#
+ ifeq ($(CONFIG_COVERAGE_KERNEL),y)
+-_c_flags += $(if $(patsubst n%,, \
++_c_flags += $(if $(if $(part-of-module),$(CONFIG_COVERAGE_MODULES),y), \
++		$(if $(patsubst n%,, \
+ 		$(COVERAGE_PROFILE_$(target-stem).o)$(COVERAGE_PROFILE)$(if $(is-kernel-object),$(CONFIG_COVERAGE_PROFILE_ALL))), \
+-		$(CFLAGS_COVERAGE))
++		$(CFLAGS_COVERAGE)))
  endif
  
  #
-@@ -206,7 +206,7 @@ objtool-args-$(CONFIG_MITIGATION_SLS)			+= --sls
- objtool-args-$(CONFIG_STACK_VALIDATION)			+= --stackval
- objtool-args-$(CONFIG_HAVE_STATIC_CALL_INLINE)		+= --static-call
- objtool-args-$(CONFIG_HAVE_UACCESS_VALIDATION)		+= --uaccess
--objtool-args-$(or $(CONFIG_GCOV_KERNEL),$(CONFIG_KCOV))	+= --no-unreachable
-+objtool-args-$(or $(CONFIG_COVERAGE_KERNEL),$(CONFIG_KCOV))	+= --no-unreachable
- objtool-args-$(CONFIG_OBJTOOL_WERROR)			+= --werror
- 
- objtool-args = $(objtool-args-y)					\
-diff --git a/scripts/Makefile.modfinal b/scripts/Makefile.modfinal
-index 01a37ec872b90..2ca03eccbe291 100644
---- a/scripts/Makefile.modfinal
-+++ b/scripts/Makefile.modfinal
-@@ -19,7 +19,7 @@ __modfinal: $(modules:%.o=%.ko)
- # modname and part-of-module are set to make c_flags define proper module flags
- modname = $(notdir $(@:.mod.o=))
- part-of-module = y
--GCOV_PROFILE := n
-+COVERAGE_PROFILE := n
- ccflags-remove-y := $(CC_FLAGS_CFI)
- 
- %.mod.o: %.mod.c FORCE
-diff --git a/scripts/sbom/sbom/environment.py b/scripts/sbom/sbom/environment.py
-index 4304066fe974e..a74c96ddfe593 100644
---- a/scripts/sbom/sbom/environment.py
-+++ b/scripts/sbom/sbom/environment.py
-@@ -18,7 +18,7 @@ KERNEL_BUILD_VARIABLES_ALLOWLIST = [
-     "CC",
-     "CC_FLAGS_FPU",
-     "CC_FLAGS_NO_FPU",
--    "CFLAGS_GCOV",
-+    "CFLAGS_COVERAGE",
-     "CFLAGS_KERNEL",
-     "CFLAGS_MODULE",
-     "CHECK",
-diff --git a/tools/testing/selftests/net/rds/config.sh b/tools/testing/selftests/net/rds/config.sh
-index 2df2226310efe..bb854f49e464d 100755
---- a/tools/testing/selftests/net/rds/config.sh
-+++ b/tools/testing/selftests/net/rds/config.sh
-@@ -43,13 +43,14 @@ scripts/config "${FLAGS[@]}" --enable CONFIG_RDS_TCP
- 
- if [ "$GENERATE_GCOV_REPORT" -eq 1 ]; then
- 	# instrument RDS and only RDS
-+	scripts/config "${FLAGS[@]}" --disable CONFIG_COVERAGE_NONE
- 	scripts/config "${FLAGS[@]}" --enable CONFIG_GCOV_KERNEL
--	scripts/config "${FLAGS[@]}" --disable GCOV_PROFILE_ALL
--	scripts/config "${FLAGS[@]}" --enable GCOV_PROFILE_RDS
-+	scripts/config "${FLAGS[@]}" --disable COVERAGE_PROFILE_ALL
-+	scripts/config "${FLAGS[@]}" --enable COVERAGE_PROFILE_RDS
- else
- 	scripts/config "${FLAGS[@]}" --disable CONFIG_GCOV_KERNEL
--	scripts/config "${FLAGS[@]}" --disable GCOV_PROFILE_ALL
--	scripts/config "${FLAGS[@]}" --disable GCOV_PROFILE_RDS
-+	scripts/config "${FLAGS[@]}" --disable COVERAGE_PROFILE_ALL
-+	scripts/config "${FLAGS[@]}" --disable COVERAGE_PROFILE_RDS
- fi
- 
- # need network namespaces to run tests with veth network interfaces
-diff --git a/tools/testing/selftests/net/rds/rds_run.sh b/tools/testing/selftests/net/rds/rds_run.sh
-index cdf487ec97dcc..25bb65d048abe 100755
---- a/tools/testing/selftests/net/rds/rds_run.sh
-+++ b/tools/testing/selftests/net/rds/rds_run.sh
-@@ -70,16 +70,16 @@ check_gcov_env()
- # Check to see if the kconfig has the required configs to generate a coverage report
- check_gcov_conf()
- {
--	if ! grep -x "CONFIG_GCOV_PROFILE_RDS=y" "$kconfig" > /dev/null 2>&1; then
--		echo "# INFO: CONFIG_GCOV_PROFILE_RDS should be enabled for coverage reports"
-+	if ! grep -x "CONFIG_COVERAGE_PROFILE_RDS=y" "$kconfig" > /dev/null 2>&1; then
-+		echo "# INFO: CONFIG_COVERAGE_PROFILE_RDS should be enabled for coverage reports"
- 		GENERATE_GCOV_REPORT=0
- 	fi
- 	if ! grep -x "CONFIG_GCOV_KERNEL=y" "$kconfig" > /dev/null 2>&1; then
- 		echo "# INFO: CONFIG_GCOV_KERNEL should be enabled for coverage reports"
- 		GENERATE_GCOV_REPORT=0
- 	fi
--	if grep -x "CONFIG_GCOV_PROFILE_ALL=y" "$kconfig" > /dev/null 2>&1; then
--		echo "# INFO: CONFIG_GCOV_PROFILE_ALL should be disabled for coverage reports"
-+	if grep -x "CONFIG_COVERAGE_PROFILE_ALL=y" "$kconfig" > /dev/null 2>&1; then
-+		echo "# INFO: CONFIG_COVERAGE_PROFILE_ALL should be disabled for coverage reports"
- 		GENERATE_GCOV_REPORT=0
- 	fi
- 
+diff --git a/scripts/Makefile.llvm-cov b/scripts/Makefile.llvm-cov
+new file mode 100644
+index 0000000000000..5babb09b6d3e6
+--- /dev/null
++++ b/scripts/Makefile.llvm-cov
+@@ -0,0 +1,6 @@
++# SPDX-License-Identifier: GPL-2.0
++
++CFLAGS_COVERAGE	:= -fprofile-instr-generate -fcoverage-mapping \
++		   -fprofile-update=atomic
++
++export CFLAGS_COVERAGE
 -- 
 2.53.0
 
