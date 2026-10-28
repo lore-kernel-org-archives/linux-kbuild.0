@@ -1,120 +1,72 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.136
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793137713;
-	b=RSY7uLGiPWiUkpST539WE9+szziLiC0hmrnFYbRy1sfXM726Tc2v1C/hQ89jr58xKGeV
-	 SWDdwWP9HVFqKf1+3P3fr8SeWyifKy7/lYEk9jAf0f3F6A6R9HnrQ6BhgkYe8rvYYJWIm
-	 BMRAi3qtdD3qpB5EMhzzqTXkpG4A0JDfYYR5HzHL+1D9Aya5F7V92niEgPpXHJfgYomJn
-	 mXvO82+4KgAF+KJs5EH+4lVckweGPYeL3bFJOnojdQz+PiaaCZIQTKnFNucDPm+BU6OAF
-	 eySkvyUbXnqvYqq4xY26h67SUZ9wB7bhGvzxhVyV4YmxbcCjbNUOrbCX+BEcTvqOsuA==
+	t=1793145837;
+	b=yiD01fB8/yUhk8wkX5yX/RfDfLpog/oT/E8CXEl3iZGtchHOw9f1DKlv6Zf4hVe8jnh6
+	 U7lPYz2F/kZ0fUYjWlPz0TZWOPqNQn0o6yE41S13ieQVYXjhJtKT6UAvzzrQd+krMKyen
+	 7ia++8SZAREqGx1gaZJgnJ1+yRzz6WlJfnloBy6BtZ6ZGihwXV2gMq9DUzB9KPp7qyEeM
+	 RtQVCXmcq6dLZWJ172udaFDPM07stVzJ6o222DFjtVBqVWUN+pi+Jnee9ZON/NbycKAik
+	 q34/eoyPxFGDyd0XRq+a6HEMihUHJ7Qt1Gj1vvo2b8CF3HKRwPacMtugkwqqs5qtwyQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793137713;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:
-	 X-Google-DKIM-Signature:X-Forwarded-Encrypted:X-Gm-Message-State:
-	 X-Gm-Gg:X-Received:X-Received:Received:From:To:Cc:Subject:Date:
-	 Message-Id:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=R5y3TC+OxgWb2k2zCyoTeuDSWBjSf0l8Xg0k9asjKQ8=;
-	b=tGoNdonZGzGRp2WfmHkXmtO2WMoYbAwlMEn4CrBibioqtq6qmqBCEQ4dD2YMGkVi/29q
-	 0pWyklMWj+vHLYIVpWY99RRaw+Kv9xjC/RXytm5QxJDzqNuhc/BcAvE4T9T+tdq4vOzN/
-	 inVH07qBgRV/+0zoqYJOiO9lLe/RwNlyW/Ds/8NkPvy+x+JdGj++TAx90ePcYNQlkSwZW
-	 1cI3GMNIf924Zm7zIl4k7HJRlehv/lB4I9Z7LYVpzK/wuycoavMvpjYbgJXTXTTDzoAA+
-	 Uvmuv5+JLPLwL54mw4OcF6uGsgw/Gp0yGHmNcKOBXtMJ1sm4roEkuQgO4KqkOPha2rQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793145837;
+	h=DMARC-Filter:Received:DKIM-Filter:DKIM-Signature:Date:From:To:CC:
+	 Subject:User-Agent:In-Reply-To:References:Message-ID:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=WvXEqGRjy1Mu33I1k+nm3uATPGEt8p/jdpqF1L/3xoE=;
+	b=eDiQtHlmg413Ta4T7YFNHRaBufa2pHawn7prpvM9E5qawkB9nJDFBYsb2vBBgnkzpziN
+	 nKI/006CPzEOwb96xaps8s9fgoeSkoZtuGcQFOrGn40flQkWmBwwPRG+dN7I0ICujXGwh
+	 +GQKKPuW9BkZoY5Rvftsmed6TbvUNYuIxjx5mnBK0HwmiTRRx/pG96BbR5BmaFnrWgpzg
+	 VPk+uYwMs8xNeRcX5RJMC8VZylHqK9sNzgfDljfjFCZWQPnWBludN01PPb4AXozJtSlHH
+	 IzhbmCIg95FOkQZCjmyJ2a6PmKYMOLgM5ZI4wb2gm3rC/nccNErhmigFolYmup8G1Nw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=canonical.com;
-	spf=pass smtp.mailfrom=canonical.com;
-	dkim=pass header.d=canonical.com header.i=@canonical.com header.a=rsa-sha256 header.s=20251003 header.b=NsnIF6s2;
-	arc=none smtp.remote-ip=185.125.188.122
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+	dmarc=pass header.from=zytor.com;
+	spf=pass smtp.mailfrom=zytor.com;
+	dkim=pass header.d=zytor.com header.i=@zytor.com header.a=rsa-sha256 header.s=2026092801 header.b=b7LPm4Gu;
+	arc=none smtp.remote-ip=198.137.202.136
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0BD0606A31F
-	for <linux-kbuild@vger.kernel.org>; Tue, 27 Oct 2026 21:48:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C0BD0606A31F
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 945AD606A324;
+	Wed, 28 Oct 2026 00:03:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 945AD606A324
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key, unprotected) header.d=canonical.com header.i=@canonical.com header.a=rsa-sha256 header.s=20251003 header.b=NsnIF6s2
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com [209.85.216.69])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 2157040252
-	for <linux-kbuild@vger.kernel.org>; Tue, 27 Oct 2026 21:48:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1793137710;
-	bh=R5y3TC+OxgWb2k2zCyoTeuDSWBjSf0l8Xg0k9asjKQ8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version;
-	b=NsnIF6s23mLz8NdigrB4LFVWsHXrAI2gv8c/0r4DaBDgi1/szzsT3mv4J1WQvsX7U
-	 zdzd/DmaabVx0WgdHBRtYbsUUXQfLEmyIpuGgKO5QETxu3kW2fIUwM5U7EAKh+CzyL
-	 Pp9eBfvo7+XiQGcCKx0ts23DJkfEFlO/G03UBIhkJasSzYcHH7IHNp5njCNmk+G+fX
-	 8D5ybftMkhFpOTqrB031ZTfloLSY5zbGBxPF3Pi4FrN6DTWkxAj/qZzzsg59AoaEST
-	 9SQcPFdyqRxu7i3MP42POw4BgRS9tkm1/JJA95eprKGqLI9+SH3EgE2aJ+83zzBQsH
-	 0BK2u573yl1ivql/6a50YiauLCYuvqU9yJpCciUGP6JfULI4OnQFcAEoLF8LQkShTJ
-	 C8pkCrsnxG0Ls3PJ67TagKG7PvFo6IabWsfM8+YMZ2fKbwt8i9URBHx+cOA+J+9wIB
-	 wjNDKJ+hHkZKc3fQAhVSzXiNzs1EkPR6BwsF+9hJgbaT19J/EoO76NQTPsQftvBV1S
-	 fue1T1CPnh3FP1giDmLPTaBIcypc/pNfudv+N/2IhOW/d7T1F9SgW+oVhU44HidGMJ
-	 +gSp4ue3iAgi/OMUiyJX881ZsA2MKWyhDgMtdfG/H//GT7I9gqPXcQFi3DcV1xLLUR
-	 +OW5JYCOTL41oZtLE0vGfUp4=
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-3ab08c4aca5so74248a91.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Oct 2026 14:48:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793137708; x=1793742508;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=R5y3TC+OxgWb2k2zCyoTeuDSWBjSf0l8Xg0k9asjKQ8=;
-        b=fyHlYt8H2GlkmbixEi0ysqVxlyd3uXq+1/gFo/NH+Qa8MGq7i44r19GRHa2EldRGHr
-         Luor+ebiurIC4FuxNXkPxChAWXaaWPlig61sjfAxoLhI8WtMwgpNBSuGKQcGhx8quV2u
-         RTYyxGKKLG8FNWm1gOsRJojoLfLEWQKDG094CZ3wdTcNJzJ+6sKlVWlJF3Bbz1Lml6U7
-         N0hUjp5/hJOmNXqo/wygQgcO+uRno/dk9+fSUk61MRj6SCS+ga2JIeSyHIRoYv3ZZbhe
-         bsU/Qgjsg8zdGQNFr01ek7LzgFG5s7IoVZ6iGqJ3dn4acOtBuISgO53aV82IpeSKJ/KW
-         08aw==
-X-Forwarded-Encrypted: i=1; AKwUvBymUkg3b+TNymuAIYNLym6FRnurPvuvdZIpV639du56e5vLonnaj/L6pRXUdjtAGFIByo2L7kWm+XXbplg=@vger.kernel.org
-X-Gm-Message-State: AFq9FYKh5ul67tet/W4ndAeg3l7l6UOiTsWZEH0QddUlbWbwr+qPvJt8
-	r4sY/AJJeSf8wp9QOKZwBfp98QaHeLLMPCuoFT5fTcICtMS3yEgeArxUkODNvx1JN9B0oB6082v
-	UUNj3ygq6t+MQ0Rg4XYHjlLkkwY8wGtGIgX0QrW4Ay52J3X4OqRc9kGpw23lpP0GDsrKDVbDoAg
-	Xlwq3dig==
-X-Gm-Gg: AYBFou3K4NHE4Wmepb0riWOCKdkCuSKim/bkqPvpBf0agRkQABUBxwsWjnrP7oujskJ
-	UGacHAL9j/DTGzk0d7AxQzVDVCBqPH3BC8/bmLRBm+HvH/GphlSdbwln6QRWszGfw40du6rrRZt
-	MYuBC92krnQiAyn+7gV9Ivy8LJcdbFk+4FHntZbzCo+5c/TOrsViud7RhBf1i4uFLD2CZVIwiNL
-	w/+iYM49bK0oqKY85bbzIVnz5o/rGUQ+VsjKXyynP+2IIJEyG5rZesvAaDmzIfOp8A7bKf/de43
-	K6Ei4yxJaF1HUgufc1ri4V9wj7NNBr+tASw+xZR99c1Lr2bBO2R0iJpc9VUAj1hjZaXkNrw6ddm
-	I20pL9VCJsibfFfo42u8g0J4kubtPxO3YbWqj9fZ+FWn8pDv6pmxY5hhbu8+LouWUGJoC/dFcNl
-	JtjANO52lD2ycLyv89LCYVeWhVTwX6JU3W7dyiviJJ54KJo5o/6xiJP+v/EZn+bui8tM+Ee9wGP
-	rZvofuwMEAZcYsh+FsSTQZcIlxI5PtlohwnURH9tg==
-X-Received: by 2002:a17:90b:6d0:b0:3a6:e1d1:e511 with SMTP id 98e67ed59e1d1-3ae581402edmr428974a91.4.1793137708590;
-        Tue, 27 Oct 2026 14:48:28 -0700 (PDT)
-X-Received: by 2002:a17:90b:6d0:b0:3a6:e1d1:e511 with SMTP id 98e67ed59e1d1-3ae581402edmr428960a91.4.1793137708192;
-        Tue, 27 Oct 2026 14:48:28 -0700 (PDT)
-Received: from an-XPS-15-9520.buildd (2001-b011-2008-445c-fcc4-d427-0dad-9764.dynamic-ip6.hinet.net. [2001:b011:2008:445c:fcc4:d427:dad:9764])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ae5a9a5e73sm37741a91.10.2026.10.27.14.48.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Oct 2026 14:48:27 -0700 (PDT)
-From: ChunAn Wu <an.wu@canonical.com>
-To: Markus Probst <markus.probst@posteo.de>
-Cc: linux-serial@vger.kernel.org,
-	platform-driver-x86@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	gregkh@linuxfoundation.org,
-	jirislaby@kernel.org,
-	hansg@kernel.org,
-	ilpo.jarvinen@linux.intel.com,
-	mpearson-lenovo@squebb.ca,
-	derekjohn.clark@gmail.com,
-	Julia Lawall <Julia.Lawall@inria.fr>,
-	Nicolas Palix <nicolas.palix@imag.fr>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>,
-	cocci@inria.fr,
-	linux-kbuild@vger.kernel.org
-Subject: Re: [PATCH v6 1/3] serdev: handle devices without an ACPI or device tree node
-Date: Wed, 28 Oct 2026 05:47:42 +0800
-Message-Id: <20261027214742.3624605-1-an.wu@canonical.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <75e6d86340073638d966acb85465c28e6a08ceda.camel@posteo.de>
-References: <cover.1792856688.git.an.wu@canonical.com> <263a607c3602f31a3f6fdd245e3c2008cdf97abd.1792856688.git.an.wu@canonical.com> <75e6d86340073638d966acb85465c28e6a08ceda.camel@posteo.de>
+	dkim=pass (2048-bit key, unprotected) header.d=zytor.com header.i=@zytor.com header.a=rsa-sha256 header.s=2026092801 header.b=b7LPm4Gu
+Received: from ehlo.thunderbird.net (ENVISION-AE.edge1.SanJose1.Level3.net [4.79.220.182])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 69S02uXc1276671
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Tue, 27 Oct 2026 17:02:57 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 69S02uXc1276671
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2026092801; t=1793145779;
+	bh=WvXEqGRjy1Mu33I1k+nm3uATPGEt8p/jdpqF1L/3xoE=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=b7LPm4Gur56cBs7NJiNICXo+rpEuSFoWjieLVGMg9VXmA/dYHqYKgNgLWtqWI+SJU
+	 L2MUuwJuSpPldjvlx7pRM52/EjKfclnno03JFD1nO1E6Oj/iWXLk3aWR6RLQnPxa4T
+	 C87ERt8txMPBKeOyqay8a54xTESCAsoQYupS/vlvR8X/C4jrejkG5JaGZDrLMs1t6a
+	 6ZPlrvyxxH3iDfAARuYkY9exrA6acZ/0noVRYSTGEg/rj/e8z+fZCbI1bcx2aUStNk
+	 g0uzq/NOqvdFo1HUmJHCwJs28DFJmtv0J2xkfQiqNkfKEoRWH1mJSj4qzYwacZAgwl
+	 pF/YTrguO6NNA==
+Date: Tue, 27 Oct 2026 17:02:52 -0700
+From: "H. Peter Anvin" <hpa@zytor.com>
+To: Nicolas Schier <nsc@kernel.org>,
+        =?ISO-8859-1?Q?Thomas_Wei=DFschuh?= <thomas.weissschuh@linutronix.de>
+CC: Nathan Chancellor <nathan@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Nam Cao <namcao@linutronix.de>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        =?ISO-8859-1?Q?Andr=E9_Almeida?= <andrealmeid@igalia.com>
+Subject: Re: [PATCH] vDSO, kbuild: Provide vDSO debug variants at runtime
+User-Agent: K-9 Mail for Android
+In-Reply-To: <179313256476.2881498.3865128683953782646.b4-reply@b4>
+References: <20260708-vdso-sysfs-v1-1-fcd93385006d@linutronix.de> <179313256476.2881498.3865128683953782646.b4-reply@b4>
+Message-ID: <A0A4758F-BCDF-4C76-A51B-3ADBB5CAC8DD@zytor.com>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -124,21 +76,56 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2026-10-26 at 13:59 +0000, Markus Probst wrote:
-> Reviewed-by: Markus Probst <markus.probst@posteo.de>
+On October 27, 2026 1:22:44 PM PDT, Nicolas Schier <nsc@kernel=2Eorg> wrote=
+:
+>On 2026-07-08 15:56 +0200, Thomas Wei=C3=9Fschuh wrote:
+>> Finding the debug version of the vDSO is not trivial as there is no com=
+mon
+>> scheme where it is placed=2E That's especially problematic for CI testi=
+ng=2E
+>>=20
+>> The vDSO futex unlock mechanism requires for testing to have access to =
+the
+>> inner labels of the unlock assembly, which are only accessible via the
+>> debug so=2E
+>>=20
+>> Also for general debugging purposes it's convenient to have access to t=
+he
+>> debug vDSO at a well defined place=2E
+>>=20
+>> The files are placed in /sys/kernel/vdso_debug=2Etar=2Exz=2E They use t=
+he
+>> regular 'make vdso_install' layout, including build-id symlinks to find
+>> the correct file for each process=2E
+>>=20
+>> The design is kept close to the ones of the similar IKCONFIG and IKHEAD=
+ERS=2E
+>>=20
+>> On x86 the x32 vDSO is derived from the x86_64 one, necessitating an
+>> explicit dependency to avoid errors due to concurrent builds=2E
+>>=20
+>> Suggested-by: Thomas Gleixner <tglx@kernel=2Eorg>
+>> Link: https://lore=2Ekernel=2Eorg/lkml/20260602090536=2E045586688@kerne=
+l=2Eorg/
+>> Signed-off-by: Thomas Wei=C3=9Fschuh <thomas=2Eweissschuh@linutronix=2E=
+de>
+>> ---
+>>  Makefile            | 33 ++++++++++++++++++++++++++++++++-
+>>  arch/x86/Makefile   |  3 +++
+>>  init/Kconfig        | 10 ++++++++++
+>>  kernel/Makefile     |  1 +
+>>  kernel/vdso_debug=2Ec | 43 +++++++++++++++++++++++++++++++++++++++++++
+>>  5 files changed, 89 insertions(+), 1 deletion(-)
+>>=20
 >
-> You should add the maintainers for the modpost scripts to To/Cc.
+>This seems to have fallen through the cracks; shall it be considered for
+>kbuild-7=2E5?
 >
-> $ ./scripts/get_maintainer.pl scripts/coccinelle/misc/of_table.cocci
-> scripts/mod/file2alias.c scripts/mod/devicetable-offsets.c
-> include/linux/mod_devicetable.h
 
-Hi Markus,
-
-Thank you for the reminder. Adding the Coccinelle and modpost
-maintainers to Cc now.
-
-BR
-    An
+A thought: most tools support compressed separate debug information=2E Wou=
+ld it make more sense to have the vdso images with separate, compressed deb=
+ug data in a subdirectory?
