@@ -1,65 +1,73 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793214879;
-	b=dM1dOGgzXiVPgayqxjzBnuyHkHmrWDqaPM5FC5InZUor9npwglEcYWf5Hm7VeML+InpB
-	 zsb20GDBRHEr3NI9UDIpVmiNuvXXVZn8DuMsRe+Prgdz+VWoPhqpJzIpS00iwSjplXexl
-	 QoLtGC0OAeyksf+wL3CNU6XpV8yyW38h1HZXlLmyAja/WS8Fe77/hFb71AIXLKkR89idS
-	 9knURm4pSV8hNddrjW9ZUOQJvF0s3ttEK2g/0+9VBS1KyErj+dKu7hPLbsfKUJLN1A6Ju
-	 GoWIZjMlvE7P0uTY7dQZL7BLonAH4qfb13DKeVDHPne+2lbOEai8fF4G1TqxjKMU5TQ==
+	t=1793219112;
+	b=KGe+Gc0XAQha0VM2xx3/8B4/6qlDwpYx3D6CS4jrRTAHGz6jMRcv2zqqMV4YNViVcRB5
+	 rmmC3u87KOT5Vr7KwbIslXQt2wA557EFrnDNj1NJRl3BB/G6SOzjx7k+2D/HnwfYanjRk
+	 Bnv00b4cnIIRpHzlxRHtm/93aNf/nALUvWZn8/A9FjCLtTyrtmyP59chWg+Jqb7sVX0mU
+	 m9Fnej0/YOs0xCN9kifJbEfoT8jK7lB3d9Ek0q9WofF87oGMOg40QF/9C3IGlXhvQfwbP
+	 4Rhkan9rfn32eHlXFfUQHqxBlzqzYAwkteoc4F+/YIGyeaFOMupunptH9OLRyTxhyPw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793214879;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=aWVDvbEQQQ1SjDTO2dDhPAAkUx0gj3dMclo/LMFAu/s=;
-	b=ml794H6YkaEpHB5q1aj3W4Y66b9XmZ5MofzrqWSqe3MJ88szjJnd8FUUpkTJr7H28HoU
-	 h9MB6mWA+wnOb586IXzrNNgRUAhiGWQDt4ViLyiE2cO+7v4dsLj2SNDOHDWCWoMu+1esT
-	 ZReUQV8Yf2jzapmHdYKFqYdpAk+vUKIB7I3wkKV1bRyQhbPf9iPIgd2eWaEE7vtAZ7IZ8
-	 GJ1NKJf64GSdli/741frFS4nleUdBhW8A0WAcx2Z4nHWnz24SDkoMWMGLI6qkpnEaLFty
-	 jmS7C1xiWI4WgxnAeWx8iZGRd3Y5+VxVYSqw1w4O/F9fdyRe5SkrhWd9ivYol2+fMXg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793219112;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=X8aM/+q4ttnDqMjxK4uqoHXh+l7bqTKFX/qauRNTst8=;
+	b=Qsv/lDt7ZOnNdBhazGC0pOPZaS1xCaPsDcW5M22WBdf0J66IL/2VZgT54gdSP4fQ7sjt
+	 UzukKxl9Tb23K544yEgGjWsAOo1K0eXviDnT/CvWGgfYKzlx0KO8XngRxie4mmi+2QkFK
+	 Yzz6OfeiGVVTBbPv+SamfvT9sCsth/M8J2DvWv/DTuk1m7eYv1zc00t7Zor8GzaaCYBlo
+	 dGxPfS/Msuv82DKNRKxCZYRhQd3aInnyx9GOErasNKdtXa8UzbiHcPnPuLe6ZQGLjoyX6
+	 ZCVUD+R0vUa+yhyeAZ/9kd1fmPV3owmBgMKNvLehaPscsih3GCmcZ1QgmYxjkTFh23A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=h7eMqn8a;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BgbALNzD;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF83606AB38;
-	Wed, 28 Oct 2026 19:14:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4A76606A31D;
+	Wed, 28 Oct 2026 20:25:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=h7eMqn8a
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 296641F01828;
-	Wed, 28 Oct 2026 19:14:34 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BgbALNzD
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 009691F01825;
+	Wed, 28 Oct 2026 20:25:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793214879;
-	bh=aWVDvbEQQQ1SjDTO2dDhPAAkUx0gj3dMclo/LMFAu/s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=h7eMqn8a8EdRBoi0X6nQ2LgNYHVdM2nmxsFYYPFJhseEhpgfO/hmFqWZ8d8bMYDtW
-	 T0nx51XwU1r1azFSFuhrqHZUmWELHLojmC3c7BOgrQ5PobT7aUyr0d+Gpx/HiX8zYT
-	 q7f3N2oyG2j5j/1ZK4aSq7pKJxO/azTvygQs1JnyosJ0FE4r6V5TtdSvDufRuhgxDw
-	 6P9glPp8xTu1YRQEf3bM/sveV9h05QQ2FcH9jhPhE07r3GQtvVODHdO1pPxTuiDJdB
-	 PdkBHXIuLria+haObP79SizdHZULGJKIRLSmhFJHaKYxBgXc5rpjZwysCwDiti/0+3
-	 LNZth8EzkCjKQ==
-Date: Wed, 28 Oct 2026 12:14:32 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Sasha Levin <sashal@kernel.org>
-Cc: linux-kernel@vger.kernel.org, Wentao Zhang <wentaoz5@illinois.edu>,
-	Alexander Potapenko <glider@google.com>,
-	Andrey Konovalov <andreyknvl@gmail.com>,
-	Bill Wendling <morbo@google.com>, Chuck Wolber <chuck@wolber.net>,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Justin Stitt <justinstitt@google.com>, kasan-dev@googlegroups.com,
-	linux-kbuild@vger.kernel.org, llvm@lists.linux.dev,
-	Marco Elver <elver@google.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Nicolas Schier <nsc@kernel.org>,
-	Peter Oberparleiter <oberpar@linux.ibm.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Thomas Gleixner <tglx@kernel.org>
-Subject: Re: [RFC PATCH 16/20] coverage: add MC/DC measurement
-Message-ID: <20261028191432.GA669102@ax162>
-References: <20261028120034.871983-1-sashal@kernel.org>
- <20261028120034.871983-17-sashal@kernel.org>
+	s=k20260515; t=1793219111;
+	bh=X8aM/+q4ttnDqMjxK4uqoHXh+l7bqTKFX/qauRNTst8=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=BgbALNzDlp4YeIp3hhEbkg+zaIHvap8iL4KJZC9knFF7UKdLNGqWiKyNxotG2FKW1
+	 SF77oG0uMrhwSy6uh0xUVjF6HL4JAUal9Ano6A/eRZjN1JekW6Wj8kUOTI8bTxhpFG
+	 L/agS3nt6S1n+kWP0vhF11yRyq6ZNi/S/nZ7RjcnKTnwJFX9EYOpluDUsmkD/EWuYo
+	 8lyHYAZ7uLCuWPp3yTdo7658RGciL4Co9QwWdbORDDAFFK2sDl8/pgDvqZJbKqTH76
+	 A/57GTADZmUNiy7EgF4ZzK2IcTScDJnxpGp4tAv2dv0CSxVWOz/xntvvdNXNKRblMR
+	 HOfTnbNvSM7+w==
+Message-ID: <sashiko-outbox-188377@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v13 01/39] selftests/dyndbg: Add kselftest script to
+ verify dynamic-debug
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Jim Cromie" <jim.cromie@gmail.com>, "Jason Baron" <jbaron@akamai.com>, "Shuah
+ Khan" <shuah@kernel.org>, "Andrew Morton" <akpm@linux-foundation.org>, "Maarten
+ Lankhorst" <maarten.lankhorst@linux.intel.com>, "Maxime Ripard" <mripard@kernel.org>, "Thomas
+ Zimmermann" <tzimmermann@suse.de>, "David Airlie" <airlied@gmail.com>, "Simona
+ Vetter" <simona@ffwll.ch>, "Arnd Bergmann" <arnd@arndb.de>, "Luis
+ Chamberlain" <mcgrof@kernel.org>, "Petr Pavlu" <petr.pavlu@suse.com>, "Daniel
+ Gomez" <da.gomez@kernel.org>, "Sami Tolvanen" <samitolvanen@google.com>, "Aaron
+ Tomlin" <atomlin@atomlin.com>, "Jonathan Corbet" <corbet@net.net>, "Greg
+ Kroah-Hartman" <gregkh@linuxfoundation.org>, "Nathan Chancellor" <nathan@kernel.org>, "Nicolas
+ Schier" <nsc@kernel.org>, "Shuah Khan" <skhan@linuxfoundation.org>, "Randy
+ Dunlap" <rdunlap@infradead.org>, "Rafael J. Wysocki" <rafael@kernel.org>, "Pavel
+ Machek" <pavel@kernel.org>, "Len Brown" <lenb@kernel.org>, "Jonathan Corbet" <corbet@lwn.net>, "Petr
+ Mladek" <pmladek@suse.com>, "Steven Rostedt" <rostedt@goodmis.org>, "John
+ Ogness" <john.ogness@linutronix.de>, "Sergey Senozhatsky" <senozhatsky@chromium.org>,
+ =?utf-8?b?VGhvbWFzIFdlacOfc2NodWg=?= <linux@weissschuh.net>, "Jason A.
+ Donenfeld" <Jason@zx2c4.com>
+Cc: dri-devel@lists.freedesktop.org, linux-modules@vger.kernel.org, linux-kbuild@vger.kernel.org, "Jason
+ Baron" <jbaron@redhat.com>
+In-Reply-To: <20261027-dd-cmap-part2-clean-v13-1-9267923be612@gmail.com>
+References: <20261027-dd-cmap-part2-clean-v13-0-9267923be612@gmail.com>
+ <20261027-dd-cmap-part2-clean-v13-1-9267923be612@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 28 Oct 2026 20:25:09 +0000
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -68,22 +76,237 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261028120034.871983-17-sashal@kernel.org>
 
-On Wed, Oct 28, 2026 at 07:59:40AM -0400, Sasha Levin wrote:
-> Larger decisions, and decisions the compiler can't instrument, produce
-> warnings. Starting with Clang 22 they are kept from becoming errors
-> with CONFIG_WERROR; older versions can't be used together with it.
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+s) to consider:
+- [Medium] selftests/dyndbg: stale record check in audit_golden_records() n=
+ever fails
+- [Medium] selftests/dyndbg: broken LACK_DD_BUILTIN fallback and missing ro=
+ot check
+--
 
-What is the reason for keeping these warnings in the build as opposed to
-just disabling them altogether? Are developers expected to address them
-and if so, how? It seems odd to keep them in the build but prevent them
-from breaking the build unless they are not intended to be acted on, in
-which case they should just be disabled outright.
+commit d24db61e852431796c45358b620c1c921638c8b3
+Author: Jim Cromie <jim.cromie@gmail.com>
 
--- 
-Cheers,
-Nathan
+selftests/dyndbg: Add kselftest script to verify dynamic-debug
+
+This commit introduces a kselftest script and a syslog/control-file hash
+validation helper library to test dynamic_debug grammar and query execution
+against a database of golden MD5 fingerprints.
+
+> diff --git a/tools/testing/selftests/dynamic_debug/dyndbg_selftest.sh b/t=
+ools/testing/selftests/dynamic_debug/dyndbg_selftest.sh
+> new file mode 100755
+> index 0000000000000..c1475c7555429
+> --- /dev/null
+> +++ b/tools/testing/selftests/dynamic_debug/dyndbg_selftest.sh
+[ ... ]
+> +[ -e /proc/dynamic_debug/control ] || {
+> +    echo -e "${RED}: this test requires CONFIG_DYNAMIC_DEBUG=3Dy ${NC}"
+> +    exit $ksft_skip # nothing to test here, no good reason to fail.
+> +}
+> +
+> +lsmod >/dev/null 2>&1 || {
+> +    echo -e "${RED}: lsmod requires /proc/modules ${NC}"
+> +    # exit $ksft_skip # maybe later we can do more
+> +}
+> +
+> +# need info to avoid failures due to untestable configs
+> +
+> +[ -f "$KCONFIG_CONFIG" ] || KCONFIG_CONFIG=3D".config"
+> +if [ -f "$KCONFIG_CONFIG" ]; then
+> +    v_echo "# consulting KCONFIG_CONFIG: $KCONFIG_CONFIG"
+> +    grep -q "CONFIG_DYNAMIC_DEBUG=3Dy" $KCONFIG_CONFIG ; LACK_DD_BUILTIN=
+=3D$?
+> +    grep -q "CONFIG_TEST_DYNAMIC_DEBUG=3Dm" $KCONFIG_CONFIG ; LACK_TMOD=
+=3D$?
+> +else
+> +    # if no config, try runtime probes
+> +    modprobe -n test_dynamic_debug 2>/dev/null ; LACK_TMOD=3D$?
+> +    # assume builtin dyndbg if control exists (checked above)
+> +    LACK_DD_BUILTIN=3D0
+> +fi
+
+[Severity: Medium]
+When kselftest runs dyndbg_selftest.sh via runner.sh, it first changes the
+working directory into tools/testing/selftests/dynamic_debug/ (or the
+installed selftest directory), where .config is not present unless
+KCONFIG_CONFIG is set to an absolute path.
+
+In that case, the fallback branch unconditionally sets LACK_DD_BUILTIN=3D0.
+However, on a kernel built with CONFIG_DYNAMIC_DEBUG_CORE=3Dy and
+CONFIG_DYNAMIC_DEBUG=3Dn, /proc/dynamic_debug/control still exists, while
+built-in files such as kernel/params.c have no dynamic debug descriptors.
+Will FT_basic_queries() then fail to skip and report false DRIFTED failures
+on empty diffs? Could the runtime fallback instead probe
+/proc/dynamic_debug/control for ^kernel/params.c: to set LACK_DD_BUILTIN?
+
+Also, /proc/dynamic_debug/control is created with mode 0644, so the
+[ -e /proc/dynamic_debug/control ] check succeeds for unprivileged users,
+causing the script to fail with $ksft_fail on the first write in ddcmd()
+or /dev/kmsg instead of skipping. Should this check for write permission
+(-w /proc/dynamic_debug/control) or root privileges before running the
+tests?
+
+[ ... ]
+> +audit_golden_records
+> +
+> +# Output consolidated blocks of unregistered and drifted fingerprints
+> +failed=3D0
+> +
+> +if [ -s "$UNREG_HASHES_FILE" ]; then
+> +    if [ "$K" -ne 2 ]; then
+> +        echo -e "${YELLOW}\n# --- Unregistered Baselines ---"
+> +        cat "$UNREG_HASHES_FILE"
+> +        echo -e "# ------------------------------${NC}"
+> +    fi
+> +    : > "$UNREG_HASHES_FILE"
+> +    failed=3D1
+> +fi
+> +
+> +if [ -s "$DRIFT_HASHES_FILE" ]; then
+> +    if [ "$K" -ne 2 ]; then
+> +        echo -e "${RED}\n# --- Drifted Baselines ---"
+> +        cat "$DRIFT_HASHES_FILE"
+> +        echo -e "# -------------------------${NC}"
+> +    fi
+> +    : > "$DRIFT_HASHES_FILE"
+> +    failed=3D1
+> +fi
+> +
+> +if [ $failed -eq 1 ]; then
+> +    [ "$K" -eq 1 ] && echo "fake success" && exit $ksft_pass
+> +    [ "$K" -eq 2 ] && exit $ksft_pass
+> +    exit $ksft_fail
+> +fi
+> +
+> +exit $ksft_pass
+> +
+> diff --git a/tools/testing/selftests/dynamic_debug/syslog_hash_validation=
+.sh b/tools/testing/selftests/dynamic_debug/syslog_hash_validation.sh
+> new file mode 100644
+> index 0000000000000..8c6e91f5d9c27
+> --- /dev/null
+> +++ b/tools/testing/selftests/dynamic_debug/syslog_hash_validation.sh
+[ ... ]
+> +    # Strictly verify that the computed fingerprint matches any
+> +    # expected hash for this label
+> +    if [ -n "$expected_hash_field" ] && [ $matched -eq 1 ]; then
+> +        local short_hash=3D"${fingerprint:0:12}"
+> +        [ "$V" -ge 1 ] && echo -e "${GREEN}=E2=9C=94 Verified '${label}'=
+ " \
+> +            "(${short_hash}) [via: '${DDCMD_LOG}']${NC}"
+> +
+> +        if [ "$V" -ge 2 ]; then
+> +            echo -e "${CYAN}--- Captured Invariant ${capture_desc} Outpu=
+t ($label) ---"
+> +	    printf "#K=3D %-32s %-24s\n" "${fingerprint}" "${label}"
+> +            echo "$raw_capture"
+> +            echo -e "-----------------------------------${NC}"
+> +        fi
+> +        echo "$fingerprint" >> "$SEEN_HASHES_FILE"
+> +    else
+[ ... ]
+> +function audit_golden_records {
+> +    local seen_file=3D"$SEEN_HASHES_FILE"
+> +
+> +    if [ ! -f "$seen_file" ]; then
+> +        return
+> +    fi
+> +
+> +    # Require GOLDEN_RECORDS to be defined in the caller script
+> +    if ! declare -f GOLDEN_RECORDS >/dev/null; then
+> +        return
+> +    fi
+> +
+> +    [ "${V:-0}" -ge 1 ] && echo -e "${YELLOW}# --- GOLDEN_RECORDS Audit =
+---${NC}"
+> +    local stale_found=3D0
+> +    local total_records=3D$(GOLDEN_RECORDS | grep -c "^#K=3D")
+> +
+> +    # Read each active record line from GOLDEN_RECORDS
+> +    while read -r line; do
+> +        # Extract the hash/hashes (second word) from the #K=3D line
+> +        local hash_field=3D$(echo "$line" | awk '{print $2}')
+> +
+> +        # Check if at least one of the comma-separated hashes was seen
+> +        local hash_seen=3D0
+> +        local h
+> +        local OLD_IFS=3D"$IFS"
+> +        IFS=3D","
+> +        for h in $hash_field; do
+> +            if grep -q "$h" "$seen_file" 2>/dev/null; then
+> +                hash_seen=3D1
+> +                break
+> +            fi
+> +        done
+> +        IFS=3D"$OLD_IFS"
+> +
+> +        # Check if this hash field was seen during the run
+> +        if [ $hash_seen -eq 0 ]; then
+> +            if [ "${K:-0}" -ne 2 ]; then
+> +                if [ $stale_found -eq 0 ]; then
+> +                    # On first failure, print header if not already prin=
+ted
+> +                    [ "${V:-0}" -eq 0 ] && \
+> +                        echo -e "${YELLOW}# --- GOLDEN_RECORDS Audit ---=
+${NC}"
+> +                    echo -e "${YELLOW}# The following GOLDEN_RECORDS ent=
+ries " \
+> +                        "were never hit and may be stale:${NC}"
+> +                fi
+> +                echo -e "${YELLOW}#K_STALE=3D $line${NC}"
+> +            fi
+> +            stale_found=3D1
+> +        fi
+> +    done < <(GOLDEN_RECORDS | grep "^#K=3D" | grep -v "<md5_hash>")
+> +
+> +    if [ $stale_found -eq 0 ] && [ "${V:-0}" -ge 1 ]; then
+> +        echo -e "${GREEN}# All $total_records GOLDEN_RECORDS entries " \
+> +            "were successfully hit!${NC}"
+> +    fi
+> +
+> +    # Detect duplicate labels in the database
+> +    local dupes=3D$(GOLDEN_RECORDS | grep "^#K=3D" | awk '{print $3}' | =
+sort | uniq -d)
+> +    if [ -n "$dupes" ]; then
+> +        echo -e "\n${RED}# WARNING: Duplicate labels detected in GOLDEN_=
+RECORDS():${NC}"
+> +        echo "$dupes" | sed 's/^/#   /'
+> +    fi
+> +
+> +    # Clean up
+> +    rm -f "$seen_file"
+> +}
+
+[Severity: Medium]
+The header comment in dyndbg_selftest.sh documents that K=3D0 fails with ex=
+it 1
+on checksum drift or stale records, and K=3D1 exits 0 with "fake success".
+
+In audit_golden_records(), stale_found and dupes are local variables and the
+function ends with rm -f "$seen_file", returning 0 without propagating the
+failure to the caller in dyndbg_selftest.sh (which only sets failed=3D1 when
+UNREG_HASHES_FILE or DRIFT_HASHES_FILE is non-empty). Doesn't this mean sta=
+le
+records or duplicate labels in GOLDEN_RECORDS() will never cause K=3D0 to e=
+xit
+with $ksft_fail or K=3D1 to report "fake success"?
+
+In addition, verify_fingerprint() writes only "$fingerprint" to
+SEEN_HASHES_FILE without the test label, and audit_golden_records() checks
+only whether the hash appears in "$seen_file". When multiple test cases in
+GOLDEN_RECORDS() share the same MD5 hash (for example, FT_grammar_errs.21 a=
+nd
+FT_grammar_errs.41 both have 94cdf3b32afa4f12a00a704208aa2e53, and
+FT_grammar_errs.25 and FT_grammar_errs.45 both have
+644b81753949ac1285e38ac995eeba46), won't running just one of those tests ma=
+rk
+the hash as seen for all of them and hide unexecuted labels? Should
+SEEN_HASHES_FILE record both the fingerprint and label (and be truncated wi=
+th
+: > "$seen_file" instead of removed with rm -f)?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261027-dd-cmap-pa=
+rt2-clean-v13-0-9267923be612@gmail.com?part=3D1
