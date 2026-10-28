@@ -1,75 +1,101 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793205309;
-	b=Nhy8OrR80DHV5yHuk9kq9sXmlk9dTZlPPR+O6rOnquuFMeT/x1AK1KzUBy2zahumY1Db
-	 RPQYKbC4H3QQYkI2QC0Ddsrrj+V9Q24UFnbDXLs2emTLr+zUhPO2Fy+yLHnLdGROw2sqY
-	 qGkNlD/CgDdeCl3BU6I9ttEo0guY4xp0fSysGPIQ5uTFA3H2sCfAPbgtrOEz0o7rM0ZTy
-	 zK3hqHwNrjCDqQjdHS1rOyzywk8zBO0+IW9klkIDQzcHyDwHsBBegj4VV6UHluTzQ00+b
-	 6kMM53AeQlPLjJAthq1shnq+kOSxbDU6yu7J2zNRCDRsMSlvnqaRQxfcGPG9ZockM1g==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793205309;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=b6pcBVxdMQUwjf02KaU8qkuRRIgCQzwBtXV/ZrkSdNU=;
-	b=ZAJeKRrUiFrSrxRsx40kniVP8FeKzSr0WbpXXgu6cbvjTd331YYVIC6F6KUb/GldDbb1
-	 g+z/jg6vTlKdJyLf5P6WHwtNOWuS/GbQrijui5f0GQakSLiL/kVCVxyOIb2t/+GK7r3Kq
-	 k0wZ1s5YvLzjv3TyK0BHLr5Ok0vbrs+77loys6ILXgDRU2MiGjDu/mOFzuPHFaSyIf9fJ
-	 TOdDdAG53T0l/7Sxn1tzGM740u9jBcPQRtiqm2d3uFxXFaip38DOnY3Q8XQ0gZkwe8fTu
-	 W1qR/mA2HuBlKxixqWH9DBjOo70zzSr4FHa99LGC54KL6KxalhHyS+i9oPPxg5fCVag==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="JYqPx/9P";
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.52
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1793211815;
+	b=o7H57lZHwjgBajlLwQpFfkmHq3XC9jRhy2H16R6Dvy2Ppiw/rkLRzlDa61nyjlTwxX2F
+	 cf6BI7/T/ofdc2S9WUvEbIHHEp71JFcCK4Ic9Vl43bvTsUYAFQLTdqSP6NHJ3FaDP8too
+	 Zt7oWmKHwvvv0v/ntUWJ9oF1daT3Ee0k6k46jVmbkAmTwc7cux9xqDn+bIbDQbHJJCrf6
+	 B3FG4mFgMak5CXTBVALwZLKA7lTe/hAekq9J3iLKpjAD/0m176EAG/L9Zs4bo3Oo0ddFc
+	 Ey4q1ZcYPrWeCqWwNeZnF4w/f+pVsg4DtAugJzJ/7UCNVqeebea/n/HW0U6ui2E+wng==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793211815;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=cFWfkIkWfjhOSUFJOJXQEhmE0QtvF6eBs0tDviPyGsc=;
+	b=Q7MoO59J54xYeev4mX8gMiOpx9YWpQZtwlWI4cWGyAnGxJSlENSqzxIPD50dwG6Cbj8p
+	 5ejt781qIwXAIPD+U7EExxCott1jwXoVbYlYWg5Ucp7ty49jfGyM7Nv/B1VU6/P5oz9KS
+	 qGL+p4kQHmxNtFLx/Wd+BM9mv8lJEftHiV4ERoRmrPl8nZZRvFGyvNin9WAl3ZeWHbLth
+	 xi+VvaXUjbmFf2NTFo87ZmJIRhQXoQVOHSy74XOS3YBqF8g5VMd+rT/fVL12NcFT2dzJ0
+	 RQtH2rbZEL2j+TW+xPXR31Gqbz2/Etv7WbBG7OxEe+tUGQojpyWHW4WrxrONYpaz8vA==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=cmCVmz5E;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.52
+Received: from mail-yx1-f52.google.com (mail-yx1-f52.google.com [74.125.224.52])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83D9C606A31A;
-	Wed, 28 Oct 2026 16:35:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E30760A2601
+	for <linux-kbuild@vger.kernel.org>; Wed, 28 Oct 2026 18:23:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5E30760A2601
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JYqPx/9P
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D7081F01825;
-	Wed, 28 Oct 2026 16:35:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793205309;
-	bh=b6pcBVxdMQUwjf02KaU8qkuRRIgCQzwBtXV/ZrkSdNU=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=JYqPx/9PiWeGlzQLparH1mu72uexdOw6wZ7nbGw7qYqnQMS3ETSwIEk3w2TSKHjVP
-	 BB/pzOw3/U82yOTB4H6G98SRIqIWXctRa0LL3MB/aC+N6Ujj8DrXnRI/H6cSIbqUPa
-	 svHrpGyMmfba0sqKuiok9nWHOM0TFeoXNECKAOBUj6ZdyjgUgNd/o8oiuDBfQspV8s
-	 BIlnVhzh51YMQqTwuDTzcUhTrGblROynC5JqngMW0B1DG2i4OAkgCs8QKuNTjGZahw
-	 N2wfyTCtrNl01p4c6YGiCHfDgVH+xiXoqw1QY+N3q6vRQAuZsoQk9ubW9ett5TR210
-	 9RUizdCTc+X1w==
-Message-ID: <sashiko-outbox-188167@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH RFC 1/2] kcov: collect early boot coverage of init_task
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Yunseong Kim" <yunseong.kim@est.tech>, "Jonathan Corbet" <corbet@lwn.net>, "Shuah
- Khan" <skhan@linuxfoundation.org>, "James Morris" <jmorris@namei.org>, "Randy
- Dunlap" <rdunlap@infradead.org>, "Andrey Konovalov" <andreyknvl@gmail.com>, "Alexander
- Potapenko" <glider@google.com>, "Dmitry Vyukov" <dvyukov@google.com>, "Peter
- Zijlstra" <peterz@infradead.org>, "Ingo Molnar" <mingo@redhat.com>, "Will
- Deacon" <will@kernel.org>, "Boqun Feng" <boqun@kernel.org>, "Waiman Long" <longman@redhat.com>, "Luis
- Chamberlain" <mcgrof@kernel.org>, "Petr Pavlu" <petr.pavlu@suse.com>, "Daniel
- Gomez" <da.gomez@kernel.org>, "Sami Tolvanen" <samitolvanen@google.com>, "Aaron
- Tomlin" <atomlin@atomlin.com>, "Paul E. McKenney" <paulmck@kernel.org>, "Frederic
- Weisbecker" <frederic@kernel.org>, "Neeraj Upadhyay" <neeraj.upadhyay@kernel.org>, "Joel
- Fernandes" <joelagnelf@nvidia.com>, "Josh Triplett" <josh@joshtriplett.org>, "Uladzislau
- Rezki" <urezki@gmail.com>, "Steven Rostedt" <rostedt@goodmis.org>, "Mathieu
- Desnoyers" <mathieu.desnoyers@efficios.com>, "Lai Jiangshan" <jiangshanlai@gmail.com>, Zqiang <qiang.zhang@linux.dev>, "Juri
- Lelli" <juri.lelli@redhat.com>, "Vincent Guittot" <vincent.guittot@linaro.org>, "Dietmar
- Eggemann" <dietmar.eggemann@arm.com>, "Ben Segall" <bsegall@google.com>, "Mel
- Gorman" <mgorman@suse.de>, "Valentin Schneider" <vschneid@redhat.com>, "K
- Prateek Nayak" <kprateek.nayak@amd.com>, "Andrew Morton" <akpm@linux-foundation.org>, "Nathan
- Chancellor" <nathan@kernel.org>, "Nicolas Schier" <nsc@kernel.org>, "Thomas
- Gleixner" <tglx@kernel.org>, "Borislav Petkov" <bp@alien8.de>, "Dave Hansen" <dave.hansen@linux.intel.com>, x86@kernel.org, "H.
- Peter Anvin" <hpa@zytor.com>
-Cc: kasan-dev@googlegroups.com, linux-modules@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org
-In-Reply-To: <20261027-early-kcov-v1-1-6f2f053255ad@est.tech>
-References: <20261027-early-kcov-v1-0-6f2f053255ad@est.tech>
- <20261027-early-kcov-v1-1-6f2f053255ad@est.tech>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 28 Oct 2026 16:35:06 +0000
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=cmCVmz5E
+Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-675617e81f9so1360424d50.3
+        for <linux-kbuild@vger.kernel.org>; Wed, 28 Oct 2026 11:23:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1793211813; cv=none;
+        d=google.com; s=arc-20260327;
+        b=BALppa40qfod3WxEZ7MacAfEINWPGnMruP6VgmhC3jg+snzBm65YhTyNXnXQ8/xnbx
+         VMl6nIM43IOH/EhxEuoEG8gVxdpsHERodYnHqgtKcdyikUta7xRYI/WAYP6FQpoJggE8
+         3QKktY6CMxV6pxQJYEcpc9GXaH0YVJWdv2Nw4bZpTMcThizFktM+cpn4p2sfaTdrPoSJ
+         I+nbOLLJ7Nl1Qvg19d8r9gebu7Emb+V3gy8usLz0llfp4qL+OL1uJOiiKOIMl6EihmD6
+         vuyJbvQx/0wl6BFmp2ctoH61rnTmrqt/r6soA1GHDvmvacb0qCKcZvxIdAiPmdkATcyW
+         OzPA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=cFWfkIkWfjhOSUFJOJXQEhmE0QtvF6eBs0tDviPyGsc=;
+        fh=+V/sc80PgtHdwdNPqKZYbZ2RZRqYLYMcKQMzZbfRvJY=;
+        b=Znh62MvtbMCis2ByKLVfxmh/t6NffD3eKcV1EWXfUfpTGJG0u1dWD7ArJJHWvoHqSp
+         hEIlGTEEckCxE0+ZGjtvq3m56B9Ilf8fgeTnZJZXwcjznjyqo+M0GoOQtSBT0oU1VCTE
+         YaQ24UzAtFgA6YrOtmPVJ9o4Wtw2bEyvHY7lTQTdeIPj96JSY0y6nOlHyRVL+RFSH0uU
+         34Xrc1n9rs/0OE9PutM9dukG1TKAbZmNbPI3Wqtv49HyOV3AXKpWEz1WHVrVrqFuZ4wA
+         FeCtA4gAddBBkhhulSkIJFospxOrUU/pjLVo+UIGUgeq0T2LDl6u32dAjKBea97pLM2c
+         HPkA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1793211813; x=1793816613; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=cFWfkIkWfjhOSUFJOJXQEhmE0QtvF6eBs0tDviPyGsc=;
+        b=cmCVmz5EDlPgGpt7D48i7zZLLkqYO+wKOQEJCFw+CPT1V0HsVdAOe24mkft9RXoEkD
+         jPI3A5deGmYs3Q1PF3kw8R4dQ23CEIy4/U1S9qF9Ar1JXrXInpunTdMqBudL8okCjjoy
+         5f2IcaSQ8wAY9ju3+/m0NYTjPTu/ueX6EsDmnX2FcC4QUPjx2/QEKkvGtV3J6mBSoLn1
+         c3+DohN62m7thFQFl0j2MU+ok2Gf6av/sgv+lltqY/+2wDnHn7XYq7irZX+hCgsbB0iP
+         CA/YnvHkM7rIJBNzGlEN4RTUyMUBRGWhDff6qMJm3GQt/BHtf5zQNMIcn/yy9/Oe26Hk
+         1FOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793211813; x=1793816613;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=cFWfkIkWfjhOSUFJOJXQEhmE0QtvF6eBs0tDviPyGsc=;
+        b=x12VjtLf0RRcl33L/3+1/kOifRUQ3TTdHOpexBT7LW2smN8OZpxuaZTqWjFCLgStqp
+         QQ46buA07EVCs2/4rOCHqRZ4qXz/PqTJwLrWcu2c02gz3hcEFrT9EEM+ff6KK5yrXIGF
+         RZlYxc5QgJ8gWiIN5QR87uJAQKoM4z7ROMStCUkccD0C0YLtJtmG6cszOtIAnGK7JNpO
+         xTm5dfZg9CaFBOzof8zxZuQAMRpy+6iYlwV+Z1ogQrGsQ0hVBomCMNoel2+vJORyg9Sb
+         m0XIOqENeLmoVRiWz0jXMC9Oa4QeT7ltQNdeH6aI5KEvwrudoFIWyOxRvoeY+0s4xaCT
+         dpdg==
+X-Forwarded-Encrypted: i=1; AKwUvBx63htLPl/VHpV7ycfFFarvlC7GZhM4qdIDKHfzRdU4xoaI8g8bkojIU48EoyUIJPnsLJGTyFxkfB5+Vpg=@vger.kernel.org
+X-Gm-Message-State: AFq9FYIbmy16yMAPwaL7dxl4vcj8WVaLTshfyzGqg7cARsOSswAXW4Ev
+	NkUEW8jstWMuyDMMP0x+fR8wcHxkmzufVi0ncHudxT7147A1jSaTvstC081X/qPL/JxMT/Vv5s2
+	0/pARkBDdM4AybN5WY1APYSPESuffyuY=
+X-Gm-Gg: AYBFou1GpUK5V3/fQFHrKGZVtT6+0lJFaS1yhzzhsycZeR2pDjZcDonK0gKa/Kzf21U
+	ldYnakzGWXKkJY79k3ig/BSNT3SVsUB+aZ79o9S9HO8AoCDlwKCQtI1mxl4JBXRmfQeiHOZ0wEP
+	vkLZEwIvMU8wS3kaLprCpl+dbOG3HayYz3bzPKgYd9WFJVcvTBaPHTNEcmflqsHv/iQjoDqoJ9B
+	3pCqpscrRFdj5wBsIBHq0P9ljvhOy9Ctr7ZN3ekBlWLPMJ7wKOsT8Czg2/yOxV+Jga68i2Co6PF
+	dqQhptGB/ehJjJ2a3yxrMOu6AIo6173OmB0VGzoUACpPpFSyXKs0fM2Be+F85+SBLaKYCDpy8Ss
+	hRGYPkypFFBIAIyTVIkJauv2oUK99EE0nDF74xGy+Lp0lrq/7M8olahQprkjRVHJZQBFR3RU8ww
+	XKHoWsUnL5wAr3ISg=
+X-Received: by 2002:a05:690e:d0d:b0:679:9e60:346c with SMTP id
+ 956f58d0204a3-67a7baef0a5mr2432293d50.4.1793211813004; Wed, 28 Oct 2026
+ 11:23:33 -0700 (PDT)
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -78,174 +104,248 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+References: <20261012-dd-cmap-part2-clean-v12-0-3c8cc5725def@gmail.com>
+ <20261012-dd-cmap-part2-clean-v12-33-3c8cc5725def@gmail.com>
+ <as4W9hToBqAvbzJ-@pathway.suse.cz> <20261027132253.5f3a461d@pumpkin>
+In-Reply-To: <20261027132253.5f3a461d@pumpkin>
+From: jim.cromie@gmail.com
+Date: Wed, 28 Oct 2026 12:23:06 -0600
+X-Gm-Features: AclHuK-4voxmbnvtymBlAumJXr1uxieHMHufYdWUINblBauYdwThefAV8akW3iU
+Message-ID: <CAJfuBxxgn8AOv_1rrAWb1xgJiPyU0faD08RuTz4kGY9RS_-v1g@mail.gmail.com>
+Subject: Re: [PATCH v12 33/40] dyndbg: Ignore additional arguments from pr_fmt
+To: David Laight <david.laight.linux@gmail.com>
+Cc: Petr Mladek <pmladek@suse.com>, Jason Baron <jbaron@akamai.com>, Shuah Khan <shuah@kernel.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Arnd Bergmann <arnd@arndb.de>, Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>, 
+	Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, 
+	Aaron Tomlin <atomlin@atomlin.com>, Jonathan Corbet <corbet@net.net>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nicolas Schier <nsc@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>, 
+	Randy Dunlap <rdunlap@infradead.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Pavel Machek <pavel@kernel.org>, Len Brown <lenb@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Steven Rostedt <rostedt@goodmis.org>, John Ogness <john.ogness@linutronix.de>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linux-arch@vger.kernel.org, 
+	linux-modules@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, linux-pm@vger.kernel.org, 
+	Philipp Hahn <phahn-oss@avm.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [High] kcov: NULL deref in __sanitizer_cov_trace_pc() during selftest()
---
+On Tue, Oct 27, 2026 at 7:22=E2=80=AFAM David Laight
+<david.laight.linux@gmail.com> wrote:
+>
+> On Tue, 13 Oct 2026 13:33:10 +0200
+> Petr Mladek <pmladek@suse.com> wrote:
+>
+> > On Mon 2026-10-12 20:37:04, Jim Cromie via B4 Relay wrote:
+> > > From: Philipp Hahn <phahn-oss@avm.de>
+> > >
+> > > pr_fmt can be used to add a common prefix to any output from a module=
+:
+> > >     #define pr_fmt(fmt) KBUILD_MODNAME ".%s " fmt, __func__
+> > >
+> > > But adding additional arguments breaks dynamic debug:
+> > > > error: macro "DEFINE_DYNAMIC_DEBUG_METADATA_CLS" passed 4 arguments=
+, but takes just 3
+> > > > |         pr_debug_ratelimited("%s", "Hello world!");
+> > > > |                                                  ^
+> > > > note: macro "DEFINE_DYNAMIC_DEBUG_METADATA_CLS" defined here
+> > > > | #define DEFINE_DYNAMIC_DEBUG_METADATA_CLS(name, cls, fmt)       \
+> > > > |
+> > > > error: =E2=80=98DEFINE_DYNAMIC_DEBUG_METADATA_CLS=E2=80=99 undeclar=
+ed (first use in this function)
+> > > > |         DEFINE_DYNAMIC_DEBUG_METADATA_CLS(name, _DPRINTK_CLASS_DF=
+LT, fmt)
+> > > > |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> >
+> > I wonder what this error about undeclared macro means.
+> >
+> > > > note: in expansion of macro =E2=80=98DEFINE_DYNAMIC_DEBUG_METADATA=
+=E2=80=99
+> > > > |         DEFINE_DYNAMIC_DEBUG_METADATA(descriptor, pr_fmt(fmt));  =
+       \
+> > > > |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > > > note: in expansion of macro =E2=80=98pr_debug_ratelimited=E2=80=99
+> > > > |         pr_debug_ratelimited("%s", "Hello world!");
+> > > > |         ^~~~~~~~~~~~~~~~~~~~
+> > >
+> > > Add an additional ', ...' to DEFINE_DYNAMIC_DEBUG_METADATA_CLS to slu=
+rp
+> > > any additional argument, which `pr_fmt` might add.
+> > >
+> > > --- a/include/linux/dynamic_debug.h
+> > > +++ b/include/linux/dynamic_debug.h
+> > > @@ -351,7 +351,7 @@ void __dynamic_ibdev_dbg(struct _ddebug *descript=
+or,
+> > >             dump_stack();                                   \
+> > >  }
+> > >
+> > > -#define DEFINE_DYNAMIC_DEBUG_METADATA_CLS(name, cls, fmt)  \
+> > > +#define DEFINE_DYNAMIC_DEBUG_METADATA_CLS(name, cls, fmt, ...)     \
+> > >     static struct _ddebug  __aligned(8)                     \
+> > >     __section("__dyndbg_descs") name =3D {                    \
+> > >             .modname =3D KBUILD_MODNAME,                      \
+> > > diff --git a/include/linux/printk.h b/include/linux/printk.h
+> > > index f594c1266bfd..5d701952e739 100644
+> > > --- a/include/linux/printk.h
+> > > +++ b/include/linux/printk.h
+> > > @@ -742,7 +742,7 @@ do {                                             =
+                       \
+> > >     static DEFINE_RATELIMIT_STATE(_rs,                              \
+> > >                                   DEFAULT_RATELIMIT_INTERVAL,       \
+> > >                                   DEFAULT_RATELIMIT_BURST);         \
+> > > -   DEFINE_DYNAMIC_DEBUG_METADATA(descriptor, pr_fmt(fmt));         \
+> > > +   DEFINE_DYNAMIC_DEBUG_METADATA(descriptor, fmt);         \
+> >
+> > IMHO, this changes the existing behavior. The prefix added by
+> > pr_fmt() will no longer be stored in DEFINE_DYNAMIC_DEBUG_METADATA().
+> > Is this intentional, please?
+> >
+> > Anyway, if we do not longer pass pr_fmt(fmt) then we should not
+> > need to add "..." into DEFINE_DYNAMIC_DEBUG_METADATA_CLS().
+> >
+> > By other words, we newly pass just the format "fmt" without the paramet=
+es.
+> > The 4th parameter was added by pr_fmt().
+> >
+> >
+> > IMHO, the right solution is to keep pr_fmt(fmt) here and extend both
+> > BEFINE_DYNAMIC_DEBUG_METADATA() and
+> > DEFINE_DYNAMIC_DEBUG_METADATA_CLS()
+> > to accept var args. I would expect something like:
+> >
+> > #define DEFINE_DYNAMIC_DEBUG_METADATA_CLS(name, cls, fmt, ...)        \
+> > ...
+> >
+> > #define DEFINE_DYNAMIC_DEBUG_METADATA(name, fmt, ...)         \
+> >       DEFINE_DYNAMIC_DEBUG_METADATA_CLS(name, _DPRINTK_CLASS_DFLT, fmt,=
+ ##__VA_ARGS__)
+> >
+> >
+> > or maybe, we could "eat" the extra parameters in
+> > DEFINE_DYNAMIC_DEBUG_METADATA. It would mean to keep
+> > DEFINE_DYNAMIC_DEBUG_METADATA_CLS() as is and just add the "..." into
+> > DEFINE_DYNAMIC_DEBUG_METADATA(), aka
+> >
+> > #define DEFINE_DYNAMIC_DEBUG_METADATA(name, fmt, ...)         \
+> >       DEFINE_DYNAMIC_DEBUG_METADATA_CLS(name, _DPRINTK_CLASS_DFLT, fmt)
+> >
+> >
+> > Or do I miss something, please?
+>
+> Don't think that will work.
 
-commit 2f2cd36073f62980c1305efe82a4239b11c076f5
-Author: Yunseong Kim <yunseong.kim@est.tech>
+Im not sure who youre responding to here,
+in any case I sent v13, with adjustments based on Petr's observations.
 
-kcov: collect early boot coverage of init_task
+here it is, in action
 
-This commit adds CONFIG_EARLY_KCOV to record code coverage of init_task
-from right after early parameter parsing in start_kernel() until the start
-of rest_init(), and exposes the collected PCs via
-/sys/kernel/debug/early_kcov. It also introduces CONFIG_KCOV_INSTRUMENT_NOI=
-SY
-and a kcov-noisy kbuild helper to instrument core subsystems normally
-excluded due to coverage noise.
+bash-5.3# history
+    1  modprobe test_dynamic_debug dyndbg=3D+p
+    2  dmesg
+    3  modprobe test_dynamic_debug_submod dyndbg=3D+pmf
+    4  dmesg
+    5  history
 
-> diff --git a/kernel/Makefile b/kernel/Makefile
-> index 4ff92e24680c5..b9e4f06e02ad0 100644
-> --- a/kernel/Makefile
-> +++ b/kernel/Makefile
-> @@ -27,14 +27,14 @@ endif
-> =20
->  # Prevents flicker of uninteresting __do_softirq()/__local_bh_disable_ip=
-()
->  # in coverage traces.
-> -KCOV_INSTRUMENT_softirq.o :=3D n
-> +KCOV_INSTRUMENT_softirq.o :=3D $(kcov-noisy)
+[    0.707538] virtme-ng-init: initialization done
+[    1.060923] clocksource: Marking clocksource tsc unstable due to
+inter CPU skew
+[    1.060929] clocksource: CPU0       4136478715 < CPU1
+4136478900 (cycles)
+[    1.060932] tsc: Marking TSC unstable due to clocksource watchdog
+[    4.703188] (udev-worker) (78) used greatest stack depth: 12376 bytes le=
+ft
+[   44.598698] dyndbg:  47 debug prints in module test_dynamic_debug
+[   44.598706] dyndbg: module: test_dynamic_debug dyndbg=3D"+p"
+[   44.599208] test_dd: init start
+[   44.599210] test_dd: do_classes 1 times:
+[   44.599212] test_dd: doing categories
+[   44.599213] test_dd: doing levels
+[   44.599214] test_dd: do_bulk 1 times:
+[   44.599215] test_dd: bulk msg 1.0
+[   44.599216] test_dd: bulk msg 1.1
+[   44.599217] test_dd: bulk msg 1.2
+[   44.599219] test_dd: bulk msg 1.3
+[   44.599220] test_dd: bulk msg 1.4
+[   44.599221] test_dd: bulk msg 1.5
+[   44.599222] test_dd: bulk msg 1.6
+[   44.599223] test_dd: bulk msg 1.7
+[   44.599224] test_dd: bulk msg 1.8
+[   44.599225] test_dd: bulk msg 1.9
+[   44.599226] test_dd: init done
+[  527.233033] dyndbg:  47 debug prints in module test_dynamic_debug_submod
+[  527.233039] dyndbg: module: test_dynamic_debug_submod dyndbg=3D"+pmf"
+[  527.233458] test_dynamic_debug_submod:test_dynamic_debug_init:
+test_dd_submod: test_dynamic_debug_init init start
+[  527.233460] test_dynamic_debug_submod:do_classes: test_dd_submod:
+do_classes do_classes 1 times:
+[  527.233461] test_dynamic_debug_submod:do_cats: test_dd_submod:
+do_cats doing categories
+[  527.233463] test_dynamic_debug_submod:do_levels: test_dd_submod:
+do_levels doing levels
+[  527.233464] test_dynamic_debug_submod:do_bulk: test_dd_submod:
+do_bulk do_bulk 1 times:
+[  527.233465] test_dynamic_debug_submod:do_bulk: test_dd_submod:
+do_bulk bulk msg 1.0
+[  527.233467] test_dynamic_debug_submod:do_bulk: test_dd_submod:
+do_bulk bulk msg 1.1
+[  527.233468] test_dynamic_debug_submod:do_bulk: test_dd_submod:
+do_bulk bulk msg 1.2
+[  527.233469] test_dynamic_debug_submod:do_bulk: test_dd_submod:
+do_bulk bulk msg 1.3
+[  527.233471] test_dynamic_debug_submod:do_bulk: test_dd_submod:
+do_bulk bulk msg 1.4
+[  527.233472] test_dynamic_debug_submod:do_bulk: test_dd_submod:
+do_bulk bulk msg 1.5
+[  527.233473] test_dynamic_debug_submod:do_bulk: test_dd_submod:
+do_bulk bulk msg 1.6
+[  527.233475] test_dynamic_debug_submod:do_bulk: test_dd_submod:
+do_bulk bulk msg 1.7
+[  527.233476] test_dynamic_debug_submod:do_bulk: test_dd_submod:
+do_bulk bulk msg 1.8
+[  527.233477] test_dynamic_debug_submod:do_bulk: test_dd_submod:
+do_bulk bulk msg 1.9
+[  527.233478] test_dynamic_debug_submod:test_dynamic_debug_init:
+test_dd_submod: test_dynamic_debug_init init done
+bash-5.3#
 
-[ ... ]
+NOTE that  the dynamic-prefix precedes the one added by pr_fmt,
+(the parent and submod differ, latter adds __func__,
+in both the dynamic-prefix, and the one from pr_fmt())
+This is perhaps vaguely sub-optimal, but it has been this way for ages.
 
-> diff --git a/kernel/locking/Makefile b/kernel/locking/Makefile
-> index cee1901d4cff8..9041cbbec9aae 100644
-> --- a/kernel/locking/Makefile
-> +++ b/kernel/locking/Makefile
-> @@ -1,7 +1,7 @@
->  # SPDX-License-Identifier: GPL-2.0
->  # Any varying coverage in these files is non-deterministic
->  # and is generally not a function of system call inputs.
-> -KCOV_INSTRUMENT		:=3D n
-> +KCOV_INSTRUMENT		:=3D $(kcov-noisy)
+> Won't you end up with ".%s" fmt as the string without the extra argument.
+> So you need to keep the expansion of pr_fmt() together until is is finall=
+y
+> substituted into a printf-like call.
+> It is possible to enclose it in () so it is passed as one parameter and
+> remove them on the final expansion.
+>
+> David
+>
 
-[ ... ]
+hi David,
 
-> diff --git a/kernel/rcu/Makefile b/kernel/rcu/Makefile
-> index 0cfb009a99b9f..fd23c1dad641b 100644
-> --- a/kernel/rcu/Makefile
-> +++ b/kernel/rcu/Makefile
-> @@ -1,7 +1,7 @@
->  # SPDX-License-Identifier: GPL-2.0
->  # Any varying coverage in these files is non-deterministic
->  # and is generally not a function of system call inputs.
-> -KCOV_INSTRUMENT :=3D n
-> +KCOV_INSTRUMENT :=3D $(kcov-noisy)
+Im not sure what / who youre responding to with "
 
-[ ... ]
-
-> diff --git a/kernel/sched/Makefile b/kernel/sched/Makefile
-> index b1f1a367034ff..4b4db5cca9b08 100644
-> --- a/kernel/sched/Makefile
-> +++ b/kernel/sched/Makefile
-> @@ -9,7 +9,7 @@ ccflags-y +=3D $(call cc-disable-warning, unused-but-set-=
-variable)
-> =20
->  # These files are disabled because they produce non-interesting flaky co=
-verage
->  # that is not a function of syscall inputs. E.g. involuntary context swi=
-tches.
-> -KCOV_INSTRUMENT :=3D n
-> +KCOV_INSTRUMENT :=3D $(kcov-noisy)
-
-[ ... ]
-
-> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-> index 6759087154edd..40bf654ec7515 100644
-> --- a/lib/Kconfig.debug
-> +++ b/lib/Kconfig.debug
-> @@ -2233,6 +2233,51 @@ config KCOV_INSTRUMENT_ALL
->  	  filesystem fuzzing with AFL) then you will want to enable coverage
->  	  for more specific subsets of files, and should say n here.
-> =20
-
-[ ... ]
-
-> +config KCOV_INSTRUMENT_NOISY
-> +	bool "Also instrument code excluded only for noisy coverage"
-> +	depends on EARLY_KCOV && KCOV_INSTRUMENT_ALL
-> +	help
-> +	  Some code (scheduler, RCU, locking, page and slab allocators,
-> +	  rbtree, stack unwinding, ...) is excluded from KCOV instrumentation
-> +	  because its coverage is not a function of system call inputs and
-> +	  only adds noise to coverage-guided fuzzing. Code that is excluded
-> +	  because it cannot be instrumented safely is not affected.
-> +
-> +	  Say y to instrument the noisy code as well, so that the early boot
-> +	  coverage shows the complete execution path. This degrades the
-> +	  coverage signal for syscall fuzzing, so say n for fuzzing kernels.
-
-[Severity: High]
-Can enabling CONFIG_KCOV_INSTRUMENT_NOISY trigger a NULL pointer dereference
-in __sanitizer_cov_trace_pc() during kcov_init() -> selftest(), as well as
-record interrupt entry and exit PCs into task coverage buffers?
-
-In kernel/kcov.c, check_kcov_mode() filters out interrupt context using
-in_task(), which relies on HARDIRQ_OFFSET being set in preempt_count().
-However, several functions in kernel/softirq.c, kernel/sched/core.c,
-kernel/locking/lockdep.c, and kernel/rcu/ run on every hardware interrupt
-either before HARDIRQ_OFFSET is added or after it is subtracted, while
-in_task() is still true:
-
-- In kernel/softirq.c, irq_enter_rcu() and irq_enter() are not marked
-  noinstr or __no_sanitize_coverage, so the compiler inserts a call to
-  __sanitizer_cov_trace_pc() at function entry before __irq_enter_raw()
-  adds HARDIRQ_OFFSET to preempt_count(). Likewise, __irq_exit_rcu()
-  (inlined into irq_exit_rcu() and irq_exit()) calls
-  preempt_count_sub(HARDIRQ_OFFSET) before finishing execution.
-
-- When CONFIG_DEBUG_PREEMPT=3Dy or CONFIG_TRACE_PREEMPT_TOGGLE=3Dy,
-  __irq_enter_raw() calls preempt_count_add(HARDIRQ_OFFSET) in
-  kernel/sched/core.c, which is instrumented at entry before
-  __preempt_count_add() updates preempt_count().
-
-- On interrupt exit after HARDIRQ_OFFSET is cleared,
-  irqentry_exit_to_kernel_mode() / irqentry_exit_cond_resched() can call
-  trace_hardirqs_on() -> lockdep_hardirqs_on_prepare() in
-  kernel/locking/lockdep.c, rcu_irq_exit_check_preempt() in kernel/rcu/,
-  and preempt_schedule_irq() -> __schedule() in kernel/sched/core.c
-  (before prepare_task_switch() sets KCOV_IN_CTXSW and after
-  kcov_finish_switch() clears it).
-
-When CONFIG_KCOV_SELFTEST=3Dy is also enabled (for example in allyesconfig
-builds), kcov_init() calls selftest() at device_initcall time with
-current->kcov_area =3D=3D NULL and current->kcov_size =3D=3D 0:
-
-kernel/kcov.c:selftest() {
-	...
-	start =3D jiffies;
-	WRITE_ONCE(current->kcov_mode, KCOV_MODE_TRACE_PC);
-	while ((jiffies - start) * MSEC_PER_SEC / HZ < 300)
-		;
-	WRITE_ONCE(current->kcov_mode, 0);
-}
-
-When a timer interrupt fires during that loop, the instrumented interrupt
-entry/exit path invokes __sanitizer_cov_trace_pc() while in_task() is true:
-
-kernel/kcov.c:__sanitizer_cov_trace_pc() {
-	...
-	t =3D current;
-	if (!check_kcov_mode(KCOV_MODE_TRACE_PC, t))
-		return;
-
-	area =3D t->kcov_area;
-	/* The first 64-bit word is the number of subsequent PCs. */
-	pos =3D READ_ONCE(area[0]) + 1;
-	if (likely(pos < t->kcov_size)) {
-	...
-}
-
-Because area[0] is read before checking t->kcov_size, dereferencing area
-when t->kcov_area is NULL crashes the kernel on boot.
-
-Should these interrupt entry/exit helpers be marked __no_sanitize_coverage
-(or noinstr), or should CONFIG_KCOV_SELFTEST depend on
-!KCOV_INSTRUMENT_NOISY?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261027-early-kcov=
--v1-0-6f2f053255ad@est.tech?part=3D1
+> >
+> > It is possible that the macros work another way. Or this depends
+> > on another change. I checked only this patch...
+> >
+> > Best Regards,
+> > Petr
+> >
+> > PS: I was curious what Sashiko says about this change and it seems
+> >     that it does not review this patchset from some reasons.
+> >
+> > >     if (DYNAMIC_DEBUG_BRANCH(descriptor) &&                         \
+> > >         __ratelimit(&_rs))                                          \
+> > >             __dynamic_pr_debug(&descriptor, pr_fmt(fmt), ##__VA_ARGS_=
+_);    \
+> >
+>
