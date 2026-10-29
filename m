@@ -1,85 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.169
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793314667;
-	b=c6IBmh3PM47s7RN4So6ZFAoiN2dO5JtYteI7DygVBC+5PL92YPhScQO1p36ybpHYskPA
-	 wxAuv8JMs6/ULNKR7UG8XfJT5vXCDpsoUC1P2uwzznU7/XxSJerTR98mEDNZFLJpJZDoG
-	 hXvNbSvU7SrOVfQqk0Gm1e8ZejRK0nmCMfRK9L1keIyWfTpluR6lNCueT5p2ywRpmEJoW
-	 721Tx7RkODBYYBY0eVbBee9WLpFLLDHnZr9nitWgW5zz0FC2bknC9FYOJ7MfKTlFhW2vM
-	 VyJvBE43QPj5e5SsGX09cRq7SvxhO2JAI5PkMbm0WVxL4caYPoxuBfMX884fHxrhriQ==
+	t=1793314959;
+	b=0qqHc7DoXDqmbRkbzgOvQi9Dm0evBxRN9VuH1ixWAUpXjMxk0UY8XzdrsiQ9ol3+OtHA
+	 VM39wiC7gNDjUYg+rfnE4wMbzLf51yrCDKtsJMsYSicIiqnNeTGwVZvPrtOdLSOUTT4AW
+	 2aXZnYbsF2udzEZHGv444LSP+Xmc4AR+5azT9ddGvK0YBjoiCpCIuScJRcwhPbajC6Kpw
+	 GrtiMOtB+5bZzw6QD4UFbi2H5JdL6fVNfew1G+oNsPP/6UBukuZdGWVX8lLFoaIvbtQ41
+	 wPU2r9PfOltwHiB35MbqggcqsUXonq4WkfsRLSB6z55NRNZ8qQbgGPJiSiJswZ4YdMg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793314667;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793314959;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:Date:Subject:
 	 MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:
 	 X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer;
-	bh=h5Hpaazv/PJJXvnma3M/buleF7hZLhW/TVfnybhiNnk=;
-	b=yFSTr2YXXxH90Y/OkPa/Ng0KZACt3aMEfBLzuk3ag9/8I+ihV1g3NqyNAGh1n+VDNcX4
-	 9B1GlJ42n4xhF4HXRKQsxwo1nHWNWdl4Vh+tsAtOAhTEPuu0V1gtqYNS/750c9joIX9CX
-	 wKdrnCb9bxGZb8LSrgb8/xprWK6PoJwzx2l7IcDov5d9fiAMqcgaPC4lUNVlrYt/pkHNE
-	 ILPor15NwZ1T3Lxw3dDn7Ts0VohEiO4MZFDzPlDtnnrw1ujdyM/1wyeD0Ew0pnRcyL7D/
-	 x9N/JJAlxfCWH1n+OXTo6KTT0jQjKPFLZS0lOlRgtfby3CDfnyTB2Ezkam7nEZjAZ2w==
+	bh=pdQPJwzRJN+nwSRrKcHiePRwRlhix19hahTM/4bzC3U=;
+	b=Z+JQJHZdNs6YBxmRwdvAYyEinIpyji3YuiVFzOB6wMC60EaSDxETW44UpkVyiXWMbKD5
+	 Vv0VV3m5+wo8OzwY4ZHrDGl+f/Cujnw9HsWKWT4g+M6sjI0h/bmmZtqZdVeOnyPXeBjQd
+	 rbqykNbp9lqHY2UXeDdfm+ldW925kwanGvp6zIZ5SaCKpEg+TrE6pwA7KeKHlv5tZU2Kw
+	 Y18EQ+MbgBqYeVhZGhCTkpH+MqL7xJqRX811tSHrIbDgRVB6iwt71sqlChdh6Xus2L5sh
+	 0ReaJsAubMGiPnzga+1PNWii+zjMWTJqafdS04I3/Dy3neFNGgSI8O2u6shxTJWKBmA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=q4Pk0bGY;
-	arc=none smtp.remote-ip=209.85.160.181
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=NAzLNtKm;
+	arc=none smtp.remote-ip=209.85.222.169
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D5C5606A31D
-	for <linux-kbuild@vger.kernel.org>; Thu, 29 Oct 2026 22:57:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7D5C5606A31D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAE5F606A31A
+	for <linux-kbuild@vger.kernel.org>; Thu, 29 Oct 2026 23:02:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BAE5F606A31A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=q4Pk0bGY
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-535850d4e6aso47921cf.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 29 Oct 2026 15:57:47 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=NAzLNtKm
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-93f1f8f59a1so1146385a.3
+        for <linux-kbuild@vger.kernel.org>; Thu, 29 Oct 2026 16:02:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793314666; x=1793919466; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1793314958; x=1793919758; darn=vger.kernel.org;
         h=cc:to:message-id:content-transfer-encoding:content-type
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=h5Hpaazv/PJJXvnma3M/buleF7hZLhW/TVfnybhiNnk=;
-        b=q4Pk0bGYejC80Vlg67vDiA4cVoyVezrRwL/1kfbcJktkHfwldceCME3k48jqzEdkVH
-         BIZf3TJ+vT12mmlyXb5TU34cFd1GCX5uM6+LYC6SSZKz4TTNPrreQhoKNz68yjxq5KGv
-         iuG8X0cBW5FiFjH4wK6SY6XQpOsGGIVJbkJiLeGRFq8ny81jQHabr0xmesjdzbUzzCDk
-         nd9lQzo6sBGPzRNeuG6Ua+or8vKb5lX0QBP6GkMcBNVzfEo43rbhlpfLWr0/5AYscHm4
-         9FvWolXD8PRa6YTChCqHvPFIoK8UMbJN7JdAKwi0rm/yjbctju6tyJ0GtpXLkUtB/+nI
-         +agA==
+        bh=pdQPJwzRJN+nwSRrKcHiePRwRlhix19hahTM/4bzC3U=;
+        b=NAzLNtKmCsF0IKPMBCGp4+IcOcKUbrxqzpMPhSHot9YZrrD7fDW6aqmudJfyu7IG8R
+         qQX63gDLg/ORm7+PWOUwW4IwEAHpUFmtBk91+smAEsZ0qYgNPdXt5gYR29qeJjQUmN0/
+         +jVX4RcZNIdKE1QYKjcSsgZCK2/TeGyu5zP0WT3EmwxLdvzsFUEnMhxJbOS/75BZq6X2
+         rwUbWV64rufl8eJJDGOx0kYyikuipmgTHXz6HDjVcG7lQKbZzlpM9+zNivbIxJJ8+rdB
+         K/6dJSbREdsozfMcdC4ADmD/sIPtrnoF4Yd3cZFXOnRrzwGiNEUMkKc8D+gj4FV5jkPK
+         jsaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793314666; x=1793919466;
+        d=1e100.net; s=20260707; t=1793314958; x=1793919758;
         h=cc:to:message-id:content-transfer-encoding:content-type
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=h5Hpaazv/PJJXvnma3M/buleF7hZLhW/TVfnybhiNnk=;
-        b=Bu4GCf8SCyNcbp/AVTH+Nd0x9mypPZCVinG97CdUP22rkpXHbpm0a0ztF0M0EGV1K5
-         PQn+EPlsRdbgfbUY8fpsebq2mR496xNE3PmVHHAgdjnJZwiHZZtfrj8PJUqy8Bg4dTmK
-         BoZWYulAnj/BDFIE3HRhZ3VM2S9xGhx1ag3RAM55qUlefLHo6/A2w7Ue17Zynls3GKY8
-         MvxXbIPCRKK2SVkD9F323vlHMyPbsL6S2u5mas1N+dW1o1NX2IQbI01SVF6Me6EHN9mY
-         ef7fpheC7fRmizGS3QCerVb+J0gq6l5beeRs2TMTRKGIT4Mp+WUy+0WXCwYVtgc9txBJ
-         /CqQ==
-X-Gm-Message-State: AFq9FYJrj1Bnqg/3oTeTlX9OsN9kDLcJdEQSxHHTa1zwiOVfGTQy4a6+
-	zj6nclcpxJvc1xfYO+9nokMB7Dn7dSE1Mb2HjWXR9tn/FGZV9z4cX9zq
-X-Gm-Gg: AYBFou0oL3WNNkWIzZPzMYopnNFU0mP+kfQH/uGrkpvc4uPgzllhben1k/NUSGpcnxg
-	mb99c6XocZVoIAR5/Kll5RZw9J9JcaTlPxJ8tGwv3uw8CNmdSfnIf8O1QJX6KikVAglu9BRi/6q
-	9VsEYF9jT2ZUc8TAX1qql6v4Ej5yDWbkeYqDxQ8xqsLdt76mq5LyCP5Kxr/VkphfW3duYp/yqlh
-	zHXFeWUmstDMhsLACUhjFpJ3M0j8LyxZO5mQ2NcghKO2ywkpR2VcXf0BnDnXYebjh/04PtCwJsJ
-	+ayHXuJR9yuPpP4ei1/UXTXHAUyTSGgV/NJyZQGTBOfsLbv4TTFrDzNY33hhQ5BjttFW7w5dZPr
-	R7EMEBHWcj4t3tF/nFtz1iQ3dr6xKvr3aJP2Dt79vOkEAxXXRmkZ0HeU8eObYzCz96yDg+OW5Vu
-	rcNygr6om77aGCNmWoGUvNQfLgsc2EOfZ1xspdL5dKBy9iXMOOWqWtcZFU1jlmVGLhtI3LikJAt
-	75TaLKKnlrt3oDAJ/MERBah8qx/KlSABdAQ8FHBZbKSPyezuC6ZbvluzQW5ONNhShwtbjKe80TR
-	9Er2rzcz8ld9u4tqJ7q/fmg6qhSiXgheWKBtS5iIUG9H52SaWTcAsCW9SDuxFiOjqA==
-X-Received: by 2002:ad4:5cc6:0:b0:91c:7b53:8007 with SMTP id 6a1803df08f44-91ca4b3a873mr10249726d6.4.1793314666398;
-        Thu, 29 Oct 2026 15:57:46 -0700 (PDT)
+        bh=pdQPJwzRJN+nwSRrKcHiePRwRlhix19hahTM/4bzC3U=;
+        b=FBjwRXk0Qk8DRUHVX8yxb2buPKUJPjwJfA2rBTiYI/cUkNZZS4TEjfQU3jLa40zv2g
+         gsmDuQMzz6Luhj1q0d5AxlAaeALxtG//VEi/kIzTpFWSA5zijjsdaXmBaf/W/qKiR/WZ
+         D3TwT73jYg5F5bh63TzNiz8IHWVdON+Tpiwgr6DRwTdZkD7/EvDKjW3QRRAtMGJtZbk0
+         LLNsos/EimBdfpo5X/E1iwgLZ4Rf982XFAfPy4eFYWxlDC0qQBeTnuHMIePhOd08Y2ag
+         A2D8d+DrJ0qSP3AZMSFsmm4VkYujZgmFd2tfURY6cQimLc8cRkqpChswKYPke71bwwhG
+         kukg==
+X-Gm-Message-State: AFq9FYIuf3yMlKSwMQ2uz8HihOMzicW0mMvW7/t1JRBz31lYE2W6pAXt
+	uoOjIq4vvlJiJ5E44vOFlI/ak7nkzySIktelYZK6J8YMSuUsVTEuCetR
+X-Gm-Gg: AYBFou3v3gxoTkkZblcCeNHAQWeT6s+hhCIQ+NWj6Fp5OiD9TPvow1QRlXI//s55/i1
+	Op7peMfaTBCW0ngPObWWbBYBim0Lr1amQs4ckZ+UHDsoEUFEhnBbLY1UKqzWDrHgfItKg8aKypV
+	yZk3Md8UtHMOZ9Fhc9iB6TcVnNiXVYtBGV+ynmVgkU5L1L1RH6WpPN7BuqzttwU4/0XY08cb4R9
+	bb55YrUeqZ27O4onZkXQOxirb5ftLfPXsvcSWlmpfv1ZTxZ2Z7fPtJigubnHdeW3f1u103LQ8rQ
+	cd7CZsom9PaunvBlUDy2TWIvDWkEJrIHiHwwRxxZ4sYQQBU4bFItrjX8chwAkrYSN2GEwNgmPEv
+	WrqA3V2ygT9ZmykWso8Z1GC6l997fQUFyVhAHzvYUeGSyNk6PHQpuKvmJbp8kQooqPZKzLbCJUF
+	mwJgAFdH5H3LRS5g+o1/3FiS4JQQwUMPythTcgXi3bejV6fdrQK91nybPUBsVt5ZXk/p54R5Gbk
+	NbJLEguJXMKZtOeRpkPuGlJrg0dOc2ZlVmORKjg+sc0+v/YB5W0JgYbTaBicS73SH7mjXovRLqY
+	7r8LgYLjD0mZAM1b4OKOeCvL9TvPChWLHAHku0THXMX5HDhqC+rt65Ub4M4iRPeUfg==
+X-Received: by 2002:a05:620a:870e:10b0:940:f21a:eb64 with SMTP id af79cd13be357-944216f3e4amr127183785a.5.1793314957732;
+        Thu, 29 Oct 2026 16:02:37 -0700 (PDT)
 Received: from [192.168.50.231] ([142.255.23.46])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-91ca68c1578sm928146d6.40.2026.10.29.15.57.44
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-94424133d61sm2791485a.3.2026.10.29.16.02.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Oct 2026 15:57:46 -0700 (PDT)
+        Thu, 29 Oct 2026 16:02:37 -0700 (PDT)
 From: Connor Abbott <cwabbott0@gmail.com>
-Date: Thu, 29 Oct 2026 18:57:37 -0400
-Subject: [PATCH] drm/msm: Fix GMEM_BASE on a8xx
+Date: Thu, 29 Oct 2026 19:02:30 -0400
+Subject: [PATCH v2] drm/msm: Fix GMEM_BASE on a8xx
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -91,10 +91,11 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261029-drm-msm-gmem-base-fix-v1-1-347642c5670c@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2M0QpAQBBFf0XzbGp3k/Ar8rC4mIdBOyUl/27ze
- E6d85AhCYy64qGES0yOPYMvC5q2uK9gmTNTcKH2LrQ8J2U15VWhPEYDL3Iz/Bhc5ZuIuqHcngl
- Z/99+eN8PXlurUmcAAAA=
+Message-Id: <20261029-drm-msm-gmem-base-fix-v2-1-26b338471b46@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/4WNQQ6CMBBFr0Jm7Zi21oKuvIdhUcpYJnGAtIZoC
+ He3cgGX7yX//RUyJaYM12qFRAtnnsYC5lBBGPwYCbkvDEYZp5W5YJ8EJQtGIcHOZ8IHv5F0Z5T
+ VjSfXQNnOiYreu/e28MD5NaXPfrPon/1XXDRqPNnaWRPOrlbhFsXz8xgmgXbbti/Yy28iugAAA
+ A==
 X-Change-ID: 20261029-drm-msm-gmem-base-fix-e1b20418ae68
 To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
  Rob Clark <robin.clark@oss.qualcomm.com>, Sean Paul <sean@poorly.run>, 
@@ -118,11 +119,15 @@ the registers.
 Fixes: 288a93200892 ("drm/msm/adreno: Introduce A8x GPU Support")
 Signed-off-by: Connor Abbott <cwabbott0@gmail.com>
 ---
+Changes in v2:
+- Fix enum name
+- Link to v1: https://lore.kernel.org/r/20261029-drm-msm-gmem-base-fix-v1-1-347642c5670c@gmail.com
+---
  drivers/gpu/drm/msm/adreno/adreno_gpu.c | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/gpu/drm/msm/adreno/adreno_gpu.c b/drivers/gpu/drm/msm/adreno/adreno_gpu.c
-index 5832dc25d6bf..aba2f0d6934e 100644
+index 5832dc25d6bf..5b05386ecffe 100644
 --- a/drivers/gpu/drm/msm/adreno/adreno_gpu.c
 +++ b/drivers/gpu/drm/msm/adreno/adreno_gpu.c
 @@ -382,7 +382,9 @@ int adreno_get_param(struct msm_gpu *gpu, struct msm_context *ctx,
@@ -130,7 +135,7 @@ index 5832dc25d6bf..aba2f0d6934e 100644
  		return 0;
  	case MSM_PARAM_GMEM_BASE:
 -		if (adreno_gpu->info->family >= ADRENO_6XX_GEN3)
-+		if (adreno_gpu->info->family >= ADRENO_8XX)
++		if (adreno_gpu->info->family >= ADRENO_8XX_GEN1)
 +			*value = SZ_64M;
 +		else if (adreno_gpu->info->family >= ADRENO_6XX_GEN3)
  			*value = 0;
