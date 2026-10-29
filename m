@@ -1,53 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.181
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793310070;
-	b=iVhyYOdyG+FJmvxm3+zSJimSPhMScmsibOPgohYfGefxF9p9kdfKiEXw5wuFc64mh8FP
-	 M/+cTzn9O2YgKHAIzneABHuTF1hkgpL9NlFW0jSZ4vq7GKEVkiLajla+z1EvUwLHbWnsE
-	 uKs1mLAmaYJD+R8XefrRTKm28dmOXWHpcp/lySsXI3G3eaKO10I7i8euLRE6fasijjLBz
-	 mDZCWTXMkZtgyByfgQcwSZB5xYWz0rCqtksq5PksejcjiH1ea/XlZUsCD6HLkSSy5gLSS
-	 Zu9m0Bpj8ItPAAtKO1ZTys7bdLNBrUqkqGJSh6gtan7DJ7OdASTNCQbCSzlQBUXwuHw==
+	t=1793314667;
+	b=c6IBmh3PM47s7RN4So6ZFAoiN2dO5JtYteI7DygVBC+5PL92YPhScQO1p36ybpHYskPA
+	 wxAuv8JMs6/ULNKR7UG8XfJT5vXCDpsoUC1P2uwzznU7/XxSJerTR98mEDNZFLJpJZDoG
+	 hXvNbSvU7SrOVfQqk0Gm1e8ZejRK0nmCMfRK9L1keIyWfTpluR6lNCueT5p2ywRpmEJoW
+	 721Tx7RkODBYYBY0eVbBee9WLpFLLDHnZr9nitWgW5zz0FC2bknC9FYOJ7MfKTlFhW2vM
+	 VyJvBE43QPj5e5SsGX09cRq7SvxhO2JAI5PkMbm0WVxL4caYPoxuBfMX884fHxrhriQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793310070;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=DX4A7jq1CXzKQrspT1o5uwX5xayxjUsi8drR3g2wMS0=;
-	b=V7LX8KZraHN4zEOrNOY++XwarrjUabBDho4F6H622SHFsDwBg4Pyfi7YMAEgfxijqilr
-	 sve36au67c95kwPzhi3GHMLoGqsxT+OisSNq+hU5iQ6MDCROtWuMCSq2kLY/+KOiFz/jQ
-	 pBn6zUN8c8H0nR4d9cbB1LOKS9Ju8Q4Q/HeGH6jDFops3nrfoAGdRRDg8TAZYRucgWeyX
-	 KQH14UYBVgLoHCYQIGMhbZtW0NyEqZiX6yUUiuJsom5HJfp9Z2vkq+GaK5O8mwFeARsMm
-	 W+F7bi4tQZLWYKJ1JASixvKwGw0M/DaeGpC07hwIoabpCzlNdx55hUJIo03I29qk0jA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793314667;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:Date:Subject:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:
+	 X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer;
+	bh=h5Hpaazv/PJJXvnma3M/buleF7hZLhW/TVfnybhiNnk=;
+	b=yFSTr2YXXxH90Y/OkPa/Ng0KZACt3aMEfBLzuk3ag9/8I+ihV1g3NqyNAGh1n+VDNcX4
+	 9B1GlJ42n4xhF4HXRKQsxwo1nHWNWdl4Vh+tsAtOAhTEPuu0V1gtqYNS/750c9joIX9CX
+	 wKdrnCb9bxGZb8LSrgb8/xprWK6PoJwzx2l7IcDov5d9fiAMqcgaPC4lUNVlrYt/pkHNE
+	 ILPor15NwZ1T3Lxw3dDn7Ts0VohEiO4MZFDzPlDtnnrw1ujdyM/1wyeD0Ew0pnRcyL7D/
+	 x9N/JJAlxfCWH1n+OXTo6KTT0jQjKPFLZS0lOlRgtfby3CDfnyTB2Ezkam7nEZjAZ2w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OrI+asDx;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=q4Pk0bGY;
+	arc=none smtp.remote-ip=209.85.160.181
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2DF8606A31A;
-	Thu, 29 Oct 2026 21:41:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D5C5606A31D
+	for <linux-kbuild@vger.kernel.org>; Thu, 29 Oct 2026 22:57:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7D5C5606A31D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OrI+asDx
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBEC21F01824;
-	Thu, 29 Oct 2026 21:41:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793310069;
-	bh=DX4A7jq1CXzKQrspT1o5uwX5xayxjUsi8drR3g2wMS0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=OrI+asDx/ZZr8nZngTcpGFdpZ1DNs33qxqstWnQiMA7nEVHTNLe7llw2lWCyz3fRh
-	 7VrPsn4PEXVlF4CCI6iju4bs6qvynJhLGYy8vxoqbZpPm2cMEvFZpuxf2il/WScP9F
-	 a8jGuDnYjqjpjEgMtfuRUl/zMDGnBuDovtgw9VqNda0wq9bmWwdr0mnX3guTQx4GwQ
-	 3PTlluVaOonFJKosINfwLbuJYpNgnZ6wqtbfCJvoi+5tvX3sSdMSz536ANahKJkY93
-	 oyXsQQQsXg1cb3GgnwJQKfEoNsqaJsMhiF5k+vdI3VonRjOyNbc2QNqksO6+osyhBb
-	 9uVcPT3gx8RkA==
-Date: Thu, 29 Oct 2026 14:41:05 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Ard Biesheuvel <ardb+git@google.com>
-Cc: linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Eric Biggers <ebiggers@kernel.org>
-Subject: Re: [PATCH 0/4] Get rid of all NEON intrinsics stdint.h type hacks
-Message-ID: <20261029214105.GA44297@ax162>
-References: <20261029135020.272082-6-ardb+git@google.com>
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=q4Pk0bGY
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-535850d4e6aso47921cf.3
+        for <linux-kbuild@vger.kernel.org>; Thu, 29 Oct 2026 15:57:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1793314666; x=1793919466; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=h5Hpaazv/PJJXvnma3M/buleF7hZLhW/TVfnybhiNnk=;
+        b=q4Pk0bGYejC80Vlg67vDiA4cVoyVezrRwL/1kfbcJktkHfwldceCME3k48jqzEdkVH
+         BIZf3TJ+vT12mmlyXb5TU34cFd1GCX5uM6+LYC6SSZKz4TTNPrreQhoKNz68yjxq5KGv
+         iuG8X0cBW5FiFjH4wK6SY6XQpOsGGIVJbkJiLeGRFq8ny81jQHabr0xmesjdzbUzzCDk
+         nd9lQzo6sBGPzRNeuG6Ua+or8vKb5lX0QBP6GkMcBNVzfEo43rbhlpfLWr0/5AYscHm4
+         9FvWolXD8PRa6YTChCqHvPFIoK8UMbJN7JdAKwi0rm/yjbctju6tyJ0GtpXLkUtB/+nI
+         +agA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793314666; x=1793919466;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=h5Hpaazv/PJJXvnma3M/buleF7hZLhW/TVfnybhiNnk=;
+        b=Bu4GCf8SCyNcbp/AVTH+Nd0x9mypPZCVinG97CdUP22rkpXHbpm0a0ztF0M0EGV1K5
+         PQn+EPlsRdbgfbUY8fpsebq2mR496xNE3PmVHHAgdjnJZwiHZZtfrj8PJUqy8Bg4dTmK
+         BoZWYulAnj/BDFIE3HRhZ3VM2S9xGhx1ag3RAM55qUlefLHo6/A2w7Ue17Zynls3GKY8
+         MvxXbIPCRKK2SVkD9F323vlHMyPbsL6S2u5mas1N+dW1o1NX2IQbI01SVF6Me6EHN9mY
+         ef7fpheC7fRmizGS3QCerVb+J0gq6l5beeRs2TMTRKGIT4Mp+WUy+0WXCwYVtgc9txBJ
+         /CqQ==
+X-Gm-Message-State: AFq9FYJrj1Bnqg/3oTeTlX9OsN9kDLcJdEQSxHHTa1zwiOVfGTQy4a6+
+	zj6nclcpxJvc1xfYO+9nokMB7Dn7dSE1Mb2HjWXR9tn/FGZV9z4cX9zq
+X-Gm-Gg: AYBFou0oL3WNNkWIzZPzMYopnNFU0mP+kfQH/uGrkpvc4uPgzllhben1k/NUSGpcnxg
+	mb99c6XocZVoIAR5/Kll5RZw9J9JcaTlPxJ8tGwv3uw8CNmdSfnIf8O1QJX6KikVAglu9BRi/6q
+	9VsEYF9jT2ZUc8TAX1qql6v4Ej5yDWbkeYqDxQ8xqsLdt76mq5LyCP5Kxr/VkphfW3duYp/yqlh
+	zHXFeWUmstDMhsLACUhjFpJ3M0j8LyxZO5mQ2NcghKO2ywkpR2VcXf0BnDnXYebjh/04PtCwJsJ
+	+ayHXuJR9yuPpP4ei1/UXTXHAUyTSGgV/NJyZQGTBOfsLbv4TTFrDzNY33hhQ5BjttFW7w5dZPr
+	R7EMEBHWcj4t3tF/nFtz1iQ3dr6xKvr3aJP2Dt79vOkEAxXXRmkZ0HeU8eObYzCz96yDg+OW5Vu
+	rcNygr6om77aGCNmWoGUvNQfLgsc2EOfZ1xspdL5dKBy9iXMOOWqWtcZFU1jlmVGLhtI3LikJAt
+	75TaLKKnlrt3oDAJ/MERBah8qx/KlSABdAQ8FHBZbKSPyezuC6ZbvluzQW5ONNhShwtbjKe80TR
+	9Er2rzcz8ld9u4tqJ7q/fmg6qhSiXgheWKBtS5iIUG9H52SaWTcAsCW9SDuxFiOjqA==
+X-Received: by 2002:ad4:5cc6:0:b0:91c:7b53:8007 with SMTP id 6a1803df08f44-91ca4b3a873mr10249726d6.4.1793314666398;
+        Thu, 29 Oct 2026 15:57:46 -0700 (PDT)
+Received: from [192.168.50.231] ([142.255.23.46])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-91ca68c1578sm928146d6.40.2026.10.29.15.57.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Oct 2026 15:57:46 -0700 (PDT)
+From: Connor Abbott <cwabbott0@gmail.com>
+Date: Thu, 29 Oct 2026 18:57:37 -0400
+Subject: [PATCH] drm/msm: Fix GMEM_BASE on a8xx
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -57,50 +89,59 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261029135020.272082-6-ardb+git@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20261029-drm-msm-gmem-base-fix-v1-1-347642c5670c@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2M0QpAQBBFf0XzbGp3k/Ar8rC4mIdBOyUl/27ze
+ E6d85AhCYy64qGES0yOPYMvC5q2uK9gmTNTcKH2LrQ8J2U15VWhPEYDL3Iz/Bhc5ZuIuqHcngl
+ Z/99+eN8PXlurUmcAAAA=
+X-Change-ID: 20261029-drm-msm-gmem-base-fix-e1b20418ae68
+To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+ Rob Clark <robin.clark@oss.qualcomm.com>, Sean Paul <sean@poorly.run>, 
+ Konrad Dybcio <konradybcio@kernel.org>, 
+ Akhil P Oommen <akhilpo@oss.qualcomm.com>, 
+ Dmitry Baryshkov <lumag@kernel.org>, 
+ Abhinav Kumar <abhinav.kumar@linux.dev>, 
+ Jessica Zhang <jesszhan0024@gmail.com>, 
+ Marijn Suijten <marijn.suijten@somainline.org>, 
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+ freedreno@lists.freedesktop.org, Connor Abbott <cwabbott0@gmail.com>
+X-Mailer: b4 0.14.3
 
-Hi Ard,
+This was missed during initial bringup because GMEM_BASE is not used
+anymore for textures on a8xx. However other things such as mesh shading
+still use the GMEM aperture. Fix it to match the value programmed into
+the registers.
 
-On Thu, Oct 29, 2026 at 02:50:20PM +0100, Ard Biesheuvel wrote:
-> Recent Clang has become more finicky when it comes to overriding the
-> type macros that the freestanding stdint.h consumes when defining the
-> uintXX_t types, and so it is time to finally get rid of this entirely.
+Fixes: 288a93200892 ("drm/msm/adreno: Introduce A8x GPU Support")
+Signed-off-by: Connor Abbott <cwabbott0@gmail.com>
+---
+ drivers/gpu/drm/msm/adreno/adreno_gpu.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Just as information for other folks:
+diff --git a/drivers/gpu/drm/msm/adreno/adreno_gpu.c b/drivers/gpu/drm/msm/adreno/adreno_gpu.c
+index 5832dc25d6bf..aba2f0d6934e 100644
+--- a/drivers/gpu/drm/msm/adreno/adreno_gpu.c
++++ b/drivers/gpu/drm/msm/adreno/adreno_gpu.c
+@@ -382,7 +382,9 @@ int adreno_get_param(struct msm_gpu *gpu, struct msm_context *ctx,
+ 		*value = adreno_gpu->info->gmem;
+ 		return 0;
+ 	case MSM_PARAM_GMEM_BASE:
+-		if (adreno_gpu->info->family >= ADRENO_6XX_GEN3)
++		if (adreno_gpu->info->family >= ADRENO_8XX)
++			*value = SZ_64M;
++		else if (adreno_gpu->info->family >= ADRENO_6XX_GEN3)
+ 			*value = 0;
+ 		else
+ 			*value = 0x100000;
 
-  https://github.com/llvm/llvm-project/pull/227722#issuecomment-6065215071
+---
+base-commit: 9c31496a57579d0a46e1eabb8f53ec735b72d180
+change-id: 20261029-drm-msm-gmem-base-fix-e1b20418ae68
 
-> So instead of making stdint.h (which comes from the compiler when
-> -ffreestanding is set on the command line) agree with the kernel's
-> linux/types.h header, avoid the latter entirely in the compilation units
-> that actually use the NEON intrinsics (which are always leaf functions
-> that are not tightly coupled to kernel APIs).
-
-I had not even considered this as an option, thanks a lot for exploring
-it and sending this series as a result. I definitely think this is the
-preferred route forward based on my discussions with clang folks
-upstream since they were quite unhappy with stdint.h being overridden in
-this manner.
-
-> Note that the disagreements are about long vs. long long on arm64, and
-> long vs. int on 32-bit ARM, so never about types that actually have
-> conflicting representations.
-> 
-> Ard Biesheuvel (4):
->   lib/crc: Don't include <linux/types.h> in NEON intrinsics code
->   xor: arm/arm64: Move NEON xor_gen() dispatch into the glue code
->   arm64: Drop stdint.h type overrides from asm/neon-intrinsics.h
->   ARM: Drop stdint.h type overrides from asm/neon-intrinsics.h
-
-This passes my arm and arm64 test matrix with LLVM 23.1.4 and a version
-of LLVM 24 with the breaking change mentioned above. This will be needed
-in stable but I don't mind taking a look at the backports when the time
-comes.
-
-Tested-by: Nathan Chancellor <nathan@kernel.org>
-
+Best regards,
 -- 
-Cheers,
-Nathan
+Connor Abbott <cwabbott0@gmail.com>
+
