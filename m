@@ -1,102 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.remote-ip=74.125.82.182
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=fail;
-	t=1793295143;
-	b=1sdjAAIGa/ZfyVnNcVj9uhsSU1BDkE8CMs/67m6qaU0u+IT/cqjhF3NMvzg8GE3Jl0RR
-	 n+GqQCVCmGA09TajzqKDVRxH7T5j3UTa5PoyhiOOq7pwVsn/cqnc6PUHjdfT3Zv4rd2jB
-	 WacD3T8IzQaBtabuNp9YcTEukL4VTY+1PtuZvZURmVA973CDeDJ8d7zE/tLEaqC/qBK2a
-	 FIUVhZBXz9K9qxlvOH78mwzk2qd1mWX8QmUSdHxUQ0uzL/TDXJKWF1OfsJQYfpHLp3mry
-	 1Fv11U5GwGMBePOae1+Fa8FprrawJyEQxRfFds/vCIOsPQPY5bNgT7P2IPclnA1DzBA==
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.160.179
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1793298232;
+	b=XlTDrFYzr6XHmP2+6XH+6du3l16Dsr8HiOvwcNHjJ0kVN0c2prDtKc1wcNtVHfiPdlOP
+	 wyJKiTk1roGH3Sx5THgO/8NpvWcA1a7N9Pf1QvZ0zdgincnpKQyphZASOsEjRIivj4zIJ
+	 yjHJ/9yEU4NlJH7lki9RxQc0c4f7FUTaVygfwCiWqn19Ag3eLXwGJz1YF20/qD3HBjmi6
+	 ES0+I8hFRm62riLQ0el+FqYa2k9clfDkTIbHBtbKoP73kln4clkAyDOdJR1FNHnYP+UwA
+	 eLsliffSHNmnOiK39Ditzt1wFGOZpC53WuotKReRi3iTMRSQ7zl5ZJSRF+i9I5j3ZNQ==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793295143;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793298232;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
 	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
 	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=R4Rs+OXHP0WWXEc1HyOxC7jIqK/84yuL7ps1Yjc1ZrA=;
-	b=duWds38mukFqSiDo9UPtZzM2v+Xc8GeX2YHqM+Bw6yWYpZwBtM6CCOI88Ycd+o2To2wF
-	 2vi1JPV2lniND7XYG15tJsMvHaPzYA7xel6h22sFI8drYHxPU4fxL/FGocrNzT8vbgIIV
-	 VrRz/KstVCbPFDcPlQqBh9a7GxCzy27lqZe0M53IylYHLt3NCosHBb0Qs+j+KMDerAxZ5
-	 wirQJZQCl0MXeDW35WCKf0Tfi7XhyNq9j6eeQrbJrv8KWeI3Cgvp1UrP2rmvcRiiBmxO2
-	 7djypY990SrILmtHS36epQAT+inZdTdgA2rTqK+t/A9KvhjuV8o44xnVemJTqB/pkHw==
+	bh=0kPogFiW6B5fuv9DVpnabZaqR2Qn/IyW3R9/wzN8wTc=;
+	b=aegxArTSK5baPQhbabYKRvnQAneU6yFcKkOHBitYp8mKL5dmU5jg4bFnkBbl6aSE6Spw
+	 vDAhZ82qErpZ061dmLOQ5KNFsfd9g+GGV6pWqPojd/0wEY60xZVL4TzuNjTQfz+4/SsK7
+	 MKDXN+nGE+w8PR5X/utjzJ7IwfvLrkWWbCsZQG+ghzlYGwJX3YtPp2TWYma13SugG24wn
+	 scmbQXSNtja17a/IiZjdwEursAUSfqfY84UFuj9pfaEBo7SGk7jkXXRIALVtHlS34y6qI
+	 8NrXu+DVY27ZNgspktPF+CmsjV489mDIlu0/gQi0l2DHHAZK4A/vpbCHRQMaaR3ryAw==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Sn8ZaqyK;
-	arc=fail smtp.remote-ip=74.125.82.182
-Received: from mail-dy1-f182.google.com (mail-dy1-f182.google.com [74.125.82.182])
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=DxY9NYue;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.160.179
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D027F606A31F
-	for <linux-kbuild@vger.kernel.org>; Thu, 29 Oct 2026 17:32:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D027F606A31F
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60A7D606A31C
+	for <linux-kbuild@vger.kernel.org>; Thu, 29 Oct 2026 18:23:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 60A7D606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Sn8ZaqyK
-Received: by mail-dy1-f182.google.com with SMTP id 5a478bee46e88-369fc2e984fso233684eec.1
-        for <linux-kbuild@vger.kernel.org>; Thu, 29 Oct 2026 10:32:22 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1793295142; cv=none;
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=DxY9NYue
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-533202fe429so46231cf.0
+        for <linux-kbuild@vger.kernel.org>; Thu, 29 Oct 2026 11:23:52 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1793298231; cv=none;
         d=google.com; s=arc-20260327;
-        b=KuNIl7Swjzh5D52ZIRCpTSuIgNYNXaguJjTMxaaczoN4W68ZQLtz4PhhVw9mrEDpDv
-         P+DLAJZImgRBDa3yFlRSwbMDrLbRdIF8iSqHSnqg4RGywsZsjPQU7Ymcm+DxPyUdxZNV
-         7cIPKSTF+Y+PmA15uq7Dv1Eo898I9HQL0bUJEN+ocZd3ifzhdyaOWJbrtOJqKX2WdNgr
-         TZuWCAmK2nMYJWoMRAcEivuImKSVYGaw11PbXn5FKVA2KnXxJNF6QTd1nGnspelUTSlG
-         rFH2CSGbTiIC4m50RsRX6yG2WDqVy4Hjh/4+s9P4CPrmLnY9gRZL/VHmIuH5i0DGdQQ2
-         JoPg==
+        b=lnrEAlozoyGfEb5C6IQo/kys+ggape+AJlhf+3CRkY7jfb3Ppr7MGF+5MTYXPq5wQQ
+         +LzjmwX7+f/mUvZw9nvNqgwmh3CZAHAlFDNJAXOk9NBHl3QFjd3aSAXSsJiyYe1FNueo
+         SehchlCWLN3Vgl4Lz0fBB7SoRggxC6Ed4Rwg9m0T8dAduSd9FzTA6aq4zuU+6QH9F/Ez
+         fSA9NbDIhMPfV69UQA1z9o/Vc+ll4lcc035gnjfIs9GuaU2YfyyV/Iiq86/vsaLFQTMX
+         HzckAzLkXW0MgDNVIoJo+wNQuBJvbereXgLRmF/zrlDcqoG0Nh3H6NSuc+uc8cl5WSOG
+         vomw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=R4Rs+OXHP0WWXEc1HyOxC7jIqK/84yuL7ps1Yjc1ZrA=;
-        fh=WGn9IFuKE8y4VKvpdh+v172rEj4Y9NZZw+/I+wDooZk=;
-        b=Gdou/oA8ndewbG+eptCFqBcIcyCJzNZC+HllobRC656hipo8SYjsGaHHmohqtYRhCi
-         yaaMV8/iMFJHxT7LdMRdAsMvuAKSws33LIM+dXQ0YnTkQlwWVrAw8bqoAlXNGSsIiMn0
-         0lt+0agVW8WY7TmycwBxmBpAraSSWOMw1xKvoHY8DRweN/2AFVMRzR3Kr+VrvNl5Edof
-         nbviS38mh5cW9Bu2dtbH8mwZ3TTunDjhNjwehEDFyu07uAFYsT+DWxtjWgrkOEtmkHbr
-         ub6eY0KsjElxOAhqaamx49tOp+6zh5o/3SY5TO8bb00Qcg9pizTyaVghMoXy83/ZgrX0
-         C1iw==;
+        bh=0kPogFiW6B5fuv9DVpnabZaqR2Qn/IyW3R9/wzN8wTc=;
+        fh=+QX1lWSsVbyeOfItszum3mRv0K69AMcc/tL2YVX8aJI=;
+        b=azBeNcdv6M8YczLLjw71iq9RcxF9y98ShYYbOt1YrgUHJfTC2eNED7fA6xlxvtzESD
+         30WmJrGBd3AO0+uhBswxSJGGA3/pyqpaKGs8t2YTuoN8ppIVo9w/wwdCQ5PsQ6j+/uNu
+         vrlS4tpRYQzIZzuIfzS2k8Ud/eXnu5PVxYabFVFXM7iFN4sFeT9fU2mexIBy/26XvNOt
+         B6tOElprBRlFLgRZxwRog2dZG0uYZ0gJ2JGss2X3LUPsV31m4eI3LKIu/YOOmIjwm9rK
+         ETn3Kbn0zSB6bewbH7tuWnRkvD4F6lFJ3FrIoYpcvq5k62BWbXu/dEg7yGabeYgdnBAd
+         daSA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793295142; x=1793899942; darn=vger.kernel.org;
+        d=google.com; s=20260707; t=1793298231; x=1793903031; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=R4Rs+OXHP0WWXEc1HyOxC7jIqK/84yuL7ps1Yjc1ZrA=;
-        b=Sn8ZaqyKa9l3To+a5GYvvAD0uAR4LJpfMXeTB71mq8b5e1Cu/L8u9HO8Zj4J0B5nci
-         ikPSN1UBdudd69fky6nx+fn2zpQNEKKb8ndM85agvMeZX1huHviwXrVWGf3dK98oNA2n
-         kPm3sFQi0kDHKs5E2U8HTKnHQfybkyFStMtmeFjCEYXW2mEF15JtSDG+5XlGpHWRHj6s
-         p7K5MntJv9WyU0bgxVoYY7vLJvNAw48cDUARB5+Bim5Zy0yKYy1Tv3NY6ydDdUGsXC0O
-         83MJ9sAETqsv7YSQ9eLhf5V4kUe2K4/oqFg8hHLQtP7JGEDhl74TjhF3bkIgdYuBHeUM
-         yhdw==
+        bh=0kPogFiW6B5fuv9DVpnabZaqR2Qn/IyW3R9/wzN8wTc=;
+        b=DxY9NYueYpPUw54/1LuKABfDp60AROnzubbbXy7OzS6fWMrILGyAPx+k/TBUzTDoQf
+         0+estVcf3DGr+NqskgZltpKjiTwBj0vHxfiZlAv1hdCBqEV+qUGB+fKraqRqaZGJI9Ad
+         aHuqa1XDAyOvsrzYt4e2fwVCkmevUnXplUQksj+fp6M1ZkXl+zkUCRvmoFsMOA3v0kwz
+         Qz991YYvpNKWfDlgqHmAUX1bJTSVeq5mbReuEAT3YssNt+yd0jN+OmcLTEbZqe3twO31
+         DfUU2J0jeNSxbzemGGGlU75TQqjY6sTlc87Wxa++VyWhSCCSHud20YoCA1co6FakOgHn
+         lsdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793295142; x=1793899942;
+        d=1e100.net; s=20260707; t=1793298231; x=1793903031;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=R4Rs+OXHP0WWXEc1HyOxC7jIqK/84yuL7ps1Yjc1ZrA=;
-        b=y1dRkx9pesR/JwOT7Ja4wiXtfMCR2dimN3IpOtnWohBm30g5ZvRSxrDdBVo8qs9Ko7
-         XYMjjyGZL37FP2/uOjPkAsCk4ffOMAHxA7Ek/V28k5iKTXjtVsy5CYMM66EpMelgx8WC
-         T19gzZQ7z/77UW0C2rRUQyMkYjG1IrGPpi8hu042X7djwcGh92F8h0fhrYXh4Ce9+j5I
-         7Vc0RcVTaJtNroV5H/ly9o3nX/kGSsN08c2wGv4zPbOxxRh9JyoOlIiVuizJqW7a3hM7
-         OzVBPCwI2HRF31tzUwXmDtYuYSDRc++8gww//3mC7zmj3fCDaI+WRpWks0Ek6MZS0GXH
-         gt4A==
-X-Forwarded-Encrypted: i=1; AKwUvBxTfRVG6tK4UGkkcSe9yh8cXkD/F7+zzzkj7KdmDao+L3VvWn99Jb7SPb8bj6wdDFcaHpMNAaNSXHWjGKQ=@vger.kernel.org
-X-Gm-Message-State: AFq9FYIeonoZOvZW7cTH3Bh5Y6MWQeTbmUfd42oHFDVV4A7u4RMZBvAz
-	AAxrd54bVhwYIOxfAWuHXG1QE5PAnS0bExfLeKJEelTWaqV+QWVVuYILjFGPNvxIsmN1WgdME1D
-	VDFqecHIw24tuGLDbuNkaw+Kw35ZDxbk=
-X-Gm-Gg: AYBFou3BdQO5tZ97VCd7M3xzTT5/mAZQVBV92NUdk2IIX0ZogdvGSTchtuXtnfqabA0
-	zkvhq62utz/Au2TDS4UtAaWpNsxMxEDvr2nLOZIJKFtO7kQ4/8K5udOQQpzKJI0bM1OuBrgEk3J
-	+Jk+M1PJMFxC5Kacxc5IvvStmeRD9aztYpwrvDkIniHs+xG6n5LopJTn7AWeC3TOrggAGbrRPJ0
-	O8GVGGITXFArCfDI6EGSL3HimxBxZciMSr8hArEo/TSN+CfmLaJKqa+9edbsE02xkTpY4EvLvfx
-	NiB2J8jq4nT3Q233GaNFiKpTTFwpeisn5O1NpH8BVoVqtrlGjG/lNTJYwvSAPH9+wbB0UJcPtXk
-	9GkVa4VY76T70Ll3FU+kWxR8/OBKD9LB+qLRxiTxXy7aiekPQDkpK2BqCP2Bi79iwtt6PUXu6j+
-	xtnPwT8Z70wOdizdU4YrdSvUf5m0nq2tkeOOfBzrjUJM7Lzd9Rgqrntu5rEMTPSkULcsRJpeFpm
-	T08YsQq50pHian9U8HFuYLUJ3t4CyroEOHuHU5996UnC7aDdcxG4HLwsg==
-X-Received: by 2002:a05:7300:ae18:b0:36a:13fd:b5c with SMTP id
- 5a478bee46e88-36a4235ceddmr139643eec.2.1793295141770; Thu, 29 Oct 2026
- 10:32:21 -0700 (PDT)
+        bh=0kPogFiW6B5fuv9DVpnabZaqR2Qn/IyW3R9/wzN8wTc=;
+        b=uSJN+ibYNb1ECF2doP/2BECJN4LUTojPoB0+UdAwx/Zi6fINFMEDUpbWiUcKkNfseM
+         lfd90peStEZl5GETTjdnm5bMqFlfbLETyjy2B9t8VO39aO2tut42u/XvDp1nigJ8MeUR
+         m3rxkFKGg/thOZvUB8TVxe9zsZDe7RhRbyDXrLtroQZVMZxYRcUfFz+6OyQqfqvIM3Gl
+         4HQGj2TjimnMEG4ecyQjl7OncM6Po5+9qxoQV5PJErRrtn/j0Of9BFCxDABS57mEeW/B
+         EtKeBJBHYAgSlvRctOJyQQuqXEnWtTWJ6oCoXS1VUcV3/zUlXj3P2eYPYH9UXmbffDli
+         8dfw==
+X-Forwarded-Encrypted: i=1; AKwUvBx3oOT2p15TlSbHWikC+b6ZkF7SSjk8NX92JfXkWXzm3Rd9Ymu1+uCTSM69yWM54RpvZFx+mOvU7AAqk6s=@vger.kernel.org
+X-Gm-Message-State: AFq9FYKtD1b32MVTBFKzYMPL48jk92mwkaSt5HZqB5RBRD+1If51txmX
+	yvawtc2OsmYPxKuJiZ5TNjvO/wRqN9NanpB1cd8PMWoLQIZMaLFiApDlBmM4sA9H+hUpvwcEf//
+	DoKXBst5pJZkMvQWB+W/KaQyw2AySs1Q3bxZHAcGy
+X-Gm-Gg: AYBFou04UTw6mX6UW8ovB4Jns7ZIQ8zdF/sS8VEXSwTjm5EusFZcYuxoUiqr2UYk+aV
+	kzOeWcSLRRD+0lXaEZDTXnUfSVw8xtHLoTpQQgICiYEmzmgI0CGKpobj0xolTzRhY+KqJyoXvM9
+	kFqrQ45JQEaBFKeqDxANiabfHqiS4CvJxz5LReH2NvcAY9lVJs27BqnceJ594TVRbosZYPzWJ9a
+	XjJ/r0JeXmpkduWbNqnaT3ppznM1V3nJ2Pik1E5XGirS3yOq7luAOMywOxJu3YNL/pQit2zXB6G
+	a/tRlR9APDJTqaUrAPSRVno6rHxVAdLKWRqVm+RwwE9BqtfAAmHN1YTS0P8JSJ0I9yULbUjnbk+
+	+FcX2O70m5ucV1ztmde+MygVd/I/1/Wx4zqMLuUueY53GtpQaHvBJXJHah9fx76Ypfg==
+X-Received: by 2002:a05:622a:2b45:b0:532:eff8:3491 with SMTP id
+ d75a77b69052e-5414ebdf590mr23748491cf.14.1793298230692; Thu, 29 Oct 2026
+ 11:23:50 -0700 (PDT)
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -106,15 +104,15 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261029162958.3224280-1-irogers@google.com>
-In-Reply-To: <20261029162958.3224280-1-irogers@google.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Thu, 29 Oct 2026 18:32:09 +0100
-X-Gm-Features: AclHuK-0mxI3LKAZpnOHH-Drrv94DNRirn4x7gfXbdMbpDKW_doTTtE6JJd6tT0
-Message-ID: <CANiq72nrhqK0NP5q8_G=936++gZR3=zrES+cK96T95-ThVTpbg@mail.gmail.com>
+References: <20261029162958.3224280-1-irogers@google.com> <CANiq72nrhqK0NP5q8_G=936++gZR3=zrES+cK96T95-ThVTpbg@mail.gmail.com>
+In-Reply-To: <CANiq72nrhqK0NP5q8_G=936++gZR3=zrES+cK96T95-ThVTpbg@mail.gmail.com>
+From: Ian Rogers <irogers@google.com>
+Date: Thu, 29 Oct 2026 11:23:39 -0700
+X-Gm-Features: AclHuK8I2R6ZBL0M8gpXX54gY1Y2jQq5EjXVV3xSH1Vs5_u0FZ2MTRQeP10WsJs
+Message-ID: <CAP-5=fU8K4as51_Vi2vKAC-kGMVEFn1LDjCg1WvP8R0Y=8SbcQ@mail.gmail.com>
 Subject: Re: [RFC PATCH v1 0/3] tools: Add Rust library build infrastructure
  and prefer zlib-rs
-To: Ian Rogers <irogers@google.com>
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
 Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
 	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Quentin Monnet <qmo@kernel.org>, 
 	Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
@@ -126,51 +124,68 @@ Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 29, 2026 at 5:30=E2=80=AFPM Ian Rogers <irogers@google.com> wro=
-te:
+On Thu, Oct 29, 2026 at 10:32=E2=80=AFAM Miguel Ojeda
+<miguel.ojeda.sandonis@gmail.com> wrote:
 >
-> 1. **tools build: Add Rust library build infrastructure and zlib-rs featu=
-re test**:
->    - Adds `tools/build/Makefile.rust` with helpers to locate Cargo crate
->      sources in distro (`/usr/share/cargo/registry`) or local Cargo
->      registries (`CARGO_HOME` / `~/.cargo`), map `.rlib` prerequisites to
+> On Thu, Oct 29, 2026 at 5:30=E2=80=AFPM Ian Rogers <irogers@google.com> w=
+rote:
+> >
+> > 1. **tools build: Add Rust library build infrastructure and zlib-rs fea=
+ture test**:
+> >    - Adds `tools/build/Makefile.rust` with helpers to locate Cargo crat=
+e
+> >      sources in distro (`/usr/share/cargo/registry`) or local Cargo
+> >      registries (`CARGO_HOME` / `~/.cargo`), map `.rlib` prerequisites =
+to
+>
+> When we were discussing whether to vendor crates for the normal build
+> or whether to fetch them locally from the registry a couple years ago,
+> we discussed approaches like this one, i.e. picking a version from the
+> registry by folder name etc.
+>
+> But that doesn't work too well. For instance, the graph of
+> dependencies may change, there may be several versions available (and
+> the highest may not be the proper one to pick), there may be different
+> major versions available (i.e. not backwards compatible), they may
+> change the build scripts, etc. Even picking the highest major wouldn't
+> always be correct, from what I recall.
+>
+> I also asked a few distributions how they felt about it, and they
+> indeed said that it wasn't a great idea without querying properly the
+> registry.
+>
+> So one should really ask Cargo for the right information about the
+> local registry (i.e. offline). It has been a while, so Cargo (or maybe
+> `pkg-config` or whatever) may have better support for querying it
+> nowadays too -- I would suggest checking that first (e.g. `cargo
+> metadata`).
+>
+> I think depending on Cargo for this, especially nowadays and for
+> `tools/`, should be fine (we were considering even back then and for
+> the normal build).
+>
+> By the way, checking Cargo's cache sounds very strange to me: that
+> means the version that gets picked is even more "uncontrolled".
+>
+> I hope that helps!
+>
+> [ In the end, for normal kernel crates, we decided to vendor for other
+> reasons, e.g. we wanted to pin the versions, to customize sometimes,
+> and most importantly to avoid any possible user misconfiguration that
+> could lead to a subtly incorrect kernel. But for `tools/` it makes way
+> more sense, of course. ]
 
-When we were discussing whether to vendor crates for the normal build
-or whether to fetch them locally from the registry a couple years ago,
-we discussed approaches like this one, i.e. picking a version from the
-registry by folder name etc.
+Hi Miguel,
 
-But that doesn't work too well. For instance, the graph of
-dependencies may change, there may be several versions available (and
-the highest may not be the proper one to pick), there may be different
-major versions available (i.e. not backwards compatible), they may
-change the build scripts, etc. Even picking the highest major wouldn't
-always be correct, from what I recall.
+This is great feedback, and it's why I thought this was an RFC series,
+rather than a full blown series intended for immediate merging. I
+think the other obvious point of contention is preferring zlib-rs over
+zlib. I'll incorporate your feedback into v2 along with addressing the
+large amount of feedback Sashiko has given, which may become
+irrelevant if we trust in Cargo more.
 
-I also asked a few distributions how they felt about it, and they
-indeed said that it wasn't a great idea without querying properly the
-registry.
+Thanks,
+Ian
 
-So one should really ask Cargo for the right information about the
-local registry (i.e. offline). It has been a while, so Cargo (or maybe
-`pkg-config` or whatever) may have better support for querying it
-nowadays too -- I would suggest checking that first (e.g. `cargo
-metadata`).
-
-I think depending on Cargo for this, especially nowadays and for
-`tools/`, should be fine (we were considering even back then and for
-the normal build).
-
-By the way, checking Cargo's cache sounds very strange to me: that
-means the version that gets picked is even more "uncontrolled".
-
-I hope that helps!
-
-[ In the end, for normal kernel crates, we decided to vendor for other
-reasons, e.g. we wanted to pin the versions, to customize sometimes,
-and most importantly to avoid any possible user misconfiguration that
-could lead to a subtly incorrect kernel. But for `tools/` it makes way
-more sense, of course. ]
-
-Cheers,
-Miguel
+> Cheers,
+> Miguel
