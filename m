@@ -1,21 +1,22 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=148.163.143.35
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=148.163.147.86
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793394065;
-	b=JGWXfPZkwuszIycenl1dMkicUiOOAXUBwAafG08ruHflF3ZdPmpNtQWU5Q8hUdD6zFi4
-	 MS8ri/7a6WW0cG8ten3Bk0qrH4GDXITEc2kic8p4KoOE4+538MKIeet2R5K3FiABs33H0
-	 OeKFov7Dbup0hxw9Q6l/wE9UpLE8KAK6uoYlNpsNDCCWchXpNnQzeNo6ID9Az/3iz3lQM
-	 3nw0Yosj1PWz89pOpWq08loHryBBr4NIVJCkaQmBMVrj7MTQIDnAZYWEOQbAxPzhDB5zs
-	 fRYUA7d1ITPe4Oo7XkG2ed/ae2NrT1liQ/3dkM1dhFkEVpE8VFiIZKEO9j2y929xO9A==
+	t=1793394074;
+	b=Kmyw/NglYIReePfcP5rQyRNm7UCFbh7yf6cMHzXtYZL8ZMlp0nspq/SyB5D11Hs+YSG2
+	 dRwGZsFWonUCOeWBy82ibzcTgh+DV26d0A+aI6ucnOcu8+eHUPTQwr0hvM8l9K6P4FoU0
+	 kVVHGJEWBrpVnieTLzsMAhXZUxb6zywVuDAfUsfmlJbpDlx2rzpTu23R6l7ngrV5WTFgh
+	 UqU6lSCEuMqDoMhPPdQmYJpD62yOQnDYMoVVb5vj6U1FuyFvvurCMMsxNdmyEW9lmlGj8
+	 VF3+nyY0v4mGnI+R/6I9GCIG9Plk0/IBhNcRJ0vtZpNqcWgQEDDIXaVB0ENFstA1kTw==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793394065;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793394074;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
-	 Received:Received:Received:Received:From:Date:Subject:Content-Type:
-	 Content-Transfer-Encoding:Message-Id:References:In-Reply-To:To:CC:
-	 X-Mailer:X-ClientProxiedBy:MIME-Version:X-MS-PublicTrafficType:
-	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
-	 X-LD-Processed:X-MS-Exchange-SenderADCheck:
-	 X-MS-Exchange-AntiSpam-Relay:X-Microsoft-Antispam:
-	 X-Microsoft-Antispam-Message-Info:X-Forefront-Antispam-Report:
+	 Received:Received:Received:Received:Received:From:Date:Subject:
+	 Content-Type:Content-Transfer-Encoding:Message-Id:References:
+	 In-Reply-To:To:CC:X-Mailer:X-ClientProxiedBy:MIME-Version:
+	 X-MS-PublicTrafficType:X-MS-TrafficTypeDiagnostic:
+	 X-MS-Office365-Filtering-Correlation-Id:X-LD-Processed:
+	 X-MS-Exchange-SenderADCheck:X-MS-Exchange-AntiSpam-Relay:
+	 X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
+	 X-Forefront-Antispam-Report:
 	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
 	 X-MS-Exchange-AntiSpam-MessageData-0:X-Exchange-RoutingPolicyChecked:
 	 X-MS-Exchange-CrossTenant-Network-Message-Id:
@@ -25,72 +26,76 @@ ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
 	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
 	 X-MS-Exchange-CrossTenant-UserPrincipalName:
 	 X-MS-Exchange-Transport-CrossTenantHeadersStamped:X-OriginatorOrg:
-	 X-Authority-Analysis:X-Proofpoint-GUID:X-Proofpoint-Spam-Details-Enc:
-	 X-Proofpoint-Spam-Info:X-Proofpoint-ORIG-GUID:X-HPE-SCL:
-	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
-	bh=UUetOG8bb12H7eTtGvbIiaV5Extzs9iFYH1LAkp3Hug=;
-	b=M7ZmgBYVxADI3Tuz8qR0G/iq+0tYjc7p5pxklDAtodJ0KEHB6SQ7Cle4471RWAhbaAl5
-	 XvTSLgcfFsKEDn0K31EJhJ+FGogKLhzrnDYVmzrIR2a5w3FdWimuTSXDvD9tQZWnWK0G1
-	 bnIvJzg7iuAt5Wb+GCIwBGOqsVKHjuNRCg0/ifIQzSqx/2fF0GrjPgGtuPeoewjHqMzEG
-	 qNpyd2kkvYJJM+ErFK7MJUKcvnqYUg4zYKML6SWk6/XhPIrEmYu9WkP+Q6EWy5E4x64A4
-	 WylvCmHSOdsWiVLUkieqB+LMjM5Cb+iTUv7OcKmKFXHjnpTbQLamAKQTqZdekU1dgDA==
+	 X-Proofpoint-ORIG-GUID:X-Proofpoint-Spam-Details-Enc:
+	 X-Authority-Analysis:X-Proofpoint-GUID:X-Proofpoint-Spam-Info:
+	 X-HPE-SCL:X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
+	bh=jokmvT97cdT91HDgt/UEHeaPTdXRagGP5/JD5X3QTQg=;
+	b=YcFZlCPIXdQRlMkxj9y3R8401CjguMDa6paDr5yF0oVwI0RU38KXiD6S4NMgTmLOix9n
+	 DXE4E0uwzp5A+loS+uFa6k36yRtYw/Ix8Kjz8b/cpxONicEmOc5sDtqJKFnIdVd6lGnf9
+	 FLFFYVFS8evxCKbGBW780mVqduEH+UlaVGuxniBpFann5Clbe8qHpkyRY97SQZipfEX2u
+	 JrslPBiGl54zJILYsVg5hyAL3rEAiecpP+8IfRYW4lfLUZ1GUeHabPIaaBs+Xp121l1jC
+	 3n+Cd6gETkSklPMixEwlY+DzxJ3ZWAiIyG7qwh5o04AjGPPl761RvBs6R/bN5UjIIvQ==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=hpe.com;
 	spf=pass smtp.mailfrom=hpe.com;
-	dkim=pass header.d=hpe.com header.i=@hpe.com header.a=rsa-sha256 header.s=pps0720 header.b=Wxoa2qGV;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=148.163.143.35
-Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
+	dkim=pass header.d=hpe.com header.i=@hpe.com header.a=rsa-sha256 header.s=pps0720 header.b=oufDnUJL;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=148.163.147.86
+Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0701E60A3822;
-	Fri, 30 Oct 2026 21:01:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0701E60A3822
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEBE7606A323;
+	Fri, 30 Oct 2026 21:01:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AEBE7606A323
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hpe.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=hpe.com header.i=@hpe.com header.a=rsa-sha256 header.s=pps0720 header.b=Wxoa2qGV
-Received: from pps.filterd (m0134424.ppops.net [127.0.0.1])
-	by mx0b-002e3701.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69UHvU3a1038028;
-	Fri, 30 Oct 2026 21:00:30 GMT
+	dkim=pass (2048-bit key, unprotected) header.d=hpe.com header.i=@hpe.com header.a=rsa-sha256 header.s=pps0720 header.b=oufDnUJL
+Received: from pps.filterd (m0134422.ppops.net [127.0.0.1])
+	by mx0b-002e3701.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69UJ21YN923821;
+	Fri, 30 Oct 2026 21:00:45 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pps0720; bh=UU
-	etOG8bb12H7eTtGvbIiaV5Extzs9iFYH1LAkp3Hug=; b=Wxoa2qGVvESY3fvNbv
-	cBWiTJc1LMestkYTA9AaMu7T/mvYPT13QgNYH3rWO/GjFhKaj6aQpLG75kvz5u5W
-	1ITY0FDJWwdVUvJjqLX2s6zPs2d19+i5Wch6AZfZbwSWZLqZf3rTkDSkPyFb4QNr
-	uewWyyA2oR6sav/OqWRWBt95lWYoFsJRCib3COr9QAWhdmSG9kIeELz7PaasWSNz
-	61AOZt+4Ann6FmxgyGVi4zZOSeFMxN3c5RHb64WDguF8QmerDQaa0dRlw4Yj9tPf
-	jjtTNzqw+8xsXaTB0w3kY5JOPnE+DZUKHWWH0hfyU7r+h0bctoKGfdhl139m3eVZ
-	C0aA==
+	:message-id:mime-version:references:subject:to; s=pps0720; bh=jo
+	kmvT97cdT91HDgt/UEHeaPTdXRagGP5/JD5X3QTQg=; b=oufDnUJL9Aua9/7skT
+	9uFbS+WNxU8rbHD56Z4zoK0Z0LgfCTj30OUbsJCUWrsDl3uDeT+lRrLVlpsFqr2Q
+	L309kq8SLCsUHB6lS+TjI18+tmx6b7KQUbjFolx+vtDTLUaqMq7awZDXb+O1Pziw
+	2xNqEWMDVeUAkapkN4e5fvb6nkf8DJJRZKfk+cEexElY/VES/Wbpv8ZkZs5kxtTC
+	+4WETTOpcsywcE1eqQIIDHMGWfpYVgUExM37aXTeOUC5TPPPoaQvVJkBH11BwSPI
+	wevlmI5lCJyiazOBepY4asnJyj/XBVWBu3+bou63hO9pWifB4RspEa8GgZ/vRpuY
+	gRVg==
 Received: from p1lg14878.it.hpe.com (p1lg14878.it.hpe.com [16.230.97.204])
-	by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 4hmx98uj5d-1
+	by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 4hmvmy4xv0-1
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Fri, 30 Oct 2026 21:00:30 +0000 (GMT)
-Received: from p1wg14925.americas.hpqcorp.net (unknown [10.119.18.114])
+	Fri, 30 Oct 2026 21:00:44 +0000 (GMT)
+Received: from p1wg14923.americas.hpqcorp.net (unknown [10.119.18.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by p1lg14878.it.hpe.com (Postfix) with ESMTPS id 64281D2F8;
-	Fri, 30 Oct 2026 21:00:29 +0000 (UTC)
-Received: from p1wg14926.americas.hpqcorp.net (10.119.18.115) by
- p1wg14925.americas.hpqcorp.net (10.119.18.114) with Microsoft SMTP Server
+	by p1lg14878.it.hpe.com (Postfix) with ESMTPS id 891B2D2F8;
+	Fri, 30 Oct 2026 21:00:44 +0000 (UTC)
+Received: from p1wg14928.americas.hpqcorp.net (10.119.18.116) by
+ p1wg14923.americas.hpqcorp.net (10.119.18.111) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Fri, 30 Oct 2026 09:00:21 -1200
+ 15.2.2562.43; Fri, 30 Oct 2026 09:00:44 -1200
+Received: from p1wg14923.americas.hpqcorp.net (10.119.18.111) by
+ p1wg14928.americas.hpqcorp.net (10.119.18.116) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Fri, 30 Oct 2026 09:00:43 -1200
 Received: from P1WG14918.americas.hpqcorp.net (16.230.19.121) by
- p1wg14926.americas.hpqcorp.net (10.119.18.115) with Microsoft SMTP Server
+ p1wg14923.americas.hpqcorp.net (10.119.18.111) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43 via Frontend Transport; Fri, 30 Oct 2026 09:00:21 -1200
-Received: from CO1PR08CU001.outbound.protection.outlook.com (192.58.206.38) by
+ 15.2.2562.43 via Frontend Transport; Fri, 30 Oct 2026 09:00:43 -1200
+Received: from CO1PR08CU001.outbound.protection.outlook.com (192.58.206.35) by
  edge.it.hpe.com (16.230.19.121) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.43; Fri, 30 Oct
- 2026 21:00:20 +0000
+ 2026 21:00:43 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YAE1d9jhyIAVjq5phkXY5S/GAVspbRanVPG3hxT1V32HpkLXA0fmwasavqHMozIn3m6gQzWESdogMcNywxoLDY7bdlL3mzjE2pZhLJFYkOJj1/SwnSix8tF7jUGBvnhpkUSY115rIw60FTeJ468HP34MRzhCciNrjJyazP4bt59VYk6trclQHpzQCCd2PGOLqQxrES+QfVabuYHBCdU/UYhwtJf9k+0J+YEqawYxnt4TH1luvrzUzmOzA1f2hZjrkCgVHenMV8vo3Ewxxgon2LL/K7OzHS0oAAOTYmO3eTE46/J8LRWClTlZCvCYaiwpOc/H/Na1dYSKsPJqQpWQvg==
+ b=wt9/Wqs+oCZBkv80zOHDSPav9UZZWOJV1T0FSbTzvoofY+183JhXw3el3pxkpNaXs2nZESWOdu+ejCTkXUDkz+3VCt55Dp38lXhiPiGBwrWdgdACbI5+29YD61JoM80HZd6GHPMz+2yXyp2MVuM0W0G9jLoupAaktMX9/uyAOccRnzY+LP3/cqDJe8CrAGfEJCow49eMaMLw6QNpAdVz5vaBROTJUfwcMKikicd+qOH16A4Ru4xK8kiNcRUwoBLKp+340QjnMMSFJ1Wf3mFny/A2+fMmFIpWMdKQv5FSrrmV9U8jkj9lnBL7ECTZzXTW4kGfbo+giD2lyv/8RUXZiw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UUetOG8bb12H7eTtGvbIiaV5Extzs9iFYH1LAkp3Hug=;
- b=ayAknQf3RGxB4OSczL98moXCsQo4UzYY4RztnEdDGPp108zxNo0C4Ob4eCXBNoemCGAuUK+etwTDPQslxYGisRH+JcvZS6I4v4sL2eLIbTSYHqxVk0xaKq26XA3ruJ7VWz2+zVyKrXqNjgnZi8JHoPAaVQYG0UWw4Y/fazGF7BdZUvPFSJYgKYX32tK/0UQCufpXJ8s8gAUNDqhSMk25pt0R4/njwIWJQmy9LbwMF4s8WEoZX0t464b/zVbHdNJZpSFiQ4qcThLVRsmXcrYNTEIUD+ghwiLo/R+n00EUhVQN0hDelG1nA/YH0WsE4WSwPNrkUNzglnRHD5MxNReVUQ==
+ bh=jokmvT97cdT91HDgt/UEHeaPTdXRagGP5/JD5X3QTQg=;
+ b=jzCAqTsveh3GhOoZSqfJE9Xd4ux+fkoGP+LOLNGw7rtuOpFPE/soAtVLDSkvThhpzgMOO7ssyJGvNN/FuWn9IVXfVvDIkcuNKjZZkmTybgfdMPYKaxXIPu6PllilJTEA8sFuk/AVgnqj1wn+N6CRYLlbucAxwu61zbI+ryjaNtXbI2UF78s2Itd0mMU/sUIHDSJHvsBQA3dr/KMhSJfjI7HONq3lbqjEOyNqbme07MeO5Yj/VFMBJcZqzsft2+yEZZrFTgvA/wb8BFwB5QQxJGiMTbi0DRaTYseGGPo6BqiXeV4a74HeEByLs3DyXLrq/r/B3VGhNuZXC7glQyG+XA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=hpe.com; dmarc=pass action=none header.from=hpe.com; dkim=pass
  header.d=hpe.com; arc=none
@@ -100,17 +105,17 @@ Received: from DM4PR84MB3970.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:8:225::20)
  by IA4PR84MB951192.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:207:144::20) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.569.10; Fri, 30 Oct
- 2026 21:00:17 +0000
+ 2026 21:00:38 +0000
 Received: from DM4PR84MB3970.NAMPRD84.PROD.OUTLOOK.COM
  ([fe80::d136:e75e:53c5:73d8]) by DM4PR84MB3970.NAMPRD84.PROD.OUTLOOK.COM
  ([fe80::d136:e75e:53c5:73d8%6]) with mapi id 15.21.0569.008; Fri, 30 Oct 2026
- 21:00:17 +0000
+ 21:00:38 +0000
 From: Doug Ledford <doug.ledford@hpe.com>
-Date: Fri, 30 Oct 2026 13:59:04 -0700
-Subject: [PATCH 08/23] net: hpe: sbl: add media, FEC and counter support
+Date: Fri, 30 Oct 2026 13:59:08 -0700
+Subject: [PATCH 12/23] net: hpe: sl: add the control layer
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261030-cxi-netdev-submission-v1-8-8c2c391cc283@hpe.com>
+Message-Id: <20261030-cxi-netdev-submission-v1-12-8c2c391cc283@hpe.com>
 References: <20261030-cxi-netdev-submission-v1-0-8c2c391cc283@hpe.com>
 In-Reply-To: <20261030-cxi-netdev-submission-v1-0-8c2c391cc283@hpe.com>
 To: Slingshot Open Source Team <slingshot-os-team@groups.ext.hpe.com>,
@@ -132,10 +137,12 @@ CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
         <linux-kbuild@vger.kernel.org>, Doug Ledford <doug.ledford@hpe.com>,
         "Sandeep
  Bhoot" <sandeep.bhoot@hpe.com>,
-        Mamila Santosh <santosh-kumar.mamila@hpe.com>
+        Mamila Santosh
+	<santosh-kumar.mamila@hpe.com>,
+        Iraimani P <iraimani.pavadai@hpe.com>
 X-Mailer: b4 0.16.0
-X-ClientProxiedBy: CH2PR10CA0024.namprd10.prod.outlook.com
- (2603:10b6:610:4c::34) To DM4PR84MB3970.NAMPRD84.PROD.OUTLOOK.COM
+X-ClientProxiedBy: CH0PR03CA0017.namprd03.prod.outlook.com
+ (2603:10b6:610:b0::22) To DM4PR84MB3970.NAMPRD84.PROD.OUTLOOK.COM
  (2603:10b6:8:225::20)
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -148,1822 +155,6575 @@ Precedence: list
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: DM4PR84MB3970:EE_|IA4PR84MB951192:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2b50deb5-f084-4898-ea7e-08df36c8cd0f
+X-MS-Office365-Filtering-Correlation-Id: 74a4694c-6338-4dd5-2052-08df36c8d905
 X-LD-Processed: 105b2061-b669-4b31-92ac-24d304d195dc,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|23010399003|376014|7416014|1800799024|366016|6133799003|18002099003|22082099003|3023799007|921020|56012099006|5023799004|261021121427099003|261026130827099003|261028144727099003|261026121527099003|261026135527099003|10067099003|261026140227099003|261021133027099003|261022115727099003|261022075727099003|261021130227099003|261022113327099003|261022105027099003|261021123027099003|261021135927099003|261009223027099003;
-X-Microsoft-Antispam-Message-Info: pKbEIOpUpeae7bRCenkCLiS45csp93aaeNsx3Ra9crj+QH8/3k/dA9MK90TkHjlXoZ7pm4zBmpSogADZ+CQMDblQjo1gMfNxRpB1zykw5NJcYN4BHD+pGs/zZuMf138m7uklkAV+5QqxjPYyB2OJv7/qeiB/JsmIPV9LViVVwIq3WBNqgAOHDJOLhfKNkegEZgrS4QPMeytxw0ur0ODLRjVs1HWZbML224ReVChe5q8P0iKCFeG+ZSvHNyTvaoYs+a1u6TXgoUAJOD1kB+E3MPsIwAtqYiCL47YjdI7eWvyoZEnTFbm6FYugG6IDymlsHisd5PVT0F30hr8eAoDJdlex64hU2UbBQ16CV7aACvA6nOJzCBl3MolQu0h52bzVvCXmf01v1nkuGP6ytIkKgkMks7DqoFyBR7YGLqPNvInZRUMqbi3kWqQFtOtmxxyef33vlJjWNwSFd4CAQcG7gspP5vFupMprZfVDY7u0R8vz5GDjpYo5LZW1sEXZwfKsEThxcnNncQ0h6Iv+eGMSQ0SDohzvoCej2uwfoLeQBKscZyNztppAbRb0RT8aNFfrmO8uc2LZwzm8+Wsljsrj1HES+pTEipRlTo1a7GyQWPn9k22KjeuYrRYeUIdzMrDHgcW+eBguIBnwnIB3ZfY6gGJ0BCXDRlW6X8DGDgS5ZIFGAk4p33xvw9puqjN5LsSHy+er7awbCirNSLL1HbhCyw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR84MB3970.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(376014)(7416014)(1800799024)(366016)(6133799003)(18002099003)(22082099003)(3023799007)(921020)(56012099006)(5023799004)(261021121427099003)(261026130827099003)(261028144727099003)(261026121527099003)(261026135527099003)(10067099003)(261026140227099003)(261021133027099003)(261022115727099003)(261022075727099003)(261021130227099003)(261022113327099003)(261022105027099003)(261021123027099003)(261021135927099003)(261009223027099003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|23010399003|376014|7416014|1800799024|366016|6133799003|18002099003|22082099003|921020|56012099006|261021121427099003|261028144727099003|261026121527099003|10067099003|261026140227099003|261022115727099003|261022075727099003|261022105027099003|261021123027099003|261021135927099003|261009223027099003;
+X-Microsoft-Antispam-Message-Info: 4GQLdtK7bylrm+YC1t6s+Ro7P+LVrCRrI0mb1hjshhgP4TLcwEfd9VbMu2CP8QQnQyZSpaQC2PTttFiPh1P17YoXC3O0ZE+SQ9aWBAo/rst5+nMNx9DeJTK1RHTvabxUKLL+Rb6DKwGw9TKBGgoNGMZjvDSNIpzA+ocLbR02s53+t6WAVA1xDuhW8805Osh2qlOKzaEOlvnPpm0IogIqc9OlXwinzmrb0/7TXJaHOY6mvU5ZrVtAKrLq6uARPM7mRu5Xr+omJHRRKWKBaDubQ9AWe3DqYFilpgUY4tmwOIP5PyABGodA9XkCD84ETXsp3YRP/MQXron8SPQbg/6vKhQnFjUAz99TB5fUYUDj4NetHbN//RiSiH+YcSG2So8AfrDGfHvFYTh1T6p1TLL62OXBViiYyAcr8IzO1fm0juxWePKzCmL213p64uCSHzlR9CutKrHykuTH0RZnue7qaA+z4zdRI/8o3PB+gqINLEKlRhOa0MURQ+u/25x3rpG9OHzocl0PxJycCN6evS8dLvQRzAdXpiOIfTZnr6sVGtRTKUVGIRuf71OQe2x9CTfA9dhgarbdvbRn+tg8ZfygNL3IO78jXb6GQlFkC1ssb6B1eiwKD6Y5uiWIzq5nIoA+e+/JJkxHDD9SYGhgONINsNXyubIf5TJKKR4Fr39oq+tfzGkapzOgy7wYwQ5Mu2HAAvkvuUXEtrILmhpyw53DNg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR84MB3970.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(376014)(7416014)(1800799024)(366016)(6133799003)(18002099003)(22082099003)(921020)(56012099006)(261021121427099003)(261028144727099003)(261026121527099003)(10067099003)(261026140227099003)(261022115727099003)(261022075727099003)(261022105027099003)(261021123027099003)(261021135927099003)(261009223027099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?b1c0c24zL2IvSzZFS3ltbmplQlE2SHlIN1BvYS9QTXlyVWc2TzVVTGFqRkoy?=
- =?utf-8?B?SzMyRTVyckNRVTd5MzZTc1FTWWFhdWlHQUlLc3JqM2dWNFc1VlVWK1k0RklE?=
- =?utf-8?B?aUw5VjFlTGoxMkorN2JrMThpYk9aaWpPSFZwZmliYm44cGI2Z2gvdXVvMzIy?=
- =?utf-8?B?WDhnVlVHdEljbXJicmR2TkN1bXhYcTNLOXFUUGJEZFZGRjk0M0UrUmMwaGpD?=
- =?utf-8?B?ZGZrNkprbkx5UHFBQ2xKTUdrL05qSnFvbzNCVjZQSFVJV2ErandpYUJIUHQr?=
- =?utf-8?B?NmZMa2szbFhCam1OWEZJZHdDcW45VU5paGJyZ05TS3pRdG5RcHJKQ3gxTkxr?=
- =?utf-8?B?NWZIMUczTHM1ZzU5TWdJdVBYTDVlYjBDd2t4QUJDNmJsajZjOVJRSmJVeTNa?=
- =?utf-8?B?SUtNbjBib0tVWTcrOFFZejRZU3N1TXEzaDVoUUZPNVEyYjFwMENjNjRoZFB1?=
- =?utf-8?B?cjhCYWhncTNYUUJ4U01NWitWSERLamxHN1RKeG9LYVEvK0NURkN3d2tQSmFn?=
- =?utf-8?B?SHRNWXY1NE9ONGRtaWQ5dW1yTlhua09ocWszRXhjcDhvZTdJSVJaMk1RRWE4?=
- =?utf-8?B?OFNOeXdUcWFKSklSUGZBTWJHQytrZFJNak9WWS9KdGFmVW5TcVMrczVUWCtL?=
- =?utf-8?B?eWcreVpINi9Tczc4VWdiV2lPMkZFN0JYMjR1NW5ETkFjaFY0OWliZ3V5cHBm?=
- =?utf-8?B?MHJJZUFiQWplUDNITy9yanBMWFlldXdhQTIycWZqd2NzZXByQnhJMG5kdzZO?=
- =?utf-8?B?MVhkbyt0RFJSTTNEdkl0RWtIZlpwS3ZpUVgwbVZZTkZ4eVlwdlhFVlNnQWx1?=
- =?utf-8?B?WUFtOWcvNnBDN0phY2V0MENsVGFBVTVPNlZyNFBPL29Ud3BrZlZsVitDcndH?=
- =?utf-8?B?c2VxWk5GZXk5eldscmdzcVl2MGIyMi9semM2SWcvSmI0VnN4VUxxYlFUd0ww?=
- =?utf-8?B?NmFsZGhSKzhPaUZnaGVvQ2VXTmhSeWdycWxYTVhsQzFaeWlPQ1FJVklWNVF6?=
- =?utf-8?B?WHhSVU1oQ3BZeTFLNzN2Rzl6QS9DQVNUMFczdTBIRVdwK0E5OXR0SU5MVmgx?=
- =?utf-8?B?NU5zWXQwdmROdWg1WXFnOTE5Smc3TmVJUnovQTVaNFVmdTBGeksrUEpnTVA4?=
- =?utf-8?B?MFRDODBGakRVREJPcmdPMktVZkxubndEMWN3aTZ0RWFqcDRobUc2VFJkOGdl?=
- =?utf-8?B?Y2NJeS9ySExoSzBBVVNCS3N4VkpLdGIxR1FGWnFNL3lRVTRKWGRBcmxuWFNL?=
- =?utf-8?B?blJkT3FVRDB1alJEbjZaM1owcklTd2NFQ0hTZGNPTnZ3ckZvQTNqanFoZUo3?=
- =?utf-8?B?WWxSUWNKZXQ4bUhabTY1NmMyRDAxWE4zbWdHVGVITGNSMHl0b3RhT1F4eldY?=
- =?utf-8?B?eDJ0VFMrcTZqVU5ybGJKZVVWV2V6SUx1QUhXTFpCRDlaZHhNRFMrMmFxVXJq?=
- =?utf-8?B?N28yR1NBcVBOV05iMVdYTS9lV1QycUVHb0NzaHRURUJBRzlNZGxOcWVnU3hy?=
- =?utf-8?B?cjJQWEIxTVZtZVh5TFR0U1I4TGJkQUMzNkZieDRzTnY3ZlpnV0pEMFJEck1j?=
- =?utf-8?B?UDI4bzZxcE1QYjYrOGFtem5YbDJoK3ErOFN2WFhLSWdJbWN6ZEpGcWVIbDAx?=
- =?utf-8?B?Nm1EZlArTTM4dFQxSkFjSDJyblN4UWlvaUlnRmhSd1dLTmFYajF0c0Y4ZHdo?=
- =?utf-8?B?eTZkOTJleGY2SlNVMFRiVnZrTmpPbUNXcFBHVERqSE1TbmIvdVFsOU1JR0p5?=
- =?utf-8?B?RFdweDhGaEdPNzRpbHE4VUI0Nk1yV0dkZXNlaXNJVitLcnFMZjZ1ZC9jbWNs?=
- =?utf-8?B?aEpYWFdtbHlqUUozeWF0MDlqS1paWWdvQ2lxZjAwaGE1WmFtdkpsL0tGcXU3?=
- =?utf-8?B?aVNoeHVNaG9odmJSTzFiNHhBbEJzMUduMmdFSmJJRkdSOWJzZ3V3TVIwMU84?=
- =?utf-8?B?eGhaWm9qVDcwSTNvbC8rRUE0Q3dBVFFJcmN4c3U2T2o1YkVoa2l1dEJXbzZz?=
- =?utf-8?B?ZXpiakRTeWpsNlg3cnRGSUhMb1hkTFRqdVhkNlVXSzk0bitaK0dBOWFrTVdq?=
- =?utf-8?B?MVczc1ZvbitYb2FkMWZzOGxJN2tWRGF4bUJIcFE1TzhjNEVFNG4rYXhmbGNx?=
- =?utf-8?B?WEhEbTFtWU9McE5uZUxBMHhoTlZ6KzZja25IenNudEdUSWpZeE5adjlCQ2VS?=
- =?utf-8?B?R1g3aXhSRkdpakFDMmNDYVk5ZXBuOWNnSWJvRHlXbUpxdWdGRDdLa09wcXRm?=
- =?utf-8?B?clRLMTdKdUxxT2NHWUp5OUhrcmdFNyt1MHdDUDJESlMrZHplQnd5c1RIcE5w?=
- =?utf-8?B?OENtWkRyWC9kT1ppMHRsWU1meDkxTzhyNjhTTVl4WkRrbE5oS0Rtdz09?=
-X-Exchange-RoutingPolicyChecked: p7UQv6nJkH+Obs9mIW/nrOIcRheg2cQK51KORKN5tRZMsuYY22VA5j2VKlJNZ8y5/WKQH98Vk5KtkeYwzGOLWTPHyYDl6C/5YH5chZH6BUFhnjzdQo1SW/UWp4HpeN9MnytUKMiP8vkThuOPy/HITZ0h7z10y+Px1i6G3gG/URVs2qUvkhxaxx20kMPvzY4w1e7kfpYyoTt80BYegDnXBAjYPDOYfhsOABOEyNn+7o4PRhKXlMvJWaeNI/gdH2+LMVAVsUASj0AKllrpH0CM9e1wuS30y0QdiFnop5PsOH9Bf9hhbE9rCM3PF2cqlXD/ZZGdfEqyJMFyOt28tY/Wkg==
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2b50deb5-f084-4898-ea7e-08df36c8cd0f
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aHR0WkVRQSs3VDE4eEZFSXdGcTBFTnJnbE4yWHA2d0ljQzI0NmJTMWp0NXdJ?=
+ =?utf-8?B?OXA4Wis1NDVOSnk1UWdibFBySng5cHdWWFhHYkpZcGJMaE1ES2pZS3hQRjJ0?=
+ =?utf-8?B?bkpSUEdFbFcxTmNIK0dId0tXT2xLeXcwdXdMT2xSUlVqWWk4NjlZbjhEMnVL?=
+ =?utf-8?B?VkNjR0FETnh4NmVXMExWeWNDMFd6U0J4STlhNCtuOThvdmwxS1lTK1JpdFJj?=
+ =?utf-8?B?bzcwWFdLRGkzTE16RFhGSzJMQWIyeWM5eWFaWTBydThJbHcwcUhmRXBLMm90?=
+ =?utf-8?B?OVBMa2crZEZrOXBqakpVRUtYYTREWUp3alRRaDd5eTFSZ0IrcWVpS0g5am84?=
+ =?utf-8?B?WDh2SDRWdmYvZm9NU3VwQjBGSGxOSlBvYU04OUR0dlpOSXMyaEIwalVYR096?=
+ =?utf-8?B?ejhhRURlR1ZGRkJZTkFYbmJuQkI3KzdpcGIxdjRxVDBhWG1HNktpTWdvNW0x?=
+ =?utf-8?B?UWViZXN4MlpBbjVTclI1bXR3UktPWTgvNkJKWm85Zk9NN1QveTlMT05scGhL?=
+ =?utf-8?B?VjRtaHV5NHZ6RzJ2ckhBK24vWUdPdkN4eFJYSCttSDU4cU9ld1p5RlRmYUV6?=
+ =?utf-8?B?VUJTd3p4djFZajZHbi84ZUlEMU8vaWZuNkRnT0ZpenJ3Q3o5OGkwKzlrVUNS?=
+ =?utf-8?B?cEdHc2JiMnh1Q3ZPTEV0ZjdxUm5KZmh6cGJYa2lpY21WQ0RBZ0ZvaTdKVHBS?=
+ =?utf-8?B?SlRIclU5VVZ1WTREKzdGS09DVVlnUEt1ZnBTNTViTkZhVDZNamVldXV4WHpm?=
+ =?utf-8?B?ZG5yaGF0SkhKdUJhM0d5b2c5WXN3aC9wU0ZrVW0vbkVJdE4xZ0JtTEtOWjR1?=
+ =?utf-8?B?ZldFZzBhUnlGZTZhdmpXZHFqd1Rick91cUsrTG1yTjV5WTUzMzBGN3h5Zk8x?=
+ =?utf-8?B?d2dpMU1QZWxNRnBMTFF4Z3RkbjZTbEZIb1duZFB0TWM2Uk9CcUo0MDcwMTVx?=
+ =?utf-8?B?dmVhQkFUeFc5eWJPYU5qR1hDcWUvWWtPTWNaUmpnOG1LU003STB1SytWNEJu?=
+ =?utf-8?B?ZW5HcXFkYjdhbWE2aWJQbExrMXJFTnZOSGRudERTcy82dHcveXc0Mk55bkNC?=
+ =?utf-8?B?NUJkWGNIcXNLcGtqZnZBbXBaRUNLaGNMc2JOUVZIRTEwbEo1UWR6R1Zvenho?=
+ =?utf-8?B?Z045ZFpoS096SmZRblJ2UFRZVW44MVpjTy9aZHZOM2JFVW9qVVhHQ0ZWc0V5?=
+ =?utf-8?B?a0xzYXVncmpvK0dKRS9UY2VRK1FYNStqTkU2dGZsVHVQSFBiNm92Y1A4NXFR?=
+ =?utf-8?B?YndySktKT2NzRUk5bGIxTU9NTGJWYUppK1VZeXF2bFpkczQrKzEwUVRjaEM5?=
+ =?utf-8?B?LzAvUHlwNldiNFJ3WWsrWjB3UlNtTFNpKys4OVl3dm0zOElZa3VQT2ZjVVpD?=
+ =?utf-8?B?SmRJRG04dmNUTkc5SVhWRkgrbWdNWXpXNFAwS3RoNkxhQ2ducm92eU51L3VK?=
+ =?utf-8?B?V3QvTVRRdkxWRmRtRW5kNVR4NzBzaEtyeHVkME9UeU1GVWlyZDBGdXJmNE1Q?=
+ =?utf-8?B?TW81cG42amZjNjUwN1JXaEMwL3hHVjgzSHZNREhSZG1SMXRiVzlKSG1SSzlh?=
+ =?utf-8?B?RjI5Y0xGcW9tV2F6T05seC9xWVpUYXFoOStBVjNOa0hoVzgvQi9MUjh4Qjhh?=
+ =?utf-8?B?Zjh3UlRCSnlwRzU3QmFSWkRCZVA2eVJmd01FOWZWWGVkTXlhSjJqdDlmK1Yz?=
+ =?utf-8?B?TytHbUFEM0dQNkt6eldJaGlLRHhhbGJLUDY5dlc0dGVSaGZCYmVMdjJUNHRa?=
+ =?utf-8?B?Y1NBRjUxODZoN2V4K1ZPOE5IOWg1T0l5NHNIc2ZpY2JQMXhkTXBpYTcrSnRK?=
+ =?utf-8?B?LzlwcTlFVkc5Qk80akpKdnVLQzFSNndoZVVvc0R4OWZ6RXZPZkNRUEE0c3pQ?=
+ =?utf-8?B?ZzcyOUlQVHJiczN1QTgyVFlCZmpWemxkczQ0MmRzb0svYnQ5eGYxRktDN0tz?=
+ =?utf-8?B?R3pVeVNob0lIMVJ5cmZMUjdJZGNqUHprcERVNGgrMjVyNXdBMCs2ZEw1Y1Fi?=
+ =?utf-8?B?RUZ0bFc0ZmhSclFtVDUrWFNsUFNrNWg2cVJLYTdDUnozYWdNTmdGMkNndjl1?=
+ =?utf-8?B?SDdPQ082bXI3WXBiUkMxcXhHZ0FGdVN6R2RkOGdjNVhha2xRak5yTFFPSHZW?=
+ =?utf-8?B?aHRmZm1STXBhNWFVWVlMWWZ0RTJmZVoxNDRlOHNQNmtjTE9hSDhuL1NjV0NB?=
+ =?utf-8?B?MU92ZCs1bnZiK1BmK0M5QzFGWVdwa2owSytyY1VvZHIrd0NSdDVydHMwMFA0?=
+ =?utf-8?B?czI0WDU1dVZOZG4wc1A0OHFwSjRnTGxQeUszTk5jNldsclRJeUo2N0dBM0hz?=
+ =?utf-8?B?TlBTTS9FcWk1V2NWemRPa3NvYXUzcFBKZHp1Q3M0YTcwVzlpajc5dz09?=
+X-Exchange-RoutingPolicyChecked: y4nJ4ylvZw1Hgvnd7xjSuv7vvciZUp7lDWtpNBPk+F7YA00FPXBD58OMFcXPJsA7YqY1en4UwbCVzU2if1h2tLqHT+D6TztUaxIHhPsk8xd6fARjJSwQxRCjIOvHGYNHaudBM2z1cN9YRW/oSL9832d/q7H8gnLY160sVMqoVfjG2GJ3w6C5zFnMLIG8VzGpb9lcz8+jB68px+g1SRZ7h3hxTl8qHOVCB6VnAhK7sdu/HHtKaPh3yoDnR+Cdz7eWj3pvZ7tHbVvXjjwV8HLesTE3JLS568tmeSYHQSLpePecYg1SroH85H0VipUssZ44efj1wCwoSIl4bnavMYbIDg==
+X-MS-Exchange-CrossTenant-Network-Message-Id: 74a4694c-6338-4dd5-2052-08df36c8d905
 X-MS-Exchange-CrossTenant-AuthSource: DM4PR84MB3970.NAMPRD84.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2026 21:00:17.5954
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2026 21:00:38.0939
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 105b2061-b669-4b31-92ac-24d304d195dc
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Fqoryb+6xbc5NSV8flu9nXwHoSuTmAw1ILqHkjfO0RT44HGKpBZJJk9PtOIiemtTjhUAsEelKY/0yOUxDeBhyg==
+X-MS-Exchange-CrossTenant-UserPrincipalName: sCrLy1pF7eOegkc/FY7L4ihw7FrG+rv8NpzV/2wQnbicndYle/8o+E4JOMEqPO9gAMQpbpIqFQbwnvY6phElyA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA4PR84MB951192
 X-OriginatorOrg: hpe.com
-X-Authority-Analysis: v=2.4 cv=QOf91QLL c=1 sm=1 tr=0 ts=6ae5056e cx=c_pps
+X-Proofpoint-ORIG-GUID: 1IadV2qlMA46P35Cw3RT641kmqENWLVA
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDMwMDA4MyBTYWx0ZWRfX2eY66psVO8R/
+ ioi0SmD/j9quOdT1DJlCqR+4ebtRa2K3kesRCNvlAvKYMOTjDQiV8MAJyAPsWQpkfuh2lLy7V2g
+ MiOtNBpmrEQzrGckrJZGAn79RafnB7wRaeZrM7W6MccGG6FTTdgesezkKYQe+WHyfowvIzqcMZl
+ tZjO3kb3M5IeoTzeu52d14a1bvFgHtbdIwok8k1KFnymXLOnIqT9lTZ7RNvxtDPGUGUtdZMHau6
+ WtxHKDUXZcS01CSoZuAnRwRi+3oDpLRayVeStDGwY6yPHeULLOu3raalDMtMnpUJ2DocSHOS5A2
+ V5pqJ8XSfxg/+vDrGgk/QS/zERVGhPJbON8DMoz1olGaCrq0nsT8skXmmSq4ZCiVjpu2MltafIv
+ memwqNni4ZAPvz5V9eZKCnjoyzYaFXqJ8fxhvbtlk+ji5yavHsLv/+SMSCH5F+os2NNZ/PmZ3OT
+ skQSQNz7dDV5/7cYQkg==
+X-Authority-Analysis: v=2.4 cv=It6L47/g c=1 sm=1 tr=0 ts=6ae5057d cx=c_pps
  a=UObrlqRbTUrrdMEdGJ+KZA==:117 a=UObrlqRbTUrrdMEdGJ+KZA==:17
  a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
  a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
  a=660iZSQnnn4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=gQcMVamqm3wCPoSYhaRC:22
- a=3haJ9R1Aw3gUfsUHDaCR:22 a=MvuuwTCpAAAA:8 a=iTzTgzf_AAAA:8
- a=uJ3LQuXv2TKb7hm_gHAA:9 a=UgyqpFzXoMhERF59:21 a=QEXdDO2ut3YA:10
- a=JL7qxNyGISI99KadRA9B:22
-X-Proofpoint-GUID: _oqZsscYN_RL4Xv66yXuOR35ZX5m-JEN
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDMwMDA4MyBTYWx0ZWRfXw3XE/CqWS2Yg
- jENnRA01GWha/yQdegB3J5+k03SbeUZs9whNJLVXnoD3La/txPKLVEwCtRDjDJtQHkkiXAE53em
- TNiWgC1qDaHGux9CA6VI3GRvXaIUKlm7WPEjCBGk1+ozBRKlQc6IS4Ma/VVwZei9PFkG3ghIPfY
- c66cdSX+DUFgjX/uduiMzZbzixAvtHEfvDjMTkHPiigv9wPyqjCkv3FXlb1E0Xly7mHJ7K+Xsdq
- lmsq4v2DXj25wnrviv4jtLsKK24blfmve2Q2MMVMZsuVY+PAP7ACy0o0w/3MImIJrA/yoSJmAQe
- 00iiEU0g6ZWmnsMWw7Etny+xvtOpK9bp8Geap96YFDcU+g4y5OAOwavbeByfHXyavfhZVrQ35bJ
- 1B8fZtHInYZBxuWfSQlyPJld6n5uu1GRGjG/74gSH6XPUTdEiVf9fPDqjs/M0CHzxZ7+R0mAfRA
- VALmqHuuj9mpQyIPiEA==
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMDMwMDA4MyBTYWx0ZWRfXyJiWaY+FhNnr
- qLMUeYO0MG4ZGHYaNkvGenxfo/P0pDQSdlY+it9ob4nkiddewcTc5TIDV+fncSIFI3AjTUVXXMn
- OiPB5NVVISpL9BO84SiPQ446ZD8AW3M=
-X-Proofpoint-ORIG-GUID: _oqZsscYN_RL4Xv66yXuOR35ZX5m-JEN
+ a=ModqzXLkJJ0tFyq98apW:22 a=MvuuwTCpAAAA:8 a=LheknTmOAAAA:8 a=L5Av9709AAAA:8
+ a=2BiQyANNfSttp-q31nQA:9 a=PIuFQOwuOW9NwPU1:21 a=QEXdDO2ut3YA:10
+ a=CJm8_YjmqYhBDa0z6R8t:22 a=Jwhx0Ts52bvbemp9dy6E:22
+X-Proofpoint-GUID: 1IadV2qlMA46P35Cw3RT641kmqENWLVA
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMDMwMDA4MyBTYWx0ZWRfX/ZX+o7RbXo4V
+ Ixu38zYx3WNJx7FWbE+QOpv9hQeSD+mhWXOo1q5xE3sMrYX1sIxtsxjsmPGwJW/BiV1DcJ6k8Ou
+ eHEwGKAkB9fITvU3N80Vu6lmanfC7u4=
 X-HPE-SCL: -1
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
  definitions=2026-10-30_06,2026-10-21_02,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 phishscore=0 lowpriorityscore=0 spamscore=0 impostorscore=0
- bulkscore=0 adultscore=0 malwarescore=0 priorityscore=1501 suspectscore=0
+ spamscore=0 lowpriorityscore=0 malwarescore=0 adultscore=0 clxscore=1015
+ priorityscore=1501 impostorscore=0 bulkscore=0 suspectscore=0 phishscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2610190000 definitions=main-2610300083
 
-Add media detection, FEC (forward error correction) configuration and
-the link counters.  sbl_platform.h is updated for the media fields
-added here.
+Add the SL control layer, which validates and serialises requests from
+the NIC driver and sysfs onto the core state machines, and delivers
+link group notifications back.
 
 checkpatch --strict (100 columns) still reports the following in this
 patch. They need coordination with the internal repositories this code
 is maintained in and will be fixed in V2:
-- WARNING: LONG_LINE (5)
-- CHECK: BRACES (16), UNNECESSARY_PARENTHESES (10)
+- WARNING: LONG_LINE (239), LONG_LINE_STRING (18), LONG_LINE_COMMENT (2)
+- CHECK: UNNECESSARY_PARENTHESES (21), ALLOC_SIZEOF_STRUCT (4)
 
 Co-developed-by: Sandeep Bhoot <sandeep.bhoot@hpe.com>
 Signed-off-by: Sandeep Bhoot <sandeep.bhoot@hpe.com>
 Co-developed-by: Mamila Santosh <santosh-kumar.mamila@hpe.com>
 Signed-off-by: Mamila Santosh <santosh-kumar.mamila@hpe.com>
+Co-developed-by: Iraimani P <iraimani.pavadai@hpe.com>
+Signed-off-by: Iraimani P <iraimani.pavadai@hpe.com>
 Signed-off-by: Doug Ledford <doug.ledford@hpe.com>
 ---
- drivers/net/ethernet/hpe/sbl/sbl_counters.c  | 137 ++++
- drivers/net/ethernet/hpe/sbl/sbl_fec.c       | 971 +++++++++++++++++++++++++++
- drivers/net/ethernet/hpe/sbl/sbl_fec_nic.c   |  36 +
- drivers/net/ethernet/hpe/sbl/sbl_media.c     | 482 +++++++++++++
- drivers/net/ethernet/hpe/sbl/sbl_media_nic.c |  47 ++
- 5 files changed, 1673 insertions(+)
+ .../ethernet/hpe/sl/ctrl/data/sl_ctrl_data_lgrp.c  |  164 +++
+ .../hpe/sl/ctrl/data/sl_ctrl_data_lgrp_trace.c     |   50 +
+ .../ethernet/hpe/sl/ctrl/data/sl_ctrl_data_link.c  |  424 +++++++
+ .../ethernet/hpe/sl/ctrl/data/sl_ctrl_data_llr.c   |   64 +
+ drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_ldev.c    |  290 +++++
+ drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_lgrp.c    |  351 ++++++
+ .../net/ethernet/hpe/sl/ctrl/sl_ctrl_lgrp_notif.c  |  258 ++++
+ drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_link.c    | 1230 ++++++++++++++++++++
+ .../ethernet/hpe/sl/ctrl/sl_ctrl_link_counters.c   |  388 ++++++
+ .../net/ethernet/hpe/sl/ctrl/sl_ctrl_link_fec.c    |  202 ++++
+ .../ethernet/hpe/sl/ctrl/sl_ctrl_link_fec_priv.c   |  539 +++++++++
+ .../net/ethernet/hpe/sl/ctrl/sl_ctrl_link_priv.c   |  865 ++++++++++++++
+ drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_llr.c     |  630 ++++++++++
+ .../ethernet/hpe/sl/ctrl/sl_ctrl_llr_counters.c    |  136 +++
+ drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_mac.c     |  536 +++++++++
+ .../ethernet/hpe/sl/ctrl/sl_ctrl_mac_counters.c    |   56 +
+ .../ethernet/hpe/sl/ctrl/sl_ctrl_media_counters.c  |  157 +++
+ 17 files changed, 6340 insertions(+)
 
-diff --git a/drivers/net/ethernet/hpe/sbl/sbl_counters.c b/drivers/net/ethernet/hpe/sbl/sbl_counters.c
+diff --git a/drivers/net/ethernet/hpe/sl/ctrl/data/sl_ctrl_data_lgrp.c b/drivers/net/ethernet/hpe/sl/ctrl/data/sl_ctrl_data_lgrp.c
 new file mode 100644
-index 000000000000..90feb6436105
+index 000000000000..279e41770f48
 --- /dev/null
-+++ b/drivers/net/ethernet/hpe/sbl/sbl_counters.c
-@@ -0,0 +1,137 @@
++++ b/drivers/net/ethernet/hpe/sl/ctrl/data/sl_ctrl_data_lgrp.c
+@@ -0,0 +1,164 @@
 +// SPDX-License-Identifier: GPL-2.0
++/* Copyright 2025-2026 Hewlett Packard Enterprise Development LP */
 +
-+/* Copyright 2019, 2022 Hewlett Packard Enterprise Development LP */
++#include "base/sl_ctrl_log.h"
++#include "sl_ctrl_ldev.h"
++#include "sl_media_lgrp.h"
++#include "sl_core_lgrp.h"
 +
-+#include <linux/types.h>
-+#include <linux/kernel.h>
-+#include <linux/slab.h>
-+#include <linux/device.h>
++#include "data/sl_core_data_lgrp.h"
++#include "data/sl_media_data_lgrp.h"
 +
-+#include <linux/hpe/sbl/sbl.h>
++#include "sl_ctrl_data_lgrp.h"
 +
-+#include "sbl_internal.h"
++#define LOG_NAME SL_CTRL_LGRP_LOG_NAME
 +
-+/* create and initialise the SBL link's counter array */
-+int sbl_link_counters_init(struct sbl_link *link)
++int sl_ctrl_data_lgrp_err_trace_enable_set(struct sl_ctrl_lgrp *ctrl_lgrp, bool err_trace_enable)
 +{
-+	int i;
++	struct sl_core_lgrp *held_lgrp_1 __free(sl_core_lgrp_put) = NULL;
++	int rtn;
 +
-+	if (!link->counters) {
-+		link->counters = kzalloc(sizeof(atomic_t) * SBL_LINK_NUM_COUNTERS,
-+					 GFP_KERNEL);
-+		if (!link->counters)
-+			return -ENOMEM;
++	sl_ctrl_log_dbg(ctrl_lgrp, LOG_NAME, "set (err_trace_enable = %s)", err_trace_enable ? "true" : "false");
++
++	held_lgrp_1 = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
++	if (!held_lgrp_1)
++		return -ENODEV;
++	spin_lock(&ctrl_lgrp->config_lock);
++	rtn = sl_core_data_lgrp_err_trace_enable_set(held_lgrp_1,
++						     err_trace_enable);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_lgrp, LOG_NAME,
++				      "core trace enable set failed [%d]", rtn);
++		spin_unlock(&ctrl_lgrp->config_lock);
++		return rtn;
 +	}
 +
-+	for (i = 0; i < SBL_LINK_NUM_COUNTERS; ++i)
-+		atomic_set(link->counters + i, 0);
++	rtn = sl_media_data_lgrp_err_trace_enable_set(sl_media_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num),
++						      err_trace_enable);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_lgrp, LOG_NAME,
++				      "media trace enable set failed [%d]", rtn);
++		spin_unlock(&ctrl_lgrp->config_lock);
++		return rtn;
++	}
++
++	ctrl_lgrp->err_trace_enable = err_trace_enable;
++
++	spin_unlock(&ctrl_lgrp->config_lock);
 +
 +	return 0;
 +}
 +
-+/* destroy the SBL link's counter array */
-+void sbl_link_counters_term(struct sbl_link *link)
++int sl_ctrl_data_lgrp_warn_trace_set(struct sl_ctrl_lgrp *ctrl_lgrp, bool err_trace_enable)
 +{
-+	kfree(link->counters);
-+	link->counters = NULL;
-+}
++	struct sl_core_lgrp *held_lgrp_1 __free(sl_core_lgrp_put) = NULL;
++	int rtn;
 +
-+/**
-+ * sbl_link_counters_get() - Get a block of SBL link counters
-+ * @sbl: A slingshot base link device instance
-+ * @port_num: port number
-+ * @counters: Number of counters to read from 'first'
-+ * @first: Index of the first counter to read
-+ * @count: Number of consecutive counters to read starting from 'first'
-+ *
-+ * Reads a sequence of counters starting from index 'first'
-+ * until the given 'count' and stores them to output
-+ * pointed by 'counters'
-+ *
-+ * Return: 0 on success, negative error code on failure
-+ */
-+int sbl_link_counters_get(struct sbl_inst *sbl, int port_num,
-+			  int *counters, u16 first, u16 count)
-+{
-+	struct sbl_link *link;
-+	int i;
-+	int err;
++	sl_ctrl_log_dbg(ctrl_lgrp, LOG_NAME, "set (warn_trace_enable = %s)", err_trace_enable ? "true" : "false");
 +
-+	err = sbl_validate_instance(sbl);
-+	if (err)
-+		return -EINVAL;
++	held_lgrp_1 = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
++	if (!held_lgrp_1)
++		return -ENODEV;
++	spin_lock(&ctrl_lgrp->config_lock);
++	rtn = sl_core_data_lgrp_warn_trace_enable_set(held_lgrp_1,
++						      err_trace_enable);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_lgrp, LOG_NAME,
++				      "core trace enable set failed [%d]", rtn);
++		spin_unlock(&ctrl_lgrp->config_lock);
++		return rtn;
++	}
 +
-+	err = sbl_validate_port_num(sbl, port_num);
-+	if (err)
-+		return -EINVAL;
++	rtn = sl_media_data_lgrp_warn_trace_enable_set(sl_media_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num),
++						       err_trace_enable);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_lgrp, LOG_NAME,
++				      "media trace enable set failed [%d]", rtn);
++		spin_unlock(&ctrl_lgrp->config_lock);
++		return rtn;
++	}
 +
-+	link = sbl->link + port_num;
++	ctrl_lgrp->warn_trace_enable = err_trace_enable;
 +
-+	if ((first + count) > SBL_LINK_NUM_COUNTERS)
-+		return -EINVAL;
-+
-+	if (!counters)
-+		return -EINVAL;
-+
-+	for (i = first; i < first + count; ++i)
-+		*counters++ = atomic_read(link->counters + i);
++	spin_unlock(&ctrl_lgrp->config_lock);
 +
 +	return 0;
 +}
-+EXPORT_SYMBOL(sbl_link_counters_get);
 +
-+/**
-+ * sbl_link_counters_read() - Read value of a SBL link counter
-+ * @sbl: A slingshot base link device instance
-+ * @port_num: port number
-+ * @counter: Index at which reads the counter value
-+ *
-+ * Read link count value based on the 'counter' index
-+ *
-+ * Return: value of a SBL link counter on success, 0 on failure
-+ */
-+int sbl_link_counters_read(struct sbl_inst *sbl, int port_num, u16 counter)
++int sl_ctrl_data_lgrp_serdes_lane_io_trace_set(struct sl_ctrl_lgrp *ctrl_lgrp, bool serdes_lane_io_trace)
 +{
-+	struct sbl_link *link;
-+	int err;
++	sl_ctrl_log_dbg(ctrl_lgrp, LOG_NAME,
++			"set (serdes_lane_io_trace = %s)", serdes_lane_io_trace ? "enable" : "disable");
 +
-+	err = sbl_validate_instance(sbl);
-+	if (err)
-+		return 0;
-+
-+	err = sbl_validate_port_num(sbl, port_num);
-+	if (err)
-+		return 0;
-+
-+	link = sbl->link + port_num;
-+
-+	if (counter >= SBL_LINK_NUM_COUNTERS)
-+		return 0;
-+
-+	return atomic_read(link->counters + counter);
-+}
-+EXPORT_SYMBOL(sbl_link_counters_read);
-+
-+/* Increment a SBL link counter */
-+int sbl_link_counters_incr(struct sbl_inst *sbl, int port_num, u16 counter)
-+{
-+	struct sbl_link *link;
-+	int err;
-+
-+	err = sbl_validate_instance(sbl);
-+	if (err)
-+		return -EINVAL;
-+
-+	err = sbl_validate_port_num(sbl, port_num);
-+	if (err)
-+		return -EINVAL;
-+
-+	link = sbl->link + port_num;
-+
-+	if (counter >= SBL_LINK_NUM_COUNTERS)
-+		return -EINVAL;
-+
-+	atomic_inc(link->counters + counter);
++	spin_lock(&ctrl_lgrp->config_lock);
++	ctrl_lgrp->serdes_lane_io_trace_enable = serdes_lane_io_trace;
++	spin_unlock(&ctrl_lgrp->config_lock);
 +
 +	return 0;
 +}
-diff --git a/drivers/net/ethernet/hpe/sbl/sbl_fec.c b/drivers/net/ethernet/hpe/sbl/sbl_fec.c
++
++int sl_ctrl_data_lgrp_mfs_get(struct sl_ctrl_lgrp *ctrl_lgrp, u32 *mfs)
++{
++	spin_lock(&ctrl_lgrp->config_lock);
++	*mfs = ctrl_lgrp->config.mfs;
++	spin_unlock(&ctrl_lgrp->config_lock);
++
++	sl_ctrl_log_dbg(ctrl_lgrp, LOG_NAME, "get (mfs = %u)", *mfs);
++
++	return 0;
++}
++
++int sl_ctrl_data_lgrp_furcation_get(struct sl_ctrl_lgrp *ctrl_lgrp, u32 *furcation)
++{
++	spin_lock(&ctrl_lgrp->config_lock);
++	*furcation = ctrl_lgrp->config.furcation;
++	spin_unlock(&ctrl_lgrp->config_lock);
++
++	sl_ctrl_log_dbg(ctrl_lgrp, LOG_NAME, "get (furcation = %u)", *furcation);
++
++	return 0;
++}
++
++int sl_ctrl_data_lgrp_fec_mode_get(struct sl_ctrl_lgrp *ctrl_lgrp, u32 *fec_mode)
++{
++	spin_lock(&ctrl_lgrp->config_lock);
++	*fec_mode = ctrl_lgrp->config.fec_mode;
++	spin_unlock(&ctrl_lgrp->config_lock);
++
++	sl_ctrl_log_dbg(ctrl_lgrp, LOG_NAME, "get (fec_mode = %u)", *fec_mode);
++
++	return 0;
++}
++
++int sl_ctrl_data_lgrp_tech_map_get(struct sl_ctrl_lgrp *ctrl_lgrp, u32 *tech_map)
++{
++	spin_lock(&ctrl_lgrp->config_lock);
++	*tech_map = ctrl_lgrp->config.tech_map;
++	spin_unlock(&ctrl_lgrp->config_lock);
++
++	sl_ctrl_log_dbg(ctrl_lgrp, LOG_NAME, "get (tech_map = 0x%X)", *tech_map);
++
++	return 0;
++}
++
++int sl_ctrl_data_lgrp_fec_map_get(struct sl_ctrl_lgrp *ctrl_lgrp, u32 *fec_map)
++{
++	spin_lock(&ctrl_lgrp->config_lock);
++	*fec_map = ctrl_lgrp->config.fec_map;
++	spin_unlock(&ctrl_lgrp->config_lock);
++
++	sl_ctrl_log_dbg(ctrl_lgrp, LOG_NAME, "get (fec_map = 0x%X)", *fec_map);
++
++	return 0;
++}
++
++int sl_ctrl_data_lgrp_options_get(struct sl_ctrl_lgrp *ctrl_lgrp, u32 *options)
++{
++	spin_lock(&ctrl_lgrp->config_lock);
++	*options = ctrl_lgrp->config.options;
++	spin_unlock(&ctrl_lgrp->config_lock);
++
++	sl_ctrl_log_dbg(ctrl_lgrp, LOG_NAME, "get (options = 0x%X)", *options);
++
++	return 0;
++}
+diff --git a/drivers/net/ethernet/hpe/sl/ctrl/data/sl_ctrl_data_lgrp_trace.c b/drivers/net/ethernet/hpe/sl/ctrl/data/sl_ctrl_data_lgrp_trace.c
 new file mode 100644
-index 000000000000..d458ca5e1269
+index 000000000000..5b6dfe73495e
 --- /dev/null
-+++ b/drivers/net/ethernet/hpe/sbl/sbl_fec.c
-@@ -0,0 +1,971 @@
++++ b/drivers/net/ethernet/hpe/sl/ctrl/data/sl_ctrl_data_lgrp_trace.c
+@@ -0,0 +1,50 @@
 +// SPDX-License-Identifier: GPL-2.0
-+
-+/* Copyright 2024-2025 Hewlett Packard Enterprise Development LP */
++/* Copyright 2025-2026 Hewlett Packard Enterprise Development LP */
 +
 +#include <linux/types.h>
-+#include <linux/kernel.h>
-+#include <linux/device.h>
-+#include <linux/delay.h>
-+#include <linux/workqueue.h>
 +#include <linux/spinlock.h>
 +
-+#include <linux/hpe/sbl/sbl.h>
-+#include <linux/hpe/sbl/sbl_an.h>
-+#include <linux/hpe/sbl/sbl_fec.h>
-+#include <linux/hpe/sbl/sbl_kconfig.h>
++#include "data/sl_ctrl_data_lgrp_trace.h"
 +
-+#include <linux/hpe/sbl/sbl_pml.h>
++#define LOG_NAME SL_CTRL_LGRP_LOG_NAME
 +
-+#include "sbl_serdes_map.h"
-+#include "sbl_pml_fn.h"
-+#include "sbl_link.h"
-+#include "sbl_serdes.h"
-+#include "sbl_serdes_fn.h"
-+#include "sbl_internal.h"
-+
-+static void sbl_fec_counts_zero(struct sbl_inst *sbl, int port_num,
-+				struct sbl_pcs_fec_cntrs *cntrs)
++int sl_ctrl_data_lgrp_is_err_trace_enabled(struct sl_ctrl_lgrp *ctrl_lgrp, bool *err_trace_enable)
 +{
-+	memset(cntrs, 0, sizeof(struct sbl_pcs_fec_cntrs));
++	spin_lock(&ctrl_lgrp->config_lock);
++	*err_trace_enable = ctrl_lgrp->err_trace_enable;
++	spin_unlock(&ctrl_lgrp->config_lock);
++
++	sl_ctrl_log_dbg(ctrl_lgrp, LOG_NAME,
++			"is err trace enabled (err_trace_enable = %s)",
++			*err_trace_enable ? "true" : "false");
++
++	return 0;
 +}
 +
-+static u64 sbl_fec_rate_calc(struct sbl_inst *sbl, int port_num,
-+			     u64 curr, u64 prev, unsigned long tdiff)
++int sl_ctrl_data_lgrp_is_warn_trace_enabled(struct sl_ctrl_lgrp *ctrl_lgrp, bool *warn_trace_enable)
 +{
-+	if (curr < prev) {
-+		sbl_dev_err(sbl->dev, "%d: fec counter went backwards", port_num);
++	spin_lock(&ctrl_lgrp->config_lock);
++	*warn_trace_enable = ctrl_lgrp->warn_trace_enable;
++	spin_unlock(&ctrl_lgrp->config_lock);
 +
-+		return 0;
-+	} else
-+		return (curr - prev) * HZ / tdiff;
++	sl_ctrl_log_dbg(ctrl_lgrp, LOG_NAME,
++			"is warn trace enabled (warn_trace_enable = %s)",
++			*warn_trace_enable ? "true" : "false");
++
++	return 0;
 +}
 +
-+static int sbl_fec_rates_update(struct sbl_inst *sbl, int port_num,
-+				u32 window)
++bool sl_ctrl_data_lgrp_is_serdes_lane_io_trace_enabled(struct sl_ctrl_lgrp *ctrl_lgrp)
 +{
-+	struct sbl_link *link = sbl->link + port_num;
-+	struct fec_data *fec_data = link->fec_data;
-+	struct sbl_fec *fec_prmts = fec_data->fec_prmts;
-+	struct sbl_pcs_fec_cntrs *temp;
-+	unsigned long tdiff;
-+	int i;
-+	bool discard_rates;
-+	enum sbl_fec_discard_type reason;
-+	unsigned long irq_flags;
++	bool serdes_lane_io_trace;
 +
-+	spin_lock(&fec_prmts->fec_cnt_lock);
++	spin_lock(&ctrl_lgrp->config_lock);
++	serdes_lane_io_trace = ctrl_lgrp->serdes_lane_io_trace_enable;
++	spin_unlock(&ctrl_lgrp->config_lock);
 +
-+	/* make sure the period is sufficient to update rates
-+	 * otherwise zero rates so nothing fires
-+	 */
-+	if (time_is_after_jiffies(fec_prmts->fec_curr_cnts->time + msecs_to_jiffies(window))) {
-+		sbl_fec_counts_zero(sbl, port_num, fec_prmts->fec_rates);
-+		spin_unlock(&fec_prmts->fec_cnt_lock);
++	sl_ctrl_log_dbg(ctrl_lgrp, LOG_NAME,
++			"is serdes lane io trace enabled (serdes_lane_io_trace = %s)",
++			serdes_lane_io_trace ? "enabled" : "disabled");
 +
-+		return -EINPROGRESS;
++	return serdes_lane_io_trace;
++}
+diff --git a/drivers/net/ethernet/hpe/sl/ctrl/data/sl_ctrl_data_link.c b/drivers/net/ethernet/hpe/sl/ctrl/data/sl_ctrl_data_link.c
+new file mode 100644
+index 000000000000..dfb1b820d5ef
+--- /dev/null
++++ b/drivers/net/ethernet/hpe/sl/ctrl/data/sl_ctrl_data_link.c
+@@ -0,0 +1,424 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright 2025 Hewlett Packard Enterprise Development LP */
++
++#include "base/sl_ctrl_log.h"
++#include "sl_ctrl_ldev.h"
++#include "sl_ctrl_lgrp.h"
++#include "sl_ctrl_link.h"
++#include "data/sl_core_data_link.h"
++
++#include "data/sl_ctrl_data_link.h"
++
++#define LOG_NAME SL_CTRL_LINK_LOG_NAME
++
++int sl_ctrl_data_link_state_get(struct sl_ctrl_link *ctrl_link, u32 *link_state)
++{
++	struct sl_core_link *held_link_1 __free(sl_core_link_put) = NULL;
++	int rtn;
++	u32 core_link_state;
++	u32 ctrl_link_state;
++
++	held_link_1 = sl_core_link_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num,
++				       ctrl_link->ctrl_lgrp->num, ctrl_link->num);
++	if (!held_link_1)
++		return -ENODEV;
++	spin_lock(&ctrl_link->data_lock);
++	rtn = sl_core_data_link_state_get(held_link_1, &core_link_state);
++	ctrl_link_state = ctrl_link->state;
++	spin_unlock(&ctrl_link->data_lock);
++
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_link, LOG_NAME,
++				      "sl_core_data_link_state_get failed (rtn = %d)", rtn);
++		return rtn;
 +	}
 +
-+	temp = fec_prmts->fec_prev_cnts;
-+	fec_prmts->fec_prev_cnts = fec_prmts->fec_curr_cnts;
-+	fec_prmts->fec_curr_cnts = temp;
-+	sbl_fec_counts_get(sbl, port_num, fec_prmts->fec_curr_cnts);
++	*link_state = (core_link_state == SL_CORE_LINK_STATE_AN) ? SL_LINK_STATE_AN : ctrl_link_state;
 +
-+	spin_lock_irqsave(&link->fec_discard_lock, irq_flags);
-+	discard_rates = (link->fec_discard_time >= fec_prmts->fec_prev_cnts->time) &&
-+			(link->fec_discard_time < fec_prmts->fec_curr_cnts->time);
-+	reason = link->fec_discard_type;
-+	spin_unlock_irqrestore(&link->fec_discard_lock, irq_flags);
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"get (link_state = %u %s)",
++			*link_state,
++			sl_link_state_str(*link_state));
 +
-+	if (discard_rates) {
-+		sbl_dev_dbg(sbl->dev, "%d: %s - ignoring FEC rates for the current window", port_num,
-+			    sbl_fec_discard_str(reason));
-+		sbl_fec_counts_zero(sbl, port_num, fec_prmts->fec_rates);
-+		spin_unlock(&fec_prmts->fec_cnt_lock);
-+		return -EINTR;
++	return 0;
++}
++
++int sl_ctrl_data_link_fec_up_settle_wait_ms_get(struct sl_ctrl_link *ctrl_link, u32 *fec_up_settle_wait_ms)
++{
++	spin_lock(&ctrl_link->data_lock);
++	*fec_up_settle_wait_ms = ctrl_link->config.fec_up_settle_wait_ms;
++	spin_unlock(&ctrl_link->data_lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"get (fec_up_settle_wait_ms = %d)", *fec_up_settle_wait_ms);
++
++	return 0;
++}
++
++int sl_ctrl_data_link_fec_up_check_wait_ms_get(struct sl_ctrl_link *ctrl_link, s32 *fec_up_check_wait_ms)
++{
++	spin_lock(&ctrl_link->data_lock);
++	*fec_up_check_wait_ms = ctrl_link->config.fec_up_check_wait_ms;
++	spin_unlock(&ctrl_link->data_lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"get (fec_up_check_wait_ms = %d)", *fec_up_check_wait_ms);
++
++	return 0;
++}
++
++int sl_ctrl_data_link_fec_up_ucw_limit_get(struct sl_ctrl_link *ctrl_link, s32 *fec_up_ucw_limit)
++{
++	spin_lock(&ctrl_link->data_lock);
++	*fec_up_ucw_limit = ctrl_link->config.fec_up_ucw_limit;
++	spin_unlock(&ctrl_link->data_lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"get (fec_up_ucw_limit = %d)", *fec_up_ucw_limit);
++
++	return 0;
++}
++
++int sl_ctrl_data_link_fec_up_ccw_limit_get(struct sl_ctrl_link *ctrl_link, s32 *fec_up_ccw_limit)
++{
++	spin_lock(&ctrl_link->data_lock);
++	*fec_up_ccw_limit = ctrl_link->config.fec_up_ccw_limit;
++	spin_unlock(&ctrl_link->data_lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"get (fec_up_ccw_limit = %d)", *fec_up_ccw_limit);
++
++	return 0;
++}
++
++int sl_ctrl_data_link_policy_fec_mon_period_ms_get(struct sl_ctrl_link *ctrl_link, s32 *mon_period_ms)
++{
++	spin_lock(&ctrl_link->config_lock);
++	*mon_period_ms = ctrl_link->policy.fec_mon_period_ms;
++	spin_unlock(&ctrl_link->config_lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"get (mon_period_ms = %d)", *mon_period_ms);
++
++	return 0;
++}
++
++int sl_ctrl_data_link_policy_fec_mon_ucw_down_limit_get(struct sl_ctrl_link *ctrl_link, s32 *mon_ucw_down_limit)
++{
++	spin_lock(&ctrl_link->config_lock);
++	*mon_ucw_down_limit = ctrl_link->policy.fec_mon_ucw_down_limit;
++	spin_unlock(&ctrl_link->config_lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"get (mon_ucw_down_limit = %d)", *mon_ucw_down_limit);
++
++	return 0;
++}
++
++int sl_ctrl_data_link_policy_fec_mon_ucw_warn_limit_get(struct sl_ctrl_link *ctrl_link, s32 *mon_ucw_warn_limit)
++{
++	spin_lock(&ctrl_link->config_lock);
++	*mon_ucw_warn_limit = ctrl_link->policy.fec_mon_ucw_warn_limit;
++	spin_unlock(&ctrl_link->config_lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"get (mon_ucw_warn_limit = %d)", *mon_ucw_warn_limit);
++
++	return 0;
++}
++
++int sl_ctrl_data_link_policy_fec_mon_ccw_down_limit_get(struct sl_ctrl_link *ctrl_link, s32 *mon_ccw_down_limit)
++{
++	spin_lock(&ctrl_link->config_lock);
++	*mon_ccw_down_limit = ctrl_link->policy.fec_mon_ccw_down_limit;
++	spin_unlock(&ctrl_link->config_lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"get (mon_ccw_down_limit = %d)", *mon_ccw_down_limit);
++
++	return 0;
++}
++
++int sl_ctrl_data_link_policy_fec_mon_ccw_warn_limit_get(struct sl_ctrl_link *ctrl_link, s32 *mon_ccw_warn_limit)
++{
++	spin_lock(&ctrl_link->config_lock);
++	*mon_ccw_warn_limit = ctrl_link->policy.fec_mon_ccw_warn_limit;
++	spin_unlock(&ctrl_link->config_lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"get (mon_ccw_warn_limit = %d)", *mon_ccw_warn_limit);
++
++	return 0;
++}
++
++int sl_ctrl_data_link_fec_down_cache_ucw_cntr_get(struct sl_ctrl_link *ctrl_link, u64 *ucw)
++{
++	spin_lock(&ctrl_link->fec_down_cache.lock);
++	*ucw = ctrl_link->fec_down_cache.cw_cntrs.ucw;
++	spin_unlock(&ctrl_link->fec_down_cache.lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"get (ucw = %llu)", *ucw);
++
++	return 0;
++}
++
++int sl_ctrl_data_link_fec_down_cache_ccw_cntr_get(struct sl_ctrl_link *ctrl_link, u64 *ccw)
++{
++	spin_lock(&ctrl_link->fec_down_cache.lock);
++	*ccw = ctrl_link->fec_down_cache.cw_cntrs.ccw;
++	spin_unlock(&ctrl_link->fec_down_cache.lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"get (ccw = %llu)", *ccw);
++
++	return 0;
++}
++
++int sl_ctrl_data_link_fec_down_cache_gcw_cntr_get(struct sl_ctrl_link *ctrl_link, u64 *gcw)
++{
++	spin_lock(&ctrl_link->fec_down_cache.lock);
++	*gcw = ctrl_link->fec_down_cache.cw_cntrs.gcw;
++	spin_unlock(&ctrl_link->fec_down_cache.lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"get (gcw = %llu)", *gcw);
++
++	return 0;
++}
++
++int sl_ctrl_data_link_fec_down_cache_lane_cntr_get(struct sl_ctrl_link *ctrl_link, u8 lane_num, u64 *lane_cntr)
++{
++	spin_lock(&ctrl_link->fec_down_cache.lock);
++	*lane_cntr = ctrl_link->fec_down_cache.lane_cntrs.lanes[lane_num];
++	spin_unlock(&ctrl_link->fec_down_cache.lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"get (lane_num = %d, lane_cntr = %llu)", lane_num, *lane_cntr);
++
++	return 0;
++}
++
++int sl_ctrl_data_link_fec_down_cache_tail_cntr_get(struct sl_ctrl_link *ctrl_link, u8 bin_num, u64 *tail_cntr)
++{
++	spin_lock(&ctrl_link->fec_down_cache.lock);
++	*tail_cntr = ctrl_link->fec_down_cache.tail_cntrs.ccw_bins[bin_num];
++	spin_unlock(&ctrl_link->fec_down_cache.lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"get (bin_num = %d, tail_cntr = %llu)", bin_num, *tail_cntr);
++
++	return 0;
++}
++
++int sl_ctrl_data_link_fec_mon_period_ms_get(struct sl_ctrl_link *ctrl_link, u32 *mon_period_get)
++
++{
++	spin_lock(&ctrl_link->fec_data.lock);
++	*mon_period_get = ctrl_link->fec_data.info.monitor.period_ms;
++	spin_unlock(&ctrl_link->fec_data.lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"get (mon_period_get = %u)", *mon_period_get);
++
++	return 0;
++}
++
++int sl_ctrl_data_link_fec_mon_ucw_down_limit_get(struct sl_ctrl_link *ctrl_link, s32 *ucw_down_limit)
++{
++	u32 period_ms;
++
++	spin_lock(&ctrl_link->fec_data.lock);
++	period_ms = ctrl_link->fec_data.info.monitor.period_ms;
++	*ucw_down_limit = ctrl_link->fec_data.info.monitor.ucw_down_limit;
++	spin_unlock(&ctrl_link->fec_data.lock);
++
++	if (!period_ms) {
++		sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME,
++				       "fec_mon_ucw_down_limit_get failed (monitoring disabled)");
++		return -EBADRQC;
 +	}
 +
-+	/* calc time difference  (HZ)
-+	 * (unsigned so rollover ok)
-+	 */
-+	tdiff = fec_prmts->fec_curr_cnts->time - fec_prmts->fec_prev_cnts->time;
++	return 0;
++}
 +
-+	/* calculate rates */
-+	fec_prmts->fec_rates->ccw =
-+		sbl_fec_rate_calc(sbl, port_num,
-+				  fec_prmts->fec_curr_cnts->ccw,
-+				  fec_prmts->fec_prev_cnts->ccw, tdiff);
-+	fec_prmts->fec_rates->ucw =
-+		sbl_fec_rate_calc(sbl, port_num,
-+				  fec_prmts->fec_curr_cnts->ucw,
-+				  fec_prmts->fec_prev_cnts->ucw, tdiff);
-+	fec_prmts->fec_rates->llr_tx_replay =
-+		sbl_fec_rate_calc(sbl, port_num,
-+				  fec_prmts->fec_curr_cnts->llr_tx_replay,
-+				  fec_prmts->fec_prev_cnts->llr_tx_replay, tdiff);
++int sl_ctrl_data_link_fec_mon_ccw_down_limit_get(struct sl_ctrl_link *ctrl_link, s32 *ccw_down_limit)
++{
++	u32 period_ms;
 +
-+	for (i = 0; i < SBL_PCS_NUM_FECL_CNTRS; ++i)
-+		fec_prmts->fec_rates->fecl[i] =
-+			sbl_fec_rate_calc(sbl, port_num,
-+					  fec_prmts->fec_curr_cnts->fecl[i],
-+					  fec_prmts->fec_prev_cnts->fecl[i], tdiff);
++	spin_lock(&ctrl_link->fec_data.lock);
++	period_ms = ctrl_link->fec_data.info.monitor.period_ms;
++	*ccw_down_limit = ctrl_link->fec_data.info.monitor.ccw_down_limit;
++	spin_unlock(&ctrl_link->fec_data.lock);
 +
-+	fec_prmts->fec_rates->time = jiffies_to_msecs(tdiff);
++	if (!period_ms) {
++		sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME,
++				       "fec_mon_ccw_down_limit_get failed (monitoring disabled)");
++		return -EBADRQC;
++	}
 +
-+	spin_unlock(&fec_prmts->fec_cnt_lock);
++	return 0;
++}
++
++int sl_ctrl_data_link_fec_mon_ccw_warn_limit_get(struct sl_ctrl_link *ctrl_link, s32 *ccw_warn_limit)
++{
++	u32 period_ms;
++
++	spin_lock(&ctrl_link->fec_data.lock);
++	period_ms = ctrl_link->fec_data.info.monitor.period_ms;
++	*ccw_warn_limit = ctrl_link->fec_data.info.monitor.ccw_warn_limit;
++	spin_unlock(&ctrl_link->fec_data.lock);
++
++	if (!period_ms) {
++		sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME,
++				       "fec_mon_ccw_warn_limit_get failed (monitoring disabled)");
++		return -EBADRQC;
++	}
++
++	return 0;
++}
++
++int sl_ctrl_data_link_fec_mon_ucw_warn_limit_get(struct sl_ctrl_link *ctrl_link, s32 *ucw_warn_limit)
++{
++	u32 period_ms;
++
++	spin_lock(&ctrl_link->fec_data.lock);
++	period_ms = ctrl_link->fec_data.info.monitor.period_ms;
++	*ucw_warn_limit = ctrl_link->fec_data.info.monitor.ucw_warn_limit;
++	spin_unlock(&ctrl_link->fec_data.lock);
++
++	if (!period_ms) {
++		sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME,
++				       "fec_mon_ucw_warn_limit_get failed (monitoring disabled)");
++		return -EBADRQC;
++	}
++
++	return 0;
++}
++
++int sl_ctrl_data_link_fec_up_cache_ucw_cntr_get(struct sl_ctrl_link *ctrl_link, u64 *ucw)
++{
++	spin_lock(&ctrl_link->fec_up_cache.lock);
++	*ucw = ctrl_link->fec_up_cache.cw_cntrs.ucw;
++	spin_unlock(&ctrl_link->fec_up_cache.lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "get (ucw = %llu)", *ucw);
++
++	return 0;
++}
++
++int sl_ctrl_data_link_fec_up_cache_ccw_cntr_get(struct sl_ctrl_link *ctrl_link, u64 *ccw)
++{
++	spin_lock(&ctrl_link->fec_up_cache.lock);
++	*ccw = ctrl_link->fec_up_cache.cw_cntrs.ccw;
++	spin_unlock(&ctrl_link->fec_up_cache.lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "get (ccw = %llu)", *ccw);
++
++	return 0;
++}
++
++int sl_ctrl_data_link_fec_up_cache_gcw_cntr_get(struct sl_ctrl_link *ctrl_link, u64 *gcw)
++{
++	spin_lock(&ctrl_link->fec_up_cache.lock);
++	*gcw = ctrl_link->fec_up_cache.cw_cntrs.gcw;
++	spin_unlock(&ctrl_link->fec_up_cache.lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "get (gcw = %llu)", *gcw);
++
++	return 0;
++}
++
++int sl_ctrl_data_link_fec_up_cache_lane_cntr_get(struct sl_ctrl_link *ctrl_link, u8 lane_num, u64 *lane_cntr)
++{
++	spin_lock(&ctrl_link->fec_up_cache.lock);
++	*lane_cntr = ctrl_link->fec_up_cache.lane_cntrs.lanes[lane_num];
++	spin_unlock(&ctrl_link->fec_up_cache.lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "get (lane_num = %d, lane_cntr = %llu)", lane_num, *lane_cntr);
++
++	return 0;
++}
++
++int sl_ctrl_data_link_fec_up_cache_tail_cntr_get(struct sl_ctrl_link *ctrl_link, u8 bin_num, u64 *tail_cntr)
++{
++	spin_lock(&ctrl_link->fec_up_cache.lock);
++	*tail_cntr = ctrl_link->fec_up_cache.tail_cntrs.ccw_bins[bin_num];
++	spin_unlock(&ctrl_link->fec_up_cache.lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "get (bin_num = %d, tail_cntr = %llu)", bin_num, *tail_cntr);
++
++	return 0;
++}
++
++int sl_ctrl_data_link_policy_options_get(struct sl_ctrl_link *ctrl_link, u32 *options)
++{
++	spin_lock(&ctrl_link->config_lock);
++	*options = ctrl_link->policy.options;
++	spin_unlock(&ctrl_link->config_lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"get (options = 0x%08x)", *options);
++
++	return 0;
++}
++
++int sl_ctrl_data_link_up_timeout_ms_get(struct sl_ctrl_link *ctrl_link, u32 *link_up_timeout_ms)
++{
++	spin_lock(&ctrl_link->data_lock);
++	*link_up_timeout_ms = ctrl_link->config.link_up_timeout_ms;
++	spin_unlock(&ctrl_link->data_lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"get (link_up_timeout_ms = %d)", *link_up_timeout_ms);
++
++	return 0;
++}
++
++int sl_ctrl_data_link_up_tries_max_get(struct sl_ctrl_link *ctrl_link, u32 *link_up_tries_max)
++{
++	spin_lock(&ctrl_link->data_lock);
++	*link_up_tries_max = ctrl_link->config.link_up_tries_max;
++	spin_unlock(&ctrl_link->data_lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"get (link_up_tries_max = %d)", *link_up_tries_max);
++
++	return 0;
++}
++
++int sl_ctrl_data_link_config_options_get(struct sl_ctrl_link *ctrl_link, u32 *options)
++{
++	spin_lock(&ctrl_link->data_lock);
++	*options = ctrl_link->config.options;
++	spin_unlock(&ctrl_link->data_lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"get (options = 0x%08x)", *options);
++
++	return 0;
++}
++
++int sl_ctrl_data_link_pause_map_get(struct sl_ctrl_link *ctrl_link, u32 *pause_map)
++{
++	spin_lock(&ctrl_link->data_lock);
++	*pause_map = ctrl_link->config.pause_map;
++	spin_unlock(&ctrl_link->data_lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"get (pause_map = 0x%x)", *pause_map);
++
++	return 0;
++}
++
++int sl_ctrl_data_link_hpe_map_get(struct sl_ctrl_link *ctrl_link, u32 *hpe_map)
++{
++	spin_lock(&ctrl_link->data_lock);
++	*hpe_map = ctrl_link->config.hpe_map;
++	spin_unlock(&ctrl_link->data_lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"get (hpe_map = 0x%x)", *hpe_map);
++
++	return 0;
++}
+diff --git a/drivers/net/ethernet/hpe/sl/ctrl/data/sl_ctrl_data_llr.c b/drivers/net/ethernet/hpe/sl/ctrl/data/sl_ctrl_data_llr.c
+new file mode 100644
+index 000000000000..be742b146a0a
+--- /dev/null
++++ b/drivers/net/ethernet/hpe/sl/ctrl/data/sl_ctrl_data_llr.c
+@@ -0,0 +1,64 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright 2025 Hewlett Packard Enterprise Development LP */
++
++#include <linux/spinlock.h>
++
++#include "base/sl_ctrl_log.h"
++#include "sl_ctrl_data_llr.h"
++
++#define LOG_NAME SL_CTRL_LLR_LOG_NAME
++
++int sl_ctrl_data_llr_config_mode_get(struct sl_ctrl_llr *ctrl_llr, u32 *mode)
++{
++	spin_lock(&ctrl_llr->data_lock);
++	*mode = ctrl_llr->config.mode;
++	spin_unlock(&ctrl_llr->data_lock);
++
++	sl_ctrl_log_dbg(ctrl_llr, LOG_NAME, "get (mode = %u)\n", *mode);
++
++	return 0;
++}
++
++int sl_ctrl_data_llr_config_setup_timeout_ms_get(struct sl_ctrl_llr *ctrl_llr, u32 *setup_timeout_ms)
++{
++	spin_lock(&ctrl_llr->data_lock);
++	*setup_timeout_ms = ctrl_llr->config.setup_timeout_ms;
++	spin_unlock(&ctrl_llr->data_lock);
++
++	sl_ctrl_log_dbg(ctrl_llr, LOG_NAME, "get (setup_timeout_ms = %u)\n", *setup_timeout_ms);
++
++	return 0;
++}
++
++int sl_ctrl_data_llr_config_start_timeout_ms_get(struct sl_ctrl_llr *ctrl_llr, u32 *start_timeout_ms)
++{
++	spin_lock(&ctrl_llr->data_lock);
++	*start_timeout_ms = ctrl_llr->config.start_timeout_ms;
++	spin_unlock(&ctrl_llr->data_lock);
++
++	sl_ctrl_log_dbg(ctrl_llr, LOG_NAME, "get (start_timeout_ms = %u)\n", *start_timeout_ms);
++
++	return 0;
++}
++
++int sl_ctrl_data_llr_config_link_dn_behavior_get(struct sl_ctrl_llr *ctrl_llr, u32 *link_dn_behavior)
++{
++	spin_lock(&ctrl_llr->data_lock);
++	*link_dn_behavior = ctrl_llr->config.link_dn_behavior;
++	spin_unlock(&ctrl_llr->data_lock);
++
++	sl_ctrl_log_dbg(ctrl_llr, LOG_NAME, "get (link_dn_behavior = %u)\n", *link_dn_behavior);
++
++	return 0;
++}
++
++int sl_ctrl_data_llr_config_options_get(struct sl_ctrl_llr *ctrl_llr, u32 *options)
++{
++	spin_lock(&ctrl_llr->data_lock);
++	*options = ctrl_llr->config.options;
++	spin_unlock(&ctrl_llr->data_lock);
++
++	sl_ctrl_log_dbg(ctrl_llr, LOG_NAME, "get (options = 0x%08x)\n", *options);
++
++	return 0;
++}
+diff --git a/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_ldev.c b/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_ldev.c
+new file mode 100644
+index 000000000000..0295dd902d6d
+--- /dev/null
++++ b/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_ldev.c
+@@ -0,0 +1,290 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright 2021-2023,2024,2025 Hewlett Packard Enterprise Development LP */
++
++#include <linux/spinlock.h>
++#include <linux/slab.h>
++#include <linux/err.h>
++#include <linux/completion.h>
++#include <linux/delay.h>
++
++#include "sl_asic.h"
++#include "sl_sysfs.h"
++#include "base/sl_ctrl_log.h"
++#include "sl_core_ldev.h"
++#include "sl_media_ldev.h"
++#include "sl_ctrl_ldev.h"
++#include "sl_ctrl_lgrp.h"
++
++#define LOG_NAME SL_CTRL_LDEV_LOG_NAME
++
++#define SL_CTRL_LDEV_DEL_TIMEOUT_MS 2000
++
++static struct sl_ctrl_ldev *ctrl_ldevs[SL_ASIC_MAX_LDEVS];
++static DEFINE_SPINLOCK(ctrl_ldevs_lock);
++
++#define CONFIG_SL_DEFAULT_WQ_MAX_ACTIVE  0 /* 0 is default (256 work items in queue). */
++int sl_ctrl_ldev_new(u8 ldev_num, struct workqueue_struct *workq,
++		     struct sl_ldev_attr *ldev_attr)
++{
++	int                   rtn;
++	struct sl_ctrl_ldev   *ctrl_ldev;
++
++	ctrl_ldev = sl_ctrl_ldev_get(ldev_num);
++	if (ctrl_ldev) {
++		sl_ctrl_log_err(NULL, LOG_NAME, "exists (ldev = 0x%p)", ctrl_ldev);
++		return -EBADRQC;
++	}
++
++	ctrl_ldev = kzalloc(sizeof(struct sl_ctrl_ldev), GFP_KERNEL);
++	if (!ctrl_ldev)
++		return -ENOMEM;
++
++	ctrl_ldev->magic = SL_CTRL_LDEV_MAGIC;
++	ctrl_ldev->ver   = SL_CTRL_LDEV_VER;
++	ctrl_ldev->num   = ldev_num;
++	ctrl_ldev->attr  = *ldev_attr;
++
++	kref_init(&ctrl_ldev->ref_cnt);
++	init_completion(&ctrl_ldev->del_complete);
++
++	spin_lock_init(&ctrl_ldev->data_lock);
++
++	if (IS_ERR_OR_NULL(workq)) {
++		ctrl_ldev->workq = alloc_workqueue("%s%u",
++						   WQ_MEM_RECLAIM | WQ_PERCPU,
++						   CONFIG_SL_DEFAULT_WQ_MAX_ACTIVE, "sl-ldev", ldev_num);
++		if (!ctrl_ldev->workq) {
++			rtn = -ENOMEM;
++			sl_ctrl_log_err(ctrl_ldev, LOG_NAME, "alloc_workqueue failed [%d]", rtn);
++			goto out;
++		}
++
++		sl_ctrl_log_dbg(ctrl_ldev, LOG_NAME, "created workqueue (workq = 0x%p)", ctrl_ldev->workq);
++		ctrl_ldev->create_workq = true;
++	} else {
++		ctrl_ldev->workq = workq;
++		sl_ctrl_log_dbg(ctrl_ldev, LOG_NAME, "client workqueue (workq = 0x%p)", ctrl_ldev->workq);
++	}
++
++	ctrl_ldev->notif_workq = alloc_workqueue("%s%u-notif",
++						 WQ_MEM_RECLAIM | WQ_PERCPU,
++						 CONFIG_SL_DEFAULT_WQ_MAX_ACTIVE, "sl-ldev", ldev_num);
++	if (!ctrl_ldev->notif_workq) {
++		rtn = -ENOMEM;
++		sl_ctrl_log_err(ctrl_ldev, LOG_NAME, "alloc_workqueue notif failed [%d]", rtn);
++		goto out_del_wq;
++	}
++
++	rtn = sl_core_ldev_new(ldev_num, ctrl_ldev->attr.accessors,
++			       ctrl_ldev->attr.ops, ctrl_ldev->workq);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_ldev, LOG_NAME, "core_ldev_new failed [%d]", rtn);
++		goto out_del_notif_wq;
++	}
++
++	rtn = sl_media_ldev_new(ldev_num, ctrl_ldev->workq);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_ldev, LOG_NAME, "media_ldev_new failed [%d]", rtn);
++		goto out_del_core;
++	}
++
++	sl_ctrl_log_dbg(ctrl_ldev, LOG_NAME, "new (ldev = 0x%p)", ctrl_ldev);
++
++	spin_lock(&ctrl_ldevs_lock);
++	ctrl_ldevs[ldev_num] = ctrl_ldev;
++	spin_unlock(&ctrl_ldevs_lock);
 +
 +	return 0;
 +
++out_del_core:
++	sl_core_ldev_del(ldev_num);
++out_del_notif_wq:
++	destroy_workqueue(ctrl_ldev->notif_workq);
++
++out_del_wq:
++	if (ctrl_ldev->create_workq)
++		destroy_workqueue(ctrl_ldev->workq);
++out:
++	kfree(ctrl_ldev);
++
++	return rtn;
 +}
 +
-+/* returns true if the corrected code word rate is bad */
-+static bool sbl_fec_ccw_rate_bad(struct sbl_inst *sbl, int port_num,
-+				 u32 thresh_adj, bool use_stp_thresh)
++#define SERDES_INIT_MAX_TRIES 3
++#define SERDES_INIT_DELAY_MS  1000
++int sl_ctrl_ldev_serdes_init(u8 ldev_num)
 +{
-+	struct sbl_link *link = sbl->link + port_num;
-+	struct fec_data *fec_data = link->fec_data;
-+	struct sbl_fec *fec_prmts = fec_data->fec_prmts;
++	int rtn;
++	int tries;
++	struct sl_ctrl_ldev *ctrl_ldev;
 +
-+	u64 ccw_bad;
-+	bool ignore_err;
-+	u64 ccw_hwm;
++	ctrl_ldev = sl_ctrl_ldev_get(ldev_num);
++	if (!ctrl_ldev) {
++		sl_ctrl_log_err(NULL, LOG_NAME, "ldev not found (ldev_num = %u)", ldev_num);
++		return -EBADRQC;
++	}
 +
-+	sbl_fec_ccw_bad_get(fec_prmts, use_stp_thresh, &ccw_bad, &ccw_hwm);
++	if (!sl_ctrl_ldev_kref_get_unless_zero(ctrl_ldev)) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"kref_get_unless_zero failed (ldev = 0x%p)", ctrl_ldev);
++		return -EBADRQC;
++	}
 +
-+	/* update high water mark
-+	 * we record this even if no test is performed so we can use it for
-+	 * debug/calibration
++	sl_ctrl_log_dbg(ctrl_ldev, LOG_NAME, "serdes init (ldev = 0x%p)", ctrl_ldev);
++
++	tries = SERDES_INIT_MAX_TRIES;
++	do {
++		rtn = sl_core_ldev_serdes_init(ldev_num);
++		if (rtn == 0)
++			goto out;
++		tries--;
++		if (tries)
++			msleep(SERDES_INIT_DELAY_MS);
++	} while (tries);
++
++out:
++	if (sl_ctrl_ldev_put(ctrl_ldev))
++		sl_ctrl_log_dbg(NULL, LOG_NAME,
++				"serdes init - ldev removed (ldev = 0x%p)", ctrl_ldev);
++
++	return rtn;
++}
++
++static void sl_ctrl_ldev_release(struct kref *ref)
++{
++	struct sl_ctrl_ldev *ctrl_ldev;
++	u8                  ldev_num;
++	u8                  lgrp_num;
++	int                 rtn;
++
++	ctrl_ldev = container_of(ref, struct sl_ctrl_ldev, ref_cnt);
++	ldev_num = ctrl_ldev->num;
++
++	sl_ctrl_log_dbg(ctrl_ldev, LOG_NAME, "release (ldev = 0x%p)", ctrl_ldev);
++
++	/* Not repeated on a retry: the sysfs delete drops kobject references. */
++	if (!ctrl_ldev->children_deleted) {
++		for (lgrp_num = 0; lgrp_num < SL_ASIC_MAX_LGRPS; ++lgrp_num) {
++			rtn = sl_ctrl_lgrp_del(ldev_num, lgrp_num);
++			if (rtn && rtn != -EBADRQC)
++				goto retry;
++		}
++		ctrl_ldev->children_deleted = true;
++	}
++
++	if (!ctrl_ldev->sysfs_deleted) {
++		/* Must delete sysfs first to guarantee nobody is reading */
++		sl_sysfs_ldev_delete(ctrl_ldev);
++		ctrl_ldev->sysfs_deleted = true;
++	}
++
++	rtn = sl_core_ldev_del(ldev_num);
++	if (rtn) {
++		/*
++		 * A core lgrp or link refused deletion, so the core ldev is
++		 * still published and uses the workqueue and ldev state.
++		 * Nobody holds a reference any more, so re-arm one for the
++		 * next sl_ctrl_ldev_del() to retry, and wake the waiter so it
++		 * can report the failure.
++		 */
++		sl_ctrl_log_err_trace(ctrl_ldev, LOG_NAME,
++				      "release - core_ldev_del failed, ldev kept [%d]", rtn);
++		goto retry;
++	}
++	sl_media_ldev_del(ldev_num);
++
++	destroy_workqueue(ctrl_ldev->notif_workq);
++
++	if (ctrl_ldev->create_workq)
++		destroy_workqueue(ctrl_ldev->workq);
++
++	spin_lock(&ctrl_ldevs_lock);
++	ctrl_ldevs[ldev_num] = NULL;
++	spin_unlock(&ctrl_ldevs_lock);
++
++	complete_all(&ctrl_ldev->del_complete);
++
++	kfree(ctrl_ldev);
++	return;
++
++retry:
++	kref_init(&ctrl_ldev->ref_cnt);
++	complete_all(&ctrl_ldev->del_complete);
++}
++
++int sl_ctrl_ldev_put(struct sl_ctrl_ldev *ctrl_ldev)
++{
++	return kref_put(&ctrl_ldev->ref_cnt, sl_ctrl_ldev_release);
++}
++
++int sl_ctrl_ldev_del(u8 ldev_num)
++{
++	struct sl_ctrl_ldev *ctrl_ldev;
++	unsigned long       timeleft;
++
++	ctrl_ldev = sl_ctrl_ldev_get(ldev_num);
++	if (!ctrl_ldev) {
++		sl_ctrl_log_err_trace(NULL, LOG_NAME,
++				      "del not found (ldev_num = %u)", ldev_num);
++		return -EBADRQC;
++	}
++
++	sl_ctrl_log_dbg(ctrl_ldev, LOG_NAME, "del (ldev = 0x%p)", ctrl_ldev);
++
++	/*
++	 * Release cannot run before the put below, so rearming a completion
++	 * left over from an earlier failed del is safe.
 +	 */
-+	if (fec_prmts->fec_rates->ccw > ccw_hwm) {
-+		spin_lock(&fec_prmts->fec_cw_lock);
-+		fec_prmts->fec_ccw_hwm = fec_prmts->fec_rates->ccw;
-+		spin_unlock(&fec_prmts->fec_cw_lock);
++	reinit_completion(&ctrl_ldev->del_complete);
++
++	if (!sl_ctrl_ldev_put(ctrl_ldev)) {
++		timeleft = wait_for_completion_timeout(&ctrl_ldev->del_complete,
++						       msecs_to_jiffies(SL_CTRL_LDEV_DEL_TIMEOUT_MS));
++
++		sl_ctrl_log_dbg(NULL, LOG_NAME,
++				"del completion_timeout (timeleft = %lums)", timeleft);
++
++		if (timeleft == 0) {
++			sl_ctrl_log_err(NULL, LOG_NAME,
++					"del timed out (ctrl_ldev = 0x%p)", ctrl_ldev);
++			return -ETIMEDOUT;
++		}
 +	}
 +
-+	/* apply percentage adjustment */
-+	ccw_bad = ccw_bad * thresh_adj / 100;
-+
-+	if (ccw_bad == 0) {
-+		sbl_dev_dbg(sbl->dev, "%d: fec ccw test ignored, threshold is zero", port_num);
-+
-+		return false;
-+	}
-+
-+	/* check corrected code words */
-+	if (fec_prmts->fec_rates->ccw > ccw_bad) {
-+		sbl_link_counters_incr(sbl, port_num, fec_ccw_err);
-+		ignore_err = sbl_debug_option(sbl, port_num, SBL_DEBUG_IGNORE_HIGH_FEC_CCW);
-+
-+		sbl_dev_err(sbl->dev, "%d: bad ccw, ccw %lld (>%lld), ucw %lld, (%lld %lld %lld %lld %lld %lld %lld %lld), window %ldms%s\n",
-+			    port_num, fec_prmts->fec_rates->ccw, ccw_bad,
-+				fec_prmts->fec_rates->ucw,
-+				fec_prmts->fec_rates->fecl[0], fec_prmts->fec_rates->fecl[1],
-+				fec_prmts->fec_rates->fecl[2], fec_prmts->fec_rates->fecl[3],
-+				fec_prmts->fec_rates->fecl[4], fec_prmts->fec_rates->fecl[5],
-+				fec_prmts->fec_rates->fecl[6], fec_prmts->fec_rates->fecl[7],
-+				fec_prmts->fec_rates->time,
-+				ignore_err ? " -ignored" : "");
-+		if (ignore_err)
-+			return false;
-+		else
-+			return true;
-+	}
-+	return false;
-+}
-+
-+/* returns true if the uncorrected code word rate is bad
-+ * threshold adjustment is a percentage
-+ */
-+static bool sbl_fec_ucw_rate_bad(struct sbl_inst *sbl, int port_num,
-+				 u32 thresh_adj)
-+{
-+	struct sbl_link *link = sbl->link + port_num;
-+	struct fec_data *fec_data = link->fec_data;
-+	struct sbl_fec *fec_prmts = fec_data->fec_prmts;
-+
-+	bool ignore_err;
-+	u64 ucw_bad;
-+	u64 ucw_hwm;
-+
-+	sbl_fec_ucw_bad_get(fec_prmts, &ucw_bad, &ucw_hwm);
-+
-+	/* update high water mark
-+	 * we record this even if no test is performed so we can use it for
-+	 * debug/calibration
++	/*
++	 * A successful release unpublishes and frees the ldev. If it is still
++	 * published, the core ldev refused deletion and was kept for a retry.
++	 * Only the pointer value is compared, the ldev is not dereferenced.
 +	 */
-+	if (fec_prmts->fec_rates->ucw > ucw_hwm) {
-+		spin_lock(&fec_prmts->fec_cw_lock);
-+		fec_prmts->fec_ucw_hwm = fec_prmts->fec_rates->ucw;
-+		spin_unlock(&fec_prmts->fec_cw_lock);
-+	}
++	if (sl_ctrl_ldev_get(ldev_num) == ctrl_ldev)
++		return -EBUSY;
 +
-+	/* apply percentage adjustment */
-+	ucw_bad = ucw_bad * thresh_adj / 100;
-+
-+	if (ucw_bad == 0) {
-+		sbl_dev_dbg(sbl->dev, "%d: fec ucw test ignored, threshold is zero", port_num);
-+		return false;
-+	}
-+
-+	/* check uncorrected code words */
-+	if (fec_prmts->fec_rates->ucw > ucw_bad) {
-+		sbl_link_counters_incr(sbl, port_num, fec_ucw_err);
-+		ignore_err = sbl_debug_option(sbl, port_num, SBL_DEBUG_IGNORE_HIGH_FEC_UCW);
-+
-+		sbl_dev_err(sbl->dev, "%d: bad ucw, ccw %lld, ucw %lld (>%lld), (%lld %lld %lld %lld %lld %lld %lld %lld), window %ldms%s\n",
-+			    port_num, fec_prmts->fec_rates->ccw,
-+				    fec_prmts->fec_rates->ucw, ucw_bad,
-+				    fec_prmts->fec_rates->fecl[0], fec_prmts->fec_rates->fecl[1],
-+				    fec_prmts->fec_rates->fecl[2], fec_prmts->fec_rates->fecl[3],
-+				    fec_prmts->fec_rates->fecl[4], fec_prmts->fec_rates->fecl[5],
-+				    fec_prmts->fec_rates->fecl[6], fec_prmts->fec_rates->fecl[7],
-+				    fec_prmts->fec_rates->time,
-+				    ignore_err ? " -ignored" : "");
-+		if (ignore_err)
-+			return false;
-+		else
-+			return true;
-+	}
-+	return false;
-+
++	return 0;
 +}
 +
-+static bool sbl_fec_txr_rate_bad(struct sbl_inst *sbl, int port_num,
-+				 u32 thresh_adj)
++bool sl_ctrl_ldev_kref_get_unless_zero(struct sl_ctrl_ldev *ctrl_ldev)
 +{
-+	struct sbl_link *link = sbl->link + port_num;
-+	struct fec_data *fec_data = link->fec_data;
-+	struct sbl_fec *fec_prmts = fec_data->fec_prmts;
-+
-+	u64 llr_tx_replay_bad;
-+	u64 llr_tx_replay_hwm;
-+	bool ignore_err;
-+
-+	spin_lock(&fec_prmts->fec_cw_lock);
-+	llr_tx_replay_bad = fec_prmts->fec_llr_tx_replay_thresh;
-+	llr_tx_replay_hwm = fec_prmts->fec_llr_tx_replay_hwm;
-+	spin_unlock(&fec_prmts->fec_cw_lock);
-+
-+	/* update high water mark
-+	 * we record this even if no test is performed so we can use it for
-+	 * debug/calibration
-+	 */
-+	if (fec_prmts->fec_rates->llr_tx_replay > llr_tx_replay_hwm) {
-+		spin_lock(&fec_prmts->fec_cw_lock);
-+		fec_prmts->fec_llr_tx_replay_hwm = fec_prmts->fec_rates->llr_tx_replay;
-+		spin_unlock(&fec_prmts->fec_cw_lock);
-+	}
-+	if (llr_tx_replay_bad == 0) {
-+		sbl_dev_dbg(sbl->dev, "%d: fec llr_tx_replay test ignored, threshold is zero", port_num);
-+		return false;
-+	}
-+
-+	/* check llr_tx_replay rate */
-+	if (fec_prmts->fec_rates->llr_tx_replay > llr_tx_replay_bad) {
-+		sbl_link_counters_incr(sbl, port_num, fec_txr_err);
-+		ignore_err = sbl_debug_option(sbl, port_num, SBL_DEBUG_IGNORE_HIGH_FEC_TXR);
-+
-+		sbl_dev_err(sbl->dev, "%d: bad llr_tx_replay, llr_tx_replay %lld (>%lld), window %ldms%s\n",
-+			    port_num,
-+				fec_prmts->fec_rates->llr_tx_replay, llr_tx_replay_bad,
-+				fec_prmts->fec_rates->time,
-+				ignore_err ? " -ignored" : "");
-+
-+		if (ignore_err)
-+			return false;
-+		else
-+			return true;
-+	}
-+	return false;
++	return (kref_get_unless_zero(&ctrl_ldev->ref_cnt) != 0);
 +}
 +
-+/* print a few warnings (so we can see how things are changing) about high
-+ * fec lane error rates
-+ */
-+static void sbl_fec_rates_warnings(struct sbl_inst *sbl, int port_num,
-+				   int *warning_count)
++struct sl_ctrl_ldev *sl_ctrl_ldev_get(u8 ldev_num)
 +{
++	struct sl_ctrl_ldev *ctrl_ldev;
 +
-+	struct sbl_link *link = sbl->link + port_num;
-+	struct fec_data *fec_data = link->fec_data;
-+	struct sbl_fec *fec_prmts = fec_data->fec_prmts;
-+	int fecl_warn;
-+	int i;
++	spin_lock(&ctrl_ldevs_lock);
++	ctrl_ldev = ctrl_ldevs[ldev_num];
++	spin_unlock(&ctrl_ldevs_lock);
 +
-+	spin_lock(&fec_prmts->fec_cw_lock);
-+	fecl_warn = fec_prmts->fecl_warn;
-+	spin_unlock(&fec_prmts->fec_cw_lock);
++	sl_ctrl_log_dbg(NULL, LOG_NAME, "get (ldev_num = %u, ldev = 0x%p)",
++			ldev_num, ctrl_ldev);
 +
-+	if (fecl_warn == 0) {
-+		dev_dbg(sbl->dev, "%d: fec ccw warn ignored, threshold is zero", port_num);
++	return ctrl_ldev;
++}
 +
++void sl_ctrl_ldev_exit(void)
++{
++	u8 ldev_num;
++
++	for (ldev_num = 0; ldev_num < SL_ASIC_MAX_LDEVS; ++ldev_num)
++		sl_ctrl_ldev_del(ldev_num);
++}
+diff --git a/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_lgrp.c b/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_lgrp.c
+new file mode 100644
+index 000000000000..1e7240325fcc
+--- /dev/null
++++ b/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_lgrp.c
+@@ -0,0 +1,351 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright 2021-2023,2024,2025 Hewlett Packard Enterprise Development LP */
++
++#include <linux/kobject.h>
++#include <linux/spinlock.h>
++#include <linux/slab.h>
++
++#include "sl_asic.h"
++#include "sl_sysfs.h"
++#include "base/sl_ctrl_log.h"
++#include "sl_ctrl_ldev.h"
++#include "sl_ctrl_lgrp.h"
++#include "sl_ctrl_lgrp_notif.h"
++#include "sl_ctrl_link.h"
++#include "sl_ctrl_llr.h"
++#include "sl_ctrl_mac.h"
++#include "sl_media_lgrp.h"
++#include "sl_core_lgrp.h"
++
++#define LOG_NAME SL_CTRL_LGRP_LOG_NAME
++
++#define SL_CTRL_LGRP_DEL_TIMEOUT_MS 2000
++
++static struct sl_ctrl_lgrp *ctrl_lgrps[SL_ASIC_MAX_LDEVS][SL_ASIC_MAX_LGRPS];
++static DEFINE_SPINLOCK(ctrl_lgrps_lock);
++
++int sl_ctrl_lgrp_new(u8 ldev_num, u8 lgrp_num, struct kobject *sysfs_parent)
++{
++	int                  rtn;
++	struct sl_ctrl_ldev *ctrl_ldev;
++	struct sl_ctrl_lgrp *ctrl_lgrp;
++
++	ctrl_ldev = sl_ctrl_ldev_get(ldev_num);
++	if (!ctrl_ldev) {
++		sl_ctrl_log_err(NULL, LOG_NAME, "missing ldev (ldev_num = %u)", ldev_num);
++		return -EBADRQC;
++	}
++
++	ctrl_lgrp = sl_ctrl_lgrp_get(ldev_num, lgrp_num);
++	if (ctrl_lgrp) {
++		sl_ctrl_log_err(NULL, LOG_NAME, "exists (lgrp = 0x%p)", ctrl_lgrp);
++		return -EBADRQC;
++	}
++
++	ctrl_lgrp = kzalloc(sizeof(struct sl_ctrl_lgrp), GFP_KERNEL);
++	if (!ctrl_lgrp)
++		return -ENOMEM;
++
++	snprintf(ctrl_lgrp->log_connect_id,
++		 sizeof(ctrl_lgrp->log_connect_id), "ctrl-lgrp%02u", lgrp_num);
++
++	ctrl_lgrp->magic     = SL_CTRL_LGRP_MAGIC;
++	ctrl_lgrp->ver       = SL_CTRL_LGRP_VER;
++	ctrl_lgrp->num       = lgrp_num;
++	ctrl_lgrp->ctrl_ldev = sl_ctrl_ldev_get(ldev_num);
++
++	kref_init(&ctrl_lgrp->ref_cnt);
++	init_completion(&ctrl_lgrp->del_complete);
++
++	spin_lock_init(&ctrl_lgrp->data_lock);
++	spin_lock_init(&ctrl_lgrp->config_lock);
++	spin_lock_init(&ctrl_lgrp->log_lock);
++
++	spin_lock_init(&(ctrl_lgrp->ctrl_notif.lock));
++
++	rtn = kfifo_alloc(&ctrl_lgrp->ctrl_notif.fifo,
++			  SL_CTRL_LGRP_NOTIF_MSG_COUNT * sizeof(struct sl_lgrp_notif_msg),
++			  GFP_KERNEL);
++	if (rtn) {
++		sl_ctrl_log_err(ctrl_lgrp, LOG_NAME, "create notif fifo failed");
++		rtn = -ENOMEM;
++		goto out_free;
++	}
++	INIT_WORK(&ctrl_lgrp->notif_work, sl_ctrl_lgrp_notif_work);
++
++	rtn = sl_core_lgrp_new(ldev_num, lgrp_num);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_lgrp, LOG_NAME, "core_lgrp_new failed [%d]", rtn);
++		goto out_kfifo_free;
++	}
++
++	rtn = sl_media_lgrp_new(ldev_num, lgrp_num);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_lgrp, LOG_NAME, "media_lgrp_new failed [%d]", rtn);
++		goto out_core_lgrp;
++	}
++
++	if (sysfs_parent) {
++		ctrl_lgrp->parent_kobj = sysfs_parent;
++
++		rtn = sl_sysfs_lgrp_create(ctrl_lgrp);
++		if (rtn) {
++			sl_ctrl_log_err_trace(ctrl_lgrp, LOG_NAME,
++					      "sysfs_lgrp_create failed");
++			goto out_media_lgrp;
++		}
++	}
++
++	sl_ctrl_log_dbg(ctrl_lgrp, LOG_NAME, "new (lgrp = 0x%p)", ctrl_lgrp);
++
++	spin_lock(&ctrl_lgrps_lock);
++	ctrl_lgrps[ldev_num][lgrp_num] = ctrl_lgrp;
++	spin_unlock(&ctrl_lgrps_lock);
++
++	return 0;
++
++out_media_lgrp:
++	sl_media_lgrp_del(ldev_num, lgrp_num);
++out_core_lgrp:
++	sl_core_lgrp_del(ldev_num, lgrp_num);
++out_kfifo_free:
++	kfifo_free(&ctrl_lgrp->ctrl_notif.fifo);
++out_free:
++	kfree(ctrl_lgrp);
++
++	return rtn;
++}
++
++static void sl_ctrl_lgrp_release(struct kref *ref)
++{
++	struct sl_ctrl_lgrp *ctrl_lgrp;
++	u8                   ldev_num;
++	u8                   lgrp_num;
++	u8                   link_num;
++	int                  rtn;
++
++	ctrl_lgrp = container_of(ref, struct sl_ctrl_lgrp, ref_cnt);
++	ldev_num = ctrl_lgrp->ctrl_ldev->num;
++	lgrp_num = ctrl_lgrp->num;
++
++	ctrl_lgrp = sl_ctrl_lgrp_get(ldev_num, lgrp_num);
++	if (!ctrl_lgrp) {
++		sl_ctrl_log_err_trace(NULL, LOG_NAME,
++				      "release lgrp not found (lgrp_num = %u)", lgrp_num);
 +		return;
 +	}
 +
-+	for (i = 0; i < SBL_PCS_NUM_FECL_CNTRS; ++i) {
-+		if (fec_prmts->fec_rates->fecl[i] > fecl_warn) {
-+			sbl_link_counters_incr(sbl, port_num, fec_warn);
++	sl_ctrl_log_dbg(ctrl_lgrp, LOG_NAME, "del (lgrp = 0x%p)", ctrl_lgrp);
 +
-+			if (*warning_count > 0) {
-+				dev_warn(sbl->dev,
-+					 "sbl %d: warning, ccw %lld, (%lld %lld %lld %lld %lld %lld %lld %lld)%s\n",
-+					 port_num, fec_prmts->fec_rates->ccw,
-+					 fec_prmts->fec_rates->fecl[0],
-+					 fec_prmts->fec_rates->fecl[1],
-+					 fec_prmts->fec_rates->fecl[2],
-+					 fec_prmts->fec_rates->fecl[3],
-+					 fec_prmts->fec_rates->fecl[4],
-+					 fec_prmts->fec_rates->fecl[5],
-+					 fec_prmts->fec_rates->fecl[6],
-+					 fec_prmts->fec_rates->fecl[7],
-+					 (*warning_count == 1) ? " - last" : "");
-+				--*warning_count;
-+			} else {
-+				dev_dbg(sbl->dev,
-+					"sbl %d: warning, ccw %lld, (%lld %lld %lld %lld %lld %lld %lld %lld)\n",
-+					port_num, fec_prmts->fec_rates->ccw,
-+					fec_prmts->fec_rates->fecl[0],
-+					fec_prmts->fec_rates->fecl[1],
-+					fec_prmts->fec_rates->fecl[2],
-+					fec_prmts->fec_rates->fecl[3],
-+					fec_prmts->fec_rates->fecl[4],
-+					fec_prmts->fec_rates->fecl[5],
-+					fec_prmts->fec_rates->fecl[6],
-+					fec_prmts->fec_rates->fecl[7]);
-+			}
-+			return;
++	if (!ctrl_lgrp->children_deleted) {
++		for (link_num = 0; link_num < SL_ASIC_MAX_LINKS; ++link_num) {
++			rtn = sl_ctrl_link_del(ldev_num, lgrp_num, link_num);
++			if (rtn && rtn != -EBADRQC)
++				goto retry;
++
++			rtn = sl_ctrl_llr_del(ldev_num, lgrp_num, link_num);
++			if (rtn && rtn != -EBADRQC)
++				goto retry;
++
++			rtn = sl_ctrl_mac_del(ldev_num, lgrp_num, link_num);
++			if (rtn && rtn != -EBADRQC)
++				goto retry;
 +		}
++		ctrl_lgrp->children_deleted = true;
 +	}
++
++	if (!ctrl_lgrp->sysfs_deleted) {
++		/* Must delete sysfs first to guarantee nobody is reading */
++		sl_sysfs_lgrp_delete(ctrl_lgrp);
++		ctrl_lgrp->sysfs_deleted = true;
++	}
++
++	rtn = sl_core_lgrp_del(ldev_num, lgrp_num);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_lgrp, LOG_NAME,
++				      "release - core_lgrp_del failed [%d]", rtn);
++		goto retry;
++	}
++
++	sl_media_lgrp_del(ldev_num, lgrp_num);
++
++	cancel_work_sync(&ctrl_lgrp->notif_work);
++	kfifo_free(&ctrl_lgrp->ctrl_notif.fifo);
++
++	spin_lock(&ctrl_lgrps_lock);
++	ctrl_lgrps[ldev_num][lgrp_num] = NULL;
++	spin_unlock(&ctrl_lgrps_lock);
++
++	complete_all(&ctrl_lgrp->del_complete);
++
++	kfree(ctrl_lgrp);
++	return;
++
++retry:
++	sl_ctrl_log_err_trace(ctrl_lgrp, LOG_NAME,
++			      "release - child/core deletion failed [%d]", rtn);
++	kref_init(&ctrl_lgrp->ref_cnt);
++	complete_all(&ctrl_lgrp->del_complete);
 +}
 +
-+/**
-+ * sbl_fec_thresholds_clear() - Clear fec ccw/ucw/warn thresholds to zero
-+ * @sbl: A slingshot base link device instance
-+ * @port_num: port number
-+ *
-+ * Clears fec ccw/ucw/warn parameters to zero. This update is performed
-+ * while holding a spinlock to ensure safe concurrent access.
-+ *
-+ * Context: Process context, Acquires lock and release fec_cw_lock <spin_lock>
-+ */
-+void sbl_fec_thresholds_clear(struct sbl_inst *sbl, int port_num)
++int sl_ctrl_lgrp_put(struct sl_ctrl_lgrp *ctrl_lgrp)
 +{
-+	struct sbl_link *link = sbl->link + port_num;
-+	struct fec_data *fec_data = link->fec_data;
-+	struct sbl_fec *fec_prmts = fec_data->fec_prmts;
-+
-+	sbl_dev_dbg(sbl->dev, "%d: clearing fec thresholds", port_num);
-+
-+	spin_lock(&fec_prmts->fec_cw_lock);
-+	fec_prmts->fec_ucw_thresh = 0;
-+	fec_prmts->fec_ccw_thresh = 0;
-+	fec_prmts->fec_stp_ccw_thresh = 0;
-+	fec_prmts->fecl_warn  = 0;
-+	spin_unlock(&fec_prmts->fec_cw_lock);
++	return kref_put(&ctrl_lgrp->ref_cnt, sl_ctrl_lgrp_release);
 +}
-+EXPORT_SYMBOL(sbl_fec_thresholds_clear);
 +
-+/**
-+ * sbl_fec_thresholds_set() - setup the fec thresholds
-+ * @sbl: A slingshot base link device instance
-+ * @port_num: port number
-+ * @ucw_in: value for link mode and media
-+ * @ccw_in: value for link mode and media
-+ *
-+ * This function gets ccw/ucw/ccw warning values using arguments
-+ * provided and copies it to the fec parameters.
-+ *
-+ * Context: Process context, Acquires lock and release fec_cw_lock <spin_lock>
-+ *
-+ * Return: 0 on success, negative error code on failure
-+ */
-+int sbl_fec_thresholds_set(struct sbl_inst *sbl, int port_num,
-+			   s32 ucw_in, s32 ccw_in)
++int sl_ctrl_lgrp_del(u8 ldev_num, u8 lgrp_num)
 +{
-+	struct sbl_link *link = sbl->link + port_num;
-+	struct fec_data *fec_data = link->fec_data;
-+	struct sbl_fec *fec_prmts = fec_data->fec_prmts;
++	struct sl_ctrl_lgrp *ctrl_lgrp;
++	unsigned long        timeleft;
 +
-+	int link_mode;
-+	u64 ucw;
-+	u64 ccw;
-+	u64 stp_ccw;
-+	u64 fecl_warn  = 0;
-+	int err = 0;
-+
-+	/* Uncorrected codeword threshold */
-+	switch (ucw_in) {
-+	case SBL_LINK_FEC_INVALID:
-+		sbl_dev_err(sbl->dev, "%d: link ucw invalid", port_num);
-+		goto fail;
-+
-+	case SBL_LINK_FEC_OFF:
-+		ucw = 0;
-+		break;
-+
-+	case SBL_LINK_FEC_IEEE:
-+		ucw = sbl_link_get_ucw_thresh_ieee(sbl, port_num);
-+		break;
-+
-+	case SBL_LINK_FEC_HPE:
-+		ucw = sbl_link_get_ucw_thresh_hpe(sbl, port_num);
-+		break;
-+
-+	default:
-+
-+		if (ucw_in < 0) {
-+			sbl_dev_err(sbl->dev, "%d: bad link attr ucw (%d)", port_num,
-+				    ucw_in);
-+			goto fail;
-+		}
-+
-+		/* explicit number, just use it */
-+		ucw = ucw_in;
-+		break;
++	ctrl_lgrp = sl_ctrl_lgrp_get(ldev_num, lgrp_num);
++	if (!ctrl_lgrp) {
++		sl_ctrl_log_err_trace(NULL, LOG_NAME,
++				      "del not found (ldev_num = %u, lgrp_num = %u)", ldev_num, lgrp_num);
++		return -EBADRQC;
 +	}
 +
-+	/* Corrected codeword threshold */
-+	switch (ccw_in) {
-+	case SBL_LINK_FEC_INVALID:
-+		sbl_dev_err(sbl->dev, "%d: attr ccw invalid", port_num);
-+		goto fail;
++	sl_ctrl_log_dbg(ctrl_lgrp, LOG_NAME, "del (lgrp = 0x%p)", ctrl_lgrp);
++	reinit_completion(&ctrl_lgrp->del_complete);
 +
-+	case SBL_LINK_FEC_OFF:
-+		ccw = 0;
-+		stp_ccw = 0;
-+		break;
++	if (!sl_ctrl_lgrp_put(ctrl_lgrp)) {
++		timeleft = wait_for_completion_timeout(&ctrl_lgrp->del_complete,
++						       msecs_to_jiffies(SL_CTRL_LGRP_DEL_TIMEOUT_MS));
 +
-+	case SBL_LINK_FEC_IEEE:
-+		ccw = sbl_link_get_ccw_thresh_ieee(sbl, port_num);
-+		stp_ccw = sbl_link_get_stp_ccw_thresh_ieee(sbl, port_num);
-+		break;
++		sl_ctrl_log_dbg(NULL, LOG_NAME,
++				"del completion_timeout (timeleft = %lums)", timeleft);
 +
-+	case SBL_LINK_FEC_HPE:
-+		ccw = sbl_link_get_ccw_thresh_hpe(sbl, port_num);
-+		stp_ccw = sbl_link_get_stp_ccw_thresh_hpe(sbl, port_num);
-+		break;
-+
-+	default:
-+
-+		if (ccw_in < 0) {
-+			sbl_dev_err(sbl->dev, "%d:bad link attr ccw (%d)", port_num,
-+				    ccw_in);
-+			goto fail;
++		if (timeleft == 0) {
++			sl_ctrl_log_err(NULL, LOG_NAME,
++					"del timed out (ctrl_lgrp = 0x%p)", ctrl_lgrp);
++			return -ETIMEDOUT;
 +		}
++	}
++	if (sl_ctrl_lgrp_get(ldev_num, lgrp_num) == ctrl_lgrp)
++		return -EBUSY;
 +
-+		/* explicit number, just use it */
-+		ccw = ccw_in;
-+		stp_ccw = ccw_in;
-+		break;
++	return 0;
++}
++
++bool sl_ctrl_lgrp_kref_get_unless_zero(struct sl_ctrl_lgrp *ctrl_lgrp)
++{
++	return (kref_get_unless_zero(&ctrl_lgrp->ref_cnt) != 0);
++}
++
++struct sl_ctrl_lgrp *sl_ctrl_lgrp_get(u8 ldev_num, u8 lgrp_num)
++{
++	struct sl_ctrl_lgrp *ctrl_lgrp;
++
++	spin_lock(&ctrl_lgrps_lock);
++	ctrl_lgrp = ctrl_lgrps[ldev_num][lgrp_num];
++	spin_unlock(&ctrl_lgrps_lock);
++
++	return ctrl_lgrp;
++}
++
++int sl_ctrl_lgrp_connect_id_set(u8 ldev_num, u8 lgrp_num, const char *connect_id)
++{
++	struct sl_ctrl_lgrp *ctrl_lgrp;
++	unsigned long       irq_flags;
++
++	ctrl_lgrp = sl_ctrl_lgrp_get(ldev_num, lgrp_num);
++	if (!ctrl_lgrp) {
++		sl_ctrl_log_err(NULL, LOG_NAME, "NULL lgrp");
++		return -EBADRQC;
 +	}
 +
-+	/* ccw warning thresholds */
-+	err = sbl_base_link_get_status(sbl, port_num,
-+				       NULL, NULL, NULL, NULL, NULL, &link_mode);
++	if (!sl_ctrl_lgrp_kref_get_unless_zero(ctrl_lgrp)) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"kref_get_unless_zero failed (ctrl_lgrp = 0x%p)", ctrl_lgrp);
++		return -EBADRQC;
++	}
 +
-+	if (err) {
-+		sbl_dev_warn(sbl->dev, "%d:thresh, get mode failed [%d]-warnings disabled", port_num, err);
-+		fecl_warn = 0;
-+	} else {
++	spin_lock_irqsave(&ctrl_lgrp->log_lock, irq_flags);
++	strscpy_pad(ctrl_lgrp->log_connect_id, connect_id,
++		    sizeof(ctrl_lgrp->log_connect_id));
++	spin_unlock_irqrestore(&ctrl_lgrp->log_lock, irq_flags);
 +
-+		switch (link_mode) {
-+		case SBL_LINK_MODE_BS_200G:
-+			fecl_warn = ccw / 8;
++	sl_media_lgrp_connect_id_set(ldev_num, lgrp_num, connect_id);
++
++	sl_core_lgrp_connect_id_set(ldev_num, lgrp_num, connect_id);
++
++	if (sl_ctrl_lgrp_put(ctrl_lgrp))
++		sl_ctrl_log_dbg(NULL, LOG_NAME,
++				"connect_id set - lgrp removed (ctrl_lgrp = 0x%p)", ctrl_lgrp);
++
++	return 0;
++}
++
++int sl_ctrl_lgrp_config_set(u8 ldev_num, u8 lgrp_num, struct sl_lgrp_config *lgrp_config)
++{
++	int                 rtn;
++	struct sl_ctrl_lgrp *ctrl_lgrp;
++
++	ctrl_lgrp = sl_ctrl_lgrp_get(ldev_num, lgrp_num);
++	if (!ctrl_lgrp) {
++		sl_ctrl_log_err(NULL, LOG_NAME, "NULL lgrp");
++		return -EBADRQC;
++	}
++
++	if (!sl_ctrl_lgrp_kref_get_unless_zero(ctrl_lgrp)) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"kref_get_unless_zero failed (ctrl_lgrp = 0x%p)", ctrl_lgrp);
++		return -EBADRQC;
++	}
++
++	sl_ctrl_log_dbg(ctrl_lgrp, LOG_NAME, "config set:");
++	sl_ctrl_log_dbg(ctrl_lgrp, LOG_NAME, "  mfs       = %d",   lgrp_config->mfs);
++	sl_ctrl_log_dbg(ctrl_lgrp, LOG_NAME, "  furcation = 0x%X", lgrp_config->furcation);
++	sl_ctrl_log_dbg(ctrl_lgrp, LOG_NAME, "  fec_mode  = 0x%X", lgrp_config->fec_mode);
++	sl_ctrl_log_dbg(ctrl_lgrp, LOG_NAME, "  tech_map  = 0x%X", lgrp_config->tech_map);
++	sl_ctrl_log_dbg(ctrl_lgrp, LOG_NAME, "  fec_map   = 0x%X", lgrp_config->fec_map);
++	sl_ctrl_log_dbg(ctrl_lgrp, LOG_NAME, "  options   = 0x%X", lgrp_config->options);
++
++	rtn = sl_core_lgrp_config_set(ldev_num, lgrp_num, lgrp_config);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_lgrp, LOG_NAME, "core_lgrp_config_set failed [%d]", rtn);
++		goto out;
++	}
++
++	spin_lock(&(ctrl_lgrp->config_lock));
++	ctrl_lgrp->config = *lgrp_config;
++	spin_unlock(&(ctrl_lgrp->config_lock));
++
++	rtn = 0;
++
++out:
++	if (sl_ctrl_lgrp_put(ctrl_lgrp))
++		sl_ctrl_log_dbg(NULL, LOG_NAME,
++				"config set - lgrp removed (ctrl_lgrp = 0x%p)", ctrl_lgrp);
++
++	return rtn;
++}
++
++int sl_ctrl_lgrp_policy_set(u8 ldev_num, u8 lgrp_num, struct sl_lgrp_policy *lgrp_policy)
++{
++	struct sl_ctrl_lgrp *ctrl_lgrp;
++
++	ctrl_lgrp = sl_ctrl_lgrp_get(ldev_num, lgrp_num);
++	if (!ctrl_lgrp) {
++		sl_ctrl_log_err(NULL, LOG_NAME, "NULL lgrp");
++		return -EBADRQC;
++	}
++
++	if (!sl_ctrl_lgrp_kref_get_unless_zero(ctrl_lgrp)) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"kref_get_unless_zero failed (lgrp = 0x%p)", ctrl_lgrp);
++		return -EBADRQC;
++	}
++
++	sl_ctrl_log_dbg(ctrl_lgrp, LOG_NAME, "policy set");
++
++	spin_lock(&(ctrl_lgrp->config_lock));
++	ctrl_lgrp->policy = *lgrp_policy;
++	spin_unlock(&(ctrl_lgrp->config_lock));
++
++	if (sl_ctrl_lgrp_put(ctrl_lgrp))
++		sl_ctrl_log_dbg(NULL, LOG_NAME,
++				"policy set - lgrp removed (ctrl_lgrp = 0x%p)", ctrl_lgrp);
++
++	return 0;
++}
+diff --git a/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_lgrp_notif.c b/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_lgrp_notif.c
+new file mode 100644
+index 000000000000..298b8ab0306c
+--- /dev/null
++++ b/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_lgrp_notif.c
+@@ -0,0 +1,258 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright 2021-2026 Hewlett Packard Enterprise Development LP */
++
++#include <linux/spinlock.h>
++#include <linux/delay.h>
++#include <linux/slab.h>
++#include <linux/err.h>
++
++#include "base/sl_ctrl_log.h"
++#include "sl_ctrl_ldev.h"
++#include "sl_ctrl_lgrp.h"
++#include "sl_ctrl_lgrp_notif.h"
++#include "sl_media_lgrp.h"
++
++#define LOG_NAME SL_CTRL_LGRP_NOTIF_LOG_NAME
++
++#define SL_CTRL_LGRP_NOTIF_LIST_STATE_IDLE    0
++#define SL_CTRL_LGRP_NOTIF_LIST_STATE_SENDING 1
++
++static int sl_ctrl_lgrp_notif_list_state_get(struct sl_ctrl_lgrp *ctrl_lgrp)
++{
++	int notif_list_state;
++
++	spin_lock(&ctrl_lgrp->ctrl_notif.lock);
++	notif_list_state = ctrl_lgrp->ctrl_notif.list_state;
++	spin_unlock(&ctrl_lgrp->ctrl_notif.lock);
++
++	return notif_list_state;
++}
++
++int sl_ctrl_lgrp_notif_callback_reg(u8 ldev_num, u8 lgrp_num, sl_lgrp_notif_t callback,
++				    u32 types, void *tag)
++{
++	int                   rtn;
++	struct sl_ctrl_lgrp  *ctrl_lgrp;
++	u8                    reg_idx;
++	u8                    counter;
++
++	ctrl_lgrp = sl_ctrl_lgrp_get(ldev_num, lgrp_num);
++	if (!ctrl_lgrp) {
++		sl_ctrl_log_err(NULL, LOG_NAME, "NULL ctrl_lgrp");
++		return -EBADRQC;
++	}
++
++	if (!sl_ctrl_lgrp_kref_get_unless_zero(ctrl_lgrp)) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"kref_get_unless_zero failed (ctrl_lgrp = 0x%p)", ctrl_lgrp);
++		return -EBADRQC;
++	}
++
++	sl_ctrl_log_dbg(ctrl_lgrp, LOG_NAME,
++			"notif callback reg (types = 0x%X, tag = 0x%p)",
++			types, tag);
++
++	counter = 0;
++	while (sl_ctrl_lgrp_notif_list_state_get(ctrl_lgrp) == SL_CTRL_LGRP_NOTIF_LIST_STATE_SENDING) {
++		msleep(20);
++		counter++;
++		if (counter >= 10) {
++			sl_ctrl_log_err(ctrl_lgrp, LOG_NAME, "registration timed out");
++			rtn = -ETIMEDOUT;
++			goto out;
++		}
++	}
++
++	spin_lock(&ctrl_lgrp->ctrl_notif.lock);
++	if (ctrl_lgrp->ctrl_notif.list_state == SL_CTRL_LGRP_NOTIF_LIST_STATE_SENDING) {
++		spin_unlock(&ctrl_lgrp->ctrl_notif.lock);
++		sl_ctrl_log_err(ctrl_lgrp, LOG_NAME, "notif list is currently being used");
++		rtn = -EBUSY;
++		goto out;
++	}
++	for (reg_idx = 0; reg_idx < ARRAY_SIZE(ctrl_lgrp->ctrl_notif.reg_entry); ++reg_idx) {
++		if (ctrl_lgrp->ctrl_notif.reg_entry[reg_idx].types == 0) {
++			ctrl_lgrp->ctrl_notif.reg_entry[reg_idx].callback = callback;
++			ctrl_lgrp->ctrl_notif.reg_entry[reg_idx].tag = tag;
++			ctrl_lgrp->ctrl_notif.reg_entry[reg_idx].types = types;
 +			break;
-+		case SBL_LINK_MODE_BJ_100G:
-+			fecl_warn = ccw / 8;
++		}
++	}
++	spin_unlock(&ctrl_lgrp->ctrl_notif.lock);
++
++	if (reg_idx >= ARRAY_SIZE(ctrl_lgrp->ctrl_notif.reg_entry)) {
++		sl_ctrl_log_err(ctrl_lgrp, LOG_NAME, "registration list is full");
++		rtn = -ENOSPC;
++		goto out;
++	}
++
++	if (types & SL_LGRP_NOTIF_MEDIA_PRESENT)
++		sl_media_lgrp_real_cable_if_present_send(ldev_num, lgrp_num);
++
++	if (types & SL_LGRP_NOTIF_MEDIA_NOT_PRESENT)
++		sl_media_lgrp_real_cable_if_not_present_send(ldev_num, lgrp_num);
++
++	if (types & SL_LGRP_NOTIF_MEDIA_HOT)
++		sl_media_lgrp_cable_hot_send(ldev_num, lgrp_num);
++
++	if (types & SL_LGRP_NOTIF_MEDIA_WARM)
++		sl_media_lgrp_cable_warm_send(ldev_num, lgrp_num);
++
++	if (types & SL_LGRP_NOTIF_MEDIA_COLD)
++		sl_media_lgrp_cable_cold_send(ldev_num, lgrp_num);
++
++	rtn = 0;
++out:
++	if (sl_ctrl_lgrp_put(ctrl_lgrp))
++		sl_ctrl_log_dbg(NULL, LOG_NAME,
++				"notif callback reg - lgrp removed (ctrl_lgrp = 0x%p)", ctrl_lgrp);
++
++	return rtn;
++}
++
++int sl_ctrl_lgrp_notif_callback_unreg(u8 ldev_num, u8 lgrp_num, sl_lgrp_notif_t callback,
++				      u32 types)
++{
++	int                   rtn;
++	struct sl_ctrl_lgrp  *ctrl_lgrp;
++	u8                    reg_idx;
++	u8                    counter;
++
++	ctrl_lgrp = sl_ctrl_lgrp_get(ldev_num, lgrp_num);
++	if (!ctrl_lgrp) {
++		sl_ctrl_log_err(NULL, LOG_NAME, "NULL ctrl_lgrp");
++		return -EBADRQC;
++	}
++
++	if (!sl_ctrl_lgrp_kref_get_unless_zero(ctrl_lgrp)) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"kref_get_unless_zero failed (ctrl_lgrp = 0x%p)", ctrl_lgrp);
++		return -EBADRQC;
++	}
++
++	sl_media_lgrp_cable_temp_flags_clr(ldev_num, lgrp_num);
++
++	counter = 0;
++	while (sl_ctrl_lgrp_notif_list_state_get(ctrl_lgrp) == SL_CTRL_LGRP_NOTIF_LIST_STATE_SENDING) {
++		msleep(20);
++		counter++;
++		if (counter >= 10) {
++			sl_ctrl_log_err(ctrl_lgrp, LOG_NAME, "unregistration timed out");
++			rtn = -ETIMEDOUT;
++			goto out;
++		}
++	}
++
++	spin_lock(&ctrl_lgrp->ctrl_notif.lock);
++	if (ctrl_lgrp->ctrl_notif.list_state == SL_CTRL_LGRP_NOTIF_LIST_STATE_SENDING) {
++		spin_unlock(&ctrl_lgrp->ctrl_notif.lock);
++		sl_ctrl_log_err(ctrl_lgrp, LOG_NAME, "notif list is currently being used");
++		rtn = -EBUSY;
++		goto out;
++	}
++	for (reg_idx = 0; reg_idx < ARRAY_SIZE(ctrl_lgrp->ctrl_notif.reg_entry); ++reg_idx) {
++		if ((ctrl_lgrp->ctrl_notif.reg_entry[reg_idx].types == types) &&
++		    (ctrl_lgrp->ctrl_notif.reg_entry[reg_idx].callback == callback)) {
++			ctrl_lgrp->ctrl_notif.reg_entry[reg_idx].callback = NULL;
++			ctrl_lgrp->ctrl_notif.reg_entry[reg_idx].tag = NULL;
++			ctrl_lgrp->ctrl_notif.reg_entry[reg_idx].types = 0;
 +			break;
-+		case SBL_LINK_MODE_CD_100G:
-+			fecl_warn = ccw / 4;
++		}
++	}
++	spin_unlock(&ctrl_lgrp->ctrl_notif.lock);
++
++	sl_ctrl_log_dbg(ctrl_lgrp, LOG_NAME, "notif callback unreg (types = 0x%X)", types);
++
++	rtn = 0;
++
++out:
++	if (sl_ctrl_lgrp_put(ctrl_lgrp))
++		sl_ctrl_log_dbg(NULL, LOG_NAME,
++				"notif callback unreg - lgrp removed (ctrl_lgrp = 0x%p)", ctrl_lgrp);
++
++	return rtn;
++}
++
++int sl_ctrl_lgrp_notif_enqueue(struct sl_ctrl_lgrp *ctrl_lgrp, u8 link_num,
++			       u32 type, union sl_lgrp_notif_info *info, u64 info_map)
++{
++	struct sl_lgrp_notif_msg notif_msg;
++	int                      rtn;
++
++	if (!ctrl_lgrp)
++		return 0;
++
++	sl_ctrl_log_dbg(ctrl_lgrp, LOG_NAME,
++			"notif enqueue (link_num = %d, type = 0x%X)", link_num, type);
++
++	spin_lock(&ctrl_lgrp->ctrl_notif.lock);
++	if (kfifo_is_full(&ctrl_lgrp->ctrl_notif.fifo)) {
++		spin_unlock(&ctrl_lgrp->ctrl_notif.lock);
++		sl_ctrl_log_err(ctrl_lgrp, LOG_NAME, "notification fifo is full");
++		return -ENOSPC;
++	}
++	spin_unlock(&ctrl_lgrp->ctrl_notif.lock);
++
++	if (info)
++		notif_msg.info = *info;
++	else
++		memset(&notif_msg.info, 0, sizeof(notif_msg.info));
++
++	notif_msg.ldev_num = ctrl_lgrp->ctrl_ldev->num;
++	notif_msg.lgrp_num = ctrl_lgrp->num;
++	notif_msg.link_num = link_num;
++	notif_msg.type     = type;
++	notif_msg.info_map = info_map;
++
++	rtn = kfifo_in_spinlocked(&ctrl_lgrp->ctrl_notif.fifo, &notif_msg, sizeof(notif_msg),
++				  &ctrl_lgrp->ctrl_notif.lock);
++	if (rtn != sizeof(notif_msg)) {
++		sl_ctrl_log_err(ctrl_lgrp, LOG_NAME, "write to kfifo failed");
++		return -EFAULT;
++	}
++
++	/* Don't catch the return as it might already be running.  This is ok */
++	queue_work(ctrl_lgrp->ctrl_ldev->notif_workq, &ctrl_lgrp->notif_work);
++
++	return 0;
++}
++
++void sl_ctrl_lgrp_notif_work(struct work_struct *notif_work)
++{
++	struct sl_ctrl_lgrp      *ctrl_lgrp;
++	struct sl_lgrp_notif_msg  notif_msg;
++	u8                        reg_idx;
++	int                       rtn;
++	bool                      is_empty;
++
++	ctrl_lgrp = container_of(notif_work, struct sl_ctrl_lgrp, notif_work);
++
++	sl_ctrl_log_dbg(ctrl_lgrp, LOG_NAME, "notif work");
++
++	spin_lock(&ctrl_lgrp->ctrl_notif.lock);
++	ctrl_lgrp->ctrl_notif.list_state = SL_CTRL_LGRP_NOTIF_LIST_STATE_SENDING;
++	spin_unlock(&ctrl_lgrp->ctrl_notif.lock);
++
++	do {
++		rtn = kfifo_out_spinlocked(&ctrl_lgrp->ctrl_notif.fifo,
++					   &notif_msg, sizeof(notif_msg),
++					   &ctrl_lgrp->ctrl_notif.lock);
++		if (rtn != sizeof(notif_msg)) {
++			sl_ctrl_log_err(ctrl_lgrp, LOG_NAME, "read from kfifo failed");
++			goto out;
++		}
++		for (reg_idx = 0; reg_idx < SL_CTRL_LGRP_NOTIF_REG_COUNT; ++reg_idx) {
++			if (notif_msg.type & ctrl_lgrp->ctrl_notif.reg_entry[reg_idx].types)
++				(ctrl_lgrp->ctrl_notif.reg_entry[reg_idx].callback)
++				(ctrl_lgrp->ctrl_notif.reg_entry[reg_idx].tag, &notif_msg);
++		}
++		spin_lock(&ctrl_lgrp->ctrl_notif.lock);
++		is_empty = kfifo_is_empty(&ctrl_lgrp->ctrl_notif.fifo);
++		spin_unlock(&ctrl_lgrp->ctrl_notif.lock);
++	} while (!is_empty);
++
++out:
++	spin_lock(&ctrl_lgrp->ctrl_notif.lock);
++	ctrl_lgrp->ctrl_notif.list_state = SL_CTRL_LGRP_NOTIF_LIST_STATE_IDLE;
++	spin_unlock(&ctrl_lgrp->ctrl_notif.lock);
++}
+diff --git a/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_link.c b/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_link.c
+new file mode 100644
+index 000000000000..f3a8246fcb67
+--- /dev/null
++++ b/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_link.c
+@@ -0,0 +1,1230 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright 2021-2026 Hewlett Packard Enterprise Development LP */
++
++#include <linux/kobject.h>
++#include <linux/spinlock.h>
++#include <linux/slab.h>
++#include <linux/completion.h>
++
++#include "sl_asic.h"
++#include "sl_sysfs.h"
++#include "base/sl_ctrl_log.h"
++#include "sl_ctrl_ldev.h"
++#include "sl_ctrl_lgrp.h"
++#include "sl_ctrl_link.h"
++#include "data/sl_ctrl_data_link.h"
++#include "sl_ctrl_link_priv.h"
++#include "sl_ctrl_link_counters.h"
++#include "sl_core_str.h"
++#include "sl_core_link.h"
++#include "sl_core_link_an.h"
++#include "sl_core_mac.h"
++#include "sl_core_llr.h"
++#include "sl_core_link_an.h"
++#include "sl_test_common.h"
++
++#define LOG_NAME SL_CTRL_LINK_LOG_NAME
++
++#define SL_CTRL_LINK_DOWN_WAIT_TIMEOUT_MS 2000
++#define SL_CTRL_LINK_DEL_WAIT_TIMEOUT_MS  2000
++
++static struct sl_ctrl_link *ctrl_links[SL_ASIC_MAX_LDEVS][SL_ASIC_MAX_LGRPS][SL_ASIC_MAX_LINKS];
++static DEFINE_SPINLOCK(ctrl_links_lock);
++
++static void sl_ctrl_link_release_work(struct work_struct *work);
++
++int sl_ctrl_link_new(u8 ldev_num, u8 lgrp_num, u8 link_num, struct kobject *sysfs_parent)
++{
++	int                  rtn;
++	struct sl_ctrl_lgrp  *ctrl_lgrp;
++	struct sl_ctrl_link *ctrl_link;
++
++	ctrl_lgrp = sl_ctrl_lgrp_get(ldev_num, lgrp_num);
++	if (!ctrl_lgrp) {
++		sl_ctrl_log_err(NULL, LOG_NAME, "missing lgrp (lgrp_num = %u)", lgrp_num);
++		return -EBADRQC;
++	}
++
++	spin_lock(&ctrl_links_lock);
++	ctrl_link = ctrl_links[ldev_num][lgrp_num][link_num];
++	spin_unlock(&ctrl_links_lock);
++	if (ctrl_link) {
++		sl_ctrl_log_err(NULL, LOG_NAME, "new - link exists");
++		return -EBADRQC;
++	}
++
++	ctrl_link = kzalloc(sizeof(struct sl_ctrl_link), GFP_KERNEL);
++	if (!ctrl_link)
++		return -ENOMEM;
++
++	ctrl_link->magic    = SL_CTRL_LINK_MAGIC;
++	ctrl_link->ver      = SL_CTRL_LINK_VER;
++	ctrl_link->num      = link_num;
++	ctrl_link->ctrl_lgrp = sl_ctrl_lgrp_get(ldev_num, lgrp_num);
++
++	kref_init(&ctrl_link->ref_cnt);
++	kref_init(&ctrl_link->mem_ref);
++	INIT_WORK(&ctrl_link->release_work, sl_ctrl_link_release_work);
++	mutex_init(&ctrl_link->delete_lock);
++	init_completion(&ctrl_link->del_complete);
++
++	spin_lock_init(&ctrl_link->config_lock);
++	spin_lock_init(&ctrl_link->data_lock);
++
++	rtn = sl_ctrl_link_counters_init(ctrl_link);
++	if (rtn) {
++		sl_ctrl_log_err(ctrl_link, LOG_NAME,
++				"ctrl_link_counters_init failed [%d]", rtn);
++		goto out;
++	}
++
++	rtn = sl_ctrl_link_cause_counters_init(ctrl_link);
++	if (rtn) {
++		sl_ctrl_log_err(ctrl_link, LOG_NAME,
++				"ctrl_link_cause_counters_init failed [%d]", rtn);
++		goto out_counters;
++	}
++
++	rtn = sl_ctrl_link_an_cause_counters_init(ctrl_link);
++	if (rtn) {
++		sl_ctrl_log_err(ctrl_link, LOG_NAME,
++				"ctrl_link_an_cause_counters_init failed [%d]", rtn);
++		goto out_cause_counters;
++	}
++
++	ctrl_link->up_clock.start           = ktime_set(0, 0);
++	ctrl_link->up_clock.elapsed         = ktime_set(0, 0);
++	ctrl_link->up_clock.attempt_count   = 0;
++	ctrl_link->up_clock.attempt_start   = ktime_set(0, 0);
++	ctrl_link->up_clock.attempt_elapsed = ktime_set(0, 0);
++	spin_lock_init(&ctrl_link->up_clock.lock);
++
++	spin_lock_init(&ctrl_link->fec_data.lock);
++	timer_setup(&ctrl_link->fec_mon_timer, sl_ctrl_link_fec_mon_timer, 0);
++	spin_lock_init(&ctrl_link->fec_mon_timer_lock);
++	ctrl_link->fec_data.curr_ptr = &ctrl_link->fec_data.cntrs[0];
++	ctrl_link->fec_data.prev_ptr = &ctrl_link->fec_data.cntrs[1];
++	INIT_WORK(&ctrl_link->fec_mon_timer_work, sl_ctrl_link_fec_mon_timer_work);
++
++	spin_lock_init(&ctrl_link->fec_up_cache.lock);
++	spin_lock_init(&ctrl_link->fec_down_cache.lock);
++
++	ctrl_link->state = SL_LINK_STATE_DOWN;
++
++	rtn = sl_core_link_new(ldev_num, lgrp_num, link_num);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_link, LOG_NAME,
++				      "core_link_new failed [%d]", rtn);
++		goto out_an_counters;
++	}
++
++	if (sysfs_parent) {
++		ctrl_link->parent_kobj = sysfs_parent;
++
++		rtn = sl_sysfs_link_create(ctrl_link);
++		if (rtn) {
++			sl_ctrl_log_err_trace(ctrl_link, LOG_NAME,
++					      "sysfs_link_create failed [%d]", rtn);
++			goto out_core_link;
++		}
++	}
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "new (link = 0x%p)", ctrl_link);
++
++	spin_lock(&ctrl_links_lock);
++	ctrl_links[ldev_num][lgrp_num][link_num] = ctrl_link;
++	spin_unlock(&ctrl_links_lock);
++
++	return 0;
++
++out_core_link:
++	sl_core_link_del(ldev_num, lgrp_num, link_num);
++out_an_counters:
++	sl_ctrl_link_an_cause_counters_del(ctrl_link);
++out_cause_counters:
++	sl_ctrl_link_cause_counters_del(ctrl_link);
++out_counters:
++	sl_ctrl_link_counters_del(ctrl_link);
++out:
++	kfree(ctrl_link);
++	return rtn;
++}
++
++static int sl_ctrl_link_down_cmd(struct sl_ctrl_link *ctrl_link)
++{
++	int rtn;
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "down cmd");
++
++	SL_CTRL_LINK_COUNTER_INC(ctrl_link, LINK_DOWN_CMD);
++
++	sl_ctrl_link_up_clock_reset(ctrl_link);
++
++	sl_ctrl_link_fec_mon_stop(ctrl_link);
++	cancel_work_sync(&ctrl_link->fec_mon_timer_work);
++
++	rtn = sl_core_link_an_lp_caps_stop(ctrl_link->ctrl_lgrp->ctrl_ldev->num,
++					   ctrl_link->ctrl_lgrp->num, ctrl_link->num);
++	if (rtn)
++		sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME,
++				       "del core_link_an_lp_caps_stop failed [%d]", rtn);
++
++	rtn = sl_core_link_down(ctrl_link->ctrl_lgrp->ctrl_ldev->num, ctrl_link->ctrl_lgrp->num, ctrl_link->num,
++				sl_ctrl_link_down_callback, ctrl_link, SL_LINK_DOWN_CAUSE_COMMAND_MAP);
++	if (rtn) {
++		sl_ctrl_log_err(ctrl_link, LOG_NAME, "core_link_down failed [%d]", rtn);
++		return rtn;
++	}
++
++	return 0;
++}
++
++static int sl_ctrl_link_cancel_cmd(struct sl_ctrl_link *ctrl_link)
++{
++	int rtn;
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "cancel cmd");
++
++	SL_CTRL_LINK_COUNTER_INC(ctrl_link, LINK_UP_CANCEL_CMD);
++
++	sl_ctrl_link_fec_mon_stop(ctrl_link);
++	cancel_work_sync(&ctrl_link->fec_mon_timer_work);
++
++	rtn = sl_core_link_an_lp_caps_stop(ctrl_link->ctrl_lgrp->ctrl_ldev->num,
++					   ctrl_link->ctrl_lgrp->num, ctrl_link->num);
++	if (rtn)
++		sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME,
++				       "del core_link_an_lp_caps_stop failed [%d]", rtn);
++
++	rtn = sl_core_link_cancel(ctrl_link->ctrl_lgrp->ctrl_ldev->num, ctrl_link->ctrl_lgrp->num, ctrl_link->num,
++				  sl_ctrl_link_down_callback, ctrl_link);
++	if (rtn) {
++		sl_ctrl_log_err(ctrl_link, LOG_NAME, "core_link_down failed [%d]", rtn);
++		return rtn;
++	}
++
++	return 0;
++}
++
++static void sl_ctrl_link_down_wait(struct sl_ctrl_link *ctrl_link)
++{
++	unsigned long timeleft;
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "down wait");
++
++	timeleft = wait_for_completion_timeout(&ctrl_link->down_complete,
++					       msecs_to_jiffies(SL_CTRL_LINK_DOWN_WAIT_TIMEOUT_MS));
++	if (timeleft == 0)
++		sl_ctrl_log_err(ctrl_link, LOG_NAME,
++				"del completion_timeout (down_complete = 0x%p)",
++			&ctrl_link->down_complete);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "del completion (timeleft = %lu)", timeleft);
++}
++
++static void sl_ctrl_link_free(struct kref *kref)
++{
++	kfree(container_of(kref, struct sl_ctrl_link, mem_ref));
++}
++
++static void sl_ctrl_link_release_work(struct work_struct *work)
++{
++	struct sl_ctrl_link *ctrl_link;
++	u32                  link_state;
++	u8                   ldev_num;
++	u8                   lgrp_num;
++	u8                   link_num;
++	int                  rtn;
++
++	ctrl_link = container_of(work, struct sl_ctrl_link, release_work);
++	ldev_num = ctrl_link->ctrl_lgrp->ctrl_ldev->num;
++	lgrp_num = ctrl_link->ctrl_lgrp->num;
++	link_num = ctrl_link->num;
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "release (link = 0x%p)", ctrl_link);
++
++	spin_lock(&ctrl_link->data_lock);
++	link_state = ctrl_link->state;
++	switch (link_state) {
++	case SL_LINK_STATE_STARTING:
++		ctrl_link->is_canceled = true;
++		spin_unlock(&ctrl_link->data_lock);
++		SL_CTRL_LINK_COUNTER_INC(ctrl_link, LINK_UP_CANCEL_CMD);
++		sl_ctrl_link_cancel_cmd(ctrl_link);
++		sl_ctrl_link_down_wait(ctrl_link);
++		break;
++	case SL_LINK_STATE_UP:
++	case SL_LINK_STATE_UP_DOWN_REQ:
++		ctrl_link->state = SL_LINK_STATE_STOPPING;
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "release stopping");
++		spin_unlock(&ctrl_link->data_lock);
++		sl_ctrl_link_down_cmd(ctrl_link);
++		sl_ctrl_link_down_wait(ctrl_link);
++		break;
++	case SL_LINK_STATE_STOPPING:
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "release already stopping");
++		spin_unlock(&ctrl_link->data_lock);
++		sl_ctrl_link_down_wait(ctrl_link);
++		break;
++	case SL_LINK_STATE_DOWN:
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "release already down");
++		spin_unlock(&ctrl_link->data_lock);
++		break;
++	case SL_LINK_STATE_INVALID:
++	default:
++		sl_ctrl_log_err(ctrl_link, LOG_NAME, "release invalid state (link_state = %u %s)",
++				link_state, sl_link_state_str(link_state));
++		spin_unlock(&ctrl_link->data_lock);
++		rtn = -EBUSY;
++		goto out_retry;
++	}
++
++	spin_lock(&ctrl_link->data_lock);
++	link_state = ctrl_link->state;
++	spin_unlock(&ctrl_link->data_lock);
++	if (link_state != SL_LINK_STATE_DOWN) {
++		rtn = -EBUSY;
++		goto out_retry;
++	}
++
++	if (!ctrl_link->sysfs_deleted) {
++		/* Must delete sysfs first to guarantee nobody is reading */
++		sl_sysfs_link_delete(ctrl_link);
++		ctrl_link->sysfs_deleted = true;
++	}
++
++	rtn = sl_core_link_del(ldev_num, lgrp_num, link_num);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_link, LOG_NAME,
++				      "release - core_link_del failed [%d]", rtn);
++		goto out_retry;
++	}
++
++	sl_ctrl_link_counters_del(ctrl_link);
++	sl_ctrl_link_cause_counters_del(ctrl_link);
++	sl_ctrl_link_an_cause_counters_del(ctrl_link);
++
++	spin_lock(&ctrl_links_lock);
++	ctrl_links[ldev_num][lgrp_num][link_num] = NULL;
++	spin_unlock(&ctrl_links_lock);
++
++	ctrl_link->delete_result = 0;
++	complete_all(&ctrl_link->del_complete);
++
++	kref_put(&ctrl_link->mem_ref, sl_ctrl_link_free);
++	return;
++
++out_retry:
++	spin_lock(&ctrl_links_lock);
++	ctrl_link->delete_result = rtn;
++	kref_init(&ctrl_link->ref_cnt);
++	ctrl_link->delete_requested = false;
++	complete_all(&ctrl_link->del_complete);
++	spin_unlock(&ctrl_links_lock);
++}
++
++static void sl_ctrl_link_release(struct kref *kref)
++{
++	struct sl_ctrl_link *ctrl_link = container_of(kref, struct sl_ctrl_link, ref_cnt);
++
++	queue_work(system_unbound_wq, &ctrl_link->release_work);
++}
++
++int sl_ctrl_link_put(struct sl_ctrl_link *ctrl_link)
++{
++	return ctrl_link ? kref_put(&ctrl_link->ref_cnt, sl_ctrl_link_release) : 0;
++}
++
++int sl_ctrl_link_del(u8 ldev_num, u8 lgrp_num, u8 link_num)
++{
++	struct sl_ctrl_link *ctrl_link;
++	unsigned long        timeleft;
++	bool                 drop_owner = false;
++	int                  rtn;
++
++	sl_ctrl_log_dbg(NULL, LOG_NAME, "link del (ldev_num = %u, lgrp_num = %u, link_num = %u)",
++			ldev_num, lgrp_num, link_num);
++
++	spin_lock(&ctrl_links_lock);
++	ctrl_link = ctrl_links[ldev_num][lgrp_num][link_num];
++	if (ctrl_link)
++		kref_get(&ctrl_link->mem_ref);
++	spin_unlock(&ctrl_links_lock);
++	if (!ctrl_link) {
++		sl_ctrl_log_err_trace(NULL, LOG_NAME,
++				      "link del link not found (ldev_num = %u, lgrp_num = %u, link_num = %u)",
++			ldev_num, lgrp_num, link_num);
++		return -EBADRQC;
++	}
++
++	mutex_lock(&ctrl_link->delete_lock);
++	spin_lock(&ctrl_links_lock);
++	if (!ctrl_link->delete_requested) {
++		ctrl_link->delete_requested = true;
++		reinit_completion(&ctrl_link->del_complete);
++		drop_owner = true;
++	}
++	spin_unlock(&ctrl_links_lock);
++	if (drop_owner)
++		sl_ctrl_link_put(ctrl_link);
++
++	timeleft = wait_for_completion_timeout(&ctrl_link->del_complete,
++					       msecs_to_jiffies(SL_CTRL_LINK_DEL_WAIT_TIMEOUT_MS));
++	rtn = timeleft ? ctrl_link->delete_result : -ETIMEDOUT;
++	mutex_unlock(&ctrl_link->delete_lock);
++	kref_put(&ctrl_link->mem_ref, sl_ctrl_link_free);
++	return rtn;
++}
++
++bool sl_ctrl_link_kref_get_unless_zero(struct sl_ctrl_link *ctrl_link)
++{
++	return (kref_get_unless_zero(&ctrl_link->ref_cnt) != 0);
++}
++
++struct sl_ctrl_link *sl_ctrl_link_get(u8 ldev_num, u8 lgrp_num, u8 link_num)
++{
++	struct sl_ctrl_link *ctrl_link;
++
++	spin_lock(&ctrl_links_lock);
++	ctrl_link = ctrl_links[ldev_num][lgrp_num][link_num];
++	if (ctrl_link && (ctrl_link->delete_requested ||
++			  !kref_get_unless_zero(&ctrl_link->ref_cnt)))
++		ctrl_link = NULL;
++	spin_unlock(&ctrl_links_lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "get (link = 0x%p)", ctrl_link);
++
++	return ctrl_link;
++}
++
++static int sl_ctrl_link_config_set_cmd(struct sl_ctrl_link *ctrl_link, struct sl_link_config *link_config)
++{
++	struct sl_core_link_config core_link_config;
++	int                        rtn;
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "config set cmd");
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "  link_up_timeout                = %ums",
++			link_config->link_up_timeout_ms);
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "  link_up_tries_max              = %d",
++			link_config->link_up_tries_max);
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "  fec_up_settle_wait             = %dms",
++			link_config->fec_up_settle_wait_ms);
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "  fec_up_check_wait              = %dms",
++			link_config->fec_up_check_wait_ms);
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "  fec_up_ucw_limit               = %d",
++			link_config->fec_up_ucw_limit);
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "  fec_up_ccw_limit               = %d",
++			link_config->fec_up_ccw_limit);
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "  pml_rec_timeout                = %ums",
++			link_config->pml_rec_timeout_ms);
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "  pml_rec_rate_limit_max_time    = %ums",
++			link_config->pml_rec_rate_limit_max_time_ms);
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "  pml_rec_rate_limit_window_size = %ums",
++			link_config->pml_rec_rate_limit_window_size_ms);
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "  pause_map                      = 0x%X",
++			link_config->pause_map);
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "  hpe_map                        = 0x%X",
++			link_config->hpe_map);
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "  options                        = 0x%X",
++			link_config->options);
++
++	/* Check if the configuration is locked. If we are performing an admin operation, then we can ignore the
++	 * lock bit and continue to write the config.
++	 */
++	spin_lock(&ctrl_link->config_lock);
++	if (!(link_config->options & SL_LINK_CONFIG_OPT_ADMIN) &&
++	    (ctrl_link->config.options & SL_LINK_CONFIG_OPT_LOCK)) {
++		sl_ctrl_log_info(ctrl_link, LOG_NAME, "link config locked (options: 0x%X)", ctrl_link->config.options);
++		spin_unlock(&ctrl_link->config_lock);
++		return 0;
++	}
++	spin_unlock(&ctrl_link->config_lock);
++
++	/* Admin bit is transient */
++	link_config->options &= ~SL_LINK_CONFIG_OPT_ADMIN;
++
++	if ((!link_config->fec_up_settle_wait_ms && link_config->fec_up_check_wait_ms) ||
++	    (link_config->fec_up_settle_wait_ms && !link_config->fec_up_check_wait_ms)) {
++		sl_ctrl_log_err(ctrl_link, LOG_NAME, "fec_up invalid (settle_wait = %ums, check_wait = %ums)",
++				link_config->fec_up_settle_wait_ms, link_config->fec_up_check_wait_ms);
++		return -EINVAL;
++	}
++
++	core_link_config.magic                = SL_CORE_LINK_CONFIG_MAGIC;
++	core_link_config.fault_start_callback = sl_ctrl_link_fault_start_callback;
++	core_link_config.fault_callback       = sl_ctrl_link_fault_callback;
++
++	/* timeouts */
++	core_link_config.link_up_timeout_ms = link_config->link_up_timeout_ms;
++
++	/* fec config */
++	core_link_config.fec_up_settle_wait_ms = link_config->fec_up_settle_wait_ms;
++	core_link_config.fec_up_check_wait_ms  = link_config->fec_up_check_wait_ms;
++	core_link_config.fec_up_ucw_limit      = link_config->fec_up_ucw_limit;
++	core_link_config.fec_up_ccw_limit      = link_config->fec_up_ccw_limit;
++
++	/* pml recovery config */
++	core_link_config.pml_rec_timeout_ms                = link_config->pml_rec_timeout_ms;
++	core_link_config.pml_rec_rate_limit_max_time_ms    = link_config->pml_rec_rate_limit_max_time_ms;
++	core_link_config.pml_rec_rate_limit_window_size_ms = link_config->pml_rec_rate_limit_window_size_ms;
++
++	/* maps */
++	core_link_config.hpe_map   = link_config->hpe_map;
++	core_link_config.pause_map = link_config->pause_map;
++
++	/* flags */
++	core_link_config.flags = link_config->options;
++
++	rtn = sl_core_link_config_set(ctrl_link->ctrl_lgrp->ctrl_ldev->num,
++				      ctrl_link->ctrl_lgrp->num, ctrl_link->num, &core_link_config);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_link, LOG_NAME,
++				      "core_link_config_set failed [%d]", rtn);
++		return rtn;
++	}
++
++	spin_lock(&ctrl_link->config_lock);
++	ctrl_link->config = *link_config;
++	spin_unlock(&ctrl_link->config_lock);
++
++	if (ctrl_link->config.link_up_tries_max == SL_LINK_INFINITE_UP_TRIES)
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "link up tries set to infinite");
++
++	return 0;
++}
++
++int sl_ctrl_link_config_set(u8 ldev_num, u8 lgrp_num, u8 link_num,
++			    struct sl_link_config *link_config)
++{
++	int                  rtn;
++	struct sl_ctrl_link *ctrl_link __free(sl_ctrl_link_put) = NULL;
++	u32                  link_state;
++
++	ctrl_link = sl_ctrl_link_get(ldev_num, lgrp_num, link_num);
++	if (!ctrl_link)
++		return -ENODEV;
++	if (!ctrl_link) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"config set NULL link (ldev_num = %u, lgrp_num = %u, link_num = %u)",
++			ldev_num, lgrp_num, link_num);
++		return -EBADRQC;
++	}
++
++	if (!sl_ctrl_link_kref_get_unless_zero(ctrl_link)) {
++		sl_ctrl_log_err(ctrl_link, LOG_NAME, "config set link ref unavailable (ctrl_link = 0x%p)",
++				ctrl_link);
++		return -EBADRQC;
++	}
++
++	rtn = sl_ctrl_data_link_state_get(ctrl_link, &link_state);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_link, LOG_NAME, "data_link_state_get failed [%d]", rtn);
++		goto out;
++	}
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "config set (link_state = %u %s)",
++			link_state, sl_link_state_str(link_state));
++
++	switch (link_state) {
++	case SL_LINK_STATE_DOWN:
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "config - set");
++		rtn = sl_ctrl_link_config_set_cmd(ctrl_link, link_config);
++		if (rtn) {
++			sl_ctrl_log_err_trace(ctrl_link, LOG_NAME, "link_config_set_cmd failed [%d]", rtn);
++			goto out;
++		}
++
++		rtn = 0;
++		goto out;
++	case SL_LINK_STATE_STARTING:
++	case SL_LINK_STATE_INVALID:
++	case SL_LINK_STATE_STOPPING:
++	case SL_LINK_STATE_UP:
++	case SL_LINK_STATE_UP_DOWN_REQ:
++	default:
++		sl_ctrl_log_err(ctrl_link, LOG_NAME, "config - invalid (link_state = %u %s)",
++				link_state, sl_link_state_str(link_state));
++		rtn = -EBADRQC;
++		goto out;
++	}
++
++out:
++	if (sl_ctrl_link_put(ctrl_link))
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "config - link removed (link = 0x%p)", ctrl_link);
++
++	return rtn;
++}
++
++int sl_ctrl_link_policy_set(u8 ldev_num, u8 lgrp_num, u8 link_num,
++			    struct sl_link_policy *link_policy)
++{
++	int                         rtn;
++	u32                         link_state;
++	struct sl_ctrl_link *ctrl_link __free(sl_ctrl_link_put) = NULL;
++	struct sl_core_link_policy  core_link_policy;
++
++	ctrl_link = sl_ctrl_link_get(ldev_num, lgrp_num, link_num);
++	if (!ctrl_link)
++		return -ENODEV;
++	if (!ctrl_link) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"policy set NULL link (ldev_num = %u, lgrp_num = %u, link_num = %u)",
++			ldev_num, lgrp_num, link_num);
++		return -EBADRQC;
++	}
++
++	if (!sl_ctrl_link_kref_get_unless_zero(ctrl_link)) {
++		sl_ctrl_log_err(ctrl_link, LOG_NAME, "policy set link ref unavailable (ctrl_link = 0x%p)",
++				ctrl_link);
++		return -EBADRQC;
++	}
++
++	/* Check if the policy is locked. If we are performing an admin operation, then we can ignore the
++	 * lock bit and continue to write the config.
++	 */
++	spin_lock(&ctrl_link->config_lock);
++	if (!(link_policy->options & SL_LINK_POLICY_OPT_ADMIN) &&
++	    (ctrl_link->policy.options & SL_LINK_POLICY_OPT_LOCK)) {
++		sl_ctrl_log_info(ctrl_link, LOG_NAME, "link policy locked (options: 0x%X)", ctrl_link->policy.options);
++		spin_unlock(&ctrl_link->config_lock);
++		rtn = 0;
++		goto out;
++	}
++	spin_unlock(&ctrl_link->config_lock);
++
++	/* Admin bit is transient */
++	link_policy->options &= ~SL_LINK_POLICY_OPT_ADMIN;
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "policy set");
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "  fec_mon_ucw_down_limit = %d", link_policy->fec_mon_ucw_down_limit);
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "  fec_mon_ucw_warn_limit = %d", link_policy->fec_mon_ucw_warn_limit);
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "  fec_mon_ccw_down_limit = %d", link_policy->fec_mon_ccw_down_limit);
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "  fec_mon_ccw_warn_limit = %d", link_policy->fec_mon_ccw_warn_limit);
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "  fec_mon_period         = %dms", link_policy->fec_mon_period_ms);
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "  options                = 0x%X", link_policy->options);
++
++	spin_lock(&ctrl_link->config_lock);
++	ctrl_link->policy = *link_policy;
++	spin_unlock(&ctrl_link->config_lock);
++
++	core_link_policy.options = link_policy->options;
++	rtn = sl_core_link_policy_set(ctrl_link->ctrl_lgrp->ctrl_ldev->num, ctrl_link->ctrl_lgrp->num, ctrl_link->num,
++				      &core_link_policy);
++	if (rtn) {
++		sl_core_log_err(ctrl_link, LOG_NAME, "core link policy set failed [%d]", rtn);
++		rtn = -EBADRQC;
++		goto out;
++	}
++
++	rtn = sl_ctrl_data_link_state_get(ctrl_link, &link_state);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_link, LOG_NAME, "data link state get failed [%d]", rtn);
++		goto out;
++	}
++
++	if ((link_state != SL_LINK_STATE_UP) && (link_state != SL_LINK_STATE_UP_DOWN_REQ)) {
++		sl_core_log_dbg(ctrl_link, LOG_NAME, "link_policy_set not up (link_state = %u %s)", link_state,
++				sl_core_link_state_str(link_state));
++		rtn = 0;
++		goto out;
++	}
++
++	sl_ctrl_link_fec_mon_start(ctrl_link);
++
++	rtn = 0;
++
++out:
++	if (sl_ctrl_link_put(ctrl_link))
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "policy set - link removed (link = 0x%p)", ctrl_link);
++
++	return rtn;
++}
++
++int sl_ctrl_link_an_lp_caps_get(u8 ldev_num, u8 lgrp_num, u8 link_num,
++				struct sl_link_caps *caps, u32 timeout_ms, u32 flags)
++{
++	int                  rtn;
++	struct sl_ctrl_link *ctrl_link __free(sl_ctrl_link_put) = NULL;
++
++	ctrl_link = sl_ctrl_link_get(ldev_num, lgrp_num, link_num);
++	if (!ctrl_link)
++		return -ENODEV;
++	if (!ctrl_link) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"caps get NULL link (ldev_num = %u, lgrp_num = %u, link_num = %u)",
++			ldev_num, lgrp_num, link_num);
++		return -EBADRQC;
++	}
++
++	if (!sl_ctrl_link_kref_get_unless_zero(ctrl_link)) {
++		sl_ctrl_log_err(ctrl_link, LOG_NAME, "caps get link ref unavailable (ctrl_link = 0x%p)",
++				ctrl_link);
++		return -EBADRQC;
++	}
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "an lp caps get");
++
++	rtn = sl_core_link_an_lp_caps_get(ldev_num, lgrp_num, link_num,
++					  sl_ctrl_link_an_lp_caps_get_callback, ctrl_link, caps, timeout_ms, flags);
++	if (rtn)
++		sl_ctrl_log_err_trace(ctrl_link, LOG_NAME,
++				      "core_link_an_lp_caps_get failed [%d]", rtn);
++
++	if (sl_ctrl_link_put(ctrl_link))
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "an lp caps get - link removed (link = 0x%p)", ctrl_link);
++
++	return rtn;
++}
++
++int sl_ctrl_link_an_lp_caps_stop(u8 ldev_num, u8 lgrp_num, u8 link_num)
++{
++	int                  rtn;
++	struct sl_ctrl_link *ctrl_link __free(sl_ctrl_link_put) = NULL;
++
++	ctrl_link = sl_ctrl_link_get(ldev_num, lgrp_num, link_num);
++	if (!ctrl_link)
++		return -ENODEV;
++	if (!ctrl_link) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"caps stop NULL link (ldev_num = %u, lgrp_num = %u, link_num = %u)",
++			ldev_num, lgrp_num, link_num);
++		return -EBADRQC;
++	}
++
++	if (!sl_ctrl_link_kref_get_unless_zero(ctrl_link)) {
++		sl_ctrl_log_err(ctrl_link, LOG_NAME, "caps stop link ref unavailable (ctrl_link = 0x%p)",
++				ctrl_link);
++		return -EBADRQC;
++	}
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "an lp caps stop");
++
++	rtn = sl_core_link_an_lp_caps_stop(ldev_num, lgrp_num, link_num);
++	if (rtn)
++		sl_ctrl_log_err_trace(ctrl_link, LOG_NAME,
++				      "core_link_an_lp_caps_stop failed [%d]", rtn);
++
++	if (sl_ctrl_link_put(ctrl_link))
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "an lp caps stop - link removed (link = 0x%p)", ctrl_link);
++
++	return rtn;
++}
++
++static int sl_ctrl_link_up_cmd(struct sl_ctrl_link *ctrl_link)
++{
++	int rtn;
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "up cmd");
++
++	SL_CTRL_LINK_COUNTER_INC(ctrl_link, LINK_UP_CMD);
++
++	sl_ctrl_link_up_clock_start(ctrl_link);
++
++	sl_ctrl_link_is_canceled_set(ctrl_link, false);
++
++	init_completion(&ctrl_link->down_complete);
++
++	sl_ctrl_link_up_clock_attempt_start(ctrl_link);
++
++	rtn = sl_core_link_up(ctrl_link->ctrl_lgrp->ctrl_ldev->num, ctrl_link->ctrl_lgrp->num, ctrl_link->num,
++			      sl_ctrl_link_up_callback, ctrl_link);
++	if (rtn) {
++		sl_ctrl_link_state_set(ctrl_link, SL_LINK_STATE_STOPPING);
++
++		sl_ctrl_log_err_trace(ctrl_link, LOG_NAME, "core_link_up failed [%d]", rtn);
++
++		sl_ctrl_link_up_clock_reset(ctrl_link);
++
++		sl_ctrl_link_state_set(ctrl_link, SL_LINK_STATE_DOWN);
++
++		return rtn;
++	}
++
++	return 0;
++}
++
++int sl_ctrl_link_up(u8 ldev_num, u8 lgrp_num, u8 link_num)
++{
++	int                  rtn;
++	struct sl_ctrl_link *ctrl_link __free(sl_ctrl_link_put) = NULL;
++	u32                  link_state;
++
++	ctrl_link = sl_ctrl_link_get(ldev_num, lgrp_num, link_num);
++	if (!ctrl_link)
++		return -ENODEV;
++	if (!ctrl_link) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"link up NULL link (ldev_num = %u, lgrp_num = %u, link_num = %u)",
++			ldev_num, lgrp_num, link_num);
++		return -EBADRQC;
++	}
++
++	if (!sl_ctrl_link_kref_get_unless_zero(ctrl_link)) {
++		sl_ctrl_log_err(ctrl_link, LOG_NAME, "link up ref unavailable (ctrl_link = 0x%p)",
++				ctrl_link);
++		return -EBADRQC;
++	}
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "up");
++
++	spin_lock(&ctrl_link->data_lock);
++	link_state = ctrl_link->state;
++	switch (link_state) {
++	case SL_LINK_STATE_DOWN:
++		ctrl_link->state = SL_LINK_STATE_STARTING;
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "up - starting");
++		spin_unlock(&ctrl_link->data_lock);
++		rtn = sl_ctrl_link_up_cmd(ctrl_link);
++		if (rtn) {
++			sl_ctrl_log_err_trace(ctrl_link, LOG_NAME, "link_up_cmd failed [%d]", rtn);
++			goto out;
++		}
++
++		rtn = 0;
++		goto out;
++	case SL_LINK_STATE_STARTING:
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "up - already starting");
++		spin_unlock(&ctrl_link->data_lock);
++		rtn = -EINPROGRESS;
++		goto out;
++	case SL_LINK_STATE_UP:
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "up - already up");
++		spin_unlock(&ctrl_link->data_lock);
++		rtn = -EALREADY;
++		goto out;
++	case SL_LINK_STATE_UP_DOWN_REQ:
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "up - already up down requested");
++		spin_unlock(&ctrl_link->data_lock);
++		rtn = -EALREADY;
++		goto out;
++	case SL_LINK_STATE_STOPPING:
++	case SL_LINK_STATE_INVALID:
++	default:
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "up - invalid (link_state = %u %s)",
++				link_state, sl_link_state_str(link_state));
++		spin_unlock(&ctrl_link->data_lock);
++		rtn = -EBADRQC;
++		goto out;
++	}
++
++out:
++	if (sl_ctrl_link_put(ctrl_link))
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "up - link removed (link = 0x%p)", ctrl_link);
++
++	return rtn;
++}
++
++int sl_ctrl_link_down(u8 ldev_num, u8 lgrp_num, u8 link_num)
++{
++	int                  rtn;
++	struct sl_ctrl_link *ctrl_link __free(sl_ctrl_link_put) = NULL;
++	u32                  link_state;
++
++	ctrl_link = sl_ctrl_link_get(ldev_num, lgrp_num, link_num);
++	if (!ctrl_link)
++		return -ENODEV;
++	if (!ctrl_link) {
++		sl_ctrl_log_dbg(NULL, LOG_NAME,
++				"link down NULL link (ldev_num = %u, lgrp_num = %u, link_num = %u)",
++			ldev_num, lgrp_num, link_num);
++		return -EBADRQC;
++	}
++
++	if (!sl_ctrl_link_kref_get_unless_zero(ctrl_link)) {
++		sl_ctrl_log_err(ctrl_link, LOG_NAME, "link down ref unavailable (ctrl_link = 0x%p)",
++				ctrl_link);
++		return -EBADRQC;
++	}
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "down");
++
++	spin_lock(&ctrl_link->data_lock);
++	link_state = ctrl_link->state;
++	switch (link_state) {
++	case SL_LINK_STATE_STARTING:
++		ctrl_link->state = SL_LINK_STATE_STOPPING;
++		ctrl_link->is_canceled = true;
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "down - canceling");
++		spin_unlock(&ctrl_link->data_lock);
++		rtn = sl_ctrl_link_cancel_cmd(ctrl_link);
++		if (rtn) {
++			sl_ctrl_log_err_trace(ctrl_link, LOG_NAME, "cancel_cmd failed [%d]", rtn);
++			goto out;
++		}
++
++		rtn = 0;
++		goto out;
++	case SL_LINK_STATE_UP:
++	case SL_LINK_STATE_UP_DOWN_REQ:
++		ctrl_link->state = SL_LINK_STATE_STOPPING;
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "down - stopping");
++		spin_unlock(&ctrl_link->data_lock);
++		rtn = sl_ctrl_link_down_cmd(ctrl_link);
++		if (rtn) {
++			sl_ctrl_log_err_trace(ctrl_link, LOG_NAME, "down_cmd failed [%d]", rtn);
++			goto out;
++		}
++
++		rtn = 0;
++		goto out;
++	case SL_LINK_STATE_DOWN:
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "down - already down");
++		spin_unlock(&ctrl_link->data_lock);
++		rtn = -EALREADY;
++		goto out;
++	case SL_LINK_STATE_STOPPING:
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "down - already stopping");
++		spin_unlock(&ctrl_link->data_lock);
++		rtn = -EINPROGRESS;
++		goto out;
++	case SL_LINK_STATE_INVALID:
++	default:
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "down - invalid (link_state = %u %s)",
++				link_state, sl_link_state_str(link_state));
++		spin_unlock(&ctrl_link->data_lock);
++		rtn = -EBADRQC;
++		goto out;
++	}
++
++out:
++	if (sl_ctrl_link_put(ctrl_link))
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "down - link removed (link = 0x%p)", ctrl_link);
++
++	return rtn;
++}
++
++static int sl_ctrl_link_reset_cmd(struct sl_ctrl_link *ctrl_link)
++{
++	int           rtn;
++	u8            ldev_num;
++	u8            lgrp_num;
++	u8            link_num;
++	unsigned long timeleft;
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "reset cmd");
++
++	SL_CTRL_LINK_COUNTER_INC(ctrl_link, LINK_RESET_CMD);
++
++	sl_ctrl_link_up_clock_reset(ctrl_link);
++
++	sl_ctrl_link_fec_mon_stop(ctrl_link);
++	cancel_work_sync(&ctrl_link->fec_mon_timer_work);
++
++	ldev_num = ctrl_link->ctrl_lgrp->ctrl_ldev->num;
++	lgrp_num = ctrl_link->ctrl_lgrp->num;
++	link_num = ctrl_link->num;
++
++	rtn = sl_core_llr_stop(ldev_num, lgrp_num, link_num);
++	if (rtn)
++		sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME, "core_llr_stop failed [%d]", rtn);
++
++	rtn = sl_core_mac_tx_stop(ldev_num, lgrp_num, link_num);
++	if (rtn)
++		sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME, "core_mac_tx_stop failed [%d]", rtn);
++
++	rtn = sl_core_mac_rx_stop(ldev_num, lgrp_num, link_num);
++	if (rtn)
++		sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME, "core_mac_rx_stop failed [%d]", rtn);
++
++	rtn = sl_core_link_down(ldev_num, lgrp_num, link_num, sl_ctrl_link_down_callback,
++				ctrl_link, SL_LINK_DOWN_CAUSE_COMMAND_MAP);
++	if (rtn)
++		sl_ctrl_log_warn(ctrl_link, LOG_NAME, "core_link_down failed [%d]", rtn);
++
++	timeleft = wait_for_completion_timeout(&ctrl_link->down_complete,
++					       msecs_to_jiffies(SL_CTRL_LINK_DOWN_WAIT_TIMEOUT_MS));
++	if (timeleft == 0)
++		sl_ctrl_log_err(ctrl_link, LOG_NAME,
++				"completion_timeout (down_complete = 0x%p)", &ctrl_link->down_complete);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "completion (timeleft = %lu)", timeleft);
++
++	sl_core_link_reset(ldev_num, lgrp_num, link_num);
++
++	return 0;
++}
++
++int sl_ctrl_link_reset(u8 ldev_num, u8 lgrp_num, u8 link_num)
++{
++	int                  rtn;
++	struct sl_ctrl_link *ctrl_link __free(sl_ctrl_link_put) = NULL;
++	u32                  link_state;
++
++	ctrl_link = sl_ctrl_link_get(ldev_num, lgrp_num, link_num);
++	if (!ctrl_link)
++		return -ENODEV;
++	if (!ctrl_link) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"link reset NULL link (ldev_num = %u, lgrp_num = %u, link_num = %u)",
++			ldev_num, lgrp_num, link_num);
++		return -EBADRQC;
++	}
++
++	if (!sl_ctrl_link_kref_get_unless_zero(ctrl_link)) {
++		sl_ctrl_log_err(ctrl_link, LOG_NAME, "link reset ref unavailable (ctrl_link = 0x%p)",
++				ctrl_link);
++		return -EBADRQC;
++	}
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "reset");
++
++	spin_lock(&ctrl_link->data_lock);
++	link_state = ctrl_link->state;
++	switch (link_state) {
++	case SL_LINK_STATE_STARTING:
++		ctrl_link->is_canceled = true;
++		SL_CTRL_LINK_COUNTER_INC(ctrl_link, LINK_UP_CANCEL_CMD);
++		fallthrough;
++	case SL_LINK_STATE_UP:
++	case SL_LINK_STATE_UP_DOWN_REQ:
++		ctrl_link->state = SL_LINK_STATE_STOPPING;
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "reset - stopping");
++		spin_unlock(&ctrl_link->data_lock);
++		rtn = sl_ctrl_link_reset_cmd(ctrl_link);
++		if (rtn) {
++			sl_ctrl_log_err_trace(ctrl_link, LOG_NAME, "link_reset_cmd failed [%d]", rtn);
++			goto out;
++		}
++
++		rtn = 0;
++		goto out;
++	case SL_LINK_STATE_DOWN:
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "reset - already down");
++		spin_unlock(&ctrl_link->data_lock);
++		rtn = 0;
++		goto out;
++	case SL_LINK_STATE_STOPPING:
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "down - already stopping");
++		spin_unlock(&ctrl_link->data_lock);
++
++		rtn = 0;
++		goto out;
++	case SL_LINK_STATE_INVALID:
++	default:
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "reset - invalid (link_state = %u %s)",
++				link_state, sl_link_state_str(link_state));
++		spin_unlock(&ctrl_link->data_lock);
++		rtn = -EBADRQC;
++		goto out;
++	}
++
++out:
++	if (sl_ctrl_link_put(ctrl_link))
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "reset - link removed (link = 0x%p)", ctrl_link);
++
++	return rtn;
++}
++
++int sl_ctrl_link_up_clocks_get(u8 ldev_num, u8 lgrp_num, u8 link_num,
++			       s64 *attempt_time, s64 *total_time, s64 *up_time)
++{
++	struct sl_ctrl_link *ctrl_link __free(sl_ctrl_link_put) = NULL;
++
++	ctrl_link = sl_ctrl_link_get(ldev_num, lgrp_num, link_num);
++	if (!ctrl_link)
++		return -ENODEV;
++	if (!ctrl_link) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"clocks get NULL link (ldev_num = %u, lgrp_num = %u, link_num = %u)",
++				ldev_num, lgrp_num, link_num);
++		return -EBADRQC;
++	}
++
++	if (!sl_ctrl_link_kref_get_unless_zero(ctrl_link)) {
++		sl_ctrl_log_err(ctrl_link, LOG_NAME, "clocks get link ref unavailable (ctrl_link = 0x%p)",
++				ctrl_link);
++		return -EBADRQC;
++	}
++
++	spin_lock(&ctrl_link->up_clock.lock);
++
++	if (!ktime_compare(ctrl_link->up_clock.attempt_start, ktime_set(0, 0)))
++		*attempt_time = ktime_to_ms(ctrl_link->up_clock.attempt_elapsed);
++	else
++		*attempt_time = ktime_to_ms(ktime_sub(ktime_get(), ctrl_link->up_clock.attempt_start));
++
++	if (!ktime_compare(ctrl_link->up_clock.start, ktime_set(0, 0)))
++		*total_time = ktime_to_ms(ctrl_link->up_clock.elapsed);
++	else
++		*total_time = ktime_to_ms(ktime_sub(ktime_get(), ctrl_link->up_clock.start));
++
++	if (!ktime_compare(ctrl_link->up_clock.up, ktime_set(0, 0)))
++		*up_time = 0;
++	else
++		*up_time = ktime_to_ms(ktime_sub(ktime_get(), ctrl_link->up_clock.up));
++
++	spin_unlock(&ctrl_link->up_clock.lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"clocks get (attempt_time = %lld, total_time = %lld)", *attempt_time, *total_time);
++
++	if (sl_ctrl_link_put(ctrl_link))
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "clocks get - link removed (link = 0x%p)", ctrl_link);
++
++	return 0;
++}
++
++int sl_ctrl_link_up_count_get(u8 ldev_num, u8 lgrp_num, u8 link_num, u32 *attempt_count)
++{
++	struct sl_ctrl_link *ctrl_link __free(sl_ctrl_link_put) = NULL;
++
++	ctrl_link = sl_ctrl_link_get(ldev_num, lgrp_num, link_num);
++	if (!ctrl_link)
++		return -ENODEV;
++	if (!ctrl_link) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"count get NULL link (ldev_num = %u, lgrp_num = %u, link_num = %u)",
++				ldev_num, lgrp_num, link_num);
++		return -EBADRQC;
++	}
++
++	if (!sl_ctrl_link_kref_get_unless_zero(ctrl_link)) {
++		sl_ctrl_log_err(ctrl_link, LOG_NAME, "count get link ref unavailable (ctrl_link = 0x%p)",
++				ctrl_link);
++		return -EBADRQC;
++	}
++
++	spin_lock(&ctrl_link->up_clock.lock);
++	*attempt_count = ctrl_link->up_clock.attempt_count;
++	spin_unlock(&ctrl_link->up_clock.lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "count get (attempt_count = %u)", *attempt_count);
++
++	if (sl_ctrl_link_put(ctrl_link))
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "count get - link removed (link = 0x%p)", ctrl_link);
++
++	return 0;
++}
++
++int sl_ctrl_link_state_get_cmd(u8 ldev_num, u8 lgrp_num, u8 link_num, u32 *state)
++{
++	int                  rtn;
++	struct sl_ctrl_link *ctrl_link __free(sl_ctrl_link_put) = NULL;
++
++	*state = SL_LINK_STATE_INVALID;
++	ctrl_link = sl_ctrl_link_get(ldev_num, lgrp_num, link_num);
++	if (!ctrl_link)
++		return -ENODEV;
++	if (!ctrl_link) {
++		sl_ctrl_log_dbg(NULL, LOG_NAME,
++				"state get NULL link (ldev_num = %u, lgrp_num = %u, link_num = %u)",
++			ldev_num, lgrp_num, link_num);
++		return 0;
++	}
++
++	if (!sl_ctrl_link_kref_get_unless_zero(ctrl_link)) {
++		sl_ctrl_log_err(ctrl_link, LOG_NAME, "state get kref unavailable (ctrl_link = 0x%p)", ctrl_link);
++		return -EBADRQC;
++	}
++
++	rtn = sl_ctrl_data_link_state_get(ctrl_link, state);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_link, LOG_NAME, "data_link_state_get failed [%d]", rtn);
++		goto out;
++	}
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"state get (state = %u %s)",
++		*state, sl_link_state_str(*state));
++
++out:
++	sl_ctrl_link_put(ctrl_link);
++
++	return rtn;
++}
++
++int sl_ctrl_link_an_lp_caps_state_get(u8 ldev_num, u8 lgrp_num, u8 link_num, u32 *state)
++{
++	struct sl_ctrl_link *ctrl_link __free(sl_ctrl_link_put) = NULL;
++
++	ctrl_link = sl_ctrl_link_get(ldev_num, lgrp_num, link_num);
++	if (!ctrl_link)
++		return -ENODEV;
++	if (!ctrl_link) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"an lp caps state get NULL link (ldev_num = %u, lgrp_num = %u, link_num = %u)",
++			ldev_num, lgrp_num, link_num);
++		return -EINVAL;
++	}
++
++	if (!sl_ctrl_link_kref_get_unless_zero(ctrl_link)) {
++		sl_ctrl_log_err(ctrl_link, LOG_NAME,
++				"an lp caps state get kref unavailable (ctrl_link = 0x%p)", ctrl_link);
++		return -EBADRQC;
++	}
++
++	*state = sl_core_link_an_lp_caps_state_get(ldev_num, lgrp_num, link_num);
++
++	if (sl_ctrl_link_put(ctrl_link))
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "an lp caps state get - link removed (link = 0x%p)", ctrl_link);
++
++	return 0;
++}
++
++int sl_ctrl_link_an_fail_cause_get(u8 ldev_num, u8 lgrp_num, u8 link_num, u32 *fail_cause, time64_t *fail_time)
++{
++	int    rtn;
++	struct sl_ctrl_link *ctrl_link __free(sl_ctrl_link_put) = NULL;
++
++	ctrl_link = sl_ctrl_link_get(ldev_num, lgrp_num, link_num);
++	if (!ctrl_link)
++		return -ENODEV;
++	if (!ctrl_link) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"an fail cause get NULL link (ldev_num = %u, lgrp_num = %u, link_num = %u)",
++				ldev_num, lgrp_num, link_num);
++		return -EBADRQC;
++	}
++
++	if (!sl_ctrl_link_kref_get_unless_zero(ctrl_link)) {
++		sl_ctrl_log_err(ctrl_link, LOG_NAME,
++				"an fail cause get kref unavailable (ctrl_link = 0x%p)", ctrl_link);
++		return -EBADRQC;
++	}
++
++	rtn = sl_core_link_an_fail_cause_get(ldev_num, lgrp_num, link_num, fail_cause, fail_time);
++
++	if (sl_ctrl_link_put(ctrl_link))
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "an fail cause get - link removed (link = 0x%p)", ctrl_link);
++
++	return rtn;
++}
++
++u32 sl_ctrl_link_an_retry_count_get(struct sl_ctrl_link *ctrl_link, int *count)
++{
++	*count = sl_core_link_an_retry_count_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num,
++						 ctrl_link->ctrl_lgrp->num, ctrl_link->num);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "an retry get (count = %d)", *count);
++
++	return 0;
++}
++
++int sl_ctrl_link_info_map_get(u8 ldev_num, u8 lgrp_num, u8 link_num, u64 *info_map)
++{
++	struct sl_ctrl_link *ctrl_link __free(sl_ctrl_link_put) = NULL;
++
++	ctrl_link = sl_ctrl_link_get(ldev_num, lgrp_num, link_num);
++	if (!ctrl_link)
++		return -ENODEV;
++	if (!ctrl_link) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"info map get NULL link (ldev_num = %u, lgrp_num = %u, link_num = %u)",
++			ldev_num, lgrp_num, link_num);
++		return -EBADRQC;
++	}
++
++	if (!sl_ctrl_link_kref_get_unless_zero(ctrl_link)) {
++		sl_ctrl_log_err(ctrl_link, LOG_NAME, "info map get ref unavailable (ctrl_link = 0x%p)",
++				ctrl_link);
++		return -EBADRQC;
++	}
++
++	*info_map = sl_core_link_info_map_get(ldev_num, lgrp_num, link_num);
++
++	if (sl_ctrl_link_put(ctrl_link))
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "info map get - link removed (link = 0x%p)", ctrl_link);
++
++	return 0;
++}
+diff --git a/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_link_counters.c b/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_link_counters.c
+new file mode 100644
+index 000000000000..1de7d93033b9
+--- /dev/null
++++ b/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_link_counters.c
+@@ -0,0 +1,388 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright 2023-2026 Hewlett Packard Enterprise Development LP */
++
++#include <linux/slab.h>
++
++#include "sl_ctrl_link.h"
++#include "sl_ctrl_link_counters.h"
++#include "base/sl_ctrl_log.h"
++#include "hw/sl_core_hw_an.h"
++
++#define LOG_NAME SL_CTRL_LINK_LOG_NAME
++
++#define SL_CTRL_LINK_COUNTER_INIT(_link, _counter) \
++	(_link)->counters[_counter].name = #_counter
++
++#define SL_CTRL_LINK_CAUSE_COUNTER_INIT(_link, _counter) \
++	(_link)->cause_counters[_counter].name = #_counter
++
++#define SL_CTRL_LINK_AN_CAUSE_COUNTER_INIT(_link, _counter) \
++	(_link)->an_cause_counters[_counter].name = #_counter
++
++int sl_ctrl_link_counters_init(struct sl_ctrl_link *ctrl_link)
++{
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "link counters init");
++
++	ctrl_link->counters = kzalloc(sizeof(struct sl_ctrl_link_counter) * SL_CTRL_LINK_COUNTERS_COUNT, GFP_KERNEL);
++	if (!ctrl_link->counters)
++		return -ENOMEM;
++
++	SL_CTRL_LINK_COUNTER_INIT(ctrl_link, LINK_UP_CMD);
++	SL_CTRL_LINK_COUNTER_INIT(ctrl_link, LINK_UP_RETRY);
++	SL_CTRL_LINK_COUNTER_INIT(ctrl_link, LINK_UP);
++	SL_CTRL_LINK_COUNTER_INIT(ctrl_link, LINK_UP_FAIL);
++
++	SL_CTRL_LINK_COUNTER_INIT(ctrl_link, LINK_DOWN_CMD);
++	SL_CTRL_LINK_COUNTER_INIT(ctrl_link, LINK_DOWN);
++
++	SL_CTRL_LINK_COUNTER_INIT(ctrl_link, LINK_UP_CANCEL_CMD);
++	SL_CTRL_LINK_COUNTER_INIT(ctrl_link, LINK_UP_CANCELED);
++	SL_CTRL_LINK_COUNTER_INIT(ctrl_link, LINK_RESET_CMD);
++
++	SL_CTRL_LINK_COUNTER_INIT(ctrl_link, LINK_FAULT_ASYNC);
++	SL_CTRL_LINK_COUNTER_INIT(ctrl_link, LINK_RECOVERING);
++
++	SL_CTRL_LINK_COUNTER_INIT(ctrl_link, LINK_CCW_WARN_CROSSED);
++	SL_CTRL_LINK_COUNTER_INIT(ctrl_link, LINK_UCW_WARN_CROSSED);
++
++	SL_CTRL_LINK_COUNTER_INIT(ctrl_link, LINK_DOWN_CCW_LIMIT_CROSSED);
++	SL_CTRL_LINK_COUNTER_INIT(ctrl_link, LINK_DOWN_UCW_LIMIT_CROSSED);
++	SL_CTRL_LINK_COUNTER_INIT(ctrl_link, LINK_DOWN_CCW_CAUSE);
++	SL_CTRL_LINK_COUNTER_INIT(ctrl_link, LINK_DOWN_UCW_CAUSE);
++
++	SL_CTRL_LINK_COUNTER_INIT(ctrl_link, LINK_UP_FAIL_CCW_LIMIT_CROSSED);
++	SL_CTRL_LINK_COUNTER_INIT(ctrl_link, LINK_UP_FAIL_UCW_LIMIT_CROSSED);
++
++	SL_CTRL_LINK_COUNTER_INIT(ctrl_link, LINK_HW_AN_ATTEMPT);
++
++	return 0;
++}
++
++int sl_ctrl_link_counters_get(struct sl_ctrl_link *ctrl_link, u32 counter, int *count)
++{
++	*count = atomic_read(&ctrl_link->counters[counter].count);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "get (counter = %u %s, count = %d)", counter,
++			ctrl_link->counters[counter].name, *count);
++
++	return 0;
++}
++
++void sl_ctrl_link_counters_del(struct sl_ctrl_link *ctrl_link)
++{
++	kfree(ctrl_link->counters);
++}
++
++int sl_ctrl_link_cause_counters_init(struct sl_ctrl_link *ctrl_link)
++{
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "link cause counters init");
++
++	ctrl_link->cause_counters = kzalloc(sizeof(*ctrl_link->cause_counters) *
++					    SL_CTRL_LINK_CAUSE_COUNTERS_COUNT, GFP_KERNEL);
++	if (!ctrl_link->cause_counters)
++		return -ENOMEM;
++
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_UCW);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_LF);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_RF);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_DOWN);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_UP_TRIES);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_AUTONEG_NOMATCH);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_AUTONEG);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_CONFIG);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_INTR_ENABLE);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_TIMEOUT);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_CANCELED);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_UNSUPPORTED_CABLE);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_COMMAND);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_DOWNSHIFT);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_LLR_REPLAY_MAX);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_UPSHIFT);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_AUTONEG_CONFIG);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_PCS_FAULT);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_SERDES_PLL);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_SERDES_CONFIG);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_SERDES_SIGNAL);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_SERDES_QUALITY);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_NO_MEDIA);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_CCW);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_MEDIA_HOT);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_MEDIA_WARM);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_INTR_REGISTER);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_MEDIA_ERROR);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_UP_CANCELED);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_UNSUPPORTED_SPEED);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_SS200_CABLE);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_TX_LOL);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_RX_LOL);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_TX_LOS);
++	SL_CTRL_LINK_CAUSE_COUNTER_INIT(ctrl_link, LINK_CAUSE_RX_LOS);
++
++	return 0;
++}
++
++int sl_ctrl_link_cause_counters_get(struct sl_ctrl_link *ctrl_link, u32 counter, int *count)
++{
++	*count = atomic_read(&ctrl_link->cause_counters[counter].count);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "get (cause counter = %u %s, count = %d)", counter,
++			ctrl_link->cause_counters[counter].name, *count);
++
++	return 0;
++}
++
++void sl_ctrl_link_cause_counters_del(struct sl_ctrl_link *ctrl_link)
++{
++	kfree(ctrl_link->cause_counters);
++}
++
++int sl_ctrl_link_an_cause_counters_init(struct sl_ctrl_link *ctrl_link)
++{
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "link an cause counters init");
++
++	ctrl_link->an_cause_counters = kzalloc(sizeof(*ctrl_link->an_cause_counters) *
++					    SL_CTRL_LINK_AN_CAUSE_COUNTERS_COUNT, GFP_KERNEL);
++	if (!ctrl_link->an_cause_counters)
++		return -ENOMEM;
++
++	SL_CTRL_LINK_AN_CAUSE_COUNTER_INIT(ctrl_link, LINK_AN_CAUSE_LP_CAPS_SERDES_LINK_UP_FAIL);
++	SL_CTRL_LINK_AN_CAUSE_COUNTER_INIT(ctrl_link, LINK_AN_CAUSE_LP_CAPS_NOT_COMPLETE);
++	SL_CTRL_LINK_AN_CAUSE_COUNTER_INIT(ctrl_link, LINK_AN_CAUSE_NOT_COMPLETE);
++	SL_CTRL_LINK_AN_CAUSE_COUNTER_INIT(ctrl_link, LINK_AN_CAUSE_TEST_CAPS_NOMATCH);
++	SL_CTRL_LINK_AN_CAUSE_COUNTER_INIT(ctrl_link, LINK_AN_CAUSE_SERDES_LINK_UP_FAIL);
++	SL_CTRL_LINK_AN_CAUSE_COUNTER_INIT(ctrl_link, LINK_AN_CAUSE_BP_STORE_STATE_BAD);
++	SL_CTRL_LINK_AN_CAUSE_COUNTER_INIT(ctrl_link, LINK_AN_CAUSE_BP_STORE_LP_ABILITY_NOT_SET);
++	SL_CTRL_LINK_AN_CAUSE_COUNTER_INIT(ctrl_link, LINK_AN_CAUSE_BP_STORE_STATE_ERROR);
++	SL_CTRL_LINK_AN_CAUSE_COUNTER_INIT(ctrl_link, LINK_AN_CAUSE_BP_STORE_BP_NOT_SET);
++	SL_CTRL_LINK_AN_CAUSE_COUNTER_INIT(ctrl_link, LINK_AN_CAUSE_BP_SEND_INTR_ENABLE_FAIL);
++	SL_CTRL_LINK_AN_CAUSE_COUNTER_INIT(ctrl_link, LINK_AN_CAUSE_NP_STORE_STATE_BAD);
++	SL_CTRL_LINK_AN_CAUSE_COUNTER_INIT(ctrl_link, LINK_AN_CAUSE_NP_STORE_BP_SET);
++	SL_CTRL_LINK_AN_CAUSE_COUNTER_INIT(ctrl_link, LINK_AN_CAUSE_NP_CHECK_STATE_BAD);
++	SL_CTRL_LINK_AN_CAUSE_COUNTER_INIT(ctrl_link, LINK_AN_CAUSE_INTR_STATE_INVALID);
++	SL_CTRL_LINK_AN_CAUSE_COUNTER_INIT(ctrl_link, LINK_AN_CAUSE_INTR_AN_RETRY_NP_SEND_FAIL);
++	SL_CTRL_LINK_AN_CAUSE_COUNTER_INIT(ctrl_link, LINK_AN_CAUSE_INTR_OUT_OF_PAGES);
++	SL_CTRL_LINK_AN_CAUSE_COUNTER_INIT(ctrl_link, LINK_AN_CAUSE_INTR_NP_SEND_FAIL);
++	SL_CTRL_LINK_AN_CAUSE_COUNTER_INIT(ctrl_link, LINK_AN_CAUSE_PAGES_DECODE_FAIL);
++	SL_CTRL_LINK_AN_CAUSE_COUNTER_INIT(ctrl_link, LINK_AN_CAUSE_PAGES_DECODE_NO_BP);
++	SL_CTRL_LINK_AN_CAUSE_COUNTER_INIT(ctrl_link, LINK_AN_CAUSE_PAGES_DECODE_OUI_INVALID);
++
++	return 0;
++}
++
++int sl_ctrl_link_an_cause_counters_get(struct sl_ctrl_link *ctrl_link, u32 counter, int *count)
++{
++	*count = atomic_read(&ctrl_link->an_cause_counters[counter].count);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "get (an cause counter = %u %s, count = %d)", counter,
++			ctrl_link->an_cause_counters[counter].name, *count);
++
++	return 0;
++}
++
++void sl_ctrl_link_an_cause_counters_del(struct sl_ctrl_link *ctrl_link)
++{
++	kfree(ctrl_link->an_cause_counters);
++}
++
++void sl_ctrl_link_cause_counter_inc(struct sl_ctrl_link *ctrl_link, u64 cause_map)
++{
++	unsigned long which;
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "link cause counter inc");
++
++	for_each_set_bit(which, (unsigned long *)&cause_map, sizeof(cause_map) * BITS_PER_BYTE) {
++		switch (BIT(which)) {
++		case SL_LINK_DOWN_CAUSE_UCW:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_UCW);
 +			break;
-+		case SBL_LINK_MODE_CD_50G:
-+			fecl_warn = ccw / 2;
++		case SL_LINK_DOWN_CAUSE_LF:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_LF);
++			break;
++		case SL_LINK_DOWN_CAUSE_RF:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_RF);
++			break;
++		case SL_LINK_DOWN_CAUSE_DOWN:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_DOWN);
++			break;
++		case SL_LINK_DOWN_CAUSE_UP_TRIES:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_UP_TRIES);
++			break;
++		case SL_LINK_DOWN_CAUSE_AUTONEG_NOMATCH:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_AUTONEG_NOMATCH);
++			break;
++		case SL_LINK_DOWN_CAUSE_AUTONEG:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_AUTONEG);
++			break;
++		case SL_LINK_DOWN_CAUSE_CONFIG:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_CONFIG);
++			break;
++		case SL_LINK_DOWN_CAUSE_INTR_ENABLE:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_INTR_ENABLE);
++			break;
++		case SL_LINK_DOWN_CAUSE_TIMEOUT:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_TIMEOUT);
++			break;
++		case SL_LINK_DOWN_CAUSE_CANCELED:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_CANCELED);
++			break;
++		case SL_LINK_DOWN_CAUSE_UNSUPPORTED_CABLE:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_UNSUPPORTED_CABLE);
++			break;
++		case SL_LINK_DOWN_CAUSE_COMMAND:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_COMMAND);
++			break;
++		case SL_LINK_DOWN_CAUSE_DOWNSHIFT:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_DOWNSHIFT);
++			break;
++		case SL_LINK_DOWN_CAUSE_LLR_REPLAY_MAX:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_LLR_REPLAY_MAX);
++			break;
++		case SL_LINK_DOWN_CAUSE_UPSHIFT:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_UPSHIFT);
++			break;
++		case SL_LINK_DOWN_CAUSE_AUTONEG_CONFIG:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_AUTONEG_CONFIG);
++			break;
++		case SL_LINK_DOWN_CAUSE_PCS_FAULT:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_PCS_FAULT);
++			break;
++		case SL_LINK_DOWN_CAUSE_SERDES_PLL:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_SERDES_PLL);
++			break;
++		case SL_LINK_DOWN_CAUSE_SERDES_CONFIG:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_SERDES_CONFIG);
++			break;
++		case SL_LINK_DOWN_CAUSE_SERDES_SIGNAL:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_SERDES_SIGNAL);
++			break;
++		case SL_LINK_DOWN_CAUSE_SERDES_QUALITY:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_SERDES_QUALITY);
++			break;
++		case SL_LINK_DOWN_CAUSE_NO_MEDIA:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_NO_MEDIA);
++			break;
++		case SL_LINK_DOWN_CAUSE_CCW:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_CCW);
++			break;
++		case SL_LINK_DOWN_CAUSE_MEDIA_HOT:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_MEDIA_HOT);
++			break;
++		case SL_LINK_DOWN_CAUSE_MEDIA_WARM:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_MEDIA_WARM);
++			break;
++		case SL_LINK_DOWN_CAUSE_INTR_REGISTER:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_INTR_REGISTER);
++			break;
++		case SL_LINK_DOWN_CAUSE_MEDIA_ERROR:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_MEDIA_ERROR);
++			break;
++		case SL_LINK_DOWN_CAUSE_UP_CANCELED:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_UP_CANCELED);
++			break;
++		case SL_LINK_DOWN_CAUSE_UNSUPPORTED_SPEED:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_UNSUPPORTED_SPEED);
++			break;
++		case SL_LINK_DOWN_CAUSE_SS200_CABLE:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_SS200_CABLE);
++			break;
++		case SL_LINK_DOWN_CAUSE_TX_LOL:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_TX_LOL);
++			break;
++		case SL_LINK_DOWN_CAUSE_RX_LOL:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_RX_LOL);
++			break;
++		case SL_LINK_DOWN_CAUSE_TX_LOS:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_TX_LOS);
++			break;
++		case SL_LINK_DOWN_CAUSE_RX_LOS:
++			SL_CTRL_LINK_CAUSE_COUNTER_INC(ctrl_link, LINK_CAUSE_RX_LOS);
++			break;
++		case SL_LINK_DOWN_RETRYABLE:
++		case SL_LINK_DOWN_ORIGIN_ASYNC:
++		case SL_LINK_DOWN_ORIGIN_LINK_UP:
 +			break;
 +		default:
-+			fecl_warn = 0;
++			sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME,
++					       "cause_counter_inc unknown cause (bit = %lu)", which);
 +			break;
 +		}
 +	}
-+
-+	sbl_dev_dbg(sbl->dev, "%d: Setting fec thresh ucw %lld, ccw %lld, warn %lld",
-+		    port_num, ucw, ccw, fecl_warn);
-+
-+	spin_lock(&fec_prmts->fec_cw_lock);
-+	fec_prmts->fec_ucw_thresh = ucw;
-+	fec_prmts->fec_ccw_thresh = ccw;
-+	fec_prmts->fec_stp_ccw_thresh = stp_ccw;
-+	fec_prmts->fec_llr_tx_replay_thresh = SBL_FEC_LLR_TX_REPLAY_THRESH;
-+	fec_prmts->fecl_warn = fecl_warn;
-+	spin_unlock(&fec_prmts->fec_cw_lock);
-+
-+	return 0;
-+fail:
-+	sbl_dev_warn(sbl->dev, "%d: fec monitoring disabled", port_num);
-+	sbl_fec_thresholds_clear(sbl, port_num);
-+	return -ENAVAIL;
 +}
-+EXPORT_SYMBOL(sbl_fec_thresholds_set);
 +
-+/**
-+ * sbl_fec_adjustments_set() - setup the fec threshold adjustments
-+ * @sbl: A slingshot base link device instance
-+ * @port_num: port number
-+ * @ucw_adj: Value (An adjustment of zero means disable the test)
-+ * @ccw_adj: Value (An adjustment of zero means disable the test)
-+ *
-+ * This function copies provided parameters(ucw adj/ccw adj) from caller
-+ * into fec parameters of fec_ucw_down_thresh_adj and fec_ccw_down_thresh_adj
-+ *
-+ * Context: Process context, Acquires lock and release fec_cw_lock <spin_lock>
-+ *
-+ * Return: 0 on success
-+ */
-+int sbl_fec_adjustments_set(struct sbl_inst *sbl, int port_num,
-+			    u32 ucw_adj, u32 ccw_adj)
++void sl_ctrl_link_an_cause_counter_inc(struct sl_ctrl_link *ctrl_link, unsigned long cause_map)
 +{
-+	struct sbl_link *link = sbl->link + port_num;
-+	struct fec_data *fec_data = link->fec_data;
-+	struct sbl_fec *fec_prmts = fec_data->fec_prmts;
++	unsigned long which;
 +
-+	spin_lock(&fec_prmts->fec_cw_lock);
-+	fec_prmts->fec_ucw_down_thresh_adj = ucw_adj;
-+	fec_prmts->fec_ccw_down_thresh_adj = ccw_adj;
-+	spin_unlock(&fec_prmts->fec_cw_lock);
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "link an cause counter inc");
 +
-+	sbl_dev_dbg(sbl->dev, "%d: Setting fec thresh adjustments ucw_adj %d, ccw_adj %d",
-+		    port_num, ucw_adj, ccw_adj);
++	BUILD_BUG_ON(SL_CTRL_LINK_AN_CAUSE_COUNTERS_COUNT > 32);
 +
-+	return 0;
-+}
-+EXPORT_SYMBOL(sbl_fec_adjustments_set);
-+
-+int sbl_fec_up_check(struct sbl_inst *sbl, int port_num)
-+{
-+	struct sbl_link *link = sbl->link + port_num;
-+	struct fec_data *fec_data = link->fec_data;
-+	struct sbl_fec *fec_prmts = fec_data->fec_prmts;
-+	bool ucw_err;
-+	bool ccw_err	 = false;
-+	bool stp_ccw_err = false;
-+	u32 ucw_thresh_adj;
-+	u32 ccw_thresh_adj;
-+	u32 stp_ccw_thresh_adj;
-+	int i;
-+
-+	spin_lock(&fec_prmts->fec_cw_lock);
-+	ucw_thresh_adj = fec_prmts->fec_ucw_up_thresh_adj;
-+	ccw_thresh_adj = fec_prmts->fec_ccw_up_thresh_adj;
-+	stp_ccw_thresh_adj = fec_prmts->fec_stp_ccw_up_thresh_adj;
-+	spin_unlock(&fec_prmts->fec_cw_lock);
-+
-+	/* initial measurement */
-+	msleep(SBL_FEC_UP_SETTLE_PERIOD); /* time for fec rates to settle */
-+	sbl_fec_counts_get(sbl, port_num, fec_prmts->fec_curr_cnts);
-+
-+	for (i = 0; i < (link->blattr.options & SBL_OPT_FABRIC_LINK ?
-+			 SBL_FEC_UP_COUNT_FABRIC : SBL_FEC_UP_COUNT_EDGE); ++i) {
-+
-+		msleep(SBL_FEC_UP_WINDOW);
-+		sbl_fec_rates_update(sbl, port_num, SBL_FEC_UP_WINDOW);
-+
-+		ucw_err = sbl_fec_ucw_rate_bad(sbl, port_num, ucw_thresh_adj);
-+		if (ucw_err)
-+			sbl_dev_err(sbl->dev, "%d: fec up check: ucw fail", port_num);
-+
-+		if ((link->dfe_tune_count == SBL_DFE_USED_SAVED_PARAMS) && (stp_ccw_thresh_adj > 0))
-+			stp_ccw_err = sbl_fec_ccw_rate_bad(sbl, port_num, stp_ccw_thresh_adj, true);
-+		else
-+			ccw_err = sbl_fec_ccw_rate_bad(sbl, port_num, ccw_thresh_adj, false);
-+
-+		if (ccw_err)
-+			sbl_dev_err(sbl->dev, "%d: fec up check: ccw fail", port_num);
-+		else if (stp_ccw_err)
-+			sbl_dev_err(sbl->dev, "%d: fec up check: stp ccw fail", port_num);
-+
-+		if (ucw_err || ccw_err || stp_ccw_err) {
-+			sbl_link_counters_incr(sbl, port_num, fec_up_fail);
-+			return -EOVERFLOW;
++	for_each_set_bit(which, &cause_map, sizeof(cause_map) * BITS_PER_BYTE) {
++		switch (BIT(which)) {
++		case SL_CORE_HW_AN_FAIL_CAUSE_LP_CAPS_SERDES_LINK_UP_FAIL:
++			SL_CTRL_LINK_AN_CAUSE_COUNTER_INC(ctrl_link, LINK_AN_CAUSE_LP_CAPS_SERDES_LINK_UP_FAIL);
++			break;
++		case SL_CORE_HW_AN_FAIL_CAUSE_LP_CAPS_NOT_COMPLETE:
++			SL_CTRL_LINK_AN_CAUSE_COUNTER_INC(ctrl_link, LINK_AN_CAUSE_LP_CAPS_NOT_COMPLETE);
++			break;
++		case SL_CORE_HW_AN_FAIL_CAUSE_NOT_COMPLETE:
++			SL_CTRL_LINK_AN_CAUSE_COUNTER_INC(ctrl_link, LINK_AN_CAUSE_NOT_COMPLETE);
++			break;
++		case SL_CORE_HW_AN_FAIL_CAUSE_TEST_CAPS_NOMATCH:
++			SL_CTRL_LINK_AN_CAUSE_COUNTER_INC(ctrl_link, LINK_AN_CAUSE_TEST_CAPS_NOMATCH);
++			break;
++		case SL_CORE_HW_AN_FAIL_CAUSE_SERDES_LINK_UP_FAIL:
++			SL_CTRL_LINK_AN_CAUSE_COUNTER_INC(ctrl_link, LINK_AN_CAUSE_SERDES_LINK_UP_FAIL);
++			break;
++		case SL_CORE_HW_AN_FAIL_CAUSE_BP_STORE_STATE_BAD:
++			SL_CTRL_LINK_AN_CAUSE_COUNTER_INC(ctrl_link, LINK_AN_CAUSE_BP_STORE_STATE_BAD);
++			break;
++		case SL_CORE_HW_AN_FAIL_CAUSE_BP_STORE_LP_ABILITY_NOT_SET:
++			SL_CTRL_LINK_AN_CAUSE_COUNTER_INC(ctrl_link, LINK_AN_CAUSE_BP_STORE_LP_ABILITY_NOT_SET);
++			break;
++		case SL_CORE_HW_AN_FAIL_CAUSE_BP_STORE_STATE_ERROR:
++			SL_CTRL_LINK_AN_CAUSE_COUNTER_INC(ctrl_link, LINK_AN_CAUSE_BP_STORE_STATE_ERROR);
++			break;
++		case SL_CORE_HW_AN_FAIL_CAUSE_BP_STORE_BP_NOT_SET:
++			SL_CTRL_LINK_AN_CAUSE_COUNTER_INC(ctrl_link, LINK_AN_CAUSE_BP_STORE_BP_NOT_SET);
++			break;
++		case SL_CORE_HW_AN_FAIL_CAUSE_BP_SEND_INTR_ENABLE_FAIL:
++			SL_CTRL_LINK_AN_CAUSE_COUNTER_INC(ctrl_link, LINK_AN_CAUSE_BP_SEND_INTR_ENABLE_FAIL);
++			break;
++		case SL_CORE_HW_AN_FAIL_CAUSE_NP_STORE_STATE_BAD:
++			SL_CTRL_LINK_AN_CAUSE_COUNTER_INC(ctrl_link, LINK_AN_CAUSE_NP_STORE_STATE_BAD);
++			break;
++		case SL_CORE_HW_AN_FAIL_CAUSE_NP_STORE_BP_SET:
++			SL_CTRL_LINK_AN_CAUSE_COUNTER_INC(ctrl_link, LINK_AN_CAUSE_NP_STORE_BP_SET);
++			break;
++		case SL_CORE_HW_AN_FAIL_CAUSE_NP_CHECK_STATE_BAD:
++			SL_CTRL_LINK_AN_CAUSE_COUNTER_INC(ctrl_link, LINK_AN_CAUSE_NP_CHECK_STATE_BAD);
++			break;
++		case SL_CORE_HW_AN_FAIL_CAUSE_INTR_STATE_INVALID:
++			SL_CTRL_LINK_AN_CAUSE_COUNTER_INC(ctrl_link, LINK_AN_CAUSE_INTR_STATE_INVALID);
++			break;
++		case SL_CORE_HW_AN_FAIL_CAUSE_INTR_AN_RETRY_NP_SEND_FAIL:
++			SL_CTRL_LINK_AN_CAUSE_COUNTER_INC(ctrl_link, LINK_AN_CAUSE_INTR_AN_RETRY_NP_SEND_FAIL);
++			break;
++		case SL_CORE_HW_AN_FAIL_CAUSE_INTR_OUT_OF_PAGES:
++			SL_CTRL_LINK_AN_CAUSE_COUNTER_INC(ctrl_link, LINK_AN_CAUSE_INTR_OUT_OF_PAGES);
++			break;
++		case SL_CORE_HW_AN_FAIL_CAUSE_INTR_NP_SEND_FAIL:
++			SL_CTRL_LINK_AN_CAUSE_COUNTER_INC(ctrl_link, LINK_AN_CAUSE_INTR_NP_SEND_FAIL);
++			break;
++		case SL_CORE_HW_AN_FAIL_CAUSE_PAGES_DECODE_FAIL:
++			SL_CTRL_LINK_AN_CAUSE_COUNTER_INC(ctrl_link, LINK_AN_CAUSE_PAGES_DECODE_FAIL);
++			break;
++		case SL_CORE_HW_AN_FAIL_CAUSE_PAGES_DECODE_NO_BP:
++			SL_CTRL_LINK_AN_CAUSE_COUNTER_INC(ctrl_link, LINK_AN_CAUSE_PAGES_DECODE_NO_BP);
++			break;
++		case SL_CORE_HW_AN_FAIL_CAUSE_PAGES_DECODE_OUI_INVALID:
++			SL_CTRL_LINK_AN_CAUSE_COUNTER_INC(ctrl_link, LINK_AN_CAUSE_PAGES_DECODE_OUI_INVALID);
++			break;
++		default:
++			sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME,
++					       "an cause_counter_inc unknown fault cause (bit = %lu)", which);
++			break;
 +		}
 +	}
-+
-+	return 0;
 +}
-+
-+void sbl_fec_counts_get(struct sbl_inst *sbl, int port_num,
-+			struct sbl_pcs_fec_cntrs *cntrs)
-+{
-+	cntrs->fecl[0] = sbl_read64(sbl, SBL_PCS_FECL_ERRORS_00_ADDR(port_num));
-+	cntrs->fecl[1] = sbl_read64(sbl, SBL_PCS_FECL_ERRORS_01_ADDR(port_num));
-+	cntrs->fecl[2] = sbl_read64(sbl, SBL_PCS_FECL_ERRORS_02_ADDR(port_num));
-+	cntrs->fecl[3] = sbl_read64(sbl, SBL_PCS_FECL_ERRORS_03_ADDR(port_num));
-+	cntrs->fecl[4] = sbl_read64(sbl, SBL_PCS_FECL_ERRORS_04_ADDR(port_num));
-+	cntrs->fecl[5] = sbl_read64(sbl, SBL_PCS_FECL_ERRORS_05_ADDR(port_num));
-+	cntrs->fecl[6] = sbl_read64(sbl, SBL_PCS_FECL_ERRORS_06_ADDR(port_num));
-+	cntrs->fecl[7] = sbl_read64(sbl, SBL_PCS_FECL_ERRORS_07_ADDR(port_num));
-+
-+	cntrs->ccw = sbl_read64(sbl, SBL_PCS_CORRECTED_CW_ADDR(port_num));
-+	cntrs->ucw = sbl_read64(sbl, SBL_PCS_UNCORRECTED_CW_ADDR(port_num));
-+
-+	cntrs->llr_tx_replay = sbl_read64(sbl, SBL_LLR_TX_REPLAY_EVENT_ADDR(port_num));
-+
-+	cntrs->time = jiffies;
-+}
-+
-+void sbl_fec_monitor_start(struct sbl_inst *sbl, int port_num)
-+{
-+	struct sbl_link *link = sbl->link + port_num;
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&link->lock, flags);
-+	if (!link->start_cancelled) {
-+		link->fec_monitor_enabled = true;
-+		mod_timer(&link->fec_data->fec_timer,
-+			  jiffies + msecs_to_jiffies(SBL_FEC_MON_PERIOD));
-+	}
-+	spin_unlock_irqrestore(&link->lock, flags);
-+}
-+
-+void sbl_fec_monitor_stop(struct sbl_inst *sbl, int port_num)
-+{
-+	struct sbl_link *link = sbl->link + port_num;
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&link->lock, flags);
-+	link->fec_monitor_enabled = false;
-+	spin_unlock_irqrestore(&link->lock, flags);
-+
-+	timer_delete_sync(&link->fec_data->fec_timer);
-+	cancel_work_sync(&link->fec_data->fec_timer_work);
-+}
-+
-+static void sbl_fec_monitor_rearm(struct sbl_link *link)
-+{
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&link->lock, flags);
-+	if (link->fec_monitor_enabled)
-+		mod_timer(&link->fec_data->fec_timer,
-+			  jiffies + msecs_to_jiffies(SBL_FEC_MON_PERIOD));
-+	spin_unlock_irqrestore(&link->lock, flags);
-+}
-+
-+void sbl_fec_timer_work(struct work_struct *work)
-+{
-+	u32 ucw_thresh_adj;
-+	u32 ccw_thresh_adj;
-+	int port_num;
-+	unsigned long irq_flags;
-+	struct sbl_link *link;
-+	enum sbl_link_down_origin down_origin = SBL_LINK_DOWN_ORIGIN_UNKNOWN;
-+	struct sbl_fec *fec_prmts;
-+	int warning_count = SBL_MAX_FEC_WARNINGS;
-+	int err;
-+	struct fec_data *fec_data = container_of(work, struct fec_data, fec_timer_work);
-+	struct sbl_inst *sbl = fec_data->sbl;
-+
-+	port_num = fec_data->port_num;
-+	link = sbl->link + port_num;
-+	fec_prmts = fec_data->fec_prmts;
-+
-+	if ((link->blstate == SBL_BASE_LINK_STATUS_UP) && (sbl_pml_pcs_aligned(sbl, port_num))) {
-+		err = sbl_fec_rates_update(sbl, port_num, SBL_FEC_MON_PERIOD);
-+
-+		if (!err) {
-+			spin_lock_irqsave(&fec_prmts->fec_cw_lock, irq_flags);
-+			ucw_thresh_adj = fec_prmts->fec_ucw_down_thresh_adj;
-+			ccw_thresh_adj = fec_prmts->fec_ccw_down_thresh_adj;
-+			spin_unlock_irqrestore(&fec_prmts->fec_cw_lock, irq_flags);
-+
-+			if (sbl_fec_ucw_rate_bad(sbl, port_num, ucw_thresh_adj)) {
-+				/* take the link down */
-+				down_origin = SBL_LINK_DOWN_ORIGIN_UCW;
-+				sbl_pml_link_down_async_alert(sbl, port_num, down_origin);
-+				return;
-+			}
-+
-+			if (sbl_fec_ccw_rate_bad(sbl, port_num, ccw_thresh_adj, false)) {
-+				/* take the link down */
-+				down_origin = SBL_LINK_DOWN_ORIGIN_CCW;
-+				sbl_pml_link_down_async_alert(sbl, port_num, down_origin);
-+				return;
-+			}
-+
-+			if (sbl_fec_txr_rate_bad(sbl, port_num, 0)) {
-+				/* take the link down */
-+				down_origin = SBL_LINK_DOWN_ORIGIN_LLR_TX_REPLAY;
-+				sbl_pml_link_down_async_alert(sbl, port_num, down_origin);
-+				return;
-+			}
-+			sbl_fec_rates_warnings(sbl, port_num, &warning_count);
-+
-+		}
-+
-+	}
-+	sbl_fec_monitor_rearm(link);
-+}
-+
-+void sbl_zero_all_fec_counts(struct sbl_inst *sbl, int port_num)
-+{
-+	struct sbl_link *link = sbl->link + port_num;
-+	struct fec_data *fec_data = link->fec_data;
-+	struct sbl_fec *fec_prmts = fec_data->fec_prmts;
-+
-+	spin_lock(&fec_prmts->fec_cnt_lock);
-+	memset(fec_prmts->fec_curr_cnts, 0, sizeof(struct sbl_pcs_fec_cntrs));
-+	memset(fec_prmts->fec_prev_cnts, 0, sizeof(struct sbl_pcs_fec_cntrs));
-+	memset(fec_prmts->fec_rates, 0, sizeof(struct sbl_pcs_fec_cntrs));
-+	spin_unlock(&fec_prmts->fec_cnt_lock);
-+}
-+
-+void sbl_fec_timer(struct timer_list *timer)
-+{
-+	int port_num;
-+	struct sbl_link *link;
-+	struct fec_data *fec_data = timer_container_of(fec_data, timer,
-+						       fec_timer);
-+	struct sbl_inst *sbl = fec_data->sbl;
-+
-+	port_num = fec_data->port_num;
-+	link = sbl->link + port_num;
-+
-+	if (!queue_work(sbl->workq, &(link->fec_data->fec_timer_work)))
-+		sbl_dev_warn(sbl->dev, "fec timer work already queued");
-+}
-+
-+#ifdef CONFIG_SYSFS
-+/**
-+ * sbl_fec_sysfs_sprint() - Format FEC parameters status into buffer
-+ * @sbl: A slingshot base link device instance
-+ * @port_num: port number
-+ * @buf: Destination buffer to write the data
-+ * @size: Size of @buf in bytes, the output is truncated to fit
-+ *
-+ * This function formats FEC parameters and writes the result into the
-+ * provided buffer typically for use in sysfs output.
-+ *
-+ * Context: Process context, Acquires lock and release fec_cw_lock <spin_lock>
-+ *
-+ * Return: Number of characters written, at most @size - 1
-+ */
-+int sbl_fec_sysfs_sprint(struct sbl_inst *sbl, int port_num, char *buf, size_t size)
-+{
-+	u64 ucw_thresh;
-+	u64 ucw_hwm;
-+	u64 ccw_thresh;
-+	u64 ccw_hwm;
-+	u64 llr_tx_replay_thresh;
-+	u64 llr_tx_replay_hwm;
-+	u64 fecl_warn;
-+	int s = 0;
-+	struct sbl_link *link = sbl->link + port_num;
-+	struct fec_data *fec_data = link->fec_data;
-+	struct sbl_fec *fec_prmts = fec_data->fec_prmts;
-+
-+	spin_lock(&fec_prmts->fec_cw_lock);
-+	if (link->blstate == SBL_BASE_LINK_STATUS_STARTING) {
-+		ucw_thresh = fec_prmts->fec_ucw_thresh * fec_prmts->fec_ucw_up_thresh_adj / 100;
-+		ccw_thresh = fec_prmts->fec_ccw_thresh * fec_prmts->fec_ccw_up_thresh_adj / 100;
-+	} else {
-+		ucw_thresh = fec_prmts->fec_ucw_thresh * fec_prmts->fec_ucw_down_thresh_adj / 100;
-+		ccw_thresh = fec_prmts->fec_ccw_thresh * fec_prmts->fec_ccw_down_thresh_adj / 100;
-+	}
-+
-+	llr_tx_replay_thresh = fec_prmts->fec_llr_tx_replay_thresh;
-+	ucw_hwm = fec_prmts->fec_ucw_hwm;
-+	ccw_hwm = fec_prmts->fec_ccw_hwm;
-+	llr_tx_replay_hwm = fec_prmts->fec_llr_tx_replay_hwm;
-+	fecl_warn = fec_prmts->fecl_warn;
-+	spin_unlock(&fec_prmts->fec_cw_lock);
-+	if (link->blstate == SBL_BASE_LINK_STATUS_UP) {
-+
-+		s += scnprintf(buf + s, size - s,
-+			       "fec monitor: hwm- ccw %lld/%lld, ucw %lld/%lld",
-+			       ccw_hwm, ccw_thresh, ucw_hwm, ucw_thresh);
-+		s += scnprintf(buf + s, size - s,
-+			       ", llr_tx_replay %lld/%lld, warn %lld",
-+			       llr_tx_replay_hwm, llr_tx_replay_thresh, fecl_warn);
-+
-+		if (ucw_thresh == 0)
-+			s += scnprintf(buf + s, size - s, ", ucw-off");
-+
-+		if (ccw_thresh == 0)
-+			s += scnprintf(buf + s, size - s, ", ccw-off");
-+
-+		s += scnprintf(buf + s, size - s, "\n");
-+
-+		if (sbl_pml_pcs_aligned(sbl, port_num)) {
-+			spin_lock(&fec_prmts->fec_cnt_lock);
-+			if (fec_prmts->fec_rates) {
-+				s += scnprintf(buf + s, size - s,
-+					       "fec monitor: rates- ccw %lld",
-+					       fec_prmts->fec_rates->ccw);
-+				s += scnprintf(buf + s, size - s, ", ucw %lld/%lld",
-+					       fec_prmts->fec_rates->ucw,
-+					       fec_prmts->fec_curr_cnts->ucw);
-+				s += scnprintf(buf + s, size - s,
-+					       ", llr_tx_replay %lld, window %ld",
-+					       fec_prmts->fec_rates->llr_tx_replay,
-+					       fec_prmts->fec_rates->time);
-+				s += scnprintf(buf + s, size - s,
-+					       ", (%lld %lld %lld %lld %lld %lld %lld %lld)\n",
-+					       fec_prmts->fec_rates->fecl[0],
-+					       fec_prmts->fec_rates->fecl[1],
-+					       fec_prmts->fec_rates->fecl[2],
-+					       fec_prmts->fec_rates->fecl[3],
-+					       fec_prmts->fec_rates->fecl[4],
-+					       fec_prmts->fec_rates->fecl[5],
-+					       fec_prmts->fec_rates->fecl[6],
-+					       fec_prmts->fec_rates->fecl[7]);
-+			}
-+			spin_unlock(&fec_prmts->fec_cnt_lock);
-+		}
-+	}
-+	return s;
-+}
-+EXPORT_SYMBOL(sbl_fec_sysfs_sprint);
-+#endif
-+
-+/**
-+ * sbl_fec_txr_rate_set() - set the llr replay threshold
-+ * @sbl: A slingshot base link device instance
-+ * @port_num: port number
-+ * @txr_rate: Value - An adjustment of zero means disable the test
-+ *
-+ * This function sets the LLR (Link-Level Retry) replay threshold
-+ * used by the FEC logic. The threshold value is provided by the caller.
-+ *
-+ * Context: Process context, Acquires lock and release fec_cw_lock <spin_lock>
-+ *
-+ * Return: 0 on success
-+ */
-+int sbl_fec_txr_rate_set(struct sbl_inst *sbl, int port_num,
-+			 u32 txr_rate)
-+{
-+	struct sbl_link *link = sbl->link + port_num;
-+	struct fec_data *fec_data = link->fec_data;
-+	struct sbl_fec *fec_prmts = fec_data->fec_prmts;
-+
-+	spin_lock(&fec_prmts->fec_cw_lock);
-+	fec_prmts->fec_llr_tx_replay_thresh = txr_rate;
-+	spin_unlock(&fec_prmts->fec_cw_lock);
-+
-+	sbl_dev_dbg(sbl->dev, "%d: Setting txr_rate %d",
-+		    port_num, txr_rate);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL(sbl_fec_txr_rate_set);
-+
-+/**
-+ * sbl_fec_modify_adjustments() - Update FEC threshold adjustments
-+ * @sbl: A slingshot base link device instance
-+ * @port_num: port number
-+ * @ucw_up_adj: Adjusting un-corrected code word thresholds
-+ * @ccw_up_adj: Adjusting corrected code word thresholds
-+ * @ucw_down_adj: Adjusting un-corrected code word thresholds
-+ * @ccw_down_adj: Adjusting corrected code word thresholds
-+ * @stp_ccw_up_adj: stp un-corrected code word thresholds
-+ *
-+ * This function adjusts max/min of uncorrected/corrected
-+ * words for tuning/debug/test purposes at various levels.
-+ * Used at test/debug/tuning interface.
-+ *
-+ * Context: Process context, Acquires lock and release fec_cw_lock <spin_lock>
-+ */
-+void sbl_fec_modify_adjustments(struct sbl_inst *sbl, int port_num,
-+				u32 *ucw_up_adj, u32 *ccw_up_adj,
-+				u32 *ucw_down_adj, u32 *ccw_down_adj,
-+				u32 *stp_ccw_up_adj)
-+{
-+	struct sbl_link *link = sbl->link + port_num;
-+	struct fec_data *fec_data = link->fec_data;
-+	struct sbl_fec *fec_prmts = fec_data->fec_prmts;
-+
-+	spin_lock(&fec_prmts->fec_cw_lock);
-+	if (ucw_up_adj)
-+		fec_prmts->fec_ucw_up_thresh_adj = *ucw_up_adj;
-+	if (ccw_up_adj)
-+		fec_prmts->fec_ccw_up_thresh_adj = *ccw_up_adj;
-+	if (ucw_down_adj)
-+		fec_prmts->fec_ucw_down_thresh_adj = *ucw_down_adj;
-+	if (ccw_down_adj)
-+		fec_prmts->fec_ccw_down_thresh_adj = *ccw_down_adj;
-+	if (stp_ccw_up_adj)
-+		fec_prmts->fec_stp_ccw_up_thresh_adj = *stp_ccw_up_adj;
-+	spin_unlock(&fec_prmts->fec_cw_lock);
-+}
-+EXPORT_SYMBOL(sbl_fec_modify_adjustments);
-+
-+/**
-+ * sbl_fec_dump() - Print FEC info
-+ * @sbl: A slingshot base link device instance
-+ * @port_num: port number
-+ *
-+ * Context: Process context, Acquires lock and release fec_cw_lock <spin_lock>
-+ */
-+void sbl_fec_dump(struct sbl_inst *sbl, int port_num)
-+{
-+	struct sbl_link *link = sbl->link + port_num;
-+	struct fec_data *fec_data = link->fec_data;
-+	struct sbl_fec *fec_prmts = fec_data->fec_prmts;
-+
-+	u64 ucw_thresh;
-+	u64 ccw_thresh;
-+	u64 stp_ccw_thresh;
-+	u32 ucw_up_adj;
-+	u32 ccw_up_adj;
-+	u32 stp_ccw_up_adj;
-+	u32 ucw_down_adj;
-+	u32 ccw_down_adj;
-+
-+	spin_lock(&fec_prmts->fec_cw_lock);
-+	ucw_thresh     = fec_prmts->fec_ucw_thresh;
-+	ccw_thresh     = fec_prmts->fec_ccw_thresh;
-+	stp_ccw_thresh = fec_prmts->fec_stp_ccw_thresh;
-+	ucw_up_adj     = fec_prmts->fec_ucw_up_thresh_adj;
-+	ccw_up_adj     = fec_prmts->fec_ccw_up_thresh_adj;
-+	stp_ccw_up_adj = fec_prmts->fec_stp_ccw_up_thresh_adj;
-+	ucw_down_adj   = fec_prmts->fec_ucw_down_thresh_adj;
-+	ccw_down_adj   = fec_prmts->fec_ccw_down_thresh_adj;
-+	spin_unlock(&fec_prmts->fec_cw_lock);
-+
-+	sbl_dev_info(sbl->dev, "%d: ucw : thresh %lld", port_num, ucw_thresh);
-+	sbl_dev_info(sbl->dev, "%d: ucw up: x%d%%, %lld", port_num,
-+		     ucw_up_adj, ucw_thresh * ucw_up_adj / 100);
-+	sbl_dev_info(sbl->dev, "%d: ucw down: x%d%%, %lld", port_num,
-+		     ucw_down_adj, ucw_thresh * ucw_down_adj / 100);
-+
-+	sbl_dev_info(sbl->dev, "%d: ccw : thresh %lld", port_num, ccw_thresh);
-+	sbl_dev_info(sbl->dev, "%d: stp ccw : thresh %lld", port_num, stp_ccw_thresh);
-+	sbl_dev_info(sbl->dev, "%d: ccw up: x%d%%, %lld", port_num,
-+		     ccw_up_adj, ccw_thresh * ccw_up_adj / 100);
-+	sbl_dev_info(sbl->dev, "%d: stp ccw up: x%d%%, %lld", port_num,
-+		     stp_ccw_up_adj, stp_ccw_thresh * stp_ccw_up_adj / 100);
-+	sbl_dev_info(sbl->dev, "%d: ccw down: x%d%%, %lld", port_num,
-+		     ccw_down_adj, ccw_thresh * ccw_down_adj / 100);
-+}
-+EXPORT_SYMBOL(sbl_fec_dump);
-+
-+/**
-+ * sbl_fec_hwms_clear() - Clear fec HW management config
-+ * @sbl: A slingshot base link device instance
-+ * @port_num: port number
-+ *
-+ * This function clears the FEC HWM configuration
-+ *
-+ * Context: Process context, Acquires lock and release fec_cw_lock <spin_lock>
-+ */
-+void sbl_fec_hwms_clear(struct sbl_inst *sbl, int port_num)
-+{
-+	struct sbl_link *link = sbl->link + port_num;
-+	struct fec_data *fec_data = link->fec_data;
-+	struct sbl_fec *fec_prmts = fec_data->fec_prmts;
-+
-+	sbl_dev_dbg(sbl->dev, "%d: clearing fec thresholds", port_num);
-+
-+	spin_lock(&fec_prmts->fec_cw_lock);
-+	fec_prmts->fec_ucw_hwm = 0;
-+	fec_prmts->fec_ccw_hwm = 0;
-+	fec_prmts->fec_llr_tx_replay_hwm = 0;
-+	spin_unlock(&fec_prmts->fec_cw_lock);
-+}
-+EXPORT_SYMBOL(sbl_fec_hwms_clear);
-diff --git a/drivers/net/ethernet/hpe/sbl/sbl_fec_nic.c b/drivers/net/ethernet/hpe/sbl/sbl_fec_nic.c
+diff --git a/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_link_fec.c b/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_link_fec.c
 new file mode 100644
-index 000000000000..e7a06c8895d7
+index 000000000000..2c54795281e0
 --- /dev/null
-+++ b/drivers/net/ethernet/hpe/sbl/sbl_fec_nic.c
-@@ -0,0 +1,36 @@
++++ b/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_link_fec.c
+@@ -0,0 +1,202 @@
 +// SPDX-License-Identifier: GPL-2.0
++/* Copyright 2023,2024,2025 Hewlett Packard Enterprise Development LP */
 +
-+/* Copyright 2025 Hewlett Packard Enterprise Development LP */
++#include "base/sl_ctrl_log.h"
++#include "sl_ctrl_link.h"
++#include "sl_ctrl_link_fec.h"
++#include "sl_core_link.h"
 +
-+#include <linux/types.h>
-+#include <linux/kernel.h>
-+#include <linux/device.h>
-+#include <linux/delay.h>
++#define LOG_NAME SL_CTRL_LINK_FEC_LOG_NAME
++
++int sl_ctrl_link_fec_info_get(u8 ldev_num, u8 lgrp_num, u8 link_num, struct sl_fec_info *fec_info)
++{
++	struct sl_ctrl_link *ctrl_link __free(sl_ctrl_link_put) = NULL;
++	int                 x;
++
++	ctrl_link = sl_ctrl_link_get(ldev_num, lgrp_num, link_num);
++	if (!ctrl_link)
++		return -ENODEV;
++	if (!ctrl_link) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"info get NULL link (ldev_num = %u, lgrp_num = %u, link_num = %u)",
++			ldev_num, lgrp_num, link_num);
++		return -EBADRQC;
++	}
++
++	if (!sl_ctrl_link_kref_get_unless_zero(ctrl_link)) {
++		sl_ctrl_log_err(ctrl_link, LOG_NAME,
++				"fec info get kref unavailable (ctrl_link = 0x%p)", ctrl_link);
++		return -EBADRQC;
++	}
++
++	*fec_info = sl_ctrl_link_fec_data_info_get(ctrl_link);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"info get (ucw = %llu, ccw = %llu, gcw = %llu, period = %ums)",
++		fec_info->ucw, fec_info->ccw, fec_info->gcw, fec_info->period_ms);
++	for (x = 0; x < SL_CTRL_NUM_FEC_LANES; ++x)
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "info get (lane %d = 0x%llX)", x, fec_info->lanes[x]);
++
++	if (sl_ctrl_link_put(ctrl_link))
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "fec info get - link removed (link = 0x%p)", ctrl_link);
++
++	return 0;
++}
++
++int sl_ctrl_link_fec_tail_get(u8 ldev_num, u8 lgrp_num, u8 link_num, struct sl_fec_tail *fec_tail)
++{
++	struct sl_ctrl_link *ctrl_link __free(sl_ctrl_link_put) = NULL;
++	int                 x;
++
++	ctrl_link = sl_ctrl_link_get(ldev_num, lgrp_num, link_num);
++	if (!ctrl_link)
++		return -ENODEV;
++	if (!ctrl_link) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"tail get NULL link (ldev_num = %u, lgrp_num = %u, link_num = %u)",
++			ldev_num, lgrp_num, link_num);
++		return -EBADRQC;
++	}
++
++	if (!sl_ctrl_link_kref_get_unless_zero(ctrl_link)) {
++		sl_ctrl_log_err(ctrl_link, LOG_NAME,
++				"fec tail get kref unavailable (ctrl_link = 0x%p)", ctrl_link);
++		return -EBADRQC;
++	}
++
++	*fec_tail = sl_ctrl_link_fec_data_tail_get(ctrl_link);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "tail get (period = %ums))", fec_tail->period_ms);
++	for (x = 0; x < SL_CTRL_NUM_CCW_BINS; ++x)
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "tail get (bin %d = %llu)", x, fec_tail->ccw_bins[x]);
++
++	if (sl_ctrl_link_put(ctrl_link))
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "fec tail get - link removed (link = 0x%p)", ctrl_link);
++
++	return 0;
++}
++
++int sl_ctrl_link_fec_data_get(u8 ldev_num, u8 lgrp_num, u8 link_num,
++			      struct sl_core_link_fec_cw_cntrs *cw_cntrs,
++			      struct sl_core_link_fec_lane_cntrs *lane_cntrs,
++			      struct sl_core_link_fec_tail_cntrs *tail_cntrs)
++{
++	struct sl_core_link *held_link_1 __free(sl_core_link_put) = NULL;
++	held_link_1 = sl_core_link_get(ldev_num, lgrp_num, link_num);
++	if (!held_link_1)
++		return -ENODEV;
++	return sl_core_link_fec_data_get(held_link_1, cw_cntrs, lane_cntrs,
++					 tail_cntrs);
++}
++
++int sl_ctrl_link_fec_mon_state_get(struct sl_ctrl_link *ctrl_link, u32 *state)
++{
++	spin_lock(&ctrl_link->fec_mon_timer_lock);
++	*state = ctrl_link->fec_mon_state;
++	spin_unlock(&ctrl_link->fec_mon_timer_lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "fec monitor (state = %u, %s)", *state,
++			sl_ctrl_link_fec_mon_state_str(*state));
++
++	return 0;
++}
++
++const char *sl_ctrl_link_fec_mon_state_str(u32 state)
++{
++	switch (state) {
++	case SL_CTRL_LINK_FEC_MON_OFF:
++		return "off";
++	case SL_CTRL_LINK_FEC_MON_ON:
++		return "on";
++	default:
++		return "unknown";
++	}
++}
++
++//#define SL_CTRL_SERDES_RATE_25	25781250000
++//#define SL_CTRL_SERDES_RATE_50	53125000000
++//#define SL_CTRL_SERDES_RATE_100	106250000000
++
++/* CCW BER Calculation Multiplier (10^6). */
++#define SL_CTRL_LINK_FEC_CCW_BER_MULT 1000000
++#define SL_CTRL_LINK_FEC_CCW_BER_EXP 6
++
++/* UCW BER Calculation Multiplier (10^12). */
++#define SL_CTRL_LINK_FEC_UCW_BER_MULT 1000000000000
++#define SL_CTRL_LINK_FEC_UCW_BER_EXP 12
++
++#define MAX_CCW_COUNT (U64_MAX / (HZ * SL_CTRL_LINK_FEC_CCW_BER_MULT))
++#define MAX_UCW_COUNT (U64_MAX / (HZ * SL_CTRL_LINK_FEC_UCW_BER_MULT))
++
++int sl_ctrl_link_fec_ber_calc(struct sl_fec_info *fec_info, struct sl_ber *ucw_ber, struct sl_ber *ccw_ber)
++{
++	u64 total;
++	u64 ccw_rate;	/* Rate * 10^10 */
++	u64 ucw_rate;	/* Rate * 10^10 */
++	int mag;
++
++	sl_ctrl_log_dbg(NULL, LOG_NAME, "fec_ber_calc");
++
++	/* Total must be > 0 to calculate */
++	total = fec_info->ccw + fec_info->gcw;
++	if (total == 0) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"fec invalid (total = %llu)", total);
++		return -EINVAL;
++	}
++
++	if (fec_info->ccw > MAX_CCW_COUNT) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"fec ccw invalid (%llu > %llu)", fec_info->ccw, MAX_CCW_COUNT);
++		return -EINVAL;
++	}
++
++	if (fec_info->ucw > MAX_UCW_COUNT) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"fec ucw invalid (%llu > %llu)", fec_info->ucw, MAX_UCW_COUNT);
++		return -EINVAL;
++	}
++
++	/* B = BER
++	 * n = [U/C]CW count
++	 * g = Good CW count
++	 * T = total CW = ccw_count + g
++	 * t = time = (jiffies / HZ)
++	 *
++	 * B = (n/T) / t; B = (n * HZ) / (T * jiffies)
++	 */
++
++	/* We use RS(544/514) with 10 bit symbols which is a total of 5440 bits per CW. */
++	total = fec_info->ccw + (fec_info->gcw * 5440);
++
++	/* CCW count * CCW multiplier */
++	ccw_rate = (fec_info->ccw * HZ * SL_CTRL_LINK_FEC_CCW_BER_MULT) / (total * fec_info->period_ms);
++
++	/* Keep at least 2 significant digits */
++	mag = 0;
++	while ((ccw_rate / 100) > 9) {
++		ccw_rate /= 100;
++		mag += 2;
++	}
++
++	ccw_ber->mant = ccw_rate;
++	ccw_ber->exp = mag - SL_CTRL_LINK_FEC_CCW_BER_EXP;	/* Divide by CCW multiplier */
++
++	/* UCW count * UCW multiplier */
++	ucw_rate = (fec_info->ucw * HZ * SL_CTRL_LINK_FEC_UCW_BER_MULT) / (total * fec_info->period_ms);
++
++	/* Keep at least 2 significant digits */
++	mag = 0;
++	while ((ucw_rate / 100) > 9) {
++		ucw_rate /= 100;
++		mag += 2;
++	}
++
++	ucw_ber->mant = ucw_rate;
++	ucw_ber->exp = mag - SL_CTRL_LINK_FEC_UCW_BER_EXP;	/* Divide by UCW multiplier */
++
++	sl_ctrl_log_dbg(NULL, LOG_NAME, "fec_ber_calc (CCW = %ue%d, UCW = %ue%d)",
++			ccw_ber->mant, ccw_ber->exp, ucw_ber->mant, ucw_ber->exp);
++
++	return 0;
++}
+diff --git a/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_link_fec_priv.c b/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_link_fec_priv.c
+new file mode 100644
+index 000000000000..a1f50d1a3b3c
+--- /dev/null
++++ b/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_link_fec_priv.c
+@@ -0,0 +1,539 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright 2023-2026 Hewlett Packard Enterprise Development LP */
++
++#include <linux/string.h>
++#include <linux/spinlock.h>
++#include <linux/time.h>
 +#include <linux/workqueue.h>
++
++#include "base/sl_ctrl_log.h"
++#include "sl_ctrl_ldev.h"
++#include "sl_ctrl_lgrp.h"
++#include "sl_ctrl_lgrp_notif.h"
++#include "sl_ctrl_link.h"
++#include "sl_ctrl_link_priv.h"
++#include "sl_ctrl_link_counters.h"
++#include "sl_ctrl_link_fec.h"
++#include "sl_ctrl_link_fec_priv.h"
++#include "sl_core_link.h"
++#include "sl_platform.h"
++
++#define SL_CTRL_LINK_UCW_LIMIT_MAX_CHANCES 2
++#define SL_CTRL_LINK_CCW_LIMIT_MAX_CHANCES 2
++#define SL_CTRL_LINK_FEC_MON_PERIOD_MS     500
++#define LOG_NAME SL_CTRL_LINK_FEC_LOG_NAME
++
++void sl_ctrl_link_fec_data_store(struct sl_ctrl_link *ctrl_link,
++				 struct sl_core_link_fec_cw_cntrs   *cw_cntrs,
++	struct sl_core_link_fec_lane_cntrs *lane_cntrs,
++	struct sl_core_link_fec_tail_cntrs *tail_cntrs)
++{
++	struct sl_ctrl_link_fec_cntrs *tmp_cntrs_ptr;
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "data_store");
++
++	spin_lock(&ctrl_link->fec_data.lock);
++
++	tmp_cntrs_ptr = ctrl_link->fec_data.prev_ptr;
++	ctrl_link->fec_data.prev_ptr = ctrl_link->fec_data.curr_ptr;
++	ctrl_link->fec_data.curr_ptr = tmp_cntrs_ptr;
++
++	ctrl_link->fec_data.curr_ptr->cw_cntrs   = *cw_cntrs;
++	ctrl_link->fec_data.curr_ptr->lane_cntrs = *lane_cntrs;
++	ctrl_link->fec_data.curr_ptr->tail_cntrs = *tail_cntrs;
++	ctrl_link->fec_data.curr_ptr->timestamp  = jiffies;
++
++	spin_unlock(&ctrl_link->fec_data.lock);
++}
++
++void sl_ctrl_link_fec_up_cache_clear(struct sl_ctrl_link *ctrl_link)
++{
++	spin_lock(&ctrl_link->fec_up_cache.lock);
++	memset(&(ctrl_link->fec_up_cache.cw_cntrs),   0, sizeof(struct sl_core_link_fec_cw_cntrs));
++	memset(&(ctrl_link->fec_up_cache.lane_cntrs), 0, sizeof(struct sl_core_link_fec_lane_cntrs));
++	memset(&(ctrl_link->fec_up_cache.tail_cntrs), 0, sizeof(struct sl_core_link_fec_tail_cntrs));
++	spin_unlock(&ctrl_link->fec_up_cache.lock);
++}
++
++void sl_ctrl_link_fec_up_cache_store(struct sl_ctrl_link *ctrl_link,
++				     struct sl_core_link_fec_cw_cntrs   *cw_cntrs,
++	struct sl_core_link_fec_lane_cntrs *lane_cntrs,
++	struct sl_core_link_fec_tail_cntrs *tail_cntrs)
++{
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "up_cache_store");
++
++	spin_lock(&ctrl_link->fec_up_cache.lock);
++	ctrl_link->fec_up_cache.cw_cntrs   = *cw_cntrs;
++	ctrl_link->fec_up_cache.lane_cntrs = *lane_cntrs;
++	ctrl_link->fec_up_cache.tail_cntrs = *tail_cntrs;
++	spin_unlock(&ctrl_link->fec_up_cache.lock);
++}
++
++void sl_ctrl_link_fec_down_cache_clear(struct sl_ctrl_link *ctrl_link)
++{
++	spin_lock(&ctrl_link->fec_down_cache.lock);
++	memset(&(ctrl_link->fec_down_cache.cw_cntrs),   0, sizeof(struct sl_core_link_fec_cw_cntrs));
++	memset(&(ctrl_link->fec_down_cache.lane_cntrs), 0, sizeof(struct sl_core_link_fec_lane_cntrs));
++	memset(&(ctrl_link->fec_down_cache.tail_cntrs), 0, sizeof(struct sl_core_link_fec_tail_cntrs));
++	spin_unlock(&ctrl_link->fec_down_cache.lock);
++}
++
++void sl_ctrl_link_fec_down_cache_store(struct sl_ctrl_link *ctrl_link,
++				       struct sl_core_link_fec_cw_cntrs   *cw_cntrs,
++	struct sl_core_link_fec_lane_cntrs *lane_cntrs,
++	struct sl_core_link_fec_tail_cntrs *tail_cntrs)
++{
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "down_cache_store");
++
++	spin_lock(&ctrl_link->fec_down_cache.lock);
++	ctrl_link->fec_down_cache.cw_cntrs   = *cw_cntrs;
++	ctrl_link->fec_down_cache.lane_cntrs = *lane_cntrs;
++	ctrl_link->fec_down_cache.tail_cntrs = *tail_cntrs;
++	spin_unlock(&ctrl_link->fec_down_cache.lock);
++}
++
++static void sl_ctrl_link_fec_mon_limits_calc(struct sl_ctrl_link *ctrl_link)
++{
++	struct sl_link_policy link_policy;
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "mon limits calc");
++
++	sl_ctrl_link_policy_get(ctrl_link, &link_policy);
++
++	spin_lock(&ctrl_link->fec_data.lock);
++
++	ctrl_link->fec_data.info.monitor.period_ms = (link_policy.fec_mon_period_ms < 0) ?
++		SL_CTRL_LINK_FEC_MON_PERIOD_MS : link_policy.fec_mon_period_ms;
++
++	if (link_policy.fec_mon_ccw_down_limit < 0)
++		ctrl_link->fec_data.info.monitor.ccw_down_limit = 0;
++	else
++		ctrl_link->fec_data.info.monitor.ccw_down_limit = link_policy.fec_mon_ccw_down_limit;
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"mon limits calc (ccw_down_limit = %d)",
++		ctrl_link->fec_data.info.monitor.ccw_down_limit);
++
++	if (link_policy.fec_mon_ccw_warn_limit < 0)
++		ctrl_link->fec_data.info.monitor.ccw_warn_limit =
++			sl_ctrl_link_fec_limit_calc(ctrl_link,
++						    SL_CTRL_LINK_FEC_CCW_MANT, SL_CTRL_LINK_FEC_CCW_EXP) >> 1;
++	else
++		ctrl_link->fec_data.info.monitor.ccw_warn_limit = link_policy.fec_mon_ccw_warn_limit;
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"mon limits calc (ccw_warn_limit = %d)",
++		ctrl_link->fec_data.info.monitor.ccw_warn_limit);
++
++	if (ctrl_link->fec_data.info.monitor.ccw_down_limit &&
++	    (ctrl_link->fec_data.info.monitor.ccw_warn_limit > ctrl_link->fec_data.info.monitor.ccw_down_limit))
++		sl_ctrl_log_warn(ctrl_link, LOG_NAME,
++				 "CCW warning limit set greater than down limit (%d > %d)",
++			ctrl_link->fec_data.info.monitor.ccw_warn_limit,
++			ctrl_link->fec_data.info.monitor.ccw_down_limit);
++
++	if (link_policy.fec_mon_ucw_down_limit < 0) {
++		ctrl_link->fec_data.info.monitor.ucw_down_limit =
++			sl_ctrl_link_fec_limit_calc(ctrl_link, SL_CTRL_LINK_FEC_UCW_MANT, SL_CTRL_LINK_FEC_UCW_EXP);
++	} else {
++		ctrl_link->fec_data.info.monitor.ucw_down_limit = link_policy.fec_mon_ucw_down_limit;
++	}
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"mon limits calc (ucw_down_limit = %d)",
++		ctrl_link->fec_data.info.monitor.ucw_down_limit);
++
++	if (link_policy.fec_mon_ucw_warn_limit < 0)
++		ctrl_link->fec_data.info.monitor.ucw_warn_limit =
++			sl_ctrl_link_fec_limit_calc(ctrl_link, SL_CTRL_LINK_FEC_UCW_MANT,
++						    SL_CTRL_LINK_FEC_UCW_EXP) >> 1;
++	else
++		ctrl_link->fec_data.info.monitor.ucw_warn_limit = link_policy.fec_mon_ucw_warn_limit;
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"mon limits calc (ucw_warn_limit = %d)",
++		ctrl_link->fec_data.info.monitor.ucw_warn_limit);
++
++	if (ctrl_link->fec_data.info.monitor.ucw_down_limit &&
++	    (ctrl_link->fec_data.info.monitor.ucw_warn_limit > ctrl_link->fec_data.info.monitor.ucw_down_limit))
++		sl_ctrl_log_warn(ctrl_link, LOG_NAME,
++				 "CCW warning limit set greater than down limit (%d > %d)",
++			ctrl_link->fec_data.info.monitor.ucw_warn_limit,
++			ctrl_link->fec_data.info.monitor.ucw_down_limit);
++
++	spin_unlock(&ctrl_link->fec_data.lock);
++}
++
++void sl_ctrl_link_fec_mon_start(struct sl_ctrl_link *ctrl_link)
++{
++	u32 period;
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "mon_start");
++
++	sl_ctrl_link_fec_mon_limits_calc(ctrl_link);
++
++	spin_lock(&ctrl_link->fec_data.lock);
++	period = ctrl_link->fec_data.info.monitor.period_ms;
++	spin_unlock(&ctrl_link->fec_data.lock);
++	if (!period) {
++		sl_ctrl_link_fec_mon_stop(ctrl_link);
++		cancel_work_sync(&ctrl_link->fec_mon_timer_work);
++		return;
++	}
++
++	spin_lock(&ctrl_link->fec_mon_timer_lock);
++	ctrl_link->fec_mon_timer_stop = false;
++	ctrl_link->fec_mon_state = SL_CTRL_LINK_FEC_MON_ON;
++	mod_timer(&ctrl_link->fec_mon_timer, jiffies + msecs_to_jiffies(period));
++	spin_unlock(&ctrl_link->fec_mon_timer_lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "monitor timer started (period = %ums)", period);
++}
++
++void sl_ctrl_link_fec_data_calc(struct sl_ctrl_link *ctrl_link)
++{
++	int x;
++
++	spin_lock(&ctrl_link->fec_data.lock);
++
++	ctrl_link->fec_data.info.ccw =
++		ctrl_link->fec_data.curr_ptr->cw_cntrs.ccw - ctrl_link->fec_data.prev_ptr->cw_cntrs.ccw;
++	ctrl_link->fec_data.info.ucw =
++		ctrl_link->fec_data.curr_ptr->cw_cntrs.ucw - ctrl_link->fec_data.prev_ptr->cw_cntrs.ucw;
++	ctrl_link->fec_data.info.gcw =
++		ctrl_link->fec_data.curr_ptr->cw_cntrs.gcw - ctrl_link->fec_data.prev_ptr->cw_cntrs.gcw;
++	for (x = 0; x < SL_CORE_LINK_FEC_NUM_LANES; ++x)
++		ctrl_link->fec_data.info.lanes[x] = ctrl_link->fec_data.curr_ptr->lane_cntrs.lanes[x] -
++			ctrl_link->fec_data.prev_ptr->lane_cntrs.lanes[x];
++	ctrl_link->fec_data.info.period_ms =
++		jiffies_to_msecs(ctrl_link->fec_data.curr_ptr->timestamp - ctrl_link->fec_data.prev_ptr->timestamp);
++
++	for (x = 0; x < SL_CTRL_NUM_CCW_BINS; ++x)
++		ctrl_link->fec_data.tail.ccw_bins[x] = ctrl_link->fec_data.curr_ptr->tail_cntrs.ccw_bins[x] -
++			ctrl_link->fec_data.prev_ptr->tail_cntrs.ccw_bins[x];
++	ctrl_link->fec_data.tail.period_ms = ctrl_link->fec_data.info.period_ms;
++
++	spin_unlock(&ctrl_link->fec_data.lock);
++
++	if ((ctrl_link->fec_data.info.ccw > 0) || (ctrl_link->fec_data.info.ucw > 0)) {
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++				"data_calc (ccw = %llu, ucw = %llu, gcw = %llu, period = %ums)",
++			ctrl_link->fec_data.info.ccw, ctrl_link->fec_data.info.ucw,
++			ctrl_link->fec_data.info.gcw, ctrl_link->fec_data.info.period_ms);
++		for (x = 0; x < SL_CTRL_NUM_CCW_BINS; ++x)
++			sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++					"data_calc (bin %d = %llu)", x, ctrl_link->fec_data.tail.ccw_bins[x]);
++	}
++}
++
++struct sl_fec_info sl_ctrl_link_fec_data_info_get(struct sl_ctrl_link *ctrl_link)
++{
++	struct sl_fec_info fec_info;
++
++	spin_lock(&ctrl_link->fec_data.lock);
++	fec_info = ctrl_link->fec_data.info;
++	spin_unlock(&ctrl_link->fec_data.lock);
++
++	return fec_info;
++}
++
++struct sl_fec_tail sl_ctrl_link_fec_data_tail_get(struct sl_ctrl_link *ctrl_link)
++{
++	struct sl_fec_tail fec_tail;
++
++	spin_lock(&ctrl_link->fec_data.lock);
++	fec_tail = ctrl_link->fec_data.tail;
++	spin_unlock(&ctrl_link->fec_data.lock);
++
++	return fec_tail;
++}
++
++static bool sl_ctrl_link_fec_ucw_chance_limit_check(struct sl_ctrl_link *ctrl_link, s32 limit, struct sl_fec_info *info)
++{
++	if (SL_CTRL_LINK_FEC_UCW_LIMIT_CHECK(limit, info)) {
++		SL_CTRL_LINK_COUNTER_INC(ctrl_link, LINK_DOWN_UCW_LIMIT_CROSSED);
++		ctrl_link->fec_ucw_chance = ctrl_link->fec_ucw_chance + 1;
++	} else {
++		ctrl_link->fec_ucw_chance = 0;
++	}
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "fec_ucw_chance_limit_check (limit = %d, UCW = %llu, ucw_chance = %u)",
++			limit, info->ucw, ctrl_link->fec_ucw_chance);
++
++	return ctrl_link->fec_ucw_chance > SL_CTRL_LINK_UCW_LIMIT_MAX_CHANCES;
++}
++
++static bool sl_ctrl_link_fec_ccw_chance_limit_check(struct sl_ctrl_link *ctrl_link, s32 limit, struct sl_fec_info *info)
++{
++	if (SL_CTRL_LINK_FEC_CCW_LIMIT_CHECK(limit, info)) {
++		SL_CTRL_LINK_COUNTER_INC(ctrl_link, LINK_DOWN_CCW_LIMIT_CROSSED);
++		ctrl_link->fec_ccw_chance = ctrl_link->fec_ccw_chance + 1;
++	} else {
++		ctrl_link->fec_ccw_chance = 0;
++	}
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "fec_ccw_chance_limit_check (limit = %d, CCW = %llu, ccw_chance = %u)",
++			limit, info->ccw, ctrl_link->fec_ccw_chance);
++
++	return ctrl_link->fec_ccw_chance > SL_CTRL_LINK_CCW_LIMIT_MAX_CHANCES;
++}
++
++int sl_ctrl_link_fec_data_check(struct sl_ctrl_link *ctrl_link)
++{
++	int                rtn;
++	s32                ccw_down_limit;
++	s32                ccw_warn_limit;
++	s32                ucw_down_limit;
++	s32                ucw_warn_limit;
++	struct sl_fec_info fec_info;
++	bool               is_limit_crossed;
++	time64_t           limit_crossed_time;
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "data check");
++
++	spin_lock(&ctrl_link->fec_data.lock);
++	ccw_down_limit = ctrl_link->fec_data.info.monitor.ccw_down_limit;
++	ccw_warn_limit = ctrl_link->fec_data.info.monitor.ccw_warn_limit;
++	ucw_down_limit = ctrl_link->fec_data.info.monitor.ucw_down_limit;
++	ucw_warn_limit = ctrl_link->fec_data.info.monitor.ucw_warn_limit;
++	spin_unlock(&ctrl_link->fec_data.lock);
++
++	fec_info = ctrl_link->fec_data.info;
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"data check config (ccw_down = %d, ucw_down = %d, ccw_warn = %d, ucw_warn = %d)",
++		ccw_down_limit, ucw_down_limit, ccw_warn_limit, ucw_warn_limit);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"data check info (UCW = %llu, CCW = %llu, GCW = %llu, period = %ums)",
++		fec_info.ucw, fec_info.ccw, fec_info.gcw, fec_info.period_ms);
++
++	if (sl_ctrl_link_fec_ucw_chance_limit_check(ctrl_link, ucw_down_limit, &fec_info)) {
++		sl_ctrl_log_err(ctrl_link, LOG_NAME,
++				"UCW exceeded down limit (UCW = %llu, CCW = %llu, ucw_chance = %u)",
++			fec_info.ucw, fec_info.ccw, ctrl_link->fec_ucw_chance);
++		ctrl_link->fec_ucw_chance = 0;
++		rtn = sl_ctrl_link_async_down(ctrl_link, SL_LINK_DOWN_CAUSE_UCW_MAP, false);
++		if (rtn) {
++			sl_ctrl_log_err_trace(ctrl_link, LOG_NAME,
++					      "data check UCW ctrl_link_async_down failed [%d]", rtn);
++			return rtn;
++		}
++		return -EIO;
++	}
++
++	if (sl_ctrl_link_fec_ccw_chance_limit_check(ctrl_link, ccw_down_limit, &fec_info)) {
++		sl_ctrl_log_err(ctrl_link, LOG_NAME,
++				"CCW exceeded down limit (UCW = %llu, CCW = %llu, ccw_chance = %u)",
++			fec_info.ucw, fec_info.ccw, ctrl_link->fec_ccw_chance);
++		ctrl_link->fec_ccw_chance = 0;
++		rtn = sl_ctrl_link_async_down(ctrl_link, SL_LINK_DOWN_CAUSE_CCW_MAP, false);
++		if (rtn) {
++			sl_ctrl_log_err_trace(ctrl_link, LOG_NAME,
++					      "data check CCW ctrl_link_async_down failed [%d]", rtn);
++			return rtn;
++		}
++		return -EIO;
++	}
++
++	if (SL_CTRL_LINK_FEC_UCW_LIMIT_CHECK(ucw_warn_limit, &fec_info)) {
++		rtn = sl_core_link_ucw_warn_limit_crossed_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num,
++							      ctrl_link->ctrl_lgrp->num, ctrl_link->num, &is_limit_crossed, &limit_crossed_time);
++		if (rtn)
++			sl_core_log_warn_trace(ctrl_link, LOG_NAME, "ucw_warn_limit_crossed_get failed [%d]", rtn);
++
++		if (!is_limit_crossed) {
++			sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME,
++					       "UCW exceeded warn limit (UCW = %llu, CCW = %llu)",
++					       fec_info.ucw, fec_info.ccw);
++			rtn = sl_ctrl_lgrp_notif_enqueue(ctrl_link->ctrl_lgrp, ctrl_link->num,
++							 SL_LGRP_NOTIF_LINK_UCW_WARN, NULL, 0);
++			if (rtn)
++				sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME,
++						       "data check ctrl_lgrp_notif_enqueue failed [%d]", rtn);
++		}
++		sl_core_link_ucw_warn_limit_crossed_set(ctrl_link->ctrl_lgrp->ctrl_ldev->num,
++							ctrl_link->ctrl_lgrp->num, ctrl_link->num, true);
++		SL_CTRL_LINK_COUNTER_INC(ctrl_link, LINK_UCW_WARN_CROSSED);
++	}
++
++	if (SL_CTRL_LINK_FEC_CCW_LIMIT_CHECK(ccw_warn_limit, &fec_info)) {
++		rtn = sl_core_link_ccw_warn_limit_crossed_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num,
++							      ctrl_link->ctrl_lgrp->num, ctrl_link->num, &is_limit_crossed, &limit_crossed_time);
++		if (rtn)
++			sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME, "ccw_warn_limit_crossed_get failed [%d]", rtn);
++
++		if (!is_limit_crossed) {
++			sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME,
++					       "CCW exceeded warn limit (UCW = %llu, CCW = %llu)",
++					       fec_info.ucw, fec_info.ccw);
++			rtn = sl_ctrl_lgrp_notif_enqueue(ctrl_link->ctrl_lgrp, ctrl_link->num,
++							 SL_LGRP_NOTIF_LINK_CCW_WARN, NULL, 0);
++			if (rtn)
++				sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME,
++						       "data check ctrl_lgrp_notif_enqueue failed [%d]", rtn);
++		}
++		sl_core_link_ccw_warn_limit_crossed_set(ctrl_link->ctrl_lgrp->ctrl_ldev->num,
++							ctrl_link->ctrl_lgrp->num, ctrl_link->num, true);
++		SL_CTRL_LINK_COUNTER_INC(ctrl_link, LINK_CCW_WARN_CROSSED);
++	}
++
++	return 0;
++}
++
++void sl_ctrl_link_fec_mon_timer_work(struct work_struct *work)
++{
++	struct sl_core_link *held_link_1 __free(sl_core_link_put) = NULL;
++	int                                  rtn;
++	struct sl_ctrl_link                 *ctrl_link;
++	u32                                  period;
++	bool                                 stop;
++	struct sl_core_link_fec_cw_cntrs     cw_cntrs;
++	struct sl_core_link_fec_lane_cntrs   lane_cntrs;
++	struct sl_core_link_fec_tail_cntrs   tail_cntrs;
++
++	ctrl_link = container_of(work, struct sl_ctrl_link, fec_mon_timer_work);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "monitor timer work");
++
++	spin_lock(&ctrl_link->fec_data.lock);
++	period = ctrl_link->fec_data.info.monitor.period_ms;
++	spin_unlock(&ctrl_link->fec_data.lock);
++	if (!period) {
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "monitor period zero");
++		return;
++	}
++
++	held_link_1 = sl_core_link_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num,
++				       ctrl_link->ctrl_lgrp->num, ctrl_link->num);
++	if (!held_link_1)
++		return;
++	if (sl_core_link_is_pml_recovery_running(held_link_1)) {
++		sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME, "fec monitor skipped due to pml recovery running");
++		goto start_mon;
++	}
++
++	spin_lock(&ctrl_link->fec_mon_timer_lock);
++	stop = ctrl_link->fec_mon_timer_stop;
++	spin_unlock(&ctrl_link->fec_mon_timer_lock);
++	if (stop) {
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "monitor stopped");
++		return;
++	}
++
++	rtn = sl_ctrl_link_fec_data_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num,
++					ctrl_link->ctrl_lgrp->num, ctrl_link->num, &cw_cntrs, &lane_cntrs,
++					&tail_cntrs);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_link, LOG_NAME,
++				      "core_link_fec_tail_cntrs_get failed [%d]", rtn);
++		goto start_mon;
++	}
++
++	sl_ctrl_link_fec_data_store(ctrl_link, &cw_cntrs, &lane_cntrs, &tail_cntrs);
++
++	sl_ctrl_link_fec_data_calc(ctrl_link);
++
++	rtn = sl_ctrl_link_fec_data_check(ctrl_link);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_link, LOG_NAME, "check failed [%d]", rtn);
++		return;
++	}
++
++	spin_lock(&ctrl_link->fec_data.lock);
++	period = ctrl_link->fec_data.info.monitor.period_ms;
++	spin_unlock(&ctrl_link->fec_data.lock);
++	if (!period) {
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "monitor period zero");
++		return;
++	}
++
++	spin_lock(&ctrl_link->fec_mon_timer_lock);
++	stop = ctrl_link->fec_mon_timer_stop;
++	spin_unlock(&ctrl_link->fec_mon_timer_lock);
++	if (stop) {
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "monitor stopped");
++		return;
++	}
++
++start_mon:
++	mod_timer(&ctrl_link->fec_mon_timer, jiffies + msecs_to_jiffies(period));
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "monitor started");
++}
++
++void sl_ctrl_link_fec_mon_timer(struct timer_list *timer)
++{
++	struct sl_ctrl_link *ctrl_link;
++
++	ctrl_link = timer_container_of(ctrl_link, timer, fec_mon_timer);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "monitor timer");
++
++	queue_work(ctrl_link->ctrl_lgrp->ctrl_ldev->workq, &ctrl_link->fec_mon_timer_work);
++}
++
++void sl_ctrl_link_fec_mon_stop(struct sl_ctrl_link *ctrl_link)
++{
++	bool stop;
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "monitor stop");
++
++	spin_lock(&ctrl_link->fec_mon_timer_lock);
++	stop = ctrl_link->fec_mon_timer_stop;
++	ctrl_link->fec_mon_timer_stop = true;
++	ctrl_link->fec_mon_state = SL_CTRL_LINK_FEC_MON_OFF;
++	spin_unlock(&ctrl_link->fec_mon_timer_lock);
++
++	if (stop) {
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "monitor already stopped");
++		return;
++	}
++
++	timer_delete_sync(&ctrl_link->fec_mon_timer);
++}
++
++#define SL_CTRL_LINK_FEC_LIMIT_25   25781250000ULL
++#define SL_CTRL_LINK_FEC_LIMIT_50   53125000000ULL
++#define SL_CTRL_LINK_FEC_LIMIT_100 106250000000ULL
++u32 sl_ctrl_link_fec_limit_calc(struct sl_ctrl_link *ctrl_link, u32 mant, int exp)
++{
++	u64                 limit;
++	int                 x;
++	struct sl_link_caps link_caps;
++
++	sl_core_link_caps_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num,
++			      ctrl_link->ctrl_lgrp->num, ctrl_link->num, &link_caps);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"fec limit calc (tech_map = 0x%X, mant = %u, exp = %d)",
++		link_caps.tech_map, mant, exp);
++
++	if (link_caps.tech_map & SL_LGRP_CONFIG_TECH_CK_400G)
++		limit = SL_CTRL_LINK_FEC_LIMIT_100 << 2;
++	else if (link_caps.tech_map & SL_LGRP_CONFIG_TECH_CK_200G)
++		limit = SL_CTRL_LINK_FEC_LIMIT_100 << 1;
++	else if (link_caps.tech_map & SL_LGRP_CONFIG_TECH_BS_200G)
++		limit = SL_CTRL_LINK_FEC_LIMIT_50 << 2;
++	else if (link_caps.tech_map & SL_LGRP_CONFIG_TECH_CK_100G)
++		limit = SL_CTRL_LINK_FEC_LIMIT_100;
++	else if (link_caps.tech_map & SL_LGRP_CONFIG_TECH_BJ_100G)
++		limit = SL_CTRL_LINK_FEC_LIMIT_25 << 2;
++	else if (link_caps.tech_map & SL_LGRP_CONFIG_TECH_CD_100G)
++		limit = SL_CTRL_LINK_FEC_LIMIT_50 << 1;
++	else if (link_caps.tech_map & SL_LGRP_CONFIG_TECH_CD_50G)
++		limit = SL_CTRL_LINK_FEC_LIMIT_50;
++	else
++		limit = SL_CTRL_LINK_FEC_LIMIT_100;
++
++	limit *= mant;
++	for (x = exp; x < 0; ++x)
++		limit /= 10;
++
++	if (limit > INT_MAX)
++		return INT_MAX;
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"fec limit calc (limit = %llu)", limit);
++
++	return limit;
++}
+diff --git a/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_link_priv.c b/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_link_priv.c
+new file mode 100644
+index 000000000000..252673b57a0b
+--- /dev/null
++++ b/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_link_priv.c
+@@ -0,0 +1,865 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright 2021-2026 Hewlett Packard Enterprise Development LP */
++
 +#include <linux/spinlock.h>
 +
-+#include <linux/hpe/sbl/sbl.h>
-+#include <linux/hpe/sbl/sbl_fec.h>
-+#include <linux/hpe/sbl/sbl_kconfig.h>
++#include <linux/hpe/sl/sl_link.h>
 +
-+#include <linux/hpe/sbl/sbl_pml.h>
++#include "base/sl_ctrl_log.h"
++#include "sl_ctrl_ldev.h"
++#include "sl_ctrl_lgrp.h"
++#include "sl_ctrl_lgrp_notif.h"
++#include "sl_ctrl_link.h"
++#include "sl_ctrl_link_priv.h"
++#include "sl_ctrl_link_counters.h"
++#include "sl_core_link.h"
++#include "sl_core_link_an.h"
++#include "sl_core_str.h"
 +
-+#include "sbl_internal.h"
++#define LOG_NAME SL_CTRL_LINK_LOG_NAME
 +
-+void sbl_fec_ucw_bad_get(struct sbl_fec *fec_prmts, u64 *ucw_bad, u64 *ucw_hwm)
++#define SL_LINK_DOWN_CAUSE_FATAL_MASK (                \
++		SL_LINK_DOWN_CAUSE_AUTONEG_NOMATCH   | \
++		SL_LINK_DOWN_CAUSE_CONFIG            | \
++		SL_LINK_DOWN_CAUSE_DOWNSHIFT         | \
++		SL_LINK_DOWN_CAUSE_INTR_ENABLE       | \
++		SL_LINK_DOWN_CAUSE_UNSUPPORTED_CABLE | \
++		SL_LINK_DOWN_CAUSE_SS200_CABLE       | \
++		SL_LINK_DOWN_CAUSE_UCW               | \
++		SL_LINK_DOWN_CAUSE_MEDIA_HOT         | \
++		SL_LINK_DOWN_CAUSE_MEDIA_WARM        | \
++		SL_LINK_DOWN_CAUSE_NO_MEDIA          | \
++		SL_LINK_DOWN_CAUSE_UPSHIFT)
++
++void sl_ctrl_link_is_canceled_set(struct sl_ctrl_link *ctrl_link, bool canceled)
 +{
-+	spin_lock(&fec_prmts->fec_cw_lock);
-+	*ucw_hwm = fec_prmts->fec_ucw_hwm;
-+	*ucw_bad = fec_prmts->fec_ucw_thresh;
-+	spin_unlock(&fec_prmts->fec_cw_lock);
++	spin_lock(&ctrl_link->data_lock);
++	ctrl_link->is_canceled = canceled;
++	spin_unlock(&ctrl_link->data_lock);
 +}
 +
-+void sbl_fec_ccw_bad_get(struct sbl_fec *fec_prmts, bool use_stp_thresh,
-+			 u64 *ccw_bad, u64 *ccw_hwm)
++bool sl_ctrl_link_is_canceled(struct sl_ctrl_link *ctrl_link)
 +{
-+	spin_lock(&fec_prmts->fec_cw_lock);
-+	*ccw_hwm = fec_prmts->fec_ccw_hwm;
-+	*ccw_bad = use_stp_thresh ? fec_prmts->fec_stp_ccw_thresh :
-+		fec_prmts->fec_ccw_thresh;
-+	spin_unlock(&fec_prmts->fec_cw_lock);
++	bool is_canceled;
++
++	spin_lock(&ctrl_link->data_lock);
++	is_canceled = ctrl_link->is_canceled;
++	spin_unlock(&ctrl_link->data_lock);
++
++	return is_canceled;
 +}
-diff --git a/drivers/net/ethernet/hpe/sbl/sbl_media.c b/drivers/net/ethernet/hpe/sbl/sbl_media.c
++
++static void sl_ctrl_link_last_up_fail_cause_map_clr(struct sl_ctrl_link *ctrl_link)
++{
++	spin_lock(&ctrl_link->data_lock);
++	ctrl_link->last_up_fail_cause_map = 0;
++	ctrl_link->last_up_fail_time      = 0;
++	spin_unlock(&ctrl_link->data_lock);
++}
++
++static void sl_ctrl_link_last_up_fail_cause_map_set(struct sl_ctrl_link *ctrl_link, u64 last_up_fail_cause_map)
++{
++	spin_lock(&ctrl_link->data_lock);
++	ctrl_link->last_up_fail_cause_map |= last_up_fail_cause_map;
++	ctrl_link->last_up_fail_time       = ktime_get_real_seconds();
++	spin_unlock(&ctrl_link->data_lock);
++}
++
++static bool sl_ctrl_link_is_last_up_fail_cause_set(struct sl_ctrl_link *ctrl_link, u64 last_up_fail_cause)
++{
++	bool is_last_up_fail_cause_set;
++
++	spin_lock(&ctrl_link->data_lock);
++	is_last_up_fail_cause_set = ctrl_link->last_up_fail_cause_map & last_up_fail_cause;
++	spin_unlock(&ctrl_link->data_lock);
++
++	return is_last_up_fail_cause_set;
++}
++
++static int sl_ctrl_link_up_notif_send(struct sl_ctrl_lgrp *ctrl_lgrp, struct sl_ctrl_link *ctrl_link,
++				      u64 info_map, u32 speed, u32 fec_mode, u32 fec_type)
++{
++	union sl_lgrp_notif_info info;
++
++	info.link_up.mode     = speed;
++	info.link_up.fec_mode = fec_mode;
++	info.link_up.fec_type = fec_type;
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "up notif send (speed = %u %s, fec mode = %u %s, fec type = %u)",
++			speed, sl_lgrp_config_tech_str(speed), fec_mode, sl_lgrp_fec_mode_str(fec_mode), fec_type);
++
++	return sl_ctrl_lgrp_notif_enqueue(ctrl_lgrp, ctrl_link->num, SL_LGRP_NOTIF_LINK_UP,
++		&info, info_map);
++}
++
++static int sl_ctrl_link_up_fail_notif_send(struct sl_ctrl_lgrp *ctrl_lgrp, struct sl_ctrl_link *ctrl_link,
++					   u64 cause_map, u64 info_map)
++{
++	union sl_lgrp_notif_info info;
++
++	info.cause_map = cause_map;
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "up fail notif send (cause_map = 0x%llX)", cause_map);
++
++	return sl_ctrl_lgrp_notif_enqueue(ctrl_lgrp, ctrl_link->num, SL_LGRP_NOTIF_LINK_UP_FAIL,
++		&info, info_map);
++}
++
++static int sl_ctrl_async_link_down_notif_send(struct sl_ctrl_link *ctrl_link, u64 cause_map, u64 info_map)
++{
++	union sl_lgrp_notif_info info;
++	char                     cause_str[SL_LINK_DOWN_CAUSE_STR_SIZE];
++
++	info.cause_map = cause_map;
++
++	sl_link_down_cause_map_with_info_str(cause_map, cause_str, sizeof(cause_str));
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"async_link_down_notif_send (core_cause_map = 0x%llX %s)", cause_map, cause_str);
++
++	return sl_ctrl_lgrp_notif_enqueue(ctrl_link->ctrl_lgrp, ctrl_link->num,
++		SL_LGRP_NOTIF_LINK_ASYNC_DOWN, &info, info_map);
++}
++
++static int sl_ctrl_link_down_notif_send(struct sl_ctrl_link *ctrl_link, u64 cause_map, u64 info_map)
++{
++	union sl_lgrp_notif_info info;
++	char                     cause_str[SL_LINK_DOWN_CAUSE_STR_SIZE];
++
++	info.cause_map = cause_map;
++
++	sl_link_down_cause_map_with_info_str(cause_map, cause_str, sizeof(cause_str));
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"link_down_notif_send (core_cause_map = 0x%llX %s)", cause_map, cause_str);
++
++	return sl_ctrl_lgrp_notif_enqueue(ctrl_link->ctrl_lgrp, ctrl_link->num,
++		SL_LGRP_NOTIF_LINK_DOWN, &info, info_map);
++}
++
++static int sl_ctrl_link_down_req_notif_send(struct sl_ctrl_link *ctrl_link, u64 cause_map, u64 info_map)
++{
++	union sl_lgrp_notif_info info;
++	char                     cause_str[SL_LINK_DOWN_CAUSE_STR_SIZE];
++
++	info.cause_map = cause_map;
++
++	sl_link_down_cause_map_with_info_str(cause_map, cause_str, sizeof(cause_str));
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"link_down_req_notif_send (core_cause_map = 0x%llX %s)", cause_map, cause_str);
++
++	return sl_ctrl_lgrp_notif_enqueue(ctrl_link->ctrl_lgrp, ctrl_link->num,
++					  SL_LGRP_NOTIF_LINK_DOWN_REQ, &info, info_map);
++}
++
++void sl_ctrl_link_up_clock_start(struct sl_ctrl_link *ctrl_link)
++{
++	spin_lock(&ctrl_link->up_clock.lock);
++	ctrl_link->up_clock.start         = ktime_get();
++	ctrl_link->up_clock.elapsed       = ktime_set(0, 0);
++	ctrl_link->up_clock.attempt_count = 0;
++	spin_unlock(&ctrl_link->up_clock.lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"clock start (time = %lld)", ctrl_link->up_clock.start);
++}
++
++static void sl_ctrl_link_up_clock_stop(struct sl_ctrl_link *ctrl_link)
++{
++	spin_lock(&ctrl_link->up_clock.lock);
++	ctrl_link->up_clock.elapsed = ktime_sub(ktime_get(), ctrl_link->up_clock.start);
++	ctrl_link->up_clock.start   = ktime_set(0, 0);
++	ctrl_link->up_clock.up      = ktime_get();
++	spin_unlock(&ctrl_link->up_clock.lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"clock stop (time = %lld)", ctrl_link->up_clock.elapsed);
++}
++
++void sl_ctrl_link_up_clock_reset(struct sl_ctrl_link *ctrl_link)
++{
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "clock reset");
++
++	spin_lock(&ctrl_link->up_clock.lock);
++	ctrl_link->up_clock.elapsed         = ktime_set(0, 0);
++	ctrl_link->up_clock.start           = ktime_set(0, 0);
++	ctrl_link->up_clock.attempt_count   = 0;
++	ctrl_link->up_clock.attempt_elapsed = ktime_set(0, 0);
++	ctrl_link->up_clock.attempt_start   = ktime_set(0, 0);
++	ctrl_link->up_clock.up              = ktime_set(0, 0);
++	spin_unlock(&ctrl_link->up_clock.lock);
++}
++
++void sl_ctrl_link_up_clock_attempt_start(struct sl_ctrl_link *ctrl_link)
++{
++	spin_lock(&ctrl_link->up_clock.lock);
++	ctrl_link->up_clock.attempt_start   = ktime_get();
++	ctrl_link->up_clock.attempt_elapsed = ktime_set(0, 0);
++	ctrl_link->up_clock.attempt_count++;
++	spin_unlock(&ctrl_link->up_clock.lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"clock attempt start (time = %lld)", ctrl_link->up_clock.attempt_start);
++}
++
++static void sl_ctrl_link_up_clock_attempt_stop(struct sl_ctrl_link *ctrl_link)
++{
++	spin_lock(&ctrl_link->up_clock.lock);
++	ctrl_link->up_clock.attempt_elapsed = ktime_sub(ktime_get(), ctrl_link->up_clock.attempt_start);
++	ctrl_link->up_clock.attempt_start   = ktime_set(0, 0);
++	spin_unlock(&ctrl_link->up_clock.lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"clock attempt stop (time = %lld)", ctrl_link->up_clock.attempt_elapsed);
++}
++
++static void sl_ctrl_link_state_stopping_set(struct sl_ctrl_link *ctrl_link)
++{
++	u32           link_state;
++
++	spin_lock(&ctrl_link->data_lock);
++	link_state = ctrl_link->state;
++	switch (link_state) {
++	case SL_LINK_STATE_STOPPING:
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "stopping set - already stopping");
++		spin_unlock(&ctrl_link->data_lock);
++		return;
++	case SL_LINK_STATE_STARTING:
++	case SL_LINK_STATE_UP:
++	case SL_LINK_STATE_UP_DOWN_REQ:
++		ctrl_link->state = SL_LINK_STATE_STOPPING;
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "stopping set - stopping");
++		spin_unlock(&ctrl_link->data_lock);
++		return;
++	default:
++		sl_ctrl_log_err(ctrl_link, LOG_NAME, "stopping set - invalid state (link_state = %u %s)",
++				link_state, sl_link_state_str(link_state));
++		spin_unlock(&ctrl_link->data_lock);
++		return;
++	}
++}
++
++int sl_ctrl_link_up_callback(void *tag, struct sl_core_link_up_info *up_info)
++{
++	struct sl_ctrl_link         *ctrl_link;
++	char                         core_imap_str[SL_LINK_INFO_STRLEN];
++	int                          max_up_tries;
++	u32                          up_count;
++	int                          rtn;
++	s64                          attempt_time;
++	s64                          total_time;
++	s64                          up_time;
++	union sl_lgrp_notif_info     info;
++	struct sl_core_link_up_info  core_link_up_info;
++	u64			     up_fail_cause_map;
++
++	ctrl_link = tag;
++	core_link_up_info = *up_info;
++
++	sl_core_info_map_str(core_link_up_info.info_map, core_imap_str, sizeof(core_imap_str));
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"up callback (core_state = %u %s, core_cause_map = 0x%llX, info_map = %s (0x%llx))",
++		core_link_up_info.state, sl_core_link_state_str(core_link_up_info.state),
++		core_link_up_info.cause_map, core_imap_str, core_link_up_info.info_map);
++
++	sl_ctrl_link_last_up_fail_cause_map_clr(ctrl_link);
++	sl_ctrl_link_last_up_fail_cause_map_set(ctrl_link, core_link_up_info.cause_map);
++
++	sl_ctrl_link_up_clock_attempt_stop(ctrl_link);
++
++	switch (core_link_up_info.state) {
++	case SL_CORE_LINK_STATE_UP:
++		SL_CTRL_LINK_COUNTER_INC(ctrl_link, LINK_UP);
++		sl_ctrl_link_up_clock_stop(ctrl_link);
++
++		rtn = sl_ctrl_link_up_clocks_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num, ctrl_link->ctrl_lgrp->num,
++						 ctrl_link->num, &attempt_time, &total_time, &up_time);
++		if (rtn)
++			sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME, "link_up_clocks_get failed [%d]", rtn);
++
++		rtn = sl_ctrl_link_up_count_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num, ctrl_link->ctrl_lgrp->num,
++						ctrl_link->num, &up_count);
++		if (rtn)
++			sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME, "link_up_count_get failed [%d]", rtn);
++
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++				"up callback (count = %d, attempt_time = %lldms, total_time = %lldms)",
++			up_count, attempt_time, total_time);
++
++		sl_ctrl_link_fec_mon_start(ctrl_link);
++
++		sl_ctrl_link_state_set(ctrl_link, SL_LINK_STATE_UP);
++
++		rtn = sl_ctrl_link_up_notif_send(ctrl_link->ctrl_lgrp, ctrl_link, core_link_up_info.info_map,
++						 core_link_up_info.speed, core_link_up_info.fec_mode, core_link_up_info.fec_type);
++		if (rtn)
++			sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME,
++					       "up callback ctrl_link_up_notif_send failed [%d]", rtn);
++		return 0;
++
++	case SL_CORE_LINK_STATE_DOWN:
++		SL_CTRL_LINK_COUNTER_INC(ctrl_link, LINK_UP_FAIL);
++
++		spin_lock(&ctrl_link->config_lock);
++		max_up_tries = ctrl_link->config.link_up_tries_max;
++		spin_unlock(&ctrl_link->config_lock);
++
++		/* canceled */
++		if (sl_ctrl_link_is_canceled(ctrl_link)) {
++			sl_ctrl_link_up_clock_reset(ctrl_link);
++
++			sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "up retry canceled");
++
++			sl_ctrl_link_state_stopping_set(ctrl_link);
++
++			flush_work(&ctrl_link->ctrl_lgrp->notif_work);
++			sl_ctrl_link_state_set(ctrl_link, SL_LINK_STATE_DOWN);
++			complete_all(&ctrl_link->down_complete);
++
++			rtn = sl_ctrl_link_last_up_fail_cause_map_get(ctrl_link, &up_fail_cause_map);
++			if (rtn)
++				sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME, "last_up_fail_cause_map_get failed [%d]", rtn);
++
++			rtn = sl_ctrl_link_up_fail_notif_send(ctrl_link->ctrl_lgrp, ctrl_link,
++							      up_fail_cause_map, core_link_up_info.info_map);
++			if (rtn)
++				sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME,
++						       "up callback work ctrl_link_up_fail_notif_send failed [%d]", rtn);
++
++			return 0;
++		}
++
++		/* check up tries */
++		rtn = sl_ctrl_link_up_count_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num,
++						ctrl_link->ctrl_lgrp->num, ctrl_link->num, &up_count);
++		if (rtn)
++			sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME, "link_up_count_get failed [%d]", rtn);
++
++		if ((up_count >= max_up_tries) && (max_up_tries != SL_LINK_INFINITE_UP_TRIES)) {
++			sl_ctrl_link_up_clock_reset(ctrl_link);
++
++			sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "up callback work out of up tries");
++
++			sl_ctrl_link_state_stopping_set(ctrl_link);
++
++			sl_ctrl_link_last_up_fail_cause_map_set(ctrl_link, SL_LINK_DOWN_CAUSE_UP_TRIES_MAP);
++
++			flush_work(&ctrl_link->ctrl_lgrp->notif_work);
++			sl_ctrl_link_state_set(ctrl_link, SL_LINK_STATE_DOWN);
++
++			complete_all(&ctrl_link->down_complete);
++
++			rtn = sl_ctrl_link_last_up_fail_cause_map_get(ctrl_link, &up_fail_cause_map);
++			if (rtn)
++				sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME, "last_up_fail_cause_map_get failed [%d]", rtn);
++			rtn = sl_ctrl_link_up_fail_notif_send(ctrl_link->ctrl_lgrp, ctrl_link,
++							      up_fail_cause_map, core_link_up_info.info_map);
++			if (rtn)
++				sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME,
++						       "up callback work ctrl_link_up_fail_notif_send failed [%d]", rtn);
++			return 0;
++		}
++
++		/* check fatal down causes */
++		if (sl_ctrl_link_is_last_up_fail_cause_set(ctrl_link, SL_LINK_DOWN_CAUSE_FATAL_MASK)) {
++			sl_ctrl_link_up_clock_reset(ctrl_link);
++
++			sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "up callback work fatal down cause");
++
++			sl_ctrl_link_state_stopping_set(ctrl_link);
++
++			flush_work(&ctrl_link->ctrl_lgrp->notif_work);
++
++			sl_ctrl_link_state_set(ctrl_link, SL_LINK_STATE_DOWN);
++			complete_all(&ctrl_link->down_complete);
++
++			rtn = sl_ctrl_link_last_up_fail_cause_map_get(ctrl_link, &up_fail_cause_map);
++			if (rtn)
++				sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME, "last_up_fail_cause_map_get failed [%d]", rtn);
++			rtn = sl_ctrl_link_up_fail_notif_send(ctrl_link->ctrl_lgrp, ctrl_link,
++							      up_fail_cause_map, core_link_up_info.info_map);
++			if (rtn)
++				sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME,
++						       "up callback work ctrl_link_up_fail_notif_send failed [%d]", rtn);
++
++			return 0;
++		}
++
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "link up retry (ctrl_link = 0x%p)", ctrl_link);
++
++		SL_CTRL_LINK_COUNTER_INC(ctrl_link, LINK_UP_RETRY);
++
++		sl_ctrl_link_up_clock_attempt_start(ctrl_link);
++
++		rtn = sl_core_link_up(ctrl_link->ctrl_lgrp->ctrl_ldev->num, ctrl_link->ctrl_lgrp->num,
++				      ctrl_link->num, sl_ctrl_link_up_callback, ctrl_link);
++		if (rtn) {
++			sl_ctrl_link_up_clock_reset(ctrl_link);
++
++			sl_ctrl_link_state_stopping_set(ctrl_link);
++
++			sl_ctrl_log_err_trace(ctrl_link, LOG_NAME,
++					      "up callback work core_link_up failed [%d]", rtn);
++
++			flush_work(&ctrl_link->ctrl_lgrp->notif_work);
++			sl_ctrl_link_state_set(ctrl_link, SL_LINK_STATE_DOWN);
++
++			complete_all(&ctrl_link->down_complete);
++
++			info.error = rtn;
++			rtn = sl_ctrl_lgrp_notif_enqueue(ctrl_link->ctrl_lgrp, ctrl_link->num,
++							 SL_LGRP_NOTIF_LINK_ERROR, &info, core_link_up_info.info_map);
++			if (rtn)
++				sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME,
++						       "up callback work ctrl_lgrp_notif_enqueue failed [%d]", rtn);
++
++			return info.error;
++		}
++		return 0;
++
++	default:
++		sl_ctrl_link_up_clock_reset(ctrl_link);
++		sl_ctrl_link_state_stopping_set(ctrl_link);
++
++		sl_ctrl_log_err(ctrl_link, LOG_NAME,
++				"up callback work invalid (core_state = %u, core_imap = %s)",
++			core_link_up_info.state, core_imap_str);
++
++		flush_work(&ctrl_link->ctrl_lgrp->notif_work);
++		sl_ctrl_link_state_set(ctrl_link, SL_LINK_STATE_DOWN);
++
++		complete_all(&ctrl_link->down_complete);
++
++		info.error = -EBADRQC;
++		rtn = sl_ctrl_lgrp_notif_enqueue(ctrl_link->ctrl_lgrp, ctrl_link->num,
++						 SL_LGRP_NOTIF_LINK_ERROR, &info, core_link_up_info.info_map);
++		if (rtn)
++			sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME,
++					       "up callback work ctrl_lgrp_notif_enqueue failed [%d]", rtn);
++
++		return info.error;
++	}
++}
++
++int sl_ctrl_link_fault_start_callback(u8 ldev_num, u8 lgrp_num, u8 link_num)
++{
++	struct sl_ctrl_link *ctrl_link __free(sl_ctrl_link_put) = NULL;
++
++	ctrl_link = sl_ctrl_link_get(ldev_num, lgrp_num, link_num);
++	if (!ctrl_link)
++		return -ENODEV;
++	if (!ctrl_link) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"NULL link (ldev_num = %u, lgrp_num = %u, link_num = %u)",
++			ldev_num, lgrp_num, link_num);
++		return -EBADRQC;
++	}
++
++	if (!sl_ctrl_link_kref_get_unless_zero(ctrl_link)) {
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++				"fault start callback kref unavailable (ctrl_link = 0x%p)", ctrl_link);
++		return -EBADRQC;
++	}
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "fault start callback");
++
++	sl_ctrl_link_state_set(ctrl_link, SL_LINK_STATE_STOPPING);
++
++	sl_ctrl_link_fec_mon_stop(ctrl_link);
++	cancel_work_sync(&ctrl_link->fec_mon_timer_work);
++
++	if (sl_ctrl_link_put(ctrl_link))
++		sl_ctrl_log_dbg(NULL, LOG_NAME,
++				"fault start callback - link removed (link = 0x%p)", ctrl_link);
++
++	return 0;
++}
++
++int sl_ctrl_link_fault_callback(void *tag, u32 core_state, u64 core_cause_map, u64 core_info_map)
++{
++	struct sl_ctrl_link      *ctrl_link;
++	char                      core_imap_str[SL_LINK_INFO_STRLEN];
++	int                       rtn;
++	union sl_lgrp_notif_info  info;
++
++	ctrl_link = tag;
++
++	SL_CTRL_LINK_COUNTER_INC(ctrl_link, LINK_FAULT_ASYNC);
++
++	sl_core_info_map_str(core_info_map, core_imap_str, sizeof(core_imap_str));
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"fault callback (core_state = %u %s, core_cause_map = 0x%llX, core_info_map = %s (0x%llx))",
++			core_state, sl_core_link_state_str(core_state), core_cause_map, core_imap_str, core_info_map);
++
++	sl_ctrl_link_up_clock_reset(ctrl_link);
++
++	switch (core_state) {
++	case SL_CORE_LINK_STATE_DOWN:
++		SL_CTRL_LINK_COUNTER_INC(ctrl_link, LINK_DOWN);
++
++		sl_ctrl_link_fec_mon_stop(ctrl_link);
++		cancel_work_sync(&ctrl_link->fec_mon_timer_work);
++
++		flush_work(&ctrl_link->ctrl_lgrp->notif_work);
++		sl_ctrl_link_state_set(ctrl_link, SL_LINK_STATE_DOWN);
++		complete_all(&ctrl_link->down_complete);
++
++		rtn = sl_ctrl_async_link_down_notif_send(ctrl_link, core_cause_map, core_info_map);
++		if (rtn)
++			sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME,
++					       "fault callback async_link_down_notif_send failed [%d]", rtn);
++
++		return 0;
++
++	default:
++		sl_ctrl_log_err(ctrl_link, LOG_NAME,
++				"fault callback invalid (core_state = %u)", core_state);
++
++		flush_work(&ctrl_link->ctrl_lgrp->notif_work);
++		sl_ctrl_link_state_set(ctrl_link, SL_LINK_STATE_DOWN);
++
++		complete_all(&ctrl_link->down_complete);
++
++		info.error = -EBADRQC;
++		rtn = sl_ctrl_lgrp_notif_enqueue(ctrl_link->ctrl_lgrp, ctrl_link->num,
++						 SL_LGRP_NOTIF_LINK_ERROR, &info, core_info_map);
++		if (rtn)
++			sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME,
++					       "fault callback ctrl_lgrp_notif_enqueue failed [%d]", rtn);
++
++		return 0;
++	}
++}
++
++int sl_ctrl_link_an_lp_caps_get_callback(void *tag, struct sl_link_caps *caps, u32 result)
++{
++	int                       rtn;
++	struct sl_ctrl_link      *ctrl_link;
++	union sl_lgrp_notif_info  info;
++
++	ctrl_link          =  tag;
++	info.lp_link_caps = *caps;
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "an lp caps get callback");
++
++	switch (result) {
++	case SL_CORE_LINK_LP_CAPS_DATA:
++		rtn = sl_ctrl_lgrp_notif_enqueue(ctrl_link->ctrl_lgrp, ctrl_link->num,
++						 SL_LGRP_NOTIF_AN_DATA, &info, 0);
++		if (rtn)
++			sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME,
++					       "lp caps data ctrl_lgrp_notif_enqueue failed [%d]", rtn);
++		break;
++	case SL_CORE_LINK_LP_CAPS_TIMEOUT:
++		rtn = sl_ctrl_lgrp_notif_enqueue(ctrl_link->ctrl_lgrp, ctrl_link->num,
++						 SL_LGRP_NOTIF_AN_TIMEOUT, NULL, 0);
++		if (rtn)
++			sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME,
++					       "lp caps timeout ctrl_lgrp_notif_enqueue failed [%d]", rtn);
++		break;
++	case SL_CORE_LINK_LP_CAPS_ERROR:
++	default:
++		rtn = sl_ctrl_lgrp_notif_enqueue(ctrl_link->ctrl_lgrp, ctrl_link->num,
++						 SL_LGRP_NOTIF_AN_ERROR, NULL, 0);
++		if (rtn)
++			sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME,
++					       "lp caps error ctrl_lgrp_notif_enqueue failed [%d]", rtn);
++		break;
++	}
++
++	return 0;
++}
++
++int sl_ctrl_link_down_callback(void *tag, u32 core_state, u64 core_cause_map, u64 core_info_map)
++{
++	int                  rtn;
++	struct sl_ctrl_link *ctrl_link;
++	char                 cause_str[100];
++
++	ctrl_link = tag;
++
++	sl_link_down_cause_map_with_info_str(core_cause_map, cause_str, sizeof(cause_str));
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"down callback (core_state = %u %s, core_cause = 0x%llX %s, core_info_map = %llu)",
++		core_state, sl_core_link_state_str(core_state), core_cause_map, cause_str, core_info_map);
++
++	switch (core_state) {
++	case SL_CORE_LINK_STATE_DOWN:
++		SL_CTRL_LINK_COUNTER_INC(ctrl_link, LINK_DOWN);
++
++		if (core_cause_map & SL_LINK_DOWN_CAUSE_CANCELED)
++			SL_CTRL_LINK_COUNTER_INC(ctrl_link, LINK_UP_CANCELED);
++
++		sl_ctrl_link_fec_mon_stop(ctrl_link);
++		cancel_work_sync(&ctrl_link->fec_mon_timer_work);
++
++		flush_work(&ctrl_link->ctrl_lgrp->notif_work);
++		sl_ctrl_link_state_set(ctrl_link, SL_LINK_STATE_DOWN);
++		complete_all(&ctrl_link->down_complete);
++
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++				"down callback (down_complete = 0x%p)", &ctrl_link->down_complete);
++
++		rtn = sl_ctrl_link_down_notif_send(ctrl_link, core_cause_map, core_info_map);
++		if (rtn)
++			sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME,
++					       "down callback ctrl_link_down_notif_send failed [%d]", rtn);
++		return 0;
++	default:
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "down callback invalid (core_state = %u %s)",
++				core_state, sl_core_link_state_str(core_state));
++		return -EBADRQC;
++	}
++}
++
++static int sl_ctrl_link_async_down_callback(void *tag, u32 core_state, u64 core_cause_map, u64 core_info_map)
++{
++	int                  rtn;
++	struct sl_ctrl_link *ctrl_link;
++	char                 cause_str[100];
++
++	ctrl_link = tag;
++
++	sl_link_down_cause_map_with_info_str(core_cause_map, cause_str, sizeof(cause_str));
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"async down callback (core_state = %u %s, core_cause = 0x%llX %s, core_info_map = %llu)",
++		core_state, sl_core_link_state_str(core_state), core_cause_map, cause_str, core_info_map);
++
++	switch (core_state) {
++	case SL_CORE_LINK_STATE_DOWN:
++		SL_CTRL_LINK_COUNTER_INC(ctrl_link, LINK_DOWN);
++
++		sl_ctrl_link_fec_mon_stop(ctrl_link);
++		cancel_work_sync(&ctrl_link->fec_mon_timer_work);
++
++		flush_work(&ctrl_link->ctrl_lgrp->notif_work);
++		sl_ctrl_link_state_set(ctrl_link, SL_LINK_STATE_DOWN);
++		complete_all(&ctrl_link->down_complete);
++
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++				"async down callback (down_complete = 0x%p)", &ctrl_link->down_complete);
++
++		rtn = sl_ctrl_async_link_down_notif_send(ctrl_link, core_cause_map, core_info_map);
++		if (rtn)
++			sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME,
++					       "async down callback async_link_down_notif_send failed [%d]", rtn);
++
++		sl_ctrl_link_put(ctrl_link);
++		return 0;
++	default:
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "async down callback invalid (core_state = %u %s)",
++				core_state, sl_core_link_state_str(core_state));
++
++		sl_ctrl_link_put(ctrl_link);
++		return -EBADRQC;
++	}
++}
++
++int sl_ctrl_link_async_down(struct sl_ctrl_link *ctrl_link, u64 down_cause_map, bool force_down)
++{
++	int  rtn;
++	u32  link_state;
++	u32  policy_options;
++	bool accepted;
++	char cause_str[SL_LINK_DOWN_CAUSE_STR_SIZE];
++
++	if (!sl_ctrl_link_kref_get_unless_zero(ctrl_link)) {
++		sl_ctrl_log_err(ctrl_link, LOG_NAME,
++				"async_down kref_get_unless_zero failed (ctrl_link = 0x%p)", ctrl_link);
++		return -EBADRQC;
++	}
++
++	sl_link_down_cause_map_with_info_str(down_cause_map, cause_str, sizeof(cause_str));
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"async_down (down_cause_map = 0x%llX %s)", down_cause_map, cause_str);
++
++	sl_ctrl_link_up_clock_reset(ctrl_link);
++
++	policy_options = sl_ctrl_link_policy_options_get(ctrl_link);
++
++	spin_lock(&ctrl_link->data_lock);
++	link_state = ctrl_link->state;
++	switch (link_state) {
++	case SL_LINK_STATE_UP_DOWN_REQ:
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "async_down already requested");
++		spin_unlock(&ctrl_link->data_lock);
++		sl_ctrl_link_put(ctrl_link);
++		return 0;
++	case SL_LINK_STATE_UP:
++		if (!force_down && (policy_options & SL_LINK_POLICY_OPT_LINK_DOWN_REQ)) {
++			ctrl_link->state = SL_LINK_STATE_UP_DOWN_REQ;
++			sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "async_down request link down");
++			spin_unlock(&ctrl_link->data_lock);
++			rtn = sl_ctrl_link_down_req_notif_send(ctrl_link, down_cause_map, 0);
++			if (rtn)
++				sl_ctrl_log_warn_trace(ctrl_link, LOG_NAME,
++						       "async_down ctrl_link_down_req_notif_send failed [%d]",
++						       rtn);
++			sl_ctrl_link_put(ctrl_link);
++			return 0;
++		}
++		ctrl_link->state = SL_LINK_STATE_STOPPING;
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "async_down stopping");
++		spin_unlock(&ctrl_link->data_lock);
++		kref_get(&ctrl_link->ref_cnt);
++		rtn = sl_core_link_down_request(ctrl_link->ctrl_lgrp->ctrl_ldev->num,
++						ctrl_link->ctrl_lgrp->num, ctrl_link->num,
++						sl_ctrl_link_async_down_callback, ctrl_link,
++						down_cause_map, &accepted);
++		if (!accepted)
++			sl_ctrl_link_put(ctrl_link);
++		if (rtn) {
++			sl_ctrl_log_err(ctrl_link, LOG_NAME, "async_down core_link_down failed [%d]", rtn);
++			spin_lock(&ctrl_link->data_lock);
++			if (ctrl_link->state == SL_LINK_STATE_STOPPING)
++				ctrl_link->state = SL_LINK_STATE_UP;
++			spin_unlock(&ctrl_link->data_lock);
++			sl_ctrl_link_put(ctrl_link);
++			return rtn;
++		}
++		sl_ctrl_link_put(ctrl_link);
++		return 0;
++	case SL_LINK_STATE_DOWN:
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "async_down already down");
++		spin_unlock(&ctrl_link->data_lock);
++		sl_ctrl_link_put(ctrl_link);
++		return 0;
++	case SL_LINK_STATE_STOPPING:
++		sl_ctrl_log_dbg(ctrl_link, LOG_NAME, "async_down already stopping");
++		spin_unlock(&ctrl_link->data_lock);
++		sl_ctrl_link_put(ctrl_link);
++		return 0;
++	default:
++		sl_ctrl_log_err(ctrl_link, LOG_NAME, "async_down invalid state (link_state = %u %s)",
++				link_state, sl_link_state_str(link_state));
++		spin_unlock(&ctrl_link->data_lock);
++		sl_ctrl_link_put(ctrl_link);
++		return -EBADRQC;
++	}
++}
++
++void sl_ctrl_link_config_get(struct sl_ctrl_link *ctrl_link, struct sl_link_config *link_config)
++{
++	spin_lock(&ctrl_link->config_lock);
++	*link_config = ctrl_link->config;
++	spin_unlock(&ctrl_link->config_lock);
++}
++
++void sl_ctrl_link_policy_get(struct sl_ctrl_link *ctrl_link, struct sl_link_policy *link_policy)
++{
++	spin_lock(&ctrl_link->config_lock);
++	*link_policy = ctrl_link->policy;
++	spin_unlock(&ctrl_link->config_lock);
++}
++
++s32 sl_ctrl_link_policy_fec_mon_ucw_down_limit_get(struct sl_ctrl_link *ctrl_link)
++{
++	s32 fec_mon_ucw_down_limit;
++
++	spin_lock(&ctrl_link->config_lock);
++	fec_mon_ucw_down_limit = ctrl_link->policy.fec_mon_ucw_down_limit;
++	spin_unlock(&ctrl_link->config_lock);
++
++	return fec_mon_ucw_down_limit;
++}
++
++s32 sl_ctrl_link_policy_fec_mon_ucw_warn_limit_get(struct sl_ctrl_link *ctrl_link)
++{
++	s32 fec_mon_ucw_warn_limit;
++
++	spin_lock(&ctrl_link->config_lock);
++	fec_mon_ucw_warn_limit = ctrl_link->policy.fec_mon_ucw_warn_limit;
++	spin_unlock(&ctrl_link->config_lock);
++
++	return fec_mon_ucw_warn_limit;
++}
++
++s32 sl_ctrl_link_policy_fec_mon_ccw_down_limit_get(struct sl_ctrl_link *ctrl_link)
++{
++	s32 fec_mon_ccw_down_limit;
++
++	spin_lock(&ctrl_link->config_lock);
++	fec_mon_ccw_down_limit = ctrl_link->policy.fec_mon_ccw_down_limit;
++	spin_unlock(&ctrl_link->config_lock);
++
++	return fec_mon_ccw_down_limit;
++}
++
++s32 sl_ctrl_link_policy_fec_mon_ccw_warn_limit_get(struct sl_ctrl_link *ctrl_link)
++{
++	s32 fec_mon_ccw_warn_limit;
++
++	spin_lock(&ctrl_link->config_lock);
++	fec_mon_ccw_warn_limit = ctrl_link->policy.fec_mon_ccw_warn_limit;
++	spin_unlock(&ctrl_link->config_lock);
++
++	return fec_mon_ccw_warn_limit;
++}
++
++s32 sl_ctrl_link_policy_fec_mon_period_ms_get(struct sl_ctrl_link *ctrl_link)
++{
++	s32 fec_mon_period_ms;
++
++	spin_lock(&ctrl_link->config_lock);
++	fec_mon_period_ms = ctrl_link->policy.fec_mon_period_ms;
++	spin_unlock(&ctrl_link->config_lock);
++
++	return fec_mon_period_ms;
++}
++
++u32 sl_ctrl_link_policy_options_get(struct sl_ctrl_link *ctrl_link)
++{
++	u32 options;
++
++	spin_lock(&ctrl_link->config_lock);
++	options = ctrl_link->policy.options;
++	spin_unlock(&ctrl_link->config_lock);
++
++	return options;
++}
++
++void sl_ctrl_link_state_set(struct sl_ctrl_link *ctrl_link, u32 link_state)
++{
++	spin_lock(&ctrl_link->data_lock);
++	ctrl_link->state = link_state;
++	spin_unlock(&ctrl_link->data_lock);
++}
++
++u32 sl_ctrl_link_state_get(struct sl_ctrl_link *ctrl_link)
++{
++	u32 state;
++
++	spin_lock(&ctrl_link->data_lock);
++	state = ctrl_link->state;
++	spin_unlock(&ctrl_link->data_lock);
++
++	return state;
++}
++
++int sl_ctrl_link_last_up_fail_cause_map_get(struct sl_ctrl_link *ctrl_link, u64 *last_up_fail_cause_map)
++{
++	spin_lock(&ctrl_link->data_lock);
++	*last_up_fail_cause_map = ctrl_link->last_up_fail_cause_map;
++	spin_unlock(&ctrl_link->data_lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"last_up_fail_cause_map_get (last_up_fail_cause_map = 0x%llX)", *last_up_fail_cause_map);
++
++	return 0;
++}
++
++int sl_ctrl_link_last_up_fail_cause_info_get(struct sl_ctrl_link *ctrl_link, u64 *last_up_fail_cause_map,
++					     time64_t *last_up_fail_time)
++{
++	spin_lock(&ctrl_link->data_lock);
++	*last_up_fail_cause_map = ctrl_link->last_up_fail_cause_map;
++	*last_up_fail_time = ctrl_link->last_up_fail_time;
++	spin_unlock(&ctrl_link->data_lock);
++
++	sl_ctrl_log_dbg(ctrl_link, LOG_NAME,
++			"last up fail time show (cause_map = 0x%llX, time = %lld %ptTt %ptTd)",
++			*last_up_fail_cause_map, *last_up_fail_time, last_up_fail_time, last_up_fail_time);
++
++	return 0;
++}
+diff --git a/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_llr.c b/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_llr.c
 new file mode 100644
-index 000000000000..ec2b4574565e
+index 000000000000..016ea353da4f
 --- /dev/null
-+++ b/drivers/net/ethernet/hpe/sbl/sbl_media.c
-@@ -0,0 +1,482 @@
++++ b/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_llr.c
+@@ -0,0 +1,630 @@
 +// SPDX-License-Identifier: GPL-2.0
++/* Copyright 2023,2024,2025 Hewlett Packard Enterprise Development LP */
 +
-+/* Copyright 2019, 2021-2025 Hewlett Packard Enterprise Development LP */
-+
++#include <linux/kobject.h>
 +#include <linux/types.h>
-+#include <linux/kernel.h>
-+#include <linux/device.h>
++#include <linux/spinlock.h>
++#include <linux/slab.h>
 +
-+#include <linux/hpe/sbl/sbl.h>
-+#include <linux/hpe/sbl/sbl_kconfig.h>
++#include "sl_asic.h"
++#include "sl_sysfs.h"
++#include "base/sl_ctrl_log.h"
++#include "sl_ctrl_ldev.h"
++#include "sl_ctrl_lgrp.h"
++#include "sl_ctrl_lgrp_notif.h"
++#include "sl_ctrl_llr.h"
++#include "data/sl_core_data_llr.h"
++#include "sl_core_str.h"
++#include "sl_ctrl_llr_counters.h"
 +
-+#include <linux/hpe/sbl/sbl_pml.h>
++#define LOG_NAME SL_CTRL_LLR_LOG_NAME
 +
-+#include "sbl_internal.h"
++#define SL_CTRL_LLR_DEL_WAIT_TIMEOUT_MS 2000
 +
-+/**
-+ * sbl_media_config() - Config media
-+ * @sbl: A slingshot base link device instance
-+ * @port_num: port number
-+ * @mattr: media attributes
-+ *
-+ * This function sets the media attributes for the link
-+ * and sets the state as configured.
-+ *
-+ * Context: Process, Acquires locks and releases link->lock <spin_lock>
-+ *
-+ * Return: 0 on success, negative error code on failure
-+ */
-+int sbl_media_config(struct sbl_inst *sbl, int port_num,
-+		     struct sbl_media_attr *mattr)
++static struct sl_ctrl_llr *ctrl_llrs[SL_ASIC_MAX_LDEVS][SL_ASIC_MAX_LGRPS][SL_ASIC_MAX_LINKS];
++static DEFINE_SPINLOCK(ctrl_llrs_lock);
++
++static void sl_ctrl_llr_setup_callback(void *tag,
++				       enum sl_core_llr_state core_llr_state,
++				       u64 core_imap,
++				       struct sl_llr_data core_llr_data)
 +{
-+	struct sbl_link *link;
-+	int err;
++	int rtn;
++	struct sl_ctrl_llr *ctrl_llr;
++	union sl_lgrp_notif_info info;
 +
-+	err = sbl_validate_instance(sbl);
-+	if (err)
-+		return err;
++	ctrl_llr = tag;
 +
-+	sbl_dev_dbg(sbl->dev, "media config\n");
++	ctrl_llr->setup.state = core_llr_state;
++	ctrl_llr->setup.imap  = core_imap;
++	ctrl_llr->setup.data  = core_llr_data;
 +
-+	err = sbl_validate_port_num(sbl, port_num);
-+	if (err)
-+		return err;
++	sl_ctrl_log_dbg(ctrl_llr, LOG_NAME, "setup callback (state = %u %s)", core_llr_state,
++			sl_core_llr_state_str(core_llr_state));
 +
-+	if (!mattr)
-+		return -EINVAL;
++	switch (core_llr_state) {
++	case SL_CORE_LLR_STATE_SETUP:
++		SL_CTRL_LLR_COUNTER_INC(ctrl_llr, LLR_SETUP);
++		info.llr_data = ctrl_llr->setup.data;
++		rtn = sl_ctrl_lgrp_notif_enqueue(ctrl_llr->ctrl_lgrp, ctrl_llr->num,
++						 SL_LGRP_NOTIF_LLR_SETUP, &info, ctrl_llr->setup.imap);
++		if (rtn)
++			sl_ctrl_log_warn_trace(ctrl_llr, LOG_NAME,
++					       "setup SETUP ctrl_lgrp_notif_enqueue failed [%d]", rtn);
++		return;
++	case SL_CORE_LLR_STATE_SETUP_TIMEOUT:
++		SL_CTRL_LLR_COUNTER_INC(ctrl_llr, LLR_SETUP_TIMEOUT);
++		rtn = sl_ctrl_lgrp_notif_enqueue(ctrl_llr->ctrl_lgrp, ctrl_llr->num,
++						 SL_LGRP_NOTIF_LLR_SETUP_TIMEOUT, NULL, ctrl_llr->setup.imap);
++		if (rtn)
++			sl_ctrl_log_warn_trace(ctrl_llr, LOG_NAME,
++					       "setup TIMEOUT ctrl_lgrp_notif_enqueue failed [%d]", rtn);
++		return;
++	case SL_CORE_LLR_STATE_CONFIGURED:
++		SL_CTRL_LLR_COUNTER_INC(ctrl_llr, LLR_CONFIGURED);
++		memset(&ctrl_llr->setup.data, 0, sizeof(struct sl_llr_data));
++		rtn = sl_ctrl_lgrp_notif_enqueue(ctrl_llr->ctrl_lgrp, ctrl_llr->num,
++						 SL_LGRP_NOTIF_LLR_CANCELED, NULL, ctrl_llr->setup.imap);
++		if (rtn)
++			sl_ctrl_log_warn_trace(ctrl_llr, LOG_NAME,
++					       "setup CONFIGURED ctrl_lgrp_notif_enqueue failed [%d]", rtn);
++		return;
++	default:
++		memset(&ctrl_llr->setup.data, 0, sizeof(struct sl_llr_data));
++		sl_ctrl_log_err(ctrl_llr, LOG_NAME,
++				"setup ERROR invalid (state = %u %s)",
++				core_llr_state, sl_core_llr_state_str(core_llr_state));
++		info.error = -ENOMSG;
++		rtn = sl_ctrl_lgrp_notif_enqueue(ctrl_llr->ctrl_lgrp, ctrl_llr->num,
++						 SL_LGRP_NOTIF_LLR_ERROR, &info, ctrl_llr->setup.imap);
++		if (rtn)
++			sl_ctrl_log_warn_trace(ctrl_llr, LOG_NAME,
++					       "setup ERROR ctrl_lgrp_notif_enqueue failed [%d]", rtn);
++		return;
++	}
++}
 +
-+	if (mattr->magic != SBL_MEDIA_ATTR_MAGIC)
-+		return -EINVAL;
++static void sl_ctrl_llr_start_callback(void *tag,
++				       enum sl_core_llr_state core_llr_state,
++				       u64 core_imap)
++{
++	int rtn;
++	struct sl_ctrl_llr *ctrl_llr;
++	union sl_lgrp_notif_info info;
 +
-+	link = sbl->link + port_num;
++	ctrl_llr = tag;
 +
-+	spin_lock(&link->lock);
++	ctrl_llr->start.state = core_llr_state;
++	ctrl_llr->start.imap  = core_imap;
 +
-+	if (!(link->blstate & (SBL_BASE_LINK_STATUS_UNCONFIGURED | SBL_BASE_LINK_STATUS_DOWN))) {
++	sl_ctrl_log_dbg(ctrl_llr, LOG_NAME, "start callback (state = %u %s)",
++			core_llr_state, sl_core_llr_state_str(core_llr_state));
 +
-+		sbl_dev_err(sbl->dev, "%d: wrong state (%s) to configure media\n", port_num,
-+			    sbl_link_state_str(link->blstate));
-+		spin_unlock(&link->lock);
-+		return -EUCLEAN;
++	switch (core_llr_state) {
++	case SL_CORE_LLR_STATE_RUNNING:
++		SL_CTRL_LLR_COUNTER_INC(ctrl_llr, LLR_RUNNING);
++		rtn = sl_ctrl_lgrp_notif_enqueue(ctrl_llr->ctrl_lgrp, ctrl_llr->num,
++						 SL_LGRP_NOTIF_LLR_RUNNING, NULL, ctrl_llr->start.imap);
++		if (rtn)
++			sl_ctrl_log_warn_trace(ctrl_llr, LOG_NAME,
++					       "start RUNNING ctrl_lgrp_notif_enqueue failed [%d[", rtn);
++		return;
++	case SL_CORE_LLR_STATE_START_TIMEOUT:
++		SL_CTRL_LLR_COUNTER_INC(ctrl_llr, LLR_START_TIMEOUT);
++		if (ctrl_llr->policy.options & SL_LLR_POLICY_OPT_CONTINUOUS_START_TRIES) {
++			sl_ctrl_log_dbg(ctrl_llr, LOG_NAME, "start TIMEOUT retry");
++			rtn = sl_core_llr_start(ctrl_llr->ctrl_lgrp->ctrl_ldev->num, ctrl_llr->ctrl_lgrp->num,
++						ctrl_llr->num, sl_ctrl_llr_start_callback, ctrl_llr, 0);
++			if (rtn)
++				sl_ctrl_log_warn_trace(ctrl_llr, LOG_NAME,
++						       "start TIMEOUT core_llr_start retry failed [%d]", rtn);
++		}
++		rtn = sl_ctrl_lgrp_notif_enqueue(ctrl_llr->ctrl_lgrp, ctrl_llr->num,
++						 SL_LGRP_NOTIF_LLR_START_TIMEOUT, NULL, ctrl_llr->start.imap);
++		if (rtn)
++			sl_ctrl_log_warn_trace(ctrl_llr, LOG_NAME,
++					       "start TIMEOUT ctrl_lgrp_notif_enqueue failed [%d[", rtn);
++		return;
++	case SL_CORE_LLR_STATE_SETUP:
++		SL_CTRL_LLR_COUNTER_INC(ctrl_llr, LLR_SETUP);
++		rtn = sl_ctrl_lgrp_notif_enqueue(ctrl_llr->ctrl_lgrp, ctrl_llr->num,
++						 SL_LGRP_NOTIF_LLR_CANCELED, NULL, ctrl_llr->start.imap);
++		if (rtn)
++			sl_ctrl_log_warn_trace(ctrl_llr, LOG_NAME,
++					       "start CONFIGURED ctrl_lgrp_notif_enqueue failed [%d[", rtn);
++		return;
++	default:
++		memset(&ctrl_llr->setup.data, 0, sizeof(struct sl_llr_data));
++		sl_ctrl_log_err(ctrl_llr, LOG_NAME, "start ERROR invalid (state = %u %s)",
++				core_llr_state, sl_core_llr_state_str(core_llr_state));
++		info.error = -ENOMSG;
++		rtn = sl_ctrl_lgrp_notif_enqueue(ctrl_llr->ctrl_lgrp, ctrl_llr->num, SL_LGRP_NOTIF_LLR_ERROR,
++						 &info, ctrl_llr->setup.imap);
++		if (rtn)
++			sl_ctrl_log_warn_trace(ctrl_llr, LOG_NAME, "start ERROR ctrl_lgrp_notif_enqueue failed [%d[",
++					       rtn);
++		return;
++	}
++}
++
++int sl_ctrl_llr_new(u8 ldev_num, u8 lgrp_num, u8 llr_num, struct kobject *sysfs_parent)
++{
++	int                 rtn;
++	struct sl_ctrl_llr *ctrl_llr;
++
++	ctrl_llr = sl_ctrl_llr_get(ldev_num, lgrp_num, llr_num);
++	if (ctrl_llr) {
++		sl_ctrl_log_err(NULL, LOG_NAME, "exists (ctrl_llr = 0x%p)", ctrl_llr);
++		return -EBADRQC;
 +	}
 +
-+	memcpy(&link->mattr, mattr, sizeof(struct sbl_media_attr));
-+	link->mconfigured = true;
++	ctrl_llr = kzalloc(sizeof(*ctrl_llr), GFP_KERNEL);
++	if (!ctrl_llr)
++		return -ENOMEM;
 +
-+	if (link->blconfigured)
-+		link->blstate = SBL_BASE_LINK_STATUS_DOWN;
++	ctrl_llr->magic     = SL_CTRL_LLR_MAGIC;
++	ctrl_llr->ver       = SL_CTRL_LLR_VER;
++	ctrl_llr->num       = llr_num;
++	ctrl_llr->ctrl_lgrp = sl_ctrl_lgrp_get(ldev_num, lgrp_num);
++	if (!ctrl_llr->ctrl_lgrp) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"new NULL lgrp (ldev_num = %u, lgrp_num = %u)", ldev_num, lgrp_num);
++		kfree(ctrl_llr);
++		return -EBADRQC;
++	}
 +
-+	/* the media might have changed so invalidate the llr loop time */
-+	link->llr_loop_time = 0;
++	spin_lock_init(&ctrl_llr->data_lock);
++	kref_init(&ctrl_llr->ref_cnt);
++	init_completion(&ctrl_llr->del_complete);
 +
-+	spin_unlock(&link->lock);
++	rtn = sl_ctrl_llr_counters_init(ctrl_llr);
++	if (rtn) {
++		sl_ctrl_log_err(ctrl_llr, LOG_NAME, "ctrl_llr_counters_init failed [%d]", rtn);
++		goto out;
++	}
++
++	rtn = sl_ctrl_llr_cause_counters_init(ctrl_llr);
++	if (rtn) {
++		sl_ctrl_log_err(ctrl_llr, LOG_NAME, "ctrl_llr_cause_counters_init failed [%d]", rtn);
++		goto out_counters;
++	}
++
++	rtn = sl_core_llr_new(ldev_num, lgrp_num, llr_num);
++	if (rtn) {
++		sl_ctrl_log_err(ctrl_llr, LOG_NAME, "core_llr_new failed [%d]", rtn);
++		goto out_cause_counters;
++	}
++
++	if (sysfs_parent) {
++		ctrl_llr->parent_kobj = sysfs_parent;
++
++		rtn = sl_sysfs_llr_create(ctrl_llr);
++		if (rtn) {
++			sl_ctrl_log_err(ctrl_llr, LOG_NAME, "sysfs_llr_create failed [%d]", rtn);
++			goto out_llr_new;
++		}
++	}
++	sl_ctrl_log_dbg(ctrl_llr, LOG_NAME, "new (ctrl_llr = 0x%p)", ctrl_llr);
++
++	spin_lock(&ctrl_llrs_lock);
++	ctrl_llrs[ldev_num][lgrp_num][llr_num] = ctrl_llr;
++	spin_unlock(&ctrl_llrs_lock);
 +
 +	return 0;
-+}
-+EXPORT_SYMBOL(sbl_media_config);
-+
-+/**
-+ * sbl_media_unconfig() - Unconfig media
-+ * @sbl: A slingshot base link device instance
-+ * @port_num: port number
-+ *
-+ * Clear media attributes and set base link status to unconfigure.
-+ *
-+ * Context: Process, Acquires Lock and releases link->lock <spin_lock>
-+ *
-+ * Return: negative error code on failure
-+ */
-+int sbl_media_unconfig(struct sbl_inst *sbl, int port_num)
-+{
-+	struct sbl_link *link;
-+	int err = 0;
-+
-+	err = sbl_validate_instance(sbl);
-+	if (err)
-+		return err;
-+
-+	sbl_dev_dbg(sbl->dev, "media unconfig\n");
-+
-+	err = sbl_validate_port_num(sbl, port_num);
-+	if (err)
-+		return err;
-+
-+	link = sbl->link + port_num;
-+
-+	spin_lock(&link->lock);
-+
-+	if (!(link->blstate & (SBL_BASE_LINK_STATUS_UNCONFIGURED |
-+			SBL_BASE_LINK_STATUS_DOWN |
-+			SBL_BASE_LINK_STATUS_STOPPING))) {
-+
-+		sbl_dev_err(sbl->dev, "%d: wrong state (%s) to unconfigure media\n", port_num,
-+			    sbl_link_state_str(link->blstate));
-+		spin_unlock(&link->lock);
-+		return -EUCLEAN;
-+	}
-+
-+	memset(&link->mattr, 0, sizeof(struct sbl_media_attr));
-+	link->mconfigured = false;
-+
-+	link->blstate = SBL_BASE_LINK_STATUS_UNCONFIGURED;
-+
-+	spin_unlock(&link->lock);
-+
-+	return err;
-+}
-+EXPORT_SYMBOL(sbl_media_unconfig);
-+
-+bool sbl_media_check_mode_supported(struct sbl_inst *sbl, int port_num, u32 link_mode)
-+{
-+	struct sbl_link *link = sbl->link + port_num;
-+	u32 info_mode_bit = 0;
-+	u32 media_info;
-+	bool allow_bad_mode;
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&link->lock, flags);
-+	media_info = link->mattr.info;
-+	allow_bad_mode = link->blattr.options & SBL_OPT_ALLOW_MEDIA_BAD_MODE;
-+	spin_unlock_irqrestore(&link->lock, flags);
-+
-+	if (!media_info) {
-+		/* We have no info about media
-+		 * assume its OK so we can carry on
-+		 * if its not we will fail later anyway
-+		 */
-+		sbl_dev_warn(sbl->dev, "%d: no media info - assuming link mode OK", port_num);
-+		return true;
-+	}
-+
-+	switch (link_mode) {
-+	case SBL_LINK_MODE_BS_200G:
-+		info_mode_bit = SBL_MEDIA_INFO_SUPPORTS_BS_200G;
-+		break;
-+	case SBL_LINK_MODE_BJ_100G:
-+		info_mode_bit = SBL_MEDIA_INFO_SUPPORTS_BJ_100G;
-+		break;
-+	case SBL_LINK_MODE_CD_100G:
-+		info_mode_bit = SBL_MEDIA_INFO_SUPPORTS_CD_100G;
-+		break;
-+	case SBL_LINK_MODE_CD_50G:
-+		info_mode_bit = SBL_MEDIA_INFO_SUPPORTS_CD_50G;
-+		break;
-+	default:
-+		/* do nothing here - below will catch invalid link mode */
-+		break;
-+	}
-+
-+	if (media_info & info_mode_bit)
-+		return true;
-+
-+	if (allow_bad_mode ||
-+	    sbl_debug_option(sbl, port_num, SBL_DEBUG_ALLOW_MEDIA_BAD_MODE)) {
-+		sbl_dev_warn(sbl->dev, "%d: link mode (%s) not supported by media - ignored",
-+			     port_num, sbl_link_mode_str(link_mode));
-+		return true;
-+	}
-+	sbl_dev_err(sbl->dev, "%d: link mode (%s) not supported by media",
-+		    port_num, sbl_link_mode_str(link_mode));
-+	return false;
++out_llr_new:
++		sl_core_llr_del(ldev_num, lgrp_num, llr_num);
++out_cause_counters:
++	sl_ctrl_llr_cause_counters_del(ctrl_llr);
++out_counters:
++	sl_ctrl_llr_counters_del(ctrl_llr);
++out:
++	kfree(ctrl_llr);
++	return rtn;
 +}
 +
-+/**
-+ * sbl_media_check_headshell_reset_supported() - Check headshell based on media info
-+ * @sbl: A slingshot base link device instance
-+ * @port_num: port number
-+ *
-+ * Return: True if reset is supported else false
-+ */
-+bool sbl_media_check_headshell_reset_supported(struct sbl_inst *sbl, int port_num)
++static void sl_ctrl_llr_release(struct kref *kref)
 +{
-+	struct sbl_link *link = sbl->link + port_num;
++	int                 rtn;
++	struct sl_ctrl_llr *ctrl_llr;
++	u8                  ldev_num;
++	u8                  lgrp_num;
++	u8                  llr_num;
 +
-+	if (!link->mattr.info) {
-+		/* We have no info about media */
-+		sbl_dev_dbg(sbl->dev, "%d: no media info available to check headshell reset supported bit", port_num);
-+		return false;
-+	}
++	ctrl_llr = container_of(kref, struct sl_ctrl_llr, ref_cnt);
++	ldev_num = ctrl_llr->ctrl_lgrp->ctrl_ldev->num;
++	lgrp_num = ctrl_llr->ctrl_lgrp->num;
++	llr_num = ctrl_llr->num;
 +
-+	if (link->mattr.info & SBL_MEDIA_INFO_SUPPORTS_HEADSHELL_RESET)
-+		return true;
++	sl_ctrl_log_dbg(ctrl_llr, LOG_NAME, "release (ctrl_llr = 0x%p)", ctrl_llr);
 +
-+	return false;
-+}
-+EXPORT_SYMBOL(sbl_media_check_headshell_reset_supported);
++	rtn = sl_core_llr_stop(ldev_num, lgrp_num, llr_num);
++	if (rtn)
++		sl_ctrl_log_warn_trace(ctrl_llr, LOG_NAME, "release core_llr_stop failed [%d]", rtn);
 +
-+static bool sbl_media_check_len_supported(struct sbl_inst *sbl, int port_num, u64 len)
-+{
-+	struct sbl_link *link = sbl->link + port_num;
++	/* Must delete sysfs first to guarantee nobody is reading */
++	sl_sysfs_llr_delete(ctrl_llr);
 +
-+	switch (len) {
-+	case SBL_LINK_LEN_BACKPLANE:
-+	case SBL_LINK_LEN_000_300:
-+	case SBL_LINK_LEN_000_400:
-+	case SBL_LINK_LEN_000_750:
-+	case SBL_LINK_LEN_000_800:
-+	case SBL_LINK_LEN_001_000:
-+	case SBL_LINK_LEN_001_100:
-+	case SBL_LINK_LEN_001_150:
-+	case SBL_LINK_LEN_001_200:
-+	case SBL_LINK_LEN_001_400:
-+	case SBL_LINK_LEN_001_420:
-+	case SBL_LINK_LEN_001_500:
-+	case SBL_LINK_LEN_001_600:
-+	case SBL_LINK_LEN_001_640:
-+	case SBL_LINK_LEN_001_700:
-+	case SBL_LINK_LEN_001_800:
-+	case SBL_LINK_LEN_001_900:
-+	case SBL_LINK_LEN_001_910:
-+	case SBL_LINK_LEN_002_000:
-+	case SBL_LINK_LEN_002_100:
-+	case SBL_LINK_LEN_002_130:
-+	case SBL_LINK_LEN_002_200:
-+	case SBL_LINK_LEN_002_300:
-+	case SBL_LINK_LEN_002_390:
-+	case SBL_LINK_LEN_002_400:
-+	case SBL_LINK_LEN_002_500:
-+	case SBL_LINK_LEN_002_600:
-+	case SBL_LINK_LEN_002_620:
-+	case SBL_LINK_LEN_002_700:
-+	case SBL_LINK_LEN_002_800:
-+	case SBL_LINK_LEN_002_900:
-+	case SBL_LINK_LEN_002_990:
-+	case SBL_LINK_LEN_003_000:
-+	case SBL_LINK_LEN_004_000:
-+	case SBL_LINK_LEN_005_000:
-+	case SBL_LINK_LEN_006_000:
-+	case SBL_LINK_LEN_007_000:
-+	case SBL_LINK_LEN_008_000:
-+	case SBL_LINK_LEN_010_000:
-+	case SBL_LINK_LEN_014_000:
-+	case SBL_LINK_LEN_015_000:
-+	case SBL_LINK_LEN_019_000:
-+	case SBL_LINK_LEN_025_000:
-+	case SBL_LINK_LEN_030_000:
-+	case SBL_LINK_LEN_035_000:
-+	case SBL_LINK_LEN_050_000:
-+	case SBL_LINK_LEN_075_000:
-+	case SBL_LINK_LEN_100_000:
-+		return true;
-+	default:
-+		if ((link->blattr.options & SBL_OPT_ALLOW_MEDIA_BAD_LEN) ||
-+		    sbl_debug_option(sbl, port_num, SBL_DEBUG_ALLOW_MEDIA_BAD_LEN)) {
-+			sbl_dev_warn(sbl->dev, "%d: unsupported media len (%lld) - ignored", port_num, len);
-+			return true;
-+		}
-+		sbl_dev_err(sbl->dev, "%d: unsupported media len (%lld)", port_num, len);
-+		return false;
-+	}
++	sl_core_llr_del(ldev_num, lgrp_num, llr_num);
++
++	/* Free the counters and unpublish together so cause_counter_inc() sees neither half-done */
++	spin_lock(&ctrl_llrs_lock);
++	sl_ctrl_llr_counters_del(ctrl_llr);
++	sl_ctrl_llr_cause_counters_del(ctrl_llr);
++	ctrl_llrs[ldev_num][lgrp_num][llr_num] = NULL;
++	spin_unlock(&ctrl_llrs_lock);
++
++	complete_all(&ctrl_llr->del_complete);
++
++	kfree(ctrl_llr);
 +}
 +
-+/* return valid length in cm or 0 */
-+u32 sbl_media_get_len_cm(struct sbl_inst *sbl, int port_num, u64 len)
++static int sl_ctrl_llr_put(struct sl_ctrl_llr *ctrl_llr)
 +{
-+	if (sbl_media_check_len_supported(sbl, port_num, len)) {
-+		switch (len) {
-+		case SBL_LINK_LEN_BACKPLANE: return 25;
-+		case SBL_LINK_LEN_000_300:   return 30;
-+		case SBL_LINK_LEN_000_400:   return 40;
-+		case SBL_LINK_LEN_000_750:   return 75;
-+		case SBL_LINK_LEN_000_800:   return 80;
-+		case SBL_LINK_LEN_001_000:   return 100;
-+		case SBL_LINK_LEN_001_100:   return 110;
-+		case SBL_LINK_LEN_001_150:   return 115;
-+		case SBL_LINK_LEN_001_200:   return 120;
-+		case SBL_LINK_LEN_001_400:   return 140;
-+		case SBL_LINK_LEN_001_420:   return 142;
-+		case SBL_LINK_LEN_001_500:   return 150;
-+		case SBL_LINK_LEN_001_600:   return 160;
-+		case SBL_LINK_LEN_001_640:   return 164;
-+		case SBL_LINK_LEN_001_700:   return 170;
-+		case SBL_LINK_LEN_001_800:   return 180;
-+		case SBL_LINK_LEN_001_900:   return 190;
-+		case SBL_LINK_LEN_001_910:   return 191;
-+		case SBL_LINK_LEN_002_000:   return 200;
-+		case SBL_LINK_LEN_002_100:   return 210;
-+		case SBL_LINK_LEN_002_130:   return 213;
-+		case SBL_LINK_LEN_002_200:   return 220;
-+		case SBL_LINK_LEN_002_300:   return 230;
-+		case SBL_LINK_LEN_002_390:   return 239;
-+		case SBL_LINK_LEN_002_400:   return 240;
-+		case SBL_LINK_LEN_002_500:   return 250;
-+		case SBL_LINK_LEN_002_600:   return 260;
-+		case SBL_LINK_LEN_002_620:   return 262;
-+		case SBL_LINK_LEN_002_700:   return 270;
-+		case SBL_LINK_LEN_002_800:   return 280;
-+		case SBL_LINK_LEN_002_900:   return 290;
-+		case SBL_LINK_LEN_002_990:   return 299;
-+		case SBL_LINK_LEN_003_000:   return 300;
-+		case SBL_LINK_LEN_004_000:   return 400;
-+		case SBL_LINK_LEN_005_000:   return 500;
-+		case SBL_LINK_LEN_006_000:   return 600;
-+		case SBL_LINK_LEN_007_000:   return 700;
-+		case SBL_LINK_LEN_008_000:   return 800;
-+		case SBL_LINK_LEN_010_000:   return 1000;
-+		case SBL_LINK_LEN_014_000:   return 1400;
-+		case SBL_LINK_LEN_015_000:   return 1500;
-+		case SBL_LINK_LEN_019_000:   return 1900;
-+		case SBL_LINK_LEN_025_000:   return 2500;
-+		case SBL_LINK_LEN_030_000:   return 3000;
-+		case SBL_LINK_LEN_035_000:   return 3500;
-+		case SBL_LINK_LEN_050_000:   return 5000;
-+		case SBL_LINK_LEN_075_000:   return 7500;
-+		case SBL_LINK_LEN_100_000:   return 10000;
++	return kref_put(&ctrl_llr->ref_cnt, sl_ctrl_llr_release);
++}
++
++int sl_ctrl_llr_del(u8 ldev_num, u8 lgrp_num, u8 llr_num)
++{
++	struct sl_ctrl_llr *ctrl_llr;
++	unsigned long       timeleft;
++
++	ctrl_llr = sl_ctrl_llr_get(ldev_num, lgrp_num, llr_num);
++	if (!ctrl_llr) {
++		sl_ctrl_log_err_trace(NULL, LOG_NAME,
++				      "del not found (ldev_num = %u, lgrp_num = %u, llr_num = %u)",
++				      ldev_num, lgrp_num, llr_num);
++		return -EBADRQC;
++	}
++
++	/* Release occurs on the last caller. Block until complete. */
++	if (!sl_ctrl_llr_put(ctrl_llr)) {
++		timeleft = wait_for_completion_timeout(&ctrl_llr->del_complete,
++						       msecs_to_jiffies(SL_CTRL_LLR_DEL_WAIT_TIMEOUT_MS));
++
++		if (timeleft == 0) {
++			sl_ctrl_log_err(NULL, LOG_NAME,
++					"del completion_timeout (ctrl_llr = 0x%p)", ctrl_llr);
++			return -ETIMEDOUT;
 +		}
 +	}
 +
 +	return 0;
 +}
 +
-+/* calc loop time based on cable length */
-+int sbl_media_calc_loop_time(struct sbl_inst *sbl, int port_num, u64 *calc_loop_time)
++static bool sl_ctrl_llr_kref_get_unless_zero(struct sl_ctrl_llr *ctrl_llr)
 +{
-+	struct sbl_link *link;
-+	u32 len;
-+	int err;
-+
-+	err = sbl_validate_instance(sbl);
-+	if (err)
-+		return err;
-+
-+	err = sbl_validate_port_num(sbl, port_num);
-+	if (err)
-+		return err;
-+
-+	if (!calc_loop_time)
-+		return -EINVAL;
-+
-+	link = sbl->link + port_num;
-+	*calc_loop_time = 0;
-+
-+	if ((link->blattr.loopback_mode == SBL_LOOPBACK_MODE_OFF) ||
-+	    (link->blattr.loopback_mode == SBL_LOOPBACK_MODE_INVALID)) {
-+		len = sbl_media_get_len_cm(sbl, port_num, link->mattr.len);
-+		if (!len)
-+			return -EBADRQC;
-+	} else
-+		len = 0;
-+
-+	sbl_dev_dbg(sbl->dev, "%d: len = %d, lb = %s",
-+		    port_num, len, sbl_loopback_mode_str(link->blattr.loopback_mode));
-+
-+	if (link->mattr.media == SBL_LINK_MEDIA_ELECTRICAL)
-+		*calc_loop_time = 2 * len * SBL_MEDIA_NS_PER_M / 100;
-+	else
-+		*calc_loop_time = (2 * len * SBL_MEDIA_OPTICAL_NS_PER_M / 100) +
-+			(4 * SBL_MEDIA_OPTICAL_TRANCEIVER_DELAY);
-+	*calc_loop_time += 2 * (SBL_ASIC_TX_DELAY + SBL_ASIC_RX_DELAY);
-+
-+	sbl_dev_dbg(sbl->dev, "%d: calc loop time %lld cm %lld ns",
-+		    port_num, link->mattr.len, *calc_loop_time);
-+
-+	return 0;
++	return (kref_get_unless_zero(&ctrl_llr->ref_cnt) != 0);
 +}
 +
-+/**
-+ * sbl_media_get_loop_time_ns() - Get loop time in ns
-+ * @sbl: A slingshot base link device instance
-+ * @port_num: port number
-+ * @measurement_only: set to false when reading
-+ *
-+ * This function returns available loop time. If not and
-+ * 'measurement_only' is true, returns 0 with a warning.
-+ * Otherwise attempts to calculate the loop time.
-+ *
-+ * Return: calculate loop time on success, 0 on failure
-+ */
-+u64 sbl_media_get_loop_time_ns(struct sbl_inst *sbl, int port_num,
-+			       bool measurement_only)
++struct sl_ctrl_llr *sl_ctrl_llr_get(u8 ldev_num, u8 lgrp_num, u8 llr_num)
 +{
-+	struct sbl_link *link = sbl->link + port_num;
-+	u64 calc_loop_time;
-+	int err;
++	struct sl_ctrl_llr *ctrl_llr;
 +
-+	if (!link->mconfigured)
-+		return 0;
++	spin_lock(&ctrl_llrs_lock);
++	ctrl_llr = ctrl_llrs[ldev_num][lgrp_num][llr_num];
++	spin_unlock(&ctrl_llrs_lock);
 +
-+	if (link->llr_loop_time)
-+		return link->llr_loop_time;
++	sl_ctrl_log_dbg(NULL, LOG_NAME,
++			"get (ldev_num = %u, lgrp_num = %u, llr_num = %u, ctrl_llr = 0x%p)",
++			ldev_num, lgrp_num, llr_num, ctrl_llr);
 +
-+	if (measurement_only) {
-+		sbl_dev_warn(sbl->dev, "%d: measured loop time not found", port_num);
-+		return 0;
++	return ctrl_llr;
++}
++
++/*
++ * The lookup and the counter update are done under ctrl_llrs_lock, which
++ * sl_ctrl_llr_release() also holds while it frees the counters.
++ */
++void sl_ctrl_llr_cause_counter_inc(struct sl_core_llr *core_llr, unsigned long cause_map)
++{
++	struct sl_ctrl_llr *ctrl_llr;
++	u8                  ldev_num = core_llr->core_lgrp->core_ldev->num;
++	u8                  lgrp_num = core_llr->core_lgrp->num;
++
++	spin_lock(&ctrl_llrs_lock);
++	ctrl_llr = ctrl_llrs[ldev_num][lgrp_num][core_llr->num];
++	if (ctrl_llr)
++		sl_ctrl_llr_cause_counters_inc(ctrl_llr, cause_map);
++	spin_unlock(&ctrl_llrs_lock);
++
++	if (!ctrl_llr)
++		sl_ctrl_log_dbg(NULL, LOG_NAME, "llr cause counter inc - llr not found");
++}
++
++int sl_ctrl_llr_config_set(u8 ldev_num, u8 lgrp_num, u8 llr_num, struct sl_llr_config *llr_config)
++{
++	int                rtn;
++	struct sl_ctrl_llr *ctrl_llr;
++
++	ctrl_llr = sl_ctrl_llr_get(ldev_num, lgrp_num, llr_num);
++	if (!ctrl_llr) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"config set NULL llr (ldev_num = %u, lgrp_num = %u, llr_num = %u)",
++				ldev_num, lgrp_num, llr_num);
++		return -EBADRQC;
 +	}
 +
-+	if (!sbl_media_check_len_supported(sbl, port_num, link->mattr.len))
-+		return 0;
-+
-+	err = sbl_media_calc_loop_time(sbl, port_num, &calc_loop_time);
-+	if (err)
-+		return 0;
-+
-+	return calc_loop_time;
-+}
-+EXPORT_SYMBOL(sbl_media_get_loop_time_ns);
-+
-+int sbl_media_validate_config(struct sbl_inst *sbl, int port_num)
-+{
-+	struct sbl_link *link = sbl->link + port_num;
-+
-+	if (!(link->mconfigured && link->blconfigured))
-+		return -EUCLEAN;
-+
-+	if ((link->mattr.media == SBL_LINK_MEDIA_ELECTRICAL) &&
-+	    (link->blattr.config_target == SBL_BASE_LINK_CONFIG_PEC))
-+		return 0;
-+
-+	if ((link->mattr.media == SBL_LINK_MEDIA_OPTICAL) &&
-+	    (link->blattr.config_target == SBL_BASE_LINK_CONFIG_AOC))
-+		return 0;
-+
-+	return -EMEDIUMTYPE;
-+}
-+
-+#ifdef CONFIG_SYSFS
-+/**
-+ * sbl_media_sysfs_sprint() - Format media info into buffer
-+ * @sbl: A slingshot base link device instance
-+ * @port_num: port number
-+ * @buf: Destination buffer to write the data
-+ * @size: Size of @buf in bytes, the output is truncated to fit
-+ *
-+ * This function checks the state of media configuration and info.
-+ * Based on that it will format the string and write into the
-+ * provided buffer.
-+ *
-+ * Return: Number of characters written, at most @size - 1
-+ */
-+int sbl_media_sysfs_sprint(struct sbl_inst *sbl, int port_num, char *buf, size_t size)
-+{
-+	struct sbl_link *link = sbl->link + port_num;
-+	int s = 0;
-+
-+	spin_lock(&link->lock);
-+	if (link->mconfigured) {
-+		s += scnprintf(buf + s, size - s, "media: %s, %s, (%s), info ",
-+			       sbl_link_media_str(link->mattr.media),
-+			       sbl_link_len_str(link->mattr.len),
-+			       sbl_link_vendor_str(link->mattr.vendor));
-+		if (link->mattr.info) {
-+			if (link->mattr.info & SBL_MEDIA_INFO_SUPPORTS_BS_200G)
-+				s += scnprintf(buf + s, size - s, "200 ");
-+			if (link->mattr.info & SBL_MEDIA_INFO_SUPPORTS_BJ_100G)
-+				s += scnprintf(buf + s, size - s, "100bj ");
-+			if (link->mattr.info & SBL_MEDIA_INFO_SUPPORTS_CD_100G)
-+				s += scnprintf(buf + s, size - s, "100cd ");
-+			if (link->mattr.info & SBL_MEDIA_INFO_SUPPORTS_CD_50G)
-+				s += scnprintf(buf + s, size - s, "50 ");
-+			if (link->mattr.info & SBL_MEDIA_INFO_ANALOG)
-+				s += scnprintf(buf + s, size - s, "analog ");
-+			if (link->mattr.info & SBL_MEDIA_INFO_DIGITAL)
-+				s += scnprintf(buf + s, size - s, "digital ");
-+		} else
-+			s += scnprintf(buf + s, size - s, "none");
-+		s += scnprintf(buf + s, size - s, "\n");
++	if (!sl_ctrl_llr_kref_get_unless_zero(ctrl_llr)) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"config set kref_get_unless_zero failed (ctrl_llr = 0x%p)",
++				ctrl_llr);
++		return -EBADRQC;
 +	}
-+	spin_unlock(&link->lock);
 +
-+	return s;
++	sl_ctrl_log_dbg(ctrl_llr, LOG_NAME, "config set (setup timeout = %d, start timeout = %d)",
++			llr_config->setup_timeout_ms, llr_config->start_timeout_ms);
++
++	rtn = sl_core_llr_config_set(ldev_num, lgrp_num, llr_num, llr_config);
++	if (rtn) {
++		sl_ctrl_log_err(ctrl_llr, LOG_NAME, "core_llr_config_set failed [%d]", rtn);
++		goto out;
++	}
++
++	spin_lock(&ctrl_llr->data_lock);
++	ctrl_llr->config = *llr_config;
++	spin_unlock(&ctrl_llr->data_lock);
++
++out:
++	if (sl_ctrl_llr_put(ctrl_llr))
++		sl_ctrl_log_dbg(NULL, LOG_NAME,
++				"config set - llr removed (ctrl_llr = 0x%p)", ctrl_llr);
++
++	return rtn;
 +}
-+EXPORT_SYMBOL(sbl_media_sysfs_sprint);
-+#endif
-diff --git a/drivers/net/ethernet/hpe/sbl/sbl_media_nic.c b/drivers/net/ethernet/hpe/sbl/sbl_media_nic.c
++
++int sl_ctrl_llr_policy_set(u8 ldev_num, u8 lgrp_num, u8 llr_num, struct sl_llr_policy *llr_policy)
++{
++	int                rtn;
++	struct sl_ctrl_llr *ctrl_llr;
++
++	ctrl_llr = sl_ctrl_llr_get(ldev_num, lgrp_num, llr_num);
++	if (!ctrl_llr) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"policy set NULL llr (ldev_num = %u, lgrp_num = %u, llr_num = %u)",
++				ldev_num, lgrp_num, llr_num);
++		return -EBADRQC;
++	}
++
++	if (!sl_ctrl_llr_kref_get_unless_zero(ctrl_llr)) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"policy set kref_get_unless_zero failed (ctrl_llr = 0x%p)", ctrl_llr);
++		return -EBADRQC;
++	}
++
++	sl_ctrl_log_dbg(ctrl_llr, LOG_NAME, "policy set");
++
++	rtn = sl_core_llr_policy_set(ldev_num, lgrp_num, llr_num, llr_policy);
++	if (rtn) {
++		sl_ctrl_log_err(ctrl_llr, LOG_NAME, "core_llr_policy_set failed [%d]", rtn);
++		goto out;
++	}
++
++	spin_lock(&ctrl_llr->data_lock);
++	ctrl_llr->policy = *llr_policy;
++	spin_unlock(&ctrl_llr->data_lock);
++
++out:
++	if (sl_ctrl_llr_put(ctrl_llr))
++		sl_ctrl_log_dbg(NULL, LOG_NAME,
++				"policy set - llr removed (ctrl_llr = 0x%p)", ctrl_llr);
++
++	return rtn;
++}
++
++int sl_ctrl_llr_setup(u8 ldev_num, u8 lgrp_num, u8 llr_num)
++{
++	int                rtn;
++	struct sl_ctrl_llr *ctrl_llr;
++
++	ctrl_llr = sl_ctrl_llr_get(ldev_num, lgrp_num, llr_num);
++	if (!ctrl_llr) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"setup NULL llr (ldev_num = %u, lgrp_num = %u, llr_num = %u)",
++				ldev_num, lgrp_num, llr_num);
++		return -EBADRQC;
++	}
++
++	if (!sl_ctrl_llr_kref_get_unless_zero(ctrl_llr)) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"setup kref_get_unless_zero failed (ctrl_llr = 0x%p)", ctrl_llr);
++		return -EBADRQC;
++	}
++
++	sl_ctrl_log_dbg(ctrl_llr, LOG_NAME, "setup");
++
++	SL_CTRL_LLR_COUNTER_INC(ctrl_llr, LLR_SETUP_CMD);
++
++	rtn = sl_core_llr_setup(ldev_num, lgrp_num, llr_num,
++				sl_ctrl_llr_setup_callback, ctrl_llr, 0);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_llr, LOG_NAME, "core_llr_setup failed [%d]", rtn);
++		SL_CTRL_LLR_COUNTER_INC(ctrl_llr, LLR_SETUP_FAIL);
++	}
++
++	if (sl_ctrl_llr_put(ctrl_llr))
++		sl_ctrl_log_dbg(NULL, LOG_NAME, "setup - llr removed (ctrl_llr = 0x%p)", ctrl_llr);
++
++	return rtn;
++}
++
++int sl_ctrl_llr_start(u8 ldev_num, u8 lgrp_num, u8 llr_num)
++{
++	int                rtn;
++	struct sl_ctrl_llr *ctrl_llr;
++
++	ctrl_llr = sl_ctrl_llr_get(ldev_num, lgrp_num, llr_num);
++	if (!ctrl_llr) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"start NULL llr (ldev_num = %u, lgrp_num = %u, llr_num = %u)",
++				ldev_num, lgrp_num, llr_num);
++		return -EBADRQC;
++	}
++
++	if (!sl_ctrl_llr_kref_get_unless_zero(ctrl_llr)) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"start kref_get_unless_zero failed (ctrl_llr = 0x%p)", ctrl_llr);
++		return -EBADRQC;
++	}
++
++	sl_ctrl_log_dbg(ctrl_llr, LOG_NAME, "start");
++
++	SL_CTRL_LLR_COUNTER_INC(ctrl_llr, LLR_START_CMD);
++
++	rtn = sl_core_llr_start(ldev_num, lgrp_num, llr_num,
++				sl_ctrl_llr_start_callback, ctrl_llr, 0);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_llr, LOG_NAME, "core_llr_start failed [%d]", rtn);
++		SL_CTRL_LLR_COUNTER_INC(ctrl_llr, LLR_START_FAIL);
++	}
++
++	if (sl_ctrl_llr_put(ctrl_llr))
++		sl_ctrl_log_dbg(NULL, LOG_NAME, "start - llr removed (ctrl_llr = 0x%p)", ctrl_llr);
++
++	return rtn;
++}
++
++int sl_ctrl_llr_stop(u8 ldev_num, u8 lgrp_num, u8 llr_num)
++{
++	int                rtn;
++	struct sl_ctrl_llr *ctrl_llr;
++
++	ctrl_llr = sl_ctrl_llr_get(ldev_num, lgrp_num, llr_num);
++	if (!ctrl_llr) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"stop NULL llr (ldev_num = %u, lgrp_num = %u, llr_num = %u)",
++				ldev_num, lgrp_num, llr_num);
++		return -EBADRQC;
++	}
++
++	if (!sl_ctrl_llr_kref_get_unless_zero(ctrl_llr)) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"stop kref_get_unless_zero failed (ctrl_llr = 0x%p)", ctrl_llr);
++		return -EBADRQC;
++	}
++
++	sl_ctrl_log_dbg(ctrl_llr, LOG_NAME, "stop");
++
++	SL_CTRL_LLR_COUNTER_INC(ctrl_llr, LLR_STOP_CMD);
++
++	rtn = sl_core_llr_stop(ldev_num, lgrp_num, llr_num);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_llr, LOG_NAME, "core_llr_stop failed [%d]", rtn);
++		SL_CTRL_LLR_COUNTER_INC(ctrl_llr, LLR_STOP_FAIL);
++	}
++
++	if (sl_ctrl_llr_put(ctrl_llr))
++		sl_ctrl_log_dbg(NULL, LOG_NAME, "stop - llr removed (ctrl_llr = 0x%p)", ctrl_llr);
++
++	return rtn;
++}
++
++enum sl_llr_state sl_ctrl_llr_state_from_core_llr_state(enum sl_core_llr_state core_llr_state)
++{
++	switch (core_llr_state) {
++	case SL_CORE_LLR_STATE_NEW:
++		return SL_LLR_STATE_OFF;
++	case SL_CORE_LLR_STATE_CONFIGURED:
++	case SL_CORE_LLR_STATE_SETUP_TIMEOUT:
++	case SL_CORE_LLR_STATE_SETUP_STOPPING:
++		return SL_LLR_STATE_CONFIGURED;
++	case SL_CORE_LLR_STATE_SETTING_UP:
++		return SL_LLR_STATE_SETUP_BUSY;
++	case SL_CORE_LLR_STATE_SETUP:
++	case SL_CORE_LLR_STATE_START_TIMEOUT:
++		return SL_LLR_STATE_SETUP;
++	case SL_CORE_LLR_STATE_STARTING:
++		return SL_LLR_STATE_START_BUSY;
++	case SL_CORE_LLR_STATE_RUNNING:
++		return SL_LLR_STATE_RUNNING;
++	case SL_CORE_LLR_STATE_STOPPING:
++		return SL_LLR_STATE_STOP_BUSY;
++	case SL_CORE_LLR_STATE_SETUP_CANCELING:
++	case SL_CORE_LLR_STATE_START_CANCELING:
++		return SL_LLR_STATE_CANCELING;
++	case SL_CORE_LLR_STATE_INVALID:
++	default:
++		return SL_LLR_STATE_INVALID;
++	}
++}
++
++int sl_ctrl_llr_state_get(u8 ldev_num, u8 lgrp_num, u8 llr_num, enum sl_llr_state *state)
++{
++	int rtn;
++	struct sl_ctrl_llr *ctrl_llr;
++	enum sl_core_llr_state core_llr_state;
++
++	ctrl_llr = sl_ctrl_llr_get(ldev_num, lgrp_num, llr_num);
++	if (!ctrl_llr) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"state get NULL llr (ldev_num = %u, lgrp_num = %u, llr_num = %u)",
++				ldev_num, lgrp_num, llr_num);
++		return -EBADRQC;
++	}
++
++	if (!sl_ctrl_llr_kref_get_unless_zero(ctrl_llr)) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"state get kref_get_unless_zero failed (ctrl_llr = 0x%p)",
++				ctrl_llr);
++		return -EBADRQC;
++	}
++
++	rtn = sl_core_llr_state_get(ldev_num, lgrp_num, llr_num, &core_llr_state);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_llr, LOG_NAME, "core_llr_state_get failed [%d]", rtn);
++		*state = SL_LLR_STATE_OFF;
++		rtn = 0;
++		goto out;
++	}
++
++	*state = sl_ctrl_llr_state_from_core_llr_state(core_llr_state);
++	if (*state == SL_LLR_STATE_INVALID)
++		sl_ctrl_log_err(ctrl_llr, LOG_NAME,
++				"invalid (core_llr_state = %u %s)",
++				core_llr_state, sl_core_llr_state_str(core_llr_state));
++
++	sl_ctrl_log_dbg(ctrl_llr, LOG_NAME, "state (core = %u %s, ctrl = %u %s)",
++			core_llr_state, sl_core_llr_state_str(core_llr_state),
++			*state, sl_llr_state_str(*state));
++
++out:
++	if (sl_ctrl_llr_put(ctrl_llr))
++		sl_ctrl_log_dbg(NULL, LOG_NAME,
++				"state get - llr removed (ctrl_llr = 0x%p)", ctrl_llr);
++
++	return rtn;
++}
++
++int sl_ctrl_llr_info_map_get(u8 ldev_num, u8 lgrp_num, u8 llr_num, u64 *info_map)
++{
++	int                 rtn;
++	struct sl_ctrl_llr *ctrl_llr;
++
++	ctrl_llr = sl_ctrl_llr_get(ldev_num, lgrp_num, llr_num);
++	if (!ctrl_llr) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"info map get NULL llr (ldev_num = %u, lgrp_num = %u, llr_num = %u)",
++				ldev_num, lgrp_num, llr_num);
++		return -EBADRQC;
++	}
++
++	if (!sl_ctrl_llr_kref_get_unless_zero(ctrl_llr)) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"info map get kref_get_unless_zero failed (ctrl_llr = 0x%p)", ctrl_llr);
++		return -EBADRQC;
++	}
++
++	rtn = sl_core_data_llr_info_map_get(sl_core_llr_get(ldev_num, lgrp_num, llr_num), info_map);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_llr, LOG_NAME, "core_data_llr_info_map_get failed [%d]", rtn);
++		goto out;
++	}
++
++	sl_ctrl_log_dbg(ctrl_llr, LOG_NAME, "info map get (info_map = 0x%llX)", *info_map);
++
++out:
++	if (sl_ctrl_llr_put(ctrl_llr))
++		sl_ctrl_log_dbg(NULL, LOG_NAME,
++				"info map get - llr removed (ctrl_llr = 0x%p)", ctrl_llr);
++
++	return rtn;
++}
+diff --git a/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_llr_counters.c b/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_llr_counters.c
 new file mode 100644
-index 000000000000..dc462e17dd72
+index 000000000000..81af580d3837
 --- /dev/null
-+++ b/drivers/net/ethernet/hpe/sbl/sbl_media_nic.c
-@@ -0,0 +1,47 @@
++++ b/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_llr_counters.c
+@@ -0,0 +1,136 @@
 +// SPDX-License-Identifier: GPL-2.0
-+
 +/* Copyright 2025 Hewlett Packard Enterprise Development LP */
 +
++#include <linux/slab.h>
++#include <linux/atomic.h>
 +#include <linux/types.h>
-+#include <linux/kernel.h>
-+#include <linux/device.h>
 +
-+#include <linux/hpe/sbl/sbl.h>
-+#include <linux/hpe/sbl/sbl_kconfig.h>
++#include "sl_ctrl_llr.h"
++#include "sl_ctrl_llr_counters.h"
++#include "base/sl_ctrl_log.h"
 +
-+#include <linux/hpe/sbl/sbl_pml.h>
++#define LOG_NAME SL_CTRL_LLR_LOG_NAME
 +
-+#include "sbl_internal.h"
++#define SL_CTRL_LLR_COUNTER_INIT(_llr, _counter) \
++	(_llr)->counters[_counter].name = #_counter
 +
-+#ifdef CONFIG_SYSFS
++#define SL_CTRL_LLR_CAUSE_COUNTER_INIT(_llr, _counter) \
++	(_llr)->cause_counters[_counter].name = #_counter
 +
-+/**
-+ * sbl_media_type_sysfs_sprint() - Report media type into buffer
-+ * @sbl: A slingshot base link device instance
-+ * @port_num: port number
-+ * @buf: Destination buffer to write the data
-+ * @size: Size of @buf in bytes, the output is truncated to fit
-+ *
-+ * This function reads the physical type of media used based on mconfigured
-+ * and writes a formatted description of the type into the provided buffer
-+ *
-+ * Return: Number of characters written, at most @size - 1
-+ */
-+int sbl_media_type_sysfs_sprint(struct sbl_inst *sbl, int port_num, char *buf, size_t size)
++#define SL_CTRL_LLR_CAUSE_COUNTER_INC(_llr, _counter) \
++	atomic_inc(&(_llr)->cause_counters[_counter].count)
++
++int sl_ctrl_llr_counters_init(struct sl_ctrl_llr *ctrl_llr)
 +{
-+	struct sbl_link *link = sbl->link + port_num;
-+	int s = 0;
++	sl_ctrl_log_dbg(ctrl_llr, LOG_NAME, "llr counters init");
 +
-+	spin_lock(&link->lock);
++	ctrl_llr->counters = kzalloc(sizeof(*ctrl_llr->counters) * SL_CTRL_LLR_COUNTERS_COUNT, GFP_KERNEL);
++	if (!ctrl_llr->counters)
++		return -ENOMEM;
 +
-+	if (link->mconfigured)
-+		s += scnprintf(buf + s, size - s, "%s", sbl_link_media_str(link->mattr.media));
-+	else
-+		s += scnprintf(buf + s, size - s, "NA");
++	SL_CTRL_LLR_COUNTER_INIT(ctrl_llr, LLR_SETUP_CMD);
++	SL_CTRL_LLR_COUNTER_INIT(ctrl_llr, LLR_SETUP);
++	SL_CTRL_LLR_COUNTER_INIT(ctrl_llr, LLR_SETUP_TIMEOUT);
++	SL_CTRL_LLR_COUNTER_INIT(ctrl_llr, LLR_SETUP_FAIL);
 +
-+	spin_unlock(&link->lock);
++	SL_CTRL_LLR_COUNTER_INIT(ctrl_llr, LLR_CONFIGURED);
 +
-+	return s;
++	SL_CTRL_LLR_COUNTER_INIT(ctrl_llr, LLR_START_CMD);
++	SL_CTRL_LLR_COUNTER_INIT(ctrl_llr, LLR_RUNNING);
++	SL_CTRL_LLR_COUNTER_INIT(ctrl_llr, LLR_START_TIMEOUT);
++	SL_CTRL_LLR_COUNTER_INIT(ctrl_llr, LLR_START_FAIL);
++
++	SL_CTRL_LLR_COUNTER_INIT(ctrl_llr, LLR_STOP_CMD);
++	SL_CTRL_LLR_COUNTER_INIT(ctrl_llr, LLR_STOP_FAIL);
++
++	return 0;
 +}
-+EXPORT_SYMBOL(sbl_media_type_sysfs_sprint);
-+#endif
++
++int sl_ctrl_llr_cause_counters_init(struct sl_ctrl_llr *ctrl_llr)
++{
++	sl_ctrl_log_dbg(ctrl_llr, LOG_NAME, "llr cause counters init");
++
++	ctrl_llr->cause_counters = kzalloc(sizeof(*ctrl_llr->cause_counters) *
++					   SL_CTRL_LLR_CAUSE_COUNTERS_COUNT, GFP_KERNEL);
++	if (!ctrl_llr->cause_counters)
++		return -ENOMEM;
++
++	SL_CTRL_LLR_CAUSE_COUNTER_INIT(ctrl_llr, LLR_CAUSE_SETUP_CONFIG);
++	SL_CTRL_LLR_CAUSE_COUNTER_INIT(ctrl_llr, LLR_CAUSE_SETUP_INTR_ENABLE);
++	SL_CTRL_LLR_CAUSE_COUNTER_INIT(ctrl_llr, LLR_CAUSE_SETUP_TIMEOUT);
++	SL_CTRL_LLR_CAUSE_COUNTER_INIT(ctrl_llr, LLR_CAUSE_START_INTR_ENABLE);
++	SL_CTRL_LLR_CAUSE_COUNTER_INIT(ctrl_llr, LLR_CAUSE_START_TIMEOUT);
++	SL_CTRL_LLR_CAUSE_COUNTER_INIT(ctrl_llr, LLR_CAUSE_COMMAND);
++	SL_CTRL_LLR_CAUSE_COUNTER_INIT(ctrl_llr, LLR_CAUSE_CANCELED);
++
++	return 0;
++}
++
++int sl_ctrl_llr_counter_get(struct sl_ctrl_llr *ctrl_llr, u32 counter, int *count)
++{
++	*count = atomic_read(&ctrl_llr->counters[counter].count);
++
++	sl_ctrl_log_dbg(ctrl_llr, LOG_NAME, "get (counter = %u %s, count = %d)", counter,
++			ctrl_llr->counters[counter].name, *count);
++
++	return 0;
++}
++
++int sl_ctrl_llr_cause_counter_get(struct sl_ctrl_llr *ctrl_llr, u32 counter, int *count)
++{
++	*count = atomic_read(&ctrl_llr->cause_counters[counter].count);
++
++	sl_ctrl_log_dbg(ctrl_llr, LOG_NAME, "get (cause counter = %u %s, count = %d)", counter,
++			ctrl_llr->cause_counters[counter].name, *count);
++
++	return 0;
++}
++
++void sl_ctrl_llr_counters_del(struct sl_ctrl_llr *ctrl_llr)
++{
++	kfree(ctrl_llr->counters);
++}
++
++void sl_ctrl_llr_cause_counters_del(struct sl_ctrl_llr *ctrl_llr)
++{
++	kfree(ctrl_llr->cause_counters);
++}
++
++void sl_ctrl_llr_cause_counters_inc(struct sl_ctrl_llr *ctrl_llr, unsigned long cause_map)
++{
++	unsigned long which;
++
++	sl_ctrl_log_dbg(ctrl_llr, LOG_NAME, "llr cause counter inc");
++
++	BUILD_BUG_ON(SL_CTRL_LLR_CAUSE_COUNTERS_COUNT > 32);
++
++	for_each_set_bit(which, &cause_map, sizeof(cause_map) * BITS_PER_BYTE) {
++		switch (BIT(which)) {
++		case SL_LLR_FAIL_CAUSE_SETUP_CONFIG:
++			SL_CTRL_LLR_CAUSE_COUNTER_INC(ctrl_llr, LLR_CAUSE_SETUP_CONFIG);
++			break;
++		case SL_LLR_FAIL_CAUSE_SETUP_INTR_ENABLE:
++			SL_CTRL_LLR_CAUSE_COUNTER_INC(ctrl_llr, LLR_CAUSE_SETUP_INTR_ENABLE);
++			break;
++		case SL_LLR_FAIL_CAUSE_SETUP_TIMEOUT:
++			SL_CTRL_LLR_CAUSE_COUNTER_INC(ctrl_llr, LLR_CAUSE_SETUP_TIMEOUT);
++			break;
++		case SL_LLR_FAIL_CAUSE_START_INTR_ENABLE:
++			SL_CTRL_LLR_CAUSE_COUNTER_INC(ctrl_llr, LLR_CAUSE_START_INTR_ENABLE);
++			break;
++		case SL_LLR_FAIL_CAUSE_START_TIMEOUT:
++			SL_CTRL_LLR_CAUSE_COUNTER_INC(ctrl_llr, LLR_CAUSE_START_TIMEOUT);
++			break;
++		case SL_LLR_FAIL_CAUSE_COMMAND:
++			SL_CTRL_LLR_CAUSE_COUNTER_INC(ctrl_llr, LLR_CAUSE_COMMAND);
++			break;
++		case SL_LLR_FAIL_CAUSE_CANCELED:
++			SL_CTRL_LLR_CAUSE_COUNTER_INC(ctrl_llr, LLR_CAUSE_CANCELED);
++			break;
++		default:
++			sl_ctrl_log_warn_trace(ctrl_llr, LOG_NAME,
++					       "cause_counter_inc unknown cause (bit = %lu)", which);
++			break;
++		}
++	}
++}
+diff --git a/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_mac.c b/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_mac.c
+new file mode 100644
+index 000000000000..a4202757d238
+--- /dev/null
++++ b/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_mac.c
+@@ -0,0 +1,536 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright 2023,2024,2025 Hewlett Packard Enterprise Development LP */
++
++#include <linux/kobject.h>
++#include <linux/spinlock.h>
++#include <linux/types.h>
++#include <linux/slab.h>
++
++#include <linux/hpe/sl/sl_mac.h>
++
++#include "sl_asic.h"
++#include "sl_sysfs.h"
++#include "base/sl_ctrl_log.h"
++#include "sl_ctrl_ldev.h"
++#include "sl_ctrl_lgrp.h"
++#include "sl_ctrl_mac.h"
++#include "sl_core_mac.h"
++#include "sl_ctrl_mac_counters.h"
++
++#define SL_CTRL_MAC_DEL_WAIT_TIMEOUT_MS 2000
++
++#define LOG_NAME SL_CTRL_MAC_LOG_NAME
++
++static struct sl_ctrl_mac *ctrl_macs[SL_ASIC_MAX_LDEVS][SL_ASIC_MAX_LGRPS][SL_ASIC_MAX_LINKS];
++static DEFINE_SPINLOCK(ctrl_macs_lock);
++
++int sl_ctrl_mac_new(u8 ldev_num, u8 lgrp_num, u8 mac_num, struct kobject *sysfs_parent)
++{
++	int                 rtn;
++	struct sl_ctrl_mac *ctrl_mac;
++
++	ctrl_mac = sl_ctrl_mac_get(ldev_num, lgrp_num, mac_num);
++	if (ctrl_mac) {
++		sl_ctrl_log_err(NULL, LOG_NAME, "exists (mac = 0x%p)", ctrl_mac);
++		return -EBADRQC;
++	}
++
++	ctrl_mac = kzalloc(sizeof(*ctrl_mac), GFP_KERNEL);
++	if (!ctrl_mac)
++		return -ENOMEM;
++
++	ctrl_mac->magic     = SL_CTRL_MAC_MAGIC;
++	ctrl_mac->ver       = SL_CTRL_MAC_VER;
++	ctrl_mac->num       = mac_num;
++	ctrl_mac->ctrl_lgrp = sl_ctrl_lgrp_get(ldev_num, lgrp_num);
++	if (!ctrl_mac->ctrl_lgrp) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"new NULL lgrp (ldev_num = %u, lgrp_num = %u)", ldev_num, lgrp_num);
++		kfree(ctrl_mac);
++		return -EBADRQC;
++	}
++
++	kref_init(&ctrl_mac->ref_cnt);
++	kref_init(&ctrl_mac->mem_ref);
++	init_completion(&ctrl_mac->del_complete);
++
++	spin_lock_init(&ctrl_mac->data_lock);
++
++	rtn = sl_ctrl_mac_counters_init(ctrl_mac);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_mac, LOG_NAME, "ctrl_mac_counters_init failed [%d]", rtn);
++		goto out;
++	}
++
++	rtn = sl_core_mac_new(ldev_num, lgrp_num, mac_num);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_mac, LOG_NAME, "core_mac_new failed [%d]", rtn);
++		goto out_counters;
++	}
++
++	if (sysfs_parent) {
++		ctrl_mac->parent_kobj = sysfs_parent;
++
++		rtn = sl_sysfs_mac_create(ctrl_mac);
++		if (rtn) {
++			sl_ctrl_log_err_trace(ctrl_mac, LOG_NAME, "sysfs_mac_create failed [%d]", rtn);
++			goto out_mac_new;
++		}
++	}
++
++	sl_ctrl_log_dbg(ctrl_mac, LOG_NAME, "new (mac = 0x%p)", ctrl_mac);
++
++	spin_lock(&ctrl_macs_lock);
++	ctrl_macs[ldev_num][lgrp_num][mac_num] = ctrl_mac;
++	spin_unlock(&ctrl_macs_lock);
++
++	return 0;
++
++out_mac_new:
++	sl_core_mac_del(ldev_num, lgrp_num, mac_num);
++out_counters:
++	sl_ctrl_mac_counters_del(ctrl_mac);
++out:
++	kfree(ctrl_mac);
++	return rtn;
++}
++
++static void sl_ctrl_mac_free(struct kref *kref)
++{
++	kfree(container_of(kref, struct sl_ctrl_mac, mem_ref));
++}
++
++static void sl_ctrl_mac_release(struct kref *kref)
++{
++	struct sl_ctrl_mac *ctrl_mac;
++	u8                  ldev_num;
++	u8                  lgrp_num;
++	u8                  mac_num;
++
++	ctrl_mac = container_of(kref, struct sl_ctrl_mac, ref_cnt);
++	ldev_num = ctrl_mac->ctrl_lgrp->ctrl_ldev->num;
++	lgrp_num = ctrl_mac->ctrl_lgrp->num;
++	mac_num  = ctrl_mac->num;
++
++	sl_ctrl_log_dbg(ctrl_mac, LOG_NAME, "release (ctrl_mac = 0x%p)", ctrl_mac);
++
++	/* Must delete sysfs first to guarantee nobody is reading */
++	sl_sysfs_mac_delete(ctrl_mac);
++
++	sl_core_mac_del(ldev_num, lgrp_num, mac_num);
++
++	sl_ctrl_mac_counters_del(ctrl_mac);
++
++	spin_lock(&ctrl_macs_lock);
++	ctrl_macs[ldev_num][lgrp_num][mac_num] = NULL;
++	spin_unlock(&ctrl_macs_lock);
++
++	/*
++	 * Wake a waiting sl_ctrl_mac_del(). The memory is not freed here:
++	 * the waiter still uses del_complete and ctrl_mac after it wakes,
++	 * and holds mem_ref until it is done. The last holder frees it.
++	 */
++	complete_all(&ctrl_mac->del_complete);
++	kref_put(&ctrl_mac->mem_ref, sl_ctrl_mac_free);
++}
++
++static int sl_ctrl_mac_put(struct sl_ctrl_mac *ctrl_mac)
++{
++	return kref_put(&ctrl_mac->ref_cnt, sl_ctrl_mac_release);
++}
++
++int sl_ctrl_mac_del(u8 ldev_num, u8 lgrp_num, u8 mac_num)
++{
++	struct sl_ctrl_mac *ctrl_mac;
++	unsigned long       timeleft;
++	int                 rtn = 0;
++
++	sl_ctrl_log_dbg(NULL, LOG_NAME, "del (ldev_num = %u, lgrp_num = %u, mac_num = %u)",
++			ldev_num, lgrp_num, mac_num);
++
++	ctrl_mac = sl_ctrl_mac_get(ldev_num, lgrp_num, mac_num);
++	if (!ctrl_mac) {
++		sl_ctrl_log_err_trace(NULL, LOG_NAME,
++				      "mac not found (ldev_num = %u, lgrp_num = %u, mac_num = %u)",
++				      ldev_num, lgrp_num, mac_num);
++		return -EBADRQC;
++	}
++
++	/*
++	 * Keep the memory, and with it del_complete, valid until we are done
++	 * waiting: the release may run on another thread and must not free it
++	 * under us.
++	 */
++	kref_get(&ctrl_mac->mem_ref);
++
++	/* Release occurs on the last caller. Block until complete. */
++	if (!sl_ctrl_mac_put(ctrl_mac)) {
++		timeleft = wait_for_completion_timeout(&ctrl_mac->del_complete,
++						       msecs_to_jiffies(SL_CTRL_MAC_DEL_WAIT_TIMEOUT_MS));
++
++		sl_ctrl_log_dbg(NULL, LOG_NAME,
++				"del completion_timeout (timeleft = %lums)", timeleft);
++
++		if (timeleft == 0) {
++			sl_ctrl_log_err(NULL, LOG_NAME,
++					"del completion_timeout (ctrl_mac = 0x%p)", ctrl_mac);
++			rtn = -ETIMEDOUT;
++		}
++	}
++
++	kref_put(&ctrl_mac->mem_ref, sl_ctrl_mac_free);
++
++	return rtn;
++}
++
++static bool sl_ctrl_mac_kref_get_unless_zero(struct sl_ctrl_mac *ctrl_mac)
++{
++	return (kref_get_unless_zero(&ctrl_mac->ref_cnt) != 0);
++}
++
++struct sl_ctrl_mac *sl_ctrl_mac_get(u8 ldev_num, u8 lgrp_num, u8 mac_num)
++{
++	struct sl_ctrl_mac *ctrl_mac;
++
++	spin_lock(&ctrl_macs_lock);
++	ctrl_mac = ctrl_macs[ldev_num][lgrp_num][mac_num];
++	spin_unlock(&ctrl_macs_lock);
++
++	sl_ctrl_log_dbg(NULL, LOG_NAME,
++			"get (ldev_num = %u, lgrp_num = %u, mac_num = %u, mac = 0x%p)",
++			ldev_num, lgrp_num, mac_num, ctrl_mac);
++
++	return ctrl_mac;
++}
++
++int sl_ctrl_mac_tx_start(u8 ldev_num, u8 lgrp_num, u8 mac_num)
++{
++	int                rtn;
++	struct sl_ctrl_mac *ctrl_mac;
++
++	ctrl_mac = sl_ctrl_mac_get(ldev_num, lgrp_num, mac_num);
++	if (!ctrl_mac) {
++		sl_ctrl_log_err(NULL, LOG_NAME, "tx start - NULL mac");
++		return -EBADRQC;
++	}
++
++	if (!sl_ctrl_mac_kref_get_unless_zero(ctrl_mac)) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"tx start - kref unavailable (ctrl_mac = 0x%p)", ctrl_mac);
++		return -EBADRQC;
++	}
++
++	sl_ctrl_log_dbg(ctrl_mac, LOG_NAME, "tx start");
++
++	SL_CTRL_MAC_COUNTER_INC(ctrl_mac, MAC_TX_START_CMD);
++
++	rtn = sl_core_mac_tx_start(ldev_num, lgrp_num, mac_num);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_mac, LOG_NAME, "tx start - core_mac_tx_start failed [%d]", rtn);
++		SL_CTRL_MAC_COUNTER_INC(ctrl_mac, MAC_TX_START_FAIL);
++		goto out;
++	}
++
++	SL_CTRL_MAC_COUNTER_INC(ctrl_mac, MAC_TX_STARTED);
++
++	rtn = 0;
++
++out:
++	if (sl_ctrl_mac_put(ctrl_mac))
++		sl_ctrl_log_dbg(NULL, LOG_NAME,
++				"tx start - mac removed (ctrl_mac = 0x%p)", ctrl_mac);
++
++	return rtn;
++}
++
++int sl_ctrl_mac_tx_stop(u8 ldev_num, u8 lgrp_num, u8 mac_num)
++{
++	int                rtn;
++	struct sl_ctrl_mac *ctrl_mac;
++
++	ctrl_mac = sl_ctrl_mac_get(ldev_num, lgrp_num, mac_num);
++	if (!ctrl_mac) {
++		sl_ctrl_log_dbg(NULL, LOG_NAME, "tx stop - NULL mac");
++		return 0;
++	}
++
++	if (!sl_ctrl_mac_kref_get_unless_zero(ctrl_mac)) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"tx stop - kref unavailable (ctrl_mac = 0x%p)", ctrl_mac);
++		return -EBADRQC;
++	}
++
++	sl_ctrl_log_dbg(ctrl_mac, LOG_NAME, "tx stop");
++
++	SL_CTRL_MAC_COUNTER_INC(ctrl_mac, MAC_TX_STOP_CMD);
++
++	rtn = sl_core_mac_tx_stop(ldev_num, lgrp_num, mac_num);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_mac, LOG_NAME, "tx stop - core_mac_tx_stop failed [%d]", rtn);
++		SL_CTRL_MAC_COUNTER_INC(ctrl_mac, MAC_TX_STOP_FAIL);
++		goto out;
++	}
++
++	SL_CTRL_MAC_COUNTER_INC(ctrl_mac, MAC_TX_STOPPED);
++
++	rtn = 0;
++
++out:
++	if (sl_ctrl_mac_put(ctrl_mac))
++		sl_ctrl_log_dbg(NULL, LOG_NAME,
++				"tx stop - mac removed (ctrl_mac = 0x%p)", ctrl_mac);
++
++	return rtn;
++}
++
++int sl_ctrl_mac_tx_state_get(u8 ldev_num, u8 lgrp_num, u8 mac_num, u32 *state)
++{
++	int                rtn;
++	struct sl_ctrl_mac *ctrl_mac;
++	u32                core_mac_state;
++
++	ctrl_mac = sl_ctrl_mac_get(ldev_num, lgrp_num, mac_num);
++	if (!ctrl_mac) {
++		sl_ctrl_log_dbg(NULL, LOG_NAME, "tx state get - NULL mac");
++		*state = SL_MAC_STATE_OFF;
++		return 0;
++	}
++
++	if (!sl_ctrl_mac_kref_get_unless_zero(ctrl_mac)) {
++		sl_ctrl_log_dbg(NULL, LOG_NAME,
++				"tx state get - kref unavailable (ctrl_mac = 0x%p)", ctrl_mac);
++		*state = SL_MAC_STATE_OFF;
++		return 0;
++	}
++
++	rtn = sl_core_mac_tx_state_get(ldev_num, lgrp_num, mac_num, &core_mac_state);
++	if (rtn) {
++		sl_ctrl_log_dbg(ctrl_mac, LOG_NAME, "tx state get - core_mac_tx_state_get failed [%d]", rtn);
++		*state = SL_MAC_STATE_OFF;
++		goto out;
++	}
++
++	switch (core_mac_state) {
++	case SL_CORE_MAC_STATE_ON:
++		*state = SL_MAC_STATE_ON;
++		break;
++	default:
++		*state = SL_MAC_STATE_OFF;
++		break;
++	}
++
++	sl_ctrl_log_dbg(ctrl_mac, LOG_NAME, "tx state get (state = %u %s, core_state = %u)",
++			*state, sl_mac_state_str(*state), core_mac_state);
++
++out:
++	if (sl_ctrl_mac_put(ctrl_mac))
++		sl_ctrl_log_dbg(NULL, LOG_NAME,
++				"tx state get - mac removed (ctrl_mac = 0x%p)", ctrl_mac);
++
++	return 0;
++}
++
++int sl_ctrl_mac_rx_start(u8 ldev_num, u8 lgrp_num, u8 mac_num)
++{
++	int                rtn;
++	struct sl_ctrl_mac *ctrl_mac;
++
++	ctrl_mac = sl_ctrl_mac_get(ldev_num, lgrp_num, mac_num);
++	if (!ctrl_mac) {
++		sl_ctrl_log_err(NULL, LOG_NAME, "rx start - NULL mac");
++		return -EBADRQC;
++	}
++
++	if (!sl_ctrl_mac_kref_get_unless_zero(ctrl_mac)) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"rx start - kref unavailable (ctrl_mac = 0x%p)", ctrl_mac);
++		return -EBADRQC;
++	}
++
++	sl_ctrl_log_dbg(ctrl_mac, LOG_NAME, "rx start");
++
++	SL_CTRL_MAC_COUNTER_INC(ctrl_mac, MAC_RX_START_CMD);
++
++	rtn = sl_core_mac_rx_start(ldev_num, lgrp_num, mac_num);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_mac, LOG_NAME, "rx start - core_mac_rx_start failed [%d]", rtn);
++		SL_CTRL_MAC_COUNTER_INC(ctrl_mac, MAC_RX_START_FAIL);
++		goto out;
++	}
++
++	SL_CTRL_MAC_COUNTER_INC(ctrl_mac, MAC_RX_STARTED);
++
++	rtn = 0;
++
++out:
++
++	if (sl_ctrl_mac_put(ctrl_mac))
++		sl_ctrl_log_dbg(NULL, LOG_NAME,
++				"rx start - mac removed (ctrl_mac = 0x%p)", ctrl_mac);
++
++	return rtn;
++}
++
++int sl_ctrl_mac_rx_stop(u8 ldev_num, u8 lgrp_num, u8 mac_num)
++{
++	int                rtn;
++	struct sl_ctrl_mac *ctrl_mac;
++
++	ctrl_mac = sl_ctrl_mac_get(ldev_num, lgrp_num, mac_num);
++	if (!ctrl_mac) {
++		sl_ctrl_log_dbg(NULL, LOG_NAME, "rx stop - NULL mac");
++		return 0;
++	}
++
++	if (!sl_ctrl_mac_kref_get_unless_zero(ctrl_mac)) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"rx stop - kref unavailable (ctrl_mac = 0x%p)", ctrl_mac);
++		return -EBADRQC;
++	}
++
++	sl_ctrl_log_dbg(ctrl_mac, LOG_NAME, "rx stop");
++
++	SL_CTRL_MAC_COUNTER_INC(ctrl_mac, MAC_RX_STOP_CMD);
++
++	rtn = sl_core_mac_rx_stop(ldev_num, lgrp_num, mac_num);
++	if (rtn) {
++		sl_ctrl_log_err_trace(ctrl_mac, LOG_NAME, "rx stop - core_mac_rx_stop failed [%d]", rtn);
++		SL_CTRL_MAC_COUNTER_INC(ctrl_mac, MAC_RX_STOP_FAIL);
++		goto out;
++	}
++
++	SL_CTRL_MAC_COUNTER_INC(ctrl_mac, MAC_RX_STOPPED);
++
++	rtn = 0;
++
++out:
++
++	sl_ctrl_mac_put(ctrl_mac);
++
++	return rtn;
++}
++
++int sl_ctrl_mac_rx_state_get(u8 ldev_num, u8 lgrp_num, u8 mac_num, u32 *state)
++{
++	int                rtn;
++	struct sl_ctrl_mac *ctrl_mac;
++	u32                core_mac_state;
++
++	ctrl_mac = sl_ctrl_mac_get(ldev_num, lgrp_num, mac_num);
++	if (!ctrl_mac) {
++		sl_ctrl_log_dbg(NULL, LOG_NAME, "rx state get - NULL mac");
++		*state = SL_MAC_STATE_OFF;
++		return 0;
++	}
++
++	if (!sl_ctrl_mac_kref_get_unless_zero(ctrl_mac)) {
++		sl_ctrl_log_dbg(NULL, LOG_NAME,
++				"rx state get - kref unavailable (ctrl_mac = 0x%p)", ctrl_mac);
++		*state = SL_MAC_STATE_OFF;
++		return 0;
++	}
++
++	rtn = sl_core_mac_rx_state_get(ldev_num, lgrp_num, mac_num, &core_mac_state);
++	if (rtn) {
++		sl_ctrl_log_dbg(ctrl_mac, LOG_NAME, "rx state get - core_mac_rx_state_get failed [%d]", rtn);
++		*state = SL_MAC_STATE_OFF;
++		goto out;
++	}
++
++	switch (core_mac_state) {
++	case SL_CORE_MAC_STATE_ON:
++		*state = SL_MAC_STATE_ON;
++		break;
++	default:
++		*state = SL_MAC_STATE_OFF;
++		break;
++	}
++
++	sl_ctrl_log_dbg(ctrl_mac, LOG_NAME, "rx state get (state = %u %s, core_state = %u)",
++			*state, sl_mac_state_str(*state), core_mac_state);
++
++out:
++
++	if (sl_ctrl_mac_put(ctrl_mac))
++		sl_ctrl_log_dbg(NULL, LOG_NAME,
++				"rx state get - mac removed (ctrl_mac = 0x%p)", ctrl_mac);
++
++	return 0;
++}
++
++int sl_ctrl_mac_reset(u8 ldev_num, u8 lgrp_num, u8 mac_num)
++{
++	int                tx_rtn;
++	int                rx_rtn;
++	int                rtn = 0;
++	struct sl_ctrl_mac *ctrl_mac;
++
++	ctrl_mac = sl_ctrl_mac_get(ldev_num, lgrp_num, mac_num);
++	if (!ctrl_mac) {
++		sl_ctrl_log_dbg(NULL, LOG_NAME, "reset - NULL mac");
++		return 0;
++	}
++
++	if (!sl_ctrl_mac_kref_get_unless_zero(ctrl_mac)) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"reset - kref unavailable (ctrl_mac = 0x%p)", ctrl_mac);
++		return -EBADRQC;
++	}
++
++	sl_ctrl_log_dbg(ctrl_mac, LOG_NAME, "reset");
++
++	SL_CTRL_MAC_COUNTER_INC(ctrl_mac, MAC_RESET_CMD);
++
++	tx_rtn = sl_core_mac_tx_stop(ldev_num, lgrp_num, mac_num);
++	if (tx_rtn) {
++		/* Log error, but allow the function to continue to mac rx stop */
++		sl_ctrl_log_err_trace(ctrl_mac, LOG_NAME, "reset - core_mac_tx_stop failed [%d]", tx_rtn);
++	}
++
++	rx_rtn = sl_core_mac_rx_stop(ldev_num, lgrp_num, mac_num);
++	if (rx_rtn) {
++		/* Log error, but allow the function to continue execution */
++		sl_ctrl_log_err_trace(ctrl_mac, LOG_NAME, "core_mac_rx_stop failed [%d]", rx_rtn);
++	}
++
++	if (tx_rtn && rx_rtn) {
++		SL_CTRL_MAC_COUNTER_INC(ctrl_mac, MAC_RESET_FAIL);
++		rtn = -EIO;
++	} else {
++		SL_CTRL_MAC_COUNTER_INC(ctrl_mac, MAC_RESET);
++	}
++
++	sl_ctrl_mac_put(ctrl_mac);
++
++	return rtn;
++}
++
++int sl_ctrl_mac_info_map_get(u8 ldev_num, u8 lgrp_num, u8 mac_num, u64 *info_map)
++{
++	struct sl_ctrl_mac *ctrl_mac;
++
++	ctrl_mac = sl_ctrl_mac_get(ldev_num, lgrp_num, mac_num);
++	if (!ctrl_mac) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"info map get NULL mac (ldev_num = %u, lgrp_num = %u, mac_num = %u)",
++				ldev_num, lgrp_num, mac_num);
++		return -EBADRQC;
++	}
++
++	if (!sl_ctrl_mac_kref_get_unless_zero(ctrl_mac)) {
++		sl_ctrl_log_err(NULL, LOG_NAME,
++				"info map get kref_get_unless_zero failed (ctrl_mac = 0x%p)",
++				ctrl_mac);
++		return -EBADRQC;
++	}
++
++	*info_map = sl_core_mac_info_map_get(ldev_num, lgrp_num, mac_num);
++
++	sl_ctrl_log_dbg(ctrl_mac, LOG_NAME, "info map get (info_map = 0x%llX)", *info_map);
++
++	if (sl_ctrl_mac_put(ctrl_mac))
++		sl_ctrl_log_dbg(NULL, LOG_NAME,
++				"info map get - mac removed (ctrl_mac = 0x%p)", ctrl_mac);
++
++	return 0;
++}
+diff --git a/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_mac_counters.c b/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_mac_counters.c
+new file mode 100644
+index 000000000000..a30e64f80122
+--- /dev/null
++++ b/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_mac_counters.c
+@@ -0,0 +1,56 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright 2025-2026 Hewlett Packard Enterprise Development LP */
++
++#include <linux/slab.h>
++#include <linux/atomic.h>
++#include <linux/types.h>
++
++#include "sl_ctrl_mac.h"
++#include "sl_ctrl_mac_counters.h"
++
++#define SL_CTRL_MAC_COUNTER_INIT(_mac, _counter) \
++	(_mac)->counters[_counter].name = #_counter
++
++int sl_ctrl_mac_counters_init(struct sl_ctrl_mac *ctrl_mac)
++{
++	if (ctrl_mac->counters)
++		return -EALREADY;
++
++	ctrl_mac->counters = kzalloc(sizeof(*ctrl_mac->counters) * SL_CTRL_MAC_COUNTERS_COUNT, GFP_KERNEL);
++	if (!ctrl_mac->counters)
++		return -ENOMEM;
++
++	SL_CTRL_MAC_COUNTER_INIT(ctrl_mac, MAC_TX_START_CMD);
++	SL_CTRL_MAC_COUNTER_INIT(ctrl_mac, MAC_TX_STARTED);
++	SL_CTRL_MAC_COUNTER_INIT(ctrl_mac, MAC_TX_START_FAIL);
++
++	SL_CTRL_MAC_COUNTER_INIT(ctrl_mac, MAC_TX_STOP_CMD);
++	SL_CTRL_MAC_COUNTER_INIT(ctrl_mac, MAC_TX_STOPPED);
++	SL_CTRL_MAC_COUNTER_INIT(ctrl_mac, MAC_TX_STOP_FAIL);
++
++	SL_CTRL_MAC_COUNTER_INIT(ctrl_mac, MAC_RX_START_CMD);
++	SL_CTRL_MAC_COUNTER_INIT(ctrl_mac, MAC_RX_STARTED);
++	SL_CTRL_MAC_COUNTER_INIT(ctrl_mac, MAC_RX_START_FAIL);
++
++	SL_CTRL_MAC_COUNTER_INIT(ctrl_mac, MAC_RX_STOP_CMD);
++	SL_CTRL_MAC_COUNTER_INIT(ctrl_mac, MAC_RX_STOPPED);
++	SL_CTRL_MAC_COUNTER_INIT(ctrl_mac, MAC_RX_STOP_FAIL);
++
++	SL_CTRL_MAC_COUNTER_INIT(ctrl_mac, MAC_RESET_CMD);
++	SL_CTRL_MAC_COUNTER_INIT(ctrl_mac, MAC_RESET);
++	SL_CTRL_MAC_COUNTER_INIT(ctrl_mac, MAC_RESET_FAIL);
++
++	return 0;
++}
++
++int sl_ctrl_mac_counter_get(struct sl_ctrl_mac *ctrl_mac, u32 counter, int *count)
++{
++	*count = atomic_read(&ctrl_mac->counters[counter].count);
++
++	return 0;
++}
++
++void sl_ctrl_mac_counters_del(struct sl_ctrl_mac *ctrl_mac)
++{
++	kfree(ctrl_mac->counters);
++}
+diff --git a/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_media_counters.c b/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_media_counters.c
+new file mode 100644
+index 000000000000..0f12a479d017
+--- /dev/null
++++ b/drivers/net/ethernet/hpe/sl/ctrl/sl_ctrl_media_counters.c
+@@ -0,0 +1,157 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright 2025,2026 Hewlett Packard Enterprise Development LP */
++
++#include <linux/slab.h>
++#include <linux/atomic.h>
++#include <linux/types.h>
++
++#include "sl_media_jack.h"
++#include "sl_ctrl_media_counters.h"
++#include "base/sl_ctrl_log.h"
++
++#define LOG_NAME SL_CTRL_MEDIA_LOG_NAME
++
++#define SL_CTRL_MEDIA_CAUSE_COUNTER_INIT(_media, _counter) \
++	(_media)->cause_counters[_counter].name = #_counter
++
++int sl_ctrl_media_cause_counters_init(struct sl_media_jack *media_jack)
++{
++	sl_ctrl_log_dbg(media_jack, LOG_NAME, "media cause counters init");
++
++	media_jack->cause_counters = kzalloc(sizeof(*media_jack->cause_counters) *
++					     SL_CTRL_MEDIA_CAUSE_COUNTERS_COUNT, GFP_KERNEL);
++	if (!media_jack->cause_counters)
++		return -ENOMEM;
++
++	SL_CTRL_MEDIA_CAUSE_COUNTER_INIT(media_jack, MEDIA_CAUSE_EEPROM_FORMAT_UNSUPPORTED);
++	SL_CTRL_MEDIA_CAUSE_COUNTER_INIT(media_jack, MEDIA_CAUSE_EEPROM_VENDOR_UNSUPPORTED);
++	SL_CTRL_MEDIA_CAUSE_COUNTER_INIT(media_jack, MEDIA_CAUSE_EEPROM_JACK_IO);
++	SL_CTRL_MEDIA_CAUSE_COUNTER_INIT(media_jack, MEDIA_CAUSE_ONLINE_STATUS_GET);
++	SL_CTRL_MEDIA_CAUSE_COUNTER_INIT(media_jack, MEDIA_CAUSE_ONLINE_TIMEDOUT);
++	SL_CTRL_MEDIA_CAUSE_COUNTER_INIT(media_jack, MEDIA_CAUSE_ONLINE_JACK_IO);
++	SL_CTRL_MEDIA_CAUSE_COUNTER_INIT(media_jack, MEDIA_CAUSE_ONLINE_JACK_GET);
++	SL_CTRL_MEDIA_CAUSE_COUNTER_INIT(media_jack, MEDIA_CAUSE_SERDES_SETTINGS_GET);
++	SL_CTRL_MEDIA_CAUSE_COUNTER_INIT(media_jack, MEDIA_CAUSE_SCAN_STATUS_GET);
++	SL_CTRL_MEDIA_CAUSE_COUNTER_INIT(media_jack, MEDIA_CAUSE_SCAN_HDL_GET);
++	SL_CTRL_MEDIA_CAUSE_COUNTER_INIT(media_jack, MEDIA_CAUSE_SCAN_JACK_GET);
++	SL_CTRL_MEDIA_CAUSE_COUNTER_INIT(media_jack, MEDIA_CAUSE_MEDIA_ATTR_SET);
++	SL_CTRL_MEDIA_CAUSE_COUNTER_INIT(media_jack, MEDIA_CAUSE_INTR_EVENT_JACK_IO);
++	SL_CTRL_MEDIA_CAUSE_COUNTER_INIT(media_jack, MEDIA_CAUSE_POWER_SET);
++	SL_CTRL_MEDIA_CAUSE_COUNTER_INIT(media_jack, MEDIA_CAUSE_SHIFT_DOWN_JACK_IO);
++	SL_CTRL_MEDIA_CAUSE_COUNTER_INIT(media_jack, MEDIA_CAUSE_SHIFT_DOWN_JACK_IO_LOW_POWER_SET);
++	SL_CTRL_MEDIA_CAUSE_COUNTER_INIT(media_jack, MEDIA_CAUSE_SHIFT_DOWN_JACK_IO_HIGH_POWER_SET);
++	SL_CTRL_MEDIA_CAUSE_COUNTER_INIT(media_jack, MEDIA_CAUSE_SHIFT_UP_JACK_IO);
++	SL_CTRL_MEDIA_CAUSE_COUNTER_INIT(media_jack, MEDIA_CAUSE_SHIFT_UP_JACK_IO_LOW_POWER_SET);
++	SL_CTRL_MEDIA_CAUSE_COUNTER_INIT(media_jack, MEDIA_CAUSE_SHIFT_UP_JACK_IO_HIGH_POWER_SET);
++	SL_CTRL_MEDIA_CAUSE_COUNTER_INIT(media_jack, MEDIA_CAUSE_SHIFT_STATE_JACK_IO);
++	SL_CTRL_MEDIA_CAUSE_COUNTER_INIT(media_jack, MEDIA_CAUSE_OFFLINE);
++	SL_CTRL_MEDIA_CAUSE_COUNTER_INIT(media_jack, MEDIA_CAUSE_HOT);
++	SL_CTRL_MEDIA_CAUSE_COUNTER_INIT(media_jack, MEDIA_CAUSE_WARM);
++
++	return 0;
++}
++
++int sl_ctrl_media_cause_counter_get(struct sl_media_jack *media_jack, u32 counter, int *count)
++{
++	*count = atomic_read(&media_jack->cause_counters[counter].count);
++
++	sl_ctrl_log_dbg(media_jack, LOG_NAME, "get (cause counter = %u %s, count = %d)", counter,
++			media_jack->cause_counters[counter].name, *count);
++
++	return 0;
++}
++
++void sl_ctrl_media_cause_counters_del(struct sl_media_jack *media_jack)
++{
++	kfree(media_jack->cause_counters);
++}
++
++void sl_ctrl_media_cause_counter_inc(struct sl_media_jack *media_jack, unsigned long cause_map)
++{
++	unsigned long which;
++
++	sl_ctrl_log_dbg(media_jack, LOG_NAME, "media cause counter inc");
++
++	BUILD_BUG_ON(SL_CTRL_MEDIA_CAUSE_COUNTERS_COUNT > 32);
++
++	for_each_set_bit(which, &cause_map, sizeof(cause_map) * BITS_PER_BYTE) {
++		switch (BIT(which)) {
++		case SL_MEDIA_FAULT_CAUSE_EEPROM_FORMAT_UNSUPPORTED:
++			SL_CTRL_MEDIA_CAUSE_COUNTER_INC(media_jack, MEDIA_CAUSE_EEPROM_FORMAT_UNSUPPORTED);
++			break;
++		case SL_MEDIA_FAULT_CAUSE_EEPROM_VENDOR_UNSUPPORTED:
++			SL_CTRL_MEDIA_CAUSE_COUNTER_INC(media_jack, MEDIA_CAUSE_EEPROM_VENDOR_UNSUPPORTED);
++			break;
++		case SL_MEDIA_FAULT_CAUSE_EEPROM_JACK_IO:
++			SL_CTRL_MEDIA_CAUSE_COUNTER_INC(media_jack, MEDIA_CAUSE_EEPROM_JACK_IO);
++			break;
++		case SL_MEDIA_FAULT_CAUSE_ONLINE_STATUS_GET:
++			SL_CTRL_MEDIA_CAUSE_COUNTER_INC(media_jack, MEDIA_CAUSE_ONLINE_STATUS_GET);
++			break;
++		case SL_MEDIA_FAULT_CAUSE_ONLINE_TIMEDOUT:
++			SL_CTRL_MEDIA_CAUSE_COUNTER_INC(media_jack, MEDIA_CAUSE_ONLINE_TIMEDOUT);
++			break;
++		case SL_MEDIA_FAULT_CAUSE_ONLINE_JACK_IO:
++			SL_CTRL_MEDIA_CAUSE_COUNTER_INC(media_jack, MEDIA_CAUSE_ONLINE_JACK_IO);
++			break;
++		case SL_MEDIA_FAULT_CAUSE_ONLINE_JACK_GET:
++			SL_CTRL_MEDIA_CAUSE_COUNTER_INC(media_jack, MEDIA_CAUSE_ONLINE_JACK_GET);
++			break;
++		case SL_MEDIA_FAULT_CAUSE_SERDES_SETTINGS_GET:
++			SL_CTRL_MEDIA_CAUSE_COUNTER_INC(media_jack, MEDIA_CAUSE_SERDES_SETTINGS_GET);
++			break;
++		case SL_MEDIA_FAULT_CAUSE_SCAN_STATUS_GET:
++			SL_CTRL_MEDIA_CAUSE_COUNTER_INC(media_jack, MEDIA_CAUSE_SCAN_STATUS_GET);
++			break;
++		case SL_MEDIA_FAULT_CAUSE_SCAN_HDL_GET:
++			SL_CTRL_MEDIA_CAUSE_COUNTER_INC(media_jack, MEDIA_CAUSE_SCAN_HDL_GET);
++			break;
++		case SL_MEDIA_FAULT_CAUSE_SCAN_JACK_GET:
++			SL_CTRL_MEDIA_CAUSE_COUNTER_INC(media_jack, MEDIA_CAUSE_SCAN_JACK_GET);
++			break;
++		case SL_MEDIA_FAULT_CAUSE_MEDIA_ATTR_SET:
++			SL_CTRL_MEDIA_CAUSE_COUNTER_INC(media_jack, MEDIA_CAUSE_MEDIA_ATTR_SET);
++			break;
++		case SL_MEDIA_FAULT_CAUSE_INTR_EVENT_JACK_IO:
++			SL_CTRL_MEDIA_CAUSE_COUNTER_INC(media_jack, MEDIA_CAUSE_INTR_EVENT_JACK_IO);
++			break;
++		case SL_MEDIA_FAULT_CAUSE_POWER_SET:
++			SL_CTRL_MEDIA_CAUSE_COUNTER_INC(media_jack, MEDIA_CAUSE_POWER_SET);
++			break;
++		case SL_MEDIA_FAULT_CAUSE_SHIFT_DOWN_JACK_IO:
++			SL_CTRL_MEDIA_CAUSE_COUNTER_INC(media_jack, MEDIA_CAUSE_SHIFT_DOWN_JACK_IO);
++			break;
++		case SL_MEDIA_FAULT_CAUSE_SHIFT_DOWN_JACK_IO_LOW_POWER_SET:
++			SL_CTRL_MEDIA_CAUSE_COUNTER_INC(media_jack, MEDIA_CAUSE_SHIFT_DOWN_JACK_IO_LOW_POWER_SET);
++			break;
++		case SL_MEDIA_FAULT_CAUSE_SHIFT_DOWN_JACK_IO_HIGH_POWER_SET:
++			SL_CTRL_MEDIA_CAUSE_COUNTER_INC(media_jack, MEDIA_CAUSE_SHIFT_DOWN_JACK_IO_HIGH_POWER_SET);
++			break;
++		case SL_MEDIA_FAULT_CAUSE_SHIFT_UP_JACK_IO:
++			SL_CTRL_MEDIA_CAUSE_COUNTER_INC(media_jack, MEDIA_CAUSE_SHIFT_UP_JACK_IO);
++			break;
++		case SL_MEDIA_FAULT_CAUSE_SHIFT_UP_JACK_IO_LOW_POWER_SET:
++			SL_CTRL_MEDIA_CAUSE_COUNTER_INC(media_jack, MEDIA_CAUSE_SHIFT_UP_JACK_IO_LOW_POWER_SET);
++			break;
++		case SL_MEDIA_FAULT_CAUSE_SHIFT_UP_JACK_IO_HIGH_POWER_SET:
++			SL_CTRL_MEDIA_CAUSE_COUNTER_INC(media_jack, MEDIA_CAUSE_SHIFT_UP_JACK_IO_HIGH_POWER_SET);
++			break;
++		case SL_MEDIA_FAULT_CAUSE_SHIFT_STATE_JACK_IO:
++			SL_CTRL_MEDIA_CAUSE_COUNTER_INC(media_jack, MEDIA_CAUSE_SHIFT_STATE_JACK_IO);
++			break;
++		case SL_MEDIA_FAULT_CAUSE_OFFLINE:
++			SL_CTRL_MEDIA_CAUSE_COUNTER_INC(media_jack, MEDIA_CAUSE_OFFLINE);
++			break;
++		case SL_MEDIA_FAULT_CAUSE_HOT:
++			SL_CTRL_MEDIA_CAUSE_COUNTER_INC(media_jack, MEDIA_CAUSE_HOT);
++			break;
++		case SL_MEDIA_FAULT_CAUSE_WARM:
++			SL_CTRL_MEDIA_CAUSE_COUNTER_INC(media_jack, MEDIA_CAUSE_WARM);
++			break;
++		default:
++			sl_ctrl_log_warn_trace(media_jack, LOG_NAME,
++					       "cause_counter_inc unknown fault cause (bit = %lu)", which);
++			break;
++		}
++	}
++}
 
 -- 
 2.56.0
