@@ -1,64 +1,56 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793398283;
-	b=jjJhD/W4wdXDfSVl9bZzckiNv7SDTu2B3lLcU5qkyBoVl/+VUalN/mVEFTNOj1cLbPh8
-	 PHmeR2sGVwInyUqQh+Ic+c/ZXHV3VPyEPpjl3I8JNxlqYka5js1LpHrnS0ZzM4CLsy8Or
-	 sBgTPoaKgycfgQNDmuyDlWeV7Laa026VcPQ0gbB1r7U1cYVTCFXZ6R8flGQyq6bcCfVBq
-	 KkeHWJ+91A8g5zLVNdjypfTgSR2UMwLX6r66S6CLEIsVpg6WiFiZBcy2LN5WZLKAUdexs
-	 R/UZR7+KQxIAXEnW85dwVgxEA7xkwdKT5g1SEOBjeJjZlG2qGw7sHQgU+d6WGLIiBIQ==
+	t=1793399399;
+	b=N5mle2nkR9aCIx4Dta3Bvgi354nw0py+p/qszGA1qQ9QqXQh15bUd3wlJcipWj0aJ0gq
+	 E4738R/31r7iZRGIjs6b36v5H2uG0sbERjP7VnJxWSLh6RuBDWI1ALg1scdJFWsbTDfp6
+	 x5SH2W6PQil8hrLtL5sYKSphrI5LGfYNuoMP6VBss7RfzpHGNoSVuWLZWmY77n7uCnj6K
+	 7OwmWUggonSgOncUkEWd/DzqkoinBPUHBndzHUV84EeTHGltfMkQyx9ge/NCxDjaQJxl1
+	 vxDPMcASCdjJyXLqAyakAi0l+ZLvILgKDMgW0R8aIsDtgraaMm4TH9BA9YTv26L6jgQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793398283;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793399399;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 In-Reply-To:References:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=/9Yi2qEaEo+04ZoHUXZf2/B+Xx4/Mv399Gk91xIUCYk=;
-	b=q8qXjip1VodBRmjXiHsACHxNP2CGDS4TfOv83rXaneUhvi6Synp24yjR5NCbzUGkM3Yb
-	 f7Vwb6oNS/6CfpuyGKD7EclbE0f3Rkxbuv1oHYuHo/4h1ew/qDQxJEwU4viDt/7F5u31z
-	 nJ8Gp232GlrezT8u0BMbN7l+9g+E33puhcawqLHfnHMNFccWwzg00yTPCtXJkw4psSkdM
-	 /NiebJWjcK4ybIsqm8WlA8Un8NdWsSa4oMkjWPiUBklc2nsrfoUK1ZDngaUnnzJSLnG6j
-	 ufdwI8ufuZh3o95DN37MoGkx5jkygj9sO6j4TxlzSktd5ujl095NcTZi8Bj/rZU8Dnw==
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=aSkk09/yktJ+E/or+xyblvOstjgnyc2a5E9M6YN6VME=;
+	b=obDKNrEuUQUy9/FSgbTIlejjYMlmwN5yCG7kFwrY2U4gZkV5yy3BdsWk7Ya+ecsL2Oa3
+	 WYRNmOffdbKdP/NtYpkzxzBnewrj3nYVsFOA6gPXuWgUZ1o/3Mo9yZcnEK3Ie4QCWdVqP
+	 HCVQtCuvucA59OiRqtkzXW1eEd+ZNUVXnvGzSgCPziD3yhqXrtriitRexEsw8uCr9x8Ri
+	 aZQ0rbeuNP85yGjBC0EfjyAUkVmHB6bkDWyGm3AldxflKGa9d5emijYmLHmwFJzuqI/sF
+	 ukMoP1F3ONWl3kfXPf2wZkVhBjniY8KRG3JkmmYQOEzUYZhrQYApDiQbT64nedbSPdA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HnySJG0+;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RtBzDAft;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC39B606A31A;
-	Fri, 30 Oct 2026 22:11:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 346A9606A31A;
+	Fri, 30 Oct 2026 22:29:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HnySJG0+
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C42261F000C1;
-	Fri, 30 Oct 2026 22:11:21 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RtBzDAft
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 026931F0093A;
+	Fri, 30 Oct 2026 22:29:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793398282;
-	bh=/9Yi2qEaEo+04ZoHUXZf2/B+Xx4/Mv399Gk91xIUCYk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=HnySJG0+PhSd4KA2MAruKVkCmkwyt8YHxIivdI1WGSeB4mnZPdi31lryacPPx9gcv
-	 HnZ/lpU0hqotrTFDri3W18cYFwDYMD5kuNEzCWEp12zeVcPHTfPu+/wqhfh5svWfAc
-	 79Q3D8KkNPjymgCkd5HxpNkPPRp6ZR8m9N2kzi54e/FWL4bYmbOzYBeVD6Lwucu7EL
-	 bzt23/INkEdFb2ss39dmy+MthJjH9EW1O7Ixt8L1Y/qS00dXtgwT7Se6C5Tuqm9CS4
-	 Tu8Iuu/fjXPJyeR8DHm7wHAuzfbKLx8s98VUZ7fDTJCl3YIQ2a5WTuGURXauK5fvqH
-	 HHopjc1lDCzcg==
-Date: Fri, 30 Oct 2026 15:11:21 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Doug Ledford <doug.ledford@hpe.com>
-Cc: Slingshot Open Source Team <slingshot-os-team@groups.ext.hpe.com>,
- "Nathan Chancellor" <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
- "Richard Cochran" <richardcochran@gmail.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Sumit
- Semwal" <sumit.semwal@linaro.org>, Christian =?UTF-8?B?S8O2bmln?=
- <christian.koenig@amd.com>, Guenter Roeck <linux@roeck-us.net>,
- <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
- <linux-kbuild@vger.kernel.org>, "Sandeep Bhoot" <sandeep.bhoot@hpe.com>,
- Iraimani P <iraimani.pavadai@hpe.com>, "Mamila Santosh"
- <santosh-kumar.mamila@hpe.com>
-Subject: Re: [PATCH 00/23] Subject: [PATCH net-next 00/23] net/hpe: add HPE
- Slingshot NIC drivers
-Message-ID: <20261030151121.1f232b50@kernel.org>
-In-Reply-To: <20261030-cxi-netdev-submission-v1-0-8c2c391cc283@hpe.com>
-References: <20261030-cxi-netdev-submission-v1-0-8c2c391cc283@hpe.com>
+	s=k20260515; t=1793399399;
+	bh=aSkk09/yktJ+E/or+xyblvOstjgnyc2a5E9M6YN6VME=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=RtBzDAftLyTiCB+s6T9O9f+u3CAcRFnr10MXb9DzJ5uWDLheTgqJlCsSLGJN2SzRB
+	 R8igDMHThaWXXvTzlNcrPM2I27DjlcEXfSbJvdFMSo0RCh8TqxW8JQjEbLgNFv1lET
+	 IgYRiPFEocjgrFPIUQh5k1I+X5wmB5xx3zlP2dF5iGfmKi1QoiIVLezo9PV/uSAkip
+	 HaJyuKFZSo9wsiymImiHOeUxCkwz80Wnb30FqoWkwbLvAo3pfucBtPCH6Jjs22e9SI
+	 1piJDPwscdARR9cgJEqJ25AwjPky0+Ik8QrMpb8Ry3bDCTGYoVZN+VG0q6xdKfKqbd
+	 lZsh+sm7B47oA==
+Date: Fri, 30 Oct 2026 15:29:58 -0700
+From: Kees Cook <kees@kernel.org>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Nicolas Schier <nsc@kernel.org>, Julian Braha <julianbraha@gmail.com>,
+	"Lorenzo Stoakes (ARM)" <ljs@kernel.org>,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Ricardo Ribalda <ribalda@chromium.org>, linux-s390@vger.kernel.org
+Subject: Re: [PATCH 1/2] kbuild: Move testing of '-mfentry' back to Makefile
+ from Kconfig
+Message-ID: <20261030222934.0fcfa7-kees@kernel.org>
+References: <20261020-kconfig-fix-mfentry-check-v1-0-428258bc0fc0@kernel.org>
+ <20261020-kconfig-fix-mfentry-check-v1-1-428258bc0fc0@kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -68,12 +60,23 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261020-kconfig-fix-mfentry-check-v1-1-428258bc0fc0@kernel.org>
 
-On Fri, 30 Oct 2026 13:58:56 -0700 Doug Ledford wrote:
->  416 files changed, 185137 insertions(+)
+On Tue, Oct 20, 2026 at 02:52:18PM -0700, Nathan Chancellor wrote:
+> Ricardo reported another issue with moving this check from Kbuild to
+> Kconfig, as '-mfentry' is not supported for x86_32 without '-fno-pic',
+> which affects GCC builds that are configured with PIE enabled by
+> default. arch/x86/Makefile adds '-fno-pic' to KBUILD_CFLAGS, so this
+> works properly in Kbuild.
 
-=F0=9F=A4=A3=EF=B8=8F
---=20
-pw-bot: cr
+FWIW, Debian's i686-linux-gnu-gcc 16.2.0 hits this too: ARCH=i386
+allmodconfig fails at scripts/mod/empty.o with "'-pg' without '-mfentry'
+may be unreliable with shrink wrapping" under -Werror. With this patch
+on top of Linus's tree, the whole build is clean.
+
+Tested-by: Kees Cook <kees@kernel.org>
+
+-- 
+Kees Cook
