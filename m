@@ -1,13 +1,13 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=148.163.143.35
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=148.163.147.86
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793394090;
-	b=nkQ59BxDFv29pDArDLVkWmm0qcpgRQQ6bRFP7OUanhmWGFcVtZzQg882EFMMoD7wrShq
-	 ZHehSszuus7Ro97qJxDp5XSqyKjS/+NHQAc+LkrZRnryEQ89VhxCpJbQ/sogMf9+4DpzQ
-	 3mQXToBUVsn161SR5JSOX6ivnw0vSpQ0pZ5Upz+M6AFGsxgkf3ncpA71cllJF0uXsqlTR
-	 TNKYJmur62yAJe3bNWig9UFwn0jumYNwxk0KvAjqBp6Yoe+n1bBnn8pzUePSwLrED1in2
-	 CRFUMP+lP+lr5/8LOqiRbawNGp3WYM3gG8UKQQWbk9JL6+YiKAmiWkEgVnzot9GbIvA==
+	t=1793394095;
+	b=TAK5P6tKlfDKFNKCB5KhHU+RqHT4C7jEbSFtVh5/oevYZ/cs9iWnMyR7YcPASn1JoV8z
+	 3Mn6crZFDJ95ZjD5wA8gboaxyHJ82rX8HI41bTCEo5LdcoxmxHsroDw0bBmRNq5ElSnZ/
+	 w97AeZfEy1zbTSq+ftBjcNZE5nw7K50pImNP6x15gQjhatchKTRgR6NLZ10Z2yCq78nwi
+	 MGU0/3SEjDOxp7E3qSAQexv9dhonTUK0tQzzt1fHSrWfEExS5u6LkwGU8QvO0RcQCqdCl
+	 Hy5pOg7/ilZbRjuFKpMhe0gPu9wg6CnsAkHd/1nodDIFSrI8S4w3CB8aC6fvjQhJDCw==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793394090;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793394095;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
 	 Received:Received:Received:Received:From:Date:Subject:Content-Type:
 	 Content-Transfer-Encoding:Message-Id:References:In-Reply-To:To:CC:
@@ -25,72 +25,72 @@ ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
 	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
 	 X-MS-Exchange-CrossTenant-UserPrincipalName:
 	 X-MS-Exchange-Transport-CrossTenantHeadersStamped:X-OriginatorOrg:
-	 X-Proofpoint-Spam-Info:X-Proofpoint-GUID:X-Proofpoint-ORIG-GUID:
-	 X-Proofpoint-Spam-Details-Enc:X-Authority-Analysis:X-HPE-SCL:
-	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
-	bh=lboqsmIAlA3b6834pdw231iO/gtmIEQpprll671Abto=;
-	b=1hkp/i0TQHzuenosePFf03sIO06vUGEVmVxBZ/JGjVln9RA6FwJgotDqxOyWZezYLfmO
-	 dFNP2U5JVnE13YjDggAH4MowUD9Wg67fkN3PMVouAUwFMXZ7WQqhhTDwOWrR88zJ5bUVv
-	 tyFTOC8DgY8p4lXeNPHdEwqE28TIdPKWzlgBeaFNg8K/LHxVXgKBFrYyc6BZLTcLH1ikv
-	 +b27GhtDhh02ubu57LBSwa8j9zxlQhV/I4xxebL0Xsl1UAhZpqimGyZml7ZvVBJSo5by1
-	 WjL3Yb4iWRmDPrrOZtvSwYpcgXePTHUKr0IJCOvBsxJf431V9jItekEnBwWrPDicuTw==
+	 X-Proofpoint-Spam-Info:X-Proofpoint-Spam-Details-Enc:
+	 X-Authority-Analysis:X-Proofpoint-GUID:X-Proofpoint-ORIG-GUID:
+	 X-HPE-SCL:X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
+	bh=g+oGN8i2nFP9hXZSb2IoPLTLh8dr+AksxnYdKj0TeSU=;
+	b=WKZcdBVN7UXmuEtU9A55ssryYaUqKvXXlVECsnHao0KjdnCNIfVd+Wq+jIToLij0MmS0
+	 8G3xM9CLH0lglwuiMl1i4GKthYjg4phfvvVZCz3j5vrkqC/rhAXj06iXNXX/yG7QgLWsU
+	 TPW47Rz5AEIJb3F4C8oYtvkv4lLetLw7FPRi8cE/gHr3gxx04SkLByXwH2a6tC7kVpUcB
+	 R1JgC6XwNpHeogLqJtZv9PNJ5WaW4hPBKtpeCCxoEyKfpYygRpSjNa6ncMEtn/CS0D9Ea
+	 AEkpQeUdNIAqkFDF+K6BSHUAvg+15WXA3KnkkIKZ/j3bbC/cX9ppPDCx7RiO3MXL3mA==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=hpe.com;
 	spf=pass smtp.mailfrom=hpe.com;
-	dkim=pass header.d=hpe.com header.i=@hpe.com header.a=rsa-sha256 header.s=pps0720 header.b=F1BpP7XM;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=148.163.143.35
-Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
+	dkim=pass header.d=hpe.com header.i=@hpe.com header.a=rsa-sha256 header.s=pps0720 header.b=MyFlVBZg;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=148.163.147.86
+Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9914606A323;
-	Fri, 30 Oct 2026 21:01:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C9914606A323
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A742660A262D;
+	Fri, 30 Oct 2026 21:01:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A742660A262D
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hpe.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=hpe.com header.i=@hpe.com header.a=rsa-sha256 header.s=pps0720 header.b=F1BpP7XM
-Received: from pps.filterd (m0150245.ppops.net [127.0.0.1])
-	by mx0b-002e3701.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69UKCeCE1185069;
-	Fri, 30 Oct 2026 21:00:59 GMT
+	dkim=pass (2048-bit key, unprotected) header.d=hpe.com header.i=@hpe.com header.a=rsa-sha256 header.s=pps0720 header.b=MyFlVBZg
+Received: from pps.filterd (m0134420.ppops.net [127.0.0.1])
+	by mx0b-002e3701.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69UIVxrv3318822;
+	Fri, 30 Oct 2026 21:01:04 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pps0720; bh=lb
-	oqsmIAlA3b6834pdw231iO/gtmIEQpprll671Abto=; b=F1BpP7XMn3JyzLLBSy
-	A2bhPcPc2pGHPIAbRbJ47QfG5zjYSexoucE+7GyoRxJiqg+LRverAmGS7hgt4LN0
-	kwnZytAszmf7yz5R9ItwVahqKg8WBEtrdGxrItaa6/3TSB9DjXV9j+mHAgoDxceG
-	Y1vRVGnuz7qQFU6iNFDEV5+Ii9JykM12vOJd4SJAHX41GWbBnOar/ddNpTxYRUJs
-	HAh0oCrRSm/qbtAIp/LuOlIIse12dk83bhwmMctxTUCxaL8MJoFX7qnjvskLxupm
-	qIQjHZ3eldck6EEwYFKre68dy2Att33tBLnmPtWpvm98uQ6AWx1z7eHdWUpnszzN
-	XpFg==
-Received: from p1lg14880.it.hpe.com (p1lg14880.it.hpe.com [16.230.97.201])
-	by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 4hn22wgds6-1
+	:message-id:mime-version:references:subject:to; s=pps0720; bh=g+
+	oGN8i2nFP9hXZSb2IoPLTLh8dr+AksxnYdKj0TeSU=; b=MyFlVBZgolnwsDCj6q
+	+5A5Q1zyFwIJzq61utOA6gC7RM/us5gFSScJpv7HUZMsePCd6bYcZWu3KO/t3lsQ
+	YiPv0cKYGrz4VeO4cSHqXayl0Vcgfakqo1OwQiofwO4g6/PMNbFKQIPV/1tv71BC
+	ne6wC+U/00lQmaq90Am8relXlP/AeglJ3GzNzDH9UudwARw+2GqO2BSO2CXazEhU
+	iYpt9X7zGVqUoTQ+iQb64gWUH6bScJNPqvvjc/4nngbqjXIiEATmp2j7hM+OSPt1
+	uVKZ/KgrXiAWEZ//lARqzw+ibrapY8+/fsD/526BzzWTS0joUiZOV/TT94IFPpO2
+	levQ==
+Received: from p1lg14881.it.hpe.com (p1lg14881.it.hpe.com [16.230.97.202])
+	by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 4hmw2jvkw8-1
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Fri, 30 Oct 2026 21:00:58 +0000 (GMT)
-Received: from p1wg14924.americas.hpqcorp.net (unknown [10.119.18.113])
+	Fri, 30 Oct 2026 21:01:03 +0000 (GMT)
+Received: from p1wg14925.americas.hpqcorp.net (unknown [10.119.18.114])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by p1lg14880.it.hpe.com (Postfix) with ESMTPS id 6476E8014E0;
-	Fri, 30 Oct 2026 21:00:57 +0000 (UTC)
-Received: from p1wg14924.americas.hpqcorp.net (10.119.18.113) by
- p1wg14924.americas.hpqcorp.net (10.119.18.113) with Microsoft SMTP Server
+	by p1lg14881.it.hpe.com (Postfix) with ESMTPS id 3ACDD8047B4;
+	Fri, 30 Oct 2026 21:01:03 +0000 (UTC)
+Received: from p1wg14926.americas.hpqcorp.net (10.119.18.115) by
+ p1wg14925.americas.hpqcorp.net (10.119.18.114) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Fri, 30 Oct 2026 09:00:54 -1200
-Received: from P1WG14918.americas.hpqcorp.net (16.230.19.121) by
- p1wg14924.americas.hpqcorp.net (10.119.18.113) with Microsoft SMTP Server
+ 15.2.2562.43; Fri, 30 Oct 2026 09:01:02 -1200
+Received: from p1wg14921.americas.hpqcorp.net (16.230.19.124) by
+ p1wg14926.americas.hpqcorp.net (10.119.18.115) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43 via Frontend Transport; Fri, 30 Oct 2026 09:00:54 -1200
-Received: from CO1PR08CU001.outbound.protection.outlook.com (192.58.206.35) by
- edge.it.hpe.com (16.230.19.121) with Microsoft SMTP Server (version=TLS1_2,
+ 15.2.2562.43 via Frontend Transport; Fri, 30 Oct 2026 09:01:02 -1200
+Received: from BYAPR08CU003.outbound.protection.outlook.com (192.58.206.35) by
+ edge.it.hpe.com (16.230.19.124) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.43; Fri, 30 Oct
- 2026 21:00:53 +0000
+ 2026 09:01:02 -1200
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ooeA8bST/zkbu6iRjqO0FDf7uyBPm89ouBWKjECMgcuXDRaC/E2+2ywAhJqiBycBTKKF8rfaoTlAesJi+Cbx3FJ7SkYE/tSW8+r81QMcoZGVyQUANYWObiDFCrjVeRo/mK9vuF+cn4UVi03b4t+X9YoORdbzpG2vBHwE+VhgTEsCYnGkuClS/To+8JN6bKsN51G2Pj/VNJDT4PsrTudoUikM6vu7zu5iDfCfMl34tu4XSnyM75bm6nK4EDMjh1ErObjxvfb89C3GUQzeWe0DVX44HwX67wzNnU0+Pxma5rRRrEPQa+XtjeUE83Zce4/j8H9bz623hbO3HeKTtj9Nvw==
+ b=UOzEDcCP0vJPO1o5lJVmL9uBUwr+QIIoxePcL6h90WL0z9DWQhPCDbhHVIlf26h+2sFktyUX84BE0wq8LJRgU/dn0Nb93kJzZMJr1RQ/TXm0I+f4IwWc/d/FLPJ7qZog7hr4YlSxUUBQ8PrJDgkp0ZsKQvuwuKLYFNQBfWxZo6WtXw6N+CLcGWGkOdkB18Xa8vWKviDeMCtjg413vTW8a1s6By0m6DrIhgNVi/t9TcTaOA5FfaB5FF6RjgbFgYj7zP7lMbur0VIioEniKNHIdb7s6UJl1rBuNKnznLg9cYmJMNRGBYOfdl2QD3LFF9vR0s21uS40MNBQr1cV6YEkGg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lboqsmIAlA3b6834pdw231iO/gtmIEQpprll671Abto=;
- b=PGkzus4qjNHRJGSnAl5JHTozqMXYJ4ntWo9mX7J80JE2q6qfYqXtw1gmY7XJHHXNuHraxA8WNyaSw7CZfe4HnVHk0k0JaFYd88zcpCxmHdv2kZP/HxPziyyFJ9aGoSt88/nhCiTLkMIUiDBSP8MPZsTisGVptplIyAc+sk7yzRxcYgWmRodWELx7S7TDiA/l7PmbE/aVBiruwi0Q8Bo2AHDK7NZyYzwLq6j/IODjjR9bWE4PQvYrhr9y3h5Kpm4ZntF+YcFZfSw6fVv8KyyHHwKNF9zuGNQJeFHMSwN5dNFwf2Z53IvL0thVYyswLnKphrIco/UXXxS0/T2BqLJkWw==
+ bh=g+oGN8i2nFP9hXZSb2IoPLTLh8dr+AksxnYdKj0TeSU=;
+ b=a0cHMFvbFQEAAcCzK0RA/86ffMZByqf8ANoValwtuAOoz5djyzFJauASx9m/YuS6yM7l4Wka/QdzX4eaWA2yNrnJyt1StVo5ejYaOum4URPuka0ZkBzwzyS2B/PT5mb43Sr9eJOTJx9uO4xSr+ze2O6hYTGmpmCaEPxau4zvDS6mfKeBsCAMFi2JpYRRmKYH/BUvUxSeTkayDiVEqXfN9tnWnovzyovm1S2cF3E1pmvpUzIKumzDG9L73t3jgOUBpuew05Vl90JofYID4JZl1WUMjliiaEcEJZ5b26SVkQRgqkxHK9Yh35FSvd8Uifd0m2GtqPMfk89BXsmrbe43yw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=hpe.com; dmarc=pass action=none header.from=hpe.com; dkim=pass
  header.d=hpe.com; arc=none
@@ -100,17 +100,18 @@ Received: from DM4PR84MB3970.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:8:225::20)
  by IA4PR84MB951192.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:207:144::20) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.569.10; Fri, 30 Oct
- 2026 21:00:46 +0000
+ 2026 21:00:58 +0000
 Received: from DM4PR84MB3970.NAMPRD84.PROD.OUTLOOK.COM
  ([fe80::d136:e75e:53c5:73d8]) by DM4PR84MB3970.NAMPRD84.PROD.OUTLOOK.COM
  ([fe80::d136:e75e:53c5:73d8%6]) with mapi id 15.21.0569.008; Fri, 30 Oct 2026
- 21:00:46 +0000
+ 21:00:58 +0000
 From: Doug Ledford <doug.ledford@hpe.com>
-Date: Fri, 30 Oct 2026 13:59:10 -0700
-Subject: [PATCH 14/23] net: hpe: sl: add the sysfs interface
+Date: Fri, 30 Oct 2026 13:59:13 -0700
+Subject: [PATCH 17/23] net: hpe: ss1: add the datapath and memory
+ translation layers
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261030-cxi-netdev-submission-v1-14-8c2c391cc283@hpe.com>
+Content-Transfer-Encoding: 8bit
+Message-Id: <20261030-cxi-netdev-submission-v1-17-8c2c391cc283@hpe.com>
 References: <20261030-cxi-netdev-submission-v1-0-8c2c391cc283@hpe.com>
 In-Reply-To: <20261030-cxi-netdev-submission-v1-0-8c2c391cc283@hpe.com>
 To: Slingshot Open Source Team <slingshot-os-team@groups.ext.hpe.com>,
@@ -130,11 +131,13 @@ To: Slingshot Open Source Team <slingshot-os-team@groups.ext.hpe.com>,
         Guenter Roeck <linux@roeck-us.net>
 CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
         <linux-kbuild@vger.kernel.org>, Doug Ledford <doug.ledford@hpe.com>,
-        "Sandeep
- Bhoot" <sandeep.bhoot@hpe.com>
+        "Iraimani P" <iraimani.pavadai@hpe.com>,
+        Sandeep Bhoot
+	<sandeep.bhoot@hpe.com>,
+        "Mamila Santosh" <santosh-kumar.mamila@hpe.com>
 X-Mailer: b4 0.16.0
-X-ClientProxiedBy: DS7PR03CA0303.namprd03.prod.outlook.com
- (2603:10b6:8:2b::19) To DM4PR84MB3970.NAMPRD84.PROD.OUTLOOK.COM
+X-ClientProxiedBy: DS7PR06CA0026.namprd06.prod.outlook.com
+ (2603:10b6:8:54::16) To DM4PR84MB3970.NAMPRD84.PROD.OUTLOOK.COM
  (2603:10b6:8:225::20)
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -147,13302 +150,10503 @@ Precedence: list
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: DM4PR84MB3970:EE_|IA4PR84MB951192:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5e823927-571f-421e-7251-08df36c8dd6a
+X-MS-Office365-Filtering-Correlation-Id: 94582599-9494-4bf0-800b-08df36c8e4db
 X-LD-Processed: 105b2061-b669-4b31-92ac-24d304d195dc,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|23010399003|376014|7416014|1800799024|366016|6133799003|18002099003|22082099003|3023799007|921020|56012099006|261021121427099003|261028144727099003|261026121527099003|10067099003|261026140227099003|261022075727099003|261022105027099003|261021123027099003|261021135927099003|261009223027099003;
-X-Microsoft-Antispam-Message-Info: VhY4kdjMfYOKEs/uXM8zGHYP5aCumkRy4AdG79BMDoZfoNxiDBje0tTK2zEzMSrbkSpXFszlqQ13HvmEV/NqMxQvKMgfuxWKthBdVwIH7rYp8qFcQlTdoUwWXxWyAJIvXxV5OlglCy5j6gpojn422vN73O8sX29tQjPH+y1SSKAJFZtVMm2YIiuhnAy/ZBXX+SJq69SOIb3est2+EwSFRS6HqmOcABMWK4S5fOd5dF3olQ9eMCsj2m1lHbsjlpMDZHeSsOkYNPI7G85+2Yc900SVDkRn2SM3MePw6sKMyXFoAclObPdddgL3ex4PBRHodnzp11aA49dghGN+06JtpDdVMp1v+XM2IYbLpvYMeuj+njl4GM/BFCHt3BMfCAqBsRE0dUsYnK6uM6mGREiXI6UB14CC6aIPf9L3eAH1FvgaYT0KtpH9CcO0vnQTRx//5+yYr++tsVuGP5haBXmiQoPaD0UGS3/LIi2sqxCFsCnakSBRP2oVQJhNI9N/0FlY381wIGN0aIBLeyi5ebuk4mxS7ZNv/XSdCUwz62qx/bekVDBL+UwSoWt2qTEaGH+lGWX1mBy1hHbQG6HGLa3q/V87ATB3fT2rYJDEGjFhrB6mGa2h6GZvxvFP4Y4jX6FOl9brduTi3ZE8wuN2+LLbl1dAnIf3fy+2zqlmVfDfWPkblaWiUbg4rOmTpttTn43S/xiJUB/qVpDHM5iDtNDMHg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR84MB3970.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(376014)(7416014)(1800799024)(366016)(6133799003)(18002099003)(22082099003)(3023799007)(921020)(56012099006)(261021121427099003)(261028144727099003)(261026121527099003)(10067099003)(261026140227099003)(261022075727099003)(261022105027099003)(261021123027099003)(261021135927099003)(261009223027099003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|23010399003|376014|7416014|1800799024|366016|6133799003|18002099003|22082099003|3023799007|921020|56012099006|5023799004|261021121427099003|261026130827099003|261028144727099003|261026121527099003|261026135527099003|10067099003|261026140227099003|261021133027099003|261022115727099003|261022075727099003|261021130227099003|261022113327099003|261022105027099003|261021123027099003|261021135927099003|261009223027099003|261009221227099003;
+X-Microsoft-Antispam-Message-Info: /R2S1pJkVZZp5IyTZoafoB1+5V6BHglGmkCwwJeJ7AkUTP5bGwdq5tyGqlNqvlXEkqXHptGQsT6FR6I8NUZMJPZFyQZ3ewnzbLA66MtiRQ3UBNwiukuf4kmokFUr/gQDXzmQ0Drc74oPhCQBVN4YwOCqGkMXvC65C/CI71D/aiWacsD5MpvIuppyGigHIAFKrMbihWMecvU/U8CGXNw1840RojxEW43ESJxRNhEiufh9WHZM6FzBpRIhiSIVdm71TWC//gEiya7BASquav/xRerz2NXUf+536KO6Och22wxrczhJRqlLWPRVzJSNv1LsWIMQv+G1oMdLge2DU98Mbv7tsgweeyi0ilEMq+XXPfDg5IVRQk8zOeuoGRRwi3JD/S2cs7k7KHgxJh4JFCAtzbidaU59jSv+f/ghGLmxXZbj6j+SAejc7xX8MPtkyB9xXVGi70Cc2yCzvPjUDCtppyT8shTlB6ncGdzQdK2BMA39Ho2aUtq/D7nekV2uXaL5uXTT3zHSvchbYcwfCRaq8Bf9zdxmj0W8jdm90I9NxWMEV18dleBWarIkpVWtwtdWdhP2H2BDpOiJrmBXNGgLHuTxvA02oMX2rNw7tFtAOQK9QGsrYLXgrKOcd61xlCkhIJqobPeF4b2JrXvpXKGuKoEq45KfLLri3AzO85XxhG+M9mVzRRnbK5X5EdZKl+SDTzzIRzc8AzG/9u60hssYmw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR84MB3970.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(376014)(7416014)(1800799024)(366016)(6133799003)(18002099003)(22082099003)(3023799007)(921020)(56012099006)(5023799004)(261021121427099003)(261026130827099003)(261028144727099003)(261026121527099003)(261026135527099003)(10067099003)(261026140227099003)(261021133027099003)(261022115727099003)(261022075727099003)(261021130227099003)(261022113327099003)(261022105027099003)(261021123027099003)(261021135927099003)(261009223027099003)(261009221227099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Z002WHZTOGJ1U3BmRTlEbkRzZklYN2xXL2hXM1l5SHRVT3RlazhwcGdDSjNn?=
- =?utf-8?B?RjhiZG12OU90QWo1RTNaT2RHNzUvZDhGUlErb3FzK0NFNGNqR015a3lwSkxa?=
- =?utf-8?B?K28zOWI2bmE4SGErY0RJOGM4Z05LdFdlREtHcDV1UkpTNGxQVkg1RCtqdVg3?=
- =?utf-8?B?RWc2eEdRdm9FMWZvRjQ3Wkh1SnBpRUl5YWxkYVg5MzAwQm02czBrOU1lTXdD?=
- =?utf-8?B?ZUo2Q1RtZzhEaTFtY3FZUzRKQThGTWhPUlc5ODBTZERZRmhrd2NTSE53K3NB?=
- =?utf-8?B?ejFKQUFZZEc3Y1VaU3lQejlNeGdhbmx1cmxxNkJpdzB3dnE4L3BNdFhtYkgr?=
- =?utf-8?B?TkNnT1NMK2FGL1hXc0wxN21oaHlWRUEwK25oWmJrMWs3ZVhvb25BY1VLeEpK?=
- =?utf-8?B?cWFDWjhoTFZGU284eDZBOUFEMGlUeUprU2g2ZmF5VDJjcVd3Z1NYT2ZMenFp?=
- =?utf-8?B?Y0owUVBnQXN2UG1SbkxRY05lS2E3VVhLaW9DdEJVK2lpQzhBcDhpQmZOUVU3?=
- =?utf-8?B?T1lKblU0aTNJQ3cyRE9SeWRXclJScGQybG1UeFo2MDgraWlRWm9vQnFNb3NO?=
- =?utf-8?B?dzNlSkxhMTFKS2pad0FzYTJ3RWxGc0hjYjA5YWJDbkFXc1ZmcG80US9XK1oz?=
- =?utf-8?B?NnpYZDdRRVF6Q21yTWFibzV1byswZUM0OFplQUI1aFh0NDR1RnM2NGorOTdQ?=
- =?utf-8?B?aEk3SFgyNmR5SE5mUi9hVDRqOGhuTW81RUxFN1BLQnVTSWFETHYvWmd2bzBF?=
- =?utf-8?B?NkV3S3lSd256WCtGdEhrOW10d3JoRENsNzlTYjlmc01VV1pqMTFKb25XYWVw?=
- =?utf-8?B?TW5rQmkrNk9qa1Bpdk9lVkFLLzE5dlR1VFc2VFJmQXJudVRzRFg4Y1BpalFM?=
- =?utf-8?B?OGloL1dndGgwTWhrNDk2OHZDbTgrdnpHZmI1U1J4RXlOMERrMjAwZnhVWXk1?=
- =?utf-8?B?MVgvd2Zyc0d0bEEwSFNkb1UrTHVJZWhTZnFXZmE5emVqM0JOcE52T3dhNUNm?=
- =?utf-8?B?dzVsUDdMbmdsT3hMcEhQSXp2eldycEdHZVovTzVqUnRlRnJWYkVTRjhHVnBX?=
- =?utf-8?B?SkFnYTVCdVI4NG15QkNjUER0QnJmRndiamNpdEt4RTNnNVp0SFRGNkYzV2ll?=
- =?utf-8?B?Zk15RVVyRS9pS3pqVHlpMFNoSDVHYkF2M2FMU3FlYzRQbG45Vk01YVhOSWpn?=
- =?utf-8?B?ZGN5UitvZzFkRWplUSsyWjg4NmxuUmlxUVRtSkRtZk5HblQ3WDF5amZRM0w0?=
- =?utf-8?B?TG5LdFVkVkwwaGdBQW9KZ3NTV3ZTTHNMUGhSYTdydWE3K2tJMTFvUWwxaFBK?=
- =?utf-8?B?MmZyQlNDUS9IUkViclRNejdaS3h5SS9ROVN3aUZMbFVmR2dwV3FneHA3Q3pT?=
- =?utf-8?B?d0dMSXZsc2x4M2VHZURyWFZaWXlJRUQzTTZCK0ZtTGJkT0NGL3RKR3NQR01W?=
- =?utf-8?B?eDE0VTltQWJ6cHN4ejB1bGx1VDg5YzJDbDVIcmRkQXhtWjVJZ2xZV09qSFlv?=
- =?utf-8?B?NG1BdW9aeUhuWnNObEtZU3drQllTaG5GQjF0c3NRU0Y0RzY4am1OMDVwKzFO?=
- =?utf-8?B?a3BMQVYxUmRaZ2xpMmpBZm91MFR2ZFpjaFFMaTJud3l5KzVHUDNtVXE2RkFt?=
- =?utf-8?B?N3VNUC8yRklUbVRvT09SaU9XNjE5VEVhTXZpZ05LQlkvVncvU1ZqRTZjV0lX?=
- =?utf-8?B?SDNwelpOMC9rdUpFVjRnNklRNmxvYTVoNUxDeUpYTXd1Q1VFSi8yc3ZvTGVP?=
- =?utf-8?B?dUlMNEU4ZG4yQVkwbFhZMXRpYmJIMEFZcGFWczQzNFYxcmlHN1oyOTBZYXB5?=
- =?utf-8?B?TEowcVEzTHJEU1NhcHdkSkhRT3ExWnI4YjhPK1BMa2xZS3BWbXd5THBBWWU0?=
- =?utf-8?B?ZkdrYURYVkZkRHJKWlNSMVZnYlpqY21JSU95YVkxTVlXdlNVRjdzK2dyQTFJ?=
- =?utf-8?B?cXFqb0lFd0o0aFZmMVJKM2ZPSGNCZWhuYm10dlFhZnBabVNtMmhHck5SWHBJ?=
- =?utf-8?B?b0tXbzBUZ2lxNDQzMXBhcmJNVk14WDJKVmZPdm1xTEd0Y1hUQmhmdHdOZVpQ?=
- =?utf-8?B?aUo2bk1JcGwrWnVJYlpkUE9hN0htR0hSNWpqVDZZTUhuUkJwQitHV2JFR29a?=
- =?utf-8?B?RldYalFZZUd6VGw5QUVnclQ4UTY3N2piWXFNMHY4bkh4YkNFZmpDY29uWit4?=
- =?utf-8?B?R2xpa0dGaVNPYzNJT1JURk1YWk0zc21xNmhRRXRZdHoreDFWSVZuZGgrL1d3?=
- =?utf-8?B?Y09JcU81cDhLcWxtaUttNExqUVRUc3lHWDdIejFDbVdlQ2txb2k5ZnNWTDY4?=
- =?utf-8?B?N3Z1dHYvaUR4R3Z6R0Z1M1R0VDBEWWk1WENqU1hUcnAxeE8zZElFdz09?=
-X-Exchange-RoutingPolicyChecked: natfP04c+MXDBX8QmkWAVzY6bYiBNYSHjcNcG/mmcTHw30hQfzK+E+qylPHe2ekqsfpKxTLuxJ54XgSZVHFeOSRztMl1R5kaoNod9FD77XxABgVAeX94xQHi39h2KFMWNkUagPwjcOw3li9WvLuurprlA7ZrOsVMaeXWpGAUdLw3MojGlbnV6SYxh3q26QseoSDrU1z4A+mUfXvlohXDCi47lK0iswm1HdW5OHK+XXyviohTBjgg4yTX25XcVJETJq/Oa2rQ991lpGfjb5ip7cnlReRHOEhWpef/UX1Yw521ntdqWxWoJmG8HxiwoggCl/74S2Yr5cM1yNUppI+eqQ==
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5e823927-571f-421e-7251-08df36c8dd6a
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?T0NZMmllZ0dyQUhPb04ya0dsUCszK2tMWUYxc2d5WEdBUTViajBtOWlKRFE0?=
+ =?utf-8?B?RTNzWWdwV05TVjFnMXR5bUZXNk4xU2hTcWk1WDdxZ0xLeW56UlpDVnRyVkhq?=
+ =?utf-8?B?OGVFN1lMNkNVS3RKWm1vbzVsMVZwL1hvYVIxT214WGxEeCtxMzI0WmRpbWk4?=
+ =?utf-8?B?WDZNMjZ2Q0QwWkU4aCsvY2tMNVljSVFyTnhuRDB5dElaRkhJdjBxQnBaMnor?=
+ =?utf-8?B?WGE5R1NGK0d2bzdkMzFqWEFKejFEUEl6Y2lsUzRCYVZ3aWpEY2d5Y1BwTjNi?=
+ =?utf-8?B?a2xvRm5WYy9OaDdvUmNqaXc3Y3N4Z1JFQ1BjUkJncXJtOStqSFJvdm1zTnRm?=
+ =?utf-8?B?M3FrY1FVRlRHemtUK0IvRGhvcGtGdEtHWUFaMXEyTnVZWW5LMkI2djRhVTFo?=
+ =?utf-8?B?M3dnRWRQMjBMTnk1RGM4ZnJPL2pNWkN1Z09tZXRGQkQybDBKOElGOTAzc2lz?=
+ =?utf-8?B?cFJuLzU0Zm1Bb2FyRWNDVmJDS29ES1pMcUE3SWJxYmMydG4rWTcvbkRHejYy?=
+ =?utf-8?B?NkZidElHTU1FWXdnN2JoVU0vdmhrT3lic0twL3l4bjU0OUx2QjRjdVlwWnBN?=
+ =?utf-8?B?TlhzUWpTNjFuSWRIZHdjWUJ6L0lQUTI4NjlBUlVsYnVPT2s3WmpTMUMwQXhU?=
+ =?utf-8?B?b1ZqMll0TTBzM09VaWsvQnkxaEFJNzlrL3lxN0FLMjd6eHlrZHRBSDJEUk1o?=
+ =?utf-8?B?Qy9yUXBXMDdQMkVlRGIwRmZ0Mm14ZmhXUnlJNkltQ09maXFYUjVIRVpxQnB5?=
+ =?utf-8?B?REFseXNOcis5RkdReHgxeTJzaitZY0MxcjFpSm96VGxpek55OVhOSldHM3JR?=
+ =?utf-8?B?dkRBVDFQaTV5OGdRamhnKzlFR0M0b3F4dHRxRkUrWSs0ckJSZTNpYzBMTnVm?=
+ =?utf-8?B?T04wVGhBeDVkS3NKREJDMkRTaTRJcHZ5YmY2dU5UbjNRN2pJczBpL0FYOG5L?=
+ =?utf-8?B?Q1ROYm9PODg1eU1TVU4rRG1ua2RSNU10NjlEdUxjeDg0ZEZoRHVqUlNWaWNm?=
+ =?utf-8?B?YytQWVUvMWlMSXlwV0JlcGdINXM2SG9SbEpremhqak50WVJ6STJtamoyNGU1?=
+ =?utf-8?B?bm1kRUpnaTV6TnhjN0ZEOG12TUJsQWUyTjd2WndSOU5pQnBMSjM1WXg5bmZ5?=
+ =?utf-8?B?cm0xOXh3eEdadWhlMzdBSElBS1IrNWsvMUx5NEtuKzN5RHdPRStWMWtOT0po?=
+ =?utf-8?B?YmlSVWR0NGE3QUlCaVgrS2hHa1FWTWhZNkRBZzBpbnorbmVWSGF2NGdMTndK?=
+ =?utf-8?B?UlVlUUxYa3JkSTBPeGY2SnMvTUp3MUFNWStJMVRpd3B4dnZKVjJNeitmWXhw?=
+ =?utf-8?B?cVIxSlVUdWRMQlJYOFRJVjZFaHZBMzc1K2laN0lIN3hWZWh1WXB6MzRGUWJl?=
+ =?utf-8?B?RWxpdm56dlhzZkJRTCtDclFLdlY4OUh6cTd2c2NpaGRMMmxBTWVtOTh1c2Fq?=
+ =?utf-8?B?L2ZkSFRYenVQTG1wM3pvMWt2M3c1TGUyM3B0ZUtXVWxWbzVyNlRkMUtNN1VN?=
+ =?utf-8?B?WDBMVXJPTDdmb2o0aGFaNHZMRkFldm5OOE1qbmtOVkZDbEx5cW5mMkJiRHd0?=
+ =?utf-8?B?QXl1bjF5Z3ZOL1IwSnFFWHorMXVaZzh2ajVKMmlYNC8rTXJVWUxadHphTGRq?=
+ =?utf-8?B?amJBaE41SFFvMmhYU2NYclFNdW5ob2N1VzU0Q1VzSEd6MXplV1QvTGVzamly?=
+ =?utf-8?B?SXFMSlhBUmFjS2h2Q3paRTBPU3VsWjdjeE5va3RyUlVEc1ZFY2lpTEU0bUxH?=
+ =?utf-8?B?L01ja2M3MjhrMHhWcG5WRXNUYmpJTzR5ZlROdnQyZ01xWlNMVFFMTTJld0lq?=
+ =?utf-8?B?RHhYZWl1Ly9mV1pacmNTTVdKT2ZVbUpTcUxrdWJ2YUNZM3F6bUhpd0szY1RY?=
+ =?utf-8?B?K1BrbGRFUXlpMjR3S2JLbHdOUm1UZnZCUjFPa0Y3WW9lWmR1dnFnYlNnZ24x?=
+ =?utf-8?B?Z2JoVnhLc3JHdWlBcnJac3Y4bGJ0NmhsbGt4VGVWeXREekVXaS8yZFl6WWdr?=
+ =?utf-8?B?YW80RjVFK2pNaVdxelkxMVJhZlpVaVBGVHJ6OUhOMXNIcjk4RWZRRTd3NnFF?=
+ =?utf-8?B?QkxtNGFmL2xuRzNCckYzWDJyQ0JGMTNQblVJdVJhNGk5VmZKR09KMkppaEpO?=
+ =?utf-8?B?OGZkWXdPL0hvWGh5NXg0cFJiRkVnazdGcGEvZVQzcUliV3VKZmRJSFVQcGVs?=
+ =?utf-8?B?WEovWFQ0MVJEcVQrSkhZek5SeHNoUEZ6QUYzZGk5aHZUKzZMak5TQXJLeEl6?=
+ =?utf-8?B?S1UybjBnb1ZST3ZoQzFLYU5mY1VFRFBqL3J3L050ZUx5SlJhRHMwVFhLVldI?=
+ =?utf-8?B?NXdIUXJYbnZtREt1cVJIL1FnU0NjekVKK3FieUpZcHdwRUU3b1FjUT09?=
+X-Exchange-RoutingPolicyChecked: WGfBB3bpe2iHPtyIM1IhgDrpioX1xpx+JG88Y92JUCSfyNQgZZIDvGoyQtYXib8YPGjssYLBjcN3Qt9qy0WC0sZyt+TnGSBl9+l/kIHzu+MtT0cPYeGE3JVm1Cx3PRmWWBllu3q9uVPe0EExUBtk/iROKCYvGrljPknipdGDXkrzqULS+h4FW++8iPGnOJyFPPD6IvO9ecCYWwJBPMZaQwqSHwEGfcrSOwRwS22cP/ow26q3uC+hUMFyiS7evVTEDhw1+Ll/8BLmB+1JmlFJzInavGBwxAymzIyJJpSdczOiPWCITOcvsvhO8qFhhE1ZEmGqP6DBmNYT0XIGo5BSAA==
+X-MS-Exchange-CrossTenant-Network-Message-Id: 94582599-9494-4bf0-800b-08df36c8e4db
 X-MS-Exchange-CrossTenant-AuthSource: DM4PR84MB3970.NAMPRD84.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2026 21:00:46.2385
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2026 21:00:58.0893
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 105b2061-b669-4b31-92ac-24d304d195dc
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uATsWLPV7zDVw+GdFOrcbkKxvdAGVvgz9lgEAC0Ugg8tjIg7v4dDhNY5XZy9a62WntbTvoHQ6mDWf98qb2KxPg==
+X-MS-Exchange-CrossTenant-UserPrincipalName: 44t+G1OvLAVwJdOqjzqjLo1projxinGvPTwOX31Q0dapxBNsW7F+Qq3VzfDXXKFjLbYUnfOYDlu+0gibf56aEw==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA4PR84MB951192
 X-OriginatorOrg: hpe.com
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMDMwMDA4MyBTYWx0ZWRfXysfFTSMivWPH
- n+dI+HcQxmyiKTsl2YOUYi/ExdrGflQzyilJsftvjziWHZye/u1Kl5eM2u+TzEr4zRfbVeRy7tG
- PvocUKP1fZl84EGl817tEM3t/BIMMIM=
-X-Proofpoint-GUID: 8aO4huqfHgT71_ZVZFYvKvcPXLZxQpr7
-X-Proofpoint-ORIG-GUID: 8aO4huqfHgT71_ZVZFYvKvcPXLZxQpr7
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDMwMDA4MyBTYWx0ZWRfX6JstFzTntFOc
- XsSmxDZolnvrK7FLnJVcM0h19wgz03adtL4X1UP2ikqyQS2BtQUjD5hAKi9z0Hd0BrCZwF/Nm2s
- chOdNmCFEclPWBIMs4HHT/SniZhX349MovrHEPP1XxgdAn0sC1LJJPTvLA+qpmV8PSYLQDh7+hP
- w0SZcfXW+RYKyoVoC5YagLaWrGOEfTTEl2G/W5nUDJXR/gXrR+OyC0/WMUA+7x/Ka2SxaWEYpNU
- MUS09rSBSE0U0BnMmC5g678RNfP3bn7Cj47KxOGAE/wvaohwViQrRXuO7yIzjpjK5ZpNzkqCE2B
- 3SMNAbjjGsnPPuCSftRJUmr5Eqr4QDBkLlO/A+Q/YnyW8sLQKjjQAZzDSoGBECLdMF7mCvUIWt+
- Oczko/daWqd1UHa68psUxm25FwHeK/IvGX6XUndIM+UCa4NRtNVNULOifeuUBGbfbczaPJj8e+Q
- u8crxT2oljYbQczSw0A==
-X-Authority-Analysis: v=2.4 cv=JfUpPkKV c=1 sm=1 tr=0 ts=6ae5058a cx=c_pps
- a=A+SOMQ4XYIH4HgQ50p3F5Q==:117 a=A+SOMQ4XYIH4HgQ50p3F5Q==:17
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMDMwMDA4MyBTYWx0ZWRfX7G1w7R0gIpKa
+ W+Au4MqkcBfB72S43yWueZ8Nltw+/HeFryq0Hh9xbfqWWCArQEKUrA74zCJ9pN6dS9150i6daId
+ ICF9YFSsvPz+/VtMZwRVCYjzh5J6/kQ=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDMwMDA4MyBTYWx0ZWRfX/o3IZqh4mQRS
+ KaaFVM9rqILiAnAcL1xYguXTVCm/HvgP5h2ddAETgZ/8I12Yc2qDtjJdxcyMKVyoccCMFxNAjrI
+ mB86HeY/6lTLuzB5a5vyvpB73U6ABE0+BulENiZuk6wEwMHzhhUGQlYRxyIT3rIV+rQQlO1XQI+
+ MEPpeCWCDwOGHmBRp7Pzl8jOBFgQqKCN+OhhqCCDYI/gi3GsI+8rUmGsod+ol70eOF4BpBpaqUi
+ rfKo65/3x3p0LA209VPKUHBNyl5RM8V+ge6mboO5+mh0xv5pSJvXPdfoysAmAgoU4CnXQntuLnp
+ WkdlvAdH/xZHnuFnWPoopfDnpYvLWifW4IHjhsJhQEAi6patFaieo5ScpbzT6DemknIynxd0xhb
+ 500phJQMdKyfgqIxwK++G4qCHFi62X0mDeWFU+g9H31/KZVCfqRls1yoVi1558rDBAp8Hnc/dqg
+ L3UsQo2LiQzvMKOOJTQ==
+X-Authority-Analysis: v=2.4 cv=QOn91QLL c=1 sm=1 tr=0 ts=6ae5058f cx=c_pps
+ a=FAnPgvRYq/vnBSvlTDCQOQ==:117 a=FAnPgvRYq/vnBSvlTDCQOQ==:17
  a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
  a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
  a=660iZSQnnn4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=gQcMVamqm3wCPoSYhaRC:22
- a=6XKncaru_qjgLvANlS_8:22 a=MvuuwTCpAAAA:8 a=Z7PFGMq4_24wirIJ3j0A:9
- a=zul3UiU5sbC5z5GV:21 a=QEXdDO2ut3YA:10
+ a=RtSn8ETxjE2H05FtM2s8:22 a=MvuuwTCpAAAA:8 a=iWPi7X4b-5o4dWzyFGIA:9
+ a=1b92cO--98ic-2wa:21 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: EA_2B-AkCJqr9akdMOcG-PEV5AG6CgG7
+X-Proofpoint-ORIG-GUID: EA_2B-AkCJqr9akdMOcG-PEV5AG6CgG7
 X-HPE-SCL: -1
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
  definitions=2026-10-30_06,2026-10-21_02,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 impostorscore=0 malwarescore=0 priorityscore=1501
- lowpriorityscore=0 bulkscore=0 phishscore=0 spamscore=0 suspectscore=0
- adultscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2610190000
- definitions=main-2610300083
+ malwarescore=0 bulkscore=0 lowpriorityscore=0 phishscore=0 suspectscore=0
+ clxscore=1015 priorityscore=1501 impostorscore=0 spamscore=0 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2610190000 definitions=main-2610300083
 
-Add the sysfs interface for logical devices, link groups, links, LLR,
-MAC, media, SerDes, SBus and PMI.  The many small files follow the
-one-attribute-per-file sysfs rule.
+Add the datapath: event and command queues, counting events, the ATU
+and ATS (address translation) layers, the RMU, the NTA and P2P/DMA
+mapping.
 
-Known open issue (Sashiko L14, V2): the SL sysfs tree (about 378
-attributes) has no Documentation/ABI entries yet. The attribute
-documentation, including which attributes are stable interfaces and
-which belong in debugfs, is being prepared with the hardware engineers
-and will be part of V2.
+When pinning user memory for buffers the device keeps mapped
+(event queues, counting event write-back), pages are now pinned with
+FOLL_LONGTERM, and event queue pages the device wrote are dirtied
+before they are unpinned so data written by the device is not lost on
+reclaim.  The counting event write-back path drops its page pin when
+the DMA mapping fails, so the PF and VF error paths do not leak it.
+
+cass_p2p.c refuses device memory when no GPU backend is registered;
+previously a missing backend left a NULL callback that was then
+called.  When EQ interrupts are re-attached all callback and data
+pointers are replaced, including with NULL, so a stale callback cannot
+be reused with a NULL interrupt object.
+
+The inbound-wait hardware failure latch lives in the per-adapter ATU
+state under the adapter's own mutex, so a failure on one NIC does not
+block waits on another.
+
+Known open issues in VF paths, deferred to the V2 SR-IOV update:
+
+- Sashiko H51: the VF CT and EQ free paths can leak their private
+  allocations when the PF does not reply.
+- Sashiko M48: cxi_cq_ack_counter_vf() returns a negative errno from the
+  PF mailbox through an unsigned counter API.
+- Sashiko M50: VF CQ free returns early on a PF RPC error while the
+  queue backing may still be DMA-active.
+
+Open hardware question (Sashiko H50, finding fixed): the DMAC wait is
+bounded, and the engine is disabled and its interrupt drained before the
+completion descriptor is read. Whether clearing C_PI_CFG_DMAC ENABLE
+guarantees that no further host writes occur is being confirmed with the
+hardware engineers. Current callers keep their DMA buffers for the
+lifetime of the device.
+
+Known limitation, deferred to V2: this patch carries SR-IOV
+virtual-function code (VF-to-PF mailbox requests, mailbox opcodes or VF
+resource handling) from an older, incomplete version of the Cassini
+SR-IOV support. V2 of this series will include the updated SR-IOV
+implementation, so issues in the VF paths should be ignored for now.
 
 checkpatch --strict (100 columns) still reports the following in this
 patch. They need coordination with the internal repositories this code
 is maintained in and will be fixed in V2:
-- WARNING: LONG_LINE (586), CONST_STRUCT (60), LONG_LINE_STRING (20)
-- CHECK: UNNECESSARY_PARENTHESES (63), BRACES (1)
+- WARNING: ALLOC_WITH_SIZEOF (19), BLOCK_COMMENT_STYLE (2),
+  SUSPECT_CODE_INDENT (2), AVOID_BUG (1), AVOID_EXTERNS (1),
+  DEPRECATED_API (1), LONG_LINE (1), VOLATILE (1)
+- CHECK: UNNECESSARY_PARENTHESES (13), COMPARISON_TO_NULL (12), BRACES
+  (4), BIT_MACRO (3), ALLOC_SIZEOF_STRUCT (2), MACRO_ARG_REUSE (2),
+  ASSIGNMENT_CONTINUATIONS (1), CAMELCASE (1), MACRO_ARG_PRECEDENCE (1),
+  OPEN_ENDED_LINE (1)
 
+Co-developed-by: Iraimani P <iraimani.pavadai@hpe.com>
+Signed-off-by: Iraimani P <iraimani.pavadai@hpe.com>
 Co-developed-by: Sandeep Bhoot <sandeep.bhoot@hpe.com>
 Signed-off-by: Sandeep Bhoot <sandeep.bhoot@hpe.com>
+Co-developed-by: Mamila Santosh <santosh-kumar.mamila@hpe.com>
+Signed-off-by: Mamila Santosh <santosh-kumar.mamila@hpe.com>
 Signed-off-by: Doug Ledford <doug.ledford@hpe.com>
 ---
- drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_ldev.c  |  410 ++++++
- drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_lgrp.c  |   98 ++
- .../ethernet/hpe/sl/sysfs/sl_sysfs_lgrp_config.c   |  438 ++++++
- .../ethernet/hpe/sl/sysfs/sl_sysfs_lgrp_policy.c   |   53 +
- drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link.c  |  830 +++++++++++
- .../net/ethernet/hpe/sl/sysfs/sl_sysfs_link_caps.c |  303 ++++
- .../ethernet/hpe/sl/sysfs/sl_sysfs_link_config.c   |  388 +++++
- .../ethernet/hpe/sl/sysfs/sl_sysfs_link_counters.c | 1498 ++++++++++++++++++++
- .../ethernet/hpe/sl/sysfs/sl_sysfs_link_degrade.c  |  336 +++++
- .../net/ethernet/hpe/sl/sysfs/sl_sysfs_link_fec.c  |  148 ++
- .../hpe/sl/sysfs/sl_sysfs_link_fec_current.c       |  336 +++++
- .../ethernet/hpe/sl/sysfs/sl_sysfs_link_fec_down.c |  316 +++++
- .../hpe/sl/sysfs/sl_sysfs_link_fec_mon_check.c     |  195 +++
- .../ethernet/hpe/sl/sysfs/sl_sysfs_link_fec_up.c   |  299 ++++
- .../hpe/sl/sysfs/sl_sysfs_link_fec_up_check.c      |  137 ++
- .../ethernet/hpe/sl/sysfs/sl_sysfs_link_pml_rec.c  |  193 +++
- .../ethernet/hpe/sl/sysfs/sl_sysfs_link_policy.c   |  261 ++++
- drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_llr.c   |  221 +++
- .../ethernet/hpe/sl/sysfs/sl_sysfs_llr_config.c    |  140 ++
- .../ethernet/hpe/sl/sysfs/sl_sysfs_llr_counters.c  |  397 ++++++
- .../ethernet/hpe/sl/sysfs/sl_sysfs_llr_loop_time.c |  221 +++
- .../ethernet/hpe/sl/sysfs/sl_sysfs_llr_policy.c    |   74 +
- drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_mac.c   |  192 +++
- .../ethernet/hpe/sl/sysfs/sl_sysfs_mac_counters.c  |  339 +++++
- drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_media.c | 1274 +++++++++++++++++
- .../hpe/sl/sysfs/sl_sysfs_media_counters.c         |  599 ++++++++
- drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_pmi.c   |   80 ++
- .../net/ethernet/hpe/sl/sysfs/sl_sysfs_pmi_rd.c    |  197 +++
- .../net/ethernet/hpe/sl/sysfs/sl_sysfs_pmi_wr.c    |  220 +++
- drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_sbus.c  |   89 ++
- .../net/ethernet/hpe/sl/sysfs/sl_sysfs_sbus_pmi.c  |   80 ++
- .../ethernet/hpe/sl/sysfs/sl_sysfs_sbus_pmi_rd.c   |  244 ++++
- .../ethernet/hpe/sl/sysfs/sl_sysfs_sbus_pmi_wr.c   |  244 ++++
- .../net/ethernet/hpe/sl/sysfs/sl_sysfs_sbus_rd.c   |  197 +++
- .../net/ethernet/hpe/sl/sysfs/sl_sysfs_sbus_rst.c  |  105 ++
- .../net/ethernet/hpe/sl/sysfs/sl_sysfs_sbus_wr.c   |  197 +++
- .../net/ethernet/hpe/sl/sysfs/sl_sysfs_serdes.c    |  302 ++++
- .../ethernet/hpe/sl/sysfs/sl_sysfs_serdes_eye.c    |  197 +++
- .../ethernet/hpe/sl/sysfs/sl_sysfs_serdes_lol.c    |  141 ++
- .../ethernet/hpe/sl/sysfs/sl_sysfs_serdes_los.c    |  142 ++
- .../hpe/sl/sysfs/sl_sysfs_serdes_settings.c        |  506 +++++++
- .../ethernet/hpe/sl/sysfs/sl_sysfs_serdes_state.c  |  121 ++
- .../hpe/sl/sysfs/sl_sysfs_serdes_swizzle.c         |  126 ++
- 43 files changed, 12884 insertions(+)
+ drivers/net/ethernet/hpe/ss1/cass_ats.c           |  299 +++
+ drivers/net/ethernet/hpe/ss1/cass_ats_inval.c     |   79 +
+ drivers/net/ethernet/hpe/ss1/cass_atu.c           | 2072 +++++++++++++++++++++
+ drivers/net/ethernet/hpe/ss1/cass_cq.c            | 1243 ++++++++++++
+ drivers/net/ethernet/hpe/ss1/cass_ct.c            |  639 +++++++
+ drivers/net/ethernet/hpe/ss1/cass_dmac.c          |  597 ++++++
+ drivers/net/ethernet/hpe/ss1/cass_eq.c            | 1518 +++++++++++++++
+ drivers/net/ethernet/hpe/ss1/cass_nta.c           | 1996 ++++++++++++++++++++
+ drivers/net/ethernet/hpe/ss1/cass_p2p.c           |  321 ++++
+ drivers/net/ethernet/hpe/ss1/cass_rmu.c           |  376 ++++
+ drivers/net/ethernet/hpe/ss1/cass_rmu_eth.c       | 1017 ++++++++++
+ drivers/net/ethernet/hpe/ss1/cass_rx_tx_profile.c |  104 ++
+ 12 files changed, 10261 insertions(+)
 
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_ldev.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_ldev.c
+diff --git a/drivers/net/ethernet/hpe/ss1/cass_ats.c b/drivers/net/ethernet/hpe/ss1/cass_ats.c
 new file mode 100644
-index 000000000000..9aac5aa41404
+index 000000000000..f1642317abb6
 --- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_ldev.c
-@@ -0,0 +1,410 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2024-2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+
-+#include <linux/hpe/sl/sl_media.h>
-+
-+#include "sl.h"
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "sl_ctrl_ldev.h"
-+#include "sl_module.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static const char *sl_cable_type_str(u32 type)
-+{
-+	switch (type) {
-+	case SL_CABLE_TYPE_PEC:
-+		return "PEC";
-+	case SL_CABLE_TYPE_AOC:
-+		return "AOC";
-+	case SL_CABLE_TYPE_POC:
-+		return "POC";
-+	case SL_CABLE_TYPE_AEC:
-+		return "AEC";
-+	default:
-+		return "unknown";
-+	}
-+}
-+
-+static ssize_t mod_ver_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_ldev *ctrl_ldev;
-+
-+	ctrl_ldev = container_of(kobj, struct sl_ctrl_ldev, sl_info_kobj);
-+
-+	sl_log_dbg(ctrl_ldev, LOG_BLOCK, LOG_NAME,
-+		   "mod ver show (ldev = 0x%p, ver = v%s)", ctrl_ldev, sl_version_str_get());
-+
-+	return sysfs_emit(buf, "v%s\n", sl_version_str_get());
-+}
-+
-+static ssize_t mod_hash_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_ldev *ctrl_ldev;
-+
-+	ctrl_ldev = container_of(kobj, struct sl_ctrl_ldev, sl_info_kobj);
-+
-+	sl_log_dbg(ctrl_ldev, LOG_BLOCK, LOG_NAME,
-+		   "mod hash show (ldev = 0x%p, hash = %s)", ctrl_ldev, sl_git_hash_str_get());
-+
-+	return sysfs_emit(buf, "%s\n", sl_git_hash_str_get());
-+}
-+
-+static struct kobj_attribute mod_ver  = __ATTR_RO(mod_ver);
-+static struct kobj_attribute mod_hash = __ATTR_RO(mod_hash);
-+
-+static struct attribute *ldev_attrs[] = {
-+	&mod_ver.attr,
-+	&mod_hash.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(ldev);
-+
-+static struct kobj_type sl_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = ldev_groups,
-+};
-+
-+static struct attribute *supported_cables_attrs[] = {
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(supported_cables);
-+
-+static struct kobj_type supported_cables_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = supported_cables_groups,
-+};
-+
-+static struct attribute *cable_types_attrs[] = {
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(cable_types);
-+
-+static struct kobj_type cable_types_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = cable_types_groups,
-+};
-+
-+static struct attribute *cable_vendors_attrs[] = {
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(cable_vendors);
-+
-+static struct kobj_type cable_vendors_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = cable_vendors_groups,
-+};
-+
-+static ssize_t length_cm_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_ldev_cable_hpe_pn_kobj *hpe_pn_kobj;
-+
-+	hpe_pn_kobj = container_of(kobj, struct sl_ctrl_ldev_cable_hpe_pn_kobj, kobj);
-+
-+	sl_log_dbg(hpe_pn_kobj->ctrl_ldev, LOG_BLOCK, LOG_NAME,
-+		   "length_cm show (ctrl_ldev = 0x%p, length_cm = %u)",
-+		   hpe_pn_kobj->ctrl_ldev, cable_db[hpe_pn_kobj->cable_idx].length_cm);
-+
-+	return sysfs_emit(buf, "%u\n", cable_db[hpe_pn_kobj->cable_idx].length_cm);
-+}
-+
-+static ssize_t max_speed_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_ldev_cable_hpe_pn_kobj *hpe_pn_kobj;
-+
-+	hpe_pn_kobj = container_of(kobj, struct sl_ctrl_ldev_cable_hpe_pn_kobj, kobj);
-+
-+	sl_log_dbg(hpe_pn_kobj->ctrl_ldev, LOG_BLOCK, LOG_NAME,
-+		   "max_speed show (ctrl_ldev = 0x%p, max_speed = %s)",
-+		   hpe_pn_kobj->ctrl_ldev, sl_media_speed_str(cable_db[hpe_pn_kobj->cable_idx].max_speed));
-+
-+	return sysfs_emit(buf, "%s\n", sl_media_speed_str(cable_db[hpe_pn_kobj->cable_idx].max_speed));
-+}
-+
-+static struct kobj_attribute cable_hpe_pn_length_cm = __ATTR_RO(length_cm);
-+static struct kobj_attribute cable_hpe_pn_max_speed = __ATTR_RO(max_speed);
-+
-+static struct attribute *cable_hpe_pn_attrs[] = {
-+	&cable_hpe_pn_length_cm.attr,
-+	&cable_hpe_pn_max_speed.attr,
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(cable_hpe_pn);
-+
-+static struct kobj_type cable_hpe_pns_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = cable_hpe_pn_groups,
-+};
-+
-+static void sl_sysfs_cable_types_delete(struct sl_ctrl_ldev *ctrl_ldev, int type_idx)
-+{
-+	int k;
-+
-+	sl_log_dbg(ctrl_ldev, LOG_BLOCK, LOG_NAME, "types delete");
-+
-+	for (k = 0; k < type_idx; ++k) {
-+		sl_log_dbg(ctrl_ldev, LOG_BLOCK, LOG_NAME, "types delete (type = %d)", k);
-+		kobject_put(&ctrl_ldev->cable_types_kobj[k]);
-+	}
-+}
-+
-+static int sl_sysfs_cable_types_create(struct sl_ctrl_ldev *ctrl_ldev)
-+{
-+	int type_idx;
-+	int rtn;
-+
-+	sl_log_dbg(ctrl_ldev, LOG_BLOCK, LOG_NAME, "types create");
-+
-+	for (type_idx = 0; type_idx < SL_CABLE_TYPES_NUM; ++type_idx) {
-+		sl_log_dbg(ctrl_ldev, LOG_BLOCK, LOG_NAME, "types create (type = %d)", type_idx);
-+		rtn = kobject_init_and_add(&ctrl_ldev->cable_types_kobj[type_idx],
-+					   &cable_types_info, &ctrl_ldev->supported_cables_kobj,
-+					   sl_cable_type_str(type_idx));
-+		if (rtn) {
-+			sl_log_err(ctrl_ldev, LOG_BLOCK, LOG_NAME,
-+				   "types create failed (type = %d) [%d]", type_idx, rtn);
-+			kobject_put(&ctrl_ldev->cable_types_kobj[type_idx]);
-+			sl_sysfs_cable_types_delete(ctrl_ldev, type_idx);
-+			return -ENOMEM;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+static void sl_sysfs_cable_vendors_delete(struct sl_ctrl_ldev *ctrl_ldev, int type_idx, int vendor_idx)
-+{
-+	int k;
-+	int l;
-+
-+	sl_log_dbg(ctrl_ldev, LOG_BLOCK, LOG_NAME, "vendors delete");
-+
-+	for (k = 0; k < type_idx; ++k) {
-+		for (l = 0; l < vendor_idx; ++l) {
-+			sl_log_dbg(ctrl_ldev, LOG_BLOCK, LOG_NAME,
-+				   "vendors delete (type = %d, vendor = %d)", k, l);
-+			kobject_put(&ctrl_ldev->cable_vendors_kobj[k][l]);
-+		}
-+	}
-+}
-+
-+static int sl_sysfs_cable_vendors_create(struct sl_ctrl_ldev *ctrl_ldev)
-+{
-+	int type_idx;
-+	int vendor_idx;
-+	int rtn;
-+	int x;
-+
-+	BUILD_BUG_ON((SL_MEDIA_VENDOR_AMPHENOL > 10) || (SL_CABLE_VENDORS_NUM > 10));
-+
-+	sl_log_dbg(ctrl_ldev, LOG_BLOCK, LOG_NAME, "vendors create");
-+
-+	for (type_idx = 0; type_idx < SL_CABLE_TYPES_NUM; ++type_idx) {
-+		for (vendor_idx = 0; vendor_idx < SL_CABLE_VENDORS_NUM; ++vendor_idx) {
-+			sl_log_dbg(ctrl_ldev, LOG_BLOCK, LOG_NAME,
-+				   "vendors create (type = %d, vendor = %d)", type_idx, vendor_idx);
-+			rtn = kobject_init_and_add(&ctrl_ldev->cable_vendors_kobj[type_idx][vendor_idx],
-+						   &cable_vendors_info, &ctrl_ldev->cable_types_kobj[type_idx],
-+						   sl_media_vendor_str(vendor_idx + SL_MEDIA_VENDOR_TE));
-+			if (rtn) {
-+				sl_log_err(ctrl_ldev, LOG_BLOCK, LOG_NAME,
-+					   "vendors create failed (type = %d, vendor = %d) [%d]",
-+					   type_idx, vendor_idx, rtn);
-+				kobject_put(&ctrl_ldev->cable_vendors_kobj[type_idx][vendor_idx]);
-+				for (x = 0; x < vendor_idx; ++x) {
-+					sl_log_dbg(ctrl_ldev, LOG_BLOCK, LOG_NAME,
-+						   "vendors create delete (type = %d, vendor = %d)", type_idx, x);
-+					kobject_put(&ctrl_ldev->cable_vendors_kobj[type_idx][x]);
-+				}
-+				sl_sysfs_cable_vendors_delete(ctrl_ldev, type_idx, SL_CABLE_VENDORS_NUM);
-+				sl_sysfs_cable_types_delete(ctrl_ldev, SL_CABLE_TYPES_NUM);
-+				return -ENOMEM;
-+			}
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+static void sl_sysfs_cable_db_delete(struct sl_ctrl_ldev *ctrl_ldev, int db_idx)
-+{
-+	int k;
-+
-+	sl_log_dbg(ctrl_ldev, LOG_BLOCK, LOG_NAME, "db delete");
-+
-+	for (k = 0; k < db_idx; ++k) {
-+		sl_log_dbg(ctrl_ldev, LOG_BLOCK, LOG_NAME, "db delete (idx = %d)", k);
-+		kobject_put(&ctrl_ldev->cable_hpe_pns_kobj[k].kobj);
-+	}
-+}
-+
-+static int sl_sysfs_cable_db_create(struct sl_ctrl_ldev *ctrl_ldev)
-+{
-+	char hpe_pn[SL_MEDIA_HPE_PN_SIZE + SL_MEDIA_VENDOR_PN_SIZE];
-+	int  i;
-+	int  type_kobj_num;
-+	int  rtn;
-+
-+	sl_log_dbg(ctrl_ldev, LOG_BLOCK, LOG_NAME, "db create");
-+
-+	for (i = 0; i < ARRAY_SIZE(cable_db); ++i) {
-+		sl_log_dbg(ctrl_ldev, LOG_BLOCK, LOG_NAME, "db create (idx = %d)", i);
-+		switch (cable_db[i].type) {
-+		case SL_MEDIA_TYPE_PEC:
-+			type_kobj_num = SL_CABLE_TYPE_PEC;
-+			break;
-+		case SL_MEDIA_TYPE_AOC:
-+			type_kobj_num = SL_CABLE_TYPE_AOC;
-+			break;
-+		case SL_MEDIA_TYPE_POC:
-+			type_kobj_num = SL_CABLE_TYPE_POC;
-+			break;
-+		case SL_MEDIA_TYPE_AEC:
-+			type_kobj_num = SL_CABLE_TYPE_AEC;
-+			break;
-+		default:
-+			sl_log_err(ctrl_ldev, LOG_BLOCK, LOG_NAME,
-+				   "unknown (type = %u)", cable_db[i].type);
-+			continue;
-+		}
-+		ctrl_ldev->cable_hpe_pns_kobj[i].ctrl_ldev = ctrl_ldev;
-+		ctrl_ldev->cable_hpe_pns_kobj[i].cable_idx = i;
-+		snprintf(hpe_pn, sizeof(hpe_pn), "%u_%s", cable_db[i].hpe_pn, cable_db[i].vendor_pn_str);
-+		rtn = kobject_init_and_add(&ctrl_ldev->cable_hpe_pns_kobj[i].kobj, &cable_hpe_pns_info,
-+					   &ctrl_ldev->cable_vendors_kobj[type_kobj_num][cable_db[i].vendor - SL_MEDIA_VENDOR_TE],
-+					   hpe_pn);
-+		if (rtn) {
-+			sl_log_err(ctrl_ldev, LOG_BLOCK, LOG_NAME,
-+				   "hpe_pn create failed (idx = %d, type = 0x%X %s, vendor = %u %s, len = %ucm, hpe_pn = %u) [%d]",
-+				   i, cable_db[i].type, sl_media_type_str(cable_db[i].type),
-+				   cable_db[i].vendor, sl_media_vendor_str(cable_db[i].vendor),
-+				   cable_db[i].length_cm, cable_db[i].hpe_pn, rtn);
-+			kobject_put(&ctrl_ldev->cable_hpe_pns_kobj[i].kobj);
-+			sl_sysfs_cable_db_delete(ctrl_ldev, i);
-+			sl_sysfs_cable_vendors_delete(ctrl_ldev, SL_CABLE_TYPES_NUM, SL_CABLE_VENDORS_NUM);
-+			sl_sysfs_cable_types_delete(ctrl_ldev, SL_CABLE_TYPES_NUM);
-+			return -ENOMEM;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+static int sl_sysfs_cable_info_create(struct sl_ctrl_ldev *ctrl_ldev)
-+{
-+	int rtn;
-+
-+	sl_log_dbg(ctrl_ldev, LOG_BLOCK, LOG_NAME, "cable info create (ldev = 0x%p)", ctrl_ldev);
-+
-+	rtn = kobject_init_and_add(&ctrl_ldev->supported_cables_kobj, &supported_cables_info,
-+				   ctrl_ldev->parent_kobj, "supported_cables");
-+	if (rtn) {
-+		sl_log_err(ctrl_ldev, LOG_BLOCK, LOG_NAME, "supported cables create failed [%d]", rtn);
-+		kobject_put(&ctrl_ldev->supported_cables_kobj);
-+		return -ENOMEM;
-+	}
-+
-+	rtn = sl_sysfs_cable_types_create(ctrl_ldev);
-+	if (rtn) {
-+		sl_log_err(ctrl_ldev, LOG_BLOCK, LOG_NAME, "cable types create failed [%d]", rtn);
-+		kobject_put(&ctrl_ldev->supported_cables_kobj);
-+		return rtn;
-+	}
-+
-+	rtn = sl_sysfs_cable_vendors_create(ctrl_ldev);
-+	if (rtn) {
-+		sl_log_err(ctrl_ldev, LOG_BLOCK, LOG_NAME, "cable vendors create failed [%d]", rtn);
-+		kobject_put(&ctrl_ldev->supported_cables_kobj);
-+		return rtn;
-+	}
-+
-+	rtn = sl_sysfs_cable_db_create(ctrl_ldev);
-+	if (rtn) {
-+		sl_log_err(ctrl_ldev, LOG_BLOCK, LOG_NAME, "cable db create failed [%d]", rtn);
-+		kobject_put(&ctrl_ldev->supported_cables_kobj);
-+		return rtn;
-+	}
-+
-+	return 0;
-+}
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_ldev_create(u8 ldev_num, struct kobject *parent)
-+{
-+#ifdef CONFIG_SYSFS
-+	int                 rtn;
-+	struct sl_ctrl_ldev *ctrl_ldev;
-+
-+	ctrl_ldev = sl_ctrl_ldev_get(ldev_num);
-+	if (!ctrl_ldev) {
-+		sl_log_err(NULL, LOG_BLOCK, LOG_NAME, "sysfs create ldev not found (ldev_num = %u)", ldev_num);
-+		return -EBADRQC;
-+	}
-+
-+	if (!sl_ctrl_ldev_kref_get_unless_zero(ctrl_ldev)) {
-+		sl_log_err(ctrl_ldev, LOG_BLOCK, LOG_NAME,
-+			   "kref_get_unless_zero failed (ldev = 0x%p)", ctrl_ldev);
-+		return -EBADRQC;
-+	}
-+
-+	sl_log_dbg(ctrl_ldev, LOG_BLOCK, LOG_NAME, "ldev create (ldev = 0x%p)", ctrl_ldev);
-+
-+	if (ctrl_ldev->is_sysfs_ok) {
-+		rtn = 0;
-+		goto out;
-+	}
-+
-+	ctrl_ldev->parent_kobj = parent;
-+	ctrl_ldev->is_sysfs_ok = false;
-+
-+	rtn = kobject_init_and_add(&(ctrl_ldev->sl_info_kobj), &sl_info, ctrl_ldev->parent_kobj, "sl_info");
-+	if (rtn) {
-+		sl_log_err(ctrl_ldev, LOG_BLOCK, LOG_NAME, "sl_info create failed [%d]", rtn);
-+		kobject_put(&ctrl_ldev->sl_info_kobj);
-+		rtn = -ENOMEM;
-+		goto out;
-+	}
-+
-+	rtn = sl_sysfs_cable_info_create(ctrl_ldev);
-+	if (rtn) {
-+		sl_log_err(ctrl_ldev, LOG_BLOCK, LOG_NAME, "cable info create failed [%d]", rtn);
-+		kobject_put(&ctrl_ldev->sl_info_kobj);
-+		goto out;
-+	}
-+
-+	ctrl_ldev->is_sysfs_ok = true;
-+	rtn = 0;
-+
-+out:
-+	sl_ctrl_ldev_put(ctrl_ldev);
-+
-+	return rtn;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_ldev_delete(struct sl_ctrl_ldev *ctrl_ldev)
-+{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_ldev, LOG_BLOCK, LOG_NAME, "ldev delete (ldev = 0x%p)", ctrl_ldev);
-+
-+	if (!ctrl_ldev->parent_kobj)
-+		return;
-+	if (!ctrl_ldev->is_sysfs_ok)
-+		return;
-+
-+	sl_sysfs_cable_db_delete(ctrl_ldev, ARRAY_SIZE(cable_db));
-+	sl_sysfs_cable_vendors_delete(ctrl_ldev, SL_CABLE_TYPES_NUM, SL_CABLE_VENDORS_NUM);
-+	sl_sysfs_cable_types_delete(ctrl_ldev, SL_CABLE_TYPES_NUM);
-+
-+	kobject_put(&ctrl_ldev->supported_cables_kobj);
-+	kobject_put(&ctrl_ldev->sl_info_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_lgrp.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_lgrp.c
-new file mode 100644
-index 000000000000..f0533c8fd888
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_lgrp.c
-@@ -0,0 +1,98 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2023,2024,2025 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/kobject.h>
-+
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "sl_ctrl_lgrp.h"
-+#include "sl_core_link.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+int sl_sysfs_lgrp_create(struct sl_ctrl_lgrp *ctrl_lgrp)
-+{
-+	int rtn;
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "lgrp create (lgrp = 0x%p)", ctrl_lgrp);
-+
-+	if (!ctrl_lgrp->parent_kobj) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "lgrp create missing parent");
-+		return -EBADRQC;
-+	}
-+
-+	rtn = sl_sysfs_lgrp_config_create(ctrl_lgrp);
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "config create failed [%d]", rtn);
-+		return -ENOMEM;
-+	}
-+
-+	rtn = sl_sysfs_lgrp_policy_create(ctrl_lgrp);
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "policy create failed [%d]", rtn);
-+		goto out_config;
-+	}
-+
-+	rtn = sl_sysfs_serdes_create(ctrl_lgrp);
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "serdes create failed [%d]", rtn);
-+		goto out_policy;
-+	}
-+
-+	rtn = sl_sysfs_media_create(ctrl_lgrp);
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media create failed [%d]", rtn);
-+		goto out_serdes;
-+	}
-+
-+	rtn = sl_sysfs_pmi_create(ctrl_lgrp);
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "pmi create failed [%d]", rtn);
-+		goto out_media;
-+	}
-+
-+	rtn = sl_sysfs_sbus_create(ctrl_lgrp);
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus create failed [%d]", rtn);
-+		goto out_pmi;
-+	}
-+
-+	rtn = sl_sysfs_sbus_pmi_create(ctrl_lgrp);
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi create failed [%d]", rtn);
-+		goto out_sbus;
-+	}
-+
-+	return 0;
-+
-+out_sbus:
-+	sl_sysfs_sbus_delete(ctrl_lgrp);
-+out_pmi:
-+	sl_sysfs_pmi_delete(ctrl_lgrp);
-+out_media:
-+	sl_sysfs_media_delete(ctrl_lgrp);
-+out_serdes:
-+	sl_sysfs_serdes_delete(ctrl_lgrp);
-+out_policy:
-+	sl_sysfs_lgrp_policy_delete(ctrl_lgrp);
-+out_config:
-+	sl_sysfs_lgrp_config_delete(ctrl_lgrp);
-+	return -ENOMEM;
-+}
-+
-+void sl_sysfs_lgrp_delete(struct sl_ctrl_lgrp *ctrl_lgrp)
-+{
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "lgrp delete (lgrp = 0x%p)", ctrl_lgrp);
-+
-+	if (!ctrl_lgrp->parent_kobj)
-+		return;
-+
-+	sl_sysfs_sbus_pmi_delete(ctrl_lgrp);
-+	sl_sysfs_sbus_delete(ctrl_lgrp);
-+	sl_sysfs_pmi_delete(ctrl_lgrp);
-+	sl_sysfs_media_delete(ctrl_lgrp);
-+	sl_sysfs_serdes_delete(ctrl_lgrp);
-+	sl_sysfs_lgrp_policy_delete(ctrl_lgrp);
-+	sl_sysfs_lgrp_config_delete(ctrl_lgrp);
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_lgrp_config.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_lgrp_config.c
-new file mode 100644
-index 000000000000..b2181e5114ee
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_lgrp_config.c
-@@ -0,0 +1,438 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2024-2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+#include <linux/hpe/sl/sl_lgrp.h>
-+
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "data/sl_ctrl_data_lgrp.h"
-+#include "data/sl_ctrl_data_lgrp_trace.h"
-+
-+#define is_flag_set(_flags, _flag) ({              \
-+		typeof(_flags) __flags = (_flags); \
-+		typeof(_flag)  __flag  = (_flag);  \
-+						   \
-+		((__flags & __flag) == __flag);    \
-+})
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t mfs_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	u32                  mfs;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, config_kobj);
-+
-+	rtn = sl_ctrl_data_lgrp_mfs_get(ctrl_lgrp, &mfs);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "mfs show (mfs = %u)", mfs);
-+
-+	return sysfs_emit(buf, "%u\n", mfs);
-+}
-+
-+static ssize_t furcation_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	u32                  furcation;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, config_kobj);
-+
-+	rtn = sl_ctrl_data_lgrp_furcation_get(ctrl_lgrp, &furcation);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "furcation show (furcation = %u %s)",
-+		   furcation, sl_lgrp_furcation_str(furcation));
-+
-+	return sysfs_emit(buf, "%s\n", sl_lgrp_furcation_str(furcation));
-+}
-+
-+static ssize_t fec_mode_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	u32                  fec_mode;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, config_kobj);
-+
-+	rtn = sl_ctrl_data_lgrp_fec_mode_get(ctrl_lgrp, &fec_mode);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "fec mode show (mode = %u %s)",
-+		   fec_mode, sl_lgrp_fec_mode_str(fec_mode));
-+
-+	return sysfs_emit(buf, "%s\n", sl_lgrp_fec_mode_str(fec_mode));
-+}
-+
-+static ssize_t tech_map_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	int                  idx;
-+	char                 output[50];
-+	u32                  tech_map;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, config_kobj);
-+
-+	rtn = sl_ctrl_data_lgrp_tech_map_get(ctrl_lgrp, &tech_map);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "tech map show (map = 0x%X)", tech_map);
-+
-+	if (tech_map == 0)
-+		return sysfs_emit(buf, "none\n");
-+
-+	idx = 0;
-+	if (is_flag_set(tech_map, SL_LGRP_CONFIG_TECH_CK_400G))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_lgrp_config_tech_str(SL_LGRP_CONFIG_TECH_CK_400G));
-+	if (is_flag_set(tech_map, SL_LGRP_CONFIG_TECH_CK_200G))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_lgrp_config_tech_str(SL_LGRP_CONFIG_TECH_CK_200G));
-+	if (is_flag_set(tech_map, SL_LGRP_CONFIG_TECH_CK_100G))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_lgrp_config_tech_str(SL_LGRP_CONFIG_TECH_CK_100G));
-+	if (is_flag_set(tech_map, SL_LGRP_CONFIG_TECH_BS_200G))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_lgrp_config_tech_str(SL_LGRP_CONFIG_TECH_BS_200G));
-+	if (is_flag_set(tech_map, SL_LGRP_CONFIG_TECH_CD_100G))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_lgrp_config_tech_str(SL_LGRP_CONFIG_TECH_CD_100G));
-+	if (is_flag_set(tech_map, SL_LGRP_CONFIG_TECH_CD_50G))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_lgrp_config_tech_str(SL_LGRP_CONFIG_TECH_CD_50G));
-+	if (is_flag_set(tech_map, SL_LGRP_CONFIG_TECH_BJ_100G))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_lgrp_config_tech_str(SL_LGRP_CONFIG_TECH_BJ_100G));
-+	if (!idx)
-+		return sysfs_emit(buf, "none\n");
-+	output[idx - 1] = '\0';
-+
-+	return sysfs_emit(buf, "%s\n", output);
-+}
-+
-+static ssize_t fec_map_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	int                  idx;
-+	char                 output[20];
-+	u32                  fec_map;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, config_kobj);
-+
-+	rtn = sl_ctrl_data_lgrp_fec_map_get(ctrl_lgrp, &fec_map);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "fec map show (map = 0x%X)", fec_map);
-+
-+	if (fec_map == 0)
-+		return sysfs_emit(buf, "none\n");
-+
-+	idx = 0;
-+	if (is_flag_set(fec_map, SL_LGRP_CONFIG_FEC_RS_LL))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_lgrp_config_fec_str(SL_LGRP_CONFIG_FEC_RS_LL));
-+	if (is_flag_set(fec_map, SL_LGRP_CONFIG_FEC_RS))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_lgrp_config_fec_str(SL_LGRP_CONFIG_FEC_RS));
-+	if (!idx)
-+		return sysfs_emit(buf, "none\n");
-+	output[idx - 1] = '\0';
-+
-+	return sysfs_emit(buf, "%s\n", output);
-+}
-+
-+static ssize_t link_type_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	u32                  options;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, config_kobj);
-+
-+	rtn = sl_ctrl_data_lgrp_options_get(ctrl_lgrp, &options);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	if (options & SL_LGRP_CONFIG_OPT_FABRIC)
-+		return sysfs_emit(buf, "fabric\n");
-+
-+	return sysfs_emit(buf, "edge\n");
-+}
-+
-+static ssize_t loopback_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	u32                  options;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, config_kobj);
-+
-+	rtn = sl_ctrl_data_lgrp_options_get(ctrl_lgrp, &options);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "loopback show (options = 0x%X)", options);
-+
-+	if (options & SL_LGRP_CONFIG_OPT_SERDES_LOOPBACK_ENABLE)
-+		return sysfs_emit(buf, "enabled-serdes\n");
-+
-+	return sysfs_emit(buf, "disabled\n");
-+}
-+
-+static struct kobj_attribute lgrp_mfs       = __ATTR_RO(mfs);
-+static struct kobj_attribute lgrp_furcation = __ATTR_RO(furcation);
-+static struct kobj_attribute lgrp_fec_mode  = __ATTR_RO(fec_mode);
-+static struct kobj_attribute lgrp_tech_map  = __ATTR_RO(tech_map);
-+static struct kobj_attribute lgrp_fec_map   = __ATTR_RO(fec_map);
-+static struct kobj_attribute lgrp_link_type = __ATTR_RO(link_type);
-+static struct kobj_attribute lgrp_loopback  = __ATTR_RO(loopback);
-+
-+static ssize_t err_trace_enable_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	bool                 is_err_trace_enabled;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, config_kobj);
-+
-+	rtn = sl_ctrl_data_lgrp_is_err_trace_enabled(ctrl_lgrp, &is_err_trace_enabled);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "err trace enable show (is_err_trace_enabled = %u)", is_err_trace_enabled);
-+
-+	return sysfs_emit(buf, "%u\n", is_err_trace_enabled);
-+}
-+
-+static ssize_t err_trace_enable_store(struct kobject *kobj, struct kobj_attribute *kattr, const char *buf, size_t count)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	u8                   val;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, config_kobj);
-+
-+	rtn = kstrtou8(buf, 0, &val);
-+	if (rtn) {
-+		sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+			   "err trace enable store failed [%d]", rtn);
-+		return rtn;
-+	}
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "err trace enable store (val = %u)", val);
-+
-+	rtn = sl_ctrl_data_lgrp_err_trace_enable_set(ctrl_lgrp, val);
-+	if (rtn) {
-+		sl_log_err_trace(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+				 "err trace enable store failed [%d]", rtn);
-+		return rtn;
-+	}
-+
-+	return count;
-+}
-+
-+static struct kobj_attribute lgrp_err_trace_enable = __ATTR_RW(err_trace_enable);
-+
-+static ssize_t warn_trace_enable_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	bool                 is_warn_trace_enabled;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, config_kobj);
-+
-+	rtn = sl_ctrl_data_lgrp_is_warn_trace_enabled(ctrl_lgrp, &is_warn_trace_enabled);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "warn trace enable show (is_warn_trace_enabled = %u)",
-+		   is_warn_trace_enabled);
-+
-+	return sysfs_emit(buf, "%u\n", is_warn_trace_enabled);
-+}
-+
-+static ssize_t warn_trace_enable_store(struct kobject *kobj, struct kobj_attribute *kattr,
-+				       const char *buf, size_t count)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	u8                   val;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, config_kobj);
-+
-+	rtn = kstrtou8(buf, 0, &val);
-+	if (rtn) {
-+		sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+			   "warn trace enable store failed [%d]", rtn);
-+		return rtn;
-+	}
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "warn trace enable store (val = %u)", val);
-+
-+	rtn = sl_ctrl_data_lgrp_warn_trace_set(ctrl_lgrp, val);
-+	if (rtn) {
-+		sl_log_err_trace(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+				 "warn trace enable store failed [%d]", rtn);
-+		return rtn;
-+	}
-+
-+	return count;
-+}
-+
-+static struct kobj_attribute lgrp_warn_trace_enable = __ATTR_RW(warn_trace_enable);
-+
-+static ssize_t serdes_lane_io_trace_enable_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	bool                 serdes_lane_io_trace;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, config_kobj);
-+
-+	serdes_lane_io_trace = sl_ctrl_data_lgrp_is_serdes_lane_io_trace_enabled(ctrl_lgrp);
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "core init io trace enable show (serdes_lane_io_trace = %s)",
-+		   serdes_lane_io_trace ? "enabled" : "disabled");
-+
-+	return sysfs_emit(buf, "%u\n", serdes_lane_io_trace ? 1 : 0);
-+}
-+
-+static ssize_t serdes_lane_io_trace_enable_store(struct kobject *kobj, struct kobj_attribute *kattr,
-+						 const char *buf, size_t count)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	u8                   val;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, config_kobj);
-+
-+	rtn = kstrtou8(buf, 0, &val);
-+	if (rtn) {
-+		sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+			   "core init io trace enable store failed [%d]", rtn);
-+		return rtn;
-+	}
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "core init io trace enable store (val = %u)", val);
-+
-+	rtn = sl_ctrl_data_lgrp_serdes_lane_io_trace_set(ctrl_lgrp, (val == 1) ? true : false);
-+	if (rtn) {
-+		sl_log_err_trace(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+				 "core init io trace enable store failed [%d]", rtn);
-+		return rtn;
-+	}
-+
-+	return count;
-+}
-+
-+static struct kobj_attribute lgrp_serdes_lane_io_trace_enable = __ATTR_RW(serdes_lane_io_trace_enable);
-+
-+static ssize_t fabric_link_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	u32                  options;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, config_kobj);
-+
-+	rtn = sl_ctrl_data_lgrp_options_get(ctrl_lgrp, &options);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "fabric link show (fabric link = %s)",
-+		   (options & SL_LGRP_CONFIG_OPT_FABRIC) ? "enabled" : "disabled");
-+
-+	return sysfs_emit(buf, "%s\n",
-+			 (options & SL_LGRP_CONFIG_OPT_FABRIC) ? "enabled" : "disabled");
-+}
-+
-+static struct kobj_attribute lgrp_fabric_link = __ATTR_RO(fabric_link);
-+
-+static ssize_t r1_partner_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	u32                  options;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, config_kobj);
-+
-+	rtn = sl_ctrl_data_lgrp_options_get(ctrl_lgrp, &options);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "r1 partner show (r1 partner = %s)",
-+		   (options & SL_LGRP_CONFIG_OPT_R1) ? "enabled" : "disabled");
-+
-+	return sysfs_emit(buf, "%s\n", (options & SL_LGRP_CONFIG_OPT_R1) ? "enabled" : "disabled");
-+}
-+
-+static struct kobj_attribute lgrp_r1_partner  = __ATTR_RO(r1_partner);
-+
-+static struct attribute *lgrp_config_attrs[] = {
-+	&lgrp_mfs.attr,
-+	&lgrp_furcation.attr,
-+	&lgrp_fec_mode.attr,
-+	&lgrp_tech_map.attr,
-+	&lgrp_fec_map.attr,
-+	&lgrp_link_type.attr,
-+	&lgrp_loopback.attr,
-+	&lgrp_err_trace_enable.attr,
-+	&lgrp_warn_trace_enable.attr,
-+	&lgrp_serdes_lane_io_trace_enable.attr,
-+	&lgrp_fabric_link.attr,
-+	&lgrp_r1_partner.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(lgrp_config);
-+
-+static struct kobj_type config_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = lgrp_config_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_lgrp_config_create(struct sl_ctrl_lgrp *ctrl_lgrp)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "lgrp config create (lgrp = 0x%p)", ctrl_lgrp);
-+
-+	rtn = kobject_init_and_add(&(ctrl_lgrp->config_kobj), &config_info, ctrl_lgrp->parent_kobj, "config");
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "lgrp config create failed [%d]", rtn);
-+		kobject_put(&(ctrl_lgrp->config_kobj));
-+		return -ENOMEM;
-+	}
-+
-+	return 0;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_lgrp_config_delete(struct sl_ctrl_lgrp *ctrl_lgrp)
-+{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "lgrp config delete (lgrp = 0x%p)", ctrl_lgrp);
-+
-+	kobject_put(&(ctrl_lgrp->config_kobj));
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_lgrp_policy.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_lgrp_policy.c
-new file mode 100644
-index 000000000000..ccb9bf627ee4
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_lgrp_policy.c
-@@ -0,0 +1,53 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2024-2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/kobject.h>
-+
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "sl_ctrl_lgrp.h"
-+#include "sl_core_link.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static struct attribute *lgrp_policy_attrs[] = {
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(lgrp_policy);
-+
-+static struct kobj_type policy_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = lgrp_policy_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_lgrp_policy_create(struct sl_ctrl_lgrp *ctrl_lgrp)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "lgrp policy create (lgrp = 0x%p)", ctrl_lgrp);
-+
-+	rtn = kobject_init_and_add(&(ctrl_lgrp->policy_kobj), &policy_info, ctrl_lgrp->parent_kobj, "policies");
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "lgrp policy create failed [%d]", rtn);
-+		kobject_put(&(ctrl_lgrp->policy_kobj));
-+		return -ENOMEM;
-+	}
-+
-+	return 0;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_lgrp_policy_delete(struct sl_ctrl_lgrp *ctrl_lgrp)
-+{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "lgrp policy delete (lgrp = 0x%p)", ctrl_lgrp);
-+
-+	kobject_put(&(ctrl_lgrp->policy_kobj));
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link.c
-new file mode 100644
-index 000000000000..df0f51c5f77e
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link.c
-@@ -0,0 +1,830 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2023-2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "data/sl_ctrl_data_link.h"
-+#include "sl_ctrl_link.h"
-+#include "sl_ctrl_lgrp.h"
-+#include "sl_ctrl_ldev.h"
-+#include "sl_core_link.h"
-+#include "sl_core_str.h"
-+#include "hw/sl_core_hw_an.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t state_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  state;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, kobj);
-+
-+	rtn = sl_ctrl_data_link_state_get(ctrl_link, &state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "state show (link = 0x%p, state = %u %s)", ctrl_link, state, sl_link_state_str(state));
-+
-+	return sysfs_emit(buf, "%s\n", sl_link_state_str(state));
-+}
-+
-+static ssize_t speed_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  state;
-+	u32                  speed;
-+	int		     rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, kobj);
-+
-+	rtn = sl_ctrl_link_state_get_cmd(ctrl_link->ctrl_lgrp->ctrl_ldev->num,
-+					 ctrl_link->ctrl_lgrp->num, ctrl_link->num, &state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	rtn = sl_core_link_speed_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num,
-+				     ctrl_link->ctrl_lgrp->num, ctrl_link->num, &speed);
-+	if (rtn == -ENOLINK)
-+		return sysfs_emit(buf, "no-link\n");
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "speed show (state = %u %s, speed = 0x%X %s)",
-+		   state, sl_link_state_str(state), speed, sl_lgrp_config_tech_str(speed));
-+
-+	if ((state != SL_LINK_STATE_UP) && (state != SL_LINK_STATE_UP_DOWN_REQ))
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	return sysfs_emit(buf, "%s\n", sl_lgrp_config_tech_str(speed));
-+}
-+
-+static ssize_t ccw_warn_limit_crossed_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	bool                 is_limit_crossed;
-+	time64_t             limit_crossed_time;
-+	int		     rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, kobj);
-+
-+	rtn = sl_core_link_ccw_warn_limit_crossed_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num, ctrl_link->ctrl_lgrp->num,
-+						      ctrl_link->num, &is_limit_crossed, &limit_crossed_time);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "ccw warn limit crossed show (is_limit_crossed = %d %s)", is_limit_crossed,
-+		is_limit_crossed ? "yes" : "no");
-+
-+	return sysfs_emit(buf, "%s\n", is_limit_crossed ? "yes" : "no");
-+}
-+
-+static ssize_t ccw_warn_limit_last_crossed_time_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	bool                 is_limit_crossed;
-+	time64_t             limit_crossed_time;
-+	int		     rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, kobj);
-+
-+	rtn = sl_core_link_ccw_warn_limit_crossed_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num, ctrl_link->ctrl_lgrp->num,
-+						      ctrl_link->num, &is_limit_crossed, &limit_crossed_time);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "ccw warn limit last crossed time show (is_limit_crossed = 0x%X, time = %lld %ptTt %ptTd)",
-+		is_limit_crossed, limit_crossed_time, &limit_crossed_time, &limit_crossed_time);
-+
-+	if (!is_limit_crossed)
-+		return sysfs_emit(buf, "not-crossed\n");
-+
-+	return sysfs_emit(buf, "%ptTt %ptTd\n", &limit_crossed_time, &limit_crossed_time);
-+}
-+
-+static ssize_t ucw_warn_limit_crossed_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	bool                 is_limit_crossed;
-+	time64_t             limit_crossed_time;
-+	int		     rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, kobj);
-+
-+	rtn = sl_core_link_ucw_warn_limit_crossed_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num, ctrl_link->ctrl_lgrp->num,
-+						      ctrl_link->num, &is_limit_crossed, &limit_crossed_time);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "ucw warn limit crossed show (is_limit_crossed = %d %s)", is_limit_crossed,
-+		is_limit_crossed ? "yes" : "no");
-+
-+	return sysfs_emit(buf, "%s\n", is_limit_crossed ? "yes" : "no");
-+}
-+
-+static ssize_t ucw_warn_limit_last_crossed_time_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	bool                 is_limit_crossed;
-+	time64_t             limit_crossed_time;
-+	int		     rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, kobj);
-+
-+	rtn = sl_core_link_ucw_warn_limit_crossed_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num, ctrl_link->ctrl_lgrp->num,
-+						      ctrl_link->num, &is_limit_crossed, &limit_crossed_time);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "ucw warn limit last crossed time show (is_limit_crossed = 0x%X, time = %lld %ptTt %ptTd)",
-+		is_limit_crossed, limit_crossed_time, &limit_crossed_time, &limit_crossed_time);
-+
-+	if (!is_limit_crossed)
-+		return sysfs_emit(buf, "not-crossed\n");
-+
-+	return sysfs_emit(buf, "%ptTt %ptTd\n", &limit_crossed_time, &limit_crossed_time);
-+}
-+
-+static ssize_t up_count_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  up_count;
-+	int		     rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, kobj);
-+
-+	rtn = sl_ctrl_link_up_count_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num, ctrl_link->ctrl_lgrp->num,
-+					ctrl_link->num, &up_count);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "up count show (up_count = %u)", up_count);
-+
-+	return sysfs_emit(buf, "%u\n", up_count);
-+}
-+
-+static ssize_t time_to_link_up_ms_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	u32                  state;
-+	struct sl_ctrl_link *ctrl_link;
-+	s64                  attempt_time_ms;
-+	s64                  total_time_ms;
-+	s64                  up_time_ms;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, kobj);
-+
-+	rtn = sl_ctrl_data_link_state_get(ctrl_link, &state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	if ((state != SL_LINK_STATE_UP) && (state != SL_LINK_STATE_UP_DOWN_REQ))
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	rtn = sl_ctrl_link_up_clocks_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num, ctrl_link->ctrl_lgrp->num,
-+					 ctrl_link->num, &attempt_time_ms, &total_time_ms, &up_time_ms);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "time to link up show (attempt_time = %lldms, total_time = %lldms)",
-+		   attempt_time_ms, total_time_ms);
-+
-+	return sysfs_emit(buf, "%lld\n", attempt_time_ms);
-+}
-+
-+static ssize_t total_time_to_link_up_ms_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	u32                  state;
-+	struct sl_ctrl_link *ctrl_link;
-+	s64                  attempt_time_ms;
-+	s64                  total_time_ms;
-+	s64                  up_time_ms;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, kobj);
-+
-+	rtn = sl_ctrl_data_link_state_get(ctrl_link, &state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	if ((state != SL_LINK_STATE_UP) && (state != SL_LINK_STATE_UP_DOWN_REQ))
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	rtn = sl_ctrl_link_up_clocks_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num, ctrl_link->ctrl_lgrp->num,
-+					 ctrl_link->num, &attempt_time_ms, &total_time_ms, &up_time_ms);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "total time to link up show (attempt_time = %lldms, total_time = %lldms)",
-+		   attempt_time_ms, total_time_ms);
-+
-+	return sysfs_emit(buf, "%lld\n", total_time_ms);
-+}
-+
-+static ssize_t up_time_ms_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	u32                  state;
-+	struct sl_ctrl_link *ctrl_link;
-+	s64                  attempt_time_ms;
-+	s64                  total_time_ms;
-+	s64                  up_time_ms;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, kobj);
-+
-+	rtn = sl_ctrl_data_link_state_get(ctrl_link, &state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	if ((state != SL_LINK_STATE_UP) && (state != SL_LINK_STATE_UP_DOWN_REQ))
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	rtn = sl_ctrl_link_up_clocks_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num, ctrl_link->ctrl_lgrp->num,
-+					 ctrl_link->num, &attempt_time_ms, &total_time_ms, &up_time_ms);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "up time show (up_time = %lldms)", up_time_ms);
-+
-+	return sysfs_emit(buf, "%lld\n", up_time_ms);
-+}
-+
-+static ssize_t lp_caps_state_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	u32                  lp_caps_state;
-+	struct sl_ctrl_link *ctrl_link;
-+	int		     rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, kobj);
-+
-+	rtn = sl_ctrl_link_an_lp_caps_state_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num, ctrl_link->ctrl_lgrp->num,
-+						ctrl_link->num, &lp_caps_state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "an lp caps state show (lp_caps_state = %u %s)",
-+		   lp_caps_state, sl_link_an_lp_caps_state_str(lp_caps_state));
-+
-+	return sysfs_emit(buf, "%s\n", sl_link_an_lp_caps_state_str(lp_caps_state));
-+}
-+
-+static ssize_t last_autoneg_fail_cause_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  fail_cause;
-+	time64_t             fail_time;
-+	int		     rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, kobj);
-+
-+	rtn = sl_ctrl_link_an_fail_cause_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num, ctrl_link->ctrl_lgrp->num,
-+					     ctrl_link->num, &fail_cause, &fail_time);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "last autoneg fail casue show (cause = %u %s)",
-+		   fail_cause, sl_core_link_an_fail_cause_str(fail_cause));
-+
-+	if (fail_cause == SL_CORE_HW_AN_FAIL_CAUSE_NONE)
-+		return sysfs_emit(buf, "no-fail\n");
-+
-+	return sysfs_emit(buf, "%s\n", sl_core_link_an_fail_cause_str(fail_cause));
-+}
-+
-+static ssize_t last_autoneg_fail_time_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  fail_cause;
-+	time64_t             fail_time;
-+	int		     rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, kobj);
-+
-+	rtn = sl_ctrl_link_an_fail_cause_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num, ctrl_link->ctrl_lgrp->num,
-+					     ctrl_link->num, &fail_cause, &fail_time);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "last autoneg fail time show (cause = %u %s, time = %lld %ptTt %ptTd)",
-+		   fail_cause, sl_core_link_an_fail_cause_str(fail_cause), fail_time, &fail_time, &fail_time);
-+
-+	if (fail_cause == SL_CORE_HW_AN_FAIL_CAUSE_NONE)
-+		return sysfs_emit(buf, "no-fail\n");
-+
-+	return sysfs_emit(buf, "%ptTt %ptTd\n", &fail_time, &fail_time);
-+}
-+
-+static ssize_t info_map_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	u64                  info_map;
-+	char                 info_map_str[900];
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, kobj);
-+
-+	rtn = sl_ctrl_link_info_map_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num,
-+					ctrl_link->ctrl_lgrp->num, ctrl_link->num, &info_map);
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "info map show sl_ctrl_link_info_map_get failed [%d]", rtn);
-+		return sysfs_emit(buf, "no-link\n");
-+	}
-+
-+	sl_core_info_map_str(info_map, info_map_str, sizeof(info_map_str));
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "info map show (info_map = 0x%llX %s)", info_map, info_map_str);
-+
-+	return sysfs_emit(buf, "%s\n", info_map_str);
-+}
-+
-+static struct kobj_attribute link_state                            = __ATTR_RO(state);
-+static struct kobj_attribute link_speed                            = __ATTR_RO(speed);
-+static struct kobj_attribute link_ccw_warn_limit_crossed           = __ATTR_RO(ccw_warn_limit_crossed);
-+static struct kobj_attribute link_ccw_warn_limit_last_crossed_time = __ATTR_RO(ccw_warn_limit_last_crossed_time);
-+static struct kobj_attribute link_ucw_warn_limit_crossed           = __ATTR_RO(ucw_warn_limit_crossed);
-+static struct kobj_attribute link_ucw_warn_limit_last_crossed_time = __ATTR_RO(ucw_warn_limit_last_crossed_time);
-+static struct kobj_attribute link_up_count                         = __ATTR_RO(up_count);
-+static struct kobj_attribute link_up_time_ms                       = __ATTR_RO(up_time_ms);
-+static struct kobj_attribute link_time_to_link_up_ms               = __ATTR_RO(time_to_link_up_ms);
-+static struct kobj_attribute link_total_time_to_link_up_ms         = __ATTR_RO(total_time_to_link_up_ms);
-+static struct kobj_attribute link_lp_caps_state                    = __ATTR_RO(lp_caps_state);
-+static struct kobj_attribute link_last_autoneg_fail_cause          = __ATTR_RO(last_autoneg_fail_cause);
-+static struct kobj_attribute link_last_autoneg_fail_time           = __ATTR_RO(last_autoneg_fail_time);
-+static struct kobj_attribute link_info_map                         = __ATTR_RO(info_map);
-+
-+static struct attribute *link_attrs[] = {
-+	&link_state.attr,
-+	&link_speed.attr,
-+	&link_ccw_warn_limit_crossed.attr,
-+	&link_ccw_warn_limit_last_crossed_time.attr,
-+	&link_ucw_warn_limit_crossed.attr,
-+	&link_ucw_warn_limit_last_crossed_time.attr,
-+	&link_up_count.attr,
-+	&link_up_time_ms.attr,
-+	&link_time_to_link_up_ms.attr,
-+	&link_total_time_to_link_up_ms.attr,
-+	&link_lp_caps_state.attr,
-+	&link_last_autoneg_fail_cause.attr,
-+	&link_last_autoneg_fail_time.attr,
-+	&link_info_map.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(link);
-+
-+static struct kobj_type link_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = link_groups,
-+};
-+
-+static ssize_t last_down_cause_map_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf, u8 num)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u64                  down_cause_map;
-+	time64_t             down_time;
-+	char                 cause_str[SL_LINK_DOWN_CAUSE_STR_SIZE];
-+	int		     rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, last_down_kobj);
-+
-+	rtn = sl_core_link_last_down_cause_map_info_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num, ctrl_link->ctrl_lgrp->num,
-+							ctrl_link->num, num, &down_cause_map, &down_time);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_link_down_cause_map_with_info_str(down_cause_map, cause_str, sizeof(cause_str));
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "last down cause show (num = %u, cause_map = 0x%llX %s)",
-+		   num, down_cause_map, cause_str);
-+
-+	return sysfs_emit(buf, "%s\n", cause_str);
-+}
-+
-+#define link_last_down_cause_map(_num)                                                                               \
-+	static inline ssize_t cause_map_##_num##_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf) \
-+	{                                                                                                            \
-+		return last_down_cause_map_show(kobj, kattr, buf, (_num));                                           \
-+	}                                                                                                            \
-+	static struct kobj_attribute link_last_down_cause_map_##_num = __ATTR_RO(cause_map_##_num)
-+
-+link_last_down_cause_map(0);
-+link_last_down_cause_map(1);
-+link_last_down_cause_map(2);
-+link_last_down_cause_map(3);
-+link_last_down_cause_map(4);
-+link_last_down_cause_map(5);
-+link_last_down_cause_map(6);
-+link_last_down_cause_map(7);
-+link_last_down_cause_map(8);
-+link_last_down_cause_map(9);
-+
-+static ssize_t last_down_time_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf, u8 num)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u64                  down_cause_map;
-+	time64_t             down_time;
-+	int		     rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, last_down_kobj);
-+
-+	rtn = sl_core_link_last_down_cause_map_info_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num, ctrl_link->ctrl_lgrp->num,
-+							ctrl_link->num, num, &down_cause_map, &down_time);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "last down time show (num = %u, cause_map = 0x%llX, time = %lld %ptTt %ptTd)",
-+		   num, down_cause_map, down_time, &down_time, &down_time);
-+
-+	if (down_cause_map == SL_LINK_DOWN_CAUSE_NONE)
-+		return sysfs_emit(buf, "none\n");
-+
-+	return sysfs_emit(buf, "%ptTt %ptTd\n", &down_time, &down_time);
-+}
-+
-+#define link_last_down_time(_num)                                                                               \
-+	static inline ssize_t time_##_num##_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf) \
-+	{                                                                                                       \
-+		return last_down_time_show(kobj, kattr, buf, (_num));                                           \
-+	}                                                                                                       \
-+	static struct kobj_attribute link_last_down_time_##_num = __ATTR_RO(time_##_num)
-+
-+link_last_down_time(0);
-+link_last_down_time(1);
-+link_last_down_time(2);
-+link_last_down_time(3);
-+link_last_down_time(4);
-+link_last_down_time(5);
-+link_last_down_time(6);
-+link_last_down_time(7);
-+link_last_down_time(8);
-+link_last_down_time(9);
-+
-+static struct attribute *last_down_attrs[] = {
-+	&link_last_down_cause_map_0.attr,
-+	&link_last_down_time_0.attr,
-+	&link_last_down_cause_map_1.attr,
-+	&link_last_down_time_1.attr,
-+	&link_last_down_cause_map_2.attr,
-+	&link_last_down_time_2.attr,
-+	&link_last_down_cause_map_3.attr,
-+	&link_last_down_time_3.attr,
-+	&link_last_down_cause_map_4.attr,
-+	&link_last_down_time_4.attr,
-+	&link_last_down_cause_map_5.attr,
-+	&link_last_down_time_5.attr,
-+	&link_last_down_cause_map_6.attr,
-+	&link_last_down_time_6.attr,
-+	&link_last_down_cause_map_7.attr,
-+	&link_last_down_time_7.attr,
-+	&link_last_down_cause_map_8.attr,
-+	&link_last_down_time_8.attr,
-+	&link_last_down_cause_map_9.attr,
-+	&link_last_down_time_9.attr,
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(last_down);
-+
-+static struct kobj_type last_down = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = last_down_groups,
-+};
-+
-+static ssize_t last_up_fail_cause_map_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf, u8 num)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u64                  up_fail_cause_map;
-+	time64_t             up_fail_time;
-+	char                 cause_str[SL_LINK_UP_FAIL_CAUSE_STR_SIZE];
-+	int		     rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, last_up_fail_kobj);
-+	rtn = sl_core_link_last_up_fail_cause_map_info_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num, ctrl_link->ctrl_lgrp->num,
-+							   ctrl_link->num, num, &up_fail_cause_map, &up_fail_time);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_link_down_cause_map_with_info_str(up_fail_cause_map, cause_str, sizeof(cause_str));
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "last up_fail cause show (num = %u, cause_map = 0x%llX %s)",
-+		   num, up_fail_cause_map, cause_str);
-+
-+	return sysfs_emit(buf, "%s\n", cause_str);
-+}
-+
-+#define link_last_up_fail_cause_map(_num)                                                                                    \
-+	static inline ssize_t up_fail_cause_map_##_num##_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf) \
-+	{                                                                                                                    \
-+		return last_up_fail_cause_map_show(kobj, kattr, buf, (_num));                                                \
-+	}                                                                                                                    \
-+	static struct kobj_attribute link_last_up_fail_cause_map_##_num = __ATTR_RO(up_fail_cause_map_##_num)
-+
-+link_last_up_fail_cause_map(0);
-+link_last_up_fail_cause_map(1);
-+link_last_up_fail_cause_map(2);
-+link_last_up_fail_cause_map(3);
-+link_last_up_fail_cause_map(4);
-+link_last_up_fail_cause_map(5);
-+link_last_up_fail_cause_map(6);
-+link_last_up_fail_cause_map(7);
-+link_last_up_fail_cause_map(8);
-+link_last_up_fail_cause_map(9);
-+
-+static ssize_t last_up_fail_time_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf, u8 num)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u64                  up_fail_cause_map;
-+	time64_t             up_fail_time;
-+	int		     rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, last_up_fail_kobj);
-+	rtn = sl_core_link_last_up_fail_cause_map_info_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num, ctrl_link->ctrl_lgrp->num,
-+							   ctrl_link->num, num, &up_fail_cause_map, &up_fail_time);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "last up_fail time show (num = %u, cause_map = 0x%llX, time = %lld %ptTt %ptTd)",
-+		   num, up_fail_cause_map, up_fail_time, &up_fail_time, &up_fail_time);
-+
-+	if (up_fail_cause_map == SL_LINK_DOWN_CAUSE_NONE)
-+		return sysfs_emit(buf, "none\n");
-+
-+	return sysfs_emit(buf, "%ptTt %ptTd\n", &up_fail_time, &up_fail_time);
-+}
-+
-+#define link_last_up_fail_time(_num)                                                                                    \
-+	static inline ssize_t up_fail_time_##_num##_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf) \
-+	{                                                                                                               \
-+		return last_up_fail_time_show(kobj, kattr, buf, (_num));                                                \
-+	}                                                                                                               \
-+	static struct kobj_attribute link_last_up_fail_time_##_num = __ATTR_RO(up_fail_time_##_num)
-+
-+link_last_up_fail_time(0);
-+link_last_up_fail_time(1);
-+link_last_up_fail_time(2);
-+link_last_up_fail_time(3);
-+link_last_up_fail_time(4);
-+link_last_up_fail_time(5);
-+link_last_up_fail_time(6);
-+link_last_up_fail_time(7);
-+link_last_up_fail_time(8);
-+link_last_up_fail_time(9);
-+
-+static struct attribute *last_up_fail_attrs[] = {
-+	&link_last_up_fail_cause_map_0.attr,
-+	&link_last_up_fail_time_0.attr,
-+	&link_last_up_fail_cause_map_1.attr,
-+	&link_last_up_fail_time_1.attr,
-+	&link_last_up_fail_cause_map_2.attr,
-+	&link_last_up_fail_time_2.attr,
-+	&link_last_up_fail_cause_map_3.attr,
-+	&link_last_up_fail_time_3.attr,
-+	&link_last_up_fail_cause_map_4.attr,
-+	&link_last_up_fail_time_4.attr,
-+	&link_last_up_fail_cause_map_5.attr,
-+	&link_last_up_fail_time_5.attr,
-+	&link_last_up_fail_cause_map_6.attr,
-+	&link_last_up_fail_time_6.attr,
-+	&link_last_up_fail_cause_map_7.attr,
-+	&link_last_up_fail_time_7.attr,
-+	&link_last_up_fail_cause_map_8.attr,
-+	&link_last_up_fail_time_8.attr,
-+	&link_last_up_fail_cause_map_9.attr,
-+	&link_last_up_fail_time_9.attr,
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(last_up_fail);
-+
-+static struct kobj_type last_up_fail = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = last_up_fail_groups,
-+};
-+
-+static int sl_sysfs_link_last_up_fail_create(struct sl_ctrl_link *ctrl_link)
-+{
-+	int rtn;
-+
-+	rtn = kobject_init_and_add(&ctrl_link->last_up_fail_kobj,
-+				   &last_up_fail, &ctrl_link->kobj, "last_up_fail");
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "last up_fail create kobject_init_and_add failed [%d]", rtn);
-+		kobject_put(&ctrl_link->last_up_fail_kobj);
-+		return rtn;
-+	}
-+
-+	return 0;
-+}
-+
-+static void sl_sysfs_link_last_up_fail_delete(struct sl_ctrl_link *ctrl_link)
-+{
-+	kobject_put(&ctrl_link->last_up_fail_kobj);
-+}
-+
-+static int sl_sysfs_link_last_down_create(struct sl_ctrl_link *ctrl_link)
-+{
-+	int rtn;
-+
-+	rtn = kobject_init_and_add(&ctrl_link->last_down_kobj,
-+				   &last_down, &ctrl_link->kobj, "last_down");
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "last down create kobject_init_and_add failed [%d]", rtn);
-+		kobject_put(&ctrl_link->last_down_kobj);
-+		return rtn;
-+	}
-+
-+	return 0;
-+}
-+
-+static void sl_sysfs_link_last_down_delete(struct sl_ctrl_link *ctrl_link)
-+{
-+	kobject_put(&ctrl_link->last_down_kobj);
-+}
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_link_create(struct sl_ctrl_link *ctrl_link)
-+{
-+#ifdef CONFIG_SYSFS
-+	int                  rtn;
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link create (num = %u)", ctrl_link->num);
-+
-+	if (!ctrl_link->parent_kobj) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME, "link create missing parent");
-+		return -EBADRQC;
-+	}
-+
-+	core_link = sl_core_link_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num,
-+				     ctrl_link->ctrl_lgrp->num, ctrl_link->num);
-+	if (!core_link)
-+		return -ENODEV;
-+
-+	rtn = kobject_init_and_add(&ctrl_link->kobj, &link_info, ctrl_link->parent_kobj, "link");
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "link create kobject_init_and_add failed [%d]", rtn);
-+		kobject_put(&ctrl_link->kobj);
-+		return rtn;
-+	}
-+
-+	rtn = sl_sysfs_link_policy_create(ctrl_link);
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "sl_sysfs_link_policy_create failed [%d]", rtn);
-+		kobject_put(&ctrl_link->kobj);
-+		return rtn;
-+	}
-+
-+	rtn = sl_sysfs_link_config_create(ctrl_link);
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "sl_sysfs_link_config_create failed [%d]", rtn);
-+		sl_sysfs_link_policy_delete(ctrl_link);
-+		kobject_put(&ctrl_link->kobj);
-+		return rtn;
-+	}
-+
-+	rtn = sl_sysfs_link_degrade_create(core_link, &ctrl_link->kobj);
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "sl_sysfs_link_degrade_create failed [%d]", rtn);
-+		sl_sysfs_link_policy_delete(ctrl_link);
-+		sl_sysfs_link_config_delete(ctrl_link);
-+		kobject_put(&ctrl_link->kobj);
-+		return rtn;
-+	}
-+
-+	rtn = sl_sysfs_link_pml_rec_create(core_link, &ctrl_link->kobj);
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME, "sl_sysfs_link_pml_rec_create failed [%d]", rtn);
-+		sl_sysfs_link_policy_delete(ctrl_link);
-+		sl_sysfs_link_config_delete(ctrl_link);
-+		sl_sysfs_link_degrade_delete(core_link);
-+		kobject_put(&ctrl_link->kobj);
-+		return rtn;
-+	}
-+
-+	rtn = sl_sysfs_link_fec_create(ctrl_link);
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "sl_sysfs_link_fec_create failed [%d]", rtn);
-+		sl_sysfs_link_policy_delete(ctrl_link);
-+		sl_sysfs_link_config_delete(ctrl_link);
-+		sl_sysfs_link_degrade_delete(core_link);
-+		sl_sysfs_link_pml_rec_delete(core_link);
-+		kobject_put(&ctrl_link->kobj);
-+		return rtn;
-+	}
-+
-+	rtn = sl_sysfs_link_caps_create(ctrl_link);
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "sl_sysfs_link_caps_create failed [%d]", rtn);
-+		sl_sysfs_link_policy_delete(ctrl_link);
-+		sl_sysfs_link_config_delete(ctrl_link);
-+		sl_sysfs_link_degrade_delete(core_link);
-+		sl_sysfs_link_pml_rec_delete(core_link);
-+		sl_sysfs_link_fec_delete(ctrl_link);
-+		kobject_put(&ctrl_link->kobj);
-+		return rtn;
-+	}
-+
-+	rtn = sl_sysfs_link_counters_create(ctrl_link);
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "sl_sysfs_link_counters_create failed [%d]", rtn);
-+		sl_sysfs_link_policy_delete(ctrl_link);
-+		sl_sysfs_link_config_delete(ctrl_link);
-+		sl_sysfs_link_degrade_delete(core_link);
-+		sl_sysfs_link_pml_rec_delete(core_link);
-+		sl_sysfs_link_fec_delete(ctrl_link);
-+		sl_sysfs_link_caps_delete(ctrl_link);
-+		kobject_put(&ctrl_link->kobj);
-+		return rtn;
-+	}
-+
-+	rtn = sl_sysfs_link_last_down_create(ctrl_link);
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "sl_sysfs_link_last_down_create failed [%d]", rtn);
-+		sl_sysfs_link_policy_delete(ctrl_link);
-+		sl_sysfs_link_config_delete(ctrl_link);
-+		sl_sysfs_link_degrade_delete(core_link);
-+		sl_sysfs_link_pml_rec_delete(core_link);
-+		sl_sysfs_link_fec_delete(ctrl_link);
-+		sl_sysfs_link_caps_delete(ctrl_link);
-+		sl_sysfs_link_counters_delete(ctrl_link);
-+		kobject_put(&ctrl_link->kobj);
-+		return rtn;
-+	}
-+
-+	rtn = sl_sysfs_link_last_up_fail_create(ctrl_link);
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "sl_sysfs_link_last_up_fail_create failed [%d]", rtn);
-+		sl_sysfs_link_policy_delete(ctrl_link);
-+		sl_sysfs_link_config_delete(ctrl_link);
-+		sl_sysfs_link_degrade_delete(core_link);
-+		sl_sysfs_link_pml_rec_delete(core_link);
-+		sl_sysfs_link_fec_delete(ctrl_link);
-+		sl_sysfs_link_caps_delete(ctrl_link);
-+		sl_sysfs_link_counters_delete(ctrl_link);
-+		sl_sysfs_link_last_down_delete(ctrl_link);
-+		kobject_put(&ctrl_link->kobj);
-+		return rtn;
-+	}
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "link create (link_kobj = 0x%p)", &ctrl_link->kobj);
-+
-+	return 0;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_link_delete(struct sl_ctrl_link *ctrl_link)
-+{
-+#ifdef CONFIG_SYSFS
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link delete (num = %u)", ctrl_link->num);
-+
-+	if (!ctrl_link->parent_kobj)
-+		return;
-+
-+	core_link = sl_core_link_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num,
-+				     ctrl_link->ctrl_lgrp->num, ctrl_link->num);
-+	if (!core_link)
-+		return;
-+
-+	sl_sysfs_link_policy_delete(ctrl_link);
-+	sl_sysfs_link_config_delete(ctrl_link);
-+	sl_sysfs_link_degrade_delete(core_link);
-+	sl_sysfs_link_pml_rec_delete(core_link);
-+	sl_sysfs_link_fec_delete(ctrl_link);
-+	sl_sysfs_link_caps_delete(ctrl_link);
-+	sl_sysfs_link_counters_delete(ctrl_link);
-+	sl_sysfs_link_last_down_delete(ctrl_link);
-+	sl_sysfs_link_last_up_fail_delete(ctrl_link);
-+	kobject_put(&ctrl_link->kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_caps.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_caps.c
-new file mode 100644
-index 000000000000..f52b34b31bd3
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_caps.c
-@@ -0,0 +1,303 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2024-2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "sl_ctrl_link.h"
-+#include "sl_core_link.h"
-+#include "sl_ctrl_lgrp.h"
-+#include "sl_ctrl_ldev.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t tech_map_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+	struct sl_core_lgrp *core_lgrp;
-+	int                  idx;
-+	char                 output[80];
-+	u32                  tech_map;
-+	u32                  link_state;
-+	int		     rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, caps_kobj);
-+
-+	core_link = sl_core_link_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num,
-+				     ctrl_link->ctrl_lgrp->num, ctrl_link->num);
-+	if (!core_link)
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	core_lgrp = core_link->core_lgrp;
-+
-+	tech_map = core_lgrp->link_caps[core_link->num].tech_map;
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME,
-+		   "tech map show (link = 0x%p, map = 0x%X)", core_link, tech_map);
-+
-+	rtn = sl_core_link_state_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num,
-+				     ctrl_link->ctrl_lgrp->num, ctrl_link->num, &link_state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	if ((tech_map == 0) ||
-+	    ((link_state != SL_CORE_LINK_STATE_UP) &&
-+		 (link_state != SL_CORE_LINK_STATE_GOING_UP) &&
-+		 (link_state != SL_CORE_LINK_STATE_AN)) ||
-+		!is_flag_set(core_link->config.flags, SL_LINK_CONFIG_OPT_AUTONEG_ENABLE))
-+		return sysfs_emit(buf, "none\n");
-+
-+	idx = 0;
-+	if (is_flag_set(tech_map, SL_LGRP_CONFIG_TECH_CK_400G))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_lgrp_config_tech_str(SL_LGRP_CONFIG_TECH_CK_400G));
-+	if (is_flag_set(tech_map, SL_LGRP_CONFIG_TECH_CK_200G))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_lgrp_config_tech_str(SL_LGRP_CONFIG_TECH_CK_200G));
-+	if (is_flag_set(tech_map, SL_LGRP_CONFIG_TECH_CK_100G))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_lgrp_config_tech_str(SL_LGRP_CONFIG_TECH_CK_100G));
-+	if (is_flag_set(tech_map, SL_LGRP_CONFIG_TECH_BS_200G))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_lgrp_config_tech_str(SL_LGRP_CONFIG_TECH_BS_200G));
-+	if (is_flag_set(tech_map, SL_LGRP_CONFIG_TECH_CD_100G))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_lgrp_config_tech_str(SL_LGRP_CONFIG_TECH_CD_100G));
-+	if (is_flag_set(tech_map, SL_LGRP_CONFIG_TECH_CD_50G))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_lgrp_config_tech_str(SL_LGRP_CONFIG_TECH_CD_50G));
-+	if (is_flag_set(tech_map, SL_LGRP_CONFIG_TECH_BJ_100G))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_lgrp_config_tech_str(SL_LGRP_CONFIG_TECH_BJ_100G));
-+	if (!idx)
-+		return sysfs_emit(buf, "none\n");
-+	output[idx - 1] = '\0';
-+
-+	return sysfs_emit(buf, "%s\n", output);
-+}
-+
-+static ssize_t pause_map_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+	struct sl_core_lgrp *core_lgrp;
-+	int                  idx;
-+	char                 output[20];
-+	u32                  pause_map;
-+	u32                  link_state;
-+	int		     rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, caps_kobj);
-+
-+	core_link = sl_core_link_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num,
-+				     ctrl_link->ctrl_lgrp->num, ctrl_link->num);
-+	if (!core_link)
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	core_lgrp = core_link->core_lgrp;
-+
-+	pause_map = core_lgrp->link_caps[core_link->num].pause_map;
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME,
-+		   "pause map show (link = 0x%p, map = 0x%X)", core_link, pause_map);
-+
-+	rtn = sl_core_link_state_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num,
-+				     ctrl_link->ctrl_lgrp->num, ctrl_link->num, &link_state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	if ((pause_map == 0) ||
-+	    ((link_state != SL_CORE_LINK_STATE_UP) &&
-+		 (link_state != SL_CORE_LINK_STATE_GOING_UP) &&
-+		 (link_state != SL_CORE_LINK_STATE_AN)) ||
-+		!is_flag_set(core_link->config.flags, SL_LINK_CONFIG_OPT_AUTONEG_ENABLE))
-+		return sysfs_emit(buf, "none\n");
-+
-+	idx = 0;
-+	if (is_flag_set(pause_map, SL_LINK_CONFIG_PAUSE_ASYM))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_link_config_pause_str(SL_LINK_CONFIG_PAUSE_ASYM));
-+	if (is_flag_set(pause_map, SL_LINK_CONFIG_PAUSE_SYM))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_link_config_pause_str(SL_LINK_CONFIG_PAUSE_SYM));
-+	if (!idx)
-+		return sysfs_emit(buf, "none\n");
-+	output[idx - 1] = '\0';
-+
-+	return sysfs_emit(buf, "%s\n", output);
-+}
-+
-+static ssize_t fec_map_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+	struct sl_core_lgrp *core_lgrp;
-+	int                  idx;
-+	char                 output[20];
-+	u32                  fec_map;
-+	u32                  link_state;
-+	int		     rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, caps_kobj);
-+
-+	core_link = sl_core_link_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num,
-+				     ctrl_link->ctrl_lgrp->num, ctrl_link->num);
-+	if (!core_link)
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	core_lgrp = core_link->core_lgrp;
-+
-+	fec_map = core_lgrp->link_caps[core_link->num].fec_map;
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME,
-+		   "fec map show (link = 0x%p, map = 0x%X)", core_link, fec_map);
-+
-+	rtn = sl_core_link_state_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num,
-+				     ctrl_link->ctrl_lgrp->num, ctrl_link->num, &link_state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	if ((fec_map == 0) ||
-+	    ((link_state != SL_CORE_LINK_STATE_UP) &&
-+		 (link_state != SL_CORE_LINK_STATE_GOING_UP) &&
-+		 (link_state != SL_CORE_LINK_STATE_AN)) ||
-+		!is_flag_set(core_link->config.flags, SL_LINK_CONFIG_OPT_AUTONEG_ENABLE))
-+		return sysfs_emit(buf, "none\n");
-+
-+	idx = 0;
-+	if (is_flag_set(fec_map, SL_LGRP_CONFIG_FEC_RS_LL))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_lgrp_config_fec_str(SL_LGRP_CONFIG_FEC_RS_LL));
-+	if (is_flag_set(fec_map, SL_LGRP_CONFIG_FEC_RS))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_lgrp_config_fec_str(SL_LGRP_CONFIG_FEC_RS));
-+	if (!idx)
-+		return sysfs_emit(buf, "none\n");
-+	output[idx - 1] = '\0';
-+
-+	return sysfs_emit(buf, "%s\n", output);
-+}
-+
-+static ssize_t hpe_map_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+	struct sl_core_lgrp *core_lgrp;
-+	int                  idx;
-+	char                 output[80];
-+	u32                  hpe_map;
-+	u32                  link_state;
-+	int		     rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, caps_kobj);
-+
-+	core_link = sl_core_link_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num,
-+				     ctrl_link->ctrl_lgrp->num, ctrl_link->num);
-+	if (!core_link)
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	core_lgrp = core_link->core_lgrp;
-+
-+	hpe_map = core_lgrp->link_caps[core_link->num].hpe_map;
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME,
-+		   "hpe map show (link = 0x%p, map = 0x%X)", core_link, hpe_map);
-+
-+	rtn = sl_core_link_state_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num,
-+				     ctrl_link->ctrl_lgrp->num, ctrl_link->num, &link_state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	if ((hpe_map == 0) ||
-+	    ((link_state != SL_CORE_LINK_STATE_UP) &&
-+		 (link_state != SL_CORE_LINK_STATE_GOING_UP) &&
-+		 (link_state != SL_CORE_LINK_STATE_AN)) ||
-+		!is_flag_set(core_link->config.flags, SL_LINK_CONFIG_OPT_AUTONEG_ENABLE))
-+		return sysfs_emit(buf, "none\n");
-+
-+	idx = 0;
-+	if (is_flag_set(hpe_map, SL_LINK_CONFIG_HPE_LINKTRAIN))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_link_config_hpe_str(SL_LINK_CONFIG_HPE_LINKTRAIN));
-+	if (is_flag_set(hpe_map, SL_LINK_CONFIG_HPE_PRECODING))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_link_config_hpe_str(SL_LINK_CONFIG_HPE_PRECODING));
-+	if (is_flag_set(hpe_map, SL_LINK_CONFIG_HPE_PCAL))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_link_config_hpe_str(SL_LINK_CONFIG_HPE_PCAL));
-+	if (is_flag_set(hpe_map, SL_LINK_CONFIG_HPE_R3))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_link_config_hpe_str(SL_LINK_CONFIG_HPE_R3));
-+	if (is_flag_set(hpe_map, SL_LINK_CONFIG_HPE_R2))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_link_config_hpe_str(SL_LINK_CONFIG_HPE_R2));
-+	if (is_flag_set(hpe_map, SL_LINK_CONFIG_HPE_C3))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_link_config_hpe_str(SL_LINK_CONFIG_HPE_R3));
-+	if (is_flag_set(hpe_map, SL_LINK_CONFIG_HPE_C2))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_link_config_hpe_str(SL_LINK_CONFIG_HPE_R2));
-+	if (is_flag_set(hpe_map, SL_LINK_CONFIG_HPE_LLR))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_link_config_hpe_str(SL_LINK_CONFIG_HPE_LLR));
-+	if (!idx)
-+		return sysfs_emit(buf, "none\n");
-+	output[idx - 1] = '\0';
-+
-+	return sysfs_emit(buf, "%s\n", output);
-+}
-+
-+static struct kobj_attribute tech_map  = __ATTR_RO(tech_map);
-+static struct kobj_attribute fec_map   = __ATTR_RO(fec_map);
-+static struct kobj_attribute pause_map = __ATTR_RO(pause_map);
-+static struct kobj_attribute hpe_map   = __ATTR_RO(hpe_map);
-+
-+static struct attribute *link_caps_attrs[] = {
-+	&tech_map.attr,
-+	&fec_map.attr,
-+	&pause_map.attr,
-+	&hpe_map.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(link_caps);
-+
-+static struct kobj_type link_caps = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = link_caps_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_link_caps_create(struct sl_ctrl_link *ctrl_link)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link caps create (num = %u)", ctrl_link->num);
-+
-+	rtn = kobject_init_and_add(&ctrl_link->caps_kobj, &link_caps, &ctrl_link->kobj, "caps");
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "link caps create kobject_init_and_add failed [%d]", rtn);
-+		kobject_put(&ctrl_link->caps_kobj);
-+		return rtn;
-+	}
-+
-+	return 0;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_link_caps_delete(struct sl_ctrl_link *ctrl_link)
-+{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link caps delete (num = %u)", ctrl_link->num);
-+
-+	kobject_put(&ctrl_link->caps_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_config.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_config.c
-new file mode 100644
-index 000000000000..a61072c56ca3
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_config.c
-@@ -0,0 +1,388 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2024-2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "data/sl_ctrl_data_link.h"
-+#include "sl_ctrl_link.h"
-+#include "sl_core_link.h"
-+#include "data/sl_ctrl_data_link.h"
-+#include "sl_test_common.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t link_up_timeout_ms_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  link_up_timeout_ms;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, config_kobj);
-+
-+	rtn = sl_ctrl_data_link_up_timeout_ms_get(ctrl_link, &link_up_timeout_ms);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "link up timeout show (link_up_timeout = %ums)", link_up_timeout_ms);
-+
-+	return sysfs_emit(buf, "%u\n", link_up_timeout_ms);
-+}
-+
-+static ssize_t link_up_tries_max_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  link_up_tries_max;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, config_kobj);
-+
-+	rtn = sl_ctrl_data_link_up_tries_max_get(ctrl_link, &link_up_tries_max);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "link up tries max show (link_up_tries_max = %d)", link_up_tries_max);
-+
-+	if (link_up_tries_max == SL_LINK_INFINITE_UP_TRIES)
-+		return sysfs_emit(buf, "infinite\n");
-+	else
-+		return sysfs_emit(buf, "%d\n", link_up_tries_max);
-+}
-+
-+static ssize_t fec_up_settle_wait_ms_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  fec_up_settle_wait_ms;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, config_kobj);
-+
-+	rtn = sl_ctrl_data_link_fec_up_settle_wait_ms_get(ctrl_link, &fec_up_settle_wait_ms);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "fec_up_settle_wait show (fec_up_settle_wait = %dms)", fec_up_settle_wait_ms);
-+
-+	return sysfs_emit(buf, "%d\n", fec_up_settle_wait_ms);
-+}
-+
-+static ssize_t fec_up_check_wait_ms_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  fec_up_check_wait_ms;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, config_kobj);
-+
-+	rtn = sl_ctrl_data_link_fec_up_check_wait_ms_get(ctrl_link, &fec_up_check_wait_ms);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "fec_up_check_wait show (fec_up_check_wait = %dms)", fec_up_check_wait_ms);
-+
-+	return sysfs_emit(buf, "%d\n", fec_up_check_wait_ms);
-+}
-+
-+static ssize_t fec_up_ucw_limit_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	s32		     fec_up_ucw_limit;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, config_kobj);
-+
-+	rtn = sl_ctrl_data_link_fec_up_ucw_limit_get(ctrl_link, &fec_up_ucw_limit);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "fec_up_ucw_limit show (fec_up_ucw_limit = %d)", fec_up_ucw_limit);
-+
-+	return sysfs_emit(buf, "%d\n", fec_up_ucw_limit);
-+}
-+
-+static ssize_t fec_up_ccw_limit_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	s32		     fec_up_ccw_limit;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, config_kobj);
-+
-+	rtn = sl_ctrl_data_link_fec_up_ccw_limit_get(ctrl_link, &fec_up_ccw_limit);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "fec_up_ccw_limit show (fec_up_ccw_limit = %d)", fec_up_ccw_limit);
-+
-+	return sysfs_emit(buf, "%d\n", fec_up_ccw_limit);
-+}
-+
-+static ssize_t lock_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  options;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, config_kobj);
-+
-+	rtn = sl_ctrl_data_link_config_options_get(ctrl_link, &options);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "lock show (options = 0x%X)", options);
-+
-+	return sysfs_emit(buf, "%s\n", is_flag_set(options,
-+			 SL_LINK_CONFIG_OPT_LOCK) ? "enabled" : "disabled");
-+}
-+
-+static ssize_t pause_map_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	int                  idx;
-+	char                 output[20];
-+	u32                  pause_map;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, config_kobj);
-+
-+	rtn = sl_ctrl_data_link_pause_map_get(ctrl_link, &pause_map);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "pause map show (link = 0x%p, map = 0x%X)", ctrl_link, pause_map);
-+
-+	if (pause_map == 0)
-+		return sysfs_emit(buf, "none\n");
-+
-+	idx = 0;
-+	if (is_flag_set(pause_map, SL_LINK_CONFIG_PAUSE_ASYM))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_link_config_pause_str(SL_LINK_CONFIG_PAUSE_ASYM));
-+	if (is_flag_set(pause_map, SL_LINK_CONFIG_PAUSE_SYM))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_link_config_pause_str(SL_LINK_CONFIG_PAUSE_SYM));
-+	if (!idx)
-+		return sysfs_emit(buf, "none\n");
-+	output[idx - 1] = '\0';
-+
-+	return sysfs_emit(buf, "%s\n", output);
-+}
-+
-+static ssize_t hpe_map_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	int                  idx;
-+	char                 output[80];
-+	u32                  hpe_map;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, config_kobj);
-+
-+	rtn = sl_ctrl_data_link_hpe_map_get(ctrl_link, &hpe_map);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "hpe map show (link = 0x%p, map = 0x%X)", ctrl_link, hpe_map);
-+
-+	if (hpe_map == 0)
-+		return sysfs_emit(buf, "none\n");
-+
-+	idx = 0;
-+	if (is_flag_set(hpe_map, SL_LINK_CONFIG_HPE_LINKTRAIN))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_link_config_hpe_str(SL_LINK_CONFIG_HPE_LINKTRAIN));
-+	if (is_flag_set(hpe_map, SL_LINK_CONFIG_HPE_PRECODING))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_link_config_hpe_str(SL_LINK_CONFIG_HPE_PRECODING));
-+	if (is_flag_set(hpe_map, SL_LINK_CONFIG_HPE_PCAL))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_link_config_hpe_str(SL_LINK_CONFIG_HPE_PCAL));
-+	if (is_flag_set(hpe_map, SL_LINK_CONFIG_HPE_R3))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_link_config_hpe_str(SL_LINK_CONFIG_HPE_R3));
-+	if (is_flag_set(hpe_map, SL_LINK_CONFIG_HPE_R2))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_link_config_hpe_str(SL_LINK_CONFIG_HPE_R2));
-+	if (is_flag_set(hpe_map, SL_LINK_CONFIG_HPE_C3))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_link_config_hpe_str(SL_LINK_CONFIG_HPE_R3));
-+	if (is_flag_set(hpe_map, SL_LINK_CONFIG_HPE_C2))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_link_config_hpe_str(SL_LINK_CONFIG_HPE_R2));
-+	if (is_flag_set(hpe_map, SL_LINK_CONFIG_HPE_LLR))
-+		idx += snprintf(output + idx, sizeof(output) - idx, "%s ",
-+			sl_link_config_hpe_str(SL_LINK_CONFIG_HPE_LLR));
-+	if (!idx)
-+		return sysfs_emit(buf, "none\n");
-+	output[idx - 1] = '\0';
-+
-+	return sysfs_emit(buf, "%s\n", output);
-+}
-+
-+static ssize_t autoneg_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  options;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, config_kobj);
-+
-+	rtn = sl_ctrl_data_link_config_options_get(ctrl_link, &options);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "autoneg show (options = 0x%X)", options);
-+
-+	if (is_flag_set(options, SL_LINK_CONFIG_OPT_AUTONEG_ENABLE))
-+		return sysfs_emit(buf, "enabled\n");
-+
-+	if (is_flag_set(options, SL_LINK_CONFIG_OPT_AUTONEG_CONTINUOUS_ENABLE))
-+		return sysfs_emit(buf, "enabled-continuous\n");
-+
-+	return sysfs_emit(buf, "disabled\n");
-+}
-+
-+static ssize_t loopback_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  options;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, config_kobj);
-+
-+	rtn = sl_ctrl_data_link_config_options_get(ctrl_link, &options);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "loopback show (options = 0x%X)", options);
-+
-+	if (is_flag_set(options, SL_LINK_CONFIG_OPT_HEADSHELL_LOOPBACK_ENABLE))
-+		return sysfs_emit(buf, "enabled-headshell\n");
-+
-+	if (is_flag_set(options, SL_LINK_CONFIG_OPT_REMOTE_LOOPBACK_ENABLE))
-+		return sysfs_emit(buf, "enabled-remote\n");
-+
-+	return sysfs_emit(buf, "disabled\n");
-+}
-+
-+static ssize_t auto_lane_degrade_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  options;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, config_kobj);
-+
-+	rtn = sl_ctrl_data_link_config_options_get(ctrl_link, &options);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "auto lane degrade show (options = 0x%X)", options);
-+
-+	if (is_flag_set(options, SL_LINK_CONFIG_OPT_ALD_ENABLE))
-+		return sysfs_emit(buf, "enabled\n");
-+
-+	return sysfs_emit(buf, "disabled\n");
-+}
-+
-+static ssize_t pml_recovery_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  options;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, config_kobj);
-+
-+	rtn = sl_ctrl_data_link_config_options_get(ctrl_link, &options);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "pml recovery show (options = 0x%X)", options);
-+
-+	if (is_flag_set(options, SL_LINK_CONFIG_OPT_PML_REC_ENABLE))
-+		return sysfs_emit(buf, "enabled\n");
-+
-+	return sysfs_emit(buf, "disabled\n");
-+}
-+
-+static struct kobj_attribute link_up_timeout_ms    = __ATTR_RO(link_up_timeout_ms);
-+static struct kobj_attribute link_up_tries_max_ms  = __ATTR_RO(link_up_tries_max);
-+static struct kobj_attribute fec_up_settle_wait_ms = __ATTR_RO(fec_up_settle_wait_ms);
-+static struct kobj_attribute fec_up_check_wait_ms  = __ATTR_RO(fec_up_check_wait_ms);
-+static struct kobj_attribute fec_up_ucw_limit      = __ATTR_RO(fec_up_ucw_limit);
-+static struct kobj_attribute fec_up_ccw_limit      = __ATTR_RO(fec_up_ccw_limit);
-+static struct kobj_attribute lock                  = __ATTR_RO(lock);
-+static struct kobj_attribute pause_map             = __ATTR_RO(pause_map);
-+static struct kobj_attribute hpe_map               = __ATTR_RO(hpe_map);
-+static struct kobj_attribute autoneg               = __ATTR_RO(autoneg);
-+static struct kobj_attribute loopback              = __ATTR_RO(loopback);
-+static struct kobj_attribute auto_lane_degrade     = __ATTR_RO(auto_lane_degrade);
-+static struct kobj_attribute pml_recovery          = __ATTR_RO(pml_recovery);
-+
-+static struct attribute *link_config_attrs[] = {
-+	&link_up_timeout_ms.attr,
-+	&link_up_tries_max_ms.attr,
-+	&fec_up_settle_wait_ms.attr,
-+	&fec_up_check_wait_ms.attr,
-+	&fec_up_ucw_limit.attr,
-+	&fec_up_ccw_limit.attr,
-+	&lock.attr,
-+	&pause_map.attr,
-+	&hpe_map.attr,
-+	&autoneg.attr,
-+	&loopback.attr,
-+	&auto_lane_degrade.attr,
-+	&pml_recovery.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(link_config);
-+
-+static struct kobj_type link_config = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = link_config_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_link_config_create(struct sl_ctrl_link *ctrl_link)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link config create (num = %u)", ctrl_link->num);
-+
-+	rtn = kobject_init_and_add(&ctrl_link->config_kobj, &link_config, &ctrl_link->kobj, "config");
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "link config create kobject_init_and_add failed [%d]", rtn);
-+		kobject_put(&ctrl_link->config_kobj);
-+		return rtn;
-+	}
-+
-+	return 0;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_link_config_delete(struct sl_ctrl_link *ctrl_link)
-+{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link config delete (num = %u)", ctrl_link->num);
-+
-+	kobject_put(&ctrl_link->config_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_counters.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_counters.c
-new file mode 100644
-index 000000000000..fdfb84636d0e
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_counters.c
-@@ -0,0 +1,1498 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2025,2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "sl_ctrl_link.h"
-+#include "sl_core_link.h"
-+#include "sl_ctrl_link_counters.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t link_up_cmd_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_counters_get(ctrl_link, LINK_UP_CMD, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link up cmd show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t link_up_retry_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_counters_get(ctrl_link, LINK_UP_RETRY, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link up retry show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t link_up_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_counters_get(ctrl_link, LINK_UP, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link up show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t link_up_fail_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_counters_get(ctrl_link, LINK_UP_FAIL, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link up fail show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t link_down_cmd_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_counters_get(ctrl_link, LINK_DOWN_CMD, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link down cmd show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t link_down_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_counters_get(ctrl_link, LINK_DOWN, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link down show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t link_up_canceled_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_counters_get(ctrl_link, LINK_UP_CANCELED, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link up canceled show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t link_up_cancel_cmd_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_counters_get(ctrl_link, LINK_UP_CANCEL_CMD, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link up cancel cmd show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t link_reset_cmd_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_counters_get(ctrl_link, LINK_RESET_CMD, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link reset cmd show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t link_fault_async_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_counters_get(ctrl_link, LINK_FAULT_ASYNC, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link fault async show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t link_ccw_warn_crossed_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_counters_get(ctrl_link, LINK_CCW_WARN_CROSSED, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link ccw warn crossed show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t link_ucw_warn_crossed_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_counters_get(ctrl_link, LINK_UCW_WARN_CROSSED, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link ucw warn crossed show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t link_down_ccw_limit_crossed_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_counters_get(ctrl_link, LINK_DOWN_CCW_LIMIT_CROSSED, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link down ccw limit crossed show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t link_down_ucw_limit_crossed_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_counters_get(ctrl_link, LINK_DOWN_UCW_LIMIT_CROSSED, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link down ucw limit crossed show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t link_down_ccw_cause_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_counters_get(ctrl_link, LINK_DOWN_CCW_CAUSE, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link down ccw cause show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t link_down_ucw_cause_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_counters_get(ctrl_link, LINK_DOWN_UCW_CAUSE, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link down ucw cause show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t link_up_fail_ccw_limit_crossed_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_counters_get(ctrl_link, LINK_UP_FAIL_CCW_LIMIT_CROSSED, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link up fail ccw limit crossed show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t link_up_fail_ucw_limit_crossed_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_counters_get(ctrl_link, LINK_UP_FAIL_UCW_LIMIT_CROSSED, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link up fail ucw limit crossed show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t link_autoneg_np_retry_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_an_retry_count_get(ctrl_link, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link autoneg np retry show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t link_autoneg_attempt_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_counters_get(ctrl_link, LINK_HW_AN_ATTEMPT, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link autoneg attempt show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_ucw_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_UCW, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause ucw show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_lf_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_LF, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause lf show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_rf_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_RF, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause rf show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_down_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_DOWN, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause down show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_up_tries_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_UP_TRIES, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause up tries show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_autoneg_nomatch_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_AUTONEG_NOMATCH, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause autoneg nomatch show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_autoneg_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_AUTONEG, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause autoneg show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_config_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_CONFIG, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause config show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_intr_enable_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_INTR_ENABLE, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause intr enable show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_timeout_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_TIMEOUT, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause timeout show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_canceled_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_CANCELED, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause canceled show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_unsupported_cable_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_UNSUPPORTED_CABLE, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause unsupported cable show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_command_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_COMMAND, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause command show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_downshift_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_DOWNSHIFT, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause downshift show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_llr_replay_max_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_LLR_REPLAY_MAX, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause llr replay max show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_upshift_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_UPSHIFT, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause upshift show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_autoneg_config_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_AUTONEG_CONFIG, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause autoneg config show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_pcs_fault_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_PCS_FAULT, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause pcs fault show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_serdes_pll_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_SERDES_PLL, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause serdes pll show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_serdes_config_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_SERDES_CONFIG, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause serdes config show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_serdes_signal_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_SERDES_SIGNAL, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause serdes signal show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_serdes_quality_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_SERDES_QUALITY, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause serdes quality show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_no_media_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_NO_MEDIA, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause no media show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_ccw_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_CCW, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause ccw show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_hot_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_MEDIA_HOT, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause hot show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_warm_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_MEDIA_WARM, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause warm show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_intr_register_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_INTR_REGISTER, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause intr register show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_media_error_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_MEDIA_ERROR, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause media error show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_up_canceled_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_UP_CANCELED, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause up canceled show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_unsupported_speed_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_UNSUPPORTED_SPEED, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause unsupported speed show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_ss200_cable_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_SS200_CABLE, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause ss200 cable show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_tx_lol_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_TX_LOL, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause tx lol show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_rx_lol_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_RX_LOL, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause rx lol show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_tx_los_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_TX_LOS, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause tx los show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_rx_los_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_cause_counters_get(ctrl_link, LINK_CAUSE_RX_LOS, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link cause rx los show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t an_cause_lp_caps_serdes_link_up_fail_show(struct kobject *kobj,
-+							 struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_an_cause_counters_get(ctrl_link, LINK_AN_CAUSE_LP_CAPS_SERDES_LINK_UP_FAIL, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link an cause lp caps serdes link up fail show (counter = %u)",
-+		   counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t an_cause_lp_caps_not_complete_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_an_cause_counters_get(ctrl_link, LINK_AN_CAUSE_LP_CAPS_NOT_COMPLETE, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link an cause lp caps not complete show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t an_cause_not_complete_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_an_cause_counters_get(ctrl_link, LINK_AN_CAUSE_NOT_COMPLETE, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link an cause not complete show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t an_cause_test_caps_nomatch_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_an_cause_counters_get(ctrl_link, LINK_AN_CAUSE_TEST_CAPS_NOMATCH, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link an cause test caps nomatch show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t an_cause_serdes_link_up_fail_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_an_cause_counters_get(ctrl_link, LINK_AN_CAUSE_SERDES_LINK_UP_FAIL, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link an cause serdes link up fail show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t an_cause_bp_store_state_bad_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_an_cause_counters_get(ctrl_link, LINK_AN_CAUSE_BP_STORE_STATE_BAD, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link an cause bp store state bad show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t an_cause_bp_store_lp_ability_not_set_show(struct kobject *kobj, struct kobj_attribute *kattr,
-+							 char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_an_cause_counters_get(ctrl_link, LINK_AN_CAUSE_BP_STORE_LP_ABILITY_NOT_SET, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link an cause bp store lp ability not set show (counter = %u)",
-+		   counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t an_cause_bp_store_state_error_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_an_cause_counters_get(ctrl_link, LINK_AN_CAUSE_BP_STORE_STATE_ERROR, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link an cause bp store state error show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t an_cause_bp_store_bp_not_set_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_an_cause_counters_get(ctrl_link, LINK_AN_CAUSE_BP_STORE_BP_NOT_SET, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link an cause bp store bp not set show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t an_cause_bp_send_intr_enable_fail_show(struct kobject *kobj, struct kobj_attribute *kattr,
-+						      char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_an_cause_counters_get(ctrl_link, LINK_AN_CAUSE_BP_SEND_INTR_ENABLE_FAIL, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link an cause bp send intr enable fail show (counter = %u)",
-+		   counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t an_cause_np_store_state_bad_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_an_cause_counters_get(ctrl_link, LINK_AN_CAUSE_NP_STORE_STATE_BAD, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link an cause np store state bad show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t an_cause_np_store_bp_set_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_an_cause_counters_get(ctrl_link, LINK_AN_CAUSE_NP_STORE_BP_SET, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link an cause np store state bp set show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t an_cause_np_check_state_bad_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_an_cause_counters_get(ctrl_link, LINK_AN_CAUSE_NP_CHECK_STATE_BAD, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link an cause np check state bad show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t an_cause_intr_state_invalid_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_an_cause_counters_get(ctrl_link, LINK_AN_CAUSE_INTR_STATE_INVALID, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link an cause intr state invalid show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t an_cause_intr_an_retry_np_send_fail_show(struct kobject *kobj, struct kobj_attribute *kattr,
-+							char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_an_cause_counters_get(ctrl_link, LINK_AN_CAUSE_INTR_AN_RETRY_NP_SEND_FAIL, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link an cause intr an retry np send fail show (counter = %u)",
-+		   counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t an_cause_intr_out_of_pages_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_an_cause_counters_get(ctrl_link, LINK_AN_CAUSE_INTR_OUT_OF_PAGES, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link an cause intr out og pages show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t an_cause_intr_np_send_fail_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_an_cause_counters_get(ctrl_link, LINK_AN_CAUSE_INTR_NP_SEND_FAIL, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link an cause intr np send fail show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t an_cause_pages_decode_fail_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_an_cause_counters_get(ctrl_link, LINK_AN_CAUSE_PAGES_DECODE_FAIL, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link an cause pages decode fail show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t an_cause_pages_decode_no_bp_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_an_cause_counters_get(ctrl_link, LINK_AN_CAUSE_PAGES_DECODE_NO_BP, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link an cause pages decode no bp show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t an_cause_pages_decode_oui_invalid_show(struct kobject *kobj, struct kobj_attribute *kattr,
-+						      char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  counter;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, counters_kobj);
-+
-+	rtn = sl_ctrl_link_an_cause_counters_get(ctrl_link, LINK_AN_CAUSE_PAGES_DECODE_OUI_INVALID, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link an cause pages decode oui invalid show (counter = %u)",
-+		   counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static struct kobj_attribute link_up_cmd                    = __ATTR_RO(link_up_cmd);
-+static struct kobj_attribute link_up_retry                  = __ATTR_RO(link_up_retry);
-+static struct kobj_attribute link_up                        = __ATTR_RO(link_up);
-+static struct kobj_attribute link_up_fail                   = __ATTR_RO(link_up_fail);
-+static struct kobj_attribute link_down_cmd                  = __ATTR_RO(link_down_cmd);
-+static struct kobj_attribute link_down                      = __ATTR_RO(link_down);
-+static struct kobj_attribute link_up_cancel_cmd             = __ATTR_RO(link_up_cancel_cmd);
-+static struct kobj_attribute link_up_canceled               = __ATTR_RO(link_up_canceled);
-+static struct kobj_attribute link_reset_cmd                 = __ATTR_RO(link_reset_cmd);
-+static struct kobj_attribute link_fault_async               = __ATTR_RO(link_fault_async);
-+static struct kobj_attribute link_ccw_warn_crossed          = __ATTR_RO(link_ccw_warn_crossed);
-+static struct kobj_attribute link_ucw_warn_crossed          = __ATTR_RO(link_ucw_warn_crossed);
-+static struct kobj_attribute link_down_ccw_limit_crossed    = __ATTR_RO(link_down_ccw_limit_crossed);
-+static struct kobj_attribute link_down_ucw_limit_crossed    = __ATTR_RO(link_down_ucw_limit_crossed);
-+static struct kobj_attribute link_down_ccw_cause            = __ATTR_RO(link_down_ccw_cause);
-+static struct kobj_attribute link_down_ucw_cause            = __ATTR_RO(link_down_ucw_cause);
-+static struct kobj_attribute link_up_fail_ccw_limit_crossed = __ATTR_RO(link_up_fail_ccw_limit_crossed);
-+static struct kobj_attribute link_up_fail_ucw_limit_crossed = __ATTR_RO(link_up_fail_ucw_limit_crossed);
-+static struct kobj_attribute link_autoneg_np_retry          = __ATTR_RO(link_autoneg_np_retry);
-+static struct kobj_attribute link_autoneg_attempt           = __ATTR_RO(link_autoneg_attempt);
-+
-+static struct kobj_attribute link_cause_ucw               = __ATTR_RO(cause_ucw);
-+static struct kobj_attribute link_cause_lf                = __ATTR_RO(cause_lf);
-+static struct kobj_attribute link_cause_rf                = __ATTR_RO(cause_rf);
-+static struct kobj_attribute link_cause_down              = __ATTR_RO(cause_down);
-+static struct kobj_attribute link_cause_up_tries          = __ATTR_RO(cause_up_tries);
-+static struct kobj_attribute link_cause_autoneg_nomatch   = __ATTR_RO(cause_autoneg_nomatch);
-+static struct kobj_attribute link_cause_autoneg           = __ATTR_RO(cause_autoneg);
-+static struct kobj_attribute link_cause_config            = __ATTR_RO(cause_config);
-+static struct kobj_attribute link_cause_intr_enable       = __ATTR_RO(cause_intr_enable);
-+static struct kobj_attribute link_cause_timeout           = __ATTR_RO(cause_timeout);
-+static struct kobj_attribute link_cause_canceled          = __ATTR_RO(cause_canceled);
-+static struct kobj_attribute link_cause_unsupported_cable = __ATTR_RO(cause_unsupported_cable);
-+static struct kobj_attribute link_cause_command           = __ATTR_RO(cause_command);
-+static struct kobj_attribute link_cause_downshift         = __ATTR_RO(cause_downshift);
-+static struct kobj_attribute link_cause_llr_replay_max    = __ATTR_RO(cause_llr_replay_max);
-+static struct kobj_attribute link_cause_upshift           = __ATTR_RO(cause_upshift);
-+static struct kobj_attribute link_cause_autoneg_config    = __ATTR_RO(cause_autoneg_config);
-+static struct kobj_attribute link_cause_pcs_fault         = __ATTR_RO(cause_pcs_fault);
-+static struct kobj_attribute link_cause_serdes_pll        = __ATTR_RO(cause_serdes_pll);
-+static struct kobj_attribute link_cause_serdes_config     = __ATTR_RO(cause_serdes_config);
-+static struct kobj_attribute link_cause_serdes_signal     = __ATTR_RO(cause_serdes_signal);
-+static struct kobj_attribute link_cause_serdes_quality    = __ATTR_RO(cause_serdes_quality);
-+static struct kobj_attribute link_cause_no_media          = __ATTR_RO(cause_no_media);
-+static struct kobj_attribute link_cause_ccw               = __ATTR_RO(cause_ccw);
-+static struct kobj_attribute link_cause_hot               = __ATTR_RO(cause_hot);
-+static struct kobj_attribute link_cause_warm              = __ATTR_RO(cause_warm);
-+static struct kobj_attribute link_cause_intr_register     = __ATTR_RO(cause_intr_register);
-+static struct kobj_attribute link_cause_media_error       = __ATTR_RO(cause_media_error);
-+static struct kobj_attribute link_cause_up_canceled       = __ATTR_RO(cause_up_canceled);
-+static struct kobj_attribute link_cause_unsupported_speed = __ATTR_RO(cause_unsupported_speed);
-+static struct kobj_attribute link_cause_ss200_cable       = __ATTR_RO(cause_ss200_cable);
-+static struct kobj_attribute link_cause_tx_lol            = __ATTR_RO(cause_tx_lol);
-+static struct kobj_attribute link_cause_rx_lol            = __ATTR_RO(cause_rx_lol);
-+static struct kobj_attribute link_cause_tx_los            = __ATTR_RO(cause_tx_los);
-+static struct kobj_attribute link_cause_rx_los            = __ATTR_RO(cause_rx_los);
-+
-+static struct kobj_attribute link_an_cause_lp_caps_serdes_link_up_fail =
-+			     __ATTR_RO(an_cause_lp_caps_serdes_link_up_fail);
-+static struct kobj_attribute link_an_cause_lp_caps_not_complete        = __ATTR_RO(an_cause_lp_caps_not_complete);
-+static struct kobj_attribute link_an_cause_not_complete                = __ATTR_RO(an_cause_not_complete);
-+static struct kobj_attribute link_an_cause_test_caps_nomatch           = __ATTR_RO(an_cause_test_caps_nomatch);
-+static struct kobj_attribute link_an_cause_serdes_link_up_fail         = __ATTR_RO(an_cause_serdes_link_up_fail);
-+static struct kobj_attribute link_an_cause_bp_store_state_bad          = __ATTR_RO(an_cause_bp_store_state_bad);
-+static struct kobj_attribute link_an_cause_bp_store_lp_ability_not_set =
-+			     __ATTR_RO(an_cause_bp_store_lp_ability_not_set);
-+static struct kobj_attribute link_an_cause_bp_store_state_error        = __ATTR_RO(an_cause_bp_store_state_error);
-+static struct kobj_attribute link_an_cause_bp_store_bp_not_set         = __ATTR_RO(an_cause_bp_store_bp_not_set);
-+static struct kobj_attribute link_an_cause_bp_send_intr_enable_fail    =
-+			     __ATTR_RO(an_cause_bp_send_intr_enable_fail);
-+static struct kobj_attribute link_an_cause_np_store_state_bad          = __ATTR_RO(an_cause_np_store_state_bad);
-+static struct kobj_attribute link_an_cause_np_store_bp_set             = __ATTR_RO(an_cause_np_store_bp_set);
-+static struct kobj_attribute link_an_cause_np_check_state_bad          = __ATTR_RO(an_cause_np_check_state_bad);
-+static struct kobj_attribute link_an_cause_intr_state_invalid          = __ATTR_RO(an_cause_intr_state_invalid);
-+static struct kobj_attribute link_an_cause_intr_an_retry_np_send_fail  =
-+			     __ATTR_RO(an_cause_intr_an_retry_np_send_fail);
-+static struct kobj_attribute link_an_cause_intr_out_of_pages           = __ATTR_RO(an_cause_intr_out_of_pages);
-+static struct kobj_attribute link_an_cause_intr_np_send_fail           = __ATTR_RO(an_cause_intr_np_send_fail);
-+static struct kobj_attribute link_an_cause_pages_decode_fail           = __ATTR_RO(an_cause_pages_decode_fail);
-+static struct kobj_attribute link_an_cause_pages_decode_no_bp          = __ATTR_RO(an_cause_pages_decode_no_bp);
-+static struct kobj_attribute link_an_cause_pages_decode_oui_invalid    =
-+			     __ATTR_RO(an_cause_pages_decode_oui_invalid);
-+
-+static struct attribute *link_counters_attrs[] = {
-+	&link_up_cmd.attr,
-+	&link_up_retry.attr,
-+	&link_up.attr,
-+	&link_up_fail.attr,
-+	&link_down_cmd.attr,
-+	&link_down.attr,
-+	&link_up_cancel_cmd.attr,
-+	&link_up_canceled.attr,
-+	&link_reset_cmd.attr,
-+	&link_fault_async.attr,
-+	&link_ccw_warn_crossed.attr,
-+	&link_ucw_warn_crossed.attr,
-+	&link_down_ccw_limit_crossed.attr,
-+	&link_down_ucw_limit_crossed.attr,
-+	&link_down_ccw_cause.attr,
-+	&link_down_ucw_cause.attr,
-+	&link_up_fail_ccw_limit_crossed.attr,
-+	&link_up_fail_ucw_limit_crossed.attr,
-+	&link_autoneg_np_retry.attr,
-+	&link_autoneg_attempt.attr,
-+	&link_cause_ucw.attr,
-+	&link_cause_lf.attr,
-+	&link_cause_rf.attr,
-+	&link_cause_down.attr,
-+	&link_cause_up_tries.attr,
-+	&link_cause_autoneg_nomatch.attr,
-+	&link_cause_autoneg.attr,
-+	&link_cause_config.attr,
-+	&link_cause_intr_enable.attr,
-+	&link_cause_timeout.attr,
-+	&link_cause_canceled.attr,
-+	&link_cause_unsupported_cable.attr,
-+	&link_cause_command.attr,
-+	&link_cause_downshift.attr,
-+	&link_cause_llr_replay_max.attr,
-+	&link_cause_upshift.attr,
-+	&link_cause_autoneg_config.attr,
-+	&link_cause_pcs_fault.attr,
-+	&link_cause_serdes_pll.attr,
-+	&link_cause_serdes_config.attr,
-+	&link_cause_serdes_signal.attr,
-+	&link_cause_serdes_quality.attr,
-+	&link_cause_no_media.attr,
-+	&link_cause_ccw.attr,
-+	&link_cause_hot.attr,
-+	&link_cause_warm.attr,
-+	&link_cause_intr_register.attr,
-+	&link_cause_media_error.attr,
-+	&link_cause_up_canceled.attr,
-+	&link_cause_unsupported_speed.attr,
-+	&link_cause_ss200_cable.attr,
-+	&link_cause_tx_lol.attr,
-+	&link_cause_rx_lol.attr,
-+	&link_cause_tx_los.attr,
-+	&link_cause_rx_los.attr,
-+	&link_an_cause_lp_caps_serdes_link_up_fail.attr,
-+	&link_an_cause_lp_caps_not_complete.attr,
-+	&link_an_cause_not_complete.attr,
-+	&link_an_cause_test_caps_nomatch.attr,
-+	&link_an_cause_serdes_link_up_fail.attr,
-+	&link_an_cause_bp_store_state_bad.attr,
-+	&link_an_cause_bp_store_lp_ability_not_set.attr,
-+	&link_an_cause_bp_store_state_error.attr,
-+	&link_an_cause_bp_store_bp_not_set.attr,
-+	&link_an_cause_bp_send_intr_enable_fail.attr,
-+	&link_an_cause_np_store_state_bad.attr,
-+	&link_an_cause_np_store_bp_set.attr,
-+	&link_an_cause_np_check_state_bad.attr,
-+	&link_an_cause_intr_state_invalid.attr,
-+	&link_an_cause_intr_an_retry_np_send_fail.attr,
-+	&link_an_cause_intr_out_of_pages.attr,
-+	&link_an_cause_intr_np_send_fail.attr,
-+	&link_an_cause_pages_decode_fail.attr,
-+	&link_an_cause_pages_decode_no_bp.attr,
-+	&link_an_cause_pages_decode_oui_invalid.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(link_counters);
-+
-+static struct kobj_type link_counters = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = link_counters_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_link_counters_create(struct sl_ctrl_link *ctrl_link)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link counters create");
-+
-+	rtn = kobject_init_and_add(&ctrl_link->counters_kobj, &link_counters, &ctrl_link->kobj, "counters");
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "link counters create kobject_init_and_add failed [%d]", rtn);
-+		kobject_put(&ctrl_link->counters_kobj);
-+		return rtn;
-+	}
-+
-+	return 0;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_link_counters_delete(struct sl_ctrl_link *ctrl_link)
-+{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link counters delete");
-+	kobject_put(&ctrl_link->counters_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_degrade.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_degrade.c
-new file mode 100644
-index 000000000000..3ba254a54560
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_degrade.c
-@@ -0,0 +1,336 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2025-2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+#include <linux/types.h>
-+
-+#include "sl_log.h"
-+#include "data/sl_core_data_link.h"
-+
-+#include "sl_sysfs.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t state_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_core_link *core_link;
-+	u32                  link_state;
-+	int                  degrade_state;
-+
-+	core_link = container_of(kobj, struct sl_core_link, degrade_kobj);
-+
-+	rtn = sl_core_data_link_state_get(core_link, &link_state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	if (link_state != SL_CORE_LINK_STATE_UP)
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	rtn = sl_core_data_link_degrade_state_get(core_link, &degrade_state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME, "degrade state show (state = %u %s)",
-+		   degrade_state, sl_link_degrade_state_str(degrade_state));
-+
-+	return sysfs_emit(buf, "%s\n", sl_link_degrade_state_str(degrade_state));
-+}
-+
-+static ssize_t is_rx_degraded_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_core_link *core_link;
-+	bool                 is_rx_degraded;
-+	u32                  link_state;
-+
-+	core_link = container_of(kobj, struct sl_core_link, degrade_kobj);
-+
-+	rtn = sl_core_data_link_state_get(core_link, &link_state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	if (link_state != SL_CORE_LINK_STATE_UP)
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	rtn = sl_core_data_link_is_rx_degrade_get(core_link, &is_rx_degraded);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME, "is rx degraded show (is_rx_degraded = %s)",
-+		   is_rx_degraded ? "yes" : "no");
-+
-+	return sysfs_emit(buf, "%s\n", is_rx_degraded ? "yes" : "no");
-+}
-+
-+static ssize_t rx_degrade_map_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_core_link *core_link;
-+	u32                  link_state;
-+	u8                   rx_degrade_map;
-+	bool                 is_rx_degraded;
-+
-+	core_link = container_of(kobj, struct sl_core_link, degrade_kobj);
-+
-+	rtn = sl_core_data_link_state_get(core_link, &link_state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	if (link_state != SL_CORE_LINK_STATE_UP)
-+		return sysfs_emit(buf, "--\n");
-+
-+	rtn = sl_core_data_link_is_rx_degrade_get(core_link, &is_rx_degraded);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	if (!is_rx_degraded)
-+		return sysfs_emit(buf, "--\n");
-+
-+	rtn = sl_core_data_link_degrade_rx_degrade_map_get(core_link, &rx_degrade_map);
-+	if (rtn == -EBADRQC)
-+		return sysfs_emit(buf, "--\n");
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME,
-+		   "rx degrade lane map show (rx_degrade_map = 0x%X)", rx_degrade_map);
-+
-+	return sysfs_emit(buf, "0x%X\n", rx_degrade_map);
-+}
-+
-+static ssize_t rx_link_speed_gbps_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_core_link *core_link;
-+	u32                  link_state;
-+	u16                  link_speed;
-+	bool                 is_rx_degraded;
-+
-+	core_link = container_of(kobj, struct sl_core_link, degrade_kobj);
-+
-+	rtn = sl_core_data_link_state_get(core_link, &link_state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	if (link_state != SL_CORE_LINK_STATE_UP)
-+		return sysfs_emit(buf, "--\n");
-+
-+	rtn = sl_core_data_link_is_rx_degrade_get(core_link, &is_rx_degraded);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	if (!is_rx_degraded)
-+		return sysfs_emit(buf, "--\n");
-+
-+	rtn = sl_core_data_link_degrade_rx_link_speed_get(core_link, &link_speed);
-+	if (rtn == -EBADRQC)
-+		return sysfs_emit(buf, "--\n");
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME,
-+		   "rx degrade link speed gbps show (link_speed = %u)", link_speed);
-+
-+	return sysfs_emit(buf, "%u\n", link_speed);
-+}
-+
-+static ssize_t is_tx_degraded_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_core_link *core_link;
-+	bool                 is_tx_degraded;
-+	u32                  link_state;
-+
-+	core_link = container_of(kobj, struct sl_core_link, degrade_kobj);
-+
-+	rtn = sl_core_data_link_state_get(core_link, &link_state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	if (link_state != SL_CORE_LINK_STATE_UP)
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	rtn = sl_core_data_link_is_tx_degrade_get(core_link, &is_tx_degraded);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME, "is tx degraded show (degrade = %s)",
-+		   is_tx_degraded ? "yes" : "no");
-+
-+	return sysfs_emit(buf, "%s\n", is_tx_degraded ? "yes" : "no");
-+}
-+
-+static ssize_t tx_degrade_map_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_core_link *core_link;
-+	u32                  link_state;
-+	u8                   tx_degrade_map;
-+	bool                 is_tx_degraded;
-+
-+	core_link = container_of(kobj, struct sl_core_link, degrade_kobj);
-+
-+	rtn = sl_core_data_link_state_get(core_link, &link_state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	if (link_state != SL_CORE_LINK_STATE_UP)
-+		return sysfs_emit(buf, "--\n");
-+
-+	rtn = sl_core_data_link_is_tx_degrade_get(core_link, &is_tx_degraded);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	if (!is_tx_degraded)
-+		return sysfs_emit(buf, "--\n");
-+
-+	rtn = sl_core_data_link_degrade_tx_degrade_map_get(core_link, &tx_degrade_map);
-+	if (rtn == -EBADRQC)
-+		return sysfs_emit(buf, "--\n");
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME,
-+		   "tx degrade lane map show (tx_degrade_map = 0x%X)", tx_degrade_map);
-+
-+	return sysfs_emit(buf, "0x%X\n", tx_degrade_map);
-+}
-+
-+static ssize_t tx_link_speed_gbps_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_core_link *core_link;
-+	u32                  link_state;
-+	u16                  link_speed;
-+	bool                 is_tx_degraded;
-+
-+	core_link = container_of(kobj, struct sl_core_link, degrade_kobj);
-+
-+	rtn = sl_core_data_link_state_get(core_link, &link_state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	if (link_state != SL_CORE_LINK_STATE_UP)
-+		return sysfs_emit(buf, "--\n");
-+
-+	rtn = sl_core_data_link_is_tx_degrade_get(core_link, &is_tx_degraded);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	if (!is_tx_degraded)
-+		return sysfs_emit(buf, "--\n");
-+
-+	rtn = sl_core_data_link_degrade_tx_link_speed_get(core_link, &link_speed);
-+	if (rtn == -EBADRQC)
-+		return sysfs_emit(buf, "--\n");
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME,
-+		   "tx degrade link speed gbps show (link_speed = %u)", link_speed);
-+
-+	return sysfs_emit(buf, "%u\n", link_speed);
-+}
-+
-+static ssize_t is_recoverable_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_core_link *core_link;
-+	u32                  link_state;
-+	bool                 is_tx_degraded;
-+	bool                 is_rx_degraded;
-+	bool                 is_recoverable;
-+
-+	core_link = container_of(kobj, struct sl_core_link, degrade_kobj);
-+
-+	rtn = sl_core_data_link_state_get(core_link, &link_state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	if (link_state != SL_CORE_LINK_STATE_UP)
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	rtn = sl_core_data_link_is_tx_degrade_get(core_link, &is_tx_degraded);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	rtn = sl_core_data_link_is_rx_degrade_get(core_link, &is_rx_degraded);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	if (!is_rx_degraded && !is_tx_degraded)
-+		return sysfs_emit(buf, "--\n");
-+
-+	rtn = sl_core_data_link_degrade_is_recoverable_get(core_link, &is_recoverable);
-+	if (rtn == -EBADRQC)
-+		return sysfs_emit(buf, "inactive\n");
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME,
-+		   "is recoverable show (is_recoverable = %s)", is_recoverable ? "yes" : "no");
-+
-+	return sysfs_emit(buf, "%s\n", is_recoverable ? "yes" : "no");
-+}
-+
-+static struct kobj_attribute link_degrade_state              = __ATTR_RO(state);
-+static struct kobj_attribute link_is_rx_degraded             = __ATTR_RO(is_rx_degraded);
-+static struct kobj_attribute link_rx_degrade_lane_map        = __ATTR_RO(rx_degrade_map);
-+static struct kobj_attribute link_rx_degrade_link_speed_gbps = __ATTR_RO(rx_link_speed_gbps);
-+static struct kobj_attribute link_is_tx_degraded             = __ATTR_RO(is_tx_degraded);
-+static struct kobj_attribute link_tx_degrade_lane_map        = __ATTR_RO(tx_degrade_map);
-+static struct kobj_attribute link_tx_degrade_link_speed_gbps = __ATTR_RO(tx_link_speed_gbps);
-+static struct kobj_attribute link_is_recoverable             = __ATTR_RO(is_recoverable);
-+
-+static struct attribute *link_degrade_attrs[] = {
-+	&link_degrade_state.attr,
-+	&link_is_rx_degraded.attr,
-+	&link_rx_degrade_lane_map.attr,
-+	&link_rx_degrade_link_speed_gbps.attr,
-+	&link_is_tx_degraded.attr,
-+	&link_tx_degrade_lane_map.attr,
-+	&link_tx_degrade_link_speed_gbps.attr,
-+	&link_is_recoverable.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(link_degrade);
-+
-+static struct kobj_type link_degrade = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = link_degrade_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_link_degrade_create(struct sl_core_link *core_link, struct kobject *parent_kobj)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME, "link degrade create (num = %u)", core_link->num);
-+
-+	rtn = kobject_init_and_add(&core_link->degrade_kobj, &link_degrade, parent_kobj, "auto_lane_degrade");
-+	if (rtn) {
-+		sl_log_err(core_link, LOG_BLOCK, LOG_NAME,
-+			   "link degrade create kobject_init_and_add failed [%d]", rtn);
-+		kobject_put(&core_link->degrade_kobj);
-+		return rtn;
-+	}
-+
-+	return 0;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_link_degrade_delete(struct sl_core_link *core_link)
-+{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME, "link degrade delete (num = %u)", core_link->num);
-+
-+	kobject_put(&core_link->degrade_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_fec.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_fec.c
-new file mode 100644
-index 000000000000..37edb89f8595
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_fec.c
-@@ -0,0 +1,148 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2024-2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "sl_core_link.h"
-+#include "sl_ctrl_ldev.h"
-+#include "sl_ctrl_lgrp.h"
-+#include "sl_ctrl_link.h"
-+#include "sl_ctrl_link_fec.h"
-+#include "sl_sysfs_link_fec_current.h"
-+#include "sl_sysfs_link_fec_mon_check.h"
-+#include "sl_sysfs_link_fec_up_check.h"
-+#include "sl_sysfs_link_fec_up.h"
-+#include "sl_sysfs_link_fec_down.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t monitor_state_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  state;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, fec.kobj);
-+
-+	rtn = sl_ctrl_link_fec_mon_state_get(ctrl_link, &state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "monitor state show (link = 0x%p, state = %u, %s)", ctrl_link, state,
-+		   sl_ctrl_link_fec_mon_state_str(state));
-+
-+	return sysfs_emit(buf, "%s\n", sl_ctrl_link_fec_mon_state_str(state));
-+}
-+
-+static struct kobj_attribute fec_monitor_state = __ATTR_RO(monitor_state);
-+
-+static struct attribute *link_fec_attrs[] = {
-+	&fec_monitor_state.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(link_fec);
-+
-+static struct kobj_type link_fec = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = link_fec_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_link_fec_create(struct sl_ctrl_link *ctrl_link)
-+{
-+#ifdef CONFIG_SYSFS
-+	int                  rtn;
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link fec create (num = %u)", ctrl_link->num);
-+
-+	core_link = sl_core_link_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num, ctrl_link->ctrl_lgrp->num, ctrl_link->num);
-+	if (!core_link)
-+		return -ENODEV;
-+
-+	rtn = kobject_init_and_add(&ctrl_link->fec.kobj, &link_fec, &ctrl_link->kobj, "fec");
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "link fec create kobject_init_and_add failed [%d]", rtn);
-+		kobject_put(&ctrl_link->fec.kobj);
-+		return rtn;
-+	}
-+
-+	rtn = sl_sysfs_link_fec_current_create(core_link, &ctrl_link->fec.kobj);
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "link fec current create kobject_init_and_add failed [%d]", rtn);
-+		kobject_put(&ctrl_link->fec.kobj);
-+		return rtn;
-+	}
-+
-+	rtn = sl_sysfs_link_fec_mon_check_create(ctrl_link);
-+	if (rtn) {
-+		sl_log_err(core_link, LOG_BLOCK, LOG_NAME, "fec mon check create failed [%d]", rtn);
-+		sl_sysfs_link_fec_current_delete(core_link);
-+		kobject_put(&ctrl_link->fec.kobj);
-+		return rtn;
-+	}
-+
-+	rtn = sl_sysfs_link_fec_up_check_create(core_link, &ctrl_link->fec.kobj);
-+	if (rtn) {
-+		sl_log_err(core_link, LOG_BLOCK, LOG_NAME, "fec up check create failed [%d]", rtn);
-+		sl_sysfs_link_fec_current_delete(core_link);
-+		sl_sysfs_link_fec_mon_check_delete(ctrl_link);
-+		kobject_put(&ctrl_link->fec.kobj);
-+		return rtn;
-+	}
-+
-+	rtn = sl_sysfs_link_fec_up_create(ctrl_link);
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "link fec up create kobject_init_and_add failed [%d]", rtn);
-+		sl_sysfs_link_fec_current_delete(core_link);
-+		sl_sysfs_link_fec_mon_check_delete(ctrl_link);
-+		sl_sysfs_link_fec_up_check_delete(core_link);
-+		kobject_put(&ctrl_link->fec.kobj);
-+		return rtn;
-+	}
-+
-+	rtn = sl_sysfs_link_fec_down_create(ctrl_link);
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "link fec down create kobject_init_and_add failed [%d]", rtn);
-+		sl_sysfs_link_fec_current_delete(core_link);
-+		sl_sysfs_link_fec_mon_check_delete(ctrl_link);
-+		sl_sysfs_link_fec_up_check_delete(core_link);
-+		sl_sysfs_link_fec_up_delete(ctrl_link);
-+		kobject_put(&ctrl_link->fec.kobj);
-+		return rtn;
-+	}
-+
-+	return 0;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_link_fec_delete(struct sl_ctrl_link *ctrl_link)
-+{
-+#ifdef CONFIG_SYSFS
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link fec delete (num = %u)", ctrl_link->num);
-+
-+	core_link = sl_core_link_get(ctrl_link->ctrl_lgrp->ctrl_ldev->num, ctrl_link->ctrl_lgrp->num, ctrl_link->num);
-+	if (!core_link)
-+		return;
-+
-+	sl_sysfs_link_fec_current_delete(core_link);
-+	sl_sysfs_link_fec_mon_check_delete(ctrl_link);
-+	sl_sysfs_link_fec_up_check_delete(core_link);
-+	sl_sysfs_link_fec_up_delete(ctrl_link);
-+	sl_sysfs_link_fec_down_delete(ctrl_link);
-+	kobject_put(&ctrl_link->fec.kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_fec_current.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_fec_current.c
-new file mode 100644
-index 000000000000..30514651d6fe
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_fec_current.c
-@@ -0,0 +1,336 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2024-2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+
-+#include "sl_log.h"
-+#include "sl_core_link.h"
-+
-+#include "sl_sysfs_link_fec_current.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t ccw_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	u64                  ccw;
-+	struct sl_core_link *core_link;
-+
-+	core_link = container_of(kobj, struct sl_core_link, fec.current_kobj);
-+
-+	rtn = sl_core_link_fec_ccw_get(core_link, &ccw);
-+	if (rtn == -ENOLINK) {
-+		sl_log_err_trace(core_link, LOG_BLOCK, LOG_NAME,
-+				 "ccw show sl_core_link_fec_ccw_get failed [%d]", rtn);
-+		return sysfs_emit(buf, "no-link\n");
-+	}
-+	if (rtn) {
-+		sl_log_err_trace(core_link, LOG_BLOCK, LOG_NAME,
-+				 "ccw show sl_core_link_fec_ccw_get failed [%d]", rtn);
-+		return sysfs_emit(buf, "io-error\n");
-+	}
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME, "ccw show (ccw = %llu)", ccw);
-+
-+	return sysfs_emit(buf, "%llu\n", ccw);
-+}
-+
-+static ssize_t ucw_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	u64                  ucw;
-+	struct sl_core_link *core_link;
-+
-+	core_link = container_of(kobj, struct sl_core_link, fec.current_kobj);
-+
-+	rtn = sl_core_link_fec_ucw_get(core_link, &ucw);
-+	if (rtn == -ENOLINK) {
-+		sl_log_err_trace(core_link, LOG_BLOCK, LOG_NAME,
-+				 "ucw show sl_core_link_fec_ucw_get failed [%d]", rtn);
-+		return sysfs_emit(buf, "no-link\n");
-+	}
-+	if (rtn) {
-+		sl_log_err_trace(core_link, LOG_BLOCK, LOG_NAME,
-+				 "ucw show sl_core_link_fec_ucw_get failed [%d]", rtn);
-+		return sysfs_emit(buf, "io-error\n");
-+	}
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME, "ucw show (ucw = %llu)", ucw);
-+
-+	return sysfs_emit(buf, "%llu\n", ucw);
-+}
-+
-+static ssize_t gcw_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int		     rtn;
-+	u64                  gcw;
-+	struct sl_core_link *core_link;
-+
-+	core_link = container_of(kobj, struct sl_core_link, fec.current_kobj);
-+
-+	rtn = sl_core_link_fec_gcw_get(core_link, &gcw);
-+	if (rtn == -ENOLINK) {
-+		sl_log_err_trace(core_link, LOG_BLOCK, LOG_NAME,
-+				 "gcw show sl_core_link_fec_gcw_get failed [%d]", rtn);
-+		return sysfs_emit(buf, "no-link\n");
-+	}
-+	if (rtn) {
-+		sl_log_err_trace(core_link, LOG_BLOCK, LOG_NAME,
-+				 "gcw show sl_core_link_fec_gcw_get failed [%d]", rtn);
-+		return sysfs_emit(buf, "io-error\n");
-+	}
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME,
-+		   "gcw show (link = 0x%p, gcw = %llu)", core_link, gcw);
-+
-+	return sysfs_emit(buf, "%llu\n", gcw);
-+}
-+
-+static struct kobj_attribute link_fec_ccw = __ATTR_RO(ccw);
-+static struct kobj_attribute link_fec_ucw = __ATTR_RO(ucw);
-+static struct kobj_attribute link_fec_gcw = __ATTR_RO(gcw);
-+
-+static struct attribute *link_fec_current_attrs[] = {
-+	&link_fec_ccw.attr,
-+	&link_fec_ucw.attr,
-+	&link_fec_gcw.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(link_fec_current);
-+
-+static struct kobj_type link_fec_current = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = link_fec_current_groups,
-+};
-+
-+static struct attribute *link_fec_current_lane_attrs[] = {
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(link_fec_current_lane);
-+
-+static struct kobj_type link_fec_current_lane = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = link_fec_current_lane_groups,
-+};
-+
-+static ssize_t link_fec_current_fecl_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf, u8 num)
-+{
-+	int                            rtn;
-+	struct sl_core_link_fecl_kobj *fecl_kobj;
-+	struct sl_core_link           *core_link;
-+	u8                             fecl_num;
-+	u64                            fecl;
-+
-+	fecl_kobj = container_of(kobj, struct sl_core_link_fecl_kobj, kobj);
-+
-+	core_link = fecl_kobj->core_link;
-+
-+	fecl_num = ((4 * fecl_kobj->lane_num) + num);
-+
-+	rtn = sl_core_link_fec_lane_cntr_get(core_link, fecl_num, &fecl);
-+	if (rtn == -ENOLINK) {
-+		sl_log_err_trace(core_link, LOG_BLOCK, LOG_NAME,
-+				 "current fecl show sl_core_link_fec_lane_cntr_get failed [%d]", rtn);
-+		return sysfs_emit(buf, "no-link\n");
-+	}
-+	if (rtn) {
-+		sl_log_err_trace(core_link, LOG_BLOCK, LOG_NAME,
-+				 "current fecl show sl_core_link_fec_lane_cntr_get failed [%d]", rtn);
-+		return sysfs_emit(buf, "io-error\n");
-+	}
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME, "current fecl show (num = %u, lane_num = %u, fecl %u = %llu)",
-+		   num, fecl_kobj->lane_num, fecl_num, fecl);
-+
-+	return sysfs_emit(buf, "%llu\n", fecl);
-+}
-+
-+#define link_fec_current_fecl(_num)                                                                            \
-+	static inline ssize_t fecl##_num##_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf) \
-+	{                                                                                                      \
-+		return link_fec_current_fecl_show(kobj, kattr, buf, (_num));                                   \
-+	}                                                                                                      \
-+	static struct kobj_attribute link_fecl##_num = __ATTR_RO(fecl##_num)
-+
-+static ssize_t link_fec_current_bin_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf, u8 num)
-+{
-+	int                  rtn;
-+	struct sl_core_link *core_link;
-+	u64                  ccw_bin;
-+
-+	core_link = container_of(kobj, struct sl_core_link, fec.current_tail_kobj);
-+
-+	rtn = sl_core_link_fec_tail_cntr_get(core_link, num, &ccw_bin);
-+	if (rtn == -ENOLINK) {
-+		sl_log_err_trace(core_link, LOG_BLOCK, LOG_NAME,
-+				 "current bin show sl_core_link_fec_tail_cntr_get failed [%d]", rtn);
-+		return sysfs_emit(buf, "no-link\n");
-+	}
-+	if (rtn) {
-+		sl_log_err_trace(core_link, LOG_BLOCK, LOG_NAME,
-+				 "current bin show sl_core_link_fec_tail_cntr_get failed [%d]", rtn);
-+		return sysfs_emit(buf, "io-error\n");
-+	}
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME, "current bin show (bin %u = %llu)", num, ccw_bin);
-+
-+	return sysfs_emit(buf, "%llu\n", ccw_bin);
-+}
-+
-+#define link_fec_current_tail0(_num)                                                                    \
-+	static ssize_t bin0##_num##_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf) \
-+	{                                                                                               \
-+		return link_fec_current_bin_show(kobj, kattr, buf, _num);                               \
-+	}                                                                                               \
-+	static struct kobj_attribute fec_bin0##_num = __ATTR_RO(bin0##_num)
-+
-+#define link_fec_current_tail(_num)                                                                           \
-+	static inline ssize_t bin##_num##_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf) \
-+	{                                                                                                     \
-+		return link_fec_current_bin_show(kobj, kattr, buf, (_num));                                   \
-+	}                                                                                                     \
-+	static struct kobj_attribute fec_bin##_num = __ATTR_RO(bin##_num)
-+
-+link_fec_current_fecl(0);
-+link_fec_current_fecl(1);
-+link_fec_current_fecl(2);
-+link_fec_current_fecl(3);
-+
-+static struct attribute *link_fec_current_fecl_attrs[] = {
-+	&link_fecl0.attr,
-+	&link_fecl1.attr,
-+	&link_fecl2.attr,
-+	&link_fecl3.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(link_fec_current_fecl);
-+
-+static struct kobj_type link_fec_current_fecl = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = link_fec_current_fecl_groups,
-+};
-+
-+link_fec_current_tail0(0);
-+link_fec_current_tail0(1);
-+link_fec_current_tail0(2);
-+link_fec_current_tail0(3);
-+link_fec_current_tail0(4);
-+link_fec_current_tail0(5);
-+link_fec_current_tail0(6);
-+link_fec_current_tail0(7);
-+link_fec_current_tail0(8);
-+link_fec_current_tail0(9);
-+link_fec_current_tail(10);
-+link_fec_current_tail(11);
-+link_fec_current_tail(12);
-+link_fec_current_tail(13);
-+link_fec_current_tail(14);
-+
-+static struct attribute *link_fec_current_tail_attrs[] = {
-+	&fec_bin00.attr,
-+	&fec_bin01.attr,
-+	&fec_bin02.attr,
-+	&fec_bin03.attr,
-+	&fec_bin04.attr,
-+	&fec_bin05.attr,
-+	&fec_bin06.attr,
-+	&fec_bin07.attr,
-+	&fec_bin08.attr,
-+	&fec_bin09.attr,
-+	&fec_bin10.attr,
-+	&fec_bin11.attr,
-+	&fec_bin12.attr,
-+	&fec_bin13.attr,
-+	&fec_bin14.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(link_fec_current_tail);
-+
-+static struct kobj_type link_fec_current_tail = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = link_fec_current_tail_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_link_fec_current_create(struct sl_core_link *core_link, struct kobject *parent_kobj)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+	int x;
-+	int out;
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME,
-+		   "link fec current create (num = %u)", core_link->num);
-+
-+	rtn = kobject_init_and_add(&core_link->fec.current_kobj, &link_fec_current, parent_kobj, "current");
-+	if (rtn) {
-+		sl_log_err(core_link, LOG_BLOCK, LOG_NAME,
-+			   "link fec current create kobject_init_and_add failed [%d]", rtn);
-+		goto out_current;
-+	}
-+
-+	rtn = kobject_init_and_add(&core_link->fec.current_lane_kobj,
-+				   &link_fec_current_lane, &core_link->fec.current_kobj, "lane");
-+	if (rtn) {
-+		sl_log_err(core_link, LOG_BLOCK, LOG_NAME,
-+			   "link fec current lane create kobject_init_and_add failed [%d]", rtn);
-+		goto out_current_lane;
-+	}
-+	for (x = 0; x < SL_MAX_LANES; ++x) {
-+		rtn = kobject_init_and_add(&core_link->fec.current_fecl_kobjs[x].kobj,
-+					   &link_fec_current_fecl, &core_link->fec.current_lane_kobj, "%d", x);
-+		if (rtn) {
-+			sl_log_err(core_link, LOG_BLOCK, LOG_NAME,
-+				   "link fec current fecl create kobject_init_and_add failed [%d]", rtn);
-+			goto out_current_fecl;
-+		}
-+		core_link->fec.current_fecl_kobjs[x].core_link = core_link;
-+		core_link->fec.current_fecl_kobjs[x].lane_num = x;
-+	}
-+
-+	rtn = kobject_init_and_add(&core_link->fec.current_tail_kobj,
-+				   &link_fec_current_tail, &core_link->fec.current_kobj, "tail");
-+	if (rtn) {
-+		sl_log_err(core_link, LOG_BLOCK, LOG_NAME,
-+			   "link fec current tail create kobject_init_and_add failed [%d]", rtn);
-+		goto out_current_tail;
-+	}
-+
-+	return 0;
-+
-+out_current_tail:
-+	kobject_put(&core_link->fec.current_tail_kobj);
-+out_current_fecl:
-+	if (x < SL_MAX_LANES)
-+		kobject_put(&core_link->fec.current_fecl_kobjs[x].kobj);
-+	for (out = 0; out < x; ++out)
-+		kobject_put(&core_link->fec.current_fecl_kobjs[out].kobj);
-+out_current_lane:
-+	kobject_put(&core_link->fec.current_lane_kobj);
-+out_current:
-+	kobject_put(&core_link->fec.current_kobj);
-+
-+	return rtn;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_link_fec_current_delete(struct sl_core_link *core_link)
-+{
-+#ifdef CONFIG_SYSFS
-+	int x;
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME,
-+		   "link fec current delete (link_num = %u)", core_link->num);
-+
-+	kobject_put(&core_link->fec.current_tail_kobj);
-+	for (x = 0; x < SL_MAX_LANES; ++x)
-+		kobject_put(&core_link->fec.current_fecl_kobjs[x].kobj);
-+	kobject_put(&core_link->fec.current_lane_kobj);
-+	kobject_put(&core_link->fec.current_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_fec_down.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_fec_down.c
-new file mode 100644
-index 000000000000..6962b2c678da
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_fec_down.c
-@@ -0,0 +1,316 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2024-2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+
-+#include "sl_log.h"
-+#include "data/sl_ctrl_data_link.h"
-+
-+#include "sl_sysfs_link_fec_down.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t ccw_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	u64                  ccw;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, fec.down_kobj);
-+
-+	rtn = sl_ctrl_data_link_fec_down_cache_ccw_cntr_get(ctrl_link, &ccw);
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "ccw show sl_ctrl_data_link_fec_down_cache_ccw_cntr_get failed [%d]", rtn);
-+		return sysfs_emit(buf, "error\n");
-+	}
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "ccw show (link = 0x%p, ccw = %llu)", ctrl_link, ccw);
-+
-+	return sysfs_emit(buf, "%llu\n", ccw);
-+}
-+
-+static ssize_t ucw_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	u64                  ucw;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, fec.down_kobj);
-+
-+	rtn = sl_ctrl_data_link_fec_down_cache_ucw_cntr_get(ctrl_link, &ucw);
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "ucw show sl_ctrl_data_link_fec_down_cache_ucw_cntr_get failed [%d]", rtn);
-+		return sysfs_emit(buf, "error\n");
-+	}
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "ucw show (link = 0x%p, ucw = %llu)", ctrl_link, ucw);
-+
-+	return sysfs_emit(buf, "%llu\n", ucw);
-+}
-+
-+static ssize_t gcw_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	u64                  gcw;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, fec.down_kobj);
-+
-+	rtn = sl_ctrl_data_link_fec_down_cache_gcw_cntr_get(ctrl_link, &gcw);
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "gcw show sl_ctrl_data_link_fec_down_cache_gcw_cntr_get failed [%d]", rtn);
-+		return sysfs_emit(buf, "error\n");
-+	}
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "gcw show (link = 0x%p, gcw = %llu)", ctrl_link, gcw);
-+
-+	return sysfs_emit(buf, "%llu\n", gcw);
-+}
-+
-+static struct kobj_attribute link_fec_ccw = __ATTR_RO(ccw);
-+static struct kobj_attribute link_fec_ucw = __ATTR_RO(ucw);
-+static struct kobj_attribute link_fec_gcw = __ATTR_RO(gcw);
-+
-+static struct attribute *link_fec_down_attrs[] = {
-+	&link_fec_ccw.attr,
-+	&link_fec_ucw.attr,
-+	&link_fec_gcw.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(link_fec_down);
-+
-+static struct kobj_type link_fec_down = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = link_fec_down_groups,
-+};
-+
-+static struct attribute *link_fec_down_lane_attrs[] = {
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(link_fec_down_lane);
-+
-+static struct kobj_type link_fec_down_lane = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = link_fec_down_lane_groups,
-+};
-+
-+static ssize_t link_fec_down_fecl_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf, u8 num)
-+{
-+	int                            rtn;
-+	struct sl_ctrl_link           *ctrl_link;
-+	struct sl_ctrl_link_fecl_kobj *fecl_kobj;
-+	u8                             fecl_num;
-+	u64                            lane_cntr;
-+
-+	fecl_kobj = container_of(kobj, struct sl_ctrl_link_fecl_kobj, kobj);
-+	ctrl_link = fecl_kobj->ctrl_link;
-+
-+	fecl_num = ((4 * fecl_kobj->lane_num) + num);
-+
-+	rtn = sl_ctrl_data_link_fec_down_cache_lane_cntr_get(ctrl_link, fecl_num, &lane_cntr);
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "current fecl show sl_ctrl_data_link_fec_down_cache_lane_cntr_get failed [%d]", rtn);
-+		return sysfs_emit(buf, "error\n");
-+	}
-+
-+	sl_log_dbg(fecl_kobj->ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "current fecl show (link = 0x%p, num = %u, lane_num = %u, fecl %u = %llu)",
-+		ctrl_link, num, fecl_kobj->lane_num, fecl_num, lane_cntr);
-+
-+	return sysfs_emit(buf, "%llu\n", lane_cntr);
-+}
-+
-+#define link_fec_down_fecl(_num)                                                                               \
-+	static inline ssize_t fecl##_num##_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf) \
-+	{                                                                                                      \
-+		return link_fec_down_fecl_show(kobj, kattr, buf, (_num));                                      \
-+	}                                                                                                      \
-+	static struct kobj_attribute link_fecl##_num = __ATTR_RO(fecl##_num)
-+
-+static ssize_t link_fec_down_bin_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf, u8 num)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	u64                  tail_cntr;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, fec.down_tail_kobj);
-+
-+	rtn = sl_ctrl_data_link_fec_down_cache_tail_cntr_get(ctrl_link, num, &tail_cntr);
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "down bin show sl_ctrl_data_link_fec_down_cache_tail_cntr_get failed [%d]", rtn);
-+		return sysfs_emit(buf, "error\n");
-+	}
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "down bin show (link = 0x%p, bin %u = %llu)",
-+		ctrl_link, num, tail_cntr);
-+
-+	return sysfs_emit(buf, "%llu\n", tail_cntr);
-+}
-+
-+#define link_fec_down_tail0(_num)                                                                       \
-+	static ssize_t bin0##_num##_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf) \
-+	{                                                                                               \
-+		return link_fec_down_bin_show(kobj, kattr, buf, _num);                                  \
-+	}                                                                                               \
-+	static struct kobj_attribute fec_bin0##_num = __ATTR_RO(bin0##_num)
-+
-+#define link_fec_down_tail(_num)                                                                              \
-+	static inline ssize_t bin##_num##_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf) \
-+	{                                                                                                     \
-+		return link_fec_down_bin_show(kobj, kattr, buf, (_num));                                      \
-+	}                                                                                                     \
-+	static struct kobj_attribute fec_bin##_num = __ATTR_RO(bin##_num)
-+
-+link_fec_down_fecl(0);
-+link_fec_down_fecl(1);
-+link_fec_down_fecl(2);
-+link_fec_down_fecl(3);
-+
-+static struct attribute *link_fec_down_fecl_attrs[] = {
-+	&link_fecl0.attr,
-+	&link_fecl1.attr,
-+	&link_fecl2.attr,
-+	&link_fecl3.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(link_fec_down_fecl);
-+
-+static struct kobj_type link_fec_down_fecl = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = link_fec_down_fecl_groups,
-+};
-+
-+link_fec_down_tail0(0);
-+link_fec_down_tail0(1);
-+link_fec_down_tail0(2);
-+link_fec_down_tail0(3);
-+link_fec_down_tail0(4);
-+link_fec_down_tail0(5);
-+link_fec_down_tail0(6);
-+link_fec_down_tail0(7);
-+link_fec_down_tail0(8);
-+link_fec_down_tail0(9);
-+link_fec_down_tail(10);
-+link_fec_down_tail(11);
-+link_fec_down_tail(12);
-+link_fec_down_tail(13);
-+link_fec_down_tail(14);
-+
-+static struct attribute *link_fec_down_tail_attrs[] = {
-+	&fec_bin00.attr,
-+	&fec_bin01.attr,
-+	&fec_bin02.attr,
-+	&fec_bin03.attr,
-+	&fec_bin04.attr,
-+	&fec_bin05.attr,
-+	&fec_bin06.attr,
-+	&fec_bin07.attr,
-+	&fec_bin08.attr,
-+	&fec_bin09.attr,
-+	&fec_bin10.attr,
-+	&fec_bin11.attr,
-+	&fec_bin12.attr,
-+	&fec_bin13.attr,
-+	&fec_bin14.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(link_fec_down_tail);
-+
-+static struct kobj_type link_fec_down_tail = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = link_fec_down_tail_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_link_fec_down_create(struct sl_ctrl_link *ctrl_link)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+	int x;
-+	int out;
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "link fec down create (num = %u)", ctrl_link->num);
-+
-+	rtn = kobject_init_and_add(&ctrl_link->fec.down_kobj, &link_fec_down,
-+				   &ctrl_link->fec.kobj, "down");
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "link fec down create kobject_init_and_add failed [%d]", rtn);
-+		goto out_down;
-+	}
-+
-+	rtn = kobject_init_and_add(&ctrl_link->fec.down_lane_kobj,
-+				   &link_fec_down_lane, &ctrl_link->fec.down_kobj, "lane");
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "link fec down lane create kobject_init_and_add failed [%d]", rtn);
-+		goto out_down_lane;
-+	}
-+	for (x = 0; x < SL_MAX_LANES; ++x) {
-+		rtn = kobject_init_and_add(&ctrl_link->fec.down_fecl_kobjs[x].kobj,
-+					   &link_fec_down_fecl, &ctrl_link->fec.down_lane_kobj, "%d", x);
-+		if (rtn) {
-+			sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+				   "link fec down fecl create kobject_init_and_add failed [%d]", rtn);
-+			goto out_down_fecl;
-+		}
-+		ctrl_link->fec.down_fecl_kobjs[x].ctrl_link = ctrl_link;
-+		ctrl_link->fec.down_fecl_kobjs[x].lane_num = x;
-+	}
-+
-+	rtn = kobject_init_and_add(&ctrl_link->fec.down_tail_kobj,
-+				   &link_fec_down_tail, &ctrl_link->fec.down_kobj, "tail");
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "link fec down tail create kobject_init_and_add failed [%d]", rtn);
-+		goto out_down_tail;
-+	}
-+
-+	return 0;
-+
-+out_down_tail:
-+	kobject_put(&ctrl_link->fec.down_tail_kobj);
-+out_down_fecl:
-+	if (x < SL_MAX_LANES)
-+		kobject_put(&ctrl_link->fec.down_fecl_kobjs[x].kobj);
-+	for (out = 0; out < x; ++out)
-+		kobject_put(&ctrl_link->fec.down_fecl_kobjs[out].kobj);
-+out_down_lane:
-+	kobject_put(&ctrl_link->fec.down_lane_kobj);
-+out_down:
-+	kobject_put(&ctrl_link->fec.down_kobj);
-+
-+	return rtn;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_link_fec_down_delete(struct sl_ctrl_link *ctrl_link)
-+{
-+#ifdef CONFIG_SYSFS
-+	int x;
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "link fec down delete (link_num = %u)", ctrl_link->num);
-+
-+	kobject_put(&ctrl_link->fec.down_tail_kobj);
-+	for (x = 0; x < SL_MAX_LANES; ++x)
-+		kobject_put(&ctrl_link->fec.down_fecl_kobjs[x].kobj);
-+	kobject_put(&ctrl_link->fec.down_lane_kobj);
-+	kobject_put(&ctrl_link->fec.down_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_fec_mon_check.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_fec_mon_check.c
-new file mode 100644
-index 000000000000..f989399518fc
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_fec_mon_check.c
-@@ -0,0 +1,195 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2024-2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+
-+#include "sl_log.h"
-+#include "data/sl_ctrl_data_link.h"
-+
-+#include "sl_sysfs_link_fec_mon_check.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t ucw_down_limit_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	s32                  ucw_down_limit;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, fec.mon_check_kobj);
-+
-+	rtn = sl_ctrl_data_link_fec_mon_ucw_down_limit_get(ctrl_link, &ucw_down_limit);
-+	if (rtn == -EBADRQC) {
-+		sl_log_warn_trace(ctrl_link, LOG_BLOCK, LOG_NAME,
-+				  "ucw down limit show monitoring not enabled");
-+		return sysfs_emit(buf, "not-monitoring\n");
-+	}
-+	if (rtn) {
-+		sl_log_err_trace(ctrl_link, LOG_BLOCK, LOG_NAME, "fec_mon_ucw_down_limit_get failed [%d]", rtn);
-+		return sysfs_emit(buf, "error\n");
-+	}
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "ucw down limit show (ucw_down_limit = %d)", ucw_down_limit);
-+
-+	if (ucw_down_limit == -1)
-+		return sysfs_emit(buf, "calculated\n");
-+
-+	return sysfs_emit(buf, "%d\n", ucw_down_limit);
-+}
-+
-+static ssize_t ucw_warn_limit_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	s32                  ucw_warn_limit;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, fec.mon_check_kobj);
-+
-+	rtn = sl_ctrl_data_link_fec_mon_ucw_warn_limit_get(ctrl_link, &ucw_warn_limit);
-+	if (rtn == -EBADRQC) {
-+		sl_log_warn_trace(ctrl_link, LOG_BLOCK, LOG_NAME,
-+				  "ucw warn limit show monitoring not enabled");
-+		return sysfs_emit(buf, "not-monitoring\n");
-+	}
-+	if (rtn) {
-+		sl_log_err_trace(ctrl_link, LOG_BLOCK, LOG_NAME, "fec_mon_ucw_warn_limit_get failed [%d]", rtn);
-+		return sysfs_emit(buf, "error\n");
-+	}
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "ucw warn limit show (ucw_warn_limit = %d)", ucw_warn_limit);
-+
-+	if (ucw_warn_limit == -1)
-+		return sysfs_emit(buf, "calculated\n");
-+
-+	return sysfs_emit(buf, "%d\n", ucw_warn_limit);
-+}
-+
-+static ssize_t ccw_down_limit_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_link *ctrl_link;
-+	s32                  ccw_down_limit;
-+	int                  rtn;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, fec.mon_check_kobj);
-+
-+	rtn = sl_ctrl_data_link_fec_mon_ccw_down_limit_get(ctrl_link, &ccw_down_limit);
-+	if (rtn == -EBADRQC) {
-+		sl_log_warn_trace(ctrl_link, LOG_BLOCK, LOG_NAME,
-+				  "ccw down limit show monitoring not enabled");
-+		return sysfs_emit(buf, "not-monitoring\n");
-+	}
-+	if (rtn) {
-+		sl_log_err_trace(ctrl_link, LOG_BLOCK, LOG_NAME, "fec_mon_ccw_down_limit_get failed [%d]", rtn);
-+		return sysfs_emit(buf, "error\n");
-+	}
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "fec_mon_ccw_down_limit show (ccw_down_limit = %d)", ccw_down_limit);
-+
-+	if (ccw_down_limit == -1)
-+		return sysfs_emit(buf, "calculated\n");
-+
-+	return sysfs_emit(buf, "%d\n", ccw_down_limit);
-+}
-+
-+static ssize_t ccw_warn_limit_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	s32                  ccw_warn_limit;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, fec.mon_check_kobj);
-+
-+	rtn = sl_ctrl_data_link_fec_mon_ccw_warn_limit_get(ctrl_link, &ccw_warn_limit);
-+	if (rtn == -EBADRQC) {
-+		sl_log_warn_trace(ctrl_link, LOG_BLOCK, LOG_NAME,
-+				  "ccw warn limit show monitoring not enabled");
-+		return sysfs_emit(buf, "not-monitoring\n");
-+	}
-+	if (rtn) {
-+		sl_log_err_trace(ctrl_link, LOG_BLOCK, LOG_NAME, "fec_mon_ccw_warn_limit_get failed [%d]", rtn);
-+		return sysfs_emit(buf, "error\n");
-+	}
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "fec_mon_ccw_warn_limit show (ccw_warn_limit = %d)", ccw_warn_limit);
-+
-+	if (ccw_warn_limit == -1)
-+		return sysfs_emit(buf, "calculated\n");
-+
-+	return sysfs_emit(buf, "%d\n", ccw_warn_limit);
-+}
-+
-+static ssize_t period_ms_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	s32                  period_ms;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, fec.mon_check_kobj);
-+
-+	rtn = sl_ctrl_data_link_fec_mon_period_ms_get(ctrl_link, &period_ms);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "fec_mon_period_ms_show show (period_ms = %u)", period_ms);
-+
-+	return sysfs_emit(buf, "%u\n", period_ms);
-+}
-+
-+static struct kobj_attribute ucw_down_limit = __ATTR_RO(ucw_down_limit);
-+static struct kobj_attribute ucw_warn_limit = __ATTR_RO(ucw_warn_limit);
-+static struct kobj_attribute ccw_down_limit = __ATTR_RO(ccw_down_limit);
-+static struct kobj_attribute ccw_warn_limit = __ATTR_RO(ccw_warn_limit);
-+static struct kobj_attribute period_ms      = __ATTR_RO(period_ms);
-+
-+static struct attribute *link_fec_mon_check_attrs[] = {
-+	&ucw_down_limit.attr,
-+	&ucw_warn_limit.attr,
-+	&ccw_down_limit.attr,
-+	&ccw_warn_limit.attr,
-+	&period_ms.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(link_fec_mon_check);
-+
-+static struct kobj_type link_fec_mon_check = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = link_fec_mon_check_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_link_fec_mon_check_create(struct sl_ctrl_link *ctrl_link)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link fec mon check create (num = %u)", ctrl_link->num);
-+
-+	rtn = kobject_init_and_add(&ctrl_link->fec.mon_check_kobj, &link_fec_mon_check,
-+				   &ctrl_link->fec.kobj, "monitor_check");
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "link monitor check create kobject_init_and_add failed [%d]", rtn);
-+		kobject_put(&ctrl_link->fec.mon_check_kobj);
-+		return rtn;
-+	}
-+
-+	return 0;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_link_fec_mon_check_delete(struct sl_ctrl_link *ctrl_link)
-+{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link fec mon check delete (num = %u)", ctrl_link->num);
-+
-+	kobject_put(&ctrl_link->fec.mon_check_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_fec_up.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_fec_up.c
-new file mode 100644
-index 000000000000..ecf92c043e01
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_fec_up.c
++++ b/drivers/net/ethernet/hpe/ss1/cass_ats.c
 @@ -0,0 +1,299 @@
 +// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2024-2026 Hewlett Packard Enterprise Development LP */
++/* Copyright 2019, 2024-2026 Hewlett Packard Enterprise Development LP */
 +
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
++/*
++ * Address Translation Unit (ATU) management
++ * ATS functionality
++ */
 +
-+#include "sl_log.h"
-+#include "data/sl_ctrl_data_link.h"
-+
-+#include "sl_sysfs_link_fec_up.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t ccw_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	u64                  ccw;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, fec.up_kobj);
-+
-+	rtn = sl_ctrl_data_link_fec_up_cache_ccw_cntr_get(ctrl_link, &ccw);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "ccw show (ccw = %llu)", ccw);
-+
-+	return sysfs_emit(buf, "%llu\n", ccw);
-+}
-+
-+static ssize_t ucw_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	u64                  ucw;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, fec.up_kobj);
-+
-+	rtn = sl_ctrl_data_link_fec_up_cache_ucw_cntr_get(ctrl_link, &ucw);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "ucw show (ucw = %llu)", ucw);
-+
-+	return sysfs_emit(buf, "%llu\n", ucw);
-+}
-+
-+static ssize_t gcw_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	u64                  gcw;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, fec.up_kobj);
-+
-+	rtn = sl_ctrl_data_link_fec_up_cache_gcw_cntr_get(ctrl_link, &gcw);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "gcw show (link = 0x%p, gcw = %llu)", ctrl_link, gcw);
-+
-+	return sysfs_emit(buf, "%llu\n", gcw);
-+}
-+
-+static struct kobj_attribute link_fec_ccw = __ATTR_RO(ccw);
-+static struct kobj_attribute link_fec_ucw = __ATTR_RO(ucw);
-+static struct kobj_attribute link_fec_gcw = __ATTR_RO(gcw);
-+
-+static struct attribute *link_fec_up_attrs[] = {
-+	&link_fec_ccw.attr,
-+	&link_fec_ucw.attr,
-+	&link_fec_gcw.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(link_fec_up);
-+
-+static struct kobj_type link_fec_up = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = link_fec_up_groups,
-+};
-+
-+static struct attribute *link_fec_up_lane_attrs[] = {
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(link_fec_up_lane);
-+
-+static struct kobj_type link_fec_up_lane = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = link_fec_up_lane_groups,
-+};
-+
-+static ssize_t link_fec_up_fecl_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf, u8 num)
-+{
-+	int                            rtn;
-+	struct sl_ctrl_link           *ctrl_link;
-+	struct sl_ctrl_link_fecl_kobj *fecl_kobj;
-+	u8                             fecl_num;
-+	u64                            fecl;
-+
-+	fecl_kobj = container_of(kobj, struct sl_ctrl_link_fecl_kobj, kobj);
-+	ctrl_link = fecl_kobj->ctrl_link;
-+
-+	fecl_num = ((4 * fecl_kobj->lane_num) + num);
-+
-+	rtn = sl_ctrl_data_link_fec_up_cache_lane_cntr_get(ctrl_link, fecl_num, &fecl);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(fecl_kobj->ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "current fecl show (link = 0x%p, num = %u, lane_num = %u, fecl %u = %llu)",
-+		fecl_kobj->ctrl_link, num, fecl_kobj->lane_num, fecl_num, fecl);
-+
-+	return sysfs_emit(buf, "%llu\n", fecl);
-+}
-+
-+#define link_fec_up_fecl(_num)                                                                                 \
-+	static inline ssize_t fecl##_num##_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf) \
-+	{                                                                                                      \
-+		return link_fec_up_fecl_show(kobj, kattr, buf, (_num));                                        \
-+	}                                                                                                      \
-+	static struct kobj_attribute link_fecl##_num = __ATTR_RO(fecl##_num)
-+
-+static ssize_t link_fec_up_bin_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf, u8 num)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	u64                 tail_cntr;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, fec.up_tail_kobj);
-+
-+	rtn = sl_ctrl_data_link_fec_up_cache_tail_cntr_get(ctrl_link, num, &tail_cntr);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "up bin show (link = 0x%p, bin %u = %llu)",
-+		ctrl_link, num, tail_cntr);
-+
-+	return sysfs_emit(buf, "%llu\n", tail_cntr);
-+}
-+
-+#define link_fec_up_tail0(_num)                                                                         \
-+	static ssize_t bin0##_num##_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf) \
-+	{                                                                                               \
-+		return link_fec_up_bin_show(kobj, kattr, buf, _num);                                    \
-+	}                                                                                               \
-+	static struct kobj_attribute fec_bin0##_num = __ATTR_RO(bin0##_num)
-+
-+#define link_fec_up_tail(_num)                                                                                \
-+	static inline ssize_t bin##_num##_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf) \
-+	{                                                                                                     \
-+		return link_fec_up_bin_show(kobj, kattr, buf, (_num));                                        \
-+	}                                                                                                     \
-+	static struct kobj_attribute fec_bin##_num = __ATTR_RO(bin##_num)
-+
-+link_fec_up_fecl(0);
-+link_fec_up_fecl(1);
-+link_fec_up_fecl(2);
-+link_fec_up_fecl(3);
-+
-+static struct attribute *link_fec_up_fecl_attrs[] = {
-+	&link_fecl0.attr,
-+	&link_fecl1.attr,
-+	&link_fecl2.attr,
-+	&link_fecl3.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(link_fec_up_fecl);
-+
-+static struct kobj_type link_fec_up_fecl = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = link_fec_up_fecl_groups,
-+};
-+
-+link_fec_up_tail0(0);
-+link_fec_up_tail0(1);
-+link_fec_up_tail0(2);
-+link_fec_up_tail0(3);
-+link_fec_up_tail0(4);
-+link_fec_up_tail0(5);
-+link_fec_up_tail0(6);
-+link_fec_up_tail0(7);
-+link_fec_up_tail0(8);
-+link_fec_up_tail0(9);
-+link_fec_up_tail(10);
-+link_fec_up_tail(11);
-+link_fec_up_tail(12);
-+link_fec_up_tail(13);
-+link_fec_up_tail(14);
-+
-+static struct attribute *link_fec_up_tail_attrs[] = {
-+	&fec_bin00.attr,
-+	&fec_bin01.attr,
-+	&fec_bin02.attr,
-+	&fec_bin03.attr,
-+	&fec_bin04.attr,
-+	&fec_bin05.attr,
-+	&fec_bin06.attr,
-+	&fec_bin07.attr,
-+	&fec_bin08.attr,
-+	&fec_bin09.attr,
-+	&fec_bin10.attr,
-+	&fec_bin11.attr,
-+	&fec_bin12.attr,
-+	&fec_bin13.attr,
-+	&fec_bin14.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(link_fec_up_tail);
-+
-+static struct kobj_type link_fec_up_tail = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = link_fec_up_tail_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_link_fec_up_create(struct sl_ctrl_link *ctrl_link)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+	int x;
-+	int out;
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "link fec up create (num = %u)", ctrl_link->num);
-+
-+	rtn = kobject_init_and_add(&ctrl_link->fec.up_kobj, &link_fec_up,
-+				   &ctrl_link->fec.kobj, "up");
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "link fec up create kobject_init_and_add failed [%d]", rtn);
-+		goto out_up;
-+	}
-+
-+	rtn = kobject_init_and_add(&ctrl_link->fec.up_lane_kobj,
-+				   &link_fec_up_lane, &ctrl_link->fec.up_kobj, "lane");
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "link fec up lane create kobject_init_and_add failed [%d]", rtn);
-+		goto out_up_lane;
-+	}
-+	for (x = 0; x < SL_MAX_LANES; ++x) {
-+		rtn = kobject_init_and_add(&ctrl_link->fec.up_fecl_kobjs[x].kobj,
-+					   &link_fec_up_fecl, &ctrl_link->fec.up_lane_kobj, "%d", x);
-+		if (rtn) {
-+			sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+				   "link fec up fecl create kobject_init_and_add failed [%d]", rtn);
-+			goto out_up_fecl;
-+		}
-+		ctrl_link->fec.up_fecl_kobjs[x].ctrl_link = ctrl_link;
-+		ctrl_link->fec.up_fecl_kobjs[x].lane_num = x;
-+	}
-+
-+	rtn = kobject_init_and_add(&ctrl_link->fec.up_tail_kobj,
-+				   &link_fec_up_tail, &ctrl_link->fec.up_kobj, "tail");
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "link fec up tail create kobject_init_and_add failed [%d]", rtn);
-+		goto out_up_tail;
-+	}
-+
-+	return 0;
-+
-+out_up_tail:
-+	kobject_put(&ctrl_link->fec.up_tail_kobj);
-+out_up_fecl:
-+	if (x < SL_MAX_LANES)
-+		kobject_put(&ctrl_link->fec.up_fecl_kobjs[x].kobj);
-+	for (out = 0; out < x; ++out)
-+		kobject_put(&ctrl_link->fec.up_fecl_kobjs[out].kobj);
-+out_up_lane:
-+	kobject_put(&ctrl_link->fec.up_lane_kobj);
-+out_up:
-+	kobject_put(&ctrl_link->fec.up_kobj);
-+
-+	return rtn;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_link_fec_up_delete(struct sl_ctrl_link *ctrl_link)
-+{
-+#ifdef CONFIG_SYSFS
-+	int x;
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "link fec up delete (link_num = %u)", ctrl_link->num);
-+
-+	kobject_put(&ctrl_link->fec.up_tail_kobj);
-+	for (x = 0; x < SL_MAX_LANES; ++x)
-+		kobject_put(&ctrl_link->fec.up_fecl_kobjs[x].kobj);
-+	kobject_put(&ctrl_link->fec.up_lane_kobj);
-+	kobject_put(&ctrl_link->fec.up_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_fec_up_check.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_fec_up_check.c
-new file mode 100644
-index 000000000000..763dde6ca217
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_fec_up_check.c
-@@ -0,0 +1,137 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2025-2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+
-+#include "sl_log.h"
-+#include "sl_core_link.h"
-+#include "data/sl_core_data_link.h"
-+
-+#include "sl_sysfs_link_fec_up_check.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t ucw_limit_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_core_link *core_link;
-+	s32                  ucw_limit;
-+
-+	core_link = container_of(kobj, struct sl_core_link, fec.up_check_kobj);
-+
-+	rtn = sl_core_data_link_fec_up_ucw_limit_get(core_link, &ucw_limit);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME,
-+		   "fec_up_ucw_limit show (ucw_limit = %d)", ucw_limit);
-+
-+	return sysfs_emit(buf, "%d\n", ucw_limit);
-+}
-+
-+static ssize_t ccw_limit_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_core_link *core_link;
-+	s32                  ccw_limit;
-+
-+	core_link = container_of(kobj, struct sl_core_link, fec.up_check_kobj);
-+
-+	rtn = sl_core_data_link_fec_up_ccw_limit_get(core_link, &ccw_limit);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME,
-+		   "fec_up_ccw_limit show (ccw_limit = %d)", ccw_limit);
-+
-+	return sysfs_emit(buf, "%d\n", ccw_limit);
-+}
-+
-+static ssize_t settle_wait_ms_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_core_link *core_link;
-+	u32                  settle_wait_ms;
-+
-+	core_link = container_of(kobj, struct sl_core_link, fec.up_check_kobj);
-+
-+	rtn = sl_core_data_link_fec_up_settle_wait_ms_get(core_link, &settle_wait_ms);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME,
-+		   "settle_wait_ms show (settle_wait_ms = %u)", settle_wait_ms);
-+
-+	return sysfs_emit(buf, "%u\n", settle_wait_ms);
-+}
-+
-+static ssize_t check_wait_ms_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_core_link *core_link;
-+	u32                  check_wait_ms;
-+
-+	core_link = container_of(kobj, struct sl_core_link, fec.up_check_kobj);
-+
-+	rtn = sl_core_data_link_fec_up_check_wait_ms_get(core_link, &check_wait_ms);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME,
-+		   "check_wait_ms show (check_wait_ms = %u)", check_wait_ms);
-+
-+	return sysfs_emit(buf, "%u\n", check_wait_ms);
-+}
-+
-+static struct kobj_attribute ucw_limit      = __ATTR_RO(ucw_limit);
-+static struct kobj_attribute ccw_limit      = __ATTR_RO(ccw_limit);
-+static struct kobj_attribute settle_wait_ms = __ATTR_RO(settle_wait_ms);
-+static struct kobj_attribute check_wait_ms  = __ATTR_RO(check_wait_ms);
-+
-+static struct attribute *link_fec_up_check_attrs[] = {
-+	&ucw_limit.attr,
-+	&ccw_limit.attr,
-+	&settle_wait_ms.attr,
-+	&check_wait_ms.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(link_fec_up_check);
-+
-+static struct kobj_type link_fec_up_check = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = link_fec_up_check_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_link_fec_up_check_create(struct sl_core_link *core_link, struct kobject *parent_kobj)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME, "link fec up check create (num = %u)", core_link->num);
-+
-+	rtn = kobject_init_and_add(&core_link->fec.up_check_kobj, &link_fec_up_check, parent_kobj, "up_check");
-+	if (rtn) {
-+		sl_log_err(core_link, LOG_BLOCK, LOG_NAME,
-+			   "link up_check create kobject_init_and_add failed [%d]", rtn);
-+		kobject_put(&core_link->fec.up_check_kobj);
-+		return rtn;
-+	}
-+
-+	return 0;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_link_fec_up_check_delete(struct sl_core_link *core_link)
-+{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME, "link fec up check delete (num = %u)", core_link->num);
-+
-+	kobject_put(&core_link->fec.up_check_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_pml_rec.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_pml_rec.c
-new file mode 100644
-index 000000000000..dc076274157d
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_pml_rec.c
-@@ -0,0 +1,193 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
++#include <linux/pci.h>
 +#include <linux/types.h>
++#include <linux/iommu.h>
 +
-+#include "sl_log.h"
-+#include "data/sl_core_data_link.h"
++#include "cass_core.h"
 +
-+#include "sl_sysfs.h"
++/* PCIe IP PF0_PORT_LOGIC register */
++#define SYMBOL_TIMER_FILTER_1_OFF 0x71c
++#define CX_FLT_MASK_CPL_LEN_MATCH (1 << 26)
++#define FILTER_MASK_2_OFF 0x720
++#define CX_FLT_UNMASK_ATS_SPECIFIC_RULES (1 << 10)
 +
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
++#define ATU_NUM_PASIDS ATU_PHYS_AC
++#define MAX_PAGE_REQS 512
 +
-+#ifdef CONFIG_SYSFS
-+static ssize_t pml_rec_attempts_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++#ifdef CONFIG_IOMMU_SVA
++
++static bool enable_ats = true;
++module_param(enable_ats, bool, 0644);
++MODULE_PARM_DESC(enable_ats, "Enable Address Translation Services (PCIe ATS)");
++
++static bool odp_mode_nic_pri;
++module_param(odp_mode_nic_pri, bool, 0644);
++MODULE_PARM_DESC(odp_mode_nic_pri,
++		 "ODP mode used for ATS. ATS_PRS:0, NIC_PRI:1");
++
++static int cass_bind_sva(struct pci_dev *pdev, struct cass_ac *cac)
 +{
-+	struct sl_core_link *core_link;
-+	int                  attempts;
-+	int		     rtn;
++	u32 pasid;
++	struct iommu_sva *sva;
 +
-+	core_link = container_of(kobj, struct sl_core_link, pml_rec_kobj);
-+
-+	rtn = sl_core_data_link_pml_rec_attempts_get(core_link, &attempts);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME, "pml rec attempts show (attempts = %d)", attempts);
-+
-+	return sysfs_emit(buf, "%d\n", attempts);
-+}
-+
-+static ssize_t pml_rec_successes_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_core_link *core_link;
-+	int                  successes;
-+	int		     rtn;
-+
-+	core_link = container_of(kobj, struct sl_core_link, pml_rec_kobj);
-+
-+	rtn = sl_core_data_link_pml_rec_successes_get(core_link, &successes);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME, "pml rec successes show (successes = %d)", successes);
-+
-+	return sysfs_emit(buf, "%d\n", successes);
-+}
-+
-+static ssize_t pml_rec_link_fault_cause_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_core_link *core_link;
-+	int                  link_fault_cause;
-+	int		     rtn;
-+
-+	core_link = container_of(kobj, struct sl_core_link, pml_rec_kobj);
-+
-+	rtn = sl_core_data_link_pml_rec_link_fault_cause_get(core_link, &link_fault_cause);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME, "pml rec link_fault_cause show (link_fault_cause = %d)", link_fault_cause);
-+
-+	return sysfs_emit(buf, "%d\n", link_fault_cause);
-+}
-+
-+static ssize_t pml_rec_link_down_cause_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_core_link *core_link;
-+	int                  link_down_cause;
-+	int		     rtn;
-+
-+	core_link = container_of(kobj, struct sl_core_link, pml_rec_kobj);
-+
-+	rtn = sl_core_data_link_pml_rec_link_down_cause_get(core_link, &link_down_cause);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME, "pml rec link_down_cause show (link_down_cause = %d)", link_down_cause);
-+
-+	return sysfs_emit(buf, "%d\n", link_down_cause);
-+}
-+
-+static ssize_t pml_rec_link_fault_failed_cause_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_core_link *core_link;
-+	int                  link_fault_failed_cause;
-+	int		     rtn;
-+
-+	core_link = container_of(kobj, struct sl_core_link, pml_rec_kobj);
-+
-+	rtn = sl_core_data_link_pml_rec_link_fault_failed_cause_get(core_link, &link_fault_failed_cause);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME, "pml rec link_fault_failed_cause show (link_fault_failed_cause = %d)",
-+		   link_fault_failed_cause);
-+
-+	return sysfs_emit(buf, "%d\n", link_fault_failed_cause);
-+}
-+
-+static ssize_t pml_rec_link_down_failed_cause_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_core_link *core_link;
-+	int                  link_down_failed_cause;
-+	int		     rtn;
-+
-+	core_link = container_of(kobj, struct sl_core_link, pml_rec_kobj);
-+
-+	rtn = sl_core_data_link_pml_rec_link_down_failed_cause_get(core_link, &link_down_failed_cause);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME, "pml rec link_down_cause show (link_down_failed_cause = %d)",
-+		   link_down_failed_cause);
-+
-+	return sysfs_emit(buf, "%d\n", link_down_failed_cause);
-+}
-+
-+static ssize_t pml_rec_rate_limit_exceeded_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_core_link *core_link;
-+	int                  rate_limit_exceeded;
-+	int		     rtn;
-+
-+	core_link = container_of(kobj, struct sl_core_link, pml_rec_kobj);
-+
-+	rtn = sl_core_data_link_pml_rec_rate_limit_exceeded_get(core_link, &rate_limit_exceeded);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME, "pml rec rate_limit_exceeded show (rate_limit_exceeded = %d)",
-+		   rate_limit_exceeded);
-+
-+	return sysfs_emit(buf, "%d\n", rate_limit_exceeded);
-+}
-+
-+static struct kobj_attribute link_pml_rec_attempts                = __ATTR_RO(pml_rec_attempts);
-+static struct kobj_attribute link_pml_rec_successes               = __ATTR_RO(pml_rec_successes);
-+static struct kobj_attribute link_pml_rec_link_fault_cause        = __ATTR_RO(pml_rec_link_fault_cause);
-+static struct kobj_attribute link_pml_rec_link_down_cause         = __ATTR_RO(pml_rec_link_down_cause);
-+static struct kobj_attribute link_pml_rec_link_fault_failed_cause = __ATTR_RO(pml_rec_link_fault_failed_cause);
-+static struct kobj_attribute link_pml_rec_link_down_failed_cause  = __ATTR_RO(pml_rec_link_down_failed_cause);
-+static struct kobj_attribute link_pml_rec_rate_limit_exceeded     = __ATTR_RO(pml_rec_rate_limit_exceeded);
-+
-+static struct attribute *link_pml_rec_attrs[] = {
-+	&link_pml_rec_attempts.attr,
-+	&link_pml_rec_successes.attr,
-+	&link_pml_rec_link_fault_cause.attr,
-+	&link_pml_rec_link_down_cause.attr,
-+	&link_pml_rec_link_fault_failed_cause.attr,
-+	&link_pml_rec_link_down_failed_cause.attr,
-+	&link_pml_rec_rate_limit_exceeded.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(link_pml_rec);
-+
-+static struct kobj_type link_pml_rec = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = link_pml_rec_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_link_pml_rec_create(struct sl_core_link *core_link, struct kobject *parent_kobj)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME, "link pml rec create (num = %u)", core_link->num);
-+
-+	rtn = kobject_init_and_add(&core_link->pml_rec_kobj, &link_pml_rec, parent_kobj, "pml_recovery");
-+	if (rtn) {
-+		sl_log_err(core_link, LOG_BLOCK, LOG_NAME,
-+			   "link pml rec create kobject_init_and_add failed [%d]", rtn);
-+		kobject_put(&core_link->pml_rec_kobj);
-+		return rtn;
++	sva = iommu_sva_bind_device(&pdev->dev, current->mm);
++	if (IS_ERR(sva)) {
++		pr_err("iommu_sva_bind_device failed ret:%ld\n", PTR_ERR(sva));
++		return PTR_ERR(sva);
 +	}
++
++	pasid = iommu_sva_get_pasid(sva);
++	if (pasid == IOMMU_PASID_INVALID) {
++		pr_err("pasid invalid\n");
++		iommu_sva_unbind_device(sva);
++		return -ENODEV;
++	}
++
++	cac->sva = sva;
++	cac->pasid = pasid;
 +
 +	return 0;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
 +}
 +
-+void sl_sysfs_link_pml_rec_delete(struct sl_core_link *core_link)
++static void cass_unbind_sva(const struct cass_ac *cac)
 +{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME, "link pml rec delete (num = %u)", core_link->num);
-+
-+	kobject_put(&core_link->pml_rec_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_policy.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_policy.c
-new file mode 100644
-index 000000000000..110486b5d274
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_link_policy.c
-@@ -0,0 +1,261 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2024-2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "data/sl_ctrl_data_link.h"
-+#include "sl_ctrl_link.h"
-+#include "sl_test_common.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t fec_mon_period_ms_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	s32                  fec_mon_period_ms;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, policy_kobj);
-+
-+	rtn = sl_ctrl_data_link_policy_fec_mon_period_ms_get(ctrl_link, &fec_mon_period_ms);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "fec_mon_period_ms show (fec_mon_period_ms = %d)", fec_mon_period_ms);
-+
-+	return sysfs_emit(buf, "%d\n", fec_mon_period_ms);
++	iommu_sva_unbind_device(cac->sva);
 +}
 +
-+static ssize_t fec_mon_ucw_down_limit_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++/**
++ * cass_bind_ac() - Bind an address context to the current task.
++ *
++ * @hw:  Cassini device
++ * @cac: Cassini AC struct
++ *
++ * @return: 0 on success
++ */
++static int cass_bind_ac(struct cass_dev *hw, struct cass_ac *cac)
 +{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	s32                  fec_mon_ucw_down_limit;
++	struct pci_dev *pdev = hw->cdev.pdev;
 +
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, policy_kobj);
-+
-+	rtn = sl_ctrl_data_link_policy_fec_mon_ucw_down_limit_get(ctrl_link, &fec_mon_ucw_down_limit);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "fec_mon_ucw_down_limit show (fec_mon_ucw_down_limit = %d)", fec_mon_ucw_down_limit);
-+
-+	return sysfs_emit(buf, "%d\n", fec_mon_ucw_down_limit);
-+}
-+
-+static ssize_t fec_mon_ucw_warn_limit_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	s32                  fec_mon_ucw_warn_limit;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, policy_kobj);
-+
-+	rtn = sl_ctrl_data_link_policy_fec_mon_ucw_warn_limit_get(ctrl_link, &fec_mon_ucw_warn_limit);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "fec_mon_ucw_warn_limit show (fec_mon_ucw_warn_limit = %d)", fec_mon_ucw_warn_limit);
-+
-+	return sysfs_emit(buf, "%d\n", fec_mon_ucw_warn_limit);
-+}
-+
-+static ssize_t fec_mon_ccw_down_limit_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	s32                  fec_mon_ccw_down_limit;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, policy_kobj);
-+
-+	rtn = sl_ctrl_data_link_policy_fec_mon_ccw_down_limit_get(ctrl_link, &fec_mon_ccw_down_limit);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "fec_mon_ccw_down_limit show (fec_mon_ccw_down_limit = %d)", fec_mon_ccw_down_limit);
-+
-+	return sysfs_emit(buf, "%d\n", fec_mon_ccw_down_limit);
-+}
-+
-+static ssize_t fec_mon_ccw_warn_limit_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	s32                  fec_mon_ccw_warn_limit;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, policy_kobj);
-+
-+	rtn = sl_ctrl_data_link_policy_fec_mon_ccw_warn_limit_get(ctrl_link, &fec_mon_ccw_warn_limit);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "fec_mon_ccw_warn_limit show (fec_mon_ccw_warn_limit = %d)", fec_mon_ccw_warn_limit);
-+
-+	return sysfs_emit(buf, "%d\n", fec_mon_ccw_warn_limit);
-+}
-+
-+static ssize_t lock_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  options;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, policy_kobj);
-+
-+	rtn = sl_ctrl_data_link_policy_options_get(ctrl_link, &options);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "link_policy_option_locked show (options = 0x%X)", options);
-+
-+	return sysfs_emit(buf, "%s\n", (options & SL_LINK_POLICY_OPT_LOCK) ? "enabled" : "disabled");
-+}
-+
-+static ssize_t keep_serdes_up_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  options;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, policy_kobj);
-+
-+	rtn = sl_ctrl_data_link_policy_options_get(ctrl_link, &options);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "link_policy_option_keep_serdes_up show (options = 0x%X)", options);
-+
-+	return sysfs_emit(buf, "%s\n",
-+			 (options & SL_LINK_POLICY_OPT_KEEP_SERDES_UP) ? "enabled" : "disabled");
-+}
-+
-+static ssize_t use_unsupported_cable_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  options;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, policy_kobj);
-+
-+	rtn = sl_ctrl_data_link_policy_options_get(ctrl_link, &options);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "link_policy_option_use_unsupported_cable show (options = 0x%X)", options);
-+
-+	return sysfs_emit(buf, "%s\n",
-+			 (options & SL_LINK_POLICY_OPT_USE_UNSUPPORTED_CABLE) ? "enabled" : "disabled");
-+}
-+
-+static ssize_t use_supported_ss200_cable_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  options;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, policy_kobj);
-+
-+	rtn = sl_ctrl_data_link_policy_options_get(ctrl_link, &options);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "link_policy_option_use_supported_ss200_cable show (options = 0x%X)", options);
-+
-+	return sysfs_emit(buf, "%s\n",
-+			 (options & SL_LINK_POLICY_OPT_USE_SUPPORTED_SS200_CABLE) ? "enabled" : "disabled");
-+}
-+
-+static ssize_t ignore_media_error_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_ctrl_link *ctrl_link;
-+	u32                  options;
-+
-+	ctrl_link = container_of(kobj, struct sl_ctrl_link, policy_kobj);
-+
-+	rtn = sl_ctrl_data_link_policy_options_get(ctrl_link, &options);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME,
-+		   "link_policy_option_ignore_media_error show (options = %u)", options);
-+
-+	return sysfs_emit(buf, "%s\n",
-+			 (options & SL_LINK_POLICY_OPT_IGNORE_MEDIA_ERROR) ? "enabled" : "disabled");
-+}
-+
-+static struct kobj_attribute fec_mon_period_ms         = __ATTR_RO(fec_mon_period_ms);
-+static struct kobj_attribute fec_mon_ucw_down_limit    = __ATTR_RO(fec_mon_ucw_down_limit);
-+static struct kobj_attribute fec_mon_ucw_warn_limit    = __ATTR_RO(fec_mon_ucw_warn_limit);
-+static struct kobj_attribute fec_mon_ccw_down_limit    = __ATTR_RO(fec_mon_ccw_down_limit);
-+static struct kobj_attribute fec_mon_ccw_warn_limit    = __ATTR_RO(fec_mon_ccw_warn_limit);
-+static struct kobj_attribute lock                      = __ATTR_RO(lock);
-+static struct kobj_attribute keep_serdes_up            = __ATTR_RO(keep_serdes_up);
-+static struct kobj_attribute use_unsupported_cable     = __ATTR_RO(use_unsupported_cable);
-+static struct kobj_attribute use_supported_ss200_cable = __ATTR_RO(use_supported_ss200_cable);
-+static struct kobj_attribute ignore_media_error        = __ATTR_RO(ignore_media_error);
-+
-+static struct attribute *link_policy_attrs[] = {
-+	&fec_mon_period_ms.attr,
-+	&fec_mon_ucw_down_limit.attr,
-+	&fec_mon_ucw_warn_limit.attr,
-+	&fec_mon_ccw_down_limit.attr,
-+	&fec_mon_ccw_warn_limit.attr,
-+	&lock.attr,
-+	&keep_serdes_up.attr,
-+	&use_unsupported_cable.attr,
-+	&use_supported_ss200_cable.attr,
-+	&ignore_media_error.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(link_policy);
-+
-+static struct kobj_type link_policy = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = link_policy_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_link_policy_create(struct sl_ctrl_link *ctrl_link)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link policy create (num = %u)", ctrl_link->num);
-+
-+	rtn = kobject_init_and_add(&ctrl_link->policy_kobj, &link_policy, &ctrl_link->kobj, "policies");
-+	if (rtn) {
-+		sl_log_err(ctrl_link, LOG_BLOCK, LOG_NAME,
-+			   "link policy create kobject_init_and_add failed [%d]", rtn);
-+		kobject_put(&ctrl_link->policy_kobj);
-+		return rtn;
++	if (!pdev->ats_enabled) {
++		cxidev_dbg(&hw->cdev, "ATS not enabled\n");
++		return -EOPNOTSUPP;
 +	}
 +
-+	return 0;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_link_policy_delete(struct sl_ctrl_link *ctrl_link)
-+{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_link, LOG_BLOCK, LOG_NAME, "link config delete (num = %u)", ctrl_link->num);
-+
-+	kobject_put(&ctrl_link->policy_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_llr.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_llr.c
-new file mode 100644
-index 000000000000..fd142ad85ea1
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_llr.c
-@@ -0,0 +1,221 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2023-2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+
-+#include <linux/hpe/sl/sl_llr.h>
-+
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "sl_core_str.h"
-+#include "sl_ctrl_llr.h"
-+#include "sl_ctrl_lgrp.h"
-+#include "sl_ctrl_ldev.h"
-+
-+#include "data/sl_core_data_llr.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t last_fail_cause_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                 rtn;
-+	struct sl_core_llr *core_llr;
-+	u32                 llr_fail_cause;
-+	time64_t            llr_fail_time;
-+
-+	core_llr = container_of(kobj, struct sl_core_llr, kobj);
-+
-+	rtn = sl_core_data_llr_last_fail_cause_get(core_llr, &llr_fail_cause, &llr_fail_time);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_llr, LOG_BLOCK, LOG_NAME,
-+		   "last fail cause show (cause = %u %s)", llr_fail_cause, sl_core_llr_fail_cause_str(llr_fail_cause));
-+
-+	if (llr_fail_cause == SL_LLR_FAIL_CAUSE_NONE)
-+		return sysfs_emit(buf, "no-fail\n");
-+
-+	return sysfs_emit(buf, "%s\n", sl_core_llr_fail_cause_str(llr_fail_cause));
-+}
-+
-+static ssize_t last_fail_time_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                 rtn;
-+	struct sl_core_llr *core_llr;
-+	u32                 llr_fail_cause;
-+	time64_t            llr_fail_time;
-+
-+	core_llr = container_of(kobj, struct sl_core_llr, kobj);
-+
-+	rtn = sl_core_data_llr_last_fail_cause_get(core_llr, &llr_fail_cause, &llr_fail_time);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_llr, LOG_BLOCK, LOG_NAME,
-+		   "last fail time show (cause = %u %s, time = %lld %ptTt %ptTd)",
-+		   llr_fail_cause, sl_core_llr_fail_cause_str(llr_fail_cause),
-+		   llr_fail_time, &llr_fail_time, &llr_fail_time);
-+
-+	if (llr_fail_cause == SL_LLR_FAIL_CAUSE_NONE)
-+		return sysfs_emit(buf, "no-fail\n");
-+
-+	return sysfs_emit(buf, "%ptTt %ptTd\n", &llr_fail_time, &llr_fail_time);
-+}
-+
-+static ssize_t state_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int rtn;
-+	struct sl_core_llr *core_llr;
-+	enum sl_core_llr_state core_llr_state;
-+	u32 llr_state;
-+
-+	core_llr = container_of(kobj, struct sl_core_llr, kobj);
-+
-+	rtn = sl_core_data_llr_state_get(core_llr, &core_llr_state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	llr_state = sl_ctrl_llr_state_from_core_llr_state(core_llr_state);
-+
-+	sl_log_dbg(core_llr, LOG_BLOCK, LOG_NAME,
-+		   "state show (core_llr_state = %u %s, llr_state = %u %s)",
-+		   core_llr_state, sl_core_llr_state_str(core_llr_state),
-+		   llr_state, sl_llr_state_str(llr_state));
-+
-+	return sysfs_emit(buf, "%s\n", sl_llr_state_str(llr_state));
-+}
-+
-+static ssize_t info_map_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                 rtn;
-+	struct sl_core_llr *core_llr;
-+	u64                 info_map;
-+	char                info_map_str[900];
-+
-+	core_llr = container_of(kobj, struct sl_core_llr, kobj);
-+
-+	rtn = sl_core_data_llr_info_map_get(core_llr, &info_map);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_core_info_map_str(info_map, info_map_str, sizeof(info_map_str));
-+
-+	sl_log_dbg(core_llr, LOG_BLOCK, LOG_NAME,
-+		   "info map show (info_map = 0x%llX %s)", info_map, info_map_str);
-+
-+	return sysfs_emit(buf, "%s\n", info_map_str);
-+}
-+
-+static struct kobj_attribute llr_state           = __ATTR_RO(state);
-+static struct kobj_attribute llr_last_fail_cause = __ATTR_RO(last_fail_cause);
-+static struct kobj_attribute llr_last_fail_time  = __ATTR_RO(last_fail_time);
-+static struct kobj_attribute llr_info_map        = __ATTR_RO(info_map);
-+
-+static struct attribute *llr_attrs[] = {
-+	&llr_state.attr,
-+	&llr_last_fail_cause.attr,
-+	&llr_last_fail_time.attr,
-+	&llr_info_map.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(llr);
-+
-+static struct kobj_type llr_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = llr_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_llr_create(struct sl_ctrl_llr *ctrl_llr)
-+{
-+#ifdef CONFIG_SYSFS
-+	int                 rtn;
-+	struct sl_core_llr *core_llr;
-+
-+	core_llr = sl_core_llr_get(ctrl_llr->ctrl_lgrp->ctrl_ldev->num,
-+				   ctrl_llr->ctrl_lgrp->num, ctrl_llr->num);
-+
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME, "llr create (num = %u)", ctrl_llr->num);
-+
-+	if (!ctrl_llr->parent_kobj) {
-+		sl_log_err(ctrl_llr, LOG_BLOCK, LOG_NAME, "llr create missing parent");
-+		return -EBADRQC;
++	if (!pdev->pasid_enabled) {
++		cxidev_dbg(&hw->cdev, "PASID not enabled\n");
++		return -EOPNOTSUPP;
 +	}
 +
-+	rtn = kobject_init_and_add(&core_llr->kobj, &llr_info, ctrl_llr->parent_kobj, "llr");
-+	if (rtn) {
-+		sl_log_err(ctrl_llr, LOG_BLOCK, LOG_NAME,
-+			   "llr create kobject_init_and_add failed [%d]", rtn);
-+		kobject_put(&core_llr->kobj);
-+		return rtn;
-+	}
-+
-+	rtn = sl_sysfs_llr_config_create(ctrl_llr, &core_llr->kobj);
-+	if (rtn) {
-+		sl_log_err(ctrl_llr, LOG_BLOCK, LOG_NAME,
-+			   "llr config create failed [%d]", rtn);
-+		kobject_put(&core_llr->kobj);
-+		return rtn;
-+	}
-+
-+	rtn = sl_sysfs_llr_policy_create(core_llr, &core_llr->kobj);
-+	if (rtn) {
-+		sl_log_err(ctrl_llr, LOG_BLOCK, LOG_NAME,
-+			   "llr policy create failed [%d]", rtn);
-+		kobject_put(&core_llr->kobj);
-+		sl_sysfs_llr_config_delete(ctrl_llr);
-+		return rtn;
-+	}
-+
-+	rtn = sl_sysfs_llr_loop_time_create(core_llr, &core_llr->kobj);
-+	if (rtn) {
-+		sl_log_err(ctrl_llr, LOG_BLOCK, LOG_NAME,
-+			   "llr loop time create failed [%d]", rtn);
-+		kobject_put(&core_llr->kobj);
-+		sl_sysfs_llr_config_delete(ctrl_llr);
-+		sl_sysfs_llr_policy_delete(core_llr);
-+		return rtn;
-+	}
-+
-+	rtn = sl_sysfs_llr_counters_create(ctrl_llr, &core_llr->kobj);
-+	if (rtn) {
-+		sl_log_err(ctrl_llr, LOG_BLOCK, LOG_NAME, "sl_sysfs_llr_counters_create failed [%d]", rtn);
-+		kobject_put(&core_llr->kobj);
-+		sl_sysfs_llr_config_delete(ctrl_llr);
-+		sl_sysfs_llr_policy_delete(core_llr);
-+		sl_sysfs_llr_loop_time_delete(core_llr);
-+		return rtn;
-+	}
-+
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME,
-+		   "llr create (llr_kobj = 0x%p)", &core_llr->kobj);
-+
-+	return 0;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
++	return cass_bind_sva(pdev, cac);
 +}
 +
-+void sl_sysfs_llr_delete(struct sl_ctrl_llr *ctrl_llr)
++/**
++ * cass_unbind_ac() - Unbind an address context. Called during AC cleanup.
++ *
++ * @hw:  Cassini device
++ * @cac: Cassini AC struct
++ */
++void cass_unbind_ac(struct cass_dev *hw, const struct cass_ac *cac)
 +{
-+#ifdef CONFIG_SYSFS
-+	struct sl_core_llr *core_llr;
-+
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME, "delete (num = %u)", ctrl_llr->num);
-+
-+	if (!ctrl_llr->parent_kobj)
++	if (!enable_ats)
 +		return;
 +
-+	core_llr = sl_core_llr_get(ctrl_llr->ctrl_lgrp->ctrl_ldev->num,
-+				   ctrl_llr->ctrl_lgrp->num, ctrl_llr->num);
-+
-+	sl_sysfs_llr_counters_delete(ctrl_llr);
-+	sl_sysfs_llr_loop_time_delete(core_llr);
-+	sl_sysfs_llr_policy_delete(core_llr);
-+	sl_sysfs_llr_config_delete(ctrl_llr);
-+	kobject_put(&core_llr->kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_llr_config.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_llr_config.c
-new file mode 100644
-index 000000000000..0fde52d669ca
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_llr_config.c
-@@ -0,0 +1,140 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2024-2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+#include <linux/hpe/sl/sl_lgrp.h>
-+
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "data/sl_ctrl_data_llr.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t mode_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                 rtn;
-+	struct sl_ctrl_llr *ctrl_llr;
-+	u32                 mode;
-+
-+	ctrl_llr = container_of(kobj, struct sl_ctrl_llr, config_kobj);
-+
-+	rtn = sl_ctrl_data_llr_config_mode_get(ctrl_llr, &mode);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME,
-+		   "mode (mode = %u %s)",
-+		   mode, sl_lgrp_llr_mode_str(mode));
-+
-+	return sysfs_emit(buf, "%s\n", sl_lgrp_llr_mode_str(mode));
-+}
-+
-+static ssize_t setup_timeout_ms_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                 rtn;
-+	struct sl_ctrl_llr *ctrl_llr;
-+	u32                 setup_timeout_ms;
-+
-+	ctrl_llr = container_of(kobj, struct sl_ctrl_llr, config_kobj);
-+
-+	rtn = sl_ctrl_data_llr_config_setup_timeout_ms_get(ctrl_llr, &setup_timeout_ms);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME,
-+		   "setup timeout show (setup_timeout = %ums)",
-+		   setup_timeout_ms);
-+
-+	return sysfs_emit(buf, "%u\n", setup_timeout_ms);
-+}
-+
-+static ssize_t start_timeout_ms_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                 rtn;
-+	struct sl_ctrl_llr *ctrl_llr;
-+	u32                 start_timeout_ms;
-+
-+	ctrl_llr = container_of(kobj, struct sl_ctrl_llr, config_kobj);
-+
-+	rtn = sl_ctrl_data_llr_config_start_timeout_ms_get(ctrl_llr, &start_timeout_ms);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME,
-+		   "start timeout show (start_timeout = %ums)",
-+		   start_timeout_ms);
-+
-+	return sysfs_emit(buf, "%u\n", start_timeout_ms);
-+}
-+
-+static ssize_t link_down_behavior_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                 rtn;
-+	struct sl_ctrl_llr *ctrl_llr;
-+	u32                 link_dn_behavior;
-+
-+	ctrl_llr = container_of(kobj, struct sl_ctrl_llr, config_kobj);
-+
-+	rtn = sl_ctrl_data_llr_config_link_dn_behavior_get(ctrl_llr, &link_dn_behavior);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME,
-+		   "down behavior show (dn_behavior = %u %s)",
-+		   link_dn_behavior, sl_llr_link_dn_behavior_str(link_dn_behavior));
-+
-+	return sysfs_emit(buf, "%s\n", sl_llr_link_dn_behavior_str(link_dn_behavior));
-+}
-+
-+static struct kobj_attribute mode             = __ATTR_RO(mode);
-+static struct kobj_attribute setup_timeout_ms = __ATTR_RO(setup_timeout_ms);
-+static struct kobj_attribute start_timeout_ms = __ATTR_RO(start_timeout_ms);
-+static struct kobj_attribute dn_behavior      = __ATTR_RO(link_down_behavior);
-+
-+static struct attribute *llr_config_attrs[] = {
-+	&mode.attr,
-+	&setup_timeout_ms.attr,
-+	&start_timeout_ms.attr,
-+	&dn_behavior.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(llr_config);
-+
-+static struct kobj_type llr_config = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = llr_config_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_llr_config_create(struct sl_ctrl_llr *ctrl_llr, struct kobject *parent_kobj)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME, "llr config create (num = %u)", ctrl_llr->num);
-+
-+	rtn = kobject_init_and_add(&ctrl_llr->config_kobj, &llr_config, parent_kobj, "config");
-+	if (rtn) {
-+		sl_log_err(ctrl_llr, LOG_BLOCK, LOG_NAME,
-+			   "llr config create kobject_init_and_add failed [%d]", rtn);
-+		kobject_put(&ctrl_llr->config_kobj);
-+		return rtn;
-+	}
-+
-+	return 0;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_llr_config_delete(struct sl_ctrl_llr *ctrl_llr)
-+{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME, "llr config delete (num = %u)", ctrl_llr->num);
-+
-+	kobject_put(&ctrl_llr->config_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_llr_counters.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_llr_counters.c
-new file mode 100644
-index 000000000000..516f130c76ff
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_llr_counters.c
-@@ -0,0 +1,397 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2025-2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+
-+#include "sl_sysfs.h"
-+#include "sl_log.h"
-+#include "sl_ctrl_llr.h"
-+#include "sl_ctrl_llr_counters.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t llr_setup_cmd_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_llr *ctrl_llr;
-+	u32                 counter;
-+	u32                 rtn;
-+
-+	ctrl_llr = container_of(kobj, struct sl_ctrl_llr, counters_kobj);
-+
-+	rtn = sl_ctrl_llr_counter_get(ctrl_llr, LLR_SETUP_CMD, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME, "llr setup cmd show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t llr_setup_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_llr *ctrl_llr;
-+	u32                 counter;
-+	u32                 rtn;
-+
-+	ctrl_llr = container_of(kobj, struct sl_ctrl_llr, counters_kobj);
-+
-+	rtn = sl_ctrl_llr_counter_get(ctrl_llr, LLR_SETUP, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME, "llr setup show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t llr_setup_timeout_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_llr *ctrl_llr;
-+	u32                 counter;
-+	u32                 rtn;
-+
-+	ctrl_llr = container_of(kobj, struct sl_ctrl_llr, counters_kobj);
-+
-+	rtn = sl_ctrl_llr_counter_get(ctrl_llr, LLR_SETUP_TIMEOUT, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME, "llr setup timeout show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t llr_setup_fail_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_llr *ctrl_llr;
-+	u32                 counter;
-+	u32                 rtn;
-+
-+	ctrl_llr = container_of(kobj, struct sl_ctrl_llr, counters_kobj);
-+
-+	rtn = sl_ctrl_llr_counter_get(ctrl_llr, LLR_SETUP_FAIL, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME, "llr setup fail show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t llr_configured_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_llr *ctrl_llr;
-+	u32                 counter;
-+	u32                 rtn;
-+
-+	ctrl_llr = container_of(kobj, struct sl_ctrl_llr, counters_kobj);
-+
-+	rtn = sl_ctrl_llr_counter_get(ctrl_llr, LLR_CONFIGURED, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME, "llr configured show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t llr_start_cmd_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_llr *ctrl_llr;
-+	u32                 counter;
-+	u32                 rtn;
-+
-+	ctrl_llr = container_of(kobj, struct sl_ctrl_llr, counters_kobj);
-+
-+	rtn = sl_ctrl_llr_counter_get(ctrl_llr, LLR_START_CMD, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME, "llr start cmd show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t llr_running_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_llr *ctrl_llr;
-+	u32                 counter;
-+	u32                 rtn;
-+
-+	ctrl_llr = container_of(kobj, struct sl_ctrl_llr, counters_kobj);
-+
-+	rtn = sl_ctrl_llr_counter_get(ctrl_llr, LLR_RUNNING, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME, "llr running show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t llr_start_timeout_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_llr *ctrl_llr;
-+	u32                 counter;
-+	u32                 rtn;
-+
-+	ctrl_llr = container_of(kobj, struct sl_ctrl_llr, counters_kobj);
-+
-+	rtn = sl_ctrl_llr_counter_get(ctrl_llr, LLR_START_TIMEOUT, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME, "llr start timeout show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t llr_start_fail_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_llr *ctrl_llr;
-+	u32                 counter;
-+	u32                 rtn;
-+
-+	ctrl_llr = container_of(kobj, struct sl_ctrl_llr, counters_kobj);
-+
-+	rtn = sl_ctrl_llr_counter_get(ctrl_llr, LLR_START_FAIL, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME, "llr start fail show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t llr_stop_cmd_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_llr *ctrl_llr;
-+	u32                 counter;
-+	u32                 rtn;
-+
-+	ctrl_llr = container_of(kobj, struct sl_ctrl_llr, counters_kobj);
-+
-+	rtn = sl_ctrl_llr_counter_get(ctrl_llr, LLR_STOP_CMD, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME, "llr stop cmd show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t llr_stop_fail_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_llr *ctrl_llr;
-+	u32                 counter;
-+	u32                 rtn;
-+
-+	ctrl_llr = container_of(kobj, struct sl_ctrl_llr, counters_kobj);
-+
-+	rtn = sl_ctrl_llr_counter_get(ctrl_llr, LLR_STOP_FAIL, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME, "llr stop fail show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_setup_config_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_llr *ctrl_llr;
-+	u32                 counter;
-+	u32                 rtn;
-+
-+	ctrl_llr = container_of(kobj, struct sl_ctrl_llr, counters_kobj);
-+
-+	rtn = sl_ctrl_llr_cause_counter_get(ctrl_llr, LLR_CAUSE_SETUP_CONFIG, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME, "llr cause setup config show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_setup_intr_enable_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_llr *ctrl_llr;
-+	u32                 counter;
-+	u32                 rtn;
-+
-+	ctrl_llr = container_of(kobj, struct sl_ctrl_llr, counters_kobj);
-+
-+	rtn = sl_ctrl_llr_cause_counter_get(ctrl_llr, LLR_CAUSE_SETUP_INTR_ENABLE, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME, "llr cause setup intr enable show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_setup_timeout_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_llr *ctrl_llr;
-+	u32                 counter;
-+	u32                 rtn;
-+
-+	ctrl_llr = container_of(kobj, struct sl_ctrl_llr, counters_kobj);
-+
-+	rtn = sl_ctrl_llr_cause_counter_get(ctrl_llr, LLR_CAUSE_SETUP_TIMEOUT, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME, "llr cause setup timeout show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_start_intr_enable_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_llr *ctrl_llr;
-+	u32                 counter;
-+	u32                 rtn;
-+
-+	ctrl_llr = container_of(kobj, struct sl_ctrl_llr, counters_kobj);
-+
-+	rtn = sl_ctrl_llr_cause_counter_get(ctrl_llr, LLR_CAUSE_START_INTR_ENABLE, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME, "llr cause start intr enable show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_start_timeout_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_llr *ctrl_llr;
-+	u32                 counter;
-+	u32                 rtn;
-+
-+	ctrl_llr = container_of(kobj, struct sl_ctrl_llr, counters_kobj);
-+
-+	rtn = sl_ctrl_llr_cause_counter_get(ctrl_llr, LLR_CAUSE_START_TIMEOUT, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME, "llr cause start timeout show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_command_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_llr *ctrl_llr;
-+	u32                 counter;
-+	u32                 rtn;
-+
-+	ctrl_llr = container_of(kobj, struct sl_ctrl_llr, counters_kobj);
-+
-+	rtn = sl_ctrl_llr_cause_counter_get(ctrl_llr, LLR_CAUSE_COMMAND, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME, "llr cause command show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static ssize_t cause_canceled_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_llr *ctrl_llr;
-+	u32                 counter;
-+	u32                 rtn;
-+
-+	ctrl_llr = container_of(kobj, struct sl_ctrl_llr, counters_kobj);
-+
-+	rtn = sl_ctrl_llr_cause_counter_get(ctrl_llr, LLR_CAUSE_CANCELED, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME, "llr cause canceled show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
-+}
-+
-+static struct kobj_attribute llr_setup_cmd     = __ATTR_RO(llr_setup_cmd);
-+static struct kobj_attribute llr_setup         = __ATTR_RO(llr_setup);
-+static struct kobj_attribute llr_setup_timeout = __ATTR_RO(llr_setup_timeout);
-+static struct kobj_attribute llr_setup_fail    = __ATTR_RO(llr_setup_fail);
-+static struct kobj_attribute llr_configured    = __ATTR_RO(llr_configured);
-+static struct kobj_attribute llr_start_cmd     = __ATTR_RO(llr_start_cmd);
-+static struct kobj_attribute llr_running       = __ATTR_RO(llr_running);
-+static struct kobj_attribute llr_start_timeout = __ATTR_RO(llr_start_timeout);
-+static struct kobj_attribute llr_start_fail    = __ATTR_RO(llr_start_fail);
-+static struct kobj_attribute llr_stop_cmd      = __ATTR_RO(llr_stop_cmd);
-+static struct kobj_attribute llr_stop_fail     = __ATTR_RO(llr_stop_fail);
-+
-+static struct kobj_attribute llr_cause_setup_config      = __ATTR_RO(cause_setup_config);
-+static struct kobj_attribute llr_cause_setup_intr_enable = __ATTR_RO(cause_setup_intr_enable);
-+static struct kobj_attribute llr_cause_setup_timeout     = __ATTR_RO(cause_setup_timeout);
-+static struct kobj_attribute llr_cause_start_intr_enable = __ATTR_RO(cause_start_intr_enable);
-+static struct kobj_attribute llr_cause_start_timeout     = __ATTR_RO(cause_start_timeout);
-+static struct kobj_attribute llr_cause_command           = __ATTR_RO(cause_command);
-+static struct kobj_attribute llr_cause_canceled          = __ATTR_RO(cause_canceled);
-+
-+static struct attribute *llr_counters_attrs[] = {
-+	&llr_setup_cmd.attr,
-+	&llr_setup.attr,
-+	&llr_setup_timeout.attr,
-+	&llr_setup_fail.attr,
-+	&llr_configured.attr,
-+	&llr_start_cmd.attr,
-+	&llr_running.attr,
-+	&llr_start_timeout.attr,
-+	&llr_start_fail.attr,
-+	&llr_stop_cmd.attr,
-+	&llr_stop_fail.attr,
-+	&llr_cause_setup_config.attr,
-+	&llr_cause_setup_intr_enable.attr,
-+	&llr_cause_setup_timeout.attr,
-+	&llr_cause_start_intr_enable.attr,
-+	&llr_cause_start_timeout.attr,
-+	&llr_cause_command.attr,
-+	&llr_cause_canceled.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(llr_counters);
-+
-+static struct kobj_type llr_counters = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = llr_counters_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_llr_counters_create(struct sl_ctrl_llr *ctrl_llr, struct kobject *parent_kobj)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME, "llr counters create");
-+
-+	rtn = kobject_init_and_add(&ctrl_llr->counters_kobj, &llr_counters, parent_kobj, "counters");
-+	if (rtn) {
-+		sl_log_err(ctrl_llr, LOG_BLOCK, LOG_NAME, "llr counters create kobject_init_and_add failed [%d]", rtn);
-+		kobject_put(&ctrl_llr->counters_kobj);
-+		return rtn;
-+	}
-+
-+	return 0;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_llr_counters_delete(struct sl_ctrl_llr *ctrl_llr)
-+{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_llr, LOG_BLOCK, LOG_NAME, "llr counters delete");
-+	kobject_put(&ctrl_llr->counters_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_llr_loop_time.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_llr_loop_time.c
-new file mode 100644
-index 000000000000..977bb176b454
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_llr_loop_time.c
-@@ -0,0 +1,221 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2024-2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+
-+#include "sl_log.h"
-+#include "data/sl_core_data_llr.h"
-+
-+#include "sl_sysfs.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t llr_loop_time_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf, u8 num)
-+{
-+	int                 rtn;
-+	struct sl_core_llr *core_llr;
-+	u64                 loop_time[SL_CORE_LLR_MAX_LOOP_TIME_COUNT];
-+
-+	core_llr = container_of(kobj, struct sl_core_llr, loop_time_kobj);
-+
-+	rtn = sl_core_data_llr_loop_time_get(core_llr, loop_time);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_llr, LOG_BLOCK, LOG_NAME,
-+		   "loop time show (loop_time[%u] = %lluns)", num, loop_time[num]);
-+
-+	return sysfs_emit(buf, "%llu\n", loop_time[num]);
-+}
-+
-+#define llr_loop_time(_num)                                                                                        \
-+	static inline ssize_t time_##_num##_ns_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf) \
-+	{                                                                                                          \
-+		return llr_loop_time_show(kobj, kattr, buf, (_num));                                               \
-+	}                                                                                                          \
-+	static struct kobj_attribute llr_loop_time_##_num = __ATTR_RO(time_##_num##_ns)
-+
-+llr_loop_time(0);
-+llr_loop_time(1);
-+llr_loop_time(2);
-+llr_loop_time(3);
-+llr_loop_time(4);
-+llr_loop_time(5);
-+llr_loop_time(6);
-+llr_loop_time(7);
-+llr_loop_time(8);
-+llr_loop_time(9);
-+
-+#define sl_sysfs_llr_loop_time_file(_num)                                                       \
-+	do {                                                                                    \
-+		rtn = sysfs_create_file(&core_llr->loop_time_kobj, &llr_loop_time_##_num.attr); \
-+		if (rtn) {                                                                      \
-+			sl_log_err(core_llr, LOG_BLOCK, LOG_NAME,                               \
-+				"llr loop time create file failed [%d]", rtn);                  \
-+			goto out;                                                               \
-+		}                                                                               \
-+	} while (0)
-+
-+static ssize_t calc_ns_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                 rtn;
-+	struct sl_core_llr *core_llr;
-+	u64                 calculated_ns;
-+
-+	core_llr = container_of(kobj, struct sl_core_llr, loop_time_kobj);
-+
-+	rtn = sl_core_data_llr_loop_calculated_ns_get(core_llr, &calculated_ns);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_llr, LOG_BLOCK, LOG_NAME,
-+		   "calc show (calculated_ns = %lluns)", calculated_ns);
-+
-+	return sysfs_emit(buf, "%llu\n", calculated_ns);
-+}
-+
-+static ssize_t min_ns_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                 rtn;
-+	struct sl_core_llr *core_llr;
-+	u64                 min_ns;
-+
-+	core_llr = container_of(kobj, struct sl_core_llr, loop_time_kobj);
-+
-+	rtn = sl_core_data_llr_loop_min_ns_get(core_llr, &min_ns);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_llr, LOG_BLOCK, LOG_NAME,
-+		   "min show (min_ns = %lluns)", min_ns);
-+
-+	return sysfs_emit(buf, "%llu\n", min_ns);
-+}
-+
-+static ssize_t max_ns_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                 rtn;
-+	struct sl_core_llr *core_llr;
-+	u64                 max_ns;
-+
-+	core_llr = container_of(kobj, struct sl_core_llr, loop_time_kobj);
-+
-+	rtn = sl_core_data_llr_loop_max_ns_get(core_llr, &max_ns);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_llr, LOG_BLOCK, LOG_NAME,
-+		   "max show (max_ns = %lluns)", max_ns);
-+
-+	return sysfs_emit(buf, "%llu\n", max_ns);
-+}
-+
-+static ssize_t average_ns_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                 rtn;
-+	struct sl_core_llr *core_llr;
-+	u64                 average_ns;
-+
-+	core_llr = container_of(kobj, struct sl_core_llr, loop_time_kobj);
-+
-+	rtn = sl_core_data_llr_loop_average_ns_get(core_llr, &average_ns);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_llr, LOG_BLOCK, LOG_NAME,
-+		   "average show (average_ns = %lluns)", average_ns);
-+
-+	return sysfs_emit(buf, "%llu\n", average_ns);
-+}
-+
-+static struct kobj_attribute llr_loop_calc    = __ATTR_RO(calc_ns);
-+static struct kobj_attribute llr_loop_min     = __ATTR_RO(min_ns);
-+static struct kobj_attribute llr_loop_max     = __ATTR_RO(max_ns);
-+static struct kobj_attribute llr_loop_average = __ATTR_RO(average_ns);
-+
-+static struct attribute *llr_loop_time_attrs[] = {
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(llr_loop_time);
-+
-+static struct kobj_type llr_loop_time = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = llr_loop_time_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_llr_loop_time_create(struct sl_core_llr *core_llr, struct kobject *parent_kobj)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	sl_log_dbg(core_llr, LOG_BLOCK, LOG_NAME, "llr loop time create (num = %u)", core_llr->num);
-+
-+	rtn = kobject_init_and_add(&core_llr->loop_time_kobj, &llr_loop_time, parent_kobj, "loop");
-+	if (rtn) {
-+		sl_log_err(core_llr, LOG_BLOCK, LOG_NAME,
-+			   "llr loop time create kobject_init_and_add failed [%d]", rtn);
-+		goto out;
-+	}
-+
-+	BUILD_BUG_ON(SL_CORE_LLR_MAX_LOOP_TIME_COUNT < 10);
-+
-+	sl_sysfs_llr_loop_time_file(0);
-+	sl_sysfs_llr_loop_time_file(1);
-+	sl_sysfs_llr_loop_time_file(2);
-+	sl_sysfs_llr_loop_time_file(3);
-+	sl_sysfs_llr_loop_time_file(4);
-+	sl_sysfs_llr_loop_time_file(5);
-+	sl_sysfs_llr_loop_time_file(6);
-+	sl_sysfs_llr_loop_time_file(7);
-+	sl_sysfs_llr_loop_time_file(8);
-+	sl_sysfs_llr_loop_time_file(9);
-+
-+	rtn = sysfs_create_file(&core_llr->loop_time_kobj, &llr_loop_calc.attr);
-+	if (rtn) {
-+		sl_log_err(core_llr, LOG_BLOCK, LOG_NAME,
-+			   "llr loop time create file failed [%d]", rtn);
-+		goto out;
-+	}
-+
-+	rtn = sysfs_create_file(&core_llr->loop_time_kobj, &llr_loop_min.attr);
-+	if (rtn) {
-+		sl_log_err(core_llr, LOG_BLOCK, LOG_NAME,
-+			   "llr loop time create file failed [%d]", rtn);
-+		goto out;
-+	}
-+
-+	rtn = sysfs_create_file(&core_llr->loop_time_kobj, &llr_loop_max.attr);
-+	if (rtn) {
-+		sl_log_err(core_llr, LOG_BLOCK, LOG_NAME,
-+			   "llr loop time create file failed [%d]", rtn);
-+		goto out;
-+	}
-+
-+	rtn = sysfs_create_file(&core_llr->loop_time_kobj, &llr_loop_average.attr);
-+	if (rtn) {
-+		sl_log_err(core_llr, LOG_BLOCK, LOG_NAME,
-+			   "llr loop time create file failed [%d]", rtn);
-+		goto out;
-+	}
-+
-+	return 0;
-+out:
-+	kobject_put(&core_llr->loop_time_kobj);
-+	return rtn;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_llr_loop_time_delete(struct sl_core_llr *core_llr)
-+{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(core_llr, LOG_BLOCK, LOG_NAME, "llr loop time delete (num = %u)", core_llr->num);
-+
-+	kobject_put(&core_llr->loop_time_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_llr_policy.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_llr_policy.c
-new file mode 100644
-index 000000000000..8b35765570c6
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_llr_policy.c
-@@ -0,0 +1,74 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2024-2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+
-+#include "sl_log.h"
-+#include "data/sl_core_data_llr.h"
-+
-+#include "sl_sysfs.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t continuous_tries_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                 rtn;
-+	struct sl_core_llr *core_llr;
-+	u32                 options;
-+
-+	core_llr = container_of(kobj, struct sl_core_llr, policy_kobj);
-+
-+	rtn = sl_core_data_llr_policy_options_get(core_llr, &options);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	return sysfs_emit(buf, "%s\n",
-+		(options & SL_LLR_POLICY_OPT_CONTINUOUS_START_TRIES) ? "enabled" : "disabled");
-+}
-+
-+static struct kobj_attribute continuous_tries = __ATTR_RO(continuous_tries);
-+
-+static struct attribute *llr_policy_attrs[] = {
-+	&continuous_tries.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(llr_policy);
-+
-+static struct kobj_type llr_policy = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = llr_policy_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_llr_policy_create(struct sl_core_llr *core_llr, struct kobject *parent_kobj)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	sl_log_dbg(core_llr, LOG_BLOCK, LOG_NAME, "llr policy create (num = %u)", core_llr->num);
-+
-+	rtn = kobject_init_and_add(&core_llr->policy_kobj, &llr_policy, parent_kobj, "policies");
-+	if (rtn) {
-+		sl_log_err(core_llr, LOG_BLOCK, LOG_NAME,
-+			   "llr policy create kobject_init_and_add failed [%d]", rtn);
-+		kobject_put(&core_llr->policy_kobj);
-+		return rtn;
-+	}
-+
-+	return 0;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_llr_policy_delete(struct sl_core_llr *core_llr)
-+{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(core_llr, LOG_BLOCK, LOG_NAME, "llr policy delete (num = %u)", core_llr->num);
-+
-+	kobject_put(&core_llr->policy_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_mac.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_mac.c
-new file mode 100644
-index 000000000000..5587398a98f9
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_mac.c
-@@ -0,0 +1,192 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2023-2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+
-+#include <linux/hpe/sl/sl_mac.h>
-+
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "sl_ctrl_mac.h"
-+#include "sl_ctrl_lgrp.h"
-+#include "sl_ctrl_ldev.h"
-+#include "sl_core_str.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t rx_state_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_mac *ctrl_mac;
-+	u32                 state;
-+	int		    rtn;
-+
-+	ctrl_mac = container_of(kobj, struct sl_ctrl_mac, kobj);
-+
-+	rtn = sl_ctrl_mac_rx_state_get(ctrl_mac->ctrl_lgrp->ctrl_ldev->num,
-+				       ctrl_mac->ctrl_lgrp->num, ctrl_mac->num, &state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_mac, LOG_BLOCK, LOG_NAME,
-+		   "rx state show (mac = 0x%p, state = %u)", ctrl_mac, state);
-+
-+	return sysfs_emit(buf, "%s\n", sl_mac_state_str(state));
-+}
-+
-+static ssize_t rx_last_start_result_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_mac *ctrl_mac;
-+	int                 last_start_result;
-+	int                 rtn;
-+
-+	ctrl_mac = container_of(kobj, struct sl_ctrl_mac, kobj);
-+
-+	rtn = sl_core_mac_rx_last_start_result_get(ctrl_mac->ctrl_lgrp->ctrl_ldev->num,
-+						   ctrl_mac->ctrl_lgrp->num, ctrl_mac->num, &last_start_result);
-+
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_mac, LOG_BLOCK, LOG_NAME,
-+		   "rx last start result show (mac = 0x%p, last_start_result = %d)", ctrl_mac, last_start_result);
-+
-+	return sysfs_emit(buf, "%d\n", last_start_result);
-+}
-+
-+static ssize_t tx_state_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_mac *ctrl_mac;
-+	u32                 state;
-+	int		    rtn;
-+
-+	ctrl_mac = container_of(kobj, struct sl_ctrl_mac, kobj);
-+
-+	rtn = sl_ctrl_mac_tx_state_get(ctrl_mac->ctrl_lgrp->ctrl_ldev->num,
-+				       ctrl_mac->ctrl_lgrp->num, ctrl_mac->num, &state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_mac, LOG_BLOCK, LOG_NAME,
-+		   "tx state show (mac = 0x%p, state = %u)", ctrl_mac, state);
-+
-+	return sysfs_emit(buf, "%s\n", sl_mac_state_str(state));
-+}
-+
-+static ssize_t tx_last_start_result_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_mac *ctrl_mac;
-+	int                 last_start_result;
-+	int                 rtn;
-+
-+	ctrl_mac = container_of(kobj, struct sl_ctrl_mac, kobj);
-+
-+	rtn = sl_core_mac_tx_last_start_result_get(ctrl_mac->ctrl_lgrp->ctrl_ldev->num,
-+						   ctrl_mac->ctrl_lgrp->num, ctrl_mac->num, &last_start_result);
-+
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_mac, LOG_BLOCK, LOG_NAME,
-+		   "tx last start result show (mac = 0x%p, last_start_result = %d)", ctrl_mac, last_start_result);
-+
-+	return sysfs_emit(buf, "%d\n", last_start_result);
-+}
-+
-+static ssize_t info_map_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                 rtn;
-+	struct sl_ctrl_mac *ctrl_mac;
-+	u64                 info_map;
-+	char                info_map_str[900];
-+
-+	ctrl_mac = container_of(kobj, struct sl_ctrl_mac, kobj);
-+
-+	rtn = sl_ctrl_mac_info_map_get(ctrl_mac->ctrl_lgrp->ctrl_ldev->num,
-+				       ctrl_mac->ctrl_lgrp->num, ctrl_mac->num, &info_map);
-+	if (rtn) {
-+		sl_log_err(ctrl_mac, LOG_BLOCK, LOG_NAME,
-+			   "info map show sl_ctrl_mac_info_map_get failed [%d]", rtn);
-+		return sysfs_emit(buf, "no-mac\n");
-+	}
-+
-+	sl_core_info_map_str(info_map, info_map_str, sizeof(info_map_str));
-+
-+	sl_log_dbg(ctrl_mac, LOG_BLOCK, LOG_NAME,
-+		   "info map show (info_map = 0x%llX %s)", info_map, info_map_str);
-+
-+	return sysfs_emit(buf, "%s\n", info_map_str);
-+}
-+
-+static struct kobj_attribute rx_state             = __ATTR_RO(rx_state);
-+static struct kobj_attribute rx_last_start_result = __ATTR_RO(rx_last_start_result);
-+static struct kobj_attribute tx_state             = __ATTR_RO(tx_state);
-+static struct kobj_attribute tx_last_start_result = __ATTR_RO(tx_last_start_result);
-+static struct kobj_attribute info_map             = __ATTR_RO(info_map);
-+
-+static struct attribute *mac_attrs[] = {
-+	&rx_state.attr,
-+	&rx_last_start_result.attr,
-+	&tx_state.attr,
-+	&tx_last_start_result.attr,
-+	&info_map.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(mac);
-+
-+static struct kobj_type mac_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = mac_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_mac_create(struct sl_ctrl_mac *ctrl_mac)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	sl_log_dbg(ctrl_mac, LOG_BLOCK, LOG_NAME, "mac create (num = %u)", ctrl_mac->num);
-+
-+	if (!ctrl_mac->parent_kobj) {
-+		sl_log_err(ctrl_mac, LOG_BLOCK, LOG_NAME, "mac create missing parent");
-+		return -EBADRQC;
-+	}
-+
-+	rtn = kobject_init_and_add(&ctrl_mac->kobj, &mac_info, ctrl_mac->parent_kobj, "mac");
-+	if (rtn) {
-+		sl_log_err(ctrl_mac, LOG_BLOCK, LOG_NAME,
-+			   "mac create kobject_init_and_add failed [%d]", rtn);
-+		kobject_put(&ctrl_mac->kobj);
-+		return rtn;
-+	}
-+
-+	rtn = sl_sysfs_mac_counters_create(ctrl_mac);
-+	if (rtn) {
-+		sl_log_err(ctrl_mac, LOG_BLOCK, LOG_NAME, "sl_sysfs_mac_counters_create failed [%d]", rtn);
-+		kobject_put(&ctrl_mac->kobj);
-+		return rtn;
-+	}
-+
-+	sl_log_dbg(ctrl_mac, LOG_BLOCK, LOG_NAME,
-+		   "mac create (mac_kobj = 0x%p)", &ctrl_mac->kobj);
-+
-+	return 0;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_mac_delete(struct sl_ctrl_mac *ctrl_mac)
-+{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_mac, LOG_BLOCK, LOG_NAME, "delete (num = %u)", ctrl_mac->num);
-+
-+	if (!ctrl_mac->parent_kobj)
-+		return;
-+
-+	sl_sysfs_mac_counters_delete(ctrl_mac);
-+	kobject_put(&ctrl_mac->kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_mac_counters.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_mac_counters.c
-new file mode 100644
-index 000000000000..97ab44983d8e
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_mac_counters.c
-@@ -0,0 +1,339 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2025-2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+
-+#include "sl_sysfs.h"
-+#include "sl_log.h"
-+#include "sl_ctrl_mac.h"
-+#include "sl_ctrl_mac_counters.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t mac_tx_start_cmd_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_mac *ctrl_mac;
-+	u32                 count;
-+	int		    rtn;
-+
-+	ctrl_mac = container_of(kobj, struct sl_ctrl_mac, counters_kobj);
-+
-+	rtn = sl_ctrl_mac_counter_get(ctrl_mac, MAC_TX_START_CMD, &count);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_mac, LOG_BLOCK, LOG_NAME, "mac tx start cmd show (count = %u)", count);
-+
-+	return sysfs_emit(buf, "%u\n", count);
-+}
-+
-+static ssize_t mac_tx_started_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_mac *ctrl_mac;
-+	u32                 count;
-+	int		    rtn;
-+
-+	ctrl_mac = container_of(kobj, struct sl_ctrl_mac, counters_kobj);
-+
-+	rtn = sl_ctrl_mac_counter_get(ctrl_mac, MAC_TX_STARTED, &count);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_mac, LOG_BLOCK, LOG_NAME, "mac tx started show (count = %u)", count);
-+
-+	return sysfs_emit(buf, "%u\n", count);
-+}
-+
-+static ssize_t mac_tx_start_fail_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_mac *ctrl_mac;
-+	u32                 count;
-+	int		    rtn;
-+
-+	ctrl_mac = container_of(kobj, struct sl_ctrl_mac, counters_kobj);
-+
-+	rtn = sl_ctrl_mac_counter_get(ctrl_mac, MAC_TX_START_FAIL, &count);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_mac, LOG_BLOCK, LOG_NAME, "mac tx start fail show (count = %u)", count);
-+
-+	return sysfs_emit(buf, "%u\n", count);
-+}
-+
-+static ssize_t mac_tx_stop_cmd_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_mac *ctrl_mac;
-+	u32                 count;
-+	int		    rtn;
-+
-+	ctrl_mac = container_of(kobj, struct sl_ctrl_mac, counters_kobj);
-+
-+	rtn = sl_ctrl_mac_counter_get(ctrl_mac, MAC_TX_STOP_CMD, &count);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_mac, LOG_BLOCK, LOG_NAME, "mac tx stop cmd show (count = %u)", count);
-+
-+	return sysfs_emit(buf, "%u\n", count);
-+}
-+
-+static ssize_t mac_tx_stopped_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_mac *ctrl_mac;
-+	u32                 count;
-+	int		    rtn;
-+
-+	ctrl_mac = container_of(kobj, struct sl_ctrl_mac, counters_kobj);
-+
-+	rtn = sl_ctrl_mac_counter_get(ctrl_mac, MAC_TX_STOPPED, &count);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_mac, LOG_BLOCK, LOG_NAME, "mac tx stopped show (count = %u)", count);
-+
-+	return sysfs_emit(buf, "%u\n", count);
-+}
-+
-+static ssize_t mac_tx_stop_fail_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_mac *ctrl_mac;
-+	u32                 count;
-+	int		    rtn;
-+
-+	ctrl_mac = container_of(kobj, struct sl_ctrl_mac, counters_kobj);
-+
-+	rtn = sl_ctrl_mac_counter_get(ctrl_mac, MAC_TX_STOP_FAIL, &count);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_mac, LOG_BLOCK, LOG_NAME, "mac tx stop fail show (count = %u)", count);
-+
-+	return sysfs_emit(buf, "%u\n", count);
-+}
-+
-+static ssize_t mac_rx_start_cmd_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_mac *ctrl_mac;
-+	u32                 count;
-+	int		    rtn;
-+
-+	ctrl_mac = container_of(kobj, struct sl_ctrl_mac, counters_kobj);
-+
-+	rtn = sl_ctrl_mac_counter_get(ctrl_mac, MAC_RX_START_CMD, &count);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_mac, LOG_BLOCK, LOG_NAME, "mac rx start cmd show (count = %u)", count);
-+
-+	return sysfs_emit(buf, "%u\n", count);
-+}
-+
-+static ssize_t mac_rx_started_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_mac *ctrl_mac;
-+	u32                 count;
-+	int		    rtn;
-+
-+	ctrl_mac = container_of(kobj, struct sl_ctrl_mac, counters_kobj);
-+
-+	rtn = sl_ctrl_mac_counter_get(ctrl_mac, MAC_RX_STARTED, &count);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_mac, LOG_BLOCK, LOG_NAME, "mac rx started show (count = %u)", count);
-+
-+	return sysfs_emit(buf, "%u\n", count);
-+}
-+
-+static ssize_t mac_rx_start_fail_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_mac *ctrl_mac;
-+	u32                 count;
-+	int		    rtn;
-+
-+	ctrl_mac = container_of(kobj, struct sl_ctrl_mac, counters_kobj);
-+
-+	rtn = sl_ctrl_mac_counter_get(ctrl_mac, MAC_RX_START_FAIL, &count);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_mac, LOG_BLOCK, LOG_NAME, "mac rx start fail show (count = %u)", count);
-+
-+	return sysfs_emit(buf, "%u\n", count);
-+}
-+
-+static ssize_t mac_rx_stop_cmd_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_mac *ctrl_mac;
-+	u32                 count;
-+	int		    rtn;
-+
-+	ctrl_mac = container_of(kobj, struct sl_ctrl_mac, counters_kobj);
-+
-+	rtn = sl_ctrl_mac_counter_get(ctrl_mac, MAC_RX_STOP_CMD, &count);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_mac, LOG_BLOCK, LOG_NAME, "mac rx stop cmd show (count = %u)", count);
-+
-+	return sysfs_emit(buf, "%u\n", count);
-+}
-+
-+static ssize_t mac_rx_stopped_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_mac *ctrl_mac;
-+	u32                 count;
-+	int		    rtn;
-+
-+	ctrl_mac = container_of(kobj, struct sl_ctrl_mac, counters_kobj);
-+
-+	rtn = sl_ctrl_mac_counter_get(ctrl_mac, MAC_RX_STOPPED, &count);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_mac, LOG_BLOCK, LOG_NAME, "mac rx stopped show (count = %u)", count);
-+
-+	return sysfs_emit(buf, "%u\n", count);
-+}
-+
-+static ssize_t mac_rx_stop_fail_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_mac *ctrl_mac;
-+	u32                 count;
-+	int		    rtn;
-+
-+	ctrl_mac = container_of(kobj, struct sl_ctrl_mac, counters_kobj);
-+
-+	rtn = sl_ctrl_mac_counter_get(ctrl_mac, MAC_RX_STOP_FAIL, &count);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_mac, LOG_BLOCK, LOG_NAME, "mac rx stop fail show (count = %u)", count);
-+
-+	return sysfs_emit(buf, "%u\n", count);
-+}
-+
-+static ssize_t mac_reset_cmd_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_mac *ctrl_mac;
-+	u32                 count;
-+	int		    rtn;
-+
-+	ctrl_mac = container_of(kobj, struct sl_ctrl_mac, counters_kobj);
-+
-+	rtn = sl_ctrl_mac_counter_get(ctrl_mac, MAC_RESET_CMD, &count);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_mac, LOG_BLOCK, LOG_NAME, "mac reset cmd show (count = %u)", count);
-+
-+	return sysfs_emit(buf, "%u\n", count);
-+}
-+
-+static ssize_t mac_reset_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_mac *ctrl_mac;
-+	u32                 count;
-+	int		    rtn;
-+
-+	ctrl_mac = container_of(kobj, struct sl_ctrl_mac, counters_kobj);
-+
-+	rtn = sl_ctrl_mac_counter_get(ctrl_mac, MAC_RESET, &count);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_mac, LOG_BLOCK, LOG_NAME, "mac reset show (count = %u)", count);
-+
-+	return sysfs_emit(buf, "%u\n", count);
-+}
-+
-+static ssize_t mac_reset_fail_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_mac *ctrl_mac;
-+	u32                 count;
-+	int		    rtn;
-+
-+	ctrl_mac = container_of(kobj, struct sl_ctrl_mac, counters_kobj);
-+
-+	rtn = sl_ctrl_mac_counter_get(ctrl_mac, MAC_RESET_FAIL, &count);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_mac, LOG_BLOCK, LOG_NAME, "mac reset fail show (count = %u)", count);
-+
-+	return sysfs_emit(buf, "%u\n", count);
-+}
-+
-+static struct kobj_attribute mac_tx_start_cmd  = __ATTR_RO(mac_tx_start_cmd);
-+static struct kobj_attribute mac_tx_started    = __ATTR_RO(mac_tx_started);
-+static struct kobj_attribute mac_tx_start_fail = __ATTR_RO(mac_tx_start_fail);
-+static struct kobj_attribute mac_tx_stop_cmd   = __ATTR_RO(mac_tx_stop_cmd);
-+static struct kobj_attribute mac_tx_stopped    = __ATTR_RO(mac_tx_stopped);
-+static struct kobj_attribute mac_tx_stop_fail  = __ATTR_RO(mac_tx_stop_fail);
-+static struct kobj_attribute mac_rx_start_cmd  = __ATTR_RO(mac_rx_start_cmd);
-+static struct kobj_attribute mac_rx_started    = __ATTR_RO(mac_rx_started);
-+static struct kobj_attribute mac_rx_start_fail = __ATTR_RO(mac_rx_start_fail);
-+static struct kobj_attribute mac_rx_stop_cmd   = __ATTR_RO(mac_rx_stop_cmd);
-+static struct kobj_attribute mac_rx_stopped    = __ATTR_RO(mac_rx_stopped);
-+static struct kobj_attribute mac_rx_stop_fail  = __ATTR_RO(mac_rx_stop_fail);
-+static struct kobj_attribute mac_reset_cmd     = __ATTR_RO(mac_reset_cmd);
-+static struct kobj_attribute mac_reset         = __ATTR_RO(mac_reset);
-+static struct kobj_attribute mac_reset_fail    = __ATTR_RO(mac_reset_fail);
-+
-+static struct attribute *mac_counters_attrs[] = {
-+	&mac_tx_start_cmd.attr,
-+	&mac_tx_started.attr,
-+	&mac_tx_start_fail.attr,
-+	&mac_tx_stop_cmd.attr,
-+	&mac_tx_stopped.attr,
-+	&mac_tx_stop_fail.attr,
-+	&mac_rx_start_cmd.attr,
-+	&mac_rx_started.attr,
-+	&mac_rx_start_fail.attr,
-+	&mac_rx_stop_cmd.attr,
-+	&mac_rx_stopped.attr,
-+	&mac_rx_stop_fail.attr,
-+	&mac_reset_cmd.attr,
-+	&mac_reset.attr,
-+	&mac_reset_fail.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(mac_counters);
-+
-+static struct kobj_type mac_counters = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = mac_counters_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_mac_counters_create(struct sl_ctrl_mac *ctrl_mac)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	sl_log_dbg(ctrl_mac, LOG_BLOCK, LOG_NAME, "mac counters create");
-+
-+	rtn = kobject_init_and_add(&ctrl_mac->counters_kobj, &mac_counters, &ctrl_mac->kobj, "counters");
-+	if (rtn) {
-+		sl_log_err(ctrl_mac, LOG_BLOCK, LOG_NAME, "mac counters create kobject_init_and_add failed [%d]", rtn);
-+		kobject_put(&ctrl_mac->counters_kobj);
-+		return rtn;
-+	}
-+
-+	return 0;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_mac_counters_delete(struct sl_ctrl_mac *ctrl_mac)
-+{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_mac, LOG_BLOCK, LOG_NAME, "mac counters delete");
-+	kobject_put(&ctrl_mac->counters_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_media.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_media.c
-new file mode 100644
-index 000000000000..8973fcc2f378
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_media.c
-@@ -0,0 +1,1274 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2024-2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+
-+#include <linux/hpe/sl/sl_media.h>
-+
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "sl_core_str.h"
-+#include "sl_core_lgrp.h"
-+#include "sl_ctrl_lgrp.h"
-+#include "sl_ctrl_ldev.h"
-+#include "sl_media_lgrp.h"
-+#include "sl_media_jack.h"
-+#include "data/sl_media_data_jack.h"
-+#include "base/sl_media_eeprom.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t state_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u8                    state;
-+	int		      rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	rtn = sl_media_jack_state_get(media_lgrp->media_jack, &state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "state show (media_lgrp = 0x%p, state = %u %s)",
-+		   media_lgrp, state, sl_media_state_str(state));
-+
-+	return sysfs_emit(buf, "%s\n", sl_media_state_str(state));
-+}
-+
-+static ssize_t jack_power_state_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	bool                  is_high_powered;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	is_high_powered = sl_media_jack_is_high_powered(media_lgrp->media_jack);
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "power state show (media_lgrp = 0x%p, state = %s)",
-+		   media_lgrp, is_high_powered ? "high" : "low");
-+
-+	return sysfs_emit(buf, "%s\n", is_high_powered ? "high" : "low");
-+}
-+
-+static ssize_t temperature_celsius_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                   rtn;
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u8                    temp;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp   = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	rtn = sl_media_jack_cable_temp_get(media_lgrp->media_ldev->num, media_lgrp->num, &temp);
-+	if (rtn == -EBADRQC)
-+		return sysfs_emit(buf, "not-active\n");
-+	if (rtn == -EIO)
-+		return sysfs_emit(buf, "io-error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "temperature_celsius show (media_lgrp = 0x%p, temp = %uc)", media_lgrp, temp);
-+
-+	return sysfs_emit(buf, "%u\n", temp);
-+}
-+
-+static ssize_t temperature_warn_limit_celsius_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                   rtn;
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u8                    temp_warn_limit_c;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp  = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	rtn = sl_media_jack_cable_temp_warn_limit_get(media_lgrp->media_ldev->num,
-+						      media_lgrp->num, &temp_warn_limit_c);
-+
-+	if (rtn == -EBADRQC)
-+		return sysfs_emit(buf, "not-active\n");
-+	if (rtn == -EIO)
-+		return sysfs_emit(buf, "io-error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "temperature_warn_limit_celsius show (media_lgrp = 0x%p, temp = %uc)",
-+		   media_lgrp, temp_warn_limit_c);
-+
-+	return sysfs_emit(buf, "%u\n", temp_warn_limit_c);
-+}
-+
-+static ssize_t temperature_down_limit_celsius_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                   rtn;
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u8                    temp_down_limit_c;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp  = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	rtn = sl_media_jack_cable_temp_down_limit_get(media_lgrp->media_ldev->num,
-+						      media_lgrp->num, &temp_down_limit_c);
-+
-+	if (rtn == -EBADRQC)
-+		return sysfs_emit(buf, "not-active\n");
-+	if (rtn == -EIO)
-+		return sysfs_emit(buf, "io-error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "temperature_down_limit_celsius show (media_lgrp = 0x%p, temp = %uc)",
-+		   media_lgrp, temp_down_limit_c);
-+
-+	return sysfs_emit(buf, "%u\n", temp_down_limit_c);
-+}
-+
-+static ssize_t temperature_state_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u8                    temperature_state;
-+	int		      rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp   = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	if (!sl_media_lgrp_media_type_is_active(media_lgrp->media_ldev->num, media_lgrp->num))
-+		return sysfs_emit(buf, "not-active\n");
-+
-+	rtn  = sl_media_jack_cable_temp_state_get(media_lgrp->media_jack, &temperature_state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "temperature state show (media_lgrp = 0x%p, temperature_state = %u %s)",
-+		   media_lgrp, temperature_state, sl_media_temp_state_str(temperature_state));
-+
-+	return sysfs_emit(buf, "%s\n", sl_media_temp_state_str(temperature_state));
-+}
-+
-+static ssize_t vendor_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   vendor;
-+	int		      rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	rtn = sl_media_lgrp_vendor_get(media_lgrp, &vendor);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "vendor show (media_lgrp = 0x%p, vendor = %u %s)",
-+		   media_lgrp, vendor, sl_media_vendor_str(vendor));
-+
-+	return sysfs_emit(buf, "%s\n", sl_media_vendor_str(vendor));
-+}
-+
-+static ssize_t vendor_part_num_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	char                  vendor_pn_str[SL_MEDIA_VENDOR_PN_SIZE];
-+	int		      rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp  = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	rtn = sl_media_lgrp_vendor_pn_str_get(media_lgrp, vendor_pn_str);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "vendor part num show (media_lgrp = 0x%p, vendor_pn_str = %s)",
-+		   media_lgrp, vendor_pn_str);
-+
-+	return sysfs_emit(buf, "%s\n", vendor_pn_str);
-+}
-+
-+static ssize_t type_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   type;
-+	int		      rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	rtn = sl_media_lgrp_type_get(media_lgrp, &type);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "type show (media_lgrp = 0x%p, type = %u %s)",
-+		   media_lgrp, type, sl_media_type_str(type));
-+
-+	return sysfs_emit(buf, "%s\n", sl_media_type_str(type));
-+}
-+
-+static ssize_t shape_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   shape;
-+	int		      rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	rtn = sl_media_lgrp_shape_get(media_lgrp, &shape);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "shape show (media_lgrp = 0x%p, shape = %u %s)", media_lgrp, shape, sl_media_shape_str(shape));
-+
-+	return sysfs_emit(buf, "%s\n", sl_media_shape_str(shape));
-+}
-+
-+static ssize_t cable_end_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u8                    cable_end;
-+	int		      rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	rtn = sl_media_jack_cable_end_get(media_lgrp->media_jack, &cable_end);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "cable_end show (media_lgrp = 0x%p, cable_end = %u %s)",
-+		media_lgrp, cable_end, sl_media_cable_end_str(cable_end));
-+
-+	return sysfs_emit(buf, "%s\n", sl_media_cable_end_str(cable_end));
-+}
-+
-+static ssize_t length_cm_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   length_cm;
-+	int		      rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	rtn = sl_media_lgrp_length_get(media_lgrp, &length_cm);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "length_cm show (media_lgrp = 0x%p, length_cm = %u)",
-+		   media_lgrp, length_cm);
-+
-+	return sysfs_emit(buf, "%u\n", length_cm);
-+}
-+
-+static ssize_t max_speed_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   max_speed;
-+	int		      rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	rtn = sl_media_lgrp_max_speed_get(media_lgrp, &max_speed);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "max speed show (media_lgrp = 0x%p, max_speed = %u %s)",
-+		   media_lgrp, max_speed, sl_media_speed_str(max_speed));
-+
-+	return sysfs_emit(buf, "%s\n", sl_media_speed_str(max_speed));
-+}
-+
-+static ssize_t serial_num_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	char                  serial_num_str[SL_MEDIA_SERIAL_NUM_SIZE];
-+	int		      rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	rtn = sl_media_lgrp_serial_num_str_get(media_lgrp, serial_num_str);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "serial num show (media_lgrp = 0x%p, serial_num = %s)",
-+		   media_lgrp, serial_num_str);
-+
-+	return sysfs_emit(buf, "%s\n", serial_num_str);
-+}
-+
-+static ssize_t hpe_part_num_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	char                  hpe_pn_str[SL_MEDIA_HPE_PN_SIZE];
-+	int		      rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	rtn = sl_media_lgrp_hpe_pn_str_get(media_lgrp, hpe_pn_str);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "hpe part num show (media_lgrp = 0x%p, hpe_pn = %s)",
-+		   media_lgrp, hpe_pn_str);
-+
-+	return sysfs_emit(buf, "%s\n", hpe_pn_str);
-+}
-+
-+static ssize_t jack_num_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "jack_num show (media_lgrp = 0x%p, jack_num = %u)",
-+		media_lgrp, media_lgrp->media_jack->physical_num);
-+
-+	return sysfs_emit(buf, "%u\n", media_lgrp->media_jack->physical_num);
-+}
-+
-+static ssize_t jack_type_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   density;
-+	u32                   jack_type;
-+	int		      rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	rtn = sl_media_lgrp_jack_type_get(media_lgrp, &jack_type);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	rtn = sl_media_lgrp_jack_type_qsfp_density_get(media_lgrp, &density);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "jack type show (media_lgrp = 0x%p, jack_type = %u %s)",
-+		   media_lgrp, jack_type, sl_media_jack_type_str(jack_type, density));
-+
-+	return sysfs_emit(buf, "%s\n", sl_media_jack_type_str(jack_type, density));
-+}
-+
-+static ssize_t furcation_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   furcation;
-+	int		      rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	rtn = sl_media_lgrp_furcation_get(media_lgrp, &furcation);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "furcation show (media_lgrp = 0x%p, furcation = %u %s)",
-+		   media_lgrp, furcation, sl_media_furcation_str(furcation));
-+
-+	return sysfs_emit(buf, "%s\n", sl_media_furcation_str(furcation));
-+}
-+
-+static ssize_t is_supported_cable_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	bool                  unsupported;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	unsupported = sl_media_lgrp_is_cable_unsupported(media_lgrp);
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "is_supported_cable show (media_lgrp = 0x%p, is_supported_cable = %s)",
-+		   media_lgrp, unsupported ? "no" : "yes");
-+
-+	return sysfs_emit(buf, "%s\n", unsupported ? "no" : "yes");
-+}
-+
-+static ssize_t date_code_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	char                  date_code_str[SL_MEDIA_DATE_CODE_SIZE];
-+	int		      rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	rtn = sl_media_lgrp_date_code_str_get(media_lgrp, date_code_str);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "date code show (media_lgrp = 0x%p, date_code = %s)",
-+		   media_lgrp, date_code_str);
-+
-+	return sysfs_emit(buf, "%s\n", date_code_str);
-+}
-+
-+static ssize_t firmware_version_hex_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u8                    fw_ver[SL_MEDIA_FIRMWARE_VERSION_SIZE];
-+	int		      rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	rtn = sl_media_lgrp_fw_ver_str_get(media_lgrp, fw_ver);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "firmware version hex show (media_lgrp = 0x%p, firmware_version_hex = %02X.%02X)",
-+		media_lgrp, fw_ver[0], fw_ver[1]);
-+
-+	return sysfs_emit(buf, "%02X.%02X\n", fw_ver[0], fw_ver[1]);
-+}
-+
-+static ssize_t target_firmware_version_hex_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u8                    target_fw_ver_str[25];
-+	int		      rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	rtn = sl_media_eeprom_target_fw_ver_str_get(media_lgrp->media_jack, target_fw_ver_str, sizeof(target_fw_ver_str));
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "target firmware version hex show (media_lgrp = 0x%p, target_firmware_version_hex = %s)",
-+		media_lgrp, target_fw_ver_str);
-+
-+	return sysfs_emit(buf, "%s\n", target_fw_ver_str);
-+}
-+
-+static ssize_t cable_speed_state_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u8                    cable_speed_state;
-+	int		      rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	rtn = sl_media_jack_cable_shift_state_get(media_lgrp->media_jack, &cable_speed_state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "cable_speed state show (media_lgrp = 0x%p, cable_speed_state = %u %s)",
-+		   media_lgrp, cable_speed_state, sl_media_cable_speed_state_str(cable_speed_state));
-+
-+	return sysfs_emit(buf, "%s\n", sl_media_cable_speed_state_str(cable_speed_state));
-+}
-+
-+static ssize_t active_cable_200g_host_interface_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u8                    host_interface;
-+	int		      rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	rtn = sl_media_jack_active_cable_200g_host_interface_get(media_lgrp->media_jack, &host_interface);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "active cable 200g host interface show (media_lgrp = 0x%p, host_interface = 0x%X)",
-+		   media_lgrp, host_interface);
-+
-+	return sysfs_emit(buf, "0x%02x\n", host_interface);
-+}
-+
-+static ssize_t active_cable_200g_lane_count_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u8                    lane_count;
-+	int		      rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	rtn = sl_media_jack_active_cable_200g_lane_count_get(media_lgrp->media_jack, &lane_count);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "active cable 200g lane coiunt show (media_lgrp = 0x%p, lane_count = 0x%X)",
-+		   media_lgrp, lane_count);
-+
-+	return sysfs_emit(buf, "0x%02x\n", lane_count);
-+}
-+
-+static ssize_t active_cable_200g_appsel_num_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u8                    appsel_num;
-+	int rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	rtn = sl_media_jack_active_cable_200g_appsel_num_get(media_lgrp->media_jack, &appsel_num);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "active cable 200g appsel no show (media_lgrp = 0x%p, appsel_num = 0x%X)", media_lgrp, appsel_num);
-+
-+	return sysfs_emit(buf, "0x%02x\n", appsel_num);
-+}
-+
-+static ssize_t active_cable_400g_host_interface_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u8                    host_interface;
-+	int		      rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	rtn = sl_media_jack_active_cable_400g_host_interface_get(media_lgrp->media_jack, &host_interface);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "active cable 400g host interface show (media_lgrp = 0x%p, host_interface = 0x%X)",
-+		   media_lgrp, host_interface);
-+
-+	return sysfs_emit(buf, "0x%02x\n", host_interface);
-+}
-+
-+static ssize_t active_cable_400g_lane_count_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u8                    lane_count;
-+	int		      rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	rtn = sl_media_jack_active_cable_400g_lane_count_get(media_lgrp->media_jack, &lane_count);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "active cable 400g lane count show (media_lgrp = 0x%p, lane_count = 0x%X)",
-+		   media_lgrp, lane_count);
-+
-+	return sysfs_emit(buf, "0x%02x\n", lane_count);
-+}
-+
-+static ssize_t active_cable_400g_appsel_num_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u8                    appsel_num;
-+	int		      rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	rtn = sl_media_jack_active_cable_400g_appsel_num_get(media_lgrp->media_jack, &appsel_num);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "active cable 400g appsel no show (media_lgrp = 0x%p, appsel_num = 0x%X)", media_lgrp, appsel_num);
-+
-+	return sysfs_emit(buf, "0x%02x\n", appsel_num);
-+}
-+
-+static ssize_t last_fault_cause_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   fault_cause;
-+	time64_t              fault_time;
-+	int		      rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	rtn = sl_media_jack_fault_cause_get(media_lgrp->media_jack, &fault_cause, &fault_time);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "last_fault cause show (cause = %u %s)", fault_cause,
-+		   sl_media_fault_cause_str(fault_cause));
-+
-+	if (fault_cause == SL_MEDIA_FAULT_CAUSE_NONE)
-+		return sysfs_emit(buf, "no-fault\n");
-+
-+	return sysfs_emit(buf, "%s\n", sl_media_fault_cause_str(fault_cause));
-+}
-+
-+static ssize_t last_fault_time_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   fault_cause;
-+	time64_t              fault_time;
-+	int		      rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+
-+	rtn = sl_media_jack_fault_cause_get(media_lgrp->media_jack, &fault_cause, &fault_time);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "last fault time show (cause = %u %s, time = %lld %ptTt %ptTd)",
-+		fault_cause, sl_media_fault_cause_str(fault_cause),
-+		fault_time, &fault_time, &fault_time);
-+
-+	if (fault_cause == SL_MEDIA_FAULT_CAUSE_NONE)
-+		return sysfs_emit(buf, "no-fault\n");
-+
-+	return sysfs_emit(buf, "%ptTt %ptTd\n", &fault_time, &fault_time);
-+}
-+
-+static ssize_t is_supported_ss200_cable_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+
-+	sl_log_dbg(media_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "is supported ss200 cable show (is_supported_ss200_cable = %s)",
-+		media_lgrp->media_jack->is_supported_ss200_cable ? "yes" : "no");
-+
-+	if (media_lgrp->media_jack->is_supported_ss200_cable)
-+		return sysfs_emit(buf, "yes\n");
-+
-+	return sysfs_emit(buf, "no\n");
-+}
-+
-+static ssize_t jack_part_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp *media_lgrp;
-+	u8                    ldev_num;
-+	u8                    lgrp_num;
-+	u32                   jack_part;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ldev_num = media_lgrp->media_ldev->num;
-+	lgrp_num = media_lgrp->num;
-+
-+	jack_part = sl_core_lgrp_jack_part_get(ldev_num, lgrp_num);
-+
-+	sl_log_dbg(media_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "jack part show (jack_part = %u %s)", jack_part, sl_core_lgrp_dt_jack_part_str(jack_part));
-+
-+	return sysfs_emit(buf, "%s\n", sl_core_lgrp_dt_jack_part_str(jack_part));
-+}
-+
-+static ssize_t signal_cache_time_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                  rtn;
-+	struct sl_media_lgrp *media_lgrp;
-+	u8                   ldev_num;
-+	u8                   lgrp_num;
-+	time64_t             signal_cache_time_s;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+	ldev_num = media_lgrp->media_ldev->num;
-+	lgrp_num = media_lgrp->num;
-+
-+	rtn = sl_media_jack_signal_cache_time_s_get(ldev_num, lgrp_num, &signal_cache_time_s);
-+	if (rtn) {
-+		sl_log_err_trace(media_lgrp, LOG_BLOCK, LOG_NAME, "signal cache time show failed [%d]", rtn);
-+		return sysfs_emit(buf, "no-cache\n");
-+	}
-+
-+	sl_log_dbg(media_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "signal cache time show (signal_cache_time_s = %llu)", signal_cache_time_s);
-+
-+	return sysfs_emit(buf, "%ptTt %ptTd\n", &signal_cache_time_s, &signal_cache_time_s);
-+}
-+
-+static ssize_t error_info_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                   rtn;
-+	u32                   error_map;
-+	struct sl_media_lgrp *media_lgrp;
-+	char                  error_str[SL_MEDIA_JACK_ATTR_ERR_STR_SIZE];
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, kobj);
-+
-+	rtn = sl_media_jack_attr_error_map_get(media_lgrp->media_jack, &error_map);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	rtn = sl_media_jack_attr_error_map_str(error_map, error_str, sizeof(error_str));
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(media_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "error info show (error_map = 0x%x %s)", error_map, error_str);
-+
-+	return sysfs_emit(buf, "%s\n", error_str);
-+}
-+
-+static struct kobj_attribute media_state                            = __ATTR_RO(state);
-+static struct kobj_attribute media_jack_power_state                 = __ATTR_RO(jack_power_state);
-+static struct kobj_attribute media_temperature_celsius              = __ATTR_RO(temperature_celsius);
-+static struct kobj_attribute media_temperature_warn_limit_celsius   = __ATTR_RO(temperature_warn_limit_celsius);
-+static struct kobj_attribute media_temperature_down_limit_celsius   = __ATTR_RO(temperature_down_limit_celsius);
-+static struct kobj_attribute media_temperature_state                = __ATTR_RO(temperature_state);
-+static struct kobj_attribute media_vendor                           = __ATTR_RO(vendor);
-+static struct kobj_attribute media_vendor_part_num                  = __ATTR_RO(vendor_part_num);
-+static struct kobj_attribute media_type                             = __ATTR_RO(type);
-+static struct kobj_attribute media_shape                            = __ATTR_RO(shape);
-+static struct kobj_attribute media_cable_end                        = __ATTR_RO(cable_end);
-+static struct kobj_attribute media_length_cm                        = __ATTR_RO(length_cm);
-+static struct kobj_attribute media_max_speed                        = __ATTR_RO(max_speed);
-+static struct kobj_attribute media_serial_num                       = __ATTR_RO(serial_num);
-+static struct kobj_attribute media_hpe_part_num                     = __ATTR_RO(hpe_part_num);
-+static struct kobj_attribute media_jack_num                         = __ATTR_RO(jack_num);
-+static struct kobj_attribute media_jack_type                        = __ATTR_RO(jack_type);
-+static struct kobj_attribute media_furcation                        = __ATTR_RO(furcation);
-+static struct kobj_attribute media_is_supported_cable               = __ATTR_RO(is_supported_cable);
-+static struct kobj_attribute media_date_code                        = __ATTR_RO(date_code);
-+static struct kobj_attribute media_firmware_version_hex             = __ATTR_RO(firmware_version_hex);
-+static struct kobj_attribute media_target_firmware_version_hex      = __ATTR_RO(target_firmware_version_hex);
-+static struct kobj_attribute media_cable_speed_state                = __ATTR_RO(cable_speed_state);
-+static struct kobj_attribute media_active_cable_200g_host_interface = __ATTR_RO(active_cable_200g_host_interface);
-+static struct kobj_attribute media_active_cable_200g_lane_count     = __ATTR_RO(active_cable_200g_lane_count);
-+static struct kobj_attribute media_active_cable_200g_appsel_num     = __ATTR_RO(active_cable_200g_appsel_num);
-+static struct kobj_attribute media_active_cable_400g_host_interface = __ATTR_RO(active_cable_400g_host_interface);
-+static struct kobj_attribute media_active_cable_400g_lane_count     = __ATTR_RO(active_cable_400g_lane_count);
-+static struct kobj_attribute media_active_cable_400g_appsel_num     = __ATTR_RO(active_cable_400g_appsel_num);
-+static struct kobj_attribute media_last_fault_cause                 = __ATTR_RO(last_fault_cause);
-+static struct kobj_attribute media_last_fault_time                  = __ATTR_RO(last_fault_time);
-+static struct kobj_attribute media_is_supported_ss200_cable         = __ATTR_RO(is_supported_ss200_cable);
-+static struct kobj_attribute media_jack_part                        = __ATTR_RO(jack_part);
-+static struct kobj_attribute media_signal_cache_time                = __ATTR_RO(signal_cache_time);
-+static struct kobj_attribute media_error_info                       = __ATTR_RO(error_info);
-+
-+static struct attribute *media_attrs[] = {
-+	&media_state.attr,
-+	&media_jack_power_state.attr,
-+	&media_temperature_celsius.attr,
-+	&media_temperature_warn_limit_celsius.attr,
-+	&media_temperature_down_limit_celsius.attr,
-+	&media_temperature_state.attr,
-+	&media_vendor.attr,
-+	&media_vendor_part_num.attr,
-+	&media_type.attr,
-+	&media_shape.attr,
-+	&media_cable_end.attr,
-+	&media_length_cm.attr,
-+	&media_max_speed.attr,
-+	&media_serial_num.attr,
-+	&media_hpe_part_num.attr,
-+	&media_jack_num.attr,
-+	&media_jack_type.attr,
-+	&media_furcation.attr,
-+	&media_is_supported_cable.attr,
-+	&media_date_code.attr,
-+	&media_firmware_version_hex.attr,
-+	&media_target_firmware_version_hex.attr,
-+	&media_cable_speed_state.attr,
-+	&media_active_cable_200g_host_interface.attr,
-+	&media_active_cable_200g_lane_count.attr,
-+	&media_active_cable_200g_appsel_num.attr,
-+	&media_active_cable_400g_host_interface.attr,
-+	&media_active_cable_400g_lane_count.attr,
-+	&media_active_cable_400g_appsel_num.attr,
-+	&media_last_fault_cause.attr,
-+	&media_last_fault_time.attr,
-+	&media_is_supported_ss200_cable.attr,
-+	&media_jack_part.attr,
-+	&media_signal_cache_time.attr,
-+	&media_error_info.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(media);
-+
-+static struct kobj_type media_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = media_groups,
-+};
-+
-+static ssize_t host_interface_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp_speed_kobject *speed_kobj;
-+	struct sl_ctrl_lgrp                *ctrl_lgrp;
-+	u32                                 speed;
-+	u32                                 type;
-+	int				    rtn;
-+
-+	speed_kobj = container_of(kobj, struct sl_media_lgrp_speed_kobject, kobj);
-+
-+	ctrl_lgrp = sl_ctrl_lgrp_get(speed_kobj->media_lgrp->media_ldev->num, speed_kobj->media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(speed_kobj->media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(speed_kobj->media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	rtn = sl_media_lgrp_type_get(speed_kobj->media_lgrp, &type);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	speed = speed_kobj->speed;
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "host interface show (media_lgrp = 0x%p, host_interface = %s)",
-+		speed_kobj->media_lgrp, sl_media_host_interface_str(speed, type));
-+
-+	return sysfs_emit(buf, "%s\n", sl_media_host_interface_str(speed, type));
-+}
-+
-+static ssize_t projected_ber_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_media_lgrp_speed_kobject *speed_kobj;
-+	struct sl_ctrl_lgrp                *ctrl_lgrp;
-+	u8                                  media_interface;
-+	u32                                 type;
-+	int				    rtn;
-+
-+	speed_kobj = container_of(kobj, struct sl_media_lgrp_speed_kobject, kobj);
-+
-+	ctrl_lgrp = sl_ctrl_lgrp_get(speed_kobj->media_lgrp->media_ldev->num, speed_kobj->media_lgrp->num);
-+
-+	if (!sl_media_jack_is_cable_online(speed_kobj->media_lgrp->media_jack)) {
-+		if (sl_media_jack_is_cable_format_unsupported(speed_kobj->media_lgrp->media_jack))
-+			return sysfs_emit(buf, "unsupported-format\n");
-+		return sysfs_emit(buf, "no-cable\n");
-+	}
-+
-+	rtn = sl_media_lgrp_type_get(speed_kobj->media_lgrp, &type);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	if (type == SL_MEDIA_TYPE_PEC || type == SL_MEDIA_TYPE_BKP) {
-+		sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+			   "projected_ber show (media_lgrp = 0x%p, projected_ber = 0)", speed_kobj->media_lgrp);
-+		return sysfs_emit(buf, "0\n");
-+	}
-+
-+	rtn = sl_media_eeprom_media_interface_get(speed_kobj->media_lgrp->media_jack, &media_interface);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "projected_ber show (media_lgrp = 0x%p, projected_ber = %s)",
-+		   speed_kobj->media_lgrp, sl_media_ber_str(media_interface));
-+
-+	return sysfs_emit(buf, "%s\n", sl_media_ber_str(media_interface));
-+}
-+
-+static struct kobj_attribute media_speed_host_interface = __ATTR_RO(host_interface);
-+static struct kobj_attribute media_speed_projected_ber  = __ATTR_RO(projected_ber);
-+
-+static struct attribute *media_speed_attrs[] = {
-+	&media_speed_host_interface.attr,
-+	&media_speed_projected_ber.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(media_speed);
-+
-+static struct kobj_type media_speed_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = media_speed_groups,
-+};
-+
-+static void parent_speed_release(struct kobject *kobj)
-+{
-+}
-+
-+static struct kobj_type parent_speed_info = {
-+	.release = parent_speed_release,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_media_create(struct sl_ctrl_lgrp *ctrl_lgrp)
-+{
-+#ifdef CONFIG_SYSFS
-+	int                   rtn;
-+	u8                    state;
-+	struct sl_media_lgrp *media_lgrp;
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media create");
-+
-+	if (!ctrl_lgrp->parent_kobj) {
-+		sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media create missing parent");
-+		return 0;
-+	}
-+
-+	media_lgrp = sl_media_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!media_lgrp) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media_lgrp_get failed");
-+		return -EFAULT;
-+	}
-+
-+	rtn = kobject_init_and_add(&media_lgrp->kobj, &media_info, ctrl_lgrp->parent_kobj, "media");
-+	if (rtn) {
-+		kobject_put(&media_lgrp->kobj);
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "kobject_init_and_add failed [%d]", rtn);
-+		return rtn;
-+	}
-+
-+	rtn = kobject_init_and_add(&media_lgrp->parent_speed_kobj, &parent_speed_info, &media_lgrp->kobj, "speeds");
-+	if (rtn) {
-+		kobject_put(&media_lgrp->parent_speed_kobj);
-+		kobject_put(&media_lgrp->kobj);
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "kobject_init_and_add failed [%d]", rtn);
-+		return rtn;
-+	}
-+
-+	rtn = sl_sysfs_media_counters_create(ctrl_lgrp);
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media counters create failed [%d]", rtn);
-+		goto out_parents;
++	if (cac->sva)
++		cass_unbind_sva(cac);
++}
++
++void cass_iommu_fini(struct cass_dev *hw)
++{
++}
++
++/**
++ * cass_iommu_init() - Initialize the AMD/Intel IOMMU for the physical device
++ *
++ * If the IOMMU is not enabled or available, ATS mode is not supported.
++ *
++ * @hw: Cassini device
++ */
++void cass_iommu_init(struct cass_dev *hw)
++{
++	int pos;
++	u32 filter_mask;
++	u32 max_requests;
++	struct pci_dev *pdev = hw->cdev.pdev;
++
++	/*
++	 * Mask length match for completions.
++	 * The PCI interface checks if the completion length matches
++	 * the requested length. Unfortunately, this is not the case for
++	 * ATS transactions as only pages that are present are returned
++	 * so enable Mask length match for Cassini 1.
++	 */
++	if (cass_version(hw, CASSINI_1)) {
++		pci_read_config_dword(pdev, SYMBOL_TIMER_FILTER_1_OFF,
++				      &filter_mask);
++		filter_mask |= CX_FLT_MASK_CPL_LEN_MATCH;
++		pci_write_config_dword(pdev, SYMBOL_TIMER_FILTER_1_OFF,
++				       filter_mask);
 +	}
 +
 +	/*
-+	 * This if condition will be false for nic here
++	 * Enable CX_FLT_UNMASK_ATS_SPECIFIC_RULES for C2.
++	 *
++	 * Cassini 2 has a new capability which uses
++	 * CX_FLT_UNMASK_ATS_SPECIFIC_RULES. The PCI controller used by
++	 * C2 has a reference section which states the following:
++	 * Lower Address is not checked for Cpls related to ATS Requests.
++	 * An ATS-related Cpl completes the request if it has a Byte Count
++	 * that is equal to four times the Length field.
 +	 */
-+	rtn = sl_media_jack_state_get(media_lgrp->media_jack, &state);
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media_jack_state_get failed [%d]", rtn);
-+		goto out_counters;
++	if (cass_version(hw, CASSINI_2)) {
++		pci_read_config_dword(pdev, FILTER_MASK_2_OFF, &filter_mask);
++		filter_mask |= CX_FLT_UNMASK_ATS_SPECIFIC_RULES;
++		pci_write_config_dword(pdev, FILTER_MASK_2_OFF, filter_mask);
 +	}
 +
-+	if (state == SL_MEDIA_JACK_CABLE_ONLINE) {
-+		/*
-+		 * kobj cleanup in the callee function
-+		 */
-+		rtn = sl_sysfs_media_speeds_create(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+		if (rtn) {
-+			sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media speeds create failed [%d]", rtn);
-+			goto out_counters;
-+		}
++	/*
++	 * The AMD IOMMU is currently hardcoding max requests to 32.
++	 * Set to MAX_PAGE_REQS.
++	 */
++	pos = pci_find_ext_capability(pdev, PCI_EXT_CAP_ID_PRI);
++	if (!pos) {
++		dev_warn(&pdev->dev, "Error: PRI extended capability in PCI config not present\n");
++		return;
 +	}
 +
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "create (media_kobj = 0x%p)", &media_lgrp->kobj);
-+
-+	return 0;
-+out_counters:
-+	sl_sysfs_media_counters_delete(ctrl_lgrp);
-+out_parents:
-+	kobject_put(&media_lgrp->parent_speed_kobj);
-+	kobject_put(&media_lgrp->kobj);
-+	return rtn;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
++	pci_read_config_dword(pdev, pos + PCI_PRI_MAX_REQ, &max_requests);
++	max_requests = min_t(u32, max_requests, (u32)MAX_PAGE_REQS);
++	pdev->pri_reqs_alloc = max_requests;
++	pci_write_config_dword(pdev, pos + PCI_PRI_ALLOC_REQ, max_requests);
 +}
 +
-+int sl_sysfs_media_speeds_create(u8 ldev_num, u8 lgrp_num)
++/**
++ * cass_ats_init() - Initialize an AC using either ATS or ATS passthrough
++ *                   and bind the AC to the current task
++ *
++ * @lni_priv: Private LNI struct
++ * @m_opts: User map options
++ * @cac:    Cassini AC struct
++ *
++ * @return: 0 on success, negative value on failure
++ */
++int cass_ats_init(struct cxi_lni_priv *lni_priv,
++		  struct ac_map_opts *m_opts,
++		  struct cass_ac *cac)
 +{
-+#ifdef CONFIG_SYSFS
-+	int                   rtn;
-+	int                   i;
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
++	int ret;
++	bool privileged = !(m_opts->flags & CXI_MAP_USER_ADDR);
++	union c_atu_cfg_ac_table *ac = &cac->cfg_ac;
++	struct cxi_dev *cdev = lni_priv->dev;
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++	bool have_pri = hw->cdev.pdev->pri_enabled;
 +
-+	media_lgrp = sl_media_lgrp_get(ldev_num, lgrp_num);
-+	ctrl_lgrp = sl_ctrl_lgrp_get(ldev_num, lgrp_num);
++	if (!enable_ats)
++		return -EOPNOTSUPP;
 +
-+	if (media_lgrp->speeds_kobj_init)
++	ret = cass_bind_ac(hw, cac);
++	if (ret)
++		return ret;
++
++	if (m_opts->flags & CXI_MAP_ATS_PT)
++		ac->ta_mode = C_ATU_PASSTHROUGH_MODE;
++	else if (m_opts->flags & CXI_MAP_ATS_DYN)
++		ac->ta_mode = C_ATU_ATS_DYNAMIC_MODE;
++	else
++		ac->ta_mode = C_ATU_ATS_MODE;
++
++	m_opts->iova = m_opts->va_start;
++	cac->iova_base = 0;
++	cac->iova_len = m_opts->flags & CXI_MAP_USER_ADDR ?
++				TASK_SIZE : ULONG_MAX;
++	cac->iova_end = cac->iova_base + cac->iova_len - 1;
++
++	ac->cntr_pool_id = 1;
++	ac->ats_vf_en = lni_priv->is_vf;
++	ac->ats_vf_num = lni_priv->is_vf ? lni_priv->vf_num : 0;
++	ac->ats_no_write = 0;
++	ac->ats_pasid = cac->pasid;
++	ac->ats_pasid_en = 1;
++	ac->ats_pasid_er = 0;
++	ac->ats_pasid_pmr = !!privileged;
++	ac->mem_base = cac->iova_base >> ATU_CFG_AC_TABLE_MB_SHIFT;
++	ac->mem_size = cac->iova_len >> C_ADDR_SHIFT;
++	ac->odp_mode = have_pri && !odp_mode_nic_pri ?
++			C_ATU_ODP_MODE_ATS_PRS : C_ATU_ODP_MODE_NIC_PRI;
++
++	return 0;
++}
++
++/**
++ * cass_ats_md_init() - Pin ATS pages or set up notifier
++ *
++ * When using ODP with NIC_PRI mode, the mmu notifier will be initialized
++ * for this descriptor. If pinning, just pin the pages.
++ *
++ * @md_priv: Private memory descriptor
++ * @m_opts:  User options containing the IOVA range
++ *
++ * @return: Success or -ENOMEM
++ */
++int cass_ats_md_init(struct cxi_md_priv *md_priv,
++		     const struct ac_map_opts *m_opts)
++{
++	int ret;
++	int write = m_opts->flags & CXI_MAP_WRITE;
++	int npages = md_priv->md.len >> md_priv->md.page_shift;
++	struct page **pages;
++	size_t size = npages * sizeof(*pages);
++	struct cass_dev *hw = container_of(md_priv->lni_priv->dev,
++					   struct cass_dev, cdev);
++
++	if (!enable_ats)
++		return -EOPNOTSUPP;
++
++	if (!(m_opts->flags & CXI_MAP_PIN)) {
++		if (odp_mode_nic_pri || !hw->cdev.pdev->pri_enabled)
++			return cass_mmu_notifier_insert(md_priv, m_opts);
++
 +		return 0;
-+
-+	media_lgrp->supported_speeds_num = 0;
-+	if (media_lgrp->cable_info->real_cable_status == CABLE_MEDIA_ATTR_ADDED) {
-+		for_each_set_bit(i, &media_lgrp->cable_info->media_attr.speeds_map,
-+				 sizeof(media_lgrp->cable_info->media_attr.speeds_map) * BITS_PER_BYTE) {
-+			media_lgrp->speeds_kobj[media_lgrp->supported_speeds_num].media_lgrp = media_lgrp;
-+			media_lgrp->speeds_kobj[media_lgrp->supported_speeds_num].speed = BIT(i);
-+			rtn = kobject_init_and_add(&media_lgrp->speeds_kobj[media_lgrp->supported_speeds_num].kobj,
-+						   &media_speed_info, &media_lgrp->parent_speed_kobj, sl_media_speed_str(BIT(i)));
-+			if (rtn) {
-+				for (i = 0; i <= media_lgrp->supported_speeds_num; ++i)
-+					kobject_put(&media_lgrp->speeds_kobj[i].kobj);
-+				media_lgrp->supported_speeds_num = 0;
-+				sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "kobject_init_and_add failed [%d]", rtn);
-+				return rtn;
-+			}
-+			media_lgrp->supported_speeds_num++;
-+		}
-+	} else if (media_lgrp->cable_info->fake_cable_status == CABLE_MEDIA_ATTR_ADDED) {
-+		for_each_set_bit(i, &media_lgrp->cable_info->stashed_media_attr.speeds_map,
-+				 sizeof(media_lgrp->cable_info->stashed_media_attr.speeds_map) * BITS_PER_BYTE) {
-+			media_lgrp->speeds_kobj[media_lgrp->supported_speeds_num].media_lgrp = media_lgrp;
-+			media_lgrp->speeds_kobj[media_lgrp->supported_speeds_num].speed = BIT(i);
-+			rtn = kobject_init_and_add(&media_lgrp->speeds_kobj[media_lgrp->supported_speeds_num].kobj,
-+						   &media_speed_info, &media_lgrp->parent_speed_kobj, sl_media_speed_str(BIT(i)));
-+			if (rtn) {
-+				for (i = 0; i <= media_lgrp->supported_speeds_num; ++i)
-+					kobject_put(&media_lgrp->speeds_kobj[i].kobj);
-+				media_lgrp->supported_speeds_num = 0;
-+				sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "kobject_init_and_add failed [%d]", rtn);
-+				return rtn;
-+			}
-+			media_lgrp->supported_speeds_num++;
-+		}
 +	}
 +
-+	media_lgrp->speeds_kobj_init = true;
++	pages = kvmalloc(size, GFP_KERNEL);
++	if (!pages)
++		return -ENOMEM;
 +
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media speed nodes created");
++	ret = cass_pin(md_priv->cac, pages, npages, md_priv->md.va, write);
 +
-+	return 0;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
++	if (ret) {
++		kvfree(pages);
++		return ret;
++	}
++
++	md_priv->pages = pages;
++
++	return ret;
 +}
 +
-+void sl_sysfs_media_speeds_delete(u8 ldev_num, u8 lgrp_num)
++#else /* CONFIG_IOMMU_SVA */
++void cass_unbind_ac(struct cass_dev *hw, const struct cass_ac *cac)
 +{
-+#ifdef CONFIG_SYSFS
-+	struct sl_media_lgrp *media_lgrp;
-+	u8 i;
-+
-+	media_lgrp = sl_media_lgrp_get(ldev_num, lgrp_num);
-+	if (!media_lgrp)
-+		return;
-+
-+	if (media_lgrp->speeds_kobj_init) {
-+		for (i = 0; i < media_lgrp->supported_speeds_num; ++i)
-+			kobject_put(&media_lgrp->speeds_kobj[i].kobj);
-+	}
-+	media_lgrp->speeds_kobj_init = false;
-+	media_lgrp->supported_speeds_num = 0;
-+#endif /* CONFIG_SYSFS */
 +}
 +
-+void sl_sysfs_media_delete(struct sl_ctrl_lgrp *ctrl_lgrp)
++void cass_iommu_fini(struct cass_dev *hw)
 +{
-+#ifdef CONFIG_SYSFS
-+	struct sl_media_lgrp *media_lgrp;
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media delete");
-+
-+	if (!ctrl_lgrp->parent_kobj)
-+		return;
-+
-+	sl_sysfs_media_counters_delete(ctrl_lgrp);
-+
-+	media_lgrp = sl_media_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!media_lgrp) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media_lgrp_get failed");
-+		return;
-+	}
-+
-+	sl_sysfs_media_speeds_delete(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	kobject_put(&media_lgrp->parent_speed_kobj);
-+	kobject_put(&media_lgrp->kobj);
-+#endif /* CONFIG_SYSFS */
 +}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_media_counters.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_media_counters.c
++
++void cass_iommu_init(struct cass_dev *hw)
++{
++}
++
++int cass_ats_init(struct cxi_lni_priv *lni_priv,
++		  struct ac_map_opts *m_opts,
++		  struct cass_ac *cac)
++{
++	return -ENODEV;
++}
++
++int cass_ats_md_init(struct cxi_md_priv *md_priv,
++		     const struct ac_map_opts *m_opts)
++{
++	return -ENODEV;
++}
++#endif /* !CONFIG_IOMMU_SVA */
+diff --git a/drivers/net/ethernet/hpe/ss1/cass_ats_inval.c b/drivers/net/ethernet/hpe/ss1/cass_ats_inval.c
 new file mode 100644
-index 000000000000..682c106d4d3a
+index 000000000000..39a1a683d85e
 --- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_media_counters.c
-@@ -0,0 +1,599 @@
++++ b/drivers/net/ethernet/hpe/ss1/cass_ats_inval.c
+@@ -0,0 +1,79 @@
 +// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2025,2026 Hewlett Packard Enterprise Development LP */
++/* Copyright 2022 Hewlett Packard Enterprise Development LP */
 +
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
++#ifdef CONFIG_AMD_IOMMU
 +
-+#include "sl_sysfs.h"
-+#include "sl_log.h"
-+#include "sl_media_lgrp.h"
-+#include "sl_ctrl_ldev.h"
-+#include "sl_ctrl_lgrp.h"
-+#include "sl_ctrl_media_counters.h"
++#include <linux/module.h>
++#include <linux/amd-iommu.h>
 +
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
++#include "cass_core.h"
 +
-+#ifdef CONFIG_SYSFS
-+static ssize_t cause_eeprom_format_unsupported_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++/*
++ * ATS invalidate interface for Cassini 1.1
++ */
++
++typedef void (*amd_iommu_invalidate_range)(struct pci_dev *pdev,
++					   int pasid, unsigned long start,
++					   unsigned long end);
++int amd_iommu_set_invalidate_range_cb(struct pci_dev *pdev,
++				      amd_iommu_invalidate_range cb);
++
++/**
++ * cass_ats_invalidate_range_cb() - Callback from the AMD IOMMU to invalidate
++ *				    and address range.
++ *
++ * @pdev: PCI device
++ * @pasid: The process address space ID.
++ * @start: Start of address range
++ * @end: End of address range
++ */
++static void cass_ats_invalidate_range_cb(struct pci_dev *pdev, int pasid,
++					 unsigned long start, unsigned long end)
 +{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   counter;
-+	u32                   rtn;
 +
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, counters_kobj);
++	struct cass_dev *hw = pci_get_drvdata(pdev);
++	struct cass_ac *cac;
 +
-+	rtn = sl_ctrl_media_cause_counter_get(media_lgrp->media_jack, MEDIA_CAUSE_EEPROM_FORMAT_UNSUPPORTED, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
++	cac = cass_cac_get(hw, pasid);
++	if (!cac)
++		return;
 +
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media cause eeprom format unsupported show (counter = %u)",
-+		   counter);
++	pr_debug("pasid:%d start:%lx end:%lx\n", pasid, start, end);
 +
-+	return sysfs_emit(buf, "%u\n", counter);
++	cass_invalidate_range(cac, start, end - start);
++	atomic_inc(&hw->dcpl_ats_mn_inval);
++	cass_cac_put(cac);
 +}
 +
-+static ssize_t cause_eeprom_vendor_unsupported_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++/**
++ * cass_amd_iommu_inval_cb_init() - Initialize the invalidation callback.
++ *
++ * @pdev: PCI device
++ */
++void cass_amd_iommu_inval_cb_init(struct pci_dev *pdev)
 +{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   counter;
-+	u32                   rtn;
++	int (*set_inval_range_cb)(struct pci_dev *pdev,
++				  amd_iommu_invalidate_range cb);
++	struct cass_dev *hw = pci_get_drvdata(pdev);
++	int ret;
 +
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, counters_kobj);
++	/* Only set up invalidation callback for Cassini 1 */
++	if (!cass_version(hw, CASSINI_1))
++		return;
 +
-+	rtn = sl_ctrl_media_cause_counter_get(media_lgrp->media_jack, MEDIA_CAUSE_EEPROM_VENDOR_UNSUPPORTED, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
++	set_inval_range_cb = symbol_get(amd_iommu_set_invalidate_range_cb);
++	if (set_inval_range_cb) {
++		ret = set_inval_range_cb(pdev, cass_ats_invalidate_range_cb);
++		if (ret) {
++			dev_WARN(&pdev->dev,
++				 "Error setting invalidation callback (%d)\n",
++				 ret);
++		} else {
++			hw->ats_c1_odp_enable = true;
++		}
 +
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media cause eeprom vendor unsupported show (counter = %u)",
-+		   counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
++		symbol_put(amd_iommu_set_invalidate_range_cb);
++	}
 +}
 +
-+static ssize_t cause_eeprom_jack_io_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++#endif /* CONFIG_AMD_IOMMU */
+diff --git a/drivers/net/ethernet/hpe/ss1/cass_atu.c b/drivers/net/ethernet/hpe/ss1/cass_atu.c
+new file mode 100644
+index 000000000000..6e80024dbc37
+--- /dev/null
++++ b/drivers/net/ethernet/hpe/ss1/cass_atu.c
+@@ -0,0 +1,2072 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright 2018, 2024-2026 Hewlett Packard Enterprise Development LP */
++
++/* Address Translation Unit (ATU) management */
++
++#include <linux/interrupt.h>
++#include <linux/types.h>
++#include <linux/hugetlb.h>
++#include <linux/iova.h>
++#include <linux/bvec.h>
++#include <linux/iopoll.h>
++#include <linux/workqueue.h>
++#include <linux/random.h>
++
++#include "cass_core.h"
++#include "cass_ss1_debugfs.h"
++
++int more_debug;
++module_param(more_debug, int, 0644);
++MODULE_PARM_DESC(more_debug, "More debug");
++
++static int default_ptg_mode = C_ATU_PTG_MODE_DBL_C;
++module_param(default_ptg_mode, int, 0644);
++MODULE_PARM_DESC(default_ptg_mode, "Default PTG Mode");
++
++/* Invalidation interval is 2^(inval_process_interval+1) - 10 is ~2 uS */
++static int inval_process_interval = 10;
++module_param(inval_process_interval, int, 0644);
++MODULE_PARM_DESC(inval_process_interval, "ATS invalidate processing interval");
++
++/* Relaxed ordering bits test */
++static bool acxt_mem_rd_ro;
++module_param(acxt_mem_rd_ro, bool, 0644);
++MODULE_PARM_DESC(acxt_mem_rd_ro, "Memory Read Relaxed Ordering");
++static bool acxt_flush_req_ro;
++module_param(acxt_flush_req_ro, bool, 0644);
++MODULE_PARM_DESC(acxt_flush_req_ro, "Flush Request Relaxed Ordering");
++static bool acxt_translation_req_ro;
++module_param(acxt_translation_req_ro, bool, 0644);
++MODULE_PARM_DESC(acxt_translation_req_ro, "Translation Request Relaxed Ordering");
++static bool acxt_fetching_amo_ro;
++module_param(acxt_fetching_amo_ro, bool, 0644);
++MODULE_PARM_DESC(acxt_fetching_amo_ro, "Fetching AMO Relaxed Ordering");
++static bool acxt_ido;
++module_param(acxt_ido, bool, 0644);
++MODULE_PARM_DESC(acxt_ido, "ID-Based Ordering");
++
++static bool ac_salt = true;
++module_param(ac_salt, bool, 0644);
++MODULE_PARM_DESC(ac_salt, "Add salt to ACs");
++
++static bool acxt_ph_en;
++module_param(acxt_ph_en, bool, 0644);
++MODULE_PARM_DESC(acxt_ph_en, "Enable use of Processing Hints and Steering Tag");
++static u8 acxt_phints;
++module_param(acxt_phints, byte, 0644);
++MODULE_PARM_DESC(acxt_phints, "TLP Processing Hints");
++static u8 acxt_steering_tag;
++module_param(acxt_steering_tag, byte, 0644);
++MODULE_PARM_DESC(acxt_steering_tag, "Steering Tag");
++
++bool ats_c1_override;
++module_param(ats_c1_override, bool, 0644);
++MODULE_PARM_DESC(ats_c1_override, "Override ODP Enable for ATS with C1");
++
++/* Use a larger base page size when huge_shift - page_shift is greater
++ * than the maximum page table size (max-threshold) allowed. This allows
++ * us to support 256, 512 and 1024 MB Cray hugepage sizes.
++ */
++static int hugepage_threshold = 1;
++module_param(hugepage_threshold, int, 0644);
++MODULE_PARM_DESC(hugepage_threshold, "Threshold to increase base page size.");
++
++void cass_atu_fini(struct cass_dev *hw)
 +{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   counter;
-+	u32                   rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, counters_kobj);
-+
-+	rtn = sl_ctrl_media_cause_counter_get(media_lgrp->media_jack, MEDIA_CAUSE_EEPROM_JACK_IO, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media cause eeprom jack io show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
++	cxi_unregister_hw_errors(hw, &hw->atu_err);
++	iova_cache_put();
++	dma_unmap_single(&hw->cdev.pdev->dev, hw->oxe_dummy_dma_addr,
++			 PAGE_SIZE, DMA_TO_DEVICE);
++	kfree(hw->oxe_dummy_addr);
++	ida_destroy(&hw->atu_table);
++	cass_iommu_fini(hw);
++	cass_nta_pri_fini(hw);
++	cass_nta_cq_fini(hw);
++	refcount_dec(&hw->refcount);
 +}
 +
-+static ssize_t cause_online_status_get_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++/* Atomically write an Address Context */
++static void cass_write_ac(struct cass_dev *hw, union c_atu_cfg_ac_table *ac,
++			  unsigned int index, bool user, bool is_physac,
++			  bool vf_en, int vf_num)
 +{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   counter;
-+	u32                   rtn;
++	union c_pi_cfg_acxt pi_cfg_acxt = {
++		.ac_en = ac->context_en,
++	};
 +
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, counters_kobj);
++	pi_cfg_acxt.vf_en = vf_en;
++	pi_cfg_acxt.vf_num = vf_num;
 +
-+	rtn = sl_ctrl_media_cause_counter_get(media_lgrp->media_jack, MEDIA_CAUSE_ONLINE_STATUS_GET, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
++	if (ac->ta_mode != C_ATU_NTA_MODE) {
++		pi_cfg_acxt.pasid = ac->ats_pasid;
++		pi_cfg_acxt.pasid_en = ac->ats_pasid_en;
++		pi_cfg_acxt.pasid_er = ac->ats_pasid_er;
++		pi_cfg_acxt.pasid_pmr = ac->ats_pasid_pmr;
++	}
 +
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media cause online status get show (counter = %u)", counter);
++	pi_cfg_acxt.mem_rd_ro = acxt_mem_rd_ro;
++	pi_cfg_acxt.flush_req_ro = acxt_flush_req_ro;
++	pi_cfg_acxt.translation_req_ro = acxt_translation_req_ro;
++	pi_cfg_acxt.fetching_amo_ro = acxt_fetching_amo_ro;
++	pi_cfg_acxt.ido = acxt_ido;
 +
-+	return sysfs_emit(buf, "%u\n", counter);
++	if (acxt_ph_en && user) {
++		pi_cfg_acxt.ph_en = acxt_ph_en;
++		pi_cfg_acxt.phints = acxt_phints;
++		pi_cfg_acxt.steering_tag = acxt_steering_tag;
++	}
++
++	if (ac_salt) {
++		u32 rand = get_random_u32();
++
++		ac->ptn_salt = rand;
++		ac->idx_salt = rand >> 2;
++	}
++
++	spin_lock(&hw->atu_shadow_lock);
++	cass_config_ac(hw, index, ac);
++	spin_unlock(&hw->atu_shadow_lock);
++
++	/* WORKAROUND: Cassini ERRATA-3277
++	 * When disabling an AC, invalidate before disabling the ACXT.
++	 */
++	if (!is_physac && cass_version(hw, CASSINI_1) && !ac->context_en) {
++		struct cass_ac *cac = container_of(ac, struct cass_ac, cfg_ac);
++
++		cass_invalidate_range(cac, 0, ATUCQ_INVALIDATE_ALL);
++	}
++
++	cass_config_pi_acxt(hw, index, &pi_cfg_acxt);
 +}
 +
-+static ssize_t cause_online_timedout_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++/* Callback registered with the interrupt error handler, executed when
++ * C_ATU_ERR_FLG.PRB_EXPIRED error interrupt is detected.
++ */
++static void cass_prb_exp_cb(struct cass_dev *hw, unsigned int irq,
++			    bool is_ext, unsigned int bitn)
 +{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   counter;
-+	u32                   rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, counters_kobj);
-+
-+	rtn = sl_ctrl_media_cause_counter_get(media_lgrp->media_jack, MEDIA_CAUSE_ONLINE_TIMEDOUT, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media cause online timedout show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
++	queue_work(hw->prb_wq, &hw->prb_work);
 +}
 +
-+static ssize_t cause_online_jack_io_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++int cass_atu_init(struct cass_dev *hw)
 +{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   counter;
-+	u32                   rtn;
++	int i;
++	int ret;
++	union c_atu_cfg_nta cfg_nta = {
++		.acid = ATU_NTA_DEF_PI_ACXT,
++	};
++	union c_atu_cfg_ac_table ac = {
++		.context_en = 1,
++		.ta_mode = C_ATU_PASSTHROUGH_MODE,
++	};
++	union c_oxe_cfg_dummy_addr oxe_dummy = {
++		.ac = ATU_PHYS_AC
++	};
++	union c_atu_cfg_ats cfg_ats;
 +
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, counters_kobj);
++	ac.mem_size = ~ac.mem_size;
 +
-+	rtn = sl_ctrl_media_cause_counter_get(media_lgrp->media_jack, MEDIA_CAUSE_ONLINE_JACK_IO, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
++	hw->oxe_dummy_addr = kcalloc(1, PAGE_SIZE, GFP_KERNEL);
++	if (hw->oxe_dummy_addr == NULL)
++		return -ENOMEM;
 +
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media cause online jack io show (counter = %u)", counter);
++	ida_init(&hw->atu_table);
++	refcount_inc(&hw->refcount);
++	spin_lock_init(&hw->cac_table_lock);
++	spin_lock_init(&hw->atu_shadow_lock);
++	mutex_init(&hw->odpq_mutex);
++	atomic_set(&hw->stats.md, 0);
++	atomic_set(&hw->atu_error_inject, 0);
++	atomic_set(&hw->atu_odp_requests, 0);
++	atomic_set(&hw->atu_odp_fails, 0);
++	atomic_set(&hw->atu_prb_expired, 0);
++	atomic_set(&hw->dcpl_md_clear_inval, 0);
++	atomic_set(&hw->dcpl_nta_mn_inval, 0);
++	atomic_set(&hw->dcpl_ats_mn_inval, 0);
++	atomic_set(&hw->dcpl_comp_wait, 0);
++	atomic_set(&hw->dcpl_entered, 0);
++	atomic_set(&hw->dcpl_ixe_cntr_0, 0);
++	atomic_set(&hw->dcpl_ixe_cntr_dec_0, 0);
++	atomic_set(&hw->dcpl_ee_cntr_dec_0, 0);
++	atomic_set(&hw->dcpl_ee_cntr_stuck, 0);
++	atomic_set(&hw->dcpl_oxe_cntr_dec_0, 0);
++	atomic_set(&hw->dcpl_oxe_cntr_stuck, 0);
++	atomic_set(&hw->dcpl_ixe_cntr_stuck, 0);
++	atomic_set(&hw->dcpl_success, 0);
++	atomic_set(&hw->dcpl_ibw_cntr_dec_0_62, 0);
++	atomic_set(&hw->dcpl_ibw_cntr_dec_0_62_count, 0);
++	atomic_set(&hw->dcpl_ibw_cntr_dec_0_64, 0);
++	atomic_set(&hw->dcpl_ibw_cntr_dec_0_64_count, 0);
++	atomic_set(&hw->dcpl_ibw_active_stuck, 0);
++	atomic_set(&hw->dcpl_ibw_idle_wait, 0);
++	atomic_set(&hw->dcpl_ibw_cntr_is_0, 0);
++	atomic_set(&hw->dcpl_ibw_issued, 0);
++	hw->dcpl_max_time = 0;
++	for (i = 0; i < DBINS; i++)
++		hw->dcpl_time[i] = 0;
++	hw->pri_max_md_time = 0;
++	hw->pri_max_fault_time = 0;
++	for (i = 0; i < MDBINS; i++)
++		hw->pri_md_time[i] = 0;
++	for (i = 0; i < FBINS; i++)
++		hw->pri_fault_time[i] = 0;
 +
-+	return sysfs_emit(buf, "%u\n", counter);
++	cass_write_ac(hw, &ac, ATU_PHYS_AC, false, false,
++		      ac.ats_vf_en, ac.ats_vf_num);
++	cass_write(hw, C_ATU_CFG_NTA, &cfg_nta, sizeof(union c_atu_cfg_nta));
++
++	hw->oxe_dummy_dma_addr = dma_map_single(&hw->cdev.pdev->dev,
++						hw->oxe_dummy_addr, PAGE_SIZE,
++						DMA_TO_DEVICE);
++	if (dma_mapping_error(&hw->cdev.pdev->dev, hw->oxe_dummy_dma_addr)) {
++		ret = -ENOMEM;
++		goto free_dummy;
++	}
++	oxe_dummy.subaddr = hw->oxe_dummy_dma_addr >> C_ADDR_SHIFT;
++	cass_write(hw, C_OXE_CFG_DUMMY_ADDR, &oxe_dummy,
++		   sizeof(union c_oxe_cfg_dummy_addr));
++
++	cass_read(hw, C_ATU_CFG_ATS, &cfg_ats.qw, sizeof(cfg_ats));
++
++	/* The simulator runs much slower so we need to change the
++	 * invalidate processing interval to a lower value.
++	 * The AMD IOMMU (in Epyc processors earlier than the 7002 series)
++	 * has bug where it returns multiple translations
++	 * with the same address if the page size is larger than the
++	 * STU size. Setting truncate_gt_stu_rsp is a workaround.
++	 * Cassini ERRATA-2431
++	 */
++	if (HW_PLATFORM_Z1(hw)) {
++		cfg_ats.inval_process_interval = 5;
++		cfg_ats.truncate_gt_stu_rsp = 1;
++	}
++
++	/* The inval_process_interval default causes IOMMU timeouts. */
++	if (HW_PLATFORM_ASIC(hw))
++		cfg_ats.inval_process_interval = inval_process_interval;
++
++	if (HW_PLATFORM_Z1(hw) || HW_PLATFORM_ASIC(hw))
++		cass_write(hw, C_ATU_CFG_ATS, &cfg_ats, sizeof(cfg_ats));
++
++	if (!cass_version(hw, CASSINI_1))
++		odp_sw_decouple = false;
++
++	if (cass_version(hw, CASSINI_1)) {
++		/* Errata 3117 */
++		union c1_atu_cfg_odp_decouple odp_decouple;
++
++		cass_read(hw, C1_ATU_CFG_ODP_DECOUPLE, &odp_decouple,
++			  sizeof(odp_decouple));
++		odp_decouple.flush_req_delay = ATU_FLUSH_REQ_DELAY;
++		odp_decouple.enable = odp_sw_decouple ? 0 : 1;
++		cass_write(hw, C1_ATU_CFG_ODP_DECOUPLE, &odp_decouple,
++			   sizeof(odp_decouple));
++	}
++
++	ret = cass_nta_cq_init(hw);
++	if (ret)
++		goto cq_init_fail;
++
++	ret = cass_nta_pri_init(hw);
++	if (ret)
++		goto pri_init_fail;
++
++	iova_cache_get();
++	cass_iommu_init(hw);
++
++	/* Register callback for C_ATU_ERR_FLG.PRB_EXPIRED bit */
++	hw->atu_err.irq = C_ATU_IRQA_MSIX_INT;
++	hw->atu_err.is_ext = false;
++	hw->atu_err.err_flags.atu.prb_expired = 1;
++	hw->atu_err.cb = cass_prb_exp_cb;
++	cxi_register_hw_errors(hw, &hw->atu_err);
++
++	return 0;
++
++pri_init_fail:
++	cass_nta_cq_fini(hw);
++
++cq_init_fail:
++	refcount_dec(&hw->refcount);
++	dma_unmap_single(&hw->cdev.pdev->dev, hw->oxe_dummy_dma_addr,
++			 PAGE_SIZE, DMA_TO_DEVICE);
++free_dummy:
++	kfree(hw->oxe_dummy_addr);
++
++	return ret;
 +}
 +
-+static ssize_t cause_online_jack_get_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++static void cass_md_list_free(struct cass_ac *cac)
 +{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   counter;
-+	u32                   rtn;
++	struct cxi_md_priv *tmp;
++	struct cxi_md_priv *le;
 +
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, counters_kobj);
++	mutex_lock(&cac->md_mutex);
 +
-+	rtn = sl_ctrl_media_cause_counter_get(media_lgrp->media_jack, MEDIA_CAUSE_ONLINE_JACK_GET, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
++	list_for_each_entry_safe(le, tmp, &cac->md_list, md_entry) {
++		list_del(&le->md_entry);
++		refcount_dec(&cac->refcount);
++		cass_md_clear(le, false, true);
++		kfree(le);
++	}
 +
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media cause online jack get show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
++	mutex_unlock(&cac->md_mutex);
 +}
 +
-+static ssize_t cause_serdes_settings_get_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++/**
++ * cass_cac_get - Pin a published Address Context for a reader
++ *
++ * @hw:  Cassini device
++ * @acid: Address Context ID
++ */
++struct cass_ac *cass_cac_get(struct cass_dev *hw, int acid)
 +{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   counter;
-+	u32                   rtn;
++	struct cass_ac *cac;
++	unsigned long flags;
 +
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, counters_kobj);
++	if (acid < 0 || acid >= ARRAY_SIZE(hw->cac_table))
++		return NULL;
 +
-+	rtn = sl_ctrl_media_cause_counter_get(media_lgrp->media_jack, MEDIA_CAUSE_SERDES_SETTINGS_GET, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
++	spin_lock_irqsave(&hw->cac_table_lock, flags);
++	cac = hw->cac_table[acid];
++	if (cac && !refcount_inc_not_zero(&cac->reader_refs))
++		cac = NULL;
++	spin_unlock_irqrestore(&hw->cac_table_lock, flags);
 +
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media cause serdes settings get show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
++	return cac;
 +}
 +
-+static ssize_t cause_scan_status_get_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++void cass_cac_put(struct cass_ac *cac)
 +{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   counter;
-+	u32                   rtn;
-+
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, counters_kobj);
-+
-+	rtn = sl_ctrl_media_cause_counter_get(media_lgrp->media_jack, MEDIA_CAUSE_SCAN_STATUS_GET, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media cause scan status get show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
++	if (cac && refcount_dec_and_test(&cac->reader_refs))
++		complete(&cac->readers_done);
 +}
 +
-+static ssize_t cause_scan_hdl_get_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++static void cass_cac_unpublish(struct cass_dev *hw, struct cass_ac *cac)
 +{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   counter;
-+	u32                   rtn;
++	int acid = cac->ac.acid;
++	unsigned long flags;
 +
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, counters_kobj);
++	spin_lock_irqsave(&hw->cac_table_lock, flags);
++	hw->cac_table[acid] = NULL;
++	spin_unlock_irqrestore(&hw->cac_table_lock, flags);
 +
-+	rtn = sl_ctrl_media_cause_counter_get(media_lgrp->media_jack, MEDIA_CAUSE_SCAN_HDL_GET, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media cause scan hdl get show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
++	cass_cac_put(cac);
++	wait_for_completion(&cac->readers_done);
 +}
 +
-+static ssize_t cause_scan_jack_get_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++static void cass_cac_free(struct cass_dev *hw, struct cass_ac *cac)
 +{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   counter;
-+	u32                   rtn;
++	int acid = cac->ac.acid;
 +
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, counters_kobj);
++	if (!refcount_dec_and_test(&cac->refcount)) {
++		cxidev_WARN_ONCE(&hw->cdev, true,
++				 "Resource leaks - AC refcount not zero: %d\n",
++				 refcount_read(&cac->refcount));
++		return;
++	}
 +
-+	rtn = sl_ctrl_media_cause_counter_get(media_lgrp->media_jack, MEDIA_CAUSE_SCAN_JACK_GET, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media cause scan jack get show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
++	kfree(cac);
++	ida_free(&hw->atu_table, acid);
 +}
 +
-+static ssize_t cause_media_attr_set_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++static void cass_ac_init(struct cass_ac *cac, const struct ac_map_opts *m_opts)
 +{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   counter;
-+	u32                   rtn;
++	union c_atu_cfg_ac_table *ac = &cac->cfg_ac;
++	struct cass_dev *hw = container_of(cac->lni_priv->dev,
++					   struct cass_dev, cdev);
 +
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, counters_kobj);
++	ac->pg_table_size = cac->huge_shift - cac->page_shift;
++	ac->base_pg_size = cac->page_shift - C_ADDR_SHIFT;
++	ac->ptg_mode = cac->ptg_mode;
++	ac->do_not_cache = !!(cac->flags & CXI_MAP_NOCACHE);
++	ac->odp_en = !(cass_version(hw, CASSINI_1_0) ||
++		       (cac->flags & CXI_MAP_PIN));
++	ac->do_not_filter = hw->ac_filter_disabled;
++	ac->context_en = 1;
 +
-+	rtn = sl_ctrl_media_cause_counter_get(media_lgrp->media_jack, MEDIA_CAUSE_MEDIA_ATTR_SET, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media cause media attr set show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
++	pr_debug("page_shift:%d huge_shift:%d base_pg_sz:%d pg_table_sz:%d\n",
++		 cac->page_shift, cac->huge_shift, ac->base_pg_size,
++		 ac->pg_table_size);
 +}
 +
-+static ssize_t cause_intr_event_jack_io_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++/**
++ * cass_lac_free() - Unmap an AC from the LNI's resource group.
++ *
++ * @lni_priv: the Logical Network Interface
++ * @lac: LAC to free
++ */
++static void cass_lac_free(struct cxi_lni_priv *lni_priv, int lac)
 +{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   counter;
-+	u32                   rtn;
++	struct cass_dev *hw = container_of(lni_priv->dev, struct cass_dev, cdev);
 +
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, counters_kobj);
-+
-+	rtn = sl_ctrl_media_cause_counter_get(media_lgrp->media_jack, MEDIA_CAUSE_INTR_EVENT_JACK_IO, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media cause intr event jack io show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
++	cass_set_acid(hw, lni_priv->lni.rgid, lac, C_AC_NONE);
++	cass_lac_put(hw, lni_priv->lni.rgid, lac);
 +}
 +
-+static ssize_t cause_power_set_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++/**
++ * cass_ac_phys_alloc - Allocate a physical Address Context for a VF
++ *
++ * This per-VF AC is analogous to ATU_PHYS_AC and is used in its place when
++ * configuring resources such as CQs that belong to a VF.
++ *
++ * @hw: CXI device
++ * @vf_en: true if allocating an AC for a VF
++ * @vf_num: VF number to allocate AC for (ignored if vf_en is false)
++ */
++int cass_ac_phys_alloc(struct cass_dev *hw, bool vf_en, int vf_num)
 +{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   counter;
-+	u32                   rtn;
++	int acid;
++	union c_atu_cfg_ac_table ac = {
++		.context_en = 1,
++		.ta_mode = C_ATU_PASSTHROUGH_MODE,
++		.mem_size = ~0,
++		.ats_vf_en = vf_en,
++		.ats_vf_num = vf_en ? vf_num : 0,
++	};
 +
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, counters_kobj);
++	acid = ida_alloc_range(&hw->atu_table, 1, ATU_PHYS_AC - 1, GFP_KERNEL);
++	if (acid < 0)
++		return acid;
 +
-+	rtn = sl_ctrl_media_cause_counter_get(media_lgrp->media_jack, MEDIA_CAUSE_POWER_SET, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
++	cass_write_ac(hw, &ac, acid, false, true, vf_en, vf_num);
 +
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media cause power set show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
++	return acid;
 +}
 +
-+static ssize_t cause_shift_down_jack_io_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++/**
++ * cass_ac_phys_free - Free a physical Address Context allocated by
++ * cass_ac_phys_alloc()
++ *
++ * @hw: CXI device
++ * @acid: ID of address context
++ */
++void cass_ac_phys_free(struct cass_dev *hw, int acid)
 +{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   counter;
-+	u32                   rtn;
++	union c_atu_cfg_ac_table ac = {};
 +
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, counters_kobj);
-+
-+	rtn = sl_ctrl_media_cause_counter_get(media_lgrp->media_jack, MEDIA_CAUSE_SHIFT_DOWN_JACK_IO, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media cause shift down jack io show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
++	cass_write_ac(hw, &ac, acid, false, true, false, 0);
++	ida_free(&hw->atu_table, acid);
 +}
 +
-+static ssize_t cause_shift_down_jack_io_low_power_set_show(struct kobject *kobj,
-+							   struct kobj_attribute *kattr, char *buf)
++/**
++ * cass_ac_alloc() - Allocate an Address Context
++ *
++ * Once the ACID is written to hardware, it cannot be freed until the LNI
++ * is freed.
++ *
++ * @lni_priv: the Logical Network Interface
++ * @m_opts: User map options
++ */
++static struct cass_ac *cass_ac_alloc(struct cxi_lni_priv *lni_priv,
++				     struct ac_map_opts *m_opts)
 +{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   counter;
-+	u32                   rtn;
++	int ret;
++	unsigned long irq_flags;
++	struct cass_ac *cac;
++	struct cxi_dev *dev = lni_priv->dev;
++	struct cass_dev *hw = container_of(dev, struct cass_dev, cdev);
 +
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, counters_kobj);
++	/* ac->pg_table_size is limited to 4 bits and a minimum of 8 entries */
++	if ((m_opts->huge_shift - m_opts->page_shift > MAX_PG_TABLE_SIZE) ||
++	    ((m_opts->ptg_mode != C_ATU_PTG_MODE_SGL) &&
++	     ((m_opts->huge_shift - m_opts->page_shift) < MIN_PG_TABLE_SIZE))) {
++		pr_debug("Invalid huge_shift:%d/page_shift:%d combination\n",
++			 m_opts->huge_shift, m_opts->page_shift);
++		return ERR_PTR(-EINVAL);
++	}
 +
-+	rtn = sl_ctrl_media_cause_counter_get(media_lgrp->media_jack, MEDIA_CAUSE_SHIFT_DOWN_JACK_IO_LOW_POWER_SET,
-+					      &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
++	/* Check the associated service to see if this AC can be allocated */
++	ret = cxi_rgroup_alloc_resource(lni_priv->rgroup, CXI_RESOURCE_AC);
++	if (ret)
++		return ERR_PTR(ret);
 +
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media cause shift down jack io low power set show (counter = %u)",
-+		   counter);
++	cac = kzalloc(sizeof(*cac), GFP_KERNEL);
++	if (!cac) {
++		ret = -ENOMEM;
++		goto dec_rsrc_use;
++	}
 +
-+	return sysfs_emit(buf, "%u\n", counter);
++	/* AC_NONE (0) is invalid, ATU_PHYS_AC is reserved for physical
++	 * mappings
++	 */
++	ret = ida_alloc_range(&hw->atu_table, 1, ATU_PHYS_AC - 1, GFP_KERNEL);
++	if (ret < 0)
++		goto cac_free;
++
++	cac->ac.acid = ret;
++
++	ret = cass_lac_get(hw, lni_priv->lni.rgid);
++	if (ret < 0)
++		goto ac_put;
++
++	cac->ac.lac = ret;
++
++	refcount_set(&cac->refcount, 1);
++	mutex_init(&cac->ac_mutex);
++	cac->lni_priv = lni_priv;
++	cac->flags = m_opts->flags;
++	cac->ptg_mode = m_opts->ptg_mode;
++	cac->page_shift = m_opts->page_shift;
++	cac->huge_shift = m_opts->huge_shift;
++	cac->hugepage_test = m_opts->hugepage_test;
++
++	cass_ac_init(cac, m_opts);
++
++	if (m_opts->flags & CXI_MAP_ATS)
++		ret = cass_ats_init(lni_priv, m_opts, cac);
++	else
++		ret = cass_nta_init(lni_priv, m_opts, cac);
++
++	if (ret)
++		goto lac_put;
++
++	INIT_LIST_HEAD(&cac->md_list);
++	mutex_init(&cac->md_mutex);
++	refcount_set(&cac->reader_refs, 1);
++	init_completion(&cac->readers_done);
++
++	spin_lock_irqsave(&hw->cac_table_lock, irq_flags);
++	hw->cac_table[cac->ac.acid] = cac;
++	spin_unlock_irqrestore(&hw->cac_table_lock, irq_flags);
++
++	cass_write_ac(hw, &cac->cfg_ac, cac->ac.acid,
++		      m_opts->flags & CXI_MAP_USER_ADDR, false,
++		      cac->lni_priv->is_vf,
++		      cac->lni_priv->is_vf ? cac->lni_priv->vf_num : 0);
++	cass_set_acid(hw, lni_priv->lni.rgid, cac->ac.lac, cac->ac.acid);
++
++	list_add_tail(&cac->list, &lni_priv->ac_list);
++	refcount_inc(&lni_priv->refcount);
++
++	atomic_inc(&hw->stats.ac);
++
++	ac_debugfs_create(cac->ac.acid, cac, hw, lni_priv);
++
++	return cac;
++
++lac_put:
++	cass_lac_put(hw, lni_priv->lni.rgid, cac->ac.lac);
++ac_put:
++	ida_free(&hw->atu_table, cac->ac.acid);
++cac_free:
++	kfree(cac);
++dec_rsrc_use:
++	cxi_rgroup_free_resource(lni_priv->rgroup, CXI_RESOURCE_AC);
++
++	pr_debug("failed rc %d\n", ret);
++	return ERR_PTR(ret);
 +}
 +
-+static ssize_t cause_shift_down_jack_io_high_power_set_show(struct kobject *kobj,
-+							    struct kobj_attribute *kattr, char *buf)
++static void cass_ac_free(struct cass_dev *hw, struct cass_ac *cac)
 +{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   counter;
-+	u32                   rtn;
++	struct cxi_lni_priv *lni_priv = cac->lni_priv;
 +
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, counters_kobj);
++	pr_debug("freeing ac %d\n", cac->ac.acid);
 +
-+	rtn = sl_ctrl_media_cause_counter_get(media_lgrp->media_jack,
-+					      MEDIA_CAUSE_SHIFT_DOWN_JACK_IO_HIGH_POWER_SET, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
++	cass_cac_unpublish(hw, cac);
 +
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media cause shift down jack io high power set show (counter = %u)",
-+		   counter);
++	debugfs_remove(cac->lni_dir);
++	debugfs_remove_recursive(cac->debug_dir);
 +
-+	return sysfs_emit(buf, "%u\n", counter);
++	atomic_dec(&hw->stats.ac);
++	cxi_rgroup_free_resource(lni_priv->rgroup, CXI_RESOURCE_AC);
++
++	cass_md_list_free(cac);
++	cass_nta_iova_fini(cac);
++
++	if (cac->nta) {
++		cass_l1_tables_free(hw, cac->nta);
++		cass_invalidate_range(cac, 0, ATUCQ_INVALIDATE_ALL);
++		cass_nta_free(hw, cac->nta);
++	}
++
++	memset(&cac->cfg_ac, 0, sizeof(cac->cfg_ac));
++	cass_write_ac(hw, &cac->cfg_ac, cac->ac.acid, false, false,
++		      lni_priv->is_vf, lni_priv->is_vf ? lni_priv->vf_num : 0);
++
++	cass_unbind_ac(hw, cac);
++
++	cass_lac_free(lni_priv, cac->ac.lac);
++	cass_cac_free(hw, cac);
++	refcount_dec(&lni_priv->refcount);
 +}
 +
-+static ssize_t cause_shift_up_jack_io_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++/**
++ * cass_acs_disable() - Disable all the ACs of an LNI
++ *
++ * The LNI is getting released. This is the first part of the cleanup.
++ *
++ * @lni_priv: the Logical Network Interface
++ */
++void cass_acs_disable(struct cxi_lni_priv *lni_priv)
 +{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   counter;
-+	u32                   rtn;
++	struct cxi_dev *dev = lni_priv->dev;
++	struct cass_dev *hw = container_of(dev, struct cass_dev, cdev);
++	struct cass_ac *cac;
 +
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, counters_kobj);
++	mutex_lock(&lni_priv->ac_list_mutex);
 +
-+	rtn = sl_ctrl_media_cause_counter_get(media_lgrp->media_jack, MEDIA_CAUSE_SHIFT_UP_JACK_IO, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
++	list_for_each_entry(cac, &lni_priv->ac_list, list) {
++		cac->cfg_ac.context_en = 0;
++		cass_write_ac(hw, &cac->cfg_ac, cac->ac.acid, false, false,
++			      cac->lni_priv->is_vf,
++			      cac->lni_priv->is_vf ? cac->lni_priv->vf_num : 0);
++	}
 +
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media cause shift up jack io show (counter = %u)", counter);
++	mutex_unlock(&lni_priv->ac_list_mutex);
 +
-+	return sysfs_emit(buf, "%u\n", counter);
++	cass_flush_pci(hw);
 +}
 +
-+static ssize_t cause_shift_up_jack_io_low_power_set_show(struct kobject *kobj, struct kobj_attribute *kattr,
-+							 char *buf)
++/**
++ * cass_acs_free() - Free all ACs associated with an LNI
++ *
++ * The ac_list is used by cass_pri_fault() and cass_sync_pagetables().
++ * LNI cleanup disables all the ACs associated with the LNI and then calls
++ * inbound wait so cass_pri_fault() will not be called while cleaning up.
++ * cass_hmm_fini() will remove this process from the hmm mirrors list so
++ * cass_sync_pagetables() will not be called while cleaning up.
++ *
++ * @lni_priv: the Logical Network Interface
++ */
++void cass_acs_free(struct cxi_lni_priv *lni_priv)
 +{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   counter;
-+	u32                   rtn;
++	struct cass_ac *cac;
++	struct cxi_dev *dev = lni_priv->dev;
++	struct cass_dev *hw = container_of(dev, struct cass_dev, cdev);
 +
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, counters_kobj);
++	mutex_lock(&lni_priv->ac_list_mutex);
 +
-+	rtn = sl_ctrl_media_cause_counter_get(media_lgrp->media_jack, MEDIA_CAUSE_SHIFT_UP_JACK_IO_LOW_POWER_SET,
-+					      &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
++	while ((cac = list_first_entry_or_null(&lni_priv->ac_list,
++					       struct cass_ac, list))) {
++		list_del(&cac->list);
++		mutex_unlock(&lni_priv->ac_list_mutex);
++		cass_ac_free(hw, cac);
++		mutex_lock(&lni_priv->ac_list_mutex);
++	}
 +
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media cause shift up jack io low power set show (counter = %u)",
-+		   counter);
++	mutex_unlock(&lni_priv->ac_list_mutex);
 +
-+	return sysfs_emit(buf, "%u\n", counter);
++	if (dev->is_physfn)
++		cass_flush_pci(hw);
 +}
 +
-+static ssize_t cause_shift_up_jack_io_high_power_set_show(struct kobject *kobj, struct kobj_attribute *kattr,
-+							  char *buf)
++/**
++ * cass_iova_alloc() - Allocate an IO virtual address in an Address Context
++ *
++ * Find an AC with matching characteristics and allocate an IOVA.
++ *
++ * @lni_priv: the Logical Network Interface
++ * @m_opts: User map options
++ */
++static struct cass_ac *cass_iova_alloc(struct cxi_lni_priv *lni_priv,
++				       struct ac_map_opts *m_opts)
 +{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   counter;
-+	u32                   rtn;
++	u64 iova;
++	struct list_head *ptr;
++	u32 masked_flags = m_opts->flags & ATU_FLAGS_MASK;
 +
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, counters_kobj);
++	list_for_each(ptr, &lni_priv->ac_list) {
++		struct cass_ac *cac = list_entry(ptr, struct cass_ac, list);
++		u32 cac_msk_flags = cac->flags & ATU_FLAGS_MASK;
 +
-+	rtn = sl_ctrl_media_cause_counter_get(media_lgrp->media_jack, MEDIA_CAUSE_SHIFT_UP_JACK_IO_HIGH_POWER_SET,
-+					      &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
++		if ((m_opts->page_shift == cac->page_shift) &&
++		    (m_opts->huge_shift == cac->huge_shift) &&
++				(m_opts->ptg_mode == cac->ptg_mode) &&
++				(masked_flags == cac_msk_flags) &&
++				!m_opts->hugepage_test) {
++			if (m_opts->flags & CXI_MAP_ATS) {
++				iova = m_opts->va_start;
++			} else {
++				iova = cass_nta_iova_alloc(cac, m_opts);
++				if (!iova)
++					continue;
++			}
 +
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media cause shift up jack io high power set show (counter = %u)",
-+		   counter);
++			m_opts->iova = iova;
 +
-+	return sysfs_emit(buf, "%u\n", counter);
++			return cac;
++		}
++	}
++
++	return ERR_PTR(-ENOSPC);
 +}
 +
-+static ssize_t cause_shift_state_jack_io_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++/* Find or allocate an AC matching the options */
++static struct cass_ac *get_matching_ac(struct cxi_lni_priv *lni_priv,
++				       struct ac_map_opts *m_opts)
 +{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   counter;
-+	u32                   rtn;
++	struct cass_ac *cac;
 +
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, counters_kobj);
++	mutex_lock(&lni_priv->ac_list_mutex);
 +
-+	rtn = sl_ctrl_media_cause_counter_get(media_lgrp->media_jack, MEDIA_CAUSE_SHIFT_STATE_JACK_IO, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
++	cac = cass_iova_alloc(lni_priv, m_opts);
++	if (IS_ERR(cac))
++		cac = cass_ac_alloc(lni_priv, m_opts);
 +
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media cause shift state jack io show (counter = %u)", counter);
++	mutex_unlock(&lni_priv->ac_list_mutex);
 +
-+	return sysfs_emit(buf, "%u\n", counter);
++	return cac;
 +}
 +
-+static ssize_t cause_offline_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++static void cass_init_md(const struct ac_map_opts *m_opts,
++			 struct cxi_md_priv *md_priv)
 +{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   counter;
-+	u32                   rtn;
++	md_priv->md.iova = m_opts->iova;
++	md_priv->md.va = m_opts->va_start;
++	md_priv->md.len = m_opts->va_len;
++	md_priv->md.page_shift = m_opts->page_shift;
++	md_priv->md.huge_shift = m_opts->huge_shift;
++	md_priv->md.lac = md_priv->cac->ac.lac;
++	md_priv->olen = m_opts->va_len;
++	md_priv->flags = m_opts->flags & ~(CXI_MAP_FAULT | CXI_MAP_PREFETCH);
 +
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, counters_kobj);
-+
-+	rtn = sl_ctrl_media_cause_counter_get(media_lgrp->media_jack, MEDIA_CAUSE_OFFLINE, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media cause offline show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
++	/* Since we don't mirror the page tables when CXI_MAP_ALLOC_MD
++	 * is set, the first call to cxi_update_iov needs to lock.
++	 */
++	if (m_opts->flags & CXI_MAP_ALLOC_MD)
++		md_priv->need_lock = true;
 +}
 +
-+static ssize_t cause_hot_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++/* Add an MD to an LNI */
++static void cass_add_md(struct cxi_lni_priv *lni_priv,
++			const struct ac_map_opts *m_opts,
++			struct cxi_md_priv *md_priv)
 +{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   counter;
-+	u32                   rtn;
++	struct cass_ac *cac = md_priv->cac;
++	struct cass_dev *hw = container_of(cac->lni_priv->dev, struct cass_dev, cdev);
 +
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, counters_kobj);
-+
-+	rtn = sl_ctrl_media_cause_counter_get(media_lgrp->media_jack, MEDIA_CAUSE_HOT, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media cause hot show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
++	mutex_lock(&cac->md_mutex);
++	list_add_tail(&md_priv->md_entry, &cac->md_list);
++	refcount_inc(&cac->refcount);
++	atomic_inc(&hw->stats.md);
++	mutex_unlock(&cac->md_mutex);
 +}
 +
-+static ssize_t cause_warm_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++/**
++ * cass_remove_md() - Remove an MD from its LNI, clear and invalidate
++ *                    page table entries.
++ *
++ * @md_priv: Private memory descriptor
++ */
++static void cass_remove_md(struct cxi_md_priv *md_priv)
 +{
-+	struct sl_media_lgrp *media_lgrp;
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	u32                   counter;
-+	u32                   rtn;
++	struct cass_ac *cac = md_priv->cac;
++	struct cass_dev *hw = container_of(cac->lni_priv->dev, struct cass_dev, cdev);
 +
-+	media_lgrp = container_of(kobj, struct sl_media_lgrp, counters_kobj);
++	mutex_lock(&md_priv->cac->md_mutex);
++	list_del(&md_priv->md_entry);
++	refcount_dec(&cac->refcount);
++	atomic_dec(&hw->stats.md);
++	mutex_unlock(&md_priv->cac->md_mutex);
 +
-+	rtn = sl_ctrl_media_cause_counter_get(media_lgrp->media_jack, MEDIA_CAUSE_WARM, &counter);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	ctrl_lgrp = sl_ctrl_lgrp_get(media_lgrp->media_ldev->num, media_lgrp->num);
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media cause warm show (counter = %u)", counter);
-+
-+	return sysfs_emit(buf, "%u\n", counter);
++	cass_md_clear(md_priv, true, true);
 +}
 +
-+static struct kobj_attribute media_cause_eeprom_format_unsupported         =
-+			     __ATTR_RO(cause_eeprom_format_unsupported);
-+static struct kobj_attribute media_cause_eeprom_vendor_unsupported         =
-+			     __ATTR_RO(cause_eeprom_vendor_unsupported);
-+static struct kobj_attribute media_cause_eeprom_jack_io                    = __ATTR_RO(cause_eeprom_jack_io);
-+static struct kobj_attribute media_cause_online_status_get                 = __ATTR_RO(cause_online_status_get);
-+static struct kobj_attribute media_cause_online_timedout                   = __ATTR_RO(cause_online_timedout);
-+static struct kobj_attribute media_cause_online_jack_io                    = __ATTR_RO(cause_online_jack_io);
-+static struct kobj_attribute media_cause_online_jack_get                   = __ATTR_RO(cause_online_jack_get);
-+static struct kobj_attribute media_cause_serdes_settings_get               = __ATTR_RO(cause_serdes_settings_get);
-+static struct kobj_attribute media_cause_scan_status_get                   = __ATTR_RO(cause_scan_status_get);
-+static struct kobj_attribute media_cause_scan_hdl_get                      = __ATTR_RO(cause_scan_hdl_get);
-+static struct kobj_attribute media_cause_scan_jack_get                     = __ATTR_RO(cause_scan_jack_get);
-+static struct kobj_attribute media_cause_media_attr_set                    = __ATTR_RO(cause_media_attr_set);
-+static struct kobj_attribute media_cause_intr_event_jack_io                = __ATTR_RO(cause_intr_event_jack_io);
-+static struct kobj_attribute media_cause_power_set                         = __ATTR_RO(cause_power_set);
-+static struct kobj_attribute media_cause_shift_down_jack_io                = __ATTR_RO(cause_shift_down_jack_io);
-+static struct kobj_attribute media_cause_shift_down_jack_io_low_power_set  =
-+			     __ATTR_RO(cause_shift_down_jack_io_low_power_set);
-+static struct kobj_attribute media_cause_shift_down_jack_io_high_power_set =
-+			     __ATTR_RO(cause_shift_down_jack_io_high_power_set);
-+static struct kobj_attribute media_cause_shift_up_jack_io                  = __ATTR_RO(cause_shift_up_jack_io);
-+static struct kobj_attribute media_cause_shift_up_jack_io_low_power_set    =
-+			     __ATTR_RO(cause_shift_up_jack_io_low_power_set);
-+static struct kobj_attribute media_cause_shift_up_jack_io_high_power_set   =
-+			     __ATTR_RO(cause_shift_up_jack_io_high_power_set);
-+static struct kobj_attribute media_cause_shift_state_jack_io               =
-+			     __ATTR_RO(cause_shift_state_jack_io);
-+static struct kobj_attribute media_cause_offline                           = __ATTR_RO(cause_offline);
-+static struct kobj_attribute media_cause_hot                               = __ATTR_RO(cause_hot);
-+static struct kobj_attribute media_cause_warm                              = __ATTR_RO(cause_warm);
++static void cass_md_iova_free(struct cxi_md_priv *md_priv)
++{
++	struct cass_ac *cac = md_priv->cac;
 +
-+static struct attribute *media_counters_attrs[] = {
-+	&media_cause_eeprom_format_unsupported.attr,
-+	&media_cause_eeprom_vendor_unsupported.attr,
-+	&media_cause_eeprom_jack_io.attr,
-+	&media_cause_online_status_get.attr,
-+	&media_cause_online_timedout.attr,
-+	&media_cause_online_jack_io.attr,
-+	&media_cause_online_jack_get.attr,
-+	&media_cause_serdes_settings_get.attr,
-+	&media_cause_scan_status_get.attr,
-+	&media_cause_scan_hdl_get.attr,
-+	&media_cause_scan_jack_get.attr,
-+	&media_cause_media_attr_set.attr,
-+	&media_cause_intr_event_jack_io.attr,
-+	&media_cause_power_set.attr,
-+	&media_cause_shift_down_jack_io.attr,
-+	&media_cause_shift_down_jack_io_low_power_set.attr,
-+	&media_cause_shift_down_jack_io_high_power_set.attr,
-+	&media_cause_shift_up_jack_io.attr,
-+	&media_cause_shift_up_jack_io_low_power_set.attr,
-+	&media_cause_shift_up_jack_io_high_power_set.attr,
-+	&media_cause_shift_state_jack_io.attr,
-+	&media_cause_offline.attr,
-+	&media_cause_hot.attr,
-+	&media_cause_warm.attr,
-+	NULL
++	if (cac->iovad)
++		FREE_IOVA_FAST(cac->iovad, md_priv->md.iova, md_priv->olen);
++}
++
++static int cass_bvec(struct cass_dev *hw, const struct iov_iter *iter,
++		     size_t *len, u64 *va)
++{
++	int i;
++	int last_seg = iter->nr_segs - 1;
++	const struct bio_vec *bvec = iter->bvec;
++
++	*va = (u64)page_address(bvec->bv_page);
++
++	for (i = 0; i < iter->nr_segs; i++) {
++		if (i && (bvec->bv_offset & ~PAGE_MASK)) {
++			cxidev_err(&hw->cdev, "bvec[%d] offset not aligned %d\n", i,
++				   bvec->bv_offset);
++			return -EINVAL;
++		}
++
++		if (i < last_seg && ((bvec->bv_offset + bvec->bv_len) &
++						~PAGE_MASK)) {
++			cxidev_err(&hw->cdev, "bvec[%d] contains a hole\n", i);
++			return -EINVAL;
++		}
++		bvec++;
++	}
++
++	*len = iter->nr_segs * PAGE_SIZE;
++
++	return 0;
++}
++
++static int cass_kvec(struct cass_dev *hw, const struct iov_iter *iter,
++		     size_t *len, u64 *va)
++{
++	int i;
++	int alen;
++	int tlen = 0;
++	int last_seg = iter->nr_segs - 1;
++	const struct kvec *kvec = iter->kvec;
++
++	*va = (u64)kvec->iov_base & PAGE_MASK;
++
++	for (i = 0; i < iter->nr_segs; i++) {
++		/*
++		 * Only the first kvec may be unaligned. The first and last
++		 * kvec's lengths can be less that a page but the rest need
++		 * to be full pages. The first base + len must be aligned.
++		 */
++		if (i && ((u64)kvec->iov_base & ~PAGE_MASK)) {
++			cxidev_err(&hw->cdev, "kvec[%d] base not aligned %p\n", i,
++				   kvec->iov_base);
++			return -EINVAL;
++		}
++
++		if (i < last_seg && (((u64)kvec->iov_base + kvec->iov_len) &
++					~PAGE_MASK)) {
++			cxidev_err(&hw->cdev, "kvec[%d] contains a hole\n", i);
++			return -EINVAL;
++		}
++
++		alen = PAGE_ALIGN(kvec->iov_len);
++		tlen += alen;
++		kvec++;
++	}
++
++	*len = tlen;
++
++	return 0;
++}
++
++/* cass_sgtable_is_valid() - Check for invalid sgt
++ *
++ * Requirements for entries in sgt:
++ * one entry:
++ *     offset < PAGE_SIZE
++ * multiple entries:
++ *     first:  offset < PAGE_SIZE, (len + offset) % PAGE_SIZE
++ *     middle: offset == 0, len % PAGE_SIZE
++ *     last:   offset == 0
++ */
++static bool cass_sgtable_is_valid(struct cass_dev *hw,
++				  const struct sg_table *sgt, size_t *length)
++{
++	int i;
++	struct scatterlist *sg;
++	int last_entry = sgt->nents - 1;
++
++	*length = 0;
++
++	for_each_sgtable_dma_sg(sgt, sg, i) {
++		size_t len = sg_dma_len(sg);
++
++		if (sg->offset > PAGE_SIZE) {
++			cxidev_err(&hw->cdev,
++				   "Entry %d offset:%x > PAGE_SIZE\n",
++				   i, sg->offset);
++
++			return false;
++		}
++
++		/* first of multiple entries */
++		if ((!i && i != last_entry && ((len + sg->offset) % PAGE_SIZE)) ||
++		    /* last entry */
++		    (i && i == last_entry && sg->offset) ||
++		    /* middle entries */
++		    (i && i < last_entry && (sg->offset ||
++					     len % PAGE_SIZE))) {
++			cxidev_err(&hw->cdev, "Hole in sg_table at entry %d offset:%x len:%lx\n",
++				   i, sg->offset, len);
++
++			return false;
++		}
++
++		*length += ALIGN(len + sg->offset, PAGE_SIZE);
++	}
++
++	return true;
++}
++
++/**
++ * cass_mirror_range() - Mirror an address range
++ *
++ * @md_priv: Private memory descriptor
++ * @m_opts:  User options
++ *
++ * @return: 0 on success or -ENOMEM
++ */
++int cass_mirror_range(struct cxi_md_priv *md_priv, struct ac_map_opts *m_opts)
++{
++	if (!(m_opts->flags & CXI_MAP_USER_ADDR))
++		return cass_nta_mirror_kern(md_priv, NULL, true);
++
++	if (m_opts->flags & CXI_MAP_ATS)
++		return cass_ats_md_init(md_priv, m_opts);
++
++	if (m_opts->flags & CXI_MAP_DEVICE)
++		return cass_mirror_device(md_priv, m_opts);
++
++	if (m_opts->hugepage_test)
++		return cass_mirror_hp(m_opts, md_priv);
++
++	if (m_opts->flags & CXI_MAP_PIN)
++		return cass_pin_mirror(md_priv, m_opts);
++
++	return cass_mmu_notifier_insert(md_priv, m_opts);
++}
++
++static void cass_unpin(struct cxi_md_priv *md_priv)
++{
++	int npages = md_priv->md.len >> PAGE_SHIFT;
++
++	if (!(md_priv->flags & CXI_MAP_PIN))
++		return;
++
++	if (!md_priv->pages)
++		return;
++
++	unpin_user_pages(md_priv->pages, npages);
++	kvfree(md_priv->pages);
++	md_priv->pages = NULL;
++}
++
++/**
++ * cass_md_clear() - Clear a memory descriptor
++ *
++ * Remove page table entries for NTA mode
++ * Unpin ATS or device pinned pages
++ *
++ * @md_priv: Private memory descriptor
++ * @inval: Invalidate this iova range
++ * @need_lock: Indicates whether the ac_mutex is required
++ */
++void cass_md_clear(struct cxi_md_priv *md_priv, bool inval, bool need_lock)
++{
++	struct cass_dev *hw = container_of(md_priv->cac->lni_priv->dev,
++					   struct cass_dev, cdev);
++
++	cass_notifier_cleanup(md_priv);
++
++	if (md_priv->flags & CXI_MAP_ATS)
++		return cass_unpin(md_priv);
++
++	/* If inval is false we have been called from cass_md_list_free()
++	 * which is only called when the AC is cleaning up so we don't
++	 * need to invalidate here as we will invalidate the whole AC range.
++	 */
++	cass_cond_lock(&md_priv->cac->ac_mutex, need_lock);
++	cass_clear_range(md_priv, md_priv->md.iova,
++			 md_priv->md.len);
++	cass_cond_unlock(&md_priv->cac->ac_mutex, need_lock);
++
++	if (inval) {
++		cass_invalidate_range(md_priv->cac, md_priv->md.iova,
++				      md_priv->md.len);
++		atomic_inc(&hw->dcpl_md_clear_inval);
++	}
++
++	if (md_priv->flags & CXI_MAP_DEVICE)
++		cass_device_put_pages(md_priv);
++	else
++		cass_unpin(md_priv);
++}
++
++static int largest_hp_size(struct vm_area_struct *vma, u64 end)
++{
++	int vma_hs;
++	int hs = INT_MAX;
++	ulong vm_end_prev;
++#ifdef VMA_ITERATOR
++	VMA_ITERATOR(vmi, vma->vm_mm, vma->vm_start);
++#endif
++
++	while (true) {
++		if (!is_vm_hugetlb_page(vma))
++			return PMD_SHIFT;
++
++		vma_hs = huge_page_shift(hstate_vma(vma));
++
++		hs = vma_hs < hs ? vma_hs : hs;
++
++		if (vma->vm_end >= end)
++			return hs;
++
++		vm_end_prev = vma->vm_end;
++#ifdef VMA_ITERATOR
++		vma = vma_next(&vmi);
++#else
++		vma = vma->vm_next;
++#endif
++		/* full range is not backed by vmas */
++		if (!vma)
++			return PMD_SHIFT;
++
++		/* found a hole */
++		if (vma->vm_start > vm_end_prev)
++			return PMD_SHIFT;
++
++		/* not in range */
++		if (vma->vm_start >= end)
++			break;
++	}
++
++	return hs;
++}
++
++static int align_and_page_shift(struct ac_map_opts *m_opts)
++{
++	/* To support hugepage sizes larger than 128MB, we need
++	 * a larger base page size.
++	 */
++	if ((m_opts->huge_shift - m_opts->page_shift) >
++			(MAX_PG_TABLE_SIZE - hugepage_threshold))
++		m_opts->page_shift = m_opts->huge_shift -
++				MAX_PG_TABLE_SIZE + hugepage_threshold;
++
++	/* A hugepage is backing this address so align
++	 * to and map the full hugepage.
++	 */
++	return m_opts->huge_shift;
++}
++
++int cass_cpu_page_size(struct cass_dev *hw, struct ac_map_opts *m_opts,
++		       struct mm_struct *mm, uintptr_t va,
++		       const struct cxi_md_hints *hints, int *align_shift)
++{
++	int ret = 0;
++	struct vm_area_struct *vma;
++
++	/* ODP hint from user for the hugepage size */
++	if (hints && !hints->page_shift && hints->huge_shift &&
++	    !(m_opts->flags & (CXI_MAP_PIN | CXI_MAP_FAULT | CXI_MAP_PREFETCH))) {
++		m_opts->huge_shift = hints->huge_shift;
++		*align_shift = align_and_page_shift(m_opts);
++
++		return 0;
++	}
++
++	mmap_read_lock(mm);
++	vma = find_vma(mm, va);
++	if (!vma) {
++		cxidev_warn(&hw->cdev, "No VMA covering 0x%016lx)\n", va);
++		ret = -EFAULT;
++		goto unlock;
++	}
++
++	/* Test arbitrary page sizes supplied by the user. The contiguous
++	 * pages will be mmapped from a 1G hugepage and combined into larger
++	 * base pages and smaller hugepages.
++	 */
++	if (hints && hints->page_shift && is_vm_hugetlb_page(vma)) {
++		m_opts->huge_shift = huge_page_shift(hstate_vma(vma));
++
++		pr_debug("Testing huge shift:%d bs:%d hs:%d\n",
++			 m_opts->huge_shift, hints->page_shift,
++			 hints->huge_shift);
++
++		if (hints->huge_shift > m_opts->huge_shift) {
++			cxidev_warn(&hw->cdev, "Hints huge_shift (%d) > vma's huge_shift (%d)\n",
++				    hints->huge_shift, m_opts->huge_shift);
++			ret = -EINVAL;
++			goto unlock;
++		}
++
++		m_opts->page_shift = hints->page_shift;
++		m_opts->huge_shift = hints->huge_shift;
++		*align_shift = hints->huge_shift;
++		m_opts->hugepage_test = true;
++		goto unlock;
++	}
++
++	if (is_vm_hugetlb_page(vma)) {
++		m_opts->huge_shift = largest_hp_size(vma, m_opts->va_end);
++		m_opts->is_huge_page = true;
++		*align_shift = align_and_page_shift(m_opts);
++	} else {
++		int vms_fs = ffsl(vma->vm_start);
++		int vml_fs = ffsl(vma->vm_end - vma->vm_start);
++
++		/* Small regions may not be aligned to the default alignment
++		 * passed in so limit alignment to the VMA.
++		 */
++		if (vms_fs < *align_shift || vml_fs < *align_shift)
++			*align_shift = min_t(int, vms_fs, vml_fs);
++	}
++
++unlock:
++	mmap_read_unlock(mm);
++
++	return ret;
++}
++
++/**
++ * cass_align_start_len() - Align the va and len to align_shift page size
++ *
++ * @m_opts: User map options
++ * @va: Virtual address
++ * @len: Length of address
++ * @align_shift: Power of two to align to
++ */
++void cass_align_start_len(struct ac_map_opts *m_opts, uintptr_t va, size_t len,
++			  int align_shift)
++{
++	size_t page_size = BIT(align_shift);
++
++	m_opts->va_start = round_down(va, page_size);
++	m_opts->va_len = round_up(va + len, page_size) - m_opts->va_start;
++	m_opts->va_end = m_opts->va_start + m_opts->va_len;
++}
++
++/**
++ * cxi_phys_lac_alloc_vf() - Allocate a physical LAC for the given LNI for a VF.
++ *
++ * @lni: the Logical Network Interface
++ * @return: LAC or negative errno
++ */
++static int cxi_phys_lac_alloc_vf(struct cxi_lni *lni)
++{
++	struct cxi_lni_priv_vf *lni_priv_vf = container_of(lni, struct cxi_lni_priv_vf, lni);
++
++	return lni_priv_vf->phys_lac;
++}
++
++/**
++ * cxi_phys_lac_alloc() - Allocate a physical LAC for the given LNI.
++ *                        Exported to allow clients to perform DMA using physical addresses.
++ *
++ * @lni: the Logical Network Interface
++ * @return: LAC or negative errno
++ */
++int cxi_phys_lac_alloc(struct cxi_lni *lni)
++{
++	struct cxi_lni_priv *lni_priv = container_of(lni, struct cxi_lni_priv, lni);
++	struct cxi_dev *cdev = lni_priv->dev;
++	struct cass_dev *hw = container_of(lni_priv->dev, struct cass_dev, cdev);
++	int lac;
++
++	if (!cdev->is_physfn)
++		return cxi_phys_lac_alloc_vf(lni);
++
++	lac = cass_lac_get(hw, lni_priv->lni.rgid);
++	if (lac < 0)
++		return lac;
++
++	/* Program the phys_ac that was already selected at the lni allocation */
++	cass_set_acid(hw, lni_priv->lni.rgid, lac, lni_priv->phys_ac);
++
++	return lac;
++}
++EXPORT_SYMBOL(cxi_phys_lac_alloc);
++
++/**
++ * cxi_phys_lac_free() - Unmap a physical LAC
++ *
++ * @lni: the Logical Network Interface
++ * @lac: LAC to free
++ */
++void cxi_phys_lac_free(struct cxi_lni *lni, int lac)
++{
++	struct cxi_lni_priv *lni_priv = container_of(lni, struct cxi_lni_priv, lni);
++	struct cxi_dev *cdev = lni_priv->dev;
++
++	/* VFs do not free physical LACs. They will be freed when the LNI is freed */
++	if (!cdev->is_physfn)
++		return;
++
++	cass_lac_free(lni_priv, lac);
++}
++EXPORT_SYMBOL(cxi_phys_lac_free);
++
++/**
++ * cxi_clear_md() - Zero page table entries and invalidate a memory descriptor
++ *
++ * @md: Memory Descriptor used in network operations
++ */
++int cxi_clear_md(struct cxi_md *md)
++{
++	struct cxi_md_priv *md_priv;
++
++	if (!md)
++		return -EINVAL;
++
++	md_priv = container_of(md, struct cxi_md_priv, md);
++
++	pr_debug("va:%llx iova:%llx len:%lx\n", md->va, md->iova, md->len);
++
++	cass_md_clear(md_priv, true, false);
++	cass_dma_unmap_pages(md_priv);
++	md_priv->external_sgt_owner = false;
++	md_priv->sgt = NULL;
++
++	return 0;
++}
++EXPORT_SYMBOL(cxi_clear_md);
++
++/**
++ * cxi_update_iov() - Map a list of virtual address or pages in an IO
++ *                    virtual address space into an existing memory
++ *                    descriptor.
++ *
++ * @md: Memory descriptor
++ * @iter: List of virtual addresses to map - supports ITER_KVEC and ITER_BVEC
++ */
++int cxi_update_iov(struct cxi_md *md, const struct iov_iter *iter)
++{
++	u64 va;
++	int ret;
++	size_t len;
++	struct cxi_md_priv *md_priv;
++	struct cxi_lni_priv *lni_priv;
++	struct cxi_dev *dev;
++	struct cass_dev *hw;
++
++	if (!md)
++		return -EINVAL;
++
++	md_priv = container_of(md, struct cxi_md_priv, md);
++	lni_priv = md_priv->lni_priv;
++	dev = lni_priv->dev;
++	hw = container_of(dev, struct cass_dev, cdev);
++
++	if (iov_iter_is_bvec(iter))
++		ret = cass_bvec(hw, iter, &len, &va);
++	else
++		ret = cass_kvec(hw, iter, &len, &va);
++	if (ret)
++		return ret;
++
++	if (len > md_priv->olen)
++		return -EINVAL;
++
++	md->len = len;
++
++	ret = cass_nta_mirror_kern(md_priv, iter, md_priv->need_lock);
++
++	pr_debug("iovs:%ld len:0x%lx iova:%llx\n", iter->nr_segs, md->len,
++		 md->iova);
++
++	return ret;
++
++}
++EXPORT_SYMBOL(cxi_update_iov);
++
++/**
++ * cxi_map_iov() - Map a list of virtual address or pages in an IO
++ *                 virtual address space
++ *
++ * @lni: the Logical Network Interface
++ * @iter: List of virtual addresses to map - supports ITER_KVEC and ITER_BVEC
++ * @flags: various options affecting the map
++ */
++struct cxi_md *cxi_map_iov(struct cxi_lni *lni, const struct iov_iter *iter,
++			   u32 flags)
++{
++	u64 va;
++	int ret;
++	struct cxi_lni_priv *lni_priv = container_of(lni, struct cxi_lni_priv, lni);
++	struct cxi_dev *cdev = lni_priv->dev;
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++	struct cxi_md_priv *md_priv;
++	struct cxi_md *md;
++	struct ac_map_opts m_opts = {
++		.page_shift = PAGE_SHIFT,
++		.huge_shift = PMD_SHIFT
++	};
++	struct cass_ac *cac;
++
++	/* currently unsupported flags */
++	if (flags & CXI_MAP_ATS)
++		return ERR_PTR(-EINVAL);
++
++	if (iov_iter_is_bvec(iter))
++		ret = cass_bvec(hw, iter, &m_opts.va_len, &va);
++	else
++		ret = cass_kvec(hw, iter, &m_opts.va_len, &va);
++	if (ret)
++		return ERR_PTR(ret);
++
++	m_opts.va_start = 0;
++	m_opts.flags = flags;
++	m_opts.va_end = m_opts.va_start + m_opts.va_len;
++	m_opts.ptg_mode = default_ptg_mode;
++
++	cac = get_matching_ac(lni_priv, &m_opts);
++	if (IS_ERR(cac))
++		return ERR_PTR(PTR_ERR(cac));
++
++	md_priv = kzalloc(sizeof(*md_priv), GFP_KERNEL);
++	if (md_priv == NULL)
++		return ERR_PTR(-ENOMEM);
++	refcount_set(&md_priv->refcount, 1);
++	md = &md_priv->md;
++	md_priv->device = &hw->cdev.pdev->dev;
++
++	/* Get an MD ID, above CXI_MD_NONE */
++	ret = ida_alloc_min(&hw->md_index_table, 1, GFP_KERNEL);
++	if (ret < 0) {
++		cxidev_err(cdev, "ida_alloc_min failed %d\n", ret);
++		goto md_free;
++	}
++	md->id = ret;
++
++	md_priv->cac = cac;
++	md_priv->lni_priv = lni_priv;
++
++	cass_init_md(&m_opts, md_priv);
++
++	ret = cass_nta_mirror_kern(md_priv, iter, true);
++	if (ret)
++		goto mirror_range_error;
++
++	cass_add_md(lni_priv, &m_opts, md_priv);
++
++	pr_debug("iovs:%ld len:0x%lx iova:%llx\n", iter->nr_segs, md->len,
++		 md->iova);
++
++	refcount_inc(&lni_priv->refcount);
++
++	return md;
++
++mirror_range_error:
++	cass_md_iova_free(md_priv);
++	ida_free(&hw->md_index_table, md->id);
++md_free:
++	kfree(md_priv);
++
++	return ERR_PTR(ret);
++}
++EXPORT_SYMBOL(cxi_map_iov);
++
++/**
++ * cxi_map_sgtable_vf() - Map an sg table to an IO virtual address space for a VF
++ *
++ * @lni: The Logical Network Interface
++ * @sgt: The sg_table object. It is expected to be dma mapped.
++ * @flags: Various options affecting the map
++ *
++ * @return: memory descriptor or error code
++ */
++static struct cxi_md *cxi_map_sgtable_vf(struct cxi_lni *lni,
++					 struct sg_table *sgt, u32 flags)
++{
++	struct cxi_lni_priv *lni_priv = container_of(lni, struct cxi_lni_priv, lni);
++	struct cxi_lni_priv_vf *lni_priv_vf = container_of(lni, struct cxi_lni_priv_vf, lni);
++	struct cxi_dev *dev = lni_priv_vf->dev;
++	struct cass_dev *hw = container_of(dev, struct cass_dev, cdev);
++	struct cxi_md_priv_vf *md_priv_vf;
++	struct cxi_atu_map_sgt_cmd *cmd;
++	struct cxi_atu_map_sgt_resp resp = {};
++	size_t resp_len = sizeof(resp);
++	struct scatterlist *sg;
++	int i;
++	int rc;
++	size_t sgt_len;
++
++	if (!sgt)
++		return ERR_PTR(-EINVAL);
++
++	if (!cass_sgtable_is_valid(hw, sgt, &sgt_len))
++		return ERR_PTR(-EINVAL);
++
++	sg = sgt->sgl;
++
++	md_priv_vf = kzalloc(sizeof(*md_priv_vf), GFP_KERNEL);
++	if (!md_priv_vf)
++		return ERR_PTR(-ENOMEM);
++
++	md_priv_vf->lni_priv = lni_priv;
++	md_priv_vf->device = &hw->cdev.pdev->dev;
++	md_priv_vf->md.va = 0;
++	md_priv_vf->md.len = sgt_len;
++	md_priv_vf->md.page_shift = PAGE_SHIFT;
++	md_priv_vf->md.huge_shift = PMD_SHIFT;
++	md_priv_vf->flags = flags & ~(CXI_MAP_FAULT | CXI_MAP_PREFETCH);
++	md_priv_vf->sgt = sgt;
++	md_priv_vf->pages = NULL;
++	md_priv_vf->npages = 0;
++
++	/* Send sgt to the PF to run cxi_map_sgtable there */
++	if (sgt->nents > CXI_ATU_SGT_MAX_ENTRIES) {
++		rc = -E2BIG;
++		cxidev_err(&hw->cdev, "SGT has too many entries: %u\n", sgt->nents);
++		goto free_md_priv;
++	}
++
++	pr_debug("VF map: md:%p lni:%u rgid:%u nents:%u len:0x%lx flags:0x%x\n",
++		 md_priv_vf, lni_priv_vf->lni.id, lni_priv_vf->lni.rgid, sgt->nents, sgt_len,
++		 flags);
++
++	cmd = kvzalloc(sizeof(*cmd), GFP_KERNEL);
++	if (!cmd) {
++		rc = -ENOMEM;
++		goto free_md_priv;
++	}
++
++	cmd->op = CXI_OP_ATU_MAP_SGT;
++	cmd->lni = lni_priv_vf->lni.id;
++	cmd->flags = flags;
++	cmd->nents = sgt->nents;
++
++	pr_debug("Sending SGT with %d entries to PF\n", sgt->nents);
++	for (i = 0; i < sgt->nents; i++) {
++		cmd->sge[i].dma_addr = sg_dma_address(sg);
++		cmd->sge[i].dma_len = sg_dma_len(sg);
++		cmd->sge[i].offset = sg->offset;
++
++		sg = sg_next(sg);
++	}
++
++	rc = cxi_send_msg_to_pf(dev, cmd, sizeof(*cmd), &resp, &resp_len);
++	kvfree(cmd);
++	if (rc)
++		goto free_md_priv;
++
++	/* Set the iova and the lac retrieved from the PF */
++	md_priv_vf->md.iova = resp.md.iova;
++	md_priv_vf->md.lac = resp.md.lac;
++	md_priv_vf->md.id = resp.md.id;
++	pr_debug("VF map resp: md:%d iova:%llx lac:%u resp_len:%zu\n",
++		 md_priv_vf->md.id, md_priv_vf->md.iova,
++		 md_priv_vf->md.lac, resp_len);
++
++	return &md_priv_vf->md;
++
++free_md_priv:
++	kfree(md_priv_vf);
++	return ERR_PTR(rc);
++}
++
++static int cxi_unmap_sgtable_vf(struct cxi_dev *dev,
++				struct cxi_md_priv_vf *md_priv_vf,
++				struct cass_dev *hw, int md_id)
++{
++	struct cxi_atu_unmap_cmd cmd = {
++		.op = CXI_OP_ATU_UNMAP,
++		.id = md_priv_vf->md.id,
++	};
++	size_t resp_len = 0;
++	int rc;
++
++	rc = cxi_send_msg_to_pf(dev, &cmd, sizeof(cmd), NULL, &resp_len);
++	if (rc)
++		cxidev_err(&hw->cdev, "VF ATU_UNMAP failed md:%d pf_md:%d rc:%d\n",
++			   md_id, md_priv_vf->md.id, rc);
++
++	return rc;
++}
++
++/**
++ * cxi_map_sgtable() - Map an sg table to an IO virtual address space
++ *
++ * @lni: The Logical Network Interface
++ * @sgt: The sg_table object. It is expected to be dma mapped.
++ * @flags: Various options affecting the map
++ *
++ * @return: memory descriptor or error code
++ */
++struct cxi_md *cxi_map_sgtable(struct cxi_lni *lni, struct sg_table *sgt,
++			       u32 flags)
++{
++	int ret;
++	size_t len;
++	struct cxi_md *md;
++	struct cass_ac *cac;
++	struct cxi_md_priv *md_priv;
++	struct cxi_lni_priv *lni_priv = container_of(lni, struct cxi_lni_priv, lni);
++	struct cxi_dev *cdev = lni_priv->dev;
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++	struct ac_map_opts m_opts = {
++		.page_shift = PAGE_SHIFT,
++		.huge_shift = PMD_SHIFT
++	};
++
++	/* unsupported flags */
++	if (flags & CXI_MAP_ATS)
++		return ERR_PTR(-EINVAL);
++
++	if (!cass_sgtable_is_valid(hw, sgt, &len))
++		return ERR_PTR(-EINVAL);
++
++	if (!cdev->is_physfn)
++		return cxi_map_sgtable_vf(lni, sgt, flags);
++
++	m_opts.va_start = 0;
++	m_opts.flags = flags;
++	m_opts.va_len = len;
++	m_opts.va_end = m_opts.va_len;
++	m_opts.ptg_mode = default_ptg_mode;
++
++	cac = get_matching_ac(lni_priv, &m_opts);
++	if (IS_ERR(cac))
++		return ERR_PTR(PTR_ERR(cac));
++
++	md_priv = kzalloc(sizeof(*md_priv), GFP_KERNEL);
++	if (md_priv == NULL)
++		return ERR_PTR(-ENOMEM);
++	refcount_set(&md_priv->refcount, 1);
++	md = &md_priv->md;
++	md_priv->device = &hw->cdev.pdev->dev;
++
++	/* Get an MD ID, above CXI_MD_NONE */
++	ret = ida_alloc_min(&hw->md_index_table, 1, GFP_KERNEL);
++	if (ret < 0) {
++		cxidev_err(cdev, "ida_alloc_min failed %d\n", ret);
++		goto md_free;
++	}
++	md->id = ret;
++
++	md_priv->sgt = sgt;
++	md_priv->external_sgt_owner = true;
++	md_priv->cac = cac;
++	md_priv->lni_priv = lni_priv;
++
++	cass_init_md(&m_opts, md_priv);
++
++	pr_debug("va:%llx va_len:%lx iova:%0llx iova_base:%llx md:%d ac:%d flags:%x\n",
++		 m_opts.va_start, m_opts.va_len, m_opts.iova, cac->iova_base,
++		 md->id, md_priv->cac->ac.acid, flags);
++
++	ret = cass_nta_mirror_sgt(md_priv, true);
++	if (ret)
++		goto mirror_range_error;
++
++	cass_add_md(lni_priv, &m_opts, md_priv);
++
++	pr_debug("nents:%u len:0x%lx iova:%llx\n", sgt->nents, md->len,
++		 md->iova);
++
++	refcount_inc(&lni_priv->refcount);
++
++	return md;
++
++mirror_range_error:
++	cass_md_iova_free(md_priv);
++	ida_free(&hw->md_index_table, md->id);
++md_free:
++	kfree(md_priv);
++
++	return ERR_PTR(ret);
++}
++EXPORT_SYMBOL(cxi_map_sgtable);
++
++/**
++ * cxi_update_sgtable() - Update the specified address range contained in MD
++ *
++ * @md: Memory Descriptor used in network operations
++ * @sgt: The sg_table object. It is expected to be dma mapped.
++ *
++ * @return: 0 on success or negative error value
++ */
++int cxi_update_sgtable(struct cxi_md *md, struct sg_table *sgt)
++{
++	int ret;
++	size_t len;
++	struct cxi_md_priv *md_priv = container_of(md, struct cxi_md_priv, md);
++	struct cxi_dev *cdev = md_priv->lni_priv->dev;
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++
++	if (!cass_sgtable_is_valid(hw, sgt, &len))
++		return -EINVAL;
++
++	if (len > md_priv->olen) {
++		pr_debug("Address range not bounded by MD\n");
++		return -EINVAL;
++	}
++
++	md_priv->sgt = sgt;
++	md_priv->external_sgt_owner = true;
++
++	pr_debug("nents:%u len:0x%lx iova:%llx\n", sgt->nents, md->len,
++		 md->iova);
++
++	ret = cass_nta_mirror_sgt(md_priv, md_priv->need_lock);
++	if (ret)
++		return ret;
++
++	md_priv->need_lock = false;
++
++	return 0;
++}
++EXPORT_SYMBOL(cxi_update_sgtable);
++
++/**
++ * cass_virt_to_pages() - Get page structures for kernel virtual addresses
++ *
++ * @hw: Cassini device for error reporting
++ * @va: Starting virtual address (will be page-aligned)
++ * @npages: Number of pages to get
++ * @pages: Array to store page pointers
++ *
++ * @return: 0 on success, negative error code on failure
++ */
++static int cass_virt_to_pages(struct cass_dev *hw, uintptr_t va, int npages,
++			      struct page **pages)
++{
++	int i;
++	uintptr_t addr = va & PAGE_MASK;
++
++	for (i = 0; i < npages; i++, addr += PAGE_SIZE) {
++		if (is_vmalloc_addr((void *)addr))
++			pages[i] = vmalloc_to_page((void *)addr);
++		else
++			pages[i] = virt_to_page(addr);
++
++		if (!pages[i]) {
++			cxidev_err(&hw->cdev, "Failed to get page for addr 0x%lx\n", addr);
++			return -EFAULT;
++		}
++	}
++
++	return 0;
++}
++
++static struct cxi_md *cxi_map_vf(struct cxi_lni *lni, uintptr_t va, size_t len,
++				 u32 flags, const struct cxi_md_hints *hints)
++{
++	struct cxi_lni_priv_vf *lni_priv_vf = container_of(lni, struct cxi_lni_priv_vf, lni);
++	struct cxi_dev *dev = lni_priv_vf->dev;
++	struct cass_dev *hw = container_of(dev, struct cass_dev, cdev);
++	struct cxi_md *md;
++	struct cxi_md_priv_vf *md_priv_vf;
++	/* For now, we do not support hugepages. This will come later when we add the ATS
++	 * for both VF and PF: NETCASSINI-7859.
++	 * In this effort we will reuse code to align pages and to support huge pages too
++	 */
++	const int npages = (PAGE_ALIGN(va + len) - (va & PAGE_MASK)) >> PAGE_SHIFT;
++	struct page **pages;
++	struct sg_table *sgt;
++	int rc;
++
++	if (flags & CXI_MAP_USER_ADDR && !(flags & CXI_MAP_PIN)) {
++		cxidev_err(&hw->cdev, "VF does not support ODP\n");
++		return ERR_PTR(-EOPNOTSUPP);
++	}
++
++	if (flags & CXI_MAP_DEVICE) {
++		cxidev_err(&hw->cdev, "TODO: VF does not support device memory\n");
++		return ERR_PTR(-EOPNOTSUPP);
++	}
++
++	if (!va) {
++		cxidev_err(&hw->cdev, "NULL virtual address\n");
++		return ERR_PTR(-EINVAL);
++	}
++
++	pages = kvmalloc_array(npages, sizeof(struct page *), GFP_KERNEL);
++	if (!pages) {
++		rc = -ENOMEM;
++		return ERR_PTR(rc);
++	}
++
++	/* Get the pages and pin them if requested */
++	if (flags & CXI_MAP_PIN) {
++		rc = pin_user_pages_fast(va & PAGE_MASK, npages, FOLL_WRITE | FOLL_LONGTERM, pages);
++		if (rc != npages) {
++			cxidev_err(&hw->cdev, "pin_user_pages_fast failed: %d/%d\n", rc, npages);
++			if (rc > 0)
++				unpin_user_pages(pages, rc);
++			rc = rc < 0 ? rc : -EFAULT;
++			goto free_pages;
++		}
++	} else {
++		rc = cass_virt_to_pages(hw, va, npages, pages);
++		if (rc)
++			goto free_pages;
++	}
++
++	/* Now we DMA-map the pages using a scatter-gather table */
++	sgt = kzalloc(sizeof(*sgt), GFP_KERNEL);
++	if (!sgt) {
++		rc = -ENOMEM;
++		goto unpin_pages;
++	}
++
++	rc = sg_alloc_table_from_pages_segment(sgt, pages, npages,
++					       va & ~PAGE_MASK, len,
++					       UINT_MAX, GFP_KERNEL);
++	if (rc)
++		goto free_sgt;
++
++	rc = dma_map_sgtable(&hw->cdev.pdev->dev, sgt, DMA_BIDIRECTIONAL, 0);
++	if (rc) {
++		cxidev_err(&hw->cdev, "dma_map_sgtable failed\n");
++		goto free_sgt_table;
++	}
++
++	pr_debug("va:0x%lx len:0x%lx npages:%d nents:%u page_aligned_va:0x%lx page_offset:0x%lx\n",
++		 va, len, npages, sgt->nents, va & PAGE_MASK, va & ~PAGE_MASK);
++
++	md = cxi_map_sgtable_vf(lni, sgt, flags);
++	if (IS_ERR(md)) {
++		rc = PTR_ERR(md);
++		goto unmap_sgt;
++	}
++
++	md_priv_vf = container_of(md, struct cxi_md_priv_vf, md);
++	md_priv_vf->md.va = va;
++	md_priv_vf->sgt = sgt;
++	md_priv_vf->pages = pages;
++	md_priv_vf->npages = npages;
++
++	/* Adjust IOVA to include the within-page offset.
++	 * PF returns page-aligned IOVA, but application needs the actual data address.
++	 */
++	md_priv_vf->md.iova += (va & ~PAGE_MASK);
++	md_priv_vf->md.len = len;
++
++	return md;
++
++unmap_sgt:
++	dma_unmap_sgtable(&hw->cdev.pdev->dev, sgt, DMA_BIDIRECTIONAL, 0);
++free_sgt_table:
++	sg_free_table(sgt);
++free_sgt:
++	kfree(sgt);
++unpin_pages:
++	if (flags & CXI_MAP_PIN)
++		unpin_user_pages(pages, npages);
++free_pages:
++	kvfree(pages);
++	return ERR_PTR(rc);
++}
++
++/**
++ * cxi_map() - Map virtual addresses into IO  address space
++ *
++ * If CXI_MAP_ALLOC_MD is set, just allocate an IOVA and return the MD.
++ *
++ * @lni: the Logical Network Interface
++ * @va: kernel or user virtual address
++ * @len: length of address to map in bytes
++ * @flags: various options affecting the map
++ * @hints: hints used for debugging
++ *
++ * @return: memory descriptor or error code
++ */
++struct cxi_md *cxi_map(struct cxi_lni *lni, uintptr_t va, size_t len,
++		       u32 flags, const struct cxi_md_hints *hints)
++{
++	struct cxi_lni_priv *lni_priv = container_of(lni, struct cxi_lni_priv, lni);
++	struct cxi_dev *cdev = lni_priv->dev;
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++	int ret;
++	struct cxi_md_priv *md_priv;
++	struct cxi_md *md;
++	struct ac_map_opts m_opts = {
++		.huge_shift = PMD_SHIFT,
++		.page_shift = PAGE_SHIFT
++	};
++	struct cass_ac *cac;
++	u64 ova = va;
++	size_t olen = len;
++
++	if (!len) {
++		pr_debug("Length is 0\n");
++		return ERR_PTR(-EINVAL);
++	}
++
++	if (flags & CXI_MAP_PIN &&
++	    (flags & CXI_MAP_FAULT || flags & CXI_MAP_PREFETCH)) {
++		pr_debug("Invalid flags combination:0x%x\n", flags);
++		return ERR_PTR(-EINVAL);
++	}
++
++	if (hints && (hints->ptg_mode_valid)) {
++		/* Invalid combination. hugepage_test builds two
++		 * level tables.
++		 */
++		if ((hints->ptg_mode == C_ATU_PTG_MODE_SGL) &&
++		    m_opts.hugepage_test) {
++			cxidev_info(cdev, "Hugepage test cannot be used with PTG Mode Single\n");
++			return ERR_PTR(-EINVAL);
++		}
++
++		if ((hints->ptg_mode < C_ATU_PTG_MODE_SGL) ||
++		    (hints->ptg_mode > C_ATU_PTG_MODE_DBL_C)) {
++			cxidev_info(cdev, "Invalid PTG_MODE supplied:%d\n",
++				    hints->ptg_mode);
++			return ERR_PTR(-EINVAL);
++		}
++		m_opts.ptg_mode = hints->ptg_mode;
++	} else {
++		m_opts.ptg_mode = default_ptg_mode;
++	}
++
++	if (!cdev->is_physfn)
++		return cxi_map_vf(lni, va, len, flags, hints);
++
++	ret = cass_odp_supported(hw, flags);
++	if (ret)
++		return ERR_PTR(ret);
++
++	md_priv = kzalloc(sizeof(*md_priv), GFP_KERNEL);
++	if (md_priv == NULL)
++		return ERR_PTR(-ENOMEM);
++
++	refcount_set(&md_priv->refcount, 1);
++	md = &md_priv->md;
++	md_priv->lni_priv = lni_priv;
++	md_priv->device = &hw->cdev.pdev->dev;
++	m_opts.flags = flags;
++	m_opts.md_priv = md_priv;
++
++	if (flags & CXI_MAP_ATS) {
++		cass_align_start_len(&m_opts, va, len, PAGE_SHIFT);
++	} else if (flags & CXI_MAP_DEVICE) {
++		if (hints) {
++			if (hints->dmabuf_valid) {
++				md_priv->dmabuf_fd = hints->dmabuf_fd;
++				md_priv->dmabuf_offset = hints->dmabuf_offset;
++				md_priv->dmabuf_length = olen;
++			} else {
++				md_priv->dmabuf_fd = INVALID_DMABUF_FD;
++			}
++		}
++
++		ret = cass_is_device_memory(hw, &m_opts, va, len);
++		if (ret)
++			goto md_free;
++
++		cass_align_start_len(&m_opts, va, len, m_opts.page_shift);
++
++		ret = cass_device_get_pages(&m_opts);
++		if (ret)
++			goto md_free;
++
++	} else if (flags & CXI_MAP_USER_ADDR) {
++		int align_shift = m_opts.page_shift;
++
++		m_opts.va_end = va + len;
++		ret = cass_cpu_page_size(hw, &m_opts, current->mm, va, hints,
++					 &align_shift);
++		if (ret)
++			goto md_free;
++
++		cass_align_start_len(&m_opts, va, len, align_shift);
++	} else {
++		/* VA is a kernel address which is expected to be aligned
++		 * to the PAGE_SIZE.
++		 */
++		if (va & ~PAGE_MASK) {
++			cxidev_err(cdev, "va not aligned 0x%lx\n", va);
++			ret = -EINVAL;
++			goto md_free;
++		}
++
++		cass_align_start_len(&m_opts, va, len, m_opts.page_shift);
++	}
++
++	if (m_opts.ptg_mode == C_ATU_PTG_MODE_SGL)
++		m_opts.huge_shift = m_opts.page_shift;
++
++	cac = get_matching_ac(lni_priv, &m_opts);
++	if (IS_ERR(cac)) {
++		cxidev_dbg(cdev, "Failure to get AC:%ld\n", PTR_ERR(cac));
++		ret = PTR_ERR(cac);
++		goto put_device_pages;
++	}
++
++	md_priv->cac = cac;
++
++	/* Get an MD ID, above CXI_MD_NONE */
++	ret = ida_alloc_min(&hw->md_index_table, 1, GFP_KERNEL);
++	if (ret < 0) {
++		cxidev_err(cdev, "ida_alloc_min failed %d\n", ret);
++		goto iova_free;
++	}
++
++	md->id = ret;
++
++	cass_init_md(&m_opts, md_priv);
++
++	pr_debug("ova:%llx olen:%lx va:%llx iova:%0llx iova_base:%llx md:%d ac:%d len:%lx flags:%x\n",
++		 ova, olen, m_opts.va_start, md->iova, cac->iova_base,
++		 md->id, md_priv->cac->ac.acid, md->len, flags);
++
++	if (!(flags & CXI_MAP_ALLOC_MD)) {
++		ret = cass_mirror_range(md_priv, &m_opts);
++		if (ret) {
++			pr_debug("Mirror address range failed:%d\n", ret);
++			goto mirror_range_error;
++		}
++	}
++
++	cass_add_md(lni_priv, &m_opts, md_priv);
++	refcount_inc(&lni_priv->refcount);
++
++	return md;
++
++mirror_range_error:
++	ida_free(&hw->md_index_table, md->id);
++iova_free:
++	cass_md_iova_free(md_priv);
++put_device_pages:
++	if (flags & CXI_MAP_DEVICE)
++		cass_device_put_pages(md_priv);
++md_free:
++	kfree(md_priv);
++
++	return ERR_PTR(ret);
++}
++EXPORT_SYMBOL(cxi_map);
++
++static int cxi_unmap_vf(struct cxi_md *md)
++{
++	struct cxi_md_priv_vf *md_priv_vf = container_of(md, struct cxi_md_priv_vf, md);
++	struct cxi_dev *dev = md_priv_vf->lni_priv->dev;
++	struct cass_dev *hw = container_of(dev, struct cass_dev, cdev);
++
++	pr_debug("VF md:%d lac:%d va:%llx iova:%llx len:%lx\n",
++		 md->id, md->lac, md->va, md->iova, md->len);
++
++	/* Notify PF to free the MD created from the VF sglist */
++	cxi_unmap_sgtable_vf(dev, md_priv_vf, hw, md->id);
++
++	/* Unmap and free scatter-gather table if we own it */
++	if (md_priv_vf->pages && md_priv_vf->sgt) {
++		dma_unmap_sgtable(md_priv_vf->device, md_priv_vf->sgt, DMA_BIDIRECTIONAL, 0);
++		sg_free_table(md_priv_vf->sgt);
++		kfree(md_priv_vf->sgt);
++	}
++
++	/* Unpin pages if they were pinned, or just free the pages array */
++	if (md_priv_vf->pages) {
++		if (md_priv_vf->flags & CXI_MAP_PIN)
++			unpin_user_pages(md_priv_vf->pages, md_priv_vf->npages);
++		kvfree(md_priv_vf->pages);
++	}
++
++	/* Free the VF MD structure */
++	kfree(md_priv_vf);
++
++	return 0;
++}
++
++/**
++ * cxi_unmap() - Unmap a virtual address
++ *
++ * @md: Memory Descriptor used in network operations
++ */
++int cxi_unmap(struct cxi_md *md)
++{
++	struct cxi_md_priv *md_priv;
++	struct cxi_lni_priv *lni_priv;
++	struct cxi_dev *dev;
++	struct cass_dev *hw;
++
++	if (!md || md->lac >= C_NUM_LACS)
++		return -EINVAL;
++
++	dev = container_of(md, struct cxi_md_priv, md)->lni_priv->dev;
++	if (!dev->is_physfn)
++		return cxi_unmap_vf(md);
++
++	md_priv = container_of(md, struct cxi_md_priv, md);
++	lni_priv = md_priv->lni_priv;
++	dev = lni_priv->dev;
++	hw = container_of(dev, struct cass_dev, cdev);
++
++	/* One reference for CAC allocation, one reference for MD. */
++	if (refcount_read(&md_priv->cac->refcount) < 2)
++		return -EINVAL;
++
++	pr_debug("md:%d ac:%d lac:%d va:%llx iova:%llx len:%lx\n",
++		 md->id, md_priv->cac->ac.acid, md->lac, md->va, md->iova,
++		 md->len);
++
++	cass_remove_md(md_priv);
++	cass_md_iova_free(md_priv);
++	ida_free(&hw->md_index_table, md->id);
++
++	cxidev_WARN_ONCE(dev, !refcount_dec_and_test(&md_priv->refcount),
++			 "Resource leaks - MD refcount not zero: %d\n",
++			 refcount_read(&md_priv->refcount));
++
++	cass_dma_unmap_pages(md_priv);
++	kfree(md_priv);
++
++	refcount_dec(&lni_priv->refcount);
++
++	return 0;
++}
++EXPORT_SYMBOL(cxi_unmap);
++
++/**
++ * cxi_update_md() - Update the specified address range contained in MD
++ *
++ * @md: Memory Descriptor used in network operations
++ * @va: User virtual address
++ * @len: Length of address to fault in bytes
++ * @flags: Currently only supports faulting pages with CXI_MAP_FAULT flag
++ *         for an ODP MD.
++ *
++ * @return: 0 on success or negative error value
++ */
++int cxi_update_md(struct cxi_md *md, uintptr_t va, size_t len, u32 flags)
++{
++	int ret;
++	struct cxi_md_priv *md_priv;
++	struct cass_dev *hw;
++	int align_shift;
++	struct ac_map_opts m_opts = {};
++
++	if (!md || md->lac >= C_NUM_LACS)
++		return -EINVAL;
++
++	if (va < md->va || len > ULONG_MAX - va ||
++	    va - md->va > md->len || len > md->len - (va - md->va)) {
++		pr_debug("Address range not bounded by MD\n");
++		return -EINVAL;
++	}
++
++	/* Just support CXI_MAP_FAULT for now */
++	if (!(flags & CXI_MAP_FAULT)) {
++		pr_debug("Only CXI_MAP_FAULT is supported\n");
++		return -EINVAL;
++	}
++
++	md_priv = container_of(md, struct cxi_md_priv, md);
++	hw = container_of(md_priv->lni_priv->dev, struct cass_dev, cdev);
++
++	if (md_priv->flags & CXI_MAP_PIN) {
++		pr_debug("Must be ODP MD\n");
++		return -EINVAL;
++	}
++
++	m_opts.va_end = va + len;
++	m_opts.md_priv = md_priv;
++	m_opts.page_shift = md->page_shift;
++	m_opts.huge_shift = md->huge_shift;
++	/* Use the permissions from the MD */
++	m_opts.flags = md_priv->flags & (CXI_MAP_READ | CXI_MAP_WRITE);
++	m_opts.flags |= flags;
++	align_shift = m_opts.page_shift;
++
++	ret = cass_cpu_page_size(hw, &m_opts, current->mm, va, NULL,
++				 &align_shift);
++	if (ret)
++		return ret;
++
++	/* We only support VMAs that match the MD's hugepage size. */
++	if (m_opts.huge_shift != md->huge_shift) {
++		pr_debug("Error: VMA huge_shift (%d) must match MD (%d)\n",
++			 m_opts.huge_shift, md->huge_shift);
++		return -EINVAL;
++	}
++
++	cass_align_start_len(&m_opts, va, len, align_shift);
++	m_opts.iova = md->iova + (m_opts.va_start - md->va);
++
++	pr_debug("md:%d ac:%d md.va:%llx va:%llx iova:%llx len:%lx flags:%x\n",
++		 md->id, md_priv->cac->ac.acid, md->va, m_opts.va_start,
++		 m_opts.iova, m_opts.va_len, m_opts.flags);
++
++	ret = cass_mirror_odp(&m_opts, md_priv->cac,
++			      m_opts.va_len >> m_opts.page_shift,
++			      m_opts.va_start);
++
++	return ret;
++}
++EXPORT_SYMBOL(cxi_update_md);
+diff --git a/drivers/net/ethernet/hpe/ss1/cass_cq.c b/drivers/net/ethernet/hpe/ss1/cass_cq.c
+new file mode 100644
+index 000000000000..fb8523590bc5
+--- /dev/null
++++ b/drivers/net/ethernet/hpe/ss1/cass_cq.c
+@@ -0,0 +1,1243 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright 2018, 2024-2026 Hewlett Packard Enterprise Development LP */
++
++/* Create and destroy Cassini command queues */
++
++#include <linux/hpe/cxi/cxi.h>
++#include <linux/dma-mapping.h>
++#include <linux/iopoll.h>
++#include <linux/kernel.h>
++#include <linux/types.h>
++
++#include "cass_core.h"
++#include "cxi_internal.h"
++#include "cass_ss1_debugfs.h"
++#include "cxi_vf_cmd.h"
++
++#ifdef CONFIG_ARM64
++/* Provide a workaround for avoiding writecombine on platforms where it is broken
++ * and for which the Linux kernel does not already provide a workaround, such as the
++ * Ampere Altra, used in the RL300.
++ */
++DEFINE_STATIC_KEY_FALSE(avoid_writecombine);
++#endif
++
++/* Lower bound for number of 64 byte commands. */
++#define MIN_CQ_COUNT (PAGE_SIZE / C_CQ_CMD_SIZE)
++
++void cass_cq_init(struct cass_dev *hw)
++{
++	static const union c_cq_cfg_cq_policy cq_policy = {
++		.policy[CXI_CQ_UPDATE_ALWAYS] = {
++			.shift = 0,
++		},
++		.policy[CXI_CQ_UPDATE_HIGH_FREQ_EMPTY] = {
++			.shift = 4,
++			.empty = 1,
++		},
++		.policy[CXI_CQ_UPDATE_LOW_FREQ_EMPTY] = {
++			.shift = 8,
++			.empty = 1,
++		},
++		.policy[CXI_CQ_UPDATE_LOW_FREQ] = {
++			.shift = 8,
++		},
++	};
++	union c_cq_cfg_tg_thresh tg_thresh = {
++		.tg[0].thresh = tg_threshold[0],
++		.tg[1].thresh = tg_threshold[1],
++		.tg[2].thresh = tg_threshold[2],
++		.tg[3].thresh = tg_threshold[3],
++	};
++
++	/* Initialize CQ policies. */
++	cass_write(hw, C_CQ_CFG_CQ_POLICY, &cq_policy, sizeof(cq_policy));
++
++	/* LPE append credits */
++	cass_write(hw, C_CQ_CFG_TG_THRESH, &tg_thresh, sizeof(tg_thresh));
++
++	/* Zero FQ allocation settings. */
++	cass_clear(hw, C_CQ_CFG_FQ_RESRV(0), C_CQ_CFG_FQ_RESRV_SIZE);
++
++#ifdef CONFIG_ARM64
++	if (pci_get_device(PCI_VENDOR_ID_AMPERE, 0xe100, NULL))
++		static_branch_enable(&avoid_writecombine);
++#endif
++}
++
++static phys_addr_t
++cq_mmio_phys_addr(const struct cass_dev *hw, int cq_id)
++{
++	return hw->regs_base + C_CQ_LAUNCH_TXQ_BASE +
++		C_CQ_LAUNCH_PAGE_SIZE * cq_id;
++}
++
++/* Write TX CQ configuration to hardware */
++static int setup_hw_tx_cq(struct cass_dev *hw, unsigned int cq_n,
++			  const struct cxi_cq_alloc_opts *opts,
++			  struct cxi_lni_priv *lni_priv,
++			  struct cxi_cq_priv *cq,
++			  struct cxi_eq_priv *eq,
++			  struct cxi_cp_priv *cp_priv)
++{
++	size_t cmds_count = cq->cmds_len / C_CQ_CMD_SIZE;
++	union c_cq_txq_tc_table tc = {
++		.mem_q_eth = !!(opts->flags & CXI_CQ_TX_ETHERNET),
++		.mem_q_trig = !!(opts->flags & CXI_CQ_TX_WITH_TRIG_CMDS),
++	};
++	union c_cq_txq_base_table txq_cfg = {
++		.mem_q_eq = eq ? eq->eq.eqn : C_EQ_NONE,
++		.mem_q_base = cq->cmds_dma_addr >> C_ADDR_SHIFT,
++		.mem_q_max_ptr = cmds_count - 1,
++		.mem_q_rgid = lni_priv->lni.rgid,
++		.mem_q_stat_cnt_pool = opts->stat_cnt_pool,
++		.mem_q_lcid = opts->lcid,
++		.mem_q_acid = lni_priv->phys_ac,
++		.mem_q_policy = opts->policy,
++	};
++	union c_cq_cfg_init_txq_hw_state txq_init;
++	union c_cq_cfg_cp_fl_table flow_cfg;
++	void __iomem *csr;
++	int rc;
++
++	/* Transmit CQ needs to be configured with the same PFQ and TC
++	 * values the corresponding communication profile is using.
++	 */
++	cass_read(hw, C_CQ_CFG_CP_FL_TABLE(cp_priv->cass_cp->id),
++		  &flow_cfg, sizeof(flow_cfg));
++
++	tc.mem_q_tc = flow_cfg.tc;
++	txq_cfg.mem_q_pfq = flow_cfg.pfq;
++
++	if (opts->flags & CXI_CQ_TX_WITH_TRIG_CMDS)
++		txq_cfg.mem_q_pfq = cxi_rgroup_tle_pool_id(lni_priv->rgroup);
++
++	spin_lock(&hw->cq_shadow_lock);
++	cass_tx_cq_init(hw, &cq->cass_cq, cq_n, &tc, &txq_cfg);
++	spin_unlock(&hw->cq_shadow_lock);
++
++	mutex_lock(&hw->cq_init_lock);
++	cass_read(hw, C_CQ_CFG_INIT_TXQ_HW_STATE, &txq_init,
++		  sizeof(txq_init));
++
++	cxidev_WARN_ONCE(&hw->cdev, txq_init.pending == 1,
++			 "TXQ init pending CSR should not be set");
++	if (txq_init.pending == 1) {
++		mutex_unlock(&hw->cq_init_lock);
++		return -EIO;
++	}
++
++	txq_init.cq_handle = cq_n;
++
++	cass_write(hw, C_CQ_CFG_INIT_TXQ_HW_STATE, &txq_init,
++		   sizeof(txq_init));
++
++	csr = cass_csr(hw, C_CQ_CFG_INIT_TXQ_HW_STATE);
++	rc = readq_poll_timeout(csr, txq_init.qw, txq_init.pending == 0,
++				1, 1000);
++
++	cxidev_WARN_ONCE(&hw->cdev, rc, "Timeout waiting for TXQ init");
++	if (rc) {
++		mutex_unlock(&hw->cq_init_lock);
++		return -EIO;
++	}
++	mutex_unlock(&hw->cq_init_lock);
++
++	cass_tx_cq_enable(hw, cq_n);
++
++	return 0;
++}
++
++/* Write TGT CQ configuration to hardware */
++#define MEM_Q_TC_REG_SIZE BIT(3)
++static int setup_hw_tgt_cq(struct cass_dev *hw, unsigned int cq_n,
++			   const struct cxi_cq_alloc_opts *opts,
++			   struct cxi_lni_priv *lni_priv,
++			   struct cxi_cq_priv *cq,
++			   struct cxi_eq_priv *eq)
++{
++	size_t cmds_count = cq->cmds_len / C_CQ_CMD_SIZE;
++	// TODO: Handle TGT TC
++	const union c_cq_tgq_table tgt_cfg = {
++		.mem_q_eq = eq ? eq->eq.eqn : C_EQ_NONE,
++		.mem_q_base = cq->cmds_dma_addr >> C_ADDR_SHIFT,
++		.mem_q_max_ptr = cmds_count - 1,
++		.mem_q_rgid = lni_priv->lni.rgid,
++		.mem_q_stat_cnt_pool = opts->stat_cnt_pool,
++		.mem_q_tc_reg = cq_n % MEM_Q_TC_REG_SIZE,
++		.mem_q_acid = lni_priv->phys_ac,
++		.mem_q_policy = opts->policy,
++	};
++	union c_cq_cfg_init_tgq_hw_state tgq_init;
++	union c_cq_cfg_thresh_map thresh_map = {
++		.thresh_id = opts->lpe_cdt_thresh_id,
++	};
++	void __iomem *csr;
++	int rc;
++
++	spin_lock(&hw->cq_shadow_lock);
++	cass_tgt_cq_init(hw, &cq->cass_cq, cq_n, &tgt_cfg);
++	spin_unlock(&hw->cq_shadow_lock);
++
++	mutex_lock(&hw->cq_init_lock);
++	cass_read(hw, C_CQ_CFG_INIT_TGQ_HW_STATE, &tgq_init,
++		  sizeof(tgq_init));
++
++	cxidev_WARN_ONCE(&hw->cdev, tgq_init.pending == 1,
++			 "TGQ init pending CSR should not be set");
++	if (tgq_init.pending == 1) {
++		mutex_unlock(&hw->cq_init_lock);
++		return -EIO;
++	}
++
++	cass_write(hw, C_CQ_CFG_THRESH_MAP(cq_n),
++		   &thresh_map, sizeof(thresh_map));
++
++	tgq_init.cq_handle = cq_n;
++	cass_write(hw, C_CQ_CFG_INIT_TGQ_HW_STATE, &tgq_init,
++		   sizeof(tgq_init));
++
++	/* TODO: Check delay and timeouts are correct for real NIC. */
++	csr = cass_csr(hw, C_CQ_CFG_INIT_TGQ_HW_STATE);
++	rc = readq_poll_timeout(csr, tgq_init.qw, tgq_init.pending == 0,
++				1, 1000);
++
++	cxidev_WARN_ONCE(&hw->cdev, rc, "Timeout waiting for TGQ init");
++	if (rc) {
++		mutex_unlock(&hw->cq_init_lock);
++		return -EIO;
++	}
++	mutex_unlock(&hw->cq_init_lock);
++
++	cass_tgt_cq_enable(hw, cq_n);
++
++	return 0;
++}
++
++/* Return an available CQ with an ID */
++static struct cxi_cq_priv *pf_get_cq_id(struct cxi_lni_priv *lni_priv,
++					const struct cxi_cq_alloc_opts *opts)
++{
++	struct cxi_dev *dev = lni_priv->dev;
++	struct cass_dev *hw =
++		container_of(dev, struct cass_dev, cdev);
++	struct cxi_cq_priv *cq;
++	enum cxi_resource_type rsrc_type;
++	int rc;
++
++	cq = kzalloc(sizeof(struct cxi_cq_priv), GFP_KERNEL);
++	if (cq == NULL)
++		return ERR_PTR(-ENOMEM);
++
++	/* Check the associated service to see if this CQ can be allocated */
++	if (opts->flags & CXI_CQ_IS_TX)
++		rsrc_type = CXI_RESOURCE_TXQ;
++	else
++		rsrc_type = CXI_RESOURCE_TGQ;
++
++	rc = cxi_rgroup_alloc_resource(lni_priv->rgroup, rsrc_type);
++	if (rc) {
++		/* Attempt to cleanup all CQs on this LNI to return service
++		 * credits and then reattempt to allocate resource.
++		 */
++		finalize_cq_cleanups(lni_priv, false);
++
++		rc = cxi_rgroup_alloc_resource(lni_priv->rgroup, rsrc_type);
++		if (rc)
++			goto cq_free;
++	}
++
++	if (opts->flags & CXI_CQ_IS_TX)
++		rc = ida_alloc_range(&hw->cq_table, 0, C_NUM_TRANSMIT_CQS - 1, GFP_KERNEL);
++	else
++		rc = ida_alloc_range(&hw->cq_table, C_NUM_TRANSMIT_CQS,
++				     C_NUM_TRANSMIT_CQS + C_NUM_TARGET_CQS - 1,
++				     GFP_KERNEL);
++
++	if (rc < 0) {
++		/* Out of CQs. Accelerate possible CQ cleanup. */
++		lni_cleanups(hw, false);
++
++		if (opts->flags & CXI_CQ_IS_TX)
++			rc = ida_alloc_range(&hw->cq_table, 0,
++					     C_NUM_TRANSMIT_CQS - 1, GFP_KERNEL);
++		else
++			rc = ida_alloc_range(&hw->cq_table, C_NUM_TRANSMIT_CQS,
++					     C_NUM_TRANSMIT_CQS + C_NUM_TARGET_CQS - 1,
++					     GFP_KERNEL);
++	}
++
++	if (rc < 0)
++		goto dec_rsrc_use;
++
++	cq->cass_cq.idx = rc;
++
++	return cq;
++
++dec_rsrc_use:
++	cxi_rgroup_free_resource(lni_priv->rgroup, rsrc_type);
++
++cq_free:
++	kfree(cq);
++
++	return ERR_PTR(rc);
++}
++
++static void put_cq_id(struct cxi_cq_priv *cq)
++{
++	struct cxi_lni_priv *lni_priv = cq->lni_priv;
++	struct cxi_dev *dev = lni_priv->dev;
++	struct cass_dev *hw = container_of(dev, struct cass_dev, cdev);
++
++	ida_free(&hw->cq_table, cq->cass_cq.idx);
++	if (cq->flags & CXI_CQ_IS_TX)
++		cxi_rgroup_free_resource(lni_priv->rgroup, CXI_RESOURCE_TXQ);
++	else
++		cxi_rgroup_free_resource(lni_priv->rgroup, CXI_RESOURCE_TGQ);
++	kfree(cq);
++}
++
++/**
++ * cxi_cq_free_vf() - Free the communication profile for VF
++ *
++ * @cmdq: Command queue to be freed
++ */
++static void cxi_cq_free_vf(struct cxi_cq *cmdq)
++{
++	struct cxi_cq_priv_vf *cq_priv_vf =
++		container_of(cmdq, struct cxi_cq_priv_vf, cass_cq);
++	struct cxi_dev *dev = cq_priv_vf->lni_priv->dev;
++	struct cass_dev *hw = container_of(dev, struct cass_dev, cdev);
++	const struct cxi_cq_free_cmd cmd = {
++		.op = CXI_OP_CQ_FREE,
++		.cq = cq_priv_vf->cass_cq.idx,
++	};
++	size_t resp_len = 0;
++	int rc;
++
++	rc = cxi_send_msg_to_pf(dev, &cmd, sizeof(cmd), NULL, &resp_len);
++	if (rc)
++		return;
++
++	if (cq_priv_vf->cq_mmio)
++		iounmap(cq_priv_vf->cq_mmio);
++
++	dma_unmap_page(&hw->cdev.pdev->dev, cq_priv_vf->cmds_dma_addr,
++		       cq_priv_vf->cmds_len, DMA_BIDIRECTIONAL);
++
++	if (cq_priv_vf->cmds_pages) {
++		__free_pages(cq_priv_vf->cmds_pages, cq_priv_vf->cmds_order);
++	} else {
++		if (cq_priv_vf->md_priv) {
++			cass_device_put_pages(cq_priv_vf->md_priv);
++			kfree(cq_priv_vf->md_priv);
++		}
++
++		if (cq_priv_vf->pages) {
++			unpin_user_pages(cq_priv_vf->pages, cq_priv_vf->cmds_len >> PAGE_SHIFT);
++			kfree(cq_priv_vf->pages);
++		}
++	}
++
++	kfree(cq_priv_vf);
++}
++
++/**
++ * get_dma_addr_if_contig() - Check for contiguous pages of user buffer,
++ *                            pin and return dma_addr.
++ *
++ * If pages are contiguous, pin the pages and return the dma_addr of the base.
++ * Otherwise, return negative errno.
++ *
++ * @hw: The cassini device
++ * @addr: address of page aligned buffer
++ * @len: page aligned length of buffer - must not be 0
++ * @dir: dma map direction
++ * @pages: ptr to list of pages returned
++ * @dma_addr: dma_addr of user buffer
++ *
++ * @return: 0 on success, negative error value
++ */
++int get_dma_addr_if_contig(struct cass_dev *hw, void *addr, size_t len,
++			   enum dma_data_direction dir, struct page ***pages,
++			   dma_addr_t *dma_addr)
++{
++	int i;
++	int rc;
++	int npinned;
++	dma_addr_t pa;
++	size_t npg = len >> PAGE_SHIFT;
++
++	*pages = kmalloc_array(npg, sizeof(struct page *), GFP_KERNEL);
++	if (!*pages)
++		return -ENOMEM;
++
++	npinned = pin_user_pages_fast((u64)addr, npg,
++				      FOLL_WRITE | FOLL_LONGTERM, *pages);
++	if (npinned < 0) {
++		rc = npinned;
++		goto free_pages;
++	}
++
++	if (npinned != npg) {
++		rc = -EFAULT;
++		goto put_pages;
++	}
++
++	/* Naively check that each page is in sequence. */
++	pa = page_to_phys((*pages)[0]);
++	for (i = 1; i < npg; i++) {
++		pa += PAGE_SIZE;
++		if (pa != page_to_phys((*pages)[i])) {
++			cxidev_dbg(&hw->cdev,
++				   "Buffer supplied is required to be contiguous\n");
++			rc = -EINVAL;
++			goto put_pages;
++		}
++	}
++
++	*dma_addr = dma_map_page(&hw->cdev.pdev->dev, (*pages)[0], 0, len, dir);
++	if (dma_mapping_error(&hw->cdev.pdev->dev, *dma_addr)) {
++		rc = -ENOMEM;
++		goto put_pages;
++	}
++
++	return 0;
++
++put_pages:
++	unpin_user_pages(*pages, npinned);
++
++free_pages:
++	kfree(*pages);
++
++	return rc;
++}
++
++static struct cxi_md_priv *get_device_addr(struct cxi_lni_priv *lni_priv,
++					   uintptr_t va, size_t len,
++					   int dmabuf_fd,
++					   unsigned long dmabuf_offset,
++					   dma_addr_t *dma_addr)
++{
++	int i;
++	int rc;
++	struct scatterlist *sg;
++	struct cxi_dev *cdev = lni_priv->dev;
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++	struct cxi_md_priv *md_priv;
++	struct ac_map_opts m_opts = {
++		.huge_shift = PMD_SHIFT,
++		.page_shift = PAGE_SHIFT
++	};
++	u32 flags = CXI_MAP_DEVICE;
++	dma_addr_t next_addr = 0;
++
++	if (!len) {
++		pr_debug("Length is 0\n");
++		return ERR_PTR(-EINVAL);
++	}
++
++	md_priv = kzalloc(sizeof(*md_priv), GFP_KERNEL);
++	if (!md_priv)
++		return ERR_PTR(-ENOMEM);
++
++	refcount_set(&md_priv->refcount, 1);
++	md_priv->lni_priv = lni_priv;
++	md_priv->device = &hw->cdev.pdev->dev;
++	md_priv->dmabuf_fd = dmabuf_fd;
++	md_priv->dmabuf_offset = dmabuf_offset;
++	md_priv->dmabuf_length = len;
++	m_opts.flags = flags;
++	m_opts.md_priv = md_priv;
++
++	rc = cass_is_device_memory(hw, &m_opts, va, len);
++	if (rc)
++		goto md_free;
++
++	cass_align_start_len(&m_opts, va, len, m_opts.page_shift);
++
++	rc = cass_device_get_pages(&m_opts);
++	if (rc) {
++		cxidev_dbg(&hw->cdev,
++			   "cass_device_get_pages failed rc:%d\n", rc);
++		goto md_free;
++	}
++
++	/* AMD p2p pages are not guaranteed to be contiguous. */
++	for_each_sgtable_dma_sg(md_priv->sgt, sg, i) {
++		long len = sg_dma_len(sg);
++		dma_addr_t dma_addr = sg_dma_address(sg);
++
++		if (dma_addr != PAGE_ALIGN(dma_addr)) {
++			cxidev_dbg(&hw->cdev,
++				   "Buffer supplied is required to be page aligned\n");
++			rc = -EINVAL;
++			goto put_pages;
++		}
++
++		if (!next_addr) {
++			next_addr = dma_addr + len;
++			continue;
++		}
++
++		if (dma_addr != next_addr) {
++			cxidev_dbg(&hw->cdev,
++				   "Buffer supplied is required to be contiguous\n");
++			rc = -EINVAL;
++			goto put_pages;
++		}
++
++		next_addr = dma_addr + len;
++	}
++
++	md_priv->olen = m_opts.va_len;
++	md_priv->flags = m_opts.flags;
++	*dma_addr = sg_dma_address(md_priv->sgt->sgl);
++
++	return md_priv;
++
++put_pages:
++	cass_device_put_pages(md_priv);
++
++md_free:
++	kfree(md_priv);
++
++	return ERR_PTR(rc);
++}
++
++/**
++ * cxi_cq_alloc_buf_vf() - Allocate a new command queue for VF
++ *
++ * The new CQ is attached to attached to the NI.
++ *
++ * @lni: LNI to associate with the command queue.
++ * @evtq: Event Queue to associate with the command queue, for error
++ *        reporting. May be NULL.
++ * @opts_b: Options affecting the CQ.
++ * @numa_node: NUMA node ID CQ memory should be allocated from.
++ *
++ * @return: the command queue or an error pointer
++ */
++static struct cxi_cq *cxi_cq_alloc_buf_vf(struct cxi_lni *lni, struct cxi_eq *evtq,
++					  const struct cxi_cq_alloc_opts_buf *opts_b,
++					  int numa_node)
++{
++	struct cxi_lni_priv_vf *lni_priv_vf =
++		container_of(lni, struct cxi_lni_priv_vf, lni);
++	struct cxi_dev *cdev = lni_priv_vf->dev;
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++	const struct cxi_cq_alloc_opts *opts = &opts_b->opts;
++	struct cxi_cq_priv_vf *cq;
++	struct cxi_cq_alloc_buf_cmd_vf cmd = {
++		.base.op = CXI_OP_CQ_ALLOC_BUF,
++		.base.lni = lni_priv_vf->lni.id,
++		.base.eq = evtq ? evtq->eqn : C_EQ_NONE,
++		.base.opts = *opts_b,
++	};
++	struct cxi_cq_alloc_resp resp;
++	size_t resp_len = sizeof(resp);
++	bool is_user = opts->flags & CXI_CQ_USER;
++	struct page *cmds_pages;
++	size_t cmds_count;
++	size_t cmds_order;
++	size_t cmds_len;
++	int rc;
++
++	/* Use provided commands count to calculate commands length. Then, use
++	 * commands length to recalculate commands count to consume entire
++	 * buffer space.
++	 */
++	cmds_count = max_t(size_t, MIN_CQ_COUNT, opts->count);
++	cmds_order = get_order(cmds_count * C_CQ_CMD_SIZE);
++	cmds_len = (1 << cmds_order) * PAGE_SIZE;
++	cmds_count = cmds_len / C_CQ_CMD_SIZE;
++
++	if (cmds_count > CXI_MAX_CQ_COUNT) {
++		cxidev_dbg(cdev, "cmds_count:%ld is > CXI_MAX_CQ_COUNT:%d\n",
++			   cmds_count, CXI_MAX_CQ_COUNT);
++		return ERR_PTR(-E2BIG);
++	}
++
++	cq = kzalloc(sizeof(*cq), GFP_KERNEL);
++	if (!cq)
++		return ERR_PTR(-ENOMEM);
++
++	if (opts_b->buf) {
++		if (!IS_ALIGNED((u64)opts_b->buf, PAGE_SIZE)) {
++			cxidev_dbg(cdev, "buffer %llx not aligned to PAGE_SIZE\n",
++				   (u64)opts_b->buf);
++			rc = -EINVAL;
++			goto free_cq;
++		}
++
++		if (opts_b->is_host_mem) {
++			rc = get_dma_addr_if_contig(hw, opts_b->buf, cmds_len,
++						    DMA_BIDIRECTIONAL,
++						    &cq->pages,
++						    &cq->cmds_dma_addr);
++			if (rc)
++				goto free_cq;
++		} else {
++			cq->md_priv = get_device_addr(container_of(lni, struct cxi_lni_priv, lni),
++						      (uintptr_t)opts_b->buf,
++						      cmds_len,
++						      opts_b->dmabuf_fd,
++						      opts_b->dmabuf_offset,
++						      &cq->cmds_dma_addr);
++			if (IS_ERR(cq->md_priv)) {
++				rc = PTR_ERR(cq->md_priv);
++				goto free_cq;
++			}
++		}
++		cq->cmds = NULL;
++	} else {
++		cmds_pages = alloc_pages_node(numa_node, GFP_KERNEL | __GFP_ZERO,
++					      cmds_order);
++		if (!cmds_pages) {
++			rc = -ENOMEM;
++			goto free_cq;
++		}
++
++		cq->cmds_order = cmds_order;
++		cq->cmds = page_address(cmds_pages);
++		cq->cmds_pages = cmds_pages;
++		cq->cmds_dma_addr = dma_map_page(&hw->cdev.pdev->dev,
++						 cmds_pages, 0, cmds_len,
++						 DMA_BIDIRECTIONAL);
++		if (dma_mapping_error(&hw->cdev.pdev->dev, cq->cmds_dma_addr)) {
++			rc = -ENOMEM;
++			goto free_pages;
++		}
++	}
++
++	cq->cmds_len = cmds_len;
++	cmd.dma_addr = cq->cmds_dma_addr;
++	cmd.cmds_len = cmds_len;
++
++	rc = cxi_send_msg_to_pf(cdev, &cmd, sizeof(cmd), &resp, &resp_len);
++	if (rc)
++		goto cq_release;
++
++	if (!is_user) {
++		phys_addr_t mmio_phys = cq_mmio_phys_addr(hw, resp.cq);
++#ifdef CONFIG_ARM64
++		if (static_branch_unlikely(&avoid_writecombine))
++			cq->cq_mmio = ioremap(mmio_phys, PAGE_SIZE);
++		else
++#endif
++		cq->cq_mmio = ioremap_wc(mmio_phys, PAGE_SIZE);
++		if (!cq->cq_mmio) {
++			cxidev_warn_once(cdev, "ioremap_wc failed\n");
++			rc = -EFAULT;
++			goto cq_release;
++		}
++	}
++
++	/* Initialize client interface structure */
++	cxi_cq_init(&cq->cass_cq,
++		    cq->cmds,
++		    cmds_count,
++		    (__force void *)cq->cq_mmio,
++		    resp.cq);
++
++	cq->lni_priv = container_of(lni, struct cxi_lni_priv, lni);
++	cq->flags = opts->flags;
++	cq->cass_cq.size = resp.count;
++	cq->cass_cq.idx = resp.cq;
++
++	return &cq->cass_cq;
++
++cq_release:
++	dma_unmap_page(&hw->cdev.pdev->dev, cq->cmds_dma_addr,
++		       cq->cmds_len, DMA_BIDIRECTIONAL);
++
++	if (cq->pages) {
++		unpin_user_pages(cq->pages, cq->cmds_len >> PAGE_SHIFT);
++		kfree(cq->pages);
++	}
++free_pages:
++	if (cq->cmds_pages)
++		__free_pages(cq->cmds_pages, cmds_order);
++free_cq:
++	kfree(cq);
++	return ERR_PTR(rc);
++}
++
++/**
++ * cxi_cq_alloc_buf_internal() - Allocate a new command queue
++ *
++ * The new CQ is attached to the LNI.
++ * The CQ buffer may be supplied by the user. It must be physically
++ * contiguous.
++ *
++ * @lni: LNI to associate with the command queue.
++ * @evtq: Event Queue to associate with the command queue, for error
++ *        reporting. May be NULL.
++ * @opts_b: Options affecting the CQ.
++ * @numa_node: NUMA node ID CQ memory should be allocated from.
++ * @cmds_dma_addr: Pre-allocated DMA address (0 to allocate new)
++ * @cmds_len: Length of pre-allocated memory (0 to allocate new)
++ *
++ * @return: the command queue or an error pointer
++ */
++struct cxi_cq *cxi_cq_alloc_buf_internal(struct cxi_lni *lni, struct cxi_eq *evtq,
++					 const struct cxi_cq_alloc_opts_buf *opts_b,
++					 int numa_node, dma_addr_t cmds_dma_addr,
++					 size_t cmds_len)
++{
++	struct cxi_lni_priv *lni_priv =
++		container_of(lni, struct cxi_lni_priv, lni);
++	struct cxi_dev *cdev = lni_priv->dev;
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++	const struct cxi_cq_alloc_opts *opts = &opts_b->opts;
++	struct cxi_eq_priv *eq;
++	struct cxi_cq_priv *cq;
++	int cq_idx;
++	int cq_n;
++	int rc;
++	size_t cmds_count;
++	size_t cmds_order;
++	struct page *cmds_pages;
++	struct cxi_cp_priv *cp_priv = NULL;
++	bool is_user = opts->flags & CXI_CQ_USER;
++
++	if (opts->policy < 0 || opts->policy > CXI_CQ_UPDATE_LOW_FREQ)
++		return ERR_PTR(-EINVAL);
++
++	if (!(opts->flags & CXI_CQ_IS_TX) && opts->lpe_cdt_thresh_id > 3)
++		return ERR_PTR(-EINVAL);
++
++	/*
++	 * Use provided commands count to calculate commands length. Then, use
++	 * commands length to recalculate commands count to consume entire
++	 * buffer space.
++	 */
++	cmds_count = max_t(size_t, MIN_CQ_COUNT, opts->count);
++	cmds_order = get_order(cmds_count * C_CQ_CMD_SIZE);
++	cmds_len = (1 << cmds_order) * PAGE_SIZE;
++	cmds_count = cmds_len / C_CQ_CMD_SIZE;
++
++	if (cmds_count > CXI_MAX_CQ_COUNT) {
++		cxidev_dbg(cdev, "cmds_count:%ld is > CXI_MAX_CQ_COUNT:%d\n",
++			   cmds_count, CXI_MAX_CQ_COUNT);
++		return ERR_PTR(-E2BIG);
++	}
++
++	/* At least one communication profile is needed for a transmit
++	 * CQ.
++	 */
++	if (opts->flags & CXI_CQ_IS_TX) {
++		/* For triggered CQs, only LCID zero can be used. */
++		if ((opts->flags & CXI_CQ_TX_WITH_TRIG_CMDS) && opts->lcid != 0)
++			return ERR_PTR(-EINVAL);
++
++		cp_priv = cass_cp_find(hw, lni_priv->lni.rgid, opts->lcid);
++		if (!cp_priv)
++			return ERR_PTR(-EINVAL);
++	}
++
++	/* Only privileged client can use the C_CMD_ETHERNET_TX command. */
++	if ((opts->flags & CXI_CQ_TX_ETHERNET) && !capable(CAP_NET_RAW))
++		return ERR_PTR(-EPERM);
++
++	cq = pf_get_cq_id(lni_priv, opts);
++	if (IS_ERR(cq))
++		return ERR_PTR(PTR_ERR(cq));
++
++	cq_idx = cq->cass_cq.idx;
++
++	if (evtq)
++		eq = container_of(evtq, struct cxi_eq_priv, eq);
++	else
++		eq = NULL;
++
++	cq->lni_priv = lni_priv;
++	cq->eq = eq;
++	cq->flags = opts->flags;
++	cq->cmds_len = cmds_len;
++
++	if (!lni_priv->is_vf) {
++		/* For physical function, we use user buffer if provided or we
++		 * allocate a new one
++		 */
++		if (opts_b->buf) {
++			if (!IS_ALIGNED((u64)opts_b->buf, PAGE_SIZE)) {
++				cxidev_dbg(cdev, "buffer %llx not aligned to PAGE_SIZE\n",
++					   (u64)opts_b->buf);
++				rc = -EINVAL;
++				goto put_id;
++			}
++
++			if (opts_b->is_host_mem) {
++				rc = get_dma_addr_if_contig(hw, opts_b->buf, cmds_len,
++							    DMA_BIDIRECTIONAL,
++							&cq->pages,
++							&cq->cmds_dma_addr);
++				if (rc)
++					goto put_id;
++			} else {
++				cq->md_priv = get_device_addr(lni_priv,
++							      (uintptr_t)opts_b->buf,
++							cmds_len,
++							opts_b->dmabuf_fd,
++							opts_b->dmabuf_offset,
++							&cq->cmds_dma_addr);
++				if (IS_ERR(cq->md_priv)) {
++					rc = PTR_ERR(cq->md_priv);
++					goto put_id;
++				}
++			}
++
++			cq->cmds = NULL;
++		} else {
++			/* CQ needs contiguous memory region. */
++			cmds_pages = alloc_pages_node(numa_node, GFP_KERNEL | __GFP_ZERO,
++						      cmds_order);
++			if (!cmds_pages) {
++				rc = -ENOMEM;
++				goto put_id;
++			}
++
++			cq->cmds_order = cmds_order;
++			cq->cmds = page_address(cmds_pages);
++			cq->cmds_pages = cmds_pages;
++			cq->cmds_dma_addr = dma_map_page(&hw->cdev.pdev->dev,
++							 cmds_pages, 0, cq->cmds_len,
++							 DMA_BIDIRECTIONAL);
++			if (dma_mapping_error(&hw->cdev.pdev->dev, cq->cmds_dma_addr)) {
++				rc = -ENOMEM;
++				goto free_pages;
++			}
++		}
++	} else {
++		/* For VF we use the provided dma_addr */
++		if (!cmds_dma_addr) {
++			rc = -EINVAL;
++			goto put_id;
++		}
++
++		cq->cmds_len = cmds_len;
++		cq->cmds_dma_addr = cmds_dma_addr;
++		/* PF doesn't have access to VF's virtual address space.
++		 * VF has already initialized its own cxi_cq structure.
++		 */
++		cq->cmds = NULL;
++	}
++
++	if (!is_user && !lni_priv->is_vf) {
++		phys_addr_t mmio_phys = cq_mmio_phys_addr(hw, cq_idx);
++#ifdef CONFIG_ARM64
++		if (static_branch_unlikely(&avoid_writecombine))
++			cq->cq_mmio = ioremap(mmio_phys, PAGE_SIZE);
++		else
++#endif
++		cq->cq_mmio = ioremap_wc(mmio_phys, PAGE_SIZE);
++		if (!cq->cq_mmio) {
++			cxidev_warn_once(cdev, "ioremap_wc failed\n");
++			rc = -EFAULT;
++			goto cq_release;
++		}
++	}
++
++	/* Initialize client interface structure */
++	cxi_cq_init(&cq->cass_cq, cq->cmds, cmds_count,
++		    (__force void *)cq->cq_mmio, cq_idx);
++
++	cq_n = cxi_cq_get_cqn(&cq->cass_cq);
++	if (opts->flags & CXI_CQ_IS_TX)
++		rc = setup_hw_tx_cq(hw, cq_n, opts, lni_priv, cq, eq, cp_priv);
++	else
++		rc = setup_hw_tgt_cq(hw, cq_n, opts, lni_priv, cq, eq);
++
++	if (rc)
++		goto cq_unmap;
++
++	if (cq->flags & CXI_CQ_IS_TX)
++		atomic_inc(&hw->stats.txq);
++	else
++		atomic_inc(&hw->stats.tgq);
++
++	cq_debugfs_create(cq_idx, cq, hw, lni_priv);
++
++	spin_lock(&lni_priv->res_lock);
++	list_add_tail(&cq->list, &lni_priv->cq_list);
++	spin_unlock(&lni_priv->res_lock);
++
++	refcount_inc(&lni_priv->refcount);
++	if (eq)
++		refcount_inc(&eq->refcount);
++
++	/* Grant access to the resource from the VF */
++	if (lni_priv->is_vf)
++		cass_config_sriovt(hw, true, lni_priv->vf_num,
++				   (cq->flags & CXI_CQ_IS_TX) ? cq_n :
++								(1024 + cq_n));
++
++	return &cq->cass_cq;
++
++cq_unmap:
++	if (!is_user)
++		iounmap(cq->cq_mmio);
++cq_release:
++	dma_unmap_page(&hw->cdev.pdev->dev, cq->cmds_dma_addr,
++		       cq->cmds_len, DMA_BIDIRECTIONAL);
++
++	if (cq->md_priv) {
++		cass_device_put_pages(cq->md_priv);
++		kfree(cq->md_priv);
++	}
++
++	if (cq->pages) {
++		unpin_user_pages(cq->pages, cq->cmds_len >> PAGE_SHIFT);
++		kfree(cq->pages);
++	}
++
++free_pages:
++	if (cq->cmds_pages)
++		__free_pages(cq->cmds_pages, cmds_order);
++put_id:
++	put_cq_id(cq);
++
++	return ERR_PTR(rc);
++}
++EXPORT_SYMBOL(cxi_cq_alloc_buf_internal);
++
++/**
++ * cxi_cq_alloc_buf() - Allocate a new command queue
++ *
++ * The new CQ is attached to the LNI.
++ * The CQ buffer may be supplied by the user. It must be physically
++ * contiguous.
++ *
++ * @lni: LNI to associate with the command queue.
++ * @evtq: Event Queue to associate with the command queue, for error
++ *        reporting. May be NULL.
++ * @opts_b: Options affecting the CQ.
++ * @numa_node: NUMA node ID CQ memory should be allocated from.
++ *
++ * @return: the command queue or an error pointer
++ */
++struct cxi_cq *cxi_cq_alloc_buf(struct cxi_lni *lni, struct cxi_eq *evtq,
++				const struct cxi_cq_alloc_opts_buf *opts_b,
++				int numa_node)
++{
++	struct cxi_dev *cdev = container_of(lni, struct cxi_lni_priv, lni)->dev;
++
++	if (!cdev->is_physfn)
++		return cxi_cq_alloc_buf_vf(lni, evtq, opts_b, numa_node);
++
++	return cxi_cq_alloc_buf_internal(lni, evtq, opts_b, numa_node, 0, 0);
++}
++EXPORT_SYMBOL(cxi_cq_alloc_buf);
++
++/**
++ * cxi_cq_alloc() - Allocate a new command queue
++ *
++ * The new CQ is attached to attached to the NI.
++ *
++ * @lni: LNI to associate with the command queue.
++ * @evtq: Event Queue to associate with the command queue, for error
++ *        reporting. May be NULL.
++ * @opts: Options affecting the CQ.
++ * @numa_node: NUMA node ID CQ memory should be allocated from.
++ *
++ * @return: the command queue or an error pointer
++ */
++struct cxi_cq *cxi_cq_alloc(struct cxi_lni *lni, struct cxi_eq *evtq,
++			    const struct cxi_cq_alloc_opts *opts,
++			    int numa_node)
++{
++	struct cxi_cq_alloc_opts_buf opts_b = {};
++
++	opts_b.opts = *opts;
++	return cxi_cq_alloc_buf(lni, evtq, &opts_b, numa_node);
++}
++EXPORT_SYMBOL(cxi_cq_alloc);
++
++/* Test whether a transmit CQ is done working */
++static bool is_txq_done(struct cass_dev *hw, int id)
++{
++	union c_cq_txq_rdptr_table rd_ptr;
++	union c_cq_txq_preptr_table pre_ptr;
++	union c_cq_txq_ack_ctr ack_ctr;
++
++	cass_read(hw, C_CQ_TXQ_ACK_CTR(id), &ack_ctr, sizeof(ack_ctr));
++	if (ack_ctr.mem_q_ack_ctr != 0)
++		return false;
++
++	cass_read(hw, C_CQ_TXQ_RDPTR_TABLE(id), &rd_ptr, sizeof(rd_ptr));
++	cass_read(hw, C_CQ_TXQ_PREPTR_TABLE(id), &pre_ptr, sizeof(pre_ptr));
++
++	if (rd_ptr.mem_q_rd_ptr != pre_ptr.mem_q_pre_ptr)
++		return false;
++
++	return true;
++}
++
++/* Test whether a target CQ is done working */
++static bool is_tgq_done(struct cass_dev *hw, int id)
++{
++	union c_cq_tgq_rdptr_table rd_ptr;
++	union c_cq_tgq_preptr_table pre_ptr;
++	union c_cq_tgq_ack_ctr ack_ctr;
++
++	cass_read(hw, C_CQ_TGQ_ACK_CTR(id), &ack_ctr, sizeof(ack_ctr));
++	if (ack_ctr.mem_q_ack_ctr != 0)
++		return false;
++
++	cass_read(hw, C_CQ_TGQ_RDPTR_TABLE(id), &rd_ptr, sizeof(rd_ptr));
++	cass_read(hw, C_CQ_TGQ_PREPTR_TABLE(id), &pre_ptr, sizeof(pre_ptr));
++	if (rd_ptr.mem_q_rd_ptr != pre_ptr.mem_q_pre_ptr)
++		return false;
++
++	return true;
++}
++
++/**
++ * cxi_cq_free() - Destroy a command queue
++ *
++ * @cmdq: the command queue to release
++ */
++void cxi_cq_free(struct cxi_cq *cmdq)
++{
++	struct cxi_cq_priv *cq = container_of(cmdq, struct cxi_cq_priv, cass_cq);
++	struct cxi_lni_priv *lni_priv = cq->lni_priv;
++	struct cxi_eq_priv *eq = cq->eq;
++	struct cxi_dev *cdev = lni_priv->dev;
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++	unsigned int cq_n = cxi_cq_get_cqn(cmdq);
++	unsigned int mem_q_rd_ptr;
++
++	if (!cdev->is_physfn) {
++		cxi_cq_free_vf(cmdq);
++		return;
++	}
++
++	/* Remove access to this resource from a VF */
++	if (lni_priv->is_vf)
++		cass_config_sriovt(hw, false, lni_priv->vf_num,
++				   (cq->flags & CXI_CQ_IS_TX) ? cq_n :
++								(1024 + cq_n));
++
++	/* CQ invalidation requires disabling and setting the drain bit for the
++	 * CQ. This is done in cass_tx_cq_disable() and cass_tgt_cq_disable().
++	 *
++	 * By the time the read pointer is stable, the buffer is not
++	 * accessed anymore and can be freed.
++	 */
++	if (cq->flags & CXI_CQ_IS_TX) {
++		union c_cq_txq_rdptr_table rd_ptr;
++
++		cass_tx_cq_disable(hw, cq_n);
++
++		cass_read(hw, C_CQ_TXQ_RDPTR_TABLE(cq_n),
++			  &rd_ptr, sizeof(rd_ptr));
++		mem_q_rd_ptr = rd_ptr.mem_q_rd_ptr;
++
++		while (true) {
++			cass_read(hw, C_CQ_TXQ_RDPTR_TABLE(cq_n),
++				  &rd_ptr, sizeof(rd_ptr));
++			if (mem_q_rd_ptr == rd_ptr.mem_q_rd_ptr)
++				break;
++			mem_q_rd_ptr = rd_ptr.mem_q_rd_ptr;
++			udelay(1);
++		}
++	} else {
++		union c_cq_tgq_rdptr_table rd_ptr;
++
++		cass_tgt_cq_disable(hw, cq_n);
++
++		cass_read(hw, C_CQ_TGQ_RDPTR_TABLE(cq_n),
++			  &rd_ptr, sizeof(rd_ptr));
++		mem_q_rd_ptr = rd_ptr.mem_q_rd_ptr;
++		while (true) {
++			cass_read(hw, C_CQ_TGQ_RDPTR_TABLE(cq_n),
++				  &rd_ptr, sizeof(rd_ptr));
++			if (mem_q_rd_ptr == rd_ptr.mem_q_rd_ptr)
++				break;
++			mem_q_rd_ptr = rd_ptr.mem_q_rd_ptr;
++			udelay(1);
++		}
++	}
++
++	if (!lni_priv->is_vf) {
++		if (!(cq->flags & CXI_CQ_USER))
++			iounmap(cq->cq_mmio);
++
++		dma_unmap_page(&hw->cdev.pdev->dev, cq->cmds_dma_addr,
++			       cq->cmds_len, DMA_BIDIRECTIONAL);
++
++		if (cq->cmds_pages) {
++			__free_pages(cq->cmds_pages, cq->cmds_order);
++		} else {
++			if (cq->md_priv) {
++				cass_device_put_pages(cq->md_priv);
++				kfree(cq->md_priv);
++			}
++
++			if (cq->pages) {
++				unpin_user_pages(cq->pages, cq->cmds_len >> PAGE_SHIFT);
++				kfree(cq->pages);
++			}
++		}
++	}
++
++	if (eq)
++		refcount_dec(&eq->refcount);
++
++	spin_lock(&lni_priv->res_lock);
++	list_del(&cq->list);
++	list_add_tail(&cq->list, &lni_priv->cq_cleanups_list);
++	spin_unlock(&lni_priv->res_lock);
++}
++EXPORT_SYMBOL(cxi_cq_free);
++
++/* Go through the list of CQ waiting for cleanup. If the CQ is quiet,
++ * it can be freed, otherwise it stays.
++ *
++ * If force is true, the CQ will be release unconditionally.
++ */
++void finalize_cq_cleanups(struct cxi_lni_priv *lni, bool force)
++{
++	struct cxi_dev *cdev = lni->dev;
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++	struct cxi_cq_priv *cq;
++	struct cxi_cq_priv *tmp;
++	struct list_head free_list;
++
++	INIT_LIST_HEAD(&free_list);
++
++	spin_lock(&lni->res_lock);
++
++	list_for_each_entry_safe(cq, tmp, &lni->cq_cleanups_list, list) {
++		unsigned int cq_n = cxi_cq_get_cqn(&cq->cass_cq);
++
++		if (!force) {
++			/* Ensure that in-flight commands are done. */
++			if (cq->flags & CXI_CQ_IS_TX) {
++				if (!is_txq_done(hw, cq_n))
++					continue;
++			} else {
++				if (!is_tgq_done(hw, cq_n))
++					continue;
++			}
++		}
++
++		list_del(&cq->list);
++		list_add(&cq->list, &free_list);
++	}
++
++	spin_unlock(&lni->res_lock);
++
++	while ((cq = list_first_entry_or_null(&free_list,
++					      struct cxi_cq_priv, list))) {
++		list_del(&cq->list);
++
++		debugfs_remove(cq->lni_dir);
++		debugfs_remove_recursive(cq->debug_dir);
++
++		refcount_dec(&lni->refcount);
++
++		if (cq->flags & CXI_CQ_IS_TX)
++			atomic_dec(&hw->stats.txq);
++		else
++			atomic_dec(&hw->stats.tgq);
++
++		put_cq_id(cq);
++	}
++}
++
++/**
++ * cxi_cq_user_info() - Get the information to mmap a cq to userspace
++ *
++ * @cmdq: the command queue
++ * @cmds_size: on return, will hold the size of the queue in 64-bytes blocks
++ * @cmds_pages: on return, will hold the pages to mmap
++ * @wp_addr: on return, will hold the CSR to control the CQ
++ * @wp_addr_size: on return, size of the CSR
++ *
++ * @return: 0, or -EINVAL is the CQ isn't for userspace
++ */
++int cxi_cq_user_info(struct cxi_cq *cmdq, size_t *cmds_size,
++		     struct page **cmds_pages, phys_addr_t *wp_addr,
++		     size_t *wp_addr_size)
++{
++	struct cxi_cq_priv *cq = container_of(cmdq, struct cxi_cq_priv, cass_cq);
++	struct cxi_lni_priv *lni_priv = cq->lni_priv;
++	struct cxi_dev *cdev = lni_priv->dev;
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++
++	if (!(cq->flags & CXI_CQ_USER))
++		return -EINVAL;
++
++	/* userspace will need to know what pages to mmap. */
++	*cmds_size = cq->cmds_len;
++	*cmds_pages = cq->cmds_pages;
++
++	*wp_addr = cq_mmio_phys_addr(hw, cq->cass_cq.idx);
++	*wp_addr_size = PAGE_SIZE;
++
++	return 0;
++}
++EXPORT_SYMBOL(cxi_cq_user_info);
++
++/**
++ * cxi_cq_ack_counter_vf() - Get the current ack counter for a CQ in VF
++ *
++ * @cmdq: CQ to get current ack counter for.
++ *
++ * Return: Current ack counter value.
++ */
++static unsigned int cxi_cq_ack_counter_vf(struct cxi_cq *cmdq)
++{
++	struct cxi_cq_priv_vf *cq_priv_vf =
++		container_of(cmdq, struct cxi_cq_priv_vf, cass_cq);
++	struct cxi_dev *dev = cq_priv_vf->lni_priv->dev;
++	const struct cxi_cq_ack_counter_cmd cmd = {
++		.op = CXI_OP_CQ_ACK_COUNTER,
++		.cq = cq_priv_vf->cass_cq.idx,
++	};
++	struct cxi_cq_ack_counter_resp resp;
++	size_t resp_len = sizeof(resp);
++	int rc;
++
++	rc = cxi_send_msg_to_pf(dev, &cmd, sizeof(cmd), &resp, &resp_len);
++	if (rc)
++		return rc;
++
++	return resp.ack_counter;
++}
++
++/**
++ * cxi_cq_ack_counter() - Get the current ack counter for a CQ.
++ *
++ * @cq: CQ to get current ack counter for.
++ *
++ * Return: Current ack counter value.
++ */
++unsigned int cxi_cq_ack_counter(struct cxi_cq *cq)
++{
++	struct cxi_cq_priv *cq_priv =
++		container_of(cq, struct cxi_cq_priv, cass_cq);
++	struct cass_dev *hw =
++		container_of(cq_priv->lni_priv->dev, struct cass_dev, cdev);
++	unsigned int cq_n = cxi_cq_get_cqn(cq);
++	union c_cq_txq_ack_ctr txq_ack_ctr;
++	union c_cq_tgq_ack_ctr tgq_ack_ctr;
++	unsigned int ack_ctr;
++
++	if (!hw->cdev.is_physfn)
++		return cxi_cq_ack_counter_vf(cq);
++
++	if (cq_priv->flags & CXI_CQ_IS_TX) {
++		cass_read(hw, C_CQ_TXQ_ACK_CTR(cq_n), &txq_ack_ctr,
++			  sizeof(txq_ack_ctr));
++		ack_ctr = txq_ack_ctr.mem_q_ack_ctr;
++	} else {
++		cass_read(hw, C_CQ_TGQ_ACK_CTR(cq_n), &tgq_ack_ctr,
++			  sizeof(tgq_ack_ctr));
++		ack_ctr = tgq_ack_ctr.mem_q_ack_ctr;
++	}
++	return ack_ctr;
++}
++EXPORT_SYMBOL(cxi_cq_ack_counter);
+diff --git a/drivers/net/ethernet/hpe/ss1/cass_ct.c b/drivers/net/ethernet/hpe/ss1/cass_ct.c
+new file mode 100644
+index 000000000000..f4d642884671
+--- /dev/null
++++ b/drivers/net/ethernet/hpe/ss1/cass_ct.c
+@@ -0,0 +1,639 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Create and destroy Cassini counting events.
++ * Copyright 2018, 2024-2026 Hewlett Packard Enterprise Development LP
++ */
++#include <linux/kernel.h>
++#include <linux/types.h>
++#include <linux/hpe/cxi/cxi.h>
++#include <linux/iopoll.h>
++
++#include "cass_core.h"
++#include "cxi_internal.h"
++#include "cass_ss1_debugfs.h"
++#include "cxi_vf_cmd.h"
++
++/* Initializes (if init is true) or cancel (if init is false) pending
++ * triggered operations on a CT.
++ */
++static int set_hw_state(struct cass_dev *hw, unsigned int ctn,
++			bool init)
++{
++	void __iomem *csr = cass_csr(hw, C_CQ_CFG_INIT_CT_HW_STATE);
++	union c_cq_cfg_init_ct_hw_state ct_hw_state;
++	int rc;
++
++	mutex_lock(&hw->ct_init_lock);
++
++	ct_hw_state.qw = 0;
++	ct_hw_state.ct_handle = ctn;
++	if (init)
++		ct_hw_state.init = 1;
++	else
++		ct_hw_state.cancel = 1;
++	cass_write(hw, C_CQ_CFG_INIT_CT_HW_STATE, &ct_hw_state.qw,
++		   sizeof(ct_hw_state));
++
++	rc = readq_poll_timeout(csr, ct_hw_state.qw,
++				ct_hw_state.pending == 0, 1, 1000000);
++	cxidev_WARN_ONCE(&hw->cdev, rc, "Timeout waiting for CT operation (%d)\n",
++			 init);
++
++	/* Need to zero cancel and init fields so that they can be reused. */
++	memset(&ct_hw_state, 0, sizeof(ct_hw_state));
++	cass_write(hw, C_CQ_CFG_INIT_CT_HW_STATE, &ct_hw_state.qw,
++		   sizeof(ct_hw_state));
++
++	mutex_unlock(&hw->ct_init_lock);
++
++	return rc;
++}
++
++/* Map the wb buffer using DMA address. Pin buffer if from user space. */
++static int ct_wb_map(struct cass_dev *hw, const struct cxi_ct_priv *ct_priv,
++		     struct ct_wb_desc *desc, struct c_ct_writeback *wb)
++{
++	static const struct c_ct_writeback wb_init = {};
++	struct device *device = &hw->cdev.pdev->dev;
++	dma_addr_t dma_addrs;
++	int rc;
++
++	desc->md_priv = NULL;
++	desc->page = NULL;
++
++	if (!ct_priv->is_user) {
++		*wb = wb_init;
++
++		if (is_vmalloc_addr(wb)) {
++			desc->wb_dma_addr = dma_map_page(device,
++							 vmalloc_to_page(wb),
++							 offset_in_page(wb),
++							 sizeof(*wb), DMA_FROM_DEVICE);
++			desc->is_map_page = 1;
++		} else {
++			desc->wb_dma_addr = dma_map_single(device, wb, sizeof(*wb),
++							   DMA_FROM_DEVICE);
++		}
++		if (dma_mapping_error(&hw->cdev.pdev->dev, desc->wb_dma_addr))
++			return -ENOMEM;
++
++		return 0;
++	}
++
++	rc = pin_user_pages_fast((unsigned long)wb, 1,
++				 FOLL_WRITE | FOLL_LONGTERM, &desc->page);
++	if (rc == 1) {
++		desc->wb_dma_addr = dma_map_single(device,
++						   page_address(desc->page) +
++						   offset_in_page(wb),
++						   sizeof(*wb), DMA_FROM_DEVICE);
++		if (dma_mapping_error(device, desc->wb_dma_addr)) {
++			unpin_user_page(desc->page);
++			desc->page = NULL;
++			return -ENOMEM;
++		}
++
++		return 0;
++	}
++
++	desc->md_priv = cass_device_md(ct_priv->lni_priv, (u64)wb, sizeof(*wb),
++				       &dma_addrs);
++	if (IS_ERR(desc->md_priv))
++		return PTR_ERR(desc->md_priv);
++
++	desc->wb_dma_addr = dma_addrs + offset_in_page(wb);
++
++	return 0;
++}
++
++static void ct_wb_unmap(struct cass_dev *hw, const struct cxi_ct_priv *ct_priv,
++			struct ct_wb_desc *desc)
++{
++	if (desc->wb_dma_addr == 0)
++		return;
++
++	/* The presence of md_priv indicates device memory which is unmapped
++	 * when the pages are released.
++	 */
++	if (desc->md_priv == NULL) {
++		if (desc->is_map_page)
++			dma_unmap_page(&hw->cdev.pdev->dev, desc->wb_dma_addr,
++				       sizeof(struct c_ct_writeback),
++				       DMA_FROM_DEVICE);
++		else
++			dma_unmap_single(&hw->cdev.pdev->dev, desc->wb_dma_addr,
++					 sizeof(struct c_ct_writeback),
++					 DMA_FROM_DEVICE);
++	}
++
++	if (!ct_priv->is_user)
++		return;
++
++	if (desc->page) {
++		unpin_user_page(desc->page);
++		desc->page = NULL;
++	} else if (desc->md_priv) {
++		p2p_ops.put_pages(desc->md_priv);
++		kfree(desc->md_priv);
++		desc->md_priv = NULL;
++	}
++}
++
++static struct cxi_ct *cxi_ct_alloc_vf(struct cxi_lni *lni,
++				      struct c_ct_writeback *wb, bool is_user)
++{
++	struct cxi_dev *dev = container_of(lni, struct cxi_lni_priv_vf, lni)->dev;
++	struct cass_dev *hw = container_of(dev, struct cass_dev, cdev);
++	struct cxi_ct_priv *ct_priv;
++	int rc;
++	int ctn;
++	struct cxi_ct_alloc_cmd_vf cmd = {
++		.base.op = CXI_OP_CT_ALLOC,
++		.base.lni = lni->id,
++	};
++	struct cxi_ct_alloc_resp resp = {};
++	size_t resp_len = sizeof(resp);
++	struct cxi_ct_free_cmd free_cmd = {
++		.op = CXI_OP_CT_FREE,
++	};
++
++	/* WB address must be 8-byte aligned. */
++	if (!IS_ALIGNED((u64)wb, 8))
++		return ERR_PTR(-EINVAL);
++
++	ct_priv = kzalloc(sizeof(*ct_priv), GFP_KERNEL);
++	if (!ct_priv)
++		return ERR_PTR(-ENOMEM);
++	ct_priv->lni_priv = container_of(lni, struct cxi_lni_priv, lni);
++	ct_priv->is_user = is_user;
++
++	/* A WB address context of zero means that WB is disabled for the CT. */
++	if (wb) {
++		rc = ct_wb_map(hw, ct_priv, &ct_priv->wb_desc, wb);
++		if (rc)
++			goto free_ct_priv;
++	} else {
++		ct_priv->wb_desc.wb_dma_addr = 0;
++	}
++
++	cmd.wb_dma_addr = ct_priv->wb_desc.wb_dma_addr;
++
++	rc = cxi_send_msg_to_pf(dev, &cmd, sizeof(cmd), &resp, &resp_len);
++	if (rc)
++		goto unmap_wb;
++
++	ctn = resp.ctn;
++	ct_priv->ct.ctn = ctn;
++
++	if (!is_user) {
++		phys_addr_t mmio_phys = hw->regs_base + C_MEMORG_CQ_TOU +
++				ctn * C_TOU_LAUNCH_PAGE_SIZE;
++		ct_priv->ct_mmio = ioremap(mmio_phys, PAGE_SIZE);
++		if (!ct_priv->ct_mmio) {
++			cxidev_warn_once(dev, "ioremap failed\n");
++			rc = -ENOMEM;
++			goto free_pf_ct;
++		}
++	}
++
++	return &ct_priv->ct;
++
++free_pf_ct:
++	free_cmd.ctn = ctn;
++	resp_len = 0;
++	cxi_send_msg_to_pf(dev, &free_cmd, sizeof(free_cmd), NULL, &resp_len);
++unmap_wb:
++	if (wb)
++		ct_wb_unmap(hw, ct_priv, &ct_priv->wb_desc);
++free_ct_priv:
++	kfree(ct_priv);
++	return ERR_PTR(rc);
++}
++
++/**
++ * cxi_ct_alloc_internal() - Allocate a counting event (internal implementation
++ * to handle VF requests)
++ *
++ * @lni: LNI counting event is allocated against
++ * @wb: User defined writeback buffer, must be DMA-able.
++ * @is_user: Non-zero value if the counting event is for userspace.
++ * @wb_dma_addr: Pre-mapped DMA address for writeback buffer (for requests from VF)
++ *
++ * Writeback buffer is optional. If @wb is NULL, the wb field in the returned
++ * cxi_ct will also be NULL. @wb must be NULL in requests coming from VFs, the
++ * writeback buffer (if any) is passed using wb_dma_addr, having already been
++ * mapped by the VF.
++ *
++ * Return: Valid pointer on success. Else, negative errno pointer.
++ */
++struct cxi_ct *cxi_ct_alloc_internal(struct cxi_lni *lni,
++				     struct c_ct_writeback *wb, bool is_user,
++				     dma_addr_t wb_dma_addr)
++{
++	struct cxi_lni_priv *lni_priv =
++		container_of(lni, struct cxi_lni_priv, lni);
++	struct cxi_dev *dev = lni_priv->dev;
++	struct cass_dev *hw =
++		container_of(dev, struct cass_dev, cdev);
++	struct cxi_ct_priv *ct_priv;
++	u16 wb_ac;
++	int rc;
++	int ctn;
++
++	/* WB address must be 8-byte aligned. */
++	if (!IS_ALIGNED((u64)wb, 8))
++		return ERR_PTR(-EINVAL);
++
++	ct_priv = kzalloc(sizeof(*ct_priv), GFP_KERNEL);
++	if (!ct_priv)
++		return ERR_PTR(-ENOMEM);
++	ct_priv->lni_priv = lni_priv;
++	ct_priv->is_user = is_user;
++
++	/* Check the associated service to see if this CT can be allocated */
++	rc = cxi_rgroup_alloc_resource(lni_priv->rgroup, CXI_RESOURCE_CT);
++	if (rc)
++		goto free_ct_priv;
++
++	/*
++	 * A WB address context of zero means that WB is disabled for
++	 * the CT.
++	 */
++	if (wb) {
++		rc = ct_wb_map(hw, ct_priv, &ct_priv->wb_desc, wb);
++		if (rc)
++			goto dec_rsrc_use;
++		wb_ac = lni_priv->phys_ac;
++	} else if (wb_dma_addr) {
++		ct_priv->wb_desc.wb_dma_addr = wb_dma_addr;
++		wb_ac = lni_priv->phys_ac;
++	} else {
++		ct_priv->wb_desc.wb_dma_addr = 0;
++		wb_ac = C_AC_NONE;
++	}
++
++	/* Allocate and configure the counting event. */
++	rc = ida_alloc_range(&hw->ct_table, 1, C_NUM_CTS - 1, GFP_KERNEL);
++	if (rc < 0)
++		goto free_md_priv;
++	ctn = rc;
++
++	if (!is_user) {
++		phys_addr_t mmio_phys = hw->regs_base + C_MEMORG_CQ_TOU +
++				ctn * C_TOU_LAUNCH_PAGE_SIZE;
++		ct_priv->ct_mmio = ioremap(mmio_phys, PAGE_SIZE);
++		if (!ct_priv->ct_mmio) {
++			cxidev_warn_once(dev, "ioremap failed\n");
++			rc = -ENOMEM;
++			goto ct_release;
++		}
++	}
++
++	/* Reset the hardware CT. */
++	rc = set_hw_state(hw, ctn, true);
++	if (rc)
++		goto ct_unmap;
++
++	if (lni_priv->is_vf)
++		cass_config_sriovt(hw, true, lni_priv->vf_num, 2048 + ctn);
++
++	/* Finally the CT can be enabled */
++	cxi_ct_init(&ct_priv->ct, wb, ctn, (__force u64 *)ct_priv->ct_mmio);
++	cass_ct_enable(hw, ctn, lni_priv->lni.rgid, ct_priv->wb_desc.wb_dma_addr, wb_ac);
++
++	/* Track the counting event. */
++	spin_lock(&lni_priv->res_lock);
++	list_add_tail(&ct_priv->entry, &lni_priv->ct_list);
++	refcount_inc(&lni_priv->refcount);
++	atomic_inc(&hw->stats.ct);
++	spin_unlock(&lni_priv->res_lock);
++
++	ct_debugfs_setup(ct_priv->ct.ctn, ct_priv, hw, lni_priv);
++
++	return &ct_priv->ct;
++
++ct_unmap:
++	if (!is_user)
++		iounmap(ct_priv->ct_mmio);
++ct_release:
++	ida_free(&hw->ct_table, ctn);
++free_md_priv:
++	if (wb)
++		ct_wb_unmap(hw, ct_priv, &ct_priv->wb_desc);
++dec_rsrc_use:
++	cxi_rgroup_free_resource(lni_priv->rgroup, CXI_RESOURCE_CT);
++free_ct_priv:
++	kfree(ct_priv);
++
++	return ERR_PTR(rc);
++}
++EXPORT_SYMBOL(cxi_ct_alloc_internal);
++
++/**
++ * cxi_ct_alloc() - Allocate a counting event
++ *
++ * @lni: LNI counting event is allocated against
++ * @wb: User defined writeback buffer, must be DMA-able.
++ * @is_user: Non-zero value if the counting event is for userspace.
++ *
++ * Writeback buffer is optional. If @wb is NULL, the wb field in the returned
++ * cxi_ct will also be NULL.
++ *
++ * Return: Valid pointer on success. Else, negative errno pointer.
++ */
++struct cxi_ct *cxi_ct_alloc(struct cxi_lni *lni,
++			    struct c_ct_writeback *wb, bool is_user)
++{
++	struct cxi_dev *dev = container_of(lni, struct cxi_lni_priv, lni)->dev;
++
++	if (dev->is_physfn)
++		return cxi_ct_alloc_internal(lni, wb, is_user, 0);
++	else
++		return cxi_ct_alloc_vf(lni, wb, is_user);
++}
++EXPORT_SYMBOL(cxi_ct_alloc);
++
++/* Wait for credits_in_use.tou_wb_credits to drain to 0. We then know that
++ * no more writebacks are in progress.
++ */
++static int drain_wb_credits(struct cass_dev *hw)
++{
++	ktime_t timeout;
++	int timeout_us = 1000;
++	union c_cq_sts_credits_in_use in_use;
++
++	timeout = ktime_add_us(ktime_get(), timeout_us);
++
++	for (;;) {
++		cass_read(hw, C_CQ_STS_CREDITS_IN_USE, &in_use,
++			  sizeof(in_use));
++
++		if (in_use.tou_wb_credits == 0)
++			return 0;
++
++		if (ktime_compare(ktime_get(), timeout) > 0)
++			return -ETIMEDOUT;
++
++		usleep_range(5, 20);
++	}
++}
++
++static int cxi_ct_wb_update_vf(struct cxi_ct *ct, struct c_ct_writeback *wb)
++{
++	struct cxi_ct_priv *ct_priv = container_of(ct, struct cxi_ct_priv, ct);
++	struct cxi_dev *dev = ct_priv->lni_priv->dev;
++	struct cass_dev *hw = container_of(dev, struct cass_dev, cdev);
++	struct cxi_ct_wb_update_cmd_vf cmd = {
++		.base.op = CXI_OP_CT_WB_UPDATE,
++		.base.ctn = ct->ctn,
++	};
++	size_t resp_len = 0;
++	struct ct_wb_desc new_desc;
++	int rc;
++
++	if (!wb)
++		return -EINVAL;
++
++	rc = ct_wb_map(hw, ct_priv, &new_desc, wb);
++	if (rc)
++		return rc;
++
++	cmd.wb_dma_addr = new_desc.wb_dma_addr;
++
++	rc = cxi_send_msg_to_pf(dev, &cmd, sizeof(cmd), NULL, &resp_len);
++	if (rc)
++		goto unmap_new_desc;
++
++	/* Previous pinned pages need to be cleaned up. */
++	ct_wb_unmap(hw, ct_priv, &ct_priv->wb_desc);
++	ct_priv->wb_desc = new_desc;
++
++	/* finally, save the new wb */
++	ct->wb = wb;
++
++	return 0;
++
++unmap_new_desc:
++	ct_wb_unmap(hw, ct_priv, &new_desc);
++	return rc;
++}
++
++/**
++ * cxi_ct_wb_update_internal() - Update a counting event with a new writeback
++ * address (internal implementation to handle VF requests)
++ *
++ * Flush by setting c_cq_cfg_credit_limits.tou_wb_credits to 0. When
++ * c_cq_sts_credits_in_use.tou_wb_credits is 0, then no writebacks are
++ * in progress. Re-enable the c_cq_cfg_credit_limits.tou_wb_credits.
++ *
++ * @ct: Counting event
++ * @wb: User defined writeback buffer, must be DMA-able.
++ * @wb_dma_addr: Pre-mapped DMA address for writeback buffer (for requests from VF)
++ *
++ * As documented in cxi_ct_alloc_internal(), @wb must be NULL in requests coming
++ * from VFs, the new writeback buffer is passed using @wb_dma_addr, having
++ * already been mapped by the VF.
++ */
++int cxi_ct_wb_update_internal(struct cxi_ct *ct, struct c_ct_writeback *wb,
++			      dma_addr_t wb_dma_addr)
++{
++	struct cxi_ct_priv *ct_priv = container_of(ct, struct cxi_ct_priv, ct);
++	struct cxi_lni_priv *lni_priv = ct_priv->lni_priv;
++	struct cass_dev *hw =
++		container_of(lni_priv->dev, struct cass_dev, cdev);
++	union c_cq_cfg_credit_limits limits = {};
++	union c_cq_cfg_ct_wb_mem_addr mem = {
++		.wb_mem_context = lni_priv->phys_ac,
++	};
++	struct ct_wb_desc new_desc = {};
++	int wb_credits = 0;
++	int rc = 0;
++
++	// TODO: write pycxi test for this fn + driver test
++
++	if (!wb && !wb_dma_addr)
++		return -EINVAL;
++
++	if (!lni_priv->is_vf) {
++		rc = ct_wb_map(hw, ct_priv, &new_desc, wb);
++		if (rc)
++			return rc;
++	} else {
++		new_desc.wb_dma_addr = wb_dma_addr;
++	}
++
++	mutex_lock(&hw->ct_init_lock);
++
++	/* If wb is valid, it may be in use. */
++	if (ct_priv->wb_desc.wb_dma_addr) {
++		/* stop wb writes */
++		cass_read(hw, C_CQ_CFG_CREDIT_LIMITS, &limits, sizeof(limits));
++		wb_credits = limits.tou_wb_credits;
++		limits.tou_wb_credits = 0;
++		cass_write(hw, C_CQ_CFG_CREDIT_LIMITS, &limits, sizeof(limits));
++
++		rc = drain_wb_credits(hw);
++		if (rc)
++			goto set_limit;
++	}
++
++	mem.wb_mem_addr = new_desc.wb_dma_addr >> 3;
++	cass_write(hw, C_CQ_CFG_CT_WB_MEM_ADDR(ct->ctn), &mem, sizeof(mem));
++	cass_flush_pci(hw);
++
++	/* Previous pinned pages need to be cleaned up. */
++	if (!lni_priv->is_vf)
++		ct_wb_unmap(hw, ct_priv, &ct_priv->wb_desc);
++
++set_limit:
++	if (ct_priv->wb_desc.wb_dma_addr) {
++		limits.tou_wb_credits = wb_credits;
++		cass_write(hw, C_CQ_CFG_CREDIT_LIMITS, &limits, sizeof(limits));
++	}
++
++	/* finally, save the new wb */
++	if (!rc) {
++		ct->wb = wb;
++		ct_priv->wb_desc = new_desc;
++	}
++	mutex_unlock(&hw->ct_init_lock);
++
++	if (rc && !lni_priv->is_vf)
++		ct_wb_unmap(hw, ct_priv, &new_desc);
++
++	return rc;
++}
++EXPORT_SYMBOL(cxi_ct_wb_update_internal);
++
++/**
++ * cxi_ct_wb_update() - Update a counting event with a new writeback address.
++ *
++ * Flush by setting c_cq_cfg_credit_limits.tou_wb_credits to 0. When
++ * c_cq_sts_credits_in_use.tou_wb_credits is 0, then no writebacks are
++ * in progress. Re-enable the c_cq_cfg_credit_limits.tou_wb_credits.
++ *
++ * @ct: Counting event
++ * @wb: User defined writeback buffer, must be DMA-able.
++ */
++int cxi_ct_wb_update(struct cxi_ct *ct, struct c_ct_writeback *wb)
++{
++	struct cxi_ct_priv *ct_priv = container_of(ct, struct cxi_ct_priv, ct);
++
++	if (!ct_priv->lni_priv->dev->is_physfn)
++		return cxi_ct_wb_update_vf(ct, wb);
++	else
++		return cxi_ct_wb_update_internal(ct, wb, 0);
++}
++EXPORT_SYMBOL(cxi_ct_wb_update);
++
++static void cxi_ct_free_vf(struct cxi_ct *ct)
++{
++	struct cxi_ct_priv *ct_priv = container_of(ct, struct cxi_ct_priv, ct);
++	struct cxi_dev *dev = ct_priv->lni_priv->dev;
++	struct cass_dev *hw = container_of(dev, struct cass_dev, cdev);
++	struct cxi_ct_free_cmd cmd = {
++		.op = CXI_OP_CT_FREE,
++		.ctn = ct->ctn,
++	};
++	size_t resp_len = 0;
++
++	/* Inform PF to free the CT */
++	cxi_send_msg_to_pf(dev, &cmd, sizeof(cmd), NULL, &resp_len);
++
++	if (!ct_priv->is_user)
++		iounmap(ct_priv->ct_mmio);
++
++	ct_wb_unmap(hw, ct_priv, &ct_priv->wb_desc);
++}
++
++/**
++ * cxi_ct_free() - Free a counting event.
++ * @ct: Counting event
++ */
++void cxi_ct_free(struct cxi_ct *ct)
++{
++	struct cxi_ct_priv *ct_priv = container_of(ct, struct cxi_ct_priv, ct);
++	struct cxi_lni_priv *lni_priv = ct_priv->lni_priv;
++	struct cass_dev *hw =
++		container_of(lni_priv->dev, struct cass_dev, cdev);
++
++	if (!hw->cdev.is_physfn) {
++		cxi_ct_free_vf(ct);
++		return;
++	}
++
++	/* Change ownership to the driver. */
++	cass_ct_disable(hw, ct_priv->ct.ctn);
++
++	if (lni_priv->is_vf)
++		cass_config_sriovt(hw, false, lni_priv->vf_num, 2048 + ct_priv->ct.ctn);
++
++	/* Cancel all pending operations. */
++	set_hw_state(hw, ct_priv->ct.ctn, false);
++
++	spin_lock(&lni_priv->res_lock);
++	list_del(&ct_priv->entry);
++	spin_unlock(&lni_priv->res_lock);
++
++	if (!ct_priv->is_user)
++		iounmap(ct_priv->ct_mmio);
++
++	if (!lni_priv->is_vf)
++		ct_wb_unmap(hw, ct_priv, &ct_priv->wb_desc);
++
++	/* Hang the CT on the LNI pending deletion list, to be
++	 * released later
++	 */
++	spin_lock(&lni_priv->res_lock);
++	list_add_tail(&ct_priv->entry, &lni_priv->ct_cleanups_list);
++	spin_unlock(&lni_priv->res_lock);
++}
++EXPORT_SYMBOL(cxi_ct_free);
++
++/* Finish releasing all the CTs on the deletion pending list */
++void finalize_ct_cleanups(struct cxi_lni_priv *lni)
++{
++	struct cxi_dev *dev = lni->dev;
++	struct cass_dev *hw = container_of(dev, struct cass_dev, cdev);
++	struct cxi_ct_priv *ct;
++
++	while ((ct = list_first_entry_or_null(&lni->ct_cleanups_list,
++					      struct cxi_ct_priv, entry))) {
++		list_del(&ct->entry);
++
++		debugfs_remove(ct->lni_dir);
++		debugfs_remove_recursive(ct->debug_dir);
++
++		refcount_dec(&lni->refcount);
++		atomic_dec(&hw->stats.ct);
++		cxi_rgroup_free_resource(lni->rgroup, CXI_RESOURCE_CT);
++		ida_free(&hw->ct_table, ct->ct.ctn);
++		kfree(ct);
++	}
++}
++
++/**
++ * cxi_ct_user_info() - Get userspace mmap info for counting event doorbell.
++ * @ct: Counting event
++ * @doorbell_addr: On success, will contain the address of the doorbell.
++ * @doorbell_size: On success, will contain the size of the doorbell.
++ *
++ * Return: On success, returns zero. On error, returns a negative error number.
++ */
++int cxi_ct_user_info(struct cxi_ct *ct, phys_addr_t *doorbell_addr,
++		     size_t *doorbell_size)
++{
++	struct cxi_ct_priv *ct_priv = container_of(ct, struct cxi_ct_priv, ct);
++	struct cass_dev *hw = container_of(ct_priv->lni_priv->dev,
++					   struct cass_dev, cdev);
++
++	if (!ct_priv->is_user)
++		return -EINVAL;
++
++	*doorbell_addr = hw->regs_base + C_MEMORG_CQ_TOU +
++		(ct->ctn * C_TOU_LAUNCH_PAGE_SIZE);
++	*doorbell_size = PAGE_SIZE;
++
++	return 0;
++}
++EXPORT_SYMBOL(cxi_ct_user_info);
+diff --git a/drivers/net/ethernet/hpe/ss1/cass_dmac.c b/drivers/net/ethernet/hpe/ss1/cass_dmac.c
+new file mode 100644
+index 000000000000..5c1e4f335a6d
+--- /dev/null
++++ b/drivers/net/ethernet/hpe/ss1/cass_dmac.c
+@@ -0,0 +1,597 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright 2020-2021, 2024-2026 Hewlett Packard Enterprise Development LP */
++
++#include <linux/iopoll.h>
++#include <linux/bitmap.h>
++
++#include "cass_core.h"
++#include "cass_ss1_debugfs.h"
++
++#define DMAC_DESC_INDEX_UNSPECIFIED		((u16)(~0))
++
++/*
++ * A transfer copies at most a few KB of NIC CSRs and normally finishes in
++ * well under a millisecond, so this is only the limit for a stuck engine.
++ */
++#define CASS_DMAC_XFER_TIMEOUT_MS		5000
++
++/*
++ * _must_ only be called when holding mutex hw->dmac.lock
++ * TODO: add kernel 'requires_lock' annotations
++ */
++static int cass_dmac_desc_set_id_verify(struct cass_dev *hw, int set_id)
++{
++	if (set_id < 0 || set_id >= DMAC_DESC_SET_COUNT ||
++	    hw->dmac.desc_sets[set_id].count == 0)
++		return -EINVAL;
++	return 0;
++}
++
++static void dmac_desc_zero_n(struct cass_dev *hw, u16 desc_index, u16 count)
++{
++	cass_clear(hw, C_PI_CFG_DMAC_DESC(desc_index),
++		   sizeof(union c_pi_cfg_dmac_desc) * count);
++	cass_flush_pci(hw);
++}
++
++static void dmac_desc_zero_all(struct cass_dev *hw)
++{
++	dmac_desc_zero_n(hw, 0, C_PI_CFG_DMAC_DESC_NUM_AVAILABLE_ENTRIES -
++			 C_PI_CFG_DMAC_DESC_NUM_RSVD_ENTRIES);
++}
++
++static void dmac_disable(struct cass_dev *hw)
++{
++	/* Disable DMAC */
++	cass_clear(hw, C_PI_CFG_DMAC, C_PI_CFG_DMAC_SIZE);
++	cass_flush_pci(hw);
++}
++
++static void dmac_enable(struct cass_dev *hw, u16 desc_index)
++{
++	union c_pi_cfg_dmac dmac = {
++		.desc_index	  = desc_index,
++		.enable		  = 1,
++		.start		  = 1,
++		.cpl_event_enable = 1,
++		.irq_on_done	  = 1,
++		.irq_on_error	  = 1
++	};
++
++	/* Enable DMAC */
++	cass_write(hw, C_PI_CFG_DMAC, &dmac, sizeof(dmac));
++	cass_flush_pci(hw);
++}
++
++/**
++ * cxi_dmac_desc_set_reset() - reset number used to zero
++ * @cdev: the device
++ * @set_id: dmac descriptor set id
++ *
++ * reset the number of used descriptors associated with the supplied
++ * dmac descriptor set id to zero
++ *
++ * Return: 0 on success, negative errno on failure
++ */
++int cxi_dmac_desc_set_reset(struct cxi_dev *cdev, int set_id)
++{
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++	int retval;
++
++	if (!cdev->is_physfn)
++		return -EPERM;
++
++	mutex_lock(&hw->dmac.lock);
++
++	retval = cass_dmac_desc_set_id_verify(hw, set_id);
++	if (retval == 0)
++		hw->dmac.desc_sets[set_id].numused = 0;
++
++	mutex_unlock(&hw->dmac.lock);
++	return retval;
++}
++EXPORT_SYMBOL(cxi_dmac_desc_set_reset);
++
++/**
++ * cxi_dmac_desc_set_add() - write the next descriptor in the set
++ * @cdev: the device
++ * @set_id: dmac descriptor set id
++ * @dst: DMA address of host buffer
++ * @src: starting nic csr offset
++ * @len: length to read, in bytes. must be a multiple of 8 (sizeof(u64))
++ *
++ * use the supplied parameters to write the appropriate values to the
++ * next descriptor in the supplied dmac descriptor set id and
++ * if this is not the first descriptor in the set written then set
++ * the continue flag of previous descriptor to true
++ *
++ * Return: 0 on success, negative errno on failure
++ */
++int cxi_dmac_desc_set_add(struct cxi_dev *cdev, int set_id, dma_addr_t dst,
++			  u32 src, size_t len)
++{
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++	int retval = 0;
++	u16 count;
++	u16 index;
++	u16 numused;
++	union c_pi_cfg_dmac_desc desc = {};
++	u32 src_end;
++	const u32 u64count = len / sizeof(u64);
++
++	if (!cdev->is_physfn)
++		return -EPERM;
++
++	/*
++	 * dst address and src offset must be 64-bit aligned
++	 *
++	 * len must be a multiple of 8 (sizeof(u64))
++	 *
++	 * u64count can not be zero and u64count - 1 must fit in 20-bits
++	 *
++	 * cxi csr offsets are within 29 bits
++	 *      the starting & ending src offsets
++	 *      must be contained in 29 bits.
++	 *
++	 * if src offset crosses 23 bit addr boundary,
++	 * then src must be 128 byte aligned
++	 */
++
++	if (!IS_ALIGNED(dst, 8)) {
++		cxidev_err(cdev,
++			   "destination address is not 64-bit aligned: 0x%016llx\n",
++			   dst);
++		return -EINVAL;
++	}
++
++	if ((len % sizeof(u64)) != 0) {
++		cxidev_err(cdev,
++			   "length is not multiple of 8 (sizeof(u64)): %ld\n",
++			   len);
++		return -EINVAL;
++	}
++	if (u64count == 0) {
++		cxidev_err(cdev, "length is zero\n");
++		return -EINVAL;
++	}
++	if (u64count > 0x00100000UL || len != u64count * sizeof(u64)) {
++		cxidev_err(cdev, "length is too large: %ld\n", len);
++		return -EINVAL;
++	}
++
++	if (!IS_ALIGNED(src, 8)) {
++		cxidev_err(cdev,
++			   "source offset is not 64-bit aligned: 0x%08x\n",
++			   src);
++		return -EINVAL;
++	}
++	if (src >= C_MEMORG_CSR_SIZE) {
++		cxidev_err(cdev,
++			   "starting source offset is out of range: 0x%08x\n",
++			   src);
++		return -EINVAL;
++	}
++	src_end = src + (u64count - 1) * sizeof(u64);
++	if (src_end >= C_MEMORG_CSR_SIZE) {
++		cxidev_err(cdev,
++			   "ending source offset is out of range: 0x%08x\n",
++			   src_end);
++		return -EINVAL;
++	}
++	if ((src & 0xff000000UL) != (src_end & 0xff000000UL) &&
++	    (src & 0x7fUL) != 0) {
++		cxidev_err(cdev,
++			   "source offset should be 128-byte aligned when transfer crosses bit-23: 0x%08x 0x%08x\n",
++			   src, src_end);
++		return -EINVAL;
++	}
++
++	mutex_lock(&hw->dmac.lock);
++
++	retval = cass_dmac_desc_set_id_verify(hw, set_id);
++	if (retval != 0)
++		goto __cxi_dmac_desc_set_add_0;
++
++	count = hw->dmac.desc_sets[set_id].count;
++	index = hw->dmac.desc_sets[set_id].index;
++	numused  = hw->dmac.desc_sets[set_id].numused;
++
++	if (numused == count) {
++		retval = -ENOSPC;
++		goto __cxi_dmac_desc_set_add_0;
++	}
++
++	desc.dst_addr = dst >> 3;
++	desc.src_addr = src >> 3;
++	desc.length   = u64count - 1;
++
++	/*
++	 * write the descriptor
++	 */
++	cass_write(hw, C_PI_CFG_DMAC_DESC(index + numused), &desc, sizeof(desc));
++
++	/*
++	 * if the added descriptor is not the first one (0th index) of the set,
++	 * then modify previous descriptor's cont flag to be 1 indicating to
++	 * chain to the next descriptor.
++	 */
++	if (numused != 0) {
++		cass_read(hw, C_PI_CFG_DMAC_DESC(index + numused - 1) +
++			  sizeof(desc.qw[0]), &desc.qw[1],
++			  sizeof(desc.qw[1]));
++		desc.cont = 1;
++		cass_write(hw, C_PI_CFG_DMAC_DESC(index + numused - 1) +
++			   sizeof(desc.qw[0]), &desc.qw[1],
++			   sizeof(desc.qw[1]));
++	}
++
++	++hw->dmac.desc_sets[set_id].numused;
++
++__cxi_dmac_desc_set_add_0:
++	mutex_unlock(&hw->dmac.lock);
++	return retval;
++}
++EXPORT_SYMBOL(cxi_dmac_desc_set_add);
++
++/*
++ * _must_ only be called when holding mutex hw->dmac.lock
++ */
++static void cass_dmac_desc_set_id_fill(struct cass_dev *hw, int set_id,
++				       u16 num_descs, u16 index,
++				       const char *name)
++{
++	cxidev_dbg(&hw->cdev, "set_id=%d num_descs=%u index=%u\n",
++		   set_id, num_descs, index);
++	hw->dmac.desc_sets[set_id].count = num_descs;
++	hw->dmac.desc_sets[set_id].index = index;
++	hw->dmac.desc_sets[set_id].numused  = 0;
++	hw->dmac.desc_sets[set_id].name = name;
++}
++
++/*
++ * _must_ only be called when holding mutex hw->dmac.lock
++ */
++static void cass_dmac_desc_set_id_clear(struct cass_dev *hw, int set_id)
++{
++	cass_dmac_desc_set_id_fill(hw, set_id, 0, DMAC_DESC_INDEX_UNSPECIFIED,
++				   NULL);
++}
++
++static int cass_dmac_desc_set_common_alloc(struct cass_dev *hw,
++					   u16 num_descs, u16 desc_idx,
++					   const char *name)
++{
++	int retval;
++	int i;
++	int set_id;
++	unsigned long index;
++	u16 idx = ((desc_idx == DMAC_DESC_INDEX_UNSPECIFIED) ? 0 : desc_idx);
++
++	if (num_descs == 0 || num_descs >= C_PI_CFG_DMAC_DESC_ENTRIES)
++		return -EINVAL;
++
++	mutex_lock(&hw->dmac.lock);
++
++	for (i = 0; i < DMAC_DESC_SET_COUNT; ++i)
++		if (hw->dmac.desc_sets[i].count == 0)
++			break;
++	if (i == DMAC_DESC_SET_COUNT) {
++		retval = -ENOSPC;
++		goto __cass_dmac_desc_set_common_alloc_0;
++	} else {
++		set_id = i;
++	}
++
++	index = bitmap_find_next_zero_area(hw->dmac.desc_map,
++					   C_PI_CFG_DMAC_DESC_ENTRIES,
++					   idx, num_descs, 0);
++
++	if (index >= C_PI_CFG_DMAC_DESC_ENTRIES) {
++		retval = -ENOSPC;
++		goto __cass_dmac_desc_set_common_alloc_0;
++	}
++
++	if (desc_idx != DMAC_DESC_INDEX_UNSPECIFIED && index != desc_idx) {
++		retval = -ENOSPC;
++		goto __cass_dmac_desc_set_common_alloc_0;
++	}
++
++	bitmap_set(hw->dmac.desc_map, index, num_descs);
++	cass_dmac_desc_set_id_fill(hw, set_id, num_descs, index, name);
++
++	retval = set_id;
++
++__cass_dmac_desc_set_common_alloc_0:
++	mutex_unlock(&hw->dmac.lock);
++	return retval;
++}
++
++/**
++ * cxi_dmac_desc_set_reserve() - reserve dmac descriptors
++ * @cdev: the device
++ * @num_descs: number of descriptors to reserve
++ * @desc_idx: starting NIC dmac descriptor
++ * @name: descriptive name to associate the dmac descriptor set
++ *        where the string must remain valid for the lifetime of the set
++ *
++ * reserve 'num_descs' contiguous from the NIC dmac descriptor pool
++ * starting with index 'desc_idx'
++ *
++ * Return: dmac descriptor set id on success, negative errno on failure
++ */
++int cxi_dmac_desc_set_reserve(struct cxi_dev *cdev, u16 num_descs,
++			      u16 desc_idx, const char *name)
++{
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++	int retval;
++
++	if (!cdev->is_physfn)
++		return -EPERM;
++
++	cxidev_dbg(cdev, "hw=%p num_descs=%u desc_idx=%u\n", hw, num_descs,
++		   desc_idx);
++
++	if (desc_idx >= C_PI_CFG_DMAC_DESC_ENTRIES)
++		return -EINVAL;
++
++	retval = cass_dmac_desc_set_common_alloc(hw, num_descs, desc_idx,
++						 name);
++	return retval;
++}
++EXPORT_SYMBOL(cxi_dmac_desc_set_reserve);
++
++/**
++ * cxi_dmac_desc_set_alloc() - allocate dmac descriptors
++ * @cdev: the device
++ * @num_descs: number of descriptors to reserve
++ * @name: descriptive name to associate the dmac descriptor set
++ *        where the string must remain valid for the lifetime of the set
++ *
++ * allocate 'num_descs' contiguous from the NIC dmac descriptor free pool
++ *
++ * Return: dmac descriptor set id on success, negative errno on failure
++ */
++int cxi_dmac_desc_set_alloc(struct cxi_dev *cdev, u16 num_descs,
++			    const char *name)
++{
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++	int retval;
++
++	if (!cdev->is_physfn)
++		return -EPERM;
++
++	cxidev_dbg(cdev, "hw=%p num_descs=%u\n", hw, num_descs);
++
++	retval = cass_dmac_desc_set_common_alloc(hw, num_descs,
++						 DMAC_DESC_INDEX_UNSPECIFIED,
++						 name);
++
++	return retval;
++}
++EXPORT_SYMBOL(cxi_dmac_desc_set_alloc);
++
++/**
++ * cxi_dmac_desc_set_free() - free dmac descriptors
++ * @cdev: the device
++ * @set_id: dmac descriptor set id
++ *
++ * free the descriptors associated with 'set_id' returning them
++ * back to the free pool
++ *
++ * Return: 0 on success, negative errno on failure
++ */
++int cxi_dmac_desc_set_free(struct cxi_dev *cdev, int set_id)
++{
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++	int retval = 0;
++	u16 count;
++	u16 index;
++
++	if (!cdev->is_physfn)
++		return -EPERM;
++
++	cxidev_dbg(cdev, "hw=%p set_id=%d\n", hw, set_id);
++
++	mutex_lock(&hw->dmac.lock);
++
++	retval = cass_dmac_desc_set_id_verify(hw, set_id);
++	if (retval != 0)
++		goto __cxi_dmac_desc_set_free_0;
++
++	count = hw->dmac.desc_sets[set_id].count;
++	index = hw->dmac.desc_sets[set_id].index;
++
++	dmac_desc_zero_n(hw, index, count);
++	bitmap_clear(hw->dmac.desc_map, index, count);
++
++	cass_dmac_desc_set_id_clear(hw, set_id);
++
++__cxi_dmac_desc_set_free_0:
++	mutex_unlock(&hw->dmac.lock);
++	return retval;
++}
++EXPORT_SYMBOL(cxi_dmac_desc_set_free);
++
++/**
++ * cxi_dmac_xfer() - start dma & wait/block for completion
++ * @cdev: the device
++ * @set_id: dmac descriptor set id
++ *
++ * Return: 0 on success, negative errno on failure
++ */
++int cxi_dmac_xfer(struct cxi_dev *cdev, int set_id)
++{
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++	volatile struct c_pi_dmac_cdesc *cpl_desc = hw->dmac.cpl_desc;
++	int retval;
++
++	if (!cdev->is_physfn)
++		return -EPERM;
++
++	cxidev_dbg(&hw->cdev, "hw=%p set_id=%d\n", hw, set_id);
++
++	mutex_lock(&hw->dmac.lock);
++
++	retval = cass_dmac_desc_set_id_verify(hw, set_id);
++	if (retval != 0)
++		goto __cxi_dmac_xfer_0;
++
++	if (hw->dmac.desc_sets[set_id].numused == 0) {
++		retval = -EINVAL;
++		goto __cxi_dmac_xfer_0;
++	}
++
++	/*
++	 * A transfer that timed out can still raise its interrupt later, so
++	 * drop any completion left over from one before starting this one.
++	 */
++	reinit_completion(&hw->dmac.irupt);
++
++	dmac_enable(hw, hw->dmac.desc_sets[set_id].index);
++
++	if (!wait_for_completion_timeout(&hw->dmac.irupt,
++					 msecs_to_jiffies(CASS_DMAC_XFER_TIMEOUT_MS)))
++		cxidev_err(cdev, "ERROR: DMAC completion timed out\n");
++
++	/*
++	 * Stop the engine before reading and clearing the completion
++	 * descriptor. In the error case, including the timeout, it may still
++	 * be running, and it must not write to the descriptor or the
++	 * destination buffer once this returns and the caller can free them.
++	 * The lock is held, so descriptor set and buffer teardown, which
++	 * takes it, cannot start before this.
++	 *
++	 * The next version of this becomes interrupt driven and the
++	 * further paranoia wants to disable irupts in dmac when done
++	 * to prevent 'erroneous spurious interrupts'.
++	 */
++	dmac_disable(hw);
++
++	/* Drain a handler for this transfer's interrupt before the next starts */
++	synchronize_irq(pci_irq_vector(hw->cdev.pdev, C_PI_DMAC_MSIX_INT));
++	reinit_completion(&hw->dmac.irupt);
++
++	if (cpl_desc->done == 0) {
++		cxidev_err(cdev,
++			   "ERROR: failed to get DMAC completion\n");
++		retval = -ETIME;
++	}
++	if (cpl_desc->status != C_PI_DMAC_CDESC_STATUS_AXI_RESP_OKAY) {
++		cxidev_err(cdev,
++			   "ERROR: DMAC_CDESC_STATUS=%x is 'not OK'\n",
++			   cpl_desc->status);
++		retval = -EBADE;
++	}
++
++	cxidev_dbg(&hw->cdev, "hw->dmac.cpl_desc=%016llx\n", *((u64 *)cpl_desc));
++
++	memset((void *)cpl_desc, 0, sizeof(*cpl_desc));
++
++__cxi_dmac_xfer_0:
++	mutex_unlock(&hw->dmac.lock);
++	return retval;
++}
++EXPORT_SYMBOL(cxi_dmac_xfer);
++
++static irqreturn_t cass_dmac_irupt_handler(int irq, void *p)
++{
++	struct completion *x = (struct completion *)p;
++
++	complete(x);
++	return IRQ_HANDLED;
++}
++
++/*
++ * Initialize DMAC (DMA Controller)
++ */
++int cass_dmac_init(struct cass_dev *hw)
++{
++	struct device *dma_dev = &hw->cdev.pdev->dev;
++	union c_pi_cfg_dmac_cpl_addr dmac_cpl = {};
++	int i;
++	int retval;
++	int vec;
++
++	dmac_disable(hw);
++	/*
++	 * Configure the DMAC to write a completion event to cpl_desc
++	 */
++	hw->dmac.cpl_desc = dma_alloc_coherent(dma_dev, sizeof(*hw->dmac.cpl_desc),
++					       &hw->dmac.cpl_desc_dma_addr,
++					       GFP_KERNEL);
++	if (!hw->dmac.cpl_desc)
++		return -ENOMEM;
++	memset(hw->dmac.cpl_desc, 0, sizeof(*hw->dmac.cpl_desc));
++	dmac_cpl.address = hw->dmac.cpl_desc_dma_addr >> 3;
++	cass_write(hw, C_PI_CFG_DMAC_CPL_ADDR, &dmac_cpl, sizeof(dmac_cpl));
++
++	dmac_desc_zero_all(hw);	/* the zero will cass_flush_pci() */
++
++	mutex_init(&hw->dmac.lock);
++
++	init_completion(&hw->dmac.irupt);
++
++	hw->dmac.desc_sets = kcalloc(DMAC_DESC_SET_COUNT,
++				     sizeof(*hw->dmac.desc_sets), GFP_KERNEL);
++
++	if (hw->dmac.desc_sets == NULL) {
++		retval = -ENOMEM;
++		goto __cass_dmac_init_0;
++	}
++
++	for (i = 0; i < DMAC_DESC_SET_COUNT; ++i)
++		cass_dmac_desc_set_id_clear(hw, i);
++
++	hw->dmac.desc_map = bitmap_zalloc(C_PI_CFG_DMAC_DESC_ENTRIES,
++					  GFP_KERNEL);
++	if (hw->dmac.desc_map == NULL) {
++		retval = -ENOMEM;
++		goto __cass_dmac_init_1;
++	}
++	scnprintf(hw->dmac.irupt_name, sizeof(hw->dmac.irupt_name),
++		  "%s_irupt_dmac", hw->cdev.name);
++	vec = pci_irq_vector(hw->cdev.pdev, C_PI_DMAC_MSIX_INT);
++	retval = request_irq(vec, cass_dmac_irupt_handler, 0,
++			     hw->dmac.irupt_name, &hw->dmac.irupt);
++	if (retval != 0)
++		goto __cass_dmac_init_2;
++
++	return 0;
++
++__cass_dmac_init_2:
++	bitmap_free(hw->dmac.desc_map);
++
++__cass_dmac_init_1:
++	kfree(hw->dmac.desc_sets);
++
++__cass_dmac_init_0:
++	mutex_destroy(&hw->dmac.lock);
++	dmac_cpl.address = 0;
++	cass_write(hw, C_PI_CFG_DMAC_CPL_ADDR, &dmac_cpl, sizeof(dmac_cpl));
++	dma_free_coherent(dma_dev, sizeof(*hw->dmac.cpl_desc),
++			  hw->dmac.cpl_desc, hw->dmac.cpl_desc_dma_addr);
++	hw->dmac.cpl_desc = NULL;
++
++	return retval;
++}
++
++/*
++ * Finish/finalize DMAC (DMA Controller)
++ */
++void cass_dmac_fini(struct cass_dev *hw)
++{
++	struct device *dma_dev = &hw->cdev.pdev->dev;
++	int vec;
++
++	dmac_disable(hw);
++	vec = pci_irq_vector(hw->cdev.pdev, C_PI_DMAC_MSIX_INT);
++	free_irq(vec, &hw->dmac.irupt);
++	cass_clear(hw, C_PI_CFG_DMAC_CPL_ADDR, C_PI_CFG_DMAC_CPL_ADDR_SIZE);
++	dmac_desc_zero_all(hw);
++	dma_free_coherent(dma_dev, sizeof(*hw->dmac.cpl_desc),
++			  hw->dmac.cpl_desc, hw->dmac.cpl_desc_dma_addr);
++	hw->dmac.cpl_desc = NULL;
++	bitmap_free(hw->dmac.desc_map);
++	kfree(hw->dmac.desc_sets);
++	mutex_destroy(&hw->dmac.lock);
++}
+diff --git a/drivers/net/ethernet/hpe/ss1/cass_eq.c b/drivers/net/ethernet/hpe/ss1/cass_eq.c
+new file mode 100644
+index 000000000000..2d65df985b05
+--- /dev/null
++++ b/drivers/net/ethernet/hpe/ss1/cass_eq.c
+@@ -0,0 +1,1518 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright 2018, 2024-2026 Hewlett Packard Enterprise Development LP */
++
++/* Portals-like interface for Cassini */
++
++#include <linux/kernel.h>
++#include <linux/slab.h>
++#include <linux/hpe/cxi/cxi.h>
++#include <linux/iopoll.h>
++
++#include "cass_core.h"
++#include "cxi_internal.h"
++#include "cass_ss1_debugfs.h"
++#include "cxi_vf_cmd.h"
++
++static unsigned int ee_timestamp_period_ms = 1000;
++module_param(ee_timestamp_period_ms, uint, 0644);
++MODULE_PARM_DESC(ee_timestamp_period_ms,
++		 "Period between EE timestamp events in milliseconds.");
++
++#define LT_LIMIT_MAX (BIT(9) - 1)
++#define GRAN_DEF 50
++
++static const union c_ee_cfg_latency_monitor lat_monitor_def = {
++	/* The EQ latency_tolerance configuration limit. An EQ's
++	 * latency_tolerance * EE granularity is the ECB expiration timeout.
++	 * Limit is 9 bits wide. Allow any configuration.
++	 */
++	.lt_limit = LT_LIMIT_MAX,
++
++	/* Latency step granularity. An EQ's latency_tolerance * EE granularity
++	 * is the ECB expiration timeout. Granularity is effectively the step
++	 * size of latency_tolerance in ns. 16 bits wide, ~65us max step size.
++	 *
++	 * A default of 50 allows a range of ~0-25us (50ns*511).
++	 */
++	.granularity = GRAN_DEF,
++
++	/* When a configured portion of ECBs are in use, the latency monitor
++	 * transitions to using a separate granularity/latency_tolerance
++	 * configuration which can accelerate ECB expiration.
++	 *
++	 * There are two stages, A and B. Stage transitions are defined by a
++	 * threshold and hysteresis value. When ECB usage hits the threshold,
++	 * the latency monitor enters the corresponding stage. When ECB usage
++	 * drops below the hysteresis value, the stage is exited.
++	 */
++	.thresh_a       = 128,
++	.hysteresis_a   = 100,
++	.granularity_a  = GRAN_DEF / 2, /* 2x speedup in stage A */
++	.lt_limit_a     = LT_LIMIT_MAX,
++	.lt_reduction_a = 0,
++
++	.thresh_b       = 196,
++	.hysteresis_b   = 150,
++	.granularity_b  = GRAN_DEF / 10,       /* 10x speedup in stage B */
++	.lt_limit_b     = 200 / (GRAN_DEF / 10), /* Hard limit of 200 ns */
++	.lt_reduction_b = 0,
 +};
-+ATTRIBUTE_GROUPS(media_counters);
 +
-+static struct kobj_type media_counters = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = media_counters_groups,
-+};
-+#endif /* CONFIG_SYSFS */
++#define LATENCY_TOLERANCE_DEF_NS (500)
 +
-+int sl_sysfs_media_counters_create(struct sl_ctrl_lgrp *ctrl_lgrp)
++/* The max number of event entries in an event queue is calculated by:
++ * The number of 4kB pages the C_EE_CFG_EQ_DESCRIPTOR BUFFER_*_SIZE value
++ * can address which is 20-bits worth of addressing or 4GB (2^32) of space.
++ */
++#define MAX_EQ_LEN (1ull << 32)
++
++/* Convert EQ queue length, in bytes, into queue size in ECB units. */
++static size_t get_eq_queue_size(size_t queue_len)
 +{
-+#ifdef CONFIG_SYSFS
-+	struct sl_media_lgrp *media_lgrp;
-+	int                   rtn;
++	return queue_len / C_EE_CFG_ECB_SIZE;
++}
 +
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media counters create");
++void cass_ee_init(struct cass_dev *hw)
++{
++	union c_ee_cfg_timestamp_freq ts_freq;
++	unsigned int clk_freq_khz;
 +
-+	media_lgrp = sl_media_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!media_lgrp) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media_lgrp_get failed");
++	if (cass_version(hw, CASSINI_1))
++		clk_freq_khz = C1_CLK_FREQ_HZ / 1000;
++	else
++		clk_freq_khz = C2_CLK_FREQ_HZ / 1000;
++
++	ts_freq.clk_divider = ee_timestamp_period_ms * clk_freq_khz / C_NUM_EQS;
++
++	cass_write(hw, C_EE_CFG_TIMESTAMP_FREQ, &ts_freq, sizeof(ts_freq));
++
++	cass_write(hw, C_EE_CFG_LATENCY_MONITOR, &lat_monitor_def,
++		   sizeof(lat_monitor_def));
++}
++
++/* Event interrupt handler for EQs */
++static int eq_event_nb(struct notifier_block *nb, unsigned long action,
++		       void *data)
++{
++	struct cxi_eq_priv *eq = container_of(nb, struct cxi_eq_priv,
++					      event_nb);
++
++	eq->event_cb(eq->event_cb_data);
++
++	return NOTIFY_OK;
++}
++
++/* Status interrupt handler for EQs */
++static int eq_status_nb(struct notifier_block *nb, unsigned long action,
++			void *data)
++{
++	struct cxi_eq_priv *eq = container_of(nb, struct cxi_eq_priv,
++					      status_nb);
++
++	eq->status_cb(eq->status_cb_data);
++
++	return NOTIFY_OK;
++}
++
++/* Return an EQ latency_tolerance value representing the requested nanosecond
++ * delay according to the currently configured ECB latency monitor granularity.
++ * Reading the currently configured value supports the expected behavior while
++ * using OOB interfaces to configure the latency monitor.
++ */
++static unsigned int eq_compute_lt(struct cass_dev *hw, unsigned int ns)
++{
++	union c_ee_cfg_latency_monitor lat_mon;
++	unsigned int step_size;
++	unsigned int lt;
++
++	cass_read(hw, C_EE_CFG_LATENCY_MONITOR, &lat_mon, sizeof(lat_mon));
++	if (cass_version(hw, CASSINI_1))
++		step_size = lat_mon.granularity / (C1_CLK_FREQ_HZ / NSEC_PER_SEC);
++	else
++		step_size = lat_mon.granularity / (C2_CLK_FREQ_HZ / NSEC_PER_SEC);
++	lt = ns / step_size;
++
++	if (lt > LT_LIMIT_MAX)
++		lt = LT_LIMIT_MAX;
++
++	return lt;
++}
++
++/* Toggle EQ timestamp events. Use eq_shadow_lock to serialize calls. */
++static void eq_timestamp_toggle(struct cass_dev *hw, int eq_n, bool enable)
++{
++	union c_ee_cfg_periodic_tstamp_table ts_tbl;
++	int ts_tbl_idx = eq_n / 64;
++	int ts_tbl_bit = eq_n % 64;
++	u64 csr_off = C_EE_CFG_PERIODIC_TSTAMP_TABLE(ts_tbl_idx);
++
++	cass_read(hw, csr_off, &ts_tbl.qw, 8);
++	if (enable)
++		ts_tbl.n63_n0_enable_periodic_tstamp |= BIT(ts_tbl_bit);
++	else
++		ts_tbl.n63_n0_enable_periodic_tstamp &= ~BIT(ts_tbl_bit);
++	cass_write(hw, csr_off, &ts_tbl.qw, 8);
++}
++
++/* Configure an EQ descriptor's status write-back settings given a queue size.
++ * This must be done each time the EQ size is changed. eq_status_config() does
++ * not write the new settings to hardware.
++ */
++static void eq_status_config(struct cxi_eq_priv *eq, size_t queue_size)
++{
++	unsigned int base_slots;
++	unsigned int delta_slots;
++	int thld_shift;
++
++	if (eq->attr.status_thresh_count) {
++		/* Don't count EQ status slot in queue size. */
++		queue_size -= 1;
++		/* Configure status update thresholds */
++		base_slots = queue_size * (100 - eq->attr.status_thresh_base) / 100;
++		delta_slots = queue_size * eq->attr.status_thresh_delta / 100;
++
++		/* Set threshold shift to preserve the 6 MSBs of the larger of
++		 * the base and delta values.
++		 */
++		thld_shift = (base_slots > delta_slots) ?
++				fls(base_slots) : fls(delta_slots);
++		thld_shift = thld_shift > 6 ? thld_shift - 6 : 0;
++
++		eq->cfg.eq_sts_num_thld = eq->attr.status_thresh_count - 1;
++		eq->cfg.eq_sts_thld_base = base_slots >> thld_shift;
++		eq->cfg.eq_sts_thld_offst = delta_slots >> thld_shift;
++		eq->cfg.eq_sts_thld_shift = thld_shift;
++	} else {
++		/* Max shift value disables threshold updates. */
++		eq->cfg.eq_sts_thld_shift = 0x1f;
++	}
++}
++
++#define EQ_MAX_RESERVED_FC (BIT(14) - 1)
++
++static int is_valid_eq_reserved_fc(struct cxi_eq_priv *eq, int fc_value)
++{
++	int new_fc_value = (int)eq->cfg.reserved_fc + fc_value;
++	int max_fc_value = eq->queue_size - 1;
++
++	if (abs(fc_value) > EQ_MAX_RESERVED_FC ||
++	    new_fc_value > EQ_MAX_RESERVED_FC || new_fc_value < 0)
++		return -EINVAL;
++
++	if (new_fc_value > max_fc_value)
++		return -ENOSPC;
++
++	return 0;
++}
++
++/**
++ * cxi_eq_adjust_reserved_fc_vf() - Adjust EQ reserved FC value for VF.
++ * @eq: EQ
++ * @value: Amount to adjust reserved FC value by. Can be negative or positive.
++ *
++ * Return: On success, value greater than or equal to zero representing current
++ * EQ reserved FC value. Else, -EINVAL if value is invalid or -ENOSPC if a valid
++ * value is provided but could not be applied.
++ */
++static int cxi_eq_adjust_reserved_fc_vf(struct cxi_eq *eq, int value)
++{
++	struct cxi_dev *cdev = container_of(eq, struct cxi_eq_priv, eq)->lni_priv->dev;
++	struct cxi_eq_adjust_reserved_fc_resp resp;
++	size_t resp_len = sizeof(resp);
++	const struct cxi_eq_adjust_reserved_fc_cmd cmd = {
++		.op = CXI_OP_EQ_ADJUST_RESERVED_FC,
++		.eq_hndl = eq->eqn,
++		.value = value,
++		.resp = &resp,
++	};
++	int rc;
++
++	rc = cxi_send_msg_to_pf(cdev, &cmd, sizeof(cmd), &resp, &resp_len);
++	if (rc)
++		return rc;
++
++	return resp.reserved_fc;
++}
++
++/**
++ * cxi_eq_adjust_reserved_fc() - Adjust EQ reserved FC value.
++ * @eq: EQ
++ * @value: Amount to adjust reserved FC value by. Can be negative or positive.
++ *
++ * Return: On success, value greater than or equal to zero representing current
++ * EQ reserved FC value. Else, -EINVAL if value is invalid or -ENOSPC if a valid
++ * value is provided but could not be applied.
++ */
++int cxi_eq_adjust_reserved_fc(struct cxi_eq *eq, int value)
++{
++	struct cxi_eq_priv *eq_priv;
++	struct cxi_dev *cdev;
++	struct cass_dev *hw;
++	int rc;
++
++	if (!eq)
++		return -EINVAL;
++
++	eq_priv = container_of(eq, struct cxi_eq_priv, eq);
++	cdev = eq_priv->lni_priv->dev;
++
++	if (!cdev->is_physfn)
++		return cxi_eq_adjust_reserved_fc_vf(eq, value);
++
++	hw = container_of(cdev, struct cass_dev, cdev);
++
++	/* Use EQ shadow_lock to serialize EQ access. */
++	spin_lock(&hw->eq_shadow_lock);
++
++	rc = is_valid_eq_reserved_fc(eq_priv, value);
++	if (rc)
++		goto unlock_out;
++
++	eq_priv->cfg.reserved_fc += value;
++
++	cass_shadow_write(hw, C_EE_BASE, C_EE_CFG_EQ_DESCRIPTOR(eq->eqn),
++			  &eq_priv->cfg, sizeof(eq_priv->cfg));
++
++	rc = eq_priv->cfg.reserved_fc;
++
++unlock_out:
++	spin_unlock(&hw->eq_shadow_lock);
++
++	return rc;
++}
++EXPORT_SYMBOL(cxi_eq_adjust_reserved_fc);
++
++/**
++ * put_pages_contig() - Un-pin a sequence of physical pages.
++ *
++ * @hw: The cassini device
++ * @desc: EQ buffer descriptor
++ */
++static void put_pages_contig(struct cass_dev *hw, struct eq_buf_desc *desc)
++{
++	size_t npg = desc->events_len >> PAGE_SHIFT;
++
++	dma_unmap_page(&hw->cdev.pdev->dev, desc->dma_addr, desc->events_len,
++		       DMA_FROM_DEVICE);
++
++	unpin_user_pages_dirty_lock(desc->pages, npg, true);
++	kfree(desc->pages);
++}
++
++static int cxi_eq_resize_vf(struct cxi_eq *evtq, void *queue, size_t queue_len,
++			    struct cxi_md *queue_md)
++{
++	struct cxi_eq_priv *eq = container_of(evtq, struct cxi_eq_priv, eq);
++	struct cxi_dev *cdev = eq->lni_priv->dev;
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++	struct cxi_eq_resize_cmd_vf cmd = {
++		.base.op = CXI_OP_EQ_RESIZE,
++		.base.eq_hndl = eq->eq.eqn,
++		.base.queue_len = queue_len,
++		.base.queue_md = queue_md ? queue_md->id : CXI_MD_NONE,
++	};
++	bool passthrough = !!(eq->attr.flags & CXI_EQ_PASSTHROUGH);
++	bool is_user = eq->attr.flags & CXI_EQ_USER;
++	int rc = 0;
++
++	if (!queue_len || queue_len > MAX_EQ_LEN || !queue)
++		return -EINVAL;
++
++	/* Queue buffer address and length must be page aligned. */
++	if (!IS_ALIGNED((uintptr_t)queue, PAGE_SIZE))
++		return -EINVAL;
++
++	if (!IS_ALIGNED(queue_len, PAGE_SIZE))
++		return -EINVAL;
++
++	mutex_lock(&eq->resize_mutex);
++
++	eq->resize.md = queue_md;
++	eq->resize.events = queue;
++	eq->resize.events_len = queue_len;
++
++	if (passthrough) {
++		if (is_user) {
++			rc = get_dma_addr_if_contig(hw, queue, queue_len,
++						    DMA_FROM_DEVICE,
++						    &eq->resize.pages,
++						    &eq->resize.dma_addr);
++		} else {
++			eq->resize.dma_addr = dma_map_single(&hw->cdev.pdev->dev,
++							     eq->resize.events,
++							     eq->resize.events_len,
++							     DMA_FROM_DEVICE);
++			if (dma_mapping_error(&hw->cdev.pdev->dev, eq->resize.dma_addr))
++				rc = -ENOMEM;
++		}
++
++		if (rc)
++			goto unlock;
++	} else {
++		eq->resize.dma_addr = queue_md->iova;
++	}
++
++	cmd.dma_addr = eq->resize.dma_addr;
++
++	rc = cxi_send_msg_to_pf(cdev, &cmd, sizeof(cmd), NULL, NULL);
++	if (rc)
++		goto unmap_dma;
++
++	eq->resized = true;
++	mutex_unlock(&eq->resize_mutex);
++
++	return 0;
++unmap_dma:
++	if (passthrough) {
++		if (is_user)
++			put_pages_contig(hw, &eq->resize);
++		else
++			dma_unmap_single(&hw->cdev.pdev->dev, eq->resize.dma_addr,
++					 eq->resize.events_len, DMA_FROM_DEVICE);
++	}
++unlock:
++	mutex_unlock(&eq->resize_mutex);
++	return rc;
++}
++
++int cxi_eq_resize_internal(struct cxi_eq *evtq, void *queue,
++			   size_t queue_len, struct cxi_md *queue_md,
++			   dma_addr_t dma_addr)
++{
++	struct cxi_eq_priv *eq = container_of(evtq, struct cxi_eq_priv, eq);
++	struct cxi_lni_priv *lni_priv = eq->lni_priv;
++	struct cxi_dev *cdev = lni_priv->dev;
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++	struct cxi_md_priv *md_priv;
++	int rc = 0;
++	int passthrough = !!(eq->attr.flags & CXI_EQ_PASSTHROUGH);
++	bool is_vf = lni_priv->is_vf;
++
++	if (!cdev->is_physfn)
++		return -EOPNOTSUPP;
++
++	if (!queue_len || queue_len > MAX_EQ_LEN)
++		return -EINVAL;
++
++	if ((!is_vf && !queue) || (is_vf && !dma_addr))
++		return -EINVAL;
++
++	/* Queue buffer address and length must be page aligned. */
++	if ((!is_vf && !IS_ALIGNED((uintptr_t)queue, PAGE_SIZE)) ||
++	    (is_vf && !IS_ALIGNED(dma_addr, PAGE_SIZE)))
++		return -EINVAL;
++
++	if (!IS_ALIGNED(queue_len, PAGE_SIZE))
++		return -EINVAL;
++
++	if (!is_vf && !passthrough) {
++		if (!queue_md || !CXI_MD_CONTAINS(queue_md, queue, queue_len)) {
++			cxidev_err(cdev, "MD does not contain queue buffer\n");
++			return -EINVAL;
++		}
++
++		if (eq->active.md->lac != queue_md->lac) {
++			cxidev_err(cdev, "New buffer AC does not match EQ\n");
++			return -EINVAL;
++		}
++	}
++
++	mutex_lock(&eq->resize_mutex);
++
++	if (eq->resized) {
++		rc = -EINVAL;
++		goto unlock;
++	}
++
++	eq->resize.md = queue_md;
++	eq->resize.events = queue;
++	eq->resize.events_len = queue_len;
++
++	if (!is_vf) {
++		if (passthrough) {
++			if (eq->attr.flags & CXI_EQ_USER) {
++				rc = get_dma_addr_if_contig(hw, queue, queue_len,
++							    DMA_FROM_DEVICE,
++							    &eq->resize.pages,
++							    &eq->resize.dma_addr);
++			} else {
++				eq->resize.dma_addr = dma_map_single(&hw->cdev.pdev->dev,
++								     queue, queue_len,
++								     DMA_FROM_DEVICE);
++				if (dma_mapping_error(&hw->cdev.pdev->dev, eq->resize.dma_addr))
++					rc = -ENOMEM;
++				else
++					rc = 0;
++			}
++
++			if (rc)
++				goto unlock;
++		} else {
++			eq->resize.dma_addr = CXI_VA_TO_IOVA(queue_md, queue);
++			md_priv = container_of(eq->resize.md, struct cxi_md_priv, md);
++			refcount_inc(&md_priv->refcount);
++		}
++	} else if (!passthrough) {
++		md_priv = container_of(queue_md, struct cxi_md_priv, md);
++		refcount_inc(&md_priv->refcount);
++		eq->resize.dma_addr = dma_addr;
++	}
++
++	if (eq->cfg.use_buffer_b) {
++		eq->cfg.buffer_a_size = queue_len >> C_ADDR_SHIFT;
++		eq->cfg.buffer_a_en   = 1;
++		eq->cfg.buffer_a_addr = eq->resize.dma_addr >> C_ADDR_SHIFT;
++		eq->cfg.use_buffer_b = 0;
++	} else {
++		eq->cfg.buffer_b_size = queue_len >> C_ADDR_SHIFT;
++		eq->cfg.buffer_b_en   = 1;
++		eq->cfg.buffer_b_addr = eq->resize.dma_addr >> C_ADDR_SHIFT;
++		eq->cfg.use_buffer_b = 1;
++	}
++
++	/* Reconfigure EQ status settings using new queue length. */
++	eq_status_config(eq, queue_len / C_EE_CFG_ECB_SIZE);
++
++	/* Re-write the EQ descriptor with the new buffer description. Read
++	 * back the descriptor to ensure it has been updated before returning
++	 * to the client in order to guarantee that a subsequent client write
++	 * to EQ_SW_STATE will force the resize to be processed by the device.
++	 */
++	spin_lock(&hw->eq_shadow_lock);
++	cass_shadow_write(hw, C_EE_BASE, C_EE_CFG_EQ_DESCRIPTOR(eq->eq.eqn),
++			  &eq->cfg, sizeof(eq->cfg));
++	cass_shadow_read(hw, C_EE_BASE, C_EE_CFG_EQ_DESCRIPTOR(eq->eq.eqn),
++			 &eq->cfg,
++			 sizeof(eq->cfg));
++	spin_unlock(&hw->eq_shadow_lock);
++
++	eq->resized = true;
++
++	mutex_unlock(&eq->resize_mutex);
++
++	return 0;
++
++unlock:
++	mutex_unlock(&eq->resize_mutex);
++
++	return rc;
++}
++EXPORT_SYMBOL(cxi_eq_resize_internal);
++
++/* cxi_eq_resize() - Resize a CXI Event Queue buffer.
++ *
++ * Resizing an Event Queue is a multi-step process. The first step is to call
++ * cxi_eq_resize() to pass a new event buffer to the device. After this call,
++ * evtq will continue to reference the old EQ buffer. The device may write a
++ * small number of events to the old EQ buffer followed by a special
++ * C_EVENT_EQ_SWITCH event to indicate that hardware has transitioned to
++ * writing to the new EQ buffer. When this event is detected, software must
++ * call cxi_eq_resize_complete() in order to start reading events from the new
++ * EQ buffer.
++ *
++ * The new event queue buffer must use the same translation mechanism as was
++ * used to allocate the EQ. If translation is used, the Addressing Context (AC)
++ * used by the new MD must match the MD used to allocate the EQ.
++ *
++ * The new event queue buffer must be cleared before calling cxi_eq_resize().
++ *
++ * @evtq: The Event Queue to resize.
++ * @queue: The new event queue buffer. Must be page aligned.
++ * @queue_len: The new event queue buffer length in bytes. Must be page aligned.
++ * @queue_md: The new event queue memory descriptor.
++ *
++ * Return: On success, 0 is returned and a resized buffer has been
++ * submitted to the device.
++ */
++int cxi_eq_resize(struct cxi_eq *evtq, void *queue, size_t queue_len,
++		  struct cxi_md *queue_md)
++{
++	struct cxi_eq_priv *eq = container_of(evtq, struct cxi_eq_priv, eq);
++	struct cxi_lni_priv *lni_priv = eq->lni_priv;
++	struct cxi_dev *cdev = lni_priv->dev;
++
++	if (cdev->is_physfn)
++		return cxi_eq_resize_internal(evtq, queue, queue_len, queue_md, 0);
++	else
++		return cxi_eq_resize_vf(evtq, queue, queue_len, queue_md);
++}
++EXPORT_SYMBOL(cxi_eq_resize);
++
++static int cxi_eq_resize_complete_vf(struct cxi_eq *evtq)
++{
++	struct cxi_eq_priv *eq = container_of(evtq, struct cxi_eq_priv, eq);
++	struct cxi_dev *cdev = eq->lni_priv->dev;
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++	const struct cxi_eq_resize_complete_cmd cmd = {
++		.op = CXI_OP_EQ_RESIZE_COMPLETE,
++		.eq_hndl = evtq->eqn,
++	};
++	int rc;
++
++	mutex_lock(&eq->resize_mutex);
++
++	rc = cxi_send_msg_to_pf(cdev, &cmd, sizeof(cmd), NULL, NULL);
++	if (rc)
++		goto unlock;
++
++	if (eq->attr.flags & CXI_EQ_PASSTHROUGH) {
++		if (eq->attr.flags & CXI_EQ_USER)
++			put_pages_contig(hw, &eq->active);
++		else
++			dma_unmap_single(&hw->cdev.pdev->dev, eq->active.dma_addr,
++					 eq->active.events_len, DMA_FROM_DEVICE);
++	}
++
++	eq->active = eq->resize;
++	eq->resized = false;
++	cxi_eq_init(evtq, eq->active.events, eq->active.events_len, eq->eq.eqn,
++		    (__force u64 *)(hw->regs + C_MEMORG_EE +
++				    eq->eq.eqn * C_EE_SW_STATE_PAGE_SIZE));
++	evtq->sw_state.reading_buffer_b = !evtq->sw_state.reading_buffer_b;
++
++unlock:
++	mutex_unlock(&eq->resize_mutex);
++	return rc;
++}
++
++/**
++ * cxi_eq_resize_complete() - Complete resizing a CXI Event Queue buffer.
++ *
++ * cxi_eq_resize_complete() must be called after an EQ has been resized
++ * using cxi_eq_resize() and a C_EVENT_EQ_SWITCH event was delivered. See
++ * the documentation for cxi_eq_resize().
++ *
++ * @evtq: The Event Queue to being resized.
++ *
++ * Return: On success, 0 is returned and evtq references the new, resized
++ * buffer.
++ */
++int cxi_eq_resize_complete(struct cxi_eq *evtq)
++{
++	struct cxi_eq_priv *eq = container_of(evtq, struct cxi_eq_priv, eq);
++	struct cxi_lni_priv *lni_priv = eq->lni_priv;
++	struct cxi_dev *cdev = lni_priv->dev;
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++	struct cxi_md_priv *md_priv;
++	bool is_vf = lni_priv->is_vf;
++
++	if (!cdev->is_physfn)
++		return cxi_eq_resize_complete_vf(evtq);
++
++	mutex_lock(&eq->resize_mutex);
++
++	if (!eq->resized) {
++		mutex_unlock(&eq->resize_mutex);
++		return -EINVAL;
++	}
++
++	if (!is_vf) {
++		if (eq->attr.flags & CXI_EQ_PASSTHROUGH) {
++			if (eq->attr.flags & CXI_EQ_USER)
++				put_pages_contig(hw, &eq->active);
++			else
++				dma_unmap_single(&hw->cdev.pdev->dev, eq->active.dma_addr,
++						 eq->active.events_len, DMA_FROM_DEVICE);
++		} else {
++			md_priv = container_of(eq->active.md, struct cxi_md_priv, md);
++			refcount_dec(&md_priv->refcount);
++		}
++	} else if (!(eq->attr.flags & CXI_EQ_PASSTHROUGH)) {
++		md_priv = container_of(eq->active.md, struct cxi_md_priv, md);
++		refcount_dec(&md_priv->refcount);
++	}
++
++	eq->active = eq->resize;
++
++	eq->attr.queue = eq->active.events;
++	eq->attr.queue_len = eq->active.events_len;
++
++	eq->queue_size = get_eq_queue_size(eq->active.events_len);
++
++	/* Re-initialize the user evtq to reference new buffer */
++	cxi_eq_init(evtq, eq->active.events, eq->active.events_len, eq->eq.eqn,
++		    (__force u64 *)(hw->regs + C_MEMORG_EE +
++				    eq->eq.eqn * C_EE_SW_STATE_PAGE_SIZE));
++	evtq->sw_state.reading_buffer_b = !evtq->sw_state.reading_buffer_b;
++
++	eq->resized = false;
++
++	mutex_unlock(&eq->resize_mutex);
++
++	return 0;
++}
++EXPORT_SYMBOL(cxi_eq_resize_complete);
++
++/* Register the PCT EQ in all 3 places */
++static void set_pct_eq(struct cass_dev *hw, unsigned int eq_n)
++{
++	union c_pct_cfg_eq_retry_q_handle rh_q = {
++		.eq_handle = eq_n,
++	};
++
++	cass_write(hw, C_PCT_CFG_EQ_RETRY_Q_HANDLE, &rh_q, sizeof(rh_q));
++	cass_write(hw, C_PCT_CFG_EQ_TGT_Q_HANDLE, &rh_q, sizeof(rh_q));
++	cass_write(hw, C_PCT_CFG_EQ_CONN_LD_Q_HANDLE, &rh_q, sizeof(rh_q));
++}
++
++/* Return an available event queue with an ID */
++static struct cxi_eq_priv *pf_get_eq_id(struct cxi_lni_priv *lni_priv)
++{
++	struct cxi_dev *cdev = lni_priv->dev;
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++	struct cxi_eq_priv *eq;
++	int rc;
++
++	/* Try to reuse an existing EQ that was put on the cleanup list */
++	spin_lock(&lni_priv->res_lock);
++
++	eq = list_first_entry_or_null(&lni_priv->eq_cleanups_list,
++				      struct cxi_eq_priv, list);
++	if (eq)
++		list_del(&eq->list);
++
++	spin_unlock(&lni_priv->res_lock);
++
++	if (eq) {
++		memset(&eq->cfg, 0, sizeof(eq->cfg));
++		eq->reused = true;
++		return eq;
++	}
++
++	/* Check the associated service to see if this EQ can be
++	 * allocated.
++	 */
++	rc = cxi_rgroup_alloc_resource(lni_priv->rgroup, CXI_RESOURCE_EQ);
++	if (rc)
++		return ERR_PTR(rc);
++
++	eq = kzalloc(sizeof(*eq), GFP_KERNEL);
++	if (eq == NULL) {
++		rc = -ENOMEM;
++		goto dec_rsrc_use;
++	}
++
++	/* Get event queue ID */
++	rc = ida_alloc_range(&hw->eq_index_table, 1, C_NUM_EQS - 1, GFP_KERNEL);
++	if (rc < 0) {
++		cxidev_err(cdev, "ida_alloc_range failed %d\n", rc);
++		goto eq_free;
++	}
++
++	eq->eq.eqn = rc;
++
++	return eq;
++
++eq_free:
++	kfree(eq);
++
++dec_rsrc_use:
++	cxi_rgroup_free_resource(lni_priv->rgroup, CXI_RESOURCE_EQ);
++
++	return ERR_PTR(rc);
++}
++
++/* Free an EQ allocated with pf_get_eq_id */
++static void pf_put_eq_id(struct cxi_eq_priv *eq)
++{
++	struct cxi_lni_priv *lni_priv = eq->lni_priv;
++	struct cxi_dev *cdev = lni_priv->dev;
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++
++	if (eq->reused) {
++		spin_lock(&lni_priv->res_lock);
++		list_add_tail(&eq->list, &lni_priv->eq_cleanups_list);
++		spin_unlock(&lni_priv->res_lock);
++	} else {
++		ida_free(&hw->eq_index_table, eq->eq.eqn);
++		cxi_rgroup_free_resource(lni_priv->rgroup, CXI_RESOURCE_EQ);
++		kfree(eq);
++	}
++}
++
++/* Prepare and write the EQ config to the adapter */
++static int pf_write_eq_config(struct cxi_eq_priv *eq, bool is_vf,
++			      int vf_event_irq_idx, int vf_status_irq_idx)
++{
++	struct cxi_dev *cdev = eq->lni_priv->dev;
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++	union c_ee_cfg_init_eq_hw_state init_eq_hw_state;
++	unsigned int eq_n = eq->eq.eqn;
++	const struct cxi_eq_attr *attr = &eq->attr;
++	void __iomem *csr;
++	int rc;
++
++	if (is_vf && vf_event_irq_idx >= 0) {
++		eq->cfg.event_int_idx = vf_event_irq_idx;
++		eq->cfg.event_int_en = 1;
++	} else if (!is_vf && eq->event_cb) {
++		eq->cfg.event_int_idx = eq->event_msi_irq->idx;
++		eq->cfg.event_int_en = 1;
++	}
++
++	if (is_vf && vf_status_irq_idx >= 0) {
++		eq->cfg.eq_sts_int_idx = vf_status_irq_idx;
++		eq->cfg.eq_sts_int_en = 1;
++	} else if (!is_vf && eq->status_cb) {
++		eq->cfg.eq_sts_int_idx = eq->status_msi_irq->idx;
++		eq->cfg.eq_sts_int_en = 1;
++	}
++
++	if (eq->attr.flags & CXI_EQ_PASSTHROUGH) {
++		eq->cfg.acid = eq->lni_priv->phys_ac;
++		eq->cfg.buffer_a_addr = eq->active.dma_addr >> C_ADDR_SHIFT;
++	} else {
++		struct cxi_md_priv *md_priv =
++			container_of(eq->active.md, struct cxi_md_priv, md);
++
++		eq->cfg.acid = md_priv->cac->ac.acid;
++		eq->cfg.buffer_a_addr =
++			CXI_VA_TO_IOVA(eq->active.md, eq->active.events) >>
++			C_ADDR_SHIFT;
++	}
++
++	eq->cfg.buffer_a_size = eq->active.events_len >> C_ADDR_SHIFT;
++	eq->cfg.buffer_a_en = 1;
++	eq->cfg.eq_enable = 1;
++
++	rc = is_valid_eq_reserved_fc(eq, eq->attr.reserved_slots);
++	if (rc)
++		return rc;
++	eq->cfg.reserved_fc = eq->attr.reserved_slots;
++
++	eq_status_config(eq, eq->queue_size);
++
++	eq->cfg.eq_sts_dropped_en =
++		eq->attr.flags & CXI_EQ_DROP_STATUS_DISABLE ? 0 : 1;
++
++	if (eq->attr.flags & CXI_EQ_EC_DISABLE) {
++		/* Disable all event combining. */
++		eq->cfg.latency_tolerance = 0;
++	} else if (attr->ec_delay) {
++		/* Set custom ECB expiration delay. */
++		eq->cfg.latency_tolerance = eq_compute_lt(hw, attr->ec_delay);
++	} else {
++		/* Use default ECB expiration configuration. */
++		eq->cfg.latency_tolerance =
++			eq_compute_lt(hw, LATENCY_TOLERANCE_DEF_NS);
++	}
++
++	mutex_lock(&hw->init_eq_hw_state);
++
++	/* Wait for C_EE_CFG_INIT_EQ_HW_STATE to be ready for use */
++	csr = cass_csr(hw, C_EE_CFG_INIT_EQ_HW_STATE);
++	rc = readq_poll_timeout(csr, init_eq_hw_state.qw,
++				init_eq_hw_state.pending == 0, 1, 1000);
++	if (rc) {
++		cxidev_warn_once(cdev, "C_EE_CFG_INIT_EQ_HW_STATE was still pending.\n");
++		mutex_unlock(&hw->init_eq_hw_state);
++		return rc;
++	}
++
++	/* Ensure no other PCT EQ exist before activating it. */
++	if (attr->flags & CXI_EQ_REGISTER_PCT) {
++		if (hw->pct_eq_n != C_EQ_NONE) {
++			mutex_unlock(&hw->init_eq_hw_state);
++			return -EEXIST;
++		}
++
++		hw->pct_eq_n = eq_n;
++	}
++
++	/* Write EQ configuration to hardware */
++	spin_lock(&hw->eq_shadow_lock);
++
++	cass_eq_init(hw, eq_n, eq->lni_priv->lni.rgid, &eq->cfg,
++		     attr->flags & CXI_EQ_INIT_LONG,
++		     attr->flags & CXI_EQ_TGT_LONG);
++
++	if (attr->flags & CXI_EQ_TIMESTAMP_EVENTS)
++		eq_timestamp_toggle(hw, eq_n, true);
++
++	spin_unlock(&hw->eq_shadow_lock);
++
++	if (attr->flags & CXI_EQ_REGISTER_PCT) {
++		/* The EQ is reserved, and up and running now. The PCT
++		 * EQ can be programmed.
++		 */
++		set_pct_eq(hw, eq_n);
++	}
++
++	mutex_unlock(&hw->init_eq_hw_state);
++
++	return 0;
++}
++
++static int eq_mmio_map(struct cass_dev *hw, void __iomem **eq_mmio, int eq_idx)
++{
++	phys_addr_t mmio_phys = hw->regs_base + C_MEMORG_EE +
++		eq_idx * C_EE_SW_STATE_PAGE_SIZE;
++
++	*eq_mmio = ioremap(mmio_phys, PAGE_SIZE);
++	if (!*eq_mmio) {
++		cxidev_warn_once(&hw->cdev, "ioremap failed");
 +		return -EFAULT;
 +	}
 +
-+	rtn = kobject_init_and_add(&media_lgrp->counters_kobj, &media_counters, &media_lgrp->kobj,
-+				   "counters");
-+	if (rtn) {
-+		kobject_put(&media_lgrp->counters_kobj);
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+			   "media counters create kobject_init_and_add failed [%d]", rtn);
-+		return rtn;
++	return 0;
++}
++
++/**
++ * cass_eq_attach_irqs() - Attach event and status interrupt handlers to an EQ.
++ *
++ * @eq: Event queue structure
++ * @hw: Cassini device
++ * @cpus: CPU mask for IRQ affinity
++ * @event_cb: Event interrupt callback
++ * @event_cb_data: Event callback data
++ * @status_cb: Status interrupt callback
++ * @status_cb_data: Status callback data
++ *
++ * Return: 0 on success, negative error code on failure
++ */
++static int cass_eq_attach_irqs(struct cxi_eq_priv *eq, struct cass_dev *hw,
++			       struct cpumask *cpus,
++			       void (*event_cb)(void *cb_data), void *event_cb_data,
++			       void (*status_cb)(void *cb_data), void *status_cb_data)
++{
++	struct cass_irq *irq;
++	int rc = 0;
++
++	eq->event_cb = event_cb;
++	eq->event_cb_data = event_cb_data;
++	eq->status_cb = status_cb;
++	eq->status_cb_data = status_cb_data;
++	if (event_cb) {
++		eq->event_nb.notifier_call = eq_event_nb;
++
++		irq = cass_comp_irq_attach(hw, cpus, &eq->event_nb);
++		if (IS_ERR(irq)) {
++			rc = PTR_ERR(irq);
++			goto out;
++		}
++		eq->event_msi_irq = irq;
++	} else {
++		eq->event_msi_irq = NULL;
++	}
++
++	if (status_cb) {
++		eq->status_nb.notifier_call = eq_status_nb;
++
++		irq = cass_comp_irq_attach(hw, cpus, &eq->status_nb);
++		if (IS_ERR(irq)) {
++			rc = PTR_ERR(irq);
++			goto event_irq_detach;
++		}
++		eq->status_msi_irq = irq;
++	} else {
++		eq->status_msi_irq = NULL;
 +	}
 +
 +	return 0;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
++
++event_irq_detach:
++	if (eq->event_msi_irq)
++		cass_comp_irq_detach(hw, eq->event_msi_irq, &eq->event_nb);
++out:
++	return rc;
 +}
 +
-+void sl_sysfs_media_counters_delete(struct sl_ctrl_lgrp *ctrl_lgrp)
++static struct cxi_eq *cxi_eq_alloc_vf(struct cxi_lni *lni, const struct cxi_md *md,
++				      const struct cxi_eq_attr *attr,
++				      void (*event_cb)(void *cb_data),
++				      void *event_cb_data,
++				      void (*status_cb)(void *cb_data),
++				      void *status_cb_data)
 +{
-+#ifdef CONFIG_SYSFS
-+	struct sl_media_lgrp *media_lgrp;
++	struct cxi_dev *dev = container_of(lni, struct cxi_lni_priv, lni)->dev;
++	struct cass_dev *hw = container_of(dev, struct cass_dev, cdev);
++	struct cxi_eq_priv *eq;
++	bool passthrough = !!(attr->flags & CXI_EQ_PASSTHROUGH);
++	struct cxi_eq_alloc_cmd_vf cmd = {
++		.base.op = CXI_OP_EQ_ALLOC,
++		.base.lni = lni->id,
++		.base.attr = *attr,
++		/* We explicitly tell PF to do nothing with these fields */
++		.base.queue_md = (!passthrough && md) ? md->id : CXI_MD_NONE,
++		.base.event_wait = CXI_WAIT_NONE,
++		.base.status_wait = CXI_WAIT_NONE,
++	};
++	struct cxi_eq_alloc_resp resp;
++	size_t resp_len = sizeof(resp);
++	bool is_user = attr->flags & CXI_EQ_USER;
++	struct cpumask cpus = {};
++	struct cxi_eq_attr cmd_attr = *attr;
++	int rc;
 +
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media counters delete");
-+
-+	media_lgrp = sl_media_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!media_lgrp) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "media_lgrp_get failed");
-+		return;
++	if (!passthrough && !md) {
++		cxidev_err(dev, "EQ_ALLOC(VF): missing MD for non-passthrough\n");
++		return ERR_PTR(-EINVAL);
 +	}
 +
-+	kobject_put(&media_lgrp->counters_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_pmi.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_pmi.c
-new file mode 100644
-index 000000000000..605a7748e242
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_pmi.c
-@@ -0,0 +1,80 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2026 Hewlett Packard Enterprise Development LP */
++	/* Queue buffer address and length must be page aligned. */
++	if (!IS_ALIGNED((uintptr_t)attr->queue, PAGE_SIZE))
++		return ERR_PTR(-EINVAL);
 +
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "sl_ctrl_lgrp.h"
++	if (!IS_ALIGNED(attr->queue_len, PAGE_SIZE))
++		return ERR_PTR(-EINVAL);
 +
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static struct attribute *pmi_attrs[] = {
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(pmi);
-+
-+static struct kobj_type pmi_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = pmi_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_pmi_create(struct sl_ctrl_lgrp *ctrl_lgrp)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "pmi (lgrp = 0x%p)", ctrl_lgrp);
-+
-+	if (!ctrl_lgrp->parent_kobj) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "pmi create missing parent");
-+		return -EBADRQC;
++	if (!passthrough) {
++		cmd_attr.queue = (void *)(uintptr_t)
++			((uintptr_t)attr->queue - (uintptr_t)md->va);
 +	}
 +
-+	rtn = kobject_init_and_add(&ctrl_lgrp->pmi_kobj, &pmi_info, ctrl_lgrp->parent_kobj, "pmi");
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "pmi create kobject_init_and_add failed [%d]", rtn);
-+		goto out_pmi;
++	eq = kzalloc(sizeof(*eq), GFP_KERNEL);
++	if (!eq)
++		return ERR_PTR(-ENOMEM);
++
++	eq->attr = *attr;
++	eq->lni_priv = container_of(lni, struct cxi_lni_priv, lni);
++	eq->active.md = md;
++	eq->active.events = eq->attr.queue;
++	eq->active.events_len = eq->attr.queue_len;
++	eq->queue_size = get_eq_queue_size(eq->active.events_len);
++	mutex_init(&eq->resize_mutex);
++	eq->resized = false;
++
++	if (eq->attr.cpu_affinity < nr_cpumask_bits)
++		cpumask_set_cpu(eq->attr.cpu_affinity, &cpus);
++
++	rc = cass_eq_attach_irqs(eq, hw, &cpus, event_cb, event_cb_data, status_cb, status_cb_data);
++	if (rc)
++		goto free_eq_alloc;
++
++	if (passthrough) {
++		if (is_user) {
++			rc = get_dma_addr_if_contig(hw, eq->active.events,
++						    eq->active.events_len,
++						    DMA_FROM_DEVICE,
++						    &eq->active.pages,
++						    &eq->active.dma_addr);
++		} else {
++			eq->active.dma_addr = dma_map_single(&hw->cdev.pdev->dev,
++							     eq->active.events,
++							     eq->active.events_len,
++							     DMA_FROM_DEVICE);
++			if (dma_mapping_error(&hw->cdev.pdev->dev, eq->active.dma_addr))
++				rc = -ENOMEM;
++		}
++
++		if (rc)
++			goto free_irqs;
++	} else {
++		eq->active.dma_addr = md->iova;
 +	}
 +
-+	rtn = sl_sysfs_pmi_rd_create(ctrl_lgrp, &ctrl_lgrp->pmi_kobj);
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "pmi rd create failed [%d]", rtn);
-+		goto out_pmi;
++	cmd.dma_addr = eq->active.dma_addr;
++	/* ... and instead give it the IRQ indices */
++	cmd.event_irq_idx = eq->event_msi_irq ? eq->event_msi_irq->idx : -1;
++	cmd.status_irq_idx = eq->status_msi_irq ? eq->status_msi_irq->idx : -1;
++	cmd.base.attr = cmd_attr;
++
++	rc = cxi_send_msg_to_pf(dev, &cmd, sizeof(cmd), &resp, &resp_len);
++	if (rc)
++		goto free_dma_map;
++
++	eq->eq.eqn = resp.eq;
++
++	if (!is_user) {
++		rc = eq_mmio_map(hw, &eq->eq_mmio, eq->eq.eqn);
++		if (rc) {
++			cxi_eq_free(&eq->eq);
++			return ERR_PTR(rc);
++		}
 +	}
 +
-+	rtn = sl_sysfs_pmi_wr_create(ctrl_lgrp, &ctrl_lgrp->pmi_kobj);
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "pmi wr create failed [%d]", rtn);
-+		goto out_rd;
-+	}
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "pmi create (pmi_kobj = 0x%p)", &ctrl_lgrp->pmi_kobj);
-+	return 0;
-+
-+out_rd:
-+	sl_sysfs_pmi_rd_delete(ctrl_lgrp);
-+out_pmi:
-+	kobject_put(&ctrl_lgrp->pmi_kobj);
-+
-+	return -ENOMEM;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_pmi_delete(struct sl_ctrl_lgrp *ctrl_lgrp)
-+{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "pmi delete (lgrp = 0x%p)", ctrl_lgrp);
-+
-+	if (!ctrl_lgrp->parent_kobj)
-+		return;
-+
-+	sl_sysfs_pmi_wr_delete(ctrl_lgrp);
-+	sl_sysfs_pmi_rd_delete(ctrl_lgrp);
-+
-+	kobject_put(&ctrl_lgrp->pmi_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_pmi_rd.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_pmi_rd.c
-new file mode 100644
-index 000000000000..8e997c4ce3f5
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_pmi_rd.c
-@@ -0,0 +1,197 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/sysfs.h>
-+#include <linux/kobject.h>
-+
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "sl_ctrl_lgrp.h"
-+#include "sl_ctrl_ldev.h"
-+#include "sl_core_lgrp.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t addr_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u16                  addr;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, pmi_rd_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_pmi_rd_addr_get(core_lgrp, &addr);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "pmi rd addr show (addr = 0x%04X)", addr);
-+
-+	return sysfs_emit(buf, "0x%04X\n", addr);
-+}
-+
-+static ssize_t data_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u16                  data;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, pmi_rd_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_pmi_rd_data_get(core_lgrp, &data);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "pmi rd data show (data = 0x%04X)", data);
-+
-+	return sysfs_emit(buf, "0x%04X\n", data);
-+}
-+
-+static ssize_t dev_id_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u8                   dev_id;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, pmi_rd_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_pmi_rd_dev_id_get(core_lgrp, &dev_id);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "pmi rd dev id show (dev_id = 0x%02X)", dev_id);
-+
-+	return sysfs_emit(buf, "0x%02X\n", dev_id);
-+}
-+
-+static ssize_t lane_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u8                   lane;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, pmi_rd_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_pmi_rd_lane_get(core_lgrp, &lane);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "pmi rd lane show (lane = 0x%02X)", lane);
-+
-+	return sysfs_emit(buf, "0x%02X\n", lane);
-+}
-+
-+static ssize_t pll_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u8                   pll;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, pmi_rd_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_pmi_rd_pll_get(core_lgrp, &pll);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "pmi rd pll show (pll = 0x%02X)", pll);
-+
-+	return sysfs_emit(buf, "0x%02X\n", pll);
-+}
-+
-+static ssize_t result_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	int                  result;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, pmi_rd_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_pmi_rd_result_get(core_lgrp, &result);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "pmi rd result show (result = %d)", result);
-+
-+	return sysfs_emit(buf, "%d\n", result);
-+}
-+
-+static struct kobj_attribute addr   = __ATTR_RO(addr);
-+static struct kobj_attribute data   = __ATTR_RO(data);
-+static struct kobj_attribute dev_id = __ATTR_RO(dev_id);
-+static struct kobj_attribute lane   = __ATTR_RO(lane);
-+static struct kobj_attribute pll    = __ATTR_RO(pll);
-+static struct kobj_attribute result = __ATTR_RO(result);
-+
-+static struct attribute *pmi_rd_attrs[] = {
-+	&addr.attr,
-+	&data.attr,
-+	&dev_id.attr,
-+	&lane.attr,
-+	&pll.attr,
-+	&result.attr,
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(pmi_rd);
-+
-+static struct kobj_type pmi_rd_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = pmi_rd_groups,
-+};
-+#endif
-+
-+int sl_sysfs_pmi_rd_create(struct sl_ctrl_lgrp *ctrl_lgrp, struct kobject *parent_kobj)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	rtn = kobject_init_and_add(&ctrl_lgrp->pmi_rd_kobj, &pmi_rd_info, parent_kobj, "rd");
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "pmi rd create kobject_init_and_add failed [%d]", rtn);
-+		goto out_pmi_rd;
-+	}
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "pmi rd create (pmi_rd_kobj = 0x%p)", &ctrl_lgrp->pmi_rd_kobj);
-+	return 0;
-+
-+out_pmi_rd:
-+	kobject_put(&ctrl_lgrp->pmi_rd_kobj);
-+
-+	return -ENOMEM;
-+#else
-+	return 0;
-+#endif
-+}
-+
-+void sl_sysfs_pmi_rd_delete(struct sl_ctrl_lgrp *ctrl_lgrp)
-+{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "pmi rd delete (lgrp = 0x%p)", ctrl_lgrp);
-+
-+	kobject_put(&ctrl_lgrp->pmi_rd_kobj);
-+#endif
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_pmi_wr.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_pmi_wr.c
-new file mode 100644
-index 000000000000..ccc672378bf5
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_pmi_wr.c
-@@ -0,0 +1,220 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/sysfs.h>
-+#include <linux/kobject.h>
-+
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "sl_ctrl_lgrp.h"
-+#include "sl_ctrl_ldev.h"
-+#include "sl_core_lgrp.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t addr_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u16                  addr;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, pmi_wr_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_pmi_wr_addr_get(core_lgrp, &addr);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "pmi wr addr show (addr = 0x%04X)", addr);
-+
-+	return sysfs_emit(buf, "0x%04X\n", addr);
-+}
-+
-+static ssize_t data_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u16                  data;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, pmi_wr_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_pmi_wr_data_get(core_lgrp, &data);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "pmi wr data show (data = 0x%04X)", data);
-+
-+	return sysfs_emit(buf, "0x%04X\n", data);
-+}
-+
-+static ssize_t mask_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u16                  mask;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, pmi_wr_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_pmi_wr_mask_get(core_lgrp, &mask);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "pmi wr mask show (mask = 0x%04X)", mask);
-+
-+	return sysfs_emit(buf, "0x%04X\n", mask);
-+}
-+
-+static ssize_t dev_id_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u8                   dev_id;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, pmi_wr_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_pmi_wr_dev_id_get(core_lgrp, &dev_id);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "pmi wr dev id show (dev_id = 0x%02X)", dev_id);
-+
-+	return sysfs_emit(buf, "0x%02X\n", dev_id);
-+}
-+
-+static ssize_t lane_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u8                   lane;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, pmi_wr_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_pmi_wr_lane_get(core_lgrp, &lane);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "pmi wr lane show (lane = 0x%02X)", lane);
-+
-+	return sysfs_emit(buf, "0x%02X\n", lane);
-+}
-+
-+static ssize_t pll_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u8                   pll;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, pmi_wr_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_pmi_wr_pll_get(core_lgrp, &pll);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "pmi wr pll show (pll = 0x%02X)", pll);
-+
-+	return sysfs_emit(buf, "0x%02X\n", pll);
-+}
-+
-+static ssize_t result_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	int                  result;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, pmi_wr_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_pmi_wr_result_get(core_lgrp, &result);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "pmi wr result show (result = %d)", result);
-+
-+	return sysfs_emit(buf, "%d\n", result);
-+}
-+
-+static struct kobj_attribute addr   = __ATTR_RO(addr);
-+static struct kobj_attribute data   = __ATTR_RO(data);
-+static struct kobj_attribute mask   = __ATTR_RO(mask);
-+static struct kobj_attribute dev_id = __ATTR_RO(dev_id);
-+static struct kobj_attribute lane   = __ATTR_RO(lane);
-+static struct kobj_attribute pll    = __ATTR_RO(pll);
-+static struct kobj_attribute result = __ATTR_RO(result);
-+
-+static struct attribute *pmi_wr_attrs[] = {
-+	&addr.attr,
-+	&data.attr,
-+	&mask.attr,
-+	&dev_id.attr,
-+	&lane.attr,
-+	&pll.attr,
-+	&result.attr,
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(pmi_wr);
-+
-+static struct kobj_type pmi_wr_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = pmi_wr_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_pmi_wr_create(struct sl_ctrl_lgrp *ctrl_lgrp, struct kobject *parent_kobj)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	rtn = kobject_init_and_add(&ctrl_lgrp->pmi_wr_kobj, &pmi_wr_info, parent_kobj, "wr");
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "pmi wr create kobject_init_and_add failed [%d]", rtn);
-+		goto out_pmi_wr;
-+	}
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "pmi wr create (pmi_wr_kobj = 0x%p)", &ctrl_lgrp->pmi_wr_kobj);
-+	return 0;
-+
-+out_pmi_wr:
-+	kobject_put(&ctrl_lgrp->pmi_wr_kobj);
-+
-+	return -ENOMEM;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_pmi_wr_delete(struct sl_ctrl_lgrp *ctrl_lgrp)
-+{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "pmi wr delete (lgrp = 0x%p)", ctrl_lgrp);
-+
-+	kobject_put(&ctrl_lgrp->pmi_wr_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_sbus.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_sbus.c
-new file mode 100644
-index 000000000000..a71c396e59f3
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_sbus.c
-@@ -0,0 +1,89 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2026 Hewlett Packard Enterprise Development LP */
-+
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "sl_ctrl_lgrp.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static struct attribute *sbus_attrs[] = {
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(sbus);
-+
-+static struct kobj_type sbus_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = sbus_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_sbus_create(struct sl_ctrl_lgrp *ctrl_lgrp)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus (lgrp = 0x%p)", ctrl_lgrp);
-+
-+	if (!ctrl_lgrp->parent_kobj) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus create missing parent");
-+		return -EBADRQC;
-+	}
-+
-+	rtn = kobject_init_and_add(&ctrl_lgrp->sbus_kobj, &sbus_info, ctrl_lgrp->parent_kobj, "sbus");
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus create kobject_init_and_add failed [%d]", rtn);
-+		goto out_sbus;
-+	}
-+
-+	rtn = sl_sysfs_sbus_rd_create(ctrl_lgrp, &ctrl_lgrp->sbus_kobj);
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus rd create failed [%d]", rtn);
-+		goto out_sbus;
-+	}
-+
-+	rtn = sl_sysfs_sbus_wr_create(ctrl_lgrp, &ctrl_lgrp->sbus_kobj);
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus wr create failed [%d]", rtn);
-+		goto out_rd;
-+	}
-+
-+	rtn = sl_sysfs_sbus_rst_create(ctrl_lgrp, &ctrl_lgrp->sbus_kobj);
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus rst create failed [%d]", rtn);
-+		goto out_wr;
-+	}
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus create (sbus_kobj = 0x%p)", &ctrl_lgrp->sbus_kobj);
-+	return 0;
-+
-+out_wr:
-+	sl_sysfs_sbus_wr_delete(ctrl_lgrp);
-+out_rd:
-+	sl_sysfs_sbus_rd_delete(ctrl_lgrp);
-+out_sbus:
-+	kobject_put(&ctrl_lgrp->sbus_kobj);
-+
-+	return -ENOMEM;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_sbus_delete(struct sl_ctrl_lgrp *ctrl_lgrp)
-+{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus delete (lgrp = 0x%p)", ctrl_lgrp);
-+
-+	if (!ctrl_lgrp->parent_kobj)
-+		return;
-+
-+	sl_sysfs_sbus_rst_delete(ctrl_lgrp);
-+	sl_sysfs_sbus_wr_delete(ctrl_lgrp);
-+	sl_sysfs_sbus_rd_delete(ctrl_lgrp);
-+
-+	kobject_put(&ctrl_lgrp->sbus_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_sbus_pmi.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_sbus_pmi.c
-new file mode 100644
-index 000000000000..5048b0f69f76
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_sbus_pmi.c
-@@ -0,0 +1,80 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2026 Hewlett Packard Enterprise Development LP */
-+
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "sl_ctrl_lgrp.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static struct attribute *sbus_pmi_attrs[] = {
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(sbus_pmi);
-+
-+static struct kobj_type sbus_pmi_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = sbus_pmi_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_sbus_pmi_create(struct sl_ctrl_lgrp *ctrl_lgrp)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi create (lgrp = 0x%p)", ctrl_lgrp);
-+
-+	if (!ctrl_lgrp->parent_kobj) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi create missing parent");
-+		return -EBADRQC;
-+	}
-+
-+	rtn = kobject_init_and_add(&ctrl_lgrp->sbus_pmi_kobj, &sbus_pmi_info, ctrl_lgrp->parent_kobj, "sbus_pmi");
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi create kobject_init_and_add failed [%d]", rtn);
-+		goto out_sbus_pmi;
-+	}
-+
-+	rtn = sl_sysfs_sbus_pmi_rd_create(ctrl_lgrp, &ctrl_lgrp->sbus_pmi_kobj);
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi rd create failed [%d]", rtn);
-+		goto out_sbus_pmi;
-+	}
-+
-+	rtn = sl_sysfs_sbus_pmi_wr_create(ctrl_lgrp, &ctrl_lgrp->sbus_pmi_kobj);
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi wr create failed [%d]", rtn);
-+		goto out_rd;
-+	}
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi create (sbus_pmi_kobj = 0x%p)", &ctrl_lgrp->sbus_pmi_kobj);
-+	return 0;
-+
-+out_rd:
-+	sl_sysfs_sbus_pmi_rd_delete(ctrl_lgrp);
-+out_sbus_pmi:
-+	kobject_put(&ctrl_lgrp->sbus_pmi_kobj);
-+
-+	return -ENOMEM;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_sbus_pmi_delete(struct sl_ctrl_lgrp *ctrl_lgrp)
-+{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi delete (lgrp = 0x%p)", ctrl_lgrp);
-+
-+	if (!ctrl_lgrp->parent_kobj)
-+		return;
-+
-+	sl_sysfs_sbus_pmi_wr_delete(ctrl_lgrp);
-+	sl_sysfs_sbus_pmi_rd_delete(ctrl_lgrp);
-+
-+	kobject_put(&ctrl_lgrp->sbus_pmi_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_sbus_pmi_rd.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_sbus_pmi_rd.c
-new file mode 100644
-index 000000000000..c8042fe67eb6
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_sbus_pmi_rd.c
-@@ -0,0 +1,244 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/sysfs.h>
-+#include <linux/kobject.h>
-+
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "sl_ctrl_lgrp.h"
-+#include "sl_ctrl_ldev.h"
-+#include "sl_core_lgrp.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t dev_addr_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u8                   dev_addr;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_pmi_rd_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_pmi_rd_dev_addr_get(core_lgrp, &dev_addr);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi rd dev_addr show (dev_addr = 0x%02X)", dev_addr);
-+
-+	return sysfs_emit(buf, "0x%02X\n", dev_addr);
-+}
-+
-+static ssize_t addr_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u16                  addr;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_pmi_rd_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_pmi_rd_addr_get(core_lgrp, &addr);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi rd addr show (addr = 0x%04X)", addr);
-+
-+	return sysfs_emit(buf, "0x%04X\n", addr);
-+}
-+
-+static ssize_t data_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u16                  data;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_pmi_rd_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_pmi_rd_data_get(core_lgrp, &data);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi rd data show (data = 0x%04X)", data);
-+
-+	return sysfs_emit(buf, "0x%04X\n", data);
-+}
-+
-+static ssize_t mask_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u16                  mask;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_pmi_rd_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_pmi_rd_mask_get(core_lgrp, &mask);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi rd mask show (mask = 0x%04X)", mask);
-+
-+	return sysfs_emit(buf, "0x%04X\n", mask);
-+}
-+
-+static ssize_t dev_id_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u8                   dev_id;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_pmi_rd_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_pmi_rd_dev_id_get(core_lgrp, &dev_id);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi rd dev id show (dev_id = 0x%02X)", dev_id);
-+
-+	return sysfs_emit(buf, "0x%02X\n", dev_id);
-+}
-+
-+static ssize_t lane_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u8                   lane;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_pmi_rd_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_pmi_rd_lane_get(core_lgrp, &lane);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi rd lane show (lane = 0x%02X)", lane);
-+
-+	return sysfs_emit(buf, "0x%02X\n", lane);
-+}
-+
-+static ssize_t pll_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u8                   pll;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_pmi_rd_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_pmi_rd_pll_get(core_lgrp, &pll);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi rd pll show (pll = 0x%02X)", pll);
-+
-+	return sysfs_emit(buf, "0x%02X\n", pll);
-+}
-+
-+static ssize_t result_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	int                  result;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_pmi_rd_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_pmi_rd_result_get(core_lgrp, &result);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi rd result show (result = %d)", result);
-+
-+	return sysfs_emit(buf, "%d\n", result);
-+}
-+
-+static struct kobj_attribute dev_addr = __ATTR_RO(dev_addr);
-+static struct kobj_attribute addr     = __ATTR_RO(addr);
-+static struct kobj_attribute data     = __ATTR_RO(data);
-+static struct kobj_attribute mask     = __ATTR_RO(mask);
-+static struct kobj_attribute dev_id   = __ATTR_RO(dev_id);
-+static struct kobj_attribute lane     = __ATTR_RO(lane);
-+static struct kobj_attribute pll      = __ATTR_RO(pll);
-+static struct kobj_attribute result   = __ATTR_RO(result);
-+
-+static struct attribute *sbus_pmi_rd_attrs[] = {
-+	&dev_addr.attr,
-+	&addr.attr,
-+	&data.attr,
-+	&mask.attr,
-+	&dev_id.attr,
-+	&lane.attr,
-+	&pll.attr,
-+	&result.attr,
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(sbus_pmi_rd);
-+
-+static struct kobj_type sbus_pmi_rd_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = sbus_pmi_rd_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_sbus_pmi_rd_create(struct sl_ctrl_lgrp *ctrl_lgrp, struct kobject *parent_kobj)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	rtn = kobject_init_and_add(&ctrl_lgrp->sbus_pmi_rd_kobj, &sbus_pmi_rd_info, parent_kobj, "rd");
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi rd create kobject_init_and_add failed [%d]", rtn);
-+		goto out_sbus_pmi_rd;
-+	}
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi rd create (sbus_pmi_rd_kobj = 0x%p)",
-+		   &ctrl_lgrp->sbus_pmi_rd_kobj);
-+	return 0;
-+
-+out_sbus_pmi_rd:
-+	kobject_put(&ctrl_lgrp->sbus_pmi_rd_kobj);
-+
-+	return -ENOMEM;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_sbus_pmi_rd_delete(struct sl_ctrl_lgrp *ctrl_lgrp)
-+{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi rd delete (lgrp = 0x%p)", ctrl_lgrp);
-+
-+	kobject_put(&ctrl_lgrp->sbus_pmi_rd_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_sbus_pmi_wr.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_sbus_pmi_wr.c
-new file mode 100644
-index 000000000000..a9de4a9e42ea
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_sbus_pmi_wr.c
-@@ -0,0 +1,244 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/sysfs.h>
-+#include <linux/kobject.h>
-+
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "sl_ctrl_lgrp.h"
-+#include "sl_ctrl_ldev.h"
-+#include "sl_core_lgrp.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t dev_addr_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u8                   dev_addr;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_pmi_wr_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_pmi_wr_dev_addr_get(core_lgrp, &dev_addr);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi wr dev_addr show (dev_addr = 0x%02X)", dev_addr);
-+
-+	return sysfs_emit(buf, "0x%02X\n", dev_addr);
-+}
-+
-+static ssize_t addr_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u16                  addr;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_pmi_wr_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_pmi_wr_addr_get(core_lgrp, &addr);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi wr addr show (addr = 0x%04X)", addr);
-+
-+	return sysfs_emit(buf, "0x%04X\n", addr);
-+}
-+
-+static ssize_t data_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u16                  data;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_pmi_wr_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_pmi_wr_data_get(core_lgrp, &data);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi wr data show (data = 0x%04X)", data);
-+
-+	return sysfs_emit(buf, "0x%04X\n", data);
-+}
-+
-+static ssize_t mask_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u16                  mask;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_pmi_wr_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_pmi_wr_mask_get(core_lgrp, &mask);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi wr mask show (mask = 0x%04X)", mask);
-+
-+	return sysfs_emit(buf, "0x%04X\n", mask);
-+}
-+
-+static ssize_t dev_id_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u8                   dev_id;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_pmi_wr_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_pmi_wr_dev_id_get(core_lgrp, &dev_id);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi wr dev id show (dev_id = 0x%02X)", dev_id);
-+
-+	return sysfs_emit(buf, "0x%02X\n", dev_id);
-+}
-+
-+static ssize_t lane_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u8                   lane;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_pmi_wr_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_pmi_wr_lane_get(core_lgrp, &lane);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi wr lane show (lane = 0x%02X)", lane);
-+
-+	return sysfs_emit(buf, "0x%02X\n", lane);
-+}
-+
-+static ssize_t pll_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u8                   pll;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_pmi_wr_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_pmi_wr_pll_get(core_lgrp, &pll);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi wr pll show (pll = 0x%02X)", pll);
-+
-+	return sysfs_emit(buf, "0x%02X\n", pll);
-+}
-+
-+static ssize_t result_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	int                  result;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_pmi_wr_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_pmi_wr_result_get(core_lgrp, &result);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi wr result show (result = %d)", result);
-+
-+	return sysfs_emit(buf, "%d\n", result);
-+}
-+
-+static struct kobj_attribute dev_addr = __ATTR_RO(dev_addr);
-+static struct kobj_attribute addr     = __ATTR_RO(addr);
-+static struct kobj_attribute data     = __ATTR_RO(data);
-+static struct kobj_attribute mask     = __ATTR_RO(mask);
-+static struct kobj_attribute dev_id   = __ATTR_RO(dev_id);
-+static struct kobj_attribute lane     = __ATTR_RO(lane);
-+static struct kobj_attribute pll      = __ATTR_RO(pll);
-+static struct kobj_attribute result   = __ATTR_RO(result);
-+
-+static struct attribute *sbus_pmi_wr_attrs[] = {
-+	&dev_addr.attr,
-+	&addr.attr,
-+	&data.attr,
-+	&mask.attr,
-+	&dev_id.attr,
-+	&lane.attr,
-+	&pll.attr,
-+	&result.attr,
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(sbus_pmi_wr);
-+
-+static struct kobj_type sbus_pmi_wr_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = sbus_pmi_wr_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_sbus_pmi_wr_create(struct sl_ctrl_lgrp *ctrl_lgrp, struct kobject *parent_kobj)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	rtn = kobject_init_and_add(&ctrl_lgrp->sbus_pmi_wr_kobj, &sbus_pmi_wr_info, parent_kobj, "wr");
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi wr create kobject_init_and_add failed [%d]", rtn);
-+		goto out_sbus_pmi_wr;
-+	}
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi wr create (sbus_pmi_wr_kobj = 0x%p)",
-+		   &ctrl_lgrp->sbus_pmi_wr_kobj);
-+	return 0;
-+
-+out_sbus_pmi_wr:
-+	kobject_put(&ctrl_lgrp->sbus_pmi_wr_kobj);
-+
-+	return -ENOMEM;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_sbus_pmi_wr_delete(struct sl_ctrl_lgrp *ctrl_lgrp)
-+{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus_pmi wr delete (lgrp = 0x%p)", ctrl_lgrp);
-+
-+	kobject_put(&ctrl_lgrp->sbus_pmi_wr_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_sbus_rd.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_sbus_rd.c
-new file mode 100644
-index 000000000000..8f4e74f9dd2d
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_sbus_rd.c
-@@ -0,0 +1,197 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/sysfs.h>
-+#include <linux/kobject.h>
-+
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "sl_ctrl_lgrp.h"
-+#include "sl_ctrl_ldev.h"
-+#include "sl_core_lgrp.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t dev_addr_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u8                   dev_addr;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_rd_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_rd_dev_addr_get(core_lgrp, &dev_addr);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus rd dev addr show (dev_addr = 0x%02X)", dev_addr);
-+
-+	return sysfs_emit(buf, "0x%02X\n", dev_addr);
-+}
-+
-+static ssize_t data_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u32                  data;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_rd_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_rd_data_get(core_lgrp, &data);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus rd data show (data = 0x%08X)", data);
-+
-+	return sysfs_emit(buf, "0x%08X\n", data);
-+}
-+
-+static ssize_t mask_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u32                  mask;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_rd_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_rd_mask_get(core_lgrp, &mask);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus rd mask show (mask = 0x%08X)", mask);
-+
-+	return sysfs_emit(buf, "0x%08X\n", mask);
-+}
-+
-+static ssize_t reg_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u8                   reg;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_rd_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_rd_reg_get(core_lgrp, &reg);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus rd reg show (reg = 0x%02X)", reg);
-+
-+	return sysfs_emit(buf, "0x%02X\n", reg);
-+}
-+
-+static ssize_t lsb_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u8                   lsb;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_rd_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_rd_lsb_get(core_lgrp, &lsb);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus rd lsb show (lsb = %u)", lsb);
-+
-+	return sysfs_emit(buf, "%u\n", lsb);
-+}
-+
-+static ssize_t result_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	int                  result;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_rd_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_rd_result_get(core_lgrp, &result);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus rd result show (result = %d)", result);
-+
-+	return sysfs_emit(buf, "%d\n", result);
-+}
-+
-+static struct kobj_attribute dev_addr = __ATTR_RO(dev_addr);
-+static struct kobj_attribute data     = __ATTR_RO(data);
-+static struct kobj_attribute mask     = __ATTR_RO(mask);
-+static struct kobj_attribute reg      = __ATTR_RO(reg);
-+static struct kobj_attribute lsb      = __ATTR_RO(lsb);
-+static struct kobj_attribute result   = __ATTR_RO(result);
-+
-+static struct attribute *sbus_rd_attrs[] = {
-+	&dev_addr.attr,
-+	&data.attr,
-+	&mask.attr,
-+	&reg.attr,
-+	&lsb.attr,
-+	&result.attr,
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(sbus_rd);
-+
-+static struct kobj_type sbus_rd_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = sbus_rd_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_sbus_rd_create(struct sl_ctrl_lgrp *ctrl_lgrp, struct kobject *parent_kobj)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	rtn = kobject_init_and_add(&ctrl_lgrp->sbus_rd_kobj, &sbus_rd_info, parent_kobj, "rd");
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus rd create kobject_init_and_add failed [%d]", rtn);
-+		goto out_sbus_rd;
-+	}
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus rd create (sbus_rd_kobj = 0x%p)", &ctrl_lgrp->sbus_rd_kobj);
-+	return 0;
-+
-+out_sbus_rd:
-+	kobject_put(&ctrl_lgrp->sbus_rd_kobj);
-+
-+	return -ENOMEM;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_sbus_rd_delete(struct sl_ctrl_lgrp *ctrl_lgrp)
-+{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus rd delete (lgrp = 0x%p)", ctrl_lgrp);
-+
-+	kobject_put(&ctrl_lgrp->sbus_rd_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_sbus_rst.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_sbus_rst.c
-new file mode 100644
-index 000000000000..872a80636630
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_sbus_rst.c
-@@ -0,0 +1,105 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/sysfs.h>
-+#include <linux/kobject.h>
-+
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "sl_ctrl_lgrp.h"
-+#include "sl_ctrl_ldev.h"
-+#include "sl_core_lgrp.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t dev_addr_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u8                   dev_addr;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_rst_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_rst_dev_addr_get(core_lgrp, &dev_addr);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus rst dev addr show (dev_addr = 0x%02X)", dev_addr);
-+
-+	return sysfs_emit(buf, "0x%02X\n", dev_addr);
-+}
-+
-+static ssize_t result_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	int                  result;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_rst_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_rst_result_get(core_lgrp, &result);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus rst result show (result = %d)", result);
-+
-+	return sysfs_emit(buf, "%d\n", result);
-+}
-+
-+static struct kobj_attribute dev_addr = __ATTR_RO(dev_addr);
-+static struct kobj_attribute result   = __ATTR_RO(result);
-+
-+static struct attribute *sbus_rst_attrs[] = {
-+	&dev_addr.attr,
-+	&result.attr,
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(sbus_rst);
-+
-+static struct kobj_type sbus_rst_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = sbus_rst_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_sbus_rst_create(struct sl_ctrl_lgrp *ctrl_lgrp, struct kobject *parent_kobj)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	rtn = kobject_init_and_add(&ctrl_lgrp->sbus_rst_kobj, &sbus_rst_info, parent_kobj, "rst");
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus rst create kobject_init_and_add failed [%d]", rtn);
-+		goto out_sbus_rst;
-+	}
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus rst create (sbus_rst_kobj = 0x%p)", &ctrl_lgrp->sbus_rst_kobj);
-+	return 0;
-+
-+out_sbus_rst:
-+	kobject_put(&ctrl_lgrp->sbus_rst_kobj);
-+
-+	return -ENOMEM;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_sbus_rst_delete(struct sl_ctrl_lgrp *ctrl_lgrp)
-+{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus rst delete (lgrp = 0x%p)", ctrl_lgrp);
-+
-+	kobject_put(&ctrl_lgrp->sbus_rst_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_sbus_wr.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_sbus_wr.c
-new file mode 100644
-index 000000000000..036977d964d6
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_sbus_wr.c
-@@ -0,0 +1,197 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/sysfs.h>
-+#include <linux/kobject.h>
-+
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "sl_ctrl_lgrp.h"
-+#include "sl_ctrl_ldev.h"
-+#include "sl_core_lgrp.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t dev_addr_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u8                   dev_addr;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_wr_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_wr_dev_addr_get(core_lgrp, &dev_addr);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus wr dev addr show (dev_addr = 0x%02X)", dev_addr);
-+
-+	return sysfs_emit(buf, "0x%02X\n", dev_addr);
-+}
-+
-+static ssize_t data_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u32                  data;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_wr_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_wr_data_get(core_lgrp, &data);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus wr data show (data = 0x%08X)", data);
-+
-+	return sysfs_emit(buf, "0x%08X\n", data);
-+}
-+
-+static ssize_t mask_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u32                  mask;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_wr_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_wr_mask_get(core_lgrp, &mask);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus wr mask show (mask = 0x%08X)", mask);
-+
-+	return sysfs_emit(buf, "0x%08X\n", mask);
-+}
-+
-+static ssize_t reg_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u8                   reg;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_wr_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_wr_reg_get(core_lgrp, &reg);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus wr reg show (reg = 0x%02X)", reg);
-+
-+	return sysfs_emit(buf, "0x%02X\n", reg);
-+}
-+
-+static ssize_t lsb_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u8                   lsb;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_wr_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_wr_lsb_get(core_lgrp, &lsb);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus wr lsb show (lsb = %u)", lsb);
-+
-+	return sysfs_emit(buf, "%u\n", lsb);
-+}
-+
-+static ssize_t result_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	int                  result;
-+	int                  rtn;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, sbus_wr_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_sbus_wr_result_get(core_lgrp, &result);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "sbus wr result show (result = %d)", result);
-+
-+	return sysfs_emit(buf, "%d\n", result);
-+}
-+
-+static struct kobj_attribute dev_addr = __ATTR_RO(dev_addr);
-+static struct kobj_attribute data     = __ATTR_RO(data);
-+static struct kobj_attribute mask     = __ATTR_RO(mask);
-+static struct kobj_attribute reg      = __ATTR_RO(reg);
-+static struct kobj_attribute lsb      = __ATTR_RO(lsb);
-+static struct kobj_attribute result   = __ATTR_RO(result);
-+
-+static struct attribute *sbus_wr_attrs[] = {
-+	&dev_addr.attr,
-+	&data.attr,
-+	&mask.attr,
-+	&reg.attr,
-+	&lsb.attr,
-+	&result.attr,
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(sbus_wr);
-+
-+static struct kobj_type sbus_wr_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = sbus_wr_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_sbus_wr_create(struct sl_ctrl_lgrp *ctrl_lgrp, struct kobject *parent_kobj)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	rtn = kobject_init_and_add(&ctrl_lgrp->sbus_wr_kobj, &sbus_wr_info, parent_kobj, "wr");
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus wr create kobject_init_and_add failed [%d]", rtn);
-+		goto out_sbus_wr;
-+	}
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus wr create (sbus_wr_kobj = 0x%p)", &ctrl_lgrp->sbus_wr_kobj);
-+	return 0;
-+
-+out_sbus_wr:
-+	kobject_put(&ctrl_lgrp->sbus_wr_kobj);
-+
-+	return -ENOMEM;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
-+}
-+
-+void sl_sysfs_sbus_wr_delete(struct sl_ctrl_lgrp *ctrl_lgrp)
-+{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "sbus wr delete (lgrp = 0x%p)", ctrl_lgrp);
-+
-+	kobject_put(&ctrl_lgrp->sbus_wr_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_serdes.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_serdes.c
-new file mode 100644
-index 000000000000..08d2858fea54
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_serdes.c
-@@ -0,0 +1,302 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2024-2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "sl_ctrl_lgrp.h"
-+#include "sl_ctrl_ldev.h"
-+#include "sl_core_lgrp.h"
-+#include "sl_core_str.h"
-+#include "sl_sysfs_serdes_settings.h"
-+#include "sl_sysfs_serdes_eye.h"
-+#include "sl_sysfs_serdes_state.h"
-+#include "sl_sysfs_serdes_swizzle.h"
-+#include "sl_sysfs_serdes_lol.h"
-+#include "sl_sysfs_serdes_los.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+u8 lane_num_to_link_num(struct sl_ctrl_lgrp *ctrl_lgrp, u8 lane_num)
-+{
-+	switch (ctrl_lgrp->config.furcation) {
-+	case SL_MEDIA_FURCATION_X1:
-+	default:
-+		return 0;
-+	case SL_MEDIA_FURCATION_X2:
-+		if (lane_num & BIT(1))
-+			return 1;
++	cxi_eq_init(&eq->eq, eq->active.events, eq->active.events_len,
++		    eq->eq.eqn, (__force u64 *)eq->eq_mmio);
++
++	return &eq->eq;
++
++free_dma_map:
++	if (passthrough) {
++		if (is_user)
++			put_pages_contig(hw, &eq->active);
 +		else
-+			return 0;
-+	case SL_MEDIA_FURCATION_X4:
-+		return lane_num;
++			dma_unmap_single(&hw->cdev.pdev->dev, eq->active.dma_addr,
++					 eq->active.events_len, DMA_FROM_DEVICE);
 +	}
++free_irqs:
++	if (eq->event_msi_irq)
++		cass_comp_irq_detach(hw, eq->event_msi_irq, &eq->event_nb);
++	if (eq->status_msi_irq)
++		cass_comp_irq_detach(hw, eq->status_msi_irq, &eq->status_nb);
++free_eq_alloc:
++	kfree(eq);
++	return ERR_PTR(rc);
 +}
 +
-+#ifdef CONFIG_SYSFS
-+static ssize_t hw_rev_1_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++/**
++ * cxi_eq_alloc_internal() - Allocate a new event queue resource.
++ *
++ * @lni: LNI to associate with the event queue.
++ * @md: Memory descriptor for the queue
++ * @attr: Event queue creation attributes.
++ * @event_cb: Event interrupt callback for that EQ.
++ * @event_cb_data: Opaque owner context pointer. Can be used in the event
++ *                 interrupt callback to retrieve some internal structures.
++ * @status_cb: Status interrupt callback for that EQ.
++ * @status_cb_data: Opaque owner context pointer. Can be used in the status
++ *                  interrupt callback to retrieve some internal structures.
++ * @dma_addr: DMA address of the event queue buffer. NULL if not provided.
++ * @event_irq_idx: Event IRQ index for VF EQ allocation. Use -1 for PF EQ allocation.
++ * @status_irq_idx: Status IRQ index for VF EQ allocation. Use -1 for PF EQ allocation.
++ *
++ * Return: On success, a pointer to the allocated event queue structure. On
++ * error, an error pointer containing a negative error number.
++ */
++struct cxi_eq *cxi_eq_alloc_internal(struct cxi_lni *lni, const struct cxi_md *md,
++				     const struct cxi_eq_attr *attr,
++				     void (*event_cb)(void *cb_data),
++				     void *event_cb_data,
++				     void (*status_cb)(void *cb_data),
++				     void *status_cb_data, dma_addr_t dma_addr,
++				     int event_irq_idx, int status_irq_idx)
 +{
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
++	struct cxi_lni_priv *lni_priv = container_of(lni, struct cxi_lni_priv, lni);
++	struct cxi_dev *cdev = lni_priv->dev;
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++	struct cxi_eq_priv *eq;
++	struct cxi_md_priv *md_priv = NULL;
++	int eq_n;
++	int rc;
++	bool passthrough = !!(attr->flags & CXI_EQ_PASSTHROUGH);
++	bool is_user = attr->flags & CXI_EQ_USER;
++	struct cpumask cpus = {};
++	bool is_vf = lni_priv->is_vf;
++	u8 vf_num = lni_priv->vf_num;
 +
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, serdes_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
++	if (!attr->queue_len || attr->queue_len > MAX_EQ_LEN ||
++	    (!attr->queue && !(is_vf && !passthrough)))
++		return ERR_PTR(-EINVAL);
 +
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "hw ver show (hw_rev_1 = 0x%X)",
-+		core_lgrp->core_ldev->serdes.hw_info[LGRP_TO_SERDES(core_lgrp->num)].rev_id_1);
++	/* If status updates are enabled, ensure all requested updates are in
++	 * the range [0-100].
++	 */
++	if (attr->status_thresh_count &&
++	    (attr->status_thresh_count > 4 ||
++	     attr->status_thresh_base > 100 ||
++	     attr->status_thresh_delta > 100 ||
++	     ((attr->status_thresh_count - 1) * attr->status_thresh_delta +
++	      (100 - attr->status_thresh_base)) > 100))
++		return ERR_PTR(-EINVAL);
 +
-+	return sysfs_emit(buf, "0x%X\n",
-+		core_lgrp->core_ldev->serdes.hw_info[LGRP_TO_SERDES(core_lgrp->num)].rev_id_1);
-+}
++	/* Queue buffer address and length must be page aligned. */
++	if (!IS_ALIGNED((uintptr_t)attr->queue, PAGE_SIZE))
++		return ERR_PTR(-EINVAL);
 +
-+static ssize_t hw_rev_2_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
++	if (!IS_ALIGNED(attr->queue_len, PAGE_SIZE))
++		return ERR_PTR(-EINVAL);
 +
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, serdes_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
++	/* If using EQ translation, the MD must cover the aligned buffer. */
++	if (!passthrough &&
++	    (!md ||
++	     !CXI_MD_CONTAINS(md, attr->queue, attr->queue_len)))
++		return ERR_PTR(-EINVAL);
 +
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "hw ver show (hw_rev_2 = 0x%X)",
-+		core_lgrp->core_ldev->serdes.hw_info[LGRP_TO_SERDES(core_lgrp->num)].rev_id_2);
++	/* Only admin can create the EQ for PCT */
++	if ((attr->flags & CXI_EQ_REGISTER_PCT) && !capable(CAP_SYS_ADMIN))
++		return ERR_PTR(-EPERM);
 +
-+	return sysfs_emit(buf, "0x%X\n",
-+		core_lgrp->core_ldev->serdes.hw_info[LGRP_TO_SERDES(core_lgrp->num)].rev_id_2);
-+}
++	if ((size_t)attr->reserved_slots >
++	    (get_eq_queue_size(attr->queue_len) - 1))
++		return ERR_PTR(-EINVAL);
 +
-+static ssize_t hw_version_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
++	eq = pf_get_eq_id(lni_priv);
++	if (IS_ERR(eq))
++		return ERR_PTR(PTR_ERR(eq));
 +
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, serdes_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
++	eq_n = eq->eq.eqn;
 +
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "hw ver show (hw_version = 0x%X)",
-+		core_lgrp->core_ldev->serdes.hw_info[LGRP_TO_SERDES(core_lgrp->num)].version);
++	eq->attr = *attr;
++	eq->lni_priv = lni_priv;
++	eq->active.md = md;
++	eq->active.events = eq->attr.queue;
++	eq->active.events_len = eq->attr.queue_len;
++	eq->queue_size = get_eq_queue_size(eq->active.events_len);
++	mutex_init(&eq->resize_mutex);
++	eq->resized = false;
 +
-+	return sysfs_emit(buf, "0x%X\n",
-+		core_lgrp->core_ldev->serdes.hw_info[LGRP_TO_SERDES(core_lgrp->num)].version);
-+}
++	refcount_set(&eq->refcount, 1);
 +
-+static ssize_t fw_signature_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, serdes_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "fw signature show (fw_signature = 0x%X)",
-+		core_lgrp->core_ldev->serdes.fw_info[LGRP_TO_SERDES(core_lgrp->num)].signature);
-+
-+	return sysfs_emit(buf, "0x%X\n",
-+		core_lgrp->core_ldev->serdes.fw_info[LGRP_TO_SERDES(core_lgrp->num)].signature);
-+}
-+
-+static ssize_t fw_version_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_ctrl_lgrp  *ctrl_lgrp;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+
-+	ctrl_lgrp = container_of(kobj, struct sl_ctrl_lgrp, serdes_kobj);
-+	core_lgrp = sl_core_lgrp_get(ctrl_lgrp->ctrl_ldev->num, ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "fw version show (fw_version = 0x%X)",
-+		core_lgrp->core_ldev->serdes.fw_info[LGRP_TO_SERDES(core_lgrp->num)].version);
-+
-+	return sysfs_emit(buf, "0x%X\n",
-+		core_lgrp->core_ldev->serdes.fw_info[LGRP_TO_SERDES(core_lgrp->num)].version);
-+}
-+
-+static struct kobj_attribute hw_rev_id_1   = __ATTR_RO(hw_rev_1);
-+static struct kobj_attribute hw_rev_id_2   = __ATTR_RO(hw_rev_2);
-+static struct kobj_attribute hw_version    = __ATTR_RO(hw_version);
-+static struct kobj_attribute fw_signature  = __ATTR_RO(fw_signature);
-+static struct kobj_attribute fw_version    = __ATTR_RO(fw_version);
-+
-+static struct attribute *serdes_attrs[] = {
-+	&hw_rev_id_1.attr,
-+	&hw_rev_id_2.attr,
-+	&hw_version.attr,
-+	&fw_signature.attr,
-+	&fw_version.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(serdes);
-+
-+static struct kobj_type serdes_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = serdes_groups,
-+};
-+
-+static struct attribute *serdes_lane_attrs[] = {
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(serdes_lane);
-+
-+static struct kobj_type serdes_lane_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = serdes_lane_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_serdes_create(struct sl_ctrl_lgrp *ctrl_lgrp)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+	int asic_lane_num;
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "serdes create (lgrp = 0x%p)", ctrl_lgrp);
-+
-+	if (!ctrl_lgrp->parent_kobj) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "serdes create missing parent");
-+		return -EBADRQC;
-+	}
-+
-+	rtn = kobject_init_and_add(&(ctrl_lgrp->serdes_kobj),
-+				   &serdes_info, ctrl_lgrp->parent_kobj, "serdes");
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+			   "serdes create kobject_init_and_add failed [%d]", rtn);
-+		goto out_serdes;
-+	}
-+
-+	rtn = kobject_init_and_add(&(ctrl_lgrp->serdes_lane_kobj),
-+				   &serdes_lane_info, &(ctrl_lgrp->serdes_kobj), "lane");
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+			   "serdes create kobject_init_and_add failed [%d]", rtn);
-+		goto out_lane;
-+	}
-+
-+	for (asic_lane_num = 0; asic_lane_num < SL_ASIC_MAX_LANES; ++asic_lane_num) {
-+
-+		rtn = kobject_init_and_add(&(ctrl_lgrp->serdes_lane_kobjs[asic_lane_num]),
-+					   &serdes_lane_info, &(ctrl_lgrp->serdes_lane_kobj), "%u", asic_lane_num);
-+		if (rtn) {
-+			sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+				   "serdes create lane kobject_init_and_add failed [%d]", rtn);
-+			goto out_lanes;
-+		}
-+
-+		rtn = sl_sysfs_serdes_lane_state_create(ctrl_lgrp, asic_lane_num);
-+		if (rtn) {
-+			sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+				   "serdes_lane_state_create failed [%d]", rtn);
-+			goto out_lanes;
-+		}
-+
-+		rtn = sl_sysfs_serdes_lane_swizzle_create(ctrl_lgrp, asic_lane_num);
-+		if (rtn) {
-+			sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+				   "serdes_lane_swizzle_create failed [%d]", rtn);
-+			goto out_state;
-+		}
-+
-+		rtn = sl_sysfs_serdes_lane_settings_create(ctrl_lgrp, asic_lane_num);
-+		if (rtn) {
-+			sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+				   "serdes_lane_settings_create failed [%d]", rtn);
-+			goto out_swizzle;
-+		}
-+
-+		rtn = sl_sysfs_serdes_lane_eye_create(ctrl_lgrp, asic_lane_num);
-+		if (rtn) {
-+			sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+				   "serdes_lane_eye_create failed [%d]", rtn);
-+			goto out_settings;
-+		}
-+
-+		rtn = sl_sysfs_serdes_lane_lol_create(ctrl_lgrp, asic_lane_num);
-+		if (rtn) {
-+			sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+				   "serdes_lane_lol_create failed [%d]", rtn);
-+			goto out_eye;
-+		}
-+
-+		rtn = sl_sysfs_serdes_lane_los_create(ctrl_lgrp, asic_lane_num);
-+		if (rtn) {
-+			sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+				   "serdes_lane_los_create failed [%d]", rtn);
-+			goto out_lol;
++	if (!is_user && !is_vf) {
++		phys_addr_t mmio_phys = hw->regs_base + C_MEMORG_EE +
++				eq_n * C_EE_SW_STATE_PAGE_SIZE;
++		eq->eq_mmio = ioremap(mmio_phys, PAGE_SIZE);
++		if (!eq->eq_mmio) {
++			cxidev_warn_once(cdev, "ioremap failed\n");
++			rc = -EFAULT;
++			goto id_remove;
 +		}
 +	}
 +
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "serdes create (serdes_kobj = 0x%p)", &(ctrl_lgrp->serdes_kobj));
++	if (!is_vf && eq->attr.cpu_affinity < nr_cpumask_bits)
++		cpumask_set_cpu(eq->attr.cpu_affinity, &cpus);
++
++	if (!is_vf) {
++		rc = cass_eq_attach_irqs(eq, hw, &cpus, event_cb, event_cb_data,
++					 status_cb, status_cb_data);
++		if (rc)
++			goto eq_unmap;
++
++		if (passthrough) {
++			if (is_user) {
++				rc = get_dma_addr_if_contig(hw, eq->active.events,
++							    eq->active.events_len,
++							    DMA_FROM_DEVICE,
++							    &eq->active.pages,
++							    &eq->active.dma_addr);
++			} else {
++				eq->active.dma_addr = dma_map_single(&hw->cdev.pdev->dev,
++								     eq->active.events,
++								     eq->active.events_len,
++								     DMA_FROM_DEVICE);
++				if (dma_mapping_error(&hw->cdev.pdev->dev, eq->active.dma_addr))
++					rc = -ENOMEM;
++				else
++					rc = 0;
++			}
++
++			if (rc)
++				goto status_irq_detach;
++		} else {
++			md_priv = container_of(eq->active.md, struct cxi_md_priv, md);
++
++			refcount_inc(&md_priv->refcount);
++		}
++	} else {
++		if (passthrough) {
++			/* VF EQ passthrough: use dma_addr from the VF */
++			eq->active.dma_addr = dma_addr;
++		} else {
++			md_priv = container_of(eq->active.md, struct cxi_md_priv, md);
++			refcount_inc(&md_priv->refcount);
++		}
++	}
++
++	cxi_eq_init(&eq->eq, eq->active.events, eq->active.events_len,
++		    eq_n, (__force u64 *)eq->eq_mmio);
++
++	if (!is_user && !is_vf)
++		memset(eq->active.events, 0, eq->active.events_len);
++
++	rc = pf_write_eq_config(eq, is_vf, event_irq_idx, status_irq_idx);
++	if (rc)
++		goto free_md;
++
++	spin_lock(&lni_priv->res_lock);
++	list_add_tail(&eq->list, &lni_priv->eq_list);
++	spin_unlock(&lni_priv->res_lock);
++
++	if (!eq->reused) {
++		atomic_inc(&hw->stats.eq);
++
++		eq_debugfs_create(eq_n, eq, hw, lni_priv);
++
++		refcount_inc(&lni_priv->refcount);
++	}
++
++	/* Grant access to the resource from the VF */
++	if (is_vf)
++		cass_config_sriovt(hw, true, vf_num, 4096 + eq_n);
++
++	return &eq->eq;
++
++free_md:
++	if (passthrough) {
++		if (!is_vf) {
++			if (is_user)
++				put_pages_contig(hw, &eq->active);
++			else
++				dma_unmap_single(&hw->cdev.pdev->dev, eq->active.dma_addr,
++						 eq->attr.queue_len, DMA_FROM_DEVICE);
++		}
++	} else {
++		refcount_dec(&md_priv->refcount);
++	}
++
++status_irq_detach:
++	if (eq->status_msi_irq)
++		cass_comp_irq_detach(hw, eq->status_msi_irq, &eq->status_nb);
++	if (eq->event_msi_irq)
++		cass_comp_irq_detach(hw, eq->event_msi_irq, &eq->event_nb);
++eq_unmap:
++	if (!is_user)
++		iounmap(eq->eq_mmio);
++id_remove:
++	pf_put_eq_id(eq);
++
++	return ERR_PTR(rc);
++}
++EXPORT_SYMBOL(cxi_eq_alloc_internal);
++
++/**
++ * cxi_eq_alloc() - Allocate a new event queue resource.
++ *
++ * @lni: LNI to associate with the event queue.
++ * @md: Memory descriptor for the queue
++ * @attr: Event queue creation attributes.
++ * @event_cb: Event interrupt callback for that EQ.
++ * @event_cb_data: Opaque owner context pointer. Can be used in the event
++ *                 interrupt callback to retrieve some internal structures.
++ * @status_cb: Status interrupt callback for that EQ.
++ * @status_cb_data: Opaque owner context pointer. Can be used in the status
++ *                  interrupt callback to retrieve some internal structures.
++ *
++ * Return: On success, a pointer to the allocated event queue structure. On
++ * error, an error pointer containing a negative error number.
++ */
++struct cxi_eq *cxi_eq_alloc(struct cxi_lni *lni, const struct cxi_md *md,
++			    const struct cxi_eq_attr *attr,
++			    void (*event_cb)(void *cb_data),
++			    void *event_cb_data,
++			    void (*status_cb)(void *cb_data),
++			    void *status_cb_data)
++{
++	struct cxi_dev *dev = container_of(lni, struct cxi_lni_priv, lni)->dev;
++
++	if (!dev->is_physfn)
++		return cxi_eq_alloc_vf(lni, md, attr,
++				       event_cb, event_cb_data,
++				       status_cb, status_cb_data);
++
++	return cxi_eq_alloc_internal(lni, md, attr,
++				     event_cb, event_cb_data,
++				     status_cb, status_cb_data, 0, -1, -1);
++}
++EXPORT_SYMBOL(cxi_eq_alloc);
++
++/** cxi_eq_free_vf() - Free VF event queue resource.
++ *
++ * @evtq: A pointer to previously allocated event queue structure.
++ *
++ * Return: On success, returns zero.
++ */
++static int cxi_eq_free_vf(struct cxi_eq *evtq)
++{
++	struct cxi_eq_priv *eq = container_of(evtq, struct cxi_eq_priv, eq);
++	struct cxi_dev *cdev = container_of(&eq->lni_priv->lni, struct cxi_lni_priv_vf, lni)->dev;
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++	bool passthrough = !!(eq->attr.flags & CXI_EQ_PASSTHROUGH);
++	bool is_user = eq->attr.flags & CXI_EQ_USER;
++	size_t resp_len = 0;
++	const struct cxi_eq_free_cmd cmd = {
++		.op = CXI_OP_EQ_FREE,
++		.eq = eq->eq.eqn,
++	};
++	int rc;
++
++	/* Send EQ free command to PF */
++	rc = cxi_send_msg_to_pf(cdev, &cmd, sizeof(cmd), NULL, &resp_len);
++	if (rc)
++		return rc;
++
++	/* Detach IRQs */
++	if (eq->status_msi_irq)
++		cass_comp_irq_detach(hw, eq->status_msi_irq, &eq->status_nb);
++	if (eq->event_msi_irq)
++		cass_comp_irq_detach(hw, eq->event_msi_irq, &eq->event_nb);
++
++	/* Unmap EQ MMIO if not for user */
++	if (!is_user)
++		iounmap(eq->eq_mmio);
++
++	/* Unmap EQ buffer if passthrough */
++	if (passthrough) {
++		if (is_user) {
++			put_pages_contig(hw, &eq->active);
++			if (eq->resized)
++				put_pages_contig(hw, &eq->resize);
++		} else {
++			dma_unmap_single(&hw->cdev.pdev->dev,
++					 eq->active.dma_addr, eq->attr.queue_len,
++					 DMA_FROM_DEVICE);
++			if (eq->resized)
++				dma_unmap_single(&hw->cdev.pdev->dev,
++						 eq->resize.dma_addr,
++						 eq->resize.events_len,
++						 DMA_FROM_DEVICE);
++		}
++	}
++
 +	return 0;
-+
-+out_lol:
-+	sl_sysfs_serdes_lane_lol_delete(ctrl_lgrp, asic_lane_num);
-+out_eye:
-+	sl_sysfs_serdes_lane_eye_delete(ctrl_lgrp, asic_lane_num);
-+out_settings:
-+	sl_sysfs_serdes_lane_settings_delete(ctrl_lgrp, asic_lane_num);
-+out_swizzle:
-+	sl_sysfs_serdes_lane_swizzle_delete(ctrl_lgrp, asic_lane_num);
-+out_state:
-+	sl_sysfs_serdes_lane_state_delete(ctrl_lgrp, asic_lane_num);
-+out_lanes:
-+	kobject_put(&(ctrl_lgrp->serdes_lane_kobjs[asic_lane_num]));
-+	for (asic_lane_num = asic_lane_num - 1; asic_lane_num >= 0; --asic_lane_num) {
-+		sl_sysfs_serdes_lane_los_delete(ctrl_lgrp, asic_lane_num);
-+		sl_sysfs_serdes_lane_lol_delete(ctrl_lgrp, asic_lane_num);
-+		sl_sysfs_serdes_lane_eye_delete(ctrl_lgrp, asic_lane_num);
-+		sl_sysfs_serdes_lane_settings_delete(ctrl_lgrp, asic_lane_num);
-+		sl_sysfs_serdes_lane_swizzle_delete(ctrl_lgrp, asic_lane_num);
-+		sl_sysfs_serdes_lane_state_delete(ctrl_lgrp, asic_lane_num);
-+		kobject_put(&(ctrl_lgrp->serdes_lane_kobjs[asic_lane_num]));
-+	}
-+out_lane:
-+	kobject_put(&(ctrl_lgrp->serdes_lane_kobj));
-+out_serdes:
-+	kobject_put(&(ctrl_lgrp->serdes_kobj));
-+
-+	return -ENOMEM;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
 +}
 +
-+void sl_sysfs_serdes_delete(struct sl_ctrl_lgrp *ctrl_lgrp)
++/**
++ * cxi_eq_free() - Free event queue resource.
++ *
++ * @evtq: A pointer to previously allocated event queue structure.
++ *
++ * Return: On success, returns zero.
++ */
++int cxi_eq_free(struct cxi_eq *evtq)
 +{
-+#ifdef CONFIG_SYSFS
-+	u8 asic_lane_num;
++	struct cxi_eq_priv *eq;
++	struct cxi_dev *cdev;
++	struct cass_dev *hw;
++	struct cxi_lni_priv *lni_priv;
++	struct cxi_md_priv *md_priv;
++	bool passthrough;
++	bool is_user;
++	bool is_vf;
++	union c_ee_cfg_sts_eq_hw_state hw_state;
++	unsigned int wr_ptr;
 +
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME, "serdes delete (lgrp = 0x%p)", ctrl_lgrp);
++	if (!evtq)
++		return -EINVAL;
 +
-+	if (!ctrl_lgrp->parent_kobj)
++	eq = container_of(evtq, struct cxi_eq_priv, eq);
++	cdev = eq->lni_priv->dev;
++
++	if (!cdev->is_physfn)
++		return cxi_eq_free_vf(evtq);
++
++	hw = container_of(cdev, struct cass_dev, cdev);
++	lni_priv = eq->lni_priv;
++	is_user = eq->attr.flags & CXI_EQ_USER;
++	is_vf = lni_priv->is_vf;
++	passthrough = !!(eq->attr.flags & CXI_EQ_PASSTHROUGH);
++
++	/* Remove access to this resource from a VF */
++	if (is_vf)
++		cass_config_sriovt(hw, false, lni_priv->vf_num, 4096 + eq->eq.eqn);
++
++	cxidev_WARN_ONCE(cdev, !refcount_dec_and_test(&eq->refcount),
++			 "Resource leaks - EQ refcount not zero: %d\n",
++			 refcount_read(&eq->refcount));
++
++	spin_lock(&lni_priv->res_lock);
++	list_del(&eq->list);
++	spin_unlock(&lni_priv->res_lock);
++
++	if (eq->attr.flags & CXI_EQ_REGISTER_PCT) {
++		set_pct_eq(hw, C_EQ_NONE);
++
++		mutex_lock(&hw->init_eq_hw_state);
++		hw->pct_eq_n = C_EQ_NONE;
++		mutex_unlock(&hw->init_eq_hw_state);
++	}
++
++	if (eq->status_msi_irq)
++		cass_comp_irq_detach(hw, eq->status_msi_irq, &eq->status_nb);
++
++	if (eq->event_msi_irq)
++		cass_comp_irq_detach(hw, eq->event_msi_irq, &eq->event_nb);
++
++	spin_lock(&hw->eq_shadow_lock);
++
++	if (eq->attr.flags & CXI_EQ_TIMESTAMP_EVENTS)
++		eq_timestamp_toggle(hw, eq->eq.eqn, false);
++
++	cass_eq_clear(hw, &eq->eq);
++
++	spin_unlock(&hw->eq_shadow_lock);
++
++	/* Wait for the EQ write pointer to stabilize before freeing
++	 * the buffer
++	 */
++	cass_read(hw, C_EE_CFG_STS_EQ_HW_STATE(eq->eq.eqn),
++		  &hw_state, sizeof(hw_state));
++	wr_ptr = hw_state.wr_ptr;
++	while (true) {
++		cass_read(hw, C_EE_CFG_STS_EQ_HW_STATE(eq->eq.eqn),
++			  &hw_state, sizeof(hw_state));
++		if (wr_ptr == hw_state.wr_ptr)
++			break;
++		wr_ptr = hw_state.wr_ptr;
++		udelay(1);
++	}
++
++	if (passthrough) {
++		if (!is_vf) {
++			if (is_user) {
++				put_pages_contig(hw, &eq->active);
++
++				if (eq->resized)
++					put_pages_contig(hw, &eq->resize);
++			} else {
++				dma_unmap_single(&hw->cdev.pdev->dev,
++						 eq->active.dma_addr, eq->attr.queue_len,
++						 DMA_FROM_DEVICE);
++				if (eq->resized)
++					dma_unmap_single(&hw->cdev.pdev->dev,
++							 eq->resize.dma_addr,
++							 eq->resize.events_len,
++							 DMA_FROM_DEVICE);
++			}
++		}
++	} else {
++		md_priv = container_of(eq->active.md, struct cxi_md_priv, md);
++		refcount_dec(&md_priv->refcount);
++
++		if (eq->resized) {
++			md_priv = container_of(eq->resize.md,
++					       struct cxi_md_priv, md);
++			refcount_dec(&md_priv->refcount);
++		}
++	}
++
++	if (!is_user)
++		iounmap(eq->eq_mmio);
++
++	/* Hang the EQ on the LNI pending deletion list, to be
++	 * released later
++	 */
++	spin_lock(&lni_priv->res_lock);
++	list_add_tail(&eq->list, &lni_priv->eq_cleanups_list);
++	spin_unlock(&lni_priv->res_lock);
++
++	return 0;
++}
++EXPORT_SYMBOL(cxi_eq_free);
++
++/* Finish releasing all the EQs on the deletion pending list */
++void finalize_eq_cleanups(struct cxi_lni_priv *lni)
++{
++	struct cxi_dev *dev = lni->dev;
++	struct cass_dev *hw = container_of(dev, struct cass_dev, cdev);
++	struct cxi_eq_priv *eq;
++
++	while ((eq = list_first_entry_or_null(&lni->eq_cleanups_list,
++					      struct cxi_eq_priv, list))) {
++		list_del(&eq->list);
++
++		debugfs_remove(eq->lni_dir);
++		debugfs_remove(eq->debug_file);
++
++		refcount_dec(&lni->refcount);
++		atomic_dec(&hw->stats.eq);
++		cxi_rgroup_free_resource(lni->rgroup, CXI_RESOURCE_EQ);
++		ida_free(&hw->eq_index_table, eq->eq.eqn);
++		kfree(eq);
++	}
++}
++
++/**
++ * cxi_eq_user_info() - Get userspace mmap info for an event queue.
++ *
++ * @evtq: A pointer to previously allocated event queue structure.
++ * @csr_addr: On success, will contain the address of the event queue CSRs.
++ * @csr_size: On success, will contain the size of the event queue CSRs.
++ *
++ * Return: On success, returns zero. On error, returns a negative error number.
++ */
++int cxi_eq_user_info(struct cxi_eq *evtq,
++		     phys_addr_t *csr_addr, size_t *csr_size)
++{
++	struct cxi_eq_priv *eq = container_of(evtq, struct cxi_eq_priv, eq);
++	struct cxi_dev *cdev = eq->lni_priv->dev;
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++
++	/* Userspace needs the SW State descriptor CSR address */
++	*csr_addr = hw->regs_base + C_MEMORG_EE +
++		(eq->eq.eqn * C_EE_SW_STATE_PAGE_SIZE);
++	*csr_size = PAGE_SIZE;
++
++	return 0;
++}
++EXPORT_SYMBOL(cxi_eq_user_info);
+diff --git a/drivers/net/ethernet/hpe/ss1/cass_nta.c b/drivers/net/ethernet/hpe/ss1/cass_nta.c
+new file mode 100644
+index 000000000000..416595de9500
+--- /dev/null
++++ b/drivers/net/ethernet/hpe/ss1/cass_nta.c
+@@ -0,0 +1,1996 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright 2019, 2024-2026 Hewlett Packard Enterprise Development LP */
++
++/*
++ * Address Translation Unit (ATU) management
++ * Nic Translation Agent (NTA) mode
++ */
++
++#include <linux/interrupt.h>
++#include <linux/pci.h>
++#include <linux/types.h>
++#include <linux/hugetlb.h>
++#include <linux/iova.h>
++#include <linux/bvec.h>
++#include <linux/iopoll.h>
++#include <linux/workqueue.h>
++#include <linux/mmu_notifier.h>
++
++#include "cass_core.h"
++
++/* Default size of the root page table for a two level table.
++ * The root page table size is 2 ^ (PAGE_SHIFT + ac_size_dbl) (currently
++ * 16 KB) and covers 2 ^ ac_size_dbl GB.
++ */
++static int ac_size_dbl = 5;
++module_param(ac_size_dbl, int, 0644);
++MODULE_PARM_DESC(ac_size_dbl, "Default two level AC size");
++
++/* Default size of the root page table for a single level table.
++ * The root page table size is 2 ^ (PAGE_SHIFT + ac_size_sgl) (currently
++ * 8 MB) and covers 2 ^ ((PAGE_SHIFT * 2) + ac_size_sgl) bytes.
++ */
++static int ac_size_sgl = 8;
++module_param(ac_size_sgl, int, 0644);
++MODULE_PARM_DESC(ac_size_sgl, "Default one level AC size");
++
++static ulong min_iova_offset = 1UL * 1024 * 1024 * 1024;
++module_param(min_iova_offset, ulong, 0644);
++MODULE_PARM_DESC(min_iova_offset, "IOVA offset if VA range straddles AC");
++
++static int atucq_timeout_us = 100000;
++module_param(atucq_timeout_us, int, 0644);
++MODULE_PARM_DESC(atucq_timeout_us, "ATUCQ timeout in microseconds");
++
++static int decouple_timeout_us = 150;
++module_param(decouple_timeout_us, int, 0644);
++MODULE_PARM_DESC(decouple_timeout_us,
++		 "ATUCQ timeout in microseconds when decoupling is enabled");
++
++bool odp_sw_decouple = true;
++module_param(odp_sw_decouple, bool, 0644);
++MODULE_PARM_DESC(odp_sw_decouple, "Enable software ODP decoupling");
++
++static int pri_shift_set(const char *val, const struct kernel_param *kp)
++{
++	int n;
++	int ret;
++
++	ret = kstrtoint(val, 10, &n);
++	if (ret || n < 12 || n > 30)
++		return -EINVAL;
++
++	return param_set_int(val, kp);
++}
++
++static const struct kernel_param_ops pri_shift_ops = {
++	.set = pri_shift_set,
++	.get = param_get_int,
++};
++
++static int pri_shift = 16;
++module_param_cb(pri_shift, &pri_shift_ops, &pri_shift, 0644);
++MODULE_PARM_DESC(pri_shift, "ODP default number of pages to fault");
++
++static irqreturn_t cass_pri_int_cb(int irq, void *context);
++static void cass_pri_worker(struct work_struct *work);
++static void cass_prb_worker(struct work_struct *work);
++static void cass_odpq_write(struct cass_dev *hw, int index,
++			    enum c_odp_status status);
++
++static int min_root_entries(struct cass_ac *cac)
++{
++	int default_ac_size = (cac->ptg_mode == C_ATU_PTG_MODE_SGL) ?
++			ac_size_sgl : ac_size_dbl;
++
++	return BIT(PAGE_SHIFT + default_ac_size) / ATU_PTE_ENTRY_SIZE;
++}
++
++static void cass_nta_cmdproc_write(struct cass_dev *hw, unsigned int wr_index)
++{
++	union c_atu_cfg_cmdproc atu_ptrs = {
++		.wr_ptr = wr_index
++	};
++
++	cass_write(hw, C_ATU_CFG_CMDPROC, &atu_ptrs, sizeof(atu_ptrs));
++}
++
++static void cass_nta_cq_write(struct cass_dev *hw, unsigned int index,
++			      const union c_atu_cfg_cq_table *entry)
++{
++	cass_write(hw, C_ATU_CFG_CQ_TABLE(index), entry, sizeof(*entry));
++}
++
++void cass_nta_cq_fini(struct cass_dev *hw)
++{
++	free_irq(pci_irq_vector(hw->cdev.pdev, hw->atu_cq_vec), hw);
++}
++
++static irqreturn_t cass_nta_cq_cb(int irq, void *context)
++{
++	/* Not expected to ever be called */
++	BUG();
++
++	return IRQ_HANDLED;
++}
++
++/**
++ * cass_nta_cq_init() - NTA command queue initialization
++ *
++ * @hw: Cassini device
++ */
++int cass_nta_cq_init(struct cass_dev *hw)
++{
++	struct cass_atu_cq *cq = &hw->atu_cq;
++	static const union c_atu_cfg_wb_data wb_data = {
++		.data = WAIT_RSP_DATA
++	};
++	union c_atu_cfg_cmds cfg_cmds = {
++		.writeback_acid = ATU_NTA_DEF_PI_ACXT
++	};
++	int rc;
++
++	cq->rsp_dma_addr = dma_map_single(&hw->cdev.pdev->dev, &cq->wait_rsp_data,
++					  sizeof(cq->wait_rsp_data), DMA_FROM_DEVICE);
++	if (dma_mapping_error(&hw->cdev.pdev->dev, cq->rsp_dma_addr))
++		return -ENOMEM;
++
++	cq->cmp_wait_rsp_addr = (cq->rsp_dma_addr + offsetof(struct wait_rsp_data, cmp)) >> 3;
++	cq->ib_wait_rsp_addr = (cq->rsp_dma_addr + offsetof(struct wait_rsp_data, ib)) >> 3;
++
++	mutex_init(&cq->atu_cq_mutex);
++	mutex_init(&cq->atu_ib_mutex);
++	cass_write(hw, C_ATU_CFG_WB_DATA, &wb_data, sizeof(wb_data));
++
++	scnprintf(cq->cmpl_wait_int_name, sizeof(cq->cmpl_wait_int_name),
++		  "%s_atu_cq", hw->cdev.name);
++	rc = request_irq(pci_irq_vector(hw->cdev.pdev, hw->atu_cq_vec),
++			 cass_nta_cq_cb, 0, cq->cmpl_wait_int_name, hw);
++	if (rc) {
++		dev_err(&hw->cdev.pdev->dev, "Failed to request IRQ.\n");
++		dma_unmap_single(&hw->cdev.pdev->dev, cq->rsp_dma_addr,
++				 sizeof(cq->wait_rsp_data), DMA_FROM_DEVICE);
++		return rc;
++	}
++
++	disable_irq(pci_irq_vector(hw->cdev.pdev, hw->atu_cq_vec));
++
++	cfg_cmds.ib_wait_int_idx = hw->atu_cq_vec;
++	cfg_cmds.cmpl_wait_int_idx = hw->atu_cq_vec;
++	cass_write(hw, C_ATU_CFG_CMDS, &cfg_cmds, sizeof(cfg_cmds));
++
++	return 0;
++}
++
++void cass_nta_pri_fini(struct cass_dev *hw)
++{
++	if (cass_version(hw, CASSINI_1_0))
 +		return;
 +
-+	for (asic_lane_num = 0; asic_lane_num < SL_ASIC_MAX_LANES; ++asic_lane_num) {
-+		sl_sysfs_serdes_lane_los_delete(ctrl_lgrp, asic_lane_num);
-+		sl_sysfs_serdes_lane_lol_delete(ctrl_lgrp, asic_lane_num);
-+		sl_sysfs_serdes_lane_eye_delete(ctrl_lgrp, asic_lane_num);
-+		sl_sysfs_serdes_lane_settings_delete(ctrl_lgrp, asic_lane_num);
-+		sl_sysfs_serdes_lane_swizzle_delete(ctrl_lgrp, asic_lane_num);
-+		sl_sysfs_serdes_lane_state_delete(ctrl_lgrp, asic_lane_num);
-+		kobject_put(&(ctrl_lgrp->serdes_lane_kobjs[asic_lane_num]));
-+	}
-+	kobject_put(&(ctrl_lgrp->serdes_lane_kobj));
-+	kobject_put(&ctrl_lgrp->serdes_kobj);
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_serdes_eye.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_serdes_eye.c
-new file mode 100644
-index 000000000000..9dac679a96d9
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_serdes_eye.c
-@@ -0,0 +1,197 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2024-2026 Hewlett Packard Enterprise Development LP */
-+
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "sl_ctrl_lgrp.h"
-+#include "sl_ctrl_ldev.h"
-+#include "sl_core_lgrp.h"
-+#include "sl_core_link.h"
-+#include "sl_sysfs_serdes_eye.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t value_upper_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                              rtn;
-+	struct sl_lgrp_serdes_lane_kobj *lane_kobj;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+	u8                               eye_upper;
-+
-+	lane_kobj = container_of(kobj, struct sl_lgrp_serdes_lane_kobj, kobj);
-+	if (!lane_kobj->ctrl_lgrp)
-+		return sysfs_emit(buf, "no-lane\n");
-+
-+	core_link = sl_core_link_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num,
-+				     lane_num_to_link_num(lane_kobj->ctrl_lgrp, lane_kobj->asic_lane_num));
-+	if (!core_link)
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	core_lgrp = sl_core_lgrp_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_eye_upper_get(core_lgrp, lane_kobj->asic_lane_num, &eye_upper);
-+	if (rtn == -EIO)
-+		return sysfs_emit(buf, "no-serdes\n");
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "eye value upper show (asic_lane_num = %u, eye = %u)",
-+		lane_kobj->asic_lane_num, eye_upper);
-+
-+	return sysfs_emit(buf, "%u\n", eye_upper);
++	cass_clear(hw, C_ATU_CFG_ODP, C_ATU_CFG_ODP_SIZE);
++	cass_clear(hw, C_ATU_CFG_PRI, C_ATU_CFG_PRI_SIZE);
++	cass_flush_pci(hw);
++	free_irq(pci_irq_vector(hw->cdev.pdev, hw->atu_pri_vec), hw);
++	destroy_workqueue(hw->prb_wq);
++	destroy_workqueue(hw->pri_wq);
++	dma_unmap_single(&hw->cdev.pdev->dev, hw->prt_dma_addr,
++			 sizeof(struct c_page_request_entry), DMA_FROM_DEVICE);
++	kfree(hw->page_request_table);
++	dma_unmap_single(&hw->cdev.pdev->dev, hw->atu_cq.rsp_dma_addr,
++			 sizeof(struct wait_rsp_data), DMA_FROM_DEVICE);
 +}
 +
-+static ssize_t value_lower_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++/**
++ * cass_nta_pri_init() - Initialize the NTA Page Request interface
++ *
++ * @hw: Cassini device
++ */
++int cass_nta_pri_init(struct cass_dev *hw)
 +{
-+	int                              rtn;
-+	struct sl_lgrp_serdes_lane_kobj *lane_kobj;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+	u8                               eye_lower;
++	int rc;
++	union c_atu_cfg_pri cpa;
++	union c_atu_cfg_odp codp = {
++		.acid = ATU_PHYS_AC,
++		.int_enable = 1,
++		.odp_en = 1
++	};
 +
-+	lane_kobj = container_of(kobj, struct sl_lgrp_serdes_lane_kobj, kobj);
-+	if (!lane_kobj->ctrl_lgrp)
-+		return sysfs_emit(buf, "no-lane\n");
++	if (cass_version(hw, CASSINI_1_0))
++		return 0;
 +
-+	core_link = sl_core_link_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num,
-+				     lane_num_to_link_num(lane_kobj->ctrl_lgrp, lane_kobj->asic_lane_num));
-+	if (!core_link)
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	core_lgrp = sl_core_lgrp_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_eye_lower_get(core_lgrp, lane_kobj->asic_lane_num, &eye_lower);
-+	if (rtn == -EIO)
-+		return sysfs_emit(buf, "no-serdes\n");
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "eye value lower show (asic_lane_num = %u, eye = %u)",
-+		lane_kobj->asic_lane_num, eye_lower);
-+
-+	return sysfs_emit(buf, "%u\n", eye_lower);
-+}
-+
-+static ssize_t limit_high_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_lgrp_serdes_lane_kobj *lane_kobj;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+
-+	lane_kobj = container_of(kobj, struct sl_lgrp_serdes_lane_kobj, kobj);
-+	if (!lane_kobj->ctrl_lgrp)
-+		return sysfs_emit(buf, "no-lane\n");
-+
-+	core_link = sl_core_link_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num,
-+				     lane_num_to_link_num(lane_kobj->ctrl_lgrp, lane_kobj->asic_lane_num));
-+	if (!core_link)
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	core_lgrp = sl_core_lgrp_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "eye limit high show (asic_lane_num = %u, limit = %u)",
-+		lane_kobj->asic_lane_num, core_lgrp->serdes.eye_limits[lane_kobj->asic_lane_num].high);
-+
-+	return sysfs_emit(buf, "%u\n",
-+		core_lgrp->serdes.eye_limits[lane_kobj->asic_lane_num].high);
-+}
-+
-+static ssize_t limit_low_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_lgrp_serdes_lane_kobj *lane_kobj;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+
-+	lane_kobj = container_of(kobj, struct sl_lgrp_serdes_lane_kobj, kobj);
-+	if (!lane_kobj->ctrl_lgrp)
-+		return sysfs_emit(buf, "no-lane\n");
-+
-+	core_link = sl_core_link_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num,
-+				     lane_num_to_link_num(lane_kobj->ctrl_lgrp, lane_kobj->asic_lane_num));
-+	if (!core_link)
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	core_lgrp = sl_core_lgrp_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "eye limit low show (asic_lane_num = %u, limit = %u)",
-+		lane_kobj->asic_lane_num, core_lgrp->serdes.eye_limits[lane_kobj->asic_lane_num].low);
-+
-+	return sysfs_emit(buf, "%u\n",
-+		core_lgrp->serdes.eye_limits[lane_kobj->asic_lane_num].low);
-+}
-+
-+static struct kobj_attribute eye_value_upper = __ATTR_RO(value_upper);
-+static struct kobj_attribute eye_value_lower = __ATTR_RO(value_lower);
-+static struct kobj_attribute eye_limit_high  = __ATTR_RO(limit_high);
-+static struct kobj_attribute eye_limit_low   = __ATTR_RO(limit_low);
-+
-+static struct attribute *serdes_lane_eye_attrs[] = {
-+	&eye_value_upper.attr,
-+	&eye_value_lower.attr,
-+	&eye_limit_high.attr,
-+	&eye_limit_low.attr,
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(serdes_lane_eye);
-+
-+static struct kobj_type serdes_lane_eye_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = serdes_lane_eye_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_serdes_lane_eye_create(struct sl_ctrl_lgrp *ctrl_lgrp, u8 asic_lane_num)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "serdes lane eye create (lgrp = 0x%p)", ctrl_lgrp);
-+
-+	rtn = kobject_init_and_add(&(ctrl_lgrp->serdes_lane_eye_kobjs[asic_lane_num].kobj),
-+				   &serdes_lane_eye_info, &(ctrl_lgrp->serdes_lane_kobjs[asic_lane_num]), "eye");
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+			   "serdes lane eye create kobject_init_and_add failed [%d]", rtn);
-+		kobject_put(&(ctrl_lgrp->serdes_lane_eye_kobjs[asic_lane_num].kobj));
++	hw->page_request_table = kcalloc(C_ATU_PRB_ENTRIES,
++					 sizeof(struct c_page_request_entry),
++					 GFP_KERNEL);
++	if (!hw->page_request_table)
 +		return -ENOMEM;
-+	}
-+	ctrl_lgrp->serdes_lane_eye_kobjs[asic_lane_num].ctrl_lgrp      = ctrl_lgrp;
-+	ctrl_lgrp->serdes_lane_eye_kobjs[asic_lane_num].asic_lane_num = asic_lane_num;
 +
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "serdes lane eye create (serdes_kobj = 0x%p)", &(ctrl_lgrp->serdes_kobj));
++	hw->prt_dma_addr = dma_map_single(&hw->cdev.pdev->dev, hw->page_request_table,
++					  sizeof(struct c_page_request_entry),
++					  DMA_FROM_DEVICE);
++	if (dma_mapping_error(&hw->cdev.pdev->dev, hw->prt_dma_addr)) {
++		rc = -ENOMEM;
++		goto free_table;
++	}
++
++	hw->pri_rd_ptr = 0;
++
++	scnprintf(hw->odp_pri_int_name, sizeof(hw->odp_pri_int_name),
++		  "%s_odp_pri", hw->cdev.name);
++	rc = request_irq(pci_irq_vector(hw->cdev.pdev, hw->atu_pri_vec),
++			 cass_pri_int_cb, 0, hw->odp_pri_int_name, hw);
++	if (rc) {
++		pr_err("Failed to request IRQ.\n");
++		goto free_mapping;
++	}
++
++	/* limit to a single threaded worker */
++	hw->pri_wq = alloc_workqueue("pri_wq", WQ_UNBOUND, 1);
++	if (!hw->pri_wq) {
++		rc = -ENOMEM;
++		pr_err("Failed to allocate PRI workqueue\n");
++		goto alloc_wq_failed;
++	}
++
++	hw->prb_wq = alloc_workqueue("prb_wq", WQ_UNBOUND, 1);
++	if (!hw->prb_wq) {
++		rc = -ENOMEM;
++		pr_err("Failed to allocate PRB workqueue\n");
++		goto alloc_prb_wq_failed;
++	}
++
++	cpa.base_addr = hw->prt_dma_addr >> C_ADDR_SHIFT;
++	cass_write(hw, C_ATU_CFG_PRI, &cpa, sizeof(cpa));
++
++	codp.int_idx = hw->atu_pri_vec;
++	cass_write(hw, C_ATU_CFG_ODP, &codp, sizeof(codp));
++
++	INIT_WORK(&hw->pri_work, cass_pri_worker);
++	INIT_WORK(&hw->prb_work, cass_prb_worker);
++
 +	return 0;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
++
++alloc_prb_wq_failed:
++	destroy_workqueue(hw->pri_wq);
++alloc_wq_failed:
++	free_irq(pci_irq_vector(hw->cdev.pdev, hw->atu_pri_vec), hw);
++free_mapping:
++	dma_unmap_single(&hw->cdev.pdev->dev, hw->prt_dma_addr,
++			 sizeof(struct c_page_request_entry), DMA_FROM_DEVICE);
++free_table:
++	kfree(hw->page_request_table);
++
++	return rc;
 +}
 +
-+void sl_sysfs_serdes_lane_eye_delete(struct sl_ctrl_lgrp *ctrl_lgrp, u8 asic_lane_num)
++int cass_sts_idle(struct sts_idle *sidle)
 +{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "serdes lane eye delete (lgrp = 0x%p)", ctrl_lgrp);
++	union c_atu_sts_cmdproc sts;
++	struct cass_dev *hw = sidle->hw;
 +
-+	kobject_put(&(ctrl_lgrp->serdes_lane_eye_kobjs[asic_lane_num].kobj));
-+	ctrl_lgrp->serdes_lane_eye_kobjs[asic_lane_num].ctrl_lgrp = NULL;
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_serdes_lol.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_serdes_lol.c
-new file mode 100644
-index 000000000000..d7162e985822
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_serdes_lol.c
-@@ -0,0 +1,141 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2025-2026 Hewlett Packard Enterprise Development LP */
++	cass_read(hw, C_ATU_STS_CMDPROC, &sts, sizeof(sts));
 +
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+
-+#include "sl_log.h"
-+#include "sl_ctrl_lgrp.h"
-+#include "sl_ctrl_ldev.h"
-+#include "sl_core_lgrp.h"
-+#include "sl_sysfs_serdes_lol.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t tx_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                              rtn;
-+	struct sl_lgrp_serdes_lane_kobj *lane_kobj;
-+	bool                             is_tx_lol;
-+	struct sl_ctrl_lgrp             *ctrl_lgrp;
-+	u8                               ldev_num;
-+	u8                               lgrp_num;
-+
-+	lane_kobj = container_of(kobj, struct sl_lgrp_serdes_lane_kobj, kobj);
-+	ctrl_lgrp = lane_kobj->ctrl_lgrp;
-+	ldev_num = lane_kobj->ctrl_lgrp->ctrl_ldev->num;
-+	lgrp_num = lane_kobj->ctrl_lgrp->num;
-+
-+	rtn = sl_core_lgrp_tx_lane_is_lol(ldev_num, lgrp_num, lane_kobj->asic_lane_num, &is_tx_lol);
-+	if (rtn == -ENOENT) {
-+		sl_core_log_dbg(ctrl_lgrp, LOG_NAME,
-+				"lol tx show (asic_lane_num = %u) - tx_lane_is_lol no cache [%d]",
-+				lane_kobj->asic_lane_num, rtn);
-+		return sysfs_emit(buf, "no-cache\n");
-+	}
-+
-+	if (rtn) {
-+		sl_core_log_err_trace(ctrl_lgrp, LOG_NAME,
-+				      "lol tx show (asic_lane_num = %u) - tx_lane_is_lol failed [%d]",
-+				      lane_kobj->asic_lane_num, rtn);
-+		return sysfs_emit(buf, "error\n");
-+	}
-+
-+	sl_core_log_dbg(ctrl_lgrp, LOG_NAME,
-+			"lol tx show (asic_lane_num = %u, is_tx_lol = %s)",
-+			lane_kobj->asic_lane_num, is_tx_lol ? "yes" : "no");
-+
-+	return sysfs_emit(buf, "%s\n", is_tx_lol ? "yes" : "no");
++	return sidle->ib_wait ? sts.inbound_wait_idle : sts.atucq_idle;
 +}
 +
-+static ssize_t rx_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++static int cass_poll_sts_cmdproc_idle(struct cass_dev *hw, bool ib_wait)
 +{
-+	int                              rtn;
-+	struct sl_lgrp_serdes_lane_kobj *lane_kobj;
-+	bool                             is_rx_lol;
-+	struct sl_ctrl_lgrp             *ctrl_lgrp;
-+	u8                               ldev_num;
-+	u8                               lgrp_num;
++	int ret;
++	int idle;
++	int timeout_us = ib_wait ? ATU_STS_IBW_IDLE_TIMEOUT :
++					ATU_STS_ATUCQ_IDLE_TIMEOUT;
++	struct sts_idle sidle = {
++		.hw = hw,
++		.ib_wait = ib_wait
++	};
 +
-+	lane_kobj = container_of(kobj, struct sl_lgrp_serdes_lane_kobj, kobj);
-+	ctrl_lgrp = lane_kobj->ctrl_lgrp;
-+	ldev_num = lane_kobj->ctrl_lgrp->ctrl_ldev->num;
-+	lgrp_num = lane_kobj->ctrl_lgrp->num;
++	ret = readx_poll_timeout(cass_sts_idle, &sidle, idle, (idle),
++				 10, timeout_us);
++	if (ret)
++		pr_crit("Timed out waiting for %s idle\n",
++			ib_wait ? "IB wait" : "ATUCQ");
 +
-+	rtn = sl_core_lgrp_rx_lane_is_lol(ldev_num, lgrp_num, lane_kobj->asic_lane_num, &is_rx_lol);
-+	if (rtn == -ENOENT) {
-+		sl_core_log_dbg(ctrl_lgrp, LOG_NAME,
-+				"lol rx show (asic_lane_num = %u) - rx_lane_is_lol no cache [%d]",
-+				lane_kobj->asic_lane_num, rtn);
-+		return sysfs_emit(buf, "no-cache\n");
-+	}
-+
-+	if (rtn) {
-+		sl_core_log_err_trace(ctrl_lgrp, LOG_NAME,
-+				      "lol rx show (asic_lane_num = %u) - rx_lane_is_lol failed [%d]",
-+				      lane_kobj->asic_lane_num, rtn);
-+		return sysfs_emit(buf, "error\n");
-+	}
-+
-+	sl_core_log_dbg(ctrl_lgrp, LOG_NAME,
-+			"lol rx show (asic_lane_num = %u, is_rx_lol = %s)",
-+			lane_kobj->asic_lane_num, is_rx_lol ? "yes" : "no");
-+
-+	return sysfs_emit(buf, "%s\n", is_rx_lol ? "yes" : "no");
++	return ret;
 +}
 +
-+static struct kobj_attribute lol_tx = __ATTR_RO(tx);
-+static struct kobj_attribute lol_rx = __ATTR_RO(rx);
++#define err_dump_csr64(name) do {		\
++	u64 val;				\
++	cass_read(hw, name, &val, sizeof(val));	\
++	cxidev_warn_ratelimited(&hw->cdev, #name " %016llx\n", val);	\
++	} while (0)
 +
-+static struct attribute *serdes_lane_lol_attrs[] = {
-+	&lol_tx.attr,
-+	&lol_rx.attr,
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(serdes_lane_lol);
-+
-+static struct kobj_type serdes_lane_lol_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = serdes_lane_lol_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_serdes_lane_lol_create(struct sl_ctrl_lgrp *ctrl_lgrp, u8 asic_lane_num)
++static bool cass_cmdproc_debug(struct cass_dev *hw, bool inbound_wait)
 +{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
++	union c_mb_sts_rev rev;
 +
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "serdes lane lol create (lgrp = 0x%p)", ctrl_lgrp);
++	/* check if HW is still alive */
++	cass_read(hw, C_MB_STS_REV, &rev, sizeof(rev));
++	if (rev.vendor_id != hw->rev.vendor_id) {
++		pr_err("HW is in a bad state\n");
++		return true;
++	}
 +
-+	rtn = kobject_init_and_add(&ctrl_lgrp->serdes_lane_lol_kobjs[asic_lane_num].kobj,
-+				   &serdes_lane_lol_info, &ctrl_lgrp->serdes_lane_kobjs[asic_lane_num], "lol");
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+			   "serdes lane lol create kobject_init_and_add failed [%d]", rtn);
-+		kobject_put(&ctrl_lgrp->serdes_lane_lol_kobjs[asic_lane_num].kobj);
++	cxidev_warn_ratelimited(&hw->cdev, "%s wait timeout\n",
++				inbound_wait ? "Inbound" : "Completion");
++	err_dump_csr64(C_ATU_STS_CMDPROC);
++	err_dump_csr64(C_ATU_STS_ODP_DECOUPLE);
++	err_dump_csr64(C_ATU_STS_AT_EPOCH);
++	err_dump_csr64(C_ATU_STS_IB_EPOCH);
++
++	return false;
++}
++
++static void cass_dcpl_debug(struct cass_dev *hw)
++{
++	u64 val1;
++	u64 val2;
++
++	cass_read(hw, C_ATU_STS_CMDPROC, &val1, sizeof(val1));
++	cass_read(hw, C_ATU_STS_AT_EPOCH, &val2, sizeof(val2));
++	cxidev_warn_ratelimited(&hw->cdev,
++				"Completion wait timeout after decouple. atu_sts_cmdproc:0x%llx atu_sts_at_epoch:0x%llx rsp_data:0x%llx\n",
++				val1, val2, hw->atu_cq.wait_rsp_data.cmp);
++}
++
++static void cass_completion_wait(struct cass_dev *hw, unsigned int wr_index)
++{
++	int rc;
++	int ret;
++	u64 cw_rsp_read_data;
++	bool hw_failure;
++	int decoupled = 0;
++	union c_atu_cfg_cq_table entry = {};
++	struct cass_atu_cq *cq = &hw->atu_cq;
++	int timeout = odp_sw_decouple ? decouple_timeout_us : atucq_timeout_us;
++
++	atomic_inc(&hw->dcpl_comp_wait);
++
++	entry.cmd = C_ATU_COMPLETION_WAIT;
++	entry.comp_wait_rsp_en = 1;
++	entry.comp_wait_rsp_addr = cq->cmp_wait_rsp_addr;
++
++	cq->wait_rsp_data.cmp = 0;
++
++	cass_nta_cq_write(hw, ATUCQ_ENTRY(wr_index), &entry);
++
++	/* WR_PTR should point at the entry that immediately follows
++	 * the last outstanding command.
++	 */
++	wr_index++;
++
++	/* Writes to C_ATU_CFG_CMDPROC are ignored if ATUCQ is not idle. */
++	cass_poll_sts_cmdproc_idle(hw, false);
++
++	/* start the processing of the command queue */
++	cass_nta_cmdproc_write(hw, wr_index);
++	cass_flush_pci(hw);
++
++	/* increase the timeout on the emulator */
++	if (HW_PLATFORM_Z1(hw))
++		timeout *= 10;
++
++	do {
++		ret = readq_poll_timeout_atomic(&cq->wait_rsp_data.cmp,
++						cw_rsp_read_data,
++						(cw_rsp_read_data == WAIT_RSP_DATA),
++						1, timeout);
++		if (ret) {
++			if (odp_sw_decouple) {
++				if (decoupled) {
++					cass_dcpl_debug(hw);
++					break;
++				}
++
++				rc = cass_odp_decouple(hw);
++				if (rc) {
++					cxidev_warn_ratelimited(&hw->cdev,
++								"Decoupling failed\n");
++					break;
++				}
++
++				decoupled++;
++				timeout = atucq_timeout_us;
++			} else {
++				hw_failure = cass_cmdproc_debug(hw, false);
++				if (hw_failure)
++					return;
++			}
++		}
++	} while (ret);
++}
++
++/**
++ * cass_invalidate_range() - Invalidate a range of IOVAs
++ *
++ * Invalidate a range of IOVAs by powers of two. Does not return until
++ * the commands have been executed - the completion wait is finished.
++ * inval_addr is modified with the length when invalidating sizes larger
++ * than a page. Treat the inval_size as bit 11 of the address.
++ *
++ * @cac:    Address Context struct
++ * @iova:   IO virtual address
++ * @length: Length of address range to invalidate
++ */
++void cass_invalidate_range(const struct cass_ac *cac, u64 iova,
++			   size_t length)
++{
++	u64 len;
++	u64 align;
++	u64 size_bits;
++	struct cass_dev *hw = container_of(cac->lni_priv->dev, struct cass_dev,
++					   cdev);
++	struct cass_atu_cq *cq = &hw->atu_cq;
++
++	if (cac->cfg_ac.do_not_cache) {
++		/* Completion wait needs to be performed so that the ODP
++		 * pri_worker is not referencing the AC while it is being
++		 * destroyed.
++		 */
++		if (cac->flags & CXI_MAP_USER_ADDR) {
++			mutex_lock(&cq->atu_cq_mutex);
++			cass_completion_wait(hw, 0);
++			mutex_unlock(&cq->atu_cq_mutex);
++		}
++
++		return;
++	}
++
++	pr_debug("ac:%d iova:%llx length:%lx\n", cac->ac.acid, iova, length);
++
++	mutex_lock(&cq->atu_cq_mutex);
++
++	while (length > 0) {
++		union c_atu_cfg_cq_table entry = {};
++		unsigned int wr_index = 0;
++
++		/* save room for the completion wait command */
++		while (length > 0 &&
++		       (C_ATU_CFG_CQ_TABLE_ENTRIES - wr_index) > 1) {
++			/* Walk through the iova and invalidate a len
++			 * based on its current alignment and the length
++			 * remaining.
++			 */
++			len = BIT(flsl(length));
++			align = !iova ? len : BIT(ffsl(iova));
++
++			if (len > align)
++				len = align;
++
++			/*
++			 * size_bits gives the 1's necessary to fill in the
++			 * lower bits of inval_addr and the inval_size fields
++			 */
++			size_bits = ((len - 1) & ~MASK(C_ADDR_SHIFT)) >> 1;
++			entry.qw = iova | size_bits;
++			entry.cmd = C_ATU_INVALIDATE_PAGES;
++			entry.inval_acid = cac->ac.acid;
++
++			atu_debug("ac:%d entry:%llx addr:%llx len:%llx\n",
++				  cac->ac.acid, entry.qw, iova, len);
++			cass_nta_cq_write(hw, ATUCQ_ENTRY(wr_index), &entry);
++
++			length -= len;
++			iova += len;
++			wr_index++;
++		}
++
++		cass_completion_wait(hw, wr_index);
++	}
++
++	mutex_unlock(&cq->atu_cq_mutex);
++}
++
++/**
++ * cass_inbound_wait() - flush internal Cassini buffers
++ *
++ * Called during resource cleanup.
++ *
++ * @hw: the device
++ * @wait_for_response: wait for hardware completion
++ *
++ * Return: 0 on success, negative errno on failure
++ */
++int cass_inbound_wait(struct cass_dev *hw, bool wait_for_response)
++{
++	int ret;
++	int rc = 0;
++	int count = 0;
++	u64 rsp_read_data;
++	struct cass_atu_cq *cq = &hw->atu_cq;
++	union c_atu_cfg_inbound_wait cfg_iw = {
++		.rsp_en = wait_for_response,
++		.rsp_addr = cq->ib_wait_rsp_addr,
++	};
++
++	/* hw_failure was set previously. No need to progress */
++	if (cq->hw_failure)
++		return -EHOSTDOWN;
++
++	cq->wait_rsp_data.ib = 0;
++
++	/* Writes to C_ATU_CFG_CMDPROC are ignored if ATUCQ is not idle. */
++	ret = cass_poll_sts_cmdproc_idle(hw, true);
++	if (ret) {
++		rc = -EALREADY;
++		goto done;
++	}
++
++	/* process an inbound wait */
++	cass_write(hw, C_ATU_CFG_INBOUND_WAIT, &cfg_iw, sizeof(cfg_iw));
++	cass_flush_pci(hw);
++
++	if (wait_for_response) {
++		do {
++			ret = readq_poll_timeout_atomic(
++				&cq->wait_rsp_data.ib, rsp_read_data,
++				(rsp_read_data == WAIT_RSP_DATA), 1,
++				ATU_IBW_TIMEOUT);
++			if (ret) {
++				cq->hw_failure = cass_cmdproc_debug(hw, true);
++
++				if (cq->hw_failure) {
++					rc = -EHOSTDOWN;
++					break;
++				}
++
++				if (count++ > 4) {
++					rc = -ETIMEDOUT;
++					pr_err("Inbound wait is stuck - bailing out\n");
++					break;
++				}
++			}
++		} while (ret);
++	}
++
++done:
++	return rc;
++}
++
++static int cxi_inbound_wait_vf(struct cxi_dev *cdev)
++{
++	const struct cxi_inbound_wait_cmd cmd = {
++		.op = CXI_OP_INBOUND_WAIT,
++	};
++
++	return cxi_send_msg_to_pf(cdev, &cmd, sizeof(cmd), NULL, 0);
++}
++
++extern bool ibw_epoch_cntr_is_0(struct cass_dev *hw, bool *epoch_ret);
++/*
++ * cxi_inbound_wait - Flush internal cassini buffers
++ *
++ * @cdev: Cassini Device
++ * Return: 0 on success, negative errno on failure
++ */
++int cxi_inbound_wait(struct cxi_dev *cdev)
++{
++	int ret;
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++	struct cass_atu_cq *cq = &hw->atu_cq;
++
++	if (!cdev->is_physfn)
++		return cxi_inbound_wait_vf(cdev);
++
++	mutex_lock(&cq->atu_ib_mutex);
++	ret = cass_inbound_wait(hw, true);
++	mutex_unlock(&cq->atu_ib_mutex);
++
++	return ret;
++}
++EXPORT_SYMBOL(cxi_inbound_wait);
++
++/**
++ * cass_nta_iova_alloc() - Allocate an IOVA from the domain
++ *
++ * @cac: Address Context
++ * @m_opts: Map options
++ */
++u64 cass_nta_iova_alloc(struct cass_ac *cac, const struct ac_map_opts *m_opts)
++{
++	u64 iova;
++
++	if (!cac->iovad)
++		return 0;
++
++	iova = ALLOC_IOVA_FAST(cac->iovad, m_opts->va_len, cac->iova_end);
++
++	/* Check for an iova overflow because of a 5.11+ (sles15sp4+)
++	 * iova bug. Free the current allocation and return iova not found.
++	 */
++	if (iova && iova < cac->iova_base) {
++		pr_debug("alloc_iova overflow iova:%llx iova_base:%llx\n",
++			 iova, cac->iova_base);
++		FREE_IOVA_FAST(cac->iovad, iova, m_opts->va_len);
++		iova = 0;
++	}
++
++	return iova;
++}
++
++void cass_nta_iova_fini(struct cass_ac *cac)
++{
++	if (cac->iovad) {
++		put_iova_domain(cac->iovad);
++		kfree(cac->iovad);
++	}
++}
++
++int cass_nta_iova_init(struct cass_ac *cac, size_t va_len)
++{
++#ifdef HAVE_IOVA_INIT_RCACHES
++	int ret;
++#endif
++
++	cac->iovad = kzalloc(sizeof(*cac->iovad), GFP_KERNEL);
++	if (!cac->iovad)
 +		return -ENOMEM;
-+	}
-+	ctrl_lgrp->serdes_lane_lol_kobjs[asic_lane_num].ctrl_lgrp     = ctrl_lgrp;
-+	ctrl_lgrp->serdes_lane_lol_kobjs[asic_lane_num].asic_lane_num = asic_lane_num;
 +
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "serdes lane lol create (serdes_kobj = 0x%p)", &ctrl_lgrp->serdes_kobj);
++	INIT_IOVA_DOMAIN(cac->iovad, PAGE_SIZE, cac->iova_base,
++			 cac->iova_end);
++
++/* linux 5.18 removed the initialization of the rcaches from init_iova_domain */
++#ifdef HAVE_IOVA_INIT_RCACHES
++	ret = iova_domain_init_rcaches(cac->iovad);
++	if (ret) {
++		cass_nta_iova_fini(cac);
++		return ret;
++	}
++#endif
++
 +	return 0;
-+#else /* CONFIG_SYSFS */
++}
++
++void cass_nta_free(struct cass_dev *hw, struct cass_nta *nta)
++{
++	dma_unmap_page(&hw->cdev.pdev->dev, nta->root_page_dma_addr,
++		       PAGE_SIZE << nta->root_order, DMA_TO_DEVICE);
++	__free_pages(nta->root_page, nta->root_order);
++	kfree(nta);
++}
++
++static struct cass_nta *cass_nta_alloc(struct cass_ac *cac, int l0_entries,
++				       int l1_entries)
++{
++	struct cass_dev *hw = container_of(cac->lni_priv->dev, struct cass_dev, cdev);
++	struct cass_nta *nta;
++	int ret;
++
++	nta = kzalloc(struct_size(nta, l1, l0_entries), GFP_KERNEL);
++	if (!nta)
++		return ERR_PTR(-ENOMEM);
++
++	nta->numa_node = dev_to_node(&hw->cdev.pdev->dev);
++	nta->root_order = get_order(l0_entries * ATU_PTE_ENTRY_SIZE);
++	nta->l1_order = get_order(l1_entries * ATU_PTE_ENTRY_SIZE);
++
++	nta->root_page = alloc_pages_node(nta->numa_node, GFP_KERNEL | __GFP_ZERO,
++					  nta->root_order);
++	if (!nta->root_page) {
++		ret = -ENOMEM;
++		goto alloc_pages_fail;
++	}
++
++	nta->root_page_dma_addr = dma_map_page(&hw->cdev.pdev->dev, nta->root_page, 0,
++					       PAGE_SIZE << nta->root_order,
++					       DMA_TO_DEVICE);
++	if (dma_mapping_error(&hw->cdev.pdev->dev, nta->root_page_dma_addr)) {
++		ret = -ENOMEM;
++		goto map_fail;
++	}
++
++	nta->root_ptr = page_address(nta->root_page);
++	nta->l0_entries = l0_entries;
++	nta->l1_entries = l1_entries;
++	cac->cfg_ac.nta_root_ptr = nta->root_page_dma_addr >> C_ADDR_SHIFT;
++	cac->cfg_ac.mem_base = cac->iova_base >> ATU_CFG_AC_TABLE_MB_SHIFT;
++	cac->cfg_ac.mem_size = cac->iova_len >> C_ADDR_SHIFT;
++	cac->cfg_ac.odp_mode = C_ATU_ODP_MODE_NIC_PRI;
++	cac->cfg_ac.ta_mode = C_ATU_NTA_MODE;
++
++	return nta;
++
++map_fail:
++	__free_pages(nta->root_page, nta->root_order);
++alloc_pages_fail:
++	kfree(nta);
++
++	return ERR_PTR(ret);
++}
++
++static int cass_ac_size(const struct ac_map_opts *m_opts, struct cass_ac *cac,
++			ulong npfns, int l1_entries)
++{
++	u64 l0_entries;
++
++	l0_entries = round_up(npfns / l1_entries, min_root_entries(cac));
++	cac->iova_base = ATU_VA_MASK(cass_iova_base(cac));
++	cac->iova_len = l0_entries * (u64)l1_entries * BIT(cac->page_shift);
++	cac->iova_base &= ~(cac->iova_len - 1);
++	cac->iova_end = cac->iova_base + cac->iova_len - 1;
++
++	pr_debug("ac:%d iova_base:%016llx iova_end:%016llx iova_len:%016llx\n",
++		 cac->ac.acid, cac->iova_base, cac->iova_end, cac->iova_len);
++
++	return l0_entries;
++}
++
++/**
++ * cass_nta_init() - Initialize an NTA Address Context
++ *
++ * @lni_priv: the Logical Network Interface
++ * @m_opts: Map options
++ * @cac:    Address Context
++ */
++int cass_nta_init(struct cxi_lni_priv *lni_priv, struct ac_map_opts *m_opts,
++		  struct cass_ac *cac)
++{
++	int ret;
++	ulong npfns;
++	int l0_entries;
++	int l1_entries;
++	int len_order;
++
++	l1_entries = BIT(cac->cfg_ac.pg_table_size);
++	npfns = m_opts->va_len >> m_opts->page_shift;
++	npfns = ALIGN(npfns, l1_entries);
++
++	/* Round up to the next power of 2 if not aligned. If the length
++	 * passed to init_iova_domain is not aligned to a power of 2, calling
++	 * iova_alloc_fast with a length that is larger than half of the
++	 * domain size can fail since the iova is aligned to the length.
++	 */
++	len_order = flsl(npfns);
++	if (npfns & MASK(len_order))
++		npfns = BIT(len_order + 1);
++
++	l0_entries = cass_ac_size(m_opts, cac, npfns, l1_entries);
++
++	ret = cass_nta_iova_init(cac, m_opts->va_len);
++	if (ret)
++		goto iova_init_fail;
++
++	m_opts->iova = cass_nta_iova_alloc(cac, m_opts);
++	if (!m_opts->iova) {
++		if (cac->iovad) {
++			pr_debug("cass_iova_alloc failed %lld\n", m_opts->iova);
++			ret = -ENOENT;
++			goto alloc_iova_fail;
++		}
++	}
++
++	cac->nta = cass_nta_alloc(cac, l0_entries, l1_entries);
++	if (IS_ERR(cac->nta)) {
++		ret = PTR_ERR(cac->nta);
++		goto iova_cleanup;
++	}
++
 +	return 0;
-+#endif /* CONFIG_SYSFS */
++
++iova_cleanup:
++	if (cac->iovad)
++		FREE_IOVA_FAST(cac->iovad, m_opts->iova, m_opts->va_len);
++alloc_iova_fail:
++	cass_nta_iova_fini(cac);
++iova_init_fail:
++
++	return ret;
 +}
 +
-+void sl_sysfs_serdes_lane_lol_delete(struct sl_ctrl_lgrp *ctrl_lgrp, u8 asic_lane_num)
++static void cass_l1_table_free(struct cass_dev *hw, struct cass_nta *nta,
++			       unsigned int l0_index)
 +{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "serdes lane los delete (lgrp = 0x%p)", ctrl_lgrp);
++	struct l1_entry *l1 = &nta->l1[l0_index];
 +
-+	kobject_put(&ctrl_lgrp->serdes_lane_lol_kobjs[asic_lane_num].kobj);
-+	ctrl_lgrp->serdes_lane_lol_kobjs[asic_lane_num].ctrl_lgrp = NULL;
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_serdes_los.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_serdes_los.c
-new file mode 100644
-index 000000000000..bdcb6b8ae4ae
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_serdes_los.c
-@@ -0,0 +1,142 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2025-2026 Hewlett Packard Enterprise Development LP */
++	dma_unmap_page(&hw->cdev.pdev->dev, l1->l1_pages_dma_addr,
++		       PAGE_SIZE << nta->l1_order, DMA_TO_DEVICE);
++	__free_pages(l1->l1_pages, nta->l1_order);
++	bitmap_free(l1->bitmap);
 +
-+#include "asm-generic/int-ll64.h"
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+
-+#include "sl_log.h"
-+#include "sl_ctrl_lgrp.h"
-+#include "sl_ctrl_ldev.h"
-+#include "sl_core_lgrp.h"
-+#include "sl_sysfs_serdes_los.h"
-+
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t tx_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	int                              rtn;
-+	struct sl_lgrp_serdes_lane_kobj *lane_kobj;
-+	bool                             is_tx_los;
-+	struct sl_ctrl_lgrp             *ctrl_lgrp;
-+	u8                               ldev_num;
-+	u8                               lgrp_num;
-+
-+	lane_kobj = container_of(kobj, struct sl_lgrp_serdes_lane_kobj, kobj);
-+	ctrl_lgrp = lane_kobj->ctrl_lgrp;
-+	ldev_num = lane_kobj->ctrl_lgrp->ctrl_ldev->num;
-+	lgrp_num = lane_kobj->ctrl_lgrp->num;
-+
-+	rtn = sl_core_lgrp_tx_lane_is_los(ldev_num, lgrp_num, lane_kobj->asic_lane_num, &is_tx_los);
-+	if (rtn == -ENOENT) {
-+		sl_core_log_dbg(ctrl_lgrp, LOG_NAME,
-+				"los tx show (asic_lane_num = %u) - tx_lane_is_los no cache [%d]",
-+				lane_kobj->asic_lane_num, rtn);
-+		return sysfs_emit(buf, "no-cache\n");
-+	}
-+
-+	if (rtn) {
-+		sl_core_log_err_trace(ctrl_lgrp, LOG_NAME,
-+				      "los tx show (asic_lane_num = %u) - tx_lane_is_los failed [%d]",
-+				      lane_kobj->asic_lane_num, rtn);
-+		return sysfs_emit(buf, "error\n");
-+	}
-+
-+	sl_core_log_dbg(ctrl_lgrp, LOG_NAME,
-+			"los tx show (asic_lane_num = %u, is_tx_los = %s)",
-+			lane_kobj->asic_lane_num, is_tx_los ? "yes" : "no");
-+
-+	return sysfs_emit(buf, "%s\n", is_tx_los ? "yes" : "no");
++	memset(l1, 0, sizeof(*l1));
 +}
 +
-+static ssize_t rx_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++/* Return the virtual address of a given PTE */
++static union a_pte *get_virt_pte(const struct cass_nta *nta, unsigned int l0_index,
++				 unsigned int l1_index)
 +{
-+	int                              rtn;
-+	struct sl_lgrp_serdes_lane_kobj *lane_kobj;
-+	bool                             is_rx_los;
-+	struct sl_ctrl_lgrp             *ctrl_lgrp;
-+	u8                               ldev_num;
-+	u8                               lgrp_num;
++	union a_pte *l1_array;
 +
-+	lane_kobj = container_of(kobj, struct sl_lgrp_serdes_lane_kobj, kobj);
-+	ctrl_lgrp = lane_kobj->ctrl_lgrp;
-+	ldev_num = lane_kobj->ctrl_lgrp->ctrl_ldev->num;
-+	lgrp_num = lane_kobj->ctrl_lgrp->num;
++	l1_array = page_address(nta->l1[l0_index].l1_pages);
 +
-+	rtn = sl_core_lgrp_rx_lane_is_los(ldev_num, lgrp_num, lane_kobj->asic_lane_num, &is_rx_los);
-+	if (rtn == -ENOENT) {
-+		sl_core_log_dbg(ctrl_lgrp, LOG_NAME,
-+				"los rx show (asic_lane_num = %u) - rx_lane_is_los no cache [%d]",
-+				lane_kobj->asic_lane_num, rtn);
-+		return sysfs_emit(buf, "no-cache\n");
-+	}
-+
-+	if (rtn) {
-+		sl_core_log_err_trace(ctrl_lgrp, LOG_NAME,
-+				      "los rx show (asic_lane_num = %u) - rx_lane_is_los failed [%d]",
-+				      lane_kobj->asic_lane_num, rtn);
-+		return sysfs_emit(buf, "error\n");
-+	}
-+
-+	sl_core_log_dbg(ctrl_lgrp, LOG_NAME,
-+			"los rx show (asic_lane_num = %u, is_rx_los = %s)",
-+			lane_kobj->asic_lane_num, is_rx_los ? "yes" : "no");
-+
-+	return sysfs_emit(buf, "%s\n", is_rx_los ? "yes" : "no");
++	return &l1_array[l1_index];
 +}
 +
-+static struct kobj_attribute los_tx = __ATTR_RO(tx);
-+static struct kobj_attribute los_rx = __ATTR_RO(rx);
-+
-+static struct attribute *serdes_lane_los_attrs[] = {
-+	&los_tx.attr,
-+	&los_rx.attr,
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(serdes_lane_los);
-+
-+static struct kobj_type serdes_lane_los_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = serdes_lane_los_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_serdes_lane_los_create(struct sl_ctrl_lgrp *ctrl_lgrp, u8 asic_lane_num)
++static void cass_pte_clear(struct cass_dev *hw, const struct cxi_md_priv *md_priv,
++			   unsigned int l0_index, unsigned int l1_index,
++			   bool unmap)
 +{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
++	struct cass_ac *cac = md_priv->cac;
++	struct cass_nta *nta = cac->nta;
++	union a_pte *pte = get_virt_pte(nta, l0_index, l1_index);
++	unsigned long *map;
 +
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "serdes lane los create (lgrp = 0x%p)", ctrl_lgrp);
++	if (pte && pte->pte.p) {
++		if (unmap)
++			dma_unmap_page(&hw->cdev.pdev->dev, PTE_ADDR(pte->pte),
++				       1 << cac->page_shift, DMA_BIDIRECTIONAL);
++		pte->qw = 0;
++	}
 +
-+	rtn = kobject_init_and_add(&ctrl_lgrp->serdes_lane_los_kobjs[asic_lane_num].kobj,
-+				   &serdes_lane_los_info, &ctrl_lgrp->serdes_lane_kobjs[asic_lane_num], "los");
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+			   "serdes lane los create kobject_init_and_add failed [%d]", rtn);
-+		kobject_put(&ctrl_lgrp->serdes_lane_los_kobjs[asic_lane_num].kobj);
++	map = nta->l1[l0_index].bitmap;
++	if (map)
++		clear_bit(l1_index, map);
++}
++
++static void cass_clear_pde(struct cass_dev *hw, union a_pte *pde)
++{
++	pde->qw = 0;
++}
++
++void cass_l1_tables_free(struct cass_dev *hw, struct cass_nta *nta)
++{
++	int i;
++	union a_pte *pde;
++
++	for (i = 0; i < nta->l0_entries; i++) {
++		if (!nta->l1[i].bitmap)
++			continue;
++
++		pde = &nta->root_ptr[i];
++		if (!pde->qw) {
++			pr_warn("%d map entry but pde 0\n", i);
++			continue;
++		}
++
++		cass_l1_table_free(hw, nta, i);
++		cass_clear_pde(hw, pde);
++	}
++}
++
++static void cass_pg_tbl_indices(const struct cass_ac *cac, s64 iova_offset,
++				int *l0_index, int *l1_index)
++{
++	int pts = cac->cfg_ac.pg_table_size;
++	int l1_shift = cac->cfg_ac.base_pg_size + C_ADDR_SHIFT;
++	int l0_shift = l1_shift + pts;
++
++	*l0_index = iova_offset >> l0_shift;
++	*l1_index = (iova_offset >> l1_shift) & MASK(pts);
++}
++
++/**
++ * cass_clear_range() - clear a range of ptes and invalidate the ATU cache
++ *
++ * @md_priv: Private memory descriptor
++ * @iova: IO virtual address
++ * @len: IOVA range to clear
++ */
++void cass_clear_range(const struct cxi_md_priv *md_priv, u64 iova, u64 len)
++{
++	struct cass_dev *hw = container_of(md_priv->cac->lni_priv->dev,
++					   struct cass_dev, cdev);
++	int l0_index;
++	int l1_index;
++	struct cass_ac *cac = md_priv->cac;
++	int page_shift = cac->page_shift;
++	int entries = len >> page_shift;
++	s64 iova_offset = iova - cac->iova_base;
++	union a_pte *pde;
++	/* Only ODP needs to be unmapped here. Device and pinned memory will
++	 * be unmapped when the SG table is cleaned up.
++	 */
++	bool do_unmap = !md_priv->sgt;
++
++	if (!len)
++		return;
++
++	for (; entries > 0; iova_offset += BIT(page_shift), entries--) {
++		cass_pg_tbl_indices(cac, iova_offset, &l0_index, &l1_index);
++
++		pde = &cac->nta->root_ptr[l0_index];
++		if (!pde->qw)
++			continue;
++
++		if (!cac->cfg_ac.pg_table_size) {
++			/* single level table */
++			if (do_unmap)
++				dma_unmap_page(&hw->cdev.pdev->dev,
++					       PTE_ADDR(pde->pte),
++					       1 << cac->page_shift,
++					       DMA_BIDIRECTIONAL);
++			pde->qw = 0;
++		} else if (pde->pte.leaf) {
++			if (do_unmap)
++				dma_unmap_page(&hw->cdev.pdev->dev,
++					       PTE_ADDR(pde->pte),
++					       1 << cac->huge_shift,
++					       DMA_BIDIRECTIONAL);
++			cass_clear_pde(hw, pde);
++			/*
++			 * the rest of the entries for this pde don't need to
++			 * be checked
++			 */
++			entries -= ATU_PMD_NR(cac) - 1;
++			iova_offset += BIT(page_shift) * (ATU_PMD_NR(cac) - 1);
++		} else {
++			if (!cac->nta->l1[l0_index].bitmap)
++				pr_err("ac:%d iova:%llx offset:%llx map %d is NULL\n",
++				       cac->ac.acid, iova, iova_offset,
++				       l0_index);
++
++			cass_pte_clear(hw, md_priv, l0_index, l1_index,
++				       do_unmap);
++		}
++	}
++}
++
++/**
++ * cass_pte_build() - construct a page table entry based on the pfn and flags
++ *
++ * @hpfn: pfn from the CPU page table containing read and write permissions
++ * @pte: constructed page table entry
++ * @dma_addr: DMA address of the page frame number
++ * @leaf: indication of the final translation - l0 hugepage entry or l1 entry
++ * @flags: user requested read and write permissions
++ * @is_hmm_pfn: DMA address is from an hpfn - use the hpfn flags
++ * @l0_entry: indicates this is a root table entry
++ */
++static void cass_pte_build(u64 hpfn, union a_pte *pte, dma_addr_t dma_addr,
++			   bool leaf, u32 flags, bool is_hmm_pfn,
++			   bool l0_entry)
++{
++	/* Always set rd/wr permissions for a non-leaf root table entry
++	 * since the 2nd level could be either rd or wr and the NIC checks
++	 * both levels for proper permissions.
++	 */
++	bool rw = l0_entry && !leaf;
++	bool rd = rw || (flags & CXI_MAP_READ);
++	bool wr = rw || (flags & CXI_MAP_WRITE);
++	bool h_wr = rw || ATU_PFN_WRITE(hpfn);
++
++	pte->qw = dma_addr;
++	pte->pte.leaf = leaf;
++
++	if (is_hmm_pfn) {
++		if (ATU_PFN_INVALID(hpfn)) {
++			pte->qw = 0;
++			return;
++		}
++
++		pte->pte.r = rd;
++		pte->pte.w = h_wr && wr;
++		pte->pte.p = !leaf || ATU_PFN_VALID(hpfn);
++	} else {
++		/* TODO: check page attributes? */
++		pte->pte.r = rd;
++		pte->pte.w = wr;
++		pte->pte.p = 1;
++	}
++}
++
++/**
++ * cass_l1_table_empty - Free l1 map buffer if table is empty.
++ *
++ * @cac:   Address context
++ * @pde:   Page directory entry
++ * @index: L1 map to free and clean up
++ * @iova:  IO virtual address
++ */
++static int cass_l1_table_empty(const struct cass_ac *cac,
++			       union a_pte *pde, int index, u64 iova)
++{
++	struct cass_dev *hw = container_of(cac->lni_priv->dev,
++					   struct cass_dev, cdev);
++	struct cass_nta *nta = cac->nta;
++
++	if (!nta->l1[index].bitmap) {
++		pr_err("ac:%d iova:%llx map %d is NULL\n", cac->ac.acid,
++		       iova, index);
++		return -EINVAL;
++	}
++
++	if (!bitmap_empty(nta->l1[index].bitmap, nta->l1_entries)) {
++		pr_err("bitmap is not empty iova:%llx\n", iova);
++		return -EINVAL;
++	}
++
++	cass_l1_table_free(hw, nta, index);
++
++	return 0;
++}
++
++static int cass_l1_table_alloc(struct cass_dev *hw, struct cass_nta *nta,
++			       int l0_index)
++{
++	struct l1_entry *l1 = &nta->l1[l0_index];
++
++	l1->bitmap = bitmap_zalloc(nta->l1_entries, GFP_KERNEL);
++	if (!l1->bitmap)
 +		return -ENOMEM;
++
++	l1->l1_pages = alloc_pages_node(nta->numa_node, GFP_KERNEL | __GFP_ZERO,
++					nta->l1_order);
++	if (!l1->l1_pages)
++		goto free_bitmap;
++
++	l1->l1_pages_dma_addr = dma_map_page(&hw->cdev.pdev->dev, l1->l1_pages,
++					     0, PAGE_SIZE << nta->l1_order,
++					     DMA_TO_DEVICE);
++	if (dma_mapping_error(&hw->cdev.pdev->dev, l1->l1_pages_dma_addr))
++		goto free_pages;
++
++	return 0;
++
++free_pages:
++	__free_pages(l1->l1_pages, nta->l1_order);
++free_bitmap:
++	bitmap_free(l1->bitmap);
++
++	memset(l1, 0, sizeof(*l1));
++
++	return -ENOMEM;
++}
++
++int cass_dma_addr_mirror(dma_addr_t dma_addr, u64 iova, struct cass_ac *cac,
++			 u32 flags, bool is_huge_page, bool *invalidate)
++{
++	int ret;
++	int l0_index;
++	int l1_index;
++	union a_pte *ppde;
++	union a_pte *ppte;
++	union a_pte pde = {};
++	union a_pte pte = {};
++	bool update_pde = false;
++	s64 iova_offset = iova - cac->iova_base;
++	bool ptg_mode_sgl = !cac->cfg_ac.pg_table_size;
++	struct cass_dev *hw = container_of(cac->lni_priv->dev, struct cass_dev,
++					   cdev);
++
++	if (iova_offset > cac->iova_len) {
++		pr_warn("iova_offset:0x%llx > iova_len:0x%llx iova:%llx iova_base:%llx\n",
++			iova_offset, cac->iova_len, iova, cac->iova_base);
++		return -EINVAL;
 +	}
-+	ctrl_lgrp->serdes_lane_los_kobjs[asic_lane_num].ctrl_lgrp     = ctrl_lgrp;
-+	ctrl_lgrp->serdes_lane_los_kobjs[asic_lane_num].asic_lane_num = asic_lane_num;
 +
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "serdes lane los create (serdes_kobj = 0x%p)", &ctrl_lgrp->serdes_kobj);
++	cass_pg_tbl_indices(cac, iova_offset, &l0_index, &l1_index);
++	ppde = &cac->nta->root_ptr[l0_index];
++
++	if (is_huge_page && ppde->qw) {
++		if (l1_index) {
++			pr_err("Huge page not aligned iova:%llx\n", iova);
++			return -EINVAL;
++		}
++
++		/* Replacing a non-leaf entry with a leaf entry. */
++		/* TODO: check if this is still necessary */
++		if (!ppde->pte.leaf) {
++			ret = cass_l1_table_empty(cac, ppde, l0_index,
++						  iova_offset);
++			if (ret)
++				return ret;
++
++			pr_debug("Replacing non-leaf pde iova:%llx entry:%lx\n",
++				 iova_offset, (ulong)PTE_ADDR(ppde->pte));
++			update_pde = true;
++			goto new_pde;
++		}
++
++		/* It is possible to get an ODP page request for the same
++		 * IOVA since we try to fill more than one entry at a time.
++		 */
++		cass_pte_build(0, &pde, dma_addr, true, flags, false, true);
++
++		if (pde.qw != ppde->qw) {
++			pr_err("Overlapping huge page ac:%d iova:%llx\n",
++			       cac->ac.acid, iova_offset);
++			return -EINVAL;
++		}
++
++		return 0;
++	}
++
++new_pde:
++	if (!ppde->qw || update_pde) {
++		if (is_huge_page || ptg_mode_sgl) {
++			cass_pte_build(0, &pde, dma_addr, true, flags, false,
++				       true);
++		} else {
++			if (update_pde) {
++				pr_err("Expected hugepage update iova:%llx l0_index:%d l1_index:%d\n",
++				       iova_offset, l0_index, l1_index);
++				return -EINVAL;
++			}
++
++			ret = cass_l1_table_alloc(hw, cac->nta, l0_index);
++			if (ret) {
++				pr_err("Error allocating l1 table\n");
++				return ret;
++			}
++
++			cass_pte_build(0, &pde,
++				       cac->nta->l1[l0_index].l1_pages_dma_addr,
++				       false, flags, false, true);
++		}
++
++		atu_debug("pde iova:%llx dma_addr:0x%llx entry:%llx\n",
++			  iova, dma_addr, pde.qw);
++		ppde->qw = pde.qw;
++
++		if (update_pde)
++			cass_invalidate_range(cac, cac->iova_base + iova_offset,
++					      BIT(cac->huge_shift));
++
++		if (is_huge_page || ptg_mode_sgl)
++			return 0;
++	} else if (ppde->pte.leaf) {
++		pr_err("Unexpected leaf iova:%llx pde %llx, l0_index:%d l1_index:%d\n",
++		       iova_offset, ppde->qw, l0_index, l1_index);
++
++		return -EINVAL;
++	}
++
++	/* fill in the l1 table entry */
++	cass_pte_build(0, &pte, dma_addr, true, flags, false, false);
++	ppte = get_virt_pte(cac->nta, l0_index, l1_index);
++
++	atu_debug("pte %p phys:%lx iova:%llx entry:0x%llx\n", ppte,
++		  (ulong)PTE_ADDR(pte.pte) + l1_index * ATU_PTE_ENTRY_SIZE,
++		  iova, pte.qw);
++
++	ppte->qw = pte.qw;
++	set_bit(l1_index, cac->nta->l1[l0_index].bitmap);
++
 +	return 0;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
 +}
 +
-+void sl_sysfs_serdes_lane_los_delete(struct sl_ctrl_lgrp *ctrl_lgrp, u8 asic_lane_num)
++/**
++ * cass_pfns_mirror() - Mirror PTEs from a list of HMM pfns
++ *
++ * @md_priv: Private memory descriptor
++ * @m_opts: map options
++ * @pfns: pfns to mirror
++ * @npfns: number of pfns to mirror
++ * @is_huge_page: The vma is covered by a hugepage. For device memory,
++ *                indicates that the pfns are contiguous.
++ *
++ * Return: 0 on success or negative error value
++ */
++int cass_pfns_mirror(struct cxi_md_priv *md_priv, const struct ac_map_opts *m_opts,
++		     u64 *pfns, int npfns, bool is_huge_page)
 +{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "serdes lane los delete (lgrp = 0x%p)", ctrl_lgrp);
++	int ret;
++	int i;
++	size_t size;
++	bool inval = false;
++	int invalidate = 0;
++	struct page *page;
++	dma_addr_t dma_addr;
++	u64 iova = m_opts->iova;
++	struct cass_ac *cac = md_priv->cac;
++	size_t page_size = BIT(cac->page_shift);
 +
-+	kobject_put(&ctrl_lgrp->serdes_lane_los_kobjs[asic_lane_num].kobj);
-+	ctrl_lgrp->serdes_lane_los_kobjs[asic_lane_num].ctrl_lgrp = NULL;
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_serdes_settings.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_serdes_settings.c
-new file mode 100644
-index 000000000000..b33174640663
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_serdes_settings.c
-@@ -0,0 +1,506 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2024-2026 Hewlett Packard Enterprise Development LP */
++	for (i = 0; i < npfns;) {
++		/* Skip pfns that are invalid which may happen during
++		 * prefetch.
++		 */
++		if (!ATU_PFN_VALID(pfns[i])) {
++			i += ATU_PTE_NR(cac);
++			iova += page_size;
++			continue;
++		}
 +
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
++		page = hmm_pfn_to_page(pfns[i]);
 +
-+#include <linux/hpe/sl/sl_media.h>
++		/* Check if there are enough remaining pfns to cover an L0
++		 * entry.
++		 */
++		if ((npfns - i) < K_PMD_NR(cac))
++			is_huge_page = false;
 +
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "sl_ctrl_lgrp.h"
-+#include "sl_ctrl_ldev.h"
-+#include "sl_core_lgrp.h"
-+#include "sl_core_link.h"
-+#include "sl_core_str.h"
-+#include "sl_sysfs_serdes_settings.h"
++		if (is_huge_page &&
++		    ((iova & MASK(cac->huge_shift)) || !PageHuge(page)))
++			is_huge_page = false;
 +
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
++		size = is_huge_page ? BIT(cac->huge_shift) : page_size;
++		dma_addr = dma_map_page(md_priv->device, page, 0, size,
++					DMA_BIDIRECTIONAL);
++		if (dma_mapping_error(md_priv->device, dma_addr)) {
++			ret = -EINVAL;
++			goto mirror_error;
++		}
 +
-+#ifdef CONFIG_SYSFS
-+static ssize_t pre1_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_lgrp_serdes_lane_kobj *lane_kobj;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+	s16                              pre1;
-+	int				 rtn;
++		ret = cass_dma_addr_mirror(dma_addr, iova, cac, md_priv->flags,
++					   is_huge_page, &inval);
++		if (ret)
++			goto mirror_error;
 +
-+	lane_kobj = container_of(kobj, struct sl_lgrp_serdes_lane_kobj, kobj);
-+	if (!lane_kobj->ctrl_lgrp)
-+		return sysfs_emit(buf, "no-lane\n");
++		i += KPFN_INC(cac, is_huge_page);
++		invalidate += inval;
++		iova += size;
++	}
 +
-+	core_link = sl_core_link_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num,
-+				     lane_num_to_link_num(lane_kobj->ctrl_lgrp, lane_kobj->asic_lane_num));
-+	if (!core_link)
-+		return sysfs_emit(buf, "no-link\n");
++mirror_error:
++	if (i < npfns) {
++		pr_err("Error populating %d PTEs at index %d\n", npfns, i);
 +
-+	core_lgrp = sl_core_lgrp_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
++		/* Clean up previously populated ptes. */
++		cass_clear_range(md_priv, m_opts->iova, i * page_size);
++	}
 +
-+	rtn = sl_core_lgrp_pre1_get(core_lgrp, lane_kobj->asic_lane_num, &pre1);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
++	/* If any PTEs are replaced they will need to be invalidated.
++	 * Invalidate the whole range.
++	 */
++	if (invalidate)
++		cass_invalidate_range(cac, m_opts->iova, npfns * page_size);
 +
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "settings pre1 show (pre1 = %d)", pre1);
-+
-+	return sysfs_emit(buf, "%d\n", pre1);
-+}
-+
-+static ssize_t pre2_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_lgrp_serdes_lane_kobj *lane_kobj;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+	s16                              pre2;
-+	int				 rtn;
-+
-+	lane_kobj = container_of(kobj, struct sl_lgrp_serdes_lane_kobj, kobj);
-+	if (!lane_kobj->ctrl_lgrp)
-+		return sysfs_emit(buf, "no-lane\n");
-+
-+	core_link = sl_core_link_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num,
-+				     lane_num_to_link_num(lane_kobj->ctrl_lgrp, lane_kobj->asic_lane_num));
-+	if (!core_link)
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	core_lgrp = sl_core_lgrp_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_pre2_get(core_lgrp, lane_kobj->asic_lane_num, &pre2);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "settings pre2 show (pre2 = %d)", pre2);
-+
-+	return sysfs_emit(buf, "%d\n", pre2);
++	return ret;
 +}
 +
-+static ssize_t pre3_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++static struct page *cass_virt_to_page(u64 addr)
 +{
-+	struct sl_lgrp_serdes_lane_kobj *lane_kobj;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+	s16                              pre3;
-+	int				 rtn;
-+
-+	lane_kobj = container_of(kobj, struct sl_lgrp_serdes_lane_kobj, kobj);
-+	if (!lane_kobj->ctrl_lgrp)
-+		return sysfs_emit(buf, "no-lane\n");
-+
-+	core_link = sl_core_link_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num,
-+				     lane_num_to_link_num(lane_kobj->ctrl_lgrp, lane_kobj->asic_lane_num));
-+	if (!core_link)
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	core_lgrp = sl_core_lgrp_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_pre3_get(core_lgrp, lane_kobj->asic_lane_num, &pre3);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "settings pre3 show (pre3 = %d)", pre3);
-+
-+	return sysfs_emit(buf, "%d\n", pre3);
-+}
-+
-+static ssize_t cursor_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_lgrp_serdes_lane_kobj *lane_kobj;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+	s16                              cursor;
-+	int				 rtn;
-+
-+	lane_kobj = container_of(kobj, struct sl_lgrp_serdes_lane_kobj, kobj);
-+	if (!lane_kobj->ctrl_lgrp)
-+		return sysfs_emit(buf, "no-lane\n");
-+
-+	core_link = sl_core_link_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num,
-+				     lane_num_to_link_num(lane_kobj->ctrl_lgrp, lane_kobj->asic_lane_num));
-+	if (!core_link)
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	core_lgrp = sl_core_lgrp_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_cursor_get(core_lgrp, lane_kobj->asic_lane_num, &cursor);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "settings cursor show (cursor = %d)", cursor);
-+
-+	return sysfs_emit(buf, "%d\n", cursor);
-+}
-+
-+static ssize_t post1_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_lgrp_serdes_lane_kobj *lane_kobj;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+	s16                              post1;
-+	int				 rtn;
-+
-+	lane_kobj = container_of(kobj, struct sl_lgrp_serdes_lane_kobj, kobj);
-+	if (!lane_kobj->ctrl_lgrp)
-+		return sysfs_emit(buf, "no-lane\n");
-+
-+	core_link = sl_core_link_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num,
-+				     lane_num_to_link_num(lane_kobj->ctrl_lgrp, lane_kobj->asic_lane_num));
-+	if (!core_link)
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	core_lgrp = sl_core_lgrp_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_post1_get(core_lgrp, lane_kobj->asic_lane_num, &post1);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "settings post1 show (post1 = %d)", post1);
-+
-+	return sysfs_emit(buf, "%d\n", post1);
-+}
-+
-+static ssize_t post2_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_lgrp_serdes_lane_kobj *lane_kobj;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+	s16                              post2;
-+	int				 rtn;
-+
-+	lane_kobj = container_of(kobj, struct sl_lgrp_serdes_lane_kobj, kobj);
-+	if (!lane_kobj->ctrl_lgrp)
-+		return sysfs_emit(buf, "no-lane\n");
-+
-+	core_link = sl_core_link_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num,
-+				     lane_num_to_link_num(lane_kobj->ctrl_lgrp, lane_kobj->asic_lane_num));
-+	if (!core_link)
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	core_lgrp = sl_core_lgrp_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_post2_get(core_lgrp, lane_kobj->asic_lane_num, &post2);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "settings post2 show (post2 = %d)", post2);
-+
-+	return sysfs_emit(buf, "%d\n", post2);
-+}
-+
-+static ssize_t media_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_lgrp_serdes_lane_kobj *lane_kobj;
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+
-+	lane_kobj = container_of(kobj, struct sl_lgrp_serdes_lane_kobj, kobj);
-+	if (!lane_kobj->ctrl_lgrp)
-+		return sysfs_emit(buf, "no-lane\n");
-+
-+	core_link = sl_core_link_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num,
-+				     lane_num_to_link_num(lane_kobj->ctrl_lgrp, lane_kobj->asic_lane_num));
-+	if (!core_link)
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME,
-+		   "settings media show (media = %d)", core_link->serdes.media_serdes_settings.media);
-+	return sysfs_emit(buf, "%d\n", core_link->serdes.media_serdes_settings.media);
-+}
-+
-+static struct kobj_attribute settings_pre1   = __ATTR_RO(pre1);
-+static struct kobj_attribute settings_pre2   = __ATTR_RO(pre2);
-+static struct kobj_attribute settings_pre3   = __ATTR_RO(pre3);
-+static struct kobj_attribute settings_cursor = __ATTR_RO(cursor);
-+static struct kobj_attribute settings_post1  = __ATTR_RO(post1);
-+static struct kobj_attribute settings_post2  = __ATTR_RO(post2);
-+static struct kobj_attribute settings_media  = __ATTR_RO(media);
-+
-+static ssize_t osr_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_lgrp_serdes_lane_kobj *lane_kobj;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+	u8                               osr;
-+	int				 rtn;
-+
-+	lane_kobj = container_of(kobj, struct sl_lgrp_serdes_lane_kobj, kobj);
-+	if (!lane_kobj->ctrl_lgrp)
-+		return sysfs_emit(buf, "no-lane\n");
-+
-+	core_link = sl_core_link_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num,
-+				     lane_num_to_link_num(lane_kobj->ctrl_lgrp, lane_kobj->asic_lane_num));
-+	if (!core_link)
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	core_lgrp = sl_core_lgrp_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_osr_get(core_lgrp, lane_kobj->asic_lane_num, &osr);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "settings osr show (osr = %u %s)", osr, sl_core_serdes_lane_osr_str(osr));
-+
-+	return sysfs_emit(buf, "%s\n", sl_core_serdes_lane_osr_str(osr));
-+}
-+
-+static ssize_t encoding_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_lgrp_serdes_lane_kobj *lane_kobj;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+	u8                               encoding;
-+	int				 rtn;
-+
-+	lane_kobj = container_of(kobj, struct sl_lgrp_serdes_lane_kobj, kobj);
-+	if (!lane_kobj->ctrl_lgrp)
-+		return sysfs_emit(buf, "no-lane\n");
-+
-+	core_link = sl_core_link_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num,
-+				     lane_num_to_link_num(lane_kobj->ctrl_lgrp, lane_kobj->asic_lane_num));
-+	if (!core_link)
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	core_lgrp = sl_core_lgrp_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_encoding_get(core_lgrp, lane_kobj->asic_lane_num, &encoding);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "settings encoding show (encoding = %u %s)",
-+		   encoding, sl_core_serdes_lane_encoding_str(encoding));
-+
-+	return sysfs_emit(buf, "%s\n", sl_core_serdes_lane_encoding_str(encoding));
-+}
-+
-+static ssize_t clocking_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_lgrp_serdes_lane_kobj *lane_kobj;
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+	u16                              clocking;
-+	int				 rtn;
-+
-+	lane_kobj = container_of(kobj, struct sl_lgrp_serdes_lane_kobj, kobj);
-+	if (!lane_kobj->ctrl_lgrp)
-+		return sysfs_emit(buf, "no-lane\n");
-+
-+	core_link = sl_core_link_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num,
-+				     lane_num_to_link_num(lane_kobj->ctrl_lgrp, lane_kobj->asic_lane_num));
-+	if (!core_link)
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	rtn = sl_core_link_clocking_get(core_link, &clocking);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_link, LOG_BLOCK, LOG_NAME,
-+		   "settings clocking show (clocking = %u %s)",
-+		   clocking, sl_core_serdes_lane_clocking_str(clocking));
-+
-+	return sysfs_emit(buf, "%s\n", sl_core_serdes_lane_clocking_str(clocking));
-+}
-+
-+static ssize_t width_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_lgrp_serdes_lane_kobj *lane_kobj;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+	u8                               width;
-+	int				 rtn;
-+
-+	lane_kobj = container_of(kobj, struct sl_lgrp_serdes_lane_kobj, kobj);
-+	if (!lane_kobj->ctrl_lgrp)
-+		return sysfs_emit(buf, "no-lane\n");
-+
-+	core_link = sl_core_link_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num,
-+				     lane_num_to_link_num(lane_kobj->ctrl_lgrp, lane_kobj->asic_lane_num));
-+	if (!core_link)
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	core_lgrp = sl_core_lgrp_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_width_get(core_lgrp, lane_kobj->asic_lane_num, &width);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "settings width show (width = %u %s)",
-+		   width, sl_core_serdes_lane_width_str(width));
-+
-+	return sysfs_emit(buf, "%s\n", sl_core_serdes_lane_width_str(width));
-+}
-+
-+static ssize_t dfe_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_lgrp_serdes_lane_kobj *lane_kobj;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+	u8                               dfe;
-+	int				 rtn;
-+
-+	lane_kobj = container_of(kobj, struct sl_lgrp_serdes_lane_kobj, kobj);
-+	if (!lane_kobj->ctrl_lgrp)
-+		return sysfs_emit(buf, "no-lane\n");
-+
-+	core_link = sl_core_link_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num,
-+				     lane_num_to_link_num(lane_kobj->ctrl_lgrp, lane_kobj->asic_lane_num));
-+	if (!core_link)
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	core_lgrp = sl_core_lgrp_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_dfe_get(core_lgrp, lane_kobj->asic_lane_num, &dfe);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "settings dfe show (dfe = %s)", (dfe) ? "enabled" : "disabled");
-+
-+	return sysfs_emit(buf, "%s\n", (dfe) ? "enabled" : "disabled");
-+}
-+
-+static ssize_t scramble_dis_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_lgrp_serdes_lane_kobj *lane_kobj;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+	u8                               scramble_dis;
-+	int				 rtn;
-+
-+	lane_kobj = container_of(kobj, struct sl_lgrp_serdes_lane_kobj, kobj);
-+	if (!lane_kobj->ctrl_lgrp)
-+		return sysfs_emit(buf, "no-lane\n");
-+
-+	core_link = sl_core_link_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num,
-+				     lane_num_to_link_num(lane_kobj->ctrl_lgrp, lane_kobj->asic_lane_num));
-+	if (!core_link)
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	core_lgrp = sl_core_lgrp_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rtn = sl_core_lgrp_scramble_dis_get(core_lgrp, lane_kobj->asic_lane_num, &scramble_dis);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "settings scramble_dis show (scramble_dis = %s)", (scramble_dis) ? "set" : "not-set");
-+
-+	return sysfs_emit(buf, "%s\n", (scramble_dis) ? "set" : "not-set");
-+}
-+
-+static struct kobj_attribute settings_osr          = __ATTR_RO(osr);
-+static struct kobj_attribute settings_encoding     = __ATTR_RO(encoding);
-+static struct kobj_attribute settings_clocking     = __ATTR_RO(clocking);
-+static struct kobj_attribute settings_width        = __ATTR_RO(width);
-+static struct kobj_attribute settings_dfe          = __ATTR_RO(dfe);
-+static struct kobj_attribute settings_scramble_dis = __ATTR_RO(scramble_dis);
-+
-+static ssize_t link_training_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_lgrp_serdes_lane_kobj *lane_kobj;
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+
-+	lane_kobj = container_of(kobj, struct sl_lgrp_serdes_lane_kobj, kobj);
-+	if (!lane_kobj->ctrl_lgrp)
-+		return sysfs_emit(buf, "no-lane\n");
-+
-+	core_link = sl_core_link_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num,
-+				     lane_num_to_link_num(lane_kobj->ctrl_lgrp, lane_kobj->asic_lane_num));
-+	if (!core_link)
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	if (is_flag_set(core_link->core_lgrp->link_caps[core_link->num].hpe_map, SL_LINK_CONFIG_HPE_LINKTRAIN))
-+		return sysfs_emit(buf, "enabled\n");
++	if (is_vmalloc_addr((void *)addr))
++		return vmalloc_to_page((void *)addr);
 +	else
-+		return sysfs_emit(buf, "disabled\n");
++		return virt_to_page(addr);
 +}
 +
-+static struct kobj_attribute settings_link_training = __ATTR_RO(link_training);
-+
-+static struct attribute *serdes_lane_settings_attrs[] = {
-+	/* media */
-+	&settings_pre1.attr,
-+	&settings_pre2.attr,
-+	&settings_pre3.attr,
-+	&settings_cursor.attr,
-+	&settings_post1.attr,
-+	&settings_post2.attr,
-+	&settings_media.attr,
-+	/* core */
-+	&settings_osr.attr,
-+	&settings_encoding.attr,
-+	&settings_clocking.attr,
-+	&settings_width.attr,
-+	&settings_dfe.attr,
-+	&settings_scramble_dis.attr,
-+	&settings_link_training.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(serdes_lane_settings);
-+
-+static struct kobj_type serdes_lane_settings_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = serdes_lane_settings_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_serdes_lane_settings_create(struct sl_ctrl_lgrp *ctrl_lgrp, u8 asic_lane_num)
++static bool cass_error_inject(const struct cxi_lni_priv *lni_priv)
 +{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
++	struct cass_dev *hw =
++		container_of(lni_priv->dev, struct cass_dev, cdev);
 +
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "serdes lane settings create (lgrp = 0x%p)", ctrl_lgrp);
++	/* decrement if not 0 */
++	atomic_add_unless(&hw->atu_error_inject, -1, 0);
 +
-+	rtn = kobject_init_and_add(&(ctrl_lgrp->serdes_lane_settings_kobjs[asic_lane_num].kobj),
-+				   &serdes_lane_settings_info, &(ctrl_lgrp->serdes_lane_kobjs[asic_lane_num]), "settings");
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+			   "serdes lane settings create kobject_init_and_add failed [%d]", rtn);
-+		kobject_put(&(ctrl_lgrp->serdes_lane_settings_kobjs[asic_lane_num].kobj));
-+		return -ENOMEM;
++	if (atomic_read(&hw->atu_error_inject) == 1)
++		return true;
++
++	return false;
++}
++
++/**
++ * cass_pin() - Call pin_user_pages() to pin an address range
++ *
++ * @cac:     Address Context metadata
++ * @pages:   Array of pages returned. Only used if there is an error.
++ * @npages:  Number of pages to pin
++ * @addr:    Virtual address
++ * @write:   Write permission
++ *
++ * Return: Success or -EFAULT or return value of gup
++ */
++int cass_pin(const struct cass_ac *cac, struct page **pages, int npages,
++	     u64 addr, bool write)
++{
++	int i;
++	int gotn;
++	unsigned int gup_flags = FOLL_LONGTERM | (write ? FOLL_WRITE : 0);
++
++	gotn = pin_user_pages_fast(addr, npages, gup_flags, pages);
++	if (gotn < 0)
++		return gotn;
++
++	if ((gotn != npages) || cass_error_inject(cac->lni_priv)) {
++		pr_debug("gup failed gotn %d of %d\n", gotn, npages);
++
++		for (i = 0; i < gotn; i++)
++			unpin_user_page(pages[i]);
++
++		return -EFAULT;
 +	}
-+	ctrl_lgrp->serdes_lane_settings_kobjs[asic_lane_num].ctrl_lgrp      = ctrl_lgrp;
-+	ctrl_lgrp->serdes_lane_settings_kobjs[asic_lane_num].asic_lane_num = asic_lane_num;
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "serdes lane settings create (serdes_kobj = 0x%p)", &(ctrl_lgrp->serdes_kobj));
 +
 +	return 0;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
 +}
 +
-+void sl_sysfs_serdes_lane_settings_delete(struct sl_ctrl_lgrp *ctrl_lgrp, u8 asic_lane_num)
++/**
++ * cass_mirror_hp() - Mirror simulated hugepages from a large hugepage
++ *
++ * Support testing of arbitrary hugepage sizes.
++ * These pages do not have a notifier callback.
++ * The pinned pages are contiguous pages masquerading as a larger page size.
++ *
++ * @m_opts: map options
++ * @md_priv: Private memory descriptor
++ *
++ * Return: number of mirrored pages or error
++ */
++int cass_mirror_hp(const struct ac_map_opts *m_opts, struct cxi_md_priv *md_priv)
 +{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "serdes lane settings delete (lgrp = 0x%p)", ctrl_lgrp);
++	int i;
++	int ret = 0;
++	int l0_index;
++	int l1_index;
++	dma_addr_t dma_addr;
++	union a_pte *ppde;
++	union a_pte pde = {};
++	struct page *page;
++	u64 iova = m_opts->iova;
++	struct cass_ac *cac = md_priv->cac;
++	uintptr_t addr = m_opts->va_start;
++	int n_mir = 1 + ((m_opts->va_len - 1) >> cac->huge_shift);
 +
-+	kobject_put(&(ctrl_lgrp->serdes_lane_settings_kobjs[asic_lane_num].kobj));
-+	ctrl_lgrp->serdes_lane_settings_kobjs[asic_lane_num].ctrl_lgrp = NULL;
-+#endif /* CONFIG_SYSFS */
-+}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_serdes_state.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_serdes_state.c
-new file mode 100644
-index 000000000000..7fc14970a588
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_serdes_state.c
-@@ -0,0 +1,121 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2024-2026 Hewlett Packard Enterprise Development LP */
++	mutex_lock(&cac->ac_mutex);
 +
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
++	for (i = 0; i < n_mir; i++) {
++		ret = cass_pin(cac, &page, 1, addr, true);
++		if (ret)
++			break;
 +
-+#include "sl_log.h"
-+#include "sl_ctrl_lgrp.h"
-+#include "sl_ctrl_ldev.h"
-+#include "sl_core_lgrp.h"
-+#include "sl_core_str.h"
-+#include "sl_sysfs_serdes_state.h"
-+#include "hw/sl_core_hw_serdes_lane.h"
++		unpin_user_page(page);
 +
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
++		dma_addr = dma_map_page(md_priv->device, page, 0,
++					1 << cac->huge_shift,
++					DMA_BIDIRECTIONAL);
++		if (dma_mapping_error(md_priv->device, dma_addr)) {
++			ret = -ENOMEM;
++			break;
++		}
 +
-+#ifdef CONFIG_SYSFS
-+static ssize_t tx_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_lgrp_serdes_lane_kobj *lane_kobj;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u32                              state;
-+	int				 rtn;
++		cass_pg_tbl_indices(cac, iova - cac->iova_base, &l0_index,
++				    &l1_index);
++		ppde = &cac->nta->root_ptr[l0_index];
++		cass_pte_build(0, &pde, dma_addr, true, m_opts->flags, false,
++			       true);
 +
-+	lane_kobj = container_of(kobj, struct sl_lgrp_serdes_lane_kobj, kobj);
-+	if (!lane_kobj->ctrl_lgrp)
-+		return sysfs_emit(buf, "no-lane\n");
++		atu_debug("pde dma_addr:0x%llx entry:%llx\n", dma_addr, pde.qw);
++		ppde->qw = pde.qw;
 +
-+	core_lgrp = sl_core_lgrp_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+	rtn	  = sl_core_hw_serdes_tx_lane_state_get(core_lgrp, lane_kobj->asic_lane_num, &state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "state tx show (asic_lane_num = %u, state = %u %s)",
-+		lane_kobj->asic_lane_num, state, sl_core_serdes_lane_state_str(state));
-+
-+	return sysfs_emit(buf, "%s\n", sl_core_serdes_lane_state_str(state));
-+}
-+
-+static ssize_t rx_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_lgrp_serdes_lane_kobj *lane_kobj;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	u32                              state;
-+	int				 rtn;
-+
-+	lane_kobj = container_of(kobj, struct sl_lgrp_serdes_lane_kobj, kobj);
-+	if (!lane_kobj->ctrl_lgrp)
-+		return sysfs_emit(buf, "no-lane\n");
-+
-+	core_lgrp = sl_core_lgrp_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+	rtn	  = sl_core_hw_serdes_rx_lane_state_get(core_lgrp, lane_kobj->asic_lane_num, &state);
-+	if (rtn)
-+		return sysfs_emit(buf, "error\n");
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "state rx show (asic_lane_num = %u, state = %u %s)",
-+		lane_kobj->asic_lane_num, state, sl_core_serdes_lane_state_str(state));
-+
-+	return sysfs_emit(buf, "%s\n", sl_core_serdes_lane_state_str(state));
-+}
-+
-+static struct kobj_attribute state_tx = __ATTR_RO(tx);
-+static struct kobj_attribute state_rx = __ATTR_RO(rx);
-+
-+static struct attribute *serdes_lane_state_attrs[] = {
-+	&state_tx.attr,
-+	&state_rx.attr,
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(serdes_lane_state);
-+
-+static struct kobj_type serdes_lane_state_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = serdes_lane_state_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_serdes_lane_state_create(struct sl_ctrl_lgrp *ctrl_lgrp, u8 asic_lane_num)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "serdes lane state create (lgrp = 0x%p)", ctrl_lgrp);
-+
-+	rtn = kobject_init_and_add(&(ctrl_lgrp->serdes_lane_state_kobjs[asic_lane_num].kobj),
-+				   &serdes_lane_state_info, &(ctrl_lgrp->serdes_lane_kobjs[asic_lane_num]), "state");
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+			   "serdes lane state create kobject_init_and_add failed [%d]", rtn);
-+		kobject_put(&(ctrl_lgrp->serdes_lane_state_kobjs[asic_lane_num].kobj));
-+		return -ENOMEM;
++		iova += BIT(cac->huge_shift);
++		addr += BIT(cac->huge_shift);
 +	}
-+	ctrl_lgrp->serdes_lane_state_kobjs[asic_lane_num].ctrl_lgrp      = ctrl_lgrp;
-+	ctrl_lgrp->serdes_lane_state_kobjs[asic_lane_num].asic_lane_num = asic_lane_num;
 +
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "serdes lane state create (serdes_kobj = 0x%p)", &(ctrl_lgrp->serdes_kobj));
-+	return 0;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
++	if (ret) {
++		pr_debug("ret:%d\n", ret);
++		cass_clear_range(md_priv, m_opts->iova, i << cac->huge_shift);
++	}
++
++	mutex_unlock(&cac->ac_mutex);
++
++	return ret;
 +}
 +
-+void sl_sysfs_serdes_lane_state_delete(struct sl_ctrl_lgrp *ctrl_lgrp, u8 asic_lane_num)
++/**
++ * cass_mirror_device() - Mirror a GPU device memory address range into
++ *                        device page tables
++ *
++ * @md_priv: Private memory descriptor
++ * @m_opts:  User options containing the IOVA range
++ *
++ * Return: 0 on success, -ENOENT if not GPU memory or error
++ */
++int cass_mirror_device(struct cxi_md_priv *md_priv,
++		       const struct ac_map_opts *m_opts)
 +{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "serdes lane state delete (lgrp = 0x%p)", ctrl_lgrp);
++	int i;
++	int j = 0;
++	int ret;
++	bool inval;
++	struct scatterlist *sg;
++	u64 iova = md_priv->md.iova;
++	struct cass_ac *cac = md_priv->cac;
++	size_t plen = BIT(cac->page_shift);
++	size_t hlen = BIT(cac->huge_shift);
 +
-+	kobject_put(&(ctrl_lgrp->serdes_lane_state_kobjs[asic_lane_num].kobj));
-+	ctrl_lgrp->serdes_lane_state_kobjs[asic_lane_num].ctrl_lgrp = NULL;
-+#endif /* CONFIG_SYSFS */
++	mutex_lock(&md_priv->cac->ac_mutex);
++
++	i = 0;
++	for_each_sgtable_dma_sg(md_priv->sgt, sg, j) {
++		long len = sg_dma_len(sg);
++		dma_addr_t dma_addr = sg_dma_address(sg);
++
++		atu_debug("dma_addr:%llx len:%lx\n", dma_addr, len);
++
++		while (len > 0) {
++			bool is_hp = ffsl(dma_addr) >= cac->huge_shift &&
++					ffsl(iova) >= cac->huge_shift &&
++					len >= hlen;
++			size_t inc = is_hp ? hlen : plen;
++
++			atu_debug("iova:%llx dma_addr:%llx inc:%lx\n",
++				  iova, dma_addr, inc);
++			ret = cass_dma_addr_mirror(dma_addr, iova, cac,
++						   md_priv->flags,
++						   is_hp, &inval);
++			if (ret)
++				goto mirror_error;
++
++			iova += inc;
++			dma_addr += inc;
++			len -= inc;
++			i += KPFN_INC(cac, is_hp);
++		}
++	}
++
++	mutex_unlock(&md_priv->cac->ac_mutex);
++
++	return 0;
++
++mirror_error:
++	if (i) {
++		pr_err("Error populating length 0x%lx at index %d\n",
++		       md_priv->md.len, i);
++
++		/* Clean up previously populated ptes. */
++		cass_clear_range(md_priv, md_priv->md.iova, md_priv->md.len);
++	}
++
++	mutex_unlock(&md_priv->cac->ac_mutex);
++
++	return ret;
 +}
-diff --git a/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_serdes_swizzle.c b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_serdes_swizzle.c
-new file mode 100644
-index 000000000000..5f2d17fc15e9
---- /dev/null
-+++ b/drivers/net/ethernet/hpe/sl/sysfs/sl_sysfs_serdes_swizzle.c
-@@ -0,0 +1,126 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2025-2026 Hewlett Packard Enterprise Development LP */
 +
++/**
++ * cass_mirror_odp() - Mirror a virtual address range into device page tables
++ *
++ * @m_opts:  User options containing the IOVA range
++ * @cac:     Address Context
++ * @npfns:   Number of pages
++ * @addr:    Virtual address
++ *
++ * @return: 0 on success or negative error value
++ */
++int cass_mirror_odp(const struct ac_map_opts *m_opts, struct cass_ac *cac,
++		    int npfns, u64 addr)
++{
++	int ret;
++	u64 *pfns;
++
++	pfns = kcalloc(npfns, sizeof(*pfns), GFP_KERNEL);
++	if (!pfns)
++		return -ENOMEM;
++
++	ret = cass_mirror_fault(m_opts, pfns, npfns, addr, m_opts->va_len);
++
++	kfree(pfns);
++
++	return ret;
++}
++
++static int cass_dma_map_pages(struct cxi_md_priv *md_priv,
++			      struct page **pages, int npages, bool is_huge_page)
++{
++	int ret;
++	struct sg_table *sgt;
++
++	sgt = kzalloc(sizeof(*sgt), GFP_KERNEL);
++	if (!sgt)
++		return -ENOMEM;
++
++	ret = sg_alloc_table_from_pages_segment(sgt, pages, npages,
++						0, md_priv->md.len, UINT_MAX, GFP_KERNEL);
++	if (ret)
++		goto sg_table_error;
++
++	ret = dma_map_sgtable(md_priv->device, sgt, DMA_BIDIRECTIONAL, 0);
++	if (ret)
++		goto dma_map_error;
++
++	md_priv->sgt = sgt;
++
++	return 0;
++
++dma_map_error:
++	sg_free_table(sgt);
++sg_table_error:
++	kfree(sgt);
++
++	return ret;
++}
++
++void cass_dma_unmap_pages(struct cxi_md_priv *md_priv)
++{
++	if (!md_priv->sgt)
++		return;
++
++	if (md_priv->external_sgt_owner)
++		return;
++
++	dma_unmap_sgtable(md_priv->device, md_priv->sgt, DMA_BIDIRECTIONAL, 0);
++	sg_free_table(md_priv->sgt);
++	kfree(md_priv->sgt);
++	md_priv->sgt = NULL;
++}
++
++/**
++ * cass_pin_mirror() - Pin and mirror a virtual address range into device
++ *                     page tables
++ *
++ * @m_opts:  User options containing the IOVA range
++ * @md_priv: Private memory descriptor
++ *
++ * Return: 0 on success or error
++ */
++int cass_pin_mirror(struct cxi_md_priv *md_priv, struct ac_map_opts *m_opts)
++{
++	int i;
++	int ret;
++	int addr_inc;
++	bool inval = false;
++	int invalidate = 0;
++	bool is_huge_page;
++	u64 iova = m_opts->iova;
++	struct page **pages = NULL;
++	struct cass_ac *cac = md_priv->cac;
++	uintptr_t addr = m_opts->va_start;
++	uintptr_t end = m_opts->va_end;
++	int hlen = BIT(m_opts->huge_shift);
++	int plen = BIT(m_opts->page_shift);
++	u64 hmask = hlen - 1;
++	size_t md_len = m_opts->va_len;
++	int npages = m_opts->va_len >> PAGE_SHIFT;
++	struct scatterlist *sg;
++
++	pages = kvmalloc_array(npages, sizeof(pages), GFP_KERNEL);
++	if (!pages)
++		return -ENOMEM;
++
++	mmap_read_lock(current->mm);
++	ret = cass_vma_write_flag(current->mm, addr, end, m_opts->flags);
++	mmap_read_unlock(current->mm);
++
++	if (ret < 0)
++		goto err;
++
++	ret = cass_pin(cac, pages, npages, m_opts->va_start, ret);
++	if (ret < 0)
++		goto err;
++
++	ret = cass_dma_map_pages(md_priv, pages, npages, m_opts->is_huge_page);
++	if (ret)
++		goto map_err;
++
++	mutex_lock(&cac->ac_mutex);
++
++	for_each_sgtable_dma_sg(md_priv->sgt, sg, i) {
++		size_t len = sg_dma_len(sg);
++		dma_addr_t dma_addr = sg_dma_address(sg);
++
++		while (len > 0 && md_len > 0) {
++			is_huge_page = m_opts->is_huge_page && (len >= hlen) &&
++						!(iova & hmask);
++			addr_inc = is_huge_page ? hlen : plen;
++
++			ret = cass_dma_addr_mirror(dma_addr, iova, cac,
++						   m_opts->flags,
++						   is_huge_page, &inval);
++			if (ret) {
++				pr_err("Error populating %d PTEs at index %d iova:%llx inc:%x\n",
++				       npages, i, iova, addr_inc);
++				goto mirror_error;
++			}
++
++			dma_addr += addr_inc;
++			iova += addr_inc;
++			len -= addr_inc;
++			md_len -= addr_inc;
++			invalidate += inval;
++		}
++
++		if (md_len <= 0)
++			break;
++	}
++
++	mutex_unlock(&cac->ac_mutex);
++
++	if (invalidate)
++		cass_invalidate_range(cac, m_opts->iova, plen * i);
++
++	md_priv->pages = pages;
++
++	return 0;
++
++mirror_error:
++	cass_clear_range(md_priv, m_opts->iova, plen * i);
++	mutex_unlock(&cac->ac_mutex);
++	cass_dma_unmap_pages(md_priv);
++
++map_err:
++	unpin_user_pages(pages, npages);
++
++err:
++	kvfree(pages);
++
++	return ret;
++}
++
++static int atu_odpq_space(struct cass_dev *hw)
++{
++	union c_atu_sts_odpq sts_odpq;
++
++	cass_read(hw, C_ATU_STS_ODPQ, &sts_odpq, sizeof(sts_odpq));
++
++	return sts_odpq.odpq_space;
++}
++
++static int cass_odpq_space(struct cass_dev *hw)
++{
++	int ret;
++	int space;
++
++	ret = readx_poll_timeout(atu_odpq_space, hw, space, (space > 0), 1,
++				 ATU_ODPQ_SPACE_TIMEOUT);
++	if (ret) {
++		pr_err("Timed out waiting for ODPQ space\n");
++		return ret;
++	}
++
++	return space;
++}
++
++/**
++ * cass_odpq_write() - Write the result of a page request
++ *
++ * Also used to clear out expired page requests.
++ * The queue is 8 deep and we just write one entry at
++ * a time so it should never overflow.
++ *
++ * @hw:     the device
++ * @index:  PRB entry
++ * @status: C_ATU_ODP_FAILURE or C_ATU_ODP_SUCCESS
++ */
++static void cass_odpq_write(struct cass_dev *hw, int index,
++			    enum c_odp_status status)
++{
++	int space;
++	union c_atu_cfg_odpq odpq = {
++		.status = status,
++		.prb_index = index
++	};
++
++	mutex_lock(&hw->odpq_mutex);
++
++	space = cass_odpq_space(hw);
++	if (space <= 0)
++		pr_err("Timed out waiting for ODPQ\n");
++	else
++		cass_write(hw, C_ATU_CFG_ODPQ, &odpq, sizeof(odpq));
++
++	mutex_unlock(&hw->odpq_mutex);
++}
++
++/**
++ * cass_prb_worker() - Clean up expired PRB entries
++ *
++ * Scan the PRB table and look for expired entries and report entry as
++ * failed. Keep scanning until there are no more entries.
++ *
++ * @work: the work_struct
++ */
++static void cass_prb_worker(struct work_struct *work)
++{
++	int i;
++	bool scan_again;
++	union c_atu_sts_prb_table entry;
++	struct cass_dev *hw = container_of(work, struct cass_dev, prb_work);
++
++	do {
++		scan_again = false;
++
++		for (i = 0; i < C_ATU_STS_PRB_TABLE_ENTRIES; i++) {
++			cass_read(hw, C_ATU_STS_PRB_TABLE(i), &entry,
++				  sizeof(entry));
++
++			if (entry.valid && entry.expired) {
++				pr_warn("Entry %d expired ac:%d addr:%lx\n",
++					i, entry.acid,
++					(ulong)entry.addr << PAGE_SHIFT);
++				scan_again = true;
++				cass_odpq_write(hw, i, C_ATU_ODP_FAILURE);
++				atomic_inc(&hw->atu_prb_expired);
++			}
++		}
++	} while (scan_again);
++}
++
++static void add_md_time_to_bin(struct cass_dev *hw, ktime_t time)
++{
++	int i;
++	int bin = FIRST_MDBIN;
++
++	if (ktime_compare(hw->pri_max_md_time, time) < 0)
++		hw->pri_max_md_time = time;
++
++	for (i = 0; i < MDBINS; i++, bin <<= 1) {
++		if (time < bin) {
++			hw->pri_md_time[i]++;
++			break;
++		}
++	}
++}
++
++static void add_fault_time_to_bin(struct cass_dev *hw, ktime_t time)
++{
++	int i;
++	int bin = FIRST_FBIN;
++
++	if (ktime_compare(hw->pri_max_fault_time, time) < 0)
++		hw->pri_max_fault_time = time;
++
++	for (i = 0; i < FBINS; i++, bin <<= 1) {
++		if (time < bin) {
++			hw->pri_fault_time[i]++;
++			break;
++		}
++	}
++}
++
++/**
++ * cass_pri_fault() - Respond to a NIC PRI page request
++ *
++ * The page request interface consists of a buffer of 512
++ * page request entries containing an AC, index and iova.
++ * Fault in the page requested, clear the request in the
++ * buffer and write a response to the ODP queue.
++ * The page request interface can only request one page
++ * at a time.
++ *
++ * @hw:  the device
++ * @pre: page request entry
++ */
++static void cass_pri_fault(struct cass_dev *hw,
++			   struct c_page_request_entry *pre)
++{
++	int rc = -1;
++	u64 iova = 0;
++	u64 addr = 0;
++	int npages;
++	int align_shift;
++	int index = pre->index;
++	struct cass_ac *cac;
++	struct cxi_md_priv *e = NULL;
++	struct ac_map_opts m_opts = {};
++	union c_atu_sts_prb_table entry;
++	enum c_odp_status status = C_ATU_ODP_FAILURE;
++	ktime_t fault_time;
++	ktime_t fault_start;
++	ktime_t get_md_time;
++	ktime_t start = ktime_get_raw();
++
++	cac = cass_cac_get(hw, pre->acid);
++	if (!cac)
++		goto no_cac;
++
++	iova = (u64)pre->addr << C_ADDR_SHIFT;
++
++	if (!(cac->flags & CXI_MAP_USER_ADDR)) {
++		pr_err("Kern iova:%llx page not present\n", iova);
++		goto no_cac;
++	}
++
++	mutex_lock(&cac->md_mutex);
++	list_for_each_entry(e, &cac->md_list, md_entry) {
++		u64 md_end = e->md.iova + e->md.len;
++
++		if ((e->md.iova <= iova) && (iova < md_end)) {
++			addr = e->md.va + (iova - e->md.iova);
++			m_opts.flags = e->flags;
++			break;
++		}
++	}
++
++	fault_start = ktime_get_raw();
++	get_md_time = fault_start - start;
++	add_md_time_to_bin(hw, get_md_time);
++
++	if (!addr)
++		goto no_md;
++
++	align_shift = pri_shift;
++	m_opts.page_shift = cac->page_shift;
++	m_opts.va_end = addr + PAGE_SIZE;
++	rc = cass_cpu_page_size(hw, &m_opts, e->mn_sub.mm, addr, NULL,
++				&align_shift);
++	if (rc)
++		goto no_md;
++
++	/* There may be vmas with larger hugepage sizes than the AC
++	 * is configured with. Use the smaller of AC configured
++	 * hugepage size or vma hugepage size (if present).
++	 */
++	align_shift = min_t(int, align_shift, cac->huge_shift);
++
++	/* Align the m_opts.va_* to align_shift */
++	cass_align_start_len(&m_opts, addr, PAGE_SIZE, align_shift);
++	/* Bound the m_opts.va_* to the MD */
++	m_opts.va_start = max_t(u64, m_opts.va_start, e->md.va);
++	m_opts.va_end = min_t(u64, m_opts.va_end, e->md.va + e->md.len);
++	m_opts.va_len = m_opts.va_end - m_opts.va_start;
++	/* Adjust iova to match va_start offset from addr */
++	m_opts.iova = iova - (addr - m_opts.va_start);
++	m_opts.md_priv = e;
++	m_opts.flags |= CXI_MAP_FAULT;
++
++	atu_debug("req_iova:%llx addr:%llx md:%d md.va:%llx iova:%llx start:%llx end:%llx va_len:%lx\n",
++		  iova, addr, e->md.id, e->md.va, m_opts.iova, m_opts.va_start,
++		  m_opts.va_end, m_opts.va_len);
++
++	npages = m_opts.va_len >> cac->page_shift;
++	rc = cass_mirror_odp(&m_opts, cac, npages, m_opts.va_start);
++	if (rc >= 0)
++		status = C_ATU_ODP_SUCCESS;
++	else {
++		atomic_inc(&hw->atu_odp_fails);
++		cass_read(hw, C_ATU_STS_PRB_TABLE(index), &entry,
++			  sizeof(entry));
++		pr_warn("ODP failure rc:%d PRT:ac:%d iova:%llx mdva:%llx SPRBT:i:%d v:%d e:%d ac:%d client:%d addr:%lx w:%d r:%d\n",
++			rc, pre->acid, iova, e->md.va,
++			index, entry.valid, entry.expired, entry.acid,
++			entry.client, (ulong)entry.addr << PAGE_SHIFT,
++			entry.w, entry.r);
++	}
++
++	fault_time = ktime_get_raw() - fault_start;
++	add_fault_time_to_bin(hw, fault_time);
++
++no_md:
++	mutex_unlock(&cac->md_mutex);
++no_cac:
++	atu_debug("sts:%s rc:%d ac:%d index:%d iova:%llx md.va:%llx\n",
++		  status ? "f" : "s", rc, pre->acid, index, iova, e ? e->md.va : 0);
++
++	*(u64 *)pre = 0;
++	/* make sure entry is zeroed before reporting to hw */
++	wmb();
++	atomic_inc(&hw->atu_odp_requests);
++	cass_odpq_write(hw, index, status);
++	cass_cac_put(cac);
++}
++
++static void cass_pri_worker(struct work_struct *work)
++{
++	struct c_page_request_entry *pre;
++	struct cass_dev *hw = container_of(work, struct cass_dev, pri_work);
++	int rd_ptr = hw->pri_rd_ptr;
++
++	while (1) {
++		pre = &hw->page_request_table[rd_ptr];
++
++		if (!pre->acid)
++			break;
++
++		cass_pri_fault(hw, pre);
++		rd_ptr = (rd_ptr + 1) % C_ATU_PRB_ENTRIES;
++	}
++
++	hw->pri_rd_ptr = rd_ptr;
++}
++
++static irqreturn_t cass_pri_int_cb(int irq, void *context)
++{
++	struct cass_dev *hw = context;
++
++	queue_work(hw->pri_wq, &hw->pri_work);
++
++	return IRQ_HANDLED;
++}
++
++int cass_nta_mirror_sgt(struct cxi_md_priv *md_priv, bool need_lock)
++{
++	int i;
++	int j = 0;
++	int ret;
++	bool inval;
++	struct scatterlist *sg;
++	u64 iova = md_priv->md.iova;
++	struct cass_ac *cac = md_priv->cac;
++
++	cass_cond_lock(&cac->ac_mutex, need_lock);
++
++	for_each_sgtable_dma_sg(md_priv->sgt, sg, i) {
++		dma_addr_t dma_addr = sg_dma_address(sg) & PAGE_MASK;
++		long len = sg_dma_len(sg) + (sg_dma_address(sg) % PAGE_SIZE);
++
++		atu_debug("dma_addr:%llx len:%lx\n", dma_addr, len);
++
++		while (len > 0) {
++			ret = cass_dma_addr_mirror(dma_addr, iova, cac,
++						   md_priv->flags, false,
++						   &inval);
++			if (ret)
++				goto mirror_error;
++
++			dma_addr += PAGE_SIZE;
++			iova += PAGE_SIZE;
++			len -= PAGE_SIZE;
++			j++;
++		}
++	}
++
++	cass_cond_unlock(&cac->ac_mutex, need_lock);
++
++	return 0;
++
++mirror_error:
++	cass_clear_range(md_priv, md_priv->md.iova, j * PAGE_SIZE);
++	cass_cond_unlock(&cac->ac_mutex, need_lock);
++
++	return ret;
++}
++
++int cass_nta_mirror_kern(struct cxi_md_priv *md_priv,
++			 const struct iov_iter *iter, bool need_lock)
++{
++	int i;
++	int j;
++	int ret;
++	int alen;
++	struct page *page;
++	struct sg_table *sgt;
++	struct scatterlist *sg;
++	u64 iova = md_priv->md.iova;
++	uintptr_t addr = md_priv->md.va;
++	int npages = md_priv->md.len >> PAGE_SHIFT;
++
++	sgt = kmalloc(sizeof(struct sg_table), GFP_KERNEL);
++	if (!sgt)
++		return -ENOMEM;
++
++	ret = sg_alloc_table(sgt, npages, GFP_KERNEL);
++	if (ret)
++		goto sg_alloc_error;
++
++	pr_debug("va:%lx iova:%llx len:%lx\n", addr, iova, md_priv->md.len);
++
++	sg = sgt->sgl;
++	if (iter == NULL) {
++		for (i = 0; i < npages; i++) {
++			if (!sg) {
++				pr_info("sg is null at %d\n", i);
++				goto dma_map_error;
++			}
++			page = cass_virt_to_page(addr + (i * PAGE_SIZE));
++			sg_set_page(sg, page, PAGE_SIZE, 0);
++			sg = sg_next(sg);
++		}
++	} else if (iov_iter_is_bvec(iter)) {
++		const struct bio_vec *bvec = iter->bvec;
++
++		for (i = 0; i < npages; i++) {
++			sg_set_page(sg, bvec->bv_page, PAGE_SIZE, 0);
++			sg = sg_next(sg);
++			bvec++;
++		}
++	} else if (iov_iter_is_kvec(iter)) {
++		int ipages;
++		const struct kvec *kvec = iter->kvec;
++
++		for (i = 0; i < npages;) {
++			alen = PAGE_ALIGN(kvec->iov_len);
++			ipages = alen >> PAGE_SHIFT;
++
++			for (j = 0; j < ipages; j++) {
++				page = cass_virt_to_page((u64)kvec->iov_base +
++								j * PAGE_SIZE);
++				sg_set_page(sg, page, PAGE_SIZE, 0);
++				sg = sg_next(sg);
++				i++;
++			}
++
++			kvec++;
++		}
++	}
++
++	ret = dma_map_sgtable(md_priv->device, sgt, DMA_BIDIRECTIONAL, 0);
++	if (ret)
++		goto dma_map_error;
++
++	md_priv->sgt = sgt;
++
++	ret = cass_nta_mirror_sgt(md_priv, need_lock);
++	if (ret)
++		goto mirror_error;
++
++	md_priv->need_lock = false;
++
++	return 0;
++
++mirror_error:
++	dma_unmap_sgtable(md_priv->device, sgt, DMA_BIDIRECTIONAL, 0);
++
++dma_map_error:
++	sg_free_table(sgt);
++
++sg_alloc_error:
++	kfree(sgt);
++
++	return ret;
++}
+diff --git a/drivers/net/ethernet/hpe/ss1/cass_p2p.c b/drivers/net/ethernet/hpe/ss1/cass_p2p.c
+new file mode 100644
+index 000000000000..02845ff7649a
+--- /dev/null
++++ b/drivers/net/ethernet/hpe/ss1/cass_p2p.c
+@@ -0,0 +1,321 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright 2020-2021 Hewlett Packard Enterprise Development LP */
++
++/* GPU direct (P2P) interface */
++
++#include "cass_core.h"
++
++static bool device_hugepage_enable = true;
++module_param(device_hugepage_enable, bool, 0644);
++MODULE_PARM_DESC(device_hugepage_enable, "Enable device hugepages");
++
++#define DEVICE_HS_ARRAY_SIZE 2
++static int device_hs_array_n = DEVICE_HS_ARRAY_SIZE;
++/* Default to 2MB and 64M. */
++static int device_hs_array[DEVICE_HS_ARRAY_SIZE] = {21, 26};
++
++#define MIN_DEVICE_HP_SHIFT (MIN_DEVICE_PG_TABLE_SIZE + PAGE_SHIFT)
++#define MAX_DEVICE_HP_SHIFT (MIN_DEVICE_HP_SHIFT + MAX_PG_TABLE_SIZE)
++#define DEVICE_HS_ARRAY_BUFFER_SIZE (DEVICE_HS_ARRAY_SIZE * 3)
++
++static int device_hs_array_get(char *buffer, const struct kernel_param *kp)
++{
++	return param_array_ops.get(buffer, kp);
++}
++
++static int device_hs_array_set(const char *val, const struct kernel_param *kp)
++{
++	int i;
++	int ret;
++	int prev = 0;
++	char buf[DEVICE_HS_ARRAY_BUFFER_SIZE];
++
++	/* save the current list in case there is an invalid value */
++	ret = device_hs_array_get(buf, kp);
++	if (ret < 0)
++		return ret;
++
++	/* set to the new value */
++	ret = param_array_ops.set(val, kp);
++	if (ret)
++		return ret;
++
++	/* check for out of range and that they are ascending in value */
++	for (i = 0; i < device_hs_array_n; i++) {
++		if (device_hs_array[i] < MIN_DEVICE_HP_SHIFT ||
++		    device_hs_array[i] > MAX_DEVICE_HP_SHIFT) {
++			pr_info("Value (%d) out of range of %d-%d\n",
++				device_hs_array[i], MIN_DEVICE_HP_SHIFT,
++				MAX_DEVICE_HP_SHIFT);
++			goto invalid;
++		}
++
++		if (device_hs_array[i] < prev) {
++			pr_info("Values should be ascending\n");
++			goto invalid;
++		}
++
++		prev = device_hs_array[i];
++	}
++
++	return 0;
++invalid:
++	/* restore previous values */
++	param_array_ops.set(buf, kp);
++	return -EINVAL;
++}
++
++static const struct kernel_param_ops device_hs_array_ops = {
++	.set = device_hs_array_set,
++	.get = device_hs_array_get,
++};
++
++/* Modified version of module_param_array_named to include the ops */
++#define module_param_array_named_cb(name, array, type, _ops, nump, perm) \
++	param_check_##type(name, &(array)[0]);				\
++	static const struct kparam_array __param_arr_##name		\
++	= { .max = ARRAY_SIZE(array), .num = nump,			\
++	    .ops = &param_ops_##type,					\
++	    .elemsize = sizeof(array[0]), .elem = array };		\
++	__module_param_call(MODULE_PARAM_PREFIX, name, &_ops,		\
++			    .arr = &__param_arr_##name, perm, -1, 0);	\
++	__MODULE_PARM_TYPE(name, "array of " #type)
++
++module_param_array_named_cb(device_hs_array, device_hs_array, int,
++			    device_hs_array_ops, &device_hs_array_n, 0644);
++MODULE_PARM_DESC(device_hs_array, "Array of allowed hugeshift values");
++
++enum cxi_p2p_type {
++	CXI_P2P_AMD_GPU = 1,
++	CXI_P2P_NVIDIA_GPU,
++};
++
++static enum cxi_p2p_type cxi_supported_p2p_type;
++static DEFINE_MUTEX(p2p_init_lock);
++
++/**
++ * cxi_p2p_init - Discover a GPU direct interface and initialize it.
++ */
++static int cxi_p2p_init(void)
++{
++	int ret = 0;
++
++	if (cxi_supported_p2p_type > 0)
++		return 0;
++
++	mutex_lock(&p2p_init_lock);
++
++	if (cxi_supported_p2p_type > 0)
++		goto out_unlock;
++
++#ifdef HAVE_NVIDIA_P2P
++	ret = nvidia_p2p_init();
++	if (!ret) {
++		cxi_supported_p2p_type = CXI_P2P_NVIDIA_GPU;
++		goto out_unlock;
++	}
++#endif
++
++#ifdef HAVE_AMD_RDMA
++	ret = amd_p2p_init();
++	if (!ret)
++		cxi_supported_p2p_type = CXI_P2P_AMD_GPU;
++#endif
++
++out_unlock:
++	mutex_unlock(&p2p_init_lock);
++
++	return ret;
++}
++
++/**
++ * cxi_p2p_fini - Clean up a GPU direct interface.
++ */
++void cxi_p2p_fini(void)
++{
++	switch (cxi_supported_p2p_type) {
++	case CXI_P2P_AMD_GPU:
++#ifdef HAVE_AMD_RDMA
++		amd_p2p_fini();
++#endif
++		break;
++	case CXI_P2P_NVIDIA_GPU:
++#ifdef HAVE_NVIDIA_P2P
++		nvidia_p2p_fini();
++#endif
++		break;
++	}
++}
++
++/**
++ * cass_device_md() - Allocate a memory descriptor and get GPU device pages
++ *
++ * @lni_priv: LNI
++ * @va: device virtual address
++ * @len: length
++ * @dma_addr: dma address of va
++ * @return: memory descriptor
++ */
++struct cxi_md_priv *cass_device_md(struct cxi_lni_priv *lni_priv, u64 va,
++				   size_t len, dma_addr_t *dma_addr)
++{
++	int rc;
++	struct ac_map_opts m_opts = {};
++	struct cxi_md_priv *md_priv;
++	struct cass_dev *hw = container_of(lni_priv->dev, struct cass_dev,
++					   cdev);
++
++	rc = cass_is_device_memory(hw, &m_opts, va, len);
++	if (rc)
++		return ERR_PTR(rc);
++
++	md_priv = kzalloc(sizeof(*md_priv), GFP_KERNEL);
++	if (!md_priv)
++		return ERR_PTR(-ENOMEM);
++
++	m_opts.md_priv = md_priv;
++	cass_align_start_len(&m_opts, va, len, m_opts.page_shift);
++
++	md_priv->lni_priv = lni_priv;
++	md_priv->md.va = m_opts.va_start;
++	md_priv->md.len = m_opts.va_len;
++	md_priv->md.page_shift = m_opts.page_shift;
++
++	refcount_set(&md_priv->refcount, 1);
++
++	rc = cass_device_get_pages(&m_opts);
++	if (rc) {
++		kfree(md_priv);
++		return ERR_PTR(rc);
++	}
++
++	/* Get the first entry of the sg_table */
++	*dma_addr = sg_dma_address(md_priv->sgt->sgl);
++
++	return md_priv;
++}
++
++/**
++ * cass_device_hugepage_size - Determine an appropriate hugepage size for
++ *                             the dma address list based on the number of
++ *                             contiguous entries.
++ *
++ * @contig_cnt: Number contiguous entries
++ * @m_opts: User map options
++ */
++void cass_device_hugepage_size(int contig_cnt, struct ac_map_opts *m_opts)
++{
++	int i;
++	int va_shift;
++	int len_shift;
++	int cntg_shift;
++	int daddr_shift;
++	int align_shift;
++	dma_addr_t dma_addr = sg_dma_address(m_opts->md_priv->sgt->sgl);
++
++	if (!device_hugepage_enable)
++		return;
++
++	cntg_shift = flsl(contig_cnt) + m_opts->page_shift;
++	len_shift = ffsl(__rounddown_pow_of_two(m_opts->va_len));
++	va_shift = ffsl(m_opts->va_start);
++	daddr_shift = ffsl(dma_addr);
++	align_shift = min_t(int, va_shift, len_shift);
++	align_shift = min_t(int, daddr_shift, align_shift);
++	align_shift = min_t(int, cntg_shift, align_shift);
++
++	/* From the list of usable hugepage sizes, pick the largest one
++	 * that the registration consumes.
++	 */
++	for (i = device_hs_array_n - 1; i >= 0; i--) {
++		int page_table_size = device_hs_array[i] - m_opts->page_shift;
++
++		if (device_hs_array[i] <= align_shift &&
++		    page_table_size <= MAX_PG_TABLE_SIZE &&
++				page_table_size >= MIN_DEVICE_PG_TABLE_SIZE) {
++			m_opts->is_huge_page = true;
++			m_opts->huge_shift = device_hs_array[i];
++			break;
++		}
++	}
++
++	pr_debug("len:%lx align_shift:%d hs:%d is_hp:%d\n", m_opts->va_len,
++		 align_shift, m_opts->huge_shift, m_opts->is_huge_page);
++}
++
++/**
++ * cass_is_device_memory - Check if va is backed by device memory
++ *
++ * Also, return the page size.
++ *
++ * @hw: The cassini device
++ * @m_opts: User map options
++ * @va: Device virtual address
++ * @len: Length of address to map in bytes
++ * @return: 0 on success or < 0 on failure
++ */
++int cass_is_device_memory(struct cass_dev *hw, struct ac_map_opts *m_opts,
++			  uintptr_t va, size_t len)
++{
++	int ret;
++
++	if (m_opts->md_priv &&
++	    m_opts->md_priv->dmabuf_fd != INVALID_DMABUF_FD) {
++		m_opts->page_shift = PAGE_SHIFT;
++
++		return 0;
++	}
++
++	if (p2p_ops.is_device_mem == NULL) {
++		ret = cxi_p2p_init();
++		if (ret) {
++			cxidev_info_ratelimited(&hw->cdev, "p2p_init failed %d\n",
++						ret);
++			return ret;
++		}
++	}
++
++	if (!p2p_ops.is_device_mem)
++		return -EOPNOTSUPP;
++
++	ret = p2p_ops.is_device_mem(va, len, &m_opts->page_shift);
++	if (ret) {
++		cxidev_info_ratelimited(&hw->cdev, "Expected device memory ret:%d\n",
++					ret);
++		return ret;
++	}
++
++	return 0;
++}
++
++/**
++ * cass_device_get_pages - Get device pages
++ *
++ * @m_opts: User map options
++ * @return: 0 on success or < 0 on failure
++ */
++int cass_device_get_pages(struct ac_map_opts *m_opts)
++{
++	if (m_opts->md_priv->dmabuf_fd != INVALID_DMABUF_FD)
++		return cxi_dmabuf_get_pages(m_opts);
++
++	if (p2p_ops.get_pages)
++		return p2p_ops.get_pages(m_opts);
++
++	return -EINVAL;
++}
++
++/**
++ * cass_device_put_pages - Put device pages returned from cass_device_get_pages
++ *
++ * @md_priv: Private memory descriptor
++ */
++void cass_device_put_pages(struct cxi_md_priv *md_priv)
++{
++	if (md_priv->dmabuf_fd != INVALID_DMABUF_FD) {
++		cxi_dmabuf_put_pages(md_priv);
++		return;
++	}
++
++	p2p_ops.put_pages(md_priv);
++}
+diff --git a/drivers/net/ethernet/hpe/ss1/cass_rmu.c b/drivers/net/ethernet/hpe/ss1/cass_rmu.c
+new file mode 100644
+index 000000000000..c510831c9e15
+--- /dev/null
++++ b/drivers/net/ethernet/hpe/ss1/cass_rmu.c
+@@ -0,0 +1,376 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright 2018, 2024-2026 Hewlett Packard Enterprise Development LP */
++
++/* Create and destroy Cassini command queues */
++
++#include <linux/hpe/cxi/cxi.h>
++#include <linux/idr.h>
++#include <linux/kernel.h>
++#include <linux/rbtree.h>
 +#include <linux/types.h>
-+#include <linux/sysfs.h>
-+#include <linux/kobject.h>
 +
-+#include "sl_log.h"
-+#include "sl_sysfs.h"
-+#include "sl_ctrl_lgrp.h"
-+#include "sl_ctrl_ldev.h"
-+#include "sl_core_lgrp.h"
-+#include "sl_core_str.h"
-+#include "sl_sysfs_serdes_swizzle.h"
++#include "cass_core.h"
++#include "cass_ss1_debugfs.h"
 +
-+#define LOG_BLOCK SL_LOG_BLOCK
-+#define LOG_NAME  SL_LOG_SYSFS_LOG_NAME
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t tx_source_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
++/* Add a new domain into a device domain tree. */
++static int insert_domain(struct rb_root *root,
++			 struct cxi_domain_priv *domain_priv)
 +{
-+	struct sl_lgrp_serdes_lane_kobj *lane_kobj;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+	u8                               tx_source;
++	struct rb_node **new = &(root->rb_node), *parent = NULL;
 +
-+	lane_kobj = container_of(kobj, struct sl_lgrp_serdes_lane_kobj, kobj);
-+	if (!lane_kobj->ctrl_lgrp)
-+		return sysfs_emit(buf, "no-lane\n");
++	/* Figure out where to put new node */
++	while (*new) {
++		struct cxi_domain_priv *this =
++			container_of(*new, struct cxi_domain_priv, node);
 +
-+	core_link = sl_core_link_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num,
-+				     lane_num_to_link_num(lane_kobj->ctrl_lgrp, lane_kobj->asic_lane_num));
-+	if (!core_link)
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	core_lgrp = sl_core_lgrp_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	tx_source = core_lgrp->serdes.dt.lane_info[lane_kobj->asic_lane_num].tx_source;
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "tx_source show (tx_source = %u)", tx_source);
-+
-+	return sysfs_emit(buf, "%u\n", tx_source);
-+}
-+
-+static ssize_t rx_source_show(struct kobject *kobj, struct kobj_attribute *kattr, char *buf)
-+{
-+	struct sl_lgrp_serdes_lane_kobj *lane_kobj;
-+	struct sl_core_lgrp *core_lgrp __free(sl_core_lgrp_put) = NULL;
-+	struct sl_core_link *core_link __free(sl_core_link_put) = NULL;
-+	u8                               rx_source;
-+
-+	lane_kobj = container_of(kobj, struct sl_lgrp_serdes_lane_kobj, kobj);
-+	if (!lane_kobj->ctrl_lgrp)
-+		return sysfs_emit(buf, "no-lane\n");
-+
-+	core_link = sl_core_link_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num,
-+				     lane_num_to_link_num(lane_kobj->ctrl_lgrp, lane_kobj->asic_lane_num));
-+	if (!core_link)
-+		return sysfs_emit(buf, "no-link\n");
-+
-+	core_lgrp = sl_core_lgrp_get(lane_kobj->ctrl_lgrp->ctrl_ldev->num, lane_kobj->ctrl_lgrp->num);
-+	if (!core_lgrp)
-+		return -ENODEV;
-+
-+	rx_source = core_lgrp->serdes.dt.lane_info[lane_kobj->asic_lane_num].rx_source;
-+
-+	sl_log_dbg(core_lgrp, LOG_BLOCK, LOG_NAME, "rx_source show (rx_source = %u)", rx_source);
-+
-+	return sysfs_emit(buf, "%u\n", rx_source);
-+}
-+
-+static struct kobj_attribute tx_source = __ATTR_RO(tx_source);
-+static struct kobj_attribute rx_source = __ATTR_RO(rx_source);
-+
-+static struct attribute *serdes_lane_swizzle_attrs[] = {
-+	&tx_source.attr,
-+	&rx_source.attr,
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(serdes_lane_swizzle);
-+
-+static struct kobj_type serdes_lane_swizzle_info = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups = serdes_lane_swizzle_groups,
-+};
-+#endif /* CONFIG_SYSFS */
-+
-+int sl_sysfs_serdes_lane_swizzle_create(struct sl_ctrl_lgrp *ctrl_lgrp, u8 asic_lane_num)
-+{
-+#ifdef CONFIG_SYSFS
-+	int rtn;
-+
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "serdes lane swizzle create (lgrp = 0x%p)", ctrl_lgrp);
-+
-+	rtn = kobject_init_and_add(&(ctrl_lgrp->serdes_lane_swizzle_kobjs[asic_lane_num].kobj),
-+				   &serdes_lane_swizzle_info, &(ctrl_lgrp->serdes_lane_kobjs[asic_lane_num]), "swizzle");
-+	if (rtn) {
-+		sl_log_err(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+			   "serdes lane swizzle create kobject_init_and_add failed [%d]", rtn);
-+		kobject_put(&(ctrl_lgrp->serdes_lane_swizzle_kobjs[asic_lane_num].kobj));
-+		return -ENOMEM;
++		parent = *new;
++		if (domain_priv->domain.vni < this->domain.vni)
++			new = &((*new)->rb_left);
++		else if (domain_priv->domain.vni > this->domain.vni)
++			new = &((*new)->rb_right);
++		else if (domain_priv->domain.pid < this->domain.pid)
++			new = &((*new)->rb_left);
++		else if (domain_priv->domain.pid > this->domain.pid)
++			new = &((*new)->rb_right);
++		else
++			return -EEXIST;
 +	}
-+	ctrl_lgrp->serdes_lane_swizzle_kobjs[asic_lane_num].ctrl_lgrp      = ctrl_lgrp;
-+	ctrl_lgrp->serdes_lane_swizzle_kobjs[asic_lane_num].asic_lane_num = asic_lane_num;
 +
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "serdes lane swizzle create (serdes_kobj = 0x%p)", &(ctrl_lgrp->serdes_kobj));
++	/* Add new node and rebalance tree. */
++	rb_link_node(&domain_priv->node, parent, new);
++	rb_insert_color(&domain_priv->node, root);
++
 +	return 0;
-+#else /* CONFIG_SYSFS */
-+	return 0;
-+#endif /* CONFIG_SYSFS */
 +}
 +
-+void sl_sysfs_serdes_lane_swizzle_delete(struct sl_ctrl_lgrp *ctrl_lgrp, u8 asic_lane_num)
++/* Look up an existing domain by (vni,pid) without modifying the tree. */
++static struct cxi_domain_priv *find_domain(struct rb_root *root,
++					   unsigned int vni, unsigned int pid)
 +{
-+#ifdef CONFIG_SYSFS
-+	sl_log_dbg(ctrl_lgrp, LOG_BLOCK, LOG_NAME,
-+		   "serdes lane swizzle delete (lgrp = 0x%p)", ctrl_lgrp);
++	struct rb_node *node = root->rb_node;
 +
-+	kobject_put(&(ctrl_lgrp->serdes_lane_swizzle_kobjs[asic_lane_num].kobj));
-+	ctrl_lgrp->serdes_lane_swizzle_kobjs[asic_lane_num].ctrl_lgrp = NULL;
-+#endif /* CONFIG_SYSFS */
++	while (node) {
++		struct cxi_domain_priv *this =
++			container_of(node, struct cxi_domain_priv, node);
++
++		if (vni < this->domain.vni)
++			node = node->rb_left;
++		else if (vni > this->domain.vni)
++			node = node->rb_right;
++		else if (pid < this->domain.pid)
++			node = node->rb_left;
++		else if (pid > this->domain.pid)
++			node = node->rb_right;
++		else
++			return this;
++	}
++
++	return NULL;
++}
++
++/* Atomically reserve a contiguous range of VNI PIDs. On success, PIDs are
++ * reserved to the LNI. Reserved PIDs are released when the LNI is destroyed.
++ * cxi_domain_alloc() must be used to create a Domain using a reserved PID.
++ */
++int cxi_domain_reserve(struct cxi_lni *lni, unsigned int vni, unsigned int pid,
++		       unsigned int count)
++{
++	struct cxi_lni_priv *lni_priv =
++		container_of(lni, struct cxi_lni_priv, lni);
++	struct cxi_dev *cdev = lni_priv->dev;
++	struct cxi_rx_profile *rx_profile;
++	struct cxi_reserved_pids *pids;
++	int rc;
++	int i;
++
++	/* Sanity checks. */
++	if (!is_vni_valid(vni))
++		return -EINVAL;
++
++	if (!cxi_valid_vni(cdev, CXI_PROF_RX, vni))
++		return -EINVAL;
++
++	if (pid >= cdev->prop.pid_count && pid != C_PID_ANY)
++		return -EINVAL;
++
++	if (!count || count > cdev->prop.pid_count)
++		return -EINVAL;
++
++	rx_profile = cxi_dev_find_rx_profile(cdev, vni);
++	if (!rx_profile)
++		return -ENOENT;
++
++	rc = cxi_rx_profile_alloc_pid(lni_priv, rx_profile, pid, vni, count, true);
++	if (rc < 0)
++		goto put_rx_profile;
++	pid = rc;
++
++	pids = kzalloc(sizeof(*pids), GFP_KERNEL);
++	if (!pids) {
++		rc = -ENOMEM;
++		goto clear_pids;
++	}
++
++	pids->rx_profile = rx_profile;
++
++	for (i = 0; i < count; i++)
++		set_bit(pid + i, pids->table);
++
++	spin_lock(&lni_priv->res_lock);
++	list_add_tail(&pids->entry, &lni_priv->reserved_pids);
++	spin_unlock(&lni_priv->res_lock);
++
++	return pid;
++
++clear_pids:
++	cxi_rx_profile_update_pid_table(rx_profile, pid, count, false);
++put_rx_profile:
++	cxi_rx_profile_dec_refcount(cdev, rx_profile);
++
++	return rc;
++}
++EXPORT_SYMBOL(cxi_domain_reserve);
++
++/* Clean up PIDs reserved to the LNI. */
++void cxi_domain_lni_cleanup(struct cxi_lni_priv *lni_priv)
++{
++	struct cxi_reserved_pids *pids;
++
++	while ((pids = list_first_entry_or_null(&lni_priv->reserved_pids,
++						struct cxi_reserved_pids,
++						entry))) {
++		list_del(&pids->entry);
++		cxi_rx_profile_andnot_pid_table(pids,
++						lni_priv->dev->prop.pid_count);
++		cxi_rx_profile_dec_refcount(lni_priv->dev, pids->rx_profile);
++		kfree(pids);
++	}
++}
++
++/** cxi_domain_alloc_vf() - Allocate a domain for VF
++ *
++ * @lni: LNI to allocate the domain on
++ * @vni: VNI for the domain
++ * @pid: PID for the domain
++ *
++ * Return: Pointer to allocated domain on success, ERR_PTR on failure.
++ */
++static struct cxi_domain *
++cxi_domain_alloc_vf(struct cxi_lni *lni, unsigned int vni, unsigned int pid)
++{
++	struct cxi_lni_priv_vf *lni_priv_vf =
++		container_of(lni, struct cxi_lni_priv_vf, lni);
++	struct cxi_dev *dev = lni_priv_vf->dev;
++	struct cxi_domain_priv_vf *domain_priv_vf;
++	const struct cxi_domain_alloc_cmd cmd = {
++		.op = CXI_OP_DOMAIN_ALLOC,
++		.lni = lni_priv_vf->lni.id,
++		.vni = vni,
++		.pid = pid,
++	};
++	struct cxi_domain_alloc_resp resp;
++	size_t resp_len = sizeof(resp);
++	int rc;
++
++	domain_priv_vf = kzalloc(sizeof(*domain_priv_vf), GFP_KERNEL);
++	if (!domain_priv_vf)
++		return ERR_PTR(-ENOMEM);
++
++	rc = cxi_send_msg_to_pf(dev, &cmd, sizeof(cmd), &resp, &resp_len);
++	if (rc)
++		goto error_out;
++
++	domain_priv_vf->lni_priv = container_of(lni, struct cxi_lni_priv, lni);
++	domain_priv_vf->domain.id = resp.domain;
++	domain_priv_vf->domain.vni = resp.vni;
++	domain_priv_vf->domain.pid = resp.pid;
++
++	return &domain_priv_vf->domain;
++
++error_out:
++	kfree(domain_priv_vf);
++
++	return ERR_PTR(rc);
++}
++
++/* Allocate a new domain, with a unique per-device VNI+PID. The VNI is
++ * reserved in the RMU table if it doesn't already exist.
++ */
++struct cxi_domain *cxi_domain_alloc(struct cxi_lni *lni, unsigned int vni,
++				    unsigned int pid)
++{
++	struct cxi_lni_priv *lni_priv =
++		container_of(lni, struct cxi_lni_priv, lni);
++	struct cxi_dev *cdev = lni_priv->dev;
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++	struct cxi_domain_priv *domain_priv;
++	struct cxi_domain_priv *existing;
++	int rc;
++	int domain_pid = pid;
++	struct cxi_rx_profile *rx_profile;
++
++	if (!cdev->is_physfn)
++		return cxi_domain_alloc_vf(lni, vni, pid);
++
++	/* Sanity checks. */
++	if (!is_vni_valid(vni))
++		return ERR_PTR(-EINVAL);
++
++	if (domain_pid >= cdev->prop.pid_count && domain_pid != C_PID_ANY)
++		return ERR_PTR(-EINVAL);
++
++	/*
++	 * Multiple QPs on one LNI (one PD/svc_id, in the RDMA per-PD-LNI
++	 * model) may legitimately want the same (vni,pid) domain identity —
++	 * e.g. several receive queues/services on one PID. Share the
++	 * existing object (refcounted) instead of colliding, but only
++	 * within the same LNI: cross-LNI reuse of one (vni,pid) would mean
++	 * two unrelated processes receiving on the same address, which
++	 * stays a hard conflict. A C_PID_ANY request always allocates
++	 * fresh, since there's nothing concrete yet to look up.
++	 */
++	if (domain_pid != C_PID_ANY) {
++		spin_lock(&hw->domain_lock);
++		existing = find_domain(&hw->domain_tree, vni, domain_pid);
++		if (existing) {
++			if (existing->lni_priv != lni_priv) {
++				spin_unlock(&hw->domain_lock);
++				return ERR_PTR(-EEXIST);
++			}
++			refcount_inc(&existing->refcount);
++			spin_unlock(&hw->domain_lock);
++			return &existing->domain;
++		}
++		spin_unlock(&hw->domain_lock);
++	}
++
++	rx_profile = cxi_dev_get_rx_profile(cdev, vni);
++	if (IS_ERR(rx_profile)) {
++		rc = PTR_ERR(rx_profile);
++		pr_debug("rx_profile not found for vni:%d rc:%d\n",
++			 vni, rc);
++		return ERR_PTR(rc);
++	}
++
++	domain_pid = cxi_rx_profile_alloc_pid(lni_priv, rx_profile, pid, vni,
++					      1, false);
++	if (domain_pid < 0) {
++		rc = domain_pid;
++		goto put_rx_profile;
++	}
++
++	domain_priv = kzalloc(sizeof(*domain_priv), GFP_KERNEL);
++	if (domain_priv == NULL) {
++		rc = -ENOMEM;
++		goto free_pid;
++	}
++
++	/* Get a domain ID */
++	rc = ida_alloc_min(&hw->domain_table, 1, GFP_KERNEL);
++	if (rc < 0) {
++		cxidev_err(cdev, "ida_alloc_min failed %d\n", rc);
++		goto free_domain;
++	}
++	domain_priv->domain.id = rc;
++
++	refcount_set(&domain_priv->refcount, 1);
++
++	domain_priv->lni_priv = lni_priv;
++	domain_priv->rx_profile = rx_profile;
++	domain_priv->domain.vni = vni;
++	domain_priv->domain.pid = domain_pid;
++
++	spin_lock(&hw->domain_lock);
++	rc = insert_domain(&hw->domain_tree, domain_priv);
++	spin_unlock(&hw->domain_lock);
++	if (rc)
++		goto free_dom_id;
++
++	domain_debugfs_create(vni, domain_pid, hw, domain_priv);
++
++	spin_lock(&lni_priv->res_lock);
++	atomic_inc(&hw->stats.domain);
++	list_add_tail(&domain_priv->list, &lni_priv->domain_list);
++	spin_unlock(&lni_priv->res_lock);
++
++	refcount_inc(&lni_priv->refcount);
++	return &domain_priv->domain;
++
++free_dom_id:
++	ida_free(&hw->domain_table, domain_priv->domain.id);
++free_domain:
++	kfree(domain_priv);
++free_pid:
++	cxi_rx_profile_update_pid_table(rx_profile, pid, 1, false);
++put_rx_profile:
++	cxi_rx_profile_dec_refcount(cdev, rx_profile);
++
++	return ERR_PTR(rc);
++}
++EXPORT_SYMBOL(cxi_domain_alloc);
++
++/** cxi_domain_free_vf() - Free an allocated domain for VF
++ *
++ * @domain: Domain to be freed
++ */
++static void cxi_domain_free_vf(struct cxi_domain *domain)
++{
++	struct cxi_domain_priv_vf *domain_priv_vf =
++		container_of(domain, struct cxi_domain_priv_vf, domain);
++	struct cxi_dev *dev = domain_priv_vf->lni_priv->dev;
++	const struct cxi_domain_free_cmd cmd = {
++		.op = CXI_OP_DOMAIN_FREE,
++		.domain = domain_priv_vf->domain.id,
++	};
++	size_t resp_len = 0;
++	int rc;
++
++	rc = cxi_send_msg_to_pf(dev, &cmd, sizeof(cmd), NULL, &resp_len);
++	if (rc)
++		cxidev_warn(dev, "VF domain free request failed: %d\n", rc);
++
++	kfree(domain_priv_vf);
++}
++
++/* Free an allocated domain. */
++void cxi_domain_free(struct cxi_domain *domain)
++{
++	struct cxi_domain_priv *domain_priv =
++			container_of(domain, struct cxi_domain_priv, domain);
++	struct cxi_lni_priv *lni_priv = domain_priv->lni_priv;
++	struct cxi_dev *cdev = lni_priv->dev;
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++
++	if (!cdev->is_physfn) {
++		cxi_domain_free_vf(domain);
++		return;
++	}
++
++	/* Other QPs on this LNI may still hold a reference (see the reuse
++	 * path in cxi_domain_alloc()) — only the last one actually tears
++	 * this domain down.
++	 */
++	if (!refcount_dec_and_test(&domain_priv->refcount))
++		return;
++
++	spin_lock(&lni_priv->res_lock);
++	list_del(&domain_priv->list);
++	atomic_dec(&hw->stats.domain);
++	spin_unlock(&lni_priv->res_lock);
++
++	debugfs_remove_recursive(domain_priv->debug_dir);
++
++	spin_lock(&hw->domain_lock);
++	rb_erase(&domain_priv->node, &hw->domain_tree);
++	spin_unlock(&hw->domain_lock);
++
++	cxi_rx_profile_update_pid_table(domain_priv->rx_profile,
++					domain->pid, 1, false);
++	cxi_rx_profile_dec_refcount(cdev, domain_priv->rx_profile);
++
++	ida_free(&hw->domain_table, domain_priv->domain.id);
++	kfree(domain_priv);
++
++	refcount_dec(&lni_priv->refcount);
++}
++EXPORT_SYMBOL(cxi_domain_free);
+diff --git a/drivers/net/ethernet/hpe/ss1/cass_rmu_eth.c b/drivers/net/ethernet/hpe/ss1/cass_rmu_eth.c
+new file mode 100644
+index 000000000000..150ba1f762b6
+--- /dev/null
++++ b/drivers/net/ethernet/hpe/ss1/cass_rmu_eth.c
+@@ -0,0 +1,1017 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright 2026 Hewlett Packard Enterprise Development LP */
++
++/* RMU Ethernet Resource Management */
++
++#include <linux/hpe/cxi/cxi.h>
++#include <linux/etherdevice.h>
++#include <linux/ethtool.h>
++#include <linux/xarray.h>
++#include <linux/idr.h>
++
++#include "cass_core.h"
++#include "cxi_internal.h"
++
++_Static_assert(CXI_ETH_MAX_INDIR_ENTRIES <=
++	       C_RMU_CFG_PORTAL_INDEX_INDIR_TABLE_ENTRIES,
++	       "CXI_ETH_MAX_INDIR_ENTRIES exceeds NIC table size");
++
++/* Maximum number of concurrent clients allowed in PF */
++static unsigned int rmu_pf_max_clients = 2;
++module_param(rmu_pf_max_clients, uint, 0444);
++MODULE_PARM_DESC(rmu_pf_max_clients, "Maximum number of concurrent RMU Ethernet clients in PF");
++
++/* Total MAC filter allocation (set_list entries)
++ * - PF gets fixed quota: rmu_pf_client_max_filters (default 20, module parameter)
++ * - VFs split remaining pool equally.
++ */
++static unsigned int rmu_pf_client_max_filters = 20;
++module_param(rmu_pf_client_max_filters, uint, 0444);
++MODULE_PARM_DESC(rmu_pf_client_max_filters,
++		 "Maximum number of MAC filters allocated to a PF client");
++
++/* Indirection table allocation
++ * - PF gets fixed quota: rmu_pf_client_max_rss_indir_size (default 64, module parameter)
++ * - VFs split remaining pool equally.
++ */
++static unsigned int rmu_pf_client_max_rss_indir_size = 64;
++static int param_set_rmu_pf_client_max_rss_indir_size(const char *val,
++						      const struct kernel_param *kp)
++{
++	unsigned int tmp;
++	int rc;
++
++	rc = kstrtouint(val, 0, &tmp);
++	if (rc)
++		return rc;
++
++	if (tmp > CXI_ETH_MAX_INDIR_ENTRIES)
++		return -EINVAL;
++
++	*(unsigned int *)kp->arg = tmp;
++
++	return 0;
++}
++
++static const struct kernel_param_ops param_ops_rmu_pf_client_max_rss_indir_size = {
++	.set = param_set_rmu_pf_client_max_rss_indir_size,
++	.get = param_get_uint,
++};
++
++module_param_cb(rmu_pf_client_max_rss_indir_size,
++		&param_ops_rmu_pf_client_max_rss_indir_size,
++		&rmu_pf_client_max_rss_indir_size, 0444);
++MODULE_PARM_DESC(rmu_pf_client_max_rss_indir_size,
++		 "Maximum size of RSS indirection table for each PF client");
++
++/**
++ * validate_mac_vf() - Validate MAC address for VF use
++ * @mac_addr: MAC address to validate
++ *
++ * VFs can only use valid unicast MAC addresses (not multicast, broadcast, or zero).
++ * This also includes the reserved MAC addresses for PTP and multicast base,
++ * which should not be used by VFs.
++ *
++ * Return: 0 if valid, -EINVAL if invalid
++ */
++static int validate_mac_vf(u64 mac_addr)
++{
++	u8 addr[ETH_ALEN];
++
++	u64_to_ether_addr(mac_addr, addr);
++
++	return is_valid_ether_addr(addr) ? 0 : -EINVAL;
++}
++
++/**
++ * cxi_rmu_eth_alloc_vf() - Allocate Ethernet packet matching resources for VF
++ * @cdev: CXI device
++ *
++ * VF version: Sends allocation request to PF via vsock. The PF will allocate
++ * the actual hardware resources and track them. The VF maintains a minimal
++ * private structure for sending future commands to the PF.
++ *
++ * Return: Pointer to cxi_rmu_eth or ERR_PTR on error
++ */
++static struct cxi_rmu_eth *cxi_rmu_eth_alloc_vf(struct cxi_dev *cdev)
++{
++	struct cxi_rmu_eth_priv *priv;
++	struct cxi_rmu_eth_alloc_resp resp;
++	const struct cxi_rmu_eth_alloc_cmd cmd = {
++		.op = CXI_OP_RMU_ETH_ALLOC,
++		.resp = &resp,
++	};
++	size_t resp_len = sizeof(resp);
++	int rc;
++
++	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
++	if (!priv)
++		return ERR_PTR(-ENOMEM);
++
++	/* Send allocation request to PF */
++	rc = cxi_send_msg_to_pf(cdev, &cmd, sizeof(cmd), &resp, &resp_len);
++	if (rc) {
++		kfree(priv);
++		return ERR_PTR(rc);
++	}
++
++	priv->dev = cdev;
++	priv->rmu_eth.id = resp.rmu_eth;
++
++	return &priv->rmu_eth;
++}
++
++/**
++ * cxi_rmu_eth_alloc_internal() - Allocate Ethernet packet matching resources
++ * @cdev: CXI device
++ * @vf_en: Whether this is a VF allocation
++ * @vf_num: VF number if vf_en is true
++ *
++ * PF supports up to CXI_RMU_ETH_PF_MAX_CLIENTS concurrent allocations.
++ * VFs support single client per function.
++ * Returns -EBUSY if no slots available.
++ *
++ * Automatically allocates FULL per-function quota based on num_vfs.
++ *
++ * Return: Pointer to cxi_rmu_eth or ERR_PTR on error
++ */
++struct cxi_rmu_eth *cxi_rmu_eth_alloc_internal(struct cxi_dev *cdev, bool vf_en, u8 vf_num)
++{
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++	struct cxi_rmu_eth *rmu_eth = NULL;
++	struct cxi_rmu_eth_priv *priv;
++	unsigned int indir_quota;
++	unsigned int set_list_quota;
++	int id;
++	int i;
++
++	if (vf_en && hw->num_vfs == 0)
++		return ERR_PTR(-EINVAL);
++
++	mutex_lock(&hw->rmu_eth_lock);
++
++	/* Allocate private structure */
++	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
++	if (!priv) {
++		mutex_unlock(&hw->rmu_eth_lock);
++		return ERR_PTR(-ENOMEM);
++	}
++
++	/* Initialize structure */
++	priv->dev = cdev;
++	priv->is_vf = vf_en;
++	priv->vf_num = vf_num;
++	priv->admin = vf_en ? false : true; /* Only PF client has admin privileges */
++
++	/* Store allocation in device structure (needed before ID allocation) */
++	rmu_eth = &priv->rmu_eth;
++
++	/* Get unique ID for this allocation. PF and VFs have separate ID spaces.
++	 * PF clients: IDs 0 to (rmu_pf_max_clients - 1)
++	 * VF clients: IDs starting from rmu_pf_max_clients
++	 */
++	id = idr_alloc(&hw->rmu_eth_idr, rmu_eth,
++		       vf_en ? rmu_pf_max_clients + vf_num : 0,
++		       vf_en ? rmu_pf_max_clients + vf_num + 1 : rmu_pf_max_clients,
++		       GFP_KERNEL);
++
++	if (id < 0) {
++		kfree(priv);
++		mutex_unlock(&hw->rmu_eth_lock);
++		return ERR_PTR(id);
++	}
++
++	rmu_eth->id = id;
++
++	/* Calculate per-client quotas and base indices
++	 * - indirection table layout remains unchanged (PF first, then VFs).
++	 * - set_list places PF clients at the end to avoid PF catch-all filters
++	 *   taking early slots.
++	 */
++	if (vf_en) {
++		/* VF gets equal share of remaining indirection and set_list pools */
++		indir_quota = (C_RMU_CFG_PORTAL_INDEX_INDIR_TABLE_ENTRIES -
++			      (rmu_pf_client_max_rss_indir_size * rmu_pf_max_clients)) / hw->num_vfs;
++		set_list_quota = (C_RMU_CFG_PTLTE_SET_LIST_ENTRIES -
++				 (rmu_pf_client_max_filters * rmu_pf_max_clients)) / hw->num_vfs;
++
++		priv->indir_base = (rmu_pf_client_max_rss_indir_size * rmu_pf_max_clients) +
++				   (vf_num * indir_quota);
++		priv->set_list_base = vf_num * set_list_quota;
++	} else {
++		/* PF client keeps original indirection layout and gets tail set_list */
++		indir_quota = rmu_pf_client_max_rss_indir_size;
++		set_list_quota = rmu_pf_client_max_filters;
++
++		priv->indir_base = id * indir_quota;
++		priv->set_list_base = C_RMU_CFG_PTLTE_SET_LIST_ENTRIES -
++				     (rmu_pf_max_clients * set_list_quota) +
++				     (id * set_list_quota);
++	}
++
++	priv->indir_size = indir_quota;
++	priv->set_list_quota = set_list_quota;
++
++	/* Allocate MAC filter slot tracking array */
++	priv->mac_filter_slots = kcalloc(set_list_quota, sizeof(u8), GFP_KERNEL);
++	if (!priv->mac_filter_slots) {
++		idr_remove(&hw->rmu_eth_idr, id);
++		kfree(priv);
++		mutex_unlock(&hw->rmu_eth_lock);
++		return ERR_PTR(-ENOMEM);
++	}
++
++	/* Invalidate all set_list entries in our quota to ensure clean state */
++	spin_lock(&hw->rmu_lock);
++	for (i = 0; i < set_list_quota; i++)
++		cass_invalidate_set_list(hw, priv->set_list_base + i);
++	spin_unlock(&hw->rmu_lock);
++
++	/* Default RSS configuration (disabled initially) */
++	priv->rss_queues = 0;
++	priv->hash_types = 0;
++	priv->indir_entries = 0;  /* Active indirection table size */
++
++	mutex_unlock(&hw->rmu_eth_lock);
++
++	return &priv->rmu_eth;
++}
++EXPORT_SYMBOL(cxi_rmu_eth_alloc_internal);
++
++struct cxi_rmu_eth *cxi_rmu_eth_alloc(struct cxi_dev *cdev)
++{
++	return cdev->is_physfn ? cxi_rmu_eth_alloc_internal(cdev, false, 0) :
++				 cxi_rmu_eth_alloc_vf(cdev);
++}
++EXPORT_SYMBOL(cxi_rmu_eth_alloc);
++
++/**
++ * cxi_rmu_eth_free_vf() - Free Ethernet resources (VF version)
++ * @rmu_eth: Resource handle
++ *
++ * VF version: Sends free request to PF via vsock.
++ */
++static void cxi_rmu_eth_free_vf(struct cxi_rmu_eth *rmu_eth)
++{
++	struct cxi_rmu_eth_priv *priv = container_of(rmu_eth,
++						     struct cxi_rmu_eth_priv,
++						     rmu_eth);
++	const struct cxi_rmu_eth_free_cmd cmd = {
++		.op = CXI_OP_RMU_ETH_FREE,
++		.resp = NULL,
++		.rmu_eth = rmu_eth->id,
++	};
++	size_t resp_len = 0;
++	int rc;
++
++	rc = cxi_send_msg_to_pf(priv->dev, &cmd, sizeof(cmd), NULL, &resp_len);
++	if (rc)
++		cxidev_err(priv->dev, "Failed to free RMU Ethernet resources on PF: %d\n", rc);
++
++	kfree(priv);
++}
++
++/**
++ * cxi_rmu_eth_free() - Free Ethernet resources
++ * @rmu_eth: Resource handle
++ *
++ * Automatically invalidates all set_list entries, clears indirection table,
++ * and releases all resources.
++ */
++void cxi_rmu_eth_free(struct cxi_rmu_eth *rmu_eth)
++{
++	struct cxi_rmu_eth_priv *priv = container_of(rmu_eth,
++						     struct cxi_rmu_eth_priv,
++						     rmu_eth);
++	struct cass_dev *hw = container_of(priv->dev, struct cass_dev, cdev);
++	int i;
++
++	if (!priv->dev->is_physfn) {
++		cxi_rmu_eth_free_vf(rmu_eth);
++		return;
++	}
++
++	mutex_lock(&hw->rmu_eth_lock);
++
++	/* Invalidate all set_list entries in our quota range */
++	spin_lock(&hw->rmu_lock);
++
++	for (i = 0; i < priv->set_list_quota; i++) {
++		unsigned int hw_idx = priv->set_list_base + i;
++
++		/* Debug log for entries that were actually programmed */
++		if (priv->mac_filter_slots[i]) {
++			cxidev_dbg(priv->dev, "Removing RMU filter at idx=%d (hw_idx=%u)\n",
++				   i, hw_idx);
++		}
++
++		cass_invalidate_set_list(hw, hw_idx);
++	}
++
++	spin_unlock(&hw->rmu_lock);
++
++	/* Free slot tracking array */
++	kfree(priv->mac_filter_slots);
++
++	/* Remove from IDR */
++	idr_remove(&hw->rmu_eth_idr, rmu_eth->id);
++
++	mutex_unlock(&hw->rmu_eth_lock);
++
++	kfree(priv);
++}
++EXPORT_SYMBOL(cxi_rmu_eth_free);
++
++/**
++ * add_rmu_set_list_filter() - Common hardware programming logic for filter installation
++ * @priv: Private resource structure
++ * @idx: Relative index within client's quota
++ * @pte: PTE pointer
++ * @use_rss: Whether traffic participates in RSS
++ * @set_list: Prepared set_list entry with match criteria
++ * @set_list_mask: Prepared mask for set_list
++ *
++ * Handles index validation, translation, and hardware programming for both
++ * MAC filters and promiscuous mode filters.
++ *
++ * Return: 0 on success, negative errno on error
++ */
++static int add_rmu_set_list_filter(struct cxi_rmu_eth_priv *priv, unsigned int idx,
++				   struct cxi_pte *pte, bool use_rss,
++				   const union c_rmu_cfg_ptlte_set_list *set_list,
++				   const union c_rmu_cfg_ptlte_set_list *set_list_mask)
++{
++	struct cass_dev *hw = container_of(priv->dev, struct cass_dev, cdev);
++	unsigned int set_list_idx;
++	unsigned int portal_idx;
++	struct c_rmu_cfg_ptlte_set_ctrl_table_entry set_ctrl = {};
++
++	/* Validate index range */
++	if (idx >= priv->set_list_quota) {
++		cxidev_err(priv->dev, "Index %d out of range [0..%u]\n",
++			   idx, priv->set_list_quota - 1);
++		return -EINVAL;
++	}
++
++	/* Extract portal index from PTE */
++	portal_idx = pte->id;
++
++	/* Translate relative index to hardware index */
++	set_list_idx = priv->set_list_base + idx;
++
++	spin_lock(&hw->rmu_lock);
++
++	/* Program set_list */
++	cass_config_set_list(hw, set_list_idx, portal_idx,
++			     set_list, set_list_mask);
++
++	/* Program set_ctrl for RSS or direct portal */
++	if (use_rss && priv->rss_queues > 1) {
++		/* Use RSS */
++		set_ctrl.portal_index_indir_base = priv->indir_base;
++		set_ctrl.hash_bits = ilog2(priv->indir_entries);
++		set_ctrl.hash_types_enabled = priv->hash_types;
++	} else {
++		/* Direct portal (RSS disabled) - point to fallback entry */
++		set_ctrl.portal_index_indir_base = 2048 + set_list_idx;
++		set_ctrl.hash_bits = 0;
++		set_ctrl.hash_types_enabled = 0;
++	}
++
++	/* Program set_ctrl */
++	cass_config_set_ctrl(hw, set_list_idx, &set_ctrl);
++
++	/* Program default portal at indir_table[2048 + set_list_idx] */
++	cass_config_indir_entry(hw, 2048 + set_list_idx, portal_idx);
++
++	spin_unlock(&hw->rmu_lock);
++
++	/* Mark slot as used */
++	priv->mac_filter_slots[idx] = use_rss ? CXI_RMU_ETH_FILTER_RSS :
++					      CXI_RMU_ETH_FILTER_DIRECT;
++
++	return 0;
++}
++
++/**
++ * cxi_rmu_eth_add_mac_filter_vf() - Add MAC address filter (VF version)
++ * @rmu_eth: Resource handle
++ * @idx: Relative index (0-based) within client's quota
++ * @mac_addr: MAC address to match (48-bit)
++ * @pte: PTE pointer
++ * @use_rss: Whether this MAC participates in RSS distribution
++ *
++ * VF version: Sends add_mac request to PF via vsock.
++ *
++ * Return: 0 on success, negative errno on error
++ */
++static int cxi_rmu_eth_add_mac_filter_vf(struct cxi_rmu_eth *rmu_eth,
++					 unsigned int idx, u64 mac_addr,
++					 struct cxi_pte *pte, bool use_rss)
++{
++	struct cxi_rmu_eth_priv *priv = container_of(rmu_eth,
++						     struct cxi_rmu_eth_priv,
++						     rmu_eth);
++	const struct cxi_rmu_eth_add_mac_filter_cmd cmd = {
++		.op = CXI_OP_RMU_ETH_ADD_MAC_FILTER,
++		.rmu_eth = rmu_eth->id,
++		.idx = idx,
++		.mac_addr = mac_addr,
++		.pte = pte->id,
++		.use_rss = use_rss,
++	};
++	size_t resp_len = 0;
++	int rc;
++
++	rc = cxi_send_msg_to_pf(priv->dev, &cmd, sizeof(cmd), NULL, &resp_len);
++	if (rc)
++		return rc;
++
++	return 0;
++}
++
++/**
++ * cxi_rmu_eth_add_all_mcast_filter_vf() - Add all-multicast filter (VF version)
++ * @rmu_eth: Resource handle
++ * @idx: Relative index (0-based) within client's quota
++ * @pte: PTE pointer
++ * @use_rss: Whether this filter participates in RSS distribution
++ *
++ * VF version: Sends add-all-multicast request to PF via vsock.
++ *
++ * Return: 0 on success, negative errno on error
++ */
++static int cxi_rmu_eth_add_all_mcast_filter_vf(struct cxi_rmu_eth *rmu_eth, unsigned int idx,
++					       struct cxi_pte *pte, bool use_rss)
++{
++	struct cxi_rmu_eth_priv *priv = container_of(rmu_eth,
++						     struct cxi_rmu_eth_priv,
++						     rmu_eth);
++	const struct cxi_rmu_eth_add_all_mcast_filter_cmd cmd = {
++		.op = CXI_OP_RMU_ETH_ADD_ALL_MCAST_FILTER,
++		.rmu_eth = rmu_eth->id,
++		.idx = idx,
++		.pte = pte->id,
++		.use_rss = use_rss,
++	};
++	size_t resp_len = 0;
++	int rc;
++
++	rc = cxi_send_msg_to_pf(priv->dev, &cmd, sizeof(cmd), NULL, &resp_len);
++	if (rc)
++		return rc;
++
++	return 0;
++}
++
++/**
++ * cxi_rmu_eth_add_mac_filter() - Add MAC address filter with portal and RSS control
++ * @rmu_eth: Resource handle
++ * @idx: Relative index (0-based) within client's quota
++ * @mac_addr: MAC address to match (48-bit)
++ * @pte: PTE pointer (provides portal index via pte->portal_index)
++ * @use_rss: Whether this MAC participates in RSS distribution
++ *
++ * Client provides relative index [0..quota-1], kernel translates to hardware index.
++ * Reserved indices (0-3) can only be used by PF.
++ *
++ * Return: 0 on success, negative errno on error
++ */
++int cxi_rmu_eth_add_mac_filter(struct cxi_rmu_eth *rmu_eth, unsigned int idx, u64 mac_addr,
++			       struct cxi_pte *pte, bool use_rss)
++{
++	struct cxi_rmu_eth_priv *priv;
++	union c_rmu_cfg_ptlte_set_list set_list = {};
++	union c_rmu_cfg_ptlte_set_list set_list_mask = {};
++	u8 mac_bytes[ETH_ALEN];
++	int rc;
++
++	if (!rmu_eth || !pte)
++		return -EINVAL;
++
++	priv = container_of(rmu_eth, struct cxi_rmu_eth_priv, rmu_eth);
++
++	if (!priv->dev->is_physfn)
++		return cxi_rmu_eth_add_mac_filter_vf(rmu_eth, idx, mac_addr, pte, use_rss);
++
++	u64_to_ether_addr(mac_addr, mac_bytes);
++	cxidev_dbg(priv->dev, "Adding MAC RMU filter %pM at idx=%d (hw_idx=%u) use_rss=%d pte id %u\n",
++		   mac_bytes, idx, priv->set_list_base + idx, use_rss, pte->id);
++
++	/* VFs must use valid unicast MACs only */
++	if (!priv->admin) {
++		rc = validate_mac_vf(mac_addr);
++		if (rc) {
++			cxidev_err(priv->dev, "VF cannot use MAC %pM\n", mac_bytes);
++			return rc;
++		}
++	}
++
++	/* Prepare set_list entry for MAC match */
++	set_list.frame_type = C_RMU_ENET_802_3;
++	set_list.dmac = mac_addr;
++
++	/* Accept only that MAC */
++	set_list_mask.qw[0] = ~set_list.qw[0];
++	set_list_mask.qw[1] = ~set_list.qw[1];
++	set_list_mask.qw[2] = ~set_list.qw[2];
++	set_list_mask.qw[3] = ~set_list.qw[3];
++
++	/* Ignore VLAN/PCP/DEI bits */
++	set_list_mask.vlan_present = 0;
++	set_list_mask.pcp = 0;
++	set_list_mask.dei = 0;
++	set_list_mask.vid = 0;
++	set_list_mask.lossless = 0;
++
++	/* Program hardware set_list filter */
++	return add_rmu_set_list_filter(priv, idx, pte, use_rss, &set_list, &set_list_mask);
++}
++EXPORT_SYMBOL(cxi_rmu_eth_add_mac_filter);
++
++/**
++ * cxi_rmu_eth_add_all_mcast_filter() - Add all-multicast filter with portal and RSS control
++ * @rmu_eth: Resource handle
++ * @idx: Relative index (0-based) within client's quota
++ * @pte: PTE pointer (provides portal index via pte->portal_index)
++ * @use_rss: Whether this filter participates in RSS distribution
++ *
++ * Programs a filter that accepts all multicast Ethernet packets by matching
++ * only frame type and destination MAC multicast bit semantics.
++ *
++ * Return: 0 on success, negative errno on error
++ */
++int cxi_rmu_eth_add_all_mcast_filter(struct cxi_rmu_eth *rmu_eth, unsigned int idx,
++				     struct cxi_pte *pte, bool use_rss)
++{
++	struct cxi_rmu_eth_priv *priv;
++	const union c_rmu_cfg_ptlte_set_list set_list = {
++		.frame_type = C_RMU_ENET_802_3,
++		.dmac = 0x010000000000ULL,
++	};
++	const union c_rmu_cfg_ptlte_set_list set_list_mask = {
++		.qw = {
++			[2] = ~set_list.qw[2],
++			[3] = ~set_list.qw[3],
++		}
++	};
++
++	if (!rmu_eth || !pte)
++		return -EINVAL;
++
++	priv = container_of(rmu_eth, struct cxi_rmu_eth_priv, rmu_eth);
++
++	if (!priv->dev->is_physfn)
++		return cxi_rmu_eth_add_all_mcast_filter_vf(rmu_eth, idx, pte, use_rss);
++
++	cxidev_dbg(priv->dev,
++		   "Adding all-multicast RMU filter at idx=%d (hw_idx=%u) use_rss=%d pte id %u\n",
++		   idx, priv->set_list_base + idx, use_rss, pte->id);
++
++	return add_rmu_set_list_filter(priv, idx, pte, use_rss, &set_list, &set_list_mask);
++}
++EXPORT_SYMBOL(cxi_rmu_eth_add_all_mcast_filter);
++
++/**
++ * cxi_rmu_eth_remove_filter_vf() - Remove filter (VF version)
++ * @rmu_eth: Resource handle
++ * @idx: Relative index of filter to remove
++ *
++ * VF version: Sends remove_filter request to PF via vsock.
++ *
++ * Return: 0 on success, negative errno on error
++ */
++static int cxi_rmu_eth_remove_filter_vf(struct cxi_rmu_eth *rmu_eth, unsigned int idx)
++{
++	struct cxi_rmu_eth_priv *priv = container_of(rmu_eth,
++						     struct cxi_rmu_eth_priv,
++						     rmu_eth);
++	const struct cxi_rmu_eth_remove_filter_cmd cmd = {
++		.op = CXI_OP_RMU_ETH_REMOVE_FILTER,
++		.rmu_eth = rmu_eth->id,
++		.idx = idx,
++	};
++	size_t resp_len = 0;
++	int rc;
++
++	rc = cxi_send_msg_to_pf(priv->dev, &cmd, sizeof(cmd), NULL, &resp_len);
++	if (rc)
++		return rc;
++
++	return 0;
++}
++
++/**
++ * cxi_rmu_eth_remove_filter() - Remove filter by index
++ * @rmu_eth: Resource handle
++ * @idx: Relative index of filter to remove
++ *
++ * Works for both MAC address filters and promiscuous mode filters.
++ * MAC filters use slot tracking and return -ENOENT if slot is empty.
++ * Promiscuous filters don't use slot tracking.
++ *
++ * Return: 0 on success, -ENOENT if MAC slot is empty, -EINVAL for invalid index
++ */
++int cxi_rmu_eth_remove_filter(struct cxi_rmu_eth *rmu_eth, unsigned int idx)
++{
++	struct cxi_rmu_eth_priv *priv = container_of(rmu_eth,
++						     struct cxi_rmu_eth_priv,
++						     rmu_eth);
++	struct cass_dev *hw = container_of(priv->dev, struct cass_dev, cdev);
++	unsigned int set_list_idx;
++
++	if (!priv->dev->is_physfn)
++		return cxi_rmu_eth_remove_filter_vf(rmu_eth, idx);
++
++	/* Validate index range */
++	if (idx >= priv->set_list_quota) {
++		cxidev_err(priv->dev, "Index %d out of range [0..%u]\n",
++			   idx, priv->set_list_quota - 1);
++		return -EINVAL;
++	}
++
++	/* Check if slot is occupied (both MAC and promiscuous filters use slot tracking) */
++	if (!priv->mac_filter_slots[idx]) {
++		cxidev_dbg(priv->dev, "Remove filter at idx=%d (hw_idx=%u) but slot is empty\n",
++			   idx, priv->set_list_base + idx);
++		return -ENOENT;
++	}
++
++	cxidev_dbg(priv->dev, "Remove filter at idx=%d (hw_idx=%u)\n",
++		   idx, priv->set_list_base + idx);
++	/* Translate to hardware index */
++	set_list_idx = priv->set_list_base + idx;
++
++	/* Invalidate hardware entry */
++	spin_lock(&hw->rmu_lock);
++	cass_invalidate_set_list(hw, set_list_idx);
++	spin_unlock(&hw->rmu_lock);
++
++	/* Clear slot (all filters use slot tracking now) */
++	priv->mac_filter_slots[idx] = CXI_RMU_ETH_FILTER_NONE;
++
++	return 0;
++}
++EXPORT_SYMBOL(cxi_rmu_eth_remove_filter);
++
++/**
++ * cxi_rmu_eth_add_promiscuous_filter() - Enable promiscuous mode filter
++ * @rmu_eth: Resource handle
++ * @idx: Relative index within client's quota for this filter
++ * @pte: PTE pointer
++ * @use_rss: Whether promiscuous traffic participates in RSS
++ *
++ * Return: 0 on success, negative errno on error
++ */
++int cxi_rmu_eth_add_promiscuous_filter(struct cxi_rmu_eth *rmu_eth, unsigned int idx,
++				       struct cxi_pte *pte, bool use_rss)
++{
++	struct cxi_rmu_eth_priv *priv;
++	const union c_rmu_cfg_ptlte_set_list set_list = {
++		.frame_type = C_RMU_ENET_802_3,
++	};
++	const union c_rmu_cfg_ptlte_set_list set_list_mask = {
++		.qw = {
++			[2] = ~set_list.qw[2],
++			[3] = ~set_list.qw[3],
++		}
++	};
++
++	if (!rmu_eth || !pte)
++		return -EINVAL;
++
++	priv = container_of(rmu_eth, struct cxi_rmu_eth_priv, rmu_eth);
++
++	/* VF cannot enable promiscuous mode */
++	if (!priv->admin)
++		return -EPERM;
++
++	cxidev_dbg(priv->dev, "Add promiscuous RMU filter at idx=%u (hw_idx=%u) use_rss=%d\n",
++		   idx, priv->set_list_base + idx, use_rss);
++
++	/* Program hardware set_list filter */
++	return add_rmu_set_list_filter(priv, idx, pte, use_rss, &set_list, &set_list_mask);
++}
++EXPORT_SYMBOL(cxi_rmu_eth_add_promiscuous_filter);
++
++/**
++ * update_rss_filters() - Update set_ctrl for all RSS-enabled filters
++ * @priv: Private resource structure
++ * @enable: If true, enable RSS; if false, disable RSS
++ *
++ * Helper function to update set_ctrl entries for all filters that use RSS.
++ * This is called when changing RSS configuration or indirection table.
++ */
++static void update_rss_filters(struct cxi_rmu_eth_priv *priv, bool enable)
++{
++	struct cass_dev *hw = container_of(priv->dev, struct cass_dev, cdev);
++	unsigned int i;
++	struct c_rmu_cfg_ptlte_set_ctrl_table_entry set_ctrl = {};
++
++	if (enable && priv->rss_queues > 1) {
++		/* RSS enabled - configure indirection table */
++		set_ctrl.portal_index_indir_base = priv->indir_base;
++		set_ctrl.hash_bits = ilog2(priv->indir_entries);
++		set_ctrl.hash_types_enabled = priv->hash_types;
++	}
++	/* else: set_ctrl stays zero (direct portal mode); portal_index_indir_base
++	 * is set per-filter below */
++
++	/* Update all filters that use RSS */
++	for (i = 0; i < priv->set_list_quota; i++) {
++		if (priv->mac_filter_slots[i] == CXI_RMU_ETH_FILTER_RSS) {
++			unsigned int hw_idx = priv->set_list_base + i;
++
++			if (!enable || priv->rss_queues <= 1) {
++				/* Use direct portal */
++				set_ctrl.portal_index_indir_base = 2048 + hw_idx;
++			}
++
++			cass_config_set_ctrl(hw, hw_idx, &set_ctrl);
++		}
++	}
++}
++
++/**
++ * cxi_rmu_eth_set_rss_queues_vf() - Configure RSS queues (VF version)
++ * @rmu_eth: Resource handle
++ * @num_queues: Number of RSS queues
++ * @ptes: Array of PTE pointers
++ * @hash_types: Hash types to enable
++ *
++ * VF version: Sends set_rss_queues request to PF via vsock.
++ *
++ * Return: 0 on success, negative errno on error
++ */
++static int cxi_rmu_eth_set_rss_queues_vf(struct cxi_rmu_eth *rmu_eth,
++					 unsigned int num_queues,
++					 struct cxi_pte **ptes,
++					 u32 hash_types)
++{
++	struct cxi_rmu_eth_priv *priv = container_of(rmu_eth,
++						     struct cxi_rmu_eth_priv,
++						     rmu_eth);
++	struct cxi_rmu_eth_set_rss_queues_cmd cmd = {
++		.op = CXI_OP_RMU_ETH_SET_RSS_QUEUES,
++		.rmu_eth = rmu_eth->id,
++		.num_queues = num_queues,
++		.hash_types = hash_types,
++	};
++	size_t resp_len = 0;
++	unsigned int i;
++
++	if (num_queues > CXI_ETH_MAX_RSS_QUEUES)
++		return -EINVAL;
++
++	/* Copy PTE numbers into command */
++	for (i = 0; i < num_queues; i++)
++		cmd.ptes[i] = ptes[i]->id;
++
++	return cxi_send_msg_to_pf(priv->dev, &cmd, sizeof(cmd), NULL, &resp_len);
++}
++
++/**
++ * cxi_rmu_eth_set_rss_queues() - Configure RSS queues and hash types
++ * @rmu_eth: Resource handle
++ * @num_queues: Number of RSS queues (0-64, where 0 disables RSS)
++ * @ptes: Array of PTE pointers for RSS queues
++ * @hash_types: Hash types to enable
++ *
++ * Return: 0 on success, negative errno on error
++ */
++int cxi_rmu_eth_set_rss_queues(struct cxi_rmu_eth *rmu_eth,
++			       unsigned int num_queues,
++			       struct cxi_pte **ptes,
++			       u32 hash_types)
++{
++	struct cxi_rmu_eth_priv *priv = container_of(rmu_eth,
++						     struct cxi_rmu_eth_priv,
++						     rmu_eth);
++	struct cass_dev *hw = container_of(priv->dev, struct cass_dev, cdev);
++	unsigned int i;
++
++	if (!priv->dev->is_physfn)
++		return cxi_rmu_eth_set_rss_queues_vf(rmu_eth, num_queues, ptes,
++						     hash_types);
++
++	/* RSS requires at least 2 queues and non-zero hash types */
++	if (num_queues == 0 || num_queues == 1 || hash_types == 0) {
++		/* Disable RSS */
++		num_queues = 0;
++		hash_types = 0;
++	} else {
++		/* Validate RSS queue count */
++		if (num_queues > CXI_ETH_MAX_RSS_QUEUES)
++			return -EINVAL;
++
++		/* Store PTE pointers for RSS queues */
++		for (i = 0; i < num_queues; i++)
++			priv->ptes[i] = ptes[i];
++	}
++
++	/* Update default RSS configuration */
++	priv->rss_queues = num_queues;
++	priv->hash_types = hash_types;
++	priv->indir_entries = (num_queues > 1) ? priv->indir_size : 0;
++
++	/* Program indirection table with default round-robin */
++	spin_lock(&hw->rmu_lock);
++
++	/* Disable RSS filters before modifying indirection table */
++	update_rss_filters(priv, false);
++
++	if (num_queues > 1) {
++		for (i = 0; i < priv->indir_entries; i++) {
++			unsigned int queue_idx = ethtool_rxfh_indir_default(i, num_queues);
++			unsigned int portal_idx = ptes[queue_idx]->id;
++
++			cass_config_indir_entry(hw, priv->indir_base + i, portal_idx);
++		}
++
++		/* Re-enable RSS filters with new configuration */
++		update_rss_filters(priv, true);
++	}
++
++	spin_unlock(&hw->rmu_lock);
++
++	return 0;
++}
++EXPORT_SYMBOL(cxi_rmu_eth_set_rss_queues);
++
++/**
++ * cxi_rmu_eth_set_indir_table_vf() - Set custom traffic distribution (VF version)
++ * @rmu_eth: Resource handle
++ * @indir_table: Custom indirection table, or NULL for default
++ * @indir_size: Size of indirection table
++ *
++ * VF version: Sends set_indir_table request to PF via vsock.
++ *
++ * Return: 0 on success, negative errno on error
++ */
++static int cxi_rmu_eth_set_indir_table_vf(struct cxi_rmu_eth *rmu_eth,
++					  const u8 *indir_table,
++					  unsigned int indir_size)
++{
++	struct cxi_rmu_eth_priv *priv = container_of(rmu_eth,
++						     struct cxi_rmu_eth_priv,
++						     rmu_eth);
++	struct cxi_rmu_eth_set_indir_table_cmd *cmd;
++	size_t resp_len = 0;
++	int ret;
++
++	cmd = kzalloc(sizeof(*cmd), GFP_KERNEL);
++	if (!cmd)
++		return -ENOMEM;
++
++	cmd->op = CXI_OP_RMU_ETH_SET_INDIR_TABLE;
++	cmd->rmu_eth = rmu_eth->id;
++	cmd->indir_size = indir_size;
++
++	/* Copy indirection table if provided, NULL means use default (all zeros) */
++	if (indir_table && indir_size <= CXI_ETH_MAX_INDIR_ENTRIES)
++		memcpy(cmd->indir_table, indir_table, indir_size);
++
++	ret = cxi_send_msg_to_pf(priv->dev, cmd, sizeof(*cmd), NULL, &resp_len);
++	kfree(cmd);
++	return ret;
++}
++
++/**
++ * cxi_rmu_eth_set_indir_table() - Set custom traffic distribution weights
++ * @rmu_eth: Resource handle
++ * @indir_table: Custom indirection table, or NULL for default
++ * @indir_size: Size of indirection table (must be power of 2)
++ *
++ * Return: 0 on success, negative errno on error
++ */
++int cxi_rmu_eth_set_indir_table(struct cxi_rmu_eth *rmu_eth,
++				const u8 *indir_table, unsigned int indir_size)
++{
++	struct cxi_rmu_eth_priv *priv = container_of(rmu_eth,
++						     struct cxi_rmu_eth_priv,
++						     rmu_eth);
++	struct cass_dev *hw = container_of(priv->dev, struct cass_dev, cdev);
++	unsigned int i;
++
++	if (!priv->dev->is_physfn)
++		return cxi_rmu_eth_set_indir_table_vf(rmu_eth, indir_table, indir_size);
++
++	if (indir_size == 0 || !is_power_of_2(indir_size)) {
++		cxidev_err(priv->dev, "Invalid indirection table size %u (must be power of 2)\n",
++			   indir_size);
++		return -EINVAL;
++	}
++
++	if (priv->rss_queues == 0) {
++		cxidev_dbg(priv->dev,
++			   "Ignoring indirection table update while RSS is disabled (indir_size=%u)\n",
++			   indir_size);
++		return 0;
++	}
++
++	cxidev_dbg(priv->dev, "Setting up RSS indirection table: indir_size=%u\n", indir_size);
++
++	if (indir_size > priv->indir_size) {
++		cxidev_err(priv->dev, "Indirection table size %u exceeds allocated size %u\n",
++			   indir_size, priv->indir_size);
++		return -EINVAL;
++	}
++
++	/* Validate all queue indices before modifying hardware */
++	if (indir_table) {
++		for (i = 0; i < indir_size; i++) {
++			if (indir_table[i] >= priv->rss_queues) {
++				cxidev_err(priv->dev, "Invalid queue index %u in indirection table (max %u)\n",
++					   indir_table[i], priv->rss_queues - 1);
++				return -EINVAL;
++			}
++		}
++	}
++
++	/* Update active indirection table size */
++	priv->indir_entries = indir_size;
++
++	spin_lock(&hw->rmu_lock);
++
++	/* Disable hashing on all active filters before modifying indirection table */
++	update_rss_filters(priv, false);
++
++	/* Program the requested entries (custom or default) */
++	for (i = 0; i < indir_size; i++) {
++		unsigned int queue_idx;
++		unsigned int portal_idx;
++
++		if (!indir_table) {
++			/* Default round-robin */
++			queue_idx = ethtool_rxfh_indir_default(i, priv->rss_queues);
++		} else {
++			/* Custom table - already validated above */
++			queue_idx = indir_table[i];
++		}
++
++		portal_idx = priv->ptes[queue_idx]->id;
++		cass_config_indir_entry(hw, priv->indir_base + i, portal_idx);
++	}
++
++	/* Fill remaining entries with default round-robin to avoid stale values although
++	 * the HW would not be using them once we update the hash_bits */
++	for (i = indir_size; i < priv->indir_size; i++) {
++		unsigned int queue_idx = ethtool_rxfh_indir_default(i, priv->rss_queues);
++		unsigned int portal_idx = priv->ptes[queue_idx]->id;
++
++		cass_config_indir_entry(hw, priv->indir_base + i, portal_idx);
++	}
++
++	/* Re-enable hashing on all active filters */
++	update_rss_filters(priv, true);
++
++	spin_unlock(&hw->rmu_lock);
++
++	return 0;
++}
++EXPORT_SYMBOL(cxi_rmu_eth_set_indir_table);
++
++static void cxi_rmu_eth_get_hash_key_vf(struct cxi_dev *cdev, u8 *key)
++{
++	const struct cxi_rmu_eth_hash_key_get_cmd cmd = {
++		.op = CXI_OP_RMU_ETH_HASH_KEY_GET,
++	};
++	struct cxi_rmu_eth_get_hash_key_resp resp = {};
++	size_t resp_len = sizeof(resp);
++	int rc;
++
++	BUILD_BUG_ON(sizeof(resp.key) != CXI_ETH_HASH_KEY_SIZE);
++
++	rc = cxi_send_msg_to_pf(cdev, &cmd, sizeof(cmd), &resp, &resp_len);
++	if (rc) {
++		/* On error, zero out the key */
++		memset(key, 0, CXI_ETH_HASH_KEY_SIZE);
++		return;
++	}
++
++	memcpy(key, resp.key, CXI_ETH_HASH_KEY_SIZE);
++}
++
++/**
++ * cxi_rmu_eth_get_hash_key() - Retrieve the RSS hash key
++ *
++ * @cdev: CXI device
++ * @key: A sufficiently large (CXI_ETH_HASH_KEY_SIZE) array to store the key.
++ */
++void cxi_rmu_eth_get_hash_key(struct cxi_dev *cdev, u8 *key)
++{
++	struct cass_dev *hw = container_of(cdev, struct cass_dev, cdev);
++	union c_rmu_cfg_hash_key hash_key;
++
++	if (!cdev->is_physfn) {
++		cxi_rmu_eth_get_hash_key_vf(cdev, key);
++		return;
++	}
++
++	spin_lock(&hw->rmu_lock);
++	cass_read(hw, C_RMU_CFG_HASH_KEY, &hash_key, sizeof(hash_key));
++	spin_unlock(&hw->rmu_lock);
++
++	memcpy(key, hash_key.qw, CXI_ETH_HASH_KEY_SIZE);
++}
++EXPORT_SYMBOL(cxi_rmu_eth_get_hash_key);
+diff --git a/drivers/net/ethernet/hpe/ss1/cass_rx_tx_profile.c b/drivers/net/ethernet/hpe/ss1/cass_rx_tx_profile.c
+new file mode 100644
+index 000000000000..23bf05c02bce
+--- /dev/null
++++ b/drivers/net/ethernet/hpe/ss1/cass_rx_tx_profile.c
+@@ -0,0 +1,104 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (C) 2024 Hewlett Packard Enterprise Development LP */
++
++/* VNI Entry manipulation routines for Cassini Device */
++
++#include "cass_core.h"
++#include "cass_rx_tx_profile.h"
++
++#include "cxi_rxtx_profile.h"
++#include "cxi_rxtx_profile_list.h"
++
++static struct xa_limit    rx_profile_limits = {
++	.min = RX_PROFILE_ID_MIN,
++	.max = RX_PROFILE_ID_MAX,
++};
++
++static struct xa_limit    tx_profile_limits = {
++	.min = TX_PROFILE_ID_MIN,
++	.max = TX_PROFILE_ID_MAX,
++};
++
++/* **************************************************************** */
++/* Cassini device initialization and shutdown                       */
++/* **************************************************************** */
++
++/**
++ * cass_dev_rx_tx_profiles_init() - Create device structures to support
++ *                                  RX and TX Profile lists.
++ *
++ * @hw: The cassini device
++ */
++void cass_dev_rx_tx_profiles_init(struct cass_dev *hw)
++{
++	cxi_rxtx_profile_list_init(&hw->rx_profile_list,
++				   &rx_profile_limits,
++				   RX_PROFILE_XARRAY_FLAGS,
++				   RX_PROFILE_GFP_OPTS);
++
++	cxi_rxtx_profile_list_init(&hw->tx_profile_list,
++				   &tx_profile_limits,
++				   TX_PROFILE_XARRAY_FLAGS,
++				   TX_PROFILE_GFP_OPTS);
++
++	mutex_init(&hw->rx_profile_get_lock);
++	mutex_init(&hw->tx_profile_get_lock);
++}
++
++struct profile_destroy_data {
++	struct cxi_dev   *cxi_dev;
++};
++
++static void rx_profile_destroy(struct cxi_rxtx_profile *rxtx_profile,
++			       void *user_arg)
++{
++	struct profile_destroy_data *data = user_arg;
++
++	refcount_dec(&rxtx_profile->state.refcount);
++	cxi_rx_profile_dec_refcount(data->cxi_dev, co_rx_profile(rxtx_profile));
++}
++
++/**
++ * cass_dev_rx_tx_profiles_fini() - Destroy all RX and TX Profile entries
++ * associated with this device, as well as locks, etc.
++ *
++ * @hw: Cassini Device
++ */
++void cass_dev_rx_tx_profiles_fini(struct cass_dev *hw)
++{
++	struct profile_destroy_data  data;
++
++	data.cxi_dev = &hw->cdev;
++
++	cxi_rxtx_profile_list_destroy(&hw->rx_profile_list,
++				      rx_profile_destroy, &data);
++	cxi_tx_profile_list_destroy(hw);
++}
++
++/**
++ * cass_rx_profile_init() - initialize the hardware specific
++ *                                 part of the RX Profile
++ * @hw: Cassini device pointer
++ * @rx_profile: pointer to Profile
++ */
++void cass_rx_profile_init(struct cass_dev *hw,
++			  struct cxi_rx_profile *rx_profile)
++{
++	spin_lock_init(&rx_profile->config.pid_lock);
++	rx_profile->config.device = &hw->cdev;
++	rx_profile->config.rmu_index = DEF_RMU_INDEX;
++}
++
++/**
++ * cass_tx_profile_init() - initialize the hardware specific
++ *                                 part of the TX Profile
++ * @hw: Cassini device pointer
++ * @tx_profile: pointer to Profile
++ */
++void cass_tx_profile_init(struct cass_dev *hw,
++			  struct cxi_tx_profile *tx_profile)
++{
++	tx_profile->config.hw = hw;
++	idr_init(&tx_profile->config.cass_cp_table);
++	spin_lock_init(&tx_profile->config.lock);
 +}
 
 -- 
