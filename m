@@ -1,118 +1,45 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=212.42.244.94
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793366994;
-	b=KITLk868xANVPlXQjCxsYcohC4PQ4FTtRK/rE4Yp+G8hdqYefJ69rlVW8ontzFGuAEZw
-	 /ekRclvU5SAx6dLu/zUXw5ScDdL6HsbOeJpNWcmfW/VQPkceClVhdrkR8EfWAGI+nONbc
-	 6ElWuzDo64Artr/cVS51oL+lc/u5Q5ETb4yldAbeDI4iEMlfnM1XnGkUW9x835/FSsOQs
-	 oWT+6xZAJ5ncZB6hj/ntH0Vdf+QeuId4i3vtW2GUm9nflflvXfeRE4LWeNiX4J41lHg+j
-	 BUjeQKDRytVCQUeydKsL5LmWI9m6nkr5yLsK/YhMZ9s+2tNhO+IiXKx1FmnJQr+grZQ==
+	t=1793370024;
+	b=frVUUCXWwr3FeDf6rWRsp45Ib0tDM/L3+yRleqbqVG4zxNzFtEjACRH6skj6HC0l1/0l
+	 EAchzbXSR7GclTuDKGiA6YAvLUYUDcFEahppmLHHTRJLXtieOLMGebD2GQIIo4lqeGDkH
+	 pBMPcABylqQbPEP0ufamSUl+bxUjLo+9dSNPixe/PsGc+354SDGDgB28MekRvdbgP+yZH
+	 PJlIfIRQr1HCg9vCJKTnRD4he4tps0kvr7//mIu4X5ngmS/98kWi2Qx46k9INP45fdwAQ
+	 3CARfyGc8Hw3iozurvcYrmCYRPa7ukw2boyuU4biWl5p4Ec4dBEYx4XbW8evvMGEjCg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793366994;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To:Organization:x-ms-reactions:
-	 X-purgate-ID:X-purgate-type:X-purgate-size:X-Notice:X-purgate:
-	 X-purgate:X-pfmilter;
-	bh=QpUKaSoVRoEgdKmoyk8G7l81p1qWRtQXTZ0eVa1XsI0=;
-	b=f6IDDM4NhbwiFYS1LPPUgfuV6ppKu5XuPxXLtW7xeqN9V1JOseEiUh9Ym+JHytrC3ri8
-	 niXReb0ZZpep/ay+qqNUMlQqLw5ywqp1kDK50usUApkWS2AowDj4KChpaXhYAW1JqyuTK
-	 bRks7wyIOVdnrE0CzfF2YwVAR6xsge6tCQhIDoDHPFYw7CURjXO0ttpQwCsfgiu9yKiei
-	 5IE/ce36xBl3He+xzzi4Ud+JiM05GpuIn/yCQO9rx7UvRJMZ+bxJpHb10mrYdVLt0Vdr+
-	 YVhbGt++F9QmDr7NmacCzl89Ya9GELVFZcZcUDpk7//VlbyC/t/sgSBvI6x9xPFnVKA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793370024;
+	h=Received:DKIM-Signature:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:Subject:From:To:Cc:In-Reply-To:References:
+	 Date:Message-Id:X-Mailer:X-Developer-Signature:X-Developer-Key;
+	bh=Gz8tufo0m0wCulzcu/zCog+PiMQz+E7r7KmJRLFYN0k=;
+	b=sgtM448n9b/wBTkk+U60yxiir4MXnlbxa4sjlAEsOuj+ZOiArlz9BgkSMOuZArIEqXCy
+	 EBQ+uf/9MO81cijqHlyHnfPQKC8ZAKWRpKCDQssD8JfLua6EBcTstyt9204bntI8iJkiv
+	 cF8JugLpkrJiLsVBluQaIqjo+K4FG+HxKGr+0D1PEOMCZH3GzCR28YmbseBZSvtpNceUF
+	 gw1330oTzeeTf1gZKxuxdwunvO7pQob4KNlP1YVkgsbTnab6bAhK3VzWqVG4D4mFj3Kl0
+	 EN0iyeydfk8HLpQX9367/XhNLnxKN6TlGQgE/fEYWxJTq05784OuNL3EDXUmyA+saJA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=fritz.com;
-	spf=pass smtp.mailfrom=fritz.com;
-	dkim=pass header.d=fritz.com header.i=@fritz.com header.a=rsa-sha256 header.s=mail header.b=AmiP1sdZ;
-	arc=none smtp.remote-ip=212.42.244.94
-Received: from mail.avm.de (mail.avm.de [212.42.244.94])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VKcRmLii;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E99AC606A31C;
-	Fri, 30 Oct 2026 13:29:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E99AC606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fritz.com
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 57CBC606A31C;
+	Fri, 30 Oct 2026 14:20:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=fritz.com header.i=@fritz.com header.a=rsa-sha256 header.s=mail header.b=AmiP1sdZ
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fritz.com; s=mail;
-	t=1793366980; bh=a/fEt90n+2smzc8tULN5m3m/hMMA3WQXHcvWhcoynLc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AmiP1sdZKE4ipmV9XkFzIAg6sDdTc8piKssit8JG5M7jVm+wWoA9HNBcL6nnioxmf
-	 UtVWmWL8HC8cipXhGGKFKn344d7QBy4BigwXDhd9cibHOOYqfnPwcm+wl7S8LyH40H
-	 PIcRpdlbp12mkcZ/qVoxVXxHxdsVB4yBgm4K8e8Gb7j8o5MGT6HVOS52CCT1ImUgYM
-	 rC8fGm5esO5fYtQK82TXSmpyrCUdX6hUkhNuydSuiEjRPAEuIkSRJ3Vr5CzOMuVEiE
-	 +YmeA56zTDNX6G2v3XBcddEQclfpxGdALH3GP+htSNoKgdV3GvyPoPiSSRu1+yw2Ux
-	 Cmo8WDvejZ5Lw==
-Received: from [212.42.244.78] (helo=mail.avm.de)
-	by mail.avm.de with ESMTP (eXpurgate 4.57.1)
-	(envelope-from <n.schier@fritz.com>)
-	id 6ae49bc4-23c8-7f0000032729-7f0000019972-1
-	for <multiple-recipients>; Fri, 30 Oct 2026 14:29:40 +0100
-Received: from mail-auth.fritz.com (unknown [212.42.244.78])
-	by mail.avm.de (Postfix) with ESMTPS;
-	Fri, 30 Oct 2026 14:29:40 +0100 (CET)
-Date: Fri, 30 Oct 2026 14:29:39 +0100
-From: Nicolas Schier <n.schier@fritz.com>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Nathan Chancellor <nathan@kernel.org>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Matt Turner <mattst88@gmail.com>,
-	Magnus Lindholm <linmag7@gmail.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Luis Augenstein <luis.augenstein@tngtech.com>,
-	Maximilian Huber <maximilian.huber@tngtech.com>,
-	Anup Patel <anup@brainfault.org>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Andy Lutomirski <luto@kernel.org>,
-	Vincenzo Frascino <vincenzo.frascino@arm.com>, soc@lists.linux.dev,
-	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-	Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>,
-	Mark Rutland <mark.rutland@arm.com>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	"Ritesh Harjani (IBM)" <ritesh.list@gmail.com>,
-	Shrikanth Hegde <sshegde@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Atish Patra <atish.patra@linux.dev>,
-	Sean Christopherson <seanjc@google.com>,
-	Alexandre Ghiti <alex@ghiti.fr>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, linux-alpha@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-s390@vger.kernel.org, linux-efi@vger.kernel.org,
-	netdev@vger.kernel.org, kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-kselftest@vger.kernel.org, llvm@lists.linux.dev
-Subject: Re: [PATCH v5 13/13] treewide: Stop defining __ASSEMBLY__ for
- assembler files
-Message-ID: <20261030-dexterous-manatee-of-honor-eac4eb@l-nschier-z2>
-References: <20261023064908.66707-1-thuth@redhat.com>
- <20261023064908.66707-14-thuth@redhat.com>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VKcRmLii
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 7F44C1F0093A;
+	Fri, 30 Oct 2026 14:20:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793370024;
+	bh=Gz8tufo0m0wCulzcu/zCog+PiMQz+E7r7KmJRLFYN0k=;
+	h=Subject:From:To:Cc:In-Reply-To:References:Date;
+	b=VKcRmLiinGZk1rDYI30Cd7gr58jw5KY9OdMpYcEaX7iGvoWRWz77o7i7RjKqfDEnz
+	 PVjQMTYzAG/ZswC9q7LV2AZehWjqg5U+X74OuG4ghf8KzjkR0jaWpIh6O0T1mKRasl
+	 JIQDbCBftxoDLrn595kLzlNd05ocT0njCEJ6g5MkmHIrVsAngOCbc+iMVXx5McRhEm
+	 RpcpdgHEwrCqJ3TPN8jt1whmrJ4mFIm+5A3VXljLpf/cHOIfgtjNq1049dEijOcWB+
+	 E3AhNQ4BAbhOfyx2s3ohOlJhvlaevyBLJJ2W76kHiB7mm+lRQwgANf0IjB/FlRKpvN
+	 crrdo+GwzxKOg==
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -122,77 +49,98 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="FhzCQO4A3K0b968D"
-Content-Disposition: inline
-In-Reply-To: <20261023064908.66707-14-thuth@redhat.com>
-Organization: FRITZ! Technology GmbH
-x-ms-reactions: disallow
-X-purgate-ID: 149429::1793366980-1E7C8EE4-1E744FE6/0/0
-X-purgate-type: clean
-X-purgate-size: 2843
-X-Notice: Whitelisted
-X-purgate: This mail is considered clean (visit https://www.eleven.de for further information)
-X-purgate: clean
-X-pfmilter: host: postfix-mx-03  mail-id: E6A11A07A2  external: no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH v5 2/2] kbuild: Support directory targets for building
+ DTBs
+From: Nicolas Schier <nsc@kernel.org>
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+ Saravana Kannan <saravanak@kernel.org>, David Heidelberg <david@ixit.cz>, 
+ Arnd Bergmann <arnd@arndb.de>, linux-kbuild@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
+In-Reply-To: <20261023-dtb-dirs-v3-v5-2-dfe13d47aa64@kernel.org>
+References: <20261023-dtb-dirs-v3-v5-0-dfe13d47aa64@kernel.org>
+ <20261023-dtb-dirs-v3-v5-2-dfe13d47aa64@kernel.org>
+Date: Fri, 30 Oct 2026 15:16:48 +0100
+Message-Id: <179336980813.3139600.12365744632390730361.b4-review@b4>
+X-Mailer: b4 0.17-dev-ce4c1
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2025; i=nsc@kernel.org;
+ s=20250924; h=from:subject:message-id;
+ bh=xjoqRoFBUlJo0LxZQBS7KJFWVkqGKDnz+QZfxjGxBic=;
+ b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBq5KbTXElPAg1iNDSd8mx2dOh46umDBQfUYOF9d
+ XwzwqbSlrSJAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCauSm0wAKCRAHUgpwFiYS
+ aX9lEADyP0y324BnGj0w37NJTRd5zotHQwsbDz+f7cpsOePQpXuPO8gtRgguPBB1kPGguwiLidR
+ gutaGPK7lFhHrHgk8jkoLo6wBRsZSAs7Z4ReLHKv5bs62Zu1D3ZXGfkDIqXdnWXtzRA3Bq+bSUc
+ kp5ENeVReaX5FPFIiquN5d+pGQEDJ+n0efvwWFS3/ro8Bih6lhGoD6S0TZhCAT763UUadxyUjJJ
+ NjB4Y+onSQIyMqlXlsncHepeA/fijrcycITUCN/S87yf2FO4vhyBBQ4yqQ8jkiXIqKWEoeJ4ngv
+ buhEWzEGzYTlU4qkj+SpiJ4FiVQM2xG1Ay50bEaAdbE9brEiJahDuF9k+HDiMd0+eVEwaPh6YoT
+ DGE5f22H9wbjIRmAHymOaOaAe675Vvq+u4bVhPmq5fPMwp0xDX6x3NtXPatZL3ydXpgRTcZc3j5
+ EyamjcBntP3X10xy5Zq4xSuDy5hLdUCY73aKXlUb8TKlcfwfhYAAoxVCr3lfXIjJqCyoZTnLUsO
+ XlAitU35AZHuyJcocR6/UI011zZWDC0v506llQBS5sGuV7m+URgVo3+xLuR3vsMO1hZePm7xQrz
+ MeDB5jo+vtt1+j4xSeWtoRc/vphPSh4QRXRGgURB0w/V9LEKD3jc/EAqYuCcf1aPDlzv3QJxeHz
+ glYF5Zbad+yyGVg==
+X-Developer-Key: i=nsc@kernel.org; a=openpgp;
+ fpr=18ED52DBE34F860EE9FBC82B7D97093255A0CE7F
 
---FhzCQO4A3K0b968D
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Oct 23, 2026 at 08:48:50AM +0200, Thomas Huth wrote:
-> All spots have been changed to __ASSEMBLER__ (i.e. the macro that
-> gets defined by the compiler), so we don't have to manually define
-> __ASSEMBLY__ anymore.
->=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> It is useful to be able to build all the DTBs for a vendor. One can list
+> all the .dts files in a directory and convert those to %.dtb targets,
+> but that doesn't work for base+overlay DTB targets.
+> 
+> The 'dtbs' and 'dtbs_check' targets can use the directory rule targets
+> as well which avoids different make paths for building DTBs.
+> 
+> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
 > ---
->  Makefile                                             | 2 +-
->  arch/alpha/boot/compressed/Makefile                  | 2 +-
->  arch/arm64/kernel/vdso32/Makefile                    | 1 -
->  arch/loongarch/vdso/Makefile                         | 2 +-
->  arch/mips/boot/compressed/Makefile                   | 2 +-
->  arch/mips/vdso/Makefile                              | 2 +-
->  arch/powerpc/boot/Makefile                           | 2 +-
->  arch/powerpc/platforms/cell/spufs/Makefile           | 2 +-
->  arch/s390/Makefile                                   | 2 +-
->  arch/x86/boot/Makefile                               | 2 +-
->  arch/x86/boot/compressed/Makefile                    | 2 +-
->  arch/x86/realmode/rm/Makefile                        | 2 +-
->  arch/xtensa/kernel/Makefile                          | 2 +-
->  drivers/firmware/efi/libstub/Makefile                | 2 +-
->  drivers/net/wan/Makefile                             | 2 +-
->  scripts/Makefile.build                               | 2 +-
->  scripts/gfp-translate                                | 2 +-
->  scripts/headers_install.sh                           | 1 -
->  scripts/sbom/tests/cmd_graph/test_savedcmd_parser.py | 2 +-
->  tools/testing/selftests/kvm/lib/riscv/handlers.S     | 4 ----
->  tools/testing/selftests/vDSO/vgetrandom-chacha.S     | 2 --
->  21 files changed, 17 insertions(+), 25 deletions(-)
->=20
+[...]
+> ---
+>  Makefile                          | 12 +++++++++---
+>  drivers/of/unittest-data/Makefile |  5 +++++
+>  scripts/Makefile.build            |  7 +++++++
+>  scripts/Makefile.dtbs             |  2 ++
+>  4 files changed, 23 insertions(+), 3 deletions(-)
+>
 
-Reviewed-by: Nicolas Schier <n.schier@fritz.com>
+[...]
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index 4349108e75e1..22fbd5199091 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -38,6 +38,13 @@ include $(srctree)/scripts/Makefile.compiler
+>  include $(kbuild-file)
+>  include $(srctree)/scripts/Makefile.lib
+>  
+> +# Make DT directory targets reachable for architectures with a DTS tree.
+> +ifeq ($(obj),arch/$(SRCARCH))
+> +ifdef need-dtbslist
+> +subdir-y += boot/dts
+> +endif
+> +endif
+> +
+>  # flags that take effect in current and sub directories
+>  KBUILD_AFLAGS += $(subdir-asflags-y)
+>  KBUILD_CFLAGS += $(subdir-ccflags-y)
+> diff --git a/scripts/Makefile.dtbs b/scripts/Makefile.dtbs
+> index c4e466390284..c7ec2a2a308e 100644
+> --- a/scripts/Makefile.dtbs
+> +++ b/scripts/Makefile.dtbs
+> @@ -23,7 +23,9 @@ dtb-y           := $(addprefix $(obj)/, $(dtb-y))
+>  multi-dtb-y     := $(addprefix $(obj)/, $(multi-dtb-y))
+>  real-dtb-y      := $(addprefix $(obj)/, $(real-dtb-y))
+>  
+> +ifdef need-dtbslist
+>  always-y        += $(dtb-y)
+> +endif
 
+Looks good to me, thanks!
 
---FhzCQO4A3K0b968D
-Content-Type: application/pgp-signature; name=signature.asc
+Reviewed-by: Nicolas Schier <nsc@kernel.org>
 
------BEGIN PGP SIGNATURE-----
+To prevent too many ifdef/endif lines, we could use substution variable
+references in scripts/Makefile.{build,dtbs}, e.g.:
 
-iQIzBAABCAAdFiEEDv+Fiet06YHnC6RpiMa8nIiabbgFAmrkm8MACgkQiMa8nIia
-bbgYnhAAoBtAI6CuFq9HQy+0LMEBBrZiObTja20n/nhSog1KoLUqfiUozqhmkZ/q
-CT6UauaVVL+guGjUkQd4MU9Y4sF+qy0kKmfzavbo/MIofHFX6fypq5WinV83BS4k
-PfHvku6pkGUFMvVkCliG3iiJVbANl4MGycOY5VxIXI9veRse6+SRuWaP5fqRD0dv
-XZHNc+ZmLOMmkijTKgYUq7fUIdBhxmeq4Px5Q0aq0cESHCORoGOcUcdASB8KRxr/
-S2whk42NUvuQxJF/S68XDQ9N3LdkhPBY2Y0GHdcJ+esswGxGJVb7rfY38dRXkz8R
-a/X59L/D+n6k/1v/xfmmj36rd/INoushZOa+gNXEg5KPwORqTYICzhwVlfZz5mdv
-0XgTKePC+FBeKnCHfJjMK1P6SAnag5q59vu8MXmzNGH9HIhm2PzyPhRrPYA4lwBl
-N1Hh9kQBBwy4oEdLX69syKiLtIA3mDxbo80VqRIUm6MpUjxkTbkAgLQgfXDRz2M0
-Wa9/fDB/O1tJKj8IR8V+jbjPqz5/6/fNkpD9/6fpqvBgeD2vkjOk3q/IvTq5gvHK
-ApKpaLY5DYJBXdX80Rm5ofEmFac0/p9C+eX3ovHAHFIG7JPR5kTF3fwDtbSbP7z6
-ghTZsJCcqEgyM22oqOSpskYbUmxnPEnUkGMg6K1a7KZPgUJQ9zA=
-=Pwya
------END PGP SIGNATURE-----
+always-$(need-dtbslist:1=y) += $(dtb-y)
 
---FhzCQO4A3K0b968D--
+-- 
+Nicolas
+
