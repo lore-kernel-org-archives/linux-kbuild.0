@@ -1,88 +1,109 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.168.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793362574;
-	b=JCjElW5F7X8y31/MeW6DLnYDpXh7yRPxkVNLGQamqREj+MWLi+9vuj8soLUQyTtuD6v5
-	 GuYSx4CDuF+LKjS4L0YaOYRK2MnU/JCEtizjyZ/0plVMjA/OAx4zcfM4fHN93bj6+yuLv
-	 zqtKsjOvp5ESU4h9pWxOBiF/zU+pGXx/aTf7u3YZNmEgQPOfm2d+K0vk107n9w4vyYvh+
-	 Uz/OJ19P2j8q5nLgcrPMUTpt3smNwkLUIIgDM8jAt46rWlsvGmDcFpHrlPHtBF3WYkb42
-	 NCgECxemsEjhFPNuYCVxnKILvJMR7D+Dutr1wnUSJ81DZdvxh0ep7NL6oHF6mlthKbw==
+	t=1793364618;
+	b=cAjV47l7rH3WAxLq7Vwqn9fOGqmcRJabWFijHSz+aU1FfqtmNso92LXhD8Wm96zZ3wPL
+	 s71np8KgLAK+CnOaqZevS3+N/SlEmn+ZlE8BJY4V44B7jkR+8ZUf8vxU7lCggwMJkNiY8
+	 jw9ydCe0jonG2fnV5EPGeg0N3SCfGjI0J0T+FS3J0AGXhOip6Ka+7txaPpHAgpeHLzpyF
+	 1VOlbXznkVUse+zBxdqEyvRKTfy6lxs1hLxJ2Ne7U0gawAfs2Yzm5vHiQiqDZgFqJ0q/2
+	 meBKhyHSPvr8+xeQTtbxaqyKkNkSapPerFGDcXYRTk+ZuLXT+m2sANNzxaHFr3+KlNw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793362574;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:Date:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	 Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer;
-	bh=zfGTr8GP82BAHjVGcRWUJj13EK5BmCatBJlN0vTN3F8=;
-	b=mTAriM7XQc7SrxFcGWZweISmRYoBTJt56SzaWXWuWWSIrdhkTomccDojoGPr93wpcFRZ
-	 gtTZo4N/vjq2d+KLvN/jq41aaExsCLI+6Ln0boDYrRzFBW1lex/mQEHZODQsxH1P14AJb
-	 aHfX4EC7NqfoLs0RzOTSU+9ydguScLqkrL7ab7FmXr/HP0ZydtX854TtVXXxREDIbvNpA
-	 hqR+L3IV+ukVx7pyRaDpJaivrKJmBMmm0sWeuJd9kcLf47TU6U5rkBGX3FXkJUKrrP5Sm
-	 PspJaApgFsHa/fseFSI+FyrrLcbJM18qM6KpRL5WFRyshtgSSfGqz3z7cGxJLLhTEDA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793364618;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
+	 DKIM-Signature:X-Google-DKIM-Signature:X-Gm-Message-State:X-Gm-Gg:
+	 X-Received:X-Received:Received:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:X-Proofpoint-Spam-Details-Enc:
+	 X-Proofpoint-GUID:X-Authority-Analysis:X-Proofpoint-ORIG-GUID:
+	 X-Proofpoint-Spam-Info:X-Proofpoint-Virus-Version:
+	 X-Proofpoint-Spam-Details;
+	bh=+36S2XfMH3Fmmp6nC8LledtkU6qCJGGKMmxe5Dy6N18=;
+	b=kuWvDjv/IPr0wHdNbIlmF/va5FkKN8kXndQx9LHIt2r9xg36tYtJTTLUVQXUAkhxiozi
+	 TFO9H2dIjWh2Gz6r8IVeHyad+RbHWXaBopt4GAGfGnqLsaH3XAOlN+N0Fpc5xq7FyIxG+
+	 wM0JzvoSYPl5kqU22b4FzPThFSJYi3F6FjRkUSG9Ae2l/v13y1Lhixb3b3p03pwOpQ9vR
+	 WWlg2+T+kO3wwl0OFeMmQB9onBwzDkC0rUKxdTHykE5msymLm1qPTfqjhQi/x7N0WSCRs
+	 O4ySnUn7/hIsp4kgvtgwi0CjkT6gV9Eke6IIEsOk7vVQCtMseJYlNwcwIuSD5wZ5BDQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linaro.org;
-	spf=pass smtp.mailfrom=linaro.org;
-	dkim=pass header.d=linaro.org header.i=@linaro.org header.a=rsa-sha256 header.s=google header.b=RrANfIKA;
-	arc=none smtp.remote-ip=209.85.218.52
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=oss.qualcomm.com;
+	spf=pass smtp.mailfrom=oss.qualcomm.com;
+	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=ScWgBRoi;
+	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=Fr8tmmEy;
+	arc=none smtp.remote-ip=205.220.168.131
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 560F9606A31C
-	for <linux-kbuild@vger.kernel.org>; Fri, 30 Oct 2026 12:16:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 560F9606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD302606A325
+	for <linux-kbuild@vger.kernel.org>; Fri, 30 Oct 2026 12:50:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CD302606A325
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=linaro.org header.i=@linaro.org header.a=rsa-sha256 header.s=google header.b=RrANfIKA
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-c468bd799ecso73700866b.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 30 Oct 2026 05:16:14 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=ScWgBRoi;
+	dkim=pass (2048-bit key, unprotected) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=Fr8tmmEy
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69UBG5qp2169739
+	for <linux-kbuild@vger.kernel.org>; Fri, 30 Oct 2026 12:50:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	+36S2XfMH3Fmmp6nC8LledtkU6qCJGGKMmxe5Dy6N18=; b=ScWgBRoisjo6bcu7
+	P5SRMb1wyAhYpNggksh+eq+iYxsVYjGMrxjc3KYI8rijyR7secQ3ot2dfUlEYSql
+	KttF74uobKkwHgM4p+tfKTwDGuCDB6zCNz2mvALPEs3FD2PsooWXRw4Qk7TyqkS5
+	P1cykXo7eDnV/etd686Y2aUv2/G4rFxhsx4kgzB5ofN5UF2SAtJYbg6jSFMrcUCQ
+	o0UPXiCg6mZlFFEgGhVDKcYaxIGDKSAGJpO1kAsFEKgiSO2LP6oVruFdok3N5+oC
+	LuCL8ekSVMdsoAGF3smEpInCy8xopFJVp+CDUP8M7HXMSupbTvuAYRtpZq3r/Bsk
+	ldT4Pg==
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com [209.85.222.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hme6pb2ww-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-kbuild@vger.kernel.org>; Fri, 30 Oct 2026 12:50:16 +0000 (GMT)
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-93edac5877bso5093985a.1
+        for <linux-kbuild@vger.kernel.org>; Fri, 30 Oct 2026 05:50:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1793362573; x=1793967373; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:content-type
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=zfGTr8GP82BAHjVGcRWUJj13EK5BmCatBJlN0vTN3F8=;
-        b=RrANfIKAnQwplsmZf36+g8+qb3TJPI+P1KTq3sqddtfDdH+c//CF5suiAvJdCgHaPG
-         qb+fo4e1Wwqk3uokpKcZliooux8JXq1kiQnTeCH4Fn9C96BP8RWlLJs61pZqqDMFL7ZY
-         cT9mork83Z4eIk3vT9UcY97Fi+tQSgAO3GSsWBMyW6KPO5kBQ+9jQc/7cRyP08tS44IT
-         UJjhAcCL33stKASvnoauVxdJVVHIJ1lJQ9TvmvjGdyLHE1R598R4G8ZZ9qqf4/Blv8pO
-         Gmmdt1iwM4zUhSHyJqYMqmTI8OURU06VfhtmDaWPvxeWg5Bo0+9gVkZT2rfWVOiY8cON
-         2+ZQ==
+        d=oss.qualcomm.com; s=google; t=1793364616; x=1793969416; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=+36S2XfMH3Fmmp6nC8LledtkU6qCJGGKMmxe5Dy6N18=;
+        b=Fr8tmmEyUbTYsgDcoqM8Co4LLyDE3W0g/CEm2o3CElDpiy08PqkZoU4enMqNVaVYIf
+         dmohnJNxXdrofJNRbwihwtuq3wgVorSx+1k5f+VdnwZBcPGgZaNsMal9dAU4B/eXMrPm
+         UaS721UuBOEefzrt+1GpmsYPQ6T+0GW5aFqBk+GAula3HB3BitfqDKTdj9TL6E70yfRH
+         qW/9ku3lly2ReVVYZe1TfiG/5PzZBnXY0R4nepFAZi/+DW3aOVU10Anh7PVEg8DKTlNs
+         G6Cbb0fRY7Z6xd+0HnRpSzK4m786Ip6OxOZQeEjpvfIfkQw0dmW3EyMAoplN32HBPZeC
+         fXkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793362573; x=1793967373;
-        h=cc:to:message-id:content-transfer-encoding:content-type
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=zfGTr8GP82BAHjVGcRWUJj13EK5BmCatBJlN0vTN3F8=;
-        b=spnJCobicsJ5fNTEzCr8od9qrxbGwhXCnHRAAmCWCC4ttYKx1bx/GcBsU6Cp99WDTS
-         LRZrLboSW3uq1lGZjmtU1iSZ5lKCkXSEj4ALBQb9Tz3ejyMPtN8X7D4AzjNTMfaG7yo8
-         zmmQoqygMeeThiWVS40I1y+WjORoP9ts5dJNlqh2QgDrjmXF2dakZPtftcZPho4Y2AJd
-         pvKHiIaSmVbKHzDOv75mNDtaOB626up7NC1Q0xz0ZBV5pCaxGgVjg68FZLHlY5cMoDfS
-         O8/5cZekC59nzGgqbWnQJJ5VfTWHhAVRuzaPNBc3wAZjbTWLZBZeKcuDh6MeasVpSGtV
-         JiEA==
-X-Forwarded-Encrypted: i=1; AKwUvBwSUjA6RtTbH40v/2IAAJjBw4gv9oDZMp1CDbQwY2hgC4SubQWWj0kckIuriFN5MLD6CJMgtXXhmAOyriA=@vger.kernel.org
-X-Gm-Message-State: AFq9FYL5Oo5b422CC0sa5asWEG0onjGTMkOXxEnURCUOgW+iD4Txl941
-	YmCabzD5enwBJGUUSug0F/3wsLODlRJlU10uiecbp30J8qu4ckS8De+8mZtR95P0UuI=
-X-Gm-Gg: AYBFou1jhi1korCv5oQSEoqpa/jtNKBVWtVf1exFWn2jrkVnZlnSu0nJYiJD4RyUYAI
-	aR4rFNahV9gDV5TVmPX2VRqLZevs3XsYltIeX/PU7qOl/He0DwyfxF5L1w9n63ImQVvR2K1gIlq
-	c5kspz10KQOLHzeB4TkzrVCZCTnVifesIwnnaQXGC8GZggEf4lz3/lb1yAA8IZU5A4zMpX4nnX3
-	MZZFZrFLQtlhvUe8XigRbzt/wE3bdZ4voOyuNKILIYATWpOxpRV7wta2bLBnERyUdg5tjXB1ar0
-	A3MzzX7j3WK56MX7PBdt7L93yFYg+LMoYW3vgJsUBEFo90NF2FKhOmSX+3twL2Cya3c9Xb7sKdu
-	P8TCBgDMB0X8uU8Fdg7GzH2f7U3bhlSvbtomVLv9ZLPJtO01NmClnY1CKfwLu9RZnu2sSPmUOgb
-	adz4Oa9sgkQnAfZ4kQIFdcc63jO4zUsLovjnqISFiMQkH/wJIpYaH5h6PBcgYXXpba7rsI0vuBG
-	vPAf1t+cITsh1KPbomn8V+ZB0Jm+vy9nxP9MuJ9hKaQyJNsSc3Dm4JKasXyoBbA4a2g/S+UHsfF
-	f6lW1VqLBVg7Afdxf3BbfuTsaCe9lMZWAtUkNG/kyvDYDfKdqH6VqM7cffVc5kCeiptsY0KcsYW
-	EVB9Pj1EY+kK6IUQC6YTG
-X-Received: by 2002:a17:907:86a7:b0:c40:80eb:c54e with SMTP id a640c23a62f3a-c4ca792ea6fmr195573666b.4.1793362572692;
-        Fri, 30 Oct 2026 05:16:12 -0700 (PDT)
-Received: from puffmais2.c.googlers.com (180.192.141.34.bc.googleusercontent.com. [34.141.192.180])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c4cabe4aa12sm59377166b.52.2026.10.30.05.16.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Oct 2026 05:16:12 -0700 (PDT)
-From: =?utf-8?q?Andr=C3=A9_Draszik?= <andre.draszik@linaro.org>
-Date: Fri, 30 Oct 2026 12:15:53 +0000
-Subject: [PATCH 6.12.y v2] kbuild: link-vmlinux.sh: improve detection of
- third pass requirement
+        d=1e100.net; s=20260707; t=1793364616; x=1793969416;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=+36S2XfMH3Fmmp6nC8LledtkU6qCJGGKMmxe5Dy6N18=;
+        b=YxzQ70NUz/91EotwiowWe0om+N9oy4L2M4VA8TW77AUTiA4NHtwhcmcEptw2muEp8o
+         POMOZbpaLe/FYPFvtsiPN/00jVZmvV2A0YJknLqLJZxr/jKqOtbnkHjTPdoGtiZBmZgK
+         iAnYQVsVqLi+5y89l3DRLLRWmbEaLcsI+tVsM8EqTyzCbNvD32hWMmXIaswM442YgHWI
+         Tm1ZnFWMxWFqoQtochtHrYnD80x2ixPcrx5Vpv9kSuj/thaaTG0O6FYc9lXng8VCNnRk
+         nhokQ70bOI5+xmpYBhJmZehY+Bbkdny8jWvFl5FRVGT2dAzzpBBDxFe5kGTAMf5RT2JJ
+         YvsA==
+X-Gm-Message-State: AFq9FYI8H2LAdWybsYtqCZCK67sAmodDYLbONcYaA3HESaXmj3KdT/Ho
+	JuJPcpMZISKHyOOVb/4jcJdVFT9zjfR9eiDuv3xtw6C2OQcdeBOk2rbeT21iI0kuzBz6YsGUjOD
+	9j6jOLJHMfuVluJwSSBLXVHXDO7iJtCHLEU6bF9UoyL9nNteeX9xpqLyWMPu7UJZjWsE=
+X-Gm-Gg: AYBFou2r7xMYyYjfQSWgRChBMmXCscl9nLM3/LwM9buqcNKQwRgqYTDX+CNzADtWsax
+	+o3enWjJTaWN0LMbefW4L+AJyjMP7vpZh8NNshRueXaqLcguglCsBKUH73QvAl+JrcpHCgaI6fi
+	9yC1G5yu/bVeI9pbOF2rKl6j1sf4KG4jcbz/y/1g4nrvsUy2L7sLk1EmTHkv64KkV/YkLM0p2Qz
+	4Ydt9jSTZCUwQCipj4A81OM9/BFBMKd0gzhl5BVBYWMsa4KNTjiLfNURJT8BFPwMHmnUlhlLMrV
+	MoHj1bcGVYC/c97KVtL5N+aip45oLhe5sIifmNVlKBSdE6QiuPm0W5GIFGr3ffU1dWYPaAaRjdN
+	RPipPE0aKGpcYj6//SyYaG5Ab4ye9EsbKNhpgdWS8LvmvV0a69x5/nmzvTI02uPN6mAumBs8=
+X-Received: by 2002:a05:620a:a8d5:20b0:93f:1eb0:88bc with SMTP id af79cd13be357-944214c4e2dmr364698785a.1.1793364615933;
+        Fri, 30 Oct 2026 05:50:15 -0700 (PDT)
+X-Received: by 2002:a05:620a:a8d5:20b0:93f:1eb0:88bc with SMTP id af79cd13be357-944214c4e2dmr364694985a.1.1793364615590;
+        Fri, 30 Oct 2026 05:50:15 -0700 (PDT)
+Received: from [10.169.205.110] ([178.235.128.140])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c4cabe8f9bbsm62954366b.67.2026.10.30.05.50.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 30 Oct 2026 05:50:14 -0700 (PDT)
+Message-ID: <415ffc75-d1ed-4540-9a55-dde0f6bd24cd@oss.qualcomm.com>
+Date: Fri, 30 Oct 2026 13:50:12 +0100
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -92,131 +113,68 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20261030-linux-kallsyms-fix-6-12-v2-1-689a11cb5b7b@linaro.org>
-X-B4-Tracking: v=1; b=H4sIAHiK5GoC/4VNSw6CMBC9Cpm1QzoDqeDKexgWDQzQiNS0SiCEu
- zvhAr7d+++QJHpJcMt2iLL45MOshC8ZtKObB0HfKQc2bMkUBic/f1d8umlK2yth71e0SIzs7LV
- 3UpECtP2Oot65/ACbE+cbNKqPPn1C3M7DhU737/ZCSFi3ZdFWNXdiyrsmXQx5iAM0x3H8AD53d
- UvHAAAA
-X-Change-ID: 20261030-linux-kallsyms-fix-6-12-2a67fae81111
-To: stable@vger.kernel.org
-Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
- Peter Griffin <peter.griffin@linaro.org>, 
- Tudor Ambarus <tudor.ambarus@linaro.org>, Juan Yescas <jyescas@google.com>, 
- linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
- kernel-team@android.com, 
- =?utf-8?q?Andr=C3=A9_Draszik?= <andre.draszik@linaro.org>
-X-Mailer: b4 0.14.3
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] drm/msm: Fix GMEM_BASE on a8xx
+To: Connor Abbott <cwabbott0@gmail.com>,
+        Nathan Chancellor
+ <nathan@kernel.org>,
+        Nicolas Schier <nsc@kernel.org>,
+        Rob Clark <robin.clark@oss.qualcomm.com>, Sean Paul <sean@poorly.run>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Akhil P Oommen <akhilpo@oss.qualcomm.com>,
+        Dmitry Baryshkov <lumag@kernel.org>,
+        Abhinav Kumar
+ <abhinav.kumar@linux.dev>,
+        Jessica Zhang <jesszhan0024@gmail.com>,
+        Marijn Suijten <marijn.suijten@somainline.org>,
+        David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        freedreno@lists.freedesktop.org
+References: <20261029-drm-msm-gmem-base-fix-v2-1-26b338471b46@gmail.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <20261029-drm-msm-gmem-base-fix-v2-1-26b338471b46@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDMwMDA1MSBTYWx0ZWRfX5mzOctk41w63
+ W3Gg0Dv7k6ASXcWSySahNwUFmKyAArb/ADkI6Ax+mtsjM+Jxu6hHKIdvuQaI6k8yF2gRi+4qq4d
+ 9KuGZ+OQXCU5d+AgdKhWDtMC4GT/gVpWkM2mUz4c1GfXdac9zR7BhlPoVAIg7HNgp7st+AXvgfP
+ xetMtqW9MPnLZhWiXNAuGLMqL3NWc/5H+wvDAJMAfXGVuu9SmS4f8BLj1hlXYK1tlhI2iwuF6kU
+ ysDcLtTvg0uU047OYdPy9m/9kPR4aWr8BlM91bSYjv+z47H7hmexzY47DEWrNZCqC4hqrMjbK+b
+ vFj11kgD8xp8hz+HSt5qxsSb5gbZ/Xe0KvUdLFUVGaykJ2wsy5eLBWBx72x953xOAhzk1RfGZhU
+ sGgSrjn2pko7uz0scMBDXGl62J7iC0K7LWM7hjGmlzZazpjNpnwA23F1ibMzICnsbIIMHdRRg65
+ tcsTRi7h3SHuEcMFu+Q==
+X-Proofpoint-GUID: UsGtYBB-9zV1MSgjWj3IsWLW2dLPGUNp
+X-Authority-Analysis: v=2.4 cv=Lp4HWXdc c=1 sm=1 tr=0 ts=6ae49288 cx=c_pps
+ a=50t2pK5VMbmlHzFWWp8p/g==:117 a=PRfkaYvzSr8QmIIGAkY2Sg==:17
+ a=IkcTkHD0fZMA:10 a=660iZSQnnn4A:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=YMgV9FUhrdKAYTUUvYB2:22
+ a=pGLkceISAAAA:8 a=EUspDBNiAAAA:8 a=XAuXcVFvbmlwbjzS6hgA:9 a=QEXdDO2ut3YA:10
+ a=IoWCM6iH3mJn3m4BftBB:22
+X-Proofpoint-ORIG-GUID: UsGtYBB-9zV1MSgjWj3IsWLW2dLPGUNp
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMDMwMDA1MSBTYWx0ZWRfX9AQXYxSkml1H
+ c8MhiLLrwOR6rPeS/Otvx+pvYETWE3v2RjnW/wh7A9kUUGm5RvePEqcMHXv34j8QFLysd/e5X7s
+ D+FdYBTfGvSXw7OTUIaNqWNfvNKi8IE=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-10-30_04,2026-10-21_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 adultscore=0 malwarescore=0 clxscore=1015 impostorscore=0
+ spamscore=0 lowpriorityscore=0 bulkscore=0 priorityscore=1501 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2610190000 definitions=main-2610300051
 
-commit 14b8b4bf2d7bd5d58c17adbeed0edfda1dfc1a7f upstream.
+On 10/30/26 12:02 AM, Connor Abbott wrote:
+> This was missed during initial bringup because GMEM_BASE is not used
+> anymore for textures on a8xx. However other things such as mesh shading
+> still use the GMEM aperture. Fix it to match the value programmed into
+> the registers.
+> 
+> Fixes: 288a93200892 ("drm/msm/adreno: Introduce A8x GPU Support")
+> Signed-off-by: Connor Abbott <cwabbott0@gmail.com>
+> ---
 
-It can happen that symbol sizes within .tmp_vmlinux1.kallsyms.o and
-.tmp_vmlinux2.kallsyms.o differ, without affecting file size on disk
-because of section alignment and/or padding emitted by the assembler.
+Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 
-link-vmlinux.sh doesn't detect this case currently and keeps using
-.tmp_vmlinux2.kallsyms.o to link the final vmlinux. Due to the
-different symbol sizes, other symbols are shifted within the final
-image compared to .tmp_vmlinux2, and the final comparison of System.map
-against "${kallsyms_sysmap}" fails with the message:
-
-    Inconsistent kallsyms data
-    Try "make KALLSYMS_EXTRA_PASS=1" as a workaround
-
-This can happen in particular if the linker emits additional symbols
-that might have different names between our (re-)linking steps, e.g.
-because those names depend on the virtual address of the symbol. Linker
-stubs for ARM errata work-arounds are one such case.
-
-These changed symbol names can cause the output of the token
-compression of kallsyms.c to change due to the changed symbol substring
-count, which in turn can change the size of the kallsyms_names symbol
-itself, causing the potential shift of subsequent symbol addresses in
-.tmp_vmlinux2.kallsyms.o and therefore the final image.
-
-Update link-vmlinux.sh to not rely on file size of
-.tmp_vmlinux?.kallsyms.o alone but to also consider symbol offsets
-within to resolve this, and do a third pass if required.
-
-Signed-off-by: André Draszik <andre.draszik@linaro.org>
-Tested-by: Nathan Chancellor <nathan@kernel.org>
-Reviewed-by: Nicolas Schier <nsc@kernel.org>
-Signed-off-by: Nicolas Schier <nsc@kernel.org>
-[AD: adjust context]
-Signed-off-by: André Draszik <andre.draszik@linaro.org>
----
-This patch fixes an actual problem people are seeing in various
-different kernel versions.
-
-The version from 7.3 doesn't apply cleanly on 6.12 and a minor context
-update was necessary.
-
-The bug was introduced by 7e2b37c971a2 ("kbuild: kallsyms allow
-3-pass generation if symbols size has changed") in v4.10.
-
-Cheers,
-Andre'
----
-Changes in v2:
-- drop a left-over sentence from the v6.18 version of this patch that
-  doesn't apply here anymore
-- Link to v1: https://lore.kernel.org/r/20261030-linux-kallsyms-fix-6-12-v1-1-9c43c892de04@linaro.org
----
- scripts/link-vmlinux.sh | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
-
-diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-index 94f794ca11ca..a5729419a452 100755
---- a/scripts/link-vmlinux.sh
-+++ b/scripts/link-vmlinux.sh
-@@ -131,6 +131,18 @@ gen_btf()
- 	btf_vmlinux_bin_o=${btf_data}
- }
- 
-+# Check if kallsymso_prev and kallsymso differ
-+# If symbol sizes within ${kallsymso} change, any symbols within vmlinux are
-+# likely to shift, invalidating ${kallsymso}.
-+# Since file size can remain unchanged even if symbol sizes change, compare the
-+# actual symbols instead of relying on file size only.
-+kallsymso_changed()
-+{
-+	${NM} -n "${kallsymso_prev}" > "${kallsymso_prev}.sym"
-+	${NM} -n "${kallsymso}" > "${kallsymso}.sym"
-+	! cmp -s "${kallsymso_prev}.sym" "${kallsymso}.sym"
-+}
-+
- # Create ${2}.o file with all symbols from the ${1} object file
- kallsyms()
- {
-@@ -151,6 +163,7 @@ kallsyms()
- 	${CC} ${NOSTDINC_FLAGS} ${LINUXINCLUDE} ${KBUILD_CPPFLAGS} \
- 	      ${KBUILD_AFLAGS} ${KBUILD_AFLAGS_KERNEL} -c -o "${2}.o" "${2}.S"
- 
-+	kallsymso_prev="${kallsymso:-}"
- 	kallsymso=${2}.o
- }
- 
-@@ -263,7 +276,12 @@ if is_enabled CONFIG_KALLSYMS; then
- 	sysmap_and_kallsyms .tmp_vmlinux2
- 	size2=$(${CONFIG_SHELL} "${srctree}/scripts/file-size.sh" ${kallsymso})
- 
--	if [ $size1 -ne $size2 ] || [ -n "${KALLSYMS_EXTRA_PASS}" ]; then
-+	# Due to alignment, file size of the kallsymso object file might remain
-+	# unchanged even if individual symbols within change size. Changed
-+	# symbol sizes can still shift other symbols, though. Therefore, don't
-+	# rely on file size alone.
-+	if [ $size1 -ne $size2 ] || kallsymso_changed || \
-+			[ -n "${KALLSYMS_EXTRA_PASS}" ]; then
- 		vmlinux_link .tmp_vmlinux3
- 		sysmap_and_kallsyms .tmp_vmlinux3
- 	fi
-
----
-base-commit: 85d82e0d7c2dfd3e75d34f35b7ebbf41f45c9c4e
-change-id: 20261030-linux-kallsyms-fix-6-12-2a67fae81111
-
-Best regards,
--- 
-André Draszik <andre.draszik@linaro.org>
-
+Konrad
