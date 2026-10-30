@@ -1,127 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=202.12.124.155
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.52
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793361202;
-	b=4rMctJWqLobepyqCLa/Ngr7JJjTmj1txLAHmB6MASSqIXtEbmBjZmpWXGzazdEy2QSm5
-	 fX6tLXD3Zg/0pgVZPbS8eO4aJ+PG7beajWJotQ9Kg2BcwhoyBGLx6B0lZSkMxdBwBfWj9
-	 wNoNWEMGJCD/vAicwkpj4gV7Cs43GuHB7s84yX8R/hUY+bKoBaiEOjFWOyHuiPD6Gj7HJ
-	 zudP73PV5fIX8vksqVKidgxMT4qfL/bbAxuckeWo3xpNp/tTPIf3ugDjd9mM/Ap5VpArt
-	 oxW7f9wPVDxRIwm21ZEqnU/wDEZUa5bUiHWIF4XwgtiUsX5xQDlwW8Y3Y2qCCKiDTIg==
+	t=1793362574;
+	b=JCjElW5F7X8y31/MeW6DLnYDpXh7yRPxkVNLGQamqREj+MWLi+9vuj8soLUQyTtuD6v5
+	 GuYSx4CDuF+LKjS4L0YaOYRK2MnU/JCEtizjyZ/0plVMjA/OAx4zcfM4fHN93bj6+yuLv
+	 zqtKsjOvp5ESU4h9pWxOBiF/zU+pGXx/aTf7u3YZNmEgQPOfm2d+K0vk107n9w4vyYvh+
+	 Uz/OJ19P2j8q5nLgcrPMUTpt3smNwkLUIIgDM8jAt46rWlsvGmDcFpHrlPHtBF3WYkb42
+	 NCgECxemsEjhFPNuYCVxnKILvJMR7D+Dutr1wnUSJ81DZdvxh0ep7NL6oHF6mlthKbw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793361202;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
-	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
-	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
-	 Received:Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:Content-Transfer-Encoding:
-	 In-Reply-To;
-	bh=mEwGWDcHWaLkp+5zlz9DxIZFTTgCkctRKHzPuG+Jo+M=;
-	b=rx8o9+llvBWb6a4yV2fhehvOdEG3FHA+4t542WpJoklPx7aI6TDSeY0XYWMoyLC60vKZ
-	 EFhSJrGYT3DWVOSikgLDNz3J6cH9Xxulq9bQwG6UVPDrvpFMzWZe9t85D5Etnd1tZ5fRe
-	 po3qlbFlrqrIsNjOpX9wQTzhTmLRdsItMqHYPtbQwDUbweiMN75U88RQCF6prmg3pK4fy
-	 rZQpxuEHBHmPg0u2BQg7MNl+qGnQYNQbT0PrkSzDp7yCATwZs8QRJBkShP9lZ2gAasoJC
-	 s19M/5fPVhTYudEt0VsbxPuAhwdPrNsNRGzhC+g8qLc/tkQxsxRsRn4sYqr1XlW9iHQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793362574;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:Date:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	 Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer;
+	bh=zfGTr8GP82BAHjVGcRWUJj13EK5BmCatBJlN0vTN3F8=;
+	b=mTAriM7XQc7SrxFcGWZweISmRYoBTJt56SzaWXWuWWSIrdhkTomccDojoGPr93wpcFRZ
+	 gtTZo4N/vjq2d+KLvN/jq41aaExsCLI+6Ln0boDYrRzFBW1lex/mQEHZODQsxH1P14AJb
+	 aHfX4EC7NqfoLs0RzOTSU+9ydguScLqkrL7ab7FmXr/HP0ZydtX854TtVXXxREDIbvNpA
+	 hqR+L3IV+ukVx7pyRaDpJaivrKJmBMmm0sWeuJd9kcLf47TU6U5rkBGX3FXkJUKrrP5Sm
+	 PspJaApgFsHa/fseFSI+FyrrLcbJM18qM6KpRL5WFRyshtgSSfGqz3z7cGxJLLhTEDA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=kroah.com;
-	spf=pass smtp.mailfrom=kroah.com;
-	dkim=pass header.d=kroah.com header.i=@kroah.com header.a=rsa-sha256 header.s=fm2 header.b=OduHKrdj;
-	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm2 header.b=TWlNGqou;
-	arc=none smtp.remote-ip=202.12.124.155
-Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=linaro.org;
+	spf=pass smtp.mailfrom=linaro.org;
+	dkim=pass header.d=linaro.org header.i=@linaro.org header.a=rsa-sha256 header.s=google header.b=RrANfIKA;
+	arc=none smtp.remote-ip=209.85.218.52
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C542606A320
-	for <linux-kbuild@vger.kernel.org>; Fri, 30 Oct 2026 11:53:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8C542606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kroah.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 560F9606A31C
+	for <linux-kbuild@vger.kernel.org>; Fri, 30 Oct 2026 12:16:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 560F9606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kroah.com header.i=@kroah.com header.a=rsa-sha256 header.s=fm2 header.b=OduHKrdj;
-	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm2 header.b=TWlNGqou
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id DEB747A0176
-	for <linux-kbuild@vger.kernel.org>; Fri, 30 Oct 2026 07:53:20 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-04.internal (MEProxy); Fri, 30 Oct 2026 07:53:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1793361199;
-	 x=1793447599; bh=mEwGWDcHWaLkp+5zlz9DxIZFTTgCkctRKHzPuG+Jo+M=; b=
-	OduHKrdjxLHqfWqkH47Pk8WAuoHC51BqVU1eRRF/+bIDc8PCxQTnshkozUg+aASF
-	umVej2dIhOaNWF5l+S5s6xXAPC35acNgGffhoQQyiR2e1hB3NKGxW8CcZDtWK7V9
-	CGPh/c5xh9YIyzsLFR3g4WbdII1Ls4gmypJH4wYaxR9RIePewXL3y8EDrrVinzou
-	6ET+9RPSmc3/eU0kZnvziSPwpTFw0D3Bf1zE9EZmOIteD4Srn13cED/dpjQKsuL5
-	Acbw2rqhCDPTkKKpUVA0R315zSOD3JFFwxkuZHaoR6tsoggkF065ArkvButpsIhQ
-	PPjYqrHLZLRDboEa76GWCw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1793361199; x=
-	1793447599; bh=mEwGWDcHWaLkp+5zlz9DxIZFTTgCkctRKHzPuG+Jo+M=; b=T
-	WlNGqouRtvVS0LQGjQ1mTXe5d8y/P/GN5Mzjg/dAs0TLEvjDjRbr/Xuk2rPt6L7C
-	nkF/2to8mnrmFuUyGqaoVsblDJWsa3VpEkZmHsl3W5Xk7OnmvZZGTyzmd7pS1ofT
-	v4wP3k1li+mtQz0Al7JIwaOwzI9MTi/miJsreoVMLYfqoBEdrMq6CusEMRNfsMP1
-	eX2jZzBH3k1l8L7XJpaRAD0Fy1kdqcPSYiYqFcJPZZMI2YMh2VKpI0mMro7ZvSti
-	k8X6Bgr9ddVwvE9RcpvDWOIEPs+ZhVXA4Dl+MtnYQupyXIRzUurtnLibwfJAcQsL
-	pjLUZulrzw8Phs/WENQIw==
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-08;
-	repo=github.com/dkim2wg/interop; date=2026-10-28; sw=lmtpprox;
-	action=sign d=kroah.com a=rsa-sha256;
-DKIM2-Signature: i=1; m=1; t=1793361199; d=kroah.com;
-	mf=PGdyZWdAa3JvYWguY29tPg==;
-	rt=PGxpbnV4LWtidWlsZEB2Z2VyLmtlcm5lbC5vcmc+;
-	s=fm2:rsa-sha256:qFPJPFWwmTxQdHgugOJfykpwRfIzOhe3T68UQg8I2K4IHta
-	QN1pT3/ySHaNtkHromJgqeXTPAT/pomKyenP1eK0bd8zbHfbYsU7QRTZRtTzUvxe
-	Tkn9Cf9yzKpLJZeLUDjRXtzOeI5QoWGIKLO5IqUR72AghngY4BqenMymSP8FPt2j
-	GhEOLgzntq1iDTZ+R9hoXrjHu/Emv7opH1zT+zicAWCh+ZKUfTDRKUb5KsG/oRl4
-	AMU1hwLxIOU++zBlotCjlb0toq3SD8zR4dKdE2Zie6kbrns7uU5k6jA8LZJwW3g5
-	5+l95jiuRCJi3bghkAG7SRO7TUHtFPlA6kK7Nzw==;
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-08;
-	repo=github.com/dkim2wg/interop; date=2026-10-28; sw=lmtpprox;
-	action=mi-m=1; hc=13;
-	hn=cc,content-disposition,content-transfer-encoding,
-	content-type,date,feedback-id,from,in-reply-to,message-id,
-	mime-version,references,subject,to;
-Message-Instance: m=1; h=sha256:V4y0ikRh81F+RID/yOa7HlyVsvAbPD4YKARZyZXv5Ag=:0JVONLFZZ6gdcHNYtO6dkHTirj64Dd06EGzmrIVkx10=;
-X-ME-Sender: <xms:L4XkalSTELpaOjoPV5wgE3etxk6Ouy9Niu4i2WpNS9dg3FF92RGi3g>
-    <xme:L4Xkal3JN4cRSU-hWOFa1HbLS0cwYrZd8iHZzzHr3wHx_9chMjaeqVFL_NppHwhFN
-    d_d6e1ukDjq2bSPbzp7Xv-0lDg7AiIRnVWnnJ5Zmx1Sxz_C7g>
-X-ME-Received: <xmr:L4XkaihsMAM_2i2ou2atD8C13U4odde8xkHkOgvlw3DcisR2JgEuluVNZhnqv2h5qBNhTwdJfhz6QbKXZRTiZ4ATiqdgSahTf85EvS-BmcE>
-X-ME-Proxy-Cause: dmFkZTEBWqqmyo8WB757nOxa4NgheVxOazllpBg/uwyCy1WpruXXxJMwk3S6kGXmYsA9rV
-    sfC5NH7ZbVQhCogp7GeP7Lzp6WwVJ6E1lea57cp5XnTRMuQGb//5jk4TQgvFw7cMrqOagE
-    UB/k8vt0BE8fRdw3mAHLvln8H5OtkzHBw8WLX12WOW+pCRvl5flwXlrVOhCFUCTROQ81Xz
-    LMSBXtLcyK+tPsBpjq5XeDEmBKExEP3h7+oZ2cRMrssXfZRVynt1rSeHO174JNu0uVdgXh
-    V9A2Vw0oSAiUGaL9y33oKNW3og02Qlib1dlwTBGNIZ2EMuuhluFNJn0olECi8qu0UxQ+E+
-    Z+d0/vujMxEHLagG/e90BGJSp+l7tWnbpCRSSMNW45V3znRsicLqSl11JaR42Dzx7jfCcS
-    4gI9vsrXGWKPcup6C/lhsOM8tl+OiLv0ovYrx56hLiEcIZziTJM5o+LoqfmGsW5emksxh3
-    iwEczJhX+AVfPR1sZLbxASozapHrzWF6v6A/xX3vvRs0/cYUPmGy+4wLJlunZKPqCh8+WV
-    PzV4NNb0LVstsuyeBo/UkibUxQxcxirdAnMOlefdPv+P78pDQ7wSVsaHrpv6j0U63J81Ng
-    fhY2y0qEXzoR6r88GHpTO68sjld/ZIwx1BBWTNPaIh+rIQP7hZorWUThTV5Q
-X-ME-Proxy: <xmx:L4XkajaxuAubDwwvr9MHmGh66qeeBk2vqifq-HGRM1NI4UDrXRE2QA>
-    <xmx:L4XkarMFXJ2YP0VR1RODYff8fVl-DPRxHJmsXUJoIizgReGMHYWEYg>
-    <xmx:L4XkanTwIsYXchNn_DDMQvGU5p6FpRsiWoDCMZ8dNV-nCB7LuAyUJg>
-    <xmx:L4Xkau6dB5-qnWCgy6FLl1QaM4G_efR5BkY0CrVxsWsE0WEkFiUoqQ>
-    <xmx:L4Xkamh-LqP2X8gIkcNJgpxS0Q1ssTXeK3iRUODnv3JB2mdPj5fIQhVH>
-Feedback-ID: i787e41f1:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 30 Oct 2026 07:53:18 -0400 (EDT)
-Date: Fri, 30 Oct 2026 12:53:16 +0100
-From: Greg KH <greg@kroah.com>
-To: =?iso-8859-1?Q?Andr=E9?= Draszik <andre.draszik@linaro.org>
-Cc: stable@vger.kernel.org, Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>,
-	Peter Griffin <peter.griffin@linaro.org>,
-	Tudor Ambarus <tudor.ambarus@linaro.org>,
-	Juan Yescas <jyescas@google.com>, linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-team@android.com
-Subject: Re: [PATCH 6.12.y] kbuild: link-vmlinux.sh: improve detection of
+	dkim=pass (2048-bit key, unprotected) header.d=linaro.org header.i=@linaro.org header.a=rsa-sha256 header.s=google header.b=RrANfIKA
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-c468bd799ecso73700866b.1
+        for <linux-kbuild@vger.kernel.org>; Fri, 30 Oct 2026 05:16:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1793362573; x=1793967373; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=zfGTr8GP82BAHjVGcRWUJj13EK5BmCatBJlN0vTN3F8=;
+        b=RrANfIKAnQwplsmZf36+g8+qb3TJPI+P1KTq3sqddtfDdH+c//CF5suiAvJdCgHaPG
+         qb+fo4e1Wwqk3uokpKcZliooux8JXq1kiQnTeCH4Fn9C96BP8RWlLJs61pZqqDMFL7ZY
+         cT9mork83Z4eIk3vT9UcY97Fi+tQSgAO3GSsWBMyW6KPO5kBQ+9jQc/7cRyP08tS44IT
+         UJjhAcCL33stKASvnoauVxdJVVHIJ1lJQ9TvmvjGdyLHE1R598R4G8ZZ9qqf4/Blv8pO
+         Gmmdt1iwM4zUhSHyJqYMqmTI8OURU06VfhtmDaWPvxeWg5Bo0+9gVkZT2rfWVOiY8cON
+         2+ZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793362573; x=1793967373;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=zfGTr8GP82BAHjVGcRWUJj13EK5BmCatBJlN0vTN3F8=;
+        b=spnJCobicsJ5fNTEzCr8od9qrxbGwhXCnHRAAmCWCC4ttYKx1bx/GcBsU6Cp99WDTS
+         LRZrLboSW3uq1lGZjmtU1iSZ5lKCkXSEj4ALBQb9Tz3ejyMPtN8X7D4AzjNTMfaG7yo8
+         zmmQoqygMeeThiWVS40I1y+WjORoP9ts5dJNlqh2QgDrjmXF2dakZPtftcZPho4Y2AJd
+         pvKHiIaSmVbKHzDOv75mNDtaOB626up7NC1Q0xz0ZBV5pCaxGgVjg68FZLHlY5cMoDfS
+         O8/5cZekC59nzGgqbWnQJJ5VfTWHhAVRuzaPNBc3wAZjbTWLZBZeKcuDh6MeasVpSGtV
+         JiEA==
+X-Forwarded-Encrypted: i=1; AKwUvBwSUjA6RtTbH40v/2IAAJjBw4gv9oDZMp1CDbQwY2hgC4SubQWWj0kckIuriFN5MLD6CJMgtXXhmAOyriA=@vger.kernel.org
+X-Gm-Message-State: AFq9FYL5Oo5b422CC0sa5asWEG0onjGTMkOXxEnURCUOgW+iD4Txl941
+	YmCabzD5enwBJGUUSug0F/3wsLODlRJlU10uiecbp30J8qu4ckS8De+8mZtR95P0UuI=
+X-Gm-Gg: AYBFou1jhi1korCv5oQSEoqpa/jtNKBVWtVf1exFWn2jrkVnZlnSu0nJYiJD4RyUYAI
+	aR4rFNahV9gDV5TVmPX2VRqLZevs3XsYltIeX/PU7qOl/He0DwyfxF5L1w9n63ImQVvR2K1gIlq
+	c5kspz10KQOLHzeB4TkzrVCZCTnVifesIwnnaQXGC8GZggEf4lz3/lb1yAA8IZU5A4zMpX4nnX3
+	MZZFZrFLQtlhvUe8XigRbzt/wE3bdZ4voOyuNKILIYATWpOxpRV7wta2bLBnERyUdg5tjXB1ar0
+	A3MzzX7j3WK56MX7PBdt7L93yFYg+LMoYW3vgJsUBEFo90NF2FKhOmSX+3twL2Cya3c9Xb7sKdu
+	P8TCBgDMB0X8uU8Fdg7GzH2f7U3bhlSvbtomVLv9ZLPJtO01NmClnY1CKfwLu9RZnu2sSPmUOgb
+	adz4Oa9sgkQnAfZ4kQIFdcc63jO4zUsLovjnqISFiMQkH/wJIpYaH5h6PBcgYXXpba7rsI0vuBG
+	vPAf1t+cITsh1KPbomn8V+ZB0Jm+vy9nxP9MuJ9hKaQyJNsSc3Dm4JKasXyoBbA4a2g/S+UHsfF
+	f6lW1VqLBVg7Afdxf3BbfuTsaCe9lMZWAtUkNG/kyvDYDfKdqH6VqM7cffVc5kCeiptsY0KcsYW
+	EVB9Pj1EY+kK6IUQC6YTG
+X-Received: by 2002:a17:907:86a7:b0:c40:80eb:c54e with SMTP id a640c23a62f3a-c4ca792ea6fmr195573666b.4.1793362572692;
+        Fri, 30 Oct 2026 05:16:12 -0700 (PDT)
+Received: from puffmais2.c.googlers.com (180.192.141.34.bc.googleusercontent.com. [34.141.192.180])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c4cabe4aa12sm59377166b.52.2026.10.30.05.16.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Oct 2026 05:16:12 -0700 (PDT)
+From: =?utf-8?q?Andr=C3=A9_Draszik?= <andre.draszik@linaro.org>
+Date: Fri, 30 Oct 2026 12:15:53 +0000
+Subject: [PATCH 6.12.y v2] kbuild: link-vmlinux.sh: improve detection of
  third pass requirement
-Message-ID: <2026103007-hundredth-deskwork-738e@gregkh>
-References: <20261030-linux-kallsyms-fix-6-12-v1-1-9c43c892de04@linaro.org>
- <3e4f24686842918a3a340cab4a7cbeb7540b8a1e.camel@linaro.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -131,17 +92,131 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <3e4f24686842918a3a340cab4a7cbeb7540b8a1e.camel@linaro.org>
+Message-Id: <20261030-linux-kallsyms-fix-6-12-v2-1-689a11cb5b7b@linaro.org>
+X-B4-Tracking: v=1; b=H4sIAHiK5GoC/4VNSw6CMBC9Cpm1QzoDqeDKexgWDQzQiNS0SiCEu
+ zvhAr7d+++QJHpJcMt2iLL45MOshC8ZtKObB0HfKQc2bMkUBic/f1d8umlK2yth71e0SIzs7LV
+ 3UpECtP2Oot65/ACbE+cbNKqPPn1C3M7DhU737/ZCSFi3ZdFWNXdiyrsmXQx5iAM0x3H8AD53d
+ UvHAAAA
+X-Change-ID: 20261030-linux-kallsyms-fix-6-12-2a67fae81111
+To: stable@vger.kernel.org
+Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+ Peter Griffin <peter.griffin@linaro.org>, 
+ Tudor Ambarus <tudor.ambarus@linaro.org>, Juan Yescas <jyescas@google.com>, 
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ kernel-team@android.com, 
+ =?utf-8?q?Andr=C3=A9_Draszik?= <andre.draszik@linaro.org>
+X-Mailer: b4 0.14.3
 
-On Fri, Oct 30, 2026 at 11:34:34AM +0000, AndrÈ Draszik wrote:
-> On Fri, 2026-10-30 at 11:29 +0000, AndrÈ Draszik wrote:
-> > xxUpstream 14b8b4bf2d7b cherry-picks cleanly onto 7.2; please apply it to
-> > the stable 7.2 tree as well.
-> 
-> Forgot to remove this stray comment from the v6.18 version. Please ignore
-> this line.
+commit 14b8b4bf2d7bd5d58c17adbeed0edfda1dfc1a7f upstream.
 
-Please fix it up and resend.
+It can happen that symbol sizes within .tmp_vmlinux1.kallsyms.o and
+.tmp_vmlinux2.kallsyms.o differ, without affecting file size on disk
+because of section alignment and/or padding emitted by the assembler.
+
+link-vmlinux.sh doesn't detect this case currently and keeps using
+.tmp_vmlinux2.kallsyms.o to link the final vmlinux. Due to the
+different symbol sizes, other symbols are shifted within the final
+image compared to .tmp_vmlinux2, and the final comparison of System.map
+against "${kallsyms_sysmap}" fails with the message:
+
+    Inconsistent kallsyms data
+    Try "make KALLSYMS_EXTRA_PASS=1" as a workaround
+
+This can happen in particular if the linker emits additional symbols
+that might have different names between our (re-)linking steps, e.g.
+because those names depend on the virtual address of the symbol. Linker
+stubs for ARM errata work-arounds are one such case.
+
+These changed symbol names can cause the output of the token
+compression of kallsyms.c to change due to the changed symbol substring
+count, which in turn can change the size of the kallsyms_names symbol
+itself, causing the potential shift of subsequent symbol addresses in
+.tmp_vmlinux2.kallsyms.o and therefore the final image.
+
+Update link-vmlinux.sh to not rely on file size of
+.tmp_vmlinux?.kallsyms.o alone but to also consider symbol offsets
+within to resolve this, and do a third pass if required.
+
+Signed-off-by: Andr√© Draszik <andre.draszik@linaro.org>
+Tested-by: Nathan Chancellor <nathan@kernel.org>
+Reviewed-by: Nicolas Schier <nsc@kernel.org>
+Signed-off-by: Nicolas Schier <nsc@kernel.org>
+[AD: adjust context]
+Signed-off-by: Andr√© Draszik <andre.draszik@linaro.org>
+---
+This patch fixes an actual problem people are seeing in various
+different kernel versions.
+
+The version from 7.3 doesn't apply cleanly on 6.12 and a minor context
+update was necessary.
+
+The bug was introduced by 7e2b37c971a2 ("kbuild: kallsyms allow
+3-pass generation if symbols size has changed") in v4.10.
+
+Cheers,
+Andre'
+---
+Changes in v2:
+- drop a left-over sentence from the v6.18 version of this patch that
+  doesn't apply here anymore
+- Link to v1: https://lore.kernel.org/r/20261030-linux-kallsyms-fix-6-12-v1-1-9c43c892de04@linaro.org
+---
+ scripts/link-vmlinux.sh | 20 +++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index 94f794ca11ca..a5729419a452 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -131,6 +131,18 @@ gen_btf()
+ 	btf_vmlinux_bin_o=${btf_data}
+ }
+ 
++# Check if kallsymso_prev and kallsymso differ
++# If symbol sizes within ${kallsymso} change, any symbols within vmlinux are
++# likely to shift, invalidating ${kallsymso}.
++# Since file size can remain unchanged even if symbol sizes change, compare the
++# actual symbols instead of relying on file size only.
++kallsymso_changed()
++{
++	${NM} -n "${kallsymso_prev}" > "${kallsymso_prev}.sym"
++	${NM} -n "${kallsymso}" > "${kallsymso}.sym"
++	! cmp -s "${kallsymso_prev}.sym" "${kallsymso}.sym"
++}
++
+ # Create ${2}.o file with all symbols from the ${1} object file
+ kallsyms()
+ {
+@@ -151,6 +163,7 @@ kallsyms()
+ 	${CC} ${NOSTDINC_FLAGS} ${LINUXINCLUDE} ${KBUILD_CPPFLAGS} \
+ 	      ${KBUILD_AFLAGS} ${KBUILD_AFLAGS_KERNEL} -c -o "${2}.o" "${2}.S"
+ 
++	kallsymso_prev="${kallsymso:-}"
+ 	kallsymso=${2}.o
+ }
+ 
+@@ -263,7 +276,12 @@ if is_enabled CONFIG_KALLSYMS; then
+ 	sysmap_and_kallsyms .tmp_vmlinux2
+ 	size2=$(${CONFIG_SHELL} "${srctree}/scripts/file-size.sh" ${kallsymso})
+ 
+-	if [ $size1 -ne $size2 ] || [ -n "${KALLSYMS_EXTRA_PASS}" ]; then
++	# Due to alignment, file size of the kallsymso object file might remain
++	# unchanged even if individual symbols within change size. Changed
++	# symbol sizes can still shift other symbols, though. Therefore, don't
++	# rely on file size alone.
++	if [ $size1 -ne $size2 ] || kallsymso_changed || \
++			[ -n "${KALLSYMS_EXTRA_PASS}" ]; then
+ 		vmlinux_link .tmp_vmlinux3
+ 		sysmap_and_kallsyms .tmp_vmlinux3
+ 	fi
+
+---
+base-commit: 85d82e0d7c2dfd3e75d34f35b7ebbf41f45c9c4e
+change-id: 20261030-linux-kallsyms-fix-6-12-2a67fae81111
+
+Best regards,
+-- 
+Andr√© Draszik <andre.draszik@linaro.org>
+
