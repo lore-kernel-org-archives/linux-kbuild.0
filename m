@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793480539;
-	b=hcW89zfjlfdNOOZkE7w0WmzmcTJeBxMF52X/tHzL5LvzbOcWdoSpA642owXZ6DhBh7D3
-	 thpikS3P+CxRezrW55Eaa0yZa2Zm0Yiw+gMAP9/cnSKuwZs+bbcm5cxBuI+cNOYpl7/++
-	 MD0ZOs/awexTW2jpnoZJQEWPyN7ajvOrOQ0Q03k3o6GiiAcW7Pxdq6TBqAmXVbE0q3C5J
-	 8+bv1jQ8O4DnquzKNAii3yN8lRZQW63ctDVzhMispQwXTf6t9eROeJ3zINIPwf+j4rs7G
-	 +NfU0J1aHzhrC8zncu0/FPigbPGY1+JrF4NZ/7tJ5Epeo+UhjMqkqUgAwKr77Hrya1A==
+	t=1793480540;
+	b=oMjNMfMls2kqO8Dz2J/IYKvO2a2CBfSeqydF56K/nzm6Qd6og6F5CoXD1Zs/DUUzU04X
+	 ZVF1nz7k/ifdtN1C7MCemydbai2dR477PHcSVQs4ipVJuyGNVBCbKdQYsZFf+WaxDQCk1
+	 g/YNhI+Y9+HccPQs3rWFl3fgmZKXLSVo2HaDEmBovI4ghaWUVy/vRZmcEbIvh/ms5/VdB
+	 yqLli5gkrqlydR0hx5qhf44HY64umt6p0eDU4f9HkdH+rzh9UQj07FDygI0Kl3inMlB7h
+	 0SuPw+041WZGkSyQ3CooebMwhSDGqnWBAcFHodt1Pv3kyK/0KfEnj1sErC7gG7+vgZQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793480539;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793480540;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=iHKwq9nI3NFxtpeouD+5YMnOj60hiZOrryjsziFw8O8=;
-	b=WG4ac3mjPOEupA6/3S5yIi3w3iMdSmF6aQ2Y57Pey/0QpPaE2QZOSb3245NYmA81Eg3Q
-	 zAphK5EVKJg3ZL6/LXdj8wtpNWHIc0EMzxv50f4xbB2Urh2C5QSe4rMjkmjD5jMR05d5d
-	 f9eSOL54xrGnxU/QVqmB9FREC1ZfdYA3uHkeBySlJkmQlB5hEU0EfhuEtmTHgVhSJFsi9
-	 SjyTwTgfTcWvqEZAtFClJQv8JnnYz8lFSajKLGza4+eG0aZI9zifAUG6EAFRwoqx77JLj
-	 C1T6fpYKvYg/zzD0uet8azmvauoQ7O6JO/dmAXY1slVaAdWYwm0mCvLYWkvHtR9a67g==
+	bh=iXGAh/vGHLroQ2VbDYIRJSfUqicF+IvIKZCtUEz1qco=;
+	b=w6SEDLNMix67UfcCK8KXm0SbQLOwyEiGSVERJdZ4MllFDAsHNeh/Y6s2tSWJMnJhgKgl
+	 S1SSSK2gC4nz9OpDjggjOlqO5rQzyuTbo0uxsBob4VobgGioQpeuwkgIwG05g4kt1GFM8
+	 RKffnEaAsx9omt/QAvuRocj8OOZvYvK2xBAiE+Wnh05A89EbJDRl1LXJ6KdGC4uPsN9L+
+	 1xr4lhmxiMFYbZV3VuRE5T1x4IWUV6DNPOqgiknyFZ5U7Z5AdJrxJ0D9uEyy8ez1/Gw9N
+	 lHwla29OnRbPOEAeEeTSl0vmJvTR5f7QgpgCJq2QVHqyjQgixdacEprEURWtVPKSyOA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AJFTYxDE;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YkQHMvl7;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D025606A31C
-	for <linux-kbuild@vger.kernel.org>; Sat, 31 Oct 2026 21:02:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6A4606A31C
+	for <linux-kbuild@vger.kernel.org>; Sat, 31 Oct 2026 21:02:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AJFTYxDE
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BA371F00A16;
-	Sat, 31 Oct 2026 21:02:17 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YkQHMvl7
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B123B1F000C1;
+	Sat, 31 Oct 2026 21:02:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793480538;
-	bh=iHKwq9nI3NFxtpeouD+5YMnOj60hiZOrryjsziFw8O8=;
+	s=k20260515; t=1793480539;
+	bh=iXGAh/vGHLroQ2VbDYIRJSfUqicF+IvIKZCtUEz1qco=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=AJFTYxDEWM0MnMTSP0ROG7TqNRtIc92mmtheUyhcCtiKblnH+W1anvBcVlLoLZA+S
-	 TmlkXhL398SM6zQQl3SvzEkJdJbADB1kXEwkU3BQnlmQiNZnIA2Njqsq7pSg7S4B5N
-	 Xu6zdqgz+clApSinBNNOc9dNeQHwQN5GP+bffD38tPObtCCZhOcoyn/VSbLMl4gC0n
-	 CzkZvGZjW9MgyuQsk5+NiPiu2rx22w/4BvsW+9PWlWvtBpQWzVG9naLnnwVg4ZMbiV
-	 zYJFBJETM7ZaqAYmro5Xrazais2N5PB7Dq1apsurRlyk0iWu2VhG+hjorcvY8P2tWc
-	 i80ZRWXGm4FFQ==
-Message-ID: <sashiko-outbox-192146@kernel.org>
+	b=YkQHMvl7ISL0dPaOPMHlf7PK1vlZ2AsCuSIXjgivd7hCXVifkdxSUG7MvxB+XzwQR
+	 Q8kurKkgCzlrS6Hy71ECKZ4lZ2xCvnetyWB8KVtnTzFpf9MlLPsHaXoInIYXmOgJ0f
+	 6ta4ylGVmxA0t960B8P1up1JbThn5bulXuQydHB6Ha5bFF8Hu1DX6TJ9dkJRp6uQ/L
+	 PU1vq4+siBm6iMYdFIHaSOv3DcJTizgibw2A+wdRwPdheuNF18gebsoBGLtGisM6We
+	 RVMJvKDx3GKjdmg88CdLFyOvxOXk7S5NwZgwVbwIu+6zuoO8sB2T+HUFOQTiUSg8Mc
+	 IczpL/2Ex1pnA==
+Message-ID: <sashiko-outbox-192147@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 19/23] net: hpe: ss1: add SR-IOV support
+Subject: Re: [PATCH 20/23] net: hpe: ss1: add the CXI core interfaces
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Doug Ledford" <doug.ledford@hpe.com>, "Slingshot Open Source Team" <slingshot-os-team@groups.ext.hpe.com>, "Nathan
  Chancellor" <nathan@kernel.org>, "Nicolas Schier" <nsc@kernel.org>, "Richard
@@ -50,13 +50,14 @@ To: "Doug Ledford" <doug.ledford@hpe.com>, "Slingshot Open Source Team" <slingsh
  Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Sumit
  Semwal" <sumit.semwal@linaro.org>, =?utf-8?b?Q2hyaXN0aWFuIEvDtm5pZw==?= <christian.koenig@amd.com>, "Guenter
  Roeck" <linux@roeck-us.net>
-Cc: linux-kbuild@vger.kernel.org
-In-Reply-To: <20261030-cxi-netdev-submission-v1-19-8c2c391cc283@hpe.com>
+Cc: linux-kbuild@vger.kernel.org, "Sandeep Bhoot" <sandeep.bhoot@hpe.com>, "Mamila
+ Santosh" <santosh-kumar.mamila@hpe.com>
+In-Reply-To: <20261030-cxi-netdev-submission-v1-20-8c2c391cc283@hpe.com>
 References: <20261030-cxi-netdev-submission-v1-0-8c2c391cc283@hpe.com>
- <20261030-cxi-netdev-submission-v1-19-8c2c391cc283@hpe.com>
+ <20261030-cxi-netdev-submission-v1-20-8c2c391cc283@hpe.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 31 Oct 2026 21:02:17 +0000
+Date: Sat, 31 Oct 2026 21:02:18 +0000
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -66,819 +67,888 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 
-Thank you for your contribution! Sashiko AI review found 16 potential issue=
+Thank you for your contribution! Sashiko AI review found 14 potential issue=
 (s) to consider:
-- [Critical] net: hpe: ss1: NULL deref and guest cred bypass in pf_get_kvm_=
-task()
-- [Critical] net: hpe: ss1: unauthenticated VF vsock handshake and global p=
-ort binding
-- [Critical] net: hpe: ss1: kthread_stop() UAF on self-exiting SR-IOV kthre=
-ads
-- [Critical] net: hpe: ss1: premature unlocked vf->req_sock clear in pf_vf_=
-msghandler()
-- [Critical] net: hpe: ss1: uncalled __cxi_vf_structure_offset_checks() hid=
-es layout bugs
-- [High] net: hpe: ss1: #warning under CXI_DISABLE_SRIOV breaks CONFIG_WERR=
-OR builds
-- [High] net: hpe: ss1: unlocked driver and vfio_dev->kvm access in pf_get_=
-kvm_task()
-- [High] net: hpe: ss1: missing num_vfs bounds check against C_NUM_VFS in e=
-nable_sriov()
-- [High] net: hpe: ss1: enable_sriov() enables VFs before listener sockets =
-are bound
-- [High] net: hpe: ss1: vf_notif_handler() hardcodes seq 0 and breaks notif=
-ications
-- [High] net: hpe: ss1: missing vsock sk_rcvtimeo and infinite -EINTR retry=
- loops
-- [High] net: hpe: ss1: broken VF IRQ binary search and num_vfs =3D=3D 1 ch=
-eck in handshake
-- [High] net: hpe: ss1: unvalidated vsock message lengths and uninitialized=
- stack vars
-- [High] net: hpe: ss1: pf_vf_msghandler() sends stale MAX_VFMSG_SIZE reply=
- on error
-- [High] net: hpe: ss1: uninitialized vf_cmd_lock when with_vf_support is f=
-alse
-- [Medium] net: hpe: ss1: enable_sriov() error return, offset order, and #w=
-arning build
+- [High] net: hpe: ss1: unsafe configfs_unregister_group() on mkdir groups =
+in teardown
+- [High] net: hpe: ss1: invalid mutex_lock_nested() on singleton dev_list_m=
+utex
+- [Medium] net: hpe: ss1: cdev set after configfs_register_group() in devic=
+e init
+- [Medium] net: hpe: ss1: kfree() instead of config_item_put() leaks ci_nam=
+e on error
+- [Medium] net: hpe: ss1: uninitialized uid, gid, and netns passed in AC ty=
+pe_store()
+- [Medium] net: hpe: ss1: configfs AC entry state desync, leaks, and wrong =
+deletion
+- [Medium] net: hpe: ss1: prefix strncmp() instead of strcmp() in configfs =
+make_group()
+- [Medium] net: hpe: ss1: signed limit parsing and %ld format for size_t in=
+ cxi_config.c
+- [Medium] net: hpe: ss1: premature match mutation in tx/rx_prof_attr_match=
+_store()
+- [Medium] net: hpe: ss1: unvalidated runtime sysfs writes to tg_threshold =
+parameter
+- [Medium] net: hpe: ss1: system_type_identifier validated after hw_registe=
+r() in cxi_init()
+- [Medium] net: hpe: ss1: inverted boolean polarity in cxi_pml_recovery_set=
+()
+- [Low] net: hpe: ss1: undocumented module parameters in cxi_core.c
+- [Low] net: hpe: ss1: stale TC state in cxi_cfg_tx_prof_tc show callbacks
 --
 
-commit cd0507e8307b6aff215ba76c73aa7b6a9f1e28d5
+commit a96b9ed904f5550cc657971c4b284154997f9863
 Author: Doug Ledford <doug.ledford@hpe.com>
 
-net: hpe: ss1: add SR-IOV support
+net: hpe: ss1: add the CXI core interfaces
 
-This commit adds SR-IOV support for the HPE Cassini driver, including VF
-creation, a vsock-based PF/VF mailbox and notification mechanism, and
-compile-time structure offset checks for VF resource structures.
+This commit adds the CXI core interface, including client registration,
+the RDMA auxiliary device, link control callbacks, and configfs support
+for resource groups and RX/TX profiles.
 
-> diff --git a/drivers/net/ethernet/hpe/ss1/cass_sriov.c b/drivers/net/ethe=
-rnet/hpe/ss1/cass_sriov.c
+> diff --git a/drivers/net/ethernet/hpe/ss1/cxi_config.c b/drivers/net/ethe=
+rnet/hpe/ss1/cxi_config.c
 > new file mode 100644
-> index 0000000000000..5c947372ab9c7
+> index 0000000000000..dd604753daeeb
 > --- /dev/null
-> +++ b/drivers/net/ethernet/hpe/ss1/cass_sriov.c
-> @@ -0,0 +1,1274 @@
-
+> +++ b/drivers/net/ethernet/hpe/ss1/cxi_config.c
 [ ... ]
-
-> +#if defined(CXI_DISABLE_SRIOV)
-> +#warning "SR-IOV support is disabled."
-> +
-> +int cass_sriov_configure(struct pci_dev *pdev, int num_vfs)
+> +static ssize_t cxi_cfg_rgroup_ac_entry_sub_type_store(struct config_item=
+ *item,
+> +						      const char *page,
+> +						      size_t count)
 > +{
-> +	return -EOPNOTSUPP;
-> +}
-> +
-> +int cass_vf_init(struct cass_dev *hw)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-
-[Severity: High]
-In cass_core.h, CXI_DISABLE_SRIOV is defined whenever CONFIG_KVM_VFIO is
-not enabled, and CONFIG_HPE_SS1 does not depend on or select
-CONFIG_KVM_VFIO.
-
-When building with CONFIG_KVM_VFIO=3Dn and CONFIG_WERROR=3Dy, will this
-unconditional #warning cause the build to fail with -Werror=3Dcpp?
-
-Also, since only pf_get_kvm_task() on the PF side touches vfio_device->kvm,
-does gating the entire file on CXI_DISABLE_SRIOV prevent a guest VM kernel
-built without host CONFIG_KVM_VFIO from probing a Cassini VF via
-cass_vf_init() and cxi_send_msg_to_pf()?
-
-[ ... ]
-
-> +/* Given a PF's pci_dev struct, find the pci_dev of one of its VFs */
-> +static struct pci_dev *get_vf_pdev(struct pci_dev *pdev, int vf_idx)
-> +{
-> +	int devfn =3D pci_iov_virtfn_devfn(pdev, vf_idx);
-> +
-> +	if (devfn < 0)
-> +		return ERR_PTR(devfn);
-> +	return pci_get_slot(pdev->bus, devfn);
-> +}
-> +
-> +/* Identify the KVM task associated with a VF that is bound to a guest V=
-M. */
-> +static struct task_struct *pf_get_kvm_task(struct cass_vf *vf)
-> +{
-> +	struct cass_dev *hw =3D vf->hw;
-> +	struct pci_dev *vf_pdev =3D NULL;
-> +	struct vfio_device *vfio_dev =3D NULL;
-> +	struct task_struct *task =3D NULL;
-> +	struct pid *pid;
-> +
-> +	vf_pdev =3D get_vf_pdev(hw->cdev.pdev, vf->vf_idx);
-> +	if (IS_ERR(vf_pdev)) {
-> +		cxidev_err(&hw->cdev, "vf %d: could not get device", vf->vf_idx);
-> +		return ERR_PTR(PTR_ERR(vf_pdev));
-> +	}
-> +
-> +	cxidev_dbg(&hw->cdev, "vf %d: device at %s", vf->vf_idx, pci_name(vf_pd=
-ev));
-> +
-> +	if (!vf_pdev->driver) {
-> +		task =3D ERR_PTR(-ENODEV);
-> +	} else if (!strncmp(vf_pdev->driver->name, "vfio-pci", strlen("vfio-pci=
-"))) {
-> +		/* VF is under control of VFIO driver, look for KVM task. */
-> +		vfio_dev =3D pci_get_drvdata(vf_pdev);
-> +		if (vfio_dev->kvm) {
-> +			pid =3D find_get_pid(vfio_dev->kvm->userspace_pid);
-> +			task =3D get_pid_task(pid, PIDTYPE_PID);
-> +			put_pid(pid);
-> +		} else {
-> +			task =3D ERR_PTR(-ESRCH);
-> +		}
-
-[Severity: Critical]
-Could pf_get_kvm_task() trigger a NULL pointer dereference or allow a guest
-VM to bypass host credential checks?
-
-First, get_vf_pdev() calls pci_get_slot(pdev->bus, devfn), which only
-searches pdev->bus (missing VFs placed on a virtual bus where
-pci_iov_virtfn_bus(pdev, vf_idx) !=3D pdev->bus->number, or when the VF
-pci_dev has not been created yet or was removed via sysfs) and returns NULL
-when no device is found. Since pf_get_kvm_task() only checks
-IS_ERR(vf_pdev), a NULL return is dereferenced by pci_name(vf_pdev) and
-vf_pdev->driver.
-
-Second, when vf_pdev is bound to vfio-pci and vfio_dev->kvm is set,
-get_pid_task(pid, PIDTYPE_PID) can return NULL if the thread that originally
-called KVM_CREATE_VM (vfio_dev->kvm->userspace_pid) has exited while other
-VMM threads keep the VM alive. In that case pf_get_kvm_task() returns NULL
-instead of an error pointer, and pf_vf_msghandler() treats vf->kvm_task =3D=
-=3D
-NULL as a host-owned VF:
-
-	if (vf->kvm_task) {
-		...
-		uid =3D __kuid_val(cred->uid);
-		gid =3D __kgid_val(cred->gid);
-		rcu_read_unlock();
-	}
-
-Wouldn't that pass the untrusted guest-supplied uid and gid from the vsock
-header directly to hw->msg_relay()?
-
-> +	} else if (!strncmp(vf_pdev->driver->name, KBUILD_MODNAME,
-> +			    strlen(KBUILD_MODNAME))) {
-> +		/* VF is under control of our driver, KVM task is not applicable */
-> +		task =3D NULL;
-> +	} else {
-> +		task =3D ERR_PTR(-EPERM);
-> +	}
-> +	pci_dev_put(vf_pdev);
-> +	return task;
-> +}
-
-[Severity: High]
-What protects vf_pdev->driver, pci_get_drvdata(vf_pdev), and vfio_dev->kvm
-against concurrent driver unbind or VFIO device close in pf_get_kvm_task()?
-
-Without holding device_lock(&vf_pdev->dev) or vfio_dev->dev_set->lock, a
-concurrent sysfs unbind (device_release_driver_internal() ->
-vfio_pci_remove()) can clear vf_pdev->driver and free vfio_dev after the
-!vf_pdev->driver check, or vfio_device_put_kvm() can clear and free
-vfio_dev->kvm while pf_get_kvm_task() dereferences
-vfio_dev->kvm->userspace_pid.
-
-> +
-> +/* Handler thread for incoming messages from the VF driver to the PF. 1 =
-instance
-> + * per active VF.
-> + */
-> +static int pf_vf_msghandler(void *data)
-> +{
-
-[ ... ]
-
-> +		mutex_lock(&hw->msg_relay_lock);
-> +		if (hw->msg_relay) {
-> +			reply_len =3D MAX_VFMSG_SIZE;
-> +			msg_rc =3D hw->msg_relay(hw->msg_relay_data, vf->vf_idx,
-> +					       vf->request, request_len, uid, gid,
-> +					       vf->reply, &reply_len);
-> +		} else {
-> +			reply_len =3D 0;
-> +			msg_rc =3D -ENODEV;
-> +		}
-> +		mutex_unlock(&hw->msg_relay_lock);
-> +
-> +		if (reply_len > MAX_VFMSG_SIZE) {
-> +			reply_len =3D 0;
-> +			msg_rc =3D -E2BIG;
-> +		}
-> +
-> +		cxidev_dbg(&hw->cdev, "vf %d: responding with %ld bytes, rc=3D%d",
-> +			   vf->vf_idx, reply_len, msg_rc);
-> +		rc =3D write_message_to_vsock(vf->req_sock, vf->reply, reply_len,
-> +					    msg_rc, seq);
-
-[Severity: High]
-In pf_vf_msghandler(), reply_len is initialized to MAX_VFMSG_SIZE before
-calling hw->msg_relay(). If hw->msg_relay() returns a negative error code
-without setting *reply_len =3D 0, won't write_message_to_vsock() send
-MAX_VFMSG_SIZE (22,452) bytes of stale data from vf->reply to the VF, both
-leaking PF memory and causing read_message_from_vsock() on the VF to fail
-with -EMSGSIZE and shut down the socket?
-
-[ ... ]
-
-> +err:
-> +	cxidev_dbg(&hw->cdev, "vf %d: handler exiting, rc=3D%d", vf->vf_idx, rc=
-);
-> +
-> +	if (vf->kvm_task)
-> +		put_task_struct(vf->kvm_task);
-> +	kernel_sock_shutdown(vf->req_sock, SHUT_RDWR);
-> +	sock_release(vf->req_sock);
-> +	vf->req_sock =3D NULL;
-> +	mutex_lock(&vf->notif_lock);
-> +	if (vf->notif_sock) {
-> +		kernel_sock_shutdown(vf->notif_sock, SHUT_RDWR);
-> +		sock_release(vf->notif_sock);
-> +		vf->notif_sock =3D NULL;
-> +	}
-> +	mutex_unlock(&vf->notif_lock);
-> +
-> +	vf->kvm_task =3D NULL;
-> +
-> +	cass_ac_phys_free(hw, vf->phys_ac);
-> +	vf->phys_ac =3D 0;
-> +
-> +	return rc;
-> +}
-
-[Severity: Critical]
-Is it safe for pf_vf_msghandler() to clear vf->req_sock =3D NULL without
-locking before releasing vf->notif_sock, clearing vf->kvm_task, and calling
-cass_ac_phys_free(hw, vf->phys_ac)?
-
-Other paths treat vf->req_sock !=3D NULL as the indicator that a VF slot is
-active:
-- In pf_vf_listener(), if vf->req_sock becomes NULL right as SR-IOV is being
-  disabled in cass_remove() -> disable_sriov(), pf_vf_listener() skips
-  kthread_stop(hw->vfs[vf_idx].task), allowing disable_sriov() and
-  cass_remove() to free hw while pf_vf_msghandler() is still running
-  cass_ac_phys_free(hw, vf->phys_ac).
-- In handle_vf_req_conn(), a reconnecting VF can see vf->req_sock =3D=3D NU=
-LL
-  and allocate a new vf->phys_ac and vf->kvm_task, which the exiting
-  pf_vf_msghandler() thread then overwrites and frees.
-- In handle_vf_notif_conn(), checking hw->vfs[i].req_sock without holding
-  vf->notif_lock can race with this teardown and install vf->notif_sock
-  after the notif_lock cleanup block has already run.
-
-> +
-> +/* Probe inactive VFs from range_min to range_max inclusive */
-> +static int pf_probe_vfs(struct cass_dev *hw, struct socket *sock,
-> +			int range_min, int range_max)
-> +{
-> +	int i, rc;
-> +	int magic;
-> +	size_t msg_len =3D sizeof(magic);
-> +	union c_pi_ipd_cfg_pf_vf_irq irqs =3D {
-> +		.irq =3D 0,
-> +	};
-> +
-> +	for (i =3D range_min; i <=3D range_max; i++)
-> +		if (!hw->vfs[i].req_sock) /* Only probe VFs that aren't already active=
- */
-> +			irqs.irq |=3D 1ULL << i;
-> +	if (!irqs.irq)
-> +		return 0;
-> +
-> +	magic =3D CXI_SRIOV_MAGIC1;
-> +	rc =3D write_message_to_vsock(sock, &magic, sizeof(magic), 0, 0);
-> +	if (rc < 0) {
-> +		cxidev_err(&hw->cdev, "could not send magic to incoming VF: %d", rc);
-> +		return rc;
-> +	}
-> +
-> +	cass_write(hw, C_PI_IPD_CFG_PF_VF_IRQ, &irqs,
-> +		   sizeof(union c_pi_ipd_cfg_pf_vf_irq));
-> +
-> +	msg_len =3D sizeof(magic);
-> +	do {
-> +		rc =3D read_message_from_vsock(sock, &magic, &msg_len, NULL, NULL, NUL=
-L, NULL);
-> +		if (rc =3D=3D -EINTR)
-> +			schedule();
-> +	} while (rc =3D=3D -EINTR);
-> +	if (rc < 0) {
-> +		cxidev_err(&hw->cdev, "could not read magic from incoming VF: %d", rc);
-> +		return rc;
-> +	}
-> +
-> +	return magic;
-> +}
-> +
-> +/* Identify which VF an incoming connection belongs to, by probing the P=
-F-to-VF
-> + * interrupt of VFs that do not have an active connection.
-> + */
-> +static int pf_vf_handshake(struct cass_dev *hw, struct socket *sock)
-> +{
-> +	int range_min =3D 0;
-> +	int range_max =3D hw->num_vfs - 1;
-> +	int range_mid, rc, seq, vf_idx;
-> +	int magic;
-> +
-> +	seq =3D 0; /* Handshake sequence number */
-> +	do {
-> +		magic =3D CXI_SRIOV_MAGIC1 + seq;
-> +		range_mid =3D range_min + (range_max - range_min) / 2;
-> +		if (pf_probe_vfs(hw, sock, range_min, range_mid) =3D=3D magic) {
-> +			seq +=3D 1;
-> +			range_max =3D range_mid;
-> +		} else if (pf_probe_vfs(hw, sock, range_mid + 1, range_max) =3D=3D mag=
-ic) {
-> +			seq +=3D 1;
-> +			range_min =3D range_mid + 1;
-> +		} else {
-> +			break;
-> +		}
-> +	} while (range_max !=3D range_min);
-> +
-> +	if (range_max !=3D range_min) {
-> +		cxidev_err(&hw->cdev, "vf search failed");
-> +		return -ENOENT;
-> +	}
-> +	vf_idx =3D range_min;
-
-[Severity: High]
-How does the binary search in pf_vf_handshake() work when a VF in the upper
-half [range_mid + 1, range_max] connects while at least one VF in the lower
-half [range_min, range_mid] is still inactive?
-
-1. pf_vf_handshake() first calls pf_probe_vfs(hw, sock, range_min,
-   range_mid), which sends CXI_SRIOV_MAGIC1 over sock to the connecting
-   upper-half VF, raises C_PI_IPD_CFG_PF_VF_IRQ only for VFs in
-   [range_min, range_mid], and blocks waiting for a reply on sock.
-2. In cass_vf_init(), the connecting upper-half VF receives
-   CXI_SRIOV_MAGIC1 and enters wait_for_completion_timeout(&hw->pf_to_vf_co=
-mp,
-   CXI_SRIOV_VF_TIMEOUT), waiting for an interrupt that was only sent to the
-   lower half, and aborts after 10 seconds with -ETIMEDOUT.
-3. Meanwhile, any other inactive VFs in [range_min, range_mid] that have
-   already registered pf_to_vf_int_cb() will have hw->pf_to_vf_comp
-   completed prematurely by the probe interrupt.
-4. Also, when hw->num_vfs =3D=3D 1, both range_min and range_max start at 0=
-; if
-   pf_probe_vfs() fails and breaks out of the loop, range_max !=3D range_min
-   is false (0 !=3D 0), so doesn't pf_vf_handshake() still succeed and retu=
-rn
-   vf_idx =3D 0?
-
-[ ... ]
-
-> +/* Handle an incoming request connection from a VF */
-> +static void handle_vf_req_conn(struct cass_dev *hw,
-> +			       struct socket *incoming)
-> +{
-> +	struct sockaddr_vm peeraddr;
-> +	struct cass_vf *vf;
-> +	int rc, vf_idx;
-> +
-> +	rc =3D kernel_getpeername(incoming, (struct sockaddr *)&peeraddr);
-> +	if (rc < 0) {
-> +		cxidev_err(&hw->cdev, "could not get peer addr for vf: %d", rc);
-> +		goto close_sock;
-> +	}
-> +
-> +	vf_idx =3D pf_vf_handshake(hw, incoming);
-
-[Severity: Critical]
-What prevents an unprivileged local host user (via vsock_loopback) or an
-unauthorized guest VM from claiming a VF in pf_vf_handshake()?
-
-In enable_sriov(), vsock_loopback is loaded and pf_vf_listener() binds
-CXI_SRIOV_VSOCK_PORT and CXI_SRIOV_VSOCK_NOTIF_PORT to VMADDR_CID_ANY in
-init_net. In pf_probe_vfs(), the PF prompts the peer with CXI_SRIOV_MAGIC1
-and accepts the predictable value CXI_SRIOV_MAGIC1 + seq in reply without
-verifying that the peer actually received the hardware interrupt or
-validating peeraddr.svm_cid in handle_vf_req_conn(). If the VF is bound to
-the host driver (so vf->kvm_task is NULL), a local process can claim the VF
-slot and supply arbitrary uid and gid values (such as 0) in the vsock
-message header.
-
-Also, since pf_vf_listener() binds fixed global ports CXI_SRIOV_VSOCK_PORT
-(0x17db) and CXI_SRIOV_VSOCK_NOTIF_PORT (0x17dc) with VMADDR_CID_ANY, won't
-enabling SR-IOV on a second Cassini PF in the same system fail in
-vsock_create_listen() -> kernel_bind() with -EADDRINUSE?
-
-[ ... ]
-
-> +/* Handle an incoming notification connection from a VF */
-> +static void handle_vf_notif_conn(struct cass_dev *hw,
-> +				 struct socket *incoming)
-> +{
-> +	struct sockaddr_vm peeraddr;
-> +	struct cass_vf *vf;
-> +	int rc, vf_idx, i;
-> +	unsigned int token;
-> +	struct cass_vf_notif_ping ping =3D {
-> +		.op =3D CASS_VF_NOTIF_OP_PING,
-> +	};
-> +	size_t msg_len;
-> +
-> +	rc =3D kernel_getpeername(incoming, (struct sockaddr *)&peeraddr);
-> +	if (rc < 0) {
-> +		cxidev_err(&hw->cdev,
-> +			   "could not get peer addr for notification connection: %d", rc);
-> +		goto close_sock;
-> +	}
-> +
-> +	/* Read token to identify which VF this is */
-> +	msg_len =3D sizeof(token);
-> +	do {
-> +		rc =3D read_message_from_vsock(incoming, &token, &msg_len, NULL, NULL,=
- NULL, NULL);
-> +		if (rc =3D=3D -EINTR)
-> +			schedule();
-> +	} while (rc =3D=3D -EINTR);
-
-[ ... ]
-
-> +	vf->notif_seq =3D 0;
-> +	vf->notif_sock =3D incoming;
-> +	mutex_unlock(&vf->notif_lock);
-> +	cxidev_dbg(&hw->cdev, "vf %d: notification socket connected", vf_idx);
-> +
-> +	/* Send test notification */
-> +	msg_len =3D sizeof(ping);
-> +	rc =3D cxi_send_msg_to_vf(&hw->cdev, vf_idx, &ping, msg_len,
-> +				NULL, NULL);
-
-[Severity: High]
-Can an unresponsive peer hang pf_vf_listener() or deadlock vf->notif_lock,
-and can the -EINTR retry loops spin indefinitely?
-
-1. Accepted AF_VSOCK sockets created by kernel_accept() initialize
-   sk->sk_rcvtimeo to MAX_SCHEDULE_TIMEOUT rather than inheriting the
-   listener socket's timeout. In handle_vf_req_conn(),
-   incoming->sk->sk_rcvtimeo is not set before pf_vf_handshake() (it is only
-   set later in pf_vf_msghandler()), and in handle_vf_notif_conn(),
-   sk_rcvtimeo is never set on incoming / vf->notif_sock at all. If a peer
-   connects and sends nothing, pf_vf_listener() blocks forever; similarly,
-   if a VF stops responding to notifications, cxi_send_msg_to_vf() blocks
-   forever in cxi_vsock_send() while holding vf->notif_lock, deadlocking
-   teardown in pf_vf_msghandler() and pf_vf_listener().
-2. In pf_probe_vfs(), handle_vf_notif_conn(), and cass_vf_init(), the loops:
-
-	do {
-		rc =3D read_message_from_vsock(...);
-		if (rc =3D=3D -EINTR)
-			schedule();
-	} while (rc =3D=3D -EINTR);
-
-   do not check kthread_should_stop() or signal_pending(). When a signal or
-   kthread_stop() is pending, kernel_recvmsg() immediately returns -EINTR
-   and schedule() with state TASK_RUNNING returns without sleeping, causing
-   a tight infinite loop.
-
-[ ... ]
-
-> +static int enable_sriov(struct pci_dev *pdev, int num_vfs)
-> +{
+> +	struct cxi_cfg_rgroup_ac_entry_sub *ac_entry_sub;
 > +	int rc;
-> +	int sriov;
-> +	u16 offset;
-> +	u16 stride;
-> +	union c_pi_cfg_pri_sriov pri_sriov =3D {};
-> +	struct cass_dev *hw =3D pci_get_drvdata(pdev);
+> +	enum cxi_ac_type ac_type_val;
+> +	union cxi_ac_data ac_data_t =3D {};
+> +	unsigned int ac_entry_id;
 > +
-> +	rc =3D request_module("vsock");
-> +	if (rc) {
-> +		cxidev_err(&hw->cdev, "could not load vsock module");
-> +		goto err_novf;
+> +	ac_entry_sub =3D to_cxi_cfg_rgroup_ac_entry_sub(item);
+> +	if (!ac_entry_sub->rgroup) {
+> +		pr_debug("Unable to get rgroup reference\n");
+> +		return -EINVAL;
 > +	}
 > +
-> +	rc =3D request_module("vsock_loopback");
-> +	if (rc) {
-> +		cxidev_err(&hw->cdev, "could not load vsock_loopback module");
-> +		goto err_novf;
+> +	rc =3D kstrtouint(page, 0, (unsigned int *)&ac_type_val);
+> +	if (rc)
+> +		return rc;
+> +
+> +	if (ac_type_val =3D=3D CXI_AC_UID)
+> +		ac_data_t.uid =3D ac_entry_sub->ac_data.uid;
+> +	else if (ac_type_val =3D=3D CXI_AC_GID)
+> +		ac_data_t.gid =3D ac_entry_sub->ac_data.gid;
+> +	else if (ac_type_val =3D=3D CXI_AC_NETNS)
+> +		ac_data_t.netns =3D ac_entry_sub->ac_data.netns;
+> +	else if (ac_type_val =3D=3D CXI_AC_OPEN)
+> +		pr_debug("Setting type to CXI_AC_OPEN\n");
+> +	else
+> +		return -EINVAL;
+> +
+> +	rc =3D cxi_rgroup_add_ac_entry(ac_entry_sub->rgroup,
+> +				     ac_type_val,
+> +				     &ac_data_t,
+> +				     &ac_entry_id);
+> +	if (rc < 0) {
+> +		pr_debug("Unable to add ac entry to resource group: err val %d\n", rc);
+> +		return rc;
 > +	}
 > +
-> +	hw->num_vfs =3D num_vfs;
+> +	ac_entry_sub->ac_type =3D ac_type_val;
+> +	ac_entry_sub->id =3D ac_entry_id;
 > +
-> +	if (!hw->vf_listener)
-> +		hw->vf_listener =3D kthread_run(pf_vf_listener, hw, "cxi_vf_listener");
-> +	if (IS_ERR(hw->vf_listener)) {
-> +		cxidev_err(&hw->cdev, "could not start vf listener thread");
-> +		rc =3D PTR_ERR(hw->vf_listener);
-> +		hw->vf_listener =3D NULL;
-> +		goto err_novf;
-> +	}
-> +
-> +	/* The VF Offset and Stride need to match the SR-IOV configuration. */
-> +	sriov =3D pci_find_ext_capability(pdev, PCI_EXT_CAP_ID_SRIOV);
-> +	if (!sriov) {
-> +		cxidev_err(&hw->cdev, "No extended capabilities found\n");
-> +		rc =3D -ENODEV;
-> +		goto err_kill_listener;
-> +	}
-> +
-> +	pci_read_config_word(pdev, sriov + PCI_SRIOV_VF_OFFSET, &offset);
-> +	pci_read_config_word(pdev, sriov + PCI_SRIOV_VF_STRIDE, &stride);
-> +
-> +	pri_sriov.vf_offset =3D offset;
-> +	pri_sriov.vf_stride =3D stride;
-> +
-> +	cass_write(hw, C_PI_CFG_PRI_SRIOV, &pri_sriov,
-> +		   sizeof(union c_pi_cfg_pri_sriov));
-> +
-> +	rc =3D pci_enable_sriov(pdev, num_vfs);
-> +	if (rc) {
-> +		cxidev_err(&hw->cdev, "SRIOV enable failed %d\n", rc);
-> +		goto err_kill_listener;
-> +	}
-> +
-> +	return num_vfs;
-> +
-> +err_kill_listener:
-> +	kthread_stop(hw->vf_listener);
-> +	hw->vf_listener =3D NULL;
-> +err_novf:
-> +	hw->num_vfs =3D 0;
-> +	return rc;
+> +	return count;
 > +}
-
-[Severity: High]
-Does enable_sriov() race with pf_vf_listener() when creating the listening
-sockets?
-
-enable_sriov() starts pf_vf_listener() asynchronously via kthread_run() and
-immediately calls pci_enable_sriov(pdev, num_vfs) without waiting for
-pf_vf_listener() to finish calling vsock_create_listen() for hw->vf_req_sock
-and hw->vf_notif_sock. When sriov_drivers_autoprobe is enabled on the host,
-pci_enable_sriov() synchronously probes VFs (cass_probe() -> cass_vf_init()
--> kernel_connect()), which can run before pf_vf_listener() has bound
-CXI_SRIOV_VSOCK_PORT. Also, if vsock_create_listen() fails in
-pf_vf_listener(), enable_sriov() will still enable SR-IOV and return
-num_vfs.
+[ ... ]
+> +static ssize_t cxi_cfg_rgroup_ac_entry_sub_data_store(struct config_item=
+ *item,
+> +						      const char *page,
+> +						      size_t count)
+> +{
+> +	struct cxi_cfg_rgroup_ac_entry_sub *ac_entry_sub;
+> +	int rc;
+> +	unsigned int ac_data_val;
+> +
+> +	ac_entry_sub =3D to_cxi_cfg_rgroup_ac_entry_sub(item);
+> +
+> +	rc =3D kstrtouint(page, 0, &ac_data_val);
+> +	if (rc)
+> +		return rc;
+> +
+> +	if (ac_entry_sub->ac_type =3D=3D CXI_AC_UID) {
+> +		ac_entry_sub->ac_data.uid =3D ac_data_val;
+> +		return count;
+> +	} else if (ac_entry_sub->ac_type =3D=3D CXI_AC_GID) {
+> +		ac_entry_sub->ac_data.gid =3D ac_data_val;
+> +		return count;
+> +	} else if (ac_entry_sub->ac_type =3D=3D CXI_AC_NETNS) {
+> +		ac_entry_sub->ac_data.netns =3D ac_data_val;
+> +		return count;
+> +	}
+> +
+> +	return -EINVAL;
+> +}
+[ ... ]
+> +static struct
+> +config_group *cxi_cfg_rgroup_ac_entry_make_group(struct config_group *gr=
+oup,
+> +						 const char *name)
+> +{
+[ ... ]
+> +	ac_entry_sub->rgroup =3D ac_entry->rgroup;
+> +	ac_entry_sub->ac_type =3D CXI_AC_UID;
+> +	ac_entry_sub->ac_data.uid =3D 0;
+> +
+> +	return &ac_entry_sub->group;
+> +}
+> +
+> +static void
+> +cxi_cfg_rgroup_ac_entry_drop_item(struct config_group *group,
+> +				  struct config_item *item)
+> +{
+> +	struct cxi_cfg_rgroup_ac_entry_sub *ac_entry_sub;
+> +	unsigned int ac_entry_id;
+> +	int rc;
+> +
+> +	ac_entry_sub =3D container_of(item, struct cxi_cfg_rgroup_ac_entry_sub,=
+ group.cg_item);
+> +
+> +	if (ac_entry_sub->ac_type =3D=3D CXI_AC_UID) {
+> +		rc =3D cxi_rgroup_get_ac_entry_id_by_data(ac_entry_sub->rgroup,
+> +							CXI_AC_UID,
+> +							&ac_entry_sub->ac_data,
+> +							&ac_entry_id);
+> +
+> +		pr_debug("Getting an entry info rc =3D %d\n", rc);
+> +	} else if (ac_entry_sub->ac_type =3D=3D CXI_AC_GID) {
+> +		rc =3D cxi_rgroup_get_ac_entry_id_by_data(ac_entry_sub->rgroup,
+> +							CXI_AC_GID,
+> +							&ac_entry_sub->ac_data,
+> +							&ac_entry_id);
+> +
+> +		pr_debug("Getting an entry info rc =3D %d\n", rc);
+> +	} else if (ac_entry_sub->ac_type =3D=3D CXI_AC_NETNS) {
+> +		rc =3D cxi_rgroup_get_ac_entry_id_by_data(ac_entry_sub->rgroup,
+> +							CXI_AC_NETNS,
+> +							&ac_entry_sub->ac_data,
+> +							&ac_entry_id);
+> +		pr_debug("Getting an entry info rc =3D %d\n", rc);
+> +	} else {
+> +		rc =3D cxi_rgroup_get_ac_entry_id_by_data(ac_entry_sub->rgroup,
+> +							CXI_AC_OPEN,
+> +							NULL,
+> +							&ac_entry_id);
+> +		pr_debug("Getting an entry info rc =3D %d\n", rc);
+> +	}
+> +
+> +	if (!rc)
+> +		cxi_rgroup_delete_ac_entry(ac_entry_sub->rgroup,
+> +					   ac_entry_id);
+> +	cxi_cfg_drop_item_ref(item);
+> +}
 
 [Severity: Medium]
-Are there also a couple of error-handling and ordering issues in
-enable_sriov()?
+Can the AC entry state in configfs get out of sync with the underlying
+rgroup, tx_profile, and rx_profile entries, causing leaked entries or
+deleting another configfs item's AC entry?
 
-1. When modprobe fails, request_module() returns a positive wait status
-   (such as 256). Jumping to err_novf returns that positive rc from
-   cass_sriov_configure() to sriov_numvfs_store(), which only treats negati=
-ve
-   values as errors.
-2. PCI_SRIOV_VF_OFFSET and PCI_SRIOV_VF_STRIDE are read and written to
-   C_PI_CFG_PRI_SRIOV before pci_enable_sriov() writes PCI_SRIOV_NUM_VF
-   (which under the PCIe SR-IOV specification can update First VF Offset and
-   VF Stride).
+When a subdirectory is created in cxi_cfg_rgroup_ac_entry_make_group()
+(and similarly in cxi_cfg_tx_prof_ac_entry_make_group() and
+cxi_cfg_rx_prof_ac_entry_make_group()), ac_type is initialized to
+CXI_AC_UID and ac_data.uid is 0 without adding a backend AC entry.
 
-> +
-> +int cass_sriov_configure(struct pci_dev *pdev, int num_vfs)
+If that directory is removed via rmdir before type is written (or after
+type_store fails with -EEXIST), cxi_cfg_rgroup_ac_entry_drop_item() and
+cxi_cfg_tx_prof_ac_entry_drop_item() do not check whether this item added
+an entry or delete by ac_entry_sub->id. Instead, they look up an entry by
+(ac_type, ac_data) and delete it, which will delete another active item's
+UID 0 entry.
+
+In addition, configuring a CXI_AC_GID or CXI_AC_NETNS entry requires
+writing type first because cxi_cfg_*_ac_entry_sub_data_store() checks
+ac_entry_sub->ac_type. However, writing type immediately adds the backend
+AC entry using the old ac_data (0), and writing data afterwards only
+updates ac_entry_sub->ac_data without updating the backend entry. On
+subsequent rmdir, looking up the entry by the new ac_data fails and leaks
+the backend entry. Writing type more than once also overwrites
+ac_entry_sub->id without deleting the previous entry, leaking it as well.
+
+> +static ssize_t cxi_cfg_rgroup_res_type_max_show(struct config_item *item,
+> +						char *page)
 > +{
-> +	if (num_vfs < 0)
-> +		return -EINVAL;
-> +
-> +	if (num_vfs =3D=3D 0) {
-> +		disable_sriov(pdev);
-> +		return 0;
-> +	}
-> +
-> +	return enable_sriov(pdev, num_vfs);
-> +}
-
-[Severity: High]
-Should cass_sriov_configure() or enable_sriov() validate that num_vfs does
-not exceed C_NUM_VFS (64) before setting hw->num_vfs =3D num_vfs?
-
-In struct cass_dev, vfs[] has fixed size C_NUM_VFS (64), and pf_probe_vfs()
-evaluates 1ULL << i for i up to hw->num_vfs - 1. If num_vfs > C_NUM_VFS,
-pf_vf_listener(), pf_probe_vfs(), handle_vf_req_conn(),
-handle_vf_notif_conn(), cxi_send_msg_to_vf(), and cass_vf_get_token() can
-shift past 63 bits and index hw->vfs[] out of bounds.
-
-[ ... ]
-
-> +/* VF-side handler thread for receiving notifications from PF */
-> +static int vf_notif_handler(void *data)
-> +{
-> +	struct cass_dev *hw =3D (struct cass_dev *)data;
+> +	struct cxi_cfg_rgroup_res_type *rgroup_res_type;
+> +	struct cxi_resource_entry *entry;
 > +	int rc;
-> +	size_t msg_len, rsp_len;
 > +
-> +	cxidev_dbg(&hw->cdev, "started notification handler");
-> +
-> +	while (!kthread_should_stop()) {
-> +		msg_len =3D MAX_VFMSG_SIZE;
-> +		rc =3D read_message_from_vsock(hw->vf_notif_sock, hw->vf_notif_buf,
-> +					     &msg_len, NULL, NULL, NULL, NULL);
-
-[ ... ]
-
-> +		rsp_len =3D 0;
-> +		rc =3D dispatch_vf_notif(hw, hw->vf_notif_buf, msg_len,
-> +				       hw->vf_notif_rsp_buf, &rsp_len);
-> +		rc =3D write_message_to_vsock(hw->vf_notif_sock, hw->vf_notif_rsp_buf,
-> +					    rsp_len, rc, 0);
-> +		if (rc < 0) {
-> +			cxidev_err(&hw->cdev, "failed to send notification response: %d", rc);
-> +			break;
-> +		}
+> +	rgroup_res_type =3D to_cxi_cfg_rgroup_res_type(item);
+> +	rc =3D cxi_rgroup_get_resource_entry(rgroup_res_type->rgroup,
+> +					   cxi_resource_str_to_type(rgroup_res_type->name),
+> +					   &entry);
+> +	if (rc !=3D 0) {
+> +		pr_debug("Error: Resource entry not yet created for the resource type\=
+n");
+> +		pr_debug("Error: Set the max file first and then the reserved file to =
+create the resource type\n");
+> +		return -EINVAL;
 > +	}
-
-[Severity: High]
-In vf_notif_handler(), read_message_from_vsock() passes NULL for seq and
-write_message_to_vsock() hardcodes seq =3D 0 in the reply.
-
-Since cxi_send_msg_to_vf() sends notifications via cxi_vsock_send() with
-hw->vfs[vf_num].notif_seq++, and cxi_vsock_send() checks:
-
-	if (rsp_seq !=3D seq) {
-		kernel_sock_shutdown(sock, SHUT_RDWR);
-		cxidev_err(&hw->cdev, "expected response seq %d but got %d",
-			   seq, rsp_seq);
-		return -EPROTO;
-	}
-
-won't every notification after the initial ping (where notif_seq is 0) fail
-with -EPROTO and shut down the notification socket?
-
-[ ... ]
-
-> +int cass_vf_init(struct cass_dev *hw)
+> +
+> +	return sprintf(page, "%ld\n", entry->limits.max);
+> +}
+> +
+> +static ssize_t cxi_cfg_rgroup_res_type_max_store(struct config_item *ite=
+m,
+> +						 const char *page,
+> +						 size_t count)
 > +{
-
-[ ... ]
-
-> +	if (!hw->with_vf_support)
-> +		return 0;
+> +	struct cxi_cfg_rgroup_res_type *rgroup_res_type;
+> +	struct cxi_resource_entry *entry;
+> +	int rc;
 > +
-> +	init_completion(&hw->pf_to_vf_comp);
+> +	rgroup_res_type =3D to_cxi_cfg_rgroup_res_type(item);
 > +
-> +	mutex_init(&hw->vf_cmd_lock);
-
-[Severity: High]
-If hw->with_vf_support is false on a VF, cass_vf_init() returns 0 before
-mutex_init(&hw->vf_cmd_lock). When cass_probe() subsequently calls
-cxi_send_msg_to_pf(), won't mutex_lock(&hw->vf_cmd_lock) operate on an
-uninitialized mutex?
-
-[ ... ]
-
-> +void cass_vf_fini(struct cass_dev *hw)
-> +{
-> +	if (!hw->with_vf_support)
-> +		return;
-> +
-> +	free_irq(hw->pf_vf_vec, hw);
-> +
-> +	if (hw->vf_notif_handler) {
-> +		kthread_stop(hw->vf_notif_handler);
-> +		hw->vf_notif_handler =3D NULL;
+> +	rc =3D cxi_rgroup_get_resource_entry(rgroup_res_type->rgroup,
+> +					   cxi_resource_str_to_type(rgroup_res_type->name),
+> +					   &entry);
+> +	if (rc =3D=3D 0) {
+> +		pr_debug("Error: Given resource type has already been added\n");
+> +		return -EINVAL;
 > +	}
-
-[Severity: Critical]
-Can kthread_stop() be called on a task_struct that has already exited and
-been freed in cass_vf_fini(), disable_sriov(), enable_sriov(), and
-pf_vf_listener()?
-
-kthread_run() does not take an extra reference on task_struct for the
-caller, so if a kthread returns before kthread_stop() is called, its
-task_struct is freed on exit:
-- In cass_vf_fini(), if the PF already closed the notification socket (or a
-  socket error occurred), vf_notif_handler() breaks out of its loop and
-  returns, leaving hw->vf_notif_handler pointing to a freed task_struct when
-  kthread_stop(hw->vf_notif_handler) is called.
-- In pf_vf_listener(), if vsock_create_listen() or kernel_accept() returns =
-an
-  error, pf_vf_listener() exits immediately, after which enable_sriov() or
-  disable_sriov() calls kthread_stop(hw->vf_listener).
-- In pf_vf_msghandler(), the thread exits whenever a VF disconnects or
-  pf_get_kvm_task() fails (and disable_sriov() calls pci_disable_sriov()
-  before stopping hw->vf_listener), which can race with pf_vf_listener()
-  calling kthread_stop(hw->vfs[vf_idx].task).
-
-[ ... ]
-
-> diff --git a/drivers/net/ethernet/hpe/ss1/cass_vf.c b/drivers/net/etherne=
-t/hpe/ss1/cass_vf.c
-> new file mode 100644
-> index 0000000000000..fde40d1b491ae
-> --- /dev/null
-> +++ b/drivers/net/ethernet/hpe/ss1/cass_vf.c
-> @@ -0,0 +1,58 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Copyright 2026 Hewlett Packard Enterprise Development LP */
 > +
-> +#include <linux/hpe/cxi/cxi.h>
-> +#include <linux/dma-mapping.h>
-> +#include "cass_core.h"
-> +#include "cass_vf.h"
+> +	rc =3D kstrtoint(page, 0, &rgroup_res_type->max);
+> +	if (rc)
+> +		return rc;
 > +
-> +/* Compile-time assertions to ensure VF structures can be safely cast to=
- their
-> + * corresponding PF structures and vice versa.
-> + * These verify that the common fields are at the same offsets in both s=
-tructures.
-> + */
-> +static inline void __cxi_vf_structure_offset_checks(void)
+> +	pr_debug("resource max value set to: %d\n", rgroup_res_type->max);
+> +
+> +	return count;
+> +}
+> +
+> +static ssize_t cxi_cfg_rgroup_res_type_reserved_show(struct config_item =
+*item,
+> +						     char *page)
 > +{
-> +	/* Ensure cxi_lni_priv_vf can be cast to cxi_lni_priv */
-> +	BUILD_BUG_ON(offsetof(struct cxi_lni_priv_vf, dev) !=3D
-> +		     offsetof(struct cxi_lni_priv, dev));
-> +	BUILD_BUG_ON(offsetof(struct cxi_lni_priv_vf, lni) !=3D
-> +		     offsetof(struct cxi_lni_priv, lni));
-
-[ ... ]
-
-> +	/* Ensure cxi_md_priv_vf can be cast to cxi_md_priv */
-> +	BUILD_BUG_ON(offsetof(struct cxi_md_priv_vf, lni_priv) !=3D
-> +		     offsetof(struct cxi_md_priv, lni_priv));
-> +	BUILD_BUG_ON(offsetof(struct cxi_md_priv_vf, device) !=3D
-> +		     offsetof(struct cxi_md_priv, device));
-> +	BUILD_BUG_ON(offsetof(struct cxi_md_priv_vf, md) !=3D
-> +		     offsetof(struct cxi_md_priv, md));
-> +	BUILD_BUG_ON(offsetof(struct cxi_md_priv_vf, sgt) !=3D
-> +		     offsetof(struct cxi_md_priv, sgt));
-> +	BUILD_BUG_ON(offsetof(struct cxi_md_priv_vf, pages) !=3D
-> +		     offsetof(struct cxi_md_priv, pages));
-> +	BUILD_BUG_ON(offsetof(struct cxi_md_priv_vf, flags) !=3D
-> +		     offsetof(struct cxi_md_priv, flags));
+> +	int rc;
+> +	struct cxi_cfg_rgroup_res_type *rgroup_res_type;
+> +	struct cxi_resource_entry *entry;
+> +
+> +	rgroup_res_type =3D to_cxi_cfg_rgroup_res_type(item);
+> +
+> +	rc =3D cxi_rgroup_get_resource_entry(rgroup_res_type->rgroup,
+> +					   cxi_resource_str_to_type(rgroup_res_type->name),
+> +					   &entry);
+> +	if (rc !=3D 0) {
+> +		pr_debug("Error: Resource entry not found for the resource type\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	return sprintf(page, "%ld\n", entry->limits.reserved);
+> +}
+> +
+> +static ssize_t cxi_cfg_rgroup_res_type_reserved_store(struct config_item=
+ *item,
+> +						      const char *page,
+> +						      size_t count)
+> +{
+> +	struct cxi_cfg_rgroup_res_type *rgroup_res_type;
+> +	int rc;
+> +	enum cxi_resource_type e_type;
+> +	struct cxi_resource_limits limits =3D {};
+> +
+> +	rgroup_res_type =3D to_cxi_cfg_rgroup_res_type(item);
+> +
+> +	rc =3D kstrtoint(page, 0, &rgroup_res_type->reserved);
+> +	if (rc)
+> +		return rc;
+> +
+> +	e_type =3D cxi_resource_str_to_type(rgroup_res_type->name);
+> +
+> +	limits.max =3D rgroup_res_type->max;
+> +	limits.reserved =3D rgroup_res_type->reserved;
+> +
+> +	rc =3D cxi_rgroup_add_resource(rgroup_res_type->rgroup, e_type, &limits=
+);
+> +	if (rc)
+> +		return rc;
+> +
+> +	return count;
+> +}
+> +
+> +static ssize_t cxi_cfg_rgroup_res_type_in_use_show(struct config_item *i=
+tem,
+> +						   char *page)
+> +{
+> +	struct cxi_cfg_rgroup_res_type *rgroup_res_type;
+> +	struct cxi_resource_entry *entry;
+> +	int rc;
+> +
+> +	rgroup_res_type =3D to_cxi_cfg_rgroup_res_type(item);
+> +
+> +	rc =3D cxi_rgroup_get_resource_entry(rgroup_res_type->rgroup,
+> +					   cxi_resource_str_to_type(rgroup_res_type->name),
+> +					   &entry);
+> +	if (rc !=3D 0) {
+> +		pr_debug("Error: Given resource type has not yet been added\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	return sprintf(page, "%ld\n", entry->limits.in_use);
 > +}
 
-[Severity: Critical]
-Because __cxi_vf_structure_offset_checks() is declared static inline and has
-no callers, the compiler discards the function without evaluating any of the
-BUILD_BUG_ON() assertions (unlike static_assert() at file scope).
+[Severity: Medium]
+What happens if a negative value is written to
+cxi_cfg_rgroup_res_type_max_store() or
+cxi_cfg_rgroup_res_type_reserved_store()?
 
-If these checks are evaluated, three of them fail due to layout mismatches
-between cass_vf.h and cxi_core.h:
-1. struct cxi_lni_priv in cxi_core.h has
-   DECLARE_BITMAP(leased_pids, 1 << MAX_PID_BITS) (64 bytes) between dev and
-   lni, whereas struct cxi_lni_priv_vf in cass_vf.h places lni immediately
-   after dev. When VF code such as cxi_map_sgtable_vf() or
-   cxi_domain_alloc_vf() runs container_of(lni, struct cxi_lni_priv, lni) on
-   a struct cxi_lni_priv_vf allocation, won't the resulting pointer point 64
-   bytes before the allocated object?
-2. In struct cxi_md_priv (cxi_core.h), pages precedes sgt, whereas in
-   struct cxi_md_priv_vf (cass_vf.h), sgt precedes pages, swapping the two
-   pointers when casting between the two structures.
-
-> diff --git a/drivers/net/ethernet/hpe/ss1/cass_vf_notif.c b/drivers/net/e=
-thernet/hpe/ss1/cass_vf_notif.c
-> new file mode 100644
-> index 0000000000000..c46e198698736
-> --- /dev/null
-> +++ b/drivers/net/ethernet/hpe/ss1/cass_vf_notif.c
-> @@ -0,0 +1,51 @@
+Because rgroup_res_type->max and rgroup_res_type->reserved are signed ints
+parsed with kstrtoint(), negative values are accepted and then
+sign-extended to size_t values near SIZE_MAX when assigned to limits.max
+and limits.reserved. Also, entry->limits.max, entry->limits.reserved, and
+entry->limits.in_use have type size_t in struct cxi_resource_limits, so
+formatting them with "%ld\n" instead of "%zu\n" in the show callbacks
+causes format warnings on 32-bit builds.
 
 [ ... ]
-
-> +int dispatch_vf_notif(struct cass_dev *hw, const void *req, size_t req_l=
-en,
-> +		      void *rsp, size_t *rsp_len)
+> +static struct
+> +config_group *cxi_cfg_rgroup_make_group(struct config_group *group,
+> +					const char *name)
 > +{
-> +	const struct cass_vf_notif_common *common_req =3D req;
-> +	enum cass_vf_notif_ops op;
-> +	const struct cass_vf_notif_info *info;
+> +	struct cxi_cfg_rgroup *rgp =3D container_of(group,
+> +						  struct cxi_cfg_rgroup,
+> +						  group);
+> +	struct cxi_cfg_rgroup_state *rgp_state;
+> +	struct cxi_cfg_rgroup_attr *rgp_attr;
+> +	struct cxi_cfg_rgroup_ac_entry *ac_entry;
+> +	struct cxi_cfg_rgroup_res *rgp_res;
 > +
-> +	op =3D common_req->op;
-> +	if (op <=3D CASS_VF_NOTIF_OP_INVALID || op >=3D CASS_VF_NOTIF_OP_MAX)
+> +	if (strncmp(name, "resources", sizeof("resources") - 1) =3D=3D 0) {
+> +		rgp_res =3D alloc_dev_rgroup_res("resources");
+> +		if (!rgp_res) {
+> +			pr_debug("unable to alloc rgroup resources");
+> +			return ERR_PTR(-EINVAL);
+> +		}
+> +		rgp_res->rgroup =3D rgp->rgroup;
+> +		rgp->rgp_res =3D rgp_res;
+> +		rgp->rgp_res->cdev =3D rgp->cdev;
+> +
+> +		return &rgp->rgp_res->group;
+> +	}
+> +
+> +	if (strncmp(name, "attr", sizeof("attr") - 1) =3D=3D 0) {
+> +		rgp_attr =3D alloc_dev_rgroup_attr("attr");
+> +		if (!rgp_attr) {
+> +			pr_debug("unable to alloc rgroup attr");
+> +			return ERR_PTR(-EINVAL);
+> +		}
+> +
+> +		rgp_attr->rgroup =3D rgp->rgroup;
+> +		rgp->rgp_attr =3D rgp_attr;
+> +		rgp->rgp_attr->cdev =3D rgp->cdev;
+> +
+> +		return &rgp->rgp_attr->group;
+> +	}
+> +
+> +	if (strncmp(name, "state", sizeof("state") - 1) =3D=3D 0) {
+> +		rgp_state =3D alloc_dev_rgroup_state("state");
+> +		if (!rgp_state) {
+> +			pr_debug("unable to alloc rgroup state");
+> +			return ERR_PTR(-EINVAL);
+> +		}
+> +		rgp_state->rgroup =3D rgp->rgroup;
+> +		rgp->rgp_state =3D rgp_state;
+> +		rgp->rgp_state->cdev =3D rgp->cdev;
+> +
+> +		return &rgp->rgp_state->group;
+> +	}
+> +
+> +	if (strncmp(name, "ac-entry", sizeof("ac-entry") - 1) =3D=3D 0) {
+> +		ac_entry =3D alloc_dev_rgroup_ac_entry("ac-entry");
+> +		if (!ac_entry) {
+> +			pr_debug("unable to alloc rgroup ac-entry");
+> +			return ERR_PTR(-EINVAL);
+> +		}
+> +		ac_entry->rgroup =3D rgp->rgroup;
+> +		rgp->ac_entry =3D ac_entry;
+> +
+> +		return &rgp->ac_entry->group;
+> +	}
+> +
+> +	return ERR_PTR(-EINVAL);
+> +}
+
+[Severity: Medium]
+Should cxi_cfg_rgroup_make_group(), cxi_cfg_tx_prof_make_group(), and
+cxi_cfg_rx_prof_make_group() use strcmp() instead of
+strncmp(name, ..., sizeof(...) - 1)?
+
+Using sizeof(...) - 1 only compares the prefix without the NUL terminator,
+allowing userspace to mkdir names with arbitrary suffixes such as
+attr_extra while the allocated config_group has ci_name hardcoded to
+"attr". If userspace then creates a second directory with the same prefix,
+make_group() overwrites the parent pointer (such as rgp->rgp_attr) before
+configfs_attach_group() -> configfs_dirent_exists() fails with -EEXIST and
+frees the newly allocated struct, leaving the parent pointer dangling.
+
+Also, on allocation failure in cxi_cfg_rgroup_make_group(), should these
+branches return ERR_PTR(-ENOMEM) instead of ERR_PTR(-EINVAL)?
+
+[ ... ]
+> +static struct
+> +config_group *cxi_cfg_rgroup_dir_make_group(struct config_group *group,
+> +					    const char *name)
+> +{
+[ ... ]
+> +	rgp->cdev =3D dev_rgp->cdev;
+> +	strscpy(attr.name, name, sizeof(attr.name));
+> +	rgroup =3D cxi_dev_alloc_rgroup(dev_rgp->cdev,
+> +				      &attr);
+> +	if (IS_ERR(rgroup)) {
+> +		kfree(rgp);
+> +		return ERR_PTR(PTR_ERR(rgroup));
+> +	}
+> +	rgp->rgroup =3D rgroup;
+> +
+> +	return &rgp->group;
+> +}
+
+[Severity: Medium]
+Does calling kfree(rgp) here (and similarly kfree(tx_prof) in
+cxi_cfg_tx_prof_dir_make_group(), kfree(rx_prof) in
+cxi_cfg_rx_prof_dir_make_group(), and kfree() in the error unwind paths of
+cxi_configfs_device_init()) leak group.cg_item.ci_name when strlen(name) is
+20 or more characters?
+
+alloc_dev_rgroup(), alloc_dev_tx_prof(), alloc_dev_rx_prof(), and
+alloc_dev_subdir() call config_group_init_type_name(), which dynamically
+allocates ci_name when strlen(name) >=3D CONFIGFS_ITEM_NAME_LEN (20).
+Calling kfree() directly instead of config_item_put(&...->group.cg_item)
+bypasses config_item_cleanup() and leaks ci_name.
+
+[ ... ]
+> +static ssize_t cxi_cfg_tx_prof_ac_entry_sub_type_store(struct config_ite=
+m *item,
+> +						       const char *page,
+> +						       size_t count)
+> +{
+> +	struct cxi_cfg_tx_prof_ac_entry_sub *ac_entry_sub;
+> +	int rc;
+> +	enum cxi_ac_type ac_type_val;
+> +	uid_t uid;
+> +	gid_t gid;
+> +	unsigned int netns;
+> +	unsigned int ac_entry_id;
+> +
+> +	ac_entry_sub =3D to_cxi_cfg_tx_prof_ac_entry_sub(item);
+> +	if (!ac_entry_sub->tx_profile) {
+> +		pr_debug("Unable to get tx profile reference\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	rc =3D kstrtouint(page, 0, (unsigned int *)&ac_type_val);
+> +	if (rc)
+> +		return rc;
+> +
+> +	if (ac_type_val =3D=3D CXI_AC_UID)
+> +		uid =3D ac_entry_sub->ac_data.uid;
+> +	else if (ac_type_val =3D=3D CXI_AC_GID)
+> +		gid =3D ac_entry_sub->ac_data.gid;
+> +	else if (ac_type_val =3D=3D CXI_AC_NETNS)
+> +		netns =3D ac_entry_sub->ac_data.netns;
+> +	else if (ac_type_val =3D=3D CXI_AC_OPEN)
+> +		pr_debug("Setting type to CXI_AC_OPEN\n");
+> +	else
 > +		return -EINVAL;
 > +
-> +	info =3D &vf_notif_info[op];
-> +	if (!info->handler)
-> +		return -EOPNOTSUPP;
+> +	rc =3D cxi_tx_profile_add_ac_entry(ac_entry_sub->tx_profile,
+> +					 ac_type_val,
+> +					 uid,
+> +					 gid,
+> +					 netns,
+> +					 &ac_entry_id);
+
+[Severity: Medium]
+Are uid, gid, and netns passed uninitialized to
+cxi_tx_profile_add_ac_entry() here (and to cxi_rx_profile_add_ac_entry() in
+cxi_cfg_rx_prof_ac_entry_sub_type_store())?
+
+Only one of uid, gid, or netns (or none when ac_type_val =3D=3D CXI_AC_OPEN=
+) is
+initialized before all three variables are passed by value.
+
+[ ... ]
+> +static ssize_t cxi_cfg_tx_prof_attr_match_store(struct config_item *item,
+> +						const char *page,
+> +						size_t count)
+> +{
+> +	struct cxi_cfg_tx_prof_attr *tx_prof_attr;
+> +	int rc;
+> +	struct cxi_tx_attr tx_attr =3D {};
 > +
-> +	if (req_len !=3D info->req_size)
-> +		return -EINVAL;
+> +	tx_prof_attr =3D to_cxi_cfg_tx_prof_attr(item);
+> +
+> +	rc =3D kstrtou16(page, 0, &tx_prof_attr->match);
+> +	if (rc)
+> +		return rc;
+> +
+> +	tx_attr.vni_attr.match =3D tx_prof_attr->match;
+> +	tx_attr.vni_attr.ignore =3D tx_prof_attr->ignore;
+> +
+> +	strscpy(tx_attr.vni_attr.name,
+> +		tx_prof_attr->tx_profile->profile_common.vni_attr.name,
+> +		sizeof(tx_attr.vni_attr.name));
+> +
+> +	rc =3D cxi_dev_set_tx_profile_attr(tx_prof_attr->cdev,
+> +					 tx_prof_attr->tx_profile,
+> +					 &tx_attr);
+> +	if (rc)
+> +		return rc;
+> +
+> +	return count;
+> +}
+
+[Severity: Medium]
+If cxi_dev_set_tx_profile_attr() fails in
+cxi_cfg_tx_prof_attr_match_store() (or cxi_dev_set_rx_profile_attr() fails
+in cxi_cfg_rx_prof_attr_match_store()), does tx_prof_attr->match retain the
+rejected value?
+
+Unlike cxi_cfg_tx_prof_attr_ignore_store() and
+cxi_cfg_rx_prof_attr_ignore_store(), which parse into a local variable and
+query current profile attributes via cxi_tx_profile_get_info() /
+cxi_rx_profile_get_info() before applying the update, the match_store
+functions write directly to tx_prof_attr->match / rx_prof_attr->match and
+use the cached ignore field (which is 0 if the attr directory was removed
+and recreated).
+
+[ ... ]
+> +static void set_tc_bool_type(unsigned int tc_type,
+> +			     struct cxi_cfg_tx_prof_tc *tx_prof_tc,
+> +			     bool tc_bool)
+> +{
+> +	switch (tc_type) {
+> +	case CXI_TC_BEST_EFFORT:
+> +		tx_prof_tc->best_effort =3D tc_bool;
+> +		break;
+> +	case CXI_TC_DEDICATED_ACCESS:
+> +		tx_prof_tc->dedicated =3D tc_bool;
+> +		break;
+> +	case CXI_TC_LOW_LATENCY:
+> +		tx_prof_tc->low_latency =3D tc_bool;
+> +		break;
+> +	case CXI_TC_BULK_DATA:
+> +		tx_prof_tc->bulk_data =3D tc_bool;
+> +		break;
+> +	case CXI_TC_ETH:
+> +		tx_prof_tc->eth =3D tc_bool;
+> +		break;
+> +	}
+> +
+> +	cxi_tx_profile_set_tc(tx_prof_tc->tx_profile, tc_type, tc_bool);
+> +}
+[ ... ]
+> +static ssize_t cxi_cfg_tx_prof_tc_best_effort_show(struct config_item *i=
+tem,
+> +						   char *page)
+> +{
+> +	struct cxi_cfg_tx_prof_tc *tx_prof_tc;
+> +
+> +	tx_prof_tc =3D to_cxi_cfg_tx_prof_tc(item);
+> +
+> +	return scnprintf(page, PAGE_SIZE, "%s\n",
+> +			 tx_prof_tc->best_effort ? "true" : "false");
+> +}
+
+[Severity: Low]
+Can the traffic-class show callbacks in cxi_cfg_tx_prof_tc report stale
+values if the tc configfs directory is removed and recreated?
+
+Because cxi_cfg_tx_prof_drop_item() does not clear
+tx_profile->config.tc_table and alloc_dev_tx_prof_tc() zero-initializes
+struct cxi_cfg_tx_prof_tc, reading tx_prof_tc->best_effort (and dedicated,
+low_latency, bulk_data, eth) instead of querying
+cxi_tx_profile_valid_tc(tx_prof_tc->tx_profile, tc) will report false for
+traffic classes that are still enabled on the profile.
+
+[ ... ]
+> +int cxi_configfs_device_init(struct cass_dev *hw)
+> +{
+[ ... ]
+> +	rc =3D configfs_register_group(&cxi_cfg_configfs->group,
+> +				     &rgp_dir->group);
+> +	if (rc)
+> +		goto rgp_dir_reg_err;
+> +
+> +	cxi_cfg_configfs->rgp_dir =3D rgp_dir;
+> +	rgp_dir->cdev =3D &hw->cdev;
+> +
+> +	rx_prof_dir =3D alloc_dev_rx_prof_dir("rx-profile");
+> +	if (!rx_prof_dir) {
+> +		rc =3D -ENOMEM;
+> +		goto rx_prof_dir_alloc_err;
+> +	}
+> +
+> +	rc =3D configfs_register_group(&cxi_cfg_configfs->group,
+> +				     &rx_prof_dir->group);
+> +	if (rc)
+> +		goto rx_prof_dir_reg_err;
+> +
+> +	cxi_cfg_configfs->rx_prof_dir =3D rx_prof_dir;
+> +	rx_prof_dir->cdev =3D &hw->cdev;
+> +
+> +	tx_prof_dir =3D alloc_dev_tx_prof_dir("tx-profile");
+> +	if (!tx_prof_dir) {
+> +		rc =3D -ENOMEM;
+> +		goto tx_prof_dir_alloc_err;
+> +	}
+> +
+> +	rc =3D configfs_register_group(&cxi_cfg_configfs->group,
+> +				     &tx_prof_dir->group);
+> +	if (rc)
+> +		goto tx_prof_dir_reg_err;
+> +
+> +	cxi_cfg_configfs->tx_prof_dir =3D tx_prof_dir;
+> +	tx_prof_dir->cdev =3D &hw->cdev;
+
+[Severity: Medium]
+In cxi_configfs_device_init(), can a concurrent mkdir race with group
+registration because rgp_dir->cdev, rx_prof_dir->cdev, and
+tx_prof_dir->cdev are assigned after configfs_register_group() returns?
+
+Once configfs_register_group() marks the directory ready, userspace can
+immediately invoke cxi_cfg_rgroup_dir_make_group(),
+cxi_cfg_rx_prof_dir_make_group(), or cxi_cfg_tx_prof_dir_make_group()
+while ->cdev is still NULL, passing NULL into cxi_dev_alloc_rgroup(),
+cxi_dev_alloc_rx_profile(), or cxi_dev_alloc_tx_profile().
+
+[ ... ]
+> +static struct config_group *
+> +get_first_child_config_group(struct config_group *parent_group,
+> +			     struct cxi_cfg_teardown_marker *marker)
+> +{
+> +	struct config_item *child_item;
+> +	struct config_group *child_group =3D NULL;
+> +	unsigned long flags;
+> +
+> +	mutex_lock(&cxi_cfg_group_subsys.su_mutex);
+> +	child_item =3D list_first_entry_or_null(&parent_group->cg_children,
+> +					      struct config_item, ci_entry);
+> +	if (child_item) {
+> +		config_item_get(child_item);
+> +		marker->item =3D child_item;
+> +		INIT_LIST_HEAD(&marker->list);
+> +		spin_lock_irqsave(&cxi_cfg_teardown_lock, flags);
+> +		list_add(&marker->list, &cxi_cfg_teardown_markers);
+> +		spin_unlock_irqrestore(&cxi_cfg_teardown_lock, flags);
+> +		child_group =3D container_of(child_item,
+> +					   struct config_group, cg_item);
+> +	}
+> +	mutex_unlock(&cxi_cfg_group_subsys.su_mutex);
+> +
+> +	return child_group;
+> +}
+> +
+> +static void unregister_all_sub_config_groups_recur(struct config_group *=
+parent_group)
+> +{
+> +	struct config_group *child_group;
+> +	struct cxi_cfg_teardown_marker marker;
+> +	unsigned long flags;
+> +
+> +	/*
+> +	 * Unregistering a child unlinks it from cg_children, so the list
+> +	 * is re-read each time round instead of being walked across the
+> +	 * unlocked section.
+> +	 */
+> +	while ((child_group =3D get_first_child_config_group(parent_group, &mar=
+ker))) {
+> +		unregister_all_sub_config_groups_recur(child_group);
+> +		configfs_unregister_group(child_group);
+> +
+> +		spin_lock_irqsave(&cxi_cfg_teardown_lock, flags);
+> +		list_del_init(&marker.list);
+> +		spin_unlock_irqrestore(&cxi_cfg_teardown_lock, flags);
+> +
+> +		/* The reference taken by get_first_child_config_group() */
+> +		config_item_put(&child_group->cg_item);
+> +		/* The creator's reference, as before */
+> +		config_item_put(&child_group->cg_item);
+> +	}
+> +}
 
 [Severity: High]
-What happens when a 0-byte or short message is received over vsock in
-dispatch_vf_notif(), pf_probe_vfs(), cass_vf_init(), or pf_vf_msghandler()?
+Is it safe for unregister_all_sub_config_groups_recur() to call
+configfs_unregister_group() on user-created mkdir groups after dropping
+cxi_cfg_group_subsys.su_mutex?
 
-read_message_from_vsock() accepts any message with hdr.len <=3D *msg_len
-(including hdr.len =3D=3D 0, where it writes nothing to msg and returns
-sizeof(hdr) > 0):
-- In dispatch_vf_notif(), common_req->op is read before checking whether
-  req_len >=3D sizeof(*common_req).
-- In pf_probe_vfs(), magic is set to CXI_SRIOV_MAGIC1 before sending and
-  msg_len =3D=3D sizeof(magic) is not checked after read_message_from_vsock=
-(),
-  so a 0-byte reply leaves magic =3D=3D CXI_SRIOV_MAGIC1 and falsely matches
-  seq =3D=3D 0.
-- In cass_vf_init(), magic and token_resp are uninitialized on the stack,
-  and neither msg_len =3D=3D sizeof(magic) after read_message_from_vsock() =
-nor
-  resp_len =3D=3D sizeof(token_resp) (or rc > 0) after cxi_send_msg_to_pf()=
- is
-  verified before using them.
-- In pf_vf_msghandler(), if the receive loop exits before invoking
-  hw->msg_relay(), reply_len is uninitialized on the stack when passed to
-  hw->msg_relay(hw->msg_relay_data, vf->vf_idx, NULL, 0, 0, 0, NULL,
-  &reply_len).
+First, if userspace concurrently runs rmdir on child_group after
+get_first_child_config_group() drops su_mutex, configfs_rmdir() detaches
+the dentry, calls unlink_group() (setting child_group->cg_subsys =3D NULL a=
+nd
+child_group->cg_item.ci_parent =3D NULL), and calls client_drop_item() ->
+cxi_cfg_drop_item_ref(), which sees the teardown marker and skips
+config_item_put(). When unregister_all_sub_config_groups_recur() then calls
+configfs_unregister_group(child_group), it dereferences
+group->cg_item.ci_parent->ci_dentry and subsys->su_mutex while both
+ci_parent and subsys are NULL.
+
+Second, configfs_unregister_group() is meant for default groups registered
+with configfs_register_group(). Calling it on mkdir-created groups does not
+invoke .drop_item callbacks (skipping cxi_rgroup_dec_refcount(),
+cxi_tx_profile_dec_refcount(), cxi_rx_profile_dec_refcount(),
+cxi_rgroup_delete_resource(), and AC entry removal) and never releases the
+two module references taken by configfs_mkdir() on subsys_owner and
+new_item_owner, preventing module unload.
+
+> diff --git a/drivers/net/ethernet/hpe/ss1/cxi_core.c b/drivers/net/ethern=
+et/hpe/ss1/cxi_core.c
+> new file mode 100644
+> index 0000000000000..d46ab3a1df104
+> --- /dev/null
+> +++ b/drivers/net/ethernet/hpe/ss1/cxi_core.c
+> @@ -0,0 +1,281 @@
+[ ... ]
+> +unsigned int pid_bits =3D DEFAULT_PID_BITS;
+> +module_param(pid_bits, uint, 0444);
+> +MODULE_PARM_DESC(pid_bits, "Width of the PID field within a NIC address"=
+);
+> +
+> +/* System info to determine if a system is mixed (C1 & C2)
+> + * or homogeneous (only C1 or only C2).
+> + */
+> +unsigned int system_type_identifier;
+> +module_param(system_type_identifier, uint, 0444);
+> +MODULE_PARM_DESC(system_type_identifier,
+> +		 "Identifies what type of Cassini NICs are present in the system\n"
+> +		"0 - Cassini 1 and Cassini 2 (Default)\n"
+> +		"1 - Cassini 1 Only\n"
+> +		"2 - Cassini 2 Only\n");
+> +
+> +unsigned int min_free_shift;
+> +module_param(min_free_shift, uint, 0444);
+> +MODULE_PARM_DESC(min_free_shift, "min_free shift (0 to 8)");
+> +
+> +unsigned int vni_matching;
+> +module_param(vni_matching, uint, 0444);
+> +MODULE_PARM_DESC(vni_matching, "vni matching configuration (0 to 3)");
+> +
+> +unsigned int tg_threshold[4] =3D { 0, 64, 128, 256 };
+> +module_param_array(tg_threshold, uint, NULL, 0644);
+> +MODULE_PARM_DESC(tg_threshold, "Array of 4 LPE append credits. Credits a=
+re 0 for immediate append, or 4 to 16383 for delayed append.");
+
+[Severity: Medium]
+Since tg_threshold is registered with 0644 permissions without custom
+param_ops, what happens if userspace modifies tg_threshold via sysfs after
+cxi_init() has run?
+
+Runtime writes bypass the 0 or 4..16383 check in cxi_init(), can exceed
+INT_MAX and wrap to a negative value when returned by
+cxi_get_lpe_append_credits(), and do not update the hardware
+C_CQ_CFG_TG_THRESH register programmed during cass_cq_init(), leaving
+software LE credit reservations out of sync with hardware.
+
+> +
+> +int untagged_eth_pcp =3D -1;
+> +module_param(untagged_eth_pcp, int, 0444);
+> +MODULE_PARM_DESC(untagged_eth_pcp, "PCP used by untagged Ethernet frames=
+. Valid PCPs 0-7. Use -1 to use the PCP specified in chosen QOS Profile");
+> +
+> +bool switch_connected =3D true;
+> +module_param(switch_connected, bool, 0644);
+> +MODULE_PARM_DESC(switch_connected, "Connected to a switch or another NIC=
+");
+
+[Severity: Low]
+Should these seven module parameters (pid_bits, system_type_identifier,
+min_free_shift, vni_matching, tg_threshold, untagged_eth_pcp, and
+switch_connected) be documented in
+Documentation/admin-guide/kernel-parameters.txt?
+
+Also, in cxi_init(), untagged_eth_pcp is a signed int checked against < -1,
+so should the error message format it with %d instead of %u?
+
+[ ... ]
+> +/* Send an asynchronous event to the clients */
+> +void cxi_send_async_event(struct cxi_dev *cdev, enum cxi_async_event eve=
+nt)
+> +{
+> +	struct cxi_client *client;
+> +
+> +	mutex_lock_nested(&dev_list_mutex, SINGLE_DEPTH_NESTING);
+> +
+> +	list_for_each_entry(client, &client_list, list)
+> +		if (client->async_event)
+> +			client->async_event(cdev, event);
+> +
+> +	mutex_unlock(&dev_list_mutex);
+> +}
+
+[Severity: High]
+Why does cxi_send_async_event() call mutex_lock_nested(&dev_list_mutex,
+SINGLE_DEPTH_NESTING) on the single static dev_list_mutex instance?
+
+A struct mutex cannot be locked recursively by the same task; if
+cxi_send_async_event() is called while dev_list_mutex is already held, it
+will self-deadlock at runtime. Using SINGLE_DEPTH_NESTING on the same
+singleton mutex also masks lock ordering inversions involving
+dev_list_mutex from lockdep, such as dev_list_mutex -> rtnl_lock in
+cxi_add_device() / cxi_remove_device() versus rtnl_lock -> dev_list_mutex
+when ndo_set_mac_address calls cxi_eth_mac_addr() ->
+cxi_set_nid_from_mac() -> program_nid() -> cxi_send_async_event().
+
+[ ... ]
+> +static int __init cxi_init(void)
+> +{
+[ ... ]
+> +	rc =3D hw_register();
+> +	if (rc < 0) {
+> +		pr_err("Driver registration failed\n");
+> +		goto err_drv_reg;
+> +	}
+> +
+> +	if (!(system_type_identifier =3D=3D CASSINI_1_ONLY ||
+> +	      system_type_identifier =3D=3D CASSINI_2_ONLY ||
+> +		system_type_identifier =3D=3D CASSINI_MIX)) {
+> +		pr_warn("Unknown system_type_identifier (%u). Using default (%u).\n",
+> +			system_type_identifier, CASSINI_MIX);
+> +		system_type_identifier =3D CASSINI_MIX;
+> +	}
+
+[Severity: Medium]
+Should system_type_identifier be validated before calling hw_register() in
+cxi_init()?
+
+hw_register() calls pci_register_driver(), which synchronously runs
+cass_probe() -> init_hw() -> cass_oxe_init() for devices already present.
+If an invalid system_type_identifier is passed, cass_probe() and
+cass_oxe_init() consume the unvalidated value (failing to disable
+C_OXE_CFG_COMMON.ioi_enable) before cxi_init() resets
+system_type_identifier to CASSINI_MIX.
+
+> diff --git a/drivers/net/ethernet/hpe/ss1/cxi_link.c b/drivers/net/ethern=
+et/hpe/ss1/cxi_link.c
+> new file mode 100644
+> index 0000000000000..8d53bbb2f027d
+> --- /dev/null
+> +++ b/drivers/net/ethernet/hpe/ss1/cxi_link.c
+[ ... ]
+> +void cxi_pml_recovery_set(struct cxi_dev *cxi_dev, bool set)
+> +{
+> +	struct cass_dev *hw =3D container_of(cxi_dev, struct cass_dev, cdev);
+> +
+> +	hw->link_ops->pml_recovery_set(hw, set);
+> +}
+> +EXPORT_SYMBOL(cxi_pml_recovery_set);
+
+[Severity: Medium]
+Does cxi_pml_recovery_set() have inverted boolean polarity between Cassini 1
+(cxi_link_ops_sbl) and Cassini 2 (cxi_link_ops_sl)?
+
+On Cassini 2, cass_sl_pml_recovery_set(hw, true) sets
+SL_LINK_CONFIG_OPT_PML_REC_ENABLE (enabling PML recovery), whereas on
+Cassini 1, cass_sbl_pml_recovery_set(hw, true) calls
+sbl_disable_pml_recovery(hw->sbl, 0, true), which sets
+SBL_DISABLE_PML_RECOVERY (disabling PML recovery).
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261030-cxi-netdev=
--submission-v1-0-8c2c391cc283@hpe.com?part=3D19
+-submission-v1-0-8c2c391cc283@hpe.com?part=3D20
