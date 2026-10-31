@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=52.42.203.116
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793416225;
-	b=kgHJeidB+tRuH7P3YKnQKuUmXQH7RDUosz1edRa8RGs1BYS4c/f6J5blKJgsuvh0xhGn
-	 m4xLxXdxN61AXMIBoFSZwBNz9oP/gkh9wG598QUtrG1mZ3k6wt0hMwKSns7w1OcGRC2pO
-	 TyhMwg/FYruCqErAExcU+cRlPfI4N/ZuEO0QCnFLBPhDK7emFx4LUJeZb9wzklnW6IhJk
-	 jeh2tfyBu7H+K6Lkm7qpSxL+sNv1rHHP9zf2BvEY/ufN9LWBx7RWEhr2Yh9mviAGGi8m2
-	 qKk/2fwNuC43YlvfLlEeDasD1kSyua02b4anWt2I86VA7/tDDx9VpL0mU0wdnc8f9SQ==
+	t=1793452201;
+	b=wMqgQtHMFCgmR9z8bistCTymPuBsd5+i1KcFuLJWEqe3yRnf/SfS99g0fE1mpzzjLkDD
+	 4oWygsgBwS5uUDUBkFxLFrzyFpVy36YkHsrrDc7+qQPHNAA0fhPrTf8HmFQc3l1JAjeNh
+	 xLAfv6VoLeRrf/zBW4EDFWL5F1nve+mWRDw5OobImWkODVcrk7mzp7TEPswgdfzCPbhTW
+	 qDxpmcaYwSm2DplPyeFmA6ettIH91+2TRMC374eHS+rYUbtq/lhN8GYqVUbgdpTdha7nR
+	 BYbdO146nduj7apkyWOea+tKFf0U8W78IdHDdKUWgX8tN2uNXmgqxuXF5TAg4We7y3A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793416225;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Received:X-Forwarded-Encrypted:X-Received:MIME-Version:References:
-	 In-Reply-To:From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=rSQVuufJqG4DagM4PmCmZM1z/EqJK6JLyOoiv3ybUJs=;
-	b=NjW47nHz2dkMvyeEFhILVwAHbMetG4aEJAIvPRlwAAqP1VYZU+OSkPfZx3L+4MfiL23T
-	 cy0jkqRWzmgKDHhx1s51ZM3IrGgSXkqaYsDuDg/K8zdT6907uzkNEJ4Oh9QrZdpM73WiJ
-	 fzx6tj2Hof6zjSTRDZVfWfVxNUpAfpR1uge8ygtUNMznNmN1CAWppOuK2TJE+GREiVe3f
-	 EzGUIxGBbnhNcFXnoG21xV2kgkqkmR9+axpLHd9mYOCa3+rfPCksYks+huxasyKCRr5G5
-	 P8w19h+KRS/c+8Y9Nc3W0jiZgIxJZrGfM9eEaQJwZ/udDFwY8WUlOk6iZRMoWrFtFBQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793452201;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:Received:Received:X-Farcaster-Flow-ID:Received:Received:
+	 From:To:CC:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type:X-Originating-IP:
+	 X-ClientProxiedBy;
+	bh=qpRQyl+F0iyCWogSrvS1H906Iwx+X1/j+/wJASJUclQ=;
+	b=u9uwzvQGYD/D733R/GZ06y5lDFciGq50YqiW87qmR8KUPaFxpkI+5BgxN/A5iseW+65c
+	 pjWAhRwpIAOBFvs9DFRJZ4JZ3alIze4963AT94D973bED/KfP/LeGRjFL+duEb8Ls4OJH
+	 C4AOFTMZ7BsfFG5eQoa/Q8csmYkbR6DZrP6yENyIyjTswNBsHScUlfvOFZPhVn06rl0+2
+	 UrHSAF1MmHNyP50APVrAAMhzKIX9SFSD+j3cJs6hcdwF3PNLaKKeIu9rUAoXdKW8dUNKR
+	 WaYaBLMASMXgadlNi2Yzx4Sesi6lkebgOG/FHw+uYfw1/OeeWwsfv4Np+uWcSK78FZg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=chromium.org;
-	spf=pass smtp.mailfrom=chromium.org;
-	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=TAQY1f+q;
-	arc=none smtp.remote-ip=209.85.208.51
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=amazon.com;
+	spf=pass smtp.mailfrom=amazon.com;
+	dkim=pass header.d=amazon.com header.i=@amazon.com header.a=rsa-sha256 header.s=amazoncorp2 header.b=njInuDVE;
+	arc=none smtp.remote-ip=52.42.203.116
+Received: from pdx-out-008.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-008.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.42.203.116])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D52A606A31A
-	for <linux-kbuild@vger.kernel.org>; Sat, 31 Oct 2026 03:10:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8D52A606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10CF8606A31A;
+	Sat, 31 Oct 2026 13:10:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 10CF8606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=TAQY1f+q
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-6b1b13e09ffso1857386a12.3
-        for <linux-kbuild@vger.kernel.org>; Fri, 30 Oct 2026 20:10:24 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=amazon.com header.i=@amazon.com header.a=rsa-sha256 header.s=amazoncorp2 header.b=njInuDVE
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1793416223; x=1794021023; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=rSQVuufJqG4DagM4PmCmZM1z/EqJK6JLyOoiv3ybUJs=;
-        b=TAQY1f+qcYj8+tbBoDh66s7ra3AFUjGNykye+dGi328lF0Kq831n3SFZEjzEtyvnbV
-         JxYs6LkOH15TA0raukNSQE9tfej/6hRU8nPi15mLc+/XgZZ/80KWFoMtHTdi5QgVrfMg
-         VtlUceT+Bj4YW05YP4jscly2f3dHqSU1FvvXg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793416223; x=1794021023;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=rSQVuufJqG4DagM4PmCmZM1z/EqJK6JLyOoiv3ybUJs=;
-        b=i4IF5ij28s4Al7DOBe5J2jMtaNNqMkzgVuNH7PbB8CvoeFPN3qEpOtJWrevbLL/EuE
-         O7xivsHIzEJiFubA2s49zoJP7a032cXBelQZQVS44J56wU7vutd8pP+x+0t3beQwu5LF
-         NL3glUdjJAnL3bkFnQTmT+PmT2rVdNpRaCb8w7rTzP2KXYOBWn6s4hz58tbss3ab1ZvD
-         P8CALDRqLo+b8uutwapI8VWuDtErpBQsT1N/zHudqH0blmSy7q21IQPjPEYQrQk5fboe
-         cjHCaSN2Tr7UWiiiGcE3X4l33jdS0IAH/TzZgYsNH/YHDBzPbwaI6ykxq9rwkhm64BKE
-         FxXg==
-X-Forwarded-Encrypted: i=1; AKwUvBzjp8TsMrCotNxJV11vEicFgvvL06I4IPoqLYf0d+rUqxgQSjuLTm4X3lesO7LkSOgyTNPFAYg55NTeVpk=@vger.kernel.org
-X-Gm-Message-State: AFq9FYLlwP/sxOk5Gh9CYabxc6scS4bj0GHUgyxewPnSmyuC3Y8I6Wp/
-	ZYCkF0A+S8w2zdl6BbbFGVRddrgKyCmp+nmjPhuGKLeQpLBadVTp7IDL2P8hiDLkqJ8HKwzHdX7
-	VB0Q+8WnY
-X-Gm-Gg: AYBFou3tSOKvHr6LWOG2r4xaCELGYyeq27D4tBBTd6hS7EVsfktLm4m3oOAfbTfl+rX
-	87pPTJ8AqODHc9QTPIii9hat15csHp1yTB4ha/wbaotDOpgo6myb/6ATG7GjSF7bvQfkYjGKSe/
-	2Bybx8Di+nc0eiqLO6qIjTnTM7rjIxG2K+lr1Xs+jTbu0SZPtfNXePrC+Aat9Aw7cQXLZUalpV5
-	angg8UPO8axLJrOU8nMJzsvzQET5brfxtUuAfcAKeaO+7hixOufzdircc2IZZ7UFGn6hF9QPuhG
-	cMcHb2h1HNEo2TdmkfHrfwc/f9hOnv5dWmueGOcctJN7nTWVN34ukAFV5gjz1owiMncM/YOg7f3
-	QNxa0p8bBifnCDhZfsLViUatLAD3CzPmrpuIkzmjSzWOpX+vZOzLLtDvQYO04PM+mDiRYezKTCA
-	0J8q9ai8TqgVfjGZU0lKPkXLmMharY1yDiWcXU+w0p0YTS2H2shyr2LKJ1miDKjYt+Ok/m7kKkG
-	/72aG6CsLaH6VHrORwLokptOE2wXXQ+vURlBz2Ree7YTnIKUshapLdRUpYAfQbWQeVvUCk/ytH2
-	BCdUnHxmBHgh13fUwwDAVcPubN6GGz6XpoldO/5knmuvGWgx7gps4P7pagvjoDXFhqx0
-X-Received: by 2002:aa7:c949:0:b0:6b1:c7ae:ec40 with SMTP id 4fb4d7f45d1cf-6b4d337c917mr2093372a12.4.1793416222253;
-        Fri, 30 Oct 2026 20:10:22 -0700 (PDT)
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com. [209.85.221.49])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6b4ec9ee7c9sm602205a12.7.2026.10.30.20.10.21
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 30 Oct 2026 20:10:21 -0700 (PDT)
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-48e0d885929so1070879f8f.3
-        for <linux-kbuild@vger.kernel.org>; Fri, 30 Oct 2026 20:10:21 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBxrDkQbUmqnCEfWDAc76GYUN3gOloI6GPYCiB3gig7tPe2fWn0a41sqn1LipWVxlioJ4HFE7d0/38Xrxog=@vger.kernel.org
-X-Received: by 2002:a5d:5f84:0:b0:48d:eec6:308b with SMTP id
- ffacd0b85a97d-48e6e4f561bmr9818154f8f.21.1793416220997; Fri, 30 Oct 2026
- 20:10:20 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1793452201; x=1824988201;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=qpRQyl+F0iyCWogSrvS1H906Iwx+X1/j+/wJASJUclQ=;
+  b=njInuDVEda+lcVa35YS8nSSsra2aAQm8GRxZ8F9+Rv99/EAg8nMQ5aBC
+   T2LRDbw///U/kIJwyGD95M2dmOiR03O7BpBGkrTWU/ZOaPXMYLjXJVQ/s
+   3jzqEKZoTZ1iXBzDnqJfuqSYw3YGtfZGDmk0U+LAeOeOzE+V5/VDZf25W
+   Sw64NESf8kCsJk4N67sCYDDCf3YIayMWXmWhDR3XHNr41IMwjFU7lkVnL
+   a7tEivaJ2jRds8imizf+PT2y8WikW9J6zmiezR5zUC+PCs5ZB8b5+9BNL
+   97vzPFBdgXYfQBBR5EqLeh7TGN0coZUrQKcvA3Bj9rBsNjAOXDu8iOsBT
+   g==;
+X-CSE-ConnectionGUID: yl+j7SMISFCmSqa074HKsQ==
+X-CSE-MsgGUID: EkYm3CWrQUC8iV6hmcVX0Q==
+X-IronPort-AV: E=Sophos;i="6.27,188,1787011200"; 
+   d="scan'208";a="32781343"
+Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
+  by internal-pdx-out-008.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2026 13:10:00 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [205.251.233.178:18493]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.22.238:2525] with esmtp (Farcaster)
+ id f6314dd5-b68f-40bd-afa9-ac54f6d9e237; Sat, 31 Oct 2026 13:10:00 +0000 (UTC)
+X-Farcaster-Flow-ID: f6314dd5-b68f-40bd-afa9-ac54f6d9e237
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.56;
+ Sat, 31 Oct 2026 13:10:00 +0000
+Received: from dev-dsk-wanjay-2c-d25651b4.us-west-2.amazon.com (172.19.198.4)
+ by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.56;
+ Sat, 31 Oct 2026 13:09:59 +0000
+From: Jay Wang <wanjay@amazon.com>
+To: <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, "Daniel
+ Borkmann" <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+	"Eduard Zingerman" <eddyz87@gmail.com>, Kumar Kartikeya Dwivedi
+	<memxor@gmail.com>
+CC: Ihor Solodrai <ihor.solodrai@linux.dev>, Alan Maguire
+	<almagui@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Yonghong Song
+	<yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, Steven Rostedt
+	<rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, "Mathieu
+ Desnoyers" <mathieu.desnoyers@efficios.com>,
+	<linux-trace-kernel@vger.kernel.org>, Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>, <linux-kbuild@vger.kernel.org>, "Arnd
+ Bergmann" <arnd@arndb.de>, <linux-arch@vger.kernel.org>, <x86@kernel.org>,
+	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Hazem Mohamed
+ Abuelfotoh" <abuehaze@amazon.com>, Bjoern Doebel <doebel@amazon.de>, "Martin
+ Pohlack" <mpohlack@amazon.de>, <jay.wang.upstream@gmail.com>
+Subject: [PATCH bpf-next 00/13] bpf: keep the vmlinux BTF compressed until first use (CONFIG_DEBUG_INFO_BTF_LAZY) to save ~6 MB memory
+Date: Sat, 31 Oct 2026 13:09:46 +0000
+Message-ID: <20261031130959.23472-1-wanjay@amazon.com>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -94,102 +94,216 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261020153652.2907186-1-dianders@chromium.org>
- <CAFLszTgzpQ-donjjtcPwy5T3pfWg_u83QMh0GcdpY2JCq_s75w@mail.gmail.com> <CAD=FV=Vt6hgGJuYtv1_mBSQztWQBjmDN9CwLtVxrXcyECGx2-A@mail.gmail.com>
-In-Reply-To: <CAD=FV=Vt6hgGJuYtv1_mBSQztWQBjmDN9CwLtVxrXcyECGx2-A@mail.gmail.com>
-From: Doug Anderson <dianders@chromium.org>
-Date: Fri, 30 Oct 2026 20:10:09 -0700
-X-Gmail-Original-Message-ID: <CAD=FV=Xxn75bf6ZjRPyQ5jfWwxx9cPe8_8bV6qzAXQc+gckB-A@mail.gmail.com>
-X-Gm-Features: AclHuK-bghq4wzz1qNlwlR04GGQ-u_3zjoGTgsEW-iZ0A7dRvqdHdSoL4JcYqzo
-Message-ID: <CAD=FV=Xxn75bf6ZjRPyQ5jfWwxx9cPe8_8bV6qzAXQc+gckB-A@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/7] arm64: Add fit images for sc7180-trogdor and google,lga
-To: Simon Glass <sjg@chromium.org>
-Cc: Devicetree-compiler@vger.kernel.org, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Konrad Dybcio <konradybcio@kernel.org>, linux-kbuild@vger.kernel.org, 
-	Brian Norris <briannorris@chromium.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	Chen-Yu Tsai <wenst@chromium.org>, linux-arm-msm@vger.kernel.org, 
-	Nicolas Schier <nsc@kernel.org>, Peter Griffin <peter.griffin@linaro.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Tudor Ambarus <tudor.ambarus@linaro.org>, Devicetree@vger.kernel.org, 
-	Julius Werner <jwerner@chromium.org>, Saravana Kannan <saravanak@kernel.org>, 
-	Will Deacon <will@kernel.org>, Michal Simek <michal.simek@amd.com>, 
-	=?UTF-8?Q?Andr=C3=A9_Draszik?= <andre.draszik@linaro.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Andrew Jones <andrew.jones@linux.dev>, 
-	Bjorn Andersson <andersson@kernel.org>, Breno Leitao <leitao@debian.org>, 
-	David Sterba <dsterba@suse.com>, Gary Guo <gary@garyguo.net>, 
-	Josh Poimboeuf <jpoimboe@kernel.org>, Luis Augenstein <luis.augenstein@tngtech.com>, 
-	Marco Elver <elver@google.com>, Mark Rutland <mark.rutland@arm.com>, 
-	Masahiro Yamada <masahiroy@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, Nick Terrell <terrelln@fb.com>, 
-	"Peter Zijlstra (Intel)" <peterz@infradead.org>, Rong Xu <xur@google.com>, 
-	=?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, 
-	cros-qcom-dts-watchers@chromium.org, linux-samsung-soc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D031UWA004.ant.amazon.com (10.13.139.19) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-Hi,
+This series follows the feedback on the previous posting, "[PATCH
+bpf-next v4 00/12] bpf: make the vmlinux BTF an on-demand loadable
+module (CONFIG_DEBUG_INFO_BTF=m) to save ~5.4 MB memory":
+https://lore.kernel.org/bpf/20261001225214.12351-1-wanjay@amazon.com/
 
-On Fri, Oct 30, 2026 at 6:09=E2=80=AFPM Doug Anderson <dianders@chromium.or=
-g> wrote:
->
-> > The FIT_ITS path is a second way to build image.fit alongside
-> > make_fit.py, and much of it repeats what make_fit.py already does: it
-> > puts the root compatible from each DTB into the configuration and
-> > compresses the DTBs. The series adds fdtget/fdtput, sed parsing of
-> > /incbin/ paths and a shell loop in Makefile.lib to do the same for a
-> > hand-written .its file, and the .its files repeat the DTB lists from
-> > the Makefiles.
-> >
-> > Have you thought about extending make_fit.py to take the per-board
-> > metadata (e.g. from a small file next to the DTs, or via
-> > FIT_EXTRA_ARGS) and to run fdtfactor itself? That would avoid the
-> > in-tree fdtget/fdtput, the mkimage dependency and most of the Makefile
-> > logic, and trogdor would come almost for free.
->
-> I certainly can do that if that's what people want. ...and, yes, I
-> think it would simplify some stuff in this patch series. The
-> question is: what does it look like? Is it a file that is a list
-> of devicetrees along with descriptions? The list of devicetrees
-> would be to limit which devicetrees are built into the FIT
-> and then each would have a description. ...and yes, that would mean
-> it would need to be updated in parallel with the Makefile, but I
-> don't see a significantly better way to do it. Yeah, I guess that
-> could work OK.
->
-> If so, I think a bunch of the patches in this series will be
-> dropped or look very different. I probably won't directly reply
-> to your comments on patch 2, 4, 6, and 7 if we go this way.
->
-> Should I give it a shot for v2?
+Based on and tested against bpf-next commit 7101b10cf281 ("Merge branch
+'bpf-add-syscall-common-attrs-support-for-xdp-link_create'"), plus
+commit fb2b27d214c3 ("bpf: Propagate btf_add_type() errors in
+btf_check_all_metas()") from the bpf tree, which a first use that runs
+out of memory relies on.
 
-FWIW, I did a quick prototype of this, and it is definitely a much
-smaller / less invasive patch series. I've got
-"sc7180-trogdor.fitconfig" and "lga.fitconfig" files. Because they are
-easy to parse in python, they're in ".ini" format in my prototype. So
-"lga.fitconfig" looks like this:
+This series adds CONFIG_DEBUG_INFO_BTF_LAZY.  With it, the kernel image
+keeps the vmlinux BTF zstd-compressed, and the kernel decompresses and
+parses it the first time something needs it, instead of at boot.  On a
+system that never uses BTF this saves ~6 MB of memory with a
+distribution config; the first user waits ~15 ms once, and from then
+on everything is as without the option.  The option is off by default.
 
-+# SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
-+#
-+# Each configuration description encodes board and SoC matching metadata
-+# for downstream packaging tools in the format:
-+#   "<Model> (<key>=3D<value>,...)"
-+# where <key> includes board_id, board_rev, soc_id, and soc_rev with
-+# hexadecimal <value>s (in any key order).
-+
-+[lga-blazer.dtb]
-+description =3D Blazer
-(board_id=3D0x070406,board_rev=3D0x010000,soc_id=3D0x0005,soc_rev=3D0x01000=
-0)
-+
-+[lga-frankel.dtb]
-+description =3D Frankel
-(board_id=3D0x070306,board_rev=3D0x010000,soc_id=3D0x0005,soc_rev=3D0x01000=
-0)
-+
-+[lga-mustang.dtb]
-+description =3D Mustang
-(board_id=3D0x070506,board_rev=3D0x010000,soc_id=3D0x0005,soc_rev=3D0x01000=
-0)
+The option is currently available on x86 and arm64 only.  On several
+other architectures the boot image is a stripped ELF copy of vmlinux,
+which would carry the 5-7 MB of uncompressed BTF that the kernel never
+uses; they can follow once their boot images drop it.
+
+It replaces the CONFIG_DEBUG_INFO_BTF=m series [1]: compression is the
+approach Ihor proposed there and prototyped [2], Alexei preferred it
+[3], and Ihor agreed to this series taking it to submission [4].
+
+Problem
+-------
+
+The vmlinux BTF is 5-7 MB of read-only data in every kernel built with
+CONFIG_DEBUG_INFO_BTF=y, and the kernel parses it at boot whether or
+not anything on the system uses it.  A distribution ships one kernel
+build to all its users, so it cannot turn BTF off for the ones who do
+not need it without taking it away from the ones who do: CO-RE,
+fentry/fexit, kfuncs, struct_ops, sched_ext and BPF LSM all depend on
+it.
+
+Approach
+--------
+
+Nothing is removed, only deferred, and nothing waits for user space:
+whoever needs the BTF first decompresses and parses it synchronously,
+so every caller of bpf_get_btf_vmlinux() still gets the BTF or an
+error.  The work is in finding the first users and in what has to wait
+for them:
+
+ - Who needs it (patches 1-3).  bpf_check() fetched the BTF for every
+   program; now it is fetched where kernel types enter a program, and
+   program context types are matched by name, so the socket filters
+   and cgroup programs systemd loads at boot do not parse it.  Neither
+   can an unprivileged bpffs mount with delegate options.
+
+ - Where it must not be parsed (patches 7, 8).  The CO-RE candidate
+   lookup and the tracefs btf_ids file fetch it before taking their
+   mutex.  The trace readers print BTF-typed arguments under the trace
+   locks while the tracer records; tracing now parses the BTF when such
+   output is enabled, and the printers never parse it.
+
+ - Boot-time registrations (patches 4, 6, 10).  kfunc sets and
+   struct_ops registered by initcalls are queued and replayed by the
+   task that parses the BTF, before it publishes it.  A first use that
+   runs out of memory, e.g. because its task is being killed, is undone
+   and left to the next one.
+
+ - Module BTF (patches 5, 11).  Module BTF is split BTF on top of the
+   vmlinux BTF.  Modules that load before the first use keep their BTF
+   unparsed and serve it in sysfs; it is parsed together with the
+   vmlinux BTF.
+
+Systems that use BTF end up with the same memory as today: the
+compressed copy is freed once it is decompressed.  What still parses
+the BTF at boot: BPF LSM programs (systemd loads one when "bpf" is in
+the LSM list), the iterators of CONFIG_BPF_PRELOAD (at the first bpffs
+mount, which systemd does at boot), and modules with distilled base
+BTF.
+
+Patches 1-8 prepare and are small changes on their own; their
+changelogs say what, if anything, changes without the option.  Patch 9
+adds the option and keeps the BTF compressed; 10 and 11 defer the
+registrations and module BTF; 12 keeps two selftests working without
+__start_BTF; 13 documents the option.
+
+Patches 1, 3, 4, 7 and 8 are Ihor's, adapted to the current tree.
+Patches 2, 5, 9, 10 and 11 are co-developed with him: 9 reworks his
+compression patch, and 2, 5, 10 and 11 combine his rework with parts
+of the =m series.
+
+Testing
+-------
+
+Tested with a distribution config, the option on against off, with
+module BTF.  A kprobe event on btf_parse_vmlinux() shows when the BTF
+gets parsed, without needing BTF itself:
+
+  # cd /sys/kernel/tracing
+  # echo 'p:parse btf_parse_vmlinux' >> kprobe_events
+  # echo 1 > events/kprobes/parse/enable
+  # grep btf_vmlinux /proc/vmallocinfo
+      -> only btf_vmlinux_keep_zst: the compressed copy, ~1.4 MB.
+  # ls -la /sys/kernel/btf/vmlinux
+      -> the full size, ~5.5 MB, although nothing is decompressed yet.
+  # modprobe ext4; ls /sys/kernel/btf
+      -> ext4 and its dependencies are there right away, although
+         their BTF is only kept, not parsed.
+  # cat /sys/kernel/btf/vmlinux > /dev/null
+  # grep btf_vmlinux /proc/vmallocinfo
+      -> btf_vmlinux_data: the decompressed copy, ~5.5 MB; the
+         compressed copy is freed.
+  # grep parse kprobe_profile
+      -> parse 0: reading the file did not parse the BTF.
+  # bpftool btf list
+      -> vmlinux, ext4 and its dependencies get BTF ids, and
+         kprobe_profile counts one parse.
+
+Results:
+
+ - Without a BTF user, MemTotal is 5.4-6.7 MB higher with the option,
+   slab ~2 MB lower, and the compressed copy takes ~1.4 MB of vmalloc:
+   ~6-7 MB more free memory.  After the first use the decompressed copy
+   takes ~5.5 MB of vmalloc, and slab is as with the option off.
+   The ~5.4 MB quoted for the =m series [1] counted MemTotal alone,
+   i.e. the size of .BTF.  The figure here also counts the ~2 MB that
+   parsing the BTF at boot allocates (=m saved that too), minus the
+   ~1.4 MB compressed copy.
+ - The first use takes ~15 ms: ~7 ms to decompress, ~6 ms to parse,
+   ~1 ms for the kept module BTF and the queued registrations.
+ - Each of these, as the first user on a fresh boot, parses the BTF
+   and works: kfunc calls, a struct_ops map, a kptr to task_struct,
+   ksyms and map_ptr access, bpf_snprintf_btf(), BPF_BTF_GET_NEXT_ID,
+   kprobe events with BTF arguments, func-args, funcgraph-args and
+   funcgraph-retval, a tracepoint's btf_ids file, a bpffs mount with
+   delegate option names, loading a module with distilled base BTF,
+   and four program loads at once.  Modules loaded before have their
+   BTF, and the kfuncs they registered from init, in place after it;
+   modules removed before leave nothing behind.
+ - These do not parse it: socket filters (also failing ones, and ones
+   with func_info and an extension of them), a light skeleton loader,
+   CO-RE relocations done by libbpf, the programs systemd loads at
+   boot, stat(), read() and mmap() of /sys/kernel/btf/vmlinux, reading
+   a module's BTF file, BPF_BTF_GET_NEXT_ID without CAP_SYS_ADMIN, and
+   an unprivileged map_ptr access or attach_btf_id.
+ - A module with broken BTF loads, loses its BTF at the first use and
+   stays loaded.
+ - Lockdep, kmemleak and KASAN kernels run the same cases cleanly.  A
+   fault injection sweep fails each of the 750 allocations of a first
+   use in turn, one per boot; each failure leaves nothing published,
+   and the next use completes.
+ - With systemd as init, its BPF LSM program parses the BTF at boot
+   when "bpf" is in the LSM list; without it, and without
+   CONFIG_BPF_PRELOAD, nothing does.
+ - Every patch builds with and without BTF.  Neither the x86
+   compressed image nor the arm64 Image carries the uncompressed BTF.
+
+[1] https://lore.kernel.org/bpf/20261001225214.12351-1-wanjay@amazon.com/
+[2] https://lore.kernel.org/bpf/44315425-c505-46fe-8379-f19d78ff3abb@linux.dev/
+[3] https://lore.kernel.org/bpf/DLUZVHOLSN1B.115EUX4KJBEA3@gmail.com/
+[4] https://lore.kernel.org/bpf/7844ef03-d9b2-4a10-8f14-1b498ada9043@linux.dev/
+
+Ihor Solodrai (5):
+  bpf: match program context types by name without vmlinux BTF
+  bpf: check CAP_SYS_ADMIN before looking up bpffs delegation names
+  bpf: move bpf_get_btf_vmlinux() to btf.c
+  bpf: parse the vmlinux BTF before taking cand_cache_mutex
+  tracing: parse the vmlinux BTF when BTF-typed output is enabled
+
+Jay Wang (8):
+  bpf: fetch the vmlinux BTF where kernel types enter a program
+  bpf: let btf_parse_module() adopt the caller's copy of the module BTF
+  bpf: look up the struct_ops common value type in the given BTF
+  bpf: keep the vmlinux BTF zstd-compressed in the kernel image
+  bpf: defer kfunc and struct_ops registrations until first BTF use
+  bpf: keep module BTF until the vmlinux BTF is parsed
+  selftests/bpf: keep ksyms and linked_vars working without __start_BTF
+  Documentation/bpf: describe CONFIG_DEBUG_INFO_BTF_LAZY
+
+ Documentation/bpf/btf.rst                     |  30 +
+ arch/x86/boot/compressed/Makefile             |   2 +-
+ include/asm-generic/vmlinux.lds.h             |  24 +-
+ include/linux/bpf.h                           |   1 +
+ include/linux/btf.h                           |   5 +
+ kernel/bpf/Makefile                           |   2 +-
+ kernel/bpf/bpf_struct_ops.c                   |   4 +-
+ kernel/bpf/btf.c                              | 636 +++++++++++++++---
+ kernel/bpf/inode.c                            |  11 +-
+ kernel/bpf/syscall.c                          |  12 +-
+ kernel/bpf/sysfs_btf.c                        | 167 ++++-
+ kernel/bpf/verifier.c                         | 115 ++--
+ kernel/trace/bpf_trace.c                      |   3 +-
+ kernel/trace/trace_btf.c                      |  32 +
+ kernel/trace/trace_btf.h                      |   3 +
+ kernel/trace/trace_events.c                   |   4 +
+ kernel/trace/trace_functions.c                |   4 +
+ kernel/trace/trace_functions_graph.c          |  15 +-
+ kernel/trace/trace_output.c                   |   3 +
+ lib/Kconfig.debug                             |  24 +
+ scripts/gen-btf.sh                            |  25 +-
+ .../testing/selftests/bpf/prog_tests/ksyms.c  |   8 +-
+ .../selftests/bpf/progs/linked_vars2.c        |   4 +-
+ .../testing/selftests/bpf/progs/test_ksyms.c  |   5 +-
+ 24 files changed, 951 insertions(+), 188 deletions(-)
 
 
-Happy to post a v2 RFC showing what that looks like if you want...
+base-commit: 7101b10cf281f629ac58c99697ca6f6d082b99a7
+prerequisite-patch-id: 7f71e8747677477d27e903f08839dcecfd176ade
+-- 
+2.47.3
+
