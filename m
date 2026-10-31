@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793480532;
-	b=t5dBuJP+5UfUw0+BhTW+h7455lhJ6zEFhP/GHIkkwzI2/DcDpIA/FyLcq+/3I3VIhRXI
-	 axDhMPHHZi+iyfQ0I8iQ55+OZVWKm6jMiQZI9cWL5XqluDSOShGxASgcBBFSlcUNW9Mkc
-	 WpRtg/eyl/A0qU/0ujhK6+3Q3XEwsmZW3bfdo6ZWc7cavINAA4IDF6gHNczKIVKcTBdXl
-	 KE/kWqXAl4zyCIzvjBURHPafFsaj/rhy6bmJLokYgQ3M4n4+P44D4x9dLnkO2P43CgwbP
-	 opDimR03RGmNknPMTkDi+Ff9WHUhQqsqUBdwMpAs09aRBrK6y5z6JTPcWOeyZbP9iGg==
+	t=1793480533;
+	b=M/P+HZoR5nyvKDBB4B1Vr9cxm03hOqIvT/dkzS8tL6qXygH2jBzHQwJU87Au5+tUqcr9
+	 1/Ug3r9qrhc7gSBXOrUs2bA8nvONasx9xpd88AAqeCiBZ44af6c2XD5eiBtG4/O9/sSLM
+	 rJ90qMzbL4+BBI5AImbWTro3MPecb8GVixLgn8vFXbMdsiENA3sLCkx2z7pmYXgavkTbV
+	 vzUFPWl0lc2yBW/mjuKDf0trSrkifAug/22vM9bDV/eSIxa99/I4hmHst++zcsD0m9Nkc
+	 Gd0whgylOUugnhRnnl6ThyAiIUV8LsqlkvxPLONpUiL84fHa7HcM7MfLP7Z0Z2h9qAg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793480532;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793480533;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=0dEhmjXsL7nPsuwlBtJSYTKnGleVgZrOcdft/ZUzRgA=;
-	b=b7znYcY1O4IzKhjb33D73+Idy/kvp7Bz1xQITfYc0uBSlQJkSA+54K7JT/sDCKdlOqa5
-	 kb1vAoYCTesNIhaeFhCndovsc82x9avLxVsie5UixHOjgbS2PQS4BhsNJHQXSHD1FFCy4
-	 vAdBW9wrTnTH8uUNrMFk54Z7gxcVcB2WQHrDlfbOw0VtYYXEz23SNgapwWWaR7/iWmUpr
-	 PQphp3TrYJ9vrjvkMUrIWOzqnY9+sanHHJM+ByYP1x2sKenCNcJtpWomfZFRW/mPDRgo7
-	 Rm5Lp16iZQlI+IQcV8pVaE6XNdKEQXUbrq5llkECWk+wNDx5Q8P8xTjRh5MdNrl8LXA==
+	bh=blcS2ufOqoUhfU8nLzGWjuN4j/BNymuSNU0bZE0coJQ=;
+	b=rYf/nVW5W33VrxfUUBAl6sHf6iK7eEdFFYlD/nbMPAApHzhC0pOp+u90vxWHfXaGLeYy
+	 E4tNFUMm0v2ld631XNKIch3WGwx4OepFoYwYCw+o0jahwPKLDzHuzC44L16wDScF22jIo
+	 RYyW+rT8GGGiT43RZTs1pDtP9PORWQqddRWA9Lik9kTx2QArnkmOlTZLvxWjGVtuHUGu9
+	 tzJ/+iwr0bqAGEsrJ5c5isru7gt0g6AcE01QZe4geWvA5t1aic75+hEwaLqfFf80FVdgt
+	 aqbScHnu+1RP24wiwawUMUVG0HPhWmiygU+7NBD21m9S0uxqFw7kuOCW1w5rE5KQgXQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SRWP6kGo;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UOdSI8Tm;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98584606A31C
-	for <linux-kbuild@vger.kernel.org>; Sat, 31 Oct 2026 21:02:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2B6D606A31C
+	for <linux-kbuild@vger.kernel.org>; Sat, 31 Oct 2026 21:02:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SRWP6kGo
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5C4B1F000C1;
-	Sat, 31 Oct 2026 21:02:10 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UOdSI8Tm
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7CF31F00919;
+	Sat, 31 Oct 2026 21:02:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793480531;
-	bh=0dEhmjXsL7nPsuwlBtJSYTKnGleVgZrOcdft/ZUzRgA=;
+	s=k20260515; t=1793480532;
+	bh=blcS2ufOqoUhfU8nLzGWjuN4j/BNymuSNU0bZE0coJQ=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=SRWP6kGo8Svsjq61/juu9uFKFweePZrBojffYu2yRZvL9YOIdptFD3GOYPxWLmMwX
-	 5UrCq+pSY4VhgJsfGU4BIAZYYyJCiM6UtjPna++cGIVSuvWsXdRkEtF0uUgagA+yex
-	 YbyfF71ZkdvhW8x1gqJv0xCcnT/kKBd875AGAzVZ12lotHJuNqTPBt/hbsR1hECFMi
-	 i4S4ajX5yOr77MlatsdZLV0xodMALMDjfQR9mVzh9WyS5BBt82uo9V8jKxp3MgkI0h
-	 0fQYYVJS10T4AQF+JWNpC3Xv55DQK/1QPa4anm8Q7by7+m//RM33OtIPPXLQekoh7l
-	 7JuJd7m+aMtHQ==
-Message-ID: <sashiko-outbox-192140@kernel.org>
+	b=UOdSI8TmOUNvaAdjMdS2Jee/xFtmUM/sG2ZXHIdyvEAG1QNLUk1t10WtVZkXlXFQr
+	 8JSjomD/pOig2vJsv4J1GH9Oajf96bmL2niXYTs7BvAcDOREC+KZkd81gMs+GUWEvr
+	 /NzEfaSEj09osrG6i4/BoBpWRWiW4DyRYsMgZQFENXxY+p4mn2+/0QeqVTKCEt3BHU
+	 hcn17BgbDXklfB0XuiH1dWosdkoiErA4Xj8FWiuPv4XrBP6yvjLRvw+0/0HJVt/yiD
+	 +D/USu/4U4VF4zSurIdh1/G/Nc7F7Z1+pw+Eqz7Yv70zfjZydqj6942dR8mVl9cN/k
+	 t8+FdVHGDJP1A==
+Message-ID: <sashiko-outbox-192141@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 08/23] net: hpe: sbl: add media, FEC and counter support
+Subject: Re: [PATCH 10/23] net: hpe: sl: add the module entry points
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Doug Ledford" <doug.ledford@hpe.com>, "Slingshot Open Source Team" <slingshot-os-team@groups.ext.hpe.com>, "Nathan
  Chancellor" <nathan@kernel.org>, "Nicolas Schier" <nsc@kernel.org>, "Richard
@@ -50,14 +50,13 @@ To: "Doug Ledford" <doug.ledford@hpe.com>, "Slingshot Open Source Team" <slingsh
  Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Sumit
  Semwal" <sumit.semwal@linaro.org>, =?utf-8?b?Q2hyaXN0aWFuIEvDtm5pZw==?= <christian.koenig@amd.com>, "Guenter
  Roeck" <linux@roeck-us.net>
-Cc: linux-kbuild@vger.kernel.org, "Sandeep Bhoot" <sandeep.bhoot@hpe.com>, "Mamila
- Santosh" <santosh-kumar.mamila@hpe.com>
-In-Reply-To: <20261030-cxi-netdev-submission-v1-8-8c2c391cc283@hpe.com>
+Cc: linux-kbuild@vger.kernel.org, "Sandeep Bhoot" <sandeep.bhoot@hpe.com>
+In-Reply-To: <20261030-cxi-netdev-submission-v1-10-8c2c391cc283@hpe.com>
 References: <20261030-cxi-netdev-submission-v1-0-8c2c391cc283@hpe.com>
- <20261030-cxi-netdev-submission-v1-8-8c2c391cc283@hpe.com>
+ <20261030-cxi-netdev-submission-v1-10-8c2c391cc283@hpe.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 31 Oct 2026 21:02:10 +0000
+Date: Sat, 31 Oct 2026 21:02:11 +0000
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -67,560 +66,290 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 
-Thank you for your contribution! Sashiko AI review found 5 potential issue(=
+Thank you for your contribution! Sashiko AI review found 6 potential issue(=
 s) to consider:
-- [Medium] net: hpe: sbl: broken FEC warning rate-limiting in sbl_fec_timer=
-_work()
-- [Medium] net: hpe: sbl: sbl_media_get_len_cm() returns 0 on ignored bad l=
-engths
-- [Medium] net: hpe: sbl: missing locking in sbl_media_unconfig() and media=
- helpers
-- [Low] net: hpe: sbl: commit message inaccurately claims sbl_platform.h up=
-date
-- [Low] net: hpe: sbl: mismatched blstate checks in sbl_fec_sysfs_sprint()
+- [Medium] net: hpe: sl: 64-bit cause_map truncation in sl_link_down_cause_=
+map_masked_str()
+- [Medium] net: hpe: sl: missing unsupported-cable case in sl_link_down_cau=
+se_map_masked_str()
+- [Low] net: hpe: sl: undocumented module parameter serdes_core_io_trace_lg=
+rp_map
+- [Low] net: hpe: sl: SL_GIT_HASH_STR stringifies undefined GIT_HASH macro
+- [Low] net: hpe: sl: missing option cases in sl_lgrp_config_opt_str() and =
+sl_link_config_opt_str()
+- [Low] net: hpe: sl: dead stub file sl_media_nic.c and uninitialized size =
+fields
 --
 
-commit 4122557cb9b8a2fb1091d55e09aa0cc6a07db9dc
+commit 44ba5c7fee3ca456d297e2330ae6adcfa7c957ae
 Author: Doug Ledford <doug.ledford@hpe.com>
 
-net: hpe: sbl: add media, FEC and counter support
+net: hpe: sl: add the module entry points
 
-This commit adds link counter management, forward error correction (FEC)
-configuration and rate monitoring, and physical media configuration and loop
-time calculation for the HPE Slingshot Base Link (SBL) driver.
+This commit adds the module entry points and the logical device, link group,
+link, MAC, LLR, FEC, and media objects that make up the SL API used by the
+NIC driver.
 
->     net: hpe: sbl: add media, FEC and counter support
->    =20
->     Add media detection, FEC (forward error correction) configuration and
->     the link counters.  sbl_platform.h is updated for the media fields
->     added here.
->    =20
->     checkpatch --strict (100 columns) still reports the following in this
->     patch. They need coordination with the internal repositories this code
->     is maintained in and will be fixed in V2:
->     - WARNING: LONG_LINE (5)
->     - CHECK: BRACES (16), UNNECESSARY_PARENTHESES (10)
->    =20
->     Co-developed-by: Sandeep Bhoot <sandeep.bhoot@hpe.com>
->     Signed-off-by: Sandeep Bhoot <sandeep.bhoot@hpe.com>
->     Co-developed-by: Mamila Santosh <santosh-kumar.mamila@hpe.com>
->     Signed-off-by: Mamila Santosh <santosh-kumar.mamila@hpe.com>
->     Signed-off-by: Doug Ledford <doug.ledford@hpe.com>
-
-[Severity: Low]
-This isn't a bug, but the commit message states that sbl_platform.h is
-updated for the media fields added here, whereas this commit does not touch
-sbl_platform.h. Should that sentence be removed from the changelog?
-
-> diff --git a/drivers/net/ethernet/hpe/sbl/sbl_fec.c b/drivers/net/etherne=
-t/hpe/sbl/sbl_fec.c
+> diff --git a/drivers/net/ethernet/hpe/sl/sl_lgrp.c b/drivers/net/ethernet=
+/hpe/sl/sl_lgrp.c
 > new file mode 100644
-> index 0000000000000..d458ca5e1269d
+> index 0000000000000..bb2dc68f4198a
 > --- /dev/null
-> +++ b/drivers/net/ethernet/hpe/sbl/sbl_fec.c
-
+> +++ b/drivers/net/ethernet/hpe/sl/sl_lgrp.c
 [ ... ]
-
-> +/* print a few warnings (so we can see how things are changing) about hi=
-gh
-> + * fec lane error rates
-> + */
-> +static void sbl_fec_rates_warnings(struct sbl_inst *sbl, int port_num,
-> +				   int *warning_count)
+> +const char *sl_lgrp_config_opt_str(u32 option)
 > +{
-> +
-> +	struct sbl_link *link =3D sbl->link + port_num;
-> +	struct fec_data *fec_data =3D link->fec_data;
-> +	struct sbl_fec *fec_prmts =3D fec_data->fec_prmts;
-> +	int fecl_warn;
-> +	int i;
-> +
-> +	spin_lock(&fec_prmts->fec_cw_lock);
-> +	fecl_warn =3D fec_prmts->fecl_warn;
-> +	spin_unlock(&fec_prmts->fec_cw_lock);
-> +
-> +	if (fecl_warn =3D=3D 0) {
-> +		dev_dbg(sbl->dev, "%d: fec ccw warn ignored, threshold is zero", port_=
-num);
-> +
-> +		return;
-> +	}
-> +
-> +	for (i =3D 0; i < SBL_PCS_NUM_FECL_CNTRS; ++i) {
-> +		if (fec_prmts->fec_rates->fecl[i] > fecl_warn) {
-> +			sbl_link_counters_incr(sbl, port_num, fec_warn);
-> +
-> +			if (*warning_count > 0) {
-> +				dev_warn(sbl->dev,
-> +					 "sbl %d: warning, ccw %lld, (%lld %lld %lld %lld %lld %lld %lld %l=
-ld)%s\n",
-> +					 port_num, fec_prmts->fec_rates->ccw,
-> +					 fec_prmts->fec_rates->fecl[0],
-> +					 fec_prmts->fec_rates->fecl[1],
-> +					 fec_prmts->fec_rates->fecl[2],
-> +					 fec_prmts->fec_rates->fecl[3],
-> +					 fec_prmts->fec_rates->fecl[4],
-> +					 fec_prmts->fec_rates->fecl[5],
-> +					 fec_prmts->fec_rates->fecl[6],
-> +					 fec_prmts->fec_rates->fecl[7],
-> +					 (*warning_count =3D=3D 1) ? " - last" : "");
-> +				--*warning_count;
-> +			} else {
-> +				dev_dbg(sbl->dev,
-> +					"sbl %d: warning, ccw %lld, (%lld %lld %lld %lld %lld %lld %lld %ll=
-d)\n",
-> +					port_num, fec_prmts->fec_rates->ccw,
-> +					fec_prmts->fec_rates->fecl[0],
-> +					fec_prmts->fec_rates->fecl[1],
-> +					fec_prmts->fec_rates->fecl[2],
-> +					fec_prmts->fec_rates->fecl[3],
-> +					fec_prmts->fec_rates->fecl[4],
-> +					fec_prmts->fec_rates->fecl[5],
-> +					fec_prmts->fec_rates->fecl[6],
-> +					fec_prmts->fec_rates->fecl[7]);
-> +			}
-> +			return;
-> +		}
-> +	}
-> +}
-
-[ ... ]
-
-> +void sbl_fec_timer_work(struct work_struct *work)
-> +{
-> +	u32 ucw_thresh_adj;
-> +	u32 ccw_thresh_adj;
-> +	int port_num;
-> +	unsigned long irq_flags;
-> +	struct sbl_link *link;
-> +	enum sbl_link_down_origin down_origin =3D SBL_LINK_DOWN_ORIGIN_UNKNOWN;
-> +	struct sbl_fec *fec_prmts;
-> +	int warning_count =3D SBL_MAX_FEC_WARNINGS;
-> +	int err;
-> +	struct fec_data *fec_data =3D container_of(work, struct fec_data, fec_t=
-imer_work);
-> +	struct sbl_inst *sbl =3D fec_data->sbl;
-> +
-> +	port_num =3D fec_data->port_num;
-> +	link =3D sbl->link + port_num;
-> +	fec_prmts =3D fec_data->fec_prmts;
-> +
-> +	if ((link->blstate =3D=3D SBL_BASE_LINK_STATUS_UP) && (sbl_pml_pcs_alig=
-ned(sbl, port_num))) {
-> +		err =3D sbl_fec_rates_update(sbl, port_num, SBL_FEC_MON_PERIOD);
-> +
-> +		if (!err) {
-> +			spin_lock_irqsave(&fec_prmts->fec_cw_lock, irq_flags);
-> +			ucw_thresh_adj =3D fec_prmts->fec_ucw_down_thresh_adj;
-> +			ccw_thresh_adj =3D fec_prmts->fec_ccw_down_thresh_adj;
-> +			spin_unlock_irqrestore(&fec_prmts->fec_cw_lock, irq_flags);
-> +
-> +			if (sbl_fec_ucw_rate_bad(sbl, port_num, ucw_thresh_adj)) {
-> +				/* take the link down */
-> +				down_origin =3D SBL_LINK_DOWN_ORIGIN_UCW;
-> +				sbl_pml_link_down_async_alert(sbl, port_num, down_origin);
-> +				return;
-> +			}
-> +
-> +			if (sbl_fec_ccw_rate_bad(sbl, port_num, ccw_thresh_adj, false)) {
-> +				/* take the link down */
-> +				down_origin =3D SBL_LINK_DOWN_ORIGIN_CCW;
-> +				sbl_pml_link_down_async_alert(sbl, port_num, down_origin);
-> +				return;
-> +			}
-> +
-> +			if (sbl_fec_txr_rate_bad(sbl, port_num, 0)) {
-> +				/* take the link down */
-> +				down_origin =3D SBL_LINK_DOWN_ORIGIN_LLR_TX_REPLAY;
-> +				sbl_pml_link_down_async_alert(sbl, port_num, down_origin);
-> +				return;
-> +			}
-> +			sbl_fec_rates_warnings(sbl, port_num, &warning_count);
-> +
-> +		}
-> +
-> +	}
-> +	sbl_fec_monitor_rearm(link);
-> +}
-
-[Severity: Medium]
-In sbl_fec_timer_work(), warning_count is a stack-local variable initialized
-to SBL_MAX_FEC_WARNINGS (3) on every work execution and passed to
-sbl_fec_rates_warnings().
-
-Inside sbl_fec_rates_warnings(), when any lane's fec_rates->fecl[i] exceeds
-fecl_warn, it decrements *warning_count once (from 3 to 2) and immediately
-returns. When sbl_fec_timer_work() finishes and rearms fec_timer, the
-decremented warning_count is lost.
-
-Does this cause dev_warn() to be emitted on every 1-second monitoring
-interval without bound while leaving the "*warning_count =3D=3D 1" suffix a=
-nd
-the dev_dbg() fallback branch unreachable? Should warning_count be stored in
-per-link state (such as struct fec_data or struct sbl_link) so that it
-persists across sbl_fec_timer_work() runs?
-
-[ ... ]
-
-> +#ifdef CONFIG_SYSFS
-> +/**
-> + * sbl_fec_sysfs_sprint() - Format FEC parameters status into buffer
-> + * @sbl: A slingshot base link device instance
-> + * @port_num: port number
-> + * @buf: Destination buffer to write the data
-> + * @size: Size of @buf in bytes, the output is truncated to fit
-> + *
-> + * This function formats FEC parameters and writes the result into the
-> + * provided buffer typically for use in sysfs output.
-> + *
-> + * Context: Process context, Acquires lock and release fec_cw_lock <spin=
-_lock>
-> + *
-> + * Return: Number of characters written, at most @size - 1
-> + */
-> +int sbl_fec_sysfs_sprint(struct sbl_inst *sbl, int port_num, char *buf, =
-size_t size)
-> +{
-> +	u64 ucw_thresh;
-> +	u64 ucw_hwm;
-> +	u64 ccw_thresh;
-> +	u64 ccw_hwm;
-> +	u64 llr_tx_replay_thresh;
-> +	u64 llr_tx_replay_hwm;
-> +	u64 fecl_warn;
-> +	int s =3D 0;
-> +	struct sbl_link *link =3D sbl->link + port_num;
-> +	struct fec_data *fec_data =3D link->fec_data;
-> +	struct sbl_fec *fec_prmts =3D fec_data->fec_prmts;
-> +
-> +	spin_lock(&fec_prmts->fec_cw_lock);
-> +	if (link->blstate =3D=3D SBL_BASE_LINK_STATUS_STARTING) {
-> +		ucw_thresh =3D fec_prmts->fec_ucw_thresh * fec_prmts->fec_ucw_up_thres=
-h_adj / 100;
-> +		ccw_thresh =3D fec_prmts->fec_ccw_thresh * fec_prmts->fec_ccw_up_thres=
-h_adj / 100;
-> +	} else {
-> +		ucw_thresh =3D fec_prmts->fec_ucw_thresh * fec_prmts->fec_ucw_down_thr=
-esh_adj / 100;
-> +		ccw_thresh =3D fec_prmts->fec_ccw_thresh * fec_prmts->fec_ccw_down_thr=
-esh_adj / 100;
-> +	}
-> +
-> +	llr_tx_replay_thresh =3D fec_prmts->fec_llr_tx_replay_thresh;
-> +	ucw_hwm =3D fec_prmts->fec_ucw_hwm;
-> +	ccw_hwm =3D fec_prmts->fec_ccw_hwm;
-> +	llr_tx_replay_hwm =3D fec_prmts->fec_llr_tx_replay_hwm;
-> +	fecl_warn =3D fec_prmts->fecl_warn;
-> +	spin_unlock(&fec_prmts->fec_cw_lock);
-> +	if (link->blstate =3D=3D SBL_BASE_LINK_STATUS_UP) {
-
-[Severity: Low]
-In sbl_fec_sysfs_sprint(), ucw_thresh and ccw_thresh are computed with a
-specific branch for link->blstate =3D=3D SBL_BASE_LINK_STATUS_STARTING, but=
- all
-output formatting immediately below is gated on link->blstate =3D=3D
-SBL_BASE_LINK_STATUS_UP.
-
-When link->blstate is SBL_BASE_LINK_STATUS_STARTING, those calculated
-thresholds are discarded and the function returns 0; conversely, if
-link->blstate transitions from SBL_BASE_LINK_STATUS_STARTING to
-SBL_BASE_LINK_STATUS_UP between the two unlocked checks, the UP output prin=
-ts
-the STARTING thresholds.
-
-Was the second check intended to include SBL_BASE_LINK_STATUS_STARTING as
-well, or should the SBL_BASE_LINK_STATUS_STARTING branch be dropped?
-
-> diff --git a/drivers/net/ethernet/hpe/sbl/sbl_media.c b/drivers/net/ether=
-net/hpe/sbl/sbl_media.c
-> new file mode 100644
-> index 0000000000000..ec2b4574565e8
-> --- /dev/null
-> +++ b/drivers/net/ethernet/hpe/sbl/sbl_media.c
-
-[ ... ]
-
-> +int sbl_media_unconfig(struct sbl_inst *sbl, int port_num)
-> +{
-> +	struct sbl_link *link;
-> +	int err =3D 0;
-> +
-> +	err =3D sbl_validate_instance(sbl);
-> +	if (err)
-> +		return err;
-> +
-> +	sbl_dev_dbg(sbl->dev, "media unconfig\n");
-> +
-> +	err =3D sbl_validate_port_num(sbl, port_num);
-> +	if (err)
-> +		return err;
-> +
-> +	link =3D sbl->link + port_num;
-> +
-> +	spin_lock(&link->lock);
-> +
-> +	if (!(link->blstate & (SBL_BASE_LINK_STATUS_UNCONFIGURED |
-> +			SBL_BASE_LINK_STATUS_DOWN |
-> +			SBL_BASE_LINK_STATUS_STOPPING))) {
-> +
-> +		sbl_dev_err(sbl->dev, "%d: wrong state (%s) to unconfigure media\n", p=
-ort_num,
-> +			    sbl_link_state_str(link->blstate));
-> +		spin_unlock(&link->lock);
-> +		return -EUCLEAN;
-> +	}
-> +
-> +	memset(&link->mattr, 0, sizeof(struct sbl_media_attr));
-> +	link->mconfigured =3D false;
-> +
-> +	link->blstate =3D SBL_BASE_LINK_STATUS_UNCONFIGURED;
-> +
-> +	spin_unlock(&link->lock);
-> +
-> +	return err;
-> +}
-> +EXPORT_SYMBOL(sbl_media_unconfig);
-
-[ ... ]
-
-> +bool sbl_media_check_headshell_reset_supported(struct sbl_inst *sbl, int=
- port_num)
-> +{
-> +	struct sbl_link *link =3D sbl->link + port_num;
-> +
-> +	if (!link->mattr.info) {
-> +		/* We have no info about media */
-> +		sbl_dev_dbg(sbl->dev, "%d: no media info available to check headshell =
-reset supported bit", port_num);
-> +		return false;
-> +	}
-> +
-> +	if (link->mattr.info & SBL_MEDIA_INFO_SUPPORTS_HEADSHELL_RESET)
-> +		return true;
-> +
-> +	return false;
-> +}
-> +EXPORT_SYMBOL(sbl_media_check_headshell_reset_supported);
-> +
-> +static bool sbl_media_check_len_supported(struct sbl_inst *sbl, int port=
-_num, u64 len)
-> +{
-> +	struct sbl_link *link =3D sbl->link + port_num;
-> +
-> +	switch (len) {
-> +	case SBL_LINK_LEN_BACKPLANE:
-
-[ ... ]
-
-> +	case SBL_LINK_LEN_100_000:
-> +		return true;
+> +	switch (option) {
+> +	case SL_LGRP_CONFIG_OPT_SERDES_LOOPBACK_ENABLE:
+> +		return "loopback-serdes-enable";
 > +	default:
-> +		if ((link->blattr.options & SBL_OPT_ALLOW_MEDIA_BAD_LEN) ||
-> +		    sbl_debug_option(sbl, port_num, SBL_DEBUG_ALLOW_MEDIA_BAD_LEN)) {
-> +			sbl_dev_warn(sbl->dev, "%d: unsupported media len (%lld) - ignored", =
-port_num, len);
-> +			return true;
-> +		}
-> +		sbl_dev_err(sbl->dev, "%d: unsupported media len (%lld)", port_num, le=
-n);
-> +		return false;
+> +		return "unknown";
 > +	}
 > +}
-> +
-> +/* return valid length in cm or 0 */
-> +u32 sbl_media_get_len_cm(struct sbl_inst *sbl, int port_num, u64 len)
-> +{
-> +	if (sbl_media_check_len_supported(sbl, port_num, len)) {
-> +		switch (len) {
-> +		case SBL_LINK_LEN_BACKPLANE: return 25;
+> +EXPORT_SYMBOL(sl_lgrp_config_opt_str);
+
+[Severity: Low]
+In drivers/net/ethernet/hpe/sl/sl_lgrp.c, sl_lgrp_config_opt_str() only
+handles SL_LGRP_CONFIG_OPT_SERDES_LOOPBACK_ENABLE, while
+include/linux/hpe/sl/sl_lgrp.h also defines SL_LGRP_CONFIG_OPT_FABRIC,
+SL_LGRP_CONFIG_OPT_R1, and SL_LGRP_CONFIG_OPT_8BYTE_PREAMBLE.
+
+Similarly, in drivers/net/ethernet/hpe/sl/sl_link.c, sl_link_config_opt_str=
+()
+omits cases for SL_LINK_CONFIG_OPT_ALD_ENABLE,
+SL_LINK_CONFIG_OPT_LOS_LOL_UP_FAIL_HIDE, and
+SL_LINK_CONFIG_OPT_PML_REC_ENABLE defined in include/linux/hpe/sl/sl_link.h.
+
+Should sl_lgrp_config_opt_str() and sl_link_config_opt_str() include cases
+for those remaining configuration option flags so callers do not get
+"unknown" for valid options?
 
 [ ... ]
-
-> +		case SBL_LINK_LEN_100_000:   return 10000;
-> +		}
-> +	}
+> diff --git a/drivers/net/ethernet/hpe/sl/sl_link.c b/drivers/net/ethernet=
+/hpe/sl/sl_link.c
+> new file mode 100644
+> index 0000000000000..c66e48a627481
+> --- /dev/null
+> +++ b/drivers/net/ethernet/hpe/sl/sl_link.c
+[ ... ]
+> +#define SL_LINK_DOWN_INFO_MASK (     \
+> +	SL_LINK_DOWN_RETRYABLE      |\
+> +	SL_LINK_DOWN_ORIGIN_ASYNC   |\
+> +	SL_LINK_DOWN_ORIGIN_LINK_UP)
 > +
-> +	return 0;
-> +}
-> +
-> +/* calc loop time based on cable length */
-> +int sbl_media_calc_loop_time(struct sbl_inst *sbl, int port_num, u64 *ca=
-lc_loop_time)
+> +static int sl_link_down_cause_map_masked_str(unsigned long cause_map, ch=
+ar *cause_str, unsigned int cause_str_size,
+> +					     u64 mask)
 > +{
-> +	struct sbl_link *link;
-> +	u32 len;
-> +	int err;
+> +	int rtn;
+> +	int str_pos;
+> +	int which;
 > +
-> +	err =3D sbl_validate_instance(sbl);
-> +	if (err)
-> +		return err;
-> +
-> +	err =3D sbl_validate_port_num(sbl, port_num);
-> +	if (err)
-> +		return err;
-> +
-> +	if (!calc_loop_time)
+> +	if (!cause_str)
 > +		return -EINVAL;
 > +
-> +	link =3D sbl->link + port_num;
-> +	*calc_loop_time =3D 0;
+> +	if (cause_str_size < SL_LINK_DOWN_CAUSE_STR_SIZE_MIN)
+> +		return -EINVAL;
 > +
-> +	if ((link->blattr.loopback_mode =3D=3D SBL_LOOPBACK_MODE_OFF) ||
-> +	    (link->blattr.loopback_mode =3D=3D SBL_LOOPBACK_MODE_INVALID)) {
-> +		len =3D sbl_media_get_len_cm(sbl, port_num, link->mattr.len);
-> +		if (!len)
-> +			return -EBADRQC;
-> +	} else
-> +		len =3D 0;
+> +	cause_map &=3D mask;
 > +
-> +	sbl_dev_dbg(sbl->dev, "%d: len =3D %d, lb =3D %s",
-> +		    port_num, len, sbl_loopback_mode_str(link->blattr.loopback_mode));
-> +
-> +	if (link->mattr.media =3D=3D SBL_LINK_MEDIA_ELECTRICAL)
-> +		*calc_loop_time =3D 2 * len * SBL_MEDIA_NS_PER_M / 100;
-> +	else
-> +		*calc_loop_time =3D (2 * len * SBL_MEDIA_OPTICAL_NS_PER_M / 100) +
-> +			(4 * SBL_MEDIA_OPTICAL_TRANCEIVER_DELAY);
-> +	*calc_loop_time +=3D 2 * (SBL_ASIC_TX_DELAY + SBL_ASIC_RX_DELAY);
-> +
-> +	sbl_dev_dbg(sbl->dev, "%d: calc loop time %lld cm %lld ns",
-> +		    port_num, link->mattr.len, *calc_loop_time);
-> +
-> +	return 0;
-> +}
-> +
-> +/**
-> + * sbl_media_get_loop_time_ns() - Get loop time in ns
-> + * @sbl: A slingshot base link device instance
-> + * @port_num: port number
-> + * @measurement_only: set to false when reading
-> + *
-> + * This function returns available loop time. If not and
-> + * 'measurement_only' is true, returns 0 with a warning.
-> + * Otherwise attempts to calculate the loop time.
-> + *
-> + * Return: calculate loop time on success, 0 on failure
-> + */
-> +u64 sbl_media_get_loop_time_ns(struct sbl_inst *sbl, int port_num,
-> +			       bool measurement_only)
-> +{
-> +	struct sbl_link *link =3D sbl->link + port_num;
-> +	u64 calc_loop_time;
-> +	int err;
-> +
-> +	if (!link->mconfigured)
-> +		return 0;
-> +
-> +	if (link->llr_loop_time)
-> +		return link->llr_loop_time;
-> +
-> +	if (measurement_only) {
-> +		sbl_dev_warn(sbl->dev, "%d: measured loop time not found", port_num);
+> +	if (cause_map =3D=3D SL_LINK_DOWN_CAUSE_NONE) {
+> +		scnprintf(cause_str, cause_str_size, "none");
 > +		return 0;
 > +	}
 > +
-> +	if (!sbl_media_check_len_supported(sbl, port_num, link->mattr.len))
-> +		return 0;
+> +	str_pos =3D 0;
 > +
-> +	err =3D sbl_media_calc_loop_time(sbl, port_num, &calc_loop_time);
-> +	if (err)
-> +		return 0;
+> +	for_each_set_bit(which, &cause_map, sizeof(cause_map) * BITS_PER_BYTE) {
 > +
-> +	return calc_loop_time;
-> +}
-> +EXPORT_SYMBOL(sbl_media_get_loop_time_ns);
+> +		switch (BIT(which)) {
 
 [Severity: Medium]
-When link->mattr.len is not one of the known SBL_LINK_LEN_* constants and
-either SBL_OPT_ALLOW_MEDIA_BAD_LEN or SBL_DEBUG_ALLOW_MEDIA_BAD_LEN is set,
-sbl_media_check_len_supported() logs a warning and returns true.
+In drivers/net/ethernet/hpe/sl/sl_link.c, sl_link_down_cause_map_str() and
+sl_link_down_cause_map_with_info_str() pass a u64 cause_map to
+sl_link_down_cause_map_masked_str(), which narrows cause_map to unsigned lo=
+ng
+and switches on BIT(which).
 
-However, sbl_media_get_len_cm() has no default case in its switch(len)
-statement, so it falls through and returns 0, causing
-sbl_media_calc_loop_time() to fail with -EBADRQC on !len. Does that defeat
-the SBL_OPT_ALLOW_MEDIA_BAD_LEN and SBL_DEBUG_ALLOW_MEDIA_BAD_LEN options?
+In include/linux/hpe/sl/sl_link.h, the upper cause and info flags are also
+defined with BIT():
 
-In addition, sbl_media_get_loop_time_ns() calls
-sbl_media_check_len_supported() before calling sbl_media_calc_loop_time():
-- In non-loopback mode, sbl_media_calc_loop_time() immediately calls
-  sbl_media_get_len_cm() -> sbl_media_check_len_supported() a second time,
-  emitting duplicate log messages.
-- In loopback mode, sbl_media_calc_loop_time() sets len =3D 0 without check=
-ing
-  link->mattr.len, whereas sbl_media_get_loop_time_ns() rejects the call and
-  returns 0 if link->mattr.len is unset.
+  #define SL_LINK_DOWN_CAUSE_TX_LOL            BIT(32)
+  #define SL_LINK_DOWN_CAUSE_RX_LOL            BIT(33)
+  #define SL_LINK_DOWN_CAUSE_TX_LOS            BIT(34)
+  #define SL_LINK_DOWN_CAUSE_RX_LOS            BIT(35)
 
-Finally, at the end of sbl_media_calc_loop_time(), sbl_dev_dbg() prints
-link->mattr.len (the enum sbl_link_len bitmask) with the unit "cm" instead =
-of
-len. Should sbl_media_get_len_cm() provide a default fallback length,
-sbl_media_get_loop_time_ns() drop the redundant
-sbl_media_check_len_supported() check, and sbl_media_calc_loop_time() log l=
-en
-instead of link->mattr.len?
+  #define SL_LINK_DOWN_RETRYABLE               BIT(61)
+  #define SL_LINK_DOWN_ORIGIN_ASYNC            BIT(62)
+  #define SL_LINK_DOWN_ORIGIN_LINK_UP          BIT(63)
 
+On 32-bit architectures where unsigned long is 32 bits wide, will this
+truncate the upper 32 bits of cause_map and overflow BIT(which) and the
+switch case labels at bit 32 and above? Should those definitions and the
+switch in sl_link_down_cause_map_masked_str() use u64 and BIT_ULL() instead?
+
+> +		case SL_LINK_DOWN_CAUSE_UCW:
+> +			rtn =3D snprintf(cause_str + str_pos, cause_str_size - str_pos, "ucw =
+");
+> +			break;
+[ ... ]
+> +		case SL_LINK_DOWN_CAUSE_TIMEOUT:
+> +			rtn =3D snprintf(cause_str + str_pos, cause_str_size - str_pos, "time=
+out ");
+> +			break;
+> +		case SL_LINK_DOWN_CAUSE_CANCELED:
+> +			rtn =3D snprintf(cause_str + str_pos, cause_str_size - str_pos, "canc=
+eled ");
+> +			break;
+> +		case SL_LINK_DOWN_CAUSE_COMMAND:
+> +			rtn =3D snprintf(cause_str + str_pos, cause_str_size - str_pos, "comm=
+and ");
+> +			break;
+
+[Severity: Medium]
+In include/linux/hpe/sl/sl_link.h, SL_LINK_DOWN_CAUSE_UNSUPPORTED_CABLE is
+defined as BIT(12) between SL_LINK_DOWN_CAUSE_CANCELED (BIT(11)) and
+SL_LINK_DOWN_CAUSE_COMMAND (BIT(13)), and is set via
+SL_LINK_DOWN_CAUSE_UNSUPPORTED_CABLE_MAP in
+drivers/net/ethernet/hpe/sl/core/sl_core_link.h.
+
+However, sl_link_down_cause_map_masked_str() in
+drivers/net/ethernet/hpe/sl/sl_link.c does not have a case for
+SL_LINK_DOWN_CAUSE_UNSUPPORTED_CABLE, causing it to fall through to default
+and format the cause as "unknown ".
+
+Also, SL_LINK_DOWN_CAUSE_STR_SIZE_MIN is defined as 4, which is smaller than
+sizeof("none") and smaller than any single cause string before the truncati=
+on
+logic writes "..." at cause_str[str_pos - 3].
+
+Was a case for SL_LINK_DOWN_CAUSE_UNSUPPORTED_CABLE missed in
+sl_link_down_cause_map_masked_str()?
+
+[ ... ]
+> diff --git a/drivers/net/ethernet/hpe/sl/sl_media_nic.c b/drivers/net/eth=
+ernet/hpe/sl/sl_media_nic.c
+> new file mode 100644
+> index 0000000000000..23af513e6bd90
+> --- /dev/null
+> +++ b/drivers/net/ethernet/hpe/sl/sl_media_nic.c
+> @@ -0,0 +1,23 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Copyright 2025 Hewlett Packard Enterprise Development LP */
 > +
-> +int sbl_media_validate_config(struct sbl_inst *sbl, int port_num)
+> +#include <linux/module.h>
+> +#include <linux/types.h>
+> +
+> +#include <linux/hpe/sl/sl_lgrp.h>
+> +
+> +#include "sl_lgrp.h"
+> +
+> +int sl_media_cable_insert(struct sl_lgrp *lgrp, u8 *eeprom_page0, u8 *ee=
+prom_page1, u32 flags)
 > +{
-> +	struct sbl_link *link =3D sbl->link + port_num;
-> +
-> +	if (!(link->mconfigured && link->blconfigured))
-> +		return -EUCLEAN;
-> +
-> +	if ((link->mattr.media =3D=3D SBL_LINK_MEDIA_ELECTRICAL) &&
-> +	    (link->blattr.config_target =3D=3D SBL_BASE_LINK_CONFIG_PEC))
-> +		return 0;
-> +
-> +	if ((link->mattr.media =3D=3D SBL_LINK_MEDIA_OPTICAL) &&
-> +	    (link->blattr.config_target =3D=3D SBL_BASE_LINK_CONFIG_AOC))
-> +		return 0;
-> +
-> +	return -EMEDIUMTYPE;
+> +	/* placeholder for future functionality */
+> +	return 0;
 > +}
+> +EXPORT_SYMBOL(sl_media_cable_insert);
+> +
+> +int sl_media_cable_remove(struct sl_lgrp *lgrp)
+> +{
+> +	/* placeholder for future functionality */
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL(sl_media_cable_remove);
 
-[Severity: Medium]
-sbl_media_config() and sbl_media_unconfig() check link->blstate and update
-link->mattr, link->mconfigured, and link->blstate under link->lock without
-acquiring link->busy_mtx. Meanwhile, sbl_base_link_start() and
-sbl_base_link_stop() in drivers/net/ethernet/hpe/sbl/sbl_link.c inspect and
-update link->blstate and validate media configuration under link->busy_mtx
-without holding link->lock:
+[Severity: Low]
+This isn't a runtime bug, but drivers/net/ethernet/hpe/sl/sl_media_nic.c
+defines and exports no-op stubs for sl_media_cable_insert() and
+sl_media_cable_remove(), while drivers/net/ethernet/hpe/sl/nic/sl_media.c
+provides the actual implementations and EXPORT_SYMBOL() definitions for both
+functions, and drivers/net/ethernet/hpe/sl/Makefile only builds
+nic/sl_media.o.
 
-drivers/net/ethernet/hpe/sbl/sbl_link.c:sbl_base_link_start() {
-    ...
-	if (link->blstate !=3D SBL_BASE_LINK_STATUS_DOWN) {
-		...
-	}
+In addition, struct sl_lgrp and struct sl_link declare a u32 size field
+alongside magic and ver just like struct sl_ldev, and sl_ldev_init() in
+drivers/net/ethernet/hpe/sl/sl_ldev.c sets ldevs[ldev_num].size, whereas
+sl_lgrp_init() in drivers/net/ethernet/hpe/sl/sl_lgrp.c and sl_link_init() =
+in
+drivers/net/ethernet/hpe/sl/sl_link.c leave size uninitialized.
 
-	/* only local loopback is possible without media */
-	if (link->blattr.loopback_mode !=3D SBL_LOOPBACK_MODE_LOCAL) {
-		err =3D sbl_media_validate_config(sbl, port_num);
-		...
-	}
+Should drivers/net/ethernet/hpe/sl/sl_media_nic.c be dropped and the size
+fields initialized (or removed if unused) for consistency?
 
-	link->blstate =3D SBL_BASE_LINK_STATUS_STARTING;
-    ...
-}
+> diff --git a/drivers/net/ethernet/hpe/sl/sl_module.c b/drivers/net/ethern=
+et/hpe/sl/sl_module.c
+> new file mode 100644
+> index 0000000000000..b63efedf94ff5
+> --- /dev/null
+> +++ b/drivers/net/ethernet/hpe/sl/sl_module.c
+[ ... ]
+> +static unsigned long serdes_core_io_trace_lgrp_map;
+> +module_param(serdes_core_io_trace_lgrp_map, ulong, 0644);
+> +MODULE_PARM_DESC(serdes_core_io_trace_lgrp_map, "serdes core io trace en=
+able link group map");
 
-If sbl_media_unconfig() runs concurrently with sbl_base_link_start() (for
-example during cable removal on attn1_worker() while cass_lmon() is starting
-the link), can sbl_media_unconfig() see SBL_BASE_LINK_STATUS_DOWN, clear
-link->mattr and link->mconfigured, and set SBL_BASE_LINK_STATUS_UNCONFIGURED
-right before sbl_base_link_start() overwrites link->blstate with
-SBL_BASE_LINK_STATUS_STARTING and continues bring-up with zeroed media
-attributes? Similarly, since sbl_media_unconfig() allows
-SBL_BASE_LINK_STATUS_STOPPING, can a concurrent sbl_base_link_stop()
-overwrite link->blstate back to SBL_BASE_LINK_STATUS_DOWN at completion even
-though link->mconfigured is false?
+[Severity: Low]
+In drivers/net/ethernet/hpe/sl/sl_module.c, serdes_core_io_trace_lgrp_map is
+registered as a module parameter via module_param(), making it configurable
+at boot and runtime, but Documentation/admin-guide/kernel-parameters.txt is
+not updated in this patch.
 
-Also, unlike sbl_media_check_mode_supported(), sbl_media_sysfs_sprint(), and
-sbl_media_type_sysfs_sprint() which acquire link->lock,
-sbl_media_check_headshell_reset_supported(), sbl_media_calc_loop_time(),
-sbl_media_get_loop_time_ns(), and sbl_media_validate_config() read
-link->mconfigured and link->mattr without holding link->lock. Should
-link->blstate and link->mattr accesses be synchronized consistently across
-these functions?
+Should serdes_core_io_trace_lgrp_map be documented in
+Documentation/admin-guide/kernel-parameters.txt?
+
+> +
+> +u64 sl_serdes_core_io_trace_lgrp_map_get(void)
+> +{
+> +	return serdes_core_io_trace_lgrp_map;
+> +}
+> +
+> +#define SL_DEVICE_NAME "sl"
+> +
+> +#define tostr(x)             #x
+> +#define version_str(a, b, c) tostr(a.b.c)
+> +#define SL_VERSION_STR       version_str(SL_VERSION_MAJOR, SL_VERSION_MI=
+NOR, SL_VERSION_INC)
+> +#define hash_str(h)          tostr(h)
+> +#define SL_GIT_HASH_STR      hash_str(GIT_HASH)
+> +
+> +void sl_version_get(int *major, int *minor, int *inc)
+> +{
+> +	if (major)
+> +		*major =3D SL_VERSION_MAJOR;
+> +	if (minor)
+> +		*minor =3D SL_VERSION_MINOR;
+> +	if (inc)
+> +		*inc =3D SL_VERSION_INC;
+> +}
+> +EXPORT_SYMBOL(sl_version_get);
+> +
+> +char *sl_version_str_get(void)
+> +{
+> +	return SL_VERSION_STR;
+> +}
+> +
+> +char *sl_git_hash_str_get(void)
+> +{
+> +	return (strlen(SL_GIT_HASH_STR) =3D=3D 0) ? "unavailable" : SL_GIT_HASH=
+_STR;
+> +}
+> +EXPORT_SYMBOL(sl_git_hash_str_get);
+
+[Severity: Low]
+In drivers/net/ethernet/hpe/sl/sl_module.c, GIT_HASH is not defined in any
+header or Makefile, so SL_GIT_HASH_STR expands hash_str(GIT_HASH) into the
+string literal "GIT_HASH".
+
+As a result, strlen(SL_GIT_HASH_STR) =3D=3D 0 in sl_git_hash_str_get() is n=
+ever
+true, sl_git_hash_str_get() returns "GIT_HASH" instead of "unavailable", and
+sl_init() logs "hash GIT_HASH".
+
+Is SL_GIT_HASH_STR / sl_git_hash_str_get() needed in an in-tree kernel buil=
+d,
+or should GIT_HASH default to an empty string when not defined?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261030-cxi-netdev=
--submission-v1-0-8c2c391cc283@hpe.com?part=3D8
+-submission-v1-0-8c2c391cc283@hpe.com?part=3D10
