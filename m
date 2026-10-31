@@ -1,69 +1,110 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.178
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793455102;
-	b=PZPyNN8L2z5yMjPWc0mpzrbhaNx4CFWnVP5HE/vwtl4+rKPhvvz80khtKjndB7TalkpX
-	 cB+wYl54Qa9sd1329qHbiZrdtIjKjRclk4VckpQDi4xtiVFdtTABxyP18H0QifrkXXrGD
-	 y+hgO0//H4frs3hN/sKmS4euqbHW2ZXH0WcSbccqvKBmc7QAcltXG9Pkm71bXlXTd0dkO
-	 O+cLgcJ+CbEc0KjyWEVeyFWHHn8mnjpq7cd2s463kKh+NCosw0xe4r8QEA04a+KfRVHje
-	 M3xhCas5kLH+k1Trz0H16DKX6ugRNCgddmn0lur79xoJoWmnhB8EMod5h/9M0VMkIXg==
+	t=1793466188;
+	b=Q02QiOUvrcqJSLahM/+cjje+kKN+n5PliArOILvA1xBjTYeR2tBWGaZSQtm9ynZMQMNo
+	 IZ0d5emH8ugnHEEy3SkMSvImc9uedqKxZJimRV3EFNJpq1N3uLyHeaW8h25DMIP9kQlHP
+	 LWUApswI2bmuUUvuXrs3ZaR/vwEnNa9xnK+zswebb6BaekOggIjuFmM7u8PuZ+AqiIbjd
+	 CZYbzGP8gB6n1OdNY/w3JHAN1eu2Kus4d+GgStGSokcNxig0wYn7gq3WiSF3F4FdjC+ku
+	 2TKsXTMpKC6pmdvpsAp7zIhYvGKQNpylqDSZZ8lHGqGACfqo6cyLjWgpvpX3BhyT/rg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793455102;
-	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
-	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To;
-	bh=KdwwhQ4hmLe2ojysKovryYH2AE4HDI2oZLgU2MxJ0ZM=;
-	b=A2dnR3KZh3+sKFBAyvMlQlu2+AybGPM3OpURLZ8y9ODL1S9eA/Am7NiLkEe1SpfUfZQa
-	 NXb6YoHTqZ352PZksnF//rzQ3kZwYhB7FHeoz5QoiWuPMgfnfrLpHtQ4hYBqEGKuovLJm
-	 svpndXHZqsvwTd7hXJk7a8MogmpEFQiIXA2h9OPkg2IR5xucPwFYcUJ6t8XmY/8ZE9Urr
-	 lodgW0tNGhviMunavtuo0UA/ak8aYxSxk8oI+Ugeq7pCUS6dbmvvad/8Rh6X85MhzIRQV
-	 FMvn4R9t/qexo+H1z4kCdWYdRmy7xEuW8N6cCffNe6zHDORfqtVsMyw/D3qCCl2atvg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793466188;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Content-Type:Date:Message-Id:Cc:Subject:From:To:In-Reply-To:
+	 References:Content-Transfer-Encoding:MIME-Version;
+	bh=gba0XFZ/wiG7mOW6sD/3lIcnTLkNzkhvuJnY/kVtgnw=;
+	b=4Sz3uMyjc8Od9TtI7AdT5c40RBR9q4Ml0hHGO6NYYRSMTgrxttIAbGixcA/cIJSbfYnf
+	 tifS0ua37zYz5jdUqNtCsIPtXo7FIYpacx2b+txfiX9abf52kyOtlGINVwxCmZo7oS7ed
+	 Y8dk3bfoZ86rdVprLmb39wMvyXMnPanBMV7uEIdLWuBinFEMEnhw+dy8X1AZwZyE5l2Bj
+	 x9gZK6iV0MFSAeBNIQq+3kLw2rFryDKENBS22AXxkRE8KO050QYFu6siMVVd9fJAzdWOd
+	 V/FSv4XAZQZtt4Q3d1T5hlTxtsxrhA+ixkmp6/afXW13M65Fvdqz87cQT+WwSSqgjvQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=lunn.ch;
-	spf=pass smtp.mailfrom=lunn.ch;
-	dkim=pass header.d=lunn.ch header.i=@lunn.ch header.a=rsa-sha256 header.s=20171124 header.b=isS3ErHr;
-	arc=none smtp.remote-ip=156.67.10.101
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=i8E3v5cp;
+	arc=none smtp.remote-ip=209.85.210.178
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04866606A31A;
-	Sat, 31 Oct 2026 13:58:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 04866606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE246606A31E
+	for <linux-kbuild@vger.kernel.org>; Sat, 31 Oct 2026 17:03:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AE246606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=lunn.ch header.i=@lunn.ch header.a=rsa-sha256 header.s=20171124 header.b=isS3ErHr
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=KdwwhQ4hmLe2ojysKovryYH2AE4HDI2oZLgU2MxJ0ZM=; b=isS3ErHrsAIzCMLoNHWkaFEAo7
-	YDK0QFMSiHyKxc8ya1zB0lmWd/pAdj5U1Cq+UYbVQIOsC8uSuAYH08Bjyo0b5Zm2g+9RN6QBGMRV4
-	p8BkUQH/AXKoZ8u69b8GcgH30oglb6EBdHEJPZOcMCSntSFt6nhUSX5furwaDQK24Ch4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1xN9au-00DX5Y-MN; Sat, 31 Oct 2026 14:58:04 +0100
-Date: Sat, 31 Oct 2026 14:58:04 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Doug Ledford <doug.ledford@hpe.com>
-Cc: Slingshot Open Source Team <slingshot-os-team@groups.ext.hpe.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Guenter Roeck <linux@roeck-us.net>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kbuild@vger.kernel.org,
-	Sandeep Bhoot <sandeep.bhoot@hpe.com>
-Subject: Re: [PATCH 01/23] net: hpe: ss1: add the Cassini headers
-Message-ID: <531c7d63-548f-467e-95df-187214ff344d@lunn.ch>
-References: <20261030-cxi-netdev-submission-v1-0-8c2c391cc283@hpe.com>
- <20261030-cxi-netdev-submission-v1-1-8c2c391cc283@hpe.com>
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=i8E3v5cp
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-8a070755c8cso777950b3a.0
+        for <linux-kbuild@vger.kernel.org>; Sat, 31 Oct 2026 10:03:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1793466187; x=1794070987; darn=vger.kernel.org;
+        h=mime-version:content-transfer-encoding:references:in-reply-to:to
+         :from:subject:cc:message-id:date:content-type:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=gba0XFZ/wiG7mOW6sD/3lIcnTLkNzkhvuJnY/kVtgnw=;
+        b=i8E3v5cpMSfAi1mqqro21Q/8Raqh769HEWZJL46CwnM2v9wK2OLVzJsAuCSE9qf3zq
+         tQY50fNwQDpf+SJSRQlAgqkCXH0WUUKhP57b7/iP77Uf3WNogA/laZGasAKdFWEz783R
+         toarBNdQRNtB75h9qwyX3N4XLDJa/7DPVsqKt+7a6In8nxnIlpSFdU2WiAXEmjKaF5ks
+         XnZGp+AauqkTqlVVZmUVXtl4Ag0HgI6GlxH75NYUPYnvp305gsOHdLStmb2NDkg/ihGG
+         sRkldpqZ/xsViTVAvbYKqxtnovFp7bSCwKkO/qhbTEhCAOOAoI1dYAM/lSLdEuekL6SG
+         SZDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793466187; x=1794070987;
+        h=mime-version:content-transfer-encoding:references:in-reply-to:to
+         :from:subject:cc:message-id:date:content-type:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=gba0XFZ/wiG7mOW6sD/3lIcnTLkNzkhvuJnY/kVtgnw=;
+        b=2eTxhxTwQUQPfiyFHGhtpMRxAoxHxeYTh6EI91N9qLpUrAcoPNs43MKoZLN0TIHHfI
+         5nJO7lW5Y3mJQ5BskbHjw+WSRwqrTTq5wE4Yg/9yDobWAftBesS/fvcRHIchP9mOXZ+W
+         0PP5rMKAjPEzfKlvs2uYRuKctBIamAXmYML3gTdjPQxpU0jhsXI7xLfS3uvPcsZ57qFS
+         S+ljcJgkbsiIOytUPpkWl4kQ36iphh978pMr/yvChisVQgumQ+75E1aFb0bA4ekk4Emv
+         rT/UcaZt42BTM0vIfkuyPsqWfeXdOj3kDnLx2FGfyaWyhilWZ9SUwJ7yafeA08IpIHCd
+         r/hQ==
+X-Forwarded-Encrypted: i=1; AKwUvBx55NCMObTJFoLcAij8nMelr/VDEUmclae/3snNIbwtR8XeEqnkjCw49kZZyHE1VKxIlgojyPs8Mz/9gZM=@vger.kernel.org
+X-Gm-Message-State: AFq9FYKKsUoyEjZ6yTFC3GaXkWeJp/QIW+Tdjb1xfBlrUbG72PC6e56K
+	aVLG5rf7weQqCI8z/eFPesgKCLqX/DAhuVXMhjRo/a43Q6ps/sJLQU5M
+X-Gm-Gg: AYBFou3NnrJIVmT7ZkkcgmoZfIEQNRig/OuTCKunknycQzRHBkBVvM37mx0RpqqdEWO
+	Hk9VHXYqhMQCa8fnP9ZQHq7+lKCH/mS+jdhy0QvkeVAlKXb474k8AzXnmTSbmmH+Un3f/ahb/r5
+	Yq0CdMSsVjzkAHpqBIk5s9hurN3lgnliHQOBM36XH2rjr1/Xv8MbbrgQRwl11BPWVjBPfhF0SWb
+	/Sf8r001CzmeNKDtAlx+dL8RqOQ9DNvUKA+WCHT21bg2xWnr252E7fbrbF53MRImWRF3vICCLCR
+	vTsHl95wE2hfK1E7+sHpWoHlnZPJqP9v1Wdgwyoic0chwZy+bto1wuQjqVpZdaQZ9suHrPAnqx0
+	4+3SWd65aU6UiOd4xK+2cn9rb3KibhL+CEIz2AKga/Uj8zvOHD9KEmxROgJyNXUpLlP03uaWFf5
+	DCiMZCCwCdVGns2tD4G+TzrN34LElyuS6PHA03zsnCAiRm9GwItEsWiTcq+jq1IHLJe3W1ZcEz/
+	D/8nadR2RMmqlmboDSRE7yZeatLQ0ZRTxmfb3JA5X8pq5ZmdsT7iFxwbOuQe1/toV4Mjh5+sty4
+	q2fiY0AVGKMRAoRfhlTuKCGY30QpJx1YUO0C0qQTEtptiUIez/qpsXxJNjkhc8aD+GugdBv9P0d
+	D3t4yW+BigpqRUHduwmxXPos2UR7T/YdYvI9kiCiscM65st6m/jMWY00=
+X-Received: by 2002:a05:6a21:b91:b0:3e8:e974:e45a with SMTP id adf61e73a8af0-3e928e26581mr4547143637.63.1793466186813;
+        Sat, 31 Oct 2026 10:03:06 -0700 (PDT)
+Received: from localhost ([153.61.198.246])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8aadad94a8esm817264b3a.55.2026.10.31.10.03.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 31 Oct 2026 10:03:05 -0700 (PDT)
+Content-Type: text/plain; charset=UTF-8
+Date: Sat, 31 Oct 2026 17:03:04 +0000
+Message-Id: <DMJ6PAVGV9ND.29T5161F064JL@gmail.com>
+Cc: "Ihor Solodrai" <ihor.solodrai@linux.dev>, "Alan Maguire"
+ <almagui@kernel.org>, "Martin KaFai Lau" <martin.lau@linux.dev>, "Yonghong
+ Song" <yonghong.song@linux.dev>, "Jiri Olsa" <jolsa@kernel.org>, "Steven
+ Rostedt" <rostedt@goodmis.org>, "Masami Hiramatsu" <mhiramat@kernel.org>,
+ "Mathieu Desnoyers" <mathieu.desnoyers@efficios.com>,
+ <linux-trace-kernel@vger.kernel.org>, "Nathan Chancellor"
+ <nathan@kernel.org>, "Nicolas Schier" <nsc@kernel.org>,
+ <linux-kbuild@vger.kernel.org>, "Arnd Bergmann" <arnd@arndb.de>,
+ <linux-arch@vger.kernel.org>, <x86@kernel.org>,
+ <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Hazem Mohamed
+ Abuelfotoh" <abuehaze@amazon.com>, "Bjoern Doebel" <doebel@amazon.de>,
+ "Martin Pohlack" <mpohlack@amazon.de>, <jay.wang.upstream@gmail.com>
+Subject: Re: [PATCH bpf-next 03/13] bpf: check CAP_SYS_ADMIN before looking
+ up bpffs delegation names
+From: "Alexei Starovoitov" <alexei.starovoitov@gmail.com>
+To: "Jay Wang" <wanjay@amazon.com>, <bpf@vger.kernel.org>, "Daniel Borkmann"
+ <daniel@iogearbox.net>, "Andrii Nakryiko" <andrii@kernel.org>, "Eduard
+ Zingerman" <eddyz87@gmail.com>, "Kumar Kartikeya Dwivedi"
+ <memxor@gmail.com>
+In-Reply-To: <20261031130959.23472-4-wanjay@amazon.com>
+References: <20261031130959.23472-1-wanjay@amazon.com> <20261031130959.23472-4-wanjay@amazon.com>
+Content-Transfer-Encoding: 8bit
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -73,46 +114,25 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261030-cxi-netdev-submission-v1-1-8c2c391cc283@hpe.com>
 
-On Fri, Oct 30, 2026 at 01:58:57PM -0700, Doug Ledford wrote:
-> Start the Cassini core driver (cxi-ss1) with its headers: the register
-> and counter definitions, error definitions, telemetry item tables, and
-> the CXI interface (cxi.h, cxi_prov_hw.h, libcassini.h) through which
-> client drivers use the NIC.
-> 
-> The cassini_* headers are generated from the hardware description and
-> are not meant to be edited by hand, so they carry the generator's
-> formatting.  cassini_user_defs.h is shared byte-for-byte with the user
-> space libraries and is therefore under include/uapi/ethernet.
+On Sat, Oct 31, 2026 at 06:09 AM Jay Wang <wanjay@amazon.com> wrote:
+> That is free today because the vmlinux BTF is parsed at boot.  Once it
+> is parsed on first use (CONFIG_DEBUG_INFO_BTF_LAZY, later in this
+> series), it would let any user make the kernel parse it and keep it
+> parsed until reboot, which is what the option is meant to avoid on
+> systems that do not use BTF.
 
-You want to keep the UAPI as small as possible, because once this is
-merged, it can never change in ways that break backwards
-compatibility. 
+Any user can do that without this mount.
+/sys/kernel/btf/vmlinux is 0444. With patch 9 one read() decompresses
+5.5 MB into vmalloc_user() memory that is never freed.
+The parse is the other 2 MB.
+After the first use the kernel has what every BTF=y kernel has today.
+There is nothing to guard.
 
-We also strongly discourage APIs that allow user space drivers, which,
-at first glance, such definitions would allow. 
+> Check the capability first.  An unprivileged caller could only ever set
+> an empty mask; such a no-op delegate option, and a malformed value,
+> now fail with EPERM as well instead of being accepted or failing with
+> EINVAL.  Privileged callers are not affected.
 
-
-> It
-> provides inline accessors that need errno.h, string.h and size_t,
-> which a standalone UAPI header cannot assume, so this patch excludes
-> it from the UAPI header self-test.
-
-Does any other driver do this? If you are doing something which no
-other driver does, it is probably broken.
-
-> checkpatch --strict (100 columns) still reports the following in this
-> patch.
-
-netdev prefers 80.
-
-> They need coordination with the internal repositories this code
-> is maintained in and will be fixed in V2:
-
-Your internal repos don't matter. Once this is merged it has a life of
-its own.
-
-	Andrew
+That changes what user space sees, with or without the option.
+Drop this patch.
